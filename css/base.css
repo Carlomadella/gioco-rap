@@ -1,0 +1,40 @@
+/* Variabili, reset, tipografia, fondale della pagina, griglia principale. */
+
+:root{
+  --bg:#0B0B0D; --card:#17171C; --card-2:#1E1E25; --line:rgba(255,255,255,.09);
+  --text:#fff; --soft:#A8A8B3; --faint:#6C6C7A;
+  --hot:#FF5A36; --violet:#B026FF; --acid:#FFC53D; --sky:#3DC7FF; --pink:#FF4D9D;
+  --green:#57C98B;
+  --r:16px;
+  --disp:"Archivo Black","Figtree",system-ui,sans-serif;
+  --cond:"Barlow Condensed","Figtree",system-ui,sans-serif;
+  --c1:#FF5A36;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:90px}
+html,body{margin:0;background:#08080B;color:var(--text);
+  font-family:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+/* fondale del gioco: alone del tuo colore, grana vera, vignetta */
+body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+  transform:translateZ(0);will-change:transform;
+  background:
+    radial-gradient(115% 62% at 50% -12%, color-mix(in srgb, var(--c1) 52%, transparent) 0%, transparent 60%),
+    radial-gradient(70% 46% at 86% 6%, rgba(176,38,255,.26), transparent 62%),
+    linear-gradient(180deg,#131120 0%,#0B0A11 42%,#08080B 100%)}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.055;
+  transform:translateZ(0);will-change:transform;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:160px 160px}
+h1,h2,h3{font-family:var(--disp);letter-spacing:-.01em;font-weight:400}
+button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,select{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--acid);outline-offset:2px}
+
+.wrap{max-width:1040px;margin:0 auto;padding:34px 22px 130px}
+.top{margin-bottom:26px}
+.top .kicker{font-size:14px;font-weight:700;color:var(--soft)}
+.top h1{font-size:clamp(38px,7vw,60px);font-weight:900;letter-spacing:-.035em;margin:4px 0 0;line-height:1}
+.top p{margin:10px 0 0;color:var(--soft);font-size:16px;max-width:60ch;font-weight:500}
+
+.grid{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}

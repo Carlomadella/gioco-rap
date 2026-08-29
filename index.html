@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anni di Fame</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=Archivo+Black&family=Barlow+Condensed:wght@600;700;800&display=swap">
+
+<!-- Fogli di stile: l'ordine conta, la cascata è quella originale. -->
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/preview.css">
+<link rel="stylesheet" href="css/shell.css">
+<link rel="stylesheet" href="css/game.css">
+<link rel="stylesheet" href="css/overlays.css">
+<link rel="stylesheet" href="css/effects.css">
+<link rel="stylesheet" href="css/hud.css">
+<link rel="stylesheet" href="css/forms.css">
+<link rel="stylesheet" href="css/actionbar.css">
+</head>
+<body>
+
+<div class="topnav">
+  <button class="navback" id="nav-back" hidden><span class="arw">‹</span> Menu principale</button>
+  <div id="nav-spacer"></div>
+  <button class="avatarbtn" id="nav-avatar" aria-label="Apri il tuo artista"></button>
+</div>
+
+<section class="screen on" id="s-menu">
+  <div class="menu">
+    <div class="mhero" id="mhero">
+      <div class="mport" id="m-port"></div>
+      <div class="mtxt">
+        <div class="game">Anni di Fame</div>
+        <h1 id="m-name">Crea il tuo artista</h1>
+        <p id="m-meta">Nessuna carriera iniziata</p>
+      </div>
+    </div>
+
+    <div class="mlist">
+      <button class="mrow big" id="m-play">
+        <span class="ic">▶</span>
+        <span class="tx"><span class="a" id="m-play-a">Inizia la carriera</span>
+        <span class="b" id="m-play-b">Prima devi creare il tuo artista</span></span>
+      </button>
+      <button class="mrow" data-go="profile">
+        <span class="ic" style="background:var(--hot)">A</span>
+        <span class="tx"><span class="a">Il tuo artista</span><span class="b">Aspetto, città, genere</span></span>
+      </button>
+      <button class="mrow" data-go="soon">
+        <span class="ic" style="background:var(--sky)">C</span>
+        <span class="tx"><span class="a">Classifiche</span><span class="b">Chi comanda questa settimana</span></span>
+      </button>
+      <button class="mrow" data-go="soon">
+        <span class="ic" style="background:var(--acid)">?</span>
+        <span class="tx"><span class="a">Come si gioca</span><span class="b">Regole, energia, contratti</span></span>
+      </button>
+    </div>
+    <p class="mfoot">La Fame Studio · prototipo. La partita è salvata su questo dispositivo.</p>
+  </div>
+</section>
+
+
+<section class="screen" id="s-game">
+  <div class="game-wrap">
+    <div class="hero2" id="gtop">
+      <div class="in2">
+        <div class="bigport" id="g-port"></div>
+        <div class="h2txt">
+          <div class="h2name" id="g-name">—</div>
+          <div class="h2sub" id="g-meta">—</div>
+          <div class="lvlrow">
+            <span class="lvl" id="g-lvl">LIV 1</span>
+            <span class="xp"><i id="g-xp" style="width:0"></i><span id="g-xptxt"></span></span>
+          </div>
+        </div>
+        <button class="mutebtn" id="g-mute" aria-label="Audio">♪</button>
+      </div>
+    </div>
+
+    <div class="res" id="g-res"></div>
+    <div class="gstats" id="g-stats"></div>
+
+    <div class="nav2">
+      <button class="nb on" data-t="settimana"><svg viewBox="0 0 24 24"><path d="M7 2h2v3H7zm8 0h2v3h-2zM4 7h16v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2 4v2h3v-2zm5 0v2h3v-2zm5 0v2h2v-2zM6 15v2h3v-2zm5 0v2h3v-2z"/></svg><span>Settimana</span></button>
+      <button class="nb" data-t="catalogo"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18m0 6.6a2.4 2.4 0 1 1 0 4.8 2.4 2.4 0 0 1 0-4.8"/></svg><span>Catalogo</span></button>
+      <button class="nb" data-t="classifica"><svg viewBox="0 0 24 24"><path d="M4 20V10h4v10zm6 0V4h4v16zm6 0v-7h4v7z"/></svg><span>Classifica</span></button>
+      <button class="nb" data-t="contratti"><svg viewBox="0 0 24 24"><path d="M6 2h8l4 4v16H6zm7 1.5V7h3.5zM8 11h8v2H8zm0 4h8v2H8z"/></svg><span>Contratti</span></button>
+      <button class="nb" data-t="lifestyle"><svg viewBox="0 0 24 24"><path d="M12 3l9 7v11h-6v-6H9v6H3V10z"/></svg><span>Lifestyle</span></button>
+      <button class="nb" data-t="obiettivi"><svg viewBox="0 0 24 24"><path d="M6 3h12v2h3v3a4 4 0 0 1-4 4h-.4A6 6 0 0 1 13 15.9V18h3v3H8v-3h3v-2.1A6 6 0 0 1 7.4 12H7a4 4 0 0 1-4-4V5h3zM5 7v1a2 2 0 0 0 2 2V7zm14 0h-2v3a2 2 0 0 0 2-2z"/></svg><span>Traguardi</span></button>
+    </div>
+
+    <div class="gcols">
+      <div>
+        <div class="gpane on" data-p="settimana"><div id="g-phase"></div><div class="acts" id="g-actions"></div></div>
+        <div class="gpane" data-p="catalogo">
+          <div class="list"><h3>Materiale in cartella</h3><div id="g-mat"></div></div>
+          <div class="list"><h3>Beat in vendita</h3><div id="g-market"></div></div>
+          <div class="list"><h3>I tuoi pezzi</h3><div id="g-songs"></div></div>
+          <div class="list"><h3>Attrezzatura</h3><div id="g-shop"></div></div>
+        </div>
+        <div class="gpane" data-p="classifica"><div class="list"><h3>Top 10 della settimana</h3><div id="g-chart"></div></div></div>
+        <div class="gpane" data-p="contratti">
+          <div class="list"><h3>Offerte sul tavolo</h3><div id="g-offers"></div></div>
+          <div class="list"><h3>Contratto in corso</h3><div id="g-deal"></div></div>
+        </div>
+        <div class="gpane" data-p="lifestyle">
+          <div class="list"><h3>Le tue spese fisse</h3><div id="g-lifesum"></div></div>
+          <div id="g-life"></div>
+        </div>
+        <div class="gpane" data-p="obiettivi"><div class="list"><h3>Traguardi</h3><div id="g-goals"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar"><div class="in">
+    <div class="who"><div class="a" id="g-bar-a">—</div><div class="b" id="g-bar-b">—</div></div>
+    <button class="ghost" id="g-diary">Diario<i class="dbdg" id="g-dbdg" hidden></i></button><button class="ghost" id="g-menu">Menu principale</button>
+    <button class="solid" id="g-advance">Chiudi la settimana</button>
+  </div></div>
+</section>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="grn"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/>
+    <feColorMatrix type="saturate" values="0"/></filter>
+  <radialGradient id="vg" cx="50%" cy="42%" r="72%">
+    <stop offset="55%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity=".62"/>
+  </radialGradient>
+</defs></svg>
+
+<div class="piazza" id="piazza"><div class="pwrap">
+  <div class="phead"><div class="pk">Freestyle in piazza</div><button class="px" id="p-x">✕</button></div>
+  <div class="scena" id="p-scena"></div>
+  <div class="pcount" id="p-count"></div>
+  <div id="p-body"></div>
+</div></div>
+
+<div class="writer" id="writer"><div class="wwrap">
+  <div class="whead"><div><div class="wk">Il foglio</div><h2 id="w-title">Scrivi la tua strofa</h2></div>
+    <button class="wx" id="w-x">✕</button></div>
+  <div class="stanza" id="w-stanza"></div>
+  <div class="wtema" id="w-tema"></div>
+  <div id="w-body"></div>
+</div>
+<div class="wbar"><div class="in">
+  <div class="st" id="w-st">—</div>
+  <button class="gh" id="w-cancel">Lascia perdere</button>
+  <button class="sl" id="w-done">Chiudi la strofa</button>
+</div></div></div>
+
+<div class="drawer" id="drawer"><div class="dwrap">
+  <div class="dhead"><h3>Diario</h3><button class="dclose" id="d-close">✕</button></div>
+  <div class="feed" id="g-feed"></div>
+</div></div>
+
+<div class="report" id="report"><div class="rcard">
+  <div class="k" id="r-k">Settimana chiusa</div>
+  <h2 id="r-t">Anno 1 · Settimana 2</h2>
+  <div class="rgrid" id="r-grid"></div>
+  <div class="rpos" id="r-pos"></div>
+  <div class="rnews" id="r-news"></div>
+  <button class="solid" id="r-go" style="width:100%">Avanti</button>
+</div></div>
+
+<div class="flash" id="flash"><div><div class="big" id="f-big"></div><div class="sub" id="f-sub"></div></div></div>
+
+<div class="modal" id="modal"><div class="sheet2">
+  <span class="k" id="m-k"></span><h2 id="m-t"></h2><p id="m-d"></p><div id="m-opts"></div>
+</div></div>
+
+<section class="screen" id="s-profile">
+<div class="wrap">
+  <div class="top">
+    <div class="kicker">Anni di Fame</div>
+    <h1>Il tuo artista</h1>
+    <p>Chi sei prima ancora del primo pezzo. Tutto quello che scegli qui resta modificabile per tutta la carriera — tranne da dove vieni.</p>
+  </div>
+
+  <div class="grid">
+    <!-- anteprima -->
+    <div class="preview">
+      <div class="stage" id="stage">
+        <div class="vista"><button class="vb on" data-vista="volto">Volto</button><button class="vb" data-vista="intero">Figura intera</button></div>
+        <div id="figure"></div>
+        <div class="nameplate">
+          <div class="nm" id="pv-name">Senza Nome</div>
+          <div class="sub" id="pv-sub">—</div>
+        </div>
+      </div>
+      <div class="silh"><div id="silh"></div><div class="sc" id="silh-txt"></div></div>
+      <div class="readout">
+        <div class="line"><span>Altezza</span><span id="pv-h">178 cm</span></div>
+        <div class="line"><span>Peso</span><span id="pv-w">72 kg</span></div>
+        <div class="line"><span>Corporatura</span><span id="pv-build">normale</span></div>
+        <div class="line"><span>Vestito</span><span id="pv-fit">Felpa oversize</span></div>
+      </div>
+      <p class="desc" id="pv-desc"></p>
+    </div>
+
+    <!-- moduli -->
+    <div>
+      <div class="panel">
+        <h2>Identità</h2>
+        <p class="hint">Il nome con cui ti chiameranno. Puoi cambiarlo, ma i fan si affezionano.</p>
+
+        <div class="field">
+          <label for="name">Nome d'arte</label>
+          <input class="txt" id="name" maxlength="22" placeholder="Scrivi il tuo nome" autocomplete="off">
+        </div>
+
+        <div class="field">
+          <label for="city">Città di provenienza <span class="sub">non si cambia più</span></label>
+          <input class="txt" id="city" maxlength="28" placeholder="Scrivi da dove vieni" autocomplete="off">
+        </div>
+
+        <div class="field">
+          <label>Com'è la scena dove sei cresciuto</label>
+          <div class="chips" id="scenes"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Corpo</h2>
+        <p class="hint">Cambia solo come appari e come ti descrivono. Nessun bonus, nessun malus.</p>
+        <div class="field">
+          <label>Carnagione</label>
+          <div class="swatches" id="skins"></div>
+        </div>
+        <div class="field">
+          <label for="h">Altezza</label>
+          <div class="slider"><input type="range" id="h" min="155" max="205" value="178"><span class="val" id="hv">178 cm</span></div>
+        </div>
+        <div class="field">
+          <label for="w">Peso</label>
+          <div class="slider"><input type="range" id="w" min="45" max="140" value="72"><span class="val" id="wv">72 kg</span></div>
+        </div>
+        <div class="field">
+          <label>Forma del viso</label>
+          <div class="chips" id="faces"></div>
+        </div>
+        <div class="field">
+          <label>Capelli</label>
+          <div class="chips" id="hairs"></div>
+        </div>
+        <div class="field">
+          <label>Colore dei capelli</label>
+          <div class="swatches" id="haircols"></div>
+        </div>
+        <div class="field">
+          <label>Colore degli occhi</label>
+          <div class="swatches" id="eyecols"></div>
+        </div>
+        <div class="field">
+          <label>Sopracciglia</label>
+          <div class="chips" id="brows"></div>
+        </div>
+        <div class="field">
+          <label>Bocca</label>
+          <div class="chips" id="mouths"></div>
+        </div>
+        <div class="field">
+          <label>Espressione <span class="sub">come ti presenti al mondo</span></label>
+          <div class="chips" id="moods"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Vestiario</h2>
+        <p class="hint">Lo stile conta: cambia come ti guardano sul palco e quanto ti prendono sul serio.</p>
+        <div class="field">
+          <div class="tiles" id="fits"></div>
+        </div>
+        <div class="field">
+          <label>Colore principale <span class="sub">tinge tutto il gioco</span></label>
+          <div class="swatches" id="colors"></div>
+        </div>
+        <div class="field">
+          <label>Colore del vestito</label>
+          <div class="swatches" id="clothcols"></div>
+        </div>
+        <div class="field">
+          <label>Cappello</label>
+          <div class="chips" id="hats"></div>
+        </div>
+        <div class="field">
+          <label>Occhiali</label>
+          <div class="chips" id="glasses"></div>
+        </div>
+        <div class="field">
+          <label>Catena</label>
+          <div class="chips" id="chains"></div>
+        </div>
+        <div class="field">
+          <label>Barba</label>
+          <div class="chips" id="beards"></div>
+        </div>
+        <div class="field">
+          <label>Orecchini</label>
+          <div class="chips" id="ears"></div>
+        </div>
+        <div class="field">
+          <label>Denti</label>
+          <div class="chips" id="grillzs"></div>
+        </div>
+        <div class="field">
+          <label>Tatuaggi</label>
+          <div class="chips" id="tattoos"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Il tuo stile</h2>
+        <p class="hint">Il genere che fai. Da dove parti: puoi cambiare strada più avanti, ma perdi parte del pubblico.</p>
+        <div class="genres" id="genres"></div>
+      </div>
+
+      <div class="effects">
+        <h2>Che artista sei</h2>
+        <div id="effects"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bar">
+  <div class="in">
+    <div class="who">
+      <div class="a" id="bar-name">Senza Nome</div>
+      <div class="b" id="bar-sub">Completa il nome per iniziare</div>
+    </div>
+    <span class="saved" id="saved" hidden>Salvato</span>
+    <button class="ghost" id="to-menu">Menu principale</button>
+    <button class="ghost" id="rand">Casuale</button>
+    <button class="solid" id="save" disabled>Salva artista</button>
+  </div>
+</div>
+</section>
+
+<!-- Script classici, caricati in ordine: ogni file usa quello che viene prima. -->
+<script src="js/core.js"></script>
+
+<!-- Creatore dell'artista -->
+<script src="js/creator/data.js"></script>
+<script src="js/creator/state.js"></script>
+<script src="js/creator/portrait.js"></script>
+<script src="js/creator/render.js"></script>
+<script src="js/creator/events.js"></script>
+<script src="js/creator/nav.js"></script>
+
+<!-- Partita -->
+<script src="js/game/state.js"></script>
+<script src="js/game/content.js"></script>
+<script src="js/game/covers.js"></script>
+<script src="js/game/rivals.js"></script>
+<script src="js/game/actions.js"></script>
+<script src="js/game/events.js"></script>
+<script src="js/game/phases.js"></script>
+<script src="js/game/sim.js"></script>
+<script src="js/game/writer.js"></script>
+<script src="js/game/piazza.js"></script>
+<script src="js/game/copertine.js"></script>
+<script src="js/game/modal.js"></script>
+<script src="js/game/scene-art.js"></script>
+<script src="js/game/ui.js"></script>
+<script src="js/game/lifestyle.js"></script>
+<script src="js/game/fx.js"></script>
+</body>
+</html>

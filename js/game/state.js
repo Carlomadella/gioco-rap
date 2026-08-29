@@ -1,0 +1,29 @@
+/* Stato della partita (G), valori iniziali, salvataggio. */
+"use strict";
+
+/* helper numerici usati solo dal gioco ($ e pick stanno in js/core.js) */
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const rnd = (a,b) => a + Math.random()*(b-a);
+const fmt = n => Math.round(n).toLocaleString("it-IT");
+const short = n => n >= 1e6 ? (n/1e6).toFixed(1).replace(".",",")+"M"
+  : n >= 1000 ? (n/1000).toFixed(1).replace(".",",")+"k" : String(Math.round(n));
+
+/* ==================== STATO ==================== */
+const SAVE_KEY = "anni-di-fame-partita-v2";
+const START = () => ({
+  week:1, year:1, age:19,
+  energy:3, maxEnergy:3,
+  money:220, fans:0, hype:0, wellbeing:80,
+  skills:{scrittura:8, flow:6, presenza:5, rete:4},
+  songs:[], bars:[], beats:[], market:[], job:null, shifts:0,
+  life:{casa:0, auto:0, look:0, uscite:0, crew:0}, gear:{}, contract:null, obligation:null,
+  offersSeen:{}, goals:{}, log:[], streak:0,
+  phase:0, trialCd:0, trialsDone:{}, evCd:{}, seenLog:0,
+  rivals:[], chartPrev:99, streamsPrev:0,
+  best:{fans:0, chart:99}, ended:false
+});
+let G = START();
+window.__G = () => G;
+try{ const r = localStorage.getItem(SAVE_KEY); if(r) G = Object.assign(START(), JSON.parse(r)); }catch(e){}
+function save(){ try{ if(typeof salvaConCopertine === 'function') salvaConCopertine();
+  else localStorage.setItem(SAVE_KEY, JSON.stringify(G)); }catch(e){} }

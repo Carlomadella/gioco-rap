@@ -1,0 +1,62 @@
+/* Moduli del creatore: pannelli, campi, slider, chip, campionari colore. */
+
+/* ---- pannelli ---- */
+.panel{background:var(--card);border-radius:var(--r);padding:20px;margin-bottom:16px}
+.panel h2{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
+.panel .hint{font-size:13.5px;color:var(--faint);margin:0 0 16px;font-weight:500}
+
+.field{margin-bottom:18px}
+.field:last-child{margin-bottom:0}
+.field > label{display:block;font-size:14px;font-weight:700;margin-bottom:8px}
+.field .sub{font-size:13px;color:var(--faint);font-weight:500;margin-left:6px}
+
+.txt{width:100%;background:var(--card-2);border:1.5px solid transparent;border-radius:12px;
+  padding:14px 16px;color:#fff;font-size:17px;font-weight:700;letter-spacing:-.01em}
+.txt::placeholder{color:var(--faint);font-weight:600}
+.txt:focus{border-color:var(--acid);outline:none}
+
+.slider{display:flex;align-items:center;gap:14px}
+.slider input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:6px;border-radius:4px;
+  background:linear-gradient(90deg,var(--hot),var(--violet));outline:none}
+.slider input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;
+  border-radius:50%;background:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.slider input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;
+  border:none;cursor:pointer}
+.slider .val{min-width:84px;text-align:right;font-size:19px;font-weight:800;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:10px 16px;border-radius:999px;background:var(--card-2);font-size:14.5px;font-weight:700;
+  transition:background .15s,color .15s;border:1.5px solid transparent}
+.chip:hover{background:#26262F}
+.chip.on{background:#fff;color:#0B0B0D}
+
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+.otile{border-radius:13px;background:var(--card-2);padding:10px;text-align:center;
+  border:2px solid transparent;transition:border-color .15s,background .15s}
+.otile:hover{background:#26262F}
+.otile.on{border-color:#fff}
+.otile .sw{height:56px;border-radius:9px;margin-bottom:8px}
+.otile .lb{font-size:12.5px;font-weight:700;line-height:1.25}
+
+.swatches{display:flex;gap:9px;flex-wrap:wrap}
+.sw-btn{width:44px;height:44px;border-radius:12px;border:2.5px solid transparent;transition:transform .12s}
+.sw-btn:hover{transform:scale(1.08)}
+.sw-btn.on{border-color:#fff}
+
+.genres{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:10px}
+.gcard{background:var(--card-2);border-radius:13px;padding:14px;text-align:left;
+  border:2px solid transparent;transition:border-color .15s,background .15s}
+.gcard:hover{background:#26262F}
+.gcard.on{border-color:#fff}
+.gcard .gn{font-size:16px;font-weight:800;letter-spacing:-.015em}
+.gcard .gd{font-size:12.5px;color:var(--soft);line-height:1.35;margin-top:3px;font-weight:500}
+.gcard .gb{font-size:12.5px;font-weight:700;color:var(--acid);margin-top:7px}
+
+.effects{background:linear-gradient(135deg,rgba(255,90,54,.16),rgba(176,38,255,.12));
+  border-radius:var(--r);padding:20px;margin-bottom:16px}
+.effects h2{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 12px}
+.eff{display:flex;gap:11px;align-items:flex-start;font-size:14px;margin-bottom:9px;line-height:1.45}
+.eff:last-child{margin-bottom:0}
+.eff b{font-weight:800}
+.eff .dot{width:8px;height:8px;border-radius:50%;background:var(--acid);flex:none;margin-top:7px}

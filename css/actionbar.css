@@ -1,0 +1,37 @@
+/* Barra fissa in basso e bottoni principali. */
+
+.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(11,11,13,.94);backdrop-filter:blur(16px);
+  border-top:1px solid var(--line);z-index:30}
+.bar .in{max-width:1040px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;
+  gap:10px;flex-wrap:wrap}
+.bar .who{flex:1 1 160px}
+.bar .who{flex:none;min-width:0;margin-right:auto}
+.bar .who .a{font-size:16px;font-weight:800;letter-spacing:-.015em;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis}
+.bar .who .b{font-size:13px;color:var(--soft);font-weight:500}
+/* bottoni fisici: bordo spesso, spallina sotto, si abbassano quando li premi */
+.ghost{font-family:var(--cond);padding:11px 20px;border-radius:13px;font-size:16px;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;color:#E4E4EC;
+  background:linear-gradient(180deg,#2C2C39,#1B1B24);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1.5px rgba(255,255,255,.09),
+    0 4px 0 #0A0A0F, 0 8px 16px rgba(0,0,0,.45);
+  transition:transform .1s, box-shadow .1s}
+.ghost:hover{background:linear-gradient(180deg,#373746,#22222D)}
+.ghost:active{transform:translateY(3px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.15), inset 0 0 0 1.5px rgba(255,255,255,.09), 0 1px 0 #0A0A0F}
+.solid{position:relative;font-family:var(--cond);padding:13px 30px;border-radius:14px;
+  color:#231402;font-size:19px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;overflow:hidden;
+  background:linear-gradient(180deg,#FFE9A6 0%,#FFC53D 42%,#F2A413 100%);
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.7), inset 0 0 0 1.5px rgba(255,255,255,.35),
+    0 5px 0 #8A5B04, 0 12px 24px rgba(255,150,20,.28);
+  transition:transform .1s, box-shadow .1s, filter .15s}
+.solid::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);
+  animation:sweep 3.4s ease-in-out infinite}
+@keyframes sweep{0%,72%{left:-60%}100%{left:130%}}
+.solid:hover{filter:brightness(1.06)}
+.solid:active{transform:translateY(4px);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.6), 0 1px 0 #8A5B04}
+.solid:disabled{filter:grayscale(.8) brightness(.7);transform:none;cursor:not-allowed;
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.14), 0 3px 0 #17171D}
+.solid:disabled::after{display:none}
+.saved{font-size:14px;font-weight:700;color:var(--acid)}
