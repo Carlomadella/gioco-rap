@@ -39,22 +39,29 @@ const GENRES = [
 ];
 
 const FITS = [
-  {id:"felpa",   n:"Felpa oversize",   top:"#39404C", hood:true,  collar:"crew"},
-  {id:"tuta",    n:"Tuta sportiva",    top:"#2B6CF0", hood:false, collar:"zip", accent:true},
-  {id:"pelle",   n:"Giacca di pelle",  top:"#141416", hood:false, collar:"lapel", shine:true},
-  {id:"black",   n:"Total black",      top:"#0E0E11", hood:true,  collar:"crew"},
-  {id:"street",  n:"Streetwear",       top:"#E8452F", hood:false, collar:"crew", accent:true},
-  {id:"canotta", n:"Canotta",          top:"#EDEDEF", hood:false, collar:"tank"},
-  {id:"elegante",n:"Giacca elegante",  top:"#26313F", hood:false, collar:"lapel"},
-  {id:"piumino", n:"Piumino",          top:"#3A3F49", hood:true,  collar:"puffer"}
+  {id:"felpa",   n:"Hoodie",          top:"#39404C", hood:true,  collar:"crew"},
+  {id:"tshirt",  n:"T-shirt",         top:"#E7E7EA", hood:false, collar:"tee"},
+  {id:"bomber",  n:"Bomber",          top:"#2E3440", hood:false, collar:"bomber"},
+  {id:"piumino", n:"Piumino",         top:"#3A3F49", hood:true,  collar:"puffer"},
+  {id:"pelle",   n:"Giacca di pelle", top:"#141416", hood:false, collar:"lapel", shine:true},
+  {id:"varsity", n:"Giacca varsity",  top:"#8A2033", hood:false, collar:"varsity"},
+  {id:"canotta", n:"Canotta",         top:"#EDEDEF", hood:false, collar:"tank"},
+  {id:"tuta",    n:"Tuta sportiva",   top:"#2B6CF0", hood:false, collar:"zip", accent:true},
+  {id:"elegante",n:"Giacca elegante", top:"#26313F", hood:false, collar:"lapel"},
+  {id:"black",   n:"Total black",     top:"#0E0E11", hood:true,  collar:"crew"},
+  {id:"street",  n:"Streetwear",      top:"#E8452F", hood:false, collar:"crew", accent:true}
 ];
 
 const SKINS = ["#FBE0C4","#F2CBA8","#E8B991","#DDA679","#C68A5C","#B0774A","#9A6238","#82502D","#684023","#4E2F1C","#3A2214"];
 const HAIRS = [
-  {id:"corti",n:"Corti"},{id:"rasati",n:"Rasati"},{id:"fade",n:"Fade"},{id:"spazzola",n:"A spazzola"},
-  {id:"treccine",n:"Treccine"},{id:"dread",n:"Dread"},{id:"afro",n:"Afro"},{id:"ricci",n:"Ricci"},
-  {id:"lunghi",n:"Lunghi"},{id:"coda",n:"Coda"},{id:"durag",n:"Durag"},{id:"cappuccio",n:"Cappuccio su"}
+  {id:"corti",n:"Corti"},{id:"fade",n:"Fade"},{id:"buzz",n:"Buzz cut"},{id:"rasati",n:"Rasati"},
+  {id:"spazzola",n:"A spazzola"},{id:"ricci",n:"Ricci"},{id:"afro",n:"Afro"},
+  {id:"treccine",n:"Treccine"},{id:"cornrows",n:"Cornrows"},{id:"twist",n:"Twist"},
+  {id:"dread",n:"Dread"},{id:"dreadlunghe",n:"Dread lunghe"},{id:"dreadcorte",n:"Dread corte"},
+  {id:"mullet",n:"Mullet"},{id:"lunghi",n:"Lunghi"},{id:"coda",n:"Coda"},
+  {id:"durag",n:"Durag"},{id:"cappuccio",n:"Cappuccio su"}
 ];
+
 const HAIRCOLS = [
   {c:"#100D0C",n:"Nero"},{c:"#3A2418",n:"Castano"},{c:"#6B4426",n:"Castano chiaro"},
   {c:"#B98A3C",n:"Biondo"},{c:"#E3DCC9",n:"Platino"},{c:"#8C3A1E",n:"Rosso"},
@@ -62,8 +69,14 @@ const HAIRCOLS = [
 ];
 const FACES = [{id:"ovale",n:"Ovale"},{id:"squadrato",n:"Squadrato"},{id:"tondo",n:"Tondo"},{id:"affilato",n:"Affilato"}];
 const EYECOLS = [
-  {c:"#3A2A1A",n:"Scuri"},{c:"#6B4E2A",n:"Nocciola"},{c:"#2E4A6B",n:"Azzurri"},
-  {c:"#3B6B4A",n:"Verdi"},{c:"#1A1414",n:"Neri"},{c:"#5F6570",n:"Grigi"}
+  {c:"#3A2A1A",n:"Marroni"},{c:"#1A1414",n:"Neri"},{c:"#6B4E2A",n:"Nocciola"},
+  {c:"#2E4A6B",n:"Azzurri"},{c:"#3B6B4A",n:"Verdi"},{c:"#5F6570",n:"Grigi"}
+];
+/* la forma dell'occhio: "auto" la lascia decidere all'espressione, le altre la fissano */
+const EYES = [
+  {id:"auto",n:"Come l'espressione"},{id:"normali",n:"Normali"},{id:"stretti",n:"Stretti"},
+  {id:"spalancati",n:"Spalancati"},{id:"socchiusi",n:"Socchiusi"},
+  {id:"sicuri",n:"Sicuri"},{id:"freddi",n:"Freddi"}
 ];
 const BROWS = [{id:"naturali",n:"Naturali"},{id:"folte",n:"Folte"},{id:"sottili",n:"Sottili"},{id:"taglio",n:"Col taglio"}];
 const MOODS = [
@@ -79,15 +92,19 @@ const MOODS = [
 ];
 const MOUTHS = [{id:"normale",n:"Normale"},{id:"carnosa",n:"Carnosa"},{id:"sottile",n:"Sottile"},{id:"seria",n:"Seria"}];
 const HATS = [
-  {id:"no",n:"Niente"},{id:"cappellino",n:"Cappellino"},{id:"lato",n:"Cappellino di lato"},
-  {id:"dietro",n:"Cappellino al contrario"},{id:"beanie",n:"Beanie"},{id:"bandana",n:"Bandana"}
+  {id:"no",n:"Niente"},{id:"cappellino",n:"Snapback"},{id:"lato",n:"Snapback laterale"},
+  {id:"dietro",n:"Snapback rovesciato"},{id:"ny",n:"Cappellino NY"},{id:"la",n:"Cappellino LA"},
+  {id:"beanie",n:"Beanie"},{id:"bucket",n:"Bucket"},{id:"bandana",n:"Bandana"}
 ];
 const EARS = [{id:"no",n:"Niente"},{id:"cerchio",n:"Cerchio"},{id:"brillante",n:"Brillante"},{id:"doppio",n:"Doppio"}];
 const GRILLZ = [{id:"no",n:"Niente"},{id:"oro",n:"Oro"},{id:"diamanti",n:"Diamanti"}];
 const COLORS = ["#FF5A36","#B026FF","#FFC53D","#3DC7FF","#FF4D9D","#57C98B","#EDEDEF","#111114"];
-const GLASSES = [{id:"no",n:"Niente"},{id:"scuri",n:"Scuri"},{id:"piccoli",n:"Lenti piccole"},{id:"vista",n:"Da vista"}];
+const GLASSES = [{id:"no",n:"Niente"},{id:"piccoli",n:"Occhiali piccoli"},{id:"grandi",n:"Occhiali grandi"},
+  {id:"scuri",n:"Occhiali neri"},{id:"colorati",n:"Occhiali colorati"},{id:"vista",n:"Da vista"}];
+const CUFFIE  = [{id:"no",n:"Niente"},{id:"cuffie",n:"Cuffie"},{id:"collo",n:"Cuffie al collo"}];
 const CHAINS  = [{id:"no",n:"Niente"},{id:"sottile",n:"Sottile"},{id:"grossa",n:"Grossa"},{id:"doppia",n:"Doppia"}];
 const BEARDS  = [{id:"no",n:"Rasato"},{id:"ombra",n:"Ombra"},{id:"baffi",n:"Baffi"},
   {id:"pizzetto",n:"Pizzetto"},{id:"corta",n:"Corta"},{id:"piena",n:"Piena"}];
-const TATTOOS = [{id:"no",n:"Niente"},{id:"collo",n:"Sul collo"},{id:"lacrima",n:"Sotto l'occhio"},
-  {id:"stelle",n:"Stelle sul viso"},{id:"croce",n:"Croce"},{id:"scritta",n:"Scritta sullo zigomo"}];
+const TATTOOS = [{id:"no",n:"Nessuno"},{id:"lacrima",n:"Lacrima"},{id:"croce",n:"Croce"},
+  {id:"rosa",n:"Rosa"},{id:"corona",n:"Corona"},{id:"stelle",n:"Stelle sul viso"},
+  {id:"scritta",n:"Scritta sul viso"},{id:"collo",n:"Scritta sul collo"},{id:"fullneck",n:"Full neck"}];

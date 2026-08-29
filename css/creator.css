@@ -37,13 +37,10 @@
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
 .cathead{font-family:var(--cond);font-size:13.5px;font-weight:800;letter-spacing:.14em;
   text-transform:uppercase;color:var(--soft);text-align:center;margin-bottom:10px}
-.optrow{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;
-  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
-.optrow + .optrow{margin-top:7px}
-.optrow::-webkit-scrollbar{height:4px}
-.optrow::-webkit-scrollbar-track{background:transparent}
-.optrow::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:2px}
-.optrow:hover::-webkit-scrollbar-thumb{background:rgba(255,255,255,.3)}
+/* le opzioni vanno a capo invece di scorrere: con diciotto tagli di capelli
+   una riga che scorre ne nasconde tredici, e quello che non si vede non si sceglie */
+.optrow{display:flex;flex-wrap:wrap;gap:7px}
+.optrow + .optrow{margin-top:9px;padding-top:9px;border-top:1px solid rgba(255,255,255,.07)}
 .opt{flex:none;width:52px;height:52px;border-radius:11px;overflow:hidden;padding:0;background:#0D0D12;
   box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.09);transition:box-shadow .14s, transform .12s}
 .opt:hover{transform:translateY(-2px);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.3)}

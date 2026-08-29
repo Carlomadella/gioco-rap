@@ -109,49 +109,49 @@ const PRESETS = [
   {n:"Il ricciolo", bg:0, look:{
     skin:"#C68A5C", hair:"ricci", hairCol:"#100D0C", face:"ovale", eyeCol:"#3A2A1A",
     brow:"folte", mouth:"carnosa", mood:"neutro", beard:"pizzetto", hat:"no",
-    glasses:"no", chain:"grossa", ear:"brillante", grillz:"no", tattoo:"lacrima",
+    glasses:"no", eyes:"auto", cuffie:"no", chain:"grossa", ear:"brillante", grillz:"no", tattoo:"lacrima",
     fit:"felpa", clothCol:"#0E0E11", color:"#FFC53D"}},
 
   {n:"Il beanie", bg:1, look:{
     skin:"#B0774A", hair:"treccine", hairCol:"#1B1310", face:"squadrato", eyeCol:"#6B4E2A",
     brow:"folte", mouth:"normale", mood:"freddo", beard:"pizzetto", hat:"beanie",
-    glasses:"no", chain:"doppia", ear:"brillante", grillz:"no", tattoo:"no",
+    glasses:"no", eyes:"auto", cuffie:"no", chain:"doppia", ear:"brillante", grillz:"no", tattoo:"no",
     fit:"felpa", clothCol:"#0E0E11", color:"#EDEDEF"}},
 
   {n:"Il cappellino", bg:2, look:{
     skin:"#DDA679", hair:"fade", hairCol:"#100D0C", face:"ovale", eyeCol:"#3A2A1A",
     brow:"naturali", mouth:"normale", mood:"sicuro", beard:"pizzetto", hat:"cappellino",
-    glasses:"no", chain:"sottile", ear:"brillante", grillz:"no", tattoo:"lacrima",
+    glasses:"no", eyes:"auto", cuffie:"no", chain:"sottile", ear:"brillante", grillz:"no", tattoo:"lacrima",
     fit:"canotta", clothCol:"#EDEDEF", color:"#B026FF"}},
 
   {n:"I dread", bg:3, look:{
     skin:"#9A6238", hair:"dread", hairCol:"#B98A3C", face:"ovale", eyeCol:"#3A2A1A",
     brow:"naturali", mouth:"carnosa", mood:"sfida", beard:"corta", hat:"bandana",
-    glasses:"scuri", chain:"doppia", ear:"brillante", grillz:"oro", tattoo:"no",
+    glasses:"scuri", eyes:"auto", cuffie:"no", chain:"doppia", ear:"brillante", grillz:"oro", tattoo:"no",
     fit:"piumino", clothCol:"#0E0E11", color:"#B026FF"}},
 
   {n:"Il rasato", bg:4, look:{
     skin:"#C68A5C", hair:"rasati", hairCol:"#100D0C", face:"squadrato", eyeCol:"#3A2A1A",
     brow:"taglio", mouth:"seria", mood:"determinato", beard:"ombra", hat:"no",
-    glasses:"no", chain:"sottile", ear:"brillante", grillz:"no", tattoo:"no",
+    glasses:"no", eyes:"auto", cuffie:"no", chain:"sottile", ear:"brillante", grillz:"no", tattoo:"no",
     fit:"canotta", clothCol:"#EDEDEF", color:"#FF5A36"}},
 
   {n:"Il fonico", bg:5, look:{
     skin:"#DDA679", hair:"spazzola", hairCol:"#3A2418", face:"ovale", eyeCol:"#3B6B4A",
     brow:"naturali", mouth:"normale", mood:"neutro", beard:"corta", hat:"no",
-    glasses:"no", chain:"sottile", ear:"no", grillz:"no", tattoo:"scritta",
+    glasses:"no", eyes:"auto", cuffie:"cuffie", chain:"sottile", ear:"no", grillz:"no", tattoo:"scritta",
     fit:"felpa", clothCol:"#1E3A2A", color:"#57C98B"}},
 
   {n:"Il notturno", bg:6, look:{
     skin:"#B0774A", hair:"corti", hairCol:"#100D0C", face:"tondo", eyeCol:"#1A1414",
     brow:"folte", mouth:"normale", mood:"freddo", beard:"pizzetto", hat:"bandana",
-    glasses:"no", chain:"doppia", ear:"cerchio", grillz:"no", tattoo:"collo",
+    glasses:"no", eyes:"auto", cuffie:"no", chain:"doppia", ear:"cerchio", grillz:"no", tattoo:"collo",
     fit:"black", clothCol:"#0E0E11", color:"#3DC7FF"}},
 
   {n:"La corona", bg:7, look:{
     skin:"#9A6238", hair:"treccine", hairCol:"#100D0C", face:"affilato", eyeCol:"#6B4E2A",
     brow:"sottili", mouth:"normale", mood:"sicuro", beard:"pizzetto", hat:"no",
-    glasses:"piccoli", chain:"grossa", ear:"brillante", grillz:"oro", tattoo:"collo",
+    glasses:"piccoli", eyes:"auto", cuffie:"no", chain:"grossa", ear:"brillante", grillz:"oro", tattoo:"collo",
     fit:"pelle", clothCol:"#141416", color:"#FFC53D"}}
 ];
 

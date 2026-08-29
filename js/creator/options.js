@@ -5,12 +5,12 @@
 
 /* Ritaglia il ritratto su una finestra: serve per mostrare solo la testa,
    solo gli occhi o solo il petto a seconda della categoria. */
-function cropRitratto(chiavi, box){
+function cropRitratto(chiavi, box, zona){
   const vecchi = {};
   for(const k in chiavi){ vecchi[k] = A[k]; A[k] = chiavi[k]; }
   /* via le sfocature: in un riquadro da 52 pixel non si vedono, e centosessanta
      filtri gaussiani in pagina inchiodano il browser */
-  const svg = portrait()
+  const svg = portrait(false, zona)
     .replace('class="portrait" viewBox="-100 -155 200 255"', 'class="mini" viewBox="' + box + '"')
     .replace(' aria-label="ritratto del personaggio"', ' aria-hidden="true"')
     .replace(/<filter id="morb[\s\S]*?<\/filter>/g, "")
@@ -25,7 +25,8 @@ const CROP = {
   occhi:  "-56 -112 112 58",    /* sopracciglia e occhi */
   faccia: "-74 -116 148 148",   /* dagli occhi al collo: barba, tatuaggi, orecchini */
   collo:  "-84 -52 168 132",    /* mento e petto: le catene */
-  busto:  "-100 -34 200 134"    /* spalle e torace: i vestiti */
+  busto:  "-100 -34 200 134",   /* spalle e torace: i vestiti */
+  cuffie: "-92 -156 184 200"    /* archetto e collo insieme: le cuffie stanno o su o giù */
 };
 
 /* Le sei categorie della barra. Ogni riga è un elenco di opzioni:
@@ -39,14 +40,16 @@ const CATEGORIE = [
     {k:"hat", list:HATS, crop:"testa"}
   ]},
   {id:"occhi", n:"Occhi", righe:[
+    {k:"eyes", list:EYES, crop:"occhi"},
     {k:"eyeCol", list:EYECOLS.map(x => ({id:x.c, n:x.n})), crop:"occhi", tinta:true},
-    {k:"brow", list:BROWS, crop:"occhi"},
-    {k:"glasses", list:GLASSES, crop:"occhi"}
+    {k:"brow", list:BROWS, crop:"occhi"}
   ]},
   {id:"accessori", n:"Accessori", righe:[
-    {k:"chain", list:CHAINS, crop:"collo"},
+    {k:"glasses", list:GLASSES, crop:"occhi"},
+    {k:"cuffie", list:CUFFIE, crop:"cuffie", full:true},
     {k:"ear", list:EARS, crop:"faccia"},
-    {k:"grillz", list:GRILLZ, crop:"faccia"}
+    {k:"grillz", list:GRILLZ, crop:"faccia"},
+    {k:"chain", list:CHAINS, crop:"collo"}
   ]},
   {id:"vestiti", n:"Vestiti", righe:[
     {k:"fit", list:FITS, crop:"busto"},
@@ -55,7 +58,8 @@ const CATEGORIE = [
       .map(c => ({id:c, n:"Tinta"}))), crop:"busto", tinta:true}
   ]},
   {id:"tatuaggi", n:"Tatuaggi", righe:[
-    {k:"tattoo", list:TATTOOS, crop:"faccia"},
+    /* i tatuaggi sul collo stanno nel busto: senza `full` l'anteprima non li disegna */
+    {k:"tattoo", list:TATTOOS, crop:"faccia", full:true},
     {k:"beard", list:BEARDS, crop:"faccia"}
   ]}
 ];
@@ -97,15 +101,34 @@ function renderOpzioni(){
   if(!$("catbar").children.length){ costruisciCatbar(); return; }
   segnaOpzioni();
   clearTimeout(opzTimer);
-  opzTimer = setTimeout(costruisciCatbar, 90);
+  opzTimer = setTimeout(costruisciCatbarAPezzi, 60);
 }
 function segnaOpzioni(){
   $("catbar").querySelectorAll(".opt").forEach(b =>
     b.classList.toggle("on", (A[b.dataset.k] || "") === (b.dataset.v || "")));
 }
 function costruisciCatbar(){
-  $("catbar").innerHTML = CATEGORIE.map(cat =>
-    '<div class="catbox" data-cat="' + cat.id + '">' +
+  $("catbar").innerHTML = CATEGORIE.map(cat => scatola(cat)).join("");
+}
+/* una categoria per frame: il totale e' lo stesso, ma la pagina non si inchioda mai */
+let catCoda = 0;
+function costruisciCatbarAPezzi(){
+  const bar = $("catbar");
+  if(!bar.children.length) bar.innerHTML = CATEGORIE.map(c =>
+    '<div class="catbox" data-cat="' + c.id + '"><div class="cathead">' + c.n + '</div></div>').join("");
+  cancelAnimationFrame(catCoda);
+  let i = 0;
+  const passo = () => {
+    if(i >= CATEGORIE.length) return;
+    const cat = CATEGORIE[i++];
+    const vecchia = bar.querySelector('.catbox[data-cat="' + cat.id + '"]');
+    if(vecchia) vecchia.outerHTML = scatola(cat);
+    catCoda = requestAnimationFrame(passo);
+  };
+  catCoda = requestAnimationFrame(passo);
+}
+function scatola(cat){
+  return '<div class="catbox" data-cat="' + cat.id + '">' +
       '<div class="cathead">' + cat.n + '</div>' +
       cat.righe.map(r => {
         const box = CROP[r.crop] || CROP.testa;
@@ -115,12 +138,12 @@ function costruisciCatbar(){
           const dentro = r.tinta
             ? '<span class="tint" style="background:' +
                 (o.id || "linear-gradient(135deg,#FF5A36,#B026FF)") + '"></span>'
-            : cropRitratto(chiavi, box);
+            : cropRitratto(chiavi, box, r.full || r.crop === "busto" || r.crop === "collo" ? true : "testa");
           return '<button class="opt' + on + '" data-k="' + r.k + '" data-v="' + o.id +
             '" title="' + o.n + '">' + dentro + '</button>';
         }).join("") + '</div>';
       }).join("") +
-    '</div>').join("");
+    '</div>';
 }
 
 /* i fondali: si scelgono come tutto il resto */

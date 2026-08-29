@@ -43,6 +43,8 @@ $("rand").onclick = () => {
   A.grillz = Math.random() < .25 ? pick(GRILLZ).id : "no";
   A.clothCol = "";
   A.glasses = pick(GLASSES).id; A.chain = pick(CHAINS).id;
+  A.eyes = Math.random() < .35 ? pick(EYES).id : "auto";
+  A.cuffie = Math.random() < .2 ? pick(CUFFIE).id : "no";
   A.beard = pick(BEARDS).id; A.tattoo = pick(TATTOOS).id;
   A.bg = Math.floor(Math.random()*BGS.length);
   A.h = 158 + Math.floor(Math.random()*45);
