@@ -16,6 +16,16 @@ document.addEventListener("click", e => {
   if(!b) return;
   A[b.dataset.k] = b.dataset.v;
   renderArtista();
+  /* le anteprime delle opzioni mostrano la tua faccia: cambiata quella, vanno rifatte */
+  if(typeof renderOpzioni === "function"){ renderOpzioni(); renderFondali(); }
+});
+
+/* uno degli otto pronti: riempie tutto l'aspetto in un colpo */
+document.addEventListener("click", e => {
+  const c = e.target.closest("[data-preset]");
+  if(!c) return;
+  usaPreset(+c.dataset.preset);
+  renderArtista(); renderOpzioni(); renderFondali();
 });
 
 $("rand").onclick = () => {
@@ -34,12 +44,13 @@ $("rand").onclick = () => {
   A.clothCol = "";
   A.glasses = pick(GLASSES).id; A.chain = pick(CHAINS).id;
   A.beard = pick(BEARDS).id; A.tattoo = pick(TATTOOS).id;
+  A.bg = Math.floor(Math.random()*BGS.length);
   A.h = 158 + Math.floor(Math.random()*45);
   A.w = 50 + Math.floor(Math.random()*70);
   $("name").value = A.name; $("city").value = A.city;
   $("h").value = A.h; $("w").value = A.w;
   $("hv").textContent = A.h + " cm"; $("wv").textContent = A.w + " kg";
-  renderArtista();
+  renderArtista(); renderOpzioni(); renderFondali();
 };
 
 let firstRun = !A.name.trim();
@@ -61,9 +72,8 @@ $("save").onclick = () => {
 
 function applyMode(){
   $("save").textContent = firstRun ? "Crea l'artista" : "Salva modifiche";
-  document.querySelector(".top h1").textContent = firstRun ? "Crea il tuo artista" : "Il tuo artista";
-  document.querySelector(".top p").textContent = firstRun
-    ? "Benvenuto. Prima di tutto: chi sei. Puoi cambiare quasi tutto anche dopo, tranne da dove vieni."
-    : "Chi sei prima ancora del primo pezzo. Tutto modificabile in qualsiasi momento, tranne la città.";
+  document.querySelector(".avhead p").textContent = firstRun
+    ? "Parti da uno degli otto e cambia ogni elemento: capelli, cappelli, occhi, accessori, vestiti, tatuaggi."
+    : "Cambia quello che vuoi, elemento per elemento. Resta tutto modificabile, tranne da dove vieni.";
 }
 

@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="css/effects.css">
 <link rel="stylesheet" href="css/hud.css">
 <link rel="stylesheet" href="css/forms.css">
+<link rel="stylesheet" href="css/creator.css">
 <link rel="stylesheet" href="css/actionbar.css">
 </head>
 <body>
@@ -171,22 +172,26 @@
 </div></div>
 
 <section class="screen" id="s-profile">
-<div class="wrap">
-  <div class="top">
+<div class="wrap avwrap">
+  <div class="avhead">
     <div class="kicker">Anni di Fame</div>
-    <h1>Il tuo artista</h1>
-    <p>Chi sei prima ancora del primo pezzo. Tutto quello che scegli qui resta modificabile per tutta la carriera — tranne da dove vieni.</p>
+    <h1>Otto avatar da rapper <em>totalmente personalizzabili</em></h1>
+    <p>Parti da uno e cambia ogni elemento: capelli, cappelli, occhi, accessori, vestiti, tatuaggi.</p>
   </div>
+
+  <!-- gli otto pronti: uno per fondale -->
+  <div class="galleria" id="galleria"></div>
 
   <div class="grid">
     <!-- anteprima -->
     <div class="preview">
       <div class="stage" id="stage">
+        <div class="stagebg" id="stagebg"></div>
         <div class="vista"><button class="vb on" data-vista="volto">Volto</button><button class="vb" data-vista="intero">Figura intera</button></div>
         <div id="figure"></div>
         <div class="nameplate">
           <div class="nm" id="pv-name">Senza Nome</div>
-          <div class="sub" id="pv-sub">—</div>
+          <div class="sub" id="pv-sub">&mdash;</div>
         </div>
       </div>
       <div class="silh"><div id="silh"></div><div class="sc" id="silh-txt"></div></div>
@@ -201,6 +206,15 @@
 
     <!-- moduli -->
     <div>
+      <!-- la barra: sei categorie, ogni opzione è la tua faccia con quell'elemento -->
+      <div class="catbar" id="catbar"></div>
+
+      <div class="panel">
+        <h2>Dove ti fai vedere</h2>
+        <p class="hint">Il fondale del tuo ritratto: quello che si vede dietro di te nelle foto.</p>
+        <div class="fondali" id="fondali"></div>
+      </div>
+
       <div class="panel">
         <h2>Identità</h2>
         <p class="hint">Il nome con cui ti chiameranno. Puoi cambiarlo, ma i fan si affezionano.</p>
@@ -211,18 +225,18 @@
         </div>
 
         <div class="field">
-          <label for="city">Città di provenienza <span class="sub">non si cambia più</span></label>
+          <label for="city">Citt&agrave; di provenienza <span class="sub">non si cambia pi&ugrave;</span></label>
           <input class="txt" id="city" maxlength="28" placeholder="Scrivi da dove vieni" autocomplete="off">
         </div>
 
         <div class="field">
-          <label>Com'è la scena dove sei cresciuto</label>
+          <label>Com'&egrave; la scena dove sei cresciuto</label>
           <div class="chips" id="scenes"></div>
         </div>
       </div>
 
       <div class="panel">
-        <h2>Corpo</h2>
+        <h2>Corpo e faccia</h2>
         <p class="hint">Cambia solo come appari e come ti descrivono. Nessun bonus, nessun malus.</p>
         <div class="field">
           <label>Carnagione</label>
@@ -241,22 +255,6 @@
           <div class="chips" id="faces"></div>
         </div>
         <div class="field">
-          <label>Capelli</label>
-          <div class="chips" id="hairs"></div>
-        </div>
-        <div class="field">
-          <label>Colore dei capelli</label>
-          <div class="swatches" id="haircols"></div>
-        </div>
-        <div class="field">
-          <label>Colore degli occhi</label>
-          <div class="swatches" id="eyecols"></div>
-        </div>
-        <div class="field">
-          <label>Sopracciglia</label>
-          <div class="chips" id="brows"></div>
-        </div>
-        <div class="field">
           <label>Bocca</label>
           <div class="chips" id="mouths"></div>
         </div>
@@ -264,55 +262,15 @@
           <label>Espressione <span class="sub">come ti presenti al mondo</span></label>
           <div class="chips" id="moods"></div>
         </div>
-      </div>
-
-      <div class="panel">
-        <h2>Vestiario</h2>
-        <p class="hint">Lo stile conta: cambia come ti guardano sul palco e quanto ti prendono sul serio.</p>
-        <div class="field">
-          <div class="tiles" id="fits"></div>
-        </div>
         <div class="field">
           <label>Colore principale <span class="sub">tinge tutto il gioco</span></label>
           <div class="swatches" id="colors"></div>
-        </div>
-        <div class="field">
-          <label>Colore del vestito</label>
-          <div class="swatches" id="clothcols"></div>
-        </div>
-        <div class="field">
-          <label>Cappello</label>
-          <div class="chips" id="hats"></div>
-        </div>
-        <div class="field">
-          <label>Occhiali</label>
-          <div class="chips" id="glasses"></div>
-        </div>
-        <div class="field">
-          <label>Catena</label>
-          <div class="chips" id="chains"></div>
-        </div>
-        <div class="field">
-          <label>Barba</label>
-          <div class="chips" id="beards"></div>
-        </div>
-        <div class="field">
-          <label>Orecchini</label>
-          <div class="chips" id="ears"></div>
-        </div>
-        <div class="field">
-          <label>Denti</label>
-          <div class="chips" id="grillzs"></div>
-        </div>
-        <div class="field">
-          <label>Tatuaggi</label>
-          <div class="chips" id="tattoos"></div>
         </div>
       </div>
 
       <div class="panel">
         <h2>Il tuo stile</h2>
-        <p class="hint">Il genere che fai. Da dove parti: puoi cambiare strada più avanti, ma perdi parte del pubblico.</p>
+        <p class="hint">Il genere che fai. Da dove parti: puoi cambiare strada pi&ugrave; avanti, ma perdi parte del pubblico.</p>
         <div class="genres" id="genres"></div>
       </div>
 
@@ -345,6 +303,8 @@
 <script src="js/creator/data.js"></script>
 <script src="js/creator/state.js"></script>
 <script src="js/creator/portrait.js"></script>
+<script src="js/creator/avatar-presets.js"></script>
+<script src="js/creator/options.js"></script>
 <script src="js/creator/render.js"></script>
 <script src="js/creator/events.js"></script>
 <script src="js/creator/nav.js"></script>

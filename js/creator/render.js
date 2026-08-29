@@ -10,6 +10,7 @@ function renderArtista(){
   const sc = scene(), g = genre(), f = fit();
 
   $("stage").style.setProperty("--c1", A.color);
+  $("stagebg").innerHTML = bgSvg(A.bg);
   window.__POSE = "fermo";
   $("figure").innerHTML = vistaCorpo
     ? '<svg class="intero" viewBox="-150 -470 300 500" xmlns="http://www.w3.org/2000/svg">' + window.ARTIST_BODY() + '</svg>'
@@ -37,36 +38,14 @@ function renderArtista(){
   $("save").disabled = !A.name.trim();
 
   $("scenes").innerHTML  = chipRow(SCENES, "scene");
-  $("hairs").innerHTML   = chipRow(HAIRS, "hair");
   $("faces").innerHTML   = chipRow(FACES, "face");
-  $("brows").innerHTML   = chipRow(BROWS, "brow");
   $("mouths").innerHTML  = chipRow(MOUTHS, "mouth");
   $("moods").innerHTML   = chipRow(MOODS, "mood");
-  $("hats").innerHTML    = chipRow(HATS, "hat");
-  $("ears").innerHTML    = chipRow(EARS, "ear");
-  $("grillzs").innerHTML = chipRow(GRILLZ, "grillz");
-  $("glasses").innerHTML = chipRow(GLASSES, "glasses");
-  $("chains").innerHTML  = chipRow(CHAINS, "chain");
-  $("beards").innerHTML  = chipRow(BEARDS, "beard");
-  $("tattoos").innerHTML = chipRow(TATTOOS, "tattoo");
 
   $("skins").innerHTML = SKINS.map(x =>
     '<button class="sw-btn' + (x === A.skin ? " on" : "") + '" data-k="skin" data-v="' + x + '" style="background:' + x + '" aria-label="carnagione"></button>').join("");
   $("colors").innerHTML = COLORS.map(x =>
     '<button class="sw-btn' + (x === A.color ? " on" : "") + '" data-k="color" data-v="' + x + '" style="background:' + x + '" aria-label="colore"></button>').join("");
-  $("haircols").innerHTML = HAIRCOLS.map(x =>
-    '<button class="sw-btn' + (x.c === A.hairCol ? " on" : "") + '" data-k="hairCol" data-v="' + x.c + '" style="background:' + x.c + '" title="' + x.n + '" aria-label="' + x.n + '"></button>').join("");
-  $("eyecols").innerHTML = EYECOLS.map(x =>
-    '<button class="sw-btn' + (x.c === A.eyeCol ? " on" : "") + '" data-k="eyeCol" data-v="' + x.c + '" style="background:' + x.c + '" title="' + x.n + '" aria-label="' + x.n + '"></button>').join("");
-  const clothList = ["", "#2E3440","#0E0E11","#EDEDEF","#2B6CF0","#E8452F","#57C98B","#FFC53D","#B026FF","#8A5A2B","#26313F"];
-  $("clothcols").innerHTML = clothList.map(x =>
-    '<button class="sw-btn' + ((x || "") === (A.clothCol || "") ? " on" : "") + '" data-k="clothCol" data-v="' + x + '" style="background:' +
-    (x || "linear-gradient(135deg,#FF5A36,#B026FF)") + '" title="' + (x ? "colore scelto" : "come lo stile") + '" aria-label="colore vestito"></button>').join("");
-
-  $("fits").innerHTML = FITS.map(x =>
-    '<button class="otile' + (x.id === A.fit ? " on" : "") + '" data-k="fit" data-v="' + x.id + '">' +
-    '<span class="sw" style="background:linear-gradient(150deg,' + (x.accent ? A.color : x.top) + ',' + shade(x.accent ? A.color : x.top, -0.45) + ')"></span>' +
-    '<span class="lb">' + x.n + '</span></button>').join("");
 
   $("genres").innerHTML = GENRES.map(x =>
     '<button class="gcard' + (x.id === A.genre ? " on" : "") + '" data-k="genre" data-v="' + x.id + '">' +

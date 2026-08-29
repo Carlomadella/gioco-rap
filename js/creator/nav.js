@@ -172,5 +172,7 @@ document.addEventListener("click", e => {
 
 applyMode();
 renderArtista();
+renderOpzioni();
+renderFondali();
 renderMenu();
 goto("menu");

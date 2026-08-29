@@ -6,7 +6,7 @@ const ART_KEY = "anni-di-fame-artista";
 const DEF = () => ({
   name:"", city:"", scene:"citta", genre:"trap", fit:"felpa",
   h:178, w:72, skin:SKINS[1], hair:"corti", color:"#FF5A36",
-  glasses:"no", chain:"sottile", beard:"ombra", tattoo:"no",
+  glasses:"no", chain:"sottile", beard:"ombra", tattoo:"no", bg:0,
   hairCol:"#100D0C", face:"ovale", eyeCol:"#3A2A1A", brow:"naturali", mouth:"normale",
   hat:"no", ear:"no", grillz:"no", clothCol:"", mood:"neutro"
 });
