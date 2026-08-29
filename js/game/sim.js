@@ -4,6 +4,10 @@
 /* ==================== SIMULAZIONE ==================== */
 const totalWeeks = () => (G.year-1)*52 + G.week;
 
+/* acceso mentre stai saltando avanti nel tempo: le settimane passano,
+   ma eventi e prove aspettano che tu torni a giocarle davvero */
+let SALTO = false;
+
 function pushLog(text, cls){
   G.log.unshift({w:"A" + G.year + " S" + String(G.week).padStart(2,"0"), t:text, c:cls || ""});
   if(G.log.length > 80) G.log.length = 80;
@@ -111,6 +115,12 @@ function advanceWeek(){
   }
   G.shifts = 0;
 
+  /* la lucidità cala da sola: se non stai sui pezzi, la testa va altrove */
+  addLuc(-4);
+  G.rest = 0;
+  if(luc() <= 25 && Math.random() < .5)
+    pushLog("<b>Non hai la testa dentro.</b> Ti siedi al foglio e non esce niente di buono.", "bad");
+
   // la scena intorno a te va avanti da sola
   sistemaRivali();
   vitaRivali(streams);
@@ -152,9 +162,9 @@ function advanceWeek(){
 
   checkGoals();
   if(G.trialCd > 0) G.trialCd--;
-  const prova = G.trialCd <= 0 ? pendingTrial() : null;
+  const prova = (!SALTO && G.trialCd <= 0) ? pendingTrial() : null;
   if(prova){ G.trialsDone[prova.ph] = true; showEvent(prova); }
-  else if(Math.random() < .38) maybeEvent();
+  else if(!SALTO && Math.random() < .38) maybeEvent();
   save(); renderGioco();
 }
 

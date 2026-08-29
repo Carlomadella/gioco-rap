@@ -26,10 +26,11 @@ function qFactors(){
   const casa = 1 + (G.life && G.life.casa ? G.life.casa : 0)*0.04;  f.push(["dove vivi", casa]);
   const stanco = 1 - Math.min(0.20, (G.shifts||0)*0.07);
   if((G.shifts||0) > 0) f.push(["turni fatti", stanco]);
+  const lu = 0.65 + luc()*0.005;                                    f.push(["lucidità", lu]);
   const esp = 1 + Math.min(0.14, G.songs.length*0.012);             f.push(["esperienza", esp]);
   const attr = 1 + Math.min(0.10, gearBonus()*0.004);
   if(gearBonus() > 0) f.push(["attrezzatura", attr]);
-  return {mult: ben*casa*stanco*esp*attr, list:f};
+  return {mult: ben*casa*stanco*esp*attr*lu, list:f};
 }
 const qDetail = () => qFactors().list
   .map(([n,v]) => n + " " + (v>=1?"+":"") + Math.round((v-1)*100) + "%").join(" · ");
@@ -66,7 +67,7 @@ function offerJobs(){
 }
 
 const ACTIONS = [
-  {id:"scrivi", n:"Scrivi barre", e:1,
+  {id:"scrivi", n:"Scrivi barre", e:1, luc:3,
    d:"Il foglio, la penna e quello che hai in testa.",
    give:() => "veloce · oppure scrivila tu ×1,5",
    run(){
@@ -87,22 +88,18 @@ const ACTIONS = [
      return "";
    }},
 
-  {id:"beat", n:"Cerca un beat", e:1,
+  {id:"beat", n:"Cerca un beat", e:1, luc:1,
    d:"Giri fra i produttori. Torni con roba da comprare.",
-   give:() => "2 beat da comprare · +rete",
+   give:() => "3 beat, 3 generi · +rete",
    run(){
-     const out = [];
-     const qa = clamp(Math.round(rnd(30,52) + G.skills.rete*0.7), 10, 95);
-     const qb = clamp(Math.round(rnd(12,26)), 8, 60);
-     [[qa, Math.round(qa*8+60)], [qb, Math.round(qb*2+10)]].forEach(([q,pr]) => {
-       const b = {n:pick(BEATNAMES), q, price:pr};
-       G.market.push(b); out.push(b.n + " (q" + q + ", " + pr + " €)");
-     });
+     const out = offriBeat();
      gain("rete", 0.9);
-     return "Due beat sul tavolo: " + out.join(" · ") + ". Si comprano dal Catalogo.";
+     return "Tre beat sul tavolo: " +
+       out.map(b => b.n + " (" + genBeat(b.gen).n.toLowerCase() + ", q" + b.q + ")").join(" · ") +
+       ". Si comprano dal Catalogo.";
    }},
 
-  {id:"registra", n:"Registra il pezzo", e:2,
+  {id:"registra", n:"Registra il pezzo", e:2, luc:3,
    money:() => G.gear.mic ? 0 : 50,
    d:"Strofa più beat, in sala. Esce una traccia grezza.",
    need:() => !G.bars.length ? "1 strofa" : !G.beats.length ? "1 beat" : null,
@@ -126,7 +123,7 @@ const ACTIONS = [
      return "";
    }},
 
-  {id:"mixa", n:"Mixa il pezzo", e:1,
+  {id:"mixa", n:"Mixa il pezzo", e:1, luc:2,
    d:"Livelli e spazio. Qui il provino diventa pezzo.",
    need:() => unmixed().length ? null : "1 traccia da mixare",
    give:() => "+" + mixGain() + " qualità · +flow",
@@ -137,7 +134,7 @@ const ACTIONS = [
      return "«" + s.t + "» mixato: qualità " + s.q + ". Pronto per uscire.";
    }},
 
-  {id:"pubblica", n:"Pubblica il pezzo", e:0,
+  {id:"pubblica", n:"Pubblica il pezzo", e:0, luc:1,
    d:"Lo metti fuori. Da qui in poi corre da solo.",
    need:() => ready().length ? null : "1 traccia",
    give:() => {
@@ -164,7 +161,7 @@ const ACTIONS = [
      return "Hype +" + Math.round(h) + ", " + f + " nuovi follower.";
    }},
 
-  {id:"free", n:"Freestyle in piazza", e:1,
+  {id:"free", n:"Freestyle in piazza", e:1, luc:3,
    d:"Solo il beat e la gente che passa.",
    give:() => "veloce · oppure giocala ×1,5",
    run(){
@@ -184,7 +181,7 @@ const ACTIONS = [
      return "";
    }},
 
-  {id:"live", n:"Serata open mic", e:2,
+  {id:"live", n:"Serata open mic", e:2, luc:2,
    d:"Palco piccolo, ma la gente ti vede in faccia.",
    need:() => G.songs.some(s => s.released) ? null : "1 pezzo fuori",
    give:() => "~" + Math.round(20 + G.hype*1.4 + 40) + " € · fan · presenza",
@@ -197,7 +194,7 @@ const ACTIONS = [
      return "Serata fatta: +" + f + " fan, +" + m + " €.";
    }},
 
-  {id:"turno", n:"Vai al turno", e:1,
+  {id:"turno", n:"Vai al turno", e:1, luc:-3,
    d:"Nessuna musica, ma i soldi entrano.",
    avail:() => !!G.job,
    dyn:() => G.job ? G.job.e : 1,
@@ -211,13 +208,13 @@ const ACTIONS = [
      return "Turno da " + j.n.toLowerCase() + ": +" + j.pay + " €." + extra;
    }},
 
-  {id:"cercalavoro", n:"Cerca lavoro", e:1,
+  {id:"cercalavoro", n:"Cerca lavoro", e:1, luc:-1,
    d:"Due colloqui, due possibilità.",
    avail:() => !G.job,
    give:() => "2 offerte fra cui scegliere",
    run(){ offerJobs(); return "Hai fatto due colloqui."; }},
 
-  {id:"stacca", n:"Stacca la spina", e:1,
+  {id:"stacca", n:"Stacca la spina", e:1, luc:1,
    d:"Dormi, mangi, vedi gente normale.",
    give:() => "+25 benessere · +1 rete",
    run(){

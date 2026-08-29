@@ -12,8 +12,8 @@ const short = n => n >= 1e6 ? (n/1e6).toFixed(1).replace(".",",")+"M"
 const SAVE_KEY = "anni-di-fame-partita-v2";
 const START = () => ({
   week:1, year:1, age:19,
-  energy:3, maxEnergy:3,
-  money:220, fans:0, hype:0, wellbeing:80,
+  energy:3, maxEnergy:3, rest:0,
+  money:220, fans:0, hype:0, wellbeing:80, lucidita:80,
   skills:{scrittura:8, flow:6, presenza:5, rete:4},
   songs:[], bars:[], beats:[], market:[], job:null, shifts:0,
   life:{casa:0, auto:0, look:0, uscite:0, crew:0}, gear:{}, contract:null, obligation:null,
@@ -22,6 +22,11 @@ const START = () => ({
   rivals:[], chartPrev:99, streamsPrev:0,
   best:{fans:0, chart:99}, ended:false
 });
+/* la lucidità: quanto hai la testa dentro la musica. Sale quando lavori ai pezzi,
+   scende con i turni, con le settimane vuote e con il tempo che salti. */
+const luc = () => (G.lucidita == null ? 80 : G.lucidita);
+function addLuc(n){ G.lucidita = clamp(luc() + n, 0, 100); }
+
 let G = START();
 window.__G = () => G;
 try{ const r = localStorage.getItem(SAVE_KEY); if(r) G = Object.assign(START(), JSON.parse(r)); }catch(e){}

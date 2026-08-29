@@ -12,6 +12,7 @@ const ART = {
 };
 
 function renderGioco(){
+  if(typeof beatStop === "function") beatStop();
   const art = window.ARTIST || {};
   const cc = art.color || "#FF5A36";
   $("gtop").style.setProperty("--c1", cc);
@@ -89,6 +90,7 @@ function renderGioco(){
     '</div>';
   $("g-stats").innerHTML =
     box(Math.round(G.wellbeing), "benessere", G.wellbeing <= 30 ? "red" : "", G.wellbeing, G.wellbeing > 30) +
+    box(Math.round(luc()), "lucidità", luc() <= 30 ? "red" : "", luc(), luc() > 45) +
     box(G.songs.filter(x => x.released).length, "pezzi fuori") +
     box(G.job ? G.job.pay + " €" : "—", G.job ? "a turno · " + G.job.n.toLowerCase() : "nessun lavoro");
 
@@ -134,6 +136,7 @@ function renderGioco(){
       const fansBefore = G.fans, moneyBefore = G.money;
       G.energy -= en2;
       const msg = a.run();
+      if(a.luc) addLuc(a.luc);
       if(msg) pushLog(msg, "");
       G.wellbeing = clamp(G.wellbeing, 0, 100);
       const s2 = SFX[SND[a.id] || "tap"]; if(s2) s2();
@@ -153,19 +156,57 @@ function renderGioco(){
   $("g-mat").innerHTML =
     '<div class="li"><span class="nm"><b>Strofe scritte</b><span>' +
       (G.bars.length ? "qualità media " + avg : "il quaderno è vuoto") + '</span></span><span class="v">' + G.bars.length + '</span></div>' +
-    '<div class="li"><span class="nm"><b>Beat comprati</b><span>' +
-      (G.beats.length ? G.beats.map(b => b.n + " (q" + b.q + ")").join(", ") : "nessuno") + '</span></span><span class="v">' + G.beats.length + '</span></div>';
+    (G.beats.length
+      ? G.beats.map((b,i) => '<div class="li"><span class="cov" style="background:' + beatCov(b) + '"></span>' +
+          '<span class="nm"><b>' + b.n + '</b><span>qualità ' + b.q + ' · ' + beatEtichetta(b) + '</span></span>' +
+          '<button class="play" data-mine="' + i + '" title="Ascolta">▶</button>' +
+          '<span class="tag">tuo</span></div>').join("")
+      : '<div class="li"><span class="nm"><b>Beat comprati</b><span>nessuno: i beat si comprano qui sotto</span></span><span class="v">0</span></div>');
 
+  $("g-mat").querySelectorAll("[data-mine]").forEach(btn => {
+    btn.onclick = () => beatSuona(G.beats[+btn.dataset.mine], btn);
+  });
+
+  const rigaBeat = (b, i) => '<div class="li"><span class="cov" style="background:' + beatCov(b) + '"></span>' +
+    '<span class="nm"><b>' + b.n + '</b><span>qualità ' + b.q + ' · ' + beatInfo(b).bpm + ' bpm</span></span>' +
+    '<button class="play no" data-drop="' + i + '" title="Rifiuta: sparisce dal catalogo">✕</button>' +
+    '<button class="play" data-hear="' + i + '" title="Ascolta il beat">▶</button>' +
+    '<button class="buy" data-buy="' + i + '"' + (G.money < b.price ? " disabled" : "") + '>' + b.price + ' €</button></div>';
+  /* il banco diviso per genere: il tuo per primo, gli altri in ordine */
+  const perGen = {};
+  G.market.forEach((b,i) => { const g = beatGen(b); (perGen[g] = perGen[g] || []).push([b,i]); });
+  const mioG = mioGenere();
+  const ordine = Object.keys(perGen).sort((x,y) =>
+    x === mioG ? -1 : y === mioG ? 1 : genBeat(x).n.localeCompare(genBeat(y).n));
   $("g-market").innerHTML = G.market.length
-    ? G.market.map((b,i) => '<div class="li"><span class="cov" style="background:linear-gradient(140deg,#3DC7FF,#B026FF)"></span>' +
-        '<span class="nm"><b>' + b.n + '</b><span>qualità ' + b.q + '</span></span>' +
-        '<button class="buy" data-buy="' + i + '"' + (G.money < b.price ? " disabled" : "") + '>' + b.price + ' €</button></div>').join("")
+    ? ordine.map(g => {
+        const gg = genBeat(g);
+        return '<div class="gsep' + (g === mioG ? " mine" : "") + '">' +
+          '<i style="background:linear-gradient(140deg,' + gg.c[0] + ',' + gg.c[1] + ')"></i>' +
+          '<b>' + gg.n + '</b><span>' + (g === mioG ? "il tuo genere" : gg.bpm[0] + "–" + gg.bpm[1] + " bpm") +
+          ' · ' + perGen[g].length + (perGen[g].length === 1 ? " beat" : " beat") + '</span></div>' +
+          perGen[g].map(([b,i]) => rigaBeat(b,i)).join("");
+      }).join("")
     : '<div class="empty2">Nessun beat in vendita. Usa «Cerca un beat».</div>';
+  $("g-market").querySelectorAll("[data-hear]").forEach(btn => {
+    btn.onclick = () => beatSuona(G.market[+btn.dataset.hear], btn);
+  });
+  /* i beat che non ti dicono niente li lasci lì: spariscono dal catalogo */
+  $("g-market").querySelectorAll("[data-drop]").forEach(btn => {
+    btn.onclick = () => {
+      const b = G.market[+btn.dataset.drop];
+      if(!b) return;
+      G.market.splice(+btn.dataset.drop, 1);
+      SFX.tap();
+      toast("Hai lasciato lì «<b>" + b.n + "</b>». Non era il tuo.", "", "✕", ["#5A6472","#2B2B34"]);
+      save(); renderGioco();
+    };
+  });
   $("g-market").querySelectorAll("[data-buy]").forEach(btn => {
     btn.onclick = () => {
       const i = +btn.dataset.buy, b = G.market[i];
       if(!b || G.money < b.price) return;
-      G.money -= b.price; G.market.splice(i,1); G.beats.push({n:b.n, q:b.q});
+      G.money -= b.price; G.market.splice(i,1); G.beats.push({n:b.n, q:b.q, gen:beatGen(b), seed:beatSeed(b)});
       pushLog("Comprato il beat «" + b.n + "» (q" + b.q + ") per " + b.price + " €.", "");
       save(); renderGioco();
     };
@@ -371,6 +412,7 @@ document.querySelectorAll(".nb").forEach(t => {
   t.onclick = () => {
     document.querySelectorAll(".nb").forEach(x => x.classList.toggle("on", x === t));
     document.querySelectorAll(".gpane").forEach(pp => pp.classList.toggle("on", pp.dataset.p === t.dataset.t));
+    if(typeof beatStop === "function") beatStop();
     SFX.tap();
   };
 });
@@ -388,6 +430,7 @@ $("g-advance").onclick = () => {
   weekReport(before, costs);
   openWeek();
 };
+$("g-skip").onclick = () => { SFX.tap(); saltaTempo(); };
 $("g-menu").onclick = () => { if(window.GO) window.GO("menu"); };
 
 
