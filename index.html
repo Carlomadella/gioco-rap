@@ -24,8 +24,25 @@
 <body>
 
 <div class="topnav">
-  <button class="navback" id="nav-back" hidden><span class="arw">‹</span> Menu principale</button>
-  <div id="nav-spacer"></div>
+  <div class="navleft">
+    <!-- Il marchio: la capsula del microfono prende il colore scelto dall'artista. -->
+    <button class="brand" id="brand" aria-label="Anni di Fame — vai al menu principale">
+      <span class="bmark" aria-hidden="true">
+        <svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="lgmark" x1="0" y1="0" x2="1" y2="1">
+            <stop class="s1" offset="0"/><stop class="s2" offset="1"/>
+          </linearGradient></defs>
+          <rect width="34" height="34" rx="10" fill="url(#lgmark)"/>
+          <rect x="14" y="6.5" width="6" height="12.6" rx="3" fill="#0B0B0D"/>
+          <g fill="none" stroke="#0B0B0D" stroke-width="2.4" stroke-linecap="round">
+            <path d="M10 16.4a7 7 0 0 0 14 0"/><path d="M17 23.4V27"/><path d="M12.8 27h8.4"/>
+          </g>
+        </svg>
+      </span>
+      <span class="bword">Anni di <b>Fame</b></span>
+    </button>
+    <button class="navback" id="nav-back" hidden><span class="arw">‹</span> Menu</button>
+  </div>
   <button class="avatarbtn" id="nav-avatar" aria-label="Apri il tuo artista"></button>
 </div>
 
@@ -34,9 +51,9 @@
     <div class="mhero" id="mhero">
       <div class="mport" id="m-port"></div>
       <div class="mtxt">
-        <div class="game">Anni di Fame</div>
+        <div class="game"><span class="dot" id="m-dot"></span><span id="m-tag">Nessuna carriera iniziata</span></div>
         <h1 id="m-name">Crea il tuo artista</h1>
-        <p id="m-meta">Nessuna carriera iniziata</p>
+        <p id="m-meta">Otto avatar pronti, o costruisci la faccia da zero.</p>
       </div>
     </div>
 
@@ -50,16 +67,61 @@
         <span class="ic" style="background:var(--hot)">A</span>
         <span class="tx"><span class="a">Il tuo artista</span><span class="b">Aspetto, città, genere</span></span>
       </button>
+      <button class="mrow" data-go="regole">
+        <span class="ic" style="background:var(--acid)">?</span>
+        <span class="tx"><span class="a">Come si gioca</span><span class="b">Energia, settimane, lucidità</span></span>
+      </button>
       <button class="mrow" data-go="soon">
         <span class="ic" style="background:var(--sky)">C</span>
         <span class="tx"><span class="a">Classifiche</span><span class="b">Chi comanda questa settimana</span></span>
       </button>
-      <button class="mrow" data-go="soon">
-        <span class="ic" style="background:var(--acid)">?</span>
-        <span class="tx"><span class="a">Come si gioca</span><span class="b">Regole, energia, contratti</span></span>
-      </button>
     </div>
-    <p class="mfoot">La Fame Studio · prototipo. La partita è salvata su questo dispositivo.</p>
+
+    <!-- La carriera in corso: compare solo se una partita è già cominciata. -->
+    <div class="mcorso" id="m-corso" hidden>
+      <div class="mchead">
+        <h2>La tua carriera</h2>
+        <button class="mreset" id="m-reset">Ricomincia da capo</button>
+      </div>
+      <div class="mstats" id="m-stats"></div>
+      <div class="mlast" id="m-last"></div>
+    </div>
+
+    <!-- Le regole, in chiaro: è la domanda che si fa chiunque apra il gioco. -->
+    <div class="mregole" id="m-regole">
+      <h2>Come si gioca</h2>
+      <p class="rsub">Nessuno diventa qualcuno in una settimana. Il gioco è tutto qui:
+        poche mosse alla volta, per anni, finché il nome non gira da solo.</p>
+      <div class="mrgrid">
+        <div class="mrcard">
+          <span class="mrnum">01</span>
+          <h3>Tre energie a settimana</h3>
+          <p>Scrivere, registrare, salire su un palco: ogni mossa costa una o due energie.
+            Ne hai tre. Le rimetti a posto solo chiudendo la settimana.</p>
+        </div>
+        <div class="mrcard">
+          <span class="mrnum">02</span>
+          <h3>La settimana si chiude</h3>
+          <p>Quando hai finito le mosse chiudi la settimana: gli stream si muovono,
+            i fan arrivano o se ne vanno, l'affitto va pagato lo stesso.</p>
+        </div>
+        <div class="mrcard">
+          <span class="mrnum">03</span>
+          <h3>La lucidità si consuma</h3>
+          <p>Lavorare ai pezzi te la alza. I turni al lavoro, le settimane vuote e il
+            tempo che salti te la abbassano. Sotto zero non scrivi più niente di buono.</p>
+        </div>
+        <div class="mrcard">
+          <span class="mrnum">04</span>
+          <h3>Si sale per prove</h3>
+          <p>Da sconosciuto a GOAT ci sono sette gradini. Ognuno ha una prova da superare,
+            con dei requisiti veri: fan, pezzi pubblicati, settimane di gavetta.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="mfoot">La Fame Studio · prototipo. La partita è salvata su questo dispositivo:
+      se svuoti i dati del browser, la carriera se ne va con loro.</p>
   </div>
 </section>
 

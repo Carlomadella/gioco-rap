@@ -11,17 +11,69 @@ function goto(screen){
   window.scrollTo({top:0});
   if(screen === "menu") renderMenu();
 }
+/* La sagoma che sta nel cerchio quando un artista non c'è ancora: senza,
+   in alto a destra restava un buco nero che non diceva niente. */
+const AVATAR_VUOTO = '<svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+  + '<circle cx="22" cy="16.4" r="7.4" fill="rgba(255,255,255,.36)"/>'
+  + '<path d="M7.4,40 C7.4,31.6 14,26.6 22,26.6 C30,26.6 36.6,31.6 36.6,40 Z" fill="rgba(255,255,255,.36)"/></svg>';
+
+/* Lo stato della partita, se i file del gioco sono già stati caricati.
+   nav.js gira prima di game/state.js, quindi al primo giro qui non c'è niente —
+   e infatti al primo giro non c'è nemmeno una carriera da mostrare. Quando questa
+   torna un oggetto, short() e fmt() ci sono di sicuro: stanno nello stesso file,
+   dichiarate prima di window.__G. */
+function partita(){
+  try{ return typeof window.__G === "function" ? window.__G() : null; }catch(e){ return null; }
+}
+const faseNome = g => { try{ return PHASES[g.phase].n; }catch(e){ return "—"; } };
+function carrieraIniziata(g){
+  return !!g && (g.week > 1 || g.year > 1 || g.fans > 0 ||
+    (g.songs && g.songs.length > 0) || (g.bars && g.bars.length > 0));
+}
+function statBox(k, v, sub, cls){
+  return '<div class="mstat' + (cls ? ' ' + cls : '') + '"><div class="k">' + k + '</div><div class="v">' + v +
+    (sub ? '<small>' + sub + '</small>' : '') + '</div></div>';
+}
+
 function renderMenu(){
   const nm = A.name.trim();
+  const g = partita();
+  const viva = nm && carrieraIniziata(g);
+
   $("mhero").style.setProperty("--c1", A.color);
+  $("mhero").classList.toggle("viva", !!viva);
   $("m-port").innerHTML = nm ? portrait() : "";
   $("m-name").textContent = nm || "Crea il tuo artista";
+  $("m-tag").textContent = viva
+    ? "Carriera in corso · anno " + g.year + ", settimana " + g.week
+    : nm ? "Artista pronto, carriera da iniziare" : "Nessuna carriera iniziata";
   $("m-meta").textContent = nm
     ? (A.city.trim() || scene().n) + " · " + genre().n + " · " + fit().n
-    : "Nessuna carriera iniziata";
-  $("m-play-a").textContent = nm ? "Inizia la carriera" : "Crea il tuo artista";
-  $("m-play-b").textContent = nm ? "Settimana 1 · zero fan, zero contatti" : "Entra subito: l'artista lo sistemi dopo";
-  $("nav-avatar").innerHTML = nm ? miniPortrait() : "";
+    : "Otto avatar pronti, oppure costruisci la faccia da zero.";
+  $("m-play-a").textContent = viva ? "Riprendi la carriera" : nm ? "Inizia la carriera" : "Crea il tuo artista";
+  $("m-play-b").textContent = viva
+    ? "Anno " + g.year + " · settimana " + g.week + " · " + short(g.fans) + " fan"
+    : nm ? "Settimana 1 · zero fan, zero contatti" : "Entra subito: l'artista lo sistemi dopo";
+
+  /* il cerchio in alto a destra */
+  const av = $("nav-avatar");
+  av.innerHTML = nm ? miniPortrait() : AVATAR_VUOTO;
+  av.classList.toggle("vuoto", !nm);
+  av.title = nm ? nm + " — apri il tuo artista" : "Crea il tuo artista";
+
+  /* la scheda della carriera: c'è solo se una partita è davvero cominciata */
+  $("m-corso").hidden = !viva;
+  if(viva){
+    const usciti = g.songs.filter(s => s.released).length;
+    $("m-stats").innerHTML =
+        statBox("Fase", faseNome(g), "", "fase")
+      + statBox("Settimana", g.week, "· anno " + g.year)
+      + statBox("Fan", short(g.fans))
+      + statBox("In tasca", fmt(g.money), "€")
+      + statBox("Pezzi usciti", usciti);
+    const ult = g.log && g.log[0];
+    $("m-last").innerHTML = ult ? "<b>" + ult.w + "</b> · " + ult.t : "";
+  }
 }
 window.ARTIST = A;
 window.ARTIST_PORTRAIT = portrait;
@@ -159,6 +211,23 @@ document.addEventListener("click", ev => {
 $("nav-avatar").onclick = () => goto("profile");
 $("nav-back").onclick = () => goto("menu");
 $("to-menu").onclick = () => goto("menu");
+$("brand").onclick = () => goto("menu");
+
+/* Ricominciare cancella la carriera: si chiede conferma sul bottone stesso,
+   così non serve una finestra di sistema che blocca tutto. */
+let resetArmato = 0;
+$("m-reset").onclick = function(){
+  if(!resetArmato){
+    resetArmato = setTimeout(() => { resetArmato = 0; this.textContent = "Ricomincia da capo";
+      this.classList.remove("armato"); }, 4000);
+    this.textContent = "Cancelli la carriera? Tocca ancora";
+    this.classList.add("armato");
+    return;
+  }
+  clearTimeout(resetArmato); resetArmato = 0;
+  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+  location.reload();
+};
 $("m-play").onclick = () => {
   if(!A.name.trim()){ A.name = "Nuovo Artista"; $("name").value = A.name; firstRun = false; applyMode(); renderArtista(); renderMenu(); }
   window.ARTIST = A; goto("game"); if(window.GAME) window.GAME.enter();
@@ -167,6 +236,7 @@ document.addEventListener("click", e => {
   const b = e.target.closest("[data-go]");
   if(!b) return;
   if(b.dataset.go === "profile") goto("profile");
+  else if(b.dataset.go === "regole") $("m-regole").scrollIntoView({behavior:"smooth", block:"start"});
   else alert("Sezione ancora da costruire.");
 });
 
@@ -176,3 +246,6 @@ renderOpzioni();
 renderFondali();
 renderMenu();
 goto("menu");
+/* Il menu si ridisegna a caricamento finito: i dati della partita stanno nei file
+   del gioco, che vengono dopo questo, e al primo giro non erano ancora arrivati. */
+document.addEventListener("DOMContentLoaded", renderMenu);
