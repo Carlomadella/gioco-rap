@@ -1,3 +1,5 @@
+quando finisci una task committa e pusha e nel committ fai riferimento al punto del file completato. Se vedi che viene modificato il file non preoccuparti, sono io, tu continua con quello che stai facendo
+
 Tutte le modifiche da fare:
 
 1. Si può simulare:
@@ -89,7 +91,7 @@ Tutte le modifiche da fare:
 
 7. Implementa nel gioco il fatto che ci possano essere gli opps, rapper rivali
 
-8. Quando clicchi su cerca un beat, parte una scena del personaggio dell'utente (stile preso dall'avatar) che incontra un produttore, l'utente può decidere che genere scegliere tra quelli impostati, specializzato in quel genere. Se il produttore collabora spesso con uno degli opps, non ti fa il beat.
+8. Quando clicchi su "cerca un beat", parte una scena del personaggio dell'utente (stile preso dall'avatar) che incontra un produttore, l'utente può decidere che genere scegliere tra quelli impostati, specializzato in quel genere. Se il produttore collabora spesso con uno degli opps, non ti fa il beat.
 
 9. migliora l'interfaccia della schermata del gioco, ci sono troppe card, troppe informazioni tutte ammassate
 
@@ -100,3 +102,5 @@ Tutte le modifiche da fare:
 12. Aggiorna le classifiche ogni settimana, metti quante posizioni ha scalato/è retrocesso l'artista rispetto alla settimana precedente. Fai in modo che si veda la top 10, poi se espandi in basso alla classifca ti fa vedere la top 100 (in futuro top 1000) e chiaramente fai in modo che l'utente possa vedere la sua posizione in classifica.
 
 13. cambia i suoni di gioco e varia i beat, te l'ho già detto una volta, non farmi incazzare.
+
+14. Nell'azione "Freestyle in piazza", come per "cerca un beat", crea una scena del personaggio dell'utente che canta barre, o prese dalle canzoni scritte o inventate e la folla applaude e urla o fischia in base alla qualità della barra detta. Inoltre fai in modo che si possa fare gara di freestyle, contro il computer o contro un amico.

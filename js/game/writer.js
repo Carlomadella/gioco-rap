@@ -99,10 +99,14 @@ let WR = null;
    veloce (un clic, risultato medio dalle statistiche) oppure giocata, con il moltiplicatore. */
 const BOOST = 1.5;
 function scegliModo(o){
-  showEvent({k:"Come la fai", t:o.t, d:o.d, opts:[
-    {n:"Falla veloce", d:o.dv, run(){ return o.veloce(); }},
-    {n:"Giocala tu · ×1,5", d:o.dg, run(){ o.gioca(); return {t:"", c:""}; }}
-  ]});
+  showEvent({k:"Come la fai", t:o.t, d:o.d,
+    /* si puo' lasciar perdere: l'azione l'hai aperta tu, e l'energia torna indietro */
+    annulla(){ annullaAzione(); },
+    opts:[
+      {n:"Falla veloce", d:o.dv, run(){ azioneFatta(); return o.veloce(); }},
+      /* qui non si chiude niente: la scena che si apre ha la sua via d'uscita */
+      {n:"Giocala tu · ×1,5", d:o.dg, run(){ o.gioca(); return {t:"", c:""}; }}
+    ]});
 }
 
 /* la tua stanza: scrivania, lampada, finestra sulla città, e tu seduto a scrivere */
@@ -269,6 +273,7 @@ function disegnaFoglio(){
 }
 
 function chiudiStrofa(){
+  azioneFatta();
   const a = analizza(WR.righe, WR.tema);
   const skill = 0.5 + G.skills.scrittura/100 * 0.5;
   const q = Math.round(clamp(a.qTesto * skill * qFactors().mult * WR.boost, 3, 100));
@@ -299,9 +304,9 @@ function chiudiStrofa(){
   pushLog("Strofa scritta sul tema «" + WR.tema.t.toLowerCase() + "», qualità <b>" + q + "</b>.", q >= 60 ? "good" : "");
 }
 
-$("w-x").onclick = () => { if(WR){ G.energy += 1; } chiudiFoglio(); renderGioco(); };
+$("w-x").onclick = () => { if(WR) annullaAzione(); chiudiFoglio(); renderGioco(); };
 $("p-x").onclick = () => uscitaPiazza();
 window.__FS = () => FS;
 window.__R = () => renderGioco();
-$("w-cancel").onclick = () => { G.energy += 1; chiudiFoglio(); renderGioco(); };
+$("w-cancel").onclick = () => { annullaAzione(); chiudiFoglio(); renderGioco(); };
 $("w-done").onclick = () => chiudiStrofa();

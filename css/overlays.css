@@ -163,9 +163,15 @@
 .modal{position:fixed;inset:0;background:rgba(6,6,8,.86);display:none;place-items:center;padding:18px;
   z-index:60;backdrop-filter:blur(6px)}
 .modal.on{display:grid}
-.sheet2{width:100%;max-width:470px;background:var(--card);border-radius:22px;padding:26px;
+.sheet2{position:relative;width:100%;max-width:470px;background:var(--card);border-radius:22px;padding:26px;
   max-height:88vh;overflow-y:auto}
-.sheet2 .k{font-size:12.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--acid)}
+/* la via d'uscita: c'è solo sulle finestre che si possono lasciare a metà */
+.sheet2 .mx{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;
+  background:rgba(255,255,255,.08);color:#fff;font-size:15px;line-height:1;display:grid;place-items:center;
+  transition:background .15s,transform .12s}
+.sheet2 .mx:hover{background:rgba(255,255,255,.18);transform:scale(1.06)}
+.sheet2 .mx[hidden]{display:none}
+.sheet2 .k{padding-right:40px;font-size:12.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--acid)}
 .sheet2 h2{font-size:30px;font-weight:900;letter-spacing:-.03em;margin:6px 0 10px;line-height:1.05}
 .sheet2 p{margin:0 0 16px;color:var(--soft);font-size:14.5px;line-height:1.6}
 .sheet2 p b{color:#fff}

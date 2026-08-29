@@ -66,11 +66,16 @@ function chiediTitolo(suggerito, onOk, pezzo){
   };
   const chiudi = () => {
     const v = ($("tt-in").value || "").trim() || suggerito;
+    azioneFatta();
+    MODALE_ANNULLA = null;
     $("modal").classList.remove("on");
     onOk(v.slice(0,26), st.seed, st.img);
   };
   b.onclick = chiudi;
   w.appendChild(b);
+  /* la sala si puo' lasciare stare: strofa e beat non sono ancora stati consumati */
+  MODALE_ANNULLA = () => annullaAzione();
+  $("m-x").hidden = false;
   $("modal").classList.add("on");
   setTimeout(() => {
     const inp = $("tt-in"); if(!inp) return;

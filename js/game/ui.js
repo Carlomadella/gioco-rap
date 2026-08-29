@@ -135,7 +135,11 @@ function renderGioco(){
       if(!ok) return;
       const fansBefore = G.fans, moneyBefore = G.money;
       G.energy -= en2;
+      /* da qui l'azione e' aperta: se si apre una scena e la abbandoni,
+         annullaAzione() rimette a posto l'energia (vedi uscita.js) */
+      iniziaAzione(en2);
       const msg = a.run();
+      if(!overlayAperto()) azioneFatta();   /* si e' conclusa subito, niente da annullare */
       if(a.luc) addLuc(a.luc);
       if(msg) pushLog(msg, "");
       G.wellbeing = clamp(G.wellbeing, 0, 100);

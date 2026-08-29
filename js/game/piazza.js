@@ -344,7 +344,7 @@ function finePiazza(){
 }
 function uscitaPiazza(){
   if(!FS) return;
-  if(FS.fine){ chiudiPiazza(); save(); renderGioco(); return; }
-  G.energy += 1;
+  if(FS.fine){ azioneFatta(); chiudiPiazza(); save(); renderGioco(); return; }
+  annullaAzione();
   chiudiPiazza(); renderGioco();
 }
