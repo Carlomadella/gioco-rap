@@ -32,10 +32,16 @@ function annullaAzione(){
 
 /* ==================== LE FINESTRE APERTE ==================== */
 /* Ogni voce: l'elemento che fa da fondale, e come si chiude.
-   L'ordine conta: la prima aperta che si incontra è quella che ESC chiude. */
+   L'ordine conta: la prima aperta che si incontra è quella che ESC chiude.
+
+   `fondale:false` toglie la chiusura col clic fuori. Serve dove dentro c'è
+   lavoro che si perde: nel foglio uno scrive barre per un minuto, e un clic
+   di sbieco che manda via tutto è un pessimo affare. Lì si esce con la ✕,
+   con «Lascia perdere» o con ESC, che sono gesti voluti. */
 const USCITE = [
   {id:"modal",  chiudi(){ return chiudiModale(); }},
-  {id:"writer", chiudi(){ if(typeof WR !== "undefined" && WR){ annullaAzione(); } chiudiFoglio(); renderGioco(); return true; }},
+  {id:"writer", fondale:false,
+   chiudi(){ if(typeof WR !== "undefined" && WR){ annullaAzione(); } chiudiFoglio(); renderGioco(); return true; }},
   {id:"piazza", chiudi(){ uscitaPiazza(); return true; }},
   {id:"drawer", chiudi(){ closeDiary(); return true; }},
   {id:"report", chiudi(){ $("report").classList.remove("on"); return true; }}
@@ -65,6 +71,7 @@ document.addEventListener("keydown", e => {
 /* clic fuori dal riquadro: il fondale scuro è l'elemento stesso, il contenuto
    sta in un figlio, quindi un clic il cui bersaglio è il fondale è un clic fuori */
 USCITE.forEach(u => {
+  if(u.fondale === false) return;
   const el = $(u.id);
   if(!el) return;
   el.addEventListener("mousedown", e => {
