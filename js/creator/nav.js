@@ -13,12 +13,6 @@ function goto(screen){
   window.scrollTo({top:0});
   if(screen === "menu") renderMenu();
 }
-/* La sagoma che sta nel cerchio quando un artista non c'è ancora: senza,
-   in alto a destra restava un buco nero che non diceva niente. */
-const AVATAR_VUOTO = '<svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
-  + '<circle cx="22" cy="16.4" r="7.4" fill="rgba(255,255,255,.36)"/>'
-  + '<path d="M7.4,40 C7.4,31.6 14,26.6 22,26.6 C30,26.6 36.6,31.6 36.6,40 Z" fill="rgba(255,255,255,.36)"/></svg>';
-
 /* Lo stato della partita, se i file del gioco sono già stati caricati.
    nav.js gira prima di game/state.js, quindi al primo giro qui non c'è niente —
    e infatti al primo giro non c'è nemmeno una carriera da mostrare. Quando questa
@@ -61,11 +55,11 @@ function renderMenu(){
     ? "Anno " + g.year + " · settimana " + g.week + " · " + short(g.fans) + " fan"
     : nm ? "Settimana 1 · zero fan, zero contatti" : "Entra subito: l'artista lo sistemi dopo";
 
-  /* il cerchio in alto a destra */
+  /* Il cerchio in alto a destra: la faccia dell'artista dell'utente, sempre.
+     Anche senza nome A ha un aspetto completo, quindi c'è sempre qualcosa da mostrare. */
   const av = $("nav-avatar");
-  av.innerHTML = nm ? miniPortrait() : AVATAR_VUOTO;
-  av.classList.toggle("vuoto", !nm);
-  av.title = nm ? nm + " — apri il tuo artista" : "Crea il tuo artista";
+  av.innerHTML = miniPortrait();
+  av.title = nm ? nm + " — apri il tuo artista" : "Il tuo artista";
 
   /* la scheda della carriera: c'è solo se una partita è davvero cominciata */
   $("m-corso").hidden = !viva;
