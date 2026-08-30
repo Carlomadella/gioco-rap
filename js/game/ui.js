@@ -435,6 +435,6 @@ $("g-advance").onclick = () => {
   openWeek();
 };
 $("g-skip").onclick = () => { SFX.tap(); saltaTempo(); };
-$("g-menu").onclick = () => { if(window.GO) window.GO("menu"); };
+$("g-tomenu").onclick = () => { save(); if(window.GO) window.GO("menu"); };
 
 

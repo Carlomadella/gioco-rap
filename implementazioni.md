@@ -107,4 +107,6 @@ Tutte le modifiche da fare:
 
 15. fai in modo che i progressi di gioco vengano salvati, dalla schermata di avvio posso decidere se caricare una partita o crearne una nuova, max 3 slot partita disponibili.
 
-16. la navbar è troppo grande, manca ancora l'avatar nella schermata di menù principale. se clicco su inizia carriera il bottone per tornare al menù non deve stare nella navbar
+<!-- 16. la navbar è troppo grande, manca ancora l'avatar nella schermata di menù principale. se clicco su inizia carriera il bottone per tornare al menù non deve stare nella navbar -->
+
+17. manca il bottone che porta dalla schermata di gioco al menù principale, crealo
