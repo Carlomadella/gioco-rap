@@ -59,10 +59,12 @@ function sistemaRivali(){
 }
 /* la scena va avanti anche senza di te */
 function vitaRivali(mieiStream){
+  /* quanto corrono gli altri mentre tu lavori: manopola «rivali» nelle impostazioni */
+  const sp = (typeof difRivali === "function" ? difRivali() : 1);
   for(const r2 of G.rivals){
     r2.prev = r2.p;
     r2.mom = (r2.mom || 0) * 0.72;
-    r2.p = Math.min(3.2e6, Math.max(120, r2.p * rnd(0.955, 1.075) * (1 + r2.mom)));
+    r2.p = Math.min(3.2e6, Math.max(120, r2.p * rnd(0.955, 1.075) * (1 + r2.mom * sp) * (1 + (sp - 1) * 0.045)));
     if(r2.hot > 0) r2.hot--;
     const dado = Math.random();
     if(dado < .045){

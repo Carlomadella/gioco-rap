@@ -1,0 +1,144 @@
+/* Impostazioni: pannello, temi, densità. © La Fame Studio. */
+
+/* ---- temi ---- */
+html.tema-nero{--bg:#000;--card:#0C0C10;--card-2:#141419;--line:rgba(255,255,255,.10)}
+html.tema-nero body{background:#000}
+html.tema-nero body::before{opacity:.55}
+html.tema-contrasto{--soft:#D4D4DC;--faint:#9C9CAA;--line:rgba(255,255,255,.22);--card:#191920;--card-2:#232330}
+html.tema-contrasto .mrow .tx .b,html.tema-contrasto .tile .s{color:#CFCFD8}
+
+/* ---- animazioni spente: resta solo quello che serve a capire ---- */
+html.ridotto *,html.ridotto *::before,html.ridotto *::after{
+  animation-duration:.001s!important;animation-iteration-count:1!important;
+  transition-duration:.001s!important;scroll-behavior:auto!important}
+
+/* ---- modalità compatta ---- */
+html.compatto .menu{padding-top:2px;padding-bottom:60px}
+html.compatto .mhero{min-height:220px}
+html.compatto .mhero .mport,html.compatto .mhero .mport svg{height:230px}
+html.compatto .mhero .mtxt{padding:18px 20px}
+html.compatto .mrow{padding:12px 14px}
+html.compatto .mrcard{padding:14px 14px 12px}
+html.compatto .mcorso{padding:14px 16px 16px}
+html.compatto .list,html.compatto .gpane .list{margin-bottom:10px}
+html.compatto .acts{gap:9px}
+html.compatto .gstats{gap:8px}
+
+/* ---- il pannello ---- */
+.setts{position:fixed;inset:0;z-index:120;display:none;background:rgba(6,6,9,.78);
+  backdrop-filter:blur(9px);padding:22px 16px;overflow:auto}
+.setts.on{display:block}
+.swrap{max-width:840px;margin:0 auto;background:var(--card);border-radius:24px;
+  box-shadow:inset 0 0 0 1px var(--line),0 30px 90px rgba(0,0,0,.6);overflow:hidden}
+.shead{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+  padding:22px 24px 16px;background:linear-gradient(150deg,color-mix(in srgb,var(--c1) 34%,#15151B),#15151B)}
+.shead .sk{font-family:var(--cond);font-size:12px;font-weight:800;letter-spacing:.16em;
+  text-transform:uppercase;color:rgba(255,255,255,.66)}
+.shead h2{margin:2px 0 0;font-size:30px;letter-spacing:-.03em}
+.sx{width:38px;height:38px;flex:none;border-radius:50%;background:rgba(0,0,0,.35);
+  font-size:16px;line-height:1;transition:background .15s,transform .12s}
+.sx:hover{background:rgba(0,0,0,.55);transform:scale(1.06)}
+
+.stabs{display:flex;gap:6px;padding:12px 16px;overflow-x:auto;background:#101015;
+  border-bottom:1px solid var(--line);scrollbar-width:none}
+.stabs::-webkit-scrollbar{display:none}
+.stab{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;padding:9px 15px;
+  border-radius:999px;font-size:13.5px;font-weight:700;color:var(--soft);
+  background:rgba(255,255,255,.05);transition:background .15s,color .15s}
+.stab i{font-style:normal;font-size:13px;opacity:.8}
+.stab:hover{background:rgba(255,255,255,.1);color:#fff}
+.stab.on{background:#fff;color:#0B0B0D}
+.stab.on i{opacity:1}
+
+.sbody{padding:18px 18px 6px}
+.scard{background:var(--card-2);border-radius:18px;padding:6px 18px;margin-bottom:14px;
+  box-shadow:inset 0 0 0 1px var(--line)}
+.scard .stit{display:block;font-size:15px;font-weight:800;padding:14px 0 0}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:14px 0;border-bottom:1px solid var(--line)}
+.srow:last-child{border-bottom:none}
+.srow .stx{min-width:0;display:flex;flex-direction:column;gap:3px}
+.srow .stx b{font-size:15px;font-weight:800;letter-spacing:-.01em}
+.srow .stx span{font-size:12.5px;color:var(--soft);font-weight:500;line-height:1.5}
+.srow .sctl{flex:none;display:flex;align-items:center;gap:8px}
+.snote{margin:0;padding:12px 0 14px;font-size:12.5px;line-height:1.6;color:var(--soft);font-weight:500}
+
+/* gruppi di bottoni */
+.seg{display:inline-flex;background:rgba(0,0,0,.32);border-radius:999px;padding:3px;gap:2px}
+.seg button{padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:700;
+  color:var(--soft);white-space:nowrap;transition:background .15s,color .15s}
+.seg button:hover{color:#fff}
+.seg button.on{background:#fff;color:#0B0B0D}
+
+/* manopole */
+.sld{display:inline-flex;align-items:center;gap:10px}
+.sld input[type=range]{width:150px;accent-color:var(--c1)}
+.sld .sval{font-family:var(--cond);font-style:normal;font-size:16px;font-weight:800;
+  min-width:46px;text-align:right;color:#fff}
+
+/* interruttori */
+.sw{width:50px;height:29px;border-radius:999px;background:rgba(255,255,255,.14);position:relative;
+  transition:background .18s}
+.sw i{position:absolute;top:3px;left:3px;width:23px;height:23px;border-radius:50%;background:#fff;
+  transition:transform .18s}
+.sw.on{background:var(--green)}
+.sw.on i{transform:translateX(21px)}
+
+/* pastiglie di colore */
+.sw2row{display:inline-flex;flex-wrap:wrap;gap:7px;max-width:230px;justify-content:flex-end}
+.sw2{width:28px;height:28px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);
+  transition:transform .12s,box-shadow .15s}
+.sw2:hover{transform:scale(1.12)}
+.sw2.on{box-shadow:0 0 0 2px #fff,inset 0 0 0 1px rgba(0,0,0,.3)}
+
+/* bottoni del pannello */
+.sbtn{padding:9px 15px;border-radius:999px;background:rgba(255,255,255,.09);
+  font-size:12.5px;font-weight:700;transition:background .15s,color .15s}
+.sbtn:hover{background:rgba(255,255,255,.17)}
+.sbtn.danger{color:#FF8B6E}
+.sbtn.danger:hover{background:rgba(255,90,54,.2)}
+.sbtn.armato{background:var(--hot);color:#0B0B0D;font-weight:800}
+.sacts{display:flex;flex-wrap:wrap;gap:8px;padding:0 0 16px}
+.sprove{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;max-width:300px}
+.sprove .sbtn{padding:7px 11px;font-size:11.5px;font-weight:700;color:var(--soft)}
+.sprove .sbtn:hover{color:#fff}
+
+/* slot di salvataggio */
+.sslot{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid var(--line)}
+.sslot:last-child{border-bottom:none}
+.sslot .sn{width:34px;height:34px;flex:none;border-radius:11px;display:grid;place-items:center;
+  background:rgba(255,255,255,.07);font-family:var(--cond);font-size:17px;font-weight:800}
+.sslot.on .sn{background:var(--c1);color:#0B0B0D}
+.sslot .stx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.sslot .stx b{font-size:15px;font-weight:800}
+.sslot .stx b em{font-style:normal;font-size:10.5px;font-weight:800;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--green);margin-left:6px}
+.sslot .stx span{font-size:12.5px;color:var(--soft);font-weight:500}
+.sslot .sacts{padding:0}
+
+.stxa{width:100%;min-height:78px;resize:vertical;border-radius:14px;padding:11px 13px;
+  background:rgba(0,0,0,.34);border:1px solid var(--line);color:var(--soft);
+  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;line-height:1.5;margin-bottom:12px}
+
+/* diritti */
+.sinfo .smark{display:flex;align-items:baseline;gap:9px;padding:16px 0 4px}
+.sinfo .smark b{font-family:var(--disp);font-size:22px;letter-spacing:-.02em;font-weight:400}
+.sinfo .smark span{font-size:12px;color:var(--faint);font-weight:600;text-transform:uppercase;letter-spacing:.1em}
+.sinfo .scop{margin:6px 0 0;font-size:14px;font-weight:800;color:var(--c1)}
+
+.sfoot{padding:14px 22px 20px;font-size:11.5px;color:var(--faint);font-weight:600;
+  border-top:1px solid var(--line);background:#101015}
+
+/* la riga del copyright nel menu */
+.mcopy{margin-top:8px;font-size:12px;color:var(--faint);font-weight:700;letter-spacing:.01em}
+
+@media (max-width:620px){
+  .setts{padding:0}
+  .swrap{border-radius:0;min-height:100%}
+  .srow{flex-direction:column;align-items:flex-start;gap:10px}
+  .srow .sctl{width:100%}
+  .sld input[type=range]{width:100%;flex:1}
+  .sld{width:100%}
+  .sw2row{max-width:none;justify-content:flex-start}
+  .sslot{flex-wrap:wrap}
+}

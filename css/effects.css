@@ -19,8 +19,6 @@
 .tile:active:not(:disabled){transform:scale(.965)}
 .tile.hit{animation:hit .42s cubic-bezier(.2,.8,.3,1)}
 @keyframes hit{0%{transform:scale(1)}30%{transform:scale(1.05)}100%{transform:scale(1)}}
-.genergy i{transition:background .35s,transform .25s}
-.genergy i.spent{transform:scaleY(.55);opacity:.5}
 
 .gtop{position:relative;overflow:hidden}
 .gtop::before{content:"";position:absolute;inset:-40% -10% auto -10%;height:200%;

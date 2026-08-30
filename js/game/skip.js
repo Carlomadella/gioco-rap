@@ -41,7 +41,7 @@ function saltaTempo(){
     {n:"Un mese",
      d:"Quattro settimane di niente. Benessere pieno, ma <b>−34 di lucidità</b> e <b>l'hype crolla</b>: la gente ha altro da ascoltare.",
      run: saltaMese},
-    {n:"Lascia stare", d:"Torni a quello che stavi facendo.", run(){ SFX.tap(); }}
+    {n:"Lascia stare", d:"Torni a quello che stavi facendo.", run(){}}
   ]);
 }
 

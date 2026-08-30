@@ -30,7 +30,8 @@ function gain(k, a){
   G.skills[k] = clamp(G.skills[k] + a * Math.max(0.12, 1 - G.skills[k]/88), 0, 88);
 }
 
-function weeklyCosts(){ return Math.round(25 + G.fans*0.0006 + G.songs.length*2 + lifeCost()); }
+/* le spese fisse: la durezza scelta nelle impostazioni pesa su tutto il conto */
+function weeklyCosts(){ return Math.round((25 + G.fans*0.0006 + G.songs.length*2 + lifeCost()) * difSpese()); }
 
 function advanceWeek(){
   if(G.ended) return;
@@ -58,7 +59,7 @@ function advanceWeek(){
   if(fattore < 0.75 && G.phase < PHASES.length-1 && Math.random() < .3)
     pushLog("Il pezzo gira, ma oltre <b>" + PHASES[G.phase].n.toLowerCase() + "</b> non arriva. Serve il passo dopo.", "");
 
-  const newFans = Math.round(streams * 0.017 + G.hype * 0.7);
+  const newFans = Math.round((streams * 0.017 + G.hype * 0.7) * difFan());
   G.fans += newFans;
 
   // chi ti segue se ne va, se sparisci

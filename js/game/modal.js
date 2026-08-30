@@ -21,9 +21,12 @@ function showEvent(e){
     b.innerHTML = '<span class="n">' + o.n + '</span><span class="d">' + o.d + '</span>';
     b.onclick = () => {
       MODALE_ANNULLA = null;
+      /* la finestra si chiude prima di eseguire: certe scelte ne riaprono
+         un'altra qui dentro (il titolo del pezzo, «Come la fai»), e chiudere
+         dopo se la sarebbe portata via appena nata */
+      $("modal").classList.remove("on");
       const r = o.run() || {t:"", c:""};
       if(r.t) pushLog(r.t, r.c);
-      $("modal").classList.remove("on");
       save(); renderGioco();
     };
     w.appendChild(b);

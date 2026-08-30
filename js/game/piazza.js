@@ -250,7 +250,7 @@ function battuta(){
       document.getElementById("onda").setAttribute("rx", "118");
       document.getElementById("onda").setAttribute("ry", "34"); } }, 150);
   }
-  if(!muted){ beep(FS.beat % 4 === 1 ? 62 : 48, .09, "sine", .09); if(FS.beat % 4 === 3) noiseHit(.09, 2400, .05); }
+  if(!muted) SFX.click(FS.beat % 4 === 1);
   if(!FS.tapped && FS.beat > 2 && !$("p-choice")){ FS.persi++; cambiaFolla(-2.6); }
   FS.tapped = false;
   if(FS.beat === 10 || FS.beat === 20 || FS.beat === 29){ momentoScelta(); return; }
@@ -263,9 +263,9 @@ function colpo(){
   FS.tapped = true;
   const j = $("p-judge");
   let txt = "", col = "#fff";
-  if(d2 < 95){ FS.perfetti++; cambiaFolla(4.6); txt = "IN POCKET"; col = "var(--acid)"; if(!muted) beep(880,.05,"square",.03); }
-  else if(d2 < 190){ FS.buoni++; cambiaFolla(2.2); txt = "a tempo"; col = "#fff"; if(!muted) beep(660,.05,"square",.025); }
-  else { FS.persi++; cambiaFolla(-3.4); txt = "fuori tempo"; col = "var(--hot)"; if(!muted) beep(150,.1,"sawtooth",.04); }
+  if(d2 < 95){ FS.perfetti++; cambiaFolla(4.6); txt = "IN POCKET"; col = "var(--acid)"; if(!muted) SFX.pocket(); }
+  else if(d2 < 190){ FS.buoni++; cambiaFolla(2.2); txt = "a tempo"; col = "#fff"; if(!muted) SFX.buono(); }
+  else { FS.persi++; cambiaFolla(-3.4); txt = "fuori tempo"; col = "var(--hot)"; if(!muted) SFX.perso(); }
   if(j){ j.textContent = txt; j.style.color = col; j.className = "judge2 show";
     setTimeout(() => { if($("p-judge")) $("p-judge").className = "judge2"; }, 320); }
 }

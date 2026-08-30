@@ -120,3 +120,22 @@ Tutte le modifiche da fare:
 21. implementa un nuovo modo di fare soldi, poi nel caso anche la fama, ovvero la professione del criminale
 
 22. l'energià più si sale di livello più aumenta, come poi per tutto, i livelli dovranno avere un senso, puntiamo ad un gioco in cui farmare non fa stufare l'utente che gioca
+
+23. ~~Menù delle impostazioni, aperto dal menu principale~~ **FATTO (30/08/2026)**
+    - Audio: interruttore, volume generale, effetti, beat, prova del suono. Il tasto ♪ in partita è lo stesso interruttore.
+    - Aspetto: tema (notte / nero assoluto / contrasto alto), colore dell'interfaccia (quello dell'artista o fisso), grana, alone, animazioni, dimensione dell'interfaccia (90-125%), modalità compatta.
+    - Gioco: preset di difficoltà (facile / normale / duro / su misura), energie a settimana (−1…+2), spese fisse, crescita dei fan, aggressività dei rivali, conferma prima delle mosse che costano soldi o due energie.
+    - Partite: i 3 slot del punto 15, ognuno col suo artista e la sua carriera (lo slot 1 tiene le chiavi storiche); esporta/importa la carriera come codice, cancella singolo slot, cancella tutto.
+    - Lingua: italiano / inglese. L'interfaccia passa in inglese (menu, pannelli, azioni, cruscotto, lifestyle); le scene scritte restano in italiano.
+    - Diritti: sezione dedicata, riga nel menu e meta nell'head — Anni di Fame è di La Fame Studio, tutti i diritti riservati.
+    File nuovi: `js/impostazioni.js`, `js/lingua.js`, `js/impostazioni-ui.js`, `css/impostazioni.css`, `strumenti/build-artifact.py`.
+
+15. Gli slot ci sono (impostazioni → Partite): restano da mettere anche nella schermata di avvio, come scelta prima di giocare.
+
+13. ~~Suoni di gioco nuovi e beat più vari~~ **FATTO in parte (30/08/2026)** — i suoni.
+    Rifatto il banco audio: compressore e riverbero corto su tutto, niente più onde quadre.
+    Click dei pulsanti d'aria (uno solo per tutta l'app, più pieno sui bottoni grossi), penna sul foglio,
+    celesta per i soldi, tonfo di sala per il rec, fader per il mix, accordo caldo per l'uscita,
+    folla che respira, traguardo lungo, metronomo e giudizio della piazza rifatti.
+    In impostazioni → Audio: carattere dei suoni (morbido / retrò), interruttore per i click, otto bottoni di prova.
+    Resta da fare la seconda metà del punto: variare di più i beat.

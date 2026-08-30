@@ -14,7 +14,9 @@ const ART = {
 function renderGioco(){
   if(typeof beatStop === "function") beatStop();
   const art = window.ARTIST || {};
-  const cc = art.color || "#FF5A36";
+  /* l'accento è il colore dell'artista, a meno che nelle impostazioni non sia
+     stato fissato un colore d'interfaccia: in quel caso comanda quello */
+  const cc = coloreAccento(art.color);
   $("gtop").style.setProperty("--c1", cc);
   document.documentElement.style.setProperty("--c1", cc);
   // la faccia segue il momento che stai vivendo
@@ -142,8 +144,7 @@ function renderGioco(){
       '</span>' +
       '<span class="t">' + a.n + '</span>' +
       '<span class="s">' + a.d + '</span>' + rw;
-    b.onclick = () => {
-      if(!ok) return;
+    const esegui = () => {
       const fansBefore = G.fans, moneyBefore = G.money;
       G.energy -= en2;
       /* da qui l'azione e' aperta: se si apre una scena e la abbandoni,
@@ -162,6 +163,23 @@ function renderGioco(){
       if(dm > 0){ extra += ' <b>+' + fmt(dm) + ' €</b>'; weekEarn += dm; }
       toast(msg + extra, "good", g[2], [g[0], g[1]]);
       checkGoals(); save(); renderGioco();
+    };
+    /* «Chiedi conferma» nelle impostazioni: si controlla solo dove fa male
+       sbagliare, cioè quando la mossa costa soldi o mezza settimana di energia */
+    b.onclick = () => {
+      if(!ok) return;
+      const pesa = SET.gioco.conferme && (c > 0 || en2 >= 2);
+      if(!pesa){ esegui(); return; }
+      showEvent({
+        k:"Confermi?", t:a.n,
+        d:"Ti costa <b>" + en2 + (en2 === 1 ? " energia" : " energie") + "</b>" +
+          (c ? " e <b>" + fmt(c) + " €</b>" : "") + ". " + a.d,
+        annulla(){},
+        opts:[
+          {n:"Vai", d:"Fai la mossa adesso", run(){ esegui(); return null; }},
+          {n:"Lascia stare", d:"Torni indietro senza spendere niente", run(){ return null; }}
+        ]
+      });
     };
     aw.appendChild(b);
   }
@@ -212,7 +230,6 @@ function renderGioco(){
       const b = G.market[+btn.dataset.drop];
       if(!b) return;
       G.market.splice(+btn.dataset.drop, 1);
-      SFX.tap();
       toast("Hai lasciato lì «<b>" + b.n + "</b>». Non era il tuo.", "", "✕", ["#5A6472","#2B2B34"]);
       save(); renderGioco();
     };
@@ -241,7 +258,6 @@ function renderGioco(){
   $("g-songs").querySelectorAll("[data-ren]").forEach(btn => {
     btn.onclick = () => {
       const sx = G.songs[+btn.dataset.ren]; if(!sx) return;
-      SFX.tap();
       chiediTitolo(sx.t, (nome, seed, img) => { sx.t = nome; sx.seed = seed; sx.img = img; save(); renderGioco(); }, sx);
     };
   });
@@ -291,7 +307,7 @@ function renderGioco(){
   }).join("");
   G.chartPrev = all.findIndex(x => x.me) + 1;
   $("g-chart").querySelectorAll("[data-riv]").forEach(el => {
-    el.onclick = () => { SFX.tap(); schedaRivale(el.dataset.riv); };
+    el.onclick = () => schedaRivale(el.dataset.riv);
   });
 
   // contratti
@@ -422,8 +438,8 @@ function openDiary(){
   G.seenLog = G.log.length; save(); renderGioco();
 }
 function closeDiary(){ $("drawer").classList.remove("on"); }
-$("g-diary").onclick = () => { SFX.tap(); openDiary(); };
-$("d-close").onclick = () => { SFX.tap(); closeDiary(); };
+$("g-diary").onclick = () => openDiary();
+$("d-close").onclick = () => closeDiary();
 $("drawer").addEventListener("click", e => { if(e.target.id === "drawer") closeDiary(); });
 document.addEventListener("keydown", e => { if(e.key === "Escape") closeDiary(); });
 
@@ -432,7 +448,6 @@ document.querySelectorAll(".nb").forEach(t => {
     document.querySelectorAll(".nb").forEach(x => x.classList.toggle("on", x === t));
     document.querySelectorAll(".gpane").forEach(pp => pp.classList.toggle("on", pp.dataset.p === t.dataset.t));
     if(typeof beatStop === "function") beatStop();
-    SFX.tap();
   };
 });
 let weekOpen = null, weekEarn = 0;
@@ -449,7 +464,7 @@ $("g-advance").onclick = () => {
   weekReport(before, costs);
   openWeek();
 };
-$("g-skip").onclick = () => { SFX.tap(); saltaTempo(); };
+$("g-skip").onclick = () => saltaTempo();
 $("g-tomenu").onclick = () => { save(); if(window.GO) window.GO("menu"); };
 
 

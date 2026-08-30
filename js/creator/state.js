@@ -11,8 +11,10 @@ const DEF = () => ({
   hat:"no", ear:"no", grillz:"no", clothCol:"", mood:"neutro",
   eyes:"auto", cuffie:"no"
 });
+/* ogni slot di salvataggio ha il suo artista: lo slot 1 tiene la chiave storica */
+const CHIAVE_ARTISTA = () => (typeof slotKey === "function" ? slotKey(ART_KEY) : ART_KEY);
 let A = DEF();
-try{ const r = localStorage.getItem(ART_KEY); if(r) A = Object.assign(DEF(), JSON.parse(r)); }catch(e){}
+try{ const r = localStorage.getItem(CHIAVE_ARTISTA()); if(r) A = Object.assign(DEF(), JSON.parse(r)); }catch(e){}
 
 const scene = () => SCENES.find(x => x.id === A.scene) || SCENES[1];
 const genre = () => GENRES.find(g => g.id === A.genre) || GENRES[0];

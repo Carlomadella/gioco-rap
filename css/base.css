@@ -18,10 +18,11 @@ html,body{margin:0;background:#08080B;color:var(--text);
 body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
   transform:translateZ(0);will-change:transform;
   background:
-    radial-gradient(115% 62% at 50% -12%, color-mix(in srgb, var(--c1) 52%, transparent) 0%, transparent 60%),
+    radial-gradient(115% 62% at 50% -12%, color-mix(in srgb, var(--c1) calc(var(--alone,52) * 1%), transparent) 0%, transparent 60%),
     radial-gradient(70% 46% at 86% 6%, rgba(176,38,255,.26), transparent 62%),
     linear-gradient(180deg,#131120 0%,#0B0A11 42%,#08080B 100%)}
-body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.055;
+/* grana e alone si regolano dalle impostazioni: --grana 0-100 → opacità 0-.1 */
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:calc(var(--grana,55) * .001);
   transform:translateZ(0);will-change:transform;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size:160px 160px}

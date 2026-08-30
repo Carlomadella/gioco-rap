@@ -304,10 +304,10 @@ function disegnaFoglio(){
     const prima = WR.righe.slice();
     WR.righe = completaStrofa(WR.righe, WR.tema);
     WR.righe.forEach((r, i) => { if((prima[i] || "").trim().length <= 1) WR.gen[i] = r; });
-    disegnaFoglio(); SFX.tap();
+    disegnaFoglio();
   };
-  const more = $("w-more"); if(more) more.onclick = () => { WR.righe.push(""); disegnaFoglio(); SFX.tap(); };
-  const less = $("w-less"); if(less) less.onclick = () => { WR.righe.pop(); disegnaFoglio(); SFX.tap(); };
+  const more = $("w-more"); if(more) more.onclick = () => { WR.righe.push(""); disegnaFoglio(); };
+  const less = $("w-less"); if(less) less.onclick = () => { WR.righe.pop(); disegnaFoglio(); };
 }
 
 /* Il voto della strofa. WR.minimo e' la qualita' che davano le statistiche da

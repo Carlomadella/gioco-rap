@@ -163,9 +163,3 @@ function completaStrofa(righe, tema){
   }
   return out;
 }
-
-/* Una strofa intera scritta da zero, per "Falla veloce": stesso motore,
-   partendo da un foglio vuoto. */
-function strofaIntera(tema, quante){
-  return completaStrofa(new Array(quante || 4).fill(""), tema);
-}

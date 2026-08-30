@@ -27,7 +27,7 @@ function caricaCopertina(file, ok, ko){
 }
 /* se il salvataggio non ci sta, la copertina caricata è la prima cosa che si sacrifica */
 function salvaConCopertine(){
-  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(G)); return true; }
+  try{ localStorage.setItem(CHIAVE_PARTITA(), JSON.stringify(G)); return true; }
   catch(e){
     const conFoto = G.songs.filter(x => x.img);
     if(!conFoto.length) return false;
@@ -82,9 +82,9 @@ function chiediTitolo(suggerito, onOk, pezzo){
     inp.focus();
     inp.oninput = ridisegna;
     inp.onkeydown = e => { if(e.key === "Enter"){ e.preventDefault(); chiudi(); } };
-    $("tt-dado").onclick = () => { $("tt-in").value = title(); SFX.tap(); ridisegna(); };
-    $("tt-altra").onclick = () => { st.seed = Math.floor(Math.random()*1e9); SFX.tap(); ridisegna(); };
-    $("tt-togli").onclick = () => { st.img = ""; SFX.tap(); $("tt-nota").textContent = "Copertina generata dal gioco."; ridisegna(); };
+    $("tt-dado").onclick = () => { $("tt-in").value = title(); ridisegna(); };
+    $("tt-altra").onclick = () => { st.seed = Math.floor(Math.random()*1e9); ridisegna(); };
+    $("tt-togli").onclick = () => { st.img = ""; $("tt-nota").textContent = "Copertina generata dal gioco."; ridisegna(); };
     $("tt-carica").onclick = () => $("tt-file").click();
     $("tt-file").onchange = ev => {
       const f = ev.target.files && ev.target.files[0]; if(!f) return;

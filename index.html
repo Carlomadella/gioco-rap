@@ -4,22 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Anni di Fame</title>
+<meta name="author" content="La Fame Studio">
+<meta name="copyright" content="© 2026 La Fame Studio — Anni di Fame. Tutti i diritti riservati.">
+<meta name="description" content="Anni di Fame — simulatore di carriera rap. Un gioco di La Fame Studio.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=Archivo+Black&family=Barlow+Condensed:wght@600;700;800&display=swap">
 
 <!-- Fogli di stile: l'ordine conta, la cascata è quella originale. -->
-<link rel="stylesheet" href="css/base.css?v=3">
-<link rel="stylesheet" href="css/preview.css?v=3">
-<link rel="stylesheet" href="css/shell.css?v=3">
-<link rel="stylesheet" href="css/game.css?v=3">
-<link rel="stylesheet" href="css/overlays.css?v=3">
-<link rel="stylesheet" href="css/effects.css?v=3">
-<link rel="stylesheet" href="css/hud.css?v=3">
-<link rel="stylesheet" href="css/forms.css?v=3">
-<link rel="stylesheet" href="css/creator.css?v=3">
-<link rel="stylesheet" href="css/actionbar.css?v=3">
+<link rel="stylesheet" href="css/base.css?v=4">
+<link rel="stylesheet" href="css/preview.css?v=4">
+<link rel="stylesheet" href="css/shell.css?v=4">
+<link rel="stylesheet" href="css/game.css?v=4">
+<link rel="stylesheet" href="css/overlays.css?v=4">
+<link rel="stylesheet" href="css/effects.css?v=4">
+<link rel="stylesheet" href="css/hud.css?v=4">
+<link rel="stylesheet" href="css/forms.css?v=4">
+<link rel="stylesheet" href="css/creator.css?v=4">
+<link rel="stylesheet" href="css/actionbar.css?v=4">
+<link rel="stylesheet" href="css/impostazioni.css?v=4">
 </head>
 <body>
 
@@ -75,6 +79,11 @@
         <span class="ic" style="background:var(--sky)">C</span>
         <span class="tx"><span class="a">Classifiche</span><span class="b">Chi comanda questa settimana</span></span>
       </button>
+      <!-- Le impostazioni si aprono da qui, dal menu principale e basta. -->
+      <button class="mrow" id="m-setts">
+        <span class="ic" style="background:var(--green)">⚙</span>
+        <span class="tx"><span class="a">Impostazioni</span><span class="b">Audio, aspetto, difficoltà, salvataggi</span></span>
+      </button>
     </div>
 
     <!-- La carriera in corso: compare solo se una partita è già cominciata. -->
@@ -122,6 +131,7 @@
 
     <p class="mfoot">La Fame Studio · prototipo. La partita è salvata su questo dispositivo:
       se svuoti i dati del browser, la carriera se ne va con loro.</p>
+    <p class="mcopy">© 2026 La Fame Studio — Anni di Fame. Tutti i diritti riservati.</p>
   </div>
 </section>
 
@@ -363,39 +373,47 @@
 </section>
 
 <!-- Script classici, caricati in ordine: ogni file usa quello che viene prima. -->
-<script src="js/core.js?v=3"></script>
+<script src="js/core.js?v=4"></script>
+
+<!-- Impostazioni: audio, aspetto, difficoltà, slot e lingua. Devono esistere
+     prima di tutto il resto, perché stato e simulazione leggono da qui. -->
+<script src="js/impostazioni.js?v=4"></script>
+<script src="js/lingua.js?v=4"></script>
 
 <!-- Creatore dell'artista -->
-<script src="js/creator/data.js?v=3"></script>
-<script src="js/creator/state.js?v=3"></script>
-<script src="js/creator/portrait.js?v=3"></script>
-<script src="js/creator/avatar-presets.js?v=3"></script>
-<script src="js/creator/options.js?v=3"></script>
-<script src="js/creator/render.js?v=3"></script>
-<script src="js/creator/events.js?v=3"></script>
-<script src="js/creator/nav.js?v=3"></script>
+<script src="js/creator/data.js?v=4"></script>
+<script src="js/creator/state.js?v=4"></script>
+<script src="js/creator/portrait.js?v=4"></script>
+<script src="js/creator/avatar-presets.js?v=4"></script>
+<script src="js/creator/options.js?v=4"></script>
+<script src="js/creator/render.js?v=4"></script>
+<script src="js/creator/events.js?v=4"></script>
+<script src="js/creator/nav.js?v=4"></script>
 
 <!-- Partita -->
-<script src="js/game/state.js?v=3"></script>
-<script src="js/game/content.js?v=3"></script>
-<script src="js/game/beats.js?v=3"></script>
-<script src="js/game/covers.js?v=3"></script>
-<script src="js/game/rivals.js?v=3"></script>
-<script src="js/game/actions.js?v=3"></script>
-<script src="js/game/events.js?v=3"></script>
-<script src="js/game/phases.js?v=3"></script>
-<script src="js/game/sim.js?v=3"></script>
-<script src="js/game/writer.js?v=3"></script>
-<script src="js/game/versi.js?v=3"></script>
-<script src="js/game/piazza.js?v=3"></script>
-<script src="js/game/copertine.js?v=3"></script>
-<script src="js/game/modal.js?v=3"></script>
-<script src="js/game/scene-art.js?v=3"></script>
-<script src="js/game/beatplay.js?v=3"></script>
-<script src="js/game/ui.js?v=3"></script>
-<script src="js/game/lifestyle.js?v=3"></script>
-<script src="js/game/fx.js?v=3"></script>
-<script src="js/game/skip.js?v=3"></script>
-<script src="js/game/uscita.js?v=3"></script>
+<script src="js/game/state.js?v=4"></script>
+<script src="js/game/content.js?v=4"></script>
+<script src="js/game/beats.js?v=4"></script>
+<script src="js/game/covers.js?v=4"></script>
+<script src="js/game/rivals.js?v=4"></script>
+<script src="js/game/actions.js?v=4"></script>
+<script src="js/game/events.js?v=4"></script>
+<script src="js/game/phases.js?v=4"></script>
+<script src="js/game/sim.js?v=4"></script>
+<script src="js/game/writer.js?v=4"></script>
+<script src="js/game/versi.js?v=4"></script>
+<script src="js/game/piazza.js?v=4"></script>
+<script src="js/game/copertine.js?v=4"></script>
+<script src="js/game/modal.js?v=4"></script>
+<script src="js/game/scene-art.js?v=4"></script>
+<script src="js/game/beatplay.js?v=4"></script>
+<script src="js/game/ui.js?v=4"></script>
+<script src="js/game/lifestyle.js?v=4"></script>
+<script src="js/game/fx.js?v=4"></script>
+<script src="js/game/skip.js?v=4"></script>
+<script src="js/game/uscita.js?v=4"></script>
+
+<!-- Il pannello delle impostazioni: per ultimo, tocca roba definita ovunque. -->
+<script src="js/impostazioni-ui.js?v=4"></script>
 </body>
 </html>

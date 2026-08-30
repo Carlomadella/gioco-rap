@@ -36,7 +36,7 @@ function renderMenu(){
   const g = partita();
   const viva = nm && carrieraIniziata(g);
 
-  $("mhero").style.setProperty("--c1", A.color);
+  $("mhero").style.setProperty("--c1", (typeof coloreAccento === "function" ? coloreAccento(A.color) : A.color));
   $("mhero").classList.toggle("viva", !!viva);
   /* Il ritratto c'è sempre, anche prima che l'artista abbia un nome: senza,
      il menu si apriva su mezzo riquadro vuoto. Finché è solo un abbozzo lo si
@@ -225,7 +225,7 @@ $("m-reset").onclick = function(){
     return;
   }
   clearTimeout(resetArmato); resetArmato = 0;
-  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+  try{ localStorage.removeItem(CHIAVE_PARTITA()); }catch(e){}
   location.reload();
 };
 $("m-play").onclick = () => {

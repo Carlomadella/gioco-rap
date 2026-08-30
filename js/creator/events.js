@@ -59,7 +59,7 @@ let firstRun = !A.name.trim();
 
 $("save").onclick = () => {
   if(!A.name.trim()) return;
-  try{ localStorage.setItem(ART_KEY, JSON.stringify(A)); }catch(e){}
+  try{ localStorage.setItem(CHIAVE_ARTISTA(), JSON.stringify(A)); }catch(e){}
   if(firstRun){
     firstRun = false;
     applyMode();

@@ -37,7 +37,6 @@ const LIFE = [
   ]}
 ];
 
-function lifeTier(id){ const c = LIFE.find(x => x.id === id); return c.t[G.life[id] || 0]; }
 function lifeCost(){ return LIFE.reduce((a,c) => a + c.t[G.life[c.id] || 0].w, 0); }
 function lifeBonus(){
   const b = {well:0, energy:0, hype:0, rete:0, fan:1, live:1};
@@ -50,7 +49,8 @@ function lifeBonus(){
 }
 function syncEnergy(){
   const art = window.ARTIST || {};
-  const base = 3 + (art.scene === "provincia" ? 1 : 0) + lifeBonus().energy;
+  /* tre di base, più la provincia, più il lifestyle, più quello che chiedono le impostazioni */
+  const base = Math.max(1, 3 + (art.scene === "provincia" ? 1 : 0) + lifeBonus().energy + difEnergia());
   if(G.maxEnergy !== base){
     const diff = base - G.maxEnergy;
     G.maxEnergy = base;

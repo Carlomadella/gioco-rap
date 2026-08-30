@@ -35,7 +35,6 @@ function qFactors(){
 const qDetail = () => qFactors().list
   .map(([n,v]) => n + " " + (v>=1?"+":"") + Math.round((v-1)*100) + "%").join(" · ");
 const wellFactor = () => qFactors().mult;
-const barQuality = () => clamp((16 + G.skills.scrittura*0.95) * wellFactor(), 5, 100);
 const qVeloce = () => clamp((28 + G.skills.scrittura*0.8) * wellFactor(), 5, 100);
 const gearBonus = () => GEAR.reduce((a,g) => a + (G.gear[g.id] ? g.q : 0), 0);
 const bestBar  = () => G.bars.slice().sort((a,b) => b.q-a.q)[0];

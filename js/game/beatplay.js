@@ -37,7 +37,6 @@ function beatInfo(b){
   return {gen:id, g, nome:g.n, bpm, root, r};
 }
 const beatEtichetta = b => { const i = beatInfo(b); return i.nome + " · " + i.bpm + " bpm"; };
-const beatGenNome = b => beatInfo(b).nome;
 
 /* ==================== suono ==================== */
 let BEAT_PLAY = null;
@@ -129,7 +128,7 @@ function beatSuona(b, btn){
 
   const master = c.createGain(); master.gain.value = .0001;
   master.connect(c.destination);
-  master.gain.linearRampToValueAtTime(.85, c.currentTime + .08);
+  master.gain.linearRampToValueAtTime(Math.max(.0001, .85 * volBeat()), c.currentTime + .08);
   const nodes = [];
   const nz = beatNoise(c, .3);
 

@@ -27,8 +27,12 @@ const START = () => ({
 const luc = () => (G.lucidita == null ? 80 : G.lucidita);
 function addLuc(n){ G.lucidita = clamp(luc() + n, 0, 100); }
 
+/* La chiave vera dipende dallo slot scelto nelle impostazioni: lo slot 1 tiene
+   quella storica, così le carriere già iniziate restano dove sono. */
+const CHIAVE_PARTITA = () => (typeof slotKey === "function" ? slotKey(SAVE_KEY) : SAVE_KEY);
+
 let G = START();
 window.__G = () => G;
-try{ const r = localStorage.getItem(SAVE_KEY); if(r) G = Object.assign(START(), JSON.parse(r)); }catch(e){}
+try{ const r = localStorage.getItem(CHIAVE_PARTITA()); if(r) G = Object.assign(START(), JSON.parse(r)); }catch(e){}
 function save(){ try{ if(typeof salvaConCopertine === 'function') salvaConCopertine();
-  else localStorage.setItem(SAVE_KEY, JSON.stringify(G)); }catch(e){} }
+  else localStorage.setItem(CHIAVE_PARTITA(), JSON.stringify(G)); }catch(e){} }
