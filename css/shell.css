@@ -3,40 +3,41 @@
 .screen{display:none}
 .screen.on{display:block}
 
-/* La barra sta bassa: è un guscio, non un pezzo di interfaccia. Tutto quello
-   che c'è dentro è tarato sui 34px del marchio, che decide l'altezza. */
+/* La barra e' un filo, non un pezzo di interfaccia: 36px in tutto. L'altezza la
+   decide il pezzo piu' alto che ci sta dentro, quindi niente qui dentro supera
+   i 26px, e il padding verticale e' 5. */
 .topnav{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;
-  justify-content:space-between;gap:10px;padding:7px 16px;background:rgba(11,11,13,.94);
-  backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.07)}
-.screen{padding-top:56px}
-.navleft{display:flex;align-items:center;gap:9px;min-width:0}
+  justify-content:space-between;gap:10px;padding:5px 14px;background:rgba(11,11,13,.92);
+  backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.06)}
+.screen{padding-top:44px}
+.navleft{display:flex;align-items:center;gap:8px;min-width:0}
 
 /* ---- il marchio ---- */
-.brand{display:inline-flex;align-items:center;gap:8px;padding:3px 7px 3px 3px;border-radius:11px;
+.brand{display:inline-flex;align-items:center;gap:7px;padding:2px 6px 2px 2px;border-radius:9px;
   transition:background .15s,transform .12s}
 .brand:hover{background:rgba(255,255,255,.06)}
 .brand:active{transform:scale(.97)}
-.bmark{width:26px;height:26px;flex:none;display:block}
+.bmark{width:22px;height:22px;flex:none;display:block}
 .bmark svg{width:100%;height:100%;display:block}
 /* le fermate del gradiente si tingono col colore dell'artista: il marchio è suo */
 .bmark .s1{stop-color:var(--c1)}
 .bmark .s2{stop-color:var(--violet)}
-.bword{font-family:var(--cond);font-size:16px;font-weight:700;letter-spacing:.1em;
+.bword{font-family:var(--cond);font-size:14px;font-weight:700;letter-spacing:.09em;
   text-transform:uppercase;color:rgba(255,255,255,.66);white-space:nowrap;line-height:1}
 .bword b{font-weight:800;color:#fff}
 @media (max-width:520px){.bword{display:none}}
 
-.navback{display:inline-flex;align-items:center;gap:6px;font-family:var(--cond);font-size:13.5px;
+.navback{display:inline-flex;align-items:center;gap:5px;font-family:var(--cond);font-size:12px;
   font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#0B0B0D;
-  padding:7px 14px;border-radius:999px;background:#fff;border:none;
+  padding:4px 11px;border-radius:999px;background:#fff;border:none;
   transition:background .15s,border-color .15s,transform .12s}
 .navback:hover{background:#E9E9EE;transform:translateX(-2px)}
-.navback .arw{font-size:16px;line-height:1;margin-top:-2px}
+.navback .arw{font-size:14px;line-height:1;margin-top:-1px}
 .navback[hidden],.avatarbtn[hidden],.ghost[hidden]{display:none}
 
 /* ---- il cerchio dell'avatar ---- */
-.avatarbtn{width:34px;height:34px;border-radius:50%;overflow:hidden;flex:none;position:relative;
-  background:#1A1A20;border:2px solid rgba(255,255,255,.16);transition:border-color .15s,transform .15s}
+.avatarbtn{width:26px;height:26px;border-radius:50%;overflow:hidden;flex:none;position:relative;
+  background:#1A1A20;border:1.5px solid rgba(255,255,255,.16);transition:border-color .15s,transform .15s}
 .avatarbtn:hover{border-color:#fff;transform:scale(1.05)}
 .avatarbtn svg{position:absolute;left:50%;top:6%;height:150%;transform:translateX(-50%)}
 /* senza artista il cerchio restava un buco nero: ora c'è una sagoma e un più */
@@ -45,8 +46,8 @@
 .avatarbtn.vuoto svg{position:static;height:auto;width:100%;transform:none}
 /* il piu' sta dentro il cerchio: .avatarbtn ritaglia, un badge sbordante verrebbe tagliato */
 .avatarbtn.vuoto::after{content:"+";position:absolute;left:50%;bottom:0;transform:translateX(-50%);
-  width:13px;height:13px;border-radius:50%;background:var(--c1);color:#0B0B0D;font-size:11px;
-  font-weight:900;line-height:13px;text-align:center}
+  width:11px;height:11px;border-radius:50%;background:var(--c1);color:#0B0B0D;font-size:9px;
+  font-weight:900;line-height:11px;text-align:center}
 
 .menu{max-width:1040px;margin:0 auto;padding:6px 22px 90px}
 .mhero{position:relative;border-radius:26px;overflow:hidden;min-height:340px;display:flex;
