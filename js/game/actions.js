@@ -74,16 +74,15 @@ const ACTIONS = [
      scegliModo({
        t:"Scrivi barre",
        d:"Puoi buttare giù qualcosa di getto e passare oltre, oppure sederti davvero al foglio e scriverla riga per riga.",
-       dv:"Un clic. Qualità decisa dalle tue statistiche: ~" + Math.round(qVeloce()) + ". Oggi contano: " + qDetail() + ".",
-       dg:"Entri nel foglio e le barre le scrivi tu. Rime, metrica e parole contano, e il risultato è moltiplicato per 1,5.",
+       dv:"La butto giù io e te la faccio leggere: qualità ~" + Math.round(qVeloce()) +
+          ", decisa dalle tue statistiche. Poi la tieni così o la sistemi. Oggi contano: " + qDetail() + ".",
+       dg:"Foglio bianco: le barre le scrivi tu, e vale ×1,5. Se ti blocchi, «Completa la canzone» riempie il resto.",
        veloce(){
-         const q = clamp(Math.round(qVeloce() + rnd(-5,6)), 5, 100);
-         G.bars.push({q, txt:"", tema:""});
-         gain("scrittura", 0.9);
-         G.wellbeing = clamp(G.wellbeing - 1, 0, 100);
-         return {t:"Strofa buttata giù di getto, qualità <b>" + q + "</b>. Ne hai " + G.bars.length + " in cartella.", c:""};
+         /* non si chiude piu' al buio: la strofa si vede e si puo' correggere */
+         apriFoglio({generata:true, righe:6, minimo:qVeloce()});
+         return {t:"", c:""};
        },
-       gioca(){ apriFoglio(BOOST); }
+       gioca(){ apriFoglio({righe:4}); }
      });
      return "";
    }},

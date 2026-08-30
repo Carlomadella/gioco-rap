@@ -1,4 +1,4 @@
-quando finisci una task committa e pusha e nel committ fai riferimento al punto del file completato. Se vedi che viene modificato il file non preoccuparti, sono io, tu continua con quello che stai facendo
+quando finisci una task committa e pusha e nel committ fai riferimento al punto del file completato. Se vedi che viene modificato il file non preoccuparti, sono io, tu continua con quello che stai facendo, ogni volta che finisci un task segnalo come completato
 
 Tutte le modifiche da fare:
 
@@ -104,3 +104,7 @@ Tutte le modifiche da fare:
 13. cambia i suoni di gioco e varia i beat, te l'ho già detto una volta, non farmi incazzare.
 
 14. Nell'azione "Freestyle in piazza", come per "cerca un beat", crea una scena del personaggio dell'utente che canta barre, o prese dalle canzoni scritte o inventate e la folla applaude e urla o fischia in base alla qualità della barra detta. Inoltre fai in modo che si possa fare gara di freestyle, contro il computer o contro un amico.
+
+15. fai in modo che i progressi di gioco vengano salvati, dalla schermata di avvio posso decidere se caricare una partita o crearne una nuova, max 3 slot partita disponibili.
+
+16. la navbar è troppo grande, manca ancora l'avatar nella schermata di menù principale. se clicco su inizia carriera il bottone per tornare al menù non deve stare nella navbar

@@ -42,6 +42,9 @@ const USCITE = [
 ];
 const aperto = id => { const el = $(id); return el && el.classList.contains("on"); };
 function overlayAperto(){ return USCITE.some(u => aperto(u.id)); }
+/* le scene vere e proprie: la modale non conta, perche' mentre si sceglie
+   un'opzione e' ancora aperta e non direbbe niente di utile */
+function scenaAperta(){ return aperto("writer") || aperto("piazza"); }
 
 /* chiude la finestra più in alto; torna false se quella aperta non si può chiudere
    (gli eventi della settimana e le prove: lì una scelta va fatta per forza) */

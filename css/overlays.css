@@ -75,7 +75,14 @@
 .wline .rm{width:23px;height:23px;border-radius:8px;flex:none;display:grid;place-items:center;
   font-size:11px;font-weight:900;background:rgba(255,255,255,.07);color:var(--faint)}
 .wline .rm.on{color:#08080A}
-.waddrow{display:flex;gap:8px;margin-bottom:16px}
+/* le righe che ha buttato giu' il foglio: si vedono, cosi' sai cosa correggere.
+   Appena le tocchi il segno sparisce, perche' da quel momento sono tue. */
+.wline.auto{background:rgba(255,197,61,.055)}
+.wline.auto .no{color:var(--acid)}
+.wline.auto input{color:#D9D4C6;font-style:italic}
+.waddrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.wadd.auto{flex:2 1 190px;background:rgba(255,197,61,.14);color:var(--acid);font-weight:800}
+.wadd.auto:hover{background:rgba(255,197,61,.24)}
 .wadd{flex:1;background:rgba(255,255,255,.06);border:0;color:var(--soft);border-radius:12px;padding:11px;
   font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
 .wadd:hover{background:rgba(255,255,255,.11);color:#fff}

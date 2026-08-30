@@ -103,7 +103,9 @@ function scegliModo(o){
     /* si puo' lasciar perdere: l'azione l'hai aperta tu, e l'energia torna indietro */
     annulla(){ annullaAzione(); },
     opts:[
-      {n:"Falla veloce", d:o.dv, run(){ azioneFatta(); return o.veloce(); }},
+      /* certe azioni veloci aprono comunque una scena (il foglio gia' scritto):
+         in quel caso il conto resta aperto, la scena ha la sua via d'uscita */
+      {n:"Falla veloce", d:o.dv, run(){ const r = o.veloce(); if(!scenaAperta()) azioneFatta(); return r; }},
       /* qui non si chiude niente: la scena che si apre ha la sua via d'uscita */
       {n:"Giocala tu · ×1,5", d:o.dg, run(){ o.gioca(); return {t:"", c:""}; }}
     ]});
@@ -194,11 +196,29 @@ function disegnaStanza(){
       ["da tua madre","una stanza in affitto","il tuo monolocale","il bilocale in centro","l\'attico"][casa] + '</div>';
 }
 
-function apriFoglio(boost){
-  WR = {righe:["","","",""], tema:pick(TEMI), boost: boost || 1};
+/* Quanto della strofa e' roba tua: le righe che ha buttato giu' il foglio e che
+   non hai toccato non contano. Scriverla tutta da solo vale x1,5, tenersi quella
+   della macchina vale x1, e in mezzo si sta in proporzione. */
+function quotaTua(){
+  const vive = WR.righe.map((r, i) => [r.trim(), i]).filter(x => x[0].length > 1);
+  if(!vive.length) return 0;
+  return vive.filter(x => WR.gen[x[1]] !== x[0]).length / vive.length;
+}
+function boostAttuale(){ return 1 + 0.5 * quotaTua(); }
+
+/* opz.generata: il foglio arriva gia' scritto (e' "falla veloce")
+   opz.righe:    quante righe ha il foglio
+   opz.minimo:   la qualita' sotto cui non si scende, quella delle statistiche */
+function apriFoglio(opz){
+  const o = opz || {};
+  WR = {righe: new Array(o.righe || 4).fill(""), tema: pick(TEMI), gen:{}, minimo: o.minimo || 0};
+  if(o.generata){
+    WR.righe = completaStrofa(WR.righe, WR.tema);
+    WR.righe.forEach((r, i) => { WR.gen[i] = r; });
+  }
   $("w-tema").innerHTML = '<b>Tema della settimana: ' + WR.tema.t + '</b><span>' + WR.tema.d +
     ' Se lo tocchi davvero, il pezzo pesa di più.</span>';
-  $("w-title").textContent = "Scrivi la tua strofa";
+  $("w-title").textContent = o.generata ? "Ecco cosa ho scritto" : "Scrivi la tua strofa";
   $("w-stanza").innerHTML = disegnaStanza();
   $("w-done").textContent = "Chiudi la strofa";
   $("w-done").onclick = () => chiudiStrofa();
@@ -216,7 +236,8 @@ function disegnaFoglio(){
     const viva = r.trim().length > 1;
     const idx = WR.righe.slice(0, i).filter(x => x.trim().length > 1).length;
     const g = viva ? a.gruppi[idx] : 0;
-    h += '<div class="wline"><span class="no">' + (i+1) + '</span>' +
+    const auto = viva && WR.gen[i] === r.trim();
+    h += '<div class="wline' + (auto ? " auto" : "") + '"><span class="no">' + (i+1) + '</span>' +
       '<input data-i="' + i + '" maxlength="90" placeholder="' +
         (i === 0 ? "Scrivi la prima barra…" : "…") + '" value="' + r.replace(/"/g,"&quot;") + '">' +
       '<span class="sil">' + (viva ? sillabe(r) : "") + '</span>' +
@@ -224,7 +245,9 @@ function disegnaFoglio(){
         (g ? a.lett[g-1] : "·") + '</span></div>';
   });
   h += '</div>';
+  const buchi = WR.righe.some(r => r.trim().length <= 1);
   h += '<div class="waddrow">' +
+    (buchi ? '<button class="wadd auto" id="w-auto">Completa la canzone</button>' : '') +
     (WR.righe.length < 10 ? '<button class="wadd" id="w-more">+ Aggiungi una riga</button>' : '') +
     (WR.righe.length > 2 ? '<button class="wadd" id="w-less">− Togli l\'ultima</button>' : '') + '</div>';
   const m = (l, v, c) => '<div class="wm"><div class="l">' + l + '</div><div class="v">' + Math.round(v*100) +
@@ -244,10 +267,16 @@ function disegnaFoglio(){
   $("w-body").innerHTML = h;
 
   const skill = 0.5 + G.skills.scrittura/100 * 0.5;
-  const qFin = Math.round(clamp(a.qTesto * skill * qFactors().mult * WR.boost, 3, 100));
+  const b = boostAttuale();
+  const qFin = qualitaStrofa(a, skill, b);
+  const mia = Math.round(quotaTua()*100);
+  const nota = b >= 1.49 ? "l'hai scritta tutta tu · <b>×1,5</b>"
+    : b <= 1.01 ? "questa l'ha buttata giù il foglio · <b>nessun moltiplicatore</b>"
+    : mia + "% è roba tua · <b>×" + b.toFixed(2).replace(".", ",") + "</b>";
   $("w-st").innerHTML = a.vive.length < 2 ? "Servono almeno <b>due barre</b>"
-    : "Qualità del pezzo: <b>" + qFin + "</b>" + (WR.boost > 1 ? ' <span style="color:var(--acid)">×1,5 incluso</span>' : "");
+    : 'Qualità del pezzo: <b>' + qFin + '</b> <span style="color:var(--acid)">' + nota + '</span>';
   $("w-done").disabled = a.vive.length < 2;
+  $("w-done").textContent = (b <= 1.01 && a.vive.length >= 2) ? "Tienila così" : "Chiudi la strofa";
 
   $("w-body").querySelectorAll("input").forEach(inp => {
     inp.oninput = () => {
@@ -268,15 +297,33 @@ function disegnaFoglio(){
       }
     };
   });
+  const auto = $("w-auto");
+  if(auto) auto.onclick = () => {
+    /* "la canzone intera": se hai scritto poche barre il foglio si allunga da solo */
+    while(WR.righe.length < 8) WR.righe.push("");
+    const prima = WR.righe.slice();
+    WR.righe = completaStrofa(WR.righe, WR.tema);
+    WR.righe.forEach((r, i) => { if((prima[i] || "").trim().length <= 1) WR.gen[i] = r; });
+    disegnaFoglio(); SFX.tap();
+  };
   const more = $("w-more"); if(more) more.onclick = () => { WR.righe.push(""); disegnaFoglio(); SFX.tap(); };
   const less = $("w-less"); if(less) less.onclick = () => { WR.righe.pop(); disegnaFoglio(); SFX.tap(); };
+}
+
+/* Il voto della strofa. WR.minimo e' la qualita' che davano le statistiche da
+   sole: chi si tiene la strofa buttata giu' dal foglio prende quella, esattamente
+   come prima. Se la sistema e viene meglio, prende il voto del testo. */
+function qualitaStrofa(a, skill, b){
+  const testo = a.qTesto * skill * qFactors().mult * b;
+  return Math.round(clamp(Math.max(WR.minimo || 0, testo), 3, 100));
 }
 
 function chiudiStrofa(){
   azioneFatta();
   const a = analizza(WR.righe, WR.tema);
   const skill = 0.5 + G.skills.scrittura/100 * 0.5;
-  const q = Math.round(clamp(a.qTesto * skill * qFactors().mult * WR.boost, 3, 100));
+  const b = boostAttuale();
+  const q = qualitaStrofa(a, skill, b);
   const testo = a.vive.join("\n");
   G.bars.push({q, txt:testo, tema:WR.tema.t});
   gain("scrittura", 1.2 + a.qTesto/100 * 1.4);
@@ -290,7 +337,8 @@ function chiudiStrofa(){
   $("w-tema").innerHTML = '<b>' + WR.tema.t + '</b><span>' + giudizio + '</span>';
   $("w-body").innerHTML = '<div class="wres"><div class="qq">' + q + '</div>' +
     '<div class="qs">qualità della strofa · la tua scrittura vale ' + Math.round(skill*100) + '% e il resto lo fa come stai' +
-      (WR.boost > 1 ? ' · <b style="color:var(--acid)">×1,5 perché te la sei giocata</b>' : '') + '</div>' +
+      (b > 1.01 ? ' · <b style="color:var(--acid)">×' + b.toFixed(2).replace(".", ",") +
+        ' perché ' + Math.round(quotaTua()*100) + "% l'hai scritta tu</b>" : '') + '</div>' +
     riga("Rime", a.rima, a.rima >= .8 ? "rime piene" : a.rima >= .5 ? "rime sporche" : a.rima >= .3 ? "solo assonanze" : "quasi niente") +
     riga("Metrica", a.metrica, Math.round(a.media) + " sillabe di media") +
     riga("Parole", a.parole, new Set((a.vive.join(" ").toLowerCase().match(/[a-z]+/g)||[]).map(pulisci)).size + " parole diverse") +
