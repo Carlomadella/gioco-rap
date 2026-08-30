@@ -110,3 +110,5 @@ Tutte le modifiche da fare:
 <!-- 16. la navbar è troppo grande, manca ancora l'avatar nella schermata di menù principale. se clicco su inizia carriera il bottone per tornare al menù non deve stare nella navbar -->
 
 17. manca il bottone che porta dalla schermata di gioco al menù principale, crealo
+
+18. fai in modo che si possa vedere l'energia rimanente della settimana

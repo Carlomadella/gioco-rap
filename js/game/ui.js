@@ -48,9 +48,6 @@ function renderGioco(){
     '<div class="pn">' + ph.n + '</div><div class="pd">' + ph.d + '</div>' +
     '<div class="ptrack">' + track + '</div>' + nxt + '</div>';
 
-  let en = "";
-  for(let i=0;i<G.maxEnergy;i++) en += '<i class="' + (i < G.energy ? "on" : "spent") + '"></i>';
-
   // livello ed esperienza
   const skl = G.skills.scrittura + G.skills.flow + G.skills.presenza + G.skills.rete;
   const xpTot = Math.round(G.fans + skl*22 + G.songs.filter(x=>x.released).length*140);
@@ -61,6 +58,20 @@ function renderGioco(){
   $("g-xp").style.width = clamp(into/need*100, 0, 100) + "%";
   $("g-xptxt").textContent = fmt(into) + " / " + fmt(need);
 
+  /* L'energia rimasta della settimana. Il numero da solo non si legge al volo,
+     i trattini si': uno per turno, spenti quelli gia' usati. Quando finisce
+     diventa rossa, che e' la cosa che devi sapere prima di cercare una mossa. */
+  const pipsEnergia = () => {
+    let p2 = "";
+    for(let i = 0; i < G.maxEnergy; i++) p2 += '<i class="' + (i < G.energy ? "on" : "") + '"></i>';
+    return p2;
+  };
+  const podEnergia = () =>
+    '<span class="rchip' + (G.energy <= 0 ? " scarica" : "") + '" style="--k:var(--sky)">' +
+    '<i style="background:linear-gradient(180deg,var(--sky),color-mix(in srgb,var(--sky) 70%, #000))">✦</i>' +
+    '<span><b>' + G.energy + '<small>/' + G.maxEnergy + '</small></b>' +
+    '<u>energia rimasta</u><span class="enpips">' + pipsEnergia() + '</span></span></span>';
+
   // risorse
   const pod = (k, ic, val, lab, neg) =>
     '<span class="rchip' + (neg ? " neg" : "") + '" style="--k:' + k + '">' +
@@ -70,7 +81,7 @@ function renderGioco(){
     pod("var(--acid)", "€", fmt(G.money), "in cassa", G.money < 0) +
     pod("var(--hot)", "♥", short(G.fans), "chi ti segue") +
     pod("var(--violet)", "▲", Math.round(G.hype), "hype") +
-    pod("var(--sky)", "✦", G.energy + "/" + G.maxEnergy, "turni");
+    podEnergia();
 
   // notifiche sulle sezioni
   const badges = {
@@ -399,7 +410,11 @@ function renderGioco(){
     : '<div class="empty2">Il diario è vuoto. Fai qualcosa.</div>';
 
   $("g-bar-a").textContent = "A" + G.year + " · S" + G.week;
-  $("g-bar-b").textContent = G.energy + "/" + G.maxEnergy + " turni";
+  $("g-bar-b").textContent = PHASES[G.phase].n;
+  const be = $("g-barenergia");
+  be.classList.toggle("vuota", G.energy <= 0);
+  be.innerHTML = '<span class="n"><b>' + G.energy + '</b>/' + G.maxEnergy + ' energia</span>' +
+    '<span class="enpips">' + pipsEnergia() + '</span>';
 }
 
 function openDiary(){
