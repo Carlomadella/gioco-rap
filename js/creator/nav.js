@@ -7,7 +7,9 @@ function miniPortrait(){
 }
 function goto(screen){
   document.querySelectorAll(".screen").forEach(x => x.classList.toggle("on", x.id === "s-" + screen));
-  $("nav-back").hidden = (screen === "menu");
+  /* In partita il tasto per il menu non sta quassù: il marchio a sinistra fa
+     già quel mestiere, e la barra deve restare fuori dai piedi mentre giochi. */
+  $("nav-back").hidden = (screen === "menu" || screen === "game");
   window.scrollTo({top:0});
   if(screen === "menu") renderMenu();
 }
@@ -42,7 +44,11 @@ function renderMenu(){
 
   $("mhero").style.setProperty("--c1", A.color);
   $("mhero").classList.toggle("viva", !!viva);
-  $("m-port").innerHTML = nm ? portrait() : "";
+  /* Il ritratto c'è sempre, anche prima che l'artista abbia un nome: senza,
+     il menu si apriva su mezzo riquadro vuoto. Finché è solo un abbozzo lo si
+     tiene indietro, in penombra, così non sembra una carriera già cominciata. */
+  $("m-port").innerHTML = portrait();
+  $("m-port").classList.toggle("abbozzo", !nm);
   $("m-name").textContent = nm || "Crea il tuo artista";
   $("m-tag").textContent = viva
     ? "Carriera in corso · anno " + g.year + ", settimana " + g.week
