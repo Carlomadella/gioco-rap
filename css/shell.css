@@ -3,42 +3,43 @@
 .screen{display:none}
 .screen.on{display:block}
 
-/* La barra sta sui 45px: l'altezza la decide il cerchio dell'avatar (30) piu'
-   il padding (7 sopra e sotto). Se tocchi uno dei due, l'altra cambia. */
-.topnav{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;
-  justify-content:space-between;gap:10px;padding:7px 15px;background:rgba(11,11,13,.93);
-  backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.07)}
-.screen{padding-top:53px}
-.navleft{display:flex;align-items:center;gap:9px;min-width:0}
+/* L'altezza della barra e' fissata qui e basta: min-height. Cosi' non dipende
+   da cosa ci finisce dentro e non si muove quando il tasto indietro compare. */
+.topnav{position:fixed;top:0;left:0;right:0;z-index:40;min-height:56px;
+  display:flex;align-items:center;justify-content:space-between;gap:11px;padding:8px 16px;
+  background:rgba(11,11,13,.93);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,.07)}
+.screen{padding-top:64px}
+.navleft{display:flex;align-items:center;gap:10px;min-width:0}
 
 /* ---- il marchio ---- */
-.brand{display:inline-flex;align-items:center;gap:8px;padding:2px 7px 2px 2px;border-radius:10px;
+.brand{display:inline-flex;align-items:center;gap:9px;padding:3px 8px 3px 3px;border-radius:12px;
   transition:background .15s,transform .12s}
 .brand:hover{background:rgba(255,255,255,.06)}
 .brand:active{transform:scale(.97)}
-.bmark{width:27px;height:27px;flex:none;display:block}
+.bmark{width:32px;height:32px;flex:none;display:block}
 .bmark svg{width:100%;height:100%;display:block}
 /* le fermate del gradiente si tingono col colore dell'artista: il marchio è suo */
 .bmark .s1{stop-color:var(--c1)}
 .bmark .s2{stop-color:var(--violet)}
-.bword{font-family:var(--cond);font-size:16px;font-weight:700;letter-spacing:.09em;
+.bword{font-family:var(--cond);font-size:18px;font-weight:700;letter-spacing:.1em;
   text-transform:uppercase;color:rgba(255,255,255,.66);white-space:nowrap;line-height:1}
 .bword b{font-weight:800;color:#fff}
 @media (max-width:520px){.bword{display:none}}
 
-.navback{display:inline-flex;align-items:center;gap:6px;font-family:var(--cond);font-size:13px;
+.navback{display:inline-flex;align-items:center;gap:7px;font-family:var(--cond);font-size:14px;
   font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#0B0B0D;
-  padding:6px 13px;border-radius:999px;background:#fff;border:none;
+  padding:8px 16px;border-radius:999px;background:#fff;border:none;
   transition:background .15s,border-color .15s,transform .12s}
 .navback:hover{background:#E9E9EE;transform:translateX(-2px)}
-.navback .arw{font-size:15px;line-height:1;margin-top:-1px}
+.navback .arw{font-size:17px;line-height:1;margin-top:-2px}
 .navback[hidden],.avatarbtn[hidden],.ghost[hidden]{display:none}
 
 /* ---- il cerchio dell'avatar ---- */
 /* Ci sta sempre la faccia dell'artista dell'utente, anche prima che abbia un
    nome: A ha comunque un aspetto completo, e quello si mostra. */
-.avatarbtn{width:30px;height:30px;border-radius:50%;overflow:hidden;flex:none;position:relative;
-  background:#1A1A20;border:1.5px solid rgba(255,255,255,.18);transition:border-color .15s,transform .15s}
+.avatarbtn{width:36px;height:36px;border-radius:50%;overflow:hidden;flex:none;position:relative;
+  background:#1A1A20;border:2px solid rgba(255,255,255,.18);transition:border-color .15s,transform .15s}
 .avatarbtn:hover{border-color:#fff;transform:scale(1.06)}
 .avatarbtn svg{position:absolute;left:50%;top:6%;height:150%;transform:translateX(-50%)}
 
