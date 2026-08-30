@@ -112,3 +112,11 @@ Tutte le modifiche da fare:
 17. manca il bottone che porta dalla schermata di gioco al menù principale, crealo
 
 18. fai in modo che si possa vedere l'energia rimanente della settimana
+
+19. il tasto completa la canzone ti dà svantaggi
+
+20. i produttori hanno delle abilità, e una fama a sè stante in costante crescita e sviluppo, la conversazione è influenzata da diversi valori: il rapporto che hai con loro, la fama tua e loro e dal tipo di genere che produce e dalla personalità
+
+21. implementa un nuovo modo di fare soldi, poi nel caso anche la fama, ovvero la professione del criminale
+
+22. l'energià più si sale di livello più aumenta, come poi per tutto, i livelli dovranno avere un senso, puntiamo ad un gioco in cui farmare non fa stufare l'utente che gioca
