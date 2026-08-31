@@ -529,3 +529,37 @@ il telefono deve sembrare un vero e proprio telefono : Quindi come un iphone esa
 Voglio che il gioco abbia vita simulata molto sviluppata. Non banalità, dobbiamo lanciare un gioco cche vogliamo sia molto valido.
 
 cambia l'energia a 100 e anche tutto ciò ce ne deriva da questo cambiamento, tu prova a farlo al meglio poi ti dico io testando come mi pare.
+
+31. Crea il file backend.md da non pushare con tutte le info sulla parte di backend, inoltre suddividi tutti i file in backend e frontend, e all'interno crea un file readme solo per il backend e uno solo per il frontend e uno solo per il database.
+    Se secondo te conviene farlo in una maniera diversa dal semplice HTML + CSS + JS vanilla cambia, il progetto deve essere il più professionale e ottimizzato possibile.
+
+   **FATTO (31/08/2026) — il progetto è diviso in due metà.**
+   - `frontend/` — il gioco: `index.html`, `css/`, `js/`, `media/`, `strumenti/`, `dist/`.
+   - `backend/` — il server: `server.js`, `bot.js`, `nomi.js`, `prova.js`, `package.json`,
+     e dentro `database/` lo strato dati (`archivio.js`) con l'archivio vero.
+   - Quattro README, uno per cosa: `README.md` in radice è la mappa del progetto,
+     `frontend/README.md` il gioco, `backend/README.md` il server,
+     `backend/database/README.md` i dati (modello, scritture atomiche, copie di sicurezza,
+     e le soglie precise per passare a SQLite quando servirà).
+   - `backend.md` in radice: il dossier interno, **fuori da git** (sta in `.gitignore`).
+     Decisioni e perché, i limiti veri dell'anti-imbroglio, cosa fare quando si rompe,
+     come si va online, dove stanno le chiavi, quanto costa, i rischi da tenere d'occhio.
+   - `backend/prova.js` (`npm run prova`): 25 controlli sull'API, senza dipendenze —
+     iscrizione, punteggi, chiave sbagliata, freni, giri di settimana, frecce, archivio.
+     Passano tutti e 25.
+
+   **RISPOSTA alla domanda «conviene cambiare da HTML + CSS + JS vanilla?» — no, e non è
+   pigrizia.** Il gioco deve poter essere **un file solo** che gira dentro a un artifact,
+   senza rete e senza niente da installare: oggi ci arriviamo con uno script Python di 60
+   righe. Con React o Vue servirebbe un bundler, un `node_modules`, un passaggio di build a
+   ogni modifica, e soprattutto la riscrittura di tutto il gioco — settimane di lavoro e di
+   regressioni per un giocatore che non vedrebbe niente di diverso. Le cose che un framework
+   porta davvero (componenti, stato reattivo, routing) qui sono già risolte in piccolo:
+   schermate che si accendono e si spengono, uno stato solo (`G`) nel localStorage, una
+   funzione di disegno per schermata.
+   **Professionale non vuol dire «con un framework»**: vuol dire cartelle chiare, un file
+   per argomento, documentazione che dice la verità e una prova che gira da sola. Quello
+   l'ho fatto. Il backend, che nasce adesso ed è l'unico posto dove la scelta era aperta,
+   l'ho tenuto senza dipendenze per lo stesso motivo: l'unica cosa che fa è leggere e
+   scrivere JSON su HTTP, ed Express aggiungerebbe sessanta pacchetti per risparmiare
+   trenta righe di routing.

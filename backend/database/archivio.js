@@ -9,7 +9,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { popolazione, settimanaBot, ricambio } = require("./bot.js");
+const { popolazione, settimanaBot, ricambio } = require("../bot.js");
 
 const VERSIONE = 1;
 

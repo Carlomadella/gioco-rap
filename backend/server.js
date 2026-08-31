@@ -8,11 +8,11 @@
    Come il resto del progetto: nessuna dipendenza, nessun passaggio di build.
    Solo Node.
 
-     node server/server.js
+     node backend/server.js
 
    Manopole (variabili d'ambiente, tutte con un valore sensato di suo):
      ADF_PORTA        porta di ascolto              (8787)
-     ADF_DATI         file dell'archivio            (server/dati/classifica.json)
+     ADF_DATI         file dell'archivio            (backend/database/dati/classifica.json)
      ADF_BOT          quanti bot tenere in pista    (140)
      ADF_SETTIMANA_H  ore vere di una settimana     (24)
      ADF_ORIGINI      CORS: * oppure lista di origini separate da virgola
@@ -23,13 +23,13 @@
 const http = require("http");
 const path = require("path");
 const crypto = require("crypto");
-const archivio = require("./archivio.js");
+const archivio = require("./database/archivio.js");
 const { idNuovo } = require("./bot.js");
 const { CITTA, GENERI, STORIE, scegli } = require("./nomi.js");
 
 const CFG = {
   porta: Number(process.env.ADF_PORTA || 8787),
-  file: process.env.ADF_DATI || path.join(__dirname, "dati", "classifica.json"),
+  file: process.env.ADF_DATI || path.join(__dirname, "database", "dati", "classifica.json"),
   quantiBot: Math.max(0, Number(process.env.ADF_BOT || 140)),
   settimanaMs: Math.max(1, Number(process.env.ADF_SETTIMANA_H || 24)) * 3600e3,
   origini: process.env.ADF_ORIGINI || "*",

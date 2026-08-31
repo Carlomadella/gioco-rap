@@ -1,2 +1,4 @@
-dist/
-server/dati/
+frontend/dist/
+backend/database/dati/
+backend/node_modules/
+backend.md

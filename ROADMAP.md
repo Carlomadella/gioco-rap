@@ -1,8 +1,9 @@
 # Anni di Fame — Roadmap di Gameplay
 
-Simulatore di carriera rap a settimane. Il repository è la fonte: `index.html` + `css/` + `js/`.
-Per l'artifact di Claude si ricompila tutto in un file solo con `python3 strumenti/build-artifact.py`
-(esce `dist/anni-di-fame.html`).
+Simulatore di carriera rap a settimane. Il repository è la fonte, diviso in due metà:
+`frontend/` (il gioco: `index.html` + `css/` + `js/`) e `backend/` (il server della classifica).
+Per l'artifact di Claude si ricompila tutto in un file solo con
+`python3 frontend/strumenti/build-artifact.py` (esce `frontend/dist/anni-di-fame.html`).
 Artifact esistente: https://claude.ai/code/artifact/9994ada6-fecb-4023-a5a5-019c2f46af89
 (da aggiornare passandolo come `url`, mai crearne uno nuovo).
 
@@ -24,7 +25,7 @@ qui c'è il disegno d'insieme.
 ## L'HUB: LA MAPPA A TRE CITTÀ _(direzione attuale — punto 26 di `implementazioni.md`)_
 
 Da qui in avanti la schermata di gioco **è** una mappa che si allarga insieme al rapper.
-Concept art in `media/photo/`: `schermata_di_gioco_città_iniziale.png`,
+Concept art in `frontend/media/photo/`: `schermata_di_gioco_città_iniziale.png`,
 `schermata_di_gioco_città_di_mezzo.png`, `schermata_di_gioco_città_finale.png`.
 
 ### La schermata
@@ -98,12 +99,12 @@ Farmare contatti è gameplay, non un menu.
 
 1. ~~Schermata hub con le linguette, la città di provincia e i suoi quattro luoghi; le azioni
    che esistono già (scrivi, beat, registra, pubblica, piazza) si aprono da lì.~~
-   **FATTA (31/08/2026)** — `js/game/hub.js`, `css/hub.css`, e come mappa la concept art
-   stessa (`media/photo/mappa_citta.jpg`), con sopra le zone da toccare. Si entra dalla
+   **FATTA (31/08/2026)** — `frontend/js/game/hub.js`, `frontend/css/hub.css`, e come mappa la concept art
+   stessa (`frontend/media/photo/mappa_citta.jpg`), con sopra le zone da toccare. Si entra dalla
    mappa; studio, beat maker e vita quotidiana aprono la partita sulla sezione giusta; club e
    concerti sono in vista e dicono cosa serve per Milano.
 2. ~~Anagrafica dei contatti: tipo, grado, come si sale, dove si incontrano.~~
-   **PRIMO PEZZO FATTO (31/08/2026)** — «La Sala» (`js/game/posto.js`): il posto della provincia dove
+   **PRIMO PEZZO FATTO (31/08/2026)** — «La Sala» (`frontend/js/game/posto.js`): il posto della provincia dove
    si conosce la gente. Ruolo, carattere, fama, e i sei gradini del rapporto; quello che puoi chiedere
    dipende da dove sei arrivato, e con un rapper si può anche rompere — e quello diventa un rivale in
    classifica. Restano: i contatti che si presentano fra loro, le scene vere delle sessioni in studio,
@@ -124,9 +125,10 @@ dice mai chi è un bot — non è un dettaglio tecnico, è la regola che tiene i
 
 ### Il server _(fatto: 31/08/2026)_
 
-`server/` — Node e basta, nessuna dipendenza e nessun build, come il gioco.
-Archivio in un file JSON (`server/dati/`), scritto con temporaneo + rinomina.
-Le rotte e le manopole stanno nel `README.md`.
+`backend/` — Node e basta, nessuna dipendenza e nessun build, come il gioco.
+Archivio in un file JSON (`backend/database/dati/`), scritto con temporaneo + rinomina.
+Le rotte e le manopole stanno in `backend/README.md`, il modello dei dati in
+`backend/database/README.md`. La prova completa dell'API: `cd backend && npm run prova`.
 
 - **Una settimana vera dura 24 ore** (`ADF_SETTIMANA_H`): a ogni giro i bot crescono, uno
   esce con un pezzo, uno firma, uno sparisce dai radar. La classifica si muove anche mentre
@@ -143,7 +145,7 @@ Le rotte e le manopole stanno nel `README.md`.
 
 1. **Agganciare la schermata classifica.** Oggi `js/game/ui.js` disegna i rivali locali;
    deve disegnare la classifica del server quando c'è, e ricadere su quella locale quando
-   non c'è. Il ponte è già pronto: `js/net/online.js`.
+   non c'è. Il ponte è già pronto: `frontend/js/net/online.js`.
 2. **Iscrizione senza modulo da compilare.** Il nome d'arte c'è già, la città anche: alla
    prima settimana chiusa l'artista entra in classifica da solo, e il giocatore lo scopre
    leggendo «sei entrato in classifica: 428°».
@@ -287,6 +289,7 @@ Grafica e feel da eguagliare: Rap Star Idle Clicker, Score Hero, Brawl Stars, Fo
 Avatar espressivo nel mood di Inazuma Eleven. Gameplay di riferimento: Il Nuovo Goat (ilnuovogoat.it).
 Per l'hub: la struttura da gestionale/RPG a tre colonne, non la mappa a tutto schermo.
 Per lo stile della schermata di gioco: `stili interfaccia schermata di gioco.md`.
+Come sono divise le cartelle e perché il frontend resta senza framework: `frontend/README.md`.
 
 ## Team
 
@@ -297,5 +300,5 @@ Alessio (La Fame Studio), Claude, Carletto (scarica il progetto e ci lavora da c
 Il codice sorgente sta nel repo e si legge da lì: non serve più allegare l'HTML in sessione.
 Il server della classifica (`server/`) non entra nell'artifact: quello è e resta un file
 solo che gira nel browser, e senza server si comporta come si è sempre comportato.
-Quando si aggiorna l'artifact si ricompila con `strumenti/build-artifact.py` e si pubblica
-`dist/anni-di-fame.html` sull'URL esistente.
+Quando si aggiorna l'artifact si ricompila con `frontend/strumenti/build-artifact.py` e si
+pubblica `frontend/dist/anni-di-fame.html` sull'URL esistente.

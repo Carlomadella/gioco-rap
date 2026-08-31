@@ -1,0 +1,15 @@
+{
+  "name": "anni-di-fame-classifica",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Il server della classifica di Anni di Fame: giocatori veri e bot nella stessa graduatoria. Nessuna dipendenza.",
+  "license": "UNLICENSED",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "prova": "node prova.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
