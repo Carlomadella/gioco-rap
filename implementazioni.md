@@ -652,3 +652,126 @@ cambia l'energia a 100 e anche tutto ciò ce ne deriva da questo cambiamento, tu
    **Resta PostgreSQL**, ma non adesso: serve quando i server diventano più di uno, non
    quando le righe diventano tante. Lo schema è già scritto per tutti e due e il cambio
    tocca un file solo (`database/archivio.js`), che è il motivo per cui esiste.
+
+38. Ogni parte di gioco deve avere proprio scenario e una propria ambientazione
+
+Preparami un prompt da mettere su chat gpt ; per ogni pagina che abbiamo (es.attività criminali, es. studio, es.casa (vita quotidiana), es. luogo dove incontriamo artisti. )
+
+Anche per la pagina di landing, e per la creazione dell'avatar, Non mettere un prompt unico ma pagine separate.
+
+39. L'energia portiamola a 100
+
+40. Facciamolo diventare alla giornata lo skip, non più alla settimana
+
+41. Ma se una persona vuole skippa 1 giorno, 2 giorni, 1 settimana, 1 mese... quanti giorni vuole skippare lui li salta, ovviamente il gameplay che avrà sarà condizionato da tutto questo
+
+42. CONTESTO — leggi tutto, non serve che esplori.
+
+Progetto: "Anni di Fame", simulatore di carriera rap nel browser, di La Fame Studio.
+Team: io (Alessio, decido e testo), tu (Claude, costruisci), Carletto (committa sul repo).
+Repo: github.com/Carlomadella/gioco-rap — branch di lavoro `beat-generi-e-salto-tempo`
+(main è vecchio, ignoralo). Sono collaboratore del repo.
+
+REGOLA FISSA: a ogni messaggio, PRIMA di rispondere, aggiornati dal repo su quel
+branch. Carletto committa in continuazione e il lavoro va sempre rifatto sull'ultimo
+stato. Clona in shallow (--depth 5), non scaricare la storia intera.
+
+Struttura (dal commit af4d02c): il progetto è diviso in `frontend/` (index.html,
+css/, js/, media/, strumenti/, dist/) e `backend/` (server.js, bot.js, database/).
+Tecnologia: HTML + CSS + JS vanilla, un file per argomento, niente framework —
+scelta voluta: il gioco deve poter diventare un file HTML solo tramite lo script
+build in strumenti/. Non proporre React/Vue.
+I punti di lavoro numerati stanno in `implementazioni.md` in radice: leggi solo la
+coda del file, non tutto.
+
+OBIETTIVO DI OGGI: l'interfaccia principale (la "plancia" da PC). Sta venendo bene
+ma non abbastanza. Useremo tutta la sessione su questo e sullo sviluppo del gioco.
+
+PRIMO LAVORO — IL TELEFONO NELLA SIDEBAR DI DESTRA (solo versione PC).
+
+Com'è adesso: `<aside class="ptel">` in frontend/index.html (riga ~187) è una
+cornice finta con dentro una colonna che scorre: messaggi del diario, poi una
+griglia di app che NON aprono niente dentro al telefono (rimandano alle schede del
+gioco), poi le notizie. Il contenuto lo scrive la funzione di render in
+frontend/js/game/hub.js (array HUB_APP riga ~109, riempimento di #hb-tel riga ~402).
+Stile in frontend/css/hub.css (classi .ptel* da riga 164).
+
+Come lo voglio: un iPhone vero.
+1. Schermata home: solo sfondo + griglia di icone app + dock in basso. Niente
+   contenuto sciolto, niente liste appese sotto.
+2. Barra di stato in alto realistica: ora del gioco, segnale, batteria, notch.
+3. Ogni app si apre DENTRO al telefono, a schermo pieno nella cornice, con la sua
+   interfaccia e il modo di tornare alla home (barra gesture in basso).
+4. Animazione di apertura e chiusura: l'app si ingrandisce dall'icona.
+5. Badge con il numero di novità sulle icone (messaggi non letti, obiettivi aperti…).
+6. App da avere: Messaggi (il diario), Contatti, Notizie, Obiettivi, Inventario,
+   Statistiche, Classifiche, Agenda, Impostazioni — più LAFAMEGRAM, il finto
+   Instagram del gioco, che nel repo ancora NON c'è: oggi mettila come app con la
+   sua schermata base, il resto lo sviluppiamo dopo.
+7. Solo da PC (sopra 1180px). Sotto quella soglia la schermata resta identica a
+   com'è: da telefono mi va già bene così.
+
+Tecnica: crea file nuovi js/game/telefono.js e css/telefono.css invece di gonfiare
+hub.js, e lascia in hub.js solo la chiamata. Regola generale del progetto: ogni cosa
+dev'essere interattiva, e le schermate devono sembrare un videogioco vero
+(riferimenti di qualità: Fortnite, Brawl Stars, Score Hero), non un pannello web.
+
+COME LAVORIAMO — importante:
+- Token: usali in modo indispensabile e valorizzali al massimo. Niente screenshot
+  nei test, niente file riletti per intero se basta un pezzo, modifiche mirate e non
+  riscritture, riassunti corti. Avvisami quando i token stanno per finire.
+- Prima di costruire, fammi 2-3 domande corte solo se servono davvero. Non
+  spiegazioni lunghe: è il mio primo gioco, spiegami le scelte in modo semplice.
+- Consegna: file HTML giocabile che apro e provo, più lo zip dei file cambiati per
+  Carletto. Poi lo commentiamo e correggiamo.
+
+NON TOCCARE: la scena beatmaker («cerca un beat»), che sta facendo un'altra persona
+in parallelo.
+
+   **FATTO in parte (01/09/2026)** — il telefono, solo da PC (`window.innerWidth
+   >= 1180`; sotto resta la vecchia colonna, invariata byte per byte).
+   File nuovi: `frontend/js/game/telefono.js`, `frontend/css/telefono.css`.
+   hub.js adesso chiama solo `renderTelefono()`; HUB_APP e la vecchia griglia
+   (`HUB_APP_VECCHIO`) si sono spostati lì. `.ptel*` si è spostato da hub.css a
+   telefono.css per intero.
+   - **Home**: barra di stato con ora, segnale, notch e **batteria nuova**
+     (mancava); tre **widget veri** (non finti) — LaFamegram con il post più
+     hype, Classifica con posizione e freccia ▲▼, Messaggi con l'ultimo
+     diario; griglia di 6 icone; **dock** con Messaggi, Contatti, LaFamegram,
+     Classifiche (scelta mia, sugli ultimi due: Classifiche invece di Agenda
+     perché lì c'è appena finito il multiplayer vero, punti 30/35/37).
+   - **10 app**, tutte a schermo intero dentro alla cornice, con dati veri
+     (non anteprime): Messaggi (diario intero), Contatti (la rete di
+     `G.gente`, grado e ruolo, tap va alla Sala), Notizie, Obiettivi (con
+     ricompensa o «fatto»), Inventario (bars/beat/pezzi/attrezzatura a
+     linguette), Statistiche (gli stessi numeri della testata e dei
+     dettagli), Classifiche (la stessa top 10 della scheda, con «sei Nº» e
+     la freccia), Agenda (gli eventi di stasera + le mosse disponibili),
+     Impostazioni (audio/difficoltà/lingua rapidi + bottone al pannello
+     vero), **LaFamegram** (non esisteva: oggi è un feed con post veri,
+     presi dal diario e dalle notizie, non finti a caso).
+   - **Apertura/chiusura**: l'app si apre ingrandendosi dal punto esatto
+     dell'icona toccata (calcolato al click, non un centro fisso), si chiude
+     con la barra in basso, con Esc, o cambiando finestra sotto i 1180px.
+   - **Cosa NON ho rifatto in miniatura**: le azioni pesanti (firmare un
+     contratto, un colpo, una sessione in studio) restano nella scheda vera
+     del gioco — dentro al telefono le vedi e le apri, ma la scena/il calcolo
+     stanno dove sono sempre stati. Rifarle da zero dentro ai 326px del
+     telefono è un lavoro a sé, che vale la pena solo dopo aver visto se
+     questa prima versione regge.
+   - **Verificato**: `npm run prova` (12/12) e `npm run build` puliti dopo il
+     cambio; non ho potuto aprirlo in un browser vero in questa sessione
+     (l'estensione Chrome non era connessa) — prima di darlo per buono va
+     provato a mano.
+   - **`prompt-app-telefono.md`** (root, come richiesto): 10 prompt per
+     ChatGPT, uno per ogni app del telefono, per farsi disegnare il
+     concept UI di ciascuna schermata — stessa logica di
+     `prompt-ambientazioni.md` ma per interfacce, non ambientazioni.
+
+43. I dialoghi di gioco devono essere molti e molto diversi tra loro, cosicche sembri ancora più realistico. 
+
+44. La suondboard del gioco è davvero ancora poco 
+
+45. Sposterei le card dalla mappa iniziale, non SOPRA gli edifici ma leggermente rimpicciolata e a lato, cosìche si vedan bene gli edifici, quando andremo a milano e los angeles poi la mappa dev'essere incredibile come ti abbiamo mandato già nei repo.
+
+46. Le abilità sono troppe e da rivedere, NON DOBBIAMO FARE NOI I MIX MA I FONICI, quindi a cosa serve 
