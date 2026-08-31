@@ -652,3 +652,20 @@ cambia l'energia a 100 e anche tutto ciò ce ne deriva da questo cambiamento, tu
    **Resta PostgreSQL**, ma non adesso: serve quando i server diventano più di uno, non
    quando le righe diventano tante. Lo schema è già scritto per tutti e due e il cambio
    tocca un file solo (`database/archivio.js`), che è il motivo per cui esiste.
+
+38. Ogni parte di gioco deve avere proprio scenario e una propria ambientazione
+
+Preparami un prompt da mettere su chat gpt ; per ogni pagina che abbiamo (es.attività criminali, es. studio, es.casa (vita quotidiana), es. luogo dove incontriamo artisti. )
+
+Anche per la pagina di landing, e per la creazione dell'avatar, Non mettere un prompt unico ma pagine separate.
+
+    **FATTO (01/09/2026).** `prompt-ambientazioni.md` (fuori dal codice, root del
+    repo): 16 prompt separati e autosufficienti, uno per pagina — landing, creazione
+    avatar, La Sala, cabina di registrazione, sala mix, stanza dove si scrive, casa,
+    palestra, staccare la spina, attività criminali, incontro col producer, pubblica,
+    promo, freestyle in piazza, live, turno di lavoro. Stessa famiglia visiva in
+    tutti (concept art semi-realistica, notte/tramonto, luce calda + neon, 3:2, niente
+    testo/logo/interfaccia nell'immagine), ognuno pensato per una chat ChatGPT a sé.
+
+
+
