@@ -116,6 +116,7 @@ const LANG = {
 
   /* --- cruscotto della partita --- */
   "chi ti segue":"who follows you", "energia rimasta":"energy left", "in cassa":"in the bank",
+  "Dettagli":"Details",
   "La tua scalata":"Your climb", "Prossimo passo:":"Next step:", "Serve:":"Needs:",
   "indipendente":"independent", "sotto contratto":"signed",
   "Suoni per gli amici e per nessun altro.":"You play for your friends and nobody else.",

@@ -13,17 +13,17 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=Archivo+Black&family=Barlow+Condensed:wght@600;700;800&display=swap">
 
 <!-- Fogli di stile: l'ordine conta, la cascata è quella originale. -->
-<link rel="stylesheet" href="css/base.css?v=4">
-<link rel="stylesheet" href="css/preview.css?v=4">
-<link rel="stylesheet" href="css/shell.css?v=4">
-<link rel="stylesheet" href="css/game.css?v=4">
-<link rel="stylesheet" href="css/overlays.css?v=4">
-<link rel="stylesheet" href="css/effects.css?v=4">
-<link rel="stylesheet" href="css/hud.css?v=4">
-<link rel="stylesheet" href="css/forms.css?v=4">
-<link rel="stylesheet" href="css/creator.css?v=4">
-<link rel="stylesheet" href="css/actionbar.css?v=4">
-<link rel="stylesheet" href="css/impostazioni.css?v=4">
+<link rel="stylesheet" href="css/base.css?v=5">
+<link rel="stylesheet" href="css/preview.css?v=5">
+<link rel="stylesheet" href="css/shell.css?v=5">
+<link rel="stylesheet" href="css/game.css?v=5">
+<link rel="stylesheet" href="css/overlays.css?v=5">
+<link rel="stylesheet" href="css/effects.css?v=5">
+<link rel="stylesheet" href="css/hud.css?v=5">
+<link rel="stylesheet" href="css/forms.css?v=5">
+<link rel="stylesheet" href="css/creator.css?v=5">
+<link rel="stylesheet" href="css/actionbar.css?v=5">
+<link rel="stylesheet" href="css/impostazioni.css?v=5">
 </head>
 <body>
 
@@ -140,23 +140,26 @@
   <div class="game-wrap">
     <!-- La via d'uscita dalla partita: qui, in chiaro, non persa fra le CTA in basso. -->
     <button class="tornamenu" id="g-tomenu"><span class="arw">&lsaquo;</span> Menu principale</button>
-    <div class="hero2" id="gtop">
-      <div class="in2">
+    <!-- Una testata sola, non tre schede impilate: chi sei, a che punto sei e i
+         tre numeri che guardi davvero. Tutto il resto sta sotto «Dettagli»,
+         chiuso finché non serve. -->
+    <div class="testata" id="gtop">
+      <div class="tline">
         <div class="bigport" id="g-port"></div>
         <div class="h2txt">
           <div class="h2name" id="g-name">—</div>
           <div class="h2sub" id="g-meta">—</div>
-          <div class="lvlrow">
-            <span class="lvl" id="g-lvl">LIV 1</span>
-            <span class="xp"><i id="g-xp" style="width:0"></i><span id="g-xptxt"></span></span>
-          </div>
+        </div>
+        <div class="tlvl">
+          <span class="lvl" id="g-lvl">LIV 1</span>
+          <span class="xp"><i id="g-xp" style="width:0"></i><span id="g-xptxt"></span></span>
         </div>
         <button class="mutebtn" id="g-mute" aria-label="Audio">♪</button>
       </div>
+      <div class="vitali" id="g-res"></div>
+      <button class="dettbtn" id="g-dett" aria-expanded="false">Dettagli<i>▾</i></button>
+      <div class="gstats" id="g-stats" hidden></div>
     </div>
-
-    <div class="res" id="g-res"></div>
-    <div class="gstats" id="g-stats"></div>
 
     <div class="nav2">
       <button class="nb on" data-t="settimana"><svg viewBox="0 0 24 24"><path d="M7 2h2v3H7zm8 0h2v3h-2zM4 7h16v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2 4v2h3v-2zm5 0v2h3v-2zm5 0v2h2v-2zM6 15v2h3v-2zm5 0v2h3v-2z"/></svg><span>Settimana</span></button>
@@ -170,11 +173,19 @@
     <div class="gcols">
       <div>
         <div class="gpane on" data-p="settimana"><div id="g-phase"></div><div class="acts" id="g-actions"></div></div>
+        <!-- Il catalogo erano quattro liste una sotto l'altra: adesso è una alla
+             volta, e il titolo della lista è la linguetta che la apre. -->
         <div class="gpane" data-p="catalogo">
-          <div class="list"><h3>Materiale in cartella</h3><div id="g-mat"></div></div>
-          <div class="list"><h3>Beat in vendita</h3><div id="g-market"></div></div>
-          <div class="list"><h3>I tuoi pezzi</h3><div id="g-songs"></div></div>
-          <div class="list"><h3>Attrezzatura</h3><div id="g-shop"></div></div>
+          <div class="subnav" data-sub="catalogo">
+            <button class="sb on" data-s="mat">Materiale in cartella</button>
+            <button class="sb" data-s="market">Beat in vendita<i class="sbdg" data-b="market" hidden></i></button>
+            <button class="sb" data-s="songs">I tuoi pezzi<i class="sbdg" data-b="songs" hidden></i></button>
+            <button class="sb" data-s="gear">Attrezzatura</button>
+          </div>
+          <div class="spane on" data-s="mat"><div class="list"><div id="g-mat"></div></div></div>
+          <div class="spane" data-s="market"><div class="list"><div id="g-market"></div></div></div>
+          <div class="spane" data-s="songs"><div class="list"><div id="g-songs"></div></div></div>
+          <div class="spane" data-s="gear"><div class="list"><div id="g-shop"></div></div></div>
         </div>
         <div class="gpane" data-p="classifica"><div class="list"><h3>Top 10 della settimana</h3><div id="g-chart"></div></div></div>
         <div class="gpane" data-p="contratti">
@@ -190,8 +201,9 @@
     </div>
   </div>
 
+  <!-- La barra dice una cosa sola: quanta settimana ti resta in mano. L'anno e
+       la fase stanno già nella testata, non serve ripeterli qui. -->
   <div class="bar"><div class="in">
-    <div class="who"><div class="a" id="g-bar-a">—</div><div class="b" id="g-bar-b">—</div></div>
     <div class="barenergia" id="g-barenergia"></div>
     <button class="ghost" id="g-diary">Diario<i class="dbdg" id="g-dbdg" hidden></i></button><button class="ghost" id="g-skip">Salta il tempo</button>
     <button class="solid" id="g-advance">Chiudi la settimana</button>
@@ -373,47 +385,47 @@
 </section>
 
 <!-- Script classici, caricati in ordine: ogni file usa quello che viene prima. -->
-<script src="js/core.js?v=4"></script>
+<script src="js/core.js?v=5"></script>
 
 <!-- Impostazioni: audio, aspetto, difficoltà, slot e lingua. Devono esistere
      prima di tutto il resto, perché stato e simulazione leggono da qui. -->
-<script src="js/impostazioni.js?v=4"></script>
-<script src="js/lingua.js?v=4"></script>
+<script src="js/impostazioni.js?v=5"></script>
+<script src="js/lingua.js?v=5"></script>
 
 <!-- Creatore dell'artista -->
-<script src="js/creator/data.js?v=4"></script>
-<script src="js/creator/state.js?v=4"></script>
-<script src="js/creator/portrait.js?v=4"></script>
-<script src="js/creator/avatar-presets.js?v=4"></script>
-<script src="js/creator/options.js?v=4"></script>
-<script src="js/creator/render.js?v=4"></script>
-<script src="js/creator/events.js?v=4"></script>
-<script src="js/creator/nav.js?v=4"></script>
+<script src="js/creator/data.js?v=5"></script>
+<script src="js/creator/state.js?v=5"></script>
+<script src="js/creator/portrait.js?v=5"></script>
+<script src="js/creator/avatar-presets.js?v=5"></script>
+<script src="js/creator/options.js?v=5"></script>
+<script src="js/creator/render.js?v=5"></script>
+<script src="js/creator/events.js?v=5"></script>
+<script src="js/creator/nav.js?v=5"></script>
 
 <!-- Partita -->
-<script src="js/game/state.js?v=4"></script>
-<script src="js/game/content.js?v=4"></script>
-<script src="js/game/beats.js?v=4"></script>
-<script src="js/game/covers.js?v=4"></script>
-<script src="js/game/rivals.js?v=4"></script>
-<script src="js/game/actions.js?v=4"></script>
-<script src="js/game/events.js?v=4"></script>
-<script src="js/game/phases.js?v=4"></script>
-<script src="js/game/sim.js?v=4"></script>
-<script src="js/game/writer.js?v=4"></script>
-<script src="js/game/versi.js?v=4"></script>
-<script src="js/game/piazza.js?v=4"></script>
-<script src="js/game/copertine.js?v=4"></script>
-<script src="js/game/modal.js?v=4"></script>
-<script src="js/game/scene-art.js?v=4"></script>
-<script src="js/game/beatplay.js?v=4"></script>
-<script src="js/game/ui.js?v=4"></script>
-<script src="js/game/lifestyle.js?v=4"></script>
-<script src="js/game/fx.js?v=4"></script>
-<script src="js/game/skip.js?v=4"></script>
-<script src="js/game/uscita.js?v=4"></script>
+<script src="js/game/state.js?v=5"></script>
+<script src="js/game/content.js?v=5"></script>
+<script src="js/game/beats.js?v=5"></script>
+<script src="js/game/covers.js?v=5"></script>
+<script src="js/game/rivals.js?v=5"></script>
+<script src="js/game/actions.js?v=5"></script>
+<script src="js/game/events.js?v=5"></script>
+<script src="js/game/phases.js?v=5"></script>
+<script src="js/game/sim.js?v=5"></script>
+<script src="js/game/writer.js?v=5"></script>
+<script src="js/game/versi.js?v=5"></script>
+<script src="js/game/piazza.js?v=5"></script>
+<script src="js/game/copertine.js?v=5"></script>
+<script src="js/game/modal.js?v=5"></script>
+<script src="js/game/scene-art.js?v=5"></script>
+<script src="js/game/beatplay.js?v=5"></script>
+<script src="js/game/ui.js?v=5"></script>
+<script src="js/game/lifestyle.js?v=5"></script>
+<script src="js/game/fx.js?v=5"></script>
+<script src="js/game/skip.js?v=5"></script>
+<script src="js/game/uscita.js?v=5"></script>
 
 <!-- Il pannello delle impostazioni: per ultimo, tocca roba definita ovunque. -->
-<script src="js/impostazioni-ui.js?v=4"></script>
+<script src="js/impostazioni-ui.js?v=5"></script>
 </body>
 </html>

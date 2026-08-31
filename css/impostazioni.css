@@ -23,6 +23,11 @@ html.compatto .mcorso{padding:14px 16px 16px}
 html.compatto .list,html.compatto .gpane .list{margin-bottom:10px}
 html.compatto .acts{gap:9px}
 html.compatto .gstats{gap:8px}
+html.compatto .testata{padding:11px 15px 10px;margin-bottom:11px}
+html.compatto .bigport{width:52px;height:52px}
+html.compatto .h2name{font-size:22px}
+html.compatto .tornamenu{margin:4px 0 11px;padding:12px 22px;font-size:18px}
+html.compatto .phase{padding:9px 13px 10px;margin-bottom:11px}
 
 /* ---- il pannello ---- */
 .setts{position:fixed;inset:0;z-index:120;display:none;background:rgba(6,6,9,.78);

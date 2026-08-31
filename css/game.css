@@ -7,7 +7,7 @@
    CTA in basso. E' l'unica via d'uscita dalla partita, quindi e' bianco pieno,
    come gli altri bottoni importanti del gioco, e ha aria sotto per staccarsi
    dalla scheda dell'artista. */
-.tornamenu{display:inline-flex;align-items:center;gap:10px;margin:10px 0 30px;padding:16px 30px;
+.tornamenu{display:inline-flex;align-items:center;gap:10px;margin:8px 0 16px;padding:14px 26px;
   border-radius:999px;background:#fff;color:#0B0B0D;
   font-family:var(--cond);font-size:20px;font-weight:800;letter-spacing:.1em;
   text-transform:uppercase;box-shadow:0 6px 26px rgba(0,0,0,.5);
@@ -18,14 +18,17 @@
 .gtop{display:flex;align-items:center;gap:16px;background:var(--card);border-radius:22px;
   padding:14px 20px 14px 14px;margin-bottom:14px;overflow:hidden}
 
-.sbox{border-radius:var(--r);padding:11px 14px;background:linear-gradient(170deg,#1A1A22,#121217);
+.sbox{position:relative;overflow:hidden;border-radius:13px;padding:10px 13px;
+  background:linear-gradient(170deg,#1A1A22,#121217);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
-.sbox .n{font-family:var(--disp);font-size:21px;font-weight:400;letter-spacing:-.03em;line-height:1.1;
+.sbox .n{font-family:var(--disp);font-size:19px;font-weight:400;letter-spacing:-.03em;line-height:1.1;
   font-variant-numeric:tabular-nums}
-.sbox .l{font-family:var(--cond);font-size:12.5px;color:var(--faint);font-weight:700;margin-top:2px;
+.sbox .l{font-family:var(--cond);font-size:11.5px;color:var(--faint);font-weight:700;margin-top:2px;
   letter-spacing:.1em;text-transform:uppercase}
 .sbox .n.red{color:var(--hot)} .sbox .n.acid{color:var(--acid)}
-.gstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:11px;margin-bottom:16px}
+/* i dettagli stanno dentro alla testata, aperti solo se li chiedi */
+.gstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:9px;margin-top:11px}
+.gstats[hidden]{display:none}
 .sbox::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
   background:linear-gradient(180deg,var(--sky),transparent)}
 .meter{height:6px;border-radius:3px;background:rgba(255,255,255,.12);margin-top:9px;overflow:hidden;
@@ -171,7 +174,9 @@
 @keyframes playpulse{0%{box-shadow:0 0 0 0 rgba(255,197,61,.55)}100%{box-shadow:0 0 0 9px rgba(255,197,61,0)}}
 .empty2{padding:16px;color:var(--faint);font-size:13px;text-align:center}
 
-.phase{border-radius:var(--r);padding:13px 16px;margin-bottom:14px;position:relative;overflow:hidden;
+/* La fase: una fascia, non una scheda. Dove sei a sinistra, i gradini a destra,
+   e sotto l'unica riga che ti serve davvero — cosa fare adesso. */
+.phase{border-radius:16px;padding:11px 15px 12px;margin-bottom:14px;position:relative;overflow:hidden;
   background:linear-gradient(120deg,color-mix(in srgb,var(--c1) 30%, #191320) 0%,#16121F 46%,#100E17 100%);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.14), inset 0 0 0 1.5px rgba(255,255,255,.07),
     0 8px 22px rgba(0,0,0,.42)}
@@ -179,17 +184,38 @@
   background:repeating-linear-gradient(115deg,rgba(255,255,255,.05) 0 2px,transparent 2px 10px);
   mask-image:linear-gradient(100deg,#000,transparent 60%)}
 .phase > *{position:relative}
-.phase .pk{font-family:var(--cond);font-size:13px;font-weight:800;letter-spacing:.16em;
+.phead2{display:flex;align-items:center;gap:16px}
+.phase .pt{flex:none;min-width:0}
+.phase .pk{display:block;font-family:var(--cond);font-size:11px;font-weight:800;letter-spacing:.16em;
   text-transform:uppercase;color:var(--acid)}
-.phase .pn{font-family:var(--disp);font-size:23px;font-weight:400;letter-spacing:-.02em;margin:2px 0 3px;
-  text-transform:uppercase;text-shadow:0 3px 0 rgba(0,0,0,.4)}
-.phase .pd{font-size:13.5px;color:var(--soft);line-height:1.5}
-.phase .pnx{margin-top:11px;padding-top:11px;border-top:1px solid rgba(255,255,255,.1);
-  font-size:13px;color:var(--soft)}
+.phase .pn{display:block;font-family:var(--disp);font-size:20px;font-weight:400;letter-spacing:-.02em;
+  line-height:1.1;margin-top:2px;text-transform:uppercase;text-shadow:0 3px 0 rgba(0,0,0,.4)}
+.phase .pnx{margin-top:9px;padding-top:9px;border-top:1px solid rgba(255,255,255,.1);
+  font-size:13px;color:var(--soft);line-height:1.4}
 .phase .pnx b{color:#fff;font-weight:800}
 .phase .pnx.ready{color:var(--acid)}
-.phase .ptrack{display:flex;gap:4px;margin-top:12px}
+.phase .ptrack{flex:1;display:flex;gap:4px;min-width:70px}
 .phase .ptrack i{flex:1;height:6px;border-radius:99px;background:rgba(255,255,255,.10);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
 .phase .ptrack i.on{background:linear-gradient(90deg,var(--hot),var(--acid));
   box-shadow:0 0 12px color-mix(in srgb,var(--acid) 60%, transparent)}
+
+/* ---- linguette dentro a un pannello ----
+   Il catalogo era quattro liste impilate: adesso è una alla volta e il titolo
+   della lista è la linguetta che la apre. */
+.subnav{display:flex;gap:6px;overflow-x:auto;padding:0 0 11px;scrollbar-width:none}
+.subnav::-webkit-scrollbar{display:none}
+.sb{position:relative;flex:none;padding:8px 14px;border-radius:999px;white-space:nowrap;
+  font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--soft);background:rgba(255,255,255,.055);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);transition:background .15s,color .15s}
+.sb:hover{background:rgba(255,255,255,.12);color:#fff}
+.sb.on{background:#fff;color:#0B0B0D;box-shadow:0 5px 16px rgba(0,0,0,.45)}
+.sb .sbdg{display:inline-grid;place-items:center;font-style:normal;margin-left:7px;
+  min-width:17px;height:17px;padding:0 5px;border-radius:9px;vertical-align:middle;
+  background:var(--hot);color:#fff;font-size:10.5px;font-weight:900;letter-spacing:0}
+.sb.on .sbdg{background:var(--hot);color:#fff}
+.spane{display:none}
+.spane.on{display:block}
+/* dentro alle linguette la lista non ha piu' bisogno del suo titolo */
+.spane > .list{margin-bottom:0}

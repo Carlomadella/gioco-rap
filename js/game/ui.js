@@ -2,6 +2,8 @@
 "use strict";
 
 const SHOWN = {};
+/* quali categorie del lifestyle l'utente ha aperto: sopravvive ai ridisegni */
+const LAPERTE = new Set();
 const ART = {
   scrivi:["#FF5A36","#B026FF","S"], beat:["#3DC7FF","#B026FF","B"],
   registra:["#FFC53D","#3DC7FF","R"], mixa:["#FF4D9D","#FF5A36","M"],
@@ -33,7 +35,9 @@ function renderGioco(){
   $("g-meta").textContent = "Anno " + G.year + " · Settimana " + G.week + " · " +
     PHASES[G.phase].n + " · " + (G.contract ? G.contract.label : "indipendente");
 
-  // fase della scalata
+  /* Fase della scalata: una fascia sola, non piu' una scheda alta mezzo schermo.
+     A sinistra dove sei, a destra i gradini fatti, sotto la riga che conta —
+     cosa devi fare adesso. Il racconto della fase sta nel titolo al passaggio. */
   const ph = PHASES[G.phase], nt = nextTrial();
   let nxt;
   if(!nt) nxt = '<div class="pnx">Sei arrivato in cima. Adesso il difficile è restarci.</div>';
@@ -46,9 +50,10 @@ function renderGioco(){
     nxt = '<div class="pnx">Prossimo passo: <b>' + nt.t + '</b>. ' + nt.hint + '</div>';
   let track = "";
   for(let i2=0;i2<PHASES.length;i2++) track += '<i class="' + (i2 <= G.phase ? "on" : "") + '"></i>';
-  $("g-phase").innerHTML = '<div class="phase"><div class="pk">La tua scalata</div>' +
-    '<div class="pn">' + ph.n + '</div><div class="pd">' + ph.d + '</div>' +
-    '<div class="ptrack">' + track + '</div>' + nxt + '</div>';
+  $("g-phase").innerHTML = '<div class="phase" title="' + ph.d.replace(/"/g, "&quot;") + '">' +
+    '<div class="phead2"><div class="pt"><span class="pk">La tua scalata</span>' +
+      '<span class="pn">' + ph.n + '</span></div>' +
+      '<div class="ptrack">' + track + '</div></div>' + nxt + '</div>';
 
   // livello ed esperienza
   const skl = G.skills.scrittura + G.skills.flow + G.skills.presenza + G.skills.rete;
@@ -62,28 +67,24 @@ function renderGioco(){
 
   /* L'energia rimasta della settimana. Il numero da solo non si legge al volo,
      i trattini si': uno per turno, spenti quelli gia' usati. Quando finisce
-     diventa rossa, che e' la cosa che devi sapere prima di cercare una mossa. */
+     diventa rossa, che e' la cosa che devi sapere prima di cercare una mossa.
+     Sta solo nella barra in basso: li' e' sempre sotto gli occhi e non fa
+     doppione con la testata. */
   const pipsEnergia = () => {
     let p2 = "";
     for(let i = 0; i < G.maxEnergy; i++) p2 += '<i class="' + (i < G.energy ? "on" : "") + '"></i>';
     return p2;
   };
-  const podEnergia = () =>
-    '<span class="rchip' + (G.energy <= 0 ? " scarica" : "") + '" style="--k:var(--sky)">' +
-    '<i style="background:linear-gradient(180deg,var(--sky),color-mix(in srgb,var(--sky) 70%, #000))">✦</i>' +
-    '<span><b>' + G.energy + '<small>/' + G.maxEnergy + '</small></b>' +
-    '<u>energia rimasta</u><span class="enpips">' + pipsEnergia() + '</span></span></span>';
 
-  // risorse
+  /* I tre numeri su cui decidi: cassa, chi ti segue, hype. In riga, senza
+     scatola dentro la scatola: sono dentro la testata, non una scheda a parte. */
   const pod = (k, ic, val, lab, neg) =>
-    '<span class="rchip' + (neg ? " neg" : "") + '" style="--k:' + k + '">' +
-    '<i style="background:linear-gradient(180deg,' + k + ',color-mix(in srgb,' + k + ' 70%, #000))">' + ic + '</i>' +
-    '<span><b>' + val + '</b><u>' + lab + '</u></span></span>';
+    '<span class="vit' + (neg ? " neg" : "") + '" style="--k:' + k + '">' +
+    '<i>' + ic + '</i><span><b>' + val + '</b><u>' + lab + '</u></span></span>';
   $("g-res").innerHTML =
     pod("var(--acid)", "€", fmt(G.money), "in cassa", G.money < 0) +
     pod("var(--hot)", "♥", short(G.fans), "chi ti segue") +
-    pod("var(--violet)", "▲", Math.round(G.hype), "hype") +
-    podEnergia();
+    pod("var(--violet)", "▲", Math.round(G.hype), "hype");
 
   // notifiche sulle sezioni
   const badges = {
@@ -96,6 +97,13 @@ function renderGioco(){
     const n = badges[nb.dataset.t] || 0;
     if(n > 0){ const e2 = document.createElement("span"); e2.className = "bdg"; e2.textContent = n; nb.appendChild(e2); }
   });
+  /* le stesse pallette sulle linguette dentro al catalogo, se no chiudendo le
+     liste non si vede piu' che c'e' roba nuova */
+  const sbadges = {market: G.market.length, songs: G.songs.filter(x => !x.released).length};
+  document.querySelectorAll(".sbdg").forEach(b => {
+    const n = sbadges[b.dataset.b] || 0;
+    b.hidden = n <= 0; b.textContent = n;
+  });
 
   const box = (n, l, cls, meter, ok, key, raw) =>
     '<div class="sbox"><div class="n ' + (cls||"") + '"' + (key ? ' data-k="' + key + '" data-to="' + raw + '"' : '') + '>' + n + '</div><div class="l">' + l + '</div>' +
@@ -106,6 +114,12 @@ function renderGioco(){
     box(Math.round(luc()), "lucidità", luc() <= 30 ? "red" : "", luc(), luc() > 45) +
     box(G.songs.filter(x => x.released).length, "pezzi fuori") +
     box(G.job ? G.job.pay + " €" : "—", G.job ? "a turno · " + G.job.n.toLowerCase() : "nessun lavoro");
+
+  /* I dettagli sono chiusi finché non li apri, ma se benessere o lucidità sono
+     a terra il bottone si accende: nascondere un numero non deve nascondere un
+     guaio. */
+  const allarme = G.wellbeing <= 30 || luc() <= 30;
+  $("g-dett").classList.toggle("allarme", allarme);
 
   $("g-stats").querySelectorAll("[data-k]").forEach(el => {
     const k = el.dataset.k, to = +el.dataset.to;
@@ -367,12 +381,18 @@ function renderGioco(){
         ', e stare in rosso lo abbassa di 12. Dal benessere dipende la qualità di tutto quello che scrivi e registri.</span></span></div>';
     })();
 
+  /* Cinque categorie per cinque gradini erano venticinque righe aperte tutte
+     insieme. Adesso vedi dove stai adesso e quanto paghi; i gradini si aprono
+     su quella che ti interessa. */
   $("g-life").innerHTML = LIFE.map(cat => {
     const cur = G.life[cat.id] || 0;
-    return '<div class="lcat" style="--a:' + cat.c[0] + '33">' +
-      '<div class="lhead"><span class="ic">' + cat.ic + '</span>' +
+    const aperta = LAPERTE.has(cat.id);
+    return '<div class="lcat' + (aperta ? " aperta" : "") + '" style="--a:' + cat.c[0] + '33">' +
+      '<button class="lhead" data-lopen="' + cat.id + '" aria-expanded="' + aperta + '">' +
+      '<span class="ic">' + cat.ic + '</span>' +
       '<span class="tt"><b>' + cat.n + '</b><span>' + cat.t[cur].n + '</span></span>' +
-      '<span class="cw">' + (cat.t[cur].w ? fmt(cat.t[cur].w) + ' €' : 'gratis') + '</span></div>' +
+      '<span class="cw">' + (cat.t[cur].w ? fmt(cat.t[cur].w) + ' €' : 'gratis') + '</span>' +
+      '<span class="lar">▾</span></button>' +
       cat.t.map((t,i) => {
         const isNow = i === cur;
         const up = i === cur + 1, down = i === cur - 1;
@@ -394,6 +414,14 @@ function renderGioco(){
           '</div>';
       }).join("") + '</div>';
   }).join("");
+
+  $("g-life").querySelectorAll("[data-lopen]").forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.lopen;
+      if(LAPERTE.has(id)) LAPERTE.delete(id); else LAPERTE.add(id);
+      renderGioco();
+    };
+  });
 
   $("g-life").querySelectorAll("[data-life]").forEach(btn => {
     btn.onclick = () => {
@@ -425,11 +453,9 @@ function renderGioco(){
     ? G.log.map(l => '<div class="ev ' + l.c + '"><span class="w">' + l.w + '</span>' + l.t + '</div>').join("")
     : '<div class="empty2">Il diario è vuoto. Fai qualcosa.</div>';
 
-  $("g-bar-a").textContent = "A" + G.year + " · S" + G.week;
-  $("g-bar-b").textContent = PHASES[G.phase].n;
   const be = $("g-barenergia");
   be.classList.toggle("vuota", G.energy <= 0);
-  be.innerHTML = '<span class="n"><b>' + G.energy + '</b>/' + G.maxEnergy + ' energia</span>' +
+  be.innerHTML = '<span class="n"><b>' + G.energy + '</b>/' + G.maxEnergy + ' <em>energia</em></span>' +
     '<span class="enpips">' + pipsEnergia() + '</span>';
 }
 
@@ -450,6 +476,28 @@ document.querySelectorAll(".nb").forEach(t => {
     if(typeof beatStop === "function") beatStop();
   };
 });
+
+/* Linguette dentro a un pannello: una lista alla volta invece di quattro
+   impilate. Vale per qualunque .subnav, non solo per il catalogo. */
+document.querySelectorAll(".subnav").forEach(sn => {
+  const pane = sn.parentNode;
+  sn.querySelectorAll(".sb").forEach(t => {
+    t.onclick = () => {
+      sn.querySelectorAll(".sb").forEach(x => x.classList.toggle("on", x === t));
+      pane.querySelectorAll(".spane").forEach(sp => sp.classList.toggle("on", sp.dataset.s === t.dataset.s));
+      if(typeof beatStop === "function") beatStop();
+    };
+  });
+});
+
+/* I numeri di contorno — benessere, lucidità, pezzi fuori, lavoro — stanno
+   chiusi: si aprono quando li vuoi e restano aperti finché non li richiudi. */
+$("g-dett").onclick = () => {
+  const st = $("g-stats"), apri = st.hidden;
+  st.hidden = !apri;
+  $("g-dett").setAttribute("aria-expanded", apri ? "true" : "false");
+  $("g-dett").classList.toggle("aperto", apri);
+};
 let weekOpen = null, weekEarn = 0;
 function openWeek(){
   weekOpen = {money:G.money, fans:G.fans,
