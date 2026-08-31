@@ -1,12 +1,13 @@
 # Anni di Fame
 
-Gioco di carriera rap. Il progetto è diviso in due metà che non si mescolano:
+Gioco di carriera rap, in uscita su **Steam** e sugli **store del telefono**.
+Il progetto è diviso in due metà che non si mescolano:
 
 | dove | cos'è | come si avvia |
 | --- | --- | --- |
-| [`frontend/`](frontend/README.md) | il gioco: HTML, CSS, JavaScript. Nessuna dipendenza, nessun build | `python -m http.server 8000` |
+| [`frontend/`](frontend/README.md) | il gioco: HTML, CSS, JavaScript, dentro a un guscio nativo per gli store | `python -m http.server 8000` |
 | [`backend/`](backend/README.md) | il server della classifica: Node, nessuna dipendenza | `npm start` |
-| [`backend/database/`](backend/database/README.md) | i dati della classifica: cosa c'è dentro, come si salva, quando cambiare motore | — |
+| [`backend/database/`](backend/database/README.md) | i dati: com'è messo adesso e dove va (lo schema completo in `schema.md`) | — |
 
 **Il gioco funziona da solo.** Il backend serve alla classifica multiplayer: se non è
 acceso, la partita gira come ha sempre girato, con la classifica in locale.
@@ -18,6 +19,30 @@ cd frontend && python -m http.server 8000      # → http://localhost:8000
 # la classifica online, in un altro terminale (facoltativa)
 cd backend && npm start                        # → http://localhost:8787
 ```
+
+## Dove esce il gioco
+
+**Steam** (Windows, macOS, Linux, Steam Deck) e gli **store del telefono** (App Store e
+Google Play). Non è un gioco da browser: è un prodotto che si scarica, si installa e si
+paga. Il codice resta HTML, CSS e JavaScript — è la tecnologia giusta per un gestionale a
+schermate, e su Steam mezzo genere è fatto così — ma ci va intorno un guscio:
+**Electron** per il desktop, **Capacitor** per il telefono.
+
+Da qui discendono cinque lavori che prima non servivano: un build vero (Vite e i moduli ES
+al posto di trenta `<script>` in ordine fisso), i **salvataggi su file e in cloud** al
+posto del `localStorage`, gli **account** (Steam, Apple, Google) al posto della chiave nel
+browser, l'**interfaccia per il telefono** in verticale e a tocchi, e i requisiti degli
+store (privacy, età, cancellazione dell'account). L'elenco completo, con l'ordine con cui
+farli, sta in [`frontend/README.md`](frontend/README.md).
+
+Intanto il gioco si mette in un file solo per farlo provare a qualcuno:
+
+```bash
+python3 frontend/strumenti/build-artifact.py     # → frontend/dist/anni-di-fame.html
+```
+
+Non è il modo in cui il gioco esce: è lo strumento per una demo o un playtest — si manda il
+file e la gente gioca, senza installare niente.
 
 I documenti di progetto stanno qui in radice: `ROADMAP.md` (il disegno d'insieme),
 `implementazioni.md` (i punti da fare, spuntati uno a uno),
@@ -78,18 +103,6 @@ settimana, e chi sparisce scende. Rotte, manopole e freni contro l'imbroglio sta
 **La schermata classifica non è ancora agganciata**: il ponte c'è
 (`frontend/js/net/online.js`), la lista in schermo disegna ancora i rivali locali. È il
 prossimo pezzo, l'ordine di lavoro sta in `ROADMAP.md`.
-
-## Un file solo, per l'artifact
-
-```bash
-python3 frontend/strumenti/build-artifact.py
-```
-
-Rimette dentro `index.html` tutti i CSS, i JS e le immagini, e scrive
-`frontend/dist/anni-di-fame.html`: il gioco intero in un file, che gira dentro a un
-artifact senza rete e senza niente da installare. È il motivo per cui il frontend resta
-senza framework e senza build — la spiegazione lunga sta in
-[`frontend/README.md`](frontend/README.md).
 
 ## Team
 

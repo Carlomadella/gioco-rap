@@ -7,6 +7,13 @@ bot. Non è un dettaglio tecnico, è la regola che tiene in piedi la cosa (punto
 
 Node e basta: **nessuna dipendenza**, nessun `npm install`, nessun build. Come il gioco.
 
+Il gioco esce su **Steam e sugli store del telefono**, quindi questo server smette di
+essere un giocattolo che gira su `localhost`: diventa un servizio online con dentro gli
+account della gente e i loro salvataggi. Cosa vuol dire, in pratica, sta nel paragrafo
+«Cosa cambia con gli store» qui sotto; il disegno dei dati che serve a reggerlo sta in
+`database/schema.md` (fuori da git, come `../backend.md`), e il piano per arrivarci in
+[`database/README.md`](database/README.md).
+
 ## Come si avvia
 
 ```bash
@@ -59,7 +66,8 @@ gioco) e `ADF_ADMIN` (una chiave lunga, mai dentro al codice).
 | `bot.js` | i bot: come nascono, come crescono, chi smette e chi spunta |
 | `nomi.js` | il vocabolario dei nomi d'arte, delle città, delle storie, dei titoli |
 | `database/archivio.js` | lo strato dati: legge, salva, ordina, fa passare la settimana |
-| `database/README.md` | **il modello dei dati**: cosa c'è dentro all'archivio e perché |
+| `database/README.md` | com'è messo l'archivio adesso, e il piano per il database vero |
+| `database/schema.md` | **lo schema completo** (fuori da git): tabelle, colonne, relazioni, query |
 | `prova.js` | la prova completa dell'API, senza dipendenze |
 
 Lo strato dati sta tutto dentro `database/`: il giorno che l'archivio JSON non basta più
@@ -119,8 +127,8 @@ riparte da adesso — non ha senso simulare tre mesi di vuoto).
 
 ## Sull'imbroglio, onestamente
 
-Il gioco gira nel browser di chi gioca: chi vuole barare bara, e nessun server lo può
-impedire. Quello che c'è serve a tenere fuori i numeri assurdi, non a blindare:
+Il gioco gira sul dispositivo di chi gioca — nel browser oggi, dentro a un'app domani:
+chi vuole barare bara, e nessun server lo può impedire. Quello che c'è serve a tenere fuori i numeri assurdi, non a blindare:
 
 - da un invio all'altro gli stream possono al massimo **quintuplicare** (il primo invio ha
   la mano larga, per chi arriva con una carriera già avviata);
@@ -130,25 +138,63 @@ impedire. Quello che c'è serve a tenere fuori i numeri assurdi, non a blindare:
 - i nomi si puliscono da caratteri invisibili e si tagliano a 22 caratteri, e due artisti
   non possono chiamarsi uguale.
 
-Il giorno che i numeri contano davvero (premi, stagioni), la strada è simulare la settimana
-**qui** invece che accettarla dal client. Sta scritto in `../backend.md`.
+Con un gioco a pagamento e con i traguardi di Steam attaccati alla classifica, questo non
+basterà: la strada è simulare la settimana **qui** invece che accettarla dal client, e
+lasciare al gioco solo le mosse. È un lavoro grosso — vuol dire portare di qua `sim.js` —
+e va fatto prima che la classifica valga qualcosa per qualcuno. Il ragionamento per esteso
+sta in `../backend.md`.
+
+## Cosa cambia con gli store
+
+Cinque cose, e sono tutte lavoro di questo server.
+
+1. **Gli account.** Oggi sei un `id` e una chiave nel `localStorage`: chi cancella i dati
+   del browser perde l'artista. Con Steam, Apple e Google si entra con l'account dello
+   store, e l'artista sta attaccato a quello. Serve la tabella `account` con sotto le
+   `identita` (una per Steam, una per Apple, una per la mail).
+2. **I salvataggi in cloud.** Una carriera da quaranta ore che sparisce perché uno ha
+   cambiato telefono è una recensione a una stella per sempre. Il salvataggio va anche
+   quassù, legato all'account, e deve passare dal PC al telefono.
+3. **I traguardi.** Steam, Game Center e Play Games vogliono che i risultati arrivino da
+   qualche parte di affidabile. Il traguardo si dà subito al giocatore e si spinge allo
+   store quando si può, riprovando: uno che non arriva è un'assistenza da fare.
+4. **La cancellazione dell'account.** Apple e Google la **pretendono** dentro al gioco. Non
+   può essere un `DELETE` a cascata, o si sfonda lo storico della classifica di tutti gli
+   altri: la procedura giusta è già scritta in `database/schema.md`.
+5. **Il database vero.** Un file JSON non regge account, salvataggi e storico. SQLite
+   appena si mette in piedi l'account, PostgreSQL dal primo giorno di vendita. Lo schema
+   è pronto, il travaso è uno script di mezz'ora, e `database/archivio.js` è stato tenuto
+   come unico punto che tocca il disco apposta per quel giorno.
+
+E una che non è codice ma è obbligatoria: **l'informativa sulla privacy**. Qui dentro
+girano nome d'arte, città, identificativo e — quando ci saranno gli account — un indirizzo
+di posta. Sono dati personali: vanno dichiarati sulla scheda dello store, e vanno
+cancellati quando qualcuno lo chiede.
 
 ## Come si mette online
 
-Non serve niente di speciale: è un processo Node che ascolta su una porta.
+Non c'è niente di speciale: un processo Node dietro a un reverse proxy.
 
 ```bash
-ADF_PORTA=8787 \
-ADF_ORIGINI=https://ilgioco.esempio.it \
-ADF_ADMIN=una-chiave-lunga-a-caso \
-ADF_DATI=/var/lib/anni-di-fame/classifica.json \
-node server.js
+ADF_PORTA=8787 ADF_ORIGINI=https://ilgioco.esempio.it ADF_ADMIN=<chiave lunga a caso> ADF_DATI=/var/lib/anni-di-fame/classifica.json node server.js
 ```
 
 Davanti ci va un reverse proxy (nginx, Caddy) che fa HTTPS e gira `/api/` qui dietro; il
 processo lo tiene su `systemd` (o `pm2`). Due accortezze che valgono più di tutto il resto:
-**l'archivio in una cartella che non si cancella** (non `/tmp`) e **una copia ogni notte**
-— un `cp` del file basta, il formato è un JSON solo (vedi `database/README.md`).
+**l'archivio in una cartella che non si cancella** (non `/tmp`) e **una copia ogni notte** —
+un `cp` del file basta, il formato è un JSON solo.
 
-Il gioco resta un sito statico: si può servire da qualsiasi parte, anche da un CDN. Solo
-`/api/` deve arrivare qui.
+**Da un gioco venduto in poi cambiano le pretese**, e vanno messe in conto prima:
+
+- **HTTPS sempre**, e `ADF_ORIGINI` col dominio vero: `*` va bene in casa, online vuol dire
+  che qualsiasi sito può parlare con la nostra API dal browser di chiunque.
+- **Il ripristino va provato**, non solo fatto: una copia che nessuno ha mai rimesso a
+  posto non è una copia.
+- **Il server può essere spento e il gioco deve funzionare lo stesso.** Vale già adesso
+  (`ONLINE` torna `null` e si gioca in locale) e diventa una promessa contrattuale: nessuno
+  può ritrovarsi senza il gioco che ha pagato perché è caduta una macchina nostra.
+- **Le chiavi non stanno nel repo**: variabili d'ambiente nel unit file di systemd, con i
+  permessi giusti.
+
+Il gioco resta un pacchetto che gira sul dispositivo: si scarica dallo store e non ha
+bisogno di noi per partire. Solo `/api/` arriva qui.

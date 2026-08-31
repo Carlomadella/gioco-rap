@@ -1,11 +1,11 @@
 # Anni di Fame — Roadmap di Gameplay
 
-Simulatore di carriera rap a settimane. Il repository è la fonte, diviso in due metà:
-`frontend/` (il gioco: `index.html` + `css/` + `js/`) e `backend/` (il server della classifica).
-Per l'artifact di Claude si ricompila tutto in un file solo con
-`python3 frontend/strumenti/build-artifact.py` (esce `frontend/dist/anni-di-fame.html`).
-Artifact esistente: https://claude.ai/code/artifact/9994ada6-fecb-4023-a5a5-019c2f46af89
-(da aggiornare passandolo come `url`, mai crearne uno nuovo).
+Simulatore di carriera rap a settimane, **in uscita su Steam e sugli store del telefono**.
+Il repository è la fonte, diviso in due metà: `frontend/` (il gioco: `index.html` + `css/` +
+`js/`) e `backend/` (il server della classifica).
+Per farlo provare a qualcuno si ricompila tutto in un file solo con
+`python3 frontend/strumenti/build-artifact.py` (esce `frontend/dist/anni-di-fame.html`):
+è la demo, non il modo in cui il gioco esce.
 
 L'elenco puntuale dei lavori aperti sta in `implementazioni.md`: lì i punti si spuntano uno a uno,
 qui c'è il disegno d'insieme.
@@ -19,6 +19,8 @@ qui c'è il disegno d'insieme.
 - **Si sblocca un mondo, non un menu** — ogni cosa nuova compare come un posto sulla mappa.
 - **Niente studio personale** — per fare musica devi uscire, andare dagli altri e conoscere gente.
 - Livelli di fama: Sconosciuto → Rapper esordiente → Rapper emergente → Rapper → Star → Man of the Year → GOAT.
+- **Si esce su Steam e sugli store del telefono** — quindi ogni schermata nuova nasce già
+  pensando al telefono in verticale e ai tocchi, non solo al monitor.
 
 ---
 
@@ -137,9 +139,11 @@ Le rotte e le manopole stanno in `backend/README.md`, il modello dei dati in
   l'8% a giro. Il posto in alto si tiene giocando.
 - **Le frecce ▲▼ vengono da qui**: prima di ogni giro si fotografa la posizione di tutti,
   e il «prima» è quello (lega col punto 12).
-- **L'imbroglio**: il gioco gira nel browser, quindi non è blindabile. Il server tiene fuori
-  l'assurdo — al massimo ×5 di stream fra un invio e l'altro, un invio ogni dieci secondi,
-  120 richieste al minuto per indirizzo, chiave salvata solo come hash.
+- **L'imbroglio**: il gioco gira sul dispositivo di chi gioca, quindi non è blindabile. Il
+  server tiene fuori l'assurdo — al massimo ×5 di stream fra un invio e l'altro, un invio
+  ogni dieci secondi, 120 richieste al minuto per indirizzo, chiave salvata solo come hash.
+  **Prima di vendere il gioco** questo non basta: la settimana va simulata sul server, e
+  dal gioco arrivano solo le mosse.
 
 ### Quello che manca (in ordine)
 
@@ -156,7 +160,11 @@ Le rotte e le manopole stanno in `backend/README.md`, il modello dei dati in
    una lista generata in casa.
 5. **Le notizie del server nel telefono**: `GET /api/notizie` racconta chi è uscito, chi ha
    firmato, chi è sparito. È il feed della città, ma con dentro gente vera.
-6. **Poi, non adesso**: sfide fra amici (la gara di freestyle del punto 14 giocata a
+6. **Prima di uscire sugli store**: account veri (Steam, Apple, Google) al posto della
+   chiave nel browser, salvataggi in cloud, database vero, traguardi spinti agli store e
+   cancellazione dell'account. L'elenco sta in `backend/README.md`, lo schema dei dati in
+   `backend/database/schema.md`.
+7. **Poi, non adesso**: sfide fra amici (la gara di freestyle del punto 14 giocata a
    distanza), classifiche per città e per genere, stagioni che si azzerano.
 
 ### Due cose da non sbagliare
@@ -298,7 +306,15 @@ Alessio (La Fame Studio), Claude, Carletto (scarica il progetto e ci lavora da c
 ## Nota tecnica
 
 Il codice sorgente sta nel repo e si legge da lì: non serve più allegare l'HTML in sessione.
-Il server della classifica (`server/`) non entra nell'artifact: quello è e resta un file
-solo che gira nel browser, e senza server si comporta come si è sempre comportato.
-Quando si aggiorna l'artifact si ricompila con `frontend/strumenti/build-artifact.py` e si
-pubblica `frontend/dist/anni-di-fame.html` sull'URL esistente.
+
+**Il gioco esce su Steam e sugli store del telefono.** Il codice resta HTML, CSS e
+JavaScript — per un gestionale a schermate è la tecnologia giusta — dentro a un guscio
+nativo: Electron per il desktop, Capacitor per il telefono. I cinque lavori che questo
+comporta (build con Vite, salvataggi su file e in cloud, account, interfaccia per il
+telefono, requisiti degli store) sono elencati in ordine in `frontend/README.md`.
+
+Il file unico (`frontend/strumenti/build-artifact.py` → `frontend/dist/anni-di-fame.html`)
+resta come demo da mandare in giro, non come formato di uscita.
+
+Il server della classifica (`backend/`) non entra nel pacchetto del gioco: il gioco parte e
+si gioca anche col server spento.

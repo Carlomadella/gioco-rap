@@ -1,12 +1,18 @@
 # Anni di Fame — il gioco (frontend)
 
-Il gioco vero e proprio: tutto quello che gira nel browser di chi gioca.
-HTML, CSS e JavaScript. **Nessuna dipendenza, nessun passaggio di build.**
+Il gioco vero e proprio: tutto quello che gira sullo schermo di chi gioca.
+HTML, CSS e JavaScript, senza dipendenze.
 
-Il server della classifica sta in `../backend/` e ha il suo README: da qui si parla
-solo del gioco. Il gioco funziona anche senza server.
+Il server della classifica sta in `../backend/` e ha il suo README: da qui si parla solo
+del gioco. Il gioco funziona anche senza server.
 
-## Come si avvia
+## Dove esce il gioco
+
+**Steam** (Windows, macOS, Linux, Steam Deck) e gli **store del telefono** (App Store e
+Google Play). Non è un gioco da browser e non è una demo: è un prodotto che si scarica, si
+installa e si paga. Tutto quello che c'è scritto qui sotto discende da questa frase.
+
+## Come si avvia, mentre si sviluppa
 
 ```bash
 # dalla cartella frontend/
@@ -15,29 +21,109 @@ python -m http.server 8000
 npx serve .
 ```
 
-Poi apri <http://localhost:8000>.
+Poi apri <http://localhost:8000>. Serve un server locale e non il doppio clic sul file:
+con `file://` il `localStorage` è legato al percorso e le chiamate alla classifica non
+partono (il browser le blocca).
 
-Gli script sono classici, non moduli ES, quindi non c'è il blocco CORS che i moduli
-hanno su `file://`: il doppio clic su `index.html` funziona comunque. Il server locale
-resta la via consigliata (è quella verificata), e serve per forza se vuoi anche la
-classifica online, perché una pagina aperta da `file://` non può chiamare l'API.
+## Perché il gioco è scritto in HTML, CSS e JavaScript
 
-## Perché è ancora vanilla, e perché ci resta
+**È la tecnologia giusta per questo gioco, e per gli store non è un ostacolo.**
 
-Non è pigrizia, è un vincolo di prodotto: **il gioco deve poter essere un file solo**
-(`dist/anni-di-fame.html`) che gira dentro a un artifact di Claude, senza rete e senza
-niente da installare. Oggi ci arriviamo con uno script Python di 60 righe che rimette
-dentro CSS, JS e immagini. Con React o Vue servirebbe un bundler, un `node_modules`, un
-passaggio di build per ogni modifica — e soprattutto la riscrittura di tutto il gioco:
-settimane di lavoro per un giocatore che non vedrebbe **niente** di diverso.
+Anni di Fame è un gestionale: schermate, liste, carte, testo, numeri che cambiano. Niente
+fisica, niente 3D, niente sessanta fotogrammi al secondo da tenere. È esattamente quello
+per cui il DOM e i CSS sono fatti — e infatti costruire questa roba con un motore di gioco
+(Godot, Unity) vorrebbe dire rifare a mano bottoni, liste che scorrono, campi di testo e
+tipografia, cioè le uniche cose che qui contano davvero. Su Steam ci sono decine di giochi
+gestionali fatti così: si impacchettano in un eseguibile e nessuno se ne accorge.
 
-Le cose che un framework porta davvero — componenti riusabili, stato reattivo, routing —
-qui sono già risolte in piccolo: le schermate sono `<section>` che si accendono e si
-spengono, lo stato è un oggetto solo (`G`) che si salva nel `localStorage`, e ogni
-schermata si ridisegna con la sua funzione (`renderGioco()`, `renderArtista()`).
+E soprattutto: **il gioco esiste già**. Diecimila righe che funzionano, con dentro anni di
+scelte di bilanciamento. Riscriverle in un'altra tecnologia sono mesi di lavoro e di
+regressioni, per un giocatore che non vedrebbe niente di diverso.
 
-Quello su cui vale la pena spendere è l'ordine: cartelle chiare, un file per argomento,
-niente logica di gioco dentro alla grafica. Quello sì, e si fa senza cambiare linguaggio.
+Quello che **cambia** rispetto a com'è oggi, e cambia sul serio, sta qui sotto.
+
+## Cosa serve per uscire su Steam e sugli store
+
+In ordine di quanto pesa. Nessuna di queste è opzionale.
+
+### 1. Un build vero (Vite)
+
+Oggi sono trenta `<script>` in un ordine fisso che condividono le variabili globali, e la
+cache si aggira alzando a mano un `?v=8`. Per un sito servito da noi si regge; per un
+prodotto in vendita no: il primo file caricato fuori ordine è una schermata bianca sul PC
+di un cliente.
+
+Si passa ai **moduli ES** con **Vite**: import espliciti al posto dell'ordine dei tag,
+bundle unico e minificato, nomi dei file con l'impronta dentro (la cache si sistema da
+sola), e `npm run dev` con il ricaricamento immediato mentre si lavora. È un lavoro
+graduale — una cartella alla volta, `js/creator/` e poi `js/game/` — e il gioco resta
+giocabile a ogni passo.
+
+### 2. L'impacchettamento
+
+Il codice è uno solo; cambia il guscio che ci sta intorno.
+
+| dove | con cosa | note |
+| --- | --- | --- |
+| Steam (Windows, macOS, Linux, Deck) | **Electron** | la strada battuta: Steamworks (traguardi, Cloud, overlay) ha collegamenti già pronti e provati |
+| iOS e Android | **Capacitor** | mette il gioco dentro a un'app nativa vera, con accesso a salvataggi, acquisti e notifiche |
+| _alternativa per tutti e quattro_ | **Tauri v2** | eseguibili molto più piccoli (una decina di MB contro un centinaio), ma il lato Steam e il lato mobile sono più giovani |
+
+La scelta che consiglio: **Electron per Steam, Capacitor per il telefono**. Sono due gusci
+sopra allo stesso gioco, non due giochi. Su Steam il peso dell'eseguibile non interessa a
+nessuno; quello che interessa è che l'overlay funzioni e che i traguardi arrivino.
+
+### 3. I salvataggi non possono più stare nel `localStorage`
+
+Oggi la carriera vive nel `localStorage` del browser. Su uno store è inaccettabile: la
+gente reinstalla, cambia telefono, gioca sul PC e poi sul cellulare, e una carriera da
+quaranta ore che sparisce è una recensione negativa che resta lì per sempre.
+
+Serve uno **strato di salvataggio** con tre gradini: un file vero nella cartella dati
+dell'app (desktop) o nello spazio dell'app (telefono); **Steam Cloud** dove c'è;
+e il **salvataggio in cloud nostro**, legato all'account, che è quello che fa passare una
+carriera dal PC al telefono. Il modello dei dati è già disegnato:
+`../backend/database/schema.md`, tabella `carriera`.
+
+### 4. L'account al posto della chiave nel browser
+
+Stessa storia dal lato classifica: oggi sei un `id` e una chiave nel `localStorage`. Con
+gli store si entra con **Steam**, **Sign in with Apple**, **Google Play Games** o una mail,
+e l'artista sta attaccato a quell'account. Apple e Google pretendono anche che dal gioco si
+possa **cancellare** il proprio account: c'è già la procedura scritta, in `schema.md`.
+
+### 5. L'interfaccia sul telefono — il lavoro più grosso
+
+La plancia è disegnata alla misura del concept (1536×1024) e rimpicciolita tutta insieme.
+Su un monitor va benissimo, su un telefono in verticale no: serve una disposizione sua
+(profilo, mappa e telefono uno sotto l'altro invece che affiancati), aree da toccare di
+almeno 44 punti, niente `hover`, e i testi che restano leggibili senza zoom.
+
+Non è una riscrittura: sono i CSS e qualche pezzo di `hub.js`. Ma è il lavoro più lungo di
+tutta la lista, ed è quello da provare su un telefono vero il prima possibile.
+
+### 6. Le cose che si notano solo quando è tardi
+
+- **Prestazioni**: `renderGioco()` ridisegna tutta la schermata a ogni cambiamento. Su un
+  computer non si vede; su un telefono di quattro anni fa sì. Si ridisegna solo il pezzo
+  che cambia, quando comincerà a sentirsi.
+- **Comandi**: sullo Steam Deck si gioca col pad. Serve almeno la navigazione fra i
+  bottoni con la croce direzionale e i due tasti principali.
+- **Audio**: sui telefoni il suono parte solo dopo che l'utente ha toccato qualcosa
+  (`AudioContext` sospeso). Vale già la pena tenerne conto.
+- **Requisiti degli store**: informativa sulla privacy (raccogliamo nome d'arte, città e
+  identificativo: sono dati personali), classificazione per età, e su iOS nessun rimando a
+  pagamenti fuori dall'app.
+
+### L'ordine con cui li farei
+
+1. Vite e i moduli ES — sblocca tutto il resto e si fa senza toccare il gioco.
+2. Lo strato di salvataggio (file vero + cloud nostro), perché cambia il modo in cui il
+   gioco parla con i dati e prima si fa, meno codice tocca.
+3. Electron e una build che si apre davvero, così si prova su una macchina vera.
+4. L'interfaccia per il telefono, provata su un telefono.
+5. Account, traguardi, Steam Cloud.
+6. Capacitor e la build mobile.
 
 ## Struttura
 
@@ -51,8 +137,8 @@ js/net/online.js      il ponte con la classifica online (non parte da solo)
 js/creator/           creazione dell'artista
 js/game/              la partita
 media/photo/          concept art delle città e avatar di riferimento
-strumenti/            build-artifact.py: rifà il gioco in un file solo
-dist/                 anni-di-fame.html, il file unico per l'artifact
+strumenti/            build-artifact.py: il gioco in un file solo, per farlo provare
+dist/                 anni-di-fame.html, il file unico
 ```
 
 ### CSS — l'ordine dei `<link>` in `index.html` conta
@@ -75,8 +161,9 @@ dist/                 anni-di-fame.html, il file unico per l'artifact
 
 ### JS — anche qui l'ordine dei `<script>` conta
 
-I file sono script classici che condividono lo scope globale: ognuno dà per scontato
-che quelli caricati prima abbiano già dichiarato le loro funzioni e costanti.
+I file sono script classici che condividono lo scope globale: ognuno dà per scontato che
+quelli caricati prima abbiano già dichiarato le loro funzioni e costanti. **È la cosa che
+Vite viene a sistemare** (punto 1 qui sopra): fino ad allora, l'ordine è legge.
 
 **Prima di tutto**
 
@@ -153,12 +240,13 @@ Si parlano tramite poche cose su `window`: `ARTIST`, `ARTIST_PORTRAIT`, `ARTIST_
 | `ONLINE.collega(url)` | punta a un altro server (di suo: `http://localhost:8787`) |
 
 **Regola**: se il server non c'è, ogni funzione torna `null` e il gioco tira dritto sulla
-classifica locale. Nessuna schermata deve aspettare la rete per disegnarsi. Da solo questo
-file non fa niente: nessuna chiamata parte se non la chiedi.
+classifica locale. Nessuna schermata deve aspettare la rete per disegnarsi — vale anche da
+installato, perché la gente gioca in aereo e in metropolitana.
 
 ## Salvataggi
 
-Tutto in `localStorage`, sul dispositivo di chi gioca:
+Oggi tutto in `localStorage`, sul dispositivo di chi gioca (vedi il punto 3 qui sopra: è
+una delle cose che devono cambiare prima di uscire).
 
 - `anni-di-fame-artista` — l'aspetto e l'identità dell'artista
 - `anni-di-fame-partita-v2` — la partita in corso
@@ -170,25 +258,26 @@ Gli slot sono tre (impostazioni → Partite). Lo slot 1 usa le chiavi storiche q
 gli altri aggiungono il suffisso `-s2` / `-s3`: chi giocava prima ritrova la sua carriera
 dov'era. Da lì si esporta e si importa una carriera come codice.
 
-## Un file solo, per l'artifact
+## Il gioco in un file solo
 
 ```bash
 python3 strumenti/build-artifact.py
 ```
 
-Rimette dentro `index.html` tutti i CSS e i JS nell'ordine in cui compaiono e scrive
-`dist/anni-di-fame.html`, senza doctype/head/body: lo scheletro lo mette l'artifact.
-Anche le immagini richiamate dai CSS finiscono dentro, come data URI: nell'artifact non
-c'è nessuna cartella `media/` da cui pescarle.
+Rimette dentro `index.html` tutti i CSS, i JS e le immagini (come data URI) e scrive
+`dist/anni-di-fame.html`: il gioco intero in un file, che si apre dappertutto senza
+installare niente.
 
-Nel file unico la classifica online non parte: `ONLINE` c'è ma punta a `localhost`, e
-`localhost` dentro a un artifact non è nessuno. Il multiplayer è per il gioco servito da
-un sito vero, e l'artifact resta quello che è sempre stato — la demo che gira dappertutto.
+**Non è il modo in cui il gioco esce** — quello sono gli eseguibili di Steam e le app degli
+store. È lo strumento per **farlo provare**: si manda il file a qualcuno e gioca, senza
+spiegazioni. Comodo per una demo, per un playtest, per farlo vedere a un editore. Quando ci
+sarà Vite, questo passaggio diventerà una riga della configurazione invece che uno script a
+parte.
 
 ## Quando si tocca l'interfaccia
 
-- **Cambi un CSS o un JS?** Alza il `?v=` nei tag di `index.html`, se no il browser di
-  chi gioca continua a servire il vecchio.
+- **Cambi un CSS o un JS?** Alza il `?v=` nei tag di `index.html`, se no il browser di chi
+  gioca continua a servire il vecchio. (Sparisce quando arriva Vite.)
 - **Aggiungi un file JS?** Va messo in `index.html` nel punto giusto della catena: i file
   contano sull'ordine, non c'è nessun import a rimettere le cose a posto.
 - **Riferimento visivo**: `../stili interfaccia schermata di gioco.md` e le foto in

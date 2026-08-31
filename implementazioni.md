@@ -488,41 +488,17 @@ L'energia stiam pensando di metterla a 100 al giorno. Ovviamente riproporzionere
 30. noi vogliamo che il gioco sia multiplayer, ad esempio le classifiche devono essere con i player reali e all'inizio bot per fare numero, i nomi dei bot devono essere reali comunque.
     Dimmi se esiste già o sennò crea un backend, poi aggiorna il readme e la roadmap di conseguenza
 
-   **Un backend non c'era**: fino a qui il gioco era tutto nel browser, con i rivali generati
-   sul computer di chi gioca (`js/game/rivals.js`) e i salvataggi nel localStorage. Nessuna
-   chiamata di rete da nessuna parte.
+31. Crea il file backend.md da non pushare con tutte le info sulla parte di backend, inoltre suddividi tutti i file in backend e frontend, e all'interno crea un file readme solo per il backend e uno solo per il frontend e uno solo per il database
+    Se secondo te conviene farlo in una maniera diversa dal semplice HTML + CSS + JS vanilla cambia, il progetto deve essere il più professionale e ottimizzato possibile.
 
-   **FATTO (31/08/2026) — il server della classifica** (`server/`, ponte in `js/net/online.js`).
-   Node e basta: nessuna dipendenza, nessun build, come il resto del progetto. Si avvia con
-   `node server/server.js`, l'archivio è un file JSON scritto con temporaneo + rinomina.
-   - **Una classifica sola per tutti**: dentro ci stanno i giocatori veri e i bot, mescolati e
-     ordinati per stream. Da fuori **non si distinguono**: il server non dice mai chi è un bot,
-     e non è un dettaglio tecnico — è la regola che tiene in piedi la cosa.
-   - **I nomi dei bot sono nomi veri**: «Nino Vento», «Marco T.», «Young Ferro», «Selva 22».
-     Quattro forme diverse, prese da un vocabolario di nomi d'arte italiani, tutti inventati —
-     nessun rapper che esiste davvero, che sarebbe un problema e non una scorciatoia. Ognuno ha
-     la sua città, il suo genere, la sua storia, le sue uscite e il suo contratto.
-   - **La classifica si muove anche mentre nessuno gioca**: ogni 24 ore vere il server fa un
-     giro di settimana — i bot crescono, uno esce con un pezzo, uno firma, uno sparisce dai
-     radar — e chi non manda un punteggio da più di una settimana e mezza scende dell'8%.
-     Prima di ogni giro si fotografa la posizione di tutti: da lì escono le frecce ▲▼ della
-     settimana (punto 12).
-   - **Si può chiedere qualsiasi fetta**: top 10, top 100, top 1000, e «chi ho davanti e chi ho
-     dietro» per la riga «sei 428°». Anche le notizie del giro, per il telefono.
-   - **Sull'imbroglio, onestamente**: il gioco gira nel browser, chi vuole barare bara. Il server
-     tiene fuori l'assurdo — al massimo ×5 di stream fra un invio e l'altro, un invio ogni dieci
-     secondi, 120 richieste al minuto per indirizzo, la chiave salvata solo come hash.
-   - **Se il server non c'è, il gioco non se ne accorge**: `ONLINE` torna `null` e si continua
-     sulla classifica locale. Il multiplayer è una cosa in più, non una da cui dipendere.
+32. ma no è sbagliato quel vincolo, noi il gioco lo vogliamo mettere su steam e sui vari store del telefono quindi non deve girare dentro ad un artifact, in
+    base a questo cambia tutti i readme e creami un file, nella cartella database (la cartella entra nel readme e non va pushata) con uno schema del database
+    con tutte le colonne, le relazioni ecc.
 
-   **RESTA DA FARE — la schermata**: oggi `js/game/ui.js` disegna ancora i rivali locali. Il
-   prossimo pezzo è agganciare la classifica vera alla schermata, con l'iscrizione automatica
-   alla prima settimana chiusa, senza moduli da compilare. L'ordine sta in `ROADMAP.md`.
-   README e ROADMAP aggiornati: rotte, manopole e cosa manca.
+Migliora la grafica e dell ' interfaccia rendila uguale identica alla foto chiamata "schermata_di_gioco", se esiste un metodo migliore della foto in background provalo.
+Come avatar metti un segnaposto di un personaggio preso dalla foto chiamata "avatar_profilo_carnagione_chiara"
 
 Dobbiamo pensare a un modo per mettere La Fame Studio il più possibile nel ggioco. Quindi ti chiedo come potremmo aggiungerla, ad esempio gli studi dove si va il migliore potremmo mettere che si chiama la fame studio. Insomma tutta roba che faccia branding. Ovviamente non deve sembrare invadente, anzi, solo piacevole quando leggono 'La Fame Studio'.
-
-Migliora la grafica e rendila uguale identica alla foto (dell ' interfaccia si intende )
 
 il telefono deve sembrare un vero e proprio telefono : Quindi come un iphone esattamente nel menù principale con solo le app cliccabili : Aggiungi inoltre LAFAMEGRAM, app dove si svilupperà molto la 'vita del gioco'.
 
@@ -530,36 +506,41 @@ Voglio che il gioco abbia vita simulata molto sviluppata. Non banalità, dobbiam
 
 cambia l'energia a 100 e anche tutto ciò ce ne deriva da questo cambiamento, tu prova a farlo al meglio poi ti dico io testando come mi pare.
 
-31. Crea il file backend.md da non pushare con tutte le info sulla parte di backend, inoltre suddividi tutti i file in backend e frontend, e all'interno crea un file readme solo per il backend e uno solo per il frontend e uno solo per il database.
-    Se secondo te conviene farlo in una maniera diversa dal semplice HTML + CSS + JS vanilla cambia, il progetto deve essere il più professionale e ottimizzato possibile.
+32. Quel vincolo è sbagliato: il gioco lo vogliamo mettere su Steam e sui vari store del telefono, quindi non deve girare dentro a un artifact. In base a questo cambia tutti i readme, e crea nella cartella database un file con lo schema del database — tutte le colonne, le relazioni ecc. — che non va pushato.
 
-   **FATTO (31/08/2026) — il progetto è diviso in due metà.**
-   - `frontend/` — il gioco: `index.html`, `css/`, `js/`, `media/`, `strumenti/`, `dist/`.
-   - `backend/` — il server: `server.js`, `bot.js`, `nomi.js`, `prova.js`, `package.json`,
-     e dentro `database/` lo strato dati (`archivio.js`) con l'archivio vero.
-   - Quattro README, uno per cosa: `README.md` in radice è la mappa del progetto,
-     `frontend/README.md` il gioco, `backend/README.md` il server,
-     `backend/database/README.md` i dati (modello, scritture atomiche, copie di sicurezza,
-     e le soglie precise per passare a SQLite quando servirà).
-   - `backend.md` in radice: il dossier interno, **fuori da git** (sta in `.gitignore`).
-     Decisioni e perché, i limiti veri dell'anti-imbroglio, cosa fare quando si rompe,
-     come si va online, dove stanno le chiavi, quanto costa, i rischi da tenere d'occhio.
-   - `backend/prova.js` (`npm run prova`): 25 controlli sull'API, senza dipendenze —
-     iscrizione, punteggi, chiave sbagliata, freni, giri di settimana, frecce, archivio.
-     Passano tutti e 25.
+   **FATTO (31/08/2026).**
+   - **`backend/database/schema.md`** (fuori da git, come `backend.md`): lo schema completo
+     per il gioco che esce sugli store. Quattordici tabelle — `account`, `identita`,
+     `dispositivo`, `artista`, `bot_stato`, `carriera`, `stagione`, `settimana`,
+     `punteggio_settimana`, `classifica_posizione`, `notizia`, `relazione`, `traguardo` +
+     `artista_traguardo`, `sospetto` + `sanzione`, `acquisto` — con tipi, vincoli `CHECK`,
+     chiavi esterne, indici, il disegno delle relazioni, le tre query che contano
+     (top N, «sei 428°», le frecce ▲▼), la procedura di cancellazione dell'account che
+     Apple e Google pretendono, le differenze su SQLite e lo script di travaso dal JSON.
+   - **README rifatti** con il vincolo giusto: radice, `frontend/`, `backend/`,
+     `backend/database/`, più il dossier `backend.md`.
 
-   **RISPOSTA alla domanda «conviene cambiare da HTML + CSS + JS vanilla?» — no, e non è
-   pigrizia.** Il gioco deve poter essere **un file solo** che gira dentro a un artifact,
-   senza rete e senza niente da installare: oggi ci arriviamo con uno script Python di 60
-   righe. Con React o Vue servirebbe un bundler, un `node_modules`, un passaggio di build a
-   ogni modifica, e soprattutto la riscrittura di tutto il gioco — settimane di lavoro e di
-   regressioni per un giocatore che non vedrebbe niente di diverso. Le cose che un framework
-   porta davvero (componenti, stato reattivo, routing) qui sono già risolte in piccolo:
-   schermate che si accendono e si spengono, uno stato solo (`G`) nel localStorage, una
-   funzione di disegno per schermata.
-   **Professionale non vuol dire «con un framework»**: vuol dire cartelle chiare, un file
-   per argomento, documentazione che dice la verità e una prova che gira da sola. Quello
-   l'ho fatto. Il backend, che nasce adesso ed è l'unico posto dove la scelta era aperta,
-   l'ho tenuto senza dipendenze per lo stesso motivo: l'unica cosa che fa è leggere e
-   scrivere JSON su HTTP, ed Express aggiungerebbe sessanta pacchetti per risparmiare
-   trenta righe di routing.
+   **La cosa che cambia davvero, ed è più grossa di un file di schema.** Il vincolo del
+   file unico non c'è più, ma al suo posto ne arrivano cinque, e sono tutti obbligatori:
+   1. **un build vero** (Vite + moduli ES): trenta `<script>` in ordine fisso e il `?v=`
+      alzato a mano sono accettabili per un sito nostro, non per un prodotto in vendita;
+   2. **i salvataggi non possono più stare nel `localStorage`**: file vero sul dispositivo,
+      Steam Cloud, e il salvataggio in cloud nostro che porta la carriera dal PC al telefono;
+   3. **account veri** (Steam, Sign in with Apple, Google Play Games) al posto della chiave
+      nel browser — e la **cancellazione dell'account dentro al gioco**, che Apple e Google
+      pretendono;
+   4. **l'interfaccia per il telefono**: la plancia è disegnata a 1536×1024 e scalata, in
+      verticale non ci sta. È il lavoro più lungo di tutta la lista;
+   5. **un database vero**: SQLite appena c'è l'account, PostgreSQL dal primo giorno di
+      vendita. Con account e salvataggi in cloud, perdere il database vuol dire perdere le
+      carriere della gente.
+
+   **Il linguaggio invece non lo cambio, e stavolta il motivo è un altro.** Non è più «il
+   file unico»: è che Anni di Fame è un gestionale fatto di schermate, liste, carte e testo
+   — niente fisica, niente 3D, niente sessanta fotogrammi al secondo — e per quello HTML e
+   CSS sono lo strumento giusto, non un ripiego. Con Godot o Unity toccherebbe rifare a
+   mano bottoni, liste che scorrono, campi di testo e tipografia, cioè le uniche cose che
+   qui contano. Su Steam mezzo genere gestionale è fatto così, dentro a un guscio: Electron
+   per il desktop, Capacitor per iOS e Android. E il gioco esiste già: riscriverlo altrove
+   sono mesi di regressioni per un giocatore che non vedrebbe niente di diverso.
+   L'ordine con cui farei i cinque lavori sta in `frontend/README.md`.
