@@ -508,159 +508,147 @@ cambia l'energia a 100 e anche tutto ciò ce ne deriva da questo cambiamento, tu
 
 32. Quel vincolo è sbagliato: il gioco lo vogliamo mettere su Steam e sui vari store del telefono, quindi non deve girare dentro a un artifact. In base a questo cambia tutti i readme, e crea nella cartella database un file con lo schema del database — tutte le colonne, le relazioni ecc. — che non va pushato.
 
-    **FATTO (31/08/2026).**
+   **FATTO (31/08/2026).**
+   - **`backend/database/schema.md`** (fuori da git, come `backend.md`): lo schema completo
+     per il gioco che esce sugli store. Quattordici tabelle — `account`, `identita`,
+     `dispositivo`, `artista`, `bot_stato`, `carriera`, `stagione`, `settimana`,
+     `punteggio_settimana`, `classifica_posizione`, `notizia`, `relazione`, `traguardo` +
+     `artista_traguardo`, `sospetto` + `sanzione`, `acquisto` — con tipi, vincoli `CHECK`,
+     chiavi esterne, indici, il disegno delle relazioni, le tre query che contano
+     (top N, «sei 428°», le frecce ▲▼), la procedura di cancellazione dell'account che
+     Apple e Google pretendono, le differenze su SQLite e lo script di travaso dal JSON.
+   - **README rifatti** con il vincolo giusto: radice, `frontend/`, `backend/`,
+     `backend/database/`, più il dossier `backend.md`.
 
-- **`backend/database/schema.md`** (fuori da git, come `backend.md`): lo schema completo
-  per il gioco che esce sugli store. Quattordici tabelle — `account`, `identita`,
-  `dispositivo`, `artista`, `bot_stato`, `carriera`, `stagione`, `settimana`,
-  `punteggio_settimana`, `classifica_posizione`, `notizia`, `relazione`, `traguardo` +
-  `artista_traguardo`, `sospetto` + `sanzione`, `acquisto` — con tipi, vincoli `CHECK`,
-  chiavi esterne, indici, il disegno delle relazioni, le tre query che contano
-  (top N, «sei 428°», le frecce ▲▼), la procedura di cancellazione dell'account che
-  Apple e Google pretendono, le differenze su SQLite e lo script di travaso dal JSON.
-- **README rifatti** con il vincolo giusto: radice, `frontend/`, `backend/`,
-  `backend/database/`, più il dossier `backend.md`.
+   **La cosa che cambia davvero, ed è più grossa di un file di schema.** Il vincolo del
+   file unico non c'è più, ma al suo posto ne arrivano cinque, e sono tutti obbligatori:
+   1. **un build vero** (Vite + moduli ES): trenta `<script>` in ordine fisso e il `?v=`
+      alzato a mano sono accettabili per un sito nostro, non per un prodotto in vendita;
+   2. **i salvataggi non possono più stare nel `localStorage`**: file vero sul dispositivo,
+      Steam Cloud, e il salvataggio in cloud nostro che porta la carriera dal PC al telefono;
+   3. **account veri** (Steam, Sign in with Apple, Google Play Games) al posto della chiave
+      nel browser — e la **cancellazione dell'account dentro al gioco**, che Apple e Google
+      pretendono;
+   4. **l'interfaccia per il telefono**: la plancia è disegnata a 1536×1024 e scalata, in
+      verticale non ci sta. È il lavoro più lungo di tutta la lista;
+   5. **un database vero**: SQLite appena c'è l'account, PostgreSQL dal primo giorno di
+      vendita. Con account e salvataggi in cloud, perdere il database vuol dire perdere le
+      carriere della gente.
 
-**La cosa che cambia davvero, ed è più grossa di un file di schema.** Il vincolo del
-file unico non c'è più, ma al suo posto ne arrivano cinque, e sono tutti obbligatori:
-
-1.  **un build vero** (Vite + moduli ES): trenta `<script>` in ordine fisso e il `?v=`
-    alzato a mano sono accettabili per un sito nostro, non per un prodotto in vendita;
-2.  **i salvataggi non possono più stare nel `localStorage`**: file vero sul dispositivo,
-    Steam Cloud, e il salvataggio in cloud nostro che porta la carriera dal PC al telefono;
-3.  **account veri** (Steam, Sign in with Apple, Google Play Games) al posto della chiave
-    nel browser — e la **cancellazione dell'account dentro al gioco**, che Apple e Google
-    pretendono;
-4.  **l'interfaccia per il telefono**: la plancia è disegnata a 1536×1024 e scalata, in
-    verticale non ci sta. È il lavoro più lungo di tutta la lista;
-5.  **un database vero**: SQLite appena c'è l'account, PostgreSQL dal primo giorno di
-    vendita. Con account e salvataggi in cloud, perdere il database vuol dire perdere le
-    carriere della gente.
-
-**Il linguaggio invece non lo cambio, e stavolta il motivo è un altro.** Non è più «il
-file unico»: è che Anni di Fame è un gestionale fatto di schermate, liste, carte e testo
-— niente fisica, niente 3D, niente sessanta fotogrammi al secondo — e per quello HTML e
-CSS sono lo strumento giusto, non un ripiego. Con Godot o Unity toccherebbe rifare a
-mano bottoni, liste che scorrono, campi di testo e tipografia, cioè le uniche cose che
-qui contano. Su Steam mezzo genere gestionale è fatto così, dentro a un guscio: Electron
-per il desktop, Capacitor per iOS e Android. E il gioco esiste già: riscriverlo altrove
-sono mesi di regressioni per un giocatore che non vedrebbe niente di diverso.
-L'ordine con cui farei i cinque lavori sta in `frontend/README.md`.
+   **Il linguaggio invece non lo cambio, e stavolta il motivo è un altro.** Non è più «il
+   file unico»: è che Anni di Fame è un gestionale fatto di schermate, liste, carte e testo
+   — niente fisica, niente 3D, niente sessanta fotogrammi al secondo — e per quello HTML e
+   CSS sono lo strumento giusto, non un ripiego. Con Godot o Unity toccherebbe rifare a
+   mano bottoni, liste che scorrono, campi di testo e tipografia, cioè le uniche cose che
+   qui contano. Su Steam mezzo genere gestionale è fatto così, dentro a un guscio: Electron
+   per il desktop, Capacitor per iOS e Android. E il gioco esiste già: riscriverlo altrove
+   sono mesi di regressioni per un giocatore che non vedrebbe niente di diverso.
+   L'ordine con cui farei i cinque lavori sta in `frontend/README.md`.
 
 --- I CINQUE LAVORI PER USCIRE SU STEAM E SUGLI STORE (dal punto 32) ---
 
 33. Il build vero: il gioco va impacchettato, non servito come trenta script in fila.
 
-    **FATTO (31/08/2026)** — `frontend/strumenti/build.js`, `dev.js`, `prova.js`,
-    `package.json`. Unica dipendenza: esbuild, e solo per il build — nel gioco non entra.
+   **FATTO (31/08/2026)** — `frontend/strumenti/build.js`, `dev.js`, `prova.js`,
+   `package.json`. Unica dipendenza: esbuild, e solo per il build — nel gioco non entra.
+   - `npm run build` → `dist/`: 13 fogli di stile e 36 file di codice diventano **due file
+     soli**, minificati (**291 KB** di codice, **77 KB** di stile), col nome che porta
+     dentro l'impronta del contenuto (`gioco-20eefd0e.js`). La cache si sistema da sé e il
+     **`?v=` a mano sparisce dal prodotto**. Tutti i percorsi sono relativi: è così che la
+     cartella viene aperta da Electron e da Capacitor.
+   - `npm run dev` → il gioco dai sorgenti con la **ricarica automatica**: salvi un file e
+     la pagina si rifà da sola. Zero dipendenze, 90 righe.
+   - `npm run demo` → `dist/anni-di-fame.html`, il gioco in un file solo (631 KB, immagini
+     comprese) da mandare a qualcuno per un playtest. Sostituisce `build-artifact.py`, che
+     ho tolto.
+   - `npm run prova` → 12 controlli senza browser: un file aggiunto e mai messo in
+     `index.html`, un tag che punta a un file che non c'è più, un'immagine sparita da sotto
+     a un CSS, un file che non compila, il build senza impronta. Passano tutti.
+   - **Provato davvero**: il build minificato aperto nel browser apre il menu e la plancia
+     intera — mappa, profilo, telefono, eventi della giornata — senza un errore in console.
 
-- `npm run build` → `dist/`: 13 fogli di stile e 36 file di codice diventano **due file
-  soli**, minificati (**291 KB** di codice, **77 KB** di stile), col nome che porta
-  dentro l'impronta del contenuto (`gioco-20eefd0e.js`). La cache si sistema da sé e il
-  **`?v=` a mano sparisce dal prodotto**. Tutti i percorsi sono relativi: è così che la
-  cartella viene aperta da Electron e da Capacitor.
-- `npm run dev` → il gioco dai sorgenti con la **ricarica automatica**: salvi un file e
-  la pagina si rifà da sola. Zero dipendenze, 90 righe.
-- `npm run demo` → `dist/anni-di-fame.html`, il gioco in un file solo (631 KB, immagini
-  comprese) da mandare a qualcuno per un playtest. Sostituisce `build-artifact.py`, che
-  ho tolto.
-- `npm run prova` → 12 controlli senza browser: un file aggiunto e mai messo in
-  `index.html`, un tag che punta a un file che non c'è più, un'immagine sparita da sotto
-  a un CSS, un file che non compila, il build senza impronta. Passano tutti.
-- **Provato davvero**: il build minificato aperto nel browser apre il menu e la plancia
-  intera — mappa, profilo, telefono, eventi della giornata — senza un errore in console.
-
-**Perché non Vite e perché niente moduli ES.** Vite serve a chi ha già i moduli; noi no,
-e convertirli tutti in una notte era una macchina da regressioni. Questi 36 file
-condividono lo stesso scope (`G`, `PHASES`, `pick`, `$`) e alcuni fanno cose al momento
-del caricamento, in un ordine che conta: coi moduli l'ordine lo deciderebbe il grafo
-degli import e il gioco si romperebbe **in silenzio**, magari in una schermata su venti.
-Con la concatenazione l'ordine resta identico a quello che gira adesso — il build non
-può cambiare il comportamento, può solo impacchettare. I moduli si faranno una cartella
-alla volta, col gioco giocabile a ogni passo, e non servono per uscire.
+   **Perché non Vite e perché niente moduli ES.** Vite serve a chi ha già i moduli; noi no,
+   e convertirli tutti in una notte era una macchina da regressioni. Questi 36 file
+   condividono lo stesso scope (`G`, `PHASES`, `pick`, `$`) e alcuni fanno cose al momento
+   del caricamento, in un ordine che conta: coi moduli l'ordine lo deciderebbe il grafo
+   degli import e il gioco si romperebbe **in silenzio**, magari in una schermata su venti.
+   Con la concatenazione l'ordine resta identico a quello che gira adesso — il build non
+   può cambiare il comportamento, può solo impacchettare. I moduli si faranno una cartella
+   alla volta, col gioco giocabile a ogni passo, e non servono per uscire.
 
 34. I salvataggi non possono più stare nel localStorage: file vero sul dispositivo, Steam Cloud, e il cloud nostro legato all'account, così la carriera passa dal PC al telefono.
 
-    **META' FATTA (01/09/2026) — il lato server c'è.** `PUT/GET /api/carriera/:slot` e
-    `GET /api/carriere`: tre slot come quelli in locale, lo stato del gioco (l'oggetto `G`)
-    salvato per intero, tetto di 2 MB. **In conflitto vince la partita più avanti** e
-    all'altro dispositivo si dice cos'è successo: due salvataggi non si fondono mai da soli,
-    si perde roba e il giocatore non capisce perché. Nel ponte del gioco ci sono già
-    `ONLINE.salvaCarriera()`, `ONLINE.carriera()` e `ONLINE.carriere()`.
-    **Resta da fare**: agganciare `save()` del gioco (adesso scrive solo nel `localStorage`),
-    il file vero nella cartella dell'app — che arriva col guscio Electron/Capacitor — e
-    Steam Cloud.
+   **META' FATTA (01/09/2026) — il lato server c'è.** `PUT/GET /api/carriera/:slot` e
+   `GET /api/carriere`: tre slot come quelli in locale, lo stato del gioco (l'oggetto `G`)
+   salvato per intero, tetto di 2 MB. **In conflitto vince la partita più avanti** e
+   all'altro dispositivo si dice cos'è successo: due salvataggi non si fondono mai da soli,
+   si perde roba e il giocatore non capisce perché. Nel ponte del gioco ci sono già
+   `ONLINE.salvaCarriera()`, `ONLINE.carriera()` e `ONLINE.carriere()`.
+   **Resta da fare**: agganciare `save()` del gioco (adesso scrive solo nel `localStorage`),
+   il file vero nella cartella dell'app — che arriva col guscio Electron/Capacitor — e
+   Steam Cloud.
 
 35. Gli account veri (Steam, Sign in with Apple, Google Play Games, mail) al posto della chiave nel browser — e la cancellazione dell'account dentro al gioco, che Apple e Google pretendono.
 
-    **FATTO (01/09/2026), tranne i tre negozi.**
-
-- **Account e sessioni**: `POST /api/account` (da ospite o con mail e password),
-  `POST /api/sessione`, `DELETE /api/sessione`, `GET /api/io`. Le password stanno come
-  **scrypt** con sale, i gettoni di sessione solo come **hash**: chi si prende il
-  database non si prende né le une né gli altri.
-- **Non si compila niente per giocare**: chi si iscrive alla classifica riceve un account
-  da ospite aperto dal server, senza mail, senza password, senza schermate.
-- **Nessuno perde quello che aveva**: la vecchia chiave (`x-chiave`) funziona ancora, e
-  si scambia con una sessione vera (`POST /api/sessione`, tipo `legacy`).
-- **La cancellazione dell'account c'è** e fa la cosa giusta: l'artista resta in
-  classifica senza nome e senza padrone (la storia degli altri non si sfonda), spariscono
-  salvataggi, identità, dispositivi e la mail. Serve `{"conferma":"cancella"}`.
-- **Steam, Apple e Google: la verifica c'è** (`backend/accessi.js`, fatta il 01/09/2026
-  poco dopo). Apple e Google mandano un token firmato RS256 e lo controlliamo contro le
-  loro chiavi pubbliche — firma, emittente, destinatario, scadenza; Steam manda un
-  biglietto e lo fa verificare a Steamworks. Tutto con Node e basta.
-  **Mancano solo le chiavi**, che si prendono quando l'app è registrata sugli store: se
-  una chiave non c'è quel canale risponde `501` e dice quale manca, se il biglietto è
-  sbagliato risponde `403`. Non c'è nessun caso in cui si entra senza verifica.
-  Provato davvero: la prova si fa una coppia di chiavi sua, mette in piedi un finto
-  «appleid.apple.com» e controlla che un biglietto buono entri e uno firmato da un altro,
-  scaduto o fatto per un altro gioco no.
-- **Chi bara: sospetti e sanzioni.** Ogni punteggio limato lascia un sospetto; da
-  `GET /api/sospetti` si guarda a mano e si decide. Tre sanzioni, e la regola è
-  **fuori dalla classifica prima della sospensione**: chi è fuori classifica sparisce
-  dalla graduatoria ma **continua a giocare la sua partita** — nel dubbio è la punizione
-  giusta, se ci siamo sbagliati non abbiamo tolto il gioco a un cliente che l'ha pagato.
-- **La copia di sicurezza**: `npm run copia`, anche a server acceso (`VACUUM INTO`), che
-  tiene le ultime trenta e controlla che la copia si apra. Con dentro account e
-  salvataggi, questa è la cosa più importante di tutto il backend.
-- **Provato in Chrome** (01/09/2026), col gioco vero e il server acceso: iscrizione,
-  punteggio, «sei 88° su 141» con i bot sopra e sotto, salvataggio in cloud e riletto,
-  conflitto rifiutato, traguardo, e la storia che conta — account legato a una mail,
-  browser svuotato come se fosse un telefono nuovo, rientro con la mail e **carriera
-  ritrovata**. Poi la cancellazione dell'account, e col server spento il gioco che tira
-  dritto senza un errore in console.
+   **FATTO (01/09/2026), tranne i tre negozi.**
+   - **Account e sessioni**: `POST /api/account` (da ospite o con mail e password),
+     `POST /api/sessione`, `DELETE /api/sessione`, `GET /api/io`. Le password stanno come
+     **scrypt** con sale, i gettoni di sessione solo come **hash**: chi si prende il
+     database non si prende né le une né gli altri.
+   - **Non si compila niente per giocare**: chi si iscrive alla classifica riceve un account
+     da ospite aperto dal server, senza mail, senza password, senza schermate.
+   - **Nessuno perde quello che aveva**: la vecchia chiave (`x-chiave`) funziona ancora, e
+     si scambia con una sessione vera (`POST /api/sessione`, tipo `legacy`).
+   - **La cancellazione dell'account c'è** e fa la cosa giusta: l'artista resta in
+     classifica senza nome e senza padrone (la storia degli altri non si sfonda), spariscono
+     salvataggi, identità, dispositivi e la mail. Serve `{"conferma":"cancella"}`.
+   - **Steam, Apple e Google: la verifica c'è** (`backend/accessi.js`, fatta il 01/09/2026
+     poco dopo). Apple e Google mandano un token firmato RS256 e lo controlliamo contro le
+     loro chiavi pubbliche — firma, emittente, destinatario, scadenza; Steam manda un
+     biglietto e lo fa verificare a Steamworks. Tutto con Node e basta.
+     **Mancano solo le chiavi**, che si prendono quando l'app è registrata sugli store: se
+     una chiave non c'è quel canale risponde `501` e dice quale manca, se il biglietto è
+     sbagliato risponde `403`. Non c'è nessun caso in cui si entra senza verifica.
+     Provato davvero: la prova si fa una coppia di chiavi sua, mette in piedi un finto
+     «appleid.apple.com» e controlla che un biglietto buono entri e uno firmato da un altro,
+     scaduto o fatto per un altro gioco no.
+   - **Chi bara: sospetti e sanzioni.** Ogni punteggio limato lascia un sospetto; da
+     `GET /api/sospetti` si guarda a mano e si decide. Tre sanzioni, e la regola è
+     **fuori dalla classifica prima della sospensione**: chi è fuori classifica sparisce
+     dalla graduatoria ma **continua a giocare la sua partita** — nel dubbio è la punizione
+     giusta, se ci siamo sbagliati non abbiamo tolto il gioco a un cliente che l'ha pagato.
+   - **La copia di sicurezza**: `npm run copia`, anche a server acceso (`VACUUM INTO`), che
+     tiene le ultime trenta e controlla che la copia si apra. Con dentro account e
+     salvataggi, questa è la cosa più importante di tutto il backend.
+   - **Provato in Chrome** (01/09/2026), col gioco vero e il server acceso: iscrizione,
+     punteggio, «sei 88° su 141» con i bot sopra e sotto, salvataggio in cloud e riletto,
+     conflitto rifiutato, traguardo, e la storia che conta — account legato a una mail,
+     browser svuotato come se fosse un telefono nuovo, rientro con la mail e **carriera
+     ritrovata**. Poi la cancellazione dell'account, e col server spento il gioco che tira
+     dritto senza un errore in console.
 
 36. L'interfaccia sul telefono: la plancia e' disegnata a 1536x1024 e scalata, in verticale non ci sta. Disposizione sua, aree da toccare da 44 punti, niente hover, testi leggibili senza zoom. E' il lavoro piu' lungo dei cinque.
 
 37. Il database vero: SQLite appena c'e' l'account, PostgreSQL dal primo giorno di vendita. Lo schema completo e' gia' scritto in backend/database/schema.md, il travaso dal JSON e' uno script di mezz'ora — e va fatto adesso che siamo a 140 bot e tre giocatori, non di corsa con diecimila account dentro.
 
-    **FATTO (01/09/2026) — il file JSON non c'è più, sotto c'è SQLite.**
-    `node:sqlite`, dentro Node: nessuna dipendenza da installare, nessun servizio da mandare
-    avanti, un file solo — e transazioni, WAL, chiavi esterne vere.
+   **FATTO (01/09/2026) — il file JSON non c'è più, sotto c'è SQLite.**
+   `node:sqlite`, dentro Node: nessuna dipendenza da installare, nessun servizio da mandare
+   avanti, un file solo — e transazioni, WAL, chiavi esterne vere.
+   - **18 tabelle** come da schema: account, identita, dispositivo, artista, bot_stato,
+     carriera, stagione, settimana, punteggio_settimana, classifica_posizione, notizia,
+     relazione, traguardo, artista_traguardo, sospetto, sanzione, acquisto, stato.
+   - **Migrazioni**: file `.sql` numerati in `database/migrazioni/`, applicati in ordine e
+     una volta sola, ognuno in una transazione. Niente ORM.
+   - **Lo storico c'è**: una riga di `punteggio_settimana` per artista per settimana, e una
+     fotografia della classifica a ogni giro — da lì escono le frecce ▲▼, che adesso sono
+     un dato salvato e non un numero tenuto a mente.
+   - **Il travaso è scritto e provato** (`npm run travaso`): l'ho fatto girare su un
+     archivio finto e il vecchio giocatore si è ritrovato l'artista, la posizione, la
+     freccia e la chiave che funzionava ancora.
+   - **La prova del server è passata da 25 a 55 controlli**, e comprende un'occhiata dentro
+     al database: le chiavi solo come hash, le password solo come scrypt, lo storico che si
+     riempie, l'artista di chi ha cancellato l'account senza nome e senza padrone.
 
-<<<<<<< HEAD
-- **18 tabelle** come da schema: account, identita, dispositivo, artista, bot_stato,
-  carriera, stagione, settimana, punteggio_settimana, classifica_posizione, notizia,
-  relazione, traguardo, artista_traguardo, sospetto, sanzione, acquisto, stato.
-- **Migrazioni**: file `.sql` numerati in `database/migrazioni/`, applicati in ordine e
-  una volta sola, ognuno in una transazione. Niente ORM.
-- **Lo storico c'è**: una riga di `punteggio_settimana` per artista per settimana, e una
-  fotografia della classifica a ogni giro — da lì escono le frecce ▲▼, che adesso sono
-  un dato salvato e non un numero tenuto a mente.
-- **Il travaso è scritto e provato** (`npm run travaso`): l'ho fatto girare su un
-  archivio finto e il vecchio giocatore si è ritrovato l'artista, la posizione, la
-  freccia e la chiave che funzionava ancora.
-- **La prova del server è passata da 25 a 55 controlli**, e comprende un'occhiata dentro
-  al database: le chiavi solo come hash, le password solo come scrypt, lo storico che si
-  riempie, l'artista di chi ha cancellato l'account senza nome e senza padrone.
-
-**Resta PostgreSQL**, ma non adesso: serve quando i server diventano più di uno, non
-quando le righe diventano tante. Lo schema è già scritto per tutti e due e il cambio
-tocca un file solo (`database/archivio.js`), che è il motivo per cui esiste.
-
-47. Quando clicco su vestiti nella sidebar di sinistra, mi deve aprire una schermata di un negozio inoltre il negozio deve essere sbloccato già dalla città iniziale
-=======
    **Resta PostgreSQL**, ma non adesso: serve quando i server diventano più di uno, non
    quando le righe diventano tante. Lo schema è già scritto per tutti e due e il cambio
    tocca un file solo (`database/archivio.js`), che è il motivo per cui esiste.
@@ -671,14 +659,121 @@ Preparami un prompt da mettere su chat gpt ; per ogni pagina che abbiamo (es.att
 
 Anche per la pagina di landing, e per la creazione dell'avatar, Non mettere un prompt unico ma pagine separate.
 
-    **FATTO (01/09/2026).** `prompt-ambientazioni.md` (fuori dal codice, root del
-    repo): 16 prompt separati e autosufficienti, uno per pagina — landing, creazione
-    avatar, La Sala, cabina di registrazione, sala mix, stanza dove si scrive, casa,
-    palestra, staccare la spina, attività criminali, incontro col producer, pubblica,
-    promo, freestyle in piazza, live, turno di lavoro. Stessa famiglia visiva in
-    tutti (concept art semi-realistica, notte/tramonto, luce calda + neon, 3:2, niente
-    testo/logo/interfaccia nell'immagine), ognuno pensato per una chat ChatGPT a sé.
+39. L'energia portiamola a 100
 
+40. Facciamolo diventare alla giornata lo skip, non più alla settimana
 
+41. Ma se una persona vuole skippa 1 giorno, 2 giorni, 1 settimana, 1 mese... quanti giorni vuole skippare lui li salta, ovviamente il gameplay che avrà sarà condizionato da tutto questo
 
->>>>>>> origin/main
+42. CONTESTO — leggi tutto, non serve che esplori.
+
+Progetto: "Anni di Fame", simulatore di carriera rap nel browser, di La Fame Studio.
+Team: io (Alessio, decido e testo), tu (Claude, costruisci), Carletto (committa sul repo).
+Repo: github.com/Carlomadella/gioco-rap — branch di lavoro `beat-generi-e-salto-tempo`
+(main è vecchio, ignoralo). Sono collaboratore del repo.
+
+REGOLA FISSA: a ogni messaggio, PRIMA di rispondere, aggiornati dal repo su quel
+branch. Carletto committa in continuazione e il lavoro va sempre rifatto sull'ultimo
+stato. Clona in shallow (--depth 5), non scaricare la storia intera.
+
+Struttura (dal commit af4d02c): il progetto è diviso in `frontend/` (index.html,
+css/, js/, media/, strumenti/, dist/) e `backend/` (server.js, bot.js, database/).
+Tecnologia: HTML + CSS + JS vanilla, un file per argomento, niente framework —
+scelta voluta: il gioco deve poter diventare un file HTML solo tramite lo script
+build in strumenti/. Non proporre React/Vue.
+I punti di lavoro numerati stanno in `implementazioni.md` in radice: leggi solo la
+coda del file, non tutto.
+
+OBIETTIVO DI OGGI: l'interfaccia principale (la "plancia" da PC). Sta venendo bene
+ma non abbastanza. Useremo tutta la sessione su questo e sullo sviluppo del gioco.
+
+PRIMO LAVORO — IL TELEFONO NELLA SIDEBAR DI DESTRA (solo versione PC).
+
+Com'è adesso: `<aside class="ptel">` in frontend/index.html (riga ~187) è una
+cornice finta con dentro una colonna che scorre: messaggi del diario, poi una
+griglia di app che NON aprono niente dentro al telefono (rimandano alle schede del
+gioco), poi le notizie. Il contenuto lo scrive la funzione di render in
+frontend/js/game/hub.js (array HUB_APP riga ~109, riempimento di #hb-tel riga ~402).
+Stile in frontend/css/hub.css (classi .ptel* da riga 164).
+
+Come lo voglio: un iPhone vero.
+1. Schermata home: solo sfondo + griglia di icone app + dock in basso. Niente
+   contenuto sciolto, niente liste appese sotto.
+2. Barra di stato in alto realistica: ora del gioco, segnale, batteria, notch.
+3. Ogni app si apre DENTRO al telefono, a schermo pieno nella cornice, con la sua
+   interfaccia e il modo di tornare alla home (barra gesture in basso).
+4. Animazione di apertura e chiusura: l'app si ingrandisce dall'icona.
+5. Badge con il numero di novità sulle icone (messaggi non letti, obiettivi aperti…).
+6. App da avere: Messaggi (il diario), Contatti, Notizie, Obiettivi, Inventario,
+   Statistiche, Classifiche, Agenda, Impostazioni — più LAFAMEGRAM, il finto
+   Instagram del gioco, che nel repo ancora NON c'è: oggi mettila come app con la
+   sua schermata base, il resto lo sviluppiamo dopo.
+7. Solo da PC (sopra 1180px). Sotto quella soglia la schermata resta identica a
+   com'è: da telefono mi va già bene così.
+
+Tecnica: crea file nuovi js/game/telefono.js e css/telefono.css invece di gonfiare
+hub.js, e lascia in hub.js solo la chiamata. Regola generale del progetto: ogni cosa
+dev'essere interattiva, e le schermate devono sembrare un videogioco vero
+(riferimenti di qualità: Fortnite, Brawl Stars, Score Hero), non un pannello web.
+
+COME LAVORIAMO — importante:
+- Token: usali in modo indispensabile e valorizzali al massimo. Niente screenshot
+  nei test, niente file riletti per intero se basta un pezzo, modifiche mirate e non
+  riscritture, riassunti corti. Avvisami quando i token stanno per finire.
+- Prima di costruire, fammi 2-3 domande corte solo se servono davvero. Non
+  spiegazioni lunghe: è il mio primo gioco, spiegami le scelte in modo semplice.
+- Consegna: file HTML giocabile che apro e provo, più lo zip dei file cambiati per
+  Carletto. Poi lo commentiamo e correggiamo.
+
+NON TOCCARE: la scena beatmaker («cerca un beat»), che sta facendo un'altra persona
+in parallelo.
+
+   **FATTO in parte (01/09/2026)** — il telefono, solo da PC (`window.innerWidth
+   >= 1180`; sotto resta la vecchia colonna, invariata byte per byte).
+   File nuovi: `frontend/js/game/telefono.js`, `frontend/css/telefono.css`.
+   hub.js adesso chiama solo `renderTelefono()`; HUB_APP e la vecchia griglia
+   (`HUB_APP_VECCHIO`) si sono spostati lì. `.ptel*` si è spostato da hub.css a
+   telefono.css per intero.
+   - **Home**: barra di stato con ora, segnale, notch e **batteria nuova**
+     (mancava); tre **widget veri** (non finti) — LaFamegram con il post più
+     hype, Classifica con posizione e freccia ▲▼, Messaggi con l'ultimo
+     diario; griglia di 6 icone; **dock** con Messaggi, Contatti, LaFamegram,
+     Classifiche (scelta mia, sugli ultimi due: Classifiche invece di Agenda
+     perché lì c'è appena finito il multiplayer vero, punti 30/35/37).
+   - **10 app**, tutte a schermo intero dentro alla cornice, con dati veri
+     (non anteprime): Messaggi (diario intero), Contatti (la rete di
+     `G.gente`, grado e ruolo, tap va alla Sala), Notizie, Obiettivi (con
+     ricompensa o «fatto»), Inventario (bars/beat/pezzi/attrezzatura a
+     linguette), Statistiche (gli stessi numeri della testata e dei
+     dettagli), Classifiche (la stessa top 10 della scheda, con «sei Nº» e
+     la freccia), Agenda (gli eventi di stasera + le mosse disponibili),
+     Impostazioni (audio/difficoltà/lingua rapidi + bottone al pannello
+     vero), **LaFamegram** (non esisteva: oggi è un feed con post veri,
+     presi dal diario e dalle notizie, non finti a caso).
+   - **Apertura/chiusura**: l'app si apre ingrandendosi dal punto esatto
+     dell'icona toccata (calcolato al click, non un centro fisso), si chiude
+     con la barra in basso, con Esc, o cambiando finestra sotto i 1180px.
+   - **Cosa NON ho rifatto in miniatura**: le azioni pesanti (firmare un
+     contratto, un colpo, una sessione in studio) restano nella scheda vera
+     del gioco — dentro al telefono le vedi e le apri, ma la scena/il calcolo
+     stanno dove sono sempre stati. Rifarle da zero dentro ai 326px del
+     telefono è un lavoro a sé, che vale la pena solo dopo aver visto se
+     questa prima versione regge.
+   - **Verificato**: `npm run prova` (12/12) e `npm run build` puliti dopo il
+     cambio; non ho potuto aprirlo in un browser vero in questa sessione
+     (l'estensione Chrome non era connessa) — prima di darlo per buono va
+     provato a mano.
+   - **`prompt-app-telefono.md`** (root, come richiesto): 10 prompt per
+     ChatGPT, uno per ogni app del telefono, per farsi disegnare il
+     concept UI di ciascuna schermata — stessa logica di
+     `prompt-ambientazioni.md` ma per interfacce, non ambientazioni.
+
+43. I dialoghi di gioco devono essere molti e molto diversi tra loro, cosicche sembri ancora più realistico. 
+
+44. La suondboard del gioco è davvero ancora poco 
+
+45. Sposterei le card dalla mappa iniziale, non SOPRA gli edifici ma leggermente rimpicciolata e a lato, cosìche si vedan bene gli edifici, quando andremo a milano e los angeles poi la mappa dev'essere incredibile come ti abbiamo mandato già nei repo.
+
+46. Le abilità sono troppe e da rivedere, NON DOBBIAMO FARE NOI I MIX MA I FONICI, quindi a cosa serve la skill mixing? come quella beatmaking.
+
+47. Quando clicco su vestiti nella sidebar di sinistra, mi deve aprire una schermata di un negozio inoltre il negozio deve essere sbloccato già dalla città iniziale

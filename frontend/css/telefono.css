@@ -1,0 +1,181 @@
+/* Il telefono della plancia: il guscio (uguale sopra e sotto i 1180px) e lo
+   schermo vero — sopra i 1180px un iPhone con home, widget, app e dock;
+   sotto, la vecchia colonna che scorre (messaggi, griglia, notizie). */
+
+/* ================= IL GUSCIO ================= */
+.ptel{position:absolute;left:1202px;top:94px;width:326px;height:824px}
+.ptelframe{width:100%;height:100%;border-radius:38px;padding:11px;
+  background:linear-gradient(160deg,#2A2E38,#0D0F14);
+  box-shadow:0 20px 50px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.12)}
+.ptelbar{position:relative;height:26px;display:flex;align-items:center;gap:5px;
+  padding:0 14px;font-size:11px;color:#C9CEDA;font-variant-numeric:tabular-nums}
+#hb-telora{margin-right:auto}
+.ptelnotch{position:absolute;left:50%;top:-1px;transform:translateX(-50%);
+  width:104px;height:19px;border-radius:0 0 12px 12px;background:#07080C}
+.ptelsig{margin-left:auto;width:46px;height:10px;border-radius:2px;
+  background:linear-gradient(90deg,#C9CEDA 0 12px,transparent 12px 16px,#C9CEDA 16px 28px,
+  transparent 28px 32px,#C9CEDA 32px 46px);opacity:.75}
+.ptelbatt{position:relative;width:22px;height:11px;border:1.4px solid #C9CEDA;
+  border-radius:3px;opacity:.85}
+.ptelbatt::before{content:"";position:absolute;left:1.5px;top:1.5px;bottom:1.5px;
+  width:70%;background:#C9CEDA;border-radius:1px}
+.ptelbatt::after{content:"";position:absolute;right:-4px;top:3px;width:2px;height:5px;
+  background:#C9CEDA;border-radius:0 2px 2px 0}
+.ptelscr{position:relative;height:calc(100% - 26px);border-radius:28px;background:#080A0F;
+  padding:14px;overflow:hidden;display:flex;flex-direction:column}
+
+/* ================= VECCHIO (sotto i 1180px) ================= */
+.ptt{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#C9CEDA}
+.pmsg{margin-top:10px;border:1px solid rgba(255,255,255,.07);border-radius:10px;
+  background:#0C0F16;overflow:hidden}
+.pmsghead{display:flex;align-items:center;gap:8px;padding:9px 11px;
+  border-bottom:1px solid rgba(255,255,255,.06)}
+.pmsghead .hicon{width:17px;height:17px;fill:#A855F7}
+.pmsghead b{flex:1;font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:#C9CEDA}
+.pnuovi{padding:3px 9px;border-radius:999px;background:#7C3AED;color:#fff;
+  font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.pmr{display:flex;align-items:center;gap:9px;width:100%;padding:11px;text-align:left;
+  border-bottom:1px solid rgba(255,255,255,.05);transition:background .15s}
+.pmr:last-child{border-bottom:none}
+.pmr:hover{background:rgba(255,255,255,.04)}
+.pmav{width:32px;height:32px;flex:none;border-radius:50%;overflow:hidden;background:#1A1B24}
+.pmav svg{width:100%;height:100%;display:block}
+.pmtx{flex:1;min-width:0}
+.pmtx b{display:block;font-size:12px;font-weight:700;color:#E8EAF0}
+.pmtx i{display:block;font-style:normal;font-size:11px;color:#8A90A0;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.pmrt{display:flex;flex-direction:column;align-items:flex-end;gap:5px;font-size:10.5px;color:#727A8C}
+.pmrt u{width:7px;height:7px;border-radius:50%;background:#A855F7}
+
+.plargo{display:block;width:100%;margin-top:12px;padding:13px;border-radius:9px;
+  border:1px solid rgba(255,255,255,.09);background:#0C0F16;
+  font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#C9CEDA;
+  transition:background .15s}
+.plargo:hover{background:#141826}
+
+.papp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.pap{display:flex;align-items:center;gap:10px;padding:17px 11px;border-radius:10px;
+  background:#0C0F16;border:1px solid rgba(255,255,255,.07);text-align:left;
+  transition:background .15s,transform .12s}
+.pap:hover{background:#151A26;transform:translateY(-1px)}
+.pap .hicon{width:26px;height:26px;flex:none;fill:var(--k)}
+.pap b{display:block;font-size:12px;font-weight:700;color:#E8EAF0;letter-spacing:.02em}
+.pap i{display:block;font-style:normal;font-size:10.5px;color:#8A90A0;margin-top:2px}
+
+.pnews{flex:1;min-height:0;margin-top:13px;border:1px solid rgba(255,255,255,.07);
+  border-radius:10px;background:#0C0F16;padding:13px}
+.pnews h4{margin:0 0 8px;font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:#C9CEDA}
+.pnews p{display:flex;gap:8px;margin:0 0 11px;font-size:11.5px;color:#C9CEDA;line-height:1.35}
+.pnews p:last-child{margin-bottom:0}
+.pnews .hicon{width:14px;height:14px;flex:none;margin-top:1px;fill:var(--k,#FB923C)}
+
+/* ================= NUOVO — SCHERMATA HOME (dai 1180px in su) ================= */
+.thome{position:relative;height:100%;display:flex;flex-direction:column;gap:12px}
+
+.twidgets{display:flex;flex-direction:column;gap:8px}
+.twid{display:block;width:100%;text-align:left;border-radius:16px;padding:11px 12px;
+  background:linear-gradient(160deg,#171B26,#0D0F16);border:1px solid rgba(255,255,255,.08);
+  transition:transform .12s}
+.twid:hover{transform:translateY(-1px)}
+.twhead{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;color:#8A90A0}
+.twhead .hicon{width:13px;height:13px;fill:#8A90A0}
+.twbody{display:block;margin-top:5px}
+.twbody b{display:block;font-size:12.5px;font-weight:700;color:#E8EAF0}
+.twbody i{display:block;font-style:normal;font-size:11px;color:#9AA1B2;margin-top:2px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.twnum{display:block;margin-top:2px;font-size:22px;font-weight:900;color:#E8EAF0}
+.twfoot{display:flex;align-items:center;gap:4px;margin-top:6px;font-size:11px;font-weight:700;color:#8A90A0}
+.twfoot.up{color:#4ADE80}
+.twfoot.dn{color:#EF4444}
+.twrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.twrow .twid{padding:10px 11px}
+
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 4px;padding:2px 4px}
+.tapp{display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:none}
+.tappic{position:relative;width:52px;height:52px;border-radius:14px;display:flex;align-items:center;
+  justify-content:center;background:linear-gradient(160deg,var(--k),#000);
+  box-shadow:0 4px 10px rgba(0,0,0,.35);transition:transform .1s}
+.tapp:active .tappic{transform:scale(.9)}
+.tappic .hicon{width:24px;height:24px;fill:#fff}
+.tbadge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;
+  border-radius:999px;background:#EF4444;color:#fff;font-size:9.5px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #080A0F}
+.tapplbl{font-size:9.5px;color:#C9CEDA;text-align:center;line-height:1.15}
+
+.tdock{margin-top:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
+  padding:10px 8px;border-radius:22px;background:rgba(255,255,255,.06)}
+.tdock .tapplbl{display:none}
+.tdock .tappic{width:46px;height:46px}
+
+/* ================= NUOVO — UNA APP APERTA ================= */
+.tscreen{position:absolute;inset:0;border-radius:28px;background:#0B0D13;
+  display:flex;flex-direction:column;overflow:hidden;
+  animation:tin .26s cubic-bezier(.2,.9,.3,1)}
+.tscreen.tout{animation:tout .16s ease-in forwards}
+@keyframes tin{from{opacity:0;transform:scale(.12)}to{opacity:1;transform:scale(1)}}
+@keyframes tout{to{opacity:0;transform:scale(.12)}}
+
+.tscreenhead{display:flex;align-items:center;gap:9px;padding:12px 12px 10px;flex:none;
+  border-bottom:1px solid rgba(255,255,255,.07)}
+.tback{flex:none;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.08);
+  position:relative;border:none}
+.tback::before{content:"";position:absolute;inset:0;margin:auto;width:7px;height:7px;
+  border-left:2px solid #C9CEDA;border-bottom:2px solid #C9CEDA;transform:rotate(45deg) translate(1px,-1px)}
+.tscreenhead b{flex:1;text-align:center;margin-right:28px;font-size:12.5px;font-weight:800;
+  letter-spacing:.06em;text-transform:uppercase;color:#E8EAF0}
+
+.tscreenbody{flex:1;min-height:0;overflow-y:auto;padding:11px 12px 4px}
+.tgest{flex:none;align-self:center;width:120px;height:5px;border-radius:99px;
+  background:rgba(255,255,255,.35);margin:8px 0 10px;border:none;cursor:pointer}
+
+.tlist{display:flex;flex-direction:column;gap:7px}
+.tlist-stat{gap:0}
+.tli{display:flex;align-items:center;gap:9px;width:100%;padding:10px;border-radius:11px;
+  background:#12151F;border:1px solid rgba(255,255,255,.06);text-align:left}
+.tli.static{cursor:default}
+.tli:not(.static):hover{background:#171B26}
+.tli:disabled{opacity:.45}
+.tli.me{border-color:rgba(124,58,237,.5);background:#171226}
+.tli.fatto{opacity:.55}
+.tliav{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;background:var(--k,#1A1B24)}
+.tliav .hicon{width:16px;height:16px;fill:#fff}
+.tlitx{flex:1;min-width:0}
+.tlitx b{display:block;font-size:12px;font-weight:700;color:#E8EAF0}
+.tlitx i{display:block;font-style:normal;font-size:10.5px;color:#8A90A0;margin-top:1px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tliv{flex:none;font-size:11px;font-weight:700;color:#9AA1B2;display:flex;align-items:center;gap:3px}
+.tliv .hicon{width:12px;height:12px;fill:#FBBF24}
+.tlipos{flex:none;width:20px;text-align:center;font-size:12px;font-weight:800;color:#8A90A0}
+.tempty{padding:20px 10px;text-align:center;font-size:11.5px;color:#7B8395;line-height:1.4}
+.tbtn{display:block;width:100%;margin-top:10px;padding:12px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.09);background:#12151F;color:#C9CEDA;
+  font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.tag{flex:none;padding:3px 8px;border-radius:999px;font-size:9.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.04em;background:rgba(255,255,255,.08);color:#9AA1B2}
+.tag.on{background:rgba(74,222,128,.18);color:#4ADE80}
+.tnote{padding:9px 11px;margin-bottom:9px;border-radius:10px;background:#12151F;
+  font-size:11px;color:#9AA1B2;line-height:1.4}
+.tnote b{color:#E8EAF0}
+
+.tsub{display:flex;gap:6px;margin-bottom:9px;overflow-x:auto}
+.tsubb{flex:none;padding:7px 11px;border-radius:999px;background:#12151F;
+  border:1px solid rgba(255,255,255,.07);font-size:10.5px;font-weight:700;color:#9AA1B2}
+.tsubb.on{background:#7C3AED;border-color:#7C3AED;color:#fff}
+
+.tig{display:flex;flex-direction:column;gap:12px}
+.tigpost{border-radius:14px;background:#12151F;border:1px solid rgba(255,255,255,.07);
+  padding:11px;overflow:hidden}
+.tighead{display:flex;align-items:center;gap:8px}
+.tigav{width:26px;height:26px;flex:none;border-radius:50%;
+  background:linear-gradient(135deg,#FEDA75,#D62976,#962FBF);
+  display:flex;align-items:center;justify-content:center}
+.tigav .hicon{width:14px;height:14px;fill:#fff}
+.tighead b{flex:1;font-size:11.5px;font-weight:700;color:#E8EAF0}
+.tighead .tigw{font-size:10px;color:#7B8395}
+.tigcap{margin-top:8px;font-size:11.5px;color:#C9CEDA;line-height:1.4}
+.tigfoot{display:flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;font-weight:700;color:#EF4444}
+.tigfoot .hicon{width:14px;height:14px;fill:#EF4444}

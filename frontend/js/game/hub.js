@@ -105,30 +105,9 @@ const HUB_EVENTI = [
    righe:[["soldi", "Soldi veloci"], ["rischio", "Rischio vero"]]}
 ];
 
-/* ================= LE APP DEL TELEFONO ================= */
-const HUB_APP = [
-  {id:"contatti", n:"Contatti", ic:"gente", k:"#38BDF8",
-   sotto:g => (g.gente || []).filter(p => !p.via && p.rel >= 1).length + " conosciuti",
-   vai:() => apriPosto()},
-  {id:"obiettivi", n:"Obiettivi", ic:"mirino", k:"#EF4444",
-   sotto:g => GOALS.filter(x => !g.goals[x.id]).length + " aperti",
-   vai:() => hubGioco("obiettivi")},
-  {id:"notizie", n:"Notizie", ic:"giornale", k:"#60A5FA",
-   sotto:() => HUB_NOTIZIE.length + " questa settimana", vai:() => hubNotizie()},
-  {id:"inventario", n:"Inventario", ic:"zaino", k:"#F59E0B",
-   sotto:g => (g.bars.length + g.beats.length + g.songs.length + Object.keys(g.gear).length) + " cose",
-   vai:() => hubGioco("catalogo", "mat")},
-  {id:"statistiche", n:"Statistiche", ic:"barre", k:"#4ADE80",
-   vai:() => { hubGioco("settimana"); const d = $("g-dett");
-     if(d && d.getAttribute("aria-expanded") !== "true") d.click(); }},
-  {id:"classifiche", n:"Classifiche", ic:"coppa", k:"#FACC15",
-   vai:() => hubGioco("classifica")},
-  {id:"agenda", n:"Agenda", ic:"agenda", k:"#F87171",
-   sotto:() => ACTIONS.filter(a => !a.avail || a.avail()).length + " mosse oggi",
-   vai:() => hubGioco("settimana")},
-  {id:"impostazioni", n:"Impostazioni", ic:"ingranaggio", k:"#9AA1B2",
-   vai:() => { if(window.IMPOSTAZIONI) window.IMPOSTAZIONI(); }}
-];
+/* Le app del telefono (HUB_APP, HUB_APP_VECCHIO) e il loro disegno stanno in
+   js/game/telefono.js: qui restano solo i dati che servono a tutta la
+   plancia, non solo al telefono. */
 
 /* ================= NOTIZIE E SUGGERIMENTI ================= */
 const HUB_NOTIZIE = [
@@ -399,31 +378,8 @@ function renderHub(){
   }).join("") +
     '<div class="pevpiu"><b>Più avanti…</b><span>Nuovi eventi arriveranno durante la settimana.</span></div>';
 
-  /* ---- il telefono ---- */
-  const nuovi = Math.max(0, G.log.length - (G.seenLog || 0));
-  const msg = G.log.slice(0, 2);
-  $("hb-tel").innerHTML =
-    '<span class="ptt">Il tuo telefono</span>' +
-    '<div class="pmsg">' +
-      '<div class="pmsghead">' + hsvg("chat") + '<b>Messaggi</b>' +
-        (nuovi ? '<span class="pnuovi">' + nuovi + ' nuovi</span>' : '') + '</div>' +
-      (msg.length ? msg.map(m =>
-        '<button class="pmr" data-diario="1">' +
-          '<span class="pmav">' + hsvg("persona") + '</span>' +
-          '<span class="pmtx"><b>Diario</b><i>' + spoglia(m.t) + '</i></span>' +
-          '<span class="pmrt">' + m.w + (nuovi ? '<u></u>' : '') + '</span>' +
-        '</button>').join("")
-        : '<div class="pmr"><span class="pmtx"><i>Ancora niente. Muoviti, e qualcosa succede.</i></span></div>') +
-    '</div>' +
-    '<button class="plargo" data-diario="1">Vedi tutti i messaggi</button>' +
-    '<div class="papp">' + HUB_APP.map(a =>
-      '<button class="pap" data-app="' + a.id + '" style="--k:' + a.k + '">' + hsvg(a.ic) +
-      '<span><b>' + a.n + '</b>' + (a.sotto ? '<i>' + a.sotto(G) + '</i>' : '') + '</span></button>').join("") +
-    '</div>' +
-    '<div class="pnews"><h4>Notizie della settimana</h4>' +
-      HUB_NOTIZIE.map(n => '<p style="--k:' + n.k + '">' + hsvg(n.ic) + n.t + '</p>').join("") +
-    '</div>' +
-    '<button class="plargo" data-news="1">Vedi tutte le notizie</button>';
+  /* ---- il telefono (js/game/telefono.js: iPhone da PC, vecchia colonna sotto) ---- */
+  renderTelefono();
 
   /* ---- la riga di fondo ---- */
   $("hb-sugg").innerHTML = "Suggerimento: <b>" +
@@ -467,17 +423,6 @@ $("hb-eventi").addEventListener("click", ev => {
     "I lavori sporchi arrivano con le attività criminali: è il prossimo pezzo di " +
     "mondo da aprire, insieme al giro storto sulla mappa.");
   else hubAzione(e.id);
-});
-
-$("hb-tel").addEventListener("click", ev => {
-  const app = ev.target.closest("[data-app]");
-  if(app){
-    const a = HUB_APP.find(x => x.id === app.dataset.app);
-    if(a){ hubTap(); a.vai(); }
-    return;
-  }
-  if(ev.target.closest("[data-diario]")){ GO("game"); renderGioco(); $("g-diary").click(); return; }
-  if(ev.target.closest("[data-news]")){ hubTap(); hubNotizie(); }
 });
 
 $("hb-logo").onclick = () => GO("menu");
