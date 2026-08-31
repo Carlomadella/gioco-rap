@@ -34,27 +34,28 @@ così il giocatore impara una volta e poi vede solo espandersi il suo mondo.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│ LOGO · nome, livello, titolo · energia · soldi · hype · seguito     │
-├───────────────────┬───────────────────────────────┬─────────────────┤
-│                   │                               │                 │
-│  PROFILO          │  LA CITTÀ                     │  TELEFONO       │
-│  ritratto, livello│  punti cliccabili sulla mappa │  contatti,      │
-│  risorse, skill   │  quelli chiusi dicono cosa    │  messaggi,      │
-│  reputazione      │  serve per aprirli            │  obiettivi,     │
-│                   │                               │  notizie        │
-├───────────────────┴───────────────────────────────┴─────────────────┤
-│ MAPPA · CONTATTI · INVENTARIO · OBIETTIVI · STATISTICHE             │
-│ obiettivo attuale (x / y) · notizie della città · chat con badge    │
-└─────────────────────────────────────────────────────────────────────┘
+│ LOGO · nome, livello, fase · energia · soldi · hype · seguito       │
+├─────────────────────────────────────────────────────────────────────┤
+│                        NOME DELLA CITTÀ                             │
+│                     la tua storia inizia qui                        │
+│                                                                     │
+│        LA MAPPA: i luoghi come punti da toccare, e quelli           │
+│        ancora chiusi che dicono cosa serve per aprirli              │
+│                                                                     │
+├─────────────────────────────────────────────────────────────────────┤
+│ MAPPA · CONTATTI · INVENTARIO · OBIETTIVI · STATISTICHE      ┌─────┐│
+│ obiettivo attuale (x / y) · notizie della città              │CHAT │2│
+└──────────────────────────────────────────────────────────────┴─────┘┘
 ```
 
-- **Sinistra, il rapper**: carta d'identità del personaggio — chi sono, in mezzo secondo.
-- **Centro, la città**: dominante, con i luoghi aperti e quelli ancora chiusi ben visibili
+- **In testata, il rapper**: chi sei e cosa hai, in mezzo secondo — nome, livello, fase e le
+  quattro cose che contano. Una riga sola: la carta d'identità completa sta nel profilo.
+- **La città, dominante**: i luoghi aperti e quelli ancora chiusi ben visibili
   («Club — sblocca a Milano»). Il giocatore deve vedere il mondo che lo aspetta.
-- **Destra, il telefono**: contatti, messaggi, obiettivi settimanali, feed di notizie.
-  Serve a far sentire che la città vive anche quando non stai facendo niente.
-- **In basso**: le linguette più la riga di cosa fare adesso. Coerente con la ripulitura già
-  fatta al punto 9 (una testata sola, i numeri che contano, il resto dietro un bottone).
+- **Il telefono**: contatti, messaggi, chat. Serve a far sentire che la città vive anche
+  quando non stai facendo niente.
+- **In basso**: le linguette più la riga di cosa fare adesso e le notizie. Coerente con la
+  ripulitura del punto 9 (una testata sola, i numeri che contano, il resto dietro un bottone).
 
 ### Le tre città
 
@@ -95,8 +96,11 @@ Farmare contatti è gameplay, non un menu.
 
 ### Ordine di lavoro dell'hub
 
-1. Schermata hub a tre colonne più linguette, con la città di provincia e i suoi quattro luoghi;
-   le azioni che esistono già (scrivi, beat, registra, pubblica, piazza) si aprono da lì.
+1. ~~Schermata hub con le linguette, la città di provincia e i suoi quattro luoghi; le azioni
+   che esistono già (scrivi, beat, registra, pubblica, piazza) si aprono da lì.~~
+   **FATTA (31/08/2026)** — `js/game/hub.js`, `css/hub.css`, città disegnata da
+   `js/game/citta-art.js`. Si entra dalla mappa; studio, beat maker e vita quotidiana aprono la
+   partita sulla sezione giusta; club e concerti sono in vista e dicono cosa serve per Milano.
 2. Anagrafica dei contatti: tipo, grado, come si sale, dove si incontrano.
 3. Studi come luoghi con una qualità, dentro il calcolo del pezzo; via ogni residuo di studio proprio.
 4. Milano: soglie di sblocco, luoghi nuovi, prezzi e qualità più alti.
@@ -120,10 +124,11 @@ Fatto di recente (dettagli in `implementazioni.md`):
 - **Schermata di gioco ripulita** (punto 9): una testata sola, tre numeri in vista, il contorno
   dietro «Dettagli», fase in fascia bassa, catalogo a linguette, lifestyle a categorie chiuse.
 
-## Fase 1 — L'hub a mappa _(prossima)_
+## Fase 1 — L'hub a mappa _(in corso: la provincia c'è)_
 
 La sezione qui sopra. È il lavoro che viene prima di tutto il resto, perché tutto il resto
-poi ci si attacca sopra come luogo della città.
+poi ci si attacca sopra come luogo della città. La città di partenza è costruita; restano
+i contatti, la criminalità e le altre due città.
 
 Dentro ci finisce anche la vecchia idea della **mappa d'Italia**, come strato successivo:
 fan per città che crescono con uscite, concerti e social; città-roccaforti che rendono di più;

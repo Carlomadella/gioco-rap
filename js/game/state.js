@@ -22,6 +22,17 @@ const START = () => ({
   rivals:[], chartPrev:99, streamsPrev:0,
   best:{fans:0, chart:99}, ended:false
 });
+/* Livello ed esperienza: fan, skill e pezzi usciti in un numero solo.
+   Lo leggono la testata della partita e la testata dell'hub, quindi sta qui
+   e non dentro a una delle due. */
+function livello(){
+  const skl = G.skills.scrittura + G.skills.flow + G.skills.presenza + G.skills.rete;
+  const xp = Math.round(G.fans + skl*22 + G.songs.filter(x => x.released).length*140);
+  let lvl = 1, need = 300, acc = 0;
+  while(xp >= acc + need && lvl < 60){ acc += need; lvl++; need = Math.round(need*1.35); }
+  return {lvl:lvl, into:xp - acc, need:need};
+}
+
 /* la lucidità: quanto hai la testa dentro la musica. Sale quando lavori ai pezzi,
    scende con i turni, con le settimane vuote e con il tempo che salti. */
 const luc = () => (G.lucidita == null ? 80 : G.lucidita);

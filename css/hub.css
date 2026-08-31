@@ -1,0 +1,186 @@
+/* L'hub: la città vista dall'alto e tutto quello che ci sta sopra.
+   Una schermata sola, alta quanto lo schermo: testata, mappa, linguette,
+   la riga in basso. Da Milano e da Los Angeles cambia il mondo in mezzo,
+   non l'interfaccia. */
+
+#s-hub{padding-top:0}
+body.in-hub .topnav{display:none}
+
+.hub{position:relative;min-height:100dvh;display:flex;flex-direction:column;
+  background:#08070C;overflow:hidden}
+
+/* ================= TESTATA ================= */
+.htop{position:relative;z-index:3;display:flex;align-items:center;gap:14px;
+  padding:10px 16px;background:linear-gradient(180deg,#0B0A11 62%,rgba(11,10,17,.86));
+  border-bottom:1px solid rgba(255,255,255,.07)}
+
+.hlogo{display:flex;align-items:center;gap:7px;padding:4px 8px;border-radius:12px;
+  transition:background .15s,transform .12s}
+.hlogo:hover{background:rgba(255,255,255,.06)}
+.hlogo:active{transform:scale(.96)}
+.hlogo span{display:flex;flex-direction:column;line-height:.82;text-align:left;
+  font-family:var(--disp);font-style:italic;letter-spacing:-.02em}
+.hlogo b{font-size:13px;font-weight:400;color:#FFD34E;text-shadow:0 2px 0 #B0700A}
+.hlogo i{font-size:21px;font-style:italic;color:#FFA92B;text-shadow:0 2px 0 #8E4A05}
+.hcrown{width:18px;height:18px;fill:#FFD34E;transform:rotate(-12deg)}
+
+.hwho{min-width:0;flex:1}
+.hname{font-family:var(--cond);font-size:17px;font-weight:800;letter-spacing:.06em;
+  text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hmeta{font-family:var(--cond);font-size:12.5px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:rgba(255,255,255,.78);margin-top:1px}
+.hmeta .hstar{color:#FFD34E}
+.hrank{font-family:var(--cond);font-size:11px;font-weight:800;letter-spacing:.16em;
+  text-transform:uppercase;color:#C084FC;margin-top:2px}
+
+.hres{display:flex;align-items:center;gap:4px;flex:none;padding:7px 6px;border-radius:14px;
+  background:rgba(9,9,13,.9);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.hr{display:inline-flex;align-items:center;gap:5px;padding:2px 8px}
+.hr + .hr{border-left:1px solid rgba(255,255,255,.08)}
+.hr .hicon{width:15px;height:15px;fill:var(--k);flex:none}
+.hr b{font-family:var(--cond);font-size:14px;font-weight:700;letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* ================= LA MAPPA ================= */
+.hmap{position:relative;flex:1;min-height:min(64vh,540px);overflow:hidden}
+.hart,.hart .cittasvg{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+/* il titolo della città, appoggiato in alto sulla mappa */
+.hhead{position:absolute;left:0;right:0;top:2.2%;z-index:2;text-align:center;pointer-events:none;
+  padding:0 12px}
+.hhead h1{margin:0;font-family:var(--disp);font-size:clamp(30px,6.6vw,58px);line-height:.94;
+  letter-spacing:.005em;text-transform:uppercase;color:#fff;transform:skewX(-7deg);
+  text-shadow:0 4px 22px rgba(0,0,0,.85),0 1px 0 rgba(0,0,0,.6)}
+.hrank2{margin-top:2px;font-family:var(--disp);font-size:clamp(13px,2.4vw,20px);
+  font-style:italic;letter-spacing:.02em;text-transform:uppercase;color:#C24BFF;
+  transform:skewX(-7deg);text-shadow:0 2px 14px rgba(0,0,0,.8)}
+.hclaim{margin:6px 0 0;font-family:var(--cond);font-size:clamp(10px,1.5vw,13px);font-weight:700;
+  letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.82);
+  text-shadow:0 2px 10px rgba(0,0,0,.9)}
+
+/* ---- i luoghi ---- */
+.hpins{position:absolute;inset:0;z-index:2}
+/* larghezza sul contenuto: se no una targhetta appoggiata al bordo destro si
+   schiaccia contro il muro e il testo va a capo ogni due parole */
+.hpin{position:absolute;left:var(--x);top:var(--y);width:max-content;
+  max-width:min(48vw,200px);display:flex;flex-direction:column;
+  align-items:center;gap:0;padding:0;transition:transform .14s}
+.hpin.al-c{transform:translateX(-50%)}
+.hpin.al-l{transform:translateX(-14px);align-items:flex-start}
+.hpin.al-r{transform:translateX(calc(-100% + 14px));align-items:flex-end}
+.hpin:hover{filter:brightness(1.12)}
+.hpin.al-c:hover{transform:translateX(-50%) translateY(-2px)}
+.hpin.al-l:hover{transform:translateX(-14px) translateY(-2px)}
+.hpin.al-r:hover{transform:translateX(calc(-100% + 14px)) translateY(-2px)}
+.hpin:active{filter:brightness(.95)}
+
+.hmark{position:relative;width:26px;height:33px;margin-bottom:-3px;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,.7))}
+.hmark svg{width:100%;height:100%;display:block;fill:var(--c);
+  stroke:rgba(0,0,0,.45);stroke-width:1}
+.hmi{position:absolute;left:50%;top:11px;transform:translate(-50%,-50%);display:block}
+.hmark .hicon.mini{width:13px;height:13px;fill:#0B0912}
+
+.hcard{display:flex;align-items:flex-start;gap:7px;max-width:100%;
+  padding:7px 10px 8px;border-radius:11px;text-align:left;
+  background:rgba(10,10,15,.84);backdrop-filter:blur(3px);
+  box-shadow:0 8px 22px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.11)}
+.hcard .hci{flex:none;margin-top:1px}
+.hcard .hicon{width:14px;height:14px;fill:var(--c,#9AA0AE);display:block}
+.hct{min-width:0}
+.hct b{display:block;font-family:var(--cond);font-size:13px;font-weight:800;letter-spacing:.07em;
+  text-transform:uppercase;color:#fff;line-height:1.1}
+.hct i{display:block;margin-top:2px;font-style:normal;font-size:10.5px;line-height:1.3;
+  color:rgba(255,255,255,.62)}
+
+.hpin.chiuso .hcard{background:rgba(9,9,13,.72);box-shadow:0 6px 16px rgba(0,0,0,.45),
+  inset 0 0 0 1px rgba(255,255,255,.07)}
+.hpin.chiuso .hct b{color:rgba(255,255,255,.72)}
+.hpin.chiuso .hct i{color:rgba(255,255,255,.45)}
+.hpin.chiuso .hcard .hicon{fill:rgba(255,255,255,.5)}
+
+/* ================= LINGUETTE ================= */
+.htabs{position:relative;z-index:3;display:flex;gap:2px;padding:6px 88px 6px 8px;
+  background:#0B0A10;border-top:1px solid rgba(255,255,255,.07)}
+.htab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:7px 2px 6px;border-radius:11px;color:rgba(255,255,255,.5);
+  transition:background .15s,color .15s}
+.htab .hicon{width:19px;height:19px;fill:currentColor}
+.htab span{font-family:var(--cond);font-size:9.5px;font-weight:800;letter-spacing:.13em;
+  text-transform:uppercase}
+.htab:hover{color:rgba(255,255,255,.8);background:rgba(255,255,255,.05)}
+.htab.on{color:#C084FC;background:rgba(168,85,247,.16)}
+
+/* ================= LA RIGA IN BASSO ================= */
+.hfoot{position:relative;z-index:3;display:flex;align-items:stretch;gap:8px;padding:8px;
+  background:#0B0A10;border-top:1px solid rgba(255,255,255,.07)}
+.hgoal,.hnews{flex:1;min-width:0;text-align:left;padding:9px 12px;border-radius:12px;
+  background:#111017;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+  transition:background .15s}
+.hgoal:hover,.hnews:hover{background:#16151E}
+.hk{display:block;font-family:var(--cond);font-size:9px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--faint)}
+.hgl{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:4px}
+.hgl b{font-size:12.5px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis}
+.hgl i{font-family:var(--cond);font-style:normal;font-size:12px;font-weight:700;
+  color:rgba(255,255,255,.55);font-variant-numeric:tabular-nums;flex:none}
+.hbar{display:block;height:3px;margin-top:6px;border-radius:3px;background:rgba(255,255,255,.1)}
+.hbar i{display:block;height:100%;border-radius:3px;
+  background:linear-gradient(90deg,#7C3AED,#C084FC)}
+
+.hnw{display:flex;align-items:center;gap:9px;margin-top:5px}
+.hth{flex:none;width:56px;height:37px;border-radius:6px;overflow:hidden;display:block}
+.hth svg{width:100%;height:100%;display:block}
+.hnt{min-width:0}
+.hnt b{display:block;font-size:12px;font-weight:600;color:#fff;line-height:1.2;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hnt i{display:block;font-style:normal;font-size:10.5px;color:rgba(255,255,255,.55);
+  line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* il telefono: sporge sopra la riga, come appoggiato allo schermo */
+.hphone{flex:none;align-self:flex-end;margin:-40px 4px -8px 0;padding:0;
+  transition:transform .14s}
+.hphone:hover{transform:translateY(-3px)}
+.hph{position:relative;display:block;width:74px;height:104px;border-radius:15px;
+  padding:7px 6px;background:linear-gradient(160deg,#25242E,#0E0D13);
+  box-shadow:0 12px 26px rgba(0,0,0,.7),inset 0 0 0 1px rgba(255,255,255,.14);
+  transform:rotate(-5deg)}
+.hscr{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  width:100%;height:100%;border-radius:10px;background:#08080C;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.hscr .hicon{width:26px;height:26px;fill:#E8E6F2}
+.hpk{font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:rgba(255,255,255,.78)}
+.hbdg{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;
+  display:flex;align-items:center;justify-content:center;border-radius:999px;
+  background:#F0243C;color:#fff;font-family:var(--cond);font-size:12px;font-weight:800;
+  font-style:normal;box-shadow:0 3px 10px rgba(240,36,60,.55)}
+
+/* ================= IL RITORNO ALLA MAPPA ================= */
+/* Nella partita il tasto bianco resta quello del menu: questo, viola, riporta
+   dove si gioca davvero. */
+.tornamenu.mappa{background:linear-gradient(180deg,#7C3AED,#5B21B6);color:#fff;
+  box-shadow:0 6px 26px rgba(124,58,237,.45)}
+.tornamenu.mappa:hover{background:linear-gradient(180deg,#8B4BF5,#6D28D9)}
+
+/* ================= SCHERMI STRETTI ================= */
+@media (max-width:560px){
+  .htop{gap:9px;padding:8px 10px}
+  .hres{gap:0;padding:5px 2px}
+  .hr{gap:4px;padding:2px 5px}
+  .hr b{font-size:12px}
+  .hname{font-size:15px}
+    .hpin{max-width:46vw}
+  .hcard{padding:6px 8px}
+  .hct b{font-size:11.5px}
+  .hct i{font-size:9.5px}
+  .hmark{width:22px;height:28px}
+  .hphone{margin:-34px 0 -8px 0}
+  .hph{width:62px;height:88px}
+  .hnews{display:none}
+}
+@media (max-width:400px){
+  .hres{flex-wrap:wrap;max-width:150px;justify-content:flex-end}
+  .hr + .hr{border-left:none}
+}

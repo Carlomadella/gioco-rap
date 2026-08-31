@@ -9,7 +9,10 @@ function goto(screen){
   document.querySelectorAll(".screen").forEach(x => x.classList.toggle("on", x.id === "s-" + screen));
   /* In partita il tasto per il menu non sta quassù: il marchio a sinistra fa
      già quel mestiere, e la barra deve restare fuori dai piedi mentre giochi. */
-  $("nav-back").hidden = (screen === "menu" || screen === "game");
+  $("nav-back").hidden = (screen === "menu" || screen === "game" || screen === "hub");
+  /* L'hub ha una testata sua, con il marchio e le risorse: la barra di sopra
+     sparisce, se no ce ne sono due una sull'altra. */
+  document.body.classList.toggle("in-hub", screen === "hub");
   window.scrollTo({top:0});
   if(screen === "menu") renderMenu();
 }
@@ -229,7 +232,9 @@ $("m-reset").onclick = function(){
 };
 $("m-play").onclick = () => {
   if(!A.name.trim()){ A.name = "Nuovo Artista"; $("name").value = A.name; firstRun = false; applyMode(); renderArtista(); renderMenu(); }
-  window.ARTIST = A; goto("game"); if(window.GAME) window.GAME.enter();
+  /* Si entra dalla mappa: è quella la schermata di gioco. Le azioni stanno
+     dietro ai luoghi, un passo più in là. */
+  window.ARTIST = A; goto("hub"); if(window.GAME) window.GAME.enter();
 };
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-go]");

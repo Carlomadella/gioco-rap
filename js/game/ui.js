@@ -55,15 +55,11 @@ function renderGioco(){
       '<span class="pn">' + ph.n + '</span></div>' +
       '<div class="ptrack">' + track + '</div></div>' + nxt + '</div>';
 
-  // livello ed esperienza
-  const skl = G.skills.scrittura + G.skills.flow + G.skills.presenza + G.skills.rete;
-  const xpTot = Math.round(G.fans + skl*22 + G.songs.filter(x=>x.released).length*140);
-  let lvl = 1, need = 300, acc = 0;
-  while(xpTot >= acc + need && lvl < 60){ acc += need; lvl++; need = Math.round(need*1.35); }
-  const into = xpTot - acc;
-  $("g-lvl").textContent = "LIV " + lvl;
-  $("g-xp").style.width = clamp(into/need*100, 0, 100) + "%";
-  $("g-xptxt").textContent = fmt(into) + " / " + fmt(need);
+  // livello ed esperienza (il conto sta in state.js: lo legge anche l'hub)
+  const L = livello();
+  $("g-lvl").textContent = "LIV " + L.lvl;
+  $("g-xp").style.width = clamp(L.into/L.need*100, 0, 100) + "%";
+  $("g-xptxt").textContent = fmt(L.into) + " / " + fmt(L.need);
 
   /* L'energia rimasta della settimana. Il numero da solo non si legge al volo,
      i trattini si': uno per turno, spenti quelli gia' usati. Quando finisce

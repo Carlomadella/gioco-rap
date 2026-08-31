@@ -190,6 +190,25 @@ Tutte le modifiche da fare:
     Riferimento grafico: la mappa generata va usata come **Main Hub / World Map**, non come logo — il logo
     vero, semplice e riconoscibile, viene dopo.
 
+    **FATTO in parte (31/08/2026)** — la schermata della città di partenza, uguale alla foto
+    `media/photo/schermata_di_gioco_città_iniziale.png`.
+    - Si entra da lì: «Inizia la carriera» apre la mappa, non più le card. Dalla mappa si va nella
+      partita e dalla partita si torna indietro con il tasto viola «Mappa».
+    - Testata: marchio, nome, livello con la stella, fase in viola, e le quattro cose che hai —
+      energia, cassa, hype, chi ti segue. Sono i numeri veri della partita, non un mockup.
+    - Il paese è disegnato, non fotografato: `js/game/citta-art.js` genera da un seme fisso colline,
+      isolati, finestre accese, la strada che scende, i lampioni, il campetto e l'insegna dei beat.
+      Cambiando seme esce un'altra provincia — servirà per Milano e Los Angeles.
+    - Quattro luoghi aperti (studio, beat maker, vita quotidiana, attività criminali) e due chiusi
+      (club, concerti) che dicono «sblocca a Milano» e, se li tocchi, cosa serve: livello 10, fama 50,
+      hype 40. Studio, beat maker e vita quotidiana aprono la partita sulla sezione giusta;
+      la criminalità dice che sta arrivando (è il punto 21).
+    - In basso le cinque linguette (mappa, contatti, inventario, obiettivi, statistiche), l'obiettivo
+      di adesso con la barra, le notizie del paese che cambiano con le settimane e il telefono con la
+      chat: il pallino rosso è la roba non letta del diario.
+      File nuovi: `js/game/citta-art.js`, `js/game/hub.js`, `css/hub.css`.
+      Restano da fare: i contatti veri, la criminalità, e le altre due città.
+
 Carlomadella/gioco-rap
 
 leggiti il repo

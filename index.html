@@ -23,6 +23,7 @@
 <link rel="stylesheet" href="css/forms.css?v=8">
 <link rel="stylesheet" href="css/creator.css?v=8">
 <link rel="stylesheet" href="css/actionbar.css?v=8">
+<link rel="stylesheet" href="css/hub.css?v=8">
 <link rel="stylesheet" href="css/impostazioni.css?v=8">
 </head>
 <body>
@@ -136,9 +137,47 @@
 </section>
 
 
+<!-- L'hub: la città di provincia. È la schermata da cui si gioca — i luoghi
+     aprono la partita sulla sezione giusta. Il contenuto lo mette js/game/hub.js. -->
+<section class="screen" id="s-hub">
+  <div class="hub">
+    <header class="htop">
+      <button class="hlogo" id="hb-logo" aria-label="Torna al menu principale">
+        <svg class="hcrown" viewBox="0 0 24 14" aria-hidden="true"><path d="M2 13 .8 2.6l5.6 4.2L12 .8l5.6 6 5.6-4.2L22 13z"/></svg>
+        <span><b>Anni di</b><i>Fame</i></span>
+      </button>
+      <div class="hwho">
+        <div class="hname" id="hb-name">—</div>
+        <div class="hmeta"><span class="hstar">&#9733;</span> Liv. <b id="hb-lvl">1</b></div>
+        <div class="hrank" id="hb-rank">—</div>
+      </div>
+      <div class="hres" id="hb-res"></div>
+    </header>
+
+    <div class="hmap">
+      <div class="hart" id="hb-art"></div>
+      <div class="hhead">
+        <h1 id="hb-city">Città di provincia</h1>
+        <div class="hrank2" id="hb-rank2">—</div>
+        <p class="hclaim" id="hb-claim">La tua storia inizia qui.</p>
+      </div>
+      <div class="hpins" id="hb-pins"></div>
+    </div>
+
+    <nav class="htabs" id="hb-tabs"></nav>
+
+    <div class="hfoot">
+      <button class="hgoal" id="hb-goal"></button>
+      <button class="hnews" id="hb-news"></button>
+      <button class="hphone" id="hb-phone" aria-label="Apri il diario"></button>
+    </div>
+  </div>
+</section>
+
 <section class="screen" id="s-game">
   <div class="game-wrap">
-    <!-- La via d'uscita dalla partita: qui, in chiaro, non persa fra le CTA in basso. -->
+    <!-- Le due vie d'uscita: la mappa, che è casa, e il menu principale. -->
+    <button class="tornamenu mappa" id="g-tomappa"><span class="arw">&lsaquo;</span> Mappa</button>
     <button class="tornamenu" id="g-tomenu"><span class="arw">&lsaquo;</span> Menu principale</button>
     <!-- Una testata sola, non tre schede impilate: chi sei, a che punto sei e i
          tre numeri che guardi davvero. Tutto il resto sta sotto «Dettagli»,
@@ -418,12 +457,14 @@
 <script src="js/game/copertine.js?v=8"></script>
 <script src="js/game/modal.js?v=8"></script>
 <script src="js/game/scene-art.js?v=8"></script>
+<script src="js/game/citta-art.js?v=8"></script>
 <script src="js/game/beatplay.js?v=8"></script>
 <script src="js/game/ui.js?v=8"></script>
 <script src="js/game/lifestyle.js?v=8"></script>
 <script src="js/game/fx.js?v=8"></script>
 <script src="js/game/skip.js?v=8"></script>
 <script src="js/game/uscita.js?v=8"></script>
+<script src="js/game/hub.js?v=8"></script>
 
 <!-- Il pannello delle impostazioni: per ultimo, tocca roba definita ovunque. -->
 <script src="js/impostazioni-ui.js?v=8"></script>

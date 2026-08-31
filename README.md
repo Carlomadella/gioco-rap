@@ -20,16 +20,17 @@ Il server locale resta la via consigliata (è quella verificata).
 
 ## Dove sta andando: l'hub è una mappa
 
-Oggi si gioca da una schermata a card. La direzione decisa (punto 26 di
-`implementazioni.md`, dettagli in `ROADMAP.md`) è un'altra: **l'hub del gioco diventa una
-mappa che si allarga insieme al rapper**. Non sblocchi funzioni sparse in un menu,
-sblocchi un mondo più grande.
+**L'hub del gioco è una mappa che si allarga insieme al rapper** (punto 26 di
+`implementazioni.md`, dettagli in `ROADMAP.md`). Non sblocchi funzioni sparse in un menu,
+sblocchi un mondo più grande. La prima città c'è già: «Inizia la carriera» apre la mappa
+della provincia, i luoghi aprono la partita sulla sezione giusta e dalla partita si torna
+indietro col tasto «Mappa».
 
 Tre città, in quest'ordine:
 
 | | città | come ci arrivi | cosa ci trovi |
 | --- | --- | --- | --- |
-| ![provincia](media/photo/schermata_di_gioco_città_iniziale.png) | **Città di provincia** — il nome lo scrive il giocatore | si parte da qui | studio, beat maker, vita quotidiana, attività criminali |
+| ![provincia](media/photo/schermata_di_gioco_città_iniziale.png) | **Città di provincia** — il nome lo scrive il giocatore _(fatta)_ | si parte da qui | studio, beat maker, vita quotidiana, attività criminali |
 | ![Milano](media/photo/schermata_di_gioco_città_di_mezzo.png) | **Milano** | livello ≥ 10, fama ≥ 50, hype ≥ 40 | studi di registrazione, manager, club, concerti, sponsor, business, shop, criminalità grossa |
 | ![Los Angeles](media/photo/schermata_di_gioco_città_finale.png) | **Los Angeles** | livello ≥ 30, fama ≥ 90, hype ≥ 85, reputazione ≥ 80 | studi top tier, label & A&R, eventi VIP, sponsor HQ, casinò, shop luxury, business district |
 
@@ -49,8 +50,13 @@ Due regole che vengono da lì e toccano tutto il resto:
   fidato → partner) e i migliori chiedono fama, hype e conoscenze in comune. Farmare la
   rete è gameplay, non un menu.
 
-Le tre immagini qui sopra stanno in `media/photo/` e sono concept art: servono come
-riferimento visivo del Main Hub, non sono ancora l'interfaccia del codice.
+Le tre immagini stanno in `media/photo/` e sono il riferimento visivo del Main Hub. La
+provincia è costruita (`js/game/hub.js` + `css/hub.css`); Milano e Los Angeles per adesso
+sono ancora solo concept art.
+
+Il paese non è una fotografia: `js/game/citta-art.js` lo disegna in SVG da un seme fisso —
+colline, isolati, finestre accese, la strada che scende, i lampioni, il campetto. Cambiando
+seme esce un'altra provincia, ed è così che si costruiranno anche le altre due città.
 
 ## Struttura
 
@@ -81,6 +87,7 @@ dist/                 anni-di-fame.html, il file unico per l'artifact
 | `forms.css` | pannelli e campi del creatore |
 | `creator.css` | sezione avatar: galleria degli otto, categorie, fondali |
 | `actionbar.css` | barra fissa in basso e bottoni |
+| `hub.css` | l'hub: testata, mappa, targhette dei luoghi, linguette, telefono |
 | `impostazioni.css` | pannello impostazioni, temi, densità |
 
 ### JS — anche qui l'ordine dei `<script>` conta
@@ -128,12 +135,14 @@ che quelli caricati prima abbiano già dichiarato le loro funzioni e costanti.
 | `copertine.js` | copertina caricata dall'utente e titolo del pezzo |
 | `modal.js` | finestra modale degli eventi |
 | `scene-art.js` | illustrazioni SVG delle azioni |
+| `citta-art.js` | la città di notte vista dall'alto, generata da un seme |
 | `beatplay.js` | ascolto dei beat: bpm, cassa, scala dal seme |
 | `ui.js` | `renderGioco()`: HUD, pannelli, liste, comandi |
 | `lifestyle.js` | spese fisse e livelli di lifestyle |
 | `fx.js` | suono, notifiche, rapporto, avvio (`window.GAME`) |
 | `skip.js` | salta un giorno, una settimana, un mese |
 | `uscita.js` | uscire da un'azione (✕, ESC, clic fuori) rimettendo a posto il conto |
+| `hub.js` | la mappa della città: testata, luoghi, linguette, obiettivo, notizie |
 
 **Per ultimo**
 
