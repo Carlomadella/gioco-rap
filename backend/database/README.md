@@ -93,11 +93,13 @@ versione più vecchia, le migrazioni mancanti si applicano da sole all'avvio.
 ## Copie di sicurezza
 
 ```bash
-sqlite3 dati/classifica.db ".backup copie/classifica-$(date +%F).db"
+npm run copia          # → dati/copie/classifica-2026-09-01.db
 ```
 
-Si può dare a server acceso: SQLite fa una copia coerente da sé. Copiare il file a mano
-mentre il server scrive **non** è sicuro (c'è anche il `-wal` da portarsi dietro).
+Si dà **a server acceso**: dentro c'è `VACUUM INTO`, che fa una copia coerente da sé e non
+si porta dietro il `-wal`. Tiene le ultime trenta (`ADF_COPIE`) e prima di dire che ha
+finito riapre la copia e conta cosa c'è dentro. Copiare il file a mano mentre il server
+scrive **non** è sicuro.
 
 Online: una copia ogni notte, tenute trenta, su un disco diverso da quello del server. Per
 rimettere a posto: si ferma il server, si copia indietro il file, si riavvia.
@@ -134,6 +136,7 @@ cose, e nessuna delle due è codice da scrivere adesso:
 ```
 database/
   README.md          questo file
+  copia.js           la copia di sicurezza
   schema.md          il disegno completo, commentato (fuori da git)
   db.js              apre SQLite e applica le migrazioni
   migrazioni/*.sql   lo schema, in file numerati

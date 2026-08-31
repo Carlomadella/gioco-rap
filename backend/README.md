@@ -43,7 +43,10 @@ Si avvia un server suo, su una porta sua, con un database usa e getta; fa tutto 
 classifica, iscrizione, punteggi, freni, account con la mail, sessioni, salvataggi in cloud
 e i loro conflitti, traguardi, giro di settimana, frecce ▲▼, cancellazione dell'account, e
 un'occhiata dentro al database per controllare che le chiavi ci stiano solo come hash — e
-si spegne. **55 controlli. Dalli dopo ogni modifica.**
+si spegne. **73 controlli**, e fra questi la verifica di un biglietto Apple vero: la prova
+si fa una coppia di chiavi sua, si mette in piedi un finto «appleid.apple.com» e prova che
+un biglietto buono entra e uno firmato da un altro, scaduto o fatto per un altro gioco no.
+**Dalli dopo ogni modifica.**
 
 ## Le manopole
 
@@ -57,6 +60,11 @@ si spegne. **55 controlli. Dalli dopo ogni modifica.**
 | `ADF_ADMIN` | chiave per le rotte di servizio | vuota (sono chiuse) |
 | `ADF_SALE` | sale per gli hash degli indirizzi IP | `anni-di-fame` |
 | `ADF_INVIO_MS` | quanto passa fra due punteggi dello stesso artista | `10000` |
+| `ADF_PROXY` | `1` se davanti c'è un reverse proxy **nostro** (legge `x-forwarded-for`) | spento |
+| `ADF_COPIE` | quante copie di sicurezza tenere | `30` |
+| `ADF_STEAM_CHIAVE`, `ADF_STEAM_APPID` | per entrare con Steam | vuote |
+| `ADF_APPLE_AUD` | il bundle id dell'app, per Sign in with Apple | vuota |
+| `ADF_GOOGLE_CLIENT` | il client id, per Google | vuota |
 
 In casa vanno bene così. Online si cambiano `ADF_ORIGINI` (solo il dominio del gioco),
 `ADF_ADMIN` e `ADF_SALE` (chiavi lunghe, mai dentro al codice).
@@ -68,13 +76,15 @@ In casa vanno bene così. Online si cambiano `ADF_ORIGINI` (solo il dominio del 
 | `server.js` | HTTP, CORS, le rotte, chi sei, i freni contro l'imbroglio |
 | `bot.js` | i bot: come nascono, come crescono, il carattere, chi smette e chi spunta |
 | `nomi.js` | il vocabolario dei nomi d'arte, delle città, delle storie, dei titoli |
+| `accessi.js` | entrare con Steam, Apple e Google: verifica dei biglietti firmati |
+| `database/copia.js` | la copia di sicurezza, anche a server acceso |
 | `database/db.js` | apre SQLite e applica le migrazioni |
 | `database/migrazioni/*.sql` | lo schema, in file numerati che si applicano in ordine |
 | `database/archivio.js` | **l'unico file che parla col database**: classifica, account, carriere, traguardi |
 | `database/travaso.js` | porta il vecchio archivio JSON dentro al database |
 | `database/README.md` | com'è messo il database e dove va |
 | `database/schema.md` | lo schema completo, commentato (fuori da git) |
-| `prova.js` | i 55 controlli sull'API |
+| `prova.js` | i 73 controlli sull'API |
 
 Il server non sa che database ci sia sotto: parla solo con `database/archivio.js`. È lì che
 si va il giorno che si passa a PostgreSQL.
@@ -130,6 +140,8 @@ si va il giorno che si passa a PostgreSQL.
 | rotta | cosa fa |
 | --- | --- |
 | `POST /api/giro` | fa passare una settimana a mano, per provare |
+| `GET /api/sospetti` | chi ha fatto alzare un sopracciglio, dal più recente |
+| `POST /api/sanzione` | avviso, fuori classifica o sospensione |
 | `GET /api/da-spingere` | i traguardi ancora da mandare a Steam e agli store |
 | `POST /api/spinto` | segna che uno è arrivato |
 
@@ -156,17 +168,51 @@ curl -X PUT localhost:8787/api/carriera/1 -H 'content-type: application/json' \
   -H 'x-sessione: …' -d '{"stato":{},"settimana":12,"anno":1}'
 ```
 
-## Steam, Apple e Google: porta chiusa, non porta finta
+## Steam, Apple e Google
 
-`POST /api/account` e `POST /api/sessione` accettano già `steam`, `apple` e `google`, ma
-rispondono **501** finché non c'è il pezzo che verifica il biglietto firmato con le loro
-API (`verificaBiglietto` in `server.js`). È voluto: accettare un id di Steam senza
-verificarlo vorrebbe dire lasciar entrare chiunque come chiunque. Si collega quando c'è il
-guscio nativo, cioè insieme a Electron e Capacitor.
+**La verifica c'è** (`accessi.js`): Apple e Google mandano un token firmato (JWT RS256) e
+lo controlliamo contro le loro chiavi pubbliche — firma, emittente, destinatario, scadenza;
+Steam manda un biglietto e lo facciamo verificare a Steamworks. Tutto con Node e basta,
+nessuna dipendenza.
 
-Nel frattempo l'account esiste lo stesso: **ospite** (aperto da solo, senza chiedere
-niente) ed **email + password**, che è quello che fa sopravvivere una carriera a un
-telefono nuovo.
+Quello che manca sono **le chiavi**, che si prendono quando c'è l'app registrata sugli
+store. Perciò:
+
+- se la chiave non c'è, quel canale risponde **501** e dice quale manca — non entra nessuno;
+- se il biglietto è sbagliato, scaduto, firmato da un altro o fatto per un altro gioco,
+  risponde **403**.
+
+Non esiste un caso in cui si entra senza verifica: `GET /api/stato` dice quali canali sono
+davvero collegati. Nel frattempo l'account esiste lo stesso — **ospite** (aperto da solo,
+senza chiedere niente) ed **email + password**, che è quello che fa sopravvivere una
+carriera a un telefono nuovo.
+
+## Chi bara: sospetti e sanzioni
+
+Ogni punteggio limato lascia un **sospetto** con dentro cosa aveva chiesto e cosa gli
+abbiamo dato. Da lì si guarda a mano (`GET /api/sospetti`) e si decide.
+
+Le sanzioni sono tre, e la regola è **fuori dalla classifica prima della sospensione**:
+
+| tipo | cosa succede |
+| --- | --- |
+| `avviso` | resta scritto, non cambia niente |
+| `fuori_classifica` | sparisce dalla graduatoria pubblica, **ma continua a giocare la sua partita** |
+| `sospensione` | non manda più punteggi |
+
+Nel dubbio si dà la seconda: se ci siamo sbagliati non abbiamo tolto il gioco a un cliente
+che l'ha pagato. Con `giorni: 0` la sanzione non scade.
+
+## La copia di sicurezza
+
+```bash
+npm run copia          # → database/dati/copie/classifica-2026-09-01.db
+```
+
+Si dà **a server acceso**: `VACUUM INTO` fa una copia coerente da sé, senza fermare niente
+e senza portarsi dietro il `-wal`. Copiare il file a mano mentre il server scrive è il modo
+migliore per ritrovarsi una copia rotta il giorno che serve. Tiene le ultime 30
+(`ADF_COPIE`) e controlla che la copia si apra e abbia dentro qualcosa.
 
 ## La settimana passa anche se non giochi
 
@@ -191,7 +237,9 @@ impedire. Quello che c'è tiene fuori i numeri assurdi, non blinda:
 - da un invio all'altro gli stream possono al massimo **quintuplicare** (il primo invio ha
   la mano larga, per chi arriva con una carriera già avviata); ogni taglio finisce in
   `sospetto`, che è la traccia da cui si guarda chi esagera di mestiere;
-- **un invio ogni dieci secondi** per artista, **120 richieste al minuto** per indirizzo;
+- **un invio ogni dieci secondi** per artista, **120 richieste al minuto** per indirizzo
+  (dietro a un reverse proxy nostro si accende `ADF_PROXY=1`, se no si conterebbero tutte
+  le richieste come se venissero dal proxy);
 - le password stanno come **scrypt**, i gettoni di sessione e le vecchie chiavi solo come
   **hash**, gli indirizzi IP solo come hash con sale;
 - i nomi si puliscono dai caratteri invisibili e due artisti non si chiamano uguale.

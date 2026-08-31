@@ -189,7 +189,7 @@ vendita sì.
 | --- | --- | --- | --- |
 | **33** | **Il build** — bundle minificato con l'impronta nel nome, server di sviluppo con ricarica automatica, controlli automatici | frontend | ✅ **fatto (31/08/2026)** |
 | **34** | **I salvataggi** — file vero sul dispositivo, Steam Cloud, cloud nostro. Il `localStorage` non basta più | frontend + backend | **metà: il cloud c'è** (01/09/2026) |
-| **35** | **Gli account** — da ospite o con la mail, sessioni, cancellazione dell'account | backend | ✅ **fatto (01/09/2026)**, tranne i tre negozi |
+| **35** | **Gli account** — da ospite o con la mail, sessioni, cancellazione, verifica Steam/Apple/Google | backend | ✅ **fatto (01/09/2026)** — dei tre negozi mancano solo le chiavi |
 | **36** | **L'interfaccia sul telefono** — verticale, a tocchi, leggibile. Il lavoro più lungo di tutti | frontend | da fare |
 | **37** | **Il database vero** — SQLite adesso, PostgreSQL il giorno dell'uscita | backend | ✅ **fatto (01/09/2026)** |
 
@@ -234,9 +234,15 @@ password stanno come scrypt, i gettoni di sessione solo come hash.
 senza nome e senza padrone — la storia degli altri non si sfonda — e spariscono salvataggi,
 identità, dispositivi e mail.
 
-**Steam, Apple e Google rispondono 501**: le rotte ci sono, manca il pezzo che verifica il
-biglietto firmato da loro, e finché manca resta una porta chiusa, non una porta finta. Si
-collega insieme al guscio nativo.
+**Steam, Apple e Google: la verifica c'è** (`backend/accessi.js`) — token firmato
+controllato contro le loro chiavi pubbliche, biglietto Steam verificato da Steamworks.
+Mancano solo **le chiavi**, che si prendono quando l'app è registrata sugli store: senza,
+quel canale risponde `501` e dice quale manca. Non c'è nessun caso in cui si entra senza
+verifica.
+
+Ci sono anche **sospetti e sanzioni** (fuori classifica prima della sospensione: chi è
+fuori sparisce dalla graduatoria ma continua a giocare la sua partita) e la **copia di
+sicurezza** a server acceso.
 
 ### 36 · L'interfaccia sul telefono
 

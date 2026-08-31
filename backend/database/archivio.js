@@ -128,9 +128,17 @@ const ultimaChiusa = () => {
   const r = A.uno("SELECT max(settimana) s FROM classifica_posizione");
   return r && r.s != null ? r.s : -1;
 };
+/* La graduatoria: una sola definizione per tutte le query, così «chi è in
+   classifica» è scritto in un posto solo. Chi è fuori: i ritirati e chi ha
+   una sanzione attiva — la sanzione non è una nota in un registro, è una cosa
+   che si vede. */
+const IN_CLASSIFICA = `a.ritirato IS NULL
+  AND NOT EXISTS (SELECT 1 FROM sanzione s WHERE s.account_id = a.account_id
+    AND s.tipo IN ('fuori_classifica','sospensione')
+    AND (s.a IS NULL OR s.a > CAST(strftime('%s','now') AS INTEGER) * 1000))`;
 const GRADUATORIA = `WITH grad AS (
-  SELECT id, row_number() OVER (ORDER BY stream DESC, creato) AS pos
-  FROM artista WHERE ritirato IS NULL )`;
+  SELECT a.id, row_number() OVER (ORDER BY a.stream DESC, a.creato) AS pos
+  FROM artista a WHERE ${IN_CLASSIFICA} )`;
 
 function classifica(da, quanti, ioId){
   const prec = ultimaChiusa();
@@ -175,7 +183,7 @@ function intorno(id, raggio){
 const artistaGrezzo = id => A.uno("SELECT * FROM artista WHERE id = ?", id);
 const nomeLibero = (nome, tranne) => !A.uno(
   "SELECT id FROM artista WHERE lower(nome) = lower(?) AND ritirato IS NULL AND id <> ?", nome, tranne || "");
-const quantiArtisti = () => A.uno("SELECT count(*) n FROM artista WHERE ritirato IS NULL").n;
+const quantiArtisti = () => A.uno("SELECT count(*) n FROM artista a WHERE " + IN_CLASSIFICA).n;
 const artistiDi = accountId => A.tutti(
   "SELECT id FROM artista WHERE account_id = ? AND ritirato IS NULL", accountId)
   .map(r => schedaConPosizione(r.id, r.id));
@@ -228,10 +236,43 @@ function segnaPunteggio(id, d, ipHash){
     if(limato) segnaSospetto(id, "salto", { chiesto, tetto });
     return s;
   });
+  /* Chi ha una sanzione «fuori classifica» continua a giocare e il punteggio
+     si salva lo stesso: solo, in graduatoria non c'è. Quindi qui la scheda può
+     non tornare, e non è un errore — è la sanzione che funziona. */
   const mia = schedaConPosizione(id, id);
-  return { ok: true, pos: mia.pos, delta: mia.delta, totale: quantiArtisti(),
-    settimana: set, limato };
+  return { ok: true, pos: mia ? mia.pos : null, delta: mia ? mia.delta : null,
+    fuoriClassifica: !mia, totale: quantiArtisti(), settimana: set, limato };
 }
+
+/* ==================== SANZIONI E SOSPETTI ====================
+   Regola: **fuori dalla classifica prima della sospensione**. Chi bara sparisce
+   dalla graduatoria pubblica ma continua a giocare la sua partita — nel dubbio
+   è la punizione giusta: se ci siamo sbagliati non abbiamo tolto il gioco a un
+   cliente che l'ha pagato. */
+const TIPI_SANZIONE = ["avviso", "fuori_classifica", "sospensione"];
+function sanziona(accountId, tipo, motivo, giorni){
+  if(TIPI_SANZIONE.indexOf(tipo) < 0) return null;
+  if(!accountId || !A.uno("SELECT id FROM account WHERE id = ?", accountId)) return null;
+  const fino = giorni > 0 ? ora() + giorni * 86400e3 : null;
+  A.fai("INSERT INTO sanzione (account_id, tipo, motivo, da, a, deciso_da) VALUES (?,?,?,?,?,?)",
+    accountId, tipo, motivo, ora(), fino, "a mano");
+  return { ok: true, tipo, motivo, fino };
+}
+const sanzioneAttiva = accountId => accountId ? A.uno(
+  `SELECT tipo, motivo, a FROM sanzione WHERE account_id = ? AND tipo <> 'avviso'
+     AND (a IS NULL OR a > ?)
+   ORDER BY CASE tipo WHEN 'sospensione' THEN 0 ELSE 1 END, id DESC LIMIT 1`,
+  accountId, ora()) : null;
+const togliSanzioni = accountId =>
+  A.fai("UPDATE sanzione SET a = ? WHERE account_id = ? AND (a IS NULL OR a > ?)", ora(), accountId, ora());
+
+/* Chi ha fatto alzare un sopracciglio, dal più recente: è la lista da cui si
+   guarda a mano prima di sanzionare qualcuno. */
+const sospetti = quanti => A.tutti(
+  `SELECT s.id, s.artista_id, a.nome, a.account_id, s.tipo, s.dettaglio, s.peso, s.creato
+   FROM sospetto s JOIN artista a ON a.id = s.artista_id
+   ORDER BY s.id DESC LIMIT ?`, quanti).map(r =>
+     Object.assign(r, { dettaglio: (() => { try{ return JSON.parse(r.dettaglio); }catch(e){ return {}; } })() }));
 
 const segnaSospetto = (id, tipo, dettaglio) =>
   A.fai("INSERT INTO sospetto (artista_id, tipo, dettaglio, creato) VALUES (?,?,?,?)",
@@ -314,10 +355,21 @@ function giroSettimana(){
     }
     A.fai("DELETE FROM notizia WHERE id NOT IN (SELECT id FROM notizia ORDER BY id DESC LIMIT 400)");
 
+    manutenzione();
     scriviStato("prossimo_giro", ora() + CFG.settimanaMs);
     return notizie.length;
   });
 }
+/* La pulizia settimanale: le sessioni che nessuno usa più si chiudono (un
+   gettone che vive per sempre è un gettone che prima o poi finisce in mano a
+   qualcun altro), e i sospetti vecchi si buttano — dopo sei mesi non dicono
+   più niente su nessuno. */
+function manutenzione(){
+  const novanta = ora() - 90 * 86400e3;
+  A.fai("UPDATE dispositivo SET revocato = ? WHERE revocato IS NULL AND visto < ?", ora(), novanta);
+  A.fai("DELETE FROM sospetto WHERE creato < ?", ora() - 180 * 86400e3);
+}
+
 const tipoNotizia = t => /è uscito/.test(t) ? "uscita" : /firmato/.test(t) ? "firma"
   : /sparito/.test(t) ? "sparizione" : /smesso/.test(t) ? "ritiro" : "ingresso";
 
@@ -484,6 +536,7 @@ module.exports = {
   apri, chiudi, stato, leggiStato, scriviStato,
   classifica, intorno, schedaConPosizione, artistaGrezzo, nomeLibero, artistiDi,
   iscriviArtista, aggiornaArtista, segnaPunteggio, segnaSospetto,
+  sanziona, sanzioneAttiva, togliSanzioni, sospetti, manutenzione,
   giroSettimana, assicuraSettimana, settimanaCorrente, notizie,
   creaAccount, account, collegaIdentita, entra, apriSessione, sessione, chiudiSessione,
   cancellaAccount, impasta, combacia, sha,

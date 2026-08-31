@@ -602,10 +602,30 @@ cambia l'energia a 100 e anche tutto ciò ce ne deriva da questo cambiamento, tu
    - **La cancellazione dell'account c'è** e fa la cosa giusta: l'artista resta in
      classifica senza nome e senza padrone (la storia degli altri non si sfonda), spariscono
      salvataggi, identità, dispositivi e la mail. Serve `{"conferma":"cancella"}`.
-   - **Steam, Apple e Google sono una porta chiusa, non una porta finta**: le rotte li
-     accettano e rispondono **501** finché non c'è il pezzo che verifica il biglietto
-     firmato da loro. Accettare un id di Steam senza verificarlo vorrebbe dire far entrare
-     chiunque come chiunque. Si collega insieme al guscio nativo (punto 2 della lista).
+   - **Steam, Apple e Google: la verifica c'è** (`backend/accessi.js`, fatta il 01/09/2026
+     poco dopo). Apple e Google mandano un token firmato RS256 e lo controlliamo contro le
+     loro chiavi pubbliche — firma, emittente, destinatario, scadenza; Steam manda un
+     biglietto e lo fa verificare a Steamworks. Tutto con Node e basta.
+     **Mancano solo le chiavi**, che si prendono quando l'app è registrata sugli store: se
+     una chiave non c'è quel canale risponde `501` e dice quale manca, se il biglietto è
+     sbagliato risponde `403`. Non c'è nessun caso in cui si entra senza verifica.
+     Provato davvero: la prova si fa una coppia di chiavi sua, mette in piedi un finto
+     «appleid.apple.com» e controlla che un biglietto buono entri e uno firmato da un altro,
+     scaduto o fatto per un altro gioco no.
+   - **Chi bara: sospetti e sanzioni.** Ogni punteggio limato lascia un sospetto; da
+     `GET /api/sospetti` si guarda a mano e si decide. Tre sanzioni, e la regola è
+     **fuori dalla classifica prima della sospensione**: chi è fuori classifica sparisce
+     dalla graduatoria ma **continua a giocare la sua partita** — nel dubbio è la punizione
+     giusta, se ci siamo sbagliati non abbiamo tolto il gioco a un cliente che l'ha pagato.
+   - **La copia di sicurezza**: `npm run copia`, anche a server acceso (`VACUUM INTO`), che
+     tiene le ultime trenta e controlla che la copia si apra. Con dentro account e
+     salvataggi, questa è la cosa più importante di tutto il backend.
+   - **Provato in Chrome** (01/09/2026), col gioco vero e il server acceso: iscrizione,
+     punteggio, «sei 88° su 141» con i bot sopra e sotto, salvataggio in cloud e riletto,
+     conflitto rifiutato, traguardo, e la storia che conta — account legato a una mail,
+     browser svuotato come se fosse un telefono nuovo, rientro con la mail e **carriera
+     ritrovata**. Poi la cancellazione dell'account, e col server spento il gioco che tira
+     dritto senza un errore in console.
 
 36. L'interfaccia sul telefono: la plancia e' disegnata a 1536x1024 e scalata, in verticale non ci sta. Disposizione sua, aree da toccare da 44 punti, niente hover, testi leggibili senza zoom. E' il lavoro piu' lungo dei cinque.
 

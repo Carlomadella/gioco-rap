@@ -23,6 +23,8 @@
      ADF_ADMIN        chiave per le rotte di servizio (se vuota, sono chiuse)
      ADF_SALE         sale per gli hash degli indirizzi IP
      ADF_INVIO_MS     quanto passa fra due punteggi dello stesso artista (10000)
+     ADF_PROXY        1 se davanti c'e' un reverse proxy nostro (legge x-forwarded-for)
+   Per entrare con Steam, Apple e Google servono le loro chiavi: vedi accessi.js.
 */
 "use strict";
 
@@ -31,6 +33,7 @@ const path = require("path");
 const crypto = require("crypto");
 const archivio = require("./database/archivio.js");
 const { GENERI, CITTA, STORIE, scegli } = require("./nomi.js");
+const accessi = require("./accessi.js");
 
 const CFG = {
   porta: Number(process.env.ADF_PORTA || 8787),
@@ -42,7 +45,11 @@ const CFG = {
   sale: process.env.ADF_SALE || "anni-di-fame",
   /* quanto deve passare fra due punteggi dello stesso artista: in prova si
      mette a zero, in casa e online resta com'è */
-  invioMs: Math.max(0, Number(process.env.ADF_INVIO_MS != null ? process.env.ADF_INVIO_MS : 10000))
+  invioMs: Math.max(0, Number(process.env.ADF_INVIO_MS != null ? process.env.ADF_INVIO_MS : 10000)),
+  /* dietro a un reverse proxy l'indirizzo di chi chiama e' quello del proxy:
+     x-forwarded-for si legge SOLO se siamo noi ad averlo messo davanti, se no
+     chiunque puo' scriverci dentro quello che vuole e saltare i freni */
+  dietroProxy: process.env.ADF_PROXY === "1"
 };
 
 archivio.apri(CFG);
@@ -59,7 +66,14 @@ function nomePulito(v, quanto){
   return s.length >= 2 ? s : "";
 }
 const UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
-const ipHash = req => archivio.sha(CFG.sale + "|" + (req.socket.remoteAddress || "?")).slice(0, 32);
+function indirizzo(req){
+  if(CFG.dietroProxy){
+    const avanti = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
+    if(avanti) return avanti;
+  }
+  return req.socket.remoteAddress || "?";
+}
+const ipHash = req => archivio.sha(CFG.sale + "|" + indirizzo(req)).slice(0, 32);
 
 /* ==================== FRENI ==================== */
 const bussate = new Map();
@@ -103,12 +117,16 @@ function corpo(req){
 /* ==================== CHI SEI ==================== */
 const chi = req => archivio.sessione(req.headers["x-sessione"] || "");
 
-/* Steam, Apple e Google mandano un biglietto firmato da loro, che va verificato
-   con le loro API prima di dare un account a qualcuno. Finché quel pezzo non
-   c'è, questa è una **porta chiusa, non una porta finta**: accettare un id di
-   Steam senza verificarlo vorrebbe dire far entrare chiunque come chiunque. */
-function verificaBiglietto(tipo, biglietto){
-  return null;                                    // da collegare con Steamworks / Apple / Google
+/* Steam, Apple e Google mandano un biglietto firmato da loro: la verifica sta
+   in `accessi.js`. Qui si traduce la risposta in un errore HTTP che dice la
+   verità — `501` se siamo noi a non avere le chiavi, `403` se il biglietto è
+   sbagliato. Non c'è nessun caso in cui si entra senza verifica. */
+async function conBiglietto(res, tipo, biglietto){
+  const r = await accessi.verifica(tipo, biglietto);
+  if(r.id) return r.id;
+  if(r.chiuso){ male(res, 501, "accesso-non-ancora-collegato", { nota: r.chiuso }); return null; }
+  male(res, 403, r.no || "biglietto-rifiutato");
+  return null;
 }
 
 /* Il vecchio modo di farsi riconoscere: id dell'artista + chiave, come prima
@@ -134,7 +152,8 @@ async function rotta(req, res, url){
   /* ---------- il mondo ---------- */
   if(M("GET", "/api/stato")){
     const s = archivio.stato();
-    return invia(res, 200, Object.assign({ ok: true, settimanaOre: CFG.settimanaMs / 3600e3 }, s));
+    return invia(res, 200, Object.assign({ ok: true, settimanaOre: CFG.settimanaMs / 3600e3,
+      accessi: accessi.collegati() }, s));
   }
 
   if(M("GET", "/api/notizie")){
@@ -157,10 +176,10 @@ async function rotta(req, res, url){
     } else if(tipo === "ospite"){
       idEsterno = crypto.randomUUID();
     } else {
-      const verificato = verificaBiglietto(tipo, b.biglietto);
-      if(!verificato) return male(res, 501, "accesso-non-ancora-collegato",
-        { nota: "Steam, Apple e Google si collegano quando c'è il guscio nativo" });
-      idEsterno = verificato;
+      idEsterno = await conBiglietto(res, tipo, b.biglietto);
+      if(!idEsterno) return;                        // la risposta l'ha già mandata conBiglietto
+      const gia = archivio.entra(tipo, idEsterno, null);
+      if(gia) return invia(res, 200, { account: gia, token: archivio.apriSessione(gia.id, b.dispositivo) });
     }
 
     const acc = archivio.creaAccount({ tipo, idEsterno, segreto: b.segreto, email: tipo === "email" ? idEsterno : null });
@@ -181,9 +200,9 @@ async function rotta(req, res, url){
         token: archivio.apriSessione(a.account_id, b.dispositivo) });
     }
     if(["steam", "apple", "google"].indexOf(b.tipo) >= 0){
-      const verificato = verificaBiglietto(b.tipo, b.biglietto);
-      if(!verificato) return male(res, 501, "accesso-non-ancora-collegato");
-      const acc = archivio.entra(b.tipo, verificato, null);
+      const idEsterno = await conBiglietto(res, b.tipo, b.biglietto);
+      if(!idEsterno) return;
+      const acc = archivio.entra(b.tipo, idEsterno, null);
       if(!acc) return male(res, 404, "account-sconosciuto");
       return invia(res, 200, { account: acc, token: archivio.apriSessione(acc.id, b.dispositivo) });
     }
@@ -282,6 +301,9 @@ async function rotta(req, res, url){
     const a = artistaMio(req, id);
     if(!a) return male(res, 403, "non-e-tuo");
     if(Date.now() - (a.punteggio || 0) < CFG.invioMs) return male(res, 429, "troppo-in-fretta");
+    const sanzione = archivio.sanzioneAttiva(a.account_id);
+    if(sanzione && sanzione.tipo === "sospensione")
+      return male(res, 403, "account-sospeso", { motivo: sanzione.motivo });
     const r = archivio.segnaPunteggio(id, {
       stream: b.stream, fan: nInt(b.fan, 0, 5e7, null), livello: nInt(b.livello, 1, 60, null),
       fase: nInt(b.fase, 0, 8, null), uscite: nInt(b.uscite, 0, 5000, null), deal: b.deal,
@@ -350,6 +372,19 @@ async function rotta(req, res, url){
     return invia(res, 200, { ok: true, settimana: archivio.settimanaCorrente(), notizie: quante });
   }
 
+  if(M("GET", "/api/sospetti")){
+    if(!admin()) return male(res, 403, "non-sei-tu");
+    return invia(res, 200, { sospetti: archivio.sospetti(nInt(q.get("quanti"), 1, 200, 50)) });
+  }
+
+  if(M("POST", "/api/sanzione")){
+    if(!admin()) return male(res, 403, "non-sei-tu");
+    const b = await corpo(req);
+    const r = archivio.sanziona(String(b.accountId || ""), String(b.tipo || ""),
+      nomePulito(b.motivo, 200) || "nessun motivo scritto", nInt(b.giorni, 0, 3650, 0));
+    return r ? invia(res, 200, r) : male(res, 400, "sanzione-non-valida");
+  }
+
   if(M("GET", "/api/da-spingere")){
     if(!admin()) return male(res, 403, "non-sei-tu");
     return invia(res, 200, { traguardi: archivio.daSpingere() });
@@ -382,7 +417,7 @@ const server = http.createServer((req, res) => {
     return res.end();
   }
 
-  if(troppe(req.socket.remoteAddress || "?")) return male(res, 429, "troppe-richieste");
+  if(troppe(indirizzo(req))) return male(res, 429, "troppe-richieste");
 
   let url;
   try{ url = new URL(req.url, "http://" + (req.headers.host || "localhost")); }

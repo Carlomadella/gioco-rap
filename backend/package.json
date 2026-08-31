@@ -8,7 +8,8 @@
   "scripts": {
     "start": "node server.js",
     "prova": "node prova.js",
-    "travaso": "node database/travaso.js"
+    "travaso": "node database/travaso.js",
+    "copia": "node database/copia.js"
   },
   "engines": {
     "node": ">=22.5"

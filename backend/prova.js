@@ -11,12 +11,16 @@
    Esce con 0 se fila tutto liscio, con 1 al primo controllo che non torna. */
 "use strict";
 
-const { spawn } = require("child_process");
+const { spawn, spawnSync } = require("child_process");
 const path = require("path");
 const fs = require("fs");
 const os = require("os");
+const http = require("http");
+const crypto = require("crypto");
 
 const PORTA = 8799;
+const PORTA_CHIAVI = 8798;                       // il finto Apple che pubblica le sue chiavi
+const AUD = "it.lafame.annidifame";
 const BASE = "http://127.0.0.1:" + PORTA;
 const ADMIN = "prova-" + Math.random().toString(16).slice(2);
 const FILE = path.join(os.tmpdir(), "adf-prova-" + Date.now() + ".db");
@@ -36,6 +40,43 @@ const chiama = async (rotta, o = {}) => {
 };
 const conSessione = t => ({ "x-sessione": t });
 
+/* Un finto «Apple»: una coppia di chiavi, un banchetto che pubblica quella
+   pubblica, e la possibilità di firmare biglietti. Serve a provare sul serio
+   la verifica della firma — che è l'unica cosa che sta fra noi e chiunque
+   dica di essere chiunque. */
+function fintoApple(){
+  const coppia = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 });
+  const altra = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 });
+  const kid = "prova-1";
+  const jwk = Object.assign(coppia.publicKey.export({ format: "jwk" }),
+    { kid, alg: "RS256", use: "sig" });
+
+  const banchetto = http.createServer((req, res) => {
+    res.writeHead(200, { "content-type": "application/json" });
+    res.end(JSON.stringify({ keys: [jwk] }));
+  }).listen(PORTA_CHIAVI);
+
+  const b64 = o => Buffer.from(JSON.stringify(o)).toString("base64url");
+  function firma(corpo, chiave, testa){
+    const t = b64(Object.assign({ alg: "RS256", kid }, testa || {}));
+    const c = b64(corpo);
+    const f = crypto.sign("RSA-SHA256", Buffer.from(t + "." + c), chiave || coppia.privateKey);
+    return t + "." + c + "." + f.toString("base64url");
+  }
+  const adesso = () => Math.floor(Date.now() / 1000);
+  return {
+    banchetto, altra,
+    buono: sub => firma({ iss: "https://appleid.apple.com", aud: AUD, sub,
+      iat: adesso(), exp: adesso() + 600 }),
+    scaduto: sub => firma({ iss: "https://appleid.apple.com", aud: AUD, sub,
+      iat: adesso() - 7200, exp: adesso() - 3600 }),
+    altrui: sub => firma({ iss: "https://appleid.apple.com", aud: AUD, sub,
+      iat: adesso(), exp: adesso() + 600 }, altra.privateKey),
+    perAltri: sub => firma({ iss: "https://appleid.apple.com", aud: "un.altro.gioco", sub,
+      iat: adesso(), exp: adesso() + 600 })
+  };
+}
+
 async function aspettaCheRisponda(figlio){
   for(let i = 0; i < 60; i++){
     if(figlio.exitCode != null) throw new Error("il server è morto prima di rispondere");
@@ -46,10 +87,13 @@ async function aspettaCheRisponda(figlio){
 }
 
 (async () => {
+  let apple = null;
+  apple = fintoApple();
   const figlio = spawn(process.execPath, [path.join(__dirname, "server.js")], {
     env: Object.assign({}, process.env, {
       ADF_PORTA: String(PORTA), ADF_BOT: "40", ADF_ADMIN: ADMIN, ADF_DATI: FILE,
-      ADF_INVIO_MS: "0"
+      ADF_INVIO_MS: "0",
+      ADF_APPLE_AUD: AUD, ADF_APPLE_JWKS: "http://127.0.0.1:" + PORTA_CHIAVI + "/chiavi"
     }),
     stdio: ["ignore", "pipe", "inherit"]
   });
@@ -205,6 +249,75 @@ async function aspettaCheRisponda(figlio){
       corpo: { tipo: "email", email: "prova@esempio.it", segreto: "unasegretalunga" } });
     controlla("e non si rientra con la vecchia mail", rientro.stato === 403);
 
+    console.log("\nentrare con Apple (biglietto firmato)");
+    const conApple = await chiama("/api/account", { metodo: "POST",
+      corpo: { tipo: "apple", biglietto: apple.buono("000123.abcdef") } });
+    controlla("con un biglietto firmato bene si entra", conApple.stato === 201 && conApple.dati.token, conApple.dati);
+    const dinuovo = await chiama("/api/account", { metodo: "POST",
+      corpo: { tipo: "apple", biglietto: apple.buono("000123.abcdef") } });
+    controlla("la seconda volta ritrova l'account di prima, non ne fa un altro",
+      dinuovo.stato === 200 && dinuovo.dati.account.id === conApple.dati.account.id, dinuovo.dati);
+    const firmaAltrui = await chiama("/api/account", { metodo: "POST",
+      corpo: { tipo: "apple", biglietto: apple.altrui("000999.xxx") } });
+    controlla("un biglietto firmato con un'altra chiave viene buttato", firmaAltrui.stato === 403, firmaAltrui.dati);
+    const scaduto = await chiama("/api/account", { metodo: "POST",
+      corpo: { tipo: "apple", biglietto: apple.scaduto("000123.abcdef") } });
+    controlla("un biglietto scaduto viene buttato", scaduto.stato === 403);
+    const altrove = await chiama("/api/account", { metodo: "POST",
+      corpo: { tipo: "apple", biglietto: apple.perAltri("000123.abcdef") } });
+    controlla("un biglietto fatto per un altro gioco viene buttato", altrove.stato === 403);
+    const senzaChiavi = await chiama("/api/account", { metodo: "POST",
+      corpo: { tipo: "google", biglietto: "qualsiasi" } });
+    controlla("Google, che non abbiamo collegato, dice 501 e non 403", senzaChiavi.stato === 501, senzaChiavi.dati);
+    const quali = await chiama("/api/stato");
+    controlla("lo stato dice quali accessi sono collegati",
+      quali.dati.accessi && quali.dati.accessi.apple === true && quali.dati.accessi.steam === false, quali.dati.accessi);
+
+    console.log("\ni sospetti e le sanzioni");
+    const visti = await chiama("/api/sospetti", { testate: { "x-admin": ADMIN } });
+    controlla("il salto da quaranta milioni ha lasciato un sospetto",
+      visti.dati.sospetti.length >= 1 && visti.dati.sospetti[0].tipo === "salto", visti.dati.sospetti[0]);
+    const nascosti = await chiama("/api/sospetti");
+    controlla("i sospetti non li vede chi passa di lì", nascosti.stato === 403);
+
+    const iomio = await chiama("/api/io", { testate: conSessione(sess1) });
+    const contoMio = iomio.dati.account.id;
+    const primaDiSanzione = await chiama("/api/classifica?quanti=60");
+    const c1 = primaDiSanzione.dati.righe.filter(r => r.id === io1).length;
+    const sanzione = await chiama("/api/sanzione", { metodo: "POST", testate: { "x-admin": ADMIN },
+      corpo: { accountId: contoMio, tipo: "fuori_classifica", motivo: "numeri impossibili", giorni: 7 } });
+    controlla("una sanzione si mette", sanzione.stato === 200, sanzione.dati);
+    const dopoSanzione = await chiama("/api/classifica?quanti=60");
+    controlla("chi è fuori classifica sparisce dalla graduatoria",
+      c1 === 1 && dopoSanzione.dati.righe.filter(r => r.id === io1).length === 0);
+    controlla("e il totale cala di uno", dopoSanzione.dati.totale === primaDiSanzione.dati.totale - 1,
+      { prima: primaDiSanzione.dati.totale, dopo: dopoSanzione.dati.totale });
+    const puoAncora = await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sess1),
+      corpo: { id: io1, stream: 60001 } });
+    controlla("ma continua a giocare la sua partita (fuori classifica non è un ban)",
+      puoAncora.stato === 200, puoAncora.dati);
+    const sospeso = await chiama("/api/sanzione", { metodo: "POST", testate: { "x-admin": ADMIN },
+      corpo: { accountId: contoMio, tipo: "sospensione", motivo: "recidivo", giorni: 1 } });
+    controlla("una sospensione si mette", sospeso.stato === 200);
+    const bloccato = await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sess1),
+      corpo: { id: io1, stream: 60002 } });
+    controlla("da sospeso non si manda più niente", bloccato.stato === 403, bloccato.dati);
+
+    console.log("\nla copia di sicurezza");
+    const dove = FILE.replace(/\.db$/, "-copia.db");
+    const copia = spawnSync(process.execPath, [path.join(__dirname, "database", "copia.js"), FILE, dove],
+      { encoding: "utf8" });
+    controlla("la copia si fa a server acceso", copia.status === 0, (copia.stderr || "").slice(0, 200));
+    controlla("e il file c'è", fs.existsSync(dove));
+    if(fs.existsSync(dove)){
+      const { DatabaseSync } = require("node:sqlite");
+      const c = new DatabaseSync(dove, { readOnly: true });
+      const dentro = c.prepare("SELECT count(*) n FROM artista").get().n;
+      c.close();
+      controlla("con dentro gli artisti", dentro > 40, dentro);
+      fs.unlinkSync(dove);
+    }
+
     console.log("\nil database");
     controlla("il file del database esiste", fs.existsSync(FILE));
     const { DatabaseSync } = require("node:sqlite");
@@ -229,6 +342,7 @@ async function aspettaCheRisponda(figlio){
     console.log("\n  esploso: " + (e && e.stack || e));
   }finally{
     figlio.kill();
+    try{ apple.banchetto.close(); }catch(e){}
     for(const f of [FILE, FILE + "-wal", FILE + "-shm"]) try{ fs.unlinkSync(f); }catch(e){}
   }
 
