@@ -1,22 +1,28 @@
-/* Anni di Fame — il server della classifica (punto 30 di implementazioni.md).
+/* Anni di Fame — il server (punti 30, 35, 37 di implementazioni.md).
 
-   Cosa fa: tiene una classifica sola per tutti. Dentro ci stanno i giocatori
-   veri e i bot, mescolati, e da fuori non si distinguono — è il punto: la
-   classifica dev'essere piena dal primo giorno, e nessuno deve accorgersi di
-   quando i numeri li fa una macchina.
+   Tiene tre cose:
+   - **la classifica**, una sola per tutti, con dentro i giocatori veri e i bot
+     mescolati e indistinguibili;
+   - **gli account**, perché su Steam e sugli store del telefono la gente
+     reinstalla, cambia telefono e pretende — giustamente — di ritrovare la
+     propria roba;
+   - **i salvataggi in cloud**, che è quello che porta una carriera dal PC al
+     telefono.
 
-   Come il resto del progetto: nessuna dipendenza, nessun passaggio di build.
-   Solo Node.
+   Sotto c'è SQLite (`database/`), senza niente da installare. Il server non sa
+   che database sia: parla solo con `database/archivio.js`.
 
-     node backend/server.js
+     npm start
 
-   Manopole (variabili d'ambiente, tutte con un valore sensato di suo):
+   Manopole (tutte con un valore sensato di suo):
      ADF_PORTA        porta di ascolto              (8787)
-     ADF_DATI         file dell'archivio            (backend/database/dati/classifica.json)
+     ADF_DATI         file del database             (backend/database/dati/classifica.db)
      ADF_BOT          quanti bot tenere in pista    (140)
      ADF_SETTIMANA_H  ore vere di una settimana     (24)
      ADF_ORIGINI      CORS: * oppure lista di origini separate da virgola
-     ADF_ADMIN        chiave per forzare un giro di settimana (se vuota, non si può)
+     ADF_ADMIN        chiave per le rotte di servizio (se vuota, sono chiuse)
+     ADF_SALE         sale per gli hash degli indirizzi IP
+     ADF_INVIO_MS     quanto passa fra due punteggi dello stesso artista (10000)
 */
 "use strict";
 
@@ -24,51 +30,39 @@ const http = require("http");
 const path = require("path");
 const crypto = require("crypto");
 const archivio = require("./database/archivio.js");
-const { idNuovo } = require("./bot.js");
-const { CITTA, GENERI, STORIE, scegli } = require("./nomi.js");
+const { GENERI, CITTA, STORIE, scegli } = require("./nomi.js");
 
 const CFG = {
   porta: Number(process.env.ADF_PORTA || 8787),
-  file: process.env.ADF_DATI || path.join(__dirname, "database", "dati", "classifica.json"),
+  file: process.env.ADF_DATI || path.join(__dirname, "database", "dati", "classifica.db"),
   quantiBot: Math.max(0, Number(process.env.ADF_BOT || 140)),
   settimanaMs: Math.max(1, Number(process.env.ADF_SETTIMANA_H || 24)) * 3600e3,
   origini: process.env.ADF_ORIGINI || "*",
-  admin: process.env.ADF_ADMIN || ""
+  admin: process.env.ADF_ADMIN || "",
+  sale: process.env.ADF_SALE || "anni-di-fame",
+  /* quanto deve passare fra due punteggi dello stesso artista: in prova si
+     mette a zero, in casa e online resta com'è */
+  invioMs: Math.max(0, Number(process.env.ADF_INVIO_MS != null ? process.env.ADF_INVIO_MS : 10000))
 };
 
-const DATI = archivio.carica(CFG.file, CFG.quantiBot, CFG.settimanaMs);
+archivio.apri(CFG);
 
 /* ==================== ATTREZZI ==================== */
-const sha = s => crypto.createHash("sha256").update(String(s)).digest("hex");
 const nInt = (v, min, max, dif) => {
   const n = Number(v);
   return Number.isFinite(n) ? Math.min(max, Math.max(min, Math.round(n))) : dif;
 };
-/* nome d'arte: niente righe intere, niente caratteri invisibili, niente vuoto */
 const INVISIBILI = /[\u0000-\u001f\u007f\u200b-\u200f\u2028\u2029\ufeff]/g;
-function nomePulito(v){
-  const s = String(v == null ? "" : v).replace(INVISIBILI, "")
-    .replace(/\s+/g, " ").trim().slice(0, 22);
+function nomePulito(v, quanto){
+  const s = String(v == null ? "" : v).replace(INVISIBILI, "").replace(/\s+/g, " ").trim()
+    .slice(0, quanto || 22);
   return s.length >= 2 ? s : "";
 }
-const nomeLibero = (nome, tranne) => !Object.values(DATI.artisti)
-  .some(a => a.id !== tranne && a.nome.toLowerCase() === nome.toLowerCase());
-
-/* Quello che il mondo può vedere di un artista. Qui dentro non passano mai
-   né la chiave né il fatto che sia un bot: la seconda cosa è una regola di
-   gioco, non una svista. */
-function riga(a, ioId){
-  const d = (a.posPrec && a.pos) ? a.posPrec - a.pos : null;
-  return {
-    id: a.id, pos: a.pos, nome: a.nome, citta: a.citta, genere: a.genere,
-    stream: a.stream, delta: d, uscite: a.uscite || 0, deal: !!a.deal,
-    ultima: a.ultima || null, seed: a.seed || 0, storia: a.storia || "",
-    io: ioId ? a.id === ioId : false
-  };
-}
+const UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+const ipHash = req => archivio.sha(CFG.sale + "|" + (req.socket.remoteAddress || "?")).slice(0, 32);
 
 /* ==================== FRENI ==================== */
-const bussate = new Map();                                   // ip -> {t, n}
+const bussate = new Map();
 function troppe(ip){
   const ora = Date.now(), b = bussate.get(ip);
   if(!b || ora - b.t > 60e3){ bussate.set(ip, { t: ora, n: 1 }); return false; }
@@ -97,148 +91,275 @@ function corpo(req){
     let dato = "", troppo = false;
     req.on("data", c => {
       dato += c;
-      if(dato.length > 16384 && !troppo){ troppo = true; no(new Error("corpo troppo grande")); req.destroy(); }
+      /* i salvataggi in cloud sono più grossi di una richiesta normale: il
+         tetto vero (2 MB) lo mette l'archivio, qui si tiene largo ma finito */
+      if(dato.length > 3e6 && !troppo){ troppo = true; no(new Error("corpo troppo grande")); req.destroy(); }
     });
     req.on("end", () => { if(troppo) return; try{ ok(dato ? JSON.parse(dato) : {}); }catch(e){ no(new Error("json non valido")); } });
     req.on("error", no);
   });
 }
 
+/* ==================== CHI SEI ==================== */
+const chi = req => archivio.sessione(req.headers["x-sessione"] || "");
+
+/* Steam, Apple e Google mandano un biglietto firmato da loro, che va verificato
+   con le loro API prima di dare un account a qualcuno. Finché quel pezzo non
+   c'è, questa è una **porta chiusa, non una porta finta**: accettare un id di
+   Steam senza verificarlo vorrebbe dire far entrare chiunque come chiunque. */
+function verificaBiglietto(tipo, biglietto){
+  return null;                                    // da collegare con Steamworks / Apple / Google
+}
+
+/* Il vecchio modo di farsi riconoscere: id dell'artista + chiave, come prima
+   degli account. Resta acceso perché i client già in giro continuino a
+   funzionare — e perché da lì ci si può prendere una sessione vera. */
+function artistaMio(req, id){
+  const s = chi(req);
+  const a = archivio.artistaGrezzo(id);
+  if(!a || a.bot || a.ritirato) return null;
+  if(s && a.account_id && a.account_id === s.account.id) return a;
+  const chiave = req.headers["x-chiave"] || "";
+  if(chiave && a.chiave_hash && a.chiave_hash === archivio.sha(chiave)) return a;
+  return null;
+}
+
 /* ==================== LE ROTTE ==================== */
 async function rotta(req, res, url){
   const p = url.pathname.replace(/\/+$/, "") || "/";
   const q = url.searchParams;
+  const M = (metodo, schema) => req.method === metodo && new RegExp("^" + schema + "$").test(p);
+  const pezzo = i => p.split("/")[i];
 
-  /* com'è messo il server e quanto manca al prossimo giro di settimana */
-  if(req.method === "GET" && p === "/api/stato"){
-    const tutti = Object.values(DATI.artisti);
+  /* ---------- il mondo ---------- */
+  if(M("GET", "/api/stato")){
+    const s = archivio.stato();
+    return invia(res, 200, Object.assign({ ok: true, settimanaOre: CFG.settimanaMs / 3600e3 }, s));
+  }
+
+  if(M("GET", "/api/notizie")){
+    return invia(res, 200, { settimana: archivio.settimanaCorrente(),
+      notizie: archivio.notizie(nInt(q.get("quante"), 1, 60, 10)) });
+  }
+
+  /* ---------- account e sessioni ---------- */
+  if(M("POST", "/api/account")){
+    const b = await corpo(req);
+    const tipo = ["ospite", "email", "steam", "apple", "google"].indexOf(b.tipo) >= 0 ? b.tipo : "ospite";
+    let idEsterno = null;
+
+    if(tipo === "email"){
+      const email = String(b.email || "").trim().toLowerCase();
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return male(res, 400, "email-non-valida");
+      if(String(b.segreto || "").length < 8) return male(res, 400, "segreto-troppo-corto");
+      if(archivio.entra("email", email, b.segreto)) return male(res, 409, "email-gia-usata");
+      idEsterno = email;
+    } else if(tipo === "ospite"){
+      idEsterno = crypto.randomUUID();
+    } else {
+      const verificato = verificaBiglietto(tipo, b.biglietto);
+      if(!verificato) return male(res, 501, "accesso-non-ancora-collegato",
+        { nota: "Steam, Apple e Google si collegano quando c'è il guscio nativo" });
+      idEsterno = verificato;
+    }
+
+    const acc = archivio.creaAccount({ tipo, idEsterno, segreto: b.segreto, email: tipo === "email" ? idEsterno : null });
+    const token = archivio.apriSessione(acc.id, b.dispositivo);
+    return invia(res, 201, { account: acc, identita: { tipo, idEsterno: tipo === "ospite" ? idEsterno : undefined }, token });
+  }
+
+  if(M("POST", "/api/sessione")){
+    const b = await corpo(req);
+    /* dal vecchio mondo: chi ha ancora solo id artista + chiave si prende una
+       sessione vera senza perdere niente */
+    if(b.tipo === "legacy"){
+      const a = archivio.artistaGrezzo(String(b.artistaId || ""));
+      if(!a || !a.chiave_hash || a.chiave_hash !== archivio.sha(b.chiave || ""))
+        return male(res, 403, "chiave-sbagliata");
+      if(!a.account_id) return male(res, 409, "artista-senza-account");
+      return invia(res, 200, { account: archivio.account(a.account_id),
+        token: archivio.apriSessione(a.account_id, b.dispositivo) });
+    }
+    if(["steam", "apple", "google"].indexOf(b.tipo) >= 0){
+      const verificato = verificaBiglietto(b.tipo, b.biglietto);
+      if(!verificato) return male(res, 501, "accesso-non-ancora-collegato");
+      const acc = archivio.entra(b.tipo, verificato, null);
+      if(!acc) return male(res, 404, "account-sconosciuto");
+      return invia(res, 200, { account: acc, token: archivio.apriSessione(acc.id, b.dispositivo) });
+    }
+    const idEsterno = b.tipo === "email" ? String(b.email || "").trim().toLowerCase() : String(b.idEsterno || "");
+    const acc = archivio.entra(b.tipo === "email" ? "email" : "ospite", idEsterno, b.segreto);
+    if(!acc) return male(res, 403, "non-torna");
+    return invia(res, 200, { account: acc, token: archivio.apriSessione(acc.id, b.dispositivo) });
+  }
+
+  if(M("DELETE", "/api/sessione")){
+    const t = req.headers["x-sessione"] || "";
+    if(!archivio.sessione(t)) return male(res, 403, "sessione-scaduta");
+    archivio.chiudiSessione(t);
+    return invia(res, 200, { ok: true });
+  }
+
+  /* tutto quello che sei: account, artisti, salvataggi, traguardi */
+  if(M("GET", "/api/io")){
+    const s = chi(req);
+    if(!s) return male(res, 403, "sessione-scaduta");
+    const artisti = archivio.artistiDi(s.account.id);
     return invia(res, 200, {
-      ok: true, versione: archivio.VERSIONE, settimana: DATI.settimana,
-      artisti: tutti.length, giocatori: tutti.filter(a => !a.bot).length,
-      settimanaOre: CFG.settimanaMs / 3600e3,
-      prossimoGiro: DATI.prossimoGiro
+      account: s.account, dispositivo: s.dispositivo, artisti,
+      carriere: archivio.carriere(s.account.id),
+      traguardi: artisti.length ? archivio.traguardiDi(artisti[0].id) : []
     });
   }
 
-  /* un artista nuovo: torna la chiave una volta sola, poi la tiene il client */
-  if(req.method === "POST" && p === "/api/artista"){
+  /* La cancellazione dell'account, quella che Apple e Google pretendono dentro
+     al gioco. Non cancella la storia della classifica: toglie il nome e tutto
+     quello che è personale. */
+  if(M("DELETE", "/api/account")){
+    const s = chi(req);
+    if(!s) return male(res, 403, "sessione-scaduta");
+    const b = await corpo(req).catch(() => ({}));
+    if(b.conferma !== "cancella") return male(res, 400, "serve-la-conferma",
+      { nota: 'manda {"conferma":"cancella"}' });
+    const r = archivio.cancellaAccount(s.account.id);
+    return invia(res, 200, { ok: true, artistiRitirati: r.artisti });
+  }
+
+  /* ---------- gli artisti ---------- */
+  if(M("POST", "/api/artista")){
     const b = await corpo(req);
     const nome = nomePulito(b.nome);
     if(!nome) return male(res, 400, "nome-non-valido");
-    if(!nomeLibero(nome, null)) return male(res, 409, "nome-occupato");
+    if(!archivio.nomeLibero(nome)) return male(res, 409, "nome-occupato");
+
+    let s = chi(req), token = null;
+    if(!s){
+      /* nessuna sessione: si apre un account da ospite al volo, così chi gioca
+         non deve compilare niente per entrare in classifica */
+      const acc = archivio.creaAccount({ tipo: "ospite", idEsterno: crypto.randomUUID() });
+      token = archivio.apriSessione(acc.id, b.dispositivo);
+      s = { account: acc };
+    }
+    if(archivio.artistiDi(s.account.id).length >= 3) return male(res, 409, "troppi-artisti");
+
+    /* la chiave vecchio stile: torna una volta sola e fa funzionare i client
+       che ancora non sanno cosa sia una sessione */
     const chiave = crypto.randomBytes(24).toString("hex");
-    const a = {
-      id: idNuovo(), bot: false, nome,
+    const a = archivio.iscriviArtista({
+      accountId: s.account.id, nome,
       citta: nomePulito(b.citta) || scegli(CITTA),
       genere: GENERI.indexOf(b.genere) >= 0 ? b.genere : scegli(GENERI),
-      storia: nomePulito(b.storia) || scegli(STORIE),
-      stream: 0, streamPrec: 0, pos: 0, posPrec: 0,
-      fan: 0, livello: 1, fase: 0, uscite: 0, deal: false,
-      seed: nInt(b.seed, 0, 2e9, Math.floor(Math.random() * 1e9)), ultima: null,
-      chiave: sha(chiave), creato: Date.now(), ultimo: 0
-    };
-    DATI.artisti[a.id] = a;
-    archivio.posizioni(DATI, false);
-    archivio.salva(DATI, CFG.file, true);
-    return invia(res, 201, { id: a.id, chiave, nome: a.nome, pos: a.pos });
+      storia: nomePulito(b.storia, 120) || scegli(STORIE),
+      seed: nInt(b.seed, 0, 2e9, Math.floor(Math.random() * 1e9)),
+      chiaveHash: archivio.sha(chiave)
+    });
+    return invia(res, 201, Object.assign({}, a, { chiave, token: token || undefined }));
   }
 
-  /* la carta d'identità: nome, città, genere si possono cambiare */
-  const mod = p.match(/^\/api\/artista\/([a-f0-9]{12})$/);
-  if(mod && (req.method === "PUT" || req.method === "GET")){
-    const a = DATI.artisti[mod[1]];
-    if(!a) return male(res, 404, "artista-sconosciuto");
-    if(req.method === "GET") return invia(res, 200, riga(a, null));
-    if(a.bot) return male(res, 404, "artista-sconosciuto");
-    if(a.chiave !== sha(req.headers["x-chiave"] || "")) return male(res, 403, "chiave-sbagliata");
+  if(M("GET", "/api/artista/" + UUID)){
+    const a = archivio.schedaConPosizione(pezzo(3), null);
+    return a ? invia(res, 200, a) : male(res, 404, "artista-sconosciuto");
+  }
+
+  if(M("PUT", "/api/artista/" + UUID)){
+    const id = pezzo(3);
+    if(!artistaMio(req, id)) return male(res, 403, "non-e-tuo");
     const b = await corpo(req);
     if(b.nome != null){
       const nome = nomePulito(b.nome);
       if(!nome) return male(res, 400, "nome-non-valido");
-      if(!nomeLibero(nome, a.id)) return male(res, 409, "nome-occupato");
-      a.nome = nome;
+      if(!archivio.nomeLibero(nome, id)) return male(res, 409, "nome-occupato");
+      b.nome = nome;
     }
-    if(b.citta != null) a.citta = nomePulito(b.citta) || a.citta;
-    if(b.genere != null && GENERI.indexOf(b.genere) >= 0) a.genere = b.genere;
-    archivio.salva(DATI, CFG.file);
-    return invia(res, 200, riga(a, a.id));
+    if(b.citta != null) b.citta = nomePulito(b.citta);
+    if(b.genere != null && GENERI.indexOf(b.genere) < 0) delete b.genere;
+    return invia(res, 200, archivio.aggiornaArtista(id, b));
   }
 
-  /* il punteggio della settimana appena chiusa */
-  if(req.method === "POST" && p === "/api/punteggio"){
+  if(M("POST", "/api/punteggio")){
     const b = await corpo(req);
-    const a = DATI.artisti[String(b.id || "")];
-    if(!a || a.bot) return male(res, 404, "artista-sconosciuto");
-    if(a.chiave !== sha(req.headers["x-chiave"] || "")) return male(res, 403, "chiave-sbagliata");
-    if(Date.now() - (a.ultimo || 0) < 10e3) return male(res, 429, "troppo-in-fretta");
-
-    /* Il freno all'imbroglio: da un invio all'altro gli stream possono al
-       massimo quintuplicare. Non è una blindatura — il gioco gira nel browser,
-       chi vuole barare bara — ma tiene fuori i numeri assurdi e rende inutile
-       il colpo singolo da dieci milioni. Il primo invio ha la mano larga: chi
-       arriva con una carriera già avviata deve poter entrare al posto suo. */
-    const chiesto = nInt(b.stream, 0, 5e7, 0);
-    const tetto = a.ultimo ? Math.max(2500, Math.round(a.stream * 5)) : 250000;
-    const limato = chiesto > tetto;
-    a.stream = limato ? tetto : chiesto;
-    a.fan = nInt(b.fan, 0, 5e7, a.fan);
-    a.livello = nInt(b.livello, 1, 60, a.livello);
-    a.fase = nInt(b.fase, 0, 8, a.fase);
-    a.uscite = nInt(b.uscite, 0, 5000, a.uscite);
-    a.deal = b.deal == null ? a.deal : !!b.deal;
-    if(b.ultima != null) a.ultima = nomePulito(b.ultima) || a.ultima;
-    if(b.seed != null) a.seed = nInt(b.seed, 0, 2e9, a.seed);
-    a.ultimo = Date.now();
-
-    archivio.posizioni(DATI, false);
-    archivio.salva(DATI, CFG.file);
-    return invia(res, 200, {
-      ok: true, pos: a.pos, delta: a.posPrec ? a.posPrec - a.pos : null,
-      totale: Object.keys(DATI.artisti).length, settimana: DATI.settimana, limato
-    });
+    const id = String(b.id || "");
+    const a = artistaMio(req, id);
+    if(!a) return male(res, 403, "non-e-tuo");
+    if(Date.now() - (a.punteggio || 0) < CFG.invioMs) return male(res, 429, "troppo-in-fretta");
+    const r = archivio.segnaPunteggio(id, {
+      stream: b.stream, fan: nInt(b.fan, 0, 5e7, null), livello: nInt(b.livello, 1, 60, null),
+      fase: nInt(b.fase, 0, 8, null), uscite: nInt(b.uscite, 0, 5000, null), deal: b.deal,
+      ultima: b.ultima != null ? nomePulito(b.ultima, 60) : null, seed: nInt(b.seed, 0, 2e9, null)
+    }, ipHash(req));
+    return r ? invia(res, 200, r) : male(res, 404, "artista-sconosciuto");
   }
 
-  /* la classifica: una fetta qualsiasi, dalla top 10 alla top 1000 */
-  if(req.method === "GET" && p === "/api/classifica"){
-    const io = String(q.get("io") || "");
-    const da = nInt(q.get("da"), 1, 100000, 1);
-    const quanti = nInt(q.get("quanti"), 1, 200, 10);
-    const lista = archivio.ordinati(DATI);
-    const mio = io && DATI.artisti[io] ? riga(DATI.artisti[io], io) : null;
-    return invia(res, 200, {
-      settimana: DATI.settimana, totale: lista.length, prossimoGiro: DATI.prossimoGiro,
-      righe: lista.slice(da - 1, da - 1 + quanti).map(a => riga(a, io)),
-      io: mio
-    });
+  /* ---------- la classifica ---------- */
+  if(M("GET", "/api/classifica")){
+    return invia(res, 200, archivio.classifica(
+      nInt(q.get("da"), 1, 100000, 1), nInt(q.get("quanti"), 1, 200, 10), String(q.get("io") || "")));
   }
 
-  /* la fetta intorno a te: quello che serve per «tu sei 428°, e sopra di te…» */
-  const int = p.match(/^\/api\/classifica\/intorno\/([a-f0-9]{12})$/);
-  if(req.method === "GET" && int){
-    const a = DATI.artisti[int[1]];
-    if(!a) return male(res, 404, "artista-sconosciuto");
-    const raggio = nInt(q.get("raggio"), 1, 25, 4);
-    const lista = archivio.ordinati(DATI);
-    const i = lista.indexOf(a);
-    const da = Math.max(0, i - raggio);
-    return invia(res, 200, {
-      settimana: DATI.settimana, totale: lista.length,
-      righe: lista.slice(da, i + raggio + 1).map(x => riga(x, a.id)), io: riga(a, a.id)
-    });
+  if(M("GET", "/api/classifica/intorno/" + UUID)){
+    const id = pezzo(4);
+    if(!archivio.artistaGrezzo(id)) return male(res, 404, "artista-sconosciuto");
+    return invia(res, 200, archivio.intorno(id, nInt(q.get("raggio"), 1, 25, 4)));
   }
 
-  /* le notizie del giro: chi è uscito, chi ha firmato, chi è sparito */
-  if(req.method === "GET" && p === "/api/notizie"){
-    const quante = nInt(q.get("quante"), 1, 60, 10);
-    return invia(res, 200, { settimana: DATI.settimana, notizie: (DATI.notizie || []).slice(0, quante) });
+  /* ---------- i salvataggi in cloud ---------- */
+  if(M("GET", "/api/carriere")){
+    const s = chi(req);
+    if(!s) return male(res, 403, "sessione-scaduta");
+    return invia(res, 200, { carriere: archivio.carriere(s.account.id) });
   }
 
-  /* far passare una settimana a mano: serve solo per provare */
-  if(req.method === "POST" && p === "/api/giro"){
-    if(!CFG.admin || (req.headers["x-admin"] || "") !== CFG.admin) return male(res, 403, "non-sei-tu");
-    const quante = archivio.giroSettimana(DATI, CFG);
-    archivio.salva(DATI, CFG.file, true);
-    return invia(res, 200, { ok: true, settimana: DATI.settimana, notizie: quante });
+  if(M("GET", "/api/carriera/[123]")){
+    const s = chi(req);
+    if(!s) return male(res, 403, "sessione-scaduta");
+    const c = archivio.carriera(s.account.id, Number(pezzo(3)));
+    return c ? invia(res, 200, c) : male(res, 404, "slot-vuoto");
+  }
+
+  if(M("PUT", "/api/carriera/[123]")){
+    const s = chi(req);
+    if(!s) return male(res, 403, "sessione-scaduta");
+    const b = await corpo(req);
+    if(!b.stato || typeof b.stato !== "object") return male(res, 400, "stato-mancante");
+    const r = archivio.salvaCarriera(s.account.id, Number(pezzo(3)), b);
+    if(r.errore) return male(res, 413, r.errore);
+    if(r.conflitto) return invia(res, 409, { errore: "carriera-piu-avanti", salvata: r.salvata,
+      nota: "in cloud c'è una partita più avanti: manda forza=true per sovrascriverla" });
+    return invia(res, 200, r);
+  }
+
+  /* ---------- i traguardi ---------- */
+  if(M("GET", "/api/traguardi")) return invia(res, 200, { traguardi: archivio.catalogo() });
+
+  if(M("GET", "/api/traguardi/" + UUID))
+    return invia(res, 200, { traguardi: archivio.traguardiDi(pezzo(3)) });
+
+  if(M("POST", "/api/traguardo")){
+    const b = await corpo(req);
+    if(!artistaMio(req, String(b.artistaId || ""))) return male(res, 403, "non-e-tuo");
+    const r = archivio.daiTraguardo(String(b.artistaId), String(b.codice || ""));
+    return r ? invia(res, 200, r) : male(res, 404, "traguardo-sconosciuto");
+  }
+
+  /* ---------- servizio (serve ADF_ADMIN) ---------- */
+  const admin = () => CFG.admin && (req.headers["x-admin"] || "") === CFG.admin;
+
+  if(M("POST", "/api/giro")){
+    if(!admin()) return male(res, 403, "non-sei-tu");
+    const quante = archivio.giroSettimana();
+    return invia(res, 200, { ok: true, settimana: archivio.settimanaCorrente(), notizie: quante });
+  }
+
+  if(M("GET", "/api/da-spingere")){
+    if(!admin()) return male(res, 403, "non-sei-tu");
+    return invia(res, 200, { traguardi: archivio.daSpingere() });
+  }
+
+  if(M("POST", "/api/spinto")){
+    if(!admin()) return male(res, 403, "non-sei-tu");
+    const b = await corpo(req);
+    archivio.segnaSpinto(String(b.artistaId || ""), String(b.codice || ""));
+    return invia(res, 200, { ok: true });
   }
 
   return male(res, 404, "rotta-sconosciuta");
@@ -254,41 +375,44 @@ const server = http.createServer((req, res) => {
 
   if(req.method === "OPTIONS"){
     res.writeHead(204, {
-      "access-control-allow-methods": "GET, POST, PUT, OPTIONS",
-      "access-control-allow-headers": "content-type, x-chiave, x-admin",
+      "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "access-control-allow-headers": "content-type, x-chiave, x-sessione, x-admin",
       "access-control-max-age": "86400"
     });
     return res.end();
   }
 
-  const ip = (req.socket.remoteAddress || "?");
-  if(troppe(ip)) return male(res, 429, "troppe-richieste");
+  if(troppe(req.socket.remoteAddress || "?")) return male(res, 429, "troppe-richieste");
 
   let url;
   try{ url = new URL(req.url, "http://" + (req.headers.host || "localhost")); }
   catch(e){ return male(res, 400, "url-non-valido"); }
 
-  archivio.assicuraSettimana(DATI, CFG);
+  try{ archivio.assicuraSettimana(); }
+  catch(e){ console.error("[settimana] " + e.message); }
 
   rotta(req, res, url).catch(e => {
     if(res.headersSent) return;
-    male(res, e && /json|corpo/.test(e.message) ? 400 : 500, e ? e.message : "errore");
+    const suo = e && /json|corpo/.test(e.message);
+    if(!suo) console.error("[errore] " + (e && e.stack || e));
+    male(res, suo ? 400 : 500, suo ? e.message : "errore-del-server");
   });
 });
 
 server.listen(CFG.porta, () => {
-  const tutti = Object.values(DATI.artisti);
-  console.log("Anni di Fame — classifica su http://localhost:" + CFG.porta);
-  console.log("  archivio:   " + CFG.file);
-  console.log("  in pista:   " + tutti.length + " artisti (" + tutti.filter(a => !a.bot).length + " giocatori veri)");
-  console.log("  settimana:  " + DATI.settimana + ", la prossima fra " +
-    Math.max(0, Math.round((DATI.prossimoGiro - Date.now()) / 60000)) + " minuti");
+  const s = archivio.stato();
+  console.log("Anni di Fame — il server su http://localhost:" + CFG.porta);
+  console.log("  database:   " + CFG.file);
+  console.log("  in pista:   " + s.artisti + " artisti (" + s.giocatori + " giocatori veri)");
+  console.log("  account:    " + s.account + ", salvataggi in cloud: " + s.carriere);
+  console.log("  settimana:  " + s.settimana + ", la prossima fra " +
+    Math.max(0, Math.round((s.prossimoGiro - Date.now()) / 60000)) + " minuti");
 });
 
 for(const segnale of ["SIGINT", "SIGTERM"]){
   process.on(segnale, () => {
-    archivio.salva(DATI, CFG.file, true);
-    console.log("\nsalvato. alla prossima.");
+    archivio.chiudi();
+    console.log("\nchiuso. alla prossima.");
     process.exit(0);
   });
 }

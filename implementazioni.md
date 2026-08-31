@@ -578,8 +578,57 @@ cambia l'energia a 100 e anche tutto ciò ce ne deriva da questo cambiamento, tu
 
 34. I salvataggi non possono più stare nel localStorage: file vero sul dispositivo, Steam Cloud, e il cloud nostro legato all'account, così la carriera passa dal PC al telefono.
 
+   **META' FATTA (01/09/2026) — il lato server c'è.** `PUT/GET /api/carriera/:slot` e
+   `GET /api/carriere`: tre slot come quelli in locale, lo stato del gioco (l'oggetto `G`)
+   salvato per intero, tetto di 2 MB. **In conflitto vince la partita più avanti** e
+   all'altro dispositivo si dice cos'è successo: due salvataggi non si fondono mai da soli,
+   si perde roba e il giocatore non capisce perché. Nel ponte del gioco ci sono già
+   `ONLINE.salvaCarriera()`, `ONLINE.carriera()` e `ONLINE.carriere()`.
+   **Resta da fare**: agganciare `save()` del gioco (adesso scrive solo nel `localStorage`),
+   il file vero nella cartella dell'app — che arriva col guscio Electron/Capacitor — e
+   Steam Cloud.
+
 35. Gli account veri (Steam, Sign in with Apple, Google Play Games, mail) al posto della chiave nel browser — e la cancellazione dell'account dentro al gioco, che Apple e Google pretendono.
+
+   **FATTO (01/09/2026), tranne i tre negozi.**
+   - **Account e sessioni**: `POST /api/account` (da ospite o con mail e password),
+     `POST /api/sessione`, `DELETE /api/sessione`, `GET /api/io`. Le password stanno come
+     **scrypt** con sale, i gettoni di sessione solo come **hash**: chi si prende il
+     database non si prende né le une né gli altri.
+   - **Non si compila niente per giocare**: chi si iscrive alla classifica riceve un account
+     da ospite aperto dal server, senza mail, senza password, senza schermate.
+   - **Nessuno perde quello che aveva**: la vecchia chiave (`x-chiave`) funziona ancora, e
+     si scambia con una sessione vera (`POST /api/sessione`, tipo `legacy`).
+   - **La cancellazione dell'account c'è** e fa la cosa giusta: l'artista resta in
+     classifica senza nome e senza padrone (la storia degli altri non si sfonda), spariscono
+     salvataggi, identità, dispositivi e la mail. Serve `{"conferma":"cancella"}`.
+   - **Steam, Apple e Google sono una porta chiusa, non una porta finta**: le rotte li
+     accettano e rispondono **501** finché non c'è il pezzo che verifica il biglietto
+     firmato da loro. Accettare un id di Steam senza verificarlo vorrebbe dire far entrare
+     chiunque come chiunque. Si collega insieme al guscio nativo (punto 2 della lista).
 
 36. L'interfaccia sul telefono: la plancia e' disegnata a 1536x1024 e scalata, in verticale non ci sta. Disposizione sua, aree da toccare da 44 punti, niente hover, testi leggibili senza zoom. E' il lavoro piu' lungo dei cinque.
 
 37. Il database vero: SQLite appena c'e' l'account, PostgreSQL dal primo giorno di vendita. Lo schema completo e' gia' scritto in backend/database/schema.md, il travaso dal JSON e' uno script di mezz'ora — e va fatto adesso che siamo a 140 bot e tre giocatori, non di corsa con diecimila account dentro.
+
+   **FATTO (01/09/2026) — il file JSON non c'è più, sotto c'è SQLite.**
+   `node:sqlite`, dentro Node: nessuna dipendenza da installare, nessun servizio da mandare
+   avanti, un file solo — e transazioni, WAL, chiavi esterne vere.
+   - **18 tabelle** come da schema: account, identita, dispositivo, artista, bot_stato,
+     carriera, stagione, settimana, punteggio_settimana, classifica_posizione, notizia,
+     relazione, traguardo, artista_traguardo, sospetto, sanzione, acquisto, stato.
+   - **Migrazioni**: file `.sql` numerati in `database/migrazioni/`, applicati in ordine e
+     una volta sola, ognuno in una transazione. Niente ORM.
+   - **Lo storico c'è**: una riga di `punteggio_settimana` per artista per settimana, e una
+     fotografia della classifica a ogni giro — da lì escono le frecce ▲▼, che adesso sono
+     un dato salvato e non un numero tenuto a mente.
+   - **Il travaso è scritto e provato** (`npm run travaso`): l'ho fatto girare su un
+     archivio finto e il vecchio giocatore si è ritrovato l'artista, la posizione, la
+     freccia e la chiave che funzionava ancora.
+   - **La prova del server è passata da 25 a 55 controlli**, e comprende un'occhiata dentro
+     al database: le chiavi solo come hash, le password solo come scrypt, lo storico che si
+     riempie, l'artista di chi ha cancellato l'account senza nome e senza padrone.
+
+   **Resta PostgreSQL**, ma non adesso: serve quando i server diventano più di uno, non
+   quando le righe diventano tante. Lo schema è già scritto per tutti e due e il cambio
+   tocca un file solo (`database/archivio.js`), che è il motivo per cui esiste.

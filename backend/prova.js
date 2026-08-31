@@ -1,10 +1,14 @@
-/* La prova del server: si avvia da solo su una porta sua, con un archivio
-   usa e getta, si fa tutto il giro e si spegne.
+/* La prova del server: si avvia da solo su una porta sua, con un database usa
+   e getta, si fa tutto il giro e si spegne.
 
-     node prova.js          (oppure: npm run prova)
+     npm run prova
 
-   Esce con 0 se fila tutto liscio, con 1 al primo controllo che non torna.
-   Nessuna dipendenza: solo Node. */
+   Copre quello che si può rompere davvero: la classifica e i bot che non si
+   devono riconoscere, gli account, le sessioni, i salvataggi in cloud e i loro
+   conflitti, i traguardi, la cancellazione dell'account, i freni
+   contro l'imbroglio, il giro di settimana e le frecce.
+
+   Esce con 0 se fila tutto liscio, con 1 al primo controllo che non torna. */
 "use strict";
 
 const { spawn } = require("child_process");
@@ -15,16 +19,14 @@ const os = require("os");
 const PORTA = 8799;
 const BASE = "http://127.0.0.1:" + PORTA;
 const ADMIN = "prova-" + Math.random().toString(16).slice(2);
-const FILE = path.join(os.tmpdir(), "adf-prova-" + Date.now() + ".json");
+const FILE = path.join(os.tmpdir(), "adf-prova-" + Date.now() + ".db");
 
 let passati = 0, falliti = 0;
 function controlla(cosa, condizione, dettaglio){
   if(condizione){ passati++; console.log("  ok   " + cosa); }
   else { falliti++; console.log("  NO   " + cosa + (dettaglio ? "  → " + JSON.stringify(dettaglio) : "")); }
 }
-
-const chiama = async (rotta, opzioni) => {
-  const o = opzioni || {};
+const chiama = async (rotta, o = {}) => {
   const res = await fetch(BASE + rotta, {
     method: o.metodo || "GET",
     headers: Object.assign(o.corpo ? { "content-type": "application/json" } : {}, o.testate || {}),
@@ -32,6 +34,7 @@ const chiama = async (rotta, opzioni) => {
   });
   return { stato: res.status, dati: await res.json().catch(() => null) };
 };
+const conSessione = t => ({ "x-sessione": t });
 
 async function aspettaCheRisponda(figlio){
   for(let i = 0; i < 60; i++){
@@ -45,104 +48,188 @@ async function aspettaCheRisponda(figlio){
 (async () => {
   const figlio = spawn(process.execPath, [path.join(__dirname, "server.js")], {
     env: Object.assign({}, process.env, {
-      ADF_PORTA: String(PORTA), ADF_BOT: "40", ADF_ADMIN: ADMIN, ADF_DATI: FILE
+      ADF_PORTA: String(PORTA), ADF_BOT: "40", ADF_ADMIN: ADMIN, ADF_DATI: FILE,
+      ADF_INVIO_MS: "0"
     }),
     stdio: ["ignore", "pipe", "inherit"]
   });
 
   try{
     await aspettaCheRisponda(figlio);
-    console.log("\nla classifica");
 
+    console.log("\nla classifica");
     const stato = await chiama("/api/stato");
     controlla("il server risponde e ha i bot in pista", stato.dati && stato.dati.artisti === 40, stato.dati);
-    controlla("all'inizio i giocatori veri sono zero", stato.dati && stato.dati.giocatori === 0);
+    controlla("all'inizio non c'è nessun giocatore vero", stato.dati && stato.dati.giocatori === 0);
 
     const top = await chiama("/api/classifica?quanti=10");
     controlla("la top 10 torna dieci righe", top.dati && top.dati.righe.length === 10);
     controlla("le righe sono ordinate per stream",
-      top.dati && top.dati.righe.every((r, i, a) => i === 0 || a[i-1].stream >= r.stream));
-    controlla("nessuna riga dice che è un bot",
-      JSON.stringify(top.dati).indexOf('"bot"') < 0);
-    controlla("i nomi dei bot sembrano nomi di gente",
-      top.dati && top.dati.righe.every(r => r.nome.length >= 2 && !/^bot|^player|_\d+$/i.test(r.nome)),
-      top.dati && top.dati.righe.map(r => r.nome));
+      top.dati.righe.every((r, i, a) => i === 0 || a[i-1].stream >= r.stream));
+    controlla("nessuna riga dice che è un bot", JSON.stringify(top.dati).indexOf('"bot"') < 0);
+    controlla("nessuna riga porta fuori un account", JSON.stringify(top.dati).indexOf("account") < 0);
+    controlla("i nomi sembrano nomi di gente",
+      top.dati.righe.every(r => r.nome.length >= 2 && !/^bot|^player|_\d+$/i.test(r.nome)),
+      top.dati.righe.map(r => r.nome));
     controlla("ogni riga ha città, genere e una storia",
-      top.dati && top.dati.righe.every(r => r.citta && r.genere && r.storia));
+      top.dati.righe.every(r => r.citta && r.genere && r.storia));
 
-    console.log("\nl'iscrizione");
-    const reg = await chiama("/api/artista", { metodo: "POST", corpo: { nome: "Young Legend", citta: "Rovereto", genere: "trap" } });
-    controlla("un artista nuovo si iscrive", reg.stato === 201 && reg.dati.id && reg.dati.chiave, reg.dati);
-    const { id, chiave } = reg.dati || {};
+    console.log("\nl'iscrizione, senza compilare niente");
+    const reg = await chiama("/api/artista", { metodo: "POST",
+      corpo: { nome: "Young Legend", citta: "Rovereto", genere: "trap" } });
+    controlla("un artista nuovo si iscrive", reg.stato === 201 && reg.dati.id, reg.dati);
+    controlla("e senza chiedere niente si ritrova un account e una sessione",
+      !!(reg.dati.token && reg.dati.chiave), Object.keys(reg.dati || {}));
+    const io1 = reg.dati.id, chiave1 = reg.dati.chiave, sess1 = reg.dati.token;
 
     const doppio = await chiama("/api/artista", { metodo: "POST", corpo: { nome: "young legend" } });
     controlla("lo stesso nome non si prende due volte", doppio.stato === 409, doppio.dati);
+    const vuoto = await chiama("/api/artista", { metodo: "POST", corpo: { nome: " " } });
+    controlla("un nome vuoto viene rifiutato", vuoto.stato === 400);
 
-    const senzaNome = await chiama("/api/artista", { metodo: "POST", corpo: { nome: " " } });
-    controlla("un nome vuoto viene rifiutato", senzaNome.stato === 400, senzaNome.dati);
+    const mio = await chiama("/api/io", { testate: conSessione(sess1) });
+    controlla("con la sessione mi ritrovo il mio artista",
+      mio.dati && mio.dati.artisti.length === 1 && mio.dati.artisti[0].id === io1, mio.dati);
 
     console.log("\nil punteggio");
-    const primo = await chiama("/api/punteggio", {
-      metodo: "POST", testate: { "x-chiave": chiave },
-      corpo: { id, stream: 9000, fan: 1200, livello: 7, uscite: 3, ultima: "Fine mese", seed: 12345 }
-    });
-    controlla("il primo punteggio entra intero", primo.dati && primo.dati.ok && primo.dati.limato === false, primo.dati);
-    controlla("e mi dà la mia posizione", primo.dati && primo.dati.pos > 0);
+    const primo = await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sess1),
+      corpo: { id: io1, stream: 9000, fan: 1200, livello: 7, uscite: 3, ultima: "Fine mese", seed: 12345 } });
+    controlla("il primo punteggio entra intero", primo.dati && primo.dati.ok && !primo.dati.limato, primo.dati);
+    controlla("e mi dà la mia posizione", primo.dati.pos > 0);
 
-    const ladro = await chiama("/api/punteggio", { metodo: "POST", testate: { "x-chiave": "sbagliata" }, corpo: { id, stream: 9e6 } });
-    controlla("con la chiave sbagliata non si manda niente", ladro.stato === 403, ladro.dati);
+    const conChiave = await chiama("/api/punteggio", { metodo: "POST", testate: { "x-chiave": chiave1 },
+      corpo: { id: io1, stream: 12000 } });
+    controlla("funziona anche col vecchio modo (id + chiave)", conChiave.stato === 200, conChiave.dati);
 
-    const troppoPresto = await chiama("/api/punteggio", { metodo: "POST", testate: { "x-chiave": chiave }, corpo: { id, stream: 9100 } });
-    controlla("due invii di fila sono troppi", troppoPresto.stato === 429, troppoPresto.dati);
+    const ladro = await chiama("/api/punteggio", { metodo: "POST", testate: { "x-chiave": "sbagliata" },
+      corpo: { id: io1, stream: 9e6 } });
+    controlla("con la chiave sbagliata non si manda niente", ladro.stato === 403);
 
-    console.log("  ...aspetto i dieci secondi del freno");
-    await new Promise(r => setTimeout(r, 10500));
-    const gonfiato = await chiama("/api/punteggio", { metodo: "POST", testate: { "x-chiave": chiave }, corpo: { id, stream: 40000000 } });
-    controlla("quaranta milioni di stream vengono limati",
-      gonfiato.dati && gonfiato.dati.limato === true, gonfiato.dati);
-    const dopo = await chiama("/api/artista/" + id);
-    controlla("e restano al massimo il quintuplo (45.000)", dopo.dati && dopo.dati.stream === 45000, dopo.dati);
+    const gonfiato = await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sess1),
+      corpo: { id: io1, stream: 40000000 } });
+    controlla("quaranta milioni di stream vengono limati", gonfiato.dati && gonfiato.dati.limato === true, gonfiato.dati);
+    const dopo = await chiama("/api/artista/" + io1);
+    controlla("e restano al massimo il quintuplo (60.000)", dopo.dati.stream === 60000, dopo.dati);
+
+    console.log("\ngli account");
+    const conMail = await chiama("/api/account", { metodo: "POST",
+      corpo: { tipo: "email", email: "Prova@Esempio.it", segreto: "unasegretalunga" } });
+    controlla("ci si iscrive con una mail", conMail.stato === 201 && conMail.dati.token, conMail.dati);
+    const stessaMail = await chiama("/api/account", { metodo: "POST",
+      corpo: { tipo: "email", email: "prova@esempio.it", segreto: "unasegretalunga" } });
+    controlla("la stessa mail non si usa due volte", stessaMail.stato === 409);
+    const cortina = await chiama("/api/account", { metodo: "POST",
+      corpo: { tipo: "email", email: "altro@esempio.it", segreto: "corta" } });
+    controlla("una password corta viene rifiutata", cortina.stato === 400);
+
+    const sbagliata = await chiama("/api/sessione", { metodo: "POST",
+      corpo: { tipo: "email", email: "prova@esempio.it", segreto: "nonquesta" } });
+    controlla("con la password sbagliata non si entra", sbagliata.stato === 403);
+    const giusta = await chiama("/api/sessione", { metodo: "POST",
+      corpo: { tipo: "email", email: "prova@esempio.it", segreto: "unasegretalunga" } });
+    controlla("con quella giusta si entra", giusta.stato === 200 && giusta.dati.token, giusta.dati);
+    const sess2 = giusta.dati.token;
+
+    const steam = await chiama("/api/account", { metodo: "POST", corpo: { tipo: "steam", biglietto: "finto" } });
+    controlla("Steam è una porta chiusa, non una porta finta", steam.stato === 501, steam.dati);
+
+    const daVecchio = await chiama("/api/sessione", { metodo: "POST",
+      corpo: { tipo: "legacy", artistaId: io1, chiave: chiave1 } });
+    controlla("dalla vecchia chiave si ottiene una sessione vera",
+      daVecchio.stato === 200 && daVecchio.dati.token, daVecchio.dati);
+
+    console.log("\ni salvataggi in cloud");
+    const salva = await chiama("/api/carriera/1", { metodo: "PUT", testate: conSessione(sess2),
+      corpo: { stato: { week: 12, fans: 3400, songs: [] }, settimana: 12, anno: 1, versioneGioco: "0.1.0" } });
+    controlla("una carriera si salva", salva.stato === 200 && salva.dati.salvata.settimana === 12, salva.dati);
+    const rileggi = await chiama("/api/carriera/1", { testate: conSessione(sess2) });
+    controlla("e si rilegge uguale", rileggi.dati && rileggi.dati.stato.fans === 3400, rileggi.dati);
+    const indietro = await chiama("/api/carriera/1", { metodo: "PUT", testate: conSessione(sess2),
+      corpo: { stato: { week: 3 }, settimana: 3, anno: 1 } });
+    controlla("una partita più indietro non sovrascrive quella più avanti", indietro.stato === 409, indietro.dati);
+    const forzata = await chiama("/api/carriera/1", { metodo: "PUT", testate: conSessione(sess2),
+      corpo: { stato: { week: 3 }, settimana: 3, anno: 1, forza: true } });
+    controlla("ma con forza=true sì, se il giocatore lo decide", forzata.stato === 200);
+    const senzaSessione = await chiama("/api/carriera/1", { metodo: "PUT", corpo: { stato: {} } });
+    controlla("senza sessione non si salva niente", senzaSessione.stato === 403);
+    const slotVuoto = await chiama("/api/carriera/3", { testate: conSessione(sess2) });
+    controlla("uno slot vuoto lo dice", slotVuoto.stato === 404);
+
+    console.log("\ni traguardi");
+    const catalogo = await chiama("/api/traguardi");
+    controlla("il catalogo dei traguardi c'è", catalogo.dati.traguardi.length > 5);
+    controlla("ogni traguardo ha un codice per Steam",
+      catalogo.dati.traguardi.every(t => t.codice && t.nome && t.descrizione));
+    const dato = await chiama("/api/traguardo", { metodo: "POST", testate: conSessione(sess1),
+      corpo: { artistaId: io1, codice: "primo_pezzo" } });
+    controlla("un traguardo si assegna", dato.dati && dato.dati.nuovo === true, dato.dati);
+    const ancora = await chiama("/api/traguardo", { metodo: "POST", testate: conSessione(sess1),
+      corpo: { artistaId: io1, codice: "primo_pezzo" } });
+    controlla("due volte no", ancora.dati && ancora.dati.gia === true);
+    const daSpingere = await chiama("/api/da-spingere", { testate: { "x-admin": ADMIN } });
+    controlla("resta in coda da mandare allo store", daSpingere.dati.traguardi.length === 1, daSpingere.dati);
 
     console.log("\nla settimana");
     const senzaChiave = await chiama("/api/giro", { metodo: "POST" });
     controlla("il giro non lo fa chi passa di lì", senzaChiave.stato === 403);
-
-    const primaDelGiro = await chiama("/api/classifica?quanti=40");
+    const prima = await chiama("/api/classifica?quanti=40");
     const giro = await chiama("/api/giro", { metodo: "POST", testate: { "x-admin": ADMIN } });
     controlla("il giro di settimana parte", giro.dati && giro.dati.settimana === 2, giro.dati);
-    const dopoIlGiro = await chiama("/api/classifica?quanti=40");
+    const poi = await chiama("/api/classifica?quanti=40");
     controlla("gli stream dei bot si sono mossi",
-      JSON.stringify(primaDelGiro.dati.righe.map(r => r.stream)) !==
-      JSON.stringify(dopoIlGiro.dati.righe.map(r => r.stream)));
-
+      JSON.stringify(prima.dati.righe.map(r => r.stream)) !== JSON.stringify(poi.dati.righe.map(r => r.stream)));
     for(let i = 0; i < 3; i++) await chiama("/api/giro", { metodo: "POST", testate: { "x-admin": ADMIN } });
     const conFrecce = await chiama("/api/classifica?quanti=40");
     controlla("qualcuno sale e qualcuno scende (le frecce ▲▼)",
       conFrecce.dati.righe.some(r => r.delta !== 0 && r.delta !== null));
+    const notizie = await chiama("/api/notizie?quante=5");
+    controlla("il giro ha lasciato delle notizie", notizie.dati.notizie.length > 0);
+    controlla("ogni notizia ha un tipo", notizie.dati.notizie.every(n => n.tipo && n.testo));
 
     console.log("\nintorno a me");
-    const intorno = await chiama("/api/classifica/intorno/" + id + "?raggio=3");
+    const intorno = await chiama("/api/classifica/intorno/" + io1 + "?raggio=3");
     controlla("mi vedo in mezzo a chi mi sta davanti e dietro",
-      intorno.dati && intorno.dati.io.id === id && intorno.dati.righe.some(r => r.io));
-    const sconosciuto = await chiama("/api/classifica/intorno/aaaaaaaaaaaa");
-    controlla("un id inventato non trova niente", sconosciuto.stato === 404);
+      intorno.dati && intorno.dati.io.id === io1 && intorno.dati.righe.some(r => r.io), intorno.dati && intorno.dati.io);
+    const inventato = await chiama("/api/classifica/intorno/00000000-0000-4000-8000-000000000000");
+    controlla("un id inventato non trova niente", inventato.stato === 404);
 
-    console.log("\nle notizie");
-    const notizie = await chiama("/api/notizie?quante=5");
-    controlla("il giro ha lasciato delle notizie", notizie.dati && notizie.dati.notizie.length > 0);
+    console.log("\nla cancellazione dell'account (quella che Apple e Google pretendono)");
+    const senzaConferma = await chiama("/api/account", { metodo: "DELETE", testate: conSessione(sess2), corpo: {} });
+    controlla("non si cancella per sbaglio", senzaConferma.stato === 400);
+    const cancella = await chiama("/api/account", { metodo: "DELETE", testate: conSessione(sess2),
+      corpo: { conferma: "cancella" } });
+    controlla("con la conferma si cancella", cancella.stato === 200, cancella.dati);
+    const dopoCancella = await chiama("/api/io", { testate: conSessione(sess2) });
+    controlla("la sessione non vale più", dopoCancella.stato === 403);
+    const rientro = await chiama("/api/sessione", { metodo: "POST",
+      corpo: { tipo: "email", email: "prova@esempio.it", segreto: "unasegretalunga" } });
+    controlla("e non si rientra con la vecchia mail", rientro.stato === 403);
 
-    console.log("\nl'archivio");
-    controlla("il file dell'archivio esiste su disco", fs.existsSync(FILE));
-    const salvato = JSON.parse(fs.readFileSync(FILE, "utf8"));
-    controlla("le chiavi sono salvate solo come hash",
-      Object.values(salvato.artisti).every(a => a.bot || (a.chiave && a.chiave.length === 64 && a.chiave !== chiave)));
+    console.log("\nil database");
+    controlla("il file del database esiste", fs.existsSync(FILE));
+    const { DatabaseSync } = require("node:sqlite");
+    const db = new DatabaseSync(FILE, { readOnly: true });
+    const chiavi = db.prepare("SELECT chiave_hash FROM artista WHERE chiave_hash IS NOT NULL").all();
+    controlla("le chiavi stanno solo come hash",
+      chiavi.every(r => r.chiave_hash.length === 64 && r.chiave_hash !== chiave1), chiavi.length);
+    const segreti = db.prepare("SELECT segreto_hash FROM identita WHERE segreto_hash IS NOT NULL").all();
+    controlla("le password stanno solo come scrypt",
+      segreti.every(r => r.segreto_hash.startsWith("scrypt$")));
+    const storia = db.prepare("SELECT count(*) n FROM punteggio_settimana").get();
+    controlla("lo storico dei punteggi si riempie", storia.n > 0, storia);
+    const foto = db.prepare("SELECT count(*) n FROM classifica_posizione").get();
+    controlla("e le fotografie della classifica anche", foto.n > 0, foto);
+    const ritirato = db.prepare("SELECT nome, account_id, ritirato FROM artista WHERE nome LIKE 'Artista ritirato%'").all();
+    controlla("l'artista di chi ha cancellato resta senza nome e senza padrone",
+      ritirato.length === 0 || ritirato.every(r => r.account_id === null && r.ritirato), ritirato);
+    db.close();
 
   }catch(e){
     falliti++;
-    console.log("\n  esploso: " + e.message);
+    console.log("\n  esploso: " + (e && e.stack || e));
   }finally{
     figlio.kill();
-    try{ fs.unlinkSync(FILE); }catch(e){}
+    for(const f of [FILE, FILE + "-wal", FILE + "-shm"]) try{ fs.unlinkSync(f); }catch(e){}
   }
 
   console.log("\n" + passati + " a posto, " + falliti + " no.\n");

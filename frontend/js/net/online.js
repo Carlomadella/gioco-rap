@@ -1,25 +1,36 @@
-/* Il ponte fra la partita e la classifica vera (punto 30).
+/* Il ponte fra la partita e il server (punti 30, 34, 35).
 
-   Regola numero uno: se il server non c'è, il gioco non se ne accorge. Ogni
-   funzione qui dentro torna `null` invece di esplodere, e chi la chiama
-   ricasca sulla classifica locale come ha sempre fatto. Il multiplayer è una
-   cosa in più, non una cosa da cui dipendere.
+   Regola numero uno, e non cambia: **se il server non c'è, il gioco non se ne
+   accorge**. Ogni funzione qui dentro torna `null` invece di esplodere, e chi
+   la chiama ricasca su quello che ha in locale. Vale ancora di più adesso che
+   il gioco si installa: la gente gioca in aereo e in metropolitana.
 
    Da solo questo file non fa niente: nessuna chiamata parte se non la chiedi.
-   Si aggancia alla schermata classifica quando quella parte sarà pronta. */
+
+   Cosa sa fare:
+   - iscriversi alla classifica (e prendersi un account senza far compilare
+     niente a nessuno);
+   - mandare il punteggio della settimana;
+   - leggere la classifica, la fetta intorno a te, le notizie;
+   - salvare e riprendere la carriera **in cloud**, che è quello che la porta
+     dal PC al telefono;
+   - dare i traguardi, quelli che poi finiscono su Steam;
+   - cancellare l'account, che Apple e Google pretendono. */
 "use strict";
 
 const ONLINE = (() => {
   const K_URL = "adf-online-url";
-  const K_ID = "adf-online-id";
-  const K_CHIAVE = "adf-online-chiave";
+  const K_ID = "adf-online-id";           // l'artista
+  const K_CHIAVE = "adf-online-chiave";   // il vecchio modo, ancora buono
+  const K_SESSIONE = "adf-online-sessione";
 
   /* l'identità sta nello slot: tre carriere, tre artisti in classifica */
   const chiave = k => (typeof slotKey === "function" ? slotKey(k) : k);
   const leggi = k => { try{ return localStorage.getItem(chiave(k)); }catch(e){ return null; } };
   const scrivi = (k, v) => { try{ localStorage.setItem(chiave(k), v); }catch(e){} };
+  const togli = k => { try{ localStorage.removeItem(chiave(k)); }catch(e){} };
 
-  let staccato = false;          // l'ultimo tentativo è andato a vuoto
+  let staccato = false;
   let base = null;
   try{ base = localStorage.getItem(K_URL); }catch(e){}
   if(!base) base = "http://localhost:8787";
@@ -27,17 +38,21 @@ const ONLINE = (() => {
   async function chiama(rotta, opzioni){
     const o = opzioni || {};
     const ctrl = new AbortController();
-    const scadenza = setTimeout(() => ctrl.abort(), o.attesa || 6000);
+    const scadenza = setTimeout(() => ctrl.abort(), o.attesa || 8000);
     try{
+      const testate = Object.assign({}, o.testate || {});
+      if(o.corpo) testate["content-type"] = "application/json";
+      const s = leggi(K_SESSIONE);
+      if(s && !o.senzaSessione) testate["x-sessione"] = s;
       const res = await fetch(base + rotta, {
         method: o.metodo || "GET",
-        headers: Object.assign(o.corpo ? { "content-type": "application/json" } : {}, o.testate || {}),
+        headers: testate,
         body: o.corpo ? JSON.stringify(o.corpo) : undefined,
         signal: ctrl.signal
       });
       const dati = await res.json().catch(() => null);
       staccato = false;
-      if(!res.ok) return { errore: (dati && dati.errore) || ("http-" + res.status) };
+      if(!res.ok) return { errore: (dati && dati.errore) || ("http-" + res.status), stato: res.status, dati };
       return dati;
     }catch(e){
       staccato = true;
@@ -45,42 +60,82 @@ const ONLINE = (() => {
     }finally{ clearTimeout(scadenza); }
   }
 
-  /* ==================== IDENTITÀ ==================== */
+  /* ==================== CHI SEI ==================== */
   function identita(){
-    const id = leggi(K_ID), ch = leggi(K_CHIAVE);
-    return id && ch ? { id, chiave: ch } : null;
+    const id = leggi(K_ID);
+    return id ? { id, chiave: leggi(K_CHIAVE), sessione: leggi(K_SESSIONE) } : null;
   }
 
-  /* Iscrive l'artista alla classifica. La chiave torna una volta sola: da lì
-     in poi vive nel localStorage di chi gioca, come i salvataggi. */
+  /* Iscrive l'artista alla classifica. Il server apre anche un account da
+     ospite: il giocatore non compila niente, e da lì in poi c'è una sessione
+     vera con cui salvare in cloud. */
   async function registra(nome, citta, genere){
     const r = await chiama("/api/artista", {
-      metodo: "POST", corpo: { nome, citta, genere }
+      metodo: "POST", senzaSessione: true,
+      corpo: { nome, citta, genere, dispositivo: { piattaforma: piattaforma(), nome: "questo dispositivo" } }
     });
     if(!r || r.errore) return r;
-    scrivi(K_ID, r.id); scrivi(K_CHIAVE, r.chiave);
+    scrivi(K_ID, r.id);
+    if(r.chiave) scrivi(K_CHIAVE, r.chiave);
+    if(r.token) scrivi(K_SESSIONE, r.token);
     return r;
   }
 
-  /* Come registra, ma non ripete: se l'artista c'è già torna quello. */
   async function assicura(nome, citta, genere){
     const mia = identita();
     if(mia) return mia;
     const r = await registra(nome, citta, genere);
-    return r && !r.errore ? { id: r.id, chiave: r.chiave, nome: r.nome, pos: r.pos } : r;
+    return r && !r.errore ? identita() : r;
   }
 
-  async function rinomina(nome, citta, genere){
+  /* Chi ha ancora solo la vecchia chiave se la scambia con una sessione: serve
+     a chi giocava prima che gli account esistessero. */
+  async function scambiaVecchiaChiave(){
     const mia = identita();
-    if(!mia) return null;
-    return chiama("/api/artista/" + mia.id, {
-      metodo: "PUT", corpo: { nome, citta, genere }, testate: { "x-chiave": mia.chiave }
-    });
+    if(!mia || mia.sessione || !mia.chiave) return null;
+    const r = await chiama("/api/sessione", { metodo: "POST", senzaSessione: true,
+      corpo: { tipo: "legacy", artistaId: mia.id, chiave: mia.chiave,
+        dispositivo: { piattaforma: piattaforma() } } });
+    if(r && r.token){ scrivi(K_SESSIONE, r.token); return r; }
+    return r;
+  }
+
+  /* Legare l'account a una mail: è quello che fa sopravvivere la carriera a un
+     telefono nuovo, finché non ci sono Steam, Apple e Google. */
+  const registraConMail = (email, segreto) => chiama("/api/account", {
+    metodo: "POST", senzaSessione: true,
+    corpo: { tipo: "email", email, segreto, dispositivo: { piattaforma: piattaforma() } }
+  }).then(r => { if(r && r.token) scrivi(K_SESSIONE, r.token); return r; });
+
+  const entra = (email, segreto) => chiama("/api/sessione", {
+    metodo: "POST", senzaSessione: true,
+    corpo: { tipo: "email", email, segreto, dispositivo: { piattaforma: piattaforma() } }
+  }).then(r => { if(r && r.token) scrivi(K_SESSIONE, r.token); return r; });
+
+  const esci = async () => {
+    await chiama("/api/sessione", { metodo: "DELETE" });
+    togli(K_SESSIONE);
+  };
+
+  const io = () => chiama("/api/io");
+
+  /* La cancellazione dell'account. Va chiesta due volte al giocatore prima di
+     arrivare qui: quello che sparisce non torna. */
+  const cancellaAccount = () => chiama("/api/account", {
+    metodo: "DELETE", corpo: { conferma: "cancella" }
+  }).then(r => { if(r && r.ok){ togli(K_SESSIONE); togli(K_ID); togli(K_CHIAVE); } return r; });
+
+  function piattaforma(){
+    const s = (navigator.userAgent || "").toLowerCase();
+    if(/android/.test(s)) return "android";
+    if(/iphone|ipad|ipod/.test(s)) return "ios";
+    if(/mac os/.test(s)) return "mac";
+    if(/windows/.test(s)) return "windows";
+    if(/linux/.test(s)) return "linux";
+    return "web";
   }
 
   /* ==================== PUNTEGGIO ==================== */
-  /* Gli stream della settimana appena chiusa: gli stessi che la classifica
-     locale usa già in `js/game/ui.js`. */
   function punteggioDaPartita(){
     if(typeof G === "undefined" || !G) return null;
     const usciti = (G.songs || []).filter(s => s.released);
@@ -104,23 +159,49 @@ const ONLINE = (() => {
     const p = dati || punteggioDaPartita();
     if(!p) return null;
     return chiama("/api/punteggio", {
-      metodo: "POST", corpo: Object.assign({ id: mia.id }, p), testate: { "x-chiave": mia.chiave }
+      metodo: "POST", corpo: Object.assign({ id: mia.id }, p),
+      testate: mia.chiave ? { "x-chiave": mia.chiave } : {}
     });
+  }
+
+  /* ==================== LA CARRIERA IN CLOUD ==================== */
+  /* Lo stato del gioco è l'oggetto G: si manda com'è. Il server tiene tre slot
+     come quelli in locale, e in conflitto vince la partita più avanti. */
+  async function salvaCarriera(slot, forza){
+    if(typeof G === "undefined" || !G) return null;
+    const mia = identita();
+    return chiama("/api/carriera/" + (slot || slotAttuale()), {
+      metodo: "PUT",
+      corpo: {
+        stato: G, settimana: G.week || 1, anno: G.year || 1,
+        artistaId: mia ? mia.id : null,
+        versioneGioco: (window.VERSIONE_GIOCO || ""), forza: !!forza
+      }
+    });
+  }
+  const carriera = slot => chiama("/api/carriera/" + (slot || slotAttuale()));
+  const carriere = () => chiama("/api/carriere");
+  const slotAttuale = () => (typeof SET === "object" && SET && SET.slot) ? SET.slot : 1;
+
+  /* ==================== TRAGUARDI ==================== */
+  const traguardi = () => chiama("/api/traguardi");
+  function daiTraguardo(codice){
+    const mia = identita();
+    if(!mia) return Promise.resolve(null);
+    return chiama("/api/traguardo", { metodo: "POST",
+      corpo: { artistaId: mia.id, codice },
+      testate: mia.chiave ? { "x-chiave": mia.chiave } : {} });
   }
 
   /* ==================== LETTURA ==================== */
   const stato = () => chiama("/api/stato", { attesa: 3000 });
   const notizie = quante => chiama("/api/notizie?quante=" + (quante || 10));
 
-  /* La fetta che vuoi: `classifica(1, 10)` è la top 10, `classifica(1, 100)`
-     la top 100. La riga tua torna sempre a parte, anche se sei fuori. */
   function classifica(da, quanti){
     const mia = identita();
     return chiama("/api/classifica?da=" + (da || 1) + "&quanti=" + (quanti || 10) +
       (mia ? "&io=" + mia.id : ""));
   }
-
-  /* Chi hai davanti e chi hai dietro: serve per «sei 428°». */
   function intorno(raggio){
     const mia = identita();
     if(!mia) return Promise.resolve(null);
@@ -133,15 +214,17 @@ const ONLINE = (() => {
     try{ localStorage.setItem(K_URL, base); }catch(e){}
     return base;
   }
-  function scollega(){
-    try{ localStorage.removeItem(chiave(K_ID)); localStorage.removeItem(chiave(K_CHIAVE)); }catch(e){}
-  }
+  function scollega(){ togli(K_ID); togli(K_CHIAVE); togli(K_SESSIONE); }
 
   return {
     get url(){ return base; },
     get staccato(){ return staccato; },
-    collega, scollega, identita, registra, assicura, rinomina,
-    punteggioDaPartita, invia, classifica, intorno, stato, notizie
+    collega, scollega, identita, registra, assicura, scambiaVecchiaChiave,
+    registraConMail, entra, esci, io, cancellaAccount, piattaforma,
+    punteggioDaPartita, invia,
+    salvaCarriera, carriera, carriere,
+    traguardi, daiTraguardo,
+    classifica, intorno, stato, notizie
   };
 })();
 window.ONLINE = ONLINE;

@@ -1,16 +1,34 @@
 /* I bot: quelli che fanno numero finché i giocatori veri non bastano.
 
-   Vivono come i rivali dentro al gioco (`js/game/rivals.js`): crescono, escono
-   con un pezzo, firmano, spariscono dai radar. La differenza è che qui la
-   settimana passa per tutti insieme, sul server, e quindi la classifica si
-   muove anche mentre nessuno gioca. */
+   Vivono come i rivali dentro al gioco (`frontend/js/game/rivals.js`): crescono,
+   escono con un pezzo, firmano, spariscono dai radar. La differenza è che qui la
+   settimana passa per tutti insieme, sul server, e quindi la classifica si muove
+   anche mentre nessuno gioca.
+
+   Da qui non esce mai niente che dica «sono un bot»: nome vero, città vera,
+   storia sua. È la regola del punto 30, ed è tutta la ragione per cui questo
+   file è scritto con cura invece che con un `Math.random()` e via. */
 "use strict";
 
 const { CITTA, GENERI, STORIE, TITOLI, scegli, nuovoNome } = require("./nomi.js");
 const crypto = require("crypto");
 
 const fra = (a, b) => a + Math.random() * (b - a);
-const idNuovo = () => crypto.randomBytes(6).toString("hex");
+const idNuovo = () => crypto.randomUUID();
+
+/* Il carattere decide come si muove uno, non quanto vale: è quello che fa
+   sembrare la classifica abitata da persone diverse invece che da
+   centoquaranta copie della stessa formula. */
+const CARATTERI = {
+  normale:   { su: [0.955, 1.075], evento: 1,    tiene: 0.72 },
+  costante:  { su: [0.985, 1.045], evento: 0.6,  tiene: 0.85 },   // sale piano e non molla
+  esplosivo: { su: [0.90,  1.16 ], evento: 1.6,  tiene: 0.60 },   // grosse salite e grosse cadute
+  meteora:   { su: [0.86,  1.28 ], evento: 2.2,  tiene: 0.45 }    // esplode e sparisce
+};
+const pesca = () => {
+  const d = Math.random();
+  return d < 0.55 ? "normale" : d < 0.78 ? "costante" : d < 0.93 ? "esplosivo" : "meteora";
+};
 
 /* Un bot nuovo. `stream` è la sua quota di partenza: la scala va da chi ha
    trecento ascolti a chi ne ha due milioni, così ogni giocatore — al primo
@@ -21,9 +39,9 @@ function nuovoBot(stream, usati){
   return {
     id: idNuovo(), bot: true, nome,
     citta: scegli(CITTA), genere: scegli(GENERI), storia: scegli(STORIE),
-    stream: Math.round(stream), streamPrec: Math.round(stream),
-    pos: 0, posPrec: 0,
-    uscite: Math.floor(fra(1, 7)), deal: Math.random() < 0.22, mom: 0, hot: 0,
+    stream: Math.round(stream),
+    uscite: Math.floor(fra(1, 7)), deal: Math.random() < 0.22,
+    slancio: 0, caldo: 0, carattere: pesca(),
     seed: Math.floor(Math.random() * 1e9), ultima: scegli(TITOLI),
     creato: Date.now()
   };
@@ -41,20 +59,22 @@ function popolazione(quanti, usati){
   return out;
 }
 
-/* Una settimana di vita dei bot. Torna le notizie da mettere in bacheca. */
+/* Una settimana di vita dei bot. Cambia gli oggetti che gli passi e torna le
+   notizie da mettere in bacheca. */
 function settimanaBot(bot, notizie){
   for(const b of bot){
-    b.mom = (b.mom || 0) * 0.72;
-    b.stream = Math.min(3.2e6, Math.max(120, b.stream * fra(0.955, 1.075) * (1 + b.mom)));
-    if(b.hot > 0) b.hot--;
+    const c = CARATTERI[b.carattere] || CARATTERI.normale;
+    b.slancio = (b.slancio || 0) * c.tiene;
+    b.stream = Math.min(3.2e6, Math.max(120, b.stream * fra(c.su[0], c.su[1]) * (1 + b.slancio)));
+    if(b.caldo > 0) b.caldo--;
 
-    const dado = Math.random();
+    const dado = Math.random() / c.evento;
     if(dado < 0.055){
       b.uscite++; b.ultima = scegli(TITOLI); b.seed = Math.floor(Math.random() * 1e9);
-      b.mom += fra(0.15, 0.5); b.hot = 3;
+      b.slancio += fra(0.15, 0.5); b.caldo = 3;
       notizie.push(b.nome + " è uscito con «" + b.ultima + "».");
     } else if(dado < 0.07 && !b.deal && b.stream > 4000){
-      b.deal = true; b.mom += 0.3;
+      b.deal = true; b.slancio += 0.3;
       notizie.push(b.nome + " ha firmato con un'etichetta.");
     } else if(dado < 0.085 && b.stream > 8000){
       b.stream *= fra(0.45, 0.68);
@@ -81,4 +101,4 @@ function ricambio(bot, quanti, usati, notizie){
   }
 }
 
-module.exports = { nuovoBot, popolazione, settimanaBot, ricambio, idNuovo };
+module.exports = { nuovoBot, popolazione, settimanaBot, ricambio, idNuovo, CARATTERI };

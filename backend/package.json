@@ -2,14 +2,15 @@
   "name": "anni-di-fame-classifica",
   "version": "1.0.0",
   "private": true,
-  "description": "Il server della classifica di Anni di Fame: giocatori veri e bot nella stessa graduatoria. Nessuna dipendenza.",
+  "description": "Il server di Anni di Fame: classifica, account e salvataggi in cloud. SQLite dentro Node, nessuna dipendenza.",
   "license": "UNLICENSED",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "prova": "node prova.js"
+    "prova": "node prova.js",
+    "travaso": "node database/travaso.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22.5"
   }
 }

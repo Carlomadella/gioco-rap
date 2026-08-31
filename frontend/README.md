@@ -109,7 +109,7 @@ La scelta che consiglio: **Electron per Steam, Capacitor per il telefono**. Sono
 sopra allo stesso gioco, non due giochi. Su Steam il peso dell'eseguibile non interessa a
 nessuno; quello che interessa è che l'overlay funzioni e che i traguardi arrivino.
 
-### 3. I salvataggi non possono più stare nel `localStorage`
+### 3. I salvataggi non possono più stare nel `localStorage` — **metà fatta**
 
 Oggi la carriera vive nel `localStorage` del browser. Su uno store è inaccettabile: la
 gente reinstalla, cambia telefono, gioca sul PC e poi sul cellulare, e una carriera da
@@ -118,15 +118,26 @@ quaranta ore che sparisce è una recensione negativa che resta lì per sempre.
 Serve uno **strato di salvataggio** con tre gradini: un file vero nella cartella dati
 dell'app (desktop) o nello spazio dell'app (telefono); **Steam Cloud** dove c'è;
 e il **salvataggio in cloud nostro**, legato all'account, che è quello che fa passare una
-carriera dal PC al telefono. Il modello dei dati è già disegnato:
-`../backend/database/schema.md`, tabella `carriera`.
+carriera dal PC al telefono.
 
-### 4. L'account al posto della chiave nel browser
+**Il terzo c'è** (01/09/2026): il server tiene tre slot in cloud e il ponte è pronto —
+`ONLINE.salvaCarriera(slot)`, `ONLINE.carriera(slot)`, `ONLINE.carriere()`. In conflitto
+vince la partita più avanti, e all'altro dispositivo si dice cos'è successo.
+**Resta da agganciarlo**: `save()` in `js/game/state.js` scrive ancora solo nel
+`localStorage`. Il file vero arriva col guscio nativo (punto 2).
 
-Stessa storia dal lato classifica: oggi sei un `id` e una chiave nel `localStorage`. Con
-gli store si entra con **Steam**, **Sign in with Apple**, **Google Play Games** o una mail,
-e l'artista sta attaccato a quell'account. Apple e Google pretendono anche che dal gioco si
-possa **cancellare** il proprio account: c'è già la procedura scritta, in `schema.md`.
+### 4. L'account al posto della chiave nel browser — **fatto lato server**
+
+Il server ha account, sessioni e cancellazione dell'account (01/09/2026). Si entra **da
+ospite** senza compilare niente — lo apre lui quando ti iscrivi alla classifica — oppure con
+**mail e password**; chi aveva la vecchia chiave se la scambia con una sessione senza
+perdere l'artista. Nel gioco: `ONLINE.registraConMail()`, `ONLINE.entra()`, `ONLINE.io()`,
+`ONLINE.cancellaAccount()`.
+
+**Restano due cose, tutte e due di qua**: le schermate (entra / esci / cancella l'account,
+che gli store vogliono dentro al gioco) e **Steam, Apple e Google**, che il server accetta
+ma respinge con `501` finché non c'è chi verifica il loro biglietto — cioè finché non c'è
+il guscio nativo.
 
 ### 5. L'interfaccia sul telefono — il lavoro più grosso
 

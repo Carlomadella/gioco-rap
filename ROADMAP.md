@@ -188,10 +188,10 @@ vendita sì.
 | | lavoro | dove | stato |
 | --- | --- | --- | --- |
 | **33** | **Il build** — bundle minificato con l'impronta nel nome, server di sviluppo con ricarica automatica, controlli automatici | frontend | ✅ **fatto (31/08/2026)** |
-| **34** | **I salvataggi** — file vero sul dispositivo, Steam Cloud, cloud nostro. Il `localStorage` non basta più | frontend + backend | da fare |
-| **35** | **Gli account** — Steam, Sign in with Apple, Google Play Games, e la cancellazione dell'account che gli store pretendono | backend | da fare |
+| **34** | **I salvataggi** — file vero sul dispositivo, Steam Cloud, cloud nostro. Il `localStorage` non basta più | frontend + backend | **metà: il cloud c'è** (01/09/2026) |
+| **35** | **Gli account** — da ospite o con la mail, sessioni, cancellazione dell'account | backend | ✅ **fatto (01/09/2026)**, tranne i tre negozi |
 | **36** | **L'interfaccia sul telefono** — verticale, a tocchi, leggibile. Il lavoro più lungo di tutti | frontend | da fare |
-| **37** | **Il database vero** — SQLite appena c'è l'account, PostgreSQL dal primo giorno di vendita | backend | da fare |
+| **37** | **Il database vero** — SQLite adesso, PostgreSQL il giorno dell'uscita | backend | ✅ **fatto (01/09/2026)** |
 
 ### 33 · Il build _(fatto)_
 
@@ -208,20 +208,35 @@ deciderebbe il grafo degli import e il gioco si romperebbe in silenzio in qualch
 Si faranno una cartella alla volta, col gioco giocabile a ogni passo — e non servono per
 uscire. Dettagli in `frontend/README.md`.
 
-### 34 · I salvataggi
+### 34 · I salvataggi _(metà fatta)_
 
 Tre gradini: un file vero nella cartella dell'app (desktop) o nello spazio dell'app
 (telefono); **Steam Cloud** dove c'è; il **cloud nostro** legato all'account, che è quello
-che porta la carriera dal PC al telefono. Da qui in poi perdere il database vuol dire
-perdere le carriere della gente: il backup smette di essere un'accortezza.
+che porta la carriera dal PC al telefono.
 
-### 35 · Gli account
+**Il terzo c'è** (01/09/2026): tre slot in cloud, lo stato del gioco salvato per intero, e
+in conflitto vince la partita più avanti — due salvataggi non si fondono mai da soli. Nel
+gioco il ponte è pronto (`ONLINE.salvaCarriera`), ma `save()` scrive ancora solo nel
+`localStorage`: agganciarlo è il prossimo pezzo, insieme al file vero, che arriva col
+guscio nativo.
 
-Oggi l'identità è una chiave nel `localStorage`: chi reinstalla perde l'artista. Servono
-Steam, Apple, Google e la mail, con sotto la tabella `account`. E la **cancellazione
-dell'account dentro al gioco**, che Apple e Google pretendono: la procedura è già scritta
-(`backend/database/schema.md`), e non è un `DELETE` a cascata — l'artista resta in
-classifica senza nome e senza padrone, tutto il resto sparisce.
+Da qui in poi perdere il database vuol dire perdere le carriere della gente: il backup
+smette di essere un'accortezza.
+
+### 35 · Gli account _(fatti, tranne i tre negozi)_
+
+Si entra **da ospite** — il server apre l'account da solo, chi gioca non compila niente —
+oppure con **mail e password**, che è quello che fa sopravvivere una carriera a un telefono
+nuovo. La vecchia chiave si scambia con una sessione vera senza perdere l'artista. Le
+password stanno come scrypt, i gettoni di sessione solo come hash.
+
+**La cancellazione dell'account c'è** e fa la cosa giusta: l'artista resta in classifica
+senza nome e senza padrone — la storia degli altri non si sfonda — e spariscono salvataggi,
+identità, dispositivi e mail.
+
+**Steam, Apple e Google rispondono 501**: le rotte ci sono, manca il pezzo che verifica il
+biglietto firmato da loro, e finché manca resta una porta chiusa, non una porta finta. Si
+collega insieme al guscio nativo.
 
 ### 36 · L'interfaccia sul telefono
 
@@ -231,13 +246,19 @@ sotto l'altro), aree da toccare di almeno 44 punti, niente `hover`, testi leggib
 zoom. Non è una riscrittura — sono i CSS e un pezzo di `hub.js` — ma è il lavoro più lungo,
 ed è quello da provare su un telefono vero il prima possibile.
 
-### 37 · Il database vero
+### 37 · Il database vero _(fatto: SQLite)_
 
-Lo schema completo è già scritto: `backend/database/schema.md`. Quattordici tabelle con
-account, identità, dispositivi, artisti, carriere, punteggi settimana per settimana,
-fotografie della classifica, traguardi, rivalità, sospetti e sanzioni. Il travaso dal file
-JSON di adesso è uno script di mezz'ora, e va fatto **quando siamo pochi**: farlo di corsa
-con diecimila account dentro è come si perdono i dati della gente.
+Il file JSON non c'è più: sotto c'è **SQLite dentro a Node** (`node:sqlite`), con 18
+tabelle, migrazioni in file `.sql` numerati, transazioni e chiavi esterne vere. Lo storico
+c'è per davvero — un punteggio per artista per settimana e una fotografia della classifica
+a ogni giro: le frecce ▲▼ adesso sono un dato salvato, non un numero tenuto a mente.
+
+Il travaso dal vecchio archivio è scritto e provato (`npm run travaso`): il giocatore che
+c'era si ritrova artista, posizione, freccia e la chiave che funziona ancora.
+
+**Resta PostgreSQL**, e serve quando i server diventano più di uno — non quando le righe
+diventano tante. Lo schema è già scritto per tutti e due e il cambio tocca un file solo
+(`backend/database/archivio.js`).
 
 ---
 

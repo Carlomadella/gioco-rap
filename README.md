@@ -6,8 +6,8 @@ Il progetto è diviso in due metà che non si mescolano:
 | dove | cos'è | come si avvia |
 | --- | --- | --- |
 | [`frontend/`](frontend/README.md) | il gioco: HTML, CSS, JavaScript, dentro a un guscio nativo per gli store | `npm run dev` |
-| [`backend/`](backend/README.md) | il server della classifica: Node, nessuna dipendenza | `npm start` |
-| [`backend/database/`](backend/database/README.md) | i dati: com'è messo adesso e dove va (lo schema completo in `schema.md`) | — |
+| [`backend/`](backend/README.md) | il server: classifica, account, salvataggi in cloud. Node + SQLite, nessuna dipendenza | `npm start` |
+| [`backend/database/`](backend/database/README.md) | i dati: 18 tabelle, migrazioni, travaso (schema completo in `schema.md`) | — |
 
 **Il gioco funziona da solo.** Il backend serve alla classifica multiplayer: se non è
 acceso, la partita gira come ha sempre girato, con la classifica in locale.
@@ -34,10 +34,10 @@ Da qui discendono **cinque lavori** che prima non servivano. Sono i punti 33-37 
 | | lavoro | stato |
 | --- | --- | --- |
 | 33 | **Il build**: bundle minificato con l'impronta nel nome, server di sviluppo con ricarica, controlli automatici | **fatto** (31/08/2026) |
-| 34 | **I salvataggi**: file vero sul dispositivo + Steam Cloud + cloud nostro, al posto del `localStorage` | da fare |
-| 35 | **Gli account**: Steam, Apple, Google al posto della chiave nel browser, con la cancellazione dell'account | da fare |
+| 34 | **I salvataggi**: file vero sul dispositivo + Steam Cloud + cloud nostro, al posto del `localStorage` | metà: **il cloud c'è** (01/09/2026) |
+| 35 | **Gli account**: da ospite o con la mail, sessioni, cancellazione dell'account | **fatto** (01/09/2026) — Steam, Apple e Google quando c'è il guscio nativo |
 | 36 | **L'interfaccia sul telefono**: verticale, a tocchi — il lavoro più lungo | da fare |
-| 37 | **Il database vero**: SQLite, poi PostgreSQL. Lo schema è già scritto | da fare |
+| 37 | **Il database vero**: SQLite adesso, PostgreSQL il giorno dell'uscita | **fatto** (01/09/2026) |
 
 Più l'impacchettamento vero e proprio (Electron per Steam, Capacitor per il telefono) e i
 requisiti degli store: informativa sulla privacy, classificazione per età, cancellazione
@@ -107,8 +107,10 @@ città, un genere, una storia, uscite che escono e contratti che firmano. Il ser
 mai a nessuno chi è un bot: è una regola di gioco, non una dimenticanza.
 
 La classifica si muove anche quando nessuno gioca: ogni 24 ore vere il server fa un giro di
-settimana, e chi sparisce scende. Rotte, manopole e freni contro l'imbroglio stanno in
-[`backend/README.md`](backend/README.md); il modello dei dati in
+settimana, e chi sparisce scende. Dal 01/09/2026 il server tiene anche **gli account** (da
+ospite o con la mail, con la cancellazione che gli store pretendono) e **i salvataggi in
+cloud**, che è quello che porta una carriera dal PC al telefono. Rotte, manopole e freni
+contro l'imbroglio stanno in [`backend/README.md`](backend/README.md); i dati in
 [`backend/database/README.md`](backend/database/README.md).
 
 **La schermata classifica non è ancora agganciata**: il ponte c'è
