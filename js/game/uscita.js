@@ -43,6 +43,7 @@ const USCITE = [
   {id:"writer", fondale:false,
    chiudi(){ if(typeof WR !== "undefined" && WR){ annullaAzione(); } chiudiFoglio(); renderGioco(); return true; }},
   {id:"piazza", chiudi(){ uscitaPiazza(); return true; }},
+  {id:"posto",  chiudi(){ chiudiPosto(); return true; }},
   {id:"drawer", chiudi(){ closeDiary(); return true; }},
   {id:"report", chiudi(){ $("report").classList.remove("on"); return true; }}
 ];
@@ -50,7 +51,7 @@ const aperto = id => { const el = $(id); return el && el.classList.contains("on"
 function overlayAperto(){ return USCITE.some(u => aperto(u.id)); }
 /* le scene vere e proprie: la modale non conta, perche' mentre si sceglie
    un'opzione e' ancora aperta e non direbbe niente di utile */
-function scenaAperta(){ return aperto("writer") || aperto("piazza"); }
+function scenaAperta(){ return aperto("writer") || aperto("piazza") || aperto("posto"); }
 
 /* chiude la finestra più in alto; torna false se quella aperta non si può chiudere
    (gli eventi della settimana e le prove: lì una scelta va fatta per forza) */

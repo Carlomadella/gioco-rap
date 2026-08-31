@@ -102,7 +102,12 @@ Farmare contatti è gameplay, non un menu.
    stessa (`media/photo/mappa_citta.jpg`), con sopra le zone da toccare. Si entra dalla
    mappa; studio, beat maker e vita quotidiana aprono la partita sulla sezione giusta; club e
    concerti sono in vista e dicono cosa serve per Milano.
-2. Anagrafica dei contatti: tipo, grado, come si sale, dove si incontrano.
+2. ~~Anagrafica dei contatti: tipo, grado, come si sale, dove si incontrano.~~
+   **PRIMO PEZZO FATTO (31/08/2026)** — «La Sala» (`js/game/posto.js`): il posto della provincia dove
+   si conosce la gente. Ruolo, carattere, fama, e i sei gradini del rapporto; quello che puoi chiedere
+   dipende da dove sei arrivato, e con un rapper si può anche rompere — e quello diventa un rivale in
+   classifica. Restano: i contatti che si presentano fra loro, le scene vere delle sessioni in studio,
+   e i ruoli di Milano (manager, promoter, A&R).
 3. Studi come luoghi con una qualità, dentro il calcolo del pezzo; via ogni residuo di studio proprio.
 4. Milano: soglie di sblocco, luoghi nuovi, prezzi e qualità più alti.
 5. Los Angeles: soglie, luoghi di lusso e di rischio, tetto della carriera.
@@ -145,7 +150,7 @@ quando dalla provincia cominci a muoverti verso Milano.
 - Barra di progresso verso il livello successivo, sempre visibile.
 - L'energia cresce col livello: salire deve valere qualcosa, farmare non deve stufare (punto 22).
 
-## Fase 3 — Contatti, team e producer
+## Fase 3 — Contatti, team e producer _(cominciata: c'è La Sala)_
 
 - I contatti (tipo e grado) sono la spina dorsale: manager, fonico e producer non si "comprano"
   in un negozio, si conoscono e si coltivano.

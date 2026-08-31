@@ -1,0 +1,80 @@
+/* La Sala: la scena del posto e la gente che ci trovi.
+   Stessa famiglia della piazza e del foglio: fondale scuro, un riquadro
+   centrale, la scena in alto e sotto le cose da fare. */
+
+.posto{position:fixed;inset:0;z-index:93;display:none;overflow-y:auto;
+  background:radial-gradient(120% 80% at 50% 0%,#1B1226,#08080B 70%)}
+.posto.on{display:block}
+.powrap{max-width:680px;margin:0 auto;padding:20px 18px 46px}
+
+.pohead{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.pohead .pok{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--acid)}
+.pox{margin-left:auto;width:34px;height:34px;border-radius:11px;
+  background:rgba(255,255,255,.08);color:#fff;font-size:15px}
+.pox:hover{background:rgba(255,255,255,.16)}
+
+.poscena{border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+.poscena svg{display:block;width:100%;height:auto}
+
+.podove{margin:12px 2px 14px;font-size:13.5px;line-height:1.5;color:var(--soft)}
+.podove b{color:#fff}
+
+/* ---- la gente ---- */
+.poperso{border-radius:15px;background:linear-gradient(170deg,#17141F,#100E17);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);margin-bottom:10px;overflow:hidden}
+.poperso.aperta{box-shadow:inset 0 0 0 1px var(--k),0 10px 30px rgba(0,0,0,.4)}
+.potesta{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;text-align:left}
+.potesta:hover{background:rgba(255,255,255,.04)}
+.poav{width:46px;height:46px;flex:none;border-radius:14px;overflow:hidden;display:block}
+.poav svg{display:block;width:100%;height:100%}
+.potx{flex:1;min-width:0}
+.potx b{display:block;font-size:16px;font-weight:800;letter-spacing:-.01em}
+.potx i{display:block;font-style:normal;font-size:12px;color:var(--k);font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.porel{flex:none;width:132px;text-align:right}
+.porel u{display:block;font-size:12px;font-weight:800;text-decoration:none;color:#fff;
+  text-transform:uppercase;letter-spacing:.06em}
+.pobar{display:block;height:4px;margin:6px 0 4px;border-radius:3px;background:rgba(255,255,255,.12)}
+.pobar i{display:block;height:100%;border-radius:3px;background:var(--k)}
+.porel em{font-style:normal;font-size:11px;color:var(--faint)}
+
+/* ---- cosa puoi chiedergli ---- */
+.poaz{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 12px}
+.poazione{text-align:left;padding:10px 12px;border-radius:12px;background:#1C1826;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);transition:background .15s,transform .12s}
+.poazione:hover{background:#251F33;transform:translateY(-1px)}
+.poazione.no{opacity:.45;cursor:default;transform:none}
+.poazione .n{display:block;font-size:13.5px;font-weight:800}
+.poazione .d{display:block;font-size:11.5px;color:var(--soft);margin-top:3px;line-height:1.3}
+.poazione .c{display:inline-block;margin-top:7px;padding:2px 8px;border-radius:999px;
+  background:rgba(255,255,255,.09);font-size:10.5px;font-weight:800;letter-spacing:.06em;
+  text-transform:uppercase;color:#D9DBE4}
+.poruolo{margin:0;padding:0 14px 14px;font-size:12px;color:var(--faint)}
+
+/* ---- la chiacchierata ---- */
+.podial{border-radius:15px;background:linear-gradient(170deg,#191322,#110F18);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);padding:16px}
+.poq{margin:0 0 14px;font-size:16px;line-height:1.45;font-weight:600}
+.porisp{display:block;width:100%;text-align:left;padding:13px 15px;border-radius:13px;
+  background:#221B2E;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);
+  font-size:14px;line-height:1.35;margin-bottom:9px;transition:background .15s,transform .12s}
+.porisp:hover{background:#2C2340;transform:translateX(3px)}
+.porisp:last-child{margin-bottom:0}
+
+/* ---- il riepilogo della rete ---- */
+.porete{margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)}
+.pok2{display:block;font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint);margin-bottom:8px}
+.porig{display:flex;align-items:baseline;gap:8px;padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
+.porig b{color:#fff;font-weight:700}
+.porig i{font-style:normal;font-size:11.5px;color:var(--k,var(--soft));text-transform:uppercase;
+  letter-spacing:.06em;font-weight:700}
+.porig u{margin-left:auto;text-decoration:none;font-size:12px;color:var(--soft)}
+
+@media (max-width:520px){
+  .poaz{grid-template-columns:1fr}
+  .porel{width:104px}
+  .potx b{font-size:15px}
+}

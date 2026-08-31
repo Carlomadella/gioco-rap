@@ -96,7 +96,8 @@ dist/                 anni-di-fame.html, il file unico per l'artifact
 | `forms.css` | pannelli e campi del creatore |
 | `creator.css` | sezione avatar: galleria degli otto, categorie, fondali |
 | `actionbar.css` | barra fissa in basso e bottoni |
-| `hub.css` | l'hub: testata, mappa, targhette dei luoghi, linguette, telefono |
+| `posto.css` | La Sala: la scena del posto e le schede della gente |
+| `hub.css` | la plancia: testata, profilo, mappa, eventi, telefono |
 | `impostazioni.css` | pannello impostazioni, temi, densità |
 
 ### JS — anche qui l'ordine dei `<script>` conta
@@ -150,7 +151,8 @@ che quelli caricati prima abbiano già dichiarato le loro funzioni e costanti.
 | `fx.js` | suono, notifiche, rapporto, avvio (`window.GAME`) |
 | `skip.js` | salta un giorno, una settimana, un mese |
 | `uscita.js` | uscire da un'azione (✕, ESC, clic fuori) rimettendo a posto il conto |
-| `hub.js` | la mappa della città: testata, luoghi, linguette, obiettivo, notizie |
+| `posto.js` | La Sala: la gente del giro, i rapporti che ci costruisci |
+| `hub.js` | la plancia: testata, profilo, mappa, eventi di oggi, telefono |
 
 **Per ultimo**
 

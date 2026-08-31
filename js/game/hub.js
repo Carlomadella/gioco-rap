@@ -54,26 +54,36 @@ const HUB_LUOGHI = [
   {id:"studio", n:"Studio", x:12.17, y:9.16, w:18.07, h:16.69,
    vai:() => hubGioco("settimana")},
   {id:"club", n:"Club & discoteche", x:61.81, y:12.11, w:19.76, h:9.31,
-   chiuso:"Si apre a <b>Milano</b>, e a Milano ci si arriva con più cose insieme: " +
-     "<b>livello 10</b>, <b>fama 50</b>, <b>hype 40</b>."},
+   chiuso:"Da fuori si sente la cassa. Stasera non è cosa: quella porta si apre da sé, " +
+     "quando sarà il momento."},
   {id:"concerti", n:"Concerti & live", x:73.86, y:31.02, w:18.19, h:9.31,
-   chiuso:"I concerti veri arrivano con <b>Milano</b>: qui i locali sono due, e chiamano " +
-     "chi conoscono. Il palco che hai adesso è la piazza e l'open mic della settimana."},
-  {id:"beat", n:"Beat maker", x:5.30, y:39.14, w:18.31, h:14.77,
-   vai:() => hubGioco("catalogo", "market")},
+   chiuso:"Il palco vero non è ancora roba tua. Per adesso ci sono la piazza e l'open mic " +
+     "della settimana: si comincia da lì."},
+  /* il beat maker non è un listino: è la sala dove si conosce la gente */
+  {id:"beat", n:"La Sala", x:5.30, y:39.14, w:18.31, h:14.77,
+   vai:() => apriPosto()},
   {id:"vita", n:"Vita quotidiana", x:37.83, y:50.96, w:19.52, h:14.77,
-   vai:() => hubGioco("lifestyle")},
+   vai:() => showEvent({k:"Vita quotidiana", t:"Casa, palestra, relazioni",
+     d:"La settimana non è solo musica. Il corpo regge o non regge, e la testa pure.",
+     annulla(){},
+     opts:[
+       {n:"Vai in palestra", d:"Un'ora di ferro: ti rimette in piedi e ti si vede addosso",
+        run(){ hubAzione("palestra"); return null; }},
+       {n:"Stacca la spina", d:"Una sera senza pensare a niente",
+        run(){ hubAzione("stacca"); return null; }},
+       {n:"Guarda cosa ti costa vivere", d:"Casa, look, uscite: le spese fisse",
+        run(){ hubGioco("lifestyle"); return null; }}
+     ]})},
   {id:"crimin", n:"Attività criminali", x:72.77, y:50.96, w:20.24, h:18.17,
    vai:() => hubPresto("Attività criminali",
      "Il giro storto della provincia — colpi piccoli, soldi veloci, guai veri — " +
      "è il prossimo pezzo di mondo da aprire.")},
   {id:"sponsor", n:"Sponsor & brand", x:6.87, y:74.59, w:19.28, h:9.31,
-   chiuso:"I brand pagano dove c'è gente: si aprono a <b>Milano</b>."},
+   chiuso:"Nessun marchio ti cerca ancora. Capita, quando cominci a spostare gente."},
   {id:"business", n:"Business", x:38.80, y:80.21, w:16.75, h:9.16,
-   chiuso:"Investire viene dopo: si apre a <b>Milano</b>."},
+   chiuso:"Mettere i soldi a lavorare è un altro sport, e non è per adesso."},
   {id:"shop", n:"Shop", x:74.58, y:81.24, w:16.27, h:9.16,
-   chiuso:"I negozi che contano stanno a <b>Milano</b>. Qui c'è quello che passa il paese: " +
-     "l'attrezzatura la trovi nel catalogo."}
+   chiuso:"Vetrina spenta. Qui c'è quello che passa il paese: l'attrezzatura sta nel catalogo."}
 ];
 
 /* ================= GLI EVENTI DI OGGI ================= */
@@ -84,9 +94,9 @@ const HUB_EVENTI = [
   {id:"free", ic:"mic", k:"#A855F7", n:"Freestyle al bar centrale",
    d:"Freestyle contest aperto a tutti.", ora:"21:00",
    righe:[["hype", "Hype in piazza"], ["gente", "Gente nuova"]]},
-  {id:"beat", ic:"nota", k:"#38BDF8", n:"Producer session",
-   d:"Incontra un producer in studio.", ora:"22:30",
-   righe:[["gente", "Nuovo contatto"], ["cursori", "Tre beat"]]},
+  {id:"sala", ic:"nota", k:"#38BDF8", n:"Producer session",
+   d:"Passa dalla Sala: stasera c'è chi fa beat.", ora:"22:30", posto:true,
+   righe:[["gente", "Gente da conoscere"], ["cursori", "Beat da farsi sentire"]]},
   {id:"stacca", ic:"corona", k:"#FACC15", n:"Piccolo party",
    d:"Party in appartamento.", ora:"00:00",
    righe:[["cuore", "Ti rimette su"], ["dado", "Evento casuale"]]},
@@ -98,10 +108,8 @@ const HUB_EVENTI = [
 /* ================= LE APP DEL TELEFONO ================= */
 const HUB_APP = [
   {id:"contatti", n:"Contatti", ic:"gente", k:"#38BDF8",
-   sotto:g => Math.round(g.skills.rete) + " di rete",
-   vai:() => hubPresto("Contatti",
-     "Producer, fonici, gente che organizza serate: la rubrica vera è il prossimo " +
-     "pezzo di gioco. Per adesso la tua rete è una statistica, e cresce quando esci.")},
+   sotto:g => (g.gente || []).filter(p => !p.via && p.rel >= 1).length + " conosciuti",
+   vai:() => apriPosto()},
   {id:"obiettivi", n:"Obiettivi", ic:"mirino", k:"#EF4444",
    sotto:g => GOALS.filter(x => !g.goals[x.id]).length + " aperti",
    vai:() => hubGioco("obiettivi")},
@@ -378,7 +386,7 @@ function renderHub(){
 
   /* ---- gli eventi di oggi ---- */
   $("hb-eventi").innerHTML = HUB_EVENTI.map(e => {
-    const st = e.presto ? {ok:true, perche:""} : hubPronta(e.id);
+    const st = (e.presto || e.posto) ? {ok:true, perche:""} : hubPronta(e.id);
     return '<button class="pev" data-e="' + e.id + '" style="--k:' + e.k + '"' +
       (st.ok ? '' : ' disabled') + '>' +
       '<span class="pevt">' + hsvg(e.ic) + e.n + '</span>' +
@@ -454,7 +462,8 @@ $("hb-eventi").addEventListener("click", ev => {
   const b = ev.target.closest(".pev"); if(!b || b.disabled) return;
   const e = HUB_EVENTI.find(x => x.id === b.dataset.e); if(!e) return;
   hubTap();
-  if(e.presto) hubPresto(e.n,
+  if(e.posto) apriPosto();
+  else if(e.presto) hubPresto(e.n,
     "I lavori sporchi arrivano con le attività criminali: è il prossimo pezzo di " +
     "mondo da aprire, insieme al giro storto sulla mappa.");
   else hubAzione(e.id);

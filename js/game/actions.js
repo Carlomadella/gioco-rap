@@ -222,5 +222,22 @@ const ACTIONS = [
      let s = "Ti sei fermato. Benessere +" + w + ", rete +1.";
      if(Math.random() < .18){ G.hype = clamp(G.hype+5,0,100); s += " Hai incrociato la persona giusta."; }
      return s;
+   }},
+
+  /* La palestra sta nella vita quotidiana: costa poco, ti tiene su il corpo e
+     ti si vede addosso quando sali su un palco. Non fa musica, fa la persona
+     che la musica la regge. */
+  {id:"palestra", n:"Palestra", e:1, luc:1,
+   money:() => 12,
+   d:"Un'ora di ferro. La testa si svuota e il corpo tiene.",
+   give:() => "+benessere · +presenza",
+   run(){
+     const b = Math.round(rnd(9,15));
+     G.wellbeing = clamp(G.wellbeing + b, 0, 100);
+     G.money -= 12;
+     gain("presenza", 0.5);
+     let s = "Un'ora di palestra: benessere +" + b + ", presenza su.";
+     if(Math.random() < .15){ gain("rete", 0.8); s += " In sala pesi c'era gente del giro."; }
+     return s;
    }}
 ];

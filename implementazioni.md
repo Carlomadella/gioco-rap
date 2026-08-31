@@ -190,38 +190,27 @@ Tutte le modifiche da fare:
     Riferimento grafico: la mappa generata va usata come **Main Hub / World Map**, non come logo — il logo
     vero, semplice e riconoscibile, viene dopo.
 
-    **FATTO in parte (31/08/2026)** — la plancia di gioco, uguale alla foto
-    `media/photo/schermata_di_gioco.png`.
-    - Si entra da lì: «Inizia la carriera» apre la plancia, non più le card. Dai luoghi si va nella
+    **FATTO in parte (31/08/2026)** — la schermata della città di partenza, uguale alla foto
+    `media/photo/schermata_di_gioco_città_iniziale.png`.
+    - Si entra da lì: «Inizia la carriera» apre la mappa, non più le card. Dalla mappa si va nella
       partita e dalla partita si torna indietro con il tasto viola «Mappa».
-    - La plancia è disegnata alla misura del concept (1536×1024) e rimpicciolita tutta insieme: le
-      proporzioni restano quelle della foto su qualunque schermo.
-    - La mappa è la foto stessa, non un disegno che le somiglia: `media/photo/mappa_citta.jpg` è il
-      concept ritagliato sul riquadro della città. Spilli, targhette e tasti «Entra» stanno dentro
-      all'immagine; sopra ci sono solo nove rettangoli invisibili, le zone da toccare, messe in
-      percentuale così restano incollate ai cartelli.
-    - Fascia in alto: marchio, città e fase, e i sei numeri veri della partita — energia, soldi,
-      hype, fama, network, benessere — più settimana, anno e l'ora della sera, che avanza con
-      l'energia che spendi.
-    - Colonna di sinistra: ritratto, nome, livello, barra dell'esperienza, sette righe di stato e le
-      sei abilità. Quattro linguette: profilo, abilità (dove si vede cosa fa crescere cosa),
-      vestiti (apre il tuo artista) e disciplina (benessere, lucidità, spese, prossima prova).
-    - Centro: la città con nove luoghi. Tre aperti portano dove si gioca davvero (studio → le mosse
-      della settimana, beat maker → i beat in vendita, vita quotidiana → lifestyle); le attività
-      criminali dicono che stanno arrivando (punto 21); club, concerti, sponsor, business e shop
-      restano in vista e spiegano cosa serve. Le frecce «scorri per esplorare» fanno il giro dei
-      luoghi uno alla volta, illuminandoli.
-    - Sotto: «Eventi e attività di oggi». Non sono cartelli finti: freestyle, producer session e
-      party fanno partire le azioni vere della settimana, con il loro costo, e si spengono da soli
-      quando non hai l'energia. Il colpo rapido dice che deve ancora arrivare.
-    - Colonna di destra: il telefono. Messaggi (le ultime righe del diario, col pallino di quelle
-      non lette), otto app che portano tutte da qualche parte — contatti, obiettivi, notizie,
-      inventario, statistiche, classifiche, agenda, impostazioni — e le notizie della settimana.
-    - Risolto: entrare in un luogo e tornare indietro senza fare niente dava schermata nera. La
-      plancia veniva misurata mentre era ancora nascosta, quindi grande zero: adesso si accende
-      prima e si misura dopo.
-      File nuovi: `js/game/hub.js`, `css/hub.css`, `media/photo/mappa_citta.jpg`. Il build
-      dell'artifact si porta dentro anche le immagini dei CSS, come data URI.
+    - Testata: marchio, nome, livello con la stella, fase in viola, e le quattro cose che hai —
+      energia, cassa, hype, chi ti segue. Sono i numeri veri della partita, non un mockup.
+    - La mappa è la foto stessa, non un disegno che le somiglia: `media/photo/mappa_provincia.jpg`
+      è il concept ritagliato sotto la testata e sopra le linguette. Spilli e targhette stanno
+      dentro all'immagine; sopra ci sono solo sei rettangoli invisibili, le zone da toccare, messe
+      in percentuale così restano incollate ai cartelli a qualunque grandezza di schermo.
+      Anche la miniatura delle notizie è ritagliata dal concept.
+    - Quattro luoghi aperti (studio, beat maker, vita quotidiana, attività criminali) e due chiusi
+      (club, concerti) che dicono «sblocca a Milano» e, se li tocchi, cosa serve: livello 10, fama 50,
+      hype 40. Studio, beat maker e vita quotidiana aprono la partita sulla sezione giusta;
+      la criminalità dice che sta arrivando (è il punto 21).
+    - In basso le cinque linguette (mappa, contatti, inventario, obiettivi, statistiche), l'obiettivo
+      di adesso con la barra, le notizie del paese che cambiano con le settimane e il telefono con la
+      chat: il pallino rosso è la roba non letta del diario.
+      File nuovi: `js/game/hub.js`, `css/hub.css`, `media/photo/mappa_provincia.jpg`,
+      `media/photo/notizia_folla.jpg`. Il build dell'artifact adesso si porta dentro anche le
+      immagini dei CSS, come data URI.
       Restano da fare: i contatti veri, la criminalità, e le altre due città.
 
 Carlomadella/gioco-rap
@@ -410,9 +399,93 @@ E questa, secondo me, è una direzione molto più da vero gioco gestionale/RPG r
 sviluppalo
 
 quando clicco su beat maker mi rimanda alla scermata della scena del personaggio che incontra il beatmaker.
+   **FATTO (31/08/2026)** — sulla mappa «Beat maker» adesso apre **La Sala**: la scena della sala prove,
+   col tuo personaggio dentro e la gente che c'è stasera. Non è più una lista di beat.
 
 Nella vita quotidiana si aggiunge la palestra
+   **FATTO (31/08/2026)** — «Vita quotidiana» sulla mappa apre tre scelte: palestra, staccare la spina,
+   guardare le spese. La palestra è una mossa vera della settimana: 1 energia e 12 €, alza benessere e
+   presenza, e ogni tanto in sala pesi c'è gente del giro (+rete).
 
-Trasforma la sezione beat maker in un posto fisico dove dentro si conoscono ARTISTI, BEATMAKER, FONICI, GIORNALISTI E TUTTI QUEI PERSONAGGI CHE RENDONO LA CARRIERA INTERATTIVA. Soprattutto troveremo beatmaker emergenti con cui creeremo relazioni e in base alle relazioni che costruiamo con questi poi avremo anche delle sessioni in studio. Ti ricordo che le sessioni in studio avremo SCENE DI GIOCO VERE E PROPRIE che ancora dobbiamo sviluppare. Ti chiedo infine se secondo te nel posto fisico che vogliamo creare abbiamo messo TROPPA ROBAA.
+Trasforma la sezione beat maker in un posto fisico dove dentro si conoscono ARTISTI, BEATMAKER, FONICI, GIORNALISTI E TUTTI QUEI PERSONAGGI CHE RENDONO LA CARRIERA INTERATTIVA. Soprattutto troveremo beatmaker emergenti con cui creeremo relazioni e in base alle relazioni che costruiamo con questi poi avremo anche delle sessioni in studio. Ti ricordo che le sessioni in studio avremo SCENE DI GIOCO VERE E PROPRIE che ancora dobbiamo sviluppare. Ti chiedo infine se secondo te nel posto fisico che vogliamo creare abbiamo messo TROPPA ROBAA. l'idea era che nella città di provincia ci sia un posto dove magari puoi sviluppare meglio la tua rete di contatti e questo influenza anche la vita del gioco come ad esempio da lì si creano post sul lafamegram e contatti, rivalità cose.
+
+   **FATTO in parte (31/08/2026) — «La Sala»** (`js/game/posto.js`, `css/posto.css`).
+   La sala prove dietro al bar centrale: una scena col tuo personaggio dentro, e stasera tre facce.
+   - Ogni persona ha un **ruolo**, un **genere**, una **fama** sua e un **carattere** (aperto, diffidente,
+     gasato, pratico) che non vedi finché non ci parli: si scopre indovinando la risposta giusta.
+   - «Fatti due parole» costa **1 energia** e apre una chiacchierata a tre risposte. Le risposte danno
+     punti, i punti fanno salire il gradino: conoscenza → contatto → amico → collaboratore → fidato →
+     partner. Più sali, più punti servono per il gradino dopo: la rete non si farma in una sera.
+   - Quello che puoi chiedere dipende dal gradino: al **beatmaker** un beat da sentire (contatto) e la
+     **sessione in studio** (amico: 2 energie e 60 €, esce un beat vostro, gratis e migliore); al
+     **fonico** il mix di un tuo pezzo (amico); al **rapper** un pezzo insieme (collaboratore: hype e
+     fan veri, con un'attesa fra un feat e l'altro); al **giornalista** un pezzo scritto su di te.
+   - **Le rivalità nascono qui**: se con un rapper dici le cose sbagliate quello se ne va, e te lo
+     ritrovi in classifica come rivale, con la storia «Vi siete conosciuti alla Sala. È finita male.»
+   - Le sessioni in studio per adesso sono una scena corta: le **scene di gioco vere** restano da fare,
+     come i post su LaFamegram, che ancora non esiste.
+
+   **RISPOSTA alla domanda «troppa roba?» — sì, per la provincia.** In un paese conosci tre persone, non
+   sei ruoli. Quindi qui dentro ci sono solo **beatmaker, rapper e fonico**; il **giornalista** si
+   affaccia da solo quando passi i 2.000 fan; manager, promoter, uffici stampa e A&R non ci sono
+   proprio, e vanno tenuti per Milano — servono a far sentire che Milano è un altro mondo. Se mettiamo
+   tutto subito, il posto diventa un menù e nessuno di quei personaggi resta in mente.
 
 Stiamo giocando e abbiamo notato ce è troppo facile fare la carriera da criminale, siamo arrivati in pochissimo tempo a reputazione strda 99, noi vogliamo creare un gioco per diventare rapper e non criminali
+
+   **RISPOSTA — regole da tenere quando la criminalità entra nel repo** (qui dentro ancora non c'è: sulla
+   mappa il posto esiste e dice che sta arrivando).
+   - La reputazione di strada sale **al massimo di 2 per colpo** e **cala di 1 a settimana** se stai
+     fermo: 99 non lo raggiungi in un mese, e per restarci devi continuare a rischiare.
+   - Un colpo costa **quanto una sessione in studio** e occupa la sera: ogni colpo è un pezzo che non hai
+     registrato. È lì che si sente che il gioco è sui rapper.
+   - La strada **non dà fama da rapper**: dà soldi e hype di strada. La fama vera esce solo dai pezzi.
+   - I **soldi sporchi** stanno in una cassa separata (vedi il punto dopo).
+
+i soldi sporchi possono essere usati per comprare le cose che oggettivamente nel mondo reale puoi comprare comunque ccol denaro ossia : Un beatmaker lo puoi pagare tutto contanti, nessuno sa di questa cosa, i soldi sporchi sono più per il futuro e per quando avrai più soldi ; Magari la finanza ti controlla e arriva ad incastrarti. Però questo se ovviamente fai acquisti spropositati coi soldi in nero ; Tipo auto ecc e cose di lusso nello shop CHE ANCORA DOBBIAM PENSARE.
+
+   **RISPOSTA — due casse, non una.** In cima si vedono i soldi puliti; i contanti stanno sotto, in una
+   riga a parte. Cosa pagano i contanti: beatmaker, fonici, favori, roba di strada, l'affitto della sala.
+   Cosa **non** pagano: promozione, contratti, tutto quello che lascia una carta. Ogni volta che spendi
+   sporco in cose che si vedono (auto, gioielli, shop di lusso) sale il **rischio finanza**: una barra
+   nascosta che, sopra soglia, fa partire un controllo — sequestro dei contanti, settimane perse, e la
+   notizia che gira. Il conto onesto è questo: i contanti sono comodi adesso e pericolosi dopo, ed è
+   proprio il motivo per cui uno smette.
+
+Non mi piace il fatto che nelle città venga scritto 'Si sblocca a Milano'. Lasciamo che sia tutto in progressione a sorpressa per i nostri player.
+   **FATTO (31/08/2026)** — tolto da tutte e due le parti: dalla foto della mappa (i cartelli chiusi
+   adesso hanno solo il lucchetto e il nome) e dai testi. Chi tocca un posto chiuso legge una frase che
+   non svela niente: «Da fuori si sente la cassa. Stasera non è cosa: quella porta si apre da sé, quando
+   sarà il momento.»
+
+Stiamo inoltre pensando di mettere il gioco alla giornata. Cioè si skippa di 1 gg alla volta. Così che magari negli eventi della giornata ci sia : 12 palestra con CHARLIE (fidanzata storicaa ad esempio), alle 19 vado in studio e alle 23 vado a fare un colpo con la banda. Che ne pensi?
+
+   **RISPOSTA — sì, ma il giorno dentro la settimana, non al posto della settimana.**
+   Il giorno è dove si gioca: tre fasce (pomeriggio, sera, notte) con l'ora scritta, esattamente come la
+   riga «Eventi e attività di oggi» che c'è già. La settimana resta il battito che chiude i conti:
+   stream, spese, classifica, rapporto. Se simuliamo tutto giorno per giorno, il rapporto settimanale
+   perde senso e il gioco diventa sette volte più lento per raccontare la stessa cosa.
+   In pratica: 7 giorni × 3 fasce = 21 mosse a settimana (adesso sono 3), e poi la settimana si chiude
+   come oggi. E la domenica la Sala è chiusa: si vede subito che i giorni non sono tutti uguali.
+
+L'energia stiam pensando di metterla a 100 al giorno. Ovviamente riproporzioneremo tutto ma lo facciamo per non aumentar etorppo la velocità di gioco. SOPRATTUTO CONSIGLIACI QUALCOSA CHE DEV'ESSERE BEN PROPOPRZIONATO .
+
+   **RISPOSTA — 100 va bene come scala, quello che conta sono i costi.** Proposta:
+   - piccole (due parole alla Sala, un post, palestra leggera): **10-15**
+   - medie (scrivi barre, cerca un beat, mixa): **25-30**
+   - grosse (registra, sessione in studio, live, colpo): **40-50**
+   Cioè tre mosse grosse al giorno, oppure sei piccole. La notte ridà **+60 fisso** più **+30 se il
+   benessere sta sopra 60**: chi si spreme non torna mai a 100, e il bruciarsi diventa una cosa che si
+   sente, non un numero scritto.
+   **Il conto da non sbagliare**: 21 mosse a settimana contro le 3 di adesso sono sette volte il gioco.
+   Se non tocchiamo il resto, fan e soldi esplodono. Quindi insieme all'energia: guadagni per mossa
+   **×0,4**, spese fisse invariate, soglie delle fasi **×2**. Una settimana piena vale più o meno quello
+   che vale oggi, ma dentro c'è da giocare per davvero.
+
+Dobbiamo pensare a un modo per mettere La Fame Studio il più possibile nel ggioco. Quindi ti chiedo come potremmo aggiungerla, ad esempio gli studi dove si va il migliore potremmo mettere che si chiama la fame studio. Insomma tutta roba che faccia branding. Ovviamente non deve sembrare invadente, anzi, solo piacevole quando leggono 'La Fame Studio'.
+
+Migliora la grafica e rendila uguale identica alla foto (dell ' interfaccia si intende )
+
+il telefono deve sembrare un vero e proprio telefono : Quindi come un iphone esattamente nel menù principale con solo le app cliccabili : Aggiungi inoltre LAFAMEGRAM, app dove si svilupperà molto la 'vita del gioco'.
+
+Voglio che il gioco abbia vita simulata molto sviluppata. Non banalità, dobbiamo lanciare un gioco cche vogliamo sia molto valido.
