@@ -1,0 +1,19 @@
+{
+  "name": "anni-di-fame",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Anni di Fame — il gioco. HTML, CSS e JavaScript; il build lo impacchetta per gli store.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "node strumenti/dev.js",
+    "build": "node strumenti/build.js",
+    "demo": "node strumenti/build.js --unico",
+    "prova": "node strumenti/prova.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

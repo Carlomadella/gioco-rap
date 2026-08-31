@@ -177,6 +177,70 @@ Le rotte e le manopole stanno in `backend/README.md`, il modello dei dati in
 
 ---
 
+## L'USCITA SUGLI STORE — i cinque lavori _(punti 33-37 di `implementazioni.md`)_
+
+Il gioco esce su **Steam** e sugli **store del telefono**. Il codice resta HTML, CSS e
+JavaScript — per un gestionale a schermate è la tecnologia giusta — dentro a un guscio
+nativo: **Electron** per il desktop, **Capacitor** per iOS e Android. Quello che cambia non
+è il linguaggio: sono cinque lavori che con un sito non servivano e con un prodotto in
+vendita sì.
+
+| | lavoro | dove | stato |
+| --- | --- | --- | --- |
+| **33** | **Il build** — bundle minificato con l'impronta nel nome, server di sviluppo con ricarica automatica, controlli automatici | frontend | ✅ **fatto (31/08/2026)** |
+| **34** | **I salvataggi** — file vero sul dispositivo, Steam Cloud, cloud nostro. Il `localStorage` non basta più | frontend + backend | da fare |
+| **35** | **Gli account** — Steam, Sign in with Apple, Google Play Games, e la cancellazione dell'account che gli store pretendono | backend | da fare |
+| **36** | **L'interfaccia sul telefono** — verticale, a tocchi, leggibile. Il lavoro più lungo di tutti | frontend | da fare |
+| **37** | **Il database vero** — SQLite appena c'è l'account, PostgreSQL dal primo giorno di vendita | backend | da fare |
+
+### 33 · Il build _(fatto)_
+
+`npm run build` mette insieme 13 fogli di stile e 36 file di codice in due file soli,
+minificati (291 KB di codice, 77 KB di stile) e con l'impronta del contenuto nel nome:
+la cache si sistema da sé, il `?v=` a mano sparisce dal prodotto, e la cartella `dist/` ha
+tutti i percorsi relativi — che è come la aprono Electron e Capacitor.
+Più `npm run dev` (ricarica automatica mentre si lavora), `npm run demo` (il gioco in un
+file solo da far provare) e `npm run prova` (dodici controlli senza browser).
+
+**Niente moduli ES, e non è una dimenticanza**: i file del gioco condividono lo stesso
+scope e alcuni fanno cose al caricamento, in un ordine che conta. Coi moduli l'ordine lo
+deciderebbe il grafo degli import e il gioco si romperebbe in silenzio in qualche schermata.
+Si faranno una cartella alla volta, col gioco giocabile a ogni passo — e non servono per
+uscire. Dettagli in `frontend/README.md`.
+
+### 34 · I salvataggi
+
+Tre gradini: un file vero nella cartella dell'app (desktop) o nello spazio dell'app
+(telefono); **Steam Cloud** dove c'è; il **cloud nostro** legato all'account, che è quello
+che porta la carriera dal PC al telefono. Da qui in poi perdere il database vuol dire
+perdere le carriere della gente: il backup smette di essere un'accortezza.
+
+### 35 · Gli account
+
+Oggi l'identità è una chiave nel `localStorage`: chi reinstalla perde l'artista. Servono
+Steam, Apple, Google e la mail, con sotto la tabella `account`. E la **cancellazione
+dell'account dentro al gioco**, che Apple e Google pretendono: la procedura è già scritta
+(`backend/database/schema.md`), e non è un `DELETE` a cascata — l'artista resta in
+classifica senza nome e senza padrone, tutto il resto sparisce.
+
+### 36 · L'interfaccia sul telefono
+
+La plancia è disegnata a 1536×1024 e rimpicciolita tutta insieme: su un monitor va bene, su
+un telefono in verticale no. Serve una disposizione sua (profilo, mappa e telefono uno
+sotto l'altro), aree da toccare di almeno 44 punti, niente `hover`, testi leggibili senza
+zoom. Non è una riscrittura — sono i CSS e un pezzo di `hub.js` — ma è il lavoro più lungo,
+ed è quello da provare su un telefono vero il prima possibile.
+
+### 37 · Il database vero
+
+Lo schema completo è già scritto: `backend/database/schema.md`. Quattordici tabelle con
+account, identità, dispositivi, artisti, carriere, punteggi settimana per settimana,
+fotografie della classifica, traguardi, rivalità, sospetti e sanzioni. Il travaso dal file
+JSON di adesso è uno script di mezz'ora, e va fatto **quando siamo pochi**: farlo di corsa
+con diecimila account dentro è come si perdono i dati della gente.
+
+---
+
 ## Fase 0 — Base attuale (fatta)
 
 Avatar (ritratto e figura intera, tagli, cappelli, espressioni, otto preset e fondali),

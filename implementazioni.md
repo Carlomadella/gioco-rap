@@ -544,3 +544,42 @@ cambia l'energia a 100 e anche tutto ciò ce ne deriva da questo cambiamento, tu
    per il desktop, Capacitor per iOS e Android. E il gioco esiste già: riscriverlo altrove
    sono mesi di regressioni per un giocatore che non vedrebbe niente di diverso.
    L'ordine con cui farei i cinque lavori sta in `frontend/README.md`.
+
+--- I CINQUE LAVORI PER USCIRE SU STEAM E SUGLI STORE (dal punto 32) ---
+
+33. Il build vero: il gioco va impacchettato, non servito come trenta script in fila.
+
+   **FATTO (31/08/2026)** — `frontend/strumenti/build.js`, `dev.js`, `prova.js`,
+   `package.json`. Unica dipendenza: esbuild, e solo per il build — nel gioco non entra.
+   - `npm run build` → `dist/`: 13 fogli di stile e 36 file di codice diventano **due file
+     soli**, minificati (**291 KB** di codice, **77 KB** di stile), col nome che porta
+     dentro l'impronta del contenuto (`gioco-20eefd0e.js`). La cache si sistema da sé e il
+     **`?v=` a mano sparisce dal prodotto**. Tutti i percorsi sono relativi: è così che la
+     cartella viene aperta da Electron e da Capacitor.
+   - `npm run dev` → il gioco dai sorgenti con la **ricarica automatica**: salvi un file e
+     la pagina si rifà da sola. Zero dipendenze, 90 righe.
+   - `npm run demo` → `dist/anni-di-fame.html`, il gioco in un file solo (631 KB, immagini
+     comprese) da mandare a qualcuno per un playtest. Sostituisce `build-artifact.py`, che
+     ho tolto.
+   - `npm run prova` → 12 controlli senza browser: un file aggiunto e mai messo in
+     `index.html`, un tag che punta a un file che non c'è più, un'immagine sparita da sotto
+     a un CSS, un file che non compila, il build senza impronta. Passano tutti.
+   - **Provato davvero**: il build minificato aperto nel browser apre il menu e la plancia
+     intera — mappa, profilo, telefono, eventi della giornata — senza un errore in console.
+
+   **Perché non Vite e perché niente moduli ES.** Vite serve a chi ha già i moduli; noi no,
+   e convertirli tutti in una notte era una macchina da regressioni. Questi 36 file
+   condividono lo stesso scope (`G`, `PHASES`, `pick`, `$`) e alcuni fanno cose al momento
+   del caricamento, in un ordine che conta: coi moduli l'ordine lo deciderebbe il grafo
+   degli import e il gioco si romperebbe **in silenzio**, magari in una schermata su venti.
+   Con la concatenazione l'ordine resta identico a quello che gira adesso — il build non
+   può cambiare il comportamento, può solo impacchettare. I moduli si faranno una cartella
+   alla volta, col gioco giocabile a ogni passo, e non servono per uscire.
+
+34. I salvataggi non possono più stare nel localStorage: file vero sul dispositivo, Steam Cloud, e il cloud nostro legato all'account, così la carriera passa dal PC al telefono.
+
+35. Gli account veri (Steam, Sign in with Apple, Google Play Games, mail) al posto della chiave nel browser — e la cancellazione dell'account dentro al gioco, che Apple e Google pretendono.
+
+36. L'interfaccia sul telefono: la plancia e' disegnata a 1536x1024 e scalata, in verticale non ci sta. Disposizione sua, aree da toccare da 44 punti, niente hover, testi leggibili senza zoom. E' il lavoro piu' lungo dei cinque.
+
+37. Il database vero: SQLite appena c'e' l'account, PostgreSQL dal primo giorno di vendita. Lo schema completo e' gia' scritto in backend/database/schema.md, il travaso dal JSON e' uno script di mezz'ora — e va fatto adesso che siamo a 140 bot e tre giocatori, non di corsa con diecimila account dentro.

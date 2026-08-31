@@ -5,7 +5,7 @@ Il progetto è diviso in due metà che non si mescolano:
 
 | dove | cos'è | come si avvia |
 | --- | --- | --- |
-| [`frontend/`](frontend/README.md) | il gioco: HTML, CSS, JavaScript, dentro a un guscio nativo per gli store | `python -m http.server 8000` |
+| [`frontend/`](frontend/README.md) | il gioco: HTML, CSS, JavaScript, dentro a un guscio nativo per gli store | `npm run dev` |
 | [`backend/`](backend/README.md) | il server della classifica: Node, nessuna dipendenza | `npm start` |
 | [`backend/database/`](backend/database/README.md) | i dati: com'è messo adesso e dove va (lo schema completo in `schema.md`) | — |
 
@@ -13,8 +13,8 @@ Il progetto è diviso in due metà che non si mescolano:
 acceso, la partita gira come ha sempre girato, con la classifica in locale.
 
 ```bash
-# il gioco
-cd frontend && python -m http.server 8000      # → http://localhost:8000
+# il gioco (la prima volta: npm install)
+cd frontend && npm run dev                     # → http://localhost:8000, si ricarica da solo
 
 # la classifica online, in un altro terminale (facoltativa)
 cd backend && npm start                        # → http://localhost:8787
@@ -28,21 +28,32 @@ paga. Il codice resta HTML, CSS e JavaScript — è la tecnologia giusta per un 
 schermate, e su Steam mezzo genere è fatto così — ma ci va intorno un guscio:
 **Electron** per il desktop, **Capacitor** per il telefono.
 
-Da qui discendono cinque lavori che prima non servivano: un build vero (Vite e i moduli ES
-al posto di trenta `<script>` in ordine fisso), i **salvataggi su file e in cloud** al
-posto del `localStorage`, gli **account** (Steam, Apple, Google) al posto della chiave nel
-browser, l'**interfaccia per il telefono** in verticale e a tocchi, e i requisiti degli
-store (privacy, età, cancellazione dell'account). L'elenco completo, con l'ordine con cui
-farli, sta in [`frontend/README.md`](frontend/README.md).
+Da qui discendono **cinque lavori** che prima non servivano. Sono i punti 33-37 di
+`implementazioni.md`, e questo è dove siamo:
 
-Intanto il gioco si mette in un file solo per farlo provare a qualcuno:
+| | lavoro | stato |
+| --- | --- | --- |
+| 33 | **Il build**: bundle minificato con l'impronta nel nome, server di sviluppo con ricarica, controlli automatici | **fatto** (31/08/2026) |
+| 34 | **I salvataggi**: file vero sul dispositivo + Steam Cloud + cloud nostro, al posto del `localStorage` | da fare |
+| 35 | **Gli account**: Steam, Apple, Google al posto della chiave nel browser, con la cancellazione dell'account | da fare |
+| 36 | **L'interfaccia sul telefono**: verticale, a tocchi — il lavoro più lungo | da fare |
+| 37 | **Il database vero**: SQLite, poi PostgreSQL. Lo schema è già scritto | da fare |
+
+Più l'impacchettamento vero e proprio (Electron per Steam, Capacitor per il telefono) e i
+requisiti degli store: informativa sulla privacy, classificazione per età, cancellazione
+dell'account dentro al gioco. Il dettaglio di ognuno sta in
+[`frontend/README.md`](frontend/README.md) e in [`backend/README.md`](backend/README.md).
+
+Intanto il gioco si impacchetta già:
 
 ```bash
-python3 frontend/strumenti/build-artifact.py     # → frontend/dist/anni-di-fame.html
+cd frontend
+npm run build     # → dist/: la cartella che Electron e Capacitor sanno aprire
+npm run demo      # → dist/anni-di-fame.html: il gioco in un file solo, da far provare
 ```
 
-Non è il modo in cui il gioco esce: è lo strumento per una demo o un playtest — si manda il
-file e la gente gioca, senza installare niente.
+Il file unico non è il modo in cui il gioco esce: è lo strumento per una demo o un playtest
+— si manda il file e la gente gioca, senza installare niente.
 
 I documenti di progetto stanno qui in radice: `ROADMAP.md` (il disegno d'insieme),
 `implementazioni.md` (i punti da fare, spuntati uno a uno),

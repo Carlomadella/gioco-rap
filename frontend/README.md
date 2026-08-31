@@ -1,7 +1,8 @@
 # Anni di Fame — il gioco (frontend)
 
 Il gioco vero e proprio: tutto quello che gira sullo schermo di chi gioca.
-HTML, CSS e JavaScript, senza dipendenze.
+HTML, CSS e JavaScript. L'unica dipendenza è esbuild, e serve solo al build: dentro al
+gioco non entra niente.
 
 Il server della classifica sta in `../backend/` e ha il suo README: da qui si parla solo
 del gioco. Il gioco funziona anche senza server.
@@ -12,18 +13,28 @@ del gioco. Il gioco funziona anche senza server.
 Google Play). Non è un gioco da browser e non è una demo: è un prodotto che si scarica, si
 installa e si paga. Tutto quello che c'è scritto qui sotto discende da questa frase.
 
-## Come si avvia, mentre si sviluppa
+## Come si avvia
 
 ```bash
-# dalla cartella frontend/
-python -m http.server 8000
-# oppure
-npx serve .
+cd frontend
+npm install          # una volta sola: serve solo esbuild, e solo per il build
+npm run dev          # → http://localhost:8000, con la ricarica automatica
 ```
 
-Poi apri <http://localhost:8000>. Serve un server locale e non il doppio clic sul file:
-con `file://` il `localStorage` è legato al percorso e le chiamate alla classifica non
-partono (il browser le blocca).
+Salvi un file e la pagina si rifà da sola: non c'è da andare a schiacciare F5.
+
+Gli altri comandi:
+
+| comando | cosa fa |
+| --- | --- |
+| `npm run dev` | il gioco dai sorgenti, con la ricarica automatica |
+| `npm run build` | `dist/`: la cartella pronta per Electron e Capacitor |
+| `npm run demo` | `dist/anni-di-fame.html`: il gioco in un file solo, da far provare a qualcuno |
+| `npm run prova` | i controlli che si possono fare senza browser (vedi in fondo) |
+| `npm run dev -- --dist` | serve la cartella `dist/`, per provare il build vero |
+
+Serve un server locale e non il doppio clic sul file: con `file://` il `localStorage` è
+legato al percorso e le chiamate alla classifica non partono.
 
 ## Perché il gioco è scritto in HTML, CSS e JavaScript
 
@@ -46,18 +57,43 @@ Quello che **cambia** rispetto a com'è oggi, e cambia sul serio, sta qui sotto.
 
 In ordine di quanto pesa. Nessuna di queste è opzionale.
 
-### 1. Un build vero (Vite)
+### 1. Un build vero — **FATTO (31/08/2026)**
 
-Oggi sono trenta `<script>` in un ordine fisso che condividono le variabili globali, e la
-cache si aggira alzando a mano un `?v=8`. Per un sito servito da noi si regge; per un
-prodotto in vendita no: il primo file caricato fuori ordine è una schermata bianca sul PC
-di un cliente.
+Prima: trenta `<script>` in un ordine fisso, tutti serviti singolarmente, e la cache
+aggirata alzando a mano un `?v=8`. Per un sito nostro si regge; per un prodotto in vendita
+no.
 
-Si passa ai **moduli ES** con **Vite**: import espliciti al posto dell'ordine dei tag,
-bundle unico e minificato, nomi dei file con l'impronta dentro (la cache si sistema da
-sola), e `npm run dev` con il ricaricamento immediato mentre si lavora. È un lavoro
-graduale — una cartella alla volta, `js/creator/` e poi `js/game/` — e il gioco resta
-giocabile a ogni passo.
+Adesso c'è `npm run build`, ottanta righe in `strumenti/build.js`:
+
+- mette insieme i 13 fogli di stile e i 36 file di codice in **due file soli**, nell'ordine
+  in cui stanno in `index.html`;
+- li **minifica** con esbuild — da 450 a **291 KB** di codice, da 110 a **77 KB** di stile;
+- dà a ognuno un nome con dentro **l'impronta del contenuto** (`gioco-20eefd0e.js`): la
+  cache si sistema da sé e il `?v=` a mano **sparisce dal prodotto**;
+- riscrive `index.html` con due tag al posto di quarantatré e copia le immagini;
+- tiene **tutti i percorsi relativi**, perché è così che la cartella viene aperta da
+  Electron e da Capacitor (`file://`).
+
+Più `npm run dev` (server con ricarica automatica, zero dipendenze) e `npm run prova`, che
+prende gli errori scemi e costosi: un file aggiunto e mai messo in `index.html`, un tag che
+punta a un file che non c'è più, un'immagine sparita da sotto a un CSS, un file che non
+compila. Provato: il build minificato apre il menu e la plancia intera — mappa, profilo,
+telefono, eventi — senza un errore in console.
+
+**Perché esbuild e non Vite, e perché i moduli ES non ci sono.** Vite serve a chi ha i
+moduli ES; noi non ce li abbiamo, e convertirli tutti in una notte sarebbe stata una
+macchina da regressioni. Il motivo è preciso: questi 36 file **non sono indipendenti** —
+condividono lo stesso scope (`G`, `PHASES`, `pick`, `$`…) e diversi fanno cose al momento
+del caricamento, in un ordine che conta. Coi moduli ES l'ordine di esecuzione lo decide il
+grafo degli import, non più la fila dei tag: basta un file che al caricamento tocca una
+cosa non ancora pronta e il gioco si rompe **in silenzio**, magari solo in una schermata su
+venti. Con la concatenazione l'ordine resta identico a quello che gira oggi: il build non
+può cambiare il comportamento del gioco, può solo impacchettarlo.
+
+I moduli ES restano una cosa buona da fare — **una cartella alla volta, con il gioco
+giocabile a ogni passo**, non tutti in una sera. E non sono un requisito per uscire: il
+requisito era avere un pacchetto minificato, con la cache a posto, che Electron e Capacitor
+sanno aprire. Quello c'è.
 
 ### 2. L'impacchettamento
 
@@ -117,7 +153,7 @@ tutta la lista, ed è quello da provare su un telefono vero il prima possibile.
 
 ### L'ordine con cui li farei
 
-1. Vite e i moduli ES — sblocca tutto il resto e si fa senza toccare il gioco.
+1. ~~Il build~~ **fatto**.
 2. Lo strato di salvataggio (file vero + cloud nostro), perché cambia il modo in cui il
    gioco parla con i dati e prima si fa, meno codice tocca.
 3. Electron e una build che si apre davvero, così si prova su una macchina vera.
@@ -137,8 +173,11 @@ js/net/online.js      il ponte con la classifica online (non parte da solo)
 js/creator/           creazione dell'artista
 js/game/              la partita
 media/photo/          concept art delle città e avatar di riferimento
-strumenti/            build-artifact.py: il gioco in un file solo, per farlo provare
-dist/                 anni-di-fame.html, il file unico
+strumenti/build.js    il build: bundle minificato con l'impronta nel nome
+strumenti/dev.js      il server di sviluppo con la ricarica automatica
+strumenti/prova.js    i controlli che si fanno senza browser
+package.json          gli script (dev, build, demo, prova) e l'unica dipendenza: esbuild
+dist/                 quello che esce dal build (fuori da git)
 ```
 
 ### CSS — l'ordine dei `<link>` in `index.html` conta
@@ -261,24 +300,21 @@ dov'era. Da lì si esporta e si importa una carriera come codice.
 ## Il gioco in un file solo
 
 ```bash
-python3 strumenti/build-artifact.py
+npm run demo          # → dist/anni-di-fame.html (631 KB, immagini comprese)
 ```
 
-Rimette dentro `index.html` tutti i CSS, i JS e le immagini (come data URI) e scrive
-`dist/anni-di-fame.html`: il gioco intero in un file, che si apre dappertutto senza
-installare niente.
-
-**Non è il modo in cui il gioco esce** — quello sono gli eseguibili di Steam e le app degli
-store. È lo strumento per **farlo provare**: si manda il file a qualcuno e gioca, senza
-spiegazioni. Comodo per una demo, per un playtest, per farlo vedere a un editore. Quando ci
-sarà Vite, questo passaggio diventerà una riga della configurazione invece che uno script a
-parte.
+Il gioco intero in un file: si apre con un doppio clic, dappertutto, senza installare
+niente. **Non è il modo in cui il gioco esce** — quello sono gli eseguibili di Steam e le
+app degli store. È lo strumento per **farlo provare**: si manda il file a qualcuno e gioca,
+senza spiegazioni. Comodo per un playtest o per farlo vedere a un editore.
 
 ## Quando si tocca l'interfaccia
 
-- **Cambi un CSS o un JS?** Alza il `?v=` nei tag di `index.html`, se no il browser di chi
-  gioca continua a servire il vecchio. (Sparisce quando arriva Vite.)
-- **Aggiungi un file JS?** Va messo in `index.html` nel punto giusto della catena: i file
-  contano sull'ordine, non c'è nessun import a rimettere le cose a posto.
+- **Aggiungi un file JS o CSS?** Va messo in `index.html` nel punto giusto della catena: i
+  file contano sull'ordine, non c'è nessun import a rimettere le cose a posto. `npm run
+  prova` se ne accorge se te lo dimentichi.
+- **Il `?v=` nei tag** serve solo mentre si sviluppa senza `npm run dev`: nel build i nomi
+  hanno già l'impronta dentro e la cache si sistema da sola.
+- **Prima di impacchettare**: `npm run build && npm run prova`.
 - **Riferimento visivo**: `../stili interfaccia schermata di gioco.md` e le foto in
   `media/photo/`.
