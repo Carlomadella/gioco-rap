@@ -409,7 +409,7 @@ $("hb-pins").addEventListener("click", ev => {
 $("hb-sxtab").addEventListener("click", ev => {
   const b = ev.target.closest(".ptab"); if(!b) return;
   hubTap();
-  if(b.dataset.v === "vestiti"){ GO("profile"); return; }
+  if(b.dataset.v === "vestiti"){ apriNegozio(); return; }
   HUB_VISTA = b.dataset.v;
   renderHub();
 });

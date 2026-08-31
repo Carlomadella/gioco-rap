@@ -777,3 +777,14 @@ in parallelo.
 46. Le abilità sono troppe e da rivedere, NON DOBBIAMO FARE NOI I MIX MA I FONICI, quindi a cosa serve la skill mixing? come quella beatmaking.
 
 47. Quando clicco su vestiti nella sidebar di sinistra, mi deve aprire una schermata di un negozio inoltre il negozio deve essere sbloccato già dalla città iniziale
+
+   **FATTO (01/09/2026).** File nuovi: `frontend/js/game/negozio.js`,
+   `frontend/css/negozio.css`. La linguetta «Vestiti» della plancia adesso apre
+   il guardaroba invece del creatore: griglia degli undici capi di `FITS`
+   (`js/creator/data.js`), ognuno con la sua anteprima vera (lo stesso
+   ritratto ritagliato sul busto che usa il creatore), un prezzo da 60 a
+   560 €, e un bottone «Compra» o «Indossa». Il capo con cui hai creato il
+   personaggio resta sempre tuo gratis. Sbloccato da subito, nessuna fase:
+   è un negozio a parte da quello (chiuso) della mappa, che resta per
+   l'attrezzatura da studio. `npm run prova` (12/12) e `npm run build`
+   puliti; non provato in un browser vero in questa sessione.

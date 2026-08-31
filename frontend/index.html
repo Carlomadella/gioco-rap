@@ -24,6 +24,7 @@
 <link rel="stylesheet" href="css/creator.css?v=8">
 <link rel="stylesheet" href="css/actionbar.css?v=8">
 <link rel="stylesheet" href="css/posto.css?v=8">
+<link rel="stylesheet" href="css/negozio.css?v=8">
 <link rel="stylesheet" href="css/hub.css?v=8">
 <link rel="stylesheet" href="css/telefono.css?v=8">
 <link rel="stylesheet" href="css/impostazioni.css?v=8">
@@ -292,6 +293,14 @@
   <div class="porete" id="po-rete"></div>
 </div></div>
 
+<!-- Il negozio di vestiti: sbloccato dall'inizio, dalla linguetta «Vestiti»
+     della plancia. Il contenuto lo mette js/game/negozio.js. -->
+<div class="negozio" id="negozio"><div class="ngwrap">
+  <div class="nghead"><div class="ngk">Il tuo guardaroba</div><button class="ngx" id="ng-x">&#10005;</button></div>
+  <p class="ngdove">Quello che indossi entra nelle foto, nelle copertine, in ogni scena. Compralo, poi mettitelo.</p>
+  <div class="nggrid" id="ng-grid"></div>
+</div></div>
+
 <div class="piazza" id="piazza"><div class="pwrap">
   <div class="phead"><div class="pk">Freestyle in piazza</div><button class="px" id="p-x">✕</button></div>
   <div class="scena" id="p-scena"></div>
@@ -499,6 +508,7 @@
 <script src="js/game/fx.js?v=8"></script>
 <script src="js/game/skip.js?v=8"></script>
 <script src="js/game/posto.js?v=8"></script>
+<script src="js/game/negozio.js?v=8"></script>
 <script src="js/game/uscita.js?v=8"></script>
 <script src="js/game/hub.js?v=8"></script>
 <script src="js/game/telefono.js?v=8"></script>
