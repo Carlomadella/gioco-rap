@@ -774,6 +774,32 @@ in parallelo.
 
 45. Sposterei le card dalla mappa iniziale, non SOPRA gli edifici ma leggermente rimpicciolata e a lato, cosìche si vedan bene gli edifici, quando andremo a milano e los angeles poi la mappa dev'essere incredibile come ti abbiamo mandato già nei repo.
 
+   **BLOCCATO (01/09/2026) — serve un asset nuovo, non è una riga di codice.**
+   Le card («STUDIO», «BEAT MAKER», i cartelli chiusi coi lucchetti…) non sono
+   elementi HTML disegnati sopra la foto: sono **dentro al pixel** di
+   `frontend/media/photo/mappa_citta.jpg`, disegnate dov'è finito bene per chi
+   ha fatto l'immagine, non da un layout che posso spostare. Non ho un
+   generatore di immagini in questa sessione, quindi non posso ritagliarle e
+   spostarle io. Le zone da toccare (`HUB_LUOGHI` in `hub.js`, sei rettangoli
+   invisibili in percentuale) restano incollate a dove sono le card **nella
+   foto attuale** — se cambia la foto, cambiano anche quei numeri, è lavoro
+   di un quarto d'ora una volta che la foto nuova c'è.
+   Prompt pronto per chi genera l'immagine (ChatGPT o altro):
+   ```
+   Rifai il concept art della mappa della città di provincia per il gioco
+   "Anni di Fame" (stessa inquadratura dall'alto, stessa notte, stesse vie e
+   stessi edifici della versione attuale). Le card con nome e descrizione dei
+   luoghi (Studio, Beat Maker, Vita quotidiana, Attività criminali, e i
+   cartelli chiusi con il lucchetto) non devono più stare sopra gli edifici,
+   coprendoli: spostale leggermente più piccole, a lato di ogni edificio, in
+   uno spazio libero della strada o del marciapiede vicino, lasciando
+   l'edificio stesso ben visibile e riconoscibile. Il pin colorato resta
+   sopra all'edificio, la card sta accanto. Stesso stile grafico, stessi
+   colori, stesso formato orizzontale.
+   ```
+   Per Milano e Los Angeles vale la stessa regola fin da subito: quando si
+   generano quelle mappe, le card vanno chieste già a lato, non sopra.
+
 46. Le abilità sono troppe e da rivedere, NON DOBBIAMO FARE NOI I MIX MA I FONICI, quindi a cosa serve la skill mixing? come quella beatmaking.
 
    **FATTO (01/09/2026).** Hai ragione: non erano abilità tue, erano
