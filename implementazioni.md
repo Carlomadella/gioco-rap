@@ -639,6 +639,7 @@ alla volta, col gioco giocabile a ogni passo, e non servono per uscire.
     `node:sqlite`, dentro Node: nessuna dipendenza da installare, nessun servizio da mandare
     avanti, un file solo — e transazioni, WAL, chiavi esterne vere.
 
+<<<<<<< HEAD
 - **18 tabelle** come da schema: account, identita, dispositivo, artista, bot_stato,
   carriera, stagione, settimana, punteggio_settimana, classifica_posizione, notizia,
   relazione, traguardo, artista_traguardo, sospetto, sanzione, acquisto, stato.
@@ -659,3 +660,25 @@ quando le righe diventano tante. Lo schema è già scritto per tutti e due e il 
 tocca un file solo (`database/archivio.js`), che è il motivo per cui esiste.
 
 47. Quando clicco su vestiti nella sidebar di sinistra, mi deve aprire una schermata di un negozio inoltre il negozio deve essere sbloccato già dalla città iniziale
+=======
+   **Resta PostgreSQL**, ma non adesso: serve quando i server diventano più di uno, non
+   quando le righe diventano tante. Lo schema è già scritto per tutti e due e il cambio
+   tocca un file solo (`database/archivio.js`), che è il motivo per cui esiste.
+
+38. Ogni parte di gioco deve avere proprio scenario e una propria ambientazione
+
+Preparami un prompt da mettere su chat gpt ; per ogni pagina che abbiamo (es.attività criminali, es. studio, es.casa (vita quotidiana), es. luogo dove incontriamo artisti. )
+
+Anche per la pagina di landing, e per la creazione dell'avatar, Non mettere un prompt unico ma pagine separate.
+
+    **FATTO (01/09/2026).** `prompt-ambientazioni.md` (fuori dal codice, root del
+    repo): 16 prompt separati e autosufficienti, uno per pagina — landing, creazione
+    avatar, La Sala, cabina di registrazione, sala mix, stanza dove si scrive, casa,
+    palestra, staccare la spina, attività criminali, incontro col producer, pubblica,
+    promo, freestyle in piazza, live, turno di lavoro. Stessa famiglia visiva in
+    tutti (concept art semi-realistica, notte/tramonto, luce calda + neon, 3:2, niente
+    testo/logo/interfaccia nell'immagine), ognuno pensato per una chat ChatGPT a sé.
+
+
+
+>>>>>>> origin/main
