@@ -94,19 +94,19 @@ Tutte le modifiche da fare:
 8. Quando clicchi su "cerca un beat", parte una scena del personaggio dell'utente (stile preso dall'avatar) che incontra un produttore, l'utente può decidere che genere scegliere tra quelli impostati, specializzato in quel genere. Se il produttore collabora spesso con uno degli opps, non ti fa il beat.
 
 9. ~~Interfaccia della schermata di gioco: troppe card, troppe informazioni ammassate~~ **FATTO (31/08/2026)**
-    - Una testata sola al posto di tre schede impilate: ritratto, nome, anno/settimana/fase, livello e barra
-      dell'esperienza sulla stessa riga; sotto, i tre numeri su cui decidi davvero (cassa, chi ti segue, hype).
-    - Il contorno — benessere, lucidità, pezzi fuori, lavoro — sta dietro il bottone «Dettagli», chiuso finché
-      non lo apri. Se benessere o lucidità scendono sotto 30 il bottone si accende in rosso: nascondere un
-      numero non deve nascondere un guaio.
-    - La fase della scalata è diventata una fascia bassa: dove sei a sinistra, i gradini a destra, e sotto la
-      sola riga che conta, cosa fare adesso. Il racconto della fase è nel titolo al passaggio del mouse.
-    - Il catalogo era quattro liste una sotto l'altra: adesso linguette, una lista alla volta, con la pallina
-      rossa sulla linguetta quando c'è roba nuova.
-    - Lifestyle: le cinque categorie sono chiuse, mostrano dove stai e quanto paghi, e si aprono su richiesta
-      invece di venticinque righe tutte insieme.
-    - L'energia sta solo nella barra in basso, sempre a schermo, e non fa più doppione con la testata; dalla
-      barra sono sparite anno, settimana e fase, già scritte nella testata.
+   - Una testata sola al posto di tre schede impilate: ritratto, nome, anno/settimana/fase, livello e barra
+     dell'esperienza sulla stessa riga; sotto, i tre numeri su cui decidi davvero (cassa, chi ti segue, hype).
+   - Il contorno — benessere, lucidità, pezzi fuori, lavoro — sta dietro il bottone «Dettagli», chiuso finché
+     non lo apri. Se benessere o lucidità scendono sotto 30 il bottone si accende in rosso: nascondere un
+     numero non deve nascondere un guaio.
+   - La fase della scalata è diventata una fascia bassa: dove sei a sinistra, i gradini a destra, e sotto la
+     sola riga che conta, cosa fare adesso. Il racconto della fase è nel titolo al passaggio del mouse.
+   - Il catalogo era quattro liste una sotto l'altra: adesso linguette, una lista alla volta, con la pallina
+     rossa sulla linguetta quando c'è roba nuova.
+   - Lifestyle: le cinque categorie sono chiuse, mostrano dove stai e quanto paghi, e si aprono su richiesta
+     invece di venticinque righe tutte insieme.
+   - L'energia sta solo nella barra in basso, sempre a schermo, e non fa più doppione con la testata; dalla
+     barra sono sparite anno, settimana e fase, già scritte nella testata.
 
 10. Dalla sezione profilo fai in modo che io possa tornare alla schermata di gioco e non solo al menù principale.
 
@@ -189,3 +189,188 @@ Tutte le modifiche da fare:
 
     Riferimento grafico: la mappa generata va usata come **Main Hub / World Map**, non come logo — il logo
     vero, semplice e riconoscibile, viene dopo.
+
+Carlomadella/gioco-rap
+
+leggiti il repo
+Sì. Ho aperto il repository e ne ho letto la struttura e il README. Repository GitHub — gioco-rap
+È “Anni di Fame”, un gioco di carriera rap fatto interamente in HTML/CSS/JavaScript vanilla, senza dipendenze né build system. Il repo contiene 17 commit ed è organizzato principalmente in css/, js/, media/photo/, index.html e alcuni .md.
+
+La parte interessante è che ho già individuato l'architettura:
+
+Creator → creazione dell'artista, aspetto, generi, vestiti, tratti, ritratto SVG.
+Game → carriera, statistiche, azioni settimanali, contratti, rivali, eventi, classifiche.
+Writer → sistema di scrittura con rime/metrica/punteggio.
+Piazza → freestyle.
+Sim → simulazione della settimana: stream, spese, classifica ecc.
+Lifestyle → costi e livelli di vita.
+Covers → copertine generate da seed + copertina caricabile dall'utente.
+Stato persistito tramite localStorage.
+Creator e partita comunicano attraverso variabili globali come ARTIST, ARTIST_PORTRAIT, ARTIST_BODY, GAME, ecc.
+Quindi sì, possiamo lavorarci direttamente a livello di codice, non solo ragionare superficialmente sul progetto.
+Se vuoi, nel prossimo messaggio posso anche entrare nei singoli file JS/CSS e ricostruirti esattamente come funziona il gioco, compresi sistemi, formule, eventi e punti in cui conviene intervenire.
+
+message.txt
+Documento
+Ho ricevuto il file: contiene il riepilogo della direzione che avete definito per Gioco Rap, inclusa la progressione Provincia → Milano → Los Angeles e soprattutto il sistema basato sui contatti da farmare invece dello studio personale.
+Dimmi cosa vuoi fare adesso con il repo: posso partire da questa nuova impostazione e progettare come modificarne concretamente codice, struttura e gameplay.
+Sì, questa è chiaramente la direzione visiva che state dando a Gioco Rap: una mappa/hub della carriera, con le varie attività distribuite nella città e sbloccabili progressivamente.
+E soprattutto si sposa bene con quello che avete definito nel file: il giocatore parte dalla provincia, poi arriva a Milano e infine a Los Angeles, con nuove opportunità e contatti man mano che cresce.
+
+La cosa che cambierei rispetto a questa immagine è non trattarla come una schermata statica: nel gioco vero e proprio la userei come riferimento per costruire una mappa interattiva, dove ogni zona/edificio è un punto cliccabile e alcune attività sono inizialmente bloccate.
+
+In particolare, visto che avete deciso che non esiste lo studio personale, toglierei quella concezione e farei diventare lo Studio un luogo esterno in cui andare per incontrare producer, fonici e altri artisti e costruire il network. Questo è coerente con il sistema di contatti che avete definito.
+
+Se vuoi, posso prendere questa immagine come concept art e passare direttamente a progettare la vera schermata HUB del repo, mantenendo questo stile ma trasformandola in una UI giocabile.
+
+Modifica
+
+Modifica
+
+Comunque una cosa che mi è venuta in mente è che quella potrebbe essere la parte centrale. a sinistra mettiamo il profilo del giocatore e a destra magari mettiamo altre cose cliccabili, capito? Cioè dividerei in tre parti comunque la schermata, la schermata, non solo tutta mappa.BE
+Sì, molto meglio così. La mappa non dovrebbe essere la schermata: dovrebbe essere il cuore centrale della schermata.
+Io la imposterei proprio come una dashboard a 3 colonne, mantenendo la mappa come elemento dominante:
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ HEADER / STATO │
+├───────────────────┬───────────────────────────────┬─────────────────┤
+│ │ │ │
+│ 👤 PROFILO │ 🗺️ MAPPA │ 📱 HUB │
+│ │ │ │
+│ Nome artista │ CITTÀ DI PROVINCIA │ 📬 Messaggi │
+│ Foto │ │ 🤝 Contatti │
+│ Livello │ ● Studio │ 🎯 Obiettivi │
+│ Fama │ ● Vita quotidiana │ 📰 Notizie │
+│ Hype │ ● Beat Maker │ 🎒 Inventario │
+│ Soldi │ ● Criminalità │ 📊 Statistiche│
+│ │ │ 🏆 Classifiche│
+│ 🎤 Skill │ │ ⚙️ Impostazioni│
+│ ✍️ Scrittura │ │ │
+│ 🎚️ Produzione │ │ │
+│ ⭐ Reputazione │ │ │
+│ │ │ │
+├───────────────────┴───────────────────────────────┴─────────────────┤
+│ ATTIVITÀ / EVENTI / NOTIFICHE │
+└─────────────────────────────────────────────────────────────────────┘
+👤 A SINISTRA: IL RAPPER
+Questa deve essere una specie di carta d'identità del personaggio.
+In alto:
+
+YOUNG LEGEND
+LV. 4 — ASPIRANTE
+
+poi:
+
+foto/avatar
+💰 denaro
+❤️ energia
+⭐ fama
+🔥 hype
+🤝 network/rete
+☠️ reputazione criminale
+E sotto le skill:
+🎤 Rap
+✍️ Scrittura
+🎹 Produzione
+🎚️ Mixing
+🎭 Carisma
+🤝 Networking
+Questa colonna deve permettere al giocatore di capire chi è il suo rapper in mezzo secondo.
+🗺️ CENTRO: LA CITTÀ
+Qui metterei molto più grande la mappa dell'immagine che abbiamo fatto.
+E soprattutto cambia in base alla città.
+
+Provincia
+Pochissimi punti:
+🟣 Studio
+
+Registra, conosci producer e crea contatti.
+🟢 Beat Maker
+Produci beat.
+🔵 Vita quotidiana
+Casa, allenamento, relazioni ecc.
+🔴 Attività criminali
+Piccoli colpi, piccoli guadagni, piccoli rischi.
+Tutto il resto potrebbe essere visivamente presente ma bloccato.
+Tipo:
+
+🔒 Club
+Richiede Milano
+
+🔒 Concerti
+Richiede 25 Fama
+
+Questo è importante perché il giocatore vede il mondo che lo aspetta.
+
+📱 DESTRA: IL "TELEFONO" DEL RAPPER
+Questa secondo me è la parte che può diventare veramente bella.
+Non la farei semplicemente una colonna di pulsanti.
+
+La farei sembrare il telefono / centro di controllo del personaggio.
+
+🤝 CONTATTI
+7 contatti
+2 nuovi messaggi
+Entri e vedi:
+Producer — Marco
+Conoscenza
+
+Rapper — Killa
+Contatto
+
+Fonico — Andre
+Amico
+
+ecc.
+
+Ed è qui che entra il sistema che abbiamo definito: devi farmare la rete sociale per poter accedere alle opportunità migliori.
+
+🎯 OBIETTIVI
+OBIETTIVO SETTIMANALE
+
+□ Scrivi 2 pezzi
+□ Conosci un nuovo producer
+□ Pubblica un singolo
+
+RICOMPENSA
++150 €
++5 Hype
+📰 NOTIZIE
+Una specie di feed del mondo:
+🔥 Nuovo freestyle contest in città
+🎤 Il rapper X ha appena pubblicato il nuovo album
+🚨 Controlli della polizia nella zona industriale
+Questo fa sembrare che la città viva anche quando non stai facendo qualcosa.
+E IN BASSO...
+Metterei una barra molto importante:
+EVENTI / ATTIVITÀ DISPONIBILI
+Per esempio:
+┌──────────────────────────────────────────────────────────────┐
+│ 🔥 STASERA │
+│ │
+│ Freestyle al Bar Centrale 21:00 +5 Hype │
+│ Producer session 22:30 Nuovo contatto │
+│ Piccolo party 00:00 ? │
+└──────────────────────────────────────────────────────────────┘
+Così quando il giocatore apre il gioco non vede solamente una mappa, ma vede immediatamente:
+Chi sono → dove sono → cosa posso fare → cosa sta succedendo → cosa devo raggiungere.
+E soprattutto questa struttura funziona per tutte e 3 le città
+La cosa bella è che l'interfaccia rimane identica.
+Cambia il mondo centrale.
+
+🏘️ PROVINCIA
+Pochissime attività.
+Profilo → Mappa piccola → Telefono
+
+🏙️ MILANO
+La mappa esplode.
+Studio, club, concerti, manager, business, sponsor, shop, criminalità ecc.
+
+🌴 LOS ANGELES
+La stessa struttura, ma ormai il rapper è GOAT:
+Studio top tier, label, eventi VIP, casino, luxury shop, business internazionali, sponsor globali, criminalità ad altissimo rischio.
+
+Quindi il giocatore non deve imparare una nuova UI ogni volta che cambia città. Impara una volta il sistema e poi vede il proprio mondo espandersi.
+
+E questa, secondo me, è una direzione molto più da vero gioco gestionale/RPG rispetto alla semplice mappa fullscreen.
+sviluppalo
