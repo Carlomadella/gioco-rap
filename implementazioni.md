@@ -776,6 +776,16 @@ in parallelo.
 
 46. Le abilità sono troppe e da rivedere, NON DOBBIAMO FARE NOI I MIX MA I FONICI, quindi a cosa serve la skill mixing? come quella beatmaking.
 
+   **FATTO (01/09/2026).** Hai ragione: non erano abilità tue, erano
+   l'attrezzatura travestita da barra. Tolte «Produzione» e «Mixing» dalla
+   scheda Abilità (`frontend/js/game/hub.js`, `skillRighe()` e
+   `vistaAbilita()`) — restano le quattro vere: Rap, Scrittura, Carisma,
+   Networking. Le formule sotto (`gearBonus()`, `mixGain()`) restano intatte:
+   contano ancora nella qualità del pezzo quando registri o mixi, sono solo
+   sparite come «barra personale» — quel mestiere lì è del beatmaker e del
+   fonico alla Sala, non tuo. `npm run prova` (12/12) e `npm run build`
+   puliti.
+
 47. Quando clicco su vestiti nella sidebar di sinistra, mi deve aprire una schermata di un negozio inoltre il negozio deve essere sbloccato già dalla città iniziale
 
    **FATTO (01/09/2026).** File nuovi: `frontend/js/game/negozio.js`,

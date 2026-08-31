@@ -217,13 +217,14 @@ function rigaSkill(ic, n, v, titolo){
     clamp(v / 88 * 100, 0, 100) + '%"></i></span><span class="v">' + Math.round(v) + '</span></div>';
 }
 
-/* le sei abilità: quattro sono statistiche vere, due vengono da quello che hai
-   in mano (attrezzatura e mestiere al mixer). Nessuna è inventata. */
+/* le quattro abilità del rapper: quello che fa lui, non il mestiere di
+   qualcun altro. Produzione e mixing non sono più abilità tue — le fa il
+   beatmaker e il fonico alla Sala (punto 46); l'attrezzatura e il mestiere
+   al mixer restano nel gioco (gearBonus, mixGain) come qualità del pezzo,
+   non come una barra che ti appartiene. */
 function skillRighe(){
   return rigaSkill("mic", "Rap", G.skills.flow) +
     rigaSkill("matita", "Scrittura", G.skills.scrittura) +
-    rigaSkill("cursori", "Produzione", gearBonus() * 2.5, "Cresce con l'attrezzatura che compri") +
-    rigaSkill("manopole", "Mixing", mixGain() * 3.2, "Cresce con monitor, cuffie e mestiere") +
     rigaSkill("faccia", "Carisma", G.skills.presenza) +
     rigaSkill("gente", "Networking", G.skills.rete);
 }
@@ -284,8 +285,6 @@ function vistaAbilita(){
     '<div class="prighe" style="margin-top:18px">' +
       rigaStat("mic", "#A855F7", "Rap", "cresce registrando") +
       rigaStat("matita", "#C084FC", "Scrittura", "cresce al foglio") +
-      rigaStat("cursori", "#38BDF8", "Produzione", "cresce con l'attrezzatura") +
-      rigaStat("manopole", "#4ADE80", "Mixing", "cresce mixando") +
       rigaStat("faccia", "#FACC15", "Carisma", "cresce sul palco") +
       rigaStat("gente", "#60A5FA", "Networking", "cresce uscendo") +
     '</div>' +
