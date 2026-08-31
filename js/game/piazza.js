@@ -123,7 +123,6 @@ function costruisciScena(){
 /* stato dei passanti */
 function initPed(){
   FS.ped = [];
-  const slotY = [176, 190, 202, 214];
   for(let i=0;i<16;i++){
     const lane = i % 4;
     FS.ped.push({

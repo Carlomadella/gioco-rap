@@ -258,7 +258,6 @@ function renderGioco(){
     };
   });
 
-  const PAL = [["#FF5A36","#FF4D9D"],["#3DC7FF","#B026FF"],["#FFC53D","#3DC7FF"],["#B026FF","#FF5A36"]];
   $("g-songs").innerHTML = G.songs.length
     ? G.songs.slice().reverse().map((x,i) => {
         return '<div class="li"><span class="cov">' +

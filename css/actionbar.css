@@ -4,7 +4,6 @@
   border-top:1px solid var(--line);z-index:30}
 .bar .in{max-width:1040px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;
   gap:10px;flex-wrap:wrap}
-.bar .who{flex:1 1 160px}
 .bar .who{flex:none;min-width:0;margin-right:auto}
 .bar .who .a{font-size:16px;font-weight:800;letter-spacing:-.015em;white-space:nowrap;overflow:hidden;
   text-overflow:ellipsis}

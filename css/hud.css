@@ -38,8 +38,9 @@
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.09)}
 .xp i{display:block;height:100%;border-radius:6px;
   background:linear-gradient(90deg,var(--acid),#fff);transition:width .8s cubic-bezier(.2,.8,.3,1)}
+/* il riempimento finisce in bianco: senza contorno i numeri ci si perdono dentro */
 .xp span{position:absolute;inset:0;display:grid;place-items:center;font-size:9.5px;font-weight:900;
-  color:rgba(255,255,255,.95);text-shadow:0 1px 3px rgba(0,0,0,.85)}
+  color:#fff;text-shadow:0 0 2px rgba(0,0,0,.95), 0 0 4px rgba(0,0,0,.8), 0 1px 2px rgba(0,0,0,.9)}
 @media (max-width:620px){
   .tline{flex-wrap:wrap}
   .tlvl{width:100%;flex-direction:row;align-items:center;gap:9px}

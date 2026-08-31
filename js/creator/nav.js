@@ -99,7 +99,6 @@ window.ARTIST_BODY = function(){
   const H = v => (v*st).toFixed(1);
 
   const SPALLE = -H(300), VITA = -H(210), ANCHE = -H(186), GINOCCHIO = -H(96), PIEDE = -4;
-  const TESTA_Y = -H(300);
 
   const braccioAlto =
     '<path d="M' + W(46) + ',' + SPALLE + ' C' + W(62) + ',' + -H(296) + ' ' + W(72) + ',' + -H(330) +
