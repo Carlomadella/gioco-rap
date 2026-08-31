@@ -18,6 +18,15 @@ Gli script sono classici, non moduli ES, quindi non c'è il blocco CORS che i mo
 hanno su `file://`: il doppio clic su `index.html` dovrebbe funzionare comunque.
 Il server locale resta la via consigliata (è quella verificata).
 
+Se vuoi anche la classifica online, in un secondo terminale:
+
+```bash
+node server/server.js
+```
+
+Il gioco funziona lo stesso senza: la classifica online è una cosa in più, non
+una da cui dipendere.
+
 ## Dove sta andando: l'hub è una mappa
 
 **L'hub del gioco è una plancia con la mappa al centro** (punto 26 di
@@ -67,6 +76,65 @@ network, benessere, settimana, ora), il profilo a sinistra con le sue quattro li
 (profilo, abilità, vestiti, disciplina), gli eventi di oggi — che fanno partire le azioni
 vere della settimana — e il telefono a destra con messaggi, otto app e le notizie.
 
+## Multiplayer: la classifica è una sola
+
+**Punto 30 di `implementazioni.md`.** La classifica non è più una faccenda privata fra te
+e i rivali generati sul tuo computer: c'è una classifica sola, uguale per tutti, e ci
+stanno dentro i giocatori veri. Finché i giocatori veri sono pochi, il numero lo fanno i
+bot — e i bot **non si riconoscono**: hanno nomi da rapper veri (`Nino Vento`, `Marco T.`,
+`Young Ferro`), una città, un genere, una storia, uscite che escono e contratti che
+firmano. Il server non dice mai a nessuno chi è un bot e chi no: è una regola di gioco,
+non una dimenticanza.
+
+```bash
+node server/server.js          # http://localhost:8787
+```
+
+Nessuna dipendenza e nessun build, come il resto: solo Node. L'archivio è un file JSON in
+`server/dati/`, scritto con temporaneo + rinomina (se il server muore a metà scrittura,
+il file buono resta quello di prima).
+
+| manopola | cosa fa | di suo |
+| --- | --- | --- |
+| `ADF_PORTA` | porta di ascolto | `8787` |
+| `ADF_DATI` | file dell'archivio | `server/dati/classifica.json` |
+| `ADF_BOT` | quanti bot tenere in pista | `140` |
+| `ADF_SETTIMANA_H` | ore vere di una settimana di classifica | `24` |
+| `ADF_ORIGINI` | CORS: `*` oppure origini separate da virgola | `*` |
+| `ADF_ADMIN` | chiave per forzare un giro di settimana | vuota (non si può) |
+
+**La settimana passa anche se non giochi.** Ogni `ADF_SETTIMANA_H` ore il server fa un
+giro: i bot crescono, qualcuno esce con un pezzo, qualcuno firma, qualcuno sparisce dai
+radar; chi non manda un punteggio da più di una settimana e mezza scende dell'8%. Prima
+del giro si fotografa la posizione di tutti, ed è da lì che escono le frecce ▲▼ della
+settimana (punto 12).
+
+### Le rotte
+
+| rotta | cosa fa |
+| --- | --- |
+| `GET /api/stato` | settimana, quanti artisti, quanti giocatori veri, quando è il prossimo giro |
+| `POST /api/artista` | iscrive un artista: torna `id` e `chiave` (la chiave si vede una volta sola) |
+| `GET /api/artista/:id` | la scheda pubblica di uno |
+| `PUT /api/artista/:id` | cambia nome, città, genere (serve `x-chiave`) |
+| `POST /api/punteggio` | manda gli stream della settimana chiusa (serve `x-chiave`) |
+| `GET /api/classifica?da=1&quanti=100` | una fetta qualsiasi: top 10, top 100, top 1000 |
+| `GET /api/classifica/intorno/:id` | chi hai davanti e chi hai dietro — «sei 428°» |
+| `GET /api/notizie` | chi è uscito, chi ha firmato, chi è sparito nell'ultimo giro |
+| `POST /api/giro` | fa passare una settimana a mano, per provare (serve `x-admin`) |
+
+**Sull'imbroglio, onestamente.** Il gioco gira nel browser: chi vuole barare bara, e un
+server non lo può impedire. Quello che c'è serve a tenere fuori i numeri assurdi: da un
+invio all'altro gli stream possono al massimo quintuplicare (il primo invio ha la mano
+larga, per chi arriva con una carriera già avviata), un invio ogni dieci secondi per
+artista, 120 richieste al minuto per indirizzo, e la chiave viaggia dal client ma sul
+server sta solo il suo hash.
+
+Dalla parte del gioco il ponte è `js/net/online.js` (`ONLINE.registra`, `ONLINE.invia`,
+`ONLINE.classifica`, `ONLINE.intorno`): se il server non risponde torna `null` e la
+partita continua sulla classifica locale come ha sempre fatto. **La schermata classifica
+non è ancora agganciata**: quello è il prossimo pezzo, e sta in `ROADMAP.md`.
+
 ## Struttura
 
 ```
@@ -77,6 +145,8 @@ js/impostazioni.js    impostazioni e slot, caricato subito dopo core
 js/lingua.js          vocabolario e traduttore dell'interfaccia
 js/creator/           creazione dell'artista
 js/game/              la partita
+js/net/online.js      il ponte con la classifica online (non parte da solo)
+server/               il server della classifica: Node e basta, nessuna dipendenza
 media/photo/          concept art delle città e avatar di riferimento
 strumenti/            build-artifact.py: rifà il gioco in un file solo
 dist/                 anni-di-fame.html, il file unico per l'artifact
@@ -112,6 +182,7 @@ che quelli caricati prima abbiano già dichiarato le loro funzioni e costanti.
 | `js/core.js` | `$` e `pick` |
 | `js/impostazioni.js` | stato `SET`, slot partita (`slotKey`), preset di difficoltà |
 | `js/lingua.js` | italiano/inglese dell'interfaccia |
+| `js/net/online.js` | `ONLINE`: iscrizione, invio del punteggio, lettura della classifica |
 
 **Creatore** (`js/creator/`)
 
@@ -172,6 +243,8 @@ Tutto in `localStorage`, sul dispositivo di chi gioca:
 - `anni-di-fame-artista` — l'aspetto e l'identità dell'artista
 - `anni-di-fame-partita-v2` — la partita in corso
 - `adf-impostazioni-v1` — impostazioni, lingua, slot scelto
+- `adf-online-id` / `adf-online-chiave` — chi sei nella classifica online (uno per slot)
+- `adf-online-url` — l'indirizzo del server della classifica, se non è quello di casa
 
 Gli slot sono tre (impostazioni → Partite). Lo slot 1 usa le chiavi storiche qui sopra,
 gli altri aggiungono il suffisso `-s2` / `-s3`: chi giocava prima ritrova la sua carriera

@@ -114,6 +114,59 @@ Farmare contatti è gameplay, non un menu.
 
 ---
 
+## LA CLASSIFICA È UNA SOLA — il multiplayer _(punto 30 di `implementazioni.md`)_
+
+La classifica smette di essere una cosa privata fra te e i rivali generati sul tuo computer.
+**Ce n'è una sola, uguale per tutti, e dentro ci stanno i giocatori veri.** Finché i
+giocatori veri sono pochi il numero lo fanno i bot, e i bot non si devono riconoscere:
+nome da rapper vero, città vera, un genere, una storia, uscite e contratti. Il server non
+dice mai chi è un bot — non è un dettaglio tecnico, è la regola che tiene in piedi la cosa.
+
+### Il server _(fatto: 31/08/2026)_
+
+`server/` — Node e basta, nessuna dipendenza e nessun build, come il gioco.
+Archivio in un file JSON (`server/dati/`), scritto con temporaneo + rinomina.
+Le rotte e le manopole stanno nel `README.md`.
+
+- **Una settimana vera dura 24 ore** (`ADF_SETTIMANA_H`): a ogni giro i bot crescono, uno
+  esce con un pezzo, uno firma, uno sparisce dai radar. La classifica si muove anche mentre
+  nessuno gioca — è così che un mondo sembra abitato.
+- **Chi sparisce scende**: chi non manda un punteggio da più di una settimana e mezza perde
+  l'8% a giro. Il posto in alto si tiene giocando.
+- **Le frecce ▲▼ vengono da qui**: prima di ogni giro si fotografa la posizione di tutti,
+  e il «prima» è quello (lega col punto 12).
+- **L'imbroglio**: il gioco gira nel browser, quindi non è blindabile. Il server tiene fuori
+  l'assurdo — al massimo ×5 di stream fra un invio e l'altro, un invio ogni dieci secondi,
+  120 richieste al minuto per indirizzo, chiave salvata solo come hash.
+
+### Quello che manca (in ordine)
+
+1. **Agganciare la schermata classifica.** Oggi `js/game/ui.js` disegna i rivali locali;
+   deve disegnare la classifica del server quando c'è, e ricadere su quella locale quando
+   non c'è. Il ponte è già pronto: `js/net/online.js`.
+2. **Iscrizione senza modulo da compilare.** Il nome d'arte c'è già, la città anche: alla
+   prima settimana chiusa l'artista entra in classifica da solo, e il giocatore lo scopre
+   leggendo «sei entrato in classifica: 428°».
+3. **Top 10 → top 100 → intorno a te** (punto 12): la fetta si chiede già al server
+   (`?da=&quanti=`, `/intorno/:id`), manca la lista che si apre in basso.
+4. **I rivali locali diventano i rivali del mondo.** Chi ti sta appena sopra in classifica
+   è materia da beef, da feat e da notizie: gli opps (punto 7) escono da lì invece che da
+   una lista generata in casa.
+5. **Le notizie del server nel telefono**: `GET /api/notizie` racconta chi è uscito, chi ha
+   firmato, chi è sparito. È il feed della città, ma con dentro gente vera.
+6. **Poi, non adesso**: sfide fra amici (la gara di freestyle del punto 14 giocata a
+   distanza), classifiche per città e per genere, stagioni che si azzerano.
+
+### Due cose da non sbagliare
+
+- **Il gioco resta giocabile da solo.** Se il server non risponde, `ONLINE` torna `null` e
+  la partita continua sulla classifica locale. Nessuna schermata deve aspettare la rete.
+- **Niente nomi di rapper veri fra i bot.** Sono nomi inventati, fatti come si fanno i nomi
+  d'arte in Italia. Un nome preso in prestito da qualcuno che esiste è un problema, non una
+  scorciatoia.
+
+---
+
 ## Fase 0 — Base attuale (fatta)
 
 Avatar (ritratto e figura intera, tagli, cappelli, espressioni, otto preset e fondali),
@@ -205,7 +258,8 @@ quando dalla provincia cominci a muoverti verso Milano.
 
 ## Fase 9 — Relazioni, opps, feat & beef
 
-- Rapper rivali, gli **opps**, in classifica: li superi o ti superano (punto 7).
+- Rapper rivali, gli **opps**, in classifica: li superi o ti superano (punto 7). Con il
+  server (punto 30) gli opps sono gente vera che ti sta due posizioni sopra.
 - Feat: chiedi la collab, patteggi le condizioni; nomi grossi = boost enorme ma difficile — e passano
   dai contatti, non da un menu.
 - Beef e dissing: eventi a scelte, puoi rispondere con un pezzo (torna su "scrivi barre").
@@ -241,5 +295,7 @@ Alessio (La Fame Studio), Claude, Carletto (scarica il progetto e ci lavora da c
 ## Nota tecnica
 
 Il codice sorgente sta nel repo e si legge da lì: non serve più allegare l'HTML in sessione.
+Il server della classifica (`server/`) non entra nell'artifact: quello è e resta un file
+solo che gira nel browser, e senza server si comporta come si è sempre comportato.
 Quando si aggiorna l'artifact si ricompila con `strumenti/build-artifact.py` e si pubblica
 `dist/anni-di-fame.html` sull'URL esistente.

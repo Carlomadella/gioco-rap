@@ -399,88 +399,126 @@ E questa, secondo me, è una direzione molto più da vero gioco gestionale/RPG r
 sviluppalo
 
 quando clicco su beat maker mi rimanda alla scermata della scena del personaggio che incontra il beatmaker.
-   **FATTO (31/08/2026)** — sulla mappa «Beat maker» adesso apre **La Sala**: la scena della sala prove,
-   col tuo personaggio dentro e la gente che c'è stasera. Non è più una lista di beat.
+**FATTO (31/08/2026)** — sulla mappa «Beat maker» adesso apre **La Sala**: la scena della sala prove,
+col tuo personaggio dentro e la gente che c'è stasera. Non è più una lista di beat.
 
 Nella vita quotidiana si aggiunge la palestra
-   **FATTO (31/08/2026)** — «Vita quotidiana» sulla mappa apre tre scelte: palestra, staccare la spina,
-   guardare le spese. La palestra è una mossa vera della settimana: 1 energia e 12 €, alza benessere e
-   presenza, e ogni tanto in sala pesi c'è gente del giro (+rete).
+**FATTO (31/08/2026)** — «Vita quotidiana» sulla mappa apre tre scelte: palestra, staccare la spina,
+guardare le spese. La palestra è una mossa vera della settimana: 1 energia e 12 €, alza benessere e
+presenza, e ogni tanto in sala pesi c'è gente del giro (+rete).
 
 Trasforma la sezione beat maker in un posto fisico dove dentro si conoscono ARTISTI, BEATMAKER, FONICI, GIORNALISTI E TUTTI QUEI PERSONAGGI CHE RENDONO LA CARRIERA INTERATTIVA. Soprattutto troveremo beatmaker emergenti con cui creeremo relazioni e in base alle relazioni che costruiamo con questi poi avremo anche delle sessioni in studio. Ti ricordo che le sessioni in studio avremo SCENE DI GIOCO VERE E PROPRIE che ancora dobbiamo sviluppare. Ti chiedo infine se secondo te nel posto fisico che vogliamo creare abbiamo messo TROPPA ROBAA. l'idea era che nella città di provincia ci sia un posto dove magari puoi sviluppare meglio la tua rete di contatti e questo influenza anche la vita del gioco come ad esempio da lì si creano post sul lafamegram e contatti, rivalità cose.
 
-   **FATTO in parte (31/08/2026) — «La Sala»** (`js/game/posto.js`, `css/posto.css`).
-   La sala prove dietro al bar centrale: una scena col tuo personaggio dentro, e stasera tre facce.
-   - Ogni persona ha un **ruolo**, un **genere**, una **fama** sua e un **carattere** (aperto, diffidente,
-     gasato, pratico) che non vedi finché non ci parli: si scopre indovinando la risposta giusta.
-   - «Fatti due parole» costa **1 energia** e apre una chiacchierata a tre risposte. Le risposte danno
-     punti, i punti fanno salire il gradino: conoscenza → contatto → amico → collaboratore → fidato →
-     partner. Più sali, più punti servono per il gradino dopo: la rete non si farma in una sera.
-   - Quello che puoi chiedere dipende dal gradino: al **beatmaker** un beat da sentire (contatto) e la
-     **sessione in studio** (amico: 2 energie e 60 €, esce un beat vostro, gratis e migliore); al
-     **fonico** il mix di un tuo pezzo (amico); al **rapper** un pezzo insieme (collaboratore: hype e
-     fan veri, con un'attesa fra un feat e l'altro); al **giornalista** un pezzo scritto su di te.
-   - **Le rivalità nascono qui**: se con un rapper dici le cose sbagliate quello se ne va, e te lo
-     ritrovi in classifica come rivale, con la storia «Vi siete conosciuti alla Sala. È finita male.»
-   - Le sessioni in studio per adesso sono una scena corta: le **scene di gioco vere** restano da fare,
-     come i post su LaFamegram, che ancora non esiste.
+**FATTO in parte (31/08/2026) — «La Sala»** (`js/game/posto.js`, `css/posto.css`).
+La sala prove dietro al bar centrale: una scena col tuo personaggio dentro, e stasera tre facce.
 
-   **RISPOSTA alla domanda «troppa roba?» — sì, per la provincia.** In un paese conosci tre persone, non
-   sei ruoli. Quindi qui dentro ci sono solo **beatmaker, rapper e fonico**; il **giornalista** si
-   affaccia da solo quando passi i 2.000 fan; manager, promoter, uffici stampa e A&R non ci sono
-   proprio, e vanno tenuti per Milano — servono a far sentire che Milano è un altro mondo. Se mettiamo
-   tutto subito, il posto diventa un menù e nessuno di quei personaggi resta in mente.
+- Ogni persona ha un **ruolo**, un **genere**, una **fama** sua e un **carattere** (aperto, diffidente,
+  gasato, pratico) che non vedi finché non ci parli: si scopre indovinando la risposta giusta.
+- «Fatti due parole» costa **1 energia** e apre una chiacchierata a tre risposte. Le risposte danno
+  punti, i punti fanno salire il gradino: conoscenza → contatto → amico → collaboratore → fidato →
+  partner. Più sali, più punti servono per il gradino dopo: la rete non si farma in una sera.
+- Quello che puoi chiedere dipende dal gradino: al **beatmaker** un beat da sentire (contatto) e la
+  **sessione in studio** (amico: 2 energie e 60 €, esce un beat vostro, gratis e migliore); al
+  **fonico** il mix di un tuo pezzo (amico); al **rapper** un pezzo insieme (collaboratore: hype e
+  fan veri, con un'attesa fra un feat e l'altro); al **giornalista** un pezzo scritto su di te.
+- **Le rivalità nascono qui**: se con un rapper dici le cose sbagliate quello se ne va, e te lo
+  ritrovi in classifica come rivale, con la storia «Vi siete conosciuti alla Sala. È finita male.»
+- Le sessioni in studio per adesso sono una scena corta: le **scene di gioco vere** restano da fare,
+  come i post su LaFamegram, che ancora non esiste.
+
+**RISPOSTA alla domanda «troppa roba?» — sì, per la provincia.** In un paese conosci tre persone, non
+sei ruoli. Quindi qui dentro ci sono solo **beatmaker, rapper e fonico**; il **giornalista** si
+affaccia da solo quando passi i 2.000 fan; manager, promoter, uffici stampa e A&R non ci sono
+proprio, e vanno tenuti per Milano — servono a far sentire che Milano è un altro mondo. Se mettiamo
+tutto subito, il posto diventa un menù e nessuno di quei personaggi resta in mente.
 
 Stiamo giocando e abbiamo notato ce è troppo facile fare la carriera da criminale, siamo arrivati in pochissimo tempo a reputazione strda 99, noi vogliamo creare un gioco per diventare rapper e non criminali
 
-   **RISPOSTA — regole da tenere quando la criminalità entra nel repo** (qui dentro ancora non c'è: sulla
-   mappa il posto esiste e dice che sta arrivando).
-   - La reputazione di strada sale **al massimo di 2 per colpo** e **cala di 1 a settimana** se stai
-     fermo: 99 non lo raggiungi in un mese, e per restarci devi continuare a rischiare.
-   - Un colpo costa **quanto una sessione in studio** e occupa la sera: ogni colpo è un pezzo che non hai
-     registrato. È lì che si sente che il gioco è sui rapper.
-   - La strada **non dà fama da rapper**: dà soldi e hype di strada. La fama vera esce solo dai pezzi.
-   - I **soldi sporchi** stanno in una cassa separata (vedi il punto dopo).
+**RISPOSTA — regole da tenere quando la criminalità entra nel repo** (qui dentro ancora non c'è: sulla
+mappa il posto esiste e dice che sta arrivando).
+
+- La reputazione di strada sale **al massimo di 2 per colpo** e **cala di 1 a settimana** se stai
+  fermo: 99 non lo raggiungi in un mese, e per restarci devi continuare a rischiare.
+- Un colpo costa **quanto una sessione in studio** e occupa la sera: ogni colpo è un pezzo che non hai
+  registrato. È lì che si sente che il gioco è sui rapper.
+- La strada **non dà fama da rapper**: dà soldi e hype di strada. La fama vera esce solo dai pezzi.
+- I **soldi sporchi** stanno in una cassa separata (vedi il punto dopo).
 
 i soldi sporchi possono essere usati per comprare le cose che oggettivamente nel mondo reale puoi comprare comunque ccol denaro ossia : Un beatmaker lo puoi pagare tutto contanti, nessuno sa di questa cosa, i soldi sporchi sono più per il futuro e per quando avrai più soldi ; Magari la finanza ti controlla e arriva ad incastrarti. Però questo se ovviamente fai acquisti spropositati coi soldi in nero ; Tipo auto ecc e cose di lusso nello shop CHE ANCORA DOBBIAM PENSARE.
 
-   **RISPOSTA — due casse, non una.** In cima si vedono i soldi puliti; i contanti stanno sotto, in una
-   riga a parte. Cosa pagano i contanti: beatmaker, fonici, favori, roba di strada, l'affitto della sala.
-   Cosa **non** pagano: promozione, contratti, tutto quello che lascia una carta. Ogni volta che spendi
-   sporco in cose che si vedono (auto, gioielli, shop di lusso) sale il **rischio finanza**: una barra
-   nascosta che, sopra soglia, fa partire un controllo — sequestro dei contanti, settimane perse, e la
-   notizia che gira. Il conto onesto è questo: i contanti sono comodi adesso e pericolosi dopo, ed è
-   proprio il motivo per cui uno smette.
+**RISPOSTA — due casse, non una.** In cima si vedono i soldi puliti; i contanti stanno sotto, in una
+riga a parte. Cosa pagano i contanti: beatmaker, fonici, favori, roba di strada, l'affitto della sala.
+Cosa **non** pagano: promozione, contratti, tutto quello che lascia una carta. Ogni volta che spendi
+sporco in cose che si vedono (auto, gioielli, shop di lusso) sale il **rischio finanza**: una barra
+nascosta che, sopra soglia, fa partire un controllo — sequestro dei contanti, settimane perse, e la
+notizia che gira. Il conto onesto è questo: i contanti sono comodi adesso e pericolosi dopo, ed è
+proprio il motivo per cui uno smette.
 
 Non mi piace il fatto che nelle città venga scritto 'Si sblocca a Milano'. Lasciamo che sia tutto in progressione a sorpressa per i nostri player.
-   **FATTO (31/08/2026)** — tolto da tutte e due le parti: dalla foto della mappa (i cartelli chiusi
-   adesso hanno solo il lucchetto e il nome) e dai testi. Chi tocca un posto chiuso legge una frase che
-   non svela niente: «Da fuori si sente la cassa. Stasera non è cosa: quella porta si apre da sé, quando
-   sarà il momento.»
+**FATTO (31/08/2026)** — tolto da tutte e due le parti: dalla foto della mappa (i cartelli chiusi
+adesso hanno solo il lucchetto e il nome) e dai testi. Chi tocca un posto chiuso legge una frase che
+non svela niente: «Da fuori si sente la cassa. Stasera non è cosa: quella porta si apre da sé, quando
+sarà il momento.»
 
 Stiamo inoltre pensando di mettere il gioco alla giornata. Cioè si skippa di 1 gg alla volta. Così che magari negli eventi della giornata ci sia : 12 palestra con CHARLIE (fidanzata storicaa ad esempio), alle 19 vado in studio e alle 23 vado a fare un colpo con la banda. Che ne pensi?
 
-   **RISPOSTA — sì, ma il giorno dentro la settimana, non al posto della settimana.**
-   Il giorno è dove si gioca: tre fasce (pomeriggio, sera, notte) con l'ora scritta, esattamente come la
-   riga «Eventi e attività di oggi» che c'è già. La settimana resta il battito che chiude i conti:
-   stream, spese, classifica, rapporto. Se simuliamo tutto giorno per giorno, il rapporto settimanale
-   perde senso e il gioco diventa sette volte più lento per raccontare la stessa cosa.
-   In pratica: 7 giorni × 3 fasce = 21 mosse a settimana (adesso sono 3), e poi la settimana si chiude
-   come oggi. E la domenica la Sala è chiusa: si vede subito che i giorni non sono tutti uguali.
+**RISPOSTA — sì, ma il giorno dentro la settimana, non al posto della settimana.**
+Il giorno è dove si gioca: tre fasce (pomeriggio, sera, notte) con l'ora scritta, esattamente come la
+riga «Eventi e attività di oggi» che c'è già. La settimana resta il battito che chiude i conti:
+stream, spese, classifica, rapporto. Se simuliamo tutto giorno per giorno, il rapporto settimanale
+perde senso e il gioco diventa sette volte più lento per raccontare la stessa cosa.
+In pratica: 7 giorni × 3 fasce = 21 mosse a settimana (adesso sono 3), e poi la settimana si chiude
+come oggi. E la domenica la Sala è chiusa: si vede subito che i giorni non sono tutti uguali.
 
 L'energia stiam pensando di metterla a 100 al giorno. Ovviamente riproporzioneremo tutto ma lo facciamo per non aumentar etorppo la velocità di gioco. SOPRATTUTO CONSIGLIACI QUALCOSA CHE DEV'ESSERE BEN PROPOPRZIONATO .
 
-   **RISPOSTA — 100 va bene come scala, quello che conta sono i costi.** Proposta:
-   - piccole (due parole alla Sala, un post, palestra leggera): **10-15**
-   - medie (scrivi barre, cerca un beat, mixa): **25-30**
-   - grosse (registra, sessione in studio, live, colpo): **40-50**
-   Cioè tre mosse grosse al giorno, oppure sei piccole. La notte ridà **+60 fisso** più **+30 se il
-   benessere sta sopra 60**: chi si spreme non torna mai a 100, e il bruciarsi diventa una cosa che si
-   sente, non un numero scritto.
-   **Il conto da non sbagliare**: 21 mosse a settimana contro le 3 di adesso sono sette volte il gioco.
-   Se non tocchiamo il resto, fan e soldi esplodono. Quindi insieme all'energia: guadagni per mossa
-   **×0,4**, spese fisse invariate, soglie delle fasi **×2**. Una settimana piena vale più o meno quello
-   che vale oggi, ma dentro c'è da giocare per davvero.
+**RISPOSTA — 100 va bene come scala, quello che conta sono i costi.** Proposta:
+
+- piccole (due parole alla Sala, un post, palestra leggera): **10-15**
+- medie (scrivi barre, cerca un beat, mixa): **25-30**
+- grosse (registra, sessione in studio, live, colpo): **40-50**
+  Cioè tre mosse grosse al giorno, oppure sei piccole. La notte ridà **+60 fisso** più **+30 se il
+  benessere sta sopra 60**: chi si spreme non torna mai a 100, e il bruciarsi diventa una cosa che si
+  sente, non un numero scritto.
+  **Il conto da non sbagliare**: 21 mosse a settimana contro le 3 di adesso sono sette volte il gioco.
+  Se non tocchiamo il resto, fan e soldi esplodono. Quindi insieme all'energia: guadagni per mossa
+  **×0,4**, spese fisse invariate, soglie delle fasi **×2**. Una settimana piena vale più o meno quello
+  che vale oggi, ma dentro c'è da giocare per davvero.
+
+30. noi vogliamo che il gioco sia multiplayer, ad esempio le classifiche devono essere con i player reali e all'inizio bot per fare numero, i nomi dei bot devono essere reali comunque.
+    Dimmi se esiste già o sennò crea un backend, poi aggiorna il readme e la roadmap di conseguenza
+
+   **Un backend non c'era**: fino a qui il gioco era tutto nel browser, con i rivali generati
+   sul computer di chi gioca (`js/game/rivals.js`) e i salvataggi nel localStorage. Nessuna
+   chiamata di rete da nessuna parte.
+
+   **FATTO (31/08/2026) — il server della classifica** (`server/`, ponte in `js/net/online.js`).
+   Node e basta: nessuna dipendenza, nessun build, come il resto del progetto. Si avvia con
+   `node server/server.js`, l'archivio è un file JSON scritto con temporaneo + rinomina.
+   - **Una classifica sola per tutti**: dentro ci stanno i giocatori veri e i bot, mescolati e
+     ordinati per stream. Da fuori **non si distinguono**: il server non dice mai chi è un bot,
+     e non è un dettaglio tecnico — è la regola che tiene in piedi la cosa.
+   - **I nomi dei bot sono nomi veri**: «Nino Vento», «Marco T.», «Young Ferro», «Selva 22».
+     Quattro forme diverse, prese da un vocabolario di nomi d'arte italiani, tutti inventati —
+     nessun rapper che esiste davvero, che sarebbe un problema e non una scorciatoia. Ognuno ha
+     la sua città, il suo genere, la sua storia, le sue uscite e il suo contratto.
+   - **La classifica si muove anche mentre nessuno gioca**: ogni 24 ore vere il server fa un
+     giro di settimana — i bot crescono, uno esce con un pezzo, uno firma, uno sparisce dai
+     radar — e chi non manda un punteggio da più di una settimana e mezza scende dell'8%.
+     Prima di ogni giro si fotografa la posizione di tutti: da lì escono le frecce ▲▼ della
+     settimana (punto 12).
+   - **Si può chiedere qualsiasi fetta**: top 10, top 100, top 1000, e «chi ho davanti e chi ho
+     dietro» per la riga «sei 428°». Anche le notizie del giro, per il telefono.
+   - **Sull'imbroglio, onestamente**: il gioco gira nel browser, chi vuole barare bara. Il server
+     tiene fuori l'assurdo — al massimo ×5 di stream fra un invio e l'altro, un invio ogni dieci
+     secondi, 120 richieste al minuto per indirizzo, la chiave salvata solo come hash.
+   - **Se il server non c'è, il gioco non se ne accorge**: `ONLINE` torna `null` e si continua
+     sulla classifica locale. Il multiplayer è una cosa in più, non una da cui dipendere.
+
+   **RESTA DA FARE — la schermata**: oggi `js/game/ui.js` disegna ancora i rivali locali. Il
+   prossimo pezzo è agganciare la classifica vera alla schermata, con l'iscrizione automatica
+   alla prima settimana chiusa, senza moduli da compilare. L'ordine sta in `ROADMAP.md`.
+   README e ROADMAP aggiornati: rotte, manopole e cosa manca.
 
 Dobbiamo pensare a un modo per mettere La Fame Studio il più possibile nel ggioco. Quindi ti chiedo come potremmo aggiungerla, ad esempio gli studi dove si va il migliore potremmo mettere che si chiama la fame studio. Insomma tutta roba che faccia branding. Ovviamente non deve sembrare invadente, anzi, solo piacevole quando leggono 'La Fame Studio'.
 
@@ -489,3 +527,5 @@ Migliora la grafica e rendila uguale identica alla foto (dell ' interfaccia si i
 il telefono deve sembrare un vero e proprio telefono : Quindi come un iphone esattamente nel menù principale con solo le app cliccabili : Aggiungi inoltre LAFAMEGRAM, app dove si svilupperà molto la 'vita del gioco'.
 
 Voglio che il gioco abbia vita simulata molto sviluppata. Non banalità, dobbiamo lanciare un gioco cche vogliamo sia molto valido.
+
+cambia l'energia a 100 e anche tutto ciò ce ne deriva da questo cambiamento, tu prova a farlo al meglio poi ti dico io testando come mi pare.
