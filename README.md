@@ -20,11 +20,12 @@ Il server locale resta la via consigliata (è quella verificata).
 
 ## Dove sta andando: l'hub è una mappa
 
-**L'hub del gioco è una mappa che si allarga insieme al rapper** (punto 26 di
+**L'hub del gioco è una plancia con la mappa al centro** (punto 26 di
 `implementazioni.md`, dettagli in `ROADMAP.md`). Non sblocchi funzioni sparse in un menu,
-sblocchi un mondo più grande. La prima città c'è già: «Inizia la carriera» apre la mappa
-della provincia, i luoghi aprono la partita sulla sezione giusta e dalla partita si torna
-indietro col tasto «Mappa».
+sblocchi un mondo più grande. La prima città c'è già: «Inizia la carriera» apre la plancia
+— profilo a sinistra, città al centro, telefono a destra, eventi di oggi in basso — i
+luoghi aprono la partita sulla sezione giusta e dalla partita si torna indietro col tasto
+«Mappa».
 
 Tre città, in quest'ordine:
 
@@ -54,11 +55,17 @@ Le tre immagini stanno in `media/photo/` e sono il riferimento visivo del Main H
 provincia è costruita (`js/game/hub.js` + `css/hub.css`); Milano e Los Angeles per adesso
 sono ancora solo concept art.
 
-**La mappa è la foto stessa.** `media/photo/mappa_provincia.jpg` è il concept ritagliato
-sotto la testata e sopra le linguette (582×600): spilli e targhette sono dentro
-all'immagine, e sopra ci stanno solo sei rettangoli invisibili — le zone da toccare, in
-percentuale, così restano incollate ai cartelli a qualunque grandezza di schermo. Tutto
-il resto della schermata è vivo e legge la partita.
+**La mappa è la foto stessa.** `media/photo/mappa_citta.jpg` è il concept
+(`schermata_di_gioco.png`) ritagliato sul riquadro della città, 830×677: spilli, targhette
+e tasti «Entra» sono dentro all'immagine, e sopra ci stanno solo nove rettangoli
+invisibili — le zone da toccare, in percentuale, così restano incollate ai cartelli.
+
+Tutto il resto è vivo e legge la partita. La plancia è disegnata alla misura del concept
+(1536×1024) e rimpicciolita tutta insieme per stare nello schermo: le proporzioni restano
+quelle della foto ovunque. Dentro ci sono la fascia in alto (energia, soldi, hype, fama,
+network, benessere, settimana, ora), il profilo a sinistra con le sue quattro linguette
+(profilo, abilità, vestiti, disciplina), gli eventi di oggi — che fanno partire le azioni
+vere della settimana — e il telefono a destra con messaggi, otto app e le notizie.
 
 ## Struttura
 

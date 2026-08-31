@@ -1,135 +1,230 @@
-/* L'hub: la città vista dall'alto e tutto quello che ci sta sopra.
-   Una schermata sola, alta quanto lo schermo: testata, mappa, linguette,
-   la riga in basso. Da Milano e da Los Angeles cambia il mondo in mezzo,
-   non l'interfaccia. */
+/* La plancia: la schermata da cui si gioca.
+
+   È disegnata alla misura del concept — 1536×1024 — e poi rimpicciolita tutta
+   insieme per stare nello schermo (hubScala). Così le proporzioni sono quelle
+   della foto a qualunque grandezza, e le zone da toccare restano incollate ai
+   cartelli disegnati dentro alla mappa. */
 
 #s-hub{padding-top:0}
 body.in-hub .topnav{display:none}
 
-.hub{position:relative;width:100%;
-  /* la mappa è alta quanto è larga (quasi): oltre una certa larghezza la
-     schermata diventerebbe un lenzuolo, quindi si tiene dentro allo schermo */
-  max-width:min(720px, calc((100dvh - 212px) * .97));
-  /* altezza fissa: così è la mappa a stringersi quando lo schermo è basso,
-     invece di far scorrere la pagina */
-  margin:0 auto;height:100dvh;min-height:560px;display:flex;flex-direction:column;
-  background:#08070C;overflow:hidden;
-  box-shadow:0 0 0 1px rgba(255,255,255,.05)}
+.palco{position:fixed;inset:0;overflow:auto;background:#05070B}
+.plancia{position:absolute;left:0;top:0;width:1536px;height:1024px;
+  transform-origin:0 0;background:#05070B;color:#E8EAF0;
+  font-family:"Figtree",system-ui,sans-serif}
 
-/* ================= TESTATA ================= */
-.htop{position:relative;z-index:3;flex:none;display:flex;align-items:center;gap:14px;
-  padding:9px 14px;background:linear-gradient(180deg,#0B0A11 62%,rgba(11,10,17,.86));
-  border-bottom:1px solid rgba(255,255,255,.07)}
+/* ---- pezzi comuni ---- */
+.pcard{position:absolute;background:linear-gradient(180deg,#0C0F16,#090C12);
+  border:1px solid rgba(255,255,255,.07);border-radius:12px}
+.ptit{display:block;font-size:13px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:#C9CEDA}
+.pk{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#727A8C}
+.hicon{width:18px;height:18px;display:block;fill:currentColor}
 
-.hlogo{display:flex;align-items:center;gap:7px;padding:4px 8px;border-radius:12px;
-  transition:background .15s,transform .12s}
-.hlogo:hover{background:rgba(255,255,255,.06)}
-.hlogo:active{transform:scale(.96)}
-.hlogo span{display:flex;flex-direction:column;line-height:.82;text-align:left;
-  font-family:var(--disp);font-style:italic;letter-spacing:-.02em}
-.hlogo b{font-size:13px;font-weight:400;color:#FFD34E;text-shadow:0 2px 0 #B0700A}
-.hlogo i{font-size:21px;font-style:italic;color:#FFA92B;text-shadow:0 2px 0 #8E4A05}
-.hcrown{width:18px;height:18px;fill:#FFD34E;transform:rotate(-12deg)}
+/* ================= FASCIA IN ALTO ================= */
+.pbarra{position:absolute;left:0;top:0;width:1536px;height:86px;display:flex;
+  align-items:stretch;background:linear-gradient(180deg,#0C1017,#080B11);
+  border-bottom:1px solid rgba(255,255,255,.08)}
 
-.hwho{min-width:0;flex:1}
-.hname{font-family:var(--cond);font-size:17px;font-weight:800;letter-spacing:.06em;
-  text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hmeta{font-family:var(--cond);font-size:12.5px;font-weight:700;letter-spacing:.1em;
-  text-transform:uppercase;color:rgba(255,255,255,.78);margin-top:1px}
-.hmeta .hstar{color:#FFD34E}
-.hrank{font-family:var(--cond);font-size:11px;font-weight:800;letter-spacing:.16em;
-  text-transform:uppercase;color:#C084FC;margin-top:2px}
-
-.hres{display:flex;align-items:center;gap:4px;flex:none;padding:7px 6px;border-radius:14px;
-  background:rgba(9,9,13,.9);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
-.hr{display:inline-flex;align-items:center;gap:5px;padding:2px 8px}
-.hr + .hr{border-left:1px solid rgba(255,255,255,.08)}
-.hr .hicon{width:15px;height:15px;fill:var(--k);flex:none}
-.hr b{font-family:var(--cond);font-size:14px;font-weight:700;letter-spacing:.02em;
-  font-variant-numeric:tabular-nums;white-space:nowrap}
-
-/* ================= LA MAPPA ================= */
-/* È la foto del concept, ritagliata sotto la testata e sopra le linguette
-   (582×600). Le proporzioni sono bloccate su quelle dell'immagine: le zone da
-   toccare stanno in percentuale, e così restano incollate ai cartelli a
-   qualunque grandezza di schermo. */
-.hmap{position:relative;flex:1 1 auto;min-height:0;overflow:hidden;background:#07060B;
-  display:flex;align-items:center;justify-content:center}
-/* la foto sta dentro intera, senza schiacciarsi: la misura la fa hubMisura(),
-   perché quello che conta è che i cartelli restino sotto le zone da toccare */
-.hfoto{position:relative;
-  background:url("../media/photo/mappa_provincia.jpg") center/100% 100% no-repeat}
-
-/* ---- i luoghi: rettangoli invisibili appoggiati sui cartelli ---- */
-.hpins{position:absolute;inset:0}
-.hspot{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);
-  border-radius:12px;transition:background .15s,box-shadow .15s,transform .12s}
-.hspot:hover{background:rgba(255,255,255,.07);
-  box-shadow:inset 0 0 0 1.5px rgba(192,132,252,.85),0 0 22px rgba(168,85,247,.35)}
-.hspot:focus-visible{background:rgba(255,255,255,.07);
-  box-shadow:inset 0 0 0 2px var(--acid)}
-.hspot:active{transform:scale(.98)}
-.hspot.chiuso:hover{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.5)}
-
-/* ================= LINGUETTE ================= */
-.htabs{position:relative;z-index:3;flex:none;display:flex;gap:2px;padding:5px 88px 5px 8px;
-  background:#0B0A10;border-top:1px solid rgba(255,255,255,.07)}
-.htab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
-  padding:6px 2px 5px;border-radius:11px;color:rgba(255,255,255,.5);
-  transition:background .15s,color .15s}
-.htab .hicon{width:19px;height:19px;fill:currentColor}
-.htab span{font-family:var(--cond);font-size:9.5px;font-weight:800;letter-spacing:.13em;
-  text-transform:uppercase}
-.htab:hover{color:rgba(255,255,255,.8);background:rgba(255,255,255,.05)}
-.htab.on{color:#C084FC;background:rgba(168,85,247,.16)}
-
-/* ================= LA RIGA IN BASSO ================= */
-.hfoot{position:relative;z-index:3;flex:none;display:flex;align-items:stretch;gap:8px;padding:7px 8px;
-  background:#0B0A10;border-top:1px solid rgba(255,255,255,.07)}
-.hgoal,.hnews{flex:1;min-width:0;text-align:left;padding:8px 11px;border-radius:12px;
-  background:#111017;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+.plogo{width:132px;flex:none;display:flex;align-items:center;justify-content:center;gap:6px;
   transition:background .15s}
-.hgoal:hover,.hnews:hover{background:#16151E}
-.hk{display:block;font-family:var(--cond);font-size:9px;font-weight:800;letter-spacing:.2em;
-  text-transform:uppercase;color:var(--faint)}
-.hgl{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:4px}
-.hgl b{font-size:12.5px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;
-  text-overflow:ellipsis}
-.hgl i{font-family:var(--cond);font-style:normal;font-size:12px;font-weight:700;
-  color:rgba(255,255,255,.55);font-variant-numeric:tabular-nums;flex:none}
-.hbar{display:block;height:3px;margin-top:6px;border-radius:3px;background:rgba(255,255,255,.1)}
-.hbar i{display:block;height:100%;border-radius:3px;
-  background:linear-gradient(90deg,#7C3AED,#C084FC)}
+.plogo:hover{background:rgba(255,255,255,.05)}
+.plogo span{display:flex;flex-direction:column;line-height:.82;text-align:left;
+  font-family:var(--disp);font-style:italic;letter-spacing:-.02em}
+.plogo b{font-size:15px;font-weight:400;color:#FFD34E;text-shadow:0 2px 0 #B0700A}
+.plogo i{font-size:25px;font-style:italic;color:#FFA92B;text-shadow:0 2px 0 #8E4A05}
+.hcrown{width:20px;height:20px;fill:#FFD34E;transform:rotate(-12deg)}
 
-.hnw{display:flex;align-items:center;gap:9px;margin-top:5px}
-.hnw .hnt{flex:1}
-/* la miniatura delle notizie è quella del concept, ritagliata */
-.hth{flex:none;width:52px;height:35px;border-radius:6px;display:block;
-  background:#160D22 url("../media/photo/notizia_folla.jpg") center/cover no-repeat}
-.hnt{min-width:0}
-.hnt b{display:block;font-size:11px;font-weight:600;color:#fff;line-height:1.2;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hnt i{display:block;font-style:normal;font-size:10px;color:rgba(255,255,255,.55);
-  line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pcitta{width:206px;flex:none;display:flex;flex-direction:column;justify-content:center;gap:3px;
+  padding-left:18px;border-left:1px solid rgba(255,255,255,.08)}
+.pcn{font-size:17px;font-weight:700;color:#C084FC;letter-spacing:.01em}
+.pcf{font-size:11px;color:#7B8395;letter-spacing:.02em}
+.pcf b{color:#E8EAF0;font-weight:700}
 
-/* il telefono: sporge sopra la riga, come appoggiato allo schermo */
-.hphone{flex:none;align-self:flex-end;margin:-40px 4px -8px 0;padding:0;
-  transition:transform .14s}
-.hphone:hover{transform:translateY(-3px)}
-.hph{position:relative;display:block;width:74px;height:104px;border-radius:15px;
-  padding:7px 6px;background:linear-gradient(160deg,#25242E,#0E0D13);
-  box-shadow:0 12px 26px rgba(0,0,0,.7),inset 0 0 0 1px rgba(255,255,255,.14);
-  transform:rotate(-5deg)}
-.hscr{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
-  width:100%;height:100%;border-radius:10px;background:#08080C;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
-.hscr .hicon{width:26px;height:26px;fill:#E8E6F2}
-.hpk{font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.18em;
-  text-transform:uppercase;color:rgba(255,255,255,.78)}
-.hbdg{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;
-  display:flex;align-items:center;justify-content:center;border-radius:999px;
-  background:#F0243C;color:#fff;font-family:var(--cond);font-size:12px;font-weight:800;
-  font-style:normal;box-shadow:0 3px 10px rgba(240,36,60,.55)}
+.pstat{flex:1;display:flex;align-items:stretch}
+.ps{flex:1;display:flex;align-items:center;gap:10px;padding:0 6px 0 16px;
+  border-left:1px solid rgba(255,255,255,.07)}
+.ps .hicon{width:22px;height:22px;flex:none;fill:var(--k)}
+.ps .pv{font-size:16px;font-weight:600;color:#F1F3F8;font-variant-numeric:tabular-nums;
+  margin-top:2px;white-space:nowrap}
+.ps .pbar{display:block;width:104px;height:5px;margin-top:6px;border-radius:3px;
+  background:rgba(255,255,255,.12)}
+.ps .pbar i{display:block;height:100%;border-radius:3px;background:var(--k)}
+
+.psett{width:132px;flex:none;display:flex;flex-direction:column;justify-content:center;gap:3px;
+  padding-left:18px;border-left:1px solid rgba(255,255,255,.08)}
+.psett .pk b{color:#E8EAF0;font-size:11px}
+.pcn2{font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.pora{width:150px;flex:none;display:flex;align-items:center;justify-content:center;gap:10px;
+  font-size:21px;font-weight:600;color:#E8EAF0;font-variant-numeric:tabular-nums}
+.pora .hicon{width:22px;height:22px;fill:#C9CEDA}
+
+/* ================= COLONNA DI SINISTRA ================= */
+.psx{left:8px;top:94px;width:340px;height:758px;padding:14px 14px 10px;overflow:hidden}
+.psxtab{left:8px;top:862px;width:340px;height:104px;display:flex;align-items:center;
+  gap:6px;padding:10px}
+
+.pface{display:flex;gap:14px;margin-top:12px}
+.pport{width:126px;height:150px;flex:none;border-radius:10px;overflow:hidden;
+  background:linear-gradient(180deg,#241C33,#12101B);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.pport svg{width:100%;height:100%;display:block}
+.pwho{flex:1;min-width:0;padding-top:4px}
+.pnome{display:flex;align-items:center;gap:6px;font-size:17px;font-weight:800;
+  letter-spacing:.02em;text-transform:uppercase}
+.pnome .hicon{width:14px;height:14px;fill:#A855F7}
+.plv{margin-top:6px;font-size:15px;font-weight:700;color:#C084FC}
+.pgrado{font-size:14px;font-weight:700;color:#A855F7;text-transform:uppercase;letter-spacing:.04em}
+.pxp{margin-top:14px;display:flex;justify-content:space-between;font-size:11px;color:#8A90A0}
+.pxp b{color:#C9CEDA;font-weight:600}
+.pbar2{display:block;height:7px;margin-top:6px;border-radius:4px;background:#20232C}
+.pbar2 i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#7C3AED,#A855F7)}
+
+.prighe{margin-top:16px;border-top:1px solid rgba(255,255,255,.06)}
+.prow{display:flex;align-items:center;gap:10px;height:28px;
+  border-bottom:1px solid rgba(255,255,255,.05);font-size:13.5px}
+.prow .hicon{width:17px;height:17px;flex:none;fill:var(--k,#8A90A0)}
+.prow .n{flex:1;color:#C9CEDA}
+.prow .v{font-weight:600;color:#F1F3F8;font-variant-numeric:tabular-nums}
+.prow .mini{width:88px;height:5px;border-radius:3px;background:#23262F}
+.prow .mini i{display:block;height:100%;border-radius:3px;background:var(--k,#EF4444)}
+
+.psk{margin-top:12px}
+.pskrow{display:flex;align-items:center;gap:9px;height:24px;font-size:12.5px;color:#C9CEDA}
+.pskrow .hicon{width:15px;height:15px;flex:none;fill:#8A90A0}
+.pskrow .n{width:86px}
+.pskrow .b{flex:1;height:6px;border-radius:3px;background:#23262F}
+.pskrow .b i{display:block;height:100%;border-radius:3px;background:#8B5CF6}
+.pskrow .v{width:28px;text-align:right;font-weight:600;color:#F1F3F8;font-variant-numeric:tabular-nums}
+
+.pdue{display:flex;margin-top:12px;border:1px solid rgba(255,255,255,.07);border-radius:9px;
+  overflow:hidden}
+.pdue > div{flex:1;padding:8px 12px}
+.pdue > div + div{border-left:1px solid rgba(255,255,255,.07)}
+.pdue .v{margin-top:3px;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.02em}
+
+.pnext{margin-top:10px;padding:9px 12px 11px;border:1px solid rgba(255,255,255,.07);
+  border-radius:9px}
+.pnexthead{display:flex;justify-content:space-between;align-items:center}
+.pnext .t{margin-top:3px;font-size:13px;color:#E8EAF0}
+
+.ptab{flex:1;height:100%;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:7px;border-radius:10px;color:#8A90A0;transition:background .15s,color .15s}
+.ptab .hicon{width:26px;height:26px;fill:currentColor}
+.ptab span{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.ptab:hover{background:rgba(255,255,255,.05);color:#C9CEDA}
+.ptab.on{background:rgba(168,85,247,.16);color:#C084FC}
+
+/* ================= LA CITTÀ ================= */
+.pmappa{left:356px;top:94px;width:838px;height:682px;padding:3px;overflow:hidden}
+.pfoto{position:relative;width:830px;height:677px;border-radius:10px;overflow:hidden;
+  background:#0A0910 url("../media/photo/mappa_citta.jpg") center/100% 100% no-repeat}
+.ppins{position:absolute;inset:0}
+.pspot{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);
+  border-radius:10px;transition:background .15s,box-shadow .15s,transform .12s}
+.pspot:hover{background:rgba(255,255,255,.06);
+  box-shadow:inset 0 0 0 2px rgba(192,132,252,.9),0 0 26px rgba(168,85,247,.4)}
+.pspot:focus-visible{box-shadow:inset 0 0 0 2px var(--acid)}
+.pspot:active{transform:scale(.985)}
+.pspot.chiuso:hover{box-shadow:inset 0 0 0 2px rgba(255,255,255,.45)}
+/* il giro guidato dei luoghi, con le frecce «scorri per esplorare» */
+.pspot.qui{box-shadow:inset 0 0 0 2px rgba(192,132,252,.95),0 0 30px rgba(168,85,247,.5);
+  animation:pspulse 1.6s ease-in-out infinite}
+@keyframes pspulse{50%{box-shadow:inset 0 0 0 2px rgba(192,132,252,.5),0 0 12px rgba(168,85,247,.2)}}
+.pfrec{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);
+  border-radius:8px;transition:background .15s}
+.pfrec:hover{background:rgba(255,255,255,.12)}
+
+/* ================= EVENTI DI OGGI ================= */
+.peventi{left:356px;top:786px;width:838px;height:190px;padding:12px 14px}
+.pevrow{display:flex;gap:10px;margin-top:10px;height:139px}
+.pev{flex:1;min-width:0;display:flex;flex-direction:column;text-align:left;
+  padding:9px 10px 10px;border-radius:10px;overflow:hidden;
+  background:#0E1119;border:1px solid var(--k);transition:transform .12s,background .15s}
+.pev:hover{background:#141826;transform:translateY(-2px)}
+.pev:disabled{opacity:.5;transform:none;cursor:default}
+.pevt{display:flex;align-items:flex-start;gap:6px;font-size:10.5px;font-weight:800;line-height:1.1;
+  letter-spacing:.04em;text-transform:uppercase;color:var(--k)}
+.pevt .hicon{width:14px;height:14px;flex:none;margin-top:-1px}
+.pevd{margin-top:6px;font-size:11px;color:#C9CEDA;line-height:1.2}
+.pevl{margin-top:7px;display:flex;flex-direction:column;gap:4px}
+.pevl span{display:flex;align-items:center;gap:6px;font-size:10.5px;color:#9AA1B2;line-height:1.15}
+.pevl .hicon{width:14px;height:14px;flex:none;fill:#7B8395}
+.pevfoot{margin-top:auto;padding-top:7px;display:flex;align-items:center;
+  justify-content:space-between;gap:8px}
+.pevora{font-size:13px;font-weight:600;color:#C9CEDA;font-variant-numeric:tabular-nums}
+.pevgo{padding:6px 12px;border-radius:7px;background:var(--k);color:#0A0A0F;
+  font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.pev:disabled .pevgo{background:#2A2E3A;color:#8A90A0}
+.pevpiu{flex:0 0 96px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;padding:10px;border-radius:10px;border:1px dashed rgba(255,255,255,.18);
+  font-size:11.5px;color:#7B8395;text-align:center;line-height:1.35}
+.pevpiu b{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#8A90A0}
+
+/* ================= IL TELEFONO ================= */
+.ptel{position:absolute;left:1202px;top:94px;width:326px;height:824px}
+.ptelframe{width:100%;height:100%;border-radius:38px;padding:11px;
+  background:linear-gradient(160deg,#2A2E38,#0D0F14);
+  box-shadow:0 20px 50px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.12)}
+.ptelbar{position:relative;height:26px;display:flex;align-items:center;
+  padding:0 14px;font-size:11px;color:#C9CEDA;font-variant-numeric:tabular-nums}
+.ptelnotch{position:absolute;left:50%;top:-1px;transform:translateX(-50%);
+  width:104px;height:19px;border-radius:0 0 12px 12px;background:#07080C}
+.ptelsig{margin-left:auto;width:46px;height:10px;border-radius:2px;
+  background:linear-gradient(90deg,#C9CEDA 0 12px,transparent 12px 16px,#C9CEDA 16px 28px,
+  transparent 28px 32px,#C9CEDA 32px 46px);opacity:.75}
+.ptelscr{height:calc(100% - 26px);border-radius:28px;background:#080A0F;padding:14px;
+  overflow:hidden;display:flex;flex-direction:column}
+
+.ptt{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#C9CEDA}
+.pmsg{margin-top:10px;border:1px solid rgba(255,255,255,.07);border-radius:10px;
+  background:#0C0F16;overflow:hidden}
+.pmsghead{display:flex;align-items:center;gap:8px;padding:9px 11px;
+  border-bottom:1px solid rgba(255,255,255,.06)}
+.pmsghead .hicon{width:17px;height:17px;fill:#A855F7}
+.pmsghead b{flex:1;font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:#C9CEDA}
+.pnuovi{padding:3px 9px;border-radius:999px;background:#7C3AED;color:#fff;
+  font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.pmr{display:flex;align-items:center;gap:9px;width:100%;padding:11px;text-align:left;
+  border-bottom:1px solid rgba(255,255,255,.05);transition:background .15s}
+.pmr:last-child{border-bottom:none}
+.pmr:hover{background:rgba(255,255,255,.04)}
+.pmav{width:32px;height:32px;flex:none;border-radius:50%;overflow:hidden;background:#1A1B24}
+.pmav svg{width:100%;height:100%;display:block}
+.pmtx{flex:1;min-width:0}
+.pmtx b{display:block;font-size:12px;font-weight:700;color:#E8EAF0}
+.pmtx i{display:block;font-style:normal;font-size:11px;color:#8A90A0;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.pmrt{display:flex;flex-direction:column;align-items:flex-end;gap:5px;font-size:10.5px;color:#727A8C}
+.pmrt u{width:7px;height:7px;border-radius:50%;background:#A855F7}
+
+.plargo{display:block;width:100%;margin-top:12px;padding:13px;border-radius:9px;
+  border:1px solid rgba(255,255,255,.09);background:#0C0F16;
+  font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#C9CEDA;
+  transition:background .15s}
+.plargo:hover{background:#141826}
+
+.papp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.pap{display:flex;align-items:center;gap:10px;padding:17px 11px;border-radius:10px;
+  background:#0C0F16;border:1px solid rgba(255,255,255,.07);text-align:left;
+  transition:background .15s,transform .12s}
+.pap:hover{background:#151A26;transform:translateY(-1px)}
+.pap .hicon{width:26px;height:26px;flex:none;fill:var(--k)}
+.pap b{display:block;font-size:12px;font-weight:700;color:#E8EAF0;letter-spacing:.02em}
+.pap i{display:block;font-style:normal;font-size:10.5px;color:#8A90A0;margin-top:2px}
+
+.pnews{flex:1;min-height:0;margin-top:13px;border:1px solid rgba(255,255,255,.07);
+  border-radius:10px;background:#0C0F16;padding:13px}
+.pnews h4{margin:0 0 8px;font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:#C9CEDA}
+.pnews p{display:flex;gap:8px;margin:0 0 11px;font-size:11.5px;color:#C9CEDA;line-height:1.35}
+.pnews p:last-child{margin-bottom:0}
+.pnews .hicon{width:14px;height:14px;flex:none;margin-top:1px;fill:var(--k,#FB923C)}
+
+/* ================= RIGA DI FONDO ================= */
+.psugg{position:absolute;left:0;top:980px;width:1536px;height:44px;display:flex;
+  align-items:center;justify-content:center;font-size:13px;color:#8A90A0}
+.psugg b{color:#C9CEDA;font-weight:600}
 
 /* ================= IL RITORNO ALLA MAPPA ================= */
 /* Nella partita il tasto bianco resta quello del menu: questo, viola, riporta
@@ -137,19 +232,3 @@ body.in-hub .topnav{display:none}
 .tornamenu.mappa{background:linear-gradient(180deg,#7C3AED,#5B21B6);color:#fff;
   box-shadow:0 6px 26px rgba(124,58,237,.45)}
 .tornamenu.mappa:hover{background:linear-gradient(180deg,#8B4BF5,#6D28D9)}
-
-/* ================= SCHERMI STRETTI ================= */
-@media (max-width:560px){
-  .htop{gap:9px;padding:8px 10px}
-  .hres{gap:0;padding:5px 2px}
-  .hr{gap:4px;padding:2px 5px}
-  .hr b{font-size:12px}
-  .hname{font-size:15px}
-    .hphone{margin:-34px 0 -8px 0}
-  .hph{width:62px;height:88px}
-  .hnews{display:none}
-}
-@media (max-width:400px){
-  .hres{flex-wrap:wrap;max-width:150px;justify-content:flex-end}
-  .hr + .hr{border-left:none}
-}

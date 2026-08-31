@@ -190,27 +190,38 @@ Tutte le modifiche da fare:
     Riferimento grafico: la mappa generata va usata come **Main Hub / World Map**, non come logo — il logo
     vero, semplice e riconoscibile, viene dopo.
 
-    **FATTO in parte (31/08/2026)** — la schermata della città di partenza, uguale alla foto
-    `media/photo/schermata_di_gioco_città_iniziale.png`.
-    - Si entra da lì: «Inizia la carriera» apre la mappa, non più le card. Dalla mappa si va nella
+    **FATTO in parte (31/08/2026)** — la plancia di gioco, uguale alla foto
+    `media/photo/schermata_di_gioco.png`.
+    - Si entra da lì: «Inizia la carriera» apre la plancia, non più le card. Dai luoghi si va nella
       partita e dalla partita si torna indietro con il tasto viola «Mappa».
-    - Testata: marchio, nome, livello con la stella, fase in viola, e le quattro cose che hai —
-      energia, cassa, hype, chi ti segue. Sono i numeri veri della partita, non un mockup.
-    - La mappa è la foto stessa, non un disegno che le somiglia: `media/photo/mappa_provincia.jpg`
-      è il concept ritagliato sotto la testata e sopra le linguette. Spilli e targhette stanno
-      dentro all'immagine; sopra ci sono solo sei rettangoli invisibili, le zone da toccare, messe
-      in percentuale così restano incollate ai cartelli a qualunque grandezza di schermo.
-      Anche la miniatura delle notizie è ritagliata dal concept.
-    - Quattro luoghi aperti (studio, beat maker, vita quotidiana, attività criminali) e due chiusi
-      (club, concerti) che dicono «sblocca a Milano» e, se li tocchi, cosa serve: livello 10, fama 50,
-      hype 40. Studio, beat maker e vita quotidiana aprono la partita sulla sezione giusta;
-      la criminalità dice che sta arrivando (è il punto 21).
-    - In basso le cinque linguette (mappa, contatti, inventario, obiettivi, statistiche), l'obiettivo
-      di adesso con la barra, le notizie del paese che cambiano con le settimane e il telefono con la
-      chat: il pallino rosso è la roba non letta del diario.
-      File nuovi: `js/game/hub.js`, `css/hub.css`, `media/photo/mappa_provincia.jpg`,
-      `media/photo/notizia_folla.jpg`. Il build dell'artifact adesso si porta dentro anche le
-      immagini dei CSS, come data URI.
+    - La plancia è disegnata alla misura del concept (1536×1024) e rimpicciolita tutta insieme: le
+      proporzioni restano quelle della foto su qualunque schermo.
+    - La mappa è la foto stessa, non un disegno che le somiglia: `media/photo/mappa_citta.jpg` è il
+      concept ritagliato sul riquadro della città. Spilli, targhette e tasti «Entra» stanno dentro
+      all'immagine; sopra ci sono solo nove rettangoli invisibili, le zone da toccare, messe in
+      percentuale così restano incollate ai cartelli.
+    - Fascia in alto: marchio, città e fase, e i sei numeri veri della partita — energia, soldi,
+      hype, fama, network, benessere — più settimana, anno e l'ora della sera, che avanza con
+      l'energia che spendi.
+    - Colonna di sinistra: ritratto, nome, livello, barra dell'esperienza, sette righe di stato e le
+      sei abilità. Quattro linguette: profilo, abilità (dove si vede cosa fa crescere cosa),
+      vestiti (apre il tuo artista) e disciplina (benessere, lucidità, spese, prossima prova).
+    - Centro: la città con nove luoghi. Tre aperti portano dove si gioca davvero (studio → le mosse
+      della settimana, beat maker → i beat in vendita, vita quotidiana → lifestyle); le attività
+      criminali dicono che stanno arrivando (punto 21); club, concerti, sponsor, business e shop
+      restano in vista e spiegano cosa serve. Le frecce «scorri per esplorare» fanno il giro dei
+      luoghi uno alla volta, illuminandoli.
+    - Sotto: «Eventi e attività di oggi». Non sono cartelli finti: freestyle, producer session e
+      party fanno partire le azioni vere della settimana, con il loro costo, e si spengono da soli
+      quando non hai l'energia. Il colpo rapido dice che deve ancora arrivare.
+    - Colonna di destra: il telefono. Messaggi (le ultime righe del diario, col pallino di quelle
+      non lette), otto app che portano tutte da qualche parte — contatti, obiettivi, notizie,
+      inventario, statistiche, classifiche, agenda, impostazioni — e le notizie della settimana.
+    - Risolto: entrare in un luogo e tornare indietro senza fare niente dava schermata nera. La
+      plancia veniva misurata mentre era ancora nascosta, quindi grande zero: adesso si accende
+      prima e si misura dopo.
+      File nuovi: `js/game/hub.js`, `css/hub.css`, `media/photo/mappa_citta.jpg`. Il build
+      dell'artifact si porta dentro anche le immagini dei CSS, come data URI.
       Restano da fare: i contatti veri, la criminalità, e le altre due città.
 
 Carlomadella/gioco-rap
@@ -397,3 +408,11 @@ Quindi il giocatore non deve imparare una nuova UI ogni volta che cambia città.
 
 E questa, secondo me, è una direzione molto più da vero gioco gestionale/RPG rispetto alla semplice mappa fullscreen.
 sviluppalo
+
+quando clicco su beat maker mi rimanda alla scermata della scena del personaggio che incontra il beatmaker.
+
+Nella vita quotidiana si aggiunge la palestra
+
+Trasforma la sezione beat maker in un posto fisico dove dentro si conoscono ARTISTI, BEATMAKER, FONICI, GIORNALISTI E TUTTI QUEI PERSONAGGI CHE RENDONO LA CARRIERA INTERATTIVA. Soprattutto troveremo beatmaker emergenti con cui creeremo relazioni e in base alle relazioni che costruiamo con questi poi avremo anche delle sessioni in studio. Ti ricordo che le sessioni in studio avremo SCENE DI GIOCO VERE E PROPRIE che ancora dobbiamo sviluppare. Ti chiedo infine se secondo te nel posto fisico che vogliamo creare abbiamo messo TROPPA ROBAA.
+
+Stiamo giocando e abbiamo notato ce è troppo facile fare la carriera da criminale, siamo arrivati in pochissimo tempo a reputazione strda 99, noi vogliamo creare un gioco per diventare rapper e non criminali

@@ -99,7 +99,7 @@ Farmare contatti è gameplay, non un menu.
 1. ~~Schermata hub con le linguette, la città di provincia e i suoi quattro luoghi; le azioni
    che esistono già (scrivi, beat, registra, pubblica, piazza) si aprono da lì.~~
    **FATTA (31/08/2026)** — `js/game/hub.js`, `css/hub.css`, e come mappa la concept art
-   stessa (`media/photo/mappa_provincia.jpg`), con sopra le zone da toccare. Si entra dalla
+   stessa (`media/photo/mappa_citta.jpg`), con sopra le zone da toccare. Si entra dalla
    mappa; studio, beat maker e vita quotidiana aprono la partita sulla sezione giusta; club e
    concerti sono in vista e dicono cosa serve per Milano.
 2. Anagrafica dei contatti: tipo, grado, come si sale, dove si incontrano.

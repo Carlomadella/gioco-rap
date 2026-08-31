@@ -137,37 +137,62 @@
 </section>
 
 
-<!-- L'hub: la città di provincia. È la schermata da cui si gioca — i luoghi
-     aprono la partita sulla sezione giusta. Il contenuto lo mette js/game/hub.js. -->
+<!-- L'hub: la plancia da cui si gioca. La mappa è la foto del concept
+     (media/photo/mappa_citta.jpg): i luoghi con le loro targhette stanno dentro
+     all'immagine, sopra ci vanno solo le zone da toccare. Tutto il resto è vivo
+     e lo riempie js/game/hub.js. La plancia è disegnata a 1536×1024 e si
+     rimpicciolisce tutta insieme per stare nello schermo. -->
 <section class="screen" id="s-hub">
-  <div class="hub">
-    <header class="htop">
-      <button class="hlogo" id="hb-logo" aria-label="Torna al menu principale">
-        <svg class="hcrown" viewBox="0 0 24 14" aria-hidden="true"><path d="M2 13 .8 2.6l5.6 4.2L12 .8l5.6 6 5.6-4.2L22 13z"/></svg>
-        <span><b>Anni di</b><i>Fame</i></span>
-      </button>
-      <div class="hwho">
-        <div class="hname" id="hb-name">—</div>
-        <div class="hmeta"><span class="hstar">&#9733;</span> Liv. <b id="hb-lvl">1</b></div>
-        <div class="hrank" id="hb-rank">—</div>
+  <div class="palco" id="hb-palco">
+    <div class="plancia" id="hb-plancia">
+
+      <!-- ---------- la fascia in alto ---------- -->
+      <header class="pbarra">
+        <button class="plogo" id="hb-logo" aria-label="Torna al menu principale">
+          <svg class="hcrown" viewBox="0 0 24 14" aria-hidden="true"><path d="M2 13 .8 2.6l5.6 4.2L12 .8l5.6 6 5.6-4.2L22 13z"/></svg>
+          <span><b>Anni di</b><i>Fame</i></span>
+        </button>
+        <div class="pcitta">
+          <span class="pk">Città attuale</span>
+          <span class="pcn" id="hb-citta">Città di provincia</span>
+          <span class="pcf">Fase 1: <b id="hb-fase">—</b></span>
+        </div>
+        <div class="pstat" id="hb-stat"></div>
+        <div class="psett">
+          <span class="pk">Settimana <b id="hb-week">1</b></span>
+          <span class="pcn2" id="hb-anno">Anno 1</span>
+        </div>
+        <div class="pora"><svg class="hicon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.7 14.6A8.6 8.6 0 0 1 9.4 3.3a8.6 8.6 0 1 0 11.3 11.3z"/></svg><span id="hb-ora">21:30</span></div>
+      </header>
+
+      <!-- ---------- colonna di sinistra: il profilo ---------- -->
+      <aside class="pcard psx" id="hb-profilo"></aside>
+      <nav class="pcard psxtab" id="hb-sxtab"></nav>
+
+      <!-- ---------- centro: la città ---------- -->
+      <!-- il titolo «La tua città» sta già dentro alla foto -->
+      <div class="pcard pmappa">
+        <div class="pfoto" id="hb-foto">
+          <div class="ppins" id="hb-pins"></div>
+        </div>
       </div>
-      <div class="hres" id="hb-res"></div>
-    </header>
 
-    <!-- La mappa è la foto del concept: quello che si vede è quello, spilli e
-         targhette compresi. Sopra ci stanno solo le zone da toccare. -->
-    <div class="hmap" id="hb-map">
-      <div class="hfoto" id="hb-foto">
-        <div class="hpins" id="hb-pins"></div>
+      <!-- ---------- centro basso: gli eventi di oggi ---------- -->
+      <div class="pcard peventi">
+        <span class="ptit">Eventi e attività di oggi</span>
+        <div class="pevrow" id="hb-eventi"></div>
       </div>
-    </div>
 
-    <nav class="htabs" id="hb-tabs"></nav>
+      <!-- ---------- colonna di destra: il telefono ---------- -->
+      <aside class="ptel">
+        <div class="ptelframe">
+          <div class="ptelbar"><span id="hb-telora">21:38</span><span class="ptelnotch"></span><span class="ptelsig"></span></div>
+          <div class="ptelscr" id="hb-tel"></div>
+        </div>
+      </aside>
 
-    <div class="hfoot">
-      <button class="hgoal" id="hb-goal"></button>
-      <button class="hnews" id="hb-news"></button>
-      <button class="hphone" id="hb-phone" aria-label="Apri il diario"></button>
+      <!-- ---------- la riga di fondo ---------- -->
+      <div class="psugg" id="hb-sugg"></div>
     </div>
   </div>
 </section>
