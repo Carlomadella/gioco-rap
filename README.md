@@ -54,9 +54,11 @@ Le tre immagini stanno in `media/photo/` e sono il riferimento visivo del Main H
 provincia è costruita (`js/game/hub.js` + `css/hub.css`); Milano e Los Angeles per adesso
 sono ancora solo concept art.
 
-Il paese non è una fotografia: `js/game/citta-art.js` lo disegna in SVG da un seme fisso —
-colline, isolati, finestre accese, la strada che scende, i lampioni, il campetto. Cambiando
-seme esce un'altra provincia, ed è così che si costruiranno anche le altre due città.
+**La mappa è la foto stessa.** `media/photo/mappa_provincia.jpg` è il concept ritagliato
+sotto la testata e sopra le linguette (582×600): spilli e targhette sono dentro
+all'immagine, e sopra ci stanno solo sei rettangoli invisibili — le zone da toccare, in
+percentuale, così restano incollate ai cartelli a qualunque grandezza di schermo. Tutto
+il resto della schermata è vivo e legge la partita.
 
 ## Struttura
 
@@ -135,7 +137,6 @@ che quelli caricati prima abbiano già dichiarato le loro funzioni e costanti.
 | `copertine.js` | copertina caricata dall'utente e titolo del pezzo |
 | `modal.js` | finestra modale degli eventi |
 | `scene-art.js` | illustrazioni SVG delle azioni |
-| `citta-art.js` | la città di notte vista dall'alto, generata da un seme |
 | `beatplay.js` | ascolto dei beat: bpm, cassa, scala dal seme |
 | `ui.js` | `renderGioco()`: HUD, pannelli, liste, comandi |
 | `lifestyle.js` | spese fisse e livelli di lifestyle |
@@ -175,3 +176,5 @@ python3 strumenti/build-artifact.py
 
 Rimette dentro `index.html` tutti i CSS e i JS nell'ordine in cui compaiono e scrive
 `dist/anni-di-fame.html`, senza doctype/head/body: lo scheletro lo mette l'artifact.
+Anche le immagini richiamate dai CSS finiscono dentro, come data URI: nell'artifact non
+c'è nessuna cartella `media/` da cui pescarle.

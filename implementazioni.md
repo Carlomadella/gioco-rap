@@ -196,9 +196,11 @@ Tutte le modifiche da fare:
       partita e dalla partita si torna indietro con il tasto viola «Mappa».
     - Testata: marchio, nome, livello con la stella, fase in viola, e le quattro cose che hai —
       energia, cassa, hype, chi ti segue. Sono i numeri veri della partita, non un mockup.
-    - Il paese è disegnato, non fotografato: `js/game/citta-art.js` genera da un seme fisso colline,
-      isolati, finestre accese, la strada che scende, i lampioni, il campetto e l'insegna dei beat.
-      Cambiando seme esce un'altra provincia — servirà per Milano e Los Angeles.
+    - La mappa è la foto stessa, non un disegno che le somiglia: `media/photo/mappa_provincia.jpg`
+      è il concept ritagliato sotto la testata e sopra le linguette. Spilli e targhette stanno
+      dentro all'immagine; sopra ci sono solo sei rettangoli invisibili, le zone da toccare, messe
+      in percentuale così restano incollate ai cartelli a qualunque grandezza di schermo.
+      Anche la miniatura delle notizie è ritagliata dal concept.
     - Quattro luoghi aperti (studio, beat maker, vita quotidiana, attività criminali) e due chiusi
       (club, concerti) che dicono «sblocca a Milano» e, se li tocchi, cosa serve: livello 10, fama 50,
       hype 40. Studio, beat maker e vita quotidiana aprono la partita sulla sezione giusta;
@@ -206,7 +208,9 @@ Tutte le modifiche da fare:
     - In basso le cinque linguette (mappa, contatti, inventario, obiettivi, statistiche), l'obiettivo
       di adesso con la barra, le notizie del paese che cambiano con le settimane e il telefono con la
       chat: il pallino rosso è la roba non letta del diario.
-      File nuovi: `js/game/citta-art.js`, `js/game/hub.js`, `css/hub.css`.
+      File nuovi: `js/game/hub.js`, `css/hub.css`, `media/photo/mappa_provincia.jpg`,
+      `media/photo/notizia_folla.jpg`. Il build dell'artifact adesso si porta dentro anche le
+      immagini dei CSS, come data URI.
       Restano da fare: i contatti veri, la criminalità, e le altre due città.
 
 Carlomadella/gioco-rap

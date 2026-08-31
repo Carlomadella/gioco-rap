@@ -6,12 +6,19 @@
 #s-hub{padding-top:0}
 body.in-hub .topnav{display:none}
 
-.hub{position:relative;min-height:100dvh;display:flex;flex-direction:column;
-  background:#08070C;overflow:hidden}
+.hub{position:relative;width:100%;
+  /* la mappa è alta quanto è larga (quasi): oltre una certa larghezza la
+     schermata diventerebbe un lenzuolo, quindi si tiene dentro allo schermo */
+  max-width:min(720px, calc((100dvh - 212px) * .97));
+  /* altezza fissa: così è la mappa a stringersi quando lo schermo è basso,
+     invece di far scorrere la pagina */
+  margin:0 auto;height:100dvh;min-height:560px;display:flex;flex-direction:column;
+  background:#08070C;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(255,255,255,.05)}
 
 /* ================= TESTATA ================= */
-.htop{position:relative;z-index:3;display:flex;align-items:center;gap:14px;
-  padding:10px 16px;background:linear-gradient(180deg,#0B0A11 62%,rgba(11,10,17,.86));
+.htop{position:relative;z-index:3;flex:none;display:flex;align-items:center;gap:14px;
+  padding:9px 14px;background:linear-gradient(180deg,#0B0A11 62%,rgba(11,10,17,.86));
   border-bottom:1px solid rgba(255,255,255,.07)}
 
 .hlogo{display:flex;align-items:center;gap:7px;padding:4px 8px;border-radius:12px;
@@ -42,68 +49,33 @@ body.in-hub .topnav{display:none}
   font-variant-numeric:tabular-nums;white-space:nowrap}
 
 /* ================= LA MAPPA ================= */
-.hmap{position:relative;flex:1;min-height:min(64vh,540px);overflow:hidden}
-.hart,.hart .cittasvg{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* È la foto del concept, ritagliata sotto la testata e sopra le linguette
+   (582×600). Le proporzioni sono bloccate su quelle dell'immagine: le zone da
+   toccare stanno in percentuale, e così restano incollate ai cartelli a
+   qualunque grandezza di schermo. */
+.hmap{position:relative;flex:1 1 auto;min-height:0;overflow:hidden;background:#07060B;
+  display:flex;align-items:center;justify-content:center}
+/* la foto sta dentro intera, senza schiacciarsi: la misura la fa hubMisura(),
+   perché quello che conta è che i cartelli restino sotto le zone da toccare */
+.hfoto{position:relative;
+  background:url("../media/photo/mappa_provincia.jpg") center/100% 100% no-repeat}
 
-/* il titolo della città, appoggiato in alto sulla mappa */
-.hhead{position:absolute;left:0;right:0;top:2.2%;z-index:2;text-align:center;pointer-events:none;
-  padding:0 12px}
-.hhead h1{margin:0;font-family:var(--disp);font-size:clamp(30px,6.6vw,58px);line-height:.94;
-  letter-spacing:.005em;text-transform:uppercase;color:#fff;transform:skewX(-7deg);
-  text-shadow:0 4px 22px rgba(0,0,0,.85),0 1px 0 rgba(0,0,0,.6)}
-.hrank2{margin-top:2px;font-family:var(--disp);font-size:clamp(13px,2.4vw,20px);
-  font-style:italic;letter-spacing:.02em;text-transform:uppercase;color:#C24BFF;
-  transform:skewX(-7deg);text-shadow:0 2px 14px rgba(0,0,0,.8)}
-.hclaim{margin:6px 0 0;font-family:var(--cond);font-size:clamp(10px,1.5vw,13px);font-weight:700;
-  letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.82);
-  text-shadow:0 2px 10px rgba(0,0,0,.9)}
-
-/* ---- i luoghi ---- */
-.hpins{position:absolute;inset:0;z-index:2}
-/* larghezza sul contenuto: se no una targhetta appoggiata al bordo destro si
-   schiaccia contro il muro e il testo va a capo ogni due parole */
-.hpin{position:absolute;left:var(--x);top:var(--y);width:max-content;
-  max-width:min(48vw,200px);display:flex;flex-direction:column;
-  align-items:center;gap:0;padding:0;transition:transform .14s}
-.hpin.al-c{transform:translateX(-50%)}
-.hpin.al-l{transform:translateX(-14px);align-items:flex-start}
-.hpin.al-r{transform:translateX(calc(-100% + 14px));align-items:flex-end}
-.hpin:hover{filter:brightness(1.12)}
-.hpin.al-c:hover{transform:translateX(-50%) translateY(-2px)}
-.hpin.al-l:hover{transform:translateX(-14px) translateY(-2px)}
-.hpin.al-r:hover{transform:translateX(calc(-100% + 14px)) translateY(-2px)}
-.hpin:active{filter:brightness(.95)}
-
-.hmark{position:relative;width:26px;height:33px;margin-bottom:-3px;
-  filter:drop-shadow(0 6px 10px rgba(0,0,0,.7))}
-.hmark svg{width:100%;height:100%;display:block;fill:var(--c);
-  stroke:rgba(0,0,0,.45);stroke-width:1}
-.hmi{position:absolute;left:50%;top:11px;transform:translate(-50%,-50%);display:block}
-.hmark .hicon.mini{width:13px;height:13px;fill:#0B0912}
-
-.hcard{display:flex;align-items:flex-start;gap:7px;max-width:100%;
-  padding:7px 10px 8px;border-radius:11px;text-align:left;
-  background:rgba(10,10,15,.84);backdrop-filter:blur(3px);
-  box-shadow:0 8px 22px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.11)}
-.hcard .hci{flex:none;margin-top:1px}
-.hcard .hicon{width:14px;height:14px;fill:var(--c,#9AA0AE);display:block}
-.hct{min-width:0}
-.hct b{display:block;font-family:var(--cond);font-size:13px;font-weight:800;letter-spacing:.07em;
-  text-transform:uppercase;color:#fff;line-height:1.1}
-.hct i{display:block;margin-top:2px;font-style:normal;font-size:10.5px;line-height:1.3;
-  color:rgba(255,255,255,.62)}
-
-.hpin.chiuso .hcard{background:rgba(9,9,13,.72);box-shadow:0 6px 16px rgba(0,0,0,.45),
-  inset 0 0 0 1px rgba(255,255,255,.07)}
-.hpin.chiuso .hct b{color:rgba(255,255,255,.72)}
-.hpin.chiuso .hct i{color:rgba(255,255,255,.45)}
-.hpin.chiuso .hcard .hicon{fill:rgba(255,255,255,.5)}
+/* ---- i luoghi: rettangoli invisibili appoggiati sui cartelli ---- */
+.hpins{position:absolute;inset:0}
+.hspot{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);
+  border-radius:12px;transition:background .15s,box-shadow .15s,transform .12s}
+.hspot:hover{background:rgba(255,255,255,.07);
+  box-shadow:inset 0 0 0 1.5px rgba(192,132,252,.85),0 0 22px rgba(168,85,247,.35)}
+.hspot:focus-visible{background:rgba(255,255,255,.07);
+  box-shadow:inset 0 0 0 2px var(--acid)}
+.hspot:active{transform:scale(.98)}
+.hspot.chiuso:hover{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.5)}
 
 /* ================= LINGUETTE ================= */
-.htabs{position:relative;z-index:3;display:flex;gap:2px;padding:6px 88px 6px 8px;
+.htabs{position:relative;z-index:3;flex:none;display:flex;gap:2px;padding:5px 88px 5px 8px;
   background:#0B0A10;border-top:1px solid rgba(255,255,255,.07)}
 .htab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
-  padding:7px 2px 6px;border-radius:11px;color:rgba(255,255,255,.5);
+  padding:6px 2px 5px;border-radius:11px;color:rgba(255,255,255,.5);
   transition:background .15s,color .15s}
 .htab .hicon{width:19px;height:19px;fill:currentColor}
 .htab span{font-family:var(--cond);font-size:9.5px;font-weight:800;letter-spacing:.13em;
@@ -112,9 +84,9 @@ body.in-hub .topnav{display:none}
 .htab.on{color:#C084FC;background:rgba(168,85,247,.16)}
 
 /* ================= LA RIGA IN BASSO ================= */
-.hfoot{position:relative;z-index:3;display:flex;align-items:stretch;gap:8px;padding:8px;
+.hfoot{position:relative;z-index:3;flex:none;display:flex;align-items:stretch;gap:8px;padding:7px 8px;
   background:#0B0A10;border-top:1px solid rgba(255,255,255,.07)}
-.hgoal,.hnews{flex:1;min-width:0;text-align:left;padding:9px 12px;border-radius:12px;
+.hgoal,.hnews{flex:1;min-width:0;text-align:left;padding:8px 11px;border-radius:12px;
   background:#111017;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
   transition:background .15s}
 .hgoal:hover,.hnews:hover{background:#16151E}
@@ -130,12 +102,14 @@ body.in-hub .topnav{display:none}
   background:linear-gradient(90deg,#7C3AED,#C084FC)}
 
 .hnw{display:flex;align-items:center;gap:9px;margin-top:5px}
-.hth{flex:none;width:56px;height:37px;border-radius:6px;overflow:hidden;display:block}
-.hth svg{width:100%;height:100%;display:block}
+.hnw .hnt{flex:1}
+/* la miniatura delle notizie è quella del concept, ritagliata */
+.hth{flex:none;width:52px;height:35px;border-radius:6px;display:block;
+  background:#160D22 url("../media/photo/notizia_folla.jpg") center/cover no-repeat}
 .hnt{min-width:0}
-.hnt b{display:block;font-size:12px;font-weight:600;color:#fff;line-height:1.2;
+.hnt b{display:block;font-size:11px;font-weight:600;color:#fff;line-height:1.2;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hnt i{display:block;font-style:normal;font-size:10.5px;color:rgba(255,255,255,.55);
+.hnt i{display:block;font-style:normal;font-size:10px;color:rgba(255,255,255,.55);
   line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* il telefono: sporge sopra la riga, come appoggiato allo schermo */
@@ -171,12 +145,7 @@ body.in-hub .topnav{display:none}
   .hr{gap:4px;padding:2px 5px}
   .hr b{font-size:12px}
   .hname{font-size:15px}
-    .hpin{max-width:46vw}
-  .hcard{padding:6px 8px}
-  .hct b{font-size:11.5px}
-  .hct i{font-size:9.5px}
-  .hmark{width:22px;height:28px}
-  .hphone{margin:-34px 0 -8px 0}
+    .hphone{margin:-34px 0 -8px 0}
   .hph{width:62px;height:88px}
   .hnews{display:none}
 }

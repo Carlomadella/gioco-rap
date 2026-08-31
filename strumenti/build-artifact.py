@@ -9,7 +9,7 @@ della pagina lo aggiunge l'artifact.
 
 © La Fame Studio. Tutti i diritti riservati.
 """
-import re, sys, pathlib
+import base64, mimetypes, re, sys, pathlib
 
 RADICE = pathlib.Path(__file__).resolve().parent.parent
 USCITA = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else RADICE / "dist" / "anni-di-fame.html"
@@ -19,11 +19,27 @@ html = (RADICE / "index.html").read_text(encoding="utf-8")
 def leggi(rel):
     return (RADICE / rel.split("?")[0]).read_text(encoding="utf-8")
 
+def immagini(testo, base):
+    """Le immagini richiamate dal CSS finiscono dentro al file come data URI:
+    nell'artifact non c'è nessuna cartella media/ da cui pescarle."""
+    def uno(m):
+        rel = m.group(1).strip("'\"")
+        if rel.startswith(("http", "data:")):
+            return m.group(0)
+        f = (base / rel.split("?")[0]).resolve()
+        if not f.exists():
+            return m.group(0)
+        tipo = mimetypes.guess_type(f.name)[0] or "application/octet-stream"
+        return "url(\"data:%s;base64,%s\")" % (tipo, base64.b64encode(f.read_bytes()).decode())
+    return re.sub(r'url\(([^)]+)\)', uno, testo)
+
 def css(m):
     href = m.group(1)
     if href.startswith("http"):
         return m.group(0)
-    return "<style>\n/* === %s === */\n%s\n</style>" % (href.split("?")[0], leggi(href))
+    rel = href.split("?")[0]
+    testo = immagini(leggi(href), (RADICE / rel).parent)
+    return "<style>\n/* === %s === */\n%s\n</style>" % (rel, testo)
 
 def js(m):
     src = m.group(1)

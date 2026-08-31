@@ -1,9 +1,11 @@
 /* L'hub: la città di provincia, la schermata da cui si gioca.
 
-   È la mappa disegnata in citta-art.js più tutto quello che ci sta sopra:
-   la testata con chi sei e cosa hai, i luoghi come punti da toccare, le
-   linguette in basso, l'obiettivo di adesso, le notizie e il telefono.
-   I luoghi non fanno il lavoro degli altri file: aprono la partita sulla
+   La mappa è la foto della città (media/photo/mappa_provincia.jpg, ritagliata
+   dal concept): spilli e targhette stanno dentro all'immagine, qui sopra ci
+   vanno solo le zone da toccare. Tutto il resto è vivo e legge la partita: la
+   testata con chi sei e cosa hai, le linguette, l'obiettivo di adesso, le
+   notizie e il telefono.
+   I luoghi non rifanno il lavoro degli altri file: aprono la partita sulla
    sezione giusta. Quelli chiusi restano in vista e dicono cosa serve —
    il paese deve far vedere il mondo che aspetta. */
 "use strict";
@@ -15,11 +17,6 @@ const HIC = {
   soldi: '<path fill-rule="evenodd" d="M3 6h18a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1zm9 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>',
   hype: '<path d="M12.6 2c.5 3.2-1.2 4.4-2.4 5.8C8.7 9.4 7.5 10.9 7.5 13a4.5 4.5 0 0 0 9 0c0-2-.9-3.6-2.1-5 .2 1.2-.3 2-1 2.4.5-3.3-.8-6.6-1.8-8.4z"/>',
   gente: '<path d="M9 11.4a3.4 3.4 0 1 0 0-6.8 3.4 3.4 0 0 0 0 6.8zM2 19.4c0-3.5 3.1-5.6 7-5.6s7 2.1 7 5.6zm14.4-8a2.8 2.8 0 1 0 0-5.6 2.8 2.8 0 0 0 0 5.6zm.2 2.2c3 .2 5.4 1.9 5.4 4.6v1.2h-3.7c.1-2.6-.6-4.4-1.7-5.8z"/>',
-  mic: '<path d="M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zM5 11h2a5 5 0 0 0 10 0h2a7 7 0 0 1-6 6.9V21h-2v-3.1A7 7 0 0 1 5 11z"/>',
-  nota: '<path d="M20 3v11.4a3.3 3.3 0 1 1-2-3V7.7l-7 1.5v7.8a3.3 3.3 0 1 1-2-3V6.5z"/>',
-  maschera: '<path d="M3.6 4h16.8v5.6c0 4.9-3.8 8.8-8.4 8.8S3.6 14.5 3.6 9.6zm4.2 4.4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm8.4 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM8 14.4c1.1 1.3 2.5 2 4 2s2.9-.7 4-2z"/>',
-  casa: '<path d="M12 3.2 21.6 11H19v9h-5v-5.6h-4V20H5v-9H2.4z"/>',
-  lucchetto: '<path d="M7 10V8a5 5 0 0 1 10 0v2h1.2c.9 0 1.6.7 1.6 1.6v7.2c0 .9-.7 1.6-1.6 1.6H5.8c-.9 0-1.6-.7-1.6-1.6v-7.2c0-.9.7-1.6 1.6-1.6zm2 0h6V8a3 3 0 0 0-6 0z"/>',
   pin: '<path d="M12 2a7 7 0 0 1 7 7c0 5.2-7 13-7 13S5 14.2 5 9a7 7 0 0 1 7-7zm0 4.6A2.4 2.4 0 1 0 12 11.4 2.4 2.4 0 0 0 12 6.6z"/>',
   scatola: '<path d="M12 2 21 6.6v10.8L12 22 3 17.4V6.6zM5.8 7.5 12 10.7l6.2-3.2L12 4.3z"/>',
   mirino: '<path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm0 2.4a7.6 7.6 0 1 0 0 15.2 7.6 7.6 0 0 0 0-15.2zm0 3.2a4.4 4.4 0 1 1 0 8.8 4.4 4.4 0 0 1 0-8.8zm0 2.6a1.8 1.8 0 1 0 0 3.6 1.8 1.8 0 0 0 0-3.6z"/>',
@@ -29,29 +26,27 @@ const HIC = {
 const hsvg = (nome, cls) => '<svg class="' + (cls || "hicon") + '" viewBox="0 0 24 24" aria-hidden="true">' + HIC[nome] + '</svg>';
 
 /* ================= I LUOGHI DELLA PROVINCIA ================= */
-/* x e y sono percentuali dentro alla mappa: il punto dove sta lo spillo.
-   al = da che parte si appoggia la targhetta (c centro, l sinistra, r destra). */
+/* La mappa è la foto (media/photo/mappa_provincia.jpg): spilli e targhette sono
+   dentro all'immagine, disegnati una volta e per sempre. Qui ci sta solo dove
+   toccare — x, y, larghezza e altezza in percentuale dell'immagine, prese sulle
+   targhette vere. Se un giorno la foto cambia, questi sei numeri si rifanno. */
 const HUB_LUOGHI = [
-  {id:"studio", n:"Studio", c:"#A855F7", ic:"mic", x:45.5, y:22, al:"c",
-   d:"Registra, mixa e<br>pubblica i tuoi pezzi.",
+  {id:"studio", n:"Studio", x:38.5, y:21, w:18.7, h:12.3,
    vai:() => hubGioco("settimana")},
 
-  {id:"beatmaker", n:"Beat maker", c:"#4ADE80", ic:"nota", x:6, y:35.5, al:"l",
-   d:"Crea i tuoi beat<br>e migliora le skill.",
+  {id:"beatmaker", n:"Beat maker", x:2.1, y:33.7, w:21.5, h:15,
    vai:() => hubGioco("catalogo", "market")},
 
-  {id:"criminali", n:"Attività criminali", c:"#EF4444", ic:"maschera", x:84, y:37.5, al:"r",
-   d:"Piccoli rischi,<br>piccoli guadagni.",
+  {id:"criminali", n:"Attività criminali", x:69.8, y:35, w:26.1, h:14.7,
    vai:() => hubPresto("Attività criminali",
      "Il giro storto della provincia — colpi piccoli, soldi veloci, guai veri — " +
      "è il prossimo pezzo di mondo da aprire.")},
 
-  {id:"vita", n:"Vita quotidiana", c:"#38BDF8", ic:"casa", x:15, y:61.5, al:"l",
-   d:"Gestisci la tua vita<br>e le tue relazioni.",
+  {id:"vita", n:"Vita quotidiana", x:2.7, y:57.5, w:30.2, h:15,
    vai:() => hubGioco("lifestyle")},
 
-  {id:"club", n:"Club & discoteche", x:72, y:67, al:"c", chiuso:"Sblocca a Milano"},
-  {id:"concerti", n:"Concerti", x:47, y:83.5, al:"c", chiuso:"Sblocca a Milano"}
+  {id:"club", n:"Club & discoteche", x:60.1, y:62.5, w:24.4, h:11.5, chiuso:true},
+  {id:"concerti", n:"Concerti", x:37.6, y:80.2, w:19.4, h:10.5, chiuso:true}
 ];
 
 /* ================= LE LINGUETTE IN BASSO ================= */
@@ -117,6 +112,19 @@ function hubChiuso(l){
 }
 
 /* ================= DISEGNO ================= */
+/* La foto ci sta dentro intera e senza deformarsi: si prende il lato che
+   stringe di più. Le zone da toccare stanno in percentuale dentro alla foto,
+   quindi basta che il riquadro sia giusto e sono giuste anche loro. */
+function hubMisura(){
+  const m = $("hb-map"), f = $("hb-foto");
+  if(!m || !f) return;
+  const k = Math.min(m.clientWidth / 582, m.clientHeight / 600);
+  f.style.width = (582 * k) + "px";
+  f.style.height = (600 * k) + "px";
+}
+window.addEventListener("resize", hubMisura);
+
+
 function hubRes(k, ic, val){
   return '<span class="hr" style="--k:' + k + '">' + hsvg(ic) + '<b>' + val + '</b></span>';
 }
@@ -138,33 +146,14 @@ function renderHub(){
     hubRes("#FB923C", "hype", Math.round(G.hype)) +
     hubRes("#60A5FA", "gente", short(G.fans));
 
-  /* il paese: disegnato una volta sola, non a ogni ritorno sulla mappa */
-  const art2 = $("hb-art");
-  if(!art2.firstChild) art2.innerHTML = arteCitta(CITTA_SEME);
+  hubMisura();
 
-  /* il titolo sopra la mappa */
-  const citta = (art.city || "").trim();
-  $("hb-city").textContent = citta || "Città di provincia";
-  $("hb-rank2").textContent = ph.n;
-  $("hb-claim").textContent = G.week === 1 && G.year === 1
-    ? "La tua storia inizia qui."
-    : "Anno " + G.year + " · settimana " + G.week + ".";
-
-  /* i luoghi */
-  const pins = $("hb-pins");
-  pins.innerHTML = HUB_LUOGHI.map(l => {
-    const stile = 'style="--x:' + l.x + '%;--y:' + l.y + '%' + (l.c ? ';--c:' + l.c : '') + '"';
-    if(l.chiuso)
-      return '<button class="hpin chiuso al-' + l.al + '" data-l="' + l.id + '" ' + stile + '>' +
-        '<span class="hcard"><span class="hci">' + hsvg("lucchetto") + '</span>' +
-        '<span class="hct"><b>' + l.n + '</b><i>' + l.chiuso + '</i></span></span></button>';
-    return '<button class="hpin al-' + l.al + '" data-l="' + l.id + '" ' + stile + '>' +
-      '<span class="hmark"><svg viewBox="0 0 28 36" aria-hidden="true">' +
-        '<path d="M14 .8c7 0 12.6 5.4 12.6 12C26.6 21.4 14 35.6 14 35.6S1.4 21.4 1.4 12.8C1.4 6.2 7 .8 14 .8z"/>' +
-        '</svg><span class="hmi">' + hsvg(l.ic, "hicon mini") + '</span></span>' +
-      '<span class="hcard"><span class="hci">' + hsvg(l.ic) + '</span>' +
-      '<span class="hct"><b>' + l.n + '</b><i>' + l.d + '</i></span></span></button>';
-  }).join("");
+  /* i luoghi: zone da toccare appoggiate sulle targhette della foto */
+  $("hb-pins").innerHTML = HUB_LUOGHI.map(l =>
+    '<button class="hspot' + (l.chiuso ? " chiuso" : "") + '" data-l="' + l.id + '" ' +
+    'style="--x:' + l.x + '%;--y:' + l.y + '%;--w:' + l.w + '%;--h:' + l.h + '%" ' +
+    'aria-label="' + l.n + (l.chiuso ? " — si sblocca a Milano" : "") + '" ' +
+    'title="' + l.n + '"></button>').join("");
 
   /* le linguette */
   $("hb-tabs").innerHTML = HUB_TABS.map((t, i) =>
@@ -180,20 +169,12 @@ function renderHub(){
     '<span class="hbar"><i style="width:' + Math.round(ora / ob.max * 100) + '%"></i></span>';
 
   /* le notizie: cambiano da sole col passare delle settimane */
-  const nz = HUB_NOTIZIE[(G.week + G.year * 3) % HUB_NOTIZIE.length];
+  /* la prima settimana è quella del concept: il contest di freestyle */
+  const nz = HUB_NOTIZIE[(G.week - 1 + (G.year - 1) * 4) % HUB_NOTIZIE.length];
   $("hb-news").innerHTML =
     '<span class="hk">Notizie</span>' +
-    '<span class="hnw"><span class="hth">' +
-      '<svg viewBox="0 0 60 40" aria-hidden="true">' +
-        '<rect width="60" height="40" fill="#1B1030"/>' +
-        '<rect y="26" width="60" height="14" fill="#0C0716"/>' +
-        '<ellipse cx="30" cy="15" rx="26" ry="12" fill="#7C2BD6" opacity=".55"/>' +
-        '<rect x="22" y="8" width="16" height="12" rx="2" fill="#FFC978" opacity=".8"/>' +
-        '<g fill="#05030A">' +
-          '<circle cx="8" cy="30" r="5"/><circle cx="20" cy="32" r="5"/><circle cx="32" cy="29" r="5"/>' +
-          '<circle cx="44" cy="32" r="5"/><circle cx="54" cy="30" r="5"/></g>' +
-      '</svg></span>' +
-    '<span class="hnt"><b>' + nz[0] + '</b><i>' + nz[1] + '</i></span></span>';
+    '<span class="hnw"><span class="hnt"><b>' + nz[0] + '</b><i>' + nz[1] + '</i></span>' +
+    '<span class="hth"></span></span>';
 
   /* il telefono: il pallino rosso è la roba non letta del diario */
   const nuovi = Math.max(0, G.log.length - (G.seenLog || 0));
@@ -204,7 +185,7 @@ function renderHub(){
 
 /* ================= COMANDI ================= */
 $("hb-pins").addEventListener("click", ev => {
-  const b = ev.target.closest(".hpin"); if(!b) return;
+  const b = ev.target.closest(".hspot"); if(!b) return;
   const l = HUB_LUOGHI.find(x => x.id === b.dataset.l); if(!l) return;
   if(typeof SFX === "object" && SFX.tap) SFX.tap();
   if(l.chiuso) hubChiuso(l); else l.vai();
