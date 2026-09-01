@@ -7,6 +7,11 @@ const totalWeeks = () => (G.year-1)*52 + G.week;
 /* acceso mentre stai saltando avanti nel tempo: le settimane passano,
    ma eventi e prove aspettano che tu torni a giocarle davvero */
 let SALTO = false;
+/* Da smistare, punto 4: quando un incontro/evento/prova "alto" capita
+   mentre SALTO è acceso, finisce qui invece che a schermo — saltaGiorni()
+   (skip.js) lo legge dopo ogni giorno vissuto, ferma il salto sul serio e
+   mostra la scelta vera, come se non si stesse saltando niente. */
+let SALTO_STOP = null;
 
 function pushLog(text, cls){
   G.log.unshift({w:"A" + G.year + " S" + String(G.week).padStart(2,"0"), t:text, c:cls || ""});
@@ -172,9 +177,16 @@ function advanceWeek(){
 
   checkGoals();
   if(G.trialCd > 0) G.trialCd--;
-  const prova = (!SALTO && G.trialCd <= 0) ? pendingTrial() : null;
-  if(prova){ G.trialsDone[prova.ph] = true; showEvent(prova); }
-  else if(!SALTO && Math.random() < .38) maybeEvent();
+  /* Da smistare, punto 4: prove ed eventi sono sempre "alto" — una prova di
+     passaggio o un bivio con soldi/contratto/salute di mezzo non si risolve
+     mai da solo. Durante un salto fermano lo scorrimento sul serio invece
+     di sparire fino all'ultimo giorno (prima capitava solo lì, per caso). */
+  const prova = (G.trialCd <= 0) ? pendingTrial() : null;
+  if(prova){
+    G.trialsDone[prova.ph] = true;
+    if(SALTO) SALTO_STOP = prova; else showEvent(prova);
+  }
+  else if(Math.random() < .38) maybeEvent();
   save(); renderGioco();
 }
 
@@ -200,8 +212,10 @@ function avanzaGiorno(){
   }
   /* punto 54: un incontro per strada, non ogni giorno e non se la settimana
      si è appena chiusa sopra (due finestre una sull'altra sono un fastidio,
-     non un'atmosfera) — e mai durante un salto, come le prove e gli eventi */
-  if(!SALTO && typeof provaIncontro === "function") provaIncontro();
+     non un'atmosfera). Da smistare, punto 4: capita anche durante un salto —
+     provaIncontro() decide da sola se risolversi in silenzio o fermare tutto,
+     in base al suo livello di importanza (strada.js). */
+  if(typeof provaIncontro === "function") provaIncontro();
   /* la chat si muove anche in mezzo alla settimana: una casella che si riempie
      solo al lunedi' si sente che e' finta. Non durante un salto — se no torni
      da un mese saltato e trovi trenta messaggi tutti insieme. */
@@ -260,6 +274,9 @@ function maybeEvent(){
   if(!pool.length) return;
   const e = pick(pool);
   G.evCd[e.id] = now;
+  /* Da smistare, punto 4: sono tutti bivi con soldi, contratti o salute di
+     mezzo — sempre "alto", fermano il salto invece di sparire */
+  if(SALTO){ SALTO_STOP = e; return; }
   showEvent(e);
 }
 

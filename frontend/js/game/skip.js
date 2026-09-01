@@ -37,21 +37,31 @@ function saltaTempo(){
 
 /* Il motore vero: n giorni di fila, senza finestre in mezzo — solo alla fine
    un rigo nel diario e, se qualche settimana si è chiusa per strada, un
-   rapporto solo (non uno a settimana, che con un mese sarebbero quattro). */
+   rapporto solo (non uno a settimana, che con un mese sarebbero quattro).
+
+   Da smistare, punto 4: "di fila" non vuol più dire "a occhi chiusi". Ogni
+   giorno vissuto può far scattare un incontro/evento/prova "alto" — vero
+   raro, vera scelta — e quando succede il salto si ferma sul serio: si vede
+   la scena (mostraEventoConRipresa, sotto), e solo dopo la risposta i
+   giorni che restavano vengono vissuti, richiamando saltaGiorni() da capo
+   sul resto. Basso e medio non arrivano fin qui: si risolvono da soli
+   dentro avanzaGiorno()/advanceWeek() (sim.js), il salto non li vede nemmeno. */
 function saltaGiorni(n){
   if(G.ended || n <= 0) return;
   if(!weekOpen) openWeek();
   const before = weekOpen, costiSettimana = weeklyCosts();
   const lucPrima = luc(), wellPrima = G.wellbeing;
   SALTO = true;
-  let settimaneChiuse = 0;
-  for(let i = 0; i < n && !G.ended; i++){
-    if(i === n - 1) SALTO = false;   /* l'ultimo giorno rimette in moto eventi e prove */
+  SALTO_STOP = null;
+  let settimaneChiuse = 0, vissuti = 0;
+  for(; vissuti < n && !G.ended; vissuti++){
+    if(vissuti === n - 1) SALTO = false;   /* l'ultimo giorno rimette in moto eventi e prove */
     if(avanzaGiorno()) settimaneChiuse++;
+    if(SALTO_STOP){ vissuti++; break; }    /* oggi si è fermato qui: contato, non si rivive */
   }
   SALTO = false;
   const dLuc = Math.round(luc() - lucPrima), dWell = Math.round(G.wellbeing - wellPrima);
-  pushLog("<b>" + n + (n === 1 ? " giorno saltato." : " giorni saltati.") + "</b> Benessere " +
+  pushLog("<b>" + vissuti + (vissuti === 1 ? " giorno saltato." : " giorni saltati.") + "</b> Benessere " +
     (dWell >= 0 ? "+" + dWell : dWell) + ", lucidità " + (dLuc >= 0 ? "+" + dLuc : dLuc) + ".",
     dLuc <= -10 ? "bad" : "");
   SFX[settimaneChiuse > 0 ? "week" : "giorno"]();
@@ -61,6 +71,27 @@ function saltaGiorni(n){
     openWeek();
   } else renderGioco();
   avvisoLucidita();
+  if(SALTO_STOP){
+    const evento = SALTO_STOP, rimasti = n - vissuti;
+    SALTO_STOP = null;
+    mostraEventoConRipresa(evento, rimasti);
+  }
+}
+
+/* La scena "alta" che ha fermato il salto: le stesse opzioni di sempre, solo
+   che scegliendone una (o chiudendo con ESC, dove è concesso) il salto
+   riprende da dove si era fermato — se restavano giorni da vivere. */
+function mostraEventoConRipresa(evento, rimasti){
+  const continua = () => { if(rimasti > 0) saltaGiorni(rimasti); };
+  const wrapped = {
+    k:evento.k, t:evento.t, d:evento.d,
+    opts:evento.opts.map(o => ({
+      n:o.n, d:o.d,
+      run(){ const r = o.run(); continua(); return r; }
+    }))
+  };
+  if(evento.annulla) wrapped.annulla = () => { evento.annulla(); continua(); };
+  showEvent(wrapped);
 }
 
 function avvisoLucidita(){

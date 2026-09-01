@@ -2,15 +2,29 @@
    scegli come rispondere — ma le circostanze sono sette storie diverse: un
    fan gentile, uno maleducato, un hater, un opp, una faccia di prima, il
    manager, uno con cui è finita male. Capitano vivendo la giornata
-   (avanzaGiorno, sim.js), non a tavolino: niente durante un salto di tempo,
-   niente lo stesso giorno in cui chiude la settimana.
+   (avanzaGiorno, sim.js), non a tavolino.
 
    Due circostanze non hanno uno stato vero dietro e sono rimaste flavor:
    «l'ex manager» — nel gioco non esiste ancora un manager che si lascia,
    solo `G.manager` acceso o spento, quindi qui è «il manager», non «l'ex»;
    «i vecchi amici» — non c'è un elenco di amicizie precedenti alla fama,
    quindi è una faccia generica, gated solo sul tempo passato. Il resto
-   (l'opp, chi ti sei giocato alla Sala) usa dati veri: G.rivals. */
+   (l'opp, chi ti sei giocato alla Sala) usa dati veri: G.rivals.
+
+   Da smistare, punto 4: ognuno ha anche un `liv` — basso, medio, alto — che
+   dice cosa succede se capita mentre stai saltando avanti nel tempo
+   (saltaGiorni, sim.js). Non è un numero a caso: rispecchia il peso che
+   l'incontro ha già (`peso`, quanto è comune) e quanto costa sbagliarlo.
+   - basso: un fan, buono o cafone — capita spesso, il conto è quasi sempre
+     una manciata di hype o benessere. Non ferma niente.
+   - medio: un hater, una vecchia amicizia, il manager — meno comuni,
+     pesano un po' di più, ma restano cose che si risolvono da sole senza
+     bisogno di stare lì a decidere.
+   - alto: un opp che sblocca solo con 300 fan veri e rivali in giro, o chi
+     ti sei giocato alla Sala — rari apposta, e la scelta cambia davvero la
+     reputazione o un rapporto. Questi fermano il salto sul serio: si vede
+     la scena, si sceglie, e solo dopo il tempo riparte da dove si era
+     fermato. */
 "use strict";
 
 const STRADA_NOMI = ["Marco","Giulia","Fede","Sara","Luca","Vale","Ale","Chicco","Mattia","Cate","Simo","Robi"];
@@ -91,7 +105,7 @@ function postaEvento(nome, testo, like){
 }
 
 const INCONTRI = [
-  {id:"fan_bello", peso:3, req:() => true, crea(){
+  {id:"fan_bello", peso:3, liv:"basso", req:() => true, crea(){
     const nome = pick(STRADA_NOMI);
     const sc = strScenaFan(STR_FAN_COMPORTAMENTI, "bello");
     return {t:"Un fan ti riconosce", d:sc.luogo + ". " + nome + " " + sc.comp,
@@ -111,7 +125,7 @@ const INCONTRI = [
       ]};
   }},
 
-  {id:"fan_maleducato", peso:2, req:() => true, crea(){
+  {id:"fan_maleducato", peso:2, liv:"basso", req:() => true, crea(){
     const nome = pick(STRADA_NOMI);
     const sc = strScenaFan(STR_FANMALE_COMPORTAMENTI, "male");
     return {t:"Un fan sopra le righe", d:sc.luogo + ". " + nome + " " + sc.comp,
@@ -133,7 +147,7 @@ const INCONTRI = [
       ]};
   }},
 
-  {id:"hater", peso:2, req:() => G.hype >= 15, crea(){
+  {id:"hater", peso:2, liv:"medio", req:() => G.hype >= 15, crea(){
     const nome = pick(STRADA_NOMI);
     return {t:"Uno se la prende con te", d:nome + " ti riconosce e comincia a dirtene di tutti i colori, ad alta voce.",
       opts:[
@@ -155,7 +169,7 @@ const INCONTRI = [
       ]};
   }},
 
-  {id:"opp", peso:2, req:() => G.rivals.length > 0 && G.fans >= 300, crea(){
+  {id:"opp", peso:2, liv:"alto", req:() => G.rivals.length > 0 && G.fans >= 300, crea(){
     const r = pick(G.rivals);
     return {t:"Lo incroci per strada", d:r.n + " ti vede, e non fa finta di niente: sa benissimo chi sei.",
       opts:[
@@ -178,7 +192,7 @@ const INCONTRI = [
       ]};
   }},
 
-  {id:"amici", peso:1, req:() => totalWeeks() >= 8, crea(){
+  {id:"amici", peso:1, liv:"medio", req:() => totalWeeks() >= 8, crea(){
     const nome = pick(STRADA_NOMI);
     return {t:"Una faccia di prima", d:nome + ", uno che conoscevi da prima che qualcuno sapesse chi sei, ti ferma per strada.",
       opts:[
@@ -192,7 +206,7 @@ const INCONTRI = [
       ]};
   }},
 
-  {id:"manager", peso:1, req:() => !!G.manager, crea(){
+  {id:"manager", peso:1, liv:"medio", req:() => !!G.manager, crea(){
     return {t:"Il tuo manager ti becca per strada", d:"Ne approfitta per parlarti di lavoro, anche se non è in ufficio.",
       opts:[
         {n:"Lo stai a sentire", d:"Cinque minuti, magari ne esce qualcosa", run(){
@@ -209,7 +223,7 @@ const INCONTRI = [
       ]};
   }},
 
-  {id:"nemico", peso:1, req:() => G.rivals.some(r => r.storia && r.storia.indexOf("Sala") >= 0), crea(){
+  {id:"nemico", peso:1, liv:"alto", req:() => G.rivals.some(r => r.storia && r.storia.indexOf("Sala") >= 0), crea(){
     const r = G.rivals.find(x => x.storia && x.storia.indexOf("Sala") >= 0);
     return {t:"È finita male, e te lo ritrovi davanti", d:r.n + " ti vede. Vi conoscevate da prima, poi non più.",
       opts:[
@@ -232,6 +246,17 @@ function mostraIncontro(scena){
   showEvent({k:"Per strada", t:scena.t, d:scena.d, annulla(){}, opts:scena.opts});
 }
 
+/* Da smistare, punto 4: un incontro basso o medio, mentre stai saltando
+   avanti, non merita un popup — si risolve da solo scegliendo la prima
+   opzione (la più prudente, per come sono scritte tutte) e finisce nel
+   diario come se l'avessi scelta tu al volo. */
+function risolviIncontroAuto(scena){
+  const o = scena.opts[0];
+  if(!o) return;
+  const r = o.run();
+  if(r && r.t) pushLog(r.t, r.c);
+}
+
 /* Un giorno su tre, più o meno, e solo fra le circostanze che oggi hanno
    senso (l'opp serve fama, il manager serve un manager…): pesata, non
    equiprobabile, così le comuni restano comuni. */
@@ -242,5 +267,14 @@ function provaIncontro(){
   const tot = eleggibili.reduce((a, i) => a + i.peso, 0);
   let r = Math.random() * tot, scelto = eleggibili[0];
   for(const i of eleggibili){ if(r < i.peso){ scelto = i; break; } r -= i.peso; }
-  mostraIncontro(scelto.crea());
+  const scena = scelto.crea();
+  /* durante un salto: basso/medio si risolvono da soli, alto ferma il
+     salto sul serio (SALTO_STOP, sim.js legge questa variabile) */
+  if(SALTO){
+    const liv = scelto.liv || "medio";
+    if(liv !== "alto"){ risolviIncontroAuto(scena); return; }
+    SALTO_STOP = {k:"Per strada", t:scena.t, d:scena.d, annulla(){}, opts:scena.opts};
+    return;
+  }
+  mostraIncontro(scena);
 }
