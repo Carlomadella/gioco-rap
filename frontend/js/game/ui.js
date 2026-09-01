@@ -13,6 +13,27 @@ const ART = {
   stacca:["#2B3340","#4A5568","Z"]
 };
 
+/* Punto 50: queste mosse finivano dritte in un toast — nessuna scena,
+   nessuna pagina, un numero e via. Scrivi/beat/free hanno già la loro
+   (foglio, piazza, e beat aspetta la scena del producer al punto 8);
+   registra e cercalavoro hanno già una finestra vera (il titolo del
+   pezzo, i due colloqui). Queste sette no: adesso aprono la scenetta che
+   avevano già sulla card (scene-art.js), grande, con l'esito scritto
+   sopra — non un'altra riga di testo che vola via in due secondi. */
+const SCENA_PIENA = new Set(["mixa","pubblica","promo","live","turno","stacca","palestra"]);
+function mostraScena(a, sc, msg, extra){
+  $("sc-art").innerHTML = sc[2]
+    ? '<svg viewBox="0 0 200 128" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">' + sc[2] + '</svg>'
+    : "";
+  $("sc-k").textContent = a.n;
+  $("sc-k").style.setProperty("--k", sc[0]);
+  $("sc-t").textContent = a.n;
+  $("sc-d").textContent = a.d;
+  $("sc-esito").innerHTML = (msg || "") + extra;
+  $("scena").classList.add("on");
+}
+$("sc-go").onclick = () => { $("scena").classList.remove("on"); };
+
 function renderGioco(){
   if(typeof beatStop === "function") beatStop();
   const art = window.ARTIST || {};
@@ -167,7 +188,8 @@ function renderGioco(){
       const df = G.fans - fansBefore, dm = Math.round(G.money - moneyBefore);
       if(df > 0) extra += ' <b>+' + fmt(df) + ' fan</b>';
       if(dm > 0){ extra += ' <b>+' + fmt(dm) + ' €</b>'; weekEarn += dm; }
-      toast(msg + extra, "good", g[2], [g[0], g[1]]);
+      if(SCENA_PIENA.has(a.id)) mostraScena(a, sc, msg, extra);
+      else toast(msg + extra, "good", g[2], [g[0], g[1]]);
       checkGoals(); save(); renderGioco();
     };
     /* «Chiedi conferma» nelle impostazioni: si controlla solo dove fa male
