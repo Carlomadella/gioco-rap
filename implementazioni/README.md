@@ -15,7 +15,7 @@ file del suo argomento con dentro cosa è stato fatto.
 | [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 24 voci |
 | [`03-artista-e-avatar.md`](03-artista-e-avatar.md) | **L'artista e il suo avatar** — 1 voce |
 | [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 9 voci |
-| [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 9 voci |
+| [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 10 voci |
 | [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md) | **Il mondo e la gente** — 9 voci |
 | [`07-multiplayer-e-backend.md`](07-multiplayer-e-backend.md) | **Il multiplayer e il server** — 4 voci |
 | [`08-uscita-sugli-store.md`](08-uscita-sugli-store.md) | **L'uscita su Steam e sugli store** — 3 voci |
@@ -26,7 +26,7 @@ per tutti e per tutto.
 
 ## Tutti i punti
 
-76 voci in tutto: **39 chiuse**, 12 a metà, il resto da fare.
+77 voci in tutto: **40 chiuse**, 12 a metà, il resto da fare.
 
 | | punto | stato | dove |
 | --- | --- | --- | --- |
@@ -105,6 +105,7 @@ per tutti e per tutto.
 | **—** | Le scene dei fan, tante e difficili da ripescare | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | La chat del telefono non va più in loop | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Scambiarsi il numero con fonici e beatmaker | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | Una gerarchia per gli incontri mentre si salta il tempo | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
 | **—** | Tutte le rotte provate su Postman | fatto | [multiplayer-e-backend](07-multiplayer-e-backend.md) |
 
 > Lo stato è letto dal testo dei punti: «fatto» vuol dire che c'è scritto cosa è
