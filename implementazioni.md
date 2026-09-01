@@ -961,3 +961,37 @@ La prova del server è a **101 controlli**, tutti verdi, e dentro c'è anche un
 finto «appleid.apple.com» con chiavi vere per provare che un biglietto firmato
 male non entra.
 
+--- ASSET NUOVI, FUORI DAI PUNTI NUMERATI (01/09/2026) ---
+
+Nessun punto chiesto qui dentro: due file HTML mandati da fuori
+(`~/Downloads/anni-di-fame-menu-2026(1)-integrato-finale.html` e
+`...-sfondi-urban.html`) erano due concept completi di una **landing page
+nuova** (menu con un hero a schermo intero, sfondo che cambia a scene, un
+dock con le stesse voci di oggi: carriera, artista, regole, classifiche,
+impostazioni) — codice e basta, con dentro cinque foto a testa incollate come
+base64. Estratte, riconvertite in JPEG (erano PNG da ~2 MB l'una, adesso
+300-500 KB) e salvate in `frontend/media/photo/`:
+
+- **Serie A** (dal file "integrato-finale"): `landing_a_provincia_urban.jpg`,
+  `landing_a_garage.jpg`, `landing_a_specchio.jpg`, `landing_a_infopoint.jpg`,
+  `landing_a_street_league.jpg`.
+- **Serie B** (dal file "sfondi-urban"): `landing_b_vicolo_graffiti.jpg`,
+  `landing_b_skate_spot.jpg`, `landing_b_negozio_angolo.jpg`,
+  `landing_b_rooftop_session.jpg`, `landing_b_ferrovia.jpg`.
+
+Due serie alternative della stessa idea, non dieci sfondi diversi: si sceglie
+quale delle due (o si mischiano i pezzi migliori) quando si rifà la landing
+page vera (punto 4, ancora aperto). Ho controllato ogni foto a occhio prima
+di salvarla — il nome del file dice cosa c'è dentro, non è un'estrazione alla
+cieca.
+
+**Nota tecnica lasciata scritta apposta**: la shell di questo ambiente è zsh,
+dove gli array partono dall'indice **1** e non da 0 come in bash — un primo
+giro di conversione con `${ARR[$((i-1))]}` ha sfasato i nomi di un posto
+(e `sips` ha pure duplicato un paio di file quando l'ho rifatto in fretta).
+Corretto controllando l'MD5 di ogni PNG sorgente contro quello copiato prima
+di convertirlo: tutti e dieci sono unici e nel posto giusto, verificato due
+volte. Se in futuro si scrivono script di conversione batch su questa
+macchina, l'indicizzazione degli array è il primo sospettato.
+`npm run prova` (12/12) pulito con i file nuovi dentro.
+
