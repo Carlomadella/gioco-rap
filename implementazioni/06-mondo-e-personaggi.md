@@ -111,6 +111,50 @@ proprio il motivo per cui uno smette.
 
 ---
 
+## 54 · Scenari veri, uguali nella forma e diversi nelle circostanze
+
+54. Aggiungerei degli scenari veri e propri ; gli scenari vorrei fossero tutti uguali ma le circostanze TOTALMENTE DIVERSE, OVVERO ; 1) scenario trovi un fan carino che ti chiede la foto e poi posta pure su lafamegram 2) Trovi un fan maleducato che si pone in modi sbagliatissimi e magari interagendo e vedendo che non corregge i suoi comportamenti noi rifiutiamo la foto e qualcuno nelle vicinanze potrebbe notare questa cosa e i giornalisti poi farla uscire per parlare male di noi 3) in strada becchi un haters 4) in strada becchi un hopps 5) in strada becchi l'ex manager 6) in strada becchi ex amici 7) in strada becchi qualcuno con cui hai brutti rapporti nel gioco 8)
+
+   **FATTO in parte (01/09/2026)** — `frontend/js/game/strada.js`, nuovo.
+   Sette circostanze (1-7 della lista; l'8 non l'hai scritta, il testo si
+   interrompe lì — niente da fare finché non arriva), **stessa forma per
+   tutte**: ti fermano per strada, scegli come rispondere, l'esito è
+   scritto (`showEvent`, lo stesso modale di sempre). Capita vivendo la
+   giornata (`avanzaGiorno()`, sim.js — un giorno su tre circa), mai
+   durante un salto di tempo, mai lo stesso giorno in cui chiude la
+   settimana sopra al rapporto.
+   - **Fan gentile**: la foto genera davvero un post su LaFamegram, dal
+     fan, non da te — cuori legati all'hype del momento.
+   - **Fan maleducato**: rifiutare la foto ha **una possibilità su tre**
+     di finire come un pezzo negativo scritto da «La Voce del Giro» — la
+     cosa che chiedevi, non un'accusa a caso ogni volta.
+   - **Hater**: rispondere a tono rende bene se `flow + presenza ≥ 24`
+     (e finisce su LaFamegram), altrimenti ti va male — un rischio vero,
+     non un tiro di dado piatto.
+   - **Opp**: pesca un rivale vero da `G.rivals`, disponibile solo con
+     fama vera (300 fan); provocarlo conta i tuoi numeri contro i suoi.
+   - **Vecchi amici**: solo dopo 8 settimane di carriera — prima non
+     esisti abbastanza perché qualcuno si ricordi di te.
+   - **Manager**: solo se `G.manager` è acceso.
+   - **Brutti rapporti**: pesca chi hai perso alla Sala per davvero
+     (`diventaOpp()`, punto 26) — non un rivale a caso, proprio quello con
+     cui è finita male lì.
+   Provato in Chrome: forzato l'incontro del fan gentile, hype e fan sono
+   saliti, e il post «Ho appena incontrato Nuovo Artista per strada, che
+   gasato 🔥» è apparso davvero su LaFamegram (in coda ai tuoi, davanti al
+   resto — `G.lafamegramEventi`, nuovo campo).
+   **In parte** per due motivi, entrambi scritti nel codice: **l'ex
+   manager** non esiste come stato — il gioco non ha un modo di *lasciare*
+   un manager, solo di averne uno o no, quindi qui è «il manager», non
+   «l'ex»; **i vecchi amici** non hanno un elenco vero (non c'è una lista
+   di amicizie precedenti alla fama) — è una faccia generica, gated solo
+   sul tempo passato. Sistemare entrambi per bene vuol dire prima costruire
+   quello stato altrove (licenziare un manager, tenere un elenco di
+   amicizie), non è lavoro di questo file. `npm run prova` (12/12) e
+   `npm run build` puliti.
+
+---
+
 ## La vita simulata
 
 Voglio che il gioco abbia vita simulata molto sviluppata. Non banalità, dobbiamo lanciare un gioco cche vogliamo sia molto valido.

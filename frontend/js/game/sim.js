@@ -191,6 +191,10 @@ function avanzaGiorno(){
     advanceWeek();
     return true;   /* la settimana si è chiusa */
   }
+  /* punto 54: un incontro per strada, non ogni giorno e non se la settimana
+     si è appena chiusa sopra (due finestre una sull'altra sono un fastidio,
+     non un'atmosfera) — e mai durante un salto, come le prove e gli eventi */
+  if(!SALTO && typeof provaIncontro === "function") provaIncontro();
   return false;
 }
 

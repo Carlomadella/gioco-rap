@@ -84,8 +84,3 @@ macchina, l'indicizzazione degli array è il primo sospettato.
 
 ---
 
-## 54 · Scenari veri, uguali nella forma e diversi nelle circostanze
-
-54. Aggiungerei degli scenari veri e propri ; gli scenari vorrei fossero tutti uguali ma le circostanze TOTALMENTE DIVERSE, OVVERO ; 1) scenario trovi un fan carino che ti chiede la foto e poi posta pure su lafamegram 2) Trovi un fan maleducato che si pone in modi sbagliatissimi e magari interagendo e vedendo che non corregge i suoi comportamenti noi rifiutiamo la foto e qualcuno nelle vicinanze potrebbe notare questa cosa e i giornalisti poi farla uscire per parlare male di noi 3) in strada becchi un haters 4) in strada becchi un hopps 5) in strada becchi l'ex manager 6) in strada becchi ex amici 7) in strada becchi qualcuno con cui hai brutti rapporti nel gioco 8)
-
----

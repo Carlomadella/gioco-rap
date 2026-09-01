@@ -148,7 +148,10 @@ function telScrivi(testo){
 function telPost(){
   if(TEL_FEED === null) telAggiornaFeed();
   const base = (TEL_FEED && TEL_FEED.length) ? TEL_FEED : telPostLocale();
-  return G.lafamegramMiei.length ? G.lafamegramMiei.concat(base) : base;
+  /* i tuoi post, poi quelli che nascono dagli incontri per strada (punto
+     54 — la foto col fan, il pezzo del giornalista...), poi il resto */
+  const miei = G.lafamegramMiei || [], eventi = G.lafamegramEventi || [];
+  return miei.concat(eventi, base);
 }
 const telPostTop = () => telPost().slice().sort((a, b) => b.like - a.like)[0];
 

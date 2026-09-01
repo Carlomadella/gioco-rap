@@ -74,7 +74,7 @@ per tutti e per tutto.
 | **51** | Un prompt per ogni card, e dove sono finiti quelli del 38 | fatto | [grafica-e-asset](09-grafica-e-asset.md) |
 | **52** | LaFamegram con post veri, caricati dai giocatori | in parte | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **53** | Il feed di LaFamegram si scorre come quello vero | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
-| **54** | Scenari veri, uguali nella forma e diversi nelle circostanze | da fare | [grafica-e-asset](09-grafica-e-asset.md) |
+| **54** | Scenari veri, uguali nella forma e diversi nelle circostanze | in parte | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
 | **—** | Niente «si sblocca a Milano» scritto in faccia | fatto | [mappa-e-citta](01-mappa-e-citta.md) |
 | **—** | Il telefono come telefono (la richiesta di partenza) | da fare | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Il gioco alla giornata invece che alla settimana | risposto, da fare | [carriera-e-tempo](05-carriera-e-tempo.md) |
