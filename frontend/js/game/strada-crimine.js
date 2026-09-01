@@ -35,7 +35,7 @@ const STRADA_COLPI = [
    d:"Porti un pacco da un posto a un altro. Meglio non sapere cosa c'è dentro.",
    min:120, max:280},
   {id:"scotta", n:"Roba che scotta", energia:20, difficolta:.30, pena:3,
-   d:"Ãˆ arrivata da poco e scotta: va fatta sparire in fretta.",
+   d:"È arrivata da poco e scotta: va fatta sparire in fretta.",
    min:220, max:480},
   {id:"cassa", n:"La cassa del bar", energia:28, difficolta:.50, pena:5,
    d:"Il bar chiude tardi, e la cassa resta lì fino al mattino.",
@@ -178,7 +178,7 @@ function stradaTenta(colpoId, approccioId){
     s.heat = clamp(s.heat + rumore, 0, 100);
     if(approccio.id === "squadra" && s.uomini > 0 && Math.random() < .5){
       s.uomini--;
-      STRADA_SCENA = {k:"Com'è andata", titolo:"Ãˆ andata male", testo:"<b>" + colpo.n + "</b> è saltato. Uno dei tuoi ci è rimasto sotto: " +
+      STRADA_SCENA = {k:"Com'è andata", titolo:"È andata male", testo:"<b>" + colpo.n + "</b> è saltato. Uno dei tuoi ci è rimasto sotto: " +
           "tu sei rientrato pulito, lui no. Un uomo in meno.",
         opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
     }else{
