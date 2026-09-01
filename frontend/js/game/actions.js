@@ -23,7 +23,10 @@ const JOBS = [
   {id:"buttafuori", n:"Buttafuori",   pay:210, e:32, d:"Notti in piedi sulla porta di un locale.",
    req:g => g.skills.presenza >= 16},
   {id:"fonico",     n:"Fonico junior", pay:180, e:32, d:"In uno studio vero. Impari guardando.",
-   req:g => g.skills.flow >= 20, extra(){ G.skills.flow += 0.9; return " Flow +0.9."; }}
+   req:g => g.skills.flow >= 20, extra(){ G.skills.flow += 0.9; return " Flow +0.9."; }},
+  /* punto 59: full time, non part time come il lavapiatti — paga di più e
+     costa più energia, un turno vero ti si mangia la giornata */
+  {id:"operaio", n:"Operaio", pay:220, e:40, d:"Fabbrica, turno pieno, linea di montaggio. Si sente tutto."}
 ];
 
 /* Cosa determina davvero la qualità di quello che fai:

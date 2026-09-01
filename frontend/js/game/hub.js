@@ -53,9 +53,11 @@ const spoglia = t => String(t).replace(/<[^>]*>/g, "");
 const HUB_LUOGHI = [
   {id:"studio", n:"Studio", x:12.17, y:9.16, w:18.07, h:16.69,
    vai:() => hubGioco("settimana")},
-  {id:"club", n:"Club & discoteche", x:61.81, y:12.11, w:19.76, h:9.31,
-   chiuso:"Da fuori si sente la cassa. Stasera non è cosa: quella porta si apre da sé, " +
-     "quando sarà il momento."},
+  /* punto 59/61: era un cartello chiuso («Club & discoteche», ancora dentro
+     alla foto — cambia solo quando cambia la mappa, punto 45); qui sotto
+     adesso c'è un lavoro vero, part time. */
+  {id:"pizzeria", n:"Pizzeria", x:61.81, y:12.11, w:19.76, h:9.31,
+   vai:() => schedaLavoro("lavapiatti", "Pizzeria")},
   /* punto 48: non più un cartello chiuso — è dove si va a fare l'open mic,
      che esisteva già come azione ma non aveva un posto sulla mappa. Se non
      hai ancora un pezzo fuori il palco non c'è, ma lo dice, non fa finta di niente. */
@@ -69,13 +71,13 @@ const HUB_LUOGHI = [
   /* il beat maker non è un listino: è la sala dove si conosce la gente */
   {id:"beat", n:"La Sala", x:5.30, y:39.14, w:18.31, h:14.77,
    vai:() => apriPosto()},
-  {id:"vita", n:"Vita quotidiana", x:37.83, y:50.96, w:19.52, h:14.77,
-   vai:() => showEvent({k:"Vita quotidiana", t:"Casa, palestra, relazioni",
-     d:"La settimana non è solo musica. Il corpo regge o non regge, e la testa pure.",
+  /* punto 60: si chiamava «Vita quotidiana» — la palestra è uscita da qui
+     ed è diventata un posto suo (punto 61), resta stacca la spina e i conti */
+  {id:"vita", n:"Casa", x:37.83, y:50.96, w:19.52, h:14.77,
+   vai:() => showEvent({k:"Casa", t:"Stacca la spina o guarda i conti",
+     d:"La settimana non è solo musica. Ogni tanto la testa va spenta, e i conti vanno guardati.",
      annulla(){},
      opts:[
-       {n:"Vai in palestra", d:"Un'ora di ferro: ti rimette in piedi e ti si vede addosso",
-        run(){ hubAzione("palestra"); return null; }},
        {n:"Stacca la spina", d:"Una sera senza pensare a niente",
         run(){ hubAzione("stacca"); return null; }},
        {n:"Guarda cosa ti costa vivere", d:"Casa, look, uscite: le spese fisse",
@@ -85,10 +87,13 @@ const HUB_LUOGHI = [
    vai:() => hubPresto("Attività criminali",
      "Il giro storto della provincia — colpi piccoli, soldi veloci, guai veri — " +
      "è il prossimo pezzo di mondo da aprire.")},
-  {id:"sponsor", n:"Sponsor & brand", x:6.87, y:74.59, w:19.28, h:9.31,
-   chiuso:"Nessun marchio ti cerca ancora. Capita, quando cominci a spostare gente."},
-  {id:"business", n:"Business", x:38.80, y:80.21, w:16.75, h:9.16,
-   chiuso:"Mettere i soldi a lavorare è un altro sport, e non è per adesso."},
+  /* punto 59: il secondo lavoro, full time — era «Sponsor & brand» */
+  {id:"fabbrica", n:"Fabbrica", x:6.87, y:74.59, w:19.28, h:9.31,
+   vai:() => schedaLavoro("operaio", "Fabbrica")},
+  /* punto 61: la palestra esce dal sottomenu di Casa e diventa un posto
+     suo — era «Business», un altro cartello chiuso senza niente dietro */
+  {id:"palestra", n:"Palestra", x:38.80, y:80.21, w:16.75, h:9.16,
+   vai:() => hubAzione("palestra")},
   /* punto 48: idem — l'attrezzatura da studio è già nel catalogo, la vetrina
      non deve stare spenta se quello che promette esiste già */
   {id:"shop", n:"Shop", x:74.58, y:81.24, w:16.27, h:9.16,
@@ -156,6 +161,36 @@ function hubPresto(titolo, testo){
 function hubChiuso(l){
   showEvent({k:"Chiuso", t:l.n, d:l.chiuso, annulla(){},
     opts:[{n:"Ho capito", d:"Torni alla mappa", run(){ return null; }}]});
+}
+
+/* punto 59: due posti di lavoro veri sulla mappa, non un cartello con su
+   scritto «arriva a Milano». Si assume da solo chi ci va, se non lavora
+   già altrove — un posto alla volta, come è sempre stato G.job. */
+function assumitiCome(jobId){
+  const def = JOBS.find(j => j.id === jobId);
+  if(!def) return;
+  if(!G.job || G.job.id !== jobId){
+    if(G.job){
+      hubChiuso({n:def.n, chiuso:"Lavori già come " + G.job.n.toLowerCase() +
+        ". Un posto alla volta — lascialo o aspetta di essere licenziato."});
+      return;
+    }
+    G.job = {id:def.id, n:def.n, pay:def.pay, e:def.e, missed:0};
+    pushLog("Hai preso il posto da " + def.n.toLowerCase() + ": " + def.pay + " € a turno.", "good");
+  }
+  hubAzione("turno");
+}
+function schedaLavoro(jobId, luogo){
+  const def = JOBS.find(j => j.id === jobId);
+  const mio = G.job && G.job.id === jobId;
+  showEvent({k:luogo, t:def.n,
+    d:mio ? "Sei già assunto qui." : def.d,
+    annulla(){},
+    opts:[
+      {n:mio ? "Fai il turno" : "Fatti assumere e lavora", d:def.pay + " € · " + def.e + " energia",
+       run(){ assumitiCome(jobId); return null; }},
+      {n:"Lascia stare", d:"Torni alla mappa", run(){ return null; }}
+    ]});
 }
 
 function hubNotizie(){
