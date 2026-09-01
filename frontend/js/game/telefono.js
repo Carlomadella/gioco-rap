@@ -479,6 +479,8 @@ $("hb-tel").addEventListener("click", ev => {
   if(ev.target.closest("[data-chathome]")){ TEL_CHAT_APERTA = null; hubTap(); renderTelefono(); return; }
   const chatOpt = ev.target.closest("[data-chatopt]");
   if(chatOpt){ hubTap(); chatRispondi(TEL_CHAT_APERTA, +chatOpt.dataset.chatopt); return; }
+  const chatTu = ev.target.closest("[data-chattu]");
+  if(chatTu){ hubTap(); chatIniziaTu(TEL_CHAT_APERTA, +chatTu.dataset.chattu); return; }
   const evb = ev.target.closest("[data-evento]");
   if(evb && !evb.disabled){
     const e = HUB_EVENTI.find(x => x.id === evb.dataset.evento); if(!e) return;

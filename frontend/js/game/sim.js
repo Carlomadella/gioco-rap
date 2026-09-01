@@ -202,6 +202,10 @@ function avanzaGiorno(){
      si è appena chiusa sopra (due finestre una sull'altra sono un fastidio,
      non un'atmosfera) — e mai durante un salto, come le prove e gli eventi */
   if(!SALTO && typeof provaIncontro === "function") provaIncontro();
+  /* la chat si muove anche in mezzo alla settimana: una casella che si riempie
+     solo al lunedi' si sente che e' finta. Non durante un salto — se no torni
+     da un mese saltato e trovi trenta messaggi tutti insieme. */
+  if(!SALTO && typeof chatGiorno === "function") chatGiorno();
   return false;
 }
 

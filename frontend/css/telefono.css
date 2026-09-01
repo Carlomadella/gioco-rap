@@ -183,6 +183,10 @@
 .tchatopts .tbtn{margin-top:0;text-transform:none;letter-spacing:0;font-weight:600;text-align:left}
 .tchatopts .tbtn small{display:block;margin-top:2px;font-size:9.5px;color:#7B8395;
   text-transform:none;letter-spacing:0;font-weight:600}
+/* «Scrivi tu»: si stacca dalle risposte perche' e' un'altra cosa — li' rispondi
+   a qualcuno, qui cominci tu, ed e' la meta' che prima non c'era. */
+.tchattu{margin:2px 0 1px;font-size:9.5px;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;color:#7B8395}
 .tchatstop{padding:9px 11px;border-radius:10px;background:#12151F;font-size:11px;
   color:#9AA1B2;line-height:1.4}
 

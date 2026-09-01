@@ -583,3 +583,66 @@ volte a distanza ravvicinata.
 Provato in Chrome: 30 incontri "fan gentile" di fila, 30 combinazioni tutte diverse; stessa cosa
 per il "fan maleducato". La scelta pesata e le condizioni di sblocco (`INCONTRI`, `provaIncontro()`)
 non sono cambiate — solo il contenuto di ogni singolo incontro.
+
+---
+
+Da smistare, punto 3 (01/09/2026): "Nell'app chat sul telefono le conversazioni sono davvero
+monotone e soprattutto vanno subito in loop. Crea una cosa MOOOOOOOLTO interattiva."
+
+**FATTO.** La chat è rifatta da capo (`frontend/js/game/chat.js`). Prima, tutto sommato,
+non era una chat: era una casella che si riempiva.
+
+**Perché andava in loop, in concreto.** Ogni contatto aveva tre o quattro frasi fisse,
+pescate a caso **senza nessuna memoria**: dopo due settimane le avevi viste tutte, e spesso
+due volte di fila. E le risposte erano attaccate al *contatto*, non al messaggio — mamma
+poteva chiederti qualunque cosa, tu potevi solo dire «tranquilla, tutto ok» oppure «sto
+correndo, ti chiamo dopo». Per sempre. Poi finiva lì: una battuta, una risposta, una
+controrisposta, chiuso.
+
+**Le quattro cose che ho cambiato**, in ordine di quanto si sentono giocando:
+
+1. **Parlano di quello che è successo davvero.** Uno spunto non è una frase, è una frase
+   *con la sua condizione*: mamma tira fuori i soldi solo se sei a secco, il pezzo solo se
+   ne è uscito uno — e lo chiama per nome — e «sono venuti dei signori a chiedere di te»
+   solo se hai preso calore sulla Strada. Con cento euro in tasca e con diecimila non ti
+   scrive la stessa cosa.
+2. **Le risposte stanno dentro al messaggio.** Ogni spunto si porta le sue, e cambiano con
+   lui.
+3. **Si va avanti a botta e risposta**: una risposta può aprirne altre, quindi una
+   conversazione è di due o tre giri invece che di uno.
+4. **Puoi scrivere tu per primo.** È la cosa che più di tutte la fa sembrare una chat e non
+   una casella della posta: quando non c'è niente in sospeso, in fondo compare «scrivi tu»,
+   e le aperture cambiano con quello che sta succedendo.
+
+**Più gente, e sbloccata da quello che fai** e non solo dai fan: erano quattro (mamma, il
+migliore amico, un fan, un hater), adesso sono otto — c'è **Kiro** che fa i beat (arriva
+appena cominci a comprarne), **Vale** che organizza serate (quando sai stare su un palco),
+la **redazione** di una rivista (quando sei qualcuno), e **tuo cugino**, che si fa vivo
+esattamente quando hai due soldi. In tutto: **38 spunti, 133 risposte scrivibili, fino a
+tre giri di conversazione**, e ognuno degli otto ha almeno quattro cose diverse da dire.
+Scrivono anche **in mezzo alla settimana** e non solo al cambio, se no si sente che è finta.
+
+**Come ho tolto il loop davvero.** Non basta pescare a caso meglio: ognuno si ricorda cosa
+ha già detto, e quando ha finito le cose sensate da dire **sta zitto** per qualche
+settimana invece di ricominciare il giro. Il silenzio è più credibile della ripetizione,
+ed è la differenza fra una persona e un distributore di frasi.
+
+**Provato facendo giocare il codice**, perché un difetto così non lo prende un controllo
+di sintassi: ho fatto vivere la chat per **160 settimane** di carriera, rispondendo a caso
+come farebbe uno che gioca senza pensarci troppo. Prima: fino a **otto volte di fila** lo
+stesso messaggio dallo stesso contatto. Adesso: **zero ripetizioni di fila** su 303
+messaggi, otto contatti che si fanno vivi, e fra i 23 e i 61 testi diversi a testa. Il
+tutto è dentro a `npm run prova` del frontend, quindi non può tornare in loop di nascosto.
+
+**Una trappola in cui sono cascato scrivendola**, scritta anche in cima al file perché non
+succeda di nuovo: `G` finisce in `localStorage` come JSON, quindi **nello stato non ci
+possono stare funzioni**. Alla prima stesura il ramo della conversazione lo restituiva
+`run()`; funzionava benissimo finché non ricaricavi la pagina, e a quel punto chi aveva una
+conversazione a metà si ritrovava dei bottoni che non facevano niente. Adesso nello stato
+c'è solo *la strada* (`{sp, via:[indici]}`) e l'albero si ripercorre da lì. C'è una prova
+apposta che apre tutte e ventisei le conversazioni a più giri, le fa passare per un giro di
+JSON e controlla che le opzioni si ritrovino.
+
+**Non provata a vista in Chrome**: il browser era chiuso. Tutto quello che c'è scritto qui
+sopra è misurato facendo girare il codice, non guardandolo.
+

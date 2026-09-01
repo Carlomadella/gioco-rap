@@ -190,6 +190,142 @@ console.log("\nil creatore: ogni opzione si deve vedere");
   }
 }
 
+console.log("\nla chat del telefono: non si deve ripetere");
+/* Il difetto da cui e' nata questa parte era: «le conversazioni sono monotone e
+   vanno subito in loop». Un difetto cosi' non lo prende un controllo di
+   sintassi — si vede solo giocando, o facendo giocare il codice. Qui si fa
+   vivere la chat per centosessanta settimane e si guarda cosa succede. */
+{
+  const vm = require("vm");
+  const scatola = {
+    console, Math, JSON, Object, Array, String, Number, Boolean, Date, isNaN,
+    localStorage: { getItem: () => null, setItem: () => {} }
+  };
+  scatola.window = scatola;
+  vm.createContext(scatola);
+  /* il minimo che chat.js si aspetta di trovare gia' in giro */
+  vm.runInContext([
+    "const pick = a => a[Math.floor(Math.random()*a.length)];",
+    "const clamp = (v,a,b) => Math.max(a, Math.min(b, v));",
+    "let G = { week:1, year:1, day:1, age:19, energy:100, maxEnergy:100,",
+    "  money:220, fans:0, hype:0, wellbeing:80, lucidita:80,",
+    "  skills:{scrittura:8, flow:6, presenza:5, rete:4},",
+    "  songs:[], beats:[], rivals:[{n:'Nino Zero'}], job:null, contract:null,",
+    "  strada:{heat:0, rep:0}, chat:{} };",
+    "const luc = () => G.lucidita;",
+    "const addLuc = n => { G.lucidita = clamp(luc()+n, 0, 100); };",
+    "const totalWeeks = () => (G.year-1)*52 + G.week;",
+    "const save = () => {}; const renderTelefono = () => {}; const renderGioco = () => {};",
+    "const spoglia = x => String(x).replace(/<[^>]*>/g, '');",
+    "const tronca = (x,n) => x.length > n ? x.slice(0,n-1) : x;",
+    "const hsvg = () => '';"
+  ].join("\n"), scatola);
+
+  let viva = true;
+  try{
+    vm.runInContext(fs.readFileSync(path.join(RADICE, "js/game/chat.js"), "utf8"),
+      scatola, { filename: "chat.js" });
+  }catch(e){ viva = false; controlla("la chat si carica fuori dal browser", false, [e.message]); }
+
+  if(viva){
+    const dentro = c => vm.runInContext(c, scatola);
+    const G = dentro("G");
+    const gente = dentro("CHAT_GENTE");
+
+    /* 1. ogni contatto deve avere di che parlare: con uno o due spunti si
+          ripete per forza, per quanto furba sia la scelta */
+    const poveri = gente.filter(c => (c.spunti || []).length < 3)
+      .map(c => c.n + " (" + (c.spunti || []).length + ")");
+    controlla("ogni contatto ha almeno tre cose diverse da dire", poveri.length === 0, poveri);
+
+    /* 2. la carriera va avanti e la chat vive: si risponde a caso, come farebbe
+          uno che gioca senza pensarci */
+    const dette = {};
+    for(let w = 1; w <= 160; w++){
+      G.week = w;
+      G.fans = Math.round(Math.pow(w, 2.2));
+      G.money = 150 + w * 45;
+      G.wellbeing = 40 + (w * 7) % 60;
+      G.lucidita = 35 + (w * 11) % 60;
+      G.skills.presenza = 5 + Math.floor(w / 12);
+      G.skills.rete = 4 + Math.floor(w / 15);
+      G.strada.heat = Math.max(0, (w % 17) * 3);
+      if(w % 5 === 0) G.songs.push({ t:"Pezzo " + w, released:true, week:w, txt:"una barra vera" });
+      if(w % 9 === 0) G.beats.push({ n:"beat" });
+      if(w === 60) G.contract = { et:"Etichetta" };
+      dentro("chatSettimana()");
+      for(let g = 0; g < 6; g++) dentro("chatGiorno()");
+      for(const c of dentro("chatAttivi()")){
+        const t = G.chat[c.id];
+        if(!t || !t.aperto) continue;
+        (dette[c.id] = dette[c.id] || []).push(t.aperto.sp);
+        let giri = 0;
+        while(t.aperto && giri < 8){
+          const opts = dentro("chatOpzioni(CHAT_GENTE.find(x=>x.id==='" + c.id + "'), G.chat['" + c.id + "'])");
+          if(!opts || !opts.length) break;
+          dentro("chatRispondi('" + c.id + "', " + Math.floor(Math.random() * opts.length) + ")");
+          giri++;
+        }
+      }
+    }
+
+    const ripetuti = [];
+    let messaggi = 0;
+    for(const id in dette){
+      const v = dette[id];
+      messaggi += v.length;
+      for(let i = 1; i < v.length; i++)
+        if(v[i] === v[i-1]) ripetuti.push(id + ": «" + v[i] + "» due volte di fila");
+    }
+    controlla("in 160 settimane (" + messaggi + " messaggi) nessuno dice due volte di fila la stessa cosa",
+      ripetuti.length === 0, ripetuti.slice(0, 6));
+
+    /* 3. si e' visto girare gente diversa, non sempre i soliti due */
+    const chiHaParlato = Object.keys(dette).length;
+    controlla("col crescere della carriera si fanno vivi almeno sei contatti diversi",
+      chiHaParlato >= 6, chiHaParlato);
+
+    /* 4. una conversazione a meta' deve sopravvivere al salvataggio: nello stato
+          va solo la strada, se ci finissero le funzioni al ricaricamento della
+          pagina resterebbero dei bottoni morti */
+    let provate = 0, perse = 0;
+    for(const c of gente){
+      for(const sp of c.spunti){
+        const ramo = sp.opts.findIndex(o => o.poi && o.poi.length);
+        if(ramo < 0) continue;
+        provate++;
+        G.chat[c.id] = { msgs:[], nonLetti:0, bloccatoFino:0, visti:[], aperto:{ sp: sp.id, via: [] } };
+        dentro("chatRispondi('" + c.id + "', " + ramo + ")");
+        const prima = dentro("chatOpzioni(CHAT_GENTE.find(x=>x.id==='" + c.id + "'), G.chat['" + c.id + "'])");
+        /* ecco il giro che fa localStorage */
+        vm.runInContext("G.chat = " + JSON.stringify(JSON.parse(JSON.stringify(G.chat))), scatola);
+        const dopo = dentro("chatOpzioni(CHAT_GENTE.find(x=>x.id==='" + c.id + "'), G.chat['" + c.id + "'])");
+        if(!prima || !dopo || prima.length !== dopo.length) perse++;
+      }
+    }
+    controlla("le " + provate + " conversazioni a più giri sopravvivono al salvataggio",
+      provate > 0 && perse === 0, perse);
+
+    /* 5. quello che si puo' scrivere dev'essere scrivibile: nessuna opzione
+          senza nome, nessuno spunto senza testo */
+    const storti = [];
+    for(const c of gente){
+      const guarda = (o, dove) => {
+        if(!o.n) storti.push(dove + ": un'opzione senza nome");
+        if(o.run && typeof o.run !== "function") storti.push(dove + ": run non è una funzione");
+        (o.poi || []).forEach(x => guarda(x, dove));
+      };
+      for(const sp of c.spunti){
+        if(typeof sp.testo !== "function") storti.push(c.n + "/" + sp.id + ": testo non è una funzione");
+        if(!sp.opts || !sp.opts.length) storti.push(c.n + "/" + sp.id + ": senza risposte");
+        (sp.opts || []).forEach(o => guarda(o, c.n + "/" + sp.id));
+      }
+      (c.tu || []).forEach(a => guarda(a, c.n + "/scrivi tu"));
+    }
+    controlla("ogni spunto ha un testo e delle risposte scritte per bene", storti.length === 0, storti);
+  }
+}
+
 console.log("\nil build");
 const dist = path.join(RADICE, "dist");
 if(!fs.existsSync(path.join(dist, "index.html"))){
