@@ -6,7 +6,13 @@ function miniPortrait(){
   return portrait().replace('class="portrait"', 'class="mini"');
 }
 function goto(screen){
+  const target = $("s-" + screen);
   document.querySelectorAll(".screen").forEach(x => x.classList.toggle("on", x.id === "s-" + screen));
+  /* Da smistare, punto 1: `.screen.on` ha la sua animazione (shell.css), ma
+     il nodo resta lo stesso ad ogni giro — senza forzare un reflow il
+     browser a volte non la fa ripartire, se il cambio di classe avviene
+     tutto nello stesso istante di script (come qui). */
+  if(target){ target.style.animation = "none"; void target.offsetWidth; target.style.animation = ""; }
   /* In partita il tasto per il menu non sta quassù: il marchio a sinistra fa
      già quel mestiere, e la barra deve restare fuori dai piedi mentre giochi. */
   $("nav-back").hidden = (screen === "menu" || screen === "game" || screen === "hub");

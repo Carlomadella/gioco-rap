@@ -15,6 +15,73 @@
 
 const STRADA_NOMI = ["Marco","Giulia","Fede","Sara","Luca","Vale","Ale","Chicco","Mattia","Cate","Simo","Robi"];
 
+/* Da smistare, punto 2: "la scena dei fan ne hai fatte si e no 3" — vero, erano
+   una frase sola con solo il nome che cambiava. Qui sotto un luogo e un
+   comportamento si combinano (12×13 = 156 possibilità, per bello e per
+   maleducato separatamente): non sono 156 scene scritte a mano, ma 156 modi
+   diversi di leggerle, e con la cronologia qui sotto le ultime 30 viste per
+   tipo non si ripescano — l'unica strada per rivedere la stessa combinazione
+   è vederne prima altre 30 diverse. */
+const STR_FAN_LUOGHI = [
+  "Al bar sotto casa", "Sulla porta del supermercato", "In fila alla posta",
+  "Aspettando il bus", "All'uscita della palestra", "Nel parcheggio del centro commerciale",
+  "In stazione, sul binario", "Davanti al chiosco dei kebab", "In metro, due fermate prima della tua",
+  "Al semaforo, mentre aspetti il verde", "Al mercato del sabato", "In coda dal barbiere"
+];
+const STR_FAN_COMPORTAMENTI = [
+  "ti punta il dito e urla il tuo nome a squarciagola: «Sei tu? Foto, dai, foto!»",
+  "si blocca a metà passo, si gira verso l'amico e sussurra: «Guarda chi c'è, non ci credo»",
+  "lascia cadere le buste della spesa dalla sorpresa, e si scusa ridendo mentre le raccoglie",
+  "si mette le mani sulla bocca, sbianca, e riesce solo a dire: «Sei proprio tu?»",
+  "ti corre incontro senza guardare la strada, rischiando di inciampare",
+  "ti manda un vocale mentre è ancora a due metri: «Non ci credo, non ci credo, non ci credo»",
+  "tira fuori il telefono e comincia a filmare ancora prima di salutarti",
+  "tira per la manica un amico che non ti aveva riconosciuto: «Guarda chi c'è, non ci posso credere»",
+  "resta immobile per qualche secondo, poi esplode: «Ti seguo da quando avevi duecento fan!»",
+  "si avvicina timido, la voce che trema: «Scusa, posso disturbarti un attimo?»",
+  "chiama a gran voce tutta la famiglia, che esce di corsa a vedere",
+  "si gira di scatto come se avesse sentito il tuo nome nell'aria",
+  "ti riconosce dalla voce prima ancora di vederti in faccia"
+];
+const STR_FANMALE_COMPORTAMENTI = [
+  "ti si struscia addosso per il selfie, sgomita, non capisce gli spazi",
+  "ti strappa quasi di mano il telefono per farsi la foto da solo",
+  "ti chiama a voce altissima da lontano finché tutti si girano",
+  "ti pianta un gomito nelle costole per farsi spazio da solo",
+  "ti blocca il passo con tutto il carrello della spesa",
+  "ti mette un braccio al collo per il selfie senza chiedere",
+  "urla al telefono con un amico mentre ti tiene per la giacca",
+  "ti chiede tre foto diverse, una via l'altra, senza fermarsi mai",
+  "insiste anche dopo il primo «no», sempre più vicino",
+  "fa notare a tutti quelli intorno chi sei, indicandoti col dito",
+  "supera la fila per arrivarti davanti prima degli altri",
+  "ti cammina accanto per venti metri raccontandoti la sua vita",
+  "registra un video senza chiedere, commentando ad alta voce"
+];
+
+/* Sceglie un indice 0..totale-1 evitando quelli visti di recente (in `storico`,
+   un array che tiene le ultime `maxStorico` combinazioni per quel tipo di
+   incontro). Con 156 combinazioni e una cronologia di 30, quasi sempre basta
+   un tentativo solo. */
+function strPescaCombo(totale, storico, maxStorico){
+  let idx, tentativi = 0;
+  do{ idx = Math.floor(Math.random() * totale); tentativi++; }
+  while(storico.indexOf(idx) >= 0 && tentativi < 8);
+  storico.push(idx);
+  if(storico.length > maxStorico) storico.shift();
+  return idx;
+}
+function strScenaFan(comportamenti, storicoKey){
+  if(!G.strFanHist) G.strFanHist = {bello:[], male:[]};
+  const storico = G.strFanHist[storicoKey] || (G.strFanHist[storicoKey] = []);
+  const totale = STR_FAN_LUOGHI.length * comportamenti.length;
+  const idx = strPescaCombo(totale, storico, 30);
+  return {
+    luogo: STR_FAN_LUOGHI[Math.floor(idx / comportamenti.length)],
+    comp: comportamenti[idx % comportamenti.length]
+  };
+}
+
 /* Un fan ti fotografa, un giornalista ti massacra: quello che nasce da un
    incontro finisce su LaFamegram davvero, non solo nel diario. */
 function postaEvento(nome, testo, like){
@@ -26,7 +93,8 @@ function postaEvento(nome, testo, like){
 const INCONTRI = [
   {id:"fan_bello", peso:3, req:() => true, crea(){
     const nome = pick(STRADA_NOMI);
-    return {t:"Un fan ti riconosce", d:nome + " ti si avvicina emozionato: «Sei tu? Foto, dai, foto!»",
+    const sc = strScenaFan(STR_FAN_COMPORTAMENTI, "bello");
+    return {t:"Un fan ti riconosce", d:sc.luogo + ". " + nome + " " + sc.comp,
       opts:[
         {n:"Fatti la foto con lui", d:"Due minuti, gli fai piacere", run(){
           const art = window.ARTIST || {};
@@ -45,7 +113,8 @@ const INCONTRI = [
 
   {id:"fan_maleducato", peso:2, req:() => true, crea(){
     const nome = pick(STRADA_NOMI);
-    return {t:"Un fan sopra le righe", d:nome + " ti si struscia addosso per il selfie, sgomita, non capisce gli spazi.",
+    const sc = strScenaFan(STR_FANMALE_COMPORTAMENTI, "male");
+    return {t:"Un fan sopra le righe", d:sc.luogo + ". " + nome + " " + sc.comp,
       opts:[
         {n:"Fatti la foto lo stesso", d:"Non vale la pena litigare", run(){
           G.hype = clamp(G.hype + rnd(1,3), 0, 100); G.wellbeing = clamp(G.wellbeing - 1, 0, 100);

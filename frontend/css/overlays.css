@@ -3,7 +3,8 @@
 .piazza{position:fixed;inset:0;z-index:92;background:radial-gradient(120% 80% at 50% 0%,#1A1220,#08080A 70%);
   display:none;overflow-y:auto}
 .piazza.on{display:block}
-.pwrap{max-width:640px;margin:0 auto;padding:20px 18px 40px;text-align:center}
+.pwrap{max-width:640px;margin:0 auto;padding:20px 18px 40px;text-align:center;
+  animation:rIn .4s cubic-bezier(.2,.9,.3,1)}
 .phead{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 .phead .pk{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--acid);text-align:left}
 .phead .px{margin-left:auto;background:rgba(255,255,255,.08);border:0;color:#fff;width:34px;height:34px;
@@ -45,7 +46,8 @@
   font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55)}
 .writer{position:fixed;inset:0;z-index:90;background:#08080A;display:none;overflow-y:auto}
 .writer.on{display:block}
-.wwrap{max-width:720px;margin:0 auto;padding:22px 18px 130px}
+.wwrap{max-width:720px;margin:0 auto;padding:22px 18px 130px;
+  animation:rIn .4s cubic-bezier(.2,.9,.3,1)}
 .whead{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
 .whead .wk{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--acid)}
 .whead h2{font-size:34px;font-weight:900;letter-spacing:-.035em;margin:2px 0 0;line-height:1}
@@ -159,8 +161,12 @@
 .modal{position:fixed;inset:0;background:rgba(6,6,8,.86);display:none;place-items:center;padding:18px;
   z-index:60;backdrop-filter:blur(6px)}
 .modal.on{display:grid}
+/* Da smistare, punto 1: le pagine/pannelli aperti da una card comparivano di
+   botto — stessa entrata rIn del rapporto di settimana e delle scene a
+   pagina piena (effects.css), qui e sugli altri pannelli (negozio, La Sala,
+   piazza, il foglio, la Strada). */
 .sheet2{position:relative;width:100%;max-width:470px;background:var(--card);border-radius:22px;padding:26px;
-  max-height:88vh;overflow-y:auto}
+  max-height:88vh;overflow-y:auto;animation:rIn .4s cubic-bezier(.2,.9,.3,1)}
 /* la via d'uscita: c'è solo sulle finestre che si possono lasciare a metà */
 .sheet2 .mx{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;
   background:rgba(255,255,255,.08);color:#fff;font-size:15px;line-height:1;display:grid;place-items:center;

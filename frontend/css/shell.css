@@ -1,7 +1,13 @@
 /* Guscio dell'app: schermate, barra in alto, menu principale. */
 
+/* Da smistare, punto 1: passare da una schermata all'altra (mappa, gioco,
+   profilo, menù) era un taglio secco, senza nessun passaggio. Qui solo
+   l'opacità, mai un transform: la mappa (hub.css, .palco) usa position:fixed
+   dentro allo schermo, e un transform sull'antenato gli cambierebbe il
+   riferimento a metà animazione, spostando tutto per una frazione di secondo. */
 .screen{display:none}
-.screen.on{display:block}
+.screen.on{display:block;animation:screenIn .32s ease-out}
+@keyframes screenIn{from{opacity:0}to{opacity:1}}
 
 /* L'altezza della barra e' fissata qui e basta: min-height. Cosi' non dipende
    da cosa ci finisce dentro e non si muove quando il tasto indietro compare. */

@@ -4,7 +4,8 @@
 .negozio{position:fixed;inset:0;z-index:93;display:none;overflow-y:auto;
   background:radial-gradient(120% 80% at 50% 0%,#1B1226,#08080B 70%)}
 .negozio.on{display:block}
-.ngwrap{max-width:820px;margin:0 auto;padding:20px 18px 46px}
+.ngwrap{max-width:820px;margin:0 auto;padding:20px 18px 46px;
+  animation:rIn .4s cubic-bezier(.2,.9,.3,1)}
 
 .nghead{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .nghead .ngk{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;
