@@ -57,7 +57,7 @@ const STRADA_COLPI_LA = [
 ];
 
 /* Gli approcci: numeri presi uno a uno dal documento
-   (âˆ’18%/âˆ’35%/+6% · +18% · +40%/+35%/+12%/pena×2,2). */
+   (−18%/−35%/+6% · +18% · +40%/+35%/+12%/pena×2,2). */
 const STRADA_APPROCCI = [
   {id:"pulito", n:"Da solo, pulito", d:"Meno guadagno, molto meno rumore, un po' più sicuro.",
    guadagno:.82, rumore:.65, riuscita:.06, pena:1},
@@ -110,8 +110,8 @@ function stScenaAvviso(colpo, msg){
 function stRigaApproccio(a){
   const delta = Math.round((a.guadagno - 1) * 100);
   return {
-    sx:(delta > 0 ? "+" : "âˆ’") + Math.abs(delta) + "% guadagno",
-    dx:a.serveFerro ? "pena ×2,2" : a.serveUomo ? "serve un uomo" : "rischio â†“"
+    sx:(delta > 0 ? "+" : "−") + Math.abs(delta) + "% guadagno",
+    dx:a.serveFerro ? "pena ×2,2" : a.serveUomo ? "serve un uomo" : "rischio ↓"
   };
 }
 
@@ -636,7 +636,7 @@ function renderStAttivita(){
         '<div class="a-top"><strong>' + a.n + '</strong><span class="price">' +
           (tua ? "TUA" : fmt(a.costo) + " €") + '</span></div>' +
         '<p>' + (tua
-          ? "Resa " + fmt(a.resa) + " €/sett. · 45% pulito / 55% sporco · âˆ’" + fmt(a.gestione) + " € di gestione"
+          ? "Resa " + fmt(a.resa) + " €/sett. · 45% pulito / 55% sporco · −" + fmt(a.gestione) + " € di gestione"
           : "Resa " + fmt(a.resa) + " €/sett. · alza di altrettanto quanto puoi ripulire.") + '</p>' +
         (tua ? "" : '<button class="pill' + (G.money < a.costo ? " no" : "") + '" data-stattivita="' + a.id + '">Rileva</button>') +
         '</div>';
