@@ -7,7 +7,7 @@ Per farlo provare a qualcuno si ricompila tutto in un file solo con
 `python3 frontend/strumenti/build-artifact.py` (esce `frontend/dist/anni-di-fame.html`):
 è la demo, non il modo in cui il gioco esce.
 
-L'elenco puntuale dei lavori aperti sta in `implementazioni.md`: lì i punti si spuntano uno a uno,
+L'elenco puntuale dei lavori aperti sta nella cartella `implementazioni/`: lì i punti si spuntano uno a uno,
 qui c'è il disegno d'insieme.
 
 ## Regole permanenti (valgono per ogni fase)
@@ -24,7 +24,7 @@ qui c'è il disegno d'insieme.
 
 ---
 
-## L'HUB: LA MAPPA A TRE CITTÀ _(direzione attuale — punto 26 di `implementazioni.md`)_
+## L'HUB: LA MAPPA A TRE CITTÀ _(direzione attuale — punto 26, in `implementazioni/01-mappa-e-citta.md`)_
 
 Da qui in avanti la schermata di gioco **è** una mappa che si allarga insieme al rapper.
 Concept art in `frontend/media/photo/`: `schermata_di_gioco_città_iniziale.png`,
@@ -117,7 +117,7 @@ Farmare contatti è gameplay, non un menu.
 
 ---
 
-## LA CLASSIFICA È UNA SOLA — il multiplayer _(punto 30 di `implementazioni.md`)_
+## LA CLASSIFICA È UNA SOLA — il multiplayer _(punto 30, in `implementazioni/07-multiplayer-e-backend.md`)_
 
 La classifica smette di essere una cosa privata fra te e i rivali generati sul tuo computer.
 **Ce n'è una sola, uguale per tutti, e dentro ci stanno i giocatori veri.** Finché i
@@ -177,7 +177,7 @@ Le rotte e le manopole stanno in `backend/README.md`, il modello dei dati in
 
 ---
 
-## L'USCITA SUGLI STORE — i cinque lavori _(punti 33-37 di `implementazioni.md`)_
+## L'USCITA SUGLI STORE — i cinque lavori _(punti 33-37, in `implementazioni/08-uscita-sugli-store.md`)_
 
 Il gioco esce su **Steam** e sugli **store del telefono**. Il codice resta HTML, CSS e
 JavaScript — per un gestionale a schermate è la tecnologia giusta — dentro a un guscio
@@ -275,7 +275,7 @@ direzione grafica approvata, struttura a settimane, menù e profilo, scrittura d
 mercato dei beat con ascolto, freestyle in piazza, lifestyle, classifica, rivali.
 Nel profilo "stile" = genere musicale.
 
-Fatto di recente (dettagli in `implementazioni.md`):
+Fatto di recente (dettagli in `implementazioni/`):
 
 - **Menu impostazioni** (punto 23): audio, aspetto e temi, preset di difficoltà, 3 slot partita,
   esporta/importa carriera, lingua italiano/inglese, diritti La Fame Studio.
