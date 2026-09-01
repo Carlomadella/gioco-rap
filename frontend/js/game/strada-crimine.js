@@ -89,26 +89,46 @@ const STRADA_UOMO_COSTO = 500, STRADA_UOMO_UPKEEP = 140, STRADA_UOMO_MAX = 5;
 const STRADA_FERRO_COSTO = 900, STRADA_AVVOCATO_COSTO = 320;
 
 /* ==================== LA SCENA IN CORSO ====================
-   Come modal.js, ma tutta dentro al pannello: showEvent (z-index 60) finirebbe
+   Come modal.js, ma tutta dentro alla schermata: showEvent (z-index 60) finirebbe
    sotto ai pannelli come questo (z-index 93, stessa famiglia di posto/negozio),
-   quindi qui le scelte del colpo si disegnano nel pannello stesso, non sopra. */
-let STRADA_SCENA = null; /* {titolo, testo, opts:[{n,d,run()}]} */
+   quindi qui le scelte del colpo si disegnano nella scheda della Strada, non sopra.
+
+   La scheda la disegna renderStScheda() qui sotto:
+   {k, titolo, testo, stats:[{t,c}], approcci, opts:[{n,d,sx,dx,hot,no,run()}]} */
+let STRADA_SCENA = null;
 
 function stScenaAvviso(colpo, msg){
-  return {titolo:"Non si può", testo:msg,
+  return {k:"Non si può", titolo:"Così no", testo:msg,
     opts:[
-      {n:"Torna alle scelte", d:"", run(){ STRADA_SCENA = stScenaApproccio(colpo); }},
-      {n:"Lascia stare", d:"", run(){ STRADA_SCENA = null; }}
+      {n:"Torna alle scelte", d:"Rivedi come muoverti", run(){ STRADA_SCENA = stScenaApproccio(colpo); }},
+      {n:"Lascia stare", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}
     ]};
 }
 
+/* Le tre righe sotto a ogni approccio escono dai numeri veri: quanto cambia il
+   guadagno, e cosa ti serve o cosa rischi in più. */
+function stRigaApproccio(a){
+  const delta = Math.round((a.guadagno - 1) * 100);
+  return {
+    sx:(delta > 0 ? "+" : "−") + Math.abs(delta) + "% guadagno",
+    dx:a.serveFerro ? "pena ×2,2" : a.serveUomo ? "serve un uomo" : "rischio ↓"
+  };
+}
+
 function stScenaApproccio(colpo){
-  return {titolo:colpo.n, testo:colpo.d + "<br><br>Guadagno stimato: " + fmt(colpo.min) + "–" + fmt(colpo.max) +
-      " €. Energia: " + colpo.energia + ".",
-    opts:STRADA_APPROCCI.map(a => ({
-      n:a.n, d:a.d,
-      run(){ stradaTenta(colpo.id, a.id); }
-    })).concat([{n:"Lascia stare", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}])};
+  const s = G.strada;
+  return {k:"Come vuoi muoverti?", titolo:colpo.n, testo:colpo.d, approcci:true,
+    stats:[
+      {t:fmt(colpo.min) + "–" + fmt(colpo.max) + " €", c:"money"},
+      {t:colpo.energia + " energia"},
+      {t:"Rischio " + stRischio(colpo).toLowerCase(), c:stClasseRischio(colpo)}
+    ],
+    opts:STRADA_APPROCCI.map(a => {
+      const riga = stRigaApproccio(a);
+      return {n:a.n, d:a.d, sx:riga.sx, dx:riga.dx, hot:a.id === "ferro",
+        no:(a.serveUomo && s.uomini <= 0) || (a.serveFerro && !s.ferro) || G.energy < colpo.energia,
+        run(){ stradaTenta(colpo.id, a.id); }};
+    })};
 }
 
 function stAvviaColpo(colpoId){
@@ -151,14 +171,14 @@ function stradaTenta(colpoId, approccioId){
     G.money += pulito; s.sporchi += sporco;
     s.rep = clamp(s.rep + 3 + colpo.difficolta * 6, 0, 100);
     s.heat = clamp(s.heat + rumore * .6, 0, 100);
-    STRADA_SCENA = {titolo:"Andata bene", testo:"<b>" + colpo.n + "</b>: " + fmt(pulito) + " € in tasca, " +
+    STRADA_SCENA = {k:"Com'è andata", titolo:"Andata bene", testo:"<b>" + colpo.n + "</b>: " + fmt(pulito) + " € in tasca, " +
         fmt(sporco) + " € sporchi da ripulire. In giro si comincia a parlarne.",
       opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
   }else{
     s.heat = clamp(s.heat + rumore, 0, 100);
     if(approccio.id === "squadra" && s.uomini > 0 && Math.random() < .5){
       s.uomini--;
-      STRADA_SCENA = {titolo:"È andata male", testo:"<b>" + colpo.n + "</b> è saltato. Uno dei tuoi ci è rimasto sotto: " +
+      STRADA_SCENA = {k:"Com'è andata", titolo:"È andata male", testo:"<b>" + colpo.n + "</b> è saltato. Uno dei tuoi ci è rimasto sotto: " +
           "tu sei rientrato pulito, lui no. Un uomo in meno.",
         opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
     }else{
@@ -166,7 +186,7 @@ function stradaTenta(colpoId, approccioId){
       if(primaVolta && Math.random() < .6){
         const multa = Math.round(colpo.min * .8);
         G.money = Math.max(0, G.money - multa);
-        STRADA_SCENA = {titolo:"Denuncia", testo:"<b>" + colpo.n + "</b> è saltato, ma te la cavi con una denuncia e " +
+        STRADA_SCENA = {k:"Com'è andata", titolo:"Denuncia", testo:"<b>" + colpo.n + "</b> è saltato, ma te la cavi con una denuncia e " +
             fmt(multa) + " € di multa. Stavolta è andata.",
           opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
       }else{
@@ -174,7 +194,7 @@ function stradaTenta(colpoId, approccioId){
           (1 + s.precedenti * .35) * (s.avvocato ? .55 : 1)));
         s.precedenti++;
         s.arresto = {settimane:settimane, colpo:colpo.n};
-        STRADA_SCENA = {titolo:"Arrestato", testo:"<b>" + colpo.n + "</b> è saltato, e stavolta non te la cavi: " +
+        STRADA_SCENA = {k:"Com'è andata", titolo:"Arrestato", testo:"<b>" + colpo.n + "</b> è saltato, e stavolta non te la cavi: " +
             settimane + (settimane === 1 ? " settimana dentro" : " settimane dentro") +
             ". Niente musica, niente strada: solo il tempo che passa.",
           opts:[{n:"Continua", d:"", run(){ STRADA_SCENA = null; }}]};
@@ -184,7 +204,10 @@ function stradaTenta(colpoId, approccioId){
   save(); renderStrada(); renderGioco();
 }
 
-/* ==================== SOLDI SPORCHI ==================== */
+/* ==================== SOLDI SPORCHI ====================
+   Le azioni piccole (ripulire, prendere un uomo, rilevare un'attività) tornano
+   la frase da mostrare: il pannello la fa comparire in basso, senza fermare
+   niente. Chi non può fare la cosa riceve il motivo, non il silenzio. */
 function stradaCapienza(){
   let cap = 400;
   for(const a of STRADA_ATTIVITA) if(G.strada.attivita[a.id]) cap += a.resa;
@@ -192,7 +215,7 @@ function stradaCapienza(){
 }
 function stradaRipulisci(){
   const s = G.strada;
-  if(s.sporchi <= 0) return;
+  if(s.sporchi <= 0) return "Non hai soldi sporchi da ripulire.";
   const importo = Math.min(s.sporchi, stradaCapienza());
   const soglia = 400;
   const bassa = Math.min(importo, soglia), alta = Math.max(0, importo - soglia);
@@ -202,43 +225,57 @@ function stradaRipulisci(){
   s.heat = clamp(s.heat + 2, 0, 100);
   pushLog("Ripuliti " + fmt(importo) + " € sporchi: in tasca ne restano " + fmt(pulito) + " €.", "");
   save(); renderStrada(); renderGioco();
+  return "Ripuliti " + fmt(importo) + " €: in tasca ne restano " + fmt(pulito) + " €.";
 }
 
 /* ==================== CHI TI COPRE ==================== */
 function stAssumiUomo(){
   const s = G.strada;
-  if(s.uomini >= STRADA_UOMO_MAX || G.money < STRADA_UOMO_COSTO) return;
+  if(s.uomini >= STRADA_UOMO_MAX) return "Hai già cinque uomini: di più non se ne tengono.";
+  if(G.money < STRADA_UOMO_COSTO) return "Non hai " + fmt(STRADA_UOMO_COSTO) + " € per prenderne un altro.";
   G.money -= STRADA_UOMO_COSTO; s.uomini++;
   pushLog("Hai preso un uomo in più: ora sono " + s.uomini + ".", "");
   save(); renderStrada(); renderGioco();
+  return "Uno dei tuoi si è unito al giro: ora siete in " + s.uomini + ".";
 }
 function stLicenziaUomo(){
   const s = G.strada;
-  if(s.uomini <= 0) return;
+  if(s.uomini <= 0) return "Non hai nessuno da mandare via.";
   s.uomini--;
   save(); renderStrada(); renderGioco();
+  return "Uno se n'è andato. Ne restano " + s.uomini + ".";
 }
 function stImpostaProtezione(livello){
   G.strada.prot = clamp(livello, 0, STRADA_PROT.length - 1);
   save(); renderStrada(); renderGioco();
+  const p = STRADA_PROT[G.strada.prot];
+  return G.strada.prot === 0 ? "Niente protezione: da qui in poi sei scoperto."
+    : "Protezione: " + p.n.toLowerCase() + ", " + fmt(p.costo) + " €/sett.";
 }
 function stCompraFerro(){
   const s = G.strada;
-  if(s.ferro || G.money < STRADA_FERRO_COSTO) return;
+  if(s.ferro) return "Il ferro ce l'hai già.";
+  if(G.money < STRADA_FERRO_COSTO) return "Non hai " + fmt(STRADA_FERRO_COSTO) + " €.";
   G.money -= STRADA_FERRO_COSTO; s.ferro = true;
   pushLog("Hai preso il ferro. Cambia i conti, in bene e in male.", "");
   save(); renderStrada(); renderGioco();
+  return "Hai preso il ferro. Cambia i conti, in bene e in male.";
 }
 function stToggleAvvocato(){
   G.strada.avvocato = !G.strada.avvocato;
   save(); renderStrada(); renderGioco();
+  return G.strada.avvocato ? "Avvocato preso: " + fmt(STRADA_AVVOCATO_COSTO) + " €/sett."
+    : "Avvocato mandato via.";
 }
 function stCompraAttivita(id){
   const a = STRADA_ATTIVITA.find(x => x.id === id);
-  if(!a || G.strada.attivita[id] || G.money < a.costo) return;
+  if(!a) return "";
+  if(G.strada.attivita[id]) return a.n + " è già tua.";
+  if(G.money < a.costo) return "Non hai " + fmt(a.costo) + " € per rilevare " + a.n.toLowerCase() + ".";
   G.money -= a.costo; G.strada.attivita[id] = true;
   pushLog("Hai rilevato: <b>" + a.n + "</b>.", "good");
   save(); renderStrada(); renderGioco();
+  return a.n + " è tua. Adesso puoi ripulire di più.";
 }
 function stMollaIlGiro(){
   const s = G.strada;
@@ -359,107 +396,368 @@ function stradaOpp(){
     ]});
 }
 
-/* ==================== IL PANNELLO ==================== */
+/* ==================== IL PANNELLO ====================
+   Il disegno arriva dal prototipo `attivita-criminali-crime-v8.html`, portato
+   dentro al gioco: l'impalcatura sta in index.html, qui c'è quello che cambia.
+   Tre pannelli sopra a un fondale che scorre — a sinistra i tuoi numeri, al
+   centro i colpi, a destra chi ti copre e le attività — con in basso le tre
+   città e il ritorno alla mappa.
+
+   Le scelte del colpo e i suoi esiti restano dentro alla schermata (la scheda
+   `#st-modal`, non `showEvent`): questo pannello sta a z-index 93, il modal
+   globale a 60, e finirebbe sotto. */
+
+/* Il fondale: trenta immagini che si danno il cambio ogni quindici secondi.
+   Sono le stesse del prototipo, ancora servite da un CDN: prima di impacchettare
+   per gli store vanno scaricate in `media/photo/` e messe qui coi percorsi
+   locali (punto 33), altrimenti a gioco installato non si vedono. */
+const STRADA_SFONDI = [
+  "media/photo/ai-generated-8567764_1280.jpg",
+  "media/photo/ai-generated-8567818_1280.jpg",
+  "media/photo/ai-generated-8567822_1280.jpg",
+  "media/photo/ai-generated-8701423_1280.png",
+  "media/photo/ai-generated-8365225_1280.jpg",
+  "media/photo/ai-generated-8860600_1280.jpg",
+  "media/photo/ai-generated-8860609_1280.jpg",
+  "media/photo/ai-generated-8775948_640.jpg",
+  "media/photo/ai-generated-9095359_1280.jpg",
+  "media/photo/ai-generated-9095360_1280.jpg",
+  "media/photo/ai-generated-9095361_1280.jpg",
+  "media/photo/ai-generated-9095362_640.jpg",
+  "media/photo/ai-generated-9095356_640.jpg",
+  "media/photo/ai-generated-9797210_1280.jpg",
+  "media/photo/ai-generated-8625769_1280.jpg",
+  "media/photo/ai-generated-8880608_1280.jpg",
+  "media/photo/ai-generated-9347716_640.png",
+  "media/photo/ai-generated-8694534_640.png",
+  "media/photo/ai-generated-8698203_640.png",
+  "media/photo/ai-generated-8701425_1280.png",
+  "media/photo/ai-generated-8375874_1280.jpg",
+  "media/photo/ai-generated-9416493_1280.jpg",
+  "media/photo/ai-generated-8717968_1280.png",
+  "media/photo/ai-generated-8701419_1280.png",
+  "media/photo/ai-generated-9095357_1280.jpg",
+  "media/photo/ai-generated-9095358_1280.jpg",
+  "media/photo/ai-generated-9095354_640.jpg",
+  "media/photo/ai-generated-8887542_1280.jpg",
+  "media/photo/ai-generated-8606642_1280.png",
+  "media/photo/ai-generated-8489041_1280.jpg"
+];
+const STRADA_SFONDO_MS = 15000;
+let ST_SFONDO = 0, ST_STRATO = 0, ST_GIRO = null;
+const ST_PRECARICATI = new Set();
+
+function stPrecarica(i){
+  const k = (i + STRADA_SFONDI.length) % STRADA_SFONDI.length;
+  if(ST_PRECARICATI.has(k)) return;
+  ST_PRECARICATI.add(k);
+  const img = new Image(); img.decoding = "async"; img.src = STRADA_SFONDI[k];
+}
+function stMostraSfondo(i, subito){
+  const strati = [$("st-bgA"), $("st-bgB")];
+  if(!strati[0] || !strati[1]) return;
+  const prossimo = subito ? strati[0] : strati[1 - ST_STRATO];
+  prossimo.style.backgroundImage = 'url("' + STRADA_SFONDI[i] + '")';
+  prossimo.classList.add("on");
+  if(subito){ ST_STRATO = 0; return; }
+  strati[ST_STRATO].classList.remove("on");
+  ST_STRATO = 1 - ST_STRATO;
+}
+/* Il giro parte quando la schermata si apre e si ferma quando si chiude: niente
+   timer che macinano mentre giochi da un'altra parte. */
+function stAvviaSfondi(){
+  stPrecarica(ST_SFONDO); stPrecarica(ST_SFONDO + 1);
+  stMostraSfondo(ST_SFONDO, true);
+  clearInterval(ST_GIRO);
+  ST_GIRO = setInterval(() => {
+    ST_SFONDO = (ST_SFONDO + 1) % STRADA_SFONDI.length;
+    stPrecarica(ST_SFONDO + 1); stPrecarica(ST_SFONDO + 2);
+    stMostraSfondo(ST_SFONDO);
+  }, STRADA_SFONDO_MS);
+}
+function stFermaSfondi(){ clearInterval(ST_GIRO); ST_GIRO = null; }
+
+/* Il messaggio di passaggio in basso: le cose piccole si dicono qui. */
+let ST_TOAST = null;
+function stToast(t){
+  const el = $("st-toast");
+  if(!el || !t) return;
+  el.textContent = t; el.classList.add("on");
+  clearTimeout(ST_TOAST);
+  ST_TOAST = setTimeout(() => el.classList.remove("on"), 2200);
+}
+
+/* Le tre città: la provincia si gioca, le altre due si guardano. */
+const STRADA_CITTA = [
+  {id:"provincia", n:"Provincia", d:"4 colpi disponibili", req:null},
+  {id:"milano", n:"Milano", d:"4 colpi · livello 10", req:"Livello 10 · fama 50 · hype 40",
+   colpi:STRADA_COLPI_MILANO},
+  {id:"la", n:"Los Angeles", d:"3 colpi · da GOAT", req:"Si apre da GOAT",
+   colpi:STRADA_COLPI_LA}
+];
+let ST_CITTA = "provincia";
+
 function apriStrada(){
   hubTap();
   STRADA_SCENA = null;
+  ST_CITTA = "provincia";
   renderStrada();
   $("strada").classList.add("on");
+  stAvviaSfondi();
 }
-function chiudiStrada(){ $("strada").classList.remove("on"); }
+function chiudiStrada(){
+  $("strada").classList.remove("on");
+  stFermaSfondi();
+}
 
+/* ==================== QUELLO CHE CAMBIA ==================== */
+function stRischio(colpo){
+  return colpo.difficolta <= .2 ? "Basso" : colpo.difficolta <= .45 ? "Medio" : "Alto";
+}
+function stClasseRischio(colpo){
+  return colpo.difficolta <= .2 ? "risk-low" : colpo.difficolta <= .45 ? "risk-mid" : "risk-high";
+}
+function stOcchiAddosso(){
+  const h = G.strada.heat;
+  return h < 20 ? "Nessuno" : h < 45 ? "Qualcuno" : h < 70 ? "Troppi" : "Ti stanno addosso";
+}
+function stCopertura(){
+  const s = G.strada;
+  return s.uomini * STRADA_UOMO_UPKEEP + STRADA_PROT[s.prot].costo + (s.avvocato ? STRADA_AVVOCATO_COSTO : 0);
+}
+
+/* ---- la testata e la colonna di sinistra ---- */
 function renderStBarre(){
   const s = G.strada;
-  const riga = (label, val, cls) => '<div class="stbarrow"><span>' + label + '</span>' +
-    '<div class="stbar"><i class="' + cls + '" style="width:' + clamp(val,0,100) + '%"></i></div>' +
-    '<b>' + Math.round(val) + '</b></div>';
-  return '<div class="stbars">' + riga("Reputazione di strada", s.rep, "rep") + riga("Attenzione", s.heat, "heat") + '</div>' +
-    '<div class="stsoldi"><span>Soldi sporchi</span><b>' + fmt(s.sporchi) + ' €</b>' +
-    '<button class="stbtn' + (s.sporchi <= 0 ? " no" : "") + '" data-ripulisci>Ripulisci (fino a ' + fmt(stradaCapienza()) + ' €)</button></div>';
+  const art = window.ARTIST || {};
+  const citta = (art.city || "").trim() || "Città di provincia";
+  $("st-dove").textContent = "Il giro // " + citta;
+  $("st-citta").textContent = citta;
+  $("st-sett").textContent = G.week;
+  $("st-ora").textContent = typeof hubOra === "function" ? hubOra() : "";
+
+  $("st-sporchi").textContent = fmt(s.sporchi) + " €";
+  const rip = $("st-ripulisci");
+  rip.textContent = "Ripulisci fino a " + fmt(stradaCapienza()) + " €";
+  rip.classList.toggle("no", s.sporchi <= 0);
+
+  $("st-repn").textContent = Math.round(s.rep);
+  $("st-repbar").style.width = clamp(s.rep, 0, 100) + "%";
+  $("st-heatn").textContent = Math.round(s.heat);
+  $("st-heatbar").style.width = clamp(s.heat, 0, 100) + "%";
+  $("st-energia").textContent = G.energy + " / " + G.maxEnergy;
+  $("st-puliti").textContent = fmt(G.money) + " €";
+  $("st-precedenti").textContent = s.precedenti;
+  const occhi = $("st-occhi");
+  occhi.textContent = stOcchiAddosso();
+  occhi.classList.toggle("hot", s.heat >= 45);
 }
 
-function renderStArresto(){
-  const a = G.strada.arresto;
-  return '<div class="starresto"><b>Sei dentro.</b><p>«' + a.colpo + '»: ancora ' + a.settimane +
-    (a.settimane === 1 ? ' settimana' : ' settimane') + '. Niente colpi finché non esci.</p></div>';
-}
-
-function renderStMain(){
+/* ---- il centro: i colpi, o il tempo che passa ---- */
+function renderStColpi(){
   const s = G.strada;
-  let h = '<div class="stsez"><h3>I colpi — Provincia</h3><div class="stgrid">' +
-    STRADA_COLPI.map(c => '<div class="stcard"><b class="n">' + c.n + '</b><p class="d">' + c.d + '</p>' +
-      '<div class="meta">' + fmt(c.min) + '–' + fmt(c.max) + ' € · ' + c.energia + ' energia</div>' +
-      '<button class="stbtn' + (G.energy < c.energia ? " no" : "") + '" data-colpo="' + c.id + '">Tenta il colpo</button></div>'
-    ).join("") + '</div></div>';
+  const centro = $("st-center"), griglia = $("st-colpi");
+  const citta = STRADA_CITTA.find(c => c.id === ST_CITTA);
 
-  h += '<div class="stsez"><h3>Milano <i>· livello 10 · fama 50 · hype 40</i></h3><div class="stgrid">' +
-    STRADA_COLPI_MILANO.map(c => '<div class="stcard stlock"><b class="n">' + c.n + '</b>' +
-      (c.nota ? '<p class="d">' + c.nota + '</p>' : '') + '<div class="meta">Si apre a Milano</div></div>').join("") + '</div></div>';
-  h += '<div class="stsez"><h3>Los Angeles <i>· da GOAT</i></h3><div class="stgrid">' +
-    STRADA_COLPI_LA.map(c => '<div class="stcard stlock"><b class="n">' + c.n + '</b>' +
-      (c.nota ? '<p class="d">' + c.nota + '</p>' : '') + '<div class="meta">Si apre a Los Angeles</div></div>').join("") + '</div></div>';
+  if(s.arresto){
+    centro.classList.remove("locked");
+    griglia.className = "dentro";
+    griglia.innerHTML = "<b>Sei dentro</b><p>«" + s.arresto.colpo + "»: ancora " + s.arresto.settimane +
+      (s.arresto.settimane === 1 ? " settimana" : " settimane") +
+      ". Niente colpi finché non esci — le settimane le fa passare il gioco, non tu.</p>";
+    return;
+  }
 
-  h += '<div class="stsez"><h3>Chi ti copre</h3><div class="stcop">' +
-    '<div class="stcopriga"><span>Uomini (' + s.uomini + '/' + STRADA_UOMO_MAX + ')</span>' +
-    '<button class="stmini' + (s.uomini >= STRADA_UOMO_MAX || G.money < STRADA_UOMO_COSTO ? " no" : "") + '" data-uomo-assumi>' +
-      '+ Prendi (' + fmt(STRADA_UOMO_COSTO) + ' €, poi ' + fmt(STRADA_UOMO_UPKEEP) + ' €/sett.)</button>' +
-    (s.uomini > 0 ? '<button class="stmini" data-uomo-licenzia>Manda via uno</button>' : '') + '</div>' +
-    '<div class="stcopriga"><span>Protezione</span>' +
-    STRADA_PROT.map((p,i) => '<button class="stmini' + (s.prot === i ? " on" : "") + '" data-prot="' + i + '">' +
-      p.n + (p.costo ? ' (' + fmt(p.costo) + ' €/sett.)' : '') + '</button>').join("") + '</div>' +
-    '<div class="stcopriga"><span>Il ferro</span>' + (s.ferro ? '<b class="stok">Ce l’hai</b>' :
-      '<button class="stmini' + (G.money < STRADA_FERRO_COSTO ? " no" : "") + '" data-ferro>Prendilo (' + fmt(STRADA_FERRO_COSTO) + ' €)</button>') + '</div>' +
-    '<div class="stcopriga"><span>Avvocato (' + fmt(STRADA_AVVOCATO_COSTO) + ' €/sett.)</span>' +
-    '<button class="stmini' + (s.avvocato ? " on" : "") + '" data-avvocato>' + (s.avvocato ? 'Ce l’hai' : 'Prendilo') + '</button></div>' +
-    '</div></div>';
+  griglia.className = "crimes";
+  if(ST_CITTA !== "provincia"){
+    centro.classList.add("locked");
+    $("st-lock-n").textContent = citta.n;
+    $("st-lock-req").textContent = citta.req;
+    griglia.innerHTML = citta.colpi.map((c, i) =>
+      '<div class="crime lock"><span class="num">0' + (i + 1) + '</span><b>' + c.n + '</b>' +
+      '<p>' + (c.nota ? c.nota : "Si apre quando ci arrivi.") + '</p></div>').join("");
+    return;
+  }
 
-  h += '<div class="stsez"><h3>Attività</h3><div class="stgrid">' +
-    STRADA_ATTIVITA.map(a => '<div class="stcard">' + '<b class="n">' + a.n + '</b>' +
-      (s.attivita[a.id]
-        ? '<p class="d">Resa: ' + fmt(a.resa) + ' €/sett. (45% pulito, 55% sporco) − ' + fmt(a.gestione) + ' € gestione</p><b class="stok">Tua</b>'
-        : '<p class="d">Costo: ' + fmt(a.costo) + ' € · resa ' + fmt(a.resa) + ' €/sett.</p>' +
-          '<button class="stbtn' + (G.money < a.costo ? " no" : "") + '" data-attivita="' + a.id + '">Rileva</button>')
-      + '</div>').join("") + '</div></div>';
-
-  h += '<div class="stsez"><button class="stmolla" data-molla>Molla il giro</button>' +
-    '<p class="stmollad">Costa il 30% dei soldi sporchi (minimo 1.500 €), abbassa la reputazione di strada, alza la lucidità.</p></div>';
-  return h;
+  centro.classList.remove("locked");
+  griglia.innerHTML = STRADA_COLPI.map((c, i) => {
+    const senzaEnergia = G.energy < c.energia;
+    return '<button class="crime' + (senzaEnergia ? " no" : "") + '" data-stcolpo="' + c.id + '">' +
+      '<span class="num">0' + (i + 1) + '</span><b>' + c.n + '</b><p>' + c.d + '</p>' +
+      '<div class="stchips">' +
+        '<span class="stchip money">' + fmt(c.min) + '–' + fmt(c.max) + ' €</span>' +
+        '<span class="stchip">' + c.energia + ' energia</span>' +
+        '<span class="stchip ' + stClasseRischio(c) + '">Rischio ' + stRischio(c).toLowerCase() + '</span>' +
+      '</div><span class="go">→</span></button>';
+  }).join("");
 }
 
-function renderStScena(sc){
-  return '<div class="stscena"><b class="stst">' + sc.titolo + '</b><p class="stq">' + sc.testo + '</p>' +
-    sc.opts.map((o,i) => '<button class="strisp" data-stopt="' + i + '"><b>' + o.n + '</b>' +
-      (o.d ? '<span>' + o.d + '</span>' : '') + '</button>').join("") + '</div>';
+/* ---- a destra: chi ti copre, le attività ---- */
+function renderStCopre(){
+  const s = G.strada;
+  const prot = STRADA_PROT[s.prot];
+  const pieno = s.uomini >= STRADA_UOMO_MAX, caro = G.money < STRADA_UOMO_COSTO;
+  $("st-tab-copre").innerHTML =
+    '<div class="cover-row"><div class="t"><strong>Uomini (' + s.uomini + '/' + STRADA_UOMO_MAX + ')</strong>' +
+      '<span>' + fmt(STRADA_UOMO_COSTO) + ' € all\'ingresso · ' + fmt(STRADA_UOMO_UPKEEP) + ' €/sett.</span></div>' +
+      '<div class="pills"><button class="pill' + (pieno || caro ? " no" : "") + '" data-stuomo="piu">+ Prendi</button>' +
+      (s.uomini > 0 ? '<button class="pill" data-stuomo="meno">Manda via</button>' : '') + '</div></div>' +
+
+    '<div class="cover-row"><div class="t"><strong>Protezione</strong>' +
+      '<span>Riduce il rischio quando la zona si scalda.</span></div>' +
+      '<div class="pills"><button class="pill' + (s.prot > 0 ? " on" : "") + '" data-stprot>' + prot.n + '</button></div></div>' +
+
+    '<div class="cover-row"><div class="t"><strong>Il ferro</strong>' +
+      '<span>Più riuscita. Se ti trovano, la pena raddoppia.</span></div>' +
+      '<div class="pills"><button class="pill danger' + (s.ferro ? " on" : G.money < STRADA_FERRO_COSTO ? " no" : "") + '" data-stferro>' +
+      (s.ferro ? "Ce l'hai" : fmt(STRADA_FERRO_COSTO) + " €") + '</button></div></div>' +
+
+    '<div class="cover-row"><div class="t"><strong>Avvocato</strong>' +
+      '<span>' + fmt(STRADA_AVVOCATO_COSTO) + ' €/sett. · l\'attenzione cala più in fretta.</span></div>' +
+      '<div class="pills"><button class="pill' + (s.avvocato ? " on" : "") + '" data-stavvocato>' +
+      (s.avvocato ? "Ce l'hai" : "Prendilo") + '</button></div></div>' +
+
+    '<div class="cover-row"><div class="t"><strong>Costo copertura</strong>' +
+      '<span>Quello che ti esce di tasca ogni settimana.</span></div>' +
+      '<div class="pills"><span class="pill on">' + fmt(stCopertura()) + ' €/sett.</span></div></div>' +
+
+    '<div class="street-note">Nel giro non compri sicurezza. Compri solo qualche minuto in più prima che qualcosa vada storto.</div>';
+}
+
+function renderStAttivita(){
+  const s = G.strada;
+  $("st-tab-attivita").innerHTML =
+    STRADA_ATTIVITA.map(a => {
+      const tua = !!s.attivita[a.id];
+      return '<div class="activity' + (tua ? " owned" : "") + '">' +
+        '<div class="a-top"><strong>' + a.n + '</strong><span class="price">' +
+          (tua ? "TUA" : fmt(a.costo) + " €") + '</span></div>' +
+        '<p>' + (tua
+          ? "Resa " + fmt(a.resa) + " €/sett. · 45% pulito / 55% sporco · −" + fmt(a.gestione) + " € di gestione"
+          : "Resa " + fmt(a.resa) + " €/sett. · alza di altrettanto quanto puoi ripulire.") + '</p>' +
+        (tua ? "" : '<button class="pill' + (G.money < a.costo ? " no" : "") + '" data-stattivita="' + a.id + '">Rileva</button>') +
+        '</div>';
+    }).join("") +
+    '<div class="business-foot">Le attività rendono ogni settimana e allargano quanto denaro sporco riesci a far sparire.</div>';
+}
+
+/* ---- in basso: le tre città ---- */
+function renderStCitta(){
+  $("st-citta-lista").innerHTML = STRADA_CITTA.map(c =>
+    '<button class="city' + (c.id === ST_CITTA ? " on" : "") + (c.id === "provincia" ? "" : " lock") +
+    '" data-stcitta="' + c.id + '"><span class="n">' + c.n + '</span><span class="d">' + c.d + '</span></button>'
+  ).join("");
+}
+
+/* ---- la scheda: le scelte del colpo, gli esiti, le conferme ---- */
+function renderStScheda(){
+  const modal = $("st-modal");
+  if(!STRADA_SCENA){ modal.classList.remove("on"); $("st-sheet").innerHTML = ""; return; }
+  const sc = STRADA_SCENA;
+  const stats = (sc.stats || []).map(x => '<span class="stchip ' + (x.c || "") + '">' + x.t + '</span>').join("");
+  $("st-sheet").innerHTML =
+    '<div class="sheet-head"><div>' +
+      '<span class="k">' + (sc.k || "La strada") + '</span>' +
+      '<h2>' + sc.titolo + '</h2>' +
+      '<p>' + sc.testo + '</p>' +
+      (stats ? '<div class="sheet-stats">' + stats + '</div>' : "") +
+    '</div><button class="closemodal" id="st-chiudi-scheda" aria-label="Chiudi">×</button></div>' +
+    '<div class="' + (sc.approcci ? "approaches" : "esiti") + '">' +
+      sc.opts.map((o, i) =>
+        '<button class="approach' + (o.hot ? " hot" : "") + (o.no ? " no" : "") + '" data-stopt="' + i + '">' +
+        (sc.approcci ? '<span class="a-num">0' + (i + 1) + '</span>' : "") +
+        '<b>' + o.n + '</b>' + (o.d ? '<p>' + o.d + '</p>' : "") +
+        (o.sx || o.dx ? '<span class="riskline"><span>' + (o.sx || "") + '</span><span>' + (o.dx || "") + '</span></span>' : "") +
+        '</button>').join("") +
+    '</div>';
+  modal.classList.add("on");
 }
 
 function renderStrada(){
-  const body = $("st-body");
-  if(!body) return;
-  if(STRADA_SCENA){ body.innerHTML = renderStScena(STRADA_SCENA); return; }
-  const s = G.strada;
-  body.innerHTML = renderStBarre() + (s.arresto ? renderStArresto() : renderStMain());
+  if(!$("st-colpi")) return;
+  renderStBarre();
+  renderStColpi();
+  renderStCopre();
+  renderStAttivita();
+  renderStCitta();
+  renderStScheda();
 }
 
-$("st-body").addEventListener("click", ev => {
-  const stopt = ev.target.closest("[data-stopt]");
-  if(stopt && STRADA_SCENA){
-    hubTap();
-    const o = STRADA_SCENA.opts[+stopt.dataset.stopt];
-    if(o && typeof o.run === "function") o.run();
-    save(); renderStrada(); renderGioco();
-    return;
-  }
-  const colpo = ev.target.closest("[data-colpo]");
-  if(colpo){ hubTap(); stAvviaColpo(colpo.dataset.colpo); return; }
-  if(ev.target.closest("[data-ripulisci]")){ hubTap(); stradaRipulisci(); return; }
-  if(ev.target.closest("[data-uomo-assumi]")){ hubTap(); stAssumiUomo(); return; }
-  if(ev.target.closest("[data-uomo-licenzia]")){ hubTap(); stLicenziaUomo(); return; }
-  const prot = ev.target.closest("[data-prot]");
-  if(prot){ hubTap(); stImpostaProtezione(+prot.dataset.prot); return; }
-  if(ev.target.closest("[data-ferro]")){ hubTap(); stCompraFerro(); return; }
-  if(ev.target.closest("[data-avvocato]")){ hubTap(); stToggleAvvocato(); return; }
-  const att = ev.target.closest("[data-attivita]");
-  if(att){ hubTap(); stCompraAttivita(att.dataset.attivita); return; }
-  if(ev.target.closest("[data-molla]")){ hubTap(); stMollaIlGiro(); return; }
+/* ==================== I TASTI ==================== */
+$("st-colpi").addEventListener("click", ev => {
+  const c = ev.target.closest("[data-stcolpo]");
+  if(!c) return;
+  hubTap(); stAvviaColpo(c.dataset.stcolpo);
 });
+
+$("st-modal").addEventListener("click", ev => {
+  if(ev.target === $("st-modal") || ev.target.closest("#st-chiudi-scheda")){
+    hubTap(); STRADA_SCENA = null; renderStScheda(); return;
+  }
+  const opt = ev.target.closest("[data-stopt]");
+  if(!opt || !STRADA_SCENA) return;
+  hubTap();
+  const o = STRADA_SCENA.opts[+opt.dataset.stopt];
+  if(o && typeof o.run === "function") o.run();
+  save(); renderStrada(); renderGioco();
+});
+
+$("st-ripulisci").onclick = () => { hubTap(); stToast(stradaRipulisci()); };
+
+$("st-tab-copre").addEventListener("click", ev => {
+  const uomo = ev.target.closest("[data-stuomo]");
+  if(uomo){ hubTap(); stToast(uomo.dataset.stuomo === "piu" ? stAssumiUomo() : stLicenziaUomo()); return; }
+  if(ev.target.closest("[data-stprot]")){
+    hubTap(); stToast(stImpostaProtezione((G.strada.prot + 1) % STRADA_PROT.length)); return;
+  }
+  if(ev.target.closest("[data-stferro]")){ hubTap(); stToast(stCompraFerro()); return; }
+  if(ev.target.closest("[data-stavvocato]")){ hubTap(); stToast(stToggleAvvocato()); return; }
+});
+
+$("st-tab-attivita").addEventListener("click", ev => {
+  const a = ev.target.closest("[data-stattivita]");
+  if(!a) return;
+  hubTap(); stToast(stCompraAttivita(a.dataset.stattivita));
+});
+
+$("st-citta-lista").addEventListener("click", ev => {
+  const c = ev.target.closest("[data-stcitta]");
+  if(!c) return;
+  hubTap(); ST_CITTA = c.dataset.stcitta; renderStColpi(); renderStCitta();
+});
+
+document.querySelectorAll("#strada [data-sttab]").forEach(t => {
+  t.onclick = () => {
+    hubTap();
+    document.querySelectorAll("#strada [data-sttab]").forEach(x => x.classList.toggle("on", x === t));
+    $("st-tab-copre").classList.toggle("on", t.dataset.sttab === "copre");
+    $("st-tab-attivita").classList.toggle("on", t.dataset.sttab === "attivita");
+  };
+});
+
+/* Mollare il giro costa: prima di farlo, lo si dice. */
+$("st-molla").onclick = () => {
+  hubTap();
+  if(G.strada.arresto){ stToast("Da dentro non si molla niente."); return; }
+  const costo = Math.max(1500, Math.round(G.strada.sporchi * .3));
+  STRADA_SCENA = {k:"Uscirne", titolo:"Molla il giro",
+    testo:"Ti costa " + fmt(costo) + " € — il 30% dei soldi sporchi, e mai meno di 1.500 € — " +
+      "e la reputazione di strada cala di un terzo. In cambio ti torna la testa per la musica. Qualcuno se la lega al dito.",
+    opts:[
+      {n:"Mollo", d:"Chiudi i conti e sparisci dal giro", hot:true,
+       run(){ stMollaIlGiro(); STRADA_SCENA = null; stToast("Hai mollato il giro."); }},
+      {n:"Lascia stare", d:"Resti dentro al giro", run(){ STRADA_SCENA = null; }}
+    ]};
+  renderStScheda();
+};
+
 $("st-x").onclick = () => { hubTap(); chiudiStrada(); };
+$("st-mappa").onclick = () => { hubTap(); chiudiStrada(); };
+
+/* ESC: lo gestisce uscita.js per tutte le finestre, e chiama questa. Un passo
+   alla volta — prima si chiude la scheda aperta, poi la schermata. */
+function uscitaStrada(){
+  if(STRADA_SCENA){ STRADA_SCENA = null; renderStScheda(); return true; }
+  chiudiStrada();
+  return true;
+}
