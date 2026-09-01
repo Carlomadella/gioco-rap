@@ -586,6 +586,8 @@ non sono cambiate — solo il contenuto di ogni singolo incontro.
 
 ---
 
+## La chat del telefono non va piu' in loop
+
 Da smistare, punto 3 (01/09/2026): "Nell'app chat sul telefono le conversazioni sono davvero
 monotone e soprattutto vanno subito in loop. Crea una cosa MOOOOOOOLTO interattiva."
 
@@ -647,6 +649,8 @@ JSON e controlla che le opzioni si ritrovino.
 sopra è misurato facendo girare il codice, non guardandolo.
 
 ---
+
+## Scambiarsi il numero con fonici e beatmaker
 
 Da smistare, punto 4 (01/09/2026): "Metti l'opzione di potersi scambiare i numeri di telefono
 con i fonici e i beatmaker, una volta scambiati appare il contatto tra le chat"

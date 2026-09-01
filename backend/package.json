@@ -11,7 +11,8 @@
     "travaso": "node database/travaso.js",
     "copia": "node database/copia.js",
     "carico": "node carico.js",
-    "prova-pg": "node prova.js --pg"
+    "prova-pg": "node prova.js --pg",
+    "postman": "node postman/prova.js"
   },
   "engines": {
     "node": ">=22.5"

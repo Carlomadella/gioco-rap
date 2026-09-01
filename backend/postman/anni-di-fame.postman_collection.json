@@ -1,0 +1,3336 @@
+{
+  "info": {
+    "name": "Anni di Fame — il server",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Tutte le rotte del server di **Anni di Fame**, con dentro i controlli.\n\n## Come si fa girare\n\n1. `cd backend && npm start` (il server sta su `http://127.0.0.1:8787`).\n2. Scegli l'ambiente **Anni di Fame — in casa**.\n3. Runner → questa collezione → Run.\n\nLe cartelle vanno **in ordine**: la 4 apre l'account e la sessione che tutte le\naltre usano, la 12 la chiude e cancella l'account. Una richiesta presa da sola,\nin mezzo, funziona solo se il giro è già passato di lì.\n\n## Cosa serve avere acceso\n\n| manopola | senza di lei |\n| --- | --- |\n| `ADF_ADMIN` | le otto rotte di servizio (cartella 10) rispondono 403 — ed è giusto così |\n| `ADF_APPLE_AUD`, `ADF_GOOGLE_CLIENT`, `ADF_STEAM_CHIAVE` | entrare con Apple/Google/Steam risponde 501 «canale chiuso». La prova accetta tutti e due i casi: quello che non deve mai succedere è un 200 |\n\n## Due avvertenze\n\n- **Non contro il server vero.** La cartella 10 fa girare la settimana e chiude la\n  stagione: sono cose che si vedono da fuori. Contro un database usa e getta, o\n  contro quello di casa.\n- **Il freno è 120 richieste al minuto per indirizzo.** Il giro intero ne fa una\n  ottantina lunga, tutte dentro allo stesso minuto: un secondo giro lanciato\n  subito dopo il primo prende 429."
+  },
+  "item": [
+    {
+      "name": "1 · Il mondo",
+      "description": "Le rotte che rispondono a chiunque, senza sessione: com'è messo il server, le notizie, il feed del telefono.",
+      "item": [
+        {
+          "name": "Lo stato del server",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/stato",
+            "description": "Quanti artisti ci sono, che settimana è, quanti collegati. È la rotta con cui si controlla che il server sia vivo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"dice ok\", function(){ pm.expect(d.ok).to.be.true; });",
+                  "pm.test(\"c'e' gente in pista\", function(){ pm.expect(d.artisti).to.be.above(0); });",
+                  "pm.test(\"la settimana e' un numero da 1 in su\", function(){ pm.expect(d.settimana).to.be.at.least(1); });",
+                  "pm.test(\"dice ogni quante ore gira la settimana\", function(){ pm.expect(d.settimanaOre).to.be.above(0); });",
+                  "pm.collectionVariables.set(\"settimanaPrima\", d.settimana);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Le notizie",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/notizie?quante=5",
+            "description": "Le ultime notizie del mondo. `?quante` va da 1 a 60, di suo 10."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna una lista\", function(){ pm.expect(d.notizie).to.be.an(\"array\"); });",
+                  "pm.test(\"non ne torna piu' di quante chieste\", function(){ pm.expect(d.notizie.length).to.be.at.most(5); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Le notizie · quante fuori scala",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/notizie?quante=99999",
+            "description": "Il tetto è 60: un numero più grande viene stretto lì, non fa esplodere niente."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"il tetto regge: al massimo 60\", function(){ pm.expect(d.notizie.length).to.be.at.most(60); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Il feed di LaFamegram (da sconosciuto)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/feed?quanti=5",
+            "description": "Senza sessione torna solo i post del mondo. Con la sessione ci finiscono anche quelli che riguardano te."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna i post\", function(){ pm.expect(d.post).to.be.an(\"array\"); });",
+                  "pm.test(\"dice a che settimana siamo\", function(){ pm.expect(d.settimana).to.be.at.least(1); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Gli opps · senza dire chi sei",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/opps",
+            "description": "Senza sessione e senza `?io`, il server non sa di chi parli: 404."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 404\", function(){ pm.response.to.have.status(404); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"artista-sconosciuto\\\"\", function(){ pm.expect(d.errore).to.eql(\"artista-sconosciuto\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2 · La classifica",
+      "description": "La classifica vera, una per tutti, coi filtri per città e per genere. La posizione si conta **dentro** al filtro.",
+      "item": [
+        {
+          "name": "La classifica",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/classifica?quanti=5",
+            "description": "Da qui esce anche l'id di un artista qualsiasi, che le prove dopo usano come «l'altro»."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna una lista non vuota\", function(){ pm.expect(d.righe).to.be.an(\"array\").that.is.not.empty; });",
+                  "pm.test(\"ne torna 5 come chiesto\", function(){ pm.expect(d.righe.length).to.eql(5); });",
+                  "pm.test(\"il primo e' in posizione 1\", function(){ pm.expect(d.righe[0].pos).to.eql(1); });",
+                  "pm.test(\"le posizioni salgono di uno alla volta\", function(){",
+                  "  for(var i = 1; i < d.righe.length; i++) pm.expect(d.righe[i].pos).to.eql(d.righe[i-1].pos + 1);",
+                  "});",
+                  "",
+                  "// Regola di gioco, non dettaglio tecnico: il server non deve MAI dire chi e' un bot.",
+                  "pm.test(\"non si vede chi e' un bot\", function(){",
+                  "  pm.expect(JSON.stringify(d.righe)).to.not.match(/\"bot\"/);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set(\"altroId\", d.righe[0].id);",
+                  "pm.collectionVariables.set(\"altraCitta\", d.righe[0].citta);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "La classifica · a pagina due",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/classifica?da=11&quanti=5",
+            "description": "`?da` è la posizione da cui partire."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"parte dalla posizione 11\", function(){ pm.expect(d.righe[0].pos).to.eql(11); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "La classifica · di una citta'",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/classifica?citta={{altraCitta}}&quanti=5",
+            "description": "Il filtro non è un'etichetta appiccicata sopra: dentro a Rovereto sei terzo, non 428esimo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"sono tutti di quella citta'\", function(){",
+                  "  var citta = pm.collectionVariables.get(\"altraCitta\");",
+                  "  d.righe.forEach(function(r){ pm.expect(r.citta).to.eql(citta); });",
+                  "});",
+                  "pm.test(\"la posizione riparte da 1 dentro al filtro\", function(){ pm.expect(d.righe[0].pos).to.eql(1); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "La classifica · di un genere",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/classifica?genere=trap&quanti=5"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"sono tutti trap\", function(){ d.righe.forEach(function(r){ pm.expect(r.genere).to.eql(\"trap\"); }); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "La classifica · genere inventato",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/classifica?genere=liscio&quanti=5",
+            "description": "Un genere che non esiste non è un errore: il filtro si spegne e torna la classifica intera."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna comunque la classifica\", function(){ pm.expect(d.righe).to.be.an(\"array\").that.is.not.empty; });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Le citta' e i generi in gioco",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/classifiche",
+            "description": "Solo quelli che hanno davvero gente dentro: serve a non mostrare un filtro che poi non dà niente."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna le citta'\", function(){ pm.expect(d.citta).to.be.an(\"array\").that.is.not.empty; });",
+                  "pm.test(\"torna i generi\", function(){ pm.expect(d.generi).to.be.an(\"array\").that.is.not.empty; });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3 · Le stagioni",
+      "description": "La stagione corrente, l'albo di chi ha vinto quelle chiuse, e chi hai davanti e dietro.",
+      "item": [
+        {
+          "name": "Le stagioni",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/stagioni"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"c'e' una stagione corrente\", function(){ pm.expect(d.corrente).to.be.an(\"object\"); });",
+                  "pm.test(\"e la lista di tutte\", function(){ pm.expect(d.tutte).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "L'albo d'oro",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/albo"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna l'albo\", function(){ pm.expect(d.albo).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Chi ho davanti e dietro",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/classifica/intorno/{{altroId}}?raggio=3",
+            "description": "Le frecce ▲▼ della schermata di classifica: chi ti sta appena sopra e appena sotto."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna i vicini\", function(){ pm.expect(d.righe).to.be.an(\"array\").that.is.not.empty; });",
+                  "pm.test(\"dice quanti sono in tutto\", function(){ pm.expect(d.totale).to.be.above(0); });",
+                  "",
+                  "// Senza questo, la schermata non saprebbe quale riga evidenziare.",
+                  "pm.test(\"e segna qual e' quello chiesto\", function(){",
+                  "  var mio = d.righe.filter(function(r){ return r.io === true; });",
+                  "  pm.expect(mio).to.have.lengthOf(1);",
+                  "  pm.expect(mio[0].id).to.eql(pm.collectionVariables.get(\"altroId\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Chi ho davanti · artista che non c'e'",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/classifica/intorno/00000000-0000-4000-8000-000000000000"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 404\", function(){ pm.response.to.have.status(404); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"artista-sconosciuto\\\"\", function(){ pm.expect(d.errore).to.eql(\"artista-sconosciuto\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4 · Account e sessioni",
+      "description": "Gli account (mail, ospite, Steam/Apple/Google) e le sessioni.\n\n**Da qui in poi le prove vanno in ordine**: la sessione che si apre qui la usano tutte le cartelle dopo.",
+      "item": [
+        {
+          "name": "Apri un account con la mail",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/account",
+            "description": "Fa l'account e apre subito la sessione: torna il token che serve a tutto il resto.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"email\",\n  \"email\": \"{{email}}\",\n  \"segreto\": \"{{segreto}}\",\n  \"dispositivo\": {\n    \"piattaforma\": \"web\",\n    \"nome\": \"Postman\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Ogni giro si fa un account suo: se no il secondo giro trova la mail gia' usata",
+                  "// e il nome dell'artista gia' occupato.",
+                  "var n = Math.random().toString(36).slice(2, 8);",
+                  "pm.collectionVariables.set(\"email\", \"prova-\" + n + \"@annidifame.test\");",
+                  "pm.collectionVariables.set(\"segreto\", \"segreto-\" + n);",
+                  "pm.collectionVariables.set(\"nomeArtista\", (\"Prova \" + n).slice(0, 22));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 201\", function(){ pm.response.to.have.status(201); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna un token\", function(){ pm.expect(d.token).to.be.a(\"string\").with.length.above(20); });",
+                  "pm.test(\"torna l'account, attivo\", function(){ pm.expect(d.account.stato).to.eql(\"attivo\"); });",
+                  "pm.test(\"la mail e' quella\", function(){ pm.expect(d.account.email).to.eql(pm.collectionVariables.get(\"email\")); });",
+                  "",
+                  "// Il segreto non deve tornare indietro. Mai, in nessuna forma.",
+                  "pm.test(\"il segreto non torna indietro\", function(){",
+                  "  pm.expect(pm.response.text()).to.not.include(pm.collectionVariables.get(\"segreto\"));",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set(\"token\", d.token);",
+                  "pm.collectionVariables.set(\"accountId\", d.account.id);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Account · la stessa mail due volte",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/account",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"email\",\n  \"email\": \"{{email}}\",\n  \"segreto\": \"{{segreto}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 409\", function(){ pm.response.to.have.status(409); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"email-gia-usata\\\"\", function(){ pm.expect(d.errore).to.eql(\"email-gia-usata\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Account · mail scritta male",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/account",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"email\",\n  \"email\": \"non-e-una-mail\",\n  \"segreto\": \"abbastanza-lungo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 400\", function(){ pm.response.to.have.status(400); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"email-non-valida\\\"\", function(){ pm.expect(d.errore).to.eql(\"email-non-valida\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Account · segreto troppo corto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/account",
+            "description": "Meno di 8 caratteri non passa.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"email\",\n  \"email\": \"corto-{{$randomInt}}@annidifame.test\",\n  \"segreto\": \"corto\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 400\", function(){ pm.response.to.have.status(400); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"segreto-troppo-corto\\\"\", function(){ pm.expect(d.errore).to.eql(\"segreto-troppo-corto\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Account · da ospite",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/account",
+            "description": "Senza compilare niente. Torna anche `identita.idEsterno`, che è l'unica cosa con cui ci si rientra: il gioco se lo deve tenere.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"ospite\",\n  \"dispositivo\": {\n    \"piattaforma\": \"web\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 201\", function(){ pm.response.to.have.status(201); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna il token\", function(){ pm.expect(d.token).to.be.a(\"string\"); });",
+                  "pm.test(\"torna l'idEsterno per rientrare\", function(){ pm.expect(d.identita.idEsterno).to.be.a(\"string\"); });",
+                  "pm.collectionVariables.set(\"ospiteId\", d.identita.idEsterno);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Rientra da ospite",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/sessione",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"ospite\",\n  \"idEsterno\": \"{{ospiteId}}\",\n  \"dispositivo\": {\n    \"piattaforma\": \"web\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna una sessione nuova\", function(){ pm.expect(d.token).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Rientra con la mail",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/sessione",
+            "description": "Rimette a posto `token` sull'account con la mail: le prove dopo lavorano su quello.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"email\",\n  \"email\": \"{{email}}\",\n  \"segreto\": \"{{segreto}}\",\n  \"dispositivo\": {\n    \"piattaforma\": \"web\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"e' lo stesso account\", function(){ pm.expect(d.account.id).to.eql(pm.collectionVariables.get(\"accountId\")); });",
+                  "pm.collectionVariables.set(\"token\", d.token);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Rientra · segreto sbagliato",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/sessione",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"email\",\n  \"email\": \"{{email}}\",\n  \"segreto\": \"questo-non-e-il-segreto\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 403\", function(){ pm.response.to.have.status(403); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"non-torna\\\"\", function(){ pm.expect(d.errore).to.eql(\"non-torna\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Rientra con Apple · biglietto finto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/sessione",
+            "description": "Senza le chiavi di Apple (`ADF_APPLE_AUD`) il canale è chiuso e lo dice: **501**. Con le chiavi messe, un biglietto finto prende **403**. Quello che non deve mai succedere è un 200.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"apple\",\n  \"biglietto\": \"questo-non-e-un-biglietto\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"non fa entrare: 501 se il canale e' chiuso, 403 se il biglietto e' finto\", function(){",
+                  "  pm.expect(pm.response.code).to.be.oneOf([501, 403]);",
+                  "});",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"non torna nessun token\", function(){ pm.expect(d.token).to.be.undefined; });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Chi sono",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              }
+            ],
+            "url": "{{base}}/api/io",
+            "description": "Tutto quello che sei: account, artisti, salvataggi, traguardi. La chiamata con cui il gioco si ritrova al primo avvio."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna il mio account\", function(){ pm.expect(d.account.id).to.eql(pm.collectionVariables.get(\"accountId\")); });",
+                  "pm.test(\"torna la lista degli artisti\", function(){ pm.expect(d.artisti).to.be.an(\"array\"); });",
+                  "pm.test(\"torna le carriere\", function(){ pm.expect(d.carriere).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Chi sono · senza sessione",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/io"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 403\", function(){ pm.response.to.have.status(403); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"sessione-scaduta\\\"\", function(){ pm.expect(d.errore).to.eql(\"sessione-scaduta\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Chi sono · con un token inventato",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "questo-token-non-esiste"
+              }
+            ],
+            "url": "{{base}}/api/io",
+            "description": "Un token a caso non deve valere più di niente."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 403\", function(){ pm.response.to.have.status(403); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"sessione-scaduta\\\"\", function(){ pm.expect(d.errore).to.eql(\"sessione-scaduta\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5 · Gli artisti",
+      "description": "Iscriversi in classifica, cambiare la propria scheda, mandare un punteggio. E i freni: i nomi che non vanno, la roba degli altri, il punteggio mandato troppo in fretta.",
+      "item": [
+        {
+          "name": "Iscrivi un artista",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/artista",
+            "description": "Con la sessione addosso, l'artista finisce sotto il tuo account. Senza, il server apre un account da ospite al volo — perché entrare in classifica non deve chiedere di compilare niente.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"{{nomeArtista}}\",\n  \"citta\": \"Rovereto\",\n  \"genere\": \"trap\",\n  \"storia\": \"Comincia da zero.\",\n  \"seed\": 12345\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 201\", function(){ pm.response.to.have.status(201); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna l'id\", function(){ pm.expect(d.id).to.be.a(\"string\"); });",
+                  "pm.test(\"il nome e' quello chiesto\", function(){ pm.expect(d.nome).to.eql(pm.collectionVariables.get(\"nomeArtista\")); });",
+                  "pm.test(\"la citta' e' quella chiesta\", function(){ pm.expect(d.citta).to.eql(\"Rovereto\"); });",
+                  "",
+                  "// La chiave vecchio stile torna una volta sola, alla nascita.",
+                  "pm.test(\"torna la chiave, una volta sola\", function(){ pm.expect(d.chiave).to.be.a(\"string\"); });",
+                  "",
+                  "pm.collectionVariables.set(\"artistaId\", d.id);",
+                  "pm.collectionVariables.set(\"chiave\", d.chiave);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Artista · nome gia' preso",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/artista",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"{{nomeArtista}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 409\", function(){ pm.response.to.have.status(409); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"nome-occupato\\\"\", function(){ pm.expect(d.errore).to.eql(\"nome-occupato\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Artista · nome di una lettera",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/artista",
+            "description": "Sotto i due caratteri il nome non è un nome.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"a\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 400\", function(){ pm.response.to.have.status(400); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"nome-non-valido\\\"\", function(){ pm.expect(d.errore).to.eql(\"nome-non-valido\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Artista · nome che finge di essere noi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/artista",
+            "description": "«Admin», «Staff», «La Fame Studio». Non è offensivo, è peggio: è qualcuno che può farsi credere.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Admin Ufficiale\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 400\", function(){ pm.response.to.have.status(400); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"nome-riservato\\\"\", function(){ pm.expect(d.errore).to.eql(\"nome-riservato\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "La scheda di un artista",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/artista/{{artistaId}}",
+            "description": "Pubblica: la si guarda anche senza sessione."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"e' il mio\", function(){ pm.expect(d.id).to.eql(pm.collectionVariables.get(\"artistaId\")); });",
+                  "pm.test(\"non fa vedere la chiave\", function(){",
+                  "  pm.expect(pm.response.text()).to.not.include(pm.collectionVariables.get(\"chiave\"));",
+                  "});",
+                  "pm.test(\"non dice se e' un bot\", function(){ pm.expect(d.bot).to.be.undefined; });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "La scheda · artista che non c'e'",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/artista/00000000-0000-4000-8000-000000000000"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 404\", function(){ pm.response.to.have.status(404); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"artista-sconosciuto\\\"\", function(){ pm.expect(d.errore).to.eql(\"artista-sconosciuto\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Cambia la mia scheda",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/artista/{{artistaId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"citta\": \"Milano\",\n  \"genere\": \"drill\",\n  \"storia\": \"Si e' trasferito.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"la citta' e' cambiata\", function(){ pm.expect(d.citta).to.eql(\"Milano\"); });",
+                  "pm.test(\"il genere e' cambiato\", function(){ pm.expect(d.genere).to.eql(\"drill\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Cambia la scheda · di uno che non e' mio",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/artista/{{altroId}}",
+            "description": "Il freno che conta: con la mia sessione non tocco la roba di un altro.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Rubato\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 403\", function(){ pm.response.to.have.status(403); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"non-e-tuo\\\"\", function(){ pm.expect(d.errore).to.eql(\"non-e-tuo\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Manda un punteggio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/punteggio",
+            "description": "Il gioco manda i numeri della settimana. Il server li mette in classifica e dà i traguardi che gli spettano.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{artistaId}}\",\n  \"stream\": 12000,\n  \"fan\": 800,\n  \"livello\": 5,\n  \"fase\": 2,\n  \"uscite\": 3,\n  \"ultima\": \"Il primo pezzo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"dice ok\", function(){ pm.expect(d.ok).to.be.true; });",
+                  "pm.test(\"torna la posizione in classifica\", function(){ pm.expect(d.pos).to.be.a(\"number\").above(0); });",
+                  "pm.test(\"e quanti sono in tutto\", function(){ pm.expect(d.totale).to.be.above(0); });",
+                  "",
+                  "// Qui si vede la riga che divide: 12.000 stream e 3 uscite bastano, e i",
+                  "// traguardi che il server sa controllare da se' arrivano da soli, senza",
+                  "// che il gioco li abbia chiesti.",
+                  "pm.test(\"e i traguardi che spettano, dati dal server da solo\", function(){",
+                  "  pm.expect(d.traguardi).to.include(\"primo_pezzo\");",
+                  "  pm.expect(d.traguardi).to.include(\"primi_mille\");",
+                  "  pm.expect(d.traguardi).to.include(\"in_classifica\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Punteggio · subito un altro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/punteggio",
+            "description": "Il freno contro chi manda punteggi a raffica: fra due invii dello stesso artista devono passare `ADF_INVIO_MS` (10 secondi di suo).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{artistaId}}\",\n  \"stream\": 99999999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 429\", function(){ pm.response.to.have.status(429); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"troppo-in-fretta\\\"\", function(){ pm.expect(d.errore).to.eql(\"troppo-in-fretta\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Punteggio · per un artista che non e' mio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/punteggio",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{altroId}}\",\n  \"stream\": 99999999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 403\", function(){ pm.response.to.have.status(403); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"non-e-tuo\\\"\", function(){ pm.expect(d.errore).to.eql(\"non-e-tuo\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6 · Il mondo che ti riguarda",
+      "description": "Le stesse rotte della prima cartella, ma adesso il server sa chi sei — più le relazioni fra artisti.",
+      "item": [
+        {
+          "name": "Il feed, con la sessione",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              }
+            ],
+            "url": "{{base}}/api/feed?quanti=10"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna i post\", function(){ pm.expect(d.post).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Gli opps",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              }
+            ],
+            "url": "{{base}}/api/opps?quanti=3",
+            "description": "Chi ti sta appena sopra in classifica (`sopra`), più chi ti sei preso come rivale (`dichiarati`)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"dice chi sono io\", function(){ pm.expect(d.io.id).to.eql(pm.collectionVariables.get(\"artistaId\")); });",
+                  "pm.test(\"torna chi mi sta sopra\", function(){ pm.expect(d.sopra).to.be.an(\"array\"); });",
+                  "pm.test(\"e i rivali dichiarati: per ora nessuno\", function(){",
+                  "  pm.expect(d.dichiarati).to.be.an(\"array\").that.is.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Prenditi un rivale",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/relazione",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{artistaId}}\",\n  \"altroId\": \"{{altroId}}\",\n  \"tipo\": \"rivale\",\n  \"nota\": \"Se l'e' cercata.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"dice con chi\", function(){ pm.expect(d.con).to.be.a(\"string\"); });",
+                  "pm.test(\"e di che tipo\", function(){ pm.expect(d.tipo).to.eql(\"rivale\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Rivale · lo stesso due volte",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/relazione",
+            "description": "Non è un errore: era già così, e il server lo dice invece di raddoppiare la riga.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{artistaId}}\",\n  \"altroId\": \"{{altroId}}\",\n  \"tipo\": \"rivale\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"dice che c'era gia'\", function(){ pm.expect(d.gia).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Relazione · un tipo che non esiste",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/relazione",
+            "description": "I tipi buoni sono quattro: rivale, feat, amico, crew.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{artistaId}}\",\n  \"altroId\": \"{{altroId}}\",\n  \"tipo\": \"nemico giurato\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 400\", function(){ pm.response.to.have.status(400); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"relazione-non-valida\\\"\", function(){ pm.expect(d.errore).to.eql(\"relazione-non-valida\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Relazione · con se stessi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/relazione",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{artistaId}}\",\n  \"altroId\": \"{{artistaId}}\",\n  \"tipo\": \"rivale\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 400\", function(){ pm.response.to.have.status(400); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"relazione-non-valida\\\"\", function(){ pm.expect(d.errore).to.eql(\"relazione-non-valida\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Relazione · a nome di un altro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/relazione",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{altroId}}\",\n  \"altroId\": \"{{artistaId}}\",\n  \"tipo\": \"rivale\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 403\", function(){ pm.response.to.have.status(403); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"non-e-tuo\\\"\", function(){ pm.expect(d.errore).to.eql(\"non-e-tuo\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Gli opps · adesso col rivale dentro",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              }
+            ],
+            "url": "{{base}}/api/opps?quanti=3",
+            "description": "La prova che le due rotte si tengono: quello che ti sei preso come rivale ricompare qui, in `dichiarati`."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"il rivale appena preso e' fra i dichiarati\", function(){",
+                  "  var ids = d.dichiarati.map(function(r){ return r.id; });",
+                  "  pm.expect(ids).to.include(pm.collectionVariables.get(\"altroId\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Togli il rivale",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/relazione",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{artistaId}}\",\n  \"altroId\": \"{{altroId}}\",\n  \"tipo\": \"rimuovi\",\n  \"era\": \"rivale\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"dice ok\", function(){ pm.expect(d.ok).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Gli opps · e adesso non c'e' piu'",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              }
+            ],
+            "url": "{{base}}/api/opps?quanti=3"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"tolto il rivale, i dichiarati sono di nuovo vuoti\", function(){",
+                  "  pm.expect(d.dichiarati).to.be.an(\"array\").that.is.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "7 · I salvataggi in cloud",
+      "description": "Tre slot per account. È quello che porta una carriera dal PC al telefono — e la parte delicata è cosa succede quando due dispositivi salvano la stessa partita.",
+      "item": [
+        {
+          "name": "Salva nello slot 1",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/carriera/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stato\": {\n    \"settimana\": 40,\n    \"soldi\": 1200,\n    \"nome\": \"prova\"\n  },\n  \"settimana\": 40,\n  \"anno\": 1,\n  \"versioneGioco\": \"1.0.0\",\n  \"artistaId\": \"{{artistaId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna la scheda del salvataggio\", function(){ pm.expect(d.salvata.slot).to.eql(1); });",
+                  "pm.test(\"con la settimana giusta\", function(){ pm.expect(d.salvata.settimana).to.eql(40); });",
+                  "pm.test(\"e quanto pesa\", function(){ pm.expect(d.salvata.byte).to.be.above(0); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Rileggi lo slot 1",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              }
+            ],
+            "url": "{{base}}/api/carriera/1"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna lo stato salvato, uguale\", function(){ pm.expect(d.stato.soldi).to.eql(1200); });",
+                  "pm.test(\"e la settimana\", function(){ pm.expect(d.settimana).to.eql(40); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Salva una partita piu' indietro",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/carriera/1",
+            "description": "**Il caso che conta.** In cloud c'è la settimana 40, questo dispositivo è alla 12. Non si fondono da soli — si perderebbe roba senza che nessuno capisca perché. Chi resta indietro se lo sente dire: **409**, con dentro cosa c'è già salvato.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stato\": {\n    \"settimana\": 12,\n    \"soldi\": 10\n  },\n  \"settimana\": 12,\n  \"anno\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 409\", function(){ pm.response.to.have.status(409); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"dice che in cloud c'e' roba piu' avanti\", function(){ pm.expect(d.errore).to.eql(\"carriera-piu-avanti\"); });",
+                  "pm.test(\"e dice cosa c'e', per poter scegliere\", function(){ pm.expect(d.salvata.settimana).to.eql(40); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Salva piu' indietro, ma forzando",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/carriera/1",
+            "description": "`forza: true` è il «sì, sovrascrivi» del giocatore. Solo dopo averglielo chiesto.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stato\": {\n    \"settimana\": 12,\n    \"soldi\": 10\n  },\n  \"settimana\": 12,\n  \"anno\": 1,\n  \"forza\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"adesso in cloud c'e' la 12\", function(){ pm.expect(d.salvata.settimana).to.eql(12); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Salva · senza stato",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/carriera/2",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"settimana\": 3,\n  \"anno\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 400\", function(){ pm.response.to.have.status(400); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"stato-mancante\\\"\", function(){ pm.expect(d.errore).to.eql(\"stato-mancante\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Leggi uno slot vuoto",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              }
+            ],
+            "url": "{{base}}/api/carriera/3"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 404\", function(){ pm.response.to.have.status(404); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"slot-vuoto\\\"\", function(){ pm.expect(d.errore).to.eql(\"slot-vuoto\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Leggi lo slot 4 · non esiste",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              }
+            ],
+            "url": "{{base}}/api/carriera/4",
+            "description": "Gli slot sono tre. Il quarto non è uno slot vuoto: è una rotta che non c'è."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 404\", function(){ pm.response.to.have.status(404); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"rotta-sconosciuta\\\"\", function(){ pm.expect(d.errore).to.eql(\"rotta-sconosciuta\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Tutti i miei salvataggi",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              }
+            ],
+            "url": "{{base}}/api/carriere"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"ce n'e' uno solo, lo slot 1\", function(){",
+                  "  pm.expect(d.carriere).to.be.an(\"array\").with.lengthOf(1);",
+                  "  pm.expect(d.carriere[0].slot).to.eql(1);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "I salvataggi · senza sessione",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/carriere"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 403\", function(){ pm.response.to.have.status(403); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"sessione-scaduta\\\"\", function(){ pm.expect(d.errore).to.eql(\"sessione-scaduta\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "8 · I traguardi",
+      "description": "Il catalogo, quelli presi, e la richiesta di uno nuovo.\n\nLa riga che divide: quelli che il server sa controllare da sé **non si chiedono**, se no basterebbe la console del browser.",
+      "item": [
+        {
+          "name": "Il catalogo dei traguardi",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/traguardi"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"il catalogo non e' vuoto\", function(){ pm.expect(d.traguardi).to.be.an(\"array\").that.is.not.empty; });",
+                  "pm.test(\"ogni traguardo ha codice e nome\", function(){",
+                  "  d.traguardi.forEach(function(t){ pm.expect(t.codice).to.be.a(\"string\"); pm.expect(t.nome).to.be.a(\"string\"); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Chiedi un traguardo che sa solo il gioco",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/traguardo",
+            "description": "«Milano» il server non può saperlo: gliel'ha detto il gioco. Questo passa.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{artistaId}}\",\n  \"codice\": \"milano\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"il traguardo e' stato dato\", function(){",
+                  "  pm.expect(d.gia === true || d.nuovo === true || d.ok === true).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Chiedi un traguardo che da' il server",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/traguardo",
+            "description": "**`primo_pezzo` lo guarda il server ai numeri che ha in mano.** Chiederlo dal client è esattamente la strada che porta ai traguardi presi aprendo la console — e con Steam attaccato dietro, quella differenza è tutto. Qui deve rispondere 409.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{artistaId}}\",\n  \"codice\": \"primo_pezzo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 409\", function(){ pm.response.to.have.status(409); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"questo-lo-da-il-server\\\"\", function(){ pm.expect(d.errore).to.eql(\"questo-lo-da-il-server\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Chiedi un traguardo inventato",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/traguardo",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{artistaId}}\",\n  \"codice\": \"traguardo_che_non_esiste\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 404\", function(){ pm.response.to.have.status(404); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"traguardo-sconosciuto\\\"\", function(){ pm.expect(d.errore).to.eql(\"traguardo-sconosciuto\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Traguardo · per un artista non mio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/traguardo",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{altroId}}\",\n  \"codice\": \"milano\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 403\", function(){ pm.response.to.have.status(403); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"non-e-tuo\\\"\", function(){ pm.expect(d.errore).to.eql(\"non-e-tuo\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "I traguardi di un artista",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/traguardi/{{artistaId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"c'e' dentro Milano, quello appena preso\", function(){",
+                  "  pm.expect(d.traguardi.map(function(t){ return t.codice; })).to.include(\"milano\");",
+                  "});",
+                  "",
+                  "// Il punteggio di prima (12.000 stream, 3 uscite) doveva far scattare i suoi da solo.",
+                  "pm.test(\"e quelli che il server si e' dato da solo col punteggio\", function(){",
+                  "  var codici = d.traguardi.map(function(t){ return t.codice; });",
+                  "  pm.expect(codici).to.include(\"primo_pezzo\");",
+                  "  pm.expect(codici).to.include(\"primi_mille\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "9 · Segnalare un nome",
+      "description": "Chi gioca segnala un nome che non va. Le segnalazioni finiscono nella coda che si guarda dalle rotte di servizio.",
+      "item": [
+        {
+          "name": "Segnala un artista",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/segnalazione",
+            "description": "Si segnala il proprio, in prova: così non si sporca la coda vera con roba finta.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{artistaId}}\",\n  \"motivo\": \"nome\",\n  \"nota\": \"prova di Postman, si puo' respingere\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"dice ok\", function(){ pm.expect(d.ok).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Segnala · lo stesso due volte",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/segnalazione",
+            "description": "Uno solo non può contare per dieci: la seconda segnalazione dallo stesso account non raddoppia niente.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{artistaId}}\",\n  \"motivo\": \"nome\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"dice che c'era gia'\", function(){ pm.expect(d.gia).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Segnala · un bot",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/segnalazione",
+            "description": "I bot non si segnalano: non c'è nessuno da moderare dietro. E il server non dice «è un bot» — dice solo che non lo trova.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{altroId}}\",\n  \"motivo\": \"nome\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 404\", function(){ pm.response.to.have.status(404); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"artista-sconosciuto\\\"\", function(){ pm.expect(d.errore).to.eql(\"artista-sconosciuto\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Segnala · senza sessione",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/segnalazione",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{artistaId}}\",\n  \"motivo\": \"nome\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 403\", function(){ pm.response.to.have.status(403); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"sessione-scaduta\\\"\", function(){ pm.expect(d.errore).to.eql(\"sessione-scaduta\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "10 · Le rotte di servizio",
+      "description": "Le otto rotte da dietro le quinte: la coda della moderazione, le sanzioni, il giro di settimana, i traguardi da spingere sugli store.\n\n**Vogliono `ADF_ADMIN`**, e senza quella manopola sono chiuse per tutti — così un server messo su di fretta non se le ritrova aperte per sbaglio.",
+      "item": [
+        {
+          "name": "Servizio · senza la chiave",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/sospetti",
+            "description": "Il primo controllo: senza `x-admin` non si entra. Vale per tutte e otto."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 403\", function(){ pm.response.to.have.status(403); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"non-sei-tu\\\"\", function(){ pm.expect(d.errore).to.eql(\"non-sei-tu\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Servizio · con la chiave sbagliata",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin",
+                "value": "questa-chiave-non-e-quella-giusta"
+              }
+            ],
+            "url": "{{base}}/api/sospetti"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 403\", function(){ pm.response.to.have.status(403); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"non-sei-tu\\\"\", function(){ pm.expect(d.errore).to.eql(\"non-sei-tu\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "I sospetti",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin",
+                "value": "{{admin}}"
+              }
+            ],
+            "url": "{{base}}/api/sospetti?quanti=10",
+            "description": "Chi ha mandato numeri che non stanno in piedi."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna la lista\", function(){ pm.expect(d.sospetti).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "La coda da guardare",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin",
+                "value": "{{admin}}"
+              }
+            ],
+            "url": "{{base}}/api/da-guardare?quanti=30"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna la coda\", function(){ pm.expect(d.artisti).to.be.an(\"array\"); });",
+                  "pm.test(\"c'e' dentro quello segnalato poco fa\", function(){",
+                  "  var ids = d.artisti.map(function(a){ return a.artista_id; });",
+                  "  pm.expect(ids).to.include(pm.collectionVariables.get(\"artistaId\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Respingi la segnalazione",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-admin",
+                "value": "{{admin}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/moderazione",
+            "description": "Il nome va bene: la segnalazione si chiude e basta.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{artistaId}}\",\n  \"azione\": \"respingi\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"dice ok\", function(){ pm.expect(d.ok).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Moderazione · un'azione che non esiste",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-admin",
+                "value": "{{admin}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/moderazione",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{artistaId}}\",\n  \"azione\": \"bandisci\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 400\", function(){ pm.response.to.have.status(400); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"azione-sconosciuta\\\"\", function(){ pm.expect(d.errore).to.eql(\"azione-sconosciuta\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Rinomina d'ufficio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-admin",
+                "value": "{{admin}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/moderazione",
+            "description": "Togliere un nome non è una punizione da scrivere in faccia a tutti: è un nome neutro al posto suo. Quello di prima resta nel database, per poter rispondere a «perché mi avete cambiato il nome».",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{artistaId}}\",\n  \"azione\": \"rinomina\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna il nome nuovo\", function(){ pm.expect(d.nome).to.be.a(\"string\"); });",
+                  "pm.test(\"e quello di prima, che era il mio\", function(){",
+                  "  pm.expect(d.prima).to.eql(pm.collectionVariables.get(\"nomeArtista\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Una sanzione",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-admin",
+                "value": "{{admin}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/sanzione",
+            "description": "Un avviso: resta scritto, ma non toglie nessuno dalla classifica. `fuori_classifica` e `sospensione` invece pesano.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accountId\": \"{{accountId}}\",\n  \"tipo\": \"avviso\",\n  \"motivo\": \"prova di Postman\",\n  \"giorni\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"dice che tipo di sanzione e'\", function(){ pm.expect(d.tipo).to.eql(\"avviso\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Sanzione · un tipo che non esiste",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-admin",
+                "value": "{{admin}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/sanzione",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accountId\": \"{{accountId}}\",\n  \"tipo\": \"fucilazione\",\n  \"motivo\": \"no\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 400\", function(){ pm.response.to.have.status(400); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"sanzione-non-valida\\\"\", function(){ pm.expect(d.errore).to.eql(\"sanzione-non-valida\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "I traguardi da spingere sugli store",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin",
+                "value": "{{admin}}"
+              }
+            ],
+            "url": "{{base}}/api/da-spingere",
+            "description": "Quelli presi qui e non ancora raccontati a Steam o agli store del telefono."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna la lista\", function(){ pm.expect(d.traguardi).to.be.an(\"array\"); });",
+                  "pm.test(\"ci sono i miei, non ancora spinti\", function(){ pm.expect(d.traguardi.length).to.be.above(0); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Segna un traguardo come spinto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-admin",
+                "value": "{{admin}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/spinto",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistaId\": \"{{artistaId}}\",\n  \"codice\": \"milano\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"dice ok\", function(){ pm.expect(d.ok).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Il giro di settimana",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-admin",
+                "value": "{{admin}}"
+              }
+            ],
+            "url": "{{base}}/api/giro",
+            "description": "Fa girare la classifica di una settimana: i bot si muovono, escono le notizie. Di suo succede da solo ogni 24 ore."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"la settimana e' avanzata di uno\", function(){",
+                  "  pm.expect(d.settimana).to.eql(Number(pm.collectionVariables.get(\"settimanaPrima\")) + 1);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Chiudi la stagione",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-admin",
+                "value": "{{admin}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/stagione/chiudi",
+            "description": "Scrive nell'albo i primi 100 e apre la stagione dopo.\n\n**Non è una prova da fare su un server vero**: azzera lo slancio dei bot e chiude la stagione per tutti.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quanti\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"dice quale ha chiuso e quale ha aperto\", function(){",
+                  "  pm.expect(d.chiusa).to.be.a(\"string\");",
+                  "  pm.expect(d.nuova).to.be.a(\"string\");",
+                  "  pm.expect(d.nuova).to.not.eql(d.chiusa);",
+                  "});",
+                  "pm.test(\"e quanti ne ha scritti nell'albo\", function(){",
+                  "  pm.expect(d.inAlbo).to.be.at.least(1).and.at.most(10);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "11 · I bordi",
+      "description": "Le cose che non sono una rotta: il preflight del browser, una rotta che non c'è, un corpo scritto male.",
+      "item": [
+        {
+          "name": "Il preflight del browser (CORS)",
+          "request": {
+            "method": "OPTIONS",
+            "header": [],
+            "url": "{{base}}/api/stato",
+            "description": "Quello che il browser manda da solo prima di una POST. Deve rispondere 204 e dire quali intestazioni accetta — se sbaglia questa, il gioco nel browser non parla più col server e in console si vede solo «CORS error»."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 204\", function(){ pm.response.to.have.status(204); });",
+                  "pm.test(\"dice quali metodi accetta\", function(){",
+                  "  pm.expect(pm.response.headers.get(\"access-control-allow-methods\")).to.include(\"POST\");",
+                  "});",
+                  "pm.test(\"e accetta le nostre intestazioni\", function(){",
+                  "  var h = (pm.response.headers.get(\"access-control-allow-headers\") || \"\").toLowerCase();",
+                  "  pm.expect(h).to.include(\"x-sessione\");",
+                  "  pm.expect(h).to.include(\"x-admin\");",
+                  "  pm.expect(h).to.include(\"x-chiave\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Una rotta che non c'e'",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/api/questa-rotta-non-esiste"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 404\", function(){ pm.response.to.have.status(404); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"rotta-sconosciuta\\\"\", function(){ pm.expect(d.errore).to.eql(\"rotta-sconosciuta\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "La radice",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base}}/",
+            "description": "Il server è solo API: non serve pagine."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 404\", function(){ pm.response.to.have.status(404); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"rotta-sconosciuta\\\"\", function(){ pm.expect(d.errore).to.eql(\"rotta-sconosciuta\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Un corpo che non e' JSON",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/artista",
+            "description": "Deve rispondere 400 e non 500: è un errore di chi chiama, non del server.",
+            "body": {
+              "mode": "raw",
+              "raw": "{ questo non e' json",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 400\", function(){ pm.response.to.have.status(400); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"json non valido\\\"\", function(){ pm.expect(d.errore).to.eql(\"json non valido\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Il metodo sbagliato",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base}}/api/classifica",
+            "description": "La rotta esiste in GET. In DELETE non esiste, e il server lo dice così."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 404\", function(){ pm.response.to.have.status(404); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"rotta-sconosciuta\\\"\", function(){ pm.expect(d.errore).to.eql(\"rotta-sconosciuta\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "12 · Chiudere",
+      "description": "Uscire, e cancellare l'account — quella che Apple e Google pretendono **dentro** al gioco. In fondo apposta: da qui in poi la sessione non vale più.",
+      "item": [
+        {
+          "name": "Esci",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              }
+            ],
+            "url": "{{base}}/api/sessione"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"dice ok\", function(){ pm.expect(d.ok).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Esci · un'altra volta",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              }
+            ],
+            "url": "{{base}}/api/sessione",
+            "description": "Il token è stato revocato: adesso non vale più."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 403\", function(){ pm.response.to.have.status(403); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"sessione-scaduta\\\"\", function(){ pm.expect(d.errore).to.eql(\"sessione-scaduta\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Rientra per poter cancellare",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/sessione",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"email\",\n  \"email\": \"{{email}}\",\n  \"segreto\": \"{{segreto}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"torna un token nuovo\", function(){ pm.expect(d.token).to.be.a(\"string\"); });",
+                  "pm.collectionVariables.set(\"token\", d.token);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Cancella l'account · senza confermare",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/account",
+            "description": "Una cancellazione non deve poter partire per sbaglio.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 400\", function(){ pm.response.to.have.status(400); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"serve-la-conferma\\\"\", function(){ pm.expect(d.errore).to.eql(\"serve-la-conferma\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Cancella l'account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              },
+              {
+                "key": "content-type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base}}/api/account",
+            "description": "Non cancella la storia della classifica — quella è di tutti. Toglie il nome e tutto quello che è personale, e ritira gli artisti.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conferma\": \"cancella\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"dice ok\", function(){ pm.expect(d.ok).to.be.true; });",
+                  "pm.test(\"dice quanti artisti ha ritirato\", function(){ pm.expect(d.artistiRitirati).to.be.at.least(1); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Chi sono · dopo la cancellazione",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-sessione",
+                "value": "{{token}}"
+              }
+            ],
+            "url": "{{base}}/api/io",
+            "description": "La prova che ha funzionato davvero: la sessione di un account cancellato non vale più niente."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"risponde 403\", function(){ pm.response.to.have.status(403); });",
+                  "pm.test(\"e la risposta e' JSON\", function(){ pm.response.to.be.json; });",
+                  "var d = pm.response.json();",
+                  "pm.test(\"l'errore e' \\\"sessione-scaduta\\\"\", function(){ pm.expect(d.errore).to.eql(\"sessione-scaduta\"); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test(\"il server non si e' spaccato\", function(){",
+          "  pm.expect(pm.response.code).to.not.be.oneOf([500, 502, 503, 504]);",
+          "});",
+          "pm.test(\"risponde entro un secondo\", function(){ pm.expect(pm.response.responseTime).to.be.below(1000); });"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base",
+      "value": "http://127.0.0.1:8787",
+      "description": "Dove sta il server."
+    },
+    {
+      "key": "admin",
+      "value": "",
+      "description": "ADF_ADMIN: la chiave delle rotte di servizio. Vuota = cartella 10 tutta 403."
+    },
+    {
+      "key": "token",
+      "value": "",
+      "description": "La sessione. La riempie la cartella 4."
+    },
+    {
+      "key": "accountId",
+      "value": ""
+    },
+    {
+      "key": "artistaId",
+      "value": ""
+    },
+    {
+      "key": "chiave",
+      "value": "",
+      "description": "La chiave vecchio stile dell'artista, per l'intestazione x-chiave."
+    },
+    {
+      "key": "altroId",
+      "value": "",
+      "description": "Un artista che non è mio: serve alle prove dei permessi."
+    },
+    {
+      "key": "altraCitta",
+      "value": ""
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "segreto",
+      "value": ""
+    },
+    {
+      "key": "nomeArtista",
+      "value": ""
+    },
+    {
+      "key": "ospiteId",
+      "value": ""
+    },
+    {
+      "key": "settimanaPrima",
+      "value": ""
+    }
+  ]
+}

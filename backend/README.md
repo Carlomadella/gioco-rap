@@ -69,6 +69,22 @@ npm run prova-pg          # vuole ADF_PG (in .env.local va benissimo)
 Non tocca le tabelle vere: si fa uno **schema usa e getta** per il giro (`prova_<a caso>`),
 ci lavora dentro e alla fine lo butta.
 
+## Le rotte, provate da fuori (Postman)
+
+```bash
+npm run postman           # 91 richieste, 498 controlli, ~9 secondi
+```
+
+Tutte e **34 le rotte** in una collezione Postman, che gira contro un server usa e getta
+tirato su per l'occasione. Dove `npm run prova` guarda il server da dentro — apre il
+database, controlla che le chiavi ci stiano solo come hash — questa lo guarda **da fuori**,
+come lo vede il gioco: metodo, stato HTTP, forma della risposta, e quale errore risponde,
+non solo quale numero.
+
+La collezione si importa anche dentro a Postman, col bottone Run. Tutto il resto —
+com'è organizzata, cosa controlla, come si cambia — sta in
+[`postman/README.md`](postman/README.md).
+
 ## Quanto regge (misurato, non detto)
 
 ```bash

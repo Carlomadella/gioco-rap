@@ -64,8 +64,8 @@ messaggi dei commit, e nessuno se lo ricordava più. Adesso hanno una riga che l
 
    **FATTO (01/09/2026).** `comandidelterminale.md` in radice: git
    (status/pull/push e cosa fare se il push viene rifiutato), i quattro
-   comandi del frontend (dev/build/demo/prova), i quattro del backend
-   (start/prova/copia/travaso), come farli girare insieme in due terminali,
+   comandi del frontend (dev/build/demo/prova), i cinque del backend
+   (start/prova/postman/copia/travaso), come farli girare insieme in due terminali,
    e i problemi comuni (porta occupata, Node troppo vecchio).
 
 ---

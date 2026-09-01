@@ -88,9 +88,17 @@ bot finti in scala. Il gioco (`frontend`) lo trova da solo: `js/net/online.js` p
 ```bash
 npm run prova
 ```
-Le prove del server (114 controlli, in crescita): account, sessioni, classifica,
+Le prove del server (133 controlli, in crescita): account, sessioni, classifica,
 salvataggi in cloud, accessi Steam/Apple/Google, moderazione, sospetti. **Va lanciato
 prima di ogni commit** che tocca `backend/`.
+
+```bash
+npm run postman
+```
+Le 34 rotte provate da fuori, con la collezione Postman: 91 richieste e 498 controlli,
+nove secondi. Si tira su un server suo con un database usa e getta, quindi non tocca
+niente di tuo e si può lanciare anche col server acceso. La prima volta si scarica
+`newman` (Postman da riga di comando), poi se lo tiene.
 
 ```bash
 npm run copia

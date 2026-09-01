@@ -120,3 +120,91 @@ finto «appleid.apple.com» con chiavi vere per provare che un biglietto firmato
 male non entra.
 
 ---
+
+## Tutte le rotte provate su Postman
+
+Da smistare (01/09/2026): "Testa tutte le API routes su postman"
+
+**FATTO.** Tutte e **34 le rotte** di `server.js`, in una collezione Postman da **91
+richieste** e **498 controlli**. Girano tutte verdi.
+
+```bash
+cd backend && npm run postman
+```
+
+Si tira su un server suo, su una porta sua, con un database usa e getta; gli fa passare
+addosso tutta la collezione; e alla fine spegne e butta via. **91 richieste, 498 controlli,
+0 falliti, 8,5 secondi.** Provata due volte anche contro un database appena nato, per
+essere sicuri che non si appoggi a roba lasciata lì dal giro prima.
+
+Il motore è **newman**, che è Postman da riga di comando: stessa collezione, stessi script,
+stessi risultati del bottone Run. Non sta fra le dipendenze — se lo tira giù `npx` la prima
+volta. Il server non deve portarsi dietro un albero di pacchetti per una cosa che si lancia
+a mano ogni tanto.
+
+**Le rotte coperte sono tutte e 34**, contate una per una sul `rotta()` di `server.js`: le
+cinque del mondo, le cinque di account e sessioni, le quattro degli artisti, le due della
+classifica, le tre delle stagioni, le tre dei salvataggi, le tre dei traguardi, la
+segnalazione, e le otto di servizio. Più il preflight CORS e la rotta che non c'è, che non
+sono rotte ma sono due modi di rispondere.
+
+**Non sono 91 richieste indipendenti: sono un giro.** La cartella 4 apre l'account e la
+sessione, la 12 la cancella; `token`, `artistaId` e `altroId` se li passano le richieste fra
+loro. È una scelta: un account finto per ogni richiesta avrebbe reso ogni prova isolata, ma
+non avrebbe mai provato la cosa che si rompe davvero — che le rotte **si tengano fra loro**.
+Il rivale che ti prendi con `POST /api/relazione` deve ricomparire dentro a `GET /api/opps`,
+e il punteggio che mandi deve far scattare i traguardi che poi ritrovi su
+`GET /api/traguardi/{id}`. Quelle due cose lì un giro le vede, cento prove separate no.
+
+Il file non si scrive a mano: lo fa `postman/genera.js`, dove le rotte stanno una sotto
+l'altra e i controlli che si ripetono si scrivono una volta sola. Un JSON da tremila righe è
+un posto dove una virgola fuori posto non si vede.
+
+**Cosa controlla oltre allo stato HTTP.** Su tutte: che il server non si sia spaccato e che
+risponda entro un secondo. Su ognuna: che la risposta sia JSON — una rotta che sbaglia
+spesso torna una pagina di errore con dentro dell'HTML, e «status 200» da solo non se ne
+accorgerebbe — e **quale** errore risponde, non solo il numero: `403` da solo non distingue
+«sessione scaduta» da «non è tuo», e sono due bug diversi.
+
+Poi le cose che sarebbe grave rompere senza accorgersene:
+
+- nessuna riga della classifica dice **chi è un bot** — è una regola di gioco, e il modo in
+  cui si rompe è che qualcuno aggiunge un campo comodo;
+- il **segreto** non torna mai indietro, nemmeno dentro alla risposta che apre l'account, e
+  la **chiave** dell'artista non si vede sulla sua scheda pubblica;
+- i **traguardi che dà il server** arrivano da soli col punteggio, e chiederli dal client
+  prende 409: è la riga fra un traguardo che vale e uno preso aprendo la console;
+- il **conflitto dei salvataggi**: in cloud la settimana 40, il dispositivo alla 12 → 409 e
+  dice cosa c'è già, invece di fondere le due partite di nascosto;
+- la **roba degli altri** non si tocca: scheda, punteggio, relazioni e traguardi di un
+  artista che non è tuo rispondono tutti 403;
+- il **preflight CORS** dice `x-sessione`, `x-admin` e `x-chiave`. Se sbaglia quello, il
+  gioco nel browser non parla più col server e in console si legge solo «CORS error».
+
+**Un controllo l'ho dovuto correggere io, e la correzione è il punto.** Avevo messo, su
+tutte le richieste, «niente errori del server: sotto il 500». Ha bocciato la prova di
+Apple, che risponde **501** — e il 501 lì è la risposta *giusta*: «questo canale non è
+ancora collegato», perché senza le chiavi di Apple il server dice «non posso» invece di
+«va bene». Adesso il controllo elenca i codici che sono roba nostra (500, 502, 503, 504) e
+lascia stare il 501. Su Apple, Google e Steam la prova accetta 501 **o** 403 secondo cosa
+hai in `.env.local`; quello che non deve mai succedere è un **200**.
+
+**Il server non ha sbagliato niente.** Nessun 500, nessun errore in console, tutte le
+risposte sotto gli 80 ms. Non è una sorpresa — `npm run prova` copre già gran parte di
+questa roba da dentro — ma è la prima volta che le rotte sono guardate **da fuori**, come le
+vede chi chiama, e con l'elenco completo davanti invece che a campione.
+
+Nel workspace Postman di Carletto ci sono anche l'ambiente **«Anni di Fame — in casa»** e
+una collezione **«Anni di Fame — il server (indice)»**. L'indice è solo la mappa da
+guardare: l'API di Postman butta via gli script di test delle richieste dentro alle
+cartelle, quindi quella caricata di lì arriverebbe senza i suoi 498 controlli. Sta scritto
+nella sua descrizione, perché è il tipo di cosa che se non la dici la scopre qualcuno
+premendo Run e credendo di aver provato qualcosa.
+
+File: `backend/postman/genera.js` (la sorgente), `anni-di-fame.postman_collection.json` (il
+generato, committato così si importa senza far girare niente), `prova.js` (il giro completo),
+`README.md`. Più `npm run postman` in `package.json`.
+
+`npm run prova` resta a 133 controlli, verdi.
+
+---
