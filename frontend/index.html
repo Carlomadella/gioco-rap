@@ -209,12 +209,17 @@
       </header>
 
       <!-- ---------- colonna di sinistra: il profilo ---------- -->
-      <aside class="pcard psx" id="hb-profilo"></aside>
-      <nav class="pcard psxtab" id="hb-sxtab"></nav>
+      <!-- la colonna di sinistra: il profilo e, sotto, le quattro linguette -->
+      <div class="pcolsx">
+            <aside class="pcard psx" id="hb-profilo"></aside>
+            <nav class="pcard psxtab" id="hb-sxtab"></nav>
+      </div>
 
       <!-- ---------- centro: la città ---------- -->
       <!-- il titolo «La tua città» sta già dentro alla foto -->
-      <div class="pcard pmappa">
+      <!-- la colonna di mezzo: la città e, sotto, gli eventi di oggi -->
+      <div class="pcolcentro">
+            <div class="pcard pmappa">
         <div class="pfoto" id="hb-foto">
           <div class="ppins" id="hb-pins"></div>
         </div>
@@ -227,6 +232,7 @@
       </div>
 
       <!-- ---------- colonna di destra: il telefono ---------- -->
+      </div>
       <aside class="ptel">
         <div class="ptelframe">
           <div class="ptelbar"><span id="hb-telora">21:38</span><span class="ptelnotch"></span><span class="ptelsig"></span><span class="ptelbatt"></span></div>

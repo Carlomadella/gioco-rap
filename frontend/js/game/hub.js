@@ -185,22 +185,11 @@ function hubPronta(id){
 }
 
 /* ================= LA MISURA DELLA PLANCIA ================= */
-/* Disegnata a 1536×1024 e rimpicciolita tutta insieme: le proporzioni restano
-   quelle del concept e le zone da toccare restano sui cartelli.
-   Se la schermata non è ancora a video le misure sono zero: in quel caso non si
-   tocca niente e si riprova al giro dopo, se no resterebbe tutto nero. */
-function hubScala(){
-  const palco = $("hb-palco"), pl = $("hb-plancia");
-  if(!palco || !pl) return;
-  const w = palco.clientWidth, h = palco.clientHeight;
-  if(w < 40 || h < 40) return;
-  const k = Math.max(Math.min(w / 1536, h / 1024), .42);
-  pl.style.transform = "scale(" + k.toFixed(4) + ")";
-  pl.style.left = Math.max(0, Math.round((w - 1536 * k) / 2)) + "px";
-  pl.style.top = Math.max(0, Math.round((h - 1024 * k) / 2)) + "px";
-  palco.style.overflow = (1536 * k > w + 1 || 1024 * k > h + 1) ? "auto" : "hidden";
-}
-window.addEventListener("resize", hubScala);
+/* La plancia adesso è una griglia e si adatta da sé: non c'è più niente da
+   rimpicciolire a mano. La funzione resta perché la chiamano in tre punti —
+   all'entrata e a ogni ridisegno — e toglierla vorrebbe dire rincorrerli
+   tutti per niente. */
+function hubScala(){}
 
 /* ================= PEZZI DI DISEGNO ================= */
 let HUB_VISTA = "profilo";     /* quale delle quattro linguette di sinistra */

@@ -1,20 +1,42 @@
 /* La plancia: la schermata da cui si gioca.
 
-   È disegnata alla misura del concept — 1536×1024 — e poi rimpicciolita tutta
-   insieme per stare nello schermo (hubScala). Così le proporzioni sono quelle
-   della foto a qualunque grandezza, e le zone da toccare restano incollate ai
-   cartelli disegnati dentro alla mappa. */
+   È il concept `schermata_di_gioco.png`, rifatto pezzo per pezzo: fascia in
+   alto, profilo a sinistra, la città in mezzo, il telefono a destra, gli
+   eventi sotto la mappa e la riga del suggerimento in fondo.
+
+   **Riempie lo schermo.** Prima era disegnata a 1536×1024 e rimpicciolita
+   tutta insieme: su un monitor largo restavano due bande nere ai lati e su uno
+   piccolo diventava illeggibile. Adesso è una griglia — le colonne di lato
+   tengono la loro misura, la città si prende quello che avanza — e la foto
+   della mappa mantiene le sue proporzioni, così le zone da toccare restano
+   incollate ai cartelli disegnati dentro. */
 
 #s-hub{padding-top:0}
 body.in-hub .topnav{display:none}
 
-.palco{position:fixed;inset:0;overflow:auto;background:#05070B}
-.plancia{position:absolute;left:0;top:0;width:1536px;height:1024px;
-  transform-origin:0 0;background:#05070B;color:#E8EAF0;
-  font-family:"Figtree",system-ui,sans-serif}
+.palco{position:fixed;inset:0;overflow:hidden;background:#05070B}
+.plancia{position:relative;width:100%;height:100%;background:#05070B;color:#E8EAF0;
+  font-family:"Figtree",system-ui,sans-serif;
+  display:grid;gap:8px;padding:0 8px 0;
+  /* le righe fisse si stringono un po' sugli schermi bassi, così la città —
+     che è la cosa per cui si sta qui — non resta mai schiacciata */
+  grid-template-columns:minmax(320px,.85fr) minmax(0,2.3fr) minmax(310px,.85fr);
+  grid-template-rows:clamp(66px,9.5vh,86px) minmax(0,1fr) clamp(32px,5vh,44px);
+  grid-template-areas:
+    "barra  barra   barra"
+    "sx     centro  tel"
+    "sugg   sugg    sugg"}
+
+/* Le due colonne hanno ingombri diversi, come nel concept: a sinistra il
+   profilo è alto e le linguette stanno in fondo, al centro la città è alta e
+   gli eventi stanno sotto. */
+.pcolsx,.pcolcentro{min-width:0;min-height:0;display:grid;gap:8px}
+.pcolsx{grid-area:sx;grid-template-rows:minmax(0,1fr) auto}
+.pcolcentro{grid-area:centro;grid-template-rows:minmax(0,1fr) auto}
 
 /* ---- pezzi comuni ---- */
-.pcard{position:absolute;background:linear-gradient(180deg,#0C0F16,#090C12);
+.pcard{position:relative;min-width:0;min-height:0;
+  background:linear-gradient(180deg,#0C0F16,#090C12);
   border:1px solid rgba(255,255,255,.07);border-radius:12px}
 .ptit{display:block;font-size:13px;font-weight:700;letter-spacing:.12em;
   text-transform:uppercase;color:#C9CEDA}
@@ -22,7 +44,7 @@ body.in-hub .topnav{display:none}
 .hicon{width:18px;height:18px;display:block;fill:currentColor}
 
 /* ================= FASCIA IN ALTO ================= */
-.pbarra{position:absolute;left:0;top:0;width:1536px;height:86px;display:flex;
+.pbarra{grid-area:barra;margin:0 -8px;display:flex;
   align-items:stretch;background:linear-gradient(180deg,#0C1017,#080B11);
   border-bottom:1px solid rgba(255,255,255,.08)}
 
@@ -60,9 +82,14 @@ body.in-hub .topnav{display:none}
 .pora .hicon{width:22px;height:22px;fill:#C9CEDA}
 
 /* ================= COLONNA DI SINISTRA ================= */
-.psx{left:8px;top:94px;width:340px;height:758px;padding:14px 14px 10px;overflow:hidden}
-.psxtab{left:8px;top:862px;width:340px;height:104px;display:flex;align-items:center;
-  gap:6px;padding:10px}
+/* Il profilo: se lo schermo è basso non si taglia, si scorre. Meglio una
+   barretta di scorrimento che un livello che sparisce. */
+.psx{padding:14px 14px 10px;display:flex;flex-direction:column;
+  overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.18) transparent}
+.psx::-webkit-scrollbar{width:6px}
+.psx::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:3px}
+.psxtab{height:104px;display:flex;align-items:center;gap:6px;padding:10px}
 
 .pface{display:flex;gap:14px;margin-top:12px}
 .pport{width:126px;height:150px;flex:none;border-radius:10px;overflow:hidden;
@@ -115,8 +142,15 @@ body.in-hub .topnav{display:none}
 .ptab.on{background:rgba(168,85,247,.16);color:#C084FC}
 
 /* ================= LA CITTÀ ================= */
-.pmappa{left:356px;top:94px;width:838px;height:682px;padding:3px;overflow:hidden}
-.pfoto{position:relative;width:830px;height:677px;border-radius:10px;overflow:hidden;
+/* Il riquadro della mappa non si vede: quello che si vede è la foto. Così
+   sugli schermi larghi, dove la foto non può riempire tutta la colonna senza
+   deformarsi, intorno resta il fondo scuro invece di una cornice vuota. */
+.pmappa{padding:0;overflow:hidden;display:grid;place-items:center;
+  background:none;border:0}
+/* La foto tiene le sue proporzioni (830×677) e prende tutto lo spazio che può:
+   è quello che fa restare le zone da toccare esattamente sui cartelli. */
+.pfoto{position:relative;aspect-ratio:830/677;height:100%;width:auto;max-width:100%;
+  border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.07),0 18px 50px rgba(0,0,0,.5);
   background:#0A0910 url("../media/photo/schermate di gioco/mappa_citta.jpg") center/100% 100% no-repeat}
 .ppins{position:absolute;inset:0}
 .pspot{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);
@@ -135,7 +169,7 @@ body.in-hub .topnav{display:none}
 .pfrec:hover{background:rgba(255,255,255,.12)}
 
 /* ================= EVENTI DI OGGI ================= */
-.peventi{left:356px;top:786px;width:838px;height:190px;padding:12px 14px}
+.peventi{height:190px;padding:12px 14px}
 .pevrow{display:flex;gap:10px;margin-top:10px;height:139px}
 .pev{flex:1;min-width:0;display:flex;flex-direction:column;text-align:left;
   padding:9px 10px 10px;border-radius:10px;overflow:hidden;
@@ -164,7 +198,7 @@ body.in-hub .topnav{display:none}
 /* Tutto il telefono — guscio, home, app, dock, widget — vive in css/telefono.css. */
 
 /* ================= RIGA DI FONDO ================= */
-.psugg{position:absolute;left:0;top:980px;width:1536px;height:44px;display:flex;
+.psugg{grid-area:sugg;margin:0 -8px;display:flex;
   align-items:center;justify-content:center;font-size:13px;color:#8A90A0}
 .psugg b{color:#C9CEDA;font-weight:600}
 
@@ -174,3 +208,26 @@ body.in-hub .topnav{display:none}
 .tornamenu.mappa{background:linear-gradient(180deg,#7C3AED,#5B21B6);color:#fff;
   box-shadow:0 6px 26px rgba(124,58,237,.45)}
 .tornamenu.mappa:hover{background:linear-gradient(180deg,#8B4BF5,#6D28D9)}
+
+/* ================= SCHERMI PICCOLI =================
+   Le colonne di lato si stringono prima di sparire, e la città resta sempre
+   la cosa più grande: è la schermata da cui si gioca. */
+@media (max-width:1400px){
+  .plancia{grid-template-columns:minmax(300px,.8fr) minmax(0,2.4fr) minmax(292px,.8fr)}
+}
+@media (max-width:1180px){
+  .plancia{grid-template-columns:minmax(280px,.8fr) minmax(0,2.4fr);
+    grid-template-areas:
+      "barra  barra"
+      "sx     centro"
+      "sugg   sugg"}
+  .ptel{display:none}
+}
+@media (max-height:760px){
+  .psxtab{height:84px}
+  .peventi{height:168px}
+  .pevrow{height:120px}
+  .pev{padding:7px 8px 8px}
+  .pevd{margin-top:4px}
+  .pevl{margin-top:5px;gap:3px}
+}

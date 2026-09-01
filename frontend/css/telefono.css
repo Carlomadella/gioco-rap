@@ -3,8 +3,11 @@
    sotto, la vecchia colonna che scorre (messaggi, griglia, notizie). */
 
 /* ================= IL GUSCIO ================= */
-.ptel{position:absolute;left:1202px;top:94px;width:326px;height:824px}
-.ptelframe{width:100%;height:100%;border-radius:38px;padding:11px;
+/* Il telefono sta nella sua casella della griglia e prende l'altezza che ha:
+   non è più inchiodato a 824 px, se no su uno schermo basso usciva fuori. */
+.ptel{grid-area:tel;min-height:0;display:flex}
+.ptelframe{width:100%;height:100%;min-height:0;display:flex;flex-direction:column;
+  border-radius:38px;padding:11px;
   background:linear-gradient(160deg,#2A2E38,#0D0F14);
   box-shadow:0 20px 50px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.12)}
 .ptelbar{position:relative;height:26px;display:flex;align-items:center;gap:5px;

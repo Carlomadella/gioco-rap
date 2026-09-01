@@ -323,3 +323,38 @@ sarà il momento.»
    `npm run prova` (12/12) pulito.
 
 ---
+
+---
+
+## La plancia riempie lo schermo, come nella foto
+
+**FATTO (01/09/2026).** La schermata di gioco era disegnata alla misura del
+concept — 1536×1024 — e poi **rimpicciolita tutta insieme** per starci dentro.
+Su un monitor largo (1912×872, quello di Carletto) restavano due bande nere da
+300 px per parte: il gioco non riempiva lo schermo.
+
+Adesso la plancia è una **griglia**, non un rettangolo scalato:
+- la fascia in alto e la riga del suggerimento prendono tutta la larghezza;
+- le colonne di lato tengono la loro misura e **la città si prende quello che
+  avanza**;
+- il profilo e le linguette sono una colonna sua, la città e gli eventi
+  un'altra: hanno ingombri diversi, come nel concept (a sinistra il profilo è
+  alto e le linguette stanno in fondo, al centro la mappa è alta e sotto ci
+  sono gli eventi);
+- **la foto della mappa tiene le sue proporzioni** (830×677) e cresce quanto
+  può: è quello che fa restare le zone da toccare esattamente sopra ai
+  cartelli disegnati dentro. Verificato: le nove zone sono agli stessi
+  percentuali di prima e il clic su «Studio» apre lo studio.
+- il riquadro della mappa non si vede più: quello che si vede è la foto, con
+  la sua ombra. Sugli schermi molto larghi, dove la foto non può riempire
+  tutta la colonna senza deformarsi, intorno resta il fondo scuro invece di
+  una cornice vuota.
+- se lo schermo è basso il profilo **si scorre** invece di tagliarsi: meglio
+  una barretta che un livello che sparisce. Sotto i 1180 px di larghezza il
+  telefono si toglie e restano profilo e città.
+
+**Quello che non ho toccato**, e che nella foto è diverso: il telefono a destra.
+Nel concept è una lista (messaggi, otto riquadri, notizie); nel gioco è un
+iPhone vero, ed è di oggi (punto 42). Rifarlo com'era nella foto vorrebbe dire
+buttare quel lavoro: se lo volete uguale alla foto ditelo e si fa.
+
