@@ -1,23 +1,23 @@
-﻿/* La Strada (punto 21): la professione del criminale in provincia.
+﻿ï»¿/* La Strada (punto 21): la professione del criminale in provincia.
 
    Ricostruita da zero seguendo il documento vincolante `claude/carriera-criminale.md`
    (i quattro numeri, gli 11 colpi, i soldi sporchi, la vetrina, chi ti copre, gli opp,
    il carcere, uscirne): il codice originale non era mai arrivato su GitHub, solo il
-   design (vedi punto 57 in implementazioni/06-mondo-e-personaggi.md). Qui c'Ã¨ la
+   design (vedi punto 57 in implementazioni/06-mondo-e-personaggi.md). Qui c'ÃƒÂ¨ la
    fetta di Provincia, giocabile davvero; Milano e Los Angeles restano in vista con
-   scritto dove si aprono, come chiede il documento, perchÃ© le loro mappe non
+   scritto dove si aprono, come chiede il documento, perchÃƒÂ© le loro mappe non
    esistono ancora.
 
-   File a parte da `strada.js`: quello Ã¨ un'altra "strada", gli incontri per la via
-   del punto 54 (il fan, l'hater, l'opp...) â€” nome uguale per un caso di battitura
+   File a parte da `strada.js`: quello ÃƒÂ¨ un'altra "strada", gli incontri per la via
+   del punto 54 (il fan, l'hater, l'opp...) Ã¢â‚¬â€ nome uguale per un caso di battitura
    nel documento originale, funzioni del tutto diverse. Tenerle divise evita di
    perdere l'uno o l'altro pezzo a ogni modifica.
 
    Cosa NON copre ancora questa prima versione, di proposito, per restare onesti:
-   - i colpi di Milano e Los Angeles (bloccati finchÃ© non esistono quelle cittÃ );
-   - il casinÃ² di Los Angeles;
+   - i colpi di Milano e Los Angeles (bloccati finchÃƒÂ© non esistono quelle cittÃƒÂ );
+   - il casinÃƒÂ² di Los Angeles;
    - il blocco delle altre azioni del gioco mentre sei dentro (l'arresto qui pesa sui
-     numeri â€” fan, hype, spese, contratto â€” ma non impedisce fisicamente di scrivere
+     numeri Ã¢â‚¬â€ fan, hype, spese, contratto Ã¢â‚¬â€ ma non impedisce fisicamente di scrivere
      o registrare: bloccare tutto il resto del gioco tocca troppi file per farlo alla
      cieca, senza poterlo provare in un browser vero);
    - i contatti criminali collegati alla rubrica (la rubrica di fase 3 non esiste ancora). */
@@ -25,50 +25,50 @@
 
 /* ==================== DATI ==================== */
 
-/* I quattro colpi di provincia, con guadagno, energia (punto 39: l'energia Ã¨
-   giornaliera), difficoltÃ  (0-1, pesa sulla riuscita) e pena base in settimane.
+/* I quattro colpi di provincia, con guadagno, energia (punto 39: l'energia ÃƒÂ¨
+   giornaliera), difficoltÃƒÂ  (0-1, pesa sulla riuscita) e pena base in settimane.
    Guadagni ed energia sono quelli del documento dov'era scritto un numero; dove
    il documento non fissava un valore esatto (energia, pena base) ho messo una
    stima ragionevole, da tarare quando si gioca davvero. */
 const STRADA_COLPI = [
   {id:"consegne", n:"Consegne che non chiedi", energia:15, difficolta:.15, pena:2,
-   d:"Porti un pacco da un posto a un altro. Meglio non sapere cosa c'Ã¨ dentro.",
+   d:"Porti un pacco da un posto a un altro. Meglio non sapere cosa c'ÃƒÂ¨ dentro.",
    min:120, max:280},
   {id:"scotta", n:"Roba che scotta", energia:20, difficolta:.30, pena:3,
-   d:"Ãˆ arrivata da poco e scotta: va fatta sparire in fretta.",
+   d:"ÃƒË† arrivata da poco e scotta: va fatta sparire in fretta.",
    min:220, max:480},
   {id:"cassa", n:"La cassa del bar", energia:28, difficolta:.50, pena:5,
-   d:"Il bar chiude tardi, e la cassa resta lÃ¬ fino al mattino.",
+   d:"Il bar chiude tardi, e la cassa resta lÃƒÂ¬ fino al mattino.",
    min:420, max:950},
   {id:"macchina", n:"La macchina giusta", energia:35, difficolta:.68, pena:8,
-   d:"Sai giÃ  dov'Ã¨ parcheggiata, e chi non se ne accorgerÃ .",
+   d:"Sai giÃƒÂ  dov'ÃƒÂ¨ parcheggiata, e chi non se ne accorgerÃƒÂ .",
    min:600, max:1350}
 ];
 
-/* CittÃ  chiuse: restano in vista col nome, come chiede il documento â€” nessun
-   numero, perchÃ© quelle mappe non esistono ancora. */
+/* CittÃƒÂ  chiuse: restano in vista col nome, come chiede il documento Ã¢â‚¬â€ nessun
+   numero, perchÃƒÂ© quelle mappe non esistono ancora. */
 const STRADA_COLPI_MILANO = [
   {n:"Il giro dei locali"}, {n:"Il tavolo"}, {n:"Il carico"},
-  {n:"La gioielleria", nota:"fino a 9.500 â‚¬"}
+  {n:"La gioielleria", nota:"fino a 9.500 Ã¢â€šÂ¬"}
 ];
 const STRADA_COLPI_LA = [
   {n:"Il porto"}, {n:"La villa sulle colline"},
-  {n:"Il giro grosso", nota:"fino a 60.000 â‚¬"}
+  {n:"Il giro grosso", nota:"fino a 60.000 Ã¢â€šÂ¬"}
 ];
 
 /* Gli approcci: numeri presi uno a uno dal documento
-   (âˆ’18%/âˆ’35%/+6% Â· +18% Â· +40%/+35%/+12%/penaÃ—2,2). */
+   (Ã¢Ë†â€™18%/Ã¢Ë†â€™35%/+6% Ã‚Â· +18% Ã‚Â· +40%/+35%/+12%/penaÃƒâ€”2,2). */
 const STRADA_APPROCCI = [
-  {id:"pulito", n:"Da solo, pulito", d:"Meno guadagno, molto meno rumore, un po' piÃ¹ sicuro.",
+  {id:"pulito", n:"Da solo, pulito", d:"Meno guadagno, molto meno rumore, un po' piÃƒÂ¹ sicuro.",
    guadagno:.82, rumore:.65, riuscita:.06, pena:1},
-  {id:"squadra", n:"Con uno dei tuoi", d:"PiÃ¹ guadagno. Se va male, puÃ² restarci lui e non tu.",
+  {id:"squadra", n:"Con uno dei tuoi", d:"PiÃƒÂ¹ guadagno. Se va male, puÃƒÂ² restarci lui e non tu.",
    guadagno:1.18, rumore:1, riuscita:0, pena:1, serveUomo:true},
-  {id:"ferro", n:"Col ferro", d:"Molto piÃ¹ guadagno e piÃ¹ riuscita â€” ma se ti perquisiscono la pena raddoppia.",
+  {id:"ferro", n:"Col ferro", d:"Molto piÃƒÂ¹ guadagno e piÃƒÂ¹ riuscita Ã¢â‚¬â€ ma se ti perquisiscono la pena raddoppia.",
    guadagno:1.40, rumore:1.35, riuscita:.12, pena:2.2, serveFerro:true}
 ];
 
-/* AttivitÃ  di provincia: Lavanderia, Autolavaggio, Minimarket (nomi dal
-   documento). Il documento non fissa costo d'acquisto nÃ© resa esatta per la
+/* AttivitÃƒÂ  di provincia: Lavanderia, Autolavaggio, Minimarket (nomi dal
+   documento). Il documento non fissa costo d'acquisto nÃƒÂ© resa esatta per la
    provincia (lo fa solo per il tipo di reparto, 45% pulito/55% sporco): i
    numeri sotto sono un punto di partenza credibile, da tarare. */
 const STRADA_ATTIVITA = [
@@ -77,7 +77,7 @@ const STRADA_ATTIVITA = [
   {id:"minimarket", n:"Minimarket", costo:2600, resa:190, gestione:30}
 ];
 
-/* Protezione a tre gradini piÃ¹ "nessuna", coi tre prezzi del documento. */
+/* Protezione a tre gradini piÃƒÂ¹ "nessuna", coi tre prezzi del documento. */
 const STRADA_PROT = [
   {n:"Nessuna", costo:0},
   {n:"Occhi in giro", costo:260},
@@ -98,7 +98,7 @@ const STRADA_FERRO_COSTO = 900, STRADA_AVVOCATO_COSTO = 320;
 let STRADA_SCENA = null;
 
 function stScenaAvviso(colpo, msg){
-  return {k:"Non si puÃ²", titolo:"CosÃ¬ no", testo:msg,
+  return {k:"Non si puÃƒÂ²", titolo:"CosÃƒÂ¬ no", testo:msg,
     opts:[
       {n:"Torna alle scelte", d:"Rivedi come muoverti", run(){ STRADA_SCENA = stScenaApproccio(colpo); }},
       {n:"Lascia stare", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}
@@ -106,12 +106,12 @@ function stScenaAvviso(colpo, msg){
 }
 
 /* Le tre righe sotto a ogni approccio escono dai numeri veri: quanto cambia il
-   guadagno, e cosa ti serve o cosa rischi in piÃ¹. */
+   guadagno, e cosa ti serve o cosa rischi in piÃƒÂ¹. */
 function stRigaApproccio(a){
   const delta = Math.round((a.guadagno - 1) * 100);
   return {
-    sx:(delta > 0 ? "+" : "âˆ’") + Math.abs(delta) + "% guadagno",
-    dx:a.serveFerro ? "pena Ã—2,2" : a.serveUomo ? "serve un uomo" : "rischio â†“"
+    sx:(delta > 0 ? "+" : "Ã¢Ë†â€™") + Math.abs(delta) + "% guadagno",
+    dx:a.serveFerro ? "pena Ãƒâ€”2,2" : a.serveUomo ? "serve un uomo" : "rischio Ã¢â€ â€œ"
   };
 }
 
@@ -119,7 +119,7 @@ function stScenaApproccio(colpo){
   const s = G.strada;
   return {k:"Come vuoi muoverti?", titolo:colpo.n, testo:colpo.d, approcci:true,
     stats:[
-      {t:fmt(colpo.min) + "â€“" + fmt(colpo.max) + " â‚¬", c:"money"},
+      {t:fmt(colpo.min) + "Ã¢â‚¬â€œ" + fmt(colpo.max) + " Ã¢â€šÂ¬", c:"money"},
       {t:colpo.energia + " energia"},
       {t:"Rischio " + stRischio(colpo).toLowerCase(), c:stClasseRischio(colpo)}
     ],
@@ -171,14 +171,14 @@ function stradaTenta(colpoId, approccioId){
     G.money += pulito; s.sporchi += sporco;
     s.rep = clamp(s.rep + 3 + colpo.difficolta * 6, 0, 100);
     s.heat = clamp(s.heat + rumore * .6, 0, 100);
-    STRADA_SCENA = {k:"Com'Ã¨ andata", titolo:"Andata bene", testo:"<b>" + colpo.n + "</b>: " + fmt(pulito) + " â‚¬ in tasca, " +
-        fmt(sporco) + " â‚¬ sporchi da ripulire. In giro si comincia a parlarne.",
+    STRADA_SCENA = {k:"Com'ÃƒÂ¨ andata", titolo:"Andata bene", testo:"<b>" + colpo.n + "</b>: " + fmt(pulito) + " Ã¢â€šÂ¬ in tasca, " +
+        fmt(sporco) + " Ã¢â€šÂ¬ sporchi da ripulire. In giro si comincia a parlarne.",
       opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
   }else{
     s.heat = clamp(s.heat + rumore, 0, 100);
     if(approccio.id === "squadra" && s.uomini > 0 && Math.random() < .5){
       s.uomini--;
-      STRADA_SCENA = {k:"Com'Ã¨ andata", titolo:"Ãˆ andata male", testo:"<b>" + colpo.n + "</b> Ã¨ saltato. Uno dei tuoi ci Ã¨ rimasto sotto: " +
+      STRADA_SCENA = {k:"Com'ÃƒÂ¨ andata", titolo:"ÃƒË† andata male", testo:"<b>" + colpo.n + "</b> ÃƒÂ¨ saltato. Uno dei tuoi ci ÃƒÂ¨ rimasto sotto: " +
           "tu sei rientrato pulito, lui no. Un uomo in meno.",
         opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
     }else{
@@ -186,15 +186,15 @@ function stradaTenta(colpoId, approccioId){
       if(primaVolta && Math.random() < .6){
         const multa = Math.round(colpo.min * .8);
         G.money = Math.max(0, G.money - multa);
-        STRADA_SCENA = {k:"Com'Ã¨ andata", titolo:"Denuncia", testo:"<b>" + colpo.n + "</b> Ã¨ saltato, ma te la cavi con una denuncia e " +
-            fmt(multa) + " â‚¬ di multa. Stavolta Ã¨ andata.",
+        STRADA_SCENA = {k:"Com'ÃƒÂ¨ andata", titolo:"Denuncia", testo:"<b>" + colpo.n + "</b> ÃƒÂ¨ saltato, ma te la cavi con una denuncia e " +
+            fmt(multa) + " Ã¢â€šÂ¬ di multa. Stavolta ÃƒÂ¨ andata.",
           opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
       }else{
         const settimane = Math.max(1, Math.round(colpo.pena * approccio.pena *
           (1 + s.precedenti * .35) * (s.avvocato ? .55 : 1)));
         s.precedenti++;
         s.arresto = {settimane:settimane, colpo:colpo.n};
-        STRADA_SCENA = {k:"Com'Ã¨ andata", titolo:"Arrestato", testo:"<b>" + colpo.n + "</b> Ã¨ saltato, e stavolta non te la cavi: " +
+        STRADA_SCENA = {k:"Com'ÃƒÂ¨ andata", titolo:"Arrestato", testo:"<b>" + colpo.n + "</b> ÃƒÂ¨ saltato, e stavolta non te la cavi: " +
             settimane + (settimane === 1 ? " settimana dentro" : " settimane dentro") +
             ". Niente musica, niente strada: solo il tempo che passa.",
           opts:[{n:"Continua", d:"", run(){ STRADA_SCENA = null; }}]};
@@ -205,9 +205,9 @@ function stradaTenta(colpoId, approccioId){
 }
 
 /* ==================== SOLDI SPORCHI ====================
-   Le azioni piccole (ripulire, prendere un uomo, rilevare un'attivitÃ ) tornano
+   Le azioni piccole (ripulire, prendere un uomo, rilevare un'attivitÃƒÂ ) tornano
    la frase da mostrare: il pannello la fa comparire in basso, senza fermare
-   niente. Chi non puÃ² fare la cosa riceve il motivo, non il silenzio. */
+   niente. Chi non puÃƒÂ² fare la cosa riceve il motivo, non il silenzio. */
 function stradaCapienza(){
   let cap = 400;
   for(const a of STRADA_ATTIVITA) if(G.strada.attivita[a.id]) cap += a.resa;
@@ -223,39 +223,39 @@ function stradaRipulisci(){
   s.sporchi -= importo;
   G.money += pulito;
   s.heat = clamp(s.heat + 2, 0, 100);
-  pushLog("Ripuliti " + fmt(importo) + " â‚¬ sporchi: in tasca ne restano " + fmt(pulito) + " â‚¬.", "");
+  pushLog("Ripuliti " + fmt(importo) + " Ã¢â€šÂ¬ sporchi: in tasca ne restano " + fmt(pulito) + " Ã¢â€šÂ¬.", "");
   save(); renderStrada(); renderGioco();
-  return "Ripuliti " + fmt(importo) + " â‚¬: in tasca ne restano " + fmt(pulito) + " â‚¬.";
+  return "Ripuliti " + fmt(importo) + " Ã¢â€šÂ¬: in tasca ne restano " + fmt(pulito) + " Ã¢â€šÂ¬.";
 }
 
 /* ==================== CHI TI COPRE ==================== */
 function stAssumiUomo(){
   const s = G.strada;
-  if(s.uomini >= STRADA_UOMO_MAX) return "Hai giÃ  cinque uomini: di piÃ¹ non se ne tengono.";
-  if(G.money < STRADA_UOMO_COSTO) return "Non hai " + fmt(STRADA_UOMO_COSTO) + " â‚¬ per prenderne un altro.";
+  if(s.uomini >= STRADA_UOMO_MAX) return "Hai giÃƒÂ  cinque uomini: di piÃƒÂ¹ non se ne tengono.";
+  if(G.money < STRADA_UOMO_COSTO) return "Non hai " + fmt(STRADA_UOMO_COSTO) + " Ã¢â€šÂ¬ per prenderne un altro.";
   G.money -= STRADA_UOMO_COSTO; s.uomini++;
-  pushLog("Hai preso un uomo in piÃ¹: ora sono " + s.uomini + ".", "");
+  pushLog("Hai preso un uomo in piÃƒÂ¹: ora sono " + s.uomini + ".", "");
   save(); renderStrada(); renderGioco();
-  return "Uno dei tuoi si Ã¨ unito al giro: ora siete in " + s.uomini + ".";
+  return "Uno dei tuoi si ÃƒÂ¨ unito al giro: ora siete in " + s.uomini + ".";
 }
 function stLicenziaUomo(){
   const s = G.strada;
   if(s.uomini <= 0) return "Non hai nessuno da mandare via.";
   s.uomini--;
   save(); renderStrada(); renderGioco();
-  return "Uno se n'Ã¨ andato. Ne restano " + s.uomini + ".";
+  return "Uno se n'ÃƒÂ¨ andato. Ne restano " + s.uomini + ".";
 }
 function stImpostaProtezione(livello){
   G.strada.prot = clamp(livello, 0, STRADA_PROT.length - 1);
   save(); renderStrada(); renderGioco();
   const p = STRADA_PROT[G.strada.prot];
   return G.strada.prot === 0 ? "Niente protezione: da qui in poi sei scoperto."
-    : "Protezione: " + p.n.toLowerCase() + ", " + fmt(p.costo) + " â‚¬/sett.";
+    : "Protezione: " + p.n.toLowerCase() + ", " + fmt(p.costo) + " Ã¢â€šÂ¬/sett.";
 }
 function stCompraFerro(){
   const s = G.strada;
-  if(s.ferro) return "Il ferro ce l'hai giÃ .";
-  if(G.money < STRADA_FERRO_COSTO) return "Non hai " + fmt(STRADA_FERRO_COSTO) + " â‚¬.";
+  if(s.ferro) return "Il ferro ce l'hai giÃƒÂ .";
+  if(G.money < STRADA_FERRO_COSTO) return "Non hai " + fmt(STRADA_FERRO_COSTO) + " Ã¢â€šÂ¬.";
   G.money -= STRADA_FERRO_COSTO; s.ferro = true;
   pushLog("Hai preso il ferro. Cambia i conti, in bene e in male.", "");
   save(); renderStrada(); renderGioco();
@@ -264,18 +264,18 @@ function stCompraFerro(){
 function stToggleAvvocato(){
   G.strada.avvocato = !G.strada.avvocato;
   save(); renderStrada(); renderGioco();
-  return G.strada.avvocato ? "Avvocato preso: " + fmt(STRADA_AVVOCATO_COSTO) + " â‚¬/sett."
+  return G.strada.avvocato ? "Avvocato preso: " + fmt(STRADA_AVVOCATO_COSTO) + " Ã¢â€šÂ¬/sett."
     : "Avvocato mandato via.";
 }
 function stCompraAttivita(id){
   const a = STRADA_ATTIVITA.find(x => x.id === id);
   if(!a) return "";
-  if(G.strada.attivita[id]) return a.n + " Ã¨ giÃ  tua.";
-  if(G.money < a.costo) return "Non hai " + fmt(a.costo) + " â‚¬ per rilevare " + a.n.toLowerCase() + ".";
+  if(G.strada.attivita[id]) return a.n + " ÃƒÂ¨ giÃƒÂ  tua.";
+  if(G.money < a.costo) return "Non hai " + fmt(a.costo) + " Ã¢â€šÂ¬ per rilevare " + a.n.toLowerCase() + ".";
   G.money -= a.costo; G.strada.attivita[id] = true;
   pushLog("Hai rilevato: <b>" + a.n + "</b>.", "good");
   save(); renderStrada(); renderGioco();
-  return a.n + " Ã¨ tua. Adesso puoi ripulire di piÃ¹.";
+  return a.n + " ÃƒÂ¨ tua. Adesso puoi ripulire di piÃƒÂ¹.";
 }
 function stMollaIlGiro(){
   const s = G.strada;
@@ -284,16 +284,16 @@ function stMollaIlGiro(){
   else { G.money = Math.max(0, G.money - (costo - s.sporchi)); s.sporchi = 0; }
   s.rep = clamp(s.rep * .7, 0, 100);
   addLuc(15);
-  pushLog("<b>Hai mollato il giro.</b> Ti Ã¨ costato " + fmt(costo) + " â‚¬. Qualcuno se la lega al dito.", "");
+  pushLog("<b>Hai mollato il giro.</b> Ti ÃƒÂ¨ costato " + fmt(costo) + " Ã¢â€šÂ¬. Qualcuno se la lega al dito.", "");
   save(); renderStrada(); renderGioco();
 }
 
 /* ==================== IL CICLO SETTIMANALE ====================
    Chiamata da sim.js, dentro advanceWeek(), prima che la settimana avanzi:
-   heat che decade, attivitÃ  che rendono, uomini/protezione/avvocato che
+   heat che decade, attivitÃƒÂ  che rendono, uomini/protezione/avvocato che
    costano, la vetrina che alza l'attenzione, il controllo delle sei del
-   mattino, gli opp a sorpresa, e â€” se sei dentro â€” il carcere che macina
-   fan, hype e contratto finchÃ© non esci. */
+   mattino, gli opp a sorpresa, e Ã¢â‚¬â€ se sei dentro Ã¢â‚¬â€ il carcere che macina
+   fan, hype e contratto finchÃƒÂ© non esci. */
 function stradaSettimana(){
   const s = G.strada;
 
@@ -311,19 +311,19 @@ function stradaSettimana(){
       const colpoFatto = s.arresto.colpo;
       s.arresto = null;
       s.rep = clamp(s.rep + 12, 0, 100);
-      showEvent({k:"Sei uscito", t:"Fuori", d:"La storia di Â«" + colpoFatto + "Â» ti ha seguito fin qui.",
+      showEvent({k:"Sei uscito", t:"Fuori", d:"La storia di Ã‚Â«" + colpoFatto + "Ã‚Â» ti ha seguito fin qui.",
         annulla(){},
         opts:[
-          {n:"Raccontala", d:"+luciditÃ , +hype: la trasformi in un pezzo",
+          {n:"Raccontala", d:"+luciditÃƒÂ , +hype: la trasformi in un pezzo",
            run(){ addLuc(25); G.hype = clamp(G.hype + 14, 0, 100); return {t:"L'hai raccontata. La gente ascolta.", c:"good"}; }},
           {n:"Torna dove avevi lasciato", d:"+reputazione di strada, ma +attenzione",
            run(){ s.rep = clamp(s.rep + 10, 0, 100); s.heat = clamp(s.heat + 8, 0, 100); return {t:"Sei tornato dove eri rimasto.", c:""}; }}
         ]});
     }
-    return; /* dentro non succede altro: niente attivitÃ , niente opp */
+    return; /* dentro non succede altro: niente attivitÃƒÂ , niente opp */
   }
 
-  /* attivitÃ : rendita settimanale (45% pulito, 55% sporco), meno la gestione */
+  /* attivitÃƒÂ : rendita settimanale (45% pulito, 55% sporco), meno la gestione */
   let attive = 0;
   for(const a of STRADA_ATTIVITA){
     if(!s.attivita[a.id]) continue;
@@ -335,7 +335,7 @@ function stradaSettimana(){
   /* uomini: se non entra abbastanza per pagarli, se ne vanno */
   if(s.uomini > 0){
     const upkeep = s.uomini * STRADA_UOMO_UPKEEP;
-    if(G.money < upkeep){ s.uomini = Math.max(0, s.uomini - 1); pushLog("Un uomo se n'Ã¨ andato: non entrava abbastanza per tenerlo.", ""); }
+    if(G.money < upkeep){ s.uomini = Math.max(0, s.uomini - 1); pushLog("Un uomo se n'ÃƒÂ¨ andato: non entrava abbastanza per tenerlo.", ""); }
     else G.money -= upkeep;
   }
   if(s.prot > 0) G.money -= STRADA_PROT[s.prot].costo;
@@ -378,7 +378,7 @@ function stradaOpp(){
       {n:"Scappi", d:"Ti prendono il contante che hai addosso", run(){
         const perso = Math.round(G.money * .15);
         G.money -= perso;
-        return {t:"Sei scappato. Ti hanno preso " + fmt(perso) + " â‚¬, e in giro si Ã¨ visto.", c:"bad"};
+        return {t:"Sei scappato. Ti hanno preso " + fmt(perso) + " Ã¢â€šÂ¬, e in giro si ÃƒÂ¨ visto.", c:"bad"};
       }},
       {n:"Li affronti", d:"Rischi, ma se vinci sali", run(){
         const vinci = Math.random() < clamp(.4 + s.rep/200 + Math.min(s.uomini,5) * .05, .15, .85);
@@ -391,17 +391,17 @@ function stradaOpp(){
         if(s.uomini <= 0) return {t:"Non avevi nessuno da chiamare. Te la sei vista brutta da solo.", c:"bad"};
         if(Math.random() < .72) return {t:"I tuoi sono arrivati in tempo. Liscia.", c:"good"};
         s.uomini--; G.wellbeing = clamp(G.wellbeing - 10, 0, 100);
-        return {t:"Uno dei tuoi ci Ã¨ rimasto sotto per te.", c:"bad"};
+        return {t:"Uno dei tuoi ci ÃƒÂ¨ rimasto sotto per te.", c:"bad"};
       }}
     ]});
 }
 
 /* ==================== IL PANNELLO ====================
    Il disegno arriva dal prototipo `attivita-criminali-crime-v8.html`, portato
-   dentro al gioco: l'impalcatura sta in index.html, qui c'Ã¨ quello che cambia.
-   Tre pannelli sopra a un fondale che scorre â€” a sinistra i tuoi numeri, al
-   centro i colpi, a destra chi ti copre e le attivitÃ  â€” con in basso le tre
-   cittÃ  e il ritorno alla mappa.
+   dentro al gioco: l'impalcatura sta in index.html, qui c'ÃƒÂ¨ quello che cambia.
+   Tre pannelli sopra a un fondale che scorre Ã¢â‚¬â€ a sinistra i tuoi numeri, al
+   centro i colpi, a destra chi ti copre e le attivitÃƒÂ  Ã¢â‚¬â€ con in basso le tre
+   cittÃƒÂ  e il ritorno alla mappa.
 
    Le scelte del colpo e i suoi esiti restano dentro alla schermata (la scheda
    `#st-modal`, non `showEvent`): questo pannello sta a z-index 93, il modal
@@ -490,12 +490,12 @@ function stToast(t){
   ST_TOAST = setTimeout(() => el.classList.remove("on"), 2200);
 }
 
-/* Le tre cittÃ : la provincia si gioca, le altre due si guardano. */
+/* Le tre cittÃƒÂ : la provincia si gioca, le altre due si guardano. */
 const STRADA_CITTA = [
   {id:"provincia", n:"Provincia", d:"4 colpi disponibili", req:null},
-  {id:"milano", n:"Milano", d:"4 colpi Â· livello 10", req:"Livello 10 Â· fama 50 Â· hype 40",
+  {id:"milano", n:"Milano", d:"4 colpi Ã‚Â· livello 10", req:"Livello 10 Ã‚Â· fama 50 Ã‚Â· hype 40",
    colpi:STRADA_COLPI_MILANO},
-  {id:"la", n:"Los Angeles", d:"3 colpi Â· da GOAT", req:"Si apre da GOAT",
+  {id:"la", n:"Los Angeles", d:"3 colpi Ã‚Â· da GOAT", req:"Si apre da GOAT",
    colpi:STRADA_COLPI_LA}
 ];
 let ST_CITTA = "provincia";
@@ -533,15 +533,15 @@ function stCopertura(){
 function renderStBarre(){
   const s = G.strada;
   const art = window.ARTIST || {};
-  const citta = (art.city || "").trim() || "CittÃ  di provincia";
+  const citta = (art.city || "").trim() || "CittÃƒÂ  di provincia";
   $("st-dove").textContent = "Il giro // " + citta;
   $("st-citta").textContent = citta;
   $("st-sett").textContent = G.week;
   $("st-ora").textContent = typeof hubOra === "function" ? hubOra() : "";
 
-  $("st-sporchi").textContent = fmt(s.sporchi) + " â‚¬";
+  $("st-sporchi").textContent = fmt(s.sporchi) + " Ã¢â€šÂ¬";
   const rip = $("st-ripulisci");
-  rip.textContent = "Ripulisci fino a " + fmt(stradaCapienza()) + " â‚¬";
+  rip.textContent = "Ripulisci fino a " + fmt(stradaCapienza()) + " Ã¢â€šÂ¬";
   rip.classList.toggle("no", s.sporchi <= 0);
 
   $("st-repn").textContent = Math.round(s.rep);
@@ -549,7 +549,7 @@ function renderStBarre(){
   $("st-heatn").textContent = Math.round(s.heat);
   $("st-heatbar").style.width = clamp(s.heat, 0, 100) + "%";
   $("st-energia").textContent = G.energy + " / " + G.maxEnergy;
-  $("st-puliti").textContent = fmt(G.money) + " â‚¬";
+  $("st-puliti").textContent = fmt(G.money) + " Ã¢â€šÂ¬";
   $("st-precedenti").textContent = s.precedenti;
   const occhi = $("st-occhi");
   occhi.textContent = stOcchiAddosso();
@@ -565,9 +565,9 @@ function renderStColpi(){
   if(s.arresto){
     centro.classList.remove("locked");
     griglia.className = "dentro";
-    griglia.innerHTML = "<b>Sei dentro</b><p>Â«" + s.arresto.colpo + "Â»: ancora " + s.arresto.settimane +
+    griglia.innerHTML = "<b>Sei dentro</b><p>Ã‚Â«" + s.arresto.colpo + "Ã‚Â»: ancora " + s.arresto.settimane +
       (s.arresto.settimane === 1 ? " settimana" : " settimane") +
-      ". Niente colpi finchÃ© non esci â€” le settimane le fa passare il gioco, non tu.</p>";
+      ". Niente colpi finchÃƒÂ© non esci Ã¢â‚¬â€ le settimane le fa passare il gioco, non tu.</p>";
     return;
   }
 
@@ -588,21 +588,21 @@ function renderStColpi(){
     return '<button class="crime' + (senzaEnergia ? " no" : "") + '" data-stcolpo="' + c.id + '">' +
       '<span class="num">0' + (i + 1) + '</span><b>' + c.n + '</b><p>' + c.d + '</p>' +
       '<div class="stchips">' +
-        '<span class="stchip money">' + fmt(c.min) + 'â€“' + fmt(c.max) + ' â‚¬</span>' +
+        '<span class="stchip money">' + fmt(c.min) + 'Ã¢â‚¬â€œ' + fmt(c.max) + ' Ã¢â€šÂ¬</span>' +
         '<span class="stchip">' + c.energia + ' energia</span>' +
         '<span class="stchip ' + stClasseRischio(c) + '">Rischio ' + stRischio(c).toLowerCase() + '</span>' +
-      '</div><span class="go">â†’</span></button>';
+      '</div><span class="go">Ã¢â€ â€™</span></button>';
   }).join("");
 }
 
-/* ---- a destra: chi ti copre, le attivitÃ  ---- */
+/* ---- a destra: chi ti copre, le attivitÃƒÂ  ---- */
 function renderStCopre(){
   const s = G.strada;
   const prot = STRADA_PROT[s.prot];
   const pieno = s.uomini >= STRADA_UOMO_MAX, caro = G.money < STRADA_UOMO_COSTO;
   $("st-tab-copre").innerHTML =
     '<div class="cover-row"><div class="t"><strong>Uomini (' + s.uomini + '/' + STRADA_UOMO_MAX + ')</strong>' +
-      '<span>' + fmt(STRADA_UOMO_COSTO) + ' â‚¬ all\'ingresso Â· ' + fmt(STRADA_UOMO_UPKEEP) + ' â‚¬/sett.</span></div>' +
+      '<span>' + fmt(STRADA_UOMO_COSTO) + ' Ã¢â€šÂ¬ all\'ingresso Ã‚Â· ' + fmt(STRADA_UOMO_UPKEEP) + ' Ã¢â€šÂ¬/sett.</span></div>' +
       '<div class="pills"><button class="pill' + (pieno || caro ? " no" : "") + '" data-stuomo="piu">+ Prendi</button>' +
       (s.uomini > 0 ? '<button class="pill" data-stuomo="meno">Manda via</button>' : '') + '</div></div>' +
 
@@ -611,20 +611,20 @@ function renderStCopre(){
       '<div class="pills"><button class="pill' + (s.prot > 0 ? " on" : "") + '" data-stprot>' + prot.n + '</button></div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Il ferro</strong>' +
-      '<span>PiÃ¹ riuscita. Se ti trovano, la pena raddoppia.</span></div>' +
+      '<span>PiÃƒÂ¹ riuscita. Se ti trovano, la pena raddoppia.</span></div>' +
       '<div class="pills"><button class="pill danger' + (s.ferro ? " on" : G.money < STRADA_FERRO_COSTO ? " no" : "") + '" data-stferro>' +
-      (s.ferro ? "Ce l'hai" : fmt(STRADA_FERRO_COSTO) + " â‚¬") + '</button></div></div>' +
+      (s.ferro ? "Ce l'hai" : fmt(STRADA_FERRO_COSTO) + " Ã¢â€šÂ¬") + '</button></div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Avvocato</strong>' +
-      '<span>' + fmt(STRADA_AVVOCATO_COSTO) + ' â‚¬/sett. Â· l\'attenzione cala piÃ¹ in fretta.</span></div>' +
+      '<span>' + fmt(STRADA_AVVOCATO_COSTO) + ' Ã¢â€šÂ¬/sett. Ã‚Â· l\'attenzione cala piÃƒÂ¹ in fretta.</span></div>' +
       '<div class="pills"><button class="pill' + (s.avvocato ? " on" : "") + '" data-stavvocato>' +
       (s.avvocato ? "Ce l'hai" : "Prendilo") + '</button></div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Costo copertura</strong>' +
       '<span>Quello che ti esce di tasca ogni settimana.</span></div>' +
-      '<div class="pills"><span class="pill on">' + fmt(stCopertura()) + ' â‚¬/sett.</span></div></div>' +
+      '<div class="pills"><span class="pill on">' + fmt(stCopertura()) + ' Ã¢â€šÂ¬/sett.</span></div></div>' +
 
-    '<div class="street-note">Nel giro non compri sicurezza. Compri solo qualche minuto in piÃ¹ prima che qualcosa vada storto.</div>';
+    '<div class="street-note">Nel giro non compri sicurezza. Compri solo qualche minuto in piÃƒÂ¹ prima che qualcosa vada storto.</div>';
 }
 
 function renderStAttivita(){
@@ -634,17 +634,17 @@ function renderStAttivita(){
       const tua = !!s.attivita[a.id];
       return '<div class="activity' + (tua ? " owned" : "") + '">' +
         '<div class="a-top"><strong>' + a.n + '</strong><span class="price">' +
-          (tua ? "TUA" : fmt(a.costo) + " â‚¬") + '</span></div>' +
+          (tua ? "TUA" : fmt(a.costo) + " Ã¢â€šÂ¬") + '</span></div>' +
         '<p>' + (tua
-          ? "Resa " + fmt(a.resa) + " â‚¬/sett. Â· 45% pulito / 55% sporco Â· âˆ’" + fmt(a.gestione) + " â‚¬ di gestione"
-          : "Resa " + fmt(a.resa) + " â‚¬/sett. Â· alza di altrettanto quanto puoi ripulire.") + '</p>' +
+          ? "Resa " + fmt(a.resa) + " Ã¢â€šÂ¬/sett. Ã‚Â· 45% pulito / 55% sporco Ã‚Â· Ã¢Ë†â€™" + fmt(a.gestione) + " Ã¢â€šÂ¬ di gestione"
+          : "Resa " + fmt(a.resa) + " Ã¢â€šÂ¬/sett. Ã‚Â· alza di altrettanto quanto puoi ripulire.") + '</p>' +
         (tua ? "" : '<button class="pill' + (G.money < a.costo ? " no" : "") + '" data-stattivita="' + a.id + '">Rileva</button>') +
         '</div>';
     }).join("") +
-    '<div class="business-foot">Le attivitÃ  rendono ogni settimana e allargano quanto denaro sporco riesci a far sparire.</div>';
+    '<div class="business-foot">Le attivitÃƒÂ  rendono ogni settimana e allargano quanto denaro sporco riesci a far sparire.</div>';
 }
 
-/* ---- in basso: le tre cittÃ  ---- */
+/* ---- in basso: le tre cittÃƒÂ  ---- */
 function renderStCitta(){
   $("st-citta-lista").innerHTML = STRADA_CITTA.map(c =>
     '<button class="city' + (c.id === ST_CITTA ? " on" : "") + (c.id === "provincia" ? "" : " lock") +
@@ -664,7 +664,7 @@ function renderStScheda(){
       '<h2>' + sc.titolo + '</h2>' +
       '<p>' + sc.testo + '</p>' +
       (stats ? '<div class="sheet-stats">' + stats + '</div>' : "") +
-    '</div><button class="closemodal" id="st-chiudi-scheda" aria-label="Chiudi">Ã—</button></div>' +
+    '</div><button class="closemodal" id="st-chiudi-scheda" aria-label="Chiudi">Ãƒâ€”</button></div>' +
     '<div class="' + (sc.approcci ? "approaches" : "esiti") + '">' +
       sc.opts.map((o, i) =>
         '<button class="approach' + (o.hot ? " hot" : "") + (o.no ? " no" : "") + '" data-stopt="' + i + '">' +
@@ -744,7 +744,7 @@ $("st-molla").onclick = () => {
   if(G.strada.arresto){ stToast("Da dentro non si molla niente."); return; }
   const costo = Math.max(1500, Math.round(G.strada.sporchi * .3));
   STRADA_SCENA = {k:"Uscirne", titolo:"Molla il giro",
-    testo:"Ti costa " + fmt(costo) + " â‚¬ â€” il 30% dei soldi sporchi, e mai meno di 1.500 â‚¬ â€” " +
+    testo:"Ti costa " + fmt(costo) + " Ã¢â€šÂ¬ Ã¢â‚¬â€ il 30% dei soldi sporchi, e mai meno di 1.500 Ã¢â€šÂ¬ Ã¢â‚¬â€ " +
       "e la reputazione di strada cala di un terzo. In cambio ti torna la testa per la musica. Qualcuno se la lega al dito.",
     opts:[
       {n:"Mollo", d:"Chiudi i conti e sparisci dal giro", hot:true,
@@ -758,7 +758,7 @@ $("st-x").onclick = () => { hubTap(); chiudiStrada(); };
 $("st-mappa").onclick = () => { hubTap(); chiudiStrada(); };
 
 /* ESC: lo gestisce uscita.js per tutte le finestre, e chiama questa. Un passo
-   alla volta â€” prima si chiude la scheda aperta, poi la schermata. */
+   alla volta Ã¢â‚¬â€ prima si chiude la scheda aperta, poi la schermata. */
 function uscitaStrada(){
   if(STRADA_SCENA){ STRADA_SCENA = null; renderStScheda(); return true; }
   chiudiStrada();
