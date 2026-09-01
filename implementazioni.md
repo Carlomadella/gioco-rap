@@ -661,74 +661,9 @@ Anche per la pagina di landing, e per la creazione dell'avatar, Non mettere un p
 
 39. L'energia portiamola a 100
 
-   **FATTO (01/09/2026)** — insieme al 40 e al 41, sono un sistema solo: non
-   avrebbe senso mettere l'energia a 100 senza cambiare anche quando si
-   ricarica. Dettagli sotto, al punto 41.
-
 40. Facciamolo diventare alla giornata lo skip, non più alla settimana
 
-   **FATTO (01/09/2026)** — vedi il punto 41: stessa consegna, un sistema
-   solo.
-
 41. Ma se una persona vuole skippa 1 giorno, 2 giorni, 1 settimana, 1 mese... quanti giorni vuole skippare lui li salta, ovviamente il gameplay che avrà sarà condizionato da tutto questo
-
-   **FATTO (01/09/2026) — i punti 39, 40 e 41 insieme: l'energia è a 100 e
-   si vive a giornate, non più a settimane intere.**
-
-   - **Stato**: `G.day` (1-7) accanto a `G.week`. La settimana resta il
-     battito che chiude i conti — stream, spese, classifica, rapporto —
-     ma scatta da sola ogni 7 giorni chiusi, non più a bottone.
-   - **Il bottone «Fine giornata»** (era «Chiudi la settimana»,
-     `frontend/index.html`) chiama `avanzaGiorno()` (nuova, `sim.js`): la
-     notte ricarica **+60 energia, +30 in più se il benessere sta sopra
-     60** (chi si spreme non torna mai a 100), il giorno avanza, e solo
-     al settimo la settimana si chiude per davvero — con lo stesso
-     rapporto di sempre, non uno che compare ogni notte.
-   - **`js/game/skip.js` riscritto**: non più tre taglie fisse con «un
-     giorno» limitato a una volta a settimana — adesso è **1, 2 giorni,
-     una settimana o un mese**, tutti la stessa funzione (`saltaGiorni(n)`)
-     che chiama `avanzaGiorno()` n volte di fila, un solo rapporto alla
-     fine anche se dentro ci sono state più settimane. Le penalità non
-     sono più inventate a mano: **vengono da sole** — niente scrivere/
-     registrare/esibirsi per n giorni vuol dire niente lucidità guadagnata,
-     e la settimana ne toglie comunque un po' da sé; è già il conto giusto
-     senza bisogno di una tabella a parte.
-   - **Ogni mossa costa di più, in proporzione** (`ACTIONS`/`JOBS` in
-     `actions.js`, i costi della Sala in `posto.js`): piccole 10-14
-     (palestra, promo, cercare lavoro, «due parole» alla Sala, un
-     intervista), medie 18-28 (scrivi, cerca un beat, mixa, un turno di
-     lavoro semplice), grosse 32-45 (registra, freestyle, live, sessione
-     in studio, un feat, un turno pesante). Con l'energia intorno a
-     100-140 al giorno (dipende da lifestyle e difficoltà, la proporzione
-     di prima è la stessa: `ENERGIA_K` in `lifestyle.js` moltiplica quello
-     che già c'era, non lo riscrive), tornano i «tre mosse grosse o sei
-     piccole» del piano.
-   - **`RITMO = 0.4`** (`actions.js`): con sette volte i turni di prima,
-     le mosse che si possono ripetere senza limite — promo, live, il
-     freestyle veloce — danno il 40% di quello che davano, se no farle
-     dieci volte in un giorno varrebbe dieci volte una sola. I pezzi non
-     ne hanno bisogno: il tetto settimanale della fase (`PHASES.cap`) li
-     tiene già a bada da solo, farne di più non fa guadagnare di più.
-   - **Cosa NON ho toccato, di proposito**: le soglie di fama/fan delle
-     fasi e delle prove (`phases.js`) restano quelle di sempre. La
-     crescita dei fan viene dagli stream, e quella corre ancora una volta
-     a settimana, uguale a prima — raddoppiarle alla cieca rischiava di
-     rendere la scalata più lenta invece che uguale, ed è il contrario di
-     quello che si vuole. Meglio deciderlo dopo aver visto come gira.
-     Non ho nemmeno chiuso la Sala di domenica (era nel piano originale):
-     è rifinitura, non il cuore della richiesta.
-   - **I salvataggi vecchi non si rompono**: `syncEnergy()` (già
-     esisteva, serviva per il lifestyle) vede che l'energia salvata è
-     fuori scala e la riporta al nuovo massimo da sola, alla prima
-     apertura — l'ho verificato leggendo il codice, non serviva scriverne
-     di nuovo.
-   - **Verificato**: `npm run prova` (12/12) e `npm run build` puliti.
-     **Non verificato**: non ho potuto aprire il gioco in un browser vero
-     in questa sessione (l'estensione Chrome non era connessa). Questo è
-     il cambiamento più grosso e più rischioso di tutta la lista — tocca
-     praticamente ogni file di `js/game/` — e i numeri (i costi, `RITMO`,
-     quanto rende la notte) sono un primo tentativo ragionato, non un
-     bilanciamento provato. Vanno giocati prima di fidarsi.
 
 42. CONTESTO — leggi tutto, non serve che esplori.
 
@@ -793,205 +728,41 @@ COME LAVORIAMO — importante:
 NON TOCCARE: la scena beatmaker («cerca un beat»), che sta facendo un'altra persona
 in parallelo.
 
-   **FATTO in parte (01/09/2026)** — il telefono, solo da PC (`window.innerWidth
-   >= 1180`; sotto resta la vecchia colonna, invariata byte per byte).
-   File nuovi: `frontend/js/game/telefono.js`, `frontend/css/telefono.css`.
-   hub.js adesso chiama solo `renderTelefono()`; HUB_APP e la vecchia griglia
-   (`HUB_APP_VECCHIO`) si sono spostati lì. `.ptel*` si è spostato da hub.css a
-   telefono.css per intero.
-   - **Home**: barra di stato con ora, segnale, notch e **batteria nuova**
-     (mancava); tre **widget veri** (non finti) — LaFamegram con il post più
-     hype, Classifica con posizione e freccia ▲▼, Messaggi con l'ultimo
-     diario; griglia di 6 icone; **dock** con Messaggi, Contatti, LaFamegram,
-     Classifiche (scelta mia, sugli ultimi due: Classifiche invece di Agenda
-     perché lì c'è appena finito il multiplayer vero, punti 30/35/37).
-   - **10 app**, tutte a schermo intero dentro alla cornice, con dati veri
-     (non anteprime): Messaggi (diario intero), Contatti (la rete di
-     `G.gente`, grado e ruolo, tap va alla Sala), Notizie, Obiettivi (con
-     ricompensa o «fatto»), Inventario (bars/beat/pezzi/attrezzatura a
-     linguette), Statistiche (gli stessi numeri della testata e dei
-     dettagli), Classifiche (la stessa top 10 della scheda, con «sei Nº» e
-     la freccia), Agenda (gli eventi di stasera + le mosse disponibili),
-     Impostazioni (audio/difficoltà/lingua rapidi + bottone al pannello
-     vero), **LaFamegram** (non esisteva: oggi è un feed con post veri,
-     presi dal diario e dalle notizie, non finti a caso).
-   - **Apertura/chiusura**: l'app si apre ingrandendosi dal punto esatto
-     dell'icona toccata (calcolato al click, non un centro fisso), si chiude
-     con la barra in basso, con Esc, o cambiando finestra sotto i 1180px.
-   - **Cosa NON ho rifatto in miniatura**: le azioni pesanti (firmare un
-     contratto, un colpo, una sessione in studio) restano nella scheda vera
-     del gioco — dentro al telefono le vedi e le apri, ma la scena/il calcolo
-     stanno dove sono sempre stati. Rifarle da zero dentro ai 326px del
-     telefono è un lavoro a sé, che vale la pena solo dopo aver visto se
-     questa prima versione regge.
-   - **Verificato**: `npm run prova` (12/12) e `npm run build` puliti dopo il
-     cambio; non ho potuto aprirlo in un browser vero in questa sessione
-     (l'estensione Chrome non era connessa) — prima di darlo per buono va
-     provato a mano.
-   - **`prompt-app-telefono.md`** (root, come richiesto): 10 prompt per
-     ChatGPT, uno per ogni app del telefono, per farsi disegnare il
-     concept UI di ciascuna schermata — stessa logica di
-     `prompt-ambientazioni.md` ma per interfacce, non ambientazioni.
-
 43. I dialoghi di gioco devono essere molti e molto diversi tra loro, cosicche sembri ancora più realistico. 
-
-   **FATTO in parte (01/09/2026)** — le chiacchierate della Sala
-   (`DIALOGHI` in `frontend/js/game/posto.js`), che erano ferme a tre a
-   testa (due per il giornalista) fin dal giorno in cui esiste la Sala:
-   ognuno dei quattro ruoli **si ritrovava le stesse tre battute in loop**
-   dopo la prima settimana, ed è esattamente il contrario di «sembra
-   reale». Portati a **12 per beatmaker, rapper e fonico, 9 per il
-   giornalista** — quaranta situazioni nuove in tutto, stesso formato di
-   prima (una scena, tre risposte, i punti e il carattere che si scopre
-   rispondendo giusto), niente logica toccata.
-   **In parte** perché «molti e diversi» non ha un traguardo: la Sala oggi
-   ha quattro volte le battute di prima, ma i dialoghi veri e propri delle
-   **scene** (foglio, piazza, la sessione in studio con un beatmaker) non
-   li ho toccati — sono un lavoro a parte, per quando quelle scene si
-   riscrivono per davvero (punto 8, 14, e le «scene di gioco vere» che la
-   Sala aspetta ancora). `npm run prova` (12/12) e `npm run build` puliti.
 
 44. La suondboard del gioco è davvero ancora poco 
 
-   **FATTO in parte (01/09/2026)** — tre suoni nuovi in `frontend/js/game/fx.js`
-   (`SUONI`, sia morbido che retrò): **promo** (un ting che sale, non più il
-   click generico di tutti i bottoni), **palestra** (un tonfo di peso e un
-   fiato, non il tap di tutti gli altri — prima non aveva nessun suono suo),
-   **giorno** (più leggero della settimana, per «Fine giornata» quando la
-   settimana non si chiude — la settimana vera resta il suono grosso).
-   `skip.js` adesso sceglie fra i due giusti a seconda che il salto abbia
-   chiuso una settimana o no.
-   **In parte** perché il punto vero, quello lasciato aperto anche dal
-   punto 25 («resta da fare... variare di più i beat»), è che i dodici
-   generi di `beats.js` suonano diversi per **giro e scala** ma usano tutti
-   lo **stesso timbro** — la stessa cassa, lo stesso rullante, lo stesso
-   basso a dente di sega (`beatplay.js`). Dare a ogni genere il suo
-   strumento vero (un 808 per la trap, una cassa più secca per il boom
-   bap, un pad per la cloud) è un lavoro sul motore di sintesi che **non
-   ho toccato**: qui non ho un modo per ascoltare quello che scrivo, e
-   dato che è già tarato e funzionante, cambiarlo alla cieca rischiava di
-   romperlo invece di migliorarlo. I tre suoni nuovi sopra, invece, sono
-   costruiti con gli stessi mattoncini (`nota`, `fruscio`) di quelli già
-   in gioco, a basso rischio. `npm run prova` (12/12) e `npm run build`
-   puliti; **da provare con l'audio acceso**, qui non l'ho potuto sentire.
-
 45. Sposterei le card dalla mappa iniziale, non SOPRA gli edifici ma leggermente rimpicciolata e a lato, cosìche si vedan bene gli edifici, quando andremo a milano e los angeles poi la mappa dev'essere incredibile come ti abbiamo mandato già nei repo.
-
-   **BLOCCATO (01/09/2026) — serve un asset nuovo, non è una riga di codice.**
-   Le card («STUDIO», «BEAT MAKER», i cartelli chiusi coi lucchetti…) non sono
-   elementi HTML disegnati sopra la foto: sono **dentro al pixel** di
-   `frontend/media/photo/mappa_citta.jpg`, disegnate dov'è finito bene per chi
-   ha fatto l'immagine, non da un layout che posso spostare. Non ho un
-   generatore di immagini in questa sessione, quindi non posso ritagliarle e
-   spostarle io. Le zone da toccare (`HUB_LUOGHI` in `hub.js`, sei rettangoli
-   invisibili in percentuale) restano incollate a dove sono le card **nella
-   foto attuale** — se cambia la foto, cambiano anche quei numeri, è lavoro
-   di un quarto d'ora una volta che la foto nuova c'è.
-   Prompt pronto per chi genera l'immagine (ChatGPT o altro):
-   ```
-   Rifai il concept art della mappa della città di provincia per il gioco
-   "Anni di Fame" (stessa inquadratura dall'alto, stessa notte, stesse vie e
-   stessi edifici della versione attuale). Le card con nome e descrizione dei
-   luoghi (Studio, Beat Maker, Vita quotidiana, Attività criminali, e i
-   cartelli chiusi con il lucchetto) non devono più stare sopra gli edifici,
-   coprendoli: spostale leggermente più piccole, a lato di ogni edificio, in
-   uno spazio libero della strada o del marciapiede vicino, lasciando
-   l'edificio stesso ben visibile e riconoscibile. Il pin colorato resta
-   sopra all'edificio, la card sta accanto. Stesso stile grafico, stessi
-   colori, stesso formato orizzontale.
-   ```
-   Per Milano e Los Angeles vale la stessa regola fin da subito: quando si
-   generano quelle mappe, le card vanno chieste già a lato, non sopra.
 
 46. Le abilità sono troppe e da rivedere, NON DOBBIAMO FARE NOI I MIX MA I FONICI, quindi a cosa serve la skill mixing? come quella beatmaking.
 
-   **FATTO (01/09/2026).** Hai ragione: non erano abilità tue, erano
-   l'attrezzatura travestita da barra. Tolte «Produzione» e «Mixing» dalla
-   scheda Abilità (`frontend/js/game/hub.js`, `skillRighe()` e
-   `vistaAbilita()`) — restano le quattro vere: Rap, Scrittura, Carisma,
-   Networking. Le formule sotto (`gearBonus()`, `mixGain()`) restano intatte:
-   contano ancora nella qualità del pezzo quando registri o mixi, sono solo
-   sparite come «barra personale» — quel mestiere lì è del beatmaker e del
-   fonico alla Sala, non tuo. `npm run prova` (12/12) e `npm run build`
-   puliti.
+48. Cambierei le troppe SEZIONI BLOCCATE NELLA MAPPA PRINCIPALE, piuttosto rimpiazzandole con alcune già sbloccate come SHOP oppure togliendole proprio, non han senso che le sezioni sian lì solo per leggerci 'sbloccabile a milano' stiamo solo spoilerando la progressione del gioco per limitarne in realtò.
 
-47. Quando clicco su vestiti nella sidebar di sinistra, mi deve aprire una schermata di un negozio inoltre il negozio deve essere sbloccato già dalla città iniziale con limiti
+49. Creami il file comandidelterminale.md in cui scrivi tutti i comandi da lanciare nel terminale per essere sempre aggiornati a vicenda con carletto e per fare partire il frontend e backend
 
-   **FATTO (01/09/2026).** File nuovi: `frontend/js/game/negozio.js`,
-   `frontend/css/negozio.css`. La linguetta «Vestiti» della plancia adesso apre
-   il guardaroba invece del creatore: griglia degli undici capi di `FITS`
-   (`js/creator/data.js`), ognuno con la sua anteprima vera (lo stesso
-   ritratto ritagliato sul busto che usa il creatore), un prezzo da 60 a
-   560 €, e un bottone «Compra» o «Indossa». Il capo con cui hai creato il
-   personaggio resta sempre tuo gratis. Sbloccato da subito, nessuna fase:
-   è un negozio a parte da quello (chiuso) della mappa, che resta per
-   l'attrezzatura da studio. `npm run prova` (12/12) e `npm run build`
-   puliti; non provato in un browser vero in questa sessione.
+   **FATTO (01/09/2026).** `comandidelterminale.md` in radice: git
+   (status/pull/push e cosa fare se il push viene rifiutato), i quattro
+   comandi del frontend (dev/build/demo/prova), i quattro del backend
+   (start/prova/copia/travaso), come farli girare insieme in due terminali,
+   e i problemi comuni (porta occupata, Node troppo vecchio).
 
---- BACKEND, LAVORI DI OGGI DOPO IL PUNTO 37 (01/09/2026) ---
+50. Leviamo tutti questi popup dalle card. Quando clicchiamo su una card deve aprirse una vera e propria pagina. COSì INIZIERà A SEMBRARE UN GIOCO.
 
-Non sono punti chiesti da voi: sono le cose che al backend mancavano per stare
-in piedi su uno store. Le segno qui per non lasciarle solo nei commit.
+51. Scrivimi un prompt per ogni card di gioco, e che fine hanno fatto i prompt del punto 38 del file implementazioni.md? TROVIAMOLI E RIPORTAMELI. RISCRIVIMELI .
 
-- **Accessi con Steam, Apple e Google** (`backend/accessi.js`): la verifica dei
-  biglietti firmati c'è tutta — JWT RS256 controllato contro le loro chiavi
-  pubbliche (firma, emittente, destinatario, scadenza), e per Steam la chiamata
-  a Steamworks. Mancano solo **le loro chiavi**, che si prendono quando l'app è
-  registrata: senza, il canale risponde `501` e dice quale manca.
-- **Moderazione dei nomi** (`moderazione.js`, `parole.js`): il nome d'arte è
-  roba scritta da un utente e mostrata agli altri, e gli store vogliono un
-  filtro e una coda di segnalazioni. Il filtro normalizza («c4zz0» → «cazzo»),
-  blocca chi finge di essere lo staff, e protegge le parole innocenti («Scazzo»
-  passa). Dietro: `POST /api/segnalazione`, la coda `GET /api/da-guardare`, e
-  il nome tolto d'ufficio con quello di prima salvato.
-- **Traguardi dati dal server**: quelli che si possono controllare dai numeri
-  non li chiede più il gioco (li darebbe chiunque dalla console): arrivano da
-  soli col punteggio. Al gioco restano quelli che il server non può sapere.
-- **Sospetti e sanzioni**: ogni punteggio limato lascia una traccia; le sanzioni
-  sono tre, e la regola è **fuori dalla classifica prima della sospensione** —
-  chi è fuori sparisce dalla graduatoria ma continua a giocare la sua partita.
-- **Classifiche per città e per genere**: «sei 3° a Rovereto» invece di «sei
-  428° in Italia». La posizione si conta dentro al filtro.
-- **Stagioni e albo d'oro**: si chiude una stagione, chi ha vinto resta scritto,
-  e i numeri di tutti si ammorbidiscono (×0,25) invece di azzerarsi.
-- **Copia di sicurezza** a server acceso (`npm run copia`), che tiene le ultime
-  trenta e ricontrolla quello che ha appena scritto.
+   **Non erano persi — solo la nota che lo diceva.** `prompt-ambientazioni.md`
+   è sempre stato in radice del repo, intatto: quello che è sparito è la
+   riga sotto al punto 38 di questo file che lo diceva, ripulita insieme a
+   tutte le altre note FATTO. Controllato adesso (01/09/2026): **16
+   prompt**, e coprono già **tutte e dodici le card di gioco** una per una
+   — scrivi barre (6), cerca un beat (11), registra (4), mixa (5), pubblica
+   (12), promo (13), freestyle in piazza (14), live (15), cerca lavoro/turno
+   (16), stacca la spina (9), palestra (8) — più La Sala (3), la casa (7),
+   il vicolo delle attività criminali (10), la landing (1) e la creazione
+   avatar (2). Niente da riscrivere: il file è già quello richiesto.
 
-La prova del server è a **101 controlli**, tutti verdi, e dentro c'è anche un
-finto «appleid.apple.com» con chiavi vere per provare che un biglietto firmato
-male non entra.
+52. la fameGram deve avere veri e propri post generati e caricati dagli utenti, deve essere un motore vivo e costantemente in movimento perchè molto del gameplay passa lì. 
 
---- ASSET NUOVI, FUORI DAI PUNTI NUMERATI (01/09/2026) ---
+53. Su lafamegram puoi vedere il feed proprio come instagram nella vita reale, scorrendo
 
-Nessun punto chiesto qui dentro: due file HTML mandati da fuori
-(`~/Downloads/anni-di-fame-menu-2026(1)-integrato-finale.html` e
-`...-sfondi-urban.html`) erano due concept completi di una **landing page
-nuova** (menu con un hero a schermo intero, sfondo che cambia a scene, un
-dock con le stesse voci di oggi: carriera, artista, regole, classifiche,
-impostazioni) — codice e basta, con dentro cinque foto a testa incollate come
-base64. Estratte, riconvertite in JPEG (erano PNG da ~2 MB l'una, adesso
-300-500 KB) e salvate in `frontend/media/photo/`:
-
-- **Serie A** (dal file "integrato-finale"): `landing_a_provincia_urban.jpg`,
-  `landing_a_garage.jpg`, `landing_a_specchio.jpg`, `landing_a_infopoint.jpg`,
-  `landing_a_street_league.jpg`.
-- **Serie B** (dal file "sfondi-urban"): `landing_b_vicolo_graffiti.jpg`,
-  `landing_b_skate_spot.jpg`, `landing_b_negozio_angolo.jpg`,
-  `landing_b_rooftop_session.jpg`, `landing_b_ferrovia.jpg`.
-
-Due serie alternative della stessa idea, non dieci sfondi diversi: si sceglie
-quale delle due (o si mischiano i pezzi migliori) quando si rifà la landing
-page vera (punto 4, ancora aperto). Ho controllato ogni foto a occhio prima
-di salvarla — il nome del file dice cosa c'è dentro, non è un'estrazione alla
-cieca.
-
-**Nota tecnica lasciata scritta apposta**: la shell di questo ambiente è zsh,
-dove gli array partono dall'indice **1** e non da 0 come in bash — un primo
-giro di conversione con `${ARR[$((i-1))]}` ha sfasato i nomi di un posto
-(e `sips` ha pure duplicato un paio di file quando l'ho rifatto in fretta).
-Corretto controllando l'MD5 di ogni PNG sorgente contro quello copiato prima
-di convertirlo: tutti e dieci sono unici e nel posto giusto, verificato due
-volte. Se in futuro si scrivono script di conversione batch su questa
-macchina, l'indicizzazione degli array è il primo sospettato.
-`npm run prova` (12/12) pulito con i file nuovi dentro.
-
+54. Aggiungerei degli scenari veri e propri ; gli scenari vorrei fossero tutti uguali ma le circostanze TOTALMENTE DIVERSE, OVVERO ; 1) scenario trovi un fan carino che ti chiede la foto e poi posta pure su lafamegram 2) Trovi un fan maleducato che si pone in modi sbagliatissimi e magari interagendo e vedendo che non corregge i suoi comportamenti noi rifiutiamo la foto e qualcuno nelle vicinanze potrebbe notare questa cosa e i giornalisti poi farla uscire per parlare male di noi 3) in strada becchi un haters 4) in strada becchi un hopps 5) in strada becchi l'ex manager 6) in strada becchi ex amici 7) in strada becchi qualcuno con cui hai brutti rapporti nel gioco 8)
