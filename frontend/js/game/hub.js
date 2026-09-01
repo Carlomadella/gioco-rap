@@ -119,7 +119,7 @@ const HUB_NOTIZIE = [
 const HUB_SUGG = [
   "Costruisci la tua rete di contatti. Ti aprirà le porte giuste.",
   "Un pezzo forte vale più di tre pezzi buttati fuori in fretta.",
-  "L'energia finisce: chiudi la settimana quando non hai più mosse.",
+  "L'energia si ricarica la notte: chiudi la giornata quando non hai più mosse.",
   "La lucidità si consuma. Se scende troppo, quello che scrivi non regge.",
   "Il beat giusto è metà del pezzo. Ascoltali prima di comprare."
 ];
@@ -236,9 +236,9 @@ function fanBase(){
     : f < 500000 ? "Nazionale" : "Internazionale";
 }
 
-/* l'ora della sera: la settimana si consuma con l'energia */
+/* l'ora della sera: la giornata si consuma con l'energia */
 function hubOra(){
-  const usate = clamp(G.maxEnergy - G.energy, 0, 8);
+  const usate = clamp(Math.round((1 - G.energy / G.maxEnergy) * 8), 0, 8);
   const h = (18 + usate * 3) % 24;
   return String(h).padStart(2, "0") + (usate % 2 ? ":30" : ":00");
 }
@@ -327,7 +327,7 @@ function renderHub(){
   /* ---- fascia in alto ---- */
   $("hb-citta").textContent = (art.city || "").trim() || "Città di provincia";
   $("hb-fase").textContent = ph.n;
-  $("hb-week").textContent = G.week;
+  $("hb-week").textContent = G.week + ", giorno " + (G.day || 1) + "/7";
   $("hb-anno").textContent = "Anno " + G.year;
   $("hb-ora").textContent = hubOra();
   $("hb-telora").textContent = hubOra();

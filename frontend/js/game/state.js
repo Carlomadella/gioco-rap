@@ -11,8 +11,8 @@ const short = n => n >= 1e6 ? (n/1e6).toFixed(1).replace(".",",")+"M"
 /* ==================== STATO ==================== */
 const SAVE_KEY = "anni-di-fame-partita-v2";
 const START = () => ({
-  week:1, year:1, age:19,
-  energy:3, maxEnergy:3, rest:0,
+  week:1, year:1, day:1, age:19,
+  energy:100, maxEnergy:100, rest:0,
   money:220, fans:0, hype:0, wellbeing:80, lucidita:80,
   skills:{scrittura:8, flow:6, presenza:5, rete:4},
   songs:[], bars:[], beats:[], market:[], job:null, shifts:0,

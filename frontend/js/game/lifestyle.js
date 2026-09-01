@@ -47,10 +47,15 @@ function lifeBonus(){
   }
   return b;
 }
+/* Punto 39: l'energia è a 100 al giorno, non più a settimana. La scala vecchia
+   (3 di base, ±1 la provincia, ±1/±2 il lifestyle, ±1/±2 le impostazioni) resta
+   la stessa proporzione, solo moltiplicata per K — così tutta la messa a punto
+   già fatta sul lifestyle e sulla difficoltà vale ancora, non si riscrive lei. */
+const ENERGIA_K = 13;
 function syncEnergy(){
   const art = window.ARTIST || {};
-  /* tre di base, più la provincia, più il lifestyle, più quello che chiedono le impostazioni */
-  const base = Math.max(1, 3 + (art.scene === "provincia" ? 1 : 0) + lifeBonus().energy + difEnergia());
+  const base = Math.max(40, 100 + (art.scene === "provincia" ? ENERGIA_K : 0) +
+    Math.round(lifeBonus().energy * ENERGIA_K) + difEnergia() * ENERGIA_K);
   if(G.maxEnergy !== base){
     const diff = base - G.maxEnergy;
     G.maxEnergy = base;

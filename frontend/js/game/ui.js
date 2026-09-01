@@ -32,8 +32,8 @@ function renderGioco(){
   if(window.ARTIST_PORTRAIT) $("g-port").innerHTML = window.ARTIST_PORTRAIT();
   window.__MOOD = null;
   $("g-name").textContent = (art.name || "Senza Nome").trim();
-  $("g-meta").textContent = "Anno " + G.year + " · Settimana " + G.week + " · " +
-    PHASES[G.phase].n + " · " + (G.contract ? G.contract.label : "indipendente");
+  $("g-meta").textContent = "Anno " + G.year + " · Settimana " + G.week + ", giorno " + (G.day || 1) +
+    "/7 · " + PHASES[G.phase].n + " · " + (G.contract ? G.contract.label : "indipendente");
 
   /* Fase della scalata: una fascia sola, non piu' una scheda alta mezzo schermo.
      A sinistra dove sei, a destra i gradini fatti, sotto la riga che conta —
@@ -66,11 +66,7 @@ function renderGioco(){
      diventa rossa, che e' la cosa che devi sapere prima di cercare una mossa.
      Sta solo nella barra in basso: li' e' sempre sotto gli occhi e non fa
      doppione con la testata. */
-  const pipsEnergia = () => {
-    let p2 = "";
-    for(let i = 0; i < G.maxEnergy; i++) p2 += '<i class="' + (i < G.energy ? "on" : "") + '"></i>';
-    return p2;
-  };
+  const pipsEnergia = () => '<i style="width:' + clamp(G.energy / G.maxEnergy * 100, 0, 100) + '%"></i>';
 
   /* I tre numeri su cui decidi: cassa, chi ti segue, hype. In riga, senza
      scatola dentro la scatola: sono dentro la testata, non una scheda a parte. */
@@ -499,13 +495,16 @@ function openWeek(){
     bestPos: chartPosition(G.songs.filter(x => x.released).reduce((a,x) => a + (x.last||0), 0))};
   weekEarn = 0;
 }
+/* Punto 40: si chiude la giornata, non più la settimana. Il rapporto
+   (weekReport) esce solo il settimo giorno, quando avanzaGiorno() fa
+   scattare davvero il battito economico — gli altri sei è solo notte
+   che passa, niente da raccontare con una finestra sopra. */
 $("g-advance").onclick = () => {
   if(!weekOpen) openWeek();
-  const before = weekOpen;
-  const costs = weeklyCosts();
-  advanceWeek();
-  weekReport(before, costs);
-  openWeek();
+  const before = weekOpen, costs = weeklyCosts();
+  const chiusa = avanzaGiorno();
+  if(chiusa){ weekReport(before, costs); openWeek(); }
+  else{ save(); renderGioco(); }
 };
 $("g-skip").onclick = () => saltaTempo();
 $("g-tomenu").onclick = () => { save(); if(window.GO) window.GO("menu"); };

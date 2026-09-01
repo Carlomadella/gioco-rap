@@ -17,6 +17,10 @@
 const POSTO_MAX = 8;                  /* quanta gente può girare in provincia */
 const REL_NOMI = ["conoscenza", "contatto", "amico", "collaboratore", "fidato", "partner"];
 
+/* Punto 39: energia a 100 al giorno. «Due parole» resta una mossa piccola,
+   la sessione in studio e il feat restano le più grosse della Sala. */
+const PO_COSTO = {parla:12, sessione:45, mix:20, feat:45, intervista:12};
+
 const POSTO_RUOLI = {
   beatmaker: {n:"Beatmaker", k:"#4ADE80",
     d:"Fa beat. Se ti prende in simpatia te li fa sentire prima degli altri."},
@@ -269,8 +273,8 @@ function poTasto(p, tipo, testo, sotto, costo, pronto){
 function azioniDi(p){
   const r = POSTO_RUOLI[p.ruolo];
   let out = poTasto(p, "parla", "Fatti due parole",
-    p.rel >= 5 ? "Ci conosciamo ormai" : "Sali di un gradino con " + p.n, "1 energia",
-    G.energy >= 1);
+    p.rel >= 5 ? "Ci conosciamo ormai" : "Sali di un gradino con " + p.n, PO_COSTO.parla + " energia",
+    G.energy >= PO_COSTO.parla);
 
   if(p.ruolo === "beatmaker"){
     out += poTasto(p, "beat", "Fatti sentire un beat",
@@ -278,24 +282,24 @@ function azioniDi(p){
       "gratis", p.rel >= 1);
     out += poTasto(p, "sessione", "Sessione in studio",
       p.rel >= 2 ? "Un pomeriggio in sala: esce un beat vostro" : "Serve che siate amici",
-      "2 energie · 60 €", p.rel >= 2 && G.energy >= 2 && G.money >= 60);
+      PO_COSTO.sessione + " energie · 60 €", p.rel >= 2 && G.energy >= PO_COSTO.sessione && G.money >= 60);
   }
   if(p.ruolo === "fonico"){
     out += poTasto(p, "mix", "Portagli un pezzo",
       p.rel >= 2 ? "Te lo mixa lui, meglio di come lo faresti tu" : "Serve che siate amici",
-      "1 energia", p.rel >= 2 && G.energy >= 1 && G.songs.some(s => !s.mixed));
+      PO_COSTO.mix + " energie", p.rel >= 2 && G.energy >= PO_COSTO.mix && G.songs.some(s => !s.mixed));
   }
   if(p.ruolo === "rapper"){
     const cd = (typeof totalWeeks === "function" ? totalWeeks() : G.week) - p.feat;
     out += poTasto(p, "feat", "Proponi un pezzo insieme",
       p.rel >= 3 ? (cd < 6 ? "Ne avete fatto uno da poco" : "Un feat vero, con la sua gente dietro")
         : "Serve che siate collaboratori",
-      "2 energie", p.rel >= 3 && cd >= 6 && G.energy >= 2);
+      PO_COSTO.feat + " energie", p.rel >= 3 && cd >= 6 && G.energy >= PO_COSTO.feat);
   }
   if(p.ruolo === "giornalista"){
     out += poTasto(p, "intervista", "Fatti intervistare",
       p.rel >= 1 ? "Un pezzo sul giro locale: la gente legge" : "Serve almeno un contatto",
-      "1 energia", p.rel >= 1 && G.energy >= 1);
+      PO_COSTO.intervista + " energia", p.rel >= 1 && G.energy >= PO_COSTO.intervista);
   }
   return '<div class="poaz">' + out + '</div>' +
     '<p class="poruolo">' + r.d + '</p>';
@@ -353,8 +357,8 @@ function renderDialogo(){
 
 function parlaCon(id){
   const p = G.gente.find(x => x.id === id);
-  if(!p || G.energy < 1) return;
-  G.energy -= 1;
+  if(!p || G.energy < PO_COSTO.parla) return;
+  G.energy -= PO_COSTO.parla;
   const pool = DIALOGHI[p.ruolo];
   POSTO_PARLA = {p:p, sit:pick(pool)};
   SFX.tap(); save(); renderPosto();
@@ -442,8 +446,8 @@ function azionePosto(tipo, id){
   }
 
   if(tipo === "sessione"){
-    if(G.energy < 2 || G.money < 60) return;
-    G.energy -= 2; G.money -= 60;
+    if(G.energy < PO_COSTO.sessione || G.money < 60) return;
+    G.energy -= PO_COSTO.sessione; G.money -= 60;
     const presi = G.market.map(b => b.n).concat(G.beats.map(b => b.n));
     const q = rnd(46, 62) + p.fama * 0.35 + p.rel * 8 + G.skills.rete * 0.3;
     const b = creaBeat(p.gen || mioGenere(), q, presi);
@@ -460,8 +464,8 @@ function azionePosto(tipo, id){
 
   if(tipo === "mix"){
     const s = G.songs.filter(x => !x.mixed).sort((a, b2) => b2.q - a.q)[0];
-    if(!s || G.energy < 1) return;
-    G.energy -= 1;
+    if(!s || G.energy < PO_COSTO.mix) return;
+    G.energy -= PO_COSTO.mix;
     const su = Math.round(mixGain() + p.rel * 2 + p.fama * 0.06);
     s.q = clamp(s.q + su, 5, 100); s.mixed = true;
     gain("rete", 0.4);
@@ -471,8 +475,8 @@ function azionePosto(tipo, id){
   }
 
   if(tipo === "feat"){
-    if(G.energy < 2) return;
-    G.energy -= 2;
+    if(G.energy < PO_COSTO.feat) return;
+    G.energy -= PO_COSTO.feat;
     p.feat = sett;
     const h = Math.round(6 + p.fama * 0.22 + p.rel * 2);
     const f = Math.round(rnd(20, 60) + p.fama * 4 + G.fans * 0.05);
@@ -484,8 +488,8 @@ function azionePosto(tipo, id){
   }
 
   if(tipo === "intervista"){
-    if(G.energy < 1) return;
-    G.energy -= 1;
+    if(G.energy < PO_COSTO.intervista) return;
+    G.energy -= PO_COSTO.intervista;
     const h = Math.round(4 + p.fama * 0.16 + p.rel * 2);
     G.hype = clamp(G.hype + h, 0, 100);
     G.fans += Math.round(rnd(5, 25) + G.fans * 0.01);
