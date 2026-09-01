@@ -142,14 +142,22 @@ body.in-hub .topnav{display:none}
 .ptab.on{background:rgba(168,85,247,.16);color:#C084FC}
 
 /* ================= LA CITTÀ ================= */
-/* Il riquadro della mappa non si vede: quello che si vede è la foto. Così
-   sugli schermi larghi, dove la foto non può riempire tutta la colonna senza
-   deformarsi, intorno resta il fondo scuro invece di una cornice vuota. */
-.pmappa{padding:0;overflow:hidden;display:grid;place-items:center;
-  background:none;border:0}
+/* Il riquadro della mappa non si vede: quello che si vede è la foto. Sugli
+   schermi larghi, dove la foto (830×677) non può riempire tutta la colonna
+   senza deformarsi, prima restava il fondo scuro piatto — due bande nere,
+   punto 62. Deformare l'immagine o tagliare i cartelli non è "fatto ad arte":
+   quello che resta è riempire i lati con la stessa foto, sfocata e più scura,
+   come lo sfondo ambientale di uno schermo — non è più un vuoto, è la stessa
+   città che sfuma. La mappa vera, sopra, resta nitida e alla sua misura
+   esatta: le zone da toccare restano incollate ai cartelli come sempre. */
+.pmappa{position:relative;padding:0;overflow:hidden;display:grid;place-items:center;
+  background:#05070B;border:0}
+.pmappa::before{content:"";position:absolute;inset:-40px;z-index:0;
+  background:url("../media/photo/schermate di gioco/mappa_citta.jpg") center/cover no-repeat;
+  filter:blur(46px) brightness(.38) saturate(1.15);transform:scale(1.12)}
 /* La foto tiene le sue proporzioni (830×677) e prende tutto lo spazio che può:
    è quello che fa restare le zone da toccare esattamente sui cartelli. */
-.pfoto{position:relative;aspect-ratio:830/677;height:100%;width:auto;max-width:100%;
+.pfoto{position:relative;z-index:1;aspect-ratio:830/677;height:100%;width:auto;max-width:100%;
   border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.07),0 18px 50px rgba(0,0,0,.5);
   background:#0A0910 url("../media/photo/schermate di gioco/mappa_citta.jpg") center/100% 100% no-repeat}
 .ppins{position:absolute;inset:0}
@@ -287,6 +295,12 @@ body.in-hub .topnav{display:none}
      come una cartina vera. Dove lo schermo è più largo di 620 non cambia
      niente: `max()` la lascia riempire la colonna. */
   .pmappa{overflow-x:auto;place-items:start;overscroll-behavior-x:contain}
+  /* la foto adesso è più larga del riquadro e lo copre tutta: lo sfondo
+     sfocato del punto 62 non si vedrebbe comunque, e con `inset:-40px` dentro
+     a un riquadro che scorre si porterebbe dietro quaranta pixel di vuoto da
+     scorrere. Via — è anche una sfocatura da 46 px in meno da disegnare sul
+     telefono. */
+  .pmappa::before{display:none}
   .pfoto{width:max(100%,620px);height:auto;max-width:none}
   .psx{overflow:visible;max-height:none}
   .psxtab{height:88px}

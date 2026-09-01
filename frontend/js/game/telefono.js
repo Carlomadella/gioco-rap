@@ -54,6 +54,8 @@ const HUB_APP = [
   {id:"messaggi", n:"Messaggi", ic:"chat", k:"#7C3AED",
    badge:g => Math.max(0, g.log.length - (g.seenLog || 0))},
   {id:"contatti", n:"Contatti", ic:"gente", k:"#38BDF8"},
+  /* punto 66: mamma e il migliore amico scrivono da subito, il resto arriva con la fama */
+  {id:"chat", n:"Chat", ic:"duebolle", k:"#25D366", badge:() => chatNonLetti()},
   {id:"lafamegram", n:"LaFamegram", ic:"camera", k:"#D62976"},
   {id:"notizie", n:"Notizie", ic:"giornale", k:"#60A5FA", badge:() => HUB_NOTIZIE.length},
   {id:"obiettivi", n:"Obiettivi", ic:"mirino", k:"#EF4444",
@@ -265,6 +267,7 @@ function schermataApp(id){
   if(id === "agenda") return schermataAgenda();
   if(id === "impostazioni") return schermataImpostazioni();
   if(id === "lafamegram") return schermataLafamegram();
+  if(id === "chat") return TEL_CHAT_APERTA ? schermataChatThread() : schermataChat();
   return "";
 }
 
@@ -366,7 +369,7 @@ function schermataClassifiche(){
     return '<div class="tli static' + (x.me ? " me" : "") + '">' +
       '<span class="tlipos">' + pos + '</span>' +
       '<span class="tlitx"><b>' + (x.me ? ((window.ARTIST || {}).name || "Tu") : x.n) + '</b>' +
-      (x.me ? '' : '<i>' + x.r.city + ' · ' + x.r.gen + '</i>') + '</span>' +
+      (x.me ? '' : '<i>' + (x.r.eta ? x.r.eta + ' anni · ' : '') + x.r.city + ' · ' + x.r.gen + '</i>') + '</span>' +
       '<span class="tliv">' + short(x.p) + '</span></div>';
   }).join("");
   return '<div class="tnote"><b>Sei ' + cl.pos + 'º</b>' +
@@ -377,7 +380,7 @@ function schermataClassifiche(){
 /* ---- Agenda: gli eventi di stasera più le mosse disponibili ---- */
 function schermataAgenda(){
   const oggi = HUB_EVENTI.map(e => {
-    const st = (e.presto || e.posto) ? {ok:true} : hubPronta(e.id);
+    const st = (e.presto || e.posto || e.strada) ? {ok:true} : hubPronta(e.id);
     return '<button class="tli" data-evento="' + e.id + '"' + (st.ok ? '' : ' disabled') + '>' +
       '<span class="tliav" style="--k:' + e.k + '">' + hsvg(e.ic) + '</span>' +
       '<span class="tlitx"><b>' + e.n + '</b><i>' + e.d + '</i></span>' +
@@ -440,6 +443,7 @@ function telApriApp(a, ev){
 function telHome(){
   const scr = document.querySelector(".tscreen");
   hubTap();
+  TEL_CHAT_APERTA = null;
   if(scr){ scr.classList.add("tout"); setTimeout(() => { TEL_APP = null; renderTelefono(); }, 160); }
   else { TEL_APP = null; renderTelefono(); }
 }
@@ -470,14 +474,18 @@ $("hb-tel").addEventListener("click", ev => {
   }
   const inv = ev.target.closest("[data-inv]");
   if(inv){ TEL_INVTAB = inv.dataset.inv; hubTap(); renderTelefono(); return; }
+  const chatOpen = ev.target.closest("[data-chat]");
+  if(chatOpen){ TEL_CHAT_APERTA = chatOpen.dataset.chat; hubTap(); renderTelefono(); return; }
+  if(ev.target.closest("[data-chathome]")){ TEL_CHAT_APERTA = null; hubTap(); renderTelefono(); return; }
+  const chatOpt = ev.target.closest("[data-chatopt]");
+  if(chatOpt){ hubTap(); chatRispondi(TEL_CHAT_APERTA, +chatOpt.dataset.chatopt); return; }
   const evb = ev.target.closest("[data-evento]");
   if(evb && !evb.disabled){
     const e = HUB_EVENTI.find(x => x.id === evb.dataset.evento); if(!e) return;
     hubTap();
     if(e.posto) apriPosto();
-    else if(e.presto) hubPresto(e.n,
-      "I lavori sporchi arrivano con le attività criminali: è il prossimo pezzo di " +
-      "mondo da aprire, insieme al giro storto sulla mappa.");
+    else if(e.strada) apriStrada();
+    else if(e.presto) hubPresto(e.n, "Sta arrivando.");
     else hubAzione(e.id);
     return;
   }

@@ -376,10 +376,12 @@ aperti, uno per uno.
    sulla mappa, le due frecce del giro guidato, gli interruttori, la crocetta
    che toglie una barra — tiene la sua misura e si prende un `::after`
    invisibile largo 44 che raccoglie il tocco al posto suo. Prima erano
-   piccoli: le sette croci per chiudere (34-38), il cerchio dell'avatar (36),
+   piccoli: le otto croci per chiudere (34-38), il cerchio dell'avatar (36),
    le frecce della mappa (18×13), i bottoni del negozio (32), le manopole
-   delle Impostazioni (16 di altezza), le righe del foglio (37). Adesso a 360,
-   390, 430 e 768 px **non resta un solo bersaglio sotto i 44**.
+   delle Impostazioni (16 di altezza), le righe del foglio (37) e, appena
+   arrivata da Carletto, tutta la Strada (`.stx` 34, `.stbtn` e `.stmini` 27-32,
+   `.stmolla` 39). Adesso a 360, 390, 430 e 768 px **non resta un solo
+   bersaglio sotto i 44**, la Strada e la Chat comprese.
    Attenzione a una trappola in cui sono cascato e che è meglio non ripetere:
    `min-width` su un elemento dentro a un `flex` **abbassa** il suo minimo
    automatico (che di suo è la misura del contenuto) e il testo si taglia — le
@@ -396,6 +398,10 @@ illuminano (`scrollIntoView`), se no indicavano un cartello fuori dalla
 finestra. Nota per chi ci torna: `behavior:"smooth"` su quel contenitore **non
 scorre affatto**, provato; senza, va sempre, e il verso lo decide comunque il
 CSS.
+Sotto i 900 lo sfondo sfocato del punto 62 si spegne: la foto è più larga del
+riquadro e lo copre tutto, quindi non si vedrebbe comunque — e con `inset:-40px`
+dentro a un riquadro che scorre si portava dietro quaranta pixel di vuoto da
+scorrere. È anche una sfocatura da 46 px in meno da disegnare sul telefono.
 
 
 ## 55 · Via la conferma «sei sicuro» per l'energia
@@ -433,6 +439,66 @@ CSS.
     ripartire anche riaprendo di fila la stessa scena, altrimenti il browser la considera già finita).
     Provato in Chrome: `stacca` poi `palestra` poi `turno` in sequenza, ognuna con l'animazione giusta
     (`getComputedStyle(...).animationName`), e il bottone «Continua» funziona ancora dopo ogni scena.
+
+---
+
+## 63 · Via i doppioni dalla sidebar del profilo
+
+63. I parametri di Soldi, benessere, Fama, Hype, Network e benessere si trovano sia sulla barra in
+    alto sia sulla side bar del profilo. Togliamoli per ora dalla side bar del profilo e piuttosto
+    nella side ci aggiungiamo cose come Lifestyle, e magari qualche altro parametro, tipo banalmente
+    Livello sospetto per quanto riguarda se fai la carriera criminale.
+
+    **FATTO (01/09/2026)** — la sidebar (`vistaProfilo()`, `hub.js`) ripeteva sei righe già scritte
+    nella fascia in alto (soldi, energia, fama, hype, network, benessere): tolte tutte tranne
+    Lucidità, che lì non c'è. Al loro posto due righe nuove: **Lifestyle** (`lifestyleRiepilogo()`,
+    nuova in `lifestyle.js` — quante delle cinque categorie hai alzato dal livello base, e di quanto
+    in media) e **Livello sospetto**, che è `G.strada.heat` del punto 21 — prima di quel punto la
+    riga sarebbe stata vuota, adesso ha un senso vero.
+    Provato in Chrome: con `G.life.auto` a un livello sopra zero e `G.strada.heat` a 42, la sidebar
+    mostra esattamente «Lucidità», «Lifestyle: 1 su 5 curati» e «Livello sospetto: 42» — niente più
+    doppioni con la fascia in alto, verificata invariata (energia, soldi, hype, fama, network,
+    benessere restano lì).
+
+---
+
+## 64 · Il profilo cliccabile dal menù, in stile character creator
+
+64. Dalla schermata del menù iniziale 02. Il profilo vorrei che fosse cliccabile e che il menù per
+    modificare il tuo profilo fosse in stile NBA 2K27 per quanto riguarda la personalizzazione del
+    proprio personaggio.
+
+    **Risulta già fatto**, prima di questa sessione: l'avatar in alto a destra nella barra del menù
+    (`#nav-avatar`, punto 4) chiama già `goto("profile")`, che apre `#s-profile` — una galleria di
+    otto avatar di partenza più un vero e proprio banco di personalizzazione: anteprima grande col
+    personaggio (volto o figura intera), altezza/peso/corporatura/vestito a lato, e una barra di
+    categorie (capelli, cappelli, occhi, accessori, vestiti, tatuaggi) con un pannello per ognuna —
+    lo schema di un character creator vero, non una scheda di testo.
+    Provato in Chrome: click su `#nav-avatar` dal menù, si apre la galleria con l'anteprima e i
+    pannelli, esattamente come chiesto. Non c'è altro da costruire per questo punto.
+
+---
+
+## 66 · «Chat»: prima solo mamma e il migliore amico, poi il resto arriva con la fama
+
+66. Nelle app potremmo implementare anche Whatsapp, ovviamente non possiamo dargli lo stesso nome ma
+    sarebbe bello che all'inizio ti contatta solamente tua madre e il tuo migliore amico, poi più hai
+    fama più gente cerca di interagire in bene o a volte anche in male con te.
+
+    **FATTO (01/09/2026)** — nuova app del telefono, «Chat» (`frontend/js/game/chat.js`): non è il
+    diario degli eventi (quello resta «Messaggi»), sono conversazioni vere con soglie di sblocco.
+    - **Mamma** e **Dario** (il migliore amico) scrivono da subito, con frasi pescate a caso ogni
+      settimana e due risposte ciascuno che danno un piccolo effetto (mamma: +benessere; Dario:
+      +rete se lo inviti in studio).
+    - **Un fan** si sblocca a 80 fan, **un hater** a 250: rispondere al fan costa niente e dà +hype,
+      rispondere all'hater è un tiro di dado (a volte +hype, a volte -benessere) — oppure lo **blocchi**
+      e non scrive più per sei settimane, oppure lo ignori.
+    - Ogni contatto ha il suo badge di non letti sull'icona dell'app e sulla singola conversazione;
+      aprire una chat la segna letta.
+    `chatSettimana()` (chiamata da `advanceWeek()`, `sim.js`) decide ogni settimana chi scrive.
+    Provato in Chrome: con pochi fan scrivono solo mamma e Dario; a 300 fan si sblocca anche l'hater,
+    rispondere con «Blocca» ferma davvero i suoi messaggi per le settimane dichiarate (verificato
+    facendo girare `chatSettimana()` per tutta la durata del blocco: zero messaggi nuovi).
 
 ---
 

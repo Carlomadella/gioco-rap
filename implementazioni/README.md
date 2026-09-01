@@ -11,22 +11,22 @@ file del suo argomento con dentro cosa è stato fatto.
 
 | file | cosa c'è dentro |
 | --- | --- |
-| [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 7 voci |
-| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 17 voci |
+| [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 8 voci |
+| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 20 voci |
 | [`03-artista-e-avatar.md`](03-artista-e-avatar.md) | **L'artista e il suo avatar** — 1 voce |
 | [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 9 voci |
 | [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 9 voci |
-| [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md) | **Il mondo e la gente** — 8 voci |
+| [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md) | **Il mondo e la gente** — 9 voci |
 | [`07-multiplayer-e-backend.md`](07-multiplayer-e-backend.md) | **Il multiplayer e il server** — 3 voci |
 | [`08-uscita-sugli-store.md`](08-uscita-sugli-store.md) | **L'uscita su Steam e sugli store** — 3 voci |
-| [`09-grafica-e-asset.md`](09-grafica-e-asset.md) | **La grafica, le ambientazioni e gli asset** — 6 voci |
+| [`09-grafica-e-asset.md`](09-grafica-e-asset.md) | **La grafica, le ambientazioni e gli asset** — 7 voci |
 
 Più [`00-come-si-lavora.md`](00-come-si-lavora.md): le regole di lavoro, che valgono
 per tutti e per tutto.
 
 ## Tutti i punti
 
-65 voci in tutto: **24 chiuse**, 9 a metà, il resto da fare.
+71 voci in tutto: **29 chiuse**, 10 a metà, il resto da fare.
 
 | | punto | stato | dove |
 | --- | --- | --- | --- |
@@ -50,7 +50,7 @@ per tutti e per tutto.
 | **18** | L'energia rimasta si deve vedere | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **19** | «Completa la canzone» deve costare qualcosa | da fare | [musica-e-suoni](04-musica-e-suoni.md) |
 | **20** | I produttori hanno abilità, fama e carattere | da fare | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
-| **21** | La professione del criminale | da fare | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
+| **21** | La professione del criminale | fatto | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
 | **22** | L'energia cresce col livello, e i livelli devono avere un senso | da fare | [carriera-e-tempo](05-carriera-e-tempo.md) |
 | **23** | Il menù delle impostazioni | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **24** | Gli slot anche nella schermata di avvio | da fare | [carriera-e-tempo](05-carriera-e-tempo.md) |
@@ -82,6 +82,12 @@ per tutti e per tutto.
 | **59** | Due lavori veri al posto di due cartelli chiusi: Pizzeria e Fabbrica | fatto | [mappa-e-citta](01-mappa-e-citta.md) |
 | **60** | «Vita quotidiana» diventa «Casa» | fatto | [mappa-e-citta](01-mappa-e-citta.md) |
 | **61** | La palestra diventa un posto suo | fatto | [mappa-e-citta](01-mappa-e-citta.md) |
+| **62** | La mappa allargata, senza bande nere | fatto | [mappa-e-citta](01-mappa-e-citta.md) |
+| **63** | Via i doppioni dalla sidebar del profilo | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **64** | Il profilo cliccabile dal menù, in stile character creator | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **65** | Un'età per i personaggi | fatto | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
+| **66** | «Chat»: mamma e il migliore amico, poi il resto con la fama | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **67** | Meno colori nella schermata di gioco | in parte | [grafica-e-asset](09-grafica-e-asset.md) |
 | **—** | Niente «si sblocca a Milano» scritto in faccia | fatto | [mappa-e-citta](01-mappa-e-citta.md) |
 | **—** | Il telefono come telefono (la richiesta di partenza) | da fare | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Il gioco alla giornata invece che alla settimana | risposto, da fare | [carriera-e-tempo](05-carriera-e-tempo.md) |

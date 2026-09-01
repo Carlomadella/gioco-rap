@@ -23,15 +23,42 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
 
 21. implementa un nuovo modo di fare soldi, poi nel caso anche la fama, ovvero la professione del criminale
 
-**57 · «Non è più giocabile, che è successo?» — controllato, non è una regressione.**
+**57 · «Non è più giocabile, che è successo?» — controllato, non era una regressione.**
 Cercato in tutta la cronologia (`git log --all --grep`, tutti i branch) qualcosa che avesse mai reso
-«Attività criminali» o «Colpo rapido» giocabili: **non c'è mai stato un commit che l'abbia costruito.**
-Sia la card sulla mappa (`HUB_LUOGHI`, id `crimin`) sia la voce degli eventi del giorno (`HUB_EVENTI`,
-id `colpo`) chiamano `hubPresto(...)` — il placeholder «sta arrivando» — fin dal punto 26, quando sono
-state create. Il punto 21 non è mai stato chiuso: quello che si ricordava «giocabile nel pomeriggio»
-probabilmente era proprio questo popup di attesa, non un minigioco vero. Le regole per farlo davvero
-ci sono già qui sotto — reputazione, cassa sporca, rischio finanza — manca solo il codice: è di nuovo
-il punto 21, non un bug da riparare.
+«Attività criminali» o «Colpo rapido» giocabili: **non c'era mai stato un commit che l'avesse
+costruito.** Sia la card sulla mappa (`HUB_LUOGHI`, id `crimin`) sia la voce degli eventi del giorno
+(`HUB_EVENTI`, id `colpo`) chiamavano `hubPresto(...)` — il placeholder «sta arrivando» — fin dal
+punto 26. Il punto 21 non era mai stato chiuso: quello che si ricordava «giocabile nel pomeriggio»
+era probabilmente proprio questo popup di attesa, non un minigioco vero.
+
+**FATTO (01/09/2026) — La Strada, `frontend/js/game/strada-crimine.js` + `css/strada-crimine.css`.**
+Il codice non era mai arrivato su GitHub — solo il documento di design (le regole già scritte qui
+sotto: reputazione, cassa sporca, rischio finanza). Recuperato da `strada-punto-21-files.zip`,
+una consegna fatta al di fuori del repo in un'altra sessione, e adattato ai file di adesso (il punto
+59 aveva nel frattempo aggiunto Fabbrica, il punto 54 aveva già preso il nome `strada.js` per gli
+incontri per strada — da cui il nome nuovo, per non perdere né l'uno né l'altro pezzo).
+- **Quattro colpi di provincia** (Consegne, Roba che scotta, La cassa del bar, La macchina giusta),
+  ognuno con tre approcci — da solo pulito, con uno dei tuoi, col ferro — che cambiano guadagno,
+  rumore e riuscita. Milano e Los Angeles restano in vista con scritto dove si aprono, non ci sono
+  ancora quelle mappe.
+- **Due casse, non una**: il colpo riuscito paga il 40% pulito subito, il 60% resta sporco finché non
+  lo ripulisci (con una soglia oltre cui rende meno).
+- **Reputazione di strada e attenzione**, non un numero solo: l'attenzione sale coi colpi rumorosi e
+  con la vetrina (spendere più di quanto dichiari fa insospettire), scende da sola nel tempo — più in
+  fretta con un avvocato — e oltre 50 rischia un controllo a sorpresa.
+- **Chi ti copre**: uomini (costano all'assunzione e ogni settimana, uno può starci sotto al posto
+  tuo), tre gradi di protezione, il ferro (più riuscita e guadagno, pena doppia se ti perquisiscono),
+  l'avvocato (dimezza le pene, l'attenzione scende più in fretta).
+  Tre attività da rilevare (lavanderia, autolavaggio, minimarket) che rendono ogni settimana, 45%
+  pulito e 55% sporco.
+- **Si può finire dentro**: la pena macina fan, hype e spese finché non esci, con un evento all'uscita
+  (raccontarla o tornare dove avevi lasciato). Si può anche **mollare il giro** (costa il 30% dei
+  soldi sporchi, minimo 1.500 €, abbassa la reputazione, alza la lucidità).
+  Provato in Chrome: colpo riuscito, colpo fallito con arresto, undici settimane di pena fino
+  all'uscita, ripulisci, assumere un uomo/protezione/ferro/avvocato, mollare il giro, ed entrambe le
+  porte d'ingresso (la card sulla mappa e «Colpo rapido» negli eventi del giorno).
+  **Non copre ancora**, di proposito: i colpi di Milano e Los Angeles, il casinò, il blocco delle
+  altre azioni del gioco mentre sei dentro, i contatti criminali nella rubrica (che non esiste).
 
 ---
 
@@ -168,5 +195,22 @@ proprio il motivo per cui uno smette.
 ## La vita simulata
 
 Voglio che il gioco abbia vita simulata molto sviluppata. Non banalità, dobbiamo lanciare un gioco cche vogliamo sia molto valido.
+
+---
+
+## 65 · Un'età per i personaggi
+
+65. Implementiamo anche le età nei personaggi di gioco, in tutti.
+
+    **FATTO (01/09/2026)** — un'età vera per chi ha un'identità che torna: i tre/quattro volti alla
+    Sala (`nuovaPersona()`, `posto.js`) e i rivali in classifica (`nuovoRivale()`, `rivals.js`). I
+    beatmaker e i rapper partono dalla stessa fascia del giocatore (18-32); fonici e giornalisti, il
+    cui mestiere presuppone anni di gavetta, da una fascia più alta (26-58). Si vede accanto al nome:
+    nella scheda alla Sala, nella riga di classifica (schermata e telefono), e il giocatore stesso
+    ora mostra la sua in classifica. **Non tocca gli incontri per strada** (punto 54: fan, hater,
+    opp...): sono passanti generati al volo per un solo evento, non personaggi che restano — dargli
+    un'età vera vorrebbe dire prima dargli un'identità vera, che il punto non chiedeva. I salvataggi
+    vecchi restano senza età sui personaggi già creati (il gioco lo gestisce, non scrive «undefined»);
+    quelli nuovi, da qui in avanti, ce l'hanno tutti.
 
 ---

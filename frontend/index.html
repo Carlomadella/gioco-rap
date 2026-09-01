@@ -13,24 +13,25 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=Archivo+Black&family=Barlow+Condensed:wght@600;700;800&display=swap">
 
 <!-- Fogli di stile: l'ordine conta, la cascata è quella originale. -->
-<link rel="stylesheet" href="css/base.css?v=8">
-<link rel="stylesheet" href="css/preview.css?v=8">
-<link rel="stylesheet" href="css/shell.css?v=8">
-<link rel="stylesheet" href="css/landing.css?v=8">
-<link rel="stylesheet" href="css/game.css?v=8">
-<link rel="stylesheet" href="css/overlays.css?v=8">
-<link rel="stylesheet" href="css/effects.css?v=8">
-<link rel="stylesheet" href="css/hud.css?v=8">
-<link rel="stylesheet" href="css/forms.css?v=8">
-<link rel="stylesheet" href="css/creator.css?v=8">
-<link rel="stylesheet" href="css/actionbar.css?v=8">
-<link rel="stylesheet" href="css/posto.css?v=8">
-<link rel="stylesheet" href="css/negozio.css?v=8">
-<link rel="stylesheet" href="css/hub.css?v=8">
-<link rel="stylesheet" href="css/telefono.css?v=8">
-<link rel="stylesheet" href="css/impostazioni.css?v=8">
+<link rel="stylesheet" href="css/base.css?v=9">
+<link rel="stylesheet" href="css/preview.css?v=9">
+<link rel="stylesheet" href="css/shell.css?v=9">
+<link rel="stylesheet" href="css/landing.css?v=9">
+<link rel="stylesheet" href="css/game.css?v=9">
+<link rel="stylesheet" href="css/overlays.css?v=9">
+<link rel="stylesheet" href="css/effects.css?v=9">
+<link rel="stylesheet" href="css/hud.css?v=9">
+<link rel="stylesheet" href="css/forms.css?v=9">
+<link rel="stylesheet" href="css/creator.css?v=9">
+<link rel="stylesheet" href="css/actionbar.css?v=9">
+<link rel="stylesheet" href="css/posto.css?v=9">
+<link rel="stylesheet" href="css/negozio.css?v=9">
+<link rel="stylesheet" href="css/strada-crimine.css?v=9">
+<link rel="stylesheet" href="css/hub.css?v=9">
+<link rel="stylesheet" href="css/telefono.css?v=9">
+<link rel="stylesheet" href="css/impostazioni.css?v=9">
 <!-- per ultimo: le aree da toccare devono vincere sulla cascata di tutti gli altri -->
-<link rel="stylesheet" href="css/tocco.css?v=8">
+<link rel="stylesheet" href="css/tocco.css?v=9">
 </head>
 <body>
 
@@ -349,6 +350,13 @@
   <div class="nggrid" id="ng-grid"></div>
 </div></div>
 
+<!-- La Strada (punto 21): il luogo "Attività criminali" della mappa apre questo
+     pannello. Il contenuto lo mette js/game/strada-crimine.js. -->
+<div class="strada" id="strada"><div class="stwrap">
+  <div class="sthead"><div class="stk">Attività criminali</div><button class="stx" id="st-x">&#10005;</button></div>
+  <div id="st-body"></div>
+</div></div>
+
 <div class="piazza" id="piazza"><div class="pwrap">
   <div class="phead"><div class="pk">Freestyle in piazza</div><button class="px" id="p-x">✕</button></div>
   <div class="scena" id="p-scena"></div>
@@ -530,53 +538,55 @@
 </section>
 
 <!-- Script classici, caricati in ordine: ogni file usa quello che viene prima. -->
-<script src="js/core.js?v=8"></script>
+<script src="js/core.js?v=9"></script>
 
 <!-- Impostazioni: audio, aspetto, difficoltà, slot e lingua. Devono esistere
      prima di tutto il resto, perché stato e simulazione leggono da qui. -->
-<script src="js/impostazioni.js?v=8"></script>
-<script src="js/lingua.js?v=8"></script>
-<script src="js/net/online.js?v=8"></script>
+<script src="js/impostazioni.js?v=9"></script>
+<script src="js/lingua.js?v=9"></script>
+<script src="js/net/online.js?v=9"></script>
 
 <!-- Creatore dell'artista -->
-<script src="js/creator/data.js?v=8"></script>
-<script src="js/creator/state.js?v=8"></script>
-<script src="js/creator/portrait.js?v=8"></script>
-<script src="js/creator/avatar-presets.js?v=8"></script>
-<script src="js/creator/options.js?v=8"></script>
-<script src="js/creator/render.js?v=8"></script>
-<script src="js/creator/events.js?v=8"></script>
-<script src="js/creator/nav.js?v=8"></script>
+<script src="js/creator/data.js?v=9"></script>
+<script src="js/creator/state.js?v=9"></script>
+<script src="js/creator/portrait.js?v=9"></script>
+<script src="js/creator/avatar-presets.js?v=9"></script>
+<script src="js/creator/options.js?v=9"></script>
+<script src="js/creator/render.js?v=9"></script>
+<script src="js/creator/events.js?v=9"></script>
+<script src="js/creator/nav.js?v=9"></script>
 
 <!-- Partita -->
-<script src="js/game/state.js?v=8"></script>
-<script src="js/game/content.js?v=8"></script>
-<script src="js/game/beats.js?v=8"></script>
-<script src="js/game/covers.js?v=8"></script>
-<script src="js/game/rivals.js?v=8"></script>
-<script src="js/game/actions.js?v=8"></script>
-<script src="js/game/events.js?v=8"></script>
-<script src="js/game/phases.js?v=8"></script>
-<script src="js/game/sim.js?v=8"></script>
-<script src="js/game/writer.js?v=8"></script>
-<script src="js/game/versi.js?v=8"></script>
-<script src="js/game/piazza.js?v=8"></script>
-<script src="js/game/copertine.js?v=8"></script>
-<script src="js/game/modal.js?v=8"></script>
-<script src="js/game/scene-art.js?v=8"></script>
-<script src="js/game/beatplay.js?v=8"></script>
-<script src="js/game/ui.js?v=8"></script>
-<script src="js/game/lifestyle.js?v=8"></script>
-<script src="js/game/fx.js?v=8"></script>
-<script src="js/game/skip.js?v=8"></script>
-<script src="js/game/posto.js?v=8"></script>
-<script src="js/game/strada.js?v=8"></script>
-<script src="js/game/negozio.js?v=8"></script>
-<script src="js/game/uscita.js?v=8"></script>
-<script src="js/game/hub.js?v=8"></script>
-<script src="js/game/telefono.js?v=8"></script>
+<script src="js/game/state.js?v=9"></script>
+<script src="js/game/content.js?v=9"></script>
+<script src="js/game/beats.js?v=9"></script>
+<script src="js/game/covers.js?v=9"></script>
+<script src="js/game/rivals.js?v=9"></script>
+<script src="js/game/actions.js?v=9"></script>
+<script src="js/game/events.js?v=9"></script>
+<script src="js/game/phases.js?v=9"></script>
+<script src="js/game/sim.js?v=9"></script>
+<script src="js/game/writer.js?v=9"></script>
+<script src="js/game/versi.js?v=9"></script>
+<script src="js/game/piazza.js?v=9"></script>
+<script src="js/game/copertine.js?v=9"></script>
+<script src="js/game/modal.js?v=9"></script>
+<script src="js/game/scene-art.js?v=9"></script>
+<script src="js/game/beatplay.js?v=9"></script>
+<script src="js/game/ui.js?v=9"></script>
+<script src="js/game/lifestyle.js?v=9"></script>
+<script src="js/game/fx.js?v=9"></script>
+<script src="js/game/skip.js?v=9"></script>
+<script src="js/game/posto.js?v=9"></script>
+<script src="js/game/strada.js?v=9"></script>
+<script src="js/game/strada-crimine.js?v=9"></script>
+<script src="js/game/negozio.js?v=9"></script>
+<script src="js/game/uscita.js?v=9"></script>
+<script src="js/game/hub.js?v=9"></script>
+<script src="js/game/chat.js?v=9"></script>
+<script src="js/game/telefono.js?v=9"></script>
 
 <!-- Il pannello delle impostazioni: per ultimo, tocca roba definita ovunque. -->
-<script src="js/impostazioni-ui.js?v=8"></script>
+<script src="js/impostazioni-ui.js?v=9"></script>
 </body>
 </html>

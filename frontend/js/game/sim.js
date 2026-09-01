@@ -83,6 +83,7 @@ function advanceWeek(){
   let gross = streams * 0.0055;
   if(G.contract) gross *= G.contract.share;
   if(G.manager) gross *= 0.85;
+  G._entratePulite = gross; /* la vetrina della Strada la confronta con le spese di lifestyle */
   const costs = weeklyCosts();
   G.money += gross - costs;
 
@@ -159,6 +160,12 @@ function advanceWeek(){
       G.obligation = null;
     }
   }
+
+  /* punto 21: il giro della Strada — heat che decade, attività che rendono,
+     uomini/protezione/avvocato che costano, il carcere che macina se sei dentro */
+  if(typeof stradaSettimana === "function") stradaSettimana();
+  /* punto 66: chi ti scrive in chat, questa settimana */
+  if(typeof chatSettimana === "function") chatSettimana();
 
   G.week++;
   if(G.week > 52){ G.week = 1; G.year++; G.age++; pushLog("<b>Un anno in più.</b> Hai " + G.age + " anni.", "big"); }

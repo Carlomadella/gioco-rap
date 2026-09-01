@@ -71,6 +71,10 @@
     transform:translate(-50%,-50%);width:44px;height:44px}
   .wline .rm{position:relative}
 
+  /* ---- la Strada (il colpo, punto 21) ---- */
+  .stx{width:44px;height:44px}
+  .stbtn,.stmini,.stmolla{min-height:44px}
+
   /* ---- il creatore e i moduli ---- */
   .chip,.vb,.ghost{min-height:44px}
 }

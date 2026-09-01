@@ -42,7 +42,8 @@ const HIC = {
   corona:'<path d="M2 19h20l-1.6-11-5 3.6L12 4 8.6 11.6l-5-3.6z"/>',
   nota:'<path d="M20 3v11.4a3.3 3.3 0 1 1-2-3V7.7l-7 1.5v7.8a3.3 3.3 0 1 1-2-3V6.5z"/>',
   rischio:'<path d="M12 2 1.5 21h21zm-1 6h2v7h-2zm0 9h2v2h-2z"/>',
-  dado:'<path d="M12 2 21 6.6v10.8L12 22 3 17.4V6.6zM5.8 7.5 12 10.7l6.2-3.2L12 4.3z"/>'
+  dado:'<path d="M12 2 21 6.6v10.8L12 22 3 17.4V6.6zM5.8 7.5 12 10.7l6.2-3.2L12 4.3z"/>',
+  duebolle:'<path d="M3 4h13v9H8.4L4 17V4zM21 9h-4v7l-3.2-2.6H10V9h2v2.4h5.6L19 13V11h2z"/>'
 };
 const hsvg = (n, cls) => '<svg class="' + (cls || "hicon") + '" viewBox="0 0 24 24" aria-hidden="true">' + HIC[n] + '</svg>';
 const spoglia = t => String(t).replace(/<[^>]*>/g, "");
@@ -83,10 +84,10 @@ const HUB_LUOGHI = [
        {n:"Guarda cosa ti costa vivere", d:"Casa, look, uscite: le spese fisse",
         run(){ hubGioco("lifestyle"); return null; }}
      ]})},
+  /* punto 21/57: la Strada, ricostruita da claude/carriera-criminale.md
+     (js/game/strada-crimine.js) — non era mai stata scritta, solo pensata */
   {id:"crimin", n:"Attività criminali", x:72.77, y:50.96, w:20.24, h:18.17,
-   vai:() => hubPresto("Attività criminali",
-     "Il giro storto della provincia — colpi piccoli, soldi veloci, guai veri — " +
-     "è il prossimo pezzo di mondo da aprire.")},
+   vai:() => apriStrada()},
   /* punto 59: il secondo lavoro, full time — era «Sponsor & brand» */
   {id:"fabbrica", n:"Fabbrica", x:6.87, y:74.59, w:19.28, h:9.31,
    vai:() => schedaLavoro("operaio", "Fabbrica")},
@@ -115,7 +116,7 @@ const HUB_EVENTI = [
    d:"Party in appartamento.", ora:"00:00",
    righe:[["cuore", "Ti rimette su"], ["dado", "Evento casuale"]]},
   {id:"colpo", ic:"maschera", k:"#EF4444", n:"Colpo rapido",
-   d:"Lavoro illegale. Rischio basso.", ora:"01:30", presto:true,
+   d:"Lavoro illegale. Rischio vero.", ora:"01:30", strada:true,
    righe:[["soldi", "Soldi veloci"], ["rischio", "Rischio vero"]]}
 ];
 
@@ -284,13 +285,12 @@ function vistaProfilo(L, ph){
       '</div>' +
     '</div>' +
     '<div class="prighe">' +
-      rigaStat("soldi", "#4ADE80", "Soldi", fmt(G.money) + " €") +
-      rigaStat("energia", "#FACC15", "Energia", G.energy + " / " + G.maxEnergy) +
-      rigaStat("fama", "#FBBF24", "Fama", short(G.fans)) +
-      rigaStat("hype", "#FB923C", "Hype", Math.round(G.hype)) +
-      rigaStat("gente", "#60A5FA", "Network", Math.round(G.skills.rete)) +
-      rigaStat("cuore", "#EF4444", "Benessere", Math.round(G.wellbeing), G.wellbeing) +
+      /* punto 63: soldi/energia/fama/hype/network/benessere stanno già nella
+         fascia in alto — qui restava solo lucidità, che lì non c'è. Al posto
+         dei doppioni: il lifestyle e quanto ti sei fatto notare per strada */
       rigaStat("testa", "#A855F7", "Lucidità", Math.round(luc()), luc()) +
+      rigaStat("zaino", "#F59E0B", "Lifestyle", lifestyleRiepilogo().alzati + " su " + LIFE.length + " curati", lifestyleRiepilogo().pct) +
+      rigaStat("rischio", "#EF4444", "Livello sospetto", Math.round((G.strada && G.strada.heat) || 0), (G.strada && G.strada.heat) || 0) +
     '</div>' +
     '<div class="psk"><span class="pk">Skill</span>' + skillRighe() + '</div>' +
     '<div class="pdue">' +
@@ -389,7 +389,7 @@ function renderHub(){
 
   /* ---- gli eventi di oggi ---- */
   $("hb-eventi").innerHTML = HUB_EVENTI.map(e => {
-    const st = (e.presto || e.posto) ? {ok:true, perche:""} : hubPronta(e.id);
+    const st = (e.presto || e.posto || e.strada) ? {ok:true, perche:""} : hubPronta(e.id);
     return '<button class="pev" data-e="' + e.id + '" style="--k:' + e.k + '"' +
       (st.ok ? '' : ' disabled') + '>' +
       '<span class="pevt">' + hsvg(e.ic) + e.n + '</span>' +
@@ -450,9 +450,8 @@ $("hb-eventi").addEventListener("click", ev => {
   const e = HUB_EVENTI.find(x => x.id === b.dataset.e); if(!e) return;
   hubTap();
   if(e.posto) apriPosto();
-  else if(e.presto) hubPresto(e.n,
-    "I lavori sporchi arrivano con le attività criminali: è il prossimo pezzo di " +
-    "mondo da aprire, insieme al giro storto sulla mappa.");
+  else if(e.strada) apriStrada();
+  else if(e.presto) hubPresto(e.n, "Sta arrivando.");
   else hubAzione(e.id);
 });
 

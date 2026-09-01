@@ -44,6 +44,7 @@ const USCITE = [
    chiudi(){ if(typeof WR !== "undefined" && WR){ annullaAzione(); } chiudiFoglio(); renderGioco(); return true; }},
   {id:"piazza", chiudi(){ uscitaPiazza(); return true; }},
   {id:"posto",  chiudi(){ chiudiPosto(); return true; }},
+  {id:"strada", chiudi(){ chiudiStrada(); return true; }},
   {id:"drawer", chiudi(){ closeDiary(); return true; }},
   {id:"report", chiudi(){ $("report").classList.remove("on"); return true; }},
   {id:"scena", chiudi(){ $("scena").classList.remove("on"); return true; }}

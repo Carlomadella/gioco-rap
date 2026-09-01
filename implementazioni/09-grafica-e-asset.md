@@ -84,3 +84,34 @@ macchina, l'indicizzazione degli array è il primo sospettato.
 
 ---
 
+## 67 · Meno colori nella schermata di gioco
+
+67. Ci sono troppi colori nella schermata principale di gioco. A differenza di quella del menù che è
+    più su pochi colori e difatti l'inquadratura mi piace molto, è bella clean.
+
+    **FATTO in parte (01/09/2026)** — le dodici mosse della settimana (`scene-art.js`) avevano
+    ognuna due tinte sue per il bordo e lo sfondo della card (`--a`/`--b` in `game.css`): otto tinte
+    diverse su dodici card, una specie di arcobaleno ogni volta che si guardava la griglia intera —
+    l'opposto del nero-e-oro della landing. Raggruppate in **quattro famiglie con un senso**
+    (`TINTA_STUDIO`, `TINTA_HUSTLE`, `TINTA_SUONO`, `TINTA_VITA` in `scene-art.js`): viola per chi
+    scrive e produce in studio (scrivi, registra, mixa, pubblica), oro per chi fa muovere soldi e
+    occasioni (promo, cerca lavoro, turno), ciano per il suono e il palco (cerca un beat, freestyle,
+    live), verde per la vita fuori dalla musica (stacca la spina, palestra). Gli stessi colori
+    vanno anche nel toast delle mosse rapide (`ART`, `ui.js`), così il popup dopo il tap non stona
+    col colore della card appena premuta.
+    **In parte** perché non ho toccato i disegni SVG delle scenette (i dettagli dentro ogni
+    illustrazione — cuori, note, luci di scena — restano colorati come prima, sono il contenuto
+    dell'arte, non il suo involucro) né i colori della fascia in alto (soldi/hype/fama/network/
+    benessere, che servono a distinguerli al volo e non affollano la schermata come dodici card
+    fianco a fianco). Toccare anche quelli è un lavoro diverso, di ridisegno vero.
+    **Bug trovato mentre lo facevo**: le quattro tinte erano dichiarate dentro alla funzione che
+    chiude `SC` (una IIFE), quindi invisibili da fuori — `ui.js` che le leggeva per `ART` mandava in
+    errore tutto il file (`TINTA_STUDIO is not defined`), il che a sua volta rompeva `renderGioco` e
+    la settimana intera. Spostate fuori dalla IIFE, verificato in Chrome che la griglia delle mosse
+    torna a disegnarsi (11 card) e che le scene a pagina piena (punto 58) partono ancora bene.
+    Occasione buona anche per alzare il numero di versione dei file (`?v=8` → `?v=9` in
+    `index.html`): con lo stesso numero il browser aveva tenuto in cache la versione rotta anche
+    dopo la correzione.
+
+---
+
