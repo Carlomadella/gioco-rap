@@ -75,6 +75,121 @@ for(const f of cssSulDisco){
 }
 controlla("ogni immagine richiamata da un CSS sta al suo posto", perse.length === 0, perse);
 
+console.log("\nil creatore: ogni opzione si deve vedere");
+/* Il punto 3 chiede un elenco preciso di opzioni per l'avatar. Che siano
+   scritte in `data.js` non basta: la domanda vera e' se ognuna **cambia
+   davvero il disegno**. Un'opzione che c'e' nell'elenco ma che il ritratto
+   ignora e' peggio che non averla — la scegli, non succede niente, e sembra
+   rotto il gioco.
+
+   Qui si carica il ritratto fuori dal browser, si generano tutti i disegni una
+   opzione alla volta e si confrontano. Due opzioni della stessa riga che danno
+   lo stesso identico SVG vogliono dire che una delle due non e' disegnata. */
+{
+  const vm = require("vm");
+  const crypto = require("crypto");
+  const scatola = {
+    localStorage: { getItem: () => null, setItem: () => {} },
+    console, Math, JSON, Object, Array, String, Number, Boolean, Date,
+    parseInt, parseFloat, isNaN
+  };
+  scatola.window = scatola;
+  vm.createContext(scatola);
+  const sorgenti = ["js/creator/data.js", "js/creator/avatar-presets.js",
+                    "js/creator/state.js", "js/creator/portrait.js"];
+  let acceso = true;
+  try{
+    for(const f of sorgenti)
+      vm.runInContext(fs.readFileSync(path.join(RADICE, f), "utf8"), scatola, { filename: f });
+  }catch(e){ acceso = false; controlla("il ritratto si carica fuori dal browser", false, [e.message]); }
+
+  if(acceso){
+    /* `const HAIRS = [...]` a livello di script e' una dichiarazione lessicale,
+       non una proprieta' globale: si legge valutando il nome nel contesto. */
+    const dentro = c => vm.runInContext(c, scatola);
+    const A = dentro("A");
+    /* gli id dentro all'SVG cambiano a ogni chiamata: si normalizzano, se no
+       due disegni identici sembrerebbero diversi */
+    const impronta = svg => crypto.createHash("sha1")
+      .update(String(svg).replace(/p\d+/g, "pX")).digest("hex");
+
+    /* le sei categorie della barra, come le costruisce js/creator/options.js */
+    const RIGHE = [
+      ["capelli", "hair", "HAIRS"], ["capelli", "hairCol", "HAIRCOLS"],
+      ["cappelli", "hat", "HATS"],
+      ["occhi", "eyes", "EYES"], ["occhi", "eyeCol", "EYECOLS"], ["occhi", "brow", "BROWS"],
+      ["accessori", "glasses", "GLASSES"], ["accessori", "cuffie", "CUFFIE"],
+      ["accessori", "ear", "EARS"], ["accessori", "grillz", "GRILLZ"],
+      ["accessori", "chain", "CHAINS"],
+      ["vestiti", "fit", "FITS"],
+      ["tatuaggi", "tattoo", "TATTOOS"], ["tatuaggi", "beard", "BEARDS"]
+    ];
+    /* «Come l'espressione» disegna gli occhi che vuole l'umore: con l'umore
+       neutro sono per l'appunto quelli normali, ed e' giusto che coincidano.
+       Con qualunque altro umore cambia — c'e' una prova apposta qui sotto. */
+    const AMMESSE = { eyes: ["auto"] };
+
+    let quante = 0;
+    const mute = [];
+    for(const [cat, k, nome] of RIGHE){
+      const lista = dentro(nome).map(o => o.id !== undefined ? o : { id: o.c, n: o.n });
+      const visti = new Map();
+      const salvato = A[k];
+      for(const o of lista){
+        A[k] = o.id;
+        quante++;
+        const imp = impronta(dentro("portrait()"));
+        if(visti.has(imp)){
+          if((AMMESSE[k] || []).indexOf(o.id) < 0 && (AMMESSE[k] || []).indexOf(visti.get(imp).id) < 0)
+            mute.push(cat + "/" + k + ": «" + o.n + "» disegna come «" + visti.get(imp).n + "»");
+        } else visti.set(imp, o);
+      }
+      A[k] = salvato;
+    }
+    controlla("tutte e " + quante + " le opzioni del creatore cambiano il ritratto",
+      mute.length === 0, mute);
+
+    /* e la scorciatoia «come l'espressione» deve seguire davvero l'umore */
+    const salvaM = A.mood, salvaE = A.eyes;
+    A.mood = "arrabbiato"; A.eyes = "auto";
+    const arrabbiato = impronta(dentro("portrait()"));
+    A.eyes = "normali";
+    const normali = impronta(dentro("portrait()"));
+    A.mood = salvaM; A.eyes = salvaE;
+    controlla("«come l'espressione» segue l'umore, non fa gli occhi normali e basta",
+      arrabbiato !== normali);
+
+    /* il punto 3 elenca quello che ci deve stare dentro, per nome */
+    const chiesto = {
+      HAIRS: ["Corti","Fade","Buzz cut","Ricci","Afro","Treccine","Dread","Dread lunghe",
+              "Dread corte","Mullet","Lunghi","Cornrows","Twist","Durag"],
+      HATS: ["Niente","Snapback","Snapback laterale","Snapback rovesciato","Beanie",
+             "Bucket","Bandana","Cappellino NY","Cappellino LA"],
+      EYECOLS: ["Marroni","Neri","Nocciola","Azzurri","Verdi","Grigi"],
+      FITS: ["Hoodie","T-shirt","Bomber","Piumino","Canotta","Tuta"],
+      TATTOOS: ["Nessuno","Lacrima","Croce","Rosa","Corona","Scritta sul collo",
+                "Scritta sul viso","Stelle","Tattoo full neck"],
+      GLASSES: ["Occhiali piccoli","Occhiali grandi","Occhiali neri","Occhiali colorati"]
+    };
+    /* Dove il gioco chiama la stessa cosa con un nome piu' lungo, sta scritto
+       qui: e' una differenza voluta, non una voce che manca. Meglio elencarla
+       che allargare il confronto, se no la prossima volta un buco vero passa. */
+    const SINONIMI = {
+      "Tuta": "Tuta sportiva",              // nel gioco si specifica che e' sportiva
+      "Stelle": "Stelle sul viso",
+      "Tattoo full neck": "Full neck"
+    };
+    const senza = [];
+    for(const nome in chiesto){
+      const ci_sono = dentro(nome).map(o => o.n);
+      for(const voce of chiesto[nome])
+        if(ci_sono.indexOf(voce) < 0 && ci_sono.indexOf(SINONIMI[voce]) < 0)
+          senza.push(nome + ": " + voce);
+    }
+    controlla("c'è tutto quello che chiede il punto 3, con quel nome", senza.length === 0, senza);
+  }
+}
+
 console.log("\nil build");
 const dist = path.join(RADICE, "dist");
 if(!fs.existsSync(path.join(dist, "index.html"))){
