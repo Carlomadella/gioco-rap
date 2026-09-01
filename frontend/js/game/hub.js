@@ -56,9 +56,16 @@ const HUB_LUOGHI = [
   {id:"club", n:"Club & discoteche", x:61.81, y:12.11, w:19.76, h:9.31,
    chiuso:"Da fuori si sente la cassa. Stasera non è cosa: quella porta si apre da sé, " +
      "quando sarà il momento."},
+  /* punto 48: non più un cartello chiuso — è dove si va a fare l'open mic,
+     che esisteva già come azione ma non aveva un posto sulla mappa. Se non
+     hai ancora un pezzo fuori il palco non c'è, ma lo dice, non fa finta di niente. */
   {id:"concerti", n:"Concerti & live", x:73.86, y:31.02, w:18.19, h:9.31,
-   chiuso:"Il palco vero non è ancora roba tua. Per adesso ci sono la piazza e l'open mic " +
-     "della settimana: si comincia da lì."},
+   vai:() => {
+     const pronto = hubPronta("live");
+     if(pronto.ok) hubAzione("live");
+     else hubChiuso({n:"Concerti & live", chiuso:"Non ancora: " + pronto.perche +
+       ". Il palco vero aspetta un pezzo pubblicato."});
+   }},
   /* il beat maker non è un listino: è la sala dove si conosce la gente */
   {id:"beat", n:"La Sala", x:5.30, y:39.14, w:18.31, h:14.77,
    vai:() => apriPosto()},
@@ -82,8 +89,10 @@ const HUB_LUOGHI = [
    chiuso:"Nessun marchio ti cerca ancora. Capita, quando cominci a spostare gente."},
   {id:"business", n:"Business", x:38.80, y:80.21, w:16.75, h:9.16,
    chiuso:"Mettere i soldi a lavorare è un altro sport, e non è per adesso."},
+  /* punto 48: idem — l'attrezzatura da studio è già nel catalogo, la vetrina
+     non deve stare spenta se quello che promette esiste già */
   {id:"shop", n:"Shop", x:74.58, y:81.24, w:16.27, h:9.16,
-   chiuso:"Vetrina spenta. Qui c'è quello che passa il paese: l'attrezzatura sta nel catalogo."}
+   vai:() => hubGioco("catalogo", "gear")}
 ];
 
 /* ================= GLI EVENTI DI OGGI ================= */

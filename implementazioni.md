@@ -738,6 +738,26 @@ in parallelo.
 
 48. Cambierei le troppe SEZIONI BLOCCATE NELLA MAPPA PRINCIPALE, piuttosto rimpiazzandole con alcune già sbloccate come SHOP oppure togliendole proprio, non han senso che le sezioni sian lì solo per leggerci 'sbloccabile a milano' stiamo solo spoilerando la progressione del gioco per limitarne in realtò.
 
+   **FATTO in parte (01/09/2026)** — due dei cinque cartelli chiusi in
+   provincia (`HUB_LUOGHI` in `frontend/js/game/hub.js`) portavano già a
+   qualcosa che *esiste*, solo senza un posto sulla mappa: **Shop** apre
+   adesso il catalogo → Attrezzatura (la vetrina diceva già da sola
+   «l'attrezzatura sta nel catalogo» — l'ho preso in parola), **Concerti &
+   Live** fa partire l'open mic (l'azione «Serata open mic» c'era già in
+   `ACTIONS`, non aveva un cartello). Se non hai ancora un pezzo pubblicato
+   te lo dice («Serve 1 pezzo fuori»), non fa finta di niente.
+   Provato in Chrome: entrambi funzionano, il secondo mostra il messaggio
+   giusto quando non sei pronto.
+   **In parte** perché **Club & discoteche, Sponsor & brand, Business**
+   restano chiusi — non hanno un sistema vero dietro nemmeno oggi, sono
+   roba di Milano, e sbloccarli vorrebbe dire inventare un meccanismo che
+   il punto non chiedeva. Restano anche **spente sopra il pixel**: i
+   lucchetti sono dentro alla foto (punto 45), non un elemento che si
+   toglie da CSS — la vetrina "SHOP" e il cartello "CONCERTI & LIVE" nella
+   foto mostrano ancora il lucchetto anche se sotto funzionano davvero:
+   si sistema quando la mappa nuova (punto 45) sostituisce quella attuale.
+   `npm run prova` (12/12) pulito.
+
 49. Creami il file comandidelterminale.md in cui scrivi tutti i comandi da lanciare nel terminale per essere sempre aggiornati a vicenda con carletto e per fare partire il frontend e backend
 
    **FATTO (01/09/2026).** `comandidelterminale.md` in radice: git
