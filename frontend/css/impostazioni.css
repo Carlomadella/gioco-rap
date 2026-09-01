@@ -137,6 +137,13 @@ html.compatto .phase{padding:9px 13px 10px;margin-bottom:11px}
 /* la riga del copyright nel menu */
 .mcopy{margin-top:8px;font-size:12px;color:var(--faint);font-weight:700;letter-spacing:.01em}
 
+/* sullo stretto le linguette si stringono: si scorrono lo stesso, ma quasi
+   tutte ci stanno */
+@media (max-width:560px){
+  .stabs{padding:10px 12px;gap:5px}
+  .stab{padding:8px 11px;font-size:12.5px;gap:6px}
+  .stab i{font-size:12px}
+}
 @media (max-width:620px){
   .setts{padding:0}
   .swrap{border-radius:0;min-height:100%}

@@ -315,3 +315,42 @@ il telefono deve sembrare un vero e proprio telefono : Quindi come un iphone esa
    è più per forza il primo che scorri.
 
 ---
+
+---
+
+## Responsività di tutto il gioco — **cominciata, da finire domani**
+
+**FATTO in parte (01/09/2026).** Il gioco adesso regge dal telefono al monitor
+grande. Provato dentro a un riquadro della misura voluta (così le regole
+rispondono davvero) a **360, 390, 430, 768, 1024, 1280, 1366, 1440, 1536, 1920
+e 2560 px** di larghezza.
+
+Cosa è stato sistemato:
+- **La plancia si impila sotto i 900 px**: fascia in alto con i numeri su due
+  colonne, poi la città a tutta larghezza, poi il profilo, poi le linguette e
+  il suggerimento. La pagina scorre come una pagina normale.
+- **La fascia in alto si stringe per gradi** invece di rompersi: prima i
+  respiri e le barrette, poi sparisce l'ora, poi il benessere (che sta anche
+  nel profilo).
+- **Sotto i 1180 px il telefono si toglie** e restano profilo e città.
+- **Il menu della landing** non è più un nastro da trascinare largo 1120 px:
+  diventa una griglia a tre colonne sotto i 900, a due sotto i 560. Tutte e
+  sei le voci sempre visibili.
+- **Le linguette della partita** (Settimana, Catalogo, Classifica…) si
+  stringono e ci stanno tutte a 390 px, invece di uscire dallo schermo.
+- **Il telefono non allarga più la sua colonna**: la riga con «Classifica» e
+  «Messaggi» aveva un testo che non va a capo e si portava fuori tutta la
+  colonna a 1366 e 1440 px.
+
+**DA FARE DOMANI:**
+1. La schermata **«Il tuo artista» (il creatore) a 768 px**: qualcosa nel
+   ritratto SVG esce di una ventina di pixel — era l'ultima cosa che stavo
+   guardando quando ci siamo fermati (un `<rect>` dentro all'anteprima).
+2. **Le altre schermate ancora da provare una per una**: il foglio di
+   scrittura, la piazza, La Sala, il negozio dei vestiti, il diario, la
+   modale degli eventi.
+3. **Provare su un telefono vero**, non solo dentro al riquadro: il tocco, la
+   barra del browser che si mangia l'altezza, e il `100svh`.
+4. Le **aree da toccare a 44 punti** (punto 36): sul telefono adesso ci sono
+   ancora bottoni piccoli.
+

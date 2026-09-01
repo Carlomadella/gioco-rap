@@ -210,8 +210,26 @@ body.in-hub .topnav{display:none}
 .tornamenu.mappa:hover{background:linear-gradient(180deg,#8B4BF5,#6D28D9)}
 
 /* ================= SCHERMI PICCOLI =================
-   Le colonne di lato si stringono prima di sparire, e la città resta sempre
-   la cosa più grande: è la schermata da cui si gioca. */
+   La plancia si stringe per gradi invece di rompersi tutta insieme:
+   1. si accorciano i respiri e le barrette;
+   2. sparisce l'ora, poi le colonne di lato si assottigliano;
+   3. sotto i 1180 px il telefono si toglie (sta tutto nella plancia comunque);
+   4. sotto i 900 px non ci sono più tre colonne: si impila, e la pagina
+      scorre come una pagina normale. La città resta la prima cosa che si
+      vede, perché è la schermata da cui si gioca. */
+
+@media (max-width:1500px){
+  .ps{padding:0 4px 0 12px}
+  .ps .pbar{width:88px}
+  .pcitta{width:190px}
+}
+@media (max-width:1340px){
+  .ps{gap:8px}
+  .ps .pbar{width:70px}
+  .ps .pv{font-size:15px}
+  .pora{width:120px;font-size:18px}
+  .psett{width:118px;padding-left:14px}
+}
 @media (max-width:1400px){
   .plancia{grid-template-columns:minmax(300px,.8fr) minmax(0,2.4fr) minmax(292px,.8fr)}
 }
@@ -221,9 +239,52 @@ body.in-hub .topnav{display:none}
       "barra  barra"
       "sx     centro"
       "sugg   sugg"}
-  .ptel{display:none}
+  .plancia .ptel{display:none}
+  .pora{display:none}
+  .pcitta{width:170px}
 }
-@media (max-height:760px){
+@media (max-width:1000px){
+  .pstat .ps:last-child{display:none}      /* il benessere sta anche nel profilo */
+  .psett{width:104px;padding-left:12px}
+}
+
+/* ---- il telefono in mano: si impila ---- */
+@media (max-width:900px){
+  .palco{overflow:auto}
+  .plancia{height:auto;min-height:100%;gap:10px;padding:0 8px 12px;
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:auto auto auto auto;
+    grid-template-areas:"barra" "centro" "sx" "sugg"}
+
+  .pbarra{height:auto;flex-wrap:wrap;align-items:center;padding:8px 6px;gap:6px 0}
+  .plogo{width:auto;padding:0 10px 0 4px}
+  .pcitta{width:auto;flex:1;border-left:0;padding-left:12px}
+  .psett{width:auto;padding-left:12px}
+  .pstat{flex:1 0 100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:4px;padding-top:6px;border-top:1px solid rgba(255,255,255,.07)}
+  .pstat .ps{border-left:0;padding:2px 4px;gap:8px}
+  .pstat .ps:last-child{display:flex}
+  .ps .pbar{width:100%;max-width:88px}
+
+  .pcolsx,.pcolcentro{grid-template-rows:auto auto}
+  .pfoto{width:100%;height:auto;max-width:100%}
+  .psx{overflow:visible;max-height:none}
+  .psxtab{height:88px}
+  .peventi{height:auto}
+  .pevrow{height:auto;flex-wrap:wrap;gap:8px}
+  .pev{flex:1 1 46%;min-height:128px}
+  .pevpiu{flex:1 1 100%;padding:10px;flex-direction:row;gap:12px}
+  .psugg{height:auto;padding:10px 12px;text-align:center;line-height:1.35}
+}
+@media (max-width:560px){
+  .pev{flex:1 1 100%}
+  .pcitta .pcn{font-size:15px}
+  .pstat{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .psxtab{height:78px}
+  .ptab .hicon{width:22px;height:22px}
+  .ptab span{font-size:9.5px}
+}
+@media (max-height:760px) and (min-width:901px){
   .psxtab{height:84px}
   .peventi{height:168px}
   .pevrow{height:120px}
