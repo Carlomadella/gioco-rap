@@ -74,7 +74,13 @@ async function apriToken(token, emittente, destinatario, urlChiavi){
   if(!buona) return null;
 
   const adesso = Math.floor(Date.now() / 1000);
-  if(corpo.exp && corpo.exp < adesso - 60) return null;            // scaduto
+  /* La scadenza è **obbligatoria**, non «controllata se c'è». Prima il
+     controllo era `if(corpo.exp && ...)`: un biglietto senza `exp` saltava la
+     riga e valeva per sempre. Apple e Google la mettono sempre, quindi non
+     toglie niente a nessuno — ma un biglietto eterno, se mai ne uscisse uno,
+     è esattamente la cosa che non deve entrare. */
+  if(typeof corpo.exp !== "number") return null;                   // senza scadenza non si entra
+  if(corpo.exp < adesso - 60) return null;                         // scaduto
   if(corpo.iat && corpo.iat > adesso + 300) return null;           // firmato nel futuro
   if(emittente && String(corpo.iss || "").replace(/^https:\/\//, "") !== emittente.replace(/^https:\/\//, "")) return null;
   const aud = Array.isArray(corpo.aud) ? corpo.aud : [corpo.aud];

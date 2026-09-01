@@ -23,6 +23,17 @@ const oggi = new Date().toISOString().slice(0, 10);
 const DOVE = process.argv[3] || path.join(__dirname, "dati", "copie", "classifica-" + oggi + ".db");
 const QUANTE = Math.max(1, Number(process.env.ADF_COPIE || 30));
 
+/* `VACUUM INTO` e' di SQLite. Con PostgreSQL sotto, la copia si fa con i suoi
+   attrezzi (`pg_dump`), che sanno cose che noi da qui non sappiamo: lo dice e
+   si ferma, invece di copiare un file che non c'e'. */
+require("../ambiente.js").carica();
+if(process.env.ADF_PG){
+  console.error("Sotto c'e' PostgreSQL (ADF_PG), non un file: qui non c'e' niente da copiare.");
+  console.error("La copia si fa con i suoi attrezzi:");
+  console.error("  pg_dump --format=custom --file=classifica.dump \"$ADF_PG\"");
+  process.exit(1);
+}
+
 if(!fs.existsSync(DA)){
   console.error("non c'è niente da copiare: " + DA);
   process.exit(1);

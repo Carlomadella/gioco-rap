@@ -2,7 +2,7 @@
   "name": "anni-di-fame-classifica",
   "version": "1.0.0",
   "private": true,
-  "description": "Il server di Anni di Fame: classifica, account e salvataggi in cloud. SQLite dentro Node, nessuna dipendenza.",
+  "description": "Il server di Anni di Fame: classifica, account e salvataggi in cloud. SQLite di suo, PostgreSQL con ADF_PG.",
   "license": "UNLICENSED",
   "main": "server.js",
   "scripts": {
@@ -10,9 +10,13 @@
     "prova": "node prova.js",
     "travaso": "node database/travaso.js",
     "copia": "node database/copia.js",
-    "carico": "node carico.js"
+    "carico": "node carico.js",
+    "prova-pg": "node prova.js --pg"
   },
   "engines": {
     "node": ">=22.5"
+  },
+  "dependencies": {
+    "pg": "^8.23.0"
   }
 }

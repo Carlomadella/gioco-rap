@@ -6,6 +6,10 @@ backend/database/schema.md
 backend/node_modules/
 backend.md
 
+# le manopole con dentro le password: mai in git
+backend/.env.local
+backend/.env
+
 # i concept HTML arrivano con le foto dentro come base64: pesano 15 MB l'uno
 # e nel repo non ci devono stare. Le foto che servono si estraggono e basta.
 anni-di-fame-menu-*.html

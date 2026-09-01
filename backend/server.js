@@ -24,9 +24,16 @@
      ADF_SALE         sale per gli hash degli indirizzi IP
      ADF_INVIO_MS     quanto passa fra due punteggi dello stesso artista (10000)
      ADF_PROXY        1 se davanti c'e' un reverse proxy nostro (legge x-forwarded-for)
+     ADF_PG           se c'e', sotto va PostgreSQL invece di SQLite:
+                      postgresql://utente:password@host:5432/anni_di_fame
+   Le manopole si possono anche mettere in `.env.local` (vedi ambiente.js).
    Per entrare con Steam, Apple e Google servono le loro chiavi: vedi accessi.js.
 */
 "use strict";
+
+/* prima di tutto: le manopole che stanno in `.env.local` (fuori da git).
+   Chi le ha gia' nell'ambiente vero vince — vedi ambiente.js. */
+require("./ambiente.js").carica();
 
 const http = require("http");
 const path = require("path");
@@ -53,7 +60,6 @@ const CFG = {
   dietroProxy: process.env.ADF_PROXY === "1"
 };
 
-archivio.apri(CFG);
 
 /* ==================== ATTREZZI ==================== */
 /* Un parametro che non c'è **non è zero**: è assente, e vale il valore di suo.
@@ -121,7 +127,7 @@ function corpo(req){
 }
 
 /* ==================== CHI SEI ==================== */
-const chi = req => archivio.sessione(req.headers["x-sessione"] || "");
+const chi = async req => archivio.sessione(req.headers["x-sessione"] || "");
 
 /* Steam, Apple e Google mandano un biglietto firmato da loro: la verifica sta
    in `accessi.js`. Qui si traduce la risposta in un errore HTTP che dice la
@@ -138,9 +144,9 @@ async function conBiglietto(res, tipo, biglietto){
 /* Il vecchio modo di farsi riconoscere: id dell'artista + chiave, come prima
    degli account. Resta acceso perché i client già in giro continuino a
    funzionare — e perché da lì ci si può prendere una sessione vera. */
-function artistaMio(req, id){
-  const s = chi(req);
-  const a = archivio.artistaGrezzo(id);
+async function artistaMio(req, id){
+  const s = await chi(req);
+  const a = await archivio.artistaGrezzo(id);
   if(!a || a.bot || a.ritirato) return null;
   if(s && a.account_id && a.account_id === s.account.id) return a;
   const chiave = req.headers["x-chiave"] || "";
@@ -157,45 +163,45 @@ async function rotta(req, res, url){
 
   /* ---------- il mondo ---------- */
   if(M("GET", "/api/stato")){
-    const s = archivio.stato();
+    const s = await archivio.stato();
     return invia(res, 200, Object.assign({ ok: true, settimanaOre: CFG.settimanaMs / 3600e3,
       accessi: accessi.collegati() }, s));
   }
 
   /* il feed di LaFamegram: i post del mondo, più quelli che riguardano te */
   if(M("GET", "/api/feed")){
-    const s = chi(req);
-    const ioId = s ? (archivio.artistiDi(s.account.id)[0] || {}).id : String(q.get("io") || "");
+    const s = await chi(req);
+    const ioId = s ? ((await archivio.artistiDi(s.account.id))[0] || {}).id : String(q.get("io") || "");
     return invia(res, 200, {
-      settimana: archivio.settimanaCorrente(),
-      post: archivio.feed(ioId || null, nInt(q.get("quanti"), 1, 60, 20))
+      settimana: await archivio.settimanaCorrente(),
+      post: await archivio.feed(ioId || null, nInt(q.get("quanti"), 1, 60, 20))
     });
   }
 
   /* gli opps: chi ti sta appena sopra, e chi ti sei preso come rivale */
   if(M("GET", "/api/opps")){
-    const s = chi(req);
-    const ioId = s ? (archivio.artistiDi(s.account.id)[0] || {}).id : String(q.get("io") || "");
-    if(!ioId || !archivio.artistaGrezzo(ioId)) return male(res, 404, "artista-sconosciuto");
-    return invia(res, 200, archivio.opps(ioId, nInt(q.get("quanti"), 1, 10, 3)));
+    const s = await chi(req);
+    const ioId = s ? ((await archivio.artistiDi(s.account.id))[0] || {}).id : String(q.get("io") || "");
+    if(!ioId || !await archivio.artistaGrezzo(ioId)) return male(res, 404, "artista-sconosciuto");
+    return invia(res, 200, await archivio.opps(ioId, nInt(q.get("quanti"), 1, 10, 3)));
   }
 
   if(M("POST", "/api/relazione")){
     const b = await corpo(req);
     const mio = String(b.artistaId || "");
-    if(!artistaMio(req, mio)) return male(res, 403, "non-e-tuo");
+    if(!await artistaMio(req, mio)) return male(res, 403, "non-e-tuo");
     if(b.tipo === "rimuovi"){
-      archivio.scancella(mio, String(b.altroId || ""), String(b.era || "rivale"));
+      await archivio.scancella(mio, String(b.altroId || ""), String(b.era || "rivale"));
       return invia(res, 200, { ok: true });
     }
-    const r = archivio.dichiara(mio, String(b.altroId || ""), String(b.tipo || "rivale"),
+    const r = await archivio.dichiara(mio, String(b.altroId || ""), String(b.tipo || "rivale"),
       nomePulito(b.nota, 140));
     return r ? invia(res, 200, r) : male(res, 400, "relazione-non-valida");
   }
 
   if(M("GET", "/api/notizie")){
-    return invia(res, 200, { settimana: archivio.settimanaCorrente(),
-      notizie: archivio.notizie(nInt(q.get("quante"), 1, 60, 10)) });
+    return invia(res, 200, { settimana: await archivio.settimanaCorrente(),
+      notizie: await archivio.notizie(nInt(q.get("quante"), 1, 60, 10)) });
   }
 
   /* ---------- account e sessioni ---------- */
@@ -208,19 +214,19 @@ async function rotta(req, res, url){
       const email = String(b.email || "").trim().toLowerCase();
       if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return male(res, 400, "email-non-valida");
       if(String(b.segreto || "").length < 8) return male(res, 400, "segreto-troppo-corto");
-      if(archivio.entra("email", email, b.segreto)) return male(res, 409, "email-gia-usata");
+      if(await archivio.entra("email", email, b.segreto)) return male(res, 409, "email-gia-usata");
       idEsterno = email;
     } else if(tipo === "ospite"){
       idEsterno = crypto.randomUUID();
     } else {
       idEsterno = await conBiglietto(res, tipo, b.biglietto);
       if(!idEsterno) return;                        // la risposta l'ha già mandata conBiglietto
-      const gia = archivio.entra(tipo, idEsterno, null);
-      if(gia) return invia(res, 200, { account: gia, token: archivio.apriSessione(gia.id, b.dispositivo) });
+      const gia = await archivio.entra(tipo, idEsterno, null);
+      if(gia) return invia(res, 200, { account: gia, token: await archivio.apriSessione(gia.id, b.dispositivo) });
     }
 
-    const acc = archivio.creaAccount({ tipo, idEsterno, segreto: b.segreto, email: tipo === "email" ? idEsterno : null });
-    const token = archivio.apriSessione(acc.id, b.dispositivo);
+    const acc = await archivio.creaAccount({ tipo, idEsterno, segreto: b.segreto, email: tipo === "email" ? idEsterno : null });
+    const token = await archivio.apriSessione(acc.id, b.dispositivo);
     return invia(res, 201, { account: acc, identita: { tipo, idEsterno: tipo === "ospite" ? idEsterno : undefined }, token });
   }
 
@@ -229,42 +235,42 @@ async function rotta(req, res, url){
     /* dal vecchio mondo: chi ha ancora solo id artista + chiave si prende una
        sessione vera senza perdere niente */
     if(b.tipo === "legacy"){
-      const a = archivio.artistaGrezzo(String(b.artistaId || ""));
+      const a = await archivio.artistaGrezzo(String(b.artistaId || ""));
       if(!a || !a.chiave_hash || a.chiave_hash !== archivio.sha(b.chiave || ""))
         return male(res, 403, "chiave-sbagliata");
       if(!a.account_id) return male(res, 409, "artista-senza-account");
-      return invia(res, 200, { account: archivio.account(a.account_id),
-        token: archivio.apriSessione(a.account_id, b.dispositivo) });
+      return invia(res, 200, { account: await archivio.account(a.account_id),
+        token: await archivio.apriSessione(a.account_id, b.dispositivo) });
     }
     if(["steam", "apple", "google"].indexOf(b.tipo) >= 0){
       const idEsterno = await conBiglietto(res, b.tipo, b.biglietto);
       if(!idEsterno) return;
-      const acc = archivio.entra(b.tipo, idEsterno, null);
+      const acc = await archivio.entra(b.tipo, idEsterno, null);
       if(!acc) return male(res, 404, "account-sconosciuto");
-      return invia(res, 200, { account: acc, token: archivio.apriSessione(acc.id, b.dispositivo) });
+      return invia(res, 200, { account: acc, token: await archivio.apriSessione(acc.id, b.dispositivo) });
     }
     const idEsterno = b.tipo === "email" ? String(b.email || "").trim().toLowerCase() : String(b.idEsterno || "");
-    const acc = archivio.entra(b.tipo === "email" ? "email" : "ospite", idEsterno, b.segreto);
+    const acc = await archivio.entra(b.tipo === "email" ? "email" : "ospite", idEsterno, b.segreto);
     if(!acc) return male(res, 403, "non-torna");
-    return invia(res, 200, { account: acc, token: archivio.apriSessione(acc.id, b.dispositivo) });
+    return invia(res, 200, { account: acc, token: await archivio.apriSessione(acc.id, b.dispositivo) });
   }
 
   if(M("DELETE", "/api/sessione")){
     const t = req.headers["x-sessione"] || "";
-    if(!archivio.sessione(t)) return male(res, 403, "sessione-scaduta");
-    archivio.chiudiSessione(t);
+    if(!await archivio.sessione(t)) return male(res, 403, "sessione-scaduta");
+    await archivio.chiudiSessione(t);
     return invia(res, 200, { ok: true });
   }
 
   /* tutto quello che sei: account, artisti, salvataggi, traguardi */
   if(M("GET", "/api/io")){
-    const s = chi(req);
+    const s = await chi(req);
     if(!s) return male(res, 403, "sessione-scaduta");
-    const artisti = archivio.artistiDi(s.account.id);
+    const artisti = await archivio.artistiDi(s.account.id);
     return invia(res, 200, {
       account: s.account, dispositivo: s.dispositivo, artisti,
-      carriere: archivio.carriere(s.account.id),
-      traguardi: artisti.length ? archivio.traguardiDi(artisti[0].id) : []
+      carriere: await archivio.carriere(s.account.id),
+      traguardi: artisti.length ? await archivio.traguardiDi(artisti[0].id) : []
     });
   }
 
@@ -272,12 +278,12 @@ async function rotta(req, res, url){
      al gioco. Non cancella la storia della classifica: toglie il nome e tutto
      quello che è personale. */
   if(M("DELETE", "/api/account")){
-    const s = chi(req);
+    const s = await chi(req);
     if(!s) return male(res, 403, "sessione-scaduta");
     const b = await corpo(req).catch(() => ({}));
     if(b.conferma !== "cancella") return male(res, 400, "serve-la-conferma",
       { nota: 'manda {"conferma":"cancella"}' });
-    const r = archivio.cancellaAccount(s.account.id);
+    const r = await archivio.cancellaAccount(s.account.id);
     return invia(res, 200, { ok: true, artistiRitirati: r.artisti });
   }
 
@@ -288,22 +294,22 @@ async function rotta(req, res, url){
     if(!nome) return male(res, 400, "nome-non-valido");
     const brutto = moderazione.controllaNome(nome);
     if(brutto) return male(res, 400, brutto.no);
-    if(!archivio.nomeLibero(nome)) return male(res, 409, "nome-occupato");
+    if(!await archivio.nomeLibero(nome)) return male(res, 409, "nome-occupato");
 
-    let s = chi(req), token = null;
+    let s = await chi(req), token = null;
     if(!s){
       /* nessuna sessione: si apre un account da ospite al volo, così chi gioca
          non deve compilare niente per entrare in classifica */
-      const acc = archivio.creaAccount({ tipo: "ospite", idEsterno: crypto.randomUUID() });
-      token = archivio.apriSessione(acc.id, b.dispositivo);
+      const acc = await archivio.creaAccount({ tipo: "ospite", idEsterno: crypto.randomUUID() });
+      token = await archivio.apriSessione(acc.id, b.dispositivo);
       s = { account: acc };
     }
-    if(archivio.artistiDi(s.account.id).length >= 3) return male(res, 409, "troppi-artisti");
+    if((await archivio.artistiDi(s.account.id)).length >= 3) return male(res, 409, "troppi-artisti");
 
     /* la chiave vecchio stile: torna una volta sola e fa funzionare i client
        che ancora non sanno cosa sia una sessione */
     const chiave = crypto.randomBytes(24).toString("hex");
-    const a = archivio.iscriviArtista({
+    const a = await archivio.iscriviArtista({
       accountId: s.account.id, nome,
       citta: nomePulito(b.citta) || scegli(CITTA),
       genere: GENERI.indexOf(b.genere) >= 0 ? b.genere : scegli(GENERI),
@@ -315,37 +321,37 @@ async function rotta(req, res, url){
   }
 
   if(M("GET", "/api/artista/" + UUID)){
-    const a = archivio.schedaConPosizione(pezzo(3), null);
+    const a = await archivio.schedaConPosizione(pezzo(3), null);
     return a ? invia(res, 200, a) : male(res, 404, "artista-sconosciuto");
   }
 
   if(M("PUT", "/api/artista/" + UUID)){
     const id = pezzo(3);
-    if(!artistaMio(req, id)) return male(res, 403, "non-e-tuo");
+    if(!await artistaMio(req, id)) return male(res, 403, "non-e-tuo");
     const b = await corpo(req);
     if(b.nome != null){
       const nome = nomePulito(b.nome);
       if(!nome) return male(res, 400, "nome-non-valido");
       const brutto = moderazione.controllaNome(nome);
       if(brutto) return male(res, 400, brutto.no);
-      if(!archivio.nomeLibero(nome, id)) return male(res, 409, "nome-occupato");
+      if(!await archivio.nomeLibero(nome, id)) return male(res, 409, "nome-occupato");
       b.nome = nome;
     }
     if(b.citta != null) b.citta = nomePulito(b.citta);
     if(b.genere != null && GENERI.indexOf(b.genere) < 0) delete b.genere;
-    return invia(res, 200, archivio.aggiornaArtista(id, b));
+    return invia(res, 200, await archivio.aggiornaArtista(id, b));
   }
 
   if(M("POST", "/api/punteggio")){
     const b = await corpo(req);
     const id = String(b.id || "");
-    const a = artistaMio(req, id);
+    const a = await artistaMio(req, id);
     if(!a) return male(res, 403, "non-e-tuo");
     if(Date.now() - (a.punteggio || 0) < CFG.invioMs) return male(res, 429, "troppo-in-fretta");
-    const sanzione = archivio.sanzioneAttiva(a.account_id);
+    const sanzione = await archivio.sanzioneAttiva(a.account_id);
     if(sanzione && sanzione.tipo === "sospensione")
       return male(res, 403, "account-sospeso", { motivo: sanzione.motivo });
-    const r = archivio.segnaPunteggio(id, {
+    const r = await archivio.segnaPunteggio(id, {
       stream: b.stream, fan: nInt(b.fan, 0, 5e7, null), livello: nInt(b.livello, 1, 60, null),
       fase: nInt(b.fase, 0, 8, null), uscite: nInt(b.uscite, 0, 5000, null), deal: b.deal,
       ultima: b.ultima != null ? nomePulito(b.ultima, 60) : null, seed: nInt(b.seed, 0, 2e9, null)
@@ -361,52 +367,52 @@ async function rotta(req, res, url){
       citta: nomePulito(q.get("citta"), 40) || null,
       genere: GENERI.indexOf(q.get("genere")) >= 0 ? q.get("genere") : null
     };
-    return invia(res, 200, archivio.classifica(
+    return invia(res, 200, await archivio.classifica(
       nInt(q.get("da"), 1, 100000, 1), nInt(q.get("quanti"), 1, 200, 10),
       String(q.get("io") || ""), filtro));
   }
 
   /* le città e i generi che hanno davvero gente dentro */
   if(M("GET", "/api/classifiche")){
-    return invia(res, 200, { citta: archivio.cittaInGioco(), generi: archivio.generiInGioco() });
+    return invia(res, 200, { citta: await archivio.cittaInGioco(), generi: await archivio.generiInGioco() });
   }
 
   /* ---------- le stagioni ---------- */
   if(M("GET", "/api/stagioni")){
-    return invia(res, 200, { corrente: archivio.stagioneCorrente(), tutte: archivio.stagioni() });
+    return invia(res, 200, { corrente: await archivio.stagioneCorrente(), tutte: await archivio.stagioni() });
   }
 
   if(M("GET", "/api/albo")){
     const s = q.get("stagione");
-    return invia(res, 200, { albo: archivio.albo(s ? nInt(s, 1, 9999, null) : null) });
+    return invia(res, 200, { albo: await archivio.albo(s ? nInt(s, 1, 9999, null) : null) });
   }
 
   if(M("GET", "/api/classifica/intorno/" + UUID)){
     const id = pezzo(4);
-    if(!archivio.artistaGrezzo(id)) return male(res, 404, "artista-sconosciuto");
-    return invia(res, 200, archivio.intorno(id, nInt(q.get("raggio"), 1, 25, 4)));
+    if(!await archivio.artistaGrezzo(id)) return male(res, 404, "artista-sconosciuto");
+    return invia(res, 200, await archivio.intorno(id, nInt(q.get("raggio"), 1, 25, 4)));
   }
 
   /* ---------- i salvataggi in cloud ---------- */
   if(M("GET", "/api/carriere")){
-    const s = chi(req);
+    const s = await chi(req);
     if(!s) return male(res, 403, "sessione-scaduta");
-    return invia(res, 200, { carriere: archivio.carriere(s.account.id) });
+    return invia(res, 200, { carriere: await archivio.carriere(s.account.id) });
   }
 
   if(M("GET", "/api/carriera/[123]")){
-    const s = chi(req);
+    const s = await chi(req);
     if(!s) return male(res, 403, "sessione-scaduta");
-    const c = archivio.carriera(s.account.id, Number(pezzo(3)));
+    const c = await archivio.carriera(s.account.id, Number(pezzo(3)));
     return c ? invia(res, 200, c) : male(res, 404, "slot-vuoto");
   }
 
   if(M("PUT", "/api/carriera/[123]")){
-    const s = chi(req);
+    const s = await chi(req);
     if(!s) return male(res, 403, "sessione-scaduta");
     const b = await corpo(req);
     if(!b.stato || typeof b.stato !== "object") return male(res, 400, "stato-mancante");
-    const r = archivio.salvaCarriera(s.account.id, Number(pezzo(3)), b);
+    const r = await archivio.salvaCarriera(s.account.id, Number(pezzo(3)), b);
     if(r.errore) return male(res, 413, r.errore);
     if(r.conflitto) return invia(res, 409, { errore: "carriera-piu-avanti", salvata: r.salvata,
       nota: "in cloud c'è una partita più avanti: manda forza=true per sovrascriverla" });
@@ -414,30 +420,30 @@ async function rotta(req, res, url){
   }
 
   /* ---------- i traguardi ---------- */
-  if(M("GET", "/api/traguardi")) return invia(res, 200, { traguardi: archivio.catalogo() });
+  if(M("GET", "/api/traguardi")) return invia(res, 200, { traguardi: await archivio.catalogo() });
 
   if(M("GET", "/api/traguardi/" + UUID))
-    return invia(res, 200, { traguardi: archivio.traguardiDi(pezzo(3)) });
+    return invia(res, 200, { traguardi: await archivio.traguardiDi(pezzo(3)) });
 
   if(M("POST", "/api/traguardo")){
     const b = await corpo(req);
-    if(!artistaMio(req, String(b.artistaId || ""))) return male(res, 403, "non-e-tuo");
+    if(!await artistaMio(req, String(b.artistaId || ""))) return male(res, 403, "non-e-tuo");
     const codice = String(b.codice || "");
     /* i traguardi che il server sa controllare da sé non si chiedono: se li dà
        lui, quando i numeri ci sono. Se no basterebbe la console del browser */
     if(archivio.CODICI_DAL_SERVER.indexOf(codice) >= 0)
       return male(res, 409, "questo-lo-da-il-server",
         { nota: "arriva da solo quando i numeri ci sono" });
-    const r = archivio.daiTraguardo(String(b.artistaId), codice);
+    const r = await archivio.daiTraguardo(String(b.artistaId), codice);
     return r ? invia(res, 200, r) : male(res, 404, "traguardo-sconosciuto");
   }
 
   /* ---------- segnalare un nome ---------- */
   if(M("POST", "/api/segnalazione")){
-    const s = chi(req);
+    const s = await chi(req);
     if(!s) return male(res, 403, "sessione-scaduta");
     const b = await corpo(req);
-    const r = archivio.segnala(String(b.artistaId || ""), s.account.id,
+    const r = await archivio.segnala(String(b.artistaId || ""), s.account.id,
       String(b.motivo || "nome"), nomePulito(b.nota, 300));
     if(!r) return male(res, 404, "artista-sconosciuto");
     return invia(res, 200, r.gia ? { gia: true } : { ok: true });
@@ -448,33 +454,33 @@ async function rotta(req, res, url){
 
   if(M("POST", "/api/giro")){
     if(!admin()) return male(res, 403, "non-sei-tu");
-    const quante = archivio.giroSettimana();
-    return invia(res, 200, { ok: true, settimana: archivio.settimanaCorrente(), notizie: quante });
+    const quante = await archivio.giroSettimana();
+    return invia(res, 200, { ok: true, settimana: await archivio.settimanaCorrente(), notizie: quante });
   }
 
   if(M("POST", "/api/stagione/chiudi")){
     if(!admin()) return male(res, 403, "non-sei-tu");
     const b = await corpo(req).catch(() => ({}));
-    const r = archivio.chiudiStagione(nInt(b.quanti, 1, 1000, 100));
+    const r = await archivio.chiudiStagione(nInt(b.quanti, 1, 1000, 100));
     return r ? invia(res, 200, r) : male(res, 409, "nessuna-stagione-aperta");
   }
 
   if(M("GET", "/api/sospetti")){
     if(!admin()) return male(res, 403, "non-sei-tu");
-    return invia(res, 200, { sospetti: archivio.sospetti(nInt(q.get("quanti"), 1, 200, 50)) });
+    return invia(res, 200, { sospetti: await archivio.sospetti(nInt(q.get("quanti"), 1, 200, 50)) });
   }
 
   if(M("POST", "/api/sanzione")){
     if(!admin()) return male(res, 403, "non-sei-tu");
     const b = await corpo(req);
-    const r = archivio.sanziona(String(b.accountId || ""), String(b.tipo || ""),
+    const r = await archivio.sanziona(String(b.accountId || ""), String(b.tipo || ""),
       nomePulito(b.motivo, 200) || "nessun motivo scritto", nInt(b.giorni, 0, 3650, 0));
     return r ? invia(res, 200, r) : male(res, 400, "sanzione-non-valida");
   }
 
   if(M("GET", "/api/da-guardare")){
     if(!admin()) return male(res, 403, "non-sei-tu");
-    return invia(res, 200, { artisti: archivio.daGuardare(nInt(q.get("quanti"), 1, 100, 30)) });
+    return invia(res, 200, { artisti: await archivio.daGuardare(nInt(q.get("quanti"), 1, 100, 30)) });
   }
 
   if(M("POST", "/api/moderazione")){
@@ -482,11 +488,11 @@ async function rotta(req, res, url){
     const b = await corpo(req);
     const id = String(b.artistaId || "");
     if(b.azione === "rinomina"){
-      const r = archivio.rinominaDufficio(id);
+      const r = await archivio.rinominaDufficio(id);
       return r ? invia(res, 200, r) : male(res, 404, "artista-sconosciuto");
     }
     if(b.azione === "respingi"){
-      archivio.chiudiSegnalazioni(id, "respinta");
+      await archivio.chiudiSegnalazioni(id, "respinta");
       return invia(res, 200, { ok: true });
     }
     return male(res, 400, "azione-sconosciuta", { nota: "rinomina oppure respingi" });
@@ -494,13 +500,13 @@ async function rotta(req, res, url){
 
   if(M("GET", "/api/da-spingere")){
     if(!admin()) return male(res, 403, "non-sei-tu");
-    return invia(res, 200, { traguardi: archivio.daSpingere() });
+    return invia(res, 200, { traguardi: await archivio.daSpingere() });
   }
 
   if(M("POST", "/api/spinto")){
     if(!admin()) return male(res, 403, "non-sei-tu");
     const b = await corpo(req);
-    archivio.segnaSpinto(String(b.artistaId || ""), String(b.codice || ""));
+    await archivio.segnaSpinto(String(b.artistaId || ""), String(b.codice || ""));
     return invia(res, 200, { ok: true });
   }
 
@@ -508,7 +514,7 @@ async function rotta(req, res, url){
 }
 
 /* ==================== IL SERVER ==================== */
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const origine = req.headers.origin || "";
   const permessa = CFG.origini === "*" ? "*"
     : (CFG.origini.split(",").map(s => s.trim()).indexOf(origine) >= 0 ? origine : "");
@@ -530,7 +536,7 @@ const server = http.createServer((req, res) => {
   try{ url = new URL(req.url, "http://" + (req.headers.host || "localhost")); }
   catch(e){ return male(res, 400, "url-non-valido"); }
 
-  try{ archivio.assicuraSettimana(); }
+  try{ await archivio.assicuraSettimana(); }
   catch(e){ console.error("[settimana] " + e.message); }
 
   rotta(req, res, url).catch(e => {
@@ -541,20 +547,32 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(CFG.porta, () => {
-  const s = archivio.stato();
+/* Prima il database, poi la porta: se il database non si apre non si deve
+   nemmeno cominciare ad ascoltare, o le prime richieste prendono un errore
+   invece di una risposta. */
+async function avvia(){
+  const M = await archivio.apri(CFG);
+  const s = await archivio.stato();
+  await new Promise(fatto => server.listen(CFG.porta, fatto));
   console.log("Anni di Fame — il server su http://localhost:" + CFG.porta);
-  console.log("  database:   " + CFG.file);
+  console.log("  database:   " + (M.nome === "postgres" ? "PostgreSQL" : CFG.file));
   console.log("  in pista:   " + s.artisti + " artisti (" + s.giocatori + " giocatori veri)");
   console.log("  account:    " + s.account + ", salvataggi in cloud: " + s.carriere);
   console.log("  settimana:  " + s.settimana + ", la prossima fra " +
     Math.max(0, Math.round((s.prossimoGiro - Date.now()) / 60000)) + " minuti");
+}
+
+avvia().catch(e => {
+  console.error("il server non è partito: " + (e && e.message || e));
+  process.exit(1);
 });
 
 for(const segnale of ["SIGINT", "SIGTERM"]){
   process.on(segnale, () => {
-    archivio.chiudi();
-    console.log("\nchiuso. alla prossima.");
-    process.exit(0);
+    /* si chiude il database prima di uscire, ma non si aspetta all'infinito:
+       se non si chiude in due secondi si esce lo stesso */
+    const fine = () => { console.log("\nchiuso. alla prossima."); process.exit(0); };
+    setTimeout(fine, 2000).unref();
+    archivio.chiudi().then(fine, fine);
   });
 }

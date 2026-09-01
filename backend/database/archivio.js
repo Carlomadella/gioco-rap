@@ -15,12 +15,12 @@
 "use strict";
 
 const crypto = require("crypto");
-const { apri: apriDb, attrezzi } = require("./db.js");
+const { apri: apriDb } = require("./db.js");
 const { nuovoBot, popolazione, settimanaBot, ricambio } = require("../bot.js");
 const { nomeDufficio } = require("../moderazione.js");
 const plausibilita = require("../plausibilita.js");
 
-let A = null;                                   // gli attrezzi del database
+let A = null;                                   // il motore del database (sqlite.js o postgres.js)
 let CFG = { quantiBot: 140, settimanaMs: 24 * 3600e3 };
 
 const ora = () => Date.now();
@@ -42,39 +42,39 @@ function combacia(segreto, impastato){
 }
 
 /* ==================== APERTURA ==================== */
-function apri(cfg){
+async function apri(cfg){
   CFG = Object.assign(CFG, cfg || {});
-  A = attrezzi(apriDb(CFG.file));
-  primaVolta();
+  A = await apriDb(CFG);
+  await primaVolta();
   return A;
 }
-function chiudi(){ if(A){ A.chiudi(); A = null; } }
+async function chiudi(){ if(A){ const a = A; A = null; await a.chiudi(); } }
 
-const leggiStato = (chiave, dif) => {
-  const r = A.uno("SELECT valore FROM stato WHERE chiave = ?", chiave);
+const leggiStato = async (chiave, dif) => {
+  const r = await A.uno("SELECT valore FROM stato WHERE chiave = ?", chiave);
   return r ? r.valore : dif;
 };
-const scriviStato = (chiave, valore) =>
-  A.fai("INSERT INTO stato (chiave, valore) VALUES (?, ?) " +
+const scriviStato = async (chiave, valore) =>
+  await A.fai("INSERT INTO stato (chiave, valore) VALUES (?, ?) " +
         "ON CONFLICT(chiave) DO UPDATE SET valore = excluded.valore", chiave, String(valore));
 
 /* La prima accensione: una stagione, una settimana, e la gente che fa numero. */
-function primaVolta(){
-  if(!A.uno("SELECT id FROM stagione LIMIT 1")){
-    A.fai("INSERT INTO stagione (nome, inizio, stato) VALUES (?, ?, 'corrente')", "Prima stagione", ora());
+async function primaVolta(){
+  if(!await A.uno("SELECT id FROM stagione LIMIT 1")){
+    await A.fai("INSERT INTO stagione (nome, inizio, stato) VALUES (?, ?, 'corrente')", "Prima stagione", ora());
   }
-  if(!A.uno("SELECT numero FROM settimana LIMIT 1")){
-    const s = A.uno("SELECT id FROM stagione WHERE stato = 'corrente' ORDER BY id DESC LIMIT 1");
-    A.fai("INSERT INTO settimana (numero, stagione_id, iniziata) VALUES (1, ?, ?)", s.id, ora());
-    scriviStato("prossimo_giro", ora() + CFG.settimanaMs);
+  if(!await A.uno("SELECT numero FROM settimana LIMIT 1")){
+    const s = await A.uno("SELECT id FROM stagione WHERE stato = 'corrente' ORDER BY id DESC LIMIT 1");
+    await A.fai("INSERT INTO settimana (numero, stagione_id, iniziata) VALUES (1, ?, ?)", s.id, ora());
+    await scriviStato("prossimo_giro", ora() + CFG.settimanaMs);
   }
-  const quanti = A.uno("SELECT count(*) n FROM artista WHERE bot = 1 AND ritirato IS NULL").n;
+  const quanti = (await A.uno("SELECT count(*) n FROM artista WHERE bot = 1 AND ritirato IS NULL")).n;
   if(quanti === 0 && CFG.quantiBot > 0){
-    const usati = new Set(A.tutti("SELECT nome FROM artista").map(r => r.nome.toLowerCase()));
-    A.insieme(() => { for(const b of popolazione(CFG.quantiBot, usati)) inserisciBot(b); });
+    const usati = new Set((await A.tutti("SELECT nome FROM artista")).map(r => r.nome.toLowerCase()));
+    await A.insieme(async () => { for(const b of popolazione(CFG.quantiBot, usati)) await inserisciBot(b); });
     console.log("[db] messi in pista " + CFG.quantiBot + " artisti");
   }
-  seminaTraguardi();
+  await seminaTraguardi();
 }
 
 /* Il catalogo dei traguardi: quelli che poi vanno spinti su Steam e sugli
@@ -95,19 +95,27 @@ const TRAGUARDI = [
   ["milano", "Milano", "Sei arrivato a Milano."],
   ["los_angeles", "Los Angeles", "Sei arrivato a Los Angeles."]
 ];
-function seminaTraguardi(){
-  const q = A.db.prepare("INSERT OR IGNORE INTO traguardo (codice, nome, descrizione, codice_steam) VALUES (?,?,?,?)");
-  for(const [codice, nome, desc] of TRAGUARDI) q.run(codice, nome, desc, codice.toUpperCase());
+async function seminaTraguardi(){
+  /* `ON CONFLICT DO UPDATE` invece di `INSERT OR IGNORE`: la seconda è una
+     scorciatoia di SQLite, la prima la capiscono tutti e due i database. E
+     l'ordine si riscrive ogni volta, così cambiare l'elenco qui sopra basta. */
+  for(let i = 0; i < TRAGUARDI.length; i++){
+    const [codice, nome, desc] = TRAGUARDI[i];
+    await A.fai(`INSERT INTO traguardo (codice, nome, descrizione, codice_steam, ordine)
+                 VALUES (?,?,?,?,?)
+                 ON CONFLICT (codice) DO UPDATE SET ordine = excluded.ordine`,
+      codice, nome, desc, codice.toUpperCase(), i + 1);
+  }
 }
 
 /* ==================== GLI ARTISTI ==================== */
-function inserisciBot(b){
-  A.fai(`INSERT INTO artista (id, account_id, bot, nome, citta, genere, storia, seed, stream,
+async function inserisciBot(b){
+  await A.fai(`INSERT INTO artista (id, account_id, bot, nome, citta, genere, storia, seed, stream,
            uscite, deal, ultima_titolo, ultima_seed, creato)
          VALUES (?, NULL, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     b.id, b.nome, b.citta, b.genere, b.storia, b.seed, Math.round(b.stream),
     b.uscite, b.deal ? 1 : 0, b.ultima, b.seed, b.creato || ora());
-  A.fai("INSERT INTO bot_stato (artista_id, slancio, caldo, carattere) VALUES (?, ?, ?, ?)",
+  await A.fai("INSERT INTO bot_stato (artista_id, slancio, caldo, carattere) VALUES (?, ?, ?, ?)",
     b.id, b.slancio || 0, b.caldo || 0, b.carattere || "normale");
 }
 
@@ -126,8 +134,8 @@ function riga(r, ioId){
   };
 }
 
-const ultimaChiusa = () => {
-  const r = A.uno("SELECT max(settimana) s FROM classifica_posizione");
+const ultimaChiusa = async () => {
+  const r = await A.uno("SELECT max(settimana) s FROM classifica_posizione");
   return r && r.s != null ? r.s : -1;
 };
 /* La graduatoria: una sola definizione per tutte le query, così «chi è in
@@ -147,26 +155,26 @@ const GRADUATORIA = `WITH grad AS (
 
 /* La posizione di uno, senza mettere in fila tutti gli altri: si contano
    quelli che stanno davanti. È una lettura di indice, non un ordinamento. */
-function posizioneDi(id, filtro){
-  const a = A.uno("SELECT stream, creato, ritirato, fuori FROM artista a WHERE a.id = ?", id);
+async function posizioneDi(id, filtro){
+  const a = await A.uno("SELECT stream, creato, ritirato, fuori FROM artista a WHERE a.id = ?", id);
   if(!a || a.ritirato || a.fuori) return null;
   const dove = [IN_CLASSIFICA, "(a.stream > ? OR (a.stream = ? AND a.creato < ?))"];
   const v = [a.stream, a.stream, a.creato];
   if(filtro && filtro.citta){ dove.push("lower(a.citta) = lower(?)"); v.push(filtro.citta); }
   if(filtro && filtro.genere){ dove.push("a.genere = ?"); v.push(filtro.genere); }
-  return A.uno("SELECT count(*) n FROM artista a WHERE " + dove.join(" AND "), ...v).n + 1;
+  return (await A.uno("SELECT count(*) n FROM artista a WHERE " + dove.join(" AND "), ...v)).n + 1;
 }
 
 /* Una fetta di classifica: l'indice è già in ordine, quindi si salta a dove
    serve e si leggono N righe. La posizione non si calcola — si sa: è
    `da`, `da+1`, `da+2`. */
-function fetta(da, quanti, filtro){
+async function fetta(da, quanti, filtro){
   const dove = [IN_CLASSIFICA];
   const v = [];
   if(filtro && filtro.citta){ dove.push("lower(a.citta) = lower(?)"); v.push(filtro.citta); }
   if(filtro && filtro.genere){ dove.push("a.genere = ?"); v.push(filtro.genere); }
-  const prec = ultimaChiusa();
-  const righe = A.tutti(
+  const prec = await ultimaChiusa();
+  const righe = await A.tutti(
     `SELECT ${CAMPI_PUBBLICI}, p.pos AS pos_prec
      FROM artista a
      LEFT JOIN classifica_posizione p ON p.artista_id = a.id AND p.settimana = ?
@@ -194,33 +202,33 @@ function graduatoriaFiltrata(filtro){
   };
 }
 
-function classifica(da, quanti, ioId, filtro){
-  const righe = fetta(da, quanti, filtro);
+async function classifica(da, quanti, ioId, filtro){
+  const righe = await fetta(da, quanti, filtro);
   return {
-    settimana: settimanaCorrente(),
-    totale: quantiInClassifica(filtro),
+    settimana: await settimanaCorrente(),
+    totale: await quantiInClassifica(filtro),
     filtro: (filtro && (filtro.citta || filtro.genere)) ? filtro : null,
-    prossimoGiro: Number(leggiStato("prossimo_giro", 0)),
+    prossimoGiro: Number(await leggiStato("prossimo_giro", 0)),
     righe: righe.map(r => riga(r, ioId)),
-    io: ioId ? schedaConPosizione(ioId, ioId, filtro) : null
+    io: ioId ? await schedaConPosizione(ioId, ioId, filtro) : null
   };
 }
 
 /* Quanti sono in classifica, dentro al filtro. */
-function quantiInClassifica(filtro){
+async function quantiInClassifica(filtro){
   const dove = [IN_CLASSIFICA];
   const v = [];
   if(filtro && filtro.citta){ dove.push("lower(a.citta) = lower(?)"); v.push(filtro.citta); }
   if(filtro && filtro.genere){ dove.push("a.genere = ?"); v.push(filtro.genere); }
-  return A.uno("SELECT count(*) n FROM artista a WHERE " + dove.join(" AND "), ...v).n;
+  return (await A.uno("SELECT count(*) n FROM artista a WHERE " + dove.join(" AND "), ...v)).n;
 }
 
 /* Le città e i generi che hanno gente dentro: servono a chi disegna il
    selettore, per non mostrare venti città vuote. */
-const cittaInGioco = () => A.tutti(
+const cittaInGioco = async () => await A.tutti(
   "SELECT a.citta, count(*) quanti, max(a.stream) meglio FROM artista a WHERE " + IN_CLASSIFICA +
   " GROUP BY lower(a.citta) ORDER BY quanti DESC, a.citta");
-const generiInGioco = () => A.tutti(
+const generiInGioco = async () => await A.tutti(
   "SELECT a.genere, count(*) quanti FROM artista a WHERE " + IN_CLASSIFICA +
   " GROUP BY a.genere ORDER BY quanti DESC");
 
@@ -228,53 +236,55 @@ const generiInGioco = () => A.tutti(
    a centomila artisti sono sessanta millisecondi — e chi chiama spesso ce l'ha
    già in mano. Calcolarla due volte nella stessa richiesta era uno spreco che
    si vedeva solo sotto carico. */
-function schedaConPosizione(id, ioId, filtro, pos){
-  const prec = ultimaChiusa();
-  const r = A.uno(
+async function schedaConPosizione(id, ioId, filtro, pos){
+  const prec = await ultimaChiusa();
+  const r = await A.uno(
     `SELECT ${CAMPI_PUBBLICI}, p.pos AS pos_prec
      FROM artista a
      LEFT JOIN classifica_posizione p ON p.artista_id = a.id AND p.settimana = ?
      WHERE a.id = ?`, prec, id);
   if(!r) return null;
-  r.pos = pos != null ? pos : posizioneDi(id, filtro);
+  r.pos = pos != null ? pos : await posizioneDi(id, filtro);
   return r.pos == null ? null : riga(r, ioId);
 }
 
-function intorno(id, raggio){
-  const mia = posizioneDi(id, null);
-  if(mia == null) return { settimana: settimanaCorrente(), totale: quantiInClassifica(null),
+async function intorno(id, raggio){
+  const mia = await posizioneDi(id, null);
+  if(mia == null) return { settimana: await settimanaCorrente(), totale: await quantiInClassifica(null),
     righe: [], io: null };
   const da = Math.max(1, mia - raggio);
   return {
-    settimana: settimanaCorrente(), totale: quantiInClassifica(null),
-    righe: fetta(da, raggio * 2 + 1, null).map(r => riga(r, id)),
-    io: schedaConPosizione(id, id, null, mia)
+    settimana: await settimanaCorrente(), totale: await quantiInClassifica(null),
+    righe: (await fetta(da, raggio * 2 + 1, null)).map(r => riga(r, id)),
+    io: await schedaConPosizione(id, id, null, mia)
   };
 }
 
-const artistaGrezzo = id => A.uno("SELECT * FROM artista WHERE id = ?", id);
-const nomeLibero = (nome, tranne) => !A.uno(
+const artistaGrezzo = async id => await A.uno("SELECT * FROM artista WHERE id = ?", id);
+const nomeLibero = async (nome, tranne) => !await A.uno(
   "SELECT id FROM artista WHERE lower(nome) = lower(?) AND ritirato IS NULL AND id <> ?", nome, tranne || "");
-const quantiArtisti = () => A.uno("SELECT count(*) n FROM artista a WHERE " + IN_CLASSIFICA).n;
-const artistiDi = accountId => A.tutti(
-  "SELECT id FROM artista WHERE account_id = ? AND ritirato IS NULL", accountId)
-  .map(r => schedaConPosizione(r.id, r.id));
+const quantiArtisti = async () => (await A.uno("SELECT count(*) n FROM artista a WHERE " + IN_CLASSIFICA)).n;
+/* `Promise.all` e non un `for`: le schede sono indipendenti fra loro, e chi ha
+   tre artisti non deve aspettare tre viaggi in fila. */
+const artistiDi = async accountId => Promise.all(
+  (await A.tutti("SELECT id FROM artista WHERE account_id = ? AND ritirato IS NULL", accountId))
+    .map(r => schedaConPosizione(r.id, r.id)));
 
-function iscriviArtista(d){
+async function iscriviArtista(d){
   const id = uuid();
-  A.fai(`INSERT INTO artista (id, account_id, bot, nome, citta, genere, storia, seed,
+  await A.fai(`INSERT INTO artista (id, account_id, bot, nome, citta, genere, storia, seed,
            chiave_hash, creato) VALUES (?, ?, 0, ?, ?, ?, ?, ?, ?, ?)`,
     id, d.accountId || null, d.nome, d.citta, d.genere, d.storia || "", d.seed || 0,
     d.chiaveHash || null, ora());
-  return schedaConPosizione(id, id);
+  return await schedaConPosizione(id, id);
 }
 
-function aggiornaArtista(id, campi){
-  const a = artistaGrezzo(id);
+async function aggiornaArtista(id, campi){
+  const a = await artistaGrezzo(id);
   if(!a) return null;
-  A.fai("UPDATE artista SET nome = ?, citta = ?, genere = ? WHERE id = ?",
+  await A.fai("UPDATE artista SET nome = ?, citta = ?, genere = ? WHERE id = ?",
     campi.nome || a.nome, campi.citta || a.citta, campi.genere || a.genere, id);
-  return schedaConPosizione(id, id);
+  return await schedaConPosizione(id, id);
 }
 
 /* Il punteggio della settimana. Il tetto contro l'imbroglio sta qui e non nel
@@ -286,8 +296,8 @@ function aggiornaArtista(id, campi){
    fuori e quello che andava già (`../plausibilita.js`). Chi sfora viene limato
    e lascia un sospetto pesato: uno che sfora di poco pesa poco, e nessuno viene
    sanzionato per un sospetto solo. */
-function segnaPunteggio(id, d, ipHash){
-  const a = artistaGrezzo(id);
+async function segnaPunteggio(id, d, ipHash){
+  const a = await artistaGrezzo(id);
   if(!a) return null;
   const esame = plausibilita.esamina(a, {
     stream: Math.min(5e7, Number(d.stream) || 0),
@@ -297,15 +307,15 @@ function segnaPunteggio(id, d, ipHash){
   });
   const limato = esame.limato;
   const stream = esame.stream;
-  const set = A.insieme(() => {
-    A.fai(`UPDATE artista SET stream = ?, fan = ?, livello = ?, fase = ?, uscite = ?, deal = ?,
+  const set = await A.insieme(async () => {
+    await A.fai(`UPDATE artista SET stream = ?, fan = ?, livello = ?, fase = ?, uscite = ?, deal = ?,
              ultima_titolo = coalesce(?, ultima_titolo), ultima_seed = coalesce(?, ultima_seed),
              punteggio = ? WHERE id = ?`,
       stream, esame.fan, esame.livello, d.fase != null ? d.fase : a.fase,
       d.uscite != null ? d.uscite : a.uscite, d.deal == null ? a.deal : (d.deal ? 1 : 0),
       d.ultima || null, d.seed || null, ora(), id);
-    const s = settimanaCorrente();
-    A.fai(`INSERT INTO punteggio_settimana (artista_id, settimana, stream, fan, livello, fase,
+    const s = await settimanaCorrente();
+    await A.fai(`INSERT INTO punteggio_settimana (artista_id, settimana, stream, fan, livello, fase,
              uscite, deal, limato, origine, ip_hash, inviato)
            VALUES (?,?,?,?,?,?,?,?,?, 'client', ?, ?)
            ON CONFLICT(artista_id, settimana) DO UPDATE SET
@@ -314,7 +324,7 @@ function segnaPunteggio(id, d, ipHash){
              limato = excluded.limato, inviato = excluded.inviato`,
       id, s, stream, esame.fan, esame.livello, d.fase || 0, d.uscite || 0,
       d.deal ? 1 : 0, limato ? 1 : 0, ipHash || null, ora());
-    if(limato && esame.peso > 0) segnaSospetto(id, esame.gravita > 20 ? "impossibile" : "salto",
+    if(limato && esame.peso > 0) await segnaSospetto(id, esame.gravita > 20 ? "impossibile" : "salto",
       { chiesto: Math.round(Number(d.stream) || 0), tetto: esame.tetto,
         fuori: esame.fuori, gravita: esame.gravita }, esame.peso);
     return s;
@@ -322,12 +332,12 @@ function segnaPunteggio(id, d, ipHash){
   /* Chi ha una sanzione «fuori classifica» continua a giocare e il punteggio
      si salva lo stesso: solo, in graduatoria non c'è. Quindi qui la scheda può
      non tornare, e non è un errore — è la sanzione che funziona. */
-  if(limato && esame.peso > 0) valutaSospetti(a.account_id);
-  const pos = posizioneDi(id, null);
-  const mia = pos == null ? null : schedaConPosizione(id, id, null, pos);
-  const traguardi = traguardiDovuti(id, pos);
+  if(limato && esame.peso > 0) await valutaSospetti(a.account_id);
+  const pos = await posizioneDi(id, null);
+  const mia = pos == null ? null : await schedaConPosizione(id, id, null, pos);
+  const traguardi = await traguardiDovuti(id, pos);
   return { ok: true, pos: mia ? mia.pos : null, delta: mia ? mia.delta : null,
-    fuoriClassifica: !mia, totale: quantiArtisti(), settimana: set, limato,
+    fuoriClassifica: !mia, totale: await quantiArtisti(), settimana: set, limato,
     tetto: esame.tetto, fuori: esame.fuori, traguardi };
 }
 
@@ -337,35 +347,35 @@ function segnaPunteggio(id, d, ipHash){
    è la punizione giusta: se ci siamo sbagliati non abbiamo tolto il gioco a un
    cliente che l'ha pagato. */
 const TIPI_SANZIONE = ["avviso", "fuori_classifica", "sospensione"];
-function sanziona(accountId, tipo, motivo, giorni){
+async function sanziona(accountId, tipo, motivo, giorni){
   if(TIPI_SANZIONE.indexOf(tipo) < 0) return null;
-  if(!accountId || !A.uno("SELECT id FROM account WHERE id = ?", accountId)) return null;
+  if(!accountId || !await A.uno("SELECT id FROM account WHERE id = ?", accountId)) return null;
   const fino = giorni > 0 ? ora() + giorni * 86400e3 : null;
-  A.fai("INSERT INTO sanzione (account_id, tipo, motivo, da, a, deciso_da) VALUES (?,?,?,?,?,?)",
+  await A.fai("INSERT INTO sanzione (account_id, tipo, motivo, da, a, deciso_da) VALUES (?,?,?,?,?,?)",
     accountId, tipo, motivo, ora(), fino, "a mano");
-  if(tipo !== "avviso") A.fai("UPDATE artista SET fuori = 1 WHERE account_id = ?", accountId);
+  if(tipo !== "avviso") await A.fai("UPDATE artista SET fuori = 1 WHERE account_id = ?", accountId);
   return { ok: true, tipo, motivo, fino };
 }
-const sanzioneAttiva = accountId => accountId ? A.uno(
+const sanzioneAttiva = async accountId => accountId ? await A.uno(
   `SELECT tipo, motivo, a FROM sanzione WHERE account_id = ? AND tipo <> 'avviso'
      AND (a IS NULL OR a > ?)
    ORDER BY CASE tipo WHEN 'sospensione' THEN 0 ELSE 1 END, id DESC LIMIT 1`,
   accountId, ora()) : null;
-function togliSanzioni(accountId){
-  A.fai("UPDATE sanzione SET a = ? WHERE account_id = ? AND (a IS NULL OR a > ?)", ora(), accountId, ora());
-  A.fai("UPDATE artista SET fuori = 0 WHERE account_id = ?", accountId);
+async function togliSanzioni(accountId){
+  await A.fai("UPDATE sanzione SET a = ? WHERE account_id = ? AND (a IS NULL OR a > ?)", ora(), accountId, ora());
+  await A.fai("UPDATE artista SET fuori = 0 WHERE account_id = ?", accountId);
 }
 
 /* Chi ha fatto alzare un sopracciglio, dal più recente: è la lista da cui si
    guarda a mano prima di sanzionare qualcuno. */
-const sospetti = quanti => A.tutti(
+const sospetti = async quanti => (await A.tutti(
   `SELECT s.id, s.artista_id, a.nome, a.account_id, s.tipo, s.dettaglio, s.peso, s.creato
    FROM sospetto s JOIN artista a ON a.id = s.artista_id
-   ORDER BY s.id DESC LIMIT ?`, quanti).map(r =>
+   ORDER BY s.id DESC LIMIT ?`, quanti)).map(r =>
      Object.assign(r, { dettaglio: (() => { try{ return JSON.parse(r.dettaglio); }catch(e){ return {}; } })() }));
 
-const segnaSospetto = (id, tipo, dettaglio, peso) =>
-  A.fai("INSERT INTO sospetto (artista_id, tipo, dettaglio, peso, creato) VALUES (?,?,?,?,?)",
+const segnaSospetto = async (id, tipo, dettaglio, peso) =>
+  await A.fai("INSERT INTO sospetto (artista_id, tipo, dettaglio, peso, creato) VALUES (?,?,?,?,?)",
     id, tipo, JSON.stringify(dettaglio || {}), Math.max(1, peso || 1), ora());
 
 /* Nessuno viene sanzionato per un sospetto solo: uno può sforare perché il
@@ -374,35 +384,35 @@ const segnaSospetto = (id, tipo, dettaglio, peso) =>
    **fuori dalla classifica**, non la sospensione: continua a giocare la sua
    partita, e chi guarda la coda decide con calma. */
 const SOGLIA_SOSPETTI = 12;
-function valutaSospetti(accountId){
+async function valutaSospetti(accountId){
   if(!accountId) return null;
-  if(sanzioneAttiva(accountId)) return null;
-  const somma = A.uno(
+  if(await sanzioneAttiva(accountId)) return null;
+  const somma = (await A.uno(
     `SELECT coalesce(sum(s.peso), 0) peso FROM sospetto s
      JOIN artista a ON a.id = s.artista_id
-     WHERE a.account_id = ? AND s.creato > ?`, accountId, ora() - 60 * 86400e3).peso;
+     WHERE a.account_id = ? AND s.creato > ?`, accountId, ora() - 60 * 86400e3)).peso;
   if(somma < SOGLIA_SOSPETTI) return null;
-  A.fai("INSERT INTO sanzione (account_id, tipo, motivo, da, a, deciso_da) VALUES (?,?,?,?,?,?)",
+  await A.fai("INSERT INTO sanzione (account_id, tipo, motivo, da, a, deciso_da) VALUES (?,?,?,?,?,?)",
     accountId, "fuori_classifica",
     "numeri che non stanno in piedi (" + somma + " punti di sospetto in due mesi)",
     ora(), ora() + 14 * 86400e3, "automatico");
-  A.fai("UPDATE artista SET fuori = 1 WHERE account_id = ?", accountId);
+  await A.fai("UPDATE artista SET fuori = 1 WHERE account_id = ?", accountId);
   return { fuoriClassifica: true, peso: somma };
 }
 
 /* ==================== IL TEMPO ==================== */
-const settimanaCorrente = () =>
-  A.uno("SELECT max(numero) n FROM settimana").n || 1;
+const settimanaCorrente = async () =>
+  (await A.uno("SELECT max(numero) n FROM settimana")).n || 1;
 
-function stato(){
+async function stato(){
   return {
-    settimana: settimanaCorrente(),
-    artisti: quantiArtisti(),
-    giocatori: A.uno("SELECT count(*) n FROM artista WHERE bot = 0 AND ritirato IS NULL").n,
-    account: A.uno("SELECT count(*) n FROM account WHERE cancellato IS NULL").n,
-    carriere: A.uno("SELECT count(*) n FROM carriera").n,
-    prossimoGiro: Number(leggiStato("prossimo_giro", 0)),
-    stagione: A.uno("SELECT id, nome FROM stagione WHERE stato = 'corrente' ORDER BY id DESC LIMIT 1")
+    settimana: await settimanaCorrente(),
+    artisti: await quantiArtisti(),
+    giocatori: (await A.uno("SELECT count(*) n FROM artista WHERE bot = 0 AND ritirato IS NULL")).n,
+    account: (await A.uno("SELECT count(*) n FROM account WHERE cancellato IS NULL")).n,
+    carriere: (await A.uno("SELECT count(*) n FROM carriera")).n,
+    prossimoGiro: Number(await leggiStato("prossimo_giro", 0)),
+    stagione: await A.uno("SELECT id, nome FROM stagione WHERE stato = 'corrente' ORDER BY id DESC LIMIT 1")
   };
 }
 
@@ -412,12 +422,12 @@ function stato(){
    3. i bot vivono la loro settimana;
    4. chi non manda un punteggio da un pezzo scende;
    5. chi è sceso troppo smette, e spunta gente nuova. */
-function giroSettimana(){
-  return A.insieme(() => {
-    const chiusa = settimanaCorrente();
-    const prec = ultimaChiusa();
+async function giroSettimana(){
+  return await A.insieme(async () => {
+    const chiusa = await settimanaCorrente();
+    const prec = await ultimaChiusa();
 
-    A.fai(GRADUATORIA + `
+    await A.fai(GRADUATORIA + `
       INSERT INTO classifica_posizione (settimana, artista_id, pos, stream, delta)
       SELECT ?, a.id, g.pos, a.stream, p.pos - g.pos
       FROM grad g JOIN artista a ON a.id = g.id
@@ -426,34 +436,37 @@ function giroSettimana(){
       ON CONFLICT(settimana, artista_id) DO UPDATE SET
         pos = excluded.pos, stream = excluded.stream, delta = excluded.delta`, chiusa, prec);
 
-    A.fai("UPDATE settimana SET chiusa = ?, artisti = ?, giocatori = ? WHERE numero = ?",
-      ora(), quantiArtisti(),
-      A.uno("SELECT count(*) n FROM artista WHERE bot = 0 AND ritirato IS NULL").n, chiusa);
-    const stagione = A.uno("SELECT id FROM stagione WHERE stato = 'corrente' ORDER BY id DESC LIMIT 1");
-    A.fai("INSERT INTO settimana (numero, stagione_id, iniziata) VALUES (?, ?, ?)",
+    await A.fai("UPDATE settimana SET chiusa = ?, artisti = ?, giocatori = ? WHERE numero = ?",
+      ora(), await quantiArtisti(),
+      (await A.uno("SELECT count(*) n FROM artista WHERE bot = 0 AND ritirato IS NULL")).n, chiusa);
+    const stagione = await A.uno("SELECT id FROM stagione WHERE stato = 'corrente' ORDER BY id DESC LIMIT 1");
+    await A.fai("INSERT INTO settimana (numero, stagione_id, iniziata) VALUES (?, ?, ?)",
       chiusa + 1, stagione.id, ora());
     const nuova = chiusa + 1;
 
     /* i bot */
-    const bot = A.tutti(`SELECT a.id, a.nome, a.citta, a.stream, a.uscite, a.deal, a.seed,
+    const bot = await A.tutti(`SELECT a.id, a.nome, a.citta, a.stream, a.uscite, a.deal, a.seed,
         a.ultima_titolo AS ultima, b.slancio, b.caldo, b.carattere
       FROM artista a JOIN bot_stato b ON b.artista_id = a.id WHERE a.ritirato IS NULL`);
     const notizie = [];
     settimanaBot(bot, notizie);
     for(const b of bot){
-      A.fai("UPDATE artista SET stream = ?, uscite = ?, deal = ?, ultima_titolo = ?, ultima_seed = ?, seed = ? WHERE id = ?",
+      await A.fai("UPDATE artista SET stream = ?, uscite = ?, deal = ?, ultima_titolo = ?, ultima_seed = ?, seed = ? WHERE id = ?",
         Math.round(b.stream), b.uscite, b.deal ? 1 : 0, b.ultima, b.seed, b.seed, b.id);
-      A.fai("UPDATE bot_stato SET slancio = ?, caldo = ? WHERE artista_id = ?", b.slancio, b.caldo, b.id);
+      await A.fai("UPDATE bot_stato SET slancio = ?, caldo = ? WHERE artista_id = ?", b.slancio, b.caldo, b.id);
     }
 
     /* chi non si fa vivo scende: la classifica non è un museo */
     const fermoDa = ora() - CFG.settimanaMs * 1.5;
-    A.fai(`UPDATE artista SET stream = CAST(stream * 0.92 AS INTEGER)
+    /* meno 8%, in numeri interi. Come il taglio di fine stagione: `CAST(x * 0.92
+       AS INTEGER)` tronca su SQLite e arrotonda su PostgreSQL, e due database
+       che fanno scendere di diverso non sono la stessa classifica. */
+    await A.fai(`UPDATE artista SET stream = (stream * 92 - stream * 92 % 100) / 100
            WHERE bot = 0 AND ritirato IS NULL AND coalesce(punteggio, creato) < ?`, fermoDa);
 
     /* ricambio: chi non ce la fa smette, e spunta qualcuno dal niente */
-    const usati = new Set(A.tutti("SELECT nome FROM artista WHERE ritirato IS NULL").map(r => r.nome.toLowerCase()));
-    const vivi = A.tutti("SELECT a.id, a.nome, a.stream FROM artista a JOIN bot_stato b ON b.artista_id = a.id WHERE a.ritirato IS NULL");
+    const usati = new Set((await A.tutti("SELECT nome FROM artista WHERE ritirato IS NULL")).map(r => r.nome.toLowerCase()));
+    const vivi = await A.tutti("SELECT a.id, a.nome, a.stream FROM artista a JOIN bot_stato b ON b.artista_id = a.id WHERE a.ritirato IS NULL");
     const dopo = vivi.slice();
     ricambio(dopo, CFG.quantiBot, usati, notizie);
     /* Il confronto fra prima e dopo si fa con due insiemi di id, non con
@@ -463,17 +476,17 @@ function giroSettimana(){
     const idPrima = new Set(vivi.map(b => b.id));
     const idDopo = new Set(dopo.map(b => b.id));
     for(const b of vivi) if(!idDopo.has(b.id))
-      A.fai("UPDATE artista SET ritirato = ? WHERE id = ?", ora(), b.id);
-    for(const b of dopo) if(!idPrima.has(b.id)) inserisciBot(b);
+      await A.fai("UPDATE artista SET ritirato = ? WHERE id = ?", ora(), b.id);
+    for(const b of dopo) if(!idPrima.has(b.id)) await inserisciBot(b);
 
     for(const n of notizie){
-      A.fai("INSERT INTO notizia (settimana, artista_id, tipo, testo, creato) VALUES (?, ?, ?, ?, ?)",
+      await A.fai("INSERT INTO notizia (settimana, artista_id, tipo, testo, creato) VALUES (?, ?, ?, ?, ?)",
         nuova, n.id || null, n.tipo || tipoNotizia(n.testo || n), n.testo || n, ora());
     }
-    A.fai("DELETE FROM notizia WHERE id NOT IN (SELECT id FROM notizia ORDER BY id DESC LIMIT 400)");
+    await A.fai("DELETE FROM notizia WHERE id NOT IN (SELECT id FROM notizia ORDER BY id DESC LIMIT 400)");
 
-    manutenzione();
-    scriviStato("prossimo_giro", ora() + CFG.settimanaMs);
+    await manutenzione();
+    await scriviStato("prossimo_giro", ora() + CFG.settimanaMs);
     return notizie.length;
   });
 }
@@ -481,29 +494,29 @@ function giroSettimana(){
    gettone che vive per sempre è un gettone che prima o poi finisce in mano a
    qualcun altro), e i sospetti vecchi si buttano — dopo sei mesi non dicono
    più niente su nessuno. */
-function manutenzione(){
+async function manutenzione(){
   /* le sanzioni a tempo scadono da sole: chi le ha finite di scontare torna in
      classifica senza che nessuno debba ricordarsene */
-  A.fai(`UPDATE artista SET fuori = 0 WHERE fuori = 1 AND account_id IS NOT NULL
+  await A.fai(`UPDATE artista SET fuori = 0 WHERE fuori = 1 AND account_id IS NOT NULL
          AND NOT EXISTS (SELECT 1 FROM sanzione s WHERE s.account_id = artista.account_id
            AND s.tipo IN ('fuori_classifica','sospensione') AND (s.a IS NULL OR s.a > ?))`, ora());
   const novanta = ora() - 90 * 86400e3;
-  A.fai("UPDATE dispositivo SET revocato = ? WHERE revocato IS NULL AND visto < ?", ora(), novanta);
-  A.fai("DELETE FROM sospetto WHERE creato < ?", ora() - 180 * 86400e3);
+  await A.fai("UPDATE dispositivo SET revocato = ? WHERE revocato IS NULL AND visto < ?", ora(), novanta);
+  await A.fai("DELETE FROM sospetto WHERE creato < ?", ora() - 180 * 86400e3);
 }
 
 const tipoNotizia = t => /è uscito/.test(t) ? "uscita" : /firmato/.test(t) ? "firma"
   : /sparito/.test(t) ? "sparizione" : /smesso/.test(t) ? "ritiro" : "ingresso";
 
-function assicuraSettimana(){
+async function assicuraSettimana(){
   let giri = 0;
-  while(ora() >= Number(leggiStato("prossimo_giro", 0)) && giri < 12){ giroSettimana(); giri++; }
-  if(giri >= 12) scriviStato("prossimo_giro", ora() + CFG.settimanaMs);
+  while(ora() >= Number(await leggiStato("prossimo_giro", 0)) && giri < 12){ await giroSettimana(); giri++; }
+  if(giri >= 12) await scriviStato("prossimo_giro", ora() + CFG.settimanaMs);
   return giri;
 }
 
-const notizie = quante => A.tutti(
-  "SELECT settimana, artista_id, tipo, testo, creato FROM notizia ORDER BY id DESC LIMIT ?", quante)
+const notizie = async quante => (await A.tutti(
+  "SELECT settimana, artista_id, tipo, testo, creato FROM notizia ORDER BY id DESC LIMIT ?", quante))
   .map(n => ({ t: n.creato, s: n.settimana, tipo: n.tipo, testo: n.testo, artistaId: n.artista_id }));
 
 /* ==================== IL FEED DEL TELEFONO ====================
@@ -520,8 +533,8 @@ function cuori(stream, seed){
   return base + (Number(seed || 0) % Math.max(2, Math.round(base * 0.35)));
 }
 
-function feed(ioId, quanti){
-  const righe = A.tutti(
+async function feed(ioId, quanti){
+  const righe = await A.tutti(
     `SELECT n.settimana, n.tipo, n.testo, n.creato, n.artista_id,
             a.nome, a.stream, a.seed, a.citta, a.genere
      FROM notizia n LEFT JOIN artista a ON a.id = n.artista_id
@@ -537,17 +550,17 @@ function feed(ioId, quanti){
   /* la parte che riguarda te: chi ti ha superato e chi hai superato tu
      dall'ultima fotografia. È quello che rende un feed «tuo» invece che una
      bacheca uguale per tutti. */
-  if(ioId) for(const p of vicini(ioId)) post.unshift(p);
+  if(ioId) for(const p of await vicini(ioId)) post.unshift(p);
   return post;
 }
 
 /* Chi si è mosso intorno a te fra l'ultima settimana chiusa e adesso. */
-function vicini(ioId){
-  const mia = posizioneDi(ioId, null);
+async function vicini(ioId){
+  const mia = await posizioneDi(ioId, null);
   if(mia == null) return [];
-  const prec = ultimaChiusa();
-  const attorno = fetta(Math.max(1, mia - 3), 7, null).filter(r => r.id !== ioId);
-  const mioPrec = A.uno(
+  const prec = await ultimaChiusa();
+  const attorno = (await fetta(Math.max(1, mia - 3), 7, null)).filter(r => r.id !== ioId);
+  const mioPrec = await A.uno(
     "SELECT pos FROM classifica_posizione WHERE artista_id = ? AND settimana = ?", ioId, prec);
   const primaEro = mioPrec ? mioPrec.pos : null;
   const fuori = [];
@@ -555,11 +568,11 @@ function vicini(ioId){
   for(const a of attorno){
     if(primaEro == null || a.pos_prec == null) continue;
     if(a.pos < mia && a.pos_prec > primaEro)
-      fuori.push({ tipo: "sorpasso", s: settimanaCorrente(), n: a.nome, artistaId: a.id,
+      fuori.push({ tipo: "sorpasso", s: await settimanaCorrente(), n: a.nome, artistaId: a.id,
         t: a.nome + " ti ha passato: adesso è " + a.pos + "°, tu " + mia + "°.",
         like: cuori(a.stream, a.seed), quando: ora() });
     else if(a.pos > mia && a.pos_prec < primaEro)
-      fuori.push({ tipo: "sorpasso", s: settimanaCorrente(), n: a.nome, artistaId: a.id,
+      fuori.push({ tipo: "sorpasso", s: await settimanaCorrente(), n: a.nome, artistaId: a.id,
         t: "Hai passato " + a.nome + ": adesso sei " + mia + "°, lui " + a.pos + "°.",
         like: cuori(a.stream, a.seed), quando: ora() });
   }
@@ -570,29 +583,29 @@ function vicini(ioId){
    I rivali non sono più gente generata in casa: sono i giocatori (e i bot) che
    ti stanno appena sopra. Quelli sono gli opps — e quando li superi lo vedi,
    perché il posto era loro. */
-function opps(ioId, quanti){
-  const pos = posizioneDi(ioId, null);
-  const mia = pos == null ? null : schedaConPosizione(ioId, ioId, null, pos);
-  if(!mia) return { io: null, sopra: [], dichiarati: relazioni(ioId) };
+async function opps(ioId, quanti){
+  const pos = await posizioneDi(ioId, null);
+  const mia = pos == null ? null : await schedaConPosizione(ioId, ioId, null, pos);
+  if(!mia) return { io: null, sopra: [], dichiarati: await relazioni(ioId) };
   const n = Math.max(1, Math.min(10, quanti || 3));
   const da = Math.max(1, mia.pos - n);
-  const sopra = fetta(da, mia.pos - da, null)
+  const sopra = (await fetta(da, mia.pos - da, null))
     .map(r => Object.assign(riga(r, ioId), { distanza: r.stream - mia.stream }));
-  return { io: mia, sopra, dichiarati: relazioni(ioId) };
+  return { io: mia, sopra, dichiarati: await relazioni(ioId) };
 }
 
 /* Una rivalità dichiarata: resta anche se uno dei due si sposta in classifica. */
-function dichiara(artistaId, altroId, tipo, nota){
+async function dichiara(artistaId, altroId, tipo, nota){
   if(artistaId === altroId) return null;
   if(["rivale", "feat", "amico", "crew"].indexOf(tipo) < 0) return null;
-  const a = artistaGrezzo(artistaId), b = artistaGrezzo(altroId);
+  const a = await artistaGrezzo(artistaId), b = await artistaGrezzo(altroId);
   if(!a || !b || b.ritirato) return null;
   try{
-    A.fai(`INSERT INTO relazione (artista_id, altro_id, tipo, da_settimana, nota, creato)
-           VALUES (?,?,?,?,?,?)`, artistaId, altroId, tipo, settimanaCorrente(), nota || null, ora());
+    await A.fai(`INSERT INTO relazione (artista_id, altro_id, tipo, da_settimana, nota, creato)
+           VALUES (?,?,?,?,?,?)`, artistaId, altroId, tipo, await settimanaCorrente(), nota || null, ora());
     if(tipo === "rivale"){
-      A.fai("INSERT INTO notizia (settimana, artista_id, tipo, testo, creato) VALUES (?,?,?,?,?)",
-        settimanaCorrente(), artistaId, "rivalita",
+      await A.fai("INSERT INTO notizia (settimana, artista_id, tipo, testo, creato) VALUES (?,?,?,?,?)",
+        await settimanaCorrente(), artistaId, "rivalita",
         a.nome + " se l'è presa con " + b.nome + ".", ora());
     }
   }catch(e){
@@ -601,10 +614,10 @@ function dichiara(artistaId, altroId, tipo, nota){
   }
   return { ok: true, tipo, con: b.nome };
 }
-const scancella = (artistaId, altroId, tipo) =>
-  A.fai("DELETE FROM relazione WHERE artista_id = ? AND altro_id = ? AND tipo = ?",
+const scancella = async (artistaId, altroId, tipo) =>
+  await A.fai("DELETE FROM relazione WHERE artista_id = ? AND altro_id = ? AND tipo = ?",
     artistaId, altroId, tipo);
-const relazioni = artistaId => A.tutti(
+const relazioni = async artistaId => await A.tutti(
   `SELECT r.tipo, r.grado, r.da_settimana, r.nota, a.id, a.nome, a.citta, a.genere, a.stream
    FROM relazione r JOIN artista a ON a.id = r.altro_id
    WHERE r.artista_id = ? AND a.ritirato IS NULL ORDER BY r.id DESC LIMIT 50`, artistaId);
@@ -616,39 +629,42 @@ const relazioni = artistaId => A.tutti(
    scritto per sempre), **ammorbidisce** i numeri di tutti invece di azzerarli
    — chi ha lavorato un anno non riparte da zero come chi ha installato ieri —
    e apre la stagione dopo. */
-const stagioneCorrente = () =>
-  A.uno("SELECT * FROM stagione WHERE stato = 'corrente' ORDER BY id DESC LIMIT 1");
+const stagioneCorrente = async () =>
+  await A.uno("SELECT * FROM stagione WHERE stato = 'corrente' ORDER BY id DESC LIMIT 1");
 
-function chiudiStagione(quanti){
-  return A.insieme(() => {
-    const vecchia = stagioneCorrente();
+async function chiudiStagione(quanti){
+  return await A.insieme(async () => {
+    const vecchia = await stagioneCorrente();
     if(!vecchia) return null;
-    const classifica = A.tutti(GRADUATORIA + `
+    const classifica = await A.tutti(GRADUATORIA + `
       SELECT a.id, a.nome, a.citta, a.genere, a.stream, g.pos
       FROM grad g JOIN artista a ON a.id = g.id
       WHERE g.pos <= ? ORDER BY g.pos`, Math.max(1, quanti || 100));
 
     for(const r of classifica){
-      A.fai(`INSERT INTO albo (stagione_id, pos, artista_id, nome, citta, genere, stream, chiusa)
+      await A.fai(`INSERT INTO albo (stagione_id, pos, artista_id, nome, citta, genere, stream, chiusa)
              VALUES (?,?,?,?,?,?,?,?)`,
         vecchia.id, r.pos, r.id, r.nome, r.citta, r.genere, r.stream, ora());
     }
-    A.fai("UPDATE stagione SET stato = 'chiusa', fine = ? WHERE id = ?", ora(), vecchia.id);
+    await A.fai("UPDATE stagione SET stato = 'chiusa', fine = ? WHERE id = ?", ora(), vecchia.id);
 
     /* il ripartire: tutti gli stream calano allo stesso modo, così l'ordine
        resta ma le distanze si accorciano e la rincorsa è possibile */
-    A.fai("UPDATE artista SET stream = CAST(stream * 0.25 AS INTEGER) WHERE ritirato IS NULL");
-    A.fai("UPDATE bot_stato SET slancio = 0, caldo = 0");
+    /* un quarto, in numeri interi: `CAST(x * 0.25 AS INTEGER)` tronca su SQLite
+       e arrotonda su PostgreSQL, e due database che tagliano diverso non sono
+       lo stesso gioco. Così è il pavimento esatto su tutti e due. */
+    await A.fai("UPDATE artista SET stream = (stream - stream % 4) / 4 WHERE ritirato IS NULL");
+    await A.fai("UPDATE bot_stato SET slancio = 0, caldo = 0");
 
-    const info = A.fai("INSERT INTO stagione (nome, inizio, stato) VALUES (?, ?, 'corrente')",
+    await A.fai("INSERT INTO stagione (nome, inizio, stato) VALUES (?, ?, 'corrente')",
       "Stagione " + (vecchia.id + 1), ora());
-    const nuova = A.uno("SELECT * FROM stagione ORDER BY id DESC LIMIT 1");
+    const nuova = await A.uno("SELECT * FROM stagione ORDER BY id DESC LIMIT 1");
     /* la settimana va avanti a contare: il tempo non si azzera con la stagione */
-    A.fai("UPDATE settimana SET stagione_id = ? WHERE numero = ?", nuova.id, settimanaCorrente());
+    await A.fai("UPDATE settimana SET stagione_id = ? WHERE numero = ?", nuova.id, await settimanaCorrente());
     const primo = classifica[0];
     if(primo){
-      A.fai("INSERT INTO notizia (settimana, artista_id, tipo, testo, creato) VALUES (?,?,?,?,?)",
-        settimanaCorrente(), primo.id, "traguardo",
+      await A.fai("INSERT INTO notizia (settimana, artista_id, tipo, testo, creato) VALUES (?,?,?,?,?)",
+        await settimanaCorrente(), primo.id, "traguardo",
         "«" + vecchia.nome + "» si chiude: primo " + primo.nome + " con " + primo.stream + " stream.", ora());
     }
     return { chiusa: vecchia.nome, nuova: nuova.nome, inAlbo: classifica.length,
@@ -656,29 +672,29 @@ function chiudiStagione(quanti){
   });
 }
 
-const albo = stagioneId => A.tutti(
+const albo = async stagioneId => await A.tutti(
   `SELECT a.pos, a.nome, a.citta, a.genere, a.stream, a.artista_id, s.nome AS stagione, a.chiusa
    FROM albo a JOIN stagione s ON s.id = a.stagione_id
    WHERE a.stagione_id = coalesce(?, a.stagione_id) ORDER BY a.stagione_id DESC, a.pos LIMIT 200`,
   stagioneId || null);
-const stagioni = () => A.tutti("SELECT id, nome, inizio, fine, stato FROM stagione ORDER BY id DESC");
+const stagioni = async () => await A.tutti("SELECT id, nome, inizio, fine, stato FROM stagione ORDER BY id DESC");
 
 /* ==================== GLI ACCOUNT ==================== */
-function creaAccount(d){
+async function creaAccount(d){
   const id = uuid();
-  A.insieme(() => {
-    A.fai("INSERT INTO account (id, email, lingua, creato, visto) VALUES (?, ?, ?, ?, ?)",
+  await A.insieme(async () => {
+    await A.fai("INSERT INTO account (id, email, lingua, creato, visto) VALUES (?, ?, ?, ?, ?)",
       id, d.email || null, d.lingua || "it", ora(), ora());
-    A.fai("INSERT INTO identita (id, account_id, tipo, id_esterno, segreto_hash, creato, usato) VALUES (?,?,?,?,?,?,?)",
+    await A.fai("INSERT INTO identita (id, account_id, tipo, id_esterno, segreto_hash, creato, usato) VALUES (?,?,?,?,?,?,?)",
       uuid(), id, d.tipo, d.idEsterno, d.segreto ? impasta(d.segreto) : null, ora(), ora());
   });
-  return account(id);
+  return await account(id);
 }
-const account = id => A.uno(
+const account = async id => await A.uno(
   "SELECT id, email, stato, lingua, creato, visto FROM account WHERE id = ? AND cancellato IS NULL", id);
 
-function collegaIdentita(accountId, d){
-  A.fai("INSERT INTO identita (id, account_id, tipo, id_esterno, segreto_hash, creato) VALUES (?,?,?,?,?,?)",
+async function collegaIdentita(accountId, d){
+  await A.fai("INSERT INTO identita (id, account_id, tipo, id_esterno, segreto_hash, creato) VALUES (?,?,?,?,?,?)",
     uuid(), accountId, d.tipo, d.idEsterno, d.segreto ? impasta(d.segreto) : null, ora());
 }
 
@@ -686,56 +702,56 @@ function collegaIdentita(accountId, d){
    Google il segreto non c'è — al posto suo c'è un biglietto firmato da loro,
    che va verificato prima di arrivare qui (vedi `verificaBiglietto` nel
    server: per adesso è una porta chiusa, non una porta finta). */
-function entra(tipo, idEsterno, segreto){
-  const i = A.uno("SELECT * FROM identita WHERE tipo = ? AND id_esterno = ?", tipo, idEsterno);
+async function entra(tipo, idEsterno, segreto){
+  const i = await A.uno("SELECT * FROM identita WHERE tipo = ? AND id_esterno = ?", tipo, idEsterno);
   if(!i) return null;
   if(i.segreto_hash && !combacia(segreto, i.segreto_hash)) return null;
-  const acc = account(i.account_id);
+  const acc = await account(i.account_id);
   if(!acc) return null;
-  A.fai("UPDATE identita SET usato = ? WHERE id = ?", ora(), i.id);
+  await A.fai("UPDATE identita SET usato = ? WHERE id = ?", ora(), i.id);
   return acc;
 }
 
 /* Una sessione = un dispositivo. Il gettone si vede una volta sola, qui dentro
    ne resta l'hash: chi si prende il database non si prende le sessioni. */
-function apriSessione(accountId, d){
+async function apriSessione(accountId, d){
   const token = crypto.randomBytes(32).toString("hex");
-  A.fai(`INSERT INTO dispositivo (id, account_id, piattaforma, nome, token_hash, versione_gioco, creato, visto)
+  await A.fai(`INSERT INTO dispositivo (id, account_id, piattaforma, nome, token_hash, versione_gioco, creato, visto)
          VALUES (?,?,?,?,?,?,?,?)`,
     uuid(), accountId, (d && d.piattaforma) || "web", (d && d.nome) || null,
     sha(token), (d && d.versione) || null, ora(), ora());
-  A.fai("UPDATE account SET visto = ? WHERE id = ?", ora(), accountId);
+  await A.fai("UPDATE account SET visto = ? WHERE id = ?", ora(), accountId);
   return token;
 }
-function sessione(token){
+async function sessione(token){
   if(!token) return null;
-  const d = A.uno("SELECT * FROM dispositivo WHERE token_hash = ? AND revocato IS NULL", sha(token));
+  const d = await A.uno("SELECT * FROM dispositivo WHERE token_hash = ? AND revocato IS NULL", sha(token));
   if(!d) return null;
-  const acc = account(d.account_id);
+  const acc = await account(d.account_id);
   if(!acc || acc.stato !== "attivo") return null;
-  A.fai("UPDATE dispositivo SET visto = ? WHERE id = ?", ora(), d.id);
+  await A.fai("UPDATE dispositivo SET visto = ? WHERE id = ?", ora(), d.id);
   return { account: acc, dispositivo: { id: d.id, piattaforma: d.piattaforma, nome: d.nome } };
 }
-const chiudiSessione = token =>
-  A.fai("UPDATE dispositivo SET revocato = ? WHERE token_hash = ?", ora(), sha(token));
+const chiudiSessione = async token =>
+  await A.fai("UPDATE dispositivo SET revocato = ? WHERE token_hash = ?", ora(), sha(token));
 
 /* La cancellazione dell'account: Apple e Google la pretendono dentro al gioco.
    Non è un DELETE a cascata — quello sfonderebbe lo storico della classifica di
    tutti gli altri. L'artista resta in graduatoria senza nome e senza padrone,
    tutto quello che è personale sparisce. */
-function cancellaAccount(accountId){
-  return A.insieme(() => {
-    const artisti = A.tutti("SELECT id FROM artista WHERE account_id = ?", accountId);
+async function cancellaAccount(accountId){
+  return await A.insieme(async () => {
+    const artisti = await A.tutti("SELECT id FROM artista WHERE account_id = ?", accountId);
     for(const a of artisti){
-      A.fai(`UPDATE artista SET nome = ?, citta = '—', storia = '', account_id = NULL,
+      await A.fai(`UPDATE artista SET nome = ?, citta = '—', storia = '', account_id = NULL,
                chiave_hash = NULL, ritirato = ? WHERE id = ?`,
         "Artista ritirato " + a.id.slice(0, 4), ora(), a.id);
-      A.fai("UPDATE punteggio_settimana SET ip_hash = NULL WHERE artista_id = ?", a.id);
+      await A.fai("UPDATE punteggio_settimana SET ip_hash = NULL WHERE artista_id = ?", a.id);
     }
-    A.fai("DELETE FROM carriera WHERE account_id = ?", accountId);
-    A.fai("DELETE FROM identita WHERE account_id = ?", accountId);
-    A.fai("DELETE FROM dispositivo WHERE account_id = ?", accountId);
-    A.fai(`UPDATE account SET email = NULL, email_confermata = 0, stato = 'cancellato',
+    await A.fai("DELETE FROM carriera WHERE account_id = ?", accountId);
+    await A.fai("DELETE FROM identita WHERE account_id = ?", accountId);
+    await A.fai("DELETE FROM dispositivo WHERE account_id = ?", accountId);
+    await A.fai(`UPDATE account SET email = NULL, email_confermata = 0, stato = 'cancellato',
              cancellato = ? WHERE id = ?`, ora(), accountId);
     return { artisti: artisti.length };
   });
@@ -747,12 +763,12 @@ function cancellaAccount(accountId){
    se no bastano cinque amici per far togliere il nome a chi non ha fatto
    niente. Il conto delle segnalazioni non decide niente da solo — decide chi
    le guarda. */
-function segnala(artistaId, accountId, motivo, nota){
-  const a = artistaGrezzo(artistaId);
+async function segnala(artistaId, accountId, motivo, nota){
+  const a = await artistaGrezzo(artistaId);
   if(!a || a.bot) return null;
   if(["nome", "storia", "imbroglio", "altro"].indexOf(motivo) < 0) return null;
   try{
-    A.fai(`INSERT INTO segnalazione (artista_id, account_id, motivo, nota, creato)
+    await A.fai(`INSERT INTO segnalazione (artista_id, account_id, motivo, nota, creato)
            VALUES (?,?,?,?,?)`, artistaId, accountId || null, motivo, nota || null, ora());
   }catch(e){
     if(/UNIQUE/.test(e.message)) return { gia: true };
@@ -762,7 +778,7 @@ function segnala(artistaId, accountId, motivo, nota){
 }
 
 /* La coda da guardare: gli artisti più segnalati, con quante e da quanti. */
-const daGuardare = quanti => A.tutti(
+const daGuardare = async quanti => await A.tutti(
   `SELECT s.artista_id, a.nome, a.storia, count(*) quante,
           count(DISTINCT s.account_id) da_quanti, max(s.creato) ultima,
           group_concat(DISTINCT s.motivo) motivi
@@ -773,18 +789,18 @@ const daGuardare = quanti => A.tutti(
 /* Togliere un nome: non è una punizione da scrivere in faccia a tutti, è un
    nome neutro al posto suo. Quello di prima resta scritto nel database, per
    poter rispondere a «perché mi avete cambiato il nome». */
-function rinominaDufficio(artistaId){
-  const a = artistaGrezzo(artistaId);
+async function rinominaDufficio(artistaId){
+  const a = await artistaGrezzo(artistaId);
   if(!a) return null;
   const nuovo = nomeDufficio(a.id);
-  A.insieme(() => {
-    A.fai("UPDATE artista SET nome_prima = coalesce(nome_prima, nome), nome = ? WHERE id = ?", nuovo, artistaId);
-    A.fai("UPDATE segnalazione SET stato = 'accolta', chiusa = ? WHERE artista_id = ? AND stato = 'aperta'", ora(), artistaId);
+  await A.insieme(async () => {
+    await A.fai("UPDATE artista SET nome_prima = coalesce(nome_prima, nome), nome = ? WHERE id = ?", nuovo, artistaId);
+    await A.fai("UPDATE segnalazione SET stato = 'accolta', chiusa = ? WHERE artista_id = ? AND stato = 'aperta'", ora(), artistaId);
   });
   return { nome: nuovo, prima: a.nome };
 }
-const chiudiSegnalazioni = (artistaId, stato) =>
-  A.fai("UPDATE segnalazione SET stato = ?, chiusa = ? WHERE artista_id = ? AND stato = 'aperta'",
+const chiudiSegnalazioni = async (artistaId, stato) =>
+  await A.fai("UPDATE segnalazione SET stato = ?, chiusa = ? WHERE artista_id = ? AND stato = 'aperta'",
     stato === "accolta" ? "accolta" : "respinta", ora(), artistaId);
 
 /* ==================== I SALVATAGGI IN CLOUD ==================== */
@@ -793,18 +809,18 @@ const TETTO_CARRIERA = 2 * 1024 * 1024;
 /* In conflitto vince chi è più avanti nel gioco: due dispositivi che salvano la
    stessa carriera non si fondono mai in automatico — si perde roba e il
    giocatore non capisce perché. Chi resta indietro se lo sente dire. */
-function salvaCarriera(accountId, slot, d){
+async function salvaCarriera(accountId, slot, d){
   const testo = JSON.stringify(d.stato || {});
   if(Buffer.byteLength(testo) > TETTO_CARRIERA) return { errore: "carriera-troppo-grande" };
   const settimana = Math.max(1, Math.round(Number(d.settimana) || 1));
   const anno = Math.max(1, Math.round(Number(d.anno) || 1));
-  const vecchia = A.uno("SELECT * FROM carriera WHERE account_id = ? AND slot = ?", accountId, slot);
+  const vecchia = await A.uno("SELECT * FROM carriera WHERE account_id = ? AND slot = ?", accountId, slot);
 
   if(vecchia && !d.forza){
     const avanti = (vecchia.anno_gioco * 52 + vecchia.settimana_gioco) > (anno * 52 + settimana);
     if(avanti) return { conflitto: true, salvata: descriviCarriera(vecchia) };
   }
-  A.fai(`INSERT INTO carriera (id, account_id, artista_id, slot, stato, versione_gioco,
+  await A.fai(`INSERT INTO carriera (id, account_id, artista_id, slot, stato, versione_gioco,
            settimana_gioco, anno_gioco, byte, creato, aggiornato)
          VALUES (?,?,?,?,?,?,?,?,?,?,?)
          ON CONFLICT(account_id, slot) DO UPDATE SET
@@ -813,35 +829,35 @@ function salvaCarriera(accountId, slot, d){
            anno_gioco = excluded.anno_gioco, byte = excluded.byte, aggiornato = excluded.aggiornato`,
     vecchia ? vecchia.id : uuid(), accountId, d.artistaId || null, slot, testo,
     d.versioneGioco || "", settimana, anno, Buffer.byteLength(testo), ora(), ora());
-  return { salvata: descriviCarriera(A.uno("SELECT * FROM carriera WHERE account_id = ? AND slot = ?", accountId, slot)) };
+  return { salvata: descriviCarriera(await A.uno("SELECT * FROM carriera WHERE account_id = ? AND slot = ?", accountId, slot)) };
 }
 const descriviCarriera = c => c ? {
   slot: c.slot, artistaId: c.artista_id, settimana: c.settimana_gioco, anno: c.anno_gioco,
   versioneGioco: c.versione_gioco, byte: c.byte, aggiornato: c.aggiornato
 } : null;
 
-function carriera(accountId, slot){
-  const c = A.uno("SELECT * FROM carriera WHERE account_id = ? AND slot = ?", accountId, slot);
+async function carriera(accountId, slot){
+  const c = await A.uno("SELECT * FROM carriera WHERE account_id = ? AND slot = ?", accountId, slot);
   if(!c) return null;
   return Object.assign(descriviCarriera(c), { stato: JSON.parse(c.stato) });
 }
-const carriere = accountId => A.tutti(
-  "SELECT * FROM carriera WHERE account_id = ? ORDER BY slot", accountId).map(descriviCarriera);
+const carriere = async accountId => (await A.tutti(
+  "SELECT * FROM carriera WHERE account_id = ? ORDER BY slot", accountId)).map(descriviCarriera);
 
 /* ==================== I TRAGUARDI ==================== */
-const catalogo = () => A.tutti("SELECT codice, nome, descrizione, nascosto FROM traguardo ORDER BY rowid");
-function daiTraguardo(artistaId, codice){
-  if(!A.uno("SELECT codice FROM traguardo WHERE codice = ?", codice)) return null;
-  const gia = A.uno("SELECT codice FROM artista_traguardo WHERE artista_id = ? AND codice = ?", artistaId, codice);
+const catalogo = async () => await A.tutti("SELECT codice, nome, descrizione, nascosto FROM traguardo ORDER BY ordine, codice");
+async function daiTraguardo(artistaId, codice){
+  if(!await A.uno("SELECT codice FROM traguardo WHERE codice = ?", codice)) return null;
+  const gia = await A.uno("SELECT codice FROM artista_traguardo WHERE artista_id = ? AND codice = ?", artistaId, codice);
   if(gia) return { gia: true };
-  A.insieme(() => {
-    A.fai("INSERT INTO artista_traguardo (artista_id, codice, settimana, ottenuto) VALUES (?,?,?,?)",
-      artistaId, codice, settimanaCorrente(), ora());
-    const a = artistaGrezzo(artistaId);
-    const t = A.uno("SELECT nome FROM traguardo WHERE codice = ?", codice);
+  await A.insieme(async () => {
+    await A.fai("INSERT INTO artista_traguardo (artista_id, codice, settimana, ottenuto) VALUES (?,?,?,?)",
+      artistaId, codice, await settimanaCorrente(), ora());
+    const a = await artistaGrezzo(artistaId);
+    const t = await A.uno("SELECT nome FROM traguardo WHERE codice = ?", codice);
     if(a && !a.bot){
-      A.fai("INSERT INTO notizia (settimana, artista_id, tipo, testo, creato) VALUES (?,?,?,?,?)",
-        settimanaCorrente(), artistaId, "traguardo", a.nome + ": " + t.nome + ".", ora());
+      await A.fai("INSERT INTO notizia (settimana, artista_id, tipo, testo, creato) VALUES (?,?,?,?,?)",
+        await settimanaCorrente(), artistaId, "traguardo", a.nome + ": " + t.nome + ".", ora());
     }
   });
   return { nuovo: true, codice };
@@ -870,30 +886,30 @@ const CODICI_DAL_SERVER = Object.keys(DAL_SERVER);
 /* Da chiamare dopo ogni punteggio e a ogni giro di settimana: guarda i numeri
    e dà quello che c'è da dare. Torna solo i traguardi nuovi, così il gioco può
    dirlo a chi sta giocando. */
-function traguardiDovuti(artistaId, posGiaNota){
-  const a = artistaGrezzo(artistaId);
+async function traguardiDovuti(artistaId, posGiaNota){
+  const a = await artistaGrezzo(artistaId);
   if(!a || a.bot) return [];
   const pos = posGiaNota !== undefined ? posGiaNota
-    : (schedaConPosizione(artistaId, null) || {}).pos || null;
+    : (await schedaConPosizione(artistaId, null) || {}).pos || null;
   const nuovi = [];
   for(const codice of CODICI_DAL_SERVER){
     if(!DAL_SERVER[codice](a, pos)) continue;
-    const r = daiTraguardo(artistaId, codice);
+    const r = await daiTraguardo(artistaId, codice);
     if(r && r.nuovo) nuovi.push(codice);
   }
   return nuovi;
 }
 
-const traguardiDi = artistaId => A.tutti(
+const traguardiDi = async artistaId => await A.tutti(
   `SELECT t.codice, t.nome, t.descrizione, at.ottenuto, at.spinto
    FROM artista_traguardo at JOIN traguardo t ON t.codice = at.codice
    WHERE at.artista_id = ? ORDER BY at.ottenuto`, artistaId);
-const daSpingere = () => A.tutti(
+const daSpingere = async () => await A.tutti(
   `SELECT at.artista_id, at.codice, t.codice_steam, t.codice_ios, t.codice_android, at.ottenuto
    FROM artista_traguardo at JOIN traguardo t ON t.codice = at.codice
    WHERE at.spinto IS NULL ORDER BY at.ottenuto LIMIT 200`);
-const segnaSpinto = (artistaId, codice) =>
-  A.fai("UPDATE artista_traguardo SET spinto = ? WHERE artista_id = ? AND codice = ?", ora(), artistaId, codice);
+const segnaSpinto = async (artistaId, codice) =>
+  await A.fai("UPDATE artista_traguardo SET spinto = ? WHERE artista_id = ? AND codice = ?", ora(), artistaId, codice);
 
 module.exports = {
   apri, chiudi, stato, leggiStato, scriviStato,

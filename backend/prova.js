@@ -18,6 +18,33 @@ const os = require("os");
 const http = require("http");
 const crypto = require("crypto");
 
+require("./ambiente.js").carica();
+
+/* Le stesse prove girano sotto tutti e due i motori. Di suo SQLite, con un
+   file usa e getta; con `ADF_PG` sotto va PostgreSQL:
+
+     npm run prova            le prove su SQLite
+     npm run prova-pg         le stesse prove su PostgreSQL
+
+   Su PostgreSQL **non si tocca il database vero**: si crea uno schema
+   apposta per il giro (`prova_<a caso>`), ci si lavora dentro, e alla fine si
+   butta. Se qualcosa esplode a meta', lo schema resta li' col suo nome
+   parlante e si vede subito che e' roba di una prova. */
+const VUOLE_PG = process.argv.includes("--pg");
+if(VUOLE_PG && !process.env.ADF_PG){
+  console.error("`--pg` chiede PostgreSQL, ma ADF_PG non c'è.");
+  console.error("Mettilo in backend/.env.local, una riga:");
+  console.error("  ADF_PG=postgresql://utente:password@127.0.0.1:5432/anni_di_fame");
+  process.exit(1);
+}
+/* La scelta è esplicita apposta: se bastasse ADF_PG nell'ambiente, `npm run
+   prova` finirebbe su PostgreSQL senza che nessuno l'abbia chiesto — e le due
+   prove servono proprio a essere due. */
+const PG = VUOLE_PG ? process.env.ADF_PG : "";
+const SCHEMA = "prova_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const pgConSchema = url => url + (url.indexOf("?") >= 0 ? "&" : "?") +
+  "options=" + encodeURIComponent("-c search_path=" + SCHEMA);
+
 const PORTA = 8799;
 const PORTA_CHIAVI = 8798;                       // il finto Apple che pubblica le sue chiavi
 const AUD = "it.lafame.annidifame";
@@ -39,6 +66,26 @@ const chiama = async (rotta, o = {}) => {
   return { stato: res.status, dati: await res.json().catch(() => null) };
 };
 const conSessione = t => ({ "x-sessione": t });
+
+/* Guardare dentro al database e' l'ultimo blocco di prove: serve a controllare
+   che le chiavi ci stiano solo come hash, che lo storico si riempia, che
+   l'artista di chi ha cancellato resti senza padrone. Sotto ci puo' essere
+   l'uno o l'altro motore, quindi la lettura passa di qui. */
+let clientePg = null;
+async function guarda(sql){
+  if(!PG){
+    const { DatabaseSync } = require("node:sqlite");
+    const db = new DatabaseSync(FILE, { readOnly: true });
+    try{ return db.prepare(sql).all(); } finally{ db.close(); }
+  }
+  return (await clientePg.query(sql)).rows;
+}
+async function schemaVia(){
+  if(!PG || !clientePg) return;
+  try{ await clientePg.query('DROP SCHEMA IF EXISTS "' + SCHEMA + '" CASCADE'); }catch(e){}
+  try{ await clientePg.end(); }catch(e){}
+  clientePg = null;
+}
 
 /* Un finto «Apple»: una coppia di chiavi, un banchetto che pubblica quella
    pubblica, e la possibilità di firmare biglietti. Serve a provare sul serio
@@ -73,7 +120,10 @@ function fintoApple(){
     altrui: sub => firma({ iss: "https://appleid.apple.com", aud: AUD, sub,
       iat: adesso(), exp: adesso() + 600 }, altra.privateKey),
     perAltri: sub => firma({ iss: "https://appleid.apple.com", aud: "un.altro.gioco", sub,
-      iat: adesso(), exp: adesso() + 600 })
+      iat: adesso(), exp: adesso() + 600 }),
+    /* firmato bene, per noi, ma senza scadenza: varrebbe per sempre */
+    senzaScadenza: sub => firma({ iss: "https://appleid.apple.com", aud: AUD, sub,
+      iat: adesso() })
   };
 }
 
@@ -93,6 +143,7 @@ async function aspettaCheRisponda(figlio){
     env: Object.assign({}, process.env, {
       ADF_PORTA: String(PORTA), ADF_BOT: "40", ADF_ADMIN: ADMIN, ADF_DATI: FILE,
       ADF_INVIO_MS: "0",
+      ADF_PG: PG ? pgConSchema(PG) : "",
       ADF_APPLE_AUD: AUD, ADF_APPLE_JWKS: "http://127.0.0.1:" + PORTA_CHIAVI + "/chiavi"
     }),
     stdio: ["ignore", "pipe", "inherit"]
@@ -463,6 +514,10 @@ async function aspettaCheRisponda(figlio){
     const senzaChiavi = await chiama("/api/account", { metodo: "POST",
       corpo: { tipo: "google", biglietto: "qualsiasi" } });
     controlla("Google, che non abbiamo collegato, dice 501 e non 403", senzaChiavi.stato === 501, senzaChiavi.dati);
+
+    const eterno = await chiama("/api/account", { metodo: "POST",
+      corpo: { tipo: "apple", biglietto: apple.senzaScadenza("000123.abcdef") } });
+    controlla("un biglietto senza scadenza viene buttato", eterno.stato === 403, eterno.dati);
     const quali = await chiama("/api/stato");
     controlla("lo stato dice quali accessi sono collegati",
       quali.dati.accessi && quali.dati.accessi.apple === true && quali.dati.accessi.steam === false, quali.dati.accessi);
@@ -501,38 +556,85 @@ async function aspettaCheRisponda(figlio){
     controlla("da sospeso non si manda più niente", bloccato.stato === 403, bloccato.dati);
 
     console.log("\nla copia di sicurezza");
-    const dove = FILE.replace(/\.db$/, "-copia.db");
-    const copia = spawnSync(process.execPath, [path.join(__dirname, "database", "copia.js"), FILE, dove],
-      { encoding: "utf8" });
-    controlla("la copia si fa a server acceso", copia.status === 0, (copia.stderr || "").slice(0, 200));
-    controlla("e il file c'è", fs.existsSync(dove));
-    if(fs.existsSync(dove)){
-      const { DatabaseSync } = require("node:sqlite");
-      const c = new DatabaseSync(dove, { readOnly: true });
-      const dentro = c.prepare("SELECT count(*) n FROM artista").get().n;
-      c.close();
-      controlla("con dentro gli artisti", dentro > 40, dentro);
-      fs.unlinkSync(dove);
+    if(PG){
+      /* `VACUUM INTO` e' di SQLite: con PostgreSQL sotto, `copia.js` deve
+         dirlo e fermarsi, non fare finta di aver copiato qualcosa. */
+      const copia = spawnSync(process.execPath, [path.join(__dirname, "database", "copia.js")],
+        { encoding: "utf8", env: Object.assign({}, process.env, { ADF_PG: PG }) });
+      controlla("con PostgreSQL la copia si tira indietro invece di mentire", copia.status === 1);
+      controlla("e dice come si fa davvero (pg_dump)",
+        /pg_dump/.test(copia.stderr || ""), (copia.stderr || "").slice(0, 160));
+    } else {
+      const dove = FILE.replace(/\.db$/, "-copia.db");
+      const copia = spawnSync(process.execPath, [path.join(__dirname, "database", "copia.js"), FILE, dove],
+        { encoding: "utf8" });
+      controlla("la copia si fa a server acceso", copia.status === 0, (copia.stderr || "").slice(0, 200));
+      controlla("e il file c'è", fs.existsSync(dove));
+      if(fs.existsSync(dove)){
+        const { DatabaseSync } = require("node:sqlite");
+        const c = new DatabaseSync(dove, { readOnly: true });
+        const dentro = c.prepare("SELECT count(*) n FROM artista").get().n;
+        c.close();
+        controlla("con dentro gli artisti", dentro > 40, dentro);
+        fs.unlinkSync(dove);
+      }
     }
 
     console.log("\nil database");
-    controlla("il file del database esiste", fs.existsSync(FILE));
-    const { DatabaseSync } = require("node:sqlite");
-    const db = new DatabaseSync(FILE, { readOnly: true });
-    const chiavi = db.prepare("SELECT chiave_hash FROM artista WHERE chiave_hash IS NOT NULL").all();
+    if(PG){
+      const { Client } = require("pg");
+      clientePg = new Client({ connectionString: pgConSchema(PG) });
+      await clientePg.connect();
+      const tab = await guarda("SELECT count(*)::int n FROM information_schema.tables WHERE table_schema = '" + SCHEMA + "'");
+      controlla("le tabelle sono nate nello schema della prova", tab[0].n >= 20, tab[0]);
+    } else {
+      controlla("il file del database esiste", fs.existsSync(FILE));
+    }
+    const chiavi = await guarda("SELECT chiave_hash FROM artista WHERE chiave_hash IS NOT NULL");
     controlla("le chiavi stanno solo come hash",
       chiavi.every(r => r.chiave_hash.length === 64 && r.chiave_hash !== chiave1), chiavi.length);
-    const segreti = db.prepare("SELECT segreto_hash FROM identita WHERE segreto_hash IS NOT NULL").all();
+    const segreti = await guarda("SELECT segreto_hash FROM identita WHERE segreto_hash IS NOT NULL");
     controlla("le password stanno solo come scrypt",
       segreti.every(r => r.segreto_hash.startsWith("scrypt$")));
-    const storia = db.prepare("SELECT count(*) n FROM punteggio_settimana").get();
-    controlla("lo storico dei punteggi si riempie", storia.n > 0, storia);
-    const foto = db.prepare("SELECT count(*) n FROM classifica_posizione").get();
-    controlla("e le fotografie della classifica anche", foto.n > 0, foto);
-    const ritirato = db.prepare("SELECT nome, account_id, ritirato FROM artista WHERE nome LIKE 'Artista ritirato%'").all();
+    const storia = await guarda("SELECT count(*) n FROM punteggio_settimana");
+    controlla("lo storico dei punteggi si riempie", Number(storia[0].n) > 0, storia[0]);
+    const foto = await guarda("SELECT count(*) n FROM classifica_posizione");
+    controlla("e le fotografie della classifica anche", Number(foto[0].n) > 0, foto[0]);
+    const ritirato = await guarda("SELECT nome, account_id, ritirato FROM artista WHERE nome LIKE 'Artista ritirato%'");
     controlla("l'artista di chi ha cancellato resta senza nome e senza padrone",
       ritirato.length === 0 || ritirato.every(r => r.account_id === null && r.ritirato), ritirato);
-    db.close();
+
+    /* I due schemi devono restare allineati: se qualcuno aggiunge una
+       migrazione a SQLite e si scorda PostgreSQL, se ne accorge qui e non fra
+       sei mesi in produzione. */
+    const soloSqlite = fs.readdirSync(path.join(__dirname, "database", "migrazioni")).filter(f => f.endsWith(".sql")).sort();
+    const soloPg = fs.readdirSync(path.join(__dirname, "database", "migrazioni-pg")).filter(f => f.endsWith(".sql")).sort();
+    controlla("i due schemi hanno le stesse migrazioni, con lo stesso nome",
+      soloSqlite.join(",") === soloPg.join(","), { sqlite: soloSqlite, postgres: soloPg });
+
+    /* La traduzione dei segnaposto e' il pezzo dell'adattatore PostgreSQL dove
+       un errore non si vede: la query parte lo stesso e chiede la cosa
+       sbagliata. E' pura, quindi si prova qui, con o senza PostgreSQL sotto. */
+    console.log("\nda `?` a `$1` (l'adattatore PostgreSQL)");
+    const { traduci } = require("./database/postgres.js");
+    controlla("i segnaposto si numerano in ordine",
+      traduci("SELECT * FROM t WHERE a = ? AND b = ?") === "SELECT * FROM t WHERE a = $1 AND b = $2",
+      traduci("SELECT * FROM t WHERE a = ? AND b = ?"));
+    controlla("tanti segnaposto di fila",
+      traduci("INSERT INTO t VALUES (?,?,?,?)") === "INSERT INTO t VALUES ($1,$2,$3,$4)",
+      traduci("INSERT INTO t VALUES (?,?,?,?)"));
+    controlla("un punto interrogativo dentro a una stringa non e' un parametro",
+      traduci("SELECT '?' FROM t WHERE a = ?") === "SELECT '?' FROM t WHERE a = $1",
+      traduci("SELECT '?' FROM t WHERE a = ?"));
+    controlla("l'apice raddoppiato dentro a una stringa non rompe il conto",
+      traduci("SELECT 'l''artista?' FROM t WHERE a = ? AND b = ?")
+        === "SELECT 'l''artista?' FROM t WHERE a = $1 AND b = $2",
+      traduci("SELECT 'l''artista?' FROM t WHERE a = ? AND b = ?"));
+    controlla("nemmeno dentro a un nome fra virgolette",
+      traduci('SELECT "col?" FROM t WHERE a = ?') === 'SELECT "col?" FROM t WHERE a = $1',
+      traduci('SELECT "col?" FROM t WHERE a = ?'));
+    controlla("una query senza parametri resta identica",
+      traduci("SELECT count(*) n FROM artista") === "SELECT count(*) n FROM artista");
 
   }catch(e){
     falliti++;
@@ -540,6 +642,7 @@ async function aspettaCheRisponda(figlio){
   }finally{
     figlio.kill();
     try{ apple.banchetto.close(); }catch(e){}
+    await schemaVia();
     if(!process.env.ADF_TIENI) for(const f of [FILE, FILE + "-wal", FILE + "-shm"]) try{ fs.unlinkSync(f); }catch(e){}
     else console.log("database tenuto: " + FILE);
   }

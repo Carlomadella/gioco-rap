@@ -10,9 +10,21 @@ Tiene tre cose:
 - **i salvataggi in cloud**, che è quello che porta una carriera dal PC al telefono
   (punto 34, la metà che sta qui).
 
-Sotto c'è **SQLite dentro a Node** (`node:sqlite`): nessuna dipendenza da installare,
-nessun servizio da mandare avanti, un file solo sul disco. Il gradino dopo è PostgreSQL, e
-il piano sta in [`database/README.md`](database/README.md).
+Sotto ci possono stare **due database**, e il server non sa quale:
+
+- **SQLite dentro a Node** (`node:sqlite`), di suo: niente da installare, niente da mandare
+  avanti, un file solo sul disco. È quello che gira in casa e su un server solo.
+- **PostgreSQL**, se c'è `ADF_PG`. Serve quando i server diventano più di uno, perché un
+  file non lo si condivide fra due macchine.
+
+Si cambia con una riga e non si tocca nient'altro:
+
+```bash
+ADF_PG=postgresql://utente:password@127.0.0.1:5432/anni_di_fame npm start
+```
+
+Le stesse prove girano sotto tutti e due (`npm run prova` e `npm run prova-pg`). Il
+disegno del database sta in [`database/README.md`](database/README.md).
 
 ## Come si avvia
 
@@ -43,10 +55,19 @@ Si avvia un server suo, su una porta sua, con un database usa e getta; fa tutto 
 classifica, iscrizione, punteggi, freni, account con la mail, sessioni, salvataggi in cloud
 e i loro conflitti, traguardi, giro di settimana, frecce ▲▼, cancellazione dell'account, e
 un'occhiata dentro al database per controllare che le chiavi ci stiano solo come hash — e
-si spegne. **125 controlli**, e fra questi la verifica di un biglietto Apple vero: la prova
+si spegne. **133 controlli**, e fra questi la verifica di un biglietto Apple vero: la prova
 si fa una coppia di chiavi sua, si mette in piedi un finto «appleid.apple.com» e prova che
-un biglietto buono entra e uno firmato da un altro, scaduto o fatto per un altro gioco no.
-**Dalli dopo ogni modifica.**
+un biglietto buono entra e uno firmato da un altro, scaduto, senza scadenza o fatto per un
+altro gioco no. **Dalli dopo ogni modifica.**
+
+Le stesse prove girano anche sotto PostgreSQL:
+
+```bash
+npm run prova-pg          # vuole ADF_PG (in .env.local va benissimo)
+```
+
+Non tocca le tabelle vere: si fa uno **schema usa e getta** per il giro (`prova_<a caso>`),
+ci lavora dentro e alla fine lo butta.
 
 ## Quanto regge (misurato, non detto)
 
@@ -91,7 +112,9 @@ dentro a un ciclo — quattrocento milioni di confronti a ogni giro di settimana
 | manopola | cosa fa | di suo |
 | --- | --- | --- |
 | `ADF_PORTA` | porta di ascolto | `8787` |
-| `ADF_DATI` | file del database | `database/dati/classifica.db` |
+| `ADF_DATI` | file del database, quando sotto c'è SQLite | `database/dati/classifica.db` |
+| `ADF_PG` | se c'è, sotto va **PostgreSQL** invece di SQLite | vuota |
+| `ADF_PG_CONNESSIONI` | quante connessioni tiene aperte verso PostgreSQL | `10` |
 | `ADF_BOT` | quanti bot tenere in pista | `140` |
 | `ADF_SETTIMANA_H` | ore vere di una settimana di classifica | `24` |
 | `ADF_ORIGINI` | CORS: `*` oppure origini separate da virgola | `*` |
@@ -107,6 +130,12 @@ dentro a un ciclo — quattrocento milioni di confronti a ogni giro di settimana
 In casa vanno bene così. Online si cambiano `ADF_ORIGINI` (solo il dominio del gioco),
 `ADF_ADMIN` e `ADF_SALE` (chiavi lunghe, mai dentro al codice).
 
+**Dove si scrivono.** Tutte si possono mettere in un file `.env.local` qui accanto, una
+riga per manopola — ed è il posto giusto per quelle che sono password (`ADF_PG`,
+`ADF_STEAM_CHIAVE`): la riga di comando finisce nella cronologia della shell. Il file
+**non sta in git**. Chi è già nell'ambiente vero vince sul file, così in produzione
+comanda chi avvia il servizio (`ambiente.js`).
+
 ## I file
 
 | file | cosa c'è dentro |
@@ -117,18 +146,23 @@ In casa vanno bene così. Online si cambiano `ADF_ORIGINI` (solo il dominio del 
 | `moderazione.js` + `parole.js` | il filtro dei nomi: normalizza, becca le scritture furbe, protegge le parole innocenti |
 | `accessi.js` | entrare con Steam, Apple e Google: verifica dei biglietti firmati |
 | `database/copia.js` | la copia di sicurezza, anche a server acceso |
-| `database/db.js` | apre SQLite e applica le migrazioni |
-| `database/migrazioni/*.sql` | lo schema, in file numerati che si applicano in ordine |
+| `ambiente.js` | legge `.env.local`: le manopole che non stanno nel codice |
+| `database/db.js` | sceglie il motore e applica le migrazioni |
+| `database/sqlite.js` | il motore SQLite |
+| `database/postgres.js` | il motore PostgreSQL: segnaposto e transazioni sul pool |
+| `database/migrazioni/*.sql` | lo schema per SQLite, in file numerati |
+| `database/migrazioni-pg/*.sql` | lo stesso schema per PostgreSQL, stessi nomi di file |
 | `database/archivio.js` | **l'unico file che parla col database**: classifica, account, carriere, traguardi |
 | `database/travaso.js` | porta il vecchio archivio JSON dentro al database |
 | `database/README.md` | com'è messo il database e dove va |
 | `database/schema.md` | lo schema completo, commentato (fuori da git) |
 | `plausibilita.js` | quanto è credibile un punteggio: il modello che decide fin dove poteva arrivare |
-| `prova.js` | i 125 controlli sull'API |
+| `prova.js` | i 133 controlli sull'API, sotto l'uno o l'altro motore |
 | `carico.js` | la prova di carico: quanto regge, con i numeri |
 
-Il server non sa che database ci sia sotto: parla solo con `database/archivio.js`. È lì che
-si va il giorno che si passa a PostgreSQL.
+Il server non sa che database ci sia sotto: parla solo con `database/archivio.js`, e
+`archivio.js` parla solo con il motore che `db.js` gli ha messo in mano. È il motivo per
+cui passare a PostgreSQL non ha toccato una riga di `server.js`.
 
 ## Le rotte
 
