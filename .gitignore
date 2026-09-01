@@ -9,3 +9,7 @@ backend.md
 # e nel repo non ci devono stare. Le foto che servono si estraggono e basta.
 anni-di-fame-menu-*.html
 concept-*.html
+
+# le schermate che ci mandiamo per farci vedere le cose: utili, ma non sono
+# roba di gioco e non devono finire nel pacchetto
+note/
