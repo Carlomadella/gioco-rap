@@ -17,6 +17,7 @@
 const crypto = require("crypto");
 const { apri: apriDb, attrezzi } = require("./db.js");
 const { nuovoBot, popolazione, settimanaBot, ricambio } = require("../bot.js");
+const { nomeDufficio } = require("../moderazione.js");
 
 let A = null;                                   // gli attrezzi del database
 let CFG = { quantiBot: 140, settimanaMs: 24 * 3600e3 };
@@ -240,8 +241,10 @@ function segnaPunteggio(id, d, ipHash){
      si salva lo stesso: solo, in graduatoria non c'è. Quindi qui la scheda può
      non tornare, e non è un errore — è la sanzione che funziona. */
   const mia = schedaConPosizione(id, id);
+  const traguardi = traguardiDovuti(id);
   return { ok: true, pos: mia ? mia.pos : null, delta: mia ? mia.delta : null,
-    fuoriClassifica: !mia, totale: quantiArtisti(), settimana: set, limato };
+    fuoriClassifica: !mia, totale: quantiArtisti(), settimana: set, limato,
+    traguardi };
 }
 
 /* ==================== SANZIONI E SOSPETTI ====================
@@ -462,6 +465,52 @@ function cancellaAccount(accountId){
   });
 }
 
+/* ==================== SEGNALAZIONI E MODERAZIONE ====================
+   Il filtro automatico prende il grosso; questo è quello che gli scappa e che
+   qualcuno trova offensivo. Una segnalazione a testa per artista e per motivo:
+   se no bastano cinque amici per far togliere il nome a chi non ha fatto
+   niente. Il conto delle segnalazioni non decide niente da solo — decide chi
+   le guarda. */
+function segnala(artistaId, accountId, motivo, nota){
+  const a = artistaGrezzo(artistaId);
+  if(!a || a.bot) return null;
+  if(["nome", "storia", "imbroglio", "altro"].indexOf(motivo) < 0) return null;
+  try{
+    A.fai(`INSERT INTO segnalazione (artista_id, account_id, motivo, nota, creato)
+           VALUES (?,?,?,?,?)`, artistaId, accountId || null, motivo, nota || null, ora());
+  }catch(e){
+    if(/UNIQUE/.test(e.message)) return { gia: true };
+    throw e;
+  }
+  return { ok: true };
+}
+
+/* La coda da guardare: gli artisti più segnalati, con quante e da quanti. */
+const daGuardare = quanti => A.tutti(
+  `SELECT s.artista_id, a.nome, a.storia, count(*) quante,
+          count(DISTINCT s.account_id) da_quanti, max(s.creato) ultima,
+          group_concat(DISTINCT s.motivo) motivi
+   FROM segnalazione s JOIN artista a ON a.id = s.artista_id
+   WHERE s.stato = 'aperta' AND a.ritirato IS NULL
+   GROUP BY s.artista_id ORDER BY da_quanti DESC, quante DESC LIMIT ?`, quanti);
+
+/* Togliere un nome: non è una punizione da scrivere in faccia a tutti, è un
+   nome neutro al posto suo. Quello di prima resta scritto nel database, per
+   poter rispondere a «perché mi avete cambiato il nome». */
+function rinominaDufficio(artistaId){
+  const a = artistaGrezzo(artistaId);
+  if(!a) return null;
+  const nuovo = nomeDufficio(a.id);
+  A.insieme(() => {
+    A.fai("UPDATE artista SET nome_prima = coalesce(nome_prima, nome), nome = ? WHERE id = ?", nuovo, artistaId);
+    A.fai("UPDATE segnalazione SET stato = 'accolta', chiusa = ? WHERE artista_id = ? AND stato = 'aperta'", ora(), artistaId);
+  });
+  return { nome: nuovo, prima: a.nome };
+}
+const chiudiSegnalazioni = (artistaId, stato) =>
+  A.fai("UPDATE segnalazione SET stato = ?, chiusa = ? WHERE artista_id = ? AND stato = 'aperta'",
+    stato === "accolta" ? "accolta" : "respinta", ora(), artistaId);
+
 /* ==================== I SALVATAGGI IN CLOUD ==================== */
 const TETTO_CARRIERA = 2 * 1024 * 1024;
 
@@ -521,6 +570,44 @@ function daiTraguardo(artistaId, codice){
   });
   return { nuovo: true, codice };
 }
+/* ==================== I TRAGUARDI CHE DÀ IL SERVER ====================
+   Quelli che si possono controllare qui non li chiede il client: li guarda il
+   server ai numeri che ha in mano. È la differenza fra un traguardo che vale e
+   uno che si prende aprendo la console del browser — e con Steam attaccato
+   dietro, quella differenza è tutto.
+
+   Restano al gioco solo quelli che il server non può sapere (essere arrivato a
+   Milano, dieci amici alla Sala): quelli passano da `POST /api/traguardo`. */
+const DAL_SERVER = {
+  primo_pezzo:     (a, pos) => a.uscite >= 1,
+  primi_mille:     (a, pos) => a.stream >= 1000,
+  in_classifica:   (a, pos) => pos != null,
+  top_100:         (a, pos) => pos != null && pos <= 100,
+  top_10:          (a, pos) => pos != null && pos <= 10,
+  primo_posto:     (a, pos) => pos === 1,
+  disco_oro:       (a, pos) => a.stream >= 50000,
+  disco_platino:   (a, pos) => a.stream >= 500000,
+  primo_contratto: (a, pos) => !!a.deal
+};
+const CODICI_DAL_SERVER = Object.keys(DAL_SERVER);
+
+/* Da chiamare dopo ogni punteggio e a ogni giro di settimana: guarda i numeri
+   e dà quello che c'è da dare. Torna solo i traguardi nuovi, così il gioco può
+   dirlo a chi sta giocando. */
+function traguardiDovuti(artistaId){
+  const a = artistaGrezzo(artistaId);
+  if(!a || a.bot) return [];
+  const scheda = schedaConPosizione(artistaId, null);
+  const pos = scheda ? scheda.pos : null;
+  const nuovi = [];
+  for(const codice of CODICI_DAL_SERVER){
+    if(!DAL_SERVER[codice](a, pos)) continue;
+    const r = daiTraguardo(artistaId, codice);
+    if(r && r.nuovo) nuovi.push(codice);
+  }
+  return nuovi;
+}
+
 const traguardiDi = artistaId => A.tutti(
   `SELECT t.codice, t.nome, t.descrizione, at.ottenuto, at.spinto
    FROM artista_traguardo at JOIN traguardo t ON t.codice = at.codice
@@ -541,5 +628,7 @@ module.exports = {
   creaAccount, account, collegaIdentita, entra, apriSessione, sessione, chiudiSessione,
   cancellaAccount, impasta, combacia, sha,
   salvaCarriera, carriera, carriere,
-  catalogo, daiTraguardo, traguardiDi, daSpingere, segnaSpinto
+  catalogo, daiTraguardo, traguardiDi, daSpingere, segnaSpinto,
+  traguardiDovuti, CODICI_DAL_SERVER,
+  segnala, daGuardare, rinominaDufficio, chiudiSegnalazioni
 };

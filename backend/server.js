@@ -34,6 +34,7 @@ const crypto = require("crypto");
 const archivio = require("./database/archivio.js");
 const { GENERI, CITTA, STORIE, scegli } = require("./nomi.js");
 const accessi = require("./accessi.js");
+const moderazione = require("./moderazione.js");
 
 const CFG = {
   porta: Number(process.env.ADF_PORTA || 8787),
@@ -249,6 +250,8 @@ async function rotta(req, res, url){
     const b = await corpo(req);
     const nome = nomePulito(b.nome);
     if(!nome) return male(res, 400, "nome-non-valido");
+    const brutto = moderazione.controllaNome(nome);
+    if(brutto) return male(res, 400, brutto.no);
     if(!archivio.nomeLibero(nome)) return male(res, 409, "nome-occupato");
 
     let s = chi(req), token = null;
@@ -287,6 +290,8 @@ async function rotta(req, res, url){
     if(b.nome != null){
       const nome = nomePulito(b.nome);
       if(!nome) return male(res, 400, "nome-non-valido");
+      const brutto = moderazione.controllaNome(nome);
+      if(brutto) return male(res, 400, brutto.no);
       if(!archivio.nomeLibero(nome, id)) return male(res, 409, "nome-occupato");
       b.nome = nome;
     }
@@ -359,8 +364,25 @@ async function rotta(req, res, url){
   if(M("POST", "/api/traguardo")){
     const b = await corpo(req);
     if(!artistaMio(req, String(b.artistaId || ""))) return male(res, 403, "non-e-tuo");
-    const r = archivio.daiTraguardo(String(b.artistaId), String(b.codice || ""));
+    const codice = String(b.codice || "");
+    /* i traguardi che il server sa controllare da sé non si chiedono: se li dà
+       lui, quando i numeri ci sono. Se no basterebbe la console del browser */
+    if(archivio.CODICI_DAL_SERVER.indexOf(codice) >= 0)
+      return male(res, 409, "questo-lo-da-il-server",
+        { nota: "arriva da solo quando i numeri ci sono" });
+    const r = archivio.daiTraguardo(String(b.artistaId), codice);
     return r ? invia(res, 200, r) : male(res, 404, "traguardo-sconosciuto");
+  }
+
+  /* ---------- segnalare un nome ---------- */
+  if(M("POST", "/api/segnalazione")){
+    const s = chi(req);
+    if(!s) return male(res, 403, "sessione-scaduta");
+    const b = await corpo(req);
+    const r = archivio.segnala(String(b.artistaId || ""), s.account.id,
+      String(b.motivo || "nome"), nomePulito(b.nota, 300));
+    if(!r) return male(res, 404, "artista-sconosciuto");
+    return invia(res, 200, r.gia ? { gia: true } : { ok: true });
   }
 
   /* ---------- servizio (serve ADF_ADMIN) ---------- */
@@ -383,6 +405,26 @@ async function rotta(req, res, url){
     const r = archivio.sanziona(String(b.accountId || ""), String(b.tipo || ""),
       nomePulito(b.motivo, 200) || "nessun motivo scritto", nInt(b.giorni, 0, 3650, 0));
     return r ? invia(res, 200, r) : male(res, 400, "sanzione-non-valida");
+  }
+
+  if(M("GET", "/api/da-guardare")){
+    if(!admin()) return male(res, 403, "non-sei-tu");
+    return invia(res, 200, { artisti: archivio.daGuardare(nInt(q.get("quanti"), 1, 100, 30)) });
+  }
+
+  if(M("POST", "/api/moderazione")){
+    if(!admin()) return male(res, 403, "non-sei-tu");
+    const b = await corpo(req);
+    const id = String(b.artistaId || "");
+    if(b.azione === "rinomina"){
+      const r = archivio.rinominaDufficio(id);
+      return r ? invia(res, 200, r) : male(res, 404, "artista-sconosciuto");
+    }
+    if(b.azione === "respingi"){
+      archivio.chiudiSegnalazioni(id, "respinta");
+      return invia(res, 200, { ok: true });
+    }
+    return male(res, 400, "azione-sconosciuta", { nota: "rinomina oppure respingi" });
   }
 
   if(M("GET", "/api/da-spingere")){

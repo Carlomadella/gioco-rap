@@ -204,14 +204,26 @@ async function aspettaCheRisponda(figlio){
     controlla("il catalogo dei traguardi c'è", catalogo.dati.traguardi.length > 5);
     controlla("ogni traguardo ha un codice per Steam",
       catalogo.dati.traguardi.every(t => t.codice && t.nome && t.descrizione));
+    controlla("i traguardi li ha già dati il server, col punteggio",
+      Array.isArray(primo.dati.traguardi) && primo.dati.traguardi.indexOf("in_classifica") >= 0,
+      primo.dati.traguardi);
+    const miei = await chiama("/api/traguardi/" + io1);
+    controlla("e sono attaccati all'artista",
+      miei.dati.traguardi.some(t => t.codice === "primo_pezzo") &&
+      miei.dati.traguardi.some(t => t.codice === "primi_mille"), miei.dati.traguardi.map(t => t.codice));
+    const chiesto = await chiama("/api/traguardo", { metodo: "POST", testate: conSessione(sess1),
+      corpo: { artistaId: io1, codice: "top_10" } });
+    controlla("un traguardo che sa controllare il server non si può chiedere",
+      chiesto.stato === 409, chiesto.dati);
     const dato = await chiama("/api/traguardo", { metodo: "POST", testate: conSessione(sess1),
-      corpo: { artistaId: io1, codice: "primo_pezzo" } });
-    controlla("un traguardo si assegna", dato.dati && dato.dati.nuovo === true, dato.dati);
+      corpo: { artistaId: io1, codice: "milano" } });
+    controlla("quelli che sa solo il gioco sì", dato.dati && dato.dati.nuovo === true, dato.dati);
     const ancora = await chiama("/api/traguardo", { metodo: "POST", testate: conSessione(sess1),
-      corpo: { artistaId: io1, codice: "primo_pezzo" } });
-    controlla("due volte no", ancora.dati && ancora.dati.gia === true);
+      corpo: { artistaId: io1, codice: "milano" } });
+    controlla("ma non due volte", ancora.dati && ancora.dati.gia === true);
     const daSpingere = await chiama("/api/da-spingere", { testate: { "x-admin": ADMIN } });
-    controlla("resta in coda da mandare allo store", daSpingere.dati.traguardi.length === 1, daSpingere.dati);
+    controlla("restano in coda da mandare allo store", daSpingere.dati.traguardi.length >= 2,
+      daSpingere.dati.traguardi.length);
 
     console.log("\nla settimana");
     const senzaChiave = await chiama("/api/giro", { metodo: "POST" });
@@ -248,6 +260,52 @@ async function aspettaCheRisponda(figlio){
     const rientro = await chiama("/api/sessione", { metodo: "POST",
       corpo: { tipo: "email", email: "prova@esempio.it", segreto: "unasegretalunga" } });
     controlla("e non si rientra con la vecchia mail", rientro.stato === 403);
+
+    console.log("\ni nomi che non vanno bene");
+    const brutti = ["C4zz0 Mio", "ADMIN", "La Fame Studio", "n1gg4"];
+    const respinti = [];
+    for(const n of brutti){
+      const r = await chiama("/api/artista", { metodo: "POST", corpo: { nome: n } });
+      if(r.stato === 400) respinti.push(n);
+    }
+    controlla("i nomi offensivi e quelli che fingono di essere noi vengono respinti",
+      respinti.length === brutti.length, { respinti, su: brutti.length });
+    const buono = await chiama("/api/artista", { metodo: "POST",
+      corpo: { nome: "Scazzo", citta: "Prato" } });
+    controlla("ma «Scazzo» passa: non è un insulto ed è una parola vera",
+      buono.stato === 201, buono.dati);
+    const scazzo = buono.dati.id, sessScazzo = buono.dati.token;
+
+    console.log("\nle segnalazioni");
+    const senza = await chiama("/api/segnalazione", { metodo: "POST",
+      corpo: { artistaId: scazzo, motivo: "nome" } });
+    controlla("chi non è entrato non segnala niente", senza.stato === 403);
+    const segn = await chiama("/api/segnalazione", { metodo: "POST", testate: conSessione(sess1),
+      corpo: { artistaId: scazzo, motivo: "nome", nota: "a me non piace" } });
+    controlla("una segnalazione si manda", segn.stato === 200 && segn.dati.ok, segn.dati);
+    const bis = await chiama("/api/segnalazione", { metodo: "POST", testate: conSessione(sess1),
+      corpo: { artistaId: scazzo, motivo: "nome" } });
+    controlla("la stessa persona non segnala due volte lo stesso", bis.dati && bis.dati.gia === true, bis.dati);
+    const coda = await chiama("/api/da-guardare", { testate: { "x-admin": ADMIN } });
+    controlla("finisce nella coda di chi modera",
+      coda.dati.artisti.length === 1 && coda.dati.artisti[0].da_quanti === 1, coda.dati.artisti);
+    const codaChiusa = await chiama("/api/da-guardare");
+    controlla("e la coda non la vede chi passa di lì", codaChiusa.stato === 403);
+
+    const respinta = await chiama("/api/moderazione", { metodo: "POST", testate: { "x-admin": ADMIN },
+      corpo: { artistaId: scazzo, azione: "respingi" } });
+    controlla("una segnalazione senza motivo si respinge", respinta.stato === 200);
+    const codaVuota = await chiama("/api/da-guardare", { testate: { "x-admin": ADMIN } });
+    controlla("e la coda si svuota", codaVuota.dati.artisti.length === 0);
+
+    await chiama("/api/segnalazione", { metodo: "POST", testate: conSessione(sess1),
+      corpo: { artistaId: scazzo, motivo: "storia" } });
+    const tolto = await chiama("/api/moderazione", { metodo: "POST", testate: { "x-admin": ADMIN },
+      corpo: { artistaId: scazzo, azione: "rinomina" } });
+    controlla("un nome si può togliere d'ufficio",
+      tolto.stato === 200 && /^Artista /.test(tolto.dati.nome), tolto.dati);
+    const dopoIlCambio = await chiama("/api/artista/" + scazzo);
+    controlla("e in classifica si vede quello nuovo", /^Artista /.test(dopoIlCambio.dati.nome), dopoIlCambio.dati.nome);
 
     console.log("\nentrare con Apple (biglietto firmato)");
     const conApple = await chiama("/api/account", { metodo: "POST",
