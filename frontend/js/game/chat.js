@@ -385,57 +385,6 @@ const CHAT_GENTE = [
       ]}
    ]},
 
-  /* ------------------------------------------------------- IL PRODUTTORE */
-  {id:"prod", n:"Kiro (beat)", ic:"manopole", k:"#A78BFA",
-   apri: m => m.beat > 0 || m.usciti > 0, spesso:.35,
-   tu:[
-     {n:"Hai qualcosa di nuovo?",
-      run:() => ["Ho sempre qualcosa di nuovo.", "Passa in sala che te li faccio sentire."],
-      poi:[{n:"Ci passo", d:"+rete", run(){ chRete(1); return "Ti aspetto."; }}]}
-   ],
-   spunti:[
-     {id:"manda", peso:3,
-      testo: () => "Ti ho mandato tre strumentali. La seconda secondo me è tua: ascoltala col volume alto.",
-      opts:[
-        {n:"L'ascolto stasera",
-         run:() => "Fammi sapere. Non la do a nessun altro per una settimana."},
-        {n:"Quanto vuoi?",
-         run:() => "Per te la faccio a metà, ma voglio il nome sul pezzo.",
-         poi:[
-           {n:"Ci sto", d:"+rete",
-            run(){ chRete(2); return "Allora siamo a posto. Passa dal mercato a prenderla."; }},
-           {n:"Il nome sì, dei soldi ne parliamo", run:() => "Sei peggio di un discografico."}
-         ]}
-      ]},
-     {id:"sessione", quando: m => m.rete >= 6, peso:2,
-      testo: () => "Sabato ho la sala libera tutto il giorno. Se vieni, facciamo qualcosa da zero.",
-      opts:[
-        {n:"Ci sono", d:"−energia, +rete",
-         run(){ chEnergia(-20); chRete(2);
-           return "Perfetto. Porta le barre che hai nel telefono, anche quelle non finite."; }},
-        {n:"Sabato non posso", run:() => "Peccato. La prossima volta avvisa prima."}
-      ]},
-     {id:"mix", quando: m => m.soldi >= 1500, peso:2,
-      testo: () => "Pensaci: un pezzo mixato bene vale il doppio di uno registrato bene.",
-      opts:[
-        {n:"Quanto per un mix serio?",
-         run:() => "Duecento. Ma te lo faccio a centocinquanta, perché sei tu.",
-         poi:[
-           {n:"Affare fatto", d:"+rete", run(){ chRete(1); return "Mandami la traccia."; }},
-           {n:"Ci penso", run:() => "Pensaci. Ma non mandare fuori roba mixata male."}
-         ]},
-        {n:"Mi arrangio", run:() => "Si sente, quando uno si arrangia. Dico solo questo."}
-      ]},
-     {id:"lento", quando: m => !m.fresco && m.usciti >= 2, peso:2,
-      testo: () => "Sono due settimane che non esce niente. Tutto a posto, o ti sei bloccato?",
-      opts:[
-        {n:"Mi sono bloccato",
-         run:() => "Capita a tutti. Vieni in sala senza l'idea: l'idea arriva lì.",
-         poi:[{n:"Ci provo", d:"+lucidità", run(){ addLuc(5); return "Bravo."; }}]},
-        {n:"Sto lavorando a una cosa grossa", run:() => "Allora aspetto. Ma non troppo."}
-      ]}
-   ]},
-
   /* --------------------------------------------------------- IL PROMOTER */
   {id:"promo", n:"Vale (serate)", ic:"mic", k:"#34D399",
    apri: m => m.palco >= 8 || m.fan >= 500, spesso:.22,
@@ -582,10 +531,246 @@ const CHAT_GENTE = [
    ]}
 ];
 
+/* ==================== CHI TI HA DATO IL NUMERO ====================
+   («Da smistare», punto 4.) I fonici e i beatmaker de La Sala non sono nomi
+   scritti qui: sono le persone vere di `G.gente`, con la loro faccia, il loro
+   carattere e il rapporto che ci hai costruito. Quando vi scambiate il numero
+   (`azionePosto("numero")`, `posto.js`) compaiono qui dentro, e da quel momento
+   ti scrivono come tutti gli altri.
+
+   Prima c'era un beatmaker finto, sempre in rubrica, che non avevi mai
+   incontrato: le sue battute erano buone ma la sua presenza non se l'era
+   guadagnata nessuno. Adesso quelle battute le dicono le persone che hai
+   conosciuto davvero, chiamandoti per nome — e la rubrica te la fai tu.
+
+   I contatti si ricostruiscono a ogni giro da `G.gente`: le funzioni stanno
+   dentro a chiusure su `p`, e va bene, perche' **nello stato non ci finisce
+   niente di tutto questo** — li' c'e' solo `G.chat["sala:<id>"]` con i
+   messaggi e la strada della conversazione, che sono dati e basta. */
+
+/* parlare avvicina, come parlarsi di persona: stessi punti, stessa soglia */
+function chatAvvicina(p, quanti){
+  p.pt = (p.pt || 0) + quanti;
+  while(typeof relSoglia === "function" && p.pt >= relSoglia(p) && p.rel < 5){
+    p.pt -= relSoglia(p); p.rel++;
+  }
+  if(p.pt < 0 && p.rel > 0){ p.rel--; p.pt = 0; }
+}
+
+/* il beat che ti manda davvero: finisce nel catalogo, come se te l'avesse
+   fatto sentire in sala. E' il motivo per cui vale la pena avere il numero. */
+function chatMandaBeat(p){
+  if(typeof creaBeat !== "function" || typeof mioGenere !== "function") return null;
+  const presi = (G.market || []).map(b => b.n).concat((G.beats || []).map(b => b.n));
+  const q = rnd(28, 48) + (p.fama || 10) * 0.3 + (p.rel || 0) * 7;
+  const b = creaBeat(p.gen || mioGenere(), q, presi);
+  b.price = Math.max(20, Math.round(b.price * (1 - (p.rel || 0) * 0.12)));
+  b.da = p.n;
+  G.market.push(b);
+  if(typeof pushLog === "function")
+    pushLog("<b>" + p.n + "</b> ti ha mandato «" + b.n + "» in chat — qualità " + b.q +
+      ", " + b.price + " €. È nel catalogo.", "");
+  return b;
+}
+
+function chatSpuntiBeatmaker(p){
+  return [
+    {id:"manda", peso:3,
+     testo: () => "Ti ho buttato giù una cosa stanotte. Te la mando?",
+     opts:[
+       {n:"Mandamela", d:"Finisce nel catalogo",
+        run(){ chatAvvicina(p, 1);
+          const b = chatMandaBeat(p);
+          return b ? ["Mandata. Si chiama «" + b.n + "».",
+                      "Sta nel tuo catalogo, " + b.price + " €. Per te è già scontata."]
+                   : "Te la faccio sentire quando passi."; }},
+       {n:"Che roba è?",
+        run:() => "Roba tua. Se non ti piace la do a un altro, ma non ti piacerà non averla presa.",
+        poi:[
+          {n:"Va bene, mandamela", d:"Finisce nel catalogo",
+           run(){ chatAvvicina(p, 1);
+             const b = chatMandaBeat(p);
+             return b ? "Fatto. «" + b.n + "», " + b.price + " €, è nel catalogo."
+                      : "Te la faccio sentire quando passi."; }},
+          {n:"Dalla a un altro", run:() => "Come vuoi. Poi non venirmi a dire niente."}
+        ]},
+       {n:"Adesso no", run:() => "Quando vuoi. Tanto sta lì."}
+     ]},
+    {id:"sessione", quando: () => (p.rel || 0) >= 2, peso:2,
+     testo: () => "Sabato ho la sala libera. Se passi, facciamo qualcosa da zero.",
+     opts:[
+       {n:"Ci sono", d:"−energia, +rete",
+        run(){ chEnergia(-20); chRete(2); chatAvvicina(p, 1);
+          return "Perfetto. Porta anche le barre non finite, quelle servono di più."; }},
+       {n:"Sabato no", run:() => "Peccato. La prossima volta avvisa prima."}
+     ]},
+    {id:"genere", peso:2,
+     testo: () => "Ma adesso su che roba stai? Che se lo so ti preparo le cose giuste.",
+     opts:[
+       {n:"Roba dura", d:"+rete",
+        run(){ chRete(1); chatAvvicina(p, 1); return "Ottimo. Ti mando qualcosa che spacca il vetro."; }},
+       {n:"Qualcosa di più aperto", d:"+rete",
+        run(){ chRete(1); chatAvvicina(p, 1); return "Ho capito. Ti tiro fuori due accordi e vediamo."; }},
+       {n:"Non lo so ancora",
+        run:() => "Allora vieni in sala. Si capisce li', non al telefono."}
+     ]},
+    {id:"lento", quando: m => !m.fresco && m.usciti >= 2, peso:2,
+     testo: () => "Sono due settimane che non esce niente. Tutto a posto, o ti sei bloccato?",
+     opts:[
+       {n:"Mi sono bloccato",
+        run:() => "Capita a tutti. Vieni in sala senza l'idea: l'idea arriva lì.",
+        poi:[{n:"Ci provo", d:"+lucidità", run(){ addLuc(5); chatAvvicina(p, 1); return "Bravo."; }}]},
+       {n:"Sto preparando una cosa grossa", run:() => "Allora aspetto. Ma non troppo."}
+     ]},
+    {id:"soldi", quando: m => m.soldi < 200, peso:2,
+     testo: () => "Se sei a corto, il prossimo te lo do e mi paghi quando esce. Fidati che ci guadagno lo stesso.",
+     opts:[
+       {n:"Grazie davvero", d:"+benessere",
+        run(){ chBene(5); chatAvvicina(p, 2); return "Figurati. Poi però esci qualcosa."; }},
+       {n:"Preferisco pagarti subito", d:"+rete",
+        run(){ chRete(1); return "Come vuoi. Rispetto."; }}
+     ]}
+  ];
+}
+
+function chatSpuntiFonico(p){
+  return [
+    {id:"portamelo", quando: m => (G.songs || []).some(x => !x.mixed), peso:3,
+     testo: () => "Hai roba da mixare? Ho una finestra libera e le orecchie fresche.",
+     opts:[
+       {n:"Ce l'ho, passo in sala", d:"+rete",
+        run(){ chRete(1); chatAvvicina(p, 1);
+          return "Portala. E portala grezza, non toccarla ancora tu."; }},
+       {n:"Non è pronta",
+        run:() => "Meglio. Una cosa non pronta mixata bene resta una cosa non pronta."}
+     ]},
+    {id:"ascolto", quando: m => m.fresco, peso:3,
+     testo: m => "Ho sentito " + chatPezzo(m) + ". Vuoi che ti dica la verità o che ti faccia i complimenti?",
+     opts:[
+       {n:"La verità", d:"+lucidità",
+        run(){ addLuc(6); chatAvvicina(p, 1);
+          return ["La voce sta troppo dentro. Si perde una parola su tre nel ritornello.",
+                  "Il pezzo però c'è. È solo la mano che manca."]; },
+        poi:[
+          {n:"Me lo rifai tu?", d:"+rete",
+           run(){ chRete(1); chatAvvicina(p, 1); return "Portamelo. Due ore e te lo cambio."; }},
+          {n:"Ci lavoro io", run:() => "Bene. Alza la voce di tre dB e senti che succede."}
+        ]},
+       {n:"I complimenti", d:"−lucidità",
+        run(){ addLuc(-3); return "È bellissima. Ecco, contento?"; }}
+     ]},
+    {id:"attrezzi", quando: m => m.soldi >= 900, peso:2,
+     testo: () => "Con quello che stai girando, prenditi un microfono decente. Ti cambia più di dieci ore di mix.",
+     opts:[
+       {n:"Che mi consigli?", d:"+lucidità",
+        run(){ addLuc(4); chatAvvicina(p, 1);
+          return "Roba da studio, non da streaming. Ti scrivo due nomi, li trovi nel negozio."; }},
+       {n:"Registro con quello che ho", run:() => "Si sente. Ma va bene, si è sempre fatto così."}
+     ]},
+    {id:"gavetta", peso:2,
+     testo: () => "Lo sai quanti pezzi ho mixato prima che uno andasse da qualche parte? Non te lo dico, ti passa la voglia.",
+     opts:[
+       {n:"Dimmelo lo stesso", d:"+lucidità",
+        run(){ addLuc(4); chatAvvicina(p, 1);
+          return "Quattrocento e passa. Il numero non conta: conta che sono ancora qui."; }},
+       {n:"Allora non me lo dire", run:() => "Bravo. Vai avanti e basta."}
+     ]},
+    {id:"stanco", quando: m => m.bene < 40, peso:2,
+     testo: () => "Ti ho sentito strano l'altro giorno in sala. Tutto a posto?",
+     opts:[
+       {n:"Sono cotto", d:"+benessere",
+        run(){ chBene(6); chatAvvicina(p, 1);
+          return "Fermati un giorno. Il pezzo non scappa, tu sì."; }},
+       {n:"Tutto a posto", run:() => "Se lo dici tu. Io comunque ci sono."}
+     ]}
+  ];
+}
+
+/* Le aperture: quello che puoi scrivere tu per primo. */
+function chatTuSala(p, fonico){
+  return fonico ? [
+    {n:"Quando hai un buco in sala?",
+     run:() => "Questa settimana ho martedì e giovedì. Dimmi tu.",
+     poi:[{n:"Martedì", d:"+rete", run(){ chRete(1); chatAvvicina(p, 1); return "Segnato."; }},
+          {n:"Ti faccio sapere", run:() => "Fammi sapere presto, che si riempie."}]},
+    {n:"Mi dai un parere onesto?", quando: m => m.usciti > 0, d:"+lucidità",
+     run(){ addLuc(4); chatAvvicina(p, 1);
+       return ["Sempre.", "Mandami la traccia e dammi mezz'ora."]; }}
+  ] : [
+    {n:"Hai qualcosa di nuovo?",
+     run:() => "Ho sempre qualcosa di nuovo.",
+     poi:[
+       {n:"Mandamela", d:"Finisce nel catalogo",
+        run(){ chatAvvicina(p, 1);
+          const b = chatMandaBeat(p);
+          return b ? "Vai: «" + b.n + "», " + b.price + " €. È nel catalogo."
+                   : "Passa in sala che te la faccio sentire."; }},
+       {n:"Passo in sala", d:"+rete", run(){ chRete(1); return "Ti aspetto."; }}
+     ]},
+    {n:"Su che roba stai lavorando?",
+     run:() => "Cose. Se vuoi sentirle prima degli altri, sai dove trovarmi.",
+     poi:[{n:"Fammi sentire", d:"+rete", run(){ chRete(1); chatAvvicina(p, 1); return "Domani ti mando."; }}]}
+  ];
+}
+
+function chatContattoSala(p){
+  const fonico = p.ruolo === "fonico";
+  const r = (typeof POSTO_RUOLI === "object" && POSTO_RUOLI[p.ruolo]) || {k:"#94A3B8", n:"Contatto"};
+  return {
+    id: "sala:" + p.id,
+    n: p.n,
+    sotto: r.n,
+    ic: fonico ? "cursori" : "manopole",
+    k: r.k,
+    sempre: true,
+    spesso: .3,
+    dallaSala: true,
+    persona: p,
+    spunti: fonico ? chatSpuntiFonico(p) : chatSpuntiBeatmaker(p),
+    tu: chatTuSala(p, fonico)
+  };
+}
+
+/* chi ti ha dato il numero ed è ancora in giro.
+
+   Il mestiere si controlla **qui** e non solo sul bottone che lo chiede: sono
+   due punti diversi, e se un domani il numero lo si potesse chiedere anche a
+   un rapper, questo si ritroverebbe in chat con le battute di un beatmaker.
+   Il filtro sta dove stanno i dati, non dove sta il bottone. */
+const CHAT_MESTIERI = ["beatmaker", "fonico"];
+function chatDaSala(){
+  return (G.gente || [])
+    .filter(x => x.numero && !x.via && CHAT_MESTIERI.indexOf(x.ruolo) >= 0)
+    .map(chatContattoSala);
+}
+
+/* Appena vi scambiate il numero si fa vivo: una chat vuota è peggio che non
+   averla, e questo è anche il modo di dire «ha funzionato». */
+function chatPresentazione(p){
+  const c = chatContattoSala(p);
+  const t = chatTraccia(c.id);
+  if(t.msgs.length) return;
+  /* Come si presentano: senza aggettivi che diano un genere a chi parla. I nomi
+     de La Sala sono un misto (Sara, Gigi, Andre, Nico...), e «quello del mixer»
+     su Sara suona sbagliato — non e' un dettaglio da niente, e' il primo
+     messaggio che leggi di quella persona. */
+  chatBolla(t, "loro", p.ruolo === "fonico"
+    ? "Sono " + p.n + ". Sto dietro al mixer: quando hai qualcosa da sistemare, scrivimi."
+    : "Sono " + p.n + ". Se ti serve roba nuova scrivimi, non aspettare di passare in sala.");
+  t.nonLetti = (t.nonLetti || 0) + 1;
+}
+
 /* ==================== CHI C'È ==================== */
 function chatAttivi(){
   const m = chatMondo();
-  return CHAT_GENTE.filter(c => c.sempre || (c.apri && c.apri(m)));
+  return CHAT_GENTE.filter(c => c.sempre || (c.apri && c.apri(m))).concat(chatDaSala());
+}
+/* Un contatto per id, fisso o venuto da La Sala. Tutto quello che lo cerca
+   deve passare di qui: `CHAT_GENTE.find()` da solo non vedrebbe le persone
+   vere, e i loro bottoni non farebbero niente. */
+function chatChi(id){
+  return CHAT_GENTE.find(x => x.id === id) ||
+    chatDaSala().find(x => x.id === id) || null;
 }
 function chatTraccia(id){
   if(!G.chat) G.chat = {};
@@ -690,7 +875,7 @@ function chatDici(t, esito){
   for(const r of [].concat(esito || [])) if(r) chatBolla(t, "loro", r);
 }
 function chatRispondi(contactId, idx){
-  const c = CHAT_GENTE.find(x => x.id === contactId);
+  const c = chatChi(contactId);
   if(!c) return;
   const t = chatTraccia(contactId);
   const opts = chatOpzioni(c, t);
@@ -714,7 +899,7 @@ function chatMieAperture(c, m){
   return (c.tu || []).filter(a => !a.quando || a.quando(m));
 }
 function chatIniziaTu(contactId, idx){
-  const c = CHAT_GENTE.find(x => x.id === contactId);
+  const c = chatChi(contactId);
   if(!c || !c.tu) return;
   const t = chatTraccia(contactId);
   if(t.aperto) return;
@@ -744,14 +929,16 @@ function schermataChat(){
       : "Tocca per scrivere";
     return '<button class="tli" data-chat="' + c.id + '">' +
       '<span class="tliav" style="--k:' + c.k + '">' + hsvg(c.ic) + '</span>' +
-      '<span class="tlitx"><b>' + c.n + '</b><i>' + tronca(anteprima, 44) + '</i></span>' +
+      '<span class="tlitx"><b>' + c.n +
+        (c.sotto ? ' <em class="tliruolo">' + c.sotto + '</em>' : '') +
+        '</b><i>' + tronca(anteprima, 44) + '</i></span>' +
       (t.nonLetti ? '<span class="tbadge2">' + t.nonLetti + '</span>' : '') +
       '</button>';
   }).join("") + '</div>';
 }
 
 function schermataChatThread(){
-  const c = CHAT_GENTE.find(x => x.id === TEL_CHAT_APERTA);
+  const c = chatChi(TEL_CHAT_APERTA);
   if(!c) return schermataChat();
   const m = chatMondo();
   const t = chatTraccia(c.id);

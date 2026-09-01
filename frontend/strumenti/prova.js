@@ -211,7 +211,15 @@ console.log("\nla chat del telefono: non si deve ripetere");
     "  money:220, fans:0, hype:0, wellbeing:80, lucidita:80,",
     "  skills:{scrittura:8, flow:6, presenza:5, rete:4},",
     "  songs:[], beats:[], rivals:[{n:'Nino Zero'}], job:null, contract:null,",
-    "  strada:{heat:0, rep:0}, chat:{} };",
+    "  strada:{heat:0, rep:0}, chat:{}, market:[], gente:[] };",
+    /* quel tanto che basta perche' i contatti de La Sala funzionino */
+    "const rnd = (a,b) => a + Math.random()*(b-a);",
+    "const relSoglia = p => 3 + p.rel;",
+    "const POSTO_RUOLI = { beatmaker:{n:'Beatmaker',k:'#4ADE80'}, fonico:{n:'Fonico',k:'#38BDF8'} };",
+    "const mioGenere = () => 'trap';",
+    "let beatFatti = 0;",
+    "const creaBeat = (g,q,presi) => { beatFatti++; return {n:'Beat '+beatFatti, q:Math.round(q), price:60}; };",
+    "const pushLog = () => {};",
     "const luc = () => G.lucidita;",
     "const addLuc = n => { G.lucidita = clamp(luc()+n, 0, 100); };",
     "const totalWeeks = () => (G.year-1)*52 + G.week;",
@@ -239,7 +247,13 @@ console.log("\nla chat del telefono: non si deve ripetere");
     controlla("ogni contatto ha almeno tre cose diverse da dire", poveri.length === 0, poveri);
 
     /* 2. la carriera va avanti e la chat vive: si risponde a caso, come farebbe
-          uno che gioca senza pensarci */
+          uno che gioca senza pensarci. Dentro ci sono anche due contatti presi
+          a La Sala, se no il giro lungo non li proverebbe mai. */
+    G.gente = [
+      { id:"pA", ruolo:"beatmaker", n:"Bit",  gen:"trap",  fama:20, rel:1, pt:0, numero:true },
+      { id:"pB", ruolo:"fonico",    n:"Sara", gen:"",      fama:30, rel:2, pt:0, numero:true },
+      { id:"pC", ruolo:"rapper",    n:"Nino", gen:"drill", fama:25, rel:3, pt:0 }
+    ];
     const dette = {};
     for(let w = 1; w <= 160; w++){
       G.week = w;
@@ -261,7 +275,7 @@ console.log("\nla chat del telefono: non si deve ripetere");
         (dette[c.id] = dette[c.id] || []).push(t.aperto.sp);
         let giri = 0;
         while(t.aperto && giri < 8){
-          const opts = dentro("chatOpzioni(CHAT_GENTE.find(x=>x.id==='" + c.id + "'), G.chat['" + c.id + "'])");
+          const opts = dentro("chatOpzioni(chatChi('" + c.id + "'), G.chat['" + c.id + "'])");
           if(!opts || !opts.length) break;
           dentro("chatRispondi('" + c.id + "', " + Math.floor(Math.random() * opts.length) + ")");
           giri++;
@@ -296,10 +310,10 @@ console.log("\nla chat del telefono: non si deve ripetere");
         provate++;
         G.chat[c.id] = { msgs:[], nonLetti:0, bloccatoFino:0, visti:[], aperto:{ sp: sp.id, via: [] } };
         dentro("chatRispondi('" + c.id + "', " + ramo + ")");
-        const prima = dentro("chatOpzioni(CHAT_GENTE.find(x=>x.id==='" + c.id + "'), G.chat['" + c.id + "'])");
+        const prima = dentro("chatOpzioni(chatChi('" + c.id + "'), G.chat['" + c.id + "'])");
         /* ecco il giro che fa localStorage */
         vm.runInContext("G.chat = " + JSON.stringify(JSON.parse(JSON.stringify(G.chat))), scatola);
-        const dopo = dentro("chatOpzioni(CHAT_GENTE.find(x=>x.id==='" + c.id + "'), G.chat['" + c.id + "'])");
+        const dopo = dentro("chatOpzioni(chatChi('" + c.id + "'), G.chat['" + c.id + "'])");
         if(!prima || !dopo || prima.length !== dopo.length) perse++;
       }
     }
@@ -323,6 +337,60 @@ console.log("\nla chat del telefono: non si deve ripetere");
       (c.tu || []).forEach(a => guarda(a, c.n + "/scrivi tu"));
     }
     controlla("ogni spunto ha un testo e delle risposte scritte per bene", storti.length === 0, storti);
+
+    /* i contatti de La Sala hanno appena fatto le 160 settimane insieme agli
+       altri: qui si guarda che compaiano e spariscano quando devono */
+    controlla("anche i contatti presi a La Sala parlano nel giro lungo",
+      !!dette["sala:pA"] && !!dette["sala:pB"],
+      Object.keys(dette).filter(k => k.indexOf("sala:") === 0));
+
+    /* ---- i contatti che arrivano da La Sala («Da smistare», punto 4) ---- */
+    G.chat = {};
+    G.gente = [
+      { id:"pA", ruolo:"beatmaker", n:"Bit", gen:"trap", fama:20, rel:1, pt:0 },
+      { id:"pB", ruolo:"fonico",    n:"Sara", gen:"",    fama:30, rel:2, pt:0 },
+      { id:"pC", ruolo:"rapper",    n:"Nino", gen:"drill", fama:25, rel:3, pt:0 }
+    ];
+    const senzaNumero = dentro("chatAttivi()").length;
+    G.gente[0].numero = true;
+    G.gente[1].numero = true;
+    G.gente[2].numero = true;                 /* al rapper il numero non si chiede: non deve comparire */
+    const conNumero = dentro("chatAttivi()");
+    controlla("chi ti ha dato il numero compare fra le chat",
+      conNumero.length === senzaNumero + 2, { prima: senzaNumero, dopo: conNumero.length });
+    controlla("e ci compare col suo nome e col suo mestiere",
+      conNumero.some(c => c.n === "Bit" && c.sotto === "Beatmaker") &&
+      conNumero.some(c => c.n === "Sara" && c.sotto === "Fonico"),
+      conNumero.filter(c => c.dallaSala).map(c => c.n + "/" + c.sotto));
+    controlla("un rapper col numero non finisce in chat: a lui si propone un feat di persona",
+      !conNumero.some(c => c.n === "Nino"));
+
+    /* si presenta da solo, se no apri una chat vuota */
+    dentro("chatPresentazione(G.gente[0])");
+    const tBit = G.chat["sala:pA"];
+    controlla("appena avete il numero si fa vivo lui per primo",
+      !!tBit && tBit.msgs.length === 1 && tBit.nonLetti === 1, tBit && tBit.msgs);
+
+    /* il beatmaker manda un beat vero, che finisce nel catalogo */
+    const primaBeat = G.market.length;
+    const cBit = dentro("chatChi('sala:pA')");
+    const spManda = cBit.spunti.find(x => x.id === "manda");
+    G.chat["sala:pA"] = { msgs:[], nonLetti:0, bloccatoFino:0, visti:[], aperto:{ sp:"manda", via:[] } };
+    dentro("chatRispondi('sala:pA', 0)");
+    controlla("il beatmaker ti manda un beat vero, che finisce nel catalogo",
+      G.market.length === primaBeat + 1 && G.market[G.market.length-1].da === "Bit",
+      G.market[G.market.length-1]);
+
+    /* parlarsi avvicina, come parlarsi di persona */
+    const relPrima = G.gente[1].rel, ptPrima = G.gente[1].pt;
+    dentro("chatAvvicina(G.gente[1], 6)");
+    controlla("parlare in chat fa salire il rapporto, come parlarsi di persona",
+      G.gente[1].rel > relPrima, { prima: relPrima + "+" + ptPrima, dopo: G.gente[1].rel + "+" + G.gente[1].pt });
+
+    /* se sparisce dal giro, sparisce anche dalla rubrica */
+    G.gente[0].via = true;
+    controlla("chi lascia il giro esce anche dalle chat",
+      !dentro("chatAttivi()").some(c => c.n === "Bit"));
   }
 }
 

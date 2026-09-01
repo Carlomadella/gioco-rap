@@ -646,3 +646,65 @@ JSON e controlla che le opzioni si ritrovino.
 **Non provata a vista in Chrome**: il browser era chiuso. Tutto quello che c'è scritto qui
 sopra è misurato facendo girare il codice, non guardandolo.
 
+---
+
+Da smistare, punto 4 (01/09/2026): "Metti l'opzione di potersi scambiare i numeri di telefono
+con i fonici e i beatmaker, una volta scambiati appare il contatto tra le chat"
+
+**FATTO.** A La Sala, sulla scheda di un beatmaker o di un fonico, c'è un bottone nuovo —
+**«Scambiatevi il numero»** — e da quel momento quella persona sta nelle tue chat, sul
+telefono, insieme a mamma e a Dario.
+
+**Serve almeno un contatto** (`rel >= 1`) e costa 4 di energia. Il numero a uno appena visto
+non si dà, e chiederlo è un gesto piccolo ma è un gesto: quattro punti sono il prezzo di
+essersi fermati a parlare due minuti in più.
+
+**Solo chi lavora sui pezzi.** Beatmaker e fonici, come chiedeva il punto — e c'è un motivo
+che regge anche a raccontarlo: sono quelli che poi ti scrivono **per lavoro**. A un rapper
+un feat lo proponi guardandolo in faccia, a un giornalista un'intervista la rilasci: non è
+la stessa cosa. Il mestiere si controlla in due posti, sul bottone e su chi entra in
+rubrica (`CHAT_MESTIERI` in `chat.js`), perché sono due decisioni diverse e la seconda deve
+reggere da sola.
+
+**Non sono contatti finti.** Sono le persone di `G.gente` — quelle che hai incontrato, con
+il loro nome, il loro mestiere, la loro faccia e il rapporto che ci hai costruito. Nella
+rubrica compaiono come **«Bit · Beatmaker»**, **«Sara · Fonico»**, e se uno lascia il giro
+(`p.via`) sparisce anche dalle chat.
+
+**Si presentano da soli** appena avete il numero, se no apri una chat vuota — che è peggio
+che non averla, e non ti dice nemmeno che ha funzionato.
+
+**E servono a qualcosa.** Non sono decorazione:
+- il **beatmaker** ti manda beat veri, che finiscono **davvero nel catalogo** col suo nome
+  sopra e già scontati secondo quanto vi conoscete (`chatMandaBeat`), e ti propone sessioni
+  in sala; se sei a corto di soldi te ne offre uno da pagare quando esce;
+- il **fonico** ti dice la verità sull'ultimo pezzo uscito («la voce sta troppo dentro, si
+  perde una parola su tre nel ritornello»), ti dà lucidità, ti consiglia gli attrezzi
+  quando cominci ad avere due soldi;
+- **parlare in chat avvicina**, con gli stessi punti e la stessa soglia di quando vi parlate
+  di persona (`chatAvvicina` rifà il conto di `poRispondi`). Quindi le due cose si tengono:
+  al telefono cresci di rapporto, e il rapporto ti sblocca le azioni in sala.
+
+**Il beatmaker finto non c'è più.** Nel giro precedente avevo inventato un «Kiro (beat)»
+sempre in rubrica: le battute erano buone, ma la sua presenza non se l'era guadagnata
+nessuno — avevi in tasca il numero di uno che non avevi mai incontrato. Quelle battute
+adesso le dicono le persone vere, e la rubrica te la fai tu. È il punto della cosa.
+
+**Provato in Chrome** (01/09/2026), col gioco vero: preso il numero a Bit (beatmaker) e a
+Sara (fonico), tutti e due compaiono in chat col mestiere accanto al nome e col pallino dei
+non letti; aperta la chat di Bit, scritto io per primo («Hai qualcosa di nuovo?»), risposto
+«Mandamela» — ed è arrivato **«Sigaretta di sempre», qualità 69, 483 €, nel catalogo, a
+nome Bit**. In Sala il bottone diventa «Avete il numero» e resta spento. Nessun errore in
+console.
+
+Più otto controlli in `npm run prova`: che compaiano e spariscano quando devono, che un
+rapper col numero **non** finisca in chat (questo l'ha trovato la prova, non io: il filtro
+guardava solo `numero` e non il mestiere), che si presentino da soli, che il beat finisca
+davvero nel catalogo, che parlare avvicini, e che anche loro reggano le 160 settimane senza
+ripetersi come tutti gli altri.
+
+Un dettaglio che sembra una sciocchezza e non lo è: la presentazione del fonico diceva
+«Sono Sara, **quello** del mixer». I nomi de La Sala sono un misto (Sara, Gigi, Andre,
+Nico, Fede, Pippo) e quell'aggettivo dà un genere a chi parla — nel **primo** messaggio che
+leggi di quella persona. Riscritta senza.
+

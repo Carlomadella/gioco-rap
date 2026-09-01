@@ -183,6 +183,11 @@
 .tchatopts .tbtn{margin-top:0;text-transform:none;letter-spacing:0;font-weight:600;text-align:left}
 .tchatopts .tbtn small{display:block;margin-top:2px;font-size:9.5px;color:#7B8395;
   text-transform:none;letter-spacing:0;font-weight:600}
+/* Chi arriva da La Sala porta il suo mestiere scritto accanto al nome: nella
+   rubrica «Bit» da solo non dice niente, «Bit · Beatmaker» si'. */
+.tliruolo{font-style:normal;font-weight:600;font-size:9.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:#7B8395;margin-left:5px}
+
 /* «Scrivi tu»: si stacca dalle risposte perche' e' un'altra cosa — li' rispondi
    a qualcuno, qui cominci tu, ed e' la meta' che prima non c'era. */
 .tchattu{margin:2px 0 1px;font-size:9.5px;font-weight:800;letter-spacing:.12em;

@@ -19,7 +19,7 @@ const REL_NOMI = ["conoscenza", "contatto", "amico", "collaboratore", "fidato", 
 
 /* Punto 39: energia a 100 al giorno. «Due parole» resta una mossa piccola,
    la sessione in studio e il feat restano le più grosse della Sala. */
-const PO_COSTO = {parla:12, sessione:45, mix:20, feat:45, intervista:12};
+const PO_COSTO = {parla:12, sessione:45, mix:20, feat:45, intervista:12, numero:4};
 
 const POSTO_RUOLI = {
   beatmaker: {n:"Beatmaker", k:"#4ADE80",
@@ -420,6 +420,20 @@ function azioniDi(p){
     p.rel >= 5 ? "Ci conosciamo ormai" : "Sali di un gradino con " + p.n, PO_COSTO.parla + " energia",
     G.energy >= PO_COSTO.parla);
 
+  /* Il numero: si scambia con chi lavora sui pezzi — chi fa i beat e chi sta
+     al mixer — perche' sono quelli che poi ti scrivono per lavoro. A un
+     rapper si propone un feat guardandolo in faccia, a un giornalista si
+     rilascia un'intervista: non e' la stessa cosa.
+     Serve almeno un contatto: il numero non lo si da' a uno appena visto. */
+  if(p.ruolo === "beatmaker" || p.ruolo === "fonico"){
+    out += p.numero
+      ? poTasto(p, "numero", "Avete il numero", "Ti scrive in chat", "", false)
+      : poTasto(p, "numero", "Scambiatevi il numero",
+          p.rel >= 1 ? "Da qui in poi ti scrive in chat" : "Serve almeno un contatto",
+          PO_COSTO.numero + " energia",
+          p.rel >= 1 && G.energy >= PO_COSTO.numero);
+  }
+
   if(p.ruolo === "beatmaker"){
     out += poTasto(p, "beat", "Fatti sentire un beat",
       p.rel >= 1 ? "Te lo mette nel mercato, a prezzo da amico" : "Serve almeno un contatto",
@@ -575,6 +589,18 @@ function azionePosto(tipo, id){
   const sett = typeof totalWeeks === "function" ? totalWeeks() : G.week;
 
   if(tipo === "parla"){ parlaCon(id); return; }
+
+  if(tipo === "numero"){
+    if(p.numero || p.rel < 1 || G.energy < PO_COSTO.numero) return;
+    G.energy -= PO_COSTO.numero;
+    p.numero = true;
+    p.numDa = sett;
+    /* si fa vivo subito: aprire una chat vuota e' peggio che non averla */
+    if(typeof chatPresentazione === "function") chatPresentazione(p);
+    pushLog("Ti sei scambiato il numero con <b>" + p.n + "</b>. Adesso lo trovi in chat, sul telefono.", "");
+    toast(p.n + " è nelle tue chat", "good", "☎", [POSTO_RUOLI[p.ruolo].k, "#0B1220"]);
+    SFX.tap();
+  }
 
   if(tipo === "beat"){
     const presi = G.market.map(b => b.n).concat(G.beats.map(b => b.n));
