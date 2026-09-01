@@ -45,9 +45,15 @@
 /* Punto 50: la mossa non finisce più in un toast, apre una pagina con la
    scenetta che c'era già sulla card (scene-art.js), grande invece che in
    miniatura. Stessa famiglia del rapporto di settimana, non un popup. */
-.scena{position:fixed;inset:0;z-index:80;display:none;place-items:center;padding:20px;
+/* Il nome è `scenapiena`, non `scena`: `.scena` è già del riquadro disegnato
+   dentro alla piazza (`overlays.css`, `#p-scena`), e siccome questo foglio si
+   carica dopo, il `display:none` di qui se lo portava via — la folla del
+   freestyle non si è vista per un pezzo, e nessuno se n'era accorto perché la
+   piazza si apriva lo stesso, solo senza scena. Come `.rcard` e `.rgrid`:
+   qui i nomi sono propri, non generici. */
+.scenapiena{position:fixed;inset:0;z-index:80;display:none;place-items:center;padding:20px;
   background:rgba(6,6,9,.9);backdrop-filter:blur(10px)}
-.scena.on{display:grid}
+.scenapiena.on{display:grid}
 .scwrap{width:100%;max-width:560px;background:linear-gradient(160deg,#1B1B22,#121218);
   border-radius:26px;overflow:hidden;animation:rIn .45s cubic-bezier(.2,.9,.3,1)}
 /* Punto 58: sette mosse, sette entrate diverse — non tutte la scena deve

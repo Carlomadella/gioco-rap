@@ -144,6 +144,22 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
 
 36. L'interfaccia sul telefono: la plancia e' disegnata a 1536x1024 e scalata, in verticale non ci sta. Disposizione sua, aree da toccare da 44 punti, niente hover, testi leggibili senza zoom. E' il lavoro piu' lungo dei cinque.
 
+   **FATTO in parte (01/09/2026).** La disposizione e le aree da toccare ci
+   sono; restano il tocco vero e il negozio.
+   - **Disposizione sua**: la plancia non è più scalata, è una griglia che si
+     impila sotto i 900 px. Da 360 a 2560 px non scorre mai di lato.
+   - **Aree da toccare da 44 punti**: `css/tocco.css`, dove si tocca
+     (`pointer:coarse`) e sotto i 900. A 360, 390, 430 e 768 non resta un
+     bersaglio sotto i 44.
+   - **Testi leggibili senza zoom**: la mappa non scende più sotto i 620 px di
+     larghezza e si sposta col dito — prima i cartelli disegnati dentro alla
+     foto erano quattro pixel di testo.
+   - **Niente hover**: da fare. Gli effetti `:hover` ci sono ancora tutti e sul
+     tocco restano appiccicati dopo il tap.
+   - **Da fare**: provarlo su un telefono vero, non solo dentro al riquadro.
+   Il dettaglio sta in [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md),
+   in fondo.
+
 37. Il database vero: SQLite appena c'e' l'account, PostgreSQL dal primo giorno di vendita. Lo schema completo e' gia' scritto in backend/database/schema.md, il travaso dal JSON e' uno script di mezz'ora — e va fatto adesso che siamo a 140 bot e tre giocatori, non di corsa con diecimila account dentro.
 
    **FATTO (01/09/2026) — il file JSON non c'è più, sotto c'è SQLite.**

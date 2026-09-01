@@ -1,0 +1,76 @@
+/* Le aree da toccare, sul telefono e su ogni schermo che si tocca.
+
+   Il disegno del gioco è nato col mouse in mano: un punto di 34 px si prende
+   sempre, perché la punta della freccia è un pixel. Il dito no — il dito è
+   largo circa 9 mm, e sotto i 44 punti si sbaglia bersaglio. Questo foglio
+   non ridisegna niente: porta a 44 quello che si tocca, e basta.
+
+   Vale **dove si tocca davvero** — `pointer:coarse` — e sugli schermi
+   stretti, che sono poi gli stessi. Sul monitor col mouse non cambia nulla:
+   la plancia resta fitta com'è disegnata.
+
+   Due modi, a seconda del pezzo:
+   - chi può crescere, cresce: `min-height:44px`;
+   - chi sta incollato a un disegno (i cartelli sulla mappa, le frecce, gli
+     interruttori) non si tocca: gli si mette sopra un `::after` invisibile
+     largo 44, che prende il tocco al posto suo. Quello che si vede resta
+     identico, quello che si prende diventa grande.
+
+   Caricato per ultimo apposta: deve vincere sulla cascata di tutti gli altri.
+   È il punto 36 di `implementazioni/02-interfaccia-e-telefono.md`. */
+
+@media (pointer:coarse), (max-width:900px){
+
+  /* ---- le croci per chiudere: erano tutte fra i 34 e i 38 ---- */
+  .dclose,.pox,.ngx,.phead .px,.whead .wx,.sx,.sheet2 .mx{width:44px;height:44px}
+
+  /* ---- la barra in alto ---- */
+  /* niente min-width qui dentro: su un elemento flessibile abbassa il minimo
+     automatico (che di suo e' la misura del contenuto) e il testo si taglia.
+     Dove serve larghezza si allarga l'imbottitura. */
+  .brand,.navback{min-height:44px}
+  .brand{padding-left:4px;padding-right:9px}   /* 43 -> 45 */
+  .avatarbtn{width:44px;height:44px}
+
+  /* ---- la plancia: il logo e le linguette ---- */
+  .plogo{min-height:44px}
+
+  /* I cartelli sulla mappa stanno incollati al disegno sotto: le loro misure
+     arrivano da --w e --h e non si toccano. Cresce solo la presa, in altezza,
+     centrata su quello che si vede. */
+  .pspot::after{content:"";position:absolute;left:0;right:0;top:50%;
+    transform:translateY(-50%);height:44px}
+  /* le due frecce che scorrono la città: 18×13, praticamente non si prendono */
+  .pfrec::after{content:"";position:absolute;left:50%;top:50%;
+    transform:translate(-50%,-50%);width:44px;height:44px}
+
+  /* ---- il negozio dei vestiti ---- */
+  .ngbtn{min-height:44px}
+
+  /* ---- le impostazioni ---- */
+  .stab,.sbtn,.seg button{min-height:44px}
+  .sbtn,.sprove .sbtn{padding-left:18px;padding-right:18px}   /* 42 -> 48 */
+  /* l'interruttore resta la pastiglia di 50×29 che è: cresce solo la presa */
+  .sw::after{content:"";position:absolute;left:0;right:0;top:50%;
+    transform:translateY(-50%);height:44px}
+  /* le manopole: la barra è alta 6 px, il pomello 24. Si alza il campo a 44 e
+     si ridisegna la barra dentro, se no il colore si spalma su tutta l'altezza. */
+  .sld input[type=range]{height:44px}
+  .slider input[type=range]{height:44px;background:transparent}
+  .slider input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:4px;
+    background:linear-gradient(90deg,var(--hot),var(--violet))}
+  .slider input[type=range]::-moz-range-track{height:6px;border-radius:4px;
+    background:linear-gradient(90deg,var(--hot),var(--violet))}
+  .slider input[type=range]::-webkit-slider-thumb{margin-top:-9px}
+
+  /* ---- il foglio di scrittura: e' qui che si scrive col pollice ---- */
+  .wline input,.wadd,.wbar button{min-height:44px}
+  /* la crocetta che toglie la riga e' una pastiglia di 23: si allarga la presa,
+     e va a prendersi lo spazio del contasillabe, che non e' da toccare */
+  .wline .rm::after{content:"";position:absolute;left:50%;top:50%;
+    transform:translate(-50%,-50%);width:44px;height:44px}
+  .wline .rm{position:relative}
+
+  /* ---- il creatore e i moduli ---- */
+  .chip,.vb,.ghost{min-height:44px}
+}

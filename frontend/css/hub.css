@@ -254,8 +254,16 @@ body.in-hub .topnav{display:none}
 
 /* ---- il telefono in mano: si impila ---- */
 @media (max-width:900px){
-  .palco{overflow:auto}
-  .plancia{height:auto;min-height:100%;gap:10px;padding:0 8px 12px;
+  /* Il palco smette di essere inchiodato allo schermo e torna a essere un
+     pezzo di pagina. Serve a due cose, tutte e due solo sul telefono vero:
+     scorrendo la pagina il browser si tira su la sua barra e ti restituisce
+     quei 60-90 px (dentro a un riquadro che scorre per conto suo, non lo fa
+     mai), e lo scorrimento e' quello di sistema, con la sua inerzia.
+     L'altezza minima e' `100svh` — la misura *piccola*, quella con le barre
+     visibili: cosi' la plancia entra dal primo momento e non si vede niente
+     tagliato mentre la barra e' ancora fuori. */
+  .palco{position:static;overflow:visible}
+  .plancia{height:auto;min-height:100svh;gap:10px;padding:0 8px 12px;
     grid-template-columns:minmax(0,1fr);
     grid-template-rows:auto auto auto auto;
     grid-template-areas:"barra" "centro" "sx" "sugg"}
@@ -271,7 +279,15 @@ body.in-hub .topnav{display:none}
   .ps .pbar{width:100%;max-width:88px}
 
   .pcolsx,.pcolcentro{grid-template-rows:auto auto}
-  .pfoto{width:100%;height:auto;max-width:100%}
+  /* La mappa non scende più sotto la soglia in cui si legge. I cartelli —
+     Studio, Beat Maker, Attività criminali — sono disegnati *dentro* alla
+     foto, quindi rimpiccioliscono con lei: a 375 px di schermo diventavano
+     quattro pixel di testo, e una città che non si legge non si gioca.
+     Sotto i 900 la foto tiene almeno 620 px e la città si sposta col dito,
+     come una cartina vera. Dove lo schermo è più largo di 620 non cambia
+     niente: `max()` la lascia riempire la colonna. */
+  .pmappa{overflow-x:auto;place-items:start;overscroll-behavior-x:contain}
+  .pfoto{width:max(100%,620px);height:auto;max-width:none}
   .psx{overflow:visible;max-height:none}
   .psxtab{height:88px}
   .peventi{height:auto}

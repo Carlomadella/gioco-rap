@@ -181,7 +181,6 @@ body.carriera-viva .navmeta .dot{background:#a6c27a;box-shadow:0 0 0 4px rgba(16
   .land-voce .des{font-size:9.5px;margin-top:2px}
   .land-piede{margin-top:7px}
   .land-piede .tasti{display:none}
-  .land-chip .mport{width:32px;height:32px}
   .land-giu{display:none}
 }
 @media (prefers-reduced-motion:reduce){

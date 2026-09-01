@@ -219,13 +219,6 @@ function hubPronta(id){
   return {ok:true, perche:""};
 }
 
-/* ================= LA MISURA DELLA PLANCIA ================= */
-/* La plancia adesso è una griglia e si adatta da sé: non c'è più niente da
-   rimpicciolire a mano. La funzione resta perché la chiamano in tre punti —
-   all'entrata e a ogni ridisegno — e toglierla vorrebbe dire rincorrerli
-   tutti per niente. */
-function hubScala(){}
-
 /* ================= PEZZI DI DISEGNO ================= */
 let HUB_VISTA = "profilo";     /* quale delle quattro linguette di sinistra */
 let HUB_QUI = -1;              /* il luogo illuminato dal giro guidato */
@@ -355,7 +348,6 @@ function renderHub(){
   const L = livello();
   const ph = PHASES[G.phase];
 
-  hubScala();
 
   /* ---- fascia in alto ---- */
   $("hb-citta").textContent = (art.city || "").trim() || "Città di provincia";
@@ -429,7 +421,14 @@ $("hb-pins").addEventListener("click", ev => {
     HUB_QUI = (HUB_QUI + (+f.dataset.f) + n) % n;
     hubTap(); renderHub();
     const q = document.querySelector(".pspot.qui");
-    if(q) q.focus({preventScroll:true});
+    /* sul telefono la mappa è più larga dello schermo e si sposta col dito:
+       il giro guidato deve portare in mezzo il luogo che sta illuminando,
+       se no indica un cartello che è fuori dalla finestra */
+    /* niente `behavior:"smooth"` a mano: provato, su questo contenitore non
+       scorre affatto. Senza, va sempre — e il verso lo decide comunque il CSS,
+       che con le animazioni spente (Impostazioni → Aspetto) è già `auto`. */
+    if(q){ q.focus({preventScroll:true});
+      q.scrollIntoView({block:"nearest", inline:"center"}); }
     return;
   }
   const b = ev.target.closest(".pspot"); if(!b) return;
@@ -463,4 +462,4 @@ $("hb-logo").onclick = () => GO("menu");
    disegna: al contrario le misure sarebbero zero e resterebbe tutto nero. */
 $("g-tomappa").onclick = () => { GO("hub"); renderHub(); };
 
-window.HUB = { apri(){ GO("hub"); renderHub(); }, render: renderHub, scala: hubScala };
+window.HUB = { apri(){ GO("hub"); renderHub(); }, render: renderHub };

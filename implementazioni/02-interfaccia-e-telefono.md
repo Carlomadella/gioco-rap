@@ -342,17 +342,60 @@ Cosa è stato sistemato:
   «Messaggi» aveva un testo che non va a capo e si portava fuori tutta la
   colonna a 1366 e 1440 px.
 
-**DA FARE DOMANI:**
-1. La schermata **«Il tuo artista» (il creatore) a 768 px**: qualcosa nel
-   ritratto SVG esce di una ventina di pixel — era l'ultima cosa che stavo
-   guardando quando ci siamo fermati (un `<rect>` dentro all'anteprima).
-2. **Le altre schermate ancora da provare una per una**: il foglio di
-   scrittura, la piazza, La Sala, il negozio dei vestiti, il diario, la
-   modale degli eventi.
-3. **Provare su un telefono vero**, non solo dentro al riquadro: il tocco, la
-   barra del browser che si mangia l'altezza, e il `100svh`.
-4. Le **aree da toccare a 44 punti** (punto 36): sul telefono adesso ci sono
-   ancora bottoni piccoli.
+**FINITA (01/09/2026, secondo giro).** I quattro punti che erano rimasti
+aperti, uno per uno.
+
+1. **Il creatore a 768 px: non c'era niente da aggiustare.** Il `<rect> che
+   sembrava uscire di venti pixel era un falso allarme del mio metodo di
+   misura: contavo come «fuori» ogni elemento che sborda dal documento, anche
+   quando un antenato con `overflow:hidden` lo taglia già — e gli sfondi SVG
+   dentro alle otto card e dentro al palco dell'anteprima sono fatti apposta
+   così. Corretto il metro (adesso salta chi è già tagliato e chi sta fuori
+   di proposito, come il diario chiuso), la schermata risulta pulita a 360,
+   390, 430, 768, 1024 e 1280.
+
+2. **Le altre schermate, provate una per una** a 360, 390, 430 e 768: foglio
+   di scrittura, La Sala, il negozio dei vestiti, il diario, la modale degli
+   eventi, le Impostazioni (tutte e sei le linguette) e la piazza. Zero
+   sbordature in orizzontale, zero contenuto tagliato senza modo di
+   raggiungerlo. Da 360 a 2560 px la pagina non scorre mai di lato.
+
+3. **La barra del browser sul telefono.** Sotto i 900 px il palco non è più
+   inchiodato allo schermo (`position:fixed`): torna a essere un pezzo di
+   pagina, con `min-height:100svh`. Serve a due cose che si vedono solo su un
+   telefono vero — scorrendo *la pagina* il browser si tira su la sua barra e
+   ti restituisce 60-90 px di altezza (dentro a un riquadro che scorre per
+   conto suo non lo fa mai), e lo scorrimento è quello di sistema, con la sua
+   inerzia. `100svh` e non `100vh` perché è la misura *piccola*, quella con le
+   barre visibili: la plancia entra dal primo momento.
+
+4. **Le aree da toccare a 44 punti (punto 36): fatte**, in un foglio nuovo,
+   `css/tocco.css`, caricato per ultimo. Vale dove si tocca davvero
+   (`pointer:coarse`) e sotto i 900 px; col mouse non cambia niente. Chi può
+   crescere cresce (`min-height`), chi sta incollato a un disegno — i cartelli
+   sulla mappa, le due frecce del giro guidato, gli interruttori, la crocetta
+   che toglie una barra — tiene la sua misura e si prende un `::after`
+   invisibile largo 44 che raccoglie il tocco al posto suo. Prima erano
+   piccoli: le sette croci per chiudere (34-38), il cerchio dell'avatar (36),
+   le frecce della mappa (18×13), i bottoni del negozio (32), le manopole
+   delle Impostazioni (16 di altezza), le righe del foglio (37). Adesso a 360,
+   390, 430 e 768 px **non resta un solo bersaglio sotto i 44**.
+   Attenzione a una trappola in cui sono cascato e che è meglio non ripetere:
+   `min-width` su un elemento dentro a un `flex` **abbassa** il suo minimo
+   automatico (che di suo è la misura del contenuto) e il testo si taglia — le
+   linguette delle Impostazioni sono diventate «Audi». Dove serve larghezza si
+   allarga l'imbottitura, non il minimo.
+
+**E una cosa che non era in lista: la mappa non si leggeva sul telefono.**
+I cartelli — Studio, Beat Maker, Attività criminali — sono disegnati *dentro*
+alla foto, quindi rimpicciolivano con lei: a 375 px erano quattro pixel di
+testo. Adesso sotto i 900 la foto tiene almeno 620 px (`width:max(100%,620px)`)
+e la città si sposta col dito, come una cartina vera; sopra i 620 non cambia
+niente. Le frecce «scorri per esplorare» adesso portano in mezzo il luogo che
+illuminano (`scrollIntoView`), se no indicavano un cartello fuori dalla
+finestra. Nota per chi ci torna: `behavior:"smooth"` su quel contenitore **non
+scorre affatto**, provato; senza, va sempre, e il verso lo decide comunque il
+CSS.
 
 
 ## 55 · Via la conferma «sei sicuro» per l'energia
@@ -392,3 +435,45 @@ Cosa è stato sistemato:
     (`getComputedStyle(...).animationName`), e il bottone «Continua» funziona ancora dopo ogni scena.
 
 ---
+
+---
+
+## Controllo di tutto il codice — due nomi di classe che si pestavano i piedi
+
+**FATTO (01/09/2026).** Passata di controllo su CSS e JS, cercando in
+particolare le classi con lo stesso nome dichiarate in due fogli diversi: il
+foglio caricato dopo vince, e il pezzo dell'altro si rompe **in silenzio**.
+Ne sono uscite due, tutte e due vere.
+
+1. **La folla del freestyle non si vedeva più.** `.scena` era due cose: il
+   riquadro disegnato dentro alla piazza (`overlays.css`, `#p-scena`) e la
+   scena a pagina piena del punto 50 (`effects.css`, `#scena`). `effects.css`
+   si carica dopo, e il suo `display:none` (giusto: quella scena si apre
+   quando serve) spegneva anche il riquadro della piazza. Risultato: si
+   apriva il freestyle e la città di notte, il rapper sotto il lampione, la
+   gente che si ferma — **non c'era**. Il gioco funzionava lo stesso, ed è
+   proprio per questo che non se n'era accorto nessuno. La scena a pagina
+   piena adesso si chiama `.scenapiena`, come la `SCENA_PIENA` di `ui.js`.
+
+2. **Le targhette del catalogo uscivano verdi e maiuscole.** `.tag` era del
+   gioco (`game.css`: 11 px, e accesa gialla) e del telefono
+   (`telefono.css`: 9,5 px maiuscole, e accesa verde). Vinceva il telefono,
+   che si carica dopo: «grezzo», «pronto», «fuori», «tuo» prendevano il
+   vestito sbagliato. Quella del telefono adesso è `.ttag`, con la t davanti
+   come tutto il resto di quel foglio (`tbtn`, `tnote`, `tsub`…) — era già la
+   convenzione, era solo saltata una volta.
+
+**Codice tolto perché non faceva più niente:**
+- `hubScala()` in `js/game/hub.js`: una funzione vuota, rimasta da quando la
+  plancia si rimpiccioliva a mano. Il commento diceva «la chiamano in tre
+  punti»; i punti erano due, ed erano lei e la sua riga di export.
+- Il blocco `.mhero` e `.mlist` in `css/shell.css` (più le due righe compatte
+  in `impostazioni.css` e `.land-chip .mport` in `landing.css`): erano il
+  menu di prima. Adesso `mhero` è un **id** sulla landing, non una classe,
+  quindi quelle regole non si applicavano più a niente.
+- `grid-column:1/-1` su `.mrow.big`: era la posizione dentro alla griglia
+  `.mlist`, che non c'è più.
+
+Il resto è pulito: nessuna funzione dichiarata e mai chiamata, nessun `id`
+ripetuto in `index.html`, nessun `console.log` o `TODO` rimasto, e `npm run
+prova` a 12 su 12.

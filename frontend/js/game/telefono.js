@@ -304,7 +304,7 @@ function schermataObiettivi(){
     return '<div class="tli static' + (fatto ? " fatto" : "") + '">' +
       '<span class="tliav">' + hsvg("mirino") + '</span>' +
       '<span class="tlitx"><b>' + g2.n + '</b><i style="white-space:normal">' + g2.d + '</i></span>' +
-      '<span class="tag' + (fatto ? " on" : "") + '">' + (fatto ? "fatto" : golPremio(g2.rw)) + '</span></div>';
+      '<span class="ttag' + (fatto ? " on" : "") + '">' + (fatto ? "fatto" : golPremio(g2.rw)) + '</span></div>';
   }).join("") + '</div>';
 }
 
@@ -398,7 +398,7 @@ function schermataImpostazioni(){
   return '<div class="tlist">' +
     '<button class="tli" data-toggleaudio="1"><span class="tliav">' + hsvg("nota") + '</span>' +
       '<span class="tlitx"><b>Audio</b><i>' + (SET.audio.on ? "Acceso" : "Spento") + '</i></span>' +
-      '<span class="tag' + (SET.audio.on ? " on" : "") + '">' + (SET.audio.on ? "on" : "off") + '</span></button>' +
+      '<span class="ttag' + (SET.audio.on ? " on" : "") + '">' + (SET.audio.on ? "on" : "off") + '</span></button>' +
     '<div class="tli static"><span class="tliav">' + hsvg("scudo") + '</span>' +
       '<span class="tlitx"><b>Difficoltà</b><i>' + SET.gioco.preset + '</i></span></div>' +
     '<div class="tli static"><span class="tliav">' + hsvg("giornale") + '</span>' +

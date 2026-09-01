@@ -14,9 +14,6 @@ html.ridotto *,html.ridotto *::before,html.ridotto *::after{
 
 /* ---- modalità compatta ---- */
 html.compatto .menu{padding-top:2px;padding-bottom:60px}
-html.compatto .mhero{min-height:220px}
-html.compatto .mhero .mport,html.compatto .mhero .mport svg{height:230px}
-html.compatto .mhero .mtxt{padding:18px 20px}
 html.compatto .mrow{padding:12px 14px}
 html.compatto .mrcard{padding:14px 14px 12px}
 html.compatto .mcorso{padding:14px 16px 16px}
