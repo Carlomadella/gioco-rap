@@ -4,13 +4,18 @@
 const SHOWN = {};
 /* quali categorie del lifestyle l'utente ha aperto: sopravvive ai ridisegni */
 const LAPERTE = new Set();
+/* punto 67: stesse quattro famiglie di colore delle card (scene-art.js),
+   così il toast che segue un tap non stona col colore della card appena
+   premuta. Solo scrivi/beat/registra/free/cercalavoro ci passano davvero —
+   le altre finiscono nella scena a pagina piena (SCENA_PIENA, sotto), non
+   nel toast, ma restano coerenti anche loro se un giorno cambia qualcosa. */
 const ART = {
-  scrivi:["#FF5A36","#B026FF","S"], beat:["#3DC7FF","#B026FF","B"],
-  registra:["#FFC53D","#3DC7FF","R"], mixa:["#FF4D9D","#FF5A36","M"],
-  pubblica:["#B026FF","#FF4D9D","P"], promo:["#3DC7FF","#FFC53D","O"],
-  free:["#FFC53D","#FF5A36","F"], live:["#FF4D9D","#B026FF","L"],
-  turno:["#4A4A58","#22262E","€"], cercalavoro:["#5A6472","#2B2B34","C"],
-  stacca:["#2B3340","#4A5568","Z"]
+  scrivi:TINTA_STUDIO.concat("S"), beat:TINTA_SUONO.concat("B"),
+  registra:TINTA_STUDIO.concat("R"), mixa:TINTA_STUDIO.concat("M"),
+  pubblica:TINTA_STUDIO.concat("P"), promo:TINTA_HUSTLE.concat("O"),
+  free:TINTA_SUONO.concat("F"), live:TINTA_SUONO.concat("L"),
+  turno:TINTA_HUSTLE.concat("€"), cercalavoro:TINTA_HUSTLE.concat("C"),
+  stacca:TINTA_VITA.concat("Z"), palestra:TINTA_VITA.concat("P")
 };
 
 /* Punto 50: queste mosse finivano dritte in un toast — nessuna scena,
@@ -334,8 +339,8 @@ function renderGioco(){
       : cover(x.r.seed, x.r.ult, x.n);
     const fc = x.me ? "" : '<span class="fc">' + faccia(x.r, 34) + '</span>';
     const sotto = x.me
-      ? ((window.ARTIST||{}).city || "la tua città") + " · " + PHASES[G.phase].n.toLowerCase()
-      : x.r.city + " · " + x.r.gen + (x.r.deal ? " · sotto contratto" : " · indipendente");
+      ? G.age + " anni · " + ((window.ARTIST||{}).city || "la tua città") + " · " + PHASES[G.phase].n.toLowerCase()
+      : (x.r.eta ? x.r.eta + " anni · " : "") + x.r.city + " · " + x.r.gen + (x.r.deal ? " · sotto contratto" : " · indipendente");
     return '<div class="crow' + (x.me ? " me" : "") + '"' + (x.me ? "" : ' data-riv="' + x.n + '"') + '>' +
       '<span class="pz">' + pos + '</span>' +
       '<span class="cv">' + cv + '</span>' + fc +

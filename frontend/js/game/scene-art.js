@@ -3,6 +3,19 @@
 
 /* ==================== INTERFACCIA ==================== */
 
+/* punto 67: la schermata di gioco aveva un colore diverso per ognuna delle
+   dodici mosse — un arcobaleno a confronto del menù, che tiene un'unica
+   identità (nero e oro). Qui sotto le due tinte di ogni scena (il bordo
+   della card e lo sfondo dietro al disegno, non il disegno stesso) sono
+   raggruppate in quattro famiglie con un senso: viola per chi scrive e
+   produce in studio, oro per chi fa muovere soldi e occasioni, ciano per il
+   suono e il palco, verde per la vita fuori dalla musica. Dichiarate fuori
+   dalla IIFE qui sotto: le usa anche ART in ui.js, per i toast. */
+const TINTA_STUDIO = ["#8B5CF6","#1D1030"];
+const TINTA_HUSTLE = ["#FFB020","#241A08"];
+const TINTA_SUONO  = ["#3DC7FF","#0E2033"];
+const TINTA_VITA   = ["#57C98B","#0E1F17"];
+
 const SC = (() => {
 /* ---- mattoni comuni delle scenette: tutto disegnato, niente icone piatte ---- */
 const cielo = (a,b) => '<rect width="200" height="128" fill="url(#sk)"/>' +
@@ -45,7 +58,7 @@ const figura = (x,y,sc,col,skin,braccio) => '<g transform="translate(' + x + ','
 const S = {};
 
 /* SCRIVI BARRE — la stanza, il tavolo, la lampada */
-S.scrivi = ["#FF7A1A","#2A1428",
+S.scrivi = [...TINTA_STUDIO,
   cielo("#2A1B3D","#140E1E") +
   '<rect x="112" y="14" width="74" height="52" rx="3" fill="#0B0A14"/>' +
   '<rect x="116" y="18" width="66" height="44" fill="#191233"/>' +
@@ -64,7 +77,7 @@ S.scrivi = ["#FF7A1A","#2A1428",
   '<rect width="200" height="128" fill="url(#vg)"/>' + grana];
 
 /* CERCA UN BEAT — il produttore, il laptop, i monitor */
-S.beat = ["#3DC7FF","#1B1046",
+S.beat = [...TINTA_SUONO,
   cielo("#1B1440","#0C0A1C") +
   '<rect x="0" y="88" width="200" height="40" fill="#141026"/>' +
   '<rect x="0" y="84" width="200" height="5" fill="#221B3E"/>' +
@@ -84,7 +97,7 @@ S.beat = ["#3DC7FF","#1B1046",
   vign + grana];
 
 /* REGISTRA — la cabina, il microfono, la luce rossa */
-S.registra = ["#FF5A36","#2B0D12",
+S.registra = [...TINTA_STUDIO,
   cielo("#2E1119","#120609") +
   '<rect x="0" y="0" width="200" height="128" fill="#170A10"/>' +
   '<rect x="8" y="8" width="184" height="112" rx="4" fill="#1F0E15"/>' +
@@ -106,7 +119,7 @@ S.registra = ["#FF5A36","#2B0D12",
   vign + grana];
 
 /* MIXA — il banco, i fader, i led */
-S.mixa = ["#FF4D9D","#2A0C2E",
+S.mixa = [...TINTA_STUDIO,
   cielo("#2A1030","#100613") +
   '<ellipse cx="100" cy="24" rx="80" ry="30" fill="#FF4D9D" opacity=".13"/>' +
   '<rect x="0" y="52" width="200" height="76" fill="#171021"/>' +
@@ -136,7 +149,7 @@ S.mixa = ["#FF4D9D","#2A0C2E",
   vign + grana];
 
 /* PUBBLICA — il telefono, la copertina che esce, le notifiche */
-S.pubblica = ["#B026FF","#1A0733",
+S.pubblica = [...TINTA_STUDIO,
   cielo("#2A0F4A","#0E0620") +
   '<ellipse cx="100" cy="70" rx="74" ry="52" fill="#B026FF" opacity=".16"/>' +
   '<g opacity=".55" fill="#D9A6FF">' +
@@ -157,7 +170,7 @@ S.pubblica = ["#B026FF","#1A0733",
   vign + grana];
 
 /* PROMO — la ring light, il telefono, i cuori che salgono */
-S.promo = ["#3DC7FF","#10233F",
+S.promo = [...TINTA_HUSTLE,
   cielo("#15325C","#08111F") +
   '<circle cx="100" cy="52" r="40" fill="none" stroke="#EAF6FF" stroke-width="7" opacity=".92"/>' +
   '<circle cx="100" cy="52" r="40" fill="#9FE0FF" opacity=".10"/>' +
@@ -173,7 +186,7 @@ S.promo = ["#3DC7FF","#10233F",
   vign + grana];
 
 /* FREESTYLE — la piazza in miniatura */
-S.free = ["#FFC53D","#1A1226",
+S.free = [...TINTA_SUONO,
   cielo("#241A33","#0D0A14") +
   '<path d="M171,14 A9,9 0 1 0 171,30 A7,7 0 1 1 171,14 Z" fill="#F3EAD3" opacity=".85"/>' +
   skyline(72,"#0B0A11","1") +
@@ -190,7 +203,7 @@ S.free = ["#FFC53D","#1A1226",
   vign + grana];
 
 /* LIVE — il palco, i fari, le mani */
-S.live = ["#FF4D9D","#20082C",
+S.live = [...TINTA_SUONO,
   cielo("#2B0C3A","#0C0412") +
   '<path d="M54,0 L28,120 L86,120 Z" fill="#FF4D9D" opacity=".16"/>' +
   '<path d="M146,0 L114,120 L172,120 Z" fill="#3DC7FF" opacity=".14"/>' +
@@ -206,7 +219,7 @@ S.live = ["#FF4D9D","#20082C",
   vign + grana];
 
 /* TURNO — il magazzino, i bancali, la luce fredda */
-S.turno = ["#57C98B","#0E1A16",
+S.turno = [...TINTA_HUSTLE,
   cielo("#16241F","#080D0B") +
   '<rect x="0" y="92" width="200" height="36" fill="#101815"/>' +
   '<path d="M0,92 L200,92 L200,96 L0,96 Z" fill="#000" opacity=".4"/>' +
@@ -226,7 +239,7 @@ S.turno = ["#57C98B","#0E1A16",
   vign + grana];
 
 /* CERCA LAVORO — la bacheca, gli annunci */
-S.cercalavoro = ["#FFC53D","#231A0C",
+S.cercalavoro = [...TINTA_HUSTLE,
   cielo("#2A2113","#100C06") +
   '<rect x="0" y="96" width="200" height="32" fill="#171208"/>' +
   '<rect x="26" y="14" width="148" height="76" rx="3" fill="#3B2B18"/>' +
@@ -247,7 +260,7 @@ S.cercalavoro = ["#FFC53D","#231A0C",
   vign + grana];
 
 /* STACCA — il divano, la tv accesa, la notte fuori */
-S.stacca = ["#7A5CFF","#12102A",
+S.stacca = [...TINTA_VITA,
   cielo("#1B1838","#0A0916") +
   '<rect x="0" y="88" width="200" height="40" fill="#151329"/>' +
   '<rect x="0" y="84" width="200" height="5" fill="#221E42"/>' +
@@ -268,7 +281,7 @@ S.stacca = ["#7A5CFF","#12102A",
   vign + grana];
 
 /* PALESTRA — i pesi, lo specchio, la luce dura */
-S.palestra = ["#57C98B","#0E1F17",
+S.palestra = [...TINTA_VITA,
   cielo("#16241C","#080D0A") +
   '<rect x="0" y="94" width="200" height="34" fill="#101815"/>' +
   '<rect x="20" y="10" width="70" height="84" rx="2" fill="#0C1410"/>' +

@@ -164,6 +164,24 @@
   font-size:11px;color:#9AA1B2;line-height:1.4}
 .tnote b{color:#E8EAF0}
 
+/* ---- Chat (punto 66): il thread con una persona, dentro all'app ---- */
+.tbadge2{flex:none;min-width:18px;height:18px;padding:0 5px;border-radius:999px;
+  background:#EF4444;color:#fff;font-size:10px;font-weight:800;
+  display:flex;align-items:center;justify-content:center}
+.tback2{align-self:flex-start;margin-bottom:9px;padding:7px 12px;border-radius:999px;
+  background:#12151F;border:1px solid rgba(255,255,255,.07);font-size:10.5px;
+  font-weight:700;color:#9AA1B2}
+.tchat{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.tbolla{max-width:82%;padding:9px 12px;border-radius:14px;font-size:12px;line-height:1.4}
+.tbolla.loro{align-self:flex-start;background:#171B26;color:#E8EAF0;border-bottom-left-radius:4px}
+.tbolla.io{align-self:flex-end;background:#7C3AED;color:#fff;border-bottom-right-radius:4px}
+.tchatopts{display:flex;flex-direction:column;gap:7px}
+.tchatopts .tbtn{margin-top:0;text-transform:none;letter-spacing:0;font-weight:600;text-align:left}
+.tchatopts .tbtn small{display:block;margin-top:2px;font-size:9.5px;color:#7B8395;
+  text-transform:none;letter-spacing:0;font-weight:600}
+.tchatstop{padding:9px 11px;border-radius:10px;background:#12151F;font-size:11px;
+  color:#9AA1B2;line-height:1.4}
+
 .tsub{display:flex;gap:6px;margin-bottom:9px;overflow-x:auto}
 .tsubb{flex:none;padding:7px 11px;border-radius:999px;background:#12151F;
   border:1px solid rgba(255,255,255,.07);font-size:10.5px;font-weight:700;color:#9AA1B2}

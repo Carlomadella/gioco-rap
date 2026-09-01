@@ -38,6 +38,14 @@ const LIFE = [
 ];
 
 function lifeCost(){ return LIFE.reduce((a,c) => a + c.t[G.life[c.id] || 0].w, 0); }
+/* punto 63: un riassunto per la sidebar del profilo, non i venticinque numeri
+   del pannello Lifestyle vero — solo quante categorie hai alzato dal livello
+   base e quanto, in media, sei sopra quel base */
+function lifestyleRiepilogo(){
+  const alzati = LIFE.filter(c => (G.life[c.id] || 0) > 0).length;
+  const pct = LIFE.reduce((a,c) => a + (G.life[c.id] || 0) / (c.t.length - 1), 0) / LIFE.length * 100;
+  return {alzati:alzati, pct:pct};
+}
 function lifeBonus(){
   const b = {well:0, energy:0, hype:0, rete:0, fan:1, live:1};
   for(const c of LIFE){

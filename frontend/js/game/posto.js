@@ -252,11 +252,17 @@ function nuovaPersona(ruolo){
   let pool = POSTO_NOMI[ruolo];
   if(!pool) pool = RIV_NOMI;                        /* i rapper: nomi da rivali */
   const liberi = pool.filter(n => usati.indexOf(n) < 0);
+  /* punto 65: un'età vera, non un numero a caso — i fonici e i giornalisti
+     sono il mestiere di chi ha già fatto qualche anno di gavetta, gli altri
+     due partono dalla stessa fascia del giocatore */
+  const etaMin = {fonico:26, giornalista:28}[ruolo] || 18;
+  const etaMax = {fonico:52, giornalista:58}[ruolo] || 32;
   return {
     id: "p" + Math.floor(Math.random() * 1e9),
     ruolo: ruolo,
     n: liberi.length ? pick(liberi) : pick(pool) + " " + Math.floor(rnd(2, 9)),
     gen: (ruolo === "beatmaker" || ruolo === "rapper") ? pick(BEAT_IDS) : "",
+    eta: Math.floor(rnd(etaMin, etaMax)),
     fama: Math.round(rnd(4, 46)),
     car: pick(CARATTERI).id,
     scoperto: false,                                /* il carattere si scopre parlando */
@@ -450,7 +456,7 @@ function schedaPersona(p, aperta){
     '<button class="potesta" data-apri="' + p.id + '">' +
       '<span class="poav">' + faccia(p, 46) + '</span>' +
       '<span class="potx"><b>' + p.n + '</b>' +
-        '<i>' + r.n + (gen ? " · " + gen.toLowerCase() : "") + '</i></span>' +
+        '<i>' + (p.eta ? p.eta + " anni · " : "") + r.n + (gen ? " · " + gen.toLowerCase() : "") + '</i></span>' +
       '<span class="porel"><u>' + relNome(p) + '</u>' +
         '<span class="pobar"><i style="width:' + Math.round(p.pt / relSoglia(p) * 100) + '%"></i></span>' +
         '<em>' + (p.scoperto ? "tipo " + p.car : "non lo conosci ancora") + '</em></span>' +

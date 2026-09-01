@@ -41,6 +41,7 @@ function nuovoRivale(forza){
   const pool = RIV_NOMI.filter(n => usati.indexOf(n) < 0);
   return {
     n: pool.length ? pick(pool) : pick(RIV_NOMI) + " " + Math.floor(rnd(2,9)),
+    eta: Math.floor(rnd(18, 33)), /* punto 65: stessa fascia del giocatore, sono la sua generazione */
     city: pick(RIV_CITTA), gen: pick(RIV_GEN), col: pick(["#FF5A36","#B026FF","#FFC53D","#3DC7FF","#FF4D9D","#57C98B","#7A5CFF","#E8452F"]),
     skin: pick(RIV_SKIN), hair: Math.floor(rnd(0,4)), storia: pick(RIV_STORIA),
     p: forza, prev: forza, mom: 0, usc: Math.floor(rnd(1,6)), deal: Math.random() < .25,
