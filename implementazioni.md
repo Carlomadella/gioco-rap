@@ -835,6 +835,22 @@ in parallelo.
 
 43. I dialoghi di gioco devono essere molti e molto diversi tra loro, cosicche sembri ancora più realistico. 
 
+   **FATTO in parte (01/09/2026)** — le chiacchierate della Sala
+   (`DIALOGHI` in `frontend/js/game/posto.js`), che erano ferme a tre a
+   testa (due per il giornalista) fin dal giorno in cui esiste la Sala:
+   ognuno dei quattro ruoli **si ritrovava le stesse tre battute in loop**
+   dopo la prima settimana, ed è esattamente il contrario di «sembra
+   reale». Portati a **12 per beatmaker, rapper e fonico, 9 per il
+   giornalista** — quaranta situazioni nuove in tutto, stesso formato di
+   prima (una scena, tre risposte, i punti e il carattere che si scopre
+   rispondendo giusto), niente logica toccata.
+   **In parte** perché «molti e diversi» non ha un traguardo: la Sala oggi
+   ha quattro volte le battute di prima, ma i dialoghi veri e propri delle
+   **scene** (foglio, piazza, la sessione in studio con un beatmaker) non
+   li ho toccati — sono un lavoro a parte, per quando quelle scene si
+   riscrivono per davvero (punto 8, 14, e le «scene di gioco vere» che la
+   Sala aspetta ancora). `npm run prova` (12/12) e `npm run build` puliti.
+
 44. La suondboard del gioco è davvero ancora poco 
 
 45. Sposterei le card dalla mappa iniziale, non SOPRA gli edifici ma leggermente rimpicciolata e a lato, cosìche si vedan bene gli edifici, quando andremo a milano e los angeles poi la mappa dev'essere incredibile come ti abbiamo mandato già nei repo.
