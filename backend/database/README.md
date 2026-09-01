@@ -2,9 +2,12 @@
 
 Dove guardare, in quest'ordine:
 
-- **`schema.md`** — il disegno completo: tabelle, colonne, tipi, vincoli, relazioni,
-  indici, le query che contano, come si cancella un account. **Non sta in git** (come
-  `backend.md`): è il documento su cui si lavora.
+- **[Lo schema, tabella per tabella](#lo-schema-tabella-per-tabella)**, qui sotto in
+  questo file: tutte le colonne di tutte le tabelle, con che cosa vogliono dire. È in
+  git, quindi lo vedono tutti e due.
+- **`schema.md`** — il documento di disegno, con il ragionamento dietro a ogni scelta,
+  il DDL per Postgres e come si cancella un account. **Non sta in git** (come
+  `backend.md`): è il foglio su cui si lavora, non il riferimento.
 - **`migrazioni/*.sql`** — lo schema come gira davvero.
 - **`archivio.js`** — lo strato dati: l'unico file di tutto il server che parla col database.
 - **`dati/`** — il database vero. **Non sta in git**: sono dati, non codice.
@@ -28,11 +31,12 @@ cui un database è fatto.
 ### Le tabelle che ci sono
 
 `account` · `identita` · `dispositivo` · `artista` · `bot_stato` · `carriera` · `stagione`
-· `settimana` · `punteggio_settimana` · `classifica_posizione` · `notizia` · `relazione` ·
-`traguardo` · `artista_traguardo` · `sospetto` · `sanzione` · `acquisto` · `stato`
+· `settimana` · `punteggio_settimana` · `classifica_posizione` · `albo` · `notizia` ·
+`relazione` · `traguardo` · `artista_traguardo` · `sospetto` · `sanzione` ·
+`segnalazione` · `acquisto` · `stato` (+ `migrazione`, che tiene il conto delle
+migrazioni applicate).
 
-Il dettaglio di ogni colonna, con i tipi, i vincoli e le tre query che contano, sta in
-**`schema.md`** (fuori da git). Qui basta sapere il perno del disegno:
+Il perno del disegno, da tenere a mente prima di leggere il resto:
 
 > **`artista.account_id` può essere NULL, e quelli sono i bot.** Tutto il resto pende
 > dall'artista, non dall'account, così un bot ha esattamente la forma di un giocatore vero
@@ -42,9 +46,390 @@ Il dettaglio di ogni colonna, con i tipi, i vincoli e le tre query che contano, 
 
 File `.sql` numerati in `migrazioni/`, applicati in ordine e una volta sola, ognuno dentro
 a una transazione; il conto lo tiene la tabella `migrazione`. Niente ORM, niente strumenti
-da installare: si aggiunge `002_qualcosa.sql` e riparte il server.
+da installare: si aggiunge `006_qualcosa.sql` e riparte il server.
 
-### Come si guarda dentro
+
+---
+
+## Lo schema, tabella per tabella
+
+Venti tabelle, più `migrazione` che tiene il conto. Tre cose valgono per tutte, e se non
+si sanno il resto sembra strano:
+
+- **Gli `id` sono testo**, non numeri: sono UUID fatti da Node (`crypto.randomUUID`). Le
+  tabelle che invece hanno un `id INTEGER` (`notizia`, `relazione`, `sospetto`,
+  `sanzione`, `segnalazione`, `stagione`) sono cose che nascono e muoiono solo sul
+  server, e lì un contatore va benissimo.
+- **I tempi sono interi in millisecondi** (`Date.now()`), non date. In Beekeeper si
+  leggono con `datetime(creato/1000,'unixepoch','localtime')` — vedi
+  [più sotto](#i-tempi-sono-numeri-non-date).
+- **I sì/no sono `INTEGER` 0/1**: SQLite non ha il booleano.
+
+### Le relazioni, in un colpo d'occhio
+
+```mermaid
+erDiagram
+  account   ||--o{ identita     : "con che cosa entri"
+  account   ||--o{ dispositivo  : "da dove giochi"
+  account   ||--o{ carriera     : "i 3 slot in cloud"
+  account   ||--o{ sanzione     : "se ha imbrogliato"
+  account   ||--o{ acquisto     : "quando ci saranno"
+  account   ||--o{ artista      : "NULL = e un bot"
+  artista   ||--o| bot_stato    : "solo i bot"
+  artista   ||--o{ punteggio_settimana : "uno a settimana"
+  artista   ||--o{ classifica_posizione : "la fotografia"
+  artista   ||--o{ artista_traguardo : "quali ha preso"
+  artista   ||--o{ relazione    : "rivali, feat"
+  artista   ||--o{ segnalazione : "chi lo ha segnalato"
+  artista   ||--o{ sospetto     : "indizi, non condanne"
+  artista   ||--o{ albo         : "chi ha chiuso in cima"
+  stagione  ||--o{ settimana    : "il tempo del mondo"
+  settimana ||--o{ punteggio_settimana : "cosa ha mandato"
+  settimana ||--o{ classifica_posizione : "com era messo"
+  settimana ||--o{ notizia      : "cosa si e detto"
+  traguardo ||--o{ artista_traguardo : "l elenco"
+```
+
+### Chi sei
+
+#### `account` — una persona
+
+| colonna | tipo | cosa c'è dentro |
+| --- | --- | --- |
+| `id` | TEXT **PK** | UUID |
+| `email` | TEXT | può mancare: si gioca anche da ospite |
+| `email_confermata` | INTEGER | 0/1 |
+| `stato` | TEXT | `attivo` · `sospeso` · `cancellato` |
+| `lingua` | TEXT | `it` di default |
+| `paese` | TEXT | |
+| `creato` `visto` | INTEGER | millisecondi |
+| `cancellato` | INTEGER | quando è stato cancellato; `NULL` = è vivo |
+
+L'unicità della mail non guarda maiuscole e minuscole, e vale solo dove la mail c'è
+(`CREATE UNIQUE INDEX … ON (lower(email)) WHERE email IS NOT NULL`).
+
+#### `identita` — con che cosa entri
+
+| colonna | tipo | cosa c'è dentro |
+| --- | --- | --- |
+| `id` | TEXT **PK** | |
+| `account_id` | TEXT → `account` | cancella a cascata |
+| `tipo` | TEXT | `steam` · `apple` · `google` · `email` · `ospite` |
+| `id_esterno` | TEXT | l'id da loro, o la mail |
+| `segreto_hash` | TEXT | **hash**, mai la password |
+| `creato` `usato` | INTEGER | |
+
+`UNIQUE (tipo, id_esterno)`: uno Steam solo per un account solo. Steam, Apple e Google
+hanno già la colonna ma non ancora il codice che verifica il biglietto firmato da loro:
+il server risponde `501` — porta chiusa, non porta finta.
+
+#### `dispositivo` — da dove giochi
+
+Una riga per sessione aperta. `token_hash` è l'**hash** del gettone: se qualcuno legge il
+database non entra in nessun account. `revocato` non NULL = quella sessione è chiusa.
+
+| colonna | tipo | cosa c'è dentro |
+| --- | --- | --- |
+| `id` | TEXT **PK** | |
+| `account_id` | TEXT → `account` | |
+| `piattaforma` | TEXT | `windows` · `mac` · `linux` · `ios` · `android` · `web` |
+| `nome` `versione_gioco` | TEXT | |
+| `token_hash` | TEXT | unico |
+| `creato` `visto` `revocato` | INTEGER | |
+
+### Chi c'è in classifica
+
+#### `artista` — la tabella centrale
+
+| colonna | tipo | cosa c'è dentro |
+| --- | --- | --- |
+| `id` | TEXT **PK** | |
+| `account_id` | TEXT → `account` | **`NULL` = è un bot** |
+| `bot` | INTEGER | 0/1, e un `CHECK` dice che se `bot=1` l'account è `NULL` |
+| `nome` | TEXT | fra 2 e 22 caratteri, unico fra i non ritirati senza guardare maiuscole |
+| `citta` `genere` `storia` | TEXT | |
+| `seed` | INTEGER | il seme con cui si ridisegna sempre uguale |
+| `stream` `fan` | INTEGER | i due numeri della classifica, mai negativi |
+| `livello` `fase` `uscite` `deal` | INTEGER | a che punto è della carriera |
+| `ultima_titolo` `ultima_seed` | TEXT, INTEGER | l'ultima uscita |
+| `chiave_hash` | TEXT | solo per i client vecchi, quelli di prima degli account |
+| `creato` | INTEGER | |
+| `punteggio` | INTEGER | quando ha mandato l'ultimo punteggio; `NULL` = mai |
+| `ritirato` | INTEGER | `NULL` = è in classifica |
+| `nome_prima` | TEXT | com'era chiamato, se il nome è stato cambiato d'ufficio (mig. 002) |
+| `fuori` | INTEGER | 0/1, sanzionato: fuori dalla classifica (mig. 004) |
+
+`fuori` è la sola colonna **ricavata** di tutto lo schema: è il riassunto di `sanzione`,
+aggiornato a mano quando una sanzione si mette o scade. È nata perché un `NOT EXISTS`
+sulle sanzioni non si può leggere da un indice, e a ventimila artisti la classifica
+costava 110 ms invece di 1,5 (mig. 004).
+
+#### `bot_stato` — le rotelle dei soli bot
+
+`artista_id` **PK** → `artista` · `slancio` REAL · `caldo` INTEGER ·
+`carattere` (`normale` · `costante` · `esplosivo` · `meteora`).
+Sta fuori da `artista` perché un giocatore vero queste cose non le ha.
+
+### Il salvataggio in cloud
+
+#### `carriera` — tre slot per account
+
+| colonna | tipo | cosa c'è dentro |
+| --- | --- | --- |
+| `id` | TEXT **PK** | |
+| `account_id` | TEXT → `account` | |
+| `artista_id` | TEXT → `artista` | |
+| `slot` | INTEGER | 1, 2 o 3 — `UNIQUE (account_id, slot)` |
+| `stato` | TEXT | **il salvataggio intero, JSON in una colonna** |
+| `versione_stato` | INTEGER | la forma del JSON, per leggere anche i salvataggi vecchi |
+| `versione_gioco` | TEXT | |
+| `settimana_gioco` `anno_gioco` | INTEGER | per mostrare la carriera senza aprire il JSON |
+| `byte` | INTEGER | quanto pesa: serve a metterci un tetto |
+| `creato` `aggiornato` | INTEGER | |
+
+### Il tempo del mondo
+
+#### `stagione`
+
+`id` INTEGER **PK** · `nome` · `inizio` · `fine` · `stato` (`corrente` · `chiusa`).
+
+#### `settimana`
+
+`numero` INTEGER **PK** — è il numero della settimana, non un id · `stagione_id` ·
+`iniziata` · `chiusa` · `artisti` · `giocatori` (quanti c'erano a quel giro).
+
+### Lo storico
+
+#### `punteggio_settimana` — quello che ha mandato ognuno, ogni settimana
+
+**PK `(artista_id, settimana)`**: un punteggio a testa a settimana. Il secondo invio della
+stessa settimana **aggiorna**, non aggiunge.
+
+| colonna | cosa c'è dentro |
+| --- | --- |
+| `stream` `fan` `livello` `fase` `uscite` `deal` | quello che ha dichiarato |
+| `limato` | 0/1: `plausibilita.js` ha tagliato il numero perché era troppo alto |
+| `origine` | `client` · `server` · `rettifica` |
+| `ip_hash` | **hash**, non l'IP |
+| `inviato` | quando |
+
+#### `classifica_posizione` — la fotografia del «prima»
+
+**PK `(settimana, artista_id)`** · `pos` · `stream` · `delta`.
+Da qui escono le frecce ▲▼. **Si scrive solo nel giro di settimana**: se la si tocca
+fuori da lì, le frecce si azzerano e nessuno capisce più chi sta salendo.
+
+#### `albo` — chi ha chiuso una stagione in cima (mig. 003)
+
+**PK `(stagione_id, pos)`** · `artista_id` · `nome` `citta` `genere` — **com'erano
+allora**: se poi cambia nome, l'albo non cambia · `stream` · `chiusa`.
+
+### Quello che gira
+
+#### `notizia`
+
+`id` · `settimana` · `artista_id` (può mancare) · `tipo` (`uscita` · `firma` ·
+`sparizione` · `ingresso` · `ritiro` · `rivalita` · `traguardo`) · `testo` · `creato`.
+È quello che il telefono legge con `GET /api/feed`.
+
+#### `relazione`
+
+`artista_id` + `altro_id` + `tipo` (`rivale` · `feat` · `amico` · `crew`), unici insieme ·
+`grado` da 1 a 6 · `da_settimana` · `nota`. Un artista non può essere in relazione con sé
+stesso: c'è un `CHECK`.
+
+### I traguardi
+
+#### `traguardo` — l'elenco
+
+`codice` TEXT **PK** · `nome` · `descrizione` · `nascosto` ·
+`codice_steam` `codice_ios` `codice_android`: come si chiama lo stesso traguardo da loro.
+
+#### `artista_traguardo` — chi l'ha preso
+
+**PK `(artista_id, codice)`** · `settimana` · `ottenuto` · `spinto` (quando è stato
+mandato allo store; `NULL` = ancora da mandare, e c'è un indice apposta per trovarli).
+
+### L'anti-imbroglio e la moderazione
+
+#### `sospetto`
+
+`artista_id` · `tipo` (`salto` · `frequenza` · `impossibile` · `doppione`) · `dettaglio`
+(JSON) · `peso` · `creato`. Li segna `plausibilita.js`: sono indizi, non condanne.
+
+#### `sanzione`
+
+`account_id` · `tipo` (`avviso` · `fuori_classifica` · `sospensione`) · `motivo` · `da` ·
+`a` (`NULL` = per sempre) · `deciso_da` (`automatico`, o chi l'ha decisa).
+Quando si mette o scade, va aggiornata anche `artista.fuori`.
+
+#### `segnalazione` (mig. 002)
+
+`artista_id` · `account_id` (chi ha segnalato) · `motivo` (`nome` · `storia` ·
+`imbroglio` · `altro`) · `nota` · `stato` (`aperta` · `accolta` · `respinta`) · `creato` ·
+`chiusa`. `UNIQUE (artista_id, account_id, motivo)`: una segnalazione a testa, non dieci.
+Esiste perché sugli store un nome d'arte è contenuto scritto da un utente e mostrato ad
+altri utenti, e Apple e Google chiedono che ci sia un modo per segnalarlo.
+
+### Il resto
+
+#### `acquisto`
+
+`account_id` · `negozio` (`steam` · `apple` · `google`) · `id_esterno` (unico insieme al
+negozio) · `prodotto` · `centesimi` · `valuta` · `stato` (`pagato` · `rimborsato` ·
+`contestato`) · `ricevuta`. C'è per quando servirà; adesso è vuota.
+
+#### `stato` — due colonne, `chiave` e `valore`
+
+Le manopole del mondo. Adesso dentro c'è `prossimo_giro`: quando scatta il prossimo giro
+di settimana, in millisecondi.
+
+#### `migrazione`
+
+`nome` **PK** · `applicata`. La tiene `db.js`: se un file `.sql` è qui dentro, non si
+riapplica. **Non toccarla a mano**: togliere una riga vuol dire far girare due volte una
+migrazione, e la seconda volta fallisce a metà.
+
+---
+
+## Guardarlo con Beekeeper Studio
+
+Beekeeper apre SQLite senza installare niente d'altro: non c'è un server a cui
+collegarsi, si sceglie **il file** e basta.
+
+### Collegarsi, la prima volta
+
+1. **New Connection** (o il `+` in alto a sinistra).
+2. Nel menù del tipo di connessione scegli **SQLite**.
+3. In **Database File** premi **Choose file** e prendi:
+
+   ```
+   C:\Users\madel\gioco-rap\backend\database\dati\classifica.db
+   ```
+
+   Dalla cartella del progetto è `backend/database/dati/classifica.db`.
+4. **Connect**. Per ritrovarla domani, prima **Save**, e chiamala
+   «Anni di Fame — classifica»: resta nell'elenco a sinistra.
+
+**Se il file non c'è**: la cartella `dati/` sta fuori da git, quindi su una macchina nuova
+non esiste. Fai partire il server una volta (`npm start` dentro a `backend/`) e se lo crea
+da sé, migrazioni comprese.
+
+### Tre cose da sapere prima di toccare qualcosa
+
+**Il file non è uno solo.** Accanto a `classifica.db` ci sono `classifica.db-wal` e
+`classifica.db-shm`: è il WAL, e **le scritture più recenti stanno lì dentro**, non ancora
+nel `.db`. Beekeeper li legge insieme senza che tu faccia niente — ma se copi il database
+per portartelo via, **copiare solo il `.db` ti dà dati vecchi**. Per una copia giusta:
+
+```bash
+npm run copia      # → dati/copie/classifica-2026-09-01.db: un file solo, coerente
+```
+
+Quella copia si apre in Beekeeper come l'originale, e si fa **a server acceso**.
+
+**A server acceso si legge tranquillamente**, si scrive con giudizio. SQLite in WAL regge
+un solo scrittore alla volta: se il server sta scrivendo mentre premi Save su una riga,
+Beekeeper dice `database is locked`. Non è rotto niente, si riprova. Se devi frugare per
+bene, o provare una `UPDATE`, fai prima `npm run copia` e apri **la copia**.
+
+<a name="le-chiavi-esterne"></a>
+**Le chiavi esterne, in SQLite, sono spente su ogni connessione nuova.** Il server le
+accende da sé (`PRAGMA foreign_keys = ON`, in `db.js`), ma la connessione di Beekeeper è
+un'altra: se cancelli un `account` dalla tabella senza averle accese, **le righe attaccate
+non se ne vanno** e ti resta un database mezzo rotto. Prima di modificare qualcosa a mano,
+apri una scheda query e lancia:
+
+```sql
+PRAGMA foreign_keys = ON;
+```
+
+Va rifatto a ogni riconnessione. In generale: **per cancellare un account usa la rotta del
+server**, che fa la cosa completa dentro a una transazione. Beekeeper serve per guardare.
+
+<a name="i-tempi-sono-numeri-non-date"></a>
+### I tempi sono numeri, non date
+
+Tutte le colonne `creato`, `visto`, `inviato`, `ottenuto`… sono millisecondi
+(`Date.now()`), e in Beekeeper appaiono come `1788214583393`. Per leggerli:
+
+```sql
+SELECT nome,
+       datetime(creato / 1000, 'unixepoch', 'localtime') AS quando
+FROM artista
+ORDER BY creato DESC
+LIMIT 20;
+```
+
+E al contrario, per chiedere «da ieri in poi»:
+
+```sql
+SELECT * FROM notizia
+WHERE creato > (strftime('%s','now','-1 day') * 1000);
+```
+
+### Quattro query da incollare
+
+**Chi comanda.** La posizione non è una colonna — si calcola, così non può mentire:
+
+```sql
+SELECT row_number() OVER (ORDER BY stream DESC, creato) AS pos,
+       nome, citta, genere, stream, fan,
+       CASE bot WHEN 1 THEN 'bot' ELSE 'giocatore' END AS chi
+FROM artista
+WHERE ritirato IS NULL AND fuori = 0
+ORDER BY stream DESC, creato
+LIMIT 30;
+```
+
+**Solo le persone vere.** Sono poche, ed è quello che di solito interessa guardare:
+
+```sql
+SELECT a.nome, a.citta, a.stream, a.fan,
+       datetime(a.punteggio / 1000,'unixepoch','localtime') AS ultimo_invio
+FROM artista a
+WHERE a.bot = 0 AND a.ritirato IS NULL
+ORDER BY a.stream DESC;
+```
+
+**Com'è andata l'ultima settimana.** `delta` è di quante posizioni si è mosso rispetto
+alla fotografia di prima:
+
+```sql
+SELECT c.pos, a.nome, c.stream, c.delta
+FROM classifica_posizione c
+JOIN artista a ON a.id = c.artista_id
+WHERE c.settimana = (SELECT max(numero) FROM settimana)
+ORDER BY c.pos
+LIMIT 40;
+```
+
+**Le segnalazioni da guardare**:
+
+```sql
+SELECT s.id, a.nome, s.motivo, s.nota,
+       datetime(s.creato/1000,'unixepoch','localtime') AS quando
+FROM segnalazione s
+JOIN artista a ON a.id = s.artista_id
+WHERE s.stato = 'aperta'
+ORDER BY s.creato DESC;
+```
+
+### Quello che da Beekeeper è meglio **non** modificare a mano
+
+1. **`migrazione`** — togliere una riga fa rigirare una migrazione già fatta, e la seconda
+   volta si rompe a metà.
+2. **`classifica_posizione`** — è la fotografia del «prima»: se la tocchi, le frecce ▲▼
+   smettono di dire la verità (è la regola 4 qui sotto).
+3. **`artista.fuori`** senza toccare anche `sanzione`, o viceversa — sono la stessa cosa
+   scritta due volte per andare veloci: se si scollano, uno è sanzionato e l'altro no.
+4. **Le colonne `*_hash`** (`token_hash`, `segreto_hash`, `chiave_hash`, `ip_hash`) — sono
+   hash, non testo: riscriverle a mano non «cambia la password», butta fuori la persona.
+5. **Cancellare un `account`** — usa la rotta del server. Da Beekeeper, senza
+   [`PRAGMA foreign_keys = ON`](#le-chiavi-esterne), lasci in giro artisti, carriere e
+   dispositivi orfani.
+
+### Se preferisci la riga di comando
 
 ```bash
 sqlite3 dati/classifica.db "SELECT nome, stream, bot FROM artista ORDER BY stream DESC LIMIT 10;"
