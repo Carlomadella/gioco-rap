@@ -215,6 +215,7 @@ function stradaCapienza(){
 }
 function stradaRipulisci(){
   const s = G.strada;
+  if(s.arresto) return "Sei in carcere: non puoi ripulire i soldi finché non esci.";
   if(s.sporchi <= 0) return "Non hai soldi sporchi da ripulire.";
   const importo = Math.min(s.sporchi, stradaCapienza());
   const soglia = 400;
@@ -413,38 +414,35 @@ function stradaOpp(){
    locali (punto 33), altrimenti a gioco installato non si vedono. */
 const STRADA_SFONDI = [
   "media/pagina-attivita-criminali/pagina-attivita-01.jpg",
-  "media/pagina-attivita-criminali/pagina-attivita-02",
-  "media/pagina-attivita-criminali/pagina-attivita-03",
-  "media/pagina-attivita-criminali/pagina-attivita-04",
-  "media/pagina-attivita-criminali/pagina-attivita-05",
-  "media/pagina-attivita-criminali/pagina-attivita-06",
-  "media/pagina-attivita-criminali/pagina-attivita-07",
-  "media/pagina-attivita-criminali/pagina-attivita-08",
-  "media/pagina-attivita-criminali/pagina-attivita-09",
-  "media/pagina-attivita-criminali/pagina-attivita-10",
-  "media/pagina-attivita-criminali/pagina-attivita-11",
-  "media/pagina-attivita-criminali/pagina-attivita-12",
-  "media/pagina-attivita-criminali/pagina-attivita-13",
-  "media/pagina-attivita-criminali/pagina-attivita-14",
-  "media/pagina-attivita-criminali/pagina-attivita-15",
-  "media/pagina-attivita-criminali/pagina-attivita-16",
-  "media/pagina-attivita-criminali/pagina-attivita-17",
-  "media/pagina-attivita-criminali/pagina-attivita-18",
-  "media/pagina-attivita-criminali/pagina-attivita-19",
-  "media/pagina-attivita-criminali/pagina-attivita-20",
-  "media/pagina-attivita-criminali/pagina-attivita-21",
-  "media/pagina-attivita-criminali/pagina-attivita-22",
-  "media/pagina-attivita-criminali/pagina-attivita-23",
-  "media/pagina-attivita-criminali/pagina-attivita-24",
-  "media/pagina-attivita-criminali/pagina-attivita-25",
-  "media/pagina-attivita-criminali/pagina-attivita-26",
-  "media/pagina-attivita-criminali/pagina-attivita-27",
-  "media/pagina-attivita-criminali/pagina-attivita-28",
-  "media/pagina-attivita-criminali/pagina-attivita-29",
-  "media/pagina-attivita-criminali/pagina-attivita-30",
-  "media/pagina-attivita-criminali/pagina-attivita-31",
-  "media/pagina-attivita-criminali/pagina-attivita-32",
-  "media/pagina-attivita-criminali/pagina-attivita-33"
+  "media/pagina-attivita-criminali/pagina-attivita-02.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-03.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-04.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-05.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-06.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-07.png",
+  "media/pagina-attivita-criminali/pagina-attivita-08.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-09.png",
+  "media/pagina-attivita-criminali/pagina-attivita-10.png",
+  "media/pagina-attivita-criminali/pagina-attivita-11.png",
+  "media/pagina-attivita-criminali/pagina-attivita-12.png",
+  "media/pagina-attivita-criminali/pagina-attivita-13.png",
+  "media/pagina-attivita-criminali/pagina-attivita-14.png",
+  "media/pagina-attivita-criminali/pagina-attivita-15.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-16.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-17.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-18.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-19.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-20.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-21.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-22.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-23.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-24.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-25.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-26.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-27.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-28.png",
+  "media/pagina-attivita-criminali/pagina-attivita-29.jpg",
+  "media/pagina-attivita-criminali/pagina-attivita-30.jpg"
 ];
 const STRADA_SFONDO_MS = 15000;
 let ST_SFONDO = 0, ST_STRATO = 0, ST_GIRO = null;
@@ -541,8 +539,9 @@ function renderStBarre(){
 
   $("st-sporchi").textContent = fmt(s.sporchi) + " €";
   const rip = $("st-ripulisci");
-  rip.textContent = "Ripulisci fino a " + fmt(stradaCapienza()) + " €";
-  rip.classList.toggle("no", s.sporchi <= 0);
+  rip.textContent = s.arresto ? "In carcere: nessuna ripulitura" : "Ripulisci fino a " + fmt(stradaCapienza()) + " €";
+  rip.classList.toggle("no", s.sporchi <= 0 || !!s.arresto);
+  rip.disabled = !!s.arresto;
 
   $("st-repn").textContent = Math.round(s.rep);
   $("st-repbar").style.width = clamp(s.rep, 0, 100) + "%";
@@ -705,7 +704,11 @@ $("st-modal").addEventListener("click", ev => {
   save(); renderStrada(); renderGioco();
 });
 
-$("st-ripulisci").onclick = () => { hubTap(); stToast(stradaRipulisci()); };
+$("st-ripulisci").onclick = () => {
+  hubTap();
+  if(G.strada.arresto){ stToast("Sei in carcere: non puoi ripulire i soldi finché non esci."); return; }
+  stToast(stradaRipulisci());
+};
 
 $("st-tab-copre").addEventListener("click", ev => {
   const uomo = ev.target.closest("[data-stuomo]");

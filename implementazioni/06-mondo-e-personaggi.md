@@ -60,6 +60,24 @@ incontri per strada — da cui il nome nuovo, per non perdere né l'uno né l'al
   **Non copre ancora**, di proposito: i colpi di Milano e Los Angeles, il casinò, il blocco delle
   altre azioni del gioco mentre sei dentro, i contatti criminali nella rubrica (che non esiste).
 
+**FATTO (01/09/2026) — la schermata è quella del prototipo `attivita-criminali-crime-v8.html`.**
+Il foglio scuro con le sezioni una sotto l'altra è diventato una scena: fascia in alto con la città,
+la settimana e l'ora; tre pannelli — a sinistra i tuoi numeri (soldi sporchi e «ripulisci»,
+reputazione, attenzione, energia, contanti, precedenti, occhi addosso), al centro i quattro colpi a
+griglia sopra al titolo, a destra le due linguette «Chi ti copre» e «Attività»; in basso le tre città
+e il tasto per tornare alla mappa. Dietro, trenta immagini che si danno il cambio ogni quindici
+secondi, con la stessa lavorazione della landing.
+- **Le regole di gioco non sono cambiate**: numeri, probabilità, pene, settimana, tutto quello che
+  c'era resta identico. È cambiato solo come si vede e come si tocca.
+- Le scelte del colpo e gli esiti stanno in una **scheda dentro alla schermata** (non `showEvent`,
+  che finirebbe sotto), con i tre approcci a carte e le percentuali vere sotto a ognuno.
+- Le cose piccole (ripulire, prendere un uomo, il ferro, rilevare un'attività) rispondono con **una
+  riga in basso** che dice com'è andata o perché no, invece di non dire niente.
+- Città chiusa: i suoi colpi si vedono spenti col cartello di dove si apre. Dentro: al posto della
+  griglia, le settimane che restano.
+- **Da fare prima degli store**: le trenta immagini del fondale arrivano ancora da un CDN, vanno
+  scaricate in `media/photo/` (punto 33), se no a gioco installato non si vedono.
+
 ---
 
 ## Il beat maker diventa un posto: La Sala

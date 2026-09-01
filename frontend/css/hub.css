@@ -11,135 +11,507 @@
    della mappa mantiene le sue proporzioni, così le zone da toccare restano
    incollate ai cartelli disegnati dentro. */
 
-#s-hub{padding-top:0}
-body.in-hub .topnav{display:none}
+#s-hub {
+  padding-top: 0;
+}
+body.in-hub .topnav {
+  display: none;
+}
 
-.palco{position:fixed;inset:0;overflow:hidden;background:#05070B}
-.plancia{position:relative;width:100%;height:100%;background:#05070B;color:#E8EAF0;
-  font-family:"Figtree",system-ui,sans-serif;
-  display:grid;gap:8px;padding:0 8px 0;
+.palco {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #05070b;
+}
+.plancia {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #05070b;
+  color: #e8eaf0;
+  font-family: "Figtree", system-ui, sans-serif;
+  display: grid;
+  gap: 8px;
+  padding: 0 8px 0;
   /* le righe fisse si stringono un po' sugli schermi bassi, così la città —
      che è la cosa per cui si sta qui — non resta mai schiacciata */
-  grid-template-columns:minmax(320px,.85fr) minmax(0,2.3fr) minmax(310px,.85fr);
-  grid-template-rows:clamp(66px,9.5vh,86px) minmax(0,1fr) clamp(32px,5vh,44px);
+  grid-template-columns: minmax(320px, 0.85fr) minmax(0, 2.3fr) minmax(
+      310px,
+      0.85fr
+    );
+  grid-template-rows: clamp(66px, 9.5vh, 86px) minmax(0, 1fr) clamp(
+      32px,
+      5vh,
+      44px
+    );
   grid-template-areas:
     "barra  barra   barra"
     "sx     centro  tel"
-    "sugg   sugg    sugg"}
+    "sugg   sugg    sugg";
+}
 
 /* Le due colonne hanno ingombri diversi, come nel concept: a sinistra il
    profilo è alto e le linguette stanno in fondo, al centro la città è alta e
    gli eventi stanno sotto. */
-.pcolsx,.pcolcentro{min-width:0;min-height:0;display:grid;gap:8px}
-.pcolsx{grid-area:sx;grid-template-rows:minmax(0,1fr) auto}
-.pcolcentro{grid-area:centro;grid-template-rows:minmax(0,1fr) auto}
+.pcolsx,
+.pcolcentro {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  gap: 8px;
+}
+.pcolsx {
+  grid-area: sx;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+.pcolcentro {
+  grid-area: centro;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
 
 /* ---- pezzi comuni ---- */
-.pcard{position:relative;min-width:0;min-height:0;
-  background:linear-gradient(180deg,#0C0F16,#090C12);
-  border:1px solid rgba(255,255,255,.07);border-radius:12px}
-.ptit{display:block;font-size:13px;font-weight:700;letter-spacing:.12em;
-  text-transform:uppercase;color:#C9CEDA}
-.pk{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#727A8C}
-.hicon{width:18px;height:18px;display:block;fill:currentColor}
+.pcard {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  background: linear-gradient(180deg, #0c0f16, #090c12);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+}
+.ptit {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #c9ceda;
+}
+.pk {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #727a8c;
+}
+.hicon {
+  width: 18px;
+  height: 18px;
+  display: block;
+  fill: currentColor;
+}
 
 /* ================= FASCIA IN ALTO ================= */
-.pbarra{grid-area:barra;margin:0 -8px;display:flex;
-  align-items:stretch;background:linear-gradient(180deg,#0C1017,#080B11);
-  border-bottom:1px solid rgba(255,255,255,.08)}
+.pbarra {
+  grid-area: barra;
+  margin: 0 -8px;
+  display: flex;
+  align-items: stretch;
+  background: linear-gradient(180deg, #0c1017, #080b11);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
 
-.plogo{width:132px;flex:none;display:flex;align-items:center;justify-content:center;gap:6px;
-  transition:background .15s}
-.plogo:hover{background:rgba(255,255,255,.05)}
-.plogo span{display:flex;flex-direction:column;line-height:.82;text-align:left;
-  font-family:var(--disp);font-style:italic;letter-spacing:-.02em}
-.plogo b{font-size:15px;font-weight:400;color:#FFD34E;text-shadow:0 2px 0 #B0700A}
-.plogo i{font-size:25px;font-style:italic;color:#FFA92B;text-shadow:0 2px 0 #8E4A05}
-.hcrown{width:20px;height:20px;fill:#FFD34E;transform:rotate(-12deg)}
+.plogo {
+  width: 132px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.15s;
+}
+.plogo:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+.plogo span {
+  display: flex;
+  flex-direction: column;
+  line-height: 0.82;
+  text-align: left;
+  font-family: var(--disp);
+  font-style: italic;
+  letter-spacing: -0.02em;
+}
+.plogo b {
+  font-size: 15px;
+  font-weight: 400;
+  color: #ffd34e;
+  text-shadow: 0 2px 0 #b0700a;
+}
+.plogo i {
+  font-size: 25px;
+  font-style: italic;
+  color: #ffa92b;
+  text-shadow: 0 2px 0 #8e4a05;
+}
+.hcrown {
+  width: 20px;
+  height: 20px;
+  fill: #ffd34e;
+  transform: rotate(-12deg);
+}
 
-.pcitta{width:206px;flex:none;display:flex;flex-direction:column;justify-content:center;gap:3px;
-  padding-left:18px;border-left:1px solid rgba(255,255,255,.08)}
-.pcn{font-size:17px;font-weight:700;color:#C084FC;letter-spacing:.01em}
-.pcf{font-size:11px;color:#7B8395;letter-spacing:.02em}
-.pcf b{color:#E8EAF0;font-weight:700}
+.pcitta {
+  width: 206px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding-left: 18px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+.pcn {
+  font-size: 17px;
+  font-weight: 700;
+  color: #c084fc;
+  letter-spacing: 0.01em;
+}
+.pcf {
+  font-size: 11px;
+  color: #7b8395;
+  letter-spacing: 0.02em;
+}
+.pcf b {
+  color: #e8eaf0;
+  font-weight: 700;
+}
 
-.pstat{flex:1;display:flex;align-items:stretch}
-.ps{flex:1;display:flex;align-items:center;gap:10px;padding:0 6px 0 16px;
-  border-left:1px solid rgba(255,255,255,.07)}
-.ps .hicon{width:22px;height:22px;flex:none;fill:var(--k)}
-.ps .pv{font-size:16px;font-weight:600;color:#F1F3F8;font-variant-numeric:tabular-nums;
-  margin-top:2px;white-space:nowrap}
-.ps .pbar{display:block;width:104px;height:5px;margin-top:6px;border-radius:3px;
-  background:rgba(255,255,255,.12)}
-.ps .pbar i{display:block;height:100%;border-radius:3px;background:var(--k)}
+.pstat {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+}
+.ps {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 6px 0 16px;
+  border-left: 1px solid rgba(255, 255, 255, 0.07);
+}
+.ps .hicon {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  fill: var(--k);
+}
+.ps .pv {
+  font-size: 16px;
+  font-weight: 600;
+  color: #f1f3f8;
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+.ps .pbar {
+  display: block;
+  width: 104px;
+  height: 5px;
+  margin-top: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.ps .pbar i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--k);
+}
 
-.psett{width:132px;flex:none;display:flex;flex-direction:column;justify-content:center;gap:3px;
-  padding-left:18px;border-left:1px solid rgba(255,255,255,.08)}
-.psett .pk b{color:#E8EAF0;font-size:11px}
-.pcn2{font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.pora{width:150px;flex:none;display:flex;align-items:center;justify-content:center;gap:10px;
-  font-size:21px;font-weight:600;color:#E8EAF0;font-variant-numeric:tabular-nums}
-.pora .hicon{width:22px;height:22px;fill:#C9CEDA}
+.psett {
+  width: 132px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding-left: 18px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+.psett .pk b {
+  color: #e8eaf0;
+  font-size: 11px;
+}
+.pcn2 {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.pora {
+  width: 150px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 21px;
+  font-weight: 600;
+  color: #e8eaf0;
+  font-variant-numeric: tabular-nums;
+}
+.pora .hicon {
+  width: 22px;
+  height: 22px;
+  fill: #c9ceda;
+}
 
 /* ================= COLONNA DI SINISTRA ================= */
 /* Il profilo: se lo schermo è basso non si taglia, si scorre. Meglio una
    barretta di scorrimento che un livello che sparisce. */
-.psx{padding:14px 14px 10px;display:flex;flex-direction:column;
-  overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;
-  scrollbar-color:rgba(255,255,255,.18) transparent}
-.psx::-webkit-scrollbar{width:6px}
-.psx::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:3px}
-.psxtab{height:104px;display:flex;align-items:center;gap:6px;padding:10px}
+.psx {
+  padding: 14px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+.psx::-webkit-scrollbar {
+  width: 6px;
+}
+.psx::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 3px;
+}
+.psxtab {
+  height: 104px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+}
 
-.pface{display:flex;gap:14px;margin-top:12px}
-.pport{width:126px;height:150px;flex:none;border-radius:10px;overflow:hidden;
-  background:linear-gradient(180deg,#241C33,#12101B);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
-.pport svg{width:100%;height:100%;display:block}
-.pwho{flex:1;min-width:0;padding-top:4px}
-.pnome{display:flex;align-items:center;gap:6px;font-size:17px;font-weight:800;
-  letter-spacing:.02em;text-transform:uppercase}
-.pnome .hicon{width:14px;height:14px;fill:#A855F7}
-.plv{margin-top:6px;font-size:15px;font-weight:700;color:#C084FC}
-.pgrado{font-size:14px;font-weight:700;color:#A855F7;text-transform:uppercase;letter-spacing:.04em}
-.pxp{margin-top:14px;display:flex;justify-content:space-between;font-size:11px;color:#8A90A0}
-.pxp b{color:#C9CEDA;font-weight:600}
-.pbar2{display:block;height:7px;margin-top:6px;border-radius:4px;background:#20232C}
-.pbar2 i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#7C3AED,#A855F7)}
+.pface {
+  display: flex;
+  gap: 14px;
+  margin-top: 12px;
+}
+.pport {
+  width: 126px;
+  height: 150px;
+  flex: none;
+  border-radius: 10px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #241c33, #12101b);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+.pport svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.pwho {
+  flex: 1;
+  min-width: 0;
+  padding-top: 4px;
+}
+.pnome {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.pnome .hicon {
+  width: 14px;
+  height: 14px;
+  fill: #a855f7;
+}
+.plv {
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #c084fc;
+}
+.pgrado {
+  font-size: 14px;
+  font-weight: 700;
+  color: #a855f7;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.pxp {
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #8a90a0;
+}
+.pxp b {
+  color: #c9ceda;
+  font-weight: 600;
+}
+.pbar2 {
+  display: block;
+  height: 7px;
+  margin-top: 6px;
+  border-radius: 4px;
+  background: #20232c;
+}
+.pbar2 i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #7c3aed, #a855f7);
+}
 
-.prighe{margin-top:16px;border-top:1px solid rgba(255,255,255,.06)}
-.prow{display:flex;align-items:center;gap:10px;height:28px;
-  border-bottom:1px solid rgba(255,255,255,.05);font-size:13.5px}
-.prow .hicon{width:17px;height:17px;flex:none;fill:var(--k,#8A90A0)}
-.prow .n{flex:1;color:#C9CEDA}
-.prow .v{font-weight:600;color:#F1F3F8;font-variant-numeric:tabular-nums}
-.prow .mini{width:88px;height:5px;border-radius:3px;background:#23262F}
-.prow .mini i{display:block;height:100%;border-radius:3px;background:var(--k,#EF4444)}
+.prighe {
+  margin-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.prow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 13.5px;
+}
+.prow .hicon {
+  width: 17px;
+  height: 17px;
+  flex: none;
+  fill: var(--k, #8a90a0);
+}
+.prow .n {
+  flex: 1;
+  color: #c9ceda;
+}
+.prow .v {
+  font-weight: 600;
+  color: #f1f3f8;
+  font-variant-numeric: tabular-nums;
+}
+.prow .mini {
+  width: 88px;
+  height: 5px;
+  border-radius: 3px;
+  background: #23262f;
+}
+.prow .mini i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--k, #ef4444);
+}
 
-.psk{margin-top:12px}
-.pskrow{display:flex;align-items:center;gap:9px;height:24px;font-size:12.5px;color:#C9CEDA}
-.pskrow .hicon{width:15px;height:15px;flex:none;fill:#8A90A0}
-.pskrow .n{width:86px}
-.pskrow .b{flex:1;height:6px;border-radius:3px;background:#23262F}
-.pskrow .b i{display:block;height:100%;border-radius:3px;background:#8B5CF6}
-.pskrow .v{width:28px;text-align:right;font-weight:600;color:#F1F3F8;font-variant-numeric:tabular-nums}
+.psk {
+  margin-top: 12px;
+}
+.pskrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 24px;
+  font-size: 12.5px;
+  color: #c9ceda;
+}
+.pskrow .hicon {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  fill: #8a90a0;
+}
+.pskrow .n {
+  width: 86px;
+}
+.pskrow .b {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: #23262f;
+}
+.pskrow .b i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: #8b5cf6;
+}
+.pskrow .v {
+  width: 28px;
+  text-align: right;
+  font-weight: 600;
+  color: #f1f3f8;
+  font-variant-numeric: tabular-nums;
+}
 
-.pdue{display:flex;margin-top:12px;border:1px solid rgba(255,255,255,.07);border-radius:9px;
-  overflow:hidden}
-.pdue > div{flex:1;padding:8px 12px}
-.pdue > div + div{border-left:1px solid rgba(255,255,255,.07)}
-.pdue .v{margin-top:3px;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.02em}
+.pdue {
+  display: flex;
+  margin-top: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 9px;
+  overflow: hidden;
+}
+.pdue > div {
+  flex: 1;
+  padding: 8px 12px;
+}
+.pdue > div + div {
+  border-left: 1px solid rgba(255, 255, 255, 0.07);
+}
+.pdue .v {
+  margin-top: 3px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
 
-.pnext{margin-top:10px;padding:9px 12px 11px;border:1px solid rgba(255,255,255,.07);
-  border-radius:9px}
-.pnexthead{display:flex;justify-content:space-between;align-items:center}
-.pnext .t{margin-top:3px;font-size:13px;color:#E8EAF0}
+.pnext {
+  margin-top: 10px;
+  padding: 9px 12px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 9px;
+}
+.pnexthead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pnext .t {
+  margin-top: 3px;
+  font-size: 13px;
+  color: #e8eaf0;
+}
 
-.ptab{flex:1;height:100%;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:7px;border-radius:10px;color:#8A90A0;transition:background .15s,color .15s}
-.ptab .hicon{width:26px;height:26px;fill:currentColor}
-.ptab span{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
-.ptab:hover{background:rgba(255,255,255,.05);color:#C9CEDA}
-.ptab.on{background:rgba(168,85,247,.16);color:#C084FC}
+.ptab {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 10px;
+  color: #8a90a0;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.ptab .hicon {
+  width: 26px;
+  height: 26px;
+  fill: currentColor;
+}
+.ptab span {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.ptab:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #c9ceda;
+}
+.ptab.on {
+  background: rgba(168, 85, 247, 0.16);
+  color: #c084fc;
+}
 
 /* ================= LA CITTÀ ================= */
 /* Il riquadro della mappa non si vede: quello che si vede è la foto. Sugli
@@ -150,72 +522,259 @@ body.in-hub .topnav{display:none}
    come lo sfondo ambientale di uno schermo — non è più un vuoto, è la stessa
    città che sfuma. La mappa vera, sopra, resta nitida e alla sua misura
    esatta: le zone da toccare restano incollate ai cartelli come sempre. */
-.pmappa{position:relative;padding:0;overflow:hidden;display:grid;place-items:center;
-  background:#05070B;border:0}
-.pmappa::before{content:"";position:absolute;inset:-40px;z-index:0;
-  background:url("../media/photo/schermate di gioco/mappa_citta.jpg") center/cover no-repeat;
-  filter:blur(46px) brightness(.38) saturate(1.15);transform:scale(1.12)}
+.pmappa {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: #05070b;
+  border: 0;
+}
+.pmappa::before {
+  content: "";
+  position: absolute;
+  inset: -40px;
+  z-index: 0;
+  background: url("../media/photo/pagina di gioco/mappa_citta.jpg") center/cover
+    no-repeat;
+  filter: blur(46px) brightness(0.38) saturate(1.15);
+  transform: scale(1.12);
+}
 /* La foto tiene le sue proporzioni (830×677) e prende tutto lo spazio che può:
    è quello che fa restare le zone da toccare esattamente sui cartelli. */
-.pfoto{position:relative;z-index:1;aspect-ratio:830/677;height:100%;width:auto;max-width:100%;
-  border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.07),0 18px 50px rgba(0,0,0,.5);
-  background:#0A0910 url("../media/photo/schermate di gioco/mappa_citta.jpg") center/100% 100% no-repeat}
-.ppins{position:absolute;inset:0}
-.pspot{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);
-  border-radius:10px;transition:background .15s,box-shadow .15s,transform .12s}
-.pspot:hover{background:rgba(255,255,255,.06);
-  box-shadow:inset 0 0 0 2px rgba(192,132,252,.9),0 0 26px rgba(168,85,247,.4)}
-.pspot:focus-visible{box-shadow:inset 0 0 0 2px var(--acid)}
-.pspot:active{transform:scale(.985)}
-.pspot.chiuso:hover{box-shadow:inset 0 0 0 2px rgba(255,255,255,.45)}
+.pfoto {
+  position: relative;
+  z-index: 1;
+  aspect-ratio: 830/677;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.07),
+    0 18px 50px rgba(0, 0, 0, 0.5);
+  background: #0a0910 url("../media/photo/pagina di gioco/mappa_citta.jpg")
+    center/100% 100% no-repeat;
+}
+.ppins {
+  position: absolute;
+  inset: 0;
+}
+.pspot {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: var(--h);
+  border-radius: 10px;
+  transition:
+    background 0.15s,
+    box-shadow 0.15s,
+    transform 0.12s;
+}
+.pspot:hover {
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 0 0 0 2px rgba(192, 132, 252, 0.9),
+    0 0 26px rgba(168, 85, 247, 0.4);
+}
+.pspot:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--acid);
+}
+.pspot:active {
+  transform: scale(0.985);
+}
+.pspot.chiuso:hover {
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.45);
+}
 /* il giro guidato dei luoghi, con le frecce «scorri per esplorare» */
-.pspot.qui{box-shadow:inset 0 0 0 2px rgba(192,132,252,.95),0 0 30px rgba(168,85,247,.5);
-  animation:pspulse 1.6s ease-in-out infinite}
-@keyframes pspulse{50%{box-shadow:inset 0 0 0 2px rgba(192,132,252,.5),0 0 12px rgba(168,85,247,.2)}}
-.pfrec{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);
-  border-radius:8px;transition:background .15s}
-.pfrec:hover{background:rgba(255,255,255,.12)}
+.pspot.qui {
+  box-shadow:
+    inset 0 0 0 2px rgba(192, 132, 252, 0.95),
+    0 0 30px rgba(168, 85, 247, 0.5);
+  animation: pspulse 1.6s ease-in-out infinite;
+}
+@keyframes pspulse {
+  50% {
+    box-shadow:
+      inset 0 0 0 2px rgba(192, 132, 252, 0.5),
+      0 0 12px rgba(168, 85, 247, 0.2);
+  }
+}
+.pfrec {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: var(--h);
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.pfrec:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
 
 /* ================= EVENTI DI OGGI ================= */
-.peventi{height:190px;padding:12px 14px}
-.pevrow{display:flex;gap:10px;margin-top:10px;height:139px}
-.pev{flex:1;min-width:0;display:flex;flex-direction:column;text-align:left;
-  padding:9px 10px 10px;border-radius:10px;overflow:hidden;
-  background:#0E1119;border:1px solid var(--k);transition:transform .12s,background .15s}
-.pev:hover{background:#141826;transform:translateY(-2px)}
-.pev:disabled{opacity:.5;transform:none;cursor:default}
-.pevt{display:flex;align-items:flex-start;gap:6px;font-size:10.5px;font-weight:800;line-height:1.1;
-  letter-spacing:.04em;text-transform:uppercase;color:var(--k)}
-.pevt .hicon{width:14px;height:14px;flex:none;margin-top:-1px}
-.pevd{margin-top:6px;font-size:11px;color:#C9CEDA;line-height:1.2}
-.pevl{margin-top:7px;display:flex;flex-direction:column;gap:4px}
-.pevl span{display:flex;align-items:center;gap:6px;font-size:10.5px;color:#9AA1B2;line-height:1.15}
-.pevl .hicon{width:14px;height:14px;flex:none;fill:#7B8395}
-.pevfoot{margin-top:auto;padding-top:7px;display:flex;align-items:center;
-  justify-content:space-between;gap:8px}
-.pevora{font-size:13px;font-weight:600;color:#C9CEDA;font-variant-numeric:tabular-nums}
-.pevgo{padding:6px 12px;border-radius:7px;background:var(--k);color:#0A0A0F;
-  font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
-.pev:disabled .pevgo{background:#2A2E3A;color:#8A90A0}
-.pevpiu{flex:0 0 96px;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:8px;padding:10px;border-radius:10px;border:1px dashed rgba(255,255,255,.18);
-  font-size:11.5px;color:#7B8395;text-align:center;line-height:1.35}
-.pevpiu b{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#8A90A0}
+.peventi {
+  height: 190px;
+  padding: 12px 14px;
+}
+.pevrow {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  height: 139px;
+}
+.pev {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  padding: 9px 10px 10px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0e1119;
+  border: 1px solid var(--k);
+  transition:
+    transform 0.12s,
+    background 0.15s;
+}
+.pev:hover {
+  background: #141826;
+  transform: translateY(-2px);
+}
+.pev:disabled {
+  opacity: 0.5;
+  transform: none;
+  cursor: default;
+}
+.pevt {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--k);
+}
+.pevt .hicon {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  margin-top: -1px;
+}
+.pevd {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #c9ceda;
+  line-height: 1.2;
+}
+.pevl {
+  margin-top: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pevl span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  color: #9aa1b2;
+  line-height: 1.15;
+}
+.pevl .hicon {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  fill: #7b8395;
+}
+.pevfoot {
+  margin-top: auto;
+  padding-top: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.pevora {
+  font-size: 13px;
+  font-weight: 600;
+  color: #c9ceda;
+  font-variant-numeric: tabular-nums;
+}
+.pevgo {
+  padding: 6px 12px;
+  border-radius: 7px;
+  background: var(--k);
+  color: #0a0a0f;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.pev:disabled .pevgo {
+  background: #2a2e3a;
+  color: #8a90a0;
+}
+.pevpiu {
+  flex: 0 0 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  font-size: 11.5px;
+  color: #7b8395;
+  text-align: center;
+  line-height: 1.35;
+}
+.pevpiu b {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8a90a0;
+}
 
 /* ================= IL TELEFONO ================= */
 /* Tutto il telefono — guscio, home, app, dock, widget — vive in css/telefono.css. */
 
 /* ================= RIGA DI FONDO ================= */
-.psugg{grid-area:sugg;margin:0 -8px;display:flex;
-  align-items:center;justify-content:center;font-size:13px;color:#8A90A0}
-.psugg b{color:#C9CEDA;font-weight:600}
+.psugg {
+  grid-area: sugg;
+  margin: 0 -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #8a90a0;
+}
+.psugg b {
+  color: #c9ceda;
+  font-weight: 600;
+}
 
 /* ================= IL RITORNO ALLA MAPPA ================= */
 /* Nella partita il tasto bianco resta quello del menu: questo, viola, riporta
    dove si gioca davvero. */
-.tornamenu.mappa{background:linear-gradient(180deg,#7C3AED,#5B21B6);color:#fff;
-  box-shadow:0 6px 26px rgba(124,58,237,.45)}
-.tornamenu.mappa:hover{background:linear-gradient(180deg,#8B4BF5,#6D28D9)}
+.tornamenu.mappa {
+  background: linear-gradient(180deg, #7c3aed, #5b21b6);
+  color: #fff;
+  box-shadow: 0 6px 26px rgba(124, 58, 237, 0.45);
+}
+.tornamenu.mappa:hover {
+  background: linear-gradient(180deg, #8b4bf5, #6d28d9);
+}
 
 /* ================= SCHERMI PICCOLI =================
    La plancia si stringe per gradi invece di rompersi tutta insieme:
@@ -226,42 +785,78 @@ body.in-hub .topnav{display:none}
       scorre come una pagina normale. La città resta la prima cosa che si
       vede, perché è la schermata da cui si gioca. */
 
-@media (max-width:1500px){
-  .ps{padding:0 4px 0 12px}
-  .ps .pbar{width:88px}
-  .pcitta{width:190px}
+@media (max-width: 1500px) {
+  .ps {
+    padding: 0 4px 0 12px;
+  }
+  .ps .pbar {
+    width: 88px;
+  }
+  .pcitta {
+    width: 190px;
+  }
 }
-@media (max-width:1340px){
-  .ps{gap:8px}
-  .ps .pbar{width:70px}
-  .ps .pv{font-size:15px}
-  .pora{width:120px;font-size:18px}
-  .psett{width:118px;padding-left:14px}
+@media (max-width: 1340px) {
+  .ps {
+    gap: 8px;
+  }
+  .ps .pbar {
+    width: 70px;
+  }
+  .ps .pv {
+    font-size: 15px;
+  }
+  .pora {
+    width: 120px;
+    font-size: 18px;
+  }
+  .psett {
+    width: 118px;
+    padding-left: 14px;
+  }
 }
-@media (max-width:1400px){
-  .plancia{grid-template-columns:minmax(300px,.8fr) minmax(0,2.4fr) minmax(292px,.8fr)}
+@media (max-width: 1400px) {
+  .plancia {
+    grid-template-columns: minmax(300px, 0.8fr) minmax(0, 2.4fr) minmax(
+        292px,
+        0.8fr
+      );
+  }
 }
-@media (max-width:1180px){
-  .plancia{grid-template-columns:minmax(280px,.8fr) minmax(0,2.4fr);
+@media (max-width: 1180px) {
+  .plancia {
+    grid-template-columns: minmax(280px, 0.8fr) minmax(0, 2.4fr);
     grid-template-areas:
       "barra  barra"
       "sx     centro"
-      "sugg   sugg"}
+      "sugg   sugg";
+  }
   /* telefono.css dichiara «.ptel{display:flex}» senza media query e viene
      caricato dopo: a parità di specificità vince l'ultimo, quindi qui serve
      un selettore più specifico, non solo l'ordine, o il telefono non si
      nasconde mai e la città sotto resta a larghezza zero. */
-  body.in-hub .ptel{display:none}
-  .pora{display:none}
-  .pcitta{width:170px}
+  body.in-hub .ptel {
+    display: none;
+  }
+  .pora {
+    display: none;
+  }
+  .pcitta {
+    width: 170px;
+  }
 }
-@media (max-width:1000px){
-  .pstat .ps:last-child{display:none}      /* il benessere sta anche nel profilo */
-  .psett{width:104px;padding-left:12px}
+@media (max-width: 1000px) {
+  .pstat .ps:last-child {
+    display: none;
+  } /* il benessere sta anche nel profilo */
+  .psett {
+    width: 104px;
+    padding-left: 12px;
+  }
 }
 
 /* ---- il telefono in mano: si impila ---- */
-@media (max-width:900px){
+@media (max-width: 900px) {
   /* Il palco smette di essere inchiodato allo schermo e torna a essere un
      pezzo di pagina. Serve a due cose, tutte e due solo sul telefono vero:
      scorrendo la pagina il browser si tira su la sua barra e ti restituisce
@@ -270,23 +865,66 @@ body.in-hub .topnav{display:none}
      L'altezza minima e' `100svh` — la misura *piccola*, quella con le barre
      visibili: cosi' la plancia entra dal primo momento e non si vede niente
      tagliato mentre la barra e' ancora fuori. */
-  .palco{position:static;overflow:visible}
-  .plancia{height:auto;min-height:100svh;gap:10px;padding:0 8px 12px;
-    grid-template-columns:minmax(0,1fr);
-    grid-template-rows:auto auto auto auto;
-    grid-template-areas:"barra" "centro" "sx" "sugg"}
+  .palco {
+    position: static;
+    overflow: visible;
+  }
+  .plancia {
+    height: auto;
+    min-height: 100svh;
+    gap: 10px;
+    padding: 0 8px 12px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas: "barra" "centro" "sx" "sugg";
+  }
 
-  .pbarra{height:auto;flex-wrap:wrap;align-items:center;padding:8px 6px;gap:6px 0}
-  .plogo{width:auto;padding:0 10px 0 4px}
-  .pcitta{width:auto;flex:1;border-left:0;padding-left:12px}
-  .psett{width:auto;padding-left:12px}
-  .pstat{flex:1 0 100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:4px;padding-top:6px;border-top:1px solid rgba(255,255,255,.07)}
-  .pstat .ps{border-left:0;padding:2px 4px;gap:8px}
-  .pstat .ps:last-child{display:flex}
-  .ps .pbar{width:100%;max-width:88px}
+  .pbarra {
+    height: auto;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 8px 6px;
+    gap: 6px 0;
+  }
+  .plogo {
+    width: auto;
+    padding: 0 10px 0 4px;
+  }
+  .pcitta {
+    width: auto;
+    flex: 1;
+    border-left: 0;
+    padding-left: 12px;
+  }
+  .psett {
+    width: auto;
+    padding-left: 12px;
+  }
+  .pstat {
+    flex: 1 0 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  .pstat .ps {
+    border-left: 0;
+    padding: 2px 4px;
+    gap: 8px;
+  }
+  .pstat .ps:last-child {
+    display: flex;
+  }
+  .ps .pbar {
+    width: 100%;
+    max-width: 88px;
+  }
 
-  .pcolsx,.pcolcentro{grid-template-rows:auto auto}
+  .pcolsx,
+  .pcolcentro {
+    grid-template-rows: auto auto;
+  }
   /* La mappa non scende più sotto la soglia in cui si legge. I cartelli —
      Studio, Beat Maker, Attività criminali — sono disegnati *dentro* alla
      foto, quindi rimpiccioliscono con lei: a 375 px di schermo diventavano
@@ -294,35 +932,95 @@ body.in-hub .topnav{display:none}
      Sotto i 900 la foto tiene almeno 620 px e la città si sposta col dito,
      come una cartina vera. Dove lo schermo è più largo di 620 non cambia
      niente: `max()` la lascia riempire la colonna. */
-  .pmappa{overflow-x:auto;place-items:start;overscroll-behavior-x:contain}
+  .pmappa {
+    overflow-x: auto;
+    place-items: start;
+    overscroll-behavior-x: contain;
+  }
   /* la foto adesso è più larga del riquadro e lo copre tutta: lo sfondo
      sfocato del punto 62 non si vedrebbe comunque, e con `inset:-40px` dentro
      a un riquadro che scorre si porterebbe dietro quaranta pixel di vuoto da
      scorrere. Via — è anche una sfocatura da 46 px in meno da disegnare sul
      telefono. */
-  .pmappa::before{display:none}
-  .pfoto{width:max(100%,620px);height:auto;max-width:none}
-  .psx{overflow:visible;max-height:none}
-  .psxtab{height:88px}
-  .peventi{height:auto}
-  .pevrow{height:auto;flex-wrap:wrap;gap:8px}
-  .pev{flex:1 1 46%;min-height:128px}
-  .pevpiu{flex:1 1 100%;padding:10px;flex-direction:row;gap:12px}
-  .psugg{height:auto;padding:10px 12px;text-align:center;line-height:1.35}
+  .pmappa::before {
+    display: none;
+  }
+  .pfoto {
+    width: max(100%, 620px);
+    height: auto;
+    max-width: none;
+  }
+  .psx {
+    overflow: visible;
+    max-height: none;
+  }
+  .psxtab {
+    height: 88px;
+  }
+  .peventi {
+    height: auto;
+  }
+  .pevrow {
+    height: auto;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pev {
+    flex: 1 1 46%;
+    min-height: 128px;
+  }
+  .pevpiu {
+    flex: 1 1 100%;
+    padding: 10px;
+    flex-direction: row;
+    gap: 12px;
+  }
+  .psugg {
+    height: auto;
+    padding: 10px 12px;
+    text-align: center;
+    line-height: 1.35;
+  }
 }
-@media (max-width:560px){
-  .pev{flex:1 1 100%}
-  .pcitta .pcn{font-size:15px}
-  .pstat{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .psxtab{height:78px}
-  .ptab .hicon{width:22px;height:22px}
-  .ptab span{font-size:9.5px}
+@media (max-width: 560px) {
+  .pev {
+    flex: 1 1 100%;
+  }
+  .pcitta .pcn {
+    font-size: 15px;
+  }
+  .pstat {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .psxtab {
+    height: 78px;
+  }
+  .ptab .hicon {
+    width: 22px;
+    height: 22px;
+  }
+  .ptab span {
+    font-size: 9.5px;
+  }
 }
-@media (max-height:760px) and (min-width:901px){
-  .psxtab{height:84px}
-  .peventi{height:168px}
-  .pevrow{height:120px}
-  .pev{padding:7px 8px 8px}
-  .pevd{margin-top:4px}
-  .pevl{margin-top:5px;gap:3px}
+@media (max-height: 760px) and (min-width: 901px) {
+  .psxtab {
+    height: 84px;
+  }
+  .peventi {
+    height: 168px;
+  }
+  .pevrow {
+    height: 120px;
+  }
+  .pev {
+    padding: 7px 8px 8px;
+  }
+  .pevd {
+    margin-top: 4px;
+  }
+  .pevl {
+    margin-top: 5px;
+    gap: 3px;
+  }
 }

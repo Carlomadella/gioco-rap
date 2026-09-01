@@ -11,6 +11,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=Archivo+Black&family=Barlow+Condensed:wght@600;700;800&display=swap">
+<!-- I tre caratteri della Strada (schermata «Attività criminali»): stencil per i
+     titoli, condensato per le etichette, Plex per il testo. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=Roboto+Condensed:wght@500;600;700;800;900&display=swap">
 
 <!-- Fogli di stile: l'ordine conta, la cascata è quella originale. -->
 <link rel="stylesheet" href="css/base.css?v=12">
@@ -26,7 +29,7 @@
 <link rel="stylesheet" href="css/actionbar.css?v=12">
 <link rel="stylesheet" href="css/posto.css?v=12">
 <link rel="stylesheet" href="css/negozio.css?v=12">
-<link rel="stylesheet" href="css/strada-crimine.css?v=12">
+<link rel="stylesheet" href="css/strada-crimine.css?v=13">
 <link rel="stylesheet" href="css/hub.css?v=12">
 <link rel="stylesheet" href="css/telefono.css?v=12">
 <link rel="stylesheet" href="css/impostazioni.css?v=12">
@@ -350,11 +353,78 @@
   <div class="nggrid" id="ng-grid"></div>
 </div></div>
 
-<!-- La Strada (punto 21): il luogo "Attività criminali" della mappa apre questo
-     pannello. Il contenuto lo mette js/game/strada-crimine.js. -->
-<div class="strada" id="strada"><div class="stwrap">
-  <div class="sthead"><div class="stk">Attività criminali</div><button class="stx" id="st-x">&#10005;</button></div>
-  <div id="st-body"></div>
+<!-- La Strada (punto 21): il luogo "Attività criminali" della mappa apre questa
+     schermata. Il disegno è quello del prototipo attivita-criminali-crime-v8.html:
+     l'impalcatura sta qui, tutto quello che cambia lo riempie
+     js/game/strada-crimine.js. -->
+<div class="strada" id="strada"><div class="stapp">
+  <div class="bg-slideshow" aria-hidden="true"><div class="bg-slide on" id="st-bgA"></div><div class="bg-slide" id="st-bgB"></div></div>
+  <div class="danger-wash" aria-hidden="true"></div><div class="shadow-pass" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="logo">
+      <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2 15 8.2 22 7l-4.8 5 1.4 7L12 15.5 5.4 19l1.4-7L2 7l7 1.2z"/></svg></span>
+      <span>Anni di <i>Fame</i></span>
+    </div>
+    <div class="where"><span class="k" id="st-dove">IL GIRO</span><strong>Attivit&agrave; <em>criminali</em></strong></div>
+    <div class="session">
+      <span id="st-citta">Provincia</span><span>Sett. <b id="st-sett">1</b></span><span><b id="st-ora">21:38</b></span>
+      <button class="exit" id="st-x" title="Chiudi" aria-label="Chiudi">&times;</button>
+    </div>
+  </header>
+
+  <main class="scene">
+    <aside class="stpan side">
+      <div class="panel-k">Adesso</div>
+      <div class="status-money">
+        <span>Soldi sporchi</span>
+        <strong id="st-sporchi">0 &euro;</strong>
+        <button class="launder" id="st-ripulisci">Ripulisci</button>
+      </div>
+      <div class="stat">
+        <div class="stat-head"><span>Reputazione di strada</span><b id="st-repn">0</b></div>
+        <div class="track"><i class="rep" id="st-repbar" style="width:0%"></i></div>
+      </div>
+      <div class="stat">
+        <div class="stat-head heat-title"><span>Attenzione</span><b id="st-heatn">0</b></div>
+        <div class="track"><i class="heat" id="st-heatbar" style="width:0%"></i></div>
+      </div>
+      <div class="risk"><span>Energia</span><b id="st-energia">0 / 100</b></div>
+      <div class="risk"><span>Contanti puliti</span><b id="st-puliti">0 &euro;</b></div>
+      <div class="risk"><span>Precedenti</span><b id="st-precedenti">0</b></div>
+      <div class="risk pressure-row"><span>Occhi addosso</span><b id="st-occhi">Pochi</b></div>
+      <div class="street-note">Pi&ugrave; soldi sporchi tieni addosso, pi&ugrave; ogni rumore fuori dalla porta sembra per te.</div>
+      <button class="quit" id="st-molla">Molla il giro</button>
+    </aside>
+
+    <section class="stpan center" id="st-center">
+      <div class="herohead">
+        <div class="kicker"><span class="pulse-dot"></span> Notte &middot; contanti &middot; favori &middot; nessun contratto</div>
+        <h1>Qui niente &egrave; <span>pulito.</span></h1>
+        <p>Ogni guadagno lascia qualcuno da pagare, qualcuno che sa troppo o qualcuno che ti sta cercando. Il giro cresce insieme al rischio.</p>
+      </div>
+      <div class="crimes" id="st-colpi"></div>
+      <div class="lockscene"><div class="lockbox"><span>Area non ancora raggiunta</span><strong id="st-lock-n">Milano</strong><span id="st-lock-req">Livello 10 &middot; fama 50 &middot; hype 40</span></div></div>
+    </section>
+
+    <aside class="stpan right">
+      <div class="tabs">
+        <button class="tab on" data-sttab="copre">Chi ti copre</button>
+        <button class="tab" data-sttab="attivita">Attivit&agrave;</button>
+      </div>
+      <div class="tabpane on" id="st-tab-copre"></div>
+      <div class="tabpane" id="st-tab-attivita"></div>
+    </aside>
+
+    <div class="citybar">
+      <div class="city-note"><span>Pi&ugrave; sali, pi&ugrave; diventa difficile sparire.</span></div>
+      <div class="cities" id="st-citta-lista"></div>
+      <div class="escape-help"><button class="map-return" id="st-mappa"><span class="arrow">&larr;</span><span>Torna alla mappa</span></button></div>
+    </div>
+  </main>
+
+  <div class="stmodal" id="st-modal"><div class="sheet" id="st-sheet"></div></div>
+  <div class="sttoast" id="st-toast"></div>
 </div></div>
 
 <div class="piazza" id="piazza"><div class="pwrap">
@@ -579,7 +649,7 @@
 <script src="js/game/skip.js?v=12"></script>
 <script src="js/game/posto.js?v=12"></script>
 <script src="js/game/strada.js?v=12"></script>
-<script src="js/game/strada-crimine.js?v=12"></script>
+<script src="js/game/strada-crimine.js?v=13"></script>
 <script src="js/game/negozio.js?v=12"></script>
 <script src="js/game/uscita.js?v=12"></script>
 <script src="js/game/hub.js?v=12"></script>
