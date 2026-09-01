@@ -208,6 +208,21 @@ const ONLINE = (() => {
     return chiama("/api/classifica/intorno/" + mia.id + "?raggio=" + (raggio || 4));
   }
 
+  /* ==================== LAFAMEGRAM (punti 52, 53) ====================
+     Il feed vero: i post del mondo, più — se hai un artista — chi ti ha
+     appena passato e chi hai passato tu. Stessa forma di telPost() in
+     telefono.js, apposta: il telefono prova questo, e se non risponde
+     resta sui post finti presi dal diario, senza che si veda la giuntura. */
+  function feed(quanti){
+    const mia = identita();
+    return chiama("/api/feed?quanti=" + (quanti || 20) + (mia ? "&io=" + mia.id : ""));
+  }
+  function opps(quanti){
+    const mia = identita();
+    if(!mia) return Promise.resolve(null);
+    return chiama("/api/opps?io=" + mia.id + "&quanti=" + (quanti || 3));
+  }
+
   /* ==================== IMPOSTAZIONI ==================== */
   function collega(url){
     base = String(url || "").replace(/\/+$/, "") || "http://localhost:8787";
@@ -224,7 +239,8 @@ const ONLINE = (() => {
     punteggioDaPartita, invia,
     salvaCarriera, carriera, carriere,
     traguardi, daiTraguardo,
-    classifica, intorno, stato, notizie
+    classifica, intorno, stato, notizie,
+    feed, opps
   };
 })();
 window.ONLINE = ONLINE;

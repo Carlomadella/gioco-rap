@@ -166,9 +166,18 @@
   border:1px solid rgba(255,255,255,.07);font-size:10.5px;font-weight:700;color:#9AA1B2}
 .tsubb.on{background:#7C3AED;border-color:#7C3AED;color:#fff}
 
+.tigscrivi{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;padding:11px;
+  border-radius:14px;background:#12151F;border:1px solid rgba(255,255,255,.07)}
+.tigscrivi textarea{resize:none;height:52px;padding:8px 10px;border-radius:9px;border:none;
+  background:#0C0F16;color:#E8EAF0;font:inherit;font-size:11.5px;line-height:1.4}
+.tigscrivi textarea::placeholder{color:#5C6376}
+.tigscrivi .tbtn{margin:0;background:linear-gradient(135deg,#FEDA75,#D62976,#962FBF);
+  color:#fff;border:none}
+
 .tig{display:flex;flex-direction:column;gap:12px}
 .tigpost{border-radius:14px;background:#12151F;border:1px solid rgba(255,255,255,.07);
   padding:11px;overflow:hidden}
+.tigpost.mia{box-shadow:inset 0 0 0 1px rgba(214,41,118,.5)}
 .tighead{display:flex;align-items:center;gap:8px}
 .tigav{width:26px;height:26px;flex:none;border-radius:50%;
   background:linear-gradient(135deg,#FEDA75,#D62976,#962FBF);

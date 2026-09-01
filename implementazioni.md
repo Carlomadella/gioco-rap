@@ -783,6 +783,34 @@ in parallelo.
 
 52. la fameGram deve avere veri e propri post generati e caricati dagli utenti, deve essere un motore vivo e costantemente in movimento perchè molto del gameplay passa lì. 
 
+   **FATTO in parte (01/09/2026)** — due cose diverse, tenute insieme.
+   **Generati da soli**: `frontend/js/game/telefono.js` adesso chiama
+   davvero `GET /api/feed` (Carletto l'aveva già scritto lato server,
+   proprio nella forma che uso io — «si incastra col telefono che ha
+   appena fatto Alessio», dice il suo commit): sorpassi veri in classifica,
+   non frasi a caso. Se il server non risponde, o risponde vuoto (un
+   server appena nato, senza rivalità dichiarate, non ha ancora niente da
+   raccontare — l'ho provato in locale ed è proprio così), si torna al
+   diario, stessa forma, senza cuciture viste. Un giro ogni due minuti da
+   solo, più uno ogni volta che riapri l'app: **vivo** vuol dire questo.
+   **Caricati dagli utenti**: adesso c'è davvero una casella «a cosa stai
+   pensando» in cima al feed — scrivi, premi Pubblica, il post tuo esce
+   subito in testa, con un cuore che tiene conto dell'hype. Provato in
+   Chrome: scritto, pubblicato, apparso all'istante.
+   **In parte** perché il post che scrivi oggi resta **sul tuo
+   dispositivo**: non c'è ancora un `POST /api/post` che lo mandi al
+   server, quindi non lo vede nessun altro giocatore — è un lavoro da
+   backend che non ho, ce l'ho scritto qui apposta perché Carletto lo
+   veda. Non sparisce mai dal tuo feed, però, qualunque cosa risponda il
+   server.
+
 53. Su lafamegram puoi vedere il feed proprio come instagram nella vita reale, scorrendo
+
+   **FATTO (01/09/2026)** — lo era già di fatto (`.tscreenbody` scorre da
+   solo), l'ho solo reso vero anche nell'ordine: prima il feed teneva i
+   post ordinati per «più cuori», adesso è cronologico come un feed vero
+   — tu in cima, poi il resto nell'ordine in cui è arrivato. Il post «più
+   hype» per il widget della home si cerca a parte (`telPostTop()`), non
+   è più per forza il primo che scorri.
 
 54. Aggiungerei degli scenari veri e propri ; gli scenari vorrei fossero tutti uguali ma le circostanze TOTALMENTE DIVERSE, OVVERO ; 1) scenario trovi un fan carino che ti chiede la foto e poi posta pure su lafamegram 2) Trovi un fan maleducato che si pone in modi sbagliatissimi e magari interagendo e vedendo che non corregge i suoi comportamenti noi rifiutiamo la foto e qualcuno nelle vicinanze potrebbe notare questa cosa e i giornalisti poi farla uscire per parlare male di noi 3) in strada becchi un haters 4) in strada becchi un hopps 5) in strada becchi l'ex manager 6) in strada becchi ex amici 7) in strada becchi qualcuno con cui hai brutti rapporti nel gioco 8)

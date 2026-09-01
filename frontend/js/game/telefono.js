@@ -82,10 +82,34 @@ function telClassifica(){
   return {all, pos, delta:(G.chartPrev || 99) - pos};
 }
 
-/* Post finti per LaFamegram, presi dalla vita vera della carriera (il
-   diario) più un paio di voci della piazza, prese dalle notizie — così il
-   feed non è mai vuoto anche a inizio partita. */
-function telPost(){
+/* ================= LAFAMEGRAM — IL FEED (punti 52, 53) =================
+   Il vero motore è sul server (`GET /api/feed`, backend/database/archivio.js
+   `feed()`): post del mondo più, se hai un artista, chi ti ha appena
+   passato e chi hai passato tu — non finti a caso, presi dagli stream veri
+   di chi li scrive. Qui si tiene solo l'ultima risposta e si ridisegna
+   quando arriva; se il server non risponde (o non è acceso) si torna ai
+   post presi dal diario, stessa forma, senza che si veda la giuntura —
+   la regola del ponte (online.js) vale anche qui. */
+let TEL_FEED = null;
+let TEL_FEED_IN_CORSO = false;
+function telAggiornaFeed(){
+  if(TEL_FEED_IN_CORSO || typeof ONLINE === "undefined") return;
+  TEL_FEED_IN_CORSO = true;
+  ONLINE.feed(24).then(r => {
+    TEL_FEED_IN_CORSO = false;
+    if(!r || r.errore || !Array.isArray(r.post) || !r.post.length) return;
+    TEL_FEED = r.post.map(p => ({
+      n:p.n, t:spoglia(p.t), w:"Settimana " + p.s, like:Math.max(0, Math.round(p.like || 0)),
+      mia:false
+    }));
+    if(telPC() && (!TEL_APP || TEL_APP === "lafamegram")) renderTelefono();
+  });
+}
+
+/* Post presi dalla vita vera della carriera (il diario) più un paio di
+   voci della piazza, prese dalle notizie — il ripiego locale, e quello che
+   si vede finché il feed vero non è ancora arrivato. */
+function telPostLocale(){
   const art = window.ARTIST || {};
   const nome = (art.name || "Tu").trim() || "Tu";
   const buoni = G.log.filter(m => m.c === "good").slice(0, 6);
@@ -96,10 +120,37 @@ function telPost(){
   HUB_NOTIZIE.slice(0, 2).forEach((n, i) => base.push({
     n:"La Voce del Giro", t:n.t, w:"in giro", mia:false, like:Math.round(18 + i * 9)
   }));
-  base.sort((a, b) => b.like - a.like);
   return base.length ? base
     : [{n:nome, t:"Ancora niente qui. Pubblica un pezzo e fatti sentire.", w:"—", mia:true, like:0}];
 }
+/* I post scritti di tuo pugno (punto 52: «generati e caricati dagli
+   utenti», non solo automatici) stanno per conto loro in G — davanti a
+   tutto il resto, sempre, che sia arrivato il feed vero o no: è roba tua,
+   non deve sparire quando risponde il server. Restano sul dispositivo
+   finché il server non ha un posto dove metterli (serve un endpoint che
+   ancora non c'è, vedi la nota nel file delle implementazioni). */
+function telScrivi(testo){
+  const t = spoglia(String(testo || "")).trim().slice(0, 220);
+  if(!t) return false;
+  const art = window.ARTIST || {};
+  G.lafamegramMiei.unshift({
+    n:(art.name || "Tu").trim() || "Tu", t, w:"adesso",
+    like:Math.round(8 + G.hype * 0.6 + rnd(0, 12)), mia:true
+  });
+  if(G.lafamegramMiei.length > 30) G.lafamegramMiei.length = 30;
+  save();
+  return true;
+}
+/* Quello che il resto di telefono.js chiama: i tuoi post scritti a mano,
+   poi il feed vero se c'è già risposto, il ripiego locale se no. L'ordine
+   è cronologico (come un feed vero, punto 53) — chi vuole il post più in
+   vista lo cerca da sé (telPostTop), non è detto sia il primo della lista. */
+function telPost(){
+  if(TEL_FEED === null) telAggiornaFeed();
+  const base = (TEL_FEED && TEL_FEED.length) ? TEL_FEED : telPostLocale();
+  return G.lafamegramMiei.length ? G.lafamegramMiei.concat(base) : base;
+}
+const telPostTop = () => telPost().slice().sort((a, b) => b.like - a.like)[0];
 
 function golPremio(rw){
   const bits = [];
@@ -149,7 +200,7 @@ function renderTelefonoHome(){
   el.className = "ptelscr";
   const nuoviMsg = Math.max(0, G.log.length - (G.seenLog || 0));
   const cl = telClassifica();
-  const top = telPost()[0];
+  const top = telPostTop();
 
   const widgets =
     '<button class="twid twid-lg" data-app="lafamegram">' +
@@ -354,8 +405,12 @@ function schermataImpostazioni(){
 
 /* ---- LaFamegram: il finto Instagram, oggi con post veri della carriera ---- */
 function schermataLafamegram(){
-  return '<div class="tig">' + telPost().map(p =>
-    '<div class="tigpost">' +
+  return '<div class="tigscrivi">' +
+      '<textarea id="tig-testo" maxlength="220" placeholder="A cosa stai pensando?"></textarea>' +
+      '<button class="tbtn" id="tig-pubblica">Pubblica</button>' +
+    '</div>' +
+    '<div class="tig">' + telPost().map(p =>
+    '<div class="tigpost' + (p.mia ? " mia" : "") + '">' +
       '<div class="tighead"><span class="tigav">' + hsvg("camera") + '</span><b>' + p.n + '</b>' +
         '<span class="tigw">' + p.w + '</span></div>' +
       '<div class="tigcap">' + p.t + '</div>' +
@@ -374,6 +429,7 @@ function telApriApp(a, ev){
     };
   } else TEL_ORIGIN = null;
   if(a.id === "messaggi" && G.seenLog !== G.log.length){ G.seenLog = G.log.length; save(); }
+  if(a.id === "lafamegram") telAggiornaFeed();   /* si riapre, si aggiorna: un feed vivo */
   TEL_APP = a.id;
   hubTap();
   renderTelefono();
@@ -398,6 +454,11 @@ $("hb-tel").addEventListener("click", ev => {
   if(ev.target.closest("[data-diario]")){ GO("game"); renderGioco(); $("g-diary").click(); return; }
   if(ev.target.closest("[data-news]")){ hubTap(); hubNotizie(); return; }
   if(ev.target.closest("[data-posto]")){ hubTap(); apriPosto(); return; }
+  if(ev.target.closest("#tig-pubblica")){
+    const ta = $("tig-testo");
+    if(ta && telScrivi(ta.value)){ hubTap(); renderTelefono(); }
+    return;
+  }
   if(ev.target.closest("[data-impostazioni]")){ if(window.IMPOSTAZIONI) window.IMPOSTAZIONI(); return; }
   if(ev.target.closest("[data-toggleaudio]")){
     SET.audio.on = !SET.audio.on; setSalva();
@@ -428,3 +489,7 @@ window.addEventListener("resize", () => {
   const ora = telPC();
   if(ora !== TEL_MODO_PC){ TEL_MODO_PC = ora; TEL_APP = null; renderTelefono(); }
 });
+
+/* un feed vivo vuol dire che si muove anche se non lo riapri tu: un giro
+   ogni due minuti, solo mentre il telefono nuovo è quello a video */
+setInterval(() => { if(telPC()) telAggiornaFeed(); }, 120000);
