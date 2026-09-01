@@ -69,3 +69,14 @@ messaggi dei commit, e nessuno se lo ricordava più. Adesso hanno una riga che l
    e i problemi comuni (porta occupata, Node troppo vecchio).
 
 ---
+
+## 56 · Restare sempre aggiornati col repo
+
+56. Assicurati sempre di essere aggiornato col mio github e quello di carletto.
+
+    **FATTO (01/09/2026)** — è già la regola fissa di ogni sessione (vedi sopra): `git fetch` e verifica
+    prima di lavorare, e prima di ogni push. In questa sessione è arrivato un push di Carletto proprio
+    a metà lavoro (il ridisegno della plancia, punto sotto); niente da fare oltre a continuare a farlo
+    a ogni giro, cosa già in corso.
+
+---

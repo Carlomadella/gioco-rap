@@ -23,6 +23,16 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
 
 21. implementa un nuovo modo di fare soldi, poi nel caso anche la fama, ovvero la professione del criminale
 
+**57 · «Non è più giocabile, che è successo?» — controllato, non è una regressione.**
+Cercato in tutta la cronologia (`git log --all --grep`, tutti i branch) qualcosa che avesse mai reso
+«Attività criminali» o «Colpo rapido» giocabili: **non c'è mai stato un commit che l'abbia costruito.**
+Sia la card sulla mappa (`HUB_LUOGHI`, id `crimin`) sia la voce degli eventi del giorno (`HUB_EVENTI`,
+id `colpo`) chiamano `hubPresto(...)` — il placeholder «sta arrivando» — fin dal punto 26, quando sono
+state create. Il punto 21 non è mai stato chiuso: quello che si ricordava «giocabile nel pomeriggio»
+probabilmente era proprio questo popup di attesa, non un minigioco vero. Le regole per farlo davvero
+ci sono già qui sotto — reputazione, cassa sporca, rischio finanza — manca solo il codice: è di nuovo
+il punto 21, non un bug da riparare.
+
 ---
 
 ## Il beat maker diventa un posto: La Sala
