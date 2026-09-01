@@ -31,5 +31,6 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 _(qui sotto finiscono i punti nuovi, appena scritti)_
 
+5. Oltre a fan cortesi e scortesi, potremmo incontrare anche opps (rivali) e giornalisti che potrebbero fermarci a fare domande che poi faran notizia se son critiche. Ovviamente i giornalisti si vedranno solo una volta famosi.
 
-4. 
+6. 

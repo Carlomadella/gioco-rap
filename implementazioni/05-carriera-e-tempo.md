@@ -162,3 +162,52 @@ L'energia stiam pensando di metterla a 100 al giorno. Ovviamente riproporzionere
 cambia l'energia a 100 e anche tutto ciò ce ne deriva da questo cambiamento, tu prova a farlo al meglio poi ti dico io testando come mi pare.
 
 ---
+
+## Una gerarchia per gli incontri mentre si salta il tempo
+
+Da smistare, punto 4 (01/09/2026): "Vai ad agire sul sistema del scorrimento del tempo, andando
+a creare una gerarchia di importanza degli eventi in base alla rarità, anche in base alla città,
+in base al progresso del gioco. Dividi la gerarchia in 3 categorie (basso medio e alto) dove basso
+non ferma lo scorrere del tempo con penalità bassissime, medio non ferma lo scorrere del tempo con
+penalità medio bassa, e alto ferma lo scorrere del tempo e obbliga il giocatore a prendere una
+decisione."
+
+**FATTO.** Prima, "Salta il tempo" (`skip.js`, punti 40/41) tagliava fuori *tutto* — incontri per
+strada, prove di passaggio, eventi — per l'intera durata del salto, tranne l'ultimissimo giorno:
+un salto di un mese poteva far sparire una prova di passaggio o un bivio con un contratto di mezzo
+semplicemente perché capitava nel giorno sbagliato. Adesso ogni incontro/evento ha un **livello**:
+
+- **`basso`** (`js/game/strada.js`, `INCONTRI`) — un fan, gentile o cafone: capita spesso (è il
+  `peso` più alto) e le sue conseguenze sono già minime per come è scritto. Durante un salto si
+  risolve da solo (`risolviIncontroAuto()`): sceglie la prima opzione — la più prudente, per come
+  sono scritte tutte — e finisce nel diario come se l'avessi scelta tu al volo. Il tempo non si
+  ferma.
+- **`medio`** (hater, una vecchia amicizia, il manager) — meno comuni, pesano un po' di più, ma
+  restano cose che non cambiano la partita. Stesso trattamento del basso: si risolvono da soli,
+  senza fermare niente — la differenza fra i due livelli è nella severità che l'incontro porta già
+  di suo (l'hater rischia benessere vero, un fan quasi nulla), non in una scala applicata a mano.
+- **`alto`** — un opp (serve fama vera e rivali in giro), chi ti sei giocato alla Sala, **qualunque
+  prova di passaggio** (`pendingTrial()`, sempre alta: decide la fase della carriera) e **qualunque
+  evento** del pool generale (`EVENTS`, `events.js`: sempre alto, sono tutti bivi con soldi,
+  contratti o salute di mezzo). Questi fermano il salto sul serio: `SALTO_STOP` (`sim.js`) porta
+  l'evento fuori dal ciclo, `saltaGiorni()` (`skip.js`) interrompe il `for`, salva quanti giorni
+  restavano, e mostra la scena vera con le scelte vere — non una versione ridotta. Scelta fatta (o
+  chiusa con ESC, dove è concesso), `mostraEventoConRipresa()` richiama `saltaGiorni()` sui giorni
+  rimasti: il salto riprende esattamente da dove si era fermato, e se un altro "alto" capita nei
+  giorni restanti si ferma di nuovo, a catena, senza perdere il conto.
+
+  **Sulla "città"**: la gerarchia è pensata per reggere quando Milano e Los Angeles esisteranno
+  (punto 26) — ma oggi c'è solo la provincia, quindi quella variabile non pesa ancora su niente per
+  davvero. **Sul "progresso del gioco"**: già dentro ai `req()` di ogni incontro (l'opp vuole 300
+  fan e rivali, l'hater vuole hype, gli amici vogliono 8 settimane) — non serviva un numero a parte,
+  la gerarchia legge la stessa eleggibilità che decide già se un incontro può capitare.
+
+  Provato in Chrome: un incontro basso (fan) e uno medio (hater) forzati durante `SALTO=true` si
+  risolvono in silenzio, un rigo nel diario, zero modali aperte. Un salto di 20 giorni con un opp
+  reso sempre eleggibile (rivali finti + 400 fan) si ferma al primo giorno utile, il rapporto di
+  settimana e la scena si accavallano senza rompersi (il rapporto ha z-index più alto, si chiude
+  prima e poi si vede la scena sotto), e chiudendo la scena il salto riprende — verificato fino
+  alla fine, anche con più interruzioni di fila nello stesso salto. Un salto di 7 giorni senza
+  condizioni rare si conclude come sempre, un solo rapporto, nessuna interruzione di troppo.
+
+---
