@@ -26,12 +26,12 @@ per tutti e per tutto.
 
 ## Tutti i punti
 
-71 voci in tutto: **29 chiuse**, 10 a metà, il resto da fare.
+71 voci in tutto: **31 chiuse**, 10 a metà, il resto da fare.
 
 | | punto | stato | dove |
 | --- | --- | --- | --- |
-| **1** | Cosa si può simulare | da fare | [carriera-e-tempo](05-carriera-e-tempo.md) |
-| **2** | Ascoltare un beat prima di comprarlo | da fare | [musica-e-suoni](04-musica-e-suoni.md) |
+| **1** | Cosa si può simulare | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
+| **2** | Ascoltare un beat prima di comprarlo | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
 | **3** | Crea il tuo avatar | da fare | [artista-e-avatar](03-artista-e-avatar.md) |
 | **4** | La pagina di landing | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **5** | Uscire da un'azione senza doverla finire | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |

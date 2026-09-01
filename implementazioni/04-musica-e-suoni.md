@@ -11,6 +11,16 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
 
 2. nei beat in vendita ci deve essere l'opzione di ascoltare il beat, poterlo comprare
 
+**Risulta già fatto.** Ogni beat in «Beat in vendita» (catalogo → materiale) ha tre
+comandi affiancati: ✕ (scarta), ▶ (ascolta) e il prezzo (compra). L'ascolto
+(`beatSuona()`, `frontend/js/game/beatplay.js`) non è un campione registrato: è un
+motore che sintetizza al volo quattro battute vere del beat — cassa, rullante,
+charleston, basso ed eventuale melodia — usando il genere e il seme del beat, così
+quello che senti prima di comprare è la stessa qualità che poi finisce nel pezzo.
+Provato in Chrome (01/09/2026): generati tre beat, aperta la vetrina, `▶` avvia
+davvero l'`AudioContext` e schedula 148 eventi sonori per un beat trap a 148 bpm; ri-
+cliccando sopra si ferma, come dice il codice.
+
 ---
 
 ## 6 · L'autocompletamento della canzone

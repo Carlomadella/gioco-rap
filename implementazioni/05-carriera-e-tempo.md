@@ -13,6 +13,16 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
    Una settimana: ti riposi, ricarichi l'energia ma perdi lucidità
    Un mese: ti riposi, ricarichi l'energia, perdi lucidità e perdi hype
 
+**Risulta già fatto**, dal lavoro sui punti 40/41: «Salta il tempo» (`saltaTempo()`,
+`frontend/js/game/skip.js`) chiede esattamente questa scelta — 1 giorno, 2 giorni, una
+settimana, un mese — con le stesse conseguenze a scalare: 1-2 giorni ricaricano solo
+energia, una settimana lascia che i suoi costi e la sua lucidità la tocchino da sola
+chiudendosi, un mese («28 giorni di silenzio») fa sentire lucidità e hype per davvero.
+Non serve una tabella di penalità scritta a mano: `avanzaGiorno()`/`advanceWeek()`
+(`sim.js`) le danno già, vivendo quei giorni senza fare niente.
+Provato in Chrome (01/09/2026): saltato un mese da 100 di lucidità e ~20 di hype, arrivati
+a 84 di lucidità e ~12 di hype, settimana avanzata di 4, energia tornata a 100.
+
 ---
 
 ## 12 · Le classifiche ogni settimana, con le frecce
