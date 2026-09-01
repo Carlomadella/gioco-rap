@@ -106,6 +106,9 @@ async function aspettaCheRisponda(figlio){
     controlla("il server risponde e ha i bot in pista", stato.dati && stato.dati.artisti === 40, stato.dati);
     controlla("all'inizio non c'è nessun giocatore vero", stato.dati && stato.dati.giocatori === 0);
 
+    const senzaParametri = await chiama("/api/classifica");
+    controlla("una rotta chiamata senza parametri usa i suoi valori di suo",
+      senzaParametri.dati.righe.length === 10, senzaParametri.dati.righe.length);
     const top = await chiama("/api/classifica?quanti=10");
     controlla("la top 10 torna dieci righe", top.dati && top.dati.righe.length === 10);
     controlla("le righe sono ordinate per stream",
@@ -152,8 +155,53 @@ async function aspettaCheRisponda(figlio){
     const gonfiato = await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sess1),
       corpo: { id: io1, stream: 40000000 } });
     controlla("quaranta milioni di stream vengono limati", gonfiato.dati && gonfiato.dati.limato === true, gonfiato.dati);
+    controlla("e il server dice fin dove poteva arrivare",
+      gonfiato.dati.tetto > 10000 && gonfiato.dati.tetto < 200000 &&
+      gonfiato.dati.fuori.indexOf("stream") >= 0, { tetto: gonfiato.dati.tetto, fuori: gonfiato.dati.fuori });
     const dopo = await chiama("/api/artista/" + io1);
-    controlla("e restano al massimo il quintuplo (60.000)", dopo.dati.stream === 60000, dopo.dati);
+    controlla("resta il tetto, non il numero inventato", dopo.dati.stream === gonfiato.dati.tetto, dopo.dati.stream);
+
+    console.log("\nil modello: cosa sta in piedi e cosa no");
+    const onesto = await chiama("/api/artista", { metodo: "POST",
+      corpo: { nome: "Gente Onesta", citta: "Bari", genere: "drill" } });
+    const onestoId = onesto.dati.id, sessOnesto = onesto.dati.token;
+    const partenza = await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sessOnesto),
+      corpo: { id: onestoId, stream: 4000, fan: 500, livello: 3, uscite: 1 } });
+    controlla("chi comincia piano passa liscio", partenza.dati.limato === false, partenza.dati);
+    const cresce = await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sessOnesto),
+      corpo: { id: onestoId, stream: 12000, fan: 620, livello: 4, uscite: 2 } });
+    controlla("una settimana buona con un pezzo nuovo passa lo stesso",
+      cresce.dati.limato === false, { limato: cresce.dati.limato, tetto: cresce.dati.tetto });
+    const fanFinti = await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sessOnesto),
+      corpo: { id: onestoId, stream: 13000, fan: 900000, livello: 4 } });
+    controlla("i fan non si moltiplicano per mille in una settimana",
+      fanFinti.dati.limato === true && fanFinti.dati.fuori.indexOf("fan") >= 0, fanFinti.dati);
+    const suo = await chiama("/api/artista/" + onestoId);
+    controlla("e restano quelli che poteva avere", suo.dati.stream > 0);
+
+    console.log("\nchi insiste a barare");
+    const furbo = await chiama("/api/artista", { metodo: "POST",
+      corpo: { nome: "Tarocco", citta: "Latina", genere: "trap" } });
+    const furboId = furbo.dati.id, sessFurbo = furbo.dati.token;
+    let fuoriDopo = null;
+    for(let i = 0; i < 4; i++){
+      const r = await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sessFurbo),
+        corpo: { id: furboId, stream: 9000000 + i, fan: 4000000 } });
+      if(r.dati && r.dati.fuoriClassifica) fuoriDopo = i + 1;
+    }
+    controlla("dopo qualche numero inventato finisce fuori classifica da solo",
+      fuoriDopo !== null, { fuoriDopo });
+    const cercalo = await chiama("/api/classifica?quanti=200");
+    controlla("e sparisce davvero dalla graduatoria",
+      cercalo.dati.righe.every(r => r.id !== furboId));
+    const gioca = await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sessFurbo),
+      corpo: { id: furboId, stream: 100 } });
+    controlla("ma il gioco continua a funzionargli: non gli abbiamo tolto niente",
+      gioca.stato === 200 && gioca.dati.ok, gioca.dati);
+    const registro = await chiama("/api/sospetti", { testate: { "x-admin": ADMIN } });
+    controlla("nel registro c'è tutto quello che ha provato",
+      registro.dati.sospetti.filter(x => x.artista_id === furboId).length >= 3,
+      registro.dati.sospetti.length);
 
     console.log("\ngli account");
     const conMail = await chiama("/api/account", { metodo: "POST",
@@ -421,8 +469,11 @@ async function aspettaCheRisponda(figlio){
 
     console.log("\ni sospetti e le sanzioni");
     const visti = await chiama("/api/sospetti", { testate: { "x-admin": ADMIN } });
-    controlla("il salto da quaranta milioni ha lasciato un sospetto",
-      visti.dati.sospetti.length >= 1 && visti.dati.sospetti[0].tipo === "salto", visti.dati.sospetti[0]);
+    const suoi = visti.dati.sospetti.filter(x => x.artista_id === io1);
+    controlla("il salto da quaranta milioni ha lasciato un sospetto pesante",
+      suoi.length >= 1 && suoi[0].tipo === "impossibile" && suoi[0].peso === 5, suoi[0]);
+    controlla("e nel sospetto c'è scritto cosa aveva chiesto e cosa poteva",
+      suoi[0].dettaglio.chiesto === 40000000 && suoi[0].dettaglio.tetto > 0, suoi[0].dettaglio);
     const nascosti = await chiama("/api/sospetti");
     controlla("i sospetti non li vede chi passa di lì", nascosti.stato === 403);
 
@@ -489,7 +540,8 @@ async function aspettaCheRisponda(figlio){
   }finally{
     figlio.kill();
     try{ apple.banchetto.close(); }catch(e){}
-    for(const f of [FILE, FILE + "-wal", FILE + "-shm"]) try{ fs.unlinkSync(f); }catch(e){}
+    if(!process.env.ADF_TIENI) for(const f of [FILE, FILE + "-wal", FILE + "-shm"]) try{ fs.unlinkSync(f); }catch(e){}
+    else console.log("database tenuto: " + FILE);
   }
 
   console.log("\n" + passati + " a posto, " + falliti + " no.\n");

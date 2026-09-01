@@ -56,7 +56,12 @@ const CFG = {
 archivio.apri(CFG);
 
 /* ==================== ATTREZZI ==================== */
+/* Un parametro che non c'è **non è zero**: è assente, e vale il valore di suo.
+   `Number(null)` fa 0 e 0 è un numero buono, quindi senza questo controllo
+   `?quanti` non passato diventava 1 invece di 10 — un bug che si vedeva solo
+   nelle rotte chiamate senza parametri. L'ha trovato la prova. */
 const nInt = (v, min, max, dif) => {
+  if(v == null || v === "") return dif;
   const n = Number(v);
   return Number.isFinite(n) ? Math.min(max, Math.max(min, Math.round(n))) : dif;
 };

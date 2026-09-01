@@ -18,6 +18,7 @@ const crypto = require("crypto");
 const { apri: apriDb, attrezzi } = require("./db.js");
 const { nuovoBot, popolazione, settimanaBot, ricambio } = require("../bot.js");
 const { nomeDufficio } = require("../moderazione.js");
+const plausibilita = require("../plausibilita.js");
 
 let A = null;                                   // gli attrezzi del database
 let CFG = { quantiBot: 140, settimanaMs: 24 * 3600e3 };
@@ -255,18 +256,27 @@ function aggiornaArtista(id, campi){
    server, perché è una regola sui dati: da un invio all'altro gli stream
    possono al massimo quintuplicare. Il primo invio ha la mano larga, per chi
    arriva con una carriera già avviata. */
+/* Il punteggio della settimana. Il freno non è più «al massimo il quintuplo»:
+   è un modello di quanto quel numero può stare in piedi, dati i fan, i pezzi
+   fuori e quello che andava già (`../plausibilita.js`). Chi sfora viene limato
+   e lascia un sospetto pesato: uno che sfora di poco pesa poco, e nessuno viene
+   sanzionato per un sospetto solo. */
 function segnaPunteggio(id, d, ipHash){
   const a = artistaGrezzo(id);
   if(!a) return null;
-  const tetto = a.punteggio ? Math.max(2500, Math.round(a.stream * 5)) : 250000;
-  const chiesto = Math.max(0, Math.min(5e7, Math.round(Number(d.stream) || 0)));
-  const limato = chiesto > tetto;
-  const stream = limato ? tetto : chiesto;
+  const esame = plausibilita.esamina(a, {
+    stream: Math.min(5e7, Number(d.stream) || 0),
+    fan: d.fan != null ? d.fan : a.fan,
+    livello: d.livello || a.livello,
+    uscite: d.uscite != null ? d.uscite : a.uscite
+  });
+  const limato = esame.limato;
+  const stream = esame.stream;
   const set = A.insieme(() => {
     A.fai(`UPDATE artista SET stream = ?, fan = ?, livello = ?, fase = ?, uscite = ?, deal = ?,
              ultima_titolo = coalesce(?, ultima_titolo), ultima_seed = coalesce(?, ultima_seed),
              punteggio = ? WHERE id = ?`,
-      stream, d.fan != null ? d.fan : a.fan, d.livello || a.livello, d.fase != null ? d.fase : a.fase,
+      stream, esame.fan, esame.livello, d.fase != null ? d.fase : a.fase,
       d.uscite != null ? d.uscite : a.uscite, d.deal == null ? a.deal : (d.deal ? 1 : 0),
       d.ultima || null, d.seed || null, ora(), id);
     const s = settimanaCorrente();
@@ -277,19 +287,22 @@ function segnaPunteggio(id, d, ipHash){
              stream = excluded.stream, fan = excluded.fan, livello = excluded.livello,
              fase = excluded.fase, uscite = excluded.uscite, deal = excluded.deal,
              limato = excluded.limato, inviato = excluded.inviato`,
-      id, s, stream, d.fan || 0, d.livello || 1, d.fase || 0, d.uscite || 0,
+      id, s, stream, esame.fan, esame.livello, d.fase || 0, d.uscite || 0,
       d.deal ? 1 : 0, limato ? 1 : 0, ipHash || null, ora());
-    if(limato) segnaSospetto(id, "salto", { chiesto, tetto });
+    if(limato && esame.peso > 0) segnaSospetto(id, esame.gravita > 20 ? "impossibile" : "salto",
+      { chiesto: Math.round(Number(d.stream) || 0), tetto: esame.tetto,
+        fuori: esame.fuori, gravita: esame.gravita }, esame.peso);
     return s;
   });
   /* Chi ha una sanzione «fuori classifica» continua a giocare e il punteggio
      si salva lo stesso: solo, in graduatoria non c'è. Quindi qui la scheda può
      non tornare, e non è un errore — è la sanzione che funziona. */
+  if(limato && esame.peso > 0) valutaSospetti(a.account_id);
   const mia = schedaConPosizione(id, id);
   const traguardi = traguardiDovuti(id);
   return { ok: true, pos: mia ? mia.pos : null, delta: mia ? mia.delta : null,
     fuoriClassifica: !mia, totale: quantiArtisti(), settimana: set, limato,
-    traguardi };
+    tetto: esame.tetto, fuori: esame.fuori, traguardi };
 }
 
 /* ==================== SANZIONI E SOSPETTI ====================
@@ -322,9 +335,30 @@ const sospetti = quanti => A.tutti(
    ORDER BY s.id DESC LIMIT ?`, quanti).map(r =>
      Object.assign(r, { dettaglio: (() => { try{ return JSON.parse(r.dettaglio); }catch(e){ return {}; } })() }));
 
-const segnaSospetto = (id, tipo, dettaglio) =>
-  A.fai("INSERT INTO sospetto (artista_id, tipo, dettaglio, creato) VALUES (?,?,?,?)",
-    id, tipo, JSON.stringify(dettaglio || {}), ora());
+const segnaSospetto = (id, tipo, dettaglio, peso) =>
+  A.fai("INSERT INTO sospetto (artista_id, tipo, dettaglio, peso, creato) VALUES (?,?,?,?,?)",
+    id, tipo, JSON.stringify(dettaglio || {}), Math.max(1, peso || 1), ora());
+
+/* Nessuno viene sanzionato per un sospetto solo: uno può sforare perché il
+   nostro modello è stretto, o perché ha fatto una settimana eccezionale. Ma
+   dodici punti di sospetto in due mesi non sono più un caso — e allora scatta
+   **fuori dalla classifica**, non la sospensione: continua a giocare la sua
+   partita, e chi guarda la coda decide con calma. */
+const SOGLIA_SOSPETTI = 12;
+function valutaSospetti(accountId){
+  if(!accountId) return null;
+  if(sanzioneAttiva(accountId)) return null;
+  const somma = A.uno(
+    `SELECT coalesce(sum(s.peso), 0) peso FROM sospetto s
+     JOIN artista a ON a.id = s.artista_id
+     WHERE a.account_id = ? AND s.creato > ?`, accountId, ora() - 60 * 86400e3).peso;
+  if(somma < SOGLIA_SOSPETTI) return null;
+  A.fai("INSERT INTO sanzione (account_id, tipo, motivo, da, a, deciso_da) VALUES (?,?,?,?,?,?)",
+    accountId, "fuori_classifica",
+    "numeri che non stanno in piedi (" + somma + " punti di sospetto in due mesi)",
+    ora(), ora() + 14 * 86400e3, "automatico");
+  return { fuoriClassifica: true, peso: somma };
+}
 
 /* ==================== IL TEMPO ==================== */
 const settimanaCorrente = () =>
@@ -836,7 +870,7 @@ module.exports = {
   apri, chiudi, stato, leggiStato, scriviStato,
   classifica, intorno, schedaConPosizione, artistaGrezzo, nomeLibero, artistiDi,
   iscriviArtista, aggiornaArtista, segnaPunteggio, segnaSospetto,
-  sanziona, sanzioneAttiva, togliSanzioni, sospetti, manutenzione,
+  sanziona, sanzioneAttiva, togliSanzioni, sospetti, manutenzione, valutaSospetti,
   giroSettimana, assicuraSettimana, settimanaCorrente, notizie,
   cittaInGioco, generiInGioco, quantiInClassifica, feed, opps, dichiara, scancella, relazioni,
   stagioneCorrente, chiudiStagione, albo, stagioni,
