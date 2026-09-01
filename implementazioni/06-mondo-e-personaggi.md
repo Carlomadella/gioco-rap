@@ -126,6 +126,36 @@ proprio il motivo per cui uno smette.
 
 ---
 
+## Opp e giornalisti per strada
+
+Da smistare, punto 5: "Oltre a fan cortesi e scortesi, potremmo incontrare anche opps (rivali) e
+giornalisti che potrebbero fermarci a fare domande che poi faran notizia se son critiche. Ovviamente
+i giornalisti si vedranno solo una volta famosi."
+
+**FATTO (01/09/2026)** — `frontend/js/game/strada.js`, stesso elenco `INCONTRI` del punto 54.
+L'opp c'era già (la circostanza 4 del punto 54, sotto): incrocia un rivale vero da `G.rivals`,
+sbloccato da 300 fan. Mancava il **giornalista**, aggiunto qui: un cronista di «La Voce del Giro» —
+la stessa testata che già firma i pezzi negativi degli altri incontri — ti ferma con una domanda
+pescata fra sei, e hai due modi di rispondere.
+- **Con cautela**: nessun rischio, nessun titolo, un pelo di benessere perso per la noia
+  dell'intervista.
+- **Senza filtri**: una frase a effetto — se `flow + presenza ≥ 24` (la stessa soglia già usata per
+  l'hater) la becchi bene e diventa un pezzo che ti fa notizia buona (hype su, postato con
+  `postaEvento`); altrimenti esce comunque un pezzo, ma contro di te (hype giù, benessere giù).
+  «Faran notizia se son critiche» è proprio questo: rispondere di petto è quello che genera
+  l'articolo, in un senso o nell'altro — con la cautela non esce nessun pezzo.
+- **Si vede solo da famosi**: `req: () => G.fans >= 2000`, la stessa soglia con cui il giornalista
+  compare già come ruolo alla Sala (`posto.js`, punto 43/54) — prima di allora nessun giornalista ti
+  ferma per strada.
+
+`liv:"medio"`, come l'hater: durante un salto di tempo (punto 4, sopra) si risolve da solo scegliendo
+la risposta prudente, non ferma niente. `npm run prova` (28/28) e `npm run build` puliti; non l'ho
+riprovato in Chrome in questa sessione (estensione non connessa) — la logica ricalca esattamente
+quella già in produzione dell'hater e dell'opp, stessi helper (`pick`, `rnd`, `clamp`,
+`postaEvento`), nessuna novità di sistema.
+
+---
+
 ## 43 · I dialoghi devono essere tanti e diversi
 
 43. I dialoghi di gioco devono essere molti e molto diversi tra loro, cosicche sembri ancora più realistico. 

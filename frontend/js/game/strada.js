@@ -1,8 +1,15 @@
 /* Incontri per strada (punto 54): stessa forma per tutti — ti fermano, tu
-   scegli come rispondere — ma le circostanze sono sette storie diverse: un
-   fan gentile, uno maleducato, un hater, un opp, una faccia di prima, il
-   manager, uno con cui è finita male. Capitano vivendo la giornata
-   (avanzaGiorno, sim.js), non a tavolino.
+   scegli come rispondere — ma le circostanze sono otto storie diverse: un
+   fan gentile, uno maleducato, un hater, un opp, un giornalista, una faccia
+   di prima, il manager, uno con cui è finita male. Capitano vivendo la
+   giornata (avanzaGiorno, sim.js), non a tavolino.
+
+   Da smistare, punto 5: il giornalista si aggiunge qui — si vede solo con
+   fama vera (G.fans >= 2000, la stessa soglia con cui compare alla Sala,
+   posto.js) e fa domande che, se rispondi senza filtri, diventano un pezzo
+   vero postato con `postaEvento` — bene se la risposta regge, male se no.
+   L'opp era già qui da prima (punto 54): non serviva altro codice, solo
+   chiuderlo come punto a sé.
 
    Due circostanze non hanno uno stato vero dietro e sono rimaste flavor:
    «l'ex manager» — nel gioco non esiste ancora un manager che si lascia,
@@ -17,7 +24,7 @@
    l'incontro ha già (`peso`, quanto è comune) e quanto costa sbagliarlo.
    - basso: un fan, buono o cafone — capita spesso, il conto è quasi sempre
      una manciata di hype o benessere. Non ferma niente.
-   - medio: un hater, una vecchia amicizia, il manager — meno comuni,
+   - medio: un hater, un giornalista, una vecchia amicizia, il manager — meno comuni,
      pesano un po' di più, ma restano cose che si risolvono da sole senza
      bisogno di stare lì a decidere.
    - alto: un opp che sblocca solo con 300 fan veri e rivali in giro, o chi
@@ -28,6 +35,20 @@
 "use strict";
 
 const STRADA_NOMI = ["Marco","Giulia","Fede","Sara","Luca","Vale","Ale","Chicco","Mattia","Cate","Simo","Robi"];
+
+/* Da smistare, punto 5: nomi e domande del giornalista di strada — persona
+   diversa da quelli della Sala (posto.js), che è un ruolo fisso lì dentro;
+   qui è un cronista di passaggio, la testata è sempre «La Voce del Giro»,
+   la stessa che già firma i pezzi negativi nati da altri incontri. */
+const STR_GIORNALISTA_NOMI = ["Marta Belloni","Dario Conte","Elisa Rinaldi","Toni Sarti","Nadia Ferro"];
+const STR_GIORNALISTA_DOMANDE = [
+  "ti chiede cosa pensi del tuo rivale del momento, e se è vero che ti scrivono le barre",
+  "ti chiede se è vero che dietro i tuoi testi c'è un ghostwriter",
+  "ti chiede perché non hai mai risposto a chi ti ha attaccato in un pezzo",
+  "ti chiede se ti senti minacciato dai nuovi che stanno uscendo adesso",
+  "ti chiede se è vero che stai per firmare con una major e lasci il giro",
+  "ti chiede cosa risponde a chi dice che sei solo hype, senza sostanza"
+];
 
 /* Da smistare, punto 2: "la scena dei fan ne hai fatte si e no 3" — vero, erano
    una frase sola con solo il nome che cambiava. Qui sotto un luogo e un
@@ -188,6 +209,32 @@ const INCONTRI = [
           }
           G.wellbeing = clamp(G.wellbeing - 3, 0, 100);
           return {t:r.n + " ha avuto l'ultima parola. Non l'hai presa bene.", c:"bad"};
+        }}
+      ]};
+  }},
+
+  {id:"giornalista", peso:1, liv:"medio", req:() => G.fans >= 2000, crea(){
+    const nome = pick(STR_GIORNALISTA_NOMI);
+    const domanda = pick(STR_GIORNALISTA_DOMANDE);
+    return {t:"Un giornalista ti ferma", d:nome + ", de «La Voce del Giro», ti riconosce e attacca subito: " + domanda + ".",
+      opts:[
+        {n:"Rispondi con cautela", d:"Una frase generica, niente titoli", run(){
+          G.wellbeing = clamp(G.wellbeing - 1, 0, 100);
+          return {t:"Hai risposto senza dire niente di vero. " + nome + " se n'è andato senza un titolo.", c:""};
+        }},
+        {n:"Rispondi a modo tuo, senza filtri", d:"Una frase a effetto: se la becchi bene fa notizia, se la sbagli pure", run(){
+          const art = window.ARTIST || {};
+          if(G.skills.flow + G.skills.presenza >= 24){
+            G.hype = clamp(G.hype + rnd(5,12), 0, 100);
+            postaEvento("La Voce del Giro", ((art.name || "un artista").trim() || "un artista") +
+              " a ruota libera con " + nome + ": la frase sta già girando.", rnd(35,80));
+            return {t:"L'hai detta come la pensi. " + nome + " sorrideva mentre scriveva.", c:"good"};
+          }
+          G.hype = clamp(G.hype - rnd(3,8), 0, 100);
+          G.wellbeing = clamp(G.wellbeing - 3, 0, 100);
+          postaEvento("La Voce del Giro", "Le parole di troppo di " + ((art.name || "un artista").trim() || "un artista") +
+            " a " + nome + ". Non la prenderanno bene tutti.", rnd(20,55));
+          return {t:"Detto e fatto: " + nome + " l'ha titolata peggio di come l'avevi pensata tu.", c:"bad"};
         }}
       ]};
   }},
