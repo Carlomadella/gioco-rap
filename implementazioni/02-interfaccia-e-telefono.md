@@ -354,3 +354,41 @@ Cosa è stato sistemato:
 4. Le **aree da toccare a 44 punti** (punto 36): sul telefono adesso ci sono
    ancora bottoni piccoli.
 
+
+## 55 · Via la conferma «sei sicuro» per l'energia
+
+55. Non chiedere le conferme per l'energia ogni volta che si vuole cliccare sulla card. Toglierlo a tutte.
+
+    **FATTO (01/09/2026)** — la conferma (`ui.js`) usciva quando la mossa costava soldi *o* almeno 2
+    energie: `SET.gioco.conferme && (c > 0 || en2 >= 2)`. Era una soglia pensata per quando l'energia
+    andava da 1 a 3 a mossa (prima dei punti 39-41); dopo il riscalo a 10-50, `en2 >= 2` era vera per
+    quasi ogni azione — la conferma usciva sempre, esattamente il problema segnalato. Tolta la metà
+    sull'energia: resta solo `SET.gioco.conferme && c > 0`, quindi la conferma si vede ancora — giustamente
+    — dove si spendono soldi veri (es. Palestra, 12 €), non per il solo consumo di energia. Aggiornata
+    anche la descrizione della voce nelle Impostazioni (`impostazioni-ui.js`).
+    Provato in Chrome: Palestra (costa soldi) chiede ancora conferma, le mosse solo-energia no.
+
+---
+
+## 58 · Transizioni diverse per ogni scena
+
+58. Sarebbe bello avere una transizione quando clicchiamo il pulsante ed entriamo nelle scene delle
+    varie card. Non tutte uguali.
+
+    **FATTO (01/09/2026)** — le sette scene a pagina piena del punto 50 (`SCENA_PIENA` in `ui.js`:
+    mixa, pubblica, promo, live, turno, stacca, palestra) usavano tutte la stessa keyframe generica
+    (`rIn`, uno scale+translateY). Ognuna adesso ha un'entrata sua, scelta in base a cosa rappresenta
+    (`css/effects.css`, selettore `.scwrap[data-anim="..."]`):
+    - **mixa** — scivola da destra con un piccolo skew (il pan della consolle)
+    - **pubblica** — esplode dal centro con un lampo di luce (il momento del rilascio)
+    - **promo** — un flip 3D leggero (la clip che si affaccia)
+    - **live** — sale da sotto come si alza il sipario
+    - **turno** — scatto secco da sinistra, meccanico (il cartellino che timbra)
+    - **stacca** — dissolvenza lenta con un filo di blur (si stacca la spina, con calma)
+    - **palestra** — rimbalza dentro con un piccolo overshoot (energia, non fatica)
+    `mostraScena()` sceglie l'animazione da `a.id` e forza il riavvio della keyframe (serve a farla
+    ripartire anche riaprendo di fila la stessa scena, altrimenti il browser la considera già finita).
+    Provato in Chrome: `stacca` poi `palestra` poi `turno` in sequenza, ognuna con l'animazione giusta
+    (`getComputedStyle(...).animationName`), e il bottone «Continua» funziona ancora dopo ogni scena.
+
+---

@@ -358,3 +358,61 @@ Nel concept è una lista (messaggi, otto riquadri, notizie); nel gioco è un
 iPhone vero, ed è di oggi (punto 42). Rifarlo com'era nella foto vorrebbe dire
 buttare quel lavoro: se lo volete uguale alla foto ditelo e si fa.
 
+**Bug trovato e sistemato (01/09/2026)** — sotto i 1180px di larghezza il
+telefono non si nascondeva davvero: `telefono.css` dichiara `.ptel{display:flex}`
+senza media query e viene caricato *dopo* `hub.css`, quindi a parità di
+specificità vinceva sempre lui, non la regola `@media(max-width:1180px)`.
+La città restava a **larghezza zero** (le nove zone da toccare collassavano a
+12×2 px, tutte impilate nello stesso punto) mentre il telefono restava a
+schermo intero. Corretto alzando la specificità del selettore che nasconde il
+telefono (`body.in-hub .ptel`, css/hub.css) invece di contare sull'ordine dei
+file. Non è mai arrivato in produzione a schermi larghi: ci si inciampa solo
+sotto i 1180px di larghezza reale della finestra.
+
+---
+
+## 59 · Due lavori veri al posto di due cartelli chiusi
+
+59. Al posto dei posti ancora lockati nella città di provincia mettiamo piuttosto che 2 sono posti di
+    lavoro; uno potrebbe essere la pizzeria dove vai a fare il lavapiatti e l'altro potrebbe essere la
+    fabbrica dove vai a fare i turni da operaio. Uno lavoro part time (pizzeria), l'altro full time (fabbrica).
+
+    **FATTO (01/09/2026)** — `Club & discoteche` e `Sponsor & brand` (`HUB_LUOGHI` in
+    `frontend/js/game/hub.js`) erano due dei cartelli chiusi senza niente dietro (punto 48). Sono
+    diventati due lavori veri, cliccabili sulla mappa:
+    - **Pizzeria** → `Lavapiatti` (job già esistente in `JOBS`, `actions.js`): 100 €, 18 energia a turno.
+    - **Fabbrica** → `Operaio`, nuovo in `JOBS`: 220 €, 40 energia a turno — full time, si sente di più.
+
+    Toccando la card si apre una scheda (`schedaLavoro()`, nuova in `hub.js`) col nome del lavoro, la
+    paga e il costo in energia; «Fatti assumere e lavora» chiama `assumitiCome()`, che assegna `G.job` e
+    fa subito il primo turno. **Un lavoro alla volta**, come è sempre stato `G.job`: se sei già assunto
+    altrove, il gioco lo dice («Lavori già come lavapiatti. Un posto alla volta — lascialo o aspetta di
+    essere licenziato.») e non ti fa doppiare.
+    Provato in Chrome, click veri sulla mappa: assunzione, turno, paga ed energia scalate, e il blocco
+    da già-occupato-altrove, tutti verificati.
+    **Resta il limite del punto 45**: le targhette dentro alla foto (`mappa_citta.jpg`) dicono ancora
+    «Club & discoteche» e «Sponsor & brand» — cambiano solo quando arriva la mappa nuova.
+
+---
+
+## 60 · «Vita quotidiana» diventa «Casa»
+
+60. La card vita quotidiana chiamala «Casa».
+
+    **FATTO (01/09/2026)** — rinominata in `HUB_LUOGHI` (`hub.js`); il sottomenu resta «Stacca la
+    spina» e «Guarda cosa ti costa vivere» (la palestra è uscita da qui, vedi punto 61). Stesso limite
+    del punto 45: nella foto il cartello dice ancora «Vita quotidiana».
+
+---
+
+## 61 · La palestra diventa un posto suo
+
+61. La palestra mettila in una card lockata che, come ti ho detto, non ha senso che si vedano se non
+    sono interagibili — piuttosto rimpiazziamole.
+
+    **FATTO (01/09/2026)** — la palestra era una delle due opzioni dentro al sottomenu di «Vita
+    quotidiana»; adesso è una card sua, al posto del cartello chiuso «Business» (che non aveva niente
+    dietro, punto 48). Il click chiama direttamente `hubAzione("palestra")`, la stessa azione di sempre
+    (`ACTIONS`): 12 energia, 12 €, +benessere. Stesso limite del punto 45 sulla targhetta nella foto
+    («Business» invece di «Palestra»).
+

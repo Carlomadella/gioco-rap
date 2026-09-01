@@ -1,10 +1,12 @@
+quando finisci una task committa e pusha e nel committ fai riferimento al punto del file completato. Se vedi che viene modificato il file non preoccuparti, sono io, tu continua con quello che stai facendo, ogni volta che finisci un task segnalo come completato
+
 # Punti nuovi
 
 **Scrivi qui.** Questo è il foglio dove si butta l'idea appena viene, senza pensare a dove
 va: un punto, una riga, anche di corsa. Poi si sposta nel file dell'argomento giusto, con
 sotto scritto cosa è stato fatto.
 
-I punti di prima — tutti e cinquantuno — stanno nella cartella
+I punti di prima — tutti e sessantuno — stanno nella cartella
 **[`implementazioni/`](implementazioni/README.md)**, divisi per argomento:
 
 | | argomento |
