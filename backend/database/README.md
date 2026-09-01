@@ -131,6 +131,15 @@ cose, e nessuna delle due è codice da scrivere adesso:
 | da quando ci sono gli account | **SQLite** (`node:sqlite`) | **è qui che siamo** |
 | dal primo giorno di store | **PostgreSQL**, con copie automatiche e ripristino provato | da fare |
 
+**La soglia adesso è misurata**, non stimata (`npm run carico`, numeri per esteso in
+`../README.md`): a **20.000 artisti** tutto sta sotto i dieci millisecondi; a **100.000**
+cominciano a sentirsi «dove sono in classifica» (64 ms, perché bisogna contare quanti
+stanno davanti) e il giro di settimana (10 secondi, che intanto blocca il processo).
+
+Quindi, in ordine, il giorno che i giocatori diventano tanti: prima si sposta il giro di
+settimana fuori dalla richiesta, poi si passa a Postgres. Non il contrario: il primo è
+mezza giornata, il secondo è un trasloco.
+
 ## Le cartelle
 
 ```
