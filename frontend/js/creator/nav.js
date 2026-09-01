@@ -46,13 +46,17 @@ function renderMenu(){
   /* Il ritratto c'è sempre, anche prima che l'artista abbia un nome: senza,
      il menu si apriva su mezzo riquadro vuoto. Finché è solo un abbozzo lo si
      tiene indietro, in penombra, così non sembra una carriera già cominciata. */
-  $("m-port").innerHTML = portrait();
-  $("m-port").classList.toggle("abbozzo", !nm);
-  $("m-name").textContent = nm || "Crea il tuo artista";
+  /* Il ritratto e il nome sulla landing non ci sono più: la schermata è la
+     foto, e basta. Restano nel profilo e nella plancia, dove servono. */
+  if($("m-port")){
+    $("m-port").innerHTML = portrait();
+    $("m-port").classList.toggle("abbozzo", !nm);
+  }
+  if($("m-name")) $("m-name").textContent = nm || "Crea il tuo artista";
   $("m-tag").textContent = viva
     ? "Carriera in corso · anno " + g.year + ", settimana " + g.week
     : nm ? "Artista pronto, carriera da iniziare" : "Nessuna carriera iniziata";
-  $("m-meta").textContent = nm
+  if($("m-meta")) $("m-meta").textContent = nm
     ? (A.city.trim() || scene().n) + " · " + genre().n + " · " + fit().n
     : "Otto avatar pronti, oppure costruisci la faccia da zero.";
   $("m-play-a").textContent = viva ? "Riprendi la carriera" : nm ? "Inizia la carriera" : "Crea il tuo artista";
