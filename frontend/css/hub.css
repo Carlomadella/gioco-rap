@@ -221,7 +221,11 @@ body.in-hub .topnav{display:none}
       "barra  barra"
       "sx     centro"
       "sugg   sugg"}
-  .ptel{display:none}
+  /* telefono.css dichiara «.ptel{display:flex}» senza media query e viene
+     caricato dopo: a parità di specificità vince l'ultimo, quindi qui serve
+     un selettore più specifico, non solo l'ordine, o il telefono non si
+     nasconde mai e la città sotto resta a larghezza zero. */
+  body.in-hub .ptel{display:none}
 }
 @media (max-height:760px){
   .psxtab{height:84px}
