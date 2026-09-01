@@ -927,3 +927,37 @@ in parallelo.
    è un negozio a parte da quello (chiuso) della mappa, che resta per
    l'attrezzatura da studio. `npm run prova` (12/12) e `npm run build`
    puliti; non provato in un browser vero in questa sessione.
+
+--- BACKEND, LAVORI DI OGGI DOPO IL PUNTO 37 (01/09/2026) ---
+
+Non sono punti chiesti da voi: sono le cose che al backend mancavano per stare
+in piedi su uno store. Le segno qui per non lasciarle solo nei commit.
+
+- **Accessi con Steam, Apple e Google** (`backend/accessi.js`): la verifica dei
+  biglietti firmati c'è tutta — JWT RS256 controllato contro le loro chiavi
+  pubbliche (firma, emittente, destinatario, scadenza), e per Steam la chiamata
+  a Steamworks. Mancano solo **le loro chiavi**, che si prendono quando l'app è
+  registrata: senza, il canale risponde `501` e dice quale manca.
+- **Moderazione dei nomi** (`moderazione.js`, `parole.js`): il nome d'arte è
+  roba scritta da un utente e mostrata agli altri, e gli store vogliono un
+  filtro e una coda di segnalazioni. Il filtro normalizza («c4zz0» → «cazzo»),
+  blocca chi finge di essere lo staff, e protegge le parole innocenti («Scazzo»
+  passa). Dietro: `POST /api/segnalazione`, la coda `GET /api/da-guardare`, e
+  il nome tolto d'ufficio con quello di prima salvato.
+- **Traguardi dati dal server**: quelli che si possono controllare dai numeri
+  non li chiede più il gioco (li darebbe chiunque dalla console): arrivano da
+  soli col punteggio. Al gioco restano quelli che il server non può sapere.
+- **Sospetti e sanzioni**: ogni punteggio limato lascia una traccia; le sanzioni
+  sono tre, e la regola è **fuori dalla classifica prima della sospensione** —
+  chi è fuori sparisce dalla graduatoria ma continua a giocare la sua partita.
+- **Classifiche per città e per genere**: «sei 3° a Rovereto» invece di «sei
+  428° in Italia». La posizione si conta dentro al filtro.
+- **Stagioni e albo d'oro**: si chiude una stagione, chi ha vinto resta scritto,
+  e i numeri di tutti si ammorbidiscono (×0,25) invece di azzerarsi.
+- **Copia di sicurezza** a server acceso (`npm run copia`), che tiene le ultime
+  trenta e ricontrolla quello che ha appena scritto.
+
+La prova del server è a **101 controlli**, tutti verdi, e dentro c'è anche un
+finto «appleid.apple.com» con chiavi vere per provare che un biglietto firmato
+male non entra.
+

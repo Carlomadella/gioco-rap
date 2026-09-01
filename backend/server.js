@@ -319,8 +319,30 @@ async function rotta(req, res, url){
 
   /* ---------- la classifica ---------- */
   if(M("GET", "/api/classifica")){
+    /* i filtri: «?citta=Rovereto» o «?genere=trap». La posizione si conta
+       dentro al filtro — sei 3° a Rovereto, non 428° con un'etichetta sopra */
+    const filtro = {
+      citta: nomePulito(q.get("citta"), 40) || null,
+      genere: GENERI.indexOf(q.get("genere")) >= 0 ? q.get("genere") : null
+    };
     return invia(res, 200, archivio.classifica(
-      nInt(q.get("da"), 1, 100000, 1), nInt(q.get("quanti"), 1, 200, 10), String(q.get("io") || "")));
+      nInt(q.get("da"), 1, 100000, 1), nInt(q.get("quanti"), 1, 200, 10),
+      String(q.get("io") || ""), filtro));
+  }
+
+  /* le città e i generi che hanno davvero gente dentro */
+  if(M("GET", "/api/classifiche")){
+    return invia(res, 200, { citta: archivio.cittaInGioco(), generi: archivio.generiInGioco() });
+  }
+
+  /* ---------- le stagioni ---------- */
+  if(M("GET", "/api/stagioni")){
+    return invia(res, 200, { corrente: archivio.stagioneCorrente(), tutte: archivio.stagioni() });
+  }
+
+  if(M("GET", "/api/albo")){
+    const s = q.get("stagione");
+    return invia(res, 200, { albo: archivio.albo(s ? nInt(s, 1, 9999, null) : null) });
   }
 
   if(M("GET", "/api/classifica/intorno/" + UUID)){
@@ -392,6 +414,13 @@ async function rotta(req, res, url){
     if(!admin()) return male(res, 403, "non-sei-tu");
     const quante = archivio.giroSettimana();
     return invia(res, 200, { ok: true, settimana: archivio.settimanaCorrente(), notizie: quante });
+  }
+
+  if(M("POST", "/api/stagione/chiudi")){
+    if(!admin()) return male(res, 403, "non-sei-tu");
+    const b = await corpo(req).catch(() => ({}));
+    const r = archivio.chiudiStagione(nInt(b.quanti, 1, 1000, 100));
+    return r ? invia(res, 200, r) : male(res, 409, "nessuna-stagione-aperta");
   }
 
   if(M("GET", "/api/sospetti")){

@@ -141,20 +141,65 @@ const GRADUATORIA = `WITH grad AS (
   SELECT a.id, row_number() OVER (ORDER BY a.stream DESC, a.creato) AS pos
   FROM artista a WHERE ${IN_CLASSIFICA} )`;
 
-function classifica(da, quanti, ioId){
+/* La stessa graduatoria, ma dentro a un sottoinsieme: la città, il genere.
+   La posizione si conta **dentro al filtro** — «sei 3° a Rovereto» — perché è
+   l'unico modo in cui una classifica per città vuol dire qualcosa. Il filtro
+   entra come parametro, mai incollato nella query. */
+function graduatoriaFiltrata(filtro){
+  const dove = [IN_CLASSIFICA];
+  const v = [];
+  if(filtro && filtro.citta){ dove.push("lower(a.citta) = lower(?)"); v.push(filtro.citta); }
+  if(filtro && filtro.genere){ dove.push("a.genere = ?"); v.push(filtro.genere); }
+  return {
+    sql: `WITH grad AS (
+      SELECT a.id, row_number() OVER (ORDER BY a.stream DESC, a.creato) AS pos
+      FROM artista a WHERE ${dove.join(" AND ")} )`,
+    v
+  };
+}
+
+function classifica(da, quanti, ioId, filtro){
   const prec = ultimaChiusa();
-  const righe = A.tutti(GRADUATORIA + `
+  const g = graduatoriaFiltrata(filtro);
+  const righe = A.tutti(g.sql + `
     SELECT ${CAMPI_PUBBLICI}, g.pos, p.pos AS pos_prec
     FROM grad g JOIN artista a ON a.id = g.id
     LEFT JOIN classifica_posizione p ON p.artista_id = a.id AND p.settimana = ?
-    WHERE g.pos BETWEEN ? AND ? ORDER BY g.pos`, prec, da, da + quanti - 1);
+    WHERE g.pos BETWEEN ? AND ? ORDER BY g.pos`, ...g.v, prec, da, da + quanti - 1);
+  /* dentro a un filtro anche «io» cambia: la mia posizione a Rovereto non è
+     la mia posizione in Italia */
+  const mio = ioId ? A.uno(g.sql + `
+    SELECT ${CAMPI_PUBBLICI}, g.pos, p.pos AS pos_prec
+    FROM grad g JOIN artista a ON a.id = g.id
+    LEFT JOIN classifica_posizione p ON p.artista_id = a.id AND p.settimana = ?
+    WHERE a.id = ?`, ...g.v, prec, ioId) : null;
   return {
-    settimana: settimanaCorrente(), totale: quantiArtisti(),
+    settimana: settimanaCorrente(),
+    totale: quantiInClassifica(filtro),
+    filtro: (filtro && (filtro.citta || filtro.genere)) ? filtro : null,
     prossimoGiro: Number(leggiStato("prossimo_giro", 0)),
     righe: righe.map(r => riga(r, ioId)),
-    io: ioId ? schedaConPosizione(ioId, ioId) : null
+    io: mio ? riga(mio, ioId) : null
   };
 }
+
+/* Quanti sono in classifica, dentro al filtro. */
+function quantiInClassifica(filtro){
+  const dove = [IN_CLASSIFICA];
+  const v = [];
+  if(filtro && filtro.citta){ dove.push("lower(a.citta) = lower(?)"); v.push(filtro.citta); }
+  if(filtro && filtro.genere){ dove.push("a.genere = ?"); v.push(filtro.genere); }
+  return A.uno("SELECT count(*) n FROM artista a WHERE " + dove.join(" AND "), ...v).n;
+}
+
+/* Le città e i generi che hanno gente dentro: servono a chi disegna il
+   selettore, per non mostrare venti città vuote. */
+const cittaInGioco = () => A.tutti(
+  "SELECT a.citta, count(*) quanti, max(a.stream) meglio FROM artista a WHERE " + IN_CLASSIFICA +
+  " GROUP BY lower(a.citta) ORDER BY quanti DESC, a.citta");
+const generiInGioco = () => A.tutti(
+  "SELECT a.genere, count(*) quanti FROM artista a WHERE " + IN_CLASSIFICA +
+  " GROUP BY a.genere ORDER BY quanti DESC");
 
 function schedaConPosizione(id, ioId){
   const prec = ultimaChiusa();
@@ -386,6 +431,60 @@ function assicuraSettimana(){
 const notizie = quante => A.tutti(
   "SELECT settimana, tipo, testo, creato FROM notizia ORDER BY id DESC LIMIT ?", quante)
   .map(n => ({ t: n.creato, s: n.settimana, tipo: n.tipo, testo: n.testo }));
+
+/* ==================== LE STAGIONI ====================
+   Una stagione che non finisce mai è una classifica in cui chi è arrivato
+   prima resta davanti per sempre, e chi arriva dopo non ha motivo di provarci.
+   Chiudere una stagione fa tre cose: scrive l'albo d'oro (chi ha vinto resta
+   scritto per sempre), **ammorbidisce** i numeri di tutti invece di azzerarli
+   — chi ha lavorato un anno non riparte da zero come chi ha installato ieri —
+   e apre la stagione dopo. */
+const stagioneCorrente = () =>
+  A.uno("SELECT * FROM stagione WHERE stato = 'corrente' ORDER BY id DESC LIMIT 1");
+
+function chiudiStagione(quanti){
+  return A.insieme(() => {
+    const vecchia = stagioneCorrente();
+    if(!vecchia) return null;
+    const classifica = A.tutti(GRADUATORIA + `
+      SELECT a.id, a.nome, a.citta, a.genere, a.stream, g.pos
+      FROM grad g JOIN artista a ON a.id = g.id
+      WHERE g.pos <= ? ORDER BY g.pos`, Math.max(1, quanti || 100));
+
+    for(const r of classifica){
+      A.fai(`INSERT INTO albo (stagione_id, pos, artista_id, nome, citta, genere, stream, chiusa)
+             VALUES (?,?,?,?,?,?,?,?)`,
+        vecchia.id, r.pos, r.id, r.nome, r.citta, r.genere, r.stream, ora());
+    }
+    A.fai("UPDATE stagione SET stato = 'chiusa', fine = ? WHERE id = ?", ora(), vecchia.id);
+
+    /* il ripartire: tutti gli stream calano allo stesso modo, così l'ordine
+       resta ma le distanze si accorciano e la rincorsa è possibile */
+    A.fai("UPDATE artista SET stream = CAST(stream * 0.25 AS INTEGER) WHERE ritirato IS NULL");
+    A.fai("UPDATE bot_stato SET slancio = 0, caldo = 0");
+
+    const info = A.fai("INSERT INTO stagione (nome, inizio, stato) VALUES (?, ?, 'corrente')",
+      "Stagione " + (vecchia.id + 1), ora());
+    const nuova = A.uno("SELECT * FROM stagione ORDER BY id DESC LIMIT 1");
+    /* la settimana va avanti a contare: il tempo non si azzera con la stagione */
+    A.fai("UPDATE settimana SET stagione_id = ? WHERE numero = ?", nuova.id, settimanaCorrente());
+    const primo = classifica[0];
+    if(primo){
+      A.fai("INSERT INTO notizia (settimana, artista_id, tipo, testo, creato) VALUES (?,?,?,?,?)",
+        settimanaCorrente(), primo.id, "traguardo",
+        "«" + vecchia.nome + "» si chiude: primo " + primo.nome + " con " + primo.stream + " stream.", ora());
+    }
+    return { chiusa: vecchia.nome, nuova: nuova.nome, inAlbo: classifica.length,
+      primo: primo ? primo.nome : null };
+  });
+}
+
+const albo = stagioneId => A.tutti(
+  `SELECT a.pos, a.nome, a.citta, a.genere, a.stream, a.artista_id, s.nome AS stagione, a.chiusa
+   FROM albo a JOIN stagione s ON s.id = a.stagione_id
+   WHERE a.stagione_id = coalesce(?, a.stagione_id) ORDER BY a.stagione_id DESC, a.pos LIMIT 200`,
+  stagioneId || null);
+const stagioni = () => A.tutti("SELECT id, nome, inizio, fine, stato FROM stagione ORDER BY id DESC");
 
 /* ==================== GLI ACCOUNT ==================== */
 function creaAccount(d){
@@ -625,6 +724,8 @@ module.exports = {
   iscriviArtista, aggiornaArtista, segnaPunteggio, segnaSospetto,
   sanziona, sanzioneAttiva, togliSanzioni, sospetti, manutenzione,
   giroSettimana, assicuraSettimana, settimanaCorrente, notizie,
+  cittaInGioco, generiInGioco, quantiInClassifica,
+  stagioneCorrente, chiudiStagione, albo, stagioni,
   creaAccount, account, collegaIdentita, entra, apriSessione, sessione, chiudiSessione,
   cancellaAccount, impasta, combacia, sha,
   salvaCarriera, carriera, carriere,

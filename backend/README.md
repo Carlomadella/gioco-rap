@@ -76,6 +76,7 @@ In casa vanno bene così. Online si cambiano `ADF_ORIGINI` (solo il dominio del 
 | `server.js` | HTTP, CORS, le rotte, chi sei, i freni contro l'imbroglio |
 | `bot.js` | i bot: come nascono, come crescono, il carattere, chi smette e chi spunta |
 | `nomi.js` | il vocabolario dei nomi d'arte, delle città, delle storie, dei titoli |
+| `moderazione.js` + `parole.js` | il filtro dei nomi: normalizza, becca le scritture furbe, protegge le parole innocenti |
 | `accessi.js` | entrare con Steam, Apple e Google: verifica dei biglietti firmati |
 | `database/copia.js` | la copia di sicurezza, anche a server acceso |
 | `database/db.js` | apre SQLite e applica le migrazioni |
@@ -97,7 +98,11 @@ si va il giorno che si passa a PostgreSQL.
 | --- | --- |
 | `GET /api/stato` | settimana, artisti, giocatori veri, account, salvataggi, prossimo giro |
 | `GET /api/classifica?da=1&quanti=100` | una fetta qualsiasi: top 10, top 100, top 1000 |
+| `GET /api/classifica?citta=Rovereto` · `?genere=trap` | la stessa classifica guardata da vicino: la posizione si conta **dentro** al filtro |
 | `GET /api/classifica/intorno/:id?raggio=4` | chi hai davanti e chi hai dietro — «sei 428°» |
+| `GET /api/classifiche` | le città e i generi che hanno davvero gente dentro |
+| `GET /api/stagioni` | la stagione in corso e quelle chiuse |
+| `GET /api/albo?stagione=1` | l'albo d'oro: chi ha chiuso in cima |
 | `GET /api/notizie?quante=10` | chi è uscito, chi ha firmato, chi è sparito |
 
 **Chi sei**
@@ -133,13 +138,17 @@ si va il giorno che si passa a PostgreSQL.
 | --- | --- |
 | `GET /api/traguardi` | il catalogo |
 | `GET /api/traguardi/:artistaId` | quelli che uno ha preso |
-| `POST /api/traguardo` | assegna un traguardo |
+| `POST /api/traguardo` | assegna un traguardo **di quelli che sa solo il gioco** (gli altri li dà il server) |
+| `POST /api/segnalazione` | segnala il nome o la storia di un artista |
 
 **Servizio** (serve `x-admin`)
 
 | rotta | cosa fa |
 | --- | --- |
 | `POST /api/giro` | fa passare una settimana a mano, per provare |
+| `POST /api/stagione/chiudi` | chiude la stagione: scrive l'albo d'oro e ne apre una nuova |
+| `GET /api/da-guardare` | la coda della moderazione: i più segnalati |
+| `POST /api/moderazione` | `rinomina` (nome d'ufficio) oppure `respingi` |
 | `GET /api/sospetti` | chi ha fatto alzare un sopracciglio, dal più recente |
 | `POST /api/sanzione` | avviso, fuori classifica o sospensione |
 | `GET /api/da-spingere` | i traguardi ancora da mandare a Steam e agli store |
@@ -186,6 +195,48 @@ Non esiste un caso in cui si entra senza verifica: `GET /api/stato` dice quali c
 davvero collegati. Nel frattempo l'account esiste lo stesso — **ospite** (aperto da solo,
 senza chiedere niente) ed **email + password**, che è quello che fa sopravvivere una
 carriera a un telefono nuovo.
+
+## I nomi: filtro e segnalazioni
+
+Un nome d'arte è **scritto da chi gioca e letto da tutti gli altri**: sta in classifica,
+nelle notizie, nelle schede. Apple e Google, giustamente, non pubblicano un gioco che
+mostra a un ragazzino quello che un altro ha inventato apposta per offenderlo.
+
+Il filtro (`moderazione.js`) normalizza il nome prima di guardarlo — via accenti, via le
+scritture furbe (`c4zz0` → `cazzo`), via le lettere ripetute — e blocca due cose: le parole
+offensive e chi prova a **spacciarsi per noi** (`admin`, `staff`, `La Fame Studio`). Le
+parole per bene che contengono dentro una vietata sono protette: «Scazzo» e «Cazzuola»
+passano, ed è giusto così.
+
+Nessun filtro prende tutto, e ogni filtro prende qualche innocente. Per questo dietro c'è
+la coda: `POST /api/segnalazione` (una a testa per artista e motivo, se no bastano cinque
+amici per far togliere il nome a chi non ha fatto niente), `GET /api/da-guardare` per chi
+modera, e `POST /api/moderazione` per togliere il nome d'ufficio — che non è una punizione
+scritta in faccia a tutti, è un nome neutro, e quello di prima resta salvato per poter
+rispondere a «perché mi avete cambiato il nome».
+
+## I traguardi li dà il server
+
+Quelli che si possono controllare qui **non li chiede il client**: `in_classifica`,
+`top_100`, `top_10`, `primo_posto`, `primo_pezzo`, `primi_mille`, `disco_oro`,
+`disco_platino`, `primo_contratto` arrivano da soli quando i numeri ci sono, e tornano
+dentro alla risposta del punteggio. Chiederli risponde `409`.
+
+Al gioco restano solo quelli che il server non può sapere — essere arrivato a Milano, dieci
+amici alla Sala. È la differenza fra un traguardo che vale e uno che si prende aprendo la
+console del browser: con Steam attaccato dietro, quella differenza è tutto.
+
+## Le stagioni
+
+Una stagione che non finisce mai è una classifica in cui chi è arrivato prima resta davanti
+per sempre. `POST /api/stagione/chiudi` fa tre cose:
+
+1. scrive **l'albo d'oro** (chi ha chiuso in cima resta scritto per sempre, col nome che
+   aveva allora);
+2. **ammorbidisce** i numeri di tutti invece di azzerarli — ×0,25: l'ordine resta, le
+   distanze si accorciano, e chi arriva adesso ha una rincorsa possibile. Chi ha lavorato
+   un anno non riparte da zero come chi ha installato ieri;
+3. apre la stagione dopo. Le settimane continuano a contare: il tempo non si azzera.
 
 ## Chi bara: sospetti e sanzioni
 

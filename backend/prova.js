@@ -249,6 +249,54 @@ async function aspettaCheRisponda(figlio){
     const inventato = await chiama("/api/classifica/intorno/00000000-0000-4000-8000-000000000000");
     controlla("un id inventato non trova niente", inventato.stato === 404);
 
+    console.log("\nle classifiche per città e per genere");
+    const elenchi = await chiama("/api/classifiche");
+    controlla("si sa quali città e quali generi hanno gente dentro",
+      elenchi.dati.citta.length > 3 && elenchi.dati.generi.length >= 3,
+      { citta: elenchi.dati.citta.length, generi: elenchi.dati.generi.length });
+    const unaCitta = elenchi.dati.citta[0].citta;
+    const perCitta = await chiama("/api/classifica?quanti=50&citta=" + encodeURIComponent(unaCitta));
+    controlla("la classifica di una città torna solo quella città",
+      perCitta.dati.righe.length > 0 && perCitta.dati.righe.every(r => r.citta.toLowerCase() === unaCitta.toLowerCase()),
+      perCitta.dati.righe.map(r => r.citta));
+    controlla("e la posizione riparte da 1 dentro alla città",
+      perCitta.dati.righe[0].pos === 1 && perCitta.dati.totale === elenchi.dati.citta[0].quanti,
+      { pos: perCitta.dati.righe[0].pos, totale: perCitta.dati.totale });
+    controlla("il filtro torna indietro con la risposta",
+      perCitta.dati.filtro && perCitta.dati.filtro.citta === unaCitta, perCitta.dati.filtro);
+    const perGenere = await chiama("/api/classifica?quanti=20&genere=trap");
+    controlla("la classifica di un genere torna solo quel genere",
+      perGenere.dati.righe.every(r => r.genere === "trap"));
+    const inventata = await chiama("/api/classifica?quanti=10&citta=Nonesiste");
+    controlla("una città che non c'è torna una classifica vuota, non un errore",
+      inventata.stato === 200 && inventata.dati.righe.length === 0 && inventata.dati.totale === 0);
+    const generePinto = await chiama("/api/classifica?quanti=10&genere=jazzfusion");
+    controlla("un genere inventato viene ignorato invece di rompere",
+      generePinto.stato === 200 && generePinto.dati.righe.length === 10);
+
+    console.log("\nle stagioni e l'albo d'oro");
+    const primaDellaStagione = await chiama("/api/classifica?quanti=3");
+    const chiusura = await chiama("/api/stagione/chiudi", { metodo: "POST",
+      testate: { "x-admin": ADMIN }, corpo: { quanti: 20 } });
+    controlla("una stagione si chiude", chiusura.stato === 200 && chiusura.dati.inAlbo === 20, chiusura.dati);
+    controlla("e ne comincia una nuova", /Stagione 2/.test(chiusura.dati.nuova || ""), chiusura.dati);
+    const albo = await chiama("/api/albo");
+    controlla("chi ha vinto resta scritto nell'albo d'oro",
+      albo.dati.albo.length === 20 && albo.dati.albo[0].pos === 1 &&
+      albo.dati.albo[0].nome === primaDellaStagione.dati.righe[0].nome, albo.dati.albo[0]);
+    const dopoStagione = await chiama("/api/classifica?quanti=3");
+    controlla("i numeri si ammorbidiscono invece di azzerarsi",
+      dopoStagione.dati.righe[0].stream < primaDellaStagione.dati.righe[0].stream &&
+      dopoStagione.dati.righe[0].stream > 0,
+      { prima: primaDellaStagione.dati.righe[0].stream, dopo: dopoStagione.dati.righe[0].stream });
+    controlla("ma la classifica non si sfascia: chi era primo è ancora primo",
+      dopoStagione.dati.righe[0].nome === primaDellaStagione.dati.righe[0].nome);
+    const stagioni = await chiama("/api/stagioni");
+    controlla("le stagioni si possono elencare, chiuse comprese",
+      stagioni.dati.tutte.length === 2 && stagioni.dati.corrente.stato === "corrente", stagioni.dati.tutte);
+    const nonTuo = await chiama("/api/stagione/chiudi", { metodo: "POST" });
+    controlla("la stagione non la chiude chi passa di lì", nonTuo.stato === 403);
+
     console.log("\nla cancellazione dell'account (quella che Apple e Google pretendono)");
     const senzaConferma = await chiama("/api/account", { metodo: "DELETE", testate: conSessione(sess2), corpo: {} });
     controlla("non si cancella per sbaglio", senzaConferma.stato === 400);
