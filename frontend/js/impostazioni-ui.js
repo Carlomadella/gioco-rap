@@ -134,7 +134,7 @@ function corpoGioco(){
   '</div>' +
   '<div class="scard">' +
     riga(L("Chiedi conferma","Ask before spending"),
-      L("Prima delle mosse che costano soldi o due energie.","Before moves that cost money or two energies."),
+      L("Prima delle mosse che costano soldi.","Before moves that cost money."),
       sw("gioco.conferme")) +
     '<p class="snote">' + L(
       "Le manopole valgono da subito, anche su una carriera già iniziata: cambiano il futuro, non quello che hai già fatto.",

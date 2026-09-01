@@ -30,6 +30,14 @@ function mostraScena(a, sc, msg, extra){
   $("sc-t").textContent = a.n;
   $("sc-d").textContent = a.d;
   $("sc-esito").innerHTML = (msg || "") + extra;
+  /* punto 58: l'entrata cambia con la mossa (css/effects.css) — tolgo e
+     rimetto l'animazione per farla ripartire anche riaprendo la stessa scena
+     di fila (altrimenti il browser la considera già "finita" e non la rilancia) */
+  const wrap = $("scena").querySelector(".scwrap");
+  wrap.style.animation = "none";
+  wrap.dataset.anim = a.id;
+  void wrap.offsetWidth;
+  wrap.style.animation = "";
   $("scena").classList.add("on");
 }
 $("sc-go").onclick = () => { $("scena").classList.remove("on"); };
@@ -196,7 +204,10 @@ function renderGioco(){
        sbagliare, cioè quando la mossa costa soldi o mezza settimana di energia */
     b.onclick = () => {
       if(!ok) return;
-      const pesa = SET.gioco.conferme && (c > 0 || en2 >= 2);
+      /* punto 55: con l'energia a 100 quasi ogni mossa costava «due energie
+         o più», quindi la conferma usciva sempre — non filtrava più niente.
+         Resta solo dove si spendono soldi veri. */
+      const pesa = SET.gioco.conferme && c > 0;
       if(!pesa){ esegui(); return; }
       showEvent({
         k:"Confermi?", t:a.n,
