@@ -543,3 +543,43 @@ Ne sono uscite due, tutte e due vere.
 Il resto è pulito: nessuna funzione dichiarata e mai chiamata, nessun `id`
 ripetuto in `index.html`, nessun `console.log` o `TODO` rimasto, e `npm run
 prova` a 12 su 12.
+
+---
+
+## Transizioni quando una card apre una pagina
+
+Da smistare, punto 1 (01/09/2026): "Prepareremo delle transiton per quando vai a cliccare sulle
+card per entrare nelle varie pagine. Non mi piace che clicchi e hai la pagina così di botto."
+
+**FATTO.** Sei pannelli aprivano di scatto, senza nessun passaggio: la modale (`#modal .sheet2`),
+il negozio (`.ngwrap`), La Sala (`.powrap`), la piazza (`.pwrap`), il foglio (`.wwrap`), la Strada
+(`.stwrap`). Gli ho dato la stessa entrata `rIn` già usata dal rapporto di settimana e dalle scene
+a pagina piena (punto 50/58) — la stessa famiglia visiva, non un'animazione nuova di zecca. Anche
+il passaggio fra le schermate intere (menù, mappa, gioco, profilo — `goto()` in `js/creator/nav.js`)
+adesso ha una dissolvenza (`screenIn`, `css/shell.css`): **solo opacità, mai un transform**, perché
+la mappa (`.palco`) usa `position:fixed` al suo interno, e un transform sull'antenato gli avrebbe
+cambiato il punto di riferimento a metà animazione, con un salto visibile per una frazione di
+secondo. Aggiunto anche un piccolo trucco di reflow (`goto()`, `mostraScena()` già lo faceva) per
+essere sicuri che l'animazione riparta ogni volta, non solo la prima.
+Provato in Chrome: aperti La Sala, il negozio e un incontro per strada, tutti con l'entrata giusta
+e senza artefatti nella mappa; passato da mappa a profilo e ritorno, nessun salto di layout.
+
+---
+
+## Le scene dei fan, tante e difficili da ripescare
+
+Da smistare, punto 2 (01/09/2026): "La scena dei fan mi sembra che ne hai fatte si e no 3 diverse.
+Ne voglio almeno 150 differenti e con una rarità molto alta di ritrovare nel breve periodo una
+stessa scena."
+
+**FATTO** (`js/game/strada.js`). Vero: «fan gentile» e «fan maleducato» erano una frase fissa a
+testa, con solo il nome a cambiare. Adesso un luogo (12: il bar sotto casa, la fila alla posta, la
+metro, il mercato del sabato...) e un comportamento (13 per il fan gentile, 13 per il maleducato)
+si combinano — **156 combinazioni per tipo**, oltre le 150 chieste — e una piccola cronologia
+(`G.strFanHist`, salvata nella partita) tiene le ultime 30 combinazioni viste per tipo: finché non
+ne sono passate altre 29, la stessa non ripesca. Non sono 156 scene scritte a mano: sono 12×13
+pezzi che si scambiano di posto, ma il risultato è che nessuno vede la stessa identica frase due
+volte a distanza ravvicinata.
+Provato in Chrome: 30 incontri "fan gentile" di fila, 30 combinazioni tutte diverse; stessa cosa
+per il "fan maleducato". La scelta pesata e le condizioni di sblocco (`INCONTRI`, `provaIncontro()`)
+non sono cambiate — solo il contenuto di ogni singolo incontro.

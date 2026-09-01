@@ -30,3 +30,7 @@ L'indice con **tutti i punti e il loro stato** sta in
 ## Da smistare
 
 _(qui sotto finiscono i punti nuovi, appena scritti)_
+
+3. Nell'app chat sul telefono le conversazioni sono davvero monotone e soprattutto vanno subito in loop. Crea una cosa MOOOOOOOLTO interattiva. 
+
+4. 
