@@ -398,8 +398,8 @@ function giroSettimana(){
     for(const b of dopo) if(vivi.indexOf(b) < 0) inserisciBot(b);
 
     for(const n of notizie){
-      A.fai("INSERT INTO notizia (settimana, tipo, testo, creato) VALUES (?, ?, ?, ?)",
-        nuova, tipoNotizia(n), n, ora());
+      A.fai("INSERT INTO notizia (settimana, artista_id, tipo, testo, creato) VALUES (?, ?, ?, ?, ?)",
+        nuova, n.id || null, n.tipo || tipoNotizia(n.testo || n), n.testo || n, ora());
     }
     A.fai("DELETE FROM notizia WHERE id NOT IN (SELECT id FROM notizia ORDER BY id DESC LIMIT 400)");
 
@@ -429,8 +429,122 @@ function assicuraSettimana(){
 }
 
 const notizie = quante => A.tutti(
-  "SELECT settimana, tipo, testo, creato FROM notizia ORDER BY id DESC LIMIT ?", quante)
-  .map(n => ({ t: n.creato, s: n.settimana, tipo: n.tipo, testo: n.testo }));
+  "SELECT settimana, artista_id, tipo, testo, creato FROM notizia ORDER BY id DESC LIMIT ?", quante)
+  .map(n => ({ t: n.creato, s: n.settimana, tipo: n.tipo, testo: n.testo, artistaId: n.artista_id }));
+
+/* ==================== IL FEED DEL TELEFONO ====================
+   LaFamegram vuole dei post, non delle righe di database. Un post ha un nome,
+   una settimana, un testo e dei cuori — la stessa forma che usa già il gioco
+   (`telPost()` in `frontend/js/game/telefono.js`), così i post del mondo vero e
+   quelli della tua carriera si mescolano senza che si veda la giuntura.
+
+   I cuori non sono a caso: vengono dagli stream di chi ha postato, con una
+   variazione fissa presa dal suo seme. Uno con due milioni di ascolti non
+   prende quattro cuori, e lo stesso post ne ha sempre gli stessi. */
+function cuori(stream, seed){
+  const base = Math.max(3, Math.round(Math.pow(Math.max(1, stream), 0.62) / 4));
+  return base + (Number(seed || 0) % Math.max(2, Math.round(base * 0.35)));
+}
+
+function feed(ioId, quanti){
+  const righe = A.tutti(
+    `SELECT n.settimana, n.tipo, n.testo, n.creato, n.artista_id,
+            a.nome, a.stream, a.seed, a.citta, a.genere
+     FROM notizia n LEFT JOIN artista a ON a.id = n.artista_id
+     ORDER BY n.id DESC LIMIT ?`, Math.max(1, quanti || 20));
+
+  const post = righe.map(n => ({
+    tipo: n.tipo, s: n.settimana, t: n.testo,
+    n: n.nome || "La città", artistaId: n.artista_id,
+    citta: n.citta || null, genere: n.genere || null,
+    like: cuori(n.stream || 800, n.seed || 7), quando: n.creato
+  }));
+
+  /* la parte che riguarda te: chi ti ha superato e chi hai superato tu
+     dall'ultima fotografia. È quello che rende un feed «tuo» invece che una
+     bacheca uguale per tutti. */
+  if(ioId) for(const p of vicini(ioId)) post.unshift(p);
+  return post;
+}
+
+/* Chi si è mosso intorno a te fra l'ultima settimana chiusa e adesso. */
+function vicini(ioId){
+  const mia = schedaConPosizione(ioId, null);
+  if(!mia) return [];
+  const prec = ultimaChiusa();
+  const fuori = [];
+  const attorno = A.tutti(GRADUATORIA + `
+    SELECT a.id, a.nome, a.stream, a.seed, g.pos, p.pos AS pos_prec
+    FROM grad g JOIN artista a ON a.id = g.id
+    LEFT JOIN classifica_posizione p ON p.artista_id = a.id AND p.settimana = ?
+    WHERE g.pos BETWEEN ? AND ? AND a.id <> ?`, prec, Math.max(1, mia.pos - 3), mia.pos + 3, ioId);
+  const mioPrec = A.uno(
+    "SELECT pos FROM classifica_posizione WHERE artista_id = ? AND settimana = ?", ioId, prec);
+  const primaEro = mioPrec ? mioPrec.pos : null;
+
+  for(const a of attorno){
+    if(primaEro == null || a.pos_prec == null) continue;
+    if(a.pos < mia.pos && a.pos_prec > primaEro)
+      fuori.push({ tipo: "sorpasso", s: settimanaCorrente(), n: a.nome, artistaId: a.id,
+        t: a.nome + " ti ha passato: adesso è " + a.pos + "°, tu " + mia.pos + "°.",
+        like: cuori(a.stream, a.seed), quando: ora() });
+    else if(a.pos > mia.pos && a.pos_prec < primaEro)
+      fuori.push({ tipo: "sorpasso", s: settimanaCorrente(), n: a.nome, artistaId: a.id,
+        t: "Hai passato " + a.nome + ": adesso sei " + mia.pos + "°, lui " + a.pos + "°.",
+        like: cuori(a.stream, a.seed), quando: ora() });
+  }
+  return fuori.slice(0, 4);
+}
+
+/* ==================== GLI OPPS ====================
+   I rivali non sono più gente generata in casa: sono i giocatori (e i bot) che
+   ti stanno appena sopra. Quelli sono gli opps — e quando li superi lo vedi,
+   perché il posto era loro. */
+function opps(ioId, quanti){
+  const mia = schedaConPosizione(ioId, null);
+  if(!mia) return { io: null, sopra: [], dichiarati: [] };
+  const prec = ultimaChiusa();
+  const n = Math.max(1, Math.min(10, quanti || 3));
+  const sopra = A.tutti(GRADUATORIA + `
+    SELECT ${CAMPI_PUBBLICI}, g.pos, p.pos AS pos_prec
+    FROM grad g JOIN artista a ON a.id = g.id
+    LEFT JOIN classifica_posizione p ON p.artista_id = a.id AND p.settimana = ?
+    WHERE g.pos < ? ORDER BY g.pos DESC LIMIT ?`, prec, mia.pos, n);
+  return {
+    io: mia,
+    sopra: sopra.map(r => Object.assign(riga(r, ioId),
+      { distanza: r.stream - mia.stream })).reverse(),
+    dichiarati: relazioni(ioId)
+  };
+}
+
+/* Una rivalità dichiarata: resta anche se uno dei due si sposta in classifica. */
+function dichiara(artistaId, altroId, tipo, nota){
+  if(artistaId === altroId) return null;
+  if(["rivale", "feat", "amico", "crew"].indexOf(tipo) < 0) return null;
+  const a = artistaGrezzo(artistaId), b = artistaGrezzo(altroId);
+  if(!a || !b || b.ritirato) return null;
+  try{
+    A.fai(`INSERT INTO relazione (artista_id, altro_id, tipo, da_settimana, nota, creato)
+           VALUES (?,?,?,?,?,?)`, artistaId, altroId, tipo, settimanaCorrente(), nota || null, ora());
+    if(tipo === "rivale"){
+      A.fai("INSERT INTO notizia (settimana, artista_id, tipo, testo, creato) VALUES (?,?,?,?,?)",
+        settimanaCorrente(), artistaId, "rivalita",
+        a.nome + " se l'è presa con " + b.nome + ".", ora());
+    }
+  }catch(e){
+    if(/UNIQUE/.test(e.message)) return { gia: true };
+    throw e;
+  }
+  return { ok: true, tipo, con: b.nome };
+}
+const scancella = (artistaId, altroId, tipo) =>
+  A.fai("DELETE FROM relazione WHERE artista_id = ? AND altro_id = ? AND tipo = ?",
+    artistaId, altroId, tipo);
+const relazioni = artistaId => A.tutti(
+  `SELECT r.tipo, r.grado, r.da_settimana, r.nota, a.id, a.nome, a.citta, a.genere, a.stream
+   FROM relazione r JOIN artista a ON a.id = r.altro_id
+   WHERE r.artista_id = ? AND a.ritirato IS NULL ORDER BY r.id DESC LIMIT 50`, artistaId);
 
 /* ==================== LE STAGIONI ====================
    Una stagione che non finisce mai è una classifica in cui chi è arrivato
@@ -724,7 +838,7 @@ module.exports = {
   iscriviArtista, aggiornaArtista, segnaPunteggio, segnaSospetto,
   sanziona, sanzioneAttiva, togliSanzioni, sospetti, manutenzione,
   giroSettimana, assicuraSettimana, settimanaCorrente, notizie,
-  cittaInGioco, generiInGioco, quantiInClassifica,
+  cittaInGioco, generiInGioco, quantiInClassifica, feed, opps, dichiara, scancella, relazioni,
   stagioneCorrente, chiudiStagione, albo, stagioni,
   creaAccount, account, collegaIdentita, entra, apriSessione, sessione, chiudiSessione,
   cancellaAccount, impasta, combacia, sha,

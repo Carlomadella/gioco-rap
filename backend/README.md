@@ -104,6 +104,9 @@ si va il giorno che si passa a PostgreSQL.
 | `GET /api/stagioni` | la stagione in corso e quelle chiuse |
 | `GET /api/albo?stagione=1` | l'albo d'oro: chi ha chiuso in cima |
 | `GET /api/notizie?quante=10` | chi è uscito, chi ha firmato, chi è sparito |
+| `GET /api/feed?quanti=20` | i post per LaFamegram: il mondo, più quello che riguarda te |
+| `GET /api/opps?quanti=3` | chi ti sta appena sopra, e i rivali che ti sei preso |
+| `POST /api/relazione` | prenderti uno come rivale (o fare pace) |
 
 **Chi sei**
 
@@ -225,6 +228,23 @@ dentro alla risposta del punteggio. Chiederli risponde `409`.
 Al gioco restano solo quelli che il server non può sapere — essere arrivato a Milano, dieci
 amici alla Sala. È la differenza fra un traguardo che vale e uno che si prende aprendo la
 console del browser: con Steam attaccato dietro, quella differenza è tutto.
+
+## Il feed e gli opps
+
+`GET /api/feed` torna dei **post**, non righe di database: nome, settimana, testo e cuori —
+la stessa forma che LaFamegram usa già nel gioco (`telPost()` in `js/game/telefono.js`),
+così i post del mondo e quelli della tua carriera si mescolano senza che si veda la
+giuntura. I cuori non sono a caso: vengono dagli stream di chi ha postato, con una
+variazione presa dal suo seme, quindi lo stesso post ne ha sempre gli stessi.
+
+Con una sessione il feed diventa **tuo**: in cima ci finisce chi ti ha passato e chi hai
+passato tu dall'ultima fotografia della classifica. È quello che fa la differenza fra un
+feed e una bacheca uguale per tutti.
+
+`GET /api/opps` sono i rivali veri: **chi ti sta appena sopra**, con quanti stream ti
+mancano per prenderlo. Più quelli che ti sei preso a mano con `POST /api/relazione`, che
+restano anche se in classifica si spostano. Con se stessi non si litiga, e nessuno può
+dichiarare rivalità per conto di un altro.
 
 ## Le stagioni
 

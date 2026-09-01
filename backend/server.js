@@ -157,6 +157,37 @@ async function rotta(req, res, url){
       accessi: accessi.collegati() }, s));
   }
 
+  /* il feed di LaFamegram: i post del mondo, più quelli che riguardano te */
+  if(M("GET", "/api/feed")){
+    const s = chi(req);
+    const ioId = s ? (archivio.artistiDi(s.account.id)[0] || {}).id : String(q.get("io") || "");
+    return invia(res, 200, {
+      settimana: archivio.settimanaCorrente(),
+      post: archivio.feed(ioId || null, nInt(q.get("quanti"), 1, 60, 20))
+    });
+  }
+
+  /* gli opps: chi ti sta appena sopra, e chi ti sei preso come rivale */
+  if(M("GET", "/api/opps")){
+    const s = chi(req);
+    const ioId = s ? (archivio.artistiDi(s.account.id)[0] || {}).id : String(q.get("io") || "");
+    if(!ioId || !archivio.artistaGrezzo(ioId)) return male(res, 404, "artista-sconosciuto");
+    return invia(res, 200, archivio.opps(ioId, nInt(q.get("quanti"), 1, 10, 3)));
+  }
+
+  if(M("POST", "/api/relazione")){
+    const b = await corpo(req);
+    const mio = String(b.artistaId || "");
+    if(!artistaMio(req, mio)) return male(res, 403, "non-e-tuo");
+    if(b.tipo === "rimuovi"){
+      archivio.scancella(mio, String(b.altroId || ""), String(b.era || "rivale"));
+      return invia(res, 200, { ok: true });
+    }
+    const r = archivio.dichiara(mio, String(b.altroId || ""), String(b.tipo || "rivale"),
+      nomePulito(b.nota, 140));
+    return r ? invia(res, 200, r) : male(res, 400, "relazione-non-valida");
+  }
+
   if(M("GET", "/api/notizie")){
     return invia(res, 200, { settimana: archivio.settimanaCorrente(),
       notizie: archivio.notizie(nInt(q.get("quante"), 1, 60, 10)) });

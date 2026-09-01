@@ -249,6 +249,46 @@ async function aspettaCheRisponda(figlio){
     const inventato = await chiama("/api/classifica/intorno/00000000-0000-4000-8000-000000000000");
     controlla("un id inventato non trova niente", inventato.stato === 404);
 
+    console.log("\nil feed del telefono e gli opps");
+    const feed = await chiama("/api/feed?quanti=10");
+    controlla("il feed torna dei post", feed.dati.post.length > 0, feed.dati.post.length);
+    controlla("ogni post ha nome, testo, settimana e cuori",
+      feed.dati.post.every(p => p.n && p.t && p.s >= 1 && typeof p.like === "number"),
+      feed.dati.post[0]);
+    controlla("i cuori seguono chi ha postato, non sono a caso",
+      feed.dati.post.some(p => p.like > 20), feed.dati.post.map(p => p.like).slice(0, 5));
+    controlla("i post dei bot dicono di chi sono (serve al feed personale)",
+      feed.dati.post.filter(p => p.artistaId).length > 0);
+    const feedMio = await chiama("/api/feed?quanti=10", { testate: conSessione(sess1) });
+    controlla("col mio account il feed si apre lo stesso", feedMio.stato === 200 && feedMio.dati.post.length > 0);
+
+    const opps = await chiama("/api/opps?quanti=3", { testate: conSessione(sess1) });
+    controlla("gli opps sono chi mi sta appena sopra",
+      opps.dati.sopra.length === 3 && opps.dati.sopra.every(o => o.pos < opps.dati.io.pos),
+      opps.dati.sopra.map(o => o.pos + " " + o.nome));
+    controlla("e mi dicono quanto mi manca",
+      opps.dati.sopra.every(o => o.distanza > 0), opps.dati.sopra.map(o => o.distanza));
+    const bersaglio = opps.dati.sopra[opps.dati.sopra.length - 1];
+    const rivale = await chiama("/api/relazione", { metodo: "POST", testate: conSessione(sess1),
+      corpo: { artistaId: io1, altroId: bersaglio.id, tipo: "rivale", nota: "me l'ha detta grossa" } });
+    controlla("uno se lo può prendere come rivale", rivale.stato === 200 && rivale.dati.ok, rivale.dati);
+    const dinuovoRivale = await chiama("/api/relazione", { metodo: "POST", testate: conSessione(sess1),
+      corpo: { artistaId: io1, altroId: bersaglio.id, tipo: "rivale" } });
+    controlla("ma una volta sola", dinuovoRivale.dati && dinuovoRivale.dati.gia === true);
+    const conRivale = await chiama("/api/opps", { testate: conSessione(sess1) });
+    controlla("la rivalità resta scritta anche se lui si sposta",
+      conRivale.dati.dichiarati.length === 1 && conRivale.dati.dichiarati[0].id === bersaglio.id,
+      conRivale.dati.dichiarati);
+    const conMeStesso = await chiama("/api/relazione", { metodo: "POST", testate: conSessione(sess1),
+      corpo: { artistaId: io1, altroId: io1, tipo: "rivale" } });
+    controlla("con se stessi non si litiga", conMeStesso.stato === 400);
+    const altrui = await chiama("/api/relazione", { metodo: "POST",
+      corpo: { artistaId: io1, altroId: bersaglio.id, tipo: "rivale" } });
+    controlla("e non si dichiarano rivalità per conto di altri", altrui.stato === 403);
+    const via = await chiama("/api/relazione", { metodo: "POST", testate: conSessione(sess1),
+      corpo: { artistaId: io1, altroId: bersaglio.id, tipo: "rimuovi", era: "rivale" } });
+    controlla("si può anche fare pace", via.stato === 200);
+
     console.log("\nle classifiche per città e per genere");
     const elenchi = await chiama("/api/classifiche");
     controlla("si sa quali città e quali generi hanno gente dentro",
