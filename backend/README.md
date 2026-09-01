@@ -43,10 +43,48 @@ Si avvia un server suo, su una porta sua, con un database usa e getta; fa tutto 
 classifica, iscrizione, punteggi, freni, account con la mail, sessioni, salvataggi in cloud
 e i loro conflitti, traguardi, giro di settimana, frecce ▲▼, cancellazione dell'account, e
 un'occhiata dentro al database per controllare che le chiavi ci stiano solo come hash — e
-si spegne. **73 controlli**, e fra questi la verifica di un biglietto Apple vero: la prova
+si spegne. **125 controlli**, e fra questi la verifica di un biglietto Apple vero: la prova
 si fa una coppia di chiavi sua, si mette in piedi un finto «appleid.apple.com» e prova che
 un biglietto buono entra e uno firmato da un altro, scaduto o fatto per un altro gioco no.
 **Dalli dopo ogni modifica.**
+
+## Quanto regge (misurato, non detto)
+
+```bash
+npm run carico            # 20.000 artisti
+node carico.js 100000     # centomila
+```
+
+Fa un database usa e getta, ci mette dentro N artisti (140 bot, il resto giocatori, come
+nel mondo vero) e cronometra le cose che il server fa davvero. Questi sono i numeri sul
+portatile su cui è stato scritto:
+
+| | 20.000 artisti | 100.000 artisti |
+| --- | --- | --- |
+| la top 10 | **0,5 ms** | 7 ms |
+| la top 100 | 1,5 ms | 9 ms |
+| la classifica di una città | 0,5 ms | 1 ms |
+| un punteggio (traguardi compresi) | 3 ms | 18 ms |
+| il feed del telefono | 8 ms | 56 ms |
+| chi ho davanti e dietro | 12 ms | 64 ms |
+| un giro di settimana | 3 s | 10 s |
+| il file sul disco | 9 MB | 34 MB |
+
+**Come si leggono.** Fino a qualche decina di migliaia di giocatori non c'è niente da
+discutere: tutto sotto i dieci millisecondi. A centomila comincia a sentirsi «dove sono in
+classifica», perché per saperlo bisogna contare quanti stanno davanti — e quello è un conto
+che cresce con la gente. Il giro di settimana a dieci secondi non è un problema di per sé
+(succede una volta al giorno), ma **blocca il processo mentre lo fa**: da lì in poi va
+spostato fuori dalla richiesta.
+
+È la soglia scritta in `database/README.md`, adesso con dei numeri sotto invece di
+un'opinione. E questa prova va rifatta quando si tocca una query: se un numero triplica,
+l'ha rotto l'ultima modifica.
+
+**Due cose che ha già trovato:** la classifica riordinava tutta la tabella a ogni richiesta
+(50 ms invece di 0,5), perché «chi è in classifica» conteneva una sottoquery sulle sanzioni
+che impediva di usare l'indice; e il ricambio dei bot confrontava due liste con `indexOf`
+dentro a un ciclo — quattrocento milioni di confronti a ogni giro di settimana.
 
 ## Le manopole
 
@@ -85,7 +123,9 @@ In casa vanno bene così. Online si cambiano `ADF_ORIGINI` (solo il dominio del 
 | `database/travaso.js` | porta il vecchio archivio JSON dentro al database |
 | `database/README.md` | com'è messo il database e dove va |
 | `database/schema.md` | lo schema completo, commentato (fuori da git) |
-| `prova.js` | i 73 controlli sull'API |
+| `plausibilita.js` | quanto è credibile un punteggio: il modello che decide fin dove poteva arrivare |
+| `prova.js` | i 125 controlli sull'API |
+| `carico.js` | la prova di carico: quanto regge, con i numeri |
 
 Il server non sa che database ci sia sotto: parla solo con `database/archivio.js`. È lì che
 si va il giorno che si passa a PostgreSQL.

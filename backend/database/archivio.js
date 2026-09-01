@@ -131,16 +131,51 @@ const ultimaChiusa = () => {
   return r && r.s != null ? r.s : -1;
 };
 /* La graduatoria: una sola definizione per tutte le query, così «chi è in
-   classifica» è scritto in un posto solo. Chi è fuori: i ritirati e chi ha
-   una sanzione attiva — la sanzione non è una nota in un registro, è una cosa
-   che si vede. */
-const IN_CLASSIFICA = `a.ritirato IS NULL
-  AND NOT EXISTS (SELECT 1 FROM sanzione s WHERE s.account_id = a.account_id
-    AND s.tipo IN ('fuori_classifica','sospensione')
-    AND (s.a IS NULL OR s.a > CAST(strftime('%s','now') AS INTEGER) * 1000))`;
+   classifica» è scritto in un posto solo. Chi è fuori: i ritirati e chi ha una
+   sanzione attiva — la sanzione non è una nota in un registro, è una cosa che
+   si vede.
+
+   `fuori` è una **colonna**, non una sottoquery sulle sanzioni: con la
+   sottoquery il database non poteva usare l'indice e si rileggeva tutta la
+   tabella a ogni classifica (50-110 ms a ventimila artisti, misurati con
+   `npm run carico`). La colonna la aggiornano `sanziona`, `togliSanzioni` e la
+   manutenzione settimanale quando una sanzione scade. */
+const IN_CLASSIFICA = "a.ritirato IS NULL AND a.fuori = 0";
 const GRADUATORIA = `WITH grad AS (
   SELECT a.id, row_number() OVER (ORDER BY a.stream DESC, a.creato) AS pos
   FROM artista a WHERE ${IN_CLASSIFICA} )`;
+
+/* La posizione di uno, senza mettere in fila tutti gli altri: si contano
+   quelli che stanno davanti. È una lettura di indice, non un ordinamento. */
+function posizioneDi(id, filtro){
+  const a = A.uno("SELECT stream, creato, ritirato, fuori FROM artista a WHERE a.id = ?", id);
+  if(!a || a.ritirato || a.fuori) return null;
+  const dove = [IN_CLASSIFICA, "(a.stream > ? OR (a.stream = ? AND a.creato < ?))"];
+  const v = [a.stream, a.stream, a.creato];
+  if(filtro && filtro.citta){ dove.push("lower(a.citta) = lower(?)"); v.push(filtro.citta); }
+  if(filtro && filtro.genere){ dove.push("a.genere = ?"); v.push(filtro.genere); }
+  return A.uno("SELECT count(*) n FROM artista a WHERE " + dove.join(" AND "), ...v).n + 1;
+}
+
+/* Una fetta di classifica: l'indice è già in ordine, quindi si salta a dove
+   serve e si leggono N righe. La posizione non si calcola — si sa: è
+   `da`, `da+1`, `da+2`. */
+function fetta(da, quanti, filtro){
+  const dove = [IN_CLASSIFICA];
+  const v = [];
+  if(filtro && filtro.citta){ dove.push("lower(a.citta) = lower(?)"); v.push(filtro.citta); }
+  if(filtro && filtro.genere){ dove.push("a.genere = ?"); v.push(filtro.genere); }
+  const prec = ultimaChiusa();
+  const righe = A.tutti(
+    `SELECT ${CAMPI_PUBBLICI}, p.pos AS pos_prec
+     FROM artista a
+     LEFT JOIN classifica_posizione p ON p.artista_id = a.id AND p.settimana = ?
+     WHERE ${dove.join(" AND ")}
+     ORDER BY a.stream DESC, a.creato LIMIT ? OFFSET ?`,
+    prec, ...v, quanti, Math.max(0, da - 1));
+  righe.forEach((r, i) => { r.pos = da + i; });
+  return righe;
+}
 
 /* La stessa graduatoria, ma dentro a un sottoinsieme: la città, il genere.
    La posizione si conta **dentro al filtro** — «sei 3° a Rovereto» — perché è
@@ -160,27 +195,14 @@ function graduatoriaFiltrata(filtro){
 }
 
 function classifica(da, quanti, ioId, filtro){
-  const prec = ultimaChiusa();
-  const g = graduatoriaFiltrata(filtro);
-  const righe = A.tutti(g.sql + `
-    SELECT ${CAMPI_PUBBLICI}, g.pos, p.pos AS pos_prec
-    FROM grad g JOIN artista a ON a.id = g.id
-    LEFT JOIN classifica_posizione p ON p.artista_id = a.id AND p.settimana = ?
-    WHERE g.pos BETWEEN ? AND ? ORDER BY g.pos`, ...g.v, prec, da, da + quanti - 1);
-  /* dentro a un filtro anche «io» cambia: la mia posizione a Rovereto non è
-     la mia posizione in Italia */
-  const mio = ioId ? A.uno(g.sql + `
-    SELECT ${CAMPI_PUBBLICI}, g.pos, p.pos AS pos_prec
-    FROM grad g JOIN artista a ON a.id = g.id
-    LEFT JOIN classifica_posizione p ON p.artista_id = a.id AND p.settimana = ?
-    WHERE a.id = ?`, ...g.v, prec, ioId) : null;
+  const righe = fetta(da, quanti, filtro);
   return {
     settimana: settimanaCorrente(),
     totale: quantiInClassifica(filtro),
     filtro: (filtro && (filtro.citta || filtro.genere)) ? filtro : null,
     prossimoGiro: Number(leggiStato("prossimo_giro", 0)),
     righe: righe.map(r => riga(r, ioId)),
-    io: mio ? riga(mio, ioId) : null
+    io: ioId ? schedaConPosizione(ioId, ioId, filtro) : null
   };
 }
 
@@ -202,28 +224,31 @@ const generiInGioco = () => A.tutti(
   "SELECT a.genere, count(*) quanti FROM artista a WHERE " + IN_CLASSIFICA +
   " GROUP BY a.genere ORDER BY quanti DESC");
 
-function schedaConPosizione(id, ioId){
+/* `pos` si può passare già calcolata: contare quanti stanno davanti costa —
+   a centomila artisti sono sessanta millisecondi — e chi chiama spesso ce l'ha
+   già in mano. Calcolarla due volte nella stessa richiesta era uno spreco che
+   si vedeva solo sotto carico. */
+function schedaConPosizione(id, ioId, filtro, pos){
   const prec = ultimaChiusa();
-  const r = A.uno(GRADUATORIA + `
-    SELECT ${CAMPI_PUBBLICI}, g.pos, p.pos AS pos_prec
-    FROM grad g JOIN artista a ON a.id = g.id
-    LEFT JOIN classifica_posizione p ON p.artista_id = a.id AND p.settimana = ?
-    WHERE a.id = ?`, prec, id);
-  return r ? riga(r, ioId) : null;
+  const r = A.uno(
+    `SELECT ${CAMPI_PUBBLICI}, p.pos AS pos_prec
+     FROM artista a
+     LEFT JOIN classifica_posizione p ON p.artista_id = a.id AND p.settimana = ?
+     WHERE a.id = ?`, prec, id);
+  if(!r) return null;
+  r.pos = pos != null ? pos : posizioneDi(id, filtro);
+  return r.pos == null ? null : riga(r, ioId);
 }
 
 function intorno(id, raggio){
-  const prec = ultimaChiusa();
-  const righe = A.tutti(GRADUATORIA + `
-    SELECT ${CAMPI_PUBBLICI}, g.pos, p.pos AS pos_prec
-    FROM grad g JOIN artista a ON a.id = g.id
-    LEFT JOIN classifica_posizione p ON p.artista_id = a.id AND p.settimana = ?
-    WHERE g.pos BETWEEN (SELECT pos FROM grad WHERE id = ?) - ?
-                    AND (SELECT pos FROM grad WHERE id = ?) + ?
-    ORDER BY g.pos`, prec, id, raggio, id, raggio);
+  const mia = posizioneDi(id, null);
+  if(mia == null) return { settimana: settimanaCorrente(), totale: quantiInClassifica(null),
+    righe: [], io: null };
+  const da = Math.max(1, mia - raggio);
   return {
-    settimana: settimanaCorrente(), totale: quantiArtisti(),
-    righe: righe.map(r => riga(r, id)), io: schedaConPosizione(id, id)
+    settimana: settimanaCorrente(), totale: quantiInClassifica(null),
+    righe: fetta(da, raggio * 2 + 1, null).map(r => riga(r, id)),
+    io: schedaConPosizione(id, id, null, mia)
   };
 }
 
@@ -298,8 +323,9 @@ function segnaPunteggio(id, d, ipHash){
      si salva lo stesso: solo, in graduatoria non c'è. Quindi qui la scheda può
      non tornare, e non è un errore — è la sanzione che funziona. */
   if(limato && esame.peso > 0) valutaSospetti(a.account_id);
-  const mia = schedaConPosizione(id, id);
-  const traguardi = traguardiDovuti(id);
+  const pos = posizioneDi(id, null);
+  const mia = pos == null ? null : schedaConPosizione(id, id, null, pos);
+  const traguardi = traguardiDovuti(id, pos);
   return { ok: true, pos: mia ? mia.pos : null, delta: mia ? mia.delta : null,
     fuoriClassifica: !mia, totale: quantiArtisti(), settimana: set, limato,
     tetto: esame.tetto, fuori: esame.fuori, traguardi };
@@ -317,6 +343,7 @@ function sanziona(accountId, tipo, motivo, giorni){
   const fino = giorni > 0 ? ora() + giorni * 86400e3 : null;
   A.fai("INSERT INTO sanzione (account_id, tipo, motivo, da, a, deciso_da) VALUES (?,?,?,?,?,?)",
     accountId, tipo, motivo, ora(), fino, "a mano");
+  if(tipo !== "avviso") A.fai("UPDATE artista SET fuori = 1 WHERE account_id = ?", accountId);
   return { ok: true, tipo, motivo, fino };
 }
 const sanzioneAttiva = accountId => accountId ? A.uno(
@@ -324,8 +351,10 @@ const sanzioneAttiva = accountId => accountId ? A.uno(
      AND (a IS NULL OR a > ?)
    ORDER BY CASE tipo WHEN 'sospensione' THEN 0 ELSE 1 END, id DESC LIMIT 1`,
   accountId, ora()) : null;
-const togliSanzioni = accountId =>
+function togliSanzioni(accountId){
   A.fai("UPDATE sanzione SET a = ? WHERE account_id = ? AND (a IS NULL OR a > ?)", ora(), accountId, ora());
+  A.fai("UPDATE artista SET fuori = 0 WHERE account_id = ?", accountId);
+}
 
 /* Chi ha fatto alzare un sopracciglio, dal più recente: è la lista da cui si
    guarda a mano prima di sanzionare qualcuno. */
@@ -357,6 +386,7 @@ function valutaSospetti(accountId){
     accountId, "fuori_classifica",
     "numeri che non stanno in piedi (" + somma + " punti di sospetto in due mesi)",
     ora(), ora() + 14 * 86400e3, "automatico");
+  A.fai("UPDATE artista SET fuori = 1 WHERE account_id = ?", accountId);
   return { fuoriClassifica: true, peso: somma };
 }
 
@@ -426,10 +456,15 @@ function giroSettimana(){
     const vivi = A.tutti("SELECT a.id, a.nome, a.stream FROM artista a JOIN bot_stato b ON b.artista_id = a.id WHERE a.ritirato IS NULL");
     const dopo = vivi.slice();
     ricambio(dopo, CFG.quantiBot, usati, notizie);
-    for(const b of vivi) if(dopo.indexOf(b) < 0){
+    /* Il confronto fra prima e dopo si fa con due insiemi di id, non con
+       `indexOf` dentro a un ciclo: con ventimila bot quello erano quattrocento
+       milioni di confronti a ogni giro di settimana — l'ha trovato
+       `npm run carico`, che ci metteva otto secondi. */
+    const idPrima = new Set(vivi.map(b => b.id));
+    const idDopo = new Set(dopo.map(b => b.id));
+    for(const b of vivi) if(!idDopo.has(b.id))
       A.fai("UPDATE artista SET ritirato = ? WHERE id = ?", ora(), b.id);
-    }
-    for(const b of dopo) if(vivi.indexOf(b) < 0) inserisciBot(b);
+    for(const b of dopo) if(!idPrima.has(b.id)) inserisciBot(b);
 
     for(const n of notizie){
       A.fai("INSERT INTO notizia (settimana, artista_id, tipo, testo, creato) VALUES (?, ?, ?, ?, ?)",
@@ -447,6 +482,11 @@ function giroSettimana(){
    qualcun altro), e i sospetti vecchi si buttano — dopo sei mesi non dicono
    più niente su nessuno. */
 function manutenzione(){
+  /* le sanzioni a tempo scadono da sole: chi le ha finite di scontare torna in
+     classifica senza che nessuno debba ricordarsene */
+  A.fai(`UPDATE artista SET fuori = 0 WHERE fuori = 1 AND account_id IS NOT NULL
+         AND NOT EXISTS (SELECT 1 FROM sanzione s WHERE s.account_id = artista.account_id
+           AND s.tipo IN ('fuori_classifica','sospensione') AND (s.a IS NULL OR s.a > ?))`, ora());
   const novanta = ora() - 90 * 86400e3;
   A.fai("UPDATE dispositivo SET revocato = ? WHERE revocato IS NULL AND visto < ?", ora(), novanta);
   A.fai("DELETE FROM sospetto WHERE creato < ?", ora() - 180 * 86400e3);
@@ -503,28 +543,24 @@ function feed(ioId, quanti){
 
 /* Chi si è mosso intorno a te fra l'ultima settimana chiusa e adesso. */
 function vicini(ioId){
-  const mia = schedaConPosizione(ioId, null);
-  if(!mia) return [];
+  const mia = posizioneDi(ioId, null);
+  if(mia == null) return [];
   const prec = ultimaChiusa();
-  const fuori = [];
-  const attorno = A.tutti(GRADUATORIA + `
-    SELECT a.id, a.nome, a.stream, a.seed, g.pos, p.pos AS pos_prec
-    FROM grad g JOIN artista a ON a.id = g.id
-    LEFT JOIN classifica_posizione p ON p.artista_id = a.id AND p.settimana = ?
-    WHERE g.pos BETWEEN ? AND ? AND a.id <> ?`, prec, Math.max(1, mia.pos - 3), mia.pos + 3, ioId);
+  const attorno = fetta(Math.max(1, mia - 3), 7, null).filter(r => r.id !== ioId);
   const mioPrec = A.uno(
     "SELECT pos FROM classifica_posizione WHERE artista_id = ? AND settimana = ?", ioId, prec);
   const primaEro = mioPrec ? mioPrec.pos : null;
+  const fuori = [];
 
   for(const a of attorno){
     if(primaEro == null || a.pos_prec == null) continue;
-    if(a.pos < mia.pos && a.pos_prec > primaEro)
+    if(a.pos < mia && a.pos_prec > primaEro)
       fuori.push({ tipo: "sorpasso", s: settimanaCorrente(), n: a.nome, artistaId: a.id,
-        t: a.nome + " ti ha passato: adesso è " + a.pos + "°, tu " + mia.pos + "°.",
+        t: a.nome + " ti ha passato: adesso è " + a.pos + "°, tu " + mia + "°.",
         like: cuori(a.stream, a.seed), quando: ora() });
-    else if(a.pos > mia.pos && a.pos_prec < primaEro)
+    else if(a.pos > mia && a.pos_prec < primaEro)
       fuori.push({ tipo: "sorpasso", s: settimanaCorrente(), n: a.nome, artistaId: a.id,
-        t: "Hai passato " + a.nome + ": adesso sei " + mia.pos + "°, lui " + a.pos + "°.",
+        t: "Hai passato " + a.nome + ": adesso sei " + mia + "°, lui " + a.pos + "°.",
         like: cuori(a.stream, a.seed), quando: ora() });
   }
   return fuori.slice(0, 4);
@@ -535,21 +571,14 @@ function vicini(ioId){
    ti stanno appena sopra. Quelli sono gli opps — e quando li superi lo vedi,
    perché il posto era loro. */
 function opps(ioId, quanti){
-  const mia = schedaConPosizione(ioId, null);
-  if(!mia) return { io: null, sopra: [], dichiarati: [] };
-  const prec = ultimaChiusa();
+  const pos = posizioneDi(ioId, null);
+  const mia = pos == null ? null : schedaConPosizione(ioId, ioId, null, pos);
+  if(!mia) return { io: null, sopra: [], dichiarati: relazioni(ioId) };
   const n = Math.max(1, Math.min(10, quanti || 3));
-  const sopra = A.tutti(GRADUATORIA + `
-    SELECT ${CAMPI_PUBBLICI}, g.pos, p.pos AS pos_prec
-    FROM grad g JOIN artista a ON a.id = g.id
-    LEFT JOIN classifica_posizione p ON p.artista_id = a.id AND p.settimana = ?
-    WHERE g.pos < ? ORDER BY g.pos DESC LIMIT ?`, prec, mia.pos, n);
-  return {
-    io: mia,
-    sopra: sopra.map(r => Object.assign(riga(r, ioId),
-      { distanza: r.stream - mia.stream })).reverse(),
-    dichiarati: relazioni(ioId)
-  };
+  const da = Math.max(1, mia.pos - n);
+  const sopra = fetta(da, mia.pos - da, null)
+    .map(r => Object.assign(riga(r, ioId), { distanza: r.stream - mia.stream }));
+  return { io: mia, sopra, dichiarati: relazioni(ioId) };
 }
 
 /* Una rivalità dichiarata: resta anche se uno dei due si sposta in classifica. */
@@ -841,11 +870,11 @@ const CODICI_DAL_SERVER = Object.keys(DAL_SERVER);
 /* Da chiamare dopo ogni punteggio e a ogni giro di settimana: guarda i numeri
    e dà quello che c'è da dare. Torna solo i traguardi nuovi, così il gioco può
    dirlo a chi sta giocando. */
-function traguardiDovuti(artistaId){
+function traguardiDovuti(artistaId, posGiaNota){
   const a = artistaGrezzo(artistaId);
   if(!a || a.bot) return [];
-  const scheda = schedaConPosizione(artistaId, null);
-  const pos = scheda ? scheda.pos : null;
+  const pos = posGiaNota !== undefined ? posGiaNota
+    : (schedaConPosizione(artistaId, null) || {}).pos || null;
   const nuovi = [];
   for(const codice of CODICI_DAL_SERVER){
     if(!DAL_SERVER[codice](a, pos)) continue;
@@ -873,6 +902,7 @@ module.exports = {
   sanziona, sanzioneAttiva, togliSanzioni, sospetti, manutenzione, valutaSospetti,
   giroSettimana, assicuraSettimana, settimanaCorrente, notizie,
   cittaInGioco, generiInGioco, quantiInClassifica, feed, opps, dichiara, scancella, relazioni,
+  posizioneDi, fetta,
   stagioneCorrente, chiudiStagione, albo, stagioni,
   creaAccount, account, collegaIdentita, entra, apriSessione, sessione, chiudiSessione,
   cancellaAccount, impasta, combacia, sha,
