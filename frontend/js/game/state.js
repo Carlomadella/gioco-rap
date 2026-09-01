@@ -20,7 +20,12 @@ const START = () => ({
   offersSeen:{}, goals:{}, log:[], streak:0,
   phase:0, trialCd:0, trialsDone:{}, evCd:{}, seenLog:0,
   rivals:[], gente:[], chartPrev:99, streamsPrev:0, lafamegramMiei:[], lafamegramEventi:[],
-  best:{fans:0, chart:99}, ended:false
+  best:{fans:0, chart:99}, ended:false,
+  /* punto 21: la Strada. Ricostruita da claude/carriera-criminale.md */
+  strada:{rep:0, heat:0, sporchi:0, uomini:0, prot:0, ferro:false, avvocato:false,
+    attivita:{}, precedenti:0, arresto:null},
+  /* punto 66: chi scrive in chat — mamma e il migliore amico da subito */
+  chat:{}
 });
 /* Livello ed esperienza: fan, skill e pezzi usciti in un numero solo.
    Lo leggono la testata della partita e la testata dell'hub, quindi sta qui
