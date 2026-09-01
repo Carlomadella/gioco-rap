@@ -68,7 +68,7 @@ const EVENTS = [
    d:"Il proprietario ti ha scritto per la terza volta. O rientri, o entro il mese sei fuori.",
    opts:[
      {n:"Trovi i soldi come puoi", d:"−300 € e una settimana bruciata",
-      run(){ G.money -= 300; G.energy = Math.max(0, G.energy-1);
+      run(){ G.money -= 300; G.energy = Math.max(0, G.energy-60);
         return {t:"Hai tappato il buco. Sei rimasto indietro di una settimana.", c:""}; }},
      {n:"Torni a stare più in basso", d:"Scendi di un livello di casa, niente debiti",
       run(){ G.life.casa = Math.max(0, (G.life.casa||0) - 1); G.hype = clamp(G.hype-6,0,100);
@@ -102,7 +102,7 @@ const EVENTS = [
    d:"Uno con più numeri di te ti chiede tre strofe. Paga bene e il tuo nome non compare da nessuna parte.",
    opts:[
      {n:"Accetti", d:"+900 €, nessun fan, una settimana di scrittura persa",
-      run(){ G.money += 900; G.energy = Math.max(0, G.energy-1); gain("scrittura", 1.5);
+      run(){ G.money += 900; G.energy = Math.max(0, G.energy-60); gain("scrittura", 1.5);
         return {t:"Novecento euro e tre strofe che canterà un altro.", c:""}; }},
      {n:"Rifiuti", d:"Niente soldi, ma le tue barre restano tue",
       run(){ G.hype = clamp(G.hype+4,0,100);

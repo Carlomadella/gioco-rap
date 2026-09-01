@@ -5,16 +5,24 @@
 const BEATNAMES = ["Vetro Rotto","Fumo Blu","Terzo Piano","Sottopasso","Neve Sporca",
   "Ferro Vecchio","Ore Piccole","Cemento Armato","Luce Gialla","Ultimo Treno"];
 
+/* Punto 39/40: con l'energia a 100 al giorno (100 non a settimana) e i giorni
+   che si chiudono uno alla volta, in una settimana ci stanno molte più mosse
+   di prima (~3). RITMO smorza i guadagni diretti delle mosse che si possono
+   ripetere senza limiti (promo, live, freestyle veloce) perché farne 10 al
+   giorno non deve valere 10 volte una sola — i pezzi restano tal quali: il
+   tetto settimanale della fase (PHASES.cap) già li tiene a bada da solo. */
+const RITMO = 0.4;
+
 const JOBS = [
-  {id:"volantini", n:"Volantinaggio", pay:70,  e:1, d:"Freddo, gambe, nessuna dignità."},
-  {id:"lavapiatti", n:"Lavapiatti",   pay:100, e:1, d:"Turni serali, cucina bollente."},
-  {id:"fattorino",  n:"Fattorino",    pay:125, e:1, d:"In giro col motorino, piove sempre."},
-  {id:"barista",    n:"Barista",      pay:130, e:1, d:"Conosci gente. Ogni turno un contatto in più.",
+  {id:"volantini", n:"Volantinaggio", pay:70,  e:18, d:"Freddo, gambe, nessuna dignità."},
+  {id:"lavapiatti", n:"Lavapiatti",   pay:100, e:18, d:"Turni serali, cucina bollente."},
+  {id:"fattorino",  n:"Fattorino",    pay:125, e:18, d:"In giro col motorino, piove sempre."},
+  {id:"barista",    n:"Barista",      pay:130, e:18, d:"Conosci gente. Ogni turno un contatto in più.",
    extra(){ G.skills.rete += 0.5; return " Rete +0.5."; }},
-  {id:"magazzino",  n:"Magazziniere", pay:165, e:2, d:"Bancali e schiena. Paga bene, ti spegne."},
-  {id:"buttafuori", n:"Buttafuori",   pay:210, e:2, d:"Notti in piedi sulla porta di un locale.",
+  {id:"magazzino",  n:"Magazziniere", pay:165, e:32, d:"Bancali e schiena. Paga bene, ti spegne."},
+  {id:"buttafuori", n:"Buttafuori",   pay:210, e:32, d:"Notti in piedi sulla porta di un locale.",
    req:g => g.skills.presenza >= 16},
-  {id:"fonico",     n:"Fonico junior", pay:180, e:2, d:"In uno studio vero. Impari guardando.",
+  {id:"fonico",     n:"Fonico junior", pay:180, e:32, d:"In uno studio vero. Impari guardando.",
    req:g => g.skills.flow >= 20, extra(){ G.skills.flow += 0.9; return " Flow +0.9."; }}
 ];
 
@@ -66,7 +74,7 @@ function offerJobs(){
 }
 
 const ACTIONS = [
-  {id:"scrivi", n:"Scrivi barre", e:1, luc:3,
+  {id:"scrivi", n:"Scrivi barre", e:28, luc:3,
    d:"Il foglio, la penna e quello che hai in testa.",
    give:() => "veloce · oppure scrivila tu ×1,5",
    run(){
@@ -86,7 +94,7 @@ const ACTIONS = [
      return "";
    }},
 
-  {id:"beat", n:"Cerca un beat", e:1, luc:1,
+  {id:"beat", n:"Cerca un beat", e:25, luc:1,
    d:"Giri fra i produttori. Torni con roba da comprare.",
    give:() => "3 beat, 3 generi · +rete",
    run(){
@@ -97,7 +105,7 @@ const ACTIONS = [
        ". Si comprano dal Catalogo.";
    }},
 
-  {id:"registra", n:"Registra il pezzo", e:2, luc:3,
+  {id:"registra", n:"Registra il pezzo", e:45, luc:3,
    money:() => G.gear.mic ? 0 : 50,
    d:"Strofa più beat, in sala. Esce una traccia grezza.",
    need:() => !G.bars.length ? "1 strofa" : !G.beats.length ? "1 beat" : null,
@@ -121,7 +129,7 @@ const ACTIONS = [
      return "";
    }},
 
-  {id:"mixa", n:"Mixa il pezzo", e:1, luc:2,
+  {id:"mixa", n:"Mixa il pezzo", e:24, luc:2,
    d:"Livelli e spazio. Qui il provino diventa pezzo.",
    need:() => unmixed().length ? null : "1 traccia da mixare",
    give:() => "+" + mixGain() + " qualità · +flow",
@@ -147,19 +155,19 @@ const ACTIONS = [
      return "«" + s.t + "» è fuori" + (s.mixed ? "." : ", ma non era mixato: qualità " + s.q + ".");
    }},
 
-  {id:"promo", n:"Promo sui social", e:1,
+  {id:"promo", n:"Promo sui social", e:12,
    d:"Clip e provocazioni. Accende quello che hai fuori.",
    need:() => G.songs.some(s => s.released) ? null : "1 pezzo fuori",
-   give:() => "+" + Math.round(6 + G.skills.rete*0.12) + " hype · follower",
+   give:() => "+" + Math.round((6 + G.skills.rete*0.12) * RITMO) + " hype · follower",
    run(){
-     const h = 6 + G.skills.rete*0.12;
+     const h = (6 + G.skills.rete*0.12) * RITMO;
      G.hype = clamp(G.hype + h, 0, 100);
-     const f = Math.round(G.fans*0.012 + rnd(4,24));
+     const f = Math.round((G.fans*0.012 + rnd(4,24)) * RITMO);
      G.fans += f; G.wellbeing -= 1;
      return "Hype +" + Math.round(h) + ", " + f + " nuovi follower.";
    }},
 
-  {id:"free", n:"Freestyle in piazza", e:1, luc:3,
+  {id:"free", n:"Freestyle in piazza", e:26, luc:3,
    d:"Solo il beat e la gente che passa.",
    give:() => "veloce · oppure giocala ×1,5",
    run(){
@@ -170,7 +178,7 @@ const ACTIONS = [
        dg:"Vai a tempo col beat e scegli le risposte giuste. Quello che guadagni dipende da quanta gente resta, e vale 1,5 volte.",
        veloce(){
          gain("presenza", 1.4);
-         const f = Math.round(rnd(2,12) + G.skills.presenza*0.5);
+         const f = Math.round((rnd(2,12) + G.skills.presenza*0.5) * RITMO);
          G.fans += f; G.wellbeing = clamp(G.wellbeing-2,0,100);
          return {t:"Giro veloce in piazza: " + f + " persone si sono fermate.", c:""};
        },
@@ -179,23 +187,23 @@ const ACTIONS = [
      return "";
    }},
 
-  {id:"live", n:"Serata open mic", e:2, luc:2,
+  {id:"live", n:"Serata open mic", e:42, luc:2,
    d:"Palco piccolo, ma la gente ti vede in faccia.",
    need:() => G.songs.some(s => s.released) ? null : "1 pezzo fuori",
-   give:() => "~" + Math.round(20 + G.hype*1.4 + 40) + " € · fan · presenza",
+   give:() => "~" + Math.round((20 + G.hype*1.4 + 40) * RITMO) + " € · fan · presenza",
    run(){
-     const f = Math.round(rnd(8,30) + G.skills.presenza*1.4 + G.hype*0.7);
-     const m = Math.round(rnd(20,60) + G.hype*1.4);
+     const f = Math.round((rnd(8,30) + G.skills.presenza*1.4 + G.hype*0.7) * RITMO);
+     const m = Math.round((rnd(20,60) + G.hype*1.4) * RITMO);
      const lbb = lifeBonus();
      G.fans += Math.round(f*lbb.live); G.money += Math.round(m*lbb.live);
      gain("presenza", 1.2); G.wellbeing -= 3;
      return "Serata fatta: +" + f + " fan, +" + m + " €.";
    }},
 
-  {id:"turno", n:"Vai al turno", e:1, luc:-3,
+  {id:"turno", n:"Vai al turno", e:18, luc:-3,
    d:"Nessuna musica, ma i soldi entrano.",
    avail:() => !!G.job,
-   dyn:() => G.job ? G.job.e : 1,
+   dyn:() => G.job ? G.job.e : 18,
    give:() => G.job ? "+" + G.job.pay + " € · −4 benessere" : "",
    run(){
      const j = G.job;
@@ -206,13 +214,13 @@ const ACTIONS = [
      return "Turno da " + j.n.toLowerCase() + ": +" + j.pay + " €." + extra;
    }},
 
-  {id:"cercalavoro", n:"Cerca lavoro", e:1, luc:-1,
+  {id:"cercalavoro", n:"Cerca lavoro", e:10, luc:-1,
    d:"Due colloqui, due possibilità.",
    avail:() => !G.job,
    give:() => "2 offerte fra cui scegliere",
    run(){ offerJobs(); return "Hai fatto due colloqui."; }},
 
-  {id:"stacca", n:"Stacca la spina", e:1, luc:1,
+  {id:"stacca", n:"Stacca la spina", e:14, luc:1,
    d:"Dormi, mangi, vedi gente normale.",
    give:() => "+25 benessere · +1 rete",
    run(){
@@ -227,7 +235,7 @@ const ACTIONS = [
   /* La palestra sta nella vita quotidiana: costa poco, ti tiene su il corpo e
      ti si vede addosso quando sali su un palco. Non fa musica, fa la persona
      che la musica la regge. */
-  {id:"palestra", n:"Palestra", e:1, luc:1,
+  {id:"palestra", n:"Palestra", e:12, luc:1,
    money:() => 12,
    d:"Un'ora di ferro. La testa si svuota e il corpo tiene.",
    give:() => "+benessere · +presenza",

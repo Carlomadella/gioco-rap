@@ -24,7 +24,9 @@
 <link rel="stylesheet" href="css/creator.css?v=8">
 <link rel="stylesheet" href="css/actionbar.css?v=8">
 <link rel="stylesheet" href="css/posto.css?v=8">
+<link rel="stylesheet" href="css/negozio.css?v=8">
 <link rel="stylesheet" href="css/hub.css?v=8">
+<link rel="stylesheet" href="css/telefono.css?v=8">
 <link rel="stylesheet" href="css/impostazioni.css?v=8">
 </head>
 <body>
@@ -106,15 +108,15 @@
       <div class="mrgrid">
         <div class="mrcard">
           <span class="mrnum">01</span>
-          <h3>Tre energie a settimana</h3>
-          <p>Scrivere, registrare, salire su un palco: ogni mossa costa una o due energie.
-            Ne hai tre. Le rimetti a posto solo chiudendo la settimana.</p>
+          <h3>Cento energie al giorno</h3>
+          <p>Scrivere, registrare, salire su un palco: ogni mossa costa energia, poca
+            o tanta a seconda di quanto pesa. La notte la ricarichi, non del tutto.</p>
         </div>
         <div class="mrcard">
           <span class="mrnum">02</span>
-          <h3>La settimana si chiude</h3>
-          <p>Quando hai finito le mosse chiudi la settimana: gli stream si muovono,
-            i fan arrivano o se ne vanno, l'affitto va pagato lo stesso.</p>
+          <h3>La settimana si chiude da sola</h3>
+          <p>Ogni sette giorni gli stream si muovono, i fan arrivano o se ne vanno,
+            l'affitto va pagato lo stesso — tu intanto continui a vivere un giorno alla volta.</p>
         </div>
         <div class="mrcard">
           <span class="mrnum">03</span>
@@ -187,7 +189,7 @@
       <!-- ---------- colonna di destra: il telefono ---------- -->
       <aside class="ptel">
         <div class="ptelframe">
-          <div class="ptelbar"><span id="hb-telora">21:38</span><span class="ptelnotch"></span><span class="ptelsig"></span></div>
+          <div class="ptelbar"><span id="hb-telora">21:38</span><span class="ptelnotch"></span><span class="ptelsig"></span><span class="ptelbatt"></span></div>
           <div class="ptelscr" id="hb-tel"></div>
         </div>
       </aside>
@@ -269,7 +271,7 @@
   <div class="bar"><div class="in">
     <div class="barenergia" id="g-barenergia"></div>
     <button class="ghost" id="g-diary">Diario<i class="dbdg" id="g-dbdg" hidden></i></button><button class="ghost" id="g-skip">Salta il tempo</button>
-    <button class="solid" id="g-advance">Chiudi la settimana</button>
+    <button class="solid" id="g-advance">Fine giornata</button>
   </div></div>
 </section>
 
@@ -289,6 +291,14 @@
   <p class="podove" id="po-dove"></p>
   <div class="polista" id="po-lista"></div>
   <div class="porete" id="po-rete"></div>
+</div></div>
+
+<!-- Il negozio di vestiti: sbloccato dall'inizio, dalla linguetta «Vestiti»
+     della plancia. Il contenuto lo mette js/game/negozio.js. -->
+<div class="negozio" id="negozio"><div class="ngwrap">
+  <div class="nghead"><div class="ngk">Il tuo guardaroba</div><button class="ngx" id="ng-x">&#10005;</button></div>
+  <p class="ngdove">Quello che indossi entra nelle foto, nelle copertine, in ogni scena. Compralo, poi mettitelo.</p>
+  <div class="nggrid" id="ng-grid"></div>
 </div></div>
 
 <div class="piazza" id="piazza"><div class="pwrap">
@@ -498,8 +508,10 @@
 <script src="js/game/fx.js?v=8"></script>
 <script src="js/game/skip.js?v=8"></script>
 <script src="js/game/posto.js?v=8"></script>
+<script src="js/game/negozio.js?v=8"></script>
 <script src="js/game/uscita.js?v=8"></script>
 <script src="js/game/hub.js?v=8"></script>
+<script src="js/game/telefono.js?v=8"></script>
 
 <!-- Il pannello delle impostazioni: per ultimo, tocca roba definita ovunque. -->
 <script src="js/impostazioni-ui.js?v=8"></script>

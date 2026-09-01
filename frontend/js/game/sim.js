@@ -99,7 +99,9 @@ function advanceWeek(){
     pushLog("Tre turni in una settimana. <b>Il tenore di vita che paghi non lo stai vivendo.</b>", "");
   gain("rete", lb.rete * vissuto);
   syncEnergy();
-  G.energy = G.maxEnergy;
+  /* punto 40: l'energia non si riempie più chiudendo la settimana — si
+     ricarica ogni notte (avanzaGiorno). La settimana resta il battito che
+     chiude i conti, non più quello che ti rimette in piedi. */
 
   if(G.job){
     if(G.shifts > 0) G.job.missed = 0;
@@ -167,6 +169,29 @@ function advanceWeek(){
   if(prova){ G.trialsDone[prova.ph] = true; showEvent(prova); }
   else if(!SALTO && Math.random() < .38) maybeEvent();
   save(); renderGioco();
+}
+
+/* ==================== IL GIORNO (punti 39/40/41) ====================
+   Il giorno è dove si gioca: l'energia si ricarica alla notte, non alla
+   settimana. Ogni sette giorni il battito economico (advanceWeek) scatta da
+   solo — non è più un bottone che il giocatore preme quando ha finito le
+   mosse, è quello che succede quando passa una settimana vera.
+
+   avanzaGiorno() è il motore puro: nessun save/render, nessuna finestra.
+   Lo richiama sia «Fine giornata» (una volta) sia saltaGiorni() (N volte di
+   fila) — così i due modi di far passare il tempo restano una sola verità. */
+function avanzaGiorno(){
+  if(G.ended) return false;
+  const notte = 60 + (G.wellbeing > 60 ? 30 : 0);
+  syncEnergy();
+  G.energy = clamp(G.energy + notte, 0, G.maxEnergy);
+  G.day = (G.day || 1) + 1;
+  if(G.day > 7){
+    G.day = 1;
+    advanceWeek();
+    return true;   /* la settimana si è chiusa */
+  }
+  return false;
 }
 
 function posPrec(x){

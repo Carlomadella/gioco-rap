@@ -85,19 +85,19 @@
 .dettbtn.allarme::after{content:"";width:7px;height:7px;border-radius:50%;background:var(--hot);
   box-shadow:0 0 10px rgba(255,90,54,.9)}
 
-/* L'energia della settimana: il numero da solo non si legge al volo, i
-   trattini si. Uno per turno, spenti quelli gia' usati. Vive nella barra in
-   basso, che e' sempre a schermo: nella testata sarebbe un doppione. */
-.enpips{display:flex;gap:4px}
-.enpips i{width:16px;height:6px;border-radius:3px;background:rgba(255,255,255,.14);
-  display:block;transition:background .2s}
-.enpips i.on{background:var(--sky);box-shadow:0 0 9px rgba(61,199,255,.55)}
+/* L'energia del giorno: col numero solo a 100 non si legge al volo un
+   trattino a testa come prima (punto 39), quindi è tornata una barra piena,
+   proporzionale. Vive nella barra in basso, che e' sempre a schermo: nella
+   testata sarebbe un doppione. */
+.enpips{width:130px;height:7px;border-radius:4px;background:rgba(255,255,255,.14);overflow:hidden}
+.enpips i{display:block;height:100%;border-radius:4px;background:var(--sky);
+  box-shadow:0 0 9px rgba(61,199,255,.55);transition:width .25s}
 .barenergia{display:flex;align-items:center;gap:9px;margin-right:auto}
 .barenergia .n{font-family:var(--cond);font-size:15px;font-weight:800;letter-spacing:.07em;
   text-transform:uppercase;color:var(--soft);white-space:nowrap}
 .barenergia .n b{color:#fff;font-size:19px}
 .barenergia.vuota .n b{color:var(--hot)}
-.barenergia.vuota .enpips i.on{background:var(--hot);box-shadow:0 0 9px rgba(255,90,54,.55)}
+.barenergia.vuota .enpips i{background:var(--hot);box-shadow:0 0 9px rgba(255,90,54,.55)}
 .barenergia .n em{font-style:normal}
 /* sullo stretto resta il numero e i trattini: la parola si capisce lo stesso */
 @media (max-width:720px){

@@ -119,8 +119,8 @@ function corpoGioco(){
                            ["duro", L("Duro","Hard")], ["custom", L("Su misura","Custom")]])) +
   '</div>' +
   '<div class="scard">' +
-    riga(L("Energie a settimana","Energies per week"),
-      L("In più o in meno rispetto alle tre di base.","On top of (or below) the standard three."),
+    riga(L("Energia al giorno","Energy per day"),
+      L("In più o in meno rispetto ai cento di base, ogni giorno.","On top of (or below) the standard hundred, every day."),
       seg("gioco.energia", [[-1,"−1"],[0,"0"],[1,"+1"],[2,"+2"]])) +
     riga(L("Spese fisse","Fixed costs"),
       L("Quanto pesano affitto, lifestyle e vita.","How heavy rent, lifestyle and living are."),

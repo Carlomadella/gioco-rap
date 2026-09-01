@@ -1,13 +1,13 @@
-/* Salta il tempo: un giorno, una settimana, un mese.
-   Più tempo lasci passare, più recuperi il corpo e più perdi la testa:
-   un giorno ti rimette in piedi, una settimana ti spegne la lucidità,
-   un mese ti fa dimenticare da tutti. */
+/* Salta il tempo (punti 40/41): quanti giorni vuoi, non più tre taglie fisse
+   e non più un giorno a settimana al massimo. Non scrivi, non registri, non
+   ti fai vedere da nessuno — il corpo si riprende da solo (la notte ricarica
+   energia, il benessere tende al suo livello naturale), la testa un po' meno:
+   niente azioni musicali vuol dire niente lucidità guadagnata, e la settimana
+   la toglie comunque un pochino da sola. Non serve inventare penalità a
+   mano: avanzaGiorno() e advanceWeek() (sim.js) le danno già, semplicemente
+   vivendo quei giorni senza fare niente — qui si sceglie solo quanti. */
 "use strict";
 
-const RIPOSI_MAX = 1;   /* quante volte a settimana puoi staccare un giorno */
-
-/* modale con le scelte: chiude prima di eseguire, così le settimane
-   che passano possono aprire i loro eventi senza che gli si chiuda sopra */
 function scegliSalto(opts){
   $("m-k").textContent = "Il tempo";
   $("m-t").textContent = "Salta avanti";
@@ -17,9 +17,8 @@ function scegliSalto(opts){
   opts.forEach(o => {
     const b = document.createElement("button");
     b.className = "opt2";
-    b.disabled = !!o.off;
     b.innerHTML = '<span class="n">' + o.n + '</span><span class="d">' + o.d + '</span>';
-    if(!o.off) b.onclick = () => { $("modal").classList.remove("on"); o.run(); };
+    b.onclick = () => { $("modal").classList.remove("on"); o.run(); };
     w.appendChild(b);
   });
   $("modal").classList.add("on");
@@ -27,69 +26,40 @@ function scegliSalto(opts){
 
 function saltaTempo(){
   if(G.ended) return;
-  const riposi = G.rest || 0;
   scegliSalto([
-    {n:"Un giorno",
-     d: riposi >= RIPOSI_MAX
-       ? "Questa settimana un giorno te lo sei già preso. Bisogna chiudere la settimana."
-       : "Dormi, mangi, non pensi a niente: <b>+1 turno</b> e <b>benessere su</b>. Una volta a settimana.",
-     off: riposi >= RIPOSI_MAX,
-     run: saltaGiorno},
-    {n:"Una settimana",
-     d:"La settimana passa da sola: torni con <b>tutti i turni</b> e il benessere su, ma perdi <b>14 di lucidità</b>. Le spese le paghi lo stesso.",
-     run: saltaSettimana},
-    {n:"Un mese",
-     d:"Quattro settimane di niente. Benessere pieno, ma <b>−34 di lucidità</b> e <b>l'hype crolla</b>: la gente ha altro da ascoltare.",
-     run: saltaMese},
+    {n:"1 giorno", d:"Una notte di ricarica: energia su, e basta.", run:() => saltaGiorni(1)},
+    {n:"2 giorni", d:"Due notti. Il corpo si riprende un po' di più.", run:() => saltaGiorni(2)},
+    {n:"Una settimana", d:"7 giorni fuori dai giochi: la settimana si chiude da sola, con le sue spese e i suoi stream.", run:() => saltaGiorni(7)},
+    {n:"Un mese", d:"28 giorni di silenzio. Benessere pieno, ma lucidità e hype ne risentono davvero.", run:() => saltaGiorni(28)},
     {n:"Lascia stare", d:"Torni a quello che stavi facendo.", run(){}}
   ]);
 }
 
-function saltaGiorno(){
-  G.rest = (G.rest || 0) + 1;
-  const prima = G.energy;
-  G.energy = Math.min(G.maxEnergy, G.energy + 1);
-  const w = Math.round(rnd(4, 8));
-  G.wellbeing = clamp(G.wellbeing + w, 0, 100);
-  const guad = G.energy > prima ? "+1 turno" : "eri già al massimo dei turni";
-  pushLog("Un giorno fuori dai giochi: " + guad + ", benessere +" + w + ".", "");
-  SFX.week();
-  toast("Un giorno di stacco: <b>" + guad + "</b>, benessere +" + w + ".", "good", "☾", ["#2B3340","#4A5568"]);
-  save(); renderGioco();
-}
-
-function saltaSettimana(){
+/* Il motore vero: n giorni di fila, senza finestre in mezzo — solo alla fine
+   un rigo nel diario e, se qualche settimana si è chiusa per strada, un
+   rapporto solo (non uno a settimana, che con un mese sarebbero quattro). */
+function saltaGiorni(n){
+  if(G.ended || n <= 0) return;
   if(!weekOpen) openWeek();
-  const before = weekOpen, costs = weeklyCosts();
-  addLuc(-14);
-  G.wellbeing = clamp(G.wellbeing + 10, 0, 100);
-  pushLog("<b>Una settimana saltata.</b> Hai dormito, hai visto gente, non hai scritto una riga.", "");
-  advanceWeek();
-  weekReport(before, costs);
-  openWeek();
-  avvisoLucidita();
-}
-
-function saltaMese(){
-  if(!weekOpen) openWeek();
-  const before = weekOpen, costs = weeklyCosts() * 4;
-  pushLog("<b>Un mese senza fare niente.</b> Ti sei riposato come non facevi da anni.", "big");
+  const before = weekOpen, costiSettimana = weeklyCosts();
+  const lucPrima = luc(), wellPrima = G.wellbeing;
   SALTO = true;
-  for(let i = 0; i < 4 && !G.ended; i++){
-    if(i === 3) SALTO = false;      /* l'ultima settimana rimette in moto eventi e prove */
-    advanceWeek();
+  let settimaneChiuse = 0;
+  for(let i = 0; i < n && !G.ended; i++){
+    if(i === n - 1) SALTO = false;   /* l'ultimo giorno rimette in moto eventi e prove */
+    if(avanzaGiorno()) settimaneChiuse++;
   }
   SALTO = false;
-  addLuc(-34);
-  G.hype = clamp(G.hype * 0.55, 0, 100);
-  G.wellbeing = clamp(G.wellbeing + 22, 0, 100);
-  G.energy = G.maxEnergy;
-  G.rest = 0;
-  pushLog("Un mese dopo: sei intero, ma <b>fuori dal giro</b>. Hype " + Math.round(G.hype) +
-    ", lucidità " + Math.round(luc()) + ".", "bad");
+  const dLuc = Math.round(luc() - lucPrima), dWell = Math.round(G.wellbeing - wellPrima);
+  pushLog("<b>" + n + (n === 1 ? " giorno saltato." : " giorni saltati.") + "</b> Benessere " +
+    (dWell >= 0 ? "+" + dWell : dWell) + ", lucidità " + (dLuc >= 0 ? "+" + dLuc : dLuc) + ".",
+    dLuc <= -10 ? "bad" : "");
+  SFX[settimaneChiuse > 0 ? "week" : "giorno"]();
   save();
-  weekReport(before, costs);
-  openWeek();
+  if(settimaneChiuse > 0){
+    weekReport(before, costiSettimana * settimaneChiuse);
+    openWeek();
+  } else renderGioco();
   avvisoLucidita();
 }
 

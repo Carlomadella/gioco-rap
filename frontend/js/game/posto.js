@@ -17,6 +17,10 @@
 const POSTO_MAX = 8;                  /* quanta gente può girare in provincia */
 const REL_NOMI = ["conoscenza", "contatto", "amico", "collaboratore", "fidato", "partner"];
 
+/* Punto 39: energia a 100 al giorno. «Due parole» resta una mossa piccola,
+   la sessione in studio e il feat restano le più grosse della Sala. */
+const PO_COSTO = {parla:12, sessione:45, mix:20, feat:45, intervista:12};
+
 const POSTO_RUOLI = {
   beatmaker: {n:"Beatmaker", k:"#4ADE80",
     d:"Fa beat. Se ti prende in simpatia te li fa sentire prima degli altri."},
@@ -44,8 +48,10 @@ const CARATTERI = [
 ];
 
 /* ==================== I DIALOGHI ====================
-   Tre situazioni per ruolo. Ogni risposta vale dei punti; quella giusta cambia
-   in base al carattere, e il carattere si scopre parlando. */
+   Punto 43: dodici situazioni per beatmaker/rapper/fonico, nove per il
+   giornalista — non più tre a testa, che con `pick()` si ripetevano in
+   fretta. Ogni risposta vale dei punti; quella giusta cambia in base al
+   carattere, e il carattere si scopre parlando. */
 const DIALOGHI = {
   beatmaker: [
     {t:"Sta caricando un progetto sul portatile. «Tu che roba fai?»",
@@ -59,7 +65,43 @@ const DIALOGHI = {
     {t:"«Qui nessuno paga i beat, lo sai vero?»",
      o:[["Gli dici che tu paghi, quando la roba vale", 2, "pratico"],
         ["Gli dici che gli porti gente che paga", 2, "aperto"],
-        ["Gli dici che neanche tu paghi", 0, null]]}
+        ["Gli dici che neanche tu paghi", 0, null]]},
+    {t:"Ha le cuffie a metà, sta ancora rifinendo qualcosa che non ti fa sentire.",
+     o:[["Aspetti senza dire niente finché non è pronto", 2, "diffidente"],
+        ["Gli chiedi se puoi ascoltare comunque", 1, "aperto"],
+        ["Gli dici di sbrigarsi", -1, null]]},
+    {t:"«Ho fatto sto beat in venti minuti, dimmi se fa schifo.»",
+     o:[["Gli dici cosa non ti convince, nel dettaglio", 2, "pratico"],
+        ["Gli dici che è già pronto così", 1, "gasato"],
+        ["Gli dici che ventiminuti si sentono", -1, null]]},
+    {t:"Ti mostra il telefono: tremila ascolti su un suo beat strumentale.",
+     o:[["Gli fai i complimenti veri, senza esagerare", 2, "aperto"],
+        ["Gli dici che con le parole sopra farebbe il doppio", 1, "gasato"],
+        ["Cambi discorso", 0, "diffidente"]]},
+    {t:"«Sto pensando di cambiare genere, sono stufo del solito giro.»",
+     o:[["Gli chiedi cosa vorrebbe provare", 2, "aperto"],
+        ["Gli dici di non cambiare, gli riesce bene questo", 1, "pratico"],
+        ["Gli dici che cambiare genere è una scusa per non lavorare", -1, "diffidente"]]},
+    {t:"Confronta due schede audio, indeciso su quale comprare.",
+     o:[["Gli dici di prendere quella più cara se se la può permettere", 1, "gasato"],
+        ["Gli chiedi cosa usa davvero, non cosa costa di più", 2, "pratico"],
+        ["Gli dici che non ne capisci e stai zitto", 0, null]]},
+    {t:"«Con te che rapper ho fatto un pezzo bomba, te lo ricordi?» Non l'ha mai fatto con te.",
+     o:[["Gli dici che si sbaglia, senza fartene un problema", 1, "diffidente"],
+        ["Stai al gioco e lo lasci raccontare", 2, "aperto"],
+        ["Gli dici in faccia che se lo inventa", -1, "gasato"]]},
+    {t:"Butta giù un giro di basso lì davanti a te, per ammazzare il tempo.",
+     o:[["Gli dici a tempo dove metteresti un cambio", 2, "pratico"],
+        ["Batti il tempo con la testa e basta", 1, null],
+        ["Gli dici di continuare, tu intanto guardi il telefono", -1, "diffidente"]]},
+    {t:"«Il tuo genere non lo faccio più, mi ha rotto le scatole.»",
+     o:[["Gli chiedi cosa fa adesso invece", 2, "aperto"],
+        ["Gli offri di pagarlo comunque per uno", 1, "pratico"],
+        ["Gli dici che allora non serve a niente parlarci", -1, null]]},
+    {t:"Ti chiede un parere sincero su un ritornello cantato, storto, suo.",
+     o:[["Gli dici la verità, con rispetto", 2, "diffidente"],
+        ["Gli dici che va bene così per non ferirlo", 0, "aperto"],
+        ["Ridi e non rispondi", -1, "gasato"]]}
   ],
   rapper: [
     {t:"Ti guarda dall'alto in basso. «Sei quello che scrive, no?»",
@@ -73,7 +115,43 @@ const DIALOGHI = {
     {t:"«Facciamo un pezzo insieme, prima o poi.»",
      o:[["Gli dici quando e dove, adesso", 2, "pratico"],
         ["Gli dici che prima vuoi sentire come scrive", 1, "diffidente"],
-        ["Gli dici che tu lavori da solo", -1, null]]}
+        ["Gli dici che tu lavori da solo", -1, null]]},
+    {t:"«Ho letto che mi hai citato in un pezzo. Bene o male?»",
+     o:[["Gli dici la verità, bene o male che fosse", 2, "diffidente"],
+        ["Gli dici che era un complimento anche se non lo era", 1, "aperto"],
+        ["Neghi di averlo mai citato", -1, null]]},
+    {t:"Ti fa sentire un ritornello che ha già venduto a un'etichetta, orgoglioso.",
+     o:[["Gli chiedi come si tratta con le etichette", 2, "pratico"],
+        ["Gli fai i complimenti e basta", 1, "gasato"],
+        ["Gli dici che vendersi un pezzo è una mossa da poco", -1, "diffidente"]]},
+    {t:"«Diciamo la verità, chi tra noi due tira di più in giro?»",
+     o:[["Gli dici che non è una gara", 1, "diffidente"],
+        ["Stai al gioco e gli dici che è lui, per ora", 2, "gasato"],
+        ["Gli dici che sei tu, senza girarci intorno", -1, null]]},
+    {t:"Racconta di quando ha aperto un concerto per un nome grosso.",
+     o:[["Gli fai domande su com'è stato davvero", 2, "aperto"],
+        ["Gli chiedi quanto l'hanno pagato", 1, "pratico"],
+        ["Gli dici che aprire per un altro non conta molto", -1, "gasato"]]},
+    {t:"«Sto scrivendo un pezzo sulla mia città, dimmi una cosa vera di qui.»",
+     o:[["Gli racconti una cosa vera, non una da cartolina", 2, "pratico"],
+        ["Gli dici di inventarsela, tanto nessuno controlla", 0, null],
+        ["Gli dici che le città sono tutte uguali", -1, "diffidente"]]},
+    {t:"Ti chiede se puoi prestargli il tuo microfono per una session.",
+     o:[["Glielo presti, tanto te lo riporta", 2, "aperto"],
+        ["Gli dici che te lo tieni per te", 0, "diffidente"],
+        ["Glielo presti in cambio di qualcosa", 1, "pratico"]]},
+    {t:"«Il mio ultimo pezzo l'hanno stroncato tutti. Secondo te avevano ragione?»",
+     o:[["Gli dici la tua onestamente", 2, "diffidente"],
+        ["Gli dici che avevano torto, punto", 1, "gasato"],
+        ["Cambi discorso per non metterti in mezzo", 0, "aperto"]]},
+    {t:"Ha appena litigato con un altro rapper della zona, e te lo racconta caldo caldo.",
+     o:[["Lo ascolti senza schierarti", 2, "aperto"],
+        ["Gli dai ragione subito", 0, "gasato"],
+        ["Gli dici di lasciar perdere, non conviene a nessuno", 1, "pratico"]]},
+    {t:"«Se ti offrissi un feat gratis, lo faresti o vuoi essere pagato?»",
+     o:[["Gli dici che dipende dal pezzo, non dai soldi", 2, "aperto"],
+        ["Gli dici che vuoi essere pagato, sempre", 1, "pratico"],
+        ["Gli dici che i feat gratis sono una perdita di tempo", -1, "diffidente"]]}
   ],
   fonico: [
     {t:"Sta sistemando un cavo che fa contatto. «Passami quello nero.»",
@@ -87,7 +165,43 @@ const DIALOGHI = {
     {t:"Ti fa vedere due versioni dello stesso ritornello.",
      o:[["Scegli e gli spieghi perché", 2, "pratico"],
         ["Gli chiedi quale sceglierebbe lui", 1, "aperto"],
-        ["Gli dici che sono uguali", 0, null]]}
+        ["Gli dici che sono uguali", 0, null]]},
+    {t:"Sta testando un microfono nuovo, te lo punta addosso senza preavviso: «Di' qualcosa.»",
+     o:[["Improvvisi due barre lì per lì", 2, "gasato"],
+        ["Dici solo «prova, prova» come tutti", 1, null],
+        ["Gli chiedi perché non avvisa prima", 0, "diffidente"]]},
+    {t:"«La tua ultima voce è arrivata compressa male. Che programma hai usato?»",
+     o:[["Glielo dici, e gli chiedi come farla meglio", 2, "pratico"],
+        ["Gli dici che va bene così", 0, "gasato"],
+        ["Gli dici che non sapevi nemmeno cosa fosse la compressione", 1, "aperto"]]},
+    {t:"Ti mostra un plugin nuovo che ha comprato, entusiasta.",
+     o:[["Gli chiedi di farti sentire la differenza vera", 2, "pratico"],
+        ["Fingi interesse e annuisci", 0, null],
+        ["Gli dici che sono tutti uguali", -1, "diffidente"]]},
+    {t:"«Se dovessi scegliere, il rap o il mix: cosa conta di più in un pezzo?»",
+     o:[["Gli dici che senza un buon mix anche il pezzo migliore si perde", 2, "pratico"],
+        ["Gli dici che senza il pezzo il mix non serve a niente", 1, "gasato"],
+        ["Gli dici che non ci hai mai pensato", 0, "aperto"]]},
+    {t:"Sta rifacendo il cablaggio della sala da solo, di sera tardi.",
+     o:[["Ti fermi ad aiutarlo, anche solo a reggere i cavi", 2, "aperto"],
+        ["Gli chiedi se ha bisogno o se te ne puoi andare", 1, "diffidente"],
+        ["Lo saluti e vai, non è il tuo lavoro", -1, null]]},
+    {t:"«Ho sentito il tuo primo pezzo, quello vecchio. Sei migliorato parecchio.»",
+     o:[["Gli chiedi cosa si sente di preciso che è cambiato", 2, "diffidente"],
+        ["Gli dici che quel pezzo era già forte", 1, "gasato"],
+        ["Cambi discorso, imbarazzato", 0, "aperto"]]},
+    {t:"Due tue tracce sono pronte, ma può mixarne solo una questa settimana: quale vuole sapere.",
+     o:[["Gli dici quale e perché, con un motivo vero", 2, "pratico"],
+        ["Gli dici che decida lui", 1, "aperto"],
+        ["Gli dici di farle tutte e due comunque", -1, "gasato"]]},
+    {t:"«La gente in sala fa troppo rumore, non riesco a lavorare bene.»",
+     o:[["Fai silenzio e provi a far calmare gli altri", 2, "pratico"],
+        ["Gli dici che è la Sala, è sempre stata così", 0, "diffidente"],
+        ["Gli dici che è un problema suo", -1, null]]},
+    {t:"Ti chiede se hai mai pensato di imparare a mixare da solo.",
+     o:[["Gli dici che preferisci lasciarlo fare a chi lo sa fare", 2, "pratico"],
+        ["Gli dici che magari un giorno ci proverai", 1, "aperto"],
+        ["Gli dici che non serve, tanto ci sono i fonici", 0, "gasato"]]}
   ],
   giornalista: [
     {t:"«Se ti scrivo un pezzo, cosa ci metto dentro?»",
@@ -97,7 +211,35 @@ const DIALOGHI = {
     {t:"Ti chiede se conosci qualcun altro del giro.",
      o:[["Gli fai due nomi veri e glieli presenti", 2, "aperto"],
         ["Gli dici che conosci tutti", 0, "gasato"],
-        ["Gli dici che preferisci parlare di musica", 1, "diffidente"]]}
+        ["Gli dici che preferisci parlare di musica", 1, "diffidente"]]},
+    {t:"«Mi hanno detto che litighi spesso col giro. È vero?»",
+     o:[["Gli dici la verità, senza nascondere niente", 2, "diffidente"],
+        ["Neghi tutto", 0, "gasato"],
+        ["Gli chiedi chi gliel'ha detto", 1, "aperto"]]},
+    {t:"Sta scrivendo un pezzo su un altro rapper della zona e ti chiede un parere su di lui.",
+     o:[["Dici qualcosa di vero, senza buttarlo giù per partito preso", 2, "aperto"],
+        ["Ne parli malissimo", -1, "gasato"],
+        ["Ti rifiuti di commentare", 1, "diffidente"]]},
+    {t:"«Il pezzo che ho scritto su di te ha fatto pochi numeri. Peccato.»",
+     o:[["Gli chiedi cosa ha funzionato meno, per capire", 2, "pratico"],
+        ["Gli dici che non era colpa sua", 1, "aperto"],
+        ["Gli dici che allora non serve scrivere più di te", -1, "diffidente"]]},
+    {t:"Ti chiede se puoi presentarlo a qualcuno che conosci nel giro.",
+     o:[["Gli fai un nome vero e lo aiuti", 2, "aperto"],
+        ["Gli dici che ci pensi", 1, "diffidente"],
+        ["Gli dici che i tuoi contatti restano tuoi", -1, "pratico"]]},
+    {t:"«Scrivo meglio se mi dai qualcosa di vero, non le solite frasi da intervista.»",
+     o:[["Gli racconti qualcosa di vero, anche scomodo", 2, "diffidente"],
+        ["Gli dai comunque le solite frasi", -1, "gasato"],
+        ["Gli chiedi cosa intende con «vero»", 1, "pratico"]]},
+    {t:"Ha scritto un titolo esagerato su un tuo pezzo, per fare click.",
+     o:[["Gliene parli con calma, senza montarla", 2, "pratico"],
+        ["Ti arrabbi e glielo dici duro", 0, "gasato"],
+        ["Lasci correre, tanto porta lettori", 1, "aperto"]]},
+    {t:"«Cosa vuoi che scriva di te tra dieci anni?»",
+     o:[["Gli rispondi con qualcosa di vero, non una frase fatta", 2, "diffidente"],
+        ["Gli dici «il più grande di sempre»", 0, "gasato"],
+        ["Gli dici che non ci hai pensato", 1, "aperto"]]}
   ]
 };
 
@@ -269,8 +411,8 @@ function poTasto(p, tipo, testo, sotto, costo, pronto){
 function azioniDi(p){
   const r = POSTO_RUOLI[p.ruolo];
   let out = poTasto(p, "parla", "Fatti due parole",
-    p.rel >= 5 ? "Ci conosciamo ormai" : "Sali di un gradino con " + p.n, "1 energia",
-    G.energy >= 1);
+    p.rel >= 5 ? "Ci conosciamo ormai" : "Sali di un gradino con " + p.n, PO_COSTO.parla + " energia",
+    G.energy >= PO_COSTO.parla);
 
   if(p.ruolo === "beatmaker"){
     out += poTasto(p, "beat", "Fatti sentire un beat",
@@ -278,24 +420,24 @@ function azioniDi(p){
       "gratis", p.rel >= 1);
     out += poTasto(p, "sessione", "Sessione in studio",
       p.rel >= 2 ? "Un pomeriggio in sala: esce un beat vostro" : "Serve che siate amici",
-      "2 energie · 60 €", p.rel >= 2 && G.energy >= 2 && G.money >= 60);
+      PO_COSTO.sessione + " energie · 60 €", p.rel >= 2 && G.energy >= PO_COSTO.sessione && G.money >= 60);
   }
   if(p.ruolo === "fonico"){
     out += poTasto(p, "mix", "Portagli un pezzo",
       p.rel >= 2 ? "Te lo mixa lui, meglio di come lo faresti tu" : "Serve che siate amici",
-      "1 energia", p.rel >= 2 && G.energy >= 1 && G.songs.some(s => !s.mixed));
+      PO_COSTO.mix + " energie", p.rel >= 2 && G.energy >= PO_COSTO.mix && G.songs.some(s => !s.mixed));
   }
   if(p.ruolo === "rapper"){
     const cd = (typeof totalWeeks === "function" ? totalWeeks() : G.week) - p.feat;
     out += poTasto(p, "feat", "Proponi un pezzo insieme",
       p.rel >= 3 ? (cd < 6 ? "Ne avete fatto uno da poco" : "Un feat vero, con la sua gente dietro")
         : "Serve che siate collaboratori",
-      "2 energie", p.rel >= 3 && cd >= 6 && G.energy >= 2);
+      PO_COSTO.feat + " energie", p.rel >= 3 && cd >= 6 && G.energy >= PO_COSTO.feat);
   }
   if(p.ruolo === "giornalista"){
     out += poTasto(p, "intervista", "Fatti intervistare",
       p.rel >= 1 ? "Un pezzo sul giro locale: la gente legge" : "Serve almeno un contatto",
-      "1 energia", p.rel >= 1 && G.energy >= 1);
+      PO_COSTO.intervista + " energia", p.rel >= 1 && G.energy >= PO_COSTO.intervista);
   }
   return '<div class="poaz">' + out + '</div>' +
     '<p class="poruolo">' + r.d + '</p>';
@@ -353,8 +495,8 @@ function renderDialogo(){
 
 function parlaCon(id){
   const p = G.gente.find(x => x.id === id);
-  if(!p || G.energy < 1) return;
-  G.energy -= 1;
+  if(!p || G.energy < PO_COSTO.parla) return;
+  G.energy -= PO_COSTO.parla;
   const pool = DIALOGHI[p.ruolo];
   POSTO_PARLA = {p:p, sit:pick(pool)};
   SFX.tap(); save(); renderPosto();
@@ -442,8 +584,8 @@ function azionePosto(tipo, id){
   }
 
   if(tipo === "sessione"){
-    if(G.energy < 2 || G.money < 60) return;
-    G.energy -= 2; G.money -= 60;
+    if(G.energy < PO_COSTO.sessione || G.money < 60) return;
+    G.energy -= PO_COSTO.sessione; G.money -= 60;
     const presi = G.market.map(b => b.n).concat(G.beats.map(b => b.n));
     const q = rnd(46, 62) + p.fama * 0.35 + p.rel * 8 + G.skills.rete * 0.3;
     const b = creaBeat(p.gen || mioGenere(), q, presi);
@@ -460,8 +602,8 @@ function azionePosto(tipo, id){
 
   if(tipo === "mix"){
     const s = G.songs.filter(x => !x.mixed).sort((a, b2) => b2.q - a.q)[0];
-    if(!s || G.energy < 1) return;
-    G.energy -= 1;
+    if(!s || G.energy < PO_COSTO.mix) return;
+    G.energy -= PO_COSTO.mix;
     const su = Math.round(mixGain() + p.rel * 2 + p.fama * 0.06);
     s.q = clamp(s.q + su, 5, 100); s.mixed = true;
     gain("rete", 0.4);
@@ -471,8 +613,8 @@ function azionePosto(tipo, id){
   }
 
   if(tipo === "feat"){
-    if(G.energy < 2) return;
-    G.energy -= 2;
+    if(G.energy < PO_COSTO.feat) return;
+    G.energy -= PO_COSTO.feat;
     p.feat = sett;
     const h = Math.round(6 + p.fama * 0.22 + p.rel * 2);
     const f = Math.round(rnd(20, 60) + p.fama * 4 + G.fans * 0.05);
@@ -484,8 +626,8 @@ function azionePosto(tipo, id){
   }
 
   if(tipo === "intervista"){
-    if(G.energy < 1) return;
-    G.energy -= 1;
+    if(G.energy < PO_COSTO.intervista) return;
+    G.energy -= PO_COSTO.intervista;
     const h = Math.round(4 + p.fama * 0.16 + p.rel * 2);
     G.hype = clamp(G.hype + h, 0, 100);
     G.fans += Math.round(rnd(5, 25) + G.fans * 0.01);
