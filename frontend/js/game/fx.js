@@ -174,7 +174,22 @@ const SUONI = {
     pocket(){ nota({hz:1568, dur:.34, tipo:"sine", vol:.05, atk:.003, cut:7000, riv:.4});
               nota({hz:2093, dur:.24, tipo:"sine", vol:.028, atk:.003, when:.02, cut:8000, riv:.4}); },
     buono(){ nota({hz:1046.5, dur:.26, tipo:"sine", vol:.045, atk:.003, cut:5200, riv:.3}); },
-    perso(){ nota({hz:174.61, hz2:130.81, dur:.28, tipo:"triangle", vol:.055, atk:.005, cut:800, riv:.18}); }
+    perso(){ nota({hz:174.61, hz2:130.81, dur:.28, tipo:"triangle", vol:.055, atk:.005, cut:800, riv:.18}); },
+    /* punto 44: la promo — un ting che sale, non il click generico di prima */
+    promo(){
+      nota({hz:1568, hz2:2093, dur:.12, tipo:"sine", vol:.045, atk:.003, cut:7000, riv:.22});
+      fruscio({dur:.03, filtro:"highpass", f:5200, q:.8, vol:.03, when:.01, riv:.12});
+    },
+    /* la palestra — un tonfo di peso e un fiato, non il tap di tutti gli altri */
+    palestra(){
+      nota({hz:90, hz2:55, dur:.22, tipo:"sine", vol:.09, atk:.002, cut:500, riv:.1});
+      fruscio({dur:.12, filtro:"lowpass", f:900, vol:.05, when:.02, riv:.12});
+    },
+    /* la fine della giornata — più morbido della settimana, che resta il battito grosso */
+    giorno(){
+      nota({hz:440, dur:.3, tipo:"sine", vol:.035, atk:.02, cut:2600, riv:.4});
+      nota({hz:659.25, dur:.32, tipo:"sine", vol:.03, atk:.03, when:.08, cut:3200, riv:.4});
+    }
   },
   retro:{
     tap(){ beep(520, .06, "square", .04); },
@@ -193,7 +208,10 @@ const SUONI = {
     click(forte){ beep(forte ? 62 : 48, .09, "sine", .09); },
     pocket(){ beep(880, .05, "square", .03); },
     buono(){ beep(660, .05, "square", .025); },
-    perso(){ beep(150, .1, "sawtooth", .04); }
+    perso(){ beep(150, .1, "sawtooth", .04); },
+    promo(){ beep(1046, .07, "square", .035); beep(1568, .06, "square", .03, .05); },
+    palestra(){ beep(80, .12, "square", .07); noiseHit(.1, 500, .08, .02); },
+    giorno(){ beep(392, .1, "triangle", .04); beep(523, .1, "triangle", .035, .08); }
   }
 };
 
@@ -217,7 +235,7 @@ function noiseHit(dur, hp, vol, when){
 /* Il banco in uso lo decidono le impostazioni. Un nome che manca al retrò
    ricade sul morbido: meglio un suono buono che nessun suono. */
 const SUONO_NOMI = ["tap","apri","chiudi","write","cash","rec","mix","publish","crowd","fail",
-  "week","fanfare","errore","click","pocket","buono","perso"];
+  "week","fanfare","errore","click","pocket","buono","perso","promo","palestra","giorno"];
 const SFX = {};
 SUONO_NOMI.forEach(k => {
   SFX[k] = function(a){
@@ -228,7 +246,8 @@ SUONO_NOMI.forEach(k => {
 });
 
 const SND = {scrivi:"write", beat:"apri", registra:"rec", mixa:"mix", pubblica:"publish",
-  promo:"tap", free:"crowd", live:"crowd", turno:"cash", cercalavoro:"apri", stacca:"tap"};
+  promo:"promo", free:"crowd", live:"crowd", turno:"cash", cercalavoro:"apri", stacca:"tap",
+  palestra:"palestra"};
 
 /* ---- il click dei pulsanti ----
    Uno solo, per tutta l'app: si sente premendo qualunque cosa sia premibile.

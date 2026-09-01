@@ -504,7 +504,7 @@ $("g-advance").onclick = () => {
   const before = weekOpen, costs = weeklyCosts();
   const chiusa = avanzaGiorno();
   if(chiusa){ weekReport(before, costs); openWeek(); }
-  else{ save(); renderGioco(); }
+  else{ SFX.giorno(); save(); renderGioco(); }
 };
 $("g-skip").onclick = () => saltaTempo();
 $("g-tomenu").onclick = () => { save(); if(window.GO) window.GO("menu"); };

@@ -853,6 +853,28 @@ in parallelo.
 
 44. La suondboard del gioco è davvero ancora poco 
 
+   **FATTO in parte (01/09/2026)** — tre suoni nuovi in `frontend/js/game/fx.js`
+   (`SUONI`, sia morbido che retrò): **promo** (un ting che sale, non più il
+   click generico di tutti i bottoni), **palestra** (un tonfo di peso e un
+   fiato, non il tap di tutti gli altri — prima non aveva nessun suono suo),
+   **giorno** (più leggero della settimana, per «Fine giornata» quando la
+   settimana non si chiude — la settimana vera resta il suono grosso).
+   `skip.js` adesso sceglie fra i due giusti a seconda che il salto abbia
+   chiuso una settimana o no.
+   **In parte** perché il punto vero, quello lasciato aperto anche dal
+   punto 25 («resta da fare... variare di più i beat»), è che i dodici
+   generi di `beats.js` suonano diversi per **giro e scala** ma usano tutti
+   lo **stesso timbro** — la stessa cassa, lo stesso rullante, lo stesso
+   basso a dente di sega (`beatplay.js`). Dare a ogni genere il suo
+   strumento vero (un 808 per la trap, una cassa più secca per il boom
+   bap, un pad per la cloud) è un lavoro sul motore di sintesi che **non
+   ho toccato**: qui non ho un modo per ascoltare quello che scrivo, e
+   dato che è già tarato e funzionante, cambiarlo alla cieca rischiava di
+   romperlo invece di migliorarlo. I tre suoni nuovi sopra, invece, sono
+   costruiti con gli stessi mattoncini (`nota`, `fruscio`) di quelli già
+   in gioco, a basso rischio. `npm run prova` (12/12) e `npm run build`
+   puliti; **da provare con l'audio acceso**, qui non l'ho potuto sentire.
+
 45. Sposterei le card dalla mappa iniziale, non SOPRA gli edifici ma leggermente rimpicciolata e a lato, cosìche si vedan bene gli edifici, quando andremo a milano e los angeles poi la mappa dev'essere incredibile come ti abbiamo mandato già nei repo.
 
    **BLOCCATO (01/09/2026) — serve un asset nuovo, non è una riga di codice.**

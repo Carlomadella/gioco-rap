@@ -54,7 +54,7 @@ function saltaGiorni(n){
   pushLog("<b>" + n + (n === 1 ? " giorno saltato." : " giorni saltati.") + "</b> Benessere " +
     (dWell >= 0 ? "+" + dWell : dWell) + ", lucidità " + (dLuc >= 0 ? "+" + dLuc : dLuc) + ".",
     dLuc <= -10 ? "bad" : "");
-  SFX.week();
+  SFX[settimaneChiuse > 0 ? "week" : "giorno"]();
   save();
   if(settimaneChiuse > 0){
     weekReport(before, costiSettimana * settimaneChiuse);
