@@ -6,7 +6,7 @@ quando finisci una task committa e pusha e nel committ fai riferimento al punto 
 va: un punto, una riga, anche di corsa. Poi si sposta nel file dell'argomento giusto, con
 sotto scritto cosa è stato fatto.
 
-I punti di prima — tutti e sessantuno — stanno nella cartella
+I punti di prima — tutti e sessantasette — stanno nella cartella
 **[`implementazioni/`](implementazioni/README.md)**, divisi per argomento:
 
 | | argomento |

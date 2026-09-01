@@ -416,3 +416,26 @@ sotto i 1180px di larghezza reale della finestra.
     (`ACTIONS`): 12 energia, 12 €, +benessere. Stesso limite del punto 45 sulla targhetta nella foto
     («Business» invece di «Palestra»).
 
+---
+
+## 62 · La mappa allargata, senza bande nere
+
+62. La mappa dopo le modifiche di Carletto che ha allargato a tutta la pagina il gioco sembra piccola e
+    ai lati ha delle side bar nere, togliamole allargando la mappa MA OVVIAMENTE NON PERDENDO DI QUALITÀ
+    E FACENDO UN LAVORO AD ARTE. Non voglio spazi neri, voglio che sian fatti bene.
+
+    **FATTO (01/09/2026)** — le bande nere non sono un bug, sono la conseguenza onesta di un fatto
+    fisico: la foto (`mappa_citta.jpg`) è 830×677, la colonna centrale della plancia no, e su schermi
+    larghi la differenza si vedeva come vuoto piatto. Le uniche vere alternative erano ritagliare la
+    foto (si perdono i cartelli ai bordi) o deformarla (si perde qualità) — la richiesta escludeva
+    entrambe. La terza via, quella "fatta ad arte": lo sfondo dietro alla mappa (`.pmappa` in
+    `css/hub.css`) adesso è la stessa foto, sfocata e scurita, ingrandita a coprire tutta la colonna —
+    la stessa tecnica delle copertine sfocate di Spotify o dei bordi ambientali di una TV. La mappa
+    nitida sopra resta esattamente alla sua misura di sempre: le nove zone da toccare (`HUB_LUOGHI`)
+    non si sono spostate di un decimale, verificato confrontando i loro `--x/--y/--w/--h` prima e dopo.
+    **Non potendo aprire una finestra larga quanto un monitor vero in questa sessione** (l'ambiente di
+    prova resta a 1014px anche forzando la finestra), il taglio esatto delle bande sui monitor
+    ultra-larghi (1920, 2560px, quelli con cui Carletto ha già provato la sua responsività) andrebbe
+    riguardato a occhio da chi ha un monitor vero — ma il meccanismo è verificato: niente più nero
+    piatto, e zero rischio sui punti cliccabili.
+

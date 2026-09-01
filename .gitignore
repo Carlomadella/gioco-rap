@@ -1,5 +1,6 @@
 frontend/dist/
 frontend/node_modules/
+.DS_Store
 backend/database/dati/
 backend/database/schema.md
 backend/node_modules/
