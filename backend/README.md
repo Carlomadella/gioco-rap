@@ -104,6 +104,9 @@ si va il giorno che si passa a PostgreSQL.
 | `GET /api/stagioni` | la stagione in corso e quelle chiuse |
 | `GET /api/albo?stagione=1` | l'albo d'oro: chi ha chiuso in cima |
 | `GET /api/notizie?quante=10` | chi è uscito, chi ha firmato, chi è sparito |
+| `GET /api/feed?quanti=20` | i post per LaFamegram: il mondo, più quello che riguarda te |
+| `GET /api/opps?quanti=3` | chi ti sta appena sopra, e i rivali che ti sei preso |
+| `POST /api/relazione` | prenderti uno come rivale (o fare pace) |
 
 **Chi sei**
 
@@ -226,6 +229,23 @@ Al gioco restano solo quelli che il server non può sapere — essere arrivato a
 amici alla Sala. È la differenza fra un traguardo che vale e uno che si prende aprendo la
 console del browser: con Steam attaccato dietro, quella differenza è tutto.
 
+## Il feed e gli opps
+
+`GET /api/feed` torna dei **post**, non righe di database: nome, settimana, testo e cuori —
+la stessa forma che LaFamegram usa già nel gioco (`telPost()` in `js/game/telefono.js`),
+così i post del mondo e quelli della tua carriera si mescolano senza che si veda la
+giuntura. I cuori non sono a caso: vengono dagli stream di chi ha postato, con una
+variazione presa dal suo seme, quindi lo stesso post ne ha sempre gli stessi.
+
+Con una sessione il feed diventa **tuo**: in cima ci finisce chi ti ha passato e chi hai
+passato tu dall'ultima fotografia della classifica. È quello che fa la differenza fra un
+feed e una bacheca uguale per tutti.
+
+`GET /api/opps` sono i rivali veri: **chi ti sta appena sopra**, con quanti stream ti
+mancano per prenderlo. Più quelli che ti sei preso a mano con `POST /api/relazione`, che
+restano anche se in classifica si spostano. Con se stessi non si litiga, e nessuno può
+dichiarare rivalità per conto di un altro.
+
 ## Le stagioni
 
 Una stagione che non finisce mai è una classifica in cui chi è arrivato prima resta davanti
@@ -285,9 +305,17 @@ Non serve un cron: parte da sé alla prima richiesta utile dopo la scadenza, e s
 Il gioco gira sul dispositivo di chi gioca: chi vuole barare bara, e nessun server lo può
 impedire. Quello che c'è tiene fuori i numeri assurdi, non blinda:
 
-- da un invio all'altro gli stream possono al massimo **quintuplicare** (il primo invio ha
-  la mano larga, per chi arriva con una carriera già avviata); ogni taglio finisce in
-  `sospetto`, che è la traccia da cui si guarda chi esagera di mestiere;
+- gli stream che si possono dichiarare non sono più «al massimo il quintuplo»: c'è un
+  **modello** (`plausibilita.js`) che guarda da dove vengono — i fan che ti ascoltano, il
+  pezzo appena uscito, quello che già andava — e dice fin dove poteva arrivare. È tarato
+  **largo** di proposito: fermare per sbaglio uno che gioca davvero è molto peggio che
+  lasciar passare uno che bara piano;
+- chi bara piano lo prendiamo dall'altra parte: ogni taglio lascia un **sospetto pesato**
+  (chi sfora di poco pesa 1, chi moltiplica per venti pesa 5) e a **12 punti in due mesi**
+  scatta da sola la sanzione più mite — fuori dalla classifica, non sospeso;
+- il **primo invio** ha la mano larga sugli stream ma non sui fan (sono loro a comandare il
+  tetto delle settimane dopo) e **non segna nessun sospetto**: chi porta dentro una carriera
+  che non abbiamo mai visto non è un imbroglione;
 - **un invio ogni dieci secondi** per artista, **120 richieste al minuto** per indirizzo
   (dietro a un reverse proxy nostro si accende `ADF_PROXY=1`, se no si conterebbero tutte
   le richieste come se venissero dal proxy);

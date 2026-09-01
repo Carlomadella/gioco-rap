@@ -59,8 +59,10 @@ function popolazione(quanti, usati){
   return out;
 }
 
-/* Una settimana di vita dei bot. Cambia gli oggetti che gli passi e torna le
-   notizie da mettere in bacheca. */
+/* Una settimana di vita dei bot. Cambia gli oggetti che gli passi e riempie
+   `notizie` con `{id, tipo, testo}`: **con dentro di chi sono**, perché il feed
+   del telefono deve poter dire «questo l'ha fatto uno che ti sta due posizioni
+   sopra», e senza l'id non si può. */
 function settimanaBot(bot, notizie){
   for(const b of bot){
     const c = CARATTERI[b.carattere] || CARATTERI.normale;
@@ -72,13 +74,13 @@ function settimanaBot(bot, notizie){
     if(dado < 0.055){
       b.uscite++; b.ultima = scegli(TITOLI); b.seed = Math.floor(Math.random() * 1e9);
       b.slancio += fra(0.15, 0.5); b.caldo = 3;
-      notizie.push(b.nome + " è uscito con «" + b.ultima + "».");
+      notizie.push({ id: b.id, tipo: "uscita", testo: b.nome + " è uscito con «" + b.ultima + "»." });
     } else if(dado < 0.07 && !b.deal && b.stream > 4000){
       b.deal = true; b.slancio += 0.3;
-      notizie.push(b.nome + " ha firmato con un'etichetta.");
+      notizie.push({ id: b.id, tipo: "firma", testo: b.nome + " ha firmato con un'etichetta." });
     } else if(dado < 0.085 && b.stream > 8000){
       b.stream *= fra(0.45, 0.68);
-      notizie.push(b.nome + " è sparito dai radar. Succede in fretta.");
+      notizie.push({ id: b.id, tipo: "sparizione", testo: b.nome + " è sparito dai radar. Succede in fretta." });
     }
     b.stream = Math.round(b.stream);
   }
@@ -89,7 +91,7 @@ function settimanaBot(bot, notizie){
 function ricambio(bot, quanti, usati, notizie){
   for(let i = bot.length - 1; i >= 0; i--){
     if(bot[i].stream < 150 && Math.random() < 0.25){
-      notizie.push(bot[i].nome + " ha smesso. Non ce l'ha fatta.");
+      notizie.push({ id: bot[i].id, tipo: "ritiro", testo: bot[i].nome + " ha smesso. Non ce l'ha fatta." });
       usati.delete(bot[i].nome.toLowerCase());
       bot.splice(i, 1);
     }
@@ -97,7 +99,7 @@ function ricambio(bot, quanti, usati, notizie){
   while(bot.length < quanti){
     const nuovo = nuovoBot(fra(260, 9000), usati);
     bot.push(nuovo);
-    notizie.push(nuovo.nome + " è spuntato dal niente. Da " + nuovo.citta + ".");
+    notizie.push({ id: nuovo.id, tipo: "ingresso", testo: nuovo.nome + " è spuntato dal niente. Da " + nuovo.citta + "." });
   }
 }
 
