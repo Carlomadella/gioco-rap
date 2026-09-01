@@ -117,7 +117,7 @@ body.in-hub .topnav{display:none}
 /* ================= LA CITTÀ ================= */
 .pmappa{left:356px;top:94px;width:838px;height:682px;padding:3px;overflow:hidden}
 .pfoto{position:relative;width:830px;height:677px;border-radius:10px;overflow:hidden;
-  background:#0A0910 url("../media/photo/mappa_citta.jpg") center/100% 100% no-repeat}
+  background:#0A0910 url("../media/photo/schermate di gioco/mappa_citta.jpg") center/100% 100% no-repeat}
 .ppins{position:absolute;inset:0}
 .pspot{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);
   border-radius:10px;transition:background .15s,box-shadow .15s,transform .12s}

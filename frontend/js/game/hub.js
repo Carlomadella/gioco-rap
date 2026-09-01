@@ -1,6 +1,6 @@
 /* La plancia: la schermata da cui si gioca.
 
-   La mappa è la foto del concept (media/photo/mappa_citta.jpg): i luoghi con le
+   La mappa è la foto del concept (media/photo/schermate di gioco/mappa_citta.jpg): i luoghi con le
    loro targhette e i loro tasti «Entra» stanno dentro all'immagine, e sopra ci
    vanno solo le zone da toccare, in percentuale, così restano incollate anche
    quando la plancia si rimpicciolisce.

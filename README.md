@@ -72,9 +72,9 @@ Tre città, in quest'ordine:
 
 | | città | come ci arrivi | cosa ci trovi |
 | --- | --- | --- | --- |
-| ![provincia](frontend/media/photo/schermata_di_gioco_città_iniziale.png) | **Città di provincia** — il nome lo scrive il giocatore _(fatta)_ | si parte da qui | studio, beat maker, vita quotidiana, attività criminali |
-| ![Milano](frontend/media/photo/schermata_di_gioco_città_di_mezzo.png) | **Milano** | livello ≥ 10, fama ≥ 50, hype ≥ 40 | studi di registrazione, manager, club, concerti, sponsor, business, shop, criminalità grossa |
-| ![Los Angeles](frontend/media/photo/schermata_di_gioco_città_finale.png) | **Los Angeles** | livello ≥ 30, fama ≥ 90, hype ≥ 85, reputazione ≥ 80 | studi top tier, label & A&R, eventi VIP, sponsor HQ, casinò, shop luxury, business district |
+| ![provincia](frontend/media/photo/schermate%20di%20gioco/schermata_di_gioco_città_iniziale.png) | **Città di provincia** — il nome lo scrive il giocatore _(fatta)_ | si parte da qui | studio, beat maker, vita quotidiana, attività criminali |
+| ![Milano](frontend/media/photo/schermate%20di%20gioco/schermata_di_gioco_città_di_mezzo.png) | **Milano** | livello ≥ 10, fama ≥ 50, hype ≥ 40 | studi di registrazione, manager, club, concerti, sponsor, business, shop, criminalità grossa |
+| ![Los Angeles](frontend/media/photo/schermate%20di%20gioco/schermata_di_gioco_città_finale.png) | **Los Angeles** | livello ≥ 30, fama ≥ 90, hype ≥ 85, reputazione ≥ 80 | studi top tier, label & A&R, eventi VIP, sponsor HQ, casinò, shop luxury, business district |
 
 La schermata resta sempre la stessa — cambia il mondo in mezzo, non l'interfaccia:
 testata con logo, nome, livello e le quattro risorse (energia, soldi, hype, seguito);
