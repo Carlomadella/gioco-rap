@@ -28,8 +28,7 @@ paga. Il codice resta HTML, CSS e JavaScript — è la tecnologia giusta per un 
 schermate, e su Steam mezzo genere è fatto così — ma ci va intorno un guscio:
 **Electron** per il desktop, **Capacitor** per il telefono.
 
-Da qui discendono **cinque lavori** che prima non servivano. Sono i punti 33-37 di
-`implementazioni.md`, e questo è dove siamo:
+Da qui discendono **cinque lavori** che prima non servivano. Sono i punti 33-37 (in `implementazioni/08-uscita-sugli-store.md`), e questo è dove siamo:
 
 | | lavoro | stato |
 | --- | --- | --- |
@@ -56,13 +55,12 @@ Il file unico non è il modo in cui il gioco esce: è lo strumento per una demo 
 — si manda il file e la gente gioca, senza installare niente.
 
 I documenti di progetto stanno qui in radice: `ROADMAP.md` (il disegno d'insieme),
-`implementazioni.md` (i punti da fare, spuntati uno a uno),
+`implementazioni/` (i punti da fare, un file per argomento),
 `stili interfaccia schermata di gioco.md` (il riferimento visivo).
 
 ## Dove sta andando: l'hub è una mappa
 
-**L'hub del gioco è una plancia con la mappa al centro** (punto 26 di
-`implementazioni.md`, dettagli in `ROADMAP.md`). Non sblocchi funzioni sparse in un menu,
+**L'hub del gioco è una plancia con la mappa al centro** (punto 26, in `implementazioni/01-mappa-e-citta.md`, dettagli in `ROADMAP.md`). Non sblocchi funzioni sparse in un menu,
 sblocchi un mondo più grande. La prima città c'è già: «Inizia la carriera» apre la plancia
 — profilo a sinistra, città al centro, telefono a destra, eventi di oggi in basso — i
 luoghi aprono la partita sulla sezione giusta e dalla partita si torna indietro col tasto
@@ -99,7 +97,7 @@ Milano e Los Angeles per adesso sono ancora solo concept art.
 
 ## Multiplayer: la classifica è una sola
 
-**Punto 30 di `implementazioni.md`.** La classifica non è più una faccenda privata fra te
+**Punto 30**, in `implementazioni/07-multiplayer-e-backend.md`. La classifica non è più una faccenda privata fra te
 e i rivali generati sul tuo computer: ce n'è una sola, uguale per tutti, e ci stanno dentro
 i giocatori veri. Finché i giocatori veri sono pochi il numero lo fanno i bot — e i bot
 **non si riconoscono**: nomi da rapper veri (`Nino Vento`, `Marco T.`, `Young Ferro`), una
