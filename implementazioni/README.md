@@ -70,8 +70,8 @@ per tutti e per tutto.
 | **47** | Il negozio dei vestiti | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **48** | Meno cartelli chiusi sulla mappa, più roba che si apre | in parte | [mappa-e-citta](01-mappa-e-citta.md) |
 | **49** | Un file coi comandi del terminale | fatto | [come-si-lavora](00-come-si-lavora.md) |
-| **50** | Via i popup dalle card: scene vere | da fare | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
-| **51** | Un prompt per ogni card, e dove sono finiti quelli del 38 | da fare | [grafica-e-asset](09-grafica-e-asset.md) |
+| **50** | Via i popup dalle card: scene vere | in parte | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **51** | Un prompt per ogni card, e dove sono finiti quelli del 38 | fatto | [grafica-e-asset](09-grafica-e-asset.md) |
 | **52** | LaFamegram con post veri, caricati dai giocatori | in parte | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **53** | Il feed di LaFamegram si scorre come quello vero | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **54** | Scenari veri, uguali nella forma e diversi nelle circostanze | da fare | [grafica-e-asset](09-grafica-e-asset.md) |

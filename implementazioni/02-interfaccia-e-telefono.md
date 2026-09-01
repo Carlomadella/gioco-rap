@@ -254,6 +254,26 @@ il telefono deve sembrare un vero e proprio telefono : Quindi come un iphone esa
 
 50. Leviamo tutti questi popup dalle card. Quando clicchiamo su una card deve aprirse una vera e propria pagina. COSì INIZIERà A SEMBRARE UN GIOCO.
 
+   **FATTO in parte (01/09/2026)** — sette mosse che finivano dritte in un
+   toast (**mixa, pubblica, promo, live, turno, stacca la spina,
+   palestra**) adesso aprono una pagina vera a schermo intero: la scenetta
+   che la card aveva già in miniatura (`frontend/js/game/scene-art.js`,
+   `SC`), grande, con sopra il nome, la descrizione e l'esito scritto —
+   non due righe che volano via in due secondi. Chiudi con «Continua»,
+   con ✕, o con Esc, come tutte le altre finestre del gioco (punto 5).
+   Markup e stile nuovi (`#scena` in `index.html`, `.scena`/`.scwrap` in
+   `effects.css`), la logica in `ui.js` (`SCENA_PIENA`, `mostraScena()`).
+   Aggiunta anche l'illustrazione della palestra, che non l'aveva.
+   Provato in Chrome: «Palestra» apre la pagina vera, mostra benessere e
+   presenza guadagnati, chiude e torna al gioco con i numeri giusti.
+   **In parte** perché **scrivi, freestyle in piazza e cerca un beat**
+   restano com'erano — i primi due hanno già una scena vera loro (il
+   foglio, la piazza), il terzo aspetta ancora la sua (punto 8, ci sta
+   lavorando un'altra persona in parallelo, non l'ho toccato); **registra**
+   e **cerca lavoro** tengono la loro finestra di scelta (il titolo del
+   pezzo, i due colloqui) invece della scena, perché lì il popup *è* la
+   decisione, non un risultato da leggere. `npm run prova` (12/12) pulito.
+
 ---
 
 ## 52 · LaFamegram con post veri, caricati dai giocatori

@@ -267,6 +267,22 @@ S.stacca = ["#7A5CFF","#12102A",
     '<circle cx="100" cy="38" r="1.4"/></g>' +
   vign + grana];
 
+/* PALESTRA — i pesi, lo specchio, la luce dura */
+S.palestra = ["#57C98B","#0E1F17",
+  cielo("#16241C","#080D0A") +
+  '<rect x="0" y="94" width="200" height="34" fill="#101815"/>' +
+  '<rect x="20" y="10" width="70" height="84" rx="2" fill="#0C1410"/>' +
+  '<rect x="24" y="14" width="62" height="76" fill="#1A2A22"/>' +
+  '<path d="M24,90 L86,14" stroke="#2E4438" stroke-width="2" opacity=".6"/>' +
+  figura(56,90,0.7,"#22322A","#B0774A") +
+  '<rect x="116" y="70" width="70" height="8" rx="4" fill="#1B2620"/>' +
+  '<circle cx="120" cy="74" r="13" fill="#0C1410"/><circle cx="182" cy="74" r="13" fill="#0C1410"/>' +
+  '<circle cx="120" cy="74" r="7" fill="#232E28"/><circle cx="182" cy="74" r="7" fill="#232E28"/>' +
+  '<rect x="108" y="34" width="6" height="46" rx="3" fill="#2E4438"/>' +
+  '<rect x="98" y="30" width="26" height="8" rx="4" fill="#3E5A48"/>' +
+  '<g fill="#57C98B" opacity=".16"><circle cx="150" cy="26" r="30"/></g>' +
+  vign + grana];
+
 return S;
 })();
 

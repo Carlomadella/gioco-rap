@@ -45,7 +45,8 @@ const USCITE = [
   {id:"piazza", chiudi(){ uscitaPiazza(); return true; }},
   {id:"posto",  chiudi(){ chiudiPosto(); return true; }},
   {id:"drawer", chiudi(){ closeDiary(); return true; }},
-  {id:"report", chiudi(){ $("report").classList.remove("on"); return true; }}
+  {id:"report", chiudi(){ $("report").classList.remove("on"); return true; }},
+  {id:"scena", chiudi(){ $("scena").classList.remove("on"); return true; }}
 ];
 const aperto = id => { const el = $(id); return el && el.classList.contains("on"); };
 function overlayAperto(){ return USCITE.some(u => aperto(u.id)); }
