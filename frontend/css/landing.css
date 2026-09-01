@@ -1,0 +1,187 @@
+/* La pagina di landing: il concept del menu 2026, con le foto vere.
+
+   Il metodo è quello della mappa della città: **la foto è lo sfondo**, e sopra
+   ci stanno solo il testo e i comandi. Qui le foto sono sei e si danno il
+   cambio da sole ogni otto secondi; passando sopra a una voce del menu si
+   richiama la scena che le appartiene.
+
+   Le foto stanno in `media/photo/pagina di landing/`. Sono 1672×941: si
+   ritagliano da sole con `cover`, quindi la landing sta bene su qualsiasi
+   schermo senza che nessuno debba rifarle. */
+
+:root{--gold-land:#d3aa5e}
+
+/* ==================== LA SCENA ==================== */
+.land{position:relative;height:calc(100svh - 56px);min-height:560px;overflow:hidden;
+  isolation:isolate;background:#0b0b0d}
+
+.land-scene{position:absolute;inset:-2%;z-index:1;opacity:0;
+  background-position:center;background-size:cover;background-repeat:no-repeat;
+  filter:saturate(.82) contrast(1.03);transform:scale(1.035);
+  transition:opacity 1.45s cubic-bezier(.2,.75,.2,1);will-change:opacity,transform}
+.land-scene.on{opacity:1;animation:landDrift 9s ease-out both}
+@keyframes landDrift{
+  from{transform:scale(1.04) translate3d(var(--px,0),var(--py,0),0)}
+  to{transform:scale(1.095) translate3d(var(--px,0),var(--py,0),0)}
+}
+
+/* le sei scene: l'ordine è quello del concept */
+.land-scene[data-scena="0"]{background-image:url("../media/photo/pagina di landing/landing_a_provincia_urban.jpg")}
+.land-scene[data-scena="1"]{background-image:url("../media/photo/pagina di landing/landing_a_garage.jpg")}
+.land-scene[data-scena="2"]{background-image:url("../media/photo/pagina di landing/landing_a_specchio.jpg")}
+.land-scene[data-scena="3"]{background-image:url("../media/photo/pagina di landing/landing_a_infopoint.jpg")}
+.land-scene[data-scena="4"]{background-image:url("../media/photo/pagina di landing/scena_5_dischi.jpg")}
+.land-scene[data-scena="5"]{background-image:url("../media/photo/pagina di landing/scena_6_cabina.jpg")}
+
+/* il velo: scurisce da sinistra, dove sta il testo, e lascia respirare la foto */
+.land-scrim{position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:linear-gradient(90deg,rgba(7,7,9,.93) 0%,rgba(7,7,9,.72) 27%,rgba(7,7,9,.18) 58%,rgba(7,7,9,.38) 100%),
+             linear-gradient(0deg,rgba(7,7,9,.9),transparent 38%,rgba(7,7,9,.36))}
+.land-grana{position:absolute;inset:0;z-index:4;opacity:.09;pointer-events:none;
+  background-image:radial-gradient(rgba(255,255,255,.18) .65px, transparent .65px);background-size:4px 4px}
+
+/* ==================== IL TESTO ==================== */
+.land-hero{position:absolute;left:7vw;top:19vh;z-index:8;width:min(760px,58vw)}
+.land-kick{display:flex;align-items:center;gap:12px;margin-bottom:14px;color:#d2c9ba;
+  font-size:12px;font-weight:800;letter-spacing:.22em;text-transform:uppercase}
+.land-kick::before{content:"";width:34px;height:2px;background:var(--gold-land)}
+.land-hero h1{font-size:clamp(58px,8.2vw,132px);line-height:.79;letter-spacing:-.075em;
+  text-transform:uppercase;margin:0;font-weight:900;max-width:7ch;
+  text-shadow:0 8px 30px rgba(0,0,0,.35)}
+.land-hero h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1.5px rgba(241,234,219,.82)}
+.land-sub{font-size:clamp(16px,1.55vw,24px);line-height:1.45;max-width:590px;margin:26px 0 0;
+  color:#d2cbc0;font-weight:500}
+
+/* il bottone grosso: è lo stesso #m-play di prima, vestito da concept */
+.land-hero .mrow.big{margin-top:30px;width:auto;display:inline-flex;align-items:center;gap:18px;
+  border:0;border-radius:999px;padding:16px 25px 16px 19px;background:#f1eadb;color:#101012;
+  box-shadow:0 10px 40px rgba(0,0,0,.28);cursor:pointer;
+  transition:transform .22s,background .22s}
+.land-hero .mrow.big:hover{transform:translateY(-3px);background:#fff}
+.land-hero .mrow.big .ic{width:34px;height:34px;border-radius:50%;background:#111;color:#fff;
+  display:grid;place-items:center;font-size:14px;flex:none}
+.land-hero .mrow.big .tx{display:flex;flex-direction:column;gap:2px;text-align:left}
+.land-hero .mrow.big .a{font-weight:900;text-transform:uppercase;letter-spacing:.07em;font-size:15px}
+.land-hero .mrow.big .b{font-size:12px;color:#5b5750;font-weight:600}
+.land-hero .mrow.big .arw{font-size:22px;margin-left:6px}
+
+/* ==================== CHI SEI ====================
+   Il concept non aveva l'artista: noi sì. Sta in basso a sinistra, sulla
+   stessa riga del menu, dove non copre la foto. */
+.land-chip{display:inline-flex;align-items:center;gap:11px;border:0;background:none;
+  padding:0;cursor:pointer;text-align:left;color:inherit;max-width:min(420px,42vw)}
+.land-chip .mport{width:40px;height:40px;flex:none;border-radius:50%;overflow:hidden;position:relative;
+  background:rgba(10,10,12,.55);border:1px solid rgba(255,255,255,.2)}
+.land-chip .mport svg{position:absolute;left:50%;top:8%;height:150%;transform:translateX(-50%)}
+.land-chip .mport.abbozzo{opacity:.5;filter:saturate(.4)}
+.land-chip .chtx{display:flex;flex-direction:column;gap:1px;min-width:0}
+.land-chip b{font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#f1eadb;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.land-chip span span,.land-chip .chtx>span{font-size:10.5px;color:#9f988d;letter-spacing:.04em;
+  text-transform:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.land-chip:hover b{color:#fff}
+.land-chip:hover .mport{border-color:rgba(255,255,255,.5)}
+
+/* ==================== IL MENU IN BASSO ==================== */
+.land-dock{position:absolute;left:38px;right:38px;bottom:30px;z-index:12}
+.land-dock nav{display:grid;grid-template-columns:1.2fr repeat(5,1fr);gap:9px;padding:9px;
+  background:rgba(13,13,15,.62);border:1px solid rgba(255,255,255,.13);border-radius:24px;
+  backdrop-filter:blur(22px);box-shadow:0 14px 50px rgba(0,0,0,.35)}
+.land-voce{position:relative;min-height:84px;border:0;border-radius:17px;background:transparent;
+  color:#e8e0d4;text-align:left;padding:15px 16px 13px;cursor:pointer;overflow:hidden;
+  transition:background .2s,transform .2s,color .2s}
+.land-voce::after{content:"";position:absolute;left:16px;right:16px;bottom:10px;height:1px;
+  background:rgba(255,255,255,.14);transform-origin:left;transform:scaleX(.25);
+  transition:transform .25s,background .25s}
+.land-voce:hover,.land-voce.on{background:rgba(255,255,255,.095);transform:translateY(-2px);color:#fff}
+.land-voce:hover::after,.land-voce.on::after{transform:scaleX(1);background:var(--gold-land)}
+.land-voce .su{display:flex;align-items:center;justify-content:space-between;gap:9px}
+.land-voce .n{font-size:10px;letter-spacing:.16em;color:#a9a195}
+.land-voce .frec{opacity:.45}
+.land-voce .tit{display:block;margin-top:10px;font-size:14px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.06em}
+.land-voce .des{display:block;font-size:11.5px;color:#aaa397;margin-top:4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.land-voce:first-child{background:rgba(211,170,94,.12)}
+.land-voce:first-child .tit{color:#f4d28e}
+
+.land-piede{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:11px;
+  padding:0 7px;font-size:10px;color:#9f988d;letter-spacing:.12em;text-transform:uppercase}
+.land-piede kbd{font-family:inherit;border:1px solid rgba(255,255,255,.22);border-radius:5px;
+  padding:2px 5px;color:#d7d0c5;background:rgba(0,0,0,.15)}
+.land-piede .tasti{display:flex;gap:14px}
+
+/* il messaggio breve, per le cose che non si possono ancora fare */
+.land-toast{position:absolute;z-index:30;left:50%;bottom:150px;transform:translate(-50%,20px);
+  opacity:0;pointer-events:none;background:#f1eadb;color:#111;padding:12px 17px;border-radius:999px;
+  font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;transition:.25s}
+.land-toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* la freccia che dice che sotto c'è altro */
+.land-giu{position:absolute;left:50%;bottom:8px;z-index:12;transform:translateX(-50%);
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#9f988d;
+  background:none;border:0;cursor:pointer;padding:6px 12px}
+.land-giu:hover{color:#fff}
+
+/* ==================== SUL MENU LA BARRA SPARISCE ====================
+   La barra in alto è utile dentro al gioco; qui coprirebbe la foto. Sulla
+   landing resta, ma trasparente: il marchio e l'avatar ci sono ancora. */
+body.su-menu .topnav{background:transparent;backdrop-filter:none;border-bottom:0;
+  min-height:64px;padding:14px 40px}
+body.su-menu .bmark{width:40px;height:40px;padding:7px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.25);backdrop-filter:blur(10px)}
+body.su-menu .bword{color:#f1eadb;font-family:inherit;font-size:15px;font-weight:900;letter-spacing:.13em}
+body.su-menu .bword b{color:var(--gold-land)}
+body.su-menu #s-menu{padding-top:64px}
+body.su-menu .avatarbtn{border-color:rgba(255,255,255,.28)}
+
+/* lo stato della carriera e il marchio dello studio, a destra come nel concept */
+.navmeta{display:none}
+body.su-menu .navmeta{display:flex;align-items:center;gap:24px;margin-left:auto;margin-right:16px;
+  font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:#d2cbc0;white-space:nowrap}
+.navmeta .stato{display:inline-flex;align-items:center;gap:9px}
+.navmeta .dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.32);
+  display:inline-block;flex:none}
+body.carriera-viva .navmeta .dot{background:#a6c27a;box-shadow:0 0 0 4px rgba(166,194,122,.12)}
+.navmeta .studio b{color:#fff}
+@media (max-width:1100px){.navmeta .studio{display:none}}
+@media (max-width:820px){body.su-menu .navmeta{display:none}}
+
+/* ==================== SCHERMI PICCOLI ==================== */
+@media (max-width:900px){
+  .land{height:calc(100svh - 56px);min-height:520px}
+  .land-hero{left:6vw;top:14vh;width:88vw}
+  .land-hero h1{font-size:clamp(52px,15vw,96px)}
+  .land-chip{max-width:60vw}
+  .land-dock{left:12px;right:12px;bottom:12px}
+  .land-dock nav{overflow-x:auto}
+  .land-dock nav{width:1120px;grid-template-columns:repeat(6,1fr)}
+  .land-piede{display:none}
+}
+/* schermi bassi o pagina ingrandita: il concept si stringe invece di tagliarsi */
+@media (min-width:901px) and (max-height:860px){
+  .land-hero{top:12vh}
+  .land-hero h1{font-size:clamp(52px,7.2vw,100px);line-height:.8}
+  .land-sub{font-size:clamp(14px,1.25vw,19px);line-height:1.38;margin-top:16px;max-width:560px}
+  .land-voce{min-height:72px;padding:11px 13px 10px}
+  .land-piede .tasti{display:none}
+}
+@media (min-width:901px) and (max-height:700px){
+  .land-hero{top:64px}
+  .land-kick{margin-bottom:8px;font-size:10px}
+  .land-hero h1{font-size:clamp(46px,6vw,78px)}
+  .land-sub{font-size:13.5px;margin-top:10px;max-width:520px}
+  .land-hero .mrow.big{margin-top:14px;padding:11px 18px 11px 15px}
+  .land-dock{bottom:8px;left:24px;right:24px}
+  .land-dock nav{gap:7px;padding:7px;border-radius:20px}
+  .land-voce{min-height:60px;padding:8px 11px}
+  .land-voce .tit{margin-top:4px;font-size:11.5px}
+  .land-voce .des{font-size:9.5px;margin-top:2px}
+  .land-piede{margin-bottom:7px}
+  .land-piede .tasti{display:none}
+  .land-chip .mport{width:32px;height:32px}
+  .land-giu{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .land-scene.on{animation:none}
+}

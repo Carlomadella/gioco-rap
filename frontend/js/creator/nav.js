@@ -13,6 +13,7 @@ function goto(screen){
   /* L'hub ha una testata sua, con il marchio e le risorse: la barra di sopra
      sparisce, se no ce ne sono due una sull'altra. */
   document.body.classList.toggle("in-hub", screen === "hub");
+  document.body.classList.toggle("su-menu", screen === "menu");
   window.scrollTo({top:0});
   if(screen === "menu") renderMenu();
 }
@@ -41,6 +42,7 @@ function renderMenu(){
 
   $("mhero").style.setProperty("--c1", (typeof coloreAccento === "function" ? coloreAccento(A.color) : A.color));
   $("mhero").classList.toggle("viva", !!viva);
+  document.body.classList.toggle("carriera-viva", !!viva);
   /* Il ritratto c'è sempre, anche prima che l'artista abbia un nome: senza,
      il menu si apriva su mezzo riquadro vuoto. Finché è solo un abbozzo lo si
      tiene indietro, in penombra, così non sembra una carriera già cominciata. */
@@ -54,6 +56,12 @@ function renderMenu(){
     ? (A.city.trim() || scene().n) + " · " + genre().n + " · " + fit().n
     : "Otto avatar pronti, oppure costruisci la faccia da zero.";
   $("m-play-a").textContent = viva ? "Riprendi la carriera" : nm ? "Inizia la carriera" : "Crea il tuo artista";
+  if($("m-voce-a")){
+    $("m-voce-a").textContent = viva ? "Riprendi la carriera" : "Inizia la carriera";
+    $("m-voce-b").textContent = viva
+      ? "Anno " + g.year + " · settimana " + g.week
+      : nm ? "La prima settimana comincia qui" : "Prima crea il tuo artista";
+  }
   $("m-play-b").textContent = viva
     ? "Anno " + g.year + " · settimana " + g.week + " · " + short(g.fans) + " fan"
     : nm ? "Settimana 1 · zero fan, zero contatti" : "Entra subito: l'artista lo sistemi dopo";
@@ -239,10 +247,89 @@ $("m-play").onclick = () => {
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-go]");
   if(!b) return;
-  if(b.dataset.go === "profile") goto("profile");
+  const g = statoPartita();
+  const viva = A.name.trim() && carrieraIniziata(g);
+  if(b.dataset.go === "gioca") $("m-play").click();
+  else if(b.dataset.go === "profile") goto("profile");
   else if(b.dataset.go === "regole") $("m-regole").scrollIntoView({behavior:"smooth", block:"start"});
-  else alert("Sezione ancora da costruire.");
+  /* Le classifiche stanno dentro alla partita: se una carriera c'è, si entra
+     lì; se non c'è, non si finge che ci sia una schermata da aprire. */
+  else if(b.dataset.go === "classifiche"){
+    if(viva){ window.ARTIST = A; goto("hub"); if(window.GAME) window.GAME.enter();
+      if(typeof hubGioco === "function") setTimeout(() => hubGioco("classifica"), 60); }
+    else landDillo("Le classifiche si aprono quando la carriera è cominciata");
+  }
+  else if(b.dataset.go === "carriera"){
+    if(viva) $("m-corso").scrollIntoView({behavior:"smooth", block:"start"});
+    else landDillo(A.name.trim() ? "La carriera non è ancora cominciata" : "Prima crea il tuo artista");
+  }
+  else if(b.dataset.go === "studio"){
+    landDillo("Anni di Fame è di La Fame Studio · 2026");
+    if(typeof IMPOSTAZIONI === "function") setTimeout(IMPOSTAZIONI, 700);
+  }
+  else landDillo("Sezione ancora da costruire");
 });
+
+/* ==================== LA LANDING ====================
+   Sei scene che si danno il cambio ogni otto secondi. Passando sopra a una
+   voce del menu si richiama la sua, e quando il mouse se ne va riparte il
+   giro: è il concept, ed è anche il modo più semplice per far vedere sei
+   posti del gioco senza chiedere niente a chi guarda. */
+const LAND_NOMI = [
+  "Provincia — dove comincia la storia",
+  "Il garage — dove si aggiusta tutto",
+  "Lo specchio — chi vuoi essere",
+  "L'info point — come ci si muove",
+  "Il negozio di dischi — chi sta girando",
+  "La cabina — chi ti cerca"
+];
+let landOra = 0, landGiro = null;
+
+function landScena(i, daHover){
+  const scene = document.querySelectorAll(".land-scene");
+  if(!scene.length) return;
+  landOra = (i + scene.length) % scene.length;
+  scene.forEach((s, j) => s.classList.toggle("on", j === landOra));
+  document.querySelectorAll(".land-voce").forEach(v =>
+    v.classList.toggle("on", Number(v.dataset.scena) === landOra));
+  const nome = $("land-scena-nome");
+  if(nome) nome.textContent = LAND_NOMI[landOra];
+  clearTimeout(landGiro);
+  if(!daHover) landGiro = setTimeout(() => landScena(landOra + 1), 8000);
+}
+function landRiprendi(){
+  clearTimeout(landGiro);
+  landGiro = setTimeout(() => landScena(landOra + 1), 8000);
+}
+/* il messaggio breve: dice la verità invece di aprire una schermata finta */
+let landToastT = 0;
+function landDillo(testo){
+  const t = $("land-toast");
+  if(!t){ alert(testo); return; }
+  t.textContent = testo;
+  t.classList.add("on");
+  clearTimeout(landToastT);
+  landToastT = setTimeout(() => t.classList.remove("on"), 2200);
+}
+
+document.querySelectorAll(".land-voce").forEach(v => {
+  v.addEventListener("mouseenter", () => landScena(Number(v.dataset.scena), true));
+  v.addEventListener("mouseleave", landRiprendi);
+});
+window.addEventListener("keydown", e => {
+  if(!document.body.classList.contains("su-menu")) return;
+  if(e.key === "ArrowRight") landScena(landOra + 1);
+  if(e.key === "ArrowLeft") landScena(landOra - 1);
+});
+/* il movimento del mouse sposta la foto di pochi pixel: basta per non farla
+   sembrare un fondale incollato */
+const landApp = document.querySelector(".land");
+if(landApp) landApp.addEventListener("pointermove", e => {
+  const x = (e.clientX / innerWidth - .5) * 8, y = (e.clientY / innerHeight - .5) * 8;
+  const s = document.querySelectorAll(".land-scene")[landOra];
+  if(s){ s.style.setProperty("--px", x + "px"); s.style.setProperty("--py", y + "px"); }
+});
+landScena(0);
 
 applyMode();
 renderArtista();

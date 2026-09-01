@@ -13,6 +13,30 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
 
 > **Risulta chiuso in un commit**, ma qui non era mai stato scritto: `d40b20c` del 30/08/2026 — «feat: landing page rifatta, marchio e avatar nella barra (punto 4)».
 
+   **RIFATTA DA CAPO (01/09/2026)** — sul concept `anni-di-fame-menu-2026`, con
+   **lo stesso metodo della mappa della città: la foto è lo sfondo**, e sopra ci
+   stanno solo testo e comandi (`frontend/css/landing.css`).
+   - **Sei scene** che si danno il cambio da sole ogni otto secondi: provincia,
+     garage, specchio, info point, negozio di dischi, cabina telefonica. Passando
+     sopra a una voce del menu si richiama la sua scena, e le frecce ← → le
+     scorrono a mano. Le foto stavano dentro al concept come base64 da 2 MB
+     l'una: quattro erano già nel repo, le altre due sono uscite da lì e
+     salvate in JPEG (200 KB invece di 2 MB).
+   - **Quello che si legge viene dalla partita vera**, non dal concept: in alto
+     a destra a che punto sei («Nessuna carriera iniziata» / «Artista pronto» /
+     «Carriera in corso · anno 1, settimana 12»), il bottone grosso che diventa
+     «Riprendi la carriera» con settimana e fan, e in basso a sinistra il tuo
+     ritratto col nome, la città, il genere e il vestito.
+   - **Il menu in basso porta a cose che esistono**: Inizia la carriera, Il tuo
+     artista, Come si gioca, Classifiche (entra in partita sulla classifica —
+     se non c'è una carriera lo dice invece di aprire una schermata finta),
+     Impostazioni, La Fame Studio. Al posto di «Contatti» del concept, che da
+     noi non esiste ancora.
+   - La barra in alto sulla landing diventa trasparente e si mette in fila col
+     concept; dentro al gioco resta com'era.
+   - Provato in Chrome accanto al concept: stessa aria, stessi ingombri, e le
+     scene che cambiano davvero. `npm run prova` (12/12) e `npm run build` puliti.
+
 ---
 
 

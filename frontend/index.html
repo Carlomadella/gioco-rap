@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="css/base.css?v=8">
 <link rel="stylesheet" href="css/preview.css?v=8">
 <link rel="stylesheet" href="css/shell.css?v=8">
+<link rel="stylesheet" href="css/landing.css?v=8">
 <link rel="stylesheet" href="css/game.css?v=8">
 <link rel="stylesheet" href="css/overlays.css?v=8">
 <link rel="stylesheet" href="css/effects.css?v=8">
@@ -51,46 +52,92 @@
     </button>
     <button class="navback" id="nav-back" hidden><span class="arw">‹</span> Menu</button>
   </div>
+  <!-- Sulla landing, a destra, quello che dice il concept: a che punto sei e
+       di chi è il gioco. Dentro al gioco sparisce e resta solo l'avatar. -->
+  <div class="navmeta">
+    <span class="stato"><i class="dot"></i><span id="m-tag">Nessuna carriera iniziata</span></span>
+    <span class="studio">La Fame <b>Studio</b></span>
+  </div>
   <button class="avatarbtn" id="nav-avatar" aria-label="Apri il tuo artista"></button>
 </div>
 
 <section class="screen on" id="s-menu">
-  <div class="menu">
-    <div class="mhero" id="mhero">
-      <div class="mport" id="m-port"></div>
-      <div class="mtxt">
-        <div class="game"><span class="dot"></span><span id="m-tag">Nessuna carriera iniziata</span></div>
-        <h1 id="m-name">Crea il tuo artista</h1>
-        <p id="m-meta">Otto avatar pronti, o costruisci la faccia da zero.</p>
-      </div>
-    </div>
+  <!-- ====================== LA LANDING ======================
+       Il concept del menu 2026, con la foto come sfondo — lo stesso metodo
+       della mappa della città. Sei scene che si danno il cambio da sole; il
+       menu in basso le richiama passandoci sopra. Tutto quello che si legge
+       viene dalla partita vera: chi sei, a che settimana sei, quanti fan. -->
+  <div class="land" id="mhero">
+    <div class="land-scene on" data-scena="0"></div>
+    <div class="land-scene" data-scena="1"></div>
+    <div class="land-scene" data-scena="2"></div>
+    <div class="land-scene" data-scena="3"></div>
+    <div class="land-scene" data-scena="4"></div>
+    <div class="land-scene" data-scena="5"></div>
+    <div class="land-scrim"></div>
+    <div class="land-grana"></div>
 
-    <div class="mlist">
+    <div class="land-hero">
+      <div class="land-kick">Simulatore di carriera rap</div>
+      <h1>Fatti<br><em>un nome.</em></h1>
+      <p class="land-sub">Non parti da una villa, una supercar o una leggenda già scritta.
+        Parti da una stanza, qualche barra e abbastanza fame da continuare.</p>
       <button class="mrow big" id="m-play">
         <span class="ic">▶</span>
         <span class="tx"><span class="a" id="m-play-a">Inizia la carriera</span>
         <span class="b" id="m-play-b">Prima devi creare il tuo artista</span></span>
-      </button>
-      <button class="mrow" data-go="profile">
-        <span class="ic" style="background:var(--hot)">A</span>
-        <span class="tx"><span class="a">Il tuo artista</span><span class="b">Aspetto, città, genere</span></span>
-      </button>
-      <button class="mrow" data-go="regole">
-        <span class="ic" style="background:var(--acid)">?</span>
-        <span class="tx"><span class="a">Come si gioca</span><span class="b">Energia, settimane, lucidità</span></span>
-      </button>
-      <button class="mrow" data-go="soon">
-        <span class="ic" style="background:var(--sky)">C</span>
-        <span class="tx"><span class="a">Classifiche</span><span class="b">Chi comanda questa settimana</span></span>
-      </button>
-      <!-- Le impostazioni si aprono da qui, dal menu principale e basta. -->
-      <button class="mrow" id="m-setts">
-        <span class="ic" style="background:var(--green)">⚙</span>
-        <span class="tx"><span class="a">Impostazioni</span><span class="b">Audio, aspetto, difficoltà, salvataggi</span></span>
+        <span class="arw">→</span>
       </button>
     </div>
 
-    <!-- La carriera in corso: compare solo se una partita è già cominciata. -->
+    <div class="land-dock">
+      <div class="land-piede">
+        <!-- Chi sei: il concept non ce l'aveva, noi sì, ed è la prima cosa che
+             uno cerca riaprendo il gioco. Sta qui sotto, non sopra alla foto. -->
+        <button class="land-chip" data-go="profile">
+          <span class="mport" id="m-port"></span>
+          <span class="chtx"><b id="m-name">Crea il tuo artista</b>
+          <span id="m-meta">Otto avatar pronti, o costruisci la faccia da zero.</span></span>
+        </button>
+        <span class="tasti"><span id="land-scena-nome">Provincia — dove comincia la storia</span>
+          <span><kbd>←</kbd> <kbd>→</kbd> cambia scena</span></span>
+      </div>
+      <nav aria-label="Menu principale">
+        <button class="land-voce on" data-scena="0" data-go="gioca">
+          <span class="su"><span class="n">01</span><span class="frec">↗</span></span>
+          <span class="tit" id="m-voce-a">Inizia la carriera</span>
+          <span class="des" id="m-voce-b">La prima settimana comincia qui</span>
+        </button>
+        <button class="land-voce" data-scena="2" data-go="profile">
+          <span class="su"><span class="n">02</span><span class="frec">↗</span></span>
+          <span class="tit">Il tuo artista</span><span class="des">Aspetto, città, genere</span>
+        </button>
+        <button class="land-voce" data-scena="3" data-go="regole">
+          <span class="su"><span class="n">03</span><span class="frec">↗</span></span>
+          <span class="tit">Come si gioca</span><span class="des">Energia, giornate, lucidità</span>
+        </button>
+        <button class="land-voce" data-scena="4" data-go="classifiche">
+          <span class="su"><span class="n">04</span><span class="frec">↗</span></span>
+          <span class="tit">Classifiche</span><span class="des">Chi comanda questa settimana</span>
+        </button>
+        <button class="land-voce" data-scena="1" id="m-setts">
+          <span class="su"><span class="n">05</span><span class="frec">↗</span></span>
+          <span class="tit">Impostazioni</span><span class="des">Audio, aspetto, salvataggi</span>
+        </button>
+        <button class="land-voce" data-scena="5" data-go="studio">
+          <span class="su"><span class="n">06</span><span class="frec">↗</span></span>
+          <span class="tit">La Fame Studio</span><span class="des">Chi fa questo gioco</span>
+        </button>
+      </nav>
+
+    </div>
+
+    <div class="land-toast" id="land-toast"></div>
+    <button class="land-giu" data-go="regole">↓ come si gioca</button>
+  </div>
+
+  <div class="menu">
+
     <div class="mcorso" id="m-corso" hidden>
       <div class="mchead">
         <h2>La tua carriera</h2>
