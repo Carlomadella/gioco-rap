@@ -50,6 +50,31 @@
 .scena.on{display:grid}
 .scwrap{width:100%;max-width:560px;background:linear-gradient(160deg,#1B1B22,#121218);
   border-radius:26px;overflow:hidden;animation:rIn .45s cubic-bezier(.2,.9,.3,1)}
+/* Punto 58: sette mosse, sette entrate diverse — non tutte la scena deve
+   "apparire" allo stesso modo. Ognuna gioca sulla mossa che rappresenta;
+   `data-anim` la sceglie da mostraScena() in ui.js, il fallback resta rIn. */
+.scwrap[data-anim="mixa"]{animation:scSlideX .5s cubic-bezier(.2,.9,.3,1)}
+@keyframes scSlideX{0%{transform:translateX(46px) skewY(-2deg);opacity:0}
+  100%{transform:none;opacity:1}}
+.scwrap[data-anim="pubblica"]{animation:scBurst .55s cubic-bezier(.2,1.1,.3,1)}
+@keyframes scBurst{0%{transform:scale(.72);opacity:0;filter:brightness(2.4)}
+  60%{filter:brightness(1.15)}100%{transform:scale(1);opacity:1;filter:brightness(1)}}
+.scwrap[data-anim="promo"]{animation:scFlip .5s cubic-bezier(.3,.9,.3,1);
+  transform-style:preserve-3d;perspective:800px}
+@keyframes scFlip{0%{transform:rotateX(-24deg) translateY(-14px);opacity:0}
+  100%{transform:none;opacity:1}}
+.scwrap[data-anim="live"]{animation:scRise .5s cubic-bezier(.2,.9,.3,1)}
+@keyframes scRise{0%{transform:translateY(64px) scale(.97);opacity:0}
+  100%{transform:none;opacity:1}}
+.scwrap[data-anim="turno"]{animation:scPunch .4s cubic-bezier(.4,0,.2,1)}
+@keyframes scPunch{0%{transform:translateX(-40px);opacity:0}
+  55%{transform:translateX(6px);opacity:1}100%{transform:none}}
+.scwrap[data-anim="stacca"]{animation:scSoft .7s ease-out}
+@keyframes scSoft{0%{transform:scale(1.02);opacity:0;filter:blur(6px)}
+  100%{transform:none;opacity:1;filter:blur(0)}}
+.scwrap[data-anim="palestra"]{animation:scBounce .55s cubic-bezier(.3,1.6,.4,1)}
+@keyframes scBounce{0%{transform:scale(.8) translateY(20px);opacity:0}
+  70%{transform:scale(1.03) translateY(-3px)}100%{transform:scale(1) translateY(0);opacity:1}}
 .scart{width:100%;aspect-ratio:200/128;background:#0B0B0D}
 .scart svg{display:block;width:100%;height:100%}
 .scbody{padding:22px 26px 26px}
