@@ -60,6 +60,12 @@ function advanceWeek(){
   for(const [s, v] of grezzi){
     const w = Math.round(v * fattore);
     s.streams += w; s.last = w; streams += w;
+    /* punto 19: la discografia deve poter dire se un pezzo sta invecchiando
+       bene o male, e per dirlo serve ricordarsi le settimane di prima. Sei
+       mesi bastano: piu' indietro non guarda nessuno. */
+    if(!s.storia) s.storia = [];
+    s.storia.push(w);
+    if(s.storia.length > 26) s.storia.shift();
   }
   if(fattore < 0.75 && G.phase < PHASES.length-1 && Math.random() < .3)
     pushLog("Il pezzo gira, ma oltre <b>" + PHASES[G.phase].n.toLowerCase() + "</b> non arriva. Serve il passo dopo.", "");

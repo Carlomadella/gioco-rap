@@ -146,6 +146,17 @@ NETWORK 64
 
 19. Aggiungere sezione "Discografia"
 
+   **FATTO (02/09/2026)** — branch `task/19-discografia`. Nuova linguetta **Discografia**
+   nella barra della partita: non è la lista del catalogo (quella è il materiale in cartella),
+   è cosa è **uscito** e come sta andando. In cima i quattro numeri (pezzi fuori, stream in
+   tutto, questa settimana, il più ascoltato); poi una riga per pezzo dal più recente, con
+   copertina, quando è uscito, qualità, la **curva delle ultime settimane** e come sta andando
+   detto a parole — sta risalendo, tiene, sta calando, sta sparendo — con la variazione vera.
+   Per disegnare una curva servivano più di due numeri: `advanceWeek()` adesso accoda gli
+   ascolti settimanali in `s.storia` e tiene gli ultimi sei mesi. Le carriere già in corso
+   partono da zero settimane di storia, e la sezione lo dice invece di inventarsela. Per
+   esteso in [`04-musica-e-suoni.md`](04-musica-e-suoni.md#19--la-discografia).
+
 20. se clicco sull'opzione di conversazione "fatti sentire un beat" non fa niente
 
 21. fare pagina di registrazione/login/logout

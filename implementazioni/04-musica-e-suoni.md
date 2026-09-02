@@ -114,3 +114,47 @@ cliccando sopra si ferma, come dice il codice.
    puliti.
 
 ---
+
+---
+
+## 19 · La discografia
+
+19. Aggiungere sezione "Discografia"
+
+    **FATTO (02/09/2026)** — branch `task/19-discografia`.
+
+    Il catalogo dice cosa hai **in cartella**: strofe scritte, beat comprati, pezzi registrati,
+    attrezzatura. La discografia dice un'altra cosa: cosa è **uscito**, e come sta andando. La
+    differenza che conta è il tempo. Un pezzo pubblicato non è un numero fermo: sale, tiene, poi
+    scende — e finché l'unica cosa che si vedeva era «12.400 stream» quella storia non si vedeva
+    per niente.
+
+    Nuova linguetta **Discografia** nella barra della partita, fra Catalogo e Classifica. Dentro:
+
+    - **In cima i quattro numeri che riassumono tutto**: quanti pezzi hai fuori, quanti stream in
+      tutto, quanti questa settimana, e qual è il più ascoltato.
+    - **Una riga per pezzo**, dal più recente: copertina, quando è uscito (anno e settimana),
+      qualità, e se ci hanno girato sopra un video.
+    - **La curva delle ultime settimane**, disegnata piccola accanto al titolo. È lì che si legge
+      se un pezzo sta invecchiando bene o male.
+    - **Come sta andando adesso, detto a parole**: sta risalendo, tiene, sta calando, sta
+      sparendo, non lo ascolta più nessuno — con la variazione vera rispetto alla settimana
+      prima. Il colore della riga segue quel verso.
+    - **Quanto ha fatto in tutto e quanto questa settimana.**
+
+    **Perché ci voleva una memoria.** Il gioco teneva `s.streams` (il totale) e `s.last` (l'ultima
+    settimana): con due numeri non si disegna nessuna curva. Adesso `advanceWeek()` in
+    `js/game/sim.js` accoda gli ascolti della settimana in `s.storia`, e tiene le ultime
+    ventisei — sei mesi, più indietro non guarda nessuno. È una riga nel salvataggio, e le
+    carriere già in corso partono semplicemente da zero settimane di storia: la sezione lo dice
+    («prima settimana») invece di inventarsi una curva che non c'è.
+
+    In fondo una riga che vale più di un grafico: un pezzo che scende non è un pezzo brutto, è un
+    pezzo vecchio. Quello che lo rimette in piedi è quello che gli succede intorno — un video, un
+    feat, un palco, un altro pezzo che tira su tutto il resto.
+
+    **Provata nel browser vero**, con tre pezzi dalle storie diverse: la curva si disegna, le
+    etichette cambiano verso, `advanceWeek()` accoda davvero e dopo trenta settimane la storia si
+    ferma a ventisei come deve.
+
+    File toccati: `js/game/ui.js`, `js/game/sim.js`, `css/game.css`, `index.html`.

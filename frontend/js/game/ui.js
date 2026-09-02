@@ -298,6 +298,8 @@ function renderGioco(){
       }).join("")
     : '<div class="empty2">Nessun pezzo registrato.</div>';
 
+  renderDiscografia();
+
   $("g-songs").querySelectorAll("[data-ren]").forEach(btn => {
     btn.onclick = () => {
       const sx = G.songs[+btn.dataset.ren]; if(!sx) return;
@@ -505,6 +507,100 @@ document.querySelectorAll(".nb").forEach(t => {
     if(typeof beatStop === "function") beatStop();
   };
 });
+
+
+/* ==================== LA DISCOGRAFIA (punto 19) ====================
+   Il catalogo dice cosa hai in cartella; la discografia dice cosa e' uscito e
+   come sta andando. La differenza che conta e' il tempo: un pezzo non e' un
+   numero fermo, e' una curva che sale e poi scende. `s.storia` (js/game/sim.js)
+   tiene le ultime ventisei settimane, e da quelle si vede se un pezzo sta
+   invecchiando bene o male. */
+
+/* la curva delle ultime settimane, disegnata piccola accanto al pezzo */
+function discoCurva(storia, colore){
+  const d = (storia || []).slice(-14);
+  if(d.length < 2) return '<span class="dcurva vuota"></span>';
+  const max = Math.max.apply(null, d) || 1;
+  const W = 68, H = 22;
+  const punti = d.map((v, i) => {
+    const x = d.length === 1 ? 0 : (i / (d.length - 1)) * W;
+    const y = H - (v / max) * (H - 2) - 1;
+    return x.toFixed(1) + "," + y.toFixed(1);
+  }).join(" ");
+  return '<span class="dcurva"><svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' +
+    '<polyline points="' + punti + '" fill="none" stroke="' + colore + '" stroke-width="1.6" ' +
+    'stroke-linejoin="round" stroke-linecap="round"/></svg></span>';
+}
+
+/* Come sta andando: si confrontano le ultime due settimane vere. Non e' un
+   giudizio sul pezzo, e' il verso in cui sta andando adesso. */
+function discoAndamento(s){
+  const d = s.storia || [];
+  if(!s.last && d.length < 2) return {k:"nuovo", t:"appena uscito", c:"#94A3B8", f:""};
+  if(d.length < 2) return {k:"nuovo", t:"prima settimana", c:"#94A3B8", f:""};
+  const ora = d[d.length - 1], prima = d[d.length - 2];
+  if(ora === 0 && prima === 0) return {k:"fermo", t:"non lo ascolta piu' nessuno", c:"#6B7280", f:""};
+  const var_ = prima === 0 ? 1 : (ora - prima) / prima;
+  if(var_ >= 0.12) return {k:"su", t:"sta risalendo", c:"#4ADE80", f:"+" + Math.round(var_ * 100) + "%"};
+  if(var_ >= -0.12) return {k:"tiene", t:"tiene", c:"#38BDF8", f:(var_ >= 0 ? "+" : "") + Math.round(var_ * 100) + "%"};
+  if(var_ >= -0.4) return {k:"cala", t:"sta calando", c:"#FBBF24", f:Math.round(var_ * 100) + "%"};
+  return {k:"giu", t:"sta sparendo", c:"#F87171", f:Math.round(var_ * 100) + "%"};
+}
+
+function discoQuando(s){
+  const sett = s.week || 0;
+  const anno = Math.floor((sett - 1) / 52) + 1;
+  const nel = sett - (anno - 1) * 52;
+  return "anno " + anno + ", settimana " + nel;
+}
+
+function renderDiscografia(){
+  const box = $("g-disco");
+  if(!box) return;
+  const fuori = G.songs.filter(x => x.released);
+
+  if(!fuori.length){
+    box.innerHTML = '<div class="list"><h3>Discografia</h3>' +
+      '<div class="empty2">Non e\u2019 ancora uscito niente. Scrivi, registra, pubblica: ' +
+      'da l\u00ec in poi i pezzi vivono per conto loro e qui si vede come.</div></div>';
+    return;
+  }
+
+  const totali = fuori.reduce((n, x) => n + (x.streams || 0), 0);
+  const settimana = fuori.reduce((n, x) => n + (x.last || 0), 0);
+  const migliore = fuori.slice().sort((a, b) => (b.streams || 0) - (a.streams || 0))[0];
+  const cc = coloreAccento((window.ARTIST || {}).color);
+
+  const testa = '<div class="dtesta">' +
+    '<div class="dbox"><span class="k">Pezzi fuori</span><span class="v">' + fuori.length + '</span></div>' +
+    '<div class="dbox"><span class="k">Stream in tutto</span><span class="v">' + short(totali) + '</span></div>' +
+    '<div class="dbox"><span class="k">Questa settimana</span><span class="v">' + short(settimana) + '</span></div>' +
+    '<div class="dbox"><span class="k">Il piu\u2019 ascoltato</span><span class="v piccolo">' + migliore.t + '</span></div>' +
+    '</div>';
+
+  /* dal piu\u2019 recente: la discografia si legge dall\u2019ultimo pezzo */
+  const righe = fuori.slice().sort((a, b) => (b.week || 0) - (a.week || 0)).map(x => {
+    const a = discoAndamento(x);
+    const i = G.songs.indexOf(x);
+    return '<div class="drow" style="--k:' + a.c + '">' +
+      '<span class="dcov">' + cover(x.seed || (i + 11), x.t, (window.ARTIST || {}).name || "", x.img) + '</span>' +
+      '<span class="dnm"><b>' + x.t + '</b>' +
+        '<span>' + discoQuando(x) + ' \u00b7 qualit\u00e0 ' + x.q +
+        (x.video ? ' \u00b7 con il video' : '') + '</span></span>' +
+      discoCurva(x.storia, a.c) +
+      '<span class="dand"><u>' + a.t + '</u>' + (a.f ? '<em>' + a.f + '</em>' : '') + '</span>' +
+      '<span class="dnum"><b>' + short(x.streams || 0) + '</b><span>' + short(x.last || 0) + ' questa sett.</span></span>' +
+      '</div>';
+  }).join("");
+
+  box.innerHTML = '<div class="list"><h3>Discografia</h3>' + testa +
+    '<div class="dlista">' + righe + '</div>' +
+    '<p class="dnota">La curva sono le ultime settimane di ascolti. Un pezzo che scende non \u00e8 ' +
+    'un pezzo brutto: \u00e8 un pezzo vecchio. Quello che lo rimette in piedi \u00e8 quello che gli ' +
+    'succede intorno \u2014 un video, un feat, un palco, un altro pezzo che tira su tutto il resto.</p>' +
+    '</div>';
+  box.querySelector(".dlista").style.setProperty("--acc", cc);
+}
 
 /* Linguette dentro a un pannello: una lista alla volta invece di quattro
    impilate. Vale per qualunque .subnav, non solo per il catalogo. */
