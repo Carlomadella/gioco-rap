@@ -158,9 +158,31 @@ NETWORK 64
 
 20. se clicco sull'opzione di conversazione "fatti sentire un beat" non fa niente
 
+   **FATTO (02/09/2026)** — branch `task/20-22-beat-si-vedono`. Erano lo stesso problema: il
+   tasto funzionava (creava il beat, lo metteva nel mercato, scriveva nel diario) ma la
+   conferma a schermo stava a `z-index: 70` mentre La Sala sta a `93`, quindi finiva **dietro
+   al fondale**. Si premeva e sembrava non succedesse niente. Vale per tutte le conferme
+   partite da dentro La Sala, la Strada, la piazza, il foglio: adesso il toast sta a `130`.
+   E il beat non sparisce più in un'altra schermata: resta **sul tavolo** nella scheda del
+   beatmaker, con copertina, qualità, bpm, il ▶ per ascoltarlo, il prezzo per prenderlo e la
+   ✕ per lasciarlo. Finché è lì non te ne fa sentire un altro, così non si riempie il catalogo
+   di beat gratis a furia di cliccare. Per esteso in
+   [`04-musica-e-suoni.md`](04-musica-e-suoni.md#20-e-22--fatti-sentire-un-beat-non-faceva-niente-e-i-beat-non-si-vedevano).
+
 21. fare pagina di registrazione/login/logout
 
 22. non si riescono a vedere i beat
+
+   **FATTO (02/09/2026)** — branch `task/20-22-beat-si-vedono`. Erano lo stesso problema: il
+   tasto funzionava (creava il beat, lo metteva nel mercato, scriveva nel diario) ma la
+   conferma a schermo stava a `z-index: 70` mentre La Sala sta a `93`, quindi finiva **dietro
+   al fondale**. Si premeva e sembrava non succedesse niente. Vale per tutte le conferme
+   partite da dentro La Sala, la Strada, la piazza, il foglio: adesso il toast sta a `130`.
+   E il beat non sparisce più in un'altra schermata: resta **sul tavolo** nella scheda del
+   beatmaker, con copertina, qualità, bpm, il ▶ per ascoltarlo, il prezzo per prenderlo e la
+   ✕ per lasciarlo. Finché è lì non te ne fa sentire un altro, così non si riempie il catalogo
+   di beat gratis a furia di cliccare. Per esteso in
+   [`04-musica-e-suoni.md`](04-musica-e-suoni.md#20-e-22--fatti-sentire-un-beat-non-faceva-niente-e-i-beat-non-si-vedevano).
 
 /_ NUOVE MODALITA' _/
 

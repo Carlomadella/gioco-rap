@@ -413,6 +413,32 @@ function poTasto(p, tipo, testo, sotto, costo, pronto){
     (costo ? '<span class="c">' + costo + '</span>' : '') + '</button>';
 }
 
+/* ============ IL BEAT SUL TAVOLO (punto 20 e 22) ============
+   Quando un beatmaker ti fa sentire un beat, quello finisce nel catalogo, che
+   pero' e' un'altra schermata: da dentro a La Sala non si vedeva niente e il
+   tasto sembrava rotto. Il beat resta segnato sulla persona finche' sta nel
+   mercato, cosi' lo si vede, lo si ascolta e lo si compra da qui. */
+function beatSulTavolo(p){
+  if(!p.beatOff) return null;
+  const b = (G.market || []).find(x => x.n === p.beatOff);
+  if(!b) delete p.beatOff;
+  return b || null;
+}
+/* la riga del beat dentro alla scheda della persona: copertina, qualita', bpm,
+   il tasto per ascoltarlo, quello per prenderlo e quello per lasciarlo li' */
+function rigaBeatSala(b){
+  const i = G.market.indexOf(b);
+  const info = typeof beatInfo === "function" ? beatInfo(b) : {bpm:"-"};
+  return '<div class="pobeat">' +
+    '<span class="pobcov" style="background:' + beatCov(b) + '"></span>' +
+    '<span class="pobnm"><b>' + b.n + '</b><span>qualit\u00e0 ' + b.q + ' \u00b7 ' + info.bpm + ' bpm</span></span>' +
+    '<button class="pobplay" data-sent="' + i + '" title="Ascolta il beat">\u25b6</button>' +
+    '<button class="pobbuy" data-prendi="' + i + '"' + (G.money < b.price ? ' disabled' : '') + '>' +
+      b.price + ' \u20ac</button>' +
+    '<button class="pobno" data-lascia="' + i + '" title="Lascialo dov\u2019e\u0300">\u2715</button>' +
+    '</div>';
+}
+
 /* quello che puoi chiedere a una persona dipende da quanto la conosci */
 function azioniDi(p){
   const r = POSTO_RUOLI[p.ruolo];
@@ -435,9 +461,14 @@ function azioniDi(p){
   }
 
   if(p.ruolo === "beatmaker"){
+    /* punto 20 e 22: il beat che ti fa sentire adesso si vede qui, non solo nel
+       catalogo di un'altra schermata. Finche' ce l'hai sul tavolo resta li':
+       lo ascolti, lo compri o lo lasci, e solo dopo te ne fa sentire un altro. */
+    const sul = beatSulTavolo(p);
     out += poTasto(p, "beat", "Fatti sentire un beat",
-      p.rel >= 1 ? "Te lo mette nel mercato, a prezzo da amico" : "Serve almeno un contatto",
-      "gratis", p.rel >= 1);
+      sul ? "Ce n'e' gia' uno sul tavolo: ascoltalo, prendilo o lascialo"
+        : p.rel >= 1 ? "Te lo mette nel mercato, a prezzo da amico" : "Serve almeno un contatto",
+      "gratis", p.rel >= 1 && !sul);
     out += poTasto(p, "sessione", "Sessione in studio",
       p.rel >= 2 ? "Un pomeriggio in sala: esce un beat vostro" : "Serve che siate amici",
       PO_COSTO.sessione + " energie · 60 €", p.rel >= 2 && G.energy >= PO_COSTO.sessione && G.money >= 60);
@@ -459,7 +490,9 @@ function azioniDi(p){
       p.rel >= 1 ? "Un pezzo sul giro locale: la gente legge" : "Serve almeno un contatto",
       PO_COSTO.intervista + " energia", p.rel >= 1 && G.energy >= PO_COSTO.intervista);
   }
+  const sulTavolo = p.ruolo === "beatmaker" ? beatSulTavolo(p) : null;
   return '<div class="poaz">' + out + '</div>' +
+    (sulTavolo ? rigaBeatSala(sulTavolo) : '') +
     '<p class="poruolo">' + r.d + '</p>';
 }
 
@@ -603,12 +636,14 @@ function azionePosto(tipo, id){
   }
 
   if(tipo === "beat"){
+    if(p.rel < 1 || beatSulTavolo(p)) return;
     const presi = G.market.map(b => b.n).concat(G.beats.map(b => b.n));
     const q = rnd(30, 50) + p.fama * 0.3 + p.rel * 7 + G.skills.rete * 0.3;
     const b = creaBeat(p.gen || mioGenere(), q, presi);
     b.price = Math.max(20, Math.round(b.price * (1 - p.rel * 0.12)));
     b.da = p.n;
     G.market.push(b);
+    p.beatOff = b.n;
     pushLog("<b>" + p.n + "</b> ti ha fatto sentire «" + b.n + "» — qualità " + b.q +
       ", " + b.price + " €. È nel catalogo.", "");
     toast(p.n + ": «" + b.n + "» nel catalogo, " + b.price + " €", "good", "♪", ["#4ADE80", "#166534"]);
@@ -677,6 +712,36 @@ function azionePosto(tipo, id){
 $("po-lista").addEventListener("click", ev => {
   const r = ev.target.closest(".porisp");
   if(r){ poRispondi(+r.dataset.r); return; }
+
+  /* punto 20 e 22: il beat sul tavolo si ascolta, si prende o si lascia da qui */
+  const asc = ev.target.closest("[data-sent]");
+  if(asc){ const b = G.market[+asc.dataset.sent]; if(b && typeof beatSuona === "function") beatSuona(b, asc); return; }
+  const prendi = ev.target.closest("[data-prendi]");
+  if(prendi && !prendi.disabled){
+    const i = +prendi.dataset.prendi, b = G.market[i];
+    if(!b || G.money < b.price) return;
+    G.money -= b.price;
+    G.market.splice(i, 1);
+    G.beats.push({n:b.n, q:b.q, gen:beatGen(b), seed:beatSeed(b)});
+    const chi = G.gente.find(x => x.beatOff === b.n);
+    if(chi){ delete chi.beatOff; chi.pt += 1; }
+    pushLog("Preso il beat \u00ab" + b.n + "\u00bb (q" + b.q + ") per " + b.price + " \u20ac. \u00c8 nella tua cartella.", "");
+    toast("\u00ab" + b.n + "\u00bb \u00e8 tuo", "good", "\u266a", ["#4ADE80", "#166534"]);
+    SFX.tap(); save(); renderGioco(); renderPosto();
+    return;
+  }
+  const lascia = ev.target.closest("[data-lascia]");
+  if(lascia){
+    const i = +lascia.dataset.lascia, b = G.market[i];
+    if(!b) return;
+    G.market.splice(i, 1);
+    const chi = G.gente.find(x => x.beatOff === b.n);
+    if(chi) delete chi.beatOff;
+    pushLog("Hai lasciato l\u00ec \u00ab" + b.n + "\u00bb.", "");
+    SFX.tap(); save(); renderGioco(); renderPosto();
+    return;
+  }
+
   const az = ev.target.closest("[data-az]");
   if(az && !az.disabled){ azionePosto(az.dataset.az, az.dataset.p); return; }
   const ap = ev.target.closest("[data-apri]");

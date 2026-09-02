@@ -51,6 +51,26 @@
 .poazione .c{display:inline-block;margin-top:7px;padding:2px 8px;border-radius:999px;
   background:rgba(255,255,255,.09);font-size:10.5px;font-weight:800;letter-spacing:.06em;
   text-transform:uppercase;color:#D9DBE4}
+/* ---- il beat che ti ha appena fatto sentire (punto 20 e 22) ----
+   Prima finiva dritto nel catalogo, che e' un'altra schermata: si premeva il
+   tasto e qui non cambiava niente. Adesso il beat resta sul tavolo, con la sua
+   copertina, e da qui lo ascolti, lo prendi o lo lasci. */
+.pobeat{display:flex;align-items:center;gap:10px;margin:0 14px 12px;padding:9px 11px;
+  border-radius:12px;background:#141020;box-shadow:inset 0 0 0 1px rgba(255,255,255,.09)}
+.pobcov{width:38px;height:38px;flex:none;border-radius:9px}
+.pobnm{flex:1;min-width:0}
+.pobnm b{display:block;font-size:13px;font-weight:800;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.pobnm span{display:block;font-size:11px;color:var(--soft);margin-top:2px}
+.pobplay,.pobno{width:32px;height:32px;flex:none;border-radius:10px;font-size:13px;
+  background:rgba(255,255,255,.08);transition:background .15s}
+.pobplay:hover,.pobno:hover{background:rgba(255,255,255,.18)}
+.pobno{color:var(--faint)}
+.pobbuy{flex:none;padding:7px 13px;border-radius:10px;font-size:12px;font-weight:800;
+  color:#0B0B0D;background:var(--acid);transition:filter .15s}
+.pobbuy:hover{filter:brightness(1.08)}
+.pobbuy:disabled{opacity:.4;filter:none;cursor:default}
+
 .poruolo{margin:0;padding:0 14px 14px;font-size:12px;color:var(--faint)}
 
 /* ---- la chiacchierata ---- */
