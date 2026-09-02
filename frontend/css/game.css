@@ -107,6 +107,51 @@
 .li .v{font-size:13px;color:var(--soft);font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
 .li .cov{width:44px;height:44px;border-radius:9px;flex:none;overflow:hidden;background:#15151A}
 .li .cov svg{display:block;width:100%;height:100%}
+/* ==== la discografia (punto 19) ====
+   Non e' la lista del catalogo: qui ogni pezzo porta con se' il tempo. La
+   curva sono le ultime settimane di ascolti, e il colore della riga e' il
+   verso in cui sta andando adesso. */
+.dtesta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;
+  background:rgba(255,255,255,.055)}
+.dbox{padding:12px 14px;background:#131319}
+.dbox .k{display:block;font-size:10.5px;font-weight:800;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--faint)}
+.dbox .v{display:block;margin-top:4px;font-size:20px;font-weight:800;
+  font-variant-numeric:tabular-nums;color:#fff}
+.dbox .v.piccolo{font-size:14px;font-weight:700;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+
+.drow{display:flex;align-items:center;gap:12px;padding:11px 16px}
+.drow + .drow{border-top:1px solid rgba(255,255,255,.055)}
+.dcov{width:46px;height:46px;border-radius:9px;flex:none;overflow:hidden;background:#15151A}
+.dcov svg{display:block;width:100%;height:100%}
+.dnm{flex:1;min-width:0}
+.dnm b{display:block;font-weight:700;font-size:14px;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.dnm span{display:block;margin-top:2px;font-size:12px;color:var(--soft);font-weight:500}
+.dcurva{width:68px;height:22px;flex:none;display:block}
+.dcurva svg{display:block;width:100%;height:100%;overflow:visible}
+.dcurva.vuota{border-bottom:1px dashed rgba(255,255,255,.16)}
+.dand{flex:none;width:118px;text-align:right}
+.dand u{display:block;text-decoration:none;font-size:11.5px;font-weight:700;color:var(--k)}
+.dand em{display:block;margin-top:2px;font-style:normal;font-size:11px;
+  color:var(--faint);font-variant-numeric:tabular-nums}
+.dnum{flex:none;width:96px;text-align:right}
+.dnum b{display:block;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
+.dnum span{display:block;margin-top:2px;font-size:11px;color:var(--faint);
+  font-variant-numeric:tabular-nums}
+.dnota{margin:0;padding:13px 16px 15px;font-size:12px;line-height:1.6;color:var(--faint);
+  border-top:1px solid rgba(255,255,255,.055)}
+
+@media (max-width:700px){
+  .dtesta{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .drow{flex-wrap:wrap;gap:10px}
+  .dnm{flex:1 1 auto}
+  .dcurva{order:4;flex:1 1 100%;width:auto}
+  .dand{order:3;width:auto;flex:1 1 auto;text-align:left}
+  .dnum{order:2;width:auto}
+}
+
 .crow{display:flex;align-items:center;gap:11px;padding:10px 14px;cursor:pointer;transition:background .15s}
 .crow:hover{background:rgba(255,255,255,.045)}
 .crow + .crow{border-top:1px solid rgba(255,255,255,.055)}
