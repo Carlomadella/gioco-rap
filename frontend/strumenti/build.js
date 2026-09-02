@@ -27,6 +27,11 @@ const USCITA = path.join(RADICE, "dist");
 const UNICO = process.argv.includes("--unico");
 const NUDO = process.argv.includes("--senza-minificare");
 
+/* Eventi V2 usa un catalogo JSON esterno. Nel build store va copiato accanto
+   al bundle; nella demo monofile va incorporato, altrimenti file:// non
+   può fare fetch del JSON e il motore eventi (con Notifiche) non parte. */
+const CATALOGO_EVENTI_V2 = path.join(RADICE, "js", "game", "eventi-master-1000-v1.2.13.json");
+
 /* ==================== ATTREZZI ==================== */
 const leggi = rel => fs.readFileSync(path.join(RADICE, rel.split("?")[0]), "utf8");
 const impronta = testo => crypto.createHash("sha256").update(testo).digest("hex").slice(0, 8);
@@ -105,6 +110,16 @@ function pesa(cartella){
 (async () => {
   const html = leggi("index.html");
   const { css, js } = pezzi(html);
+  const usaEventiV2 = js.some(f => f.split("?")[0] === "js/game/eventi-v2.js");
+  let catalogoEventiV2 = null;
+  if(usaEventiV2){
+    if(!fs.existsSync(CATALOGO_EVENTI_V2))
+      throw new Error("Eventi V2: manca " + CATALOGO_EVENTI_V2);
+    catalogoEventiV2 = JSON.parse(fs.readFileSync(CATALOGO_EVENTI_V2, "utf8"));
+    if(!Array.isArray(catalogoEventiV2) || catalogoEventiV2.length !== 1000)
+      throw new Error("Eventi V2: catalogo non valido (" +
+        (Array.isArray(catalogoEventiV2) ? catalogoEventiV2.length : typeof catalogoEventiV2) + ")");
+  }
   console.log((UNICO ? "Il gioco in un file solo" : "Il gioco per gli store") +
     " — " + css.length + " fogli di stile, " + js.length + " file di codice");
 
@@ -132,11 +147,16 @@ function pesa(cartella){
   }
 
   if(UNICO){
+    const catalogoInline = catalogoEventiV2
+      ? '<script>window.__ADF_EVENT_CATALOG__=' +
+        JSON.stringify(catalogoEventiV2).replace(/<\/script/gi, "<\\/script") +
+        ';<\/script>\n'
+      : "";
     const pagina = html
       .replace(/<link[^>]+rel="stylesheet"[^>]+href="(?!http)[^"]+"[^>]*>\s*/g, "")
       .replace(/<script[^>]+src="(?!http)[^"]+"[^>]*><\/script>\s*/g, "")
       .replace("</head>", "<style>\n" + stile + "\n</style>\n</head>")
-      .replace("</body>", "<script>\n" + codice + "\n</script>\n</body>");
+      .replace("</body>", catalogoInline + "<script>\n" + codice + "\n</script>\n</body>");
     const f = path.join(USCITA, "anni-di-fame.html");
     fs.writeFileSync(f, pagina);
     console.log("\nscritto " + f + " (" + kb(Buffer.byteLength(pagina)) + ")");
@@ -149,6 +169,10 @@ function pesa(cartella){
   fs.mkdirSync(path.join(USCITA, "assets"), { recursive: true });
   fs.writeFileSync(path.join(USCITA, "assets", nomeStile), stile);
   fs.writeFileSync(path.join(USCITA, "assets", nomeCodice), codice);
+  if(catalogoEventiV2){
+    fs.copyFileSync(CATALOGO_EVENTI_V2,
+      path.join(USCITA, "assets", path.basename(CATALOGO_EVENTI_V2)));
+  }
 
   let pagina = html
     .replace(/<link[^>]+rel="stylesheet"[^>]+href="(?!http)[^"]+"[^>]*>\s*/g, "")

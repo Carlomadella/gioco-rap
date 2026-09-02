@@ -11,7 +11,8 @@
    - Il catalogo JSON deve stare nella stessa cartella di questo script.
    ============================================================ */
 
-const ADF_SCRIPT_BASE = new URL(".", document.currentScript.src);
+const ADF_SCRIPT_SRC = (document.currentScript && document.currentScript.src) || location.href;
+const ADF_SCRIPT_BASE = new URL(".", ADF_SCRIPT_SRC);
 const ADF_CATALOG_URL = new URL("eventi-master-1000-v1.2.13.json", ADF_SCRIPT_BASE).href;
 
 const ADF = {
@@ -2720,9 +2721,19 @@ showEvent=function(e){
   return _showEvent.apply(this,arguments);
 };
 
-/* Catalogo: caricato per ultimo, poi il motore diventa attivo. */
-fetch(ADF_CATALOG_URL,{cache:"no-store"})
-  .then(r=>{ if(!r.ok) throw new Error("Catalogo HTTP "+r.status); return r.json(); })
+/* Catalogo: nella demo monofile arriva già incorporato dal build.
+   L'app Notifiche viene registrata SUBITO: non deve sparire solo perché un
+   catalogo esterno non è raggiungibile. Il motore eventi diventa ready dopo
+   la validazione dei 1000 eventi. */
+adfInstallNotificationApp();
+const ADF_INLINE_CATALOG = Array.isArray(window.__ADF_EVENT_CATALOG__)
+  ? window.__ADF_EVENT_CATALOG__ : null;
+const ADF_CATALOG_LOAD = ADF_INLINE_CATALOG
+  ? Promise.resolve(ADF_INLINE_CATALOG)
+  : fetch(ADF_CATALOG_URL,{cache:"no-store"})
+      .then(r=>{ if(!r.ok) throw new Error("Catalogo HTTP "+r.status); return r.json(); });
+
+ADF_CATALOG_LOAD
   .then(db=>{
     if(!Array.isArray(db) || db.length!==1000) throw new Error("Catalogo v1.2 non valido: "+(db&&db.length));
     ADF.db=db;
