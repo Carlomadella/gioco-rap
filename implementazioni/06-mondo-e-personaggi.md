@@ -381,3 +381,42 @@ disegno sopra.
   `TRASFERTE.forzaInvito("milano", "festival")` per provare senza aspettare.
 
 ---
+
+---
+
+## 10 · Il videomaker entra a La Sala
+
+10. se vogliamo tenere la hub che in questo momento è chiamata sala, dove incontri le altre persone,
+    sono da aggiungere i videomaker, Secondo me è meglio farla come mappa di gta con tutte le cose divise
+
+    **FATTO (02/09/2026)** — branch `task/10-videomaker-nella-sala`.
+
+    Il videomaker c'era già, ma solo **fuori**: nelle trasferte (`js/game/trasferte.js`, punto 9) lo
+    incontri a uno shooting o a una pubblicità in un'altra città. In città non esisteva, e in città è
+    quello che decide come ti si vede prima ancora di come suoni. Adesso è a La Sala insieme agli
+    altri, con lo stesso trattamento: un mestiere vero, non una voce in più in un elenco.
+
+    - **Si affaccia quando serve.** Come il giornalista arriva a 2000 fan, il videomaker arriva
+      quando hai almeno un pezzo fuori: prima non avrebbe niente da girare.
+    - **Dodici situazioni sue** (`DIALOGHI.videomaker`), come per beatmaker, rapper e fonico. Parla
+      di immagini, di posti, di luce e di come vuoi essere visto — non di mix e non di beat, se no
+      sarebbe un fonico con un altro nome. Il carattere si scopre parlando, come con tutti.
+    - **Il numero si scambia anche con lui**, perché è uno che lavora sui tuoi pezzi: da lì in poi
+      ti scrive in chat, con sei spunti scritti apposta (`chatSpuntiVideomaker`) e due aperture tue.
+    - **«Fategli un video»** (da amici in su): costa energia e soldi — più caro se è uno che conta,
+      meno caro se siete in confidenza — e sceglie il pezzo uscito da meno tempo che non ha ancora
+      un video. Un pezzo, un video: non è una leva da tirare due volte sullo stesso.
+
+    **Cosa fa un video, davvero.** Non è un colpo secco di hype che passa in una settimana. Resta
+    attaccato alla canzone (`s.video`) e `songWeekly()` in `js/game/sim.js` lo legge **ogni
+    settimana**: il pezzo continua a girare più a lungo invece di spegnersi con la curva. Sul
+    momento arrivano anche un po' di hype e di fan, ma la roba vera è la coda. Nel catalogo, sotto
+    al titolo, si legge «video di <nome>».
+
+    **La seconda metà del punto** — «meglio farla come mappa di GTA con tutte le cose divise» — è
+    esattamente quello che è successo con il punto 7 (`01-mappa-e-citta.md`): i luoghi sono
+    diventati punti separati sulla mappa, ognuno con il suo cartello e la sua porta, e La Sala è uno
+    di quelli. Qui non c'era altro da fare.
+
+    File toccati: `js/game/posto.js`, `js/game/chat.js`, `js/game/sim.js`, `js/game/ui.js`,
+    `index.html`.

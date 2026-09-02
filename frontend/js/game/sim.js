@@ -26,6 +26,10 @@ function songWeekly(s){
   const fanPull = G.fans * rnd(0.26, 0.5) * (0.5 + s.q/170);
   const scoperta = Math.pow(Math.max(0, s.q - 26)/74, 2.6) * (35 + G.hype*13) * push;
   let out = (fanPull + scoperta) * curve * rnd(0.8, 1.25);
+  /* punto 10: il video girato dal videomaker de La Sala. Non è un colpo di
+     hype che passa: resta attaccato al pezzo e lo tiene a galla settimana
+     dopo settimana, che è quello che fa un video per davvero. */
+  if(s.video) out *= s.video;
   if(s.viral) out *= s.viral;
   return Math.round(out);
 }
