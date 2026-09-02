@@ -7,6 +7,42 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
 
 ---
 
+## 6 · La mappa definitiva
+
+6. Implementa la mappa con il "file mappa definitiva", elabora la mappa ESATTAMENTE COME NELLE FOTO
+   CHE TROVI NELL'ALBUM MEDIA DELLA CARTELLA GIOCO RAP.
+
+   **FATTO (02/09/2026)** — la mappa definitiva
+   (`frontend/media/photo/pagina di gioco/mappa_definitiva.png`, 1536×1024) è il concept intero della
+   plancia: fascia in alto, profilo, player musicale e slider dell'ora ci sono già, veri, in
+   `hub.js`/`hub.css`/`telefono.js` — solo la città con i suoi cartelli mancava. Ritagliata la sola
+   fascia della città (0,340 → 1536,940, sotto testata e profilo, sopra player e slider — nessun
+   cartello tagliato) e salvata al posto della vecchia foto, stesso file: `mappa_citta.jpg`.
+
+   Ricalcolate le percentuali di tutte le nove zone di prima su questa foto (`HUB_LUOGHI`, `hub.js`) —
+   gli id non sono cambiati, li usano anche `orari.js`, `eventi-tempo.js`, `trasferte.js` e
+   `spostamenti.js` (che aveva anche le sue misure della mappa, 830×677, aggiornate a 1536×600).
+   «Concerti & live» adesso si chiama «Live Club» in `hb-pins`, come dice il cartello nella foto —
+   stesso posto, stesso id `concerti`.
+
+   Tre cartelli nuovi, che nella foto vecchia non c'erano:
+   - **Beat Maker** — lo stesso posto de «La Sala» (non c'è ancora un listino beat separato, punto 46):
+     due edifici disegnati, un solo `vai()`.
+   - **Centro per l'impiego** — apre *tutti* i lavori di `JOBS` (`actions.js`), non solo Pizzeria e
+     Fabbrica: chi non ha i requisiti (es. Buttafuori, Fonico junior) lo vede scritto, non può prenderlo
+     lo stesso. Orario d'ufficio, 09:00–18:00 (`orari.js`).
+   - **Campetto** — nella foto c'è, nel gioco no: dice «sta arrivando» (`hubPresto`), non finge un
+     minigioco che non esiste.
+
+   «Periferia», «Centro» e «Industriale» restano scritte nella foto ma non sono cartelli cliccabili:
+   sono etichette di zona, come le schede in alto nel concept — non un luogo con una sua scena.
+
+   Verificato: le dodici zone disegnate sopra alla foto, a video, combaciano coi cartelli (script di
+   controllo, non il browser — l'estensione Chrome non era collegata in questa sessione). Da controllare
+   ancora a mano: un giro vero in Chrome, click per click.
+
+---
+
 ## 26 · La carriera cresce con la mappa: Provincia → Milano → Los Angeles
 
 26. **Concept: la carriera cresce con la mappa — Provincia → Milano → Los Angeles.**

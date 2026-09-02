@@ -91,8 +91,9 @@ Due regole che vengono da lì e toccano tutto il resto:
   rete è gameplay, non un menu.
 
 La provincia è costruita (`frontend/js/game/hub.js` + `frontend/css/hub.css`); **la mappa è
-la foto stessa** (`frontend/media/photo/mappa_citta.jpg`, il concept ritagliato a 830×677:
-spilli e targhette sono dentro all'immagine, sopra ci stanno solo le zone da toccare).
+la foto stessa** (`frontend/media/photo/pagina di gioco/mappa_citta.jpg`, il ritaglio della
+mappa definitiva a 1536×600: spilli e targhette sono dentro all'immagine, sopra ci stanno
+solo le zone da toccare).
 Milano e Los Angeles per adesso sono ancora solo concept art.
 
 ## Multiplayer: la classifica è una sola

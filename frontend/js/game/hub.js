@@ -50,31 +50,44 @@ const spoglia = t => String(t).replace(/<[^>]*>/g, "");
 
 /* ================= I LUOGHI ================= */
 /* Le targhette sono dentro alla foto: qui c'è solo dove si tocca, in
-   percentuale dell'immagine (830×677), e cosa succede quando si tocca. */
+   percentuale dell'immagine (1536×600 — punto 6: il ritaglio della mappa
+   definitiva, frontend/media/photo/pagina di gioco/mappa_definitiva.png,
+   senza fascia in alto, profilo, player e slider dell'ora, che sono già
+   disegnati veri altrove), e cosa succede quando si tocca.
+   Gli id non si toccano: orari.js, eventi-tempo.js, spostamenti.js e
+   trasferte.js li usano per sapere orari, eventi ambientali e distanze. */
 const HUB_LUOGHI = [
-  {id:"studio", n:"Studio", x:12.17, y:9.16, w:18.07, h:16.69,
+  {id:"studio", n:"Studio", x:5.86, y:1.67, w:16.60, h:23.33,
    vai:() => hubGioco("settimana")},
   /* punto 59/61: era un cartello chiuso («Club & discoteche», ancora dentro
      alla foto — cambia solo quando cambia la mappa, punto 45); qui sotto
      adesso c'è un lavoro vero, part time. */
-  {id:"pizzeria", n:"Pizzeria", x:61.81, y:12.11, w:19.76, h:9.31,
+  {id:"pizzeria", n:"Pizzeria", x:80.08, y:49.17, w:19.92, h:22.50,
    vai:() => schedaLavoro("lavapiatti", "Pizzeria")},
   /* punto 48: non più un cartello chiuso — è dove si va a fare l'open mic,
      che esisteva già come azione ma non aveva un posto sulla mappa. Se non
-     hai ancora un pezzo fuori il palco non c'è, ma lo dice, non fa finta di niente. */
-  {id:"concerti", n:"Concerti & live", x:73.86, y:31.02, w:18.19, h:9.31,
+     hai ancora un pezzo fuori il palco non c'è, ma lo dice, non fa finta di
+     niente. Nella mappa definitiva il cartello dice «Live Club», il posto
+     resta lo stesso di sempre (id "concerti"). */
+  {id:"concerti", n:"Live Club", x:58.27, y:14.17, w:12.37, h:23.33,
    vai:() => {
      const pronto = hubPronta("live");
      if(pronto.ok) hubAzione("live");
-     else hubChiuso({n:"Concerti & live", chiuso:"Non ancora: " + pronto.perche +
+     else hubChiuso({n:"Live Club", chiuso:"Non ancora: " + pronto.perche +
        ". Il palco vero aspetta un pezzo pubblicato."});
    }},
   /* il beat maker non è un listino: è la sala dove si conosce la gente */
-  {id:"beat", n:"La Sala", x:5.30, y:39.14, w:18.31, h:14.77,
+  {id:"beat", n:"La Sala", x:41.34, y:6.67, w:16.60, h:25.67,
+   vai:() => apriPosto()},
+  /* punto 6: nella mappa definitiva «La Sala» e «Beat Maker» sono due
+     edifici disegnati, ma restano lo stesso posto di gioco — non c'è
+     ancora un listino di beat separato da comprare, solo la sala dove si
+     conosce la gente e si lavora ai pezzi. Stesso vai() di "beat" apposta. */
+  {id:"beatmaker", n:"Beat Maker", x:22.79, y:25.00, w:18.23, h:24.17,
    vai:() => apriPosto()},
   /* punto 60: si chiamava «Vita quotidiana» — la palestra è uscita da qui
      ed è diventata un posto suo (punto 61), resta stacca la spina e i conti */
-  {id:"vita", n:"Casa", x:37.83, y:50.96, w:19.52, h:14.77,
+  {id:"vita", n:"Casa", x:9.77, y:50.33, w:15.95, h:18.00,
    vai:() => showEvent({k:"Casa", t:"Stacca la spina o guarda i conti",
      d:"La settimana non è solo musica. Ogni tanto la testa va spenta, e i conti vanno guardati.",
      annulla(){},
@@ -86,19 +99,27 @@ const HUB_LUOGHI = [
      ]})},
   /* punto 21/57: la Strada, ricostruita da claude/carriera-criminale.md
      (js/game/strada-crimine.js) — non era mai stata scritta, solo pensata */
-  {id:"crimin", n:"Attività criminali", x:72.77, y:50.96, w:20.24, h:18.17,
+  {id:"crimin", n:"Attività criminali", x:4.88, y:69.17, w:21.16, h:30.83,
    vai:() => apriStrada()},
   /* punto 59: il secondo lavoro, full time — era «Sponsor & brand» */
-  {id:"fabbrica", n:"Fabbrica", x:6.87, y:74.59, w:19.28, h:9.31,
+  {id:"fabbrica", n:"Fabbrica", x:76.82, y:15.83, w:23.18, h:27.50,
    vai:() => schedaLavoro("operaio", "Fabbrica")},
   /* punto 61: la palestra esce dal sottomenu di Casa e diventa un posto
      suo — era «Business», un altro cartello chiuso senza niente dietro */
-  {id:"palestra", n:"Palestra", x:38.80, y:80.21, w:16.75, h:9.16,
+  {id:"palestra", n:"Palestra", x:66.73, y:70.83, w:17.58, h:29.17,
    vai:() => hubAzione("palestra")},
   /* punto 48: idem — l'attrezzatura da studio è già nel catalogo, la vetrina
      non deve stare spenta se quello che promette esiste già */
-  {id:"shop", n:"Shop", x:74.58, y:81.24, w:16.27, h:9.16,
-   vai:() => hubGioco("catalogo", "gear")}
+  {id:"shop", n:"Shop", x:49.15, y:38.67, w:9.77, h:11.33,
+   vai:() => hubGioco("catalogo", "gear")},
+  /* punto 6: due luoghi nuovi, arrivati con la mappa definitiva.
+     Il centro per l'impiego apre tutti i lavori (JOBS), non solo i due che
+     hanno già un edificio — rispetta i requisiti, non finge che siano tutti
+     presi al volo. Il campetto invece non ha ancora niente dietro: lo dice. */
+  {id:"impiego", n:"Centro per l'impiego", x:53.06, y:50.00, w:12.37, h:21.67,
+   vai:() => schedaImpiego()},
+  {id:"campetto", n:"Campetto", x:6.19, y:32.50, w:16.60, h:17.50,
+   vai:() => hubPresto("Campetto", "Un campo dove giocare, sfogarti, farti conoscere in quartiere. Sta arrivando.")}
 ];
 
 /* ================= GLI EVENTI DI OGGI ================= */
@@ -192,6 +213,23 @@ function schedaLavoro(jobId, luogo){
        run(){ assumitiCome(jobId); return null; }},
       {n:"Lascia stare", d:"Torni alla mappa", run(){ return null; }}
     ]});
+}
+
+/* punto 6: il centro per l'impiego — l'unico luogo che apre tutti i lavori
+   di JOBS (actions.js), non solo Pizzeria e Fabbrica che hanno un edificio
+   loro. Chi non ha i requisiti lo vede, ma non può prenderlo: niente finto. */
+function schedaImpiego(){
+  const righe = JOBS.map(j => {
+    const ok = !j.req || j.req(G);
+    return {n:j.n, d:ok ? j.pay + " € · " + j.e + " energia" : "Serve di più: non ancora",
+      run(){ if(ok) assumitiCome(j.id); return null; }};
+  });
+  righe.push({n:"Lascia stare", d:"Torni alla mappa", run(){ return null; }});
+  showEvent({k:"Centro per l'impiego", t:"Tutti i lavori in città",
+    d:G.job ? "Lavori già come " + G.job.n.toLowerCase() +
+      ". Un posto alla volta — lascialo o aspetta di essere licenziato."
+      : "Guarda cosa c'è, e fatti assumere.",
+    annulla(){}, opts:righe});
 }
 
 function hubNotizie(){

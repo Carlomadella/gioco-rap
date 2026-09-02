@@ -26,7 +26,7 @@ per tutti e per tutto.
 
 ## Tutti i punti
 
-78 voci in tutto: **41 chiuse**, 12 a metà, il resto da fare.
+79 voci in tutto: **42 chiuse**, 12 a metà, il resto da fare.
 
 | | punto | stato | dove |
 | --- | --- | --- | --- |
@@ -36,6 +36,7 @@ per tutti e per tutto.
 | **4** | La pagina di landing | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **5** | Uscire da un'azione senza doverla finire | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **6** | L'autocompletamento della canzone | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
+| **6** | La mappa definitiva | fatto | [mappa-e-citta](01-mappa-e-citta.md) |
 | **7** | Gli opps, i rapper rivali | da fare | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
 | **8** | La scena del produttore quando cerchi un beat | da fare | [musica-e-suoni](04-musica-e-suoni.md) |
 | **9** | La schermata di gioco era troppo affollata | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |

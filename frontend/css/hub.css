@@ -515,7 +515,7 @@ body.in-hub .topnav {
 
 /* ================= LA CITTÀ ================= */
 /* Il riquadro della mappa non si vede: quello che si vede è la foto. Sugli
-   schermi larghi, dove la foto (830×677) non può riempire tutta la colonna
+   schermi larghi, dove la foto (1536×600) non può riempire tutta la colonna
    senza deformarsi, prima restava il fondo scuro piatto — due bande nere,
    punto 62. Deformare l'immagine o tagliare i cartelli non è "fatto ad arte":
    quello che resta è riempire i lati con la stessa foto, sfocata e più scura,
@@ -541,12 +541,13 @@ body.in-hub .topnav {
   filter: blur(46px) brightness(0.38) saturate(1.15);
   transform: scale(1.12);
 }
-/* La foto tiene le sue proporzioni (830×677) e prende tutto lo spazio che può:
-   è quello che fa restare le zone da toccare esattamente sui cartelli. */
+/* La foto tiene le sue proporzioni (1536×600, il ritaglio della mappa
+   definitiva — punto 6) e prende tutto lo spazio che può: è quello che fa
+   restare le zone da toccare esattamente sui cartelli. */
 .pfoto {
   position: relative;
   z-index: 1;
-  aspect-ratio: 830/677;
+  aspect-ratio: 1536/600;
   height: 100%;
   width: auto;
   max-width: 100%;

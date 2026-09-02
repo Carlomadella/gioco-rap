@@ -19,8 +19,10 @@
   if(typeof GAME_TIME === "undefined" || typeof GAME_HOURS === "undefined") return;
 
   const HOME = "vita";
-  const MAP_W = 830;
-  const MAP_H = 677;
+  /* punto 6: dimensioni del ritaglio della mappa definitiva (hub.js,
+     HUB_LUOGHI) — servono solo a dare proporzione alle distanze qui sotto. */
+  const MAP_W = 1536;
+  const MAP_H = 600;
 
   /* Solo i lavori che hanno già un punto fisico esplicito sulla mappa. */
   const JOB_PLACE = Object.freeze({
