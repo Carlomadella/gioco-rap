@@ -13,6 +13,30 @@ const BEATNAMES = ["Vetro Rotto","Fumo Blu","Terzo Piano","Sottopasso","Neve Spo
    tetto settimanale della fase (PHASES.cap) già li tiene a bada da solo. */
 const RITMO = 0.4;
 
+/* Blocco 2 — ritmo giornaliero.
+   La memoria sta dentro G, quindi sopravvive al save. Non serve un reset
+   esplicito: quando anno/settimana/giorno cambia, la chiave cambia con lui. */
+const ADF_MAX_SCRITTURE_GIORNO = 2;
+function adfGiornoKey(){
+  return [Number(G.year||1), Number(G.week||1), Number(G.day||1)].join(":");
+}
+function adfDailyCounts(){
+  const key = adfGiornoKey();
+  if(!G.adfDailyActions || G.adfDailyActions.key !== key ||
+     !G.adfDailyActions.counts || typeof G.adfDailyActions.counts !== "object"){
+    G.adfDailyActions = {key:key, counts:{}};
+  }
+  return G.adfDailyActions.counts;
+}
+function adfOggi(id){
+  return Number(adfDailyCounts()[id] || 0);
+}
+function adfSegnaOggi(id){
+  const c = adfDailyCounts();
+  c[id] = Number(c[id] || 0) + 1;
+  return c[id];
+}
+
 const JOBS = [
   {id:"volantini", n:"Volantinaggio", pay:70,  e:18, d:"Freddo, gambe, nessuna dignità."},
   {id:"lavapiatti", n:"Lavapiatti",   pay:100, e:18, d:"Turni serali, cucina bollente."},
@@ -46,7 +70,7 @@ function qFactors(){
 const qDetail = () => qFactors().list
   .map(([n,v]) => n + " " + (v>=1?"+":"") + Math.round((v-1)*100) + "%").join(" · ");
 const wellFactor = () => qFactors().mult;
-const qVeloce = () => clamp((28 + G.skills.scrittura*0.8) * wellFactor(), 5, 100);
+const qVeloce = () => clamp((22 + G.skills.scrittura*0.65) * wellFactor(), 5, 100);
 const gearBonus = () => GEAR.reduce((a,g) => a + (G.gear[g.id] ? g.q : 0), 0);
 const bestBar  = () => G.bars.slice().sort((a,b) => b.q-a.q)[0];
 const bestBeat = () => G.beats.slice().sort((a,b) => b.q-a.q)[0];
@@ -79,7 +103,10 @@ function offerJobs(){
 const ACTIONS = [
   {id:"scrivi", n:"Scrivi barre", e:28, luc:3,
    d:"Il foglio, la penna e quello che hai in testa.",
-   give:() => "veloce · oppure scrivila tu ×1,5",
+   need:() => adfOggi("scrivi") >= ADF_MAX_SCRITTURE_GIORNO ? "TORNARE DOMANI" : null,
+   give:() => adfOggi("scrivi") === 1
+     ? "2ª e ultima strofa di oggi"
+     : "veloce · oppure scrivila tu ×1,5",
    run(){
      scegliModo({
        t:"Scrivi barre",
@@ -225,13 +252,20 @@ const ACTIONS = [
 
   {id:"stacca", n:"Stacca la spina", e:14, luc:1,
    d:"Dormi, mangi, vedi gente normale.",
-   give:() => "+25 benessere · +1 rete",
+   need:() => adfOggi("stacca") >= 2 ? "TORNARE DOMANI" : null,
+   give:() => adfOggi("stacca") === 0
+     ? "+10–14 benessere · un po' di rete"
+     : "+3–5 benessere · recupero ridotto",
    run(){
-     const w = Math.round(rnd(20,32));
+     const n = adfOggi("stacca");
+     const prima = G.wellbeing;
+     const w = n === 0 ? Math.round(rnd(10,15)) : Math.round(rnd(3,6));
      G.wellbeing = clamp(G.wellbeing + w, 0, 100);
-     gain("rete", 1.4);
-     let s = "Ti sei fermato. Benessere +" + w + ", rete +1.";
-     if(Math.random() < .18){ G.hype = clamp(G.hype+5,0,100); s += " Hai incrociato la persona giusta."; }
+     const reale = Math.max(0, Math.round(G.wellbeing - prima));
+     if(n === 0) gain("rete", 0.4);
+     adfSegnaOggi("stacca");
+     let s = "Ti sei fermato. Benessere +" + reale + (n === 0 ? ", rete +0,4." : ".");
+     if(n === 1) s += " Per oggi hai recuperato abbastanza.";
      return s;
    }},
 

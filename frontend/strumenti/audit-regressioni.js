@@ -14,6 +14,8 @@ const leggi = p => fs.readFileSync(path.join(ROOT,p),"utf8");
 const build = leggi("strumenti/build.js");
 const ev = leggi("js/game/eventi-v2.js");
 const tel = leggi("js/game/telefono.js");
+const actions = leggi("js/game/actions.js");
+const writer = leggi("js/game/writer.js");
 const cat = JSON.parse(leggi("js/game/eventi-master-1000-v1.2.13.json"));
 
 console.log("\nBlocco 1 — Eventi V2 / telefono / dist");
@@ -33,7 +35,29 @@ const msgScreen = s0 >= 0 && s1 > s0 ? tel.slice(s0,s1) : "";
 test("schermata Messaggi non legge G.log", !!msgScreen && !msgScreen.includes("G.log"));
 test("da Messaggi si entra nella Chat vera", tel.includes('TEL_APP = "chat"; TEL_CHAT_APERTA = chatOpen.dataset.chat'));
 
-for(const f of ["strumenti/build.js","js/game/eventi-v2.js","js/game/telefono.js"]){
+console.log("\nBlocco 2 — recupero / scrittura");
+test("contatore giornaliero usa anno:settimana:giorno",
+  actions.includes('return [Number(G.year||1), Number(G.week||1), Number(G.day||1)].join(":")'));
+test("massimo 2 strofe completate al giorno",
+  actions.includes("const ADF_MAX_SCRITTURE_GIORNO = 2") &&
+  actions.includes('adfOggi("scrivi") >= ADF_MAX_SCRITTURE_GIORNO'));
+test("una strofa conta solo quando viene realmente chiusa",
+  writer.includes('adfSegnaOggi("scrivi")'));
+test("Stacca la spina si blocca dopo due usi",
+  actions.includes('adfOggi("stacca") >= 2 ? "TORNARE DOMANI"'));
+test("Stacca la spina non usa più il vecchio +20/+32",
+  !actions.includes("rnd(20,32)") && actions.includes("rnd(10,15)") && actions.includes("rnd(3,6)"));
+test("Stacca la spina non genera più hype casuale",
+  !actions.includes('Math.random() < .18){ G.hype = clamp(G.hype+5'));
+test("scrittura automatica veloce parte più bassa",
+  actions.includes("(22 + G.skills.scrittura*0.65)"));
+test("fattore Scrittura 5 è circa 31,6%, non 52,5%",
+  writer.includes("0.28 + s * 0.0072") &&
+  Math.abs((0.28 + 5*0.0072) - 0.316) < 1e-9);
+test("vecchio fattore 0,5 + skill/200 rimosso",
+  !writer.includes("0.5 + G.skills.scrittura/100 * 0.5"));
+
+for(const f of ["strumenti/build.js","js/game/eventi-v2.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }

@@ -98,6 +98,15 @@ let WR = null;
 /* Ogni azione con una scena si può fare in due modi:
    veloce (un clic, risultato medio dalle statistiche) oppure giocata, con il moltiplicatore. */
 const BOOST = 1.5;
+
+/* Blocco 2 — la skill deve pesare davvero.
+   Prima una Scrittura 5 valeva già il 52,5% del voto e il generatore produceva
+   rime/metrica quasi perfette: da qui le strofe automatiche da 60+ viste
+   nell'audit. Ora skill 5 vale ~31,6%, skill 50 ~64%, skill 100 = 100%. */
+function fattoreScrittura(){
+  const s = clamp(Number(G.skills.scrittura || 0), 0, 100);
+  return clamp(0.28 + s * 0.0072, 0.28, 1);
+}
 function scegliModo(o){
   showEvent({k:"Come la fai", t:o.t, d:o.d,
     /* si puo' lasciar perdere: l'azione l'hai aperta tu, e l'energia torna indietro */
@@ -266,7 +275,7 @@ function disegnaFoglio(){
   h += '<div class="wtip">' + tip + '</div>';
   $("w-body").innerHTML = h;
 
-  const skill = 0.5 + G.skills.scrittura/100 * 0.5;
+  const skill = fattoreScrittura();
   const b = boostAttuale();
   const qFin = qualitaStrofa(a, skill, b);
   const mia = Math.round(quotaTua()*100);
@@ -321,11 +330,12 @@ function qualitaStrofa(a, skill, b){
 function chiudiStrofa(){
   azioneFatta();
   const a = analizza(WR.righe, WR.tema);
-  const skill = 0.5 + G.skills.scrittura/100 * 0.5;
+  const skill = fattoreScrittura();
   const b = boostAttuale();
   const q = qualitaStrofa(a, skill, b);
   const testo = a.vive.join("\n");
   G.bars.push({q, txt:testo, tema:WR.tema.t});
+  if(typeof adfSegnaOggi === "function") adfSegnaOggi("scrivi");
   gain("scrittura", 1.2 + a.qTesto/100 * 1.4);
   G.wellbeing = clamp(G.wellbeing - 1, 0, 100);
 
