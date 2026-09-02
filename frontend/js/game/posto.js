@@ -19,7 +19,7 @@ const REL_NOMI = ["conoscenza", "contatto", "amico", "collaboratore", "fidato", 
 
 /* Punto 39: energia a 100 al giorno. «Due parole» resta una mossa piccola,
    la sessione in studio e il feat restano le più grosse della Sala. */
-const PO_COSTO = {parla:12, sessione:45, mix:20, feat:45, intervista:12, numero:4};
+const PO_COSTO = {parla:12, sessione:45, mix:20, feat:45, intervista:12, numero:4, video:35};
 
 const POSTO_RUOLI = {
   beatmaker: {n:"Beatmaker", k:"#4ADE80",
@@ -30,14 +30,22 @@ const POSTO_RUOLI = {
     d:"Sta dietro al mixer. Un pezzo mixato bene è un altro pezzo."},
   giornalista: {n:"Giornalista", k:"#FBBF24",
     d:"Scrive di musica per il giro. Arriva quando cominci a esistere.",
-    da:g => g.fans >= 2000}
+    da:g => g.fans >= 2000},
+  /* punto 10: il videomaker. Nelle trasferte c'era già (js/game/trasferte.js),
+     in città no — e in città è quello che decide come ti si vede prima ancora
+     di come suoni. Si affaccia quando hai qualcosa da girare: prima di avere
+     un pezzo fuori non avrebbe niente da fare con te. */
+  videomaker: {n:"Videomaker", k:"#22D3EE",
+    d:"Gira i video. Decide come ti si vede, prima ancora di come suoni.",
+    da:g => (g.songs || []).some(x => x.released)}
 };
 
 const POSTO_NOMI = {
   beatmaker: ["Bit", "Cassa", "Tino Sale", "Otto", "Grillo", "Pino Beats", "Sonar", "Mimmo Loop"],
   rapper: null,                        /* i rapper prendono i nomi dei rivali */
   fonico: ["Andre", "Gigi", "Fede", "Nico", "Sara", "Pippo"],
-  giornalista: ["Marta", "Dario", "Elisa", "Toni"]
+  giornalista: ["Marta", "Dario", "Elisa", "Toni"],
+  videomaker: ["Ciro", "Vale", "Manu", "Bea", "Tommy", "Zeta"]
 };
 
 const CARATTERI = [
@@ -240,6 +248,59 @@ const DIALOGHI = {
      o:[["Gli rispondi con qualcosa di vero, non una frase fatta", 2, "diffidente"],
         ["Gli dici «il più grande di sempre»", 0, "gasato"],
         ["Gli dici che non ci hai pensato", 1, "aperto"]]}
+  ],
+  /* punto 10: dodici situazioni anche per lui, come per gli altri mestieri.
+     Il videomaker ragiona per immagini: quello che gli interessa è se hai
+     un'idea di come ti si deve vedere, non quanto sei bravo a rappare. */
+  videomaker: [
+    {t:"Ti mostra sul telefono trenta secondi girati ieri notte per un altro.",
+     o:[["Guardi tutto e gli dici quale inquadratura ti è rimasta", 2, "aperto"],
+        ["Gli chiedi con che roba l'ha girato", 1, "pratico"],
+        ["Gli dici che il tuo verrebbe meglio", 0, "gasato"]]},
+    {t:"«Se domani ti giro un video, tu come ti vedi? Dimmi un posto.»",
+     o:[["Gli dici un posto vero della tua zona e perché quello", 2, "diffidente"],
+        ["Gli dici che decide lui, ti fidi", 1, "aperto"],
+        ["Gli dici «una villa, macchine, il solito»", 0, "gasato"]]},
+    {t:"Sta rimontando la stessa scena per la quinta volta e sbuffa.",
+     o:[["Ti siedi e guardi con lui finché non esce", 2, "pratico"],
+        ["Gli dici che così va già bene", 1, "gasato"],
+        ["Gli dici di lasciar perdere e uscire", 0, null]]},
+    {t:"«La gente ti riconosce da come sei vestito nel video, non dalle barre.»",
+     o:[["Gli dai ragione e gli chiedi come lo useresti", 2, "pratico"],
+        ["Gli dici che tu vuoi restare quello che sei", 2, "diffidente"],
+        ["Gli dici che le barre bastano", 0, "gasato"]]},
+    {t:"Ti chiede se puoi girare alle sei di mattina, che la luce è quella giusta.",
+     o:[["Gli dici che ci sei, e ci sei davvero", 2, "aperto"],
+        ["Gli chiedi se si può fare al tramonto", 1, "pratico"],
+        ["Gli dici che a quell'ora non ti alzi", -1, null]]},
+    {t:"«Ho una camera vecchia. Se aspetti due mesi ne prendo una seria.»",
+     o:[["Gli dici che giri adesso, con quella che ha", 2, "aperto"],
+        ["Gli chiedi quanto costa quella nuova", 1, "pratico"],
+        ["Gli dici che allora aspetti", 0, "diffidente"]]},
+    {t:"Ha montato il tuo pezzo su immagini che non c'entrano niente con il testo.",
+     o:[["Gli spieghi di cosa parla davvero il pezzo", 2, "pratico"],
+        ["Gli dici che così è più interessante", 1, "aperto"],
+        ["Gli dici che ha rovinato tutto", -1, "gasato"]]},
+    {t:"«Il video più visto che ho fatto l'ho girato col telefono in un garage.»",
+     o:[["Gli chiedi cosa aveva quel video che gli altri non hanno", 2, "pratico"],
+        ["Gli dici che è stato culo", 0, "gasato"],
+        ["Gli dici che ci credi, la roba vera si vede", 2, "aperto"]]},
+    {t:"Ti riprende mentre non te ne accorgi e poi te lo fa vedere.",
+     o:[["Gli dici di tenerlo, che sei tu più di mille pose", 2, "aperto"],
+        ["Gli chiedi di cancellarlo", 1, "diffidente"],
+        ["Ti arrabbi", -1, null]]},
+    {t:"«Quanto vuoi spendere? Perché con zero si fa, ma si vede.»",
+     o:[["Gli dici la cifra vera che hai, senza gonfiarla", 2, "pratico"],
+        ["Gli dici che i soldi arrivano dopo il video", 1, "gasato"],
+        ["Gli dici che tu non paghi i video", -1, null]]},
+    {t:"Ti fa vedere due montaggi dello stesso girato e ti chiede quale.",
+     o:[["Scegli e gli dici esattamente perché quello", 2, "diffidente"],
+        ["Gli dici che sono belli tutti e due", 0, "aperto"],
+        ["Gli dici di scegliere lui, che è il suo mestiere", 1, "pratico"]]},
+    {t:"«Ma tu i video li guardi, o li fai e basta?»",
+     o:[["Gli fai il nome di un video che ti ha cambiato la testa", 2, "aperto"],
+        ["Gli dici che guardi solo i tuoi", 0, "gasato"],
+        ["Gli chiedi lui quali guarda", 1, "diffidente"]]}
   ]
 };
 
@@ -255,8 +316,8 @@ function nuovaPersona(ruolo){
   /* punto 65: un'età vera, non un numero a caso — i fonici e i giornalisti
      sono il mestiere di chi ha già fatto qualche anno di gavetta, gli altri
      due partono dalla stessa fascia del giocatore */
-  const etaMin = {fonico:26, giornalista:28}[ruolo] || 18;
-  const etaMax = {fonico:52, giornalista:58}[ruolo] || 32;
+  const etaMin = {fonico:26, giornalista:28, videomaker:22}[ruolo] || 18;
+  const etaMax = {fonico:52, giornalista:58, videomaker:45}[ruolo] || 32;
   return {
     id: "p" + Math.floor(Math.random() * 1e9),
     ruolo: ruolo,
@@ -281,8 +342,12 @@ function sistemaGente(){
   const ruoli = ["beatmaker", "rapper", "fonico", "beatmaker", "rapper", "beatmaker", "fonico", "rapper"];
   while(G.gente.length < quante){
     let r = ruoli[G.gente.length % ruoli.length];
+    /* punto 10: uno slot lo prende il videomaker, appena hai qualcosa da
+       girare — prima del giornalista, che arriva molto più avanti */
+    if(G.gente.length >= 3 && POSTO_RUOLI.videomaker.da(G) &&
+       !G.gente.some(p => p.ruolo === "videomaker")) r = "videomaker";
     /* uno slot ogni tanto lo prende il giornalista, se è ora */
-    if(G.gente.length >= 4 && POSTO_RUOLI.giornalista.da(G) &&
+    else if(G.gente.length >= 4 && POSTO_RUOLI.giornalista.da(G) &&
        !G.gente.some(p => p.ruolo === "giornalista")) r = "giornalista";
     G.gente.push(nuovaPersona(r));
   }
@@ -439,6 +504,21 @@ function rigaBeatSala(b){
     '</div>';
 }
 
+/* ==================== IL VIDEO (punto 10) ====================
+   Il pezzo che ha più senso girare: quello uscito da poco che ancora non ha
+   un video. Se sono tutti coperti non c'è niente da fare, e il tasto lo dice
+   invece di restare acceso a vuoto. */
+function daGirare(){
+  return (G.songs || [])
+    .filter(s => s.released && !s.video)
+    .sort((a, b) => (b.week - a.week) || (b.q - a.q))[0] || null;
+}
+/* costa più caro se il videomaker è uno che conta: è il suo mestiere, non un
+   favore. Con il rapporto scende, come tutto il resto qui dentro. */
+function costoVideo(p){
+  return Math.max(60, Math.round((110 + p.fama * 3.4) * (1 - p.rel * 0.09)));
+}
+
 /* quello che puoi chiedere a una persona dipende da quanto la conosci */
 function azioniDi(p){
   const r = POSTO_RUOLI[p.ruolo];
@@ -451,7 +531,7 @@ function azioniDi(p){
      rapper si propone un feat guardandolo in faccia, a un giornalista si
      rilascia un'intervista: non e' la stessa cosa.
      Serve almeno un contatto: il numero non lo si da' a uno appena visto. */
-  if(p.ruolo === "beatmaker" || p.ruolo === "fonico"){
+  if(p.ruolo === "beatmaker" || p.ruolo === "fonico" || p.ruolo === "videomaker"){
     out += p.numero
       ? poTasto(p, "numero", "Avete il numero", "Ti scrive in chat", "", false)
       : poTasto(p, "numero", "Scambiatevi il numero",
@@ -484,6 +564,16 @@ function azioniDi(p){
       p.rel >= 3 ? (cd < 6 ? "Ne avete fatto uno da poco" : "Un feat vero, con la sua gente dietro")
         : "Serve che siate collaboratori",
       PO_COSTO.feat + " energie", p.rel >= 3 && cd >= 6 && G.energy >= PO_COSTO.feat);
+  }
+  /* punto 10: il videomaker gira il video di un pezzo che è già fuori. Un
+     pezzo, un video: non è una leva da tirare due volte sullo stesso. */
+  if(p.ruolo === "videomaker"){
+    const senza = daGirare();
+    out += poTasto(p, "video", "Fategli un video",
+      p.rel < 2 ? "Serve che siate amici"
+        : (senza ? "«" + senza.t + "»: il pezzo continua a girare" : "Ogni pezzo fuori ha già il suo video"),
+      PO_COSTO.video + " energie · " + costoVideo(p) + " €",
+      p.rel >= 2 && !!senza && G.energy >= PO_COSTO.video && G.money >= costoVideo(p));
   }
   if(p.ruolo === "giornalista"){
     out += poTasto(p, "intervista", "Fatti intervistare",
@@ -690,6 +780,27 @@ function azionePosto(tipo, id){
     pushLog("Pezzo insieme a <b>" + p.n + "</b>: +" + h + " hype, +" + fmt(f) + " fan.", "big");
     toast("Feat con " + p.n + " · +" + fmt(f) + " fan", "good", "★", ["#A855F7", "#4C1D95"]);
     SFX.crowd();
+  }
+
+  /* punto 10: il video non è un colpo secco di hype — è quello che tiene in
+     piedi un pezzo nelle settimane dopo. Resta attaccato alla canzone
+     (`s.video`) e js/game/sim.js lo legge ogni settimana in songWeekly(). */
+  if(tipo === "video"){
+    const s = daGirare();
+    const costo = costoVideo(p);
+    if(!s || p.rel < 2 || G.energy < PO_COSTO.video || G.money < costo) return;
+    G.energy -= PO_COSTO.video; G.money -= costo;
+    s.video = Math.min(1.75, 1 + 0.16 + p.rel * 0.06 + p.fama * 0.004 + G.skills.presenza * 0.002);
+    s.videoDa = p.n;
+    const h = Math.round(5 + p.fama * 0.18 + p.rel * 2);
+    G.hype = clamp(G.hype + h, 0, 100);
+    G.fans += Math.round(rnd(10, 40) + G.fans * 0.012);
+    gain("rete", 0.6); gain("presenza", 0.4);
+    p.pt += 1;
+    pushLog("<b>" + p.n + "</b> ha girato il video di «" + s.t + "»: +" + h +
+      " hype, e il pezzo continua a girare più a lungo.", "big");
+    toast("Video di «" + s.t + "» · +" + h + " hype", "good", "▶", ["#22D3EE", "#083344"]);
+    SFX.publish();
   }
 
   if(tipo === "intervista"){

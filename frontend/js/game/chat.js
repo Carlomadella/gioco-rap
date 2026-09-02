@@ -686,8 +686,77 @@ function chatSpuntiFonico(p){
   ];
 }
 
+/* punto 10: il videomaker. Parla di immagini, di posti e di come ti si vede —
+   non di mix e non di beat, se no sarebbe un fonico con un altro nome. */
+function chatSpuntiVideomaker(p){
+  return [
+    {id:"giriamo", quando: m => m.fresco, peso:3,
+     testo: m => "Su " + chatPezzo(m) + " ci farei un video. Ho già in testa dove.",
+     opts:[
+       {n:"Dimmi dove", d:"+rete",
+        run(){ chRete(1); chatAvvicina(p, 1);
+          return ["Il piazzale dietro alla stazione, di notte, con le luci arancioni.",
+                  "Passa in sala che ti faccio vedere due riferimenti."]; }},
+       {n:"Adesso non ho i soldi",
+        run:() => "Allora aspettiamo. Ma non aspettare troppo, che il pezzo invecchia."}
+     ]},
+    {id:"riprese", peso:3,
+     testo: () => "Ti ho ripreso l'altra sera senza dirtelo. Guarda che roba viene quando non posi.",
+     opts:[
+       {n:"Mandamelo", d:"+benessere",
+        run(){ chBene(4); chatAvvicina(p, 1); return "Te lo mando. Usalo come vuoi, è tuo."; }},
+       {n:"Non riprendermi senza chiedere", d:"+lucidità",
+        run(){ addLuc(3); return "Hai ragione. La prossima volta te lo dico prima."; }}
+     ]},
+    {id:"immagine", quando: m => m.fan > 400, peso:2,
+     testo: () => "Adesso che ti guarda un po' di gente, devi decidere come ti si vede. Se non decidi tu, decide internet.",
+     opts:[
+       {n:"Aiutami a decidere", d:"+rete",
+        run(){ chRete(1); chatAvvicina(p, 1);
+          return "Semplice: un colore, un posto, una faccia. Le stesse tre cose per sei mesi."; }},
+       {n:"Io resto come sono", d:"+lucidità",
+        run(){ addLuc(4); chatAvvicina(p, 1); return "Anche quella è una scelta. Basta che sia una scelta."; }}
+     ]},
+    {id:"attrezzi", quando: m => m.soldi >= 700, peso:2,
+     testo: () => "Se ci metti trecento euro di luci, il prossimo video sembra un altro mestiere.",
+     opts:[
+       {n:"Prendile", d:"−soldi, +rete",
+        run(){ G.money = Math.max(0, (G.money || 0) - 300); chRete(1); chatAvvicina(p, 2);
+          return "Fatto. Da adesso in poi si vede la differenza."; }},
+       {n:"Giriamo con quello che abbiamo",
+        run:() => "Va bene. Si è sempre girato così, ma si vede anche quello."}
+     ]},
+    {id:"fermo", quando: m => !m.fresco && m.usciti >= 2, peso:2,
+     testo: () => "Non esce niente da un po'. Vuoi che monti qualcosa con il girato vecchio, tanto per far vedere che ci sei?",
+     opts:[
+       {n:"Montalo", d:"+hype",
+        run(){ G.hype = clamp((G.hype || 0) + 3, 0, 100); chatAvvicina(p, 1);
+          return "Ci penso io. Domani sera è online."; }},
+       {n:"Preferisco aspettare la roba nuova", d:"+lucidità",
+        run(){ addLuc(3); return "Rispetto. Però non sparire."; }}
+     ]},
+    {id:"gavetta", peso:2,
+     testo: () => "Il primo video che ho girato l'ho fatto col telefono di mia sorella. Lo rivedo e mi vergogno, ma è quello che mi ha aperto tutto.",
+     opts:[
+       {n:"Fammelo vedere", d:"+benessere",
+        run(){ chBene(4); chatAvvicina(p, 1); return "Te lo mando solo perché sei tu. Non farlo girare."; }},
+       {n:"Vale per tutti: si parte da lì", d:"+lucidità",
+        run(){ addLuc(3); return "Esatto. Basta partire."; }}
+     ]}
+  ];
+}
+
 /* Le aperture: quello che puoi scrivere tu per primo. */
 function chatTuSala(p, fonico){
+  if(p.ruolo === "videomaker") return [
+    {n:"Quando giriamo?",
+     run:() => "Quando vuoi. Dimmi solo che pezzo e dove ti immagini.",
+     poi:[{n:"Decidi tu", d:"+rete", run(){ chRete(1); chatAvvicina(p, 1); return "Allora preparo tutto io. Tu porta la faccia."; }},
+          {n:"Ti faccio sapere", run:() => "Fammi sapere presto, che la luce buona dura poco."}]},
+    {n:"Come vengo nei video?", d:"+lucidità",
+     run(){ addLuc(4); chatAvvicina(p, 1);
+       return ["Bene quando non ci pensi.", "Male quando cerchi di sembrare uno che non sei."]; }}
+  ];
   return fonico ? [
     {n:"Quando hai un buco in sala?",
      run:() => "Questa settimana ho martedì e giovedì. Dimmi tu.",
@@ -715,18 +784,19 @@ function chatTuSala(p, fonico){
 
 function chatContattoSala(p){
   const fonico = p.ruolo === "fonico";
+  const video = p.ruolo === "videomaker";
   const r = (typeof POSTO_RUOLI === "object" && POSTO_RUOLI[p.ruolo]) || {k:"#94A3B8", n:"Contatto"};
   return {
     id: "sala:" + p.id,
     n: p.n,
     sotto: r.n,
-    ic: fonico ? "cursori" : "manopole",
+    ic: video ? "mirino" : (fonico ? "cursori" : "manopole"),
     k: r.k,
     sempre: true,
     spesso: .3,
     dallaSala: true,
     persona: p,
-    spunti: fonico ? chatSpuntiFonico(p) : chatSpuntiBeatmaker(p),
+    spunti: video ? chatSpuntiVideomaker(p) : (fonico ? chatSpuntiFonico(p) : chatSpuntiBeatmaker(p)),
     tu: chatTuSala(p, fonico)
   };
 }
@@ -737,7 +807,7 @@ function chatContattoSala(p){
    due punti diversi, e se un domani il numero lo si potesse chiedere anche a
    un rapper, questo si ritroverebbe in chat con le battute di un beatmaker.
    Il filtro sta dove stanno i dati, non dove sta il bottone. */
-const CHAT_MESTIERI = ["beatmaker", "fonico"];
+const CHAT_MESTIERI = ["beatmaker", "fonico", "videomaker"];
 function chatDaSala(){
   return (G.gente || [])
     .filter(x => x.numero && !x.via && CHAT_MESTIERI.indexOf(x.ruolo) >= 0)
@@ -754,9 +824,12 @@ function chatPresentazione(p){
      de La Sala sono un misto (Sara, Gigi, Andre, Nico...), e «quello del mixer»
      su Sara suona sbagliato — non e' un dettaglio da niente, e' il primo
      messaggio che leggi di quella persona. */
-  chatBolla(t, "loro", p.ruolo === "fonico"
-    ? "Sono " + p.n + ". Sto dietro al mixer: quando hai qualcosa da sistemare, scrivimi."
-    : "Sono " + p.n + ". Se ti serve roba nuova scrivimi, non aspettare di passare in sala.");
+  chatBolla(t, "loro",
+    p.ruolo === "fonico"
+      ? "Sono " + p.n + ". Sto dietro al mixer: quando hai qualcosa da sistemare, scrivimi."
+    : p.ruolo === "videomaker"
+      ? "Sono " + p.n + ", quello con la camera. Quando c'è da girare qualcosa, scrivimi prima di chiunque altro."
+      : "Sono " + p.n + ". Se ti serve roba nuova scrivimi, non aspettare di passare in sala.");
   t.nonLetti = (t.nonLetti || 0) + 1;
 }
 

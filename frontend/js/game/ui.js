@@ -292,7 +292,9 @@ function renderGioco(){
     ? G.songs.slice().reverse().map((x,i) => {
         return '<div class="li"><span class="cov">' +
           cover(x.seed || (i+11), x.t, (window.ARTIST||{}).name || "", x.img) + '</span>' +
-        '<span class="nm"><b>' + x.t + '</b><span>qualità ' + x.q + (x.released ? " · " + short(x.streams) + " stream" : "") + '</span></span>' +
+        '<span class="nm"><b>' + x.t + '</b><span>qualità ' + x.q + (x.released ? " · " + short(x.streams) + " stream" : "") +
+          /* punto 10: se ci hanno girato un video sopra, si vede — e si vede chi */
+          (x.video ? " · video" + (x.videoDa ? " di " + x.videoDa : "") : "") + '</span></span>' +
         '<button class="rinomina" data-ren="' + G.songs.indexOf(x) + '" title="Cambia titolo">✎</button>' +
         '<span class="tag' + (x.released ? " on" : "") + '">' + (x.released ? "fuori" : x.mixed ? "pronto" : "grezzo") + '</span></div>';
       }).join("")

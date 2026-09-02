@@ -102,6 +102,16 @@ CARLO:
 
 10. se vogliamo tenere la hub che in questo momento è chiamata sala, dove incontri le altre persone, sono da aggiungere i videomaker, Secondo me è meglio farla come mappa di gta con tutte le cose divise
 
+   **FATTO (02/09/2026)** — branch `task/10-videomaker-nella-sala`. Il videomaker c'era solo
+   fuori città (le trasferte del punto 9); adesso è a La Sala come gli altri: si affaccia
+   quando hai un pezzo fuori, ha dodici situazioni sue, ti dà il numero e da lì ti scrive in
+   chat. Da amici in su gli puoi far girare **il video di un pezzo**: costa energia e soldi e
+   non è un colpo secco di hype — resta attaccato alla canzone e `songWeekly()` lo legge ogni
+   settimana, così il pezzo continua a girare più a lungo invece di spegnersi. Sulla seconda
+   metà del punto («come una mappa di GTA, con le cose divise») non c'era altro da fare: è
+   quello che ha fatto il punto 7. Per esteso in
+   [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md#10--il-videomaker-entra-a-la-sala).
+
 11. quando clicchi su una card -> transizione (alla scena) -> esempio: video del personaggio che entra in studio oppure mini-video del personaggio che torna a casa a dormire, oppure che va a cena con la tipa ecc.
 
 12. aggiungere la reputazione cioè quanto sei affidabile, il massimo è real/real oppure OG, e il minimo tipo figlio di troia quando ti comporti da figlio di troia (detto meglio) O TENERE SOLO LA FAMa
