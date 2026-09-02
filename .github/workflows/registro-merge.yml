@@ -1,0 +1,53 @@
+name: Registro automatico merge
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  aggiorna-registro:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Scarica repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configura Git
+        run: |
+          git config user.name "Anni di Fame Bot"
+          git config user.email "actions@github.com"
+
+      - name: Controlla se è un merge
+        id: mergecheck
+        shell: bash
+        run: |
+          PARENTS=$(git rev-list --parents -n 1 HEAD | wc -w)
+
+          if [ "$PARENTS" -ge 3 ]; then
+            echo "is_merge=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_merge=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Aggiorna registro modifiche
+        if: steps.mergecheck.outputs.is_merge == 'true'
+        run: node scripts/genera-registro-modifiche.js
+
+      - name: Salva registro
+        if: steps.mergecheck.outputs.is_merge == 'true'
+        shell: bash
+        run: |
+          if git diff --quiet -- registro-modifiche; then
+            echo "Nessuna modifica da registrare."
+            exit 0
+          fi
+
+          git add registro-modifiche
+          git commit -m "docs: aggiorna registro modifiche"
+          git push
