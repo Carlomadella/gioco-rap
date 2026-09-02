@@ -548,9 +548,17 @@ function poRispondi(i){
   while(p.pt >= relSoglia(p) && p.rel < 5){ p.pt -= relSoglia(p); p.rel++; salito = true; }
   if(p.pt < 0 && p.rel > 0){ p.rel--; p.pt = 0; }
 
+  /* punto 12: come tratti la gente in faccia e' la reputazione. Dire la cosa
+     sbagliata costa poco, rompere con qualcuno costa parecchio: le voci nel
+     giro girano piu' in fretta dei pezzi. */
+  if(typeof repAggiungi === "function" && pt < 0) repAggiungi(-1);
+
   /* con un rapper si può anche rompere: e quello diventa un opp */
   let opp = false;
-  if(p.pt <= -3 && p.rel === 0 && p.ruolo === "rapper"){ diventaOpp(p); opp = true; }
+  if(p.pt <= -3 && p.rel === 0 && p.ruolo === "rapper"){
+    diventaOpp(p); opp = true;
+    if(typeof repAggiungi === "function") repAggiungi(-5, "hai rotto con " + p.n);
+  }
   else if(p.pt <= -3){ p.pt = -2; }
 
   POSTO_PARLA = null;
@@ -617,6 +625,9 @@ function azionePosto(tipo, id){
 
   if(tipo === "sessione"){
     if(G.energy < PO_COSTO.sessione || G.money < 60) return;
+    /* punto 12: passare un pomeriggio in sala con uno e portarlo a casa e'
+       lavoro fatto insieme, ed e' cosi' che uno si fa un nome di uno serio */
+    if(typeof repAggiungi === "function") repAggiungi(1.5);
     G.energy -= PO_COSTO.sessione; G.money -= 60;
     const presi = G.market.map(b => b.n).concat(G.beats.map(b => b.n));
     const q = rnd(46, 62) + p.fama * 0.35 + p.rel * 8 + G.skills.rete * 0.3;
@@ -646,6 +657,7 @@ function azionePosto(tipo, id){
 
   if(tipo === "feat"){
     if(G.energy < PO_COSTO.feat) return;
+    if(typeof repAggiungi === "function") repAggiungi(2, "un pezzo portato a termine con " + p.n);
     G.energy -= PO_COSTO.feat;
     p.feat = sett;
     const h = Math.round(6 + p.fama * 0.22 + p.rel * 2);

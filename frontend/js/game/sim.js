@@ -110,11 +110,17 @@ function advanceWeek(){
      chiude i conti, non più quello che ti rimette in piedi. */
 
   if(G.job){
+    /* punto 12: presentarsi al lavoro tutte le settimane e' la forma piu'
+       piccola e piu' vera di essere uno su cui contare */
+    if(G.shifts > 0 && typeof repAggiungi === "function") repAggiungi(0.5);
     if(G.shifts > 0) G.job.missed = 0;
     else{
       G.job.missed++;
       if(G.job.missed >= 3){
         pushLog("<b>Ti hanno licenziato</b> da " + G.job.n + ". Niente più stipendio.", "bad");
+        /* punto 12: farsi licenziare per non essersi presentati e' esattamente
+           il tipo di cosa che ti brucia la reputazione */
+        if(typeof repAggiungi === "function") repAggiungi(-6, "ti hanno licenziato");
         G.job = null;
       }else{
         pushLog("Non ti sei presentato al lavoro. Ancora " + (3 - G.job.missed) +

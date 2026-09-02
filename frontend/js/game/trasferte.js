@@ -236,8 +236,20 @@ function cittaStato(id){
   if(!s.citta[id]) s.citta[id] = {visite:0, fan:0, rep:0, ultima:-99, inviti:0};
   return s.citta[id];
 }
-function reputazione(){ return Math.round(cl(st().rep, 0, 100)); }
-function addRep(n){ const s = st(); s.rep = cl(s.rep + n, 0, 100); }
+/* punto 12: la reputazione non e' piu' roba solo delle trasferte — e' una
+   statistica della partita (js/game/reputazione.js, `G.rep`). Qui si continua a
+   leggerla e a muoverla con gli stessi nomi di prima, ma il numero e' uno solo:
+   chi ti chiama da fuori citta' guarda la stessa reputazione che guardano alla
+   Sala, al lavoro e per strada. Se il file nuovo non c'e' si ricasca sul vecchio
+   `st().rep`, cosi' questo modulo resta capace di girare da solo. */
+function reputazione(){
+  if(typeof repValore === "function") return repValore();
+  return Math.round(cl(st().rep, 0, 100));
+}
+function addRep(n, perche){
+  if(typeof repAggiungi === "function"){ st().rep = repAggiungi(n, perche); return; }
+  const s = st(); s.rep = cl(s.rep + n, 0, 100);
+}
 
 function salva(){ try{ if(typeof save === "function") save(); }catch(e){} }
 function diario(t, c){ try{ if(typeof pushLog === "function") pushLog(t, c || ""); }catch(e){} }
@@ -780,7 +792,8 @@ function rifiuta(inv){
   const s = st(), c = CITTA_BY_ID[inv.citta], t = TIPI_BY_ID[inv.tipo];
   togliInvito(inv.iid);
   s.rifiutiFila = (s.rifiutiFila || 0) + 1;
-  addRep(-3 - Math.min(6, s.rifiutiFila * 2));
+  addRep(-3 - Math.min(6, s.rifiutiFila * 2),
+    s.rifiutiFila > 1 ? "hai detto di no " + s.rifiutiFila + " volte di fila" : "hai rifiutato una data");
   /* chi ti aveva chiamato si raffredda davvero: il rapporto scende */
   const da = inv.daId ? personaPerId(inv.daId) : null;
   if(da){
@@ -895,7 +908,7 @@ function applicaEvento(e, riuscito){
   if(e.skill && typeof gain === "function")
     for(const k of Object.keys(e.skill)) gain(k, e.skill[k]);
   if(e.rep) addRep(e.rep);
-  addRep(riuscito ? 2 : -1);
+  addRep(riuscito ? 2 : -1, riuscito ? "una data fatta bene" : "");
 
   const cs = cittaStato(c.id);
   cs.fan = (cs.fan || 0) + Math.round(fan * .7);

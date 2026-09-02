@@ -291,6 +291,9 @@ function vistaProfilo(L, ph){
       rigaStat("testa", "#A855F7", "Lucidità", Math.round(luc()), luc()) +
       rigaStat("zaino", "#F59E0B", "Lifestyle", lifestyleRiepilogo().alzati + " su " + LIFE.length + " curati", lifestyleRiepilogo().pct) +
       rigaStat("rischio", "#EF4444", "Livello sospetto", Math.round((G.strada && G.strada.heat) || 0), (G.strada && G.strada.heat) || 0) +
+      /* punto 12: qui per esteso, con il numero e cosa vuol dire */
+      rigaStat("scudo", repRiepilogo().k, "Reputazione",
+        repRiepilogo().nome + " \u00b7 " + repRiepilogo().valore, repRiepilogo().valore) +
     '</div>' +
     '<div class="psk"><span class="pk">Skill</span>' + skillRighe() + '</div>' +
     '<div class="pdue">' +
@@ -322,7 +325,18 @@ function vistaAbilita(){
 
 function vistaDisciplina(){
   const ph = PHASES[G.phase], nt = typeof nextTrial === "function" ? nextTrial() : null;
+  const rep = repRiepilogo();
   return '<span class="ptit">Disciplina</span>' +
+    /* punto 12: la reputazione sta qui in mezzo alla disciplina perche' e'
+       esattamente quello: la somma di come ti sei comportato. */
+    '<div class="prep" style="--k:' + rep.k + '">' +
+      '<div class="prephead"><span class="pk">Reputazione</span><b>' + rep.valore + '</b></div>' +
+      '<div class="prepn">' + rep.nome + '</div>' +
+      '<span class="pbar2"><i style="width:' + rep.valore + '%"></i></span>' +
+      '<div class="prepd">' + rep.d + '</div>' +
+      '<div class="prepscala">' + REP_GRADI.map(g =>
+        '<span' + (g.n === rep.nome ? ' class="qui"' : '') + '>' + g.n + '</span>').join("") + '</div>' +
+    '</div>' +
     '<div class="prighe" style="margin-top:14px">' +
       rigaStat("cuore", "#EF4444", "Benessere", Math.round(G.wellbeing), G.wellbeing) +
       rigaStat("testa", "#A855F7", "Lucidità", Math.round(luc()), luc()) +
@@ -356,6 +370,7 @@ function renderHub(){
   $("hb-anno").textContent = "Anno " + G.year;
   $("hb-ora").textContent = hubOra();
   $("hb-telora").textContent = hubOra();
+  const rep = repRiepilogo();
   $("hb-stat").innerHTML =
     statCella("#FACC15", "energia", "Energia", G.energy + " / " + G.maxEnergy,
       G.energy / G.maxEnergy * 100) +
@@ -363,6 +378,9 @@ function renderHub(){
     statCella("#FB923C", "hype", "Hype", Math.round(G.hype)) +
     statCella("#FBBF24", "fama", "Fama", short(G.fans)) +
     statCella("#60A5FA", "gente", "Network", Math.round(G.skills.rete)) +
+    /* punto 12: la reputazione accanto alla fama, che e' il paragone che
+       conta — quanta gente sa chi sei, e quanta gente ci conta su */
+    statCella(rep.k, "scudo", "Reputazione", rep.nome, rep.valore) +
     statCella("#EF4444", "cuore", "Benessere", Math.round(G.wellbeing), G.wellbeing);
 
   /* ---- colonna di sinistra ---- */

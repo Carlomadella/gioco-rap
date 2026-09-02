@@ -96,6 +96,20 @@ CARLO:
 
 12. aggiungere la reputazione cioè quanto sei affidabile, il massimo è real/real oppure OG, e il minimo tipo figlio di troia quando ti comporti da figlio di troia (detto meglio) O TENERE SOLO LA FAMa
 
+    **FATTO (02/09/2026)** — branch `task/12-reputazione`. La via corta («o tenere solo la
+    fama») non l'ho presa: fama e reputazione dicono due cose diverse. La fama è quanta gente
+    sa chi sei, la reputazione è quanta gente **ci conta su** — e nella fascia in alto adesso
+    stanno una accanto all'altra. Il numero esisteva già ma chiuso dentro alle trasferte
+    (punto 9): adesso è `G.rep`, lo governa `js/game/reputazione.js` ed è **uno solo** per
+    tutto il gioco. Otto gradini dal basso: *venduto*, *uno senza parola*, *poco affidabile*,
+    *uno qualsiasi* (si parte da lì), *uno serio*, *uno su cui contare*, *real*, *OG*. La
+    muovono cose che già fai: rifiutare date (e sempre di più a ogni no di fila), farsi
+    licenziare, presentarsi al lavoro, un feat portato a termine, come tratti la gente alla
+    Sala, rompere con qualcuno. Il cambio di gradino finisce nel diario. Si vede nella fascia
+    in alto, nel profilo e per esteso in **Disciplina**, con tutta la scala. Le carriere già in
+    corso ereditano la reputazione che avevano nel giro. Per esteso in
+    [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md#12--la-reputazione-quanto-sei-uno-su-cui-contare).
+
 13. aggiungere la sezione delle skill, sbloccabili con i soldi o con un'altra valuta, un esempio: penna d'oro: +1 alla statistica scrittura
 
 14. DA DISCUTERE aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
@@ -150,18 +164,22 @@ NETWORK 64
 
 21. fare pagina di registrazione/login/logout
 
-   **FATTO (02/09/2026)** — branch `task/21-account-login-logout`. Il ponte col server c'era
-   già tutto (`online.js`) e le rotte pure: mancava il posto da cui usarle. Adesso c'è la
-   sezione **Account** nelle impostazioni, con la voce **07** nel menu che ci entra dritta:
-   *Entra*, *Registrati*, *Esci* e *Cancella l'account* (due tocchi, come le altre cose che
-   cancellano). Quattro stati che dicono la verità, server irraggiungibile compreso — e lì il
-   gioco continua offline come sempre. Gli errori del server sono tradotti a parole, in
-   italiano e in inglese. Per strada è saltato fuori un bug vero: `nav.js` chiamava
-   `statoPartita()` invece di `partita()`, quindi **nessuna** voce del menu con `data-go`
-   funzionava (artista, regole, classifiche, studio). Per esteso in
-   [`07-multiplayer-e-backend.md`](07-multiplayer-e-backend.md#21--registrazione-entrata-e-uscita).
+    **FATTO (02/09/2026)** — branch `task/21-account-login-logout`. Il ponte col server c'era
+    già tutto (`online.js`) e le rotte pure: mancava il posto da cui usarle. Adesso c'è la
+    sezione **Account** nelle impostazioni, con la voce **07** nel menu che ci entra dritta:
+    _Entra_, _Registrati_, _Esci_ e _Cancella l'account_ (due tocchi, come le altre cose che
+    cancellano). Quattro stati che dicono la verità, server irraggiungibile compreso — e lì il
+    gioco continua offline come sempre. Gli errori del server sono tradotti a parole, in
+    italiano e in inglese. Per strada è saltato fuori un bug vero: `nav.js` chiamava
+    `statoPartita()` invece di `partita()`, quindi **nessuna** voce del menu con `data-go`
+    funzionava (artista, regole, classifiche, studio). Per esteso in
+    [`07-multiplayer-e-backend.md`](07-multiplayer-e-backend.md#21--registrazione-entrata-e-uscita).
 
 22. non si riescono a vedere i beat
+
+23. la pagina di landing deve essere staccata dalla pagina di login e dalla pagina di gioco
+
+24. la pagina di login deve essere a sè stante, visibile nella pagina di landing, e non presente nella sezione account. Non deve esserci il server visibile, inoltre falla molto ma molto meglio visivamente
 
 /_ NUOVE MODALITA' _/
 

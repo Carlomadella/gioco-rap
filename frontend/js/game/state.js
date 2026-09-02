@@ -21,6 +21,10 @@ const START = () => ({
   phase:0, trialCd:0, trialsDone:{}, evCd:{}, seenLog:0,
   rivals:[], gente:[], chartPrev:99, streamsPrev:0, lafamegramMiei:[], lafamegramEventi:[],
   best:{fans:0, chart:99}, ended:false,
+  /* punto 12: la reputazione. Non e' la fama: e' quanto sei uno su cui
+     contare. Parte a meta' — nessuno ti conosce, nessuno ha motivo di
+     diffidare. La muove js/game/reputazione.js. */
+  rep:50,
   /* punto 21: la Strada. Ricostruita da claude/carriera-criminale.md */
   strada:{rep:0, heat:0, sporchi:0, uomini:0, prot:0, ferro:false, avvocato:false,
     attivita:{}, precedenti:0, arresto:null},

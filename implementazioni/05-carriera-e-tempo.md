@@ -211,3 +211,64 @@ semplicemente perché capitava nel giorno sbagliato. Adesso ogni incontro/evento
   condizioni rare si conclude come sempre, un solo rapporto, nessuna interruzione di troppo.
 
 ---
+
+---
+
+## 12 · La reputazione: quanto sei uno su cui contare
+
+12. aggiungere la reputazione cioè quanto sei affidabile, il massimo è real/real oppure OG, e il
+    minimo tipo figlio di troia quando ti comporti da figlio di troia (detto meglio) O TENERE
+    SOLO LA FAMA
+
+    **FATTO (02/09/2026)** — branch `task/12-reputazione`. Il punto lasciava aperta anche la via
+    corta («o tenere solo la fama»): non l'ho presa, perché fama e reputazione dicono due cose
+    diverse e la seconda mancava davvero.
+
+    **La fama è quanta gente sa chi sei. La reputazione è quanta gente ci conta su.** Di gente
+    famosa e inaffidabile è pieno il mondo, e a quella gente alla fine non risponde più nessuno al
+    telefono. Nella fascia in alto della plancia adesso stanno una accanto all'altra, che è
+    esattamente il paragone che serve vedere.
+
+    **Il numero c'era già, ma non lo vedeva nessuno.** `js/game/trasferte.js` (punto 9) teneva un
+    `rep` da 0 a 100 per decidere chi ti chiama da fuori città. Era una statistica vera, con delle
+    soglie vere, chiusa dentro a un modulo. Adesso esce allo scoperto: sta in `G.rep`, la governa
+    `js/game/reputazione.js`, e le trasferte leggono quella — **un numero solo**, non due che si
+    somigliano. Chi ti chiama da Bologna guarda la stessa reputazione che guardano alla Sala, al
+    lavoro e per strada.
+
+    **Gli otto gradini**, dal basso: *venduto*, *uno senza parola*, *poco affidabile*, *uno
+    qualsiasi*, *uno serio*, *uno su cui contare*, *real*, *OG*. Si parte da **uno qualsiasi**, a
+    metà: nessuno ti conosce, nessuno ha motivo di diffidare. Il fondo detto meglio, come chiedeva
+    il punto: «venduto» è la parola che si usa davvero per chi molla la gente, e dice la stessa
+    cosa senza doverla urlare.
+
+    **Cosa la muove**, e sono tutte cose che il giocatore fa già:
+
+    - **rifiutare una data** e rifiutarne un'altra e un'altra ancora: scende, e scende sempre di
+      più a ogni no di fila;
+    - **una trasferta portata a casa bene**: sale;
+    - **farsi licenziare** perché non ti sei presentato per tre settimane: −6, che è tanto;
+    - **presentarsi al lavoro**, ogni settimana: +0,5, che è poco. È giusto così: essere
+      affidabili non è un colpo grosso, è una cosa noiosa fatta tante volte;
+    - **un feat portato a termine**, un pomeriggio in sala con uno: sale;
+    - **dire la cosa sbagliata** a qualcuno alla Sala: scende un pelo. **Rompere** con qualcuno
+      fino a farlo diventare un opp: −5. Le voci nel giro girano più in fretta dei pezzi.
+
+    **Il cambio di gradino si racconta.** Un numero che si muove da solo non insegna niente: quando
+    passi da un gradino all'altro finisce nel diario e a schermo — «Nel giro adesso sei *uno
+    serio* — una data fatta bene». Nel mezzo, se il colpo è grosso, resta la riga nel diario.
+
+    **Dove si vede**: nella fascia in alto della plancia accanto alla fama, nel profilo con il
+    numero, e nella linguetta **Disciplina** per esteso — il numero, il gradino in cui sei, cosa
+    vuol dire, e tutta la scala, così si vede da dove vieni e dove puoi arrivare. Sta lì perché è
+    esattamente quello che è: la somma di come ti sei comportato.
+
+    **Le carriere già in corso non ripartono da zero**: chi si era già fatto un nome nel giro delle
+    trasferte se lo porta dietro, perché `G.rep` la prima volta eredita il vecchio
+    `G.trasferte.rep`.
+
+    **Provata nel browser vero**: gli otto gradini, il diario che scatta al cambio, la carriera
+    vecchia che eredita, le trasferte che restano allineate in tutte e due i versi, e le tre viste.
+
+    File nuovi: `js/game/reputazione.js`. Toccati: `js/game/state.js`, `js/game/sim.js`,
+    `js/game/posto.js`, `js/game/trasferte.js`, `js/game/hub.js`, `css/hub.css`, `index.html`.
