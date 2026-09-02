@@ -91,7 +91,15 @@
       closeText:fmt(close), label:"Aperto fino alle " + fmt(close)};
   }
 
-  function placeStatus(id, at){ return statusWindow(PLACE_HOURS[id], at); }
+  function placeStatus(id, at){
+    /* Blocco 3: se sei detenuto, il carcere non "apre alle 18".
+       Lo stesso hotspot della mappa porta alla schermata Carcere 24/7. */
+    if(id === "crimin" && G.strada && G.strada.arresto){
+      const now = at == null ? GAME_TIME.now() : at;
+      return {open:true, now, allDay:true, jail:true, label:"Carcere · sempre accessibile"};
+    }
+    return statusWindow(PLACE_HOURS[id], at);
+  }
 
   function scheduleForAction(id){
     if(id === "turno"){

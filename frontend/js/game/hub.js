@@ -100,7 +100,9 @@ const HUB_LUOGHI = [
   /* punto 21/57: la Strada, ricostruita da claude/carriera-criminale.md
      (js/game/strada-crimine.js) — non era mai stata scritta, solo pensata */
   {id:"crimin", n:"Attività criminali", x:4.88, y:69.17, w:21.16, h:30.83,
-   vai:() => apriStrada()},
+   vai:() => (G.strada && G.strada.arresto && typeof apriCarcere === "function")
+  ? apriCarcere()
+  : apriStrada()},
   /* punto 59: il secondo lavoro, full time — era «Sponsor & brand» */
   {id:"fabbrica", n:"Fabbrica", x:76.82, y:15.83, w:23.18, h:27.50,
    vai:() => schedaLavoro("operaio", "Fabbrica")},

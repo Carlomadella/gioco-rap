@@ -16,6 +16,27 @@ const TEL_SOGLIA = 1180;
 const telPC = () => window.innerWidth >= TEL_SOGLIA;
 const tronca = (s, n) => (s && s.length > n) ? s.slice(0, n - 1) + "…" : (s || "");
 
+/* Messaggi = persone che ti scrivono. Il diario generale G.log NON è una
+   casella messaggi: esiti, skip ed eventi di sistema appartengono a Diario /
+   Notifiche. Questa separazione evita che ogni evento sembri un DM. */
+function telMessaggiDiretti(){
+  if(typeof chatAttivi !== "function" || !G.chat) return [];
+  return chatAttivi().map(c => {
+    const t = G.chat[c.id];
+    if(!t || !Array.isArray(t.msgs) || !t.msgs.length) return null;
+    const ultimo = t.msgs[t.msgs.length - 1];
+    return {
+      id:c.id, n:c.n,
+      t:String((ultimo && ultimo.testo) || ""),
+      w:Number((ultimo && ultimo.s) || 0),
+      nonLetti:Number(t.nonLetti || 0)
+    };
+  }).filter(Boolean).sort((a,b) => b.w - a.w);
+}
+function telMessaggiNonLetti(){
+  return telMessaggiDiretti().reduce((n,m) => n + m.nonLetti, 0);
+}
+
 let TEL_APP = null;        /* id dell'app aperta, null = sei alla home */
 let TEL_ORIGIN = null;     /* da dove parte l'animazione di apertura */
 let TEL_INVTAB = "bars";   /* linguetta aperta dentro Inventario */
@@ -52,7 +73,7 @@ const HUB_APP_VECCHIO = [
    dell'app si vede aprendola, non prima. */
 const HUB_APP = [
   {id:"messaggi", n:"Messaggi", ic:"chat", k:"#7C3AED",
-   badge:g => Math.max(0, g.log.length - (g.seenLog || 0))},
+   badge:() => telMessaggiNonLetti()},
   {id:"contatti", n:"Contatti", ic:"gente", k:"#38BDF8"},
   /* punto 66: mamma e il migliore amico scrivono da subito, il resto arriva con la fama */
   {id:"chat", n:"Chat", ic:"duebolle", k:"#25D366", badge:() => chatNonLetti()},
@@ -203,7 +224,9 @@ function renderTelefonoVecchio(){
 function renderTelefonoHome(){
   const el = $("hb-tel");
   el.className = "ptelscr";
-  const nuoviMsg = Math.max(0, G.log.length - (G.seenLog || 0));
+  const messaggiDiretti = telMessaggiDiretti();
+  const nuoviMsg = telMessaggiNonLetti();
+  const ultimoMsg = messaggiDiretti[0] || null;
   const cl = telClassifica();
   const top = telPostTop();
 
@@ -221,7 +244,7 @@ function renderTelefonoHome(){
         '</span></button>' +
       '<button class="twid" data-app="messaggi">' +
         '<span class="twhead">' + hsvg("chat") + 'Messaggi</span>' +
-        '<span class="twbody"><i>' + (G.log[0] ? tronca(spoglia(G.log[0].t), 38) : "Ancora niente") + '</i></span>' +
+        '<span class="twbody"><i>' + (ultimoMsg ? tronca(spoglia(ultimoMsg.t), 38) : "Nessun messaggio diretto") + '</i></span>' +
         (nuoviMsg ? '<span class="twfoot up">' + nuoviMsg + ' nuovi</span>' : '') +
       '</button>' +
     '</div>';
@@ -271,13 +294,16 @@ function schermataApp(id){
   return "";
 }
 
-/* ---- Messaggi: il diario intero, non solo gli ultimi due ---- */
+/* ---- Messaggi: solo messaggi di persone, mai il diario G.log ---- */
 function schermataMessaggi(){
-  if(!G.log.length) return '<div class="tempty">Ancora niente. Muoviti, e qualcosa succede.</div>';
-  return '<div class="tlist">' + G.log.map(m =>
-    '<div class="tli static"><span class="tliav">' + hsvg("persona") + '</span>' +
-    '<span class="tlitx"><b>' + m.w + '</b><i style="white-space:normal">' + m.t + '</i></span></div>').join("") +
-    '</div>';
+  const msg = telMessaggiDiretti();
+  if(!msg.length) return '<div class="tempty">Nessun messaggio diretto. Gli eventi automatici li trovi in Notifiche.</div>';
+  return '<div class="tlist">' + msg.map(m =>
+    '<button class="tli" data-chat="' + m.id + '">' +
+    '<span class="tliav">' + hsvg("persona") + '</span>' +
+    '<span class="tlitx"><b>' + m.n + '</b><i style="white-space:normal">' + spoglia(m.t) + '</i></span>' +
+    (m.nonLetti ? '<span class="ttag on">' + m.nonLetti + ' nuovi</span>' : '') +
+    '</button>').join("") + '</div>';
 }
 
 /* ---- Contatti: la rete vera, con grado e ruolo ----
@@ -447,7 +473,6 @@ function telApriApp(a, ev){
       y:((ic.top + ic.height / 2 - scr.top) / scr.height * 100).toFixed(1) + "%"
     };
   } else TEL_ORIGIN = null;
-  if(a.id === "messaggi" && G.seenLog !== G.log.length){ G.seenLog = G.log.length; save(); }
   if(a.id === "lafamegram") telAggiornaFeed();   /* si riapre, si aggiorna: un feed vivo */
   TEL_APP = a.id;
   hubTap();
@@ -488,7 +513,7 @@ $("hb-tel").addEventListener("click", ev => {
   const inv = ev.target.closest("[data-inv]");
   if(inv){ TEL_INVTAB = inv.dataset.inv; hubTap(); renderTelefono(); return; }
   const chatOpen = ev.target.closest("[data-chat]");
-  if(chatOpen){ TEL_CHAT_APERTA = chatOpen.dataset.chat; hubTap(); renderTelefono(); return; }
+  if(chatOpen){ TEL_APP = "chat"; TEL_CHAT_APERTA = chatOpen.dataset.chat; hubTap(); renderTelefono(); return; }
   if(ev.target.closest("[data-chathome]")){ TEL_CHAT_APERTA = null; hubTap(); renderTelefono(); return; }
   const chatOpt = ev.target.closest("[data-chatopt]");
   if(chatOpt){ hubTap(); chatRispondi(TEL_CHAT_APERTA, +chatOpt.dataset.chatopt); return; }
