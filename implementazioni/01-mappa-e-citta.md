@@ -41,6 +41,27 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
    controllo, non il browser — l'estensione Chrome non era collegata in questa sessione). Da controllare
    ancora a mano: un giro vero in Chrome, click per click.
 
+   **«La foto è riadattata malissimo» (03/09/2026) — trovata la causa, non era il ritaglio.**
+   Confrontato pixel per pixel il ritaglio (0,340 → 1536,940) di `mappa_definitiva.png` con
+   `mappa_citta.jpg` sul disco: identici, il ritaglio del 02/09 è corretto. Ma quel commit ha
+   **sovrascritto lo stesso nome di file** (`mappa_citta.jpg`, 186 KB → 320 KB) con dentro una foto
+   completamente diversa — la vecchia versione aveva le card scritte SOPRA agli edifici, coprendoli
+   («CLUB & DISCOTECHE», «SPONSOR & BRAND», «BUSINESS», la mappa piccola di prima del punto 6). A
+   differenza di ogni CSS e JS del gioco, che in `index.html` hanno tutti un `?v=` per rompere la
+   cache, l'immagine dentro a `hub.css` non ce l'aveva: chi l'aveva già vista prima del 02/09 — nel
+   browser o nella webview di Electron/Capacitor, che tengono le immagini in cache più a lungo di una
+   pagina — continuava a vedersi la foto vecchia anche a file già cambiato sul disco. Confermato anche
+   un secondo posto dove capitava: `frontend/dist/` (la cartella del build, non versionata) aveva
+   ancora la foto di prima del 01/09, sotto il vecchio percorso `media/photo/schermate di gioco/` —
+   un `npm run build` rifatto adesso la sostituisce da solo, perché il build ricopia tutta `media/`
+   da zero.
+   **Fatto:** aggiunto `?v=2` alle due `url(...)` di `mappa_citta.jpg` in `hub.css` (sfondo sfocato e
+   foto nitida) e alzato `hub.css?v=12` a `?v=13` in `index.html`, così anche il foglio di stile che
+   punta alla foto si ri-scarica. La prossima volta che si sovrascrive un'immagine con lo stesso nome,
+   va alzato quel numero — altrimenti chi l'ha già vista resta con la versione vecchia in cache.
+   Verificato in Chrome headless (dev server locale, profilo pulito): la mappa in gioco combacia
+   esattamente col ritaglio fatto a mano da `mappa_definitiva.png`, sia a 1600×1000 che a 2560×1080.
+
 ---
 
 ## 26 · La carriera cresce con la mappa: Provincia → Milano → Los Angeles

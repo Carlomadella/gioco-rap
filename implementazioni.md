@@ -31,6 +31,3 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 _(qui sotto finiscono i punti nuovi, appena scritti)_
 
-6. 
-
-7. 
