@@ -87,7 +87,12 @@ const HUB_LUOGHI = [
   /* punto 21/57: la Strada, ricostruita da claude/carriera-criminale.md
      (js/game/strada-crimine.js) — non era mai stata scritta, solo pensata */
   {id:"crimin", n:"Attività criminali", x:72.77, y:50.96, w:20.24, h:18.17,
-   vai:() => apriStrada()},
+   /* Blocco 3: la condanna è uno stato del personaggio, non un orario del giro.
+      Il punto resta la porta d'ingresso sulla mappa, ma se sei dentro apre una
+      schermata Carcere autonoma invece delle Attività criminali. */
+   vai:() => (G.strada && G.strada.arresto && typeof apriCarcere === "function")
+     ? apriCarcere()
+     : apriStrada()},
   /* punto 59: il secondo lavoro, full time — era «Sponsor & brand» */
   {id:"fabbrica", n:"Fabbrica", x:6.87, y:74.59, w:19.28, h:9.31,
    vai:() => schedaLavoro("operaio", "Fabbrica")},

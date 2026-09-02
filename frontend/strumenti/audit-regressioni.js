@@ -16,6 +16,9 @@ const ev = leggi("js/game/eventi-v2.js");
 const tel = leggi("js/game/telefono.js");
 const actions = leggi("js/game/actions.js");
 const writer = leggi("js/game/writer.js");
+const hub = leggi("js/game/hub.js");
+const hours = leggi("js/game/orari.js");
+const crimeui = leggi("js/game/strada-crimine-ui.js");
 const cat = JSON.parse(leggi("js/game/eventi-master-1000-v1.2.13.json"));
 
 console.log("\nBlocco 1 — Eventi V2 / telefono / dist");
@@ -57,7 +60,26 @@ test("fattore Scrittura 5 è circa 31,6%, non 52,5%",
 test("vecchio fattore 0,5 + skill/200 rimosso",
   !writer.includes("0.5 + G.skills.scrittura/100 * 0.5"));
 
-for(const f of ["strumenti/build.js","js/game/eventi-v2.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js"]){
+console.log("\nBlocco 3 — carcere separato");
+test("hub manda il detenuto alla schermata Carcere",
+  hub.includes('G.strada && G.strada.arresto && typeof apriCarcere === "function"'));
+test("orari non bloccano il carcere alle 08:00",
+  hours.includes('id === "crimin" && G.strada && G.strada.arresto') &&
+  hours.includes('jail:true'));
+test("esiste una UI Carcere separata dal root criminale",
+  crimeui.includes('function ensureJail()') &&
+  crimeui.includes('jail.id="adf-jail"') &&
+  crimeui.includes('window.apriCarcere=openJail'));
+test("apriStrada reindirizza al carcere se detenuto",
+  crimeui.includes('function open(){if(street().arresto)return openJail();'));
+test("dopo l'esito Arrestato si esce dal giro e si apre il carcere",
+  crimeui.includes('if(street().arresto&&!STRADA_SCENA){close();openJail()}'));
+test("la UI carcere usa la pena esistente, non una seconda condanna",
+  crimeui.includes('const a=street().arresto;') &&
+  crimeui.includes('Number(a.settimane)') &&
+  !crimeui.includes('carcereSettimane'));
+
+for(const f of ["strumenti/build.js","js/game/eventi-v2.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/orari.js","js/game/strada-crimine-ui.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }

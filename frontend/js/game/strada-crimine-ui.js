@@ -77,6 +77,104 @@
   function triggerPhone(level){const now=Date.now();if(now-lastPhoneAt<1500)return;lastPhoneAt=now;try{if(window.TRAPHONE16)TRAPHONE16.triggerTrapEvent(level||"low")}catch(_){}}
   function setVisual(tags,ms){try{if(window.setCrimeVisualEvent)window.setCrimeVisualEvent(tags,ms||60000)}catch(_){}}
 
+  /* ---------- Blocco 3: CARCERE separato dal giro ----------
+     Fase 1 intenzionalmente semplice: mostra condanna e tempo residuo.
+     Le meccaniche dedicate restano fuori da questo blocco. La pena continua
+     a essere consumata da stradaSettimana(): qui non duplichiamo formule. */
+  function ensureJail(){
+    let jail=document.getElementById("adf-jail");
+    if(jail)return jail;
+    const css=document.createElement("style");
+    css.id="adf-jail-css";
+    css.textContent=`
+      .adf-jail{position:fixed;inset:0;z-index:112;display:none;background:#08090c;color:#f5f1ea;font-family:Figtree,Inter,system-ui,sans-serif;overflow:hidden}
+      .adf-jail.on{display:block}
+      .adf-jail-bg{position:absolute;inset:0;background-position:center;background-size:cover;filter:grayscale(.62) brightness(.28);transform:scale(1.02)}
+      .adf-jail-bg:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,5,8,.97) 0%,rgba(4,5,8,.77) 45%,rgba(4,5,8,.45) 100%),repeating-linear-gradient(90deg,transparent 0 72px,rgba(255,255,255,.045) 72px 78px)}
+      .adf-jail-top{position:relative;z-index:2;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 34px;border-bottom:1px solid rgba(255,255,255,.12);background:rgba(5,6,9,.72);backdrop-filter:blur(18px)}
+      .adf-jail-brand{font-weight:950;letter-spacing:.08em;text-transform:uppercase}.adf-jail-brand i{font-style:normal;color:#ff315b}
+      .adf-jail-meta{display:flex;gap:18px;color:#b7b2b4;font:800 11px/1.2 IBM Plex Mono,monospace;text-transform:uppercase}
+      .adf-jail-main{position:relative;z-index:2;height:calc(100% - 72px);display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px;padding:clamp(34px,5vw,82px)}
+      .adf-jail-copy{align-self:center;max-width:920px}
+      .adf-jail-k{color:#ff315b;font:900 13px/1 IBM Plex Mono,monospace;letter-spacing:.15em;text-transform:uppercase}
+      .adf-jail h1{margin:14px 0 18px;font-family:"Big Shoulders Stencil Display","League Gothic",Impact,sans-serif;font-size:clamp(86px,10vw,190px);line-height:.72;letter-spacing:-.025em;text-transform:uppercase}
+      .adf-jail h1 span{display:block;color:#ff315b}
+      .adf-jail-copy>p{max-width:690px;margin:0;color:#c8c2c3;font-size:17px;line-height:1.55}
+      .adf-jail-card{align-self:center;padding:28px;border:1px solid rgba(255,49,91,.42);background:rgba(16,12,17,.82);backdrop-filter:blur(18px);box-shadow:0 26px 80px rgba(0,0,0,.42)}
+      .adf-jail-card small{display:block;color:#a39ca0;font:850 10px/1 IBM Plex Mono,monospace;letter-spacing:.13em;text-transform:uppercase}
+      .adf-jail-weeks{margin:10px 0 20px;font-family:"Big Shoulders Stencil Display",Impact,sans-serif;font-size:78px;line-height:.9;color:#fff}
+      .adf-jail-weeks span{display:block;margin-top:8px;color:#ff315b;font:900 12px/1.2 Figtree,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase}
+      .adf-jail-row{padding:14px 0;border-top:1px solid rgba(255,255,255,.10)}.adf-jail-row b{display:block;margin-top:5px;font-size:15px}
+      .adf-jail-exit{width:100%;margin-top:18px;padding:14px 16px;border:1px solid rgba(255,255,255,.18);background:#f4f0ea;color:#111;font-weight:950;text-transform:uppercase;cursor:pointer}
+      @media(max-width:900px){.adf-jail-main{grid-template-columns:1fr;padding:28px}.adf-jail-card{align-self:end}.adf-jail h1{font-size:86px}.adf-jail-meta{display:none}}
+    `;
+    document.head.appendChild(css);
+    jail=document.createElement("div");
+    jail.id="adf-jail";
+    jail.className="adf-jail";
+    jail.innerHTML=`<div class="adf-jail-bg" id="adf-jail-bg"></div>
+      <div class="adf-jail-top">
+        <div class="adf-jail-brand">Anni di <i>Fame</i> // Carcere</div>
+        <div class="adf-jail-meta"><span id="adf-jail-city">Provincia</span><span id="adf-jail-time">08:00</span></div>
+      </div>
+      <div class="adf-jail-main">
+        <div class="adf-jail-copy">
+          <div class="adf-jail-k">Detenzione</div>
+          <h1>Sei <span>dentro.</span></h1>
+          <p>Niente colpi finché non esci. La pena scorre con le settimane del gioco: il carcere non dipende dagli orari delle Attività criminali.</p>
+        </div>
+        <aside class="adf-jail-card">
+          <small>Tempo residuo</small>
+          <div class="adf-jail-weeks" id="adf-jail-weeks">—</div>
+          <div class="adf-jail-row"><small>Per cosa</small><b id="adf-jail-cause">—</b></div>
+          <div class="adf-jail-row"><small>Precedenti</small><b id="adf-jail-record">0</b></div>
+          <button class="adf-jail-exit" id="adf-jail-exit" type="button">Torna alla mappa</button>
+        </aside>
+      </div>`;
+    document.body.appendChild(jail);
+    jail.querySelector("#adf-jail-exit").onclick=closeJail;
+    return jail;
+  }
+  function jailBackground(){
+    const all=window.CRIME_BACKGROUNDS_LOCAL||[];
+    return all.find(bg=>Array.isArray(bg.tags)&&bg.tags.includes("prison"))
+      || all.find(bg=>Array.isArray(bg.tags)&&bg.tags.includes("court"))
+      || all.find(bg=>Array.isArray(bg.tags)&&bg.tags.includes("arrest"))
+      || null;
+  }
+  function syncJail(){
+    const jail=document.getElementById("adf-jail");
+    const a=street().arresto;
+    if(!a){if(jail)jail.classList.remove("on");return false}
+    const el=ensureJail();
+    const n=Math.max(0,Number(a.settimane)||0);
+    el.querySelector("#adf-jail-weeks").innerHTML=n+`<span>${n===1?"settimana rimasta":"settimane rimaste"}</span>`;
+    el.querySelector("#adf-jail-cause").textContent=a.colpo||"Arresto";
+    el.querySelector("#adf-jail-record").textContent=String(Number(street().precedenti)||0);
+    el.querySelector("#adf-jail-time").textContent=timeText();
+    const art=window.ARTIST||{};
+    el.querySelector("#adf-jail-city").textContent=(String(art.city||art.citta||"").trim()||"Provincia");
+    const bg=jailBackground(), bgEl=el.querySelector("#adf-jail-bg");
+    if(bg&&bg.url)bgEl.style.backgroundImage=`url("${bg.url}")`;
+    return true;
+  }
+  function closeJail(){
+    const jail=document.getElementById("adf-jail");
+    if(jail)jail.classList.remove("on");
+    try{window.dispatchEvent(new CustomEvent("jail-ui:closed"))}catch(_){}
+  }
+  function openJail(){
+    if(!street().arresto)return false;
+    root.classList.remove("on");
+    const jail=ensureJail();
+    syncJail();
+    jail.classList.add("on");
+    try{window.dispatchEvent(new CustomEvent("jail-ui:opened"))}catch(_){}
+    return true;
+  }
+  window.apriCarcere=openJail;
+  window.chiudiCarcere=closeJail;
+
   /* ---------- local background engine ---------- */
   function careerBand(s){let structure=s.men*5+s.protection*7+s.businessCount*6+(s.gun?4:0)+(s.lawyer?4:0),capital=Math.min(25,Math.log10(Math.max(1,s.dirty+100))*6),cityBonus=s.city.includes("milano")?14:(s.city.includes("los")||s.city==="la"?26:0),score=s.rep*.62+structure+capital+cityBonus;if(s.goat)score=Math.max(score,88);return score>=78?3:score>=50?2:score>=27?1:0}
   let visualEvent={tags:[],until:0};
@@ -91,11 +189,11 @@
   function sync(){const s=street(),art=window.ARTIST||{},city=(String(art.city||art.citta||"").trim()||"Provincia");q("#crimeCity").textContent=city;q("#crimeWhere").textContent="IL GIRO // "+city.toUpperCase();q("#dirty").textContent=money(s.sporchi)+" €";q("#clean").textContent=money(G.money)+" €";q("#energy").textContent=Math.round(G.energy)+" / "+Math.round(G.maxEnergy||100);q("#repN").textContent=Math.round(s.rep);q("#repBar").style.width=clampN(s.rep,0,100)+"%";q("#heatN").textContent=Math.round(s.heat);q("#heatBar").style.width=clampN(s.heat,0,100)+"%";q("#precedents").textContent=Math.round(s.precedenti||0);q("#pressure").textContent=pressure(s.heat);q("#menCount").textContent=`(${s.uomini}/5)`;q("#addMan").disabled=s.uomini>=5||G.money<500;q("#launder").textContent="Ripulisci fino a "+money(typeof stradaCapienza==="function"?stradaCapienza():400)+" €";q("#launder").disabled=s.sporchi<=0;q("#gun").textContent=s.ferro?"Ce l'hai":"900 €";q("#gun").classList.toggle("on",!!s.ferro);q("#gun").disabled=!!s.ferro||G.money<900;q("#lawyer").textContent=s.avvocato?"Ce l'hai":"Prendilo";q("#lawyer").classList.toggle("on",!!s.avvocato);q("#prot").textContent=(STRADA_PROT[s.prot]||STRADA_PROT[0]).n;q("#prot").classList.toggle("on",s.prot>0);q("#weekly").textContent=money(weeklyCost())+" €/sett.";q("#crimeWeek").textContent=String(G.week||1).padStart(2,"0");q("#crimeClock").textContent=timeText();const tc=q("#trapClock");if(tc)tc.textContent=timeText();const ar=!!s.arresto;q("#crimeCenter").classList.toggle("locked",ar);q("#crimeLock").style.display=ar?"flex":"";if(ar){q("#lockTitle").textContent="Sei dentro.";q("#lockReq").textContent=(s.arresto.settimane||0)+" settimane rimaste · "+(s.arresto.colpo||"arresto")};renderCrimes();renderBusinesses();renderScene();try{if(window.TRAPHONE16){const snap=TRAPHONE16.snapshot();q("#trapDockStatus").textContent=(snap.unread||0)+" NON LETTI"}}catch(_){} }
 
   function close(){root.classList.remove("on");try{window.dispatchEvent(new CustomEvent("crime-ui:closed"))}catch(_){} }
-  function open(){if(typeof hubTap==="function")hubTap();STRADA_SCENA=null;sync();root.classList.add("on");chooseBackground(!q("#bgA").style.backgroundImage);if(!bgTimer)bgTimer=setInterval(()=>{if(root.classList.contains("on"))chooseBackground(false)},15000); }
+  function open(){if(street().arresto)return openJail();if(typeof hubTap==="function")hubTap();STRADA_SCENA=null;sync();root.classList.add("on");chooseBackground(!q("#bgA").style.backgroundImage);if(!bgTimer)bgTimer=setInterval(()=>{if(root.classList.contains("on"))chooseBackground(false)},15000); }
 
   root.addEventListener("click",ev=>{
     const c=ev.target.closest("[data-crime]");if(c){if(!canDoCrime(c.dataset.crime)){toast("È troppo tardi per completare questo colpo oggi.");return}if(window.GAME_EVENTS&&GAME_EVENTS.blocked&&GAME_EVENTS.blocked()){toast("Prima devi risolvere l'evento in corso.");return}if(typeof hubTap==="function")hubTap();stAvviaColpo(c.dataset.crime);sync();return}
-    const so=ev.target.closest("[data-scene-opt]");if(so&&STRADA_SCENA){const o=STRADA_SCENA.opts[+so.dataset.sceneOpt];if(o&&typeof o.run==="function")o.run();try{save()}catch(_){}sync();try{renderGioco()}catch(_){}return}
+    const so=ev.target.closest("[data-scene-opt]");if(so&&STRADA_SCENA){const o=STRADA_SCENA.opts[+so.dataset.sceneOpt];if(o&&typeof o.run==="function")o.run();try{save()}catch(_){}sync();try{renderGioco()}catch(_){}if(street().arresto&&!STRADA_SCENA){close();openJail()}return}
     if(ev.target.closest("#launder")){const before=Number(street().sporchi)||0,msg=stradaRipulisci();if(msg)toast(msg);if((Number(street().sporchi)||0)<before){setVisual(["launder","cash","dirty"]);triggerPhone("low")}sync();return}
     if(ev.target.closest("#addMan")){const before=Number(street().uomini)||0,msg=stAssumiUomo();if(msg)toast(msg);if((Number(street().uomini)||0)>before){setVisual(["crew","meeting","protection"]);triggerPhone("low")}sync();return}
     if(ev.target.closest("#prot")){const before=Number(street().prot)||0,msg=stImpostaProtezione((before+1)%STRADA_PROT.length);if(msg)toast(msg);if((Number(street().prot)||0)!==before){setVisual(["protection","crew"]);triggerPhone("low")}sync();return}
@@ -122,8 +220,13 @@
     uscitaStrada=function(){if(STRADA_SCENA){STRADA_SCENA=null;sync();return true}close();return true};
     window.uscitaStrada=uscitaStrada;
   }
-  window.addEventListener("game-time:advanced",sync);
-  window.addEventListener("game-time:day-start",sync);
-  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&root.classList.contains("on")&&!STRADA_SCENA)close()});
+  window.addEventListener("game-time:advanced",()=>{sync();syncJail()});
+  window.addEventListener("game-time:day-start",()=>{sync();syncJail()});
+  document.addEventListener("keydown",e=>{
+    if(e.key!=="Escape")return;
+    const jail=document.getElementById("adf-jail");
+    if(jail&&jail.classList.contains("on")){closeJail();return}
+    if(root.classList.contains("on")&&!STRADA_SCENA)close();
+  });
   sync();
 })();
