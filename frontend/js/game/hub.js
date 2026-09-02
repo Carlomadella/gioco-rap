@@ -1,9 +1,10 @@
 /* La plancia: la schermata da cui si gioca.
 
-   La mappa è la foto del concept (media/photo/schermate di gioco/mappa_citta.jpg): i luoghi con le
-   loro targhette e i loro tasti «Entra» stanno dentro all'immagine, e sopra ci
-   vanno solo le zone da toccare, in percentuale, così restano incollate anche
-   quando la plancia si rimpicciolisce.
+   La mappa è la città vista dall'alto (media/photo/pagina di gioco/mappa_citta.jpg),
+   tenuta sfocata come sfondo: i cartelli dei luoghi non sono più disegnati
+   dentro alla foto ma sono HTML, messi in percentuale sulla mappa (punto 7).
+   Così la mappa riempie tutto lo spazio fra le due colonne — niente più bande
+   ai lati — e per aggiungere un punto basta aggiungere una riga a HUB_LUOGHI.
 
    Tutto il resto è vivo e legge la partita: la fascia in alto, il profilo con
    le sue quattro viste, gli eventi di oggi (che sono le azioni vere della
@@ -49,20 +50,48 @@ const hsvg = (n, cls) => '<svg class="' + (cls || "hicon") + '" viewBox="0 0 24 
 const spoglia = t => String(t).replace(/<[^>]*>/g, "");
 
 /* ================= I LUOGHI ================= */
-/* Le targhette sono dentro alla foto: qui c'è solo dove si tocca, in
-   percentuale dell'immagine (830×677), e cosa succede quando si tocca. */
+/* Punto 7. Prima le targhette erano **disegnate dentro alla foto** e qui sopra
+   ci andavano solo dei rettangoli invisibili: la mappa doveva quindi restare
+   alle sue proporzioni esatte (830×677) per non staccarsi dai cartelli, e su
+   una colonna più larga restavano le due bande ai lati. Adesso il cartello è
+   HTML — nome, riga di spiegazione, tasto — e la foto è solo la città sotto,
+   sfocata: la mappa può riempire tutto lo spazio fra le due colonne senza
+   bande, e aggiungere un punto vuol dire aggiungere una riga qui.
+
+   `x/y/w/h` restano in percentuale della mappa: sono la geografia della città
+   e servono anche a js/game/spostamenti.js per calcolare quanto ci metti ad
+   andare da un posto all'altro. `k` è il colore del cartello, `d` la riga che
+   spiega cosa ci si fa, `go` la scritta sul tasto. */
 const HUB_LUOGHI = [
-  {id:"studio", n:"Studio", x:12.17, y:9.16, w:18.07, h:16.69,
+  {id:"studio", n:"Studio", ic:"mic", k:"#A855F7", x:12.17, y:9.16, w:18.07, h:16.69,
+   d:"Registra, mixa e pubblica i tuoi pezzi.", go:"Entra",
    vai:() => hubGioco("settimana")},
+  /* punto 7: la stazione — le chiamate da fuori città (js/game/trasferte.js)
+     erano solo una notifica sul telefono, adesso hanno un posto dove andare */
+  {id:"stazione", n:"Stazione", ic:"gente", k:"#22D3EE", x:34.50, y:4.00, w:19.50, h:9.30,
+   d:"Le date fuori città: chi ti chiama e dove.", go:"Guarda",
+   vai:() => { if(typeof TRASFERTE === "object") TRASFERTE.apri();
+     else hubPresto("Stazione", "Le trasferte non sono ancora attive."); }},
   /* punto 59/61: era un cartello chiuso («Club & discoteche», ancora dentro
      alla foto — cambia solo quando cambia la mappa, punto 45); qui sotto
      adesso c'è un lavoro vero, part time. */
-  {id:"pizzeria", n:"Pizzeria", x:61.81, y:12.11, w:19.76, h:9.31,
+  {id:"pizzeria", n:"Pizzeria", ic:"soldi", k:"#F59E0B", x:61.81, y:12.11, w:19.76, h:9.31,
+   d:"Part time: turni la sera, pochi soldi sicuri.", go:"Lavora",
    vai:() => schedaLavoro("lavapiatti", "Pizzeria")},
+  /* punto 7: la piazza — il freestyle davanti alla gente esisteva già come
+     azione della settimana, ma non aveva un posto sulla mappa */
+  {id:"piazza", n:"Piazza", ic:"duebolle", k:"#C084FC", x:26.00, y:27.50, w:19.50, h:9.30,
+   d:"Freestyle davanti a chi passa.", go:"Vai",
+   vai:() => {
+     const pronto = hubPronta("free");
+     if(pronto.ok) hubAzione("free");
+     else hubChiuso({n:"Piazza", chiuso:"Non adesso: " + pronto.perche + "."});
+   }},
   /* punto 48: non più un cartello chiuso — è dove si va a fare l'open mic,
      che esisteva già come azione ma non aveva un posto sulla mappa. Se non
      hai ancora un pezzo fuori il palco non c'è, ma lo dice, non fa finta di niente. */
-  {id:"concerti", n:"Concerti & live", x:73.86, y:31.02, w:18.19, h:9.31,
+  {id:"concerti", n:"Concerti & live", ic:"nota", k:"#38BDF8", x:73.86, y:31.02, w:18.19, h:9.31,
+   d:"Il palco vero, quando hai un pezzo fuori.", go:"Sali",
    vai:() => {
      const pronto = hubPronta("live");
      if(pronto.ok) hubAzione("live");
@@ -70,11 +99,17 @@ const HUB_LUOGHI = [
        ". Il palco vero aspetta un pezzo pubblicato."});
    }},
   /* il beat maker non è un listino: è la sala dove si conosce la gente */
-  {id:"beat", n:"La Sala", x:5.30, y:39.14, w:18.31, h:14.77,
+  {id:"beat", n:"La Sala", ic:"cursori", k:"#34D399", x:5.30, y:39.14, w:18.31, h:14.77,
+   d:"Beatmaker, fonici, gente che gira. Qui si fa rete.", go:"Entra",
    vai:() => apriPosto()},
+  /* punto 7: l'edicola — le notizie della settimana erano solo nel telefono */
+  {id:"edicola", n:"Edicola", ic:"giornale", k:"#94A3B8", x:55.00, y:40.00, w:16.50, h:9.30,
+   d:"Cosa gira in paese, questa settimana.", go:"Leggi",
+   vai:() => hubNotizie()},
   /* punto 60: si chiamava «Vita quotidiana» — la palestra è uscita da qui
      ed è diventata un posto suo (punto 61), resta stacca la spina e i conti */
-  {id:"vita", n:"Casa", x:37.83, y:50.96, w:19.52, h:14.77,
+  {id:"vita", n:"Casa", ic:"cuore", k:"#60A5FA", x:37.83, y:50.96, w:19.52, h:14.77,
+   d:"Stacca la spina, o guarda cosa ti costa vivere.", go:"Entra",
    vai:() => showEvent({k:"Casa", t:"Stacca la spina o guarda i conti",
      d:"La settimana non è solo musica. Ogni tanto la testa va spenta, e i conti vanno guardati.",
      annulla(){},
@@ -86,18 +121,22 @@ const HUB_LUOGHI = [
      ]})},
   /* punto 21/57: la Strada, ricostruita da claude/carriera-criminale.md
      (js/game/strada-crimine.js) — non era mai stata scritta, solo pensata */
-  {id:"crimin", n:"Attività criminali", x:72.77, y:50.96, w:20.24, h:18.17,
+  {id:"crimin", n:"Attività criminali", ic:"maschera", k:"#EF4444", x:72.77, y:50.96, w:20.24, h:18.17,
+   d:"Piccoli colpi, piccoli guadagni, rischi veri.", go:"Entra",
    vai:() => apriStrada()},
   /* punto 59: il secondo lavoro, full time — era «Sponsor & brand» */
-  {id:"fabbrica", n:"Fabbrica", x:6.87, y:74.59, w:19.28, h:9.31,
+  {id:"fabbrica", n:"Fabbrica", ic:"soldi", k:"#A3A3A3", x:6.87, y:74.59, w:19.28, h:9.31,
+   d:"Full time: paga di più, ti mangia la giornata.", go:"Lavora",
    vai:() => schedaLavoro("operaio", "Fabbrica")},
   /* punto 61: la palestra esce dal sottomenu di Casa e diventa un posto
      suo — era «Business», un altro cartello chiuso senza niente dietro */
-  {id:"palestra", n:"Palestra", x:38.80, y:80.21, w:16.75, h:9.16,
+  {id:"palestra", n:"Palestra", ic:"scudo", k:"#A3E635", x:38.80, y:80.21, w:16.75, h:9.16,
+   d:"Ti tiene su di morale e di presenza.", go:"Allenati",
    vai:() => hubAzione("palestra")},
   /* punto 48: idem — l'attrezzatura da studio è già nel catalogo, la vetrina
      non deve stare spenta se quello che promette esiste già */
-  {id:"shop", n:"Shop", x:74.58, y:81.24, w:16.27, h:9.16,
+  {id:"shop", n:"Shop", ic:"zaino", k:"#FACC15", x:74.58, y:81.24, w:16.27, h:9.16,
+   d:"Microfoni, schede, cuffie: l'attrezzatura.", go:"Entra",
    vai:() => hubGioco("catalogo", "gear")}
 ];
 
@@ -377,15 +416,24 @@ function renderHub(){
     '<button class="ptab' + (HUB_VISTA === id ? " on" : "") + '" data-v="' + id + '">' +
     hsvg(ic) + '<span>' + n + '</span></button>').join("");
 
-  /* ---- i luoghi sulla mappa ---- */
+  /* ---- i luoghi sulla mappa (punto 7) ----
+     Il cartello non è più disegnato dentro alla foto: è qui, e dice quello
+     che il luogo fa davvero. Le percentuali restano quelle della città. */
   $("hb-pins").innerHTML = HUB_LUOGHI.map((l, i) =>
     '<button class="pspot' + (l.chiuso ? " chiuso" : "") + (HUB_QUI === i ? " qui" : "") +
-    '" data-l="' + l.id + '" style="--x:' + l.x + '%;--y:' + l.y + '%;--w:' + l.w + '%;--h:' + l.h + '%" ' +
-    'aria-label="' + l.n + (l.chiuso ? " — chiuso" : "") + '" title="' + l.n + '"></button>').join("") +
-    '<button class="pfrec" data-f="-1" aria-label="Luogo precedente" ' +
-      'style="--x:34.82%;--y:93.5%;--w:5.06%;--h:4.28%"></button>' +
-    '<button class="pfrec" data-f="1" aria-label="Luogo successivo" ' +
-      'style="--x:56.02%;--y:93.5%;--w:5.06%;--h:4.28%"></button>';
+    '" data-l="' + l.id + '" style="--x:' + l.x + '%;--y:' + l.y + '%;--w:' + l.w + '%;--h:' + l.h +
+    '%;--k:' + (l.k || "#A855F7") + '" ' +
+    'aria-label="' + l.n + (l.chiuso ? " — chiuso" : "") + '" title="' + l.n + '">' +
+    '<span class="pspin" aria-hidden="true"></span>' +
+    '<span class="pspt">' + hsvg(l.ic || "mirino", "hicon pspi") + '<b>' + l.n + '</b></span>' +
+    (l.d ? '<span class="pspd">' + l.d + '</span>' : '') +
+    '<span class="pspgo">' + (l.chiuso ? "Chiuso" : (l.go || "Entra")) + '</span>' +
+    '</button>').join("") +
+    '<div class="pguida">' +
+      '<button class="pfrec" data-f="-1" aria-label="Luogo precedente">&lsaquo;</button>' +
+      '<span>Scorri per esplorare</span>' +
+      '<button class="pfrec" data-f="1" aria-label="Luogo successivo">&rsaquo;</button>' +
+    '</div>';
 
   /* ---- gli eventi di oggi ---- */
   $("hb-eventi").innerHTML = HUB_EVENTI.map(e => {

@@ -31,7 +31,7 @@
 <link rel="stylesheet" href="css/negozio.css?v=12">
 <link rel="stylesheet" href="css/strada-crimine.css?v=13">
 <link rel="stylesheet" href="css/strada-crimine-v2.css?v=1">
-<link rel="stylesheet" href="css/hub.css?v=12">
+<link rel="stylesheet" href="css/hub.css?v=13">
 <link rel="stylesheet" href="css/telefono.css?v=12">
 <link rel="stylesheet" href="css/trasferte.css?v=1">
 <link rel="stylesheet" href="css/impostazioni.css?v=12">
@@ -188,11 +188,12 @@
 </section>
 
 
-<!-- L'hub: la plancia da cui si gioca. La mappa è la foto del concept
-     (media/photo/schermate di gioco/mappa_citta.jpg): i luoghi con le loro targhette stanno dentro
-     all'immagine, sopra ci vanno solo le zone da toccare. Tutto il resto è vivo
-     e lo riempie js/game/hub.js. La plancia è disegnata a 1536×1024 e si
-     rimpicciolisce tutta insieme per stare nello schermo. -->
+<!-- L'hub: la plancia da cui si gioca. La mappa è la città vista dall'alto
+     (media/photo/pagina di gioco/mappa_citta.jpg) tenuta sfocata come sfondo:
+     i cartelli dei luoghi non stanno più dentro alla foto, li disegna
+     js/game/hub.js sopra la mappa (punto 7), così la città riempie tutto lo
+     spazio fra le due colonne e non restano bande ai lati. Tutto il resto è
+     vivo e lo riempie sempre js/game/hub.js. -->
 <section class="screen" id="s-hub">
   <div class="palco" id="hb-palco">
     <div class="plancia" id="hb-plancia">
@@ -224,14 +225,14 @@
       </div>
 
       <!-- ---------- centro: la città ---------- -->
-      <!-- il titolo «La tua città» sta già dentro alla foto -->
       <!-- la colonna di mezzo: la città e, sotto, gli eventi di oggi -->
       <div class="pcolcentro">
-            <div class="pcard pmappa">
-        <div class="pfoto" id="hb-foto">
-          <div class="ppins" id="hb-pins"></div>
+        <div class="pcard pmappa">
+          <span class="pmaptit">La tua città</span>
+          <div class="pfoto" id="hb-foto">
+            <div class="ppins" id="hb-pins"></div>
+          </div>
         </div>
-      </div>
 
       <!-- ---------- centro basso: gli eventi di oggi ---------- -->
       <div class="pcard peventi">
@@ -654,13 +655,13 @@
 <script src="js/game/strada-crimine.js?v=13"></script>
 <script src="js/game/negozio.js?v=12"></script>
 <script src="js/game/uscita.js?v=12"></script>
-<script src="js/game/hub.js?v=12"></script>
+<script src="js/game/hub.js?v=13"></script>
 <script src="js/game/chat.js?v=12"></script>
 <script src="js/game/telefono.js?v=12"></script>
 
 <!-- Integrazione tempo/eventi/crime 2026-09-02 — ordine intenzionale -->
 <script src="js/game/tempo.js?v=8"></script>
-<script src="js/game/orari.js?v=8"></script>
+<script src="js/game/orari.js?v=9"></script>
 <script src="js/game/spostamenti.js?v=8"></script>
 <script src="js/game/interruzioni.js?v=8"></script>
 <!-- Eventi V2 prima di eventi-tempo: proprietario di skip e Notifiche. -->

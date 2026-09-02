@@ -12,7 +12,10 @@
 
   const PLACE_HOURS = Object.freeze({
     studio:    {open:"09:00", close:"02:00"},
+    stazione:  {allDay:true},
     pizzeria:  {open:"16:00", close:"02:00"},
+    piazza:    {open:"18:00", close:"02:00"},
+    edicola:   {open:"07:00", close:"13:00"},
     concerti:  {open:"20:00", close:"03:00"},
     beat:      {open:"13:00", close:"02:00"},
     vita:      {allDay:true},
@@ -29,7 +32,10 @@
     registra:"studio",
     mixa:"studio",
     live:"concerti",
-    palestra:"palestra"
+    palestra:"palestra",
+    /* punto 7: il freestyle davanti alla gente adesso ha un posto sulla
+       mappa — la piazza — e quindi anche un orario in cui si può fare */
+    free:"piazza"
   });
 
   /* I lavori non usano tutti un punto della mappa, ma hanno comunque un turno
@@ -54,7 +60,7 @@
     colpo:  {open:"01:30", close:"04:00"}
   });
 
-  const DIRECT_PLACE_ACTION = Object.freeze({concerti:"live", palestra:"palestra"});
+  const DIRECT_PLACE_ACTION = Object.freeze({concerti:"live", palestra:"palestra", piazza:"free"});
 
   function parseClock(text){
     const m = String(text || "").match(/^(\d{1,2}):(\d{2})$/);

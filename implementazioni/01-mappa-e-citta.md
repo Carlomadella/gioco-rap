@@ -439,3 +439,58 @@ sotto i 1180px di larghezza reale della finestra.
     riguardato a occhio da chi ha un monitor vero — ma il meccanismo è verificato: niente più nero
     piatto, e zero rischio sui punti cliccabili.
 
+---
+
+## 7 · I cartelli escono dalla foto: la mappa riempie davvero la colonna
+
+7. rimuovi la pagina che trovi in foto su media al nome "bozza_schermata_di_gioco" e trasferisci
+   tutte le info sulla mappa, puoi anche cambiarla e aggiungere punti basta che togli le barre
+   nere affianco alla mappa tra le 2 sidebar
+
+   **FATTO (02/09/2026)** — branch `task/07-mappa-senza-barre`.
+
+   Il punto 62 aveva coperto le bande, non tolte: restavano lì, riempite con la stessa foto
+   sfocata. La ragione per cui non si potevano togliere era una sola — i cartelli (Studio, La Sala,
+   Attività criminali…) erano **disegnati dentro** a `mappa_citta.jpg`, e le zone da toccare erano
+   rettangoli invisibili appoggiati sopra. Per non staccarsi dai cartelli la foto doveva restare
+   alle sue proporzioni esatte, 830×677, e quello che avanzava nella colonna era per forza banda.
+
+   Adesso i cartelli sono usciti dalla foto. Ogni luogo di `HUB_LUOGHI` (`js/game/hub.js`) porta il
+   suo nome, la sua icona, il suo colore, la riga che dice cosa ci si fa e la scritta del tasto, e
+   `renderHub()` lo disegna come una targhetta vera in HTML, col puntatore sopra, messa in
+   percentuale sulla mappa. Le percentuali sono rimaste **le stesse**: sono la geografia della
+   città e `js/game/spostamenti.js` le usa per calcolare quanto ci metti ad andare da un posto
+   all'altro, quindi non si toccano.
+
+   Con i cartelli fuori, la foto non deve più tenere le sue proporzioni: `.pfoto` è diventata
+   `inset: 0` dentro a `.pmappa` e riempie tutta la colonna fra le due sidebar. Niente banda nera,
+   niente banda sfocata, niente `aspect-ratio`. La città sotto è tenuta sfocata e scurita di
+   proposito: le vecchie targhette stampate dentro all'immagine sparirebbero comunque sotto ai
+   cartelli veri, ma sfocata la città resta città e non fa a botte con il testo che ci sta sopra.
+
+   **Le info della bozza sono passate sulla mappa.** `media/photo/pagina di gioco/schermata_di_gioco.png`
+   — la bozza della schermata di gioco — è stata rimossa: quello che diceva (nome del luogo, riga di
+   spiegazione, tasto «Entra», stato chiuso) adesso lo dice la mappa vera. Restano i tre concept
+   delle città (`_città_iniziale`, `_di_mezzo`, `_finale`), che sono un'altra cosa: sono il
+   riferimento per Milano e Los Angeles, che non esistono ancora.
+
+   **Tre punti nuovi**, tutti attaccati a roba che nel gioco c'era già ma non aveva un posto dove
+   andare:
+   - **Stazione** — le chiamate da fuori città (`js/game/trasferte.js`, punto 9) arrivavano solo
+     come notifica sul telefono; adesso hanno una porta sulla mappa. Sempre aperta.
+   - **Piazza** — il freestyle davanti alla gente era un'azione della settimana senza luogo. Ora è
+     un posto, con il suo orario (18:00–02:00) e la finestra del contest che `js/game/orari.js` già
+     conosceva.
+   - **Edicola** — le notizie della settimana stavano solo nel telefono. Aperta la mattina, 07:00–13:00.
+
+   E aggiungerne un quarto adesso vuol dire aggiungere una riga a `HUB_LUOGHI`, non ridisegnare una
+   foto.
+
+   Anche «scorri per esplorare» era disegnato dentro all'immagine, con due rettangoli invisibili
+   sopra alle frecce: adesso è una barra vera in fondo alla mappa, con due tasti veri.
+
+   Sul telefono (sotto i 900 px) la città tiene una misura sua, 720×560, e si sposta col dito come
+   una cartina: un cartello largo il 18% di uno schermo da 375 px sarebbe sessanta pixel, e un
+   cartello che non si legge non si tocca.
+
+   File toccati: `js/game/hub.js`, `js/game/orari.js`, `css/hub.css`, `index.html`.

@@ -7,9 +7,10 @@
    **Riempie lo schermo.** Prima era disegnata a 1536×1024 e rimpicciolita
    tutta insieme: su un monitor largo restavano due bande nere ai lati e su uno
    piccolo diventava illeggibile. Adesso è una griglia — le colonne di lato
-   tengono la loro misura, la città si prende quello che avanza — e la foto
-   della mappa mantiene le sue proporzioni, così le zone da toccare restano
-   incollate ai cartelli disegnati dentro. */
+   tengono la loro misura, la città si prende quello che avanza. E la mappa
+   riempie davvero la colonna di mezzo: i cartelli dei luoghi sono usciti dalla
+   foto e sono diventati HTML (punto 7), così la foto non deve più tenere le
+   sue proporzioni e non restano bande di nessun colore ai lati. */
 
 #s-hub {
   padding-top: 0;
@@ -514,106 +515,269 @@ body.in-hub .topnav {
 }
 
 /* ================= LA CITTÀ ================= */
-/* Il riquadro della mappa non si vede: quello che si vede è la foto. Sugli
-   schermi larghi, dove la foto (830×677) non può riempire tutta la colonna
-   senza deformarsi, prima restava il fondo scuro piatto — due bande nere,
-   punto 62. Deformare l'immagine o tagliare i cartelli non è "fatto ad arte":
-   quello che resta è riempire i lati con la stessa foto, sfocata e più scura,
-   come lo sfondo ambientale di uno schermo — non è più un vuoto, è la stessa
-   città che sfuma. La mappa vera, sopra, resta nitida e alla sua misura
-   esatta: le zone da toccare restano incollate ai cartelli come sempre. */
+/* Punto 7. Prima la foto della mappa portava dentro di sé i cartelli dei
+   luoghi: per non staccarli dalle zone da toccare doveva restare alle sue
+   proporzioni esatte (830×677), e su una colonna più larga avanzavano due
+   bande ai lati — prima nere, poi riempite con la stessa foto sfocata. Erano
+   sempre bande.
+
+   Adesso i cartelli sono HTML (js/game/hub.js) e la foto è soltanto la città
+   sotto: può quindi riempire tutto lo spazio fra le due colonne senza bande e
+   senza tagli. È tenuta sfocata e scura di proposito — le vecchie targhette
+   disegnate dentro all'immagine sparirebbero comunque sotto ai cartelli veri,
+   ma sfocata la città resta città e non fa a botte con il testo sopra. */
 .pmappa {
   position: relative;
   padding: 0;
   overflow: hidden;
-  display: grid;
-  place-items: center;
   background: #05070b;
   border: 0;
 }
-.pmappa::before {
-  content: "";
-  position: absolute;
-  inset: -40px;
-  z-index: 0;
-  background: url("../media/photo/pagina di gioco/mappa_citta.jpg") center/cover
-    no-repeat;
-  filter: blur(46px) brightness(0.38) saturate(1.15);
-  transform: scale(1.12);
-}
-/* La foto tiene le sue proporzioni (830×677) e prende tutto lo spazio che può:
-   è quello che fa restare le zone da toccare esattamente sui cartelli. */
 .pfoto {
-  position: relative;
-  z-index: 1;
-  aspect-ratio: 830/677;
-  height: 100%;
-  width: auto;
-  max-width: 100%;
+  position: absolute;
+  inset: 0;
   border-radius: 12px;
   overflow: hidden;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.07),
     0 18px 50px rgba(0, 0, 0, 0.5);
-  background: #0a0910 url("../media/photo/pagina di gioco/mappa_citta.jpg")
-    center/100% 100% no-repeat;
+  background: #0a0910;
+}
+/* la città: sfocata, un po' più grande del riquadro così la sfocatura non
+   scopre i bordi, e con sopra un velo scuro che tiene leggibili i cartelli */
+.pfoto::before {
+  content: "";
+  position: absolute;
+  inset: -28px;
+  background: url("../media/photo/pagina di gioco/mappa_citta.jpg") center/cover
+    no-repeat;
+  filter: blur(7px) brightness(0.52) saturate(1.2);
+}
+.pfoto::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      120% 90% at 50% 42%,
+      rgba(5, 7, 11, 0) 40%,
+      rgba(5, 7, 11, 0.72) 100%
+    ),
+    linear-gradient(180deg, rgba(5, 7, 11, 0.5), rgba(5, 7, 11, 0.12) 30%);
+}
+.pmaptit {
+  position: absolute;
+  left: 14px;
+  top: 11px;
+  z-index: 3;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #d6dae4;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+  pointer-events: none;
 }
 .ppins {
   position: absolute;
   inset: 0;
+  z-index: 2;
 }
+
+/* ---- il cartello di un luogo ----
+   Sta dove sta il luogo (le percentuali sono la geografia della città, le
+   stesse che js/game/spostamenti.js usa per le distanze). L'altezza è quella
+   del posto, ma se il testo chiede di più il cartello cresce invece di
+   tagliare. */
 .pspot {
   position: absolute;
   left: var(--x);
   top: var(--y);
   width: var(--w);
-  height: var(--h);
-  border-radius: 10px;
+  min-width: 128px;
+  height: auto;
+  min-height: var(--h);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+  padding: 8px 9px 8px;
+  border-radius: 11px;
+  background: linear-gradient(
+    180deg,
+    rgba(12, 15, 22, 0.9),
+    rgba(7, 9, 14, 0.92)
+  );
+  border: 1px solid color-mix(in srgb, var(--k) 42%, rgba(255, 255, 255, 0.12));
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(3px);
   transition:
-    background 0.15s,
-    box-shadow 0.15s,
-    transform 0.12s;
+    transform 0.12s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+/* il puntatore sopra al cartello, come sulle mappe */
+.pspin {
+  position: absolute;
+  left: 12px;
+  top: -11px;
+  width: 13px;
+  height: 17px;
+  background: var(--k);
+  clip-path: polygon(
+    50% 100%,
+    12% 52%,
+    6% 33%,
+    18% 10%,
+    50% 0,
+    82% 10%,
+    94% 33%,
+    88% 52%
+  );
+  box-shadow: 0 0 14px color-mix(in srgb, var(--k) 55%, transparent);
+}
+.pspt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  color: var(--k);
+}
+.pspt b {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 800;
+}
+.pspi {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  fill: var(--k);
+}
+.pspd {
+  font-size: 10.5px;
+  line-height: 1.25;
+  color: #b9c0cf;
+  overflow: hidden;
+}
+.pspgo {
+  margin-top: auto;
+  align-self: flex-start;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #0b0d12;
+  background: var(--k);
 }
 .pspot:hover {
-  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--k) 85%, transparent);
   box-shadow:
-    inset 0 0 0 2px rgba(192, 132, 252, 0.9),
-    0 0 26px rgba(168, 85, 247, 0.4);
+    0 16px 34px rgba(0, 0, 0, 0.6),
+    0 0 26px color-mix(in srgb, var(--k) 34%, transparent);
 }
 .pspot:focus-visible {
-  box-shadow: inset 0 0 0 2px var(--acid);
+  border-color: var(--acid);
+  box-shadow: 0 0 0 2px var(--acid);
 }
 .pspot:active {
-  transform: scale(0.985);
+  transform: translateY(0) scale(0.985);
 }
-.pspot.chiuso:hover {
-  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.45);
+/* un luogo chiuso non è spento: si vede cosa sarebbe, ma non promette niente */
+.pspot.chiuso {
+  border-color: rgba(255, 255, 255, 0.14);
+  opacity: 0.72;
+}
+.pspot.chiuso .pspt,
+.pspot.chiuso .pspi {
+  color: #aab1c0;
+  fill: #aab1c0;
+}
+.pspot.chiuso .pspin {
+  background: #8b93a3;
+  box-shadow: none;
+}
+.pspot.chiuso .pspgo {
+  color: #cdd3df;
+  background: rgba(255, 255, 255, 0.12);
 }
 /* il giro guidato dei luoghi, con le frecce «scorri per esplorare» */
 .pspot.qui {
+  z-index: 4;
+  border-color: var(--k);
   box-shadow:
-    inset 0 0 0 2px rgba(192, 132, 252, 0.95),
-    0 0 30px rgba(168, 85, 247, 0.5);
+    0 16px 34px rgba(0, 0, 0, 0.6),
+    0 0 0 2px color-mix(in srgb, var(--k) 70%, transparent),
+    0 0 34px color-mix(in srgb, var(--k) 45%, transparent);
   animation: pspulse 1.6s ease-in-out infinite;
 }
 @keyframes pspulse {
   50% {
     box-shadow:
-      inset 0 0 0 2px rgba(192, 132, 252, 0.5),
-      0 0 12px rgba(168, 85, 247, 0.2);
+      0 16px 34px rgba(0, 0, 0, 0.6),
+      0 0 0 2px color-mix(in srgb, var(--k) 35%, transparent),
+      0 0 14px color-mix(in srgb, var(--k) 18%, transparent);
   }
 }
-.pfrec {
+/* il pallino «sei qui» di js/game/spostamenti.js: al centro finirebbe in
+   mezzo al testo del cartello, qui sta nell'angolo */
+.ppins .pspot.travel-current::before {
+  left: auto;
+  right: 7px;
+  top: 7px;
+  transform: none;
+}
+
+/* ---- «scorri per esplorare» ---- */
+/* era disegnata dentro alla foto, con due rettangoli invisibili sopra */
+.pguida {
   position: absolute;
-  left: var(--x);
-  top: var(--y);
-  width: var(--w);
-  height: var(--h);
-  border-radius: 8px;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border-radius: 999px;
+  background: rgba(7, 9, 14, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(6px);
+}
+.pguida span {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #aab1c0;
+  white-space: nowrap;
+}
+.pfrec {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  border-radius: 999px;
+  font-size: 16px;
+  line-height: 1;
+  color: #d6dae4;
+  background: rgba(255, 255, 255, 0.06);
   transition: background 0.15s;
 }
 .pfrec:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.16);
 }
 
 /* ================= EVENTI DI OGGI ================= */
@@ -925,30 +1089,22 @@ body.in-hub .topnav {
   .pcolcentro {
     grid-template-rows: auto auto;
   }
-  /* La mappa non scende più sotto la soglia in cui si legge. I cartelli —
-     Studio, Beat Maker, Attività criminali — sono disegnati *dentro* alla
-     foto, quindi rimpiccioliscono con lei: a 375 px di schermo diventavano
-     quattro pixel di testo, e una città che non si legge non si gioca.
-     Sotto i 900 la foto tiene almeno 620 px e la città si sposta col dito,
-     come una cartina vera. Dove lo schermo è più largo di 620 non cambia
+  /* La mappa non scende più sotto la soglia in cui si legge. I cartelli sono
+     larghi quanto il posto che indicano: a 375 px di schermo un cartello da
+     18% sarebbe sessanta pixel, e un cartello che non si legge non si tocca.
+     Sotto i 900 la città tiene una misura sua — 720×560 — e si sposta col
+     dito, come una cartina vera. Dove lo schermo è più largo non cambia
      niente: `max()` la lascia riempire la colonna. */
   .pmappa {
-    overflow-x: auto;
-    place-items: start;
-    overscroll-behavior-x: contain;
-  }
-  /* la foto adesso è più larga del riquadro e lo copre tutta: lo sfondo
-     sfocato del punto 62 non si vedrebbe comunque, e con `inset:-40px` dentro
-     a un riquadro che scorre si porterebbe dietro quaranta pixel di vuoto da
-     scorrere. Via — è anche una sfocatura da 46 px in meno da disegnare sul
-     telefono. */
-  .pmappa::before {
-    display: none;
+    overflow: auto;
+    overscroll-behavior: contain;
   }
   .pfoto {
-    width: max(100%, 620px);
-    height: auto;
-    max-width: none;
+    position: relative;
+    inset: auto;
+    width: max(100%, 720px);
+    height: max(100%, 560px);
+    min-height: 560px;
   }
   .psx {
     overflow: visible;

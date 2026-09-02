@@ -71,6 +71,20 @@ CARLO:
 
 7. rimuovi la pagina che trovi in foto su media al nome "bozza_schermata_di_gioco" e trasferisci tutte le info sulla mappa, puoi anche cambiarla e aggiungere punti basta che togli le barre nere affianco alla mappa tra le 2 sidebar
 
+   **FATTO (02/09/2026)** — branch `task/07-mappa-senza-barre`. Le bande c'erano perché i
+   cartelli dei luoghi erano *disegnati dentro* a `mappa_citta.jpg`: per non staccarsi da loro
+   la foto doveva restare a 830×677, e il resto della colonna era per forza banda (il punto 62
+   le aveva riempite di foto sfocata, non tolte). Adesso i cartelli sono HTML —
+   nome, icona, riga di spiegazione, tasto — disegnati da `renderHub()` sopra alla mappa, con le
+   stesse percentuali di prima (servono anche a `spostamenti.js` per le distanze). La foto non
+   deve più tenere le proporzioni e riempie tutta la colonna fra le due sidebar: niente banda,
+   né nera né sfocata. La bozza `media/photo/pagina di gioco/schermata_di_gioco.png` è stata
+   rimossa e quello che diceva lo dice la mappa. Tre punti nuovi, su roba che c'era già ma non
+   aveva un posto: **Stazione** (le trasferte del punto 9), **Piazza** (il freestyle) e
+   **Edicola** (le notizie della settimana). Anche «scorri per esplorare» è diventato una barra
+   vera. Il racconto per esteso sta in
+   [`01-mappa-e-citta.md`](01-mappa-e-citta.md#7--i-cartelli-escono-dalla-foto-la-mappa-riempie-davvero-la-colonna).
+
 8. creami un README delle API routes e di tutte le chiamate, ecc.
 
 9. aggiungi al sistema di gioco eventi che possono accadure durante la giornata, e se esistono già aggiungi la possibilità di venir chiamato in altre città d'italia per un concerto o una pubblicità o altro, che creano di conseguenza altri eventi come ad esempio conoscere altre persone tipo producer, fonici o videomaker
