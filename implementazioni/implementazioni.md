@@ -73,6 +73,16 @@ CARLO:
 
 8. creami un README delle API routes e di tutte le chiamate, ecc.
 
+   **FATTO (02/09/2026)** — branch `task/08-readme-api-routes`, file
+   [`backend/README-API.md`](../backend/README-API.md). Dentro c'è tutta l'API HTTP:
+   avvio, header (`x-sessione`, `x-chiave`, `x-admin`), limiti, CORS, formato degli
+   errori, i modelli che tornano più spesso, l'indice e il dettaglio di tutte e
+   trentaquattro le route con richiesta ed esempio di risposta, il bridge
+   `ONLINE` del frontend con la mappatura chiamata per chiamata, quali chiamate
+   sono davvero collegate all'interfaccia e quali no, i flussi completi (primo
+   ingresso, chiusura settimana, salvataggio cloud con conflitto, chiamata admin),
+   come si prova con Postman, le variabili d'ambiente e gli otto limiti noti.
+
 9. aggiungi al sistema di gioco eventi che possono accadure durante la giornata, e se esistono già aggiungi la possibilità di venir chiamato in altre città d'italia per un concerto o una pubblicità o altro, che creano di conseguenza altri eventi come ad esempio conoscere altre persone tipo producer, fonici o videomaker
 
    **FATTO (02/09/2026)** — le trasferte fuori città, in `frontend/js/game/trasferte.js`
