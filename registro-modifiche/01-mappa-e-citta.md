@@ -6,6 +6,23 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:e415c9a -->
+## 03/09/26, 01:36 — fix(mappa): cache-busting sulla foto della città (punto 6)
+
+**Tipo:** Commit diretto su main  
+**Autore:** Sadyco La Fame (sadycolafame@192.168.1.53)  
+**Commit:** `e415c9a`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/hub.css`
+- **Modificato:** `frontend/index.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- commit:06de3fa -->
 ## 03/09/26, 00:00 — feat: integra meteo dinamico e widget tempo
 

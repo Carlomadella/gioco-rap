@@ -6,6 +6,22 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:a3e0c61 -->
+## 03/09/26, 01:52 — fix: uniforma gerarchia e arbitraggio eventi
+
+**Tipo:** Commit diretto su main  
+**Autore:** Mycol (mycolbraga@gmail.com)  
+**Commit:** `a3e0c61`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/eventi-tempo.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:06de3fa -->
 ## 03/09/26, 00:00 — feat: integra meteo dinamico e widget tempo
 

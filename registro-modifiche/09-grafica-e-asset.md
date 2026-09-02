@@ -6,6 +6,22 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:e415c9a -->
+## 03/09/26, 01:36 — fix(mappa): cache-busting sulla foto della città (punto 6)
+
+**Tipo:** Commit diretto su main  
+**Autore:** Sadyco La Fame (sadycolafame@192.168.1.53)  
+**Commit:** `e415c9a`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/hub.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:7c5c331 -->
 ## 02/09/26, 18:19 — Merge branch 'task/19-discografia'
 
