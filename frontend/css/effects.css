@@ -6,7 +6,12 @@
   30%{transform:translate(-50%,0) scale(1);opacity:1}
   82%{transform:translate(-50%,0) scale(1);opacity:1}
   100%{transform:translate(-50%,-16px) scale(.98);opacity:0}}
-.toast{position:fixed;left:50%;bottom:104px;z-index:70;pointer-events:none;
+/* Punto 20. Il toast stava a 70, sotto a tutti gli overlay: La Sala e la
+   Strada sono a 93, la piazza a 92, il foglio a 90, il rapporto a 80. Ogni
+   conferma partita da dentro a uno di quei posti finiva dietro al fondale e
+   non si vedeva: si premeva un tasto e sembrava non succedesse niente.
+   Adesso sta sopra a tutto — non da' fastidio a nessuno, e' `pointer-events:none`. */
+.toast{position:fixed;left:50%;bottom:104px;z-index:130;pointer-events:none;
   display:flex;align-items:center;gap:13px;padding:14px 20px 14px 14px;border-radius:18px;
   background:rgba(23,23,28,.97);box-shadow:0 18px 50px rgba(0,0,0,.6);
   animation:toastIn 2.6s cubic-bezier(.2,.8,.3,1) forwards;max-width:min(92vw,460px)}

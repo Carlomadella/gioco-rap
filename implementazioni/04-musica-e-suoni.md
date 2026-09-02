@@ -114,3 +114,39 @@ cliccando sopra si ferma, come dice il codice.
    puliti.
 
 ---
+
+---
+
+## 20 e 22 · «Fatti sentire un beat» non faceva niente, e i beat non si vedevano
+
+20. se clicco sull'opzione di conversazione "fatti sentire un beat" non fa niente
+
+22. non si riescono a vedere i beat
+
+    **FATTO (02/09/2026)** — branch `task/20-22-beat-si-vedono`. Sono lo stesso problema visto da
+    due lati, e la causa era una sola.
+
+    **La causa.** Il tasto funzionava eccome: creava il beat, lo metteva nel mercato, scriveva nel
+    diario e faceva partire la conferma a schermo. Solo che la conferma — il `.toast` di
+    `css/effects.css` — stava a `z-index: 70`, e La Sala sta a `93`. La Strada pure, la piazza a
+    `92`, il foglio di scrittura a `90`, il rapporto di fine settimana a `80`. **Ogni conferma
+    partita da dentro a uno di quei posti finiva dietro al fondale e non si vedeva.** Si premeva il
+    tasto e sembrava non succedesse niente. Il beat intanto era finito nel catalogo, che però è
+    un'altra schermata: da La Sala non si vedeva nemmeno quello.
+
+    Verificato nel browser vero, non a occhio: aperta la pagina in Chrome via CDP, cliccato il
+    tasto e letto lo stato del DOM — `toast z=70`, `posto z=93`. Adesso il toast sta a `130`,
+    sopra a tutto, e non dà fastidio a nessuno perché è `pointer-events: none`.
+
+    **Il beat resta sul tavolo.** Sistemata la conferma restava il fatto che il beat spariva in
+    un'altra schermata. Adesso il beat che il beatmaker ti fa sentire resta segnato sulla persona
+    (`p.beatOff`) finché sta nel mercato, e nella sua scheda compare per davvero: copertina del suo
+    genere, nome, qualità, bpm, il tasto **▶** per ascoltarlo, il prezzo per prenderlo e la **✕**
+    per lasciarlo lì. Comprarlo da qui è comprarlo per davvero — esce dal mercato ed entra nella
+    tua cartella — e prenderglielo gli fa piacere: un punto di rapporto.
+
+    **E non se ne fa sentire un altro finché quello è ancora lì.** Prima si poteva premere il tasto
+    all'infinito e riempire il catalogo di beat gratis. Adesso finché ce n'è uno sul tavolo il
+    tasto lo dice e resta spento: ascolti, prendi o lasci, e poi se ne parla.
+
+    File toccati: `js/game/posto.js`, `css/posto.css`, `css/effects.css`, `index.html`.
