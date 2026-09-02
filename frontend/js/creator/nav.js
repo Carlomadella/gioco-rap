@@ -257,7 +257,10 @@ $("m-play").onclick = () => {
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-go]");
   if(!b) return;
-  const g = statoPartita();
+  /* si chiama partita(), non statoPartita(): con il nome sbagliato questo
+     gestore esplodeva alla prima riga e **nessuna** voce del menu con
+     `data-go` faceva niente (artista, regole, classifiche, studio). */
+  const g = partita();
   const viva = A.name.trim() && carrieraIniziata(g);
   if(b.dataset.go === "gioca") $("m-play").click();
   else if(b.dataset.go === "profile") goto("profile");
@@ -272,6 +275,12 @@ document.addEventListener("click", e => {
   else if(b.dataset.go === "carriera"){
     if(viva) $("m-corso").scrollIntoView({behavior:"smooth", block:"start"});
     else landDillo(A.name.trim() ? "La carriera non è ancora cominciata" : "Prima crea il tuo artista");
+  }
+  /* punto 21: registrazione, entrata e uscita. Stanno nel pannello delle
+     impostazioni, nella sezione Account: da qui ci si entra dritti. */
+  else if(b.dataset.go === "account"){
+    if(typeof IMPOSTAZIONI === "function") IMPOSTAZIONI("account");
+    else landDillo("L'account si apre dalle impostazioni");
   }
   else if(b.dataset.go === "studio"){
     landDillo("Anni di Fame è di La Fame Studio · 2026");

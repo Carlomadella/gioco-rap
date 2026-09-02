@@ -208,3 +208,57 @@ generato, committato così si importa senza far girare niente), `prova.js` (il g
 `npm run prova` resta a 133 controlli, verdi.
 
 ---
+
+---
+
+## 21 · Registrazione, entrata e uscita
+
+21. fare pagina di registrazione/login/logout
+
+    **FATTO (02/09/2026)** — branch `task/21-account-login-logout`.
+
+    Il ponte con il server c'era già tutto (`js/net/online.js`:
+    `registraConMail`, `entra`, `esci`, `io`, `cancellaAccount`) e le rotte del backend pure
+    (`POST /api/account`, `POST /api/sessione`, `DELETE /api/sessione`, `GET /api/io`,
+    `DELETE /api/account`). Mancava solo il posto da cui usarle: fino a ieri l'unico modo di
+    registrarsi era aprire la console del browser.
+
+    Adesso c'è la sezione **Account** nel pannello delle impostazioni, con la sua voce **07** nel
+    menu principale che ci entra dritta. Quattro stati, e ognuno dice la verità:
+
+    - **Il server non risponde** — non è un errore rosso, è un fatto. La regola del ponte non
+      cambia: se il server non c'è il gioco non se ne accorge. La sezione lo dice, offre «Riprova»
+      e «Cambia server», e tutto il resto continua a funzionare offline come sempre.
+    - **Fuori** — due linguette, *Entra* e *Registrati*. Mail e password, e i controlli fatti
+      prima di disturbare il server: password sotto gli otto caratteri, le due password che non
+      coincidono, i campi vuoti.
+    - **Dentro** — chi sei, con che mail, quanti artisti hai, quante carriere hai in cloud, e il
+      tasto per **uscire**. Uscire chiude la sessione sul server e cancella il token da qui: la
+      carriera su questo dispositivo non si muove, e lo dice.
+    - **Cancella l'account** — quello che Apple e Google pretendono dentro al gioco. Si chiede due
+      volte sul bottone stesso, come le altre cose che cancellano.
+
+    Gli errori del server non arrivano in faccia come codici: `segreto-troppo-corto`,
+    `email-gia-usata`, `non-torna`, `sessione-scaduta`, `troppe-richieste` sono tradotti in
+    italiano e in inglese, come tutto il resto del pannello.
+
+    **Una nota onesta è scritta nel pannello**, non nascosta qui: registrandosi con la mail si crea
+    un account **nuovo e vuoto**. L'artista e le carriere già in cloud restano attaccati
+    all'account ospite che il gioco si era preso da solo al primo giro (è il limite 3 del
+    `README-API`). La carriera su questo dispositivo — quella che stai giocando — non si tocca.
+
+    **Provato nel browser vero**, non a occhio, contro il server vivo: con il server su e nessuna
+    sessione compare la vista d'ingresso; con credenziali sbagliate il server risponde davvero
+    `non-torna` e a schermo si legge «Mail o password sbagliate»; con il server irraggiungibile la
+    sezione passa allo stato staccato e non rompe niente. Registrazione e uscita **non** sono state
+    provate fino in fondo di proposito: il server ha dentro dati veri, e non ci vado a scrivere
+    account di prova.
+
+    **Un bug preso per strada.** La voce nuova del menu non funzionava, e non per colpa sua:
+    `js/creator/nav.js` chiamava `statoPartita()`, che non esiste — si chiama `partita()`. Era la
+    prima riga del gestore dei `data-go`, quindi esplodeva subito e **nessuna** voce del menu con
+    `data-go` faceva niente: «Il tuo artista», «Come si gioca», «Classifiche», «La Fame Studio».
+    Funzionavano solo «Inizia la carriera» e «Impostazioni», che hanno un `onclick` loro.
+
+    File toccati: `js/impostazioni-ui.js`, `js/creator/nav.js`, `css/impostazioni.css`,
+    `index.html`.

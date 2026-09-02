@@ -150,6 +150,17 @@ NETWORK 64
 
 21. fare pagina di registrazione/login/logout
 
+   **FATTO (02/09/2026)** — branch `task/21-account-login-logout`. Il ponte col server c'era
+   già tutto (`online.js`) e le rotte pure: mancava il posto da cui usarle. Adesso c'è la
+   sezione **Account** nelle impostazioni, con la voce **07** nel menu che ci entra dritta:
+   *Entra*, *Registrati*, *Esci* e *Cancella l'account* (due tocchi, come le altre cose che
+   cancellano). Quattro stati che dicono la verità, server irraggiungibile compreso — e lì il
+   gioco continua offline come sempre. Gli errori del server sono tradotti a parole, in
+   italiano e in inglese. Per strada è saltato fuori un bug vero: `nav.js` chiamava
+   `statoPartita()` invece di `partita()`, quindi **nessuna** voce del menu con `data-go`
+   funzionava (artista, regole, classifiche, studio). Per esteso in
+   [`07-multiplayer-e-backend.md`](07-multiplayer-e-backend.md#21--registrazione-entrata-e-uscita).
+
 22. non si riescono a vedere i beat
 
 /_ NUOVE MODALITA' _/
