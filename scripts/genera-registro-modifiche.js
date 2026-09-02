@@ -15,47 +15,47 @@ const registroDir = path.join(root, "registro-modifiche");
 const categorie = [
     {
         file: "01-mappa-e-citta.md",
-        titolo: "01 — Mappa e città",
+        titolo: "01 â€” Mappa e cittÃ ",
         match: p => /(mappa|map|citta|city|meteo|spostament|trasfert|viagg|quartier|location)/i.test(p)
     },
     {
         file: "02-interfaccia-e-telefono.md",
-        titolo: "02 — Interfaccia e telefono",
+        titolo: "02 â€” Interfaccia e telefono",
         match: p => /(telefono|phone|traphone|actionbar|hud|interfaccia|schermata|menu|modal|\/ui\.|ui\.js)/i.test(p)
     },
     {
         file: "03-artista-e-avatar.md",
-        titolo: "03 — Artista e avatar",
+        titolo: "03 â€” Artista e avatar",
         match: p => /(avatar|creator|character.?creator|artista|capelli|hair|outfit|vestiti|aspetto|profilo.?artista)/i.test(p)
     },
     {
         file: "04-musica-e-suoni.md",
-        titolo: "04 — Musica e suoni",
+        titolo: "04 â€” Musica e suoni",
         match: p => /(musica|music|audio|sound|sfx|beat|brano|track|studio.?musicale|recording)/i.test(p)
     },
     {
         file: "05-carriera-e-tempo.md",
-        titolo: "05 — Carriera e tempo",
+        titolo: "05 â€” Carriera e tempo",
         match: p => /(tempo|time|carriera|career|lavoro|job|lifestyle|calendario|energia|fame|hardening|bilanciamento)/i.test(p)
     },
     {
         file: "06-mondo-e-personaggi.md",
-        titolo: "06 — Mondo e personaggi",
+        titolo: "06 â€” Mondo e personaggi",
         match: p => /(mondo|npc|evento|eventi|strada|crimine|criminal|posto|negozio|personaggi|polizia)/i.test(p)
     },
     {
         file: "07-multiplayer-e-backend.md",
-        titolo: "07 — Multiplayer e backend",
+        titolo: "07 â€” Multiplayer e backend",
         match: p => /(^backend\/|multiplayer|server|socket|database|\/api\/|api\.|websocket)/i.test(p)
     },
     {
         file: "08-uscita-sugli-store.md",
-        titolo: "08 — Uscita sugli store",
+        titolo: "08 â€” Uscita sugli store",
         match: p => /(steam|store|release|deploy|electron|manifest|installer|distribution|pubblicazione)/i.test(p)
     },
     {
         file: "09-grafica-e-asset.md",
-        titolo: "09 — Grafica e asset",
+        titolo: "09 â€” Grafica e asset",
         match: p => /(\/css\/|\/media\/|\/assets\/|grafica|texture|font|\.png$|\.jpg$|\.jpeg$|\.webp$|\.svg$|\.gif$)/i.test(p)
     }
 ];
@@ -100,6 +100,8 @@ function ignorare(file) {
     if (p.startsWith("implementazioni/")) return true;
     if (p.startsWith("brainstorming-miglioramenti-ai/")) return true;
     if (p.startsWith(".githooks/")) return true;
+    if (p.startsWith(".github/")) return true;
+    if (p.startsWith("scripts/")) return true;
 
     if (p === "scripts/genera-registro-modifiche.js") return true;
 
@@ -169,14 +171,14 @@ function inserisciVoce(fileCategoria, titoloCategoria, voce, marker) {
 inizializza();
 
 if (process.argv.includes("--init")) {
-    console.log("✓ File del registro inizializzati.");
+    console.log("âœ“ File del registro inizializzati.");
     process.exit(0);
 }
 
 const branchCorrente = git(["branch", "--show-current"]);
 
 if (branchCorrente !== "main") {
-    console.log("Registro non aggiornato: il merge non è avvenuto su main.");
+    console.log("Registro non aggiornato: il merge non Ã¨ avvenuto su main.");
     process.exit(0);
 }
 
@@ -184,7 +186,7 @@ const rigaParents = git(["rev-list", "--parents", "-n", "1", "HEAD"]);
 const parents = rigaParents.split(/\s+/);
 
 if (parents.length < 3) {
-    console.log("Registro non aggiornato: HEAD non è un merge commit.");
+    console.log("Registro non aggiornato: HEAD non Ã¨ un merge commit.");
     process.exit(0);
 }
 
@@ -231,7 +233,7 @@ let modifiche = diffRaw
     .filter(x => !ignorare(x.file));
 
 if (modifiche.length === 0) {
-    console.log("✓ Merge composto solo da documentazione o file ignorati.");
+    console.log("âœ“ Merge composto solo da documentazione o file ignorati.");
     process.exit(0);
 }
 
@@ -252,7 +254,7 @@ const commits = commitRaw
         .map(riga => {
             const [hash, autore, ...resto] = riga.split("\t");
 
-            return `- \`${hash}\` — ${resto.join("\t")} — **${autore}**`;
+            return `- \`${hash}\` â€” ${resto.join("\t")} â€” **${autore}**`;
         })
         .join("\n")
     : "- Nessun commit individuale rilevato";
@@ -269,7 +271,7 @@ function descrizioneFile(item) {
     }
 
     if (item.stato.startsWith("R")) {
-        return `- **Rinominato:** \`${item.vecchioFile}\` → \`${item.file}\``;
+        return `- **Rinominato:** \`${item.vecchioFile}\` â†’ \`${item.file}\``;
     }
 
     return `- **Modificato:** \`${item.file}\``;
@@ -302,12 +304,12 @@ for (const [fileCategoria, files] of assegnazioni.entries()) {
         .join("\n");
 
     const voce = `${marker}
-## ${data} — ${branchSorgente} → main
+## ${data} â€” ${branchSorgente} â†’ main
 
 **Merge effettuato da:** ${committer} (${email})  
 **Merge commit:** \`${mergeHash}\`
 
-### Cosa è entrato
+### Cosa Ã¨ entrato
 
 ${commits}
 
@@ -329,8 +331,8 @@ ${listaFile}
 }
 
 console.log("");
-console.log("✓ REGISTRO MODIFICHE AGGIORNATO");
-console.log(`✓ Merge: ${branchSorgente} → main`);
-console.log(`✓ Eseguito da: ${committer}`);
-console.log(`✓ Categorie aggiornate: ${assegnazioni.size}`);
+console.log("âœ“ REGISTRO MODIFICHE AGGIORNATO");
+console.log(`âœ“ Merge: ${branchSorgente} â†’ main`);
+console.log(`âœ“ Eseguito da: ${committer}`);
+console.log(`âœ“ Categorie aggiornate: ${assegnazioni.size}`);
 console.log("");

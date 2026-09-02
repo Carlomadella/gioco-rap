@@ -17,13 +17,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: main
 
       - name: Configura Git
         run: |
           git config user.name "Anni di Fame Bot"
           git config user.email "actions@github.com"
 
-      - name: Controlla se è un merge
+      - name: Controlla se Ã¨ un merge
         id: mergecheck
         shell: bash
         run: |
