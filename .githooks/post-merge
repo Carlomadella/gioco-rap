@@ -1,0 +1,36 @@
+#!/bin/sh
+
+BRANCH="$(git branch --show-current)"
+
+if [ "$BRANCH" != "main" ]; then
+    exit 0
+fi
+
+set -- $(git rev-list --parents -n 1 HEAD)
+
+if [ "$#" -lt 3 ]; then
+    exit 0
+fi
+
+echo ""
+echo "=========================================="
+echo " MERGE RILEVATO SU MAIN"
+echo " Aggiornamento registro modifiche..."
+echo "=========================================="
+echo ""
+
+node scripts/genera-registro-modifiche.js
+
+if [ $? -ne 0 ]; then
+    echo "ERRORE: impossibile aggiornare il registro."
+    exit 1
+fi
+
+if ! git diff --quiet -- registro-modifiche; then
+    git add registro-modifiche
+    git commit -m "docs: aggiorna registro modifiche"
+
+    echo ""
+    echo "✓ Registro committato automaticamente."
+    echo ""
+fi
