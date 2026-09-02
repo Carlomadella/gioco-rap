@@ -360,6 +360,9 @@
   function planHigh(detail){
     detail=detail||{};
     if(pending()) return null;
+    try{
+      if(window.ADF_EVENTI && ADF_EVENTI.activeCatalog) return null;
+    }catch(_){}
     const from=Number(detail.from), to=Number(detail.to);
     if(!Number.isFinite(from)||!Number.isFinite(to)||to-from<=15) return null;
     const step=(GAME_TIME && Number(GAME_TIME.SLOT))||15;
@@ -386,6 +389,9 @@
   function evaluate(detail){
     detail=detail||{};
     if(AUTO_GUARD || pending() || detail.suppressRandomEvents) return null;
+    try{
+      if(window.ADF_EVENTI && ADF_EVENTI.activeCatalog) return null;
+    }catch(_){}
     const ctx = context(detail);
     if(ctx.minutes <= 0) return null;
     /* alto → medio → basso, salvo quando l'alto e' gia' stato campionato

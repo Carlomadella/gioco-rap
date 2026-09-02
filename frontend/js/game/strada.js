@@ -315,13 +315,41 @@ function provaIncontro(){
   let r = Math.random() * tot, scelto = eleggibili[0];
   for(const i of eleggibili){ if(r < i.peso){ scelto = i; break; } r -= i.peso; }
   const scena = scelto.crea();
+  const liv = scelto.liv || "medio";
+
   /* durante un salto: basso/medio si risolvono da soli, alto ferma il
      salto sul serio (SALTO_STOP, sim.js legge questa variabile) */
   if(SALTO){
-    const liv = scelto.liv || "medio";
     if(liv !== "alto"){ risolviIncontroAuto(scena); return; }
     SALTO_STOP = {k:"Per strada", t:scena.t, d:scena.d, annulla(){}, opts:scena.opts};
     return;
   }
+
+  /* Anche nel gioco normale LOW/MEDIUM non fermano il giocatore. */
+  if(liv !== "alto"){
+    risolviIncontroAuto(scena);
+    try{
+      if(window.ADF_EVENTI && typeof ADF_EVENTI.addNotification==="function"){
+        ADF_EVENTI.addNotification({
+          eventId:"strada:"+scelto.id,
+          tier:liv,
+          title:scena.t,
+          result:scena.d,
+          source:"legacy-street",
+          read:false
+        });
+      }
+    }catch(_){}
+    try{
+      window.dispatchEvent(new CustomEvent("game-event:resolved",{detail:{
+        id:"strada:"+scelto.id,
+        level:liv,
+        automatic:true,
+        legacy:true
+      }}));
+    }catch(_){}
+    return;
+  }
+
   mostraIncontro(scena);
 }

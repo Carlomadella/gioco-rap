@@ -20,6 +20,7 @@ const ADF = {
   db:[],
   byId:new Map(),
   skipRunning:false,
+  activeCatalog:null,
   hookTimer:null,
   version:"1.2.13-repo",
   commit:"531edf193439eb2fd67812fc4f2377b6550b2f3e"
@@ -1887,6 +1888,7 @@ function eventObject(e, resume, meta){
       n:c.label,d:c.hint||"",
       run(){
         const r=execute(e,c,false);
+        ADF.activeCatalog=null;
         if(meta.fromSkip){
           adfAddSkipNotification(e,r,{read:true,interrupted:true});
         }
@@ -1912,6 +1914,15 @@ function showCatalog(e,resume,meta){
   if(!e) return;
   meta=meta||{};
 
+  /* Se il motore a minuti ha già un HIGH pendente, non apriamo una seconda
+     decisione sopra la prima. */
+  try{
+    if(window.GAME_EVENTS && GAME_EVENTS.blocked && GAME_EVENTS.blocked()){
+      setTimeout(()=>showCatalog(e,resume,meta),180);
+      return;
+    }
+  }catch(_){}
+
   /* v1.2.13
      Gli eventi generati dagli skip appartengono ESCLUSIVAMENTE al Centro
      Notifiche. Non devono creare una copia in Messaggi/Chat o LaFamegram,
@@ -1924,6 +1935,22 @@ function showCatalog(e,resume,meta){
     mirrorDelivery(e);
   }
 
+  /* Gerarchia globale:
+     LOW/MEDIUM = automatici, mai bloccanti.
+     HIGH       = scelta obbligatoria. */
+  if(e.tier!=="high"){
+    const r=meta.fromSkip ? autoResolve(e) : autoResolveNormal(e);
+    if(r && e.social && e.social.eligible &&
+       adfSocialShouldPublish(e,r.choice,r,meta.socialPost||null)){
+      const p=adfSocialPostFromEvent(e,r.choice,r);
+      p.socialMeta=p.socialMeta||{};
+      p.socialMeta.fromSkip=!!meta.fromSkip;
+      adfSocialStorePost(p);
+    }
+    return r;
+  }
+
+  ADF.activeCatalog=e.id;
   showEvent(eventObject(e,resume,meta));
 }
 function autoResolve(e){
@@ -1936,7 +1963,33 @@ function autoResolve(e){
   /* v1.2.13: niente più una riga di Diario per ogni evento dello skip.
      La cronologia completa vive nell'app Notifiche del telefono. */
   adfAddSkipNotification(e,r,{read:false,interrupted:false});
-  return true;
+  return r;
+}
+function autoResolveNormal(e){
+  if(!e) return false;
+  const cs=e.choices||[];
+  if(!cs.length) return false;
+  const idx=cs.length>=3?1:Math.min(1,cs.length-1);
+  const r=execute(e,cs[idx],true);
+
+  try{
+    if(typeof ADF.addNotification==="function"){
+      ADF.addNotification({
+        eventId:e.id,
+        tier:e.tier,
+        title:e.title,
+        result:r&&r.t?r.t:e.title,
+        source:"catalog-auto",
+        read:false
+      });
+    }
+  }catch(_){}
+
+  try{
+    save();
+    if(typeof refreshHub==="function") refreshHub();
+  }catch(_){}
+  return r;
 }
 
 /* -------------------- hook repo reali -------------------- */
@@ -2155,11 +2208,20 @@ saltaGiorni=function(n){
           const roll=Math.random(), base=Number(e.social.chance||0);
           if(roll<base) socialCandidate={roll:roll,base:base};
         }
-        if(socialCandidate){
-          adfStop=e; adfSocialStop=socialCandidate; break;
+        if(e.tier==="high"){
+          adfStop=e;
+          adfSocialStop=socialCandidate;
+          break;
         }
-        if(e.tier==="high"){ adfStop=e; break; }
-        autoResolve(e);
+
+        const autoResult=autoResolve(e);
+        if(socialCandidate && autoResult &&
+           adfSocialShouldPublish(e,autoResult.choice,autoResult,socialCandidate)){
+          const p=adfSocialPostFromEvent(e,autoResult.choice,autoResult);
+          p.socialMeta=p.socialMeta||{};
+          p.socialMeta.fromSkip=true;
+          adfSocialStorePost(p);
+        }
       }
     }
   }
