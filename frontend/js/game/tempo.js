@@ -30,7 +30,8 @@
     live:180,
     cercalavoro:90,
     stacca:180,
-    palestra:60
+    palestra:60,
+    ricicla:45
   });
 
   const DURATE_LAVORO = Object.freeze({

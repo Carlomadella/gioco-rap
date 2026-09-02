@@ -151,6 +151,13 @@ function stradaChance(colpo, approccio){
   return clamp(p, .06, .93);
 }
 
+function stradaLavaggioStato(){
+  const s=G.strada, key=(G.year||1)+":"+(G.week||1);
+  if(!s.lavaggio || typeof s.lavaggio!=="object" || s.lavaggio.key!==key) s.lavaggio={key:key,used:0};
+  if(typeof s.lavaggio.used!=="number") s.lavaggio.used=0;
+  return s.lavaggio;
+}
+
 function stradaTenta(colpoId, approccioId){
   const colpo = STRADA_COLPI.find(c => c.id === colpoId);
   const approccio = STRADA_APPROCCI.find(a => a.id === approccioId);
@@ -208,20 +215,41 @@ function stradaTenta(colpoId, approccioId){
    Le azioni piccole (ripulire, prendere un uomo, rilevare un'attività) tornano
    la frase da mostrare: il pannello la fa comparire in basso, senza fermare
    niente. Chi non può fare la cosa riceve il motivo, non il silenzio. */
-function stradaCapienza(){
-  let cap = 400;
-  for(const a of STRADA_ATTIVITA) if(G.strada.attivita[a.id]) cap += a.resa;
+function stradaCapienzaTotale(){
+  let cap=400;
+  for(const a of STRADA_ATTIVITA) if(G.strada.attivita[a.id]) cap+=a.resa;
   return cap;
+}
+function stradaCapienza(){
+  return Math.max(0,stradaCapienzaTotale()-stradaLavaggioStato().used);
+}
+function stradaTempoRiciclaggio(){
+  try{
+    if(typeof GAME_EVENTS !== "undefined" && GAME_EVENTS.blocked && GAME_EVENTS.blocked())
+      return "Prima devi risolvere l'evento in corso.";
+  }catch(_){}
+  if(typeof GAME_TIME === "undefined") return null;
+  const minuti = typeof GAME_TIME.durationFor === "function" ? GAME_TIME.durationFor("ricicla") : 45;
+  if(typeof GAME_TIME.remaining === "function" && GAME_TIME.remaining() < minuti)
+    return "È troppo tardi per ripulire adesso: servono " +
+      (GAME_TIME.formatDuration ? GAME_TIME.formatDuration(minuti) : minuti + " minuti") + ".";
+  const tx = GAME_TIME.advance(minuti, "crime:launder");
+  if(tx && tx.blocked) return "Prima devi chiudere quello che stai facendo.";
+  return null;
 }
 function stradaRipulisci(){
   const s = G.strada;
   if(s.arresto) return "Sei in carcere: non puoi ripulire i soldi finché non esci.";
   if(s.sporchi <= 0) return "Non hai soldi sporchi da ripulire.";
+  if(stradaCapienza()<=0) return "Hai già usato tutta la capacità di ripulitura di questa settimana.";
+  const tempoRiciclaggio = stradaTempoRiciclaggio();
+  if(tempoRiciclaggio) return tempoRiciclaggio;
   const importo = Math.min(s.sporchi, stradaCapienza());
   const soglia = 400;
   const bassa = Math.min(importo, soglia), alta = Math.max(0, importo - soglia);
   const pulito = Math.round(bassa * .58 + alta * .86);
   s.sporchi -= importo;
+  stradaLavaggioStato().used += importo;
   G.money += pulito;
   s.heat = clamp(s.heat + 2, 0, 100);
   pushLog("Ripuliti " + fmt(importo) + " € sporchi: in tasca ne restano " + fmt(pulito) + " €.", "");
@@ -333,14 +361,34 @@ function stradaSettimana(){
     s.sporchi += Math.round(a.resa * .55);
   }
 
-  /* uomini: se non entra abbastanza per pagarli, se ne vanno */
+  /* Blocco 4: le coperture non sono credito infinito.
+     A fine settimana resta attivo solo ciò che puoi davvero pagare. */
   if(s.uomini > 0){
-    const upkeep = s.uomini * STRADA_UOMO_UPKEEP;
-    if(G.money < upkeep){ s.uomini = Math.max(0, s.uomini - 1); pushLog("Un uomo se n'è andato: non entrava abbastanza per tenerlo.", ""); }
-    else G.money -= upkeep;
+    const prima = s.uomini;
+    const pagabili = Math.min(prima, Math.floor(Math.max(0, G.money) / STRADA_UOMO_UPKEEP));
+    if(pagabili < prima){
+      s.uomini = pagabili;
+      pushLog((prima - pagabili === 1 ? "Un uomo se n'è andato" :
+        (prima - pagabili) + " uomini se ne sono andati") +
+        ": non entrava abbastanza per tenerli.", "");
+    }
+    G.money -= s.uomini * STRADA_UOMO_UPKEEP;
   }
-  if(s.prot > 0) G.money -= STRADA_PROT[s.prot].costo;
-  if(s.avvocato) G.money -= STRADA_AVVOCATO_COSTO;
+  if(s.prot > 0){
+    const costoProt = STRADA_PROT[s.prot].costo;
+    if(G.money >= costoProt) G.money -= costoProt;
+    else{
+      s.prot = 0;
+      pushLog("<b>Protezione saltata.</b> Non avevi abbastanza per pagarla questa settimana.", "bad");
+    }
+  }
+  if(s.avvocato){
+    if(G.money >= STRADA_AVVOCATO_COSTO) G.money -= STRADA_AVVOCATO_COSTO;
+    else{
+      s.avvocato = false;
+      pushLog("<b>L'avvocato si è tirato indietro.</b> La parcella non era coperta.", "bad");
+    }
+  }
 
   /* attenzione: scende ~6% a settimana, ~12% con l'avvocato */
   s.heat = clamp(s.heat * (1 - (s.avvocato ? .12 : .06)), 0, 100);
@@ -539,9 +587,14 @@ function renderStBarre(){
 
   $("st-sporchi").textContent = fmt(s.sporchi) + " €";
   const rip = $("st-ripulisci");
-  rip.textContent = s.arresto ? "In carcere: nessuna ripulitura" : "Ripulisci fino a " + fmt(stradaCapienza()) + " €";
-  rip.classList.toggle("no", s.sporchi <= 0 || !!s.arresto);
-  rip.disabled = !!s.arresto;
+  const ripCap = stradaCapienza();
+  const ripMin = typeof GAME_TIME !== "undefined" && GAME_TIME.durationFor ? GAME_TIME.durationFor("ricicla") : 45;
+  const ripDur = typeof GAME_TIME !== "undefined" && GAME_TIME.formatDuration ? GAME_TIME.formatDuration(ripMin) : ripMin + " min";
+  rip.textContent = s.arresto ? "In carcere: nessuna ripulitura"
+    : ripCap <= 0 ? "Limite settimanale raggiunto"
+    : "Ripulisci fino a " + fmt(ripCap) + " € · " + ripDur;
+  rip.classList.toggle("no", s.sporchi <= 0 || !!s.arresto || ripCap <= 0);
+  rip.disabled = !!s.arresto || s.sporchi <= 0 || ripCap <= 0;
 
   $("st-repn").textContent = Math.round(s.rep);
   $("st-repbar").style.width = clamp(s.rep, 0, 100) + "%";

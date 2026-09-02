@@ -19,6 +19,8 @@ const writer = leggi("js/game/writer.js");
 const hub = leggi("js/game/hub.js");
 const hours = leggi("js/game/orari.js");
 const crimeui = leggi("js/game/strada-crimine-ui.js");
+const crime = leggi("js/game/strada-crimine.js");
+const time = leggi("js/game/tempo.js");
 const cat = JSON.parse(leggi("js/game/eventi-master-1000-v1.2.13.json"));
 
 console.log("\nBlocco 1 — Eventi V2 / telefono / dist");
@@ -79,7 +81,34 @@ test("la UI carcere usa la pena esistente, non una seconda condanna",
   crimeui.includes('Number(a.settimane)') &&
   !crimeui.includes('carcereSettimane'));
 
-for(const f of ["strumenti/build.js","js/game/eventi-v2.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/orari.js","js/game/strada-crimine-ui.js"]){
+
+console.log("\nBlocco 4 — riciclaggio / costi / tempo");
+test("capacità settimanale già usa anno:settimana e used",
+  crime.includes("function stradaLavaggioStato()") &&
+  crime.includes("s.lavaggio={key:key,used:0}") &&
+  crime.includes("stradaLavaggioStato().used += importo"));
+test("riciclaggio costa 45 minuti",
+  time.includes("ricicla:45") &&
+  crime.includes('GAME_TIME.durationFor("ricicla")') &&
+  crime.includes('GAME_TIME.advance(minuti, "crime:launder")'));
+test("riciclaggio non parte se manca tempo prima delle 04:00",
+  crime.includes("GAME_TIME.remaining() < minuti"));
+test("uomini vengono ridotti al numero realmente pagabile",
+  crime.includes("Math.floor(Math.max(0, G.money) / STRADA_UOMO_UPKEEP)"));
+test("protezione decade se non pagabile",
+  crime.includes("s.prot = 0") &&
+  crime.includes("Protezione saltata."));
+test("avvocato decade se non pagabile",
+  crime.includes("s.avvocato = false") &&
+  crime.includes("La parcella non era coperta."));
+test("UI principale mostra residuo e durata riciclaggio",
+  crimeui.includes("const launderCap=") &&
+  crimeui.includes('GAME_TIME.durationFor("ricicla")') &&
+  crimeui.includes('"Limite settimanale raggiunto"'));
+test("UI legacy disabilita il riciclaggio a capacità zero",
+  crime.includes("rip.disabled = !!s.arresto || s.sporchi <= 0 || ripCap <= 0"));
+
+for(const f of ["strumenti/build.js","js/game/eventi-v2.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/orari.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }
