@@ -1,0 +1,246 @@
+# 11 — Strumenti e test
+
+Registro automatico delle modifiche realmente entrate in `main`.
+
+Non contiene idee, TODO o implementazioni future.
+
+---
+
+<!-- commit:0b33abe -->
+## 02/09/26, 21:45 — feat: aggiunge controllo globale del tempo
+
+**Tipo:** Commit diretto su main  
+**Autore:** Mycol (mycolbraga@gmail.com)  
+**Commit:** `0b33abe`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:10f4cc0 -->
+## 02/09/26, 20:13 — Merge remote-tracking branch 'origin/feature/bilanciamento-hardening-365' into integration/bilanciamento-hardening-365
+
+**Tipo:** Merge  
+**Autore:** Mycol (mycolbraga@gmail.com)  
+**Commit:** `10f4cc0`
+
+
+### Commit contenuti nel merge
+
+- `5135bd0` — fix: limita riciclaggio e coperture criminali — **Mycol**
+- `05f315a` — fix: separa il carcere dalle attivita criminali — **Mycol**
+- `1e1d03d` — balance: limita recupero e scrittura giornaliera — **Mycol**
+- `84d80c4` — fix: ripristina notifiche e catalogo eventi nel dist — **Mycol**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/strumenti/audit-regressioni.js`
+- **Modificato:** `frontend/strumenti/build.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
+<!-- commit:673953b -->
+## 02/09/26, 11:22 — Integrate game time, events v2 and crime TRAPHONE
+
+**Tipo:** Commit diretto su main  
+**Autore:** Mycol (mycolbraga@gmail.com)  
+**Commit:** `673953b`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/dev.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- commit:3a5ded4 -->
+## 02/09/26, 01:40 — Fix strada map and jail flow
+
+**Tipo:** Commit diretto su main  
+**Autore:** Carlomadella (madella871@gmail.com)  
+**Commit:** `3a5ded4`
+
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/strumenti/fix-mojibake.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- commit:e38367a -->
+## 01/09/26, 16:57 — test: tutte e 34 le rotte del server provate su Postman (Da smistare)
+
+**Tipo:** Commit diretto su main  
+**Autore:** Carlomadella (madella871@gmail.com)  
+**Commit:** `e38367a`
+
+
+### File di questa categoria
+
+- **Modificato:** `backend/README.md`
+- **Modificato:** `backend/package.json`
+- **Aggiunto:** `backend/postman/README.md`
+- **Aggiunto:** `backend/postman/anni-di-fame.postman_collection.json`
+- **Aggiunto:** `backend/postman/genera.js`
+- **Aggiunto:** `backend/postman/prova.js`
+
+**File interessati in questa categoria:** 6
+
+---
+
+<!-- commit:4706666 -->
+## 01/09/26, 15:24 — feat: scambiarsi il numero con fonici e beatmaker, e ritrovarseli in chat (Da smistare 4)
+
+**Tipo:** Commit diretto su main  
+**Autore:** Carlomadella (madella871@gmail.com)  
+**Commit:** `4706666`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/prova.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- commit:df6e337 -->
+## 01/09/26, 15:05 — feat: la chat del telefono non va piu' in loop e si puo' portare avanti (Da smistare 3)
+
+**Tipo:** Commit diretto su main  
+**Autore:** Carlomadella (madella871@gmail.com)  
+**Commit:** `df6e337`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/prova.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- commit:b92a86e -->
+## 01/09/26, 14:49 — test: ogni opzione del creatore deve cambiare il ritratto (chiude il punto 3 dell'indice)
+
+**Tipo:** Commit diretto su main  
+**Autore:** Carlomadella (madella871@gmail.com)  
+**Commit:** `b92a86e`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/prova.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:2c00ae5 -->
+## 01/09/26, 04:56 — Merge remote-tracking branch 'origin/main'
+
+**Tipo:** Merge  
+**Autore:** Carlomadella (madella871@gmail.com)  
+**Commit:** `2c00ae5`
+
+
+### Commit contenuti nel merge
+
+- `cb5ea2d` — fix: sotto i 1180px il telefono non si nascondeva, la mappa collassava a zero — **Sadyco La Fame**
+- `a66f3e0` — feat: via la conferma per la sola energia, sette scene con entrate diverse (punti 55, 58) — **Sadyco La Fame**
+- `a2b805e` — feat: Pizzeria e Fabbrica al posto di due cartelli chiusi, Casa e Palestra (punti 59, 60, 61) — **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/effects.css`
+- **Modificato:** `frontend/css/hub.css`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/ui.js`
+- **Modificato:** `frontend/js/impostazioni-ui.js`
+
+**File interessati in questa categoria:** 6
+
+---
+
+<!-- commit:24354f7 -->
+## 31/08/26, 23:31 — feat: il build vero, primo dei cinque lavori per gli store (punto 33)
+
+**Tipo:** Commit diretto su main  
+**Autore:** Carlomadella (madella871@gmail.com)  
+**Commit:** `24354f7`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/README.md`
+- **Aggiunto:** `frontend/package-lock.json`
+- **Aggiunto:** `frontend/package.json`
+- **Rimosso:** `frontend/strumenti/build-artifact.py`
+- **Aggiunto:** `frontend/strumenti/build.js`
+- **Aggiunto:** `frontend/strumenti/dev.js`
+- **Aggiunto:** `frontend/strumenti/prova.js`
+
+**File interessati in questa categoria:** 7
+
+---
+
+<!-- commit:af4d02c -->
+## 31/08/26, 22:54 — refactor: il progetto si divide in frontend e backend (punto 31)
+
+**Tipo:** Commit diretto su main  
+**Autore:** Carlomadella (madella871@gmail.com)  
+**Commit:** `af4d02c`
+
+
+### File di questa categoria
+
+- **Rinominato:** `strumenti/build-artifact.py` → `frontend/strumenti/build-artifact.py`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- commit:b2ae674 -->
+## 31/08/26, 16:47 — feat: la mappa e' la foto del concept, non un disegno che le somiglia (punto 26)
+
+**Tipo:** Commit diretto su main  
+**Autore:** Carlomadella (madella871@gmail.com)  
+**Commit:** `b2ae674`
+
+
+### File di questa categoria
+
+- **Modificato:** `strumenti/build-artifact.py`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- commit:7c3f9ec -->
+## 30/08/26, 17:13 — feat: menu impostazioni e banco suoni nuovo (punti 23, 13, meta del 15)
+
+**Tipo:** Commit diretto su main  
+**Autore:** Carlomadella (madella871@gmail.com)  
+**Commit:** `7c3f9ec`
+
+
+### File di questa categoria
+
+- **Aggiunto:** `strumenti/build-artifact.py`
+
+**File interessati in questa categoria:** 1
+
+---
+

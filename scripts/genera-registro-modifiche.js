@@ -58,6 +58,18 @@ const categorie = [
         titolo: "09 â€” Grafica e asset",
         match: p => /(\/css\/|\/media\/|\/assets\/|grafica|texture|font|\.png$|\.jpg$|\.jpeg$|\.webp$|\.svg$|\.gif$)/i.test(p)
     }
+,
+
+    {
+        file: "10-sistemi-di-gioco.md",
+        titolo: "10 — Sistemi di gioco",
+        match: p => /(gameplay|sistema.?di.?gioco)/i.test(p)
+    },
+    {
+        file: "11-strumenti-e-test.md",
+        titolo: "11 — Strumenti e test",
+        match: p => /(frontend\/strumenti\/|audit|build|dev|test|fix-mojibake)/i.test(p)
+    }
 ];
 
 const altra = {
@@ -280,7 +292,159 @@ function descrizioneFile(item) {
 const assegnazioni = new Map();
 
 for (const modifica of modifiche) {
-    const trovate = categorie.filter(cat => cat.match(modifica.file));
+    const contesto = `${modifica.file} ${branchSorgente} ${commitRaw}`;
+
+    let trovate = [];
+
+    function aggiungiCategoria(nomeFile) {
+        const categoria = categorie.find(
+            c => c.file === nomeFile
+        );
+
+        if (
+            categoria &&
+            !trovate.includes(categoria)
+        ) {
+            trovate.push(categoria);
+        }
+    }
+
+    // Gli strumenti tecnici non sono gameplay.
+    if (
+        /^(?:frontend\/)?strumenti\//i.test(modifica.file) ||
+        /(audit-regressioni|build\.js|dev\.js|fix-mojibake)/i.test(modifica.file)
+    ) {
+        aggiungiCategoria("11-strumenti-e-test.md");
+    } else {
+
+        // Prima usa le normali regole delle categorie.
+        trovate = categorie.filter(cat =>
+            cat.match(contesto)
+        );
+
+        // MAPPA / CITTA
+        if (
+            /(mappa|\bmap\b|meteo|citt[aà]|trasfert|spostament|viagg|quartier|location)/i.test(contesto)
+        ) {
+            aggiungiCategoria("01-mappa-e-citta.md");
+        }
+
+        // INTERFACCIA / TELEFONO
+        if (
+            /(interfaccia|telefono|traphone|actionbar|hud|\bui\b|menu|schermata|modal)/i.test(contesto)
+        ) {
+            aggiungiCategoria("02-interfaccia-e-telefono.md");
+        }
+
+        // ARTISTA / AVATAR
+        if (
+            /(avatar|creator|character.?creator|artista|capelli|hair|outfit|vestiti)/i.test(contesto)
+        ) {
+            aggiungiCategoria("03-artista-e-avatar.md");
+        }
+
+        // MUSICA
+        if (
+            /(discografia|videomaker|\bsala\b|beat|brano|musica|music|audio|sound|producer|studio musicale)/i.test(contesto)
+        ) {
+            aggiungiCategoria("04-musica-e-suoni.md");
+        }
+
+        // CARRIERA / TEMPO
+        if (
+            /(tempo|\btime\b|orari|salto.?di.?tempo|carriera|career|lifestyle|energia|hardening|bilanciamento|recupero)/i.test(contesto)
+        ) {
+            aggiungiCategoria("05-carriera-e-tempo.md");
+        }
+
+        // MONDO / NPC / CRIMINALITA
+        if (
+            /(crime|criminal|crimine|carcere|jail|strada|evento|eventi|incontr|opportunit|npc|polizia)/i.test(contesto)
+        ) {
+            aggiungiCategoria("06-mondo-e-personaggi.md");
+        }
+
+        // BACKEND
+        if (
+            /(backend|server|socket|database|multiplayer|websocket|\bapi\b)/i.test(contesto)
+        ) {
+            aggiungiCategoria("07-multiplayer-e-backend.md");
+        }
+
+        // RELEASE
+        if (
+            /(steam|release|deploy|store|installer|electron|pubblicazione)/i.test(contesto)
+        ) {
+            aggiungiCategoria("08-uscita-sugli-store.md");
+        }
+
+        // ==========================================
+        // REGOLE LEGACY PRE-FRONTEND
+        // Supportano la struttura iniziale:
+        // css/, js/, media/, index.html
+        // ==========================================
+
+        // Vecchi CSS e media = grafica / asset.
+        if (
+            /^(?:frontend\/)?(?:css|media|assets)\//i.test(modifica.file)
+        ) {
+            aggiungiCategoria("09-grafica-e-asset.md");
+        }
+
+        // Plancia, navbar e componenti visivi.
+        if (
+            /(navbar|sidebar|plancia|badge|linguett|fondale|overlay|ritratto|barra.?dell.?esperienza)/i.test(contesto)
+        ) {
+            aggiungiCategoria("02-interfaccia-e-telefono.md");
+        }
+
+        // Uscita/chiusura delle finestre e degli overlay.
+        if (
+            /(ESC|clic fuori|clic sul fondale|esce da ogni azione|chiude pi[uù]?)/i.test(contesto)
+        ) {
+            aggiungiCategoria("02-interfaccia-e-telefono.md");
+        }
+
+        // Scrittura musicale e contenuti collegati.
+        if (
+            /(strofa|versi|writer|copertin|covers|autocompletamento)/i.test(contesto)
+        ) {
+            aggiungiCategoria("04-musica-e-suoni.md");
+        }
+
+        // Piazza e scene del mondo di gioco.
+        if (
+            /(piazza)/i.test(contesto)
+        ) {
+            aggiungiCategoria("06-mondo-e-personaggi.md");
+        }
+
+        // Refactor strutturali e import iniziale:
+        // sono parte dell'architettura del gioco.
+        if (
+            /(refactor|monolite|import iniziale|artifact)/i.test(contesto)
+        ) {
+            aggiungiCategoria("10-sistemi-di-gioco.md");
+        }
+
+        // JS di gioco che non appartiene chiaramente
+        // a una categoria specifica.
+        if (
+            trovate.length === 0 &&
+            /^(?:frontend\/)?js\/game\//i.test(modifica.file)
+        ) {
+            aggiungiCategoria("10-sistemi-di-gioco.md");
+        }
+
+        // HTML generico = interfaccia, salvo che il
+        // contesto lo abbia già classificato meglio.
+        if (
+            trovate.length === 0 &&
+            /^(?:frontend\/)?(?:.*\/)?[^/]+\.html$/i.test(modifica.file)
+        ) {
+            aggiungiCategoria("02-interfaccia-e-telefono.md");
+        }
+    }
 
     if (trovate.length === 0) {
         const lista = assegnazioni.get(altra.file) || [];
