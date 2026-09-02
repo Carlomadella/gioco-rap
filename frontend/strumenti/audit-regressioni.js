@@ -21,6 +21,8 @@ const hours = leggi("js/game/orari.js");
 const crimeui = leggi("js/game/strada-crimine-ui.js");
 const crime = leggi("js/game/strada-crimine.js");
 const time = leggi("js/game/tempo.js");
+const timeControls = leggi("js/game/tempo-controlli.js");
+const index = leggi("index.html");
 const cat = JSON.parse(leggi("js/game/eventi-master-1000-v1.2.13.json"));
 
 console.log("\nBlocco 1 — Eventi V2 / telefono / dist");
@@ -108,7 +110,40 @@ test("UI principale mostra residuo e durata riciclaggio",
 test("UI legacy disabilita il riciclaggio a capacità zero",
   crime.includes("rip.disabled = !!s.arresto || s.sporchi <= 0 || ripCap <= 0"));
 
-for(const f of ["strumenti/build.js","js/game/eventi-v2.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/orari.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js"]){
+console.log("\nPunto 1 — controllo tempo globale coerente");
+test("controller tempo globale è caricato dopo i motori eventi",
+  index.indexOf('js/game/tempo-controlli.js') > index.indexOf('js/game/eventi-tempo.js'));
+test("esiste un solo controller globale del tempo",
+  timeControls.includes('const ROOT_ID = "adf-time-controls"') &&
+  timeControls.includes('window.ADF_TIME_CONTROLS=Object.freeze'));
+test("controller si monta nella testata della finestra attiva",
+  timeControls.includes('const HOSTS = [') &&
+  timeControls.includes('head:".pbarra"') &&
+  timeControls.includes('head:"#gtop .tline"') &&
+  timeControls.includes('head:".pohead"') &&
+  timeControls.includes('head:".nghead"') &&
+  timeControls.includes('head:".topbar"') &&
+  timeControls.includes('head:".adf-jail-top"'));
+test("pannello resta ancorato sotto lo stesso blocco in alto a destra",
+  timeControls.includes('right:var(--adf-time-right,14px)') &&
+  timeControls.includes('top:calc(100% + 9px)'));
+test("slider orario e tasti +/- lavorano a step di 15 minuti",
+  timeControls.includes('type="range"') &&
+  timeControls.includes('const STEP = Number(GAME_TIME.SLOT) || 15') &&
+  timeControls.includes('adf-tc-minus') && timeControls.includes('adf-tc-plus'));
+test("attesa usa il clock reale e non teletrasporta G.timeMinutes",
+  timeControls.includes('GAME_TIME.advance(step,"wait-global"') &&
+  !timeControls.includes('G.timeMinutes=target'));
+test("attesa si ferma su action o evento alto pendente",
+  timeControls.includes('GAME_TIME.pending && GAME_TIME.pending()') &&
+  timeControls.includes('GAME_EVENTS.blocked && GAME_EVENTS.blocked()'));
+test("cambio giorno riusa il comando Fine giornata esistente",
+  timeControls.includes('document.getElementById("g-advance")') &&
+  timeControls.includes('official.click()'));
+test("controller reagisce anche a finestre create dinamicamente",
+  timeControls.includes('new MutationObserver'));
+
+for(const f of ["strumenti/build.js","js/game/eventi-v2.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/orari.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }
