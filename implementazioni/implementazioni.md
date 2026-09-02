@@ -37,6 +37,10 @@ ALE:
 
 2. Rendi accessibile lo shop già dalla città iniziale, con limitazioni sui prodotti in vendita
 
+3. i rapporti con i beatmaker non vanno mai in negativo, puoi offenderli quanto vuoi e il rapporto resta uguale
+
+4. Ci sono i prezzi dei beat spropositati. Non ha senso che alcuni beat costino 700 euro al livello quattro. Facciamo prezzi realistici : da 100 a 250 euro beat da beatmaker emergenti , da 300 euro a 1000 per beatmaker affermati e da 1000 a 2000 per beatmaker famosissimi
+
 CARLO:
 
 <!-- 3. Nell'app chat sul telefono le conversazioni sono davvero monotone e soprattutto vanno subito in loop. Crea una cosa MOOOOOOOLTO interattiva.
@@ -53,25 +57,19 @@ CARLO:
 
 9. aggiungi al sistema di gioco eventi che possono accadure durante la giornata, e se esistono già aggiungi la possibilità di venir chiamato in altre città d'italia per un concerto o una pubblicità o altro, che creano di conseguenza altri eventi come ad esempio conoscere altre persone tipo producer, fonici o videomaker
 
-10. se vogliamo tenere la hub che in questo momento è chiamata sala, dove incontri le altre persone, sono da aggiungere i videomaker
+10. se vogliamo tenere la hub che in questo momento è chiamata sala, dove incontri le altre persone, sono da aggiungere i videomaker, Secondo me è meglio farla come mappa di gta con tutte le cose divise
 
-11. Secondo me è meglio farla come mappa di gta con tutte le cose divise
+11. quando clicchi su una card -> transizione (alla scena) -> esempio: video del personaggio che entra in studio oppure mini-video del personaggio che torna a casa a dormire, oppure che va a cena con la tipa ecc.
 
-<!-- 12. Il player può mettere schermo intero e vede il personaggio fare cose tipo passeggiare per strada o altro al posto di avere la mappa e le sidebar laterali -->
+12. aggiungere la reputazione cioè quanto sei affidabile, il massimo è real/real oppure OG, e il minimo tipo figlio di troia quando ti comporti da figlio di troia (detto meglio) O TENERE SOLO LA FAMa
 
-13. quando clicchi su una card -> transizione (alla scena) -> esempio: video del personaggio che entra in studio oppure mini-video del personaggio che torna a casa a dormire, oppure che va a cena con la tipa ecc.
+13. aggiungere la sezione delle skill, sbloccabili con i soldi o con un'altra valuta, un esempio: penna d'oro: +1 alla statistica scrittura
 
-14. aggiungere la reputazione cioè quanto sei affidabile, il massimo è real/real oppure OG, e il minimo tipo figlio di troia quando ti comporti da figlio di troia (detto meglio) O TENERE SOLO LA FAMa
+14. DA DISCUTERE aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
 
-15. aggiungere la sezione delle skill, sbloccabili con i soldi o con un'altra valuta, un esempio: penna d'oro: +1 alla statistica scrittura
+15. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles?
 
-16. DA DISCUTERE aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
-
-17. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles?
-
-18. Questa secondo me è una delle prossime grandi evoluzioni.
-
-Non è più: "Faccio un pezzo → +10 fama", ma diventa:
+16. Non è più: "Faccio un pezzo → +10 fama", ma diventa:
 
 TRACK
 │
@@ -116,6 +114,8 @@ NETWORK 64
 19. Aggiungere sezione "Discografia"
 
 20. se clicco sull'opzione di conversazione "fatti sentire un beat" non fa niente
+
+21. fare pagina di registrazione/login/logout
 
 /_ NUOVE MODALITA' _/
 
