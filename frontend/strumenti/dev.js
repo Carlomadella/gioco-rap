@@ -49,6 +49,7 @@ function avvisa(){
 let attesa = null;
 fs.watch(RADICE, { recursive: true }, (tipo, file) => {
   if(!file || /node_modules|[\\/]dist[\\/]|\.tmp$|~$/.test(file)) return;
+  if(!/\.(?:html|css|js|json)$/i.test(String(file))) return;
   clearTimeout(attesa);
   attesa = setTimeout(() => {
     console.log("  ~ " + String(file).replace(/\\/g, "/"));
