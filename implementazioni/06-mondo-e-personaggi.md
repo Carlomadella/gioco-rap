@@ -262,3 +262,122 @@ Voglio che il gioco abbia vita simulata molto sviluppata. Non banalità, dobbiam
     quelli nuovi, da qui in avanti, ce l'hanno tutti.
 
 ---
+
+---
+
+## Le trasferte fuori città
+
+_(«Da smistare» punto 9 di [`implementazioni.md`](implementazioni.md).)_
+
+> aggiungi al sistema di gioco eventi che possono accadere durante la giornata, e se
+> esistono già aggiungi la possibilità di venir chiamato in altre città d'Italia per un
+> concerto o una pubblicità o altro, che creano di conseguenza altri eventi come ad
+> esempio conoscere altre persone tipo producer, fonici o videomaker
+
+**FATTO (02/09/2026)** — `frontend/js/game/trasferte.js`, `frontend/css/trasferte.css`.
+Gli eventi dentro alla giornata c'erano già (`eventi-tempo.js` a minuti, `eventi-v2.js`
+col catalogo da mille): il pezzo che mancava era **essere chiamati da fuori**. Adesso
+c'è, e non come un bottone che regala fan: come una piccola spedizione narrativa.
+
+    invito → viaggio → evento principale → incontri → conseguenze → nuove occasioni
+
+### L'invito è una scelta, non un premio
+
+Ogni giorno il gioco guarda se il giro fuori casa si sta accorgendo di te — fan, hype,
+rete, livello, e la **reputazione** (`G.trasferte.rep`, 0–100, parte da 50: non è la fama,
+è quanto sei uno su cui contare). Quando scatta, arriva una notifica sul telefono e una
+finestra con tre risposte:
+
+- **accetti** — paghi viaggio (26–150 € a seconda di quanto è lontana e di quante notti),
+  energia e uno o due giorni di calendario;
+- **ci pensi** — l'invito resta in agenda fino alla scadenza, che è vera: passata quella
+  chiamano un altro e la reputazione scende;
+- **rifiuti** — chi ti aveva chiamato si raffredda per davvero (il rapporto scende di un
+  punto) e i rifiuti di fila dimezzano la probabilità delle chiamate successive.
+
+**Non serve avere la città sbloccata.** Ci vai, lavori, torni: la trasferta sposta te, non
+l'hub. Le tre città della carriera (punto 26) restano quelle.
+
+### Dodici motivi per salire su un treno, diciotto città
+
+I tipi: data live, apertura di un nome grosso, festival (due giorni), showcase, comparsata
+in serata, sessione in studio, collaborazione, shooting, pubblicità, evento brand,
+intervista, passaggio in radio. Ognuno ha le sue soglie (fan, hype, reputazione), il suo
+costo, la sua resa e **la sua gente**: a uno shooting non conosci un promoter, conosci chi
+tiene la luce.
+
+Le città (Milano, Roma, Bologna, Torino, Napoli, Firenze, Verona, Padova, Brescia, Genova,
+Rimini, Perugia, Pescara, Bari, Palermo, Catania, Cagliari, Trieste) hanno una distanza,
+un peso di scena e un'**affinità di mestieri**: a Rimini escono DJ e proprietari di club, a
+Milano A&R e manager. La città che il giocatore ha scritto nel creator è esclusa: lì ci
+abita.
+
+Ogni evento principale apre **tre modi di giocarlo**, e uno dei tre è sempre un rischio con
+un tiro vero dietro (presenza, flow, scrittura, rete, hype). Chi resta fino a che chiudono
+conosce più gente e dorme meno; chi fa il minimo torna a casa intero e invisibile.
+
+### La rete si costruisce lavorando
+
+Chi incontri entra in `G.gente` come tutti gli altri contatti — **stesso array, stesso
+grado** (conoscenza → contatto → amico → collaboratore → fidato → partner) — con in più
+`fuori:true`, la `citta` e un **requisito** per andare oltre (`reqKey`): un A&R conosciuto a
+un festival te lo ricordi, ma finché non hai cinquemila persone che ti seguono resta un
+numero in rubrica. I mestieri sono dodici: producer, rapper, fonico, videomaker, fotografo,
+stylist, promoter, manager, DJ, proprietario di club, brand/agenzia, A&R — i nove nuovi si
+registrano dentro a `POSTO_RUOLI` e `TEL_RUOLI` all'avvio, così La Sala e il telefono non si
+trovano fra le mani un ruolo che non sanno disegnare.
+
+**La Sala resta La Sala.** `sistemaGente()` e `presentiOggi()` (`posto.js`) girano su
+`G.gente` senza quelli di fuori e se la ritrovano intera subito dopo: chi lavora a Napoli
+non passa il martedì pomeriggio nella sala prove dietro al bar, e non ruba gli slot alla
+provincia. Chi ti dà il numero e fa un mestiere che scrive in chat (producer, fonico) si
+presenta da solo nei messaggi, come quelli di casa.
+
+### Le catene
+
+Una conoscenza che non torna mai è una riga in rubrica. Ogni persona che ti ha preso in
+simpatia ha una probabilità di rifarsi viva **dopo settimane, non domani**, con una delle
+tre cose che sa fare:
+
+- **un invito** — ti chiama per un lavoro nella sua città (e lo vedi: «Ti hanno chiamato da
+  Bologna. Selva: una sessione in studio»);
+- **una presentazione** — ti passa a qualcun altro, che entra nella rete e che a sua volta
+  potrà richiamarti: è qui che la catena riparte;
+- **un'occasione** — una cosa piccola e concreta subito: una base nel catalogo, un mix, un
+  video, uno scatto, un posto in scaletta, un consiglio che vale reputazione.
+
+Il tipo dipende dal mestiere, il quando è casuale, il se dipende da quanto ci hai parlato.
+Non c'è uno script: ci sono persone con una probabilità, ed è per questo che due partite
+non raccontano la stessa storia.
+
+### Le città si ricordano di te
+
+`G.trasferte.citta[id]` tiene visite, fan locali e reputazione locale di ogni città
+toccata. I fan di una serata restano per il 70% **lì**, la reputazione locale sale, e da
+quel momento **da quella città ti richiamano più spesso**. Quando arriverà la mappa
+d'Italia / il tour (punto 26) troverà i dati già pronti: è già la mappa, solo senza il
+disegno sopra.
+
+### Dove si vede
+
+- **App «Trasferte» sul telefono** (icona valigia, badge sugli inviti aperti): gli inviti
+  con il tasto per rispondere, le città con fan e reputazione, la rete divisa per città con
+  il requisito di ognuno, e lo storico di quello che hai fatto.
+- **App «Contatti»**: chi hai conosciuto fuori mostra la sua città accanto al ruolo e apre
+  l'agenda invece di mandarti alla Sala a cercarlo, che lì non lo trovi.
+- **Centro notifiche** di Eventi V2: inviti, scadenze e riepiloghi passano da lì, senza
+  aprire un secondo centro notifiche.
+
+### Note tecniche
+
+- Si aggancia a `avanzaGiorno()` (`sim.js`), che è il motore unico del giorno: vale sia per
+  «Fine giornata» sia per i salti.
+- I giorni della trasferta si consumano **alla fine**, al ritorno, e durante quei giorni non
+  nasce niente altro: se no torni da Bologna e trovi tre finestre impilate sopra al rapporto
+  di fine settimana.
+- Un refresh in mezzo a una trasferta la riprende dal punto giusto, e un invito ancora da
+  rispondere torna a galla appena lo schermo è libero.
+- Console: `TRASFERTE.debug()` per vedere probabilità, inviti, catene e rete;
+  `TRASFERTE.forzaInvito("milano", "festival")` per provare senza aspettare.
+
+---

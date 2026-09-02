@@ -1,0 +1,98 @@
+/* Trasferte fuori città: la finestra dell'invito (dentro alla modale di
+   sempre) e l'agenda sul telefono. Niente di nuovo come linguaggio — sono le
+   stesse superfici scure, gli stessi bordi tenui e lo stesso accento per
+   colore del resto del gioco: una trasferta è una cosa che succede dentro
+   alla partita, non un pannello che arriva da fuori. */
+
+/* ---------- dentro alla modale degli eventi ---------- */
+.trascosti{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px;
+  margin:14px 0}
+.trascosti span{
+  display:flex;flex-direction:column;gap:2px;padding:9px 10px;border-radius:10px;
+  background:var(--card-2);border:1px solid var(--line);
+  font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:var(--faint)}
+.trascosti span b{font-family:var(--cond);font-size:19px;letter-spacing:0;
+  text-transform:none;color:var(--text)}
+
+.trasnota{margin:8px 0 0;font-size:13px;line-height:1.45;color:var(--soft)}
+.trasnota.bad{color:#F59E9E}
+.trasnota.good{color:var(--green)}
+
+.traslista{margin:12px 0 0;padding:0 0 0 16px;font-size:13.5px;line-height:1.7;color:var(--soft)}
+.traslista b{color:var(--text)}
+
+/* ---------- l'agenda sul telefono ---------- */
+#tras-overlay{position:fixed;inset:0;z-index:120;display:none;
+  align-items:center;justify-content:center;padding:22px;
+  background:rgba(4,5,9,.72);backdrop-filter:blur(6px)}
+#tras-overlay.on{display:flex}
+
+.trascard{width:min(520px,100%);max-height:86vh;display:flex;flex-direction:column;
+  border-radius:var(--r);overflow:hidden;
+  background:var(--card);border:1px solid var(--line);
+  box-shadow:0 26px 70px rgba(0,0,0,.6)}
+
+.trashead{display:flex;align-items:center;gap:12px;padding:14px 16px;
+  border-bottom:1px solid var(--line);background:var(--card-2)}
+.trashead b{font-family:var(--disp);font-size:17px;letter-spacing:-.01em}
+.trasback{width:30px;height:30px;flex:none;border-radius:9px;
+  background:rgba(255,255,255,.06);border:1px solid var(--line);position:relative}
+.trasback::before{content:"";position:absolute;left:11px;top:10px;width:9px;height:9px;
+  border-left:2px solid var(--soft);border-bottom:2px solid var(--soft);transform:rotate(45deg)}
+.trasback:hover{background:rgba(255,255,255,.11)}
+
+.trasbody{padding:14px 16px 20px;overflow:auto}
+
+.trastesta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}
+.trastesta div{padding:10px;border-radius:10px;text-align:center;
+  background:var(--card-2);border:1px solid var(--line)}
+.trastesta b{display:block;font-family:var(--cond);font-size:24px;line-height:1}
+.trastesta span{display:block;margin-top:3px;font-size:10px;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--faint)}
+
+.trassez{margin:18px 0 8px;font-family:var(--cond);font-size:12px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--faint)}
+.trasvuoto{padding:12px;border-radius:10px;font-size:13px;line-height:1.5;color:var(--soft);
+  background:rgba(255,255,255,.03);border:1px dashed var(--line)}
+
+.trasinvito{display:block;width:100%;text-align:left;margin-bottom:8px;padding:11px 12px;
+  border-radius:11px;background:var(--card-2);border:1px solid var(--line);
+  border-left:3px solid var(--k,var(--violet))}
+.trasinvito:hover{background:rgba(255,255,255,.07)}
+.trasinvito.in{cursor:default;border-left-color:var(--acid)}
+.trasinvito b{display:block;font-size:14.5px}
+.trasinvito i{display:block;margin-top:3px;font-style:normal;font-size:12px;color:var(--soft)}
+.trasinvito u{display:inline-block;margin-top:7px;font-size:11px;letter-spacing:.06em;
+  text-transform:uppercase;text-decoration:none;color:var(--k,var(--violet))}
+
+.trascitta{margin-bottom:8px;padding:11px 12px;border-radius:11px;
+  background:var(--card-2);border:1px solid var(--line)}
+.trascittatop{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.trascittatop b{font-size:14.5px}
+.trascittatop i{font-style:normal;font-size:11px;color:var(--faint)}
+.trasbarra{margin:8px 0 7px;height:4px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.08)}
+.trasbarra span{display:block;height:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--hot),var(--acid))}
+.trascittariga{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11.5px;color:var(--soft)}
+
+.trasgruppo{margin-bottom:10px}
+.trasgruppo>span{display:block;margin-bottom:5px;font-size:11px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--faint)}
+.traspersona{margin-bottom:5px;padding:9px 11px;border-radius:10px;
+  background:var(--card-2);border:1px solid var(--line);border-left:3px solid var(--k,#9AA1B2)}
+.traspersona b{display:block;font-size:13.5px}
+.traspersona i{display:block;margin-top:2px;font-style:normal;font-size:11.5px;color:var(--soft)}
+.traspersona u{display:inline-block;margin-top:5px;font-size:10.5px;letter-spacing:.04em;
+  text-transform:uppercase;text-decoration:none}
+.traspersona u.ok{color:var(--green)}
+.traspersona u.no{color:var(--faint)}
+
+.trasriga{margin-bottom:5px;padding:8px 11px;border-radius:10px;background:rgba(255,255,255,.03)}
+.trasriga b{display:block;font-size:13px}
+.trasriga i{display:block;margin-top:2px;font-style:normal;font-size:11.5px;color:var(--faint)}
+
+@media (max-width:520px){
+  #tras-overlay{padding:0}
+  .trascard{max-height:100vh;height:100%;border-radius:0;border:none}
+}

@@ -41,6 +41,24 @@ ALE:
 
 4. Ci sono i prezzi dei beat spropositati. Non ha senso che alcuni beat costino 700 euro al livello quattro. Facciamo prezzi realistici : da 100 a 250 euro beat da beatmaker emergenti , da 300 euro a 1000 per beatmaker affermati e da 1000 a 2000 per beatmaker famosissimi
 
+5. Il giocatore parte con tutti i parametri a 1
+
+6. Le azioni ripetibili che facevano farmare facilmente senza avere un gameplay dinamico troviamo un modo per limitarle realisticamente nella possibilità di eseguirla ; Ad esempio la battle di freestyle potremmo metterlo come 'Evento esclusivo' Una sola volta alla settimana e in un orario specifico.
+   Inoltre, per aumentare la dinamicità, potremmo fare che NON tutti gli eventi danno gli stessi hype, soldi, fan.. dipende dall'importanza dell'evento stesso della settimana.
+
+7. Verissima la cosa dell'hype, fattore che dev'essere davvero primario nel gioco e i player dovran costantemente provare a inseguire ma con tanta fatica, Partiamo proprio dallo sviluppo dell'hype :
+
+L'hype è in scala internazionale, vuol dire che se sei al livello 100 è impossibile che tu sia ancora nel paesino di provincia.
+Probabilmente all'inizio l'unico modo per fare hype è andare al pub e pubblicare sui social pubblicità per la tua musica (DA SVILUPPARE QUESTO) , ma più di tanto HYPE all'inizio non si può fare, quindi è impossibile che al primo anno rimanendo nella prima città tu diventi 100 di hype
+
+Tutt'altro se non sei goat manco puoi averli 100 di hype
+
+L'hype vero si inizierà a fare quando i tuoi numeri social andranno forte e nelle classifiche il tuo nome inizierà a farsi valere sempre di più, quando farai feat con nomi più grandi dei tuoi e i pezzi andranno bene, quando prendiamo una macchina importante e molto costosa e la flexiamo sui social
+
+Insomma, come le cose che vanno davvero in hype IRL, non se fai un feat con pinko pallino a caso che nessuno conosce
+
+8.
+
 CARLO:
 
 <!-- 3. Nell'app chat sul telefono le conversazioni sono davvero monotone e soprattutto vanno subito in loop. Crea una cosa MOOOOOOOLTO interattiva.
@@ -56,6 +74,21 @@ CARLO:
 8. creami un README delle API routes e di tutte le chiamate, ecc.
 
 9. aggiungi al sistema di gioco eventi che possono accadure durante la giornata, e se esistono già aggiungi la possibilità di venir chiamato in altre città d'italia per un concerto o una pubblicità o altro, che creano di conseguenza altri eventi come ad esempio conoscere altre persone tipo producer, fonici o videomaker
+
+   **FATTO (02/09/2026)** — le trasferte fuori città, in `frontend/js/game/trasferte.js`
+   (+ `frontend/css/trasferte.css`). Gli eventi durante la giornata c'erano già
+   (`eventi-tempo.js`, `eventi-v2.js`): questo è il pezzo che mancava, cioè essere
+   chiamati altrove. Il racconto per esteso sta in
+   [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md#le-trasferte-fuori-città).
+   In breve: dodici tipi di chiamata (live, apertura, festival, showcase, comparsata,
+   studio, collaborazione, shooting, pubblicità, evento brand, intervista, radio),
+   diciotto città italiane, l'invito che arriva come notifica e apre una scelta vera
+   (accetti / ci pensi / rifiuti, con viaggio, energia e giorni da pagare), la
+   spedizione in quattro schermate, gli incontri con dodici mestieri diversi che
+   entrano nella rete contatti con città e grado, e le catene: chi hai conosciuto
+   può richiamarti settimane dopo, presentarti qualcun altro o proporti una cosa
+   concreta. Le città toccate accumulano fan e reputazione locale e da lì in poi
+   chiamano di più — è il seme del tour.
 
 10. se vogliamo tenere la hub che in questo momento è chiamata sala, dove incontri le altre persone, sono da aggiungere i videomaker, Secondo me è meglio farla come mappa di gta con tutte le cose divise
 
@@ -116,6 +149,8 @@ NETWORK 64
 20. se clicco sull'opzione di conversazione "fatti sentire un beat" non fa niente
 
 21. fare pagina di registrazione/login/logout
+
+22. non si riescono a vedere i beat
 
 /_ NUOVE MODALITA' _/
 

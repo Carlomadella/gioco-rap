@@ -280,17 +280,30 @@ function schermataMessaggi(){
     '</div>';
 }
 
-/* ---- Contatti: la rete vera, con grado e ruolo ---- */
+/* ---- Contatti: la rete vera, con grado e ruolo ----
+   Da quando esistono le trasferte (trasferte.js) la rubrica non e' piu' solo La
+   Sala: chi hai conosciuto fuori citta' porta con se' la citta' dov'e', e il suo
+   tasto non deve mandarti in sala prove a cercarlo — li' non lo trovi. */
 function schermataContatti(){
   const vivi = (G.gente || []).filter(p => !p.via);
   if(!vivi.length) return '<div class="tempty">Nessun contatto ancora. Passa dalla Sala, dietro al bar centrale.</div>' +
     '<button class="tbtn" data-posto="1">Vai alla Sala</button>';
   return '<div class="tlist">' + vivi.map(p =>
-    '<button class="tli" data-posto="1">' +
+    '<button class="tli" ' + (p.fuori ? 'data-app="trasferte"' : 'data-posto="1"') + '>' +
       '<span class="tliav" style="--k:' + p.col + '">' + hsvg("persona") + '</span>' +
-      '<span class="tlitx"><b>' + p.n + '</b><i>' + (TEL_RUOLI[p.ruolo] || p.ruolo) + ' · ' + REL_NOMI[p.rel] + '</i></span>' +
+      '<span class="tlitx"><b>' + p.n + '</b><i>' + (TEL_RUOLI[p.ruolo] || p.ruolo) + ' · ' + REL_NOMI[p.rel] +
+        (p.fuori && p.citta ? ' · ' + telCittaNome(p.citta) : '') + '</i></span>' +
       '<span class="tliv">' + hsvg("fama") + Math.round(p.fama) + '</span></button>').join("") +
     '</div><button class="tbtn" data-posto="1">Vai alla Sala</button>';
+}
+/* Il nome per esteso della citta' lo sa trasferte.js; se non e' caricato si
+   ripiega sull'id, che e' gia' leggibile («bologna»). */
+function telCittaNome(id){
+  try{
+    const c = (window.TRASFERTE && window.TRASFERTE.citta || []).find(x => x.id === id);
+    if(c) return c.n;
+  }catch(e){}
+  return String(id || "").replace(/^./, ch => ch.toUpperCase());
 }
 
 /* ---- Notizie ---- */
