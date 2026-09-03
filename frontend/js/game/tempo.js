@@ -157,6 +157,7 @@
   function bloccoTempoEsterno(){
     if(azionePendente()) return "action-pending";
     try{
+      if(window.ADF_JAIL && typeof ADF_JAIL.blocked === "function" && ADF_JAIL.blocked()) return "jail-event-pending";
       if(typeof GAME_EVENTS !== "undefined" && GAME_EVENTS.blocked && GAME_EVENTS.blocked()) return "event-pending";
     }catch(e){}
     return null;

@@ -317,6 +317,358 @@ function stMollaIlGiro(){
   save(); renderStrada(); renderGioco();
 }
 
+
+/* ==================== CARCERE EVENTI V2 — 35 SCENE CONTESTUALI ====================
+   Regola narrativa: mentre sei detenuto il mondo "normale" non entra dalla
+   porta. Qui succedono solo vita interna, rapporti fra detenuti, criminalità
+   interna e contatti esterni plausibili (posta, colloqui, legale).
+   I cinque HIGH sono obbligatori, persistono al refresh e bloccano il tempo. */
+
+const CARCERE_EVENTI = [
+  /* ---------- ROUTINE · 10 ---------- */
+  {id:"jail_conta_22",n:"Conta delle ventidue",cat:"routine",tier:"low",weight:1.8,
+   run(){G.wellbeing=clamp(G.wellbeing-1,0,100);return {t:"Porte, passi e nomi letti ad alta voce. Benessere -1.",c:"bad"};}},
+  {id:"jail_cella_rivoltata",n:"Cella rivoltata",cat:"routine",tier:"medium",weight:1.1,
+   run(){G.wellbeing=clamp(G.wellbeing-2,0,100);carcereLuc(-1);return {t:"Ti svuotano il poco che hai e rimettono tutto come capita. Benessere -2, lucidità -1.",c:"bad"};}},
+  {id:"jail_mensa_fondo",n:"Tavolo in fondo alla mensa",cat:"routine",tier:"low",weight:1.5,
+   run(){G.wellbeing=clamp(G.wellbeing+2,0,100);return {t:"Per mezz'ora mangi senza che nessuno ti chieda niente. Benessere +2.",c:"good"};}},
+  {id:"jail_notte_senza_sonno",n:"Notte senza sonno",cat:"routine",tier:"low",weight:1.4,
+   run(){carcereLuc(-2);return {t:"Nel corridoio non smettono di parlare. Lucidità -2.",c:"bad"};}},
+  {id:"jail_acqua_fredda",n:"Acqua fredda",cat:"routine",tier:"low",weight:1.1,
+   run(){G.wellbeing=clamp(G.wellbeing-1,0,100);carcereLuc(1);return {t:"Doccia gelata. Ti sveglia, ma non ti migliora la giornata. Benessere -1, lucidità +1.",c:""};}},
+  {id:"jail_biblioteca",n:"Un'ora in biblioteca",cat:"routine",tier:"low",weight:1.25,minDays:3,
+   run(){carcereLuc(2);carcereSkill("scrittura",.25);return {t:"Un'ora senza televisori né urla. Lucidità +2, scrittura +0,25.",c:"good"};}},
+  {id:"jail_pulizie",n:"Turno nel corridoio",cat:"routine",tier:"low",weight:1.0,minDays:2,
+   run(){G.wellbeing=clamp(G.wellbeing-1,0,100);carcereLuc(1);return {t:"Secchio, pavimento, un'ora che passa. Benessere -1, lucidità +1.",c:""};}},
+  {id:"jail_sopravvitto",n:"Due cose dal sopravvitto",cat:"routine",tier:"medium",weight:.8,
+   when:()=>Number(G.money)>=12,
+   run(){G.money-=12;G.wellbeing=clamp(G.wellbeing+2,0,100);return {t:"Dodici euro per rendere la cella un po' meno ostile. -12 €, benessere +2.",c:""};}},
+  {id:"jail_cambio_braccio",n:"Cambio di braccio",cat:"routine",tier:"medium",weight:.72,minDays:10,cooldown:28,
+   run(){G.wellbeing=clamp(G.wellbeing-2,0,100);return {t:"Nuove porte, nuovi nomi, stesse regole da capire. Benessere -2.",c:"bad"};}},
+  {id:"jail_infermeria",n:"Passaggio in infermeria",cat:"routine",tier:"medium",weight:.75,
+   when:()=>Number(G.wellbeing)<=48,
+   run(){G.wellbeing=clamp(G.wellbeing+4,0,100);return {t:"Ti controllano e per una volta nessuno ti chiede di essere duro. Benessere +4.",c:"good"};}},
+
+  /* ---------- RAPPORTI TRA DETENUTI · 8 ---------- */
+  {id:"jail_compagno_parla",n:"Il compagno rompe il silenzio",cat:"rapporti",tier:"low",weight:1.25,minDays:2,
+   run(){G.wellbeing=clamp(G.wellbeing+1,0,100);return {t:"Dieci minuti di discorsi normali. Benessere +1.",c:"good"};}},
+  {id:"jail_vecchio_consiglio",n:"Uno che è qui da anni",cat:"rapporti",tier:"medium",weight:.9,minDays:6,
+   when:s=>(Number(s.precedenti)||0)<=1,
+   run(){carcereLuc(2);G.strada.rep=clamp((G.strada.rep||0)+.2,0,100);return {t:"Ti spiega cosa conviene non fare quando sei nuovo. Lucidità +2, reputazione +0,2.",c:"good"};}},
+  {id:"jail_tavolo_cortile",n:"Posto al tavolo del cortile",cat:"rapporti",tier:"medium",weight:1.0,minDays:7,
+   when:s=>(Number(s.rep)||0)<30,
+   run(){G.strada.rep=clamp((G.strada.rep||0)+.4,0,100);G.wellbeing=clamp(G.wellbeing+1,0,100);return {t:"Ti fanno spazio senza tante parole. Reputazione +0,4, benessere +1.",c:"good"};}},
+  {id:"jail_riconosciuto_dentro",n:"La tua voce è arrivata fin qui",cat:"rapporti",tier:"medium",weight:.72,minFans:500,
+   run(){G.wellbeing=clamp(G.wellbeing+3,0,100);return {t:"Un detenuto conosce un tuo pezzo. Non è un fan per strada: è uno qui dentro con te. Benessere +3.",c:"good"};}},
+  {id:"jail_favore_piccolo",n:"Un favore da niente",cat:"rapporti",tier:"medium",weight:.86,minDays:5,minRep:3,
+   run(){G.strada.rep=clamp((G.strada.rep||0)+.6,0,100);G.wellbeing=clamp(G.wellbeing-1,0,100);return {t:"Gli sistemi una cosa piccola e adesso si ricordano che l'hai fatto. Reputazione +0,6, benessere -1.",c:""};}},
+  {id:"jail_chiamano_nome",n:"Ti chiamano per nome",cat:"rapporti",tier:"medium",weight:.72,minRep:15,
+   run(){G.strada.rep=clamp((G.strada.rep||0)+.5,0,100);G.wellbeing=clamp(G.wellbeing+1,0,100);return {t:"Non sei più soltanto quello della cella in fondo. Reputazione +0,5, benessere +1.",c:"good"};}},
+  {id:"jail_aria_pesante",n:"Aria pesante nel braccio",cat:"rapporti",tier:"medium",weight:.85,minDays:12,
+   run(){G.wellbeing=clamp(G.wellbeing-2,0,100);G.strada.rep=clamp((G.strada.rep||0)+.2,0,100);return {t:"Nessuno fa niente, ma tutti guardano tutti. Benessere -2, reputazione +0,2.",c:"bad"};}},
+  {id:"jail_barre_quaderno",n:"Barre sul quaderno",cat:"rapporti",tier:"low",weight:1.0,minDays:5,
+   run(){carcereLuc(1);carcereSkill("scrittura",.35);return {t:"Uno scrive due righe, tu ne aggiungi quattro. Lucidità +1, scrittura +0,35.",c:"good"};}},
+
+  /* ---------- CRIMINALITÀ INTERNA · 7 ---------- */
+  {id:"jail_voce_giro",n:"Una voce dal giro passa le sbarre",cat:"crime",tier:"medium",weight:1.0,minRep:4,
+   run(){G.strada.rep=clamp((G.strada.rep||0)+.5,0,100);return {t:"Qualcuno ti fa arrivare due nomi e una notizia da fuori. Reputazione +0,5.",c:"good"};}},
+  {id:"jail_messaggio_piegato",n:"Messaggio piegato in quattro",cat:"crime",tier:"medium",weight:.82,minRep:12,minDays:7,
+   run(){G.strada.rep=clamp((G.strada.rep||0)+.4,0,100);carcereLuc(1);return {t:"Poche parole, abbastanza per capire che fuori si stanno muovendo. Reputazione +0,4, lucidità +1.",c:""};}},
+  {id:"jail_nome_pesa",n:"Il nome pesa anche dentro",cat:"crime",tier:"medium",weight:.7,minRep:30,
+   run(){G.strada.rep=clamp((G.strada.rep||0)+.8,0,100);return {t:"Una conversazione si ferma quando arrivi. Reputazione +0,8.",c:"good"};}},
+  {id:"jail_perquisizione_mirata",n:"Perquisizione mirata",cat:"crime",tier:"medium",weight:.66,minDays:8,
+   when:s=>(Number(s.rep)||0)>=25||(Number(s.precedenti)||0)>=2,
+   run(){G.wellbeing=clamp(G.wellbeing-3,0,100);carcereLuc(-1);return {t:"Questa volta non stanno controllando il piano: stanno controllando te. Benessere -3, lucidità -1.",c:"bad"};}},
+  {id:"jail_faccia_giro",n:"Una faccia del giro",cat:"crime",tier:"medium",weight:.72,minRep:18,minDays:10,
+   run(){G.strada.rep=clamp((G.strada.rep||0)+.7,0,100);carcereSkill("rete",.25);return {t:"Non vi conoscete, ma conoscete le stesse persone. Reputazione +0,7, rete +0,25.",c:"good"};}},
+  {id:"jail_conto_vecchio",n:"Un conto vecchio",cat:"crime",tier:"medium",weight:.62,minPrecedents:1,minDays:10,
+   run(){G.wellbeing=clamp(G.wellbeing-2,0,100);G.strada.rep=clamp((G.strada.rep||0)-.4,0,100);return {t:"Un nome del passato torna fuori in una conversazione che non volevi avere. Benessere -2, reputazione -0,4.",c:"bad"};}},
+  {id:"jail_fuori_silenzio",n:"Fuori non risponde nessuno",cat:"crime",tier:"medium",weight:.58,minRep:10,minDays:14,
+   run(){G.wellbeing=clamp(G.wellbeing-3,0,100);G.strada.rep=clamp((G.strada.rep||0)-.5,0,100);return {t:"Quelli che dicevano «qualsiasi cosa serve» oggi non rispondono. Benessere -3, reputazione -0,5.",c:"bad"};}},
+
+  /* ---------- LEGALE / MONDO ESTERNO · 5 ---------- */
+  {id:"jail_busta_legale",n:"Busta dello studio legale",cat:"esterno",tier:"low",weight:1.0,lawyer:true,
+   run(){carcereLuc(2);return {t:"Il legale ti aggiorna sulla pratica. Nessun miracolo, ma almeno sai cosa succede. Lucidità +2.",c:"good"};}},
+  {id:"jail_carta_casa",n:"Carta da casa",cat:"esterno",tier:"low",weight:.92,minDays:4,
+   run(){G.wellbeing=clamp(G.wellbeing+4,0,100);return {t:"Una pagina scritta fuori vale più di quanto pensavi. Benessere +4.",c:"good"};}},
+  {id:"jail_posta_nome_arte",n:"Posta col nome d'arte",cat:"esterno",tier:"low",weight:.55,minFans:2000,minDays:7,
+   run(){G.wellbeing=clamp(G.wellbeing+3,0,100);return {t:"Qualcuno ha scritto al carcere usando il tuo nome d'arte. Il pubblico è fuori, la lettera è qui. Benessere +3.",c:"good"};}},
+  {id:"jail_vetro_vuoto",n:"Vetro del colloquio vuoto",cat:"esterno",tier:"medium",weight:.68,minDays:7,
+   run(){G.wellbeing=clamp(G.wellbeing-3,0,100);return {t:"Aspetti un colloquio che oggi non arriva. Benessere -3.",c:"bad"};}},
+  {id:"jail_udienza_spostata",n:"Data dell'udienza spostata",cat:"esterno",tier:"medium",weight:.62,lawyer:true,minWeeks:3,minDays:10,
+   run(){G.wellbeing=clamp(G.wellbeing-2,0,100);carcereLuc(1);return {t:"Il legale ti dice che la data si sposta ancora. Benessere -2, lucidità +1.",c:""};}},
+
+  /* ---------- HIGH · 5 · SEMPRE SCELTA ---------- */
+  {id:"jail_high_schieramento",n:"Nel cortile vogliono una risposta",cat:"high",tier:"high",weight:1,minDays:10,minRep:8,once:true,
+   desc:()=>"Due gruppi hanno smesso di parlarsi e qualcuno decide che anche il tuo silenzio è una risposta. Vogliono sapere da che parte stai.",
+   choices:()=>[
+     {n:"Resti neutrale",d:"Provi a far capire che non sei entrato nel loro conto",
+      run(){const p=(G.skills&&Number(G.skills.presenza))||0;if(p>=32){G.wellbeing=clamp(G.wellbeing+1,0,100);return {t:"La fai passare senza sembrare debole. Benessere +1.",c:"good"};}G.wellbeing=clamp(G.wellbeing-3,0,100);G.strada.rep=clamp((G.strada.rep||0)-1,0,100);return {t:"La neutralità viene letta come paura. Benessere -3, reputazione -1.",c:"bad"};}},
+     {n:"Prendi una parte",d:"Dentro peserai di più, ma il braccio diventa più stretto",
+      run(){G.strada.rep=clamp((G.strada.rep||0)+4,0,100);G.wellbeing=clamp(G.wellbeing-5,0,100);return {t:"Adesso sanno dove stai. Reputazione +4, benessere -5.",c:""};}},
+     {n:"Provi a spegnere la cosa",d:"Presenza e reputazione decidono se ti ascoltano",
+      run(){const score=((G.skills&&Number(G.skills.presenza))||0)+(G.strada.rep||0)*.45;if(score>=45){G.strada.rep=clamp((G.strada.rep||0)+2,0,100);G.wellbeing=clamp(G.wellbeing+1,0,100);return {t:"Non hai risolto il carcere, hai evitato una guerra stupida. Reputazione +2, benessere +1.",c:"good"};}G.wellbeing=clamp(G.wellbeing-4,0,100);return {t:"Nessuno ti ha chiesto di mediare. Benessere -4.",c:"bad"};}}
+   ]},
+  {id:"jail_high_telefono",n:"Un telefono passa di mano",cat:"high",tier:"high",weight:1,minDays:14,once:true,
+   when:s=>(Number(s.rep)||0)>=15||(Number(s.precedenti)||0)>=2,
+   desc:()=>"Per pochi minuti arriva fino a te un telefono che non dovrebbe essere nel braccio. Puoi usarlo, rifiutarlo o farlo passare senza toccarlo.",
+   choices:ctx=>[
+     {n:"Fai una chiamata",d:"Parli con fuori, ma se arriva una perquisizione paghi tu",
+      run(){if(Math.random()<.34){const c=carcereStato();c.airBlockedUntil=carcereSerialeGiorno()+3;G.wellbeing=clamp(G.wellbeing-4,0,100);return {t:"Il telefono sparisce, ma il controllo arriva dopo. Ora d'aria sospesa per 3 giorni, benessere -4.",c:"bad"};}G.strada.rep=clamp((G.strada.rep||0)+2,0,100);carcereLuc(1);return {t:"Due minuti con fuori e il telefono riparte. Reputazione +2, lucidità +1.",c:"good"};}},
+     {n:"Lo rifiuti",d:"Nessun rischio disciplinare, qualcuno però se lo ricorda",
+      run(){G.strada.rep=clamp((G.strada.rep||0)-1,0,100);G.wellbeing=clamp(G.wellbeing+1,0,100);return {t:"Non lo tocchi. Reputazione -1, benessere +1.",c:""};}},
+     {n:"Lo fai passare",d:"Non chiami nessuno, ma non blocchi il favore",
+      run(){G.strada.rep=clamp((G.strada.rep||0)+1,0,100);return {t:"Il telefono continua il suo giro. Reputazione +1.",c:""};}}
+   ]},
+  {id:"jail_high_vecchio_opp",n:"Una faccia del passato nel braccio",cat:"high",tier:"high",weight:1,minDays:18,minRep:24,minPrecedents:1,once:true,
+   desc:()=>"Nel cortile riconosci una faccia legata a un conto vecchio. Anche lui ti ha riconosciuto. Questa volta nessuno può semplicemente cambiare strada.",
+   choices:()=>[
+     {n:"Parli prima che salga",d:"Provi a chiuderla con la testa",
+      run(){const p=(G.skills&&Number(G.skills.presenza))||0;if(p+(G.strada.rep||0)*.3>=40){G.strada.rep=clamp((G.strada.rep||0)+1,0,100);G.wellbeing=clamp(G.wellbeing+1,0,100);return {t:"Non diventate amici, ma il conto resta fuori dal cortile. Reputazione +1, benessere +1.",c:"good"};}G.wellbeing=clamp(G.wellbeing-4,0,100);G.strada.rep=clamp((G.strada.rep||0)-1,0,100);return {t:"Le parole non bastano e la tensione resta lì. Benessere -4, reputazione -1.",c:"bad"};}},
+     {n:"Lo affronti",d:"Rischio alto: reputazione o una settimana fisicamente pesante",
+      run(){const p=(G.skills&&Number(G.skills.presenza))||0;const win=Math.random()<clamp(.30+(G.strada.rep||0)/220+p/190,.2,.78);if(win){G.strada.rep=clamp((G.strada.rep||0)+5,0,100);G.wellbeing=clamp(G.wellbeing-4,0,100);return {t:"La situazione finisce dalla tua parte. Reputazione +5, benessere -4.",c:"good"};}G.wellbeing=clamp(G.wellbeing-12,0,100);G.strada.rep=clamp((G.strada.rep||0)-2,0,100);return {t:"Hai scelto lo scontro e l'hai pagato. Benessere -12, reputazione -2.",c:"bad"};}},
+     {n:"Chiedi di cambiare sezione",d:"Ti togli dal problema, ma dentro si legge in un solo modo",
+      run(){G.strada.rep=clamp((G.strada.rep||0)-3,0,100);G.wellbeing=clamp(G.wellbeing+3,0,100);return {t:"Il problema resta dall'altra parte di una porta. Reputazione -3, benessere +3.",c:""};}}
+   ]},
+  {id:"jail_high_disciplinare",n:"Rapporto sul tavolo del comandante",cat:"high",tier:"high",weight:1,minDays:12,once:true,
+   desc:()=>"Ti chiamano fuori dalla cella: c'è un rapporto disciplinare con il tuo nome. Non è un processo, ma può rendere i prossimi giorni molto più stretti.",
+   choices:ctx=>[
+     {n:"Testa bassa",d:"Non contesti e assorbi la sanzione",
+      run(){const c=carcereStato();c.airBlockedUntil=carcereSerialeGiorno()+2;G.wellbeing=clamp(G.wellbeing-2,0,100);return {t:"Due giorni senza ora d'aria. Benessere -2.",c:"bad"};}},
+     {n:"Contesti il rapporto",d:"Se reggi la versione eviti la sanzione, altrimenti peggiora",
+      run(){const p=(G.skills&&Number(G.skills.presenza))||0;if(p>=35||Math.random()<.42){carcereLuc(1);return {t:"Il rapporto non regge abbastanza per toglierti il cortile. Lucidità +1.",c:"good"};}const c=carcereStato();c.airBlockedUntil=carcereSerialeGiorno()+4;G.wellbeing=clamp(G.wellbeing-3,0,100);return {t:"Hai contestato e non è servito: quattro giorni senza ora d'aria, benessere -3.",c:"bad"};}},
+     {n:"Fai intervenire il legale",d:"Il legale riduce il danno amministrativo",
+      when:()=>!!G.strada.avvocato,
+      run(){const c=carcereStato();c.airBlockedUntil=carcereSerialeGiorno()+1;carcereLuc(2);return {t:"Il legale riduce la sanzione a un giorno senza ora d'aria. Lucidità +2.",c:"good"};}}
+   ]},
+  {id:"jail_high_quando_esci",n:"Ti aspettano quando esci",cat:"high",tier:"high",weight:1,minDays:21,minRep:35,minWeeks:3,once:true,
+   desc:()=>"Un messaggio arriva attraverso il giro: quando esci c'è posto per te in una cosa più grossa. Nessun dettaglio scritto, proprio per questo capisci che è seria.",
+   choices:()=>[
+     {n:"Dici sì",d:"Dentro guadagni peso; fuori tornerai con più reputazione e più attenzione",
+      run(){const c=carcereStato();c.releaseRepBonus=(c.releaseRepBonus||0)+4;c.releaseHeatBonus=(c.releaseHeatBonus||0)+5;G.strada.rep=clamp((G.strada.rep||0)+2,0,100);G.wellbeing=clamp(G.wellbeing-2,0,100);return {t:"La risposta torna fuori: sì. Reputazione +2 adesso; all'uscita il giro e l'attenzione ti aspettano.",c:""};}},
+     {n:"Dici no",d:"Perdi peso nel giro, ma esci senza quella promessa addosso",
+      run(){G.strada.rep=clamp((G.strada.rep||0)-3,0,100);G.wellbeing=clamp(G.wellbeing+2,0,100);return {t:"Hai chiuso la porta prima di uscire. Reputazione -3, benessere +2.",c:""};}},
+     {n:"Non dai una risposta",d:"Lasci uno spiraglio senza impegnarti",
+      run(){const c=carcereStato();c.releaseRepBonus=(c.releaseRepBonus||0)+1;c.releaseHeatBonus=(c.releaseHeatBonus||0)+1;carcereLuc(-1);return {t:"Non hai detto né sì né no. All'uscita qualcosa sarà ancora aperto. Lucidità -1.",c:""};}}
+   ]}
+];
+
+function carcereDetenuto(){return !!(G.strada&&G.strada.arresto);}
+function carcereSerialeGiorno(){return (((Math.max(1,Number(G.year)||1)-1)*52+(Math.max(1,Number(G.week)||1)-1))*7+(Math.max(1,Number(G.day)||1)-1));}
+function carcereSerialeSettimana(){return (Math.max(1,Number(G.year)||1)-1)*52+Math.max(1,Number(G.week)||1);}
+function carcereLuc(n){if(typeof addLuc==="function")addLuc(n);else G.lucidita=clamp((Number(G.lucidita)||0)+n,0,100);}
+function carcereSkill(k,n){if(typeof gain==="function")gain(k,n);else{G.skills=G.skills||{};G.skills[k]=clamp((Number(G.skills[k])||0)+n,0,88);}}
+
+function carcereStato(){
+  if(!carcereDetenuto())return null;
+  const s=G.strada,a=s.arresto,d=carcereSerialeGiorno();
+  if(!a.jailId)a.jailId="J:"+(G.year||1)+":"+(G.week||1)+":"+(G.day||1)+":"+(s.precedenti||0)+":"+String(a.colpo||"arresto");
+  if(!s.carcere||typeof s.carcere!=="object"||s.carcere.jailId!==a.jailId){
+    s.carcere={jailId:a.jailId,eventi:[],recenti:[],seen:{},lastEventDay:d,lastHighDay:d-30,startedDay:d,
+      daily:{key:d},weekly:{key:carcereSerialeSettimana()},ricorsoUsato:false,pendingHigh:null,airBlockedUntil:0,
+      releaseRepBonus:0,releaseHeatBonus:0};
+  }
+  const c=s.carcere;
+  if(!Array.isArray(c.eventi))c.eventi=[];
+  if(!Array.isArray(c.recenti))c.recenti=[];
+  if(!c.seen||typeof c.seen!=="object")c.seen={};
+  if(!Number.isFinite(c.startedDay))c.startedDay=d;
+  if(!Number.isFinite(c.lastHighDay))c.lastHighDay=d-30;
+  if(!Number.isFinite(c.airBlockedUntil))c.airBlockedUntil=0;
+  if(!Number.isFinite(c.releaseRepBonus))c.releaseRepBonus=0;
+  if(!Number.isFinite(c.releaseHeatBonus))c.releaseHeatBonus=0;
+  const dk=carcereSerialeGiorno();if(!c.daily||c.daily.key!==dk)c.daily={key:dk};
+  const wk=carcereSerialeSettimana();if(!c.weekly||c.weekly.key!==wk)c.weekly={key:wk};
+  return c;
+}
+function carcereCtx(){
+  const c=carcereStato(),s=G.strada,a=s&&s.arresto;
+  return {state:c,street:s,arrest:a,day:carcereSerialeGiorno(),days:c?Math.max(0,carcereSerialeGiorno()-c.startedDay):0,
+    weeks:a?Math.max(0,Number(a.settimane)||0):0,rep:s?Number(s.rep)||0:0,precedents:s?Number(s.precedenti)||0:0,
+    fans:Number(G.fans)||0,lawyer:!!(s&&s.avvocato)};
+}
+function carcereEligible(e,ctx){
+  if(e.minDays!=null&&ctx.days<e.minDays)return false;
+  if(e.minRep!=null&&ctx.rep<e.minRep)return false;
+  if(e.minPrecedents!=null&&ctx.precedents<e.minPrecedents)return false;
+  if(e.minFans!=null&&ctx.fans<e.minFans)return false;
+  if(e.minWeeks!=null&&ctx.weeks<e.minWeeks)return false;
+  if(e.lawyer===true&&!ctx.lawyer)return false;
+  if(e.lawyer===false&&ctx.lawyer)return false;
+  if(e.once&&ctx.state.seen[e.id])return false;
+  if(e.cooldown){
+    const last=ctx.state.eventLast&&Number(ctx.state.eventLast[e.id]);
+    if(Number.isFinite(last)&&ctx.day-last<e.cooldown)return false;
+  }
+  if(e.when&&!e.when(ctx.street,ctx))return false;
+  return true;
+}
+function carcerePick(pool){
+  if(!pool.length)return null;
+  let total=pool.reduce((n,e)=>n+Math.max(.05,Number(e.weight)||1),0),r=Math.random()*total;
+  for(const e of pool){r-=Math.max(.05,Number(e.weight)||1);if(r<=0)return e;}
+  return pool[pool.length-1];
+}
+function carcereChanged(){try{window.dispatchEvent(new CustomEvent("jail:changed"));}catch(_){}}
+function carcereRegistra(id,titolo,testo,kind){
+  const c=carcereStato();if(!c)return;
+  c.eventi.unshift({id:id,t:titolo,txt:testo,kind:kind||"evento",year:G.year||1,week:G.week||1,day:G.day||1});
+  if(c.eventi.length>14)c.eventi.length=14;
+}
+function carcereMark(e,ctx){
+  const c=ctx.state;
+  c.eventLast=c.eventLast||{};c.eventLast[e.id]=ctx.day;
+  c.recenti.unshift(e.id);if(c.recenti.length>7)c.recenti.length=7;
+  if(e.once)c.seen[e.id]=true;
+}
+function carcereModalLayer(on){
+  const m=document.getElementById("modal");if(!m)return;
+  if(on){
+    if(m.dataset.jailOldZ==null)m.dataset.jailOldZ=m.style.zIndex||"";
+    m.style.zIndex="130";document.body.classList.add("adf-jail-high");
+  }else{
+    m.style.zIndex=m.dataset.jailOldZ||"";delete m.dataset.jailOldZ;
+    document.body.classList.remove("adf-jail-high");
+  }
+}
+function carcereHighObject(e){
+  const ctx=carcereCtx(),choices=(typeof e.choices==="function"?e.choices(ctx):[]).filter(o=>!o.when||o.when(ctx));
+  return {k:"CARCERE · DECISIONE",t:e.n,d:typeof e.desc==="function"?e.desc(ctx):String(e.desc||""),
+    opts:choices.map(o=>({n:o.n,d:o.d,run(){return carcereResolveHigh(e,o);}}))};
+}
+function carcereResolveHigh(e,o){
+  const ctx=carcereCtx(),c=ctx.state;
+  const r=(o&&o.run?o.run(ctx):null)||{t:e.n,c:""};
+  c.pendingHigh=null;c.lastHighDay=ctx.day;carcereMark(e,ctx);
+  carcereRegistra(e.id,e.n,r.t||e.n,"high");
+  carcereModalLayer(false);carcereChanged();if(typeof save==="function")save();
+  return r;
+}
+function carcereShowHigh(e){
+  if(!e||!carcereDetenuto())return false;
+  const c=carcereStato();if(c.pendingHigh)return false;
+  c.pendingHigh=e.id;carcereModalLayer(true);if(typeof save==="function")save();
+  const obj=carcereHighObject(e);
+  if(typeof SALTO!=="undefined"&&SALTO){
+    if(typeof SALTO_STOP!=="undefined")SALTO_STOP=obj;
+    return true;
+  }
+  setTimeout(()=>{if(typeof showEvent==="function")showEvent(obj);},80);
+  return true;
+}
+function carcereRestoreHigh(){
+  if(!carcereDetenuto())return false;
+  const c=carcereStato();if(!c.pendingHigh)return false;
+  const e=CARCERE_EVENTI.find(x=>x.id===c.pendingHigh&&x.tier==="high");
+  if(!e){c.pendingHigh=null;carcereModalLayer(false);return false;}
+  const m=document.getElementById("modal");
+  if(m&&m.classList.contains("on"))return false;
+  carcereModalLayer(true);setTimeout(()=>{if(typeof showEvent==="function")showEvent(carcereHighObject(e));},80);
+  return true;
+}
+function carcereGiorno(){
+  if(!carcereDetenuto())return false;
+  const ctx=carcereCtx(),c=ctx.state,d=ctx.day;
+  if(c.pendingHigh)return false;
+  const gap=d-(Number.isFinite(c.lastEventDay)?c.lastEventDay:d);
+  if(gap<4)return false;
+  if(gap<8&&Math.random()>=.28)return false;
+
+  const recent=new Set(c.recenti.slice(0,4));
+  const highReady=ctx.days>=10&&(d-c.lastHighDay)>=18;
+  const highPool=CARCERE_EVENTI.filter(e=>e.tier==="high"&&carcereEligible(e,ctx));
+  let e=null;
+  if(highReady&&highPool.length&&Math.random()<.22)e=carcerePick(highPool);
+  if(!e){
+    let pool=CARCERE_EVENTI.filter(e=>e.tier!=="high"&&carcereEligible(e,ctx)&&!recent.has(e.id));
+    if(!pool.length)pool=CARCERE_EVENTI.filter(e=>e.tier!=="high"&&carcereEligible(e,ctx));
+    e=carcerePick(pool);
+  }
+  if(!e)return false;
+  c.lastEventDay=d;
+  if(e.tier==="high")return carcereShowHigh(e);
+
+  const r=(e.run?e.run(ctx):null)||{t:e.n,c:""};
+  carcereMark(e,ctx);carcereRegistra(e.id,e.n,r.t||e.n,e.tier);
+  carcereChanged();if(typeof save==="function")save();return true;
+}
+function carcereTempo(minuti,id){
+  if(carcereStato()&&carcereStato().pendingHigh)return {ok:false,t:"Prima devi prendere la decisione aperta in carcere."};
+  try{
+    if(typeof GAME_TIME==="undefined")return {ok:true};
+    if(GAME_TIME.remaining()<minuti)return {ok:false,t:"Non c'è abbastanza tempo prima delle 04:00."};
+    const r=GAME_TIME.advance(minuti,"jail:"+id,{detail:{jail:true,jailAction:id}});
+    if(r&&r.blocked)return {ok:false,t:"Adesso il tempo è bloccato da un'altra situazione."};
+  }catch(_){}
+  return {ok:true};
+}
+function carcereAirDays(c){
+  return Math.max(0,(Number(c.airBlockedUntil)||0)-carcereSerialeGiorno());
+}
+function carcereAzioni(){
+  const c=carcereStato();if(!c)return [];
+  const s=G.strada,a=s.arresto,pending=!!c.pendingHigh;
+  let rem=9999;try{if(typeof GAME_TIME!=="undefined")rem=GAME_TIME.remaining();}catch(_){}
+  const airDays=carcereAirDays(c),ariaUsata=!!c.daily.aria,giroUsato=!!c.weekly.giro;
+  const legaleNoSoldi=!s.avvocato&&Number(G.money)<STRADA_AVVOCATO_COSTO,legaleFine=(Number(a.settimane)||0)<=1;
+  return [
+    {id:"aria",n:"Ora d'aria",d:"60 min · recuperi un po' di testa e benessere",
+     disabled:pending||airDays>0||ariaUsata||rem<60,
+     reason:pending?"Decisione in sospeso":airDays>0?"Sospesa per "+airDays+(airDays===1?" giorno":" giorni"):ariaUsata?"Già fatta oggi":rem<60?"Troppo tardi oggi":""},
+    {id:"giro",n:"Parla con il giro",d:"45 min · una volta a settimana · reputazione di strada",
+     disabled:pending||giroUsato||rem<45,
+     reason:pending?"Decisione in sospeso":giroUsato?"Già fatto questa settimana":rem<45?"Troppo tardi oggi":""},
+    {id:"avvocato",n:s.avvocato?"Parla con l'avvocato":"Chiama un avvocato",
+     d:(s.avvocato?"30 min · ricorso incluso nell'incarico":"30 min · 320 € per incaricarlo")+" · può togliere 1 settimana",
+     disabled:pending||!!c.ricorsoUsato||legaleNoSoldi||legaleFine||rem<30,
+     reason:pending?"Decisione in sospeso":c.ricorsoUsato?"Ricorso già usato in questa detenzione":legaleNoSoldi?"Non hai 320 €":legaleFine?"Ti resta solo 1 settimana":rem<30?"Troppo tardi oggi":""}
+  ];
+}
+function carcereAzione(id){
+  if(!carcereDetenuto())return {ok:false,t:"Non sei in carcere."};
+  const c=carcereStato(),s=G.strada,a=s.arresto;
+  if(c.pendingHigh)return {ok:false,t:"Prima devi prendere la decisione aperta in carcere."};
+
+  if(id==="aria"){
+    const airDays=carcereAirDays(c);if(airDays>0)return {ok:false,t:"L'ora d'aria è sospesa ancora per "+airDays+(airDays===1?" giorno.":" giorni.")};
+    if(c.daily.aria)return {ok:false,t:"Hai già fatto l'ora d'aria oggi."};
+    const tempo=carcereTempo(60,id);if(!tempo.ok)return tempo;c.daily.aria=true;
+    G.wellbeing=clamp(G.wellbeing+4,0,100);carcereLuc(3);
+    const t="Un'ora fuori dalla cella. Benessere +4, lucidità +3.";carcereRegistra("azione_aria","Ora d'aria",t,"azione");
+    carcereChanged();if(typeof save==="function")save();return {ok:true,t:t,c:"good"};
+  }
+  if(id==="giro"){
+    if(c.weekly.giro)return {ok:false,t:"Per questa settimana hai già mosso abbastanza il giro dentro."};
+    const tempo=carcereTempo(45,id);if(!tempo.ok)return tempo;c.weekly.giro=true;
+    s.rep=clamp((s.rep||0)+.8,0,100);G.wellbeing=clamp(G.wellbeing-1,0,100);
+    const t="Due parole nel cortile, niente promesse. Reputazione +0,8, benessere -1.";carcereRegistra("azione_giro","Parla con il giro",t,"azione");
+    carcereChanged();if(typeof save==="function")save();return {ok:true,t:t,c:""};
+  }
+  if(id==="avvocato"){
+    if(c.ricorsoUsato)return {ok:false,t:"Hai già usato il ricorso in questa detenzione."};
+    if((Number(a.settimane)||0)<=1)return {ok:false,t:"Con una sola settimana residua non c'è più margine per il ricorso."};
+    if(!s.avvocato&&Number(G.money)<STRADA_AVVOCATO_COSTO)return {ok:false,t:"Ti servono "+STRADA_AVVOCATO_COSTO+" € per incaricare l'avvocato."};
+    const tempo=carcereTempo(30,id);if(!tempo.ok)return tempo;
+    if(!s.avvocato){G.money-=STRADA_AVVOCATO_COSTO;s.avvocato=true;}
+    a.settimane=Math.max(1,(Number(a.settimane)||1)-1);c.ricorsoUsato=true;carcereLuc(2);
+    const t="Il legale ottiene una revisione: 1 settimana in meno sulla pena residua. Lucidità +2.";
+    carcereRegistra("azione_avvocato","Parla con l'avvocato",t,"azione");
+    if(typeof pushLog==="function")pushLog("<b>Dal carcere: ricorso accolto.</b> Una settimana in meno.","good");
+    carcereChanged();if(typeof save==="function")save();return {ok:true,t:t,c:"good"};
+  }
+  return {ok:false,t:"Azione carcere sconosciuta."};
+}
+function carcereVista(){
+  const c=carcereStato();if(!c)return {detenuto:false,azioni:[],eventi:[],pendingHigh:null};
+  return {detenuto:true,azioni:carcereAzioni(),eventi:c.eventi.slice(0,10),pendingHigh:c.pendingHigh||null};
+}
+window.addEventListener("jail-ui:opened",()=>setTimeout(carcereRestoreHigh,100));
+window.ADF_JAIL=Object.freeze({
+  inJail:carcereDetenuto,day:carcereGiorno,view:carcereVista,act:carcereAzione,
+  blocked:()=>!!(carcereStato()&&carcereStato().pendingHigh),restore:carcereRestoreHigh,
+  catalog:()=>CARCERE_EVENTI.map(e=>({id:e.id,n:e.n,cat:e.cat,tier:e.tier}))
+});
+
 /* ==================== IL CICLO SETTIMANALE ====================
    Chiamata da sim.js, dentro advanceWeek(), prima che la settimana avanzi:
    heat che decade, attività che rendono, uomini/protezione/avvocato che
@@ -338,8 +690,12 @@ function stradaSettimana(){
     }
     if(s.arresto.settimane <= 0){
       const colpoFatto = s.arresto.colpo;
+      const jailFx = s.carcere || {};
       s.arresto = null;
-      s.rep = clamp(s.rep + 12, 0, 100);
+      s.rep = clamp(s.rep + 12 + (Number(jailFx.releaseRepBonus)||0), 0, 100);
+      s.heat = clamp(s.heat + (Number(jailFx.releaseHeatBonus)||0), 0, 100);
+      if(jailFx.releaseRepBonus || jailFx.releaseHeatBonus)
+        pushLog("<b>Quello che hai deciso dentro ti aspetta fuori.</b> Il giro e l'attenzione ripartono da dove li avevi lasciati.", "");
       showEvent({k:"Sei uscito", t:"Fuori", d:"La storia di «" + colpoFatto + "» ti ha seguito fin qui.",
         annulla(){},
         opts:[
@@ -820,4 +1176,3 @@ function uscitaStrada(){
   chiudiStrada();
   return true;
 }
-

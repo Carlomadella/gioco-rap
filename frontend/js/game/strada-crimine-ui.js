@@ -105,6 +105,16 @@
       .adf-jail-weeks{margin:10px 0 20px;font-family:"Big Shoulders Stencil Display",Impact,sans-serif;font-size:78px;line-height:.9;color:#fff}
       .adf-jail-weeks span{display:block;margin-top:8px;color:#ff315b;font:900 12px/1.2 Figtree,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase}
       .adf-jail-row{padding:14px 0;border-top:1px solid rgba(255,255,255,.10)}.adf-jail-row b{display:block;margin-top:5px;font-size:15px}
+      .adf-jail-tools{margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12)}
+      .adf-jail-tools>small,.adf-jail-feed>small{display:block;margin-bottom:8px;color:#9aa0aa;font-size:10px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}
+      .adf-jail-actions{display:grid;gap:7px}.adf-jail-act{width:100%;padding:10px 11px;text-align:left;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.055);color:#f5f1ea;cursor:pointer}
+      .adf-jail-act b{display:block;font-size:12px}.adf-jail-act span{display:block;margin-top:3px;color:#aeb3bd;font-size:10px;line-height:1.3}
+      .adf-jail-act:disabled{opacity:.42;cursor:not-allowed}.adf-jail-act:not(:disabled):hover{border-color:#ff315b;background:rgba(255,49,91,.09)}
+      .adf-jail-result{min-height:18px;margin-top:8px;color:#d9dde4;font-size:11px;line-height:1.35}
+      .adf-jail-feed{margin-top:15px;padding-top:12px;border-top:1px solid rgba(255,255,255,.10)}
+      .adf-jail-event{padding:7px 0;border-top:1px solid rgba(255,255,255,.07)}.adf-jail-event:first-of-type{border-top:0}
+      .adf-jail-event b{display:block;font-size:11px}.adf-jail-event span{display:block;margin-top:2px;color:#9fa5af;font-size:10px;line-height:1.35}
+      .adf-jail-empty{color:#777e89;font-size:10px;line-height:1.35}
       .adf-jail-exit{width:100%;margin-top:18px;padding:14px 16px;border:1px solid rgba(255,255,255,.18);background:#f4f0ea;color:#111;font-weight:950;text-transform:uppercase;cursor:pointer}
       @media(max-width:900px){.adf-jail-main{grid-template-columns:1fr;padding:28px}.adf-jail-card{align-self:end}.adf-jail h1{font-size:86px}.adf-jail-meta{display:none}}
     `;
@@ -128,11 +138,28 @@
           <div class="adf-jail-weeks" id="adf-jail-weeks">—</div>
           <div class="adf-jail-row"><small>Per cosa</small><b id="adf-jail-cause">—</b></div>
           <div class="adf-jail-row"><small>Precedenti</small><b id="adf-jail-record">0</b></div>
+          <div class="adf-jail-tools">
+            <small>Cosa puoi fare qui dentro</small>
+            <div class="adf-jail-actions" id="adf-jail-actions"></div>
+            <div class="adf-jail-result" id="adf-jail-result"></div>
+          </div>
+          <div class="adf-jail-feed">
+            <small>Dentro succede</small>
+            <div id="adf-jail-events"></div>
+          </div>
           <button class="adf-jail-exit" id="adf-jail-exit" type="button">Torna alla mappa</button>
         </aside>
       </div>`;
     document.body.appendChild(jail);
     jail.querySelector("#adf-jail-exit").onclick=closeJail;
+    jail.addEventListener("click",ev=>{
+      const b=ev.target.closest&&ev.target.closest("[data-jail-action]");
+      if(!b || !window.ADF_JAIL || typeof ADF_JAIL.act!=="function") return;
+      const r=ADF_JAIL.act(b.dataset.jailAction);
+      const out=jail.querySelector("#adf-jail-result");
+      if(out) out.textContent=(r&&r.t)||"";
+      syncJail();
+    });
     return jail;
   }
   function jailBackground(){
@@ -142,6 +169,24 @@
       || all.find(bg=>Array.isArray(bg.tags)&&bg.tags.includes("arrest"))
       || null;
   }
+  function renderJailLoop(el){
+    const box=el.querySelector("#adf-jail-actions"), feed=el.querySelector("#adf-jail-events");
+    if(!window.ADF_JAIL || typeof ADF_JAIL.view!=="function"){
+      if(box) box.innerHTML='<div class="adf-jail-empty">Meccaniche carcere non disponibili.</div>';
+      return;
+    }
+    const v=ADF_JAIL.view();
+    if(box) box.innerHTML=(v.azioni||[]).map(a=>
+      '<button class="adf-jail-act" type="button" data-jail-action="'+esc(a.id)+'" '+(a.disabled?"disabled":"")+'>'+
+        '<b>'+esc(a.n)+'</b><span>'+esc(a.reason||a.d||"")+'</span></button>'
+    ).join("");
+    if(feed){
+      feed.innerHTML=(v.eventi&&v.eventi.length)
+        ? v.eventi.map(e=>'<div class="adf-jail-event"><b>'+esc(e.t)+'</b><span>'+esc(e.txt)+'</span></div>').join("")
+        : '<div class="adf-jail-empty">Per ora solo rumore di chiavi e porte. Gli eventi qui dentro arrivano con il tempo, non ogni ora.</div>';
+    }
+  }
+
   function syncJail(){
     const jail=document.getElementById("adf-jail");
     const a=street().arresto;
@@ -156,6 +201,7 @@
     el.querySelector("#adf-jail-city").textContent=(String(art.city||art.citta||"").trim()||"Provincia");
     const bg=jailBackground(), bgEl=el.querySelector("#adf-jail-bg");
     if(bg&&bg.url)bgEl.style.backgroundImage=`url("${bg.url}")`;
+    renderJailLoop(el);
     return true;
   }
   function closeJail(){
@@ -174,6 +220,7 @@
   }
   window.apriCarcere=openJail;
   window.chiudiCarcere=closeJail;
+  window.addEventListener("jail:changed",()=>{ if(street().arresto) syncJail(); });
 
   /* ---------- local background engine ---------- */
   function careerBand(s){let structure=s.men*5+s.protection*7+s.businessCount*6+(s.gun?4:0)+(s.lawyer?4:0),capital=Math.min(25,Math.log10(Math.max(1,s.dirty+100))*6),cityBonus=s.city.includes("milano")?14:(s.city.includes("los")||s.city==="la"?26:0),score=s.rep*.62+structure+capital+cityBonus;if(s.goat)score=Math.max(score,88);return score>=78?3:score>=50?2:score>=27?1:0}

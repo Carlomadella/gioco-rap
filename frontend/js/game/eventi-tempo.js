@@ -44,6 +44,10 @@
   let RESTORE_TIMER = null;
   let AUTO_GUARD = false;
 
+  function inJail(){
+    return !!(G.strada && G.strada.arresto);
+  }
+
   function artist(){
     try{
       if(window.ARTIST) return window.ARTIST;
@@ -297,6 +301,7 @@
 
   function showPending(){
     const p = pending();
+    if(inJail()) return;
     if(!p || MOSTRANDO_ALTO || typeof showEvent !== "function" || !screenGameplay()) return;
     const modal = document.getElementById("modal");
     if(modal && modal.classList.contains("on")){
@@ -392,6 +397,7 @@
      davvero la mossa. I checkpoint iniziale/finale non sono validi. */
   function planHigh(detail){
     detail=detail||{};
+    if(inJail()) return null;
     if(pending()) return null;
     try{
       if(window.ADF_EVENTI){
@@ -425,6 +431,7 @@
 
   function evaluate(detail){
     detail=detail||{};
+    if(inJail()) return null;
     if(AUTO_GUARD || pending() || detail.suppressRandomEvents) return null;
     let allowHigh=true;
     try{

@@ -1468,6 +1468,11 @@ function giornoTrasferte(){
 
   scadenze();
 
+  /* La vita fuori continua: un invito già ricevuto può scadere. Ma da dentro
+     non maturano nuove catene, non arrivano nuove occasioni e non ti chiamano
+     per partire in trasferta. Al rilascio riprende tutto dal giorno seguente. */
+  if(G.strada && G.strada.arresto){ salva(); return; }
+
   /* le catene mature: una al giorno al massimo, se no torni da un salto di un
      mese e trovi otto persone che ti scrivono insieme */
   const mature = s.catene.filter(x => x.quando <= oggi);

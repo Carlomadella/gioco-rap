@@ -161,6 +161,7 @@
 
   function eventBlocked(){
     try{
+      if(window.ADF_JAIL && typeof ADF_JAIL.blocked==="function" && ADF_JAIL.blocked()) return true;
       if(typeof GAME_EVENTS!=="undefined" && GAME_EVENTS.blocked && GAME_EVENTS.blocked()) return true;
       if(window.ADF_EVENTI && typeof ADF_EVENTI.globalHigh==="function" && ADF_EVENTI.globalHigh()) return true;
       return false;

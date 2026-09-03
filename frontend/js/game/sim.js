@@ -44,6 +44,10 @@ function weeklyCosts(){ return Math.round((25 + G.fans*0.0006 + G.songs.length*2
 
 function advanceWeek(){
   if(G.ended) return;
+  /* Se la settimana si apre con una detenzione attiva, gli eventi e i contatti
+     del mondo fuori restano fuori anche se proprio questa settimana è quella
+     della scarcerazione. Il mondo normale riparte dal giorno successivo. */
+  const detenutoAInizioSettimana=!!(G.strada&&G.strada.arresto);
   // colpo di fortuna: raro, e più probabile se il pezzo è forte ed è appena uscito
   for(const s of G.songs){
     if(!s.released) continue;
@@ -179,8 +183,9 @@ function advanceWeek(){
   /* punto 21: il giro della Strada — heat che decade, attività che rendono,
      uomini/protezione/avvocato che costano, il carcere che macina se sei dentro */
   if(typeof stradaSettimana === "function") stradaSettimana();
-  /* punto 66: chi ti scrive in chat, questa settimana */
-  if(typeof chatSettimana === "function") chatSettimana();
+  /* Il telefono non continua a generare conversazioni "normali" mentre sei
+     fisicamente dentro: il contatto con l'esterno passa dal micro-loop carcere. */
+  if(!detenutoAInizioSettimana && typeof chatSettimana === "function") chatSettimana();
 
   G.week++;
   if(G.week > 52){ G.week = 1; G.year++; G.age++; pushLog("<b>Un anno in più.</b> Hai " + G.age + " anni.", "big"); }
@@ -191,12 +196,12 @@ function advanceWeek(){
      passaggio o un bivio con soldi/contratto/salute di mezzo non si risolve
      mai da solo. Durante un salto fermano lo scorrimento sul serio invece
      di sparire fino all'ultimo giorno (prima capitava solo lì, per caso). */
-  const prova = (G.trialCd <= 0) ? pendingTrial() : null;
+  const prova = (!detenutoAInizioSettimana && G.trialCd <= 0) ? pendingTrial() : null;
   if(prova){
     G.trialsDone[prova.ph] = true;
     if(SALTO) SALTO_STOP = prova; else showEvent(prova);
   }
-  else if(Math.random() < .38) maybeEvent();
+  else if(!detenutoAInizioSettimana && Math.random() < .38) maybeEvent();
   save(); renderGioco();
 }
 
@@ -225,11 +230,17 @@ function avanzaGiorno(){
      non un'atmosfera). Da smistare, punto 4: capita anche durante un salto —
      provaIncontro() decide da sola se risolversi in silenzio o fermare tutto,
      in base al suo livello di importanza (strada.js). */
-  if(typeof provaIncontro === "function") provaIncontro();
-  /* la chat si muove anche in mezzo alla settimana: una casella che si riempie
-     solo al lunedi' si sente che e' finta. Non durante un salto — se no torni
-     da un mese saltato e trovi trenta messaggi tutti insieme. */
-  if(!SALTO && typeof chatGiorno === "function") chatGiorno();
+  if(G.strada && G.strada.arresto){
+    /* Dentro non incontri fan, giornalisti, hater o gente per strada.
+       Al loro posto gira esclusivamente il piccolo calendario del carcere. */
+    if(typeof carcereGiorno === "function") carcereGiorno();
+  }else{
+    if(typeof provaIncontro === "function") provaIncontro();
+    /* la chat si muove anche in mezzo alla settimana: una casella che si riempie
+       solo al lunedi' si sente che e' finta. Non durante un salto — se no torni
+       da un mese saltato e trovi trenta messaggi tutti insieme. */
+    if(!SALTO && typeof chatGiorno === "function") chatGiorno();
+  }
   return false;
 }
 

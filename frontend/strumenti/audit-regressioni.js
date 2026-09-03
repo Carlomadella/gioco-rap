@@ -22,6 +22,8 @@ const hours = leggi("js/game/orari.js");
 const travel = leggi("js/game/spostamenti.js");
 const crimeui = leggi("js/game/strada-crimine-ui.js");
 const crime = leggi("js/game/strada-crimine.js");
+const sim = leggi("js/game/sim.js");
+const transfers = leggi("js/game/trasferte.js");
 const time = leggi("js/game/tempo.js");
 const timeControls = leggi("js/game/tempo-controlli.js");
 const index = leggi("index.html");
@@ -322,6 +324,101 @@ test("Agenda mostra esplicitamente il blocco carcere",
   tel.includes('gate.reason === "jail"') &&
   tel.includes('GAME_TRAVEL.inJail()') &&
   tel.includes('return {ok:false, perche:"Sei in carcere"}'));
+
+console.log("\nCarcere contestuale — solo vita interna");
+test("il carcere ha un micro-loop dedicato e non sblocca ACTION normali",
+  crime.includes("const CARCERE_EVENTI = [") &&
+  crime.includes("function carcereGiorno()") &&
+  crime.includes("window.ADF_JAIL=Object.freeze") &&
+  travel.includes('reason:"jail"'));
+test("gli eventi carcere hanno cadenza 4-8 giorni e memoria anti-ripetizione", (() => {
+  const compact = crime.replace(/\s+/g, "");
+  return compact.includes("if(gap<4)returnfalse;") &&
+         compact.includes("if(gap<8&&Math.random()>=.28)returnfalse;") &&
+         compact.includes("c.recenti.slice(0,4)");
+})());
+test("la UI carcere espone solo azioni dedicate e feed interno",
+  crimeui.includes('data-jail-action') &&
+  crimeui.includes('id="adf-jail-events"') &&
+  crimeui.includes("renderJailLoop(el)"));
+test("ora d'aria e giro hanno limiti giorno/settimana",
+  crime.includes("if(c.daily.aria)") &&
+  crime.includes("if(c.weekly.giro)") &&
+  crime.includes('GAME_TIME.advance(minuti,"jail:"+id'));
+test("il ricorso dell'avvocato è una volta per detenzione e toglie solo 1 settimana",
+  crime.includes("if(c.ricorsoUsato)") &&
+  crime.includes("a.settimane=Math.max(1,(Number(a.settimane)||1)-1)") &&
+  crime.includes("STRADA_AVVOCATO_COSTO"));
+test("sim sostituisce street e chat con carcereGiorno durante la detenzione",
+  sim.includes("if(G.strada && G.strada.arresto)") &&
+  sim.includes('typeof carcereGiorno === "function"') &&
+  sim.includes('typeof provaIncontro === "function"') &&
+  sim.includes('!detenutoAInizioSettimana && typeof chatSettimana'));
+test("trial ed eventi legacy settimanali restano fuori dal carcere",
+  sim.includes("!detenutoAInizioSettimana && G.trialCd <= 0") &&
+  sim.includes("!detenutoAInizioSettimana && Math.random() < .38"));
+test("Eventi V2 non consegna catalogo, hook o street legacy in carcere",
+  ev.includes("function adfInJail()") &&
+  ev.includes("if(adfInJail()) return null") &&
+  ev.includes("if(adfInJail()) return;") &&
+  ev.includes("if(adfInJail()) return false"));
+test("eventi clock non pianifica né valuta eventi cittadini in carcere",
+  clockEvents.includes("function inJail()") &&
+  clockEvents.includes("if(inJail()) return null") &&
+  clockEvents.includes("if(inJail()) return;"));
+test("trasferte lascia scadere inviti ma non ne genera di nuovi in carcere",
+  transfers.indexOf("scadenze();") < transfers.indexOf("G.strada && G.strada.arresto") &&
+  transfers.includes("if(G.strada && G.strada.arresto){ salva(); return; }"));
+
+console.log("\nCatalogo carcere V2 — coerenza / HIGH / persistenza");
+const jail0=crime.indexOf("CARCERE EVENTI V2 — 35 SCENE CONTESTUALI");
+const jail1=crime.indexOf("/* ==================== IL CICLO SETTIMANALE",jail0);
+const jailV2src=jail0>=0&&jail1>jail0?crime.slice(jail0,jail1):"";
+const jailMeta=[...jailV2src.matchAll(/\{id:"(jail_[^"]+)",n:"([^"]+)",cat:"([^"]+)",tier:"([^"]+)"/g)];
+test("catalogo carcere contiene 35 eventi con ID e titoli unici",
+  jailMeta.length===35 &&
+  new Set(jailMeta.map(x=>x[1])).size===35 &&
+  new Set(jailMeta.map(x=>x[2].toLowerCase())).size===35);
+test("ripartizione editoriale è 10 routine, 8 rapporti, 7 crime, 5 esterno e 5 high",
+  ["routine","rapporti","crime","esterno","high"].every((k,i)=>
+    jailMeta.filter(x=>x[3]===k).length===[10,8,7,5,5][i]));
+test("i cinque HIGH sono separati dal pool automatico e sono once per detenzione",
+  jailMeta.filter(x=>x[4]==="high").length===5 &&
+  (jailV2src.match(/tier:"high"/g)||[]).length===5 &&
+  (jailV2src.match(/tier:"high",weight:1[^]*?once:true/g)||[]).length>=1 &&
+  jailV2src.includes('e.tier!=="high"&&carcereEligible'));
+test("eventi carcere hanno gating su giorni, reputazione, precedenti, fan, pena e avvocato",
+  jailV2src.includes("e.minDays") && jailV2src.includes("e.minRep") &&
+  jailV2src.includes("e.minPrecedents") && jailV2src.includes("e.minFans") &&
+  jailV2src.includes("e.minWeeks") && jailV2src.includes("e.lawyer===true"));
+test("HIGH carcere ha cooldown minimo e persiste finché non scegli",
+  jailV2src.includes("(d-c.lastHighDay)>=18") &&
+  jailV2src.includes("c.pendingHigh=e.id") &&
+  jailV2src.includes("function carcereRestoreHigh()") &&
+  jailV2src.includes("c.pendingHigh=null;c.lastHighDay=ctx.day"));
+test("un HIGH carcere non espone annulla e le opzioni passano tutte dal resolver",
+  !jailV2src.includes("annulla") &&
+  jailV2src.includes("opts:choices.map") &&
+  jailV2src.includes("carcereResolveHigh(e,o)"));
+test("azioni carcere si bloccano finché un HIGH è pendente",
+  jailV2src.includes('pending?"Decisione in sospeso"') &&
+  jailV2src.includes('if(c.pendingHigh)return {ok:false,t:"Prima devi prendere la decisione aperta in carcere."}'));
+test("GAME_TIME considera il pending HIGH carcere un blocco esterno",
+  time.includes('ADF_JAIL.blocked === "function"') &&
+  time.includes('return "jail-event-pending"'));
+test("widget tempo e skip rispettano lo stesso pending HIGH carcere",
+  timeControls.includes('typeof ADF_JAIL.blocked==="function"') &&
+  timeControls.includes("ADF_JAIL.blocked()"));
+test("sanzioni disciplinari possono sospendere davvero l'ora d'aria",
+  jailV2src.includes("airBlockedUntil") &&
+  jailV2src.includes("function carcereAirDays") &&
+  jailV2src.includes('?"Sospesa per "'));
+test("scelte fatte dentro possono avere una conseguenza coerente al rilascio",
+  jailV2src.includes("releaseRepBonus") &&
+  jailV2src.includes("releaseHeatBonus") &&
+  crime.includes("Quello che hai deciso dentro ti aspetta fuori."));
+test("catalogo carcere non reintroduce giornalisti, hater o trasferte come incontri interni",
+  !/giornalist|hater|trasfert/i.test(jailV2src));
 const ux0=ui.indexOf("const esegui = () => {");
 const ux1=ui.indexOf("const fansBefore = G.fans",ux0);
 const uxBody=ux0>=0&&ux1>ux0?ui.slice(ux0,ux1+32):"";

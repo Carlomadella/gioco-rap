@@ -2006,6 +2006,9 @@ function eventObject(e, resume, meta){
 }
 function showCatalog(e,resume,meta){
   if(!e) return;
+  /* Il catalogo da 1000 eventi racconta il mondo fuori. In detenzione la
+     delivery appartiene solo al pool carcere. */
+  if(adfInJail()) return null;
   meta=meta||{};
 
   /* Un HIGH già attivo possiede il turno. L'unica eccezione è il ripristino
@@ -2145,6 +2148,7 @@ function hookChance(kind){
 }
 function emitHook(kind,payload,forced){
   if(!ADF.ready || ADF.skipRunning) return;
+  if(adfInJail()) return;
   payload=payload||{};
   const s=st(), now=absDay();
   if(!forced && s.lastEventDay===now) return;
@@ -2171,6 +2175,16 @@ function emitHook(kind,payload,forced){
   afterClear(()=>showCatalog(pick),80);
 }
 function emitWeeklyHooks(before){
+  /* Le settimane passano anche dentro, ma non devono generare job/chat/deal
+     esterni. Se proprio questa settimana finisce la pena, conserviamo solo
+     l'hook coerente di uscita. */
+  if(before&&before.arresto){
+    if(!(G.strada&&G.strada.arresto)){
+      st().runtime.justReleasedDay=absDay();
+      emitHook("on_release",{},true);
+    }
+    return;
+  }
   emitHook("weekly_state",{},false);
   emitHook("weekly_job_state",{},false);
   if(G.obligation) emitHook("weekly_contract_obligation",{offer_id:G.contract&&G.contract.id},false);
@@ -2200,6 +2214,10 @@ function scheduleDaysAfterSala(action, actor){
   }
 }
 
+function adfInJail(){
+  return !!(G.strada&&G.strada.arresto);
+}
+
 /* -------------------- incontri PER STRADA legacy --------------------
    La repo ha un sottosistema autonomo (`provaIncontro`) che viene chiamato da
    avanzaGiorno(). Lasciato libero durante +7/+28, può produrre molti ALTI
@@ -2215,6 +2233,7 @@ if(typeof provaIncontro==="function"){
   const _adfProvaIncontro=provaIncontro;
   provaIncontro=function(){
     const s=st(), now=absDay();
+    if(adfInJail()) return false;
     if(ADF.skipRunning || SALTO) return false;
     if(now-s.lastLegacyStreetDay < 14) return false;
     return _adfProvaIncontro.apply(this,arguments);
@@ -2223,7 +2242,7 @@ if(typeof provaIncontro==="function"){
 
 /* -------------------- cadenza normale -------------------- */
 function tryNormal(){
-  if(!ADF.ready || ADF.skipRunning || G.ended) return;
+  if(!ADF.ready || ADF.skipRunning || G.ended || adfInJail()) return;
   const s=st();
   if(s.lastEventDay===absDay()) return;
   const highNow=highDue();
@@ -2259,8 +2278,9 @@ advanceWeek=function(){
 
 const _avanzaGiorno=avanzaGiorno;
 avanzaGiorno=function(){
+  const wasJailed=adfInJail();
   const r=_avanzaGiorno.apply(this,arguments);
-  if(!ADF.skipRunning){
+  if(!ADF.skipRunning && !wasJailed && !adfInJail()){
     const s=st();
     s.skip1Chain=0;
     s.normalDays++;
@@ -2307,10 +2327,14 @@ saltaGiorni=function(n){
 
   for(let i=0;i<n && !G.ended;i++){
     SALTO=true;
+    const wasJailed=adfInJail();
     if(avanzaGiorno()) weeks++;
     done++;
 
     if(SALTO_STOP) break;
+    /* Anche +1/+7/+28 può scontare una pena: quei giorni devono generare
+       soltanto carcereGiorno(), non eventi del catalogo normale. */
+    if(wasJailed || adfInJail()) continue;
     let trigger=highDue(), ctx="skip7";
     if(!trigger && n===1){
       ctx="skip1";
