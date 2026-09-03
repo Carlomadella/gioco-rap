@@ -6,6 +6,22 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:b2122c7 -->
+## 03/09/26, 03:06 — fix: separa messaggi e notifiche nel telefono compatto
+
+**Tipo:** Commit diretto su main  
+**Autore:** Mycol (mycolbraga@gmail.com)  
+**Commit:** `b2122c7`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/telefono.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:dc49c91 -->
 ## 03/09/26, 02:48 — fix: blocca azioni fuori luogo e orario
 
