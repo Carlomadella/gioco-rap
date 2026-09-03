@@ -248,6 +248,38 @@ il telefono deve sembrare un vero e proprio telefono : Quindi come un iphone esa
    l'attrezzatura da studio. `npm run prova` (12/12) e `npm run build`
    puliti; non provato in un browser vero in questa sessione.
 
+   **«Se clicchi Vestiti ti escono anche vestiti acquistabile. NO!» (03/09/2026)
+   — separato guardaroba e negozio, che era il bug: erano la stessa schermata.**
+   La linguetta «Vestiti» apriva `#negozio` con dentro sia i capi già tuoi
+   (Indossa) sia quelli da comprare (Compra) — un armadio travestito da
+   negozio. Adesso:
+   - la linguetta «Vestiti» apre il **guardaroba** (`apriArmadio()`, stesso
+     overlay `#negozio`): solo equip, solo quello che hai già. Un capo non
+     posseduto non compare proprio — niente più «Compra» lì dentro.
+   - i capi si comprano solo al **Catalogo → Abbigliamento** (`#g-fit`, nuova
+     sotto-linguetta accanto ad «Attrezzatura», dentro alla schermata di
+     gioco): undici capi di `FITS`, stesso prezzo di sempre, «Compra» o
+     «Indossa». Ci si arriva dal cartello Shop sulla mappa, come per
+     l'attrezzatura — o da un evento in game, in futuro.
+   `frontend/js/game/negozio.js` riscritto: `renderArmadio()` (solo
+   posseduti) e `renderAbbigliamento()` (tutti, popolata da `renderGioco()`
+   in `ui.js`) condividono la stessa `ngCard()`, invece di una funzione sola
+   che mischiava i due casi.
+   **Bug trovato mentre verificavo il cambio, non introdotto da lui:** il
+   capo di partenza non veniva mai scritto in `G.vestiti` — «posseduto» era
+   solo «è quello che indosso adesso». Bastava indossarne un altro e quello
+   iniziale spariva dal guardaroba (nel vecchio negozio-unico tornava
+   comprabile a pagamento, il che tradiva la scritta «resta sempre tuo
+   gratis»; nel guardaroba nuovo, senza «Compra», sarebbe sparito e basta).
+   Corretto in `ngEquipaggia()`: il capo che stai lasciando entra in
+   `G.vestiti` prima di indossarne un altro, così resta tuo per sempre come
+   promesso.
+   Verificato in Chrome headless (dev server locale): comprato un capo dal
+   Catalogo, il guardaroba lo mostra; cambiato capo, quello di partenza
+   resta nel guardaroba invece di sparire. Versioni di cache alzate per
+   tutti i file toccati (`negozio.js`, `hub.js`, `ui.js`, `orari.js` +1) —
+   punto 6 insegna a non lasciarle indietro.
+
 ---
 
 ## 50 · Via i popup dalle card: scene vere

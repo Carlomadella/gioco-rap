@@ -325,6 +325,9 @@ function renderGioco(){
     };
   });
 
+  /* punto 7: i vestiti si comprano qui, non dal guardaroba della plancia */
+  if(typeof renderAbbigliamento === "function") renderAbbigliamento();
+
   // classifica
   const my = G.songs.filter(x => x.released).reduce((a2,x) => a2 + (x.last||0), 0);
   sistemaRivali();

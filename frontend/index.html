@@ -31,7 +31,7 @@
 <link rel="stylesheet" href="css/negozio.css?v=12">
 <link rel="stylesheet" href="css/strada-crimine.css?v=13">
 <link rel="stylesheet" href="css/strada-crimine-v2.css?v=1">
-<link rel="stylesheet" href="css/hub.css?v=13">
+<link rel="stylesheet" href="css/hub.css?v=14">
 <link rel="stylesheet" href="css/telefono.css?v=12">
 <link rel="stylesheet" href="css/trasferte.css?v=1">
 <link rel="stylesheet" href="css/impostazioni.css?v=12">
@@ -301,11 +301,16 @@
             <button class="sb" data-s="market">Beat in vendita<i class="sbdg" data-b="market" hidden></i></button>
             <button class="sb" data-s="songs">I tuoi pezzi<i class="sbdg" data-b="songs" hidden></i></button>
             <button class="sb" data-s="gear">Attrezzatura</button>
+            <!-- punto 7: i vestiti si comprano SOLO da qui (o da un evento in
+                 game) — la linguetta «Vestiti» della plancia è il guardaroba,
+                 solo equip, mai acquisto. -->
+            <button class="sb" data-s="fit">Abbigliamento</button>
           </div>
           <div class="spane on" data-s="mat"><div class="list"><div id="g-mat"></div></div></div>
           <div class="spane" data-s="market"><div class="list"><div id="g-market"></div></div></div>
           <div class="spane" data-s="songs"><div class="list"><div id="g-songs"></div></div></div>
           <div class="spane" data-s="gear"><div class="list"><div id="g-shop"></div></div></div>
+          <div class="spane" data-s="fit"><div class="list"><div class="nggrid" id="g-fit"></div></div></div>
         </div>
         <!-- Punto 19. La discografia: i pezzi che sono usciti davvero, con quanto
              hanno fatto e come stanno invecchiando. Non e' la lista del catalogo
@@ -352,11 +357,12 @@
   <div class="porete" id="po-rete"></div>
 </div></div>
 
-<!-- Il negozio di vestiti: sbloccato dall'inizio, dalla linguetta «Vestiti»
-     della plancia. Il contenuto lo mette js/game/negozio.js. -->
+<!-- Il guardaroba: dalla linguetta «Vestiti» della plancia, solo equip — quello
+     che possiedi già. Si compra altrove: Catalogo → Abbigliamento, o un evento
+     in game (punto 7). Il contenuto lo mette js/game/negozio.js. -->
 <div class="negozio" id="negozio"><div class="ngwrap">
   <div class="nghead"><div class="ngk">Il tuo guardaroba</div><button class="ngx" id="ng-x">&#10005;</button></div>
-  <p class="ngdove">Quello che indossi entra nelle foto, nelle copertine, in ogni scena. Compralo, poi mettitelo.</p>
+  <p class="ngdove">Quello che indossi entra nelle foto, nelle copertine, in ogni scena. Quello che hai già sbloccato — nuovi capi si comprano al Catalogo, sotto «Abbigliamento», o arrivano da un evento.</p>
   <div class="nggrid" id="ng-grid"></div>
 </div></div>
 
@@ -650,22 +656,22 @@
 <script src="js/game/modal.js?v=12"></script>
 <script src="js/game/scene-art.js?v=12"></script>
 <script src="js/game/beatplay.js?v=12"></script>
-<script src="js/game/ui.js?v=13"></script>
+<script src="js/game/ui.js?v=14"></script>
 <script src="js/game/lifestyle.js?v=12"></script>
 <script src="js/game/fx.js?v=12"></script>
 <script src="js/game/skip.js?v=12"></script>
 <script src="js/game/posto.js?v=13"></script>
 <script src="js/game/strada.js?v=12"></script>
 <script src="js/game/strada-crimine.js?v=13"></script>
-<script src="js/game/negozio.js?v=12"></script>
+<script src="js/game/negozio.js?v=13"></script>
 <script src="js/game/uscita.js?v=12"></script>
-<script src="js/game/hub.js?v=12"></script>
+<script src="js/game/hub.js?v=13"></script>
 <script src="js/game/chat.js?v=13"></script>
 <script src="js/game/telefono.js?v=12"></script>
 
 <!-- Integrazione tempo/eventi/crime 2026-09-02 — ordine intenzionale -->
 <script src="js/game/tempo.js?v=8"></script>
-<script src="js/game/orari.js?v=8"></script>
+<script src="js/game/orari.js?v=9"></script>
 <script src="js/game/spostamenti.js?v=8"></script>
 <script src="js/game/interruzioni.js?v=8"></script>
 <!-- Eventi V2 prima di eventi-tempo: proprietario di skip e Notifiche. -->

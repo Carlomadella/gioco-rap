@@ -496,3 +496,36 @@ sotto i 1180px di larghezza reale della finestra.
     riguardato a occhio da chi ha un monitor vero — ma il meccanismo è verificato: niente più nero
     piatto, e zero rischio sui punti cliccabili.
 
+---
+
+## Via il Campetto dalla mappa
+
+Rimuovere il campetto dalla mappa. Non lo vogliamo un posto giocabile nè tantomeno segnato con
+una card.
+
+**FATTO (03/09/2026).** Due parti, non una:
+- **Il gioco:** tolta la voce `campetto` da `HUB_LUOGHI` (`hub.js`) — niente più zona da toccare,
+  niente più `hubPresto("Campetto", …)`. Verificato in Chrome: `elementFromPoint` su dove stava il
+  cartello adesso restituisce il contenitore della mappa, non un `.pspot`; l'elenco dei luoghi
+  cliccabili non ha più `campetto` in mezzo.
+- **La foto:** qui il punto 45 aveva già spiegato perché di solito non si tocca — le card sono
+  dentro al pixel di `mappa_citta.jpg`, non un livello HTML separabile. Stavolta però il compito
+  era il contrario, togliere una card senza rimetterne un'altra al suo posto: un lavoro di
+  *inpainting* (ricostruire lo sfondo dov'era la card), non di ridisegno. Con `simple-lama-inpainting`
+  (rete neurale, gira in CPU, ~6 secondi per l'immagine intera) è stato tolto il cartello «Campetto» —
+  la maschera copriva solo il rettangolo della targhetta (234,197)-(335,244) su 1536×600, il resto
+  del file è **bit a bit identico a prima** (`ImageChops.difference` conferma il diff-bbox coincidente
+  con la maschera). Il campetto stesso — l'erba, la rete, i pali — resta lì com'era, non era nella
+  maschera: è rimasta un'ambientazione come «Periferia» o «Centro», non un luogo. Ri-salvata con le
+  stesse tabelle di quantizzazione e lo stesso subsampling del jpg originale, per non perdere qualità
+  nel resto della foto (323 KB contro i 320 KB di prima).
+  **Lezione del punto 6 applicata subito:** stesso nome di file, contenuto diverso — alzato
+  `?v=2`→`?v=3` sulle due `url(mappa_citta.jpg)` di `hub.css` e `hub.css?v=13`→`?v=14` in
+  `index.html`, altrimenti chi l'aveva già vista restava con la vecchia card in cache.
+  **Trovato mentre ci lavoravo, sistemato anche quello:** il build normale (`npm run build`,
+  `strumenti/build.js`, funzione `immagini()`) buttava via il `?v=` delle immagini quando riscriveva
+  i percorsi per `dist/` — la cache-busting del punto 6 non sarebbe mai arrivata a chi gioca dalla
+  versione Electron/Capacitor. Corretto: la query string adesso passa anche lì.
+  Se in futuro serve rifare la mappa da capo per un altro motivo (punto 45), il campetto va tolto
+  anche dal nuovo prompt di generazione — qui non serviva perché il resto della foto non cambiava.
+

@@ -81,7 +81,11 @@ function immagini(testo, dentro){
     if(rel.startsWith("http") || rel.startsWith("data:")) return tutto;
     const f = path.resolve(RADICE, "css", rel.split("?")[0]);
     if(!fs.existsSync(f)) return tutto;
-    if(!dentro) return 'url("' + path.posix.join("..", path.relative(RADICE, f).split(path.sep).join("/")) + '")';
+    /* il "?v=" che rompe la cache va tenuto anche qui: senza, il build
+       normale lo perdeva per strada — la stessa svista del punto 6, dentro
+       al build invece che nel CSS sorgente. */
+    const query = rel.includes("?") ? rel.slice(rel.indexOf("?")) : "";
+    if(!dentro) return 'url("' + path.posix.join("..", path.relative(RADICE, f).split(path.sep).join("/")) + query + '")';
     const tipo = { ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png",
       ".webp": "image/webp", ".gif": "image/gif", ".svg": "image/svg+xml" }[path.extname(f).toLowerCase()]
       || "application/octet-stream";

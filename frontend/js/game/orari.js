@@ -20,8 +20,7 @@
     fabbrica:  {open:"08:00", close:"19:00"},
     palestra:  {open:"08:00", close:"23:00"},
     shop:      {open:"10:00", close:"22:00"},
-    /* punto 6: un ufficio pubblico, orario d'ufficio — il campetto invece
-       resta senza voce qui, e statusWindow lo tratta come sempre aperto. */
+    /* punto 6: un ufficio pubblico, orario d'ufficio */
     impiego:   {open:"09:00", close:"18:00"}
   });
 

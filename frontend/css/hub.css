@@ -536,7 +536,7 @@ body.in-hub .topnav {
   position: absolute;
   inset: -40px;
   z-index: 0;
-  background: url("../media/photo/pagina di gioco/mappa_citta.jpg?v=2") center/cover
+  background: url("../media/photo/pagina di gioco/mappa_citta.jpg?v=3") center/cover
     no-repeat;
   filter: blur(46px) brightness(0.38) saturate(1.15);
   transform: scale(1.12);
@@ -556,7 +556,7 @@ body.in-hub .topnav {
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.07),
     0 18px 50px rgba(0, 0, 0, 0.5);
-  background: #0a0910 url("../media/photo/pagina di gioco/mappa_citta.jpg?v=2")
+  background: #0a0910 url("../media/photo/pagina di gioco/mappa_citta.jpg?v=3")
     center/100% 100% no-repeat;
 }
 .ppins {

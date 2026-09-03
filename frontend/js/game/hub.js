@@ -114,14 +114,15 @@ const HUB_LUOGHI = [
      non deve stare spenta se quello che promette esiste già */
   {id:"shop", n:"Shop", x:49.15, y:38.67, w:9.77, h:11.33,
    vai:() => hubGioco("catalogo", "gear")},
-  /* punto 6: due luoghi nuovi, arrivati con la mappa definitiva.
-     Il centro per l'impiego apre tutti i lavori (JOBS), non solo i due che
-     hanno già un edificio — rispetta i requisiti, non finge che siano tutti
-     presi al volo. Il campetto invece non ha ancora niente dietro: lo dice. */
+  /* punto 6: il centro per l'impiego, arrivato con la mappa definitiva.
+     Apre tutti i lavori (JOBS), non solo i due che hanno già un edificio —
+     rispetta i requisiti, non finge che siano tutti presi al volo.
+     Il campetto (che stava qui) è uscito col punto 8: non lo vogliamo un
+     posto giocabile. Il cartello nella foto resta — punto 45, le targhette
+     sono dentro al pixel — ma senza una zona da toccare sopra non fa più
+     niente, come «Periferia» o «Centro». */
   {id:"impiego", n:"Centro per l'impiego", x:53.06, y:50.00, w:12.37, h:21.67,
-   vai:() => schedaImpiego()},
-  {id:"campetto", n:"Campetto", x:6.19, y:32.50, w:16.60, h:17.50,
-   vai:() => hubPresto("Campetto", "Un campo dove giocare, sfogarti, farti conoscere in quartiere. Sta arrivando.")}
+   vai:() => schedaImpiego()}
 ];
 
 /* ================= GLI EVENTI DI OGGI ================= */
@@ -480,7 +481,10 @@ $("hb-pins").addEventListener("click", ev => {
 $("hb-sxtab").addEventListener("click", ev => {
   const b = ev.target.closest(".ptab"); if(!b) return;
   hubTap();
-  if(b.dataset.v === "vestiti"){ apriNegozio(); return; }
+  /* punto 7: la linguetta «Vestiti» è il guardaroba — solo equip, mai
+     acquisto. I capi nuovi si comprano al Catalogo → Abbigliamento, o
+     arrivano da un evento. */
+  if(b.dataset.v === "vestiti"){ apriArmadio(); return; }
   HUB_VISTA = b.dataset.v;
   renderHub();
 });
