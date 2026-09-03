@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:e89ad13 -->
+## 03/09/26, 14:13 — feat: completa il gameplay del carcere
+
+**Tipo:** Commit diretto su main
+
+**Autore:** Mycol (mycolbraga@gmail.com)
+
+**Commit:** `e89ad13`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/eventi-tempo.js`
+- **Modificato:** `frontend/js/game/tempo-controlli.js`
+- **Modificato:** `frontend/js/game/tempo.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- commit:eab276a -->
 ## 03/09/26, 09:29 — fix: allinea agenda alla disponibilita runtime
 

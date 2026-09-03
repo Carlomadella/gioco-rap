@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:e89ad13 -->
+## 03/09/26, 14:13 — feat: completa il gameplay del carcere
+
+**Tipo:** Commit diretto su main
+
+**Autore:** Mycol (mycolbraga@gmail.com)
+
+**Commit:** `e89ad13`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/trasferte.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:36dd0b5 -->
 ## 03/09/26, 10:30 — fix: blocca il gameplay durante il carcere
 
