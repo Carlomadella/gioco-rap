@@ -141,7 +141,7 @@ Qualche controllo che vale la pena di sapere che c'è:
 
 | | cosa fa |
 | --- | --- |
-| `npm run prova` | 133 controlli sul comportamento, compresa la firma di un biglietto Apple vero. **Va data dopo ogni modifica.** |
+| `npm run prova` | 143 controlli sul comportamento, compresa la firma di un biglietto Apple vero. **Va data dopo ogni modifica.** |
 | `npm run postman` | le rotte come le vede chi chiama: metodo, stato, forma della risposta |
 | `npm run carico` | quanto regge, con 20.000 o 100.000 artisti |
 

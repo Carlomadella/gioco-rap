@@ -55,7 +55,7 @@ Si avvia un server suo, su una porta sua, con un database usa e getta; fa tutto 
 classifica, iscrizione, punteggi, freni, account con la mail, sessioni, salvataggi in cloud
 e i loro conflitti, traguardi, giro di settimana, frecce ▲▼, cancellazione dell'account, e
 un'occhiata dentro al database per controllare che le chiavi ci stiano solo come hash — e
-si spegne. **133 controlli**, e fra questi la verifica di un biglietto Apple vero: la prova
+si spegne. **143 controlli**, e fra questi la verifica di un biglietto Apple vero: la prova
 si fa una coppia di chiavi sua, si mette in piedi un finto «appleid.apple.com» e prova che
 un biglietto buono entra e uno firmato da un altro, scaduto, senza scadenza o fatto per un
 altro gioco no. **Dalli dopo ogni modifica.**
@@ -138,6 +138,7 @@ dentro a un ciclo — quattrocento milioni di confronti a ogni giro di settimana
 | `ADF_SALE` | sale per gli hash degli indirizzi IP | `anni-di-fame` |
 | `ADF_INVIO_MS` | quanto passa fra due punteggi dello stesso artista | `10000` |
 | `ADF_PROXY` | `1` se davanti c'è un reverse proxy **nostro** (legge `x-forwarded-for`) | spento |
+| `ADF_BUSSATE` | richieste al minuto da uno stesso indirizzo | `120` |
 | `ADF_COPIE` | quante copie di sicurezza tenere | `30` |
 | `ADF_STEAM_CHIAVE`, `ADF_STEAM_APPID` | per entrare con Steam | vuote |
 | `ADF_APPLE_AUD` | il bundle id dell'app, per Sign in with Apple | vuota |
@@ -173,12 +174,28 @@ comanda chi avvia il servizio (`ambiente.js`).
 | `database/README.md` | com'è messo il database e dove va |
 | `database/schema.md` | lo schema completo, commentato (fuori da git) |
 | `plausibilita.js` | quanto è credibile un punteggio: il modello che decide fin dove poteva arrivare |
-| `prova.js` | i 133 controlli sull'API, sotto l'uno o l'altro motore |
+| `prova.js` | i 143 controlli sull'API, sotto l'uno o l'altro motore |
 | `carico.js` | la prova di carico: quanto regge, con i numeri |
 
 Il server non sa che database ci sia sotto: parla solo con `database/archivio.js`, e
 `archivio.js` parla solo con il motore che `db.js` gli ha messo in mano. È il motivo per
 cui passare a PostgreSQL non ha toccato una riga di `server.js`.
+
+## La difficoltà: si scrive, non divide
+
+Il gioco ha tre difficoltà — «strada aperta», «anni di fame», «niente sconti» — che si
+scelgono all'avvio e restano attaccate alla carriera. Il server ne sa due cose:
+
+- **se la scrive**, accanto all'artista, all'iscrizione e a ogni punteggio. Oggi il
+  bilanciamento è identico per tutte e tre, quindi non cambia niente in graduatoria — ma il
+  giorno che peseranno davvero, senza questa colonna non si potrà più sapere a posteriori
+  chi ha corso con quali regole, ed è una riga di storia che non si recupera dopo;
+- **non ci divide la classifica.** La graduatoria resta **una sola per tutti**, bot
+  compresi. `?difficolta=` filtra una vista, come `?citta=` e `?genere=`: spaccare il gioco
+  in tre classifiche è una scelta di gioco, e va presa quando il bilanciamento c'è.
+
+Un client vecchio che non la manda non la cancella: resta quella che c'era. Una difficoltà
+che non esiste ricasca su `anni-di-fame`, che è il riferimento del gioco.
 
 ## Le rotte
 
@@ -188,7 +205,7 @@ cui passare a PostgreSQL non ha toccato una riga di `server.js`.
 | --- | --- |
 | `GET /api/stato` | settimana, artisti, giocatori veri, account, salvataggi, prossimo giro |
 | `GET /api/classifica?da=1&quanti=100` | una fetta qualsiasi: top 10, top 100, top 1000 |
-| `GET /api/classifica?citta=Rovereto` · `?genere=trap` | la stessa classifica guardata da vicino: la posizione si conta **dentro** al filtro |
+| `GET /api/classifica?citta=Rovereto` · `?genere=trap` · `?difficolta=niente-sconti` | la stessa classifica guardata da vicino: la posizione si conta **dentro** al filtro |
 | `GET /api/classifica/intorno/:id?raggio=4` | chi hai davanti e chi hai dietro — «sei 428°» |
 | `GET /api/classifiche` | le città e i generi che hanno davvero gente dentro |
 | `GET /api/stagioni` | la stagione in corso e quelle chiuse |

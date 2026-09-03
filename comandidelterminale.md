@@ -88,7 +88,7 @@ bot finti in scala. Il gioco (`frontend`) lo trova da solo: `js/net/online.js` p
 ```bash
 npm run prova
 ```
-Le prove del server (133 controlli, in crescita): account, sessioni, classifica,
+Le prove del server (143 controlli, in crescita): account, sessioni, classifica,
 salvataggi in cloud, accessi Steam/Apple/Google, moderazione, sospetti. **Va lanciato
 prima di ogni commit** che tocca `backend/`.
 

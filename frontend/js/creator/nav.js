@@ -257,7 +257,7 @@ $("m-play").onclick = () => {
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-go]");
   if(!b) return;
-  const g = statoPartita();
+  const g = partita();
   const viva = A.name.trim() && carrieraIniziata(g);
   if(b.dataset.go === "gioca") $("m-play").click();
   else if(b.dataset.go === "profile") goto("profile");

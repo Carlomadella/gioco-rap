@@ -124,6 +124,26 @@ for(const f of cssSulDisco){
 }
 controlla("ogni immagine richiamata da un CSS sta al suo posto", perse.length === 0, perse);
 
+/* Le immagini non stanno solo nei CSS: gli sfondi delle Attività criminali e del
+   carcere sono elenchi di percorsi dentro al codice, e il controllo qui sopra non
+   li guardava. Novanta file erano spariti dal disco senza che niente se ne
+   accorgesse: la schermata si apriva nera e la prova diceva ok. */
+console.log("\nle immagini richiamate dal codice");
+const senzaFile = [];
+const ESTENSIONE = /\.(?:jpe?g|png|webp|gif|svg|mp3|ogg|wav)$/i;
+for(const f of jsSulDisco){
+  const testo = fs.readFileSync(path.join(RADICE, f), "utf8");
+  const visti = new Set();
+  for(const m of testo.matchAll(/["'`]((?:media|assets)\/[A-Za-z0-9_\-./]+)["'`]/g)){
+    const rel = m[1];
+    if(!ESTENSIONE.test(rel) || visti.has(rel)) continue;
+    visti.add(rel);
+    if(!fs.existsSync(path.resolve(RADICE, rel))) senzaFile.push(f + " → " + rel);
+  }
+}
+controlla("ogni immagine richiamata dal codice sta al suo posto", senzaFile.length === 0,
+  senzaFile.length > 6 ? senzaFile.slice(0, 6).concat("… e altri " + (senzaFile.length - 6)) : senzaFile);
+
 console.log("\nil creatore: ogni opzione si deve vedere");
 /* Il punto 3 chiede un elenco preciso di opzioni per l'avatar. Che siano
    scritte in `data.js` non basta: la domanda vera e' se ognuna **cambia

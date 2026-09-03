@@ -143,6 +143,9 @@ async function aspettaCheRisponda(figlio){
     env: Object.assign({}, process.env, {
       ADF_PORTA: String(PORTA), ADF_BOT: "40", ADF_ADMIN: ADMIN, ADF_DATI: FILE,
       ADF_INVIO_MS: "0",
+      /* la prova fa tutto il giro da un indirizzo solo: col freno di casa (120
+         al minuto) le ultime prove si prendevano un 429 al posto della risposta */
+      ADF_BUSSATE: "100000",
       ADF_PG: PG ? pgConSchema(PG) : "",
       ADF_APPLE_AUD: AUD, ADF_APPLE_JWKS: "http://127.0.0.1:" + PORTA_CHIAVI + "/chiavi"
     }),
@@ -261,6 +264,14 @@ async function aspettaCheRisponda(figlio){
     const stessaMail = await chiama("/api/account", { metodo: "POST",
       corpo: { tipo: "email", email: "prova@esempio.it", segreto: "unasegretalunga" } });
     controlla("la stessa mail non si usa due volte", stessaMail.stato === 409);
+    /* «esiste gia'?» e «la password e' giusta?» sono due domande diverse: chi
+       riprovava con la stessa mail e un'altra password passava il controllo e
+       andava a sbattere contro l'indice unico — 500 e stack nei log invece del
+       409 che spiegava cos'era successo. */
+    const stessaMailAltraPassword = await chiama("/api/account", { metodo: "POST",
+      corpo: { tipo: "email", email: "prova@esempio.it", segreto: "unaltrasegreto" } });
+    controlla("nemmeno con un'altra password (409, non un errore del server)",
+      stessaMailAltraPassword.stato === 409, stessaMailAltraPassword.dati);
     const cortina = await chiama("/api/account", { metodo: "POST",
       corpo: { tipo: "email", email: "altro@esempio.it", segreto: "corta" } });
     controlla("una password corta viene rifiutata", cortina.stato === 400);
@@ -297,6 +308,18 @@ async function aspettaCheRisponda(figlio){
     controlla("senza sessione non si salva niente", senzaSessione.stato === 403);
     const slotVuoto = await chiama("/api/carriera/3", { testate: conSessione(sess2) });
     controlla("uno slot vuoto lo dice", slotVuoto.stato === 404);
+    /* L'artista dichiarato nel corpo dev'essere tuo. Prima ci si fidava: un id
+       inventato arrivava fino alla chiave esterna e tornava un 500, e l'id di
+       un altro giocatore veniva accettato — la carriera in cloud restava
+       legata a un artista che non era suo. */
+    const artistaInventato = await chiama("/api/carriera/2", { metodo: "PUT", testate: conSessione(sess2),
+      corpo: { stato: { week: 1 }, settimana: 1, anno: 1, artistaId: "non-esisto-proprio" } });
+    controlla("un artista inventato nello slot viene respinto, non esplode",
+      artistaInventato.stato === 403, artistaInventato.dati);
+    const artistaDiUnAltro = await chiama("/api/carriera/2", { metodo: "PUT", testate: conSessione(sess2),
+      corpo: { stato: { week: 1 }, settimana: 1, anno: 1, artistaId: io1 } });
+    controlla("e nemmeno l'artista di un altro giocatore",
+      artistaDiUnAltro.stato === 403, artistaDiUnAltro.dati);
 
     console.log("\ni traguardi");
     const catalogo = await chiama("/api/traguardi");
@@ -412,6 +435,40 @@ async function aspettaCheRisponda(figlio){
     const generePinto = await chiama("/api/classifica?quanti=10&genere=jazzfusion");
     controlla("un genere inventato viene ignorato invece di rompere",
       generePinto.stato === 200 && generePinto.dati.righe.length === 10);
+
+    /* La difficolta' (punto «nuovo flusso avvio, slot e difficolta»): il gioco
+       ne ha tre, la classifica resta **una sola per tutti**, e il server la
+       scrive accanto all'artista per sapere con quali regole e' stato fatto un
+       punteggio il giorno che i tre livelli peseranno davvero. */
+    console.log("\nla difficolta della carriera");
+    const duro = await chiama("/api/artista", { metodo: "POST",
+      corpo: { nome: "Niente Sconti", citta: "Trento", genere: "trap", difficolta: "niente-sconti" } });
+    controlla("l'iscrizione si porta dietro la difficolta scelta",
+      duro.stato === 201 && duro.dati.difficolta === "niente-sconti", duro.dati.difficolta);
+    const inventataDiff = await chiama("/api/artista", { metodo: "POST",
+      corpo: { nome: "Difficolta Finta", citta: "Trento", genere: "trap", difficolta: "modalita-dio" } });
+    controlla("una difficolta inventata ricasca su quella di riferimento",
+      inventataDiff.dati.difficolta === "anni-di-fame", inventataDiff.dati.difficolta);
+    await chiama("/api/punteggio", { metodo: "POST", testate: { "x-chiave": duro.dati.chiave },
+      corpo: { id: duro.dati.id, stream: 4000, fan: 300 } });
+    const senzaDiff = await chiama("/api/artista/" + duro.dati.id);
+    controlla("un client vecchio che non la manda non la cancella",
+      senzaDiff.dati.difficolta === "niente-sconti", senzaDiff.dati.difficolta);
+    await chiama("/api/punteggio", { metodo: "POST", testate: { "x-chiave": duro.dati.chiave },
+      corpo: { id: duro.dati.id, stream: 4200, fan: 320, difficolta: "strada-aperta" } });
+    const cambiata = await chiama("/api/artista/" + duro.dati.id);
+    controlla("ricominciare in un'altra difficolta la aggiorna",
+      cambiata.dati.difficolta === "strada-aperta", cambiata.dati.difficolta);
+    const soloDuri = await chiama("/api/classifica?quanti=50&difficolta=strada-aperta");
+    controlla("la classifica si puo guardare per difficolta",
+      soloDuri.dati.righe.length > 0 && soloDuri.dati.righe.every(r => r.difficolta === "strada-aperta"),
+      soloDuri.dati.righe.map(r => r.difficolta));
+    controlla("il conto e l'elenco filtrati combaciano",
+      soloDuri.dati.totale === soloDuri.dati.righe.length,
+      { totale: soloDuri.dati.totale, elencati: soloDuri.dati.righe.length });
+    const diffPinta = await chiama("/api/classifica?quanti=10&difficolta=modalita-dio");
+    controlla("una difficolta inventata nel filtro viene ignorata",
+      diffPinta.stato === 200 && diffPinta.dati.filtro === null);
 
     console.log("\nle stagioni e l'albo d'oro");
     const primaDellaStagione = await chiama("/api/classifica?quanti=3");

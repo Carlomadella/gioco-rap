@@ -25,6 +25,15 @@ let CFG = { quantiBot: 140, settimanaMs: 24 * 3600e3 };
 
 const ora = () => Date.now();
 const uuid = () => crypto.randomUUID();
+
+/* Le tre difficolta' del gioco (`frontend/js/avvio.js`). Il server non le usa
+   per bilanciare niente — il bilanciamento e' lo stesso per tutte e tre — le
+   tiene scritte perche' il giorno che peseranno davvero si possa sapere con
+   quali regole e' stato fatto un punteggio. Quello che arriva e non e' una di
+   queste torna al riferimento del gioco, invece di finire nel database. */
+const DIFFICOLTA = ["strada-aperta", "anni-di-fame", "niente-sconti"];
+const DIFFICOLTA_DIF = "anni-di-fame";
+const difficoltaBuona = v => DIFFICOLTA.indexOf(String(v || "")) >= 0 ? String(v) : DIFFICOLTA_DIF;
 const sha = s => crypto.createHash("sha256").update(String(s)).digest("hex");
 
 /* i segreti (password, chiavi di dispositivo) si salvano con scrypt e un sale
@@ -120,7 +129,7 @@ async function inserisciBot(b){
 }
 
 const CAMPI_PUBBLICI = `a.id, a.nome, a.citta, a.genere, a.storia, a.stream, a.uscite, a.deal,
-  a.ultima_titolo, a.ultima_seed, a.seed, a.livello, a.fase`;
+  a.ultima_titolo, a.ultima_seed, a.seed, a.livello, a.fase, a.difficolta`;
 
 /* La riga che il mondo può vedere. Qui dentro non passano né `bot` né le
    chiavi né l'account: la prima è una regola di gioco, le altre di sicurezza. */
@@ -130,7 +139,8 @@ function riga(r, ioId){
     stream: r.stream, delta: (r.pos_prec == null || r.pos == null) ? null : r.pos_prec - r.pos,
     uscite: r.uscite, deal: !!r.deal, ultima: r.ultima_titolo || null,
     seed: r.ultima_seed || r.seed || 0, storia: r.storia || "",
-    livello: r.livello || 1, io: ioId ? r.id === ioId : false
+    livello: r.livello || 1, difficolta: r.difficolta || DIFFICOLTA_DIF,
+    io: ioId ? r.id === ioId : false
   };
 }
 
@@ -158,21 +168,32 @@ const GRADUATORIA = `WITH grad AS (
 async function posizioneDi(id, filtro){
   const a = await A.uno("SELECT stream, creato, ritirato, fuori FROM artista a WHERE a.id = ?", id);
   if(!a || a.ritirato || a.fuori) return null;
-  const dove = [IN_CLASSIFICA, "(a.stream > ? OR (a.stream = ? AND a.creato < ?))"];
-  const v = [a.stream, a.stream, a.creato];
-  if(filtro && filtro.citta){ dove.push("lower(a.citta) = lower(?)"); v.push(filtro.citta); }
-  if(filtro && filtro.genere){ dove.push("a.genere = ?"); v.push(filtro.genere); }
+  const { dove, v } = condizioniFiltro(filtro);
+  dove.push("(a.stream > ? OR (a.stream = ? AND a.creato < ?))");
+  v.push(a.stream, a.stream, a.creato);
   return (await A.uno("SELECT count(*) n FROM artista a WHERE " + dove.join(" AND "), ...v)).n + 1;
 }
 
 /* Una fetta di classifica: l'indice è già in ordine, quindi si salta a dove
    serve e si leggono N righe. La posizione non si calcola — si sa: è
    `da`, `da+1`, `da+2`. */
-async function fetta(da, quanti, filtro){
+/* Le condizioni del filtro, scritte una volta sola. Erano ricopiate in quattro
+   query — `fetta`, `graduatoriaFiltrata`, `posizioneDi`, `quantiInClassifica` —
+   e aggiungerne una voleva dire ricordarsi di tutte e quattro: aggiungendo la
+   difficolta' ne era gia' rimasta indietro una, e una classifica che conta i
+   filtrati in un modo e li elenca in un altro dice numeri che non tornano.
+   Il filtro entra sempre come parametro, mai incollato nella query. */
+function condizioniFiltro(filtro){
   const dove = [IN_CLASSIFICA];
   const v = [];
   if(filtro && filtro.citta){ dove.push("lower(a.citta) = lower(?)"); v.push(filtro.citta); }
   if(filtro && filtro.genere){ dove.push("a.genere = ?"); v.push(filtro.genere); }
+  if(filtro && filtro.difficolta){ dove.push("a.difficolta = ?"); v.push(filtro.difficolta); }
+  return { dove, v };
+}
+
+async function fetta(da, quanti, filtro){
+  const { dove, v } = condizioniFiltro(filtro);
   const prec = await ultimaChiusa();
   const righe = await A.tutti(
     `SELECT ${CAMPI_PUBBLICI}, p.pos AS pos_prec
@@ -190,10 +211,7 @@ async function fetta(da, quanti, filtro){
    l'unico modo in cui una classifica per città vuol dire qualcosa. Il filtro
    entra come parametro, mai incollato nella query. */
 function graduatoriaFiltrata(filtro){
-  const dove = [IN_CLASSIFICA];
-  const v = [];
-  if(filtro && filtro.citta){ dove.push("lower(a.citta) = lower(?)"); v.push(filtro.citta); }
-  if(filtro && filtro.genere){ dove.push("a.genere = ?"); v.push(filtro.genere); }
+  const { dove, v } = condizioniFiltro(filtro);
   return {
     sql: `WITH grad AS (
       SELECT a.id, row_number() OVER (ORDER BY a.stream DESC, a.creato) AS pos
@@ -207,7 +225,7 @@ async function classifica(da, quanti, ioId, filtro){
   return {
     settimana: await settimanaCorrente(),
     totale: await quantiInClassifica(filtro),
-    filtro: (filtro && (filtro.citta || filtro.genere)) ? filtro : null,
+    filtro: (filtro && (filtro.citta || filtro.genere || filtro.difficolta)) ? filtro : null,
     prossimoGiro: Number(await leggiStato("prossimo_giro", 0)),
     righe: righe.map(r => riga(r, ioId)),
     io: ioId ? await schedaConPosizione(ioId, ioId, filtro) : null
@@ -216,10 +234,7 @@ async function classifica(da, quanti, ioId, filtro){
 
 /* Quanti sono in classifica, dentro al filtro. */
 async function quantiInClassifica(filtro){
-  const dove = [IN_CLASSIFICA];
-  const v = [];
-  if(filtro && filtro.citta){ dove.push("lower(a.citta) = lower(?)"); v.push(filtro.citta); }
-  if(filtro && filtro.genere){ dove.push("a.genere = ?"); v.push(filtro.genere); }
+  const { dove, v } = condizioniFiltro(filtro);
   return (await A.uno("SELECT count(*) n FROM artista a WHERE " + dove.join(" AND "), ...v)).n;
 }
 
@@ -273,9 +288,9 @@ const artistiDi = async accountId => Promise.all(
 async function iscriviArtista(d){
   const id = uuid();
   await A.fai(`INSERT INTO artista (id, account_id, bot, nome, citta, genere, storia, seed,
-           chiave_hash, creato) VALUES (?, ?, 0, ?, ?, ?, ?, ?, ?, ?)`,
+           chiave_hash, difficolta, creato) VALUES (?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?)`,
     id, d.accountId || null, d.nome, d.citta, d.genere, d.storia || "", d.seed || 0,
-    d.chiaveHash || null, ora());
+    d.chiaveHash || null, difficoltaBuona(d.difficolta), ora());
   return await schedaConPosizione(id, id);
 }
 
@@ -310,10 +325,15 @@ async function segnaPunteggio(id, d, ipHash){
   const set = await A.insieme(async () => {
     await A.fai(`UPDATE artista SET stream = ?, fan = ?, livello = ?, fase = ?, uscite = ?, deal = ?,
              ultima_titolo = coalesce(?, ultima_titolo), ultima_seed = coalesce(?, ultima_seed),
-             punteggio = ? WHERE id = ?`,
+             difficolta = ?, punteggio = ? WHERE id = ?`,
       stream, esame.fan, esame.livello, d.fase != null ? d.fase : a.fase,
       d.uscite != null ? d.uscite : a.uscite, d.deal == null ? a.deal : (d.deal ? 1 : 0),
-      d.ultima || null, d.seed || null, ora(), id);
+      d.ultima || null, d.seed || null,
+      /* la difficolta' la dice il gioco a ogni invio: una carriera puo' essere
+         ricominciata in un altro modo dentro allo stesso slot. Se non la manda
+         (client vecchio) resta quella che c'era. */
+      d.difficolta != null ? difficoltaBuona(d.difficolta) : (a.difficolta || DIFFICOLTA_DIF),
+      ora(), id);
     const s = await settimanaCorrente();
     await A.fai(`INSERT INTO punteggio_settimana (artista_id, settimana, stream, fan, livello, fase,
              uscite, deal, limato, origine, ip_hash, inviato)
@@ -702,6 +722,12 @@ async function collegaIdentita(accountId, d){
    Google il segreto non c'è — al posto suo c'è un biglietto firmato da loro,
    che va verificato prima di arrivare qui (vedi `verificaBiglietto` nel
    server: per adesso è una porta chiusa, non una porta finta). */
+/* C'è già qualcuno con questa identità? Non chiede la password: serve a chi
+   apre un account, per dire «questa mail è presa» invece di andare a sbattere
+   contro l'indice unico e tornare un errore del server. */
+const identitaEsiste = async (tipo, idEsterno) => !!await A.uno(
+  "SELECT id FROM identita WHERE tipo = ? AND id_esterno = ?", tipo, idEsterno);
+
 async function entra(tipo, idEsterno, segreto){
   const i = await A.uno("SELECT * FROM identita WHERE tipo = ? AND id_esterno = ?", tipo, idEsterno);
   if(!i) return null;
@@ -920,10 +946,11 @@ module.exports = {
   cittaInGioco, generiInGioco, quantiInClassifica, feed, opps, dichiara, scancella, relazioni,
   posizioneDi, fetta,
   stagioneCorrente, chiudiStagione, albo, stagioni,
-  creaAccount, account, collegaIdentita, entra, apriSessione, sessione, chiudiSessione,
+  creaAccount, account, collegaIdentita, entra, identitaEsiste, apriSessione, sessione, chiudiSessione,
   cancellaAccount, impasta, combacia, sha,
   salvaCarriera, carriera, carriere,
   catalogo, daiTraguardo, traguardiDi, daSpingere, segnaSpinto,
   traguardiDovuti, CODICI_DAL_SERVER,
-  segnala, daGuardare, rinominaDufficio, chiudiSegnalazioni
+  segnala, daGuardare, rinominaDufficio, chiudiSegnalazioni,
+  DIFFICOLTA, DIFFICOLTA_DIF, difficoltaBuona
 };

@@ -24,6 +24,7 @@
      ADF_SALE         sale per gli hash degli indirizzi IP
      ADF_INVIO_MS     quanto passa fra due punteggi dello stesso artista (10000)
      ADF_PROXY        1 se davanti c'e' un reverse proxy nostro (legge x-forwarded-for)
+     ADF_BUSSATE      richieste al minuto da uno stesso indirizzo (120)
      ADF_PG           se c'e', sotto va PostgreSQL invece di SQLite:
                       postgresql://utente:password@host:5432/anni_di_fame
    Le manopole si possono anche mettere in `.env.local` (vedi ambiente.js).
@@ -57,7 +58,13 @@ const CFG = {
   /* dietro a un reverse proxy l'indirizzo di chi chiama e' quello del proxy:
      x-forwarded-for si legge SOLO se siamo noi ad averlo messo davanti, se no
      chiunque puo' scriverci dentro quello che vuole e saltare i freni */
-  dietroProxy: process.env.ADF_PROXY === "1"
+  dietroProxy: process.env.ADF_PROXY === "1",
+  /* quante richieste al minuto da uno stesso indirizzo. Era murato a 120, e
+     `prova.js` — che fa tutto il giro da una macchina sola — ci arrivava a un
+     paio di richieste di distanza: la prova successiva che qualcuno aggiungeva
+     faceva cadere prove che non c'entravano niente, con un 429 al posto della
+     risposta. Adesso e' una manopola come le altre, e la prova se la alza. */
+  bussateAlMinuto: Math.max(1, Number(process.env.ADF_BUSSATE || 120))
 };
 
 
@@ -93,7 +100,7 @@ function troppe(ip){
   const ora = Date.now(), b = bussate.get(ip);
   if(!b || ora - b.t > 60e3){ bussate.set(ip, { t: ora, n: 1 }); return false; }
   b.n++;
-  return b.n > 120;
+  return b.n > CFG.bussateAlMinuto;
 }
 setInterval(() => {
   const ora = Date.now();
@@ -214,7 +221,12 @@ async function rotta(req, res, url){
       const email = String(b.email || "").trim().toLowerCase();
       if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return male(res, 400, "email-non-valida");
       if(String(b.segreto || "").length < 8) return male(res, 400, "segreto-troppo-corto");
-      if(await archivio.entra("email", email, b.segreto)) return male(res, 409, "email-gia-usata");
+      /* «esiste già?» e «la password è giusta?» sono due domande diverse.
+         Prima si chiedeva la seconda: chi riprovava con la stessa mail e una
+         password sbagliata passava il controllo, arrivava all'INSERT e si
+         prendeva un 500 con lo stack nei log, invece del 409 che gli spiegava
+         cos'era successo. L'unico che conta qui è se la mail è già presa. */
+      if(await archivio.identitaEsiste("email", email)) return male(res, 409, "email-gia-usata");
       idEsterno = email;
     } else if(tipo === "ospite"){
       idEsterno = crypto.randomUUID();
@@ -315,6 +327,7 @@ async function rotta(req, res, url){
       genere: GENERI.indexOf(b.genere) >= 0 ? b.genere : scegli(GENERI),
       storia: nomePulito(b.storia, 120) || scegli(STORIE),
       seed: nInt(b.seed, 0, 2e9, Math.floor(Math.random() * 1e9)),
+      difficolta: b.difficolta,
       chiaveHash: archivio.sha(chiave)
     });
     return invia(res, 201, Object.assign({}, a, { chiave, token: token || undefined }));
@@ -354,7 +367,8 @@ async function rotta(req, res, url){
     const r = await archivio.segnaPunteggio(id, {
       stream: b.stream, fan: nInt(b.fan, 0, 5e7, null), livello: nInt(b.livello, 1, 60, null),
       fase: nInt(b.fase, 0, 8, null), uscite: nInt(b.uscite, 0, 5000, null), deal: b.deal,
-      ultima: b.ultima != null ? nomePulito(b.ultima, 60) : null, seed: nInt(b.seed, 0, 2e9, null)
+      ultima: b.ultima != null ? nomePulito(b.ultima, 60) : null, seed: nInt(b.seed, 0, 2e9, null),
+      difficolta: b.difficolta
     }, ipHash(req));
     return r ? invia(res, 200, r) : male(res, 404, "artista-sconosciuto");
   }
@@ -365,7 +379,11 @@ async function rotta(req, res, url){
        dentro al filtro — sei 3° a Rovereto, non 428° con un'etichetta sopra */
     const filtro = {
       citta: nomePulito(q.get("citta"), 40) || null,
-      genere: GENERI.indexOf(q.get("genere")) >= 0 ? q.get("genere") : null
+      genere: GENERI.indexOf(q.get("genere")) >= 0 ? q.get("genere") : null,
+      /* «?difficolta=niente-sconti»: guardare la classifica di chi corre con le
+         stesse regole tue. La graduatoria di suo resta **una sola per tutti** —
+         qui si filtra una vista, non si spacca il gioco in tre. */
+      difficolta: archivio.DIFFICOLTA.indexOf(q.get("difficolta")) >= 0 ? q.get("difficolta") : null
     };
     return invia(res, 200, await archivio.classifica(
       nInt(q.get("da"), 1, 100000, 1), nInt(q.get("quanti"), 1, 200, 10),
@@ -412,6 +430,15 @@ async function rotta(req, res, url){
     if(!s) return male(res, 403, "sessione-scaduta");
     const b = await corpo(req);
     if(!b.stato || typeof b.stato !== "object") return male(res, 400, "stato-mancante");
+    /* L'artista attaccato allo slot deve essere tuo. Prima ci si fidava del
+       corpo della richiesta: un id inventato arrivava fino alla chiave esterna
+       e tornava un 500, e l'id di un altro giocatore veniva accettato — la sua
+       carriera in cloud restava legata a un artista che non era suo, e il
+       giorno che quello cancellava l'account si portava via anche il legame. */
+    if(b.artistaId != null && b.artistaId !== ""){
+      const suo = await archivio.artistaGrezzo(String(b.artistaId));
+      if(!suo || suo.account_id !== s.account.id) return male(res, 403, "non-e-tuo");
+    }
     const r = await archivio.salvaCarriera(s.account.id, Number(pezzo(3)), b);
     if(r.errore) return male(res, 413, r.errore);
     if(r.conflitto) return invia(res, 409, { errore: "carriera-piu-avanti", salvata: r.salvata,

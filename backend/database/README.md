@@ -48,7 +48,13 @@ Il perno del disegno, da tenere a mente prima di leggere il resto:
 
 File `.sql` numerati in `migrazioni/`, applicati in ordine e una volta sola, ognuno dentro
 a una transazione; il conto lo tiene la tabella `migrazione`. Niente ORM, niente strumenti
-da installare: si aggiunge `006_qualcosa.sql` e riparte il server.
+da installare: si aggiunge `008_qualcosa.sql` e riparte il server.
+
+Ogni migrazione ha **due file con lo stesso nome**, uno per motore: `migrazioni/` per
+SQLite e `migrazioni-pg/` per PostgreSQL, perché il DDL non si scrive uguale. Che i due
+elenchi combacino lo controlla `npm run prova`. L'ultima è `007_difficolta.sql`: la
+difficoltà della carriera accanto all'artista — si scrive e si filtra, non entra
+nell'ordinamento (il perché sta in [`../README.md`](../README.md)).
 
 
 ---

@@ -18,6 +18,14 @@
    - cancellare l'account, che Apple e Google pretendono. */
 "use strict";
 
+/* La versione del gioco, quella che finisce accanto a ogni salvataggio in
+   cloud e a ogni dispositivo. La colonna nel database c'e' da sempre e il
+   ponte la leggeva gia' (`window.VERSIONE_GIOCO`) — solo che non l'ha mai
+   scritta nessuno, e in cloud finiva la stringa vuota. Serve il giorno che un
+   salvataggio vecchio va riletto da un gioco nuovo: senza, non si sa da che
+   versione arriva. Sta qui e si alza a mano, come il numero in package.json. */
+window.VERSIONE_GIOCO = window.VERSIONE_GIOCO || "0.1.0";
+
 const ONLINE = (() => {
   const K_URL = "adf-online-url";
   const K_ID = "adf-online-id";           // l'artista
@@ -72,7 +80,9 @@ const ONLINE = (() => {
   async function registra(nome, citta, genere){
     const r = await chiama("/api/artista", {
       metodo: "POST", senzaSessione: true,
-      corpo: { nome, citta, genere, dispositivo: { piattaforma: piattaforma(), nome: "questo dispositivo" } }
+      corpo: { nome, citta, genere,
+        difficolta: (typeof G !== "undefined" && G && G.difficolta) || "anni-di-fame",
+        dispositivo: { piattaforma: piattaforma(), nome: "questo dispositivo", versione: window.VERSIONE_GIOCO } }
     });
     if(!r || r.errore) return r;
     scrivi(K_ID, r.id);
@@ -95,7 +105,7 @@ const ONLINE = (() => {
     if(!mia || mia.sessione || !mia.chiave) return null;
     const r = await chiama("/api/sessione", { metodo: "POST", senzaSessione: true,
       corpo: { tipo: "legacy", artistaId: mia.id, chiave: mia.chiave,
-        dispositivo: { piattaforma: piattaforma() } } });
+        dispositivo: { piattaforma: piattaforma(), versione: window.VERSIONE_GIOCO } } });
     if(r && r.token){ scrivi(K_SESSIONE, r.token); return r; }
     return r;
   }
@@ -104,12 +114,12 @@ const ONLINE = (() => {
      telefono nuovo, finché non ci sono Steam, Apple e Google. */
   const registraConMail = (email, segreto) => chiama("/api/account", {
     metodo: "POST", senzaSessione: true,
-    corpo: { tipo: "email", email, segreto, dispositivo: { piattaforma: piattaforma() } }
+    corpo: { tipo: "email", email, segreto, dispositivo: { piattaforma: piattaforma(), versione: window.VERSIONE_GIOCO } }
   }).then(r => { if(r && r.token) scrivi(K_SESSIONE, r.token); return r; });
 
   const entra = (email, segreto) => chiama("/api/sessione", {
     metodo: "POST", senzaSessione: true,
-    corpo: { tipo: "email", email, segreto, dispositivo: { piattaforma: piattaforma() } }
+    corpo: { tipo: "email", email, segreto, dispositivo: { piattaforma: piattaforma(), versione: window.VERSIONE_GIOCO } }
   }).then(r => { if(r && r.token) scrivi(K_SESSIONE, r.token); return r; });
 
   const esci = async () => {
@@ -148,7 +158,11 @@ const ONLINE = (() => {
       uscite: usciti.length,
       deal: !!G.contract,
       ultima: ultima ? ultima.t : null,
-      seed: ultima ? (ultima.seed || 0) : 0
+      seed: ultima ? (ultima.seed || 0) : 0,
+      /* Con quali regole e' stata corsa questa settimana. Oggi le tre
+         difficolta' pesano uguale, quindi non cambia niente in classifica: il
+         server se la scrive e basta, per il giorno che peseranno. */
+      difficolta: G.difficolta || "anni-di-fame"
     };
   }
 
