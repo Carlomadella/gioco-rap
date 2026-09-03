@@ -139,6 +139,35 @@ function stAvviaColpo(colpoId){
 }
 
 /* ==================== TENTARE UN COLPO ==================== */
+
+/* Gli Opp criminali appartengono solo a chi è davvero entrato nel giro.
+   Il flag resta per tutta la carriera. I salvataggi precedenti al flag vengono
+   migrati da prove criminali già presenti nello stato. */
+function stradaGiroAvviato(){
+  const s=G.strada||{};
+  if(s.giroAvviato===true)return true;
+  if(s.giroAvviato===false)return false;
+
+  const attive=Object.values(s.attivita||{}).some(Boolean);
+  const riciclato=!!(s.lavaggio&&Number(s.lavaggio.used)>0);
+  const evidenza=
+    Number(s.precedenti)>0 ||
+    Number(s.sporchi)>0 ||
+    Number(s.uomini)>0 ||
+    Number(s.prot)>0 ||
+    !!s.ferro ||
+    !!s.avvocato ||
+    !!s.arresto ||
+    !!s.carcere ||
+    attive ||
+    riciclato ||
+    Number(s.rep)>0 ||
+    Number(s.heat)>0;
+
+  s.giroAvviato=!!evidenza;
+  return s.giroAvviato;
+}
+
 function stradaChance(colpo, approccio){
   const s = G.strada;
   let p = .62 - colpo.difficolta * .34;
@@ -168,6 +197,7 @@ function stradaTenta(colpoId, approccioId){
   if(approccio.serveUomo && s.uomini <= 0){ STRADA_SCENA = stScenaAvviso(colpo, "Ti serve avere almeno un uomo con te."); return; }
   if(approccio.serveFerro && !s.ferro){ STRADA_SCENA = stScenaAvviso(colpo, "Ti serve il ferro, e non ce l'hai ancora."); return; }
 
+  s.giroAvviato=true;
   G.energy -= colpo.energia;
   const successo = Math.random() < stradaChance(colpo, approccio);
   const rumore = clamp((6 + colpo.difficolta * 10) * approccio.rumore, 2, 30);
@@ -770,9 +800,10 @@ function stradaSettimana(){
     }else pushLog("Controllo alle sei del mattino. Non hanno trovato niente, ma l'hanno fatto girare in paese.", "");
   }
 
-  /* gli opp, quando non te lo aspetti */
+  /* Gli Opp criminali non possono nascere dal nulla su una carriera pulita. */
+  const giroAvviato=stradaGiroAvviato();
   const probOpp = clamp(.018 + s.heat/100 * .05 + s.rep/100 * .04 + attive * .008 - s.prot * .015, .01, .3);
-  if(!s.arresto && Math.random() < probOpp) stradaOpp();
+  if(giroAvviato && !s.arresto && Math.random() < probOpp) stradaOpp();
 }
 
 function stradaOpp(){

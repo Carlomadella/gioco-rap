@@ -24,7 +24,7 @@ const START = () => ({
   best:{fans:0, chart:99}, ended:false,
   /* punto 21: la Strada. Ricostruita da claude/carriera-criminale.md */
   strada:{rep:0, heat:0, sporchi:0, uomini:0, prot:0, ferro:false, avvocato:false,
-    attivita:{}, precedenti:0, arresto:null},
+    attivita:{}, precedenti:0, arresto:null, giroAvviato:false},
   /* punto 66: chi scrive in chat — mamma e il migliore amico da subito */
   chat:{},
   /* Da smistare, punto 2: le ultime combinazioni viste degli incontri coi fan,

@@ -22,6 +22,7 @@ const hours = leggi("js/game/orari.js");
 const travel = leggi("js/game/spostamenti.js");
 const crimeui = leggi("js/game/strada-crimine-ui.js");
 const crime = leggi("js/game/strada-crimine.js");
+const state = leggi("js/game/state.js");
 const sim = leggi("js/game/sim.js");
 const skip = leggi("js/game/skip.js");
 const transfers = leggi("js/game/trasferte.js");
@@ -313,6 +314,25 @@ test("widget +1/+7 delega al bridge Eventi V2",
   timeControls.includes('calendarSerial()'));
 test("controller reagisce anche a finestre create dinamicamente",
   timeControls.includes('new MutationObserver'));
+
+
+console.log("\nOpp criminali — ingresso reale nel giro");
+test("nuova carriera dichiara esplicitamente di non essere nel giro criminale",
+  state.includes("arresto:null, giroAvviato:false"));
+test("profilo pulito non entra nel pool Opp criminale",
+  crime.includes("const giroAvviato=stradaGiroAvviato();") &&
+  crime.includes("if(giroAvviato && !s.arresto && Math.random() < probOpp) stradaOpp();"));
+test("il primo colpo realmente tentato rende persistente l'ingresso nel giro",
+  crime.includes("s.giroAvviato=true;") &&
+  crime.indexOf("s.giroAvviato=true;") < crime.indexOf("G.energy -= colpo.energia;"));
+test("migrazione vecchi salvataggi usa prove criminali concrete",
+  crime.includes("Number(s.precedenti)>0") &&
+  crime.includes("Number(s.sporchi)>0") &&
+  crime.includes("!!s.carcere") &&
+  crime.includes("Object.values(s.attivita||{}).some(Boolean)") &&
+  crime.includes("s.lavaggio&&Number(s.lavaggio.used)>0"));
+test("una storia criminale già attiva non decade con heat o rep",
+  crime.includes("if(s.giroAvviato===true)return true;"));
 
 console.log("\nHardening eventi — arbitro globale");
 const street = leggi("js/game/strada.js");
