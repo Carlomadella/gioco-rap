@@ -70,6 +70,37 @@ test("Escape chiude una app anche sotto 1180",
   tel.includes('if(ev.key === "Escape" && TEL_APP) telHome();') &&
   !tel.includes('if(ev.key === "Escape" && TEL_APP && telPC())'));
 
+console.log("\nAgenda — disponibilità reale");
+test("Agenda combina requisiti base e guardia runtime",
+  tel.includes("function telAgendaAzione(id)") &&
+  tel.includes("const base=hubPronta(id)") &&
+  tel.includes("GAME_TRAVEL.actionAccess(id)"));
+test("Agenda traduce luogo, orari, fine giornata e mossa pendente",
+  tel.includes('gate.reason === "wrong-place"') &&
+  tel.includes('gate.reason === "hours"') &&
+  tel.includes('gate.reason === "day-end"') &&
+  tel.includes('gate.reason === "action-pending"'));
+test("eventi Agenda rispettano gli orari reali",
+  tel.includes("function telAgendaEvento(e)") &&
+  tel.includes("GAME_HOURS.eventStatus(e.id)") &&
+  tel.includes("telAgendaEventText(st)"));
+test("schermata Agenda usa i nuovi stati per eventi e mosse",
+  tel.includes("const st = telAgendaEvento(e)") &&
+  tel.includes("const pronto = telAgendaAzione(a.id)") &&
+  tel.includes("(st.ok ? e.d : st.perche)") &&
+  tel.includes("(pronto.ok ? a.d : pronto.perche)"));
+test("contatore Agenda compatta conta solo mosse eseguibili ora",
+  tel.includes('sotto:() => telAgendaDisponibili() + " mosse ora"') &&
+  tel.includes("function telAgendaDisponibili()"));
+test("Agenda non usa più hubPronta da solo nel renderer",
+  (() => {
+    const a0=tel.indexOf("function schermataAgenda()");
+    const a1=tel.indexOf("/* ---- Impostazioni",a0);
+    const body=a0>=0&&a1>a0?tel.slice(a0,a1):"";
+    return !!body && !body.includes("hubPronta(") &&
+      body.includes("telAgendaAzione(") && body.includes("telAgendaEvento(");
+  })());
+
 console.log("\nBlocco 2 — recupero / scrittura");
 test("contatore giornaliero usa anno:settimana:giorno",
   actions.includes('return [Number(G.year||1), Number(G.week||1), Number(G.day||1)].join(":")'));

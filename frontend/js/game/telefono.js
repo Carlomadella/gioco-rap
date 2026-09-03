@@ -65,7 +65,7 @@ const HUB_APP_VECCHIO = [
   {id:"classifiche", n:"Classifiche", ic:"coppa", k:"#FACC15",
    vai:() => hubGioco("classifica")},
   {id:"agenda", n:"Agenda", ic:"agenda", k:"#F87171",
-   sotto:() => ACTIONS.filter(a => !a.avail || a.avail()).length + " mosse oggi",
+   sotto:() => telAgendaDisponibili() + " mosse ora",
    vai:() => hubGioco("settimana")},
   {id:"impostazioni", n:"Impostazioni", ic:"ingranaggio", k:"#9AA1B2",
    vai:() => { if(window.IMPOSTAZIONI) window.IMPOSTAZIONI(); }}
@@ -188,6 +188,69 @@ function golPremio(rw){
   if(rw.money) bits.push("+" + fmt(rw.money) + " €");
   if(rw.wellbeing) bits.push("+" + rw.wellbeing + " benessere");
   return bits.length ? bits.join(" · ") : "aperto";
+}
+
+/* L'Agenda non deve indovinare se una mossa è disponibile: prima usa gli
+   stessi requisiti della plancia (hubPronta), poi consulta la guardia runtime
+   che protegge davvero l'esecuzione da luogo/orari/fine giornata/pending. */
+function telAgendaGateText(gate){
+  if(!gate) return "Non adesso";
+  if(gate.reason === "action-pending") return "Prima chiudi la mossa in corso";
+  if(gate.reason === "day-end") return "Non c'è abbastanza tempo oggi";
+  if(gate.reason === "wrong-place"){
+    const req=gate.requiredPlace;
+    const l=(typeof HUB_LUOGHI !== "undefined" ? HUB_LUOGHI : []).find(x => {
+      try{
+        return window.GAME_HOURS && typeof GAME_HOURS.samePlace === "function"
+          ? GAME_HOURS.samePlace(x.id,req) : x.id === req;
+      }catch(_){ return x.id === req; }
+    });
+    return l ? "Devi andare a " + l.n : "Devi spostarti";
+  }
+  if(gate.reason === "hours"){
+    const st=gate.status||{};
+    if(st.phase === "before" && st.nextText) return "Apre alle " + st.nextText;
+    if(st.phase === "too-late") return "Troppo tardi per oggi";
+    if(st.phase === "after") return "Chiuso per oggi";
+    return st.label || "Fuori orario";
+  }
+  return gate.perche || "Non adesso";
+}
+
+function telAgendaAzione(id){
+  const base=hubPronta(id);
+  if(!base.ok) return base;
+  try{
+    if(window.GAME_TRAVEL && typeof GAME_TRAVEL.actionAccess === "function"){
+      const gate=GAME_TRAVEL.actionAccess(id);
+      if(!gate.ok) return {ok:false, perche:telAgendaGateText(gate), gate};
+    }
+  }catch(_){}
+  return {ok:true, perche:""};
+}
+
+function telAgendaEventText(st){
+  if(!st) return "Non adesso";
+  if(st.phase === "before" && st.nextText) return "Dalle " + st.nextText;
+  if(st.phase === "too-late") return "Troppo tardi per partecipare";
+  if(st.phase === "after") return "Finito per oggi";
+  return st.label || "Non adesso";
+}
+
+function telAgendaEvento(e){
+  if(e.presto) return {ok:false, perche:"Non ancora"};
+  try{
+    if(window.GAME_HOURS && typeof GAME_HOURS.eventStatus === "function"){
+      const st=GAME_HOURS.eventStatus(e.id);
+      if(st && !st.open) return {ok:false, perche:telAgendaEventText(st), status:st};
+    }
+  }catch(_){}
+  if(e.posto || e.strada) return {ok:true, perche:""};
+  return telAgendaAzione(e.id);
+}
+
+function telAgendaDisponibili(){
+  return ACTIONS.reduce((n,a) => n + (telAgendaAzione(a.id).ok ? 1 : 0), 0);
 }
 
 /* ================= RENDER — INGRESSO UNICO ================= */
@@ -424,14 +487,14 @@ function schermataClassifiche(){
 /* ---- Agenda: gli eventi di stasera più le mosse disponibili ---- */
 function schermataAgenda(){
   const oggi = HUB_EVENTI.map(e => {
-    const st = (e.presto || e.posto || e.strada) ? {ok:true} : hubPronta(e.id);
+    const st = telAgendaEvento(e);
     return '<button class="tli" data-evento="' + e.id + '"' + (st.ok ? '' : ' disabled') + '>' +
       '<span class="tliav" style="--k:' + e.k + '">' + hsvg(e.ic) + '</span>' +
-      '<span class="tlitx"><b>' + e.n + '</b><i>' + e.d + '</i></span>' +
+      '<span class="tlitx"><b>' + e.n + '</b><i>' + (st.ok ? e.d : st.perche) + '</i></span>' +
       '<span class="tliv">' + e.ora + '</span></button>';
   }).join("");
   const mosse = ACTIONS.filter(a => !a.avail || a.avail()).map(a => {
-    const pronto = hubPronta(a.id);
+    const pronto = telAgendaAzione(a.id);
     return '<button class="tli" data-azione="' + a.id + '"' + (pronto.ok ? '' : ' disabled') + '>' +
       '<span class="tlitx"><b>' + a.n + '</b><i>' + (pronto.ok ? a.d : pronto.perche) + '</i></span>' +
       '<span class="tliv">' + a.e + '⚡</span></button>';
