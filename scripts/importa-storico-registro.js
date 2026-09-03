@@ -155,6 +155,11 @@ function inserisciVoce(fileCategoria, titoloCategoria, voce, marker) {
         ? fs.readFileSync(destinazione, "utf8")
         : intestazione(titoloCategoria);
 
+    // Lavora internamente in LF, poi ripristina il tipo di fine riga
+    // già usato dal file. Evita diff enormi su Windows (CRLF/LF misti).
+    const eol = contenuto.includes("\r\n") ? "\r\n" : "\n";
+    contenuto = contenuto.replace(/\r\n/g, "\n");
+
     // Se abbiamo già registrato questo commit, non lo duplichiamo.
     if (contenuto.includes(marker)) {
         return false;
@@ -178,6 +183,7 @@ function inserisciVoce(fileCategoria, titoloCategoria, voce, marker) {
             contenuto.slice(fineSeparatore).trimStart();
     }
 
+    contenuto = contenuto.replace(/\n/g, eol);
     fs.writeFileSync(destinazione, contenuto, "utf8");
 
     return true;
@@ -517,7 +523,7 @@ for (const [fileCategoria, files] of assegnazioni.entries()) {
             emailCommitter !== emailAutore
         ) {
             dettagliAutore +=
-                `  \n**Commit effettuato da:** ${committer} (${emailCommitter})`;
+                `\n\n**Commit effettuato da:** ${committer} (${emailCommitter})`;
         }
 
         let bloccoMerge = "";
@@ -533,8 +539,10 @@ ${commitsMerge}
         const voce = `${marker}
 ## ${data} — ${subject}
 
-**Tipo:** ${isMerge ? "Merge" : "Commit diretto su main"}  
-${dettagliAutore}  
+**Tipo:** ${isMerge ? "Merge" : "Commit diretto su main"}
+
+${dettagliAutore}
+
 **Commit:** \`${shortHash}\`
 
 ${bloccoMerge}
