@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:b0840d4 -->
+## 03/09/26, 21:40 — fix: evita opp criminali per giocatori puliti
+
+**Tipo:** Commit diretto su main
+
+**Autore:** Mycol (mycolbraga@gmail.com)
+
+**Commit:** `b0840d4`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/index.html`
+- **Modificato:** `frontend/js/game/state.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- commit:f28bb6a -->
 ## 03/09/26, 20:33 — feat: completa esperienza e navigazione del carcere
 

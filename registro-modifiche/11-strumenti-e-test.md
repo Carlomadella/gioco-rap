@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:b0840d4 -->
+## 03/09/26, 21:40 — fix: evita opp criminali per giocatori puliti
+
+**Tipo:** Commit diretto su main
+
+**Autore:** Mycol (mycolbraga@gmail.com)
+
+**Commit:** `b0840d4`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:d7455b1 -->
 ## 03/09/26, 21:10 — fix: nuove carriere partono da zero
 
