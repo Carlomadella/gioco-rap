@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:0468db2 -->
+## 03/09/26, 13:09 — feat: nuovo flusso avvio, slot e difficolta
+
+**Tipo:** Commit diretto su main
+
+**Autore:** Mycol (mycolbraga@gmail.com)
+
+**Commit:** `0468db2`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/state.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:36dd0b5 -->
 ## 03/09/26, 10:30 — fix: blocca il gameplay durante il carcere
 

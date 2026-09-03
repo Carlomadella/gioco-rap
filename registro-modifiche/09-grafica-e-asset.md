@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:0468db2 -->
+## 03/09/26, 13:09 — feat: nuovo flusso avvio, slot e difficolta
+
+**Tipo:** Commit diretto su main
+
+**Autore:** Mycol (mycolbraga@gmail.com)
+
+**Commit:** `0468db2`
+
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/css/avvio.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:595c0b8 -->
 ## 03/09/26, 02:04 — feat: guardaroba separato dal negozio, via il Campetto dalla mappa (punti 7, 8)
 
