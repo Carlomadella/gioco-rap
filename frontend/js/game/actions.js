@@ -100,6 +100,47 @@ function offerJobs(){
     d:"Non è quello che vuoi fare nella vita. È quello che paga la sala e i beat.", opts});
 }
 
+/* ================= LA PALESTRA (punto 9) =================
+   Non è più un pulsante piatto: al cartello sulla mappa si sceglie tra
+   Pesi e Cardio (hub.js), e la costanza conta più della singola seduta.
+   Giorni di fila alzano il guadagno di presenza fino al +50% (dieci giorni
+   di fila, poi si ferma lì); tornarci due volte nello stesso giorno non
+   raddoppia niente — il corpo non recupera così in fretta, e la seconda
+   seduta rende molto meno (o toglie benessere invece di darne). */
+function palestraGiorno(){
+  const sett = typeof totalWeeks === "function" ? totalWeeks() : ((G.year-1)*52 + G.week);
+  return (sett - 1) * 7 + (G.day || 1);
+}
+/* streak valido *adesso*, senza scriverlo: se sono passati più di uno-due
+   giorni dall'ultima volta la serie è già persa, anche se G.palestra non
+   lo sa ancora — lo scrive solo la prossima sessione vera. */
+function palestraStreakOra(){
+  if(!G.palestra || G.palestra.ultimo == null) return 0;
+  return (palestraGiorno() - G.palestra.ultimo > 1) ? 0 : (G.palestra.streak || 0);
+}
+function palestraRegistraSessione(){
+  if(!G.palestra) G.palestra = {streak:0, ultimo:null, sessioni:0};
+  const p = G.palestra, oggi = palestraGiorno();
+  if(p.ultimo !== oggi) p.streak = palestraStreakOra() + 1;
+  p.ultimo = oggi;
+  p.sessioni = (p.sessioni || 0) + 1;
+  return p.streak;
+}
+function palestraMoltiplicatore(){ return 1 + Math.min(10, palestraStreakOra()) * 0.05; }
+function palestraFlavor(streak){
+  if(streak === 3) return " Terzo giorno di fila: si comincia a vedere.";
+  if(streak === 7) return " Una settimana intera senza saltarne uno.";
+  if(streak >= 14 && streak % 7 === 0) return " " + (streak/7) + " settimane di fila. Adesso è abitudine.";
+  return "";
+}
+/* per la scheda «Disciplina» del profilo (hub.js): la stessa lettura a
+   sola lettura di palestraStreakOra(), in una riga per l'utente */
+function palestraTesto(){
+  const s = palestraStreakOra();
+  if(s === 0) return G.palestra && G.palestra.sessioni ? "Persa: da riprendere" : "Non ci sei ancora andato";
+  return s + (s === 1 ? " giorno di fila" : " giorni di fila");
+}
+
 const ACTIONS = [
   {id:"scrivi", n:"Scrivi barre", e:28, luc:3,
    d:"Il foglio, la penna e quello che hai in testa.",
@@ -269,20 +310,52 @@ const ACTIONS = [
      return s;
    }},
 
-  /* La palestra sta nella vita quotidiana: costa poco, ti tiene su il corpo e
-     ti si vede addosso quando sali su un palco. Non fa musica, fa la persona
-     che la musica la regge. */
-  {id:"palestra", n:"Palestra", e:12, luc:1,
-   money:() => 12,
-   d:"Un'ora di ferro. La testa si svuota e il corpo tiene.",
+  /* La palestra sta nella vita quotidiana: ti tiene su il corpo e ti si vede
+     addosso quando sali su un palco. Non fa musica, fa la persona che la
+     musica la regge. Due sedute, non una — la scelta sta nel cartello sulla
+     mappa (hub.js), qui c'è solo cosa succede quando la fai davvero. */
+  {id:"palestra_pesi", n:"Pesi", e:16, luc:1,
+   money:() => 18,
+   d:"Ferro pesante, poche ripetizioni. Il fisico che si vede sotto le luci.",
    give:() => "+benessere · +presenza",
    run(){
-     const b = Math.round(rnd(9,15));
+     const giaOggi = adfOggi("palestra") > 0;
+     const streak = palestraRegistraSessione();
+     const molt = palestraMoltiplicatore();
+     adfSegnaOggi("palestra");
+     G.money -= 18;
+     if(giaOggi){
+       const p = Math.round(rnd(4,8));
+       G.wellbeing = clamp(G.wellbeing - p, 0, 100);
+       gain("presenza", 0.1);
+       return "Il corpo non recupera due volte lo stesso giorno: benessere −" + p + ". Hai solo strapazzato quello che avevi già costruito prima.";
+     }
+     const b = Math.round(rnd(10,16) * molt);
+     const pr = Math.round(0.6 * molt * 10) / 10;
      G.wellbeing = clamp(G.wellbeing + b, 0, 100);
-     G.money -= 12;
-     gain("presenza", 0.5);
-     let s = "Un'ora di palestra: benessere +" + b + ", presenza su.";
+     gain("presenza", pr);
+     let s = "Serie pesante: benessere +" + b + ", presenza +" + pr + "." + palestraFlavor(streak);
      if(Math.random() < .15){ gain("rete", 0.8); s += " In sala pesi c'era gente del giro."; }
      return s;
+   }},
+
+  {id:"palestra_cardio", n:"Cardio leggero", e:9, luc:3,
+   d:"Una corsa, la testa che si svuota. Costa poco, ci si torna facile.",
+   give:() => "+lucidità · +benessere",
+   run(){
+     const giaOggi = adfOggi("palestra") > 0;
+     const streak = palestraRegistraSessione();
+     const molt = palestraMoltiplicatore();
+     adfSegnaOggi("palestra");
+     if(giaOggi){
+       const p = Math.round(rnd(2,5));
+       G.wellbeing = clamp(G.wellbeing - p, 0, 100);
+       return "Le gambe sono già andate stamattina: benessere −" + p + ". Questa seconda corsa stanca e basta.";
+     }
+     const b = Math.round(rnd(6,10) * molt);
+     const pr = Math.round(0.25 * molt * 10) / 10;
+     G.wellbeing = clamp(G.wellbeing + b, 0, 100);
+     gain("presenza", pr);
+     return "Corsa leggera: benessere +" + b + ", lucidità su." + palestraFlavor(streak);
    }}
 ];

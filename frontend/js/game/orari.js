@@ -31,7 +31,9 @@
     registra:"studio",
     mixa:"studio",
     live:"concerti",
-    palestra:"palestra"
+    /* punto 9: due mosse, stesso posto */
+    palestra_pesi:"palestra",
+    palestra_cardio:"palestra"
   });
 
   /* I lavori non usano tutti un punto della mappa, ma hanno comunque un turno
@@ -56,7 +58,11 @@
     colpo:  {open:"01:30", close:"04:00"}
   });
 
-  const DIRECT_PLACE_ACTION = Object.freeze({concerti:"live", palestra:"palestra"});
+  /* punto 9: la palestra adesso chiede quale delle due — qui basta un'ancora
+     per il controllo "fai in tempo a finire prima che chiuda": la più
+     corta (cardio) è la scelta prudente, l'altra la controlla la sua tile
+     una volta dentro (decorateActions). */
+  const DIRECT_PLACE_ACTION = Object.freeze({concerti:"live", palestra:"palestra_cardio"});
 
   function parseClock(text){
     const m = String(text || "").match(/^(\d{1,2}):(\d{2})$/);

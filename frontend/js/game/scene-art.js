@@ -295,6 +295,9 @@ S.palestra = [...TINTA_VITA,
   '<rect x="98" y="30" width="26" height="8" rx="4" fill="#3E5A48"/>' +
   '<g fill="#57C98B" opacity=".16"><circle cx="150" cy="26" r="30"/></g>' +
   vign + grana];
+/* punto 9: due mosse (pesi/cardio), stessa palestra — stesso disegno */
+S.palestra_pesi = S.palestra;
+S.palestra_cardio = S.palestra;
 
 return S;
 })();

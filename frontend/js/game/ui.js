@@ -15,7 +15,8 @@ const ART = {
   pubblica:TINTA_STUDIO.concat("P"), promo:TINTA_HUSTLE.concat("O"),
   free:TINTA_SUONO.concat("F"), live:TINTA_SUONO.concat("L"),
   turno:TINTA_HUSTLE.concat("€"), cercalavoro:TINTA_HUSTLE.concat("C"),
-  stacca:TINTA_VITA.concat("Z"), palestra:TINTA_VITA.concat("P")
+  stacca:TINTA_VITA.concat("Z"), palestra_pesi:TINTA_VITA.concat("P"),
+  palestra_cardio:TINTA_VITA.concat("P")
 };
 
 /* Punto 50: queste mosse finivano dritte in un toast — nessuna scena,
@@ -25,7 +26,8 @@ const ART = {
    pezzo, i due colloqui). Queste sette no: adesso aprono la scenetta che
    avevano già sulla card (scene-art.js), grande, con l'esito scritto
    sopra — non un'altra riga di testo che vola via in due secondi. */
-const SCENA_PIENA = new Set(["mixa","pubblica","promo","live","turno","stacca","palestra"]);
+const SCENA_PIENA = new Set(["mixa","pubblica","promo","live","turno","stacca",
+  "palestra_pesi","palestra_cardio"]);
 function mostraScena(a, sc, msg, extra){
   $("sc-art").innerHTML = sc[2]
     ? '<svg viewBox="0 0 200 128" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">' + sc[2] + '</svg>'

@@ -247,7 +247,7 @@ SUONO_NOMI.forEach(k => {
 
 const SND = {scrivi:"write", beat:"apri", registra:"rec", mixa:"mix", pubblica:"publish",
   promo:"promo", free:"crowd", live:"crowd", turno:"cash", cercalavoro:"apri", stacca:"tap",
-  palestra:"palestra"};
+  palestra_pesi:"palestra", palestra_cardio:"palestra"};
 
 /* ---- il click dei pulsanti ----
    Uno solo, per tutta l'app: si sente premendo qualunque cosa sia premibile.

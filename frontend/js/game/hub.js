@@ -43,7 +43,8 @@ const HIC = {
   nota:'<path d="M20 3v11.4a3.3 3.3 0 1 1-2-3V7.7l-7 1.5v7.8a3.3 3.3 0 1 1-2-3V6.5z"/>',
   rischio:'<path d="M12 2 1.5 21h21zm-1 6h2v7h-2zm0 9h2v2h-2z"/>',
   dado:'<path d="M12 2 21 6.6v10.8L12 22 3 17.4V6.6zM5.8 7.5 12 10.7l6.2-3.2L12 4.3z"/>',
-  duebolle:'<path d="M3 4h13v9H8.4L4 17V4zM21 9h-4v7l-3.2-2.6H10V9h2v2.4h5.6L19 13V11h2z"/>'
+  duebolle:'<path d="M3 4h13v9H8.4L4 17V4zM21 9h-4v7l-3.2-2.6H10V9h2v2.4h5.6L19 13V11h2z"/>',
+  manubrio:'<path d="M2 9a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm17 0a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2zM8 10h2v4H8zm6 0h2v4h-2zM9 11h6v2H9z"/>'
 };
 const hsvg = (n, cls) => '<svg class="' + (cls || "hicon") + '" viewBox="0 0 24 24" aria-hidden="true">' + HIC[n] + '</svg>';
 const spoglia = t => String(t).replace(/<[^>]*>/g, "");
@@ -107,9 +108,18 @@ const HUB_LUOGHI = [
   {id:"fabbrica", n:"Fabbrica", x:76.82, y:15.83, w:23.18, h:27.50,
    vai:() => schedaLavoro("operaio", "Fabbrica")},
   /* punto 61: la palestra esce dal sottomenu di Casa e diventa un posto
-     suo — era «Business», un altro cartello chiuso senza niente dietro */
+     suo — era «Business», un altro cartello chiuso senza niente dietro.
+     Punto 9: non è più un pulsante solo — si sceglie cosa fare, come a Casa. */
   {id:"palestra", n:"Palestra", x:66.73, y:70.83, w:17.58, h:29.17,
-   vai:() => hubAzione("palestra")},
+   vai:() => showEvent({k:"Palestra", t:"Che allenamento fai?",
+     d:"Il fisico che si vede sotto le luci, o la testa che si svuota prima di scrivere: scegli tu.",
+     annulla(){},
+     opts:[
+       {n:"Pesi", d:"Più energia, 18 € — benessere e presenza su.",
+        run(){ hubAzione("palestra_pesi"); return null; }},
+       {n:"Cardio leggero", d:"Poca energia, gratis — lucidità e benessere su.",
+        run(){ hubAzione("palestra_cardio"); return null; }}
+     ]})},
   /* punto 48: idem — l'attrezzatura da studio è già nel catalogo, la vetrina
      non deve stare spenta se quello che promette esiste già */
   {id:"shop", n:"Shop", x:49.15, y:38.67, w:9.77, h:11.33,
@@ -373,6 +383,7 @@ function vistaDisciplina(){
         (typeof totalWeeks === "function" ? totalWeeks() : G.week)) +
       rigaStat("zaino", "#F59E0B", "Lavoro", G.job ? G.job.n : "nessuno") +
       rigaStat("soldi", "#4ADE80", "Spese fisse", fmt(weeklyCosts()) + " €") +
+      rigaStat("manubrio", "#57C98B", "Palestra", palestraTesto()) +
     '</div>' +
     '<div class="pnext" style="margin-top:18px"><div class="pnexthead">' +
       '<span class="pk">La tua scalata</span>' + hsvg("coppa") + '</div>' +

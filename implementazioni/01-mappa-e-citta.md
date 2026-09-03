@@ -473,6 +473,39 @@ sotto i 1180px di larghezza reale della finestra.
     (`ACTIONS`): 12 energia, 12 €, +benessere. Stesso limite del punto 45 sulla targhetta nella foto
     («Business» invece di «Palestra»).
 
+    **«Implementa come la palestra dinamicizzi il gameplay» (03/09/2026)** — non era un pulsante,
+    era *il* pulsante: un numero casuale uguale ogni volta, senza motivo per tornarci due volte
+    invece di una. Adesso:
+    - **Si sceglie, come a Casa.** Il cartello apre una scelta (`showEvent`, `hub.js`) invece di
+      lanciare l'azione da solo: **Pesi** (16 energia, 18 €, benessere e presenza su, per chi si
+      prepara a salire su un palco) o **Cardio leggero** (9 energia, gratis, lucidità e benessere
+      su, per chi è senza soldi o senza tempo ma vuole tenere il filo). Due `ACTIONS` nuove in
+      `actions.js` — `palestra_pesi` e `palestra_cardio` — al posto della vecchia `palestra` sola.
+    - **La costanza conta, non il colpo isolato.** `G.palestra` (`{streak, ultimo, sessioni}`,
+      `actions.js`) ricorda da quanti giorni di fila ci vai: ogni giorno consecutivo alza il
+      guadagno di presenza del 5%, fino al +50% al decimo giorno di fila. Il conto è "vivo" —
+      `palestraStreakOra()` capisce da solo se la serie si è già rotta (più di un giorno saltato)
+      anche prima che tu ci torni, non aspetta la sessione successiva per accorgersene.
+    - **Strafare non paga.** Tornarci due volte lo stesso giorno (`adfOggi("palestra")`, lo stesso
+      contatore giornaliero di "stacca la spina") non raddoppia niente: la seconda seduta toglie
+      benessere invece di darne — «Il corpo non recupera due volte lo stesso giorno» — invece di
+      essere solo un guadagno più basso, così spammare il pulsante ha un costo vero, non un
+      rendimento decrescente che uno character-il-giusto ignora.
+    - **Si vede.** La scheda «Disciplina» del profilo (`vistaDisciplina()`) mostra la serie attuale
+      — «3 giorni di fila», o «Persa: da riprendere» se hai saltato — con un'icona nuova
+      (`manubrio`, `HIC`). Prima questo stato non esisteva da nessuna parte fuori dal log.
+      A 3 e 7 giorni di fila (e ogni settimana intera dopo) un accenno di testo lo nota anche
+      l'esito della sessione, non solo lo stat.
+    Tutti gli altri punti che tenevano viva la vecchia `"palestra"` come id di azione sono stati
+    aggiornati per le due nuove — orari d'apertura (`orari.js`), durata (`tempo.js`: pesi 75 min,
+    cardio 45), suono (`fx.js`), scena a pagina piena e colore del toast (`ui.js`), disegno
+    (`scene-art.js`, stesso SVG per entrambe: è la stessa palestra). Il luogo sulla mappa resta
+    uno solo, `"palestra"` — cambiano solo le mosse dietro al cartello.
+    Verificato in Chrome headless: prima sessione (streak 1, presenza +0,6), sessione il giorno
+    dopo (streak 2, +10%), due sessioni lo stesso giorno (seconda: benessere −5, niente presenza),
+    salto di più giorni poi ripresa (streak torna a 1, "Persa: da riprendere" nel frattempo).
+    `npm run prova` (28/28) pulito.
+
 ---
 
 ## 62 · La mappa allargata, senza bande nere

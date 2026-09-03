@@ -30,7 +30,8 @@
     live:180,
     cercalavoro:90,
     stacca:180,
-    palestra:60,
+    palestra_pesi:75,
+    palestra_cardio:45,
     ricicla:45
   });
 

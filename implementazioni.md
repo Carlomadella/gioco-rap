@@ -31,10 +31,6 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 _(qui sotto finiscono i punti nuovi, appena scritti)_
 
-6. La foto è riadattata malissimo. Devi OVVIAMENTE RIADATTARLA CHE STIA PERFETTA NELLA FOTO E SI VEDA BENE COME QUANDO LA APRI DAL FILE CHE TI HO MANDATO 'MAPPA DEFINITIVA'. Rifai.
-
-9. Implementa come la palestra dinamicizzi il gameplay, e integralo come parte secondaria ma attiva del gameplay 
-
 10. Lo studio lo terrei sempre aperto.
 
 11. Beatmaker intengriamola a una sezione dello studio.
