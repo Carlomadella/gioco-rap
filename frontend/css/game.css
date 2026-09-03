@@ -171,6 +171,19 @@
 .crow .rt .st{font-size:13.5px;font-weight:800;font-variant-numeric:tabular-nums}
 .crow .rt .dl{font-size:11.5px;font-weight:800}
 .dl.up{color:var(--green,#57C98B)} .dl.dn{color:var(--hot)} .dl.eq{color:var(--faint)}
+/* una riga che non apre niente non deve far comparire la manina: nella
+   classifica vera dietro a un nome c'e' una persona, non una scheda da aprire */
+.crow.ferma{cursor:default}
+/* «sei 428°»: la tua riga quando sei fuori dalla fetta che si vede. Staccata
+   da sopra, se no sembra che tu sia undicesimo. */
+.crow.staccata{margin-top:10px;border-top:1px dashed rgba(255,255,255,.16)!important;
+  padding-top:14px}
+#g-chartpiu{padding:12px 14px 2px}
+.chartpiu{width:100%;padding:11px 14px;border-radius:10px;font:inherit;font-size:13px;
+  font-weight:800;color:var(--soft);background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:background .15s,color .15s}
+.chartpiu:hover{background:rgba(255,255,255,.09);color:#fff}
+.chartnota{margin-top:9px;font-size:12px;color:var(--faint);text-align:center}
 .hotdot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--hot);
   margin-left:6px;vertical-align:middle}
 .rcard2{text-align:left}

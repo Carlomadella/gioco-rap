@@ -652,7 +652,20 @@ function poRispondi(i){
   const o = sit.o[i];
   const sett = typeof totalWeeks === "function" ? totalWeeks() : G.week;
   let pt = o[1];
-  if(o[2] && o[2] === p.car){ pt += 1; p.scoperto = true; }     /* hai capito che tipo è */
+  /* «Hai capito che tipo è»: se la risposta è quella giusta per il suo
+     carattere vale un punto in più, e da lì in poi il carattere lo sai.
+
+     Il bonus però **non si applica a una risposta che non è un passo verso di
+     lui**. Prima si sommava a tutte, e usciva la cosa che non torna del punto
+     14: alla richiesta di prestargli il microfono, «gli dici che te lo tieni
+     per te» vale zero ed è etichettata «diffidente» — con uno diffidente
+     davanti diventava +1 e l'amicizia **saliva dicendo di no**. Aver capito
+     che tipo è resta vero comunque (e infatti `scoperto` si segna lo stesso):
+     è quello che conta come rapporto che non deve crescere. */
+  if(o[2] && o[2] === p.car){
+    p.scoperto = true;
+    if(pt > 0) pt += 1;
+  }
   if(p.ult === sett) pt = Math.min(pt, 1);                       /* già visto oggi: vale meno */
   p.ult = sett;
 

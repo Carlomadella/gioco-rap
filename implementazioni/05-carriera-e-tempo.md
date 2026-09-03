@@ -29,11 +29,40 @@ a 84 di lucidità e ~12 di hype, settimana avanzata di 4, energia tornata a 100.
 
 12. Aggiorna le classifiche ogni settimana, metti quante posizioni ha scalato/è retrocesso l'artista rispetto alla settimana precedente. Fai in modo che si veda la top 10, poi se espandi in basso alla classifca ti fa vedere la top 100 (in futuro top 1000) e chiaramente fai in modo che l'utente possa vedere la sua posizione in classifica.
 
+   **FATTO (03/09/2026)** — insieme al punto 30, di cui era la metà mancante. Il server
+   sapeva già fare tutto — chiude il giro di settimana, fotografa la posizione di tutti
+   prima di chiuderlo e da lì tira fuori le frecce ▲▼ — e la schermata continuava a
+   disegnare i rivali finti di casa: il multiplayer c'era e non si vedeva.
+
+   Adesso `js/game/ui.js` disegna la classifica **vera** quando il server risponde, e
+   quella locale quando non risponde, senza che si veda la giuntura: stessa riga, stesso
+   vestito. La top 10 si allarga alla top 100 con un bottone in fondo, e la tua posizione
+   si vede sempre — se sei fuori dalla fetta, in fondo compare la tua riga staccata con
+   scritto a che numero sei («sei 428°»). Le frecce sono quelle del server: chi non ha una
+   posizione della settimana prima ha un punto, non uno zero verde, perché «non lo
+   sappiamo» e «non si è mosso» sono due cose diverse.
+
+   Iscrizione: **niente da compilare**. Parte da sola a settimana chiusa (`advanceWeek` in
+   `js/game/sim.js`) col nome e la città del creatore, e se il server non c'è la partita va
+   avanti identica. Per la strada è saltato fuori che i generi del creatore sono dodici e
+   quelli della classifica sei: il server non riconosceva «boombap» o «rnb» e ne pescava
+   **uno a caso**, così in classifica ti trovavi accanto un genere mai scelto. La
+   corrispondenza sta in `js/net/online.js`. E i nomi degli altri giocatori adesso passano
+   da un filtro che disinnesca l'HTML: il server li tiene corti ma non li ripulisce dai
+   tag, e il posto dove quella roba va spenta è chi disegna. C'è una prova apposta.
+
 ---
 
 ## 15 · I progressi si salvano, tre slot
 
 15. fai in modo che i progressi di gioco vengano salvati, dalla schermata di avvio posso decidere se caricare una partita o crearne una nuova, max 3 slot partita disponibili.
+
+   **FATTO (02/09/2026)** — `js/avvio.js`: la schermata di avvio ha i tre slot espliciti,
+   con dentro a che punto è ogni carriera; da lì si carica, si comincia una partita nuova o
+   si elimina uno slot. Il pulsante grosso cambia da solo — INIZIA se non c'è niente,
+   CONTINUA sull'ultima carriera usata — e l'avvio rapido prende il primo slot libero.
+   Ogni slot ha il suo artista e il suo salvataggio (`slotKey`, `js/impostazioni.js`), e da
+   qui in poi anche il suo posto in classifica.
 
 ---
 
@@ -46,6 +75,16 @@ a 84 di lucidità e ~12 di hype, settimana avanzata di 4, energia tornata a 100.
 ## 24 · Gli slot anche nella schermata di avvio
 
 24. Gli slot ci sono (impostazioni → Partite): restano da mettere anche nella schermata di avvio, come scelta prima di giocare.
+
+   **FATTO (02/09/2026)** — col punto 15: i tre slot si scelgono nella schermata di avvio,
+   prima di giocare, e non solo dalle impostazioni. Nello stesso passaggio è arrivata la
+   **difficoltà** — «strada aperta», «anni di fame», «niente sconti» — che si sceglie
+   quando si comincia una carriera e resta attaccata allo slot. Per adesso è nominale: il
+   bilanciamento è lo stesso per tutte e tre, e lo dice invece di far finta. Il server però
+   se la scrive già accanto all'artista (vedi
+   [multiplayer-e-backend](07-multiplayer-e-backend.md)), perché il giorno che i tre
+   livelli peseranno davvero, con quali regole è stato fatto un punteggio non si recupera
+   più a posteriori.
 
 ---
 

@@ -203,6 +203,15 @@ function advanceWeek(){
   }
   else if(!detenutoAInizioSettimana && Math.random() < .38) maybeEvent();
   save(); renderGioco();
+
+  /* Punti 12 e 30: la settimana chiusa è il momento in cui il punteggio va in
+     classifica. Alla prima ci si iscrive da soli — nessun modulo, nessuna
+     schermata: il nome e la città li ha già scritti il giocatore nel creatore.
+     Non si aspetta la risposta e non si guarda l'errore: se il server non c'è,
+     la partita va avanti identica e la classifica resta quella locale. */
+  if(typeof ONLINE !== "undefined" && ONLINE){
+    ONLINE.sincronizza().then(c => { if(c) renderChart(); }).catch(() => {});
+  }
 }
 
 /* ==================== IL GIORNO (punti 39/40/41) ====================

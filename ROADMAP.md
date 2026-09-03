@@ -141,20 +141,23 @@ Le rotte e le manopole stanno in `backend/README.md`, il modello dei dati in
   e il «prima» è quello (lega col punto 12).
 - **L'imbroglio**: il gioco gira sul dispositivo di chi gioca, quindi non è blindabile. Il
   server tiene fuori l'assurdo — al massimo ×5 di stream fra un invio e l'altro, un invio
-  ogni dieci secondi, 120 richieste al minuto per indirizzo, chiave salvata solo come hash.
+  ogni dieci secondi, 120 richieste al minuto per indirizzo (`ADF_BUSSATE`), chiave
+  salvata solo come hash.
   **Prima di vendere il gioco** questo non basta: la settimana va simulata sul server, e
   dal gioco arrivano solo le mosse.
 
 ### Quello che manca (in ordine)
 
-1. **Agganciare la schermata classifica.** Oggi `js/game/ui.js` disegna i rivali locali;
-   deve disegnare la classifica del server quando c'è, e ricadere su quella locale quando
-   non c'è. Il ponte è già pronto: `frontend/js/net/online.js`.
-2. **Iscrizione senza modulo da compilare.** Il nome d'arte c'è già, la città anche: alla
-   prima settimana chiusa l'artista entra in classifica da solo, e il giocatore lo scopre
-   leggendo «sei entrato in classifica: 428°».
-3. **Top 10 → top 100 → intorno a te** (punto 12): la fetta si chiede già al server
-   (`?da=&quanti=`, `/intorno/:id`), manca la lista che si apre in basso.
+1. ~~**Agganciare la schermata classifica.**~~ **FATTO (03/09/2026)** — `js/game/ui.js`
+   disegna la classifica del server quando c'è e ricade su quella locale quando non c'è,
+   con la stessa riga e lo stesso vestito: la giuntura non si vede.
+2. ~~**Iscrizione senza modulo da compilare.**~~ **FATTO (03/09/2026)** — alla prima
+   settimana chiusa l'artista entra in classifica da solo, col nome e la città che ha già
+   scritto nel creatore.
+3. ~~**Top 10 → top 100**~~ **FATTO (03/09/2026)** — la top 10 si allarga alla top 100 con
+   un bottone in fondo, e se sei fuori dalla fetta la tua riga compare staccata in coda
+   con scritto a che numero sei. **Resta l'«intorno a te»**: la rotta c'è
+   (`/intorno/:id`), la vista «chi ho davanti e chi ho dietro» no.
 4. **I rivali locali diventano i rivali del mondo.** Chi ti sta appena sopra in classifica
    è materia da beef, da feat e da notizie: gli opps (punto 7) escono da lì invece che da
    una lista generata in casa.

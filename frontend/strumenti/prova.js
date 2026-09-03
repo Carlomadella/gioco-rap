@@ -463,6 +463,235 @@ console.log("\nla chat del telefono: non si deve ripetere");
   }
 }
 
+/* La classifica vera nella schermata (punti 12 e 30). Il server la sa dare da
+   un pezzo; quello che va provato è la metà di qua: che le righe che arrivano
+   da Internet si disegnino, che si veda la tua posizione anche quando sei
+   fuori dalla fetta, e soprattutto che **un nome scritto da un altro
+   giocatore non possa portarsi dentro dell'HTML**. Il server tiene i nomi
+   corti e senza caratteri invisibili ma non li ripulisce dai tag — non è il
+   suo mestiere — quindi il posto dove quella roba va disinnescata è
+   esattamente questo, e una prova che lo tenga fermo ci vuole.
+
+   Si carica `ui.js` fuori dal browser con un DOM finto: quello che ci
+   interessa è la stringa che finisce dentro a `#g-chart`. */
+console.log("\nla classifica vera nella schermata");
+{
+  const vm = require("vm");
+  const nodi = {};
+  const finto = () => ({
+    innerHTML: "", textContent: "", style: { setProperty(){} }, dataset: {},
+    classList: { add(){}, remove(){}, toggle(){}, contains: () => false },
+    offsetWidth: 0, addEventListener(){}, removeEventListener(){},
+    querySelector: () => finto(), querySelectorAll: () => []
+  });
+  const scatola = {
+    console, Math, JSON, Object, Array, String, Number, Boolean, Date, Set, Map,
+    parseInt, parseFloat, isNaN, isFinite,
+    localStorage: { getItem: () => null, setItem: () => {} },
+    document: {
+      getElementById(id){ return nodi[id] || (nodi[id] = finto()); },
+      querySelectorAll: () => [], addEventListener(){}
+    }
+  };
+  scatola.window = scatola;
+  vm.createContext(scatola);
+
+  const sorgenti = ["js/core.js", "js/game/state.js", "js/game/rivals.js",
+                    "js/game/covers.js", "js/game/scene-art.js", "js/game/content.js",
+                    "js/game/actions.js", "js/game/phases.js", "js/game/sim.js",
+                    "js/game/ui.js"];
+  let acceso = true, errore = null;
+  try{
+    for(const f of sorgenti)
+      vm.runInContext(fs.readFileSync(path.join(RADICE, f), "utf8"), scatola, { filename: f });
+    vm.runInContext("G = START(); G.songs = []; window.ARTIST = {name:'Io', city:'Rovereto'};", scatola);
+  }catch(e){ acceso = false; errore = e; }
+  controlla("la classifica si carica fuori dal browser", acceso, errore ? [errore.message] : []);
+
+  if(acceso){
+    const dentro = c => vm.runInContext(c, scatola);
+    const riga = (pos, nome, extra) => Object.assign({
+      id: "id-" + pos, pos, nome, citta: "Milano", genere: "trap", stream: 5000 - pos * 10,
+      delta: null, uscite: 3, deal: false, ultima: "Un pezzo", seed: 12345,
+      storia: "", livello: 4, difficolta: "anni-di-fame", io: false
+    }, extra || {});
+
+    /* dieci righe vere, e io non ci sono: sono 428° */
+    dentro("ONLINE = { classificaInCache: () => CACHE_FINTA, identita: () => ({id:'io'}) };");
+    scatola.CACHE_FINTA = {
+      settimana: 3, totale: 1200, filtro: null, prossimoGiro: 0,
+      righe: [riga(1, "Primo", { delta: 2 }), riga(2, "Secondo", { delta: -1 }),
+              riga(3, "Terzo"), riga(4, "Quarto"), riga(5, "Quinto"),
+              riga(6, "Sesto"), riga(7, "Settimo"), riga(8, "Ottavo"),
+              riga(9, "Nono"), riga(10, "Decimo")],
+      io: riga(428, "Io", { io: true, stream: 90 })
+    };
+    dentro("renderChart()");
+    const html = nodi["g-chart"].innerHTML;
+
+    controlla("le righe del server si disegnano tutte",
+      (html.match(/class="crow/g) || []).length === 11,
+      (html.match(/class="crow/g) || []).length + " righe");
+    controlla("la freccia della settimana arriva dal server",
+      html.indexOf("▲ 2") >= 0 && html.indexOf("▼ 1") >= 0);
+    controlla("chi non ha una posizione di prima ha un punto, non uno zero",
+      html.indexOf('class="dl eq">·') >= 0);
+    controlla("«sei 428°»: la tua riga c'è anche se sei fuori dalla fetta",
+      html.indexOf(">428<") >= 0 && html.indexOf("staccata") >= 0);
+    /* il punto separatore lo mette toLocaleString, che fuori dal browser
+       dipende da com'e' compilato Node: si guardano le cifre, non il punto */
+    controlla("il titolo dice quanti sono in classifica",
+      nodi["g-charthead"].textContent.replace(/[.  ]/g, "").indexOf("1200artisti") >= 0,
+      nodi["g-charthead"].textContent);
+    controlla("da sotto si allarga alla top 100 (punto 12)",
+      nodi["g-chartpiu"].innerHTML.indexOf('data-chart="100"') >= 0,
+      nodi["g-chartpiu"].innerHTML);
+
+    /* il pezzo che conta: il nome lo scrive un altro giocatore */
+    scatola.CACHE_FINTA.righe = [riga(1, '<img src=x onerror="alert(1)">',
+      { ultima: "</text><script>alert(2)</script>" })];
+    scatola.CACHE_FINTA.io = null;
+    dentro("renderChart()");
+    const cattivo = nodi["g-chart"].innerHTML;
+    controlla("un nome con dentro dell'HTML non diventa HTML",
+      cattivo.indexOf("<img") < 0 && cattivo.indexOf("&lt;img") >= 0, cattivo.slice(0, 160));
+    controlla("e nemmeno il titolo del pezzo, che finisce dentro alla copertina",
+      cattivo.toLowerCase().indexOf("<script") < 0);
+
+    /* niente server: si torna ai rivali di casa, senza accorgersene */
+    dentro("ONLINE = { classificaInCache: () => null, identita: () => null };");
+    dentro("G.rivals = []; sistemaRivali();");
+    dentro("renderChart()");
+    controlla("senza server si disegna la classifica di casa, come prima",
+      nodi["g-chart"].innerHTML.indexOf('class="crow') >= 0 &&
+      nodi["g-charthead"].textContent === "Top 10 della settimana",
+      nodi["g-charthead"].textContent);
+  }
+}
+
+/* I dialoghi della Sala devono tornare (punto 14 di `implementazioni.md`).
+   La cosa segnalata: «in una conversazione in studio, alla domanda "mi presti
+   il microfono", anche se gli dico di no l'amicizia aumenta». Era vero, e non
+   era quella battuta lì: era la regola. Il bonus «hai capito che tipo è» (+1
+   quando la risposta è quella giusta per il suo carattere) si sommava a
+   **tutte** le risposte, comprese quelle che valgono zero o meno — così un
+   rifiuto etichettato col carattere giusto diventava un passo avanti.
+
+   Qui non si legge il codice: si gioca. Ogni situazione, per ogni risposta,
+   contro ognuno dei quattro caratteri, chiamando la `poRispondi()` vera; e si
+   guarda se il rapporto è salito. Una risposta che non è un passo verso di lui
+   non deve **mai** farlo salire, qualunque carattere abbia davanti. */
+console.log("\ni dialoghi della Sala: dire di no non è fare amicizia");
+{
+  const vm = require("vm");
+  const zitto = () => {};
+  const scatola = {
+    console: { log: zitto, warn: zitto, error: zitto },
+    Math, JSON, Object, Array, String, Number, Boolean, Date, Set, Map,
+    parseInt, parseFloat, isNaN, isFinite,
+    localStorage: { getItem: () => null, setItem: () => {} },
+    document: {
+      getElementById: () => finto(), querySelectorAll: () => [], addEventListener: zitto
+    }
+  };
+  const finto = () => ({
+    innerHTML: "", textContent: "", style: { setProperty: zitto }, dataset: {},
+    classList: { add: zitto, remove: zitto, toggle: zitto, contains: () => false },
+    addEventListener: zitto, querySelector: () => finto(), querySelectorAll: () => []
+  });
+  scatola.window = scatola;
+  vm.createContext(scatola);
+
+  let acceso = true, errore = null;
+  try{
+    for(const f of ["js/core.js", "js/game/state.js", "js/game/posto.js"])
+      vm.runInContext(fs.readFileSync(path.join(RADICE, f), "utf8"), scatola, { filename: f });
+    /* tutto quello che poRispondi tocca fuori da sé: qui non deve fare niente,
+       serve solo che non esploda — quello che ci interessa è `p.pt` e `p.rel` */
+    vm.runInContext(`
+      G = START();
+      SFX = { tap(){}, fanfare(){} };
+      function toast(){} function pushLog(){} function save(){}
+      function renderGioco(){} function renderPosto(){} function gain(){}
+      function addLuc(){}
+    `, scatola);
+  }catch(e){ acceso = false; errore = e; }
+  controlla("i dialoghi si caricano fuori dal browser", acceso, errore ? [errore.message] : []);
+
+  if(acceso){
+    const dentro = c => vm.runInContext(c, scatola);
+    const DIALOGHI = dentro("DIALOGHI");
+    const CARATTERI = dentro("CARATTERI").map(c => c.id);
+
+    /* prima: sono scritti bene? */
+    const storti = [];
+    let situazioni = 0, risposte = 0;
+    for(const ruolo of Object.keys(DIALOGHI)){
+      const visti = new Set();
+      for(const sit of DIALOGHI[ruolo]){
+        situazioni++;
+        if(visti.has(sit.t)) storti.push(ruolo + " · situazione ripetuta: " + sit.t);
+        visti.add(sit.t);
+        if(!sit.t || sit.o.length < 2) storti.push(ruolo + " · situazione monca: " + sit.t);
+        for(const o of sit.o){
+          risposte++;
+          if(!o[0]) storti.push(ruolo + " · risposta senza testo: " + sit.t);
+          if(!(o[1] >= -1 && o[1] <= 2)) storti.push(ruolo + " · punti fuori scala (" + o[1] + "): " + o[0]);
+          if(o[2] != null && CARATTERI.indexOf(o[2]) < 0)
+            storti.push(ruolo + " · carattere inventato (" + o[2] + "): " + o[0]);
+        }
+      }
+    }
+    controlla("ogni situazione e ogni risposta sono scritte per bene (" +
+      situazioni + " situazioni, " + risposte + " risposte)", storti.length === 0, storti.slice(0, 8));
+
+    /* poi: si gioca. Ogni risposta contro ogni carattere. */
+    const saliti = [];
+    let giocate = 0;
+    for(const ruolo of Object.keys(DIALOGHI)){
+      for(let s = 0; s < DIALOGHI[ruolo].length; s++){
+        for(let i = 0; i < DIALOGHI[ruolo][s].o.length; i++){
+          for(const car of CARATTERI){
+            dentro(`
+              G.gente = [{ id:"x", n:"Tizio", ruolo:${JSON.stringify(ruolo)}, car:${JSON.stringify(car)},
+                           rel:1, pt:0, ult:-99, fama:30, via:false }];
+              POSTO_PARLA = { p: G.gente[0], sit: DIALOGHI[${JSON.stringify(ruolo)}][${s}] };
+              poRispondi(${i});
+            `);
+            giocate++;
+            const p = dentro("G.gente[0]");
+            const base = DIALOGHI[ruolo][s].o[i][1];
+            /* un rifiuto (o una risposta che vale zero) non deve mai lasciare
+               il rapporto più su di com'era: rel 1 e pt 0 di partenza */
+            if(base <= 0 && (p.pt > 0 || p.rel > 1))
+              saliti.push(ruolo + " · «" + DIALOGHI[ruolo][s].o[i][0] + "» (" + base +
+                ", carattere " + car + ") → pt " + p.pt + ", rel " + p.rel);
+          }
+        }
+      }
+    }
+    controlla("una risposta che vale zero o meno non fa mai salire l'amicizia (" +
+      giocate + " conversazioni giocate)", saliti.length === 0, saliti.slice(0, 8));
+
+    /* e la controprova: il bonus deve funzionare ancora dov'è giusto. Si parte
+       da rel 1 (soglia 4) apposta: da rel 0 la soglia è 3, i punti la
+       toccherebbero e verrebbero spesi per salire di gradino — giusto per il
+       gioco, ma qui nasconderebbe il numero che stiamo guardando. */
+    const beat0 = DIALOGHI.beatmaker[0];
+    const buona = beat0.o.findIndex(o => o[1] > 0 && o[2]);
+    dentro(`
+      G.gente = [{ id:"x", n:"Tizio", ruolo:"beatmaker", car:${JSON.stringify(beat0.o[buona][2])},
+                   rel:1, pt:0, ult:-99, fama:30, via:false }];
+      POSTO_PARLA = { p: G.gente[0], sit: DIALOGHI.beatmaker[0] };
+      poRispondi(${buona});
+    `);
+    const conBonus = dentro("G.gente[0].pt");
+    controlla("ma con la risposta giusta il bonus «hai capito che tipo è» c'è ancora",
+      conBonus === beat0.o[buona][1] + 1, "pt = " + conBonus + ", attesi " + (beat0.o[buona][1] + 1));
+    controlla("e il carattere, indovinato, resta scoperto", dentro("G.gente[0].scoperto") === true);
+  }
+}
+
 console.log("\nil build");
 const dist = path.join(RADICE, "dist");
 if(!fs.existsSync(path.join(dist, "index.html"))){

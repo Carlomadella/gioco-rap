@@ -17,7 +17,7 @@ file del suo argomento con dentro cosa è stato fatto.
 | [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 9 voci |
 | [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 10 voci |
 | [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md) | **Il mondo e la gente** — 10 voci |
-| [`07-multiplayer-e-backend.md`](07-multiplayer-e-backend.md) | **Il multiplayer e il server** — 4 voci |
+| [`07-multiplayer-e-backend.md`](07-multiplayer-e-backend.md) | **Il multiplayer e il server** — 5 voci |
 | [`08-uscita-sugli-store.md`](08-uscita-sugli-store.md) | **L'uscita su Steam e sugli store** — 3 voci |
 | [`09-grafica-e-asset.md`](09-grafica-e-asset.md) | **La grafica, le ambientazioni e gli asset** — 7 voci |
 
@@ -26,7 +26,7 @@ per tutti e per tutto.
 
 ## Tutti i punti
 
-80 voci in tutto: **43 chiuse**, 12 a metà, il resto da fare.
+81 voci in tutto: **47 chiuse**, 12 a metà, il resto da fare.
 
 | | punto | stato | dove |
 | --- | --- | --- | --- |
@@ -42,10 +42,10 @@ per tutti e per tutto.
 | **9** | La schermata di gioco era troppo affollata | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **10** | Dal profilo si torna al gioco, non solo al menù | da fare | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **11** | Via il bottone del menù dalle CTA in basso | da fare | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
-| **12** | Le classifiche ogni settimana, con le frecce | da fare | [carriera-e-tempo](05-carriera-e-tempo.md) |
+| **12** | Le classifiche ogni settimana, con le frecce | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
 | **13** | Suoni e beat più vari | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
 | **14** | Il freestyle in piazza, con la folla | da fare | [musica-e-suoni](04-musica-e-suoni.md) |
-| **15** | I progressi si salvano, tre slot | da fare | [carriera-e-tempo](05-carriera-e-tempo.md) |
+| **15** | I progressi si salvano, tre slot | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
 | **16** | La navbar | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **17** | Il bottone per il menù principale | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **18** | L'energia rimasta si deve vedere | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
@@ -54,10 +54,11 @@ per tutti e per tutto.
 | **21** | La professione del criminale | fatto | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
 | **22** | L'energia cresce col livello, e i livelli devono avere un senso | da fare | [carriera-e-tempo](05-carriera-e-tempo.md) |
 | **23** | Il menù delle impostazioni | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
-| **24** | Gli slot anche nella schermata di avvio | da fare | [carriera-e-tempo](05-carriera-e-tempo.md) |
+| **24** | Gli slot anche nella schermata di avvio | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
 | **25** | Il banco dei suoni rifatto | in parte | [musica-e-suoni](04-musica-e-suoni.md) |
 | **26** | La carriera cresce con la mappa: Provincia → Milano → Los Angeles | in parte | [mappa-e-citta](01-mappa-e-citta.md) |
 | **30** | La classifica con i giocatori veri, e i bot per fare numero | fatto | [multiplayer-e-backend](07-multiplayer-e-backend.md) |
+| **—** | La difficoltà della carriera, scritta accanto all'artista | fatto | [multiplayer-e-backend](07-multiplayer-e-backend.md) |
 | **31** | Backend e frontend separati, e i README di ognuno | fatto | [multiplayer-e-backend](07-multiplayer-e-backend.md) |
 | **32** | Il gioco esce su Steam e sugli store, non dentro a un artifact | da fare | [uscita-sugli-store](08-uscita-sugli-store.md) |
 | **32** | (riscritto) e lo schema del database | fatto | [uscita-sugli-store](08-uscita-sugli-store.md) |

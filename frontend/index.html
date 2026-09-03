@@ -317,7 +317,10 @@
              hanno fatto e come stanno invecchiando. Non e' la lista del catalogo
              (quella e' il materiale in cartella): qui c'e' solo cio' che e' fuori. -->
         <div class="gpane" data-p="discografia"><div id="g-disco"></div></div>
-        <div class="gpane" data-p="classifica"><div class="list"><h3>Top 10 della settimana</h3><div id="g-chart"></div></div></div>
+        <!-- Punti 12 e 30. La classifica: quella vera del server se risponde,
+             quella locale se no. Il titolo e il bottone «vedi la top 100» li
+             scrive js/game/ui.js, che sa quale delle due sta disegnando. -->
+        <div class="gpane" data-p="classifica"><div class="list"><h3 id="g-charthead">Top 10 della settimana</h3><div id="g-chart"></div><div id="g-chartpiu"></div></div></div>
         <div class="gpane" data-p="contratti">
           <div class="list"><h3>Offerte sul tavolo</h3><div id="g-offers"></div></div>
           <div class="list"><h3>Contratto in corso</h3><div id="g-deal"></div></div>

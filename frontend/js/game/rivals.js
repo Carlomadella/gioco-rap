@@ -9,6 +9,12 @@ const RIV_CITTA = ["Milano","Roma","Napoli","Torino","Bologna","Palermo","Bari",
   "Catania","Padova","Brescia","Modena","Prato","Rimini","Trieste","Perugia","Latina","Foggia"];
 const RIV_GEN = ["trap","drill","hip hop","r&b"];
 const RIV_SKIN = ["#F2CBA8","#E8B991","#C68A5C","#B0774A","#9A6238","#82502D","#684023","#4E2F1C"];
+/* Era scritta dentro a nuovoRivale(). Sta qui perché adesso la usa anche la
+   classifica vera (`ui.js`): di un giocatore in carne e ossa il server non
+   manda l'aspetto — non è roba della classifica — e il volto si ricava dal
+   suo id pescando da queste stesse tavolozze, così una riga che arriva da
+   Internet e una fatta in casa si assomigliano invece di stonare. */
+const RIV_COL = ["#FF5A36","#B026FF","#FFC53D","#3DC7FF","#FF4D9D","#57C98B","#7A5CFF","#E8452F"];
 const RIV_STORIA = [
   "Ha cominciato in un centro sociale, adesso riempie i club.",
   "Faceva il magazziniere fino all'anno scorso. Poi un pezzo è esploso.",
@@ -42,7 +48,7 @@ function nuovoRivale(forza){
   return {
     n: pool.length ? pick(pool) : pick(RIV_NOMI) + " " + Math.floor(rnd(2,9)),
     eta: Math.floor(rnd(18, 33)), /* punto 65: stessa fascia del giocatore, sono la sua generazione */
-    city: pick(RIV_CITTA), gen: pick(RIV_GEN), col: pick(["#FF5A36","#B026FF","#FFC53D","#3DC7FF","#FF4D9D","#57C98B","#7A5CFF","#E8452F"]),
+    city: pick(RIV_CITTA), gen: pick(RIV_GEN), col: pick(RIV_COL),
     skin: pick(RIV_SKIN), hair: Math.floor(rnd(0,4)), storia: pick(RIV_STORIA),
     p: forza, prev: forza, mom: 0, usc: Math.floor(rnd(1,6)), deal: Math.random() < .25,
     seed: Math.floor(Math.random()*1e9), ult: pick(BEATNAMES), hot: 0

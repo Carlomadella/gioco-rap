@@ -563,58 +563,179 @@ body.in-hub .topnav {
   position: absolute;
   inset: 0;
 }
+/* Le zone da toccare stanno **sopra a una foto**, e una foto non è uno sfondo
+   piatto: un rettangolo di colore tutto intorno al palazzo ci si appiccica
+   sopra come un adesivo, e dove sotto c'è un'insegna accesa non si legge più.
+   Quindi non un bordo intero: i **quattro angoli**, come un mirino. Dicono
+   «qui si tocca» senza chiudere in una scatola l'edificio che c'è sotto.
+
+   E si vedono **da fermi**, non solo col mouse sopra. Prima l'unico stato
+   disegnato era `:hover`, e sul telefono l'hover non esiste: la mappa non
+   diceva in nessun modo dove si poteva toccare, si andava a tentoni sperando
+   di prendere il cartello giusto. Da fermi gli angoli sono bianchi e
+   discreti; sotto il dito, al fuoco e nel giro guidato diventano viola e si
+   allungano. */
 .pspot {
   position: absolute;
   left: var(--x);
   top: var(--y);
   width: var(--w);
   height: var(--h);
-  border-radius: 10px;
+  border-radius: 12px;
+  /* quanto è lungo il braccio dell'angolo, in percentuale della zona: così
+     una zona piccola non si ritrova quattro angoli che si toccano in mezzo */
+  --ang: 26%;
+  --col: rgba(255, 255, 255, 0.5);
   transition:
-    background 0.15s,
-    box-shadow 0.15s,
+    background 0.16s,
+    box-shadow 0.16s,
     transform 0.12s;
 }
-.pspot:hover {
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow:
-    inset 0 0 0 2px rgba(192, 132, 252, 0.9),
-    0 0 26px rgba(168, 85, 247, 0.4);
+/* Gli angoli sono un bordo intero a cui si toglie il centro di ogni lato: la
+   maschera lascia scoperti solo i quattro quadrati agli spigoli, raccordi
+   tondi compresi. `drop-shadow` e non `box-shadow` perché deve seguire il
+   ritaglio — con box-shadow si vedrebbe l'ombra del rettangolo pieno, che è
+   proprio la cosa che stiamo togliendo. L'ombra serve: senza, sul neon
+   acceso della Sala il bianco su bianco sparisce. */
+.pspot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--col);
+  border-radius: inherit;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9));
+  transition:
+    border-color 0.16s,
+    opacity 0.16s;
+  -webkit-mask:
+    linear-gradient(#000, #000) 0 0 / var(--ang) var(--ang) no-repeat,
+    linear-gradient(#000, #000) 100% 0 / var(--ang) var(--ang) no-repeat,
+    linear-gradient(#000, #000) 0 100% / var(--ang) var(--ang) no-repeat,
+    linear-gradient(#000, #000) 100% 100% / var(--ang) var(--ang) no-repeat;
+  mask:
+    linear-gradient(#000, #000) 0 0 / var(--ang) var(--ang) no-repeat,
+    linear-gradient(#000, #000) 100% 0 / var(--ang) var(--ang) no-repeat,
+    linear-gradient(#000, #000) 0 100% / var(--ang) var(--ang) no-repeat,
+    linear-gradient(#000, #000) 100% 100% / var(--ang) var(--ang) no-repeat;
 }
+/* la luce sale dalla base dell'edificio invece di riempire il rettangolo:
+   su una foto in prospettiva un velo piatto si vede che è un rettangolo */
+.pspot:hover {
+  --ang: 44%;
+  --col: rgba(216, 180, 254, 0.98);
+  background: radial-gradient(
+    120% 100% at 50% 100%,
+    rgba(168, 85, 247, 0.26),
+    transparent 70%
+  );
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.32);
+}
+/* col tasto Tab il segno dev'essere fuori di dubbio sopra a qualsiasi pixel
+   della foto: gli angoli gialli più il filo di contorno di `base.css` */
 .pspot:focus-visible {
-  box-shadow: inset 0 0 0 2px var(--acid);
+  --ang: 44%;
+  --col: var(--acid);
+  outline: 2px solid var(--acid);
+  outline-offset: 2px;
 }
 .pspot:active {
   transform: scale(0.985);
 }
+/* un posto ancora chiuso resta grigio: si tocca — dice cosa gli manca — ma
+   non si accende come quelli dove si può entrare davvero */
+.pspot.chiuso {
+  --col: rgba(255, 255, 255, 0.28);
+}
 .pspot.chiuso:hover {
-  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.45);
+  --ang: 44%;
+  --col: rgba(255, 255, 255, 0.72);
+  background: radial-gradient(
+    120% 100% at 50% 100%,
+    rgba(255, 255, 255, 0.09),
+    transparent 70%
+  );
+  box-shadow: none;
 }
 /* il giro guidato dei luoghi, con le frecce «scorri per esplorare» */
 .pspot.qui {
-  box-shadow:
-    inset 0 0 0 2px rgba(192, 132, 252, 0.95),
-    0 0 30px rgba(168, 85, 247, 0.5);
+  --ang: 50%;
+  --col: rgba(216, 180, 254, 1);
+  background: radial-gradient(
+    120% 100% at 50% 100%,
+    rgba(168, 85, 247, 0.32),
+    transparent 70%
+  );
+  box-shadow: 0 0 34px rgba(168, 85, 247, 0.45);
   animation: pspulse 1.6s ease-in-out infinite;
+}
+.pspot.qui::before {
+  animation: psang 1.6s ease-in-out infinite;
 }
 @keyframes pspulse {
   50% {
-    box-shadow:
-      inset 0 0 0 2px rgba(192, 132, 252, 0.5),
-      0 0 12px rgba(168, 85, 247, 0.2);
+    box-shadow: 0 0 14px rgba(168, 85, 247, 0.18);
   }
 }
+@keyframes psang {
+  50% {
+    opacity: 0.5;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pspot.qui,
+  .pspot.qui::before {
+    animation: none;
+  }
+}
+
+/* Le due frecce che scorrono il giro guidato. Erano due rettangoli invisibili
+   in mezzo alla strada: si accendevano solo col mouse sopra, e siccome nella
+   foto lì sotto non c'è disegnato niente, sul telefono non esistevano proprio
+   — nessuno poteva sapere che erano lì. Adesso il segno c'è sempre. */
 .pfrec {
   position: absolute;
   left: var(--x);
   top: var(--y);
   width: var(--w);
   height: var(--h);
-  border-radius: 8px;
-  transition: background 0.15s;
+  border-radius: 999px;
+  background: rgba(10, 9, 16, 0.5);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22),
+    0 2px 8px rgba(0, 0, 0, 0.55);
+  transition:
+    background 0.15s,
+    box-shadow 0.15s;
+}
+/* il chevron: mezzo quadrato girato di 45°, come si fa da sempre */
+.pfrec::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 30%;
+  height: 30%;
+  border-left: 2px solid rgba(255, 255, 255, 0.85);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.85);
+}
+.pfrec[data-f="-1"]::before {
+  transform: translate(-30%, -50%) rotate(45deg);
+}
+.pfrec[data-f="1"]::before {
+  transform: translate(-70%, -50%) rotate(-135deg);
 }
 .pfrec:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(168, 85, 247, 0.5);
+  box-shadow:
+    inset 0 0 0 1px rgba(216, 180, 254, 0.9),
+    0 2px 12px rgba(0, 0, 0, 0.55);
+}
+.pfrec:focus-visible {
+  outline: 2px solid var(--acid);
+  outline-offset: 2px;
+}
+.pfrec:active {
+  transform: scale(0.94);
 }
 
 /* ================= EVENTI DI OGGI ================= */

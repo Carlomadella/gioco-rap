@@ -39,9 +39,12 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
    - **Se il server non c'è, il gioco non se ne accorge**: `ONLINE` torna `null` e si continua
      sulla classifica locale. Il multiplayer è una cosa in più, non una da cui dipendere.
 
-   **RESTA DA FARE — la schermata**: oggi `js/game/ui.js` disegna ancora i rivali locali. Il
-   prossimo pezzo è agganciare la classifica vera alla schermata, con l'iscrizione automatica
-   alla prima settimana chiusa, senza moduli da compilare. L'ordine sta in `ROADMAP.md`.
+   **LA SCHERMATA — FATTA (03/09/2026)**, ed era l'ultimo pezzo: fino a ieri `js/game/ui.js`
+   disegnava ancora i rivali locali, e di tutto questo server in partita non si vedeva
+   niente. Adesso la classifica vera è dentro alla schermata di gioco, con l'iscrizione da
+   sola alla prima settimana chiusa e nessun modulo da compilare. Il come sta scritto per
+   esteso nel **punto 12** ([carriera-e-tempo](05-carriera-e-tempo.md)): erano la stessa
+   cosa vista dalle due parti.
    README e ROADMAP aggiornati: rotte, manopole e cosa manca.
 
 ---
@@ -118,6 +121,54 @@ in piedi su uno store. Le segno qui per non lasciarle solo nei commit.
 La prova del server è a **101 controlli**, tutti verdi, e dentro c'è anche un
 finto «appleid.apple.com» con chiavi vere per provare che un biglietto firmato
 male non entra.
+
+---
+
+## La difficoltà accanto all'artista, e tre buchi
+
+--- BACKEND (03/09/2026) ---
+
+Il gioco è arrivato a tre difficoltà (punti 15 e 24) e il server non ne sapeva
+niente. Adesso se le scrive: migrazione `007_difficolta.sql` — gemella per
+SQLite e PostgreSQL — colonna sull'artista, campo all'iscrizione e a ogni
+punteggio, `?difficolta=` fra i filtri della classifica.
+
+**La graduatoria non si tocca**: resta una sola per tutti, bot compresi. La
+colonna si legge e si filtra, non entra nell'ordinamento — spaccare il gioco in
+tre classifiche è una scelta di gioco, e si prende il giorno che il
+bilanciamento pesa davvero. Serve però cominciare a scriverla adesso, perché è
+una riga di storia che a posteriori non si recupera. Un client vecchio che non
+la manda non la cancella; una difficoltà inventata ricasca su `anni-di-fame`.
+
+Per la strada, tre cose rotte:
+
+- **la mail già presa tornava un 500.** All'apertura di un account si chiedeva
+  «la password è giusta?» invece di «esiste già?»: chi riprovava con la stessa
+  mail e un'altra password passava il controllo, andava a sbattere contro
+  l'indice unico e si prendeva un errore del server con lo stack nei log,
+  invece del 409 che gli spiegava cos'era successo. Nuova `identitaEsiste`.
+- **lo slot in cloud accettava l'artista di un altro.** `PUT /api/carriera/:n`
+  si fidava dell'`artistaId` nel corpo: un id inventato arrivava fino alla
+  chiave esterna (500), e quello di un altro giocatore veniva accettato — la
+  carriera restava legata a un artista che non era suo. Adesso si controlla che
+  sia tuo, 403 se no.
+- **`statoPartita()` non esisteva.** In `js/creator/nav.js` la funzione si
+  chiama `partita()`: ogni click su un `[data-go]` moriva con un
+  ReferenceError.
+
+E due prove che non guardavano: le immagini richiamate **dal codice** (gli
+sfondi delle Attività criminali e del carcere sono elenchi di percorsi dentro
+ai `.js`) non le controllava nessuno, e il freno delle richieste era murato a
+120 al minuto mentre `prova.js` fa tutto il giro da una macchina sola — ci
+arrivava a un paio di richieste di distanza, e la prova successiva che qualcuno
+aggiungeva avrebbe fatto cadere prove che non c'entravano niente. Adesso è
+`ADF_BUSSATE`, e la prova se la alza.
+
+Più `window.VERSIONE_GIOCO`: la colonna nel database c'era da sempre e il ponte
+la leggeva già, solo che non l'ha mai scritta nessuno e in cloud finiva la
+stringa vuota.
+
+`npm run prova` a **143 controlli**, verdi.
 
 ---
 

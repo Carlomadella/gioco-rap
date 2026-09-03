@@ -77,10 +77,26 @@ const ONLINE = (() => {
   /* Iscrive l'artista alla classifica. Il server apre anche un account da
      ospite: il giocatore non compila niente, e da lì in poi c'è una sessione
      vera con cui salvare in cloud. */
+  /* I generi del creatore sono dodici (`js/creator/data.js`), quelli della
+     classifica sei (`backend/nomi.js`): la graduatoria è pubblica, condivisa
+     coi bot e con chi gioca da un'altra versione, e sei etichette larghe sono
+     quelle che rendono `?genere=` una domanda con una risposta sensata.
+     Qui c'è scritto in quale delle sei finisce ognuno dei dodici. Serve: senza,
+     il server non riconosceva «boombap» o «rnb», ne pescava uno **a caso**, e
+     in classifica ti ritrovavi accanto un genere che non avevi mai scelto. */
+  const GENERE_SERVER = {
+    trap: "trap", plugg: "trap", cloud: "trap",
+    drill: "drill",
+    rap: "hip hop", conscious: "hip hop",
+    boombap: "boom bap",
+    rnb: "r&b",
+    garage: "urban pop", jersey: "urban pop", afro: "urban pop", pop: "urban pop"
+  };
+
   async function registra(nome, citta, genere){
     const r = await chiama("/api/artista", {
       metodo: "POST", senzaSessione: true,
-      corpo: { nome, citta, genere,
+      corpo: { nome, citta, genere: GENERE_SERVER[genere] || genere,
         difficolta: (typeof G !== "undefined" && G && G.difficolta) || "anni-di-fame",
         dispositivo: { piattaforma: piattaforma(), nome: "questo dispositivo", versione: window.VERSIONE_GIOCO } }
     });
@@ -237,13 +253,72 @@ const ONLINE = (() => {
     return chiama("/api/opps?io=" + mia.id + "&quanti=" + (quanti || 3));
   }
 
+  /* ==================== LA CLASSIFICA NELLA SCHERMATA (punti 12 e 30) ====
+     Il server c'era da un pezzo, con dentro tutto — graduatoria, frecce,
+     stagioni, sanzioni — e la schermata del gioco continuava a disegnare i
+     rivali finti di casa: il multiplayer esisteva e non si vedeva. Qui c'è
+     il giro che li mette in contatto, e sta in questo file perché è ancora
+     traffico verso il server, non disegno.
+
+     Due regole. La prima: **nessun modulo da compilare.** Alla prima
+     settimana chiusa ci si iscrive da soli, col nome e la città che il
+     giocatore ha già scritto nel creatore — se non ha un nome non si fa
+     niente e si riprova la settimana dopo. La seconda, quella di sempre: se
+     il server non c'è non se ne accorge nessuno. `CACHE` resta quella di
+     prima (o `null`), e la schermata ricasca sui rivali locali. */
+  let CACHE = null;
+  let CACHE_QUANTI = 10;
+  let inCorso = false, daRifare = false;
+
+  /* Solo leggere: funziona anche per chi non si è mai iscritto — la
+     classifica è pubblica, la si guarda anche stando fuori. */
+  async function aggiornaClassifica(quanti){
+    const q = quanti || CACHE_QUANTI;
+    const c = await classifica(1, q);
+    if(!c || c.errore) return null;
+    CACHE = c; CACHE_QUANTI = q;
+    return c;
+  }
+
+  /* Il giro intero di fine settimana: iscrizione se serve, punteggio, e la
+     classifica aggiornata.
+
+     Uno alla volta, ma senza perdere pezzi: con un salto lungo si chiudono
+     venti settimane di fila in un attimo, e accavallare venti richieste non ha
+     senso. Chi arriva mentre è in corso però non viene buttato via — lascia
+     detto di rifare il giro appena finisce questo. Se lo si scartasse e basta,
+     l'ultimo punteggio, quello vero, potrebbe non partire mai. */
+  async function sincronizza(quanti){
+    if(inCorso){ daRifare = true; return CACHE; }
+    inCorso = true;
+    try{
+      let ultima = CACHE;
+      do{
+        daRifare = false;
+        const art = window.ARTIST || {};
+        const nome = String(art.name || "").trim();
+        if(nome){
+          const mia = await assicura(nome, String(art.city || "").trim(), art.genre);
+          if(mia && mia.id) await invia();
+        }
+        ultima = await aggiornaClassifica(quanti);
+      } while(daRifare);
+      return ultima;
+    }catch(e){
+      return CACHE;
+    }finally{ inCorso = false; daRifare = false; }
+  }
+
+  const classificaInCache = () => CACHE;
+
   /* ==================== IMPOSTAZIONI ==================== */
   function collega(url){
     base = String(url || "").replace(/\/+$/, "") || "http://localhost:8787";
     try{ localStorage.setItem(K_URL, base); }catch(e){}
+    CACHE = null;   /* un altro server è un'altra classifica */
     return base;
   }
-  function scollega(){ togli(K_ID); togli(K_CHIAVE); togli(K_SESSIONE); }
+  function scollega(){ togli(K_ID); togli(K_CHIAVE); togli(K_SESSIONE); CACHE = null; }
 
   return {
     get url(){ return base; },
@@ -254,6 +329,7 @@ const ONLINE = (() => {
     salvaCarriera, carriera, carriere,
     traguardi, daiTraguardo,
     classifica, intorno, stato, notizie,
+    sincronizza, aggiornaClassifica, classificaInCache,
     feed, opps
   };
 })();

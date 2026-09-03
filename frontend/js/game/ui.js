@@ -349,36 +349,7 @@ function renderGioco(){
   if(typeof renderAbbigliamento === "function") renderAbbigliamento();
 
   // classifica
-  const my = G.songs.filter(x => x.released).reduce((a2,x) => a2 + (x.last||0), 0);
-  sistemaRivali();
-  const all = G.rivals.map(r => ({n:r.n, p:r.p, r})).concat([{n:(art.name||"Tu").trim(), p:my, me:true}]);
-  all.sort((a2,b2) => b2.p - a2.p);
-  const mioTop = G.songs.filter(x => x.released).sort((a,b) => (b.last||0)-(a.last||0))[0];
-  $("g-chart").innerHTML = all.slice(0,10).map((x,i) => {
-    const pos = i+1;
-    const prima = x.me ? (G.chartPrev || 99) : posPrec(x);
-    const d = prima - pos;
-    const dl = d > 0 ? '<span class="dl up">▲ ' + d + '</span>'
-      : d < 0 ? '<span class="dl dn">▼ ' + (-d) + '</span>'
-      : '<span class="dl eq">—</span>';
-    const cv = x.me
-      ? (mioTop ? cover(mioTop.seed || 1, mioTop.t, (window.ARTIST||{}).name || "TU", mioTop.img) : "")
-      : cover(x.r.seed, x.r.ult, x.n);
-    const fc = x.me ? "" : '<span class="fc">' + faccia(x.r, 34) + '</span>';
-    const sotto = x.me
-      ? G.age + " anni · " + ((window.ARTIST||{}).city || "la tua città") + " · " + PHASES[G.phase].n.toLowerCase()
-      : (x.r.eta ? x.r.eta + " anni · " : "") + x.r.city + " · " + x.r.gen + (x.r.deal ? " · sotto contratto" : " · indipendente");
-    return '<div class="crow' + (x.me ? " me" : "") + '"' + (x.me ? "" : ' data-riv="' + x.n + '"') + '>' +
-      '<span class="pz">' + pos + '</span>' +
-      '<span class="cv">' + cv + '</span>' + fc +
-      '<span class="in3"><b>' + (x.me ? ((window.ARTIST||{}).name || "Tu") : x.n) +
-        (x.r && x.r.hot > 0 ? '<i class="hotdot"></i>' : "") + '</b><span>' + sotto + '</span></span>' +
-      '<span class="rt"><span class="st">' + short(x.p) + '</span>' + dl + '</span></div>';
-  }).join("");
-  G.chartPrev = all.findIndex(x => x.me) + 1;
-  $("g-chart").querySelectorAll("[data-riv]").forEach(el => {
-    el.onclick = () => schedaRivale(el.dataset.riv);
-  });
+  renderChart();
 
   // contratti
   const avail = OFFERS.filter(o => G.fans >= o.need && !G.contract);
@@ -530,9 +501,167 @@ document.querySelectorAll(".nb").forEach(t => {
     document.querySelectorAll(".nb").forEach(x => x.classList.toggle("on", x === t));
     document.querySelectorAll(".gpane").forEach(pp => pp.classList.toggle("on", pp.dataset.p === t.dataset.t));
     if(typeof beatStop === "function") beatStop();
+    /* Aprire la classifica è chiedere «a che punto sono adesso»: si va a
+       risentire il server. Se non risponde resta quella che c'è. */
+    if(t.dataset.t === "classifica" && typeof ONLINE !== "undefined" && ONLINE){
+      ONLINE.aggiornaClassifica(CHART_QUANTI).then(c => { if(c) renderChart(); }).catch(() => {});
+    }
   };
 });
 
+
+/* ==================== LA CLASSIFICA (punti 12 e 30) ====================
+   Il server con dentro la graduatoria vera c'era da un pezzo — le frecce ▲▼
+   della settimana, le stagioni, i bot per fare numero, tutto provato — e
+   questa schermata continuava a disegnare i rivali finti di casa. Il
+   multiplayer esisteva e non si vedeva da nessuna parte.
+
+   Adesso: se il server risponde si vede la classifica **vera**; se non
+   risponde si vedono i rivali locali, esattamente come prima. Nessun avviso
+   in faccia, nessuna schermata d'errore — chi gioca in aereo non si deve
+   accorgere che esiste un server.
+
+   L'iscrizione non la chiede nessuno e non c'è niente da compilare: parte da
+   sola a settimana chiusa (`advanceWeek`, js/game/sim.js) col nome e la città
+   che il giocatore ha già scritto nel creatore.
+
+   Punto 12: si apre in top 10, e da sotto si allarga alla top 100. La tua
+   posizione si vede sempre — se sei fuori dalla fetta, in fondo compare la
+   tua riga con scritto a che numero sei. */
+let CHART_QUANTI = 10;
+
+/* I nomi e i titoli di questa schermata li scrive **altra gente**, e il
+   server li tiene corti e senza caratteri invisibili ma non li ripulisce
+   dall'HTML — non è il suo mestiere, è roba di chi disegna. Qui si disegna,
+   quindi qui si mette al sicuro. Si chiama così e non `esc` perché `esc`
+   esiste già in trasferte.js: due `const` con lo stesso nome in due file
+   caricati insieme sono un errore che spegne tutto il gioco. */
+const chartEsc = s => String(s == null ? "" : s)
+  .replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+
+/* Il volto di chi gioca davvero. Il server manda i numeri, non l'aspetto — e
+   fa bene, l'aspetto è roba del gioco, non della classifica. Si ricava
+   dall'id, che non cambia mai: stesso artista, stessa faccia, su ogni
+   dispositivo e a ogni giro di settimana. Pesca dalle stesse tavolozze dei
+   rivali locali (`rivals.js`), così le due metà della classifica non stonano. */
+function facciaDaId(id){
+  const s = String(id || "");
+  let h = 2166136261;
+  for(let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+  return {
+    skin: RIV_SKIN[h % RIV_SKIN.length],
+    hair: (h >>> 7) % 4,
+    col: RIV_COL[(h >>> 13) % RIV_COL.length]
+  };
+}
+
+/* `null` vuol dire «non lo sappiamo»: alla prima settimana, o per chi è
+   appena entrato, una posizione precedente non c'è. Un trattino è la verità;
+   uno zero verde sarebbe una bugia. */
+function chartFreccia(d){
+  return d == null ? '<span class="dl eq">·</span>'
+    : d > 0 ? '<span class="dl up">▲ ' + d + '</span>'
+    : d < 0 ? '<span class="dl dn">▼ ' + (-d) + '</span>'
+    : '<span class="dl eq">—</span>';
+}
+
+/* Una riga, con lo stesso vestito sia che arrivi dal server sia che sia fatta
+   in casa: la giuntura non si deve vedere. */
+function chartRigaHtml(d){
+  return '<div class="crow' + (d.me ? " me" : "") + (d.staccata ? " staccata" : "") +
+    (d.click ? "" : " ferma") + '"' +
+    (d.click ? ' data-riv="' + chartEsc(d.click) + '"' : "") + '>' +
+    '<span class="pz">' + d.pos + '</span>' +
+    '<span class="cv">' + (d.cover || "") + '</span>' +
+    (d.faccia ? '<span class="fc">' + d.faccia + '</span>' : "") +
+    '<span class="in3"><b>' + chartEsc(d.nome) + (d.hot ? '<i class="hotdot"></i>' : "") +
+      '</b><span>' + chartEsc(d.sotto) + '</span></span>' +
+    '<span class="rt"><span class="st">' + short(d.stream) + '</span>' +
+      chartFreccia(d.delta) + '</span></div>';
+}
+
+function renderChart(){
+  const c = (typeof ONLINE !== "undefined" && ONLINE) ? ONLINE.classificaInCache() : null;
+  if(c && c.righe && c.righe.length) chartDalServer(c);
+  else chartDiCasa();
+}
+
+function chartDalServer(c){
+  const righe = c.righe.slice(0, CHART_QUANTI);
+  const mioTop = G.songs.filter(x => x.released).sort((a, b) => (b.last || 0) - (a.last || 0))[0];
+  const vestita = (r, staccata) => chartRigaHtml({
+    pos: r.pos, me: !!r.io, nome: r.nome, staccata: !!staccata,
+    /* la mia copertina è quella vera del mio pezzo più forte, non una
+       ricostruita dal seed: ce l'ho in mano, tanto vale usarla */
+    cover: r.io && mioTop
+      ? cover(mioTop.seed || 1, mioTop.t, (window.ARTIST || {}).name || "TU", mioTop.img)
+      : cover(r.seed || 1, chartEsc(r.ultima || ""), chartEsc(r.nome)),
+    faccia: r.io ? "" : faccia(facciaDaId(r.id), 34),
+    sotto: r.citta + " · " + r.genere + (r.deal ? " · sotto contratto" : " · indipendente"),
+    stream: r.stream, delta: r.delta
+  });
+
+  let html = righe.map(vestita).join("");
+  /* «sei 428°»: se la tua riga non è nella fetta che si vede, si attacca in
+     fondo staccata. È la domanda che si fa chiunque apra una classifica. */
+  if(c.io && !righe.some(r => r.io)) html += vestita(Object.assign({}, c.io, { io: true }), true);
+  $("g-chart").innerHTML = html;
+
+  $("g-charthead").textContent = "Top " + CHART_QUANTI + " della settimana · " +
+    fmt(c.totale) + (c.totale === 1 ? " artista" : " artisti") + " in classifica";
+
+  /* Punto 12: la top 10 si allarga alla top 100. Il server ne manda fino a
+     200 per richiesta, quindi la fetta più grande è una richiesta sola. */
+  const piu = $("g-chartpiu");
+  const iscritto = typeof ONLINE !== "undefined" && ONLINE.identita();
+  piu.innerHTML =
+    (c.totale > 10
+      ? '<button class="chartpiu" data-chart="' + (CHART_QUANTI === 10 ? 100 : 10) + '">' +
+        (CHART_QUANTI === 10 ? "Vedi la top 100" : "Torna alla top 10") + '</button>'
+      : "") +
+    (iscritto ? "" : '<div class="chartnota">Entri in classifica a fine settimana.</div>');
+  piu.querySelectorAll("[data-chart]").forEach(b => {
+    b.onclick = () => {
+      CHART_QUANTI = +b.dataset.chart;
+      ONLINE.aggiornaClassifica(CHART_QUANTI).then(() => renderChart());
+      renderChart();
+    };
+  });
+}
+
+/* La classifica di casa: quella di sempre, per chi gioca senza server. */
+function chartDiCasa(){
+  const art = window.ARTIST || {};
+  const my = G.songs.filter(x => x.released).reduce((a2, x) => a2 + (x.last || 0), 0);
+  sistemaRivali();
+  const all = G.rivals.map(r => ({ n: r.n, p: r.p, r })).concat([{ n: (art.name || "Tu").trim(), p: my, me: true }]);
+  all.sort((a2, b2) => b2.p - a2.p);
+  const mioTop = G.songs.filter(x => x.released).sort((a, b) => (b.last || 0) - (a.last || 0))[0];
+  $("g-chart").innerHTML = all.slice(0, 10).map((x, i) => {
+    const pos = i + 1;
+    const prima = x.me ? (G.chartPrev || 99) : posPrec(x);
+    return chartRigaHtml({
+      pos, me: !!x.me, nome: x.me ? (art.name || "Tu") : x.n,
+      click: x.me ? "" : x.n,
+      cover: x.me
+        ? (mioTop ? cover(mioTop.seed || 1, mioTop.t, art.name || "TU", mioTop.img) : "")
+        : cover(x.r.seed, x.r.ult, x.n),
+      faccia: x.me ? "" : faccia(x.r, 34),
+      hot: !x.me && x.r.hot > 0,
+      sotto: x.me
+        ? G.age + " anni · " + (art.city || "la tua città") + " · " + PHASES[G.phase].n.toLowerCase()
+        : (x.r.eta ? x.r.eta + " anni · " : "") + x.r.city + " · " + x.r.gen +
+          (x.r.deal ? " · sotto contratto" : " · indipendente"),
+      stream: x.p, delta: prima - pos
+    });
+  }).join("");
+  G.chartPrev = all.findIndex(x => x.me) + 1;
+  $("g-charthead").textContent = "Top 10 della settimana";
+  $("g-chartpiu").innerHTML = "";
+  $("g-chart").querySelectorAll("[data-riv]").forEach(el => {
+    el.onclick = () => schedaRivale(el.dataset.riv);
+  });
+}
 
 /* ==================== LA DISCOGRAFIA (punto 19) ====================
    Il catalogo dice cosa hai in cartella; la discografia dice cosa e' uscito e
