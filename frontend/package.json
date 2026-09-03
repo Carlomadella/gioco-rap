@@ -8,7 +8,9 @@
     "dev": "node strumenti/dev.js",
     "build": "node strumenti/build.js",
     "demo": "node strumenti/build.js --unico",
-    "prova": "node strumenti/prova.js"
+    "prova": "node strumenti/prova.js",
+    "verifica:build": "npm run build && npm run demo && node strumenti/verifica-build.js",
+    "verifica": "npm run prova && node strumenti/audit-regressioni.js && npm run verifica:build"
   },
   "engines": {
     "node": ">=18"

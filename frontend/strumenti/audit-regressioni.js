@@ -26,6 +26,40 @@ const time = leggi("js/game/tempo.js");
 const timeControls = leggi("js/game/tempo-controlli.js");
 const index = leggi("index.html");
 const cat = JSON.parse(leggi("js/game/eventi-master-1000-v1.2.13.json"));
+const pkg = JSON.parse(leggi("package.json"));
+const verifyBuild = leggi("strumenti/verifica-build.js");
+const ciWorkflow = fs.readFileSync(path.resolve(ROOT,"..",".github","workflows","verifica-gioco.yml"),"utf8");
+
+console.log("\nCI / build — verifica automatica");
+test("package espone un comando verifica unico",
+  pkg.scripts && pkg.scripts.verifica &&
+  pkg.scripts.verifica.includes("npm run prova") &&
+  pkg.scripts.verifica.includes("node strumenti/audit-regressioni.js") &&
+  pkg.scripts.verifica.includes("npm run verifica:build"));
+test("verifica build produce sia store sia demo e poi controlla dist",
+  pkg.scripts && pkg.scripts["verifica:build"] &&
+  pkg.scripts["verifica:build"].includes("npm run build") &&
+  pkg.scripts["verifica:build"].includes("npm run demo") &&
+  pkg.scripts["verifica:build"].includes("node strumenti/verifica-build.js"));
+test("verificatore dist controlla bundle, catalogo, media e demo",
+  verifyBuild.includes("stile-[0-9a-f]{8}") &&
+  verifyBuild.includes("gioco-[0-9a-f]{8}") &&
+  verifyBuild.includes("eventi-master-1000-v1.2.13.json") &&
+  verifyBuild.includes('exists("media")') &&
+  verifyBuild.includes("window.__ADF_EVENT_CATALOG__="));
+test("GitHub Actions esegue la verifica su push e pull request",
+  ciWorkflow.includes("push:") &&
+  ciWorkflow.includes("pull_request:") &&
+  ciWorkflow.includes("run: npm run verifica"));
+test("CI usa npm ci con Node 20 e cache del lockfile frontend",
+  ciWorkflow.includes("actions/setup-node@v4") &&
+  ciWorkflow.includes("node-version: 20") &&
+  ciWorkflow.includes("run: npm ci") &&
+  ciWorkflow.includes("frontend/package-lock.json"));
+test("workflow di verifica è read-only sul repository",
+  ciWorkflow.includes("permissions:") &&
+  ciWorkflow.includes("contents: read") &&
+  !ciWorkflow.includes("contents: write"));
 
 console.log("\nBlocco 1 — Eventi V2 / telefono / dist");
 test("catalogo contiene esattamente 1000 eventi", Array.isArray(cat) && cat.length === 1000);
@@ -426,7 +460,7 @@ test("eventi tempo normalizza Beat Maker come luogo beat",
   }
 }
 
-for(const f of ["strumenti/build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js"]){
+for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }
