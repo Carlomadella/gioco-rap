@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:815cabf -->
+## 03/09/26, 18:49 — feat: aggiunge menu di sistema e navigazione mappa
+
+**Tipo:** Commit diretto su main
+
+**Autore:** Mycol (mycolbraga@gmail.com)
+
+**Commit:** `815cabf`
+
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/css/menu-sistema.css`
+- **Modificato:** `frontend/index.html`
+- **Aggiunto:** `frontend/js/menu-sistema.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- commit:e89ad13 -->
 ## 03/09/26, 14:13 — feat: completa il gameplay del carcere
 

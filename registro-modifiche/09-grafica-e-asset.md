@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:815cabf -->
+## 03/09/26, 18:49 — feat: aggiunge menu di sistema e navigazione mappa
+
+**Tipo:** Commit diretto su main
+
+**Autore:** Mycol (mycolbraga@gmail.com)
+
+**Commit:** `815cabf`
+
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/css/menu-sistema.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:0468db2 -->
 ## 03/09/26, 13:09 — feat: nuovo flusso avvio, slot e difficolta
 
