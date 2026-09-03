@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:36dd0b5 -->
+## 03/09/26, 10:30 — fix: blocca il gameplay durante il carcere
+
+**Tipo:** Commit diretto su main  
+**Autore:** Mycol (mycolbraga@gmail.com)  
+**Commit:** `36dd0b5`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/spostamenti.js`
+- **Modificato:** `frontend/js/game/telefono.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- commit:6f4d15e -->
 ## 03/09/26, 02:57 — fix: unifica La Sala e Beat Maker come luogo logico
 

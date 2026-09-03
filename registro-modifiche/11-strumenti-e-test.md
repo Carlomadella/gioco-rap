@@ -6,6 +6,22 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:36dd0b5 -->
+## 03/09/26, 10:30 — fix: blocca il gameplay durante il carcere
+
+**Tipo:** Commit diretto su main  
+**Autore:** Mycol (mycolbraga@gmail.com)  
+**Commit:** `36dd0b5`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:eab276a -->
 ## 03/09/26, 09:29 — fix: allinea agenda alla disponibilita runtime
 
