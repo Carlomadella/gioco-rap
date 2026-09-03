@@ -1,8 +1,9 @@
 /* Il telefono della plancia.
 
-   Sotto i 1180px di finestra resta quello di sempre: una colonna che scorre
-   con i messaggi, la griglia di app e le notizie (renderTelefonoVecchio,
-   HUB_APP_VECCHIO — non li tocca nessuno, byte per byte quello che c'era).
+   Sotto i 1180px resta la colonna compatta, ma usa gli stessi dati del telefono
+   grande: Messaggi sono solo conversazioni reali; Diario/G.log vive in
+   Notifiche. Le schermate Messaggi e Chat vengono riusate anche qui, senza
+   creare un secondo sistema.
 
    Dai 1180px in su diventa un iPhone vero: schermata home con widget veri,
    griglia di icone, dock, e ogni app che si apre a schermo pieno dentro alla
@@ -42,11 +43,14 @@ let TEL_ORIGIN = null;     /* da dove parte l'animazione di apertura */
 let TEL_INVTAB = "bars";   /* linguetta aperta dentro Inventario */
 let TEL_MODO_PC = telPC();
 
-/* ================= LE APP — VECCHIO (sotto i 1180px, invariato) ================= */
+/* ================= LE APP — COMPATTE (sotto i 1180px) ================= */
 const HUB_APP_VECCHIO = [
   {id:"contatti", n:"Contatti", ic:"gente", k:"#38BDF8",
    sotto:g => (g.gente || []).filter(p => !p.via && p.rel >= 1).length + " conosciuti",
    vai:() => apriPosto()},
+  {id:"notifiche", n:"Notifiche", ic:"rischio", k:"#FB923C",
+   sotto:g => Math.max(0, g.log.length - (g.seenLog || 0)) + " nuove",
+   vai:() => { GO("game"); renderGioco(); $("g-diary").click(); }},
   {id:"obiettivi", n:"Obiettivi", ic:"mirino", k:"#EF4444",
    sotto:g => GOALS.filter(x => !g.goals[x.id]).length + " aperti",
    vai:() => hubGioco("obiettivi")},
@@ -188,13 +192,13 @@ function golPremio(rw){
 
 /* ================= RENDER — INGRESSO UNICO ================= */
 function renderTelefono(){
-  if(!telPC()){ TEL_APP = null; renderTelefonoVecchio(); return; }
+  if(!telPC()){ renderTelefonoVecchio(); return; }
   renderTelefonoHome();
 }
 
 function renderTelefonoVecchio(){
-  const nuovi = Math.max(0, G.log.length - (G.seenLog || 0));
-  const msg = G.log.slice(0, 2);
+  const msg = telMessaggiDiretti().slice(0, 2);
+  const nuovi = telMessaggiNonLetti();
   $("hb-tel").className = "ptelscr";
   $("hb-tel").innerHTML =
     '<span class="ptt">Il tuo telefono</span>' +
@@ -202,14 +206,14 @@ function renderTelefonoVecchio(){
       '<div class="pmsghead">' + hsvg("chat") + '<b>Messaggi</b>' +
         (nuovi ? '<span class="pnuovi">' + nuovi + ' nuovi</span>' : '') + '</div>' +
       (msg.length ? msg.map(m =>
-        '<button class="pmr" data-diario="1">' +
+        '<button class="pmr" data-chat="' + m.id + '">' +
           '<span class="pmav">' + hsvg("persona") + '</span>' +
-          '<span class="pmtx"><b>Diario</b><i>' + spoglia(m.t) + '</i></span>' +
-          '<span class="pmrt">' + m.w + (nuovi ? '<u></u>' : '') + '</span>' +
+          '<span class="pmtx"><b>' + m.n + '</b><i>' + spoglia(m.t) + '</i></span>' +
+          '<span class="pmrt">' + (m.nonLetti ? m.nonLetti + ' nuovi<u></u>' : '') + '</span>' +
         '</button>').join("")
-        : '<div class="pmr"><span class="pmtx"><i>Ancora niente. Muoviti, e qualcosa succede.</i></span></div>') +
+        : '<div class="pmr"><span class="pmtx"><i>Nessun messaggio diretto. Gli eventi automatici sono in Notifiche.</i></span></div>') +
     '</div>' +
-    '<button class="plargo" data-diario="1">Vedi tutti i messaggi</button>' +
+    '<button class="plargo" data-telapp="messaggi">Vedi tutti i messaggi</button>' +
     '<div class="papp">' + HUB_APP_VECCHIO.map(a =>
       '<button class="pap" data-app="' + a.id + '" style="--k:' + a.k + '">' + hsvg(a.ic) +
       '<span><b>' + a.n + '</b>' + (a.sotto ? '<i>' + a.sotto(G) + '</i>' : '') + '</span></button>').join("") +
@@ -217,7 +221,8 @@ function renderTelefonoVecchio(){
     '<div class="pnews"><h4>Notizie della settimana</h4>' +
       HUB_NOTIZIE.map(n => '<p style="--k:' + n.k + '">' + hsvg(n.ic) + n.t + '</p>').join("") +
     '</div>' +
-    '<button class="plargo" data-news="1">Vedi tutte le notizie</button>';
+    '<button class="plargo" data-news="1">Vedi tutte le notizie</button>' +
+    (TEL_APP ? schermataWrap(TEL_APP) : '');
 }
 
 /* ================= RENDER — HOME NUOVA ================= */
@@ -489,6 +494,14 @@ function telHome(){
 /* ================= COMANDI ================= */
 $("hb-tel").addEventListener("click", ev => {
   if(ev.target.closest("[data-home]")){ telHome(); return; }
+  const telApp = ev.target.closest("[data-telapp]");
+  if(telApp){
+    TEL_APP = telApp.dataset.telapp;
+    TEL_ORIGIN = null;
+    hubTap();
+    renderTelefono();
+    return;
+  }
   const app = ev.target.closest("[data-app]");
   if(app){
     const a = (telPC() ? HUB_APP : HUB_APP_VECCHIO).find(x => x.id === app.dataset.app);
@@ -534,7 +547,7 @@ $("hb-tel").addEventListener("click", ev => {
 });
 
 document.addEventListener("keydown", ev => {
-  if(ev.key === "Escape" && TEL_APP && telPC()) telHome();
+  if(ev.key === "Escape" && TEL_APP) telHome();
 });
 window.addEventListener("resize", () => {
   const ora = telPC();

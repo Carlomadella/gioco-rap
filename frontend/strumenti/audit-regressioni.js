@@ -44,6 +44,32 @@ const msgScreen = s0 >= 0 && s1 > s0 ? tel.slice(s0,s1) : "";
 test("schermata Messaggi non legge G.log", !!msgScreen && !msgScreen.includes("G.log"));
 test("da Messaggi si entra nella Chat vera", tel.includes('TEL_APP = "chat"; TEL_CHAT_APERTA = chatOpen.dataset.chat'));
 
+const mv0 = tel.indexOf("function renderTelefonoVecchio()");
+const mv1 = tel.indexOf("/* ================= RENDER — HOME NUOVA", mv0);
+const mobilePhone = mv0 >= 0 && mv1 > mv0 ? tel.slice(mv0,mv1) : "";
+test("telefono sotto 1180 usa messaggi diretti e non G.log",
+  mobilePhone.includes("telMessaggiDiretti().slice(0, 2)") &&
+  mobilePhone.includes("telMessaggiNonLetti()") &&
+  !mobilePhone.includes("G.log"));
+test("anteprima mobile apre il thread Chat vero",
+  mobilePhone.includes('data-chat="') &&
+  mobilePhone.includes("m.id") &&
+  tel.includes('TEL_APP = "chat"; TEL_CHAT_APERTA = chatOpen.dataset.chat'));
+test("telefono compatto può aprire la stessa schermata Messaggi del PC",
+  tel.includes('data-telapp="messaggi"') &&
+  tel.includes("(TEL_APP ? schermataWrap(TEL_APP) : '')") &&
+  tel.includes('if(!telPC()){ renderTelefonoVecchio(); return; }'));
+test("G.log mobile è esplicitamente Notifiche",
+  tel.includes('{id:"notifiche", n:"Notifiche"') &&
+  tel.includes('g.log.length - (g.seenLog || 0)') &&
+  tel.includes('$("g-diary").click()'));
+test("Vedi tutti i messaggi non apre più il Diario",
+  mobilePhone.includes('data-telapp="messaggi"') &&
+  !mobilePhone.includes('data-diario="1">Vedi tutti i messaggi'));
+test("Escape chiude una app anche sotto 1180",
+  tel.includes('if(ev.key === "Escape" && TEL_APP) telHome();') &&
+  !tel.includes('if(ev.key === "Escape" && TEL_APP && telPC())'));
+
 console.log("\nBlocco 2 — recupero / scrittura");
 test("contatore giornaliero usa anno:settimana:giorno",
   actions.includes('return [Number(G.year||1), Number(G.week||1), Number(G.day||1)].join(":")'));
