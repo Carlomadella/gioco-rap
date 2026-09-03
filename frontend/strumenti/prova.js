@@ -692,6 +692,55 @@ console.log("\ni dialoghi della Sala: dire di no non è fare amicizia");
   }
 }
 
+/* Le certificazioni dei pezzi (punto 13). La scala chiesta era scritta di
+   corsa e non tornava — il diamante messo sotto al platino, e il platino
+   definito con se stesso — quindi è stata rimessa nell'ordine che ha nel
+   mondo tenendo i numeri dati. Proprio perché è un'interpretazione, il posto
+   dove sta scritta nero su bianco è una prova: se un giorno si cambia idea,
+   si cambia qui e si vede subito cosa si sta cambiando. */
+console.log("\nle certificazioni dei pezzi");
+{
+  const vm = require("vm");
+  const scatola = { console, Math, JSON, Object, Array, String, Number, Boolean, Date };
+  scatola.window = scatola;
+  vm.createContext(scatola);
+  let acceso = true, errore = null;
+  try{
+    vm.runInContext(fs.readFileSync(path.join(RADICE, "js/game/content.js"), "utf8"),
+      scatola, { filename: "content.js" });
+  }catch(e){ acceso = false; errore = e; }
+  controlla("le certificazioni si caricano", acceso, errore ? [errore.message] : []);
+
+  if(acceso){
+    const cert = n => vm.runInContext("certificazione(" + n + ")", scatola);
+    const grad = n => vm.runInContext("gradinoDisco(" + n + ")", scatola);
+    const nome = n => { const c = cert(n); return c ? c.etichetta : null; };
+
+    controlla("sotto il mezzo milione un pezzo non è certificato",
+      cert(0) === null && cert(499999) === null, nome(499999));
+    controlla("mezzo milione è il disco d'oro", nome(500000) === "Disco d'oro", nome(500000));
+    controlla("un milione è il disco di platino",
+      nome(1000000) === "Disco di platino", nome(1000000));
+    controlla("i multipli si contano: tre milioni sono 3× platino",
+      nome(3000000) === "3× Disco di platino", nome(3000000));
+    controlla("dieci volte il platino è il diamante",
+      nome(10000000) === "Disco di diamante", nome(10000000));
+    controlla("e il diamante non si moltiplica: sopra non c'è più niente da dire",
+      nome(90000000) === "Disco di diamante", nome(90000000));
+
+    /* il gradino serve al giro di settimana per dire «è successo adesso»:
+       deve salire a ogni traguardo e non scendere mai */
+    const tappe = [0, 499999, 500000, 999999, 1000000, 2000000, 3000000, 9999999, 10000000];
+    let cresce = true, saliti = 0;
+    for(let i = 1; i < tappe.length; i++){
+      if(grad(tappe[i]) < grad(tappe[i - 1])) cresce = false;
+      if(grad(tappe[i]) > grad(tappe[i - 1])) saliti++;
+    }
+    controlla("il gradino non torna mai indietro, e scatta a ogni traguardo",
+      cresce && saliti === 6, "gradini saliti: " + saliti);
+  }
+}
+
 console.log("\nil build");
 const dist = path.join(RADICE, "dist");
 if(!fs.existsSync(path.join(dist, "index.html"))){

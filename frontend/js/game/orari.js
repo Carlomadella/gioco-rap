@@ -22,7 +22,12 @@
   }
 
   const PLACE_HOURS = Object.freeze({
-    studio:    {open:"09:00", close:"02:00"},
+    /* Punto 10: lo studio è sempre aperto. È un simulatore di vita da rapper,
+       e la vita da rapper in studio è di notte: trovare la porta chiusa alle
+       tre perché l'orario dice così non aggiunge niente al gioco, toglie
+       soltanto la cosa che uno era venuto a fare. Gli altri posti gli orari
+       li tengono — è la differenza fra il tuo mestiere e il resto della città. */
+    studio:    {allDay:true},
     pizzeria:  {open:"16:00", close:"02:00"},
     concerti:  {open:"20:00", close:"03:00"},
     beat:      {open:"13:00", close:"02:00"},
@@ -38,7 +43,11 @@
   /* Finestre delle azioni realmente legate a un luogo. Le altre restano libere:
      per esempio scrivere barre o fare promo non richiede che un locale sia aperto. */
   const ACTION_PLACE = Object.freeze({
-    beat:"beat",
+    /* Punto 11: cercare un beat si fa **in studio**, non in un edificio suo.
+       La Sala resta il posto dove si conosce la gente; il lavoro sul beat è
+       una sezione dello studio, e quindi segue l'orario dello studio — cioè
+       nessuno (punto 10). */
+    beat:"studio",
     registra:"studio",
     mixa:"studio",
     live:"concerti",

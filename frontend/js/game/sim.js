@@ -67,7 +67,20 @@ function advanceWeek(){
   let streams = 0;
   for(const [s, v] of grezzi){
     const w = Math.round(v * fattore);
+    /* punto 13: un disco d'oro si deve sapere **la settimana che arriva**, non
+       scoprirlo aprendo la discografia tre mesi dopo. Si guarda il gradino
+       prima e dopo: se è salito, è successo qualcosa che vale una riga grossa
+       nel diario. Vale anche per i multipli — «2× platino» è una notizia. */
+    const primaDisco = gradinoDisco(s.streams);
     s.streams += w; s.last = w; streams += w;
+    if(gradinoDisco(s.streams) > primaDisco){
+      const c = certificazione(s.streams);
+      s.disco = c.id;
+      pushLog("<b>«" + s.t + "» è " + c.etichetta.toLowerCase() + ".</b> " +
+        short(s.streams) + " ascolti, e non è un numero che si toglie più.", "big");
+      if(typeof toast === "function")
+        toast("«" + s.t + "»: " + c.etichetta, "good", "◆", [c.k, "#1A1A1F"]);
+    }
     /* punto 19: la discografia deve poter dire se un pezzo sta invecchiando
        bene o male, e per dirlo serve ricordarsi le settimane di prima. Sei
        mesi bastano: piu' indietro non guarda nessuno. */

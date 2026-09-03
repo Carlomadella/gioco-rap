@@ -736,9 +736,13 @@ function renderDiscografia(){
   const righe = fuori.slice().sort((a, b) => (b.week || 0) - (a.week || 0)).map(x => {
     const a = discoAndamento(x);
     const i = G.songs.indexOf(x);
+    /* punto 13: la certificazione sta attaccata al pezzo, e si vede qui */
+    const c = certificazione(x.streams);
     return '<div class="drow" style="--k:' + a.c + '">' +
       '<span class="dcov">' + cover(x.seed || (i + 11), x.t, (window.ARTIST || {}).name || "", x.img) + '</span>' +
-      '<span class="dnm"><b>' + x.t + '</b>' +
+      '<span class="dnm"><b>' + x.t +
+        (c ? '<i class="dcert" style="--c:' + c.k + '" title="' + c.etichetta + '">' +
+             c.etichetta + '</i>' : '') + '</b>' +
         '<span>' + discoQuando(x) + ' \u00b7 qualit\u00e0 ' + x.q +
         (x.video ? ' \u00b7 con il video' : '') + '</span></span>' +
       discoCurva(x.storia, a.c) +
