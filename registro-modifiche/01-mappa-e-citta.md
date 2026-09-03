@@ -6,6 +6,22 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:dc49c91 -->
+## 03/09/26, 02:48 — fix: blocca azioni fuori luogo e orario
+
+**Tipo:** Commit diretto su main  
+**Autore:** Mycol (mycolbraga@gmail.com)  
+**Commit:** `dc49c91`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/spostamenti.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:595c0b8 -->
 ## 03/09/26, 02:04 — feat: guardaroba separato dal negozio, via il Campetto dalla mappa (punti 7, 8)
 

@@ -6,6 +6,22 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:dc49c91 -->
+## 03/09/26, 02:48 — fix: blocca azioni fuori luogo e orario
+
+**Tipo:** Commit diretto su main  
+**Autore:** Mycol (mycolbraga@gmail.com)  
+**Commit:** `dc49c91`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/ui.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:5d3233c -->
 ## 03/09/26, 02:31 — feat: la palestra diventa un sistema, non un pulsante (punto 9)
 

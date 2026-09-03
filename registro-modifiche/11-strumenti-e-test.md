@@ -6,6 +6,22 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:dc49c91 -->
+## 03/09/26, 02:48 — fix: blocca azioni fuori luogo e orario
+
+**Tipo:** Commit diretto su main  
+**Autore:** Mycol (mycolbraga@gmail.com)  
+**Commit:** `dc49c91`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:de3eb52 -->
 ## 03/09/26, 02:34 — fix: consolida arbitro globale degli eventi
 
