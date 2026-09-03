@@ -6,6 +6,23 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:6f4d15e -->
+## 03/09/26, 02:57 — fix: unifica La Sala e Beat Maker come luogo logico
+
+**Tipo:** Commit diretto su main  
+**Autore:** Mycol (mycolbraga@gmail.com)  
+**Commit:** `6f4d15e`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/eventi-tempo.js`
+- **Modificato:** `frontend/js/game/orari.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- commit:dc49c91 -->
 ## 03/09/26, 02:48 — fix: blocca azioni fuori luogo e orario
 

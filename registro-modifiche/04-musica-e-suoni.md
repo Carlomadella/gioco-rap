@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:6f4d15e -->
+## 03/09/26, 02:57 — fix: unifica La Sala e Beat Maker come luogo logico
+
+**Tipo:** Commit diretto su main  
+**Autore:** Mycol (mycolbraga@gmail.com)  
+**Commit:** `6f4d15e`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/eventi-tempo.js`
+- **Modificato:** `frontend/js/game/orari.js`
+- **Modificato:** `frontend/js/game/spostamenti.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:10f4cc0 -->
 ## 02/09/26, 20:13 — Merge remote-tracking branch 'origin/feature/bilanciamento-hardening-365' into integration/bilanciamento-hardening-365
 
