@@ -195,6 +195,7 @@ function golPremio(rw){
    che protegge davvero l'esecuzione da luogo/orari/fine giornata/pending. */
 function telAgendaGateText(gate){
   if(!gate) return "Non adesso";
+  if(gate.reason === "jail") return "Sei in carcere";
   if(gate.reason === "action-pending") return "Prima chiudi la mossa in corso";
   if(gate.reason === "day-end") return "Non c'è abbastanza tempo oggi";
   if(gate.reason === "wrong-place"){
@@ -238,6 +239,10 @@ function telAgendaEventText(st){
 }
 
 function telAgendaEvento(e){
+  try{
+    if(window.GAME_TRAVEL && typeof GAME_TRAVEL.inJail === "function" && GAME_TRAVEL.inJail())
+      return {ok:false, perche:"Sei in carcere"};
+  }catch(_){}
   if(e.presto) return {ok:false, perche:"Non ancora"};
   try{
     if(window.GAME_HOURS && typeof GAME_HOURS.eventStatus === "function"){

@@ -258,7 +258,11 @@ function hubAzione(id){
   const t = document.querySelector('.tile[data-id="' + id + '"]');
   if(t) t.click();
 }
+function hubDetenuto(){
+  return !!(G.strada && G.strada.arresto);
+}
 function hubPronta(id){
+  if(hubDetenuto()) return {ok:false, perche:"Sei in carcere"};
   const a = ACTIONS.find(x => x.id === id);
   if(!a) return {ok:false, perche:"Non c'è"};
   if(a.avail && !a.avail()) return {ok:false, perche:"Non adesso"};
@@ -441,7 +445,9 @@ function renderHub(){
 
   /* ---- gli eventi di oggi ---- */
   $("hb-eventi").innerHTML = HUB_EVENTI.map(e => {
-    const st = (e.presto || e.posto || e.strada) ? {ok:true, perche:""} : hubPronta(e.id);
+    const st = hubDetenuto()
+      ? {ok:false, perche:"Sei in carcere"}
+      : ((e.presto || e.posto || e.strada) ? {ok:true, perche:""} : hubPronta(e.id));
     return '<button class="pev" data-e="' + e.id + '" style="--k:' + e.k + '"' +
       (st.ok ? '' : ' disabled') + '>' +
       '<span class="pevt">' + hsvg(e.ic) + e.n + '</span>' +
@@ -503,6 +509,10 @@ $("hb-sxtab").addEventListener("click", ev => {
 $("hb-eventi").addEventListener("click", ev => {
   const b = ev.target.closest(".pev"); if(!b || b.disabled) return;
   const e = HUB_EVENTI.find(x => x.id === b.dataset.e); if(!e) return;
+  if(hubDetenuto()){
+    if(typeof apriCarcere === "function") apriCarcere();
+    return;
+  }
   hubTap();
   if(e.posto) apriPosto();
   else if(e.strada) apriStrada();

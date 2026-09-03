@@ -256,6 +256,38 @@ test("la guardia usa clock, orari e posizione reale",
   travel.includes('reason:"wrong-place"') &&
   travel.includes('reason:"hours"') &&
   travel.includes('reason:"day-end"'));
+
+console.log("\nHardening carcere — blocco globale gameplay");
+test("spostamenti riconosce il carcere come stato runtime",
+  travel.includes("function inJail()") &&
+  travel.includes('const JAIL = "crimin"') &&
+  travel.includes("G.strada && G.strada.arresto") &&
+  travel.includes("inJail,"));
+const jailAction0=travel.indexOf("function actionAccess(id, at)");
+const jailAction1=travel.indexOf("function actionBlockText",jailAction0);
+const jailActionBody=jailAction0>=0&&jailAction1>jailAction0?travel.slice(jailAction0,jailAction1):"";
+test("un detenuto non pu? iniziare nessuna ACTION",
+  jailActionBody.includes('return {ok:false, reason:"jail", id, now, duration, remaining') &&
+  jailActionBody.indexOf('reason:"jail", id') < jailActionBody.indexOf("GAME_TIME.pending"));
+
+test("un detenuto non può viaggiare fuori dal carcere",
+  travel.includes('if(inJail() && toId !== JAIL)') &&
+  travel.includes('reason:"jail", fromId, toId'));
+test("il nuovo giorno resta in carcere finché la pena è attiva",
+  travel.includes('G.currentPlace = inJail()') &&
+  travel.includes('(luogo(JAIL) ? JAIL : from)'));
+test("il tempo resta disponibile per scontare la pena",
+  crime.includes("s.arresto.settimane--") &&
+  timeControls.includes('id:"jail"') &&
+  timeControls.includes("window.ADF_TIME_SKIP(count)"));
+test("Hub disabilita le attività mentre sei detenuto",
+  hub.includes("function hubDetenuto()") &&
+  hub.includes('if(hubDetenuto()) return {ok:false, perche:"Sei in carcere"}') &&
+  hub.includes('? {ok:false, perche:"Sei in carcere"}'));
+test("Agenda mostra esplicitamente il blocco carcere",
+  tel.includes('gate.reason === "jail"') &&
+  tel.includes('GAME_TRAVEL.inJail()') &&
+  tel.includes('return {ok:false, perche:"Sei in carcere"}'));
 const ux0=ui.indexOf("const esegui = () => {");
 const ux1=ui.indexOf("const fansBefore = G.fans",ux0);
 const uxBody=ux0>=0&&ux1>ux0?ui.slice(ux0,ux1+32):"";
@@ -298,9 +330,10 @@ test("eventi tempo normalizza Beat Maker come luogo beat",
   let pending=false, canStart=true, hoursOpen=true;
   const box={
     console,Math,JSON,Object,Array,String,Number,Boolean,Date,
-    G:{currentPlace:"vita",job:null},
+    G:{currentPlace:"vita",job:null,strada:{arresto:null}},
     HUB_LUOGHI:[
       {id:"vita",n:"Casa",x:0,y:0,w:10,h:10},
+      {id:"crimin",n:"Attività criminali",x:10,y:0,w:10,h:10},
       {id:"studio",n:"Studio",x:20,y:0,w:10,h:10},
       {id:"beat",n:"La Sala",x:30,y:0,w:10,h:10},
       {id:"beatmaker",n:"Beat Maker",x:35,y:0,w:10,h:10},
@@ -324,8 +357,12 @@ test("eventi tempo normalizza Beat Maker come luogo beat",
     document:{getElementById:()=>null,querySelectorAll:()=>[]},
     CustomEvent:function(){},save:()=>{}
   };
+  const listeners={};
   box.window=box;
-  box.addEventListener=()=>{};
+  box.addEventListener=(type,fn)=>{
+    if(!listeners[type]) listeners[type]=[];
+    listeners[type].push(fn);
+  };
   box.dispatchEvent=()=>{};
   vm.createContext(box);
 
@@ -362,6 +399,30 @@ test("eventi tempo normalizza Beat Maker come luogo beat",
     g=box.GAME_TRAVEL.actionAccess("turno");
     test("runtime: il turno lavapiatti richiede la Pizzeria",
       !g.ok && g.reason==="wrong-place" && g.requiredPlace==="pizzeria");
+
+    box.G.strada.arresto={settimane:2,colpo:"test"};
+    box.G.job=null; box.G.currentPlace="vita";
+    g=box.GAME_TRAVEL.actionAccess("registra");
+    test("runtime carcere: un'azione viene bloccata prima di luogo/orari",
+      !g.ok && g.reason==="jail" && g.currentPlace==="crimin");
+
+    let p=box.GAME_TRAVEL.plan("studio");
+    test("runtime carcere: non puoi viaggiare allo Studio",
+      !p.ok && p.reason==="jail" && p.fromId==="crimin");
+
+    p=box.GAME_TRAVEL.plan("crimin");
+    test("runtime carcere: il punto Carcere resta la posizione corrente",
+      p.ok===true && p.same===true && box.GAME_TRAVEL.current()==="crimin");
+
+    const starts=listeners["game-time:day-start"]||[];
+    starts.forEach(fn=>fn());
+    test("runtime carcere: nuovo giorno non ti riporta a Casa",
+      box.G.currentPlace==="crimin");
+
+    box.G.strada.arresto=null;
+    starts.forEach(fn=>fn());
+    test("runtime carcere: dopo la scarcerazione il nuovo giorno torna a Casa",
+      box.G.currentPlace==="vita");
   }
 }
 

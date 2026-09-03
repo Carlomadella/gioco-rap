@@ -19,6 +19,12 @@
   if(typeof GAME_TIME === "undefined" || typeof GAME_HOURS === "undefined") return;
 
   const HOME = "vita";
+  const JAIL = "crimin";
+
+  function inJail(){
+    return !!(G.strada && G.strada.arresto);
+  }
+
   /* punto 6: dimensioni del ritaglio della mappa definitiva (hub.js,
      HUB_LUOGHI) — servono solo a dare proporzione alle distanze qui sotto. */
   const MAP_W = 1536;
@@ -41,6 +47,16 @@
 
   function assicuraPosizione(){
     const all = elencoLuoghi();
+
+    /* Un arresto è anche uno stato fisico: finché la pena è attiva il
+       giocatore si trova al punto Carcere/Attività criminali, non a Casa. */
+    if(inJail()){
+      if(!all.length || all.some(x => x.id === JAIL)){
+        G.currentPlace = JAIL;
+        return G.currentPlace;
+      }
+    }
+
     if(!all.length) return G.currentPlace || HOME;
     if(all.some(x => x.id === G.currentPlace)) return G.currentPlace;
     G.currentPlace = all.some(x => x.id === HOME) ? HOME : all[0].id;
@@ -94,6 +110,10 @@
     const fromId = assicuraPosizione();
     const dest = luogo(toId);
     if(!dest) return {ok:false, reason:"unknown-place", fromId, toId};
+
+    if(inJail() && toId !== JAIL)
+      return {ok:false, reason:"jail", fromId, toId};
+
     if(typeof GAME_TIME.pending === "function" && GAME_TIME.pending())
       return {ok:false, reason:"action-pending", fromId, toId};
 
@@ -145,6 +165,11 @@
     const remaining = typeof GAME_TIME.remaining === "function"
       ? GAME_TIME.remaining() : null;
 
+    if(inJail()){
+      return {ok:false, reason:"jail", id, now, duration, remaining,
+        currentPlace:current, requiredPlace:required};
+    }
+
     if(typeof GAME_TIME.pending === "function" && GAME_TIME.pending()){
       return {ok:false, reason:"action-pending", id, now, duration, remaining,
         currentPlace:current, requiredPlace:required};
@@ -171,6 +196,9 @@
   }
 
   function actionBlockText(gate){
+    if(gate.reason === "jail")
+      return "Sei in <b>carcere</b>. Finché non sconti la pena non puoi iniziare mosse, lavorare o andare in giro: puoi solo far passare il tempo.";
+
     if(gate.reason === "action-pending")
       return "Prima devi chiudere o completare la mossa già in corso.";
 
@@ -251,6 +279,7 @@
   }
 
   function blockText(p){
+    if(p.reason === "jail") return "Sei in <b>carcere</b>: non puoi spostarti finché la pena non è finita. Il calendario continua a scorrere normalmente.";
     if(p.reason === "action-pending") return "Prima devi chiudere o completare quello che stai facendo.";
     if(p.reason === "day-end") return "Non c'è abbastanza giornata: il tragitto finirebbe oltre le <b>04:00</b>.";
     if(p.reason === "arrival-closed"){
@@ -325,21 +354,25 @@
   function decorateActions(){
     css();
     const cur = assicuraPosizione();
+    const jailed = inJail();
     document.querySelectorAll(".tile[data-id]").forEach(tile => {
       const req = requiredPlaceForAction(tile.dataset.id);
       const away = !!req && !sameGameplayPlace(req,cur);
-      tile.classList.toggle("travel-away", away);
+      tile.classList.toggle("travel-away", away || jailed);
       let badge = tile.querySelector(".travelneed");
-      if(away){
+
+      if(jailed || away){
         if(!badge){
           badge = document.createElement("span");
           badge.className = "travelneed";
           const scene = tile.querySelector(".scene");
           (scene || tile).appendChild(badge);
         }
-        badge.textContent = "serve spostarti";
+        badge.textContent = jailed ? "in carcere" : "serve spostarti";
         tile.disabled = true;
-        tile.title = "Devi prima raggiungere il luogo sulla mappa.";
+        tile.title = jailed
+          ? "Sei in carcere: puoi solo far passare il tempo."
+          : "Devi prima raggiungere il luogo sulla mappa.";
       }else if(badge){ badge.remove(); }
     });
   }
@@ -389,11 +422,13 @@
     };
   }
 
-  /* Dormire/fine giornata riporta fisicamente a casa. Non facciamo save qui:
-     il normale flusso di fine giornata/salto salva già subito dopo avanzaGiorno(). */
+  /* Dormire/fine giornata riporta a casa solo se sei libero. Se la condanna
+     è ancora attiva, ogni nuovo giorno comincia fisicamente in carcere. */
   window.addEventListener("game-time:day-start", () => {
     const from = assicuraPosizione();
-    G.currentPlace = luogo(HOME) ? HOME : from;
+    G.currentPlace = inJail()
+      ? (luogo(JAIL) ? JAIL : from)
+      : (luogo(HOME) ? HOME : from);
     if(from !== G.currentPlace){
       emit("game-location:changed", {
         fromId:from, toId:G.currentPlace, minutes:0,
@@ -407,6 +442,8 @@
   window.GAME_TRAVEL = Object.freeze({
     handlesMapClicks:true,
     HOME,
+    JAIL,
+    inJail,
     ensure:assicuraPosizione,
     current:() => assicuraPosizione(),
     distance:distanza,
