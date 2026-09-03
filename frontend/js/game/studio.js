@@ -85,12 +85,15 @@ function studioBeatFatto(p){
   const sett = typeof totalWeeks === "function" ? totalWeeks() : G.week;
   return p.beatSett === sett;
 }
+/* Il perché sta in una frase, non in un numero secco: «35 €» su un bottone
+   spento non dice se te ne mancano trenta o se costa e basta. */
 function studioBeatPronto(p){
-  if(p.rel < 1) return {ok:false, perche:"Prima diventate almeno contatti, alla Sala"};
+  if(p.rel < 1) return {ok:false, perche:"Prima diventate contatti, alla Sala"};
   if(studioBeatFatto(p)) return {ok:false, perche:"Ci ha già lavorato questa settimana"};
-  if(G.energy < STUDIO_BEAT_ENERGIA) return {ok:false, perche:"Serve energia"};
+  if(G.energy < STUDIO_BEAT_ENERGIA)
+    return {ok:false, perche:"Ti serve energia: " + STUDIO_BEAT_ENERGIA + ", ne hai " + Math.round(G.energy)};
   const c = studioBeatPrezzo(p);
-  if(G.money < c) return {ok:false, perche:fmt(c) + " €"};
+  if(G.money < c) return {ok:false, perche:"Ti servono " + fmt(c) + " €, ne hai " + fmt(G.money)};
   return {ok:true, perche:""};
 }
 /* Il prezzo cala col rapporto e sparisce da «fidato» in su: a un certo punto
@@ -169,13 +172,17 @@ function studioSezBeat(){
   const righe = gente.map(p => {
     const st = studioBeatPronto(p);
     const costo = studioBeatPrezzo(p);
+    /* Il bottone dice sempre cosa fa; **sotto** c'è o il prezzo o il motivo
+       per cui adesso non si può. Prima il motivo finiva sul bottone al posto
+       del verbo, e chi guardava vedeva un tasto grigio con scritto «35 €»
+       senza capire se era il prezzo o un errore. */
     return studioPersona(p,
       '<button class="stgo" data-beat="' + studioEsc(p.id) + '"' + (st.ok ? "" : " disabled") + '>' +
-        (st.ok ? "Fattelo fare" : studioEsc(st.perche)) + '</button>' +
-        '<span class="stsub">' + (st.ok
+        'Fattelo fare</button>' +
+        '<span class="stsub' + (st.ok ? "" : " no") + '">' + (st.ok
           ? (costo ? fmt(costo) + " € · " : "gratis · ") + STUDIO_BEAT_ENERGIA + " energia · q~" +
             Math.round(20 + p.fama * 0.55 + p.rel * 7 + (G.skills.rete || 0) * 0.4)
-          : "&nbsp;") + '</span>', false);
+          : studioEsc(st.perche)) + '</span>', false);
   }).join("");
 
   return '<p class="stdice">Un beat comprato è un beat di chiunque. Uno che ti fa una ' +
@@ -277,7 +284,9 @@ function renderStudio(){
     x.n + '</button>').join("");
 
   $("st-scena").innerHTML = art[2]
-    ? '<svg viewBox="0 0 200 128" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">' +
+    /* `YMin` e non `YMid`: la fascia ritaglia, e quello che conta in queste
+       scenette sta in alto — centrando si tagliava la testa a chi c'è dentro. */
+    ? '<svg viewBox="0 0 200 128" preserveAspectRatio="xMidYMin slice" xmlns="http://www.w3.org/2000/svg">' +
       art[2] + '</svg>'
     : "";
   $("st-scena").style.setProperty("--k", art[0]);

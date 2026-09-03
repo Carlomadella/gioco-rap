@@ -65,7 +65,6 @@ function renderGioco(){
     : G.hype >= 35 ? "sicuro"
     : G.phase >= 3 ? "freddo"
     : (G.songs.some(x => x.released) ? "determinato" : null);
-  if(window.ARTIST_PORTRAIT) $("g-port").innerHTML = window.ARTIST_PORTRAIT();
   window.__MOOD = null;
   $("g-name").textContent = (art.name || "Senza Nome").trim();
   $("g-meta").textContent = "Anno " + G.year + " · Settimana " + G.week + ", giorno " + (G.day || 1) +
@@ -91,12 +90,6 @@ function renderGioco(){
       '<span class="pn">' + ph.n + '</span></div>' +
       '<div class="ptrack">' + track + '</div></div>' + nxt + '</div>';
 
-  // livello ed esperienza (il conto sta in state.js: lo legge anche l'hub)
-  const L = livello();
-  $("g-lvl").textContent = "LIV " + L.lvl;
-  $("g-xp").style.width = clamp(L.into/L.need*100, 0, 100) + "%";
-  $("g-xptxt").textContent = fmt(L.into) + " / " + fmt(L.need);
-
   /* L'energia rimasta della settimana. Il numero da solo non si legge al volo,
      i trattini si': uno per turno, spenti quelli gia' usati. Quando finisce
      diventa rossa, che e' la cosa che devi sapere prima di cercare una mossa.
@@ -104,15 +97,9 @@ function renderGioco(){
      doppione con la testata. */
   const pipsEnergia = () => '<i style="width:' + clamp(G.energy / G.maxEnergy * 100, 0, 100) + '%"></i>';
 
-  /* I tre numeri su cui decidi: cassa, chi ti segue, hype. In riga, senza
-     scatola dentro la scatola: sono dentro la testata, non una scheda a parte. */
-  const pod = (k, ic, val, lab, neg) =>
-    '<span class="vit' + (neg ? " neg" : "") + '" style="--k:' + k + '">' +
-    '<i>' + ic + '</i><span><b>' + val + '</b><u>' + lab + '</u></span></span>';
-  $("g-res").innerHTML =
-    pod("var(--acid)", "€", fmt(G.money), "in cassa", G.money < 0) +
-    pod("var(--hot)", "♥", short(G.fans), "chi ti segue") +
-    pod("var(--violet)", "▲", Math.round(G.hype), "hype");
+  /* Punto 7: cassa, chi ti segue e hype stavano qui **e** nella fascia in alto
+     della mappa. Adesso stanno solo lì: due posti per lo stesso numero sono un
+     posto di troppo, e il secondo è quello che finisce per non aggiornarsi. */
 
   // notifiche sulle sezioni
   const badges = {
@@ -133,31 +120,10 @@ function renderGioco(){
     b.hidden = n <= 0; b.textContent = n;
   });
 
-  const box = (n, l, cls, meter, ok, key, raw) =>
-    '<div class="sbox"><div class="n ' + (cls||"") + '"' + (key ? ' data-k="' + key + '" data-to="' + raw + '"' : '') + '>' + n + '</div><div class="l">' + l + '</div>' +
-    (meter !== undefined ? '<div class="meter"><i class="' + (ok?"ok":"") + '" style="width:' + clamp(meter,0,100) + '%"></i></div>' : '') +
-    '</div>';
-  $("g-stats").innerHTML =
-    box(Math.round(G.wellbeing), "benessere", G.wellbeing <= 30 ? "red" : "", G.wellbeing, G.wellbeing > 30) +
-    box(Math.round(luc()), "lucidità", luc() <= 30 ? "red" : "", luc(), luc() > 45) +
-    box(G.songs.filter(x => x.released).length, "pezzi fuori") +
-    box(G.job ? G.job.pay + " €" : "—", G.job ? "a turno · " + G.job.n.toLowerCase() : "nessun lavoro");
-
-  /* I dettagli sono chiusi finché non li apri, ma se benessere o lucidità sono
-     a terra il bottone si accende: nascondere un numero non deve nascondere un
-     guaio. */
-  const allarme = G.wellbeing <= 30 || luc() <= 30;
-  $("g-dett").classList.toggle("allarme", allarme);
-
-  $("g-stats").querySelectorAll("[data-k]").forEach(el => {
-    const k = el.dataset.k, to = +el.dataset.to;
-    const prev = SHOWN[k];
-    if(prev !== undefined && prev !== to){
-      el.dataset.v = prev;
-      countTo(el, to, k === "money" ? (v => fmt(v) + " €") : (v => short(v)));
-    }
-    SHOWN[k] = to;
-  });
+  /* Punto 7: benessere, lucidità, pezzi fuori e lavoro stavano sotto
+     «Dettagli», qui dentro. Adesso stanno tutti sulla mappa — benessere nella
+     fascia in alto, lucidità e pezzi fuori nel profilo, il lavoro sotto
+     Disciplina — e il bottone che li apriva non serve più. */
 
   // azioni
   const aw = $("g-actions"); aw.innerHTML = "";
@@ -773,14 +739,6 @@ document.querySelectorAll(".subnav").forEach(sn => {
   });
 });
 
-/* I numeri di contorno — benessere, lucidità, pezzi fuori, lavoro — stanno
-   chiusi: si aprono quando li vuoi e restano aperti finché non li richiudi. */
-$("g-dett").onclick = () => {
-  const st = $("g-stats"), apri = st.hidden;
-  st.hidden = !apri;
-  $("g-dett").setAttribute("aria-expanded", apri ? "true" : "false");
-  $("g-dett").classList.toggle("aperto", apri);
-};
 let weekOpen = null, weekEarn = 0;
 function openWeek(){
   weekOpen = {money:G.money, fans:G.fans,
@@ -799,6 +757,11 @@ $("g-advance").onclick = () => {
   else{ SFX.giorno(); save(); renderGioco(); }
 };
 $("g-skip").onclick = () => saltaTempo();
-$("g-tomenu").onclick = () => { save(); if(window.GO) window.GO("menu"); };
+/* Qui c'era `$("g-tomenu").onclick`, e `#g-tomenu` non esiste più nel markup:
+   il bottone per il menu principale è uscito dalla schermata di gioco quando
+   la via di ritorno è diventata la mappa («‹ Mappa», `#g-tomappa`) e il menu
+   di sistema. Restava la riga, che a ogni caricamento tirava un TypeError in
+   console — l'ultima riga del file, quindi non portava giù nient'altro, ma
+   era un errore rosso a ogni avvio. */
 
 

@@ -31,8 +31,14 @@
 .sttab.on{color:#fff;background:linear-gradient(180deg,rgba(139,92,246,.32),rgba(139,92,246,.14));
   box-shadow:inset 0 0 0 1px rgba(192,132,252,.5)}
 
-.stscena{border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.55)}
-.stscena svg{display:block;width:100%;height:auto}
+/* La scena è un'ambientazione, non il contenuto: alla sua altezza naturale
+   (200×128, quindi 435px su una colonna da 680) si prendeva mezzo schermo e
+   spingeva sotto la piega la gente e i bottoni, cioè le uniche cose con cui si
+   gioca. Si taglia in altezza — l'SVG è già `slice`, quindi ritaglia invece di
+   schiacciare — e resta una fascia. */
+.stscena{height:clamp(120px,21vh,186px);border-radius:18px;overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.55)}
+.stscena svg{display:block;width:100%;height:100%}
 .stdove{margin:12px 2px 15px;font-size:13.5px;line-height:1.5;color:var(--soft)}
 .stdove b{color:#fff}
 
@@ -59,6 +65,8 @@
 .stgo.on{background:linear-gradient(180deg,rgba(139,92,246,.5),rgba(139,92,246,.28))}
 .stgo:disabled{opacity:.5;cursor:default;font-weight:700;font-size:11.5px}
 .stsub{font-size:10.5px;font-weight:700;color:var(--faint);white-space:nowrap}
+/* il motivo per cui adesso non si può: si legge, non si indovina */
+.stsub.no{color:#F0A87E;white-space:normal;max-width:190px;text-align:right;line-height:1.3}
 
 /* ---- la mossa vera: una sola, grossa, in fondo alla stanza ---- */
 .stoppure{display:flex;align-items:center;gap:10px;margin:16px 2px 12px;

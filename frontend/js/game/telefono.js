@@ -59,9 +59,11 @@ const HUB_APP_VECCHIO = [
   {id:"inventario", n:"Inventario", ic:"zaino", k:"#F59E0B",
    sotto:g => (g.bars.length + g.beats.length + g.songs.length + Object.keys(g.gear).length) + " cose",
    vai:() => hubGioco("catalogo", "mat")},
+  /* punto 7: i numeri stavano sotto «Dettagli», nella vecchia schermata di
+     gioco. Adesso stanno sulla plancia — quindi l'app li mostra dove sono,
+     invece di aprire un pannello che non c'è più. */
   {id:"statistiche", n:"Statistiche", ic:"barre", k:"#4ADE80",
-   vai:() => { hubGioco("settimana"); const d = $("g-dett");
-     if(d && d.getAttribute("aria-expanded") !== "true") d.click(); }},
+   vai:() => { GO("hub"); HUB_VISTA = "disciplina"; renderHub(); }},
   {id:"classifiche", n:"Classifiche", ic:"coppa", k:"#FACC15",
    vai:() => hubGioco("classifica")},
   {id:"agenda", n:"Agenda", ic:"agenda", k:"#F87171",

@@ -15,6 +15,14 @@
   border-radius:50%;pointer-events:none;
   background:radial-gradient(circle, color-mix(in srgb,var(--c1) 42%, transparent), transparent 66%)}
 .testata > *{position:relative;z-index:2}
+/* Punto 7: la testata non è più una scheda alta con dentro un secondo menù di
+   gioco — ritratto, livello, XP, i tre numeri e «Dettagli» stanno tutti sulla
+   plancia della mappa. Qui resta una riga: chi sei, a che giorno sei, l'audio,
+   e l'orologio che ci monta dentro (`js/game/tempo-controlli.js`). */
+.testata.slim{border-radius:16px;margin-bottom:12px;padding:9px 16px}
+.testata.slim::after{width:190px;height:190px;right:-50px;top:-70px}
+.testata.slim .h2name{font-size:20px}
+.testata.slim .h2sub{font-size:12px}
 .tline{display:flex;align-items:center;gap:15px}
 .bigport{width:62px;height:62px;border-radius:16px;flex:none;position:relative;overflow:hidden;
   background:radial-gradient(70% 70% at 50% 22%, color-mix(in srgb,var(--c1) 46%, #16161E), #0C0C12);

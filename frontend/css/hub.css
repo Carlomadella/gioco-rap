@@ -569,12 +569,19 @@ body.in-hub .topnav {
    Quindi non un bordo intero: i **quattro angoli**, come un mirino. Dicono
    «qui si tocca» senza chiudere in una scatola l'edificio che c'è sotto.
 
-   E si vedono **da fermi**, non solo col mouse sopra. Prima l'unico stato
-   disegnato era `:hover`, e sul telefono l'hover non esiste: la mappa non
-   diceva in nessun modo dove si poteva toccare, si andava a tentoni sperando
-   di prendere il cartello giusto. Da fermi gli angoli sono bianchi e
-   discreti; sotto il dito, al fuoco e nel giro guidato diventano viola e si
-   allungano. */
+   **Quando si vedono.** Il primo tentativo li teneva accesi sempre, per il
+   telefono, dove l'hover non esiste e senza un segno la mappa non dice in
+   nessun modo dove si può toccare. Visto su uno schermo vero era sbagliato:
+   dodici zone per quattro angoli fanno quarantotto trattini, i bracci
+   arrivavano a toccarsi fra una zona e l'altra, e sopra alla foto usciva una
+   griglia — un reticolo da wireframe incollato sulla città.
+
+   Quindi si guarda **chi sta guardando**: dove il mouse c'è, la mappa resta
+   pulita e l'angolo compare quando ci passi sopra; dove il mouse non c'è
+   (`hover: none`, cioè il telefono) restano accesi, perché lì l'alternativa
+   non è una mappa pulita, è andare a tentoni. E in ogni caso sono **trattini
+   corti a misura fissa**, non bracci in percentuale: un angolo deve marcare
+   uno spigolo, non disegnare il lato. */
 .pspot {
   position: absolute;
   left: var(--x);
@@ -582,10 +589,13 @@ body.in-hub .topnav {
   width: var(--w);
   height: var(--h);
   border-radius: 12px;
-  /* quanto è lungo il braccio dell'angolo, in percentuale della zona: così
-     una zona piccola non si ritrova quattro angoli che si toccano in mezzo */
-  --ang: 26%;
-  --col: rgba(255, 255, 255, 0.5);
+  /* Quanto è lungo il braccio. Fisso in pixel — a percentuale, su una zona
+     larga il braccio diventava mezzo lato e i quattro angoli si chiudevano in
+     una scatola. Il `min()` è per le zone piccole: lì 12px sarebbero già
+     tutto il lato, e si torna alla scatola dall'altra parte. */
+  --ang: min(13px, 30%);
+  --col: rgba(255, 255, 255, 0.62);
+  --vis: 0;
   transition:
     background 0.16s,
     box-shadow 0.16s,
@@ -603,6 +613,7 @@ body.in-hub .topnav {
   inset: 0;
   border: 2px solid var(--col);
   border-radius: inherit;
+  opacity: var(--vis);
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9));
   transition:
     border-color 0.16s,
@@ -618,10 +629,18 @@ body.in-hub .topnav {
     linear-gradient(#000, #000) 0 100% / var(--ang) var(--ang) no-repeat,
     linear-gradient(#000, #000) 100% 100% / var(--ang) var(--ang) no-repeat;
 }
+/* Sul telefono il dito non passa sopra prima di toccare: senza un segno da
+   fermi la mappa non si può leggere. Lì restano accesi, discreti. Dove c'è un
+   mouse no — ci si passa sopra e compaiono, e la città resta una città. */
+@media (hover: none) {
+  .pspot { --vis: 0.42; }
+}
+
 /* la luce sale dalla base dell'edificio invece di riempire il rettangolo:
    su una foto in prospettiva un velo piatto si vede che è un rettangolo */
 .pspot:hover {
-  --ang: 44%;
+  --vis: 1;
+  --ang: min(26px, 42%);
   --col: rgba(216, 180, 254, 0.98);
   background: radial-gradient(
     120% 100% at 50% 100%,
@@ -633,7 +652,8 @@ body.in-hub .topnav {
 /* col tasto Tab il segno dev'essere fuori di dubbio sopra a qualsiasi pixel
    della foto: gli angoli gialli più il filo di contorno di `base.css` */
 .pspot:focus-visible {
-  --ang: 44%;
+  --vis: 1;
+  --ang: min(26px, 42%);
   --col: var(--acid);
   outline: 2px solid var(--acid);
   outline-offset: 2px;
@@ -644,10 +664,11 @@ body.in-hub .topnav {
 /* un posto ancora chiuso resta grigio: si tocca — dice cosa gli manca — ma
    non si accende come quelli dove si può entrare davvero */
 .pspot.chiuso {
-  --col: rgba(255, 255, 255, 0.28);
+  --col: rgba(255, 255, 255, 0.4);
 }
 .pspot.chiuso:hover {
-  --ang: 44%;
+  --vis: 1;
+  --ang: min(26px, 42%);
   --col: rgba(255, 255, 255, 0.72);
   background: radial-gradient(
     120% 100% at 50% 100%,
@@ -658,7 +679,8 @@ body.in-hub .topnav {
 }
 /* il giro guidato dei luoghi, con le frecce «scorri per esplorare» */
 .pspot.qui {
-  --ang: 50%;
+  --vis: 1;
+  --ang: min(30px, 46%);
   --col: rgba(216, 180, 254, 1);
   background: radial-gradient(
     120% 100% at 50% 100%,

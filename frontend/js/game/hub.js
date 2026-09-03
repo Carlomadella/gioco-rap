@@ -352,10 +352,20 @@ function vistaProfilo(L, ph){
       rigaStat("rischio", "#EF4444", "Livello sospetto", Math.round((G.strada && G.strada.heat) || 0), (G.strada && G.strada.heat) || 0) +
     '</div>' +
     '<div class="psk"><span class="pk">Skill</span>' + skillRighe() + '</div>' +
+    /* punto 7: «trasferisci tutte le info sulla mappa». Erano le ultime due
+       che stavano solo nella vecchia schermata di gioco e in nessun altro
+       posto — quanti pezzi hai fuori, e con chi hai firmato. Adesso stanno
+       qui, dove sta il resto di chi sei, e la testata doppia può sparire. */
     '<div class="pdue">' +
       '<div><span class="pk">Stile musicale</span><div class="v">' +
         (typeof genre === "function" ? genre().n : "—") + '</div></div>' +
       '<div><span class="pk">Fan base</span><div class="v">' + fanBase() + '</div></div>' +
+    '</div>' +
+    '<div class="pdue">' +
+      '<div><span class="pk">Pezzi fuori</span><div class="v">' +
+        G.songs.filter(s => s.released).length + '</div></div>' +
+      '<div><span class="pk">Contratto</span><div class="v">' +
+        (G.contract ? G.contract.label : "indipendente") + '</div></div>' +
     '</div>' +
     '<div class="pnext"><div class="pnexthead"><span class="pk">Prossimo livello</span>' +
       hsvg("fama") + '</div>' +

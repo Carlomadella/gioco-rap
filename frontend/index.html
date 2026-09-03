@@ -261,25 +261,25 @@
   <div class="game-wrap">
     <!-- La via di ritorno dal gameplay è la mappa. Il menu principale passa dal menu di sistema LA FAME. -->
     <button class="tornamenu mappa" id="g-tomappa"><span class="arw">&lsaquo;</span> Mappa</button>
-    <!-- Una testata sola, non tre schede impilate: chi sei, a che punto sei e i
-         tre numeri che guardi davvero. Tutto il resto sta sotto «Dettagli»,
-         chiuso finché non serve. -->
-    <div class="testata" id="gtop">
+    <!-- Punto 7: qui c'era la vecchia schermata di gioco — ritratto, livello,
+         barra XP, i tre numeri (cassa, fan, hype) e «Dettagli» con benessere,
+         lucidità, pezzi fuori e lavoro. Era un secondo menù di gioco, e diceva
+         le stesse cose che la plancia della mappa dice già: la fascia in alto
+         ha soldi, hype, fama, energia e benessere; la colonna di sinistra ha
+         ritratto, livello, XP, lucidità, skill, pezzi fuori e contratto; il
+         lavoro sta sotto «Disciplina». Restava solo da spostare pezzi fuori e
+         contratto — fatto in `hub.js` — e la testata poteva sparire.
+         Resta una riga sola: chi sei, a che giorno sei, e l'audio. `#gtop` e
+         `.tline` non cambiano nome perché ci si agganciano il menu di sistema
+         (`js/menu-sistema.js`) e l'orologio (`js/game/tempo-controlli.js`). -->
+    <div class="testata slim" id="gtop">
       <div class="tline">
-        <div class="bigport" id="g-port"></div>
         <div class="h2txt">
           <div class="h2name" id="g-name">—</div>
           <div class="h2sub" id="g-meta">—</div>
         </div>
-        <div class="tlvl">
-          <span class="lvl" id="g-lvl">LIV 1</span>
-          <span class="xp"><i id="g-xp" style="width:0"></i><span id="g-xptxt"></span></span>
-        </div>
         <button class="mutebtn" id="g-mute" aria-label="Audio">♪</button>
       </div>
-      <div class="vitali" id="g-res"></div>
-      <button class="dettbtn" id="g-dett" aria-expanded="false">Dettagli<i>▾</i></button>
-      <div class="gstats" id="g-stats" hidden></div>
     </div>
 
     <div class="nav2">

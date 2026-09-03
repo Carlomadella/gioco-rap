@@ -11,7 +11,7 @@ file del suo argomento con dentro cosa è stato fatto.
 
 | file | cosa c'è dentro |
 | --- | --- |
-| [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 10 voci |
+| [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 11 voci |
 | [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 24 voci |
 | [`03-artista-e-avatar.md`](03-artista-e-avatar.md) | **L'artista e il suo avatar** — 1 voce |
 | [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 11 voci |
@@ -26,7 +26,7 @@ per tutti e per tutto.
 
 ## Tutti i punti
 
-85 voci in tutto: **51 chiuse**, 12 a metà, il resto da fare.
+86 voci in tutto: **52 chiuse**, 12 a metà, il resto da fare.
 
 | | punto | stato | dove |
 | --- | --- | --- | --- |
@@ -48,6 +48,7 @@ per tutti e per tutto.
 | **—** | 13 · I dischi: oro, platino, diamante | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
 | **—** | 14 · I dialoghi devono tornare fra di loro | fatto | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
 | **—** | I bordi delle aree cliccabili sulla mappa | fatto | [mappa-e-citta](01-mappa-e-citta.md) |
+| **7** | Via la vecchia schermata di gioco, le info sulla mappa | fatto | [mappa-e-citta](01-mappa-e-citta.md) |
 | **14** | Il freestyle in piazza, con la folla | da fare | [musica-e-suoni](04-musica-e-suoni.md) |
 | **15** | I progressi si salvano, tre slot | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
 | **16** | La navbar | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |

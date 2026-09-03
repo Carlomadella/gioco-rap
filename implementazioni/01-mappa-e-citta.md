@@ -579,12 +579,77 @@ adesivo, e dove sotto c'è un'insegna accesa non si legge più.
 
 Adesso sono i **quattro angoli**, come un mirino: dicono «qui si tocca» senza chiudere in
 una scatola il palazzo che c'è sotto, e hanno un'ombra loro perché si leggano sia sul nero
-della strada che sul neon della Sala. Si vedono **da fermi** — bianchi e discreti — e
-diventano viola e più lunghi sotto il dito, gialli col Tab (con il filo di contorno di
-`base.css` dietro, che su una foto serve). La luce che si accende non è un velo piatto ma
-sale dalla base dell'edificio, perché in prospettiva un rettangolo pieno si vede che è un
+della strada che sul neon della Sala. La luce che si accende non è un velo piatto ma sale
+dalla base dell'edificio, perché in prospettiva un rettangolo pieno si vede che è un
 rettangolo. Il giro guidato pulsa, e con `prefers-reduced-motion` sta fermo.
+
+**Corretto dopo averlo visto su uno schermo vero (03/09/2026).** Il primo tentativo teneva
+gli angoli accesi sempre, per il telefono, e con bracci lunghi in percentuale della zona.
+Sbagliato due volte: dodici zone per quattro angoli fanno quarantotto trattini, e a
+percentuale il braccio diventava mezzo lato — i quattro angoli si chiudevano in una
+scatola e arrivavano a toccarsi da una zona all'altra. Sopra alla foto usciva un reticolo
+da wireframe incollato sulla città. Adesso:
+
+- i bracci sono **corti e a misura fissa** (`min(13px, 30%)`): un angolo marca uno spigolo,
+  non disegna il lato; il `min()` serve alle zone piccole, dove 13px sarebbero già tutto il
+  lato e si tornerebbe alla scatola dall'altra parte;
+- si guarda **chi sta guardando**: dove c'è un mouse la mappa resta pulita e l'angolo
+  compare al passaggio; dove il mouse non c'è (`@media (hover: none)`, cioè il telefono)
+  restano accesi, discreti, perché lì l'alternativa non è una mappa pulita — è andare a
+  tentoni.
+
+Provato in Chrome a 1600×1000: a riposo l'opacità degli angoli è 0 e la città si vede per
+quello che è; passando sopra allo Studio compaiono i quattro angoli viola, corti, attaccati
+all'edificio.
 
 Le due frecce che scorrono il giro guidato erano due rettangoli invisibili in mezzo alla
 strada, e siccome lì sotto nella foto non c'è disegnato niente, sul telefono non esistevano
 proprio: nessuno poteva sapere che erano lì. Adesso hanno il loro segno, sempre.
+
+---
+
+## 7 · Via la vecchia schermata di gioco, le info sulla mappa
+
+7. rimuovi la pagina che trovi in foto su media al nome "bozza_schermata_di_gioco" e
+   trasferisci tutte le info sulla mappa, puoi anche cambiarla e aggiungere punti basta che
+   togli le barre nere affianco alla mappa tra le 2 sidebar
+
+   **FATTO (03/09/2026)** — era rimasto a metà, e nessuno se n'era accorto perché la parte
+   che si vedeva di più (le bande nere) era stata chiusa col punto 62.
+
+   La pagina c'era ancora: `#s-game`, con la sua testata — ritratto, nome, livello, barra
+   XP, i tre numeri (cassa, chi ti segue, hype) e «Dettagli» con benessere, lucidità, pezzi
+   fuori e lavoro. Era un **secondo menù di gioco**, e diceva le stesse cose che la plancia
+   della mappa dice già: la fascia in alto ha soldi, hype, fama, energia e benessere; la
+   colonna di sinistra ha ritratto, nome, livello, XP, lucidità, lifestyle, sospetto e le
+   skill; il lavoro sta sotto «Disciplina». Due posti per lo stesso numero sono un posto di
+   troppo, e il secondo è quello che prima o poi non si aggiorna.
+
+   Prima di toglierla si è confrontato riga per riga cosa c'era di qua e cosa di là: di
+   suo mancavano solo **pezzi fuori** e **il contratto**, ed è quello che è stato
+   trasferito, nel profilo della plancia accanto a «Stile musicale» e «Fan base»
+   (`vistaProfilo`, `js/game/hub.js`). Poi la testata è diventata una riga sola: chi sei, a
+   che giorno sei, l'audio. `#gtop` e `.tline` tengono il nome che avevano perché ci si
+   agganciano il menu di sistema (`js/menu-sistema.js`) e l'orologio
+   (`js/game/tempo-controlli.js`), che è il tipo di legame che non si vede finché non si
+   rompe. L'app «Statistiche» del telefono apriva quel pannello: adesso apre la Disciplina
+   sulla plancia, dove i numeri stanno davvero.
+
+   **Quello che non si toglie**: `#s-game` resta come contenitore delle linguette —
+   Catalogo, Discografia, Classifica, Contratti, Lifestyle, Traguardi e le mosse della
+   settimana. Quelle non sono «info da trasferire», sono il gioco.
+
+   **Trovato mentre ci si lavorava:** `ui.js` finiva con `$("g-tomenu").onclick`, e
+   `#g-tomenu` non esiste più nel markup da quando la via di ritorno è diventata la mappa.
+   Era l'ultima riga del file, quindi non portava giù nient'altro, ma tirava un TypeError
+   rosso in console a ogni avvio. Tolta.
+
+   **Un difetto arrivato dal punto 11:** «Beat Maker» adesso apre lo Studio, che è sempre
+   aperto (punto 10), ma in `orari.js` il cartello puntava ancora agli orari della Sala —
+   la porta si apriva e l'orario diceva «chiuso, apre alle 13». E le card delle mosse
+   legate allo studio dicevano «fino **undefined**», perché il posto senza orario non ha
+   un'ora di chiusura da scrivere e prima quel caso non esisteva. Sistemati tutti e due.
+
+   Provato in Chrome, partita vera: la schermata di gioco ha una riga sola al posto della
+   testata, il profilo della mappa dice «Pezzi fuori» e «Contratto», lo Studio e il Beat
+   Maker risultano aperti alle 08:00, e le card dicono «sempre aperto».

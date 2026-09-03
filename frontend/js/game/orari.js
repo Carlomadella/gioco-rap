@@ -13,8 +13,13 @@
   /* Due hotspot possono rappresentare lo stesso luogo di gameplay.
      Manteniamo gli ID fisici distinti per mappa/distanze, ma normalizziamo
      regole, orari, azioni ed eventi sulla stessa identità logica. */
+  /* Punto 11: «Beat Maker» non porta più alla Sala, porta alla sezione dei
+     beat dello Studio — quindi segue l'orario dello studio, che non ne ha
+     (punto 10). Finché puntava a `beat` il cartello diceva «chiuso, apre alle
+     13» per un posto che ormai era sempre aperto: la porta si apriva e
+     l'orario diceva di no. */
   const PLACE_ALIAS = Object.freeze({
-    beatmaker:"beat"
+    beatmaker:"studio"
   });
   function normalizePlace(id){
     const key=String(id||"");
@@ -227,7 +232,12 @@
         const scene = tile.querySelector(".scene");
         (scene || tile).appendChild(badge);
       }
-      badge.textContent = st.open ? "fino " + st.closeText
+      /* un posto senza orario non ha un'ora di chiusura da scrivere: prima di
+         adesso non ne esisteva nessuno fra quelli legati a una mossa, e la
+         card diceva «fino undefined». Con lo studio sempre aperto (punto 10)
+         è diventato il caso normale. */
+      badge.textContent = st.allDay ? "sempre aperto"
+        : st.open ? "fino " + st.closeText
         : st.phase === "before" ? "apre " + st.nextText
         : st.phase === "too-late" ? "chiude " + fmt(st.closeAt)
         : "chiuso";

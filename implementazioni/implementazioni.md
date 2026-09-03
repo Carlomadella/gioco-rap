@@ -71,6 +71,13 @@ CARLO:
 
 7. rimuovi la pagina che trovi in foto su media al nome "bozza_schermata_di_gioco" e trasferisci tutte le info sulla mappa, puoi anche cambiarla e aggiungere punti basta che togli le barre nere affianco alla mappa tra le 2 sidebar
 
+   **FATTO (03/09/2026)** — era rimasto a metà: le bande nere le aveva chiuse il punto 62,
+   ma la pagina c'era ancora (`#s-game` e la sua testata, un secondo menù di gioco che
+   ripeteva quello che la plancia della mappa dice già). Adesso è una riga sola, e le due
+   uniche info che stavano solo lì — pezzi fuori e contratto — sono nel profilo della
+   mappa. Per esteso in
+   [`01-mappa-e-citta.md`](implementazioni/01-mappa-e-citta.md#7--via-la-vecchia-schermata-di-gioco-le-info-sulla-mappa).
+
 8. creami un README delle API routes e di tutte le chiamate, ecc.
 
    **FATTO (02/09/2026)** — branch `task/08-readme-api-routes`, file
