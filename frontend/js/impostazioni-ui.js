@@ -111,34 +111,23 @@ function corpoLook(){
 }
 
 function corpoGioco(){
-  const p = SET.gioco;
   return '<div class="scard">' +
     riga(L("Difficoltà","Difficulty"),
-      L("Tre preset. Toccando una manopola passi a «su misura».","Three presets. Touch a knob and it goes «custom»."),
-      seg("gioco.preset", [["facile", L("Facile","Easy")], ["normale", L("Normale","Normal")],
-                           ["duro", L("Duro","Hard")], ["custom", L("Su misura","Custom")]])) +
-  '</div>' +
-  '<div class="scard">' +
-    riga(L("Energia al giorno","Energy per day"),
-      L("In più o in meno rispetto ai cento di base, ogni giorno.","On top of (or below) the standard hundred, every day."),
-      seg("gioco.energia", [[-1,"−1"],[0,"0"],[1,"+1"],[2,"+2"]])) +
-    riga(L("Spese fisse","Fixed costs"),
-      L("Quanto pesano affitto, lifestyle e vita.","How heavy rent, lifestyle and living are."),
-      seg("gioco.spese", [[0.6, L("Leggere","Light")], [1, L("Normali","Normal")], [1.5, L("Pesanti","Heavy")]])) +
-    riga(L("Crescita dei fan","Fan growth"),
-      L("Quanto in fretta la gente ti trova.","How fast people find you."),
-      seg("gioco.fan", [[1.35, L("Veloce","Fast")], [1, L("Normale","Normal")], [0.75, L("Lenta","Slow")]])) +
-    riga(L("I rivali","The rivals"),
-      L("Quanto corrono gli altri mentre tu lavori.","How hard the others run while you work."),
-      seg("gioco.rivali", [[0.75, L("Tranquilli","Easy-going")], [1, L("Normali","Normal")], [1.35, L("Spietati","Ruthless")]])) +
+      L("Scegli il tono della carriera. Per ora tutti e tre usano il bilanciamento standard.",
+        "Choose the career tone. For now all three use the standard balance."),
+      seg("gioco.difficolta", [
+        ["strada-aperta", L("Strada aperta","Open road")],
+        ["anni-di-fame", L("Anni di Fame","Anni di Fame")],
+        ["niente-sconti", L("Niente sconti","No breaks")]
+      ])) +
+    '<p class="snote">' + L(
+      "La scelta viene già salvata con la carriera. I modificatori reali verranno collegati più avanti.",
+      "The choice is already saved with the career. Actual modifiers will be connected later.") + '</p>' +
   '</div>' +
   '<div class="scard">' +
     riga(L("Chiedi conferma","Ask before spending"),
       L("Prima delle mosse che costano soldi.","Before moves that cost money."),
       sw("gioco.conferme")) +
-    '<p class="snote">' + L(
-      "Le manopole valgono da subito, anche su una carriera già iniziata: cambiano il futuro, non quello che hai già fatto.",
-      "The knobs take effect right away, even mid-career: they change what comes next, not what you've already done.") + '</p>' +
   '</div>';
 }
 
@@ -310,7 +299,9 @@ document.addEventListener("click", e => {
     if(path === "gioco.preset"){ if(v !== "custom") applicaPreset(v); else SET.gioco.preset = "custom"; }
     else{
       setPut(path, v);
-      if(path.indexOf("gioco.") === 0) SET.gioco.preset = "custom";
+      if(path === "gioco.difficolta"){
+        try{ if(typeof G !== "undefined"){ G.difficolta = v; if(typeof save === "function") save(); } }catch(e2){}
+      }else if(path.indexOf("gioco.") === 0) SET.gioco.preset = "custom";
     }
     dopoModifica(); return;
   }

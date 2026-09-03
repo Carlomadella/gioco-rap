@@ -20,7 +20,7 @@ const SET_DEF = () => ({
   audio: {on:true, master:80, sfx:80, beat:85, suoni:"morbido", click:true},
   look:  {tema:"notte", accento:"artista", col:"#FF5A36", grana:55, alone:52,
           scala:100, anim:true, compatto:false},
-  gioco: {preset:"normale", energia:0, spese:1, fan:1, rivali:1, conferme:true}
+  gioco: {difficolta:"anni-di-fame", preset:"normale", energia:0, spese:1, fan:1, rivali:1, conferme:true}
 });
 
 let SET = SET_DEF();
@@ -62,10 +62,10 @@ function applicaPreset(id){
   const p = PRESET[id]; if(!p) return;
   Object.assign(SET.gioco, p, {preset:id});
 }
-const difSpese  = () => SET.gioco.spese  || 1;
-const difFan    = () => SET.gioco.fan    || 1;
-const difRivali = () => SET.gioco.rivali || 1;
-const difEnergia = () => SET.gioco.energia || 0;
+const difSpese   = () => 1;
+const difFan     = () => 1;
+const difRivali  = () => 1;
+const difEnergia = () => 0;
 
 /* ==================== ASPETTO ====================
    L'accento normalmente è il colore scelto dall'artista: è roba sua.

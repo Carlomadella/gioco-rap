@@ -1,0 +1,125 @@
+/* Menu contestuale di avvio sulla landing — V2. */
+.land .land-scene{transition:opacity 1.45s cubic-bezier(.2,.75,.2,1),filter .45s ease,transform .65s ease}
+.land .land-scrim{transition:background .45s ease}
+.land.avvio-aperto .land-scene{filter:saturate(.58) contrast(1.01) brightness(.66)}
+.land.avvio-aperto .land-scrim{
+  background:linear-gradient(90deg,rgba(7,7,9,.97) 0%,rgba(7,7,9,.82) 39%,rgba(7,7,9,.35) 68%,rgba(7,7,9,.58) 100%),
+             linear-gradient(0deg,rgba(7,7,9,.94),transparent 42%,rgba(7,7,9,.48))}
+
+.land-kick,.land-hero h1,.land-sub,.land-hero .mrow.big{
+  transition:opacity .28s ease,transform .42s cubic-bezier(.2,.75,.2,1),filter .28s ease}
+.land.avvio-aperto .land-kick,
+.land.avvio-aperto .land-hero h1,
+.land.avvio-aperto .land-sub,
+.land.avvio-aperto .land-hero .mrow.big{
+  opacity:0;transform:translateX(-26px);filter:blur(4px);pointer-events:none}
+.land.avvio-aperto .land-dock{opacity:.34;filter:saturate(.5);pointer-events:none;transform:translateY(4px)}
+.land-dock{transition:opacity .35s ease,filter .35s ease,transform .35s ease}
+
+.land-avvio{position:absolute;left:0;top:50%;z-index:20;width:min(760px,88vw);max-height:calc(100% - 42px);
+  transform:translate(-24px,-47%);opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .28s ease,transform .45s cubic-bezier(.2,.78,.2,1),visibility 0s linear .45s;color:#f2ebdf}
+.land.avvio-aperto .land-avvio{opacity:1;visibility:visible;pointer-events:auto;transform:translate(0,-50%);
+  transition:opacity .32s ease .08s,transform .48s cubic-bezier(.2,.78,.2,1) .04s,visibility 0s}
+.land-avvio.step-in > *{animation:avvStepIn .28s cubic-bezier(.2,.78,.2,1) both}
+@keyframes avvStepIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.land.avvio-aperto .land-giu{opacity:0;pointer-events:none}.land-giu{transition:opacity .22s ease}
+
+.avv-testa{margin-bottom:17px;max-width:680px}
+.avv-kicker,.avv-back{display:inline-flex;align-items:center;gap:8px;color:#cbbfae;font-size:11px;font-weight:800;
+  letter-spacing:.18em;text-transform:uppercase}
+.avv-kicker::before{content:"";width:28px;height:2px;background:var(--gold-land)}
+.avv-back{border:0;background:none;padding:6px 0;color:#bbb2a6;cursor:pointer}.avv-back:hover{color:#fff}
+.avv-testa h2{margin:10px 0 5px;font-family:"Archivo Black",Figtree,sans-serif;font-size:clamp(31px,3.6vw,55px);
+  line-height:.94;letter-spacing:-.045em;text-transform:uppercase;color:#f4eee3}
+.avv-testa p{margin:8px 0 0;max-width:650px;color:#bdb5aa;font-size:14px;line-height:1.42;font-weight:550}
+
+.avv-lista,.avv-slots{display:flex;flex-direction:column;border-top:1px solid rgba(255,255,255,.16)}
+.avv-riga,.avv-slot{position:relative;width:100%;display:grid;grid-template-columns:46px minmax(0,1fr) 34px;
+  align-items:center;gap:13px;min-height:68px;padding:10px 8px 10px 4px;border:0;border-bottom:1px solid rgba(255,255,255,.14);
+  background:transparent;color:#eee7dc;text-align:left;cursor:pointer;transition:background .18s,padding .2s,color .18s}
+.avv-riga:not(:disabled):hover,.avv-slot:not(:disabled):hover{background:rgba(255,255,255,.075);padding-left:11px}
+.avv-riga.prima{background:linear-gradient(90deg,rgba(211,170,94,.16),transparent 82%)}
+.avv-riga.prima .avv-ic{border-color:rgba(211,170,94,.55);color:#f5d898}
+.avv-riga:disabled,.avv-slot:disabled{opacity:.38;cursor:not-allowed}
+.avv-ic{width:38px;height:38px;border:1px solid rgba(255,255,255,.2);border-radius:50%;display:grid;place-items:center;
+  font-size:15px;color:#ddd4c6}
+.avv-tx,.avv-slot-tx{display:flex;flex-direction:column;min-width:0}
+.avv-tx b,.avv-slot-tx b{font-size:14px;line-height:1.15;text-transform:uppercase;letter-spacing:.075em;font-weight:900}
+.avv-tx small,.avv-slot-tx small{margin-top:4px;color:#a9a196;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.avv-freccia{justify-self:end;color:#b9afa2;font-size:20px;transition:transform .2s,color .2s}
+.avv-riga:not(:disabled):hover .avv-freccia,.avv-slot:not(:disabled):hover .avv-freccia{transform:translateX(4px);color:#fff}
+
+.avv-importa{margin-top:12px;display:grid;grid-template-columns:25px auto 1fr;align-items:center;gap:8px;border:0;background:none;
+  color:#bdb4a8;padding:8px 4px;cursor:pointer;text-align:left}
+.avv-importa b{font-size:11px;text-transform:uppercase;letter-spacing:.12em}.avv-importa small{font-size:10.5px;color:#857e74}
+.avv-importa:hover{color:#fff}
+
+.avv-diff{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.avv-diff-card{position:relative;min-width:0;min-height:190px;border:1px solid rgba(255,255,255,.17);border-radius:16px;
+  padding:18px 17px 38px;background:rgba(13,13,15,.42);backdrop-filter:blur(15px);color:#eee7dc;text-align:left;cursor:pointer;
+  transition:transform .22s,background .22s,border-color .22s}
+.avv-diff-card:hover{transform:translateY(-4px);background:rgba(255,255,255,.085);border-color:rgba(255,255,255,.32)}
+.avv-diff-card.consigliata{border-color:rgba(211,170,94,.47);background:rgba(211,170,94,.085)}
+.avv-diff-tag{display:block;color:#9f978c;text-transform:uppercase;letter-spacing:.15em;font-size:9px;font-weight:800;margin-bottom:9px}
+.avv-diff-card b{display:block;font-family:"Archivo Black",Figtree,sans-serif;text-transform:uppercase;font-size:18px;line-height:1.02}
+.avv-diff-card p{font-size:11.5px;line-height:1.4;color:#aaa298;margin:10px 0 0}
+.avv-diff-card em{position:absolute;left:17px;bottom:13px;font-style:normal;color:#e4c57e;text-transform:uppercase;
+  letter-spacing:.12em;font-size:8.5px;font-weight:900}
+.avv-diff-go{position:absolute;right:15px;bottom:10px;font-size:21px;color:#d9d1c5}
+
+.avv-conferma{display:flex;align-items:flex-start;gap:16px;padding:18px 0;border-top:1px solid rgba(255,255,255,.16);
+  border-bottom:1px solid rgba(255,255,255,.16)}
+.avv-alert{width:42px;height:42px;border:1px solid rgba(224,113,92,.55);border-radius:50%;display:grid;place-items:center;
+  color:#f3a18f;font-weight:900;font-size:20px;flex:none}
+.avv-conferma b{font-size:15px;text-transform:uppercase;letter-spacing:.06em}.avv-conferma p{margin:5px 0 0;color:#aaa298;font-size:12px}
+.avv-conferma strong{color:#e8cf98}.avv-conferma-azioni{display:flex;justify-content:flex-end;gap:9px;margin-top:14px}
+.avv-conferma-azioni button{border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:11px 16px;background:rgba(255,255,255,.05);
+  color:#e7dfd4;text-transform:uppercase;letter-spacing:.08em;font-size:10px;font-weight:900;cursor:pointer}
+.avv-conferma-azioni button:hover{background:rgba(255,255,255,.1)}
+.avv-conferma-azioni .danger{border-color:rgba(224,113,92,.45);color:#ffc0b3;background:rgba(160,50,34,.16)}
+
+/* Righe salvataggio. In Carica il tasto Elimina è separato dal tasto che apre
+   la carriera, quindi non ci sono bottoni annidati e l'interazione resta pulita. */
+.avv-slot-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;border-bottom:1px solid rgba(255,255,255,.14)}
+.avv-slot-row .avv-slot{border-bottom:0}
+.avv-slot-row .avv-elimina{align-self:center;margin:0 8px 0 12px;border:1px solid rgba(224,113,92,.25);border-radius:999px;
+  padding:8px 11px;background:transparent;color:#b9958d;text-transform:uppercase;letter-spacing:.09em;font-size:9px;font-weight:900;cursor:pointer}
+.avv-slot-row .avv-elimina:hover{color:#ffc0b3;background:rgba(160,50,34,.13);border-color:rgba(224,113,92,.48)}
+.avv-slot{grid-template-columns:44px minmax(0,1fr) 34px;min-height:74px}
+.avv-slot-scelta{grid-template-columns:44px minmax(0,1fr) auto 34px}
+.avv-slot-num{font-family:"Barlow Condensed",sans-serif;font-size:22px;color:#8e867b;font-weight:800;letter-spacing:.06em}
+.avv-slot.libero:not(:disabled){background:linear-gradient(90deg,rgba(90,146,104,.10),transparent 76%)}
+.avv-slot.occupato{background:linear-gradient(90deg,rgba(211,170,94,.07),transparent 78%)}
+.avv-slot-stato{justify-self:end;padding:4px 7px;border:1px solid rgba(255,255,255,.16);border-radius:999px;color:#9d958a;
+  font-size:8px;letter-spacing:.12em;font-weight:900}
+.avv-slot.libero .avv-slot-stato{color:#a9c9aa;border-color:rgba(125,177,132,.27)}
+.avv-slot.occupato .avv-slot-stato{color:#d0b67d;border-color:rgba(211,170,94,.25)}
+
+/* Profilo bloccato finché non esiste almeno un artista salvato. */
+.land-voce.bloccata{opacity:.48;cursor:not-allowed}.land-voce.bloccata:hover{transform:none;background:transparent;color:#e8e0d4}
+.land-voce.bloccata:hover::after{transform:scaleX(.25);background:rgba(255,255,255,.14)}
+.land-voce.bloccata .frec{opacity:.72;font-size:11px;filter:grayscale(1)}
+
+@media (max-width:900px){
+  .land-avvio{top:auto;bottom:9px;max-height:calc(100% - 28px);transform:translateY(18px);width:100%}
+  .land.avvio-aperto .land-avvio{transform:translateY(0)}.land.avvio-aperto .land-dock{opacity:0;visibility:hidden}
+  .avv-testa{margin-bottom:12px}.avv-testa h2{font-size:clamp(28px,8vw,44px)}.avv-testa p{font-size:12.5px}
+  .avv-riga,.avv-slot{min-height:60px}.avv-diff{grid-template-columns:1fr;gap:7px}
+  .avv-diff-card{min-height:0;padding:13px 45px 13px 14px;border-radius:13px}.avv-diff-card b{font-size:15px}
+  .avv-diff-card p{margin-top:5px;font-size:10.5px}.avv-diff-tag{margin-bottom:5px}.avv-diff-card em{position:static;display:inline-block;margin-top:7px}
+  .avv-diff-go{right:14px;bottom:50%;transform:translateY(50%)}
+}
+@media (max-width:560px){
+  .land-avvio{bottom:5px;width:100%;max-height:calc(100% - 12px);overflow:auto;padding-right:4px}
+  .avv-testa h2{font-size:30px}.avv-testa p{font-size:11.5px;line-height:1.35}
+  .avv-riga,.avv-slot{grid-template-columns:38px minmax(0,1fr) 24px;gap:9px;min-height:55px;padding-top:7px;padding-bottom:7px}
+  .avv-slot-scelta{grid-template-columns:38px minmax(0,1fr) 24px}.avv-slot-scelta .avv-slot-stato{display:none}
+  .avv-ic{width:31px;height:31px;font-size:12px}.avv-tx b,.avv-slot-tx b{font-size:12px}.avv-tx small,.avv-slot-tx small{font-size:9.5px}
+  .avv-importa small{display:none}.avv-conferma-azioni{justify-content:stretch}.avv-conferma-azioni button{flex:1}
+  .avv-slot-row{grid-template-columns:minmax(0,1fr) auto}.avv-slot-row .avv-elimina{margin-left:6px;padding:7px 8px;font-size:8px}
+}
+@media (prefers-reduced-motion:reduce){
+  .land-avvio,.land-kick,.land-hero h1,.land-sub,.land-hero .mrow.big,.land-dock,.avv-diff-card{transition:none!important}
+  .land-avvio.step-in > *{animation:none!important}
+}
