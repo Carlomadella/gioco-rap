@@ -6,6 +6,38 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:de3eb52 -->
+## 03/09/26, 02:34 — fix: consolida arbitro globale degli eventi
+
+**Tipo:** Commit diretto su main  
+**Autore:** Mycol (mycolbraga@gmail.com)  
+**Commit:** `de3eb52`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- commit:595c0b8 -->
+## 03/09/26, 02:04 — feat: guardaroba separato dal negozio, via il Campetto dalla mappa (punti 7, 8)
+
+**Tipo:** Commit diretto su main  
+**Autore:** Sadyco La Fame (sadycolafame@192.168.1.53)  
+**Commit:** `595c0b8`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/build.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:0b33abe -->
 ## 02/09/26, 21:45 — feat: aggiunge controllo globale del tempo
 

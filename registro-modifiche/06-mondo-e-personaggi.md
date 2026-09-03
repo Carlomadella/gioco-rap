@@ -6,6 +6,48 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:de3eb52 -->
+## 03/09/26, 02:34 — fix: consolida arbitro globale degli eventi
+
+**Tipo:** Commit diretto su main  
+**Autore:** Mycol (mycolbraga@gmail.com)  
+**Commit:** `de3eb52`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/eventi-tempo.js`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/strada.js`
+- **Modificato:** `frontend/js/game/tempo-controlli.js`
+
+**File interessati in questa categoria:** 4
+
+---
+
+<!-- commit:595c0b8 -->
+## 03/09/26, 02:04 — feat: guardaroba separato dal negozio, via il Campetto dalla mappa (punti 7, 8)
+
+**Tipo:** Commit diretto su main  
+**Autore:** Sadyco La Fame (sadycolafame@192.168.1.53)  
+**Commit:** `595c0b8`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/hub.css`
+- **Modificato:** `frontend/css/negozio.css`
+- **Modificato:** `frontend/index.html`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/negozio.js`
+- **Modificato:** `frontend/js/game/orari.js`
+- **Modificato:** `frontend/js/game/ui.js`
+- **Modificato:** `frontend/media/photo/pagina di gioco/mappa_citta.jpg`
+
+**File interessati in questa categoria:** 8
+
+---
+
 <!-- commit:a3e0c61 -->
 ## 03/09/26, 01:52 — fix: uniforma gerarchia e arbitraggio eventi
 

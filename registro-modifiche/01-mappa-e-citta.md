@@ -6,6 +6,29 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:595c0b8 -->
+## 03/09/26, 02:04 — feat: guardaroba separato dal negozio, via il Campetto dalla mappa (punti 7, 8)
+
+**Tipo:** Commit diretto su main  
+**Autore:** Sadyco La Fame (sadycolafame@192.168.1.53)  
+**Commit:** `595c0b8`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/hub.css`
+- **Modificato:** `frontend/css/negozio.css`
+- **Modificato:** `frontend/index.html`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/negozio.js`
+- **Modificato:** `frontend/js/game/orari.js`
+- **Modificato:** `frontend/js/game/ui.js`
+- **Modificato:** `frontend/media/photo/pagina di gioco/mappa_citta.jpg`
+
+**File interessati in questa categoria:** 8
+
+---
+
 <!-- commit:e415c9a -->
 ## 03/09/26, 01:36 — fix(mappa): cache-busting sulla foto della città (punto 6)
 

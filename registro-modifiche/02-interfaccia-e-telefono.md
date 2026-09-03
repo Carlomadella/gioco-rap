@@ -6,6 +6,39 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:5d3233c -->
+## 03/09/26, 02:31 — feat: la palestra diventa un sistema, non un pulsante (punto 9)
+
+**Tipo:** Commit diretto su main  
+**Autore:** Sadyco La Fame (sadycolafame@192.168.1.53)  
+**Commit:** `5d3233c`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/index.html`
+- **Modificato:** `frontend/js/game/ui.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
+<!-- commit:595c0b8 -->
+## 03/09/26, 02:04 — feat: guardaroba separato dal negozio, via il Campetto dalla mappa (punti 7, 8)
+
+**Tipo:** Commit diretto su main  
+**Autore:** Sadyco La Fame (sadycolafame@192.168.1.53)  
+**Commit:** `595c0b8`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/ui.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:10f4cc0 -->
 ## 02/09/26, 20:13 — Merge remote-tracking branch 'origin/feature/bilanciamento-hardening-365' into integration/bilanciamento-hardening-365
 

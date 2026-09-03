@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:5d3233c -->
+## 03/09/26, 02:31 — feat: la palestra diventa un sistema, non un pulsante (punto 9)
+
+**Tipo:** Commit diretto su main  
+**Autore:** Sadyco La Fame (sadycolafame@192.168.1.53)  
+**Commit:** `5d3233c`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/fx.js`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/scene-art.js`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- commit:6d99c14 -->
 ## 01/09/26, 14:45 — feat: transizioni quando una card apre una pagina, 156 scene per i fan (Da smistare 1, 2)
 
