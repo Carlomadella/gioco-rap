@@ -187,6 +187,24 @@ function renderGioco(){
       '<span class="t">' + a.n + '</span>' +
       '<span class="s">' + a.d + '</span>' + rw;
     const esegui = () => {
+      /* Le tile disabilitate da orari/spostamenti/clock sono solo UI.
+         Prima di toccare energia, soldi o statistiche chiediamo al runtime
+         se la mossa è davvero eseguibile in questo preciso momento. */
+      try{
+        if(window.GAME_TRAVEL && typeof GAME_TRAVEL.guardAction === "function"){
+          const gate = GAME_TRAVEL.guardAction(a.id);
+          if(!gate.ok){
+            if(typeof SFX === "object" && SFX.fail) SFX.fail();
+            return;
+          }
+        }
+      }catch(err){
+        console.error("[Anni di Fame] guardia runtime azione non riuscita", err);
+        if(typeof toast === "function")
+          toast("<b>Mossa non avviata.</b> Controllo luogo/orario non disponibile.","bad","!",["#B91C1C","#7F1D1D"]);
+        return;
+      }
+
       const fansBefore = G.fans, moneyBefore = G.money;
       G.energy -= en2;
       /* da qui l'azione e' aperta: se si apre una scena e la abbandoni,

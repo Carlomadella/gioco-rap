@@ -17,7 +17,9 @@ const tel = leggi("js/game/telefono.js");
 const actions = leggi("js/game/actions.js");
 const writer = leggi("js/game/writer.js");
 const hub = leggi("js/game/hub.js");
+const ui = leggi("js/game/ui.js");
 const hours = leggi("js/game/orari.js");
+const travel = leggi("js/game/spostamenti.js");
 const crimeui = leggi("js/game/strada-crimine-ui.js");
 const crime = leggi("js/game/strada-crimine.js");
 const time = leggi("js/game/tempo.js");
@@ -184,7 +186,99 @@ test("refresh di un HIGH catalogo non duplica Chat o LaFamegram",
   scBody.includes("!meta.fromSkip && !meta.restorePending") &&
   scBody.includes("mirrorDelivery(e)"));
 
-for(const f of ["strumenti/build.js","js/game/eventi-v2.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/orari.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js"]){
+console.log("\nHardening accesso azioni — luogo / orari / fine giornata");
+test("spostamenti espone una guardia runtime per le azioni",
+  travel.includes("function actionAccess(id, at)") &&
+  travel.includes("function guardAction(id, opts)") &&
+  travel.includes("actionAccess,") &&
+  travel.includes("guardAction,"));
+test("la guardia usa clock, orari e posizione reale",
+  travel.includes("GAME_TIME.canStart(id)") &&
+  travel.includes("GAME_HOURS.actionStatus(id, now)") &&
+  travel.includes("requiredPlaceForAction(id)") &&
+  travel.includes('reason:"wrong-place"') &&
+  travel.includes('reason:"hours"') &&
+  travel.includes('reason:"day-end"'));
+const ux0=ui.indexOf("const esegui = () => {");
+const ux1=ui.indexOf("const fansBefore = G.fans",ux0);
+const uxBody=ux0>=0&&ux1>ux0?ui.slice(ux0,ux1+32):"";
+test("ui consulta la guardia prima di scalare energia",
+  uxBody.includes("GAME_TRAVEL.guardAction(a.id)") &&
+  ui.indexOf("GAME_TRAVEL.guardAction(a.id)",ux0) <
+    ui.indexOf("G.energy -= en2",ux0));
+test("entrambe le nuove mosse palestra richiedono lo stesso luogo",
+  hours.includes('palestra_pesi:"palestra"') &&
+  hours.includes('palestra_cardio:"palestra"') &&
+  travel.includes("GAME_HOURS.placeForAction"));
+test("i turni con luogo fisico mantengono la mappa esplicita",
+  travel.includes('lavapiatti:"pizzeria"') &&
+  travel.includes('operaio:"fabbrica"') &&
+  travel.includes('if(id === "turno")'));
+
+{
+  const vm=require("vm");
+  let pending=false, canStart=true, hoursOpen=true;
+  const box={
+    console,Math,JSON,Object,Array,String,Number,Boolean,Date,
+    G:{currentPlace:"vita",job:null},
+    HUB_LUOGHI:[
+      {id:"vita",n:"Casa",x:0,y:0,w:10,h:10},
+      {id:"studio",n:"Studio",x:20,y:0,w:10,h:10},
+      {id:"palestra",n:"Palestra",x:40,y:0,w:10,h:10},
+      {id:"pizzeria",n:"Pizzeria",x:60,y:0,w:10,h:10},
+      {id:"fabbrica",n:"Fabbrica",x:80,y:0,w:10,h:10}
+    ],
+    GAME_TIME:{
+      now:()=>600,pending:()=>pending,canStart:()=>canStart,
+      durationFor:id=>id==="turno"?300:id==="registra"?180:60,
+      remaining:()=>480,formatDuration:m=>m+" min",format:m=>String(m),
+      text:()=>"10:00",DAY_END:1680,travel:()=>({blocked:false})
+    },
+    GAME_HOURS:{
+      actionStatus:()=>hoursOpen?{open:true}:{open:false,phase:"before",nextText:"12:00",label:"Apre alle 12:00"},
+      placeForAction:id=>({registra:"studio",palestra_pesi:"palestra",palestra_cardio:"palestra"}[id]||null),
+      directActionForPlace:()=>null,
+      placeStatus:()=>({open:true})
+    },
+    document:{getElementById:()=>null,querySelectorAll:()=>[]},
+    CustomEvent:function(){},save:()=>{}
+  };
+  box.window=box;
+  box.addEventListener=()=>{};
+  box.dispatchEvent=()=>{};
+  vm.createContext(box);
+
+  let loaded=true;
+  try{ vm.runInContext(travel,box,{filename:"spostamenti.js"}); }
+  catch(e){ loaded=false; test("spostamenti si carica nel test runtime",false,e.message); }
+
+  if(loaded){
+    let g=box.GAME_TRAVEL.actionAccess("registra");
+    test("runtime: registra da Casa viene bloccata per luogo",
+      !g.ok && g.reason==="wrong-place" && g.requiredPlace==="studio");
+
+    box.G.currentPlace="studio";
+    g=box.GAME_TRAVEL.actionAccess("registra");
+    test("runtime: registra in Studio e in orario passa",g.ok===true);
+
+    hoursOpen=false;
+    g=box.GAME_TRAVEL.actionAccess("registra");
+    test("runtime: un'azione fuori orario viene bloccata",
+      !g.ok && g.reason==="hours");
+
+    hoursOpen=true; canStart=false;
+    g=box.GAME_TRAVEL.actionAccess("registra");
+    test("runtime: un'azione oltre fine giornata viene bloccata",
+      !g.ok && g.reason==="day-end");
+
+    canStart=true; box.G.job={id:"lavapiatti"}; box.G.currentPlace="vita";
+    g=box.GAME_TRAVEL.actionAccess("turno");
+    test("runtime: il turno lavapiatti richiede la Pizzeria",
+      !g.ok && g.reason==="wrong-place" && g.requiredPlace==="pizzeria");
+  }
+}
+
+for(const f of ["strumenti/build.js","js/game/eventi-v2.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }

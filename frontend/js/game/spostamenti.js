@@ -120,6 +120,95 @@
     return typeof GAME_HOURS.placeForAction === "function" ? GAME_HOURS.placeForAction(id) : null;
   }
 
+  /* Guardia RUNTIME, non decorazione UI.
+     Una tile disabilitata è solo presentazione: la stessa regola deve essere
+     vera anche se un click è programmatico, la UI è rimasta indietro di un
+     render o un altro ingresso prova a lanciare la mossa.
+     Qui convergono:
+       - transazione/azione già pendente;
+       - tempo residuo prima delle 04:00;
+       - finestra oraria dell'azione/turno;
+       - luogo fisico realmente raggiunto. */
+  function actionAccess(id, at){
+    const now = at == null ? GAME_TIME.now() : Number(at);
+    const current = assicuraPosizione();
+    const required = requiredPlaceForAction(id);
+    const duration = GAME_TIME.durationFor(id);
+    const remaining = typeof GAME_TIME.remaining === "function"
+      ? GAME_TIME.remaining() : null;
+
+    if(typeof GAME_TIME.pending === "function" && GAME_TIME.pending()){
+      return {ok:false, reason:"action-pending", id, now, duration, remaining,
+        currentPlace:current, requiredPlace:required};
+    }
+
+    if(typeof GAME_TIME.canStart === "function" && !GAME_TIME.canStart(id)){
+      return {ok:false, reason:"day-end", id, now, duration, remaining,
+        currentPlace:current, requiredPlace:required};
+    }
+
+    const status = GAME_HOURS.actionStatus(id, now);
+    if(status && !status.open){
+      return {ok:false, reason:"hours", id, now, duration, remaining,
+        currentPlace:current, requiredPlace:required, status};
+    }
+
+    if(required && required !== current){
+      return {ok:false, reason:"wrong-place", id, now, duration, remaining,
+        currentPlace:current, requiredPlace:required, status:status||null};
+    }
+
+    return {ok:true, id, now, duration, remaining,
+      currentPlace:current, requiredPlace:required, status:status||null};
+  }
+
+  function actionBlockText(gate){
+    if(gate.reason === "action-pending")
+      return "Prima devi chiudere o completare la mossa già in corso.";
+
+    if(gate.reason === "day-end"){
+      const need = GAME_TIME.formatDuration ? GAME_TIME.formatDuration(gate.duration) : (gate.duration+" min");
+      const left = GAME_TIME.formatDuration && gate.remaining != null
+        ? GAME_TIME.formatDuration(gate.remaining) : String(gate.remaining||0)+" min";
+      return "Non c'è abbastanza giornata: questa mossa richiede <b>"+need+
+        "</b>, ma restano <b>"+left+"</b> prima delle 04:00.";
+    }
+
+    if(gate.reason === "hours"){
+      const st=gate.status||{};
+      if(st.phase === "before")
+        return "Questa attività non è ancora disponibile: apre alle <b>"+st.nextText+"</b>.";
+      if(st.phase === "too-late")
+        return "È troppo tardi per iniziarla: non finiresti prima della chiusura.";
+      return st.label ? String(st.label) : "Questa attività per oggi è chiusa.";
+    }
+
+    if(gate.reason === "wrong-place"){
+      const l=luogo(gate.requiredPlace);
+      return "Per fare questa mossa devi prima raggiungere <b>"+
+        (l ? l.n : gate.requiredPlace)+"</b> sulla mappa. Non hai speso energia né tempo.";
+    }
+
+    return "Questa mossa non può partire adesso.";
+  }
+
+  function showActionBlock(gate){
+    if(typeof showEvent !== "function") return;
+    showEvent({
+      k:"Accesso all'attività",
+      t:"Non puoi iniziare questa mossa",
+      d:actionBlockText(gate),
+      annulla(){},
+      opts:[{n:"Va bene", d:"Non passa tempo e non spendi niente", run(){ return null; }}]
+    });
+  }
+
+  function guardAction(id, opts){
+    const gate=actionAccess(id);
+    if(!gate.ok && !(opts&&opts.silent)) showActionBlock(gate);
+    return gate;
+  }
+
   function emit(type, detail){
     try{ window.dispatchEvent(new CustomEvent(type, {detail})); }catch(e){}
   }
@@ -317,6 +406,8 @@
     plan:piano,
     go:esegui,
     requiredPlaceForAction,
+    actionAccess,
+    guardAction,
     inTransit:() => TRANSIT ? Object.assign({}, TRANSIT) : null
   });
 
