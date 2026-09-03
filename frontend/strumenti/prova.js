@@ -62,6 +62,55 @@ for(const f of jsSulDisco){
 }
 controlla("ogni file di codice compila", rotti.length === 0, rotti);
 
+/* === START ZERO REGRESSION V1 START === */
+console.log("\nla nuova carriera parte da zero");
+{
+  const vm = require("vm");
+  const scatola = {
+    console, Math, JSON, Object, Array, String, Number, Boolean, Date,
+    parseInt, parseFloat, isNaN,
+    localStorage: { getItem: () => null, setItem: () => {} }
+  };
+  scatola.window = scatola;
+  vm.createContext(scatola);
+
+  let stato = null, lvl = null, errore = null;
+  try{
+    vm.runInContext(
+      fs.readFileSync(path.join(RADICE, "js/game/state.js"), "utf8"),
+      scatola,
+      { filename: "state.js" }
+    );
+    stato = vm.runInContext("START()", scatola);
+    lvl = vm.runInContext("livello().lvl", scatola);
+  }catch(e){ errore = e; }
+
+  controlla(
+    "soldi, fan, hype, skill e stream iniziano tutti da zero",
+    !errore &&
+      stato.money === 0 &&
+      stato.fans === 0 &&
+      stato.hype === 0 &&
+      stato.streamsPrev === 0 &&
+      Array.isArray(stato.songs) && stato.songs.length === 0 &&
+      Object.values(stato.skills).every(v => v === 0),
+    errore ? [errore.message] : [
+      "money=" + stato.money,
+      "fans=" + stato.fans,
+      "hype=" + stato.hype,
+      "streamsPrev=" + stato.streamsPrev,
+      "skills=" + JSON.stringify(stato.skills)
+    ]
+  );
+
+  controlla(
+    "una nuova carriera parte dal livello 1",
+    !errore && lvl === 1,
+    errore ? [errore.message] : ["livello=" + lvl]
+  );
+}
+/* === START ZERO REGRESSION V1 END === */
+
 console.log("\nle immagini dei fogli di stile");
 const perse = [];
 for(const f of cssSulDisco){
