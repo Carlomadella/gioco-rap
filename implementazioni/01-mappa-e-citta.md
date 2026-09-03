@@ -562,3 +562,29 @@ una card.
   Se in futuro serve rifare la mappa da capo per un altro motivo (punto 45), il campetto va tolto
   anche dal nuovo prompt di generazione — qui non serviva perché il resto della foto non cambiava.
 
+
+---
+
+## I bordi delle aree cliccabili sulla mappa
+
+_(chiesto a voce: «i border delle aree cliccabili sono da migliorare»)_
+
+**FATTO (03/09/2026)** — `css/hub.css`.
+
+Le zone da toccare sulla mappa avevano **un solo stato disegnato: `:hover`**. Sul telefono
+l'hover non esiste, quindi la mappa non diceva in nessun modo dove si poteva toccare — si
+andava a tentoni sperando di prendere il cartello giusto. E quando il bordo compariva era
+un rettangolo di colore tutto intorno all'edificio: sopra a una foto si appiccica come un
+adesivo, e dove sotto c'è un'insegna accesa non si legge più.
+
+Adesso sono i **quattro angoli**, come un mirino: dicono «qui si tocca» senza chiudere in
+una scatola il palazzo che c'è sotto, e hanno un'ombra loro perché si leggano sia sul nero
+della strada che sul neon della Sala. Si vedono **da fermi** — bianchi e discreti — e
+diventano viola e più lunghi sotto il dito, gialli col Tab (con il filo di contorno di
+`base.css` dietro, che su una foto serve). La luce che si accende non è un velo piatto ma
+sale dalla base dell'edificio, perché in prospettiva un rettangolo pieno si vede che è un
+rettangolo. Il giro guidato pulsa, e con `prefers-reduced-motion` sta fermo.
+
+Le due frecce che scorrono il giro guidato erano due rettangoli invisibili in mezzo alla
+strada, e siccome lì sotto nella foto non c'è disegnato niente, sul telefono non esistevano
+proprio: nessuno poteva sapere che erano lì. Adesso hanno il loro segno, sempre.

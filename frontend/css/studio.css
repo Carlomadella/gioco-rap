@@ -1,0 +1,100 @@
+/* Lo Studio (punti 10, 11, 12): le quattro stanze di un pezzo.
+
+   Stessa famiglia della Sala (`posto.css`) apposta — è la stessa gente e lo
+   stesso mondo, cambia solo cosa ci fai insieme: fondale scuro, un riquadro
+   centrale, la scena in alto e sotto le cose da fare. Quello che qui c'è in
+   più sono le linguette, perché lo Studio non è un momento solo: è quattro
+   stanze che si attraversano in ordine, e l'ordine si deve vedere. */
+
+.studio{position:fixed;inset:0;z-index:94;display:none;overflow-y:auto;
+  background:radial-gradient(120% 80% at 50% 0%,#1A1230,#08080B 70%)}
+.studio.on{display:block}
+.stwrap{max-width:680px;margin:0 auto;padding:20px 18px 46px;
+  animation:rIn .4s cubic-bezier(.2,.9,.3,1)}
+
+.sthead{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.sthead .stk{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--acid);flex:none}
+.strisorse{display:flex;gap:14px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+.strisorse span{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.strisorse i{display:block;font-style:normal;font-size:9.5px;font-weight:800;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+
+/* ---- le quattro stanze ---- */
+.sttabs{display:flex;gap:6px;margin-bottom:13px;overflow-x:auto;scrollbar-width:none}
+.sttabs::-webkit-scrollbar{display:none}
+.sttab{flex:1;min-width:78px;padding:9px 10px;border-radius:11px;font:inherit;font-size:12.5px;
+  font-weight:800;color:var(--soft);background:rgba(255,255,255,.045);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);cursor:pointer;white-space:nowrap;
+  transition:background .15s,color .15s,box-shadow .15s}
+.sttab:hover{background:rgba(255,255,255,.09);color:#fff}
+.sttab.on{color:#fff;background:linear-gradient(180deg,rgba(139,92,246,.32),rgba(139,92,246,.14));
+  box-shadow:inset 0 0 0 1px rgba(192,132,252,.5)}
+
+.stscena{border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+.stscena svg{display:block;width:100%;height:auto}
+.stdove{margin:12px 2px 15px;font-size:13.5px;line-height:1.5;color:var(--soft)}
+.stdove b{color:#fff}
+
+.stdice{margin:0 2px 14px;font-size:12.5px;line-height:1.55;color:var(--faint)}
+.stdice b{color:var(--soft)}
+
+/* ---- una persona: beatmaker al banco dei beat, fonico dietro al vetro ---- */
+.stperso{display:flex;align-items:center;gap:12px;padding:11px 13px;margin-bottom:9px;
+  border-radius:15px;background:linear-gradient(170deg,#17141F,#100E17);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+.stperso.scelta{box-shadow:inset 0 0 0 1px var(--k),0 10px 30px rgba(0,0,0,.4)}
+.stav{width:46px;height:46px;flex:none;border-radius:14px;overflow:hidden;display:block;line-height:0}
+.stav svg{display:block;width:100%;height:100%}
+.stchi{flex:1;min-width:0}
+.stchi b{display:block;font-size:14.5px;font-weight:800;letter-spacing:-.01em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stchi span{display:block;margin-top:2px;font-size:12px;color:var(--soft);font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stfa{flex:none;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.stgo{padding:8px 13px;border-radius:10px;font:inherit;font-size:12.5px;font-weight:800;
+  color:#fff;background:rgba(255,255,255,.09);cursor:pointer;white-space:nowrap;
+  transition:background .15s}
+.stgo:hover:not(:disabled){background:rgba(255,255,255,.17)}
+.stgo.on{background:linear-gradient(180deg,rgba(139,92,246,.5),rgba(139,92,246,.28))}
+.stgo:disabled{opacity:.5;cursor:default;font-weight:700;font-size:11.5px}
+.stsub{font-size:10.5px;font-weight:700;color:var(--faint);white-space:nowrap}
+
+/* ---- la mossa vera: una sola, grossa, in fondo alla stanza ---- */
+.stoppure{display:flex;align-items:center;gap:10px;margin:16px 2px 12px;
+  font-size:10.5px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.stoppure::before,.stoppure::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.09)}
+.stazione{display:block;width:100%;text-align:left;padding:14px 16px;border-radius:15px;
+  font:inherit;cursor:pointer;color:#fff;
+  background:linear-gradient(170deg,rgba(139,92,246,.24),rgba(139,92,246,.08));
+  box-shadow:inset 0 0 0 1px rgba(192,132,252,.34);transition:background .15s,transform .12s}
+.stazione:hover{background:linear-gradient(170deg,rgba(139,92,246,.34),rgba(139,92,246,.14))}
+.stazione:active{transform:scale(.99)}
+.stazione b{display:block;font-size:15px;font-weight:900;letter-spacing:-.01em}
+.stazione span{display:block;margin-top:3px;font-size:12.5px;color:var(--soft);font-weight:500}
+
+/* ---- un pezzo pronto a uscire ---- */
+.stpezzo{display:flex;align-items:center;gap:12px;padding:10px 13px;margin-bottom:8px;
+  border-radius:14px;background:rgba(255,255,255,.035);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.stpezzo.ok{box-shadow:inset 0 0 0 1px rgba(87,201,139,.32)}
+.stcov{width:44px;height:44px;flex:none;border-radius:10px;overflow:hidden;background:#15151A}
+.stcov svg{display:block;width:100%;height:100%}
+
+.stvuoto{padding:16px 14px;border-radius:14px;font-size:12.5px;line-height:1.5;
+  color:var(--faint);background:rgba(255,255,255,.025);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.055)}
+
+/* la porta verso il resto della settimana: c'è, ma non compete con la mossa
+   della stanza — è un'uscita, non una proposta */
+.stmosse{display:block;width:100%;margin-top:18px;padding:12px;border-radius:12px;
+  font:inherit;font-size:12.5px;font-weight:800;color:var(--faint);background:none;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);cursor:pointer;
+  transition:color .15s,background .15s}
+.stmosse:hover{color:#fff;background:rgba(255,255,255,.05)}
+
+@media (max-width:520px){
+  .stwrap{padding:16px 13px 40px}
+  .strisorse{gap:11px}
+  .stfa{flex-direction:row;align-items:center;gap:8px}
+}

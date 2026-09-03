@@ -58,8 +58,11 @@ const spoglia = t => String(t).replace(/<[^>]*>/g, "");
    Gli id non si toccano: orari.js, eventi-tempo.js, spostamenti.js e
    trasferte.js li usano per sapere orari, eventi ambientali e distanze. */
 const HUB_LUOGHI = [
+  /* punto 12: lo studio non è più una scorciatoia alla linguetta della
+     settimana — è una stanza sua, con dentro le quattro fasi di un pezzo e la
+     gente che ci lavora (js/game/studio.js). Punto 10: è sempre aperto. */
   {id:"studio", n:"Studio", x:5.86, y:1.67, w:16.60, h:23.33,
-   vai:() => hubGioco("settimana")},
+   vai:() => apriStudio("beat")},
   /* punto 59/61: era un cartello chiuso («Club & discoteche», ancora dentro
      alla foto — cambia solo quando cambia la mappa, punto 45); qui sotto
      adesso c'è un lavoro vero, part time. */
@@ -80,12 +83,13 @@ const HUB_LUOGHI = [
   /* il beat maker non è un listino: è la sala dove si conosce la gente */
   {id:"beat", n:"La Sala", x:41.34, y:6.67, w:16.60, h:25.67,
    vai:() => apriPosto()},
-  /* punto 6: nella mappa definitiva «La Sala» e «Beat Maker» sono due
-     edifici disegnati, ma restano lo stesso posto di gioco — non c'è
-     ancora un listino di beat separato da comprare, solo la sala dove si
-     conosce la gente e si lavora ai pezzi. Stesso vai() di "beat" apposta. */
+  /* punto 11: «Beat Maker» non è più un secondo ingresso della Sala. Il
+     lavoro sul beat è **una sezione dello studio**, e il cartello ci porta
+     dritto: alla Sala si conosce la gente, in studio ci si fa il pezzo.
+     I due edifici restano due edifici disegnati (punto 45, le targhette sono
+     dentro al pixel), ma adesso portano in due posti diversi davvero. */
   {id:"beatmaker", n:"Beat Maker", x:22.79, y:25.00, w:18.23, h:24.17,
-   vai:() => apriPosto()},
+   vai:() => apriStudio("beat")},
   /* punto 60: si chiamava «Vita quotidiana» — la palestra è uscita da qui
      ed è diventata un posto suo (punto 61), resta stacca la spina e i conti */
   {id:"vita", n:"Casa", x:9.77, y:50.33, w:15.95, h:18.00,

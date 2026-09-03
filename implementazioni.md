@@ -31,14 +31,4 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 _(qui sotto finiscono i punti nuovi, appena scritti)_
 
-10. Lo studio lo terrei sempre aperto.
-
-11. Beatmaker intengriamola a una sezione dello studio.
-
-12. Tantissimo del gampley noi vogliamo che si sviluppi in STUDIO, essendo un simulatore della vita da RAPPER. Quindi = Dobbiamo sicuramente sviluppare un altra interfaccia e proprio dei veri scenari all'interno dello studio, Dalla sezione in cui creeremo rapporto coi vari beatmaker, alla parte in cui andremo a mixare i pezzi, TUTTO.
-
-13. Implementare il disco d'oro(500K STREAM), Disco di Diamante (1 MLNS TREAM) e DISCO DI PLATINO (OTTENIBILE DOPO I 10X DISCHI DI PLATINO A SINGOLO BRANO/PROGETTO)
-
-14. Ci sono da correggere molte meccaniche di gioco ; Ad esempio in una conversazione in studio noto che con uno alla domanda 'Mi presti il microfono' anche se gli dico di no l'amicizia con questo aumenta. Verifica che sian tutti coerenti tra di loro i dialoghi svolgendo simulazioni di gioco effettive. 
-
-15. 
+15.

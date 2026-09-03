@@ -29,6 +29,7 @@
 <link rel="stylesheet" href="css/creator.css?v=12">
 <link rel="stylesheet" href="css/actionbar.css?v=12">
 <link rel="stylesheet" href="css/posto.css?v=13">
+<link rel="stylesheet" href="css/studio.css?v=1">
 <link rel="stylesheet" href="css/negozio.css?v=12">
 <link rel="stylesheet" href="css/strada-crimine.css?v=13">
 <link rel="stylesheet" href="css/strada-crimine-v2.css?v=1">
@@ -353,6 +354,20 @@
 
 <!-- La Sala: il posto dove si conosce la gente. Il contenuto lo mette
      js/game/posto.js. -->
+<!-- Lo Studio (punti 10, 11, 12): le quattro stanze di un pezzo — il beat, la
+     cabina, il banco, fuori. Non rifà l'economia del gioco: chiama le stesse
+     azioni della settimana, e ci mette dentro la gente conosciuta alla Sala.
+     Il contenuto lo scrive js/game/studio.js. -->
+<div class="studio" id="studio"><div class="stwrap">
+  <div class="sthead"><div class="stk">Lo Studio</div>
+    <div class="strisorse" id="st-risorse"></div>
+    <button class="pox" id="st-x">&#10005;</button></div>
+  <div class="sttabs" id="st-tabs"></div>
+  <div class="stscena" id="st-scena"></div>
+  <p class="stdove" id="st-dove"></p>
+  <div class="stcorpo" id="st-corpo"></div>
+</div></div>
+
 <div class="posto" id="posto"><div class="powrap">
   <div class="pohead"><div class="pok">La Sala</div><button class="pox" id="po-x">&#10005;</button></div>
   <div class="poscena" id="po-scena"></div>
@@ -665,6 +680,7 @@
 <script src="js/game/fx.js?v=13"></script>
 <script src="js/game/skip.js?v=13"></script>
 <script src="js/game/posto.js?v=13"></script>
+<script src="js/game/studio.js?v=1"></script>
 <script src="js/game/strada.js?v=12"></script>
 <script src="js/game/strada-crimine.js?v=14"></script>
 <script src="js/game/negozio.js?v=13"></script>

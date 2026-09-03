@@ -11,12 +11,12 @@ file del suo argomento con dentro cosa è stato fatto.
 
 | file | cosa c'è dentro |
 | --- | --- |
-| [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 9 voci |
+| [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 10 voci |
 | [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 24 voci |
 | [`03-artista-e-avatar.md`](03-artista-e-avatar.md) | **L'artista e il suo avatar** — 1 voce |
-| [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 9 voci |
+| [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 11 voci |
 | [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 10 voci |
-| [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md) | **Il mondo e la gente** — 10 voci |
+| [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md) | **Il mondo e la gente** — 11 voci |
 | [`07-multiplayer-e-backend.md`](07-multiplayer-e-backend.md) | **Il multiplayer e il server** — 5 voci |
 | [`08-uscita-sugli-store.md`](08-uscita-sugli-store.md) | **L'uscita su Steam e sugli store** — 3 voci |
 | [`09-grafica-e-asset.md`](09-grafica-e-asset.md) | **La grafica, le ambientazioni e gli asset** — 7 voci |
@@ -26,7 +26,7 @@ per tutti e per tutto.
 
 ## Tutti i punti
 
-81 voci in tutto: **47 chiuse**, 12 a metà, il resto da fare.
+85 voci in tutto: **51 chiuse**, 12 a metà, il resto da fare.
 
 | | punto | stato | dove |
 | --- | --- | --- | --- |
@@ -44,6 +44,10 @@ per tutti e per tutto.
 | **11** | Via il bottone del menù dalle CTA in basso | da fare | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **12** | Le classifiche ogni settimana, con le frecce | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
 | **13** | Suoni e beat più vari | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
+| **—** | 10, 11, 12 · Lo Studio: una stanza sua, e il gameplay dentro | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
+| **—** | 13 · I dischi: oro, platino, diamante | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
+| **—** | 14 · I dialoghi devono tornare fra di loro | fatto | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
+| **—** | I bordi delle aree cliccabili sulla mappa | fatto | [mappa-e-citta](01-mappa-e-citta.md) |
 | **14** | Il freestyle in piazza, con la folla | da fare | [musica-e-suoni](04-musica-e-suoni.md) |
 | **15** | I progressi si salvano, tre slot | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
 | **16** | La navbar | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |

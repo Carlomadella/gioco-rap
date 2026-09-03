@@ -77,7 +77,13 @@ const bestBeat = () => G.beats.slice().sort((a,b) => b.q-a.q)[0];
 const unmixed  = () => G.songs.filter(s => !s.released && !s.mixed);
 const ready    = () => G.songs.filter(s => !s.released);
 const songQ = (bar, beat) => clamp((bar.q*0.45 + beat.q*0.33 + G.skills.flow*0.35 + gearBonus()) * wellFactor(), 5, 100);
-const mixGain = () => Math.round(6 + (G.gear.monitor?5:0) + (G.gear.cuffie?3:0) + G.skills.flow*0.06);
+/* punto 12: quanto migliora il mix. Ai monitor e alle cuffie si aggiunge **chi
+   c'è dietro al banco**: un fonico conosciuto alla Sala e chiamato dallo
+   Studio vale quanto il rapporto che avete costruito. `typeof` perché
+   studio.js si carica dopo, e perché il gioco deve reggere anche senza. */
+const studioBonus = () => (typeof studioAiutoFonico === "function" ? studioAiutoFonico() : 0);
+const mixGain = () => Math.round(6 + (G.gear.monitor?5:0) + (G.gear.cuffie?3:0) + G.skills.flow*0.06)
+  + studioBonus();
 
 function offerJobs(){
   const pool = JOBS.filter(j => (!j.req || j.req(G)) && (!G.job || G.job.id !== j.id));
@@ -182,7 +188,8 @@ const ACTIONS = [
    need:() => !G.bars.length ? "1 strofa" : !G.beats.length ? "1 beat" : null,
    give:() => {
      const b = bestBar(), bt = bestBeat();
-     return (b && bt ? "1 traccia · qualità ~" + Math.round(songQ(b,bt)) : "1 traccia grezza") + " · −3 benessere";
+     return (b && bt ? "1 traccia · qualità ~" + Math.round(songQ(b,bt) + studioBonus()) : "1 traccia grezza") +
+       " · −3 benessere";
    },
    run(){
      const b = bestBar(), bt = bestBeat();
@@ -190,7 +197,9 @@ const ACTIONS = [
        G.bars.splice(G.bars.indexOf(b),1);
        G.beats.splice(G.beats.indexOf(bt),1);
        if(!G.gear.mic) G.money -= 50;
-       const q = clamp(Math.round(songQ(b,bt) + rnd(-5,6)), 5, 100);
+       /* punto 12: chi sta dietro al vetro conta anche in registrazione — un
+          fonico che ti conosce sa dove metterti la voce prima che glielo chiedi */
+       const q = clamp(Math.round(songQ(b,bt) + studioBonus() + rnd(-5,6)), 5, 100);
        const s2 = {t:nome, q, mixed:false, released:false, week:0, streams:0, last:0,
          txt:b.txt||"", tema:b.tema||"", seed:seed, img:img||""};
        G.songs.push(s2); G.wellbeing = clamp(G.wellbeing-3,0,100);

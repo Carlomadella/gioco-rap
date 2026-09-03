@@ -741,6 +741,158 @@ console.log("\nle certificazioni dei pezzi");
   }
 }
 
+/* Lo Studio (punti 10, 11, 12). Le quattro stanze si aprono davvero, e
+   soprattutto: **la gente conosciuta alla Sala conta**. Un beatmaker con cui
+   sei in confidenza ti fa un beat migliore e te lo fa pagare meno; un fonico
+   dietro al banco alza il mix. Se quel legame si rompe — un `typeof` di
+   troppo, un id che non combacia — lo Studio continua a disegnarsi benissimo
+   e il gioco perde il suo motivo per tornare alla Sala, senza dire niente.
+   Ecco perché si prova qui e non a occhio. */
+console.log("\nlo Studio: la gente della Sala conta");
+{
+  const vm = require("vm");
+  const zitto = () => {};
+  const nodi = {};
+  /* un DOM finto ma con le classi vere: `apriStudio` mette "on" e
+     `renderStudio` non disegna niente se non la trova */
+  function finto(){
+    const cls = new Set();
+    return {
+      innerHTML: "", textContent: "", value: "", dataset: {}, hidden: false,
+      style: { setProperty: zitto, removeProperty: zitto },
+      classList: {
+        add: c => cls.add(c), remove: c => cls.delete(c),
+        contains: c => cls.has(c),
+        toggle: (c, v) => (v === undefined ? (cls.has(c) ? cls.delete(c) : cls.add(c))
+                                           : (v ? cls.add(c) : cls.delete(c)))
+      },
+      offsetWidth: 0, addEventListener: zitto, removeEventListener: zitto,
+      querySelector: () => finto(), querySelectorAll: () => [], appendChild: zitto,
+      set onclick(v){}, get onclick(){ return null; }
+    };
+  }
+  const scatola = {
+    console: { log: zitto, warn: zitto, error: zitto },
+    Math, JSON, Object, Array, String, Number, Boolean, Date, Set, Map,
+    parseInt, parseFloat, isNaN, isFinite, setTimeout: zitto, clearTimeout: zitto,
+    localStorage: { getItem: () => null, setItem: zitto, removeItem: zitto },
+    document: {
+      getElementById: id => nodi[id] || (nodi[id] = finto()),
+      querySelector: () => finto(), querySelectorAll: () => [], addEventListener: zitto,
+      createElement: () => finto(), body: finto()
+    }
+  };
+  scatola.window = scatola;
+  vm.createContext(scatola);
+
+  const sorgenti = ["js/core.js", "js/game/state.js", "js/game/content.js",
+                    "js/game/actions.js", "js/game/beats.js", "js/game/covers.js",
+                    "js/game/rivals.js", "js/game/scene-art.js", "js/game/phases.js",
+                    "js/game/posto.js", "js/game/studio.js"];
+  let acceso = true, errore = null;
+  try{
+    /* i pochi appigli fuori dai file caricati: non devono fare niente */
+    vm.runInContext(`
+      function toast(){} function pushLog(){} function save(){} function renderGioco(){}
+      function gain(){} function addLuc(){} function totalWeeks(){ return G.week; }
+      function chiediTitolo(){} function hubPronta(){ return {ok:true, perche:""}; }
+      function hubAzione(){} function apriFoglio(){} function scegliModo(){}
+      function offriBeat(){ return []; } function adfOggi(){ return 0; }
+      SFX = { tap(){}, rec(){}, fanfare(){}, fail(){} };
+    `, scatola);
+    for(const f of sorgenti)
+      vm.runInContext(fs.readFileSync(path.join(RADICE, f), "utf8"), scatola, { filename: f });
+    vm.runInContext(`
+      G = START();
+      G.money = 5000; G.energy = 100; G.skills.rete = 20;
+      window.ARTIST = { name: "Io", city: "Rovereto", genre: "trap", color: "#FF5A36" };
+    `, scatola);
+  }catch(e){ acceso = false; errore = e; }
+  controlla("lo Studio si carica fuori dal browser", acceso, errore ? [errore.message] : []);
+
+  if(acceso){
+    const dentro = c => vm.runInContext(c, scatola);
+
+    /* due persone conosciute alla Sala: un beatmaker in confidenza e un fonico */
+    dentro(`
+      G.gente = [
+        { id:"bm", ruolo:"beatmaker", n:"Bit", gen:"trap", eta:24, fama:30, car:"pratico",
+          scoperto:true, rel:2, pt:0, ult:-1, feat:-99, skin:"#C68A5C", hair:1, col:"#B026FF" },
+        { id:"fo", ruolo:"fonico", n:"Gigi", gen:"", eta:40, fama:22, car:"aperto",
+          scoperto:false, rel:3, pt:0, ult:-1, feat:-99, skin:"#E8B991", hair:0, col:"#3DC7FF" }
+      ];
+      apriStudio("beat");
+    `);
+    controlla("si apre, e la stanza dei beat elenca chi conosci",
+      nodi["st-corpo"].innerHTML.indexOf("Bit") >= 0 &&
+      nodi["st-corpo"].innerHTML.indexOf('data-beat="bm"') >= 0,
+      nodi["st-corpo"].innerHTML.slice(0, 200));
+
+    /* tutte e quattro le stanze si disegnano: una che esplode manderebbe giù
+       lo Studio intero, e capiterebbe solo a chi ci clicca */
+    const rotte = [];
+    for(const s of ["beat", "cabina", "banco", "fuori"]){
+      try{
+        dentro('STUDIO_SEZ = ' + JSON.stringify(s) + '; renderStudio();');
+        if(!nodi["st-corpo"].innerHTML) rotte.push(s + " (vuota)");
+      }catch(e){ rotte.push(s + " — " + e.message); }
+    }
+    controlla("tutte e quattro le stanze si disegnano", rotte.length === 0, rotte);
+
+    /* il beat su misura: costa, arriva in cartella, e porta il nome di chi l'ha fatto */
+    const soldiPrima = dentro("G.money"), energiaPrima = dentro("G.energy");
+    dentro("studioFattiUnBeat('bm')");
+    const beats = dentro("G.beats");
+    controlla("un beatmaker in confidenza ti fa un beat, e finisce in cartella",
+      beats.length === 1 && beats[0].da === "Bit", JSON.stringify(beats));
+    controlla("e costa: soldi ed energia scendono",
+      dentro("G.money") < soldiPrima && dentro("G.energy") === energiaPrima - 20,
+      "soldi " + soldiPrima + " → " + dentro("G.money") +
+      ", energia " + energiaPrima + " → " + dentro("G.energy"));
+    dentro("studioFattiUnBeat('bm')");
+    controlla("ma uno a settimana: un beatmaker non è un distributore",
+      dentro("G.beats").length === 1, dentro("G.beats").length + " beat");
+
+    /* più siete in confidenza, meglio lo fa e meno lo fa pagare */
+    const q0 = dentro("G.gente[0].rel = 0; studioBeatPrezzo(G.gente[0])");
+    const q5 = dentro("G.gente[0].rel = 5; studioBeatPrezzo(G.gente[0])");
+    controlla("da partner non te lo fa nemmeno pagare", q5 === 0 && q0 > 0,
+      "conoscenza " + q0 + " € · partner " + q5 + " €");
+    dentro("G.gente[0].rel = 1");
+    const s1 = dentro("G.skills.rete = 0; G.gente[0].fama = 30; G.gente[0].rel = 1; studioBeatQualita(G.gente[0])");
+    const s5 = dentro("G.gente[0].rel = 5; studioBeatQualita(G.gente[0])");
+    controlla("e viene meglio: il rapporto vale qualità", s5 > s1, "rel 1 → q" + s1 + ", rel 5 → q" + s5);
+
+    /* il fonico dietro al banco entra nell'economia vera, non in una sua */
+    const mixSolo = dentro("mixGain()");
+    dentro("studioScegliFonico('fo')");
+    const mixCon = dentro("mixGain()");
+    controlla("un fonico chiamato dallo Studio alza il mix di actions.js",
+      mixCon === mixSolo + 6 && dentro("studioAiutoFonico()") === 6,
+      "da solo " + mixSolo + ", con Gigi " + mixCon);
+    dentro("studioScegliFonico('fo')");
+    controlla("e si può rimandare a casa", dentro("mixGain()") === mixSolo,
+      "mix " + dentro("mixGain()"));
+
+    /* chi molla la scena non resta dietro a un banco */
+    dentro("G.gente[1].via = true; studioScegliFonico('fo');");
+    controlla("chi lascia il giro non lavora più in studio",
+      dentro("studioFonico()") === null && dentro("mixGain()") === mixSolo);
+
+    /* Prima del punto 12 il cartello «Studio» sulla mappa portava dritto
+       all'elenco delle mosse della settimana, ed era da lì che ci si passava:
+       sostituirlo con le quattro stanze senza lasciare quella porta avrebbe
+       tolto di mezzo scrivere le barre, la promo, il palco e i turni. */
+    dentro("STUDIO_SEZ = 'beat'; renderStudio();");
+    controlla("la porta verso il resto della settimana non si è chiusa",
+      nodi["st-corpo"].innerHTML.indexOf('data-mosse') >= 0);
+    dentro("G.bars = []; G.beats = []; STUDIO_SEZ = 'cabina'; renderStudio();");
+    controlla("e senza strofa la cabina non è un vicolo cieco: si scrive da lì",
+      nodi["st-corpo"].innerHTML.indexOf('data-az="scrivi"') >= 0,
+      nodi["st-corpo"].innerHTML.slice(0, 200));
+  }
+}
+
 console.log("\nil build");
 const dist = path.join(RADICE, "dist");
 if(!fs.existsSync(path.join(dist, "index.html"))){

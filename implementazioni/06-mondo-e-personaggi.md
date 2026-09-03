@@ -420,3 +420,37 @@ disegno sopra.
 
     File toccati: `js/game/posto.js`, `js/game/chat.js`, `js/game/sim.js`, `js/game/ui.js`,
     `index.html`.
+
+---
+
+## 14 · I dialoghi devono tornare fra di loro
+
+14. Ci sono da correggere molte meccaniche di gioco; ad esempio in una conversazione in
+    studio noto che con uno alla domanda «Mi presti il microfono» anche se gli dico di no
+    l'amicizia con questo aumenta. Verifica che siano tutti coerenti tra di loro i dialoghi
+    svolgendo simulazioni di gioco effettive.
+
+    **FATTO (03/09/2026)** — `js/game/posto.js`, `strumenti/prova.js`.
+
+    Era vero, e non era quella battuta: **era la regola.** Il bonus «hai capito che tipo è»
+    — +1 quando la risposta è quella giusta per il carattere di chi hai davanti — si sommava
+    a **tutte** le risposte, comprese quelle che valgono zero o meno. Così «gli dici che te
+    lo tieni per te» (zero punti, etichettata «diffidente») davanti a uno diffidente
+    diventava +1, e l'amicizia saliva **dicendo di no**.
+
+    Adesso il bonus vale solo dove c'è già un passo verso di lui. Aver capito che tipo è
+    resta vero comunque — `scoperto` si segna lo stesso: è la conoscenza, ed è giusta; è il
+    *rapporto* che non deve crescere quando ti sei tirato indietro.
+
+    La seconda metà della richiesta — «verifica che siano tutti coerenti svolgendo
+    simulazioni di gioco effettive» — è diventata una prova che **gioca davvero**, invece di
+    leggere il codice: ogni situazione, per ogni risposta, contro ognuno dei quattro
+    caratteri, chiamando la `poRispondi()` vera. Sono 57 situazioni × 171 risposte × 4
+    caratteri = **684 conversazioni giocate a ogni `npm run prova`**, e la domanda che fa è
+    sempre quella: c'è un rifiuto che fa amicizia? Al primo giro ne ha trovati quindici,
+    sparsi su tutti e quattro i ruoli. Adesso zero, e se qualcuno ne riscrive uno male lo
+    dice subito.
+
+    Nello stesso giro anche i controlli scemi che non c'erano: ogni situazione con almeno
+    due risposte e nessuna ripetuta, ogni risposta con un testo, punti nella scala giusta e
+    un carattere che esiste davvero.

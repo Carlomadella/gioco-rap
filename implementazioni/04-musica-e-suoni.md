@@ -194,3 +194,106 @@ cliccando sopra si ferma, come dice il codice.
     ferma a ventisei come deve.
 
     File toccati: `js/game/ui.js`, `js/game/sim.js`, `css/game.css`, `index.html`.
+
+---
+
+## 10, 11, 12 · Lo Studio: una stanza sua, e tantissimo gameplay dentro
+
+10. Lo studio lo terrei sempre aperto.
+
+11. Beatmaker integriamola a una sezione dello studio.
+
+12. Tantissimo del gameplay noi vogliamo che si sviluppi in STUDIO, essendo un simulatore
+    della vita da RAPPER. Quindi = Dobbiamo sicuramente sviluppare un'altra interfaccia e
+    proprio dei veri scenari all'interno dello studio, dalla sezione in cui creeremo
+    rapporto coi vari beatmaker, alla parte in cui andremo a mixare i pezzi, TUTTO.
+
+    **FATTO (03/09/2026)** — `js/game/studio.js`, `css/studio.css`. Lo Studio non è più una
+    scorciatoia alla linguetta della settimana: è una stanza sua, con dentro le **quattro
+    fasi vere di un pezzo**, che sono anche le sue quattro sezioni.
+
+    | | cosa ci si fa |
+    | --- | --- |
+    | **Il beat** | chi te lo fa, e a che condizioni |
+    | **La cabina** | la strofa e il beat diventano una traccia |
+    | **Il banco** | il fonico la mixa |
+    | **Fuori** | esce, e da lì corre da sola |
+
+    **Qui non si rifà l'economia del gioco.** I numeri stanno tutti in `actions.js` e ci
+    restano: lo Studio chiama le stesse azioni della settimana. Quello che aggiunge — ed è
+    il punto del 12 — è **chi c'è dentro.**
+
+    - **Il beat non è più una voce di listino.** Te lo fa una persona conosciuta alla Sala,
+      e il rapporto che avete comanda tutto: da «contatto» in su te lo fa, più siete in
+      confidenza meglio viene, il prezzo cala a ogni gradino e da «fidato» non te lo fa
+      nemmeno pagare. Non passa dal mercato — ti finisce in cartella, perché non l'hai
+      comprato, te l'ha fatto uno che ti conosce, e il beat si porta dietro il suo nome.
+      Uno a settimana a testa: un beatmaker non è un distributore.
+    - **Il mix non è più un +6 fisso.** Dietro al banco ci sta un fonico con un nome, che
+      si chiama dalla Cabina e resta finché non lo cambi. Quanto ti migliora il pezzo
+      dipende da dove siete arrivati voi due, e vale sia in registrazione che al mix —
+      entra dentro a `mixGain()` e a `songQ()`, cioè nell'economia vera, non in una sua.
+
+    È il loop scritto nella ROADMAP — cerco, mi muovo, conosco, creo rapporti, ottengo
+    occasioni, miglioro — chiuso su se stesso invece che interrotto a metà: alla Sala si
+    conosce la gente, in studio ci si lavora insieme, e la differenza si vede nel pezzo.
+
+    **Punto 10** — lo studio è sempre aperto (`js/game/orari.js`). È un simulatore di vita
+    da rapper, e la vita da rapper in studio è di notte: trovare la porta chiusa alle tre
+    perché l'orario dice così non aggiunge niente al gioco, toglie soltanto la cosa che uno
+    era venuto a fare. Gli altri posti gli orari li tengono — è la differenza fra il tuo
+    mestiere e il resto della città.
+
+    **Punto 11** — «Beat Maker» sulla mappa non è più un secondo ingresso della Sala:
+    porta alla sezione dei beat dello Studio, e l'azione «cerca un beat» segue l'orario
+    dello studio invece di quello della Sala. I due edifici restano due edifici disegnati
+    (punto 45), ma adesso portano in due posti diversi davvero.
+
+    **Una cosa da non perdere di vista**: il cartello «Studio» era la porta da cui si
+    arrivava all'elenco delle mosse della settimana. Sostituirla con le quattro stanze
+    senza lasciare quella strada avrebbe tolto di mezzo scrivere le barre, la promo, il
+    palco e i turni — quindi in fondo a ogni stanza c'è «tutte le mosse della settimana →»,
+    e la Cabina senza strofa non è un vicolo cieco: da lì si scrive. C'è una prova apposta
+    che lo tiene fermo, perché è il tipo di cosa che si rompe zitta.
+
+    Provato con quattordici controlli in `strumenti/prova.js`, che **giocano** invece di
+    leggere il codice: le quattro stanze si disegnano, il beat su misura costa e arriva in
+    cartella col nome di chi l'ha fatto, il prezzo scende col rapporto, il fonico alza
+    davvero `mixGain()`, e chi molla la scena non resta dietro a un banco.
+
+    File toccati: `js/game/studio.js`, `css/studio.css`, `js/game/hub.js`,
+    `js/game/orari.js`, `js/game/actions.js`, `index.html`, `strumenti/prova.js`.
+
+---
+
+## 13 · I dischi: oro, platino, diamante
+
+13. Implementare il disco d'oro (500K stream), disco di diamante (1 MLN stream) e disco di
+    platino (ottenibile dopo i 10× dischi di platino a singolo brano/progetto).
+
+    **FATTO (03/09/2026)** — `js/game/content.js`, `js/game/sim.js`, `js/game/ui.js`.
+
+    Un disco d'oro non è un traguardo del giocatore: è del **pezzo**, e gli resta attaccato
+    per sempre — è la riga che uno si mette in firma cinque anni dopo. I traguardi (`GOALS`,
+    e quelli che dà il server) guardano la carriera intera; questi guardano un brano.
+
+    | | soglia |
+    | --- | --- |
+    | Disco d'oro | 500.000 ascolti |
+    | Disco di platino | 1.000.000 |
+    | Disco di diamante | 10.000.000 (il 10× del platino) |
+
+    I multipli contano: oltre il milione si legge «2× platino», «3× platino», fino al
+    diamante. È così che si legge una certificazione vera, ed è anche quello che fa venire
+    voglia di rimettere in giro un pezzo vecchio.
+
+    Si vede nella discografia accanto al titolo, e soprattutto **la settimana che arriva**:
+    il giro di settimana guarda il gradino prima e dopo, e se è salito lo dice grosso nel
+    diario invece di lasciartelo scoprire tre mesi dopo aprendo una lista.
+
+    **Sulla scala, una nota onesta.** Quella scritta nel punto non tornava: il diamante
+    messo a un milione, quindi *sotto* al platino, e il platino definito con se stesso
+    («dopo i 10× dischi di platino»). È stata rimessa nell'ordine che ha nel mondo tenendo i
+    numeri dati. Siccome è un'interpretazione e non un fatto, sta scritta nero su bianco in
+    una prova (`strumenti/prova.js`): se si cambia idea, si cambia lì e si vede subito cosa
+    si sta cambiando.
