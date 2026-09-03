@@ -61,19 +61,19 @@ const HUB_LUOGHI = [
   /* punto 12: lo studio non è più una scorciatoia alla linguetta della
      settimana — è una stanza sua, con dentro le quattro fasi di un pezzo e la
      gente che ci lavora (js/game/studio.js). Punto 10: è sempre aperto. */
-  {id:"studio", n:"Studio", x:5.86, y:1.67, w:16.60, h:23.33,
+  {id:"studio", n:"Studio", x:19.50, y:56.00, w:10.50, h:12.50,
    vai:() => apriStudio("beat")},
   /* punto 59/61: era un cartello chiuso («Club & discoteche», ancora dentro
      alla foto — cambia solo quando cambia la mappa, punto 45); qui sotto
      adesso c'è un lavoro vero, part time. */
-  {id:"pizzeria", n:"Pizzeria", x:80.08, y:49.17, w:19.92, h:22.50,
+  {id:"pizzeria", n:"Pizzeria", x:49.00, y:68.00, w:12.50, h:17.00,
    vai:() => schedaLavoro("lavapiatti", "Pizzeria")},
   /* punto 48: non più un cartello chiuso — è dove si va a fare l'open mic,
      che esisteva già come azione ma non aveva un posto sulla mappa. Se non
      hai ancora un pezzo fuori il palco non c'è, ma lo dice, non fa finta di
      niente. Nella mappa definitiva il cartello dice «Live Club», il posto
      resta lo stesso di sempre (id "concerti"). */
-  {id:"concerti", n:"Live Club", x:58.27, y:14.17, w:12.37, h:23.33,
+  {id:"concerti", n:"Live Club", x:33.00, y:20.00, w:14.00, h:13.50,
    vai:() => {
      const pronto = hubPronta("live");
      if(pronto.ok) hubAzione("live");
@@ -81,18 +81,18 @@ const HUB_LUOGHI = [
        ". Il palco vero aspetta un pezzo pubblicato."});
    }},
   /* il beat maker non è un listino: è la sala dove si conosce la gente */
-  {id:"beat", n:"La Sala", x:41.34, y:6.67, w:16.60, h:25.67,
+  {id:"beat", n:"La Sala", x:49.50, y:20.00, w:11.00, h:13.50,
    vai:() => apriPosto()},
   /* punto 11: «Beat Maker» non è più un secondo ingresso della Sala. Il
      lavoro sul beat è **una sezione dello studio**, e il cartello ci porta
      dritto: alla Sala si conosce la gente, in studio ci si fa il pezzo.
      I due edifici restano due edifici disegnati (punto 45, le targhette sono
      dentro al pixel), ma adesso portano in due posti diversi davvero. */
-  {id:"beatmaker", n:"Beat Maker", x:22.79, y:25.00, w:18.23, h:24.17,
+  {id:"beatmaker", n:"Beat Maker", x:33.50, y:43.00, w:7.00, h:10.50,
    vai:() => apriStudio("beat")},
   /* punto 60: si chiamava «Vita quotidiana» — la palestra è uscita da qui
      ed è diventata un posto suo (punto 61), resta stacca la spina e i conti */
-  {id:"vita", n:"Casa", x:9.77, y:50.33, w:15.95, h:18.00,
+  {id:"vita", n:"Casa", x:16.50, y:67.00, w:14.50, h:16.50,
    vai:() => showEvent({k:"Casa", t:"Stacca la spina o guarda i conti",
      d:"La settimana non è solo musica. Ogni tanto la testa va spenta, e i conti vanno guardati.",
      annulla(){},
@@ -104,17 +104,17 @@ const HUB_LUOGHI = [
      ]})},
   /* punto 21/57: la Strada, ricostruita da claude/carriera-criminale.md
      (js/game/strada-crimine.js) — non era mai stata scritta, solo pensata */
-  {id:"crimin", n:"Attività criminali", x:4.88, y:69.17, w:21.16, h:30.83,
+  {id:"crimin", n:"Attività criminali", x:0.50, y:64.00, w:13.00, h:16.00,
    vai:() => (G.strada && G.strada.arresto && typeof apriCarcere === "function")
   ? apriCarcere()
   : apriStrada()},
   /* punto 59: il secondo lavoro, full time — era «Sponsor & brand» */
-  {id:"fabbrica", n:"Fabbrica", x:76.82, y:15.83, w:23.18, h:27.50,
+  {id:"fabbrica", n:"Fabbrica", x:79.00, y:28.00, w:20.00, h:22.00,
    vai:() => schedaLavoro("operaio", "Fabbrica")},
   /* punto 61: la palestra esce dal sottomenu di Casa e diventa un posto
      suo — era «Business», un altro cartello chiuso senza niente dietro.
      Punto 9: non è più un pulsante solo — si sceglie cosa fare, come a Casa. */
-  {id:"palestra", n:"Palestra", x:66.73, y:70.83, w:17.58, h:29.17,
+  {id:"palestra", n:"Palestra", x:71.50, y:75.00, w:17.50, h:17.00,
    vai:() => showEvent({k:"Palestra", t:"Che allenamento fai?",
      d:"Il fisico che si vede sotto le luci, o la testa che si svuota prima di scrivere: scegli tu.",
      annulla(){},
@@ -126,7 +126,7 @@ const HUB_LUOGHI = [
      ]})},
   /* punto 48: idem — l'attrezzatura da studio è già nel catalogo, la vetrina
      non deve stare spenta se quello che promette esiste già */
-  {id:"shop", n:"Shop", x:49.15, y:38.67, w:9.77, h:11.33,
+  {id:"shop", n:"Shop", x:43.50, y:30.00, w:15.00, h:11.50,
    vai:() => hubGioco("catalogo", "gear")},
   /* punto 6: il centro per l'impiego, arrivato con la mappa definitiva.
      Apre tutti i lavori (JOBS), non solo i due che hanno già un edificio —
@@ -135,7 +135,7 @@ const HUB_LUOGHI = [
      posto giocabile. Il cartello nella foto resta — punto 45, le targhette
      sono dentro al pixel — ma senza una zona da toccare sopra non fa più
      niente, come «Periferia» o «Centro». */
-  {id:"impiego", n:"Centro per l'impiego", x:53.06, y:50.00, w:12.37, h:21.67,
+  {id:"impiego", n:"Centro per l'impiego", x:60.00, y:21.50, w:18.50, h:18.50,
    vai:() => schedaImpiego()}
 ];
 
@@ -143,6 +143,109 @@ const HUB_LUOGHI = [
 /* Non sono cartelli finti: ognuno fa partire un'azione vera della settimana,
    con il suo costo e i suoi rischi. Il colpo rapido è l'unico che ancora non
    c'è, e lo dice invece di far finta. */
+/* Mappa nuova: nomi dei luoghi come UI, non testo raster nell'immagine. */
+const HUB_PIN_COLOR = Object.freeze({
+  studio:"#A855F7",
+  pizzeria:"#FF5A36",
+  concerti:"#EC4899",
+  beat:"#A855F7",
+  beatmaker:"#4ADE80",
+  vita:"#FB923C",
+  crimin:"#EF4444",
+  fabbrica:"#CBD5E1",
+  palestra:"#38BDF8",
+  shop:"#0EA5E9",
+  impiego:"#22D3EE"
+});
+
+/* Quartieri UI. Le strade principali sono fasce neutre e fanno da confine naturale. */
+const HUB_DISTRICT = Object.freeze({
+  studio:"periferia",
+  beatmaker:"periferia",
+  vita:"periferia",
+  crimin:"periferia",
+  concerti:"centro",
+  beat:"centro",
+  shop:"centro",
+  impiego:"centro",
+  fabbrica:"industriale",
+  pizzeria:"industriale",
+  palestra:"industriale"
+});
+
+/* V5-strade approvata: nessuna sovrapposizione tra i tre quartieri. */
+const HUB_DISTRICT_POLY = Object.freeze({
+  periferia:[[0,0],[18,0],[18,23],[20,26],[25,30],[30,34],[35,39],[38,45],[39,52],[38,58],[36,65],[36,72],[38,80],[44,89],[50,100],[0,100]],
+  centro:[[22,0],[100,0],[100,23],[88,28],[82,31],[76,36],[70,40],[64,45],[58,49],[52,52],[48,55],[46,50],[43,40],[38,33],[33,28],[28,24],[24,21]],
+  industriale:[[89,30],[100,30],[100,100],[59,100],[54,96],[48,89],[44,82],[42,75],[42,68],[45,61],[52,55],[61,51],[70,47],[79,40],[86,32]]
+});
+
+let HUB_QUARTIERE = "";
+
+function hubDentroPoligono(x, y, poly){
+  let dentro = false;
+  for(let i=0, j=poly.length-1; i<poly.length; j=i++){
+    const xi=poly[i][0], yi=poly[i][1];
+    const xj=poly[j][0], yj=poly[j][1];
+    const incrocia=((yi>y)!==(yj>y)) &&
+      (x < (xj-xi)*(y-yi)/((yj-yi)||0.000001)+xi);
+    if(incrocia) dentro=!dentro;
+  }
+  return dentro;
+}
+
+function hubQuartiereDaPunto(x, y){
+  for(const id of ["periferia","centro","industriale"]){
+    if(hubDentroPoligono(x,y,HUB_DISTRICT_POLY[id])) return id;
+  }
+  return "";
+}
+
+function hubSetQuartiere(id){
+  HUB_QUARTIERE = id || "";
+  const foto = document.getElementById("hb-foto");
+  if(foto){
+    if(HUB_QUARTIERE) foto.dataset.district = HUB_QUARTIERE;
+    else delete foto.dataset.district;
+  }
+  document.querySelectorAll("#hb-pins .pspot[data-l]").forEach(btn => {
+    const q = HUB_DISTRICT[btn.dataset.l] || "";
+    btn.classList.toggle("district-active", !!HUB_QUARTIERE && q === HUB_QUARTIERE);
+  });
+  document.querySelectorAll("#hb-districts .pdistrict").forEach(poly => {
+    poly.classList.toggle("active", !!HUB_QUARTIERE && poly.dataset.district === HUB_QUARTIERE);
+  });
+}
+
+function hubPuntoPercentuale(ev){
+  const foto = document.getElementById("hb-foto");
+  if(!foto) return null;
+  const r=foto.getBoundingClientRect();
+  if(!r.width || !r.height) return null;
+  return {x:(ev.clientX-r.left)/r.width*100,y:(ev.clientY-r.top)/r.height*100};
+}
+
+function hubInitQuartieri(){
+  const foto=document.getElementById("hb-foto");
+  if(!foto || foto.dataset.districtBound==="1") return;
+  foto.dataset.districtBound="1";
+  foto.addEventListener("pointermove", ev => {
+    if(ev.pointerType && ev.pointerType !== "mouse") return;
+    const p=hubPuntoPercentuale(ev);
+    hubSetQuartiere(p ? hubQuartiereDaPunto(p.x,p.y) : "");
+  });
+  foto.addEventListener("pointerleave", ev => {
+    if(!ev.pointerType || ev.pointerType === "mouse") hubSetQuartiere("");
+  });
+  foto.addEventListener("click", ev => {
+    if(ev.target.closest(".pspot,.pfrec")) return;
+    const p=hubPuntoPercentuale(ev);
+    if(!p) return;
+    const q=hubQuartiereDaPunto(p.x,p.y);
+    if(q) hubSetQuartiere(HUB_QUARTIERE===q ? "" : q);
+    else hubSetQuartiere("");
+  });
+}
 const HUB_EVENTI = [
   {id:"free", ic:"mic", k:"#A855F7", n:"Freestyle al bar centrale",
    d:"Freestyle contest aperto a tutti.", ora:"21:00",
@@ -450,13 +553,17 @@ function renderHub(){
   /* ---- i luoghi sulla mappa ---- */
   $("hb-pins").innerHTML = HUB_LUOGHI.map((l, i) =>
     '<button class="pspot' + (l.chiuso ? " chiuso" : "") + (HUB_QUI === i ? " qui" : "") +
-    '" data-l="' + l.id + '" style="--x:' + l.x + '%;--y:' + l.y + '%;--w:' + l.w + '%;--h:' + l.h + '%" ' +
-    'aria-label="' + l.n + (l.chiuso ? " — chiuso" : "") + '" title="' + l.n + '"></button>').join("") +
+    '" data-l="' + l.id + '" data-district="' + (HUB_DISTRICT[l.id] || "") +
+    '" style="--x:' + l.x + '%;--y:' + l.y + '%;--w:' + l.w + '%;--h:' + l.h +
+    '%;--pk:' + (HUB_PIN_COLOR[l.id] || "#C084FC") + '" ' +
+    'aria-label="' + l.n + (l.chiuso ? " — chiuso" : "") + '" title="' + l.n + '">' +
+    '<span class="pspot-dot"></span><span class="pspot-tag"><i></i><b>' + l.n + '</b></span></button>').join("") +
     '<button class="pfrec" data-f="-1" aria-label="Luogo precedente" ' +
       'style="--x:34.82%;--y:93.5%;--w:5.06%;--h:4.28%"></button>' +
     '<button class="pfrec" data-f="1" aria-label="Luogo successivo" ' +
       'style="--x:56.02%;--y:93.5%;--w:5.06%;--h:4.28%"></button>';
-
+  hubInitQuartieri();
+  hubSetQuartiere(HUB_QUARTIERE);
   /* ---- gli eventi di oggi ---- */
   $("hb-eventi").innerHTML = HUB_EVENTI.map(e => {
     const st = hubDetenuto()

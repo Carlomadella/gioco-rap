@@ -232,7 +232,20 @@
       <div class="pcolcentro">
             <div class="pcard pmappa">
         <div class="pfoto" id="hb-foto">
-          <div class="ppins" id="hb-pins"></div>
+          <div class="pmaplayers" aria-hidden="true">
+            <div class="pmaplayer pmap-day"></div>
+            <div class="pmaplayer pmap-sunset"></div>
+            <div class="pmaplayer pmap-night"></div>
+          </div>
+          <svg class="pdistricts" id="hb-districts" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+  <polygon class="pdistrict" data-district="periferia"
+    points="0,0 18,0 18,23 20,26 25,30 30,34 35,39 38,45 39,52 38,58 36,65 36,72 38,80 44,89 50,100 0,100"></polygon>
+  <polygon class="pdistrict" data-district="centro"
+    points="22,0 100,0 100,23 88,28 82,31 76,36 70,40 64,45 58,49 52,52 48,55 46,50 43,40 38,33 33,28 28,24 24,21"></polygon>
+  <polygon class="pdistrict" data-district="industriale"
+    points="89,30 100,30 100,100 59,100 54,96 48,89 44,82 42,75 42,68 45,61 52,55 61,51 70,47 79,40 86,32"></polygon>
+</svg>
+<div class="ppins" id="hb-pins"></div>
         </div>
       </div>
 
@@ -708,6 +721,8 @@
 <script src="js/game/meteo.js?v=2"></script>
 <!-- Widget unico tempo/meteo + controlli globali. -->
 <script src="js/game/tempo-controlli.js?v=13"></script>
+<!-- Luce della città: crossfade dei tre render sul clock di gioco. -->
+<script src="js/game/mappa-luce.js?v=1"></script>
 
 <!-- Il pannello delle impostazioni: per ultimo, tocca roba definita ovunque. -->
 <script src="js/impostazioni-ui.js?v=12"></script>

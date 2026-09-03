@@ -30,6 +30,26 @@
   const MAP_W = 1536;
   const MAP_H = 600;
 
+  /* Geometria TRAVEL congelata sulla mappa 1536×600 in uso fino al punto 6.
+     Le coordinate visuali di HUB_LUOGHI possono quindi essere riposizionate
+     su una nuova grafica senza cambiare per sbaglio i 15/30/45/60 minuti
+     dei tragitti già bilanciati.
+
+     Sono i CENTRI percentuali degli hotspot originali, non nuove distanze. */
+  const TRAVEL_POS = Object.freeze({
+    studio:    {x:14.160, y:13.335},
+    pizzeria:  {x:90.040, y:60.420},
+    concerti:  {x:64.455, y:25.835},
+    beat:      {x:49.640, y:19.505},
+    beatmaker: {x:31.905, y:37.085},
+    vita:      {x:17.745, y:59.330},
+    crimin:    {x:15.460, y:84.585},
+    fabbrica:  {x:88.410, y:29.580},
+    palestra:  {x:75.520, y:85.415},
+    shop:      {x:54.035, y:44.335},
+    impiego:   {x:59.245, y:60.835}
+  });
+
   /* Solo i lavori che hanno già un punto fisico esplicito sulla mappa. */
   const JOB_PLACE = Object.freeze({
     lavapiatti:"pizzeria",
@@ -64,9 +84,16 @@
   }
 
   function centro(l){
+    const travel = l && TRAVEL_POS[l.id];
+    const px = travel
+      ? travel.x
+      : (Number(l.x)||0) + (Number(l.w)||0)/2;
+    const py = travel
+      ? travel.y
+      : (Number(l.y)||0) + (Number(l.h)||0)/2;
     return {
-      x: ((Number(l.x)||0) + (Number(l.w)||0)/2) / 100 * MAP_W,
-      y: ((Number(l.y)||0) + (Number(l.h)||0)/2) / 100 * MAP_H
+      x: px / 100 * MAP_W,
+      y: py / 100 * MAP_H
     };
   }
 

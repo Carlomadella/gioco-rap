@@ -536,7 +536,7 @@ body.in-hub .topnav {
   position: absolute;
   inset: -40px;
   z-index: 0;
-  background: url("../media/photo/pagina di gioco/mappa_citta.jpg?v=3") center/cover
+  background: url("../media/photo/pagina di gioco/mappa_citta_giorno.png") center/cover
     no-repeat;
   filter: blur(46px) brightness(0.38) saturate(1.15);
   transform: scale(1.12);
@@ -544,24 +544,53 @@ body.in-hub .topnav {
 /* La foto tiene le sue proporzioni (1536×600, il ritaglio della mappa
    definitiva — punto 6) e prende tutto lo spazio che può: è quello che fa
    restare le zone da toccare esattamente sui cartelli. */
+/* Mappa v2: il viewport mantiene il rapporto del crop approvato.
+   Nessuna immagine viene stirata: tutti i layer condividono lo stesso frame,
+   quindi anche gli hotspot percentuali restano geometricamente coerenti. */
 .pfoto {
   position: relative;
   z-index: 1;
-  aspect-ratio: 1536/600;
-  height: 100%;
-  width: auto;
+  aspect-ratio: 1672/941;
+  width: 100%;
+  height: auto;
   max-width: 100%;
+  max-height: 100%;
   border-radius: 12px;
   overflow: hidden;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.07),
     0 18px 50px rgba(0, 0, 0, 0.5);
-  background: #0a0910 url("../media/photo/pagina di gioco/mappa_citta.jpg?v=3")
-    center/100% 100% no-repeat;
+  background: #0a0910;
+}
+
+.pmaplayers {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.pmaplayer {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0;
+}
+.pmap-day {
+  background-image: url("../media/photo/pagina di gioco/mappa_citta_giorno.png");
+  opacity: 1;
+}
+.pmap-sunset {
+  background-image: url("../media/photo/pagina di gioco/mappa_citta_tramonto.png");
+}
+.pmap-night {
+  background-image: url("../media/photo/pagina di gioco/mappa_citta_notte.png");
 }
 .ppins {
   position: absolute;
   inset: 0;
+  z-index: 2;
 }
 /* Le zone da toccare stanno **sopra a una foto**, e una foto non è uno sfondo
    piatto: un rettangolo di colore tutto intorno al palazzo ci si appiccica
@@ -677,6 +706,98 @@ body.in-hub .topnav {
   );
   box-shadow: none;
 }
+/* MAPPA V2 — quartieri interattivi */
+.pdistricts {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.pdistrict {
+  stroke: none;
+  fill: rgba(255,255,255,0);
+  transition: fill .18s ease;
+}
+.pdistrict.active {
+  fill: rgba(255,255,255,.045);
+}
+.pspot-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  transform: translate(-50%,-50%);
+  background: var(--pk);
+  border: 2px solid rgba(7,9,14,.88);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.24), 0 0 9px var(--pk);
+  pointer-events: none;
+  opacity: .94;
+  transition: transform .15s ease, opacity .15s ease;
+}
+.pspot:hover .pspot-dot,
+.pspot:focus-visible .pspot-dot,
+.pspot.qui .pspot-dot,
+.pspot.district-active .pspot-dot {
+  transform: translate(-50%,-50%) scale(1.22);
+  opacity: 1;
+}
+
+/* MAPPA V2 — targhette HTML */
+.pspot {
+  overflow: visible;
+}
+.pspot-tag {
+  opacity: 0;
+  position: absolute;
+  left: 50%;
+  top: 7px;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 28px;
+  padding: 5px 9px;
+  border-radius: 9px;
+  white-space: nowrap;
+  pointer-events: none;
+  background: rgba(7, 9, 14, 0.91);
+  border: 1px solid rgba(255,255,255,.17);
+  box-shadow: 0 7px 18px rgba(0,0,0,.42), inset 0 0 0 1px rgba(255,255,255,.025);
+  color: #f7f8fb;
+  font: 900 clamp(8px, .67vw, 11px)/1 Figtree, system-ui, sans-serif;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0,0,0,.75);
+  transition: transform .15s ease, border-color .15s ease, background .15s ease, opacity .15s ease;
+}
+.pspot-tag i {
+  display: block;
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 3px;
+  background: var(--pk);
+  box-shadow: 0 0 10px var(--pk);
+}
+.pspot-tag b {
+  font: inherit;
+}
+.pspot:hover .pspot-tag,
+.pspot:focus-visible .pspot-tag,
+.pspot.qui .pspot-tag,
+.pspot.district-active .pspot-tag {
+  transform: translateX(-50%) translateY(-2px);
+  border-color: var(--pk);
+  background: rgba(7, 9, 14, 0.97);
+}
+.pspot.chiuso .pspot-tag {
+  opacity: .72;
+}
+
 /* il giro guidato dei luoghi, con le frecce «scorri per esplorare» */
 .pspot.qui {
   --vis: 1;
@@ -1167,4 +1288,21 @@ body.in-hub .topnav {
     margin-top: 5px;
     gap: 3px;
   }
+}
+
+/* FIX MAPPA V2 — visibilita nomi quartiere */
+.pspot:hover .pspot-tag,
+.pspot:focus-visible .pspot-tag,
+.pspot.qui .pspot-tag,
+.pspot.district-active .pspot-tag {
+  opacity: 1;
+}
+
+/* MAPPA V2 — luce dinamica clock */
+.pmaplayer {
+  transition: opacity var(--map-light-ms, 900ms) linear;
+  will-change: opacity;
+}
+#hb-foto.map-light-instant .pmaplayer {
+  transition: none !important;
 }
