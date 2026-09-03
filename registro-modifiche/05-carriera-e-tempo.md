@@ -6,6 +6,22 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:eab276a -->
+## 03/09/26, 09:29 — fix: allinea agenda alla disponibilita runtime
+
+**Tipo:** Commit diretto su main  
+**Autore:** Mycol (mycolbraga@gmail.com)  
+**Commit:** `eab276a`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/telefono.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:6f4d15e -->
 ## 03/09/26, 02:57 — fix: unifica La Sala e Beat Maker come luogo logico
 

@@ -6,6 +6,22 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:eab276a -->
+## 03/09/26, 09:29 — fix: allinea agenda alla disponibilita runtime
+
+**Tipo:** Commit diretto su main  
+**Autore:** Mycol (mycolbraga@gmail.com)  
+**Commit:** `eab276a`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:b2122c7 -->
 ## 03/09/26, 03:06 — fix: separa messaggi e notifiche nel telefono compatto
 
