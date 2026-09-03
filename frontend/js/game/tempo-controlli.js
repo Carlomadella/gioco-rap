@@ -172,7 +172,9 @@
     catch(_){ return false; }
   }
   function blockingOverlay(){
+    const detenuto=!!(G.strada&&G.strada.arresto);
     for(const sel of ["#modal.on","#report.on","#crimeModal.on","#adf-result-overlay.on","#adf-social-overlay.on","#adf-social-banner.show"]){
+      if(sel==="#report.on" && detenuto) continue;
       if(document.querySelector(sel)) return true;
     }
     return false;

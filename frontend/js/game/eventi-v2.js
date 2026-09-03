@@ -184,11 +184,17 @@ function resetNormal(){
   s.nextNormalAt=2+Math.floor(Math.random()*2);
 }
 function overlayBusy(){
+  const detenuto=!!(G.strada&&G.strada.arresto);
   try{
-    if(typeof overlayAperto==="function" && overlayAperto()) return true;
+    if(typeof overlayAperto==="function" && overlayAperto()){
+      const report=document.getElementById("report");
+      const soloReport=detenuto && report && report.classList.contains("on");
+      if(!soloReport) return true;
+    }
   }catch(_){}
   const ids=["modal","report","writer","piazza","scena","posto","strada-crimine","negozio","adf-result-overlay","adf-social-overlay"];
   for(const id of ids){
+    if(id==="report" && detenuto) continue;
     const el=document.getElementById(id);
     if(el && el.classList.contains("on")) return true;
   }
@@ -2307,6 +2313,7 @@ function finishSkipLog(done,lucPrima,wellPrima,newNotifications,interrupted){
 saltaGiorni=function(n){
   if(G.ended || n<=0) return;
   if(!weekOpen) openWeek();
+  const detenutoPrimaDelSalto=!!(G.strada&&G.strada.arresto);
   const before=weekOpen, costiSettimana=weeklyCosts();
   const lucPrima=luc(), wellPrima=G.wellbeing;
   const s=st(), chainBefore=s.skip1Chain;
@@ -2385,7 +2392,15 @@ saltaGiorni=function(n){
   save();
 
   if(weeks>0){
-    weekReport(before,costiSettimana*weeks);
+    if(!detenutoPrimaDelSalto){
+      weekReport(before,costiSettimana*weeks);
+    }else{
+      /* Lo skip è partito dal carcere: anche se questa settimana contiene
+         la scarcerazione, il report legacy non deve restare .on dietro alla
+         schermata successiva e bloccare il widget del tempo. */
+      const report=document.getElementById("report");
+      if(report) report.classList.remove("on");
+    }
     openWeek();
   }else renderGioco();
 

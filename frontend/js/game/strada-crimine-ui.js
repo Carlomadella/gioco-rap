@@ -8,6 +8,86 @@
   const clampN=(v,a,b)=>Math.max(a,Math.min(b,Number(v)||0));
   const CRIME_DURATIONS={consegne:90,scotta:120,cassa:150,macchina:150};
   let activeBg=0,bgHistory=[],bgTimer=null,lastPhoneAt=0;
+  let jailBgTimer=null,jailBgLast="",jailBgActive=0,jailTransitionBusy=false,jailLastPhrase="";
+
+  const JAIL_ARREST_PHRASES = [
+    ["Ti hanno","bevuto."],
+    ["Ti hanno","fatto."],
+    ["Stavolta ti hanno","preso."],
+    ["Sei finito","dentro."],
+    ["Ti hanno messo","al fresco."],
+    ["Ti hanno","chiuso."],
+    ["Le manette sono","scattate."],
+    ["La corsa finisce","qui."],
+    ["Non l'hai fatta","franca."],
+    ["Stavolta è andata","male."]
+  ];
+
+  function jailPickArrestPhrase(){
+    const s=street()||{},a=s.arresto||{};
+    const special=[];
+    if((Number(s.precedenti)||0)>=2)special.push(["Di nuovo","dentro."]);
+    if((Number(s.heat)||0)>=70)special.push(["Era solo questione","di tempo."]);
+    if(a.colpo)special.push(["Il colpo è saltato.","Tu pure."]);
+    const pool=special.length&&Math.random()<.45?special:JAIL_ARREST_PHRASES;
+    const key=x=>Array.isArray(x)?x.join("|"):String(x||"");
+    const choices=pool.filter(x=>key(x)!==jailLastPhrase);
+    const use=choices.length?choices:pool;
+    const chosen=use[Math.floor(Math.random()*use.length)]||["Ti hanno","preso."];
+    jailLastPhrase=key(chosen);
+    return chosen;
+  }
+
+  const jailWait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+
+  function ensureArrestTransition(){
+    let layer=document.getElementById("adf-arrest-transition");
+    if(layer)return layer;
+    layer=document.createElement("div");
+    layer.id="adf-arrest-transition";
+    layer.className="adf-arrest-transition";
+    layer.setAttribute("aria-live","assertive");
+    layer.innerHTML='<div class="adf-arrest-phrase" id="adf-arrest-phrase"></div>';
+    document.body.appendChild(layer);
+    return layer;
+  }
+
+  async function playArrestTransition(){
+    if(jailTransitionBusy||!street().arresto)return false;
+    jailTransitionBusy=true;
+    ensureJail();
+    const layer=ensureArrestTransition();
+    const phrase=layer.querySelector("#adf-arrest-phrase");
+    const words=jailPickArrestPhrase();
+    phrase.innerHTML='<span class="white">'+esc(words[0])+'</span><span class="red">'+esc(words[1])+'</span>';
+    const reduced=!!(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    layer.className="adf-arrest-transition";
+    void layer.offsetWidth;
+    try{
+      await jailWait(reduced?30:350);
+      layer.classList.add("on");
+      await jailWait(reduced?90:2500);
+      layer.classList.add("show-phrase");
+      await jailWait(reduced?260:3400);
+      layer.classList.remove("show-phrase");
+      await jailWait(reduced?90:750);
+      close();
+      openJail({direct:true,reason:"arrest-transition"});
+      await jailWait(reduced?30:200);
+      layer.classList.add("leave");
+      await jailWait(reduced?90:1000);
+    }finally{
+      layer.remove();
+      jailTransitionBusy=false;
+    }
+    return true;
+  }
+
+  window.ADF_JAIL_TRANSITION=Object.freeze({
+    play:playArrestTransition,
+    phrases:()=>JAIL_ARREST_PHRASES.map(x=>x.slice()),
+    busy:()=>jailTransitionBusy
+  });
 
   function shell(){
     root.innerHTML=`<div class="app crime-app" id="crimeApp">
@@ -77,10 +157,10 @@
   function triggerPhone(level){const now=Date.now();if(now-lastPhoneAt<1500)return;lastPhoneAt=now;try{if(window.TRAPHONE16)TRAPHONE16.triggerTrapEvent(level||"low")}catch(_){}}
   function setVisual(tags,ms){try{if(window.setCrimeVisualEvent)window.setCrimeVisualEvent(tags,ms||60000)}catch(_){}}
 
-  /* ---------- Blocco 3: CARCERE separato dal giro ----------
-     Fase 1 intenzionalmente semplice: mostra condanna e tempo residuo.
-     Le meccaniche dedicate restano fuori da questo blocco. La pena continua
-     a essere consumata da stradaSettimana(): qui non duplichiamo formule. */
+  /* ---------- CARCERE: stato esclusivo della partita ----------
+     Non è un luogo della mappa né una sottopagina del giro: quando sei detenuto
+     questa è la scena di gioco disponibile. Il nuovo menu di sistema globale
+     resta accessibile; la Mappa invece rimane bloccata fino alla scarcerazione. */
   function ensureJail(){
     let jail=document.getElementById("adf-jail");
     if(jail)return jail;
@@ -118,17 +198,50 @@
       .adf-jail-exit{width:100%;margin-top:18px;padding:14px 16px;border:1px solid rgba(255,255,255,.18);background:#f4f0ea;color:#111;font-weight:950;text-transform:uppercase;cursor:pointer}
       @media(max-width:900px){.adf-jail-main{grid-template-columns:1fr;padding:28px}.adf-jail-card{align-self:end}.adf-jail h1{font-size:86px}.adf-jail-meta{display:none}}
     `;
+    css.textContent+=`
+      .adf-jail-bg{opacity:0;transition:opacity 1.8s ease,filter 1.5s ease;will-change:opacity,filter}
+      .adf-jail-bg.on{opacity:1}
+      .adf-jail[data-jail-daypart="morning"] .adf-jail-bg{filter:grayscale(.18) sepia(.05) brightness(.46) contrast(1.03)}
+      .adf-jail[data-jail-daypart="day"] .adf-jail-bg{filter:grayscale(.28) brightness(.40) contrast(1.05)}
+      .adf-jail[data-jail-daypart="evening"] .adf-jail-bg{filter:grayscale(.24) sepia(.08) brightness(.34) contrast(1.07)}
+      .adf-jail[data-jail-daypart="night"] .adf-jail-bg{filter:grayscale(.52) saturate(.74) brightness(.25) contrast(1.12)}
+      .adf-jail-prisoner{display:flex;align-items:center;gap:18px;margin:0 0 24px}
+      .adf-jail-portrait-shell{position:relative;width:112px;height:112px;flex:0 0 112px;overflow:hidden;border:1px solid rgba(255,255,255,.20);background:#0b0c0f;box-shadow:0 18px 45px rgba(0,0,0,.35)}
+      .adf-jail-portrait{position:absolute;inset:0;display:grid;place-items:center;filter:grayscale(.32) contrast(1.04)}
+      .adf-jail-portrait svg,.adf-jail-portrait img{width:100%;height:100%;display:block;object-fit:cover}
+      .adf-jail-bars{position:absolute;inset:-3px;z-index:3;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0 18px,rgba(7,8,10,.94) 18px 24px,rgba(255,255,255,.12) 24px 25px,transparent 25px 40px);box-shadow:inset 0 0 30px rgba(0,0,0,.42)}
+      .adf-jail-bars:after{content:"";position:absolute;left:-4%;right:-4%;top:52%;height:8px;background:linear-gradient(#1a1c20,#050608 55%,#24272d);box-shadow:0 1px rgba(255,255,255,.10)}
+      .adf-jail-prisoner-meta{display:flex;flex-direction:column;gap:5px}
+      .adf-jail-prisoner-meta span{color:#ff315b;font:900 10px/1 IBM Plex Mono,monospace;letter-spacing:.16em;text-transform:uppercase}
+      .adf-jail-prisoner-meta b{font-size:20px;line-height:1.05;text-transform:uppercase}
+      .adf-arrest-transition{position:fixed;inset:0;z-index:220;display:grid;place-items:center;background:#050506;opacity:0;pointer-events:all;transition:opacity 1.15s cubic-bezier(.22,.61,.36,1)}
+      .adf-arrest-transition.on{opacity:1}
+      .adf-arrest-transition.leave{opacity:0;transition-duration:.9s}
+      .adf-arrest-phrase{position:relative;z-index:2;max-width:min(1100px,90vw);padding:0 24px;text-align:center;font-family:"Big Shoulders Stencil Display","League Gothic",Impact,sans-serif;font-size:clamp(86px,10vw,190px);font-weight:900;line-height:.72;letter-spacing:-.025em;text-transform:uppercase;opacity:0;transition:opacity 1.4s ease}
+      .adf-arrest-phrase .white,.adf-arrest-phrase .red{display:block}
+      .adf-arrest-phrase .white{color:#111114;transition:color 1.4s ease}
+      .adf-arrest-phrase .red{color:#121216;transition:color 1.4s ease}
+      .adf-arrest-transition.show-phrase .adf-arrest-phrase{opacity:1}
+      .adf-arrest-transition.show-phrase .adf-arrest-phrase .white{color:#f5f1ea}
+      .adf-arrest-transition.show-phrase .adf-arrest-phrase .red{color:#ff315b}
+      @media(max-width:900px){.adf-jail-prisoner{margin-bottom:16px}.adf-jail-portrait-shell{width:86px;height:86px;flex-basis:86px}.adf-jail-prisoner-meta b{font-size:16px}.adf-arrest-phrase{font-size:clamp(72px,18vw,118px)}}
+      @media(prefers-reduced-motion:reduce){.adf-jail-bg,.adf-arrest-transition,.adf-arrest-phrase{transition-duration:.01ms!important}}
+    `;
     document.head.appendChild(css);
     jail=document.createElement("div");
     jail.id="adf-jail";
     jail.className="adf-jail";
-    jail.innerHTML=`<div class="adf-jail-bg" id="adf-jail-bg"></div>
+    jail.innerHTML=`<div class="adf-jail-bg on" id="adf-jail-bg-a"></div><div class="adf-jail-bg" id="adf-jail-bg-b"></div>
       <div class="adf-jail-top">
         <div class="adf-jail-brand">Anni di <i>Fame</i> // Carcere</div>
         <div class="adf-jail-meta"><span id="adf-jail-city">Provincia</span><span id="adf-jail-time">08:00</span></div>
       </div>
       <div class="adf-jail-main">
         <div class="adf-jail-copy">
+          <div class="adf-jail-prisoner">
+            <div class="adf-jail-portrait-shell"><div class="adf-jail-portrait" id="adf-jail-portrait"></div><div class="adf-jail-bars" aria-hidden="true"></div></div>
+            <div class="adf-jail-prisoner-meta"><span>Detenuto</span><b id="adf-jail-prisoner-name">—</b></div>
+          </div>
           <div class="adf-jail-k">Detenzione</div>
           <h1>Sei <span>dentro.</span></h1>
           <p>Niente colpi finché non esci. La pena scorre con le settimane del gioco: il carcere non dipende dagli orari delle Attività criminali.</p>
@@ -147,11 +260,9 @@
             <small>Dentro succede</small>
             <div id="adf-jail-events"></div>
           </div>
-          <button class="adf-jail-exit" id="adf-jail-exit" type="button">Torna alla mappa</button>
         </aside>
       </div>`;
     document.body.appendChild(jail);
-    jail.querySelector("#adf-jail-exit").onclick=closeJail;
     jail.addEventListener("click",ev=>{
       const b=ev.target.closest&&ev.target.closest("[data-jail-action]");
       if(!b || !window.ADF_JAIL || typeof ADF_JAIL.act!=="function") return;
@@ -162,12 +273,62 @@
     });
     return jail;
   }
+  function jailDaypart(){
+    let minutes=Number(G.timeMinutes);
+    if(!Number.isFinite(minutes)){
+      const txt=timeText(),m=/^(\d{1,2}):(\d{2})$/.exec(txt);
+      minutes=m?(+m[1]*60)+(+m[2]):480;
+    }
+    const h=((Math.floor(minutes/60)%24)+24)%24;
+    return h>=6&&h<11?"morning":h>=11&&h<18?"day":h>=18&&h<22?"evening":"night";
+  }
   function jailBackground(){
-    const all=window.CRIME_BACKGROUNDS_LOCAL||[];
-    return all.find(bg=>Array.isArray(bg.tags)&&bg.tags.includes("prison"))
-      || all.find(bg=>Array.isArray(bg.tags)&&bg.tags.includes("court"))
-      || all.find(bg=>Array.isArray(bg.tags)&&bg.tags.includes("arrest"))
-      || null;
+    const all=window.JAIL_BACKGROUNDS_LOCAL||[];
+    if(!all.length)return null;
+    const part=jailDaypart();
+    const scored=all.map(bg=>{
+      const tags=Array.isArray(bg.tags)?bg.tags:[];
+      let score=1;
+      if(tags.includes(part))score+=8;
+      if(part==="morning"&&tags.includes("day"))score+=2;
+      if(part==="evening"&&tags.includes("day"))score+=1;
+      if(part==="night"&&tags.includes("indoor"))score+=2;
+      if(part==="night"&&tags.includes("outdoor")&&!tags.includes("night"))score-=1;
+      if(bg.url===jailBgLast)score=0;
+      return {bg,score:Math.max(0,score)};
+    }).filter(x=>x.score>0);
+    const pool=scored.length?scored:all.map(bg=>({bg,score:1}));
+    let total=pool.reduce((n,x)=>n+x.score,0),r=Math.random()*total,pick=pool[pool.length-1].bg;
+    for(const x of pool){r-=x.score;if(r<=0){pick=x.bg;break}}
+    jailBgLast=pick&&pick.url||"";
+    return pick||null;
+  }
+  function applyJailBackground(el,force){
+    if(!el)return;
+    el.dataset.jailDaypart=jailDaypart();
+    const a=el.querySelector("#adf-jail-bg-a"),b=el.querySelector("#adf-jail-bg-b");
+    if(!a||!b)return;
+    const current=jailBgActive?a:b;
+    const next=jailBgActive?b:a;
+    if(!force&&current.dataset.ready==="1")return;
+    const bg=jailBackground();
+    if(!bg||!bg.url)return;
+    next.style.backgroundImage=`url("${bg.url}")`;
+    next.style.backgroundPosition=bg.position||"center";
+    next.dataset.ready="1";
+    requestAnimationFrame(()=>{
+      next.classList.add("on");
+      current.classList.remove("on");
+      jailBgActive=jailBgActive?0:1;
+    });
+  }
+  function startJailBackgroundCycle(){
+    clearInterval(jailBgTimer);
+    jailBgTimer=setInterval(()=>{
+      const jail=document.getElementById("adf-jail");
+      if(!jail||!jail.classList.contains("on")||!street().arresto){clearInterval(jailBgTimer);jailBgTimer=null;return}
+      applyJailBackground(jail,true);
+    },24000);
   }
   function renderJailLoop(el){
     const box=el.querySelector("#adf-jail-actions"), feed=el.querySelector("#adf-jail-events");
@@ -190,7 +351,7 @@
   function syncJail(){
     const jail=document.getElementById("adf-jail");
     const a=street().arresto;
-    if(!a){if(jail)jail.classList.remove("on");return false}
+    if(!a){closeJail(true);return false}
     const el=ensureJail();
     const n=Math.max(0,Number(a.settimane)||0);
     el.querySelector("#adf-jail-weeks").innerHTML=n+`<span>${n===1?"settimana rimasta":"settimane rimaste"}</span>`;
@@ -199,28 +360,42 @@
     el.querySelector("#adf-jail-time").textContent=timeText();
     const art=window.ARTIST||{};
     el.querySelector("#adf-jail-city").textContent=(String(art.city||art.citta||"").trim()||"Provincia");
-    const bg=jailBackground(), bgEl=el.querySelector("#adf-jail-bg");
-    if(bg&&bg.url)bgEl.style.backgroundImage=`url("${bg.url}")`;
+    const pname=el.querySelector("#adf-jail-prisoner-name");
+    if(pname)pname.textContent=(String(art.name||"").trim()||"Detenuto");
+    const portrait=el.querySelector("#adf-jail-portrait");
+    if(portrait&&window.ARTIST_PORTRAIT)portrait.innerHTML=window.ARTIST_PORTRAIT();
+    applyJailBackground(el,false);
     renderJailLoop(el);
     return true;
   }
-  function closeJail(){
+  function closeJail(force){
+    if(street().arresto&&!force)return false;
     const jail=document.getElementById("adf-jail");
     if(jail)jail.classList.remove("on");
+    clearInterval(jailBgTimer);jailBgTimer=null;
     try{window.dispatchEvent(new CustomEvent("jail-ui:closed"))}catch(_){}
+    return true;
   }
-  function openJail(){
+  function openJail(opts){
     if(!street().arresto)return false;
     root.classList.remove("on");
     const jail=ensureJail();
     syncJail();
     jail.classList.add("on");
-    try{window.dispatchEvent(new CustomEvent("jail-ui:opened"))}catch(_){}
+    applyJailBackground(jail,true);
+    startJailBackgroundCycle();
+    try{window.dispatchEvent(new CustomEvent("jail-ui:opened",{detail:opts||{}}))}catch(_){}
     return true;
   }
   window.apriCarcere=openJail;
-  window.chiudiCarcere=closeJail;
-  window.addEventListener("jail:changed",()=>{ if(street().arresto) syncJail(); });
+  window.chiudiCarcere=()=>closeJail(false);
+  window.addEventListener("jail:changed",()=>{
+    if(street().arresto){
+      syncJail();
+      const jail=document.getElementById("adf-jail");
+      if(!jailTransitionBusy&&jail&&!jail.classList.contains("on"))openJail({direct:true,reason:"jail-state"});
+    }else closeJail(true);
+  });
 
   /* ---------- local background engine ---------- */
   function careerBand(s){let structure=s.men*5+s.protection*7+s.businessCount*6+(s.gun?4:0)+(s.lawyer?4:0),capital=Math.min(25,Math.log10(Math.max(1,s.dirty+100))*6),cityBonus=s.city.includes("milano")?14:(s.city.includes("los")||s.city==="la"?26:0),score=s.rep*.62+structure+capital+cityBonus;if(s.goat)score=Math.max(score,88);return score>=78?3:score>=50?2:score>=27?1:0}
@@ -240,7 +415,7 @@
 
   root.addEventListener("click",ev=>{
     const c=ev.target.closest("[data-crime]");if(c){if(!canDoCrime(c.dataset.crime)){toast("È troppo tardi per completare questo colpo oggi.");return}if(window.GAME_EVENTS&&GAME_EVENTS.blocked&&GAME_EVENTS.blocked()){toast("Prima devi risolvere l'evento in corso.");return}if(typeof hubTap==="function")hubTap();stAvviaColpo(c.dataset.crime);sync();return}
-    const so=ev.target.closest("[data-scene-opt]");if(so&&STRADA_SCENA){const o=STRADA_SCENA.opts[+so.dataset.sceneOpt];if(o&&typeof o.run==="function")o.run();try{save()}catch(_){}sync();try{renderGioco()}catch(_){}if(street().arresto&&!STRADA_SCENA){close();openJail()}return}
+    const so=ev.target.closest("[data-scene-opt]");if(so&&STRADA_SCENA){const o=STRADA_SCENA.opts[+so.dataset.sceneOpt];if(o&&typeof o.run==="function")o.run();try{save()}catch(_){}sync();try{renderGioco()}catch(_){}if(street().arresto&&!STRADA_SCENA){playArrestTransition()}return}
     if(ev.target.closest("#launder")){const before=Number(street().sporchi)||0,msg=stradaRipulisci();if(msg)toast(msg);if((Number(street().sporchi)||0)<before){setVisual(["launder","cash","dirty"]);triggerPhone("low")}sync();return}
     if(ev.target.closest("#addMan")){const before=Number(street().uomini)||0,msg=stAssumiUomo();if(msg)toast(msg);if((Number(street().uomini)||0)>before){setVisual(["crew","meeting","protection"]);triggerPhone("low")}sync();return}
     if(ev.target.closest("#prot")){const before=Number(street().prot)||0,msg=stImpostaProtezione((before+1)%STRADA_PROT.length);if(msg)toast(msg);if((Number(street().prot)||0)!==before){setVisual(["protection","crew"]);triggerPhone("low")}sync();return}
@@ -272,7 +447,12 @@
   document.addEventListener("keydown",e=>{
     if(e.key!=="Escape")return;
     const jail=document.getElementById("adf-jail");
-    if(jail&&jail.classList.contains("on")){closeJail();return}
+    if(jail&&jail.classList.contains("on")){
+      /* Sul nuovo main ESC viene intercettato prima dal menu di sistema.
+         Se arriva fin qui, non deve mai chiudere il carcere. */
+      if(street().arresto)return;
+      closeJail(true);return;
+    }
     if(root.classList.contains("on")&&!STRADA_SCENA)close();
   });
   sync();

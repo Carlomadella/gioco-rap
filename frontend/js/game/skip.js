@@ -67,8 +67,19 @@ function saltaGiorni(n){
   SFX[settimaneChiuse > 0 ? "week" : "giorno"]();
   save();
   if(settimaneChiuse > 0){
-    weekReport(before, costiSettimana * settimaneChiuse);
+    const detenutoDopoSalto=!!(G.strada&&G.strada.arresto);
+    if(!detenutoDopoSalto){
+      weekReport(before, costiSettimana * settimaneChiuse);
+    }else{
+      /* Il report settimanale, se lasciato .on dietro al carcere,
+         rende invisibilmente bloccanti i successivi +1/+7. */
+      const report=document.getElementById("report");
+      if(report) report.classList.remove("on");
+    }
     openWeek();
+    if(detenutoDopoSalto){
+      try{window.dispatchEvent(new CustomEvent("jail:changed"))}catch(_){}
+    }
   } else renderGioco();
   avvisoLucidita();
   if(SALTO_STOP){

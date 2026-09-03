@@ -316,9 +316,13 @@
     if(typeof setSalva === "function") setSalva();
     window.ARTIST = A;
     segnaUltimo(s.n);
+    const jailed=!!(G.strada&&G.strada.arresto);
     chiudi();
     goto("hub");
     if(window.GAME) window.GAME.enter();
+    if(jailed&&typeof window.apriCarcere==="function"){
+      setTimeout(()=>window.apriCarcere({direct:true,reason:"resume"}),0);
+    }
   }
 
   function continuaUltima(){

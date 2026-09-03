@@ -23,10 +23,14 @@ const travel = leggi("js/game/spostamenti.js");
 const crimeui = leggi("js/game/strada-crimine-ui.js");
 const crime = leggi("js/game/strada-crimine.js");
 const sim = leggi("js/game/sim.js");
+const skip = leggi("js/game/skip.js");
 const transfers = leggi("js/game/trasferte.js");
 const time = leggi("js/game/tempo.js");
 const timeControls = leggi("js/game/tempo-controlli.js");
 const index = leggi("index.html");
+const avvio = leggi("js/avvio.js");
+const jailBg = leggi("js/game/jail-backgrounds.js");
+const menuSystem = leggi("js/menu-sistema.js");
 const cat = JSON.parse(leggi("js/game/eventi-master-1000-v1.2.13.json"));
 const pkg = JSON.parse(leggi("package.json"));
 const verifyBuild = leggi("strumenti/verifica-build.js");
@@ -171,13 +175,83 @@ test("esiste una UI Carcere separata dal root criminale",
   crimeui.includes('window.apriCarcere=openJail'));
 test("apriStrada reindirizza al carcere se detenuto",
   crimeui.includes('function open(){if(street().arresto)return openJail();'));
-test("dopo l'esito Arrestato si esce dal giro e si apre il carcere",
-  crimeui.includes('if(street().arresto&&!STRADA_SCENA){close();openJail()}'));
+test("dopo l'esito Arrestato parte la transizione e non l'apertura secca",
+  crimeui.includes('if(street().arresto&&!STRADA_SCENA){playArrestTransition()}') &&
+  !crimeui.includes('if(street().arresto&&!STRADA_SCENA){close();openJail()}'));
 test("la UI carcere usa la pena esistente, non una seconda condanna",
   crimeui.includes('const a=street().arresto;') &&
   crimeui.includes('Number(a.settimane)') &&
   !crimeui.includes('carcereSettimane'));
 
+
+test("transizione arresto ha almeno dieci frasi e varianti contestuali",
+  crimeui.includes("const JAIL_ARREST_PHRASES = [") &&
+  crimeui.includes('["Ti hanno","bevuto."]') &&
+  crimeui.includes('["Ti hanno","fatto."]') &&
+  crimeui.includes('["Ti hanno messo","al fresco."]') &&
+  crimeui.includes('["Non l\'hai fatta","franca."]') &&
+  crimeui.includes('["Di nuovo","dentro."]') &&
+  crimeui.includes('["Era solo questione","di tempo."]'));
+
+test("transizione usa nero pieno, timing suspense e font del Carcere",
+  crimeui.includes('await jailWait(reduced?90:2500)') &&
+  crimeui.includes('await jailWait(reduced?260:3400)') &&
+  crimeui.includes('font-family:"Big Shoulders Stencil Display","League Gothic",Impact,sans-serif') &&
+  crimeui.includes('font-size:clamp(86px,10vw,190px)') &&
+  crimeui.includes('line-height:.72') &&
+  crimeui.includes('letter-spacing:-.025em'));
+
+test("carcere è esclusivo: niente ritorno mappa e il listener locale non lo chiude con Escape",
+  !crimeui.includes('id="adf-jail-exit"') &&
+  crimeui.includes('if(street().arresto&&!force)return false') &&
+  crimeui.includes('if(street().arresto)return;'));
+
+test("nuovo menu di sistema riconosce il carcere e blocca Mappa",
+  menuSystem.includes('if(document.querySelector("#adf-jail.on")) return "jail";') &&
+  menuSystem.includes('if(hostAttivo() === "jail" || hostAttivo() === "hub"'));
+
+test("caricando una carriera arrestata si entra direttamente nel carcere",
+  avvio.includes('const jailed=!!(G.strada&&G.strada.arresto)') &&
+  avvio.includes('window.apriCarcere({direct:true,reason:"resume"})'));
+
+test("avatar del detenuto usa ritratto reale con sbarre sovrapposte",
+  crimeui.includes('id="adf-jail-portrait"') &&
+  crimeui.includes('class="adf-jail-bars"') &&
+  crimeui.includes('portrait.innerHTML=window.ARTIST_PORTRAIT()'));
+
+test("carcere carica il registro dedicato prima della sua UI",
+  index.includes('js/game/jail-backgrounds.js?v=1') &&
+  index.indexOf('js/game/jail-backgrounds.js?v=1') < index.indexOf('js/game/strada-crimine-ui.js?v=3'));
+
+test("registro carcere contiene esattamente 20 sfondi ufficiali",
+  (jailBg.match(/"id":/g)||[]).length === 20 &&
+  (jailBg.match(/media\/photo\/carcere\/carcere-bg-/g)||[]).length === 20);
+
+test("sfondi carcere non dipendono più dal pool Attività criminali",
+  crimeui.includes("window.JAIL_BACKGROUNDS_LOCAL||[]") &&
+  !crimeui.includes('const all=window.CRIME_BACKGROUNDS_LOCAL||[];\\n    const pool=all.filter(bg=>Array.isArray(bg.tags)&&bg.tags.includes("prison")') &&
+  crimeui.includes('id="adf-jail-bg-a"') &&
+  crimeui.includes('id="adf-jail-bg-b"') &&
+  crimeui.includes('transition:opacity 1.8s ease,filter 1.5s ease') &&
+  crimeui.includes('data-jail-daypart') &&
+  crimeui.includes('},24000);'));
+
+
+test("salto +7 in carcere non lascia un report invisibile bloccante",
+  skip.includes("const detenutoDopoSalto=!!(G.strada&&G.strada.arresto)") &&
+  skip.includes('report.classList.remove("on")'));
+
+test("Eventi V2 ignora il report settimanale legacy mentre sei detenuto",
+  ev.includes('if(id==="report" && detenuto) continue;'));
+
+test("widget tempo resta riapribile dopo +7 mentre sei detenuto",
+  timeControls.includes('if(sel==="#report.on" && detenuto) continue;'));
+
+
+test("skip iniziato in carcere non apre report neanche se termina con scarcerazione",
+  ev.includes("const detenutoPrimaDelSalto=!!(G.strada&&G.strada.arresto)") &&
+  ev.includes("if(!detenutoPrimaDelSalto){") &&
+  ev.includes('if(report) report.classList.remove("on")'));
 
 console.log("\nBlocco 4 — riciclaggio / costi / tempo");
 test("capacità settimanale già usa anno:settimana e used",
