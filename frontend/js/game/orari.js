@@ -10,6 +10,17 @@
 (function(){
   if(typeof GAME_TIME === "undefined") return;
 
+  /* Due hotspot possono rappresentare lo stesso luogo di gameplay.
+     Manteniamo gli ID fisici distinti per mappa/distanze, ma normalizziamo
+     regole, orari, azioni ed eventi sulla stessa identità logica. */
+  const PLACE_ALIAS = Object.freeze({
+    beatmaker:"beat"
+  });
+  function normalizePlace(id){
+    const key=String(id||"");
+    return PLACE_ALIAS[key] || key;
+  }
+
   const PLACE_HOURS = Object.freeze({
     studio:    {open:"09:00", close:"02:00"},
     pizzeria:  {open:"16:00", close:"02:00"},
@@ -97,13 +108,14 @@
   }
 
   function placeStatus(id, at){
+    const place=normalizePlace(id);
     /* Blocco 3: se sei detenuto, il carcere non "apre alle 18".
        Lo stesso hotspot della mappa porta alla schermata Carcere 24/7. */
-    if(id === "crimin" && G.strada && G.strada.arresto){
+    if(place === "crimin" && G.strada && G.strada.arresto){
       const now = at == null ? GAME_TIME.now() : at;
       return {open:true, now, allDay:true, jail:true, label:"Carcere · sempre accessibile"};
     }
-    return statusWindow(PLACE_HOURS[id], at);
+    return statusWindow(PLACE_HOURS[place], at);
   }
 
   function scheduleForAction(id){
@@ -302,13 +314,16 @@
 
   window.GAME_HOURS = Object.freeze({
     places:PLACE_HOURS,
+    aliases:PLACE_ALIAS,
     jobs:JOB_HOURS,
     events:EVENT_HOURS,
     parse:parseClock,
+    normalizePlace,
+    samePlace:(a,b) => normalizePlace(a) === normalizePlace(b),
     placeStatus,
     actionStatus,
     eventStatus,
     placeForAction:(id) => ACTION_PLACE[id] || null,
-    directActionForPlace:(id) => DIRECT_PLACE_ACTION[id] || null
+    directActionForPlace:(id) => DIRECT_PLACE_ACTION[normalizePlace(id)] || null
   });
 })();

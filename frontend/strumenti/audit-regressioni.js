@@ -70,7 +70,7 @@ console.log("\nBlocco 3 — carcere separato");
 test("hub manda il detenuto alla schermata Carcere",
   hub.includes('G.strada && G.strada.arresto && typeof apriCarcere === "function"'));
 test("orari non bloccano il carcere alle 08:00",
-  hours.includes('id === "crimin" && G.strada && G.strada.arresto') &&
+  hours.includes('place === "crimin" && G.strada && G.strada.arresto') &&
   hours.includes('jail:true'));
 test("esiste una UI Carcere separata dal root criminale",
   crimeui.includes('function ensureJail()') &&
@@ -215,6 +215,27 @@ test("i turni con luogo fisico mantengono la mappa esplicita",
   travel.includes('operaio:"fabbrica"') &&
   travel.includes('if(id === "turno")'));
 
+console.log("\nAlias luogo — La Sala / Beat Maker");
+test("Beat Maker eredita gli orari della Sala",
+  hours.includes('beatmaker:"beat"') &&
+  hours.includes("function normalizePlace(id)") &&
+  hours.includes("PLACE_HOURS[place]"));
+test("orari espone equivalenza logica senza fondere gli hotspot fisici",
+  hours.includes("normalizePlace,") &&
+  hours.includes("samePlace:(a,b)") &&
+  hub.includes('{id:"beat", n:"La Sala"') &&
+  hub.includes('{id:"beatmaker", n:"Beat Maker"'));
+test("spostamenti usa l'equivalenza solo per accesso azioni",
+  travel.includes("function sameGameplayPlace(a,b)") &&
+  travel.includes("!sameGameplayPlace(required,current)") &&
+  travel.includes("G.currentPlace = toId"));
+test("eventi tempo normalizza Beat Maker come luogo beat",
+  clockEvents.includes("function canonicalPlace(id)") &&
+  clockEvents.includes("GAME_HOURS.normalizePlace") &&
+  clockEvents.includes("place:canonicalPlace(") &&
+  clockEvents.includes("fromId:canonicalPlace(") &&
+  clockEvents.includes("toId:canonicalPlace("));
+
 {
   const vm=require("vm");
   let pending=false, canStart=true, hoursOpen=true;
@@ -224,6 +245,8 @@ test("i turni con luogo fisico mantengono la mappa esplicita",
     HUB_LUOGHI:[
       {id:"vita",n:"Casa",x:0,y:0,w:10,h:10},
       {id:"studio",n:"Studio",x:20,y:0,w:10,h:10},
+      {id:"beat",n:"La Sala",x:30,y:0,w:10,h:10},
+      {id:"beatmaker",n:"Beat Maker",x:35,y:0,w:10,h:10},
       {id:"palestra",n:"Palestra",x:40,y:0,w:10,h:10},
       {id:"pizzeria",n:"Pizzeria",x:60,y:0,w:10,h:10},
       {id:"fabbrica",n:"Fabbrica",x:80,y:0,w:10,h:10}
@@ -235,8 +258,9 @@ test("i turni con luogo fisico mantengono la mappa esplicita",
       text:()=>"10:00",DAY_END:1680,travel:()=>({blocked:false})
     },
     GAME_HOURS:{
+      normalizePlace:id=>id==="beatmaker"?"beat":String(id||""),
       actionStatus:()=>hoursOpen?{open:true}:{open:false,phase:"before",nextText:"12:00",label:"Apre alle 12:00"},
-      placeForAction:id=>({registra:"studio",palestra_pesi:"palestra",palestra_cardio:"palestra"}[id]||null),
+      placeForAction:id=>({beat:"beat",registra:"studio",palestra_pesi:"palestra",palestra_cardio:"palestra"}[id]||null),
       directActionForPlace:()=>null,
       placeStatus:()=>({open:true})
     },
@@ -261,6 +285,12 @@ test("i turni con luogo fisico mantengono la mappa esplicita",
     g=box.GAME_TRAVEL.actionAccess("registra");
     test("runtime: registra in Studio e in orario passa",g.ok===true);
 
+    box.G.currentPlace="beatmaker";
+    g=box.GAME_TRAVEL.actionAccess("beat");
+    test("runtime: Cerca un beat passa anche dal cartello Beat Maker",
+      g.ok===true && box.GAME_TRAVEL.current()==="beatmaker" &&
+      box.GAME_TRAVEL.logicalPlace("beatmaker")==="beat");
+
     hoursOpen=false;
     g=box.GAME_TRAVEL.actionAccess("registra");
     test("runtime: un'azione fuori orario viene bloccata",
@@ -278,7 +308,7 @@ test("i turni con luogo fisico mantengono la mappa esplicita",
   }
 }
 
-for(const f of ["strumenti/build.js","js/game/eventi-v2.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js"]){
+for(const f of ["strumenti/build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }

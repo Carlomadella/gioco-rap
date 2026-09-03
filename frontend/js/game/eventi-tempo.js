@@ -102,11 +102,20 @@
     }catch(e){ return null; }
   }
 
+  function canonicalPlace(id){
+    try{
+      if(typeof GAME_HOURS !== "undefined" && typeof GAME_HOURS.normalizePlace === "function")
+        return GAME_HOURS.normalizePlace(id);
+    }catch(e){}
+    return String(id||"");
+  }
+
   function currentPlace(){
     try{
-      if(typeof GAME_TRAVEL !== "undefined" && GAME_TRAVEL.current) return GAME_TRAVEL.current();
+      if(typeof GAME_TRAVEL !== "undefined" && GAME_TRAVEL.current)
+        return canonicalPlace(GAME_TRAVEL.current());
     }catch(e){}
-    return G.currentPlace || "vita";
+    return canonicalPlace(G.currentPlace || "vita");
   }
 
   function context(detail){
@@ -120,10 +129,10 @@
       to:now,
       time:Number.isFinite(detail.time) ? detail.time : now,
       band:detail.band || (GAME_TIME.bandAt ? GAME_TIME.bandAt(now) : (GAME_TIME.band ? GAME_TIME.band() : "")),
-      place:detail.place || (tr ? "transit" : currentPlace()),
+      place:canonicalPlace(detail.place || (tr ? "transit" : currentPlace())),
       transit:detail.transit != null ? !!detail.transit : !!tr,
-      fromId:detail.fromId != null ? detail.fromId : (tr ? tr.fromId : null),
-      toId:detail.toId != null ? detail.toId : (tr ? tr.toId : null),
+      fromId:canonicalPlace(detail.fromId != null ? detail.fromId : (tr ? tr.fromId : null)),
+      toId:canonicalPlace(detail.toId != null ? detail.toId : (tr ? tr.toId : null)),
       city:detail.city || cityName(),
       scene:detail.scene || sceneId(),
       phase:detail.phase != null ? Number(detail.phase)||0 : Number(G.phase)||0,

@@ -120,6 +120,14 @@
     return typeof GAME_HOURS.placeForAction === "function" ? GAME_HOURS.placeForAction(id) : null;
   }
 
+  function logicalPlace(id){
+    return typeof GAME_HOURS.normalizePlace === "function"
+      ? GAME_HOURS.normalizePlace(id) : String(id||"");
+  }
+  function sameGameplayPlace(a,b){
+    return logicalPlace(a) === logicalPlace(b);
+  }
+
   /* Guardia RUNTIME, non decorazione UI.
      Una tile disabilitata è solo presentazione: la stessa regola deve essere
      vera anche se un click è programmatico, la UI è rimasta indietro di un
@@ -153,7 +161,7 @@
         currentPlace:current, requiredPlace:required, status};
     }
 
-    if(required && required !== current){
+    if(required && !sameGameplayPlace(required,current)){
       return {ok:false, reason:"wrong-place", id, now, duration, remaining,
         currentPlace:current, requiredPlace:required, status:status||null};
     }
@@ -319,7 +327,7 @@
     const cur = assicuraPosizione();
     document.querySelectorAll(".tile[data-id]").forEach(tile => {
       const req = requiredPlaceForAction(tile.dataset.id);
-      const away = !!req && req !== cur;
+      const away = !!req && !sameGameplayPlace(req,cur);
       tile.classList.toggle("travel-away", away);
       let badge = tile.querySelector(".travelneed");
       if(away){
@@ -406,6 +414,8 @@
     plan:piano,
     go:esegui,
     requiredPlaceForAction,
+    logicalPlace,
+    sameGameplayPlace,
     actionAccess,
     guardAction,
     inTransit:() => TRANSIT ? Object.assign({}, TRANSIT) : null
