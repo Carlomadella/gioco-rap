@@ -289,8 +289,20 @@ const INCONTRI = [
   }}
 ];
 
-function mostraIncontro(scena){
-  showEvent({k:"Per strada", t:scena.t, d:scena.d, annulla(){}, opts:scena.opts});
+function mostraIncontro(scena, obbligatorio, onDone){
+  const opts=(scena.opts||[]).map(o=>({
+    n:o.n,d:o.d,
+    run(){
+      let r=null;
+      try{ r=o.run ? o.run() : {t:"",c:""}; }
+      finally{ if(typeof onDone==="function") onDone(); }
+      return r;
+    }
+  }));
+  const ev={k:"Per strada",t:scena.t,d:scena.d,opts};
+  /* Gli HIGH non hanno annulla: niente X, ESC o click fuori. */
+  if(!obbligatorio) ev.annulla=function(){};
+  showEvent(ev);
 }
 
 /* Da smistare, punto 4: un incontro basso o medio, mentre stai saltando
@@ -309,7 +321,22 @@ function risolviIncontroAuto(scena){
    equiprobabile, così le comuni restano comuni. */
 function provaIncontro(){
   if(G.ended || Math.random() > 0.35) return;
-  const eleggibili = INCONTRI.filter(i => i.req());
+
+  try{
+    if(window.ADF_EVENTI && typeof ADF_EVENTI.globalHigh==="function" &&
+       ADF_EVENTI.globalHigh()) return;
+  }catch(_){}
+
+  let eleggibili = INCONTRI.filter(i => i.req());
+
+  /* Un incontro ALTO entra nel pool solo quando la finestra HIGH globale
+     è pronta; altrimenti continuiamo a pescare soltanto basso/medio. */
+  try{
+    if(window.ADF_EVENTI && typeof ADF_EVENTI.highReady==="function" &&
+       !ADF_EVENTI.highReady())
+      eleggibili=eleggibili.filter(i => (i.liv||"medio")!=="alto");
+  }catch(_){}
+
   if(!eleggibili.length) return;
   const tot = eleggibili.reduce((a, i) => a + i.peso, 0);
   let r = Math.random() * tot, scelto = eleggibili[0];
@@ -327,6 +354,11 @@ function provaIncontro(){
 
   /* Anche nel gioco normale LOW/MEDIUM non fermano il giocatore. */
   if(liv !== "alto"){
+    try{
+      if(window.ADF_EVENTI && typeof ADF_EVENTI.claimAutoEvent==="function" &&
+         !ADF_EVENTI.claimAutoEvent("street")) return;
+    }catch(_){}
+
     risolviIncontroAuto(scena);
     try{
       if(window.ADF_EVENTI && typeof ADF_EVENTI.addNotification==="function"){
@@ -351,5 +383,36 @@ function provaIncontro(){
     return;
   }
 
-  mostraIncontro(scena);
+  try{
+    if(window.ADF_EVENTI && typeof ADF_EVENTI.beginHigh==="function" &&
+       !ADF_EVENTI.beginHigh("street",scelto.id)) return;
+  }catch(_){}
+
+  mostraIncontro(scena,true,()=>{
+    try{
+      if(window.ADF_EVENTI && typeof ADF_EVENTI.endHigh==="function")
+        ADF_EVENTI.endHigh("street",scelto.id);
+    }catch(_){}
+  });
 }
+
+/* Ripristina un HIGH per strada dopo refresh. La scena viene ricostruita
+   dallo stesso id: può cambiare un dettaglio cosmetico casuale, ma la
+   decisione obbligatoria e i suoi effetti restano quelli dell'incontro. */
+window.ADF_RESTORE_STREET_HIGH=function(id){
+  const scelto=INCONTRI.find(i=>i.id===id && i.req());
+  if(!scelto){
+    try{
+      if(window.ADF_EVENTI && typeof ADF_EVENTI.endHigh==="function")
+        ADF_EVENTI.endHigh("street",String(id||""));
+    }catch(_){}
+    return false;
+  }
+  mostraIncontro(scelto.crea(),true,()=>{
+    try{
+      if(window.ADF_EVENTI && typeof ADF_EVENTI.endHigh==="function")
+        ADF_EVENTI.endHigh("street",scelto.id);
+    }catch(_){}
+  });
+  return true;
+};

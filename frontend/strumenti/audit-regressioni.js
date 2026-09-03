@@ -124,9 +124,11 @@ test("controller si monta nella testata della finestra attiva",
   timeControls.includes('head:".nghead"') &&
   timeControls.includes('head:".topbar"') &&
   timeControls.includes('head:".adf-jail-top"'));
-test("pannello resta ancorato sotto lo stesso blocco in alto a destra",
-  timeControls.includes('right:var(--adf-time-right,14px)') &&
-  timeControls.includes('top:calc(100% + 9px)'));
+test("pannello fixed nel body viene riposizionato vicino al widget attivo",
+  timeControls.includes('.adf-tc-panel{position:fixed') &&
+  timeControls.includes('function positionPanel()') &&
+  timeControls.includes('panel.style.left=Math.round(left)+"px"') &&
+  timeControls.includes('panel.style.top=Math.round(top)+"px"'));
 test("slider orario e tasti +/- lavorano a step di 15 minuti",
   timeControls.includes('type="range"') &&
   timeControls.includes('const STEP = Number(GAME_TIME.SLOT) || 15') &&
@@ -137,11 +139,50 @@ test("attesa usa il clock reale e non teletrasporta G.timeMinutes",
 test("attesa si ferma su action o evento alto pendente",
   timeControls.includes('GAME_TIME.pending && GAME_TIME.pending()') &&
   timeControls.includes('GAME_EVENTS.blocked && GAME_EVENTS.blocked()'));
-test("cambio giorno riusa il comando Fine giornata esistente",
-  timeControls.includes('document.getElementById("g-advance")') &&
-  timeControls.includes('official.click()'));
+test("widget +1/+7 delega al bridge Eventi V2",
+  timeControls.includes('window.ADF_TIME_SKIP(count)') &&
+  timeControls.includes('calendarSerial()'));
 test("controller reagisce anche a finestre create dinamicamente",
   timeControls.includes('new MutationObserver'));
+
+console.log("\nHardening eventi — arbitro globale");
+const street = leggi("js/game/strada.js");
+const clockEvents = leggi("js/game/eventi-tempo.js");
+test("Eventi V2 espone un unico arbitro HIGH globale",
+  ev.includes("ADF.beginHigh=beginGlobalHigh") &&
+  ev.includes("ADF.endHigh=endGlobalHigh") &&
+  ev.includes("ADF.highReady=highReady") &&
+  ev.includes("pendingGlobalHigh"));
+test("LOW/MEDIUM condividono la guardia anti-doppio evento",
+  ev.includes("ADF.claimAutoEvent=claimAutoEvent") &&
+  clockEvents.includes('ADF_EVENTI.claimAutoEvent("clock")') &&
+  street.includes('ADF_EVENTI.claimAutoEvent("street")'));
+test("il clock usa la stessa finestra HIGH del catalogo",
+  clockEvents.includes('ADF_EVENTI.beginHigh("clock",e.id)') &&
+  clockEvents.includes('ADF_EVENTI.endHigh("clock",p.id)') &&
+  clockEvents.includes("ADF_EVENTI.highReady"));
+test("un HIGH per strada non ha annulla e usa il lock globale",
+  street.includes('if(!obbligatorio) ev.annulla=function(){}') &&
+  street.includes('ADF_EVENTI.beginHigh("street",scelto.id)') &&
+  street.includes("mostraIncontro(scena,true"));
+test("HIGH catalogo e strada sopravvivono al refresh",
+  ev.includes("pendingGlobalHigh") &&
+  ev.includes('ph.source==="catalog"') &&
+  ev.includes('ph.source==="street"') &&
+  street.includes("ADF_RESTORE_STREET_HIGH"));
+const sc0=ev.indexOf("function showCatalog(");
+const sc1=ev.indexOf("function autoResolve(",sc0);
+const scBody=sc0>=0&&sc1>sc0?ev.slice(sc0,sc1):"";
+test("HIGH catalogo prende il lock prima di chat o LaFamegram",
+  scBody.includes('beginGlobalHigh("catalog",e.id') &&
+  scBody.indexOf('beginGlobalHigh("catalog",e.id') < scBody.indexOf("mirrorDelivery(e)"));
+test("gli skip del widget sono bloccati da qualunque HIGH globale",
+  ev.includes("!globalHigh() && !overlayBusy()") &&
+  timeControls.includes("ADF_EVENTI.globalHigh") &&
+  timeControls.includes("window.ADF_TIME_SKIP(count)"));
+test("refresh di un HIGH catalogo non duplica Chat o LaFamegram",
+  scBody.includes("!meta.fromSkip && !meta.restorePending") &&
+  scBody.includes("mirrorDelivery(e)"));
 
 for(const f of ["strumenti/build.js","js/game/eventi-v2.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/orari.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }

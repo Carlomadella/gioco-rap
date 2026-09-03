@@ -160,8 +160,11 @@
   }
 
   function eventBlocked(){
-    try{ return typeof GAME_EVENTS!=="undefined" && GAME_EVENTS.blocked && GAME_EVENTS.blocked(); }
-    catch(_){ return false; }
+    try{
+      if(typeof GAME_EVENTS!=="undefined" && GAME_EVENTS.blocked && GAME_EVENTS.blocked()) return true;
+      if(window.ADF_EVENTI && typeof ADF_EVENTI.globalHigh==="function" && ADF_EVENTI.globalHigh()) return true;
+      return false;
+    }catch(_){ return false; }
   }
   function actionBlocked(){
     try{ return !!(GAME_TIME.pending && GAME_TIME.pending()); }
@@ -181,6 +184,10 @@
       w:Math.max(1,Number(G.week)||1),
       y:Math.max(1,Number(G.year)||1)
     };
+  }
+  function calendarSerial(){
+    const x=dayParts();
+    return ((x.y-1)*52+(x.w-1))*7+(x.d-1);
   }
   function dayText(){
     const x=dayParts();
@@ -540,6 +547,37 @@
     if(actionBlocked()||eventBlocked()||blockingOverlay()){
       status("Prima devi chiudere la decisione o l'azione in corso.","bad");return;
     }
+
+    /* Via principale: Eventi V2 possiede il salto +1/+7 e quindi gestisce
+       SALTO, LOW/MEDIUM automatici, HIGH che interrompono e Notifiche. */
+    if(typeof window.ADF_TIME_SKIP==="function"){
+      const before=calendarSerial();
+      waiting=true;status("Avanzo il calendario…","");syncTarget();
+      let ok=false;
+      try{
+        ok=!!window.ADF_TIME_SKIP(count);
+        try{if(typeof GAME_WEATHER!=="undefined"&&GAME_WEATHER.sync)GAME_WEATHER.sync();}catch(_){}
+      }finally{
+        waiting=false;refreshOtherViews();targetTouched=false;sync(true);
+      }
+      if(!ok){
+        status("Il calendario è bloccato da una decisione o da un'azione in corso.","bad");
+        return;
+      }
+      const done=Math.max(0,calendarSerial()-before);
+      const stopped=done<count;
+      if(stopped){
+        closePanel();
+        status("Calendario fermato dopo "+done+" giorno"+(done===1?"":"i")+": c'è una decisione da prendere.","bad");
+      }else{
+        status("Avanzato di "+done+" giorno"+(done===1?"":"i")+" · "+GAME_TIME.text()+".","good");
+      }
+      /* Alcuni HIGH vengono materializzati nel tick successivo allo skip. */
+      setTimeout(()=>queueSync(true),180);
+      return;
+    }
+
+    /* Fallback legacy: resta disponibile solo se Eventi V2 non è caricato. */
     if(typeof avanzaGiorno!=="function"){
       status("Il cambio giorno non è disponibile in questa schermata.","bad");return;
     }

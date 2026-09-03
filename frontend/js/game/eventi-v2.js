@@ -21,6 +21,7 @@ const ADF = {
   byId:new Map(),
   skipRunning:false,
   activeCatalog:null,
+  activeHigh:null,
   hookTimer:null,
   version:"1.2.13-repo",
   commit:"531edf193439eb2fd67812fc4f2377b6550b2f3e"
@@ -94,6 +95,89 @@ function armHigh(){
   s.nextHighDue=absDay()+n;
   return n;
 }
+
+/* Arbitro unico degli eventi.
+   - un solo HIGH può essere attivo in qualunque motore;
+   - qualunque HIGH consuma la stessa finestra globale 10–15 giorni;
+   - LOW/MEDIUM condividono una chiave minuto per evitare doppie conseguenze
+     prodotte da due motori sulla stessa azione. */
+function eventMinuteKey(){
+  let minute=0;
+  try{
+    if(typeof GAME_TIME!=="undefined" && GAME_TIME.now) minute=Math.round(Number(GAME_TIME.now())||0);
+    else minute=Math.round(Number(G.timeMinutes)||0);
+  }catch(_){ minute=Math.round(Number(G.timeMinutes)||0); }
+  return absDay()+":"+minute;
+}
+function claimAutoEvent(source){
+  const s=st(), key=eventMinuteKey();
+  if(s.runtime.lastAutoEventKey===key) return false;
+  s.runtime.lastAutoEventKey=key;
+  s.runtime.lastAutoEventSource=source||"unknown";
+  return true;
+}
+function pendingGlobalHigh(){
+  const p=st().runtime.pendingGlobalHigh;
+  return p && typeof p==="object" ? p : null;
+}
+function globalHigh(){
+  const cur=ADF.activeHigh || pendingGlobalHigh();
+  return cur ? {source:cur.source,eventId:cur.eventId} : null;
+}
+function highReady(){
+  if(globalHigh()) return false;
+  try{
+    if(window.GAME_EVENTS && GAME_EVENTS.blocked && GAME_EVENTS.blocked()) return false;
+  }catch(_){}
+  return highDue();
+}
+function beginGlobalHigh(source,eventId,opts){
+  opts=opts||{};
+  source=String(source||"unknown");
+  eventId=String(eventId||"high");
+
+  if(ADF.activeHigh)
+    return ADF.activeHigh.source===source && ADF.activeHigh.eventId===eventId;
+
+  const persisted=pendingGlobalHigh();
+  if(opts.restore && persisted &&
+     persisted.source===source && persisted.eventId===eventId){
+    ADF.activeHigh={source,eventId};
+    return true;
+  }
+
+  /* Se un LOW/MEDIUM ha già occupato questo stesso minuto, l'HIGH resta
+     dovuto ma aspetta la prossima occasione: una singola azione non produce
+     due eventi di motori diversi. */
+  if(st().runtime.lastAutoEventKey===eventMinuteKey()) return false;
+  if(!highDue()) return false;
+
+  ADF.activeHigh={source,eventId};
+  armHigh();
+  const s=st();
+  s.runtime.pendingGlobalHigh={
+    source,eventId,at:absDay(),
+    meta:opts.meta && typeof opts.meta==="object" ? opts.meta : null
+  };
+  try{ save(); }catch(_){}
+  return true;
+}
+function endGlobalHigh(source,eventId){
+  const cur=ADF.activeHigh;
+  if(cur && cur.source===source && cur.eventId===eventId) ADF.activeHigh=null;
+
+  const s=st(), p=pendingGlobalHigh();
+  if(p && p.source===source && p.eventId===eventId)
+    delete s.runtime.pendingGlobalHigh;
+
+  try{ save(); }catch(_){}
+}
+ADF.claimAutoEvent=claimAutoEvent;
+ADF.highReady=highReady;
+ADF.beginHigh=beginGlobalHigh;
+ADF.endHigh=endGlobalHigh;
+ADF.globalHigh=globalHigh;
+
 function resetNormal(){
   const s=st();
   s.normalDays=0;
@@ -377,7 +461,13 @@ function mark(e, auto){
   if(e.once) s.seen[e.id]=true;
   s.lastEventDay=now;
   if(auto) s.stats.auto++; else s.stats.shown++;
-  if(e.tier==="high"){ s.stats.high++; armHigh(); }
+  if(e.tier==="high"){
+    s.stats.high++;
+    /* beginGlobalHigh() ha già armato la finestra comune. Manteniamo il
+       fallback solo per chiamate legacy che arrivassero direttamente qui. */
+    if(!(ADF.activeHigh && ADF.activeHigh.source==="catalog" &&
+         ADF.activeHigh.eventId===e.id)) armHigh();
+  }
   resetNormal();
 }
 function execute(e, choice, auto){
@@ -1887,8 +1977,12 @@ function eventObject(e, resume, meta){
     opts:(e.choices||[]).map(c=>({
       n:c.label,d:c.hint||"",
       run(){
-        const r=execute(e,c,false);
-        ADF.activeCatalog=null;
+        let r=null;
+        try{ r=execute(e,c,false); }
+        finally{
+          ADF.activeCatalog=null;
+          endGlobalHigh("catalog",e.id);
+        }
         if(meta.fromSkip){
           adfAddSkipNotification(e,r,{read:true,interrupted:true});
         }
@@ -1914,6 +2008,13 @@ function showCatalog(e,resume,meta){
   if(!e) return;
   meta=meta||{};
 
+  /* Un HIGH già attivo possiede il turno. L'unica eccezione è il ripristino
+     dello stesso HIGH di catalogo dopo un refresh. */
+  const gh=globalHigh();
+  const sameRestoredHigh=!!(gh && e.tier==="high" &&
+    gh.source==="catalog" && gh.eventId===e.id);
+  if(gh && !sameRestoredHigh) return null;
+
   /* Se il motore a minuti ha già un HIGH pendente, non apriamo una seconda
      decisione sopra la prima. */
   try{
@@ -1923,6 +2024,25 @@ function showCatalog(e,resume,meta){
     }
   }catch(_){}
 
+  /* LOW/MEDIUM normali competono per lo stesso minuto con clock/strada.
+     Se un altro motore ha già prodotto una conseguenza automatica, questa
+     viene scartata prima di creare chat/feed/notifiche duplicate. */
+  if(e.tier!=="high" && !meta.fromSkip && !claimAutoEvent("catalog"))
+    return null;
+
+  /* Un HIGH deve possedere il lock PRIMA di qualunque delivery.
+     Se il lock non è disponibile, l'evento non lascia chat/post fantasma. */
+  if(e.tier==="high"){
+    const highMeta={
+      fromSkip:!!meta.fromSkip,
+      socialPost:meta.socialPost||null
+    };
+    if(!beginGlobalHigh("catalog",e.id,{
+      restore:!!meta.restorePending,
+      meta:highMeta
+    })) return null;
+  }
+
   /* v1.2.13
      Gli eventi generati dagli skip appartengono ESCLUSIVAMENTE al Centro
      Notifiche. Non devono creare una copia in Messaggi/Chat o LaFamegram,
@@ -1931,7 +2051,9 @@ function showCatalog(e,resume,meta){
 
      Gli stessi eventi, se accadono durante il gioco normale, continuano
      invece a usare il canale previsto dal catalogo. */
-  if(!meta.fromSkip){
+  /* Al ripristino di un HIGH dopo refresh la decisione deve tornare,
+     ma la consegna già avvenuta non va duplicata in Chat/LaFamegram. */
+  if(!meta.fromSkip && !meta.restorePending){
     mirrorDelivery(e);
   }
 
@@ -2803,6 +2925,27 @@ ADF_CATALOG_LOAD
     ADF.ready=true;
     st();
     adfInstallNotificationApp();
+
+    /* Ripristino di una decisione HIGH lasciata aperta da un refresh.
+       Il clock conserva già il proprio pendingHigh; per catalogo e strada
+       ricostruiamo la scena qui, dopo che il catalogo è pronto. */
+    try{
+      const ph=pendingGlobalHigh();
+      if(ph){
+        beginGlobalHigh(ph.source,ph.eventId,{restore:true,meta:ph.meta||null});
+        if(ph.source==="catalog"){
+          const pe=ADF.byId.get(ph.eventId);
+          if(pe && pe.tier==="high"){
+            const pm=Object.assign({},ph.meta||{},{restorePending:true});
+            setTimeout(()=>showCatalog(pe,null,pm),0);
+          }else endGlobalHigh(ph.source,ph.eventId);
+        }else if(ph.source==="street" && typeof window.ADF_RESTORE_STREET_HIGH==="function"){
+          afterClear(()=>window.ADF_RESTORE_STREET_HIGH(ph.eventId),80);
+        }
+      }
+    }catch(err){
+      console.warn("[ADF] ripristino HIGH non riuscito",err);
+    }
     try{
       if(typeof TEL_APP==="undefined" || TEL_APP===null){
         if(typeof renderTelefono==="function") renderTelefono();
@@ -2825,7 +2968,7 @@ ADF_CATALOG_LOAD
   });
 
 window.ADF_CAN_SKIP_TIME=function(){
-  return ADF.ready && !ADF.skipRunning && !overlayBusy() && !G.ended;
+  return ADF.ready && !ADF.skipRunning && !globalHigh() && !overlayBusy() && !G.ended;
 };
 
 /* Bridge unico per i controlli +1/+7 e per gli eventi a minuti.

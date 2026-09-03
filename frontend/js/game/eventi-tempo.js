@@ -250,6 +250,14 @@
 
   function pending(){ return state().pendingHigh || null; }
 
+  /* Se rientriamo da un salvataggio con un HIGH del clock aperto,
+     ricostruiamo anche il lock globale prima che altri motori possano agire. */
+  try{
+    const restored=pending();
+    if(restored && window.ADF_EVENTI && typeof ADF_EVENTI.beginHigh==="function")
+      ADF_EVENTI.beginHigh("clock",restored.id,{restore:true});
+  }catch(_){}
+
   function pendingContext(raw){
     const c = Object.assign({}, raw || {});
     if(!c.city) c.city = cityName();
@@ -258,9 +266,13 @@
   }
 
   function clearPending(){
-    const s = state();
+    const s = state(), p=s.pendingHigh||null;
     delete s.pendingHigh;
     MOSTRANDO_ALTO = false;
+    try{
+      if(p && window.ADF_EVENTI && typeof ADF_EVENTI.endHigh==="function")
+        ADF_EVENTI.endHigh("clock",p.id);
+    }catch(_){}
     if(typeof save === "function") save();
   }
 
@@ -317,6 +329,11 @@
 
   function triggerHigh(e,ctx){
     if(pending()) return {blocked:true, reason:"high-pending"};
+    try{
+      if(window.ADF_EVENTI && typeof ADF_EVENTI.beginHigh==="function" &&
+         !ADF_EVENTI.beginHigh("clock",e.id))
+        return {blocked:true, reason:"global-high-cooldown"};
+    }catch(_){}
     mark(e,ctx);
     state().pendingHigh = {id:e.id, at:ctx.abs, context:{
       source:ctx.source, minutes:ctx.minutes, from:ctx.from, to:ctx.to, time:ctx.time,
@@ -336,6 +353,13 @@
   function trigger(e,ctx){
     if(!e) return null;
     if(e.level === "alto") return triggerHigh(e,ctx);
+
+    try{
+      if(window.ADF_EVENTI && typeof ADF_EVENTI.claimAutoEvent==="function" &&
+         !ADF_EVENTI.claimAutoEvent("clock"))
+        return {suppressed:true,reason:"auto-event-already-claimed"};
+    }catch(_){}
+
     /* Anche basso/medio sono differiti di un tick: azioneFatta() emette
        game-time:advanced prima che ui.js calcoli i delta dell'azione. Se
        applicassimo subito una spesa o dei fan, il risultato dell'evento
@@ -361,7 +385,11 @@
     detail=detail||{};
     if(pending()) return null;
     try{
-      if(window.ADF_EVENTI && ADF_EVENTI.activeCatalog) return null;
+      if(window.ADF_EVENTI){
+        if(ADF_EVENTI.activeCatalog) return null;
+        if(typeof ADF_EVENTI.globalHigh==="function" && ADF_EVENTI.globalHigh()) return null;
+        if(typeof ADF_EVENTI.highReady==="function" && !ADF_EVENTI.highReady()) return null;
+      }
     }catch(_){}
     const from=Number(detail.from), to=Number(detail.to);
     if(!Number.isFinite(from)||!Number.isFinite(to)||to-from<=15) return null;
@@ -389,14 +417,19 @@
   function evaluate(detail){
     detail=detail||{};
     if(AUTO_GUARD || pending() || detail.suppressRandomEvents) return null;
+    let allowHigh=true;
     try{
-      if(window.ADF_EVENTI && ADF_EVENTI.activeCatalog) return null;
+      if(window.ADF_EVENTI){
+        if(ADF_EVENTI.activeCatalog) return null;
+        if(typeof ADF_EVENTI.globalHigh==="function" && ADF_EVENTI.globalHigh()) return null;
+        if(typeof ADF_EVENTI.highReady==="function" && !ADF_EVENTI.highReady()) allowHigh=false;
+      }
     }catch(_){}
     const ctx = context(detail);
     if(ctx.minutes <= 0) return null;
     /* alto → medio → basso, salvo quando l'alto e' gia' stato campionato
-       dal planner intra-ACTION. */
-    const levels=detail.skipHigh ? ["medio","basso"] : ["alto","medio","basso"];
+       dal planner intra-ACTION o la finestra HIGH globale non è ancora pronta. */
+    const levels=(detail.skipHigh || !allowHigh) ? ["medio","basso"] : ["alto","medio","basso"];
     for(const level of levels){
       const pool = eligible(level,ctx,false);
       if(!pool.length) continue;
