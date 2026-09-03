@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:f28bb6a -->
+## 03/09/26, 20:33 — feat: completa esperienza e navigazione del carcere
+
+**Tipo:** Commit diretto su main
+
+**Autore:** Mycol (mycolbraga@gmail.com)
+
+**Commit:** `f28bb6a`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/strada-crimine-ui.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:815cabf -->
 ## 03/09/26, 18:49 — feat: aggiunge menu di sistema e navigazione mappa
 

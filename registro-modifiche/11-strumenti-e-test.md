@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:f28bb6a -->
+## 03/09/26, 20:33 — feat: completa esperienza e navigazione del carcere
+
+**Tipo:** Commit diretto su main
+
+**Autore:** Mycol (mycolbraga@gmail.com)
+
+**Commit:** `f28bb6a`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:e89ad13 -->
 ## 03/09/26, 14:13 — feat: completa il gameplay del carcere
 

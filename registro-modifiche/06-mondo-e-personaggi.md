@@ -6,6 +6,50 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:f28bb6a -->
+## 03/09/26, 20:33 — feat: completa esperienza e navigazione del carcere
+
+**Tipo:** Commit diretto su main
+
+**Autore:** Mycol (mycolbraga@gmail.com)
+
+**Commit:** `f28bb6a`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/index.html`
+- **Modificato:** `frontend/js/avvio.js`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Aggiunto:** `frontend/js/game/jail-backgrounds.js`
+- **Modificato:** `frontend/js/game/skip.js`
+- **Modificato:** `frontend/js/game/strada-crimine-ui.js`
+- **Modificato:** `frontend/js/game/tempo-controlli.js`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-01.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-02.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-03.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-04.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-05.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-06.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-07.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-08.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-09.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-10.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-11.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-12.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-13.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-14.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-15.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-16.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-17.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-18.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-19.jpg`
+- **Aggiunto:** `frontend/media/photo/carcere/carcere-bg-20.jpg`
+
+**File interessati in questa categoria:** 27
+
+---
+
 <!-- commit:e89ad13 -->
 ## 03/09/26, 14:13 — feat: completa il gameplay del carcere
 
