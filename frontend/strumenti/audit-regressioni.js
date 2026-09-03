@@ -282,7 +282,7 @@ test("UI legacy disabilita il riciclaggio a capacità zero",
 
 console.log("\nPunto 1 — controllo tempo globale coerente");
 test("controller tempo globale è caricato dopo i motori eventi",
-  index.indexOf('js/game/tempo-controlli.js') > index.indexOf('js/game/eventi-tempo.js'));
+  index.indexOf('<script src="js/game/tempo-controlli.js') > index.indexOf('<script src="js/game/eventi-tempo.js'));
 test("esiste un solo controller globale del tempo",
   timeControls.includes('const ROOT_ID = "adf-time-controls"') &&
   timeControls.includes('window.ADF_TIME_CONTROLS=Object.freeze'));
@@ -529,21 +529,20 @@ test("i turni con luogo fisico mantengono la mappa esplicita",
   travel.includes('operaio:"fabbrica"') &&
   travel.includes('if(id === "turno")'));
 
-console.log("\nAlias luogo — La Sala / Beat Maker");
-test("Beat Maker eredita gli orari della Sala",
-  hours.includes('beatmaker:"beat"') &&
-  hours.includes("function normalizePlace(id)") &&
-  hours.includes("PLACE_HOURS[place]"));
-test("orari espone equivalenza logica senza fondere gli hotspot fisici",
-  hours.includes("normalizePlace,") &&
-  hours.includes("samePlace:(a,b)") &&
-  hub.includes('{id:"beat", n:"La Sala"') &&
-  hub.includes('{id:"beatmaker", n:"Beat Maker"'));
-test("spostamenti usa l'equivalenza solo per accesso azioni",
-  travel.includes("function sameGameplayPlace(a,b)") &&
-  travel.includes("!sameGameplayPlace(required,current)") &&
-  travel.includes("G.currentPlace = toId"));
-test("eventi tempo normalizza Beat Maker come luogo beat",
+console.log("\nLuoghi — Beat Maker assorbito dallo Studio");
+test("Beat Maker non è più un hotspot fisico",
+  !hub.includes('{id:"beatmaker", n:"Beat Maker"') &&
+  !travel.includes("beatmaker: {") &&
+  !hours.includes('beatmaker:"studio"') &&
+  !hours.includes('beatmaker:"beat"'));
+test("la produzione beat richiede lo Studio mentre La Sala resta networking",
+  hours.includes('beat:"studio"') &&
+  hub.includes('{id:"studio", n:"Studio"') &&
+  hub.includes('{id:"beat", n:"La Sala"'));
+test("spostamenti migra i vecchi salvataggi Beat Maker allo Studio",
+  travel.includes('G.currentPlace === "beatmaker"') &&
+  travel.includes('G.currentPlace = "studio"'));
+test("eventi tempo continua a canonicalizzare i luoghi",
   clockEvents.includes("function canonicalPlace(id)") &&
   clockEvents.includes("GAME_HOURS.normalizePlace") &&
   clockEvents.includes("place:canonicalPlace(") &&
@@ -561,7 +560,6 @@ test("eventi tempo normalizza Beat Maker come luogo beat",
       {id:"crimin",n:"Attività criminali",x:10,y:0,w:10,h:10},
       {id:"studio",n:"Studio",x:20,y:0,w:10,h:10},
       {id:"beat",n:"La Sala",x:30,y:0,w:10,h:10},
-      {id:"beatmaker",n:"Beat Maker",x:35,y:0,w:10,h:10},
       {id:"palestra",n:"Palestra",x:40,y:0,w:10,h:10},
       {id:"pizzeria",n:"Pizzeria",x:60,y:0,w:10,h:10},
       {id:"fabbrica",n:"Fabbrica",x:80,y:0,w:10,h:10}
@@ -573,9 +571,9 @@ test("eventi tempo normalizza Beat Maker come luogo beat",
       text:()=>"10:00",DAY_END:1680,travel:()=>({blocked:false})
     },
     GAME_HOURS:{
-      normalizePlace:id=>id==="beatmaker"?"beat":String(id||""),
+      normalizePlace:id=>String(id||""),
       actionStatus:()=>hoursOpen?{open:true}:{open:false,phase:"before",nextText:"12:00",label:"Apre alle 12:00"},
-      placeForAction:id=>({beat:"beat",registra:"studio",palestra_pesi:"palestra",palestra_cardio:"palestra"}[id]||null),
+      placeForAction:id=>({beat:"studio",registra:"studio",palestra_pesi:"palestra",palestra_cardio:"palestra"}[id]||null),
       directActionForPlace:()=>null,
       placeStatus:()=>({open:true})
     },
@@ -605,10 +603,13 @@ test("eventi tempo normalizza Beat Maker come luogo beat",
     test("runtime: registra in Studio e in orario passa",g.ok===true);
 
     box.G.currentPlace="beatmaker";
+    test("runtime: un vecchio salvataggio Beat Maker migra allo Studio",
+      box.GAME_TRAVEL.current()==="studio");
+
     g=box.GAME_TRAVEL.actionAccess("beat");
-    test("runtime: Cerca un beat passa anche dal cartello Beat Maker",
-      g.ok===true && box.GAME_TRAVEL.current()==="beatmaker" &&
-      box.GAME_TRAVEL.logicalPlace("beatmaker")==="beat");
+    test("runtime: Cerca un beat si fa nello Studio",
+      g.ok===true && box.GAME_TRAVEL.current()==="studio" &&
+      box.GAME_TRAVEL.logicalPlace("studio")==="studio");
 
     hoursOpen=false;
     g=box.GAME_TRAVEL.actionAccess("registra");

@@ -83,13 +83,8 @@ const HUB_LUOGHI = [
   /* il beat maker non è un listino: è la sala dove si conosce la gente */
   {id:"beat", n:"La Sala", x:49.50, y:20.00, w:11.00, h:13.50,
    vai:() => apriPosto()},
-  /* punto 11: «Beat Maker» non è più un secondo ingresso della Sala. Il
-     lavoro sul beat è **una sezione dello studio**, e il cartello ci porta
-     dritto: alla Sala si conosce la gente, in studio ci si fa il pezzo.
-     I due edifici restano due edifici disegnati (punto 45, le targhette sono
-     dentro al pixel), ma adesso portano in due posti diversi davvero. */
-  {id:"beatmaker", n:"Beat Maker", x:33.50, y:43.00, w:7.00, h:10.50,
-   vai:() => apriStudio("beat")},
+  /* Beat Maker non è più un luogo sulla mappa: i beatmaker si conoscono
+     alla Sala e si lavora con loro nello Studio. */
   /* punto 60: si chiamava «Vita quotidiana» — la palestra è uscita da qui
      ed è diventata un posto suo (punto 61), resta stacca la spina e i conti */
   {id:"vita", n:"Casa", x:16.50, y:67.00, w:14.50, h:16.50,
@@ -149,7 +144,6 @@ const HUB_PIN_COLOR = Object.freeze({
   pizzeria:"#FF5A36",
   concerti:"#EC4899",
   beat:"#A855F7",
-  beatmaker:"#4ADE80",
   vita:"#FB923C",
   crimin:"#EF4444",
   fabbrica:"#CBD5E1",
@@ -161,7 +155,6 @@ const HUB_PIN_COLOR = Object.freeze({
 /* Quartieri UI. Le strade principali sono fasce neutre e fanno da confine naturale. */
 const HUB_DISTRICT = Object.freeze({
   studio:"periferia",
-  beatmaker:"periferia",
   vita:"periferia",
   crimin:"periferia",
   concerti:"centro",

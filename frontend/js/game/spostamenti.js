@@ -41,7 +41,6 @@
     pizzeria:  {x:90.040, y:60.420},
     concerti:  {x:64.455, y:25.835},
     beat:      {x:49.640, y:19.505},
-    beatmaker: {x:31.905, y:37.085},
     vita:      {x:17.745, y:59.330},
     crimin:    {x:15.460, y:84.585},
     fabbrica:  {x:88.410, y:29.580},
@@ -67,6 +66,10 @@
 
   function assicuraPosizione(){
     const all = elencoLuoghi();
+
+    /* Compatibilità con i salvataggi precedenti alla rimozione dell'hotspot:
+       chi aveva chiuso la partita al Beat Maker riparte nello Studio. */
+    if(G.currentPlace === "beatmaker") G.currentPlace = "studio";
 
     /* Un arresto è anche uno stato fisico: finché la pena è attiva il
        giocatore si trova al punto Carcere/Attività criminali, non a Casa. */

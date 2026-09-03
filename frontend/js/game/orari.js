@@ -10,17 +10,10 @@
 (function(){
   if(typeof GAME_TIME === "undefined") return;
 
-  /* Due hotspot possono rappresentare lo stesso luogo di gameplay.
-     Manteniamo gli ID fisici distinti per mappa/distanze, ma normalizziamo
-     regole, orari, azioni ed eventi sulla stessa identità logica. */
-  /* Punto 11: «Beat Maker» non porta più alla Sala, porta alla sezione dei
-     beat dello Studio — quindi segue l'orario dello studio, che non ne ha
-     (punto 10). Finché puntava a `beat` il cartello diceva «chiuso, apre alle
-     13» per un posto che ormai era sempre aperto: la porta si apriva e
-     l'orario diceva di no. */
-  const PLACE_ALIAS = Object.freeze({
-    beatmaker:"studio"
-  });
+  /* Nessun alias fisico attivo: Beat Maker non è più un luogo della città.
+     I vecchi salvataggi che si trovavano lì vengono migrati allo Studio
+     da spostamenti.js. */
+  const PLACE_ALIAS = Object.freeze({});
   function normalizePlace(id){
     const key=String(id||"");
     return PLACE_ALIAS[key] || key;
