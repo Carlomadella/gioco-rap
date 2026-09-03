@@ -6,6 +6,23 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:cc87b56 -->
+## 03/09/26, 10:54 — ci: aggiunge verifica automatica del gioco
+
+**Tipo:** Commit diretto su main  
+**Autore:** Mycol (mycolbraga@gmail.com)  
+**Commit:** `cc87b56`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+- **Aggiunto:** `frontend/strumenti/verifica-build.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- commit:36dd0b5 -->
 ## 03/09/26, 10:30 — fix: blocca il gameplay durante il carcere
 
