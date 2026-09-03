@@ -37,6 +37,7 @@
 <link rel="stylesheet" href="css/trasferte.css?v=1">
 <link rel="stylesheet" href="css/impostazioni.css?v=12">
 <!-- per ultimo: le aree da toccare devono vincere sulla cascata di tutti gli altri -->
+<link rel="stylesheet" href="css/menu-sistema.css?v=8">
 <link rel="stylesheet" href="css/tocco.css?v=12">
 </head>
 <body>
@@ -200,7 +201,7 @@
 
       <!-- ---------- la fascia in alto ---------- -->
       <header class="pbarra">
-        <button class="plogo" id="hb-logo" aria-label="Torna al menu principale">
+        <button class="plogo" id="hb-logo" aria-label="Apri menu di sistema">
           <svg class="hcrown" viewBox="0 0 24 14" aria-hidden="true"><path d="M2 13 .8 2.6l5.6 4.2L12 .8l5.6 6 5.6-4.2L22 13z"/></svg>
           <span><b>Anni di</b><i>Fame</i></span>
         </button>
@@ -257,9 +258,8 @@
 
 <section class="screen" id="s-game">
   <div class="game-wrap">
-    <!-- Le due vie d'uscita: la mappa, che è casa, e il menu principale. -->
+    <!-- La via di ritorno dal gameplay è la mappa. Il menu principale passa dal menu di sistema LA FAME. -->
     <button class="tornamenu mappa" id="g-tomappa"><span class="arw">&lsaquo;</span> Mappa</button>
-    <button class="tornamenu" id="g-tomenu"><span class="arw">&lsaquo;</span> Menu principale</button>
     <!-- Una testata sola, non tre schede impilate: chi sei, a che punto sei e i
          tre numeri che guardi davvero. Tutto il resto sta sotto «Dettagli»,
          chiuso finché non serve. -->
@@ -692,5 +692,6 @@
 <!-- Il pannello delle impostazioni: per ultimo, tocca roba definita ovunque. -->
 <script src="js/impostazioni-ui.js?v=12"></script>
 <script src="js/avvio.js?v=2"></script>
+<script src="js/menu-sistema.js?v=7"></script>
 </body>
 </html>

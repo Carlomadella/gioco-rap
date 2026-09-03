@@ -1,0 +1,567 @@
+/* Menu di sistema — ESC / LA FAME.
+   Non è un menu "pausa": nessun tempo di gioco scorre da solo. */
+
+.adf-system-menu{position:fixed;inset:0;z-index:10000;display:none;font-family:Figtree,Inter,system-ui,sans-serif;color:#f3ede3}
+.adf-system-menu.on{display:block}
+.adf-system-scrim{position:absolute;inset:0;background:rgba(5,5,7,.72);backdrop-filter:blur(9px) saturate(.68)}
+.adf-system-panel{position:absolute;left:clamp(18px,5vw,76px);top:50%;width:min(470px,calc(100vw - 36px));max-height:calc(100vh - 36px);overflow:auto;
+  transform:translateY(-50%);padding:22px;border:1px solid rgba(255,255,255,.14);border-radius:22px;
+  background:linear-gradient(160deg,rgba(22,21,24,.985),rgba(8,8,10,.985));box-shadow:0 34px 90px rgba(0,0,0,.68)}
+.adf-system-panel::before{content:"";position:absolute;left:0;top:22px;bottom:22px;width:3px;border-radius:2px;
+  background:linear-gradient(180deg,#d7b06a,rgba(215,176,106,.08))}
+.adf-system-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:0 0 18px 8px}
+.adf-system-kicker{display:block;color:#b7aa98;font-size:9px;font-weight:900;letter-spacing:.2em;text-transform:uppercase}
+.adf-system-head h2{margin:5px 0 0;font-family:"Archivo Black",Figtree,sans-serif;font-size:34px;line-height:1;text-transform:uppercase;letter-spacing:-.04em}
+.adf-system-x{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#eee6da;font-size:18px;cursor:pointer}
+.adf-system-x:hover{background:rgba(255,255,255,.11)}
+
+.adf-system-row,.adf-system-save{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;text-align:left;cursor:pointer}
+.adf-system-row{padding:15px 12px;border:0;border-top:1px solid rgba(255,255,255,.11);background:transparent;color:#eee7dd}
+.adf-system-row:last-of-type{border-bottom:1px solid rgba(255,255,255,.11)}
+.adf-system-row:hover{background:rgba(255,255,255,.055)}
+.adf-system-row span,.adf-system-save span{display:flex;flex-direction:column;gap:3px}
+.adf-system-row b,.adf-system-save b{font-size:13px;font-weight:900;letter-spacing:.075em;text-transform:uppercase}
+.adf-system-row small,.adf-system-save small{font-size:10.5px;color:#999187;line-height:1.35}
+.adf-system-row i,.adf-system-save i{font-style:normal;font-size:20px;color:#bcb3a8}
+
+.adf-system-audio{margin:9px 0 10px;padding:14px 12px;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(255,255,255,.035)}
+.adf-system-audio-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.adf-system-audio-head>span{display:flex;flex-direction:column;gap:2px}
+.adf-system-audio-head b{font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.adf-system-audio-head small{font-size:10px;color:#918a80}
+.adf-system-mute{min-width:48px;padding:7px 10px;border-radius:999px;border:1px solid rgba(126,185,139,.36);background:rgba(74,145,89,.12);color:#bfe0c5;
+  font-size:9px;font-weight:900;letter-spacing:.12em;cursor:pointer}
+.adf-system-mute.off{border-color:rgba(226,110,92,.32);background:rgba(160,55,42,.12);color:#dfa79d}
+.adf-system-volume{display:block;margin-top:13px}
+.adf-system-volume>span{display:flex;justify-content:space-between;margin-bottom:7px;color:#aaa297;font-size:10px;font-weight:700}
+.adf-system-volume input{width:100%;accent-color:#d7b06a}
+
+.adf-system-save{margin-top:14px;padding:15px 16px;border:1px solid rgba(215,176,106,.38);border-radius:15px;
+  background:linear-gradient(90deg,rgba(215,176,106,.17),rgba(215,176,106,.055));color:#f5ead7}
+.adf-system-save:hover{border-color:rgba(215,176,106,.65);background:linear-gradient(90deg,rgba(215,176,106,.24),rgba(215,176,106,.08))}
+.adf-system-save i{color:#e4c27f}
+.adf-system-status{min-height:16px;margin:8px 4px 0;font-size:10.5px;line-height:1.4;color:#a9a095}
+.adf-system-status[data-tipo="bad"]{color:#e7a194}.adf-system-status[data-tipo="good"]{color:#a8d2af}
+.adf-system-nosave{display:block;margin:5px auto 0;padding:7px 10px;border:0;background:none;color:#746f69;font-size:9px;font-weight:800;
+  letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.adf-system-nosave:hover,.adf-system-nosave.armato{color:#e19486;text-decoration:underline}
+
+body.adf-system-open{overflow:hidden}
+
+/* Navigazione globale: stesso punto, stesso componente, in ogni schermata
+   di gameplay. LA FAME è sempre presente; MAPPA scompare soltanto nell'hub
+   principale e in carcere. */
+.adf-global-nav{position:fixed;top:14px;left:14px;z-index:9600;display:flex;align-items:center;gap:8px;
+  font-family:Figtree,Inter,system-ui,sans-serif;pointer-events:auto}
+.adf-global-nav[hidden]{display:none!important}
+.adf-global-system,.adf-global-map{height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.15);
+  box-shadow:0 9px 28px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.08);backdrop-filter:blur(14px);cursor:pointer}
+.adf-global-system{display:flex;align-items:center;gap:9px;padding:0 11px 0 7px;background:rgba(10,10,13,.91);color:#f3ede3}
+.adf-global-system:hover{background:rgba(20,19,22,.96);border-color:rgba(215,176,106,.38)}
+.adf-global-mark{width:27px;height:27px;border-radius:8px;display:grid;place-items:center;background:#d7b06a;color:#15110b;
+  font:950 9px/1 Figtree,system-ui,sans-serif;letter-spacing:-.03em}
+.adf-global-name{font-size:10px;font-weight:950;letter-spacing:.14em;white-space:nowrap}
+.adf-global-system kbd{margin-left:2px;padding:3px 5px;border-radius:5px;border:1px solid rgba(255,255,255,.13);
+  background:rgba(255,255,255,.055);color:#837d75;font:800 7px/1 Figtree,system-ui,sans-serif;letter-spacing:.06em}
+.adf-global-map{display:flex;align-items:center;gap:7px;padding:0 13px;background:rgba(10,10,13,.82);color:#d8d0c5;
+  font:900 9px/1 Figtree,system-ui,sans-serif;letter-spacing:.11em;text-transform:uppercase}
+.adf-global-map:hover:not(:disabled){background:rgba(25,24,28,.94);color:#fff;border-color:rgba(255,255,255,.28)}
+.adf-global-map:disabled{opacity:.38;cursor:not-allowed}
+.adf-global-map[hidden]{display:none!important}
+
+/* I vecchi ritorni restano nel DOM per compatibilità con i moduli legacy, ma
+   la navigazione visibile è una sola e non cambia posto tra le schermate. */
+#g-tomappa,#st-mappa,#mapReturn{display:none!important}
+.adf-context-btn{display:none!important}
+.adf-system-logo{cursor:pointer;outline:none}
+.adf-system-logo:focus-visible{box-shadow:0 0 0 2px rgba(215,176,106,.55);border-radius:10px}
+
+/* Il vecchio pulsante diretto al menu non appartiene più al gameplay. La
+   regola resta anche per cache/build precedenti; il JS lo rimuove dal DOM. */
+#g-tomenu{display:none!important}
+
+@media (max-width:620px){
+  .adf-system-panel{left:10px;width:calc(100vw - 20px);padding:17px;border-radius:18px}
+  .adf-system-head h2{font-size:29px}
+  .adf-system-row,.adf-system-save{padding-left:10px;padding-right:10px}
+  .adf-global-nav{top:9px;left:9px;gap:6px}
+  .adf-global-system,.adf-global-map{height:36px;border-radius:10px}
+  .adf-global-system{padding-right:9px}
+  .adf-global-system kbd{display:none}
+  .adf-global-map{padding:0 10px}
+}
+@media (prefers-reduced-motion:reduce){
+  .adf-system-panel,.adf-system-scrim{transition:none!important}
+}
+
+/* === WORDMARK MENU V4.1 SAFE START === */
+/* Nessun nuovo runtime: il bottone V2 esistente usa il wordmark originale. */
+.adf-global-system{
+  width:132px;
+  min-width:132px;
+  height:58px;
+  padding:0 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  border:0;
+  border-radius:0;
+  background:linear-gradient(180deg,#0c1017,#080b11);
+  color:#e8eaf0;
+  box-shadow:none;
+  backdrop-filter:none;
+}
+.adf-global-system:hover{
+  background:rgba(255,255,255,.05);
+  border:0;
+  box-shadow:none;
+}
+.adf-global-system:focus-visible{
+  outline:2px solid rgba(255,211,78,.48);
+  outline-offset:-2px;
+}
+.adf-wordmark-crown{
+  width:20px;
+  height:20px;
+  flex:none;
+  display:block;
+  fill:#ffd34e;
+  transform:rotate(-12deg);
+  filter:drop-shadow(0 2px 0 #8e4a05);
+}
+.adf-wordmark-text{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  line-height:.82;
+  text-align:left;
+  font-family:var(--disp);
+  font-style:italic;
+  letter-spacing:-.02em;
+  white-space:nowrap;
+}
+.adf-wordmark-text b{
+  display:block;
+  font-size:15px;
+  line-height:.9;
+  font-weight:400;
+  color:#ffd34e;
+  text-shadow:0 2px 0 #b0700a;
+}
+.adf-wordmark-text i{
+  display:block;
+  font-size:25px;
+  line-height:.82;
+  font-weight:400;
+  font-style:italic;
+  color:#ffa92b;
+  text-shadow:0 2px 0 #8e4a05;
+}
+
+/* Il globale occupa il posto del marchio locale senza alterare il layout. */
+#s-hub.screen.on #hb-logo,
+#strada.on .topbar .logo,
+#adf-jail.on .adf-jail-brand{
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+
+@media (max-width:620px){
+  .adf-global-system{
+    width:118px;
+    min-width:118px;
+    height:52px;
+    padding:0 9px;
+    gap:6px;
+  }
+  .adf-wordmark-crown{width:18px;height:18px}
+  .adf-wordmark-text b{font-size:13px}
+  .adf-wordmark-text i{font-size:22px}
+}
+/* === WORDMARK MENU V4.1 SAFE END === */
+
+/* === MAPPA GLOBALE V5 START === */
+/* Wordmark e Mappa sono un unico blocco HUD.
+   La posizione resta quella globale già validata. */
+.adf-global-nav{
+  gap:0;
+  align-items:stretch;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.075);
+  border-radius:0 0 9px 0;
+  background:linear-gradient(180deg,#0c1017,#080b11);
+  box-shadow:0 8px 24px rgba(0,0,0,.28);
+}
+
+/* La cornice ora appartiene al contenitore, non ai singoli segmenti. */
+.adf-global-system{
+  flex:none;
+  border:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+}
+.adf-global-system:hover{
+  background:rgba(255,255,255,.045)!important;
+}
+
+/* Secondo segmento: ritorno alla città. */
+.adf-global-map{
+  position:relative;
+  width:112px;
+  min-width:112px;
+  height:58px;
+  padding:0 13px 0 15px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:9px;
+  border:0!important;
+  border-left:1px solid rgba(255,255,255,.085)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:#c9ced8;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  font-family:Figtree,Inter,system-ui,sans-serif;
+  cursor:pointer;
+  transition:background .15s ease,color .15s ease;
+}
+
+/* Freccia: stesso peso di un'icona HUD, non emoji/bottone flottante. */
+.adf-global-map > span:first-child{
+  width:25px;
+  height:25px;
+  flex:0 0 25px;
+  display:grid;
+  place-items:center;
+  border-radius:6px;
+  background:rgba(192,132,252,.075);
+  border:1px solid rgba(192,132,252,.18);
+  color:#c084fc;
+  font-size:17px;
+  font-weight:700;
+  line-height:1;
+  transform:translateY(-1px);
+}
+
+/* Il testo diventa una gerarchia a due righe senza cambiare il markup. */
+.adf-global-map > span:last-child{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  padding-top:9px;
+  color:#eef0f5;
+  font-size:11px;
+  font-weight:850;
+  line-height:1;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.adf-global-map > span:last-child::before{
+  content:"TORNA ALLA";
+  position:absolute;
+  left:0;
+  top:-1px;
+  color:#707887;
+  font-size:6.5px;
+  font-weight:850;
+  line-height:1;
+  letter-spacing:.17em;
+}
+
+.adf-global-map:hover:not(:disabled){
+  background:rgba(255,255,255,.045)!important;
+  color:#fff;
+}
+.adf-global-map:hover:not(:disabled) > span:first-child{
+  background:rgba(192,132,252,.13);
+  border-color:rgba(192,132,252,.34);
+  color:#d8b4fe;
+}
+
+.adf-global-map:focus-visible{
+  outline:none;
+  box-shadow:inset 0 0 0 2px rgba(192,132,252,.38)!important;
+}
+
+.adf-global-map:disabled{
+  opacity:.34;
+  cursor:not-allowed;
+}
+.adf-global-map:disabled > span:first-child{
+  filter:grayscale(.65);
+}
+
+/* Quando MAPPA è nascosto, il wordmark resta pulito e non conserva separatori. */
+.adf-global-map[hidden]{
+  display:none!important;
+}
+
+/* Mantiene il blocco compatto sui display piccoli. */
+@media (max-width:620px){
+  .adf-global-nav{
+    border-radius:0 0 8px 0;
+  }
+  .adf-global-map{
+    width:96px;
+    min-width:96px;
+    height:52px;
+    padding:0 9px 0 11px;
+    gap:7px;
+  }
+  .adf-global-map > span:first-child{
+    width:22px;
+    height:22px;
+    flex-basis:22px;
+    font-size:15px;
+  }
+  .adf-global-map > span:last-child{
+    font-size:9.5px;
+    padding-top:8px;
+  }
+  .adf-global-map > span:last-child::before{
+    font-size:5.8px;
+  }
+}
+/* === MAPPA GLOBALE V5 END === */
+
+/* === NAV HUD HOST V7 START === */
+
+/* BASE: il contenitore non si vede più. È soltanto un supporto click. */
+.adf-system-host-v7{
+  position:relative!important;
+}
+
+.adf-system-host-v7 > .adf-global-nav{
+  position:absolute!important;
+  z-index:30!important;
+  display:flex!important;
+  align-items:stretch!important;
+  gap:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:visible!important;
+
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+}
+
+/* I segmenti sono parti della barra, non card. */
+.adf-system-host-v7 > .adf-global-nav > .adf-global-system,
+.adf-system-host-v7 > .adf-global-nav > .adf-global-map{
+  align-self:stretch!important;
+  height:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  border-radius:0!important;
+  border-top:0!important;
+  border-bottom:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+}
+
+/* Wordmark */
+.adf-system-host-v7 > .adf-global-nav > .adf-global-system{
+  width:132px!important;
+  min-width:132px!important;
+  padding:0 12px!important;
+  border-left:0!important;
+  border-right:1px solid rgba(255,255,255,.075)!important;
+}
+.adf-system-host-v7 > .adf-global-nav > .adf-global-system:hover{
+  background:rgba(255,255,255,.04)!important;
+}
+
+/* MAPPA: niente quadratino/pill intorno alla freccia. */
+.adf-system-host-v7 > .adf-global-nav > .adf-global-map{
+  width:112px!important;
+  min-width:112px!important;
+  padding:0 13px!important;
+  gap:7px!important;
+  border-left:0!important;
+  border-right:1px solid rgba(255,255,255,.065)!important;
+}
+.adf-system-host-v7 > .adf-global-nav > .adf-global-map:hover:not(:disabled){
+  background:rgba(255,255,255,.04)!important;
+}
+
+.adf-system-host-v7 .adf-global-map > span:first-child{
+  width:19px!important;
+  height:19px!important;
+  flex:0 0 19px!important;
+  display:grid!important;
+  place-items:center!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:#c084fc!important;
+  font-size:18px!important;
+  font-weight:600!important;
+  line-height:1!important;
+}
+
+.adf-system-host-v7 .adf-global-map > span:last-child{
+  padding-top:9px!important;
+}
+
+.adf-system-host-v7 .adf-global-map:disabled{
+  opacity:.32!important;
+}
+
+/* ============================================================
+   MAPPA / CITTÀ
+   Il vecchio #hb-logo rimane invisibile ma CONSERVA i suoi 132px:
+   il nuovo wordmark occupa esattamente quelle coordinate.
+   MAPPA qui è già hidden dalla logica.
+   ============================================================ */
+#s-hub.screen.on .pbarra.adf-system-host-v7 > .adf-global-nav{
+  left:0!important;
+  top:0!important;
+  bottom:0!important;
+  height:auto!important;
+}
+#s-hub.screen.on .pbarra.adf-system-host-v7 > #hb-logo{
+  visibility:hidden!important;
+  display:flex!important;
+  pointer-events:none!important;
+}
+
+/* ============================================================
+   ATTIVITÀ CRIMINALI
+   La topbar reale è 72px, padding 0 30px.
+   Il blocco parte ESATTAMENTE da x=30 ed è alto tutti i 72px.
+   Il vecchio logo resta invisibile nella prima colonna della grid, così
+   "Attività criminali" continua a restare perfettamente centrato.
+   ============================================================ */
+#strada.on .topbar.adf-system-host-v7 > .adf-global-nav{
+  left:30px!important;
+  top:0!important;
+  height:72px!important;
+  bottom:auto!important;
+}
+#strada.on .topbar.adf-system-host-v7 > .logo{
+  visibility:hidden!important;
+  display:flex!important;
+  pointer-events:none!important;
+}
+
+/* Il tema Strada resta rosso/rosa solo nell'hover e nella freccia. */
+#strada.on .topbar.adf-system-host-v7 .adf-global-map > span:first-child{
+  color:var(--gold,#c52e5f)!important;
+}
+#strada.on .topbar.adf-system-host-v7 > .adf-global-nav > .adf-global-map:hover:not(:disabled){
+  background:rgba(197,46,95,.065)!important;
+}
+
+/* ============================================================
+   CARCERE
+   Stessa altezza della testata (72px), padding laterale originale 34px.
+   MAPPA rimane hidden.
+   ============================================================ */
+#adf-jail.on .adf-jail-top.adf-system-host-v7 > .adf-global-nav{
+  left:34px!important;
+  top:0!important;
+  height:72px!important;
+}
+#adf-jail.on .adf-jail-top.adf-system-host-v7 > .adf-jail-brand{
+  visibility:hidden!important;
+  display:block!important;
+  pointer-events:none!important;
+}
+
+/* ============================================================
+   STUDIO / schermata gioco
+   Qui NON entriamo più nella .tline flex.
+   Il blocco vive dentro la card #gtop, sulle stesse coordinate del padding
+   (18px,14px), alto quanto il ritratto (62px).
+   Riserviamo lo spazio soltanto nella prima riga, non nell'intera pagina.
+   ============================================================ */
+#s-game.screen.on #gtop.adf-system-host-v7 > .adf-global-nav{
+  left:18px!important;
+  top:14px!important;
+  height:62px!important;
+}
+#s-game.screen.on #gtop.adf-system-host-v7 > .tline{
+  padding-left:256px!important;
+  min-height:62px!important;
+}
+
+/* ============================================================
+   SALA / GUARDAROBA
+   Header piccoli dentro wrapper: il blocco è incassato a sinistra;
+   titolo del luogo parte subito dopo.
+   ============================================================ */
+#posto.on .pohead.adf-system-host-v7,
+#negozio.on .nghead.adf-system-host-v7{
+  min-height:58px!important;
+  align-items:center!important;
+}
+#posto.on .pohead.adf-system-host-v7 > .adf-global-nav,
+#negozio.on .nghead.adf-system-host-v7 > .adf-global-nav{
+  left:0!important;
+  top:0!important;
+  height:58px!important;
+}
+#posto.on .pohead.adf-system-host-v7 > .pok,
+#negozio.on .nghead.adf-system-host-v7 > .ngk{
+  margin-left:256px!important;
+}
+
+/* Piazza e writer: stesso principio, senza alterare i contenuti sotto. */
+#piazza.on .phead.adf-system-host-v7,
+#writer.on .whead.adf-system-host-v7{
+  min-height:58px!important;
+}
+#piazza.on .phead.adf-system-host-v7 > .adf-global-nav,
+#writer.on .whead.adf-system-host-v7 > .adf-global-nav{
+  left:0!important;
+  top:0!important;
+  height:58px!important;
+}
+#piazza.on .phead.adf-system-host-v7 > :not(.adf-global-nav):first-child,
+#writer.on .whead.adf-system-host-v7 > :not(.adf-global-nav):first-child{
+  margin-left:256px!important;
+}
+
+/* ============================================================
+   MOBILE
+   Il componente si compatta; nelle testate strette i titoli restano leggibili.
+   ============================================================ */
+@media (max-width:620px){
+  .adf-system-host-v7 > .adf-global-nav > .adf-global-system{
+    width:112px!important;
+    min-width:112px!important;
+    padding:0 8px!important;
+  }
+  .adf-system-host-v7 > .adf-global-nav > .adf-global-map{
+    width:90px!important;
+    min-width:90px!important;
+    padding:0 8px!important;
+  }
+
+  #s-game.screen.on #gtop.adf-system-host-v7 > .tline{
+    padding-left:0!important;
+    padding-top:58px!important;
+  }
+  #s-game.screen.on #gtop.adf-system-host-v7 > .adf-global-nav{
+    height:50px!important;
+  }
+
+  #posto.on .pohead.adf-system-host-v7 > .pok,
+  #negozio.on .nghead.adf-system-host-v7 > .ngk{
+    margin-left:210px!important;
+  }
+}
+
+/* === NAV HUD HOST V7 END === */
