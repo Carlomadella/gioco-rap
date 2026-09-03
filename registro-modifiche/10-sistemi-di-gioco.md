@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:d7455b1 -->
+## 03/09/26, 21:10 — fix: nuove carriere partono da zero
+
+**Tipo:** Commit diretto su main
+
+**Autore:** Mycol (mycolbraga@gmail.com)
+
+**Commit:** `d7455b1`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/state.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:e89ad13 -->
 ## 03/09/26, 14:13 — feat: completa il gameplay del carcere
 

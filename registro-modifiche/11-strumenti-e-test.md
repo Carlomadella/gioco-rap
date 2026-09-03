@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- commit:d7455b1 -->
+## 03/09/26, 21:10 — fix: nuove carriere partono da zero
+
+**Tipo:** Commit diretto su main
+
+**Autore:** Mycol (mycolbraga@gmail.com)
+
+**Commit:** `d7455b1`
+
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/prova.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- commit:f28bb6a -->
 ## 03/09/26, 20:33 — feat: completa esperienza e navigazione del carcere
 
