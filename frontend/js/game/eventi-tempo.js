@@ -290,8 +290,10 @@
   }
 
   function screenGameplay(){
-    const a = document.getElementById("s-hub"), b = document.getElementById("s-game");
-    return !!((a && a.classList.contains("on")) || (b && b.classList.contains("on")));
+    /* Punto 7: la schermata di gioco è una sola, la mappa. Il quaderno le sta
+       sopra ma non la spegne, quindi basta guardare lei. */
+    const a = document.getElementById("s-hub");
+    return !!(a && a.classList.contains("on"));
   }
 
   function queuePending(){
@@ -632,7 +634,7 @@
     if(!pending()) return;
     const inside=ev.target&&ev.target.closest ? ev.target.closest("#modal") : null;
     if(inside) return;
-    const block=ev.target&&ev.target.closest ? ev.target.closest(".tile[data-id],.pspot[data-l],#g-advance,#g-skip") : null;
+    const block=ev.target&&ev.target.closest ? ev.target.closest(".tile[data-id],.pspot[data-l]") : null;
     if(!block) return;
     ev.preventDefault(); ev.stopImmediatePropagation();
     queuePending();
