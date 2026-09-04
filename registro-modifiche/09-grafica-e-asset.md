@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:4284600 -->
+## 04/09/26, 20:41 â€” task/registro-e-media â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `4284600`
+
+### Cosa Ã¨ entrato
+
+- `2a43296` â€” docs: registro allineato e due sfondi nuovi â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/media/photo/immagini_background_personaggio/booth_registrazione_notturno.png`
+- **Aggiunto:** `frontend/media/photo/immagini_background_personaggio/control_room_notturna.png`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:60b46fe -->
 ## 04/09/26, 12:12 â€” task/studio-prova â†’ main
 
