@@ -11,7 +11,7 @@ file del suo argomento con dentro cosa è stato fatto.
 
 | file | cosa c'è dentro |
 | --- | --- |
-| [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 11 voci |
+| [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 12 voci |
 | [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 27 voci |
 | [`03-artista-e-avatar.md`](03-artista-e-avatar.md) | **L'artista e il suo avatar** — 1 voce |
 | [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 11 voci |
@@ -26,7 +26,7 @@ per tutti e per tutto.
 
 ## Tutti i punti
 
-89 voci in tutto: **55 chiuse**, 12 a metà, il resto da fare.
+90 voci in tutto: **56 chiuse**, 12 a metà, il resto da fare.
 
 | | punto | stato | dove |
 | --- | --- | --- | --- |
@@ -119,6 +119,7 @@ per tutti e per tutto.
 | **—** | Tutte le rotte provate su Postman | fatto | [multiplayer-e-backend](07-multiplayer-e-backend.md) |
 | **—** | Opp e giornalisti per strada | fatto | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
 | **—** | Via il Campetto dalla mappa | fatto | [mappa-e-citta](01-mappa-e-citta.md) |
+| **—** | Le zone da toccare, tutte della misura dello Studio | fatto | [mappa-e-citta](01-mappa-e-citta.md) |
 
 > Lo stato è letto dal testo dei punti: «fatto» vuol dire che c'è scritto cosa è
 > stato fatto e quando, «risposto» che c'è una risposta ragionata ma il codice

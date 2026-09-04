@@ -51,22 +51,44 @@ const spoglia = t => String(t).replace(/<[^>]*>/g, "");
 
 /* ================= I LUOGHI ================= */
 /* Le targhette sono dentro alla foto: qui c'è solo dove si tocca, in
-   percentuale dell'immagine (1536×600 — punto 6: il ritaglio della mappa
-   definitiva, frontend/concept/mappa_definitiva.png,
+   percentuale del riquadro della foto (mappa v2: i tre strati dell'ora in
+   media/photo/pagina di gioco/, 1672×941,
    senza fascia in alto, profilo, player e slider dell'ora, che sono già
    disegnati veri altrove), e cosa succede quando si tocca.
    Gli id non si toccano: orari.js, eventi-tempo.js, spostamenti.js e
-   trasferte.js li usano per sapere orari, eventi ambientali e distanze. */
+   trasferte.js li usano per sapere orari, eventi ambientali e distanze.
+
+   **Tutte della misura dello Studio.** Erano dieci rettangoli uno diverso
+   dall'altro — la Fabbrica prendeva tre volte e mezzo lo Studio, e mezzo
+   quartiere si accendeva per un edificio solo. Adesso `w`/`h` valgono
+   10.50 × 12.50 per tutti: quello che cambia è solo `x`/`y`, cioè dove sta
+   la zona, non quanto è grande. Una zona si sposta muovendo `x`/`y`, mai
+   allargandola.
+
+   **`x`/`y` sono l'angolo in alto a sinistra**, non il centro: il pallino
+   (.pspot-dot) sta in mezzo, a `x + 5.25` / `y + 6.25`. È il pallino che si
+   vede da fermi, quindi è quello che va tenuto **sull'edificio giusto** e
+   **lontano dagli altri**. I due più vicini (Studio e Casa) sono passati da
+   45 px a 66 px sullo schermo, nessuna zona ne tocca più un'altra, e con
+   tutte e dieci le targhette accese insieme non se ne sovrappone nessuna:
+   sono le tre cose da rimisurare in console se un giorno si sposta una zona.
+
+   Un avvertimento sulle distanze: la foto **non è quadrata come il file**.
+   Quando la plancia è bassa e larga, `max-height` schiaccia .pfoto e i tre
+   strati (`background-size: 100% 100%`) si stirano con lei. Le percentuali
+   restano giuste — sono percentuali della stessa scatola — ma un centimetro
+   verticale vale meno di uno orizzontale, e due pallini «lontani» sul file
+   possono essere vicini a schermo. Si misura sempre nel browser. */
 const HUB_LUOGHI = [
   /* punto 12: lo studio non è più una scorciatoia alla linguetta della
      settimana — è una stanza sua, con dentro le quattro fasi di un pezzo e la
      gente che ci lavora (js/game/studio.js). Punto 10: è sempre aperto. */
-  {id:"studio", n:"Studio", x:19.50, y:56.00, w:10.50, h:12.50,
+  {id:"studio", n:"Studio", x:17.40, y:53.80, w:10.50, h:12.50,
    vai:() => apriStudio("beat")},
   /* punto 59/61: era un cartello chiuso («Club & discoteche», ancora dentro
      alla foto — cambia solo quando cambia la mappa, punto 45); qui sotto
      adesso c'è un lavoro vero, part time. */
-  {id:"pizzeria", n:"Pizzeria", x:49.00, y:68.00, w:12.50, h:17.00,
+  {id:"pizzeria", n:"Pizzeria", x:50.00, y:70.25, w:10.50, h:12.50,
    vai:() => schedaLavoro("lavapiatti", "Pizzeria")},
   /* punto 48: non più un cartello chiuso — è dove si va a fare l'open mic,
      che esisteva già come azione ma non aveva un posto sulla mappa. Se non
@@ -78,7 +100,7 @@ const HUB_LUOGHI = [
      («Freestyle al bar centrale»): se passavi di lì a un'altra ora non
      esisteva. Il palco è il posto dove si sta davanti alla gente: ci stanno
      tutte e due. */
-  {id:"concerti", n:"Live Club", x:33.00, y:20.00, w:14.00, h:13.50,
+  {id:"concerti", n:"Live Club", x:34.75, y:20.50, w:10.50, h:12.50,
    vai:() => {
      const palco = hubPronta("live");
      showEvent({k:"Live Club", t:"Che serata fai?",
@@ -95,13 +117,13 @@ const HUB_LUOGHI = [
        ]});
    }},
   /* il beat maker non è un listino: è la sala dove si conosce la gente */
-  {id:"beat", n:"La Sala", x:49.50, y:20.00, w:11.00, h:13.50,
+  {id:"beat", n:"La Sala", x:53.20, y:18.00, w:10.50, h:12.50,
    vai:() => apriPosto()},
   /* Beat Maker non è più un luogo sulla mappa: i beatmaker si conoscono
      alla Sala e si lavora con loro nello Studio. */
   /* punto 60: si chiamava «Vita quotidiana» — la palestra è uscita da qui
      ed è diventata un posto suo (punto 61), resta stacca la spina e i conti */
-  {id:"vita", n:"Casa", x:16.50, y:67.00, w:14.50, h:16.50,
+  {id:"vita", n:"Casa", x:21.05, y:71.00, w:10.50, h:12.50,
    vai:() => showEvent({k:"Casa", t:"Stacca la spina o guarda i conti",
      d:"La settimana non è solo musica. Ogni tanto la testa va spenta, e i conti vanno guardati.",
      annulla(){},
@@ -114,17 +136,17 @@ const HUB_LUOGHI = [
      ]})},
   /* punto 21/57: la Strada, ricostruita da claude/carriera-criminale.md
      (js/game/strada-crimine.js) — non era mai stata scritta, solo pensata */
-  {id:"crimin", n:"Attività criminali", x:0.50, y:64.00, w:13.00, h:16.00,
+  {id:"crimin", n:"Attività criminali", x:1.75, y:65.70, w:10.50, h:12.50,
    vai:() => (G.strada && G.strada.arresto && typeof apriCarcere === "function")
   ? apriCarcere()
   : apriStrada()},
   /* punto 59: il secondo lavoro, full time — era «Sponsor & brand» */
-  {id:"fabbrica", n:"Fabbrica", x:79.00, y:28.00, w:20.00, h:22.00,
+  {id:"fabbrica", n:"Fabbrica", x:83.80, y:32.75, w:10.50, h:12.50,
    vai:() => schedaLavoro("operaio", "Fabbrica")},
   /* punto 61: la palestra esce dal sottomenu di Casa e diventa un posto
      suo — era «Business», un altro cartello chiuso senza niente dietro.
      Punto 9: non è più un pulsante solo — si sceglie cosa fare, come a Casa. */
-  {id:"palestra", n:"Palestra", x:71.50, y:75.00, w:17.50, h:17.00,
+  {id:"palestra", n:"Palestra", x:75.00, y:77.30, w:10.50, h:12.50,
    vai:() => showEvent({k:"Palestra", t:"Che allenamento fai?",
      d:"Il fisico che si vede sotto le luci, o la testa che si svuota prima di scrivere: scegli tu.",
      annulla(){},
@@ -139,7 +161,7 @@ const HUB_LUOGHI = [
   /* punto 48 + «via il quaderno»: qui dentro è finito tutto quello che si
      compra — l'attrezzatura, il banco dei beat e i vestiti. Era il Catalogo,
      che come linguetta a sé non aveva senso: un negozio è un posto. */
-  {id:"shop", n:"Shop", x:43.50, y:30.00, w:15.00, h:11.50,
+  {id:"shop", n:"Shop", x:45.40, y:30.95, w:10.50, h:12.50,
    vai:() => apriPannello("Shop", "shop",
      "Attrezzatura, beat da comprare e roba da mettersi addosso.")},
   /* punto 6: il centro per l'impiego, arrivato con la mappa definitiva.
@@ -149,7 +171,7 @@ const HUB_LUOGHI = [
      posto giocabile. Il cartello nella foto resta — punto 45, le targhette
      sono dentro al pixel — ma senza una zona da toccare sopra non fa più
      niente, come «Periferia» o «Centro». */
-  {id:"impiego", n:"Centro per l'impiego", x:60.00, y:21.50, w:18.50, h:18.50,
+  {id:"impiego", n:"Centro per l'impiego", x:65.40, y:24.45, w:10.50, h:12.50,
    vai:() => schedaImpiego()}
 ];
 

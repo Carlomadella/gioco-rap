@@ -29,6 +29,8 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 ## Da smistare
 
-_(qui sotto finiscono i punti nuovi, appena scritti)_ 
+_(qui sotto finiscono i punti nuovi, appena scritti)_
 
-2.  Le card sulla mappa come studio, fabbrica, pizzeria, la sala ecc hanno una card cliccabile troppo grande, LE VOGLIO TUTTE COME STUDIO 
+_Vuoto: l'ultimo punto (le card cliccabili tutte come lo Studio, e i punti sulla mappa
+piu' distanti fra loro) e' chiuso ed e' finito in
+[`implementazioni/01-mappa-e-citta.md`](implementazioni/01-mappa-e-citta.md)._

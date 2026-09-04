@@ -777,3 +777,63 @@ metà riga) e il nome può andare a capo.
 `npm run prova` 67/67, `audit-regressioni` 178/178, `verifica:build` 15/15. Provato in
 Chrome: Shop, Casa, le tre app del telefono, il Live Club che fa scegliere, la promo
 nello Studio, console pulita.
+
+---
+
+## Le zone da toccare, tutte della misura dello Studio (04/09/2026)
+
+> Le card sulla mappa come studio, fabbrica, pizzeria, la sala ecc hanno una card cliccabile
+> troppo grande, LE VOGLIO TUTTE COME STUDIO. E i punti sulla mappa sono ancora troppo vicini,
+> allontanali un po' tra di loro anche.
+
+**FATTO.** Erano dieci rettangoli uno diverso dall'altro, scritti a occhio uno alla volta
+in `HUB_LUOGHI` (`frontend/js/game/hub.js`). Lo Studio era fra i più piccoli e la Fabbrica
+prendeva **tre volte e mezzo** la sua area: toccavi un capannone e si accendeva mezzo
+quartiere.
+
+| la zona | prima (w × h) | quante volte lo Studio |
+|---|---|---|
+| Studio | 10,50 × 12,50 | 1× |
+| La Sala | 11,00 × 13,50 | 1,1× |
+| Pizzeria | 12,50 × 17,00 | 1,6× |
+| Attività criminali | 13,00 × 16,00 | 1,6× |
+| Live Club | 14,00 × 13,50 | 1,4× |
+| Casa | 14,50 × 16,50 | 1,8× |
+| Shop | 15,00 × 11,50 | 1,3× |
+| Palestra | 17,50 × 17,00 | 2,3× |
+| Centro per l'impiego | 18,50 × 18,50 | 2,6× |
+| **Fabbrica** | 20,00 × 22,00 | **3,4×** |
+
+Adesso `w` e `h` valgono **10,50 × 12,50 per tutte e dieci**, cioè la misura dello Studio.
+Quello che cambia da una zona all'altra è solo `x`/`y`: dove sta, non quanto è grande.
+
+**Rimpicciolire non basta, e non era nemmeno la parte difficile.** `x`/`y` sono l'angolo in
+alto a sinistra, non il centro: cambiando solo `w`/`h` ogni zona sarebbe scivolata in alto a
+sinistra, via dal suo edificio. Ognuna è stata **rimessa sul suo palazzo** misurando la foto
+(`media/photo/pagina di gioco/mappa_citta_giorno.png`, 1672×941) e ricontrollando il pallino
+uno per uno: il magazzino con lo showroom aperto per lo Studio, il palazzone accanto per la
+Casa, il cartellone della pizza per la Pizzeria, il capannone della ciminiera per la Fabbrica,
+il palazzo con le colonne per il Centro per l'impiego.
+
+**E allontanati, che era la seconda richiesta.** Non si spostano i palazzi, quindi lo spazio
+è quello che è: si è lavorato dentro all'ingombro di ogni edificio, portando il pallino nel
+punto più lontano dai vicini che restasse sopra il suo. Studio e Casa si sono divisi anche di
+lato invece che solo in verticale; lo Shop è sceso sulla fila di negozi sotto alla Sala,
+la Sala è salita sul suo palazzo, il Centro per l'impiego si è spostato verso il colonnato.
+Misurato nel browser: **i due pallini più vicini erano a 45 px, adesso sono a 66**, i secondi
+a 79, i terzi a 97. Nessuna zona ne tocca più un'altra (prima Live Club e Shop, e Sala e
+Shop, si accavallavano davvero), e con **tutte e dieci le targhette accese insieme** — il caso
+peggiore, quando si illumina un quartiere — non se ne sovrappone nessuna.
+
+**Una cosa trovata per strada, non toccata.** La foto **non tiene il suo rapporto**: quando la
+plancia è bassa e larga, `max-height` schiaccia `.pfoto` e i tre strati dell'ora
+(`background-size: 100% 100%`) si stirano con lei — 845×341 dove il file è 1672×941. Le
+percentuali restano giuste, perché sono percentuali della stessa scatola, ma la città si vede
+un po' schiacciata e un centimetro in verticale vale meno di uno in orizzontale. È scritto nel
+commento di `HUB_LUOGHI` come avvertimento a chi misura, ed è il motivo per cui le distanze
+qui sopra sono misurate **nel browser** e non sul file. Sistemarla è un'altra cosa: tocca il
+CSS della mappa, non le zone.
+
+`npm run prova` 67/67, `audit-regressioni` 188/188, `verifica:build` 15/15. Provato in Chrome
+sulla partita vera: dieci zone tutte 89×43 px, zero sovrapposizioni fra zone, zero fra
+targhette, console pulita.
