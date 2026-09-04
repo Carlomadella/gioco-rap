@@ -6,6 +6,29 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:7a51f54 -->
+## 04/09/26, 22:50 â€” task/video-transizioni â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `7a51f54`
+
+### Cosa Ã¨ entrato
+
+- `5e07d27` â€” assets: i video delle transizioni â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/media/video/01_studio_definitivo.mp4`
+- **Aggiunto:** `frontend/media/video/02_ingresso_sala_definitivo.mp4`
+- **Aggiunto:** `frontend/media/video/03_ritorno_casa_definitivo.mp4`
+- **Aggiunto:** `frontend/media/video/04_stacca_la_spina_definitivo.mp4`
+- **Aggiunto:** `frontend/media/video/05_registra_pezzo_definitivo.mp4`
+- **Aggiunto:** `frontend/media/video/video_transizione_entrata_in_studio.mp4`
+
+**File interessati in questa categoria:** 6
+
+---
+
 <!-- merge:76cfda1 -->
 ## 04/09/26, 22:48 â€” main â†’ main
 
