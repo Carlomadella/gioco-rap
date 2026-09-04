@@ -454,3 +454,36 @@ disegno sopra.
     Nello stesso giro anche i controlli scemi che non c'erano: ogni situazione con almeno
     due risposte e nessuna ripetuta, ogni risposta con un testo, punti nella scala giusta e
     un carattere che esiste davvero.
+
+---
+
+## 6 · Al massimo una conversazione lunga al giorno
+
+6. Con le persone non ci si può sentire sempre! Limitiamo il tutto a MASSIMO una
+   conversazione lunga al giorno.
+
+> **Fatto (05/09/2026).** Era vero solo a metà: `chatGiorno()` (i giorni normali della
+> settimana) già sceglieva un solo contatto a caso su cui tirare il dado. Il buco stava in
+> `chatSettimana()`, che gira una volta sola ma al cambio settimana — lì ogni contatto
+> attivo tirava il **suo** dado per conto proprio (`c.spesso`, tipico 0,3–0,4): con quattro
+> o cinque persone sbloccate (mamma, il tuo produttore, un beatmaker preso a La Sala, un
+> giornalista...) potevano scriverti tutte lo stesso giorno, un coro invece che una persona
+> alla volta.
+>
+> `js/game/chat.js`: `chatSettimana()` continua a far tirare il dado a ognuno (`c.spesso`
+> resta "quanto spesso" di ognuno, non è stato toccato), ma adesso **sceglie una sola
+> persona fra chi lo passa**, con lo stesso `pick()` che usa già `chatGiorno()` — non tutti
+> quelli che passano il dado scrivono, solo uno. Dato che `avanzaGiorno()` (`js/game/sim.js`)
+> chiama `chatSettimana()` o `chatGiorno()` per un dato giorno ma mai tutti e due insieme (il
+> giorno del cambio settimana esce prima di arrivare a `chatGiorno()`), il risultato è che in
+> nessun giorno del calendario può scriverti più di una persona.
+>
+> Non tocca `chatIniziaTu()` (quando scrivi tu per primo) né quante risposte puoi dare dentro
+> a una conversazione già aperta: il limite riguarda solo chi **prende l'iniziativa**, non
+> quanto puoi rispondere una volta che qualcuno ti ha scritto.
+>
+> Un controllo nuovo in `strumenti/prova.js`: forza il dado di ognuno a passare sempre
+> (`Math.random` a 0, dentro alla sandbox del test) su tre contatti attivi insieme e chiama
+> `chatSettimana()` venti volte, verificando che non scriva mai più di una persona per
+> chiamata. `npm run prova` pulito sulla parte chat; le due prove che risultano rotte
+> (`js/creator3d/*`) sono lavoro di un altro, non toccato da qui.

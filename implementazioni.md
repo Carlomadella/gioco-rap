@@ -33,4 +33,4 @@ _(qui sotto finiscono i punti nuovi, appena scritti)_
 
 5. Avaturn voglio lo rendiamo UN 50/50 , Cioè chi non vuole andare a farsi tutta la trafila per fare avaturn (anche se ovviamente dobbiamo fare di tutto per consigliarli a farlo) può benissimamente creare il suo avatar in game. FAI COESISTERE LE COSE.
 
-6. 
+7. 

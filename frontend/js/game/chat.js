@@ -909,10 +909,19 @@ function chatScrive(c, m){
 /* ==================== IL TEMPO CHE PASSA ====================
    Una volta a settimana ognuno può farsi vivo; in più c'è una possibilità al
    giorno, perché una chat che si muove solo al cambio di settimana si sente
-   che è finta. */
+   che è finta.
+
+   Punto 6: nella vita vera non ti scrivono tutti lo stesso giorno. Prima
+   ogni contatto attivo tirava il suo dado per conto suo — al cambio
+   settimana, con quattro o cinque persone sbloccate, potevano scriverti
+   tutte insieme lo stesso giorno. Qui si tira comunque un dado a testa
+   (`c.spesso` resta il "quanto spesso" di ognuno) ma si sceglie una sola
+   persona fra chi passa il dado, come già fa chatGiorno() qui sotto: al
+   massimo una conversazione lunga al giorno, non un coro. */
 function chatSettimana(){
   const m = chatMondo();
-  for(const c of chatAttivi()) if(Math.random() < (c.spesso || .4)) chatScrive(c, m);
+  const idonei = chatAttivi().filter(c => Math.random() < (c.spesso || .4));
+  if(idonei.length) chatScrive(pick(idonei), m);
 }
 function chatGiorno(){
   const attivi = chatAttivi();

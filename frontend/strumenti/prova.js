@@ -456,6 +456,24 @@ console.log("\nla chat del telefono: non si deve ripetere");
     controlla("parlare in chat fa salire il rapporto, come parlarsi di persona",
       G.gente[1].rel > relPrima, { prima: relPrima + "+" + ptPrima, dopo: G.gente[1].rel + "+" + G.gente[1].pt });
 
+    /* punto 6: al massimo una persona scrive lo stesso giorno — prima ogni
+       contatto attivo tirava il suo dado per conto suo, e a inizio settimana
+       con tre contatti sbloccati potevano scriverti tutti e tre insieme */
+    {
+      dentro("var _mr = Math.random; Math.random = () => 0;");  /* ogni "spesso" passa di sicuro */
+      let piuDiUno = 0, nessuno = 0;
+      for(let i = 0; i < 20; i++){
+        G.chat = {};
+        dentro("chatSettimana()");
+        const scritto = dentro("chatAttivi()").filter(c => (G.chat[c.id] || {msgs:[]}).msgs.length);
+        if(scritto.length > 1) piuDiUno++;
+        if(scritto.length === 0) nessuno++;
+      }
+      dentro("Math.random = _mr;");
+      controlla("chatSettimana() fa scrivere una persona alla volta, mai un coro",
+        piuDiUno === 0 && nessuno === 0, { piuDiUno, nessuno, su: 20 });
+    }
+
     /* se sparisce dal giro, sparisce anche dalla rubrica */
     G.gente[0].via = true;
     controlla("chi lascia il giro esce anche dalle chat",
