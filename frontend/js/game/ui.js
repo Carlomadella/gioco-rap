@@ -49,6 +49,116 @@ function mostraScena(a, sc, msg, extra){
 }
 $("sc-go").onclick = () => { $("scena").classList.remove("on"); };
 
+/* ================= AZIONI DIRETTE DAI LUOGHI =================
+   Permette a un luogo della mappa (es. Palestra) di avviare una ACTION
+   senza aprire il quaderno e senza simulare il click su una tile.
+   Mantiene lo stesso flusso della schermata Settimana. */
+function avviaAzioneDiretta(id){
+  const a = ACTIONS.find(x => x.id === id);
+  if(!a){
+    console.error("[Anni di Fame] azione diretta non trovata:", id);
+    return false;
+  }
+
+  if(a.avail && !a.avail()) return false;
+
+  const en2 = a.dyn ? a.dyn() : a.e;
+  const c = a.money ? a.money() : 0;
+  const miss = a.need ? a.need() : null;
+  const noMoney = c && G.money < c;
+
+  if(miss || noMoney || G.energy < en2){
+    if(typeof SFX === "object" && SFX.fail) SFX.fail();
+
+    let motivo = "";
+    if(miss) motivo = "Serve " + miss + ".";
+    else if(noMoney) motivo = "Servono " + c + " € in cassa.";
+    else motivo = "Non hai abbastanza energia.";
+
+    if(typeof toast === "function")
+      toast("<b>Mossa non disponibile.</b> " + motivo, "bad", "!", ["#B91C1C","#7F1D1D"]);
+    return false;
+  }
+
+  const sc = SC[a.id] || ["#3A3F49","#22262E",""];
+  const g = ART[a.id] || ["#3A3F49","#22262E","·"];
+
+  const esegui = () => {
+    try{
+      if(window.GAME_TRAVEL && typeof GAME_TRAVEL.guardAction === "function"){
+        const gate = GAME_TRAVEL.guardAction(a.id);
+        if(!gate.ok){
+          if(typeof SFX === "object" && SFX.fail) SFX.fail();
+          return false;
+        }
+      }
+    }catch(err){
+      console.error("[Anni di Fame] guardia runtime azione diretta non riuscita", err);
+      if(typeof toast === "function")
+        toast("<b>Mossa non avviata.</b> Controllo luogo/orario non disponibile.",
+          "bad","!",["#B91C1C","#7F1D1D"]);
+      return false;
+    }
+
+    const fansBefore = G.fans;
+    const moneyBefore = G.money;
+
+    G.energy -= en2;
+    iniziaAzione(en2);
+
+    const msg = a.run();
+
+    if(!overlayAperto()) azioneFatta();
+    if(a.luc) addLuc(a.luc);
+    if(msg) pushLog(msg, "");
+
+    G.wellbeing = clamp(G.wellbeing, 0, 100);
+
+    const s2 = SFX[SND[a.id] || "tap"];
+    if(s2) s2();
+
+    let extra = "";
+    const df = G.fans - fansBefore;
+    const dm = Math.round(G.money - moneyBefore);
+
+    if(df > 0) extra += ' <b>+' + fmt(df) + ' fan</b>';
+    if(dm > 0){
+      extra += ' <b>+' + fmt(dm) + ' €</b>';
+      weekEarn += dm;
+    }
+
+    if(SCENA_PIENA.has(a.id)) mostraScena(a, sc, msg, extra);
+    else if(typeof toast === "function") toast((msg || "") + extra, "good", g[2], [g[0], g[1]]);
+
+    checkGoals();
+    save();
+    renderGioco();
+    if(typeof renderHub === "function") renderHub();
+    return true;
+  };
+
+  /* Stessa regola della tile: conferma soltanto quando si spendono soldi veri. */
+  const pesa = SET.gioco.conferme && c > 0;
+
+  if(!pesa) return esegui();
+
+  showEvent({
+    k:"Confermi?",
+    t:a.n,
+    d:"Ti costa <b>" + en2 + (en2 === 1 ? " energia" : " energie") + "</b>" +
+      (c ? " e <b>" + fmt(c) + " €</b>" : "") + ". " + a.d,
+    annulla(){},
+    opts:[
+      {n:"Vai", d:"Fai la mossa adesso", run(){ esegui(); return null; }},
+      {n:"Lascia stare", d:"Torni indietro senza spendere niente", run(){ return null; }}
+    ]
+  });
+
+  return true;
+}
+window.avviaAzioneDiretta = avviaAzioneDiretta;
+
+
 function renderGioco(){
   if(typeof beatStop === "function") beatStop();
   const art = window.ARTIST || {};

@@ -115,9 +115,9 @@ const HUB_LUOGHI = [
      annulla(){},
      opts:[
        {n:"Pesi", d:"Più energia, 18 € — benessere e presenza su.",
-        run(){ hubAzione("palestra_pesi"); return null; }},
+        run(){ avviaAzioneDiretta("palestra_pesi"); return null; }},
        {n:"Cardio leggero", d:"Poca energia, gratis — lucidità e benessere su.",
-        run(){ hubAzione("palestra_cardio"); return null; }}
+        run(){ avviaAzioneDiretta("palestra_cardio"); return null; }}
      ]})},
   /* punto 48: idem — l'attrezzatura da studio è già nel catalogo, la vetrina
      non deve stare spenta se quello che promette esiste già */
