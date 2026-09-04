@@ -399,10 +399,9 @@ function hubNotizie(){
    nel magazzino, invisibile — ma è sempre lei la macchina: si ridisegna e si
    preme la card, che porta con sé la conferma, il costo e le scene di sempre. */
 function hubAzione(id){
-  renderGioco();
-  const t = document.querySelector('.tile[data-id="' + id + '"]');
-  if(t) t.click();
+  return avviaAzioneDiretta(id);
 }
+
 function hubDetenuto(){
   return !!(G.strada && G.strada.arresto);
 }
