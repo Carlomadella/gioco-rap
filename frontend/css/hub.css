@@ -624,7 +624,14 @@ body.in-hub .topnav {
      tutto il lato, e si torna alla scatola dall'altra parte. */
   --ang: min(13px, 30%);
   --col: rgba(255, 255, 255, 0.62);
+  /* L'alone: spento finché la zona è ferma. Acceso, è il colore del posto —
+     lo stesso del pallino e della targhetta, così il segno resta uno solo. */
+  --alone: transparent;
   --vis: 0;
+  /* Gli angoli entrano da appena fuori e si stringono sull'edificio, come un
+     mirino che aggancia. Comparire già a posto era solo una cosa che si
+     accende; così invece è una cosa che ti indica. */
+  --avv: 1.07;
   transition:
     background 0.16s,
     box-shadow 0.16s,
@@ -634,8 +641,10 @@ body.in-hub .topnav {
    maschera lascia scoperti solo i quattro quadrati agli spigoli, raccordi
    tondi compresi. `drop-shadow` e non `box-shadow` perché deve seguire il
    ritaglio — con box-shadow si vedrebbe l'ombra del rettangolo pieno, che è
-   proprio la cosa che stiamo togliendo. L'ombra serve: senza, sul neon
-   acceso della Sala il bianco su bianco sparisce. */
+   proprio la cosa che stiamo togliendo. Le ombre sono due e servono tutte e
+   due: la nera stacca il trattino dalla foto (sul neon acceso della Sala il
+   bianco su bianco sparisce), quella colorata è la luce del posto e fa
+   sembrare il trattino acceso invece che disegnato sopra. */
 .pspot::before {
   content: "";
   position: absolute;
@@ -643,10 +652,35 @@ body.in-hub .topnav {
   border: 2px solid var(--col);
   border-radius: inherit;
   opacity: var(--vis);
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9));
+  transform: scale(var(--avv));
+  filter:
+    drop-shadow(0 0 7px var(--alone))
+    drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9));
   transition:
     border-color 0.16s,
-    opacity 0.16s;
+    opacity 0.16s,
+    filter 0.18s,
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Il filo bianco appena dentro. Il colore di un posto può essere scuro — il
+   rosso delle Attività criminali, di notte, sopra all'asfalto — e da solo si
+   perde: questo tiene lo spigolo netto qualunque sia il colore. È un capello,
+   non una seconda cornice: dentro al trattino, non accanto. */
+.pspot::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 9px;
+  opacity: calc(var(--vis) * 0.5);
+  transform: scale(var(--avv));
+  transition:
+    opacity 0.16s,
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.pspot::before,
+.pspot::after {
+  pointer-events: none;
   -webkit-mask:
     linear-gradient(#000, #000) 0 0 / var(--ang) var(--ang) no-repeat,
     linear-gradient(#000, #000) 100% 0 / var(--ang) var(--ang) no-repeat,
@@ -659,31 +693,55 @@ body.in-hub .topnav {
     linear-gradient(#000, #000) 100% 100% / var(--ang) var(--ang) no-repeat;
 }
 /* Sul telefono il dito non passa sopra prima di toccare: senza un segno da
-   fermi la mappa non si può leggere. Lì restano accesi, discreti. Dove c'è un
-   mouse no — ci si passa sopra e compaiono, e la città resta una città. */
+   fermi la mappa non si può leggere. Lì restano accesi, discreti — bianchi,
+   già agganciati e più corti: dodici zone accese ognuna col suo colore
+   sarebbero una fiera, e il colore lo si vede toccando. */
 @media (hover: none) {
-  .pspot { --vis: 0.42; }
+  .pspot {
+    --vis: 0.4;
+    --avv: 1;
+    --ang: min(11px, 26%);
+  }
+  .pspot::after {
+    opacity: 0;
+  }
 }
 
-/* la luce sale dalla base dell'edificio invece di riempire il rettangolo:
-   su una foto in prospettiva un velo piatto si vede che è un rettangolo */
+/* Passando su un quartiere si accendono, appena, tutti i posti che ci stanno
+   dentro: è il quartiere che risponde, non un posto scelto — quindi solo gli
+   angoli, senza la luce da terra, che è la risposta del posto singolo. */
+.pspot.district-active {
+  --vis: 0.55;
+  --avv: 1;
+  --col: color-mix(in srgb, var(--pk) 55%, #fff);
+  --alone: color-mix(in srgb, var(--pk) 38%, transparent);
+}
+/* Acceso, il posto si accende **del suo colore** — quello del pallino e della
+   targhetta: prima si accendevano tutti dello stesso viola, e dodici posti
+   dello stesso viola sono dodici volte lo stesso posto. La luce sale dalla
+   base dell'edificio invece di riempire il rettangolo: su una foto in
+   prospettiva un velo piatto si vede che è un rettangolo. */
 .pspot:hover {
   --vis: 1;
+  --avv: 1;
   --ang: min(26px, 42%);
-  --col: rgba(216, 180, 254, 0.98);
+  --col: color-mix(in srgb, var(--pk) 60%, #fff);
+  --alone: color-mix(in srgb, var(--pk) 62%, transparent);
   background: radial-gradient(
     120% 100% at 50% 100%,
-    rgba(168, 85, 247, 0.26),
+    color-mix(in srgb, var(--pk) 26%, transparent),
     transparent 70%
   );
-  box-shadow: 0 0 30px rgba(168, 85, 247, 0.32);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--pk) 32%, transparent);
 }
 /* col tasto Tab il segno dev'essere fuori di dubbio sopra a qualsiasi pixel
    della foto: gli angoli gialli più il filo di contorno di `base.css` */
 .pspot:focus-visible {
   --vis: 1;
+  --avv: 1;
   --ang: min(26px, 42%);
   --col: var(--acid);
+  --alone: color-mix(in srgb, var(--acid) 50%, transparent);
   outline: 2px solid var(--acid);
   outline-offset: 2px;
 }
@@ -694,11 +752,14 @@ body.in-hub .topnav {
    non si accende come quelli dove si può entrare davvero */
 .pspot.chiuso {
   --col: rgba(255, 255, 255, 0.4);
+  --alone: transparent;
 }
 .pspot.chiuso:hover {
   --vis: 1;
+  --avv: 1;
   --ang: min(26px, 42%);
   --col: rgba(255, 255, 255, 0.72);
+  --alone: transparent;
   background: radial-gradient(
     120% 100% at 50% 100%,
     rgba(255, 255, 255, 0.09),
@@ -725,6 +786,9 @@ body.in-hub .topnav {
 }
 .pspot-dot {
   position: absolute;
+  /* sopra agli angoli: il filo bianco è l'ultimo figlio del bottone e
+     passerebbe sopra al pallino e alla targhetta di una zona stretta */
+  z-index: 3;
   left: 50%;
   top: 50%;
   width: 9px;
@@ -753,6 +817,7 @@ body.in-hub .topnav {
 .pspot-tag {
   opacity: 0;
   position: absolute;
+  z-index: 3;
   left: 50%;
   top: 7px;
   transform: translateX(-50%);
@@ -801,14 +866,16 @@ body.in-hub .topnav {
 /* il giro guidato dei luoghi, con le frecce «scorri per esplorare» */
 .pspot.qui {
   --vis: 1;
+  --avv: 1;
   --ang: min(30px, 46%);
-  --col: rgba(216, 180, 254, 1);
+  --col: color-mix(in srgb, var(--pk) 45%, #fff);
+  --alone: color-mix(in srgb, var(--pk) 75%, transparent);
   background: radial-gradient(
     120% 100% at 50% 100%,
-    rgba(168, 85, 247, 0.32),
+    color-mix(in srgb, var(--pk) 32%, transparent),
     transparent 70%
   );
-  box-shadow: 0 0 34px rgba(168, 85, 247, 0.45);
+  box-shadow: 0 0 34px color-mix(in srgb, var(--pk) 45%, transparent);
   animation: pspulse 1.6s ease-in-out infinite;
 }
 .pspot.qui::before {
@@ -816,7 +883,7 @@ body.in-hub .topnav {
 }
 @keyframes pspulse {
   50% {
-    box-shadow: 0 0 14px rgba(168, 85, 247, 0.18);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--pk) 18%, transparent);
   }
 }
 @keyframes psang {
