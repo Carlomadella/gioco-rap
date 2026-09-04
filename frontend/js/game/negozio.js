@@ -5,7 +5,7 @@
      SOLO equip: mostra i capi che hai già sbloccato, punto. Prima mischiava
      dentro anche i capi da comprare — sembrava un negozio travestito da
      armadio, ed era il bug del punto 7.
-   - Il negozio vero (Catalogo → Abbigliamento, `#g-fit`, dentro alla
+   - Il negozio vero (Shop → Abbigliamento, `#g-fit`, dentro al pannello dello
      schermata di gioco) è dove i capi NON posseduti si comprano. Da lì in
      poi, o da un evento in game, mai dal guardaroba.
 
@@ -22,7 +22,7 @@ const NG_PREZZI = {
 const ngPosseduto = id => id === (window.ARTIST || {}).fit || !!(G.vestiti && G.vestiti[id]);
 const ngIndossato = id => id === (window.ARTIST || {}).fit;
 
-/* `shop`: true nel Catalogo (mostra anche i capi da comprare), false nel
+/* `shop`: true nello Shop (mostra anche i capi da comprare), false nel
    guardaroba (mostra solo equip — un capo non posseduto non compare proprio). */
 function ngCard(f, shop){
   const posseduto = ngPosseduto(f.id), indossato = ngIndossato(f.id);
@@ -42,7 +42,7 @@ function renderArmadio(){
   if(!G.vestiti) G.vestiti = {};
   const posseduti = FITS.filter(f => ngPosseduto(f.id));
   $("ng-grid").innerHTML = posseduti.map(f => ngCard(f, false)).join("") ||
-    '<p class="ngvuoto">Non hai ancora altro nel guardaroba. Nuovi capi si trovano al Catalogo, sotto «Abbigliamento», o da un evento.</p>';
+    '<p class="ngvuoto">Non hai ancora altro nel guardaroba. Nuovi capi si comprano allo Shop sulla mappa, sotto «Abbigliamento», o arrivano da un evento.</p>';
 }
 
 function renderAbbigliamento(){

@@ -658,7 +658,7 @@ $("hb-sxtab").addEventListener("click", ev => {
   const b = ev.target.closest(".ptab"); if(!b) return;
   hubTap();
   /* punto 7: la linguetta «Vestiti» è il guardaroba — solo equip, mai
-     acquisto. I capi nuovi si comprano al Catalogo → Abbigliamento, o
+     acquisto. I capi nuovi si comprano allo Shop → Abbigliamento, o
      arrivano da un evento. */
   if(b.dataset.v === "vestiti"){ apriArmadio(); return; }
   HUB_VISTA = b.dataset.v;

@@ -843,8 +843,8 @@ function azionePosto(tipo, id){
     G.market.push(b);
     p.beatOff = b.n;
     pushLog("<b>" + p.n + "</b> ti ha fatto sentire «" + b.n + "» — qualità " + b.q +
-      ", " + b.price + " €. È nel catalogo.", "");
-    toast(p.n + ": «" + b.n + "» nel catalogo, " + b.price + " €", "good", "♪", ["#4ADE80", "#166534"]);
+      ", " + b.price + " €. È sul banco dello Shop.", "");
+    toast(p.n + ": «" + b.n + "» sul banco dello Shop, " + b.price + " €", "good", "♪", ["#4ADE80", "#166534"]);
     SFX.tap();
   }
 
