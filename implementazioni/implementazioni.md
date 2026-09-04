@@ -109,15 +109,15 @@ CARLO:
 
 10. se vogliamo tenere la hub che in questo momento è chiamata sala, dove incontri le altre persone, sono da aggiungere i videomaker, Secondo me è meglio farla come mappa di gta con tutte le cose divise
 
-   **FATTO (02/09/2026)** — branch `task/10-videomaker-nella-sala`. Il videomaker c'era solo
-   fuori città (le trasferte del punto 9); adesso è a La Sala come gli altri: si affaccia
-   quando hai un pezzo fuori, ha dodici situazioni sue, ti dà il numero e da lì ti scrive in
-   chat. Da amici in su gli puoi far girare **il video di un pezzo**: costa energia e soldi e
-   non è un colpo secco di hype — resta attaccato alla canzone e `songWeekly()` lo legge ogni
-   settimana, così il pezzo continua a girare più a lungo invece di spegnersi. Sulla seconda
-   metà del punto («come una mappa di GTA, con le cose divise») non c'era altro da fare: è
-   quello che ha fatto il punto 7. Per esteso in
-   [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md#10--il-videomaker-entra-a-la-sala).
+    **FATTO (02/09/2026)** — branch `task/10-videomaker-nella-sala`. Il videomaker c'era solo
+    fuori città (le trasferte del punto 9); adesso è a La Sala come gli altri: si affaccia
+    quando hai un pezzo fuori, ha dodici situazioni sue, ti dà il numero e da lì ti scrive in
+    chat. Da amici in su gli puoi far girare **il video di un pezzo**: costa energia e soldi e
+    non è un colpo secco di hype — resta attaccato alla canzone e `songWeekly()` lo legge ogni
+    settimana, così il pezzo continua a girare più a lungo invece di spegnersi. Sulla seconda
+    metà del punto («come una mappa di GTA, con le cose divise») non c'era altro da fare: è
+    quello che ha fatto il punto 7. Per esteso in
+    [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md#10--il-videomaker-entra-a-la-sala).
 
 11. quando clicchi su una card -> transizione (alla scena) -> esempio: video del personaggio che entra in studio oppure mini-video del personaggio che torna a casa a dormire, oppure che va a cena con la tipa ecc.
 
@@ -173,44 +173,45 @@ NETWORK 64
 
 19. Aggiungere sezione "Discografia"
 
-   **FATTO (02/09/2026)** — branch `task/19-discografia`. Nuova linguetta **Discografia**
-   nella barra della partita: non è la lista del catalogo (quella è il materiale in cartella),
-   è cosa è **uscito** e come sta andando. In cima i quattro numeri (pezzi fuori, stream in
-   tutto, questa settimana, il più ascoltato); poi una riga per pezzo dal più recente, con
-   copertina, quando è uscito, qualità, la **curva delle ultime settimane** e come sta andando
-   detto a parole — sta risalendo, tiene, sta calando, sta sparendo — con la variazione vera.
-   Per disegnare una curva servivano più di due numeri: `advanceWeek()` adesso accoda gli
-   ascolti settimanali in `s.storia` e tiene gli ultimi sei mesi. Le carriere già in corso
-   partono da zero settimane di storia, e la sezione lo dice invece di inventarsela. Per
-   esteso in [`04-musica-e-suoni.md`](04-musica-e-suoni.md#19--la-discografia).
+    **FATTO (02/09/2026)** — branch `task/19-discografia`. Nuova linguetta **Discografia**
+    nella barra della partita: non è la lista del catalogo (quella è il materiale in cartella),
+    è cosa è **uscito** e come sta andando. In cima i quattro numeri (pezzi fuori, stream in
+    tutto, questa settimana, il più ascoltato); poi una riga per pezzo dal più recente, con
+    copertina, quando è uscito, qualità, la **curva delle ultime settimane** e come sta andando
+    detto a parole — sta risalendo, tiene, sta calando, sta sparendo — con la variazione vera.
+    Per disegnare una curva servivano più di due numeri: `advanceWeek()` adesso accoda gli
+    ascolti settimanali in `s.storia` e tiene gli ultimi sei mesi. Le carriere già in corso
+    partono da zero settimane di storia, e la sezione lo dice invece di inventarsela. Per
+    esteso in [`04-musica-e-suoni.md`](04-musica-e-suoni.md#19--la-discografia).
 
 20. se clicco sull'opzione di conversazione "fatti sentire un beat" non fa niente
 
-   **FATTO (02/09/2026)** — branch `task/20-22-beat-si-vedono`. Erano lo stesso problema: il
-   tasto funzionava (creava il beat, lo metteva nel mercato, scriveva nel diario) ma la
-   conferma a schermo stava a `z-index: 70` mentre La Sala sta a `93`, quindi finiva **dietro
-   al fondale**. Si premeva e sembrava non succedesse niente. Vale per tutte le conferme
-   partite da dentro La Sala, la Strada, la piazza, il foglio: adesso il toast sta a `130`.
-   E il beat non sparisce più in un'altra schermata: resta **sul tavolo** nella scheda del
-   beatmaker, con copertina, qualità, bpm, il ▶ per ascoltarlo, il prezzo per prenderlo e la
-   ✕ per lasciarlo. Finché è lì non te ne fa sentire un altro, così non si riempie il catalogo
-   di beat gratis a furia di cliccare. Per esteso in
-   [`04-musica-e-suoni.md`](04-musica-e-suoni.md#20-e-22--fatti-sentire-un-beat-non-faceva-niente-e-i-beat-non-si-vedevano).
+    **FATTO (02/09/2026)** — branch `task/20-22-beat-si-vedono`. Erano lo stesso problema: il
+    tasto funzionava (creava il beat, lo metteva nel mercato, scriveva nel diario) ma la
+    conferma a schermo stava a `z-index: 70` mentre La Sala sta a `93`, quindi finiva **dietro
+    al fondale**. Si premeva e sembrava non succedesse niente. Vale per tutte le conferme
+    partite da dentro La Sala, la Strada, la piazza, il foglio: adesso il toast sta a `130`.
+    E il beat non sparisce più in un'altra schermata: resta **sul tavolo** nella scheda del
+    beatmaker, con copertina, qualità, bpm, il ▶ per ascoltarlo, il prezzo per prenderlo e la
+    ✕ per lasciarlo. Finché è lì non te ne fa sentire un altro, così non si riempie il catalogo
+    di beat gratis a furia di cliccare. Per esteso in
+    [`04-musica-e-suoni.md`](04-musica-e-suoni.md#20-e-22--fatti-sentire-un-beat-non-faceva-niente-e-i-beat-non-si-vedevano).
 
 21. fare pagina di registrazione/login/logout
+    fatto
 
 22. non si riescono a vedere i beat
 
-   **FATTO (02/09/2026)** — branch `task/20-22-beat-si-vedono`. Erano lo stesso problema: il
-   tasto funzionava (creava il beat, lo metteva nel mercato, scriveva nel diario) ma la
-   conferma a schermo stava a `z-index: 70` mentre La Sala sta a `93`, quindi finiva **dietro
-   al fondale**. Si premeva e sembrava non succedesse niente. Vale per tutte le conferme
-   partite da dentro La Sala, la Strada, la piazza, il foglio: adesso il toast sta a `130`.
-   E il beat non sparisce più in un'altra schermata: resta **sul tavolo** nella scheda del
-   beatmaker, con copertina, qualità, bpm, il ▶ per ascoltarlo, il prezzo per prenderlo e la
-   ✕ per lasciarlo. Finché è lì non te ne fa sentire un altro, così non si riempie il catalogo
-   di beat gratis a furia di cliccare. Per esteso in
-   [`04-musica-e-suoni.md`](04-musica-e-suoni.md#20-e-22--fatti-sentire-un-beat-non-faceva-niente-e-i-beat-non-si-vedevano).
+    **FATTO (02/09/2026)** — branch `task/20-22-beat-si-vedono`. Erano lo stesso problema: il
+    tasto funzionava (creava il beat, lo metteva nel mercato, scriveva nel diario) ma la
+    conferma a schermo stava a `z-index: 70` mentre La Sala sta a `93`, quindi finiva **dietro
+    al fondale**. Si premeva e sembrava non succedesse niente. Vale per tutte le conferme
+    partite da dentro La Sala, la Strada, la piazza, il foglio: adesso il toast sta a `130`.
+    E il beat non sparisce più in un'altra schermata: resta **sul tavolo** nella scheda del
+    beatmaker, con copertina, qualità, bpm, il ▶ per ascoltarlo, il prezzo per prenderlo e la
+    ✕ per lasciarlo. Finché è lì non te ne fa sentire un altro, così non si riempie il catalogo
+    di beat gratis a furia di cliccare. Per esteso in
+    [`04-musica-e-suoni.md`](04-musica-e-suoni.md#20-e-22--fatti-sentire-un-beat-non-faceva-niente-e-i-beat-non-si-vedevano).
 
 /_ NUOVE MODALITA' _/
 
