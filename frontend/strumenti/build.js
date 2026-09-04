@@ -32,6 +32,29 @@ const NUDO = process.argv.includes("--senza-minificare");
    può fare fetch del JSON e il motore eventi (con Notifiche) non parte. */
 const CATALOGO_EVENTI_V2 = path.join(RADICE, "js", "game", "eventi-master-1000-v1.2.13.json");
 
+/* ADF_RPG_V24_BUILD: nella demo monofile il creator iframe deve viaggiare dentro
+   allo stesso HTML. Nel build store resta invece sotto media/ ed è copiato normalmente. */
+const CREATOR_RPG_V24_DIR = path.join(RADICE, "media", "creator-rpg-v24");
+function mimeFile(f){ return ({".png":"image/png",".jpg":"image/jpeg",".jpeg":"image/jpeg",".webp":"image/webp",".gif":"image/gif",".svg":"image/svg+xml"})[path.extname(f).toLowerCase()] || "application/octet-stream"; }
+function inlineCreatorAssets(html, base){
+  return html.replace(/assets\/([A-Za-z0-9._-]+)/g,(m,n)=>{
+    const f=path.join(base,"assets",n); if(!fs.existsSync(f)) return m;
+    return "data:"+mimeFile(f)+";base64,"+fs.readFileSync(f).toString("base64");
+  });
+}
+function creatorRpgV24DataUrl(){
+  const cfile=path.join(CREATOR_RPG_V24_DIR,"creator.html");
+  const rfile=path.join(CREATOR_RPG_V24_DIR,"camerino.html");
+  const lfile=path.join(CREATOR_RPG_V24_DIR,"local-editor.html");
+  if(!fs.existsSync(cfile)||!fs.existsSync(rfile)||!fs.existsSync(lfile)) throw new Error("Creator RPG V24: file integrazione mancanti");
+  let room=inlineCreatorAssets(fs.readFileSync(rfile,"utf8"),CREATOR_RPG_V24_DIR);
+  let local=inlineCreatorAssets(fs.readFileSync(lfile,"utf8"),CREATOR_RPG_V24_DIR);
+  let creator=inlineCreatorAssets(fs.readFileSync(cfile,"utf8"),CREATOR_RPG_V24_DIR);
+  creator=creator.replace('src="camerino.html"','src="data:text/html;base64,'+Buffer.from(room).toString("base64")+'"');
+  creator=creator.replace('src="local-editor.html"','src="data:text/html;base64,'+Buffer.from(local).toString("base64")+'"');
+  return "data:text/html;base64,"+Buffer.from(creator).toString("base64");
+}
+
 /* ==================== ATTREZZI ==================== */
 const leggi = rel => fs.readFileSync(path.join(RADICE, rel.split("?")[0]), "utf8");
 const impronta = testo => crypto.createHash("sha256").update(testo).digest("hex").slice(0, 8);
@@ -151,6 +174,7 @@ function pesa(cartella){
   }
 
   if(UNICO){
+    const creatorRpgInline = "<script>window.__ADF_RPG_V24_SRC__=" + JSON.stringify(creatorRpgV24DataUrl()).replace(/<\/script/gi,"<\\/script") + ";<\/script>\n";
     const catalogoInline = catalogoEventiV2
       ? '<script>window.__ADF_EVENT_CATALOG__=' +
         JSON.stringify(catalogoEventiV2).replace(/<\/script/gi, "<\\/script") +
@@ -160,7 +184,7 @@ function pesa(cartella){
       .replace(/<link[^>]+rel="stylesheet"[^>]+href="(?!http)[^"]+"[^>]*>\s*/g, "")
       .replace(/<script[^>]+src="(?!http)[^"]+"[^>]*><\/script>\s*/g, "")
       .replace("</head>", "<style>\n" + stile + "\n</style>\n</head>")
-      .replace("</body>", catalogoInline + "<script>\n" + codice + "\n</script>\n</body>");
+      .replace("</body>", creatorRpgInline + catalogoInline + "<script>\n" + codice + "\n</script>\n</body>");
     const f = path.join(USCITA, "anni-di-fame.html");
     fs.writeFileSync(f, pagina);
     console.log("\nscritto " + f + " (" + kb(Buffer.byteLength(pagina)) + ")");

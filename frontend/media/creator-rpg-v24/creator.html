@@ -1,0 +1,2028 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anni di Fame · Creator RPG V3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06070a;
+  --panel:#101218;
+  --panel2:#171b24;
+  --line:rgba(255,255,255,.10);
+  --line2:rgba(211,170,94,.24);
+  --text:#f3eee3;
+  --muted:#8c9098;
+  --soft:#5c616c;
+  --gold:#d3aa5e;
+  --gold2:#f1d8a7;
+  --darkgold:#845d1f;
+  --shadow:0 26px 80px rgba(0,0,0,.42);
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--text);font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overflow:hidden}
+button,input{font:inherit}
+button{color:inherit}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:80;opacity:.08;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.30'/%3E%3C/svg%3E");
+  mix-blend-mode:soft-light;
+}
+.app{
+  position:relative;width:100%;height:100%;
+  background:
+    radial-gradient(circle at 78% 14%, rgba(211,170,94,.09), transparent 28%),
+    radial-gradient(circle at 18% 88%, rgba(95,121,255,.07), transparent 24%),
+    linear-gradient(135deg,#07080b 0%,#0b0d12 45%,#06070a 100%);
+}
+.topbar{
+  position:absolute;left:0;right:0;top:0;z-index:20;height:78px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px 0 32px;
+  border-bottom:1px solid var(--line);
+  background:rgba(7,8,10,.76);
+  backdrop-filter:blur(16px);
+}
+.brand{
+  display:flex;flex-direction:column;gap:2px;line-height:1;
+}
+.brand b{
+  font-family:"Barlow Condensed", sans-serif;
+  font-size:22px;letter-spacing:.03em;text-transform:uppercase;
+}
+.brand span{
+  font-size:9px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);
+}
+.progress{
+  display:flex;align-items:center;gap:8px;
+}
+.pstep{
+  display:flex;align-items:center;gap:8px;
+  font-family:"Barlow Condensed", sans-serif;
+  font-size:12px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;
+  color:#535862;
+}
+.pstep i{
+  width:27px;height:27px;border-radius:50%;
+  display:grid;place-items:center;font-style:normal;
+  border:1px solid rgba(255,255,255,.12);
+  font-size:10px;letter-spacing:.08em;
+}
+.pstep.on{color:var(--gold2)}
+.pstep.on i{
+  border-color:rgba(211,170,94,.42);
+  color:var(--gold);
+  background:rgba(211,170,94,.08);
+  box-shadow:0 0 0 1px rgba(211,170,94,.08) inset;
+}
+.pline{width:34px;height:1px;background:rgba(255,255,255,.08)}
+.viewport{position:absolute;inset:78px 0 0;overflow:hidden}
+.page{position:absolute;inset:0;display:none}
+.page.on{display:block}
+.layout{
+  position:absolute;inset:0;
+  display:grid;grid-template-columns:minmax(350px,42%) 1fr;
+}
+.visual{
+  position:relative;overflow:hidden;border-right:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,0));
+}
+.visual-inner{
+  position:absolute;inset:20px 18px 20px 20px;
+  border-radius:28px;overflow:hidden;
+  border:1px solid rgba(255,255,255,.07);
+  box-shadow:var(--shadow), inset 0 0 0 1px rgba(0,0,0,.44);
+  background:#0b0d11;
+}
+.visual-art{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center;
+  opacity:0;transition:opacity .38s ease;
+}
+.visual-art.on{opacity:1}
+.visual-overlay{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(180deg,rgba(4,5,7,.08),rgba(4,5,7,.18) 34%, rgba(4,5,7,.82) 100%);
+}
+.visual-kicker{
+  position:absolute;left:24px;top:22px;
+  font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);
+}
+.visual-copy{
+  position:absolute;left:24px;right:24px;bottom:22px;
+}
+.visual-copy h2{
+  margin:0 0 12px;
+  font-family:"Barlow Condensed", sans-serif;
+  font-size:clamp(38px,4vw,72px);line-height:.90;letter-spacing:-.025em;
+  text-transform:uppercase;
+}
+.visual-copy p{
+  margin:0;max-width:440px;
+  color:#a0a5ae;font-size:12px;line-height:1.6;
+}
+.content{
+  position:relative;padding:42px 52px 34px;display:flex;flex-direction:column;min-width:0;
+}
+.eyebrow{
+  color:var(--gold);
+  font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;
+  margin-bottom:12px;
+}
+.content h1{
+  margin:0;
+  font-family:"Barlow Condensed", sans-serif;
+  font-size:clamp(42px,4.2vw,76px);line-height:.90;letter-spacing:-.03em;text-transform:uppercase;
+}
+.lead{
+  margin:14px 0 24px;
+  max-width:820px;color:#91959e;font-size:12px;line-height:1.62;
+}
+.form{
+  max-width:820px;display:grid;grid-template-columns:1fr 1fr;gap:12px;
+}
+.field{
+  padding:12px 14px;border:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
+  border-radius:16px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+}
+.field label{
+  display:block;margin-bottom:7px;
+  font-size:9px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:#7f848d;
+}
+.field input{
+  width:100%;border:0;outline:0;background:transparent;
+  color:#fff;font-size:19px;font-weight:750;padding:4px 1px;
+}
+.field input::placeholder{color:#464b55}
+.section-head{
+  display:flex;align-items:end;justify-content:space-between;gap:12px;
+  margin-top:28px;margin-bottom:12px;
+}
+.section-head .left b{
+  display:block;
+  font-family:"Barlow Condensed", sans-serif;
+  font-size:24px;letter-spacing:.02em;text-transform:uppercase;
+}
+.section-head .left span{
+  display:block;margin-top:2px;
+  color:#7f848d;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+}
+.section-head .right{
+  color:#666b75;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+}
+.grid{display:grid;gap:10px}
+.genre-grid{grid-template-columns:repeat(3,minmax(0,1fr));max-width:920px}
+.choice-grid{grid-template-columns:repeat(2,minmax(0,1fr));max-width:980px}
+.card{
+  position:relative;min-height:128px;padding:15px 15px 14px;
+  border-radius:18px;border:1px solid var(--line);
+  text-align:left;cursor:pointer;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018)),
+    radial-gradient(circle at 85% 0%, rgba(211,170,94,.08), transparent 34%);
+  transition:.18s transform,.18s border-color,.18s background,.18s box-shadow;
+}
+.card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(255,255,255,.18);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.024)),
+    radial-gradient(circle at 85% 0%, rgba(211,170,94,.12), transparent 34%);
+}
+.card.on{
+  border-color:rgba(211,170,94,.48);
+  box-shadow:0 0 0 1px rgba(211,170,94,.08) inset;
+  background:
+    linear-gradient(180deg,rgba(211,170,94,.13),rgba(255,255,255,.018)),
+    radial-gradient(circle at 85% 0%, rgba(211,170,94,.16), transparent 36%);
+}
+.card .id{
+  color:#676c75;font-size:8px;font-weight:900;letter-spacing:.15em;text-transform:uppercase;
+}
+.card .n{
+  display:block;margin-top:6px;
+  font-family:"Barlow Condensed", sans-serif;
+  font-size:23px;line-height:1;letter-spacing:.02em;text-transform:uppercase;
+}
+.card .d{
+  margin-top:8px;color:#979ca5;font-size:10px;line-height:1.45;
+}
+.card .mini{
+  position:absolute;left:15px;right:15px;bottom:13px;
+  color:var(--gold);font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;
+}
+.bottom{
+  margin-top:auto;padding-top:22px;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+}
+.counter{
+  color:#5e646d;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+}
+.btns{display:flex;gap:8px;align-items:center}
+.btn{
+  min-height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--line);
+  background:rgba(255,255,255,.04);cursor:pointer;
+  font-size:10px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;
+}
+.btn:hover{background:rgba(255,255,255,.07)}
+.btn.primary{
+  border-color:rgba(211,170,94,.46);
+  background:linear-gradient(180deg,rgba(211,170,94,.18),rgba(211,170,94,.10));
+  color:var(--gold2);
+}
+.btn.primary:hover{
+  background:linear-gradient(180deg,rgba(211,170,94,.28),rgba(211,170,94,.12));
+}
+.btn:disabled{opacity:.28;cursor:not-allowed}
+.story-meter{
+  display:flex;align-items:center;gap:8px;margin-bottom:14px;
+}
+.story-meter .bar{
+  flex:1;height:8px;border-radius:999px;overflow:hidden;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.05);
+}
+.story-meter .fill{
+  height:100%;width:33%;border-radius:999px;
+  background:linear-gradient(90deg,var(--gold),var(--gold2));
+}
+.story-label{
+  color:#666b75;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;
+}
+.question{
+  max-width:860px;
+  font-family:"Barlow Condensed", sans-serif;
+  font-size:clamp(40px,4vw,68px)!important;line-height:.92;
+}
+.scene-tags{
+  display:flex;gap:6px;flex-wrap:wrap;margin-top:10px
+}
+.scene-tag{
+  padding:6px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.10);
+  color:#8c9199;background:rgba(255,255,255,.03);
+  font-size:8px;font-weight:800;letter-spacing:.10em;text-transform:uppercase;
+}
+
+.result{
+  position:absolute;inset:0;overflow:hidden;
+  background:#08090d;
+}
+.result-left{
+  position:absolute;inset:0;border-right:0;z-index:0;
+}
+.hero{
+  position:absolute;inset:0;border-radius:0;overflow:hidden;
+  border:0;box-shadow:none;
+}
+.hero-bg{
+  position:absolute;inset:0;background-size:cover;background-position:center;
+  opacity:0;transition:opacity .48s ease;
+}
+.hero-bg.on{opacity:1}
+.hero-overlay{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(90deg, rgba(7,8,10,.08) 0%, rgba(7,8,10,.14) 44%, rgba(7,8,10,.30) 62%, rgba(7,8,10,.56) 76%, rgba(7,8,10,.82) 100%),
+    linear-gradient(180deg, rgba(7,8,10,.10), rgba(7,8,10,.24));
+}
+.hero-copy{display:none}
+.result-right{
+  position:relative;z-index:1;
+  margin-left:auto;width:min(45vw, 760px);min-width:560px;height:100%;
+  padding:46px 52px 34px;
+  display:flex;flex-direction:column;justify-content:flex-start;
+  background:linear-gradient(90deg, rgba(7,8,10,.04) 0%, rgba(7,8,10,.22) 8%, rgba(7,8,10,.54) 20%, rgba(7,8,10,.78) 44%, rgba(7,8,10,.92) 100%);
+  backdrop-filter:blur(8px);
+}
+.result-kicker{
+  color:var(--gold);font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;
+}
+.result-title{
+  margin-top:12px;
+  font-family:"Barlow Condensed", sans-serif;
+  font-size:clamp(56px,5vw,98px);line-height:.84;letter-spacing:-.04em;text-transform:uppercase;
+}
+.result-desc{
+  margin-top:14px;max-width:640px;color:#a0a6ae;font-size:14px;line-height:1.68;
+}
+.identity-strip{
+  display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 18px;
+}
+.pill{
+  padding:8px 11px;border-radius:999px;border:1px solid rgba(255,255,255,.09);
+  background:rgba(255,255,255,.03);
+  color:#d0ccc5;font-size:8px;font-weight:900;letter-spacing:.10em;text-transform:uppercase;
+}
+.answers{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:900px;
+}
+.answer{
+  padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+}
+.answer small{
+  display:block;color:#666b75;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px;
+}
+.answer b{
+  display:block;
+  font-family:"Barlow Condensed", sans-serif;
+  font-size:18px;line-height:1;text-transform:uppercase;letter-spacing:.02em;
+}
+.note{
+  max-width:760px;margin-top:18px;
+  padding:12px 14px;border-left:2px solid rgba(211,170,94,.45);
+  color:#6f747c;background:rgba(255,255,255,.028);font-size:10px;line-height:1.55;
+}
+.preview-note{
+  position:absolute;right:18px;bottom:18px;z-index:10;
+  padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.09);
+  background:rgba(7,8,10,.68);backdrop-filter:blur(12px);
+  color:#7f848d;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;
+}
+@media(max-width:980px){
+  html,body{overflow:auto;height:auto;min-height:100%}
+  .app{min-height:100vh}
+  .topbar{position:sticky;top:0;height:auto;min-height:70px;padding:14px 18px}
+  .progress{display:none}
+  .viewport{position:relative;inset:auto;min-height:calc(100vh - 70px)}
+  .page{position:relative;min-height:calc(100vh - 70px)}
+  .page:not(.on){display:none}
+   .layout,.result{position:relative;display:block}
+  .visual{height:36vh;min-height:260px;border-right:0;border-bottom:1px solid var(--line)}
+  .result{min-height:calc(100vh - 70px)}
+  .result-left{position:relative;height:40vh;min-height:320px;border:0}
+  .visual-inner{inset:14px}
+  .hero{inset:0;border-radius:0}
+  .result-right{width:100%;min-width:0;height:auto;padding:26px 18px;background:linear-gradient(180deg,rgba(7,8,10,.30),rgba(7,8,10,.92) 12%)}
+  .content{padding:26px 18px}
+  .form,.genre-grid,.choice-grid,.answers{grid-template-columns:1fr}
+}
+
+/* V5 — solo la schermata finale usa gli 11 sfondi fotografici approvati */
+.result-article{
+  display:inline-block;
+  margin-right:.18em;
+  font-size:.30em;
+  line-height:1;
+  font-weight:800;
+  letter-spacing:.12em;
+  vertical-align:top;
+  transform:translateY(.24em);
+}
+.result-name{
+  display:inline-block;
+  font-size:1em;
+  line-height:.88;
+}
+.hero-bg{
+  background-size:cover;
+  background-position:center center;
+  filter:none;
+}
+.hero-overlay{
+  background:
+    linear-gradient(180deg,rgba(5,6,8,.04),rgba(5,6,8,.10) 44%,rgba(5,6,8,.64) 100%),
+    linear-gradient(90deg,rgba(5,6,8,.08),transparent 48%);
+}
+
+
+/* TEST PROFILI FINALI — rimuovere nella build definitiva */
+.profile-test-panel{
+  position:fixed;
+  z-index:9999;
+  left:22px;
+  top:96px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:8px;
+  border:1px solid rgba(211,170,94,.38);
+  border-radius:12px;
+  background:rgba(7,8,10,.84);
+  backdrop-filter:blur(18px);
+  box-shadow:0 14px 40px rgba(0,0,0,.30);
+}
+.profile-test-panel::before{
+  content:"TEST PROFILO";
+  margin:0 5px 0 2px;
+  color:var(--gold);
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.15em;
+}
+.profile-test-panel select,
+.profile-test-panel button{
+  height:32px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;
+  background:#11141a;
+  color:#eee9df;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+}
+.profile-test-panel select{
+  min-width:160px;
+  padding:0 9px;
+  outline:none;
+}
+.profile-test-panel button{
+  min-width:34px;
+  padding:0 9px;
+  cursor:pointer;
+}
+.profile-test-panel button:hover{
+  border-color:rgba(211,170,94,.48);
+  color:var(--gold2);
+}
+.profile-test-hint{
+  position:fixed;
+  z-index:9998;
+  left:22px;
+  top:141px;
+  color:rgba(255,255,255,.38);
+  font-size:8px;
+  letter-spacing:.08em;
+}
+@media(max-width:800px){
+  .profile-test-panel{top:78px;left:10px;right:10px}
+  .profile-test-panel select{min-width:0;flex:1}
+  .profile-test-hint{display:none}
+}
+
+
+.stage-test-panel{
+  position:fixed;
+  z-index:9999;
+  left:22px;
+  top:152px;
+  width:352px;
+  padding:8px;
+  border:1px solid rgba(211,170,94,.30);
+  border-radius:12px;
+  background:rgba(7,8,10,.84);
+  backdrop-filter:blur(18px);
+  box-shadow:0 14px 40px rgba(0,0,0,.30);
+}
+.stage-test-title{
+  color:var(--gold);
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  margin:0 0 7px 2px;
+}
+.stage-test-row{
+  display:flex;
+  gap:6px;
+  margin-bottom:6px;
+}
+.stage-test-row button{
+  height:30px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;
+  background:#11141a;
+  color:#eee9df;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+.stage-test-row button:hover,
+.stage-test-row button.on{
+  border-color:rgba(211,170,94,.52);
+  color:var(--gold2);
+}
+.stage-tab{flex:1}
+.stage-scene-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+}
+.stage-scene-grid button{
+  min-height:34px;
+  padding:5px 7px;
+  text-align:left;
+  line-height:1.05;
+}
+@media(max-width:800px){
+  .stage-test-panel{left:10px;right:10px;top:130px;width:auto}
+}
+
+
+/* V12 FIX — test controls visibility */
+.stage-scene-grid button{
+  appearance:none !important;
+  background:#11141a !important;
+  color:#eee9df !important;
+  border:1px solid rgba(255,255,255,.14) !important;
+  border-radius:8px !important;
+  min-height:36px !important;
+  padding:7px 9px !important;
+  font-size:8px !important;
+  font-weight:900 !important;
+  letter-spacing:.06em !important;
+  text-transform:uppercase !important;
+  cursor:pointer !important;
+}
+.stage-scene-grid button:hover{
+  color:var(--gold2) !important;
+  border-color:rgba(211,170,94,.52) !important;
+}
+
+
+.stage-scene-grid button.on{
+  color:var(--gold2) !important;
+  border-color:rgba(211,170,94,.72) !important;
+  background:rgba(211,170,94,.08) !important;
+}
+
+/* =========================================================
+   V14 — SOLO LAYOUT DEI 3 STAGE DECISIONALI
+   Allineato alla schermata finale:
+   - immagine unica a tutto schermo
+   - contenuto a destra sopra overlay scuro
+   - nessuna modifica a logica, testi, mapping o asset
+   ========================================================= */
+
+#pageStory .layout{
+  position:absolute;
+  inset:0;
+  display:block;
+  overflow:hidden;
+  background:#08090d;
+}
+
+
+
+/* =========================================================
+   V20 — 01 ASPETTO · SCELTA METODO AVATAR
+   Solo questa pagina: stage e risultato finale restano invariati.
+   ========================================================= */
+#pageAppearance .avatar-method-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  max-width:920px;
+}
+#pageAppearance .avatar-method{
+  min-height:230px;
+  padding:20px 20px 18px;
+}
+#pageAppearance .avatar-method .n{
+  font-size:34px;
+  margin-top:10px;
+}
+#pageAppearance .avatar-method .d{
+  max-width:430px;
+  font-size:11px;
+  line-height:1.58;
+}
+#pageAppearance .avatar-features{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:18px;
+  padding-bottom:24px;
+}
+#pageAppearance .avatar-features span{
+  border:1px solid rgba(255,255,255,.09);
+  background:rgba(255,255,255,.035);
+  border-radius:999px;
+  padding:6px 9px;
+  color:#9297a0;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+#pageAppearance .avatar-method.on .avatar-features span{
+  border-color:rgba(211,170,94,.20);
+  color:#cdbb97;
+}
+#pageAppearance .avatar-selection-note{
+  max-width:920px;
+  min-height:46px;
+  margin-top:12px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 13px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:13px;
+  background:rgba(255,255,255,.025);
+  color:#777d86;
+  font-size:9px;
+  line-height:1.5;
+}
+#pageAppearance .avatar-selection-note b{
+  color:var(--gold2);
+  font-size:9px;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+}
+@media(max-width:800px){
+  #pageAppearance .avatar-method-grid{grid-template-columns:1fr}
+  #pageAppearance .avatar-method{min-height:190px}
+}
+
+/* Lo sfondo occupa tutta la schermata, come nella fase finale */
+#pageStory .visual{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  overflow:hidden;
+  border:0;
+  background:#08090d;
+}
+
+#pageStory .visual-inner{
+  position:absolute;
+  inset:0;
+  border:0;
+  border-radius:0;
+  overflow:hidden;
+  box-shadow:none;
+  background:#08090d;
+}
+
+#pageStory .visual-art{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center center;
+  background-repeat:no-repeat;
+  opacity:0;
+  transition:opacity .38s ease;
+}
+
+#pageStory .visual-art.on{
+  opacity:1;
+}
+
+/* Stesso principio della finale:
+   foto visibile a sinistra, progressivamente scurita verso destra */
+#pageStory .visual-overlay{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(7,8,10,.06) 0%,
+      rgba(7,8,10,.10) 38%,
+      rgba(7,8,10,.26) 53%,
+      rgba(7,8,10,.58) 68%,
+      rgba(7,8,10,.84) 84%,
+      rgba(7,8,10,.94) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(7,8,10,.06) 0%,
+      rgba(7,8,10,.10) 55%,
+      rgba(7,8,10,.28) 100%
+    );
+}
+
+/* Mantengo intatti kicker/copy degli stage: cambia solo l'impaginazione */
+#pageStory .visual-kicker,
+#pageStory .visual-copy{
+  z-index:2;
+}
+
+/* Colonna decisionale sopra la stessa immagine,
+   con trattamento equivalente al pannello finale */
+#pageStory .content{
+  position:relative;
+  z-index:3;
+  margin-left:auto;
+  width:58%;
+  min-width:680px;
+  height:100%;
+  padding:42px 52px 34px;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(7,8,10,.08) 0%,
+      rgba(7,8,10,.30) 10%,
+      rgba(7,8,10,.58) 28%,
+      rgba(7,8,10,.80) 58%,
+      rgba(7,8,10,.92) 100%
+    );
+  backdrop-filter:blur(5px);
+}
+
+/* Evita che la copy a sinistra entri nel pannello decisionale */
+#pageStory .visual-copy{
+  right:62%;
+  max-width:520px;
+}
+
+@media(max-width:1100px){
+  #pageStory .content{
+    width:62%;
+    padding:34px 34px 28px;
+  }
+
+  #pageStory .visual-copy{
+    right:66%;
+  }
+}
+
+@media(max-width:800px){
+  #pageStory .layout{
+    min-height:calc(100vh - 70px);
+  }
+
+  #pageStory .visual{
+    position:absolute;
+    inset:0;
+    height:auto;
+    min-height:0;
+    border:0;
+  }
+
+  #pageStory .visual-inner{
+    inset:0;
+    border-radius:0;
+  }
+
+  #pageStory .content{
+    width:100%;
+    height:100%;
+    padding:26px 18px;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(7,8,10,.30) 0%,
+        rgba(7,8,10,.72) 34%,
+        rgba(7,8,10,.94) 100%
+      );
+  }
+
+  #pageStory .visual-copy{
+    display:none;
+  }
+}
+
+
+/* =========================================================
+   V15 — SOLO FASE FINALE
+   Impaginazione resa IDENTICA ai 3 stage V14.
+   Nessuna modifica a immagini, soggetti, testi, logica o mapping.
+   ========================================================= */
+
+#pageResult .result{
+  position:absolute;
+  inset:0;
+  display:block;
+  overflow:hidden;
+  background:#08090d;
+}
+
+/* L'immagine finale usa la stessa geometria dello sfondo degli stage */
+#pageResult .result-left{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  border:0;
+  overflow:hidden;
+  background:#08090d;
+}
+
+#pageResult .hero{
+  position:absolute;
+  inset:0;
+  border:0;
+  border-radius:0;
+  overflow:hidden;
+  box-shadow:none;
+  background:#08090d;
+}
+
+#pageResult .hero-bg{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center center;
+  background-repeat:no-repeat;
+  opacity:0;
+  transition:opacity .38s ease;
+}
+
+#pageResult .hero-bg.on{
+  opacity:1;
+}
+
+/* COPIA ESATTA del trattamento visivo usato nei 3 stage */
+#pageResult .hero-overlay{
+  position:absolute;
+  inset:0;
+  display:block !important;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(7,8,10,.06) 0%,
+      rgba(7,8,10,.10) 38%,
+      rgba(7,8,10,.26) 53%,
+      rgba(7,8,10,.58) 68%,
+      rgba(7,8,10,.84) 84%,
+      rgba(7,8,10,.94) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(7,8,10,.06) 0%,
+      rgba(7,8,10,.10) 55%,
+      rgba(7,8,10,.28) 100%
+    );
+}
+
+/* Niente testo duplicato sulla fotografia */
+#pageResult .hero-copy{
+  display:none !important;
+}
+
+/* COPIA ESATTA della geometria del pannello destro degli stage */
+#pageResult .result-right{
+  position:relative;
+  z-index:3;
+  margin-left:auto;
+  width:58%;
+  min-width:0;
+  height:100%;
+  padding:42px 52px 34px;
+  display:flex;
+  flex-direction:column;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(7,8,10,.08) 0%,
+      rgba(7,8,10,.30) 10%,
+      rgba(7,8,10,.58) 28%,
+      rgba(7,8,10,.80) 58%,
+      rgba(7,8,10,.92) 100%
+    );
+  backdrop-filter:blur(5px);
+}
+
+/* Mantengo intatti tutti gli elementi interni della finale */
+#pageResult .result-kicker,
+#pageResult .result-title,
+#pageResult .result-desc,
+#pageResult .identity-strip,
+#pageResult .answers,
+#pageResult .note,
+#pageResult .bottom{
+  position:relative;
+  z-index:4;
+}
+
+@media(max-width:1100px){
+  #pageResult .result-right{
+    width:62%;
+    padding:34px 34px 28px;
+  }
+}
+
+@media(max-width:800px){
+  #pageResult .result{
+    min-height:calc(100vh - 70px);
+  }
+
+  #pageResult .result-left{
+    position:absolute;
+    inset:0;
+    height:auto;
+    min-height:0;
+    border:0;
+  }
+
+  #pageResult .hero{
+    inset:0;
+    border-radius:0;
+  }
+
+  #pageResult .result-right{
+    width:100%;
+    height:100%;
+    padding:26px 18px;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(7,8,10,.30) 0%,
+        rgba(7,8,10,.72) 34%,
+        rgba(7,8,10,.94) 100%
+      );
+  }
+}
+
+/* =========================================================
+   V21 — CAMERINO INTERMEDIO TRA 01 ASPETTO E 02 IDENTITÀ
+   Solo flusso avatar. Stage e finale restano invariati.
+   ========================================================= */
+#pageDressingRoom{
+  background:#050609;
+}
+.dressing-room-frame{
+  display:block;
+  width:100%;
+  height:100%;
+  border:0;
+  background:#050609;
+}
+.room-pstep i{
+  font-size:15px;
+  line-height:1;
+}
+.room-pstep.on{color:var(--gold2)}
+.room-pstep.on i{
+  border-color:rgba(211,170,94,.42);
+  color:var(--gold);
+  background:rgba(211,170,94,.08);
+  box-shadow:0 0 0 1px rgba(211,170,94,.08) inset;
+}
+
+
+
+/* =========================================================
+   V24 — INTRO CARRIERA APPROVATA (baseline preview V4)
+   Overlay isolato: non modifica stage, finali o camerino.
+   ========================================================= */
+#careerIntro{
+  position:fixed;inset:0;z-index:100000;background:#050609;overflow:hidden;
+  visibility:hidden;opacity:0;pointer-events:none;
+}
+#careerIntro.active{visibility:visible;opacity:1;pointer-events:auto}
+#careerIntro .career-intro-frame{
+  position:absolute;inset:-2.2%;opacity:0;will-change:opacity,transform,filter;
+  transform:scale(1.03);background-position:center;background-size:cover;background-repeat:no-repeat;
+  filter:brightness(.94) saturate(1.03);
+}
+#careerIntro .career-intro-frame::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(5,6,9,.05),rgba(5,6,9,.015) 54%,rgba(5,6,9,.16)),
+             radial-gradient(circle at 50% 48%,rgba(255,255,255,0) 34%,rgba(4,5,8,.10) 72%,rgba(4,5,8,.18) 100%);
+  pointer-events:none;
+}
+#careerIntroF1{background-image:url("assets/creator-00-e2c2866ee5ea.png")}
+#careerIntroF2{background-image:url("assets/creator-01-6778b410cbf1.png")}
+#careerIntroF3{background-image:url("assets/creator-02-e28be96a4a22.png")}
+#careerIntroF4{background-image:url("assets/creator-03-947905e87828.png");inset:-4%}
+
+#careerIntro.play #careerIntroF1{animation:careerShot1 2.8s cubic-bezier(.22,.61,.36,1) both}
+#careerIntro.play #careerIntroF2{animation:careerShot2 2.8s 2.2s cubic-bezier(.22,.61,.36,1) both}
+#careerIntro.play #careerIntroF3{animation:careerShot3 2.8s 4.4s cubic-bezier(.22,.61,.36,1) both}
+#careerIntro.play #careerIntroF4{animation:careerFinalShot 4.6s 6.6s cubic-bezier(.22,.61,.36,1) both}
+
+@keyframes careerShot1{
+  0%{opacity:0;transform:scale(1.048) translate3d(-.42%,.14%,0);filter:brightness(.90) saturate(1.01)}
+  10%{opacity:.08}24%{opacity:.48;filter:brightness(.95) saturate(1.02)}
+  40%{opacity:1;filter:brightness(1) saturate(1.04)}82%{opacity:1}
+  100%{opacity:0;transform:scale(1.016) translate3d(.18%,0,0);filter:brightness(.98) saturate(1.01)}
+}
+@keyframes careerShot2{
+  0%{opacity:0;transform:scale(1.045) translate3d(.34%,.10%,0);filter:brightness(.90) saturate(1.01)}
+  10%{opacity:.08}24%{opacity:.48;filter:brightness(.95) saturate(1.02)}
+  40%{opacity:1;filter:brightness(1) saturate(1.04)}82%{opacity:1}
+  100%{opacity:0;transform:scale(1.016) translate3d(-.16%,-.06%,0);filter:brightness(.98) saturate(1.01)}
+}
+@keyframes careerShot3{
+  0%{opacity:0;transform:scale(1.048) translate3d(-.24%,.12%,0);filter:brightness(.91) saturate(1.01)}
+  10%{opacity:.08}24%{opacity:.48;filter:brightness(.96) saturate(1.02)}
+  40%{opacity:1;filter:brightness(1) saturate(1.03)}84%{opacity:1}
+  100%{opacity:0;transform:scale(1.014) translate3d(.14%,-.05%,0);filter:brightness(.985) saturate(1.01)}
+}
+@keyframes careerFinalShot{
+  0%{opacity:0;transform:scale(1.00) translate3d(0,0,0);filter:brightness(.90)}
+  12%{opacity:.10}28%{opacity:.55;filter:brightness(.95)}
+  44%{opacity:1;filter:brightness(1)}
+  100%{opacity:1;transform:scale(1.038) translate3d(0,-.14%,0);filter:brightness(1.02)}
+}
+#careerIntro .career-intro-fade{
+  position:absolute;inset:0;z-index:20;
+  background:radial-gradient(circle at 50% 46%,rgba(5,6,9,.78) 0%,rgba(5,6,9,.90) 58%,rgba(5,6,9,.98) 100%);
+  opacity:0;pointer-events:none;
+}
+#careerIntro.play .career-intro-fade{animation:careerOpening 1.35s cubic-bezier(.22,.61,.36,1) both}
+@keyframes careerOpening{0%{opacity:1}30%{opacity:.78}58%{opacity:.34}100%{opacity:0}}
+#careerIntro .career-intro-grain{
+  position:absolute;inset:0;z-index:15;pointer-events:none;opacity:.04;mix-blend-mode:screen;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
+}
+#careerIntro .career-intro-badge{
+  position:absolute;left:20px;top:18px;z-index:40;color:rgba(255,255,255,.62);
+  font:700 10px/1 "Inter",sans-serif;letter-spacing:.16em;text-transform:uppercase;opacity:0;
+}
+#careerIntro.play .career-intro-badge{animation:careerBadge 2.8s .3s ease both}
+@keyframes careerBadge{0%{opacity:0;transform:translateY(-5px)}18%,82%{opacity:.75;transform:none}100%{opacity:0}}
+#careerIntro .career-intro-replay{
+  position:absolute;right:22px;bottom:20px;z-index:40;opacity:0;pointer-events:none;
+  border:1px solid rgba(255,255,255,.14);background:rgba(7,8,10,.66);backdrop-filter:blur(12px);
+  color:#eee5d4;border-radius:999px;padding:10px 15px;font:700 12px/1 "Inter",sans-serif;
+  letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:.2s ease;
+}
+#careerIntro .career-intro-replay:hover{border-color:rgba(211,170,94,.5);background:rgba(18,15,11,.82)}
+#careerIntro.done .career-intro-replay{opacity:.9;pointer-events:auto}
+@media (prefers-reduced-motion:reduce){
+  #careerIntro.play #careerIntroF1,#careerIntro.play #careerIntroF2,#careerIntro.play #careerIntroF3{animation:none;opacity:0}
+  #careerIntro.play #careerIntroF4{animation:none;opacity:1;transform:scale(1.03)}
+}
+
+
+/* integrazione gioco: pannelli TEST disattivati */
+.profile-test-panel,.profile-test-hint,.stage-test-panel,.preview-note{display:none!important}
+.local-editor-overlay{position:fixed;inset:0;z-index:120000;background:#050609;display:none}
+.local-editor-overlay.on{display:block}
+.local-editor-overlay iframe{width:100%;height:100%;border:0;background:#050609;display:block}
+.creator-exit-game{position:fixed;left:18px;bottom:18px;z-index:130000;border:1px solid rgba(255,255,255,.16);background:rgba(7,8,10,.72);color:#f1eadb;border-radius:999px;padding:10px 14px;font:700 11px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(10px)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <b>Anni di Fame</b>
+      <span>Creator personaggio · prototype v23</span>
+    </div>
+    <div class="progress">
+      <div class="pstep on" data-step="0"><i>01</i>Aspetto</div><div class="pline"></div>
+      <div class="pstep room-pstep" data-room-step><i>•</i>Camerino</div><div class="pline"></div>
+      <div class="pstep" data-step="1"><i>02</i>Identità</div><div class="pline"></div>
+      <div class="pstep" data-step="2"><i>03</i>La tua storia</div><div class="pline"></div>
+      <div class="pstep" data-step="3"><i>04</i>Che artista sei</div>
+    </div>
+  </header>
+
+  <main class="viewport">
+    <section class="page on" id="pageAppearance">
+      <div class="layout">
+        <div class="visual">
+          <div class="visual-inner">
+            <div class="visual-art on" id="appearanceArt"></div>
+            <div class="visual-overlay"></div>
+            <div class="visual-kicker">01 · Aspetto</div>
+            <div class="visual-copy">
+              <h2>Il tuo artista.<br>Il tuo modo.</h2>
+              <p>Scegli come vuoi creare il personaggio. Il resto del creator non cambia: cambia soltanto la sorgente dell’avatar.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="eyebrow">Creazione personaggio</div>
+          <h1>Come vuoi creare il tuo artista?</h1>
+          <p class="lead">Puoi partire da Avaturn per una creazione più completa oppure usare l’editor locale con preset pronti e personalizzazione rapida. Dopo aver creato o scelto il personaggio passerai sempre dal camerino, dove potrai vederlo e confermarlo prima di entrare nell’identità.</p>
+
+          <div class="avatar-method-grid">
+            <button class="card avatar-method" type="button" data-avatar-source="avaturn">
+              <div class="id">01 · editor esterno</div>
+              <span class="n">Avaturn</span>
+              <div class="d">Per chi vuole costruire un avatar più personale, usando selfie oppure l’editor completo di Avaturn.</div>
+              <div class="avatar-features">
+                <span>Selfie opzionale</span><span>Più personalizzazione</span><span>Editor Avaturn</span>
+              </div>
+              <div class="mini">Creazione completa</div>
+            </button>
+
+            <button class="card avatar-method" type="button" data-avatar-source="local">
+              <div class="id">02 · editor del gioco</div>
+              <span class="n">Editor locale</span>
+              <div class="d">Per chi vuole iniziare più velocemente: scegli un preset pronto e modifica solo gli elementi principali del personaggio.</div>
+              <div class="avatar-features">
+                <span>Nessun selfie</span><span>Preset pronti</span><span>Personalizzazione rapida</span>
+              </div>
+              <div class="mini">Scelta rapida</div>
+            </button>
+          </div>
+
+          <div class="avatar-selection-note" id="avatarSelectionNote">
+            Seleziona uno dei due metodi. Dopo l’editor scelto il flusso confluisce nel camerino, che resta uguale per entrambi i tipi di avatar.
+          </div>
+
+          <div class="bottom">
+            <span class="counter">Passo 1 di 4</span>
+            <div class="btns">
+              <button class="btn primary" id="goIdentity" disabled>Seleziona un metodo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="pageDressingRoom">
+      <iframe class="dressing-room-frame" id="dressingRoomFrame" src="camerino.html" title="Camerino personaggio"></iframe>
+    </section>
+
+    <section class="page" id="pageIdentity">
+      <div class="layout">
+        <div class="visual">
+          <div class="visual-inner">
+            <div class="visual-art" id="identityArt"></div>
+            <div class="visual-overlay"></div>
+            <div class="visual-kicker">02 · Identità</div>
+            <div class="visual-copy">
+              <h2>Prima il nome.<br>Poi il tuo suono.</h2>
+              <p>L’aspetto ormai è definito. Adesso il gioco deve capire come ti presenti al mondo e da dove arriva il tuo artista.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="eyebrow">Costruisci il profilo</div>
+          <h1>Chi sei, quando ancora nessuno ti conosce?</h1>
+          <p class="lead">Questa parte non tocca la difficoltà. Serve a definire l’identità narrativa del personaggio e a costruire il profilo finale di <em>Che artista sei</em>.</p>
+
+          <div class="form">
+            <div class="field">
+              <label>Nome d’arte · obbligatorio</label>
+              <input id="name" placeholder="es. NOIR">
+            </div>
+            <div class="field">
+              <label>Città di provenienza · obbligatoria</label>
+              <input id="city" placeholder="es. Torino">
+            </div>
+          </div>
+
+          <div class="section-head">
+            <div class="left">
+              <b>Che musica fai?</b>
+              <span>Scegli il tuo suono iniziale</span>
+            </div>
+            <div class="right">6 generi · espandibili</div>
+          </div>
+
+          <div class="grid genre-grid" id="genreGrid"></div>
+
+          <div class="bottom">
+            <span class="counter">Passo 2 di 4</span>
+            <div class="btns">
+              <button class="btn" id="backAppearance">← Camerino</button>
+              <button class="btn primary" id="goStory" disabled>Continua →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="pageStory">
+      <div class="layout">
+        <div class="visual">
+          <div class="visual-inner">
+            <div class="visual-art on" id="storyArtA"></div><div class="visual-art" id="storyArtB"></div>
+            <div class="visual-overlay"></div>
+            <div class="visual-kicker" id="storyKicker">03 · La tua storia</div>
+            <div class="visual-copy">
+              <h2 id="storyTitle">Ogni artista<br>parte da qualcosa.</h2>
+              <p id="storyText">Per ora non ci sono bonus o malus: il gioco sta solo raccogliendo la tua impronta.</p>
+              <div class="scene-tags" id="storyTags"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="story-meter">
+            <span class="story-label" id="storyMeterText">Scenario 1 di 3</span>
+            <div class="bar"><div class="fill" id="storyMeterFill"></div></div>
+          </div>
+          <div class="eyebrow" id="storyEyebrow">Origini</div>
+          <h1 class="question" id="storyQuestion">Come hai cominciato davvero?</h1>
+          <p class="lead" id="storyLead">Scegli la cosa che assomiglia di più all’inizio della tua storia.</p>
+
+          <div class="grid choice-grid" id="choiceGrid"></div>
+
+          <div class="bottom">
+            <span class="counter" id="storyCounter">1 / 3</span>
+            <div class="btns">
+              <button class="btn" id="storyBack">← Indietro</button>
+              <button class="btn primary" id="storyNext" disabled>Continua →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="pageResult">
+      <div class="result">
+        <div class="result-left">
+          <div class="hero">
+            <div class="hero-bg on" id="resultArtA"></div><div class="hero-bg" id="resultArtB"></div>
+            <div class="hero-overlay"></div>
+            <div class="hero-copy">
+              <small>04 · Che artista sei</small>
+              <b id="resultHero"><span class="result-article">IL</span><span class="result-name">VISIONARIO</span></b>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-right">
+          <div class="result-kicker">Profilo finale</div>
+          <div class="result-title" id="resultTitle"><span class="result-article">IL</span><span class="result-name">VISIONARIO</span></div>
+          <div class="result-desc" id="resultDesc"></div>
+
+          <div class="identity-strip">
+            <span class="pill" id="pillName"></span>
+            <span class="pill" id="pillCity"></span>
+            <span class="pill" id="pillGenre"></span>
+          </div>
+
+          <div class="answers" id="answerGrid"></div>
+
+          <div class="note">Questo risultato, per ora, è solo narrativo: non modifica soldi, statistiche, difficoltà, relazioni o eventi. Però è perfetto da salvare nel progetto per usarlo più avanti.</div>
+
+          <div class="bottom">
+            <span class="counter">Passo 4 di 4</span>
+            <div class="btns">
+              <button class="btn" id="editChoices">← Modifica</button>
+              <button class="btn primary" id="startCareer">Inizia la carriera →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+
+  <!-- TEST ONLY -->
+  <div class="profile-test-panel" id="profileTestPanel">
+    <button type="button" id="profilePrev">◀</button>
+    <select id="profileTestSelect" aria-label="Seleziona profilo finale">
+      <option value="freestyler">Freestyler</option>
+      <option value="autore">L’Autore</option>
+      <option value="mc">L’MC</option>
+      <option value="producer">Producer</option>
+      <option value="visionario" selected>Visionario</option>
+      <option value="outsider">Outsider</option>
+      <option value="performer">Performer</option>
+      <option value="networker">Networker</option>
+      <option value="perfezionista">Perfezionista</option>
+      <option value="istintivo">Istintivo</option>
+      <option value="costruttore">Costruttore</option>
+    </select>
+    <button type="button" id="profileNext">▶</button>
+  </div>
+  <div class="profile-test-hint">← → cambia profilo · test soltanto</div>
+
+
+  <!-- TEST ONLY: sfondi stage decisionali -->
+  <div class="stage-test-panel" id="stageTestPanel">
+    <div class="stage-test-title">TEST SFONDI STAGE</div>
+    <div class="stage-test-row">
+      <button type="button" class="stage-tab on" data-test-stage="0">Stage 1</button>
+      <button type="button" class="stage-tab" data-test-stage="1">Stage 2</button>
+      <button type="button" class="stage-tab" data-test-stage="2">Stage 3</button>
+    </div>
+    <div class="stage-scene-grid" id="stageSceneButtons"></div>
+  </div>
+
+  <div class="preview-note">V20 · SCELTA AVATAR · STAGE E FINALI BLOCCATI</div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const SCENES = {
+  bedroom: `data:image/svg+xml;utf8,
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1400">
+    <defs>
+      <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+        <stop stop-color="%23191b22"/><stop offset="1" stop-color="%23090a0d"/>
+      </linearGradient>
+      <radialGradient id="gl1" cx=".55" cy=".26" r=".35">
+        <stop stop-color="%23d3aa5e" stop-opacity=".22"/><stop offset="1" stop-color="%23d3aa5e" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1200" height="1400" fill="url(%23g1)"/>
+    <rect width="1200" height="760" fill="url(%23gl1)"/>
+    <rect x="130" y="160" width="930" height="930" rx="34" fill="none" stroke="white" stroke-opacity=".06"/>
+    <rect x="170" y="214" width="860" height="770" rx="18" fill="%230d0f14"/>
+    <rect x="210" y="252" width="780" height="38" rx="14" fill="%231f242d"/>
+    <rect x="240" y="780" width="320" height="88" rx="14" fill="%23181b22"/>
+    <rect x="600" y="770" width="210" height="108" rx="14" fill="%23181c23"/>
+    <rect x="840" y="760" width="140" height="130" rx="14" fill="%23252a33"/>
+    <circle cx="398" cy="514" r="136" fill="%23171b21"/>
+    <path d="M220 1120c28-206 100-314 178-314s150 108 178 314z" fill="%23151a20"/>
+    <rect x="782" y="345" width="86" height="300" rx="22" fill="%23242a33"/>
+    <circle cx="826" cy="312" r="42" fill="%232d343f"/>
+    <rect x="775" y="1020" width="180" height="20" rx="10" fill="%23363d48"/>
+    <rect x="775" y="1060" width="140" height="20" rx="10" fill="%23242a33"/>
+  </svg>`,
+  piazza: `data:image/svg+xml;utf8,
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1400">
+    <defs>
+      <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+        <stop stop-color="%230d1015"/><stop offset="1" stop-color="%23090a0d"/>
+      </linearGradient>
+      <radialGradient id="gl2" cx=".46" cy=".22" r=".30">
+        <stop stop-color="%23d3aa5e" stop-opacity=".18"/><stop offset="1" stop-color="%23d3aa5e" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1200" height="1400" fill="url(%23g2)"/>
+    <rect width="1200" height="800" fill="url(%23gl2)"/>
+    <path d="M0 900L1200 760V1400H0Z" fill="%2311141a"/>
+    <rect x="62" y="380" width="180" height="460" fill="%23161a22"/>
+    <rect x="950" y="260" width="180" height="590" fill="%23151a21"/>
+    <rect x="270" y="520" width="160" height="320" fill="%23141a21"/>
+    <rect x="460" y="450" width="210" height="390" fill="%23161c24"/>
+    <circle cx="570" cy="330" r="150" fill="%23d3aa5e" opacity=".07"/>
+    <g fill="%23212730">
+      <circle cx="270" cy="770" r="54"/><path d="M196 1060c18-130 48-214 74-214s56 84 74 214z"/>
+      <circle cx="450" cy="735" r="64"/><path d="M356 1080c18-150 57-246 94-246s76 96 94 246z"/>
+      <circle cx="640" cy="750" r="58"/><path d="M556 1070c18-137 50-224 84-224s66 87 84 224z"/>
+    </g>
+    <path d="M120 920h960" stroke="%23d3aa5e" stroke-opacity=".22" stroke-width="4"/>
+  </svg>`,
+  studio: `data:image/svg+xml;utf8,
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1400">
+    <defs>
+      <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
+        <stop stop-color="%2314171e"/><stop offset="1" stop-color="%23090a0d"/>
+      </linearGradient>
+      <radialGradient id="gl3" cx=".58" cy=".20" r=".33">
+        <stop stop-color="%23d3aa5e" stop-opacity=".17"/><stop offset="1" stop-color="%23d3aa5e" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1200" height="1400" fill="url(%23g3)"/>
+    <rect width="1200" height="900" fill="url(%23gl3)"/>
+    <rect x="130" y="148" width="930" height="1010" rx="32" fill="%230d1015" stroke="white" stroke-opacity=".05"/>
+    <rect x="190" y="240" width="810" height="360" rx="24" fill="%23090b0f"/>
+    <path d="M240 462c80-102 126 110 220 0s140 104 220 0 126 92 180 0" fill="none" stroke="%23d3aa5e" stroke-opacity=".28" stroke-width="6"/>
+    <rect x="220" y="736" width="760" height="120" rx="20" fill="%23181c24"/>
+    <rect x="270" y="780" width="360" height="18" rx="9" fill="%23303640"/>
+    <rect x="270" y="818" width="280" height="18" rx="9" fill="%23232931"/>
+    <circle cx="806" cy="795" r="42" fill="%232a313c"/>
+    <circle cx="892" cy="795" r="42" fill="%232a313c"/>
+    <circle cx="406" cy="1010" r="90" fill="%231a1f27"/>
+    <path d="M285 1210c18-122 63-196 121-196s103 74 121 196z" fill="%23151a21"/>
+  </svg>`,
+  backstage: `data:image/svg+xml;utf8,
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1400">
+    <defs>
+      <linearGradient id="g4" x1="0" y1="0" x2="0" y2="1">
+        <stop stop-color="%230c0e12"/><stop offset="1" stop-color="%2308090c"/>
+      </linearGradient>
+      <radialGradient id="gl4" cx=".55" cy=".18" r=".28">
+        <stop stop-color="%23d3aa5e" stop-opacity=".24"/><stop offset="1" stop-color="%23d3aa5e" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1200" height="1400" fill="url(%23g4)"/>
+    <rect width="1200" height="760" fill="url(%23gl4)"/>
+    <rect x="60" y="960" width="1080" height="210" rx="18" fill="%23111418"/>
+    <path d="M0 1060h1200" stroke="white" stroke-opacity=".05" stroke-width="2"/>
+    <circle cx="180" cy="190" r="78" fill="%23d3aa5e" opacity=".24"/>
+    <circle cx="425" cy="168" r="58" fill="%23d3aa5e" opacity=".18"/>
+    <circle cx="660" cy="195" r="68" fill="%23d3aa5e" opacity=".24"/>
+    <circle cx="930" cy="180" r="78" fill="%23d3aa5e" opacity=".16"/>
+    <rect x="165" y="290" width="870" height="520" rx="28" fill="%230d1015" stroke="white" stroke-opacity=".05"/>
+    <circle cx="600" cy="522" r="120" fill="%23171b21"/>
+    <path d="M430 950c28-176 88-266 170-266s142 90 170 266z" fill="%2314191f"/>
+    <rect x="220" y="1028" width="760" height="16" rx="8" fill="%23262c35"/>
+  </svg>`,
+  tunnel: `data:image/svg+xml;utf8,
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1400">
+    <defs>
+      <linearGradient id="g5" x1="0" y1="0" x2="0" y2="1">
+        <stop stop-color="%230b0d10"/><stop offset="1" stop-color="%2306070a"/>
+      </linearGradient>
+      <linearGradient id="t" x1="0" x2="1">
+        <stop stop-color="%2313161b"/><stop offset=".5" stop-color="%231d222a"/><stop offset="1" stop-color="%2313161b"/>
+      </linearGradient>
+      <radialGradient id="gl5" cx=".50" cy=".20" r=".34">
+        <stop stop-color="%23d3aa5e" stop-opacity=".14"/><stop offset="1" stop-color="%23d3aa5e" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1200" height="1400" fill="url(%23g5)"/>
+    <rect width="1200" height="780" fill="url(%23gl5)"/>
+    <path d="M140 0L0 1400h250L470 0Z" fill="url(%23t)"/>
+    <path d="M1060 0L730 0 950 1400h250Z" fill="url(%23t)"/>
+    <path d="M340 1220H860" stroke="%23d3aa5e" stroke-opacity=".24" stroke-width="6"/>
+    <circle cx="600" cy="556" r="122" fill="%23181c23"/>
+    <path d="M420 1160c22-182 91-278 180-278s158 96 180 278z" fill="%23141920"/>
+    <rect x="540" y="170" width="120" height="70" rx="14" fill="%23d3aa5e" opacity=".18"/>
+  </svg>`,
+  rooftop: `data:image/svg+xml;utf8,
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1400">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop stop-color="%23131820"/><stop offset="1" stop-color="%2308090d"/>
+      </linearGradient>
+      <radialGradient id="moon" cx=".70" cy=".18" r=".18">
+        <stop stop-color="%23d3aa5e" stop-opacity=".28"/><stop offset="1" stop-color="%23d3aa5e" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1200" height="1400" fill="url(%23sky)"/>
+    <rect width="1200" height="780" fill="url(%23moon)"/>
+    <rect x="0" y="880" width="1200" height="520" fill="%230d1015"/>
+    <path d="M0 910H1200" stroke="white" stroke-opacity=".05" stroke-width="3"/>
+    <g fill="%23161b23">
+      <rect x="74" y="510" width="120" height="370"/><rect x="240" y="430" width="170" height="450"/>
+      <rect x="454" y="360" width="150" height="520"/><rect x="660" y="300" width="190" height="580"/>
+      <rect x="900" y="470" width="160" height="410"/>
+    </g>
+    <circle cx="625" cy="590" r="122" fill="%23171b22"/>
+    <path d="M455 1200c22-188 86-286 170-286s148 98 170 286z" fill="%23141a20"/>
+    <rect x="180" y="1010" width="840" height="16" rx="8" fill="%23262c35"/>
+  </svg>`,
+  setvideo: `data:image/svg+xml;utf8,
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1400">
+    <defs>
+      <linearGradient id="g7" x1="0" y1="0" x2="0" y2="1">
+        <stop stop-color="%2313161b"/><stop offset="1" stop-color="%2307090c"/>
+      </linearGradient>
+      <radialGradient id="gl7" cx=".48" cy=".20" r=".26">
+        <stop stop-color="%23d3aa5e" stop-opacity=".18"/><stop offset="1" stop-color="%23d3aa5e" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1200" height="1400" fill="url(%23g7)"/>
+    <rect width="1200" height="780" fill="url(%23gl7)"/>
+    <rect x="125" y="170" width="950" height="980" rx="30" fill="%230c0f14" stroke="white" stroke-opacity=".05"/>
+    <rect x="180" y="250" width="840" height="600" rx="26" fill="%23090b0f"/>
+    <rect x="268" y="350" width="214" height="400" rx="20" fill="%23171b22"/>
+    <rect x="718" y="350" width="214" height="400" rx="20" fill="%23171b22"/>
+    <circle cx="600" cy="530" r="134" fill="%23191e25"/>
+    <path d="M410 1046c26-186 96-284 190-284s164 98 190 284z" fill="%23151a21"/>
+    <circle cx="268" cy="288" r="62" fill="%23d3aa5e" opacity=".19"/>
+    <circle cx="932" cy="288" r="62" fill="%23d3aa5e" opacity=".19"/>
+    <rect x="295" y="1018" width="610" height="18" rx="9" fill="%23252b35"/>
+  </svg>`,
+  hero: `data:image/svg+xml;utf8,
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1400">
+    <defs>
+      <linearGradient id="gh" x1="0" y1="0" x2="0" y2="1">
+        <stop stop-color="%23141820"/><stop offset="1" stop-color="%2308090c"/>
+      </linearGradient>
+      <radialGradient id="h1" cx=".5" cy=".18" r=".34">
+        <stop stop-color="%23d3aa5e" stop-opacity=".22"/><stop offset="1" stop-color="%23d3aa5e" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1200" height="1400" fill="url(%23gh)"/>
+    <rect width="1200" height="900" fill="url(%23h1)"/>
+    <rect x="130" y="140" width="940" height="1120" rx="34" fill="none" stroke="white" stroke-opacity=".07"/>
+    <circle cx="600" cy="480" r="158" fill="%231c2028"/>
+    <path d="M330 1180c30-240 118-360 270-360s240 120 270 360z" fill="%23161a21"/>
+    <path d="M448 330c18-106 198-126 234-6-78-18-154-16-234 6z" fill="%23282e39"/>
+    <rect x="280" y="1060" width="640" height="20" rx="10" fill="%23272d36"/>
+    <rect x="360" y="1100" width="480" height="20" rx="10" fill="%231f252d"/>
+  </svg>`
+};
+
+
+const STAGE_BACKGROUNDS = {
+  s1_camera_home_studio:"assets/creator-04-d8cd03a9358e.png",
+  s1_piazza_cypher:"assets/creator-05-af378d92ec72.png",
+  s1_backstage_locale:"assets/creator-06-f580ef0524c1.png",
+  s2_scrittura_quaderno:"assets/creator-07-e9dce1b4cfd4.png",
+  s2_control_room_suono:"assets/creator-08-074310580fc7.png",
+  s2_set_creativo:"assets/creator-09-0b9c68c98bd1.png",
+  s3_invio_pezzo:"assets/creator-10-feea16a4f25f.png",
+  s3_listening_room:"assets/creator-11-be76dd3d8087.png",
+  s3_studio_notturno:"assets/creator-12-fbbcdd33154a.png",
+  s3_venue_video:"assets/creator-13-099fef24faef.png"
+};
+
+
+const GENRES = [
+  {id:"rap", name:"Rap", desc:"Parola al centro. Beat, flow e scrittura prima di tutto.", mini:"Classico · diretto"},
+  {id:"trap", name:"Trap", desc:"808, melodie, autotune e un’identità sonora immediata.", mini:"Moderno · melodico"},
+  {id:"drill", name:"Drill", desc:"Ritmo spezzato, delivery aggressiva e presenza.", mini:"Teso · incisivo"},
+  {id:"boombap", name:"Boom bap", desc:"Campioni, batterie secche e attenzione maniacale alle barre.", mini:"Tecnico · lirico"},
+  {id:"rnb", name:"R&B", desc:"Voce, armonie e pezzi costruiti sull’atmosfera.", mini:"Vocale · emotivo"},
+  {id:"cloud", name:"Cloud", desc:"Texture, ambienti sospesi e una direzione meno convenzionale.", mini:"Atmosferico · personale"}
+];
+
+const STORY = [
+  {
+    eyebrow:"Origini",
+    meter:"Scenario 1 di 3",
+    title:"Da qualche parte<br>hai cominciato.",
+    text:"Lo scenario cambia solo quando fai una scelta.",
+    question:"Come hai cominciato davvero?",
+    lead:"Scegli la cosa che assomiglia di più all’inizio della tua storia.",
+    tags:["Origini","Nessun bonus o malus"],
+    choices:[
+      {id:"camera", name:"Da solo in camera", desc:"Notti, cuffie e take registrate con quello che avevi.", tags:["outsider","autore"], bg:"s1_camera_home_studio"},
+      {id:"piazza", name:"In piazza", desc:"Freestyle, amici attorno e nessun posto dove nasconderti.", tags:["freestyler","performer"], bg:"s1_piazza_cypher"},
+      {id:"crew", name:"Con una crew", desc:"Hai iniziato insieme ad altri. Sessioni, idee e confronto continuo.", tags:["networker","costruttore"], bg:"s1_piazza_cypher"},
+      {id:"beat", name:"Dietro ai beat", desc:"Prima hai imparato a costruire un suono, poi ci hai messo la voce.", tags:["producer","visionario"], bg:"s1_camera_home_studio"},
+      {id:"microfono", name:"Col microfono in mano", desc:"Hai iniziato cercando flow, metriche e modi diversi di stare sopra un beat.", tags:["mc","freestyler"], bg:"s1_backstage_locale"},
+      {id:"online", name:"Online", desc:"Hai pubblicato roba prima ancora di salire su un palco.", tags:["visionario","istintivo"], bg:"s1_camera_home_studio"},
+      {id:"locali", name:"Nei locali", desc:"Open mic, piccoli live e serate dove nessuno era venuto per vedere te.", tags:["performer","networker"], bg:"s1_backstage_locale"}
+    ]
+  },
+  {
+    eyebrow:"Priorità",
+    meter:"Scenario 2 di 3",
+    title:"Una cosa deve<br>arrivare prima.",
+    text:"La direzione visiva reagisce alla risposta che scegli.",
+    question:"Cosa vuoi che la gente riconosca per prima?",
+    lead:"Non cosa pensi sia importante in assoluto. Cosa vuoi che resti di te.",
+    tags:["Identità","Direzione artistica"],
+    choices:[
+      {id:"barre", name:"Le barre", desc:"Scrittura, incastri, punchline. Vuoi che si torni indietro ad ascoltare.", tags:["autore","perfezionista"], bg:"s2_scrittura_quaderno"},
+      {id:"flow", name:"Il flow", desc:"Vuoi che il modo in cui stai sul beat sia riconoscibile prima ancora del testo.", tags:["mc","freestyler"], bg:"s2_control_room_suono"},
+      {id:"suono", name:"Il suono", desc:"Prima dell’artista deve arrivare un mondo sonoro riconoscibile.", tags:["producer","visionario"], bg:"s2_control_room_suono"},
+      {id:"presenza", name:"La presenza", desc:"Voce, sicurezza, palco. Devi occupare lo spazio.", tags:["performer","mc"], bg:"s2_set_creativo"},
+      {id:"immagine", name:"L’immagine", desc:"Non separi musica, estetica e modo di presentarti.", tags:["visionario","networker"], bg:"s2_set_creativo"},
+      {id:"originalita", name:"L’originalità", desc:"Preferisci dividere le persone piuttosto che sembrare già sentito.", tags:["outsider","visionario"], bg:"s2_set_creativo"},
+      {id:"storie", name:"Quello che racconti", desc:"Vuoi che si ricordino delle cose che hai detto, non solo di come suonano.", tags:["autore","costruttore"], bg:"s2_scrittura_quaderno"}
+    ]
+  },
+  {
+    eyebrow:"Primo movimento",
+    meter:"Scenario 3 di 3",
+    title:"Il primo pezzo<br>è pronto.",
+    text:"Quello che fai subito dopo chiude il profilo.",
+    question:"Hai finito il primo pezzo di cui sei davvero convinto. Che fai?",
+    lead:"Il brano è sul computer. Nessuno lo sta aspettando. Come ti muovi?",
+    tags:["Primo pezzo","Istinto"],
+    choices:[
+      {id:"manda", name:"Lo mando in giro", desc:"Lo fai ascoltare a chiunque possa aprirti una porta o darti un contatto.", tags:["networker","istintivo"], bg:"s3_invio_pezzo"},
+      {id:"perfetto", name:"Lo rifinisco ancora", desc:"Finché senti qualcosa che non torna, non esce.", tags:["perfezionista","autore"], bg:"s3_studio_notturno"},
+      {id:"palco", name:"Cerco un palco", desc:"Vuoi sapere subito cosa succede quando il pezzo incontra delle persone.", tags:["performer","freestyler"], bg:"s3_venue_video"},
+      {id:"video", name:"Costruisco immagine e video", desc:"Il brano è solo una parte. Vuoi presentare un mondo completo.", tags:["visionario","costruttore"], bg:"s3_venue_video"},
+      {id:"altro", name:"Ne inizio subito un altro", desc:"Non vuoi vivere di un singolo pezzo. Vuoi muoverti e capire strada facendo.", tags:["istintivo","producer"], bg:"s3_studio_notturno"},
+      {id:"fidati", name:"Lo faccio sentire a pochi", desc:"Poche persone, ma scelte bene. Prima vuoi capire se regge davvero.", tags:["perfezionista","costruttore"], bg:"s3_listening_room"}
+    ]
+  }
+];
+
+const FINAL_HERO = {
+  freestyler:"assets/creator-14-a6ba69b179c7.png",
+  autore:"assets/creator-15-8df3818b2963.png",
+  mc:"assets/creator-16-c8b356f82796.png",
+  producer:"assets/creator-17-c2f9d50ac1b6.png",
+  visionario:"assets/creator-18-e665640c3f33.png",
+  outsider:"assets/creator-19-7edafe3ab020.png",
+  performer:"assets/creator-20-65ce9e992984.png",
+  networker:"assets/creator-21-49713b7b43c2.png",
+  perfezionista:"assets/creator-22-42bba9409793.png",
+  istintivo:"assets/creator-23-7aa9e3fd43d9.png",
+  costruttore:"assets/creator-24-3b16665e142b.png"
+};
+
+const PROFILES = {
+  freestyler:{title:"Il Freestyler", desc:"Vivi meglio quando devi reagire sul momento. La musica per te è presenza, istinto e capacità di stare dentro la situazione."},
+  autore:{title:"L’Autore", desc:"Se una frase non funziona continui a riscriverla. Il pezzo comincia dalle parole e da quello che vuoi lasciare a chi ascolta."},
+  mc:{title:"L’MC", desc:"Flow, metrica, delivery e controllo della voce sono il centro del tuo modo di fare musica. Il beat è il terreno su cui devi saper stare meglio degli altri."},
+  producer:{title:"Il Producer", desc:"Prima ancora di pensare a cosa dire, vuoi sapere come deve suonare. Beat, arrangiamento e atmosfera vengono prima della performance."},
+  visionario:{title:"Il Visionario", desc:"Non ti basta una canzone. Vuoi che suono, immagine e atmosfera sembrino appartenere allo stesso mondo."},
+  outsider:{title:"L’Outsider", desc:"Hai imparato molto da solo e non senti il bisogno di entrare subito in una scena già esistente. Preferisci costruirti uno spazio tuo."},
+  performer:{title:"Il Performer", desc:"Un pezzo prende davvero vita quando davanti c’è qualcuno. Energia, presenza e reazione del pubblico per te contano moltissimo."},
+  networker:{title:"Il Networker", desc:"La musica per te è anche persone, sessioni, collaborazioni e occasioni che nascono parlando con qualcuno nel momento giusto."},
+  perfezionista:{title:"Il Perfezionista", desc:"Pubblicare qualcosa che non ti rappresenta ti dà più fastidio che aspettare. Vuoi riconoscerti in ogni dettaglio."},
+  istintivo:{title:"L’Istintivo", desc:"Preferisci fare, provare e capire dopo cosa funziona. Il movimento per te vale più dell’attesa perfetta."},
+  costruttore:{title:"Il Costruttore", desc:"Non cerchi necessariamente il colpo immediato. Vuoi mettere insieme catalogo, identità e percorso un pezzo alla volta."}
+};
+
+function heroScene(profile){ return FINAL_HERO[profile] || FINAL_HERO.visionario; }
+
+const state = {avatarSource:null, avatarPendingSource:null, avatarData:null, name:"", city:"", genre:null, answers:[]};
+let storyStep = 0;
+
+function setBg(el, key){ el.style.backgroundImage = `url("${SCENES[key]}")`; }
+function makeCrossfade(aId,bId,initialKey,source){
+  let front=$(aId), back=$(bId), current=initialKey;
+  const get=key=>source==='hero' ? heroScene(key) : (STAGE_BACKGROUNDS[key] || SCENES[key]);
+  front.style.backgroundImage=`url("${get(initialKey)}")`; front.classList.add('on');
+  back.style.backgroundImage=`url("${get(initialKey)}")`;
+  return function(next){
+    if(!next || next===current) return;
+    back.style.backgroundImage=`url("${get(next)}")`;
+    requestAnimationFrame(()=>{
+      back.classList.add('on'); front.classList.remove('on');
+      setTimeout(()=>{ const t=front; front=back; back=t; back.classList.remove('on'); current=next; },500);
+    });
+  };
+}
+const changeStoryBg=makeCrossfade('storyArtA','storyArtB','setvideo','scene');
+const changeResultBg=makeCrossfade('resultArtA','resultArtB','visionario','hero');
+
+function renderGenres(){
+  $('genreGrid').innerHTML = GENRES.map((g,i)=>`
+    <button class="card ${state.genre===g.id?'on':''}" data-genre="${g.id}">
+      <div class="id">${String(i+1).padStart(2,'0')} · genere</div>
+      <span class="n">${g.name}</span>
+      <div class="d">${g.desc}</div>
+      <div class="mini">${g.mini}</div>
+    </button>
+  `).join('');
+  document.querySelectorAll('[data-genre]').forEach(btn=>{
+    btn.onclick=()=>{
+      state.genre = btn.dataset.genre;
+      renderGenres();
+      validateIdentity();
+    };
+  });
+}
+
+function setProgress(stepIndex){
+  document.querySelectorAll('.pstep[data-step]').forEach(x=>{
+    x.classList.toggle('on', String(x.dataset.step)===String(stepIndex));
+  });
+  const roomStep=document.querySelector('[data-room-step]');
+  if(roomStep) roomStep.classList.toggle('on', stepIndex==='room');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  if(stepIndex===0) $('pageAppearance').classList.add('on');
+  if(stepIndex==='room') $('pageDressingRoom').classList.add('on');
+  if(stepIndex===1) $('pageIdentity').classList.add('on');
+  if(stepIndex===2) $('pageStory').classList.add('on');
+  if(stepIndex===3) $('pageResult').classList.add('on');
+}
+
+
+function selectedAvatarSource(){
+  return state.avatarPendingSource || state.avatarSource || null;
+}
+
+function renderAvatarSource(){
+  const selected = selectedAvatarSource();
+  document.querySelectorAll('[data-avatar-source]').forEach(btn=>{
+    btn.classList.toggle('on', btn.dataset.avatarSource===selected);
+  });
+
+  const note = $('avatarSelectionNote');
+  const go = $('goIdentity');
+  if(!selected){
+    note.textContent = 'Seleziona uno dei due metodi. Dopo l’editor scelto passerai dal camerino prima di entrare nell’identità.';
+    go.textContent = 'Seleziona un metodo';
+    go.disabled = true;
+    return;
+  }
+
+  const hasConfirmedAvatar = !!(state.avatarSource && state.avatarData);
+  const switchingMethod = hasConfirmedAvatar && selected!==state.avatarSource;
+  const selectedName = selected==='avaturn' ? 'Avaturn' : 'Editor locale';
+  const currentName = state.avatarSource==='avaturn' ? 'Avaturn' : (state.avatarSource==='local' ? 'Editor locale' : '');
+
+  if(switchingMethod){
+    note.innerHTML = `<b>Passaggio a ${selectedName}</b><span>Il personaggio attuale creato con ${currentName} resta salvato finché non completi il nuovo avatar. Se esci dal nuovo editor senza confermare, non perdi quello che hai già.</span>`;
+    go.textContent = selected==='avaturn' ? 'Passa ad Avaturn →' : 'Passa all’editor locale →';
+    go.disabled = false;
+    return;
+  }
+
+  if(selected==='avaturn'){
+    note.innerHTML = hasConfirmedAvatar
+      ? '<b>Avatar Avaturn attuale</b><span>Puoi riaprire Avaturn oppure scegliere l’editor locale senza dover ricominciare la partita.</span>'
+      : '<b>Avaturn selezionato</b><span>Crei il personaggio con Avaturn; al termine lo rivedi nel camerino e poi continui con l’identità.</span>';
+    go.textContent = hasConfirmedAvatar ? 'Riapri Avaturn →' : 'Continua con Avaturn →';
+  } else {
+    note.innerHTML = hasConfirmedAvatar
+      ? '<b>Avatar locale attuale</b><span>Puoi riaprire l’editor locale oppure passare ad Avaturn senza dover ricominciare la partita.</span>'
+      : '<b>Editor locale selezionato</b><span>Scegli e personalizzi un preset locale; al termine lo rivedi nel camerino e poi continui con l’identità.</span>';
+    go.textContent = hasConfirmedAvatar ? 'Riapri editor locale →' : 'Continua con editor locale →';
+  }
+  go.disabled = false;
+}
+
+function selectAvatarSource(source){
+  if(source!=='avaturn' && source!=='local') return;
+  /* La selezione non sostituisce mai l'avatar già confermato.
+     Il cambio diventa definitivo solo quando l'editor chiama completeAvatarCreation(). */
+  state.avatarPendingSource = source;
+  renderAvatarSource();
+}
+
+/* Hook già pronto per l’integrazione reale dei due editor.
+   Quando Avaturn o l’editor locale avranno finito, potranno chiamare:
+   completeAvatarCreation('avaturn', data) oppure completeAvatarCreation('local', data). */
+window.completeAvatarCreation = function(source, avatarData={}){
+  if(source!=='avaturn' && source!=='local') return;
+  /* Solo qui il nuovo metodo sostituisce davvero quello precedente. */
+  state.avatarSource = source;
+  state.avatarPendingSource = null;
+  state.avatarData = avatarData;
+  renderAvatarSource();
+  openDressingRoom(false);
+};
+
+function normalizeAvatarForRoom(){
+  const d = state.avatarData || {};
+  const url = d.avatarUrl || d.modelUrl || d.url || d.glbUrl || '';
+  return {
+    avatarSource: state.avatarSource || '',
+    avatarUrl: url,
+    avatarUrlType: d.avatarUrlType || d.urlType || (url ? 'glb' : ''),
+    avatarId: d.avatarId || d.id || '',
+    avatarSessionId: d.avatarSessionId || d.sessionId || '',
+    avatarBodyId: d.avatarBodyId || d.bodyId || '',
+    avatarGender: d.avatarGender || d.gender || '',
+    avatarFaceAnimations: !!(d.avatarFaceAnimations || d.faceAnimations),
+    avatarPreviewImage: d.avatarPreviewImage || d.previewImage || '',
+    localAvatar: d.localAvatar || null
+  };
+}
+
+function sendDressingRoomInit(previewOnly=false){
+  const frame = $('dressingRoomFrame');
+  if(!frame?.contentWindow) return;
+  const roomSource = state.avatarData && state.avatarSource ? state.avatarSource : selectedAvatarSource();
+  frame.contentWindow.postMessage({
+    type:'adf-avatar-room-init',
+    mode:'new',
+    source:roomSource,
+    previewOnly:!!previewOnly,
+    artist:normalizeAvatarForRoom()
+  }, '*');
+}
+
+function openDressingRoom(previewOnly=false){
+  setProgress('room');
+  setTimeout(()=>sendDressingRoomInit(previewOnly),60);
+}
+
+function validateIdentity(){
+  state.name = $('name').value.trim();
+  state.city = $('city').value.trim();
+  $('goStory').disabled = !(state.name && state.city && state.genre);
+}
+
+function renderStory(){
+  const s = STORY[storyStep];
+  const current = state.answers[storyStep] || null;
+  $('storyEyebrow').textContent = s.eyebrow;
+  $('storyMeterText').textContent = s.meter;
+  $('storyMeterFill').style.width = `${((storyStep+1)/STORY.length)*100}%`;
+  $('storyQuestion').textContent = s.question;
+  $('storyLead').textContent = s.lead;
+  $('storyTitle').innerHTML = s.title;
+  $('storyText').textContent = s.text;
+  $('storyCounter').textContent = `${storyStep+1} / ${STORY.length}`;
+  $('storyTags').innerHTML = s.tags.map(t=>`<span class="scene-tag">${t}</span>`).join('');
+
+  $('choiceGrid').innerHTML = s.choices.map((c,i)=>`
+    <button class="card ${current && current.id===c.id ? 'on' : ''}" data-choice="${c.id}">
+      <div class="id">${String(i+1).padStart(2,'0')} · scelta</div>
+      <span class="n">${c.name}</span>
+      <div class="d">${c.desc}</div>
+    </button>
+  `).join('');
+
+  document.querySelectorAll('[data-choice]').forEach(btn=>{
+    btn.onclick=()=>{
+      const c = s.choices.find(x=>x.id===btn.dataset.choice);
+      state.answers[storyStep] = c;
+      changeStoryBg(c.bg);
+      renderStory();
+    };
+  });
+
+  $('storyBack').textContent = storyStep===0 ? '← Identità' : '← Indietro';
+  $('storyNext').textContent = storyStep===STORY.length-1 ? 'Scopri chi sei →' : 'Continua →';
+  $('storyNext').disabled = !current;
+}
+
+function showResult(){
+  const score = {};
+  Object.keys(PROFILES).forEach(k=>score[k]=0);
+
+  state.answers.forEach(a=>{
+    if(!a) return;
+    a.tags.forEach((t,i)=> score[t] += (i===0 ? 2 : 1));
+  });
+
+  if(state.genre==="boombap"){ score.autore += 1; score.mc += 1; }
+  if(state.genre==="rnb" || state.genre==="cloud") score.visionario += 1;
+  if(state.genre==="trap") score.istintivo += 1;
+  if(state.genre==="drill"){ score.mc += 1; score.performer += 1; }
+  if(state.genre==="rap"){ score.autore += 1; score.mc += 1; }
+
+  const winner = Object.entries(score).sort((a,b)=>b[1]-a[1])[0][0];
+  const {title, desc} = PROFILES[winner];
+  const parts = {
+    freestyler:["IL","FREESTYLER"],
+    autore:["L’","AUTORE"],
+    mc:["L’","MC"],
+    producer:["IL","PRODUCER"],
+    visionario:["IL","VISIONARIO"],
+    outsider:["L’","OUTSIDER"],
+    performer:["IL","PERFORMER"],
+    networker:["IL","NETWORKER"],
+    perfezionista:["IL","PERFEZIONISTA"],
+    istintivo:["L’","ISTINTIVO"],
+    costruttore:["IL","COSTRUTTORE"]
+  }[winner];
+  const titleHTML = `<span class="result-article">${parts[0]}</span><span class="result-name">${parts[1]}</span>`;
+
+  $('resultHero').innerHTML = titleHTML;
+  $('resultTitle').innerHTML = titleHTML;
+  $('resultDesc').textContent = desc;
+  $('pillName').textContent = state.name;
+  $('pillCity').textContent = state.city;
+  $('pillGenre').textContent = GENRES.find(g=>g.id===state.genre)?.name || '';
+
+  $('answerGrid').innerHTML = state.answers.map((a,i)=>`
+    <div class="answer">
+      <small>${STORY[i].eyebrow}</small>
+      <b>${a.name}</b>
+    </div>
+  `).join('');
+
+  changeResultBg(winner);
+  setProgress(3);
+}
+
+document.querySelectorAll('[data-avatar-source]').forEach(btn=>{
+  btn.addEventListener('click', ()=>selectAvatarSource(btn.dataset.avatarSource));
+});
+
+const localEditorOverlay = $('localEditorOverlay');
+const localEditorFrame = $('localEditorFrame');
+function openLocalEditor(){
+  if(!localEditorOverlay) return;
+  localEditorOverlay.classList.add('on');
+  localEditorOverlay.setAttribute('aria-hidden','false');
+  setTimeout(()=>{
+    try{ localEditorFrame.contentWindow.postMessage({type:'adf-local-avatar-init',artist:state.avatarData||{}},'*'); }catch(e){}
+  },60);
+}
+function closeLocalEditor(){
+  if(!localEditorOverlay) return;
+  localEditorOverlay.classList.remove('on');
+  localEditorOverlay.setAttribute('aria-hidden','true');
+}
+
+$('goIdentity').onclick = ()=>{
+  const source = selectedAvatarSource();
+  if(!source) return;
+  state.avatarPendingSource=source;
+  if(source==='local'){ openLocalEditor(); return; }
+  /* Avaturn vive dentro al camerino: il bottone MODIFICA CON AVATURN apre
+     l’SDK e Continua rimane disabilitato finché non esiste un export reale. */
+  openDressingRoom(false);
+};
+
+$('backAppearance').onclick = ()=> state.avatarData ? openDressingRoom(false) : setProgress(0);
+
+window.addEventListener('message', e=>{
+  const msg=e.data||{};
+  const frame=$('dressingRoomFrame');
+
+  if(localEditorFrame && e.source===localEditorFrame.contentWindow){
+    if(msg.type==='adf-local-avatar-complete'){
+      closeLocalEditor();
+      window.completeAvatarCreation('local', msg.artist||{});
+      return;
+    }
+    if(msg.type==='adf-local-avatar-cancel'){
+      closeLocalEditor();
+      state.avatarPendingSource = state.avatarSource || 'local';
+      if(state.avatarData) openDressingRoom(false); else setProgress(0);
+      renderAvatarSource();
+      return;
+    }
+    return;
+  }
+
+  if(!frame || e.source!==frame.contentWindow) return;
+  if(msg.type==='adf-avatar-room-ready'){
+    sendDressingRoomInit(false);
+    return;
+  }
+  if(msg.type==='adf-avatar-room-continue'){
+    const art=msg.artist||{};
+    const source=msg.source || state.avatarPendingSource || state.avatarSource;
+    if(source==='avaturn' && art.avatarUrl){
+      state.avatarSource='avaturn'; state.avatarPendingSource=null; state.avatarData=art; renderAvatarSource();
+    }else if(source==='local' && (art.avatarPreviewImage || art.previewImage || state.avatarData)){
+      state.avatarSource='local'; state.avatarPendingSource=null; state.avatarData=Object.assign({},state.avatarData||{},art); renderAvatarSource();
+    }
+    if(!state.avatarData){ return; }
+    setProgress(1);
+    validateIdentity();
+    return;
+  }
+  if(msg.type==='adf-avatar-room-cancel'){
+    setProgress(0);
+    return;
+  }
+  if(msg.type==='adf-avatar-room-edit-request'){
+    const source=msg.source;
+    if(source==='local'){ state.avatarPendingSource='local'; openLocalEditor(); }
+    return;
+  }
+  if(msg.type==='adf-avatar-room-change-method'){
+    state.avatarPendingSource = state.avatarSource || null;
+    setProgress(0);
+    renderAvatarSource();
+    return;
+  }
+});
+
+$('creatorExitGame').onclick=()=>{
+  window.parent.postMessage({type:'adf-rpg-v24-cancel'},'*');
+};
+
+$('name').addEventListener('input', validateIdentity);
+$('city').addEventListener('input', validateIdentity);
+
+$('goStory').onclick = ()=>{
+  setProgress(2);
+  storyStep = 0;
+  renderStory();
+};
+
+$('storyBack').onclick = ()=>{
+  if(storyStep===0){
+    setProgress(1);
+    return;
+  }
+  storyStep--;
+  renderStory();
+};
+
+$('storyNext').onclick = ()=>{
+  if(!state.answers[storyStep]) return;
+  if(storyStep < STORY.length-1){
+    storyStep++;
+    renderStory();
+  } else {
+    showResult();
+  }
+};
+
+$('editChoices').onclick = ()=> setProgress(1);
+$('startCareer').onclick = ()=> {
+  playCareerIntro();
+};
+
+setBg($('appearanceArt'), 'hero');
+setBg($('identityArt'), 'setvideo');
+renderAvatarSource();
+renderGenres();
+validateIdentity();
+if(window.parent!==window) window.parent.postMessage({type:'adf-rpg-v24-ready'},'*');
+
+/* pannelli TEST rimossi nell'integrazione gioco */
+
+
+</script>
+
+
+
+<div class="local-editor-overlay" id="localEditorOverlay" aria-hidden="true">
+  <iframe id="localEditorFrame" src="local-editor.html" title="Editor locale personaggio"></iframe>
+</div>
+<button type="button" class="creator-exit-game" id="creatorExitGame">← Menu</button>
+
+<!-- V24 · Intro carriera approvata -->
+<div id="careerIntro" aria-label="Introduzione alla carriera" aria-hidden="true">
+  <div class="career-intro-frame" id="careerIntroF1"></div>
+  <div class="career-intro-frame" id="careerIntroF2"></div>
+  <div class="career-intro-frame" id="careerIntroF3"></div>
+  <div class="career-intro-frame" id="careerIntroF4"></div>
+  <div class="career-intro-grain"></div>
+  <div class="career-intro-fade"></div>
+  <div class="career-intro-badge">Anni di Fame · Inizio carriera</div>
+  <button class="career-intro-replay" id="careerIntroReplay" type="button">↻ Riproduci</button>
+</div>
+
+
+<script>
+/* V24 · Intro carriera: ponte verso la schermata di gioco */
+(() => {
+  const intro = document.getElementById('careerIntro');
+  const replay = document.getElementById('careerIntroReplay');
+  let introTimer = null;
+
+  window.playCareerIntro = function(){
+    if(!intro) return;
+    clearTimeout(introTimer);
+    intro.classList.remove('play','done');
+    intro.classList.add('active');
+    intro.setAttribute('aria-hidden','false');
+    void intro.offsetWidth;
+    intro.classList.add('play');
+
+    introTimer = setTimeout(() => {
+      intro.classList.add('done');
+      const detail={
+        creatorVersion:'rpg-v24',
+        avatarSource: state.avatarSource || null,
+        avatarData: state.avatarData || null,
+        name: state.name || '',
+        city: state.city || '',
+        genre: state.genre || null,
+        profile: typeof calculateProfile === 'function' ? calculateProfile() : null,
+        answers: (state.answers||[]).map((a,i)=>({
+          stage:i+1,id:a?.id||'',name:a?.name||'',desc:a?.desc||''
+        }))
+      };
+      window.dispatchEvent(new CustomEvent('anniDiFame:careerIntroComplete',{detail}));
+      if(window.parent!==window) window.parent.postMessage({type:'adf-rpg-v24-complete',detail},'*');
+    },11500);
+  };
+
+  if(replay) replay.addEventListener('click', window.playCareerIntro);
+})();
+</script>
+
+</body>
+</html>

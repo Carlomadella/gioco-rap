@@ -1,0 +1,4238 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anni di Fame — Creator · V84 Long Hair + Matte Fix</title>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"
+  }
+}
+</script>
+<style>
+:root{
+  --ink:#0d0d0f;
+  --paper:#f1eadb;
+  --muted:#bdb6a9;
+  --line:rgba(255,255,255,.17);
+  --gold:#d3aa5e;
+  --wine:#8e3354;
+  --sage:#71876e;
+  --panel:rgba(10,10,12,.62);
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:#0b0b0d;color:var(--paper);font-family:Inter,Arial,sans-serif}
+body{overflow:hidden}
+button,input{font:inherit}
+.stage{position:relative;width:100vw;height:100vh;overflow:hidden;background:#0b0b0d;isolation:isolate}
+.blur{position:absolute;inset:-3%;background:url(assets/room-00-5e3089bb6543.png) center/cover no-repeat;filter:blur(22px) brightness(.48) saturate(.82);transform:scale(1.04)}
+.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;filter:saturate(.90) contrast(1.025);transform-origin:50% 43%;will-change:transform}
+.blur{transform-origin:50% 43%;will-change:transform}
+.shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,7,9,.63) 0%,rgba(7,7,9,.12) 27%,rgba(7,7,9,.06) 66%,rgba(7,7,9,.70) 100%),linear-gradient(0deg,rgba(7,7,9,.42),transparent 42%,rgba(7,7,9,.18));pointer-events:none;z-index:2}
+.stage::after{content:"";position:absolute;inset:0;z-index:11;opacity:.065;pointer-events:none;background-image:radial-gradient(rgba(255,255,255,.22) .65px,transparent .65px);background-size:4px 4px}
+.viewer{position:absolute;left:50%;top:0;width:39%;height:100%;transform:translateX(-50%);z-index:3}
+canvas{width:100%;height:100%;display:block}
+
+/* Wordmark: stesso lessico tipografico del menu principale */
+.brand{position:absolute;z-index:14;left:42px;top:31px;font-size:15px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:var(--paper);text-shadow:0 2px 18px rgba(0,0,0,.45)}
+.brand::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;margin:0 12px 2px 0;background:var(--gold);box-shadow:0 0 0 4px rgba(211,170,94,.10)}
+.brand::after{content:" · CREATOR";color:var(--gold)}
+.status{position:absolute;z-index:14;right:42px;top:30px;text-align:right;color:#d2cbc0;font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:750}
+.status b{display:block;color:var(--paper);margin-top:7px;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:none}
+
+/* View switcher derivato dal dock del menu */
+.views{position:absolute;left:50%;top:79%;transform:translateX(-50%);z-index:15;display:flex;gap:6px;padding:7px;background:rgba(13,13,15,.66);border:1px solid rgba(255,255,255,.13);border-radius:22px;backdrop-filter:blur(22px);box-shadow:0 14px 50px rgba(0,0,0,.30)}
+.views button{position:relative;min-width:82px;border:0;background:transparent;color:#aaa397;padding:11px 15px 12px;border-radius:15px;font-size:9px;font-weight:850;letter-spacing:.13em;text-transform:uppercase;cursor:pointer;transition:.2s background,.2s transform,.2s color}
+.views button::after{content:"";position:absolute;left:14px;right:14px;bottom:6px;height:1px;background:rgba(255,255,255,.13);transform:scaleX(.25);transform-origin:left;transition:.22s transform,.22s background}
+.views button:hover{background:rgba(255,255,255,.075);color:#fff;transform:translateY(-1px)}
+.views button.on{background:rgba(211,170,94,.12);color:#f4d28e}
+.views button.on::after,.views button:hover::after{transform:scaleX(1);background:var(--gold)}
+
+/* Pannello creator: vetro scuro coerente col dock */
+.panel{position:absolute;z-index:14;right:38px;top:94px;width:326px;padding:10px;background:rgba(13,13,15,.64);border:1px solid rgba(255,255,255,.13);border-radius:24px;backdrop-filter:blur(22px);box-shadow:0 14px 50px rgba(0,0,0,.34)}
+.panel h2{position:relative;margin:0;padding:18px 20px 17px;border-radius:17px;background:rgba(255,255,255,.055);font-size:13px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:var(--paper)}
+.panel h2::before{content:"01";display:block;margin-bottom:7px;font-size:9px;font-weight:800;letter-spacing:.18em;color:#a9a195}
+.panel h2::after{content:"";position:absolute;left:18px;right:18px;bottom:10px;height:1px;background:var(--gold);opacity:.72;transform:scaleX(.20);transform-origin:left}
+.group{margin:8px 0 0;padding:15px 18px 17px;border-radius:17px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.055);transition:.2s background,.2s border-color}
+.group:hover{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.10)}
+.group label{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#d2c9ba;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.16em;margin-bottom:12px}
+.group label span{display:flex;align-items:center;gap:9px}
+.group label span::before{content:"";width:17px;height:1px;background:var(--gold);opacity:.85}
+.group label b{color:var(--paper);font-size:10px;letter-spacing:.06em;font-weight:850;text-transform:none}
+
+.faces{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.faces button{position:relative;border:1px solid rgba(255,255,255,.11);background:rgba(8,8,10,.36);color:#c8c1b8;padding:11px 10px;border-radius:13px;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:.2s background,.2s border-color,.2s color,.2s transform}
+.faces button:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18);color:#fff;transform:translateY(-1px)}
+.faces button.on{background:rgba(211,170,94,.13);border-color:rgba(211,170,94,.44);color:#f4d28e;box-shadow:inset 0 -1px 0 rgba(211,170,94,.42)}
+.faces button.on::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--gold);margin-right:7px;vertical-align:1px}
+
+/* Range completamente ridisegnati, stessa palette */
+.group input[type=range]{width:100%;height:18px;margin:0;appearance:none;-webkit-appearance:none;background:transparent;cursor:pointer}
+.group input[type=range]::-webkit-slider-runnable-track{height:2px;border-radius:999px;background:linear-gradient(90deg,rgba(211,170,94,.78),rgba(241,234,219,.28))}
+.group input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;margin-top:-6.5px;border-radius:50%;background:var(--paper);border:4px solid #151517;box-shadow:0 0 0 1px rgba(211,170,94,.70),0 4px 12px rgba(0,0,0,.35)}
+.group input[type=range]::-moz-range-track{height:2px;border:0;border-radius:999px;background:rgba(241,234,219,.28)}
+.group input[type=range]::-moz-range-progress{height:2px;border-radius:999px;background:rgba(211,170,94,.78)}
+.group input[type=range]::-moz-range-thumb{width:8px;height:8px;border-radius:50%;background:var(--paper);border:4px solid #151517;box-shadow:0 0 0 1px rgba(211,170,94,.70)}
+
+.note{position:absolute;left:50%;bottom:17px;transform:translateX(-50%);z-index:14;padding:7px 11px;border:1px solid rgba(255,255,255,.09);border-radius:999px;background:rgba(13,13,15,.50);backdrop-filter:blur(14px);color:#9f988d;font-size:9px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;white-space:nowrap}
+
+@media(max-width:1100px){
+  .viewer{width:52%}
+  .panel{right:14px;width:270px}
+  .brand{left:22px;top:21px}
+  .status{right:22px;top:21px}
+}
+@media(max-height:720px) and (min-width:901px){
+  .panel{top:68px;transform:scale(.90);transform-origin:top right}
+  .views{top:auto;bottom:54px;transform:translateX(-50%) scale(.92)}
+  .brand{top:16px}
+  .status{top:15px}
+}
+
+
+.panel-section{display:contents}
+.panel-section:not(.active){display:none}
+.face-shapes{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.face-shapes button{padding:9px 7px;font-size:8.8px}
+.face-dual{gap:10px}
+.mini-control{min-width:0}
+.mini-control + .mini-control{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.065)}
+.mini-control label{margin-bottom:6px}
+.mini-control input[type=range]{height:14px}
+
+.color-picks{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.color-picks button,.brow-styles button{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 6px;font-size:8.7px}
+.brow-styles{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.dot{width:10px;height:10px;border-radius:999px;display:inline-block;flex:0 0 auto;box-shadow:0 0 0 1px rgba(255,255,255,.16) inset,0 0 0 1px rgba(0,0,0,.28)}
+.native-color-picker{
+  position:absolute;
+  width:1px;height:1px;
+  opacity:0;
+  pointer-events:none;
+}
+.custom-color-btn .custom-dot{
+  box-shadow:0 0 0 1px rgba(211,170,94,.42),0 0 0 1px rgba(0,0,0,.30) inset;
+}
+.custom-color-btn.on{
+  border-color:rgba(211,170,94,.64);
+}
+button:disabled{opacity:.45;cursor:not-allowed}
+input.disabled{opacity:.45}
+
+
+/* ================= V67 · VOLTO A SOTTOSEZIONI ================= */
+.face-subnav{
+  grid-column:1 / -1;
+  min-width:0;
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:6px;
+  padding:5px;
+  border-radius:15px;
+  border:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.025);
+}
+.face-subnav button{
+  position:relative;
+  min-width:0;
+  border:1px solid rgba(255,255,255,.09);
+  background:rgba(8,8,10,.28);
+  color:#aaa397;
+  border-radius:11px;
+  padding:8px 9px 9px;
+  font:800 8.7px/1 Inter,Arial,sans-serif;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:.18s background,.18s border-color,.18s color,.18s transform;
+}
+.face-subnav button:hover{
+  background:rgba(255,255,255,.065);
+  border-color:rgba(255,255,255,.16);
+  color:#fff;
+  transform:translateY(-1px);
+}
+.face-subnav button.on{
+  background:rgba(211,170,94,.12);
+  border-color:rgba(211,170,94,.40);
+  color:#f4d28e;
+}
+.face-tab-item{display:none !important}
+.face-tab-item.on{display:flex !important}
+
+/* Face panel stays shallow: subnav row + one row of controls. */
+.panel:has([data-panel-section="face"].active){
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  align-items:stretch;
+}
+.panel:has([data-panel-section="face"].active) .face-subnav{
+  min-height:34px;
+}
+.panel:has([data-panel-section="face"].active) .group{
+  min-height:92px;
+}
+
+@media(max-width:900px){
+  .face-subnav{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+
+/* ================= V73 · CAPELLI TEXTURED ================= */
+.panel:has([data-panel-section="hair"].active){
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  align-items:stretch;
+}
+.panel:has([data-panel-section="hair"].active) .group{
+  min-height:106px;
+}
+.hair-test-styles{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+.panel:has([data-panel-section="hair"].active) .hair-style-group{min-height:180px}
+.panel:has([data-panel-section="hair"].active){bottom:105px}
+@media(max-width:900px){.hair-test-styles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ================= V27 · NAVIGAZIONE IN BASSO ================= */
+/* Il pannello laterale diventa un tray orizzontale. Nessuna logica 3D qui. */
+.panel{
+  left:50%; right:auto; top:auto; bottom:113px;
+  transform:translateX(-50%);
+  width:min(1100px,calc(100vw - 56px));
+  padding:9px;
+  display:grid;
+  grid-template-columns:1.15fr 1fr 1fr 1fr;
+  gap:8px;
+  align-items:stretch;
+  border-radius:24px;
+  background:rgba(13,13,15,.67);
+}
+.panel h2{
+  margin:0;
+  min-height:96px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:18px 20px 17px;
+}
+.panel h2::before{content:"01 / EDIT";margin-bottom:8px}
+.panel h2::after{bottom:13px;transform:scaleX(.34)}
+.group{
+  margin:0;
+  min-width:0;
+  padding:15px 18px 16px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.group label{margin-bottom:11px}
+.faces{grid-template-columns:repeat(2,minmax(0,1fr))}
+.faces button{padding:11px 10px;font-size:9.5px}
+
+/* Due sole inquadrature utili: Volto e Intero. */
+.views{
+  left:auto; right:32px; top:auto; bottom:122px;
+  transform:none;
+  z-index:17;
+  padding:6px;
+  border-radius:18px;
+}
+.views button{min-width:78px;padding:12px 17px 13px;font-size:9.5px}
+
+/* Dock principale derivato dal menu iniziale. */
+.creator-nav{
+  position:absolute;
+  left:50%; bottom:24px;
+  transform:translateX(-50%);
+  z-index:18;
+  width:min(1100px,calc(100vw - 56px));
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:6px;
+  padding:7px;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:22px;
+  background:rgba(13,13,15,.72);
+  backdrop-filter:blur(22px);
+  box-shadow:0 14px 50px rgba(0,0,0,.34);
+}
+.creator-nav button{
+  position:relative;
+  border:0;
+  min-height:66px;
+  padding:12px 17px 13px;
+  border-radius:15px;
+  background:transparent;
+  color:#aaa397;
+  text-align:left;
+  cursor:pointer;
+  transition:.2s background,.2s color,.2s transform;
+}
+.creator-nav button .num{
+  display:block;
+  margin-bottom:4px;
+  font-size:9px;
+  line-height:1;
+  font-weight:850;
+  letter-spacing:.18em;
+  color:#817b72;
+}
+.creator-nav button .name{
+  display:block;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.creator-nav button::after{
+  content:"";
+  position:absolute;
+  left:14px; right:14px; bottom:7px;
+  height:1px;
+  background:rgba(255,255,255,.12);
+  transform:scaleX(.18);
+  transform-origin:left;
+  transition:.22s transform,.22s background;
+}
+.creator-nav button:not(:disabled):hover{
+  background:rgba(255,255,255,.065);
+  color:#fff;
+  transform:translateY(-1px);
+}
+.creator-nav button.active{
+  background:rgba(211,170,94,.12);
+  color:#f4d28e;
+}
+.creator-nav button.active .num{color:var(--gold)}
+.creator-nav button.active::after,
+.creator-nav button:not(:disabled):hover::after{
+  transform:scaleX(1);
+  background:var(--gold);
+}
+.creator-nav button:disabled{
+  cursor:default;
+  opacity:.42;
+}
+.creator-nav button:disabled .name::after{
+  content:"  · presto";
+  font-size:7px;
+  font-weight:700;
+  letter-spacing:.09em;
+  color:#777168;
+}
+
+.note{
+  left:28px; bottom:29px; transform:none;
+  z-index:19;
+  max-width:190px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+@media(max-width:1100px){
+  .viewer{width:50%}
+  .panel{
+    left:50%;right:auto;bottom:110px;
+    width:calc(100vw - 36px);
+    grid-template-columns:1.1fr 1fr 1fr 1fr;
+    transform:translateX(-50%);
+  }
+  .creator-nav{width:calc(100vw - 36px)}
+  .views{right:19px;bottom:118px}
+}
+@media(max-width:820px){
+  .panel{
+    width:calc(100vw - 24px);
+    grid-template-columns:repeat(2,1fr);
+    bottom:95px;
+    max-height:240px;
+    overflow:auto;
+  }
+  .creator-nav{width:calc(100vw - 24px);overflow-x:auto;grid-template-columns:repeat(5,minmax(112px,1fr));bottom:14px}
+  .views{right:12px;bottom:103px}
+  .note{display:none}
+}
+@media(max-height:720px) and (min-width:901px){
+  .panel{
+    top:auto;right:auto;bottom:92px;
+    transform:translateX(-50%) scale(.90);
+    transform-origin:bottom center;
+  }
+  .views{top:auto;right:22px;bottom:98px;transform:scale(.90);transform-origin:bottom right}
+  .creator-nav{bottom:14px;transform:translateX(-50%) scale(.94);transform-origin:bottom center}
+}
+
+
+.adf-local-actions{position:fixed;z-index:99999;right:18px;top:18px;display:flex;gap:9px}
+.adf-local-actions button{border:1px solid rgba(255,255,255,.2);background:rgba(8,8,10,.78);color:#f1eadb;border-radius:999px;padding:10px 14px;font:700 11px/1 Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(9px)}
+.adf-local-actions .ok{background:#f1eadb;color:#0d0d0f;border-color:#f1eadb}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="blur"></div>
+  <img class="bg" src="assets/room-00-5e3089bb6543.png" alt="">
+  <div class="shade"></div>
+
+  <div class="brand">Anni di Fame</div>
+  <div class="status">01 · Sesso + fisico<b id="status">caricamento corpo leggero…</b></div>
+
+  <div class="viewer" id="viewer"></div>
+
+  <div class="views">
+    <button data-view="face">Volto</button>
+    <button data-view="full" class="on">Intero</button>
+  </div>
+
+  <div class="panel">
+    <div class="panel-section active" data-panel-section="body">
+      <div class="group">
+        <label><span>Sesso</span></label>
+        <div class="faces">
+          <button data-sex="male" class="on">Maschile</button>
+          <button data-sex="female">Femminile</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <label><span>Altezza</span><b id="hv">178 cm</b></label>
+        <input id="height" type="range" min="155" max="205" value="178">
+      </div>
+
+      <div class="group">
+        <label><span>Peso</span><b id="wv">72 kg</b></label>
+        <input id="weight" type="range" min="45" max="140" value="72">
+      </div>
+
+      <div class="group">
+        <label><span>Corporatura</span><b id="bv">media</b></label>
+        <input id="build" type="range" min="-100" max="100" value="0">
+      </div>
+    </div>
+
+    <div class="panel-section" data-panel-section="face">
+      <div class="face-subnav" aria-label="Sottosezioni volto">
+        <button type="button" class="on" data-face-subtab="structure">Struttura</button>
+        <button type="button" data-face-subtab="nose">Naso</button>
+        <button type="button" data-face-subtab="eyes">Occhi</button>
+        <button type="button" data-face-subtab="brows">Sopracciglia</button>
+        <button type="button" data-face-subtab="mouth">Bocca</button>
+        <button type="button" data-face-subtab="chin">Mento / Orecchie</button>
+      </div>
+      <div class="group face-shape-group face-tab-item on" data-face-tab="structure">
+        <label><span>Forma volto</span><b id="faceShapeLabel">base</b></label>
+        <div class="faces face-shapes">
+          <button data-face-shape="base" class="on">Base</button>
+          <button data-face-shape="ovale">Ovale</button>
+          <button data-face-shape="squadrato">Squadrato</button>
+          <button data-face-shape="tondo">Tondo</button>
+          <button data-face-shape="affilato">Affilato</button>
+        </div>
+      </div>
+
+      <div class="group face-dual face-tab-item on" data-face-tab="structure">
+        <div class="mini-control">
+          <label><span>Linea mandibolare</span><b id="jawV">neutra</b></label>
+          <input id="faceJaw" type="range" min="-100" max="100" value="0">
+        </div>
+        <div class="mini-control">
+          <label><span>Prominenza zigomi</span><b id="cheekV">neutra</b></label>
+          <input id="faceCheeks" type="range" min="0" max="100" value="0">
+        </div>
+      </div>
+
+      <div class="group face-tab-item on" data-face-tab="structure">
+        <label><span>Guance · volume</span><b id="cheekVolumeV">neutre</b></label>
+        <input id="faceCheekVolume" type="range" min="-100" max="100" value="0">
+      </div>
+
+      <div class="group face-dual face-tab-item" data-face-tab="nose">
+        <div class="mini-control">
+          <label><span>Naso · larghezza</span><b id="noseWidthV">neutro</b></label>
+          <input id="faceNoseWidth" type="range" min="-100" max="100" value="0">
+        </div>
+        <div class="mini-control">
+          <label><span>Naso · lunghezza</span><b id="noseLengthV">neutro</b></label>
+          <input id="faceNoseLength" type="range" min="-100" max="100" value="0">
+        </div>
+      </div>
+
+      <div class="group face-dual face-tab-item" data-face-tab="nose">
+        <div class="mini-control">
+          <label><span>Naso · dimensione</span><b id="noseSizeV">neutra</b></label>
+          <input id="faceNoseSize" type="range" min="-100" max="100" value="0">
+        </div>
+        <div class="mini-control">
+          <label><span>Naso · punta</span><b id="noseTipV">neutra</b></label>
+          <input id="faceNoseTip" type="range" min="-100" max="100" value="0">
+        </div>
+      </div>
+
+      <div class="group face-dual face-tab-item" data-face-tab="nose">
+        <div class="mini-control">
+          <label><span>Naso · profilo</span><b id="noseProfileV">neutro</b></label>
+          <input id="faceNoseProfile" type="range" min="-100" max="100" value="0">
+        </div>
+        <div class="mini-control">
+          <label><span>Narici · larghezza</span><b id="nostrilsV">neutre</b></label>
+          <input id="faceNostrils" type="range" min="-100" max="100" value="0">
+        </div>
+      </div>
+
+      <div class="group face-dual face-tab-item" data-face-tab="eyes">
+        <div class="mini-control">
+          <label><span>Occhi · dimensione</span><b id="eyesV">neutri</b></label>
+          <input id="faceEyes" type="range" min="-100" max="100" value="0">
+        </div>
+        <div class="mini-control">
+          <label><span>Occhi · distanza</span><b id="eyesSpaceV">neutra</b></label>
+          <input id="faceEyeSpacing" type="range" min="-100" max="100" value="0">
+        </div>
+      </div>
+
+      <div class="group face-tab-item" data-face-tab="eyes">
+        <label><span>Colore occhi</span><b id="eyeColorV">marroni</b></label>
+        <div class="faces color-picks">
+          <button data-eye-color="#5b3a21" class="on"><span class="dot" style="background:#5b3a21"></span>Marroni</button>
+          <button data-eye-color="#7a5a2a"><span class="dot" style="background:#7a5a2a"></span>Nocciola</button>
+          <button data-eye-color="#4e6a3d"><span class="dot" style="background:#4e6a3d"></span>Verdi</button>
+          <button data-eye-color="#4d6786"><span class="dot" style="background:#4d6786"></span>Azzurri</button>
+          <button data-eye-color="#6b7078"><span class="dot" style="background:#6b7078"></span>Grigi</button>
+          <button type="button" id="eyeCustomBtn" class="custom-color-btn">
+            <span class="dot custom-dot" id="eyeCustomDot" style="background:#5b3a21"></span>Personalizza
+          </button>
+          <input id="eyeCustomColor" class="native-color-picker" type="color" value="#5b3a21" aria-label="Colore occhi personalizzato">
+        </div>
+      </div>
+
+      <div class="group face-dual face-tab-item" data-face-tab="brows">
+        <div class="mini-control">
+          <label><span>Sopracciglia · altezza</span><b id="browHeightV">neutra</b></label>
+          <input id="faceBrowHeight" type="range" min="-100" max="100" value="0">
+        </div>
+        <div class="mini-control">
+          <label><span>Sopracciglia · arco</span><b id="browAngleV">neutro</b></label>
+          <input id="faceBrowAngle" type="range" min="-100" max="100" value="0">
+        </div>
+      </div>
+
+      <div class="group face-tab-item" data-face-tab="brows">
+        <label><span>Sopracciglia · stile</span><b id="browStyleV">base</b></label>
+        <div class="faces brow-styles">
+          <button data-brow-style="base" class="on">Base</button>
+          <button data-brow-style="sottili">Sottili</button>
+          <button data-brow-style="spesse">Spesse</button>
+          <button data-brow-style="arcuate">Arcuate</button>
+          <button data-brow-style="dritte">Dritte</button>
+        </div>
+      </div>
+
+      <div class="group face-tab-item" data-face-tab="brows">
+        <label><span>Colore sopracciglia</span><b id="browColorV">castano scuro</b></label>
+        <div class="faces color-picks">
+          <button data-brow-color="#1c1713"><span class="dot" style="background:#1c1713"></span>Nere</button>
+          <button data-brow-color="#2c1b12" class="on"><span class="dot" style="background:#2c1b12"></span>Cast. scuro</button>
+          <button data-brow-color="#5a3c25"><span class="dot" style="background:#5a3c25"></span>Castane</button>
+          <button data-brow-color="#8f6a2e"><span class="dot" style="background:#8f6a2e"></span>Bionde</button>
+          <button data-brow-color="#7b3525"><span class="dot" style="background:#7b3525"></span>Ramate</button>
+          <button type="button" id="browCustomBtn" class="custom-color-btn">
+            <span class="dot custom-dot" id="browCustomDot" style="background:#2c1b12"></span>Personalizza
+          </button>
+          <input id="browCustomColor" class="native-color-picker" type="color" value="#2c1b12" aria-label="Colore sopracciglia personalizzato">
+        </div>
+      </div>
+
+      <div class="group face-dual face-tab-item" data-face-tab="mouth">
+        <div class="mini-control">
+          <label><span>Bocca · larghezza</span><b id="mouthWidthV">neutra</b></label>
+          <input id="faceMouthWidth" type="range" min="-100" max="100" value="0">
+        </div>
+        <div class="mini-control">
+          <label><span>Bocca · proiezione</span><b id="mouthDepthV">neutra</b></label>
+          <input id="faceMouthDepth" type="range" min="-100" max="100" value="0">
+        </div>
+      </div>
+
+      <div class="group face-dual face-tab-item" data-face-tab="mouth">
+        <div class="mini-control">
+          <label><span>Labbro superiore</span><b id="upperLipV">neutro</b></label>
+          <input id="faceUpperLip" type="range" min="-100" max="100" value="0">
+        </div>
+        <div class="mini-control">
+          <label><span>Labbro inferiore</span><b id="lowerLipV">neutro</b></label>
+          <input id="faceLowerLip" type="range" min="-100" max="100" value="0">
+        </div>
+      </div>
+
+      <div class="group face-tab-item" data-face-tab="mouth">
+        <label><span>Angoli bocca</span><b id="mouthCornersV">neutri</b></label>
+        <input id="faceMouthCorners" type="range" min="-100" max="100" value="0">
+      </div>
+
+      <div class="group face-dual face-tab-item" data-face-tab="chin">
+        <div class="mini-control">
+          <label><span>Mento · lunghezza</span><b id="chinLengthV">neutro</b></label>
+          <input id="faceChinLength" type="range" min="-100" max="100" value="0">
+        </div>
+        <div class="mini-control">
+          <label><span>Mento · proiezione</span><b id="chinDepthV">neutra</b></label>
+          <input id="faceChinDepth" type="range" min="-100" max="100" value="0">
+        </div>
+      </div>
+
+      <div class="group face-tab-item" data-face-tab="chin">
+        <label><span>Mento · punta</span><b id="chinPointV">neutro</b></label>
+        <input id="faceChinPoint" type="range" min="0" max="100" value="0">
+      </div>
+
+      <div class="group face-dual face-tab-item" data-face-tab="chin">
+        <div class="mini-control">
+          <label><span>Orecchie · dimensione</span><b id="earSizeV">neutre</b></label>
+          <input id="faceEarSize" type="range" min="-100" max="100" value="0">
+        </div>
+        <div class="mini-control">
+          <label><span>Orecchie · apertura</span><b id="earWingV">neutra</b></label>
+          <input id="faceEarWing" type="range" min="0" max="100" value="0">
+        </div>
+      </div>
+    </div>
+    <div class="panel-section" data-panel-section="hair">
+      <div class="group hair-style-group" style="grid-column:span 2">
+        <label><span>Taglio</span><b id="hairStyleV">corto 1</b></label>
+        <div class="faces hair-test-styles">
+          <button type="button" data-hair-asset="none">Nessuno</button>
+          <button type="button" data-hair-asset="short02" class="on">Corto 1</button>
+          <button type="button" data-hair-asset="short01">Corto 2</button>
+          <button type="button" data-hair-asset="short03">Corto 3</button>
+          <button type="button" data-hair-asset="short04">Corto 4</button>
+          <button type="button" data-hair-asset="afro01">Afro</button>
+          <button type="button" data-hair-asset="bob01">Bob 1</button>
+          <button type="button" data-hair-asset="bob02">Bob 2</button>
+          <button type="button" data-hair-asset="braid01">Treccia</button>
+          <button type="button" data-hair-asset="ponytail01">Coda</button>
+          <button type="button" data-hair-asset="long01">Lungo</button>
+        </div>
+      </div>
+
+      <div class="group" style="grid-column:span 2">
+        <label><span>Colore capelli</span><b id="hairColorV">castano scuro</b></label>
+        <div class="faces color-picks">
+          <button data-hair-color="#ffffff"><span class="dot" style="background:linear-gradient(135deg,#33241c,#9a755a)"></span>Originale</button>
+          <button data-hair-color="#181310"><span class="dot" style="background:#181310"></span>Neri</button>
+          <button data-hair-color="#302018" class="on"><span class="dot" style="background:#302018"></span>Cast. scuro</button>
+          <button data-hair-color="#5b402c"><span class="dot" style="background:#5b402c"></span>Castani</button>
+          <button data-hair-color="#956735"><span class="dot" style="background:#956735"></span>Biondo sc.</button>
+          <button data-hair-color="#c3a168"><span class="dot" style="background:#c3a168"></span>Biondi</button>
+          <button data-hair-color="#7c351f"><span class="dot" style="background:#7c351f"></span>Ramati</button>
+          <button data-hair-color="#817970"><span class="dot" style="background:#817970"></span>Grigi</button>
+          <button type="button" id="hairCustomBtn" class="custom-color-btn">
+            <span class="dot custom-dot" id="hairCustomDot" style="background:#302018"></span>Personalizza
+          </button>
+          <input id="hairCustomColor" class="native-color-picker" type="color" value="#302018" aria-label="Colore capelli personalizzato">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <nav class="creator-nav" aria-label="Sezioni creator">
+    <button class="active" type="button" data-section="body"><span class="num">01</span><span class="name">Corpo</span></button>
+    <button type="button" data-section="face"><span class="num">02</span><span class="name">Volto</span></button>
+    <button type="button" data-section="hair"><span class="num">03</span><span class="name">Capelli</span></button>
+    <button type="button" disabled><span class="num">04</span><span class="name">Vestiti</span></button>
+    <button type="button" disabled><span class="num">05</span><span class="name">Accessori</span></button>
+  </nav>
+
+  <div class="note">V92 · treccia helper smooth fit · afro/coda ok</div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const host = document.getElementById('viewer');
+const status = document.getElementById('status');
+const bgLayer = document.querySelector('.bg');
+const blurLayer = document.querySelector('.blur');
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(28, host.clientWidth/host.clientHeight, .01, 100);
+const renderer = new THREE.WebGLRenderer({alpha:true,antialias:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(host.clientWidth,host.clientHeight);
+renderer.setClearColor(0x000000,0);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+host.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enablePan = false;
+controls.enableDamping = true;
+controls.minPolarAngle = Math.PI*.30;
+controls.maxPolarAngle = Math.PI*.70;
+
+const hemi = new THREE.HemisphereLight(0xfff2df,0x302338,2.1);
+scene.add(hemi);
+const key = new THREE.DirectionalLight(0xffd7a0,2.7);
+key.position.set(2.5,4,3); scene.add(key);
+const rim = new THREE.DirectionalLight(0x8460ff,1.3);
+rim.position.set(-3,2,-2); scene.add(rim);
+
+// Face-edit sculpt light: off in body view, enabled only while editing the face.
+// Its side angle reveals cheekbones/nose/jaw without changing geometry.
+const faceSculptLight = new THREE.DirectionalLight(0xffe7cf,0);
+faceSculptLight.position.set(-2.8,2.6,3.4);
+scene.add(faceSculptLight);
+
+let model, bbox, heightWorld=1.75, contactShadow=null;
+const meshes = [];
+const skinnedMeshes = [];
+const eyebrowMeshes = [];
+const eyeColorMaterials = [];
+const browColorMaterials = [];
+const syntheticEyeMeshes = [];
+let syntheticBrowRoot = null;
+let syntheticEyeRoot = null;
+let bodyMesh = null;
+let eyesMesh = null;
+const browRaycaster = new THREE.Raycaster();
+let currentBrowHeight = 0;
+let currentBrowAngle = 0;
+let currentEyeSpacing = 0;
+let currentEyeSize = 0;
+let currentBrowStyle = 'base';
+let currentEyeColor = '#5b3a21';
+let currentBrowColor = '#2c1b12';
+let currentHairColor = '#302018';
+
+let texturedHairRoot = null;
+let texturedHairObject = null;
+let texturedHairMaterial = null;
+let texturedHairTexture = null;
+let tintedHairTextureV76 = null;
+let texturedHairNormalV78 = null;
+
+let mhProxyV = null;                // parsed .mhclo mappings
+let mhHairObjData = null;           // parsed OBJ topology / UVs
+let mhOriginalToBodyVertex = null;  // hm08 original index -> GLB Body vertex
+let mhHairOutputOrigV = null;       // rendered output vertex -> proxy vertex
+let mhHairGeometry = null;
+let mhProxyReady = false;
+let mhBaseObjPositions = null;
+
+// V85: MakeHuman hm08 contains 13,380 visible body vertices followed by
+// helper/cage vertices. Several long hairstyles (bob/braid/ponytail/long)
+// reference those helper vertices in their .mhclo. The GLB only exposes the
+// visible body vertices, so we reconstruct each missing helper from its nearest
+// mapped body anchor plus the original hm08 local offset.
+const HM08_VISIBLE_BODY_VERTS_V85 = 13380;
+const mhHelperAnchorCacheV85 = new Map();
+let mhHelperFallbackHitsV85 = 0;
+
+// V92 — braid01 usa molti helper vertices del basemesh MakeHuman.
+// La V85 li agganciava a UN solo vertice vicino: sui helper adiacenti questo
+// crea discontinuità e quindi i "buchi" triangolari visibili sulla testa.
+// Per braid01 propaghiamo invece la deformazione con un blend morbido dei
+// 6 vertici corporei visibili più vicini.
+const mhHelperBlendCacheV92 = new Map();
+let mhHelperBlendHitsV92 = 0;
+
+let texturedHairHeadBone = null;
+let texturedHairVisible = true;
+let texturedHairLoading = false;
+
+let currentHairAssetV83='short02';
+let hairRequestTokenV83=0;
+
+const HAIR_LABELS_V83={
+  short02:'corto 1', short01:'corto 2', short03:'corto 3', short04:'corto 4',
+  afro01:'afro', bob01:'bob 1', bob02:'bob 2', braid01:'treccia',
+  ponytail01:'coda', long01:'lungo'
+};
+
+const HAIR_DIFFUSE_V83={
+  short02:'short02_diffuse.png', short01:'short01_diffuse.png',
+  short03:'short03_diffuse.png', short04:'short04_diffuse.png',
+  afro01:'afro_diffuse.png', bob01:'bob01_diffuse.png', bob02:'bob02_diffuse.png',
+  braid01:'braid01_diffuse.png', ponytail01:'ponytail01_diffuse.png', long01:'long01_diffuse.png'
+};
+
+const HAIR_NORMAL_V83={short02:'short02_normal.png'};
+const HAIR_COMMIT_V83='8d806798841f6e77368cbb2cd2b43d3d4a8f42d1';
+
+
+// Skin pass 1: use the native MakeHuman UV-compatible diffuse textures.
+// Kept completely separate from rig/morph logic.
+let originalBodyMaterial = null;
+let activeSkinSex = 'male';
+let skinRequestToken = 0;
+const skinTextureLoader = new THREE.TextureLoader();
+skinTextureLoader.setCrossOrigin('anonymous');
+
+const SKIN_TEXTURES = {
+  male: [
+    'https://raw.githubusercontent.com/makehuman-js/makehuman-data/e5d1a42cb469025a6d2b3ecea3e0252e6feccc1f/public/data/skins/young_caucasian_male/textures/young_lightskinned_male_diffuse.png',
+    'https://cdn.jsdelivr.net/gh/makehuman-js/makehuman-data@e5d1a42cb469025a6d2b3ecea3e0252e6feccc1f/public/data/skins/young_caucasian_male/textures/young_lightskinned_male_diffuse.png'
+  ],
+  female: [
+    'https://raw.githubusercontent.com/makehuman-js/makehuman-data/e5d1a42cb469025a6d2b3ecea3e0252e6feccc1f/public/data/skins/young_caucasian_female/textures/young_lightskinned_female_diffuse.png',
+    'https://cdn.jsdelivr.net/gh/makehuman-js/makehuman-data@e5d1a42cb469025a6d2b3ecea3e0252e6feccc1f/public/data/skins/young_caucasian_female/textures/young_lightskinned_female_diffuse.png'
+  ]
+};
+
+// Rig refit state.
+// The source GLB bakes morphs on the mesh, but its joint rest positions remain
+// those of the neutral body. We derive joint motion from the morphed skinned
+// surface, rebind the skeleton, then re-apply the approved male pose rotations.
+let neutralRig = null;
+let jointTrackers = new Map();
+let malePoseRotations = null;
+
+const BASE_HEIGHT_CM = 178;
+let currentHeightScale = 1;
+let currentWeightHeavy = 0;
+let currentWeightThin = 0;
+
+function applyBodyScale(){
+  if(!model) return;
+  // Keep height proportional so the head is not distorted.
+  // Add width/depth compensation from weight so a tall character doesn't read as thin.
+  const extraMass = 1 + currentWeightHeavy * 0.14 - currentWeightThin * 0.05;
+  model.scale.set(currentHeightScale * extraMass, currentHeightScale, currentHeightScale * extraMass);
+  model.updateMatrixWorld(true);
+  rebox();
+
+  applyEyeSpacing();
+  applyEyebrowTransforms();
+  fitSyntheticEyesToFace();
+  if(texturedHairObject) fitTexturedHairToHead();
+
+  if(contactShadow){
+    const shadowScale = Math.max(.92, currentHeightScale) * (1 + currentWeightHeavy * 0.12 - currentWeightThin * 0.03);
+    contactShadow.scale.setScalar(shadowScale);
+    contactShadow.position.x=(bbox.min.x+bbox.max.x)/2;
+    contactShadow.position.z=(bbox.min.z+bbox.max.z)/2;
+  }
+}
+
+function setMorph(name, value){
+  meshes.forEach(m=>{
+    if(m.morphTargetDictionary && name in m.morphTargetDictionary){
+      const i=m.morphTargetDictionary[name];
+      m.morphTargetInfluences[i]=THREE.MathUtils.clamp(value,0,1);
+    }
+  });
+}
+
+function resetMorphs(names){
+  names.forEach(n=>setMorph(n,0));
+}
+
+const FACE_SHAPE_MORPHS = [
+  'headOval','headSquare','headRound','headNarrower','jawChinPointed'
+];
+
+let currentFaceShape='base';
+let currentJawlineValue=0;
+let currentChinPointValue=0;
+let currentCheekboneProminence=0;
+let currentCheekVolume=0;
+
+const FACE_SHAPES = {
+  base: {},
+  ovale: {headOval:.82},
+  squadrato: {headSquare:.82},
+  tondo: {headRound:.84},
+  affilato: {headNarrower:.38, headOval:.16, jawChinPointed:.34}
+};
+
+function setMorphGroup(names,value){
+  names.forEach(name=>setMorph(name,value));
+}
+
+function setSignedMorphPair(negativeNames,positiveNames,value){
+  const v=THREE.MathUtils.clamp(Number(value)||0,-100,100)/100;
+  setMorphGroup(negativeNames,0);
+  setMorphGroup(positiveNames,0);
+  if(v<0) setMorphGroup(negativeNames,-v);
+  if(v>0) setMorphGroup(positiveNames,v);
+}
+
+function applyChinPointComposite(){
+  // Combine the selected face-shape recipe, jawline refinement and the
+  // dedicated chin-point slider without letting the controls erase each other.
+  const shapeRecipe=FACE_SHAPES[currentFaceShape] || FACE_SHAPES.base;
+  const basePoint=shapeRecipe.jawChinPointed || 0;
+
+  const jawV=THREE.MathUtils.clamp(Number(currentJawlineValue)||0,-100,100)/100;
+  const jawContribution=jawV<0 ? (-jawV)*.16 : 0;
+
+  const userPoint=THREE.MathUtils.clamp(Number(currentChinPointValue)||0,0,100)/100;
+  const userContribution=userPoint*.50;
+
+  setMorph(
+    'jawChinPointed',
+    THREE.MathUtils.clamp(basePoint + jawContribution + userContribution,0,1)
+  );
+}
+
+function setFaceShape(shape){
+  if(!model) return;
+  currentFaceShape=shape;
+  const recipe=FACE_SHAPES[shape] || FACE_SHAPES.base;
+  resetMorphs(FACE_SHAPE_MORPHS);
+  Object.entries(recipe).forEach(([name,value])=>setMorph(name,value));
+
+  document.querySelectorAll('[data-face-shape]').forEach(b=>{
+    b.classList.toggle('on',b.dataset.faceShape===shape);
+  });
+  applyChinPointComposite();
+
+  const label=document.getElementById('faceShapeLabel');
+  if(label) label.textContent=shape;
+  if(syntheticBrowRoot) fitSyntheticBrowsToFace();
+  if(texturedHairObject) fitTexturedHairToHead();
+}
+
+function signedLabel(value,negative,positive,neutral='neutro'){
+  const v=Number(value)||0;
+  if(Math.abs(v)<3) return neutral;
+  return `${v<0?negative:positive} ${Math.round(Math.abs(v))}%`;
+}
+
+
+function hasMorph(name){
+  return meshes.some(m=>m.morphTargetDictionary && name in m.morphTargetDictionary);
+}
+
+function allMorphsAvailable(names){
+  return (names || []).every(hasMorph);
+}
+
+function setInputAvailability(inputId, outId, enabled, unavailableText='n/d'){
+  const input=document.getElementById(inputId);
+  const output=document.getElementById(outId);
+  if(input){
+    input.disabled=!enabled;
+    input.classList.toggle('disabled', !enabled);
+  }
+  if(!enabled && output) output.textContent=unavailableText;
+}
+
+function setButtonGroupAvailability(selector, enabled){
+  document.querySelectorAll(selector).forEach(b=>{ b.disabled=!enabled; });
+}
+
+function pushUnique(arr,item){
+  if(item && !arr.includes(item)) arr.push(item);
+}
+
+const BROW_STYLE_PRESETS = {
+  // V50: stessa forma/posizione V49, solo più piene e folte.
+  base:     {width:0.98, thickness:1.54, arch:.12, tilt:.000, density:1.48, softness:.27, tailLift:.00},
+  sottili:  {width:.92, thickness:1.00, arch:.075, tilt:-.004, density:1.08, softness:.18, tailLift:.00},
+  spesse:   {width:1.04, thickness:2.02, arch:.13, tilt:.002, density:1.96, softness:.34, tailLift:.00},
+  arcuate:  {width:.97, thickness:1.46, arch:.31, tilt:.032, density:1.55, softness:.29, tailLift:.06},
+  dritte:   {width:1.00, thickness:1.32, arch:.020, tilt:-.018, density:1.38, softness:.25, tailLift:-.025}
+};
+
+function browCurveY(style,t){
+  // 0..1 in texture space: arco naturale ma leggibile.
+  const core = .565 - Math.sin(Math.PI*t) * style.arch;
+  // Leggero lift o drop sulla coda per distinguere meglio gli stili.
+  return core - (t-.5) * (style.tailLift || 0);
+}
+
+function deterministicJitter(i){
+  const x=Math.sin(i*91.733+17.17)*43758.5453;
+  return x-Math.floor(x);
+}
+
+function makeBrowTexture(styleKey){
+  const style=BROW_STYLE_PRESETS[styleKey] || BROW_STYLE_PRESETS.base;
+  const c=document.createElement('canvas');
+  c.width=768; c.height=220;
+  const ctx=c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.lineCap='round';
+  ctx.lineJoin='round';
+
+  const x0=44, span=680;
+  const centerY=t=>browCurveY(style,t)*c.height;
+
+  // Base soffice: aggiunge leggibilità ma resta organica.
+  ctx.save();
+  ctx.filter='blur(5px)';
+  ctx.globalAlpha=0.18 + (style.softness||0);
+  ctx.strokeStyle='#fff';
+  ctx.lineWidth=14.5*style.thickness;
+  ctx.beginPath();
+  for(let s=0;s<=64;s++){
+    const t=s/64;
+    const x=x0+t*span;
+    const y=centerY(t);
+    if(s===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  ctx.restore();
+  ctx.globalAlpha=1;
+
+  // Secondo pass più compatto per dare corpo alla sopracciglia.
+  ctx.save();
+  ctx.globalAlpha=0.36;
+  ctx.strokeStyle='#fff';
+  ctx.lineWidth=6.2*style.thickness;
+  ctx.beginPath();
+  for(let s=0;s<=64;s++){
+    const t=s/64;
+    const x=x0+t*span;
+    const y=centerY(t);
+    if(s===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  ctx.restore();
+
+  // Pelo individuale: più denso e più contrastato.
+  const hairs=Math.round(300*style.thickness*(style.density||1));
+  for(let i=0;i<hairs;i++){
+    const r1=deterministicJitter(i*3+1);
+    const r2=deterministicJitter(i*3+2);
+    const r3=deterministicJitter(i*3+3);
+    const t=.04 + r1*.92;
+    const x=x0 + t*span;
+    const yc=centerY(t);
+    const band=(r2-.5)*(22*style.thickness);
+    const len=(8+r3*13)*style.thickness;
+
+    const inner=(1-t);
+    const sweep=2.2 + 6.2*t;
+    const dx=sweep*(r3>.48?1:.78);
+    const dy=-(len*(.72+.34*inner));
+
+    ctx.strokeStyle=`rgba(255,255,255,${(.44+r3*.48).toFixed(3)})`;
+    ctx.lineWidth=1.05 + r2*1.65;
+    ctx.beginPath();
+    ctx.moveTo(x,yc+band);
+    ctx.lineTo(x+dx,yc+band+dy);
+    ctx.stroke();
+  }
+
+  // Micro hairs in senso opposto per rompere la rigidità.
+  const flyaways=Math.round(36*style.thickness);
+  for(let i=0;i<flyaways;i++){
+    const r1=deterministicJitter(500+i*5+1);
+    const r2=deterministicJitter(500+i*5+2);
+    const t=.08 + r1*.84;
+    const x=x0 + t*span;
+    const yc=centerY(t);
+    const len=5 + r2*6;
+    ctx.strokeStyle='rgba(255,255,255,.20)';
+    ctx.lineWidth=.75;
+    ctx.beginPath();
+    ctx.moveTo(x,yc-2);
+    ctx.lineTo(x-2.5,yc-len);
+    ctx.stroke();
+  }
+
+  // V45: smussa entrambe le estremità per evitare l'effetto ponte/blob al centro.
+  ctx.save();
+  ctx.globalCompositeOperation='destination-in';
+  const edgeFade = ctx.createLinearGradient(0,0,c.width,0);
+  edgeFade.addColorStop(0.00,'rgba(255,255,255,0)');
+  edgeFade.addColorStop(0.12,'rgba(255,255,255,1)');
+  edgeFade.addColorStop(0.88,'rgba(255,255,255,1)');
+  edgeFade.addColorStop(1.00,'rgba(255,255,255,0)');
+  ctx.fillStyle=edgeFade;
+  ctx.fillRect(0,0,c.width,c.height);
+  ctx.restore();
+
+  const tex=new THREE.CanvasTexture(c);
+  tex.colorSpace=THREE.SRGBColorSpace;
+  tex.needsUpdate=true;
+  return tex;
+}
+
+
+function makeIrisTexture(colorHex){
+  const c=document.createElement('canvas');
+  c.width=256; c.height=256;
+  const ctx=c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+
+  const cx=128, cy=128;
+  const irisR=82;
+  const pupilR=16;
+  const key=(colorHex||'').toLowerCase();
+
+  const palettes={
+    '#5b3a21': { dark:'#2f2016', mid:'#5b3a21', light:'#8a6544', ring:'#241913' },
+    '#7a5a2a': { dark:'#4e3a1f', mid:'#7a5a2a', light:'#a48754', ring:'#34281a' },
+    '#4e6a3d': { dark:'#304327', mid:'#4e6a3d', light:'#7f9a65', ring:'#24311e' },
+    '#4d6786': { dark:'#32465d', mid:'#4d6786', light:'#86a4c6', ring:'#263444' },
+    '#6b7078': { dark:'#43484f', mid:'#6b7078', light:'#a2a8b0', ring:'#31353a' }
+  };
+
+  let dark, mid, light, ring;
+  if(palettes[key]){
+    dark=new THREE.Color(palettes[key].dark);
+    mid=new THREE.Color(palettes[key].mid);
+    light=new THREE.Color(palettes[key].light);
+    ring=palettes[key].ring;
+  }else{
+    const iris=new THREE.Color(colorHex || '#5b3a21');
+    const hsl={h:0,s:0,l:0};
+    iris.getHSL(hsl);
+    mid=iris.clone().setHSL(hsl.h, Math.min(.70, Math.max(.25, hsl.s*1.08)), Math.min(.55, Math.max(.34, hsl.l*1.06)));
+    dark=mid.clone().multiplyScalar(.62);
+    light=mid.clone().lerp(new THREE.Color('#e7d8c4'), .18);
+    ring='#2d241f';
+  }
+
+  const irisGrad=ctx.createRadialGradient(cx,cy,18,cx,cy,irisR);
+  irisGrad.addColorStop(0.00, `rgba(${Math.round(light.r*255)},${Math.round(light.g*255)},${Math.round(light.b*255)},1)`);
+  irisGrad.addColorStop(0.28, `rgba(${Math.round(mid.r*255)},${Math.round(mid.g*255)},${Math.round(mid.b*255)},1)`);
+  irisGrad.addColorStop(0.76, `rgba(${Math.round(dark.r*255)},${Math.round(dark.g*255)},${Math.round(dark.b*255)},1)`);
+  irisGrad.addColorStop(1.00, ring);
+  ctx.fillStyle=irisGrad;
+  ctx.beginPath(); ctx.arc(cx,cy,irisR,0,Math.PI*2); ctx.fill();
+
+  ctx.save();
+  ctx.globalCompositeOperation='soft-light';
+  for(let i=0;i<96;i++){
+    const a=(Math.PI*2*i)/96;
+    const inner=pupilR+4+((i%5)/5)*7;
+    const outer=irisR-5-((i%7)/7)*8;
+    const x1=cx+Math.cos(a)*inner, y1=cy+Math.sin(a)*inner;
+    const x2=cx+Math.cos(a)*outer, y2=cy+Math.sin(a)*outer;
+    ctx.strokeStyle=`rgba(255,255,255,${0.09+((i%9)/9)*0.10})`;
+    ctx.lineWidth=1.1;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  }
+  ctx.restore();
+
+  const pupilGrad=ctx.createRadialGradient(cx-4,cy-5,3,cx,cy,pupilR);
+  pupilGrad.addColorStop(0,'rgba(18,14,12,1)');
+  pupilGrad.addColorStop(1,'rgba(5,4,4,1)');
+  ctx.fillStyle=pupilGrad;
+  ctx.beginPath(); ctx.arc(cx,cy,pupilR,0,Math.PI*2); ctx.fill();
+
+  ctx.strokeStyle='rgba(255,255,255,.18)';
+  ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(cx,cy,irisR-2,0,Math.PI*2); ctx.stroke();
+
+  ctx.fillStyle='rgba(255,255,255,.80)';
+  ctx.beginPath(); ctx.arc(cx-20,cy-20,7,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.30)';
+  ctx.beginPath(); ctx.arc(cx+14,cy+14,3,0,Math.PI*2); ctx.fill();
+
+  ctx.save();
+  ctx.globalCompositeOperation='destination-in';
+  const fade=ctx.createRadialGradient(cx,cy,irisR*.86,cx,cy,irisR+5);
+  fade.addColorStop(0,'rgba(255,255,255,1)');
+  fade.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=fade;
+  ctx.beginPath(); ctx.arc(cx,cy,irisR+5,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+
+  const tex=new THREE.CanvasTexture(c);
+  tex.colorSpace=THREE.SRGBColorSpace;
+  tex.needsUpdate=true;
+  return tex;
+}
+
+function styleNativeEyeMaterials(){
+  eyeColorMaterials.forEach(m=>{
+    if(!m) return;
+    if(m.color) m.color.set('#f4eee7');
+    if('roughness' in m) m.roughness=.58;
+    if('metalness' in m) m.metalness=0;
+    if('envMapIntensity' in m) m.envMapIntensity=.45;
+    if(m.emissive) m.emissive.set('#000000');
+    if('emissiveIntensity' in m) m.emissiveIntensity=0;
+    m.needsUpdate=true;
+  });
+}
+
+function ensureSyntheticEyes(){
+  if(syntheticEyeRoot || !model || !eyesMesh) return;
+  syntheticEyeRoot=new THREE.Group();
+  syntheticEyeRoot.name='SyntheticEyes';
+  model.add(syntheticEyeRoot);
+  for(const side of [-1,1]){
+    const tex=makeIrisTexture(currentEyeColor);
+    const mat=new THREE.MeshBasicMaterial({
+      color:'#ffffff',
+      map:tex,
+      alphaMap:null,
+      transparent:true,
+      opacity:1,
+      alphaTest:.08,
+      depthTest:true,
+      depthWrite:false,
+      side:THREE.DoubleSide,
+      toneMapped:true,
+      premultipliedAlpha:true
+    });
+    // V70: same UV/texture footprint as the approved flat iris, but subdivided
+    // so the surface can follow the native eyeball curvature in profile.
+    const mesh=new THREE.Mesh(new THREE.PlaneGeometry(1,1,24,16),mat);
+    mesh.name=side<0?'syntheticEyeLeft':'syntheticEyeRight';
+    mesh.userData.synthetic=true;
+    mesh.userData.side=side;
+    mesh.renderOrder=10;
+    syntheticEyeRoot.add(mesh);
+    syntheticEyeMeshes.push(mesh);
+  }
+  fitSyntheticEyesToFace();
+}
+
+function conformSyntheticIrisToEyeSurface(mesh, eyeBox, irisX, irisY, w, h){
+  if(!mesh?.geometry?.attributes?.position || !eyeBox) return;
+
+  const eyeCenter=eyeBox.getCenter(new THREE.Vector3());
+  const eyeSize=eyeBox.getSize(new THREE.Vector3());
+
+  // Approximate the native eye as an ellipsoid in model-local space.
+  // The visible iris pixels occupy only the central part of the subdivided plane,
+  // so this bends the iris itself while transparent outer fragments remain discarded.
+  const rx=Math.max(eyeSize.x*.5, w*.55);
+  const ry=Math.max(eyeSize.y*.5, h*.55);
+  const rz=Math.max(eyeSize.z*.5, .006);
+
+  // Tiny lift above the sclera prevents z-fighting, while remaining behind
+  // eyelid skin at oblique/profile angles.
+  const surfaceLift=.00028;
+
+  const pos=mesh.geometry.attributes.position;
+  for(let i=0;i<pos.count;i++){
+    const gx=pos.getX(i);
+    const gy=pos.getY(i);
+
+    const px=irisX + gx*w;
+    const py=irisY + gy*h;
+
+    const nx=(px-eyeCenter.x)/rx;
+    const ny=(py-eyeCenter.y)/ry;
+    const radial=Math.max(0, 1 - nx*nx - ny*ny);
+
+    const pz=eyeCenter.z + rz*Math.sqrt(radial) + surfaceLift;
+    pos.setZ(i,pz);
+  }
+
+  pos.needsUpdate=true;
+  mesh.geometry.computeBoundingBox();
+  mesh.geometry.computeBoundingSphere();
+}
+
+function fitSyntheticEyesToFace(){
+  if(!syntheticEyeRoot || !eyesMesh || !model) return;
+  const boxes=eyeSideBoxesLocal();
+  if(!boxes) return;
+
+  const leftSize=boxes.left.getSize(new THREE.Vector3());
+  const rightSize=boxes.right.getSize(new THREE.Vector3());
+  const leftCenter=boxes.left.getCenter(new THREE.Vector3());
+  const rightCenter=boxes.right.getCenter(new THREE.Vector3());
+  const avgSize=new THREE.Vector3().addVectors(leftSize,rightSize).multiplyScalar(.5);
+
+  // V59: start from the V54/V58 placement.
+  // Keep size and depth the same.
+  // Move the irises only a touch lower and a touch more outward.
+  const avgY=((leftCenter.y+rightCenter.y)*.5) - .0022;
+  // V70: no flat avgZ; depth follows each native eyeball surface.
+  const baseAbsX=(Math.abs(leftCenter.x)+Math.abs(rightCenter.x))*.5;
+  const outward=Math.max(.0016, avgSize.x*.030);
+
+  // V61: keep V60 position exactly as-is.
+  // Sync iris/pupil visual size with the "Occhi · dimensione" slider.
+  // Range: -100 -> ~75%, 0 -> 100%, +100 -> ~125%.
+  const irisScale=THREE.MathUtils.clamp(1 + currentEyeSize*.0025, .75, 1.25);
+  const w=Math.max(.0205,avgSize.x*.58) * irisScale;
+  const h=Math.max(.0145,avgSize.y*.56) * irisScale;
+
+  syntheticEyeMeshes.forEach(m=>{
+    const side=m.userData.side || 1;
+    const x=side*(baseAbsX + outward);
+    const eyeBox=side<0 ? boxes.left : boxes.right;
+
+    // V70: preserve the approved frontal X/Y and iris size exactly.
+    // Z now comes from the curved native eyeball surface instead of one flat plane.
+    m.position.set(x,avgY,0);
+    m.rotation.set(0,0,0);
+    m.scale.set(w,h,1);
+    conformSyntheticIrisToEyeSurface(m,eyeBox,x,avgY,w,h);
+  });
+  model.updateMatrixWorld(true);
+}
+
+function findEyesPrimitive(){
+  return model.getObjectByName('Eyes') ||
+    skinnedMeshes.find(m=>/^eyes$/i.test(m.name || '')) ||
+    meshes.find(m=>/^eyes$/i.test(m.name || '')) || null;
+}
+
+function eyeSideBoxesLocal(){
+  if(!eyesMesh || !eyesMesh.geometry?.attributes?.position || !model) return null;
+
+  model.updateMatrixWorld(true);
+  eyesMesh.updateMatrixWorld(true);
+
+  const pos=eyesMesh.geometry.attributes.position;
+  const invModel=model.matrixWorld.clone().invert();
+  const pts=[];
+  const v=new THREE.Vector3();
+
+  for(let i=0;i<pos.count;i++){
+    if(typeof eyesMesh.getVertexPosition==='function'){
+      eyesMesh.getVertexPosition(i,v);
+    }else{
+      v.fromBufferAttribute(pos,i);
+    }
+    v.applyMatrix4(eyesMesh.matrixWorld).applyMatrix4(invModel);
+    pts.push(v.clone());
+  }
+  if(!pts.length) return null;
+
+  let minX=Infinity,maxX=-Infinity;
+  pts.forEach(p=>{minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);});
+  const mid=(minX+maxX)*.5;
+
+  const left=new THREE.Box3(); left.makeEmpty();
+  const right=new THREE.Box3(); right.makeEmpty();
+  pts.forEach(p=>{
+    if(p.x<mid) left.expandByPoint(p);
+    else right.expandByPoint(p);
+  });
+
+  if(left.isEmpty() || right.isEmpty()) return null;
+  return {left,right};
+}
+
+function raycastFaceLocal(x,y,startZ){
+  if(!model || !bodyMesh) return null;
+  model.updateMatrixWorld(true);
+  bodyMesh.updateMatrixWorld(true);
+
+  const originLocal=new THREE.Vector3(x,y,startZ);
+  const originWorld=model.localToWorld(originLocal.clone());
+  const dirWorld=new THREE.Vector3(0,0,-1).transformDirection(model.matrixWorld);
+  browRaycaster.set(originWorld,dirWorld);
+  browRaycaster.near=0;
+  browRaycaster.far=2.0;
+
+  const hit=browRaycaster.intersectObject(bodyMesh,false)[0];
+  if(!hit) return null;
+  return model.worldToLocal(hit.point.clone());
+}
+
+function ensureSyntheticBrows(){
+  if(syntheticBrowRoot || !model || !eyesMesh || !bodyMesh) return;
+
+  syntheticBrowRoot=new THREE.Group();
+  syntheticBrowRoot.name='SyntheticBrows';
+  model.add(syntheticBrowRoot);
+
+  for(const side of [-1,1]){
+    const tex=makeBrowTexture(currentBrowStyle);
+    const mat=new THREE.MeshBasicMaterial({
+      color:new THREE.Color(currentBrowColor),
+      map:tex,
+      alphaMap:tex,
+      transparent:true,
+      opacity:.98,
+      alphaTest:.006,
+      depthTest:true,
+      depthWrite:false,
+      side:THREE.DoubleSide,
+      toneMapped:true
+    });
+    const mesh=new THREE.Mesh(new THREE.PlaneGeometry(1,1),mat);
+    mesh.name=side<0?'syntheticBrowLeft':'syntheticBrowRight';
+    mesh.userData.synthetic=true;
+    mesh.userData.side=side;
+    mesh.renderOrder=12;
+    syntheticBrowRoot.add(mesh);
+    eyebrowMeshes.push(mesh);
+    browColorMaterials.push(mat);
+  }
+
+  fitSyntheticBrowsToFace();
+}
+
+function fitSyntheticBrowsToFace(){
+  if(!syntheticBrowRoot || !eyesMesh || !model) return;
+  const boxes=eyeSideBoxesLocal();
+  if(!boxes) return;
+
+  const h=THREE.MathUtils.clamp(currentBrowHeight,-100,100)/100;
+  const a=THREE.MathUtils.clamp(currentBrowAngle,-100,100)/100;
+  const style=BROW_STYLE_PRESETS[currentBrowStyle] || BROW_STYLE_PRESETS.base;
+
+  eyebrowMeshes.forEach(m=>{
+    if(!m.userData.synthetic) return;
+    const side=m.userData.side || 1;
+    const box=side<0 ? boxes.left : boxes.right;
+    const size=box.getSize(new THREE.Vector3());
+    const center=box.getCenter(new THREE.Vector3());
+
+    // V49: look closer to V46 (higher + fuller), but with a small safe gap in the center.
+    const browY=box.max.y + Math.max(.0024,size.y*.078) + h*.0048;
+    const inward=Math.max(.0012,size.x*.055);
+    const x=center.x - side*inward;
+    const startZ=box.max.z+.17;
+    const skin=raycastFaceLocal(x,browY,startZ);
+    const z=skin ? skin.z+.00135 : box.max.z+.0032;
+
+    m.position.set(x,browY,z);
+    m.rotation.set(0,0,side*(a*.13+style.tilt*.92));
+
+    const browW=Math.max(.051,size.x*1.07)*style.width;
+    const browH=Math.max(.015,size.y*.48)*style.thickness;
+    // Mirror the texture so both brows have the same inner-to-outer hair flow.
+    m.scale.set(side<0 ? browW : -browW,browH,1);
+  });
+  model.updateMatrixWorld(true);
+}
+
+function applyEyeSpacing(){
+  // Exact identity morphs exposed by parametric-base.glb.
+  setSignedMorphPair(
+    ['eyeInwardLeft','eyeInwardRight'],
+    ['eyeOutwardLeft','eyeOutwardRight'],
+    currentEyeSpacing
+  );
+  if(syntheticBrowRoot) fitSyntheticBrowsToFace();
+  if(syntheticEyeRoot) fitSyntheticEyesToFace();
+}
+
+function applyEyeColor(colorHex){
+  currentEyeColor=colorHex;
+  styleNativeEyeMaterials();
+  syntheticEyeMeshes.forEach(m=>{
+    if(!m?.material) return;
+    const tex=makeIrisTexture(colorHex);
+    const oldMap=m.material.map;
+    m.material.color.set('#ffffff');
+    m.material.map=tex;
+    m.material.alphaMap=null;
+    m.material.needsUpdate=true;
+    if(oldMap) oldMap.dispose?.();
+  });
+
+  const label=document.getElementById('eyeColorV');
+  const names={
+    '#5b3a21':'marroni','#7a5a2a':'nocciola','#4e6a3d':'verdi',
+    '#4d6786':'azzurri','#6b7078':'grigi'
+  };
+  if(label) label.textContent=names[colorHex] || 'personalizzato';
+  document.querySelectorAll('[data-eye-color]').forEach(b=>{
+    b.classList.toggle('on',b.dataset.eyeColor===colorHex);
+  });
+}
+
+function skinAttrComponent(attr,index,component){
+  if(!attr?.array) return 0;
+  return attr.array[index*attr.itemSize+component] ?? 0;
+}
+
+function currentHeadBoxModelV80(){
+  if(!bodyMesh?.geometry || !model) return null;
+
+  const geo=bodyMesh.geometry;
+
+  model.updateMatrixWorld(true);
+  bodyMesh.skeleton?.update?.();
+
+  const bodyBox=new THREE.Box3();
+  const headBox=new THREE.Box3();
+  const p=new THREE.Vector3();
+
+  const total=geo.attributes.position.count;
+  const step=Math.max(1,Math.floor(total/22000));
+
+  // PASS 1: actual skinned body bounds in MODEL space.
+  for(let i=0;i<total;i+=step){
+    if(typeof bodyMesh.getVertexPosition==='function'){
+      bodyMesh.getVertexPosition(i,p);
+    }else{
+      p.fromBufferAttribute(geo.attributes.position,i);
+      if(typeof bodyMesh.applyBoneTransform==='function'){
+        bodyMesh.applyBoneTransform(i,p);
+      }
+    }
+
+    p.applyMatrix4(bodyMesh.matrixWorld);
+    model.worldToLocal(p);
+    bodyBox.expandByPoint(p);
+  }
+
+  if(bodyBox.isEmpty()) return null;
+
+  const bodySize=bodyBox.getSize(new THREE.Vector3());
+  const bodyHeight=bodySize.y;
+
+  // The human head occupies roughly the upper 14–15% of standing height.
+  // Crucially, shoulders/torso can no longer enlarge this box just because
+  // they have some Head-bone influence.
+  const headCutY=bodyBox.max.y - bodyHeight*.145;
+
+  // PASS 2: only real geometry physically inside the upper head zone.
+  for(let i=0;i<total;i+=step){
+    if(typeof bodyMesh.getVertexPosition==='function'){
+      bodyMesh.getVertexPosition(i,p);
+    }else{
+      p.fromBufferAttribute(geo.attributes.position,i);
+      if(typeof bodyMesh.applyBoneTransform==='function'){
+        bodyMesh.applyBoneTransform(i,p);
+      }
+    }
+
+    p.applyMatrix4(bodyMesh.matrixWorld);
+    model.worldToLocal(p);
+
+    if(p.y>=headCutY){
+      headBox.expandByPoint(p);
+    }
+  }
+
+  if(headBox.isEmpty()) return null;
+
+  // Safety clamp: even a pathological sampled vertex can never make the
+  // detected "head" shoulder-width again.
+  const size=headBox.getSize(new THREE.Vector3());
+  const center=headBox.getCenter(new THREE.Vector3());
+
+  const maxHeadWidth=bodyHeight*.115;
+  const maxHeadDepth=bodyHeight*.135;
+
+  if(size.x>maxHeadWidth){
+    headBox.min.x=center.x-maxHeadWidth*.5;
+    headBox.max.x=center.x+maxHeadWidth*.5;
+  }
+  if(size.z>maxHeadDepth){
+    headBox.min.z=center.z-maxHeadDepth*.5;
+    headBox.max.z=center.z+maxHeadDepth*.5;
+  }
+
+  return headBox;
+}
+
+function currentHeadBoxLocal(){
+  if(!bodyMesh?.geometry || !texturedHairHeadBone) return null;
+
+  const geo=bodyMesh.geometry;
+  const skinIndex=geo.attributes.skinIndex;
+  const skinWeight=geo.attributes.skinWeight;
+  if(!skinIndex || !skinWeight) return null;
+
+  const headIndex=bodyMesh.skeleton?.bones?.indexOf(texturedHairHeadBone) ?? -1;
+  if(headIndex<0) return null;
+
+  model.updateMatrixWorld(true);
+  bodyMesh.skeleton?.update?.();
+  texturedHairHeadBone.updateWorldMatrix(true,false);
+
+  const box=new THREE.Box3();
+  const p=new THREE.Vector3();
+  let count=0;
+
+  const total=geo.attributes.position.count;
+  const step=Math.max(1,Math.floor(total/18000));
+
+  for(let i=0;i<total;i+=step){
+    let hw=0;
+    for(let k=0;k<4;k++){
+      if(skinAttrComponent(skinIndex,i,k)===headIndex){
+        hw+=skinAttrComponent(skinWeight,i,k);
+      }
+    }
+    if(hw<.40) continue;
+
+    if(typeof bodyMesh.getVertexPosition==='function'){
+      bodyMesh.getVertexPosition(i,p);
+    }else{
+      p.fromBufferAttribute(geo.attributes.position,i);
+      if(typeof bodyMesh.applyBoneTransform==='function') bodyMesh.applyBoneTransform(i,p);
+    }
+
+    p.applyMatrix4(bodyMesh.matrixWorld);
+    texturedHairHeadBone.worldToLocal(p);
+    box.expandByPoint(p);
+    count++;
+  }
+
+  if(count<20 || box.isEmpty()) return null;
+  return box;
+}
+
+function objectBoundsInOwnLocalSpaceV76(root){
+  if(!root) return null;
+
+  root.updateMatrixWorld(true);
+  const invRoot=new THREE.Matrix4().copy(root.matrixWorld).invert();
+  const box=new THREE.Box3();
+  const v=new THREE.Vector3();
+
+  root.traverse(o=>{
+    if(!o.isMesh || !o.geometry) return;
+
+    if(!o.geometry.boundingBox) o.geometry.computeBoundingBox();
+    const b=o.geometry.boundingBox;
+    if(!b || b.isEmpty()) return;
+
+    const rel=new THREE.Matrix4().multiplyMatrices(invRoot,o.matrixWorld);
+
+    const xs=[b.min.x,b.max.x];
+    const ys=[b.min.y,b.max.y];
+    const zs=[b.min.z,b.max.z];
+
+    for(const x of xs){
+      for(const y of ys){
+        for(const z of zs){
+          v.set(x,y,z).applyMatrix4(rel);
+          box.expandByPoint(v);
+        }
+      }
+    }
+  });
+
+  return box.isEmpty() ? null : box;
+}
+
+
+function helperBlendForHm08V92(originalIndex){
+  if(!mhBaseObjPositions || !mhOriginalToBodyVertex) return null;
+  if(mhHelperBlendCacheV92.has(originalIndex)) return mhHelperBlendCacheV92.get(originalIndex);
+
+  const src=mhBaseObjPositions[originalIndex];
+  if(!src){
+    mhHelperBlendCacheV92.set(originalIndex,null);
+    return null;
+  }
+
+  const limit=Math.min(
+    HM08_VISIBLE_BODY_VERTS_V85,
+    mhBaseObjPositions.length,
+    mhOriginalToBodyVertex.length
+  );
+
+  const K=6;
+  const best=[];
+
+  for(let i=0;i<limit;i++){
+    const bodyIndex=mhOriginalToBodyVertex[i];
+    if(bodyIndex===undefined || bodyIndex<0) continue;
+
+    const p=mhBaseObjPositions[i];
+    if(!p) continue;
+
+    const dx=src[0]-p[0];
+    const dy=src[1]-p[1];
+    const dz=src[2]-p[2];
+    const d2=dx*dx+dy*dy+dz*dz;
+
+    if(best.length<K || d2<best[best.length-1].d2){
+      const item={sourceIndex:i,bodyIndex,d2};
+      let pos=best.length;
+      while(pos>0 && best[pos-1].d2>d2) pos--;
+      best.splice(pos,0,item);
+      if(best.length>K) best.pop();
+    }
+  }
+
+  if(!best.length){
+    mhHelperBlendCacheV92.set(originalIndex,null);
+    return null;
+  }
+
+  // Inverse-distance weighting. Il residuo preserva ESATTAMENTE la posizione
+  // base dell'helper; quando il corpo si deforma, applichiamo solo una
+  // deformazione media e continua ricavata dai vicini.
+  let sumW=0;
+  for(const n of best){
+    n.w=1/Math.max(n.d2,1e-8);
+    sumW+=n.w;
+  }
+  for(const n of best) n.w/=sumW;
+
+  let bx=0,by=0,bz=0;
+  for(const n of best){
+    const p=mhBaseObjPositions[n.sourceIndex];
+    bx+=p[0]*.1*n.w;
+    by+=p[1]*.1*n.w;
+    bz+=p[2]*.1*n.w;
+  }
+
+  const blend={
+    neighbors:best,
+    rx:src[0]*.1-bx,
+    ry:src[1]*.1-by,
+    rz:src[2]*.1-bz
+  };
+
+  mhHelperBlendCacheV92.set(originalIndex,blend);
+  return blend;
+}
+
+function getCurrentHm08HelperSmoothV92(originalIndex,target){
+  const blend=helperBlendForHm08V92(originalIndex);
+  if(!blend || !bodyMesh) return false;
+
+  const tmp=new THREE.Vector3();
+  target.set(0,0,0);
+
+  for(const n of blend.neighbors){
+    bodyMesh.getVertexPosition(n.bodyIndex,tmp);
+    target.x+=tmp.x*n.w;
+    target.y+=tmp.y*n.w;
+    target.z+=tmp.z*n.w;
+  }
+
+  target.x+=blend.rx;
+  target.y+=blend.ry;
+  target.z+=blend.rz;
+
+  mhHelperBlendHitsV92++;
+  return true;
+}
+
+function helperAnchorForHm08V85(originalIndex){
+  if(!mhBaseObjPositions || !mhOriginalToBodyVertex) return null;
+  if(mhHelperAnchorCacheV85.has(originalIndex)) return mhHelperAnchorCacheV85.get(originalIndex);
+
+  const src=mhBaseObjPositions[originalIndex];
+  if(!src){
+    mhHelperAnchorCacheV85.set(originalIndex,null);
+    return null;
+  }
+
+  const limit=Math.min(
+    HM08_VISIBLE_BODY_VERTS_V85,
+    mhBaseObjPositions.length,
+    mhOriginalToBodyVertex.length
+  );
+
+  let bestSource=-1;
+  let bestBody=-1;
+  let bestD2=Infinity;
+
+  // Lazy nearest-neighbour lookup. It runs only once per helper vertex and is
+  // cached across hairstyle changes. This preserves the exact MakeHuman proxy
+  // offsets instead of collapsing unsupported refs to (0,0,0).
+  for(let i=0;i<limit;i++){
+    const bodyIndex=mhOriginalToBodyVertex[i];
+    if(bodyIndex===undefined || bodyIndex<0) continue;
+    const p=mhBaseObjPositions[i];
+    if(!p) continue;
+
+    const dx=src[0]-p[0];
+    const dy=src[1]-p[1];
+    const dz=src[2]-p[2];
+    const d2=dx*dx+dy*dy+dz*dz;
+    if(d2<bestD2){
+      bestD2=d2;
+      bestSource=i;
+      bestBody=bodyIndex;
+      if(d2<1e-10) break;
+    }
+  }
+
+  if(bestSource<0 || bestBody<0){
+    mhHelperAnchorCacheV85.set(originalIndex,null);
+    return null;
+  }
+
+  const base=mhBaseObjPositions[bestSource];
+  const anchor={
+    bodyIndex:bestBody,
+    // base.obj is in decimetres while parametric-base.glb is in metres.
+    dx:(src[0]-base[0])*.1,
+    dy:(src[1]-base[1])*.1,
+    dz:(src[2]-base[2])*.1,
+    sourceIndex:bestSource,
+    distance:Math.sqrt(bestD2)*.1
+  };
+
+  mhHelperAnchorCacheV85.set(originalIndex,anchor);
+  return anchor;
+}
+
+function getCurrentHm08VertexVProxy(originalIndex,target){
+  if(!mhOriginalToBodyVertex || !bodyMesh) return false;
+
+  // Normal path for the 13,380 visible hm08 body vertices.
+  const glbIndex=mhOriginalToBodyVertex[originalIndex];
+  if(glbIndex!==undefined && glbIndex>=0){
+    bodyMesh.getVertexPosition(glbIndex,target);
+    return true;
+  }
+
+  // V92: SOLO la treccia usa il campo di deformazione morbido dei helper.
+  // Gli altri tagli restano esattamente sul comportamento V85 già approvato.
+  if(currentHairAssetV83==='braid01'){
+    if(getCurrentHm08HelperSmoothV92(originalIndex,target)) return true;
+  }
+
+  // V85 fallback originale per Bob/Coda/Lungo e come sicurezza.
+  const anchor=helperAnchorForHm08V85(originalIndex);
+  if(!anchor) return false;
+
+  bodyMesh.getVertexPosition(anchor.bodyIndex,target);
+  target.x+=anchor.dx;
+  target.y+=anchor.dy;
+  target.z+=anchor.dz;
+  mhHelperFallbackHitsV85++;
+  return true;
+}
+
+function proxyScaleMatrixVProxy(){
+  if(!mhProxyV) return null;
+
+  const scales=new THREE.Vector3(1,1,1);
+  const a=new THREE.Vector3();
+  const b=new THREE.Vector3();
+
+  for(let axis=0;axis<3;axis++){
+    const d=mhProxyV.scaleData[axis];
+    if(!d) continue;
+
+    if(!getCurrentHm08VertexVProxy(d.v1,a) ||
+       !getCurrentHm08VertexVProxy(d.v2,b)) return null;
+
+    const num=Math.abs(
+      axis===0 ? a.x-b.x :
+      axis===1 ? a.y-b.y :
+                 a.z-b.z
+    );
+
+    // MakeHuman getMatrix(): abs(co1[axis]-co2[axis]) / denominator.
+    const s=num/Math.max(Math.abs(d.den),1e-9);
+    if(axis===0) scales.x=s;
+    if(axis===1) scales.y=s;
+    if(axis===2) scales.z=s;
+  }
+
+  return scales;
+}
+
+function calculateProxyVertexPositionsVProxy(){
+  if(!mhProxyV || !mhOriginalToBodyVertex) return null;
+
+  const scale=proxyScaleMatrixVProxy();
+  if(!scale) return null;
+
+  const result=new Array(mhProxyV.refs.length);
+  const a=new THREE.Vector3();
+  const b=new THREE.Vector3();
+  const c=new THREE.Vector3();
+
+  for(let i=0;i<mhProxyV.refs.length;i++){
+    const r=mhProxyV.refs[i];
+
+    if(!getCurrentHm08VertexVProxy(r.v0,a) ||
+       !getCurrentHm08VertexVProxy(r.v1,b) ||
+       !getCurrentHm08VertexVProxy(r.v2,c)){
+      return null;
+    }
+
+    result[i]=new THREE.Vector3(
+      a.x*r.w0 + b.x*r.w1 + c.x*r.w2 + r.dx*scale.x,
+      a.y*r.w0 + b.y*r.w1 + c.y*r.w2 + r.dy*scale.y,
+      a.z*r.w0 + b.z*r.w1 + c.z*r.w2 + r.dz*scale.z
+    );
+  }
+
+  return result;
+}
+
+function refineShortHairShapeV81(position, headBox){
+  const size=headBox.getSize(new THREE.Vector3());
+  const center=headBox.getCenter(new THREE.Vector3());
+  const out=position.clone();
+
+  // Compact scalp envelope for a believable short cut.
+  const scalpCenter=new THREE.Vector3(
+    center.x,
+    headBox.max.y - size.y*.115,
+    center.z + size.z*.01
+  );
+
+  const rx=Math.max(size.x*.60,1e-4);
+  const ry=Math.max(size.y*.43,1e-4);
+  const rz=Math.max(size.z*.72,1e-4);
+
+  const dx=out.x-scalpCenter.x;
+  const dy=out.y-scalpCenter.y;
+  const dz=out.z-scalpCenter.z;
+
+  const ell=Math.sqrt(
+    (dx*dx)/(rx*rx) +
+    (dy*dy)/(ry*ry) +
+    (dz*dz)/(rz*rz)
+  );
+
+  const upperWeight=THREE.MathUtils.smoothstep(
+    out.y,
+    headBox.min.y + size.y*.44,
+    headBox.max.y + size.y*.10
+  );
+
+  // Shrink any overshoot back toward a tight shell around the cranium.
+  if(ell>1.02){
+    const targetEll=1.02;
+    const strength=THREE.MathUtils.clamp((ell-targetEll)/.60,0,1) * (.55 + upperWeight*.45);
+    const s=THREE.MathUtils.lerp(1,targetEll/ell,strength);
+    out.x=scalpCenter.x + dx*s;
+    out.y=scalpCenter.y + dy*s;
+    out.z=scalpCenter.z + dz*s;
+  }
+
+  // Keep the crown lower and less mushroom-like.
+  const maxTopY=headBox.max.y + size.y*.05;
+  if(out.y>maxTopY){
+    const t=THREE.MathUtils.clamp((out.y-maxTopY)/(size.y*.20),0,1);
+    out.y=THREE.MathUtils.lerp(out.y,maxTopY,.70 + t*.20);
+    out.x=center.x + (out.x-center.x)*(1 - .06*t);
+    out.z=center.z + (out.z-center.z)*(1 - .08*t);
+  }
+
+  // Pull down-hanging cards inward/upward so the cut stays short.
+  const minCompactY=headBox.max.y - size.y*.34;
+  if(out.y<minCompactY){
+    const t=THREE.MathUtils.clamp((minCompactY-out.y)/(size.y*.24),0,1);
+    out.y=THREE.MathUtils.lerp(out.y,minCompactY,.82);
+    out.x=center.x + (out.x-center.x)*(1 - .18*t);
+    out.z=center.z + (out.z-center.z)*(1 - .10*t);
+  }
+
+  // Light side tightening: enough to avoid the helmet effect, but without
+  // flattening the front hairline.
+  const sideNorm=Math.abs(out.x-center.x)/Math.max(size.x*.5,1e-4);
+  if(sideNorm>.84){
+    const t=THREE.MathUtils.clamp((sideNorm-.84)/.55,0,1);
+    out.x=center.x + (out.x-center.x)*(1 - .16*t);
+    out.z=center.z + (out.z-center.z)*(1 - .05*t);
+  }
+
+  return out;
+}
+
+function fitTexturedHairToHead(){
+  // TRUE MakeHuman proxy update + compact refinement for a believable short cut.
+  if(!mhProxyReady || !mhHairGeometry || !mhHairOutputOrigV) return;
+
+  const proxyPositions=calculateProxyVertexPositionsVProxy();
+  if(!proxyPositions) return;
+
+  const headBox=currentHeadBoxModelV80();
+  const attr=mhHairGeometry.attributes.position;
+
+  for(let i=0;i<mhHairOutputOrigV.length;i++){
+    const p=proxyPositions[mhHairOutputOrigV[i]];
+    if(!p) continue;
+
+    const finalPos=(headBox && currentHairAssetV83==='short02') ? refineShortHairShapeV81(p,headBox) : p;
+    attr.setXYZ(i,finalPos.x,finalPos.y,finalPos.z);
+  }
+
+  attr.needsUpdate=true;
+  mhHairGeometry.computeVertexNormals();
+  mhHairGeometry.computeBoundingBox();
+  mhHairGeometry.computeBoundingSphere();
+
+  if(texturedHairRoot){
+    texturedHairRoot.position.set(0,0,0);
+    texturedHairRoot.rotation.set(0,0,0);
+    texturedHairRoot.scale.set(1,1,1);
+  }
+
+  model?.updateMatrixWorld(true);
+}
+function setTexturedHairVisible(visible){
+  texturedHairVisible=!!visible;
+  if(texturedHairRoot) texturedHairRoot.visible=texturedHairVisible;
+
+  document.querySelectorAll('[data-hair-visible]').forEach(b=>{
+    b.classList.toggle(
+      'on',
+      b.dataset.hairVisible === (texturedHairVisible ? '1' : '0')
+    );
+  });
+
+  const label=document.getElementById('hairStyleV');
+  if(label) label.textContent=texturedHairVisible ? (HAIR_LABELS_V83[currentHairAssetV83]||currentHairAssetV83) : 'nessuno';
+}
+
+function mixHairV83(a,b,t){ return a+(b-a)*t; }
+
+function hexRgbHairV83(hex){
+  const h=String(hex||'#302018').replace('#','').padEnd(6,'0').slice(0,6);
+  return {
+    r:parseInt(h.slice(0,2),16)/255,
+    g:parseInt(h.slice(2,4),16)/255,
+    b:parseInt(h.slice(4,6),16)/255
+  };
+}
+
+function buildTintedHairTextureV76(colorHex){
+  if(!texturedHairTexture?.image) return null;
+
+  if(String(colorHex).toLowerCase()==='#ffffff'){
+    if(tintedHairTextureV76){ tintedHairTextureV76.dispose?.(); tintedHairTextureV76=null; }
+    return texturedHairTexture;
+  }
+
+  const img=texturedHairTexture.image;
+  const w=img.naturalWidth || img.videoWidth || img.width;
+  const h=img.naturalHeight || img.videoHeight || img.height;
+  if(!w || !h) return texturedHairTexture;
+
+  const canvas=document.createElement('canvas');
+  canvas.width=w; canvas.height=h;
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  if(!ctx) return texturedHairTexture;
+
+  try{
+    ctx.drawImage(img,0,0,w,h);
+    const imageData=ctx.getImageData(0,0,w,h);
+    const data=imageData.data;
+    const base=hexRgbHairV83(colorHex);
+
+    let minLum=1,maxLum=0;
+    for(let i=0;i<data.length;i+=4){
+      if(data[i+3]<8) continue;
+      const l=(data[i]*.299+data[i+1]*.587+data[i+2]*.114)/255;
+      minLum=Math.min(minLum,l); maxLum=Math.max(maxLum,l);
+    }
+    const range=Math.max(.08,maxLum-minLum);
+    const baseLum=base.r*.299+base.g*.587+base.b*.114;
+    const shadow={r:base.r*.16,g:base.g*.14,b:base.b*.13};
+    const mid={r:base.r*.90,g:base.g*.90,b:base.b*.90};
+    // V84: highlights much more restrained so the diffuse keeps strand detail
+    // without looking lacquered/plastic under the backstage lights.
+    const softLight={r:.92,g:.90,b:.86};
+    const highlightStrength=THREE.MathUtils.clamp(.025+baseLum*.08,.025,.10);
+    const highlight={
+      r:mixHairV83(base.r,softLight.r,highlightStrength),
+      g:mixHairV83(base.g,softLight.g,highlightStrength),
+      b:mixHairV83(base.b,softLight.b,highlightStrength)
+    };
+
+    for(let i=0;i<data.length;i+=4){
+      if(data[i+3]===0) continue;
+      const sr=data[i]/255, sg=data[i+1]/255, sb=data[i+2]/255;
+      let n=((sr*.299+sg*.587+sb*.114)-minLum)/range;
+      n=Math.pow(THREE.MathUtils.clamp(n,0,1),.88);
+      let rr,gg,bb;
+      if(n<.62){
+        const t=n/.62;
+        rr=mixHairV83(shadow.r,mid.r,t);
+        gg=mixHairV83(shadow.g,mid.g,t);
+        bb=mixHairV83(shadow.b,mid.b,t);
+      }else{
+        const t=(n-.62)/.38;
+        rr=mixHairV83(mid.r,highlight.r,t);
+        gg=mixHairV83(mid.g,highlight.g,t);
+        bb=mixHairV83(mid.b,highlight.b,t);
+      }
+      const chroma=((sr-sb)*.026+(sg-sb)*.012);
+      data[i]=Math.round(THREE.MathUtils.clamp(rr+chroma,0,1)*255);
+      data[i+1]=Math.round(THREE.MathUtils.clamp(gg+chroma*.35,0,1)*255);
+      data[i+2]=Math.round(THREE.MathUtils.clamp(bb-chroma*.18,0,1)*255);
+    }
+
+    ctx.putImageData(imageData,0,0);
+    if(tintedHairTextureV76) tintedHairTextureV76.dispose?.();
+    const tex=new THREE.CanvasTexture(canvas);
+    tex.colorSpace=THREE.SRGBColorSpace;
+    tex.wrapS=texturedHairTexture.wrapS; tex.wrapT=texturedHairTexture.wrapT;
+    tex.flipY=texturedHairTexture.flipY;
+    tex.anisotropy=Math.min(16,renderer.capabilities.getMaxAnisotropy());
+    tex.needsUpdate=true;
+    tintedHairTextureV76=tex;
+    return tex;
+  }catch(err){
+    console.warn('Tint capelli: uso texture originale',err);
+    return texturedHairTexture;
+  }
+}
+
+function applyHairColor(colorHex){
+  currentHairColor=colorHex;
+  if(texturedHairMaterial){
+    if(texturedHairTexture){
+      texturedHairMaterial.map=buildTintedHairTextureV76(colorHex);
+      texturedHairMaterial.color.set('#ffffff');
+    }else{
+      texturedHairMaterial.color.set(colorHex);
+    }
+    texturedHairMaterial.needsUpdate=true;
+  }
+
+  const names={
+    '#181310':'nero','#302018':'castano scuro','#5b402c':'castano',
+    '#956735':'biondo scuro','#c3a168':'biondo','#7c351f':'ramato',
+    '#817970':'grigio','#ffffff':'texture originale'
+  };
+  const label=document.getElementById('hairColorV');
+  if(label) label.textContent=names[String(colorHex).toLowerCase()] || 'personalizzato';
+  document.querySelectorAll('[data-hair-color]').forEach(b=>{
+    b.classList.toggle('on',String(b.dataset.hairColor).toLowerCase()===String(colorHex).toLowerCase());
+  });
+  return currentHairColor;
+}
+
+function parseMakeHumanObjVProxy(source){
+  const positions=[];
+  const uvs=[];
+  const faces=[];
+
+  for(const raw of source.split(/\r?\n/)){
+    const line=raw.trim();
+    if(!line || line.startsWith('#')) continue;
+
+    if(line.startsWith('v ')){
+      const p=line.split(/\s+/);
+      positions.push([Number(p[1]),Number(p[2]),Number(p[3])]);
+    }else if(line.startsWith('vt ')){
+      const p=line.split(/\s+/);
+      uvs.push([Number(p[1]),Number(p[2])]);
+    }else if(line.startsWith('f ')){
+      const corners=line.slice(2).trim().split(/\s+/).map(token=>{
+        const parts=token.split('/');
+        return {
+          v: Number(parts[0])-1,
+          vt: parts[1] ? Number(parts[1])-1 : -1
+        };
+      });
+      if(corners.length>=3) faces.push(corners);
+    }
+  }
+
+  return {positions,uvs,faces};
+}
+
+function parseMhcloVProxy(source,expectedVerts){
+  const scaleData=[null,null,null];
+  const refs=[];
+  let inVerts=false;
+
+  for(const raw of source.split(/\r?\n/)){
+    const line=raw.trim();
+    if(!line || line.startsWith('#')) continue;
+
+    const p=line.split(/\s+/);
+    const key=p[0];
+
+    if(key==='x_scale'){
+      scaleData[0]={v1:Number(p[1]),v2:Number(p[2]),den:Number(p[3])};
+      continue;
+    }
+    if(key==='y_scale'){
+      scaleData[1]={v1:Number(p[1]),v2:Number(p[2]),den:Number(p[3])};
+      continue;
+    }
+    if(key==='z_scale'){
+      scaleData[2]={v1:Number(p[1]),v2:Number(p[2]),den:Number(p[3])};
+      continue;
+    }
+
+    if(key==='verts'){
+      inVerts=true;
+      continue;
+    }
+
+    if(inVerts){
+      if(refs.length>=expectedVerts) break;
+
+      // Old MakeHuman proxy format:
+      // v0 v1 v2 w0 w1 w2 dx dy dz
+      if(p.length>=9 &&
+         /^-?\d+$/.test(p[0]) &&
+         /^-?\d+$/.test(p[1]) &&
+         /^-?\d+$/.test(p[2])){
+        refs.push({
+          v0:Number(p[0]), v1:Number(p[1]), v2:Number(p[2]),
+          w0:Number(p[3]), w1:Number(p[4]), w2:Number(p[5]),
+          dx:Number(p[6]), dy:Number(p[7]), dz:Number(p[8])
+        });
+      }
+    }
+  }
+
+  if(refs.length!==expectedVerts){
+    throw new Error(`mhclo refs ${refs.length} != OBJ verts ${expectedVerts}`);
+  }
+  if(scaleData.some(v=>!v)){
+    throw new Error('mhclo x/y/z_scale incompleti');
+  }
+
+  return {scaleData,refs};
+}
+
+function quantizedVertexKeyVProxy(x,y,z){
+  // Source OBJ is four-decimal MakeHuman data, GLB positions are float32.
+  // Relative Y removes the single floor translation used by the GLB baker.
+  const q=v=>Math.round(v*100000);
+  return `${q(x)}|${q(y)}|${q(z)}`;
+}
+
+function buildHm08ToBodyMapVProxy(basePositions){
+  if(!bodyMesh?.geometry?.attributes?.position) return null;
+
+  const bind=bodyMesh.geometry.attributes.position;
+  const map=new Int32Array(HM08_VISIBLE_BODY_VERTS_V85);
+  map.fill(-1);
+
+  let srcMinY=Infinity;
+  for(let i=0;i<Math.min(HM08_VISIBLE_BODY_VERTS_V85,basePositions.length);i++){
+    srcMinY=Math.min(srcMinY,basePositions[i][1]*.1);
+  }
+
+  let glbMinY=Infinity;
+  for(let i=0;i<bind.count;i++){
+    glbMinY=Math.min(glbMinY,bind.getY(i));
+  }
+
+  const lookup=new Map();
+  for(let i=0;i<bind.count;i++){
+    const key=quantizedVertexKeyVProxy(
+      bind.getX(i),
+      bind.getY(i)-glbMinY,
+      bind.getZ(i)
+    );
+    if(!lookup.has(key)) lookup.set(key,i);
+  }
+
+  let mapped=0;
+  for(let i=0;i<Math.min(HM08_VISIBLE_BODY_VERTS_V85,basePositions.length);i++){
+    const s=basePositions[i];
+    const key=quantizedVertexKeyVProxy(
+      s[0]*.1,
+      s[1]*.1-srcMinY,
+      s[2]*.1
+    );
+    const idx=lookup.get(key);
+    if(idx!==undefined){
+      map[i]=idx;
+      mapped++;
+    }
+  }
+
+  console.info(`hm08→GLB mapping: ${mapped}/${HM08_VISIBLE_BODY_VERTS_V85}`);
+
+  // We do not need every body vertex, but if topology matching catastrophically
+  // fails it is safer to stop than render another giant wig.
+  if(mapped<12000){
+    throw new Error(`hm08 mapping insufficiente: ${mapped}/${HM08_VISIBLE_BODY_VERTS_V85}`);
+  }
+
+  return map;
+}
+
+function buildHairGeometryFromProxyVProxy(objData){
+  const outIndex=new Map();
+  const outputOrigV=[];
+  const uvs=[];
+  const indices=[];
+
+  const cornerIndex=corner=>{
+    const key=`${corner.v}/${corner.vt}`;
+    let idx=outIndex.get(key);
+
+    if(idx===undefined){
+      idx=outputOrigV.length;
+      outIndex.set(key,idx);
+      outputOrigV.push(corner.v);
+
+      const uv=corner.vt>=0 ? objData.uvs[corner.vt] : [0,0];
+      uvs.push(uv[0],uv[1]);
+    }
+    return idx;
+  };
+
+  for(const face of objData.faces){
+    const corners=face.map(cornerIndex);
+    for(let i=2;i<corners.length;i++){
+      indices.push(corners[0],corners[i-1],corners[i]);
+    }
+  }
+
+  const geometry=new THREE.BufferGeometry();
+  geometry.setAttribute(
+    'position',
+    new THREE.Float32BufferAttribute(new Float32Array(outputOrigV.length*3),3)
+  );
+  geometry.setAttribute(
+    'uv',
+    new THREE.Float32BufferAttribute(new Float32Array(uvs),2)
+  );
+  geometry.setIndex(indices);
+
+  mhHairOutputOrigV=outputOrigV;
+  mhHairGeometry=geometry;
+  return geometry;
+}
+
+async function fetchTextVProxy(url){
+  const r=await fetch(url,{mode:'cors',cache:'force-cache'});
+  if(!r.ok) throw new Error(`${r.status} ${url}`);
+  return await r.text();
+}
+
+function disposeHairV83(){
+  if(texturedHairRoot?.parent) texturedHairRoot.parent.remove(texturedHairRoot);
+  mhHairGeometry?.dispose?.();
+  texturedHairMaterial?.dispose?.();
+  tintedHairTextureV76?.dispose?.();
+  texturedHairTexture?.dispose?.();
+  texturedHairNormalV78?.dispose?.();
+  texturedHairRoot=null; texturedHairObject=null; texturedHairMaterial=null;
+  texturedHairTexture=null; tintedHairTextureV76=null; texturedHairNormalV78=null;
+  mhHairGeometry=null; mhHairOutputOrigV=null; mhHairObjData=null; mhProxyV=null; mhProxyReady=false;
+}
+
+async function ensureHm08MapV83(){
+  if(mhBaseObjPositions && mhOriginalToBodyVertex) return;
+  const bodyUrl='https://raw.githubusercontent.com/nirholas/three.ws/main/avatar-sources/anny/3dobjs/base.obj';
+  const txt=await fetchTextVProxy(bodyUrl);
+  const baseObj=parseMakeHumanObjVProxy(txt);
+  mhBaseObjPositions=baseObj.positions;
+  mhOriginalToBodyVertex=buildHm08ToBodyMapVProxy(mhBaseObjPositions);
+}
+
+function textureUrlsV83(assetKey,filename){
+  const rel=`makehuman/data/hair/${assetKey}/${filename}`;
+  return [
+    `https://cdn.jsdelivr.net/gh/dmaugis/makehuman-custom@${HAIR_COMMIT_V83}/${rel}`,
+    `https://raw.githubusercontent.com/dmaugis/makehuman-custom/${HAIR_COMMIT_V83}/${rel}`,
+    `https://media.githubusercontent.com/media/dmaugis/makehuman-custom/${HAIR_COMMIT_V83}/${rel}`
+  ];
+}
+
+async function loadTextureRobustV83(assetKey,filename){
+  let lastErr=null;
+  for(const url of textureUrlsV83(assetKey,filename)){
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),30000);
+    try{
+      const response=await fetch(url,{mode:'cors',cache:'force-cache',signal:controller.signal});
+      if(!response.ok) throw new Error(`HTTP ${response.status}`);
+      const blob=await response.blob();
+      if(blob.size<2048) throw new Error(`file troppo piccolo (${blob.size} B)`);
+      const bitmap=await createImageBitmap(blob);
+      const tex=new THREE.Texture(bitmap);
+      tex.colorSpace=THREE.SRGBColorSpace;
+      tex.wrapS=THREE.ClampToEdgeWrapping; tex.wrapT=THREE.ClampToEdgeWrapping;
+      tex.anisotropy=Math.min(16,renderer.capabilities.getMaxAnisotropy());
+      tex.needsUpdate=true;
+      console.info('Texture capelli OK:',assetKey,filename,url,Math.round(blob.size/1024)+' KB');
+      return {tex,url};
+    }catch(err){
+      lastErr=err;
+      console.warn('Texture fallback fallito:',url,err);
+    }finally{ clearTimeout(timer); }
+  }
+  throw lastErr || new Error('nessuna sorgente texture disponibile');
+}
+
+// V84: some MakeHuman hair packs do not use the same diffuse filename as the
+// asset folder. Read any image filename declared in the .mhclo and then try
+// conservative aliases. This fixes long01 without changing its geometry/UVs.
+const HAIR_DIFFUSE_ALIASES_V84={
+  long01:['long_diffuse.png','long01.png','long.png','hair_diffuse.png','hair.png']
+};
+
+function hairDiffuseCandidatesV84(assetKey,mhcloText=''){
+  const out=[];
+  const push=(name)=>{
+    if(!name) return;
+    const clean=String(name).trim().replace(/\\/g,'/').split('/').pop();
+    if(!clean || !/\.(?:png|jpe?g)$/i.test(clean)) return;
+    if(!out.some(v=>v.toLowerCase()===clean.toLowerCase())) out.push(clean);
+  };
+
+  // Prefer filenames explicitly referenced by the MakeHuman clothing/hair file.
+  const matches=String(mhcloText).match(/[A-Za-z0-9_ .\-\/\\]+\.(?:png|jpe?g)/gi) || [];
+  matches.forEach(push);
+  push(HAIR_DIFFUSE_V83[assetKey]);
+  (HAIR_DIFFUSE_ALIASES_V84[assetKey]||[]).forEach(push);
+  return out;
+}
+
+async function loadHairDiffuseV84(assetKey,mhcloText=''){
+  let lastErr=null;
+  const candidates=hairDiffuseCandidatesV84(assetKey,mhcloText);
+  for(const filename of candidates){
+    try{
+      const loaded=await loadTextureRobustV83(assetKey,filename);
+      console.info('Diffuse capelli scelta:',assetKey,filename);
+      return {...loaded,filename};
+    }catch(err){
+      lastErr=err;
+      console.warn('Diffuse candidata non valida:',assetKey,filename,err);
+    }
+  }
+  throw lastErr || new Error(`nessuna diffuse valida per ${assetKey}`);
+}
+
+function makeHairMaterialV83(){
+  // V85: intentionally very matte. Keep the existing geometry/UV mapping,
+  // but kill the hard synthetic highlights that made the cards look plastic.
+  const mat=new THREE.MeshStandardMaterial({
+    color:new THREE.Color(currentHairColor),
+    roughness:.97,
+    metalness:0,
+    side:THREE.DoubleSide,
+    transparent:false,
+    alphaTest:.13,
+    alphaToCoverage:true,
+    depthWrite:true,
+    depthTest:true,
+    dithering:true
+  });
+  mat.envMapIntensity=.012;
+  return mat;
+}
+
+function applyHairMaterialProfileV87(assetKey){
+  if(!texturedHairMaterial) return;
+
+  // Safe baseline for all hairstyles.
+  texturedHairMaterial.transparent=false;
+  texturedHairMaterial.side=THREE.DoubleSide;
+  texturedHairMaterial.depthWrite=true;
+  texturedHairMaterial.depthTest=true;
+  texturedHairMaterial.roughness=.97;
+  texturedHairMaterial.metalness=0;
+  texturedHairMaterial.envMapIntensity=.012;
+  texturedHairMaterial.alphaTest=.13;
+  texturedHairMaterial.alphaToCoverage=true;
+
+  // Dense cap-based styles were getting punched open on the crown.
+  // Use an almost-zero cutoff and disable A2C to stop scalp holes.
+  if(assetKey==='long01' || assetKey==='braid01'){
+    texturedHairMaterial.alphaTest=.001;
+    texturedHairMaterial.alphaToCoverage=false;
+  }
+
+  // Afro cards looked globally too transparent from the side.
+  // Increase the cutoff so the silhouette reads denser and more solid.
+  if(assetKey==='afro01'){
+    texturedHairMaterial.alphaTest=.22;
+    texturedHairMaterial.alphaToCoverage=false;
+  }
+
+  texturedHairMaterial.needsUpdate=true;
+}
+
+async function loadHairAssetV83(assetKey){
+  const token=++hairRequestTokenV83;
+  currentHairAssetV83=assetKey;
+
+  document.querySelectorAll('[data-hair-asset]').forEach(b=>{
+    b.classList.toggle('on',b.dataset.hairAsset===assetKey);
+  });
+
+  if(assetKey==='none'){
+    texturedHairVisible=false;
+    if(texturedHairRoot) texturedHairRoot.visible=false;
+    const label=document.getElementById('hairStyleV'); if(label) label.textContent='nessuno';
+    return;
+  }
+
+  texturedHairLoading=true;
+  status.textContent=`CAPELLI · caricamento ${HAIR_LABELS_V83[assetKey]||assetKey}`;
+  try{
+    await ensureHm08MapV83();
+    if(token!==hairRequestTokenV83) return;
+
+    const base=`https://raw.githubusercontent.com/dmaugis/makehuman-custom/${HAIR_COMMIT_V83}/makehuman/data/hair/${assetKey}/`;
+    const [objText,mhcloText]=await Promise.all([
+      fetchTextVProxy(base+assetKey+'.obj'),
+      fetchTextVProxy(base+assetKey+'.mhclo')
+    ]);
+    if(token!==hairRequestTokenV83) return;
+
+    const objData=parseMakeHumanObjVProxy(objText);
+    const proxy=parseMhcloVProxy(mhcloText,objData.positions.length);
+
+    disposeHairV83();
+    currentHairAssetV83=assetKey;
+    mhHairObjData=objData; mhProxyV=proxy;
+    const geometry=buildHairGeometryFromProxyVProxy(objData);
+    texturedHairMaterial=makeHairMaterialV83();
+    applyHairMaterialProfileV87(assetKey);
+
+    const mesh=new THREE.Mesh(geometry,texturedHairMaterial);
+    mesh.name=`MakeHuman_${assetKey}_mhclo_proxy`;
+    mesh.castShadow=true; mesh.receiveShadow=true; mesh.frustumCulled=false;
+    texturedHairObject=mesh;
+    texturedHairRoot=new THREE.Group();
+    texturedHairRoot.name=`HairRoot_${assetKey}`;
+    model.add(texturedHairRoot); texturedHairRoot.add(mesh);
+    mhProxyReady=true; texturedHairVisible=true;
+    mhHelperFallbackHitsV85=0;
+    mhHelperBlendHitsV92=0;
+    fitTexturedHairToHead();
+    console.info(
+      'Hair helper refs resolved:',
+      assetKey,
+      'V92 smooth=',mhHelperBlendHitsV92,
+      'V85 fallback=',mhHelperFallbackHitsV85
+    );
+
+    const label=document.getElementById('hairStyleV');
+    if(label) label.textContent=HAIR_LABELS_V83[assetKey]||assetKey;
+
+    // V85 diffuse loading: keep V84 fallbacks; helper-vertex geometry is now fixed separately.
+    const diffuseCandidates=hairDiffuseCandidatesV84(assetKey,mhcloText);
+    if(diffuseCandidates.length){
+      try{
+        const loaded=await loadHairDiffuseV84(assetKey,mhcloText);
+        if(token!==hairRequestTokenV83){ loaded.tex.dispose?.(); return; }
+        texturedHairTexture=loaded.tex;
+        texturedHairMaterial.map=loaded.tex;
+        texturedHairMaterial.color.set('#ffffff');
+        texturedHairMaterial.needsUpdate=true;
+        applyHairColor(currentHairColor);
+        status.textContent=`CAPELLI · ${HAIR_LABELS_V83[assetKey]} · texture OK`;
+      }catch(err){
+        console.error('Diffuse capelli fallita dopo tutti i fallback',assetKey,diffuseCandidates,err);
+        status.textContent=`CAPELLI · ${HAIR_LABELS_V83[assetKey]} · texture fallita`;
+      }
+    }
+
+    // Normal maps are optional and intentionally subtle to avoid the faceted/plastic look.
+    const normal=HAIR_NORMAL_V83[assetKey];
+    if(normal){
+      try{
+        const loaded=await loadTextureRobustV83(assetKey,normal);
+        if(token!==hairRequestTokenV83){ loaded.tex.dispose?.(); return; }
+        texturedHairNormalV78=loaded.tex;
+        texturedHairNormalV78.colorSpace=THREE.NoColorSpace;
+        texturedHairMaterial.normalMap=texturedHairNormalV78;
+        texturedHairMaterial.normalScale=new THREE.Vector2(.07,.07);
+        texturedHairMaterial.needsUpdate=true;
+      }catch(err){ console.info('Normal map non disponibile:',assetKey); }
+    }
+
+    texturedHairLoading=false;
+  }catch(err){
+    if(token!==hairRequestTokenV83) return;
+    texturedHairLoading=false;
+    console.error('Errore asset capelli',assetKey,err);
+    status.textContent=`CAPELLI · errore ${assetKey}`;
+  }
+}
+
+async function loadTexturedHairMhcloProxy(){
+  return loadHairAssetV83('short02');
+}
+
+function loadFirstTexture(urls,onSuccess,onFail){
+  const loader=new THREE.TextureLoader();
+  loader.setCrossOrigin('anonymous');
+
+  let index=0;
+  const attempt=()=>{
+    if(index>=urls.length){
+      onFail?.();
+      return;
+    }
+
+    const url=urls[index++];
+    loader.load(url,tex=>{
+      onSuccess(tex,url);
+    },undefined,err=>{
+      console.warn('Texture capelli fallita:',url,err);
+      attempt();
+    });
+  };
+  attempt();
+}
+
+function loadFirstObj(urls,onSuccess,onFail){
+  const loader=new OBJLoader();
+  let index=0;
+
+  const attempt=()=>{
+    if(index>=urls.length){
+      onFail?.();
+      return;
+    }
+
+    const url=urls[index++];
+    loader.load(url,obj=>{
+      onSuccess(obj,url);
+    },undefined,err=>{
+      console.warn('OBJ capelli fallito:',url,err);
+      attempt();
+    });
+  };
+  attempt();
+}
+
+function installShort02Object(obj){
+  texturedHairObject=obj;
+  texturedHairObject.name='MakeHuman_short02_textured';
+
+  // The mesh becomes visible immediately, even before the diffuse texture
+  // finishes loading. This makes mesh-vs-texture failures distinguishable.
+  if(!texturedHairMaterial){
+    texturedHairMaterial=new THREE.MeshStandardMaterial({
+      color:new THREE.Color('#3a2a22'),
+      transparent:false,
+      depthWrite:true,
+      depthTest:true,
+      side:THREE.DoubleSide,
+      roughness:.82,
+      metalness:0
+    });
+  }
+
+  obj.traverse(o=>{
+    if(!o.isMesh) return;
+    o.material=texturedHairMaterial;
+    o.castShadow=true;
+    o.receiveShadow=true;
+    o.frustumCulled=false;
+  });
+
+  texturedHairRoot=new THREE.Group();
+  texturedHairRoot.name='TexturedHairRoot';
+  model.add(texturedHairRoot);
+  texturedHairRoot.add(texturedHairObject);
+
+  fitTexturedHairToHead();
+  setTexturedHairVisible(true);
+
+  status.textContent='V78 · MESH OK · texture in caricamento';
+  const hs=document.getElementById('hairStyleV'); if(hs) hs.textContent='short02 · mesh OK';
+}
+
+function installShort02Texture(tex,sourceUrl){
+  texturedHairTexture=tex;
+  tex.colorSpace=THREE.SRGBColorSpace;
+  tex.wrapS=THREE.ClampToEdgeWrapping;
+  tex.wrapT=THREE.ClampToEdgeWrapping;
+  tex.anisotropy=Math.min(12,renderer.capabilities.getMaxAnisotropy());
+  tex.needsUpdate=true;
+
+  if(!texturedHairMaterial){
+    texturedHairMaterial=new THREE.MeshStandardMaterial();
+  }
+
+  texturedHairMaterial.map=tex;
+  texturedHairMaterial.color.set('#ffffff');
+
+  // Match the original MakeHuman material: transparent hair cards,
+  // alpha-to-coverage, no back-face culling.
+  texturedHairMaterial.transparent=false;
+  texturedHairMaterial.alphaTest=(currentHairAssetV83==='long01'||currentHairAssetV83==='braid01')?.012:.22;
+  texturedHairMaterial.alphaToCoverage=true;
+  texturedHairMaterial.depthWrite=true;
+  texturedHairMaterial.depthTest=true;
+  texturedHairMaterial.side=THREE.DoubleSide;
+  texturedHairMaterial.roughness=.70;
+  texturedHairMaterial.metalness=0;
+  texturedHairMaterial.envMapIntensity=.20;
+  texturedHairMaterial.needsUpdate=true;
+
+  if(texturedHairObject){
+    texturedHairObject.traverse(o=>{
+      if(o.isMesh) o.material=texturedHairMaterial;
+    });
+  }
+
+  applyHairColor(currentHairColor);
+  status.textContent='V78 · MESH OK · TEXTURE OK';
+  const hs=document.getElementById('hairStyleV'); if(hs) hs.textContent='short02 · texture OK';
+  console.info('Texture capelli caricata da',sourceUrl);
+}
+
+
+function installShort02NormalMap(tex,sourceUrl){
+  texturedHairNormalV78=tex;
+  tex.colorSpace=THREE.NoColorSpace;
+  tex.wrapS=THREE.ClampToEdgeWrapping;
+  tex.wrapT=THREE.ClampToEdgeWrapping;
+  tex.anisotropy=Math.min(12,renderer.capabilities.getMaxAnisotropy());
+  tex.needsUpdate=true;
+
+  if(texturedHairMaterial){
+    texturedHairMaterial.normalMap=tex;
+    texturedHairMaterial.normalScale=new THREE.Vector2(.42,.42);
+    texturedHairMaterial.roughness=.68;
+    texturedHairMaterial.needsUpdate=true;
+  }
+
+  console.info('Normal map capelli caricata da',sourceUrl);
+}
+
+function loadTexturedHairShort02(){
+  if(texturedHairLoading || texturedHairObject || !model || !bodyMesh) return;
+  texturedHairLoading=true;
+
+  texturedHairHeadBone=boneByCanonical('Head');
+  if(!texturedHairHeadBone){
+    texturedHairLoading=false;
+    status.textContent='errore: osso Head non trovato';
+    return;
+  }
+
+  // V78: GitHub first. The avatar and skin already load successfully from
+  // raw.githubusercontent.com in this creator. TuxFamily remains fallback only.
+  const objUrls=[
+    'https://raw.githubusercontent.com/dmaugis/makehuman-custom/8d806798841f6e77368cbb2cd2b43d3d4a8f42d1/makehuman/data/hair/short02/short02.obj'
+  ];
+
+  // V75: entrambi i file sono stati verificati direttamente nel repository.
+  const textureUrls=[
+    'https://raw.githubusercontent.com/dmaugis/makehuman-custom/8d806798841f6e77368cbb2cd2b43d3d4a8f42d1/makehuman/data/hair/short02/short02_diffuse.png'
+  ];
+  const normalUrls=[
+    'https://raw.githubusercontent.com/dmaugis/makehuman-custom/8d806798841f6e77368cbb2cd2b43d3d4a8f42d1/makehuman/data/hair/short02/short02_normal.png'
+  ];
+
+  status.textContent='V78 · caricamento short02 da path verificato';
+
+  loadFirstObj(objUrls,(obj,sourceUrl)=>{
+    installShort02Object(obj);
+    console.info('Mesh capelli caricata da',sourceUrl);
+
+    // Texture starts only after mesh success, but failure no longer hides hair.
+    loadFirstTexture(textureUrls,(tex,texSource)=>{
+      installShort02Texture(tex,texSource);
+
+      // short02 has a dedicated normal map: load it independently so
+      // diffuse hair remains visible even if the normal map fails.
+      loadFirstTexture(normalUrls,(normalTex,normalSource)=>{
+        installShort02NormalMap(normalTex,normalSource);
+        texturedHairLoading=false;
+        status.textContent='HAIR TEST · CRANIO GEOMETRICO OK';
+        const hs=document.getElementById('hairStyleV');
+        if(hs) hs.textContent='short02 · mhclo';
+      },()=>{
+        texturedHairLoading=false;
+        status.textContent='V78 · SHORT02 · DIFFUSE OK · NORMAL FALLITA';
+      });
+    },()=>{
+      texturedHairLoading=false;
+      status.textContent='V78 · MESH OK · TEXTURE FALLITA';
+      const hs=document.getElementById('hairStyleV'); if(hs) hs.textContent='short02 · texture fallita';
+      console.error('Tutte le sorgenti texture short02 hanno fallito');
+    });
+
+  },()=>{
+    texturedHairLoading=false;
+    status.textContent='V78 · MESH FALLITA';
+    const hs=document.getElementById('hairStyleV'); if(hs) hs.textContent='short02 · mesh fallita';
+    console.error('Tutte le sorgenti OBJ short02 hanno fallito');
+  });
+}
+
+function applyBrowColor(colorHex){
+  currentBrowColor=colorHex;
+  const c=new THREE.Color(colorHex);
+  browColorMaterials.forEach(m=>{
+    if(!m?.color) return;
+    m.color.copy(c);
+    m.needsUpdate=true;
+  });
+
+  const label=document.getElementById('browColorV');
+  const names={
+    '#1c1713':'nere','#2c1b12':'castano scuro','#5a3c25':'castane',
+    '#8f6a2e':'bionde','#7b3525':'ramate'
+  };
+  if(label) label.textContent=names[colorHex] || 'personalizzato';
+  document.querySelectorAll('[data-brow-color]').forEach(b=>{
+    b.classList.toggle('on',b.dataset.browColor===colorHex);
+  });
+}
+
+function setBrowStyle(style){
+  currentBrowStyle=style;
+  const label=document.getElementById('browStyleV');
+  if(label) label.textContent=style;
+
+  eyebrowMeshes.forEach(m=>{
+    if(!m.userData.synthetic || !m.material) return;
+    const tex=makeBrowTexture(style);
+    const oldMap=m.material.map;
+    m.material.map=tex;
+    m.material.alphaMap=tex;
+    m.material.needsUpdate=true;
+    if(oldMap) oldMap.dispose?.();
+  });
+
+  document.querySelectorAll('[data-brow-style]').forEach(b=>{
+    b.classList.toggle('on',b.dataset.browStyle===style);
+  });
+  fitSyntheticBrowsToFace();
+}
+
+function applyEyebrowTransforms(){
+  // V47: native brow morphs disabled to avoid altering the whole forehead/face shape.
+  setSignedMorphPair(['browsDown'],['browsUp'],0);
+  setSignedMorphPair(['browsAngleDown'],['browsAngleUp'],0);
+  fitSyntheticBrowsToFace();
+}
+
+function initOptionalFaceFeatures(){
+  eyesMesh=findEyesPrimitive();
+  eyeColorMaterials.length=0;
+  browColorMaterials.length=0;
+  eyebrowMeshes.length=0;
+  syntheticEyeMeshes.length=0;
+
+  if(eyesMesh){
+    const mats=Array.isArray(eyesMesh.material)?eyesMesh.material:[eyesMesh.material];
+    mats.forEach(m=>pushUnique(eyeColorMaterials,m));
+  }
+
+  const eyeSpacingAvailable=allMorphsAvailable([
+    'eyeInwardLeft','eyeInwardRight','eyeOutwardLeft','eyeOutwardRight'
+  ]);
+  const browHeightAvailable=allMorphsAvailable(['browsDown','browsUp']);
+  const browAngleAvailable=allMorphsAvailable(['browsAngleDown','browsAngleUp']);
+
+  if(eyesMesh){
+    styleNativeEyeMaterials();
+    ensureSyntheticEyes();
+    ensureSyntheticBrows();
+  }
+  const browsVisualAvailable=!!syntheticBrowRoot;
+
+  setInputAvailability('faceEyeSpacing','eyesSpaceV',eyeSpacingAvailable,eyeSpacingAvailable?'neutra':'n/d');
+  setInputAvailability('faceBrowHeight','browHeightV',browHeightAvailable && browsVisualAvailable,'n/d');
+  setInputAvailability('faceBrowAngle','browAngleV',browAngleAvailable && browsVisualAvailable,'n/d');
+  setButtonGroupAvailability('[data-eye-color]',!!eyesMesh);
+  setButtonGroupAvailability('[data-brow-color]',browsVisualAvailable);
+  setButtonGroupAvailability('[data-brow-style]',browsVisualAvailable);
+
+  if(eyesMesh){
+    applyEyeColor(currentEyeColor); // brown default
+    fitSyntheticEyesToFace();
+  }
+  if(browsVisualAvailable){
+    applyBrowColor(currentBrowColor);
+    setBrowStyle(currentBrowStyle);
+    applyEyebrowTransforms();
+  }
+  if(eyeSpacingAvailable) applyEyeSpacing();
+}
+
+function setJawline(value){
+  currentJawlineValue=Number(value)||0;
+  const v=THREE.MathUtils.clamp(currentJawlineValue,-100,100)/100;
+
+  // Only lower-face controls are reset here. Crucially, headNarrower is NOT
+  // touched by the jaw slider, because it also narrows temples / upper skull.
+  ['jawNarrower','jawWider','headSquare','jawChinPointed']
+    .forEach(name=>setMorph(name,0));
+
+  // Preserve the currently selected face-shape recipe where it overlaps.
+  const shapeRecipe=FACE_SHAPES[currentFaceShape] || FACE_SHAPES.base;
+  const baseSquare=shapeRecipe.headSquare || 0;
+  const basePoint=shapeRecipe.jawChinPointed || 0;
+  if(baseSquare) setMorph('headSquare',baseSquare);
+  if(basePoint) setMorph('jawChinPointed',basePoint);
+
+  if(v>0){
+    // Broader / squarer lower face, with restrained chin-width contribution.
+    setMorph('headSquare', Math.min(1,baseSquare + v*.42));
+    setMorph('jawWider', v*.34);
+  }else if(v<0){
+    const a=-v;
+    // Narrow ONLY the lower face. No headNarrower here: temples and upper
+    // cranium keep the shape chosen by Forma volto.
+    setMorph('jawNarrower', a*.34);
+  }
+
+  applyChinPointComposite();
+}
+
+function applyCheekComposite(){
+  const prominence=THREE.MathUtils.clamp(Number(currentCheekboneProminence)||0,0,100)/100;
+  const volume=THREE.MathUtils.clamp(Number(currentCheekVolume)||0,-100,100)/100;
+
+  // Prominence remains the same V66/V68 behaviour.
+  setMorph('cheekBonesLeft', prominence*.90);
+  setMorph('cheekBonesRight', prominence*.90);
+
+  // Volume is independent: negative = hollow, positive = fuller.
+  const hollow=volume<0 ? -volume : 0;
+  const fuller=volume>0 ? volume : 0;
+  setMorph('cheekHollowLeft', hollow*.72);
+  setMorph('cheekHollowRight', hollow*.72);
+  setMorph('cheekFullerLeft', fuller*.72);
+  setMorph('cheekFullerRight', fuller*.72);
+}
+
+function setCheekboneProminence(value){
+  currentCheekboneProminence=Number(value)||0;
+  applyCheekComposite();
+}
+
+function setCheekVolume(value){
+  currentCheekVolume=Number(value)||0;
+  applyCheekComposite();
+}
+
+function setupFaceControls(){
+  const setFaceSubtab=(name)=>{
+    document.querySelectorAll('[data-face-subtab]').forEach(b=>{
+      b.classList.toggle('on', b.dataset.faceSubtab===name);
+    });
+    document.querySelectorAll('.face-tab-item').forEach(el=>{
+      el.classList.toggle('on', el.dataset.faceTab===name);
+    });
+
+    // Recalculate framing against the new, shallower editor panel.
+    if(model){
+      if(cameraViewState==='face') view('face');
+      else syncSmartZoom();
+    }
+  };
+
+  document.querySelectorAll('[data-face-subtab]').forEach(b=>{
+    b.onclick=()=>setFaceSubtab(b.dataset.faceSubtab);
+  });
+
+
+  document.querySelectorAll('[data-face-shape]').forEach(b=>{
+    b.onclick=()=>setFaceShape(b.dataset.faceShape);
+  });
+
+  document.querySelectorAll('[data-eye-color]').forEach(b=>{
+    b.onclick=()=>{
+      applyEyeColor(b.dataset.eyeColor);
+      document.getElementById('eyeCustomBtn')?.classList.remove('on');
+    };
+  });
+
+  const eyeCustomBtn=document.getElementById('eyeCustomBtn');
+  const eyeCustomInput=document.getElementById('eyeCustomColor');
+  const eyeCustomDot=document.getElementById('eyeCustomDot');
+  if(eyeCustomBtn && eyeCustomInput){
+    eyeCustomBtn.onclick=()=>eyeCustomInput.click();
+    eyeCustomInput.oninput=()=>{
+      const color=eyeCustomInput.value;
+      applyEyeColor(color);
+      if(eyeCustomDot) eyeCustomDot.style.background=color;
+      eyeCustomBtn.classList.add('on');
+      document.querySelectorAll('[data-eye-color]').forEach(b=>b.classList.remove('on'));
+    };
+  }
+
+  document.querySelectorAll('[data-brow-color]').forEach(b=>{
+    b.onclick=()=>{
+      applyBrowColor(b.dataset.browColor);
+      document.getElementById('browCustomBtn')?.classList.remove('on');
+    };
+  });
+
+  const browCustomBtn=document.getElementById('browCustomBtn');
+  const browCustomInput=document.getElementById('browCustomColor');
+  const browCustomDot=document.getElementById('browCustomDot');
+  if(browCustomBtn && browCustomInput){
+    browCustomBtn.onclick=()=>browCustomInput.click();
+    browCustomInput.oninput=()=>{
+      const color=browCustomInput.value;
+      applyBrowColor(color);
+      if(browCustomDot) browCustomDot.style.background=color;
+      browCustomBtn.classList.add('on');
+      document.querySelectorAll('[data-brow-color]').forEach(b=>b.classList.remove('on'));
+    };
+  }
+
+  document.querySelectorAll('[data-brow-style]').forEach(b=>{
+    b.onclick=()=>setBrowStyle(b.dataset.browStyle);
+  });
+
+  const jawInput=document.getElementById('faceJaw');
+  const jawOutput=document.getElementById('jawV');
+  if(jawInput){
+    jawInput.oninput=()=>{
+      setJawline(jawInput.value);
+      if(jawOutput){
+        jawOutput.textContent=signedLabel(
+          jawInput.value,'affilata','squadrata','neutra'
+        );
+      }
+    };
+  }
+
+  const cheekInput=document.getElementById('faceCheeks');
+  const cheekOutput=document.getElementById('cheekV');
+  if(cheekInput){
+    cheekInput.oninput=()=>{
+      setCheekboneProminence(cheekInput.value);
+      if(cheekOutput){
+        const v=Number(cheekInput.value)||0;
+        cheekOutput.textContent=v<3 ? 'neutra' : `marcati ${Math.round(v)}%`;
+      }
+    };
+  }
+
+  const cheekVolumeInput=document.getElementById('faceCheekVolume');
+  const cheekVolumeOutput=document.getElementById('cheekVolumeV');
+  if(cheekVolumeInput){
+    cheekVolumeInput.oninput=()=>{
+      setCheekVolume(cheekVolumeInput.value);
+      if(cheekVolumeOutput){
+        const v=Number(cheekVolumeInput.value)||0;
+        if(Math.abs(v)<3) cheekVolumeOutput.textContent='neutre';
+        else if(v<0) cheekVolumeOutput.textContent=`scavate ${Math.round(-v)}%`;
+        else cheekVolumeOutput.textContent=`piene ${Math.round(v)}%`;
+      }
+    };
+  }
+
+  const chinPointInput=document.getElementById('faceChinPoint');
+  const chinPointOutput=document.getElementById('chinPointV');
+  if(chinPointInput){
+    chinPointInput.oninput=()=>{
+      currentChinPointValue=Number(chinPointInput.value)||0;
+      applyChinPointComposite();
+      if(chinPointOutput){
+        const v=currentChinPointValue;
+        chinPointOutput.textContent=v<3 ? 'neutro' : `marcato ${Math.round(v)}%`;
+      }
+    };
+  }
+
+  const earWingInput=document.getElementById('faceEarWing');
+  const earWingOutput=document.getElementById('earWingV');
+  if(earWingInput){
+    earWingInput.oninput=()=>{
+      const v=THREE.MathUtils.clamp(Number(earWingInput.value)||0,0,100)/100;
+      setMorph('earWingOutLeft',v);
+      setMorph('earWingOutRight',v);
+      if(earWingOutput){
+        earWingOutput.textContent=v<.03 ? 'neutra' : `aperte ${Math.round(v*100)}%`;
+      }
+    };
+  }
+
+  const defs = [
+    {
+      id:'faceNoseWidth', out:'noseWidthV',
+      neg:['noseNarrower'], pos:['noseWider'],
+      negLabel:'stretto', posLabel:'largo', neutral:'neutro'
+    },
+    {
+      id:'faceNoseLength', out:'noseLengthV',
+      neg:['noseShorter'], pos:['noseLonger'],
+      negLabel:'corto', posLabel:'lungo', neutral:'neutro'
+    },
+    {
+      id:'faceNoseSize', out:'noseSizeV',
+      neg:['noseSmaller'], pos:['noseBigger'],
+      negLabel:'piccolo', posLabel:'grande', neutral:'neutra'
+    },
+    {
+      id:'faceNoseTip', out:'noseTipV',
+      neg:['noseTipDown'], pos:['noseTipUp'],
+      negLabel:'verso il basso', posLabel:'verso l’alto', neutral:'neutra'
+    },
+    {
+      id:'faceNoseProfile', out:'noseProfileV',
+      neg:['noseConcave'], pos:['noseHump'],
+      negLabel:'concavo', posLabel:'gobba', neutral:'neutro'
+    },
+    {
+      id:'faceNostrils', out:'nostrilsV',
+      neg:['noseNostrilsNarrower'], pos:['noseNostrilsWider'],
+      negLabel:'strette', posLabel:'larghe', neutral:'neutre'
+    },
+    {
+      id:'faceEyes', out:'eyesV',
+      neg:['eyeSmallerLeft','eyeSmallerRight'],
+      pos:['eyeBiggerLeft','eyeBiggerRight'],
+      negLabel:'piccoli', posLabel:'grandi', neutral:'neutri'
+    },
+    {
+      id:'faceMouthWidth', out:'mouthWidthV',
+      neg:['mouthNarrower'], pos:['mouthWider'],
+      negLabel:'stretta', posLabel:'larga', neutral:'neutra'
+    },
+    {
+      id:'faceMouthDepth', out:'mouthDepthV',
+      neg:['mouthBackward'], pos:['mouthForward'],
+      negLabel:'indietro', posLabel:'avanti', neutral:'neutra'
+    },
+    {
+      id:'faceUpperLip', out:'upperLipV',
+      neg:['mouthUpperLipThinner'], pos:['mouthUpperLipFuller'],
+      negLabel:'sottile', posLabel:'pieno', neutral:'neutro'
+    },
+    {
+      id:'faceLowerLip', out:'lowerLipV',
+      neg:['mouthLowerLipThinner'], pos:['mouthLowerLipFuller'],
+      negLabel:'sottile', posLabel:'pieno', neutral:'neutro'
+    },
+    {
+      id:'faceMouthCorners', out:'mouthCornersV',
+      neg:['mouthCornersDown'], pos:['mouthCornersUp'],
+      negLabel:'verso il basso', posLabel:'verso l’alto', neutral:'neutri'
+    },
+    {
+      id:'faceChinLength', out:'chinLengthV',
+      neg:['jawChinShorter'], pos:['jawChinLonger'],
+      negLabel:'corto', posLabel:'lungo', neutral:'neutro'
+    },
+    {
+      id:'faceChinDepth', out:'chinDepthV',
+      neg:['jawChinBack'], pos:['jawChinForward'],
+      negLabel:'indietro', posLabel:'avanti', neutral:'neutra'
+    },
+    {
+      id:'faceEarSize', out:'earSizeV',
+      neg:['earSmallerLeft','earSmallerRight'],
+      pos:['earScaleLeft','earScaleRight'],
+      negLabel:'piccole', posLabel:'grandi', neutral:'neutre'
+    }
+  ];
+
+  defs.forEach(def=>{
+    const input=document.getElementById(def.id);
+    const output=document.getElementById(def.out);
+    if(!input) return;
+    input.oninput=()=>{
+      if(def.id==='faceEyes'){
+        currentEyeSize = Number(input.value)||0;
+      }
+      setSignedMorphPair(def.neg,def.pos,input.value);
+      if(syntheticBrowRoot) fitSyntheticBrowsToFace();
+      if(syntheticEyeRoot) fitSyntheticEyesToFace();
+      if(texturedHairObject) fitTexturedHairToHead();
+      if(output){
+        output.textContent=signedLabel(
+          input.value,def.negLabel,def.posLabel,def.neutral
+        );
+      }
+    };
+  });
+
+  const eyeSpacingInput=document.getElementById('faceEyeSpacing');
+  const eyeSpacingOut=document.getElementById('eyesSpaceV');
+  if(eyeSpacingInput){
+    eyeSpacingInput.oninput=()=>{
+      currentEyeSpacing = Number(eyeSpacingInput.value)||0;
+      applyEyeSpacing();
+      if(eyeSpacingOut){
+        eyeSpacingOut.textContent=signedLabel(
+          eyeSpacingInput.value,'vicini','distanti','neutra'
+        );
+      }
+    };
+  }
+
+  const browHeightInput=document.getElementById('faceBrowHeight');
+  const browHeightOut=document.getElementById('browHeightV');
+  if(browHeightInput){
+    browHeightInput.oninput=()=>{
+      currentBrowHeight = Number(browHeightInput.value)||0;
+      applyEyebrowTransforms();
+      if(browHeightOut){
+        browHeightOut.textContent=signedLabel(
+          browHeightInput.value,'basse','alte','neutra'
+        );
+      }
+    };
+  }
+
+  const browAngleInput=document.getElementById('faceBrowAngle');
+  const browAngleOut=document.getElementById('browAngleV');
+  if(browAngleInput){
+    browAngleInput.oninput=()=>{
+      currentBrowAngle = Number(browAngleInput.value)||0;
+      applyEyebrowTransforms();
+      if(browAngleOut){
+        browAngleOut.textContent=signedLabel(
+          browAngleInput.value,'piatte','arcuate','neutro'
+        );
+      }
+    };
+  }
+}
+
+const REFIT_BONES = [
+  'Hips',
+  'Spine','Spine1','Spine2',
+  'Neck','Head',
+  // Stop refitting the hand joints from skin-weight centroids.
+  // That heuristic works for shoulder/elbow but is unstable at the wrist,
+  // especially on the female body. The hands now inherit the forearm motion
+  // from the neutral rig instead of being repositioned independently.
+  'LeftShoulder','LeftArm','LeftForeArm',
+  'RightShoulder','RightArm','RightForeArm',
+  'LeftUpLeg','LeftLeg','LeftFoot',
+  'RightUpLeg','RightLeg','RightFoot'
+];
+
+function cleanBoneName(name){
+  return String(name||'')
+    .replace(/^mixamorig\d*[:_]?/i,'')
+    .replace(/[:_.-]/g,'')
+    .toLowerCase();
+}
+
+function boneByCanonical(name){
+  if(!bodyMesh || !bodyMesh.skeleton) return null;
+  const wanted=cleanBoneName(name);
+  return bodyMesh.skeleton.bones.find(b=>cleanBoneName(b.name)===wanted) || null;
+}
+
+function captureNeutralRig(){
+  if(!model || !bodyMesh || !bodyMesh.skeleton) return;
+
+  model.updateMatrixWorld(true);
+  const invModel = new THREE.Matrix4().copy(model.matrixWorld).invert();
+  const bones = new Map();
+
+  bodyMesh.skeleton.bones.forEach((bone,index)=>{
+    const wp=bone.getWorldPosition(new THREE.Vector3());
+    const mp=wp.applyMatrix4(invModel);
+    bones.set(bone.name,{
+      index,
+      position:bone.position.clone(),
+      quaternion:bone.quaternion.clone(),
+      scale:bone.scale.clone(),
+      modelPosition:mp.clone()
+    });
+  });
+
+  neutralRig={bones};
+}
+
+function restoreNeutralRig(){
+  if(!neutralRig || !bodyMesh) return;
+  for(const bone of bodyMesh.skeleton.bones){
+    const r=neutralRig.bones.get(bone.name);
+    if(!r) continue;
+    bone.position.copy(r.position);
+    bone.quaternion.copy(r.quaternion);
+    bone.scale.copy(r.scale);
+  }
+  model.updateMatrixWorld(true);
+}
+
+function attr4(attr,vertex){
+  return [
+    attr.getX(vertex),
+    attr.getY(vertex),
+    attr.getZ(vertex),
+    attr.getW(vertex)
+  ];
+}
+
+// Build one anatomical tracker per major joint from vertices whose skin weights
+// transition between the parent and the child bone.
+// We only use the MOVEMENT of that centroid, never its absolute surface position.
+function buildJointTrackers(){
+  jointTrackers.clear();
+  if(!bodyMesh || !bodyMesh.skeleton) return;
+
+  const geo=bodyMesh.geometry;
+  const pos=geo.attributes.position;
+  const si=geo.attributes.skinIndex;
+  const sw=geo.attributes.skinWeight;
+  if(!pos || !si || !sw) return;
+
+  const skeleton=bodyMesh.skeleton;
+  const boneIndex=new Map(skeleton.bones.map((b,i)=>[b,i]));
+
+  for(const canonical of REFIT_BONES){
+    const bone=boneByCanonical(canonical);
+    if(!bone) continue;
+    const childIndex=boneIndex.get(bone);
+    const parentIndex=boneIndex.get(bone.parent);
+
+    const samples=[];
+    let total=0, sx=0, sy=0, sz=0;
+
+    if(parentIndex !== undefined){
+      for(let v=0; v<pos.count; v++){
+        const ids=attr4(si,v), ws=attr4(sw,v);
+        let wc=0, wp=0;
+        for(let k=0;k<4;k++){
+          if(ids[k]===childIndex) wc+=ws[k];
+          if(ids[k]===parentIndex) wp+=ws[k];
+        }
+
+        // Product peaks exactly in the parent/child transition zone.
+        const score=wc*wp;
+        if(score < 0.003) continue;
+
+        samples.push([v,score]);
+        total+=score;
+        sx+=pos.getX(v)*score;
+        sy+=pos.getY(v)*score;
+        sz+=pos.getZ(v)*score;
+      }
+    }
+
+    // Some joints have almost no blended transition vertices.
+    // Fallback: follow the core surface strongly driven by this bone.
+    if(samples.length < 8 || total < 0.02){
+      samples.length=0; total=0; sx=sy=sz=0;
+      for(let v=0; v<pos.count; v++){
+        const ids=attr4(si,v), ws=attr4(sw,v);
+        let wc=0;
+        for(let k=0;k<4;k++) if(ids[k]===childIndex) wc+=ws[k];
+        if(wc < 0.35) continue;
+        const score=wc*wc;
+        samples.push([v,score]);
+        total+=score;
+        sx+=pos.getX(v)*score;
+        sy+=pos.getY(v)*score;
+        sz+=pos.getZ(v)*score;
+      }
+    }
+
+    if(!samples.length || total<=0) continue;
+
+    jointTrackers.set(bone.name,{
+      bone,
+      samples,
+      total,
+      neutralCentroid:new THREE.Vector3(sx/total,sy/total,sz/total)
+    });
+  }
+
+  console.log('rig-refit trackers', [...jointTrackers.entries()].map(([name,t])=>[name,t.samples.length]));
+}
+
+function activeBodyMorphs(){
+  if(!bodyMesh || !bodyMesh.morphTargetDictionary || !bodyMesh.morphTargetInfluences) return [];
+  const attrs=bodyMesh.geometry.morphAttributes?.position || [];
+  const result=[];
+
+  for(const [name,index] of Object.entries(bodyMesh.morphTargetDictionary)){
+    const influence=bodyMesh.morphTargetInfluences[index] || 0;
+    const attr=attrs[index];
+    if(!attr || Math.abs(influence)<1e-5) continue;
+    result.push({name,index,influence,attr});
+  }
+  return result;
+}
+
+function currentVertexPosition(v,active,out){
+  const geo=bodyMesh.geometry;
+  const base=geo.attributes.position;
+  out.set(base.getX(v),base.getY(v),base.getZ(v));
+
+  for(const m of active){
+    if(geo.morphTargetsRelative){
+      out.x += m.attr.getX(v)*m.influence;
+      out.y += m.attr.getY(v)*m.influence;
+      out.z += m.attr.getZ(v)*m.influence;
+    }else{
+      out.x += (m.attr.getX(v)-base.getX(v))*m.influence;
+      out.y += (m.attr.getY(v)-base.getY(v))*m.influence;
+      out.z += (m.attr.getZ(v)-base.getZ(v))*m.influence;
+    }
+  }
+  return out;
+}
+
+function rebindSkinnedMeshes(){
+  model.updateMatrixWorld(true);
+
+  for(const mesh of skinnedMeshes){
+    if(!mesh.skeleton) continue;
+    mesh.updateMatrixWorld(true);
+
+    // New joint positions become the new bind/rest skeleton.
+    mesh.skeleton.calculateInverses();
+
+    // Rebind in the mesh's current world frame so changing the rest skeleton
+    // does not move/deform the already-morphed body at rest.
+    mesh.bindMatrix.copy(mesh.matrixWorld);
+    mesh.bindMatrixInverse.copy(mesh.matrixWorld).invert();
+    mesh.skeleton.update();
+  }
+}
+
+function refitSkeletonToCurrentBody(){
+  if(!neutralRig || !bodyMesh) return;
+
+  // Crucial: refit always starts from the authored neutral rig, never from the
+  // previously posed or previously morphed skeleton.
+  restoreNeutralRig();
+
+  const active=activeBodyMorphs();
+  const deltas=new Map();
+  const tmp=new THREE.Vector3();
+
+  // Measure how each anatomical skin-transition region moved under the active
+  // body morphs. This gives the joint translation required by that body.
+  for(const [boneName,t] of jointTrackers){
+    let sx=0,sy=0,sz=0;
+    for(const [v,score] of t.samples){
+      currentVertexPosition(v,active,tmp);
+      sx+=tmp.x*score;
+      sy+=tmp.y*score;
+      sz+=tmp.z*score;
+    }
+    const cur=new THREE.Vector3(sx/t.total,sy/t.total,sz/t.total);
+    deltas.set(boneName,cur.sub(t.neutralCentroid));
+  }
+
+  // Desired joint origins in MODEL-LOCAL coordinates.
+  const targetModelPos=new Map();
+  for(const bone of bodyMesh.skeleton.bones){
+    const r=neutralRig.bones.get(bone.name);
+    if(!r) continue;
+    const d=deltas.get(bone.name);
+    targetModelPos.set(
+      bone.name,
+      d ? r.modelPosition.clone().add(d) : r.modelPosition.clone()
+    );
+  }
+
+  // Parent first. Changing a joint's REST POSITION is the actual MakeHuman
+  // behaviour; rotations remain the bind rotations here.
+  const depth=(bone)=>{
+    let d=0,n=bone.parent;
+    while(n && n.isBone){ d++; n=n.parent; }
+    return d;
+  };
+  const ordered=[...bodyMesh.skeleton.bones].sort((a,b)=>depth(a)-depth(b));
+
+  model.updateMatrixWorld(true);
+  for(const bone of ordered){
+    const desiredModel=targetModelPos.get(bone.name);
+    if(!desiredModel) continue;
+
+    const desiredWorld=model.localToWorld(desiredModel.clone());
+    if(bone.parent){
+      bone.position.copy(bone.parent.worldToLocal(desiredWorld.clone()));
+    }
+    model.updateMatrixWorld(true);
+  }
+
+  rebindSkinnedMeshes();
+}
+
+function captureMalePoseRotations(){
+  malePoseRotations=new Map();
+  if(!bodyMesh) return;
+  for(const bone of bodyMesh.skeleton.bones){
+    malePoseRotations.set(bone.name,bone.quaternion.clone());
+  }
+}
+
+function applyMalePoseRotations(){
+  if(!malePoseRotations || !bodyMesh) return;
+
+  for(const bone of bodyMesh.skeleton.bones){
+    const clean=cleanBoneName(bone.name);
+    const isHandOrFinger =
+      clean.includes('hand') ||
+      clean.includes('thumb') ||
+      clean.includes('index') ||
+      clean.includes('middle') ||
+      clean.includes('ring') ||
+      clean.includes('pinky');
+
+    if(isHandOrFinger){
+      // Keep wrists/fingers exactly in the authored neutral pose.
+      const rest=neutralRig?.bones.get(bone.name);
+      if(rest) bone.quaternion.copy(rest.quaternion);
+      continue;
+    }
+
+    const q=malePoseRotations.get(bone.name);
+    if(q) bone.quaternion.copy(q);
+  }
+
+  model.updateMatrixWorld(true);
+  for(const mesh of skinnedMeshes) mesh.skeleton?.update();
+}
+
+function poseRelaxed(root){
+  // Approved male pose. This is computed once on the correctly refitted male
+  // rest skeleton. Later we copy ONLY these rotations to the female rig.
+  const bones=[];
+  root.traverse(o=>{ if(o.isBone) bones.push(o); });
+  const clean = s => s.replace(/[:_.-]/g,'').toLowerCase();
+  const find = suffix => bones.find(b => clean(b.name).endsWith(clean(suffix)));
+
+  const la=find('LeftArm'),      ra=find('RightArm');
+  const lf=find('LeftForeArm'), rf=find('RightForeArm');
+  const lh=find('LeftHand'),     rh=find('RightHand');
+
+  root.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(root);
+  const centerX = (box.min.x + box.max.x) * .5;
+
+  function aimBoneWorld(bone, child, desiredWorldDir){
+    if(!bone || !child) return;
+    root.updateMatrixWorld(true);
+
+    const bp = bone.getWorldPosition(new THREE.Vector3());
+    const cp = child.getWorldPosition(new THREE.Vector3());
+    const current = cp.sub(bp).normalize();
+    const desired = desiredWorldDir.clone().normalize();
+
+    const delta = new THREE.Quaternion().setFromUnitVectors(current, desired);
+    const worldQ = bone.getWorldQuaternion(new THREE.Quaternion());
+    const wantedWorldQ = delta.multiply(worldQ);
+
+    const parentWorldQ = bone.parent
+      ? bone.parent.getWorldQuaternion(new THREE.Quaternion())
+      : new THREE.Quaternion();
+    const localQ = parentWorldQ.clone().invert().multiply(wantedWorldQ);
+    bone.quaternion.copy(localQ);
+    root.updateMatrixWorld(true);
+  }
+
+  for(const [arm, fore, hand] of [[la,lf,lh],[ra,rf,rh]]){
+    if(!arm || !fore) continue;
+    const shoulderX = arm.getWorldPosition(new THREE.Vector3()).x;
+    const side = shoulderX < centerX ? -1 : 1;
+
+    aimBoneWorld(arm, fore, new THREE.Vector3(side*.18, -1, .035));
+    if(hand){
+      aimBoneWorld(fore, hand, new THREE.Vector3(-side*.035, -1, .075));
+    }
+  }
+
+  // Hands stay in their authored neutral local rotation.
+  // The forearm drives their position/orientation naturally; no extra wrist twist.
+  root.updateMatrixWorld(true);
+}
+
+function refitAndRepose(){
+  refitSkeletonToCurrentBody();
+  applyMalePoseRotations();
+}
+
+function pseudoNoise2D(x, y){
+  const s = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+  return s - Math.floor(s);
+}
+
+function buildSkinDerivedMaps(baseTexture){
+  const source = baseTexture && baseTexture.image;
+  if(!source || !(source.width || source.naturalWidth)) return null;
+
+  const srcW = source.naturalWidth || source.videoWidth || source.width;
+  const srcH = source.naturalHeight || source.videoHeight || source.height;
+  const maxDim = 1024;
+  const scale = Math.min(1, maxDim / Math.max(srcW, srcH));
+  const w = Math.max(8, Math.round(srcW * scale));
+  const h = Math.max(8, Math.round(srcH * scale));
+
+  const srcCanvas = document.createElement('canvas');
+  srcCanvas.width = w; srcCanvas.height = h;
+  const srcCtx = srcCanvas.getContext('2d', {willReadFrequently:true});
+  srcCtx.drawImage(source, 0, 0, w, h);
+  const srcImage = srcCtx.getImageData(0, 0, w, h);
+  const src = srcImage.data;
+
+  const lum = new Float32Array(w * h);
+  for(let i=0, p=0; i<lum.length; i++, p+=4){
+    const r = src[p], g = src[p+1], b = src[p+2];
+    lum[i] = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  }
+
+  const roughCanvas = document.createElement('canvas');
+  roughCanvas.width = w; roughCanvas.height = h;
+  const roughCtx = roughCanvas.getContext('2d');
+  const roughImg = roughCtx.createImageData(w, h);
+  const rough = roughImg.data;
+
+  const normalCanvas = document.createElement('canvas');
+  normalCanvas.width = w; normalCanvas.height = h;
+  const normalCtx = normalCanvas.getContext('2d');
+  const normalImg = normalCtx.createImageData(w, h);
+  const normal = normalImg.data;
+
+  const clamp255 = v => Math.max(0, Math.min(255, v));
+  const getLum = (x, y) => {
+    x = Math.max(0, Math.min(w - 1, x));
+    y = Math.max(0, Math.min(h - 1, y));
+    return lum[y * w + x];
+  };
+
+  for(let y=0; y<h; y++){
+    for(let x=0; x<w; x++){
+      const i = y * w + x;
+      const p = i * 4;
+      const l = lum[i];
+
+      const n1 = pseudoNoise2D(x * 0.37, y * 0.37) - 0.5;
+      const n2 = pseudoNoise2D(x * 1.71 + 19.7, y * 1.71 + 7.3) - 0.5;
+      const pore = n1 * 10 + n2 * 5;
+
+      // Broad matte skin response with subtle per-pixel variation.
+      const roughV = clamp255(194 + l * 0.10 + pore * 0.35);
+      rough[p] = rough[p+1] = rough[p+2] = roughV;
+      rough[p+3] = 255;
+
+      const dx = (getLum(x+1,y) - getLum(x-1,y)) / 255;
+      const dy = (getLum(x,y+1) - getLum(x,y-1)) / 255;
+      const fine = (pseudoNoise2D(x * 2.6 + 1.3, y * 2.6 + 4.9) - 0.5) * 0.035;
+      let nx = -(dx * 0.95 + fine);
+      let ny = -(dy * 0.95 + fine * 0.55);
+      let nz = 1.0;
+      const invLen = 1 / Math.hypot(nx, ny, nz);
+      nx *= invLen; ny *= invLen; nz *= invLen;
+
+      normal[p]   = Math.round((nx * 0.5 + 0.5) * 255);
+      normal[p+1] = Math.round((ny * 0.5 + 0.5) * 255);
+      normal[p+2] = Math.round((nz * 0.5 + 0.5) * 255);
+      normal[p+3] = 255;
+    }
+  }
+
+  roughCtx.putImageData(roughImg, 0, 0);
+  normalCtx.putImageData(normalImg, 0, 0);
+
+  const roughnessMap = new THREE.CanvasTexture(roughCanvas);
+  roughnessMap.flipY = false;
+  roughnessMap.wrapS = roughnessMap.wrapT = THREE.ClampToEdgeWrapping;
+  roughnessMap.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+
+  const normalMap = new THREE.CanvasTexture(normalCanvas);
+  normalMap.flipY = false;
+  normalMap.wrapS = normalMap.wrapT = THREE.ClampToEdgeWrapping;
+  normalMap.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+
+  return { roughnessMap, normalMap };
+}
+
+function disposeSkinMaterial(mat){
+  if(!mat || mat.name !== 'ADF_Skin_Pass1') return;
+  if(mat.map) mat.map.dispose();
+  if(mat.normalMap) mat.normalMap.dispose();
+  if(mat.roughnessMap) mat.roughnessMap.dispose();
+  mat.dispose();
+}
+
+function makeSkinMaterial(texture){
+  // The source UVs are already converted for glTF in parametric-base.glb.
+  texture.flipY = false;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+  texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+
+  const derived = buildSkinDerivedMaps(texture) || {};
+
+  const mat = new THREE.MeshPhysicalMaterial({
+    map: texture,
+    color: 0xffffff,
+    metalness: 0.0,
+    roughness: 1.0,
+    roughnessMap: derived.roughnessMap || null,
+    normalMap: derived.normalMap || null,
+    normalScale: new THREE.Vector2(0.14, 0.14),
+
+    // Broad, soft highlight without a plastic look.
+    sheen: 0.05,
+    sheenRoughness: 0.96,
+    sheenColor: new THREE.Color(0xffd3c4),
+
+    // Tiny top response only to stop the skin from reading as flat clay.
+    clearcoat: 0.005,
+    clearcoatRoughness: 0.98
+  });
+
+  mat.name = 'ADF_Skin_Pass1';
+  return mat;
+}
+
+function applySkinForSex(sex){
+  if(!bodyMesh) return;
+  activeSkinSex = sex === 'female' ? 'female' : 'male';
+
+  const requestedSex = activeSkinSex;
+  const token = ++skinRequestToken;
+  const urls = SKIN_TEXTURES[requestedSex] || [];
+
+  function restoreFallback(){
+    if(token !== skinRequestToken || !bodyMesh || !originalBodyMaterial) return;
+
+    const oldMaterial = bodyMesh.material;
+    bodyMesh.material = originalBodyMaterial;
+
+    disposeSkinMaterial(oldMaterial)
+
+    bodyMesh.material.needsUpdate = true;
+    status.textContent = 'texture pelle non caricata · materiale V21 ripristinato';
+  }
+
+  function tryUrl(index){
+    if(token !== skinRequestToken || requestedSex !== activeSkinSex) return;
+
+    if(index >= urls.length){
+      restoreFallback();
+      return;
+    }
+
+    status.textContent =
+      'carico texture pelle '+(requestedSex==='male'?'maschile':'femminile')+
+      ' · sorgente '+(index+1)+'/'+urls.length+'…';
+
+    skinTextureLoader.load(
+      urls[index],
+      texture=>{
+        // Ignore an older request if the user changed sex while it loaded.
+        if(token !== skinRequestToken || requestedSex !== activeSkinSex){
+          texture.dispose();
+          return;
+        }
+
+        const oldMaterial = bodyMesh.material;
+        bodyMesh.material = makeSkinMaterial(texture);
+
+        // Dispose only materials created by this skin pass.
+        disposeSkinMaterial(oldMaterial)
+
+        bodyMesh.material.needsUpdate = true;
+        status.textContent =
+          (requestedSex==='male'?'Maschile':'Femminile')+
+          ' · texture pelle applicata · versione pulita game V25 · sorgente '+(index+1);
+      },
+      undefined,
+      err=>{
+        console.warn('Texture pelle sorgente '+(index+1)+' fallita', urls[index], err);
+        tryUrl(index+1);
+      }
+    );
+  }
+
+  tryUrl(0);
+}
+
+function rebox(){
+  bbox = new THREE.Box3().setFromObject(model);
+  if(bbox.min.y !== 0){
+    model.position.y -= bbox.min.y;
+    bbox = new THREE.Box3().setFromObject(model);
+  }
+  heightWorld = bbox.max.y-bbox.min.y;
+}
+
+function projectY(worldPoint){
+  const p = worldPoint.clone().project(camera);
+  return (1 - (p.y + 1) * .5) * host.clientHeight;
+}
+
+function unusedAlignFeetToVisibleFloor(){
+  // Il modello era a y=0 nel suo mondo, ma visivamente restava dentro lo specchio.
+  // Qui allineiamo i piedi al pavimento DIPINTO nello sfondo (~88.5% della viewport).
+  rebox();
+  const foot = new THREE.Vector3(
+    (bbox.min.x+bbox.max.x)/2,
+    bbox.min.y,
+    (bbox.min.z+bbox.max.z)/2
+  );
+
+  const desiredPx = host.clientHeight * .922;
+  controls.update();
+  camera.updateMatrixWorld(true);
+
+  const y0 = projectY(foot);
+
+  // Derivata numerica: spostare insieme camera e target verso l'alto
+  // fa scendere il personaggio sullo schermo senza alterare l'inquadratura.
+  const eps = Math.max(.02, heightWorld*.025);
+  camera.position.y += eps;
+  controls.target.y += eps;
+  controls.update();
+  camera.updateMatrixWorld(true);
+  const y1 = projectY(foot);
+
+  camera.position.y -= eps;
+  controls.target.y -= eps;
+
+  const deriv = (y1-y0)/eps;
+  if(Math.abs(deriv) > .001){
+    const dy = (desiredPx-y0)/deriv;
+    camera.position.y += dy;
+    controls.target.y += dy;
+  }
+  controls.update();
+}
+
+// Camera presets + smart zoom.
+// Full is deliberately farther than the old 1.38× framing: the avatar should
+// never become smaller than the approved whole-body composition.
+let cameraViewState = 'full';
+let cameraSyncBusy = false;
+
+function smoothstep01(x){
+  x=Math.max(0,Math.min(1,x));
+  return x*x*(3-2*x);
+}
+
+function setEditorSection(section){
+  document.querySelectorAll('[data-panel-section]').forEach(p=>{
+    p.classList.toggle('active', p.dataset.panelSection===section);
+  });
+
+  // More directional light only in face editing mode.
+  // Body mode restores the approved V35 lighting exactly.
+  if(section==='face' || section==='hair'){
+    hemi.intensity=1.62;
+    faceSculptLight.intensity=.92;
+  }else{
+    hemi.intensity=2.1;
+    faceSculptLight.intensity=0;
+  }
+}
+
+function setViewButtonState(name){
+  cameraViewState=name;
+
+  // Camera shortcut buttons.
+  document.querySelectorAll('[data-view]').forEach(b=>{
+    b.classList.toggle('on', b.dataset.view===name);
+  });
+
+  // Main creator navigation and the editing tray follow the camera together.
+  const section = name==='face' ? 'face' : 'body';
+  document.querySelectorAll('.creator-nav [data-section]').forEach(b=>{
+    b.classList.toggle('active', b.dataset.section===section);
+  });
+  setEditorSection(section);
+}
+
+function cameraMetrics(){
+  rebox();
+  const cx=(bbox.min.x+bbox.max.x)/2;
+  const cz=(bbox.min.z+bbox.max.z)/2;
+
+  // V32 endpoints: preserve approved full-body framing; move the face endpoint closer and higher.
+  // FULL: enough distance to keep the whole avatar above the bottom editor UI.
+  const fullFov=29;
+  const faceFov=24;
+  const fullDistance=heightWorld*3.18;
+  const faceDistance=heightWorld*.88;
+
+  // Put the feet just above the editor panel. This is calculated from the
+  // actual DOM position, so resizing the browser does not hide the feet again.
+  const panelEl=document.querySelector('.panel');
+  const panelTop=panelEl ? panelEl.getBoundingClientRect().top : host.clientHeight*.82;
+  const footPx=Math.max(host.clientHeight*.62, Math.min(host.clientHeight*.86, panelTop-28));
+  const footNdc=1-(2*footPx/host.clientHeight);
+  const fullTargetY=bbox.min.y-footNdc*fullDistance*Math.tan(THREE.MathUtils.degToRad(fullFov*.5));
+
+  // FACE: aim lower than the eyes so the authored preset shows head + shoulders,
+  // matching the requested close-up instead of filling the screen with the face.
+  const faceTargetY=bbox.min.y+heightWorld*.835;
+
+  return {
+    cx,cz,fullTargetY,faceTargetY,fullDistance,faceDistance,
+    fullFov,faceFov,footPx,footNdc
+  };
+}
+
+function syncBackgroundToZoom(zoomT){
+  // Keep the 2D room visually tied to the 3D camera.
+  // Intero = original composition. Volto = subtle cinematic push-in.
+  const t = smoothstep01(THREE.MathUtils.clamp(zoomT,0,1));
+  const scale = THREE.MathUtils.lerp(1.0, 1.18, t);
+
+  // When the 3D target rises toward the face, the room moves slightly down
+  // on screen, mimicking an upward camera pan. Keep it deliberately subtle.
+  const shiftY = THREE.MathUtils.lerp(0, host.clientHeight * 0.022, t);
+
+  if(bgLayer){
+    bgLayer.style.transform = `translate3d(0,${shiftY}px,0) scale(${scale})`;
+  }
+  if(blurLayer){
+    // The blurred safety layer follows the same motion, preserving its
+    // original 1.04 overscan so no border can appear during the push-in.
+    blurLayer.style.transform = `translate3d(0,${shiftY}px,0) scale(${scale * 1.04})`;
+  }
+}
+
+function applyCameraLimits(){
+  if(!model) return;
+  const m=cameraMetrics();
+  // Hard endpoints: the user can move continuously between these two authored
+  // compositions, but cannot zoom closer than Volto or farther than Intero.
+  controls.minDistance=m.faceDistance;
+  controls.maxDistance=m.fullDistance;
+}
+
+function view(name){
+  if(!model)return;
+  const m=cameraMetrics();
+  applyCameraLimits();
+
+  if(name==='face'){
+    camera.fov=m.faceFov;
+    camera.updateProjectionMatrix();
+    controls.target.set(m.cx,m.faceTargetY,m.cz);
+    camera.position.set(m.cx,m.faceTargetY,m.cz+m.faceDistance);
+    setViewButtonState('face');
+    syncBackgroundToZoom(1);
+  } else {
+    // Intero: feet stay above the editor UI and this is the hard zoom-out limit.
+    camera.fov=m.fullFov;
+    camera.updateProjectionMatrix();
+    controls.target.set(m.cx,m.fullTargetY,m.cz);
+    camera.position.set(m.cx,m.fullTargetY,m.cz+m.fullDistance);
+    setViewButtonState('full');
+    syncBackgroundToZoom(0);
+  }
+
+  controls.update();
+}
+
+function syncSmartZoom(){
+  if(!model || cameraSyncBusy) return;
+  cameraSyncBusy=true;
+
+  const m=cameraMetrics();
+  controls.minDistance=m.faceDistance;
+  controls.maxDistance=m.fullDistance;
+
+  // OrbitControls has already changed the radius. Clamp both authored endpoints
+  // here too, so resizing/body changes cannot bypass the wheel limits.
+  let d=camera.position.distanceTo(controls.target);
+  if(d>m.fullDistance || d<m.faceDistance){
+    const clamped=THREE.MathUtils.clamp(d,m.faceDistance,m.fullDistance);
+    const dir=camera.position.clone().sub(controls.target).normalize();
+    camera.position.copy(controls.target).addScaledVector(dir,clamped);
+    d=clamped;
+  }
+
+  // Start climbing toward the head BEFORE the camera reaches the torso.
+  // At ~78% of the full distance the focus begins to move upward; around the
+  // face range it is fully locked to the head.
+  const focusStart=m.fullDistance*.76;
+  const focusEnd=m.faceDistance*1.18;
+  const raw=1-(d-focusEnd)/(focusStart-focusEnd);
+  const faceFocus=smoothstep01(raw);
+
+  // Smoothly blend the two endpoint FOVs first, because the vertical
+  // framing calculation depends on the actual FOV currently being used.
+  const nextFov=THREE.MathUtils.lerp(m.fullFov,m.faceFov,faceFocus);
+  if(Math.abs(camera.fov-nextFov)>.01){
+    camera.fov=nextFov;
+    camera.updateProjectionMatrix();
+  }
+
+  // V63: calculate the full-body vertical target from the REAL current
+  // camera radius, not from m.fullDistance. This matters after changing
+  // character height: V62 intentionally preserves camera distance so height
+  // remains visibly different, therefore using the theoretical new max
+  // distance pushed the feet behind the editor panel.
+  const distanceAwareFullTargetY =
+    bbox.min.y - m.footNdc*d*Math.tan(THREE.MathUtils.degToRad(nextFov*.5));
+
+  const desiredY=THREE.MathUtils.lerp(
+    distanceAwareFullTargetY,
+    m.faceTargetY,
+    faceFocus
+  );
+  const dy=desiredY-controls.target.y;
+  if(Math.abs(dy)>1e-6){
+    // Move camera and target together: keeps orbit angle/radius intact,
+    // changing only what the zoom is visually centred on.
+    controls.target.y+=dy;
+    camera.position.y+=dy;
+  }
+  controls.target.x=m.cx;
+  controls.target.z=m.cz;
+
+  // Keep the Volto / Intero selector tied to the REAL zoom radius, not to
+  // the focus interpolation. This makes the visual selector follow the wheel
+  // reliably even while target/FOV are being blended.
+  const zoomT = THREE.MathUtils.clamp(
+    (m.fullDistance - d) / (m.fullDistance - m.faceDistance),
+    0, 1
+  );
+
+  // Same real zoom radius drives the 2D room, so avatar and backstage
+  // visually push in/out together.
+  syncBackgroundToZoom(zoomT);
+
+  // Small hysteresis around the midpoint avoids flicker without making the
+  // selector feel delayed.
+  if(cameraViewState==='full' && zoomT>.54) setViewButtonState('face');
+  else if(cameraViewState==='face' && zoomT<.46) setViewButtonState('full');
+
+  cameraSyncBusy=false;
+}
+
+setupFaceControls();
+
+function setupTexturedHairControls(){
+  document.querySelectorAll('[data-hair-asset]').forEach(b=>{
+    b.onclick=()=>loadHairAssetV83(b.dataset.hairAsset);
+  });
+
+  document.querySelectorAll('[data-hair-color]').forEach(b=>{
+    b.onclick=()=>{
+      applyHairColor(b.dataset.hairColor);
+      document.getElementById('hairCustomBtn')?.classList.remove('on');
+    };
+  });
+
+  const customBtn=document.getElementById('hairCustomBtn');
+  const customInput=document.getElementById('hairCustomColor');
+  const customDot=document.getElementById('hairCustomDot');
+
+  if(customBtn && customInput){
+    customBtn.onclick=()=>customInput.click();
+    customInput.oninput=()=>{
+      const color=customInput.value;
+      applyHairColor(color);
+      if(customDot) customDot.style.background=color;
+      customBtn.classList.add('on');
+      document.querySelectorAll('[data-hair-color]').forEach(b=>b.classList.remove('on'));
+    };
+  }
+}
+setupTexturedHairControls();
+
+new GLTFLoader().load('https://raw.githubusercontent.com/nirholas/three.ws/main/public/avatars/parametric-base.glb', gltf=>{
+  model=gltf.scene;
+  scene.add(model);
+
+  model.traverse(o=>{
+    if(o.isMesh && o.morphTargetDictionary) meshes.push(o);
+    if(o.isSkinnedMesh) skinnedMeshes.push(o);
+  });
+  bodyMesh=skinnedMeshes.find(m=>m.name==='Body') || skinnedMeshes[0] || null;
+  eyesMesh=skinnedMeshes.find(m=>m.name==='Eyes') || null;
+
+  if(!bodyMesh || !bodyMesh.skeleton){
+    status.textContent='errore: rig parametrico non trovato';
+    return;
+  }
+
+  originalBodyMaterial = bodyMesh.material;
+  initOptionalFaceFeatures();
+
+  // Capture the TRUE authored bind rig before pose or morph.
+  model.updateMatrixWorld(true);
+  captureNeutralRig();
+  buildJointTrackers();
+
+  // Fase 1 default: male morphology first, THEN refit the skeleton to it.
+  setMorph('bodyFeminine',0);
+  setMorph('bodyMasculine',1);
+  setMorph('bodyMuscular',.10);
+  setMorph('bodyHeavier',0);
+  setMorph('bodyThinner',0);
+  setMorph('bodySofter',0);
+  setMorph('heightTaller',0);
+  setMorph('heightShorter',0);
+
+  refitSkeletonToCurrentBody();
+
+  // Compute the approved pose ONCE on the correctly fitted male rig.
+  poseRelaxed(model);
+  captureMalePoseRotations();
+
+  rebox();
+
+  // contact shadow: ancorato esattamente a y=0
+  contactShadow = new THREE.Mesh(
+    new THREE.CircleGeometry(Math.max(.15,(bbox.max.x-bbox.min.x)*.45),48),
+    new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.26,depthWrite:false})
+  );
+  contactShadow.rotation.x=-Math.PI/2;
+  contactShadow.position.set((bbox.min.x+bbox.max.x)/2,.002,(bbox.min.z+bbox.max.z)/2);
+  scene.add(contactShadow);
+
+  loadTexturedHairMhcloProxy();
+
+  status.textContent = 'corpo pronto · caricamento capelli textured';
+  h.oninput();
+  w.oninput();
+  view('full');
+
+  // Skin is loaded last and does not participate in rig/morph setup.
+  applySkinForSex('male');
+}, undefined, e=>{
+  status.textContent='errore caricamento base parametrica';
+  console.error(e);
+});
+
+
+function setSex(sex){
+  if(!model) return;
+
+  const male = sex === 'male';
+  setMorph('bodyMasculine', male ? 1 : 0);
+  setMorph('bodyFeminine', male ? 0 : 1);
+
+  document.querySelectorAll('[data-sex]').forEach(b=>{
+    b.classList.toggle('on', b.dataset.sex === sex);
+  });
+
+  // Shape changes first; then the rest joints are fitted to that shape;
+  // finally the exact male pose rotations are copied onto the fitted rig.
+  applyPhysicalMorphs();
+  rebox();
+
+  const current=document.querySelector('[data-view].on')?.dataset.view || 'full';
+  view(current);
+  // Skin is a visual layer only: change diffuse after body/rig update.
+  applySkinForSex(male ? 'male' : 'female');
+}
+
+document.querySelectorAll('[data-sex]').forEach(b=>{
+  b.onclick=()=>setSex(b.dataset.sex);
+});
+
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{
+  view(b.dataset.view);
+});
+
+// Main dock shortcuts mirror the camera presets. Later these same buttons
+// will also reveal their real editing panels; for now they are honest camera/section selectors.
+document.querySelectorAll('.creator-nav [data-section]').forEach(b=>b.onclick=()=>{
+  const section=b.dataset.section;
+
+  if(section==='hair'){
+    view('face');
+    document.querySelectorAll('.creator-nav [data-section]').forEach(n=>{
+      n.classList.toggle('active',n.dataset.section==='hair');
+    });
+    setEditorSection('hair');
+    return;
+  }
+
+  view(section==='face' ? 'face' : 'full');
+});
+
+const h=document.getElementById('height'), w=document.getElementById('weight'), build=document.getElementById('build');
+
+h.oninput=()=>{
+  const v=+h.value;
+  document.getElementById('hv').textContent=v+' cm';
+  if(!model) return;
+
+  // V62: preserve the current camera framing while height changes.
+  // Previously view('full') recomputed camera distance from heightWorld,
+  // visually cancelling almost all of the height difference.
+  const savedCameraPos = camera.position.clone();
+  const savedTarget = controls.target.clone();
+
+  setMorph('heightTaller', 0);
+  setMorph('heightShorter', 0);
+  currentHeightScale = v / BASE_HEIGHT_CM;
+  applyBodyScale();
+
+  camera.position.copy(savedCameraPos);
+  controls.target.copy(savedTarget);
+  controls.update();
+};
+function applyPhysicalMorphs(){
+  if(!model) return;
+
+  const wv=+w.value;
+  const bv=+build.value;
+
+  currentWeightHeavy = wv>=72 ? (wv-72)/(140-72) : 0;
+  currentWeightThin  = wv<72 ? (72-wv)/(72-45) : 0;
+
+  setMorph('bodyHeavier', Math.min(1, currentWeightHeavy * 1.45));
+  setMorph('bodyThinner', Math.min(1, currentWeightThin * 1.10));
+  setMorph('bodyMuscular', bv>0 ? .10 + (bv/100)*.75 : .10);
+  setMorph(
+    'bodySofter',
+    Math.max(currentWeightHeavy * 0.95, bv<0 ? (-bv/100)*.55 : 0)
+  );
+
+  // This is the part missing from V15–V18.
+  refitAndRepose();
+  applyBodyScale();
+}
+
+w.oninput=()=>{
+  const v=+w.value;
+  document.getElementById('wv').textContent=v+' kg';
+  if(!model) return;
+
+  applyPhysicalMorphs();
+
+  const current=document.querySelector('[data-view].on')?.dataset.view || 'full';
+  if(current==='full') view('full');
+};
+
+build.oninput=()=>{
+  const v=+build.value;
+  document.getElementById('bv').textContent=v>35?'atletica':v<-35?'morbida':'media';
+  if(!model) return;
+
+  applyPhysicalMorphs();
+
+  const current=document.querySelector('[data-view].on')?.dataset.view || 'full';
+  if(current==='full') view('full');
+};
+
+
+function animate(){
+  requestAnimationFrame(animate);
+  controls.update();
+  syncSmartZoom();
+  renderer.render(scene,camera);
+}
+animate();
+
+addEventListener('resize',()=>{
+  renderer.setSize(host.clientWidth,host.clientHeight);
+  camera.aspect=host.clientWidth/host.clientHeight;
+  camera.updateProjectionMatrix();
+  applyCameraLimits();
+});
+</script>
+
+<div class="adf-local-actions"><button id="adfLocalCancel">Annulla</button><button class="ok" id="adfLocalConfirm">Conferma personaggio →</button></div>
+<script>
+(()=>{
+  const val=id=>document.getElementById(id)?.value ?? null;
+  const active=attr=>{
+    const all=[...document.querySelectorAll('['+attr+']')];
+    const el=all.find(x=>x.classList.contains('on')||x.classList.contains('active'))||all[0];
+    return el ? el.getAttribute(attr) : null;
+  };
+  function snapshot(){
+    try{
+      if(window.renderer && window.scene && window.camera) window.renderer.render(window.scene,window.camera);
+      const c=(window.renderer&&window.renderer.domElement)||document.querySelector('#viewer canvas');
+      return c ? c.toDataURL('image/png') : '';
+    }catch(e){ return ''; }
+  }
+  function payload(){
+    const sliders={};
+    ['faceEyes','faceEyeSpacing','faceBrowHeight','faceBrowAngle','faceCheeks','faceCheekVolume','faceJaw','faceChinLength','faceChinDepth','faceChinPoint','faceNoseSize','faceNoseWidth','faceNoseLength','faceNoseTip','faceNoseProfile','faceNostrils','faceMouthWidth','faceMouthDepth','faceMouthCorners','faceUpperLip','faceLowerLip','faceEarSize','faceEarWing'].forEach(id=>{const v=val(id);if(v!==null)sliders[id]=Number(v)});
+    const previewImage=snapshot();
+    return {
+      avatarPreviewImage:previewImage, previewImage,
+      localAvatar:{
+        sex:active('data-sex'), height:Number(val('height')||178), weight:Number(val('weight')||72), build:Number(val('build')||0),
+        hairAsset:active('data-hair-asset'), hairColor:active('data-hair-color') || val('hairCustomColor'),
+        faceShape:active('data-face-shape'), eyeColor:active('data-eye-color') || val('eyeCustomColor'),
+        browStyle:active('data-brow-style'), browColor:active('data-brow-color') || val('browCustomColor'), sliders
+      }
+    };
+  }
+  document.getElementById('adfLocalConfirm').onclick=()=>window.parent.postMessage({type:'adf-local-avatar-complete',artist:payload()},'*');
+  document.getElementById('adfLocalCancel').onclick=()=>window.parent.postMessage({type:'adf-local-avatar-cancel'},'*');
+  window.parent.postMessage({type:'adf-local-avatar-ready'},'*');
+})();
+</script>
+</body>
+</html>
