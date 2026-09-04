@@ -804,7 +804,6 @@ body.in-hub .topnav {
 }
 .pspot:hover .pspot-dot,
 .pspot:focus-visible .pspot-dot,
-.pspot.qui .pspot-dot,
 .pspot.district-active .pspot-dot {
   transform: translate(-50%,-50%) scale(1.22);
   opacity: 1;
@@ -853,7 +852,6 @@ body.in-hub .topnav {
 }
 .pspot:hover .pspot-tag,
 .pspot:focus-visible .pspot-tag,
-.pspot.qui .pspot-tag,
 .pspot.district-active .pspot-tag {
   transform: translateX(-50%) translateY(-2px);
   border-color: var(--pk);
@@ -861,91 +859,6 @@ body.in-hub .topnav {
 }
 .pspot.chiuso .pspot-tag {
   opacity: .72;
-}
-
-/* il giro guidato dei luoghi, con le frecce «scorri per esplorare» */
-.pspot.qui {
-  --vis: 1;
-  --avv: 1;
-  --ang: min(30px, 46%);
-  --col: color-mix(in srgb, var(--pk) 45%, #fff);
-  --alone: color-mix(in srgb, var(--pk) 75%, transparent);
-  background: radial-gradient(
-    120% 100% at 50% 100%,
-    color-mix(in srgb, var(--pk) 32%, transparent),
-    transparent 70%
-  );
-  box-shadow: 0 0 34px color-mix(in srgb, var(--pk) 45%, transparent);
-  animation: pspulse 1.6s ease-in-out infinite;
-}
-.pspot.qui::before {
-  animation: psang 1.6s ease-in-out infinite;
-}
-@keyframes pspulse {
-  50% {
-    box-shadow: 0 0 14px color-mix(in srgb, var(--pk) 18%, transparent);
-  }
-}
-@keyframes psang {
-  50% {
-    opacity: 0.5;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .pspot.qui,
-  .pspot.qui::before {
-    animation: none;
-  }
-}
-
-/* Le due frecce che scorrono il giro guidato. Erano due rettangoli invisibili
-   in mezzo alla strada: si accendevano solo col mouse sopra, e siccome nella
-   foto lì sotto non c'è disegnato niente, sul telefono non esistevano proprio
-   — nessuno poteva sapere che erano lì. Adesso il segno c'è sempre. */
-.pfrec {
-  position: absolute;
-  left: var(--x);
-  top: var(--y);
-  width: var(--w);
-  height: var(--h);
-  border-radius: 999px;
-  background: rgba(10, 9, 16, 0.5);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.22),
-    0 2px 8px rgba(0, 0, 0, 0.55);
-  transition:
-    background 0.15s,
-    box-shadow 0.15s;
-}
-/* il chevron: mezzo quadrato girato di 45°, come si fa da sempre */
-.pfrec::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 30%;
-  height: 30%;
-  border-left: 2px solid rgba(255, 255, 255, 0.85);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.85);
-}
-.pfrec[data-f="-1"]::before {
-  transform: translate(-30%, -50%) rotate(45deg);
-}
-.pfrec[data-f="1"]::before {
-  transform: translate(-70%, -50%) rotate(-135deg);
-}
-.pfrec:hover {
-  background: rgba(168, 85, 247, 0.5);
-  box-shadow:
-    inset 0 0 0 1px rgba(216, 180, 254, 0.9),
-    0 2px 12px rgba(0, 0, 0, 0.55);
-}
-.pfrec:focus-visible {
-  outline: 2px solid var(--acid);
-  outline-offset: 2px;
-}
-.pfrec:active {
-  transform: scale(0.94);
 }
 
 /* ================= EVENTI DI OGGI ================= */
@@ -1360,7 +1273,6 @@ body.in-hub .topnav {
 /* FIX MAPPA V2 — visibilita nomi quartiere */
 .pspot:hover .pspot-tag,
 .pspot:focus-visible .pspot-tag,
-.pspot.qui .pspot-tag,
 .pspot.district-active .pspot-tag {
   opacity: 1;
 }

@@ -31,4 +31,6 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 _(qui sotto finiscono i punti nuovi, appena scritti)_ 
 
-2.  Le card sulla mappa come studio, fabbrica, pizzeria, la sala ecc hanno una card cliccabile troppo grande, LE VOGLIO TUTTE COME STUDIO 
+5. Avaturn voglio lo rendiamo UN 50/50 , Cioè chi non vuole andare a farsi tutta la trafila per fare avaturn (anche se ovviamente dobbiamo fare di tutto per consigliarli a farlo) può benissimamente creare il suo avatar in game. FAI COESISTERE LE COSE.
+
+6. 

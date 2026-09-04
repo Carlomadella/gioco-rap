@@ -869,3 +869,49 @@ leggi di quella persona. Riscritta senza.
 > niente) non torna indietro zitta. `npm run verifica` pulito: prova 67/67, audit 188/188,
 > build 15/15.
 
+---
+
+## 4 · Lo Shop diventa uno shop, non un menù
+
+4. Lo shop dev'essere un vero e proprio shop, come gli shop di fortnite o nba2k..
+   LEVA STI CAZZO DI INTERFACCIA MENU! RENDILO UNO SHOP DA VIDEOGIOCO NEL 2026
+
+> **Fatto (04/09/2026), provato dal vivo in Chrome.** Aveva ragione: Attrezzatura e
+> Beat in vendita erano righe — titolo, sottotitolo, un bottone a destra — la stessa
+> identica scatola grigia delle Offerte sul tavolo o del Contratto in corso. Un
+> negozio disegnato come un pannello impostazioni.
+>
+> **Tre reparti dietro tre linguette**, non tre liste una sopra l'altra: Attrezzatura,
+> Beat, Vestiti (`.shtabs`/`.shsec`, cambia solo quale si vede — nessuna sezione è
+> stata smontata). **La cassa sempre in vista** (`.shcash`, in alto a destra accanto
+> alle linguette): prima per sapere quanto avevi in tasca dovevi uscire dallo Shop e
+> controllare il pallino in cima alla mappa.
+>
+> **Attrezzatura**: da riga a card (`.shcard`) — fondale colorato (lo stesso
+> `TINTA_STUDIO` viola delle azioni di scrittura/registrazione/mix, perché è la
+> stessa famiglia di roba), un'icona propria per pezzo (cuffie, microfono, manopole
+> per la scheda audio, un diffusore per il monitor, le barre per il trattamento
+> acustico — le prime due icone create apposta, `hub.js`, non c'erano), prezzo in
+> alto, "Tuo" quando l'hai già comprato.
+>
+> **Beat in vendita**: da riga a card (`.shbeat`) con la cover del beat come
+> fondale, il tasto ascolta al centro (lo stesso `beatSuona()` di sempre, non
+> riscritto) e la X per rifiutare in un angolo — il genere resta il divisorio sopra
+> ai gruppi, come prima.
+>
+> **Vestiti**: non toccato. Il Catalogo → Abbigliamento (`ngcard`) aveva già una
+> vera griglia con l'anteprima del capo — gli ho solo dato lo stesso sollevamento al
+> passaggio del mouse delle nuove card, per farlo sembrare la stessa famiglia.
+>
+> **Cosa non è cambiato**: l'economia. `GEAR`, `G.market`, i prezzi, `G.gear`,
+> `G.beats`, il salvataggio — tutto identico. Le card chiamano le stesse funzioni di
+> comprare/ascoltare/rifiutare di prima, cambia solo cosa disegnano.
+>
+> **Provato dal vivo in Chrome**: le tre linguette, la cassa che scende dopo un
+> acquisto vero (10.000 € → 9.780 € comprando le Cuffie da studio, la card diventa
+> "Tuo"), l'ascolto di un beat che accende il tasto play, i bottoni disabilitati e
+> spenti quando i soldi non bastano.
+>
+> Sette controlli nuovi in `strumenti/audit-regressioni.js`. `npm run verifica`
+> pulito: prova 67/67, audit 199/199, build 15/15.
+

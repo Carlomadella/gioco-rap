@@ -96,3 +96,15 @@ $("ng-x").onclick = () => { hubTap(); chiudiNegozio(); };
 document.addEventListener("keydown", e => {
   if(e.key === "Escape" && $("negozio").classList.contains("on")) chiudiNegozio();
 });
+
+/* punto 4: i tre reparti dello Shop (Attrezzatura, Beat, Vestiti) dietro tre
+   linguette invece di tre liste una sopra l'altra. Solo presentazione — le
+   sezioni restano tutte renderizzate, cambia solo quale si vede. Il tasto
+   resta lo stesso nodo quando il pannello sposta la vetrina dal magazzino
+   avanti e indietro (appendChild non tocca gli event listener). */
+$("sh-tabs").addEventListener("click", ev => {
+  const b = ev.target.closest(".shtab"); if(!b) return;
+  hubTap();
+  document.querySelectorAll("#sh-tabs .shtab").forEach(t => t.classList.toggle("on", t === b));
+  document.querySelectorAll(".shsec").forEach(s => s.classList.toggle("on", s.dataset.shsec === b.dataset.sh));
+});

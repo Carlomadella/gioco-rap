@@ -44,7 +44,10 @@ const HIC = {
   rischio:'<path d="M12 2 1.5 21h21zm-1 6h2v7h-2zm0 9h2v2h-2z"/>',
   dado:'<path d="M12 2 21 6.6v10.8L12 22 3 17.4V6.6zM5.8 7.5 12 10.7l6.2-3.2L12 4.3z"/>',
   duebolle:'<path d="M3 4h13v9H8.4L4 17V4zM21 9h-4v7l-3.2-2.6H10V9h2v2.4h5.6L19 13V11h2z"/>',
-  manubrio:'<path d="M2 9a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm17 0a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2zM8 10h2v4H8zm6 0h2v4h-2zM9 11h6v2H9z"/>'
+  manubrio:'<path d="M2 9a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm17 0a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2zM8 10h2v4H8zm6 0h2v4h-2zM9 11h6v2H9z"/>',
+  /* punto 4: lo Shop — servivano cuffie e monitor da studio, non c'erano */
+  cuffie:'<path d="M12 3a8 8 0 0 0-8 8v6a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H5.1A6.9 6.9 0 0 1 12 5a6.9 6.9 0 0 1 6.9 6H17a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-6a8 8 0 0 0-8-8z"/>',
+  altoparlante:'<path fill-rule="evenodd" d="M6 2h12a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm6 3a2.6 2.6 0 1 0 0 5.2A2.6 2.6 0 0 0 12 5zm0 8.2a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8z"/>'
 };
 const hsvg = (n, cls) => '<svg class="' + (cls || "hicon") + '" viewBox="0 0 24 24" aria-hidden="true">' + HIC[n] + '</svg>';
 const spoglia = t => String(t).replace(/<[^>]*>/g, "");
@@ -56,7 +59,12 @@ const spoglia = t => String(t).replace(/<[^>]*>/g, "");
    senza fascia in alto, profilo, player e slider dell'ora, che sono già
    disegnati veri altrove), e cosa succede quando si tocca.
    Gli id non si toccano: orari.js, eventi-tempo.js, spostamenti.js e
-   trasferte.js li usano per sapere orari, eventi ambientali e distanze. */
+   trasferte.js li usano per sapere orari, eventi ambientali e distanze.
+
+   w/h sono tutti 10.50×12.50, la misura dello Studio: prima ognuno aveva
+   la sua (la Fabbrica arrivava a 20×22, quasi il quadruplo), e le zone da
+   toccare si vedevano di taglio diverso l'una dall'altra. x/y sono ricalcolati
+   per tenere il quadrato centrato dove stava prima, non sul vecchio angolo. */
 const HUB_LUOGHI = [
   /* punto 12: lo studio non è più una scorciatoia alla linguetta della
      settimana — è una stanza sua, con dentro le quattro fasi di un pezzo e la
@@ -66,7 +74,7 @@ const HUB_LUOGHI = [
   /* punto 59/61: era un cartello chiuso («Club & discoteche», ancora dentro
      alla foto — cambia solo quando cambia la mappa, punto 45); qui sotto
      adesso c'è un lavoro vero, part time. */
-  {id:"pizzeria", n:"Pizzeria", x:49.00, y:68.00, w:12.50, h:17.00,
+  {id:"pizzeria", n:"Pizzeria", x:50.00, y:70.25, w:10.50, h:12.50,
    vai:() => schedaLavoro("lavapiatti", "Pizzeria")},
   /* punto 48: non più un cartello chiuso — è dove si va a fare l'open mic,
      che esisteva già come azione ma non aveva un posto sulla mappa. Se non
@@ -78,7 +86,7 @@ const HUB_LUOGHI = [
      («Freestyle al bar centrale»): se passavi di lì a un'altra ora non
      esisteva. Il palco è il posto dove si sta davanti alla gente: ci stanno
      tutte e due. */
-  {id:"concerti", n:"Live Club", x:33.00, y:20.00, w:14.00, h:13.50,
+  {id:"concerti", n:"Live Club", x:34.75, y:20.50, w:10.50, h:12.50,
    vai:() => {
      const palco = hubPronta("live");
      showEvent({k:"Live Club", t:"Che serata fai?",
@@ -95,13 +103,13 @@ const HUB_LUOGHI = [
        ]});
    }},
   /* il beat maker non è un listino: è la sala dove si conosce la gente */
-  {id:"beat", n:"La Sala", x:49.50, y:20.00, w:11.00, h:13.50,
+  {id:"beat", n:"La Sala", x:49.75, y:20.50, w:10.50, h:12.50,
    vai:() => apriPosto()},
   /* Beat Maker non è più un luogo sulla mappa: i beatmaker si conoscono
      alla Sala e si lavora con loro nello Studio. */
   /* punto 60: si chiamava «Vita quotidiana» — la palestra è uscita da qui
      ed è diventata un posto suo (punto 61), resta stacca la spina e i conti */
-  {id:"vita", n:"Casa", x:16.50, y:67.00, w:14.50, h:16.50,
+  {id:"vita", n:"Casa", x:18.50, y:69.00, w:10.50, h:12.50,
    vai:() => showEvent({k:"Casa", t:"Stacca la spina o guarda i conti",
      d:"La settimana non è solo musica. Ogni tanto la testa va spenta, e i conti vanno guardati.",
      annulla(){},
@@ -114,17 +122,17 @@ const HUB_LUOGHI = [
      ]})},
   /* punto 21/57: la Strada, ricostruita da claude/carriera-criminale.md
      (js/game/strada-crimine.js) — non era mai stata scritta, solo pensata */
-  {id:"crimin", n:"Attività criminali", x:0.50, y:64.00, w:13.00, h:16.00,
+  {id:"crimin", n:"Attività criminali", x:1.75, y:65.75, w:10.50, h:12.50,
    vai:() => (G.strada && G.strada.arresto && typeof apriCarcere === "function")
   ? apriCarcere()
   : apriStrada()},
   /* punto 59: il secondo lavoro, full time — era «Sponsor & brand» */
-  {id:"fabbrica", n:"Fabbrica", x:79.00, y:28.00, w:20.00, h:22.00,
+  {id:"fabbrica", n:"Fabbrica", x:83.75, y:32.75, w:10.50, h:12.50,
    vai:() => schedaLavoro("operaio", "Fabbrica")},
   /* punto 61: la palestra esce dal sottomenu di Casa e diventa un posto
      suo — era «Business», un altro cartello chiuso senza niente dietro.
      Punto 9: non è più un pulsante solo — si sceglie cosa fare, come a Casa. */
-  {id:"palestra", n:"Palestra", x:71.50, y:75.00, w:17.50, h:17.00,
+  {id:"palestra", n:"Palestra", x:75.00, y:77.25, w:10.50, h:12.50,
    vai:() => showEvent({k:"Palestra", t:"Che allenamento fai?",
      d:"Il fisico che si vede sotto le luci, o la testa che si svuota prima di scrivere: scegli tu.",
      annulla(){},
@@ -139,7 +147,7 @@ const HUB_LUOGHI = [
   /* punto 48 + «via il quaderno»: qui dentro è finito tutto quello che si
      compra — l'attrezzatura, il banco dei beat e i vestiti. Era il Catalogo,
      che come linguetta a sé non aveva senso: un negozio è un posto. */
-  {id:"shop", n:"Shop", x:43.50, y:30.00, w:15.00, h:11.50,
+  {id:"shop", n:"Shop", x:45.75, y:29.50, w:10.50, h:12.50,
    vai:() => apriPannello("Shop", "shop",
      "Attrezzatura, beat da comprare e roba da mettersi addosso.")},
   /* punto 6: il centro per l'impiego, arrivato con la mappa definitiva.
@@ -149,7 +157,7 @@ const HUB_LUOGHI = [
      posto giocabile. Il cartello nella foto resta — punto 45, le targhette
      sono dentro al pixel — ma senza una zona da toccare sopra non fa più
      niente, come «Periferia» o «Centro». */
-  {id:"impiego", n:"Centro per l'impiego", x:60.00, y:21.50, w:18.50, h:18.50,
+  {id:"impiego", n:"Centro per l'impiego", x:64.00, y:24.50, w:10.50, h:12.50,
    vai:() => schedaImpiego()}
 ];
 
@@ -250,7 +258,7 @@ function hubInitQuartieri(){
     if(!ev.pointerType || ev.pointerType === "mouse") hubSetQuartiere("");
   });
   foto.addEventListener("click", ev => {
-    if(ev.target.closest(".pspot,.pfrec")) return;
+    if(ev.target.closest(".pspot")) return;
     const p=hubPuntoPercentuale(ev);
     if(!p) return;
     const q=hubQuartiereDaPunto(p.x,p.y);
@@ -421,7 +429,6 @@ function hubPronta(id){
 
 /* ================= PEZZI DI DISEGNO ================= */
 let HUB_VISTA = "profilo";     /* quale delle quattro linguette di sinistra */
-let HUB_QUI = -1;              /* il luogo illuminato dal giro guidato */
 
 function statCella(k, ic, lab, val, barra){
   return '<div class="ps" style="--k:' + k + '">' + hsvg(ic) +
@@ -588,17 +595,13 @@ function renderHub(){
     hsvg(ic) + '<span>' + n + '</span></button>').join("");
 
   /* ---- i luoghi sulla mappa ---- */
-  $("hb-pins").innerHTML = HUB_LUOGHI.map((l, i) =>
-    '<button class="pspot' + (l.chiuso ? " chiuso" : "") + (HUB_QUI === i ? " qui" : "") +
+  $("hb-pins").innerHTML = HUB_LUOGHI.map(l =>
+    '<button class="pspot' + (l.chiuso ? " chiuso" : "") +
     '" data-l="' + l.id + '" data-district="' + (HUB_DISTRICT[l.id] || "") +
     '" style="--x:' + l.x + '%;--y:' + l.y + '%;--w:' + l.w + '%;--h:' + l.h +
     '%;--pk:' + (HUB_PIN_COLOR[l.id] || "#C084FC") + '" ' +
     'aria-label="' + l.n + (l.chiuso ? " — chiuso" : "") + '" title="' + l.n + '">' +
-    '<span class="pspot-dot"></span><span class="pspot-tag"><i></i><b>' + l.n + '</b></span></button>').join("") +
-    '<button class="pfrec" data-f="-1" aria-label="Luogo precedente" ' +
-      'style="--x:34.82%;--y:93.5%;--w:5.06%;--h:4.28%"></button>' +
-    '<button class="pfrec" data-f="1" aria-label="Luogo successivo" ' +
-      'style="--x:56.02%;--y:93.5%;--w:5.06%;--h:4.28%"></button>';
+    '<span class="pspot-dot"></span><span class="pspot-tag"><i></i><b>' + l.n + '</b></span></button>').join("");
   hubInitQuartieri();
   hubSetQuartiere(HUB_QUARTIERE);
   /* ---- gli eventi di oggi ---- */
@@ -630,26 +633,16 @@ function renderHub(){
 const hubTap = () => { if(typeof SFX === "object" && SFX.tap) SFX.tap(); };
 
 $("hb-pins").addEventListener("click", ev => {
-  const f = ev.target.closest(".pfrec");
-  if(f){
-    /* «scorri per esplorare»: il giro guidato dei luoghi, uno alla volta */
-    const n = HUB_LUOGHI.length;
-    HUB_QUI = (HUB_QUI + (+f.dataset.f) + n) % n;
-    hubTap(); renderHub();
-    const q = document.querySelector(".pspot.qui");
-    /* sul telefono la mappa è più larga dello schermo e si sposta col dito:
-       il giro guidato deve portare in mezzo il luogo che sta illuminando,
-       se no indica un cartello che è fuori dalla finestra */
-    /* niente `behavior:"smooth"` a mano: provato, su questo contenitore non
-       scorre affatto. Senza, va sempre — e il verso lo decide comunque il CSS,
-       che con le animazioni spente (Impostazioni → Aspetto) è già `auto`. */
-    if(q){ q.focus({preventScroll:true});
-      q.scrollIntoView({block:"nearest", inline:"center"}); }
-    return;
-  }
   const b = ev.target.closest(".pspot"); if(!b) return;
   const l = HUB_LUOGHI.find(x => x.id === b.dataset.l); if(!l) return;
   hubTap();
+  /* Senza questo, il cartello appena toccato resta l'elemento a fuoco della
+     pagina: tornando alla mappa da dentro il luogo, il browser lo ridisegna
+     ancora "a fuoco" — l'anello e il pallino in --acid (giallo) restano accesi
+     su quello che hai appena lasciato, come se indicasse l'ultima mossa. Il
+     Tab da tastiera resta intatto: sposta il fuoco su un ALTRO bottone, e a
+     quello si riaccende regolarmente. */
+  b.blur();
   if(l.chiuso) hubChiuso(l); else l.vai();
 });
 
