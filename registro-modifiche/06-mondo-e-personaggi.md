@@ -6,6 +6,59 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:3170d23 -->
+## 04/09/26, 10:08 â€” main â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.53)  
+**Merge commit:** `3170d23`
+
+### Cosa Ã¨ entrato
+
+- `0287cef` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `994aa67` â€” Merge branch 'task/schermata-originale-nella-mappa' â€” **Carlomadella**
+- `276e8d1` â€” fix: via anche i quattro bottoni in fondo alla mappa, erano doppioni â€” **Carlomadella**
+- `cee9ce0` â€” feat: via la vecchia schermata di gioco, le sue schede sopra la mappa â€” **Carlomadella**
+- `6dad126` â€” chore: pulizia dei media, 35 MB fuori dal pacchetto per gli store â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_negozio_angolo.jpg` â†’ `frontend/concept/landing_b_negozio_angolo.jpg`
+- **Modificato:** `frontend/js/game/eventi-tempo.js`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-01.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-02.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-03.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-04.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-05.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-06.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-07.png"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-08.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-09.png"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-10.png"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-11.png"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-12.png"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-13.png"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-14.png"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-15.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-16.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-17.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-18.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-19.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-20.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-21.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-22.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-23.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-24.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-25.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-26.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-27.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-28.png"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-29.jpg"`
+- **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-30.jpg"`
+
+**File interessati in questa categoria:** 32
+
+---
+
 <!-- merge:994aa67 -->
 ## 04/09/26, 10:05 â€” task/schermata-originale-nella-mappa â†’ main
 

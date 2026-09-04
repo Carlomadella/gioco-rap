@@ -6,6 +6,30 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:3170d23 -->
+## 04/09/26, 10:08 â€” main â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.53)  
+**Merge commit:** `3170d23`
+
+### Cosa Ã¨ entrato
+
+- `0287cef` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `994aa67` â€” Merge branch 'task/schermata-originale-nella-mappa' â€” **Carlomadella**
+- `276e8d1` â€” fix: via anche i quattro bottoni in fondo alla mappa, erano doppioni â€” **Carlomadella**
+- `cee9ce0` â€” feat: via la vecchia schermata di gioco, le sue schede sopra la mappa â€” **Carlomadella**
+- `6dad126` â€” chore: pulizia dei media, 35 MB fuori dal pacchetto per gli store â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Rinominato:** `frontend/media/photo/pagina avatar/avatar_profilo_carnagione_chiara.png` â†’ `frontend/concept/avatar_profilo_carnagione_chiara.png`
+- **Rinominato:** `frontend/media/photo/pagina avatar/avatar_profilo_carnagione_scura.png` â†’ `frontend/concept/avatar_profilo_carnagione_scura.png`
+- **Modificato:** `frontend/js/creator/nav.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:994aa67 -->
 ## 04/09/26, 10:05 â€” task/schermata-originale-nella-mappa â†’ main
 
