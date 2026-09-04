@@ -389,10 +389,11 @@ function studioAzione(id){
   hubAzione(id);
 }
 
+/* Si esce dallo Studio solo dal bottone globale «Torna alla mappa» (punto 1):
+   niente X in testata, niente chiusura cliccando sul fondo. chiudiStudio()
+   resta esposta — la chiama menu-sistema.js quando premi quel bottone. */
 if($("studio")){
-  $("st-x").onclick = () => chiudiStudio();
   $("studio").addEventListener("click", e => {
-    if(e.target.id === "studio"){ chiudiStudio(); return; }
     const t = e.target.closest("[data-sez]");
     if(t){ STUDIO_SEZ = t.dataset.sez; SFX.tap(); renderStudio(); return; }
     const b = e.target.closest("[data-beat]");
@@ -402,8 +403,5 @@ if($("studio")){
     const a = e.target.closest("[data-az]");
     if(a){ studioAzione(a.dataset.az); return; }
     if(e.target.closest("[data-mosse]")){ chiudiStudio(); hubGioco("settimana"); return; }
-  });
-  document.addEventListener("keydown", e => {
-    if(e.key === "Escape" && $("studio").classList.contains("on")) chiudiStudio();
   });
 }

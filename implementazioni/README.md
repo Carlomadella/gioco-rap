@@ -12,7 +12,7 @@ file del suo argomento con dentro cosa è stato fatto.
 | file | cosa c'è dentro |
 | --- | --- |
 | [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 11 voci |
-| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 25 voci |
+| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 26 voci |
 | [`03-artista-e-avatar.md`](03-artista-e-avatar.md) | **L'artista e il suo avatar** — 1 voce |
 | [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 11 voci |
 | [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 10 voci |
@@ -26,11 +26,12 @@ per tutti e per tutto.
 
 ## Tutti i punti
 
-87 voci in tutto: **53 chiuse**, 12 a metà, il resto da fare.
+88 voci in tutto: **54 chiuse**, 12 a metà, il resto da fare.
 
 | | punto | stato | dove |
 | --- | --- | --- | --- |
 | **1** | Cosa si può simulare | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
+| **1** | Dallo Studio si esce solo con «Torna alla mappa» | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **2** | Ascoltare un beat prima di comprarlo | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
 | **3** | Crea il tuo avatar | fatto | [artista-e-avatar](03-artista-e-avatar.md) |
 | **4** | La pagina di landing | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |

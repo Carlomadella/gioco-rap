@@ -18,6 +18,7 @@
     if(document.querySelector("#strada.on")) return "strada";
     if(document.querySelector("#posto.on")) return "posto";
     if(document.querySelector("#negozio.on")) return "negozio";
+    if(document.querySelector("#studio.on")) return "studio";
     if(document.querySelector("#s-game.screen.on")) return "game";
     if(document.querySelector("#s-hub.screen.on")) return "hub";
     return "";
@@ -326,6 +327,7 @@
        destinazione hub, così il tasto significa sempre davvero "Mappa". */
     try{ if($id("posto") && $id("posto").classList.contains("on") && typeof chiudiPosto === "function") chiudiPosto(); }catch(_){}
     try{ if($id("negozio") && $id("negozio").classList.contains("on") && typeof chiudiNegozio === "function") chiudiNegozio(); }catch(_){}
+    try{ if($id("studio") && $id("studio").classList.contains("on") && typeof chiudiStudio === "function") chiudiStudio(); }catch(_){}
     try{ if($id("strada") && $id("strada").classList.contains("on") && typeof chiudiStrada === "function") chiudiStrada(); }catch(_){}
 
     try{
@@ -496,6 +498,7 @@
     {id:"writer",  root:"#writer.on",        head:".whead"},
     /* nello Studio usiamo tutta la card testata, non la flex-line:
        così non spostiamo più avatar/nome come faceva la V6 */
+    {id:"studio",  root:"#studio.on",        head:".sthead"},
     {id:"game",    root:"#s-game.screen.on", head:"#gtop"},
     {id:"hub",     root:"#s-hub.screen.on",  head:".pbarra"}
   ];

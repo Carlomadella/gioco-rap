@@ -774,3 +774,37 @@ leggi di quella persona. Riscritta senza.
 > senza che la prova se ne accorga. `npm run verifica` pulito: prova 67/67, audit 170/170,
 > build 15/15.
 
+---
+
+## 1 · Dallo Studio si esce solo con «Torna alla mappa»
+
+1. Quando apri lo studio e vai nell'interfaccia di questo se clicchi sul vuoto ti torna
+   indietro, l'unico modo per tornare alla mappa da quel punto voglio che sia proprio con
+   il pulsante che abbiamo fatto torna alla mappa, quindi togli anche la x in alto a destra.
+
+> **Fatto (04/09/2026).** Tolte le due scorciatoie: cliccare sul fondo dello Studio non lo
+> chiude più (`e.target.id === "studio"` tolto da `js/game/studio.js`), e la X in testata
+> (`id="st-x"` in `frontend/index.html`) non c'è più — con lei anche il suo handler e
+> l'Escape diretto, che ora ricade sul menu di sistema globale come già fa La Sala.
+>
+> Il motivo per cui prima **non c'era neanche un bottone «Torna alla mappa» visibile** nello
+> Studio: `js/menu-sistema.js` non lo trattava come una sua "stanza". `hostAttivo()` non
+> controllava `#studio.on`, quindi con lo Studio aperto il menu pensava di essere ancora
+> sulla Hub (che resta "on" sotto al popup) — e la barra globale nasconde MAPPA proprio
+> quando sei già sulla hub. La lista `HOSTS` del secondo blocco (quello che monta la barra
+> nella testata giusta) aveva perfino un commento che *parlava* dello Studio senza avere la
+> sua riga: mancava proprio l'aggancio.
+>
+> Aggiunti entrambi: `hostAttivo()` ora riconosce `#studio.on` (prima della Hub, come La
+> Sala e il Negozio), `tornaMappa()` chiude lo Studio prima di andare alla Hub, e
+> `HOSTS` monta la barra dentro `.sthead` invece che sotto, in `.pbarra`. `chiudiStudio()`
+> resta esposta: la chiama solo quel bottone.
+>
+> Sei controlli nuovi in `strumenti/audit-regressioni.js` (niente X, niente chiusura sul
+> click di fondo, niente Escape diretto, `hostAttivo`/`tornaMappa`/`HOSTS` che riconoscono
+> lo Studio). `npm run verifica` pulito: prova 67/67, audit 178/178, build 15/15.
+>
+> Non provato dal vivo in Chrome in questa sessione — l'estensione non era connessa.
+> Da controllare a mano: aprire lo Studio, cliccare sul fondo (non deve chiudersi),
+> premere «Torna alla mappa» (deve chiudere lo Studio e portare alla mappa).
+

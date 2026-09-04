@@ -916,9 +916,8 @@ test("eventi tempo continua a canonicalizzare i luoghi",
 }
 
 console.log("\nPunto 15 — niente pulsanti vuoti per ID duplicati");
-test("la X dello Studio e quella della Strada non condividono più id=\"st-x\"",
+test("la X della Strada non usa più id=\"st-x\", quello resta solo allo Studio",
   crime.includes('$("str-x").onclick = () => { hubTap(); chiudiStrada(); };') &&
-  studio.includes('$("st-x").onclick = () => chiudiStudio();') &&
   index.includes('id="str-x"'));
 test("index.html non ha nessun id duplicato",
   (() => {
@@ -929,7 +928,23 @@ test("index.html non ha nessun id duplicato",
     return doppi.size === 0;
   })());
 
-for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js"]){
+console.log("\nPunto 1 — dallo Studio si esce solo con «Torna alla mappa»");
+test("lo Studio non ha più una X in testata, né uno sfondo che chiude al click",
+  !index.includes('id="st-x"') &&
+  !studio.includes('e.target.id === "studio"') &&
+  !studio.includes('$("st-x")'));
+test("lo Studio non chiude più su Escape: ricade sul menu di sistema globale, come La Sala",
+  !studio.includes('e.key === "Escape"'));
+test("chiudiStudio() resta esposta perché la chiama il bottone globale, non lo Studio stesso",
+  studio.includes("function chiudiStudio()"));
+test("il menu di sistema riconosce lo Studio come host e ci mostra «Torna alla mappa»",
+  menuSystem.includes('if(document.querySelector("#studio.on")) return "studio";'));
+test("«Torna alla mappa» chiude davvero lo Studio prima di andare all'hub",
+  menuSystem.includes('if($id("studio") && $id("studio").classList.contains("on") && typeof chiudiStudio === "function") chiudiStudio();'));
+test("la barra globale si monta nella testata dello Studio, non sotto in hub",
+  menuSystem.includes('{id:"studio",  root:"#studio.on",        head:".sthead"}'));
+
+for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }
