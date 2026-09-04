@@ -639,6 +639,58 @@ proprio: nessuno poteva sapere che erano lì. Adesso hanno il loro segno, sempre
    Catalogo, Discografia, Classifica, Contratti, Lifestyle, Traguardi e le mosse della
    settimana. Quelle non sono «info da trasferire», sono il gioco.
 
+   **CHIUSO DAVVERO (04/09/2026)** — e quella riga qui sopra era la scusa che teneva in
+   piedi mezza pagina. La richiesta era «togli la pagina», non «togli la testata della
+   pagina»: finché `#s-game` restava una `.screen`, restavano **due schermate di gioco**
+   — si usciva dalla mappa per entrare in un posto che non era un luogo, e si tornava
+   indietro con un bottone. Il riferimento questa volta è
+   `frontend/concept/pagina_di_gioco_originale.png`.
+
+   **La pagina non esiste più.** Le sette linguette e quello che c'è dentro sono diventate
+   **il quaderno** (`#quaderno`): un pannello che si apre *sopra* alla mappa, della stessa
+   famiglia dello Studio e della Sala — fondale scuro, riquadro centrale, la croce in alto
+   per tornare alla città (o `Esc`). La mappa non si spegne mai: chiudendo si è di nuovo
+   esattamente dov'eravamo. `hubGioco(tab, sotto)` apre il quaderno invece di cambiare
+   schermata, quindi **tutte le porte di prima funzionano identiche**: i luoghi, il
+   telefono, la voce «Classifiche» della landing.
+
+   **Il trucco che ha reso la cosa sicura**: si è *spostato il DOM*, non riscritto. Ogni id
+   `g-*` è rimasto quello che era, quindi `renderGioco()` e le sette schede non si sono
+   accorte di niente e non è stata toccata una riga di quello che ci disegna dentro.
+
+   **Cosa è stato trasferito, e cosa no perché sarebbe stato un doppione.** Confrontata la
+   foto voce per voce con la plancia:
+
+   | quello che c'era nella pagina | dov'è adesso |
+   |---|---|
+   | nome dell'artista, fase, contratto | già nel profilo della plancia — **non toccato** |
+   | anno, settimana, giorno x/7, ora | già nella fascia in alto (`hb-anno`, `hb-week`, `hb-ora`) — **non toccato** |
+   | «La tua scalata» e «Prossimo passo» | già nella colonna di sinistra — **non toccato** |
+   | barra dell'energia in fondo | già la prima cella della fascia, con la sua barra — **tolta** |
+   | Diario, Salta il tempo, Fine giornata | **spostati** in fondo alla mappa (`.pcomandi`) |
+   | il tasto dell'audio | **spostato** lì accanto |
+   | le sette schede | **il quaderno**, sopra alla mappa |
+
+   Così sono sparite anche le due righe di `renderGioco()` che riscrivevano nome, anno,
+   settimana, giorno, fase e contratto: sei doppioni su sei.
+
+   **I legami che si sarebbero rotti in silenzio**, tutti ricollegati: il menu di sistema e
+   il widget dell'orologio si montavano su `#gtop .tline` e adesso si montano su `.qhead`
+   (e `menu-sistema.css` non ha più le sue due regole di geometria cucite addosso alla
+   vecchia testata, ma entra nella famiglia di `.pohead`/`.nghead`); `schermoLibero()` in
+   `trasferte.js` e `screenGameplay()` in `eventi-tempo.js` guardavano se `#s-game` era
+   accesa per capire se si stava giocando, e adesso guardano la mappa — con il quaderno
+   aggiunto all'elenco delle finestre che mettono in pausa gli inviti; `hostAttivo()` in
+   `menu-sistema.js`; la ricolorazione dell'accento in `ui.js`. Il guardiano di
+   `audit-regressioni.js` che pretendeva `head:"#gtop .tline"` adesso pretende `.qhead`:
+   è lo stesso controllo, sul posto giusto.
+
+   `npm run prova` 67/67, `audit-regressioni` 151/151, `verifica:build` 15/15. In più è
+   stato passato un controllo apposta — ogni id che il JS cerca con `$("...")` contro
+   quelli che esistono davvero in `index.html` — ed è quello che ha pescato `g-name` e
+   `g-meta`, che nessun test avrebbe visto: `renderGioco()` ci scriveva dentro senza
+   guardia e sarebbe morto al primo giro, portandosi giù la schermata intera.
+
    **Trovato mentre ci si lavorava:** `ui.js` finiva con `$("g-tomenu").onclick`, e
    `#g-tomenu` non esiste più nel markup da quando la via di ritorno è diventata la mappa.
    Era l'ultima riga del file, quindi non portava giù nient'altro, ma tirava un TypeError

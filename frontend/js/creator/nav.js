@@ -15,7 +15,7 @@ function goto(screen){
   if(target){ target.style.animation = "none"; void target.offsetWidth; target.style.animation = ""; }
   /* In partita il tasto per il menu non sta quassù: il marchio a sinistra fa
      già quel mestiere, e la barra deve restare fuori dai piedi mentre giochi. */
-  $("nav-back").hidden = (screen === "menu" || screen === "game" || screen === "hub");
+  $("nav-back").hidden = (screen === "menu" || screen === "hub");
   /* L'hub ha una testata sua, con il marchio e le risorse: la barra di sopra
      sparisce, se no ce ne sono due una sull'altra. */
   document.body.classList.toggle("in-hub", screen === "hub");

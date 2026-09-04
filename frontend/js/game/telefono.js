@@ -50,7 +50,7 @@ const HUB_APP_VECCHIO = [
    vai:() => apriPosto()},
   {id:"notifiche", n:"Notifiche", ic:"rischio", k:"#FB923C",
    sotto:g => Math.max(0, g.log.length - (g.seenLog || 0)) + " nuove",
-   vai:() => { GO("game"); renderGioco(); $("g-diary").click(); }},
+   vai:() => { renderGioco(); $("g-diary").click(); }},
   {id:"obiettivi", n:"Obiettivi", ic:"mirino", k:"#EF4444",
    sotto:g => GOALS.filter(x => !g.goals[x.id]).length + " aperti",
    vai:() => hubGioco("obiettivi")},
@@ -579,7 +579,7 @@ $("hb-tel").addEventListener("click", ev => {
     if(telPC()) telApriApp(a, ev); else { hubTap(); a.vai(); }
     return;
   }
-  if(ev.target.closest("[data-diario]")){ GO("game"); renderGioco(); $("g-diary").click(); return; }
+  if(ev.target.closest("[data-diario]")){ renderGioco(); $("g-diary").click(); return; }
   if(ev.target.closest("[data-news]")){ hubTap(); hubNotizie(); return; }
   if(ev.target.closest("[data-posto]")){ hubTap(); apriPosto(); return; }
   if(ev.target.closest("#tig-pubblica")){

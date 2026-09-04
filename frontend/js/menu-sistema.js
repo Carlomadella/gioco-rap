@@ -18,7 +18,7 @@
     if(document.querySelector("#strada.on")) return "strada";
     if(document.querySelector("#posto.on")) return "posto";
     if(document.querySelector("#negozio.on")) return "negozio";
-    if(document.querySelector("#s-game.screen.on")) return "game";
+    if(document.querySelector("#quaderno.on")) return "quaderno";
     if(document.querySelector("#s-hub.screen.on")) return "hub";
     return "";
   }
@@ -496,7 +496,7 @@
     {id:"writer",  root:"#writer.on",        head:".whead"},
     /* nello Studio usiamo tutta la card testata, non la flex-line:
        così non spostiamo più avatar/nome come faceva la V6 */
-    {id:"game",    root:"#s-game.screen.on", head:"#gtop"},
+    {id:"quaderno",root:"#quaderno.on",      head:".qhead"},
     {id:"hub",     root:"#s-hub.screen.on",  head:".pbarra"}
   ];
 

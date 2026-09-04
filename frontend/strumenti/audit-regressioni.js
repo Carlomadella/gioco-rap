@@ -289,7 +289,9 @@ test("esiste un solo controller globale del tempo",
 test("controller si monta nella testata della finestra attiva",
   timeControls.includes('const HOSTS = [') &&
   timeControls.includes('head:".pbarra"') &&
-  timeControls.includes('head:"#gtop .tline"') &&
+  /* punto 7: la vecchia schermata di gioco non c'è più, al suo posto il
+     quaderno sopra alla mappa — la testata dove si monta è la sua. */
+  timeControls.includes('head:".qhead"') &&
   timeControls.includes('head:".pohead"') &&
   timeControls.includes('head:".nghead"') &&
   timeControls.includes('head:".topbar"') &&

@@ -55,7 +55,7 @@ function renderGioco(){
   /* l'accento è il colore dell'artista, a meno che nelle impostazioni non sia
      stato fissato un colore d'interfaccia: in quel caso comanda quello */
   const cc = coloreAccento(art.color);
-  $("gtop").style.setProperty("--c1", cc);
+  $("quaderno").style.setProperty("--c1", cc);
   document.documentElement.style.setProperty("--c1", cc);
   // la faccia segue il momento che stai vivendo
   window.__MOOD = G.wellbeing <= 28 ? "stanco"
@@ -66,9 +66,11 @@ function renderGioco(){
     : G.phase >= 3 ? "freddo"
     : (G.songs.some(x => x.released) ? "determinato" : null);
   window.__MOOD = null;
-  $("g-name").textContent = (art.name || "Senza Nome").trim();
-  $("g-meta").textContent = "Anno " + G.year + " · Settimana " + G.week + ", giorno " + (G.day || 1) +
-    "/7 · " + PHASES[G.phase].n + " · " + (G.contract ? G.contract.label : "indipendente");
+  /* Punto 7: qui si riscriveva la testata del quaderno — nome, anno, settimana,
+     giorno, fase e contratto. Erano sei doppioni su sei: il nome e il contratto
+     stanno nel profilo della plancia, anno e settimana-con-giorno nella fascia
+     in alto (`hb-anno`, `hb-week`), la fase accanto alla città (`hb-fase`).
+     La testata è sparita e con lei queste due righe. */
 
   /* Fase della scalata: una fascia sola, non piu' una scheda alta mezzo schermo.
      A sinistra dove sei, a destra i gradini fatti, sotto la riga che conta —
@@ -95,7 +97,6 @@ function renderGioco(){
      diventa rossa, che e' la cosa che devi sapere prima di cercare una mossa.
      Sta solo nella barra in basso: li' e' sempre sotto gli occhi e non fa
      doppione con la testata. */
-  const pipsEnergia = () => '<i style="width:' + clamp(G.energy / G.maxEnergy * 100, 0, 100) + '%"></i>';
 
   /* Punto 7: cassa, chi ti segue e hype stavano qui **e** nella fascia in alto
      della mappa. Adesso stanno solo lì: due posti per lo stesso numero sono un
@@ -446,10 +447,9 @@ function renderGioco(){
     ? G.log.map(l => '<div class="ev ' + l.c + '"><span class="w">' + l.w + '</span>' + l.t + '</div>').join("")
     : '<div class="empty2">Il diario è vuoto. Fai qualcosa.</div>';
 
-  const be = $("g-barenergia");
-  be.classList.toggle("vuota", G.energy <= 0);
-  be.innerHTML = '<span class="n"><b>' + G.energy + '</b>/' + G.maxEnergy + ' <em>energia</em></span>' +
-    '<span class="enpips">' + pipsEnergia() + '</span>';
+  /* Punto 7: la barra dell'energia del quaderno non c'è più — sarebbe stata
+     un doppione della prima cella della fascia in alto della mappa, che
+     l'energia la dice già col suo numero e la sua barra (`hb-stat`). */
 }
 
 function openDiary(){
@@ -759,7 +759,7 @@ $("g-advance").onclick = () => {
 $("g-skip").onclick = () => saltaTempo();
 /* Qui c'era `$("g-tomenu").onclick`, e `#g-tomenu` non esiste più nel markup:
    il bottone per il menu principale è uscito dalla schermata di gioco quando
-   la via di ritorno è diventata la mappa («‹ Mappa», `#g-tomappa`) e il menu
+   la via di ritorno è diventata la mappa (adesso si chiude il quaderno) e il menu
    di sistema. Restava la riga, che a ogni caricamento tirava un TypeError in
    console — l'ultima riga del file, quindi non portava giù nient'altro, ma
    era un errore rosso a ogni avvio. */

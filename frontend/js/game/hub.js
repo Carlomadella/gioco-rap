@@ -276,8 +276,20 @@ const HUB_SUGG = [
 /* ================= APERTURE ================= */
 /* Il luogo non rifà quello che sa già fare la partita: la apre sulla sezione
    giusta. Così la plancia resta la porta, e il gioco resta dov'è. */
+function apriQuaderno(){
+  $("quaderno").classList.add("on");
+  document.body.classList.add("quaderno-aperto");
+}
+function chiudiQuaderno(){
+  $("quaderno").classList.remove("on");
+  document.body.classList.remove("quaderno-aperto");
+  renderHub();
+}
+window.apriQuaderno = apriQuaderno;
+window.chiudiQuaderno = chiudiQuaderno;
+
 function hubGioco(tab, sotto){
-  GO("game");
+  apriQuaderno();
   renderGioco();
   const nb = document.querySelector('.nb[data-t="' + tab + '"]');
   if(nb) nb.click();
@@ -636,8 +648,13 @@ $("hb-eventi").addEventListener("click", ev => {
 
 $("hb-logo").onclick = () => GO("menu");
 
-/* La via di ritorno dalla partita. Prima si accende la schermata, poi si
-   disegna: al contrario le misure sarebbero zero e resterebbe tutto nero. */
-$("g-tomappa").onclick = () => { GO("hub"); renderHub(); };
+/* La via di ritorno dal quaderno è chiuderlo: la mappa è sempre rimasta lì
+   sotto, viva, quindi non c'è nessuna schermata da riaccendere — si ridisegna
+   e basta, perché nel frattempo può essere cambiato tutto (soldi, energia,
+   giorno). Si chiude anche con Esc, come gli altri pannelli. */
+$("q-x").onclick = () => chiudiQuaderno();
+document.addEventListener("keydown", e => {
+  if(e.key === "Escape" && $("quaderno").classList.contains("on")) chiudiQuaderno();
+});
 
 window.HUB = { apri(){ GO("hub"); renderHub(); }, render: renderHub };

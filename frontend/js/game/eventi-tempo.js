@@ -290,8 +290,10 @@
   }
 
   function screenGameplay(){
-    const a = document.getElementById("s-hub"), b = document.getElementById("s-game");
-    return !!((a && a.classList.contains("on")) || (b && b.classList.contains("on")));
+    /* Punto 7: la schermata di gioco è una sola, la mappa. Il quaderno le sta
+       sopra ma non la spegne, quindi basta guardare lei. */
+    const a = document.getElementById("s-hub");
+    return !!(a && a.classList.contains("on"));
   }
 
   function queuePending(){

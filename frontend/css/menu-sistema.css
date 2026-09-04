@@ -71,7 +71,7 @@ body.adf-system-open{overflow:hidden}
 
 /* I vecchi ritorni restano nel DOM per compatibilità con i moduli legacy, ma
    la navigazione visibile è una sola e non cambia posto tra le schermate. */
-#g-tomappa,#st-mappa,#mapReturn{display:none!important}
+#st-mappa,#mapReturn{display:none!important}
 .adf-context-btn{display:none!important}
 .adf-system-logo{cursor:pointer;outline:none}
 .adf-system-logo:focus-visible{box-shadow:0 0 0 2px rgba(215,176,106,.55);border-radius:10px}
@@ -483,38 +483,28 @@ body.adf-system-open{overflow:hidden}
 /* ============================================================
    STUDIO / schermata gioco
    Qui NON entriamo più nella .tline flex.
-   Il blocco vive dentro la card #gtop, sulle stesse coordinate del padding
-   (18px,14px), alto quanto il ritratto (62px).
-   Riserviamo lo spazio soltanto nella prima riga, non nell'intera pagina.
    ============================================================ */
-#s-game.screen.on #gtop.adf-system-host-v7 > .adf-global-nav{
-  left:18px!important;
-  top:14px!important;
-  height:62px!important;
-}
-#s-game.screen.on #gtop.adf-system-host-v7 > .tline{
-  padding-left:256px!important;
-  min-height:62px!important;
-}
-
 /* ============================================================
    SALA / GUARDAROBA
    Header piccoli dentro wrapper: il blocco è incassato a sinistra;
    titolo del luogo parte subito dopo.
    ============================================================ */
 #posto.on .pohead.adf-system-host-v7,
-#negozio.on .nghead.adf-system-host-v7{
+#negozio.on .nghead.adf-system-host-v7,
+#quaderno.on .qhead.adf-system-host-v7{
   min-height:58px!important;
   align-items:center!important;
 }
 #posto.on .pohead.adf-system-host-v7 > .adf-global-nav,
-#negozio.on .nghead.adf-system-host-v7 > .adf-global-nav{
+#negozio.on .nghead.adf-system-host-v7 > .adf-global-nav,
+#quaderno.on .qhead.adf-system-host-v7 > .adf-global-nav{
   left:0!important;
   top:0!important;
   height:58px!important;
 }
 #posto.on .pohead.adf-system-host-v7 > .pok,
-#negozio.on .nghead.adf-system-host-v7 > .ngk{
+#negozio.on .nghead.adf-system-host-v7 > .ngk,
+#quaderno.on .qhead.adf-system-host-v7 > .qk{
   margin-left:256px!important;
 }
 
@@ -550,16 +540,9 @@ body.adf-system-open{overflow:hidden}
     padding:0 8px!important;
   }
 
-  #s-game.screen.on #gtop.adf-system-host-v7 > .tline{
-    padding-left:0!important;
-    padding-top:58px!important;
-  }
-  #s-game.screen.on #gtop.adf-system-host-v7 > .adf-global-nav{
-    height:50px!important;
-  }
-
   #posto.on .pohead.adf-system-host-v7 > .pok,
-  #negozio.on .nghead.adf-system-host-v7 > .ngk{
+  #negozio.on .nghead.adf-system-host-v7 > .ngk,
+  #quaderno.on .qhead.adf-system-host-v7 > .qk{
     margin-left:210px!important;
   }
 }
