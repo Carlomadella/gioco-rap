@@ -854,6 +854,14 @@ leggi di quella persona. Riscritta senza.
 > visibile, acceso (non più grigio in Piazza/Writer) e il click ha davvero chiuso la stanza
 > e riportato alla mappa, senza errori in console.
 >
+> **Nel mezzo, un collega ha tolto il Quaderno** («via il quaderno»: ogni scheda torna nel
+> posto della mappa che già esisteva — Shop, Spese fisse, eccetera — riusando lo stesso
+> contenuto da un magazzino nascosto invece di riscriverlo). L'id e la funzione sono
+> diventati `#pannello`/`chiudiPannello()`. Il merge non poteva saperlo: la mia riga in
+> `tornaMappa()` è rimasta com'era, puntando a un nome che non esisteva più — stesso bug,
+> tornato sotto un altro nome. Aggiornata al rename, riverificato dal vivo che il Pannello
+> (aperto con `apriPannello(...)`) si chiuda correttamente da MAPPA.
+>
 > Sette controlli nuovi in `strumenti/audit-regressioni.js`, incluso uno strutturale che
 > confronta l'insieme delle stanze di `hostAttivo()` con quello di `HOSTS` (devono coincidere
 > sempre) e uno che verifica che ogni stanza riconosciuta abbia davvero un modo di chiudersi
