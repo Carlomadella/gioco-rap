@@ -29,6 +29,11 @@ const START = () => ({
     attivita:{}, precedenti:0, arresto:null, giroAvviato:false},
   /* punto 66: chi scrive in chat — mamma e il migliore amico da subito */
   chat:{},
+  /* Le palline rosse del telefono: qui sta quello che hai gia' guardato, se no
+     restano accese per sempre e smettono di voler dire «c'e' roba nuova».
+     Notizie: la settimana in cui le hai aperte. Obiettivi: com'erano l'ultima
+     volta che li hai guardati (vedi telefono.js). */
+  telVisto:{notizie:0, obiettivi:[]},
   /* Da smistare, punto 2: le ultime combinazioni viste degli incontri coi fan,
      per non ripescare la stessa scena a breve (strada.js) */
   strFanHist:{bello:[], male:[]}

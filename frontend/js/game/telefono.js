@@ -41,7 +41,7 @@ function telMessaggiNonLetti(){
 let TEL_APP = null;        /* id dell'app aperta, null = sei alla home */
 /* Aprire un'app dal suo widget. Prima i «vai» portavano fuori dal telefono,
    nel quaderno: adesso il telefono ce l'ha in casa e non si esce più. */
-function telVaiApp(id){ TEL_APP = id; if(typeof hubTap === "function") hubTap(); renderTelefono(); }
+function telVaiApp(id){ TEL_APP = id; telSegnaVisto(id); if(typeof hubTap === "function") hubTap(); renderTelefono(); }
 window.telVaiApp = telVaiApp;
 let TEL_ORIGIN = null;     /* da dove parte l'animazione di apertura */
 let TEL_INVTAB = "bars";   /* linguetta aperta dentro Inventario */
@@ -83,10 +83,45 @@ const HUB_APP_VECCHIO = [
    vai:() => { if(window.IMPOSTAZIONI) window.IMPOSTAZIONI(); }}
 ];
 
+/* ================= QUELLO CHE HAI GIA' GUARDATO ================= */
+/* Una pallina rossa che non si spegne mai smette di essere una notizia e
+   diventa un pezzo dell'icona: la guardi due volte e poi non la vedi piu'.
+   Notizie e Obiettivi erano cosi' — quattro notizie sempre le stesse e gli
+   obiettivi ancora aperti, numeri che non calavano mai. Adesso si toccano e
+   si spengono, e tornano quando c'e' davvero qualcosa da vedere. Cosa hai
+   gia' visto sta in G.telVisto, quindi resta anche riaprendo la partita. */
+function telVisto(){
+  if(!G.telVisto || typeof G.telVisto !== "object") G.telVisto = {notizie:0, obiettivi:[]};
+  if(!Array.isArray(G.telVisto.obiettivi)) G.telVisto.obiettivi = [];
+  return G.telVisto;
+}
+/* Le notizie sono della settimana: le leggi e la pallina sparisce fino alla
+   settimana dopo, quando il giornale e' di nuovo nuovo. */
+function telNotizieNuove(){
+  return telVisto().notizie === G.week ? 0 : HUB_NOTIZIE.length;
+}
+/* Un obiettivo «nuovo» e' uno cambiato da quando l'hai guardato: all'inizio
+   sono tutti quelli aperti, dopo sono quelli che nel frattempo hai fatto —
+   che e' l'unica cosa che valga la pena farti sapere senza aprire l'app. */
+const telGolStato = g2 => g2.id + (G.goals[g2.id] ? "!" : "");
+function telObiettiviNuovi(){
+  const visti = telVisto().obiettivi;
+  return GOALS.filter(g2 => visti.indexOf(telGolStato(g2)) < 0).length;
+}
+/* Aprire l'app **e'** averla letta: si segna qui, una volta sola, per tutti i
+   modi in cui ci si arriva (icona, widget, telefono compatto). */
+function telSegnaVisto(id){
+  if(id === "notizie") telVisto().notizie = G.week;
+  else if(id === "obiettivi") telVisto().obiettivi = GOALS.map(telGolStato);
+  else return;
+  if(typeof save === "function") save();
+}
+
 /* ================= LE APP — NUOVO (home dell'iPhone) ================= */
 /* Badge = un numero rosso sull'icona, solo dove ha senso «novità»: messaggi
-   non letti, obiettivi ancora aperti, notizie della settimana. Il resto
-   dell'app si vede aprendola, non prima. */
+   non letti, obiettivi cambiati da quando li hai guardati, le notizie di
+   questa settimana se non le hai ancora aperte. Il resto dell'app si vede
+   aprendola, non prima — e quello che hai gia' aperto non ha piu' pallina. */
 const HUB_APP = [
   {id:"messaggi", n:"Messaggi", ic:"chat", k:"#7C3AED",
    badge:() => telMessaggiNonLetti()},
@@ -94,9 +129,9 @@ const HUB_APP = [
   /* punto 66: mamma e il migliore amico scrivono da subito, il resto arriva con la fama */
   {id:"chat", n:"Chat", ic:"duebolle", k:"#25D366", badge:() => chatNonLetti()},
   {id:"lafamegram", n:"LaFamegram", ic:"camera", k:"#D62976"},
-  {id:"notizie", n:"Notizie", ic:"giornale", k:"#60A5FA", badge:() => HUB_NOTIZIE.length},
+  {id:"notizie", n:"Notizie", ic:"giornale", k:"#60A5FA", badge:() => telNotizieNuove()},
   {id:"obiettivi", n:"Obiettivi", ic:"mirino", k:"#EF4444",
-   badge:g => GOALS.filter(x => !g.goals[x.id]).length},
+   badge:() => telObiettiviNuovi()},
   {id:"inventario", n:"Inventario", ic:"zaino", k:"#F59E0B"},
   {id:"statistiche", n:"Statistiche", ic:"barre", k:"#4ADE80"},
   {id:"discografia", n:"Discografia", ic:"nota", k:"#C084FC"},
@@ -619,6 +654,7 @@ $("hb-tel").addEventListener("click", ev => {
   const telApp = ev.target.closest("[data-telapp]");
   if(telApp){
     TEL_APP = telApp.dataset.telapp;
+    telSegnaVisto(TEL_APP);
     TEL_ORIGIN = null;
     hubTap();
     renderTelefono();
@@ -628,11 +664,12 @@ $("hb-tel").addEventListener("click", ev => {
   if(app){
     const a = (telPC() ? HUB_APP : HUB_APP_VECCHIO).find(x => x.id === app.dataset.app);
     if(!a) return;
+    telSegnaVisto(a.id);
     if(telPC()) telApriApp(a, ev); else { hubTap(); a.vai(); }
     return;
   }
   if(ev.target.closest("[data-diario]")){ renderGioco(); openDiary(); return; }
-  if(ev.target.closest("[data-news]")){ hubTap(); hubNotizie(); return; }
+  if(ev.target.closest("[data-news]")){ telSegnaVisto("notizie"); hubTap(); hubNotizie(); return; }
   if(ev.target.closest("[data-posto]")){ hubTap(); apriPosto(); return; }
   if(ev.target.closest("#tig-pubblica")){
     const ta = $("tig-testo");
