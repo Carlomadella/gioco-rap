@@ -667,12 +667,28 @@ proprio: nessuno poteva sapere che erano lì. Adesso hanno il loro segno, sempre
    | anno, settimana, giorno x/7, ora | già nella fascia in alto (`hb-anno`, `hb-week`, `hb-ora`) — **non toccato** |
    | «La tua scalata» e «Prossimo passo» | già nella colonna di sinistra — **non toccato** |
    | barra dell'energia in fondo | già la prima cella della fascia, con la sua barra — **tolta** |
-   | Diario, Salta il tempo, Fine giornata | **spostati** in fondo alla mappa (`.pcomandi`) |
-   | il tasto dell'audio | **spostato** lì accanto |
+   | Diario | l'app **Notifiche** del telefono — **tolto** |
+   | Salta il tempo | «**Attendi**» del widget del tempo, nella fascia — **tolto** |
+   | Fine giornata | «**+1 giorno**» dello stesso widget — **tolto** |
+   | il tasto ♪ | l'interruttore **Audio** delle impostazioni — **tolto** |
    | le sette schede | **il quaderno**, sopra alla mappa |
 
    Così sono sparite anche le due righe di `renderGioco()` che riscrivevano nome, anno,
    settimana, giorno, fase e contratto: sei doppioni su sei.
+
+   **I quattro bottoni in fondo sono durati mezz'ora.** Al primo giro erano stati spostati
+   in fondo alla mappa, ed era sbagliato: erano doppioni anche loro. Controllato uno per
+   uno prima di toglierli, perché se una di quelle funzioni non avesse avuto un'altra
+   porta la partita restava bloccata:
+   - il **diario** si apre dall'app Notifiche del telefono (`vai:` di `telefono.js`);
+   - «**Attendi**» e «**+1 giorno**» sono nel widget del tempo, che si monta sulla fascia
+     della mappa ed è quindi sempre a portata. E «+1 giorno» non è un pari, è **meglio**:
+     passa da `ADF_TIME_SKIP` (Eventi V2), che al settimo giorno tira fuori lo stesso
+     `weekReport()` + `openWeek()` del vecchio bottone e in più sa fermarsi quando salta
+     fuori un evento ALTO. Il motore è sempre stato uno solo, `avanzaGiorno()` in `sim.js`;
+   - il tasto ♪ era **letteralmente** la stessa manopola di `SET.audio.on` — c'era già
+     scritto in un commento di `fx.js`: «il tasto ♪ e l'interruttore nelle impostazioni
+     sono la stessa cosa».
 
    **I legami che si sarebbero rotti in silenzio**, tutti ricollegati: il menu di sistema e
    il widget dell'orologio si montavano su `#gtop .tline` e adesso si montano su `.qhead`

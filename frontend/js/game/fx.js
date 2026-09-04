@@ -334,11 +334,11 @@ function aggiornaTastoAudio(){
   b.style.opacity = muted ? ".5" : "1";
   b.title = muted ? "Audio spento" : "Audio acceso";
 }
-$("g-mute").onclick = () => {
-  SET.audio.on = !SET.audio.on;
-  setSalva(); applicaImpostazioni();
-  if(!muted) SFX.tap();
-};
+/* Il tasto ♪ non c'è più nel markup (punto 7): era la stessa manopola
+   dell'interruttore Audio delle impostazioni — lo diceva già il commento qui
+   sopra. `aggiornaTastoAudio()` resta, con la sua guardia, perché le
+   impostazioni la chiamano a ogni cambio: se un giorno il tasto torna, torna a
+   funzionare da solo. */
 aggiornaTastoAudio();
 
 window.__ADFCELEB = n => { flash("TRAGUARDO", n, true); };

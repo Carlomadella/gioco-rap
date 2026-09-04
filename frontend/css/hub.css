@@ -1015,42 +1015,9 @@ body.in-hub .topnav {
 /* Tutto il telefono — guscio, home, app, dock, widget — vive in css/telefono.css. */
 
 /* ================= RIGA DI FONDO ================= */
-/* Punto 7: la riga di fondo adesso tiene due cose — il suggerimento a
-   sinistra e i tre comandi della giornata a destra, quelli che prima stavano
-   nella barra fissa della vecchia schermata di gioco. */
-.pfondo {
+.psugg {
   grid-area: sugg;
   margin: 0 -8px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-  padding: 0 10px;
-}
-.pcomandi {
-  flex: none;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.pcomandi .ghost,
-.pcomandi .solid {
-  padding: 7px 14px;
-  font-size: 12.5px;
-  border-radius: 999px;
-  white-space: nowrap;
-}
-.pcomandi .mutebtn {
-  width: 30px;
-  height: 30px;
-  flex: none;
-}
-.psugg {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;

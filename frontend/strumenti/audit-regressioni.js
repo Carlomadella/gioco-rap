@@ -103,7 +103,9 @@ test("telefono compatto può aprire la stessa schermata Messaggi del PC",
 test("G.log mobile è esplicitamente Notifiche",
   tel.includes('{id:"notifiche", n:"Notifiche"') &&
   tel.includes('g.log.length - (g.seenLog || 0)') &&
-  tel.includes('$("g-diary").click()'));
+  /* punto 7: il bottone «Diario» non c'è più, il telefono chiama la funzione
+     invece di simulare un click su un elemento che non esiste. */
+  tel.includes('openDiary()'));
 test("Vedi tutti i messaggi non apre più il Diario",
   mobilePhone.includes('data-telapp="messaggi"') &&
   !mobilePhone.includes('data-diario="1">Vedi tutti i messaggi'));

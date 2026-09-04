@@ -22,7 +22,7 @@
 <link rel="stylesheet" href="css/landing.css?v=12">
 <link rel="stylesheet" href="css/avvio.css?v=2">
 <link rel="stylesheet" href="css/game.css?v=14">
-<link rel="stylesheet" href="css/overlays.css?v=12">
+<link rel="stylesheet" href="css/overlays.css?v=13">
 <link rel="stylesheet" href="css/effects.css?v=13">
 <link rel="stylesheet" href="css/hud.css?v=12">
 <link rel="stylesheet" href="css/forms.css?v=12">
@@ -33,7 +33,7 @@
 <link rel="stylesheet" href="css/negozio.css?v=12">
 <link rel="stylesheet" href="css/strada-crimine.css?v=13">
 <link rel="stylesheet" href="css/strada-crimine-v2.css?v=1">
-<link rel="stylesheet" href="css/hub.css?v=15">
+<link rel="stylesheet" href="css/hub.css?v=16">
 <link rel="stylesheet" href="css/telefono.css?v=12">
 <link rel="stylesheet" href="css/trasferte.css?v=1">
 <link rel="stylesheet" href="css/impostazioni.css?v=12">
@@ -265,18 +265,15 @@
       </aside>
 
       <!-- ---------- la riga di fondo ---------- -->
-      <!-- Punto 7: il suggerimento, e i tre comandi che prima stavano solo in
-           fondo alla vecchia schermata di gioco. L'energia non è stata portata
-           qui: è già la prima cella della fascia in alto, con la sua barra. -->
-      <div class="pfondo">
-        <div class="psugg" id="hb-sugg"></div>
-        <div class="pcomandi">
-          <button class="mutebtn" id="g-mute" aria-label="Audio">&#9834;</button>
-          <button class="ghost" id="g-diary">Diario<i class="dbdg" id="g-dbdg" hidden></i></button>
-          <button class="ghost" id="g-skip">Salta il tempo</button>
-          <button class="solid" id="g-advance">Fine giornata</button>
-        </div>
-      </div>
+      <!-- Punto 7: qui per un momento erano finiti i quattro bottoni della
+           vecchia schermata di gioco. Sono durati poco, ed è giusto così: le
+           loro funzioni erano già tutte nel gioco, con la stessa resa. Diario
+           → l'app del telefono; Salta il tempo → «Attendi» del widget del
+           tempo, che sta nella fascia qui sopra; Fine giornata → «+1 giorno»
+           dello stesso widget, che passa da Eventi V2 e quindi fa anche il
+           rapporto di fine settimana; il tasto ♪ → l'interruttore Audio delle
+           impostazioni, che è letteralmente la stessa manopola. -->
+      <div class="psugg" id="hb-sugg"></div>
     </div>
   </div>
 </section>
@@ -683,9 +680,9 @@
 <script src="js/game/modal.js?v=12"></script>
 <script src="js/game/scene-art.js?v=13"></script>
 <script src="js/game/beatplay.js?v=12"></script>
-<script src="js/game/ui.js?v=16"></script>
+<script src="js/game/ui.js?v=17"></script>
 <script src="js/game/lifestyle.js?v=12"></script>
-<script src="js/game/fx.js?v=13"></script>
+<script src="js/game/fx.js?v=14"></script>
 <script src="js/game/skip.js?v=13"></script>
 <script src="js/game/posto.js?v=13"></script>
 <script src="js/game/studio.js?v=1"></script>
@@ -695,7 +692,7 @@
 <script src="js/game/uscita.js?v=12"></script>
 <script src="js/game/hub.js?v=15"></script>
 <script src="js/game/chat.js?v=13"></script>
-<script src="js/game/telefono.js?v=13"></script>
+<script src="js/game/telefono.js?v=14"></script>
 
 <!-- Integrazione tempo/eventi/crime 2026-09-02 — ordine intenzionale -->
 <script src="js/game/tempo.js?v=10"></script>
@@ -705,7 +702,7 @@
 <!-- Eventi V2 prima di eventi-tempo: proprietario di skip e Notifiche. -->
 <script src="js/game/eventi-v2.js?v=1216"></script>
 <!-- Eventi a minuti: azioni/spostamenti; nessuna seconda app Notifiche. -->
-<script src="js/game/eventi-tempo.js?v=10"></script>
+<script src="js/game/eventi-tempo.js?v=11"></script>
 <script src="js/game/trasferte.js?v=2"></script>
 <script src="js/game/crime-backgrounds.js?v=1"></script>
 <script src="js/game/jail-backgrounds.js?v=1"></script>

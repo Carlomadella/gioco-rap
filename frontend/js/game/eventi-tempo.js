@@ -634,7 +634,7 @@
     if(!pending()) return;
     const inside=ev.target&&ev.target.closest ? ev.target.closest("#modal") : null;
     if(inside) return;
-    const block=ev.target&&ev.target.closest ? ev.target.closest(".tile[data-id],.pspot[data-l],#g-advance,#g-skip") : null;
+    const block=ev.target&&ev.target.closest ? ev.target.closest(".tile[data-id],.pspot[data-l]") : null;
     if(!block) return;
     ev.preventDefault(); ev.stopImmediatePropagation();
     queuePending();

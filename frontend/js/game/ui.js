@@ -440,6 +440,8 @@ function renderGioco(){
   });
 
   // diario (a tendina)
+  /* Il bollino sta sul bottone «Diario», che non c'è più: la guardia qui sotto
+     è quello che regge, e il conto dei non letti resta buono per chi lo vuole. */
   const nuovi = Math.max(0, G.log.length - (G.seenLog || 0));
   const bdg = $("g-dbdg");
   if(bdg){ bdg.hidden = nuovi <= 0 || $("drawer").classList.contains("on"); bdg.textContent = nuovi > 99 ? "99" : nuovi; }
@@ -457,7 +459,6 @@ function openDiary(){
   G.seenLog = G.log.length; save(); renderGioco();
 }
 function closeDiary(){ $("drawer").classList.remove("on"); }
-$("g-diary").onclick = () => openDiary();
 $("d-close").onclick = () => closeDiary();
 $("drawer").addEventListener("click", e => { if(e.target.id === "drawer") closeDiary(); });
 document.addEventListener("keydown", e => { if(e.key === "Escape") closeDiary(); });
@@ -749,14 +750,14 @@ function openWeek(){
    (weekReport) esce solo il settimo giorno, quando avanzaGiorno() fa
    scattare davvero il battito economico — gli altri sei è solo notte
    che passa, niente da raccontare con una finestra sopra. */
-$("g-advance").onclick = () => {
-  if(!weekOpen) openWeek();
-  const before = weekOpen, costs = weeklyCosts();
-  const chiusa = avanzaGiorno();
-  if(chiusa){ weekReport(before, costs); openWeek(); }
-  else{ SFX.giorno(); save(); renderGioco(); }
-};
-$("g-skip").onclick = () => saltaTempo();
+/* Punto 7: qui c'erano `#g-advance` e `#g-skip`, i due bottoni in fondo alla
+   vecchia schermata. Non ci sono più perché erano un doppione del widget del
+   tempo, che sta nella fascia della mappa ed è sempre a portata: «Attendi» fa
+   il salto e «+1 giorno» il cambio giorno. E lo fa **meglio**, non solo
+   uguale: passa da `ADF_TIME_SKIP` (Eventi V2), che al settimo giorno tira
+   fuori lo stesso `weekReport()` + `openWeek()` che faceva questo bottone, e
+   in più sa fermarsi quando salta fuori un evento ALTO. Il motore, comunque,
+   è sempre stato uno solo: `avanzaGiorno()` in `sim.js`. */
 /* Qui c'era `$("g-tomenu").onclick`, e `#g-tomenu` non esiste più nel markup:
    il bottone per il menu principale è uscito dalla schermata di gioco quando
    la via di ritorno è diventata la mappa (adesso si chiude il quaderno) e il menu
