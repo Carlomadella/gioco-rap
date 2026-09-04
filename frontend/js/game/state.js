@@ -22,7 +22,7 @@ const START = () => ({
   phase:0, trialCd:0, trialsDone:{}, evCd:{}, seenLog:0,
   rivals:[], gente:[], chartPrev:99, streamsPrev:0, lafamegramMiei:[], lafamegramEventi:[],
   best:{fans:0, chart:99}, ended:false,
-  /* Anti-spam Promo: memoria della quota percentuale gi? consumata nella settimana. */
+  /* Anti-spam Promo: memoria della quota percentuale gia' consumata nella settimana. */
   promoSaturation:{key:"", baseFans:0, pctUsed:0},
   /* punto 21: la Strada. Ricostruita da claude/carriera-criminale.md */
   strada:{rep:0, heat:0, sporchi:0, uomini:0, prot:0, ferro:false, avvocato:false,

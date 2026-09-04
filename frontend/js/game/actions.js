@@ -39,7 +39,7 @@ function adfSegnaOggi(id){
 
 /* Punto 2 - Promo.
    La prima promo del giorno rende pieno, poi il pubblico si satura.
-   La componente percentuale non pu? inoltre crescere all'infinito
+   La componente percentuale non puo' inoltre crescere all'infinito
    ricomponendosi sui follower appena guadagnati. */
 const ADF_PROMO_DAILY_MULT = Object.freeze([1, 0.5, 0.2]);
 const ADF_PROMO_DAILY_FLOOR = 0.1;
@@ -278,7 +278,7 @@ const ACTIONS = [
    give:() => {
      const mult = promoDailyMult();
      return "+" + Math.round((6 + G.skills.rete*0.12) * RITMO * mult) +
-       " hype ? follower" + (mult < 1 ? " ? resa ridotta" : "");
+       " hype \u00b7 follower" + (mult < 1 ? " \u00b7 resa ridotta" : "");
    },
    run(){
      const mult = promoDailyMult();
@@ -301,10 +301,10 @@ const ACTIONS = [
      adfSegnaOggi("promo");
 
      const satToday = mult < 1
-       ? " Reach ridotta: oggi hai gi? spinto parecchio."
+       ? " Reach ridotta: oggi hai gi\u00e0 spinto parecchio."
        : "";
      const satWeek = pctCap > 0 && p.pctUsed >= pctCap - 1e-9
-       ? " La crescita percentuale della settimana ? satura."
+       ? " La crescita percentuale della settimana \u00e8 satura."
        : "";
 
      return "Hype +" + Math.round(h) + ", " + f +
