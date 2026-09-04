@@ -40,9 +40,6 @@
      centrata su quello che si vede. */
   .pspot::after{content:"";position:absolute;left:0;right:0;top:50%;
     transform:translateY(-50%);height:44px}
-  /* le due frecce che scorrono la città: 18×13, praticamente non si prendono */
-  .pfrec::after{content:"";position:absolute;left:50%;top:50%;
-    transform:translate(-50%,-50%);width:44px;height:44px}
 
   /* ---- il negozio dei vestiti ---- */
   .ngbtn{min-height:44px}

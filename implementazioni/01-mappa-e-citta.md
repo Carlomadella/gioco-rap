@@ -777,3 +777,55 @@ metà riga) e il nome può andare a capo.
 `npm run prova` 67/67, `audit-regressioni` 178/178, `verifica:build` 15/15. Provato in
 Chrome: Shop, Casa, le tre app del telefono, il Live Club che fa scegliere, la promo
 nello Studio, console pulita.
+
+---
+
+## 2 · Le card sulla mappa, tutte come lo Studio
+
+2. Le card sulla mappa come studio, fabbrica, pizzeria, la sala ecc hanno una card
+   cliccabile troppo grande, LE VOGLIO TUTTE COME STUDIO. Inoltre noto che l'ultima
+   cosa dove entri resta una sorte di pallino gialla come se t'indicasse l'ultima
+   cosa schiacciata. Non la voglio.
+
+> **Fatto (04/09/2026), provato dal vivo in Chrome.** Due cose distinte.
+>
+> **Le zone cliccabili.** Prima ognuna aveva la sua misura — lo Studio 10,5×12,5%
+> della foto, la Fabbrica 20×22%, quasi il quadruplo — e si vedeva: alcuni cartelli
+> coprivano un pezzo di città, altri un francobollo. Portati tutti e dieci a
+> 10,50×12,50, la misura dello Studio. Le coordinate non sono solo il vecchio angolo
+> con la nuova misura incollata sopra — sono ricalcolate per tenere il quadrato
+> **centrato dov'era prima**, altrimenti si sarebbe staccato dall'edificio nella
+> foto. Controllato uno per uno in Chrome (Studio, Casa, Attività criminali,
+> Fabbrica, Pizzeria — quella col murale della pizza — Palestra): ogni cartello
+> resta sopra al suo edificio.
+>
+> **Il pallino giallo che restava acceso.** Non era il giro guidato (quello è
+> viola, ed è sparito col punto 3 qui sotto) — era il **focus da tastiera**. Un
+> click su un cartello lo lascia come "elemento a fuoco" della pagina; quando torni
+> alla mappa da dentro lo Studio (o un altro luogo), quello stesso bottone è ancora
+> a fuoco, e CSS lo illumina con l'anello e il pallino in `--acid` (giallo/ambra) —
+> come se dicesse "sei entrato qui l'ultima volta". Tolto con un `b.blur()` subito
+> dopo il click, prima di aprire il luogo: chi naviga col Tab continua a vedere
+> dove si trova (l'accessibilità non è toccata), ma cliccare un cartello e tornare
+> indietro non lo lascia più "acceso".
+>
+> Due controlli nuovi in `audit-regressioni.js`. `npm run verifica` pulito.
+
+---
+
+## 3 · Via i tastini che muovono la mappa
+
+3. Ci sono dei tastini sul fondo della mappa che fan muovere la mappa. Levali. La
+   mappa non voglio si veda.
+
+> **Fatto (04/09/2026), provato dal vivo in Chrome.** Erano le due frecce «scorri
+> per esplorare» in fondo alla mappa (`.pfrec`): un giro guidato dei luoghi, uno
+> alla volta, che scorreva la mappa e accendeva un cartello alla volta (viola,
+> pulsante — cosa diversa dal pallino giallo del punto 2 qui sopra). Tolte le
+> frecce, il codice che le faceva funzionare (`HUB_QUI`, la classe `.qui`) e ogni
+> riferimento rimasto nei fogli di stile (`css/hub.css`, `css/tocco.css`,
+> `js/game/orari.js`, che ci si appoggiava per un effetto di hover). La mappa non
+> si sposta più da sola: resta ferma dove la vedi.
+>
+> Due controlli nuovi in `audit-regressioni.js`. `npm run verifica` pulito: prova
+> 67/67, audit 199/199, build 15/15.
