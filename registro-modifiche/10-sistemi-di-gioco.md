@@ -6,6 +6,27 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:60b46fe -->
+## 04/09/26, 12:12 â€” task/studio-prova â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `60b46fe`
+
+### Cosa Ã¨ entrato
+
+- `05d39fc` â€” fix: il logo non finisce piu' sopra a "Lo Studio" â€” **Carlomadella**
+- `ccaf2a1` â€” fix: lo Studio non manda piu' al Catalogo, e la promo non finge â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/studio.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- commit:d7455b1 -->
 ## 03/09/26, 21:10 — fix: nuove carriere partono da zero
 

@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:60b46fe -->
+## 04/09/26, 12:12 â€” task/studio-prova â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `60b46fe`
+
+### Cosa Ã¨ entrato
+
+- `05d39fc` â€” fix: il logo non finisce piu' sopra a "Lo Studio" â€” **Carlomadella**
+- `ccaf2a1` â€” fix: lo Studio non manda piu' al Catalogo, e la promo non finge â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/menu-sistema.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:d80b80a -->
 ## 04/09/26, 11:23 â€” task/via-il-quaderno â†’ main
 
