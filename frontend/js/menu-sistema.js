@@ -347,7 +347,7 @@
     try{ if($id("piazza") && $id("piazza").classList.contains("on") && typeof uscitaPiazza === "function") uscitaPiazza(); }catch(_){}
     try{ if($id("writer") && $id("writer").classList.contains("on") && typeof uscitaFoglio === "function") uscitaFoglio(); }catch(_){}
     try{ if($id("studio") && $id("studio").classList.contains("on") && typeof chiudiStudio === "function") chiudiStudio(); }catch(_){}
-    try{ if($id("quaderno") && $id("quaderno").classList.contains("on") && typeof chiudiQuaderno === "function") chiudiQuaderno(); }catch(_){}
+    try{ if($id("pannello") && $id("pannello").classList.contains("on") && typeof chiudiPannello === "function") chiudiPannello(); }catch(_){}
     try{ if($id("strada") && $id("strada").classList.contains("on") && typeof chiudiStrada === "function") chiudiStrada(); }catch(_){}
 
     try{

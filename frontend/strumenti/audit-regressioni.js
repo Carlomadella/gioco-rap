@@ -964,9 +964,9 @@ test("«Torna alla mappa» annulla un freestyle o una strofa a metà invece di l
 test("uscitaFoglio() esiste ed è la stessa sequenza di annulla+chiudi+renderGioco della X del foglio",
   writer.includes("function uscitaFoglio()") &&
   writer.includes("if(WR) annullaAzione(); chiudiFoglio(); renderGioco();"));
-test("il Quaderno (ex vecchia schermata di gioco) è riconosciuto come host ma «Torna alla mappa» non lo chiudeva: ora sì",
-  menuSystem.includes('if(document.querySelector("#quaderno.on")) return "quaderno";') &&
-  menuSystem.includes('typeof chiudiQuaderno === "function") chiudiQuaderno();'));
+test("il Pannello (ex Quaderno) è riconosciuto come host ma «Torna alla mappa» non lo chiudeva: ora sì",
+  menuSystem.includes('if(document.querySelector("#pannello.on")) return "pannello";') &&
+  menuSystem.includes('typeof chiudiPannello === "function") chiudiPannello();'));
 test("il vero bug: in Piazza e Writer il bottone si vedeva ma restava disabled per sempre — mappaBloccata() riusava la lista dell'ESC, che li considera giustamente \"interni\" a prescindere",
   menuSystem.includes("function dialogoFlottante(){") &&
   !/dialogoFlottante\(\)\{[^}]*piazza/s.test(menuSystem) &&
