@@ -879,13 +879,17 @@ console.log("\nlo Studio: la gente della Sala conta");
     controlla("chi lascia il giro non lavora più in studio",
       dentro("studioFonico()") === null && dentro("mixGain()") === mixSolo);
 
-    /* Prima del punto 12 il cartello «Studio» sulla mappa portava dritto
-       all'elenco delle mosse della settimana, ed era da lì che ci si passava:
-       sostituirlo con le quattro stanze senza lasciare quella porta avrebbe
-       tolto di mezzo scrivere le barre, la promo, il palco e i turni. */
-    dentro("STUDIO_SEZ = 'beat'; renderStudio();");
-    controlla("la porta verso il resto della settimana non si è chiusa",
-      nodi["st-corpo"].innerHTML.indexOf('data-mosse') >= 0);
+    /* Qui c'era il guardiano della porta «Tutte le mosse della settimana →»:
+       serviva perché senza quella porta restavano orfane scrivere le barre, la
+       promo, il palco e i turni. Adesso l'elenco non esiste più e ognuna ha un
+       posto suo — le barre nella cabina (il controllo qui sotto), il palco al
+       Live Club, i turni in Pizzeria/Fabbrica/Centro per l'impiego — e la
+       promo è entrata nello Studio, in «Fuori». Il guardiano resta, sulla
+       cosa che adesso può davvero rompersi in silenzio: che la promo sia lì. */
+    dentro("G.songs = [{t:'Uno', q:60, mixed:true, released:true, seed:1}]; STUDIO_SEZ = 'fuori'; renderStudio();");
+    controlla("la promo ha un posto: sta nello Studio, in «Fuori»",
+      nodi["st-corpo"].innerHTML.indexOf('data-az="promo"') >= 0,
+      nodi["st-corpo"].innerHTML.slice(0, 200));
     dentro("G.bars = []; G.beats = []; STUDIO_SEZ = 'cabina'; renderStudio();");
     controlla("e senza strofa la cabina non è un vicolo cieco: si scrive da lì",
       nodi["st-corpo"].innerHTML.indexOf('data-az="scrivi"') >= 0,

@@ -325,7 +325,18 @@ function studioSezFuori(){
           '<b>Pubblica «' + studioEsc(s.t) + '»</b>' +
           '<span>esce con qualità ' + (s.mixed ? s.q : clamp(s.q - 8, 5, 100)) + '</span>' +
         '</button>'
-      : "");
+      : "") +
+    /* «Via il quaderno»: la promo era l'unica delle tredici mosse senza un
+       posto sulla mappa — stava solo nella griglia della settimana. Sta qui,
+       nella stanza dove il pezzo esce, perché è la cosa che si fa subito dopo:
+       l'hai messo fuori, adesso lo fai sapere. */
+    '<div class="stoppure"><span>e quando è fuori</span></div>' +
+    '<button class="stazione" data-az="promo">' +
+      '<b>Promo sui social</b>' +
+      '<span>' + (G.songs.some(x => x.released)
+        ? "Clip e provocazioni. Accende quello che hai già fuori."
+        : "Non hai ancora niente fuori: prima esce un pezzo, poi lo si spinge.") + '</span>' +
+    '</button>';
 }
 
 function renderStudio(){
@@ -357,12 +368,12 @@ function renderStudio(){
     (sez.id === "beat" ? studioSezBeat() :
      sez.id === "cabina" ? studioSezCabina() :
      sez.id === "banco" ? studioSezBanco() :
-     studioSezFuori()) +
-    /* Lo Studio è quattro stanze, non tutta la settimana: promo, palco,
-       turni e piazza stanno fuori di qui. Prima del punto 12 il cartello
-       «Studio» sulla mappa portava dritto all'elenco delle mosse, ed è da lì
-       che ci si passava: quella porta resta, in fondo, dove non dà fastidio. */
-    '<button class="stmosse" data-mosse="1">Tutte le mosse della settimana →</button>';
+     studioSezFuori());
+    /* Qui in fondo c'era «Tutte le mosse della settimana →», la porta verso
+       l'elenco. Quell'elenco non è più una schermata: il palco sta al Live
+       Club, il turno in Pizzeria o in Fabbrica, staccare la spina a Casa,
+       pesi e cardio in Palestra, il lavoro al Centro per l'impiego. E la
+       promo è entrata qui sopra, in «Fuori». Non resta niente da linkare. */
 }
 
 /* ==================== APRI E CHIUDI ====================
@@ -402,6 +413,6 @@ if($("studio")){
     if(f){ studioScegliFonico(f.dataset.fonico); return; }
     const a = e.target.closest("[data-az]");
     if(a){ studioAzione(a.dataset.az); return; }
-    if(e.target.closest("[data-mosse]")){ chiudiStudio(); hubGioco("settimana"); return; }
+    /* la porta verso l'elenco delle mosse non c'è più: non c'è più l'elenco */
   });
 }

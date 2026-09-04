@@ -721,3 +721,59 @@ proprio: nessuno poteva sapere che erano lì. Adesso hanno il loro segno, sempre
    Provato in Chrome, partita vera: la schermata di gioco ha una riga sola al posto della
    testata, il profilo della mappa dice «Pezzi fuori» e «Contratto», lo Studio e il Beat
    Maker risultano aperti alle 08:00, e le card dicono «sempre aperto».
+
+---
+
+## Il quaderno non esiste più (04/09/2026)
+
+Il quaderno era ancora **una pagina con sette linguette**, cioè un menu: esattamente
+la cosa che il punto 7 voleva togliere. Adesso non c'è più niente del genere. Ogni
+scheda è tornata dove la cosa già esisteva, e dove non esisteva è stata messa.
+
+| la scheda | dov'è finita |
+|---|---|
+| **Settimana** (le 13 mosse) | nei luoghi: si scrive/registra/mixa/pubblica allo **Studio**, il palco al **Live Club**, il turno in **Pizzeria**/**Fabbrica**, il lavoro al **Centro per l'impiego**, staccare la spina a **Casa**, pesi e cardio in **Palestra** |
+| **Catalogo** | lo **Shop** della mappa (attrezzatura, banco dei beat, vestiti). Quello che si possiede lo dice già l'app **Inventario** del telefono |
+| **Discografia** | app nuova del **telefono** |
+| **Classifica** | app **Classifiche** del telefono, **al posto** di quella che c'era |
+| **Contratti** | app nuova del **telefono** |
+| **Lifestyle** | **Casa** → «guarda cosa ti costa vivere» |
+| **Traguardi** | c'erano già: app **Obiettivi** del telefono. Tolti |
+
+**Le due che non avevano una casa.** La **promo sui social** stava solo nella griglia:
+è entrata nello Studio, nella stanza «Fuori», che è dove il pezzo esce — la promo è
+la cosa che si fa subito dopo. Il **freestyle in piazza** sulla mappa c'era, ma solo
+come evento della sera alle 21:00: se passavi di lì a un'altra ora non esisteva.
+Adesso il **Live Club** fa scegliere, come Casa e Palestra: open mic o freestyle.
+
+**La classifica finta è morta.** L'app Classifiche del telefono costruiva la sua
+graduatoria dai rivali generati sul computer (`telClassifica()`), mentre quella vera
+— server, giocatori e bot — si vedeva solo dentro al quaderno. Due classifiche, e
+quella che si guardava di più era la sbagliata. Adesso l'app mostra quella del
+server, e anche il widget della posizione in home legge il numero vero quando il
+server risponde.
+
+**Come è stato fatto, che è la parte che conta.** Non è stata riscritta una riga di
+quello che disegna. I contenitori sono gli stessi, con gli stessi id, e stanno in un
+**magazzino** nascosto (`#g-magazzino`) dove `renderGioco()` continua a scrivere come
+ha sempre fatto. Chi li deve mostrare **se li fa prestare**: il pannello di un luogo
+(`apriPannello`, uno solo, riusato da Casa e dallo Shop) o una schermata del telefono.
+Alla chiusura tornano indietro. Il telefono si ridisegna con `innerHTML`, che
+cancella quello che ha dentro: perciò `renderTelefono()` **prima restituisce**, poi
+ridisegna, poi riprende — altrimenti il contenitore sparirebbe per sempre e da lì in
+avanti `renderGioco()` scriverebbe nel vuoto.
+
+**La trappola grossa.** La griglia delle mosse **non si poteva cancellare**:
+`hubAzione(id)` fa partire una mossa *cliccando la sua card*, con la sua conferma, il
+suo costo e le sue scene — e ogni luogo della mappa passa da lì. Cancellarla voleva
+dire riscrivere l'esecuzione di tutte e tredici le mosse. Resta nel magazzino,
+invisibile: non è più una vetrina, è la macchina.
+
+**Adattato il vestito, non il contenuto**: la riga della classifica era disegnata per
+una colonna larga il doppio, e infilata nel telefono tagliava i nomi a due lettere.
+Nel telefono la copertina e la faccia spariscono (lì non aggiungono niente e mangiano
+metà riga) e il nome può andare a capo.
+
+`npm run prova` 67/67, `audit-regressioni` 178/178, `verifica:build` 15/15. Provato in
+Chrome: Shop, Casa, le tre app del telefono, il Live Club che fa scegliere, la promo
+nello Studio, console pulita.

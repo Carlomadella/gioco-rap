@@ -19,7 +19,7 @@
     if(document.querySelector("#posto.on")) return "posto";
     if(document.querySelector("#negozio.on")) return "negozio";
     if(document.querySelector("#studio.on")) return "studio";
-    if(document.querySelector("#quaderno.on")) return "quaderno";
+    if(document.querySelector("#pannello.on")) return "pannello";
     if(document.querySelector("#s-hub.screen.on")) return "hub";
     return "";
   }
@@ -499,7 +499,7 @@
     /* nello Studio usiamo tutta la card testata, non la flex-line:
        così non spostiamo più avatar/nome come faceva la V6 */
     {id:"studio",  root:"#studio.on",        head:".sthead"},
-    {id:"quaderno",root:"#quaderno.on",      head:".qhead"},
+    {id:"pannello",root:"#pannello.on",      head:".pnhead"},
     {id:"hub",     root:"#s-hub.screen.on",  head:".pbarra"}
   ];
 

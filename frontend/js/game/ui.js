@@ -165,7 +165,7 @@ function renderGioco(){
   /* l'accento è il colore dell'artista, a meno che nelle impostazioni non sia
      stato fissato un colore d'interfaccia: in quel caso comanda quello */
   const cc = coloreAccento(art.color);
-  $("quaderno").style.setProperty("--c1", cc);
+  $("pannello").style.setProperty("--c1", cc);
   document.documentElement.style.setProperty("--c1", cc);
   // la faccia segue il momento che stai vivendo
   window.__MOOD = G.wellbeing <= 28 ? "stanco"
@@ -361,7 +361,7 @@ function renderGioco(){
           ' · ' + perGen[g].length + (perGen[g].length === 1 ? " beat" : " beat") + '</span></div>' +
           perGen[g].map(([b,i]) => rigaBeat(b,i)).join("");
       }).join("")
-    : '<div class="empty2">Nessun beat in vendita. Usa «Cerca un beat».</div>';
+    : '<div class="empty2">Il banco è vuoto. I beat si vanno a cercare allo Studio, nella stanza «Il beat».</div>';
   $("g-market").querySelectorAll("[data-hear]").forEach(btn => {
     btn.onclick = () => beatSuona(G.market[+btn.dataset.hear], btn);
   });

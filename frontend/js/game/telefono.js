@@ -39,6 +39,10 @@ function telMessaggiNonLetti(){
 }
 
 let TEL_APP = null;        /* id dell'app aperta, null = sei alla home */
+/* Aprire un'app dal suo widget. Prima i «vai» portavano fuori dal telefono,
+   nel quaderno: adesso il telefono ce l'ha in casa e non si esce più. */
+function telVaiApp(id){ TEL_APP = id; if(typeof hubTap === "function") hubTap(); renderTelefono(); }
+window.telVaiApp = telVaiApp;
 let TEL_ORIGIN = null;     /* da dove parte l'animazione di apertura */
 let TEL_INVTAB = "bars";   /* linguetta aperta dentro Inventario */
 let TEL_MODO_PC = telPC();
@@ -53,22 +57,28 @@ const HUB_APP_VECCHIO = [
    vai:() => { renderGioco(); openDiary(); }},
   {id:"obiettivi", n:"Obiettivi", ic:"mirino", k:"#EF4444",
    sotto:g => GOALS.filter(x => !g.goals[x.id]).length + " aperti",
-   vai:() => hubGioco("obiettivi")},
+   vai:() => telVaiApp("obiettivi")},
   {id:"notizie", n:"Notizie", ic:"giornale", k:"#60A5FA",
    sotto:() => HUB_NOTIZIE.length + " questa settimana", vai:() => hubNotizie()},
   {id:"inventario", n:"Inventario", ic:"zaino", k:"#F59E0B",
    sotto:g => (g.bars.length + g.beats.length + g.songs.length + Object.keys(g.gear).length) + " cose",
-   vai:() => hubGioco("catalogo", "mat")},
+   vai:() => telVaiApp("inventario")},
   /* punto 7: i numeri stavano sotto «Dettagli», nella vecchia schermata di
      gioco. Adesso stanno sulla plancia — quindi l'app li mostra dove sono,
      invece di aprire un pannello che non c'è più. */
   {id:"statistiche", n:"Statistiche", ic:"barre", k:"#4ADE80",
    vai:() => { GO("hub"); HUB_VISTA = "disciplina"; renderHub(); }},
+  {id:"discografia", n:"Discografia", ic:"nota", k:"#C084FC",
+   sotto:g => g.songs.filter(x => x.released).length + " pezzi fuori",
+   vai:() => telVaiApp("discografia")},
+  {id:"contratti", n:"Contratti", ic:"foglio", k:"#94A3B8",
+   sotto:g => (g.contract ? g.contract.label : "indipendente"),
+   vai:() => telVaiApp("contratti")},
   {id:"classifiche", n:"Classifiche", ic:"coppa", k:"#FACC15",
-   vai:() => hubGioco("classifica")},
+   vai:() => telVaiApp("classifiche")},
   {id:"agenda", n:"Agenda", ic:"agenda", k:"#F87171",
    sotto:() => telAgendaDisponibili() + " mosse ora",
-   vai:() => hubGioco("settimana")},
+   vai:() => telVaiApp("agenda")},
   {id:"impostazioni", n:"Impostazioni", ic:"ingranaggio", k:"#9AA1B2",
    vai:() => { if(window.IMPOSTAZIONI) window.IMPOSTAZIONI(); }}
 ];
@@ -89,6 +99,8 @@ const HUB_APP = [
    badge:g => GOALS.filter(x => !g.goals[x.id]).length},
   {id:"inventario", n:"Inventario", ic:"zaino", k:"#F59E0B"},
   {id:"statistiche", n:"Statistiche", ic:"barre", k:"#4ADE80"},
+  {id:"discografia", n:"Discografia", ic:"nota", k:"#C084FC"},
+  {id:"contratti", n:"Contratti", ic:"foglio", k:"#94A3B8"},
   {id:"classifiche", n:"Classifiche", ic:"coppa", k:"#FACC15"},
   {id:"agenda", n:"Agenda", ic:"agenda", k:"#F87171"},
   {id:"impostazioni", n:"Impostazioni", ic:"ingranaggio", k:"#9AA1B2"}
@@ -261,9 +273,29 @@ function telAgendaDisponibili(){
 }
 
 /* ================= RENDER — INGRESSO UNICO ================= */
+/* Il telefono si ridisegna con `innerHTML`, che **cancella** quello che ha
+   dentro: se un contenitore preso in prestito dal magazzino fosse ancora lì,
+   sparirebbe per sempre e `renderGioco()` da quel momento scriverebbe nel
+   vuoto. Quindi prima si restituisce tutto, poi si ridisegna, poi si riprende
+   quello che serve alla schermata aperta adesso. */
+function svuotaSlotTelefono(){
+  const mag = document.getElementById("g-magazzino");
+  if(!mag) return;
+  document.querySelectorAll("#hb-tel [data-mag]").forEach(n => mag.appendChild(n));
+}
+function riempiSlotTelefono(){
+  const mag = document.getElementById("g-magazzino");
+  const slot = document.querySelector("#hb-tel [data-slot]");
+  if(!mag || !slot) return;
+  mag.querySelectorAll('[data-mag="' + slot.dataset.slot + '"]').forEach(n => slot.appendChild(n));
+}
+window.riempiSlotTelefono = riempiSlotTelefono;
+
 function renderTelefono(){
-  if(!telPC()){ renderTelefonoVecchio(); return; }
-  renderTelefonoHome();
+  svuotaSlotTelefono();
+  if(!telPC()) renderTelefonoVecchio();
+  else renderTelefonoHome();
+  riempiSlotTelefono();
 }
 
 function renderTelefonoVecchio(){
@@ -302,7 +334,12 @@ function renderTelefonoHome(){
   const messaggiDiretti = telMessaggiDiretti();
   const nuoviMsg = telMessaggiNonLetti();
   const ultimoMsg = messaggiDiretti[0] || null;
+  /* Il widget della posizione diceva un numero preso dai rivali finti di casa,
+     mentre la schermata diceva quello del server: due verità nello stesso
+     telefono. Adesso comanda il server quando risponde. */
   const cl = telClassifica();
+  const cs = (typeof ONLINE !== "undefined" && ONLINE) ? ONLINE.classificaInCache() : null;
+  if(cs && cs.io && cs.io.pos){ cl.pos = cs.io.pos; cl.delta = 0; }
   const top = telPostTop();
 
   const widgets =
@@ -361,6 +398,8 @@ function schermataApp(id){
   if(id === "obiettivi") return schermataObiettivi();
   if(id === "inventario") return schermataInventario();
   if(id === "statistiche") return schermataStatistiche();
+  if(id === "discografia") return schermataDiscografiaTel();
+  if(id === "contratti") return schermataContrattiTel();
   if(id === "classifiche") return schermataClassifiche();
   if(id === "agenda") return schermataAgenda();
   if(id === "impostazioni") return schermataImpostazioni();
@@ -475,20 +514,33 @@ function schermataStatistiche(){
   return extra + '<div class="tlist tlist-stat">' + stat + '</div>';
 }
 
-/* ---- Classifiche: la stessa classifica della scheda, top 10 ---- */
+/* ---- Classifiche, Discografia, Contratti: prestate, non ricopiate ----
+
+   Qui dentro c'era una classifica **finta**: `telClassifica()` la costruiva dai
+   rivali generati sul computer, e la classifica vera — quella del server, coi
+   giocatori e i bot — si vedeva solo dentro al quaderno. Due classifiche, e
+   quella che si guardava di più era la sbagliata.
+
+   Adesso queste tre schermate non disegnano niente: lasciano uno **slot**, e
+   `riempiSlotTelefono()` ci mette dentro il contenitore vero preso dal
+   magazzino — lo stesso che `renderGioco()` riempie da sempre. Zero logica
+   ricopiata: se cambia come si disegna una classifica, cambia in un posto solo. */
 function schermataClassifiche(){
-  const cl = telClassifica();
-  const righe = cl.all.slice(0, 10).map((x, i) => {
-    const pos = i + 1;
-    return '<div class="tli static' + (x.me ? " me" : "") + '">' +
-      '<span class="tlipos">' + pos + '</span>' +
-      '<span class="tlitx"><b>' + (x.me ? ((window.ARTIST || {}).name || "Tu") : x.n) + '</b>' +
-      (x.me ? '' : '<i>' + (x.r.eta ? x.r.eta + ' anni · ' : '') + x.r.city + ' · ' + x.r.gen + '</i>') + '</span>' +
-      '<span class="tliv">' + short(x.p) + '</span></div>';
-  }).join("");
-  return '<div class="tnote"><b>Sei ' + cl.pos + 'º</b>' +
-    (cl.delta > 0 ? ', su di ' + cl.delta : cl.delta < 0 ? ', giù di ' + (-cl.delta) : ', stabile') +
-    ' rispetto alla settimana scorsa.</div><div class="tlist">' + righe + '</div>';
+  /* aprirla è chiedere «a che punto sono adesso»: si risente il server, e se
+     non risponde resta quella che c'è (o quella di casa). */
+  if(typeof ONLINE !== "undefined" && ONLINE){
+    ONLINE.aggiornaClassifica(10).then(c => { if(c && typeof renderChart === "function"){
+      renderChart(); riempiSlotTelefono(); } }).catch(() => {});
+  }
+  if(typeof renderChart === "function") renderChart();
+  return '<div class="telslot" data-slot="chart"></div>';
+}
+function schermataDiscografiaTel(){
+  if(typeof renderDiscografia === "function") renderDiscografia();
+  return '<div class="telslot" data-slot="disco"></div>';
+}
+function schermataContrattiTel(){
+  return '<div class="telslot" data-slot="contratti"></div>';
 }
 
 /* ---- Agenda: gli eventi di stasera più le mosse disponibili ---- */
