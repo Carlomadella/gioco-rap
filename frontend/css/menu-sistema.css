@@ -491,20 +491,20 @@ body.adf-system-open{overflow:hidden}
    ============================================================ */
 #posto.on .pohead.adf-system-host-v7,
 #negozio.on .nghead.adf-system-host-v7,
-#quaderno.on .qhead.adf-system-host-v7{
+#pannello.on .pnhead.adf-system-host-v7{
   min-height:58px!important;
   align-items:center!important;
 }
 #posto.on .pohead.adf-system-host-v7 > .adf-global-nav,
 #negozio.on .nghead.adf-system-host-v7 > .adf-global-nav,
-#quaderno.on .qhead.adf-system-host-v7 > .adf-global-nav{
+#pannello.on .pnhead.adf-system-host-v7 > .adf-global-nav{
   left:0!important;
   top:0!important;
   height:58px!important;
 }
 #posto.on .pohead.adf-system-host-v7 > .pok,
 #negozio.on .nghead.adf-system-host-v7 > .ngk,
-#quaderno.on .qhead.adf-system-host-v7 > .qk{
+#pannello.on .pnhead.adf-system-host-v7 > .pnk{
   margin-left:256px!important;
 }
 
@@ -542,7 +542,7 @@ body.adf-system-open{overflow:hidden}
 
   #posto.on .pohead.adf-system-host-v7 > .pok,
   #negozio.on .nghead.adf-system-host-v7 > .ngk,
-  #quaderno.on .qhead.adf-system-host-v7 > .qk{
+  #pannello.on .pnhead.adf-system-host-v7 > .pnk{
     margin-left:210px!important;
   }
 }

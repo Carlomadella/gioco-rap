@@ -31,7 +31,7 @@
     {id:"strada", root:"#strada.on",         head:".topbar",       mount:".session", before:".exit", accent:"#c52e5f", panel:"linear-gradient(180deg,rgba(27,7,20,.985),rgba(8,5,9,.985))", border:"rgba(197,46,95,.42)"},
     {id:"posto",  root:"#posto.on",          head:".pohead",       mount:".pohead", before:".pox", accentVar:"--acid", accent:"#a3e635", panel:"linear-gradient(180deg,rgba(25,20,34,.985),rgba(12,10,17,.985))", border:"rgba(255,255,255,.14)"},
     {id:"negozio",root:"#negozio.on",        head:".nghead",       mount:".nghead", before:".ngx", accentVar:"--acid", accent:"#a3e635", panel:"linear-gradient(180deg,rgba(25,20,34,.985),rgba(12,10,17,.985))", border:"rgba(255,255,255,.14)"},
-    {id:"quaderno",root:"#quaderno.on",      head:".qhead",        mount:".qhead", accentVar:"--c1", accent:"#7c3aed", panel:"linear-gradient(180deg,rgba(20,18,25,.985),rgba(10,10,14,.985))", border:"rgba(255,255,255,.14)"},
+    {id:"pannello",root:"#pannello.on",      head:".pnhead",       mount:".pnhead", accentVar:"--c1", accent:"#7c3aed", panel:"linear-gradient(180deg,rgba(20,18,25,.985),rgba(10,10,14,.985))", border:"rgba(255,255,255,.14)"},
     {id:"hub",    root:"#s-hub.screen.on",   head:".pbarra",       mount:".pbarra", accent:"#c084fc", panel:"linear-gradient(180deg,rgba(16,18,27,.985),rgba(7,9,14,.985))", border:"rgba(192,132,252,.28)"}
   ];
 

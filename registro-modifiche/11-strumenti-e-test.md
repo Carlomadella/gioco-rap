@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:d80b80a -->
+## 04/09/26, 11:23 â€” task/via-il-quaderno â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `d80b80a`
+
+### Cosa Ã¨ entrato
+
+- `e8b1dda` â€” feat: via il quaderno, ogni scheda torna nel posto che gia' esisteva â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+- **Modificato:** `frontend/strumenti/prova.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:3170d23 -->
 ## 04/09/26, 10:08 â€” main â†’ main
 

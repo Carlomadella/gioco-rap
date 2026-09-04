@@ -1,28 +1,37 @@
 /* Schermata di gioco: testata, statistiche, azioni, liste, classifica, fase. */
 
 /* ---- gioco ---- */
-/* IL QUADERNO (punto 7) — quella che era la schermata di gioco a sé stante.
-   Adesso è un pannello sopra alla mappa, della stessa famiglia dello Studio
-   (`studio.css`) e della Sala: fondale scuro a tutto schermo, un riquadro
-   centrale, la testata in alto con la croce per tornare alla città. La mappa
-   resta dietro, viva: chiudendo si è di nuovo lì dov'eravamo.
+/* IL PANNELLO DI UN LUOGO — quello che resta del quaderno.
 
-   `.qwrap` tiene la stessa larghezza che aveva `.game-wrap`, così le sette
-   schede dentro non si sono accorte di niente e non è stato necessario
-   toccare una riga di quello che ci disegna dentro `js/game/ui.js`. */
-.quaderno{position:fixed;inset:0;z-index:94;display:none;overflow-y:auto;
+   Il quaderno era una pagina con sette linguette: un menu, cioè la cosa che il
+   punto 7 voleva togliere. Adesso non c'è più niente del genere. Le cose che
+   avevano ancora bisogno di una superficie — le spese fisse (Casa) e il negozio
+   (Shop) — si aprono qui, e questo pannello è uno solo, riusato: è della
+   stessa famiglia dello Studio (`studio.css`) e della Sala, perché è la stessa
+   cosa, entrare in un posto.
+
+   Il contenuto non è suo: se lo fa prestare dal magazzino (`#g-magazzino` in
+   `index.html`), dove `renderGioco()` continua a scrivere come ha sempre
+   fatto. Così la larghezza qui sotto è quella che aveva `.game-wrap`, e quello
+   che ci finisce dentro non si è accorto di niente. */
+.pannello{position:fixed;inset:0;z-index:94;display:none;overflow-y:auto;
   background:radial-gradient(120% 80% at 50% 0%,#151024,#07070B 70%)}
-.quaderno.on{display:block}
-.qwrap{max-width:1040px;margin:0 auto;padding:14px 22px 46px;
+.pannello.on{display:block}
+.pnwrap{max-width:1040px;margin:0 auto;padding:14px 22px 46px;
   animation:rIn .4s cubic-bezier(.2,.9,.3,1)}
-.qhead{display:flex;align-items:center;gap:10px;margin-bottom:13px}
-.qhead .qk{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;
+.pnhead{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.pnhead .pnk{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;
   color:var(--acid);flex:none}
-.qx{margin-left:auto;flex:none;width:38px;height:38px;border-radius:50%;border:0;
+.pndove{margin:0 0 16px;color:var(--soft);font-size:13.5px;line-height:1.5}
+.pndove[hidden]{display:none}
+.pncorpo{display:grid;gap:16px;align-items:start}
+.pnx{margin-left:auto;flex:none;width:38px;height:38px;border-radius:50%;border:0;
   background:rgba(255,255,255,.06);color:#e8eaf0;font-size:15px;cursor:pointer;
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
   transition:background .15s,color .15s}
-.qx:hover{background:rgba(255,255,255,.12);color:#fff}
+.pnx:hover{background:rgba(255,255,255,.12);color:#fff}
+/* lo slot dentro al telefono: il contenitore prestato ci sta dentro intero */
+.telslot{display:block}
 
 /* Torna al menu: sta in cima al contenuto, non nella barra fissa e non fra le
    CTA in basso. E' l'unica via d'uscita dalla partita, quindi e' bianco pieno,
