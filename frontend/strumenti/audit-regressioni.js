@@ -1058,7 +1058,27 @@ test("comprare attrezzatura e beat resta la stessa economia di prima: stesso cos
   ui.includes("G.money -= g2.p; G.gear[g2.id] = true;") &&
   ui.includes("G.money -= b.price; G.market.splice(i,1); G.beats.push("));
 
-for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/piazza.js","js/game/negozio.js"]){
+console.log("\nProblemi riscontrati \u2014 carcere senza notifiche, didascalie scritte in casa");
+const caption = leggi("js/game/crime-caption.js");
+test("in carcere la fascia di LaFamegram non compare",
+  ev.includes("function adfRenderSocialBanner(post){") &&
+  ev.includes("  if(adfInJail()) return;") &&
+  ev.indexOf("  if(adfInJail()) return;") > ev.indexOf("function adfRenderSocialBanner(post){"));
+test("e se era gi\u00e0 a schermo quando ti prendono, se ne va con te",
+  ev.includes('window.addEventListener("jail-ui:opened"') &&
+  ev.includes("adfHideSocialBanner();") &&
+  crimeui.includes('new CustomEvent("jail-ui:opened"'));
+test("il post resta comunque nel feed: \u00e8 solo la notifica che non arriva",
+  ev.includes("s.runtime.socialAlerts.unshift({") &&
+  ev.indexOf("s.runtime.socialAlerts.unshift({") < ev.indexOf("adfRenderSocialBanner(post);\n}"));
+test("le didascalie della strada non citano nessuna lirica vera",
+  !/\bby:\s*"/.test(caption) && !caption.includes("track:") &&
+  !/Wu-Tang|2Pac|Tupac|Notorious|Jay-Z|Eminem|Kendrick|Drake|Snoop|Nas\b/.test(caption));
+test("e sono abbastanza da reggere il filtro delle ultime 28 uscite",
+  (caption.match(/\{id:"c\d{3}"/g) || []).length >= 40 &&
+  caption.includes('da:"') && caption.includes("recent.slice(-28)"));
+
+for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }
