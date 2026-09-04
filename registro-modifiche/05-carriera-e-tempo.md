@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:994aa67 -->
+## 04/09/26, 10:05 â€” task/schermata-originale-nella-mappa â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `994aa67`
+
+### Cosa Ã¨ entrato
+
+- `276e8d1` â€” fix: via anche i quattro bottoni in fondo alla mappa, erano doppioni â€” **Carlomadella**
+- `cee9ce0` â€” feat: via la vecchia schermata di gioco, le sue schede sopra la mappa â€” **Carlomadella**
+- `6dad126` â€” chore: pulizia dei media, 35 MB fuori dal pacchetto per gli store â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/eventi-tempo.js`
+- **Modificato:** `frontend/js/game/tempo-controlli.js`
+- **Modificato:** `frontend/js/game/tempo.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- commit:f28bb6a -->
 ## 03/09/26, 20:33 — feat: completa esperienza e navigazione del carcere
 
