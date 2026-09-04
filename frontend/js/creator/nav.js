@@ -266,7 +266,7 @@ document.addEventListener("click", e => {
      lì; se non c'è, non si finge che ci sia una schermata da aprire. */
   else if(b.dataset.go === "classifiche"){
     if(viva){ window.ARTIST = A; goto("hub"); if(window.GAME) window.GAME.enter();
-      if(typeof hubGioco === "function") setTimeout(() => hubGioco("classifica"), 60); }
+      if(typeof telVaiApp === "function") setTimeout(() => telVaiApp("classifiche"), 60); }
     else landDillo("Le classifiche si aprono quando la carriera è cominciata");
   }
   else if(b.dataset.go === "carriera"){

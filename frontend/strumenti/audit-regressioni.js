@@ -101,7 +101,12 @@ test("anteprima mobile apre il thread Chat vero",
 test("telefono compatto può aprire la stessa schermata Messaggi del PC",
   tel.includes('data-telapp="messaggi"') &&
   tel.includes("(TEL_APP ? schermataWrap(TEL_APP) : '')") &&
-  tel.includes('if(!telPC()){ renderTelefonoVecchio(); return; }'));
+  /* «via il quaderno»: renderTelefono() non può più uscire con un return
+     secco — dopo aver ridisegnato deve riprendersi dal magazzino il
+     contenitore della schermata aperta (classifica, discografia, contratti).
+     Lo smistamento fra telefono compatto e da PC è lo stesso di prima. */
+  tel.includes('if(!telPC()) renderTelefonoVecchio();') &&
+  tel.includes('riempiSlotTelefono();'));
 test("G.log mobile è esplicitamente Notifiche",
   tel.includes('{id:"notifiche", n:"Notifiche"') &&
   tel.includes('g.log.length - (g.seenLog || 0)') &&
@@ -556,7 +561,7 @@ test("controller si monta nella testata della finestra attiva",
   timeControls.includes('head:".pbarra"') &&
   /* punto 7: la vecchia schermata di gioco non c'è più, al suo posto il
      quaderno sopra alla mappa — la testata dove si monta è la sua. */
-  timeControls.includes('head:".qhead"') &&
+  timeControls.includes('head:".pnhead"') &&
   timeControls.includes('head:".pohead"') &&
   timeControls.includes('head:".nghead"') &&
   timeControls.includes('head:".topbar"') &&

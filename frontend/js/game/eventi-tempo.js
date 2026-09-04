@@ -290,8 +290,8 @@
   }
 
   function screenGameplay(){
-    /* Punto 7: la schermata di gioco è una sola, la mappa. Il quaderno le sta
-       sopra ma non la spegne, quindi basta guardare lei. */
+    /* Punto 7: la schermata di gioco è una sola, la mappa. I pannelli dei
+       luoghi le stanno sopra ma non la spengono, quindi basta guardare lei. */
     const a = document.getElementById("s-hub");
     return !!(a && a.classList.contains("on"));
   }

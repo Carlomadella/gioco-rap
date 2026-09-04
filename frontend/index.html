@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="css/shell.css?v=12">
 <link rel="stylesheet" href="css/landing.css?v=12">
 <link rel="stylesheet" href="css/avvio.css?v=2">
-<link rel="stylesheet" href="css/game.css?v=14">
+<link rel="stylesheet" href="css/game.css?v=15">
 <link rel="stylesheet" href="css/overlays.css?v=13">
 <link rel="stylesheet" href="css/effects.css?v=13">
 <link rel="stylesheet" href="css/hud.css?v=12">
@@ -34,11 +34,11 @@
 <link rel="stylesheet" href="css/strada-crimine.css?v=13">
 <link rel="stylesheet" href="css/strada-crimine-v2.css?v=1">
 <link rel="stylesheet" href="css/hub.css?v=16">
-<link rel="stylesheet" href="css/telefono.css?v=12">
+<link rel="stylesheet" href="css/telefono.css?v=13">
 <link rel="stylesheet" href="css/trasferte.css?v=1">
 <link rel="stylesheet" href="css/impostazioni.css?v=12">
 <!-- per ultimo: le aree da toccare devono vincere sulla cascata di tutti gli altri -->
-<link rel="stylesheet" href="css/menu-sistema.css?v=9">
+<link rel="stylesheet" href="css/menu-sistema.css?v=10">
 <link rel="stylesheet" href="css/tocco.css?v=12">
 </head>
 <body>
@@ -278,76 +278,75 @@
   </div>
 </section>
 
-<!-- IL QUADERNO (punto 7) — quella che era la vecchia schermata di gioco:
-     settimana, catalogo, discografia, classifica, contratti, lifestyle,
-     traguardi. **Non è più una pagina a sé**: è un pannello che si apre sopra
-     alla mappa, come lo Studio e La Sala, e la mappa resta la schermata di
-     gioco. Della sua testata non è stato portato dentro niente, perché sarebbe
-     stato tutto un doppione: nome, livello, fase, pezzi fuori e contratto
-     stanno nel profilo della plancia; anno, settimana, giorno e ora nella
-     fascia in alto; l'energia è già una cella della fascia, con la sua barra.
-     Le uniche tre cose che stavano solo qui — diario, salta il tempo e fine
-     giornata — sono passate in fondo alla mappa, insieme all'audio. -->
-<div class="quaderno" id="quaderno"><div class="qwrap">
-  <div class="qhead">
-    <div class="qk">Il quaderno</div>
-    <button class="qx" id="q-x" aria-label="Torna alla mappa">&#10005;</button>
-  </div>
+<!-- IL MAGAZZINO — e il quaderno che non c'è più.
 
-    <div class="nav2">
-      <button class="nb on" data-t="settimana"><svg viewBox="0 0 24 24"><path d="M7 2h2v3H7zm8 0h2v3h-2zM4 7h16v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2 4v2h3v-2zm5 0v2h3v-2zm5 0v2h2v-2zM6 15v2h3v-2zm5 0v2h3v-2z"/></svg><span>Settimana</span></button>
-      <button class="nb" data-t="catalogo"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18m0 6.6a2.4 2.4 0 1 1 0 4.8 2.4 2.4 0 0 1 0-4.8"/></svg><span>Catalogo</span></button>
-      <button class="nb" data-t="discografia"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m0 6.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7m0 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3"/></svg><span>Discografia</span></button>
-      <button class="nb" data-t="classifica"><svg viewBox="0 0 24 24"><path d="M4 20V10h4v10zm6 0V4h4v16zm6 0v-7h4v7z"/></svg><span>Classifica</span></button>
-      <button class="nb" data-t="contratti"><svg viewBox="0 0 24 24"><path d="M6 2h8l4 4v16H6zm7 1.5V7h3.5zM8 11h8v2H8zm0 4h8v2H8z"/></svg><span>Contratti</span></button>
-      <button class="nb" data-t="lifestyle"><svg viewBox="0 0 24 24"><path d="M12 3l9 7v11h-6v-6H9v6H3V10z"/></svg><span>Lifestyle</span></button>
-      <button class="nb" data-t="obiettivi"><svg viewBox="0 0 24 24"><path d="M6 3h12v2h3v3a4 4 0 0 1-4 4h-.4A6 6 0 0 1 13 15.9V18h3v3H8v-3h3v-2.1A6 6 0 0 1 7.4 12H7a4 4 0 0 1-4-4V5h3zM5 7v1a2 2 0 0 0 2 2V7zm14 0h-2v3a2 2 0 0 0 2-2z"/></svg><span>Traguardi</span></button>
-    </div>
+     Il quaderno era ancora una pagina sola con sette linguette, e sette
+     linguette sono un menu: le stesse cose stavano già nei luoghi della mappa,
+     nello Studio e nel telefono. Adesso non esiste più niente del genere.
 
-    <div class="gcols">
-      <div>
-        <div class="gpane on" data-p="settimana"><div id="g-phase"></div><div class="acts" id="g-actions"></div></div>
-        <!-- Il catalogo erano quattro liste una sotto l'altra: adesso è una alla
-             volta, e il titolo della lista è la linguetta che la apre. -->
-        <div class="gpane" data-p="catalogo">
-          <div class="subnav" data-sub="catalogo">
-            <button class="sb on" data-s="mat">Materiale in cartella</button>
-            <button class="sb" data-s="market">Beat in vendita<i class="sbdg" data-b="market" hidden></i></button>
-            <button class="sb" data-s="songs">I tuoi pezzi<i class="sbdg" data-b="songs" hidden></i></button>
-            <button class="sb" data-s="gear">Attrezzatura</button>
-            <!-- punto 7: i vestiti si comprano SOLO da qui (o da un evento in
-                 game) — la linguetta «Vestiti» della plancia è il guardaroba,
-                 solo equip, mai acquisto. -->
-            <button class="sb" data-s="fit">Abbigliamento</button>
-          </div>
-          <div class="spane on" data-s="mat"><div class="list"><div id="g-mat"></div></div></div>
-          <div class="spane" data-s="market"><div class="list"><div id="g-market"></div></div></div>
-          <div class="spane" data-s="songs"><div class="list"><div id="g-songs"></div></div></div>
-          <div class="spane" data-s="gear"><div class="list"><div id="g-shop"></div></div></div>
-          <div class="spane" data-s="fit"><div class="list"><div class="nggrid" id="g-fit"></div></div></div>
-        </div>
-        <!-- Punto 19. La discografia: i pezzi che sono usciti davvero, con quanto
-             hanno fatto e come stanno invecchiando. Non e' la lista del catalogo
-             (quella e' il materiale in cartella): qui c'e' solo cio' che e' fuori. -->
-        <div class="gpane" data-p="discografia"><div id="g-disco"></div></div>
-        <!-- Punti 12 e 30. La classifica: quella vera del server se risponde,
-             quella locale se no. Il titolo e il bottone «vedi la top 100» li
-             scrive js/game/ui.js, che sa quale delle due sta disegnando. -->
-        <div class="gpane" data-p="classifica"><div class="list"><h3 id="g-charthead">Top 10 della settimana</h3><div id="g-chart"></div><div id="g-chartpiu"></div></div></div>
-        <div class="gpane" data-p="contratti">
-          <div class="list"><h3>Offerte sul tavolo</h3><div id="g-offers"></div></div>
-          <div class="list"><h3>Contratto in corso</h3><div id="g-deal"></div></div>
-        </div>
-        <div class="gpane" data-p="lifestyle">
-          <div class="list"><h3>Le tue spese fisse</h3><div id="g-lifesum"></div></div>
-          <div id="g-life"></div>
-        </div>
-        <div class="gpane" data-p="obiettivi"><div class="list"><h3>Traguardi</h3><div id="g-goals"></div></div></div>
-      </div>
-    </div>
-  </div>
+     Quello che sopravvive però non è stato riscritto: i contenitori sono gli
+     stessi di sempre, con gli stessi id, e `renderGioco()` continua a
+     scriverci dentro senza sapere dove sono finiti. Stanno qui, fermi, finché
+     qualcuno non se li prende — il pannello di un luogo (`apriPannello`) o una
+     schermata del telefono. Quando si chiude, tornano qui.
 
+     `g-mat` e `g-songs` non li mostra più nessuno: quello che c'era dentro —
+     le strofe scritte e i pezzi — lo dice già l'app Inventario del telefono.
+     Restano perché il codice che li riempie è lo stesso che tiene in piedi il
+     resto, e toglierli voleva dire riscriverlo. -->
+<div id="g-magazzino" hidden>
+
+  <!-- discografia → app del telefono -->
+  <div id="g-disco" data-mag="disco"></div>
+
+  <!-- classifica → app Classifiche del telefono, al posto di quella locale -->
+  <div class="list" data-mag="chart"><h3 id="g-charthead">Top 10 della settimana</h3><div id="g-chart"></div><div id="g-chartpiu"></div></div>
+
+  <!-- contratti → app del telefono -->
+  <div class="list" data-mag="contratti"><h3>Offerte sul tavolo</h3><div id="g-offers"></div></div>
+  <div class="list" data-mag="contratti"><h3>Contratto in corso</h3><div id="g-deal"></div></div>
+
+  <!-- lifestyle → Casa, «guarda cosa ti costa vivere» -->
+  <div class="list" data-mag="lifestyle"><h3>Le tue spese fisse</h3><div id="g-lifesum"></div></div>
+  <div data-mag="lifestyle" id="g-life"></div>
+
+  <!-- il banco e la vetrina → lo Shop della mappa -->
+  <div class="list" data-mag="shop"><h3>Attrezzatura</h3><div id="g-shop"></div></div>
+  <div class="list" data-mag="shop"><h3>Beat in vendita</h3><div id="g-market"></div></div>
+  <div class="list" data-mag="shop"><h3>Abbigliamento</h3><div class="nggrid" id="g-fit"></div></div>
+
+  <!-- nessuno li apre più: li dice l'Inventario del telefono -->
+  <div id="g-mat"></div>
+  <div id="g-songs"></div>
+
+  <!-- I traguardi: li mostra l'app Obiettivi del telefono, questo lo riempie
+       `renderGioco()` e nessuno lo guarda. -->
+  <div id="g-goals"></div>
+
+  <!-- LA GRIGLIA DELLE MOSSE, e perché è ancora qui.
+       Come schermata non esiste più: si scrive, si registra, si mixa e si
+       pubblica nello Studio; l'open mic al Live Club; il turno in Pizzeria o
+       in Fabbrica; stacca la spina a Casa; pesi e cardio in Palestra; il
+       lavoro al Centro per l'impiego. Ma **è la macchina**, non una vetrina:
+       `hubAzione(id)` in `hub.js` fa partire una mossa cliccando la sua card,
+       con la sua conferma, il suo costo e le sue scene. Cancellarla voleva
+       dire riscrivere da capo l'esecuzione di tutte e tredici le mosse e di
+       ogni luogo che le chiama. Resta qui, invisibile, e i luoghi la usano. -->
+  <div id="g-phase"></div>
+  <div class="acts" id="g-actions"></div>
 </div>
+
+<!-- IL PANNELLO DI UN LUOGO — uno solo, riusato.
+     Casa ci mette dentro il lifestyle, lo Shop il banco e la vetrina. Stessa
+     famiglia dello Studio e della Sala: fondale scuro, riquadro, la croce per
+     tornare alla città. Il contenuto non è suo: se lo prende in prestito dal
+     magazzino qui sopra e alla chiusura lo restituisce. -->
+<div class="pannello" id="pannello"><div class="pnwrap">
+  <div class="pnhead"><div class="pnk" id="pn-tit">—</div>
+    <button class="pnx" id="pn-x" aria-label="Torna alla mappa">&#10005;</button></div>
+  <p class="pndove" id="pn-dove"></p>
+  <div class="pncorpo" id="pn-corpo"></div>
+</div></div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
   <filter id="grn"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/>
@@ -660,7 +659,7 @@
 <script src="js/creator/options.js?v=12"></script>
 <script src="js/creator/render.js?v=12"></script>
 <script src="js/creator/events.js?v=12"></script>
-<script src="js/creator/nav.js?v=13"></script>
+<script src="js/creator/nav.js?v=14"></script>
 
 <!-- Partita -->
 <script src="js/game/state.js?v=12"></script>
@@ -679,30 +678,30 @@
 <script src="js/game/modal.js?v=12"></script>
 <script src="js/game/scene-art.js?v=13"></script>
 <script src="js/game/beatplay.js?v=12"></script>
-<script src="js/game/ui.js?v=17"></script>
+<script src="js/game/ui.js?v=19"></script>
 <script src="js/game/lifestyle.js?v=12"></script>
 <script src="js/game/fx.js?v=14"></script>
 <script src="js/game/skip.js?v=13"></script>
 <script src="js/game/posto.js?v=13"></script>
-<script src="js/game/studio.js?v=1"></script>
+<script src="js/game/studio.js?v=2"></script>
 <script src="js/game/strada.js?v=12"></script>
 <script src="js/game/strada-crimine.js?v=14"></script>
 <script src="js/game/negozio.js?v=13"></script>
 <script src="js/game/uscita.js?v=12"></script>
-<script src="js/game/hub.js?v=15"></script>
+<script src="js/game/hub.js?v=17"></script>
 <script src="js/game/chat.js?v=13"></script>
-<script src="js/game/telefono.js?v=14"></script>
+<script src="js/game/telefono.js?v=15"></script>
 
 <!-- Integrazione tempo/eventi/crime 2026-09-02 — ordine intenzionale -->
-<script src="js/game/tempo.js?v=10"></script>
+<script src="js/game/tempo.js?v=11"></script>
 <script src="js/game/orari.js?v=10"></script>
 <script src="js/game/spostamenti.js?v=8"></script>
 <script src="js/game/interruzioni.js?v=8"></script>
 <!-- Eventi V2 prima di eventi-tempo: proprietario di skip e Notifiche. -->
 <script src="js/game/eventi-v2.js?v=1216"></script>
 <!-- Eventi a minuti: azioni/spostamenti; nessuna seconda app Notifiche. -->
-<script src="js/game/eventi-tempo.js?v=11"></script>
-<script src="js/game/trasferte.js?v=2"></script>
+<script src="js/game/eventi-tempo.js?v=12"></script>
+<script src="js/game/trasferte.js?v=3"></script>
 <script src="js/game/crime-backgrounds.js?v=1"></script>
 <script src="js/game/jail-backgrounds.js?v=1"></script>
 <script src="js/game/strada-crimine-ui.js?v=3"></script>
@@ -711,13 +710,13 @@
 <!-- Meteo globale: previsione coerente e persistente, senza effetti gameplay. -->
 <script src="js/game/meteo.js?v=2"></script>
 <!-- Widget unico tempo/meteo + controlli globali. -->
-<script src="js/game/tempo-controlli.js?v=14"></script>
+<script src="js/game/tempo-controlli.js?v=15"></script>
 <!-- Luce della città: crossfade dei tre render sul clock di gioco. -->
 <script src="js/game/mappa-luce.js?v=1"></script>
 
 <!-- Il pannello delle impostazioni: per ultimo, tocca roba definita ovunque. -->
-<script src="js/impostazioni-ui.js?v=13"></script>
+<script src="js/impostazioni-ui.js?v=14"></script>
 <script src="js/avvio.js?v=3"></script>
-<script src="js/menu-sistema.js?v=8"></script>
+<script src="js/menu-sistema.js?v=9"></script>
 </body>
 </html>

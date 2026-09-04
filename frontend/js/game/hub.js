@@ -73,12 +73,26 @@ const HUB_LUOGHI = [
      hai ancora un pezzo fuori il palco non c'è, ma lo dice, non fa finta di
      niente. Nella mappa definitiva il cartello dice «Live Club», il posto
      resta lo stesso di sempre (id "concerti"). */
+  /* «Via il quaderno»: qui adesso si sceglie, come a Casa e in Palestra. Il
+     freestyle sulla mappa c'era già, ma solo come evento della sera alle 21:00
+     («Freestyle al bar centrale»): se passavi di lì a un'altra ora non
+     esisteva. Il palco è il posto dove si sta davanti alla gente: ci stanno
+     tutte e due. */
   {id:"concerti", n:"Live Club", x:33.00, y:20.00, w:14.00, h:13.50,
    vai:() => {
-     const pronto = hubPronta("live");
-     if(pronto.ok) hubAzione("live");
-     else hubChiuso({n:"Live Club", chiuso:"Non ancora: " + pronto.perche +
-       ". Il palco vero aspetta un pezzo pubblicato."});
+     const palco = hubPronta("live");
+     showEvent({k:"Live Club", t:"Che serata fai?",
+       d:"Il palco vero vuole un pezzo pubblicato. La piazza no: lì c’è solo il beat e la gente che passa.",
+       annulla(){},
+       opts:[
+         {n:"Serata open mic", d:palco.ok ? "Il palco, con i tuoi pezzi" : "Non ancora: " + palco.perche,
+          run(){ if(palco.ok) hubAzione("live");
+                 else hubChiuso({n:"Live Club", chiuso:"Non ancora: " + palco.perche +
+                   ". Il palco vero aspetta un pezzo pubblicato."});
+                 return null; }},
+         {n:"Freestyle in piazza", d:"Solo il beat e la gente che passa",
+          run(){ hubAzione("free"); return null; }}
+       ]});
    }},
   /* il beat maker non è un listino: è la sala dove si conosce la gente */
   {id:"beat", n:"La Sala", x:49.50, y:20.00, w:11.00, h:13.50,
@@ -95,7 +109,8 @@ const HUB_LUOGHI = [
        {n:"Stacca la spina", d:"Una sera senza pensare a niente",
         run(){ hubAzione("stacca"); return null; }},
        {n:"Guarda cosa ti costa vivere", d:"Casa, look, uscite: le spese fisse",
-        run(){ hubGioco("lifestyle"); return null; }}
+        run(){ apriPannello("Le spese fisse", "lifestyle",
+          "Quanto ti costa vivere come vivi, e cosa ti dà in cambio."); return null; }}
      ]})},
   /* punto 21/57: la Strada, ricostruita da claude/carriera-criminale.md
      (js/game/strada-crimine.js) — non era mai stata scritta, solo pensata */
@@ -121,8 +136,12 @@ const HUB_LUOGHI = [
      ]})},
   /* punto 48: idem — l'attrezzatura da studio è già nel catalogo, la vetrina
      non deve stare spenta se quello che promette esiste già */
+  /* punto 48 + «via il quaderno»: qui dentro è finito tutto quello che si
+     compra — l'attrezzatura, il banco dei beat e i vestiti. Era il Catalogo,
+     che come linguetta a sé non aveva senso: un negozio è un posto. */
   {id:"shop", n:"Shop", x:43.50, y:30.00, w:15.00, h:11.50,
-   vai:() => hubGioco("catalogo", "gear")},
+   vai:() => apriPannello("Shop", "shop",
+     "Attrezzatura, beat da comprare e roba da mettersi addosso.")},
   /* punto 6: il centro per l'impiego, arrivato con la mappa definitiva.
      Apre tutti i lavori (JOBS), non solo i due che hanno già un edificio —
      rispetta i requisiti, non finge che siano tutti presi al volo.
@@ -276,29 +295,40 @@ const HUB_SUGG = [
 /* ================= APERTURE ================= */
 /* Il luogo non rifà quello che sa già fare la partita: la apre sulla sezione
    giusta. Così la plancia resta la porta, e il gioco resta dov'è. */
-function apriQuaderno(){
-  $("quaderno").classList.add("on");
-  document.body.classList.add("quaderno-aperto");
+/* IL PANNELLO DI UN LUOGO.
+   Uno solo, riusato: Casa ci mette le spese fisse, lo Shop il banco e la
+   vetrina. Il contenuto non lo disegna lui — se lo prende in prestito dal
+   magazzino (`#g-magazzino`), dove `renderGioco()` continua a scrivere come ha
+   sempre fatto, e alla chiusura glielo restituisce. Così non è stata riscritta
+   una riga di quello che disegna le spese, il banco dei beat o la vetrina. */
+function prendiDalMagazzino(gruppo, dove){
+  document.querySelectorAll('#g-magazzino [data-mag="' + gruppo + '"]')
+    .forEach(n => dove.appendChild(n));
 }
-function chiudiQuaderno(){
-  $("quaderno").classList.remove("on");
-  document.body.classList.remove("quaderno-aperto");
+function rimettiInMagazzino(dove){
+  const mag = $("g-magazzino");
+  if(!mag || !dove) return;
+  Array.from(dove.children).forEach(n => { if(n.dataset.mag) mag.appendChild(n); });
+  dove.innerHTML = "";
+}
+
+function apriPannello(titolo, gruppo, dove){
+  renderGioco();                       /* prima si riempie, poi si mostra */
+  const corpo = $("pn-corpo");
+  rimettiInMagazzino(corpo);
+  $("pn-tit").textContent = titolo;
+  $("pn-dove").textContent = dove || "";
+  $("pn-dove").hidden = !dove;
+  prendiDalMagazzino(gruppo, corpo);
+  $("pannello").classList.add("on");
+}
+function chiudiPannello(){
+  $("pannello").classList.remove("on");
+  rimettiInMagazzino($("pn-corpo"));
   renderHub();
 }
-window.apriQuaderno = apriQuaderno;
-window.chiudiQuaderno = chiudiQuaderno;
-
-function hubGioco(tab, sotto){
-  apriQuaderno();
-  renderGioco();
-  const nb = document.querySelector('.nb[data-t="' + tab + '"]');
-  if(nb) nb.click();
-  if(sotto){
-    const sb = document.querySelector('.sb[data-s="' + sotto + '"]');
-    if(sb) sb.click();
-  }
-  window.scrollTo({top:0});
-}
+window.apriPannello = apriPannello;
+window.chiudiPannello = chiudiPannello;
 
 function hubPresto(titolo, testo){
   showEvent({k:"Non ancora", t:titolo, d:testo, annulla(){},
@@ -365,8 +395,11 @@ function hubNotizie(){
 
 /* L'azione vera dietro a un evento di oggi: si apre nella partita, con il suo
    costo, la sua conferma e le sue scene. Qui si guarda solo se si può fare. */
+/* Far partire una mossa. La griglia delle mosse non è più una schermata — sta
+   nel magazzino, invisibile — ma è sempre lei la macchina: si ridisegna e si
+   preme la card, che porta con sé la conferma, il costo e le scene di sempre. */
 function hubAzione(id){
-  hubGioco("settimana");
+  renderGioco();
   const t = document.querySelector('.tile[data-id="' + id + '"]');
   if(t) t.click();
 }
@@ -648,13 +681,13 @@ $("hb-eventi").addEventListener("click", ev => {
 
 $("hb-logo").onclick = () => GO("menu");
 
-/* La via di ritorno dal quaderno è chiuderlo: la mappa è sempre rimasta lì
+/* La via di ritorno da un pannello è chiuderlo: la mappa è sempre rimasta lì
    sotto, viva, quindi non c'è nessuna schermata da riaccendere — si ridisegna
    e basta, perché nel frattempo può essere cambiato tutto (soldi, energia,
    giorno). Si chiude anche con Esc, come gli altri pannelli. */
-$("q-x").onclick = () => chiudiQuaderno();
+$("pn-x").onclick = () => chiudiPannello();
 document.addEventListener("keydown", e => {
-  if(e.key === "Escape" && $("quaderno").classList.contains("on")) chiudiQuaderno();
+  if(e.key === "Escape" && $("pannello").classList.contains("on")) chiudiPannello();
 });
 
 window.HUB = { apri(){ GO("hub"); renderHub(); }, render: renderHub };

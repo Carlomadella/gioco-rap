@@ -251,7 +251,7 @@ function chiudiImpostazioni(){
   el.classList.remove("on");
   document.body.style.overflow = "";
   if(typeof renderMenu === "function") renderMenu();
-  if(typeof renderGioco === "function" && $("quaderno") && $("quaderno").classList.contains("on")) renderGioco();
+  if(typeof renderGioco === "function" && $("pannello") && $("pannello").classList.contains("on")) renderGioco();
 }
 
 /* ==================== quello che succede quando tocchi ==================== */

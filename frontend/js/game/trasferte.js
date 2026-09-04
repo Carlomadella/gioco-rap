@@ -703,7 +703,7 @@ function schermoLibero(){
   const hub = document.getElementById("s-hub");
   if(!(hub && hub.classList.contains("on"))) return false;
   for(const id of ["modal", "report", "writer", "piazza", "scena", "posto", "strada-crimine",
-                   "negozio", "quaderno", "adf-result-overlay", "adf-social-overlay", "tras-overlay"]){
+                   "negozio", "pannello", "adf-result-overlay", "adf-social-overlay", "tras-overlay"]){
     const el = document.getElementById(id);
     if(el && el.classList.contains("on")) return false;
   }

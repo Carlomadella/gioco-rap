@@ -228,3 +228,30 @@
    si portava dietro tutta la colonna fuori dallo schermo. */
 .ptelframe,.ptelscr,.twidgets,.twid,.twrow > *,.papp > *{min-width:0}
 .ptelscr{overflow-x:hidden}
+
+/* ================= I PANNELLI IN PRESTITO =================
+   Classifica, discografia e contratti non sono ricopiati per il telefono: sono
+   gli stessi contenitori che riempie `renderGioco()`, prestati dentro allo
+   slot. Erano però disegnati per una colonna larga il doppio, e infilati qui
+   i nomi si tagliavano a due lettere. Qui si stringono: via la copertina e la
+   faccia (nel telefono non aggiungono niente e mangiano metà riga), numeri più
+   piccoli, e il nome può andare a capo invece di sparire. */
+.telslot{display:block}
+.telslot .list{border-radius:12px;padding:0}
+.telslot .list h3{padding:11px 12px 8px;font-size:12px}
+.telslot .crow{gap:8px;padding:8px 10px}
+.telslot .crow .cv,
+.telslot .crow .fc{display:none}
+.telslot .crow .pz{width:18px;font-size:14px}
+.telslot .crow .in3 b{font-size:12.5px;line-height:1.25;white-space:normal}
+.telslot .crow .in3 span{font-size:10.5px;line-height:1.3}
+.telslot .crow .rt{font-size:11px}
+.telslot .crow .rt .st{font-size:12px}
+/* discografia e contratti: stesse righe, stessa cura */
+.telslot .li{padding:9px 10px;gap:8px}
+.telslot .li .nm b{font-size:12.5px}
+.telslot .li .nm span{font-size:10.5px;line-height:1.35}
+.telslot .dtesta{grid-template-columns:1fr 1fr;gap:6px}
+.telslot .dtesta .dbox{padding:8px 9px}
+.telslot .dtesta .v{font-size:15px}
+.telslot .empty2{padding:12px;font-size:12px}
