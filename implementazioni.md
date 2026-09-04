@@ -30,5 +30,3 @@ L'indice con **tutti i punti e il loro stato** sta in
 ## Da smistare
 
 _(qui sotto finiscono i punti nuovi, appena scritti)_
-
-15.

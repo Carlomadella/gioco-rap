@@ -744,3 +744,33 @@ Un dettaglio che sembra una sciocchezza e non lo è: la presentazione del fonico
 Nico, Fede, Pippo) e quell'aggettivo dà un genere a chi parla — nel **primo** messaggio che
 leggi di quella persona. Riscritta senza.
 
+---
+
+## 15 · La X dello Studio non tornava indietro
+
+15. Nel pop up dello studio la x per tornare indietro non è funzionale, non torna al menù
+    principale, è un pulsante vuoto. Verifica non ci siano pulsanti vuoti.
+
+> **Fatto (04/09/2026).** Non era un pulsante vuoto: era un **`id` duplicato**. Sia il
+> popup dello Studio sia la schermata «Attività criminali» (la Strada) usano il prefisso
+> `st-` per i loro elementi, e per due nomi — `st-x` (la X di chiusura) e `st-dove` (la
+> riga «dove sei») — finivano identici in entrambi. `$("st-x")` è `document.getElementById`
+> (`js/core.js`), che prende sempre il **primo** elemento col quel `id` nel documento: nella
+> pagina lo Studio viene prima della Strada, quindi la X che *si vede* nel popup dello
+> Studio è lo stesso nodo su cui la Strada attacca il suo handler. `js/game/strada-crimine.js`
+> si carica **dopo** `js/game/studio.js`, quindi il suo `$("st-x").onclick = chiudiStrada`
+> sovrascriveva quello dello Studio — cliccare la X chiamava `chiudiStrada()`, che non fa
+> niente se la Strada non è aperta: il pulsante sembrava morto.
+>
+> Rinominati i due id della Strada in `str-x` e `str-dove` (`frontend/index.html`,
+> `frontend/js/game/strada-crimine.js`), lasciando `st-x`/`st-dove` solo allo Studio.
+> Controllati tutti gli altri `id` di `index.html`: nessun altro doppione, e gli altri
+> pulsanti di chiusura (`po-x` sulla Sala, `ng-x` sul guardaroba, `st-mappa` e
+> `st-chiudi-scheda` sulla Strada) hanno tutti il loro handler, nessuno vuoto.
+>
+> Aggiunti due controlli in `strumenti/audit-regressioni.js` — uno che verifica che la X
+> della Strada non usi più `st-x`, uno generico che scansiona `index.html` e fallisce se
+> compare un `id` doppio, così la classe di bug (non solo questo caso) non torna indietro
+> senza che la prova se ne accorga. `npm run verifica` pulito: prova 67/67, audit 170/170,
+> build 15/15.
+

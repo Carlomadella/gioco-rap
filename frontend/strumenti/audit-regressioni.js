@@ -915,6 +915,20 @@ test("eventi tempo continua a canonicalizzare i luoghi",
   }
 }
 
+console.log("\nPunto 15 — niente pulsanti vuoti per ID duplicati");
+test("la X dello Studio e quella della Strada non condividono più id=\"st-x\"",
+  crime.includes('$("str-x").onclick = () => { hubTap(); chiudiStrada(); };') &&
+  studio.includes('$("st-x").onclick = () => chiudiStudio();') &&
+  index.includes('id="str-x"'));
+test("index.html non ha nessun id duplicato",
+  (() => {
+    const ids = [...index.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);
+    const visti = new Set();
+    const doppi = new Set();
+    for(const id of ids){ if(visti.has(id)) doppi.add(id); visti.add(id); }
+    return doppi.size === 0;
+  })());
+
 for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }

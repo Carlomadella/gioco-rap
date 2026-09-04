@@ -967,7 +967,7 @@ function renderStBarre(){
   const s = G.strada;
   const art = window.ARTIST || {};
   const citta = (art.city || "").trim() || "Città di provincia";
-  $("st-dove").textContent = "Il giro // " + citta;
+  $("str-dove").textContent = "Il giro // " + citta;
   $("st-citta").textContent = citta;
   $("st-sett").textContent = G.week;
   $("st-ora").textContent = typeof hubOra === "function" ? hubOra() : "";
@@ -1197,7 +1197,7 @@ $("st-molla").onclick = () => {
   renderStScheda();
 };
 
-$("st-x").onclick = () => { hubTap(); chiudiStrada(); };
+$("str-x").onclick = () => { hubTap(); chiudiStrada(); };
 $("st-mappa").onclick = () => { hubTap(); chiudiStrada(); };
 
 /* ESC: lo gestisce uscita.js per tutte le finestre, e chiama questa. Un passo
