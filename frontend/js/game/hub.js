@@ -1,6 +1,6 @@
 /* La plancia: la schermata da cui si gioca.
 
-   La mappa è la foto del concept (media/photo/schermate di gioco/mappa_citta.jpg): i luoghi con le
+   La mappa è la foto del concept (media/photo/pagina di gioco/mappa_citta.jpg): i luoghi con le
    loro targhette e i loro tasti «Entra» stanno dentro all'immagine, e sopra ci
    vanno solo le zone da toccare, in percentuale, così restano incollate anche
    quando la plancia si rimpicciolisce.
@@ -52,7 +52,7 @@ const spoglia = t => String(t).replace(/<[^>]*>/g, "");
 /* ================= I LUOGHI ================= */
 /* Le targhette sono dentro alla foto: qui c'è solo dove si tocca, in
    percentuale dell'immagine (1536×600 — punto 6: il ritaglio della mappa
-   definitiva, frontend/media/photo/pagina di gioco/mappa_definitiva.png,
+   definitiva, frontend/concept/mappa_definitiva.png,
    senza fascia in alto, profilo, player e slider dell'ora, che sono già
    disegnati veri altrove), e cosa succede quando si tocca.
    Gli id non si toccano: orari.js, eventi-tempo.js, spostamenti.js e

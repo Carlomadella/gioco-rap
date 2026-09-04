@@ -13,7 +13,7 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
    CHE TROVI NELL'ALBUM MEDIA DELLA CARTELLA GIOCO RAP.
 
    **FATTO (02/09/2026)** — la mappa definitiva
-   (`frontend/media/photo/pagina di gioco/mappa_definitiva.png`, 1536×1024) è il concept intero della
+   (`frontend/concept/mappa_definitiva.png`, 1536×1024) è il concept intero della
    plancia: fascia in alto, profilo, player musicale e slider dell'ora ci sono già, veri, in
    `hub.js`/`hub.css`/`telefono.js` — solo la città con i suoi cartelli mancava. Ritagliata la sola
    fascia della città (0,340 → 1536,940, sotto testata e profilo, sopra player e slider — nessun
@@ -104,7 +104,7 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
     vero, semplice e riconoscibile, viene dopo.
 
     **FATTO in parte (31/08/2026)** — la schermata della città di partenza, uguale alla foto
-    `media/photo/schermata_di_gioco_città_iniziale.png`.
+    `frontend/concept/schermata_di_gioco_città_iniziale.png`.
     - Si entra da lì: «Inizia la carriera» apre la mappa, non più le card. Dalla mappa si va nella
       partita e dalla partita si torna indietro con il tasto viola «Mappa».
     - Testata: marchio, nome, livello con la stella, fase in viola, e le quattro cose che hai —
