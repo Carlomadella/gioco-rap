@@ -700,11 +700,10 @@ let CODA_INVITO = null;
 
 function schermoLibero(){
   if(typeof G === "undefined" || G.ended) return false;
-  const gioco = document.getElementById("s-game"), hub = document.getElementById("s-hub");
-  const dentro = (gioco && gioco.classList.contains("on")) || (hub && hub.classList.contains("on"));
-  if(!dentro) return false;
+  const hub = document.getElementById("s-hub");
+  if(!(hub && hub.classList.contains("on"))) return false;
   for(const id of ["modal", "report", "writer", "piazza", "scena", "posto", "strada-crimine",
-                   "negozio", "adf-result-overlay", "adf-social-overlay", "tras-overlay"]){
+                   "negozio", "quaderno", "adf-result-overlay", "adf-social-overlay", "tras-overlay"]){
     const el = document.getElementById(id);
     if(el && el.classList.contains("on")) return false;
   }

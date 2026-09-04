@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:994aa67 -->
+## 04/09/26, 10:05 â€” task/schermata-originale-nella-mappa â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `994aa67`
+
+### Cosa Ã¨ entrato
+
+- `276e8d1` â€” fix: via anche i quattro bottoni in fondo alla mappa, erano doppioni â€” **Carlomadella**
+- `cee9ce0` â€” feat: via la vecchia schermata di gioco, le sue schede sopra la mappa â€” **Carlomadella**
+- `6dad126` â€” chore: pulizia dei media, 35 MB fuori dal pacchetto per gli store â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Rinominato:** `frontend/media/photo/pagina avatar/avatar_profilo_carnagione_chiara.png` â†’ `frontend/concept/avatar_profilo_carnagione_chiara.png`
+- **Rinominato:** `frontend/media/photo/pagina avatar/avatar_profilo_carnagione_scura.png` â†’ `frontend/concept/avatar_profilo_carnagione_scura.png`
+- **Modificato:** `frontend/js/creator/nav.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- commit:3a5ded4 -->
 ## 02/09/26, 01:40 — Fix strada map and jail flow
 

@@ -105,7 +105,9 @@ test("telefono compatto può aprire la stessa schermata Messaggi del PC",
 test("G.log mobile è esplicitamente Notifiche",
   tel.includes('{id:"notifiche", n:"Notifiche"') &&
   tel.includes('g.log.length - (g.seenLog || 0)') &&
-  tel.includes('$("g-diary").click()'));
+  /* punto 7: il bottone «Diario» non c'è più, il telefono chiama la funzione
+     invece di simulare un click su un elemento che non esiste. */
+  tel.includes('openDiary()'));
 test("Vedi tutti i messaggi non apre più il Diario",
   mobilePhone.includes('data-telapp="messaggi"') &&
   !mobilePhone.includes('data-diario="1">Vedi tutti i messaggi'));
@@ -552,7 +554,9 @@ test("esiste un solo controller globale del tempo",
 test("controller si monta nella testata della finestra attiva",
   timeControls.includes('const HOSTS = [') &&
   timeControls.includes('head:".pbarra"') &&
-  timeControls.includes('head:"#gtop .tline"') &&
+  /* punto 7: la vecchia schermata di gioco non c'è più, al suo posto il
+     quaderno sopra alla mappa — la testata dove si monta è la sua. */
+  timeControls.includes('head:".qhead"') &&
   timeControls.includes('head:".pohead"') &&
   timeControls.includes('head:".nghead"') &&
   timeControls.includes('head:".topbar"') &&

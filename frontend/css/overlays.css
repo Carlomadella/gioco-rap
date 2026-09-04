@@ -147,7 +147,9 @@
 .dclose{background:rgba(255,255,255,.08);border:0;color:#fff;width:34px;height:34px;border-radius:11px;
   font-size:15px;cursor:pointer}
 .dclose:hover{background:rgba(255,255,255,.16)}
-#g-diary{position:relative}
+/* Il bollino dei nuovi appunti stava attaccato al bottone «Diario», che non
+   c'è più (punto 7): il diario si apre dal telefono. La classe resta pronta,
+   senza il suo aggancio. */
 .dbdg{position:absolute;top:-7px;right:-7px;min-width:19px;height:19px;border-radius:999px;background:var(--hot);
   color:#fff;font-size:11px;font-weight:900;font-style:normal;display:grid;place-items:center;padding:0 5px}
 .dbdg[hidden]{display:none}

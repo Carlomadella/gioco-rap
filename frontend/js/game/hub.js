@@ -1,6 +1,6 @@
 /* La plancia: la schermata da cui si gioca.
 
-   La mappa è la foto del concept (media/photo/schermate di gioco/mappa_citta.jpg): i luoghi con le
+   La mappa è la foto del concept (media/photo/pagina di gioco/mappa_citta.jpg): i luoghi con le
    loro targhette e i loro tasti «Entra» stanno dentro all'immagine, e sopra ci
    vanno solo le zone da toccare, in percentuale, così restano incollate anche
    quando la plancia si rimpicciolisce.
@@ -52,7 +52,7 @@ const spoglia = t => String(t).replace(/<[^>]*>/g, "");
 /* ================= I LUOGHI ================= */
 /* Le targhette sono dentro alla foto: qui c'è solo dove si tocca, in
    percentuale dell'immagine (1536×600 — punto 6: il ritaglio della mappa
-   definitiva, frontend/media/photo/pagina di gioco/mappa_definitiva.png,
+   definitiva, frontend/concept/mappa_definitiva.png,
    senza fascia in alto, profilo, player e slider dell'ora, che sono già
    disegnati veri altrove), e cosa succede quando si tocca.
    Gli id non si toccano: orari.js, eventi-tempo.js, spostamenti.js e
@@ -276,8 +276,20 @@ const HUB_SUGG = [
 /* ================= APERTURE ================= */
 /* Il luogo non rifà quello che sa già fare la partita: la apre sulla sezione
    giusta. Così la plancia resta la porta, e il gioco resta dov'è. */
+function apriQuaderno(){
+  $("quaderno").classList.add("on");
+  document.body.classList.add("quaderno-aperto");
+}
+function chiudiQuaderno(){
+  $("quaderno").classList.remove("on");
+  document.body.classList.remove("quaderno-aperto");
+  renderHub();
+}
+window.apriQuaderno = apriQuaderno;
+window.chiudiQuaderno = chiudiQuaderno;
+
 function hubGioco(tab, sotto){
-  GO("game");
+  apriQuaderno();
   renderGioco();
   const nb = document.querySelector('.nb[data-t="' + tab + '"]');
   if(nb) nb.click();
@@ -636,8 +648,13 @@ $("hb-eventi").addEventListener("click", ev => {
 
 $("hb-logo").onclick = () => GO("menu");
 
-/* La via di ritorno dalla partita. Prima si accende la schermata, poi si
-   disegna: al contrario le misure sarebbero zero e resterebbe tutto nero. */
-$("g-tomappa").onclick = () => { GO("hub"); renderHub(); };
+/* La via di ritorno dal quaderno è chiuderlo: la mappa è sempre rimasta lì
+   sotto, viva, quindi non c'è nessuna schermata da riaccendere — si ridisegna
+   e basta, perché nel frattempo può essere cambiato tutto (soldi, energia,
+   giorno). Si chiude anche con Esc, come gli altri pannelli. */
+$("q-x").onclick = () => chiudiQuaderno();
+document.addEventListener("keydown", e => {
+  if(e.key === "Escape" && $("quaderno").classList.contains("on")) chiudiQuaderno();
+});
 
 window.HUB = { apri(){ GO("hub"); renderHub(); }, render: renderHub };

@@ -13,7 +13,7 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
    CHE TROVI NELL'ALBUM MEDIA DELLA CARTELLA GIOCO RAP.
 
    **FATTO (02/09/2026)** — la mappa definitiva
-   (`frontend/media/photo/pagina di gioco/mappa_definitiva.png`, 1536×1024) è il concept intero della
+   (`frontend/concept/mappa_definitiva.png`, 1536×1024) è il concept intero della
    plancia: fascia in alto, profilo, player musicale e slider dell'ora ci sono già, veri, in
    `hub.js`/`hub.css`/`telefono.js` — solo la città con i suoi cartelli mancava. Ritagliata la sola
    fascia della città (0,340 → 1536,940, sotto testata e profilo, sopra player e slider — nessun
@@ -104,7 +104,7 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
     vero, semplice e riconoscibile, viene dopo.
 
     **FATTO in parte (31/08/2026)** — la schermata della città di partenza, uguale alla foto
-    `media/photo/schermata_di_gioco_città_iniziale.png`.
+    `frontend/concept/schermata_di_gioco_città_iniziale.png`.
     - Si entra da lì: «Inizia la carriera» apre la mappa, non più le card. Dalla mappa si va nella
       partita e dalla partita si torna indietro con il tasto viola «Mappa».
     - Testata: marchio, nome, livello con la stella, fase in viola, e le quattro cose che hai —
@@ -638,6 +638,74 @@ proprio: nessuno poteva sapere che erano lì. Adesso hanno il loro segno, sempre
    **Quello che non si toglie**: `#s-game` resta come contenitore delle linguette —
    Catalogo, Discografia, Classifica, Contratti, Lifestyle, Traguardi e le mosse della
    settimana. Quelle non sono «info da trasferire», sono il gioco.
+
+   **CHIUSO DAVVERO (04/09/2026)** — e quella riga qui sopra era la scusa che teneva in
+   piedi mezza pagina. La richiesta era «togli la pagina», non «togli la testata della
+   pagina»: finché `#s-game` restava una `.screen`, restavano **due schermate di gioco**
+   — si usciva dalla mappa per entrare in un posto che non era un luogo, e si tornava
+   indietro con un bottone. Il riferimento questa volta è
+   `frontend/concept/pagina_di_gioco_originale.png`.
+
+   **La pagina non esiste più.** Le sette linguette e quello che c'è dentro sono diventate
+   **il quaderno** (`#quaderno`): un pannello che si apre *sopra* alla mappa, della stessa
+   famiglia dello Studio e della Sala — fondale scuro, riquadro centrale, la croce in alto
+   per tornare alla città (o `Esc`). La mappa non si spegne mai: chiudendo si è di nuovo
+   esattamente dov'eravamo. `hubGioco(tab, sotto)` apre il quaderno invece di cambiare
+   schermata, quindi **tutte le porte di prima funzionano identiche**: i luoghi, il
+   telefono, la voce «Classifiche» della landing.
+
+   **Il trucco che ha reso la cosa sicura**: si è *spostato il DOM*, non riscritto. Ogni id
+   `g-*` è rimasto quello che era, quindi `renderGioco()` e le sette schede non si sono
+   accorte di niente e non è stata toccata una riga di quello che ci disegna dentro.
+
+   **Cosa è stato trasferito, e cosa no perché sarebbe stato un doppione.** Confrontata la
+   foto voce per voce con la plancia:
+
+   | quello che c'era nella pagina | dov'è adesso |
+   |---|---|
+   | nome dell'artista, fase, contratto | già nel profilo della plancia — **non toccato** |
+   | anno, settimana, giorno x/7, ora | già nella fascia in alto (`hb-anno`, `hb-week`, `hb-ora`) — **non toccato** |
+   | «La tua scalata» e «Prossimo passo» | già nella colonna di sinistra — **non toccato** |
+   | barra dell'energia in fondo | già la prima cella della fascia, con la sua barra — **tolta** |
+   | Diario | l'app **Notifiche** del telefono — **tolto** |
+   | Salta il tempo | «**Attendi**» del widget del tempo, nella fascia — **tolto** |
+   | Fine giornata | «**+1 giorno**» dello stesso widget — **tolto** |
+   | il tasto ♪ | l'interruttore **Audio** delle impostazioni — **tolto** |
+   | le sette schede | **il quaderno**, sopra alla mappa |
+
+   Così sono sparite anche le due righe di `renderGioco()` che riscrivevano nome, anno,
+   settimana, giorno, fase e contratto: sei doppioni su sei.
+
+   **I quattro bottoni in fondo sono durati mezz'ora.** Al primo giro erano stati spostati
+   in fondo alla mappa, ed era sbagliato: erano doppioni anche loro. Controllato uno per
+   uno prima di toglierli, perché se una di quelle funzioni non avesse avuto un'altra
+   porta la partita restava bloccata:
+   - il **diario** si apre dall'app Notifiche del telefono (`vai:` di `telefono.js`);
+   - «**Attendi**» e «**+1 giorno**» sono nel widget del tempo, che si monta sulla fascia
+     della mappa ed è quindi sempre a portata. E «+1 giorno» non è un pari, è **meglio**:
+     passa da `ADF_TIME_SKIP` (Eventi V2), che al settimo giorno tira fuori lo stesso
+     `weekReport()` + `openWeek()` del vecchio bottone e in più sa fermarsi quando salta
+     fuori un evento ALTO. Il motore è sempre stato uno solo, `avanzaGiorno()` in `sim.js`;
+   - il tasto ♪ era **letteralmente** la stessa manopola di `SET.audio.on` — c'era già
+     scritto in un commento di `fx.js`: «il tasto ♪ e l'interruttore nelle impostazioni
+     sono la stessa cosa».
+
+   **I legami che si sarebbero rotti in silenzio**, tutti ricollegati: il menu di sistema e
+   il widget dell'orologio si montavano su `#gtop .tline` e adesso si montano su `.qhead`
+   (e `menu-sistema.css` non ha più le sue due regole di geometria cucite addosso alla
+   vecchia testata, ma entra nella famiglia di `.pohead`/`.nghead`); `schermoLibero()` in
+   `trasferte.js` e `screenGameplay()` in `eventi-tempo.js` guardavano se `#s-game` era
+   accesa per capire se si stava giocando, e adesso guardano la mappa — con il quaderno
+   aggiunto all'elenco delle finestre che mettono in pausa gli inviti; `hostAttivo()` in
+   `menu-sistema.js`; la ricolorazione dell'accento in `ui.js`. Il guardiano di
+   `audit-regressioni.js` che pretendeva `head:"#gtop .tline"` adesso pretende `.qhead`:
+   è lo stesso controllo, sul posto giusto.
+
+   `npm run prova` 67/67, `audit-regressioni` 151/151, `verifica:build` 15/15. In più è
+   stato passato un controllo apposta — ogni id che il JS cerca con `$("...")` contro
+   quelli che esistono davvero in `index.html` — ed è quello che ha pescato `g-name` e
+   `g-meta`, che nessun test avrebbe visto: `renderGioco()` ci scriveva dentro senza
+   guardia e sarebbe morto al primo giro, portandosi giù la schermata intera.
 
    **Trovato mentre ci si lavorava:** `ui.js` finiva con `$("g-tomenu").onclick`, e
    `#g-tomenu` non esiste più nel markup da quando la via di ritorno è diventata la mappa.

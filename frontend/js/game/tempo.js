@@ -406,6 +406,12 @@
     });
   }
 
+  /* Punto 7: `#g-meta` era la riga della testata del quaderno, e non c'è più —
+     era un doppione di quello che la fascia della mappa dice già. Quindi da qui
+     in poi questa non fa niente, e va bene così: l'ora sta nella fascia
+     (`hb-ora`) e dentro al quaderno la mette il widget del tempo, che si monta
+     sulla sua testata (`.qhead`). Il controllo c'era già, adesso è lui a
+     comandare. */
   function decoraMeta(){
     const meta=document.getElementById("g-meta"); if(!meta) return;
     let clock=document.getElementById("game-clock-main");

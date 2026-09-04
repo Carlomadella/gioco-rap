@@ -115,3 +115,83 @@ macchina, l'indicizzazione degli array è il primo sospettato.
 
 ---
 
+
+## La pulizia dei media, e i sessanta sfondi che sono dieci foto
+
+--- FUORI DAI PUNTI NUMERATI (04/09/2026) ---
+
+Controllo di `frontend/media/` file per file, con l'MD5 di ognuno: erano **163
+file**, ne restano **120**. Quello che conta è che `strumenti/build.js` copia
+`media/` **intera** dentro al pacchetto per gli store (`copiaCartella` a riga
+188), quindi tutto quello che sta lì dentro se lo scarica chi installa il
+gioco — anche se nessuna riga di codice lo chiede mai.
+
+**Tre cose fatte.**
+
+1. **Trenta doppioni esatti, 17,5 MB.** `media/photo/pagina attività criminali/`
+   era una copia byte per byte di `media/pagina-attivita-criminali/` — stessi
+   trenta file, stessi MD5. Quella richiamata da `STRADA_SFONDI`
+   (`js/game/strada-crimine.js`) è la seconda; la prima non era nominata da
+   nessuna parte. Cancellata.
+2. **Tredici concept, 18 MB, spostati fuori da `media/`.** Non sono roba di
+   gioco: sono le immagini di riferimento — le tre schermate di città, la mappa
+   definitiva, i due avatar di prova, i sei sfondi di landing delle due serie
+   alternative del punto sopra. Nessuna è richiamata da CSS o JS. Adesso stanno
+   in `frontend/concept/`, con dentro un `README.md` che dice la regola: se un
+   file serve al gioco non va richiamato da lì, va rimesso in `media/`.
+3. **Rimessi a posto i percorsi rimasti indietro.** Tre commenti in
+   `hub.js`/`hub.css` e in `implementazioni/01-mappa-e-citta.md` nominavano i
+   concept al vecchio indirizzo. E le tre foto delle città nel `README.md`
+   puntavano a `frontend/media/photo/schermate di gioco/` — una cartella che
+   non è mai esistita con quel nome: erano **rotte già prima**, e su GitHub si
+   vedevano tre riquadri vuoti. Adesso si vedono.
+4. Via i due file di lavoro dell'audit (`hashes.tmp`, `media-audit.json`): il
+   risultato è questa nota, non i file intermedi.
+
+**In tutto sono 35 MB in meno addosso a chi installa.** `npm run prova` 67/67 e
+`audit-regressioni.js` 151/151 puliti dopo.
+
+**Quello che ho trovato e non ho toccato — e che è il problema vero.**
+`media/photo/attivita-criminali/` ha **sessanta file, ma dentro ci sono dieci
+foto**. Non è uno spreco di spazio: è quello che si vede giocando. Sono gli
+sfondi della schermata Attività criminali, quelli che `chooseBackground`
+(`js/game/strada-crimine-ui.js`, riga 406) pesca pesandoli per tier e per tag da
+`CRIME_BACKGROUNDS_LOCAL`. I gruppi:
+
+| foto | quante volte | quali `crime-bg` |
+|---|---|---|
+| nastro «CRIME SCENE DO NOT CROSS», 640×362 | **24** | 01, 04, 06, 07, 08, 13, 15, 16, 17, 18, 23, 24, 26, 29, 30, 32, 33, 36, 37, 38, 43, 45, 59, 60 |
+| 960×534 | 6 | 02, 34, 40, 44, 48, 58 |
+| 960×534 | 6 | 27, 41, 46, 50, 55, 57 |
+| 960×534 | 5 | 10, 14, 22, 42, 54 |
+| 960×534 | 4 | 12, 20, 28, 52 |
+| 960×534 | 4 | 19, 31, 35, 51 |
+| 960×534 | 3 | 03, 11, 56 |
+| 960×534 | 3 | 21, 25, 53 |
+| 960×534 | 3 | 39, 47, 49 |
+| 960×534 | 2 | 05, 09 |
+
+Vuol dire che due colpi su cinque, qualunque sia il tier e qualunque tag abbia
+l'evento, mostrano la stessa foto del nastro della polizia: «Riunione sullo
+yacht» (id 51, tier 3) e «Riunione nel magazzino» (id 31, tier 1) sono la stessa
+immagine, «Blitz alla villa» (43) e «Fermato in strada» (37) pure. E la memoria
+anti-ripetizione non aiuta: `bgHistory` tiene gli ultimi sei **id**, non le
+immagini, quindi la stessa foto può tornare due volte di fila con due nomi
+diversi. Le misure dicono la stessa cosa da un'altra parte: 640×362 e 960×534
+per una foto a tutto schermo, mentre gli sfondi del carcere — venti, tutte
+diverse — sono 1600×900.
+
+Non l'ho sistemato perché sistemarlo vuol dire **procurare cinquanta foto
+nuove**, non spostare file: rifare i percorsi sulle dieci che ci sono
+risparmierebbe 2 MB e lascerebbe la schermata identica a com'è adesso.
+Da decidere: o si scarica il set vero (i titoli e i tag di
+`crime-backgrounds.js` sono già lì, uno per uno, e fanno da lista della spesa),
+oppure si accorcia `CRIME_BACKGROUNDS_LOCAL` a dieci voci oneste e si smette di
+promettere sessanta scenari diversi.
+
+**Come si rifà il controllo**: si cammina su `frontend/media/` con l'MD5 di ogni
+file e si raggruppa per impronta; gli orfani sono quelli il cui nome non compare
+in nessun `.js`, `.css` o `.html` sotto `frontend/` (escluso `dist/`, che è
+generato). Attenzione a una trappola: `media/photo/pagina di gioco/` e
+`media/photo/pagina di landing/` hanno spazi e accenti nel nome, e un `grep`
+scritto in fretta li perde.
