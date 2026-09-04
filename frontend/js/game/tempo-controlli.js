@@ -504,7 +504,16 @@
     try{if(typeof renderHub==="function")renderHub();}catch(_){}
     try{if(typeof renderStrada==="function")renderStrada();}catch(_){}
     try{if(typeof renderPosto==="function")renderPosto();}catch(_){}
-    try{if(typeof renderNegozio==="function")renderNegozio();}catch(_){}
+    /* `renderNegozio` non è mai esistita: le funzioni si chiamano
+       `renderArmadio` (il guardaroba) e `renderAbbigliamento` (la vetrina
+       dentro allo Shop). Il `typeof` teneva nascosto lo sbaglio — la chiamata
+       non esplodeva, semplicemente non faceva niente, e quelle due viste non
+       si sono mai riaggiornate quando passava il tempo. Aggiunto anche lo
+       Studio, che mancava del tutto: la sua testata dice energia, soldi e
+       lucidità, cioè esattamente le cose che il tempo cambia. */
+    try{if(typeof renderArmadio==="function")renderArmadio();}catch(_){}
+    try{if(typeof renderAbbigliamento==="function")renderAbbigliamento();}catch(_){}
+    try{if(typeof renderStudio==="function")renderStudio();}catch(_){}
     try{if(typeof renderTelefono==="function")renderTelefono();}catch(_){}
     try{window.dispatchEvent(new CustomEvent("adf-time-controls:changed",{detail:{time:GAME_TIME.now(),day:Number(G.day)||1,week:Number(G.week)||1,year:Number(G.year)||1}}));}catch(_){}
     queueSync(true);

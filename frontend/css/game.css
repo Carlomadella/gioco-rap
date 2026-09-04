@@ -30,8 +30,7 @@
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
   transition:background .15s,color .15s}
 .pnx:hover{background:rgba(255,255,255,.12);color:#fff}
-/* lo slot dentro al telefono: il contenitore prestato ci sta dentro intero */
-.telslot{display:block}
+/* lo slot dentro al telefono lo veste `telefono.css`, dove sta il resto */
 
 /* Torna al menu: sta in cima al contenuto, non nella barra fissa e non fra le
    CTA in basso. E' l'unica via d'uscita dalla partita, quindi e' bianco pieno,
