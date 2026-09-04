@@ -21,6 +21,7 @@ const writer = leggi("js/game/writer.js");
 const piazza = leggi("js/game/piazza.js");
 const hub = leggi("js/game/hub.js");
 const ui = leggi("js/game/ui.js");
+const negozio = leggi("js/game/negozio.js");
 const hours = leggi("js/game/orari.js");
 const travel = leggi("js/game/spostamenti.js");
 const crimeui = leggi("js/game/strada-crimine-ui.js");
@@ -1011,7 +1012,53 @@ test("ogni stanza non-hub/jail riconosciuta da hostAttivo() ha davvero un modo d
     return !!body && stanze.every(id => body.includes('$id("' + id + '")'));
   })());
 
-for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/piazza.js"]){
+console.log("\nPunto 2 — le card della mappa sono tutte come lo Studio");
+test("tutti i dieci luoghi hanno lo stesso ingombro dello Studio (10.50×12.50)",
+  (() => {
+    const misure = [...hub.matchAll(/\{id:"[a-z]+",[^}]*?w:([\d.]+), h:([\d.]+),/g)]
+      .map(m => m[1] + "x" + m[2]);
+    return misure.length === 10 && misure.every(m => m === "10.50x12.50");
+  })());
+test("l'ultimo luogo toccato non resta con l'anello giallo del focus: si toglie il fuoco al click",
+  (() => {
+    const c0 = hub.indexOf('$("hb-pins").addEventListener("click"');
+    const c1 = hub.indexOf("});", c0);
+    const body = c0 >= 0 && c1 > c0 ? hub.slice(c0, c1) : "";
+    return !!body && body.includes("b.blur();") && body.indexOf("b.blur();") < body.indexOf("l.vai()");
+  })());
+
+console.log("\nPunto 3 — via i tastini che muovono la mappa");
+test("le frecce «scorri per esplorare» (pfrec) e il giro guidato (HUB_QUI) non esistono più",
+  !hub.includes("pfrec") && !hub.includes("HUB_QUI") && !hub.includes('"qui"'));
+test("nessun foglio di stile parla ancora di pfrec o di .pspot.qui",
+  (() => {
+    const css = [
+      leggi("css/hub.css"), leggi("css/tocco.css")
+    ].join("\n");
+    return !css.includes("pfrec") && !css.includes(".qui");
+  })());
+
+console.log("\nPunto 4 — lo Shop è uno shop, non un menù impostazioni");
+test("Attrezzatura e Beat sono card (.shcard/.shbeat), non righe di lista (.li)",
+  ui.includes('"shcard') && ui.includes('"shbeat') &&
+  !/\$\("g-shop"\)\.innerHTML\s*=\s*GEAR\.map\(g2 => \{[^}]*<div class="li"/.test(ui));
+test("ogni pezzo di attrezzatura ha un'icona propria (cuffie, mic, manopole, altoparlante, barre)",
+  ui.includes("SH_GEAR_ICONE") &&
+  ui.includes('cuffie:"cuffie"') && ui.includes('monitor:"altoparlante"') &&
+  hub.includes("cuffie:'<path") && hub.includes("altoparlante:'<path"));
+test("la cassa dello shop si vede sempre, non solo scorrendo fino in fondo",
+  ui.includes('$("sh-cash")') && ui.includes("fmt(G.money)"));
+test("Attrezzatura, Beat e Vestiti sono tre reparti dietro tre linguette, non tre liste impilate",
+  index.includes('data-sh="gear"') && index.includes('data-sh="beat"') && index.includes('data-sh="fit"') &&
+  index.includes('data-shsec="gear"') && index.includes('data-shsec="beat"') && index.includes('data-shsec="fit"') &&
+  negozio.includes('$("sh-tabs").addEventListener("click"'));
+test("il tab dei vestiti mostra ancora la stessa griglia di sempre (nggrid/ngcard), non riscritta",
+  index.includes('<div class="nggrid" id="g-fit">') && negozio.includes("function renderAbbigliamento()"));
+test("comprare attrezzatura e beat resta la stessa economia di prima: stesso costo, stesso G.money, stesso G.gear/G.beats",
+  ui.includes("G.money -= g2.p; G.gear[g2.id] = true;") &&
+  ui.includes("G.money -= b.price; G.market.splice(i,1); G.beats.push("));
+
+for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/piazza.js","js/game/negozio.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }

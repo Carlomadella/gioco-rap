@@ -264,6 +264,86 @@
 @keyframes playpulse{0%{box-shadow:0 0 0 0 rgba(255,197,61,.55)}100%{box-shadow:0 0 0 9px rgba(255,197,61,0)}}
 .empty2{padding:16px;color:var(--faint);font-size:13px;text-align:center}
 
+/* ==== LO SHOP (punto 4) ====
+   Prima erano tre `.list` — la stessa scatola grigia delle Offerte sul
+   tavolo, del Contratto, delle Spese fisse — impilate una sopra l'altra:
+   un menù di impostazioni travestito da negozio. Qui sotto tre reparti
+   dietro tre linguette (`.shtabs`), la cassa sempre in vista (`.shcash`),
+   e le card (`.shcard`/`.shbeat`) sono le stesse ossa delle tile delle
+   azioni — fondale colorato, prezzo in un angolo, titolo sotto — perché
+   quelle già leggono come "roba da prendere", non come una riga di lista. */
+.shshop{margin-bottom:14px}
+.shbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;
+  position:sticky;top:0;z-index:3;padding:10px 0}
+.shtabs{display:flex;gap:8px;flex-wrap:wrap}
+.shtab{padding:9px 18px;border-radius:999px;font-family:var(--cond);font-size:13px;font-weight:800;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--soft);background:rgba(255,255,255,.05);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);transition:background .15s,color .15s,box-shadow .15s}
+.shtab:hover{color:#fff;background:rgba(255,255,255,.09)}
+.shtab.on{color:#0B0B0D;background:var(--acid);box-shadow:none}
+.shcash{margin-left:auto;display:inline-flex;align-items:center;gap:7px;padding:8px 16px 8px 8px;
+  border-radius:999px;background:rgba(255,197,61,.1);color:var(--acid);font-weight:800;font-size:14px;
+  font-variant-numeric:tabular-nums;box-shadow:inset 0 0 0 1px rgba(255,197,61,.28)}
+.shcash i{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;
+  background:linear-gradient(180deg,#FFE49A,var(--acid))}
+.shcash i svg{width:15px;height:15px;fill:#251A02}
+.shsec{display:none}
+.shsec.on{display:block}
+.shgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:13px}
+/* la card dell'attrezzatura: un bottone intero, come le tile delle azioni */
+.shcard{position:relative;text-align:left;display:flex;flex-direction:column;overflow:hidden;
+  border-radius:16px;background:linear-gradient(180deg,#20202A 0%,#17171E 60%,#111116 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1.5px rgba(255,255,255,.08),
+    0 4px 0 #08080C, 0 12px 24px rgba(0,0,0,.5);
+  transition:transform .13s cubic-bezier(.2,.9,.3,1),box-shadow .13s}
+.shcard:hover:not(:disabled){transform:translateY(-4px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.26), inset 0 0 0 1.5px color-mix(in srgb,var(--a) 55%,transparent),
+    0 7px 0 #08080C, 0 18px 32px rgba(0,0,0,.58)}
+.shcard:active:not(:disabled){transform:translateY(1px)}
+.shcard:disabled{cursor:default}
+.shcard.owned{filter:saturate(.7) brightness(.86)}
+.shcard:disabled:not(.owned){filter:grayscale(.55) brightness(.62)}
+.shart{position:relative;height:96px;flex:none;display:grid;place-items:center;
+  background:linear-gradient(150deg,var(--a),var(--b))}
+.shart::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(80% 60% at 50% 120%,rgba(0,0,0,.4),transparent 70%)}
+.shicon{width:38px;height:38px;fill:rgba(255,255,255,.92);filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))}
+.shprice,.shtag{position:absolute;top:8px;right:8px;z-index:2;padding:4px 10px;border-radius:999px;
+  font-family:var(--cond);font-size:12px;font-weight:800;letter-spacing:.04em;background:rgba(6,6,10,.78)}
+.shprice{color:var(--acid);box-shadow:inset 0 0 0 1px rgba(255,197,61,.32)}
+.shtag{color:#0B0B0D;background:var(--acid);box-shadow:none}
+.sht{font-family:var(--disp);font-size:15px;font-weight:400;letter-spacing:-.01em;line-height:1.15;
+  margin:11px 12px 0;text-shadow:0 2px 0 rgba(0,0,0,.5)}
+.shs{font-size:11.5px;color:var(--soft);line-height:1.35;font-weight:500;margin:5px 12px 12px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:30px}
+/* la card di un beat: niente bottone unico, ci vivono dentro tre azioni —
+   ascolta, rifiuta, compra — quindi resta un div con tre controlli veri */
+.shbeat{position:relative;display:flex;flex-direction:column;overflow:hidden;border-radius:16px;
+  background:linear-gradient(180deg,#20202A 0%,#17171E 60%,#111116 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1.5px rgba(255,255,255,.08),
+    0 4px 0 #08080C, 0 12px 24px rgba(0,0,0,.5);
+  transition:transform .13s cubic-bezier(.2,.9,.3,1)}
+.shbeat:hover{transform:translateY(-4px)}
+.shbeat.no .shbuy{opacity:.4;cursor:not-allowed}
+.shbeat .shart{height:88px}
+.shplay{width:42px;height:42px;border-radius:50%;font-size:13px;color:#fff;
+  background:rgba(6,6,10,.55);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35);
+  display:grid;place-items:center;backdrop-filter:blur(3px);transition:background .15s,transform .1s}
+.shplay:hover{background:rgba(6,6,10,.75)}
+.shplay:active{transform:scale(.92)}
+.shplay.on{background:var(--acid);color:#0B0B0D;box-shadow:none;animation:playpulse 1.15s ease-out infinite}
+.shdrop{position:absolute;top:7px;right:7px;z-index:2;width:24px;height:24px;border-radius:50%;
+  font-size:10.5px;color:rgba(255,255,255,.75);background:rgba(6,6,10,.6);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);display:grid;place-items:center;transition:background .15s,color .15s}
+.shdrop:hover{color:#fff;background:var(--hot)}
+.shbuy{margin:0 12px 12px;padding:9px;border-radius:10px;background:#fff;color:#0B0B0D;
+  font-size:13px;font-weight:800;text-align:center}
+.shbuy:disabled{opacity:.35;cursor:not-allowed}
+@media (max-width:640px){
+  .shbar{position:static}
+  .shgrid{grid-template-columns:repeat(auto-fill,minmax(136px,1fr))}
+}
+
 /* La fase: una fascia, non una scheda. Dove sei a sinistra, i gradini a destra,
    e sotto l'unica riga che ti serve davvero — cosa fare adesso. */
 .phase{border-radius:16px;padding:11px 15px 12px;margin-bottom:14px;position:relative;overflow:hidden;

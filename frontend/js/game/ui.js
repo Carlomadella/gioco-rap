@@ -18,6 +18,13 @@ const ART = {
   stacca:TINTA_VITA.concat("Z"), palestra_pesi:TINTA_VITA.concat("P"),
   palestra_cardio:TINTA_VITA.concat("P")
 };
+/* punto 4: un'icona per pezzo di attrezzatura — hsvg() e le icone (HIC) sono
+   di hub.js, ma essendo tutti <script> classici sullo stesso scope globale
+   sono già pronte quando renderGioco() gira davvero (hub.js carica dopo,
+   ma questa mappa la legge solo a runtime, non al caricamento del file). */
+const SH_GEAR_ICONE = {
+  cuffie:"cuffie", mic:"mic", scheda:"manopole", monitor:"altoparlante", tratt:"barre"
+};
 
 /* Punto 50: queste mosse finivano dritte in un toast — nessuna scena,
    nessuna pagina, un numero e via. Scrivi/beat/free hanno già la loro
@@ -341,11 +348,16 @@ function renderGioco(){
     btn.onclick = () => beatSuona(G.beats[+btn.dataset.mine], btn);
   });
 
-  const rigaBeat = (b, i) => '<div class="li"><span class="cov" style="background:' + beatCov(b) + '"></span>' +
-    '<span class="nm"><b>' + b.n + '</b><span>qualità ' + b.q + ' · ' + beatInfo(b).bpm + ' bpm</span></span>' +
-    '<button class="play no" data-drop="' + i + '" title="Rifiuta: sparisce dal catalogo">✕</button>' +
-    '<button class="play" data-hear="' + i + '" title="Ascolta il beat">▶</button>' +
-    '<button class="buy" data-buy="' + i + '"' + (G.money < b.price ? " disabled" : "") + '>' + b.price + ' €</button></div>';
+  /* punto 4: card da vetrina, non righe da lista — la cover fa da fondale,
+     ascolta e rifiuta stanno sopra di lei, comprare è un tasto pieno sotto. */
+  const rigaBeat = (b, i) => '<div class="shbeat' + (G.money < b.price ? " no" : "") + '">' +
+    '<span class="shart" style="background:' + beatCov(b) + '">' +
+      '<button class="shplay" data-hear="' + i + '" title="Ascolta il beat">▶</button>' +
+      '<button class="shdrop" data-drop="' + i + '" title="Rifiuta: sparisce dal catalogo">✕</button>' +
+    '</span>' +
+    '<span class="sht">' + b.n + '</span>' +
+    '<span class="shs">qualità ' + b.q + ' · ' + beatInfo(b).bpm + ' bpm</span>' +
+    '<button class="shbuy" data-buy="' + i + '"' + (G.money < b.price ? " disabled" : "") + '>' + b.price + ' €</button></div>';
   /* il banco diviso per genere: il tuo per primo, gli altri in ordine */
   const perGen = {};
   G.market.forEach((b,i) => { const g = beatGen(b); (perGen[g] = perGen[g] || []).push([b,i]); });
@@ -359,7 +371,7 @@ function renderGioco(){
           '<i style="background:linear-gradient(140deg,' + gg.c[0] + ',' + gg.c[1] + ')"></i>' +
           '<b>' + gg.n + '</b><span>' + (g === mioG ? "il tuo genere" : gg.bpm[0] + "–" + gg.bpm[1] + " bpm") +
           ' · ' + perGen[g].length + (perGen[g].length === 1 ? " beat" : " beat") + '</span></div>' +
-          perGen[g].map(([b,i]) => rigaBeat(b,i)).join("");
+          '<div class="shgrid">' + perGen[g].map(([b,i]) => rigaBeat(b,i)).join("") + '</div>';
       }).join("")
     : '<div class="empty2">Il banco è vuoto. I beat si vanno a cercare allo Studio, nella stanza «Il beat».</div>';
   $("g-market").querySelectorAll("[data-hear]").forEach(btn => {
@@ -406,11 +418,22 @@ function renderGioco(){
     };
   });
 
+  /* punto 4: la vetrina dell'attrezzatura — card come le altre, non righe di
+     menù. Tutta l'attrezzatura è "roba da studio", quindi un solo fondale
+     (TINTA_STUDIO, lo stesso delle azioni di scrittura/registrazione/mix):
+     a differenziare le card è l'icona e il nome, non cinque colori a caso. */
   $("g-shop").innerHTML = GEAR.map(g2 => {
     const owned = !!G.gear[g2.id];
-    return '<div class="li"><span class="nm"><b>' + g2.n + '</b><span>' + g2.d + '</span></span>' +
-      (owned ? '<span class="tag on">tuo</span>'
-             : '<button class="buy" data-gear="' + g2.id + '"' + (G.money < g2.p ? " disabled" : "") + '>' + g2.p + ' €</button>') + '</div>';
+    const noMoney = !owned && G.money < g2.p;
+    return '<button class="shcard' + (owned ? " owned" : "") +
+      '" style="--a:' + TINTA_STUDIO[0] + ';--b:' + TINTA_STUDIO[1] + '" data-gear="' + g2.id + '"' +
+      (owned || noMoney ? " disabled" : "") + '>' +
+      '<span class="shart">' + hsvg(SH_GEAR_ICONE[g2.id] || "ingranaggio", "shicon") +
+        (owned ? '<span class="shtag">Tuo</span>' : '<span class="shprice">' + g2.p + ' €</span>') +
+      '</span>' +
+      '<span class="sht">' + g2.n + '</span>' +
+      '<span class="shs">' + g2.d + '</span>' +
+    '</button>';
   }).join("");
   $("g-shop").querySelectorAll("[data-gear]").forEach(btn => {
     btn.onclick = () => {
@@ -424,6 +447,11 @@ function renderGioco(){
 
   /* punto 7: i vestiti si comprano qui, non dal guardaroba della plancia */
   if(typeof renderAbbigliamento === "function") renderAbbigliamento();
+
+  /* punto 4: la cassa dello shop, sempre in vista sopra le linguette —
+     in un negozio vero non si scorre a caso per sapere quanto si ha. */
+  const shCash = $("sh-cash");
+  if(shCash) shCash.innerHTML = '<i>' + hsvg("soldi") + '</i>' + fmt(G.money) + ' €';
 
   // classifica
   renderChart();
