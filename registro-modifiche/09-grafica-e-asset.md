@@ -6,6 +6,29 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:76cfda1 -->
+## 04/09/26, 22:48 â€” main â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `76cfda1`
+
+### Cosa Ã¨ entrato
+
+- `4c52f4f` â€” fix: lo Shop diventa uno shop, non un menù impostazioni (punto 4) â€” **Sadyco La Fame**
+- `5a66eb5` â€” fix: card della mappa uniformi come lo Studio, via i tastini che la scorrono (punti 2, 3) â€” **Sadyco La Fame**
+- `4e9168e` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/game.css`
+- **Modificato:** `frontend/css/hub.css`
+- **Modificato:** `frontend/css/negozio.css`
+- **Modificato:** `frontend/css/tocco.css`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:4284600 -->
 ## 04/09/26, 20:41 â€” task/registro-e-media â†’ main
 
