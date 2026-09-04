@@ -37,6 +37,43 @@ function adfSegnaOggi(id){
   return c[id];
 }
 
+/* Punto 2 - Promo.
+   La prima promo del giorno rende pieno, poi il pubblico si satura.
+   La componente percentuale non pu? inoltre crescere all'infinito
+   ricomponendosi sui follower appena guadagnati. */
+const ADF_PROMO_DAILY_MULT = Object.freeze([1, 0.5, 0.2]);
+const ADF_PROMO_DAILY_FLOOR = 0.1;
+const ADF_PROMO_WEEKLY_PCT_CAP = 0.015;
+
+function promoSettimanaKey(){
+  return [Number(G.year||1), Number(G.week||1)].join(":");
+}
+
+function promoSettimana(){
+  const key = promoSettimanaKey();
+  if(!G.promoSaturation || G.promoSaturation.key !== key){
+    G.promoSaturation = {
+      key:key,
+      baseFans:Math.max(0, Number(G.fans||0)),
+      pctUsed:0
+    };
+  }
+
+  G.promoSaturation.baseFans =
+    Math.max(0, Number(G.promoSaturation.baseFans||0));
+  G.promoSaturation.pctUsed =
+    Math.max(0, Number(G.promoSaturation.pctUsed||0));
+
+  return G.promoSaturation;
+}
+
+function promoDailyMult(){
+  const n = adfOggi("promo");
+  return n < ADF_PROMO_DAILY_MULT.length
+    ? ADF_PROMO_DAILY_MULT[n]
+    : ADF_PROMO_DAILY_FLOOR;
+}
+
 const JOBS = [
   {id:"volantini", n:"Volantinaggio", pay:70,  e:18, d:"Freddo, gambe, nessuna dignità."},
   {id:"lavapiatti", n:"Lavapiatti",   pay:100, e:18, d:"Turni serali, cucina bollente."},
@@ -238,13 +275,40 @@ const ACTIONS = [
   {id:"promo", n:"Promo sui social", e:12,
    d:"Clip e provocazioni. Accende quello che hai fuori.",
    need:() => G.songs.some(s => s.released) ? null : "1 pezzo fuori",
-   give:() => "+" + Math.round((6 + G.skills.rete*0.12) * RITMO) + " hype · follower",
+   give:() => {
+     const mult = promoDailyMult();
+     return "+" + Math.round((6 + G.skills.rete*0.12) * RITMO * mult) +
+       " hype ? follower" + (mult < 1 ? " ? resa ridotta" : "");
+   },
    run(){
-     const h = (6 + G.skills.rete*0.12) * RITMO;
+     const mult = promoDailyMult();
+
+     const h = (6 + G.skills.rete*0.12) * RITMO * mult;
      G.hype = clamp(G.hype + h, 0, 100);
-     const f = Math.round((G.fans*0.012 + rnd(4,24)) * RITMO);
-     G.fans += f; G.wellbeing -= 1;
-     return "Hype +" + Math.round(h) + ", " + f + " nuovi follower.";
+
+     const p = promoSettimana();
+     const pctWanted = G.fans * 0.012 * RITMO * mult;
+     const pctCap = p.baseFans * ADF_PROMO_WEEKLY_PCT_CAP;
+     const pctBudget = Math.max(0, pctCap - p.pctUsed);
+     const pctGain = Math.min(pctWanted, pctBudget);
+
+     const flatGain = rnd(4,24) * RITMO * mult;
+     const f = Math.max(0, Math.round(flatGain + pctGain));
+
+     p.pctUsed += pctGain;
+     G.fans += f;
+     G.wellbeing -= 1;
+     adfSegnaOggi("promo");
+
+     const satToday = mult < 1
+       ? " Reach ridotta: oggi hai gi? spinto parecchio."
+       : "";
+     const satWeek = pctCap > 0 && p.pctUsed >= pctCap - 1e-9
+       ? " La crescita percentuale della settimana ? satura."
+       : "";
+
+     return "Hype +" + Math.round(h) + ", " + f +
+       " nuovi follower." + satToday + satWeek;
    }},
 
   {id:"free", n:"Freestyle in piazza", e:26, luc:3,

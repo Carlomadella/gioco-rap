@@ -164,6 +164,158 @@ test("fattore Scrittura 5 è circa 31,6%, non 52,5%",
 test("vecchio fattore 0,5 + skill/200 rimosso",
   !writer.includes("0.5 + G.skills.scrittura/100 * 0.5"));
 
+console.log("\nPunto 2 - Promo con saturazione");
+
+test("nuova carriera inizializza la memoria saturazione Promo",
+  state.includes('promoSaturation:{key:"", baseFans:0, pctUsed:0}'));
+
+test("Promo ha rendimenti giornalieri decrescenti",
+  actions.includes("const ADF_PROMO_DAILY_MULT = Object.freeze([1, 0.5, 0.2])") &&
+  actions.includes("const ADF_PROMO_DAILY_FLOOR = 0.1") &&
+  actions.includes("function promoDailyMult()"));
+
+test("ogni Promo completata viene contata nel giorno",
+  actions.includes('adfSegnaOggi("promo")'));
+
+test("la componente percentuale Promo ha cap settimanale 1,5%",
+  actions.includes("const ADF_PROMO_WEEKLY_PCT_CAP = 0.015") &&
+  actions.includes("const pctGain = Math.min(pctWanted, pctBudget)"));
+
+test("il cap usa i fan di partenza della settimana",
+  actions.includes("baseFans:Math.max(0, Number(G.fans||0))") &&
+  actions.includes("p.baseFans * ADF_PROMO_WEEKLY_PCT_CAP"));
+
+test("la vecchia formula percentuale illimitata e rimossa",
+  !actions.includes("Math.round((G.fans*0.012 + rnd(4,24)) * RITMO)"));
+
+{
+  const vmPromo = require("vm");
+
+  let promoErr = null;
+  let promoGains = [];
+  let promoCapOk = false;
+  let promoResetOk = false;
+
+  try{
+    const mathPromo = Object.create(Math);
+    mathPromo.random = () => 0.5;
+
+    const box = {
+      console,
+      Math:mathPromo,
+      JSON,Object,Array,String,Number,Boolean,Date,
+      parseInt,parseFloat,isNaN,
+
+      clamp:(v,a,b) => Math.max(a, Math.min(b,v)),
+      rnd:(a,b) => (a+b)/2,
+
+      G:{
+        year:1,
+        week:1,
+        day:1,
+
+        fans:10000,
+        hype:0,
+        wellbeing:80,
+
+        skills:{
+          scrittura:0,
+          flow:0,
+          presenza:0,
+          rete:0
+        },
+
+        songs:[{released:true}],
+        bars:[],
+        beats:[],
+        gear:{},
+
+        adfDailyActions:null,
+        promoSaturation:{
+          key:"",
+          baseFans:0,
+          pctUsed:0
+        }
+      }
+    };
+
+    box.window = box;
+    vmPromo.createContext(box);
+
+    vmPromo.runInContext(actions, box, {
+      filename:"actions.js"
+    });
+
+    const promo = vmPromo.runInContext(
+      'ACTIONS.find(a => a.id === "promo")',
+      box
+    );
+
+    /* Quattro Promo consecutive nello stesso giorno. */
+    for(let i=0; i<4; i++){
+      const prima = box.G.fans;
+      promo.run();
+      promoGains.push(box.G.fans - prima);
+    }
+
+    /* Continuiamo a promuovere nei giorni successivi. */
+    for(let d=2; d<=7; d++){
+      box.G.day = d;
+      promo.run();
+    }
+
+    const cap =
+      box.G.promoSaturation.baseFans * 0.015;
+
+    promoCapOk =
+      box.G.promoSaturation.pctUsed <= cap + 1e-9 &&
+      Math.abs(
+        box.G.promoSaturation.pctUsed - cap
+      ) < 1e-9;
+
+    /* Nuova settimana: nuovo budget. */
+    box.G.week = 2;
+    box.G.day = 1;
+
+    const fansPrima =
+      box.G.fans;
+
+    promo.run();
+
+    promoResetOk =
+      box.G.promoSaturation.key === "1:2" &&
+      box.G.promoSaturation.baseFans === fansPrima &&
+      box.G.promoSaturation.pctUsed > 0;
+
+  }catch(e){
+    promoErr = e;
+  }
+
+  test(
+    "runtime: prima, seconda, terza e quarta Promo rendono sempre meno",
+    !promoErr &&
+    promoGains.length === 4 &&
+    promoGains[0] > promoGains[1] &&
+    promoGains[1] > promoGains[2] &&
+    promoGains[2] > promoGains[3],
+    promoErr
+      ? promoErr.message
+      : promoGains.join(" > ")
+  );
+
+  test(
+    "runtime: spam Promo non supera il budget percentuale settimanale",
+    !promoErr && promoCapOk,
+    promoErr ? promoErr.message : null
+  );
+
+  test(
+    "runtime: nuova settimana crea un nuovo budget Promo",
+    !promoErr && promoResetOk,
+    promoErr ? promoErr.message : null
+  );
+}
+
 console.log("\nBlocco 3 — carcere separato");
 test("hub manda il detenuto alla schermata Carcere",
   hub.includes('G.strada && G.strada.arresto && typeof apriCarcere === "function"'));
