@@ -81,6 +81,57 @@ function studioAiutoFonico(){
    Un beat a testa per settimana: un beatmaker non è un distributore. */
 const STUDIO_BEAT_ENERGIA = 20;
 
+const STUDIO_BEAT_MINUTI = 120;
+
+function studioBeatTempoGate(){
+  if(typeof GAME_TIME==="undefined" ||
+     typeof GAME_TIME.canSpend!=="function"){
+    return {
+      ok:true,
+      reason:null,
+      minutes:STUDIO_BEAT_MINUTI,
+      remaining:Infinity
+    };
+  }
+
+  return GAME_TIME.canSpend(STUDIO_BEAT_MINUTI);
+}
+
+function studioBeatTempoTesto(){
+  if(typeof GAME_TIME!=="undefined" &&
+     typeof GAME_TIME.formatDuration==="function")
+    return GAME_TIME.formatDuration(STUDIO_BEAT_MINUTI);
+
+  return STUDIO_BEAT_MINUTI+" min";
+}
+
+function studioBeatTempoPerche(g){
+  if(g && g.reason==="day-end"){
+    const rim = typeof GAME_TIME!=="undefined" &&
+      typeof GAME_TIME.formatDuration==="function"
+        ? GAME_TIME.formatDuration(g.remaining)
+        : g.remaining+" min";
+
+    return "Troppo tardi: restano "+rim+" prima delle 04:00";
+  }
+
+  return "Prima risolvi quello che hai in sospeso";
+}
+
+function studioBeatTempoAvanza(){
+  if(typeof GAME_TIME==="undefined" ||
+     typeof GAME_TIME.spend!=="function")
+    return true;
+
+  const out=GAME_TIME.spend(
+    STUDIO_BEAT_MINUTI,
+    "studio-beat-custom"
+  );
+
+  return !(out && out.blocked);
+}
+
+
 function studioBeatFatto(p){
   const sett = typeof totalWeeks === "function" ? totalWeeks() : G.week;
   return p.beatSett === sett;
@@ -94,6 +145,10 @@ function studioBeatPronto(p){
     return {ok:false, perche:"Ti serve energia: " + STUDIO_BEAT_ENERGIA + ", ne hai " + Math.round(G.energy)};
   const c = studioBeatPrezzo(p);
   if(G.money < c) return {ok:false, perche:"Ti servono " + fmt(c) + " €, ne hai " + fmt(G.money)};
+
+  const tempo=studioBeatTempoGate();
+  if(!tempo.ok)
+    return {ok:false, perche:studioBeatTempoPerche(tempo)};
   return {ok:true, perche:""};
 }
 /* Il prezzo cala col rapporto e sparisce da «fidato» in su: a un certo punto
@@ -130,6 +185,7 @@ function studioFattiUnBeat(id){
   p.pt += 1;
   while(p.pt >= relSoglia(p) && p.rel < 5){ p.pt -= relSoglia(p); p.rel++; }
   gain("rete", 0.4);
+  studioBeatTempoAvanza();
 
   pushLog("<b>" + p.n + "</b> ti ha fatto «" + b.n + "» — qualità " + b.q +
     (costo ? ", " + fmt(costo) + " €." : ", e non ha voluto niente."), "good");
@@ -180,7 +236,7 @@ function studioSezBeat(){
       '<button class="stgo" data-beat="' + studioEsc(p.id) + '"' + (st.ok ? "" : " disabled") + '>' +
         'Fattelo fare</button>' +
         '<span class="stsub' + (st.ok ? "" : " no") + '">' + (st.ok
-          ? (costo ? fmt(costo) + " € · " : "gratis · ") + STUDIO_BEAT_ENERGIA + " energia · q~" +
+          ? (costo ? fmt(costo) + " € · " : "gratis · ") + STUDIO_BEAT_ENERGIA + " energia \\u00b7 " + studioBeatTempoTesto() + " \\u00b7 q~" +
             Math.round(20 + p.fama * 0.55 + p.rel * 7 + (G.skills.rete || 0) * 0.4)
           : studioEsc(st.perche)) + '</span>', false);
   }).join("");

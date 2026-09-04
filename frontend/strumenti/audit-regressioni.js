@@ -15,6 +15,8 @@ const build = leggi("strumenti/build.js");
 const ev = leggi("js/game/eventi-v2.js");
 const tel = leggi("js/game/telefono.js");
 const actions = leggi("js/game/actions.js");
+const posto = leggi("js/game/posto.js");
+const studio = leggi("js/game/studio.js");
 const writer = leggi("js/game/writer.js");
 const hub = leggi("js/game/hub.js");
 const ui = leggi("js/game/ui.js");
@@ -315,6 +317,115 @@ test("la vecchia formula percentuale illimitata e rimossa",
     promoErr ? promoErr.message : null
   );
 }
+
+
+console.log("\nPunto 3 - tempo reale Sala / Studio");
+
+test("GAME_TIME espone gate e consumo per azioni custom",
+  time.includes("function puoSpendere(minuti)") &&
+  time.includes("function spendi(minuti,source,opts)") &&
+  time.includes("canSpend:puoSpendere") &&
+  time.includes("spend:spendi"));
+
+{
+  const vmClock=require("vm");
+  let clockErr=null;
+  let clockOk=false;
+
+  try{
+    const box={
+      console,Math,JSON,Object,Array,String,Number,Boolean,Date,
+      parseInt,parseFloat,isNaN,
+      setTimeout:()=>0,
+      clearTimeout:()=>{},
+      setInterval:()=>0,
+      clearInterval:()=>{},
+      G:{
+        year:1,week:1,day:1,
+        energy:100,maxEnergy:100,
+        timeMinutes:480,
+        timeRuntime:{}
+      },
+      document:{
+        addEventListener:()=>{},
+        getElementById:()=>null,
+        querySelectorAll:()=>[],
+        createElement:()=>({}),
+        head:{appendChild:()=>{}}
+      },
+      CustomEvent:function(type,opts){
+        this.type=type;
+        this.detail=opts&&opts.detail;
+      }
+    };
+
+    box.window=box;
+    box.addEventListener=()=>{};
+    box.dispatchEvent=()=>{};
+
+    vmClock.createContext(box);
+    vmClock.runInContext(time,box,{filename:"tempo.js"});
+
+    const prima=box.GAME_TIME.canSpend(60);
+    box.GAME_TIME.spend(45,"audit");
+    const dopo=box.G.timeMinutes;
+
+    box.G.timeMinutes=1650;
+    const tardi=box.GAME_TIME.canSpend(60);
+
+    clockOk=
+      prima.ok===true &&
+      dopo===525 &&
+      tardi.ok===false &&
+      tardi.reason==="day-end" &&
+      tardi.remaining===30;
+
+  }catch(e){
+    clockErr=e;
+  }
+
+  test("runtime: spend avanza esatto e non tronca una mossa alle 04:00",
+    !clockErr && clockOk,
+    clockErr ? clockErr.message : null);
+}
+
+test("La Sala dichiara una durata per ogni interazione di progresso",
+  posto.includes("parla:30") &&
+  posto.includes("numero:15") &&
+  posto.includes("beat:60") &&
+  posto.includes("sessione:180") &&
+  posto.includes("mix:120") &&
+  posto.includes("feat:180") &&
+  posto.includes("video:240") &&
+  posto.includes("intervista:60"));
+
+test("i bottoni della Sala mostrano e rispettano il costo tempo",
+  posto.includes("const gate=poTempoGate(tipo)") &&
+  posto.includes("const puo=!!pronto && gate.ok") &&
+  posto.includes("poTempoCosto(tipo,costo)"));
+
+test("Fatti due parole usa il clock reale",
+  posto.includes('if(poTempoBlocca("parla")) return;') &&
+  posto.includes('poTempoAvanza("parla")'));
+
+test("le altre azioni della Sala passano tutte dal gate e poi avanzano il tempo",
+  posto.includes('if(tipo !== "parla"){') &&
+  posto.includes("Object.prototype.hasOwnProperty.call(PO_TEMPO,tipo)") &&
+  posto.includes('if(tipo !== "parla") poTempoAvanza(tipo);'));
+
+test("il beat su misura dello Studio costa due ore reali",
+  studio.includes("const STUDIO_BEAT_MINUTI = 120") &&
+  studio.includes("studioBeatTempoGate()") &&
+  studio.includes("studioBeatTempoAvanza()") &&
+  studio.includes('"studio-beat-custom"'));
+
+test("le ACTION standard dello Studio non vengono addebitate due volte",
+  (() => {
+    const a=studio.indexOf("function studioAzione(id)");
+    const body=a>=0 ? studio.slice(a,a+500) : "";
+    return body.includes("hubAzione(id)") &&
+      !body.includes("GAME_TIME.spend");
+  })());
 
 console.log("\nBlocco 3 — carcere separato");
 test("hub manda il detenuto alla schermata Carcere",

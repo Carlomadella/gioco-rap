@@ -177,6 +177,44 @@
 
   function spostamento(minuti){ return avanza(minuti==null?30:minuti,"travel"); }
 
+  /* Azioni custom di schermate come Sala e Studio.
+     Prima si controlla che ci sia davvero spazio nella giornata;
+     spend() non tronca mai una mossa alle 04:00. */
+  function puoSpendere(minuti){
+    assicuraTempo();
+    const m=Math.max(0,Math.round(Number(minuti)||0));
+    const reason=bloccoTempoEsterno();
+
+    if(reason) return {
+      ok:false, reason:reason, minutes:m,
+      remaining:minutiRimasti()
+    };
+
+    if(m>minutiRimasti()) return {
+      ok:false, reason:"day-end", minutes:m,
+      remaining:minutiRimasti()
+    };
+
+    return {
+      ok:true, reason:null, minutes:m,
+      remaining:minutiRimasti()
+    };
+  }
+
+  function spendi(minuti,source,opts){
+    const gate=puoSpendere(minuti);
+    if(!gate.ok) return Object.assign({blocked:true},gate);
+
+    const out=avanza(
+      gate.minutes,
+      source||"custom-action",
+      opts
+    );
+
+    return Object.assign({ok:!out.blocked},out);
+  }
+
+
   function pianoAlto(tx,targetTo){
     try{
       if(typeof GAME_EVENTS === "undefined" || typeof GAME_EVENTS.planHigh !== "function") return null;
@@ -397,6 +435,8 @@
     format:formatta,
     formatDuration:formattaDurata,
     advance:avanza,
+    canSpend:puoSpendere,
+    spend:spendi,
     travel:spostamento,
     durationFor:durataAzione,
     canStart:puoIniziare,

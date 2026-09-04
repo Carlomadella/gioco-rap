@@ -21,6 +21,88 @@ const REL_NOMI = ["conoscenza", "contatto", "amico", "collaboratore", "fidato", 
    la sessione in studio e il feat restano le più grosse della Sala. */
 const PO_COSTO = {parla:12, sessione:45, mix:20, feat:45, intervista:12, numero:4, video:35};
 
+const PO_TEMPO = Object.freeze({
+  parla:30,
+  numero:15,
+  beat:60,
+  sessione:180,
+  mix:120,
+  feat:180,
+  video:240,
+  intervista:60
+});
+
+function poTempoMinuti(tipo){
+  return Number(PO_TEMPO[tipo]||0);
+}
+
+function poTempoGate(tipo){
+  const minuti=poTempoMinuti(tipo);
+
+  if(typeof GAME_TIME==="undefined" ||
+     typeof GAME_TIME.canSpend!=="function"){
+    return {ok:true,reason:null,minutes:minuti,remaining:Infinity};
+  }
+
+  return GAME_TIME.canSpend(minuti);
+}
+
+function poTempoTesto(tipo){
+  const minuti=poTempoMinuti(tipo);
+
+  if(typeof GAME_TIME!=="undefined" &&
+     typeof GAME_TIME.formatDuration==="function")
+    return GAME_TIME.formatDuration(minuti);
+
+  return minuti+" min";
+}
+
+function poTempoPerche(g){
+  if(g && g.reason==="day-end"){
+    const rim = typeof GAME_TIME!=="undefined" &&
+      typeof GAME_TIME.formatDuration==="function"
+        ? GAME_TIME.formatDuration(g.remaining)
+        : g.remaining+" min";
+
+    return "Troppo tardi: restano "+rim+" prima delle 04:00";
+  }
+
+  return "Prima risolvi quello che hai in sospeso";
+}
+
+function poTempoCosto(tipo,costo){
+  if(!costo) return "";
+  return costo+" \u00b7 "+poTempoTesto(tipo);
+}
+
+function poTempoBlocca(tipo){
+  const g=poTempoGate(tipo);
+  if(g.ok) return false;
+
+  toast(
+    poTempoPerche(g),
+    "bad",
+    "!",
+    ["#3A3F49","#22262E"]
+  );
+
+  return true;
+}
+
+function poTempoAvanza(tipo){
+  if(typeof GAME_TIME==="undefined" ||
+     typeof GAME_TIME.spend!=="function")
+    return true;
+
+  const out=GAME_TIME.spend(
+    poTempoMinuti(tipo),
+    "sala-"+tipo
+  );
+
+  return !(out && out.blocked);
+}
+
+
 const POSTO_RUOLI = {
   beatmaker: {n:"Beatmaker", k:"#4ADE80",
     d:"Fa beat. Se ti prende in simpatia te li fa sentire prima degli altri."},
@@ -472,10 +554,17 @@ function chiudiPosto(){
    scope, e un «bottone» qualsiasi qui dentro pesterebbe i piedi a quello delle
    impostazioni. */
 function poTasto(p, tipo, testo, sotto, costo, pronto){
-  return '<button class="poazione' + (pronto ? '' : ' no') + '" data-az="' + tipo + '" data-p="' + p.id + '"' +
-    (pronto ? '' : ' disabled') + '><span class="n">' + testo + '</span>' +
-    '<span class="d">' + sotto + '</span>' +
-    (costo ? '<span class="c">' + costo + '</span>' : '') + '</button>';
+  const gate=poTempoGate(tipo);
+  const puo=!!pronto && gate.ok;
+  const sottoFinale=(!!pronto && !gate.ok)
+    ? poTempoPerche(gate)
+    : sotto;
+  const costoFinale=poTempoCosto(tipo,costo);
+
+  return '<button class="poazione' + (puo ? '' : ' no') + '" data-az="' + tipo + '" data-p="' + p.id + '"' +
+    (puo ? '' : ' disabled') + '><span class="n">' + testo + '</span>' +
+    '<span class="d">' + sottoFinale + '</span>' +
+    (costoFinale ? '<span class="c">' + costoFinale + '</span>' : '') + '</button>';
 }
 
 /* ============ IL BEAT SUL TAVOLO (punto 20 e 22) ============
@@ -639,7 +728,9 @@ function renderDialogo(){
 function parlaCon(id){
   const p = G.gente.find(x => x.id === id);
   if(!p || G.energy < PO_COSTO.parla) return;
+  if(poTempoBlocca("parla")) return;
   G.energy -= PO_COSTO.parla;
+  poTempoAvanza("parla");
   const pool = DIALOGHI[p.ruolo];
   POSTO_PARLA = {p:p, sit:pick(pool)};
   SFX.tap(); save(); renderPosto();
@@ -723,6 +814,10 @@ function azionePosto(tipo, id){
   const p = G.gente.find(x => x.id === id);
   if(!p) return;
   const sett = typeof totalWeeks === "function" ? totalWeeks() : G.week;
+  if(tipo !== "parla"){
+    if(!Object.prototype.hasOwnProperty.call(PO_TEMPO,tipo)) return;
+    if(poTempoBlocca(tipo)) return;
+  }
 
   if(tipo === "parla"){ parlaCon(id); return; }
 
@@ -828,6 +923,7 @@ function azionePosto(tipo, id){
     SFX.publish();
   }
 
+  if(tipo !== "parla") poTempoAvanza(tipo);
   save(); renderGioco(); renderPosto();
   if(typeof renderHub === "function") renderHub();
 }
