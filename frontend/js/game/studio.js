@@ -73,7 +73,7 @@ function studioAiutoFonico(){
 
 /* ==================== IL BEAT SU MISURA (punto 11) ====================
    Il giro dei produttori (`offriBeat`) resta: tre beat sul banco, si comprano
-   dal Catalogo, ed è quello che fa chi non conosce nessuno. Questo è l'altra
+   dallo Shop, ed è quello che fa chi non conosce nessuno. Questo è l'altra
    strada: **te lo fa una persona**. Costa meno, è più tuo, e il beat non
    passa dal mercato — ti finisce direttamente in cartella, perché non l'hai
    comprato, te l'ha fatto uno che ti conosce.
@@ -248,7 +248,7 @@ function studioSezBeat(){
     '<div class="stoppure"><span>oppure</span></div>' +
     '<button class="stazione" data-az="beat">' +
       '<b>Gira a cercare beat</b>' +
-      '<span>Tre beat sul banco, da comprare al Catalogo. Non serve conoscere nessuno.</span>' +
+      '<span>Tre beat sul banco dello Shop, da comprare. Non serve conoscere nessuno.</span>' +
     '</button>';
 }
 
@@ -285,7 +285,7 @@ function studioSezCabina(){
           '</button>' +
           (!bt ? studioVuoto("E serve anche un beat: te lo fai fare al Beat.") : "")
         : studioVuoto("Hai la strofa, manca il beat. Te lo fai fare al Beat, " +
-            "o lo compri al Catalogo."));
+            "o lo compri allo Shop."));
 }
 
 function studioSezBanco(){
@@ -331,12 +331,15 @@ function studioSezFuori(){
        nella stanza dove il pezzo esce, perché è la cosa che si fa subito dopo:
        l'hai messo fuori, adesso lo fai sapere. */
     '<div class="stoppure"><span>e quando è fuori</span></div>' +
-    '<button class="stazione" data-az="promo">' +
-      '<b>Promo sui social</b>' +
-      '<span>' + (G.songs.some(x => x.released)
-        ? "Clip e provocazioni. Accende quello che hai già fuori."
-        : "Non hai ancora niente fuori: prima esce un pezzo, poi lo si spinge.") + '</span>' +
-    '</button>';
+    /* Come al banco: se la mossa non si può fare, non si mette un bottone che
+       sembra vivo e poi risponde di no. Senza un pezzo fuori la promo non ha
+       niente da spingere, e si dice invece di farlo scoprire col tap. */
+    (G.songs.some(x => x.released)
+      ? '<button class="stazione" data-az="promo">' +
+          '<b>Promo sui social</b>' +
+          '<span>Clip e provocazioni. Accende quello che hai già fuori.</span>' +
+        '</button>'
+      : studioVuoto("Niente da spingere: la promo accende un pezzo già uscito."));
 }
 
 function renderStudio(){

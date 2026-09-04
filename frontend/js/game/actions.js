@@ -216,7 +216,7 @@ const ACTIONS = [
      gain("rete", 0.9);
      return "Tre beat sul tavolo: " +
        out.map(b => b.n + " (" + genBeat(b.gen).n.toLowerCase() + ", q" + b.q + ")").join(" · ") +
-       ". Si comprano dal Catalogo.";
+       ". Si comprano allo Shop.";
    }},
 
   {id:"registra", n:"Registra il pezzo", e:45, luc:3,
