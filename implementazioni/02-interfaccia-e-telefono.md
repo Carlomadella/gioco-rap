@@ -808,3 +808,56 @@ leggi di quella persona. Riscritta senza.
 > Da controllare a mano: aprire lo Studio, cliccare sul fondo (non deve chiudersi),
 > premere «Torna alla mappa» (deve chiudere lo Studio e portare alla mappa).
 
+---
+
+## 1 · «Torna alla mappa» non funzionava in alcune interfacce
+
+1. In alcune interfacce il pulsante in alto a sx 'torna alla mappa' che abbiamo fatto non
+   funziona. Quando c'è verifica che funzioni tutto.
+
+> **Fatto (04/09/2026), provato dal vivo in Chrome.** Tre falle diverse, tutte nello stesso
+> punto: `js/menu-sistema.js` deve sapere di OGNI stanza per farci funzionare davvero il
+> bottone — non basta che ci si veda.
+>
+> **Piazza e Writer: il bug vero.** Il bottone *si vedeva* — la lista `HOSTS` (quella che
+> monta la barra nella testata giusta) li aveva già — ma restava **disabilitato per
+> sempre**. `mappaBloccata()` (decide se disabilitare MAPPA) riusava di peso
+> `internoDaChiuderePrima()`, la lista pensata per una cosa diversa: dire all'ESC «qui c'è
+> una finestra interna, chiudi quella prima di aprire il menu». `#piazza.on` e `#writer.on`
+> erano lì per una buona ragione — hanno un'azione che può restare a metà (freestyle
+> interrotto, strofa non chiusa) — ma quella ragione vale per l'ESC, non per il bottone: il
+> bottone lo sa già chiudere in sicurezza (vedi sotto). Risultato prima del fix: entravi in
+> Piazza o nel Foglio e MAPPA restava grigio finché non uscivi con la X, esattamente il
+> pulsante «che non funziona» descritto nel punto.
+>
+> Separata la lista in due: `dialogoFlottante()` (i veri dialoghi flottanti — impostazioni,
+> il foglio dei risultati, il diario, il report settimanale, la scena, gli overlay social,
+> l'orologio aperto, il telefono aperto — quelli senza un modo proprio di annullare quello
+> che stai facendo, che per questo devono bloccare anche MAPPA) e
+> `internoDaChiuderePrima()` (quella più `dialogoFlottante()` più Piazza/Writer, che resta
+> per l'ESC). `mappaBloccata()` ora chiama solo `dialogoFlottante()`.
+>
+> **Piazza e Writer non chiudevano nemmeno pulito.** `hostAttivo()` non li riconosceva
+> affatto come stanze (stesso bug del punto precedente sullo Studio): con uno dei due
+> aperto pensava di essere sulla Hub sottostante. Aggiunti. E chiuderli col semplice tolto
+> l'"on" avrebbe lasciato un'azione a metà pendente (un freestyle interrotto, una strofa non
+> salvata) — la X di ognuno già lo sa fare bene (`uscitaPiazza()`, e l'accoppiata
+> `annullaAzione()+chiudiFoglio()+renderGioco()` del Foglio): aggiunta `uscitaFoglio()` in
+> `writer.js` con la stessa sequenza, e richiamate entrambe da `tornaMappa()`.
+>
+> **Il Quaderno (la schermata di gioco nuova, ex punto 1 del bis precedente):** riconosciuto
+> come host, monta la barra — ma nessuno chiamava `chiudiQuaderno()` da MAPPA: il bottone
+> restava senza effetto premuto da lì. Aggiunta la chiamata.
+>
+> **Provato dal vivo in Chrome** (partita reale, non simulata): aperti uno per uno Studio,
+> Piazza, il Foglio, il Quaderno e La Sala — in ognuno il bottone «Torna alla mappa» era
+> visibile, acceso (non più grigio in Piazza/Writer) e il click ha davvero chiuso la stanza
+> e riportato alla mappa, senza errori in console.
+>
+> Sette controlli nuovi in `strumenti/audit-regressioni.js`, incluso uno strutturale che
+> confronta l'insieme delle stanze di `hostAttivo()` con quello di `HOSTS` (devono coincidere
+> sempre) e uno che verifica che ogni stanza riconosciuta abbia davvero un modo di chiudersi
+> in `tornaMappa()` — così questa classe di bug (bottone che si vede o è visibile ma non fa
+> niente) non torna indietro zitta. `npm run verifica` pulito: prova 67/67, audit 188/188,
+> build 15/15.
+

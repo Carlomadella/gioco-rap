@@ -30,3 +30,5 @@ L'indice con **tutti i punti e il loro stato** sta in
 ## Da smistare
 
 _(qui sotto finiscono i punti nuovi, appena scritti)_ 
+
+2.  Le card sulla mappa come studio, fabbrica, pizzeria, la sala ecc hanno una card cliccabile troppo grande, LE VOGLIO TUTTE COME STUDIO 

@@ -238,6 +238,10 @@ function apriFoglio(opz){
 }
 function chiudiFoglio(){ $("writer").classList.remove("on"); WR = null; }
 
+/* Come w-x/w-cancel, ma richiamabile da fuori (bottone globale «Torna alla
+   mappa»): annulla la strofa a metà invece di lasciarla pendente. */
+function uscitaFoglio(){ if(WR) annullaAzione(); chiudiFoglio(); renderGioco(); }
+
 function disegnaFoglio(){
   const a = analizza(WR.righe, WR.tema);
   let h = '<div class="wfoglio">';

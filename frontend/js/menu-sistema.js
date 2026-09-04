@@ -18,6 +18,8 @@
     if(document.querySelector("#strada.on")) return "strada";
     if(document.querySelector("#posto.on")) return "posto";
     if(document.querySelector("#negozio.on")) return "negozio";
+    if(document.querySelector("#piazza.on")) return "piazza";
+    if(document.querySelector("#writer.on")) return "writer";
     if(document.querySelector("#studio.on")) return "studio";
     if(document.querySelector("#quaderno.on")) return "quaderno";
     if(document.querySelector("#s-hub.screen.on")) return "hub";
@@ -26,15 +28,15 @@
 
   function giocoAttivo(){ return !!hostAttivo(); }
 
-  /* ESC conserva la priorità delle finestre "dentro" una schermata:
-     prima chiudi una scelta, il foglio, il diario, un'app del telefono, ecc.
-     Solo quando sei davvero sulla schermata di gioco apre il menu di sistema. */
-  function internoDaChiuderePrima(){
+  /* Dialoghi flottanti veri: possono comparire sopra QUALSIASI stanza (Hub,
+     Studio, Piazza, Writer...), non hanno un modo proprio di annullare quello
+     che stai facendo, e per questo bloccano anche «Torna alla mappa» — non
+     solo l'ESC. Diverso da Piazza/Writer qui sotto, che sono stanze intere
+     con un loro tornaMappa() che sa annullarle in sicurezza. */
+  function dialogoFlottante(){
     const selectors = [
       "#setts.on",
       "#modal.on",
-      "#writer.on",
-      "#piazza.on",
       "#drawer.on",
       "#report.on",
       "#scena.on",
@@ -50,6 +52,18 @@
 
     /* Nell'iPhone ESC torna prima alla home del telefono. */
     try{ if(typeof TEL_APP !== "undefined" && TEL_APP) return true; }catch(_){}
+    return false;
+  }
+
+  /* ESC conserva la priorità delle finestre "dentro" una schermata:
+     prima chiudi una scelta, il foglio, il diario, un'app del telefono, ecc.
+     Solo quando sei davvero sulla schermata di gioco apre il menu di sistema.
+     Piazza e Writer hanno un loro chiudi (uscitaPiazza/uscitaFoglio, punto 1):
+     ESC lascia fare a loro, ma questo NON deve bloccare «Torna alla mappa» —
+     vedi mappaBloccata(), che infatti non passa da qui. */
+  function internoDaChiuderePrima(){
+    if(dialogoFlottante()) return true;
+    if(document.querySelector("#writer.on") || document.querySelector("#piazza.on")) return true;
     return false;
   }
 
@@ -312,7 +326,7 @@
   }
 
   function mappaBloccata(){
-    if(internoDaChiuderePrima()) return true;
+    if(dialogoFlottante()) return true;
     try{ if(window.GAME_TIME && typeof GAME_TIME.pending === "function" && GAME_TIME.pending()) return true; }catch(_){}
     try{ if(typeof GAME_EVENTS !== "undefined" && GAME_EVENTS.blocked && GAME_EVENTS.blocked()) return true; }catch(_){}
     try{ if(window.ADF_EVENTI && typeof ADF_EVENTI.globalHigh === "function" && ADF_EVENTI.globalHigh()) return true; }catch(_){}
@@ -327,7 +341,13 @@
        destinazione hub, così il tasto significa sempre davvero "Mappa". */
     try{ if($id("posto") && $id("posto").classList.contains("on") && typeof chiudiPosto === "function") chiudiPosto(); }catch(_){}
     try{ if($id("negozio") && $id("negozio").classList.contains("on") && typeof chiudiNegozio === "function") chiudiNegozio(); }catch(_){}
+    /* Piazza e Writer non si chiudono col semplice "on" tolto: un'azione può
+       restare a metà (freestyle interrotto, strofa non chiusa) e va annullata
+       esplicitamente, altrimenti resta pendente e blocca il tempo di gioco. */
+    try{ if($id("piazza") && $id("piazza").classList.contains("on") && typeof uscitaPiazza === "function") uscitaPiazza(); }catch(_){}
+    try{ if($id("writer") && $id("writer").classList.contains("on") && typeof uscitaFoglio === "function") uscitaFoglio(); }catch(_){}
     try{ if($id("studio") && $id("studio").classList.contains("on") && typeof chiudiStudio === "function") chiudiStudio(); }catch(_){}
+    try{ if($id("quaderno") && $id("quaderno").classList.contains("on") && typeof chiudiQuaderno === "function") chiudiQuaderno(); }catch(_){}
     try{ if($id("strada") && $id("strada").classList.contains("on") && typeof chiudiStrada === "function") chiudiStrada(); }catch(_){}
 
     try{

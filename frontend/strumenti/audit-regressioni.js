@@ -18,6 +18,7 @@ const actions = leggi("js/game/actions.js");
 const posto = leggi("js/game/posto.js");
 const studio = leggi("js/game/studio.js");
 const writer = leggi("js/game/writer.js");
+const piazza = leggi("js/game/piazza.js");
 const hub = leggi("js/game/hub.js");
 const ui = leggi("js/game/ui.js");
 const hours = leggi("js/game/orari.js");
@@ -948,7 +949,64 @@ test("«Torna alla mappa» chiude davvero lo Studio prima di andare all'hub",
 test("la barra globale si monta nella testata dello Studio, non sotto in hub",
   menuSystem.includes('{id:"studio",  root:"#studio.on",        head:".sthead"}'));
 
-for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js"]){
+console.log("\nPunto 1 (bis) — «Torna alla mappa» funziona in ogni stanza dove si vede");
+test("Piazza e Writer si mostravano nella barra HOSTS ma il menu non li riconosceva: ora sì",
+  menuSystem.includes('if(document.querySelector("#piazza.on")) return "piazza";') &&
+  menuSystem.includes('if(document.querySelector("#writer.on")) return "writer";'));
+test("«Torna alla mappa» annulla un freestyle o una strofa a metà invece di lasciarli pendenti",
+  menuSystem.includes('typeof uscitaPiazza === "function") uscitaPiazza();') &&
+  menuSystem.includes('typeof uscitaFoglio === "function") uscitaFoglio();'));
+test("uscitaFoglio() esiste ed è la stessa sequenza di annulla+chiudi+renderGioco della X del foglio",
+  writer.includes("function uscitaFoglio()") &&
+  writer.includes("if(WR) annullaAzione(); chiudiFoglio(); renderGioco();"));
+test("il Quaderno (ex vecchia schermata di gioco) è riconosciuto come host ma «Torna alla mappa» non lo chiudeva: ora sì",
+  menuSystem.includes('if(document.querySelector("#quaderno.on")) return "quaderno";') &&
+  menuSystem.includes('typeof chiudiQuaderno === "function") chiudiQuaderno();'));
+test("il vero bug: in Piazza e Writer il bottone si vedeva ma restava disabled per sempre — mappaBloccata() riusava la lista dell'ESC, che li considera giustamente \"interni\" a prescindere",
+  menuSystem.includes("function dialogoFlottante(){") &&
+  !/dialogoFlottante\(\)\{[^}]*piazza/s.test(menuSystem) &&
+  !/dialogoFlottante\(\)\{[^}]*writer/s.test(menuSystem));
+test("mappaBloccata() ora blocca solo i dialoghi flottanti veri, non Piazza/Writer (che tornaMappa() sa chiudere da soli)",
+  (() => {
+    const b0 = menuSystem.indexOf("function mappaBloccata(){");
+    const b1 = menuSystem.indexOf("}", b0);
+    const body = menuSystem.slice(b0, b1);
+    return body.includes("dialogoFlottante()") && !body.includes("internoDaChiuderePrima()");
+  })());
+test("l'ESC continua a lasciar chiudere Piazza e Writer da soli prima di aprire il menu di sistema",
+  (() => {
+    const b0 = menuSystem.indexOf("function internoDaChiuderePrima(){");
+    const b1 = menuSystem.indexOf("}", b0);
+    const body = menuSystem.slice(b0, b1);
+    return body.includes('querySelector("#writer.on")') && body.includes('querySelector("#piazza.on")');
+  })());
+test("hostAttivo() e la lista HOSTS che monta la barra riconoscono esattamente le stesse stanze",
+  (() => {
+    const hostBody = menuSystem.slice(
+      menuSystem.indexOf("function hostAttivo(){"),
+      menuSystem.indexOf("}", menuSystem.indexOf("function hostAttivo(){"))
+    );
+    const daHostAttivo = [...hostBody.matchAll(/return "([a-z]+)";/g)].map(m => m[1]).sort();
+    const hostsBlock = menuSystem.slice(menuSystem.indexOf("const HOSTS=["), menuSystem.indexOf("];", menuSystem.indexOf("const HOSTS=[")));
+    const daHosts = [...hostsBlock.matchAll(/id:"([a-z]+)"/g)].map(m => m[1]).sort();
+    return daHostAttivo.length > 0 && daHosts.length > 0 &&
+      JSON.stringify(daHostAttivo) === JSON.stringify(daHosts);
+  })());
+test("ogni stanza non-hub/jail riconosciuta da hostAttivo() ha davvero un modo di chiudersi in tornaMappa()",
+  (() => {
+    const tm0 = menuSystem.indexOf("function tornaMappa(){");
+    const tm1 = menuSystem.indexOf("\n  function creaBarraGlobale", tm0);
+    const body = tm0 >= 0 && tm1 > tm0 ? menuSystem.slice(tm0, tm1) : "";
+    const hostBody = menuSystem.slice(
+      menuSystem.indexOf("function hostAttivo(){"),
+      menuSystem.indexOf("}", menuSystem.indexOf("function hostAttivo(){"))
+    );
+    const stanze = [...hostBody.matchAll(/return "([a-z]+)";/g)].map(m => m[1])
+      .filter(id => id !== "jail" && id !== "hub");
+    return !!body && stanze.every(id => body.includes('$id("' + id + '")'));
+  })());
+
+for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/piazza.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }
