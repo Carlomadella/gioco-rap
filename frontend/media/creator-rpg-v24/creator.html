@@ -1125,7 +1125,7 @@ body::before{
       <div class="layout">
         <div class="visual">
           <div class="visual-inner">
-            <div class="visual-art" id="identityArt"></div>
+            <div class="visual-art on" id="identityArt"></div>
             <div class="visual-overlay"></div>
             <div class="visual-kicker">02 · Identità</div>
             <div class="visual-copy">
@@ -1284,6 +1284,11 @@ body::before{
 
   <div class="preview-note">V20 · SCELTA AVATAR · STAGE E FINALI BLOCCATI</div>
 </div>
+
+<div class="local-editor-overlay" id="localEditorOverlay" aria-hidden="true">
+  <iframe id="localEditorFrame" src="local-editor.html" title="Editor locale personaggio"></iframe>
+</div>
+<button type="button" class="creator-exit-game" id="creatorExitGame">← Menu</button>
 
 <script>
 const $ = id => document.getElementById(id);
@@ -1964,13 +1969,6 @@ if(window.parent!==window) window.parent.postMessage({type:'adf-rpg-v24-ready'},
 
 
 </script>
-
-
-
-<div class="local-editor-overlay" id="localEditorOverlay" aria-hidden="true">
-  <iframe id="localEditorFrame" src="local-editor.html" title="Editor locale personaggio"></iframe>
-</div>
-<button type="button" class="creator-exit-game" id="creatorExitGame">← Menu</button>
 
 <!-- V24 · Intro carriera approvata -->
 <div id="careerIntro" aria-label="Introduzione alla carriera" aria-hidden="true">
