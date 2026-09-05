@@ -1163,7 +1163,9 @@ function initViewer(){
 
   renderer = new THREE.WebGLRenderer({alpha:true,antialias:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-  renderer.setSize(viewer.clientWidth,viewer.clientHeight);
+  renderer.setSize(Math.max(20,viewer.clientWidth),Math.max(20,viewer.clientHeight),false);
+  renderer.domElement.style.width='100%';
+  renderer.domElement.style.height='100%';
   renderer.setClearColor(0x000000,0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -1184,6 +1186,15 @@ function initViewer(){
   rim.position.set(-3,3,-4); scene.add(rim);
 
   addEventListener('resize', resize);
+
+  if(typeof ResizeObserver !== 'undefined'){
+    const viewerResizeObserver = new ResizeObserver(()=>{
+      resize();
+      if(avatarRoot) fitFull();
+    });
+    viewerResizeObserver.observe(viewer);
+  }
+
   renderer.setAnimationLoop(renderLoop);
   resize();
 }
@@ -1534,6 +1545,14 @@ function resetRoomVisual(){
 
 function applyParentInit(msg){
   initializedByParent=true;
+
+  requestAnimationFrame(()=>{
+    resize();
+    requestAnimationFrame(()=>{
+      resize();
+      if(avatarRoot) fitFull();
+    });
+  });
   roomMode=msg.mode==='edit' ? 'edit' : 'new';
   currentArtist=Object.assign({},msg.artist||{});
   roomScenes=Array.isArray(msg.scenes) ? msg.scenes : [];
