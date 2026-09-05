@@ -98,28 +98,10 @@
     }
   });
 
-  function install(){
-    const play=document.getElementById("m-play");
-    if(play && !play.dataset.rpgV24){
-      const precedente=play.onclick;
-      play.onclick=function(ev){
-        const g=(typeof partita==="function")?partita():null;
-        const viva=(typeof carrieraIniziata==="function")?carrieraIniziata(g):false;
-        if(!viva){ open(); return; }
-        if(typeof precedente==="function") return precedente.call(this,ev);
-      };
-      play.dataset.rpgV24="1";
-    }
-    document.querySelectorAll('[data-go="gioca"]').forEach(b=>{
-      if(b.dataset.rpgV24) return;
-      b.addEventListener("click",e=>{
-        const g=(typeof partita==="function")?partita():null;
-        const viva=(typeof carrieraIniziata==="function")?carrieraIniziata(g):false;
-        if(!viva){ e.preventDefault(); e.stopImmediatePropagation(); open(); }
-      },true);
-      b.dataset.rpgV24="1";
-    });
-  }
+  /* La landing è gestita interamente da avvio.js.
+     Questo bridge espone soltanto l'API del creator e non intercetta
+     CONTINUA / INIZIA / data-go="gioca". */
+  function install(){}
 
   window.ADF_RPG_V24={open,close};
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",install);
