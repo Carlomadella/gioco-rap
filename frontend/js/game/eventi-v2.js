@@ -1801,6 +1801,11 @@ function adfQueueSocialAlert(post,onContinue){
 }
 
 function adfRenderSocialBanner(post){
+  /* Dentro non arriva niente: in carcere il telefono non ce l'hai, e la fascia
+     di LaFamegram sopra alla cella era la nota più stonata della schermata.
+     Il post resta comunque nel feed (è già in socialAlerts, qui sopra): è
+     solo la notifica che non suona, e te lo ritrovi quando esci. */
+  if(adfInJail()) return;
   let el=document.getElementById("adf-social-banner");
   if(!el){
     el=document.createElement("div");
@@ -1829,6 +1834,10 @@ function adfHideSocialBanner(){
   const el=document.getElementById("adf-social-banner");
   if(el)el.classList.remove("show");
 }
+
+/* E se era già a schermo quando ti prendono, se ne va con te: l'arresto può
+   arrivare da un evento mentre la fascia sta ancora lì. */
+window.addEventListener("jail-ui:opened",()=>{ adfHideSocialBanner(); });
 
 function adfSocialOpenLatest(){
   try{
