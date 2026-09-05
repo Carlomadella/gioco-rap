@@ -6,6 +6,29 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:b42c3ca -->
+## 05/09/26, 23:53 â€” task/26-landing-login-gioco-pagine-separate â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `b42c3ca`
+
+### Cosa Ã¨ entrato
+
+- `e3634c6` â€” feat: la landing, l'accesso e il gioco diventano tre pagine (punto 27) â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/index.html`
+- **Modificato:** `frontend/js/impostazioni-ui.js`
+- **Modificato:** `frontend/js/menu-sistema.js`
+- **Aggiunto:** `frontend/pagine/accesso.html`
+- **Aggiunto:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 6
+
+---
+
 <!-- merge:bdb2c5f -->
 ## 05/09/26, 16:17 â€” task/pagine-di-servizio â†’ main
 
