@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Le pagine stanno in pagine/, i file del gioco no: con questo tutti i
+     percorsi relativi (css/, js/, media/) restano quelli di sempre, anche
+     quelli che il codice si costruisce da solo a runtime. -->
+<base href="../">
+<title>Anni di Fame — Accesso</title>
+<meta name="author" content="La Fame Studio">
+<meta name="copyright" content="© 2026 La Fame Studio — Anni di Fame. Tutti i diritti riservati.">
+<meta name="description" content="Anni di Fame — entra nel tuo account: la carriera ti segue da un dispositivo all'altro.">
+<meta name="robots" content="noindex">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=Archivo+Black&family=Barlow+Condensed:wght@600;700;800&display=swap">
+
+<!-- Fogli di stile: qui ne servono quattro, non quarantatré. -->
+<link rel="stylesheet" href="css/base.css?v=12">
+<link rel="stylesheet" href="css/servizio.css?v=1">
+<link rel="stylesheet" href="css/shell.css?v=12">
+<link rel="stylesheet" href="css/accesso.css?v=1">
+</head>
+<body class="su-accesso">
+
+<!-- LE PAGINE DI SERVIZIO (js/servizio.js, css/servizio.css).
+
+     L'AVVIO sta qui dentro, scritto a mano, e non lo disegna il JavaScript
+     apposta: se un file di codice non arriva o il browser è troppo vecchio per
+     leggerlo, il JS non parte proprio e una schermata disegnata da lui non si
+     vedrebbe mai — resterebbe la pagina bianca. Questa invece c'è già prima
+     che giri una riga, e dopo dodici secondi tira fuori da sola, con una
+     animazione CSS, il messaggio che qualcosa non va. Se il gioco parte, se ne
+     va da sé.
+
+     Gli altri due li riempie il codice: il foglio grande per quando si rompe
+     qualcosa o il salvataggio non si legge, la fascia in basso per quando il
+     server non risponde. -->
+<div class="avvio" id="avvio">
+  <span class="marchio" aria-hidden="true">
+    <svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+      <rect x="14" y="6.5" width="6" height="12.6" rx="3" fill="#0B0B0D"/>
+      <g fill="none" stroke="#0B0B0D" stroke-width="2.4" stroke-linecap="round">
+        <path d="M10 16.4a7 7 0 0 0 14 0"/><path d="M17 23.4V27"/><path d="M12.8 27h8.4"/>
+      </g>
+    </svg>
+  </span>
+  <h1>Anni di <em>Fame</em></h1>
+  <p class="dice">Si sta accendendo tutto: mille eventi, la città, la gente che ci abita.</p>
+  <span class="barra" aria-hidden="true"><i></i></span>
+  <p class="lento" role="status">
+    <b>Ci sta mettendo troppo.</b> Se resta così, qualcosa non si è caricato.
+    Prova a ricaricare con <code>Ctrl</code>+<code>F5</code>: nove volte su dieci
+    è la cache. Se non basta, il gioco vuole un browser aggiornato — Chrome,
+    Edge o Firefox degli ultimi due anni.
+  </p>
+</div>
+
+<div class="servizio" id="servizio" role="alert"></div>
+
+<div class="staccato" id="staccato" role="status">
+  <span class="segno" aria-hidden="true">!</span>
+  <span class="testo">
+    <strong>Il server non risponde</strong>
+    <span>Classifica, account e salvataggio in cloud restano fermi. La partita no: si gioca lo stesso, tutto in locale.</span>
+  </span>
+  <button type="button" data-riprova="1">Riprova</button>
+  <button type="button">Va bene</button>
+</div>
+
+<div class="topnav">
+  <div class="navleft">
+    <!-- Il marchio: da qui si torna alla landing, che è la porta di casa. -->
+    <button class="brand" id="brand" aria-label="Anni di Fame — torna al menu principale">
+      <span class="bmark" aria-hidden="true">
+        <svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="lgmark" x1="0" y1="0" x2="1" y2="1">
+            <stop class="s1" offset="0"/><stop class="s2" offset="1"/>
+          </linearGradient></defs>
+          <rect width="34" height="34" rx="10" fill="url(#lgmark)"/>
+          <rect x="14" y="6.5" width="6" height="12.6" rx="3" fill="#0B0B0D"/>
+          <g fill="none" stroke="#0B0B0D" stroke-width="2.4" stroke-linecap="round">
+            <path d="M10 16.4a7 7 0 0 0 14 0"/><path d="M17 23.4V27"/><path d="M12.8 27h8.4"/>
+          </g>
+        </svg>
+      </span>
+      <span class="bword">Anni di <b>Fame</b></span>
+    </button>
+    <button class="navback" id="nav-back"><span class="arw">‹</span> Menu</button>
+  </div>
+</div>
+
+<!-- ====================== L'ACCESSO ======================
+     Punto 27: una pagina sua, staccata dalla landing e dal gioco. L'account
+     non serve per giocare — la carriera sta su questo dispositivo e ci resta —
+     serve per portarsela dietro e per stare in classifica con un nome che è
+     tuo. È scritto qui sotto, perché è la prima domanda che si fa chiunque
+     veda un modulo di accesso in un gioco che si può giocare offline. -->
+<main class="accesso">
+  <div class="acc-scheda">
+    <span class="acc-kick">Anni di Fame</span>
+    <h1 id="acc-tit">Entra nel tuo account</h1>
+    <p class="acc-sub" id="acc-sub">Serve solo a portarti dietro la carriera: cambi telefono, rientri, e
+      ritrovi tutto. Per giocare non serve — la partita è già salvata qui.</p>
+
+    <!-- chi è già entrato non vede il modulo, vede sé stesso -->
+    <div class="acc-chi" id="acc-chi">
+      <dl>
+        <dt>Account</dt><dd id="acc-chi-mail">—</dd>
+        <dt>Aperto il</dt><dd id="acc-chi-da">—</dd>
+        <dt>Carriere in cloud</dt><dd id="acc-chi-carriere">—</dd>
+      </dl>
+      <button class="acc-esci" id="acc-esci" type="button">Esci dall'account</button>
+    </div>
+
+    <form id="acc-modulo" autocomplete="on">
+      <div class="acc-tabs" role="tablist">
+        <button type="button" role="tab" class="on" id="acc-t-entra" aria-selected="true">Ho un account</button>
+        <button type="button" role="tab" id="acc-t-nuovo" aria-selected="false">Me ne creo uno</button>
+      </div>
+
+      <label class="acc-campo">
+        <span>Mail</span>
+        <input type="email" id="acc-mail" name="email" autocomplete="username"
+               inputmode="email" placeholder="latua@mail.it" required>
+      </label>
+      <label class="acc-campo">
+        <span>Password</span>
+        <input type="password" id="acc-segreto" name="password" autocomplete="current-password"
+               placeholder="almeno otto caratteri" minlength="8" required>
+      </label>
+
+      <button class="acc-vai" id="acc-vai" type="submit">Entra</button>
+      <p class="acc-nota" id="acc-nota">Se la password la dimentichi, la carriera su questo dispositivo
+        resta comunque dov'è: l'account serve solo a ritrovarla altrove.</p>
+    </form>
+
+    <p class="acc-dice" id="acc-dice" role="status"></p>
+
+    <p class="acc-piede"><a href="pagine/landing.html">‹ Torna al menu</a></p>
+  </div>
+</main>
+
+<!-- Script: qui non entra né la landing né il gioco. Solo il ponte col
+     server (js/net/online.js) e questa pagina. -->
+<script src="js/core.js?v=12"></script>
+<!-- Dove stanno le tre pagine e come si passa dall'una all'altra. -->
+<script src="js/pagine.js?v=1"></script>
+<script src="js/servizio.js?v=1"></script>
+<script src="js/impostazioni.js?v=12"></script>
+<script src="js/lingua.js?v=12"></script>
+<script src="js/net/online.js?v=12"></script>
+<script src="js/accesso.js?v=1"></script>
+</body>
+</html>

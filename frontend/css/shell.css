@@ -98,3 +98,14 @@
 .mrcard p{margin:0;font-size:13.5px;line-height:1.6;color:var(--soft);font-weight:500}
 
 .mfoot{margin-top:26px;font-size:12.5px;color:var(--faint);font-weight:500;line-height:1.6}
+
+/* ---- il tasto dell'account (punto 27) ----
+   Sta nella barra della landing, accanto all'avatar: l'accesso è una pagina
+   sua e senza un appiglio qui dentro non ci arriverebbe nessuno. Dentro alla
+   partita non c'è: lì la barra sparisce tutta. */
+.navacc{font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:rgba(255,255,255,.72);background:transparent;
+  border:1px solid rgba(255,255,255,.18);padding:8px 14px;border-radius:999px;flex:none;
+  transition:background .15s,border-color .15s,color .15s}
+.navacc:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.4);color:#fff}
+@media (max-width:520px){.navacc{padding:7px 11px;font-size:12px}}

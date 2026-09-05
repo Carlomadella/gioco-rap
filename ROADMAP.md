@@ -1,8 +1,9 @@
 # Anni di Fame — Roadmap di Gameplay
 
 Simulatore di carriera rap a settimane, **in uscita su Steam e sugli store del telefono**.
-Il repository è la fonte, diviso in due metà: `frontend/` (il gioco: `index.html` + `css/` +
-`js/`) e `backend/` (il server della classifica).
+Il repository è la fonte, diviso in due metà: `frontend/` (il gioco: le tre pagine in
+`pagine/` — landing, accesso, partita — più `css/` e `js/`) e `backend/` (il server della
+classifica).
 Per farlo provare a qualcuno si ricompila tutto in un file solo con
 `python3 frontend/strumenti/build-artifact.py` (esce `frontend/dist/anni-di-fame.html`):
 è la demo, non il modo in cui il gioco esce.

@@ -63,6 +63,11 @@ $("save").onclick = () => {
   if(firstRun){
     firstRun = false;
     applyMode();
+    /* Punto 27: se ci si è arrivati da «nuova partita», l'artista appena
+       creato entra in città e non passa dalla landing — che adesso è
+       un'altra pagina, e attraversarla vorrebbe dire un caricamento in mezzo
+       per niente. Chi mette questo appiglio è js/gioco-ingresso.js. */
+    if(typeof window.__ADF_DOPO_CREAZIONE === "function"){ window.__ADF_DOPO_CREAZIONE(); return; }
     goto("menu");
     return;
   }

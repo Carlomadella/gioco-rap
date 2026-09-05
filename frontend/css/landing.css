@@ -134,6 +134,13 @@ body.su-menu .navmeta{display:flex;align-items:center;gap:24px;margin-left:auto;
 body.carriera-viva .navmeta .dot{background:#a6c27a;box-shadow:0 0 0 4px rgba(166,194,122,.12)}
 @media (max-width:820px){body.su-menu .navmeta{display:none}}
 
+/* Il tasto dell'account (punto 27). La barra qui sopra non prende i clic —
+   è solo una scritta sulla foto — quindi glieli ridiamo a lui, che invece è
+   un tasto vero. Sul telefono la riga «a che punto sei» sparisce e questo
+   resta: è l'unico modo per arrivare all'accesso da uno schermo piccolo. */
+body.su-menu .navacc{pointer-events:auto;margin-left:20px}
+@media (max-width:820px){body.su-menu .navacc{margin-left:auto}}
+
 /* ==================== SCHERMI PICCOLI ==================== */
 /* ---- in mano: il menu diventa una griglia, non un nastro da scorrere ---- */
 @media (max-width:900px){

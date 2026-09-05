@@ -43,8 +43,15 @@ const skip = leggi("js/game/skip.js");
 const transfers = leggi("js/game/trasferte.js");
 const time = leggi("js/game/tempo.js");
 const timeControls = leggi("js/game/tempo-controlli.js");
-const index = leggi("index.html");
+/* Punto 27: le pagine sono tre. «index» qui è la pagina del gioco, che è
+   quella che tiene tutta l'impalcatura di cui parlano queste prove; la landing
+   e la porta d'ingresso hanno le loro, più sotto. */
+const index = leggi("pagine/gioco.html");
+const landing = leggi("pagine/landing.html");
+const accesso = leggi("pagine/accesso.html");
+const porta = leggi("index.html");
 const avvio = leggi("js/avvio.js");
+const ingresso = leggi("js/gioco-ingresso.js");
 const jailBg = leggi("js/game/jail-backgrounds.js");
 const menuSystem = leggi("js/menu-sistema.js");
 const cat = JSON.parse(leggi("js/game/eventi-master-1000-v1.2.13.json"));
@@ -63,9 +70,12 @@ test("verifica build produce sia store sia demo e poi controlla dist",
   pkg.scripts["verifica:build"].includes("npm run build") &&
   pkg.scripts["verifica:build"].includes("npm run demo") &&
   pkg.scripts["verifica:build"].includes("node strumenti/verifica-build.js"));
+/* Punto 27: i bundle non sono più due ma due per pagina, e il nome se lo
+   porta dietro dalla pagina («gioco-3f2a91c4.js», «landing-...»). Il
+   verificatore deve controllarli pagina per pagina. */
 test("verificatore dist controlla bundle, catalogo, media e demo",
-  verifyBuild.includes("stile-[0-9a-f]{8}") &&
-  verifyBuild.includes("gioco-[0-9a-f]{8}") &&
+  verifyBuild.includes('"^assets/"+p.nome+"-[0-9a-f]{8}') &&
+  verifyBuild.includes('pagine/gioco.html') &&
   verifyBuild.includes("eventi-master-1000-v1.2.13.json") &&
   verifyBuild.includes('exists("media")') &&
   verifyBuild.includes("window.__ADF_EVENT_CATALOG__="));
@@ -494,9 +504,13 @@ test("nuovo menu di sistema riconosce il carcere e blocca Mappa",
   menuSystem.includes('if(document.querySelector("#adf-jail.on")) return "jail";') &&
   menuSystem.includes('if(hostAttivo() === "jail" || hostAttivo() === "hub"'));
 
+/* Punto 27: il controllo non sta più in js/avvio.js — la landing non fa più
+   entrare nessuno, cambia pagina. Adesso è la pagina del gioco a guardare,
+   appena si apre, se la carriera che sta riprendendo è dentro. */
 test("caricando una carriera arrestata si entra direttamente nel carcere",
-  avvio.includes('const jailed=!!(G.strada&&G.strada.arresto)') &&
-  avvio.includes('window.apriCarcere({direct:true,reason:"resume"})'));
+  ingresso.includes("G.strada && G.strada.arresto") &&
+  ingresso.includes('window.apriCarcere({direct:true, reason:"resume"})') &&
+  !avvio.includes("apriCarcere"));
 
 test("avatar del detenuto usa ritratto reale con sbarre sovrapposte",
   crimeui.includes('id="adf-jail-portrait"') &&
@@ -1142,7 +1156,7 @@ test("in media/ non restano immagini che nessuna riga di codice carica",
        ancora da collegare. */
     /* le pagine del creator RPG stanno dentro a media/ e chiamano i loro
        disegni da lì: contano come codice anche quelle. */
-    const codice = ["js","css","media"].flatMap(d => elencaFile(path.join(ROOT, d)))
+    const codice = ["js","css","media","pagine"].flatMap(d => elencaFile(path.join(ROOT, d)))
       .concat([path.join(ROOT, "index.html")])
       .filter(f => /\.(js|css|html)$/i.test(f))
       .map(f => fs.readFileSync(f, "utf8")).join("\n");
@@ -1182,6 +1196,47 @@ test("la pagina del 404 non sta piu' qui: la fa il middleware del backend",
     return typeof R.PAGINE[404] === "function" &&
       R.PAGINE[404]({ dove: "/api/x" }).indexOf("/api/x") > 0;
   })());
+
+console.log("\nPunto 27 — la landing, l'accesso e il gioco sono tre pagine");
+test("le tre pagine stanno tutte in pagine/",
+  ["landing","accesso","gioco"].every(n => fs.existsSync(path.join(ROOT, "pagine", n + ".html"))));
+test("ognuna ha il <base href=\"../\">: da pagine/ i percorsi restano quelli di sempre",
+  [landing, accesso, index].every(t => t.includes('<base href="../">')));
+test("index.html è solo la porta d'ingresso: rimanda alla landing e non carica niente",
+  porta.includes("pagine/landing.html") &&
+  !/<script[^>]+src="(?!http)/.test(porta) &&
+  !/<link[^>]+rel="stylesheet"[^>]+href="(?!http)/.test(porta));
+test("la landing non si porta dietro il gioco: solo lo stato e le fasi",
+  (() => {
+    const suoi = [...landing.matchAll(/<script[^>]+src="(js\/[^"?]+)/g)].map(m => m[1])
+      .filter(f => f.startsWith("js/game/"));
+    if(suoi.some(f => f !== "js/game/state.js" && f !== "js/game/phases.js")) console.log("      " + suoi.join(", "));
+    return suoi.every(f => f === "js/game/state.js" || f === "js/game/phases.js");
+  })());
+test("nella pagina del gioco la landing non c'è più",
+  !index.includes('id="s-menu"') && !index.includes('class="land"') &&
+  !index.includes('<script src="js/landing.js') && !index.includes('<script src="js/avvio.js'));
+test("nella landing il gioco non c'è più",
+  !landing.includes('id="s-hub"') && !landing.includes('id="s-profile"') &&
+  !landing.includes('<script src="js/game/hub.js'));
+test("i nomi dei file delle pagine stanno scritti in un posto solo (js/pagine.js)",
+  (() => {
+    /* nei commenti si possono nominare quanto si vuole — anzi, è giusto che
+       lo facciano. Quello che non deve succedere è che un altro file se li
+       costruisca da sé: il giorno che cambiano nome (la demo monofile) si
+       riscrive js/pagine.js e basta. */
+    const senzaCommenti = t => t.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+    const altrove = elencaFile(path.join(ROOT, "js"))
+      .filter(f => /\.js$/.test(f) && path.basename(f) !== "pagine.js")
+      .filter(f => /pagine\/(landing|accesso|gioco)\.html/.test(senzaCommenti(fs.readFileSync(f, "utf8"))))
+      .map(f => path.relative(ROOT, f));
+    if(altrove.length) console.log("      " + altrove.join("\n      "));
+    return altrove.length === 0;
+  })());
+test("il build impacchetta tutte e tre le pagine",
+  build.includes('{ file: "pagine/landing.html"') &&
+  build.includes('{ file: "pagine/accesso.html"') &&
+  build.includes('{ file: "pagine/gioco.html"'));
 
 for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }

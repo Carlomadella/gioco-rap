@@ -287,9 +287,12 @@
     if(!esito.ok){ stato(esito.msg || "Salvataggio non riuscito.", "bad"); return; }
 
     stato("Checkpoint salvato. Torno al menu principale…", "good");
-    /* Il reload è voluto: chiude qualunque overlay e ricarica esattamente il
-       checkpoint appena scritto, senza lasciare in RAM una transazione vecchia. */
-    setTimeout(() => location.reload(), 140);
+    /* Punto 27: «esci» vuol dire uscire davvero. Prima bastava ricaricare —
+       la pagina si riapriva sul menu, perché il menu era una sezione di questa
+       stessa pagina. Adesso ricaricare vuol dire rientrare in partita, quindi
+       si va alla landing, che è un'altra pagina. Vale lo stesso il motivo per
+       cui prima c'era un reload: non resta niente in RAM di quello che c'era. */
+    setTimeout(() => tornaAlMenu(), 140);
   }
 
   function esciSenzaSalvare(b){
@@ -309,8 +312,15 @@
       return;
     }
 
-    /* Nessuna chiamata a save(): il reload rimette in memoria l'ultimo
-       checkpoint realmente presente in localStorage. */
+    /* Nessuna chiamata a save(): si esce e basta, e quello che resta sul
+       disco è l'ultimo checkpoint scritto davvero. */
+    tornaAlMenu();
+  }
+
+  /* La landing è una pagina sua (punto 27). Se per qualche motivo js/pagine.js
+     non ci fosse, il reload di prima è meglio di niente. */
+  function tornaAlMenu(){
+    if(typeof window.vaiA === "function"){ window.vaiA("landing"); return; }
     location.reload();
   }
 

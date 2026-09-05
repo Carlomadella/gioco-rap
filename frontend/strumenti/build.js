@@ -1,19 +1,28 @@
 /* Il build del gioco.
 
      npm run build     → dist/       la cartella da dare a Electron e a Capacitor
-     npm run demo      → dist/anni-di-fame.html   il gioco in un file solo, per farlo provare
+     npm run demo      → dist/anni-di-fame.html   il gioco da mandare a qualcuno
 
-   Cosa fa, in ordine:
-   1. legge `index.html` e ne tira fuori l'elenco ordinato dei CSS e dei JS
-      (l'ordine dei tag è il contratto del gioco: i file contano l'uno sull'altro);
+   Le pagine sono tre (punto 27): `pagine/landing.html`, `pagine/accesso.html`,
+   `pagine/gioco.html`. Ognuna cita i suoi file e ognuna si impacchetta per
+   conto suo — la landing non si porta dietro il gioco, che è il motivo per cui
+   sono state separate.
+
+   Cosa fa, per ogni pagina, in ordine:
+   1. ne tira fuori l'elenco ordinato dei CSS e dei JS (l'ordine dei tag è il
+      contratto del gioco: i file contano l'uno sull'altro);
    2. li mette insieme in due file soli e li minifica con esbuild;
    3. dà a ognuno un nome con dentro l'impronta del contenuto
       (`gioco-3f2a91c4.js`), così la cache si sistema da sé e il `?v=` a mano sparisce;
-   4. riscrive `index.html` con due tag al posto di quarantatré;
-   5. copia le immagini e i suoni.
+   4. riscrive la pagina con due tag al posto di quarantatré;
+   e alla fine copia le immagini e i suoni, e `index.html` — che è la porta
+   d'ingresso e non cita niente di suo.
 
-   Con `--unico` fa invece un file HTML solo, con dentro anche le immagini come
-   data URI: quello si manda a qualcuno e ci gioca, senza installare niente.
+   Con `--unico` fa invece tre file HTML che stanno in piedi da soli, con dentro
+   anche le immagini dei CSS come data URI: si mandano a qualcuno e ci gioca,
+   senza installare niente. Sono tre e non uno perché le pagine sono tre; i
+   collegamenti fra loro vengono riscritti coi nomi nuovi (js/pagine.js tiene
+   quei nomi in un posto solo apposta).
 
    L'unica dipendenza è esbuild, e serve solo qui: nel gioco non entra niente. */
 "use strict";
@@ -26,6 +35,14 @@ const RADICE = path.resolve(__dirname, "..");
 const USCITA = path.join(RADICE, "dist");
 const UNICO = process.argv.includes("--unico");
 const NUDO = process.argv.includes("--senza-minificare");
+
+/* Le tre pagine, e come si chiamano nella demo monofile (dove finiscono tutte
+   nella stessa cartella e «pagine/» non esiste più). */
+const PAGINE = [
+  { file: "pagine/landing.html", nome: "landing", unico: "anni-di-fame.html" },
+  { file: "pagine/accesso.html", nome: "accesso", unico: "anni-di-fame-accesso.html" },
+  { file: "pagine/gioco.html",   nome: "gioco",   unico: "anni-di-fame-gioco.html" }
+];
 
 /* Eventi V2 usa un catalogo JSON esterno. Nel build store va copiato accanto
    al bundle; nella demo monofile va incorporato, altrimenti file:// non
@@ -134,21 +151,13 @@ function pesa(cartella){
 }
 
 /* ==================== IL BUILD ==================== */
-(async () => {
-  const html = leggi("index.html");
+
+/* Una pagina: i suoi CSS in uno, i suoi JS in uno. */
+async function impacchetta(pagina){
+  const html = leggi(pagina.file);
   const { css, js } = pezzi(html);
-  const usaEventiV2 = js.some(f => f.split("?")[0] === "js/game/eventi-v2.js");
-  let catalogoEventiV2 = null;
-  if(usaEventiV2){
-    if(!fs.existsSync(CATALOGO_EVENTI_V2))
-      throw new Error("Eventi V2: manca " + CATALOGO_EVENTI_V2);
-    catalogoEventiV2 = JSON.parse(fs.readFileSync(CATALOGO_EVENTI_V2, "utf8"));
-    if(!Array.isArray(catalogoEventiV2) || catalogoEventiV2.length !== 1000)
-      throw new Error("Eventi V2: catalogo non valido (" +
-        (Array.isArray(catalogoEventiV2) ? catalogoEventiV2.length : typeof catalogoEventiV2) + ")");
-  }
-  console.log((UNICO ? "Il gioco in un file solo" : "Il gioco per gli store") +
-    " — " + css.length + " fogli di stile, " + js.length + " file di codice");
+  if(!css.length || !js.length)
+    throw new Error(pagina.file + " non cita né fogli di stile né codice");
 
   /* i CSS, uno dietro l'altro nell'ordine dei tag */
   let stile = css.map(f => "/* " + f.split("?")[0] + " */\n" + leggi(f)).join("\n");
@@ -159,62 +168,122 @@ function pesa(cartella){
   let codice = js.map(f => "/* " + f.split("?")[0] + " */\n" + leggi(f)).join("\n;\n");
   codice = await minifica(codice, "js");
 
+  return { html, css, js, stile, codice,
+    usaEventiV2: js.some(f => f.split("?")[0] === "js/game/eventi-v2.js") };
+}
+
+/* I collegamenti fra le pagine: nella demo monofile i file cambiano nome e
+   stanno tutti nella stessa cartella. I nomi compaiono in due posti soli —
+   js/pagine.js e qualche <a href> — e qui si riscrivono tutti insieme. */
+function riscriviCollegamenti(testo){
+  let t = testo;
+  for(const p of PAGINE) t = t.split(p.file).join(p.unico);
+  return t;
+}
+
+const SENZA_TAG_LOCALI = pagina => pagina
+  .replace(/<link[^>]+rel="stylesheet"[^>]+href="(?!http)[^"]+"[^>]*>\s*/g, "")
+  .replace(/<script[^>]+src="(?!http)[^"]+"[^>]*><\/script>\s*/g, "");
+
+(async () => {
+  const fatte = [];
+  for(const p of PAGINE) fatte.push(Object.assign({ pagina: p }, await impacchetta(p)));
+  const gioco = fatte.find(f => f.pagina.nome === "gioco");
+
+  /* Eventi V2 usa un catalogo esterno: è roba della pagina del gioco. */
+  let catalogoEventiV2 = null;
+  if(gioco.usaEventiV2){
+    if(!fs.existsSync(CATALOGO_EVENTI_V2))
+      throw new Error("Eventi V2: manca " + CATALOGO_EVENTI_V2);
+    catalogoEventiV2 = JSON.parse(fs.readFileSync(CATALOGO_EVENTI_V2, "utf8"));
+    if(!Array.isArray(catalogoEventiV2) || catalogoEventiV2.length !== 1000)
+      throw new Error("Eventi V2: catalogo non valido (" +
+        (Array.isArray(catalogoEventiV2) ? catalogoEventiV2.length : typeof catalogoEventiV2) + ")");
+  }
+
+  console.log((UNICO ? "Il gioco da mandare in giro" : "Il gioco per gli store") +
+    " — " + PAGINE.length + " pagine");
+  for(const f of fatte)
+    console.log("  " + f.pagina.nome.padEnd(8) + f.css.length + " fogli di stile, " + f.js.length + " file di codice");
+
   /* attenzione ai caratteri: se li prendiamo dalla rete, senza rete cambiano */
-  if(/fonts\.googleapis\.com/.test(html)){
+  if(fatte.some(f => /fonts\.googleapis\.com/.test(f.html))){
     console.log("  ! i caratteri arrivano ancora da Google Fonts: dentro a un'app,\n" +
                 "    senza rete, il gioco si vede con quelli di sistema. Da portare dentro.");
   }
 
   fs.mkdirSync(USCITA, { recursive: true });
-  if(!UNICO){
-    /* si rifà il build, non si butta la demo che magari sta li' accanto */
-    fs.rmSync(path.join(USCITA, "assets"), { recursive: true, force: true });
-    fs.rmSync(path.join(USCITA, "media"), { recursive: true, force: true });
-    fs.rmSync(path.join(USCITA, "index.html"), { force: true });
-  }
 
+  /* ---------- la demo: pagine che stanno in piedi da sole ---------- */
   if(UNICO){
-    const creatorRpgInline = "<script>window.__ADF_RPG_V24_SRC__=" + JSON.stringify(creatorRpgV24DataUrl()).replace(/<\/script/gi,"<\\/script") + ";<\/script>\n";
+    const creatorRpgInline = "<script>window.__ADF_RPG_V24_SRC__=" +
+      JSON.stringify(creatorRpgV24DataUrl()).replace(/<\/script/gi, "<\/script") + ";<\/script>\n";
     const catalogoInline = catalogoEventiV2
       ? '<script>window.__ADF_EVENT_CATALOG__=' +
-        JSON.stringify(catalogoEventiV2).replace(/<\/script/gi, "<\\/script") +
+        JSON.stringify(catalogoEventiV2).replace(/<\/script/gi, "<\/script") +
         ';<\/script>\n'
       : "";
-    const pagina = html
-      .replace(/<link[^>]+rel="stylesheet"[^>]+href="(?!http)[^"]+"[^>]*>\s*/g, "")
-      .replace(/<script[^>]+src="(?!http)[^"]+"[^>]*><\/script>\s*/g, "")
-      .replace("</head>", "<style>\n" + stile + "\n</style>\n</head>")
-      .replace("</body>", creatorRpgInline + catalogoInline + "<script>\n" + codice + "\n</script>\n</body>");
-    const f = path.join(USCITA, "anni-di-fame.html");
-    fs.writeFileSync(f, pagina);
-    console.log("\nscritto " + f + " (" + kb(Buffer.byteLength(pagina)) + ")");
-    console.log("Si apre con un doppio clic: dentro c'è tutto, immagini comprese.");
+
+    for(const f of fatte){
+      const suo = f.pagina.nome === "gioco" ? creatorRpgInline + catalogoInline : "";
+      /* fuori il <base>: qui le pagine stanno accanto a media/, non dentro a pagine/ */
+      let pagina = SENZA_TAG_LOCALI(f.html)
+        .replace(/\s*<base href="\.\.\/">\n?/, "\n")
+        .replace("</head>", "<style>\n" + f.stile + "\n</style>\n</head>")
+        .replace("</body>", suo + "<script>\n" + f.codice + "\n</script>\n</body>");
+      pagina = riscriviCollegamenti(pagina);
+      const uscita = path.join(USCITA, f.pagina.unico);
+      fs.writeFileSync(uscita, pagina);
+      console.log("\nscritto " + uscita + " (" + kb(Buffer.byteLength(pagina)) + ")");
+    }
+    console.log("\nSi apre " + PAGINE[0].unico + " con un doppio clic. Le tre pagine si");
+    console.log("chiamano fra loro, quindi vanno tenute nella stessa cartella insieme");
+    console.log("a media/: dentro all'HTML ci sono i disegni dei CSS, le foto no.");
     return;
   }
 
-  const nomeStile = "stile-" + impronta(stile) + ".css";
-  const nomeCodice = "gioco-" + impronta(codice) + ".js";
+  /* ---------- il pacchetto per gli store ---------- */
+  /* si rifà il build, non si buttano le demo che magari stanno lì accanto */
+  fs.rmSync(path.join(USCITA, "assets"), { recursive: true, force: true });
+  fs.rmSync(path.join(USCITA, "media"), { recursive: true, force: true });
+  fs.rmSync(path.join(USCITA, "pagine"), { recursive: true, force: true });
+  fs.rmSync(path.join(USCITA, "index.html"), { force: true });
+
   fs.mkdirSync(path.join(USCITA, "assets"), { recursive: true });
-  fs.writeFileSync(path.join(USCITA, "assets", nomeStile), stile);
-  fs.writeFileSync(path.join(USCITA, "assets", nomeCodice), codice);
+  fs.mkdirSync(path.join(USCITA, "pagine"), { recursive: true });
+
+  for(const f of fatte){
+    const nomeStile = f.pagina.nome + "-" + impronta(f.stile) + ".css";
+    const nomeCodice = f.pagina.nome + "-" + impronta(f.codice) + ".js";
+    fs.writeFileSync(path.join(USCITA, "assets", nomeStile), f.stile);
+    fs.writeFileSync(path.join(USCITA, "assets", nomeCodice), f.codice);
+    /* le pagine hanno <base href="../">: da dentro pagine/ «assets/...» è
+       la cartella accanto, esattamente come nei sorgenti «css/...» */
+    const pagina = SENZA_TAG_LOCALI(f.html)
+      .replace("</head>", '<link rel="stylesheet" href="assets/' + nomeStile + '">\n</head>')
+      .replace("</body>", '<script src="assets/' + nomeCodice + '"></script>\n</body>');
+    fs.writeFileSync(path.join(USCITA, f.pagina.file), pagina);
+    f.uscita = { pagina: f.pagina.file, stile: nomeStile, codice: nomeCodice,
+      peso: Buffer.byteLength(pagina) };
+  }
+
   if(catalogoEventiV2){
     fs.copyFileSync(CATALOGO_EVENTI_V2,
       path.join(USCITA, "assets", path.basename(CATALOGO_EVENTI_V2)));
   }
 
-  let pagina = html
-    .replace(/<link[^>]+rel="stylesheet"[^>]+href="(?!http)[^"]+"[^>]*>\s*/g, "")
-    .replace(/<script[^>]+src="(?!http)[^"]+"[^>]*><\/script>\s*/g, "")
-    .replace("</head>", '<link rel="stylesheet" href="assets/' + nomeStile + '">\n</head>')
-    .replace("</body>", '<script src="assets/' + nomeCodice + '"></script>\n</body>');
-  fs.writeFileSync(path.join(USCITA, "index.html"), pagina);
+  /* la porta d'ingresso: non cita niente di suo, si copia com'è */
+  fs.copyFileSync(path.join(RADICE, "index.html"), path.join(USCITA, "index.html"));
 
-  copiaCartella(path.join(RADICE, "media"), path.join(USCITA, "media"));
+  copiaCartella(path.join(RADICE, "media"), path.join(USCITA, "media"));
 
   console.log("\nscritto " + USCITA);
-  console.log("  index.html          " + kb(Buffer.byteLength(pagina)));
-  console.log("  assets/" + nomeStile + "  " + kb(Buffer.byteLength(stile)));
-  console.log("  assets/" + nomeCodice + "  " + kb(Buffer.byteLength(codice)));
+  console.log("  index.html          " + kb(fs.statSync(path.join(USCITA, "index.html")).size));
+  for(const f of fatte){
+    console.log("  " + f.uscita.pagina.padEnd(20) + kb(f.uscita.peso));
+    console.log("    assets/" + f.uscita.stile + "  " + kb(Buffer.byteLength(f.stile)));
+    console.log("    assets/" + f.uscita.codice + "  " + kb(Buffer.byteLength(f.codice)));
+  }
   console.log("  media/              " + kb(pesa(path.join(USCITA, "media"))));
   console.log("\nTutti i percorsi sono relativi: la cartella gira anche da file://,");
   console.log("che è come la aprono Electron e Capacitor.");
