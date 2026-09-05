@@ -1070,10 +1070,12 @@ test("e se era gi\u00e0 a schermo quando ti prendono, se ne va con te",
   crimeui.includes('new CustomEvent("jail-ui:opened"'));
 test("il post resta comunque nel feed: \u00e8 solo la notifica che non arriva",
   ev.includes("s.runtime.socialAlerts.unshift({") &&
-  ev.indexOf("s.runtime.socialAlerts.unshift({") < ev.indexOf("adfRenderSocialBanner(post);\n}"));
+  ev.indexOf("s.runtime.socialAlerts.unshift({") < ev.indexOf("adfRenderSocialBanner(post);"));
 test("le didascalie della strada non citano nessuna lirica vera",
   !/\bby:\s*"/.test(caption) && !caption.includes("track:") &&
   !/Wu-Tang|2Pac|Tupac|Notorious|Jay-Z|Eminem|Kendrick|Drake|Snoop|Nas\b/.test(caption));
+test("ogni didascalia dice da dove arriva, e a schermo ci finisce quella firma",
+  caption.includes('da:"') && caption.includes("a.textContent=c.da"));
 test("e sono abbastanza da reggere il filtro delle ultime 28 uscite",
   (caption.match(/\{id:"c\d{3}"/g) || []).length >= 40 &&
   caption.includes('da:"') && caption.includes("recent.slice(-28)"));
