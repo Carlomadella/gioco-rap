@@ -25,6 +25,8 @@ const negozio = leggi("js/game/negozio.js");
 const hours = leggi("js/game/orari.js");
 const travel = leggi("js/game/spostamenti.js");
 const crimeui = leggi("js/game/strada-crimine-ui.js");
+const abilita = leggi("js/game/abilita.js");
+const abilitaCss = leggi("css/abilita.css");
 const crime = leggi("js/game/strada-crimine.js");
 const state = leggi("js/game/state.js");
 const sim = leggi("js/game/sim.js");
@@ -1057,6 +1059,34 @@ test("il tab dei vestiti mostra ancora la stessa griglia di sempre (nggrid/ngcar
 test("comprare attrezzatura e beat resta la stessa economia di prima: stesso costo, stesso G.money, stesso G.gear/G.beats",
   ui.includes("G.money -= g2.p; G.gear[g2.id] = true;") &&
   ui.includes("G.money -= b.price; G.market.splice(i,1); G.beats.push("));
+
+console.log("\nPunto 13 — l'albero delle abilità");
+test("la linguetta «Abilità» apre l'albero, senza vista di mezzo",
+  hub.includes('if(b.dataset.v === "abilita"){') &&
+  hub.includes("apriAbilita()") && !hub.includes("function vistaAbilita("));
+test("l'albero è una schermata sua, con dentro i 32 nodi del disegno",
+  index.includes('<div class="abilita" id="abilita">') &&
+  (index.match(/class="skill-hotspot"/g) || []).length === 32);
+test("la tela riempie la finestra: niente più bande sopra e sotto",
+  abilitaCss.includes("#abilita .hud-canvas{position:relative;width:100%;height:100%") &&
+  !abilitaCss.includes("aspect-ratio:1672/793"));
+test("il tasto per tornare alla mappa c'è, e si vede",
+  index.includes('id="returnToMap"') && index.includes("Torna alla mappa") &&
+  abilitaCss.includes("#abilita .nav-hot.back{"));
+test("la colonna di sinistra legge la partita, non il disegno",
+  abilita.includes("function renderColonna()") &&
+  abilita.includes("window.ARTIST_PORTRAIT") && abilita.includes("livello()") &&
+  ["ab-nome","ab-livello","ab-xp","ab-citta","ab-punti","ab-skill"]
+    .every(id => abilita.includes('"#' + id + '"') && index.includes('id="' + id + '"')));
+test("le quattro barre sono quelle del gioco, col fondoscala di hub.js",
+  abilita.includes('k:"flow"') && abilita.includes('k:"scrittura"') &&
+  abilita.includes('k:"presenza"') && abilita.includes('k:"rete"') &&
+  abilita.includes("v / 88 * 100") && hub.includes("v / 88 * 100"));
+test("la fase dei nodi la dà la carriera vera",
+  abilita.includes("function fase(){") && abilita.includes("G.phase") &&
+  abilita.includes("return (fase() + 1) >= item.row"));
+test("i talenti non scrivono nel salvataggio della partita",
+  abilita.includes("ABILITA_CHIAVE") && !/\bG\.(talenti|pt)\b/.test(abilita));
 
 for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/piazza.js","js/game/negozio.js","js/game/abilita.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }

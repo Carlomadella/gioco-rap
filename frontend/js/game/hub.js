@@ -521,26 +521,6 @@ function vistaProfilo(L, ph){
     '</div>';
 }
 
-function vistaAbilita(){
-  return '<span class="ptit">Le tue abilità</span>' +
-    '<div class="psk" style="margin-top:14px">' + skillRighe() + '</div>' +
-    '<div class="prighe" style="margin-top:18px">' +
-      rigaStat("mic", "#A855F7", "Rap", "cresce registrando") +
-      rigaStat("matita", "#C084FC", "Scrittura", "cresce al foglio") +
-      rigaStat("faccia", "#FACC15", "Carisma", "cresce sul palco") +
-      rigaStat("gente", "#60A5FA", "Networking", "cresce uscendo") +
-    '</div>' +
-    '<div class="pnext" style="margin-top:18px"><div class="pnexthead">' +
-      '<span class="pk">Come si sale</span>' + hsvg("mirino") + '</div>' +
-      '<div class="t">Le abilità non si comprano: crescono facendo la cosa. ' +
-      'Ogni mossa della settimana ne alza una.</div></div>' +
-    /* punto 13: le quattro qui sopra crescono da sole, i talenti no — quelli
-       si scelgono, uno per volta, e non si tornano indietro. Sono una cosa a
-       parte e stanno in una schermata a parte (js/game/abilita.js). */
-    '<button class="solid" data-abilita="1" style="width:100%;margin-top:14px">' +
-      'Apri l’albero dei talenti</button>';
-}
-
 function vistaDisciplina(){
   const ph = PHASES[G.phase], nt = typeof nextTrial === "function" ? nextTrial() : null;
   return '<span class="ptit">Disciplina</span>' +
@@ -589,7 +569,6 @@ function renderHub(){
 
   /* ---- colonna di sinistra ---- */
   $("hb-profilo").innerHTML =
-    HUB_VISTA === "abilita" ? vistaAbilita() :
     HUB_VISTA === "disciplina" ? vistaDisciplina() : vistaProfilo(L, ph);
 
   $("hb-sxtab").innerHTML = [
@@ -651,15 +630,6 @@ $("hb-pins").addEventListener("click", ev => {
   if(l.chiuso) hubChiuso(l); else l.vai();
 });
 
-/* La colonna di sinistra si ridisegna a ogni renderHub(), quindi il tasto
-   dell'albero dei talenti non può tenersi il suo ascoltatore: si ascolta il
-   contenitore, che invece resta. */
-$("hb-profilo").addEventListener("click", ev => {
-  if(!ev.target.closest("[data-abilita]")) return;
-  hubTap();
-  if(typeof apriAbilita === "function") apriAbilita();
-});
-
 $("hb-sxtab").addEventListener("click", ev => {
   const b = ev.target.closest(".ptab"); if(!b) return;
   hubTap();
@@ -667,6 +637,14 @@ $("hb-sxtab").addEventListener("click", ev => {
      acquisto. I capi nuovi si comprano allo Shop → Abbigliamento, o
      arrivano da un evento. */
   if(b.dataset.v === "vestiti"){ apriArmadio(); return; }
+  /* punto 13: «Abilità» apre l'albero dei talenti e basta. Prima disegnava una
+     vista in colonna con dentro un tasto per aprirlo: due passaggi per una
+     cosa sola, e le quattro barre le ripeteva mentre l'albero le ha già in
+     faccia. La vista è sparita, la linguetta porta dritta dov'è la roba. */
+  if(b.dataset.v === "abilita"){
+    if(typeof apriAbilita === "function") apriAbilita();
+    return;
+  }
   HUB_VISTA = b.dataset.v;
   renderHub();
 });

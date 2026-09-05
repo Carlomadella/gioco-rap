@@ -420,8 +420,6 @@
   <div id="hudRoot">
   <main class="hud-canvas" id="hudCanvas" aria-label="Schermata abilità Anni di Fame">
     <img class="concept" alt="L'albero delle abilità di Anni di Fame" src="media/photo/pagina_skill_tree/albero-abilita.png">
-    <div class="visual-mask mask-filters" aria-hidden="true"></div>
-    <div class="visual-mask mask-quote" aria-hidden="true"></div>
     <div class="interactive-layer" id="interactiveLayer">
       <button class="skill-hotspot" type="button" data-node-id="quaderno" data-branch="penna" style="--x:33.7%;--y:61.35%;--c:#ef4dcc" aria-label="Quaderno sempre in tasca"></button>
       <button class="skill-hotspot" type="button" data-node-id="orecchio" data-branch="penna" style="--x:39.9%;--y:63.36%;--c:#ef4dcc" aria-label="Orecchio per le rime"></button>
@@ -455,8 +453,20 @@
       <button class="skill-hotspot" type="button" data-node-id="testadura" data-branch="schiena" style="--x:65.2%;--y:32.63%;--c:#f0c54f" aria-label="Testa dura"></button>
       <button class="skill-hotspot" type="button" data-node-id="quintoturno" data-branch="schiena" style="--x:69.2%;--y:37.61%;--c:#f0c54f" aria-label="Quinto turno"></button>
       <button class="skill-hotspot" type="button" data-node-id="bivio-schiena" data-branch="schiena" style="--x:54.5%;--y:36.90%;--c:#f0c54f" aria-label="Bivio della Schiena"></button>
-      <div class="live-pages" id="livePages">42 PT</div>
-      <button class="nav-hot back" id="returnToMap" type="button" aria-label="Torna indietro"></button>
+      <aside class="left-sidebar" id="leftSidebar">
+        <button class="nav-hot back" id="returnToMap" type="button"><span class="arrow">&#8592;</span><span>Torna alla mappa</span></button>
+        <div class="left-hero"><div class="ritratto" id="ab-ritratto"></div>
+          <div class="chi"><span>Il tuo artista</span><strong id="ab-nome">&#8212;</strong></div></div>
+        <div class="left-blocco">
+          <div class="left-livello"><span class="k">Livello</span><span class="v" id="ab-livello">1</span></div>
+          <span class="left-barra"><i id="ab-xp-barra" style="width:0%"></i></span>
+          <div class="left-xp" id="ab-xp"></div>
+        </div>
+        <div class="left-citta"><div class="dove"><b id="ab-citta">Provincia</b><small id="ab-grado"></small></div><span class="freccia">&#8250;</span></div>
+        <div class="left-punti"><div class="k">Punti disponibili</div><div class="v" id="ab-punti">0 PT</div></div>
+        <div class="left-skill" id="ab-skill"></div>
+        <p class="left-nota">Queste quattro non si comprano: crescono facendo la cosa. I talenti qui accanto s&#236;, e non si torna indietro.</p>
+      </aside>
       <aside class="right-sidebar" id="rightSidebar" aria-live="polite">
         <div class="right-sidebar-head"><strong>Dettagli abilità</strong><span id="rightSidebarIndex">00 / 32</span></div>
         <div class="right-sidebar-hero" id="rightSidebarHero"><img alt="Studio di registrazione" src="media/photo/pagina_skill_tree/dettaglio-studio.jpg"><div class="hero-node-badge" id="rightSidebarBadge">◆</div></div>

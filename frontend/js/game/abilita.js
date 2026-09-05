@@ -459,11 +459,21 @@ const ABILITA_PARTENZA = {
   const visualColor = {palco:"#b557ff", penna:"#ef4dcc", schiena:"#f0c54f", strada:"#27a9ff"};
 
   function owns(id){ return !!game.talenti[id] }
+  /* «1 pagine disponibili» lo diceva il mock: al singolare è una pagina sola. */
+  const pagine = n => n === 1 ? "1 pagina" : n + " pagine";
   function save(){
     try{ localStorage.setItem(ABILITA_CHIAVE, JSON.stringify(game)); }catch(e){}
     window.dispatchEvent(new CustomEvent("adf:talenti-change", {detail:{talenti:{...game.talenti}, pt:game.pt}}));
   }
-  function visible(item){ return (game.phase + 1) >= item.row }
+  /* La fase la dice la carriera vera: `G.phase` è lo stesso concetto che il
+     mock chiamava `phase`, e senza di lui la schermata direbbe una bugia
+     («Serve la fase 3» a uno che è alla prima). Le PT e i contatori dei
+     requisiti restano invece locali, perché nel gioco non esistono ancora. */
+  function fase(){
+    try{ if(typeof G === "object" && G && typeof G.phase === "number") return G.phase; }catch(e){}
+    return game.phase;
+  }
+  function visible(item){ return (fase() + 1) >= item.row }
   function gateOk(item){ return !item.gate || (game.conta[item.gate.key] || 0) >= item.gate.need }
   function excluded(item){ return !!(item.excludes && owns(item.excludes)) }
   function reason(item){
@@ -473,7 +483,7 @@ const ABILITA_PARTENZA = {
     const miss = (item.req || []).find(id => !owns(id));
     if(miss) return `Manca ${choiceById[miss]?.name || byId[miss]?.name || miss}`;
     if(!gateOk(item)) return item.gate.label;
-    if(game.pt < item.cost) return `Servono ${item.cost} pagine`;
+    if(game.pt < item.cost) return `Servono ${pagine(item.cost)}`;
     return null;
   }
   function status(item){
@@ -482,7 +492,7 @@ const ABILITA_PARTENZA = {
     (item.req || []).forEach(id => list.push({ok:owns(id), label:`Talento: ${byId[id]?.name || id}`}));
     if(item.gate) list.push({ok:gateOk(item), label:item.gate.label});
     if(item.excludes) list.push({ok:!owns(item.excludes), label:"Alternativa ancora libera"});
-    list.push({ok:game.pt >= item.cost, label:`${item.cost} pagine disponibili`});
+    list.push({ok:game.pt >= item.cost, label:item.cost === 1 ? "1 pagina disponibile" : `${item.cost} pagine disponibili`});
     return list;
   }
   function slotOwned(slot){ return slot.type === "choice" ? slot.options.some(o => owns(o.id)) : owns(slot.id) }
@@ -505,8 +515,7 @@ const ABILITA_PARTENZA = {
       el.setAttribute("aria-disabled", !isOwned && !!why ? "true" : "false");
       el.dataset.status = isOwned ? "owned" : isReady ? "ready" : "locked";
     });
-    q("#livePages").textContent = `${game.pt} PT`;
-    q("#livePages").classList.toggle("on", game.pt !== 42);
+    renderColonna();
   }
   function reqHtml(item){
     return status(item).map(r => `<div class="reqline ${r.ok?"ok":"no"}"><i>${r.ok?"✓":"×"}</i><span>${r.label}</span></div>`).join("");
@@ -572,6 +581,64 @@ const ABILITA_PARTENZA = {
     const parent = item.parent ? byId[item.parent] : byId[item.id];
     if(parent) detail(parent);
   }
+  /* ---- LA COLONNA DI SINISTRA ----
+     Nel disegno era dipinta: ALBERO, livello 50, Los Angeles, quattro barre a
+     75. Qui sopra c'è il pannello che la copre, e questo lo riempie con la
+     partita vera. Le quattro barre sono le stesse di `skillRighe()` in hub.js,
+     stesso fondoscala (88) — se le due schermate dicessero numeri diversi
+     sarebbe peggio che non dirli. */
+  const ABILITA_BARRE = [
+    {n:"Rap",        k:"flow",      c:"#b557ff"},
+    {n:"Scrittura",  k:"scrittura", c:"#ef4dcc"},
+    {n:"Carisma",    k:"presenza",  c:"#f0c54f"},
+    {n:"Networking", k:"rete",      c:"#27a9ff"}
+  ];
+  const numero = n => typeof fmt === "function" ? fmt(n) : String(Math.round(n));
+  function laPartita(){
+    try{ return (typeof G === "object" && G) ? G : null; }catch(e){ return null; }
+  }
+  /* Una città vera nel salvataggio non c'è ancora (Milano e Los Angeles sono
+     in vista ma chiuse): si guarda dove il gioco la tiene quando la terrà, e
+     nel frattempo è la Provincia. Stessa trafila di meteo.js. */
+  function citta(){
+    const g = laPartita() || {};
+    for(const v of [g.city, g.citta, g.currentCity, g.location, g.luogo]){
+      if(typeof v === "string" && v.trim()) return v.trim();
+      if(v && typeof v === "object"){
+        const t = v.nome || v.name || v.id;
+        if(typeof t === "string" && t.trim()) return t.trim();
+      }
+    }
+    return "Provincia";
+  }
+  function grado(){
+    const g = laPartita();
+    try{ if(g && typeof PHASES !== "undefined") return PHASES[g.phase].n; }catch(e){}
+    return "";
+  }
+  function renderColonna(){
+    const g = laPartita(), art = window.ARTIST || {};
+    q("#ab-ritratto").innerHTML =
+      typeof window.ARTIST_PORTRAIT === "function" ? window.ARTIST_PORTRAIT() : "";
+    q("#ab-nome").textContent = String(art.name || "senza nome").trim().toUpperCase() || "SENZA NOME";
+    let L = {lvl:1, into:0, need:300};
+    try{ if(g && typeof livello === "function") L = livello(); }catch(e){}
+    q("#ab-livello").textContent = L.lvl;
+    q("#ab-xp").textContent = numero(L.into) + " / " + numero(L.need) + " XP";
+    q("#ab-xp-barra").style.width =
+      Math.max(0, Math.min(100, L.need ? L.into / L.need * 100 : 0)) + "%";
+    q("#ab-citta").textContent = citta();
+    q("#ab-grado").textContent = grado();
+    q("#ab-punti").textContent = game.pt + " PT";
+    const sk = (g && g.skills) || {};
+    q("#ab-skill").innerHTML = ABILITA_BARRE.map(b => {
+      const v = Number(sk[b.k] || 0);
+      return `<div class="riga"><span class="n">${b.n}</span>` +
+        `<span class="b"><i style="--c:${b.c};width:${Math.max(0, Math.min(100, v / 88 * 100))}%"></i></span>` +
+        `<span class="v">${Math.round(v)}</span></div>`;
+    }).join("");
+  }
+
   function flash(msg){
     const t = q("#ab-toast");
     t.textContent = msg; t.classList.add("on");
@@ -587,6 +654,7 @@ const ABILITA_PARTENZA = {
   /* Apertura e chiusura: stessa famiglia della Sala e dello Studio. */
   function apriAbilita(nodo){
     radice().classList.add("on");
+    renderColonna();
     renderHotspots();
     detail(byId[nodo] || slots[0]);
   }
