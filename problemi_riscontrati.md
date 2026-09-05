@@ -11,6 +11,8 @@ frase arriva — il muro del sottopasso, il vecchio del bar, uno appena uscito.
 Il motore è lo stesso di prima (tag, pesi, cooldown): cambiano solo le frasi e
 il campo `by`/`track`, diventato `da`.
 
+DA RIVEDERE
+
 fix: togliere che quando sei in carcere ti vengono fuori le notifiche di lafamegram
 
 **RISOLTO (05/09/2026)** — branch `task/problemi-riscontrati`. Il catalogo già

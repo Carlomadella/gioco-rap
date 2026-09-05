@@ -213,6 +213,14 @@ NETWORK 64
     di beat gratis a furia di cliccare. Per esteso in
     [`04-musica-e-suoni.md`](04-musica-e-suoni.md#20-e-22--fatti-sentire-un-beat-non-faceva-niente-e-i-beat-non-si-vedevano).
 
+23. implementa le transizioni all'interno del progetto, fai in modo che partano quando si clicca sulla scheda collegata, il primo video parte quando
+    il player clicca sul luogo chiamato "studio", il secondo video parte quando il player clicca sul luogo chiamato "sala", il terzo quando il player
+    decide di ritornare a "casa", il quarto quando clicca su stacca la spina, il quinto quando clicca su registra un pezzo
+
+24. Cambia il nome "disciplina"
+
+25. togli il paramentro "lucidità" e anche tutto ciò che ne consegue
+
 /_ NUOVE MODALITA' _/
 
 Nelle cose da mettere dopo aver masterizzato il gioco, creiamo delle nuove modalità giocabili/DLC:
