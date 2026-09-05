@@ -10,6 +10,13 @@ function test(n, cond, d){
   else { no++; console.log("  NO   " + n + (d ? " — " + d : "")); }
 }
 const leggi = p => fs.readFileSync(path.join(ROOT,p),"utf8");
+function elencaFile(dir){
+  if(!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir, {withFileTypes:true}).flatMap(e => {
+    const p = path.join(dir, e.name);
+    return e.isDirectory() ? elencaFile(p) : [p];
+  });
+}
 
 const build = leggi("strumenti/build.js");
 const ev = leggi("js/game/eventi-v2.js");
@@ -1109,6 +1116,40 @@ test("la fase dei nodi la dà la carriera vera",
   abilita.includes("return (fase() + 1) >= item.row"));
 test("i talenti non scrivono nel salvataggio della partita",
   abilita.includes("ABILITA_CHIAVE") && !/\bG\.(talenti|pt)\b/.test(abilita));
+
+console.log("\nPulizia — quello che finisce addosso a chi installa il gioco");
+const trasferte = leggi("js/game/trasferte.js");
+test("il foglio delle trasferte non si richiede da solo dentro al build",
+  trasferte.includes("function regoleCaricate()") &&
+  trasferte.includes('r.selectorText.indexOf(".trascosti")') &&
+  trasferte.indexOf("if(regoleCaricate()) return;") <
+    trasferte.indexOf('l.href = "css/trasferte.css'));
+test("i video delle transizioni stanno in una cartella sola, senza doppioni",
+  (() => {
+    const dir = path.join(ROOT, "media/video");
+    const fuori = fs.readdirSync(dir).filter(n => n.toLowerCase().endsWith(".mp4"));
+    const dentro = fs.readdirSync(path.join(dir, "Transizioni di scena"));
+    return fuori.length === 0 && new Set(dentro).size === dentro.length;
+  })());
+test("in media/ non restano immagini che nessuna riga di codice carica",
+  (() => {
+    /* media/ la copia intera strumenti/build.js: un concept lasciato qui
+       finisce nel pacchetto per gli store senza che nessuno lo chieda mai.
+       Il posto dei concept e' frontend/concept/, che il build non guarda.
+       I video restano fuori dal conto: sono il materiale del punto 23,
+       ancora da collegare. */
+    /* le pagine del creator RPG stanno dentro a media/ e chiamano i loro
+       disegni da lì: contano come codice anche quelle. */
+    const codice = ["js","css","media"].flatMap(d => elencaFile(path.join(ROOT, d)))
+      .concat([path.join(ROOT, "index.html")])
+      .filter(f => /\.(js|css|html)$/i.test(f))
+      .map(f => fs.readFileSync(f, "utf8")).join("\n");
+    const orfane = elencaFile(path.join(ROOT, "media"))
+      .filter(f => /\.(png|jpe?g|webp|gif)$/i.test(f))
+      .filter(f => !codice.includes(path.basename(f)));
+    if(orfane.length) console.log("      " + orfane.map(f => path.relative(ROOT, f)).join("\n      "));
+    return orfane.length === 0;
+  })());
 
 for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
