@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:5508151 -->
+## 05/09/26, 00:56 â€” main â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `5508151`
+
+### Cosa Ã¨ entrato
+
+- `58aa00d` â€” fix: continua riprende la partita esistente â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/creator/rpg-v24-bridge.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:d80b80a -->
 ## 04/09/26, 11:23 â€” task/via-il-quaderno â†’ main
 
