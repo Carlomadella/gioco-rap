@@ -354,6 +354,12 @@
       return;
     }
 
+    if(window.ADF_RPG_V24 && typeof window.ADF_RPG_V24.open === "function"){
+      avvioDopoCreator = false;
+      window.ADF_RPG_V24.open();
+      return;
+    }
+
     avvioDopoCreator = true;
     goto("profile");
     setTimeout(() => { try{ $("name").focus(); }catch(e){} }, 80);
