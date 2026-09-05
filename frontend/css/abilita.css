@@ -1,0 +1,164 @@
+/* LA SCHERMATA DELLE ABILITÀ — l'albero dei talenti.
+
+   Arriva da `abilita(11).html`, il mock a pagina intera: dentro c'è il disegno
+   vero (`media/photo/pagina_skill_tree/albero-abilita.png`) come strato
+   visivo, e sopra ci stanno solo le cose che si muovono — i 32 nodi da
+   toccare, la colonna di destra e le pezze che coprono i comandi finti
+   disegnati nella foto. Il punto è che il punto di partenza resta identico
+   al pixel: quello che vedi è il disegno, non una sua imitazione in CSS.
+
+   **Perché è tutto sotto `#abilita`.** Il foglio originale era una pagina a
+   sé e si prendeva quello che voleva: `*`, `html,body`, e un `:root` con
+   `--line`, `--text`, `--pink`, `--green` — nomi che in `base.css` esistono
+   già con altri valori. Messo così com'era avrebbe ridipinto tutto il gioco,
+   e `.toast`, `.buy` e `.cost` si sarebbero scontrate con quelle di casa
+   (la lezione delle due `.scena`: due classi con lo stesso nome in due fogli
+   diversi si rompono in silenzio). Adesso ogni riga sta dentro al pannello,
+   variabili comprese: fuori di lì non tocca niente.
+
+   L'unica cosa che è stata tolta è il `html,body{overflow:hidden}` della
+   pagina intera — qui a non scorrere è il pannello, che è lui a coprire lo
+   schermo. Tutto il resto è quello di prima, riga per riga. */
+
+/* Il pannello: stessa famiglia della Sala e dello Studio, sopra alla mappa. */
+#abilita{position:fixed;inset:0;z-index:95;display:none;overflow:hidden;
+  background:#040608;color:#f2f0eb;font-family:'IBM Plex Sans',system-ui,sans-serif}
+#abilita.on{display:block}
+
+#abilita{--ui:'Roboto Condensed','Arial Narrow',Arial,sans-serif;--body:'IBM Plex Sans',system-ui,sans-serif;--gold:#f0c75e;--purple:#b557ff;--pink:#ef4dcc;--blue:#27a9ff;--green:#65d79b;--panel:#0b0f14;--line:#ffffff29;--text:#f2f0eb;--muted:#a8adb7}
+#abilita *,#abilita *::before,#abilita *::after{box-sizing:border-box}
+#abilita button{font:inherit}
+#abilita #hudRoot{position:fixed;inset:0;display:grid;place-items:center;background:#040608;isolation:isolate}
+/* La tela riempie la finestra. Il disegno ha `object-fit:fill` e i nodi
+   stanno in percentuale sulla tela, quindi si allunga tutto insieme e
+   restano incollati dove devono: prima invece la tela teneva le sue
+   proporzioni e sopra e sotto restavano due bande nere. */
+#abilita .hud-canvas{position:relative;width:100%;height:100%;overflow:hidden;background:#06090d}
+#abilita .concept{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;user-select:none;-webkit-user-drag:none;pointer-events:none}
+/* The reference image is the actual visual layer so the starting point stays pixel-identical. */
+#abilita .interactive-layer{position:absolute;inset:0;z-index:5}
+#abilita .skill-hotspot{position:absolute;left:var(--x);top:var(--y);width:3.5%;aspect-ratio:1;transform:translate(-50%,-50%);border:0;border-radius:50%;background:transparent;cursor:pointer;padding:0;outline:0;transition:opacity .14s ease}
+#abilita .skill-hotspot:hover,#abilita .skill-hotspot:focus-visible{outline:0}
+#abilita .skill-hotspot[aria-disabled="true"]{cursor:not-allowed}
+#abilita .skill-hotspot{--node-accent:#b557ff}
+/* Purchased talent: no badge, border, check or extra geometry. The original node simply becomes much brighter. */
+#abilita .skill-hotspot.owned,#abilita .skill-hotspot.owned:focus-visible{background:transparent;filter:none;backdrop-filter:brightness(1.58) saturate(1.34) contrast(1.10);-webkit-backdrop-filter:brightness(1.58) saturate(1.34) contrast(1.10)}
+#abilita .skill-hotspot.owned:hover{background:transparent;filter:none;backdrop-filter:brightness(1.68) saturate(1.40) contrast(1.12);-webkit-backdrop-filter:brightness(1.68) saturate(1.40) contrast(1.12)}
+/* Full right sidebar is live HTML; the baked sidebar is fully covered. */
+#abilita .right-sidebar{position:absolute;z-index:8;left:77.62%;top:1.55%;width:21.15%;height:96.8%;display:flex;flex-direction:column;overflow:hidden;background:linear-gradient(180deg,rgba(10,14,19,.995),rgba(6,9,13,.998));border:1px solid rgba(214,221,229,.28);border-radius:1.05%;box-shadow:0 18px 48px #0009,inset 0 1px rgba(255,255,255,.035);--accent:var(--purple)}
+#abilita .right-sidebar::before{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(255,255,255,.025),transparent 18%,transparent 82%,rgba(255,255,255,.018));z-index:0}
+#abilita .right-sidebar-head{position:relative;z-index:1;padding:3.2% 6% 2.2%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.08)}
+#abilita .right-sidebar-head strong{font:800 clamp(10px,.78vw,14px)/1 var(--ui);letter-spacing:.09em;text-transform:uppercase;color:#c8cbd1}
+#abilita .right-sidebar-head span{font:700 clamp(8px,.63vw,11px)/1 var(--ui);color:#717985;letter-spacing:.08em}
+#abilita .right-sidebar-hero{position:relative;z-index:1;margin:3.6% 5.2% 0;height:27.5%;overflow:hidden;border:1px solid rgba(255,255,255,.16);border-radius:2.6%;background:#11161d}
+#abilita .right-sidebar-hero img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.82) contrast(1.06) brightness(.83)}
+#abilita .right-sidebar-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 58%,rgba(6,9,13,.68));pointer-events:none}
+#abilita .hero-node-badge{position:absolute;left:5%;bottom:7%;z-index:2;min-width:15%;aspect-ratio:1;display:grid;place-items:center;padding:.5em;border:1px solid color-mix(in srgb,var(--accent) 75%,#fff 25%);background:color-mix(in srgb,var(--accent) 18%,#0b1016 82%);box-shadow:0 0 18px color-mix(in srgb,var(--accent) 32%,transparent);font:900 clamp(12px,1.05vw,19px)/1 var(--ui);color:#fff;clip-path:polygon(25% 6%,75% 6%,96% 25%,96% 75%,75% 94%,25% 94%,4% 75%,4% 25%)}
+#abilita .right-sidebar-body{position:relative;z-index:1;min-height:0;flex:1;overflow:auto;padding:4.2% 6% 5.2%;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
+#abilita .right-sidebar-body .eyebrow{font:800 clamp(9px,.71vw,13px)/1 var(--ui);letter-spacing:.085em;text-transform:uppercase;color:var(--accent);display:flex;justify-content:space-between;gap:10px}
+#abilita .right-sidebar-body h2{margin:.48em 0 .32em;font:900 clamp(20px,1.7vw,30px)/.98 var(--ui);text-transform:uppercase;letter-spacing:.005em;color:#f4f3ef}
+#abilita .right-sidebar-body .kind-copy{margin:0 0 .85em;color:#9ea5af;font-size:clamp(9px,.69vw,12px);line-height:1.4}
+#abilita .right-sidebar-body .effect{margin-top:.75em;padding:.82em .9em;border:1px solid color-mix(in srgb,var(--accent) 48%,#ffffff12);border-radius:5px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 12%,#10151c),#0e1319);color:#ece9f2;font-size:clamp(9px,.72vw,13px);line-height:1.38}
+#abilita .right-sidebar-body .req{margin-top:.9em;padding-top:.72em;border-top:1px solid rgba(255,255,255,.11)}
+#abilita .right-sidebar-body .req h3{margin:0 0 .55em;font:800 clamp(9px,.68vw,12px)/1 var(--ui);text-transform:uppercase;letter-spacing:.085em;color:#929aa6}
+#abilita .right-sidebar-body .reqline{display:flex;gap:.58em;align-items:flex-start;margin:.47em 0;color:#d5d8dd;font-size:clamp(8px,.65vw,12px);line-height:1.25}
+#abilita .right-sidebar-body .reqline i{flex:0 0 1.28em;height:1.28em;display:grid;place-items:center;border:1px solid rgba(255,255,255,.28);border-radius:2px;font-style:normal;font-weight:900}
+#abilita .right-sidebar-body .reqline.ok i{color:#83e2aa;border-color:#64d99b7f;background:#64d99b10}
+#abilita .right-sidebar-body .reqline.no i{color:#ee7686;border-color:#ee76867f;background:#ee768610}
+#abilita .right-sidebar-body .choicebox{display:grid;gap:.5em;margin-top:.75em}
+#abilita .right-sidebar-body .choice{text-align:left;border:1px solid rgba(255,255,255,.15);background:#ffffff05;color:#fff;padding:.7em .75em;cursor:pointer;font-size:clamp(8px,.66vw,12px);border-radius:4px}
+#abilita .right-sidebar-body .choice strong{display:block;font-family:var(--ui);text-transform:uppercase;font-size:1.15em}
+#abilita .right-sidebar-body .choice small{color:#aeb3bc;line-height:1.3}
+#abilita .right-sidebar-body .choice.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,#10141a);box-shadow:inset 3px 0 var(--accent)}
+#abilita .sidebar-buy{position:relative;z-index:2;padding:3.5% 6% 4.2%;border-top:1px solid rgba(255,255,255,.09);background:linear-gradient(180deg,rgba(8,11,15,.98),#070a0e);display:grid;grid-template-columns:1fr auto;gap:.7em;align-items:center}
+#abilita .sidebar-buy .buy{border:1px solid #f0c75e;background:linear-gradient(180deg,#f2d47c,#c89c3e);color:#161006;padding:.84em .8em;font:900 clamp(9px,.83vw,15px)/1 var(--ui);text-transform:uppercase;cursor:pointer;border-radius:3px;box-shadow:inset 0 1px rgba(255,255,255,.34)}
+#abilita .sidebar-buy .buy:disabled{opacity:.38;filter:grayscale(.75);cursor:not-allowed}
+#abilita .sidebar-buy .cost{font:900 clamp(17px,1.35vw,25px)/1 var(--ui);color:#f0c75e;white-space:nowrap}
+#abilita .sidebar-empty{height:100%;display:flex;flex-direction:column;justify-content:center;gap:.65em;color:#98a0aa}
+#abilita .sidebar-empty strong{font:900 clamp(20px,1.6vw,29px)/1 var(--ui);text-transform:uppercase;color:#f1f0eb}
+#abilita .sidebar-empty p{font-size:clamp(9px,.7vw,12px);line-height:1.45;margin:0}
+/* Il tasto per tornare alla mappa. Nel mock era un rettangolo invisibile
+   sopra a un disegno che non c'era: si usciva solo indovinando dove premere.
+   Adesso è un tasto vero, della stessa famiglia di quello della Strada. */
+#abilita .nav-hot.back{flex:none;margin:4.5% 6% 0;padding:.85em .6em;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:.55em;
+  border:1px solid rgba(240,199,94,.45);border-radius:5px;
+  background:linear-gradient(180deg,rgba(20,24,31,.94),rgba(10,13,18,.96));
+  color:#f0c75e;font:800 clamp(8px,.66vw,12px)/1 var(--ui);
+  letter-spacing:.09em;text-transform:uppercase;transition:.16s}
+#abilita .nav-hot.back:hover{background:linear-gradient(180deg,rgba(30,35,44,.96),rgba(15,19,26,.98));
+  border-color:rgba(240,199,94,.85)}
+#abilita .nav-hot.back .arrow{font-size:1.3em;line-height:1}
+
+/* ---- LA COLONNA DI SINISTRA, VIVA ----
+   Nel disegno era dipinta dentro alla foto: un artista che si chiama ALBERO,
+   livello 50, Los Angeles, quattro barre a 75. Erano numeri finti, e finti
+   restavano qualunque partita avessi aperto. Adesso quella parte della foto è
+   coperta da questo pannello, che dice la tua: la faccia del creatore, il tuo
+   nome, il livello vero con l'XP, dove sei, e le quattro abilità come le
+   conta il gioco (`G.skills`). Stessa geometria del riquadro dipinto — misurata
+   sul disegno, x 17→357 e y 92→866 su 1672×793 — così non ne sbuca fuori un
+   bordo, e stessa famiglia della colonna di destra, che era già viva. */
+#abilita .left-sidebar{position:absolute;z-index:8;left:.9%;top:1.9%;width:20.9%;height:98.2%;
+  display:flex;flex-direction:column;overflow:hidden;
+  background:linear-gradient(180deg,rgba(10,14,19,.995),rgba(6,9,13,.998));
+  border:1px solid rgba(214,221,229,.28);border-radius:1.05%;
+  box-shadow:0 18px 48px #0009,inset 0 1px rgba(255,255,255,.035)}
+#abilita .left-hero{position:relative;flex:none;height:24%;margin-top:4.5%;overflow:hidden;
+  background:linear-gradient(180deg,#241c33,#12101b)}
+#abilita .left-hero .ritratto{position:absolute;inset:0}
+#abilita .left-hero .ritratto svg{width:100%;height:100%;display:block;object-fit:cover}
+#abilita .left-hero::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,transparent 42%,rgba(6,9,13,.92))}
+#abilita .left-hero .chi{position:absolute;right:6%;bottom:8%;z-index:2;text-align:right}
+#abilita .left-hero .chi span{display:block;font:700 clamp(7px,.55vw,10px)/1 var(--ui);
+  letter-spacing:.14em;text-transform:uppercase;color:#8f97a3}
+#abilita .left-hero .chi strong{display:block;margin-top:.3em;
+  font:900 clamp(16px,1.5vw,27px)/1 var(--ui);text-transform:uppercase;color:#f4f3ef}
+
+#abilita .left-blocco{flex:none;padding:4.5% 7% 4%;border-top:1px solid rgba(255,255,255,.07)}
+#abilita .left-livello{display:flex;align-items:baseline;gap:.55em}
+#abilita .left-livello .k{font:700 clamp(8px,.62vw,12px)/1 var(--ui);letter-spacing:.13em;
+  text-transform:uppercase;color:#8f97a3}
+#abilita .left-livello .v{font:900 clamp(17px,1.5vw,27px)/1 var(--ui);color:#f4f3ef}
+#abilita .left-xp{margin-top:.5em;text-align:right;font:700 clamp(7px,.56vw,11px)/1 var(--ui);color:#7d848f}
+/* display:block o niente: era uno <span>, e su un elemento in linea l'altezza
+   non vale — la barra veniva fuori un blocchetto storto largo un terzo di se stessa. */
+#abilita .left-barra{display:block;margin-top:.7em;height:5px;border-radius:3px;overflow:hidden;background:#ffffff14}
+#abilita .left-barra i{display:block;height:100%;background:linear-gradient(90deg,#27a9ff,#59c2ff)}
+
+#abilita .left-citta{display:flex;align-items:center;gap:.7em;margin-top:.2em;
+  padding:4% 7%;border-top:1px solid rgba(255,255,255,.07)}
+#abilita .left-citta .dove{flex:1;min-width:0}
+#abilita .left-citta .dove b{display:block;font:900 clamp(12px,1.05vw,19px)/1 var(--ui);
+  text-transform:uppercase;color:#f4f3ef;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#abilita .left-citta .dove small{display:block;margin-top:.28em;font:700 clamp(7px,.55vw,10px)/1 var(--ui);
+  letter-spacing:.12em;text-transform:uppercase;color:#8f97a3}
+#abilita .left-citta .freccia{color:#5d646e;font-size:clamp(12px,1vw,18px)}
+
+#abilita .left-punti{padding:4.5% 7% 3%;border-top:1px solid rgba(255,255,255,.07)}
+#abilita .left-punti .k{font:700 clamp(8px,.62vw,12px)/1 var(--ui);letter-spacing:.13em;
+  text-transform:uppercase;color:#8f97a3}
+#abilita .left-punti .v{margin-top:.15em;font:900 clamp(26px,2.9vw,52px)/1 var(--ui);color:#f2ca61}
+
+#abilita .left-skill{flex:1;min-height:0;overflow:auto;padding:3% 7% 6%;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
+#abilita .left-skill .riga{display:flex;align-items:center;gap:.6em;margin:.62em 0}
+#abilita .left-skill .n{flex:0 0 38%;font:700 clamp(8px,.63vw,12px)/1 var(--ui);
+  letter-spacing:.07em;text-transform:uppercase;color:#c8cbd1}
+#abilita .left-skill .b{flex:1;height:6px;border-radius:3px;overflow:hidden;background:#ffffff12}
+#abilita .left-skill .b i{display:block;height:100%;border-radius:3px;background:var(--c)}
+#abilita .left-skill .v{flex:0 0 auto;min-width:2.1em;text-align:right;
+  font:800 clamp(9px,.7vw,13px)/1 var(--ui);color:#e6e8ec;font-variant-numeric:tabular-nums}
+#abilita .left-nota{flex:none;margin:0;padding:0 7% 6%;color:#6f7681;
+  font-size:clamp(8px,.6vw,11px);line-height:1.42}
+#abilita .toast{position:absolute;z-index:20;left:50%;bottom:4%;transform:translate(-50%,15px);opacity:0;padding:.7em 1.05em;border:1px solid #ffffff25;background:#0c1118ee;color:#fff;font:800 clamp(9px,.75vw,13px)/1 var(--ui);text-transform:uppercase;letter-spacing:.06em;transition:.15s;pointer-events:none}
+#abilita .toast.on{opacity:1;transform:translate(-50%,0)}
+#abilita .confirm{border:1px solid #ffffff2a;background:#0a0f15;color:#fff;padding:0;width:min(430px,calc(100% - 24px));box-shadow:0 35px 100px #000c}
+#abilita .confirm::backdrop{background:#000c;backdrop-filter:blur(4px)}
+#abilita .confirm-inner{padding:20px}
+#abilita .confirm h3{font:900 26px/1 var(--ui);text-transform:uppercase;margin:5px 0 9px}
+#abilita .confirm p{color:#b8bdc6;line-height:1.45}
+#abilita .confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:15px}
+#abilita .confirm-actions button{padding:11px;border:1px solid #ffffff2a;background:#ffffff08;color:#fff;font:800 13px/1 var(--ui);text-transform:uppercase}
+#abilita .confirm-actions .yes{background:#e6bf5c;color:#171006;border-color:#e6bf5c}

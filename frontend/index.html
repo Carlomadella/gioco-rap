@@ -30,6 +30,7 @@
 <link rel="stylesheet" href="css/actionbar.css?v=12">
 <link rel="stylesheet" href="css/posto.css?v=13">
 <link rel="stylesheet" href="css/studio.css?v=1">
+<link rel="stylesheet" href="css/abilita.css?v=1">
 <link rel="stylesheet" href="css/negozio.css?v=12">
 <link rel="stylesheet" href="css/strada-crimine.css?v=13">
 <link rel="stylesheet" href="css/strada-crimine-v2.css?v=1">
@@ -402,6 +403,83 @@
   <div class="nggrid" id="ng-grid"></div>
 </div></div>
 
+<!-- L'ALBERO DELLE ABILITÀ (punto 13) — arriva da `abilita(11).html`.
+
+     Quello che si vede è il disegno del concept, messo lì come immagine:
+     `.concept` è la foto vera, non una sua imitazione in CSS, così il punto di
+     partenza resta identico al pixel. Sopra ci stanno solo le cose che si
+     muovono — i 32 nodi da toccare, la colonna di destra e le due `.visual-mask`
+     che coprono i comandi finti disegnati dentro alla foto (i filtri in basso a
+     sinistra e la citazione in alto).
+
+     Gli id sono quelli del mock, così il codice che ci scrive dentro non è
+     stato riscritto; le sole eccezioni sono `#ab-toast` e `#ab-confirm`, che
+     nel mock si chiamavano `toast` e `confirmDialog` — nomi troppo generici
+     per un file come questo. Il contenuto lo mette js/game/abilita.js. -->
+<div class="abilita" id="abilita">
+  <div id="hudRoot">
+  <main class="hud-canvas" id="hudCanvas" aria-label="Schermata abilità Anni di Fame">
+    <img class="concept" alt="L'albero delle abilità di Anni di Fame" src="media/photo/pagina_skill_tree/albero-abilita.png">
+    <div class="interactive-layer" id="interactiveLayer">
+      <button class="skill-hotspot" type="button" data-node-id="quaderno" data-branch="penna" style="--x:33.7%;--y:61.35%;--c:#ef4dcc" aria-label="Quaderno sempre in tasca"></button>
+      <button class="skill-hotspot" type="button" data-node-id="orecchio" data-branch="penna" style="--x:39.9%;--y:63.36%;--c:#ef4dcc" aria-label="Orecchio per le rime"></button>
+      <button class="skill-hotspot" type="button" data-node-id="metrica" data-branch="penna" style="--x:43.8%;--y:57.19%;--c:#ef4dcc" aria-label="Metrica a memoria"></button>
+      <button class="skill-hotspot" type="button" data-node-id="vocabolario" data-branch="penna" style="--x:36.4%;--y:69.89%;--c:#ef4dcc" aria-label="Vocabolario sporco"></button>
+      <button class="skill-hotspot" type="button" data-node-id="doppiotempo" data-branch="penna" style="--x:32.8%;--y:77.49%;--c:#ef4dcc" aria-label="Doppio tempo"></button>
+      <button class="skill-hotspot" type="button" data-node-id="notte" data-branch="penna" style="--x:40.0%;--y:77.25%;--c:#ef4dcc" aria-label="Scrivi di notte"></button>
+      <button class="skill-hotspot" type="button" data-node-id="pezzoresta" data-branch="penna" style="--x:43.2%;--y:82.59%;--c:#ef4dcc" aria-label="Il pezzo che resta"></button>
+      <button class="skill-hotspot" type="button" data-node-id="bivio-penna" data-branch="penna" style="--x:29.4%;--y:85.55%;--c:#ef4dcc" aria-label="Bivio della Penna"></button>
+      <button class="skill-hotspot" type="button" data-node-id="pocket" data-branch="palco" style="--x:32.2%;--y:16.97%;--c:#b557ff" aria-label="Pocket"></button>
+      <button class="skill-hotspot" type="button" data-node-id="occhio" data-branch="palco" style="--x:39.4%;--y:16.97%;--c:#b557ff" aria-label="Occhio sul pubblico"></button>
+      <button class="skill-hotspot" type="button" data-node-id="botta" data-branch="palco" style="--x:36.4%;--y:24.56%;--c:#b557ff" aria-label="Botta e risposta"></button>
+      <button class="skill-hotspot" type="button" data-node-id="fiato" data-branch="palco" style="--x:30.8%;--y:26.22%;--c:#b557ff" aria-label="Fiato"></button>
+      <button class="skill-hotspot" type="button" data-node-id="primafila" data-branch="palco" style="--x:40.2%;--y:32.27%;--c:#b557ff" aria-label="Prima fila"></button>
+      <button class="skill-hotspot" type="button" data-node-id="faccia" data-branch="palco" style="--x:33.8%;--y:33.58%;--c:#b557ff" aria-label="Non ti scordi la faccia"></button>
+      <button class="skill-hotspot" type="button" data-node-id="palcocasa" data-branch="palco" style="--x:44.0%;--y:36.67%;--c:#b557ff" aria-label="Il palco è casa"></button>
+      <button class="skill-hotspot" type="button" data-node-id="bivio-palco" data-branch="palco" style="--x:37.7%;--y:39.75%;--c:#b557ff" aria-label="Bivio del Palco"></button>
+      <button class="skill-hotspot" type="button" data-node-id="numeri" data-branch="strada" style="--x:54.9%;--y:57.91%;--c:#26a9ff" aria-label="Numeri giusti"></button>
+      <button class="skill-hotspot" type="button" data-node-id="contratta" data-branch="strada" style="--x:59.0%;--y:63.84%;--c:#26a9ff" aria-label="Sai contrattare"></button>
+      <button class="skill-hotspot" type="button" data-node-id="contrattochiaro" data-branch="strada" style="--x:65.0%;--y:61.11%;--c:#26a9ff" aria-label="Non firmi al buio"></button>
+      <button class="skill-hotspot" type="button" data-node-id="favore" data-branch="strada" style="--x:62.6%;--y:69.89%;--c:#26a9ff" aria-label="Uno che ti deve un favore"></button>
+      <button class="skill-hotspot" type="button" data-node-id="featuring" data-branch="strada" style="--x:66.0%;--y:77.60%;--c:#26a9ff" aria-label="Featuring"></button>
+      <button class="skill-hotspot" type="button" data-node-id="giro" data-branch="strada" style="--x:59.5%;--y:77.72%;--c:#26a9ff" aria-label="Ti conoscono in giro"></button>
+      <button class="skill-hotspot" type="button" data-node-id="stanze" data-branch="strada" style="--x:55.7%;--y:82.71%;--c:#26a9ff" aria-label="Le stanze giuste"></button>
+      <button class="skill-hotspot" type="button" data-node-id="bivio-strada" data-branch="strada" style="--x:67.2%;--y:67.04%;--c:#26a9ff" aria-label="Bivio della Strada"></button>
+      <button class="skill-hotspot" type="button" data-node-id="dormi" data-branch="schiena" style="--x:59.5%;--y:16.85%;--c:#f0c54f" aria-label="Dormi quando puoi"></button>
+      <button class="skill-hotspot" type="button" data-node-id="mangi" data-branch="schiena" style="--x:66.5%;--y:16.61%;--c:#f0c54f" aria-label="Mangi poco"></button>
+      <button class="skill-hotspot" type="button" data-node-id="schienadritta" data-branch="schiena" style="--x:62.6%;--y:24.09%;--c:#f0c54f" aria-label="Schiena dritta"></button>
+      <button class="skill-hotspot" type="button" data-node-id="rosso" data-branch="schiena" style="--x:56.0%;--y:25.04%;--c:#f0c54f" aria-label="Sai stare in rosso"></button>
+      <button class="skill-hotspot" type="button" data-node-id="quartoturno" data-branch="schiena" style="--x:59.1%;--y:31.21%;--c:#f0c54f" aria-label="Quarto turno"></button>
+      <button class="skill-hotspot" type="button" data-node-id="testadura" data-branch="schiena" style="--x:65.2%;--y:32.63%;--c:#f0c54f" aria-label="Testa dura"></button>
+      <button class="skill-hotspot" type="button" data-node-id="quintoturno" data-branch="schiena" style="--x:69.2%;--y:37.61%;--c:#f0c54f" aria-label="Quinto turno"></button>
+      <button class="skill-hotspot" type="button" data-node-id="bivio-schiena" data-branch="schiena" style="--x:54.5%;--y:36.90%;--c:#f0c54f" aria-label="Bivio della Schiena"></button>
+      <aside class="left-sidebar" id="leftSidebar">
+        <button class="nav-hot back" id="returnToMap" type="button"><span class="arrow">&#8592;</span><span>Torna alla mappa</span></button>
+        <div class="left-hero"><div class="ritratto" id="ab-ritratto"></div>
+          <div class="chi"><span>Il tuo artista</span><strong id="ab-nome">&#8212;</strong></div></div>
+        <div class="left-blocco">
+          <div class="left-livello"><span class="k">Livello</span><span class="v" id="ab-livello">1</span></div>
+          <span class="left-barra"><i id="ab-xp-barra" style="width:0%"></i></span>
+          <div class="left-xp" id="ab-xp"></div>
+        </div>
+        <div class="left-citta"><div class="dove"><b id="ab-citta">Provincia</b><small id="ab-grado"></small></div><span class="freccia">&#8250;</span></div>
+        <div class="left-punti"><div class="k">Punti disponibili</div><div class="v" id="ab-punti">0 PT</div></div>
+        <div class="left-skill" id="ab-skill"></div>
+        <p class="left-nota">Queste quattro non si comprano: crescono facendo la cosa. I talenti qui accanto s&#236;, e non si torna indietro.</p>
+      </aside>
+      <aside class="right-sidebar" id="rightSidebar" aria-live="polite">
+        <div class="right-sidebar-head"><strong>Dettagli abilità</strong><span id="rightSidebarIndex">00 / 32</span></div>
+        <div class="right-sidebar-hero" id="rightSidebarHero"><img alt="Studio di registrazione" src="media/photo/pagina_skill_tree/dettaglio-studio.jpg"><div class="hero-node-badge" id="rightSidebarBadge">◆</div></div>
+        <div class="right-sidebar-body" id="rightSidebarBody"><div class="sidebar-empty"><strong>Seleziona un'abilità</strong><p>Scegli un nodo dell'albero per vedere effetto, requisiti e costo.</p></div></div>
+        <div class="sidebar-buy" id="rightSidebarBuy"><button class="buy" id="buyTalent" type="button" disabled>Seleziona un nodo</button><div class="cost" id="rightSidebarCost">—</div></div>
+      </aside>
+      <div class="toast" id="ab-toast"></div>
+    </div>
+  </main>
+  </div>
+  <dialog class="confirm" id="ab-confirm"><div class="confirm-inner"><div style="font:800 11px var(--ui);color:#f0c75e;letter-spacing:.12em;text-transform:uppercase">Scelta permanente</div><h3 id="ab-confirm-titolo">Sblocca talento</h3><p id="ab-confirm-testo"></p><div class="confirm-actions"><button id="ab-annulla" type="button">Annulla</button><button class="yes" id="ab-conferma" type="button">Conferma</button></div></div></dialog>
+</div>
+
 <!-- La Strada (punto 21): il luogo "Attività criminali" della mappa apre questa
      schermata. Il disegno è quello del prototipo attivita-criminali-crime-v8.html:
      l'impalcatura sta qui, tutto quello che cambia lo riempie
@@ -699,6 +777,7 @@
 <script src="js/game/skip.js?v=13"></script>
 <script src="js/game/posto.js?v=14"></script>
 <script src="js/game/studio.js?v=3"></script>
+<script src="js/game/abilita.js?v=1"></script>
 <script src="js/game/strada.js?v=12"></script>
 <script src="js/game/strada-crimine.js?v=14"></script>
 <script src="js/game/negozio.js?v=14"></script>
