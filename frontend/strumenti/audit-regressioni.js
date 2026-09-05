@@ -33,6 +33,9 @@ const hours = leggi("js/game/orari.js");
 const travel = leggi("js/game/spostamenti.js");
 const crimeui = leggi("js/game/strada-crimine-ui.js");
 const abilita = leggi("js/game/abilita.js");
+const servizio = leggi("js/servizio.js");
+const servizioCss = leggi("css/servizio.css");
+const pagina404 = leggi("404.html");
 const abilitaCss = leggi("css/abilita.css");
 const crime = leggi("js/game/strada-crimine.js");
 const state = leggi("js/game/state.js");
@@ -1151,7 +1154,33 @@ test("in media/ non restano immagini che nessuna riga di codice carica",
     return orfane.length === 0;
   })());
 
-for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js"]){
+console.log("\nLe pagine di servizio — quando qualcosa non va");
+test("la schermata di avvio sta nell'HTML, non la disegna il codice",
+  index.includes('id="avvio"') && index.includes("Anni di <em>Fame</em>") &&
+  !servizio.includes('id="avvio"><'));
+test("il messaggio «ci sta mettendo troppo» è CSS puro: si vede anche se il JS non parte",
+  servizioCss.includes("#avvio .lento{") && servizioCss.includes("animation:avvioLento") &&
+  servizioCss.includes("12s forwards") && !servizio.includes("lento"));
+test("gli ascoltatori degli errori si installano prima dei moduli del gioco",
+  index.indexOf('<script src="js/servizio.js') > index.indexOf('<script src="js/core.js') &&
+  index.indexOf('<script src="js/servizio.js') < index.indexOf('<script src="js/game/state.js') &&
+  servizio.includes('window.addEventListener("error"') &&
+  servizio.includes('window.addEventListener("unhandledrejection"'));
+test("da ogni schermata si esce: nessuna senza tasti",
+  (servizio.match(/tasti: \[/g) || []).length ===
+  (servizio.match(/titolo: /g) || []).length);
+test("un salvataggio illeggibile viene messo da parte, non perso",
+  state.includes("illeggibile-") && state.includes("__ADF_SALVATAGGIO_ROTTO") &&
+  state.indexOf("localStorage.setItem(copia") < state.indexOf("__ADF_SALVATAGGIO_ROTTO = { chiave"));
+test("il server che non risponde lo dice a qualcuno",
+  leggi("js/net/online.js").includes('new CustomEvent("adf:rete-staccata"') &&
+  servizio.includes('window.addEventListener("adf:rete-staccata"'));
+test("la 404 si regge da sola e finisce nel build",
+  !/<link[^>]+stylesheet/i.test(pagina404) && !/<script[^>]+src=/i.test(pagina404) &&
+  pagina404.includes("<style>") &&
+  build.includes('copyFileSync(path.join(RADICE, "404.html")'));
+
+for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }

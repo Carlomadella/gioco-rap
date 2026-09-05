@@ -209,7 +209,13 @@ function pesa(cartella){
     .replace("</body>", '<script src="assets/' + nomeCodice + '"></script>\n</body>');
   fs.writeFileSync(path.join(USCITA, "index.html"), pagina);
 
-  copiaCartella(path.join(RADICE, "media"), path.join(USCITA, "media"));
+  copiaCartella(path.join(RADICE, "media"), path.join(USCITA, "media"));
+
+  /* La 404 si porta dietro il suo stile e non chiede niente a nessuno, quindi
+     si copia com'è: serve a chi mette il gioco su un sito, dove un indirizzo
+     sbagliato lo si becca prima o poi. Dentro Electron e Capacitor non la vede
+     nessuno, e non dà fastidio: sono 3 KB. */
+  fs.copyFileSync(path.join(RADICE, "404.html"), path.join(USCITA, "404.html"));
 
   console.log("\nscritto " + USCITA);
   console.log("  index.html          " + kb(Buffer.byteLength(pagina)));
