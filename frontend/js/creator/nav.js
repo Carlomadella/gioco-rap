@@ -1,11 +1,19 @@
-/* Navigazione fra schermate, menu principale e corpo intero (window.ARTIST_BODY). */
+/* Navigazione fra le schermate del gioco e corpo intero (window.ARTIST_BODY).
+
+   Punto 27: la landing non è più una di queste schermate. Sta in una pagina
+   sua (`pagine/landing.html`, js/landing.js) e `goto("menu")` non toglie più
+   una classe: cambia pagina. Tutto il resto — mappa, profilo — resta com'era,
+   perché sono schermate della stessa partita e vivono nello stesso documento. */
 "use strict";
 
 /* ================= NAVIGAZIONE ================= */
 function miniPortrait(){
   return portrait().replace('class="portrait"', 'class="mini"');
 }
+/* La landing sta fuori di qui: chi chiede "menu" sta chiedendo di uscire. */
+function vaiAllaLanding(){ vaiA("landing"); }
 function goto(screen){
+  if(screen === "menu"){ vaiAllaLanding(); return; }
   const target = $("s-" + screen);
   document.querySelectorAll(".screen").forEach(x => x.classList.toggle("on", x.id === "s-" + screen));
   /* Da smistare, punto 1: `.screen.on` ha la sua animazione (shell.css), ma
@@ -15,86 +23,11 @@ function goto(screen){
   if(target){ target.style.animation = "none"; void target.offsetWidth; target.style.animation = ""; }
   /* In partita il tasto per il menu non sta quassù: il marchio a sinistra fa
      già quel mestiere, e la barra deve restare fuori dai piedi mentre giochi. */
-  $("nav-back").hidden = (screen === "menu" || screen === "hub");
+  $("nav-back").hidden = (screen === "hub");
   /* L'hub ha una testata sua, con il marchio e le risorse: la barra di sopra
      sparisce, se no ce ne sono due una sull'altra. */
   document.body.classList.toggle("in-hub", screen === "hub");
-  document.body.classList.toggle("su-menu", screen === "menu");
   window.scrollTo({top:0});
-  if(screen === "menu") renderMenu();
-}
-/* Lo stato della partita, se i file del gioco sono già stati caricati.
-   nav.js gira prima di game/state.js, quindi al primo giro qui non c'è niente —
-   e infatti al primo giro non c'è nemmeno una carriera da mostrare. Quando questa
-   torna un oggetto, short() e fmt() ci sono di sicuro: stanno nello stesso file,
-   dichiarate prima di window.__G. */
-function partita(){
-  try{ return typeof window.__G === "function" ? window.__G() : null; }catch(e){ return null; }
-}
-const faseNome = g => { try{ return PHASES[g.phase].n; }catch(e){ return "—"; } };
-function carrieraIniziata(g){
-  return !!g && (g.week > 1 || g.year > 1 || g.fans > 0 ||
-    (g.songs && g.songs.length > 0) || (g.bars && g.bars.length > 0));
-}
-function statBox(k, v, sub, cls){
-  return '<div class="mstat' + (cls ? ' ' + cls : '') + '"><div class="k">' + k + '</div><div class="v">' + v +
-    (sub ? '<small>' + sub + '</small>' : '') + '</div></div>';
-}
-
-function renderMenu(){
-  const nm = A.name.trim();
-  const g = partita();
-  const viva = nm && carrieraIniziata(g);
-
-  $("mhero").style.setProperty("--c1", (typeof coloreAccento === "function" ? coloreAccento(A.color) : A.color));
-  $("mhero").classList.toggle("viva", !!viva);
-  document.body.classList.toggle("carriera-viva", !!viva);
-  /* Il ritratto c'è sempre, anche prima che l'artista abbia un nome: senza,
-     il menu si apriva su mezzo riquadro vuoto. Finché è solo un abbozzo lo si
-     tiene indietro, in penombra, così non sembra una carriera già cominciata. */
-  /* Il ritratto e il nome sulla landing non ci sono più: la schermata è la
-     foto, e basta. Restano nel profilo e nella plancia, dove servono. */
-  if($("m-port")){
-    $("m-port").innerHTML = portrait();
-    $("m-port").classList.toggle("abbozzo", !nm);
-  }
-  if($("m-name")) $("m-name").textContent = nm || "Crea il tuo artista";
-  $("m-tag").textContent = viva
-    ? "Carriera in corso · anno " + g.year + ", settimana " + g.week
-    : nm ? "Artista pronto, carriera da iniziare" : "Nessuna carriera iniziata";
-  if($("m-meta")) $("m-meta").textContent = nm
-    ? (A.city.trim() || scene().n) + " · " + genre().n + " · " + fit().n
-    : "Otto avatar pronti, oppure costruisci la faccia da zero.";
-  $("m-play-a").textContent = viva ? "Riprendi la carriera" : nm ? "Inizia la carriera" : "Crea il tuo artista";
-  if($("m-voce-a")){
-    $("m-voce-a").textContent = viva ? "Riprendi la carriera" : "Inizia la carriera";
-    $("m-voce-b").textContent = viva
-      ? "Anno " + g.year + " · settimana " + g.week
-      : nm ? "La prima settimana comincia qui" : "Prima crea il tuo artista";
-  }
-  $("m-play-b").textContent = viva
-    ? "Anno " + g.year + " · settimana " + g.week + " · " + short(g.fans) + " fan"
-    : nm ? "Settimana 1 · zero fan, zero contatti" : "Entra subito: l'artista lo sistemi dopo";
-
-  /* Il cerchio in alto a destra: la faccia dell'artista dell'utente, sempre.
-     Anche senza nome A ha un aspetto completo, quindi c'è sempre qualcosa da mostrare. */
-  const av = $("nav-avatar");
-  av.innerHTML = miniPortrait();
-  av.title = nm ? nm + " — apri il tuo artista" : "Il tuo artista";
-
-  /* la scheda della carriera: c'è solo se una partita è davvero cominciata */
-  $("m-corso").hidden = !viva;
-  if(viva){
-    const usciti = g.songs.filter(s => s.released).length;
-    $("m-stats").innerHTML =
-        statBox("Fase", faseNome(g), "", "fase")
-      + statBox("Settimana", g.week, "· anno " + g.year)
-      + statBox("Fan", short(g.fans))
-      + statBox("In tasca", fmt(g.money), "€")
-      + statBox("Pezzi usciti", usciti);
-    const ult = g.log && g.log[0];
-    $("m-last").innerHTML = ult ? "<b>" + ult.w + "</b> · " + ult.t : "";
-  }
 }
 window.ARTIST = A;
 window.ARTIST_PORTRAIT = portrait;
@@ -233,120 +166,11 @@ $("nav-back").onclick = () => goto("menu");
 $("to-menu").onclick = () => goto("menu");
 $("brand").onclick = () => goto("menu");
 
-/* Ricominciare cancella la carriera: si chiede conferma sul bottone stesso,
-   così non serve una finestra di sistema che blocca tutto. */
-let resetArmato = 0;
-$("m-reset").onclick = function(){
-  if(!resetArmato){
-    resetArmato = setTimeout(() => { resetArmato = 0; this.textContent = "Ricomincia da capo";
-      this.classList.remove("armato"); }, 4000);
-    this.textContent = "Cancelli la carriera? Tocca ancora";
-    this.classList.add("armato");
-    return;
-  }
-  clearTimeout(resetArmato); resetArmato = 0;
-  try{ localStorage.removeItem(CHIAVE_PARTITA()); }catch(e){}
-  location.reload();
-};
-$("m-play").onclick = () => {
-  if(!A.name.trim()){ A.name = "Nuovo Artista"; $("name").value = A.name; firstRun = false; applyMode(); renderArtista(); renderMenu(); }
-  /* Si entra dalla mappa: è quella la schermata di gioco. Le azioni stanno
-     dietro ai luoghi, un passo più in là. */
-  window.ARTIST = A; goto("hub"); if(window.GAME) window.GAME.enter();
-};
-document.addEventListener("click", e => {
-  const b = e.target.closest("[data-go]");
-  if(!b) return;
-  const g = partita();
-  const viva = A.name.trim() && carrieraIniziata(g);
-  if(b.dataset.go === "gioca") $("m-play").click();
-  else if(b.dataset.go === "profile") goto("profile");
-  else if(b.dataset.go === "regole") $("m-regole").scrollIntoView({behavior:"smooth", block:"start"});
-  /* Le classifiche stanno dentro alla partita: se una carriera c'è, si entra
-     lì; se non c'è, non si finge che ci sia una schermata da aprire. */
-  else if(b.dataset.go === "classifiche"){
-    if(viva){ window.ARTIST = A; goto("hub"); if(window.GAME) window.GAME.enter();
-      if(typeof telVaiApp === "function") setTimeout(() => telVaiApp("classifiche"), 60); }
-    else landDillo("Le classifiche si aprono quando la carriera è cominciata");
-  }
-  else if(b.dataset.go === "carriera"){
-    if(viva) $("m-corso").scrollIntoView({behavior:"smooth", block:"start"});
-    else landDillo(A.name.trim() ? "La carriera non è ancora cominciata" : "Prima crea il tuo artista");
-  }
-  else if(b.dataset.go === "studio"){
-    landDillo("Anni di Fame è di La Fame Studio · 2026");
-    if(typeof IMPOSTAZIONI === "function") setTimeout(IMPOSTAZIONI, 700);
-  }
-  else landDillo("Sezione ancora da costruire");
-});
-
-/* ==================== LA LANDING ====================
-   Sei scene che si danno il cambio ogni otto secondi. Passando sopra a una
-   voce del menu si richiama la sua, e quando il mouse se ne va riparte il
-   giro: è il concept, ed è anche il modo più semplice per far vedere sei
-   posti del gioco senza chiedere niente a chi guarda. */
-const LAND_NOMI = [
-  "Provincia — dove comincia la storia",
-  "Il garage — dove si aggiusta tutto",
-  "Lo specchio — chi vuoi essere",
-  "L'info point — come ci si muove",
-  "Il negozio di dischi — chi sta girando",
-  "La cabina — chi ti cerca"
-];
-let landOra = 0, landGiro = null;
-
-function landScena(i, daHover){
-  const scene = document.querySelectorAll(".land-scene");
-  if(!scene.length) return;
-  landOra = (i + scene.length) % scene.length;
-  scene.forEach((s, j) => s.classList.toggle("on", j === landOra));
-  document.querySelectorAll(".land-voce").forEach(v =>
-    v.classList.toggle("on", Number(v.dataset.scena) === landOra));
-  const nome = $("land-scena-nome");
-  if(nome) nome.textContent = LAND_NOMI[landOra];
-  clearTimeout(landGiro);
-  if(!daHover) landGiro = setTimeout(() => landScena(landOra + 1), 8000);
-}
-function landRiprendi(){
-  clearTimeout(landGiro);
-  landGiro = setTimeout(() => landScena(landOra + 1), 8000);
-}
-/* il messaggio breve: dice la verità invece di aprire una schermata finta */
-let landToastT = 0;
-function landDillo(testo){
-  const t = $("land-toast");
-  if(!t){ alert(testo); return; }
-  t.textContent = testo;
-  t.classList.add("on");
-  clearTimeout(landToastT);
-  landToastT = setTimeout(() => t.classList.remove("on"), 2200);
-}
-
-document.querySelectorAll(".land-voce").forEach(v => {
-  v.addEventListener("mouseenter", () => landScena(Number(v.dataset.scena), true));
-  v.addEventListener("mouseleave", landRiprendi);
-});
-window.addEventListener("keydown", e => {
-  if(!document.body.classList.contains("su-menu")) return;
-  if(e.key === "ArrowRight") landScena(landOra + 1);
-  if(e.key === "ArrowLeft") landScena(landOra - 1);
-});
-/* il movimento del mouse sposta la foto di pochi pixel: basta per non farla
-   sembrare un fondale incollato */
-const landApp = document.querySelector(".land");
-if(landApp) landApp.addEventListener("pointermove", e => {
-  const x = (e.clientX / innerWidth - .5) * 8, y = (e.clientY / innerHeight - .5) * 8;
-  const s = document.querySelectorAll(".land-scene")[landOra];
-  if(s){ s.style.setProperty("--px", x + "px"); s.style.setProperty("--py", y + "px"); }
-});
-landScena(0);
-
+/* Il creatore si accende com'era: quello che stava qui sotto — la carriera
+   in corso, le sei scene, il menu della landing — è andato in js/landing.js,
+   che è l'unico posto dove quella roba esiste ancora. Chi decide su quale
+   schermata aprirsi è js/gioco-ingresso.js, in fondo alla pagina. */
 applyMode();
 renderArtista();
 renderOpzioni();
 renderFondali();
-renderMenu();
-goto("menu");
-/* Il menu si ridisegna a caricamento finito: i dati della partita stanno nei file
-   del gioco, che vengono dopo questo, e al primo giro non erano ancora arrivati. */
-document.addEventListener("DOMContentLoaded", renderMenu);

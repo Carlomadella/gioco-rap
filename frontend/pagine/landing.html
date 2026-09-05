@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Le pagine stanno in pagine/, i file del gioco no: con questo tutti i
+     percorsi relativi (css/, js/, media/) restano quelli di sempre, anche
+     quelli che il codice si costruisce da solo a runtime. -->
+<base href="../">
+<title>Anni di Fame</title>
+<meta name="author" content="La Fame Studio">
+<meta name="copyright" content="© 2026 La Fame Studio — Anni di Fame. Tutti i diritti riservati.">
+<meta name="description" content="Anni di Fame — simulatore di carriera rap. Un gioco di La Fame Studio.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=Archivo+Black&family=Barlow+Condensed:wght@600;700;800&display=swap">
+<!-- I tre caratteri della Strada (schermata «Attività criminali»): stencil per i
+     titoli, condensato per le etichette, Plex per il testo. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=Roboto+Condensed:wght@500;600;700;800;900&display=swap">
+
+<!-- Fogli di stile: l'ordine conta, la cascata è quella originale. -->
+<link rel="stylesheet" href="css/base.css?v=12">
+<link rel="stylesheet" href="css/servizio.css?v=1">
+<link rel="stylesheet" href="css/preview.css?v=12">
+<link rel="stylesheet" href="css/shell.css?v=12">
+<link rel="stylesheet" href="css/landing.css?v=12">
+<link rel="stylesheet" href="css/avvio.css?v=2">
+<link rel="stylesheet" href="css/forms.css?v=12">
+<link rel="stylesheet" href="css/impostazioni.css?v=12">
+<!-- per ultimo: le aree da toccare devono vincere sulla cascata di tutti gli altri -->
+<link rel="stylesheet" href="css/tocco.css?v=12">
+
+</head>
+<body>
+<!-- LE PAGINE DI SERVIZIO (js/servizio.js, css/servizio.css).
+
+     L'AVVIO sta qui dentro, scritto a mano, e non lo disegna il JavaScript
+     apposta: se un file di codice non arriva o il browser è troppo vecchio per
+     leggerlo, il JS non parte proprio e una schermata disegnata da lui non si
+     vedrebbe mai — resterebbe la pagina bianca. Questa invece c'è già prima
+     che giri una riga, e dopo dodici secondi tira fuori da sola, con una
+     animazione CSS, il messaggio che qualcosa non va. Se il gioco parte, se ne
+     va da sé.
+
+     Gli altri due li riempie il codice: il foglio grande per quando si rompe
+     qualcosa o il salvataggio non si legge, la fascia in basso per quando il
+     server non risponde. -->
+<div class="avvio" id="avvio">
+  <span class="marchio" aria-hidden="true">
+    <svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+      <rect x="14" y="6.5" width="6" height="12.6" rx="3" fill="#0B0B0D"/>
+      <g fill="none" stroke="#0B0B0D" stroke-width="2.4" stroke-linecap="round">
+        <path d="M10 16.4a7 7 0 0 0 14 0"/><path d="M17 23.4V27"/><path d="M12.8 27h8.4"/>
+      </g>
+    </svg>
+  </span>
+  <h1>Anni di <em>Fame</em></h1>
+  <p class="dice">Si sta accendendo tutto: mille eventi, la città, la gente che ci abita.</p>
+  <span class="barra" aria-hidden="true"><i></i></span>
+  <p class="lento" role="status">
+    <b>Ci sta mettendo troppo.</b> Se resta così, qualcosa non si è caricato.
+    Prova a ricaricare con <code>Ctrl</code>+<code>F5</code>: nove volte su dieci
+    è la cache. Se non basta, il gioco vuole un browser aggiornato — Chrome,
+    Edge o Firefox degli ultimi due anni.
+  </p>
+</div>
+
+<div class="servizio" id="servizio" role="alert"></div>
+
+<div class="staccato" id="staccato" role="status">
+  <span class="segno" aria-hidden="true">!</span>
+  <span class="testo">
+    <strong>Il server non risponde</strong>
+    <span>Classifica, account e salvataggio in cloud restano fermi. La partita no: si gioca lo stesso, tutto in locale.</span>
+  </span>
+  <button type="button" data-riprova="1">Riprova</button>
+  <button type="button">Va bene</button>
+</div>
+
+<div class="topnav">
+  <div class="navleft">
+    <!-- Il marchio: la capsula del microfono prende il colore scelto dall'artista. -->
+    <button class="brand" id="brand" aria-label="Anni di Fame — vai al menu principale">
+      <span class="bmark" aria-hidden="true">
+        <svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="lgmark" x1="0" y1="0" x2="1" y2="1">
+            <stop class="s1" offset="0"/><stop class="s2" offset="1"/>
+          </linearGradient></defs>
+          <rect width="34" height="34" rx="10" fill="url(#lgmark)"/>
+          <rect x="14" y="6.5" width="6" height="12.6" rx="3" fill="#0B0B0D"/>
+          <g fill="none" stroke="#0B0B0D" stroke-width="2.4" stroke-linecap="round">
+            <path d="M10 16.4a7 7 0 0 0 14 0"/><path d="M17 23.4V27"/><path d="M12.8 27h8.4"/>
+          </g>
+        </svg>
+      </span>
+      <span class="bword">Anni di <b>Fame</b></span>
+    </button>
+  </div>
+  <!-- Sulla landing, a destra, quello che dice il concept: a che punto sei e
+       di chi è il gioco. Dentro al gioco sparisce e resta solo l'avatar. -->
+  <div class="navmeta">
+    <span class="stato"><i class="dot"></i><span id="m-tag">Nessuna carriera iniziata</span></span>
+  </div>
+  <!-- Punto 27: l'accesso è una pagina sua, e da qualche parte bisogna pur
+       vederla. Qui, accanto all'avatar: è il posto dove si cerca. -->
+  <button class="navacc" id="nav-accesso" data-go="accesso">Account</button>
+  <button class="avatarbtn" id="nav-avatar" aria-label="Apri il tuo artista"></button>
+</div>
+
+
+<section class="screen on" id="s-menu">
+  <!-- ====================== LA LANDING ======================
+       Il concept del menu 2026, con la foto come sfondo — lo stesso metodo
+       della mappa della città. Sei scene che si danno il cambio da sole; il
+       menu in basso le richiama passandoci sopra. Tutto quello che si legge
+       viene dalla partita vera: chi sei, a che settimana sei, quanti fan. -->
+  <div class="land" id="mhero">
+    <div class="land-scene on" data-scena="0"></div>
+    <div class="land-scene" data-scena="1"></div>
+    <div class="land-scene" data-scena="2"></div>
+    <div class="land-scene" data-scena="3"></div>
+    <div class="land-scene" data-scena="4"></div>
+    <div class="land-scene" data-scena="5"></div>
+    <div class="land-scrim"></div>
+    <div class="land-grana"></div>
+
+    <div class="land-hero">
+      <div class="land-kick">Simulatore di carriera rap</div>
+      <h1>Fatti<br><em>un nome.</em></h1>
+      <p class="land-sub">Non parti da una villa, una supercar o una leggenda già scritta.
+        Parti da una stanza, qualche barra e abbastanza fame da continuare.</p>
+      <button class="mrow big" id="m-play">
+        <span class="ic">▶</span>
+        <span class="tx"><span class="a" id="m-play-a">Inizia la carriera</span>
+        <span class="b" id="m-play-b">Prima devi creare il tuo artista</span></span>
+        <span class="arw">→</span>
+      </button>
+    </div>
+
+    <div class="land-dock">
+      <nav aria-label="Menu principale">
+        <button class="land-voce on" data-scena="0" data-go="gioca">
+          <span class="su"><span class="n">01</span><span class="frec">↗</span></span>
+          <span class="tit" id="m-voce-a">Inizia la carriera</span>
+          <span class="des" id="m-voce-b">La prima settimana comincia qui</span>
+        </button>
+        <button class="land-voce" data-scena="2" data-go="profile">
+          <span class="su"><span class="n">02</span><span class="frec">↗</span></span>
+          <span class="tit">Il tuo artista</span><span class="des">Aspetto, città, genere</span>
+        </button>
+        <button class="land-voce" data-scena="3" data-go="regole">
+          <span class="su"><span class="n">03</span><span class="frec">↗</span></span>
+          <span class="tit">Come si gioca</span><span class="des">Energia, giornate, lucidità</span>
+        </button>
+        <button class="land-voce" data-scena="4" data-go="classifiche">
+          <span class="su"><span class="n">04</span><span class="frec">↗</span></span>
+          <span class="tit">Classifiche</span><span class="des">Chi comanda questa settimana</span>
+        </button>
+        <button class="land-voce" data-scena="1" id="m-setts">
+          <span class="su"><span class="n">05</span><span class="frec">↗</span></span>
+          <span class="tit">Impostazioni</span><span class="des">Audio, aspetto, salvataggi</span>
+        </button>
+        <button class="land-voce" data-scena="5" data-go="studio">
+          <span class="su"><span class="n">06</span><span class="frec">↗</span></span>
+          <span class="tit">La Fame Studio</span><span class="des">Chi fa questo gioco</span>
+        </button>
+      </nav>
+      <div class="land-piede">
+        <span id="land-scena-nome">Provincia — dove comincia la storia</span>
+        <span class="tasti"><span><kbd>←</kbd> <kbd>→</kbd> cambia scena</span>
+          <span>passa sul menu per richiamarla</span></span>
+      </div>
+
+    </div>
+
+    <div class="land-toast" id="land-toast"></div>
+    <button class="land-giu" data-go="regole">↓ come si gioca</button>
+  </div>
+
+  <div class="menu">
+
+    <div class="mcorso" id="m-corso" hidden>
+      <div class="mchead">
+        <h2>La tua carriera</h2>
+        <button class="mreset" id="m-reset">Ricomincia da capo</button>
+      </div>
+      <div class="mstats" id="m-stats"></div>
+      <div class="mlast" id="m-last"></div>
+    </div>
+
+    <!-- Le regole, in chiaro: è la domanda che si fa chiunque apra il gioco. -->
+    <div class="mregole" id="m-regole">
+      <h2>Come si gioca</h2>
+      <p class="rsub">Nessuno diventa qualcuno in una settimana. Il gioco è tutto qui:
+        poche mosse alla volta, per anni, finché il nome non gira da solo.</p>
+      <div class="mrgrid">
+        <div class="mrcard">
+          <span class="mrnum">01</span>
+          <h3>Cento energie al giorno</h3>
+          <p>Scrivere, registrare, salire su un palco: ogni mossa costa energia, poca
+            o tanta a seconda di quanto pesa. La notte la ricarichi, non del tutto.</p>
+        </div>
+        <div class="mrcard">
+          <span class="mrnum">02</span>
+          <h3>La settimana si chiude da sola</h3>
+          <p>Ogni sette giorni gli stream si muovono, i fan arrivano o se ne vanno,
+            l'affitto va pagato lo stesso — tu intanto continui a vivere un giorno alla volta.</p>
+        </div>
+        <div class="mrcard">
+          <span class="mrnum">03</span>
+          <h3>La lucidità si consuma</h3>
+          <p>Lavorare ai pezzi te la alza. I turni al lavoro, le settimane vuote e il
+            tempo che salti te la abbassano. Sotto zero non scrivi più niente di buono.</p>
+        </div>
+        <div class="mrcard">
+          <span class="mrnum">04</span>
+          <h3>Si sale per prove</h3>
+          <p>Da sconosciuto a GOAT ci sono sette gradini. Ognuno ha una prova da superare,
+            con dei requisiti veri: fan, pezzi pubblicati, settimane di gavetta.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="mfoot">La Fame Studio · prototipo. La partita è salvata su questo dispositivo:
+      se svuoti i dati del browser, la carriera se ne va con loro.
+      <b><a href="pagine/accesso.html">Con un account</a></b> invece ti segue: cambi telefono e la ritrovi.</p>
+    <p class="mcopy">© 2026 La Fame Studio — Anni di Fame. Tutti i diritti riservati.</p>
+  </div>
+</section>
+
+<!-- Script della landing. Qui non entra niente del gioco vero: solo quello
+     che serve a far vedere a che punto sei e a mandarti dentro. -->
+<script src="js/core.js?v=12"></script>
+<!-- Dove stanno le tre pagine e come si passa dall'una all'altra. -->
+<script src="js/pagine.js?v=1"></script>
+<script src="js/servizio.js?v=1"></script>
+
+<!-- Impostazioni e lingua: la landing ha il suo pannello. -->
+<script src="js/impostazioni.js?v=12"></script>
+<script src="js/lingua.js?v=12"></script>
+<script src="js/net/online.js?v=12"></script>
+
+<!-- L'artista: solo i file che disegnano la faccia, senza il creatore
+     (quello sta nella pagina del gioco, insieme al resto). -->
+<script src="js/creator/data.js?v=15"></script>
+<script src="js/creator/state.js?v=15"></script>
+<script src="js/creator/portrait.js?v=15"></script>
+<script src="js/creator/avatar-presets.js?v=12"></script>
+
+<!-- Della partita servono solo lo stato e le fasi: la landing legge il
+     salvataggio per dire a che punto sei, non fa girare niente. -->
+<script src="js/game/state.js?v=12"></script>
+<script src="js/game/phases.js?v=12"></script>
+
+<script src="js/landing.js?v=1"></script>
+<script src="js/avvio.js?v=4"></script>
+<script src="js/impostazioni-ui.js?v=14"></script>
+</body>
+</html>

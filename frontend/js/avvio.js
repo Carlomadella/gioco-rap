@@ -28,7 +28,6 @@
   let modalita = "";
   let difficoltaScelta = "anni-di-fame";
   let targetSlot = 0;
-  let avvioDopoCreator = false;
   let ritornoElimina = "carica";
 
   const esc = v => String(v == null ? "" : v).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
@@ -51,7 +50,6 @@
   const slotAttivo = () => infoSlot((SET && SET.slot) || 1);
   const slots = () => Array.from({length:nSlot()}, (_,i) => infoSlot(i + 1));
   const primoLibero = () => { const s = slots().find(x => x.vuoto); return s ? s.n : 0; };
-  const artistaCreato = () => slotAttivo().artista;
   const diffNome = id => (DIFFICOLTA[id] || DIFFICOLTA["anni-di-fame"]).nome;
   const diffCorrente = s => (s && s.g && DIFFICOLTA[s.g.difficolta])
     ? s.g.difficolta
@@ -266,16 +264,13 @@
     if(typeof setSalva === "function") setSalva();
   }
 
+  /* La memoria di questa pagina: A e G. I campi del creatore non stanno più
+     qui (punto 27), quindi non c'è niente da ridisegnare — la pagina del gioco
+     riparte da zero e rilegge il disco, che è già stato ripulito. */
   function resetMemoriaEditor(){
     A = DEF();
     G = START();
     window.ARTIST = A;
-    try{
-      $("name").value = A.name; $("city").value = A.city;
-      $("h").value = A.h; $("w").value = A.w;
-      $("hv").textContent = A.h + " cm"; $("wv").textContent = A.w + " kg";
-      firstRun = true; applyMode(); renderArtista(); renderOpzioni(); renderFondali();
-    }catch(e){}
   }
 
   function eliminaSlot(n){
@@ -316,13 +311,12 @@
     if(typeof setSalva === "function") setSalva();
     window.ARTIST = A;
     segnaUltimo(s.n);
-    const jailed=!!(G.strada&&G.strada.arresto);
     chiudi();
-    goto("hub");
-    if(window.GAME) window.GAME.enter();
-    if(jailed&&typeof window.apriCarcere==="function"){
-      setTimeout(()=>window.apriCarcere({direct:true,reason:"resume"}),0);
-    }
+    /* Punto 27: da qui in poi è un'altra pagina. Lo slot scelto è già scritto
+       nelle impostazioni e la carriera è già sul disco: la pagina del gioco
+       riapre esattamente questa, senza bisogno di portarsi dietro niente.
+       Anche il carcere lo ritrova da sé, guardando G.strada.arresto. */
+    vaiAlGioco();
   }
 
   function continuaUltima(){
@@ -331,38 +325,17 @@
     entraSlot(u);
   }
 
-  function entraPartita(){
-    const s = slotAttivo();
-    if(!s.artista){ landDillo("Prima crea il tuo artista"); return; }
-    entraSlot(s);
-  }
-
   function avviaNuova(n){
     const modo = modalita;
     const id = salvaDifficolta(difficoltaScelta);
     preparaNuovoSlot(n, id);
     chiudi();
 
-    if(modo === "rapido"){
-      try{ $("rand").click(); }catch(e){}
-      try{ localStorage.setItem(chiavi(n).artista, JSON.stringify(A)); }catch(e){}
-      firstRun = false;
-      try{ applyMode(); }catch(e){}
-      window.ARTIST = A;
-      renderMenu();
-      entraSlot(infoSlot(n));
-      return;
-    }
-
-    if(window.ADF_RPG_V24 && typeof window.ADF_RPG_V24.open === "function"){
-      avvioDopoCreator = false;
-      window.ADF_RPG_V24.open();
-      return;
-    }
-
-    avvioDopoCreator = true;
-    goto("profile");
-    setTimeout(() => { try{ $("name").focus(); }catch(e){} }, 80);
+    /* Punto 27: l'artista non si crea più qui. Il creatore — sia quello a
+       schede sia quello 3D — vive nella pagina del gioco, che è l'unica ad
+       averlo caricato. La landing prepara lo slot e dice come si entra;
+       js/gioco-ingresso.js, di là, fa il resto. */
+    vaiAlGioco("nuova=" + (modo === "rapido" ? "rapido" : "creatore") + "&slot=" + n);
   }
 
   function scegliDifficolta(id){
@@ -428,20 +401,14 @@
     }
   }
 
+  /* Il profilo si apre di là. Qui si sceglie solo *quale* carriera aprire: se
+     lo slot attivo è vuoto ma ce n'è un'altra, si passa a quella, così la
+     pagina del gioco la ritrova da sola leggendo lo slot. */
   function preparaProfiloSeServe(){
     let s = slotAttivo();
     if(!s.artista) s = ultimoSlot();
     if(!s || !s.artista) return false;
     if(s.n !== +(SET.slot || 1)) selezionaSlot(s.n);
-    A = Object.assign(DEF(), s.a || {});
-    G = Object.assign(START(), s.g || {});
-    window.ARTIST = A;
-    try{
-      $("name").value = A.name; $("city").value = A.city;
-      $("h").value = A.h; $("w").value = A.w;
-      $("hv").textContent = A.h + " cm"; $("wv").textContent = A.w + " kg";
-      firstRun = false; applyMode(); renderArtista(); renderOpzioni(); renderFondali();
-    }catch(e){}
     return true;
   }
 
@@ -510,34 +477,9 @@
     }
   }, true);
 
-  /* Se Nuova partita arriva al creator, il salvataggio dell'artista chiude il
-     percorso e porta direttamente alla città. */
-  const salvaArtista = $("save");
-  if(salvaArtista && typeof salvaArtista.onclick === "function"){
-    const salvaBase = salvaArtista.onclick;
-    salvaArtista.onclick = function(e){
-      const deveAvviare = avvioDopoCreator;
-      salvaBase.call(this, e);
-      if(deveAvviare && artistaCreato()){
-        avvioDopoCreator = false;
-        try{
-          G.difficolta = difficoltaScelta;
-          localStorage.setItem(chiavi(SET.slot).partita, JSON.stringify(G));
-        }catch(err){}
-        setTimeout(entraPartita, 0);
-      }
-    };
-  }
-
-  const tornaMenu = $("to-menu");
-  if(tornaMenu) tornaMenu.addEventListener("click", () => {
-    if(!avvioDopoCreator) return;
-    avvioDopoCreator = false;
-    if(!artistaCreato()){
-      try{ localStorage.removeItem(chiavi(SET.slot).partita); }catch(e){}
-      G = START();
-    }
-  }, true);
+  /* Il pezzo che stava qui — «salvato l'artista si entra in città», e il suo
+     contrario quando si torna indietro senza salvare — adesso sta in
+     js/gioco-ingresso.js: quei due bottoni vivono nella pagina del gioco. */
 
   document.addEventListener("keydown", e => {
     if(e.key !== "Escape" || !aperto()) return;

@@ -915,3 +915,128 @@ leggi di quella persona. Riscritta senza.
 > Sette controlli nuovi in `strumenti/audit-regressioni.js`. `npm run verifica`
 > pulito: prova 67/67, audit 199/199, build 15/15.
 
+
+---
+
+## 27 · La landing è una pagina sua, staccata dall'accesso e dal gioco
+
+> **FATTO (06/09/2026)** — branch `task/26-landing-login-gioco-pagine-separate`.
+> Il punto era il 26 quando l'ho preso in mano; nel frattempo il foglio si è
+> rinumerato ed è diventato il 27. È lo stesso: «la pagina di landing dev'essere
+> staccata dalla pagina di login e da quella di gioco».
+>
+> **Com'era.** Un documento solo. `frontend/index.html` teneva dentro tutto —
+> la landing (`#s-menu`), la mappa (`#s-hub`), il creatore (`#s-profile`), lo
+> Studio, la Strada, il negozio, il telefono — e «entrare in partita» voleva
+> dire togliere una classe a una `<section>`. Comodo da scrivere, ma vuol dire
+> che chi apriva la copertina si scaricava e faceva girare **tutto il gioco**,
+> sessanta file di codice, per guardare una foto e leggere a che settimana era
+> arrivato. E la pagina di accesso non esisteva proprio: l'account stava dentro
+> a una scheda delle impostazioni.
+>
+> **Com'è adesso.** Tre file in `frontend/pagine/`, e passare dall'uno all'altro
+> è un caricamento vero:
+>
+> | pagina | cosa c'è | fogli di stile | file di codice | codice impacchettato |
+> | --- | --- | --- | --- | --- |
+> | `landing.html` | copertina, sei scene, menu di avvio | 9 | 15 | 132 KB |
+> | `accesso.html` | entra, apri un account, esci | 4 | 7 | 29 KB |
+> | `gioco.html` | la partita intera | 23 | 61 | 895 KB |
+>
+> Della partita, la landing carica **due file soli**: `js/game/state.js` e
+> `js/game/phases.js`, che servono a leggere il salvataggio e a scrivere «anno
+> 1, settimana 2». Non fa girare niente del gioco, e `npm run prova` fallisce se
+> un domani ci rientra qualcos'altro.
+>
+> `frontend/index.html` resta dov'è ma diventa **una porta**: rimanda a
+> `pagine/landing.html` e basta. Serve perché è l'indirizzo che conoscono tutti
+> — la cartella aperta col doppio clic, `npm run dev`, Electron, Capacitor — e
+> il rimando è scritto due volte, `meta refresh` e `location.replace`, così
+> funziona anche col JavaScript spento e non lascia traccia nella cronologia
+> (il tasto «indietro» non ti ributta dentro in un giro infinito).
+>
+> **Come si passa da una all'altra.** I nomi dei tre file stanno in
+> `js/pagine.js` e in nessun altro posto: `vaiA("gioco")`, `vaiA("landing")`,
+> `vaiA("accesso")`. Serve perché la demo monofile li rinomina, e un controllo
+> in `audit-regressioni.js` verifica che nessun altro file se li costruisca da
+> sé. Quello che la landing vuole dire alla partita sta nell'indirizzo, e a
+> leggerlo c'è `js/gioco-ingresso.js`:
+>
+> | indirizzo | cosa fa |
+> | --- | --- |
+> | `gioco.html` | riprende la carriera dello slot attivo ed entra in città |
+> | `gioco.html?vai=profilo` | apre il tuo artista, senza far partire la settimana |
+> | `gioco.html?vai=classifiche` | entra e apre le classifiche sul telefono |
+> | `gioco.html?nuova=rapido` | artista a caso e via in città |
+> | `gioco.html?nuova=creatore` | apre il creatore; quando salvi, si entra |
+>
+> **La carriera non viaggia nell'indirizzo.** Sta su `localStorage` come sempre,
+> e la pagina del gioco la rilegge da sé: la landing decide solo *quale* slot è
+> quello attivo, e scrive quello. È il motivo per cui il travaso è stato corto —
+> `js/creator/state.js` e `js/game/state.js` leggevano già dal disco allo
+> slot giusto, non c'era niente da passarsi.
+>
+> **Il `<base href="../">`.** Le pagine stanno in `pagine/`, i file del gioco
+> no. Senza quella riga in testa, ogni `media/photo/...` che il codice si
+> costruisce a runtime — e ce ne sono trentasette — cercherebbe dentro a
+> `pagine/`. Con quella, tutti i percorsi restano identici a prima e non c'è
+> stato niente da riscrivere, né nei CSS né nel codice.
+>
+> **Cosa si è spostato, file per file.**
+> - `js/creator/nav.js` teneva sia la navigazione del gioco sia la landing.
+>   Adesso tiene solo la prima (più `ARTIST_BODY`, che disegna la figura intera
+>   e serve alle scene); `goto("menu")` non toglie più una classe, cambia pagina.
+> - La landing — le sei scene, la carriera in corso, il menu — è andata in
+>   `js/landing.js`, nuovo.
+> - `js/avvio.js` (continua / nuova / slot) resta sulla landing, ma non fa più
+>   entrare nessuno: prepara lo slot e cambia pagina. Il pezzo «salvato
+>   l'artista si entra in città» è andato in `js/gioco-ingresso.js`, dove
+>   quel bottone esiste davvero.
+> - Il cerchio con la tua faccia nella barra lo riempiva `renderMenu()`: nella
+>   pagina del gioco quella funzione non c'è più, e adesso lo riempie
+>   `renderArtista()` (`js/creator/render.js`), che gira ogni volta che
+>   l'artista cambia faccia.
+>
+> **Due cose che si sarebbero rotte in silenzio, e sono state sistemate.**
+> «Salva ed esci» del menu di sistema faceva `location.reload()`: bastava,
+> finché ricaricare voleva dire riaprire il menu. Adesso ricaricare vuol dire
+> **rientrare in partita**, quindi va alla landing. Stessa cosa per cambiare
+> slot, importare un salvataggio e cancellare dalle impostazioni: dopo, la
+> partita in memoria non vale più niente, e si torna al menu invece di ricadere
+> dentro a una carriera che non c'è più.
+>
+> **La pagina di accesso** (`pagine/accesso.html`, `js/accesso.js`,
+> `css/accesso.css`) è nuova: mail e password, entra o apri un account, e
+> quando sei dentro dice chi sei e quante carriere hai in cloud. Parla con le
+> rotte che c'erano già e non erano collegate a niente — `POST /api/account`,
+> `POST /api/sessione`, `GET /api/io`, `DELETE /api/sessione` — e traduce in
+> italiano gli errori del server (`non-torna`, `email-gia-usata`,
+> `segreto-troppo-corto`). Se il server non risponde non è colpa di chi scrive:
+> lo dice e basta, e la carriera resta dov'è. Ci si arriva dal tasto **Account**
+> nella barra della landing e dal piede del menu. Il punto 28 — «fatta molto
+> meglio, senza il server a vista» — resta aperto: questa è la pagina, non il
+> suo restyle.
+>
+> **Il build.** `strumenti/build.js` impacchettava una pagina sola; adesso ne fa
+> tre, ognuna coi suoi due file e la sua impronta (`gioco-c44c53ea.js`,
+> `landing-f76fcffe.js`…), e copia `index.html` com'è. `npm run demo` non fa più
+> un file solo ma tre, che stanno in piedi da soli e si chiamano fra loro
+> (`anni-di-fame.html` è la landing, da lì si entra): i collegamenti li riscrive
+> il build, che è il motivo per cui i nomi stanno tutti in `js/pagine.js`.
+>
+> **Provato in Chrome, sul gioco vero.** Dai sorgenti (`npm run dev`): la porta
+> che rimanda alla landing, la carriera in corso letta bene, CONTINUA che entra
+> in città con mappa/profilo/telefono, «‹ Menu» e «Salva ed esci» che tornano
+> alla landing, «Il tuo artista» che apre il creatore, avvio rapido che crea
+> l'artista e parte da Milano settimana 1, nuova partita che apre il creatore
+> sullo slot scelto e — se esci senza creare — libera lo slot che aveva
+> preparato. La pagina di accesso con il server acceso: sessione riconosciuta,
+> uscita, e un tentativo sbagliato che risponde «Mail o password non tornano».
+> Poi il pacchetto (`npm run build`, servito da `dist/`): la landing e la
+> partita si aprono dai bundle, il catalogo dei mille eventi si carica da
+> `assets/`. Zero errori in console da tutte le parti.
+>
+> `npm run verifica` pulito: prova **70/70** (con tre controlli nuovi: la porta
+> resta una porta, la landing non si porta dietro il gioco, ogni pagina cita i
+> suoi file), audit **234/234** (otto controlli nuovi sul punto), build
+> **31/31** — il verificatore del build adesso guarda pagina per pagina.

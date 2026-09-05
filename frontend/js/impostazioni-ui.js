@@ -325,11 +325,20 @@ document.addEventListener("click", e => {
   if(!d) return;
   const [az, arg] = d.dataset.do.split(":");
 
+  /* Cambiare slot, importare un salvataggio, cancellare: dopo, la partita che
+     sta in memoria non vale più niente. Prima bastava ricaricare, perché la
+     pagina si riapriva sul menu; adesso il menu è un'altra pagina (punto 27)
+     e ci si torna, invece di rientrare in una carriera che non c'è più. */
+  const riparti = () => {
+    if(typeof window.vaiA === "function"){ window.vaiA("landing"); return; }
+    location.reload();
+  };
+
   if(az === "prova"){ if(typeof SFX !== "undefined" && SFX[arg || "tap"]) SFX[arg || "tap"](); return; }
 
   if(az === "slot"){
     try{ if(typeof save === "function") save(); }catch(e2){}
-    SET.slot = +arg; setSalva(); location.reload(); return;
+    SET.slot = +arg; setSalva(); riparti(); return;
   }
   if(az === "esporta"){
     const t = $("s-codice"); if(t){ t.value = codiceSlot(+arg); t.focus(); t.select(); }
@@ -349,7 +358,7 @@ document.addEventListener("click", e => {
     const t = $("s-codice");
     if(!t || !t.value.trim()){ d.textContent = L("Incolla prima il codice","Paste the code first");
       setTimeout(() => { d.textContent = L("Importa nello slot aperto","Import into the open slot"); }, 2200); return; }
-    if(importaCodice(t.value)){ location.reload(); }
+    if(importaCodice(t.value)){ riparti(); }
     else{
       d.textContent = L("Codice non valido","Invalid code");
       setTimeout(() => { d.textContent = L("Importa nello slot aperto","Import into the open slot"); }, 2200);
@@ -373,7 +382,7 @@ document.addEventListener("click", e => {
         localStorage.removeItem(k.partita);
         localStorage.removeItem(k.artista);
       }catch(e2){}
-      if(+arg === SET.slot){ location.reload(); return; }
+      if(+arg === SET.slot){ riparti(); return; }
       disegnaImpostazioni(); return;
     }
     try{
@@ -384,7 +393,7 @@ document.addEventListener("click", e => {
       }
       via.forEach(k => localStorage.removeItem(k));
     }catch(e2){}
-    location.reload();
+    riparti();
   }
 });
 

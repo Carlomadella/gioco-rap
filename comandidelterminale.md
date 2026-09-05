@@ -58,13 +58,15 @@ ogni volta il comando.
 ```bash
 npm run demo
 ```
-Il gioco intero (immagini comprese) in **un file HTML solo**, `dist/anni-di-fame.html`:
-si manda a chiunque per un playtest veloce, non serve un server.
+Le tre pagine del gioco, ognuna che sta in piedi da sola (immagini dei CSS comprese):
+`dist/anni-di-fame.html` è la landing e da lì si entra, accanto ci sono
+`anni-di-fame-gioco.html` e `anni-di-fame-accesso.html`. Si manda la cartella a chiunque
+per un playtest veloce, non serve un server.
 
 ```bash
 npm run prova
 ```
-Dodici controlli senza aprire un browser: file dimenticati fuori da `index.html`,
+Dodici controlli senza aprire un browser: file dimenticati fuori dalle pagine,
 immagini sparite da sotto a un CSS, codice che non compila, build senza l'impronta nel
 nome. **Va lanciato prima di ogni commit** che tocca `frontend/`.
 

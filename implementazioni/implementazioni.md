@@ -214,18 +214,40 @@ NETWORK 64
     [`04-musica-e-suoni.md`](04-musica-e-suoni.md#20-e-22--fatti-sentire-un-beat-non-faceva-niente-e-i-beat-non-si-vedevano).
 
 23. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
-
     Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il
     secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su
     "stacca la spina", il quinto su "registra un pezzo".
 
-24. cambia il nome «disciplina»
+24. nella schermata di gioco deve esserci un bottone che ti porta alla schermata di landing o menù principale, ecc.
 
-25. togli il parametro «lucidità» e tutto ciò che ne consegue
+25. cambia il nome «disciplina»
 
-26. la landing dev'essere staccata dalla pagina di login e da quella di gioco
+26. togli il parametro «lucidità» e tutto ciò che ne consegue
 
-27. la pagina di login a sè stante, visibile dalla landing, fuori dalla sezione account, senza il server a vista e fatta molto meglio
+27. la pagina di landing dev'essere staccata dalla pagina di login e da quella di gioco
+
+    **FATTO (06/09/2026)** — branch `task/26-landing-login-gioco-pagine-separate`. Adesso
+    sono tre file in `frontend/pagine/`: `landing.html`, `accesso.html`, `gioco.html`.
+    `index.html` resta la porta d'ingresso e rimanda alla landing. La landing non carica
+    più il gioco — 15 file invece di 61, 132 KB invece di 895 — e della partita legge solo
+    lo stato salvato, per dire a che punto sei. Ci si passa con `js/pagine.js`
+    (`vaiA("gioco")`), e cosa fare all'ingresso lo dice l'indirizzo (`?nuova=rapido`,
+    `?vai=profilo`…), che legge `js/gioco-ingresso.js`. La pagina di accesso è nuova e usa
+    le rotte account che c'erano già; il suo restyle è il punto 28, ancora aperto. Per
+    esteso in
+    [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#27--la-landing-è-una-pagina-sua-staccata-dallaccesso-e-dal-gioco).
+
+28. la pagina di login a sè stante, visibile dalla landing, fuori dalla sezione account, senza il server a vista e fatta molto meglio
+
+29. l'azione "gira a cercare beat" non dovrebbe costare energia
+
+PAGINA DI LANDING: 30. migliorare graficamente la schermata opzioni
+
+31. creare una schermata per le classifiche che si apre anche dall'app del telefono
+
+32. DA DISCUTERE collegare la pagina di mycoltogliere la sezione il tuo artista dalla pagina di landing o , oltre che da nuova partita. e collegarla allo shop?
+
+33. dividi tutti i file .md sparsi in cartelle con nomi coerenti, inoltre smista le task fatte da implementazioni.md
 
 /_ NUOVE MODALITA' _/
 

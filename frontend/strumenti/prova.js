@@ -35,24 +35,49 @@ function tuttiIFile(dentro, estensione, trovati){
   return trovati;
 }
 
-const html = fs.readFileSync(path.join(RADICE, "index.html"), "utf8");
-const citati = tag => [...html.matchAll(tag)].map(m => m[1].split("?")[0]).filter(h => !h.startsWith("http"));
-const css = citati(/<link[^>]+rel="stylesheet"[^>]+href="([^"]+)"[^>]*>/g);
-const js = citati(/<script[^>]+src="([^"]+)"[^>]*><\/script>/g);
+/* Punto 27: le pagine sono tre e ognuna cita i suoi file. Un file dimenticato
+   è dimenticato se non lo chiama nessuna delle tre; i doppioni invece si
+   contano dentro a una pagina sola, perché lo stesso file citato da due pagine
+   diverse è normale — base.css lo vogliono tutte. */
+const PAGINE = ["pagine/landing.html", "pagine/accesso.html", "pagine/gioco.html"];
+const RE_CSS = () => /<link[^>]+rel="stylesheet"[^>]+href="([^"]+)"[^>]*>/g;
+const RE_JS = () => /<script[^>]+src="([^"]+)"[^>]*><\/script>/g;
+const citatiIn = (testo, tag) => [...testo.matchAll(tag)].map(m => m[1].split("?")[0]).filter(h => !h.startsWith("http"));
+const pagine = PAGINE.map(f => {
+  const testo = fs.readFileSync(path.join(RADICE, f), "utf8");
+  return { f, css: citatiIn(testo, RE_CSS()), js: citatiIn(testo, RE_JS()) };
+});
+const css = [...new Set(pagine.flatMap(p => p.css))];
+const js = [...new Set(pagine.flatMap(p => p.js))];
 
 console.log("\ni file e l'ordine");
-controlla("index.html cita dei fogli di stile e del codice", css.length > 0 && js.length > 0);
+const mute = pagine.filter(p => !p.css.length || !p.js.length).map(p => p.f);
+controlla("ogni pagina cita dei fogli di stile e del codice", mute.length === 0, mute);
 
 const mancanti = [...css, ...js].filter(f => !fs.existsSync(path.join(RADICE, f)));
-controlla("ogni file citato in index.html esiste davvero", mancanti.length === 0, mancanti);
+controlla("ogni file citato dalle pagine esiste davvero", mancanti.length === 0, mancanti);
 
 const cssSulDisco = tuttiIFile(path.join(RADICE, "css"), ".css");
 const jsSulDisco = tuttiIFile(path.join(RADICE, "js"), ".js");
 const dimenticati = [...cssSulDisco, ...jsSulDisco].filter(f => css.indexOf(f) < 0 && js.indexOf(f) < 0);
-controlla("nessun file sul disco è rimasto fuori da index.html", dimenticati.length === 0, dimenticati);
+controlla("nessun file sul disco è rimasto fuori dalle pagine", dimenticati.length === 0, dimenticati);
 
-const doppi = [...css, ...js].filter((f, i, a) => a.indexOf(f) !== i);
-controlla("nessun file è citato due volte", doppi.length === 0, doppi);
+const doppi = pagine.flatMap(p => [...p.css, ...p.js]
+  .filter((f, i, a) => a.indexOf(f) !== i).map(f => p.f + " → " + f));
+controlla("nessun file è citato due volte nella stessa pagina", doppi.length === 0, doppi);
+
+/* La porta d'ingresso deve restare una porta. Se un giorno ci si rimette
+   dentro il gioco, il punto 27 si scioglie senza che nessuno se ne accorga. */
+const porta = fs.readFileSync(path.join(RADICE, "index.html"), "utf8");
+controlla("index.html è solo la porta: rimanda alla landing e non carica niente",
+  porta.includes("pagine/landing.html") &&
+  citatiIn(porta, RE_JS()).length === 0 && citatiIn(porta, RE_CSS()).length === 0);
+
+/* E la landing deve restare leggera: del gioco le servono lo stato salvato e
+   le fasi, per dire a che punto sei. Il resto no, ed è tutto il punto. */
+const landingCol = pagine[0].js.filter(f => f.startsWith("js/game/") &&
+  f !== "js/game/state.js" && f !== "js/game/phases.js");
+controlla("la landing non si porta dietro il gioco", landingCol.length === 0, landingCol);
 
 console.log("\nil codice");
 const rotti = [];
@@ -917,10 +942,11 @@ console.log("\nlo Studio: la gente della Sala conta");
 
 console.log("\nil build");
 const dist = path.join(RADICE, "dist");
-if(!fs.existsSync(path.join(dist, "index.html"))){
+if(!fs.existsSync(path.join(dist, "pagine", "gioco.html"))){
   console.log("  --   dist/ non c'è ancora: dai `npm run build` e ridai questa prova");
 }else{
-  const pagina = fs.readFileSync(path.join(dist, "index.html"), "utf8");
+  /* la pagina con dentro il gioco: è quella che vale la pena controllare */
+  const pagina = fs.readFileSync(path.join(dist, "pagine", "gioco.html"), "utf8");
   const codice = [...pagina.matchAll(/<script[^>]+src="(assets\/[^"]+)"/g)].map(m => m[1]);
   const stile = [...pagina.matchAll(/<link[^>]+href="(assets\/[^"]+)"/g)].map(m => m[1]);
   controlla("il build ha un file di codice solo e un foglio di stile solo",

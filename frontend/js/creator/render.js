@@ -57,4 +57,14 @@ function renderArtista(){
     .concat(['<div class="eff"><span class="dot"></span><span><b>' + g.n + '</b> — ' + g.d + '</span></div>'])
     .concat(g.eff.map(e => '<div class="eff"><span class="dot"></span><span>' + e + '</span></div>'))
     .join("");
+
+  /* Il cerchio in alto a destra. Prima lo riempiva renderMenu(), che stava in
+     nav.js insieme alla landing; dalla separazione delle pagine (punto 27) la
+     landing è un'altra pagina, e qui il posto giusto è questo: è la funzione
+     che gira ogni volta che l'artista cambia faccia. */
+  const av = $("nav-avatar");
+  if(av){
+    av.innerHTML = portrait().replace('class="portrait"', 'class="mini"');
+    av.title = A.name.trim() ? A.name.trim() + " — apri il tuo artista" : "Il tuo artista";
+  }
 }

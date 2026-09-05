@@ -66,16 +66,17 @@ no.
 Adesso c'è `npm run build`, ottanta righe in `strumenti/build.js`:
 
 - mette insieme i 13 fogli di stile e i 36 file di codice in **due file soli**, nell'ordine
-  in cui stanno in `index.html`;
+  in cui stanno nella pagina;
 - li **minifica** con esbuild — da 450 a **291 KB** di codice, da 110 a **77 KB** di stile;
 - dà a ognuno un nome con dentro **l'impronta del contenuto** (`gioco-20eefd0e.js`): la
   cache si sistema da sé e il `?v=` a mano **sparisce dal prodotto**;
-- riscrive `index.html` con due tag al posto di quarantatré e copia le immagini;
+- riscrive **ogni pagina** con due tag al posto di quarantatré e copia le immagini
+  (dal punto 27 le pagine sono tre e ognuna ha i suoi due file);
 - tiene **tutti i percorsi relativi**, perché è così che la cartella viene aperta da
   Electron e da Capacitor (`file://`).
 
 Più `npm run dev` (server con ricarica automatica, zero dipendenze) e `npm run prova`, che
-prende gli errori scemi e costosi: un file aggiunto e mai messo in `index.html`, un tag che
+prende gli errori scemi e costosi: un file aggiunto e mai messo in una pagina, un tag che
 punta a un file che non c'è più, un'immagine sparita da sotto a un CSS, un file che non
 compila. Provato: il build minificato apre il menu e la plancia intera — mappa, profilo,
 telefono, eventi — senza un errore in console.
@@ -175,7 +176,10 @@ tutta la lista, ed è quello da provare su un telefono vero il prima possibile.
 ## Struttura
 
 ```
-index.html            solo il markup + i collegamenti a CSS e JS
+index.html            la porta d'ingresso: rimanda a pagine/landing.html
+pagine/landing.html   la copertina: chi sei, a che punto sei, come si entra
+pagine/accesso.html   l'account: entra, apri, esci
+pagine/gioco.html     la partita: mappa, profilo, studio, strada, telefono
 css/                  i fogli di stile, nell'ordine in cui vanno caricati
 js/core.js            $ e pick, usati da tutto il resto
 js/impostazioni.js    impostazioni e slot, caricato subito dopo core
@@ -184,6 +188,11 @@ js/net/online.js      il ponte con la classifica online (non parte da solo)
 js/creator/           creazione dell'artista
 js/game/              la partita
 media/photo/          concept art delle città e avatar di riferimento
+js/pagine.js          i nomi delle tre pagine, scritti in un posto solo
+js/landing.js         la landing: le sei scene, la carriera in corso
+js/avvio.js           il menu di avvio: continua, nuova, slot
+js/accesso.js         la pagina dell'account
+js/gioco-ingresso.js  la porta della partita: legge come ci sei arrivato
 strumenti/build.js    il build: bundle minificato con l'impronta nel nome
 strumenti/dev.js      il server di sviluppo con la ricarica automatica
 strumenti/prova.js    i controlli che si fanno senza browser
@@ -191,7 +200,50 @@ package.json          gli script (dev, build, demo, prova) e l'unica dipendenza:
 dist/                 quello che esce dal build (fuori da git)
 ```
 
-### CSS — l'ordine dei `<link>` in `index.html` conta
+### Tre pagine, non una — punto 27 (06/09/2026)
+
+Fino a ieri era **un documento solo**: landing, creatore e partita erano tre
+`<section>` dello stesso `index.html`, e «entrare in partita» voleva dire togliere una
+classe. Comodo da scrivere, ma vuol dire che chi apre la copertina si scarica e fa girare
+**tutto il gioco** — sessanta file di codice — per guardare una foto e leggere a che
+settimana è arrivato.
+
+Adesso sono tre file in `pagine/`, e passare dall'una all'altra è un caricamento vero.
+Quanto costa aprirle, dal build:
+
+| pagina | fogli di stile | file di codice | codice impacchettato |
+| --- | --- | --- | --- |
+| `landing.html` | 9 | 15 | 132 KB |
+| `accesso.html` | 4 | 7 | 29 KB |
+| `gioco.html` | 23 | 61 | 895 KB |
+
+Della partita, la landing carica **due file soli**: `js/game/state.js` e
+`js/game/phases.js`, che servono a leggere il salvataggio e a dire «anno 1, settimana 2».
+Non fa girare niente del gioco, e `npm run prova` lo verifica a ogni giro.
+
+**Come ci si passa.** I nomi dei tre file stanno in `js/pagine.js` e da nessun'altra
+parte: `vaiA("gioco")`, `vaiA("landing")`, `vaiA("accesso")`. Serve perché la demo
+monofile (`npm run demo`) li rinomina, e perché così non si va a caccia di percorsi in
+cinque file. Cosa si dice alla pagina del gioco sta nell'indirizzo, e lo legge
+`js/gioco-ingresso.js`:
+
+| indirizzo | cosa fa |
+| --- | --- |
+| `gioco.html` | riprende la carriera dello slot attivo ed entra in città |
+| `gioco.html?vai=profilo` | apre il tuo artista, senza far partire la settimana |
+| `gioco.html?vai=classifiche` | entra e apre le classifiche sul telefono |
+| `gioco.html?nuova=rapido` | artista a caso e via |
+| `gioco.html?nuova=creatore` | apre il creatore; quando salvi, si entra |
+
+La carriera **non viaggia nell'indirizzo**: sta su `localStorage` come sempre, e la pagina
+del gioco la rilegge da sola. La landing decide solo *quale* slot è quello attivo.
+
+**Il `<base href="../">`.** Le pagine stanno in `pagine/`, i file del gioco no. Senza
+quella riga in testa, ogni `media/photo/...` che il codice si costruisce a runtime
+cercherebbe dentro a `pagine/`. Con quella, i percorsi restano identici a prima — nei CSS,
+nel codice, ovunque — e non c'è stato niente da riscrivere.
+
+### CSS — l'ordine dei `<link>` conta (in ognuna delle tre pagine)
 
 | file | contenuto |
 | --- | --- |
@@ -321,9 +373,11 @@ senza spiegazioni. Comodo per un playtest o per farlo vedere a un editore.
 
 ## Quando si tocca l'interfaccia
 
-- **Aggiungi un file JS o CSS?** Va messo in `index.html` nel punto giusto della catena: i
-  file contano sull'ordine, non c'è nessun import a rimettere le cose a posto. `npm run
-  prova` se ne accorge se te lo dimentichi.
+- **Aggiungi un file JS o CSS?** Va messo **nella pagina che lo usa** (`pagine/gioco.html`
+  quasi sempre) nel punto giusto della catena: i file contano sull'ordine, non c'è nessun
+  import a rimettere le cose a posto. `npm run prova` se ne accorge se te lo dimentichi —
+  e si accorge anche se finisce sulla landing roba del gioco, che è quello che il punto 27
+  ha appena tolto di mezzo.
 - **Il `?v=` nei tag** serve solo mentre si sviluppa senza `npm run dev`: nel build i nomi
   hanno già l'impronta dentro e la cache si sistema da sola.
 - **Prima di impacchettare**: `npm run build && npm run prova`.
