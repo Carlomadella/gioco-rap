@@ -213,6 +213,16 @@ NETWORK 64
     di beat gratis a furia di cliccare. Per esteso in
     [`04-musica-e-suoni.md`](04-musica-e-suoni.md#20-e-22--fatti-sentire-un-beat-non-faceva-niente-e-i-beat-non-si-vedevano).
 
+23. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
+
+24. cambia il nome «disciplina»
+
+25. togli il parametro «lucidità» e tutto ciò che ne consegue
+
+26. la landing dev'essere staccata dalla pagina di login e da quella di gioco
+
+27. la pagina di login a sé stante, visibile dalla landing, fuori dalla sezione account, senza il server a vista e fatta molto meglio
+
 /_ NUOVE MODALITA' _/
 
 Nelle cose da mettere dopo aver masterizzato il gioco, creiamo delle nuove modalità giocabili/DLC:
