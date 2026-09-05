@@ -967,6 +967,153 @@ input.disabled{opacity:.45}
 
 
 .local-avatar-preview{position:absolute;inset:5% 7% 7%;z-index:7;object-fit:contain;width:86%;height:88%;filter:drop-shadow(0 28px 34px rgba(0,0,0,.5));display:none;pointer-events:none}
+
+/* ADF_CAMERINO_RESPONSIVE_HEIGHT_V1 */
+
+@media (max-height:850px) and (min-width:701px){
+
+  .brand{
+    left:24px;
+    top:16px;
+  }
+
+  .status{
+    right:24px;
+    top:16px;
+  }
+
+  .room-exit{
+    left:24px;
+    top:38px;
+  }
+
+  .room-tools{
+    bottom:86px;
+    max-height:220px;
+    overflow:auto;
+    overscroll-behavior:contain;
+  }
+
+  .room-tools .group{
+    min-height:96px;
+    padding:10px 12px 11px;
+  }
+
+  .room-tools .group label{
+    margin-bottom:7px;
+  }
+
+  .room-tools .av-small{
+    margin-top:5px;
+    font-size:9px;
+  }
+
+  .room-progress{
+    bottom:9px;
+    min-height:60px;
+    padding:6px 10px;
+  }
+
+  .room-progress-step{
+    padding:5px 8px;
+  }
+
+  .room-progress-step span{
+    width:27px;
+    height:27px;
+  }
+
+  .room-progress-step small{
+    font-size:7px;
+  }
+
+  .identity-overlay{
+    padding:46px 30px 86px;
+  }
+
+  .identity-card{
+    max-height:calc(100vh - 128px);
+    padding:18px;
+    overflow:auto;
+  }
+
+  .identity-card h2{
+    font-size:24px;
+  }
+
+  .identity-lead{
+    margin-bottom:12px;
+  }
+
+  .identity-actions{
+    position:sticky;
+    bottom:0;
+    padding-top:8px;
+    margin-top:10px;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(14,13,16,0),
+        rgba(14,13,16,.98) 36%
+      );
+  }
+
+  .avaturn-shell{
+    inset:8px;
+    grid-template-rows:48px 1fr;
+  }
+}
+
+
+@media (max-height:700px) and (min-width:701px){
+
+  .brand{
+    top:10px;
+  }
+
+  .status{
+    top:10px;
+  }
+
+  .room-exit{
+    top:30px;
+  }
+
+  .room-tools{
+    bottom:72px;
+    max-height:174px;
+    transform:translateX(-50%) scale(.92);
+    transform-origin:bottom center;
+  }
+
+  .room-tools .group{
+    min-height:88px;
+  }
+
+  .room-progress{
+    bottom:5px;
+    min-height:52px;
+    transform:translateX(-50%) scale(.92);
+    transform-origin:bottom center;
+  }
+
+  .room-progress-step{
+    padding:4px 6px;
+  }
+
+  .room-progress-step small{
+    display:none;
+  }
+
+  .identity-overlay{
+    padding:32px 20px 70px;
+  }
+
+  .identity-card{
+    max-height:calc(100vh - 82px);
+    padding:14px;
+  }
+}
 </style>
 </head>
 <body>
