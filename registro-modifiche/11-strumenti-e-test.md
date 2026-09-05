@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:74dc954 -->
+## 05/09/26, 12:38 â€” task/schermata-abilita â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `74dc954`
+
+### Cosa Ã¨ entrato
+
+- `a3e530a` â€” feat: l'albero delle abilità a tutto schermo, con dentro la tua carriera (punto 13) â€” **Carlomadella**
+- `297022f` â€” feat: l'albero delle abilità entra nel gioco (punto 13, la schermata) â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:76cfda1 -->
 ## 04/09/26, 22:48 â€” main â†’ main
 
