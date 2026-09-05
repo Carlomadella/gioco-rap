@@ -533,7 +533,12 @@ function vistaAbilita(){
     '<div class="pnext" style="margin-top:18px"><div class="pnexthead">' +
       '<span class="pk">Come si sale</span>' + hsvg("mirino") + '</div>' +
       '<div class="t">Le abilità non si comprano: crescono facendo la cosa. ' +
-      'Ogni mossa della settimana ne alza una.</div></div>';
+      'Ogni mossa della settimana ne alza una.</div></div>' +
+    /* punto 13: le quattro qui sopra crescono da sole, i talenti no — quelli
+       si scelgono, uno per volta, e non si tornano indietro. Sono una cosa a
+       parte e stanno in una schermata a parte (js/game/abilita.js). */
+    '<button class="solid" data-abilita="1" style="width:100%;margin-top:14px">' +
+      'Apri l’albero dei talenti</button>';
 }
 
 function vistaDisciplina(){
@@ -644,6 +649,15 @@ $("hb-pins").addEventListener("click", ev => {
      quello si riaccende regolarmente. */
   b.blur();
   if(l.chiuso) hubChiuso(l); else l.vai();
+});
+
+/* La colonna di sinistra si ridisegna a ogni renderHub(), quindi il tasto
+   dell'albero dei talenti non può tenersi il suo ascoltatore: si ascolta il
+   contenitore, che invece resta. */
+$("hb-profilo").addEventListener("click", ev => {
+  if(!ev.target.closest("[data-abilita]")) return;
+  hubTap();
+  if(typeof apriAbilita === "function") apriAbilita();
 });
 
 $("hb-sxtab").addEventListener("click", ev => {
