@@ -25,6 +25,8 @@
      ADF_INVIO_MS     quanto passa fra due punteggi dello stesso artista (10000)
      ADF_PROXY        1 se davanti c'e' un reverse proxy nostro (legge x-forwarded-for)
      ADF_BUSSATE      richieste al minuto da uno stesso indirizzo (120)
+     ADF_MANUTENZIONE 1 per rispondere 503 a tutto tranne al battito
+     ADF_MANUTENZIONE_FINO  quando si torna, scritto a parole ("verso le 22")
      ADF_PG           se c'e', sotto va PostgreSQL invece di SQLite:
                       postgresql://utente:password@host:5432/anni_di_fame
    Le manopole si possono anche mettere in `.env.local` (vedi ambiente.js).
@@ -43,6 +45,7 @@ const archivio = require("./database/archivio.js");
 const { GENERI, CITTA, STORIE, scegli } = require("./nomi.js");
 const accessi = require("./accessi.js");
 const moderazione = require("./moderazione.js");
+const R = require("./risposte.js");
 
 const CFG = {
   porta: Number(process.env.ADF_PORTA || 8787),
@@ -64,7 +67,13 @@ const CFG = {
      paio di richieste di distanza: la prova successiva che qualcuno aggiungeva
      faceva cadere prove che non c'entravano niente, con un 429 al posto della
      risposta. Adesso e' una manopola come le altre, e la prova se la alza. */
-  bussateAlMinuto: Math.max(1, Number(process.env.ADF_BUSSATE || 120))
+  bussateAlMinuto: Math.max(1, Number(process.env.ADF_BUSSATE || 120)),
+  /* Manutenzione: acceso, il server risponde 503 a tutto tranne al battito
+     (`/api/stato`), senza nemmeno aprire il database. Si legge a ogni
+     richiesta e non all'avvio, così si accende e si spegne senza riavviare:
+     `ADF_MANUTENZIONE=1` e basta. Il gioco intanto si gioca lo stesso —
+     la partita sta nel dispositivo, non qui. */
+  manutenzioneFino: process.env.ADF_MANUTENZIONE_FINO || ""
 };
 
 
@@ -107,17 +116,14 @@ setInterval(() => {
   for(const [ip, b] of bussate) if(ora - b.t > 120e3) bussate.delete(ip);
 }, 120e3).unref();
 
-/* ==================== RISPOSTE ==================== */
-function invia(res, codice, corpoRisposta){
-  const testo = JSON.stringify(corpoRisposta);
-  res.writeHead(codice, {
-    "content-type": "application/json; charset=utf-8",
-    "content-length": Buffer.byteLength(testo),
-    "cache-control": "no-store"
-  });
-  res.end(testo);
-}
-const male = (res, codice, errore, extra) => invia(res, codice, Object.assign({ errore }, extra || {}));
+/* ==================== RISPOSTE ====================
+   Le scrive `risposte.js`, che sa anche vestirle da pagina quando a chiedere
+   è un browser invece del gioco. Qui restano i due nomi di sempre, con la
+   stessa firma, così le trenta chiamate in giro per il file non cambiano:
+   la richiesta gliela passa `res.req`, che Node tiene lì apposta. */
+const invia = R.json;
+const male = (res, codice, errore, extra) =>
+  R.male(res.req, res, codice, errore, extra ? { pubblico: extra, dove: res.req.url } : { dove: res.req.url });
 
 function corpo(req){
   return new Promise((ok, no) => {
@@ -540,39 +546,28 @@ async function rotta(req, res, url){
   return male(res, 404, "rotta-sconosciuta");
 }
 
-/* ==================== IL SERVER ==================== */
-const server = http.createServer(async (req, res) => {
-  const origine = req.headers.origin || "";
-  const permessa = CFG.origini === "*" ? "*"
-    : (CFG.origini.split(",").map(s => s.trim()).indexOf(origine) >= 0 ? origine : "");
-  if(permessa) res.setHeader("access-control-allow-origin", permessa);
-  res.setHeader("vary", "origin");
-
-  if(req.method === "OPTIONS"){
-    res.writeHead(204, {
-      "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
-      "access-control-allow-headers": "content-type, x-chiave, x-sessione, x-admin",
-      "access-control-max-age": "86400"
-    });
-    return res.end();
-  }
-
-  if(troppe(indirizzo(req))) return male(res, 429, "troppe-richieste");
-
-  let url;
-  try{ url = new URL(req.url, "http://" + (req.headers.host || "localhost")); }
-  catch(e){ return male(res, 400, "url-non-valido"); }
-
-  try{ await archivio.assicuraSettimana(); }
-  catch(e){ console.error("[settimana] " + e.message); }
-
-  rotta(req, res, url).catch(e => {
-    if(res.headersSent) return;
-    const suo = e && /json|corpo/.test(e.message);
-    if(!suo) console.error("[errore] " + (e && e.stack || e));
-    male(res, suo ? 400 : 500, suo ? e.message : "errore-del-server");
-  });
-});
+/* ==================== IL SERVER ====================
+   Il giro di una richiesta, strato per strato, in ordine. Prima era tutto
+   dentro a `createServer` una riga sotto l'altra, e ogni volta che serviva un
+   controllo nuovo si infilava in mezzo: adesso ogni pezzo ha il suo nome, sta
+   in `risposte.js` e si sposta cambiando l'ordine di questa lista. L'ultimo
+   strato è l'instradamento vero; se nemmeno lui risponde, `catena()` chiude
+   con un 404, e se qualcuno scoppia lo raccoglie sempre lei. */
+const giro = R.catena(
+  R.cors(CFG.origini),
+  R.manutenzione(() => process.env.ADF_MANUTENZIONE === "1", CFG.manutenzioneFino),
+  R.freno(troppe, indirizzo),
+  R.indirizzoValido(),
+  /* la settimana si fa avanzare qui: sta dentro al giro, quindi se il
+     database tossisce l'errore lo prende la catena come tutti gli altri */
+  async (req, res, ctx, avanti) => {
+    try{ await archivio.assicuraSettimana(); }
+    catch(e){ console.error("[settimana] " + e.message); }
+    return avanti();
+  },
+  (req, res, ctx) => rotta(req, res, ctx.url)
+);
+const server = http.createServer(giro);
 
 /* Prima il database, poi la porta: se il database non si apre non si deve
    nemmeno cominciare ad ascoltare, o le prime richieste prendono un errore

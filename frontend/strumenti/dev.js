@@ -75,15 +75,12 @@ http.createServer((req, res) => {
   if(!f.startsWith(RADICE)){ res.writeHead(403).end("no"); return; }   // niente giri fuori dalla cartella
 
   fs.readFile(f, (err, dato) => {
-    if(err){
-      /* la pagina 404 vera se c'è, il testo secco se manca anche quella:
-         il server di sviluppo deve far vedere quello che vedrà chi gioca. */
-      fs.readFile(path.join(RADICE, "404.html"), (e2, pagina) => {
-        if(e2){ res.writeHead(404, { "content-type": "text/plain; charset=utf-8" }).end("non c'è: " + rel); return; }
-        res.writeHead(404, { "content-type": "text/html; charset=utf-8" }).end(pagina);
-      });
-      return;
-    }
+    /* Un file che non c'è, qui, vuol dire un percorso sbagliato mentre si
+       lavora: si dice quale ed è finita. Le pagine di errore vestite bene le
+       fa il backend (`backend/risposte.js`), che è l'unico posto dove hanno
+       senso — questo è un banchetto che serve file dal disco, non il server
+       del gioco. */
+    if(err){ res.writeHead(404, { "content-type": "text/plain; charset=utf-8" }).end("non c'è: " + rel); return; }
     const tipo = TIPI[path.extname(f).toLowerCase()] || "application/octet-stream";
     if(tipo.startsWith("text/html")){
       dato = Buffer.from(String(dato).replace("</body>", RICARICA + "\n</body>"));

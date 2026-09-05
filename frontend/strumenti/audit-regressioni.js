@@ -35,7 +35,6 @@ const crimeui = leggi("js/game/strada-crimine-ui.js");
 const abilita = leggi("js/game/abilita.js");
 const servizio = leggi("js/servizio.js");
 const servizioCss = leggi("css/servizio.css");
-const pagina404 = leggi("404.html");
 const abilitaCss = leggi("css/abilita.css");
 const crime = leggi("js/game/strada-crimine.js");
 const state = leggi("js/game/state.js");
@@ -1175,10 +1174,14 @@ test("un salvataggio illeggibile viene messo da parte, non perso",
 test("il server che non risponde lo dice a qualcuno",
   leggi("js/net/online.js").includes('new CustomEvent("adf:rete-staccata"') &&
   servizio.includes('window.addEventListener("adf:rete-staccata"'));
-test("la 404 si regge da sola e finisce nel build",
-  !/<link[^>]+stylesheet/i.test(pagina404) && !/<script[^>]+src=/i.test(pagina404) &&
-  pagina404.includes("<style>") &&
-  build.includes('copyFileSync(path.join(RADICE, "404.html")'));
+test("la pagina del 404 non sta piu' qui: la fa il middleware del backend",
+  !fs.existsSync(path.join(ROOT, "404.html")) &&
+  !build.includes("404.html") &&
+  (() => {
+    const R = require(path.join(ROOT, "..", "backend", "risposte.js"));
+    return typeof R.PAGINE[404] === "function" &&
+      R.PAGINE[404]({ dove: "/api/x" }).indexOf("/api/x") > 0;
+  })());
 
 for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }

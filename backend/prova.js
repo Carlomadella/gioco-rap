@@ -693,6 +693,103 @@ async function aspettaCheRisponda(figlio){
     controlla("una query senza parametri resta identica",
       traduci("SELECT count(*) n FROM artista") === "SELECT count(*) n FROM artista");
 
+    /* ============ LE RISPOSTE E LA CATENA (risposte.js) ============
+       Lo stesso errore, due vestiti: JSON per il gioco, una pagina per una
+       persona che ha aperto l'indirizzo col browser. Il codice HTTP e il campo
+       `errore` non cambiano — se cambiassero, cambierebbe il contratto. */
+    console.log("\nle risposte e la catena dei middleware");
+
+    const grezza = async (rotta, testate) => {
+      const res = await fetch(BASE + rotta, { headers: testate || {} });
+      return { stato: res.status, tipo: res.headers.get("content-type") || "",
+               retry: res.headers.get("retry-after"), testo: await res.text() };
+    };
+
+    const nonCe = await grezza("/api/questa-rotta-non-esiste");
+    controlla("una rotta che non c'è resta un 404 in JSON per il gioco",
+      nonCe.stato === 404 && nonCe.tipo.indexOf("application/json") >= 0 &&
+      JSON.parse(nonCe.testo).errore === "rotta-sconosciuta", nonCe);
+
+    const daBrowser = await grezza("/api/questa-rotta-non-esiste",
+      { accept: "text/html,application/xhtml+xml,*/*;q=0.8" });
+    controlla("la stessa rotta, chiesta da un browser, torna una pagina",
+      daBrowser.stato === 404 && daBrowser.tipo.indexOf("text/html") >= 0 &&
+      daBrowser.testo.indexOf("<!doctype html>") === 0, { stato: daBrowser.stato, tipo: daBrowser.tipo });
+    controlla("la pagina dice qual è l'indirizzo che non esiste",
+      daBrowser.testo.indexOf("/api/questa-rotta-non-esiste") > 0);
+    controlla("e non si porta dietro nessun file: né fogli di stile né script",
+      !/<link[^>]+stylesheet/i.test(daBrowser.testo) && !/<script/i.test(daBrowser.testo));
+    controlla("chi chiede JSON esplicitamente riceve JSON anche se accetta html",
+      (await grezza("/api/niente", { accept: "text/html,application/json" }))
+        .tipo.indexOf("application/json") >= 0);
+
+    /* Gli strati si provano da soli, senza server: sono funzioni. */
+    const R = require("./risposte.js");
+    const R2 = R;   /* stesso modulo, nome corto per le prove delle pagine */
+    const fintaRes = () => {
+      const r = { codice: 0, testate: {}, corpo: "", writableEnded: false, headersSent: false };
+      r.writeHead = (c, t) => { r.codice = c; Object.assign(r.testate, t || {}); r.headersSent = true; return r; };
+      r.setHeader = (k, v) => { r.testate[k.toLowerCase()] = v; };
+      r.end = t => { r.corpo = t || ""; r.writableEnded = true; };
+      return r;
+    };
+    const fintaReq = (url, accept) => ({ url, method: "GET", headers: accept ? { accept } : {} });
+
+    controlla("in manutenzione il server risponde 503 e dice quando riprovare",
+      await (async () => {
+        const res = fintaRes();
+        await R.catena(R.manutenzione(() => true, "verso le 22"))(fintaReq("/api/classifica"), res);
+        return res.codice === 503 && res.testate["retry-after"] === "600" &&
+          JSON.parse(res.corpo).errore === "in-manutenzione";
+      })());
+    controlla("e la pagina della manutenzione dice davvero quando si torna",
+      R2.PAGINE[503]({ fino: "verso le 22" }).indexOf("verso le 22") > 0 &&
+      R2.PAGINE[404]({ dove: "/api/x" }).indexOf("/api/x") > 0);
+    controlla("ma il battito risponde lo stesso: serve a sapere che è vivo",
+      await (async () => {
+        const res = fintaRes();
+        let passato = false;
+        await R.catena(R.manutenzione(() => true, ""),
+          (req, r2) => { passato = true; R.json(r2, 200, { ok: 1 }); })(fintaReq("/api/stato"), res);
+        return passato && res.codice === 200;
+      })());
+    controlla("se nessuno strato risponde, la catena chiude con un 404",
+      await (async () => {
+        const res = fintaRes();
+        await R.catena((req, r2, ctx, avanti) => avanti())(fintaReq("/api/vuoto"), res);
+        return res.codice === 404 && JSON.parse(res.corpo).errore === "rotta-sconosciuta";
+      })());
+    controlla("uno strato che scoppia diventa un 500, non una richiesta appesa",
+      await (async () => {
+        const res = fintaRes();
+        const erroriVeri = console.error; console.error = () => {};
+        try{
+          await R.catena(() => { throw new Error("bum"); })(fintaReq("/api/bum"), res);
+        }finally{ console.error = erroriVeri; }
+        return res.codice === 500 && JSON.parse(res.corpo).errore === "errore-del-server" &&
+          res.corpo.indexOf("bum") < 0;
+      })());
+    controlla("un corpo illeggibile è colpa di chi chiama: 400, e glielo si dice",
+      await (async () => {
+        const res = fintaRes();
+        await R.catena(() => { throw new Error("json storto"); })(fintaReq("/api/x"), res);
+        return res.codice === 400 && JSON.parse(res.corpo).errore === "json storto";
+      })());
+    controlla("il freno dice quanto aspettare",
+      await (async () => {
+        const res = fintaRes();
+        await R.catena(R.freno(() => true, () => "1.2.3.4"))(fintaReq("/api/classifica"), res);
+        return res.codice === 429 && res.testate["retry-after"] === "60";
+      })());
+    controlla("un URL che non si legge non arriva alle rotte",
+      await (async () => {
+        const res = fintaRes();
+        let arrivato = false;
+        await R.catena(R.indirizzoValido(), () => { arrivato = true; })(
+          { url: "http://[", method: "GET", headers: {} }, res);
+        return !arrivato && res.codice === 400;
+      })());
+
   }catch(e){
     falliti++;
     console.log("\n  esploso: " + (e && e.stack || e));
