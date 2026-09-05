@@ -215,13 +215,17 @@ NETWORK 64
 
 23. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
 
+    Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il
+    secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su
+    "stacca la spina", il quinto su "registra un pezzo".
+
 24. cambia il nome «disciplina»
 
 25. togli il parametro «lucidità» e tutto ciò che ne consegue
 
 26. la landing dev'essere staccata dalla pagina di login e da quella di gioco
 
-27. la pagina di login a sé stante, visibile dalla landing, fuori dalla sezione account, senza il server a vista e fatta molto meglio
+27. la pagina di login a sè stante, visibile dalla landing, fuori dalla sezione account, senza il server a vista e fatta molto meglio
 
 /_ NUOVE MODALITA' _/
 

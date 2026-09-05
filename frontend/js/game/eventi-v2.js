@@ -1800,7 +1800,16 @@ function adfQueueSocialAlert(post,onContinue){
   adfRenderSocialBanner(post);
 }
 
+/* In carcere il telefono non ce l'hai. Il catalogo lo sa gia' (showCatalog,
+   emitHook e tryNormal si fermano se sei dentro), ma un post puo' nascere
+   **dalla scelta che ti ci ha portato**: l'evento si apre da libero, la
+   scelta ti fa arrestare, e la notifica di LaFamegram arriva addosso a uno
+   che sta gia' in cella. Peggio: la fascia conta come finestra aperta per
+   tempo-controlli.js, quindi restava li' a bloccare i comandi del tempo
+   mentre scontavi la pena. Il post resta nel feed — il mondo fuori continua
+   a parlare — ma la notifica no: quella la trovi quando esci. */
 function adfRenderSocialBanner(post){
+  if(adfInJail()) return;
   let el=document.getElementById("adf-social-banner");
   if(!el){
     el=document.createElement("div");
@@ -1829,6 +1838,10 @@ function adfHideSocialBanner(){
   const el=document.getElementById("adf-social-banner");
   if(el)el.classList.remove("show");
 }
+/* E se la fascia era gia' a schermo quando ti hanno preso, se ne va con te:
+   la porta del carcere si chiude sopra a una notifica che non ha piu' nessun
+   posto dove stare. */
+window.addEventListener("jail-ui:opened",()=>{ adfHideSocialBanner(); });
 
 function adfSocialOpenLatest(){
   try{
