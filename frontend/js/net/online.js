@@ -64,6 +64,10 @@ const ONLINE = (() => {
       return dati;
     }catch(e){
       staccato = true;
+      /* `staccato` c'era già ma non lo leggeva nessuno: chi giocava con il
+         server spento non lo sapeva, vedeva solo la classifica che non si
+         apriva. Adesso lo dice, e js/servizio.js tira su la fascia. */
+      try{ window.dispatchEvent(new CustomEvent("adf:rete-staccata", {detail:{rotta}})); }catch(_){}
       return null;
     }finally{ clearTimeout(scadenza); }
   }

@@ -116,6 +116,7 @@ Alcuni errori aggiungono `nota`, `motivo`, `salvata` o altri dettagli utili.
 | `429` | troppe richieste o punteggio inviato troppo presto |
 | `500` | errore interno del server |
 | `501` | accesso Steam, Apple o Google non ancora configurato |
+| `503` | server fermo per manutenzione (`ADF_MANUTENZIONE=1`) |
 
 Errori generali possibili:
 
@@ -127,6 +128,56 @@ troppe-richieste
 rotta-sconosciuta
 errore-del-server
 ```
+
+### Lo stesso errore, due vestiti
+
+Chi chiama dichiarando `Accept: application/json` — cioè il gioco, `curl`,
+Postman — riceve **sempre** il JSON qui sopra: codice HTTP e campo `errore` non
+cambiano mai, ed è il contratto su cui il client si regge.
+
+Chi chiama con `Accept: text/html` — cioè una persona che ha aperto l'indirizzo
+del server con il browser, e capita ogni volta che qualcuno controlla se è
+acceso — riceve **la stessa risposta vestita da pagina**: stesso codice, testo
+leggibile, nessun file esterno da caricare. Le pagine le scrive
+`backend/risposte.js` per 400, 404, 429, 500 e 503; non sono file `.html` sul
+disco apposta, perché una pagina che deve dire «il server ha un problema» non
+può dipendere da un file che il server dovrebbe andare a leggere proprio in
+quel momento.
+
+Se `Accept` contiene tutti e due, vince JSON: chi lo nomina lo sta chiedendo.
+
+### Manutenzione
+
+Con `ADF_MANUTENZIONE=1` il server risponde `503 in-manutenzione` a tutto —
+senza nemmeno toccare il database — tranne che a `/api/stato`, che resta acceso
+perché è quello che dice se il server è vivo. La risposta porta
+`Retry-After: 600`; con `ADF_MANUTENZIONE_FINO` si aggiunge quando si torna,
+scritto a parole (`"verso le 22"`), che finisce sia nel JSON sia nella pagina.
+
+La manopola si legge a ogni richiesta e non all'avvio: si accende e si spegne
+senza riavviare niente.
+
+**La partita non si ferma.** Il gioco si salva nel dispositivo: con il server
+in manutenzione restano fermi classifica, account e salvataggio in cloud, e il
+resto si gioca come sempre.
+
+### Il giro di una richiesta
+
+Gli strati, in ordine (`backend/risposte.js`, montati in `server.js`):
+
+| # | Strato | Cosa fa |
+| --- | --- | --- |
+| 1 | `cors` | intestazioni CORS su ogni risposta, e il preflight `OPTIONS` finisce qui |
+| 2 | `manutenzione` | se acceso, `503` a tutto tranne al battito |
+| 3 | `freno` | `429` a chi bussa più di `ADF_BUSSATE` volte al minuto |
+| 4 | `indirizzoValido` | l'URL si legge o è `400`; quello buono resta in `ctx.url` |
+| 5 | settimana | fa avanzare la settimana di gioco se è ora |
+| 6 | rotte | l'instradamento vero |
+
+Se nessuno strato risponde, la catena chiude con `404 rotta-sconosciuta`. Se
+uno strato scoppia, la catena risponde `500 errore-del-server` e lo stack
+finisce nei log, mai nella risposta — tranne quando l'errore è di chi chiama
+(JSON storto, corpo illeggibile), che è un `400` con il messaggio dentro.
 
 ## Modelli restituiti più spesso
 

@@ -17,6 +17,7 @@
 
 <!-- Fogli di stile: l'ordine conta, la cascata è quella originale. -->
 <link rel="stylesheet" href="css/base.css?v=12">
+<link rel="stylesheet" href="css/servizio.css?v=1">
 <link rel="stylesheet" href="css/preview.css?v=12">
 <link rel="stylesheet" href="css/shell.css?v=12">
 <link rel="stylesheet" href="css/landing.css?v=12">
@@ -43,6 +44,52 @@
 <link rel="stylesheet" href="css/tocco.css?v=12">
 </head>
 <body>
+
+<!-- LE PAGINE DI SERVIZIO (js/servizio.js, css/servizio.css).
+
+     L'AVVIO sta qui dentro, scritto a mano, e non lo disegna il JavaScript
+     apposta: se un file di codice non arriva o il browser è troppo vecchio per
+     leggerlo, il JS non parte proprio e una schermata disegnata da lui non si
+     vedrebbe mai — resterebbe la pagina bianca. Questa invece c'è già prima
+     che giri una riga, e dopo dodici secondi tira fuori da sola, con una
+     animazione CSS, il messaggio che qualcosa non va. Se il gioco parte, se ne
+     va da sé.
+
+     Gli altri due li riempie il codice: il foglio grande per quando si rompe
+     qualcosa o il salvataggio non si legge, la fascia in basso per quando il
+     server non risponde. -->
+<div class="avvio" id="avvio">
+  <span class="marchio" aria-hidden="true">
+    <svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+      <rect x="14" y="6.5" width="6" height="12.6" rx="3" fill="#0B0B0D"/>
+      <g fill="none" stroke="#0B0B0D" stroke-width="2.4" stroke-linecap="round">
+        <path d="M10 16.4a7 7 0 0 0 14 0"/><path d="M17 23.4V27"/><path d="M12.8 27h8.4"/>
+      </g>
+    </svg>
+  </span>
+  <h1>Anni di <em>Fame</em></h1>
+  <p class="dice">Si sta accendendo tutto: mille eventi, la città, la gente che ci abita.</p>
+  <span class="barra" aria-hidden="true"><i></i></span>
+  <p class="lento" role="status">
+    <b>Ci sta mettendo troppo.</b> Se resta così, qualcosa non si è caricato.
+    Prova a ricaricare con <code>Ctrl</code>+<code>F5</code>: nove volte su dieci
+    è la cache. Se non basta, il gioco vuole un browser aggiornato — Chrome,
+    Edge o Firefox degli ultimi due anni.
+  </p>
+</div>
+
+<div class="servizio" id="servizio" role="alert"></div>
+
+<div class="staccato" id="staccato" role="status">
+  <span class="segno" aria-hidden="true">!</span>
+  <span class="testo">
+    <strong>Il server non risponde</strong>
+    <span>Classifica, account e salvataggio in cloud restano fermi. La partita no: si gioca lo stesso, tutto in locale.</span>
+  </span>
+  <button type="button" data-riprova="1">Riprova</button>
+  <button type="button">Va bene</button>
+</div>
+
 
 <div class="topnav">
   <div class="navleft">
@@ -736,6 +783,7 @@
 
 <!-- Script classici, caricati in ordine: ogni file usa quello che viene prima. -->
 <script src="js/core.js?v=12"></script>
+<script src="js/servizio.js?v=1"></script>
 
 <!-- Impostazioni: audio, aspetto, difficoltà, slot e lingua. Devono esistere
      prima di tutto il resto, perché stato e simulazione leggono da qui. -->

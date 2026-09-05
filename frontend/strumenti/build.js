@@ -209,7 +209,7 @@ function pesa(cartella){
     .replace("</body>", '<script src="assets/' + nomeCodice + '"></script>\n</body>');
   fs.writeFileSync(path.join(USCITA, "index.html"), pagina);
 
-  copiaCartella(path.join(RADICE, "media"), path.join(USCITA, "media"));
+  copiaCartella(path.join(RADICE, "media"), path.join(USCITA, "media"));
 
   console.log("\nscritto " + USCITA);
   console.log("  index.html          " + kb(Buffer.byteLength(pagina)));

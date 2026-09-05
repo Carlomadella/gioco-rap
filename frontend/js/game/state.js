@@ -60,6 +60,26 @@ const CHIAVE_PARTITA = () => (typeof slotKey === "function" ? slotKey(SAVE_KEY) 
 
 let G = START();
 window.__G = () => G;
-try{ const r = localStorage.getItem(CHIAVE_PARTITA()); if(r) G = Object.assign(START(), JSON.parse(r)); }catch(e){}
+/* Se il salvataggio non si legge — troncato, scritto a metà perché il browser
+   si è chiuso mentre salvava — prima si mette da parte una copia intatta, poi
+   si parte da una partita nuova. Prima qui c'era un `catch(e){}` muto: la
+   partita rotta restava lì finché il primo salvataggio non ci scriveva sopra,
+   e a quel punto non era più recuperabile da nessuno. Chi lo dice al giocatore
+   è js/servizio.js, che guarda `__ADF_SALVATAGGIO_ROTTO`. */
+try{
+  const r = localStorage.getItem(CHIAVE_PARTITA());
+  if(r) G = Object.assign(START(), JSON.parse(r));
+}catch(e){
+  let copia = null;
+  try{
+    const grezzo = localStorage.getItem(CHIAVE_PARTITA());
+    copia = CHIAVE_PARTITA() + "-illeggibile-" + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+    localStorage.setItem(copia, grezzo);
+    window.__ADF_SALVATAGGIO_ROTTO = { chiave: CHIAVE_PARTITA(), copia, errore: e.message, grezzo };
+  }catch(e2){
+    /* niente spazio per la copia: si dice lo stesso cos'è successo */
+    window.__ADF_SALVATAGGIO_ROTTO = { chiave: CHIAVE_PARTITA(), copia: null, errore: e.message, grezzo: "" };
+  }
+}
 function save(){ try{ if(typeof salvaConCopertine === 'function') salvaConCopertine();
   else localStorage.setItem(CHIAVE_PARTITA(), JSON.stringify(G)); }catch(e){} }

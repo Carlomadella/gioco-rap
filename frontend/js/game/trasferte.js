@@ -1744,11 +1744,32 @@ function riprendiInSospeso(){
    ============================================================ */
 /* Il foglio vero sta in `css/trasferte.css` ed è linkato da index.html insieme a
    tutti gli altri. Questo è solo la rete di sicurezza per chi carica il modulo
-   da solo (una pagina di prova): se il foglio non c'è, se lo tira dietro. */
+   da solo (una pagina di prova): se il foglio non c'è, se lo tira dietro.
+
+   **Nel build il nome del file non esiste più.** `strumenti/build.js` mette
+   tutti i fogli in uno solo (`assets/stile-<impronta>.css`) e toglie i link ai
+   sorgenti: cercando la parola «trasferte.css» fra gli href non la trovava,
+   si credeva da sola e chiedeva `css/trasferte.css` — che nel pacchetto non
+   c'è. Risultato: un 404 a ogni avvio del gioco installato, con gli stili che
+   intanto c'erano già dentro al bundle. Adesso invece di cercare il nome del
+   file si guarda se le regole ci sono davvero. */
+function regoleCaricate(){
+  for(const foglio of document.styleSheets){
+    let regole;
+    /* un foglio di un altro dominio (i caratteri di Google) non si legge:
+       non è un errore, è solo un foglio che non ci riguarda. */
+    try{ regole = foglio.cssRules; }catch(e){ continue; }
+    if(!regole) continue;
+    for(const r of regole)
+      if(r.selectorText && r.selectorText.indexOf(".trascosti") >= 0) return true;
+  }
+  return false;
+}
 function stile(){
   if(document.getElementById("trasferte-css")) return;
   for(const l of document.querySelectorAll('link[rel="stylesheet"]'))
     if(String(l.getAttribute("href") || "").indexOf("trasferte.css") >= 0) return;
+  if(regoleCaricate()) return;
   const l = document.createElement("link");
   l.id = "trasferte-css";
   l.rel = "stylesheet";

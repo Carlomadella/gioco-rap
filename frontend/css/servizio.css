@@ -1,0 +1,135 @@
+/* LE PAGINE DI SERVIZIO — quelle che si vedono quando qualcosa non va.
+
+   Sono quattro, e sono tutte della stessa famiglia perché sono tutte lo stesso
+   momento: il gioco che si ferma e ti deve dire una cosa. Fondale scuro come
+   il resto, un riquadro al centro, un titolo grosso, una spiegazione in
+   italiano e i tasti veri — mai un vicolo cieco, da ognuna si esce.
+
+     #avvio        il caricamento, l'unica che si vede sempre
+     #servizio     rotto / salvataggio illeggibile, a schermo intero
+     #staccato     il server non risponde: una fascia, non una pagina
+
+   **Perché l'avvio è HTML e CSS e basta.** Se un file di codice non si carica
+   o il browser è troppo vecchio per capirlo, il JavaScript non parte proprio:
+   una schermata di caricamento disegnata da JS in quel caso non comparirebbe
+   mai, e resterebbe la pagina bianca. Questa invece sta già nell'HTML, si vede
+   prima che parta una riga di codice, e dopo dodici secondi tira fuori da sola
+   — con un'animazione, senza JS — il messaggio che qualcosa non va. È l'unico
+   pezzo del gioco che deve funzionare anche quando non funziona niente. */
+
+/* ============================ AVVIO ============================ */
+#avvio{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:22px;padding:24px;
+  background:radial-gradient(120% 80% at 50% 0%,#161226,#08080B 68%);
+  color:var(--text);text-align:center;
+  transition:opacity .45s ease,visibility .45s ease}
+/* se ne va quando il gioco è pronto: js/servizio.js mette .via */
+#avvio.via{opacity:0;visibility:hidden;pointer-events:none}
+
+#avvio .marchio{width:64px;height:64px;border-radius:20px;
+  background:linear-gradient(135deg,var(--c1,#FF5A36),var(--violet));
+  display:grid;place-items:center;box-shadow:0 18px 50px rgba(0,0,0,.55)}
+#avvio .marchio svg{width:38px;height:38px;display:block}
+#avvio h1{margin:0;font-family:var(--disp);font-size:clamp(26px,4.6vw,44px);
+  letter-spacing:-.02em}
+#avvio h1 em{font-style:normal;color:var(--acid)}
+#avvio .dice{margin:0;max-width:34ch;color:var(--soft);font-size:15px;line-height:1.5}
+
+/* La barra non finge una percentuale che nessuno sa: va e viene, e vuol dire
+   «sto ancora lavorando». Una percentuale inventata è una bugia piccola che si
+   vede subito, la prima volta che si pianta a metà. */
+#avvio .barra{width:min(280px,70vw);height:4px;border-radius:3px;overflow:hidden;
+  background:rgba(255,255,255,.09)}
+#avvio .barra i{display:block;width:38%;height:100%;border-radius:3px;
+  background:linear-gradient(90deg,transparent,var(--acid),transparent);
+  animation:avvioScorre 1.25s ease-in-out infinite}
+@keyframes avvioScorre{
+  0%{transform:translateX(-110%)}
+  100%{transform:translateX(370%)}
+}
+
+/* Il cane da guardia: nessun JavaScript, solo un'animazione che dopo dodici
+   secondi lo tira fuori. Se il gioco è partito, #avvio se n'è già andato e
+   questo non lo vede nessuno. Se non è partito, è l'unica cosa che parla. */
+#avvio .lento{max-width:44ch;margin:0;padding:16px 18px;border-radius:14px;
+  border:1px solid rgba(255,90,54,.32);background:rgba(255,90,54,.07);
+  color:#FFD9CE;font-size:14px;line-height:1.55;text-align:left;
+  opacity:0;animation:avvioLento .6s ease 12s forwards}
+#avvio .lento b{color:#fff}
+#avvio .lento code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;
+  padding:1px 5px;border-radius:5px;background:rgba(0,0,0,.35);color:var(--acid)}
+@keyframes avvioLento{to{opacity:1}}
+
+@media (prefers-reduced-motion:reduce){
+  #avvio .barra i{animation:none;width:100%;opacity:.5}
+  #avvio .lento{animation-duration:.01s}
+}
+
+/* ========================== SERVIZIO ==========================
+   Rotto e salvataggio illeggibile: schermo intero, sopra a tutto. */
+#servizio{position:fixed;inset:0;z-index:9500;display:none;
+  align-items:center;justify-content:center;padding:24px;overflow-y:auto;
+  background:rgba(6,6,9,.93);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#servizio.on{display:flex}
+#servizio .foglio{width:min(560px,100%);padding:26px 26px 24px;border-radius:var(--r);
+  background:linear-gradient(180deg,#191622,#111017);
+  border:1px solid var(--line);box-shadow:0 30px 90px rgba(0,0,0,.6);
+  animation:servizioSu .32s cubic-bezier(.2,.9,.3,1)}
+@keyframes servizioSu{from{opacity:0;transform:translateY(14px)}}
+
+#servizio .k{display:inline-flex;align-items:center;gap:7px;
+  font-family:var(--cond);font-size:12px;font-weight:800;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--hot)}
+#servizio .k::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+#servizio.calmo .k{color:var(--acid)}
+#servizio h2{margin:10px 0 8px;font-size:clamp(23px,3.4vw,31px);line-height:1.1}
+#servizio p{margin:0 0 11px;color:var(--soft);font-size:15px;line-height:1.55}
+#servizio p b{color:var(--text)}
+#servizio .tasti{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}
+#servizio .tasti button{padding:12px 18px;border-radius:12px;font-family:var(--cond);
+  font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);
+  transition:background .15s,transform .12s}
+#servizio .tasti button:hover{background:rgba(255,255,255,.1)}
+#servizio .tasti button:active{transform:translateY(1px)}
+#servizio .tasti button.primo{border-color:transparent;color:#1a1206;
+  background:linear-gradient(180deg,#FFD980,#E0A32E)}
+
+/* Il dettaglio tecnico c'è ma non aggredisce: chi deve mandarlo a qualcuno lo
+   apre, chi vuole solo tornare a giocare non lo vede nemmeno. */
+#servizio details{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
+#servizio summary{cursor:pointer;font-family:var(--cond);font-size:13px;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+#servizio summary:hover{color:var(--soft)}
+#servizio pre{margin:10px 0 0;padding:12px;border-radius:10px;max-height:210px;overflow:auto;
+  background:#0A0A0E;border:1px solid var(--line);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.5;
+  color:#C9CBD4;white-space:pre-wrap;word-break:break-word}
+
+/* ========================== STACCATO ==========================
+   Il server non risponde. Non è una pagina: il gioco si gioca lo stesso, da
+   soli, e prendersi lo schermo per dire «manca la classifica» sarebbe una
+   bugia sulla gravità della cosa. È una fascia, e si può chiudere. */
+#staccato{position:fixed;left:50%;bottom:18px;transform:translate(-50%,140%);
+  z-index:8800;display:flex;align-items:center;gap:12px;
+  width:min(520px,calc(100vw - 28px));padding:13px 15px;border-radius:14px;
+  background:linear-gradient(180deg,#241a1a,#171317);
+  border:1px solid rgba(255,90,54,.34);box-shadow:0 20px 50px rgba(0,0,0,.5);
+  transition:transform .32s cubic-bezier(.2,.9,.3,1)}
+#staccato.on{transform:translate(-50%,0)}
+#staccato .segno{flex:none;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;
+  background:rgba(255,90,54,.14);color:var(--hot);font-size:17px}
+#staccato .testo{flex:1;min-width:0}
+#staccato .testo strong{display:block;font-family:var(--cond);font-size:15px;
+  letter-spacing:.03em;text-transform:uppercase}
+#staccato .testo span{display:block;margin-top:2px;color:var(--soft);font-size:13px;line-height:1.4}
+#staccato button{flex:none;padding:8px 12px;border-radius:10px;border:1px solid var(--line);
+  background:rgba(255,255,255,.05);font-family:var(--cond);font-size:13px;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--text)}
+#staccato button:hover{background:rgba(255,255,255,.1)}
+
+@media (max-width:560px){
+  #servizio .foglio{padding:22px 18px 20px}
+  #staccato{flex-wrap:wrap}
+  #staccato .testo{flex:1 0 100%}
+}
