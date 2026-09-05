@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:bdb2c5f -->
+## 05/09/26, 16:17 â€” task/pagine-di-servizio â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `bdb2c5f`
+
+### Cosa Ã¨ entrato
+
+- `59c3988` â€” refactor(backend): le pagine di errore diventano middleware, e il 404 esce dal frontend â€” **Carlomadella**
+- `28af709` â€” feat: le pagine di servizio — avvio, rotto, salvataggio illeggibile, server giù, 404 â€” **Carlomadella**
+- `86ba2c2` â€” chore: i video in ordine, i concept fuori dal pacchetto, e un 404 a ogni avvio â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+- **Modificato:** `frontend/strumenti/build.js`
+- **Modificato:** `frontend/strumenti/dev.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:74dc954 -->
 ## 05/09/26, 12:38 â€” task/schermata-abilita â†’ main
 

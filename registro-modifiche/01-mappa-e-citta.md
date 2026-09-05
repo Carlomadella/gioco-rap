@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:bdb2c5f -->
+## 05/09/26, 16:17 â€” task/pagine-di-servizio â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `bdb2c5f`
+
+### Cosa Ã¨ entrato
+
+- `59c3988` â€” refactor(backend): le pagine di errore diventano middleware, e il 404 esce dal frontend â€” **Carlomadella**
+- `28af709` â€” feat: le pagine di servizio — avvio, rotto, salvataggio illeggibile, server giù, 404 â€” **Carlomadella**
+- `86ba2c2` â€” chore: i video in ordine, i concept fuori dal pacchetto, e un 404 a ogni avvio â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/trasferte.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:76cfda1 -->
 ## 04/09/26, 22:48 â€” main â†’ main
 

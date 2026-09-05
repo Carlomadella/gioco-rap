@@ -6,6 +6,43 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:bdb2c5f -->
+## 05/09/26, 16:17 â€” task/pagine-di-servizio â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `bdb2c5f`
+
+### Cosa Ã¨ entrato
+
+- `59c3988` â€” refactor(backend): le pagine di errore diventano middleware, e il 404 esce dal frontend â€” **Carlomadella**
+- `28af709` â€” feat: le pagine di servizio — avvio, rotto, salvataggio illeggibile, server giù, 404 â€” **Carlomadella**
+- `86ba2c2` â€” chore: i video in ordine, i concept fuori dal pacchetto, e un 404 a ogni avvio â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `backend/README-API.md`
+- **Modificato:** `backend/prova.js`
+- **Aggiunto:** `backend/risposte.js`
+- **Modificato:** `backend/server.js`
+- **Modificato:** `frontend/concept/README.md`
+- **Rinominato:** `frontend/media/photo/immagini_background_personaggio/booth_registrazione_notturno.png` â†’ `frontend/concept/booth_registrazione_notturno.png`
+- **Rinominato:** `frontend/media/photo/immagini_background_personaggio/control_room_notturna.png` â†’ `frontend/concept/control_room_notturna.png`
+- **Rinominato:** `frontend/media/photo/pagina_skill_tree/interfaccia_skill_tree_a colonne.png` â†’ `frontend/concept/skill_tree_a_colonne.png`
+- **Rinominato:** `frontend/media/photo/pagina_skill_tree/interfaccia_skill_tree_ramificato.png` â†’ `frontend/concept/skill_tree_ramificato.png`
+- **Aggiunto:** `frontend/css/servizio.css`
+- **Modificato:** `frontend/index.html`
+- **Modificato:** `frontend/js/game/state.js`
+- **Modificato:** `frontend/js/game/trasferte.js`
+- **Modificato:** `frontend/js/net/online.js`
+- **Aggiunto:** `frontend/js/servizio.js`
+- **Rimosso:** `frontend/media/video/06_palestra_boxe_definitivo.mp4`
+- **Rimosso:** `frontend/media/video/08_ingresso_club_definitivo.mp4`
+- **Rinominato:** `frontend/media/video/07_partenza_milano_definitivo.mp4` â†’ `frontend/media/video/Transizioni di scena/07_partenza_milano_definitivo.mp4`
+
+**File interessati in questa categoria:** 18
+
+---
+
 <!-- merge:74dc954 -->
 ## 05/09/26, 12:38 â€” task/schermata-abilita â†’ main
 
