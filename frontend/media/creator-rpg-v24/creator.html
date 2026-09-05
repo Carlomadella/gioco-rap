@@ -1043,6 +1043,392 @@ body::before{
 .local-editor-overlay.on{display:block}
 .local-editor-overlay iframe{width:100%;height:100%;border:0;background:#050609;display:block}
 .creator-exit-game{position:fixed;left:18px;bottom:18px;z-index:130000;border:1px solid rgba(255,255,255,.16);background:rgba(7,8,10,.72);color:#f1eadb;border-radius:999px;padding:10px 14px;font:700 11px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(10px)}
+
+/* ADF_RESPONSIVE_HEIGHT_V1 */
+
+/*
+   Responsive verticale per notebook / browser con viewport basso.
+   Sopra 900px di altezza il layout desktop approvato NON cambia.
+*/
+
+@media (max-height:900px) and (min-width:801px){
+
+  .topbar{
+    height:64px;
+    padding:0 22px 0 26px;
+  }
+
+  .viewport{
+    inset:64px 0 0;
+  }
+
+  .brand b{font-size:19px}
+  .brand span{font-size:8px}
+
+  .progress{gap:5px}
+  .pstep{
+    gap:5px;
+    font-size:10px;
+  }
+  .pstep i{
+    width:23px;
+    height:23px;
+    font-size:9px;
+  }
+  .pline{width:24px}
+
+  .content{
+    padding:24px 34px 18px;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    scrollbar-gutter:stable;
+  }
+
+  .eyebrow{
+    margin-bottom:7px;
+    font-size:9px;
+  }
+
+  .content h1{
+    font-size:clamp(36px,3.4vw,56px);
+  }
+
+  .lead{
+    margin:8px 0 12px;
+    font-size:10.5px;
+    line-height:1.45;
+  }
+
+  .form{
+    gap:8px;
+  }
+
+  .field{
+    padding:9px 11px;
+    border-radius:12px;
+  }
+
+  .field label{
+    margin-bottom:4px;
+    font-size:8px;
+  }
+
+  .field input{
+    padding:2px 0;
+    font-size:16px;
+  }
+
+  .section-head{
+    margin-top:14px;
+    margin-bottom:7px;
+  }
+
+  .section-head .left b{
+    font-size:20px;
+  }
+
+  .section-head .left span,
+  .section-head .right{
+    font-size:8px;
+  }
+
+  .grid{
+    gap:7px;
+  }
+
+  .card{
+    min-height:92px;
+    padding:11px 12px 10px;
+    border-radius:14px;
+  }
+
+  .card .id{
+    font-size:7px;
+  }
+
+  .card .n{
+    margin-top:4px;
+    font-size:20px;
+  }
+
+  .card .d{
+    margin-top:5px;
+    font-size:9px;
+    line-height:1.30;
+  }
+
+  .card .mini{
+    left:12px;
+    right:12px;
+    bottom:8px;
+    font-size:7px;
+  }
+
+  .bottom{
+    padding-top:10px;
+  }
+
+  .btn{
+    min-height:39px;
+    padding:0 14px;
+    font-size:9px;
+  }
+
+  /* IDENTITÀ */
+  #pageIdentity .bottom{
+    position:sticky;
+    z-index:8;
+    bottom:0;
+    padding-bottom:4px;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(6,7,10,0),
+        rgba(6,7,10,.94) 38%,
+        rgba(6,7,10,.99)
+      );
+  }
+
+  /* STORIA — tutti e tre gli stage */
+  #pageStory .content{
+    padding:20px 30px 14px;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+  }
+
+  #pageStory .story-meter{
+    margin-bottom:8px;
+  }
+
+  #pageStory .question{
+    font-size:clamp(34px,3.2vw,50px)!important;
+  }
+
+  #pageStory .choice-grid{
+    gap:7px;
+  }
+
+  #pageStory .card{
+    min-height:84px;
+  }
+
+  #pageStory .scene-tags{
+    margin-top:6px;
+    gap:4px;
+  }
+
+  #pageStory .scene-tag{
+    padding:4px 6px;
+    font-size:7px;
+  }
+
+  #pageStory .visual-copy h2{
+    font-size:44px;
+  }
+
+  #pageStory .visual-copy p{
+    font-size:10px;
+    line-height:1.4;
+  }
+
+  #pageStory .bottom{
+    position:sticky;
+    z-index:10;
+    bottom:0;
+    padding-bottom:4px;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(6,7,10,0),
+        rgba(6,7,10,.94) 36%,
+        rgba(6,7,10,.99)
+      );
+  }
+
+  /* ASPETTO */
+  #pageAppearance .bottom{
+    position:sticky;
+    z-index:8;
+    bottom:0;
+    padding-bottom:4px;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(6,7,10,0),
+        rgba(6,7,10,.94) 38%,
+        rgba(6,7,10,.99)
+      );
+  }
+
+  /* PROFILO FINALE */
+  #pageResult .result-right{
+    padding:24px 32px 16px;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+  }
+
+  #pageResult .result-title{
+    margin-top:7px;
+    font-size:clamp(48px,4.2vw,72px);
+  }
+
+  #pageResult .result-desc{
+    margin-top:8px;
+    font-size:11.5px;
+    line-height:1.50;
+  }
+
+  #pageResult .identity-strip{
+    margin:12px 0 10px;
+  }
+
+  #pageResult .answers{
+    gap:6px;
+  }
+
+  #pageResult .bottom{
+    position:sticky;
+    z-index:10;
+    bottom:0;
+    padding-bottom:4px;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(7,8,10,0),
+        rgba(7,8,10,.94) 34%,
+        rgba(7,8,10,.99)
+      );
+  }
+
+  /* INTRO */
+  #careerIntro{
+    height:100dvh;
+  }
+
+  #careerIntro .career-intro-replay{
+    bottom:max(14px,env(safe-area-inset-bottom));
+  }
+}
+
+
+/* Notebook ancora più bassi: es. MacBook con Safari e barre visibili */
+@media (max-height:740px) and (min-width:801px){
+
+  .topbar{
+    height:54px;
+    padding-left:20px;
+    padding-right:18px;
+  }
+
+  .viewport{
+    inset:54px 0 0;
+  }
+
+  .brand b{font-size:17px}
+  .brand span{font-size:7px}
+
+  .pstep{
+    font-size:9px;
+  }
+
+  .pstep i{
+    width:21px;
+    height:21px;
+  }
+
+  .pline{width:18px}
+
+  .content{
+    padding:14px 24px 10px;
+  }
+
+  .eyebrow{
+    margin-bottom:5px;
+  }
+
+  .content h1{
+    font-size:44px;
+  }
+
+  .lead{
+    margin:6px 0 9px;
+    font-size:9.5px;
+    line-height:1.35;
+  }
+
+  .section-head{
+    margin-top:10px;
+    margin-bottom:5px;
+  }
+
+  .field{
+    padding:7px 9px;
+  }
+
+  .field input{
+    font-size:14px;
+  }
+
+  .card{
+    min-height:78px;
+    padding:8px 10px;
+  }
+
+  .card .n{
+    font-size:18px;
+  }
+
+  .card .d{
+    margin-top:4px;
+    font-size:8.3px;
+    line-height:1.24;
+  }
+
+  #pageStory .content{
+    padding:12px 22px 8px;
+  }
+
+  #pageStory .question{
+    font-size:42px!important;
+  }
+
+  #pageStory .card{
+    min-height:74px;
+  }
+
+  #pageStory .visual-copy{
+    bottom:14px;
+  }
+
+  #pageStory .visual-copy h2{
+    margin-bottom:7px;
+    font-size:38px;
+  }
+
+  #pageStory .visual-copy p{
+    font-size:9px;
+  }
+
+  .bottom{
+    padding-top:6px;
+  }
+
+  .btn{
+    min-height:36px;
+  }
+
+  #pageResult .result-right{
+    padding:16px 24px 10px;
+  }
+
+  #pageResult .result-title{
+    font-size:56px;
+  }
+
+  #pageResult .result-desc{
+    font-size:10.5px;
+  }
+}
 </style>
 </head>
 <body>
