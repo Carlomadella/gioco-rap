@@ -163,9 +163,15 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
 2. voglio creare una pagina per praticamente ogni azione, con interfaccia e bottoni cliccabili a schermo (anche trasparenti ma non per forza), secondo te ha senso questa cosa? crea un README che analizzi e progetti tutto ciò, segna anche i pro e i contro e come vorresti sviluppare ogni pagina.
 
    **FATTO (06/09/2026)** — il README è
-   [`documentazione/pagine-azioni/README.md`](../documentazione/pagine-azioni/README.md):
-   l'analisi, i pro, i contro coi numeri veri, il progetto pagina per pagina e
-   l'ordine in cui le farei. **La risposta breve è sì all'idea, no al «per ogni
+   [`documentazione/pagine-azioni/README.md`](../documentazione/pagine-azioni/README.md).
+   Tre parti: **l'analisi** (cosa c'è già, i pro, i contro coi numeri veri, il criterio),
+   **il telaio** (quello che serve prima e che tutte le pagine si dividono) e **il
+   progetto di ogni pagina** — tutte e tredici le mosse e tutti i posti, uno per uno, col
+   disegno della schermata, cosa si decide dentro, cosa serve, quanto costa e cosa ne
+   penso. Anche quelle che io lascerei leggere: il disegno c'è lo stesso, così la scelta
+   resta tua. In fondo la tabella di tutto e l'ordine in cui le farei.
+
+   **La risposta breve è sì all'idea, no al «per ogni
    azione»:** una pagina non si dà a un'azione, si dà a un posto, e dentro al posto
    si gioca una decisione. Le mosse che una decisione non ce l'hanno — il turno, la
    palestra, staccare la spina — con una pagina diventano più lente, non più belle,
