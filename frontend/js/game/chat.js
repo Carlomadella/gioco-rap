@@ -903,6 +903,7 @@ function chatScrive(c, m){
   t.aperto = { sp: s.id, via: [] };
   t.ultimaSett = m.sett;
   t.nonLetti = (t.nonLetti || 0) + 1;
+  chatSegnaSentitoOggi(c.id);
   return true;
 }
 
@@ -976,7 +977,25 @@ function chatRispondi(contactId, idx){
 
 /* ==================== SCRIVERE PER PRIMI ====================
    È la cosa che più di tutte fa sembrare una chat una chat: non aspetti che
-   qualcuno si faccia vivo, apri tu. */
+   qualcuno si faccia vivo, apri tu.
+
+   Da smistare, punto 1: senza un freno, questo è esattamente il ramo che si
+   farmava — apri tu, la conversazione si chiude in una battuta ("Mangio,
+   tranquilla" → +benessere), e la riapri subito, all'infinito. Il resto della
+   chat non ha questo problema perché è chi scrive a decidere quando (dado
+   settimanale/giornaliero, `chatSettimana`/`chatGiorno`), ma qui la mossa è
+   sempre e solo del giocatore. Il freno è lo stesso identificatore-giorno di
+   `actions.js` (anno:settimana:giorno), tenuto qui in proprio perché chat.js
+   deve reggere anche da solo, fuori dal browser (vedi i test in prova.js). */
+function chatGiornoChiave(){
+  return [Number(G.year || 1), Number(G.week || 1), Number(G.day || 1)].join(":");
+}
+function chatGiaSentitoOggi(id){
+  return chatTraccia(id).ultimoGiornoParlato === chatGiornoChiave();
+}
+function chatSegnaSentitoOggi(id){
+  chatTraccia(id).ultimoGiornoParlato = chatGiornoChiave();
+}
 function chatMieAperture(c, m){
   return (c.tu || []).filter(a => !a.quando || a.quando(m));
 }
@@ -985,6 +1004,11 @@ function chatIniziaTu(contactId, idx){
   if(!c || !c.tu) return;
   const t = chatTraccia(contactId);
   if(t.aperto) return;
+  if(chatGiaSentitoOggi(contactId)){
+    if(typeof toast === "function")
+      toast("<b>L'hai già sentito oggi.</b> Richiamalo domani.", "bad", "!", ["#B91C1C", "#7F1D1D"]);
+    return;
+  }
   const m = chatMondo();
   const a = chatMieAperture(c, m)[idx];
   if(!a) return;
@@ -993,6 +1017,7 @@ function chatIniziaTu(contactId, idx){
   chatBolla(t, "io", a.n);
   chatDici(t, a.run ? a.run(m) : null);
   t.aperto = (a.poi && a.poi.length) ? { sp: "tu:" + vero, via: [] } : null;
+  chatSegnaSentitoOggi(contactId);
   save(); renderTelefono(); renderGioco();
 }
 
