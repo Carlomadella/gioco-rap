@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:dc0d94e -->
+## 06/09/26, 10:09 â€” task/pagine-per-ogni-azione â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `dc0d94e`
+
+### Cosa Ã¨ entrato
+
+- `180960c` â€” docs: una pagina per ogni azione? l'analisi e il progetto (punto 2) â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/README.md`
+- **Aggiunto:** `documentazione/pagine-azioni/README.md`
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:b42c3ca -->
 ## 05/09/26, 23:53 â€” task/26-landing-login-gioco-pagine-separate â†’ main
 
