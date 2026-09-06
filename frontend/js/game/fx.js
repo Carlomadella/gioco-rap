@@ -5,7 +5,13 @@
 /* L'interruttore dell'audio sta nelle impostazioni (SET.audio.on): il tasto ♪
    in partita è la stessa manopola, vista da vicino. I volumi arrivano da lì. */
 let AC = null, muted = !SET.audio.on;
+/* ADF_AUDIO_FX_BRIDGE_V1: gli SFX legacy restano compatibili ma usano il backend centrale. */
+const audioSfxVol = () => (window.ADF_AUDIO && ADF_AUDIO.legacy) ? 1 : volSfx();
 function ac(){
+  if(window.ADF_AUDIO && ADF_AUDIO.legacy){
+    const shared = ADF_AUDIO.legacy.context();
+    if(shared) return shared;
+  }
   if(!AC){ try{ AC = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ return null; } }
   if(AC.state === "suspended") AC.resume();
   return AC;
@@ -26,6 +32,19 @@ function impulso(c, dur, coda){
 }
 function bus(){
   const c = ac(); if(!c) return null;
+  const shared = window.ADF_AUDIO && ADF_AUDIO.legacy ? ADF_AUDIO.legacy.bus("sfx") : null;
+  if(shared){
+    if(BUS !== shared){
+      BUS = shared;
+      try{
+        const cv = c.createConvolver(); cv.buffer = impulso(c, 1.2, 3.4);
+        const rg = c.createGain(); rg.gain.value = .55;
+        cv.connect(rg); rg.connect(BUS);
+        RIV = cv;
+      }catch(e){ RIV = null; }
+    }
+    return BUS;
+  }
   if(BUS && BUS.context === c) return BUS;
   const g = c.createGain(); g.gain.value = 1;
   try{
@@ -46,10 +65,10 @@ function bus(){
 
 /* una nota: attacco morbido, coda esponenziale, filtro in cima e un po' di stanza */
 function nota(o){
-  if(muted) return;
+  if(muted || (window.ADF_AUDIO && !ADF_AUDIO.canPlay("sfx"))) return;
   const c = ac(), out = bus(); if(!c || !out) return;
   const t = c.currentTime + (o.when || 0);
-  const dur = o.dur || .2, vol = (o.vol == null ? .06 : o.vol) * volSfx();
+  const dur = o.dur || .2, vol = (o.vol == null ? .06 : o.vol) * audioSfxVol();
   if(vol <= 0) return;
   const osc = c.createOscillator(), g = c.createGain(), f = c.createBiquadFilter();
   osc.type = o.tipo || "sine";
@@ -62,15 +81,15 @@ function nota(o){
   g.gain.exponentialRampToValueAtTime(Math.max(.0002, vol), t + atk);
   g.gain.exponentialRampToValueAtTime(.0001, t + dur);
   osc.connect(f); f.connect(g); g.connect(out);
-  if(RIV && o.riv){ const s = c.createGain(); s.gain.value = o.riv * volSfx(); g.connect(s); s.connect(RIV); }
+  if(RIV && o.riv){ const s = c.createGain(); s.gain.value = o.riv * audioSfxVol(); g.connect(s); s.connect(RIV); }
   osc.start(t); osc.stop(t + dur + .05);
 }
 /* un fruscio: il transiente dei click, il respiro della folla, la mano sul fader */
 function fruscio(o){
-  if(muted) return;
+  if(muted || (window.ADF_AUDIO && !ADF_AUDIO.canPlay("sfx"))) return;
   const c = ac(), out = bus(); if(!c || !out) return;
   const t = c.currentTime + (o.when || 0);
-  const dur = o.dur || .08, vol = (o.vol == null ? .07 : o.vol) * volSfx();
+  const dur = o.dur || .08, vol = (o.vol == null ? .07 : o.vol) * audioSfxVol();
   if(vol <= 0) return;
   const len = Math.max(1, Math.floor(c.sampleRate * (dur + .06)));
   const buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
@@ -87,7 +106,7 @@ function fruscio(o){
   g.gain.exponentialRampToValueAtTime(Math.max(.0002, vol), t + atk);
   g.gain.exponentialRampToValueAtTime(.0001, t + dur);
   src.connect(f); f.connect(g); g.connect(out);
-  if(RIV && o.riv){ const s = c.createGain(); s.gain.value = o.riv * volSfx(); g.connect(s); s.connect(RIV); }
+  if(RIV && o.riv){ const s = c.createGain(); s.gain.value = o.riv * audioSfxVol(); g.connect(s); s.connect(RIV); }
   src.start(t); src.stop(t + dur + .06);
 }
 
@@ -217,10 +236,10 @@ const SUONI = {
 
 /* i vecchi mattoncini restano: piazza.js e chi altro li usa non cambia riga */
 function beep(freq, dur, type, vol, when){
-  if(muted) return;
+  if(muted || (window.ADF_AUDIO && !ADF_AUDIO.canPlay("sfx"))) return;
   const c = ac(), out = bus(); if(!c || !out) return;
   const t = c.currentTime + (when || 0);
-  const v = (vol || .07) * volSfx(); if(v <= 0) return;
+  const v = (vol || .07) * audioSfxVol(); if(v <= 0) return;
   const o = c.createOscillator(), g = c.createGain();
   o.type = type || "triangle"; o.frequency.setValueAtTime(freq, t);
   g.gain.setValueAtTime(0, t);
@@ -342,14 +361,4 @@ function aggiornaTastoAudio(){
 aggiornaTastoAudio();
 
 window.__ADFCELEB = n => { flash("TRAGUARDO", n, true); };
-window.GAME = {
-  enter(){
-    const art = window.ARTIST || {};
-    syncEnergy();
-    openWeek();
-    if(!G.log.length) pushLog("<b>Si comincia.</b> Zero fan, zero contatti, una settimana davanti.", "big");
-    renderGioco();
-    /* la mappa è la prima cosa che si vede: va riempita anche lei */
-    if(typeof renderHub === "function") renderHub();
-  }
-};
+/* ADF_AUDIO_GAME_ENTRY_MOVED_V1: window.GAME.enter ora sta in js/game/entry.js. */

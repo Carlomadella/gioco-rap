@@ -92,6 +92,7 @@ function beatTone(c, out, t, hz, dur, type, v, cut, nodes){
 }
 
 function beatStop(){
+  if(window.ADF_AUDIO && ADF_AUDIO.transport) ADF_AUDIO.transport.stop();
   const p = BEAT_PLAY;
   BEAT_PLAY = null;
   document.querySelectorAll(".play.on").forEach(b => { b.classList.remove("on"); b.textContent = "▶"; });
@@ -112,10 +113,10 @@ function beatSuona(b, btn){
   const stesso = BEAT_PLAY && BEAT_PLAY.key === key;
   beatStop();
   if(stesso) return;
-  if(muted){
-    toast("L'audio è spento: riaccendilo col tasto <b>♪</b> in alto.", "bad", "♪", ["#5A6472","#2B2B34"]);
+  if(muted || (window.ADF_AUDIO && !ADF_AUDIO.canPlay("beat"))){
+    toast("L'audio dei beat è spento o non disponibile in questa fase.", "bad", "♪", ["#5A6472","#2B2B34"]);
     return;
-  }
+  } /* ADF_AUDIO_BEAT_ROUTING_V1 */
   const c = ac(); if(!c) return;
 
   const info = beatInfo(b), r = info.r, st = info.g;
@@ -127,13 +128,16 @@ function beatSuona(b, btn){
   const snare = st.snare || [4, 12];
 
   const master = c.createGain(); master.gain.value = .0001;
-  master.connect(c.destination);
-  master.gain.linearRampToValueAtTime(Math.max(.0001, .85 * volBeat()), c.currentTime + .08);
+  const beatBus = window.ADF_AUDIO && ADF_AUDIO.legacy ? ADF_AUDIO.legacy.bus("beat") : null;
+  master.connect(beatBus || c.destination);
+  const beatLevel = beatBus ? .85 : .85 * volBeat();
+  master.gain.linearRampToValueAtTime(Math.max(.0001, beatLevel), c.currentTime + .08);
   const nodes = [];
   const nz = beatNoise(c, .3);
 
   const spb = 60 / info.bpm, sed = spb / 4, bars = 4;
   const t0 = c.currentTime + .1;
+  if(window.ADF_AUDIO && ADF_AUDIO.transport) ADF_AUDIO.transport.start({bpm:info.bpm, at:t0}); /* ADF_AUDIO_BEAT_TRANSPORT_V1 */
   const jit = () => (Math.random() * 2 - 1) * sbava;
 
   /* il giro della cassa: uno dei giri tipici del genere, piu' un colpo in piu'

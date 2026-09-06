@@ -40,6 +40,7 @@ console.log("\nVerifica output build");
 test("dist/index.html esiste",exists("index.html"));
 test("dist/assets esiste",exists("assets"));
 test("dist/media esiste",exists("media"));
+test("musica menu è copiata nel build",exists("media/audio/music/dream-catcher.mp3")); /* ADF_MENU_MUSIC_VERIFY_V1 */
 test("le tre pagine sono nel build",PAGINE.every(p=>exists(p.file)),
   PAGINE.filter(p=>!exists(p.file)).map(p=>p.file));
 test("le tre demo che stanno in piedi da sole esistono",PAGINE.every(p=>exists(p.unico)),
@@ -112,6 +113,8 @@ try{ demoGioco=read("anni-di-fame-gioco.html"); }catch(_){}
 
 test("la demo del gioco incorpora il catalogo eventi",
   demoGioco.includes("window.__ADF_EVENT_CATALOG__="));
+test("landing e gioco incorporano la musica menu nella demo",
+  demo.includes("window.__ADF_MENU_MUSIC_SRC__=") && demoGioco.includes("window.__ADF_MENU_MUSIC_SRC__="));
 const senzaInline = t => t
   .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "")
   .replace(/<script\b(?![^>]*\bsrc=)[^>]*>[\s\S]*?<\/script>/gi, "");
@@ -127,7 +130,9 @@ test("nelle demo i collegamenti fra le pagine sono stati riscritti",
   !/pagine\/(landing|accesso|gioco)\.html/.test(demoGioco) &&
   demo.includes("anni-di-fame-gioco.html"));
 test("nelle demo non è rimasto il <base> di pagine/",
-  !demo.includes('<base href="../">') && !demoGioco.includes('<base href="../">'));
+  [demo,demoGioco].every(t =>
+    !/<base\b[^>]*href=["']\.\.\/["'][^>]*>/i.test(senzaInline(t))
+  ));
 
 console.log("\nRisultato build: "+ok+" ok, "+no+" falliti");
 process.exit(no?1:0);

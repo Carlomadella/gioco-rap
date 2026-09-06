@@ -17,6 +17,20 @@
     frame.style.cssText="display:block;width:100%;height:100%;border:0;background:#050609";
     overlay.appendChild(frame);
     document.body.appendChild(overlay);
+    /* ADF_AUDIO_CREATOR_BRIDGE_V1: il primo gesto dentro l'iframe può
+       sbloccare/riprendere la musica del documento padre anche su Safari. */
+    frame.addEventListener("load", () => {
+      try{
+        const doc = frame.contentDocument;
+        if(!doc || doc.__adfAudioGestureBridge) return;
+        doc.__adfAudioGestureBridge = true;
+        const wake = () => {
+          try{ if(window.ADF_AUDIO && ADF_AUDIO.music) ADF_AUDIO.music.ensureMenu(); }catch(e){}
+        };
+        doc.addEventListener("pointerdown", wake, {capture:true});
+        doc.addEventListener("keydown", wake, {capture:true});
+      }catch(e){}
+    });
   }
 
   function payloadIniziale(){
@@ -93,6 +107,14 @@
     if(m.type==="adf-rpg-v24-complete"){
       if(!salvaRisultato(m.detail||{})) return;
       close();
+      /* gioco-ingresso.js è il proprietario della transizione pregame → gameplay.
+         Prima questo bridge lo saltava e chiamava GAME.enter direttamente. */
+      if(typeof window.__ADF_DOPO_CREAZIONE === "function"){
+        const dopo = window.__ADF_DOPO_CREAZIONE;
+        window.__ADF_DOPO_CREAZIONE = null;
+        dopo();
+        return;
+      }
       goto("hub");
       if(window.GAME) window.GAME.enter();
     }

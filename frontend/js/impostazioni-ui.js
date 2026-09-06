@@ -53,21 +53,23 @@ let SEZ = "audio";
 function corpoAudio(){
   return '<div class="scard">' +
     riga(L("Audio del gioco","Game audio"),
-         L("Il tasto ♪ in partita fa la stessa cosa.","The ♪ button in game does the same."), sw("audio.on")) +
+         L("Comanda musica, effetti e beat.","Controls music, effects and beats."), sw("audio.on")) +
     riga(L("Volume generale","Master volume"),
          L("Comanda su tutto il resto.","It rules everything else."), slider("audio.master",0,100,5,"%")) +
+    riga(L("Musica","Music"),
+         L("Colonna sonora e musica dei menu.","Soundtrack and menu music."), slider("audio.music",0,100,5,"%")) +
     riga(L("Effetti","Sound effects"),
-         L("Tasti, cassa, folla, fine settimana.","Taps, kicks, crowds, week's end."), slider("audio.sfx",0,100,5,"%")) +
+         L("Tasti, cassa, folla, fine settimana. Nel pre-game restano temporaneamente muti.","Buttons, cash, crowds, week's end. They are temporarily muted before gameplay."), slider("audio.sfx",0,100,5,"%")) +
     riga(L("Beat","Beats"),
-         L("Quanto suonano forte i beat che ascolti.","How loud the beats you audition play."), slider("audio.beat",0,100,5,"%")) +
+         L("Beat ascoltati e futuro studio musicale.","Beat playback and the future music studio."), slider("audio.beat",0,100,5,"%")) +
   '</div>' +
   '<div class="scard">' +
     riga(L("Carattere dei suoni","Sound character"),
-      L("Morbido: click d'aria e legni. Retrò: il vecchio banco a otto bit.",
-        "Soft: airy clicks and wooden tones. Retro: the old 8-bit bench."),
+      L("Sistema legacy conservato: verrà sostituito senza rompere il gameplay.",
+        "Legacy sound bank kept for compatibility; it can be replaced without breaking gameplay."),
       seg("audio.suoni", [["morbido", L("Morbido","Soft")], ["retro", L("Retrò","Retro")]])) +
     riga(L("Click dei pulsanti","Button clicks"),
-      L("Il tocco che senti quando premi qualcosa.","The tick you hear when you press something."),
+      L("Resta configurabile, ma durante menu e creazione personaggio è silenziato dal motore audio.","Still configurable, but muted by the audio engine during menus and character creation."),
       sw("audio.click")) +
     riga(L("Prova i suoni","Try the sounds"), "",
       '<span class="sprove">' +
@@ -76,7 +78,7 @@ function corpoAudio(){
        ["week", L("settimana","week")], ["fanfare", L("traguardo","milestone")]]
         .map(([k,n]) => '<button class="sbtn" data-do="prova:' + k + '">' + n + '</button>').join("") +
       '</span>') +
-  '</div>';
+  '</div>'; /* ADF_AUDIO_UI_V1 */
 }
 
 function corpoLook(){

@@ -17,7 +17,7 @@ const SET_DEF = () => ({
   v: 1,
   lingua: "it",
   slot: 1,
-  audio: {on:true, master:80, sfx:80, beat:85, suoni:"morbido", click:true},
+  audio: {on:true, master:80, music:70, sfx:80, beat:85, ui:80, ambient:70, suoni:"morbido", click:true}, /* ADF_AUDIO_SETTINGS_V1 */
   look:  {tema:"notte", accento:"artista", col:"#FF5A36", grana:55, alone:52,
           scala:100, anim:true, compatto:false},
   gioco: {difficolta:"anni-di-fame", preset:"normale", energia:0, spese:1, fan:1, rivali:1, conferme:true}
@@ -47,8 +47,11 @@ function slotKey(base){ return (SET.slot > 1) ? base + "-s" + SET.slot : base; }
    Un solo interruttore (SET.audio.on) e tre manopole. I volumi tornano come
    moltiplicatori, così chi suona non deve sapere niente delle impostazioni. */
 const volMaster = () => (SET.audio.on ? SET.audio.master / 100 : 0);
+const volMusic  = () => volMaster() * ((SET.audio.music == null ? 70 : SET.audio.music) / 100);
 const volSfx    = () => volMaster() * (SET.audio.sfx / 100);
+const volUi     = () => volMaster() * ((SET.audio.ui == null ? SET.audio.sfx : SET.audio.ui) / 100);
 const volBeat   = () => volMaster() * (SET.audio.beat / 100);
+const volAmbient= () => volMaster() * ((SET.audio.ambient == null ? 70 : SET.audio.ambient) / 100); /* ADF_AUDIO_LEVELS_V1 */
 
 /* ==================== DIFFICOLTÀ ====================
    Tre manopole vere (spese, crescita dei fan, rivali) più le energie in più.
@@ -94,6 +97,7 @@ function applicaImpostazioni(){
   /* l'audio spento è la stessa cosa del vecchio tasto ♪: chi legge `muted`
      continua a funzionare come prima (fx.js lo dichiara, qui lo si allinea) */
   try{ if(typeof muted !== "undefined") muted = !SET.audio.on; }catch(e){}
+  try{ if(typeof ADF_AUDIO !== "undefined" && ADF_AUDIO.refresh) ADF_AUDIO.refresh(); }catch(e){} /* ADF_AUDIO_REFRESH_V1 */
   try{ if(typeof aggiornaTastoAudio === "function") aggiornaTastoAudio(); }catch(e){}
 }
 applicaImpostazioni();

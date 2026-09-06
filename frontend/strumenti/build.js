@@ -52,6 +52,12 @@ const CATALOGO_EVENTI_V2 = path.join(RADICE, "js", "game", "eventi-master-1000-v
 /* ADF_RPG_V24_BUILD: nella demo monofile il creator iframe deve viaggiare dentro
    allo stesso HTML. Nel build store resta invece sotto media/ ed è copiato normalmente. */
 const CREATOR_RPG_V24_DIR = path.join(RADICE, "media", "creator-rpg-v24");
+/* ADF_MENU_MUSIC_BUILD_V1: nello store resta un MP3; nella demo viene incorporato. */
+const MENU_MUSIC_FILE = path.join(RADICE, "media", "audio", "music", "dream-catcher.mp3");
+function menuMusicDataUrl(){
+  if(!fs.existsSync(MENU_MUSIC_FILE)) throw new Error("Musica menu: manca " + MENU_MUSIC_FILE);
+  return "data:audio/mpeg;base64," + fs.readFileSync(MENU_MUSIC_FILE).toString("base64");
+}
 function mimeFile(f){ return ({".png":"image/png",".jpg":"image/jpeg",".jpeg":"image/jpeg",".webp":"image/webp",".gif":"image/gif",".svg":"image/svg+xml"})[path.extname(f).toLowerCase()] || "application/octet-stream"; }
 function inlineCreatorAssets(html, base){
   return html.replace(/assets\/([A-Za-z0-9._-]+)/g,(m,n)=>{
@@ -216,6 +222,8 @@ const SENZA_TAG_LOCALI = pagina => pagina
 
   /* ---------- la demo: pagine che stanno in piedi da sole ---------- */
   if(UNICO){
+    const menuMusicInline = "<script>window.__ADF_MENU_MUSIC_SRC__=" +
+      JSON.stringify(menuMusicDataUrl()).replace(/<\/script/gi, "<\/script") + ";<\/script>\n";
     const creatorRpgInline = "<script>window.__ADF_RPG_V24_SRC__=" +
       JSON.stringify(creatorRpgV24DataUrl()).replace(/<\/script/gi, "<\/script") + ";<\/script>\n";
     const catalogoInline = catalogoEventiV2
@@ -225,7 +233,9 @@ const SENZA_TAG_LOCALI = pagina => pagina
       : "";
 
     for(const f of fatte){
-      const suo = f.pagina.nome === "gioco" ? creatorRpgInline + catalogoInline : "";
+      const usaMenuMusic = f.js.some(x => x.split("?")[0] === "js/audio/music.js");
+      const suo = (usaMenuMusic ? menuMusicInline : "") +
+        (f.pagina.nome === "gioco" ? creatorRpgInline + catalogoInline : "");
       /* fuori il <base>: qui le pagine stanno accanto a media/, non dentro a pagine/ */
       let pagina = SENZA_TAG_LOCALI(f.html)
         .replace(/\s*<base href="\.\.\/">\n?/, "\n")

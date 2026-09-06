@@ -23,6 +23,18 @@
   const vai = q.get("vai") || "";
   const nuova = q.get("nuova") || "";
 
+  /* ADF_AUDIO_INGRESSO_V1: una sola fonte decide quando finisce il pre-game. */
+  function audioPregame(){
+    if(!window.ADF_AUDIO) return;
+    ADF_AUDIO.setMode("pregame");
+    if(ADF_AUDIO.music) ADF_AUDIO.music.ensureMenu();
+  }
+  function audioGameplay(){
+    if(!window.ADF_AUDIO) return;
+    ADF_AUDIO.setMode("gameplay");
+    if(ADF_AUDIO.music) ADF_AUDIO.music.stopForGameplay(1.4);
+  }
+
   /* Ricaricare la pagina non deve rifare «nuova partita» un'altra volta: dopo
      aver letto la richiesta, l'indirizzo torna pulito. */
   function pulisci(){
@@ -30,6 +42,7 @@
   }
 
   function entraInCitta(){
+    audioGameplay();
     goto("hub");
     if(window.GAME) window.GAME.enter();
     /* Chi era dentro quando ha chiuso, dentro si risveglia. */
@@ -53,6 +66,7 @@
      torna indietro senza averlo creato, lo slot preparato va liberato, se no
      resta occupato da una carriera che non esiste. */
   function creatorePoiCitta(){
+    audioPregame();
     window.__ADF_DOPO_CREAZIONE = entraInCitta;
     const indietro = $("to-menu");
     if(indietro) indietro.addEventListener("click", () => {
@@ -74,7 +88,7 @@
 
   if(nuova === "rapido"){ artistaACaso(); entraInCitta(); return; }
   if(nuova === "creatore"){ creatorePoiCitta(); return; }
-  if(vai === "profilo"){ goto("profile"); return; }
+  if(vai === "profilo"){ audioPregame(); goto("profile"); return; }
   if(vai === "classifiche"){
     entraInCitta();
     if(typeof telVaiApp === "function") setTimeout(() => telVaiApp("classifiche"), 60);
