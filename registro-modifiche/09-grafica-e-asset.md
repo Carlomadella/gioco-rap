@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:e673802 -->
+## 06/09/26, 01:44 â€” task/7-8-9-md-agenda-eventi â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `e673802`
+
+### Cosa Ã¨ entrato
+
+- `fcee5ec` â€” feat: l'agenda con le notifiche, e i file .md in cartelle (punti 7, 8, 9) â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/hub.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:b42c3ca -->
 ## 05/09/26, 23:53 â€” task/26-landing-login-gioco-pagine-separate â†’ main
 

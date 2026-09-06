@@ -6,6 +6,39 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:e673802 -->
+## 06/09/26, 01:44 â€” task/7-8-9-md-agenda-eventi â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `e673802`
+
+### Cosa Ã¨ entrato
+
+- `fcee5ec` â€” feat: l'agenda con le notifiche, e i file .md in cartelle (punti 7, 8, 9) â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Aggiunto:** `documentazione/README.md`
+- **Rinominato:** `comandidelterminale.md` â†’ `documentazione/comandidelterminale.md`
+- **Rinominato:** `problemi_riscontrati.md` â†’ `documentazione/problemi-riscontrati.md`
+- **Rinominato:** `stili interfaccia schermata di gioco.md` â†’ `documentazione/stili-interfaccia.md`
+- **Modificato:** `frontend/README.md`
+- **Aggiunto:** `frontend/concept/interfaccia_telefono.png`
+- **Modificato:** `frontend/css/hub.css`
+- **Aggiunto:** `frontend/js/game/agenda.js`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/state.js`
+- **Modificato:** `frontend/js/game/telefono.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `prompt/README.md`
+- **Aggiunto:** `prompt/foto_da_creare.md`
+- **Rinominato:** `prompt-ambientazioni.md` â†’ `prompt/prompt-ambientazioni.md`
+- **Rinominato:** `prompt-app-telefono.md` â†’ `prompt/prompt-app-telefono.md`
+
+**File interessati in questa categoria:** 16
+
+---
+
 <!-- merge:76cfda1 -->
 ## 04/09/26, 22:48 â€” main â†’ main
 
