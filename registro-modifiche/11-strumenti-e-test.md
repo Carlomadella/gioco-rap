@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:51b2c5e -->
+## 06/09/26, 13:33 â€” task/agenda-blocca-skip â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `51b2c5e`
+
+### Cosa Ã¨ entrato
+
+- `efa2033` â€” feat(agenda): un appuntamento segnato ferma il salto del tempo (punto 1 DA FARE) â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:e823d71 -->
 ## 06/09/26, 09:34 â€” task/pagina-attivita-criminali â†’ main
 

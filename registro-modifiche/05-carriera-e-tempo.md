@@ -6,6 +6,27 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:51b2c5e -->
+## 06/09/26, 13:33 â€” task/agenda-blocca-skip â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `51b2c5e`
+
+### Cosa Ã¨ entrato
+
+- `efa2033` â€” feat(agenda): un appuntamento segnato ferma il salto del tempo (punto 1 DA FARE) â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/agenda.js`
+- **Modificato:** `frontend/js/game/skip.js`
+- **Modificato:** `frontend/js/game/tempo-controlli.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:8860b08 -->
 ## 06/09/26, 12:17 â€” task/8-chat-limite-giornaliero â†’ main
 
