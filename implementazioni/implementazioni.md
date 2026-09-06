@@ -122,13 +122,15 @@ NETWORK 64
 
 9. possono verificarsi eventi settimanali, da segnare in agenda anche quelli e la matina del giorno stesso arriva la notifica
 
+10. implementare il telefono nuovo, si vede nei media la foto
+
 /_ PAGINA DI LANDING: _/
 
-10. migliorare graficamente la schermata opzioni
+11. migliorare graficamente la schermata opzioni
 
-11. creare una schermata per le classifiche che si apre anche dall'app del telefono
+12. creare una schermata per le classifiche che si apre anche dall'app del telefono
 
-12. DA DISCUTERE collegare la pagina di mycol togliere la sezione il tuo artista dalla pagina di landing o , oltre che da nuova partita. e collegarla allo shop?
+13. DA DISCUTERE collegare la pagina di mycol togliere la sezione il tuo artista dalla pagina di landing o , oltre che da nuova partita. e collegarla allo shop?
 
 /_ NUOVE MODALITA' _/
 
