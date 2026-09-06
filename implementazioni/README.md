@@ -113,6 +113,7 @@ per tutti e per tutto.
 | **—** | La Fame Studio dentro al gioco, senza essere invadente | da fare | [grafica-e-asset](09-grafica-e-asset.md) |
 | **—** | Gli asset arrivati da fuori | da fare | [grafica-e-asset](09-grafica-e-asset.md) |
 | **—** | Transizioni quando una card apre una pagina | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | Una pagina per ogni azione? | risposto, da fare | [pagine-azioni](../documentazione/pagine-azioni/README.md) |
 | **—** | Le scene dei fan, tante e difficili da ripescare | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | La chat del telefono non va più in loop | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Scambiarsi il numero con fonici e beatmaker | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |

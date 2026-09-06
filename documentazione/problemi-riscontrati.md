@@ -52,3 +52,34 @@ e `css/telefono.css`). Nessun danno — le due righe erano identiche — ma è
 esattamente la forma del guaio che qui è già costato caro una volta: due classi
 con lo stesso nome in due fogli diversi si rompono in silenzio. Tolta da
 `game.css`, dove il resto della vestizione dello slot non c'è.
+
+---
+
+DA RIVEDERE
+
+`strada-crimine` non è l'id di niente: due guardie saltano la pagina delle
+Attività criminali
+
+**TROVATO (06/09/2026), non ancora sistemato.** Venuto fuori mentre si contavano
+i posti in cui va iscritta una schermata nuova (il conto sta in
+[`pagine-azioni/README.md`](pagine-azioni/README.md)). Due elenchi scritti a mano
+nominano l'elemento **`strada-crimine`**:
+
+- `frontend/js/game/eventi-v2.js:195` — cosa chiudere prima di far uscire un evento
+- `frontend/js/game/trasferte.js:705` — cosa impedisce di partire per un'altra città
+
+**Quell'id non esiste in nessun file**: l'elemento vero è `id="strada"`
+(`frontend/pagine/gioco.html:430`). `getElementById("strada-crimine")` risponde
+`null`, quindi tutt'e due le guardie **saltano la pagina delle Attività criminali**
+da sempre. Cosa vuol dire giocando: con la Strada aperta un evento può uscirti
+sopra, e una trasferta può partire.
+
+Non è grave e non blocca niente — per questo è segnato invece che sistemato di
+corsa: cambiare quelle due righe cambia il comportamento del gioco (un evento che
+prima usciva adesso aspetta), ed è una cosa da decidere, non da far scivolare
+dentro insieme a un documento.
+
+È il **terzo** guaio della stessa famiglia: la stessa lista di schermate scritta a
+mano in posti diversi, e una copia che resta indietro. Gli altri due erano la ✕
+dello Studio (punto 15) e `renderNegozio` qui sopra. La cura, invece delle pezze,
+è il registro unico proposto in [`pagine-azioni/README.md`](pagine-azioni/README.md).

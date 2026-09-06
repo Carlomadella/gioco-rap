@@ -9,6 +9,7 @@ in radice fino al punto 7.
 | [`comandidelterminale.md`](comandidelterminale.md) | tutti i comandi: git, il frontend, il backend, e i guai comuni |
 | [`stili-interfaccia.md`](stili-interfaccia.md) | i riferimenti visivi di fuori (i link ai mock e ai concept) |
 | [`problemi-riscontrati.md`](problemi-riscontrati.md) | i problemi trovati leggendo il codice, e come sono stati chiusi |
+| [`pagine-azioni/`](pagine-azioni/README.md) | una pagina per ogni azione? l'analisi, i pro e i contro, e il progetto pagina per pagina |
 
 Il resto sta dove è nato e ci resta, perché è lì che lo si cerca:
 [`../README.md`](../README.md) (la mappa del progetto), [`../ROADMAP.md`](../ROADMAP.md)

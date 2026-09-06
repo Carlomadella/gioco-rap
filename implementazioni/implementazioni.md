@@ -67,7 +67,7 @@ CARLO:
 
 /_ DA FARE _/
 
-2. voglio creare una pagina per praticamente ogni azione, con interfaccia e bottoni cliccabili a schermo (anche trasparenti ma non per forza), secondo te ha senso questa cosa? crea un README che analizzi e progetti tutto ciò, segna anche i pro e i contro e come vorresti sviluppare ogni pagina.
+1. gli eventi segnati in agenda bloccano lo skip
 
 3. implementare il telefono nuovo, si vede nei media la foto
 
@@ -138,7 +138,7 @@ NETWORK 64
 
 2. creare una schermata per le classifiche che si apre anche dall'app del telefono
 
-3. DA DISCUTERE collegare la pagina di mycol togliere la sezione il tuo artista dalla pagina di landing o , oltre che da nuova partita. e collegarla allo shop?
+3. DA DISCUTERE collegare la pagina di mycol togliere la sezione il tuo artista dalla pagina di landing o , oltre che da nuova partita. e collegarla allo shop, se shoppi qualcosa ti va nell'inventario
 
 /_ NUOVE MODALITA' _/
 
@@ -160,6 +160,36 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
 
 /_ FATTE _/
 
+2. voglio creare una pagina per praticamente ogni azione, con interfaccia e bottoni cliccabili a schermo (anche trasparenti ma non per forza), secondo te ha senso questa cosa? crea un README che analizzi e progetti tutto ciò, segna anche i pro e i contro e come vorresti sviluppare ogni pagina.
+
+   **FATTO (06/09/2026)** — il README è
+   [`documentazione/pagine-azioni/README.md`](../documentazione/pagine-azioni/README.md):
+   l'analisi, i pro, i contro coi numeri veri, il progetto pagina per pagina e
+   l'ordine in cui le farei. **La risposta breve è sì all'idea, no al «per ogni
+   azione»:** una pagina non si dà a un'azione, si dà a un posto, e dentro al posto
+   si gioca una decisione. Le mosse che una decisione non ce l'hanno — il turno, la
+   palestra, staccare la spina — con una pagina diventano più lente, non più belle,
+   e se tutto pesa uguale il concerto smette di sembrare un evento.
+
+   Contate le mosse: sono **tredici**, e le uniche due che hanno già una pagina —
+   il foglio e la piazza — sono le uniche due che hanno una scelta dentro. Non è un
+   caso. Applicando lo stesso metro alle altre vengono fuori **cinque pagine, non
+   tredici**, e tre delle cinque sono **stanze dello Studio che esistono già e sono
+   mezze vuote**: al banco e in «Fuori» il pezzo lo sceglie il codice
+   (`sort()[0]`), non tu. Le due davvero nuove sono la scena del produttore (i beat
+   si ascoltano già, `beatplay.js`) e il Live Club. La promo non merita una pagina:
+   merita un'app del telefono.
+
+   **Ma prima va fatta una cosa che non si vede.** Oggi una schermata nuova va
+   iscritta a mano in **sette elenchi in sette file** (uscita, orologio, eventi,
+   trasferte, menu di sistema): chi ne dimentica uno rompe qualcosa in silenzio, ed
+   **è già successo tre volte** — la ✕ dello Studio (punto 15), `renderNegozio` che
+   non esisteva, e una terza trovata scrivendo il README, ancora aperta
+   (`strada-crimine` non è l'id di niente: sta in
+   [`documentazione/problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md)).
+   Un registro unico costa un paio di giorni, non cambia niente di quello che si
+   vede e dimezza il costo di ogni pagina fatta da lì in poi.
+
 1. PRIMA DI TUTTO, risolvere problema con pagina di attività criminali.
 
    **FATTO (06/09/2026)** — la pagina **tagliava i pezzi**, e a qualsiasi misura: a
@@ -178,7 +208,7 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
    esteso in
    [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md#21--la-professione-del-criminale).
 
-4. dividi tutti i file .md sparsi in cartelle con nomi coerenti, inoltre smista le task fatte da implementazioni.md
+2. dividi tutti i file .md sparsi in cartelle con nomi coerenti, inoltre smista le task fatte da implementazioni.md
 
    **FATTO (06/09/2026)** — in radice restano solo `README.md` e `ROADMAP.md`, che sono le
    due porte d'ingresso. Gli altri sono andati in due cartelle nuove, ognuna col suo README:
@@ -193,7 +223,7 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
    fatte è la seconda metà del punto, ed era già stato fatto: i punti chiusi stanno nel file
    del loro argomento e l'indice è [`README.md`](README.md).
 
-5. gli eventi in basso sono cliccabili, e puoi segnarli nell'agenda, quando scatta l'ora o poco prima, arriva una notifica
+3. gli eventi in basso sono cliccabili, e puoi segnarli nell'agenda, quando scatta l'ora o poco prima, arriva una notifica
 
    **FATTO (06/09/2026)** — ogni card degli eventi ha adesso un quadratino in alto a destra:
    toccalo e l'evento finisce in agenda. **Un quarto d'ora prima dell'ora arriva la
@@ -204,7 +234,7 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
    un timer suo: se il tempo non si muove, non succede niente. Per esteso in
    [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#8-e-9--lagenda-gli-appuntamenti-e-le-notifiche).
 
-6. possono verificarsi eventi settimanali, da segnare in agenda anche quelli e la matina del giorno stesso arriva la notifica
+4. possono verificarsi eventi settimanali, da segnare in agenda anche quelli e la matina del giorno stesso arriva la notifica
 
    **FATTO (06/09/2026)** — al posto del riquadro «Più avanti…», che prometteva senza dire
    cosa, adesso c'è **«Questa settimana»** con due eventi veri: giorno, ora e a cosa
