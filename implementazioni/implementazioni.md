@@ -7,23 +7,23 @@ va: un punto, una riga, anche di corsa. Poi si sposta nel file dell'argomento gi
 sotto scritto cosa è stato fatto.
 
 I punti di prima — tutti e sessantasette — stanno nella cartella
-**[`implementazioni/`](implementazioni/README.md)**, divisi per argomento:
+**[`implementazioni/`](README.md)**, divisi per argomento:
 
 |                                                                                | argomento                                       |
 | ------------------------------------------------------------------------------ | ----------------------------------------------- |
-| [`00-come-si-lavora.md`](implementazioni/00-come-si-lavora.md)                 | le regole di lavoro                             |
-| [`01-mappa-e-citta.md`](implementazioni/01-mappa-e-citta.md)                   | la plancia, la mappa, le tre città              |
-| [`02-interfaccia-e-telefono.md`](implementazioni/02-interfaccia-e-telefono.md) | schermate, navigazione, il telefono, il negozio |
-| [`03-artista-e-avatar.md`](implementazioni/03-artista-e-avatar.md)             | la faccia, i vestiti, chi sei                   |
-| [`04-musica-e-suoni.md`](implementazioni/04-musica-e-suoni.md)                 | barre, beat, freestyle, come suona              |
-| [`05-carriera-e-tempo.md`](implementazioni/05-carriera-e-tempo.md)             | energia, giornate, livelli, salvataggi          |
-| [`06-mondo-e-personaggi.md`](implementazioni/06-mondo-e-personaggi.md)         | La Sala, i contatti, gli opps, la strada        |
-| [`07-multiplayer-e-backend.md`](implementazioni/07-multiplayer-e-backend.md)   | la classifica vera, gli account, il cloud       |
-| [`08-uscita-sugli-store.md`](implementazioni/08-uscita-sugli-store.md)         | Steam, App Store, Play Store                    |
-| [`09-grafica-e-asset.md`](implementazioni/09-grafica-e-asset.md)               | ambientazioni, foto, branding                   |
+| [`00-come-si-lavora.md`](00-come-si-lavora.md)                 | le regole di lavoro                             |
+| [`01-mappa-e-citta.md`](01-mappa-e-citta.md)                   | la plancia, la mappa, le tre città              |
+| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | schermate, navigazione, il telefono, il negozio |
+| [`03-artista-e-avatar.md`](03-artista-e-avatar.md)             | la faccia, i vestiti, chi sei                   |
+| [`04-musica-e-suoni.md`](04-musica-e-suoni.md)                 | barre, beat, freestyle, come suona              |
+| [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md)             | energia, giornate, livelli, salvataggi          |
+| [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md)         | La Sala, i contatti, gli opps, la strada        |
+| [`07-multiplayer-e-backend.md`](07-multiplayer-e-backend.md)   | la classifica vera, gli account, il cloud       |
+| [`08-uscita-sugli-store.md`](08-uscita-sugli-store.md)         | Steam, App Store, Play Store                    |
+| [`09-grafica-e-asset.md`](09-grafica-e-asset.md)               | ambientazioni, foto, branding                   |
 
 L'indice con **tutti i punti e il loro stato** sta in
-[`implementazioni/README.md`](implementazioni/README.md).
+[`implementazioni/README.md`](README.md).
 
 ---
 
@@ -61,69 +61,33 @@ Insomma, come le cose che vanno davvero in hype IRL, non se fai un feat con pink
 
 CARLO:
 
-<!-- 3. Nell'app chat sul telefono le conversazioni sono davvero monotone e soprattutto vanno subito in loop. Crea una cosa MOOOOOOOLTO interattiva.
-
-4. Metti l'opzione di potersi scambiare i numeri di telefono con i fonici e i beatmaker, una volta scambiati appare il contatto tra le chat
-
-5. Testa tutte le API routes su postman
-
-6. Prompt per CHATGPT: Guarda la repo di carlomadella nella pagina attività criminali che si apre dopo aver schiacciato sul punto della mappa chiamato attività criminali, mi piace molto il contenuto di gioco ma per niente la grafica e l'interfaccia di gioco. Lo scenario deve sembrare di stare in una parte 'Pericolosa e criminale' , inoltre non voglio che sia un interfaccia a scorrimento cosi lungo, anzi lo preferirei tutto conceentrato nella schermata -->
-
-7. rimuovi la pagina che trovi in foto su media al nome "bozza_schermata_di_gioco" e trasferisci tutte le info sulla mappa, puoi anche cambiarla e aggiungere punti basta che togli le barre nere affianco alla mappa tra le 2 sidebar
-
-   **FATTO (03/09/2026)** — era rimasto a metà: le bande nere le aveva chiuse il punto 62,
-   ma la pagina c'era ancora (`#s-game` e la sua testata, un secondo menù di gioco che
-   ripeteva quello che la plancia della mappa dice già). Adesso è una riga sola, e le due
-   uniche info che stavano solo lì — pezzi fuori e contratto — sono nel profilo della
-   mappa. Per esteso in
-   [`01-mappa-e-citta.md`](implementazioni/01-mappa-e-citta.md#7--via-la-vecchia-schermata-di-gioco-le-info-sulla-mappa).
-
-8. creami un README delle API routes e di tutte le chiamate, ecc.
-
-   **FATTO (02/09/2026)** — branch `task/08-readme-api-routes`, file
-   [`backend/README-API.md`](../backend/README-API.md). Dentro c'è tutta l'API HTTP:
-   avvio, header (`x-sessione`, `x-chiave`, `x-admin`), limiti, CORS, formato degli
-   errori, i modelli che tornano più spesso, l'indice e il dettaglio di tutte e
-   trentaquattro le route con richiesta ed esempio di risposta, il bridge
-   `ONLINE` del frontend con la mappatura chiamata per chiamata, quali chiamate
-   sono davvero collegate all'interfaccia e quali no, i flussi completi (primo
-   ingresso, chiusura settimana, salvataggio cloud con conflitto, chiamata admin),
-   come si prova con Postman, le variabili d'ambiente e gli otto limiti noti.
-
-9. aggiungi al sistema di gioco eventi che possono accadure durante la giornata, e se esistono già aggiungi la possibilità di venir chiamato in altre città d'italia per un concerto o una pubblicità o altro, che creano di conseguenza altri eventi come ad esempio conoscere altre persone tipo producer, fonici o videomaker
-
-   **FATTO (02/09/2026)** — le trasferte fuori città, in `frontend/js/game/trasferte.js`
-   (+ `frontend/css/trasferte.css`). Gli eventi durante la giornata c'erano già
-   (`eventi-tempo.js`, `eventi-v2.js`): questo è il pezzo che mancava, cioè essere
-   chiamati altrove. Il racconto per esteso sta in
-   [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md#le-trasferte-fuori-città).
-   In breve: dodici tipi di chiamata (live, apertura, festival, showcase, comparsata,
-   studio, collaborazione, shooting, pubblicità, evento brand, intervista, radio),
-   diciotto città italiane, l'invito che arriva come notifica e apre una scelta vera
-   (accetti / ci pensi / rifiuti, con viaggio, energia e giorni da pagare), la
-   spedizione in quattro schermate, gli incontri con dodici mestieri diversi che
-   entrano nella rete contatti con città e grado, e le catene: chi hai conosciuto
-   può richiamarti settimane dopo, presentarti qualcun altro o proporti una cosa
-   concreta. Le città toccate accumulano fan e reputazione locale e da lì in poi
-   chiamano di più — è il seme del tour.
-
-10. se vogliamo tenere la hub che in questo momento è chiamata sala, dove incontri le altre persone, sono da aggiungere i videomaker, Secondo me è meglio farla come mappa di gta con tutte le cose divise
-
-    **FATTO (02/09/2026)** — branch `task/10-videomaker-nella-sala`. Il videomaker c'era solo
-    fuori città (le trasferte del punto 9); adesso è a La Sala come gli altri: si affaccia
-    quando hai un pezzo fuori, ha dodici situazioni sue, ti dà il numero e da lì ti scrive in
-    chat. Da amici in su gli puoi far girare **il video di un pezzo**: costa energia e soldi e
-    non è un colpo secco di hype — resta attaccato alla canzone e `songWeekly()` lo legge ogni
-    settimana, così il pezzo continua a girare più a lungo invece di spegnersi. Sulla seconda
-    metà del punto («come una mappa di GTA, con le cose divise») non c'era altro da fare: è
-    quello che ha fatto il punto 7. Per esteso in
-    [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md#10--il-videomaker-entra-a-la-sala).
-
-11. quando clicchi su una card -> transizione (alla scena) -> esempio: video del personaggio che entra in studio oppure mini-video del personaggio che torna a casa a dormire, oppure che va a cena con la tipa ecc.
+> **I numeri saltano, ed è voluto.** Qui restano solo i punti **da fare**: quelli
+> chiusi sono stati spostati nel file del loro argomento, con dentro scritto cosa
+> è stato fatto — è il modo di lavorare di [`00-come-si-lavora.md`](00-come-si-lavora.md),
+> e la seconda metà del punto 33. I numeri non si rifanno: un punto è quel numero
+> lì per sempre, se no i commit e i messaggi vecchi puntano a un'altra cosa.
+>
+> | punto | cosa era | dove sta scritto adesso |
+> | --- | --- | --- |
+> | **3** | la chat del telefono, interattiva e non in loop | [interfaccia-e-telefono](02-interfaccia-e-telefono.md#la-chat-del-telefono-non-va-piu-in-loop) |
+> | **4** | scambiarsi il numero con fonici e beatmaker | [interfaccia-e-telefono](02-interfaccia-e-telefono.md#scambiarsi-il-numero-con-fonici-e-beatmaker) |
+> | **5** | tutte le rotte provate su Postman | [multiplayer-e-backend](07-multiplayer-e-backend.md#tutte-le-rotte-provate-su-postman) |
+> | **6** | la grafica delle attività criminali | [mondo-e-personaggi](06-mondo-e-personaggi.md#21--la-professione-del-criminale) |
+> | **7** | via la vecchia schermata di gioco | [mappa-e-citta](01-mappa-e-citta.md#7--via-la-vecchia-schermata-di-gioco-le-info-sulla-mappa) |
+> | **8** | il README di tutte le rotte dell'API | [multiplayer-e-backend](07-multiplayer-e-backend.md#8--un-readme-di-tutte-le-rotte-dellapi) |
+> | **9** | gli eventi del giorno e le trasferte | [mondo-e-personaggi](06-mondo-e-personaggi.md#le-trasferte-fuori-città) |
+> | **10** | il videomaker a La Sala | [mondo-e-personaggi](06-mondo-e-personaggi.md#10--il-videomaker-entra-a-la-sala) |
+> | **11** | la transizione quando clicchi una card | [interfaccia-e-telefono](02-interfaccia-e-telefono.md#transizioni-quando-una-card-apre-una-pagina) |
+> | **13** | l'albero delle abilità | [carriera-e-tempo](05-carriera-e-tempo.md#13--lalbero-delle-abilità) |
+> | **19** | la sezione Discografia | [musica-e-suoni](04-musica-e-suoni.md#19--la-discografia) |
+> | **20**, **22** | «fatti sentire un beat», e i beat che non si vedevano | [musica-e-suoni](04-musica-e-suoni.md#20-e-22--fatti-sentire-un-beat-non-faceva-niente-e-i-beat-non-si-vedevano) |
+> | **21** | registrazione, accesso, uscita | [multiplayer-e-backend](07-multiplayer-e-backend.md#21--registrazione-accesso-uscita) |
+> | **24** | il tasto per uscire al menu | [interfaccia-e-telefono](02-interfaccia-e-telefono.md#24--un-tasto-per-uscire-al-menu-scritto-a-lettere) |
+> | **25** | «disciplina» cambia nome | [interfaccia-e-telefono](02-interfaccia-e-telefono.md#25--disciplina-diventa-condizione) |
+> | **27** | la landing staccata dall'accesso e dal gioco | [interfaccia-e-telefono](02-interfaccia-e-telefono.md#27--la-landing-è-una-pagina-sua-staccata-dallaccesso-e-dal-gioco) |
+> | **28** | cercare beat non costa energia | [musica-e-suoni](04-musica-e-suoni.md#28--girare-a-cercare-beat-non-costa-più-energia) |
 
 12. aggiungere la reputazione cioè quanto sei affidabile, il massimo è real/real oppure OG, e il minimo tipo figlio di troia quando ti comporti da figlio di troia (detto meglio) O TENERE SOLO LA FAMa
-
-13. aggiungere la sezione delle skill, sbloccabili con i soldi o con un'altra valuta, un esempio: penna d'oro: +1 alla statistica scrittura
 
 14. DA DISCUTERE aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
 
@@ -171,102 +135,12 @@ NETWORK 64
 
 è possibile controllare come stanno andando le canzoni nel tempo da un'app del telefono per sapere se stanno invecchiando bene o male e magari farci delle remastered o parti 2 di una canzone o di un album
 
-19. Aggiungere sezione "Discografia"
-
-    **FATTO (02/09/2026)** — branch `task/19-discografia`. Nuova linguetta **Discografia**
-    nella barra della partita: non è la lista del catalogo (quella è il materiale in cartella),
-    è cosa è **uscito** e come sta andando. In cima i quattro numeri (pezzi fuori, stream in
-    tutto, questa settimana, il più ascoltato); poi una riga per pezzo dal più recente, con
-    copertina, quando è uscito, qualità, la **curva delle ultime settimane** e come sta andando
-    detto a parole — sta risalendo, tiene, sta calando, sta sparendo — con la variazione vera.
-    Per disegnare una curva servivano più di due numeri: `advanceWeek()` adesso accoda gli
-    ascolti settimanali in `s.storia` e tiene gli ultimi sei mesi. Le carriere già in corso
-    partono da zero settimane di storia, e la sezione lo dice invece di inventarsela. Per
-    esteso in [`04-musica-e-suoni.md`](04-musica-e-suoni.md#19--la-discografia).
-
-20. se clicco sull'opzione di conversazione "fatti sentire un beat" non fa niente
-
-    **FATTO (02/09/2026)** — branch `task/20-22-beat-si-vedono`. Erano lo stesso problema: il
-    tasto funzionava (creava il beat, lo metteva nel mercato, scriveva nel diario) ma la
-    conferma a schermo stava a `z-index: 70` mentre La Sala sta a `93`, quindi finiva **dietro
-    al fondale**. Si premeva e sembrava non succedesse niente. Vale per tutte le conferme
-    partite da dentro La Sala, la Strada, la piazza, il foglio: adesso il toast sta a `130`.
-    E il beat non sparisce più in un'altra schermata: resta **sul tavolo** nella scheda del
-    beatmaker, con copertina, qualità, bpm, il ▶ per ascoltarlo, il prezzo per prenderlo e la
-    ✕ per lasciarlo. Finché è lì non te ne fa sentire un altro, così non si riempie il catalogo
-    di beat gratis a furia di cliccare. Per esteso in
-    [`04-musica-e-suoni.md`](04-musica-e-suoni.md#20-e-22--fatti-sentire-un-beat-non-faceva-niente-e-i-beat-non-si-vedevano).
-
-21. fare pagina di registrazione/login/logout
-    fatto
-
-22. non si riescono a vedere i beat
-
-    **FATTO (02/09/2026)** — branch `task/20-22-beat-si-vedono`. Erano lo stesso problema: il
-    tasto funzionava (creava il beat, lo metteva nel mercato, scriveva nel diario) ma la
-    conferma a schermo stava a `z-index: 70` mentre La Sala sta a `93`, quindi finiva **dietro
-    al fondale**. Si premeva e sembrava non succedesse niente. Vale per tutte le conferme
-    partite da dentro La Sala, la Strada, la piazza, il foglio: adesso il toast sta a `130`.
-    E il beat non sparisce più in un'altra schermata: resta **sul tavolo** nella scheda del
-    beatmaker, con copertina, qualità, bpm, il ▶ per ascoltarlo, il prezzo per prenderlo e la
-    ✕ per lasciarlo. Finché è lì non te ne fa sentire un altro, così non si riempie il catalogo
-    di beat gratis a furia di cliccare. Per esteso in
-    [`04-musica-e-suoni.md`](04-musica-e-suoni.md#20-e-22--fatti-sentire-un-beat-non-faceva-niente-e-i-beat-non-si-vedevano).
-
 23. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
     Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il
     secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su
     "stacca la spina", il quinto su "registra un pezzo".
 
-24. nella schermata di gioco deve esserci un bottone che ti porta alla schermata di landing o menù principale, ecc, oltre al logo.
-
-    **FATTO (06/09/2026)** — branch `task/24-25-28-menu-disciplina-beat`. Nella fascia in
-    alto della plancia, accanto al marchio, adesso c'è un tasto con su scritto **Menu**:
-    un clic e sei al menu principale. Prima l'unica via era il marchio, che apre il menu di
-    sistema — e bisognava saperlo. Salva la partita prima di uscire (lo stesso codice di
-    «Salva ed esci», `js/menu-sistema.js`); se in quel momento non si può salvare —
-    un'azione a metà, un avanzamento in corso — apre il menu di sistema con scritto il
-    perché, invece di sparire senza dire niente. Per esteso in
-    [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#24--un-tasto-per-uscire-al-menu-scritto-a-lettere).
-
-
-25. cambia il nome «disciplina»
-
-    **FATTO (06/09/2026)** — adesso si chiama **Condizione**, e dentro il titolo è «La tua
-    condizione». «Disciplina» prometteva una cosa che lì dentro non c'è: non si comanda
-    niente, si legge come stai (benessere, lucidità, energia, palestra), cosa ti tocca ogni
-    settimana (lavoro, spese fisse) e a che punto sei della scalata. Cambiata anche l'icona,
-    dallo scudo al cuore, e il nome dentro al codice (`vistaCondizione`, `HUB_VISTA`), così
-    non resta un nome vecchio a far confondere chi legge. Per esteso in
-    [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#25--disciplina-diventa-condizione).
-
-
 26. togli il parametro «lucidità» e tutto ciò che ne consegue
-
-27. la pagina di landing dev'essere staccata dalla pagina di login e da quella di gioco
-
-    **FATTO (06/09/2026)** — branch `task/26-landing-login-gioco-pagine-separate`. Adesso
-    sono tre file in `frontend/pagine/`: `landing.html`, `accesso.html`, `gioco.html`.
-    `index.html` resta la porta d'ingresso e rimanda alla landing. La landing non carica
-    più il gioco — 15 file invece di 61, 132 KB invece di 895 — e della partita legge solo
-    lo stato salvato, per dire a che punto sei. Ci si passa con `js/pagine.js`
-    (`vaiA("gioco")`), e cosa fare all'ingresso lo dice l'indirizzo (`?nuova=rapido`,
-    `?vai=profilo`…), che legge `js/gioco-ingresso.js`. La pagina di accesso è nuova e usa
-    le rotte account che c'erano già; il suo restyle è il punto 28, ancora aperto. Per
-    esteso in
-    [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#27--la-landing-è-una-pagina-sua-staccata-dallaccesso-e-dal-gioco).
-
-28. l'azione "gira a cercare beat" non dovrebbe costare energia
-
-    **FATTO (06/09/2026)** — costava 25 di energia, adesso **zero**. Non è lavoro: è
-    camminare e ascoltare, e far pagare la stanchezza per andare a *guardare* la roba da
-    comprare voleva dire che a fine giornata non potevi nemmeno farti un giro. Gratis però
-    non vuol dire infinito: sono comunque **due ore** di gioco (`DURATE.beat`) e si fa solo
-    a studio aperto, dalle 13 alle 2 — il freno resta il tempo, che è quello giusto. Nella
-    griglia delle mosse una mossa da zero energia adesso si scrive «gratis» invece di
-    «0 energia». Per esteso in
-    [`04-musica-e-suoni.md`](04-musica-e-suoni.md#28--girare-a-cercare-beat-non-costa-più-energia).
-
 
 PAGINA DI LANDING: 30. migliorare graficamente la schermata opzioni
 

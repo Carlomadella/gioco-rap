@@ -144,32 +144,39 @@ body.in-hub .topnav {
   color: #ffa92b;
   text-shadow: 0 2px 0 #8e4a05;
 }
-/* Punto 24: il tasto per tornare al menu, accanto al marchio. Sta nella
-   fascia, non galleggia sopra alla mappa: è una via d'uscita, non un comando
-   di gioco, e deve stare dove si guarda quando si cerca «come esco». */
+/* Punto 24: il tasto per tornare al menu. Sta in fondo a destra, l'ultima
+   cella della fascia, ed è fatto come le altre: il filetto a sinistra che
+   divide, l'icona da 22 come quelle delle risorse, e l'etichetta con la stessa
+   `.pk` di «CITTÀ ATTUALE» o «SETTIMANA». Non è un bottone colorato che urla:
+   è una voce della barra, che si accende quando ci passi sopra.
+
+   `order` serve perché il widget del tempo (js/game/tempo-controlli.js) si
+   infila dentro alla fascia da solo, a caricamento fatto: senza, finirebbe
+   dopo di lui. Così invece resta l'ultima cosa a destra, sempre. */
 .pmenu {
+  order: 2;
   flex: none;
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 0 14px;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 20px;
   border-left: 1px solid rgba(255, 255, 255, 0.08);
-  color: #9aa3b2;
-  font-family: Figtree, Inter, system-ui, sans-serif;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
+  color: #727a8c;
   transition: background 0.15s, color 0.15s;
 }
-.pmenu:hover {
+.pmenu:hover,
+.pmenu:focus-visible {
   background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+  color: #e8eaf0;
 }
 .pmenu .hicon {
-  width: 15px;
-  height: 15px;
+  width: 22px;
+  height: 22px;
   fill: currentColor;
+}
+.pmenu .pk {
+  color: inherit;
 }
 
 .hcrown {
@@ -1165,9 +1172,10 @@ body.in-hub .topnav {
   }
   /* sullo schermo stretto resta la casetta: la parola la mangia la riga */
   .pmenu {
-    padding: 0 10px;
+    padding: 0 12px;
+    margin-left: auto;
   }
-  .pmenu span {
+  .pmenu .pk {
     display: none;
   }
   .pcitta {

@@ -250,3 +250,37 @@ semplicemente perché capitava nel giorno sbagliato. Adesso ogni incontro/evento
   condizioni rare si conclude come sempre, un solo rapporto, nessuna interruzione di troppo.
 
 ---
+
+---
+
+## 13 · L'albero delle abilità
+
+> **FATTO** — commit `297022f` (la schermata) e `a3e530a` (dentro ci finisce la
+> tua carriera). File: `frontend/js/game/abilita.js`, `frontend/css/abilita.css`,
+> e come strato visivo il disegno del concept
+> (`media/photo/pagina_skill_tree/albero-abilita.png`, 1672×793).
+>
+> La richiesta era «una sezione delle skill, sbloccabili con i soldi o con
+> un'altra valuta — per esempio penna d'oro: +1 alla scrittura». Adesso è una
+> schermata a tutto schermo con **trentadue nodi**, che si apre dalla linguetta
+> **Abilità** della plancia.
+>
+> **Il disegno è il disegno, non una sua imitazione.** Sopra alla foto del
+> concept ci stanno solo le cose che si muovono: i nodi, la colonna di destra e
+> due pezze che coprono i comandi finti dipinti dentro all'immagine. Il foglio
+> di stile sta tutto sotto `#abilita`: il mock era una pagina a sé e si prendeva
+> `*`, `html,body` e un `:root` coi nomi che in `base.css` esistono già — messo
+> com'era avrebbe ridipinto tutto il gioco.
+>
+> **Quello che la seconda passata ha sistemato**, provandolo:
+> - copre tutta la finestra (prima restavano due bande nere sopra e sotto);
+> - la linguetta «Abilità» apre l'albero e basta, senza una vista in mezzo con
+>   dentro un tasto per aprirlo;
+> - il tasto per tornare alla mappa è un tasto vero e scritto, non un rettangolo
+>   invisibile da indovinare;
+> - la colonna di sinistra dice **la tua** partita e non più i numeri finti
+>   dipinti nella foto (un artista di nome ALBERO, livello 50, Los Angeles):
+>   faccia, nome, livello vero con la barra dell'XP, e le quattro abilità come
+>   le conta il gioco, con lo stesso fondoscala dell'hub — se le due schermate
+>   dicessero numeri diversi sarebbe peggio che non dirli;
+> - anche la fase richiesta dai nodi è `G.phase`, quella vera.

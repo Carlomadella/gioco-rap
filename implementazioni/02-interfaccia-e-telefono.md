@@ -1013,9 +1013,10 @@ leggi di quella persona. Riscritta senza.
 > italiano gli errori del server (`non-torna`, `email-gia-usata`,
 > `segreto-troppo-corto`). Se il server non risponde non è colpa di chi scrive:
 > lo dice e basta, e la carriera resta dov'è. Ci si arriva dal tasto **Account**
-> nella barra della landing e dal piede del menu. Il punto 28 — «fatta molto
-> meglio, senza il server a vista» — resta aperto: questa è la pagina, non il
-> suo restyle.
+> nella barra della landing e dal piede del menu. Quello che resta è il vestito:
+> la richiesta diceva anche «fatta molto meglio, senza il server a vista», e
+> questa è la pagina, non il suo restyle. Nell'elenco quel punto adesso non c'è
+> più — se lo si rivuole, va riscritto.
 >
 > **Il build.** `strumenti/build.js` impacchettava una pagina sola; adesso ne fa
 > tre, ognuna coi suoi due file e la sua impronta (`gioco-c44c53ea.js`,

@@ -136,17 +136,6 @@
           <svg class="hcrown" viewBox="0 0 24 14" aria-hidden="true"><path d="M2 13 .8 2.6l5.6 4.2L12 .8l5.6 6 5.6-4.2L22 13z"/></svg>
           <span><b>Anni di</b><i>Fame</i></span>
         </button>
-        <!-- Punto 24: la via d'uscita scritta a lettere. Il marchio qui accanto
-             apre il menu di sistema, ma bisogna saperlo; questo dice quello che
-             fa. Salva la partita e torna alla landing — chi lo esegue è
-             js/menu-sistema.js, lo stesso codice di «Salva ed esci». -->
-        <button class="pmenu" id="hb-menu" data-adf-global="menu"
-                title="Salva la partita e torna al menu principale">
-          <svg class="hicon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 3 3 10v11h6v-6h6v6h6V10z"/>
-          </svg>
-          <span>Menu</span>
-        </button>
         <div class="pcitta">
           <span class="pk">Città attuale</span>
           <span class="pcn" id="hb-citta">Città di provincia</span>
@@ -158,6 +147,20 @@
           <span class="pcn2" id="hb-anno">Anno 1</span>
         </div>
         <div class="pora"><svg class="hicon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.7 14.6A8.6 8.6 0 0 1 9.4 3.3a8.6 8.6 0 1 0 11.3 11.3z"/></svg><span id="hb-ora">21:30</span></div>
+        <!-- Punto 24: la via d'uscita scritta a lettere, in fondo a destra. Il
+             marchio dall'altra parte apre il menu di sistema, ma bisogna
+             saperlo; questo dice quello che fa. Salva la partita e torna alla
+             landing — chi lo esegue è js/menu-sistema.js, lo stesso codice di
+             «Salva ed esci». Sta per ultimo anche nella fascia: il widget del
+             tempo si aggiunge qui dentro da solo, e `order` lo tiene comunque
+             all'estrema destra. -->
+        <button class="pmenu" id="hb-menu" data-adf-global="menu"
+                title="Salva la partita e torna al menu principale">
+          <svg class="hicon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3 3 10v11h6v-6h6v6h6V10z"/>
+          </svg>
+          <span class="pk">Menu</span>
+        </button>
       </header>
 
       <!-- ---------- colonna di sinistra: il profilo ---------- -->

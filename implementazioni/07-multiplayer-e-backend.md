@@ -259,3 +259,40 @@ generato, committato così si importa senza far girare niente), `prova.js` (il g
 `npm run prova` resta a 133 controlli, verdi.
 
 ---
+
+---
+
+## 8 · Un README di tutte le rotte dell'API
+
+> **FATTO (02/09/2026)** — branch `task/08-readme-api-routes`, file
+> [`../backend/README-API.md`](../backend/README-API.md).
+>
+> Dentro c'è tutta l'API HTTP: avvio, header (`x-sessione`, `x-chiave`,
+> `x-admin`), limiti, CORS, formato degli errori, i modelli che tornano più
+> spesso, l'indice e il dettaglio di **tutte e trentaquattro le route** con
+> richiesta ed esempio di risposta, il bridge `ONLINE` del frontend con la
+> mappatura chiamata per chiamata, quali chiamate sono davvero collegate
+> all'interfaccia e quali no, i flussi completi (primo ingresso, chiusura
+> settimana, salvataggio cloud con conflitto, chiamata admin), come si prova con
+> Postman, le variabili d'ambiente e gli otto limiti noti.
+
+---
+
+## 21 · Registrazione, accesso, uscita
+
+> **FATTO** — il pezzo del server c'era già da prima: `POST /api/account` apre
+> un account (da ospite o con mail e password), `POST /api/sessione` fa entrare,
+> `DELETE /api/sessione` fa uscire, `GET /api/io` dice chi sei e cosa hai in
+> cloud, `DELETE /api/account` cancella tutto — quella che Apple e Google
+> pretendono. Sono tutte in [`../backend/README-API.md`](../backend/README-API.md).
+>
+> **La pagina** è arrivata dopo, col punto 27 (06/09/2026): `pagine/accesso.html`
+> più `js/accesso.js`, una pagina sua staccata dalla landing e dal gioco. Prima
+> quelle rotte esistevano e non le chiamava nessuno: l'account si prendeva da
+> solo, di nascosto, la prima volta che ti iscrivevi alla classifica. Il
+> racconto sta in
+> [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#27--la-landing-è-una-pagina-sua-staccata-dallaccesso-e-dal-gioco).
+>
+> Quello che resta è il vestito. La richiesta era anche «fatta molto meglio,
+> senza il server a vista»: la pagina di adesso è sobria e onesta, non è il
+> restyle. Nell'elenco quel punto non c'è più — se lo si vuole, va riscritto.

@@ -3,7 +3,7 @@
 Era un file solo (`implementazioni.md`), diventato lungo come un libro. Adesso è
 una cartella: **un file per argomento**, e questo indice per non perdersi.
 
-I punti nuovi si scrivono in [`../implementazioni.md`](../implementazioni.md), che
+I punti nuovi si scrivono in [`implementazioni.md`](implementazioni.md), qui dentro, che
 resta lì come foglio dove buttare le idee: quando un punto è chiuso, si sposta nel
 file del suo argomento con dentro cosa è stato fatto.
 
@@ -11,13 +11,13 @@ file del suo argomento con dentro cosa è stato fatto.
 
 | file | cosa c'è dentro |
 | --- | --- |
-| [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 11 voci |
-| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 27 voci |
+| [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 16 voci |
+| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 33 voci |
 | [`03-artista-e-avatar.md`](03-artista-e-avatar.md) | **L'artista e il suo avatar** — 1 voce |
-| [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 11 voci |
-| [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 10 voci |
-| [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md) | **Il mondo e la gente** — 11 voci |
-| [`07-multiplayer-e-backend.md`](07-multiplayer-e-backend.md) | **Il multiplayer e il server** — 5 voci |
+| [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 14 voci |
+| [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 11 voci |
+| [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md) | **Il mondo e la gente** — 14 voci |
+| [`07-multiplayer-e-backend.md`](07-multiplayer-e-backend.md) | **Il multiplayer e il server** — 7 voci |
 | [`08-uscita-sugli-store.md`](08-uscita-sugli-store.md) | **L'uscita su Steam e sugli store** — 3 voci |
 | [`09-grafica-e-asset.md`](09-grafica-e-asset.md) | **La grafica, le ambientazioni e gli asset** — 7 voci |
 
@@ -26,7 +26,7 @@ per tutti e per tutto.
 
 ## Tutti i punti
 
-89 voci in tutto: **55 chiuse**, 12 a metà, il resto da fare.
+109 voci in tutto: **74 chiuse**, 13 a metà, il resto da fare.
 
 | | punto | stato | dove |
 | --- | --- | --- | --- |
@@ -119,6 +119,27 @@ per tutti e per tutto.
 | **—** | Tutte le rotte provate su Postman | fatto | [multiplayer-e-backend](07-multiplayer-e-backend.md) |
 | **—** | Opp e giornalisti per strada | fatto | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
 | **—** | Via il Campetto dalla mappa | fatto | [mappa-e-citta](01-mappa-e-citta.md) |
+
+| **—** | La plancia riempie lo schermo, come nella foto | fatto | [mappa-e-citta](01-mappa-e-citta.md) |
+| **—** | Il quaderno non esiste più | fatto | [mappa-e-citta](01-mappa-e-citta.md) |
+| **2** | Le card sulla mappa, tutte come lo Studio | fatto | [mappa-e-citta](01-mappa-e-citta.md) |
+| **3** | Via i tastini che muovono la mappa | fatto | [mappa-e-citta](01-mappa-e-citta.md) |
+| **—** | Responsività di tutto il gioco | in parte | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | Controllo del codice: due nomi di classe che si pestavano i piedi | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **4** | Lo Shop diventa uno shop, non un menù | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **24** | Un tasto per uscire al menu, scritto a lettere | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **25** | «Disciplina» diventa «Condizione» | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **27** | La landing è una pagina sua, staccata dall'accesso e dal gioco | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **19** | La discografia | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
+| **20**, **22** | «Fatti sentire un beat» non faceva niente, e i beat non si vedevano | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
+| **28** | Girare a cercare beat non costa più energia | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
+| **13** | L'albero delle abilità | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
+| **6** | Al massimo una conversazione lunga al giorno | fatto | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
+| **9** | Le trasferte fuori città | fatto | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
+| **10** | Il videomaker entra a La Sala | fatto | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
+| **8** | Un README di tutte le rotte dell'API | fatto | [multiplayer-e-backend](07-multiplayer-e-backend.md) |
+| **21** | Registrazione, accesso, uscita | fatto | [multiplayer-e-backend](07-multiplayer-e-backend.md) |
+| **—** | La pulizia dei media, e i sessanta sfondi che sono dieci foto | fatto | [grafica-e-asset](09-grafica-e-asset.md) |
 
 > Lo stato è letto dal testo dei punti: «fatto» vuol dire che c'è scritto cosa è
 > stato fatto e quando, «risposto» che c'è una risposta ragionata ma il codice

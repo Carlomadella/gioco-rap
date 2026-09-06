@@ -19,7 +19,7 @@ Era un file solo, ed era diventato lungo come un libro: mille righe in cui per r
 una cosa bisognava sapere già dov'era. Adesso è una cartella, **un file per argomento**, e
 l'indice sta in [`README.md`](README.md).
 
-**I punti nuovi si scrivono in [`../implementazioni.md`](../implementazioni.md)**, che è
+**I punti nuovi si scrivono in [`implementazioni.md`](implementazioni.md)**, qui dentro, che è
 rimasto lì apposta: è il foglio dove si butta l'idea appena viene, senza pensare a dove va.
 Quando un punto è chiuso — o anche solo quando si capisce di che argomento è — si sposta
 nel file giusto, con dentro scritto **cosa è stato fatto e quando**.
