@@ -6,6 +6,32 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:c9451d0 -->
+## 06/09/26, 11:28 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `c9451d0`
+
+### Cosa Ã¨ entrato
+
+- `15fe477` â€” feat: rifinisce transizioni audio e player persistente â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/audio/engine.js`
+- **Modificato:** `frontend/js/audio/music.js`
+- **Modificato:** `frontend/js/avvio.js`
+- **Modificato:** `frontend/js/creator/rpg-v24-bridge.js`
+- **Modificato:** `frontend/js/pagine.js`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+- **Modificato:** `frontend/pagine/accesso.html`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 9
+
+---
+
 <!-- commit:6f4d15e -->
 ## 03/09/26, 02:57 — fix: unifica La Sala e Beat Maker come luogo logico
 

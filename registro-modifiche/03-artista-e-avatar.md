@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:c9451d0 -->
+## 06/09/26, 11:28 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `c9451d0`
+
+### Cosa Ã¨ entrato
+
+- `15fe477` â€” feat: rifinisce transizioni audio e player persistente â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/creator/rpg-v24-bridge.js`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:b42c3ca -->
 ## 05/09/26, 23:53 â€” task/26-landing-login-gioco-pagine-separate â†’ main
 

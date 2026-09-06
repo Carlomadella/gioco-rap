@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:c9451d0 -->
+## 06/09/26, 11:28 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `c9451d0`
+
+### Cosa Ã¨ entrato
+
+- `15fe477` â€” feat: rifinisce transizioni audio e player persistente â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:66b0f10 -->
 ## 06/09/26, 09:48 â€” task/fix-render-e-agenti â†’ main
 
