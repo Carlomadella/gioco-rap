@@ -527,3 +527,57 @@ const ACTIONS = [
      return "Corsa leggera: benessere +" + b + ", lucidità su." + palestraFlavor(streak);
    }}
 ];
+
+/* ================= «NON HAI ENERGIA» — UNA RISPOSTA SOLA =================
+   Le mosse si lanciano da quattro posti diversi (i cartelli della mappa, le
+   card di «Eventi e attività di oggi», le tile della Settimana, l'agenda del
+   telefono) e fino a ieri ognuno rispondeva a modo suo quando l'energia non
+   bastava: dalla mappa usciva un avviso, altrove il bottone si spegneva e
+   basta — ci clicchi sopra e non succede niente, senza che nessuno ti dica
+   perché.
+
+   L'energia però non è un ostacolo come gli altri: gli oggetti che mancano o
+   i soldi che non hai te li devi andare a prendere, l'energia torna da sola
+   dormendo. È l'unico «no» che vale la pena spiegare, ed è per questo che
+   qui si comporta diversamente dagli altri: **solo** quando manca l'energia
+   la mossa resta cliccabile e risponde con l'avviso. Se manca dell'altro
+   (sei in carcere, serve un beat, servono i soldi, è l'ora sbagliata) il
+   bottone resta spento come prima, col motivo già scritto sopra. */
+
+/* Quanta energia vuole una mossa: `dyn()` per quelle che cambiano prezzo. */
+function energiaChiesta(a){
+  if(!a) return 0;
+  return a.dyn ? a.dyn() : a.e;
+}
+
+/* Vero solo se l'UNICA cosa che manca è l'energia. Se manca anche altro il
+   bottone deve restare spento: un avviso che parla di energia mentre il vero
+   problema è che sei in carcere farebbe più danni che altro. */
+function soloSenzaEnergia(id){
+  const a = (typeof ACTIONS !== "undefined") && ACTIONS.find(x => x.id === id);
+  if(!a) return false;
+  if(typeof hubDetenuto === "function" && hubDetenuto()) return false;
+  if(a.avail && !a.avail()) return false;
+  if(a.need && a.need()) return false;
+  const c = a.money ? a.money() : 0;
+  if(c && G.money < c) return false;
+  return G.energy < energiaChiesta(a);
+}
+
+/* L'avviso vero e proprio, uguale ovunque, col fulmine della barra in alto
+   (`HIC.energia`, lo stesso disegno: preso da lì e non ricopiato, così se un
+   giorno cambia il fulmine cambia anche qui). */
+function avvisoSenzaEnergia(id){
+  const a = (typeof ACTIONS !== "undefined") && ACTIONS.find(x => x.id === id);
+  const serve = energiaChiesta(a);
+  const hai = Math.max(0, Math.round(G.energy));
+  const fulmine = (typeof hsvg === "function" && typeof HIC === "object" && HIC.energia)
+    ? hsvg("energia") : "\u26A1";
+  if(typeof SFX === "object" && SFX.fail) SFX.fail();
+  if(typeof toast !== "function") return false;
+  toast("<b>Non hai abbastanza energia.</b> " +
+    (a ? a.n + " chiede " + serve + ", ne hai " + hai + ". " : "") +
+    "L'energia torna dormendo: chiudi la giornata quando non hai più mosse.",
+    "bad", fulmine, ["#FACC15", "#B45309"]);
+  return true;
+}

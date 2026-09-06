@@ -389,3 +389,14 @@
 .spane.on{display:block}
 /* dentro alle linguette la lista non ha piu' bisogno del suo titolo */
 .spane > .list{margin-bottom:0}
+
+/* ---- «spenta»: sembra spenta, ma risponde ----
+   Una mossa a cui manca solo l'energia non si disabilita più: resta cliccabile
+   apposta, per poter dire perché non parte (l'avviso col fulmine, actions.js).
+   A vedersi però deve restare identica a prima — se sembrasse accesa uno la
+   preme aspettandosi che parta. Quindi si copia l'aspetto di `:disabled` e si
+   cambia solo il cursore: non è «vietato», è «adesso no, e ti spiego». */
+.tile.spenta{filter:grayscale(.7) brightness(.62);cursor:help;
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.05), 0 3px 0 #08080C}
+.tile.spenta:hover{transform:none}
+.tile.spenta:active{transform:scale(.985)}

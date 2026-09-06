@@ -1457,3 +1457,18 @@ body.in-hub .topnav {
 #hb-foto.map-light-instant .pmaplayer {
   transition: none !important;
 }
+
+/* Vedi `.tile.spenta` in game.css: manca solo l'energia, quindi la card resta
+   cliccabile per poterlo dire, ma si veste da spenta come faceva :disabled. */
+.pev.spenta {
+  opacity: 0.5;
+  transform: none;
+  cursor: help;
+}
+.pev.spenta:hover {
+  transform: none;
+}
+.pev.spenta .pevgo {
+  background: #2a2e3a;
+  color: #8a90a0;
+}

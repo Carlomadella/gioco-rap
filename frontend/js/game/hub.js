@@ -746,8 +746,12 @@ function renderHub(){
     const st = hubDetenuto()
       ? {ok:false, perche:"Sei in carcere"}
       : ((e.presto || e.posto || e.strada) ? {ok:true, perche:""} : hubPronta(e.id));
+    /* Manca solo l'energia: la card resta cliccabile per poterlo dire
+       (actions.js). Resta spenta a vedersi, ma risponde. */
+    const soloEnergia = !st.ok && soloSenzaEnergia(e.id);
     return '<div class="pevbox" style="--k:' + e.k + '">' +
-      '<button class="pev" data-e="' + e.id + '"' + (st.ok ? '' : ' disabled') + '>' +
+      '<button class="pev' + (soloEnergia ? ' spenta' : '') + '" data-e="' + e.id + '"' +
+        (st.ok || soloEnergia ? '' : ' disabled') + '>' +
         '<span class="pevt">' + hsvg(e.ic) + e.n + '</span>' +
         '<span class="pevd">' + e.d + '</span>' +
         '<span class="pevl">' + e.righe.map(([ic, t]) =>
@@ -830,6 +834,8 @@ $("hb-eventi").addEventListener("click", ev => {
 
   const b = ev.target.closest(".pev"); if(!b || b.disabled) return;
   const e = HUB_EVENTI.find(x => x.id === b.dataset.e); if(!e) return;
+  /* card spenta per la sola energia: risponde e si ferma qui */
+  if(b.classList.contains("spenta")){ avvisoSenzaEnergia(e.id); return; }
   if(hubDetenuto()){
     if(typeof apriCarcere === "function") apriCarcere();
     return;

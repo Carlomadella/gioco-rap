@@ -75,12 +75,17 @@ function avviaAzioneDiretta(id){
   const noMoney = c && G.money < c;
 
   if(miss || noMoney || G.energy < en2){
+    /* Se l'unica cosa che manca è l'energia lo dice l'avviso col fulmine,
+       lo stesso in tutto il gioco (actions.js). Per il resto resta l'avviso
+       di prima: sono cose che si risolvono andandosele a prendere, non
+       dormendo. */
+    if(!miss && !noMoney && avvisoSenzaEnergia(id)) return false;
+
     if(typeof SFX === "object" && SFX.fail) SFX.fail();
 
-    let motivo = "";
-    if(miss) motivo = "Serve " + miss + ".";
-    else if(noMoney) motivo = "Servono " + c + " € in cassa.";
-    else motivo = "Non hai abbastanza energia.";
+    const motivo = miss ? "Serve " + miss + "."
+      : noMoney ? "Servono " + c + " € in cassa."
+      : "Non hai abbastanza energia.";
 
     if(typeof toast === "function")
       toast("<b>Mossa non disponibile.</b> " + motivo, "bad", "!", ["#B91C1C","#7F1D1D"]);
@@ -253,10 +258,15 @@ function renderGioco(){
     const miss = a.need ? a.need() : null;
     const noMoney = c && G.money < c;
     const ok = !miss && !noMoney && G.energy >= en2;
+    /* Manca solo l'energia? La tile resta cliccabile e lo dice (actions.js).
+       Sembra spenta come prima — ci pensa `.spenta` — ma non è un vicolo
+       cieco muto: la premi e ti spiega che devi dormire. */
+    const soloEnergia = !ok && !miss && !noMoney;
     const sc = SC[a.id] || ["#3A3F49","#22262E",""];
     const g = ART[a.id] || ["#3A3F49","#22262E","·"];
     const b = document.createElement("button");
-    b.className = "tile"; b.disabled = !ok;
+    b.className = "tile" + (soloEnergia ? " spenta" : "");
+    b.disabled = !ok && !soloEnergia;
     b.dataset.id = a.id;
     b.style.setProperty("--a", sc[0]); b.style.setProperty("--b", sc[1]);
     const rw = miss ? '<span class="rw need">SERVE ' + miss + '</span>'
@@ -274,6 +284,9 @@ function renderGioco(){
       '<span class="t">' + a.n + '</span>' +
       '<span class="s">' + a.d + '</span>' + rw;
     const esegui = () => {
+      /* La tile «spenta» arriva fin qui apposta: è cliccabile solo per poter
+         rispondere. Nessuna energia scalata, nessuna mossa avviata. */
+      if(b.classList.contains("spenta")){ avvisoSenzaEnergia(a.id); return; }
       /* Le tile disabilitate da orari/spostamenti/clock sono solo UI.
          Prima di toccare energia, soldi o statistiche chiediamo al runtime
          se la mossa è davvero eseguibile in questo preciso momento. */
@@ -315,6 +328,10 @@ function renderGioco(){
     /* «Chiedi conferma» nelle impostazioni: si controlla solo dove fa male
        sbagliare, cioè quando la mossa costa soldi o mezza settimana di energia */
     b.onclick = () => {
+      /* Prima di tutto: se manca solo l'energia la tile è cliccabile apposta,
+         e la risposta è l'avviso col fulmine. Sta qui e non dentro `esegui`
+         perché il `!ok` qui sotto fermerebbe il clic prima di arrivarci. */
+      if(soloEnergia){ avvisoSenzaEnergia(a.id); return; }
       if(!ok) return;
       /* punto 55: con l'energia a 100 quasi ogni mossa costava «due energie
          o più», quindi la conferma usciva sempre — non filtrava più niente.
