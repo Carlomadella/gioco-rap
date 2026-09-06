@@ -244,14 +244,17 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
 
     **FATTO (06/09/2026)** — la home del telefono nella plancia è adesso quella della foto
     `frontend/media/photo/pagina di gioco/schermata_telefono.png`: **sfondo** (il rapper di
-    spalle davanti alla città di notte), **nove icone su quattro colonne**, **dock** in
-    fondo con Messaggi, Contatti, Notizie, Classifiche, e la barra di stato con l'isola
+    spalle davanti alla città di notte, che riempie tutto lo schermo da un bordo all'altro),
+    **otto icone su quattro colonne**, **dock** in fondo con Chat, Contatti, LaFamegram,
+    Inventario — le quattro che si aprono di più — e la barra di stato con l'isola
     dentro allo schermo invece che in una fascia sopra al vetro. Le icone non sono
-    ridisegnate: sono **ritagliate dalla foto** e stanno in `frontend/media/telefono/`. Le
-    palline rosse della foto sono state cancellate una per una, perché quei numeri li deve
-    dire la partita — e infatti li dice. **Tutte e quindici le app aprono**, comprese le due
+    ridisegnate: sono **ritagliate dalla foto** e stanno in `frontend/media/photo/telefono/`.
+    Le palline rosse della foto sono state cancellate una per una, perché quei numeri li deve
+    dire la partita — e infatti li dice. **Tutte e quattordici le app aprono**, comprese le due
     che si registrano a partita avviata (Notifiche, Trasferte): quelle non hanno una foto e
     tengono il loro disegno, dentro a una piastrella copiata dalle altre. I widget che
-    stavano sopra la griglia non ci sono più: nella foto la home è solo icone e sfondo.
+    stavano sopra la griglia non ci sono più: nella foto la home è solo icone e sfondo. E
+    l'app **Messaggi** è sparita: elencava le stesse conversazioni di Chat con meno roba
+    dentro, due icone per la stessa cosa.
     Per esteso in
     [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#68--il-telefono-nuovo-quello-della-foto).

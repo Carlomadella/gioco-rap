@@ -1215,25 +1215,32 @@ leggi di quella persona. Riscritta senza.
    **FATTO (06/09/2026)** — la foto è
    `frontend/media/photo/pagina di gioco/schermata_telefono.png`, e la home del telefono
    nella plancia adesso è quella: **sfondo** col rapper di spalle davanti alla città di
-   notte, **nove icone su quattro colonne**, **dock** in fondo con Messaggi, Contatti,
-   Notizie e Classifiche, barra di stato e isola **dentro** allo schermo invece che in una
+   notte, **otto icone su quattro colonne**, **dock** in fondo con Chat, Contatti,
+   LaFamegram e Inventario, barra di stato e isola **dentro** allo schermo invece che in una
    fascia grigia sopra al vetro.
 
    **Le icone sono la foto, non un disegno che le somiglia.** Ritagliate dal PNG una per una
-   e salvate in `frontend/media/telefono/app-*.png` (118 px quelle della griglia, 110 quelle
-   del dock, misurate sui bordi veri delle piastrelle). Anche lo sfondo esce da lì:
-   `sfondo.png` è il pezzo di foto pulito — sotto all'etichetta «IMPOSTAZIONI» e sopra ai
-   pallini delle pagine — allungato in basso perché dietro al dock non restasse un buco
-   nero, e sfumato in alto perché l'attacco col nero dello schermo non si veda.
+   e salvate in `frontend/media/photo/telefono/app-*.png` (118 px quelle della griglia, 110
+   quelle del dock, misurate sui bordi veri delle piastrelle). Anche lo sfondo esce da lì:
+   `sfondo.png` è il pezzo di foto pulito, sotto all'etichetta «IMPOSTAZIONI» e sopra ai
+   pallini delle pagine.
+
+   **Lo sfondo riempie tutto lo schermo**, da un bordo all'altro. Prima si fermava a metà e
+   sopra restava una fascia nera — che è quello che fa la foto di partenza, ma su un telefono
+   in mano non si vede mai. `cover` la ingrandisce finché copre e taglia ai lati, che è
+   esattamente quello che fa un telefono con uno sfondo più largo del display: il rapper e i
+   grattacieli restano al centro, si perdono le palme di bordo. Sopra ci va un velo scuro che
+   sfuma verso il basso, per tenere leggibili le icone e le loro scritte dove la città è
+   illuminata.
 
    **Le palline rosse invece no.** Nella foto sono cotte dentro all'immagine (5 su CHAT, 2
    su LAFAMEGRAM, 4 su AGENDA, 3 su MESSAGGI, 1 su NOTIZIE) e sono state **cancellate**, coprendo
    il cerchio col riflesso della stessa piastrella, e per il giornale con lo sfondo preso da
-   una piastrella pulita del dock. I numeri li ridisegna la partita: messaggi non letti,
+   una piastrella pulita del dock. I numeri li ridisegna la partita: le chat non lette, gli
    obiettivi cambiati da quando li hai guardati, le notizie della settimana se non le hai
    ancora aperte. Un telefono con un numero finto stampato sopra non è un telefono.
 
-   **Tutte e quindici le app aprono** — nove nella griglia, quattro nel dock, più le due che
+   **Tutte e quattordici le app aprono** — otto nella griglia, quattro nel dock, più le due che
    si registrano a partita avviata: Notifiche (`eventi-v2.js`) e Trasferte (`trasferte.js`).
    Quelle due nella foto non ci sono, quindi non hanno un ritaglio: tengono il loro disegno
    vettoriale, ma dentro a una piastrella copiata dalle altre — nera, appena schiarita in
@@ -1243,9 +1250,22 @@ leggi di quella persona. Riscritta senza.
 
    **Cosa è sparito**: i tre widget che stavano sopra la griglia (il post più in vista, la
    posizione in classifica, l'ultimo messaggio). Nella foto la home è solo icone e sfondo, e
-   quelle tre cose le dicono le app che aprono — LaFamegram, Classifiche, Messaggi — dove
+   quelle tre cose le dicono le app che aprono — LaFamegram, Classifiche, Chat — dove
    sono per esteso invece che in un rettangolo da tre righe. Con loro se ne sono andate
    `telClassifica()` e `telPostTop()`, che non le usava più nessuno.
+
+   **E poi è sparita anche l'app Messaggi.** Elencava le stesse conversazioni di Chat con
+   meno roba dentro: nessun ruolo accanto al nome, nessun modo di scrivere per primo. Due
+   icone per la stessa cosa. Via l'app, via `schermataMessaggi()`, via il ritaglio
+   `app-messaggi.png`; nel telefono stretto (sotto i 1180px) il pulsante «Vedi tutti i
+   messaggi» è diventato «Vedi tutte le chat» e apre Chat. `telMessaggiDiretti()` resta,
+   perché la lista corta in cima al telefono stretto la usa ancora.
+
+   **Il dock ha cambiato inquilini.** Nella foto erano Messaggi, Contatti, Notizie e
+   Classifiche; adesso sono **Chat, Contatti, LaFamegram e Inventario**, cioè le quattro che
+   si aprono di più — Messaggi non c'è più, e Notizie e Classifiche si guardano una volta a
+   settimana, non ogni volta che prendi in mano il telefono. Notizie e Classifiche sono
+   passate in griglia, in testa.
 
    **Le misure non sono a occhio.** Sono quelle della foto (schermo 620 × 1333: piastrella
    112, passo fra le colonne 147, griglia che comincia 114 sotto al bordo, dock largo 572 a
@@ -1257,6 +1277,10 @@ leggi di quella persona. Riscritta senza.
    con uno normale «IMPOSTAZIONI» e «LAFAMEGRAM» non ci stavano sotto alla loro icona e
    finivano tagliate coi puntini.
 
-   Provato in Chrome: le quindici app aprono e tornano alla home, e la casella del telefono
-   tirata a 292 × 470, 297 × 556, 360 × 660 e 430 × 900 non fa mai sovrapporre la griglia al
-   dock né uscire il dock dallo schermo. `npm run prova` 70/70, `npm run build` pulito.
+   Provato in Chrome: le quattordici app aprono e tornano alla home (le dodici della foto
+   dentro allo schermo, Notifiche e Trasferte nella loro finestra sopra al gioco), tutti e
+   tredici i ritagli si caricano — nessuna immagine rotta — e la casella del telefono tirata a
+   292 × 470, 297 × 556, 360 × 660 e 430 × 900 non fa mai sovrapporre la griglia al dock né
+   uscire il dock dallo schermo. Sotto i 1180px, dove il telefono è ancora quello vecchio,
+   «Vedi tutte le chat» apre Chat e la freccia riporta indietro. Nessun errore in console.
+   `npm run prova` 70/70, `npm run build` pulito.

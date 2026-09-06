@@ -122,13 +122,14 @@ function telSegnaVisto(id){
 }
 
 /* ================= LE APP — NUOVO (home dell'iPhone) ================= */
-/* Badge = un numero rosso sull'icona, solo dove ha senso «novità»: messaggi
-   non letti, obiettivi cambiati da quando li hai guardati, le notizie di
+/* Badge = un numero rosso sull'icona, solo dove ha senso «novità»: le chat non
+   lette, gli obiettivi cambiati da quando li hai guardati, le notizie di
    questa settimana se non le hai ancora aperte. Il resto dell'app si vede
    aprendola, non prima — e quello che hai gia' aperto non ha piu' pallina. */
+/* Messaggi non c'è più: elencava le stesse conversazioni di Chat, con meno roba
+   dentro (nessun ruolo accanto al nome, nessun modo di scrivere per primo). Due
+   icone per la stessa cosa. */
 const HUB_APP = [
-  {id:"messaggi", n:"Messaggi", ic:"chat", k:"#7C3AED",
-   badge:() => telMessaggiNonLetti()},
   {id:"contatti", n:"Contatti", ic:"gente", k:"#38BDF8"},
   /* punto 66: mamma e il migliore amico scrivono da subito, il resto arriva con la fama */
   {id:"chat", n:"Chat", ic:"duebolle", k:"#25D366", badge:() => chatNonLetti()},
@@ -145,15 +146,15 @@ const HUB_APP = [
   {id:"impostazioni", n:"Impostazioni", ic:"ingranaggio", k:"#9AA1B2"}
 ];
 /* La home è quella della foto — `media/photo/pagina di gioco/schermata_telefono.png`:
-   nove icone in griglia su quattro colonne, quattro nel dock in fondo. Le icone
-   sono ritagliate da quella foto (`media/telefono/app-*.png`, vedi
+   otto icone in griglia su quattro colonne, quattro nel dock in fondo — Chat,
+   Contatti, LaFamegram e Inventario, cioè le quattro che si aprono di più. Le icone
+   sono ritagliate da quella foto (`media/photo/telefono/app-*.png`, vedi
    `implementazioni/02-interfaccia-e-telefono.md`), le palline rosse invece no:
    quelle le dice la partita, quindi nella foto sono state cancellate e qui si
    ridisegnano coi numeri veri. */
-const TEL_DOCK = ["messaggi", "contatti", "notizie", "classifiche"];
-const TEL_GRIGLIA = ["chat", "lafamegram", "obiettivi", "inventario",
-                     "statistiche", "discografia", "contratti", "agenda",
-                     "impostazioni"];
+const TEL_DOCK = ["chat", "contatti", "lafamegram", "inventario"];
+const TEL_GRIGLIA = ["obiettivi", "notizie", "classifiche", "statistiche",
+                     "discografia", "contratti", "agenda", "impostazioni"];
 /* Chi non ha la sua foto (le app che si aggiungono a partita avviata, come
    Notifiche di eventi-v2) tiene il disegno vettoriale di prima. */
 const TEL_FOTO = new Set(TEL_GRIGLIA.concat(TEL_DOCK));
@@ -352,7 +353,7 @@ function renderTelefonoVecchio(){
         '</button>').join("")
         : '<div class="pmr"><span class="pmtx"><i>Nessun messaggio diretto. Gli eventi automatici sono in Notifiche.</i></span></div>') +
     '</div>' +
-    '<button class="plargo" data-telapp="messaggi">Vedi tutti i messaggi</button>' +
+    '<button class="plargo" data-telapp="chat">Vedi tutte le chat</button>' +
     '<div class="papp">' + HUB_APP_VECCHIO.map(a =>
       '<button class="pap" data-app="' + a.id + '" style="--k:' + a.k + '">' + hsvg(a.ic) +
       '<span><b>' + a.n + '</b>' + (a.sotto ? '<i>' + a.sotto(G) + '</i>' : '') + '</span></button>').join("") +
@@ -377,7 +378,7 @@ function telIconaApp(a, dock){
   if(!a) return "";
   const n = a.badge ? a.badge(G) : 0;
   const disegno = TEL_FOTO.has(a.id)
-    ? '<img src="media/telefono/app-' + a.id + '.png" alt="" draggable="false">'
+    ? '<img src="media/photo/telefono/app-' + a.id + '.png" alt="" draggable="false">'
     : '<span class="tappsvg">' + hsvg(a.ic) + '</span>';
   return '<button class="tapp' + (dock ? ' tappdock' : '') + '" data-app="' + a.id +
     '" style="--k:' + a.k + '">' +
@@ -411,7 +412,6 @@ function schermataWrap(id){
 }
 
 function schermataApp(id){
-  if(id === "messaggi") return schermataMessaggi();
   if(id === "contatti") return schermataContatti();
   if(id === "notizie") return schermataNotizie();
   if(id === "obiettivi") return schermataObiettivi();
@@ -425,18 +425,6 @@ function schermataApp(id){
   if(id === "lafamegram") return schermataLafamegram();
   if(id === "chat") return TEL_CHAT_APERTA ? schermataChatThread() : schermataChat();
   return "";
-}
-
-/* ---- Messaggi: solo messaggi di persone, mai il diario G.log ---- */
-function schermataMessaggi(){
-  const msg = telMessaggiDiretti();
-  if(!msg.length) return '<div class="tempty">Nessun messaggio diretto. Gli eventi automatici li trovi in Notifiche.</div>';
-  return '<div class="tlist">' + msg.map(m =>
-    '<button class="tli" data-chat="' + m.id + '">' +
-    '<span class="tliav">' + hsvg("persona") + '</span>' +
-    '<span class="tlitx"><b>' + m.n + '</b><i style="white-space:normal">' + spoglia(m.t) + '</i></span>' +
-    (m.nonLetti ? '<span class="ttag on">' + m.nonLetti + ' nuovi</span>' : '') +
-    '</button>').join("") + '</div>';
 }
 
 /* ---- Contatti: la rete vera, con grado e ruolo ----

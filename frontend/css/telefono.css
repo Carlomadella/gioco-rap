@@ -39,11 +39,20 @@
 .ptelbatt::after{content:"";position:absolute;right:-3px;top:28%;bottom:28%;width:2px;
   background:rgba(255,255,255,.85);border-radius:0 2px 2px 0}
 
-/* Lo schermo: nero, con la foto dello sfondo appoggiata in basso, alla stessa
-   altezza che ha nella foto (737 px su 620 di larghezza). */
+/* Lo schermo: la foto lo riempie tutto, da un bordo all'altro, come lo sfondo di
+   un telefono vero. Prima si fermava a metà e sopra restava una fascia nera —
+   che è quello che fa la foto di partenza, ma su un telefono in mano non si
+   vede mai. `cover` la ingrandisce finché copre e taglia ai lati, che è
+   esattamente quello che fa un telefono con uno sfondo più largo del display:
+   il rapper e i grattacieli restano al centro, si perdono le palme di bordo.
+   Il velo scuro qui sopra tiene leggibili le icone e le loro scritte dove la
+   città è illuminata. */
 .ptelscr{position:relative;flex:1;min-width:0;height:100%;border-radius:28px;
   container-type:inline-size;
-  background:#000 url("../media/telefono/sfondo.png") center bottom/100% auto no-repeat;
+  background:
+    linear-gradient(180deg,rgba(0,0,0,.5) 0,rgba(0,0,0,.34) 26%,
+      rgba(0,0,0,.14) 44%,rgba(0,0,0,0) 60%),
+    #000 url("../media/photo/telefono/sfondo.png") center center/cover no-repeat;
   overflow:hidden;display:flex;flex-direction:column}
 
 /* ================= VECCHIO (sotto i 1180px) ================= */
