@@ -548,6 +548,40 @@ function vistaCondizione(){
         : "Sei arrivato in cima. Adesso il difficile è restarci.") + '</div></div>';
 }
 
+/* Il quadratino per segnare in agenda, uguale per gli eventi di oggi e per
+   quelli della settimana. Se l'ora è già passata non compare: segnare una cosa
+   finita non avvisa nessuno. */
+function hubTastoAgenda(e, tipo){
+  if(!window.AGENDA) return "";
+  const seg = AGENDA.segnato(e, tipo), passata = AGENDA.passata(e, tipo);
+  if(passata && !seg) return "";
+  const che = seg ? "Toglilo dall'agenda" : "Segnalo in agenda";
+  return '<button class="pevseg' + (seg ? " on" : "") + '" data-seg="' + e.id +
+    '" data-segtipo="' + tipo + '" title="' + che + '" aria-label="' + che + ': ' + e.n +
+    '" aria-pressed="' + (seg ? "true" : "false") + '">' + hsvg("agenda") + '</button>';
+}
+
+/* Gli eventi della settimana (punto 9). Sono in un altro giorno, quindi qui non
+   c'è niente da «fare adesso»: l'unica cosa che ha senso è segnarli, e la
+   mattina di quel giorno l'agenda te lo ricorda. Stanno al posto del vecchio
+   riquadro «Più avanti…», che diceva che sarebbe arrivato qualcosa senza mai
+   dire cosa. */
+function hubSettimana(){
+  if(!window.AGENDA)
+    return '<div class="pevpiu"><b>Più avanti…</b><span>Nuovi eventi arriveranno durante la settimana.</span></div>';
+  const righe = AGENDA.settimanali().map(e => {
+    const seg = AGENDA.segnato(e, "settimana"), passata = AGENDA.passata(e, "settimana");
+    return '<button class="pevsr' + (seg ? " on" : "") + (passata ? " via" : "") +
+      '" data-seg="' + e.id + '" data-segtipo="settimana" style="--k:' + e.k + '"' +
+      (passata && !seg ? " disabled" : "") + '>' +
+      '<span class="pevsi">' + hsvg(e.ic) + '</span>' +
+      '<span class="pevst"><b>' + e.n + '</b><i>' + AGENDA.giornoNome(e.giorno) + ' · ' + e.ora + '</i></span>' +
+      '<span class="pevsg">' + (passata ? "passato" : seg ? "segnato" : "segna") + '</span>' +
+    '</button>';
+  }).join("");
+  return '<div class="pevsett"><b>Questa settimana</b>' + righe + '</div>';
+}
+
 /* ================= IL GRANDE DISEGNO ================= */
 function renderHub(){
   const art = window.ARTIST || {};
@@ -592,22 +626,28 @@ function renderHub(){
     '<span class="pspot-dot"></span><span class="pspot-tag"><i></i><b>' + l.n + '</b></span></button>').join("");
   hubInitQuartieri();
   hubSetQuartiere(HUB_QUARTIERE);
-  /* ---- gli eventi di oggi ---- */
+  /* ---- gli eventi di oggi (punto 8) ----
+     Ogni card fa due cose adesso: ci clicchi sopra e vai, oppure tocchi il
+     quadratino dell'agenda e te la segni — e l'agenda ti avvisa un quarto d'ora
+     prima (js/game/agenda.js). Il tasto per segnare sta FUORI dal bottone della
+     card e non dentro: un bottone dentro a un bottone non è HTML valido e il
+     browser fa quello che gli pare. Per questo la card sta in una scatola. */
   $("hb-eventi").innerHTML = HUB_EVENTI.map(e => {
     const st = hubDetenuto()
       ? {ok:false, perche:"Sei in carcere"}
       : ((e.presto || e.posto || e.strada) ? {ok:true, perche:""} : hubPronta(e.id));
-    return '<button class="pev" data-e="' + e.id + '" style="--k:' + e.k + '"' +
-      (st.ok ? '' : ' disabled') + '>' +
-      '<span class="pevt">' + hsvg(e.ic) + e.n + '</span>' +
-      '<span class="pevd">' + e.d + '</span>' +
-      '<span class="pevl">' + e.righe.map(([ic, t]) =>
-        '<span>' + hsvg(ic) + t + '</span>').join("") + '</span>' +
-      '<span class="pevfoot"><span class="pevora">' + e.ora + '</span>' +
-      '<span class="pevgo">' + (st.ok ? (e.id === "colpo" ? "Accetta" : "Partecipa") : st.perche) +
-      '</span></span></button>';
-  }).join("") +
-    '<div class="pevpiu"><b>Più avanti…</b><span>Nuovi eventi arriveranno durante la settimana.</span></div>';
+    return '<div class="pevbox" style="--k:' + e.k + '">' +
+      '<button class="pev" data-e="' + e.id + '"' + (st.ok ? '' : ' disabled') + '>' +
+        '<span class="pevt">' + hsvg(e.ic) + e.n + '</span>' +
+        '<span class="pevd">' + e.d + '</span>' +
+        '<span class="pevl">' + e.righe.map(([ic, t]) =>
+          '<span>' + hsvg(ic) + t + '</span>').join("") + '</span>' +
+        '<span class="pevfoot"><span class="pevora">' + e.ora + '</span>' +
+        '<span class="pevgo">' + (st.ok ? (e.id === "colpo" ? "Accetta" : "Partecipa") : st.perche) +
+        '</span></span>' +
+      '</button>' + hubTastoAgenda(e, "oggi") +
+    '</div>';
+  }).join("") + hubSettimana();
 
   /* ---- il telefono (js/game/telefono.js: iPhone da PC, vecchia colonna sotto) ---- */
   renderTelefono();
@@ -654,6 +694,30 @@ $("hb-sxtab").addEventListener("click", ev => {
 });
 
 $("hb-eventi").addEventListener("click", ev => {
+  /* prima di tutto il quadratino dell'agenda: sta accanto alla card, non
+     dentro, quindi non si pesta i piedi col clic che manda all'evento */
+  const seg = ev.target.closest("[data-seg]");
+  if(seg && !seg.disabled){
+    const tipo = seg.dataset.segtipo || "oggi";
+    const lista = tipo === "settimana" ? AGENDA.settimanali() : HUB_EVENTI;
+    const e = lista.find(x => x.id === seg.dataset.seg);
+    if(!e) return;
+    hubTap();
+    const r = AGENDA.tocca(e, tipo);
+    if(typeof toast === "function"){
+      if(!r.segnato)
+        toast("<b>Tolto dall'agenda.</b> " + e.n, "", "✕", ["#4B5563", "#1F2937"]);
+      else if(tipo === "settimana")
+        toast("<b>Segnato in agenda.</b> " + e.n + ", " + AGENDA.giornoNome(e.giorno) +
+          " alle " + e.ora + ": ti avviso quella mattina.", "", "🔔", ["#F59E0B", "#B45309"]);
+      else
+        toast("<b>Segnato in agenda.</b> " + e.n + " alle " + e.ora +
+          ": ti avviso un quarto d'ora prima.", "", "🔔", ["#F59E0B", "#B45309"]);
+    }
+    renderHub();
+    return;
+  }
+
   const b = ev.target.closest(".pev"); if(!b || b.disabled) return;
   const e = HUB_EVENTI.find(x => x.id === b.dataset.e); if(!e) return;
   if(hubDetenuto()){

@@ -220,10 +220,11 @@ in parallelo.
      cambio; non ho potuto aprirlo in un browser vero in questa sessione
      (l'estensione Chrome non era connessa) — prima di darlo per buono va
      provato a mano.
-   - **`prompt-app-telefono.md`** (root, come richiesto): 10 prompt per
+   - **`prompt/prompt-app-telefono.md`** (era in radice, come richiesto; spostato
+     col punto 7): 10 prompt per
      ChatGPT, uno per ogni app del telefono, per farsi disegnare il
      concept UI di ciascuna schermata — stessa logica di
-     `prompt-ambientazioni.md` ma per interfacce, non ambientazioni.
+     `prompt/prompt-ambientazioni.md` ma per interfacce, non ambientazioni.
 
 ---
 
@@ -1092,3 +1093,71 @@ leggi di quella persona. Riscritta senza.
 > dire che fra un mese uno legge «disciplina» e cerca una cosa che non esiste.
 > L'app **Statistiche** del telefono, che apre questa scheda, ci arriva come
 > prima.
+
+
+---
+
+## 8 e 9 · L'agenda: gli appuntamenti e le notifiche
+
+> **FATTO (06/09/2026)** — branch `task/7-8-9-md-agenda-eventi`. File nuovo:
+> `frontend/js/game/agenda.js`.
+>
+> **Il problema.** In fondo alla plancia ci sono gli eventi della giornata —
+> freestyle alle 21:00, la Sala alle 22:30, il colpo all'01:30 — e si potevano
+> solo fare **adesso**: ci clicchi sopra e parti. Ma un evento alle 21:00 quando
+> sono le 15:00 non è una mossa: è un appuntamento. E un appuntamento o te lo
+> segni o te lo dimentichi, che è precisamente quello che succedeva.
+>
+> **Il quadratino (punto 8).** Ogni card ne ha uno in alto a destra. Toccalo e
+> l'evento è in agenda; toccalo di nuovo e lo togli. Sta **accanto** alla card e
+> non dentro, perché la card è un `<button>` e un bottone dentro a un bottone
+> non è HTML valido — il browser fa quello che gli pare. Per questo la card sta
+> in una scatola (`.pevbox`), con il quadratino appoggiato sopra.
+>
+> **Quando arriva la notifica.**
+> - **Eventi di oggi**: un quarto d'ora prima (`PREAVVISO = 15`). Se il tempo è
+>   saltato oltre — una mossa lunga, un +1 ora dai controlli — la notifica arriva
+>   comunque e cambia parole: «è cominciata: …, erano le 21:00».
+> - **Eventi della settimana**: sono in un altro giorno, e avvisare quindici
+>   minuti prima non servirebbe a niente. Arriva **la mattina del giorno
+>   stesso**, al primo avanzamento di tempo del giorno nuovo.
+>
+> **Dove arriva.** Un toast a schermo sul momento, e in ogni caso una riga nel
+> **centro notifiche del telefono** — quello di Eventi V2, l'unico che c'è: non
+> se ne apre un secondo. Così se stavi guardando altro la trovi lì, col pallino
+> rosso sull'icona.
+>
+> **Cosa non fa, e perché.** Non ti porta all'evento e non lo fa partire da solo.
+> Il tempo di questo gioco lo muove il giocatore: un'agenda che ti teletrasporta
+> alle 21:00 sarebbe il gioco che gioca al posto tuo. Ti avvisa, poi decidi tu.
+>
+> **«Questa settimana» (punto 9).** Al posto del riquadro «Più avanti…» — che
+> diceva che sarebbe arrivato qualcosa senza mai dire cosa — ci sono due eventi
+> veri, con giorno e ora: la battle di quartiere il venerdì, l'open mic il
+> sabato, la sessione lunga alla Sala, la giornata di lanci, il giro grosso, le
+> porte aperte in palestra. Sei in tutto, due per settimana.
+>
+> Sono **sempre quelle due** per quella settimana lì: il seme è il numero della
+> settimana, non `Math.random()`. Serve perché la plancia si ridisegna venti
+> volte al minuto, e col caso gli eventi cambierebbero sotto gli occhi mentre li
+> leggi. Fra i sei si preferiscono quelli che devono ancora arrivare — due
+> eventi già passati sono una riga di storia, e la storia non serve: serve
+> sapere cosa c'è da qui a domenica.
+>
+> **L'app Agenda del telefono** apre adesso con **«Segnati»**: gli appuntamenti
+> presi, in ordine, con quando arriva l'avviso e un «togli» per disdire. Sotto
+> resta quello che c'era — stasera e le tue mosse.
+>
+> **Nel salvataggio** c'è `G.agenda`, e le voci vecchie si buttano da sole: un
+> appuntamento di due settimane fa non è storia, è sporcizia.
+>
+> **Provato in Chrome, sul gioco vero.** Segnato il freestyle delle 21:00 con
+> l'orologio alle 18:00, avanzato il tempo fino alle 20:50: toast a schermo, il
+> pallino delle Notifiche da 1 a 2, e dentro «Fra poco: Freestyle al bar
+> centrale — Alle 21:00, segnato in agenda». Poi un evento della settimana
+> segnato di lunedì per il martedì: al cambio di giorno è arrivata «Oggi:
+> Giornata di lanci — Alle 18:00, te l'eri segnato». L'app Agenda mostra il
+> segnato in cima, la plancia lo dice «SEGNATO» in arancione, e il «togli»
+> funziona da tutte e due le parti.
+>
+> Nove controlli nuovi in `strumenti/audit-regressioni.js`.

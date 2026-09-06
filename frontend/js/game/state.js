@@ -36,7 +36,10 @@ const START = () => ({
   telVisto:{notizie:0, obiettivi:[]},
   /* Da smistare, punto 2: le ultime combinazioni viste degli incontri coi fan,
      per non ripescare la stessa scena a breve (strada.js) */
-  strFanHist:{bello:[], male:[]}
+  strFanHist:{bello:[], male:[]},
+  /* punti 8 e 9: gli appuntamenti che ti sei segnato dalla plancia, e l'ultimo
+     giorno in cui l'agenda ha guardato (js/game/agenda.js) */
+  agenda:{voci:[], ultimoGiorno:0}
 });
 /* Livello ed esperienza: fan, skill e pezzi usciti in un numero solo.
    Lo leggono la testata della partita e la testata dell'hub, quindi sta qui

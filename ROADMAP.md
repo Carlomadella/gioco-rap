@@ -391,7 +391,7 @@ quando dalla provincia cominci a muoverti verso Milano.
 Grafica e feel da eguagliare: Rap Star Idle Clicker, Score Hero, Brawl Stars, Fortnite, Rematch.
 Avatar espressivo nel mood di Inazuma Eleven. Gameplay di riferimento: Il Nuovo Goat (ilnuovogoat.it).
 Per l'hub: la struttura da gestionale/RPG a tre colonne, non la mappa a tutto schermo.
-Per lo stile della schermata di gioco: `stili interfaccia schermata di gioco.md`.
+Per lo stile della schermata di gioco: `documentazione/stili-interfaccia.md`.
 Come sono divise le cartelle e perché il frontend resta senza framework: `frontend/README.md`.
 
 ## Team

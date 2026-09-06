@@ -578,7 +578,34 @@ function schermataContrattiTel(){
   return '<div class="telslot" data-slot="contratti"></div>';
 }
 
-/* ---- Agenda: gli eventi di stasera più le mosse disponibili ---- */
+/* ---- Agenda: quello che ti sei segnato, gli eventi di stasera, le mosse ----
+   La parte in cima (punti 8 e 9) è il quaderno vero: gli appuntamenti presi
+   dalla plancia, in ordine, con scritto quando arriva l'avviso. Toccandoli si
+   tolgono — è l'unica cosa che ha senso fare qui dentro a un appuntamento che
+   non è ancora ora. */
+function segnatiInAgenda(){
+  if(!window.AGENDA) return "";
+  const voci = AGENDA.voci();
+  if(!voci.length)
+    return '<div class="tnote"><b>Agenda</b></div>' +
+      '<div class="tempty">Non hai segnato niente. Gli eventi della plancia hanno ' +
+      'un quadratino: toccalo e finiscono qui.</div>';
+  const righe = voci.map(v => {
+    const oggi = v.giorno === (G.day || 1);
+    const quando = v.tipo === "settimana" && !oggi
+      ? AGENDA.giornoNome(v.giorno) + " · " + v.ora
+      : oggi ? "oggi · " + v.ora : "giorno " + v.giorno + " · " + v.ora;
+    const avviso = v.avvisato ? "avvisato"
+      : v.tipo === "settimana" ? "avviso la mattina"
+      : "avviso " + AGENDA.PREAVVISO + " min prima";
+    return '<button class="tli" data-agendavia="' + v.k + '">' +
+      '<span class="tliav" style="--k:' + (v.kolore || "#F59E0B") + '">' + hsvg(v.ic || "agenda") + '</span>' +
+      '<span class="tlitx"><b>' + v.n + '</b><i>' + quando + ' · ' + avviso + '</i></span>' +
+      '<span class="tliv">togli</span></button>';
+  }).join("");
+  return '<div class="tnote"><b>Segnati</b></div><div class="tlist">' + righe + '</div>';
+}
+
 function schermataAgenda(){
   const oggi = HUB_EVENTI.map(e => {
     const st = telAgendaEvento(e);
@@ -593,7 +620,8 @@ function schermataAgenda(){
       '<span class="tlitx"><b>' + a.n + '</b><i>' + (pronto.ok ? a.d : pronto.perche) + '</i></span>' +
       '<span class="tliv">' + a.e + '⚡</span></button>';
   }).join("");
-  return '<div class="tnote"><b>Stasera</b></div><div class="tlist">' + oggi + '</div>' +
+  return segnatiInAgenda() +
+    '<div class="tnote" style="margin-top:12px"><b>Stasera</b></div><div class="tlist">' + oggi + '</div>' +
     '<div class="tnote" style="margin-top:12px"><b>Le tue mosse</b></div><div class="tlist">' + mosse + '</div>';
 }
 
@@ -691,6 +719,20 @@ $("hb-tel").addEventListener("click", ev => {
   if(chatOpt){ hubTap(); chatRispondi(TEL_CHAT_APERTA, +chatOpt.dataset.chatopt); return; }
   const chatTu = ev.target.closest("[data-chattu]");
   if(chatTu){ hubTap(); chatIniziaTu(TEL_CHAT_APERTA, +chatTu.dataset.chattu); return; }
+  /* punti 8 e 9: togliere un appuntamento dall'agenda */
+  const via = ev.target.closest("[data-agendavia]");
+  if(via && window.AGENDA){
+    const v = AGENDA.voci().find(x => x.k === via.dataset.agendavia);
+    if(v){
+      hubTap();
+      AGENDA.togli({id:v.id}, v.tipo);
+      if(typeof toast === "function")
+        toast("<b>Tolto dall'agenda.</b> " + v.n, "", "✕", ["#4B5563", "#1F2937"]);
+      renderTelefono();
+      if(typeof renderHub === "function") renderHub();
+    }
+    return;
+  }
   const evb = ev.target.closest("[data-evento]");
   if(evb && !evb.disabled){
     const e = HUB_EVENTI.find(x => x.id === evb.dataset.evento); if(!e) return;

@@ -71,7 +71,7 @@ macchina, l'indicizzazione degli array è il primo sospettato.
 
 51. Scrivimi un prompt per ogni card di gioco, e che fine hanno fatto i prompt del punto 38 del file implementazioni.md? TROVIAMOLI E RIPORTAMELI. RISCRIVIMELI .
 
-   **Non erano persi — solo la nota che lo diceva.** `prompt-ambientazioni.md`
+   **Non erano persi — solo la nota che lo diceva.** `prompt/prompt-ambientazioni.md`
    è sempre stato in radice del repo, intatto: quello che è sparito è la
    riga sotto al punto 38 di questo file che lo diceva, ripulita insieme a
    tutte le altre note FATTO. Controllato adesso (01/09/2026): **16

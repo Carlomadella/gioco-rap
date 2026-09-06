@@ -54,7 +54,7 @@ messaggi dei commit, e nessuno se lo ricordava più. Adesso hanno una riga che l
 | [`../frontend/README.md`](../frontend/README.md) | il gioco: struttura, build, i lavori per gli store |
 | [`../backend/README.md`](../backend/README.md) | il server: rotte, manopole, quanto regge |
 | `../backend.md` | il quaderno di bordo del server (fuori da git) |
-| [`../stili interfaccia schermata di gioco.md`](../stili%20interfaccia%20schermata%20di%20gioco.md) | il riferimento visivo |
+| [`../documentazione/stili-interfaccia.md`](../documentazione/stili-interfaccia.md) | il riferimento visivo |
 
 ---
 
@@ -62,7 +62,8 @@ messaggi dei commit, e nessuno se lo ricordava più. Adesso hanno una riga che l
 
 49. Creami il file comandidelterminale.md in cui scrivi tutti i comandi da lanciare nel terminale per essere sempre aggiornati a vicenda con carletto e per fare partire il frontend e backend
 
-   **FATTO (01/09/2026).** `comandidelterminale.md` in radice: git
+   **FATTO (01/09/2026).** `documentazione/comandidelterminale.md` (stava in radice
+   fino al punto 7): git
    (status/pull/push e cosa fare se il push viene rifiutato), i quattro
    comandi del frontend (dev/build/demo/prova), i cinque del backend
    (start/prova/postman/copia/travaso), come farli girare insieme in due terminali,
@@ -80,3 +81,35 @@ messaggi dei commit, e nessuno se lo ricordava più. Adesso hanno una riga che l
     a ogni giro, cosa già in corso.
 
 ---
+
+
+---
+
+## 7 · I file .md in cartelle con nomi coerenti
+
+> **FATTO (06/09/2026)** — branch `task/7-8-9-md-agenda-eventi`.
+>
+> In radice c'erano nove `.md` uno accanto all'altro: la roadmap, i comandi del
+> terminale, due file di prompt, i riferimenti visivi, i problemi trovati, gli
+> appunti locali. Adesso in radice restano **due**, che sono le porte d'ingresso:
+> `README.md` e `ROADMAP.md`. Gli altri stanno in due cartelle nuove, ognuna col
+> suo README che dice cosa c'è dentro:
+>
+> | cartella | cosa ci sta |
+> | --- | --- |
+> | [`../documentazione/`](../documentazione/README.md) | `comandidelterminale.md`, `stili-interfaccia.md`, `problemi-riscontrati.md` |
+> | [`../prompt/`](../prompt/README.md) | `prompt-ambientazioni.md`, `prompt-app-telefono.md`, `foto_da_creare.md` |
+>
+> **Un nome cambiato**: `stili interfaccia schermata di gioco.md` aveva gli spazi
+> dentro, e ogni collegamento diventava `stili%20interfaccia%20schermata%20di%20gioco.md`.
+> Adesso è `documentazione/stili-interfaccia.md`.
+>
+> **Due file restano in radice apposta**: `PROVARE.md` e `backend.md`. Sono
+> appunti locali tenuti fuori da git — uno in `.git/info/exclude`, l'altro in
+> `.gitignore` — e spostarli vorrebbe dire rompere le righe che li escludono.
+>
+> Aggiornati tutti i rimandi (README di radice, ROADMAP, `frontend/README.md`, i
+> file di questa cartella) e rifatta la mappa dei documenti in cima al README di
+> radice, che adesso è una tabella: dove sta cosa, in una riga per cartella. Un
+> controllo in `strumenti/audit-regressioni.js` verifica che in radice non
+> ricompaia un `.md` sciolto e che nessun documento punti più ai vecchi percorsi.
