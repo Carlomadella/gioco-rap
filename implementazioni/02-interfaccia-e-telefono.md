@@ -1161,3 +1161,46 @@ leggi di quella persona. Riscritta senza.
 > funziona da tutte e due le parti.
 >
 > Nove controlli nuovi in `strumenti/audit-regressioni.js`.
+
+> **AGGIUNTO (06/09/2026)** — branch `task/agenda-blocca-skip`: **l'agenda ferma il
+> salto del tempo.**
+>
+> **Il problema.** Segnarsi un appuntamento e poi cancellarlo con un «+7 giorni» era
+> il caso peggiore di tutti: te l'eri segnato apposta, e il gioco te lo portava via
+> senza dire niente. La notifica arrivava pure — dentro a un salto che l'aveva già
+> superata.
+>
+> **Cosa succede adesso.** Un salto di *n* giorni si lascia dietro i giorni da oggi a
+> oggi+*n*−1: sull'ultimo ci atterri, ed è mattina, quindi all'appuntamento ci arrivi
+> ancora in tempo. Quindi:
+> - **appuntamento oggi**: il salto non parte. Un toast lo dice, e dice anche come si
+>   fa a sbloccarlo — il quadratino sulla card lo toglie dall'agenda;
+> - **appuntamento più avanti**: il salto si ferma la sua mattina, qualunque taglia
+>   avessi scelto. All'arrivo parte l'avviso «Oggi: …», che è la stessa notifica del
+>   mattino (segnata `avvisato`, così non arriva doppia);
+> - **ora già passata**: non blocca. Un appuntamento delle 21:00 mancato terrebbe
+>   fermo il tempo fino a mezzanotte, che è una punizione e non una comodità.
+>
+> **Dove sta.** In `agenda.js`, non nel salto: `bloccoSalto(n)` dice qual è il primo
+> appuntamento di mezzo e quanti giorni restano saltabili, e un incarto attorno a
+> `saltaGiorni()` taglia la taglia scelta. `saltaGiorni` è dichiarata in `skip.js` e
+> riscritta da Eventi V2, e `agenda.js` si carica dopo tutti e due: incartandola lì si
+> copre in un colpo il menu «Salta avanti», i tasti +1/+7 del widget del tempo e la
+> ripresa dopo un evento alto, che rientra dalla stessa porta e quindi ricontrolla
+> l'agenda.
+>
+> Il conto dei giorni è quello assoluto (anno × 52 settimane × 7), lo stesso di
+> `absDay()` in Eventi V2: mercoledì prossimo, visto di sabato, ha un numero di giorno
+> più basso di oggi.
+>
+> **Le scritte.** Il menu «Salta avanti» avvisa **prima** che uno scelga, se no scegli
+> «Un mese» e ti ritrovi avanzato di due giorni senza capire perché. Il widget del
+> tempo, che finora diceva sempre «c'è una decisione da prendere», adesso dice quando
+> a fermarlo è stato un appuntamento.
+>
+> **Cosa resta libero apposta**: «Fine giornata». È una mossa sola e deliberata, non
+> un salto, e bloccarla rischierebbe di incastrare la partita.
+>
+> Tre controlli nuovi in `strumenti/audit-regressioni.js`, e sette prove di logica su
+> `bloccoSalto` (nessun impegno, impegno oggi, ora già passata, taglio di 7 a 3,
+> atterraggio esatto, due impegni, impegno fuori portata).

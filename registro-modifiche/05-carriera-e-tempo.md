@@ -6,6 +6,83 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:06bcd36 -->
+## 06/09/26, 14:18 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `06bcd36`
+
+### Cosa Ã¨ entrato
+
+- `9a6d8ed` â€” feat: rende dinamica intro finale carriera â€” **Mycol**
+
+### File di questa categoria
+
+- **Rimosso:** `frontend/media/creator-rpg-v24/assets/creator-03-947905e87828.png`
+- **Aggiunto:** `frontend/media/creator-rpg-v24/assets/creator-03-intro-clean.png`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 3
+
+---
+
+<!-- merge:7858816 -->
+## 06/09/26, 13:38 â€” task/foto-luoghi-e-azioni â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `7858816`
+
+### Cosa Ã¨ entrato
+
+- `35f9227` â€” assets: le undici foto delle azioni e dei luoghi â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/media/photo/studio_promo_su_lafamegram.png`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:51b2c5e -->
+## 06/09/26, 13:33 â€” task/agenda-blocca-skip â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `51b2c5e`
+
+### Cosa Ã¨ entrato
+
+- `efa2033` â€” feat(agenda): un appuntamento segnato ferma il salto del tempo (punto 1 DA FARE) â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/agenda.js`
+- **Modificato:** `frontend/js/game/skip.js`
+- **Modificato:** `frontend/js/game/tempo-controlli.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+
+**File interessati in questa categoria:** 4
+
+---
+
+<!-- merge:8860b08 -->
+## 06/09/26, 12:17 â€” task/8-chat-limite-giornaliero â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.53)  
+**Merge commit:** `8860b08`
+
+### Cosa Ã¨ entrato
+
+- `f72dd92` â€” chat: un contatto al giorno, non un farm infinito (punto 1 ALE / punto 8) â€” **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/chat.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:cdc13d5 -->
 ## 06/09/26, 11:50 â€” task/6-7-hype-e-farming â†’ main
 

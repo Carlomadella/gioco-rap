@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:7858816 -->
+## 06/09/26, 13:38 â€” task/foto-luoghi-e-azioni â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `7858816`
+
+### Cosa Ã¨ entrato
+
+- `35f9227` â€” assets: le undici foto delle azioni e dei luoghi â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/media/photo/studio_creazione_beat.png`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:c9451d0 -->
 ## 06/09/26, 11:28 â€” branch non identificato â†’ main
 

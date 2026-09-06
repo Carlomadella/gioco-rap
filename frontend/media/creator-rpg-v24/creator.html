@@ -6,7 +6,7 @@
 <title>Anni di Fame · Creator RPG V3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700;800&family=Bebas+Neue&family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#06070a;
@@ -975,12 +975,209 @@ body::before{
 #careerIntroF1{background-image:url("assets/creator-00-e2c2866ee5ea.png")}
 #careerIntroF2{background-image:url("assets/creator-01-6778b410cbf1.png")}
 #careerIntroF3{background-image:url("assets/creator-02-e28be96a4a22.png")}
-#careerIntroF4{background-image:url("assets/creator-03-947905e87828.png");inset:-4%}
+#careerIntroF4{background-image:url("assets/creator-03-intro-clean.png");inset:-4%}
 
 #careerIntro.play #careerIntroF1{animation:careerShot1 2.8s cubic-bezier(.22,.61,.36,1) both}
 #careerIntro.play #careerIntroF2{animation:careerShot2 2.8s 2.2s cubic-bezier(.22,.61,.36,1) both}
 #careerIntro.play #careerIntroF3{animation:careerShot3 2.8s 4.4s cubic-bezier(.22,.61,.36,1) both}
-#careerIntro.play #careerIntroF4{animation:careerFinalShot 4.6s 6.6s cubic-bezier(.22,.61,.36,1) both}
+#careerIntro.play #careerIntroF4{animation:careerFinalShot 10s 6.6s cubic-bezier(.22,.61,.36,1) both}
+
+/* ADF_CAREER_INTRO_DYNAMIC_COPY_V1
+   Testi del frame finale separati dall'immagine.
+   Nome, città e profilo arrivano dallo stato reale del creator. */
+#careerIntro .career-intro-copy{
+  position:absolute;
+  inset:0;
+  z-index:32;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:0 6vw;
+  text-align:center;
+  pointer-events:none;
+  transform:translateY(-1.6vh);
+}
+
+#careerIntro .career-intro-copy > *{
+  opacity:0;
+  transform:translate3d(0,14px,0);
+  filter:blur(5px);
+  will-change:opacity,transform,filter;
+}
+
+#careerIntro .career-intro-title{
+  color:#f3eee3;
+  font-family:"Bebas Neue","Barlow Condensed",sans-serif;
+  font-size:clamp(62px,8vw,136px);
+  font-weight:400;
+  line-height:.88;
+  letter-spacing:.025em;
+  text-transform:uppercase;
+  text-shadow:0 4px 28px rgba(0,0,0,.58);
+}
+
+#careerIntro .career-intro-subtitle{
+  margin-top:16px;
+  padding-left:.42em;
+  color:#ead9bd;
+  font-family:"Barlow Condensed",sans-serif;
+  font-size:clamp(13px,1.55vw,25px);
+  font-weight:700;
+  line-height:1.15;
+  letter-spacing:.42em;
+  text-transform:uppercase;
+  text-shadow:0 2px 18px rgba(0,0,0,.62);
+}
+
+#careerIntro .career-intro-rule{
+  width:94px;
+  height:1px;
+  margin-top:25px;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(241,216,167,.92) 28%,
+    rgba(255,255,255,.96) 50%,
+    rgba(241,216,167,.92) 72%,
+    transparent
+  );
+  box-shadow:0 0 12px rgba(211,170,94,.20);
+}
+
+#careerIntro .career-intro-player{
+  margin-top:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px;
+
+  color:#e4cfaa;
+  font-family:"Cormorant Garamond",serif;
+  font-size:clamp(13px,1.25vw,20px);
+  font-weight:600;
+  line-height:1.3;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  text-shadow:0 2px 14px rgba(0,0,0,.66);
+
+  opacity:1;
+  transform:none;
+  filter:none;
+}
+
+#careerIntro .career-intro-player-piece{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+
+  opacity:0;
+  transform:translate3d(0,12px,0);
+  filter:blur(4px);
+
+  will-change:opacity,transform,filter;
+}
+
+#careerIntro .career-intro-player-name{
+  color:#f4ead8;
+  font-weight:800;
+}
+
+#careerIntro .career-intro-sep{
+  color:rgba(211,170,94,.72);
+  font-weight:400;
+}
+
+#careerIntro.play .career-intro-title{
+  animation:careerCopyInSlow 1.8s 7.50s cubic-bezier(.16,.72,.24,1) both;
+}
+
+#careerIntro.play .career-intro-subtitle{
+  animation:careerCopyInSlow 1.7s 9.00s cubic-bezier(.16,.72,.24,1) both;
+}
+
+#careerIntro.play .career-intro-rule{
+  animation:careerCopyInSlow 1.4s 10.35s cubic-bezier(.16,.72,.24,1) both;
+}
+
+/* Nome -> città -> profilo.
+   Restano sulla stessa riga, ma vengono rivelati uno alla volta. */
+#careerIntro.play .career-intro-player-piece:nth-child(1){
+  animation:careerPlayerPieceIn 1.5s 11.15s cubic-bezier(.16,.72,.24,1) both;
+}
+
+#careerIntro.play .career-intro-player-piece:nth-child(2){
+  animation:careerPlayerPieceIn 1.5s 12.55s cubic-bezier(.16,.72,.24,1) both;
+}
+
+#careerIntro.play .career-intro-player-piece:nth-child(3){
+  animation:careerPlayerPieceIn 1.5s 13.95s cubic-bezier(.16,.72,.24,1) both;
+}
+
+@keyframes careerCopyInSlow{
+  0%{
+    opacity:0;
+    transform:translate3d(0,18px,0);
+    filter:blur(7px);
+  }
+  38%{
+    opacity:.28;
+    filter:blur(4px);
+  }
+  72%{
+    opacity:.82;
+    filter:blur(1px);
+  }
+  100%{
+    opacity:1;
+    transform:translate3d(0,0,0);
+    filter:blur(0);
+  }
+}
+
+@keyframes careerPlayerPieceIn{
+  0%{
+    opacity:0;
+    transform:translate3d(0,12px,0);
+    filter:blur(4px);
+  }
+  45%{
+    opacity:.36;
+    filter:blur(2px);
+  }
+  100%{
+    opacity:1;
+    transform:none;
+    filter:blur(0);
+  }
+}
+
+@media (max-width:800px){
+  #careerIntro .career-intro-copy{
+    padding:0 24px;
+    transform:translateY(-1vh);
+  }
+
+  #careerIntro .career-intro-title{
+    font-size:clamp(44px,12vw,78px);
+  }
+
+  #careerIntro .career-intro-subtitle{
+    margin-top:12px;
+    font-size:clamp(9px,2.7vw,15px);
+    letter-spacing:.25em;
+    padding-left:.25em;
+  }
+
+  #careerIntro .career-intro-player{
+    margin-top:16px;
+    font-size:10px;
+    letter-spacing:.11em;
+    gap:6px;
+  }
+}
+
 
 @keyframes careerShot1{
   0%{opacity:0;transform:scale(1.048) translate3d(-.42%,.14%,0);filter:brightness(.90) saturate(1.01)}
@@ -1034,6 +1231,7 @@ body::before{
 @media (prefers-reduced-motion:reduce){
   #careerIntro.play #careerIntroF1,#careerIntro.play #careerIntroF2,#careerIntro.play #careerIntroF3{animation:none;opacity:0}
   #careerIntro.play #careerIntroF4{animation:none;opacity:1;transform:scale(1.03)}
+  #careerIntro.play .career-intro-copy > *,#careerIntro.play .career-intro-player-piece{animation:none!important;opacity:1;transform:none;filter:none}
 }
 
 
@@ -1429,6 +1627,210 @@ body::before{
     font-size:10.5px;
   }
 }
+</style>
+
+<!-- ADF_INTRO_FONT_LINK_V4 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ADF_INTRO_LOOK_FIX_V4_START */
+
+/* TITOLO
+   Condensato + avorio caldo con profondità.
+   Niente bianco piatto. */
+#careerIntro .career-intro-title{
+  font-family:"Bebas Neue","Barlow Condensed",sans-serif !important;
+  font-size:clamp(68px,7.6vw,124px) !important;
+  font-weight:400 !important;
+  line-height:.88 !important;
+  letter-spacing:.018em !important;
+  text-transform:uppercase !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #fff7eb 0%,
+      #f3e8d7 24%,
+      #e5d5bd 52%,
+      #d2b993 76%,
+      #b9905e 100%
+    ) !important;
+
+  -webkit-background-clip:text !important;
+  background-clip:text !important;
+
+  color:transparent !important;
+  -webkit-text-fill-color:transparent !important;
+
+  -webkit-text-stroke:.35px rgba(91,58,28,.25);
+
+  text-shadow:
+    0 1px 0 rgba(255,250,240,.10),
+    0 2px 1px rgba(87,52,22,.25),
+    0 7px 18px rgba(0,0,0,.42),
+    0 16px 34px rgba(0,0,0,.24) !important;
+}
+
+
+/* SOTTOTITOLO
+   Oro/bronzo tenue come nel riferimento. */
+#careerIntro .career-intro-subtitle{
+  font-family:"Bebas Neue","Barlow Condensed",sans-serif !important;
+  font-size:clamp(18px,1.85vw,30px) !important;
+  font-weight:400 !important;
+  line-height:1 !important;
+  letter-spacing:.42em !important;
+  padding-left:.42em !important;
+  text-transform:uppercase !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ecd6b4 0%,
+      #d4ad78 42%,
+      #b98449 72%,
+      #93632f 100%
+    ) !important;
+
+  -webkit-background-clip:text !important;
+  background-clip:text !important;
+
+  color:transparent !important;
+  -webkit-text-fill-color:transparent !important;
+
+  text-shadow:
+    0 3px 14px rgba(0,0,0,.42) !important;
+}
+
+
+/* LINEA CENTRALE */
+#careerIntro .career-intro-rule{
+  width:96px !important;
+  height:1px !important;
+  margin-top:25px !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(191,143,78,.22) 18%,
+      rgba(241,218,180,.95) 50%,
+      rgba(191,143,78,.22) 82%,
+      transparent 100%
+    ) !important;
+
+  box-shadow:
+    0 0 10px rgba(214,170,105,.20) !important;
+}
+
+
+/* DATI PLAYER
+   Nome · città · profilo
+   Più editoriale/elegante come la riga del PNG originale. */
+#careerIntro .career-intro-player{
+  font-family:"Cormorant Garamond",Georgia,serif !important;
+  font-size:clamp(12px,1.12vw,18px) !important;
+  font-weight:600 !important;
+  line-height:1.2 !important;
+  letter-spacing:.15em !important;
+  text-transform:uppercase !important;
+
+  color:#d5b98f !important;
+
+  text-shadow:
+    0 2px 10px rgba(0,0,0,.52),
+    0 0 18px rgba(196,145,78,.08) !important;
+}
+
+
+/* Nome leggermente più luminoso */
+#careerIntro .career-intro-player-name{
+  color:#ead8bc !important;
+  font-weight:700 !important;
+}
+
+
+/* Separatore dorato */
+#careerIntro .career-intro-sep{
+  color:#a97843 !important;
+  opacity:.9 !important;
+}
+
+
+/* Manteniamo esattamente l'animazione sequenziale già approvata */
+#careerIntro .career-intro-player-piece{
+  font-family:inherit !important;
+}
+
+/* ADF_INTRO_LOOK_FIX_V4_END */
+</style>
+
+<style>
+/* ADF_INTRO_META_CONTRAST_V1_START */
+
+/* Solo leggibilità dati dinamici.
+   Nessuna modifica a timing, layout o titolo. */
+#careerIntro .career-intro-player{
+  position:relative !important;
+  z-index:2 !important;
+
+  font-size:clamp(14px,1.28vw,21px) !important;
+  font-weight:700 !important;
+  letter-spacing:.14em !important;
+
+  color:#e6cfaa !important;
+
+  text-shadow:
+    0 1px 1px rgba(0,0,0,.95),
+    0 3px 8px rgba(0,0,0,.88),
+    0 8px 22px rgba(0,0,0,.78) !important;
+}
+
+/* Velo scuro morbido dietro la riga, senza box visibile */
+#careerIntro .career-intro-player::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:125%;
+  height:240%;
+  transform:translate(-50%,-50%);
+  z-index:-1;
+  pointer-events:none;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(4,3,2,.52) 0%,
+      rgba(4,3,2,.30) 46%,
+      rgba(4,3,2,.10) 72%,
+      transparent 100%
+    );
+
+  filter:blur(7px);
+}
+
+/* Nome leggermente più luminoso */
+#careerIntro .career-intro-player-name{
+  color:#f1dfc2 !important;
+  font-weight:700 !important;
+}
+
+/* Città e profilo leggibili ma meno forti del nome */
+#careerIntro #careerIntroCity,
+#careerIntro #careerIntroProfile{
+  color:#e3c79d !important;
+}
+
+/* Pallini più presenti */
+#careerIntro .career-intro-sep{
+  color:#c8975b !important;
+  opacity:1 !important;
+}
+
+/* ADF_INTRO_META_CONTRAST_V1_END */
 </style>
 </head>
 <body>
@@ -2170,7 +2572,7 @@ function renderStory(){
   $('storyNext').disabled = !current;
 }
 
-function showResult(){
+function calculateProfile(){
   const score = {};
   Object.keys(PROFILES).forEach(k=>score[k]=0);
 
@@ -2185,7 +2587,12 @@ function showResult(){
   if(state.genre==="drill"){ score.mc += 1; score.performer += 1; }
   if(state.genre==="rap"){ score.autore += 1; score.mc += 1; }
 
-  const winner = Object.entries(score).sort((a,b)=>b[1]-a[1])[0][0];
+  return Object.entries(score)
+    .sort((a,b)=>b[1]-a[1])[0][0];
+}
+
+function showResult(){
+  const winner = calculateProfile();
   const {title, desc} = PROFILES[winner];
   const parts = {
     freestyler:["IL","FREESTYLER"],
@@ -2367,6 +2774,31 @@ if(window.parent!==window) window.parent.postMessage({type:'adf-rpg-v24-ready'},
   <div class="career-intro-frame" id="careerIntroF2"></div>
   <div class="career-intro-frame" id="careerIntroF3"></div>
   <div class="career-intro-frame" id="careerIntroF4"></div>
+  <div class="career-intro-copy">
+    <div class="career-intro-title">Da qui comincia tutto</div>
+    <div class="career-intro-subtitle">Benvenuto ad Anni di Fame</div>
+    <div class="career-intro-rule"></div>
+
+    <div class="career-intro-player">
+
+      <span class="career-intro-player-piece">
+        <span
+          class="career-intro-player-name"
+          id="careerIntroName"></span>
+      </span>
+
+      <span class="career-intro-player-piece">
+        <span class="career-intro-sep">·</span>
+        <span id="careerIntroCity"></span>
+      </span>
+
+      <span class="career-intro-player-piece">
+        <span class="career-intro-sep">·</span>
+        <span id="careerIntroProfile"></span>
+      </span>
+
+    </div>
+  </div>
   <div class="career-intro-grain"></div>
   <div class="career-intro-fade"></div>
   <div class="career-intro-badge">Anni di Fame · Inizio carriera</div>
@@ -2379,10 +2811,45 @@ if(window.parent!==window) window.parent.postMessage({type:'adf-rpg-v24-ready'},
 (() => {
   const intro = document.getElementById('careerIntro');
   const replay = document.getElementById('careerIntroReplay');
+
+  const introName =
+    document.getElementById('careerIntroName');
+
+  const introCity =
+    document.getElementById('careerIntroCity');
+
+  const introProfile =
+    document.getElementById('careerIntroProfile');
+
   let introTimer = null;
+  let introProfileKey = null;
+
+  function renderIntroIdentity(){
+    introProfileKey =
+      typeof calculateProfile === 'function'
+        ? calculateProfile()
+        : null;
+
+    if(introName)
+      introName.textContent = state.name || '';
+
+    if(introCity)
+      introCity.textContent = state.city || '';
+
+    if(introProfile){
+      introProfile.textContent =
+        introProfileKey &&
+        PROFILES[introProfileKey]
+          ? PROFILES[introProfileKey].title
+          : '';
+    }
+  }
 
   window.playCareerIntro = function(){
     if(!intro) return;
+
+    renderIntroIdentity();
+
     clearTimeout(introTimer);
     intro.classList.remove('play','done');
     intro.classList.add('active');
@@ -2399,14 +2866,14 @@ if(window.parent!==window) window.parent.postMessage({type:'adf-rpg-v24-ready'},
         name: state.name || '',
         city: state.city || '',
         genre: state.genre || null,
-        profile: typeof calculateProfile === 'function' ? calculateProfile() : null,
+        profile: introProfileKey,
         answers: (state.answers||[]).map((a,i)=>({
           stage:i+1,id:a?.id||'',name:a?.name||'',desc:a?.desc||''
         }))
       };
       window.dispatchEvent(new CustomEvent('anniDiFame:careerIntroComplete',{detail}));
       if(window.parent!==window) window.parent.postMessage({type:'adf-rpg-v24-complete',detail},'*');
-    },11500);
+    },17000);
   };
 
   if(replay) replay.addEventListener('click', window.playCareerIntro);

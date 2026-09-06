@@ -6,6 +6,54 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:06bcd36 -->
+## 06/09/26, 14:18 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `06bcd36`
+
+### Cosa Ã¨ entrato
+
+- `9a6d8ed` â€” feat: rende dinamica intro finale carriera â€” **Mycol**
+
+### File di questa categoria
+
+- **Rimosso:** `frontend/media/creator-rpg-v24/assets/creator-03-947905e87828.png`
+- **Aggiunto:** `frontend/media/creator-rpg-v24/assets/creator-03-intro-clean.png`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 3
+
+---
+
+<!-- merge:7858816 -->
+## 06/09/26, 13:38 â€” task/foto-luoghi-e-azioni â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `7858816`
+
+### Cosa Ã¨ entrato
+
+- `35f9227` â€” assets: le undici foto delle azioni e dei luoghi â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/media/photo/casa_di_provincia.png`
+- **Aggiunto:** `frontend/media/photo/concerto_live.png`
+- **Aggiunto:** `frontend/media/photo/freestyle_in_piazza.png`
+- **Aggiunto:** `frontend/media/photo/palestra.png`
+- **Aggiunto:** `frontend/media/photo/registrazione_pezzo.png`
+- **Aggiunto:** `frontend/media/photo/scrittura_barre.png`
+- **Aggiunto:** `frontend/media/photo/stacca_la_spina.png`
+- **Aggiunto:** `frontend/media/photo/studio_creazione_beat.png`
+- **Aggiunto:** `frontend/media/photo/studio_mixaggio.png`
+- **Aggiunto:** `frontend/media/photo/studio_promo_su_lafamegram.png`
+- **Aggiunto:** `frontend/media/photo/studio_uscita_pezzo.png`
+
+**File interessati in questa categoria:** 11
+
+---
+
 <!-- merge:cdc13d5 -->
 ## 06/09/26, 11:50 â€” task/6-7-hype-e-farming â†’ main
 
