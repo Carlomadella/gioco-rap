@@ -101,7 +101,7 @@ Insomma, come le cose che vanno davvero in hype IRL, non se fai un feat con pink
 **FATTO (06/09/2026)** — l'hype adesso ha un **tetto che dipende dalla fase della
 carriera** (`PHASES[fase].hcap` in `phases.js`, letto da `hypeCap()`): 20 da
 Sconosciuto, 42 da esordiente, 55, 65, 80, 92, e solo da GOAT il tetto è 100. Non
-conta *come* l'hype sale — farmando o con un colpo di fortuna — il tetto tiene
+conta _come_ l'hype sale — farmando o con un colpo di fortuna — il tetto tiene
 comunque, perché è applicato ovunque l'hype cresce (oltre 30 punti diversi nel
 codice, da `promo` alla Strada). I tetti restano sempre sopra alle soglie
 `G.hype >= 40/60/55` già richieste dalle prove di passaggio della carriera stessa
@@ -124,7 +124,7 @@ fase e sul tetto settimanale della promo.
 
 8.  Le card sulla mappa come studio, fabbrica, pizzeria, la sala ecc hanno una card cliccabile troppo grande, LE VOGLIO TUTTE COME STUDIO. Inoltre noto che l'ultima cosa dove entri resta una sorte di pallino gialla come se t'indicasse l'ulitma cosa schiacciata. Non la voglio.
 
-9. Ci sono dei tastini sul in centro sotto della mappa che fan muovere la mappa. Levali. La mappa non voglio si veda muoveree. dev'essere ferma
+9.  Ci sono dei tastini sul in centro sotto della mappa che fan muovere la mappa. Levali. La mappa non voglio si veda muoveree. dev'essere ferma
 
 10. Lo shop dev'essere un vero e proprio shop, come gli shop di fortnite o nba2k.. LEVA STI CAZZO DI INTERFACCIA MENU! RENDILO UNO SHOP DA VIDEOGIOCO NEL 2026
 
@@ -160,33 +160,29 @@ CARLO:
    - dettagli in
      [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#8-e-9--lagenda-gli-appuntamenti-e-le-notifiche).
 
-3. implementare il telefono nuovo, si vede nei media la foto
+2. implementare il telefono nuovo, si vede nei media la foto
 
    **FATTO (06/09/2026)** — per esteso al punto 10 delle FATTE qui sotto e in
    [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#68--il-telefono-nuovo-quello-della-foto).
 
-4. mi piace il po-up che esce quando non hai energia e clicchi sull'azione Freestyle in piazza, applica il pop-up ad ogni azione se manca energia, aggiungici anche un'icona dele fulmine, la stessa della navbar
+3. mi piace il po-up che esce quando non hai energia e clicchi sull'azione Freestyle in piazza, applica il pop-up ad ogni azione se manca energia, aggiungici anche un'icona del fulmine, la stessa della navbar
 
-5. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
+4. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
    Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il
    secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su
    "stacca la spina", il quinto su "registra un pezzo".
 
-6. quando skippi tante ore ci mette troppo a simulare
+5. quando skippi tante ore ci mette troppo a simulare
 
-7. nei pulsanti dei luoghi della mappa tieni solo il riquadro con nome e sfondo nero e togli il bordo neon presente dietro (il quadrato con i lati tagliati e i bordi molto smussati)
+6. togli il parametro «lucidità» e tutto ciò che ne consegue
+
+7. aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
 
 /_ DA DISCUTERE _/
 
-1. DA DISCUTERE aggiungere la reputazione cioè quanto sei affidabile, il massimo è real/real oppure OG, e il minimo tipo figlio di troia quando ti comporti da figlio di troia (detto meglio) O TENERE SOLO LA FAMa
+2. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles? Per forza a los angeles, però può decidere di tornare nelle città prima
 
-2. DA DISCUTERE togli il parametro «lucidità» e tutto ciò che ne consegue
-
-3. DA DISCUTERE aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
-
-4. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles?
-
-5. DA DISCUTERE Non è più: "Faccio un pezzo → +10 fama", ma diventa:
+3. DA DISCUTERE Non è più: "Faccio un pezzo → +10 fama", ma diventa:
 
 TRACK
 │
@@ -194,7 +190,6 @@ TRACK
 ├── Producer
 ├── Studio
 ├── Mix
-├── Master
 ├── Testo
 ├── Cover (influenza meno, ma ha 3 opzioni: caricamento file da telefono/computer, assets preimpostati e personalizzazione stile emblema black ops 2)
 ├── Featuring
@@ -310,7 +305,7 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
    esteso in
    [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md#21--la-professione-del-criminale).
 
-2. dividi tutti i file .md sparsi in cartelle con nomi coerenti, inoltre smista le task fatte da implementazioni.md
+1. dividi tutti i file .md sparsi in cartelle con nomi coerenti, inoltre smista le task fatte da implementazioni.md
 
    **FATTO (06/09/2026)** — in radice restano solo `README.md` e `ROADMAP.md`, che sono le
    due porte d'ingresso. Gli altri sono andati in due cartelle nuove, ognuna col suo README:
@@ -325,7 +320,7 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
    fatte è la seconda metà del punto, ed era già stato fatto: i punti chiusi stanno nel file
    del loro argomento e l'indice è [`README.md`](README.md).
 
-3. gli eventi in basso sono cliccabili, e puoi segnarli nell'agenda, quando scatta l'ora o poco prima, arriva una notifica
+1. gli eventi in basso sono cliccabili, e puoi segnarli nell'agenda, quando scatta l'ora o poco prima, arriva una notifica
 
    **FATTO (06/09/2026)** — ogni card degli eventi ha adesso un quadratino in alto a destra:
    toccalo e l'evento finisce in agenda. **Un quarto d'ora prima dell'ora arriva la
@@ -336,7 +331,7 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
    un timer suo: se il tempo non si muove, non succede niente. Per esteso in
    [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#8-e-9--lagenda-gli-appuntamenti-e-le-notifiche).
 
-4. possono verificarsi eventi settimanali, da segnare in agenda anche quelli e la matina del giorno stesso arriva la notifica
+1. possono verificarsi eventi settimanali, da segnare in agenda anche quelli e la matina del giorno stesso arriva la notifica
 
    **FATTO (06/09/2026)** — al posto del riquadro «Più avanti…», che prometteva senza dire
    cosa, adesso c'è **«Questa settimana»** con due eventi veri: giorno, ora e a cosa
@@ -346,7 +341,7 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
    **la mattina del giorno stesso arriva la notifica**. Stessa cosa per esteso in
    [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#8-e-9--lagenda-gli-appuntamenti-e-le-notifiche).
 
-5. ALE 1 — le chat nel cellulare erano infinite e sempre uguali: si poteva sentire la
+1. ALE 1 — le chat nel cellulare erano infinite e sempre uguali: si poteva sentire la
    stessa persona all'infinito e farmare il benessere con la solita conversazione.
 
    **FATTO (06/09/2026)** — `chatIniziaTu` non aveva nessun limite: si apriva «Ciao ma',
@@ -359,7 +354,7 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
    sporadicamente» — il dado giornaliero e settimanale, gli spunti che non si ripetono —
    c'era già e non è stata toccata. Commit `f72dd92`.
 
-6. ALE 6 — le azioni ripetibili facevano farmare senza gameplay: la battle di freestyle
+1. ALE 6 — le azioni ripetibili facevano farmare senza gameplay: la battle di freestyle
    doveva diventare un evento esclusivo, e gli eventi non dovevano valere tutti uguale.
 
    **FATTO (06/09/2026)** — la battle vera in piazza è **una volta a settimana, e solo fra
@@ -369,7 +364,7 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
    davvero la ricompensa quando li giochi nel loro giorno: freestyle, open mic, promo,
    palestra, sessione alla Sala, colpo della Strada. Commit `a4073c3`.
 
-7. ALE 7 — l'hype: dev'essere il fattore primario, in scala internazionale, e impossibile
+1. ALE 7 — l'hype: dev'essere il fattore primario, in scala internazionale, e impossibile
    da avere alto restando nel paesino di provincia al primo anno.
 
    **FATTO (06/09/2026)** — l'hype ha un **tetto legato alla fase della carriera** (da 20 a
@@ -379,33 +374,33 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
    feat scala per la grandezza (rara) del collaboratore invece di valere sempre uguale:
    con pinko pallino non si va in hype. Commit `a4073c3`.
 
-8. gli eventi segnati in agenda devono bloccare lo skip
+1. gli eventi segnati in agenda devono bloccare lo skip
 
    **FATTO (06/09/2026)** — un appuntamento segnato ferma il salto del tempo: se prima
    dell'ora a cui sei diretto c'è qualcosa in agenda, il tempo si ferma lì e te lo dice,
    invece di scavalcarlo. Commit `efa2033`.
 
-9. una pagina per ogni azione, con interfaccia e bottoni cliccabili a schermo — ha senso?
+1. una pagina per ogni azione, con interfaccia e bottoni cliccabili a schermo — ha senso?
    Un README che analizzi e progetti tutto, coi pro e i contro.
 
    **FATTO (06/09/2026)** — l'analisi e il progetto di ogni schermata, pro e contro
    compresi, stanno in `frontend/pagine/README.md`. Commit `180960c` e `4925a82`.
 
-10. implementare il telefono nuovo, si vede nei media la foto
+1. implementare il telefono nuovo, si vede nei media la foto
 
-    **FATTO (06/09/2026)** — la home del telefono nella plancia è adesso quella della foto
-    `frontend/media/photo/pagina di gioco/schermata_telefono.png`: **sfondo** (il rapper di
-    spalle davanti alla città di notte, che riempie tutto lo schermo da un bordo all'altro),
-    **otto icone su quattro colonne**, **dock** in fondo con Chat, Contatti, LaFamegram,
-    Inventario — le quattro che si aprono di più — e la barra di stato con l'isola
-    dentro allo schermo invece che in una fascia sopra al vetro. Le icone non sono
-    ridisegnate: sono **ritagliate dalla foto** e stanno in `frontend/media/photo/telefono/`.
-    Le palline rosse della foto sono state cancellate una per una, perché quei numeri li deve
-    dire la partita — e infatti li dice. **Tutte e quattordici le app aprono**, comprese le due
-    che si registrano a partita avviata (Notifiche, Trasferte): quelle non hanno una foto e
-    tengono il loro disegno, dentro a una piastrella copiata dalle altre. I widget che
-    stavano sopra la griglia non ci sono più: nella foto la home è solo icone e sfondo. E
-    l'app **Messaggi** è sparita: elencava le stesse conversazioni di Chat con meno roba
-    dentro, due icone per la stessa cosa.
-    Per esteso in
-    [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#68--il-telefono-nuovo-quello-della-foto).
+   **FATTO (06/09/2026)** — la home del telefono nella plancia è adesso quella della foto
+   `frontend/media/photo/pagina di gioco/schermata_telefono.png`: **sfondo** (il rapper di
+   spalle davanti alla città di notte, che riempie tutto lo schermo da un bordo all'altro),
+   **otto icone su quattro colonne**, **dock** in fondo con Chat, Contatti, LaFamegram,
+   Inventario — le quattro che si aprono di più — e la barra di stato con l'isola
+   dentro allo schermo invece che in una fascia sopra al vetro. Le icone non sono
+   ridisegnate: sono **ritagliate dalla foto** e stanno in `frontend/media/photo/telefono/`.
+   Le palline rosse della foto sono state cancellate una per una, perché quei numeri li deve
+   dire la partita — e infatti li dice. **Tutte e quattordici le app aprono**, comprese le due
+   che si registrano a partita avviata (Notifiche, Trasferte): quelle non hanno una foto e
+   tengono il loro disegno, dentro a una piastrella copiata dalle altre. I widget che
+   stavano sopra la griglia non ci sono più: nella foto la home è solo icone e sfondo. E
+   l'app **Messaggi** è sparita: elencava le stesse conversazioni di Chat con meno roba
+   dentro, due icone per la stessa cosa.
+   Per esteso in
+   [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#68--il-telefono-nuovo-quello-della-foto).
