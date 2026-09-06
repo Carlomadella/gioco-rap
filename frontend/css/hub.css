@@ -585,6 +585,14 @@ body.in-hub .topnav {
 .pfoto {
   position: relative;
   z-index: 1;
+  /* Tutto quello che sta sopra alla mappa - cartelli e pallini - si misura
+     in `cqw`, cioe' in centesimi della LARGHEZZA DELLA FOTO, non dello
+     schermo. Cosi' un cartello occupa sempre la stessa fetta di citta': su
+     un monitor grande non diventa un francobollo, e sul telefono non copre
+     mezzo quartiere. Le misure in pixel restano solo come limite minimo e
+     massimo, perche' sotto una certa misura il testo non si legge e sopra
+     un'altra diventa un cartellone. */
+  container-type: inline-size;
   aspect-ratio: 1672/941;
   width: 100%;
   height: auto;
@@ -730,12 +738,12 @@ body.in-hub .topnav {
      storto il centro del rettangolo cade regolarmente fuori dall'edificio */
   left: var(--cx, 50%);
   top: var(--cy, 50%);
-  width: 9px;
-  height: 9px;
+  width: clamp(7px, 0.68cqw, 11px);
+  height: clamp(7px, 0.68cqw, 11px);
   border-radius: 50%;
   transform: translate(-50%,-50%);
   background: var(--pk);
-  border: 2px solid rgba(7,9,14,.88);
+  border: max(1.5px, 0.14cqw) solid rgba(7,9,14,.88);
   box-shadow: 0 0 0 1px rgba(255,255,255,.24), 0 0 9px var(--pk);
   pointer-events: none;
   opacity: .94;
@@ -774,20 +782,19 @@ body.in-hub .topnav {
   top: 0;
   transform: translate(
     calc(-50% + var(--tagx, 0px)),
-    calc(-100% - 8px + var(--tagy, 0px))
+    calc(-100% - clamp(5px, 0.55cqw, 9px) + var(--tagy, 0px))
   );
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 28px;
-  padding: 6px 10px;
-  border-radius: 10px;
+  gap: clamp(5px, 0.6cqw, 9px);
+  padding: clamp(4px, 0.45cqw, 7px) clamp(6px, 0.72cqw, 11px);
+  border-radius: clamp(7px, 0.75cqw, 11px);
   white-space: nowrap;
   background: rgba(7, 9, 14, 0.92);
   border: 1px solid rgba(255,255,255,.17);
   box-shadow: 0 7px 18px rgba(0,0,0,.42), inset 0 0 0 1px rgba(255,255,255,.025);
   color: #f7f8fb;
-  font: 900 clamp(8px, .67vw, 11px)/1 Figtree, system-ui, sans-serif;
+  font: 900 clamp(8.5px, 0.8cqw, 12px)/1 Figtree, system-ui, sans-serif;
   letter-spacing: .035em;
   text-transform: uppercase;
   text-shadow: 0 1px 2px rgba(0,0,0,.75);
@@ -795,10 +802,10 @@ body.in-hub .topnav {
 }
 .pspot-tag i {
   display: block;
-  width: 8px;
-  height: 8px;
+  width: clamp(6px, 0.6cqw, 9px);
+  height: clamp(6px, 0.6cqw, 9px);
   flex: none;
-  border-radius: 3px;
+  border-radius: 0.25cqw;
   background: var(--pk);
   box-shadow: 0 0 10px var(--pk);
 }
@@ -806,7 +813,7 @@ body.in-hub .topnav {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+  gap: clamp(2px, 0.3cqw, 5px);
   min-width: 0;
 }
 .pspot-tag b {
@@ -817,16 +824,16 @@ body.in-hub .topnav {
 .pspot-ore {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font: 800 clamp(7px, .55vw, 9px)/1 Figtree, system-ui, sans-serif;
+  gap: clamp(3px, 0.38cqw, 6px);
+  font: 800 clamp(7px, 0.64cqw, 9.5px)/1 Figtree, system-ui, sans-serif;
   letter-spacing: .07em;
   font-style: normal;
   color: #9fd9b4;
 }
 .pspot-ore s {
   display: block;
-  width: 5px;
-  height: 5px;
+  width: clamp(4px, 0.4cqw, 6px);
+  height: clamp(4px, 0.4cqw, 6px);
   flex: none;
   border-radius: 50%;
   text-decoration: none;
@@ -1355,7 +1362,12 @@ body.in-hub .topnav {
     display: none;
   }
   .pfoto {
-    width: max(100%, 620px);
+    /* La citta' non scende sotto una misura in cui i cartelli restano
+       leggibili: sotto i 900 px la foto tiene i suoi 900 e ci si sposta col
+       dito, come una cartina vera. Le targhette si misurano sulla foto
+       (`cqw`), quindi a questa larghezza occupano la stessa fetta di citta'
+       che occupano sul monitor grande: non coprono piu' mezzo quartiere. */
+    width: max(100%, 900px);
     height: auto;
     max-width: none;
   }
