@@ -2316,3 +2316,97 @@
     transform:translate(-48px,-85px) scale(1.34)!important;
   }
 }
+
+
+/* ==========================================================
+   HOTFIX 04 · LA PAGINA NON TAGLIA PIÙ I PEZZI
+
+   La schermata è alta esattamente quanto la finestra (`.app` 100svh) e
+   ogni pannello ha `overflow:hidden`: quello che non ci sta non si vede
+   e non si raggiunge in nessun modo. Con i corpi cresciuti dal blocco
+   V7 («più leggibile ma senza gonfiare la UI») il conto non torna più a
+   nessuna misura. Provato in Chrome, misurando contenuto e contenitore:
+
+     1920×1080  colonna destra 834 su 885 · titolo 239 su 260
+     1440×900   colonna sinistra 600 su 625 — «Molla il giro» tagliato
+     1366×768   colonna sinistra 564 su 625 · destra 522 su 820 —
+                «Molla il giro» sparito, il TRAPHONE segato a metà
+
+   Qui sotto tre cose, in ordine di importanza:
+   1. le due colonne scorrono, così niente resta irraggiungibile;
+   2. sotto i 900 di altezza la colonna sinistra si stringe quel tanto
+      che basta perché «Molla il giro» si veda senza scorrere;
+   3. la riga delle città smette di essere alta 66 fissi, e il titolo
+      smette di sovrapporsi a se stesso (l'accento di «È» finiva dentro
+      la riga sopra) e di essere tagliato in cima.
+   ========================================================== */
+
+/* 1 · le colonne scorrono — la barra si vede solo quando serve */
+#strada .side,
+#strada .tabpane.on{
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(197,46,95,.42) transparent;
+}
+#strada .side::-webkit-scrollbar,
+#strada .tabpane.on::-webkit-scrollbar{width:6px}
+#strada .side::-webkit-scrollbar-track,
+#strada .tabpane.on::-webkit-scrollbar-track{background:transparent}
+#strada .side::-webkit-scrollbar-thumb,
+#strada .tabpane.on::-webkit-scrollbar-thumb{
+  background:rgba(197,46,95,.34);border-radius:999px
+}
+#strada .side:hover::-webkit-scrollbar-thumb,
+#strada .tabpane.on:hover::-webkit-scrollbar-thumb{background:rgba(197,46,95,.55)}
+
+/* 2 · sotto i 900 la colonna sinistra si stringe: i 61 px che mancavano
+       a 768 escono da qui, senza toccare i corpi del testo */
+@media(max-height:900px){
+  #strada .side{padding:14px}
+  #strada .panel-k{margin-bottom:10px}
+  #strada .status-money{padding:11px 12px;margin-bottom:11px}
+  #strada .status-money strong{font-size:33px;margin:4px 0 7px}
+  #strada .stat{margin-bottom:10px}
+  #strada .risk{padding:8px 0}
+  #strada .street-note{padding-top:10px;line-height:1.4}
+  #strada .quit{margin-top:8px}
+}
+
+/* 3 · la riga delle città prende l'altezza che le serve */
+#strada .scene{grid-template-rows:minmax(0,1fr) auto}
+#strada .citybar{min-height:66px}
+
+/* 4 · il titolo: righe che non si toccano più, e niente tagliato in cima */
+#strada .herohead h1{
+  line-height:.92;
+  padding-top:.05em;
+}
+@media(max-height:900px){
+  #strada .herohead h1{font-size:clamp(52px,5.2vw,80px)}
+  #strada .herohead{padding:14px 20px 10px}
+}
+
+/* 5 · sotto i 760 (i portatili da 1280×720) la colonna sinistra si
+       stringe ancora: sono gli ultimi 49 px che mancavano perché
+       «Molla il giro» stesse dentro senza scorrere */
+@media(max-height:760px){
+  #strada .side{padding:12px}
+  #strada .panel-k{margin-bottom:8px}
+  #strada .status-money{padding:9px 11px;margin-bottom:9px}
+  #strada .status-money strong{font-size:28px;margin:3px 0 6px}
+  #strada .launder{padding:7px 10px}
+  #strada .stat{margin-bottom:8px}
+  #strada .risk{padding:6px 0}
+  #strada .street-note{padding-top:8px;font-size:11.5px}
+  #strada .quit{margin-top:6px;padding:7px 12px}
+}
+
+/* 6 · sotto gli 800 (ci sta dentro anche il 1366×768) il titolone lascia
+       ai quattro colpi i 44 px che gli servono: se no le targhette
+       (guadagno, energia, durata) restano tagliate fuori dalla card */
+@media(max-height:800px){
+  #strada .herohead{padding:10px 20px 8px}
+  #strada .herohead h1{font-size:clamp(40px,4.2vw,54px);margin:6px 0 4px}
+  #strada .herohead p{margin-top:6px}
+}

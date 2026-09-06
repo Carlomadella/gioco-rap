@@ -36,6 +36,8 @@ const abilita = leggi("js/game/abilita.js");
 const servizio = leggi("js/servizio.js");
 const servizioCss = leggi("css/servizio.css");
 const abilitaCss = leggi("css/abilita.css");
+const cssCrimeV2 = leggi("css/strada-crimine-v2.css").replace(/\s+/g, " ");
+const crimeuiPiatto = crimeui.replace(/\s+/g, "");
 const crime = leggi("js/game/strada-crimine.js");
 const state = leggi("js/game/state.js");
 const sim = leggi("js/game/sim.js");
@@ -513,14 +515,33 @@ test("caricando una carriera arrestata si entra direttamente nel carcere",
   ingresso.includes('window.apriCarcere({direct:true, reason:"resume"})') &&
   !avvio.includes("apriCarcere"));
 
+/* La schermata è alta quanto la finestra e i pannelli hanno overflow:hidden:
+   se il contenuto cresce, sparisce. È già successo — «Molla il giro» e il
+   TRAPHONE tagliati fuori a 1366×768. Queste prove tengono aperta la via di
+   fuga: le colonne devono poter scorrere, e i due titoloni non devono
+   tornare a un'interlinea che fa sovrapporre le righe.
+   (I fogli si leggono con gli spazi appiattiti: qui conta cosa dice la
+   regola, non su quante righe è scritta.) */
+test("le colonne delle Attività criminali possono scorrere",
+  cssCrimeV2.includes("#strada .side, #strada .tabpane.on{ overflow-y:auto;"));
+
+test("il titolo delle Attività criminali non ha righe che si toccano",
+  cssCrimeV2.includes("#strada .herohead h1{ line-height:.92;"));
+
+test("il carcere: titolo leggibile e scheda che scorre",
+  crimeuiPiatto.includes("line-height:.86;letter-spacing:-.025em;text-transform:uppercase}") &&
+  crimeuiPiatto.includes(".adf-jail-card{align-self:center;max-height:100%;overflow-y:auto;"));
+
 test("avatar del detenuto usa ritratto reale con sbarre sovrapposte",
   crimeui.includes('id="adf-jail-portrait"') &&
   crimeui.includes('class="adf-jail-bars"') &&
   crimeui.includes('portrait.innerHTML=window.ARTIST_PORTRAIT()'));
 
+/* Il numero dietro al ?v= cambia a ogni ritocco del file: qui conta solo
+   l'ordine dei due <script>, non la versione. */
 test("carcere carica il registro dedicato prima della sua UI",
-  index.includes('js/game/jail-backgrounds.js?v=1') &&
-  index.indexOf('js/game/jail-backgrounds.js?v=1') < index.indexOf('js/game/strada-crimine-ui.js?v=3'));
+  index.includes('js/game/jail-backgrounds.js?v=') &&
+  index.indexOf('js/game/jail-backgrounds.js?v=') < index.indexOf('js/game/strada-crimine-ui.js?v='));
 
 test("registro carcere contiene esattamente 20 sfondi ufficiali",
   (jailBg.match(/"id":/g)||[]).length === 20 &&
