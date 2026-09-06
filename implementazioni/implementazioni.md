@@ -9,8 +9,8 @@ sotto scritto cosa è stato fatto.
 I punti di prima — tutti e sessantasette — stanno nella cartella
 **[`implementazioni/`](README.md)**, divisi per argomento:
 
-|                                                                                | argomento                                       |
-| ------------------------------------------------------------------------------ | ----------------------------------------------- |
+|                                                                | argomento                                       |
+| -------------------------------------------------------------- | ----------------------------------------------- |
 | [`00-come-si-lavora.md`](00-come-si-lavora.md)                 | le regole di lavoro                             |
 | [`01-mappa-e-citta.md`](01-mappa-e-citta.md)                   | la plancia, la mappa, le tre città              |
 | [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | schermate, navigazione, il telefono, il negozio |
@@ -61,39 +61,13 @@ Insomma, come le cose che vanno davvero in hype IRL, non se fai un feat con pink
 
 CARLO:
 
-> **I numeri saltano, ed è voluto.** Qui restano solo i punti **da fare**: quelli
-> chiusi sono stati spostati nel file del loro argomento, con dentro scritto cosa
-> è stato fatto — è il modo di lavorare di [`00-come-si-lavora.md`](00-come-si-lavora.md),
-> e la seconda metà del punto 33. I numeri non si rifanno: un punto è quel numero
-> lì per sempre, se no i commit e i messaggi vecchi puntano a un'altra cosa.
->
-> | punto | cosa era | dove sta scritto adesso |
-> | --- | --- | --- |
-> | **3** | la chat del telefono, interattiva e non in loop | [interfaccia-e-telefono](02-interfaccia-e-telefono.md#la-chat-del-telefono-non-va-piu-in-loop) |
-> | **4** | scambiarsi il numero con fonici e beatmaker | [interfaccia-e-telefono](02-interfaccia-e-telefono.md#scambiarsi-il-numero-con-fonici-e-beatmaker) |
-> | **5** | tutte le rotte provate su Postman | [multiplayer-e-backend](07-multiplayer-e-backend.md#tutte-le-rotte-provate-su-postman) |
-> | **6** | la grafica delle attività criminali | [mondo-e-personaggi](06-mondo-e-personaggi.md#21--la-professione-del-criminale) |
-> | **7** | via la vecchia schermata di gioco | [mappa-e-citta](01-mappa-e-citta.md#7--via-la-vecchia-schermata-di-gioco-le-info-sulla-mappa) |
-> | **8** | il README di tutte le rotte dell'API | [multiplayer-e-backend](07-multiplayer-e-backend.md#8--un-readme-di-tutte-le-rotte-dellapi) |
-> | **9** | gli eventi del giorno e le trasferte | [mondo-e-personaggi](06-mondo-e-personaggi.md#le-trasferte-fuori-città) |
-> | **10** | il videomaker a La Sala | [mondo-e-personaggi](06-mondo-e-personaggi.md#10--il-videomaker-entra-a-la-sala) |
-> | **11** | la transizione quando clicchi una card | [interfaccia-e-telefono](02-interfaccia-e-telefono.md#transizioni-quando-una-card-apre-una-pagina) |
-> | **13** | l'albero delle abilità | [carriera-e-tempo](05-carriera-e-tempo.md#13--lalbero-delle-abilità) |
-> | **19** | la sezione Discografia | [musica-e-suoni](04-musica-e-suoni.md#19--la-discografia) |
-> | **20**, **22** | «fatti sentire un beat», e i beat che non si vedevano | [musica-e-suoni](04-musica-e-suoni.md#20-e-22--fatti-sentire-un-beat-non-faceva-niente-e-i-beat-non-si-vedevano) |
-> | **21** | registrazione, accesso, uscita | [multiplayer-e-backend](07-multiplayer-e-backend.md#21--registrazione-accesso-uscita) |
-> | **24** | il tasto per uscire al menu | [interfaccia-e-telefono](02-interfaccia-e-telefono.md#24--un-tasto-per-uscire-al-menu-scritto-a-lettere) |
-> | **25** | «disciplina» cambia nome | [interfaccia-e-telefono](02-interfaccia-e-telefono.md#25--disciplina-diventa-condizione) |
-> | **27** | la landing staccata dall'accesso e dal gioco | [interfaccia-e-telefono](02-interfaccia-e-telefono.md#27--la-landing-è-una-pagina-sua-staccata-dallaccesso-e-dal-gioco) |
-> | **28** | cercare beat non costa energia | [musica-e-suoni](04-musica-e-suoni.md#28--girare-a-cercare-beat-non-costa-più-energia) |
+1. aggiungere la reputazione cioè quanto sei affidabile, il massimo è real/real oppure OG, e il minimo tipo figlio di troia quando ti comporti da figlio di troia (detto meglio) O TENERE SOLO LA FAMa
 
-12. aggiungere la reputazione cioè quanto sei affidabile, il massimo è real/real oppure OG, e il minimo tipo figlio di troia quando ti comporti da figlio di troia (detto meglio) O TENERE SOLO LA FAMa
+2. DA DISCUTERE aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
 
-14. DA DISCUTERE aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
+3. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles?
 
-15. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles?
-
-16. Non è più: "Faccio un pezzo → +10 fama", ma diventa:
+4. Non è più: "Faccio un pezzo → +10 fama", ma diventa:
 
 TRACK
 │
@@ -135,20 +109,26 @@ NETWORK 64
 
 è possibile controllare come stanno andando le canzoni nel tempo da un'app del telefono per sapere se stanno invecchiando bene o male e magari farci delle remastered o parti 2 di una canzone o di un album
 
-23. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
+5. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
     Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il
     secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su
     "stacca la spina", il quinto su "registra un pezzo".
 
-26. togli il parametro «lucidità» e tutto ciò che ne consegue
+6. togli il parametro «lucidità» e tutto ciò che ne consegue
 
-PAGINA DI LANDING: 30. migliorare graficamente la schermata opzioni
+7. dividi tutti i file .md sparsi in cartelle con nomi coerenti, inoltre smista le task fatte da implementazioni.md
 
-31. creare una schermata per le classifiche che si apre anche dall'app del telefono
+8. gli eventi in basso sono cliccabili, e puoi segnarli nell'agenda, quando scatta l'ora o poco prima, arriva una notifica
 
-32. DA DISCUTERE collegare la pagina di mycol togliere la sezione il tuo artista dalla pagina di landing o , oltre che da nuova partita. e collegarla allo shop?
+9. possono verificarsi eventi settimanali, da segnare in agenda anche quelli e la matina del giorno stesso arriva la notifica
 
-33. dividi tutti i file .md sparsi in cartelle con nomi coerenti, inoltre smista le task fatte da implementazioni.md
+/_ PAGINA DI LANDING: _/
+
+10. migliorare graficamente la schermata opzioni
+
+11. creare una schermata per le classifiche che si apre anche dall'app del telefono
+
+12. DA DISCUTERE collegare la pagina di mycol togliere la sezione il tuo artista dalla pagina di landing o , oltre che da nuova partita. e collegarla allo shop?
 
 /_ NUOVE MODALITA' _/
 
