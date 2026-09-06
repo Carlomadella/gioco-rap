@@ -186,8 +186,10 @@
          Adesso e' la seconda riga della targhetta (.pspot-ore, stile in
          hub.css) e il bottone chiuso si spegne solo nel pallino e negli
          angoli, non nel cartello, che deve restare leggibile. */
-      .pspot.orario-chiuso{--col:rgba(255,255,255,.42);--alone:transparent}
-      .pspot.orario-chiuso .pspot-dot{filter:grayscale(.75) brightness(.8);opacity:.8}
+      .pspot.orario-chiuso{--col:rgba(255,178,168,.55);--alone:transparent}
+      .pspot.orario-chiuso:hover{--col:#ffb2a8;--alone:rgba(239,68,68,.45);--riemp:.16}
+      .pspot.orario-chiuso .pspot-sagoma polygon{fill:#ef4444}
+      .pspot.orario-chiuso .pspot-dot{filter:grayscale(.7) brightness(.85);opacity:.82}
       .tile .hourscost{position:absolute;right:9px;bottom:8px;z-index:4;padding:4px 7px;border-radius:999px;
         background:rgba(5,7,11,.78);border:1px solid rgba(255,255,255,.14);color:#cfd4de;
         font:700 10px/1 Figtree,system-ui,sans-serif;letter-spacing:.02em;backdrop-filter:blur(8px)}

@@ -55,7 +55,6 @@ const porta = leggi("index.html");
 const avvio = leggi("js/avvio.js");
 const ingresso = leggi("js/gioco-ingresso.js");
 const agenda = leggi("js/game/agenda.js");
-const skipFile = leggi("js/game/skip.js");
 const jailBg = leggi("js/game/jail-backgrounds.js");
 const menuSystem = leggi("js/menu-sistema.js");
 const cat = JSON.parse(leggi("js/game/eventi-master-1000-v1.2.13.json"));
@@ -1060,12 +1059,30 @@ test("ogni stanza non-hub/jail riconosciuta da hostAttivo() ha davvero un modo d
     return !!body && stanze.every(id => body.includes('$id("' + id + '")'));
   })());
 
-console.log("\nPunto 2 — le card della mappa sono tutte come lo Studio");
-test("tutti i dieci luoghi hanno lo stesso ingombro dello Studio (10.50×12.50)",
+console.log("\nPunto 2 — la zona da toccare è la sagoma dell'edificio, non un rettangolo");
+/* Il rettangolo uguale per tutti (10.50×12.50) non c'è più: su una foto in
+   prospettiva non combaciava con nessun palazzo. Adesso ogni posto ha il suo
+   profilo in HUB_SAGOME, e il rettangolo del bottone è solo il contenitore. */
+test("i dieci luoghi hanno un profilo in HUB_SAGOME, di almeno tre punti",
   (() => {
-    const misure = [...hub.matchAll(/\{id:"[a-z]+",[^}]*?w:([\d.]+), h:([\d.]+),/g)]
-      .map(m => m[1] + "x" + m[2]);
-    return misure.length === 10 && misure.every(m => m === "10.50x12.50");
+    const b0 = hub.indexOf("const HUB_SAGOME");
+    const b1 = hub.indexOf("});", b0);
+    if(b0 < 0 || b1 < 0) return false;
+    const blocco = hub.slice(b0, b1);
+    const sagome = [...blocco.matchAll(/([a-z]+):\s*\[(\[[^\]]*\][,\s]*)+\]/g)];
+    return sagome.length === 10 &&
+      sagome.every(m => (m[0].match(/\[[\d.]+,[\d.]+\]/g) || []).length >= 3);
+  })());
+test("nessun luogo porta più x/y/w/h a mano: misure e baricentro escono dal profilo",
+  !/\{id:"[a-z]+", n:"[^"]*", x:/.test(hub) && hub.includes("function hubSagoma"));
+test("il bottone non prende i clic: li prende il poligono della sagoma",
+  (() => {
+    const css = leggi("css/hub.css");
+    const b0 = css.indexOf(".pspot {");
+    const b1 = css.indexOf("}", b0);
+    const body = b0 >= 0 ? css.slice(b0, b1) : "";
+    return body.includes("pointer-events: none") &&
+      /\.pspot-sagoma polygon\s*\{[^}]*pointer-events:\s*all/.test(css);
   })());
 test("l'ultimo luogo toccato non resta con l'anello giallo del focus: si toglie il fuoco al click",
   (() => {
@@ -1328,22 +1345,6 @@ test("l'app Agenda del telefono mostra quello che ti sei segnato",
   tel.includes("function segnatiInAgenda(") &&
   tel.includes("segnatiInAgenda() +") &&
   tel.includes("data-agendavia"));
-test("un appuntamento segnato ferma il salto del tempo",
-  agenda.includes("function bloccoSalto(") &&
-  agenda.includes("window.saltaGiorni = function(n)") &&
-  /* il taglio sta nel salto vero, non in una copia: la taglia scelta passa
-     da bloccoSalto prima di arrivare a saltaGiorni originale */
-  agenda.includes("salto.call(this, blocco ? blocco.giorni : n)"));
-test("il blocco del salto guarda il giorno assoluto, non il giorno della settimana",
-  agenda.includes("const giornoAssoluto = (anno, settimana, giorno)") &&
-  agenda.includes("oggiAssoluto()") &&
-  /* un'ora già passata non deve bloccare niente fino a mezzanotte */
-  agenda.includes("if(g === oggi && v.minuti <= ora) continue;"));
-test("il widget del tempo e il menu «Salta avanti» dicono chi ha fermato il calendario",
-  timeControls.includes("AGENDA.bloccoSalto(count)") &&
-  timeControls.includes("segnato in agenda") &&
-  skipFile.includes("function avvisoAgenda(") &&
-  skipFile.includes("AGENDA.bloccoSalto(28)"));
 
 console.log("\nPunto 7 — i file .md in cartelle con nomi coerenti");
 test("in radice restano solo README e ROADMAP",

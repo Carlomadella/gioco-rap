@@ -61,20 +61,23 @@ const spoglia = t => String(t).replace(/<[^>]*>/g, "");
    Gli id non si toccano: orari.js, eventi-tempo.js, spostamenti.js e
    trasferte.js li usano per sapere orari, eventi ambientali e distanze.
 
-   w/h sono tutti 10.50×12.50, la misura dello Studio: prima ognuno aveva
-   la sua (la Fabbrica arrivava a 20×22, quasi il quadruplo), e le zone da
-   toccare si vedevano di taglio diverso l'una dall'altra. x/y sono ricalcolati
-   per tenere il quadrato centrato dove stava prima, non sul vecchio angolo. */
+   La zona da toccare NON è più un rettangolo. Un rettangolo su una foto in
+   prospettiva non può mai coincidere con un palazzo: o taglia via metà
+   edificio, o si prende mezza strada e il cortile del vicino — e quello che
+   si accende è sempre più grande della cosa che stai per cliccare. Adesso
+   ogni posto ha il PROFILO del suo edificio (HUB_SAGOME, misurato sulla foto):
+   il riquadro del bottone è solo il rettangolo che lo contiene, e dentro una
+   clip-path ritaglia sia quello che si vede sia quello che si clicca. */
 const HUB_LUOGHI = [
   /* punto 12: lo studio non è più una scorciatoia alla linguetta della
      settimana — è una stanza sua, con dentro le quattro fasi di un pezzo e la
      gente che ci lavora (js/game/studio.js). Punto 10: è sempre aperto. */
-  {id:"studio", n:"Studio", x:19.50, y:56.00, w:10.50, h:12.50,
+  {id:"studio", n:"Studio",
    vai:() => apriStudio("beat")},
   /* punto 59/61: era un cartello chiuso («Club & discoteche», ancora dentro
      alla foto — cambia solo quando cambia la mappa, punto 45); qui sotto
      adesso c'è un lavoro vero, part time. */
-  {id:"pizzeria", n:"Pizzeria", x:50.00, y:70.25, w:10.50, h:12.50,
+  {id:"pizzeria", n:"Pizzeria",
    vai:() => schedaLavoro("lavapiatti", "Pizzeria")},
   /* punto 48: non più un cartello chiuso — è dove si va a fare l'open mic,
      che esisteva già come azione ma non aveva un posto sulla mappa. Se non
@@ -86,7 +89,7 @@ const HUB_LUOGHI = [
      («Freestyle al bar centrale»): se passavi di lì a un'altra ora non
      esisteva. Il palco è il posto dove si sta davanti alla gente: ci stanno
      tutte e due. */
-  {id:"concerti", n:"Live Club", x:34.75, y:20.50, w:10.50, h:12.50,
+  {id:"concerti", n:"Live Club",
    vai:() => {
      const palco = hubPronta("live");
      showEvent({k:"Live Club", t:"Che serata fai?",
@@ -103,13 +106,13 @@ const HUB_LUOGHI = [
        ]});
    }},
   /* il beat maker non è un listino: è la sala dove si conosce la gente */
-  {id:"beat", n:"La Sala", x:49.75, y:20.50, w:10.50, h:12.50,
+  {id:"beat", n:"La Sala",
    vai:() => apriPosto()},
   /* Beat Maker non è più un luogo sulla mappa: i beatmaker si conoscono
      alla Sala e si lavora con loro nello Studio. */
   /* punto 60: si chiamava «Vita quotidiana» — la palestra è uscita da qui
      ed è diventata un posto suo (punto 61), resta stacca la spina e i conti */
-  {id:"vita", n:"Casa", x:18.50, y:69.00, w:10.50, h:12.50,
+  {id:"vita", n:"Casa",
    vai:() => showEvent({k:"Casa", t:"Stacca la spina o guarda i conti",
      d:"La settimana non è solo musica. Ogni tanto la testa va spenta, e i conti vanno guardati.",
      annulla(){},
@@ -122,17 +125,17 @@ const HUB_LUOGHI = [
      ]})},
   /* punto 21/57: la Strada, ricostruita da claude/carriera-criminale.md
      (js/game/strada-crimine.js) — non era mai stata scritta, solo pensata */
-  {id:"crimin", n:"Attività criminali", x:1.75, y:65.75, w:10.50, h:12.50,
+  {id:"crimin", n:"Attività criminali",
    vai:() => (G.strada && G.strada.arresto && typeof apriCarcere === "function")
   ? apriCarcere()
   : apriStrada()},
   /* punto 59: il secondo lavoro, full time — era «Sponsor & brand» */
-  {id:"fabbrica", n:"Fabbrica", x:83.75, y:32.75, w:10.50, h:12.50,
+  {id:"fabbrica", n:"Fabbrica",
    vai:() => schedaLavoro("operaio", "Fabbrica")},
   /* punto 61: la palestra esce dal sottomenu di Casa e diventa un posto
      suo — era «Business», un altro cartello chiuso senza niente dietro.
      Punto 9: non è più un pulsante solo — si sceglie cosa fare, come a Casa. */
-  {id:"palestra", n:"Palestra", x:75.00, y:77.25, w:10.50, h:12.50,
+  {id:"palestra", n:"Palestra",
    vai:() => showEvent({k:"Palestra", t:"Che allenamento fai?",
      d:"Il fisico che si vede sotto le luci, o la testa che si svuota prima di scrivere: scegli tu.",
      annulla(){},
@@ -147,7 +150,7 @@ const HUB_LUOGHI = [
   /* punto 48 + «via il quaderno»: qui dentro è finito tutto quello che si
      compra — l'attrezzatura, il banco dei beat e i vestiti. Era il Catalogo,
      che come linguetta a sé non aveva senso: un negozio è un posto. */
-  {id:"shop", n:"Shop", x:45.75, y:29.50, w:10.50, h:12.50,
+  {id:"shop", n:"Shop",
    vai:() => apriPannello("Shop", "shop",
      "Attrezzatura, beat da comprare e roba da mettersi addosso.")},
   /* punto 6: il centro per l'impiego, arrivato con la mappa definitiva.
@@ -157,9 +160,59 @@ const HUB_LUOGHI = [
      posto giocabile. Il cartello nella foto resta — punto 45, le targhette
      sono dentro al pixel — ma senza una zona da toccare sopra non fa più
      niente, come «Periferia» o «Centro». */
-  {id:"impiego", n:"Centro per l'impiego", x:64.00, y:24.50, w:10.50, h:12.50,
+  {id:"impiego", n:"Centro per l'impiego",
    vai:() => schedaImpiego()}
 ];
+
+/* ================= I PROFILI DEGLI EDIFICI =================
+   Punti in percentuale della foto (la foto tiene sempre il suo rapporto
+   1672×941, quindi le percentuali restano incollate ai palazzi a qualsiasi
+   dimensione). Sono misurati a mano sull'immagine: tetto + facciata, cioè
+   la sagoma che si vede, non la pianta dell'edificio.
+   Per rimisurarne uno: le percentuali sono pixel/1672 e pixel/941. */
+const HUB_SAGOME = Object.freeze({
+  studio:  [[14.83,53.13],[26.91,49.73],[29.90,56.11],[29.72,63.76],[15.43,63.55]],
+  pizzeria:[[47.25,68.86],[57.72,63.34],[62.32,66.74],[62.08,71.41],[56.22,80.77],
+            [51.32,89.05],[44.74,84.17],[44.98,79.17]],
+  concerti:[[33.25,22.32],[42.17,19.98],[45.57,21.89],[45.33,28.69],[35.17,32.09],[33.25,30.61]],
+  beat:    [[52.63,21.79],[59.21,20.40],[62.68,24.44],[62.50,30.82],[55.92,32.41],[52.63,28.69]],
+  vita:    [[19.74,69.08],[26.44,66.31],[33.37,73.96],[34.39,80.77],[22.25,83.32],[20.10,75.66]],
+  crimin:  [[1.79,65.36],[12.26,63.55],[14.95,72.26],[11.06,80.98],[3.29,78.64]],
+  fabbrica:[[78.95,36.98],[85.83,28.69],[92.40,31.88],[92.11,44.63],[83.73,49.95],[78.95,45.70]],
+  palestra:[[69.56,76.30],[83.13,68.54],[87.02,73.11],[86.72,80.77],[75.96,88.20],[69.56,84.80]],
+  shop:    [[42.22,31.67],[51.32,26.57],[57.42,28.48],[57.12,37.41],[45.57,39.85],[42.22,36.77]],
+  impiego: [[61.72,25.29],[68.66,20.19],[75.66,24.44],[75.48,31.88],[68.18,36.13],[61.72,31.88]]
+});
+
+/* Dal profilo si ricavano tre cose: il rettangolo che lo contiene (la misura
+   del bottone), la stessa sagoma riscritta in coordinate LOCALI del bottone
+   (quella che va nella clip-path) e il baricentro, dove si posa il pallino —
+   il centro del rettangolo, su una sagoma storta, cade regolarmente fuori. */
+function hubSagoma(id){
+  const p = HUB_SAGOME[id];
+  if(!p || p.length < 3) return null;
+  const xs = p.map(q => q[0]), ys = p.map(q => q[1]);
+  const x = Math.min(...xs), y = Math.min(...ys);
+  const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+  if(!(w > 0) || !(h > 0)) return null;
+  const locali = p.map(q => [(q[0] - x) / w * 100, (q[1] - y) / h * 100]);
+  /* baricentro dell'area (formula del poligono), non media dei vertici: con
+     lati di lunghezza diversa la media dei vertici scivola verso l'angolo
+     dove ce ne sono di più. */
+  let a = 0, cx = 0, cy = 0;
+  for(let i = 0; i < locali.length; i++){
+    const [x1, y1] = locali[i], [x2, y2] = locali[(i + 1) % locali.length];
+    const f = x1 * y2 - x2 * y1;
+    a += f; cx += (x1 + x2) * f; cy += (y1 + y2) * f;
+  }
+  if(Math.abs(a) < 1e-6){ cx = 50; cy = 50; }
+  else { cx = cx / (3 * a); cy = cy / (3 * a); }
+  return {
+    x, y, w, h, cx, cy,
+    /* per l'<svg viewBox="0 0 100 100">: stesse coordinate locali, senza % */
+    punti: locali.map(q => q[0].toFixed(2) + "," + q[1].toFixed(2)).join(" ")
+  };
+}
 
 /* ================= GLI EVENTI DI OGGI ================= */
 /* Non sono cartelli finti: ognuno fa partire un'azione vera della settimana,
@@ -650,12 +703,25 @@ function renderHub(){
     hsvg(ic) + '<span>' + n + '</span></button>').join("");
 
   /* ---- i luoghi sulla mappa ---- */
-  $("hb-pins").innerHTML = HUB_LUOGHI.map(l =>
-    '<button class="pspot' + (l.chiuso ? " chiuso" : "") +
+  $("hb-pins").innerHTML = HUB_LUOGHI.map(l => {
+    const s = hubSagoma(l.id);
+    if(!s) return "";
+    return '<button class="pspot' + (l.chiuso ? " chiuso" : "") +
     '" data-l="' + l.id + '" data-district="' + (HUB_DISTRICT[l.id] || "") +
-    '" style="--x:' + l.x + '%;--y:' + l.y + '%;--w:' + l.w + '%;--h:' + l.h +
+    '" style="--x:' + s.x + '%;--y:' + s.y + '%;--w:' + s.w + '%;--h:' + s.h +
+    '%;--cx:' + s.cx.toFixed(2) + '%;--cy:' + s.cy.toFixed(2) +
     '%;--pk:' + (HUB_PIN_COLOR[l.id] || "#C084FC") + '" ' +
     'aria-label="' + l.n + (l.chiuso ? " — chiuso" : "") + '" title="' + l.n + '">' +
+    /* La parte che si clicca e che si accende è SOLO questa sagoma: il bottone
+       è il rettangolo che la contiene e non prende clic (pointer-events:none
+       in hub.css), li prende il poligono. `preserveAspectRatio="none"` fa
+       combaciare il viewBox 0-100 col rettangolo del bottone, e
+       `vector-effect` tiene il filo del contorno spesso uguale dappertutto
+       anche se il rettangolo è stirato. Pallino e targhetta restano fuori
+       dall'SVG: devono poter uscire dalla sagoma. */
+    '<svg class="pspot-sagoma" viewBox="0 0 100 100" preserveAspectRatio="none" ' +
+    'aria-hidden="true" focusable="false"><polygon vector-effect="non-scaling-stroke" points="' +
+    s.punti + '"/></svg>' +
     /* La targhetta è UN cartello solo: pallino del colore, nome, e sotto al
        nome la riga degli orari (la riempie js/game/orari.js). Prima l'orario
        era uno pseudo-elemento `::after` del bottone — lo stesso `::after` che
@@ -663,7 +729,8 @@ function renderHub(){
        usciva ritagliato dai quattro quadratini del mirino, cioè tagliato a
        metà. Adesso è un elemento vero dentro alla targhetta. */
     '<span class="pspot-dot"></span><span class="pspot-tag"><i></i>' +
-    '<span class="pspot-txt"><b>' + l.n + '</b></span></span></button>').join("");
+    '<span class="pspot-txt"><b>' + l.n + '</b></span></span></button>';
+  }).join("");
   hubClampTarghette();
   hubInitQuartieri();
   hubSetQuartiere(HUB_QUARTIERE);

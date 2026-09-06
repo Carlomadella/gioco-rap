@@ -35,11 +35,12 @@
   /* ---- la plancia: il logo e le linguette ---- */
   .plogo{min-height:44px}
 
-  /* I cartelli sulla mappa stanno incollati al disegno sotto: le loro misure
-     arrivano da --w e --h e non si toccano. Cresce solo la presa, in altezza,
-     centrata su quello che si vede. */
-  .pspot::after{content:"";position:absolute;left:0;right:0;top:50%;
-    transform:translateY(-50%);height:44px}
+  /* I posti sulla mappa non allargano più la presa con un rettangolo
+     invisibile: la zona da toccare adesso è la sagoma dell'edificio (il
+     poligono in js/game/hub.js), e un rettangolo di 44 px sopra la sagoma
+     rimetterebbe esattamente il problema che la sagoma è lì per togliere —
+     toccare la strada e finire dentro al palazzo accanto. Gli edifici sulla
+     foto sono comunque tutti più larghi e più alti di 44 px. */
 
   /* ---- il negozio dei vestiti ---- */
   .ngbtn{min-height:44px}

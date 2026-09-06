@@ -358,7 +358,7 @@
     const s = document.createElement("style");
     s.id = "city-travel-css";
     s.textContent = `
-      .pspot.travel-current::before{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;
+      .pspot.travel-current::before{content:"";position:absolute;left:var(--cx,50%);top:var(--cy,50%);width:12px;height:12px;
         transform:translate(-50%,-50%);border-radius:50%;background:#F4D28E;border:2px solid rgba(12,12,14,.92);
         box-shadow:0 0 0 4px rgba(244,210,142,.18),0 0 18px rgba(244,210,142,.52);z-index:11;pointer-events:none}
       .pspot.travel-current{filter:none!important}
