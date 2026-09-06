@@ -5,23 +5,98 @@
 /* ================= IL GUSCIO =================
    Le misure vengono dalla foto — `media/photo/pagina di gioco/schermata_telefono.png`,
    schermo 620 x 1333 px — e qui sono in percentuale della larghezza dello
-   schermo, così restano quelle a qualsiasi misura prenda la colonna. */
-.ptel{grid-area:tel;min-height:0;min-width:0;display:flex}
+   schermo, così restano quelle a qualsiasi misura prenda la colonna.
+
+   Il guscio è quello della foto, misurato sui pixel e non a occhio. Il profilo
+   del telefono lì dentro sta fra x=207 e x=883, lo schermo fra 237 e 856:
+   trenta pixel di scocca per parte, cioè il 4,4% della larghezza del guscio.
+   E quei trenta pixel **non sono una fascia grigia**: sono tre pixel di filo
+   metallico lucidissimo (#EFF2F7 sul fianco, bianco pieno sotto, appena più
+   spento in alto) e poi ventisette di **nero pieno** — la cornice del vetro.
+   Prima invece era tutta un degradé grigio scuro, che è il motivo per cui
+   sembrava una scatola e non un telefono.
+
+   L'angolo è tondo davvero: seguendo il bordo nella foto viene un cerchio di
+   raggio 110 px (verificato in quattro punti, y=42, 54, 84 e 96, tutti a meno
+   di un pixel e mezzo), che è il 16,2% della larghezza del guscio. Lo schermo
+   dentro segue lo stesso centro, quindi 110 - 30 = 80 px di raggio suo.
+
+   Le misure stanno in `cqw`, cioè in percentuale della larghezza vera della
+   colonna: il contenitore è `.ptel` qui sotto — serve lui, perché le unità di
+   un elemento si leggono sempre sul contenitore che ha *sopra*, e `.ptelframe`
+   è contenitore per i suoi figli, non per sé stesso. I `clamp()` servono solo
+   agli estremi, perché a colonna strettissima il filo di metallo non sparisca
+   e a colonna larghissima l'angolo non diventi una pastiglia. */
+.ptel{grid-area:tel;min-height:0;min-width:0;display:flex;
+  container-type:inline-size}
 .ptelframe{position:relative;width:100%;height:100%;min-height:0;display:flex;
   container-type:inline-size;
-  border-radius:38px;padding:11px;
-  background:linear-gradient(160deg,#2A2E38,#0D0F14);
-  box-shadow:0 20px 50px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.12)}
+  --scocca:clamp(7px,4.4cqw,34px);   /* i 30 px di cornice */
+  /* Il filo vero sarebbe 3 px su 620 di schermo, cioè 1,3 px alla misura che
+     il telefono ha davvero nella plancia: sotto al pixel dello schermo, e
+     infatti alla prima prova spariva a destra e in alto — restava acceso solo
+     dove il bordo cadeva per caso su un pixel intero. Un filo che c'è su due
+     lati e non sugli altri è peggio di un filo un po' più spesso, quindi il
+     minimo è 1,6 px: alla peggio si arrotonda a due pixel veri e si vede
+     tutto intorno, che è quello che conta guardando la foto. */
+  --filo:clamp(1.6px,.5cqw,4px);
+  padding:var(--scocca);
+  border:var(--filo) solid transparent;
+  border-radius:clamp(26px,16.2cqw,124px);
+  /* Il filo di metallo è il bordo, il nero è il fondo: due sfondi ritagliati
+     uno sul bordo e uno dentro, così l'anello resta un anello anche quando
+     l'angolo è tondo — cosa che una `box-shadow` non sa fare in degradé.
+     I colori sono quelli letti sulla foto lungo tutto il profilo: in alto
+     #EAEBEE, sui fianchi #EFF2F7, sotto bianco pieno, perché la luce rimbalza
+     da lì. */
+  background:
+    linear-gradient(#04050A,#04050A) padding-box,
+    linear-gradient(180deg,#C9CBD0 0,#E9EBEE 3%,#EFF2F7 22%,#E6E9EF 48%,#F1F3F8 72%,#FDFEFF 94%,#D2D4DA 100%) border-box;
+  /* dove il metallo incontra il vetro la foto non è nera di colpo: c'è un filo
+     di luce rimasto (#1A1A1E contro #010100 della cornice) */
+  box-shadow:0 20px 50px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.06)}
+
+/* ---- I tasti veri, quelli che sporgono dal profilo ----
+   Nella foto ci sono e si vedono: tre sul fianco sinistro (azione in alto,
+   corto; volume su; volume giù) e l'accensione a destra, più in basso e più
+   lungo di tutti. Le posizioni sono quelle misurate sulla foto, rimesse in
+   percentuale dell'altezza del guscio (1369 px da bordo a bordo): azione a
+   235 px dall'alto e alta 37, volume su a 325 e alto 92, volume giù a 447 e
+   alto 91, accensione a 370 e alta 139.
+   Sporgono di sei pixel oltre il profilo, quindi nessuno qui sopra li deve
+   tagliare — `.ptel` contiene la disposizione, non il disegno. */
+.ptelt{position:absolute;z-index:1;pointer-events:none;
+  /* nella foto sporgono 6 px e se ne vedono 10 di larghezza, contando il
+     pezzo appoggiato sul filo: qui sporgono e basta, quindi vale la
+     larghezza vista, 10 su 680 di guscio */
+  --sporg:clamp(2.5px,1.45cqw,9px);width:var(--sporg);
+  box-shadow:0 1px 2px rgba(0,0,0,.55)}
+.ptelt-azione,.ptelt-volsu,.ptelt-volgiu{left:calc(var(--sporg) * -1);
+  border-radius:2px 0 0 2px;
+  background:linear-gradient(180deg,#F2F3F6,#B4B6BC 34%,#E2E5EA 66%,#97999F)}
+/* A destra la luce arriva di taglio: nella foto lo stesso metallo lì legge
+   #626166, non #D5D5D7. Stesso tasto, lato in ombra. */
+.ptelt-power{right:calc(var(--sporg) * -1);border-radius:0 2px 2px 0;
+  background:linear-gradient(180deg,#C4C6CB,#76787F 34%,#B0B3B9 66%,#5E6066)}
+.ptelt-azione{top:17.2%;height:2.7%}
+.ptelt-volsu {top:23.7%;height:6.7%}
+.ptelt-volgiu{top:32.7%;height:6.6%}
+.ptelt-power {top:27%;height:10.2%}
 
 /* La barra di stato sta SOPRA allo schermo, come in un telefono vero: non è
    una fascia che ruba altezza al vetro, ci galleggia sopra allo sfondo. */
-.ptelbar{position:absolute;left:11px;right:11px;top:11px;z-index:3;pointer-events:none;
+.ptelbar{position:absolute;left:var(--scocca);right:var(--scocca);top:var(--scocca);
+  z-index:3;pointer-events:none;
   height:clamp(28px,10.2cqw,44px);display:flex;align-items:center;gap:1.6cqw;
   padding:0 7cqw 0 8.4cqw;font-size:clamp(10px,4cqw,16px);font-weight:700;color:#fff;
   font-variant-numeric:tabular-nums;text-shadow:0 1px 3px rgba(0,0,0,.7)}
 #hb-telora{margin-right:auto}
-/* l'isola, non più la tacca: pillola centrata, un quarto dello schermo come nella foto */
-.ptelnotch{position:absolute;left:50%;top:clamp(13px,5cqw,26px);transform:translateX(-50%);z-index:4;
+/* l'isola, non più la tacca: pillola centrata, un quarto dello schermo come nella foto.
+   Sta 18 px sotto al bordo alto del vetro (2,9% della larghezza dello schermo),
+   quindi parte da dove finisce la scocca e scende di lì: se la cornice cambia
+   spessore, l'isola resta attaccata al vetro e non alla scatola. */
+.ptelnotch{position:absolute;left:50%;top:calc(var(--scocca) + 2.9cqw);
+  transform:translateX(-50%);z-index:4;
   width:24%;aspect-ratio:156/42;border-radius:99px;background:#000;
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.045);
   display:flex;align-items:center;justify-content:flex-end;padding-right:9%}
@@ -47,7 +122,10 @@
    il rapper e i grattacieli restano al centro, si perdono le palme di bordo.
    Il velo scuro qui sopra tiene leggibili le icone e le loro scritte dove la
    città è illuminata. */
-.ptelscr{position:relative;flex:1;min-width:0;height:100%;border-radius:28px;
+.ptelscr{position:relative;flex:1;min-width:0;height:100%;
+  /* concentrico con l'angolo di fuori: 110 di raggio esterno meno 30 di
+     scocca fanno 80, cioè il 12,9% della larghezza del vetro */
+  border-radius:clamp(18px,12.9cqw,98px);
   container-type:inline-size;
   background:
     linear-gradient(180deg,rgba(0,0,0,.5) 0,rgba(0,0,0,.34) 26%,

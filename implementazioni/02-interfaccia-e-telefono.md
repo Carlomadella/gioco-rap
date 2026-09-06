@@ -1267,6 +1267,37 @@ leggi di quella persona. Riscritta senza.
    settimana, non ogni volta che prendi in mano il telefono. Notizie e Classifiche sono
    passate in griglia, in testa.
 
+   **Anche il guscio è quello della foto, non una scatola arrotondata.** Prima la cornice
+   era un rettangolo con un degradé grigio scuro e l'angolo da 38 px: leggeva come una
+   scatola col vetro dentro. Nella foto invece il profilo del telefono sta fra x=207 e
+   x=883 e lo schermo fra 237 e 856 — **trenta pixel di scocca per parte**, e quei trenta
+   non sono grigi: sono **tre pixel di filo metallico lucidissimo** (#EFF2F7 sui fianchi,
+   bianco pieno sotto perché la luce rimbalza da lì, appena più spento in alto) e poi
+   **ventisette di nero pieno**, che è la cornice del vetro. Rifatto così: il filo è un
+   `border` in degradé e il nero è il fondo, ritagliati uno sul bordo e uno dentro
+   (`padding-box` / `border-box`), perché una `box-shadow` un anello in degradé non lo sa
+   fare.
+
+   **L'angolo l'ho misurato, non scelto.** Seguendo il bordo della foto riga per riga viene
+   un cerchio di **raggio 110 px**, verificato in quattro punti (y=42, 54, 84 e 96: tutti
+   entro un pixel e mezzo). Sono il 16,2% della larghezza del guscio; lo schermo dentro
+   segue lo stesso centro, quindi 110 − 30 = 80 px di raggio suo. Tutto in `cqw` sulla
+   colonna vera (il contenitore è `.ptel`, non `.ptelframe`: le unità di un elemento si
+   leggono sempre sul contenitore che ha *sopra*), quindi le proporzioni restano identiche
+   da 200 a 420 px di colonna — provato a sette misure.
+
+   **E ci sono i tasti.** Tre sul fianco sinistro (azione corto in alto, volume su, volume
+   giù) e l'accensione a destra, più in basso e più lungo di tutti: posizioni e altezze
+   prese dalla foto e rimesse in percentuale dell'altezza del guscio. Sporgono dal profilo,
+   come quelli veri.
+
+   Una cosa che la foto non poteva dirmi: il filo vero sarebbe 1,3 px alla misura che il
+   telefono ha davvero nella plancia, cioè **sotto al pixel dello schermo**, e alla prima
+   prova spariva a destra e in alto — restava acceso solo dove il bordo cadeva per caso su
+   un pixel intero. Un filo che c'è su due lati e non sugli altri è peggio di un filo un po'
+   più spesso, quindi il minimo è 1,6 px: alla peggio si arrotonda a due pixel veri e si
+   vede tutto intorno, che guardando la foto è quello che conta.
+
    **Le misure non sono a occhio.** Sono quelle della foto (schermo 620 × 1333: piastrella
    112, passo fra le colonne 147, griglia che comincia 114 sotto al bordo, dock largo 572 a
    32 dal fondo) rimesse in percentuale della larghezza dello schermo, così restano quelle a
