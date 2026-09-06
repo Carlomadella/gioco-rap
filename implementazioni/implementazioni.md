@@ -136,16 +136,18 @@ fase e sul tetto settimanale della promo.
 
 14. L'app statistiche nel cellulare ora riporta statistiche che già trovi in game; Vorrei altre statistiche: Statistiche in studio con Brani pubblicati, contatti fatti, videoclip registrati, impression totali, insomma un vero e proprio archivio di tutte le statistiche più importanti che poi i nostri player si vanno a leggere.
 
-    **FATTO (07/09/2026)** — l'app «Statistiche» del telefono teneva solo i numeri
-    che si vedono già nella testata (energia, benessere, hype, fan, soldi...).
-    Sotto è comparso un **Archivio** nuovo, coi totali di carriera che prima non
-    stavano scritti da nessuna parte tutti insieme: **brani pubblicati** (i pezzi
-    con `released:true`), **contatti fatti** (`chatAttivi().length`, gli stessi
-    contatti che popolano la Chat), **videoclip registrati** (i pezzi con un video
-    girato, `s.video`) e **impression totali** (la somma degli stream di tutti i
-    pezzi, `frontend/js/game/telefono.js`, `schermataStatistiche()`). La parte
-    sopra (i numeri "come stai adesso") non è stata toccata. `npm run prova`
-    (70/70) più una verifica dedicata delle quattro formule.
+    **FATTO (07/09/2026)** — primo giro: aggiunto un «Archivio» sotto ai numeri
+    di sempre. Sbagliato: quei numeri (energia, benessere, hype, fan, soldi...)
+    sono esattamente quello di cui l'utente si lamentava, e lasciarli lì sopra
+    voleva dire non aver cambiato niente di quello che dava fastidio. Tolti del
+    tutto. Adesso `schermataStatistiche()` (`frontend/js/game/telefono.js`) è
+    **solo** un diario di bordo — due gruppi, undici righe, tutte cose che non
+    stavano scritte da nessuna parte tutte insieme e che non scendono mai:
+    **Carriera** (settimane di carriera, età, fase raggiunta, traguardi
+    raggiunti su quanti ce ne sono, record di fan, record in classifica) e
+    **Archivio** (brani pubblicati, dischi certificati, videoclip registrati,
+    contatti fatti, impression totali = somma degli stream di tutti i pezzi).
+    `npm run prova` (70/70) più una verifica dedicata delle undici formule.
 
 CARLO:
 

@@ -500,40 +500,36 @@ function schermataInventario(){
   return nav + corpo;
 }
 
-/* ---- Statistiche: gli stessi numeri della testata e dei dettagli, più
-   l'archivio di carriera (Da smistare, punto 14 di ALE — "l'app statistiche
-   ora riporta cose che già trovi in game, ne vorrei altre: brani pubblicati,
-   contatti fatti, videoclip registrati, impression totali, un vero archivio
-   delle statistiche più importanti"). La prima parte resta "come stai
-   adesso"; l'archivio è "cosa hai fatto finora", numeri che altrove nel
-   gioco non stanno da nessuna parte tutti insieme. */
+/* ---- Statistiche: il diario di bordo della carriera ----
+   Da smistare, punto 14 di ALE. Prima ripeteva energia/benessere/lucidità/
+   hype/fan/soldi/network — gli stessi numeri già in testata, "come stai
+   adesso". L'utente l'ha bocciata a ragione: qui dentro non deve più starci
+   niente che si vede già altrove. Adesso è solo "cosa hai fatto finora": una
+   riga per traguardo, che cresce da sola mentre giochi e non scende mai —
+   il vero senso di un diario di bordo, non uno specchio del profilo. */
 function schermataStatistiche(){
-  const lb = lifeBonus();
-  const righe = [
-    ["energia", "#FACC15", "Energia", G.energy + " / " + G.maxEnergy, G.energy / G.maxEnergy * 100],
-    ["cuore", "#EF4444", "Benessere", Math.round(G.wellbeing), G.wellbeing],
-    ["luna", "#818CF8", "Lucidità", Math.round(luc()), luc()],
-    ["hype", "#FB923C", "Hype", Math.round(G.hype), null],
-    ["fama", "#FBBF24", "Fan", short(G.fans), null],
-    ["soldi", "#4ADE80", "Soldi", fmt(G.money) + " €", null],
-    ["gente", "#60A5FA", "Network", Math.round(G.skills.rete), null]
-  ];
-  const stat = righe.map(([ic, k, n, v, barra]) => rigaStat(ic, k, n, v, barra)).join("");
-  const extra = '<div class="tnote"><b>' + fmt(weeklyCosts()) + ' €</b> a settimana di spese' +
-    (lb.hype ? ', +' + lb.hype + ' hype dal lifestyle' : '') +
-    (G.obligation ? '<br>Devi consegnare ' +
-      (G.obligation.need - G.songs.filter(x => x.released && x.week > G.obligation.from).length) +
-      ' uscite in ' + G.obligation.left + ' settimane.' : '') + '</div>';
+  const carriera = [
+    ["agenda", "#60A5FA", "Settimane di carriera", fmt(totalWeeks()), null],
+    ["testa", "#818CF8", "Età", G.age + " anni", null],
+    ["coppa", "#FBBF24", "Fase raggiunta", PHASES[G.phase].n, null],
+    ["scudo", "#4ADE80", "Traguardi raggiunti",
+      GOALS.filter(g => G.goals[g.id]).length + " / " + GOALS.length, null],
+    ["fama", "#FB923C", "Record fan", short(G.best.fans), null],
+    ["mic", "#A78BFA", "Record in classifica",
+      G.best.chart >= 99 ? "mai entrato" : "#" + G.best.chart, null]
+  ].map(([ic, k, n, v, barra]) => rigaStat(ic, k, n, v, barra)).join("");
 
   const totaleStream = G.songs.reduce((a, s) => a + (s.streams || 0), 0);
   const archivio = [
     ["nota", "#38BDF8", "Brani pubblicati", fmt(G.songs.filter(s => s.released).length), null],
-    ["persona", "#A78BFA", "Contatti fatti", fmt(chatAttivi().length), null],
+    ["corona", "#FACC15", "Dischi certificati", fmt(G.songs.filter(s => s.disco).length), null],
     ["mirino", "#F472B6", "Videoclip registrati", fmt(G.songs.filter(s => s.video).length), null],
+    ["persona", "#EF4444", "Contatti fatti", fmt(chatAttivi().length), null],
     ["giornale", "#4ADE80", "Impression totali", short(totaleStream), null]
   ].map(([ic, k, n, v, barra]) => rigaStat(ic, k, n, v, barra)).join("");
 
-  return extra + '<div class="tlist tlist-stat">' + stat + '</div>' +
+  return '<div class="tnote"><b>Carriera</b></div>' +
+    '<div class="tlist tlist-stat">' + carriera + '</div>' +
     '<div class="tnote"><b>Archivio</b></div>' +
     '<div class="tlist tlist-stat">' + archivio + '</div>';
 }
