@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:e823d71 -->
+## 06/09/26, 09:34 â€” task/pagina-attivita-criminali â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `e823d71`
+
+### Cosa Ã¨ entrato
+
+- `1afca19` â€” fix: la pagina delle Attività criminali non taglia più i pezzi (punto 1 «DA FARE») â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:e673802 -->
 ## 06/09/26, 01:44 â€” task/7-8-9-md-agenda-eventi â†’ main
 
