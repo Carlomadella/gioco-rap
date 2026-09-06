@@ -6,6 +6,35 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:e4ad390 -->
+## 06/09/26, 14:40 â€” origin/main â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@Mac.Home)  
+**Merge commit:** `e4ad390`
+
+### Cosa Ã¨ entrato
+
+- `b1a0d15` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `06bcd36` â€” merge: intro finale carriera dinamica â€” **Mycol**
+- `9a6d8ed` â€” feat: rende dinamica intro finale carriera â€” **Mycol**
+- `90d6c1a` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `7858816` â€” Merge branch 'task/foto-luoghi-e-azioni' â€” **Carlomadella**
+- `35f9227` â€” assets: le undici foto delle azioni e dei luoghi â€” **Carlomadella**
+- `0b7bc2d` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `51b2c5e` â€” Merge branch 'task/agenda-blocca-skip' â€” **Carlomadella**
+- `efa2033` â€” feat(agenda): un appuntamento segnato ferma il salto del tempo (punto 1 DA FARE) â€” **Carlomadella**
+- `ddabac6` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+
+### File di questa categoria
+
+- **Rimosso:** `frontend/media/creator-rpg-v24/assets/creator-03-947905e87828.png`
+- **Aggiunto:** `frontend/media/creator-rpg-v24/assets/creator-03-intro-clean.png`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:06bcd36 -->
 ## 06/09/26, 14:18 â€” branch non identificato â†’ main
 

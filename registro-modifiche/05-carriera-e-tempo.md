@@ -6,6 +6,68 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:4b44613 -->
+## 06/09/26, 18:51 â€” origin/feature/avvio-rapido-intro â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `4b44613`
+
+### Cosa Ã¨ entrato
+
+- `7a1ce94` â€” fix: avvio rapido con preset temporaneo e cinematic RPG â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/gioco-ingresso.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:e4ad390 -->
+## 06/09/26, 14:40 â€” origin/main â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@Mac.Home)  
+**Merge commit:** `e4ad390`
+
+### Cosa Ã¨ entrato
+
+- `b1a0d15` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `06bcd36` â€” merge: intro finale carriera dinamica â€” **Mycol**
+- `9a6d8ed` â€” feat: rende dinamica intro finale carriera â€” **Mycol**
+- `90d6c1a` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `7858816` â€” Merge branch 'task/foto-luoghi-e-azioni' â€” **Carlomadella**
+- `35f9227` â€” assets: le undici foto delle azioni e dei luoghi â€” **Carlomadella**
+- `0b7bc2d` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `51b2c5e` â€” Merge branch 'task/agenda-blocca-skip' â€” **Carlomadella**
+- `efa2033` â€” feat(agenda): un appuntamento segnato ferma il salto del tempo (punto 1 DA FARE) â€” **Carlomadella**
+- `ddabac6` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/agenda.js`
+- **Modificato:** `frontend/js/game/skip.js`
+- **Modificato:** `frontend/js/game/tempo-controlli.js`
+- **Rimosso:** `frontend/media/creator-rpg-v24/assets/creator-03-947905e87828.png`
+- **Aggiunto:** `frontend/media/creator-rpg-v24/assets/creator-03-intro-clean.png`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+- **Aggiunto:** `frontend/media/photo/casa_di_provincia.png`
+- **Aggiunto:** `frontend/media/photo/concerto_live.png`
+- **Aggiunto:** `frontend/media/photo/freestyle_in_piazza.png`
+- **Aggiunto:** `frontend/media/photo/palestra.png`
+- **Aggiunto:** `frontend/media/photo/registrazione_pezzo.png`
+- **Aggiunto:** `frontend/media/photo/scrittura_barre.png`
+- **Aggiunto:** `frontend/media/photo/stacca_la_spina.png`
+- **Aggiunto:** `frontend/media/photo/studio_creazione_beat.png`
+- **Aggiunto:** `frontend/media/photo/studio_mixaggio.png`
+- **Aggiunto:** `frontend/media/photo/studio_promo_su_lafamegram.png`
+- **Aggiunto:** `frontend/media/photo/studio_uscita_pezzo.png`
+- **Modificato:** `frontend/pagine/gioco.html`
+
+**File interessati in questa categoria:** 18
+
+---
+
 <!-- merge:06bcd36 -->
 ## 06/09/26, 14:18 â€” branch non identificato â†’ main
 
