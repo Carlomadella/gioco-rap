@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:538291d -->
+## 06/09/26, 10:23 â€” task/readme-pagine-completo â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `538291d`
+
+### Cosa Ã¨ entrato
+
+- `4925a82` â€” docs: il README delle pagine, completo — il progetto di ogni schermata (punto 2) â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/README.md`
+- **Modificato:** `documentazione/pagine-azioni/README.md`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:66b0f10 -->
 ## 06/09/26, 09:48 â€” task/fix-render-e-agenti â†’ main
 
