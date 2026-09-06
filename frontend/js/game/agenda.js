@@ -21,7 +21,14 @@
 
    Cosa NON fa: non ti porta all'evento e non lo fa partire da solo. Il tempo di
    questo gioco lo muove il giocatore, e un'agenda che ti teletrasporta alle
-   21:00 sarebbe il gioco che gioca da solo. Ti avvisa, e poi decidi tu. */
+   21:00 sarebbe il gioco che gioca da solo. Ti avvisa, e poi decidi tu.
+
+   Quello che invece fa, da qui in poi: **ferma il salto del tempo**. Un
+   appuntamento segnato e poi saltato con un «+7 giorni» era il caso peggiore
+   di tutti — te lo eri segnato apposta, e il gioco te lo portava via senza
+   dire niente. Adesso il salto si ferma la mattina dell'appuntamento, e se
+   l'appuntamento è oggi il salto non parte proprio. Se hai cambiato idea,
+   il quadratino sulla card lo toglie dall'agenda e il tempo torna a correre. */
 "use strict";
 
 (() => {
@@ -220,6 +227,72 @@
     return cambiato;
   }
 
+  /* ==================== L'AGENDA FERMA IL SALTO ====================
+     Un salto di n giorni attraversa i giorni da oggi a oggi+n: quelli che si
+     lascia dietro davvero sono da oggi a oggi+n-1, perché sull'ultimo ci
+     atterri, ed è mattina, e all'appuntamento ci arrivi ancora in tempo.
+
+     Il giorno assoluto è lo stesso conto di Eventi V2 (absDay): l'anno è
+     52 settimane, la settimana 7 giorni. Serve perché un appuntamento di
+     mercoledì prossimo, visto di sabato, ha un numero di giorno più basso
+     di oggi. */
+  const SETTIMANE_ANNO = 52;
+  const giornoAssoluto = (anno, settimana, giorno) =>
+    ((((anno || 1) - 1) * SETTIMANE_ANNO) + ((settimana || 1) - 1)) * 7 + (giorno || 1);
+  const oggiAssoluto = () => giornoAssoluto(G.year, G.week, G.day);
+
+  /* Il primo appuntamento che un salto di n giorni si mangerebbe. Torna anche
+     quanti giorni si possono saltare lo stesso: 0 vuol dire «l'appuntamento è
+     oggi, non ti muovi». Un'ora già passata non ferma niente — se no un
+     appuntamento delle 21:00 mancato bloccherebbe il tempo fino a mezzanotte. */
+  function bloccoSalto(n){
+    n = Math.max(0, Math.floor(Number(n) || 0));
+    if(n <= 0) return null;
+    const oggi = oggiAssoluto(), ora = adesso();
+    let primo = null, quando = Infinity;
+    for(const v of voci()){
+      const g = giornoAssoluto(v.anno, v.settimana, v.giorno);
+      if(g < oggi || g > oggi + n - 1) continue;
+      if(g === oggi && v.minuti <= ora) continue;
+      if(g < quando){ primo = v; quando = g; }
+    }
+    return primo ? {voce:primo, giorni:quando - oggi} : null;
+  }
+
+  /* Il salto vero è saltaGiorni() — dichiarato in skip.js e riscritto da
+     Eventi V2. Questo file si carica dopo tutti e due, quindi lo incarta una
+     volta sola e vale per ogni strada che ci passa: le taglie del menu «Salta
+     avanti», i tasti +1/+7 del widget del tempo, e la ripresa dopo un evento
+     alto (che rientra da qui e quindi ricontrolla l'agenda). */
+  if(typeof window.saltaGiorni === "function"){
+    const salto = window.saltaGiorni;
+    window.saltaGiorni = function(n){
+      n = Math.max(0, Math.floor(Number(n) || 0));
+      const blocco = bloccoSalto(n);
+      if(blocco && blocco.giorni <= 0){
+        const v = blocco.voce;
+        try{
+          if(typeof toast === "function")
+            toast("<b>Hai un appuntamento oggi.</b> " + v.n + " alle " + v.ora +
+              ": il tempo non si salta. Toglilo dall'agenda se hai cambiato idea.",
+              "bad", "📌", ["#F59E0B", "#B45309"]);
+        }catch(e){}
+        return;
+      }
+      const r = salto.call(this, blocco ? blocco.giorni : n);
+      /* L'avviso solo se ci siamo arrivati davvero: in mezzo può esserci
+         stato un evento alto che ha fermato il salto prima. */
+      if(blocco && oggiAssoluto() === giornoAssoluto(blocco.voce.anno, blocco.voce.settimana, blocco.voce.giorno)){
+        const v = blocco.voce;
+        v.avvisato = true;   /* niente doppione dalla notifica del mattino */
+        ag().ultimoGiorno = G.day || 1;
+        avvisa(v, "Oggi: " + v.n, "Alle " + v.ora + ". Il salto si è fermato qui: te l'eri segnato.");
+        if(typeof save === "function") save();
+      }
+      return r;
+    };
+  }
+
   window.addEventListener("game-time:advanced", ev => {
     const d = (ev && ev.detail) || {};
     let cambiato = controllaGiorno();
@@ -232,6 +305,8 @@
     settimanali, voci, segnato, segna, togli, tocca,
     pesoDiOggi, consumaPeso,
     minutiDi:oraInMinuti,
+    /* quanti giorni si possono saltare, e per colpa di chi ci si ferma */
+    bloccoSalto,
     /* è già passata? serve alla card, per non far segnare l'impossibile */
     passata(e, tipo){
       if(tipo === "settimana") return (e.giorno || 7) < (G.day || 1);

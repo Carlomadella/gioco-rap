@@ -560,6 +560,18 @@
       status("Prima devi chiudere la decisione o l'azione in corso.","bad");return;
     }
 
+    /* Un appuntamento segnato in agenda ferma il calendario: se è oggi non ci
+       si muove per niente, se è più avanti il salto arriva alla sua mattina e
+       lì si pianta. Il taglio vero lo fa agenda.js, dentro saltaGiorni(); qui
+       serve solo a dire la cosa giusta nella riga di stato — se no un salto
+       fermato da un appuntamento si annunciava come «c'è una decisione da
+       prendere», che è un'altra cosa. */
+    const impegno=(window.AGENDA&&typeof AGENDA.bloccoSalto==="function")?AGENDA.bloccoSalto(count):null;
+    if(impegno&&impegno.giorni<=0){
+      status("Hai «"+impegno.voce.n+"» alle "+impegno.voce.ora+" segnato in agenda: il calendario non si muove.","bad");
+      return;
+    }
+
     /* Via principale: Eventi V2 possiede il salto +1/+7 e quindi gestisce
        SALTO, LOW/MEDIUM automatici, HIGH che interrompono e Notifiche. */
     if(typeof window.ADF_TIME_SKIP==="function"){
@@ -580,7 +592,10 @@
       const stopped=done<count;
       if(stopped){
         closePanel();
-        status("Calendario fermato dopo "+done+" giorno"+(done===1?"":"i")+": c'è una decisione da prendere.","bad");
+        status("Calendario fermato dopo "+done+" giorno"+(done===1?"":"i")+": "+
+          (impegno&&done>=impegno.giorni
+            ?"hai «"+impegno.voce.n+"» segnato in agenda."
+            :"c'è una decisione da prendere."),"bad");
       }else{
         status("Avanzato di "+done+" giorno"+(done===1?"":"i")+" · "+GAME_TIME.text()+".","good");
       }
@@ -598,6 +613,9 @@
     let done=0,stopped=false;
     try{
       for(let i=0;i<count;i++){
+        /* stessa regola sulla via legacy (Eventi V2 non caricato): l'agenda
+           ferma anche qui, perché altrimenti il salto la scavalcherebbe. */
+        if(impegno&&done>=impegno.giorni){stopped=true;break;}
         avanzaGiorno();done++;
         try{if(typeof GAME_WEATHER!=="undefined"&&GAME_WEATHER.sync)GAME_WEATHER.sync();}catch(_){}
         queueSync(true);
@@ -608,7 +626,10 @@
     }finally{
       waiting=false;refreshOtherViews();targetTouched=false;sync(true);
       if(stopped){
-        closePanel();status("Calendario fermato dopo "+done+" giorno"+(done===1?"":"i")+": c'è una decisione da prendere.","bad");
+        closePanel();status("Calendario fermato dopo "+done+" giorno"+(done===1?"":"i")+": "+
+          (impegno&&done>=impegno.giorni
+            ?"hai «"+impegno.voce.n+"» segnato in agenda."
+            :"c'è una decisione da prendere."),"bad");
       }else status("Avanzato di "+done+" giorno"+(done===1?"":"i")+" · "+GAME_TIME.text()+".","good");
     }
   }
