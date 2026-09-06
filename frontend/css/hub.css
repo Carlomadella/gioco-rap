@@ -757,7 +757,14 @@ body.in-hub .topnav {
    che si sovrapponevano fra loro e finivano dentro la maschera degli angoli.
    `--tagx/--tagy` le scrive hub.js quando il cartello sborderebbe dalla foto. */
 .pspot-tag {
-  opacity: 0;
+  /* SEMPRE accesa. Prima compariva solo col mouse sopra: per sapere cosa
+     c'era sulla mappa bisognava passarci sopra a tentoni, un edificio alla
+     volta. Adesso i dieci posti si leggono tutti insieme, da fermi - e
+     siccome e' l'unica cosa che si vede, e' anche cliccabile: si entra dal
+     cartello oltre che dall'edificio. */
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
   position: absolute;
   z-index: 6;
   left: var(--cx, 50%);
@@ -776,7 +783,6 @@ body.in-hub .topnav {
   padding: 6px 10px;
   border-radius: 10px;
   white-space: nowrap;
-  pointer-events: none;
   background: rgba(7, 9, 14, 0.92);
   border: 1px solid rgba(255,255,255,.17);
   box-shadow: 0 7px 18px rgba(0,0,0,.42), inset 0 0 0 1px rgba(255,255,255,.025);
@@ -834,6 +840,10 @@ body.in-hub .topnav {
   background: #ef4444;
   box-shadow: 0 0 7px rgba(239,68,68,.7);
 }
+/* La targhetta si vede sempre: quello che cambia col mouse sopra (e col
+   Tab, e quando risponde il quartiere) e' che si stacca di due pixel e
+   prende il bordo del colore del posto. E' tutta la risposta che c'e':
+   sulla foto non si disegna niente. */
 .pspot:hover .pspot-tag,
 .pspot:focus-visible .pspot-tag,
 .pspot.district-active .pspot-tag {
@@ -843,6 +853,10 @@ body.in-hub .topnav {
   );
   border-color: var(--pk);
   background: rgba(7, 9, 14, 0.97);
+}
+.pspot:focus-visible .pspot-tag {
+  border-color: var(--acid);
+  box-shadow: 0 0 0 2px var(--acid), 0 7px 18px rgba(0, 0, 0, 0.42);
 }
 .pspot.chiuso .pspot-tag {
   opacity: .72;
@@ -1421,13 +1435,6 @@ body.in-hub .topnav {
     margin-top: 5px;
     gap: 3px;
   }
-}
-
-/* FIX MAPPA V2 — visibilita nomi quartiere */
-.pspot:hover .pspot-tag,
-.pspot:focus-visible .pspot-tag,
-.pspot.district-active .pspot-tag {
-  opacity: 1;
 }
 
 /* MAPPA V2 — luce dinamica clock */
