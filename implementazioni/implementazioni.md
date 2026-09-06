@@ -35,6 +35,26 @@ ALE:
 
 1. Le chat nel cellulare allo stato attuale sono infinite e sempre ripetitive. Volendo noi potremmo looppare all'infinito di parlare con nostra madre e farmare il (+benessere) con la solita conversazione. Non va bene, noi vogliamo che sia tutto più realistico possibile. dobbiamo far avere conversazioni uniche ogni volta e soprattutto non possiamo sentire più di una volta al giorno la stessa persona, tutt'anzi le persone ci scriveranno sporadicamente Nel cellulare volendo
 
+   **FATTO (06/09/2026)** — il loop era proprio quello descritto: `chatIniziaTu`
+   (il "scrivi tu" del telefono) non aveva nessun freno, quindi si poteva aprire
+   «Ciao ma', tutto bene?», rispondere «Mangio, tranquilla» (+4 benessere,
+   `chBene`), e ripetere all'infinito nello stesso istante. Adesso `chat.js`
+   tiene un identificatore di giorno per contatto (`chatGiornoChiave`,
+   anno:settimana:giorno, lo stesso schema di `actions.js` ma tenuto in proprio
+   perché il file deve reggere anche da solo — i test in `prova.js` lo caricano
+   fuori dal browser): la prima volta che **scrivi tu o ti scrive lui/lei**
+   quel giorno lì (`chatSegnaSentitoOggi`, chiamata sia da `chatIniziaTu` che
+   da `chatScrive`) resta segnato, e un secondo «scrivi tu» con la stessa
+   persona lo stesso giorno non parte — un toast lo dice («L'hai già sentito
+   oggi»), niente ricompensa doppia. Il giorno dopo torna disponibile. Non ho
+   toccato il lato «le persone scrivono sporadicamente»: `chatSettimana`/
+   `chatGiorno` (dado a testa, una persona sola al giorno) e la non-ripetizione
+   degli spunti (`chatSpunto`, mai lo stesso di fila, 6 settimane prima di
+   ripescarli) c'erano già e reggevano bene ai test — il buco era solo nel ramo
+   comandato dal giocatore. `npm run prova` (70/70) più una verifica dedicata
+   fuori dal browser sul nuovo limite (stesso giorno bloccato, giorno dopo
+   sbloccato, segnato anche quando scrivono loro, sopravvive al salvataggio).
+
 2. Rendi accessibile lo shop già dalla città iniziale, con limitazioni sui prodotti in vendita
 
 3. i rapporti con i beatmaker non vanno mai in negativo, puoi offenderli quanto vuoi e il rapporto resta uguale
