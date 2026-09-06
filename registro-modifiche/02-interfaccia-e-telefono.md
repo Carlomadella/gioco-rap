@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:66b0f10 -->
+## 06/09/26, 09:48 â€” task/fix-render-e-agenti â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `66b0f10`
+
+### Cosa Ã¨ entrato
+
+- `9bdef2e` â€” fix: renderNegozio non è mai esistita, e i tre agenti entrano in main â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Aggiunto:** `.claude/agents/prova-sul-telefono.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:e823d71 -->
 ## 06/09/26, 09:34 â€” task/pagina-attivita-criminali â†’ main
 
