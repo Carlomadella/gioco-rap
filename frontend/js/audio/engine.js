@@ -6,7 +6,8 @@
    cambiare il formato dei beat né la logica delle schermate. */
 "use strict";
 (() => {
-  const CANALI = ["music", "sfx", "ui", "beat", "ambient"];
+  const CANALI = ["music", "sfx", "ui", "beat", "ambient", "cinematic"];
+  const MODI = new Set(["pregame", "cinematic", "gameplay"]); /* ADF_AUDIO_MODES_V1_1 */
   let modo = "pregame";
   let backend = null;
 
@@ -22,12 +23,18 @@
       sfx,
       ui: pct(a.ui == null ? (a.sfx == null ? 80 : a.sfx) : a.ui),
       beat: pct(a.beat == null ? 85 : a.beat),
-      ambient: pct(a.ambient == null ? 70 : a.ambient)
+      ambient: pct(a.ambient == null ? 70 : a.ambient),
+      /* Per ora CINEMATIC segue il volume SFX. */
+      cinematic: pct(a.cinematic == null ? (a.sfx == null ? 80 : a.sfx) : a.cinematic)
     };
   }
   function soppresso(canale){
-    if(modo !== "pregame") return false;
-    return canale === "sfx" || canale === "ui" || canale === "beat" || canale === "ambient";
+    /* Pregame: soltanto Dream Catcher.
+       Cinematic: musica in uscita + effetti delle scene.
+       Gameplay: tutti i bus disponibili. */
+    if(modo === "pregame") return canale !== "music";
+    if(modo === "cinematic") return canale !== "music" && canale !== "cinematic";
+    return false;
   }
 
   function webAudioBackend(){
@@ -176,7 +183,7 @@
     return l.master > 0 && (l[channel] == null || l[channel] > 0);
   }
   function setMode(next){
-    modo = next === "gameplay" ? "gameplay" : "pregame";
+    modo = MODI.has(next) ? next : "pregame";
     refresh();
     try{ window.dispatchEvent(new CustomEvent("adf:audio-mode", {detail:{mode:modo}})); }catch(e){}
   }

@@ -25,7 +25,14 @@
         if(!doc || doc.__adfAudioGestureBridge) return;
         doc.__adfAudioGestureBridge = true;
         const wake = () => {
-          try{ if(window.ADF_AUDIO && ADF_AUDIO.music) ADF_AUDIO.music.ensureMenu(); }catch(e){}
+          try{
+            if(!window.ADF_AUDIO) return;
+            if(ADF_AUDIO.mode === "cinematic"){
+              ADF_AUDIO.unlock();
+              return;
+            }
+            if(ADF_AUDIO.music) ADF_AUDIO.music.ensureMenu();
+          }catch(e){}
         };
         doc.addEventListener("pointerdown", wake, {capture:true});
         doc.addEventListener("keydown", wake, {capture:true});
@@ -104,6 +111,23 @@
       return;
     }
     if(m.type==="adf-rpg-v24-cancel"){ close(); return; }
+
+    /* ADF_AUDIO_CINEMATIC_BRIDGE_V1_1
+       Dream Catcher sfuma mentre la intro comincia. */
+    if(m.type==="adf-rpg-v24-career-intro-start"){
+      try{
+        if(window.ADF_AUDIO){
+          if(ADF_AUDIO.music && typeof ADF_AUDIO.music.startCinematic === "function"){
+            ADF_AUDIO.music.startCinematic(2.5);
+          }else{
+            ADF_AUDIO.setMode("cinematic");
+            if(ADF_AUDIO.music) ADF_AUDIO.music.stopForGameplay(2.5);
+          }
+        }
+      }catch(err){}
+      return;
+    }
+
     if(m.type==="adf-rpg-v24-complete"){
       if(!salvaRisultato(m.detail||{})) return;
       close();
