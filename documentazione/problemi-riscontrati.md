@@ -26,3 +26,29 @@ Adesso `adfRenderSocialBanner()` non disegna niente se sei dentro, e se la
 fascia era già a schermo quando ti prendono se ne va all'apertura del carcere.
 Il post **resta nel feed**: il mondo fuori continua a parlare di te, lo trovi
 quando esci. È solo la notifica che non arriva, perché il telefono non ce l'hai.
+
+---
+
+DA RIVEDERE
+
+fix: `renderNegozio` non è mai esistita — il guardaroba e la vetrina non si
+riaggiornavano quando passa il tempo
+
+**RISOLTO (06/09/2026)** — branch `task/fix-render-e-agenti`, recuperato da
+`task/simulazione-carriera`, che era rimasto fuori da `main`. Dentro a
+`refreshOtherViews()` (`frontend/js/game/tempo-controlli.js`) — la funzione che
+quando il tempo avanza ridisegna le schermate aperte perché non mostrino numeri
+vecchi — c'era scritto `renderNegozio()`. **Quella funzione non esiste**: si
+chiamano `renderArmadio` (il guardaroba) e `renderAbbigliamento` (la vetrina
+dentro allo Shop). Il `typeof` davanti teneva nascosto lo sbaglio: la chiamata
+non esplodeva, semplicemente non faceva niente. Controllato nel browser —
+`typeof renderNegozio` risponde `undefined` — quindi da sempre quelle due viste
+non si sono mai riaggiornate col tempo. Nello stesso elenco **mancava anche lo
+Studio**, che in testata dice energia, soldi e lucidità: le tre cose che il tempo
+cambia. Adesso ci sono tutte e tre.
+
+Insieme è uscita `.telslot`, che stava **dichiarata in due fogli** (`css/game.css`
+e `css/telefono.css`). Nessun danno — le due righe erano identiche — ma è
+esattamente la forma del guaio che qui è già costato caro una volta: due classi
+con lo stesso nome in due fogli diversi si rompono in silenzio. Tolta da
+`game.css`, dove il resto della vestizione dello slot non c'è.

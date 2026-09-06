@@ -16,3 +16,31 @@ Il resto sta dove è nato e ci resta, perché è lì che lo si cerca:
 (i punti da fare e quelli chiusi), [`../registro-modifiche/`](../registro-modifiche)
 (cosa è cambiato, commit per commit), [`../frontend/README.md`](../frontend/README.md)
 e [`../backend/README.md`](../backend/README.md).
+
+---
+
+## Gli agenti
+
+In `.claude/agents/` ci sono tre agenti che fanno da soli un giro di controllo e
+**scrivono quello che trovano invece di sistemarlo**. Si chiamano per nome nel
+discorso («fai un giro con `segnala-problemi`»).
+
+| agente | cosa fa |
+| --- | --- |
+| `segnala-problemi` | gira il gioco, trova le cose storte e le scrive in [`problemi-riscontrati.md`](problemi-riscontrati.md). Non tocca il codice. |
+| `prova-sul-telefono` | apre il gioco nel browser a misura di telefono, ci gioca, fa gli screenshot e segna cosa si rompe. Il giro dura: non è da fare a ogni modifica. |
+| `backend-allineato` | controlla che le tre copie della stessa cosa non divergano — `backend/server.js`, `backend/README-API.md`, `backend/database/schema.md` — e le due serie di migrazioni, SQLite e PostgreSQL. |
+
+Due di loro hanno una sveglia, in `.claude/settings.json`:
+
+- **a ogni messaggio** parte `scripts/controlla-backend.js`, che confronta rotte,
+  migrazioni e schema; se trova uno scarto lo dice in una riga e propone
+  `backend-allineato`. Se non trova niente, tace.
+- **all'apertura di una sessione** parte `scripts/promemoria-telefono.js`, che
+  guarda quanti file dell'interfaccia sono cambiati dall'ultimo giro sul telefono
+  e, se sono tanti, propone `prova-sul-telefono`.
+
+Tutti e due i comandi si possono dare anche a mano (`node scripts/...`) e non
+fermano niente se falliscono. Se dan fastidio, si tolgono cancellando il pezzo
+che li chiama da `.claude/settings.json`. Quando è stato fatto l'ultimo giro sta
+in `.claude/stato-agenti.json`, che è di questa macchina e resta fuori da git.

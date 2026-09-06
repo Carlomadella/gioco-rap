@@ -1,0 +1,28 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/scripts/controlla-backend.js\" --hook 2>/dev/null || true",
+            "timeout": 10,
+            "statusMessage": "Controllo che il backend sia allineato..."
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/scripts/promemoria-telefono.js\" --hook 2>/dev/null || true",
+            "timeout": 20,
+            "statusMessage": "Guardo se serve un giro sul telefono..."
+          }
+        ]
+      }
+    ]
+  }
+}
