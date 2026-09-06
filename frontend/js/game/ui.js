@@ -241,7 +241,8 @@ function renderGioco(){
   /* Punto 7: benessere, lucidità, pezzi fuori e lavoro stavano sotto
      «Dettagli», qui dentro. Adesso stanno tutti sulla mappa — benessere nella
      fascia in alto, lucidità e pezzi fuori nel profilo, il lavoro sotto
-     Disciplina — e il bottone che li apriva non serve più. */
+     Condizione (si chiamava Disciplina fino al punto 25) — e il bottone che li
+     apriva non serve più. */
 
   // azioni
   const aw = $("g-actions"); aw.innerHTML = "";
@@ -264,7 +265,9 @@ function renderGioco(){
     b.innerHTML =
       '<span class="scene">' +
         '<svg viewBox="0 0 200 128" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">' + sc[2] + '</svg>' +
-        '<span class="cost"><i>' + en2 + '</i>energia</span>' +
+        /* Punto 28: una mossa può non costare energia. «0 energia» è un
+           numero che non vuol dire niente: si scrive gratis. */
+        '<span class="cost">' + (en2 ? '<i>' + en2 + '</i>energia' : 'gratis') + '</span>' +
         (c ? '<span class="price">' + c + ' \u20AC</span>' : '') +
         (ok ? '' : '<span class="lock">\uD83D\uDD12</span>') +
       '</span>' +

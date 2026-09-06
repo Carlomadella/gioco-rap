@@ -521,9 +521,13 @@ function vistaProfilo(L, ph){
     '</div>';
 }
 
-function vistaDisciplina(){
+/* Punto 25: si chiamava «Disciplina», e non era quello. Qui dentro non c'è
+   niente che si comandi: c'è come stai (benessere, lucidità, energia,
+   palestra), cosa ti tocca ogni settimana (lavoro, spese) e a che punto sei
+   della scalata. È la tua **condizione**, e adesso si chiama così. */
+function vistaCondizione(){
   const ph = PHASES[G.phase], nt = typeof nextTrial === "function" ? nextTrial() : null;
-  return '<span class="ptit">Disciplina</span>' +
+  return '<span class="ptit">La tua condizione</span>' +
     '<div class="prighe" style="margin-top:14px">' +
       rigaStat("cuore", "#EF4444", "Benessere", Math.round(G.wellbeing), G.wellbeing) +
       rigaStat("testa", "#A855F7", "Lucidità", Math.round(luc()), luc()) +
@@ -569,11 +573,11 @@ function renderHub(){
 
   /* ---- colonna di sinistra ---- */
   $("hb-profilo").innerHTML =
-    HUB_VISTA === "disciplina" ? vistaDisciplina() : vistaProfilo(L, ph);
+    HUB_VISTA === "condizione" ? vistaCondizione() : vistaProfilo(L, ph);
 
   $("hb-sxtab").innerHTML = [
     ["profilo", "Profilo", "persona"], ["abilita", "Abilità", "matita"],
-    ["vestiti", "Vestiti", "maglietta"], ["disciplina", "Disciplina", "scudo"]
+    ["vestiti", "Vestiti", "maglietta"], ["condizione", "Condizione", "cuore"]
   ].map(([id, n, ic]) =>
     '<button class="ptab' + (HUB_VISTA === id ? " on" : "") + '" data-v="' + id + '">' +
     hsvg(ic) + '<span>' + n + '</span></button>').join("");

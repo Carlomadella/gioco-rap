@@ -297,3 +297,40 @@ cliccando sopra si ferma, come dice il codice.
     numeri dati. Siccome è un'interpretazione e non un fatto, sta scritta nero su bianco in
     una prova (`strumenti/prova.js`): se si cambia idea, si cambia lì e si vede subito cosa
     si sta cambiando.
+
+---
+
+## 28 · Girare a cercare beat non costa più energia
+
+> **FATTO (06/09/2026)** — branch `task/24-25-28-menu-disciplina-beat`.
+>
+> «Gira a cercare beat» (lo Studio → Il beat, oppure la mossa `beat`) costava
+> **25 di energia** su cento. Non è lavoro: è camminare e ascoltare, e torni con
+> tre beat **da comprare**, mica con un pezzo fatto. Far pagare la stanchezza
+> per andare a *guardare* la roba in vendita voleva dire che a fine giornata non
+> potevi nemmeno farti un giro — e che il giro te lo pensavi due volte anche a
+> metà pomeriggio.
+>
+> Adesso è **zero**. Resta il +1 di lucidità: girare fra i produttori la testa
+> te la accende, e quello non è cambiato.
+>
+> **Gratis non vuol dire infinito**, ed è la parte che conta:
+> - sono comunque **due ore** di gioco (`DURATE.beat` in `js/game/tempo.js`),
+>   e le ore in una giornata sono quelle;
+> - si fa solo **a studio aperto**, dalle 13:00 alle 02:00 (`js/game/orari.js`);
+> - e ci si deve **arrivare**, allo Studio, col tempo del tragitto.
+>
+> Il freno è il tempo, che per una mossa così è quello giusto: l'energia serve a
+> dire «hai lavorato abbastanza per oggi», non «non puoi nemmeno uscire di
+> casa». È anche il motivo per cui **«Fattelo fare»** — chiedere il beat a un
+> beatmaker che conosci — continua a costare le sue 20: quella è una sessione,
+> non un giro.
+>
+> **Un dettaglio dell'interfaccia**: nella griglia delle mosse il costo si
+> stampava sempre come numero, e sarebbe uscito «0 energia», che non vuol dire
+> niente. Una mossa da zero energia adesso si scrive **gratis**.
+>
+> **Provato in Chrome sul gioco vero**: dallo Studio a Napoli, energia 30/100
+> prima e 30/100 dopo, l'orologio da 16:15 a 18:00 (45 minuti di tragitto più le
+> due ore), lucidità da 96 a 97, tre beat nuovi sul banco dello Shop (da 6 a 9) e
+> la riga nel diario. Prima quella stessa mossa lasciava 5 di energia.

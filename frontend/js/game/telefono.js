@@ -67,7 +67,7 @@ const HUB_APP_VECCHIO = [
      gioco. Adesso stanno sulla plancia — quindi l'app li mostra dove sono,
      invece di aprire un pannello che non c'è più. */
   {id:"statistiche", n:"Statistiche", ic:"barre", k:"#4ADE80",
-   vai:() => { GO("hub"); HUB_VISTA = "disciplina"; renderHub(); }},
+   vai:() => { GO("hub"); HUB_VISTA = "condizione"; renderHub(); }},
   {id:"discografia", n:"Discografia", ic:"nota", k:"#C084FC",
    sotto:g => g.songs.filter(x => x.released).length + " pezzi fuori",
    vai:() => telVaiApp("discografia")},

@@ -176,7 +176,7 @@ function palestraFlavor(streak){
   if(streak >= 14 && streak % 7 === 0) return " " + (streak/7) + " settimane di fila. Adesso è abitudine.";
   return "";
 }
-/* per la scheda «Disciplina» del profilo (hub.js): la stessa lettura a
+/* per la scheda «Condizione» del profilo (hub.js): la stessa lettura a
    sola lettura di palestraStreakOra(), in una riga per l'utente */
 function palestraTesto(){
   const s = palestraStreakOra();
@@ -208,7 +208,13 @@ const ACTIONS = [
      return "";
    }},
 
-  {id:"beat", n:"Cerca un beat", e:25, luc:1,
+  /* Punto 28: girare a cercare beat non costa più energia (era 25). Non è
+     lavoro: è camminare e ascoltare, e far pagare la stanchezza per andare a
+     *guardare* la roba da comprare voleva dire che a fine giornata non potevi
+     nemmeno farti un giro. Non diventa gratis però: sono comunque due ore di
+     gioco (`DURATE.beat` in tempo.js) e si fa solo quando lo studio è aperto,
+     13:00–02:00 (orari.js). Il freno resta il tempo, che è quello giusto. */
+  {id:"beat", n:"Cerca un beat", e:0, luc:1,
    d:"Giri fra i produttori. Torni con roba da comprare.",
    give:() => "3 beat, 3 generi · +rete",
    run(){

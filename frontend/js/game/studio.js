@@ -236,7 +236,9 @@ function studioSezBeat(){
       '<button class="stgo" data-beat="' + studioEsc(p.id) + '"' + (st.ok ? "" : " disabled") + '>' +
         'Fattelo fare</button>' +
         '<span class="stsub' + (st.ok ? "" : " no") + '">' + (st.ok
-          ? (costo ? fmt(costo) + " € · " : "gratis · ") + STUDIO_BEAT_ENERGIA + " energia \\u00b7 " + studioBeatTempoTesto() + " \\u00b7 q~" +
+          /* i due separatori qui in mezzo erano scritti con una barra di
+             troppo e finivano a schermo come lettere: «20 energia \u00b7 2h». */
+          ? (costo ? fmt(costo) + " € · " : "gratis · ") + STUDIO_BEAT_ENERGIA + " energia · " + studioBeatTempoTesto() + " · q~" +
             Math.round(20 + p.fama * 0.55 + p.rel * 7 + (G.skills.rete || 0) * 0.4)
           : studioEsc(st.perche)) + '</span>', false);
   }).join("");
@@ -248,7 +250,8 @@ function studioSezBeat(){
     '<div class="stoppure"><span>oppure</span></div>' +
     '<button class="stazione" data-az="beat">' +
       '<b>Gira a cercare beat</b>' +
-      '<span>Tre beat sul banco dello Shop, da comprare. Non serve conoscere nessuno.</span>' +
+      '<span>Tre beat sul banco dello Shop, da comprare. Non serve conoscere nessuno, ' +
+      'e non costa energia: ci vogliono solo due ore.</span>' +
     '</button>';
 }
 

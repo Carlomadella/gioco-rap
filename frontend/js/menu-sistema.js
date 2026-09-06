@@ -324,6 +324,21 @@
     location.reload();
   }
 
+  /* Punto 24: l'uscita in un colpo solo, per il tasto «Menu» della plancia.
+     Fa quello che fa «Salva ed esci», ma senza far aprire prima il menu di
+     sistema: scrive il checkpoint e se ne va. L'unico caso in cui il menu si
+     apre lo stesso è quando non si può salvare — un'azione a metà, un
+     avanzamento in corso: il motivo si legge solo lì dentro, e sparire senza
+     dire niente sarebbe la cosa peggiore. */
+  function uscitaRapida(){
+    const blocco = checkpointNonSicuro();
+    if(blocco){ apri(); stato(blocco, "bad"); return false; }
+    const esito = scriviCheckpoint();
+    if(!esito.ok){ apri(); stato(esito.msg || "Salvataggio non riuscito.", "bad"); return false; }
+    tornaAlMenu();
+    return true;
+  }
+
   function apriImpostazioniSistema(){
     chiudi();
     try{
@@ -457,6 +472,7 @@
       e.preventDefault();
       e.stopImmediatePropagation();
       if(global.dataset.adfGlobal === "mappa") tornaMappa();
+      else if(global.dataset.adfGlobal === "menu") uscitaRapida();
       else apri();
       return;
     }
@@ -511,7 +527,8 @@
     open:apri,
     close:chiudi,
     map:tornaMappa,
-    saveAndExit:salvaEdEsci
+    saveAndExit:salvaEdEsci,
+    exitToMenu:uscitaRapida
   });
 })();
 
