@@ -134,6 +134,19 @@ fase e sul tetto settimanale della promo.
 
 13. Ti ricordo che i pulsanti sopra la mappa sono ANCORA TROPPO GRANDI rispetto ai quadratini stessi. Rivedilo.
 
+14. L'app statistiche nel cellulare ora riporta statistiche che già trovi in game; Vorrei altre statistiche: Statistiche in studio con Brani pubblicati, contatti fatti, videoclip registrati, impression totali, insomma un vero e proprio archivio di tutte le statistiche più importanti che poi i nostri player si vanno a leggere.
+
+    **FATTO (07/09/2026)** — l'app «Statistiche» del telefono teneva solo i numeri
+    che si vedono già nella testata (energia, benessere, hype, fan, soldi...).
+    Sotto è comparso un **Archivio** nuovo, coi totali di carriera che prima non
+    stavano scritti da nessuna parte tutti insieme: **brani pubblicati** (i pezzi
+    con `released:true`), **contatti fatti** (`chatAttivi().length`, gli stessi
+    contatti che popolano la Chat), **videoclip registrati** (i pezzi con un video
+    girato, `s.video`) e **impression totali** (la somma degli stream di tutti i
+    pezzi, `frontend/js/game/telefono.js`, `schermataStatistiche()`). La parte
+    sopra (i numeri "come stai adesso") non è stata toccata. `npm run prova`
+    (70/70) più una verifica dedicata delle quattro formule.
+
 CARLO:
 
 /_ GIORNALIERE _/
