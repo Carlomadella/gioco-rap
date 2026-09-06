@@ -657,7 +657,6 @@ body.in-hub .topnav {
   border: 0;
   padding: 0;
   --col: rgba(255, 255, 255, 0.62);
-  --alone: transparent;
   --vis: 0;
   --riemp: 0;
 }
@@ -670,10 +669,15 @@ body.in-hub .topnav {
   overflow: visible;
   pointer-events: none;
 }
-/* `pointer-events: all` vale anche col riempimento trasparente: si clicca
-   dentro alla sagoma, non attorno. Opacità e riempimento passano da
-   fill-opacity / stroke-opacity e non da `opacity`, così la zona resta
-   cliccabile anche da spenta senza doverla tenere visibile. */
+/* La sagoma NON si vede mai: e' solo la forma di quello che si clicca.
+   Sopra a una foto ogni contorno disegnato e' un adesivo, e dieci contorni
+   accesi sono un reticolo appiccicato sulla citta'. La risposta al mouse la
+   da' la targhetta, che compare sopra all'edificio, piu' il pallino che si
+   ingrossa: bastano, e non sporcano l'immagine.
+   `pointer-events: all` vale anche col riempimento trasparente, quindi si
+   clicca dentro alla sagoma e non attorno anche se non c'e' niente da vedere.
+   Se un giorno la si vuole rimettere: --vis e' l'opacita' del contorno,
+   --riemp quella del velo di colore. */
 .pspot-sagoma polygon {
   pointer-events: all;
   cursor: pointer;
@@ -682,67 +686,25 @@ body.in-hub .topnav {
   stroke: var(--col);
   stroke-opacity: var(--vis);
   stroke-width: 2;
+  /* niente ombra: senza contorno non ha nulla da staccare dalla foto */
   stroke-linejoin: round;
-  filter: drop-shadow(0 0 7px var(--alone)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.85));
   transition:
     fill-opacity 0.16s ease,
     stroke-opacity 0.16s ease,
     stroke 0.16s ease,
     filter 0.18s ease;
 }
-@media (hover: none) {
-  .pspot {
-    --vis: 0.42;
-  }
-}
-
-/* Passando su un quartiere si accendono, appena, tutti i posti che ci stanno
-   dentro: è il quartiere che risponde, non un posto scelto — quindi solo il
-   filo del contorno, senza il velo di colore, che è la risposta del posto
-   singolo. */
-.pspot.district-active {
-  --vis: 0.6;
-  --col: color-mix(in srgb, var(--pk) 55%, #fff);
-  --alone: color-mix(in srgb, var(--pk) 34%, transparent);
-}
-/* Acceso, il posto si accende **del suo colore** — quello del pallino e della
-   targhetta: prima si accendevano tutti dello stesso viola, e dieci posti
-   dello stesso viola sono dieci volte lo stesso posto. Il velo è tenue e sta
-   dentro alla sagoma: sopra a una foto un colore pieno cancella l'edificio,
-   ed è l'edificio la cosa che stai scegliendo. */
-.pspot:hover {
-  --vis: 1;
-  --riemp: 0.2;
-  --col: color-mix(in srgb, var(--pk) 62%, #fff);
-  --alone: color-mix(in srgb, var(--pk) 62%, transparent);
-}
-/* col tasto Tab il segno dev'essere fuori di dubbio sopra a qualsiasi pixel
-   della foto: contorno giallo acido e alone */
+/* Passando su un quartiere risponde il quartiere, non un posto scelto: si
+   accendono le targhette dei posti che ci stanno dentro (regola più sotto),
+   e basta. */
+/* Col mouse sopra — e col tasto Tab — l'unica risposta è la targhetta che
+   compare sopra all'edificio, col nome e l'orario, più il pallino che si
+   ingrossa. Sulla foto non si disegna niente. */
 .pspot:focus-visible {
-  --vis: 1;
-  --riemp: 0.22;
-  --col: var(--acid);
-  --alone: color-mix(in srgb, var(--acid) 50%, transparent);
   outline: none;
 }
-.pspot:active .pspot-sagoma polygon {
-  fill-opacity: 0.3;
-}
-/* un posto ancora chiuso resta grigio: si tocca — dice cosa gli manca — ma
-   non si accende come quelli dove si può entrare davvero */
-.pspot.chiuso {
-  --col: rgba(255, 255, 255, 0.4);
-  --alone: transparent;
-}
-.pspot.chiuso:hover {
-  --vis: 1;
-  --riemp: 0.1;
-  --col: rgba(255, 255, 255, 0.75);
-  --alone: transparent;
-}
-.pspot.chiuso .pspot-sagoma polygon {
-  fill: #fff;
-}
+/* un posto ancora chiuso si tocca lo stesso — dice cosa gli manca — e lo
+   dice la sua targhetta, più smorta delle altre (regola più sotto) */
 /* MAPPA V2 — quartieri interattivi */
 .pdistricts {
   position: absolute;

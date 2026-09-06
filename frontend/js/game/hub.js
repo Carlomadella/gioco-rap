@@ -66,8 +66,10 @@ const spoglia = t => String(t).replace(/<[^>]*>/g, "");
    edificio, o si prende mezza strada e il cortile del vicino — e quello che
    si accende è sempre più grande della cosa che stai per cliccare. Adesso
    ogni posto ha il PROFILO del suo edificio (HUB_SAGOME, misurato sulla foto):
-   il riquadro del bottone è solo il rettangolo che lo contiene, e dentro una
-   clip-path ritaglia sia quello che si vede sia quello che si clicca. */
+   il riquadro del bottone è solo il rettangolo che lo contiene, e a prendere
+   i clic è il poligono. Il poligono NON si disegna: sopra a una foto ogni
+   contorno è un adesivo. Quello che risponde al mouse è la targhetta, che
+   compare sopra all'edificio. */
 const HUB_LUOGHI = [
   /* punto 12: lo studio non è più una scorciatoia alla linguetta della
      settimana — è una stanza sua, con dentro le quattro fasi di un pezzo e la
