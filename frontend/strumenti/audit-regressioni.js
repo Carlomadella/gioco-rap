@@ -1238,6 +1238,34 @@ test("il build impacchetta tutte e tre le pagine",
   build.includes('{ file: "pagine/accesso.html"') &&
   build.includes('{ file: "pagine/gioco.html"'));
 
+console.log("\nPunti 24, 25, 28 — la via d'uscita, il nome della scheda, i beat gratis");
+test("punto 24: la plancia ha un tasto «Menu» in chiaro, non solo il logo",
+  index.includes('id="hb-menu"') && index.includes('data-adf-global="menu"') &&
+  index.includes('id="hb-logo"') &&
+  leggi("css/hub.css").includes(".pmenu {"));
+test("punto 24: quel tasto salva prima di uscire, e se non può dice perché",
+  menuSystem.includes("function uscitaRapida()") &&
+  menuSystem.includes('adfGlobal === "menu") uscitaRapida()') &&
+  menuSystem.includes("exitToMenu:uscitaRapida") &&
+  (() => {
+    const f = menuSystem.slice(menuSystem.indexOf("function uscitaRapida()"));
+    const corpo = f.slice(0, f.indexOf("\n  }") + 4);
+    return corpo.includes("checkpointNonSicuro()") && corpo.includes("scriviCheckpoint()") &&
+      corpo.includes("tornaAlMenu()") && corpo.includes("apri()");
+  })());
+test("punto 25: la scheda non si chiama più «Disciplina»",
+  hub.includes('["condizione", "Condizione"') &&
+  hub.includes('HUB_VISTA === "condizione" ? vistaCondizione()') &&
+  hub.includes("La tua condizione") &&
+  !hub.includes('["disciplina"') && !hub.includes('class="ptit">Disciplina') &&
+  tel.includes('HUB_VISTA = "condizione"'));
+test("punto 28: girare a cercare beat non costa energia",
+  /\{id:"beat", n:"Cerca un beat", e:0,/.test(actions));
+test("punto 28: ma costa tempo, che è il freno vero",
+  /beat:\s*120/.test(time) && hours.includes('beat:      {open:"13:00", close:"02:00"}'));
+test("punto 28: una mossa da zero energia si scrive «gratis», non «0 energia»",
+  ui.includes("(en2 ? '<i>' + en2 + '</i>energia' : 'gratis')"));
+
 for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }

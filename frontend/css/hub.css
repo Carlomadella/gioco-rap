@@ -144,6 +144,34 @@ body.in-hub .topnav {
   color: #ffa92b;
   text-shadow: 0 2px 0 #8e4a05;
 }
+/* Punto 24: il tasto per tornare al menu, accanto al marchio. Sta nella
+   fascia, non galleggia sopra alla mappa: è una via d'uscita, non un comando
+   di gioco, e deve stare dove si guarda quando si cerca «come esco». */
+.pmenu {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 14px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  color: #9aa3b2;
+  font-family: Figtree, Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  transition: background 0.15s, color 0.15s;
+}
+.pmenu:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+.pmenu .hicon {
+  width: 15px;
+  height: 15px;
+  fill: currentColor;
+}
+
 .hcrown {
   width: 20px;
   height: 20px;
@@ -1134,6 +1162,13 @@ body.in-hub .topnav {
   .plogo {
     width: auto;
     padding: 0 10px 0 4px;
+  }
+  /* sullo schermo stretto resta la casetta: la parola la mangia la riga */
+  .pmenu {
+    padding: 0 10px;
+  }
+  .pmenu span {
+    display: none;
   }
   .pcitta {
     width: auto;

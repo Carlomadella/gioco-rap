@@ -218,9 +218,28 @@ NETWORK 64
     secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su
     "stacca la spina", il quinto su "registra un pezzo".
 
-24. nella schermata di gioco deve esserci un bottone che ti porta alla schermata di landing o menù principale, ecc.
+24. nella schermata di gioco deve esserci un bottone che ti porta alla schermata di landing o menù principale, ecc, oltre al logo.
+
+    **FATTO (06/09/2026)** — branch `task/24-25-28-menu-disciplina-beat`. Nella fascia in
+    alto della plancia, accanto al marchio, adesso c'è un tasto con su scritto **Menu**:
+    un clic e sei al menu principale. Prima l'unica via era il marchio, che apre il menu di
+    sistema — e bisognava saperlo. Salva la partita prima di uscire (lo stesso codice di
+    «Salva ed esci», `js/menu-sistema.js`); se in quel momento non si può salvare —
+    un'azione a metà, un avanzamento in corso — apre il menu di sistema con scritto il
+    perché, invece di sparire senza dire niente. Per esteso in
+    [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#24--un-tasto-per-uscire-al-menu-scritto-a-lettere).
+
 
 25. cambia il nome «disciplina»
+
+    **FATTO (06/09/2026)** — adesso si chiama **Condizione**, e dentro il titolo è «La tua
+    condizione». «Disciplina» prometteva una cosa che lì dentro non c'è: non si comanda
+    niente, si legge come stai (benessere, lucidità, energia, palestra), cosa ti tocca ogni
+    settimana (lavoro, spese fisse) e a che punto sei della scalata. Cambiata anche l'icona,
+    dallo scudo al cuore, e il nome dentro al codice (`vistaCondizione`, `HUB_VISTA`), così
+    non resta un nome vecchio a far confondere chi legge. Per esteso in
+    [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#25--disciplina-diventa-condizione).
+
 
 26. togli il parametro «lucidità» e tutto ciò che ne consegue
 
@@ -237,15 +256,23 @@ NETWORK 64
     esteso in
     [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#27--la-landing-è-una-pagina-sua-staccata-dallaccesso-e-dal-gioco).
 
-28. la pagina di login a sè stante, visibile dalla landing, fuori dalla sezione account, senza il server a vista e fatta molto meglio
+28. l'azione "gira a cercare beat" non dovrebbe costare energia
 
-29. l'azione "gira a cercare beat" non dovrebbe costare energia
+    **FATTO (06/09/2026)** — costava 25 di energia, adesso **zero**. Non è lavoro: è
+    camminare e ascoltare, e far pagare la stanchezza per andare a *guardare* la roba da
+    comprare voleva dire che a fine giornata non potevi nemmeno farti un giro. Gratis però
+    non vuol dire infinito: sono comunque **due ore** di gioco (`DURATE.beat`) e si fa solo
+    a studio aperto, dalle 13 alle 2 — il freno resta il tempo, che è quello giusto. Nella
+    griglia delle mosse una mossa da zero energia adesso si scrive «gratis» invece di
+    «0 energia». Per esteso in
+    [`04-musica-e-suoni.md`](04-musica-e-suoni.md#28--girare-a-cercare-beat-non-costa-più-energia).
+
 
 PAGINA DI LANDING: 30. migliorare graficamente la schermata opzioni
 
 31. creare una schermata per le classifiche che si apre anche dall'app del telefono
 
-32. DA DISCUTERE collegare la pagina di mycoltogliere la sezione il tuo artista dalla pagina di landing o , oltre che da nuova partita. e collegarla allo shop?
+32. DA DISCUTERE collegare la pagina di mycol togliere la sezione il tuo artista dalla pagina di landing o , oltre che da nuova partita. e collegarla allo shop?
 
 33. dividi tutti i file .md sparsi in cartelle con nomi coerenti, inoltre smista le task fatte da implementazioni.md
 

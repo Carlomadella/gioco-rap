@@ -1040,3 +1040,54 @@ leggi di quella persona. Riscritta senza.
 > resta una porta, la landing non si porta dietro il gioco, ogni pagina cita i
 > suoi file), audit **234/234** (otto controlli nuovi sul punto), build
 > **31/31** — il verificatore del build adesso guarda pagina per pagina.
+
+---
+
+## 24 · Un tasto per uscire al menu, scritto a lettere
+
+> **FATTO (06/09/2026)** — branch `task/24-25-28-menu-disciplina-beat`.
+>
+> **Il problema.** Dalla partita si usciva solo dal marchio in alto a sinistra:
+> ci clicchi sopra e si apre il menu di sistema, dove c'è «Salva ed esci». È una
+> cosa che o te la dice qualcuno o non la scopri — un logo non sembra un
+> bottone, sembra un logo. Dal punto 27 la landing è per giunta una pagina a
+> parte, quindi «tornare al menu» è un'uscita vera e merita una porta visibile.
+>
+> **Cosa c'è adesso.** Nella fascia in alto della plancia, subito accanto al
+> marchio, un tasto con la casetta e la parola **MENU**. Un clic solo: salva la
+> partita e va alla landing. Sotto c'è lo stesso codice di «Salva ed esci»
+> (`uscitaRapida()` in `js/menu-sistema.js`), quindi il salvataggio è lo stesso
+> checkpoint di sempre, non una scorciatoia che scrive a metà.
+>
+> **Quando non si può salvare** — un'azione a metà, un avanzamento in corso —
+> il tasto non ti butta fuori e non resta muto: apre il menu di sistema con
+> scritto il motivo, che è l'unico posto dove quel messaggio si può leggere.
+>
+> **Come è fatto**: il bottone porta `data-adf-global="menu"`, cioè passa dallo
+> stesso instradamento dei comandi globali che c'era già per «← MAPPA» e per il
+> marchio. Non c'è un secondo giro di logica: un attributo, e il menu di sistema
+> sa cosa fare. Il vestito è `.pmenu` in `css/hub.css`; sullo schermo stretto
+> resta la casetta e la parola sparisce, come fa il resto della fascia.
+>
+> **Dalle altre schermate** (Studio, Strada, Sala…) la via resta quella di
+> prima, ed è a due passi: «← MAPPA» e poi MENU.
+
+---
+
+## 25 · «Disciplina» diventa «Condizione»
+
+> **FATTO (06/09/2026)** — stesso branch.
+>
+> La quarta linguetta della colonna di sinistra si chiamava **Disciplina** e
+> l'icona era uno scudo. Prometteva una cosa che lì dentro non c'è: non si
+> comanda niente e non c'è niente da rispettare. Quello che c'è è **come stai**
+> — benessere, lucidità, energia, la striscia di giorni di palestra — **cosa ti
+> tocca ogni settimana** — il lavoro, le spese fisse — e **a che punto sei**
+> della scalata, con la prova che ti aspetta.
+>
+> Adesso si chiama **Condizione**, il titolo dentro è «La tua condizione» e
+> l'icona è il cuore. È cambiato anche il nome nel codice — `vistaCondizione()`,
+> `HUB_VISTA === "condizione"` — perché lasciare il nome vecchio di sotto vuol
+> dire che fra un mese uno legge «disciplina» e cerca una cosa che non esiste.
+> L'app **Statistiche** del telefono, che apre questa scheda, ci arriva come
+> prima.
