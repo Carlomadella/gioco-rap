@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:4b44613 -->
+## 06/09/26, 18:51 â€” origin/feature/avvio-rapido-intro â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `4b44613`
+
+### Cosa Ã¨ entrato
+
+- `7a1ce94` â€” fix: avvio rapido con preset temporaneo e cinematic RPG â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/gioco-ingresso.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:e4ad390 -->
 ## 06/09/26, 14:40 â€” origin/main â†’ main
 
