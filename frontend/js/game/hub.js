@@ -75,7 +75,7 @@ const HUB_LUOGHI = [
      settimana — è una stanza sua, con dentro le quattro fasi di un pezzo e la
      gente che ci lavora (js/game/studio.js). Punto 10: è sempre aperto. */
   {id:"studio", n:"Studio",
-   vai:() => apriStudio("beat")},
+   vai:() => apriStudio(G.bars.length ? "beat" : "cabina")},
   /* punto 59/61: era un cartello chiuso («Club & discoteche», ancora dentro
      alla foto — cambia solo quando cambia la mappa, punto 45); qui sotto
      adesso c'è un lavoro vero, part time. */
