@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:06bcd36 -->
+## 06/09/26, 14:18 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `06bcd36`
+
+### Cosa Ã¨ entrato
+
+- `9a6d8ed` â€” feat: rende dinamica intro finale carriera â€” **Mycol**
+
+### File di questa categoria
+
+- **Rimosso:** `frontend/media/creator-rpg-v24/assets/creator-03-947905e87828.png`
+- **Aggiunto:** `frontend/media/creator-rpg-v24/assets/creator-03-intro-clean.png`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:c9451d0 -->
 ## 06/09/26, 11:28 â€” branch non identificato â†’ main
 
