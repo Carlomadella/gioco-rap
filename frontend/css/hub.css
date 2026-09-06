@@ -799,8 +799,14 @@ body.in-hub .topnav {
   position: absolute;
   z-index: 6;
   left: var(--cx, 50%);
-  top: 7px;
-  transform: translate(calc(-50% + var(--tagx, 0px)), var(--tagy, 0px));
+  /* SOPRA all'edificio, non addosso: appoggiata dentro alla sagoma copriva
+     proprio il tetto del posto che sta indicando. Se così esce dalla foto ci
+     pensa hubClampTarghette() a rimetterla dentro (--tagy). */
+  top: 0;
+  transform: translate(
+    calc(-50% + var(--tagx, 0px)),
+    calc(-100% - 8px + var(--tagy, 0px))
+  );
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -869,7 +875,10 @@ body.in-hub .topnav {
 .pspot:hover .pspot-tag,
 .pspot:focus-visible .pspot-tag,
 .pspot.district-active .pspot-tag {
-  transform: translate(calc(-50% + var(--tagx, 0px)), calc(var(--tagy, 0px) - 2px));
+  transform: translate(
+    calc(-50% + var(--tagx, 0px)),
+    calc(-100% - 10px + var(--tagy, 0px))
+  );
   border-color: var(--pk);
   background: rgba(7, 9, 14, 0.97);
 }
