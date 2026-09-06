@@ -1223,6 +1223,8 @@ test("in media/ non restano immagini che nessuna riga di codice carica",
       "palestra.png", "registrazione_pezzo.png", "scrittura_barre.png",
       "stacca_la_spina.png", "studio_creazione_beat.png", "studio_mixaggio.png",
       "studio_promo_su_lafamegram.png", "studio_uscita_pezzo.png",
+      /* la versione definitiva di Casa, arrivata dopo le altre */
+      "casa_di provincia_definitiva.png",
       /* Le stesse undici scene, ma senza gli elementi HTML sopra: servono per
          capire cosa e' disegno e cosa e' foto quando si rifanno le pagine dei
          luoghi. Materiale di riferimento, non ancora caricato da nessuno. */

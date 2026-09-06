@@ -581,14 +581,20 @@ function segnatiInAgenda(){
 function schermataAgenda(){
   const oggi = HUB_EVENTI.map(e => {
     const st = telAgendaEvento(e);
-    return '<button class="tli" data-evento="' + e.id + '"' + (st.ok ? '' : ' disabled') + '>' +
+    const soloEnergiaEv = !st.ok && soloSenzaEnergia(e.id);
+    return '<button class="tli' + (soloEnergiaEv ? ' spenta' : '') + '" data-evento="' + e.id + '"' +
+      (st.ok || soloEnergiaEv ? '' : ' disabled') + '>' +
       '<span class="tliav" style="--k:' + e.k + '">' + hsvg(e.ic) + '</span>' +
       '<span class="tlitx"><b>' + e.n + '</b><i>' + (st.ok ? e.d : st.perche) + '</i></span>' +
       '<span class="tliv">' + e.ora + '</span></button>';
   }).join("");
   const mosse = ACTIONS.filter(a => !a.avail || a.avail()).map(a => {
     const pronto = telAgendaAzione(a.id);
-    return '<button class="tli" data-azione="' + a.id + '"' + (pronto.ok ? '' : ' disabled') + '>' +
+    /* Come sulla plancia: se manca solo l'energia la riga resta cliccabile
+       e lo dice col fulmine (actions.js), invece di spegnersi e basta. */
+    const soloEnergia = !pronto.ok && soloSenzaEnergia(a.id);
+    return '<button class="tli' + (soloEnergia ? ' spenta' : '') + '" data-azione="' + a.id + '"' +
+      (pronto.ok || soloEnergia ? '' : ' disabled') + '>' +
       '<span class="tlitx"><b>' + a.n + '</b><i>' + (pronto.ok ? a.d : pronto.perche) + '</i></span>' +
       '<span class="tliv">' + a.e + '⚡</span></button>';
   }).join("");
@@ -708,6 +714,8 @@ $("hb-tel").addEventListener("click", ev => {
   const evb = ev.target.closest("[data-evento]");
   if(evb && !evb.disabled){
     const e = HUB_EVENTI.find(x => x.id === evb.dataset.evento); if(!e) return;
+    /* riga spenta per la sola energia: risponde col fulmine e si ferma */
+    if(evb.classList.contains("spenta")){ avvisoSenzaEnergia(e.id); return; }
     hubTap();
     if(e.posto) apriPosto();
     else if(e.strada) apriStrada();
@@ -716,7 +724,11 @@ $("hb-tel").addEventListener("click", ev => {
     return;
   }
   const azb = ev.target.closest("[data-azione]");
-  if(azb && !azb.disabled){ hubTap(); hubAzione(azb.dataset.azione); }
+  if(azb && !azb.disabled){
+    /* riga spenta per la sola energia: risponde col fulmine e si ferma */
+    if(azb.classList.contains("spenta")){ avvisoSenzaEnergia(azb.dataset.azione); return; }
+    hubTap(); hubAzione(azb.dataset.azione);
+  }
 });
 
 document.addEventListener("keydown", ev => {

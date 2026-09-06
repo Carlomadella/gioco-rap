@@ -261,6 +261,9 @@
 .tli.static{cursor:default}
 .tli:not(.static):hover{background:#171B26}
 .tli:disabled{opacity:.45}
+/* manca solo l'energia: resta cliccabile per poterlo dire (vedi `.tile.spenta`
+   in game.css), ma si veste da spenta come le altre */
+.tli.spenta{opacity:.45;cursor:help}
 .tli.me{border-color:rgba(124,58,237,.5);background:#171226}
 .tli.fatto{opacity:.55}
 .tliav{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;

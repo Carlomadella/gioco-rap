@@ -165,7 +165,33 @@ CARLO:
    **FATTO (06/09/2026)** — per esteso al punto 10 delle FATTE qui sotto e in
    [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#68--il-telefono-nuovo-quello-della-foto).
 
-3. mi piace il po-up che esce quando non hai energia e clicchi sull'azione Freestyle in piazza, applica il pop-up ad ogni azione se manca energia, aggiungici anche un'icona del fulmine, la stessa della navbar
+3. mi piace il pop-up che esce quando non hai energia e clicchi sull'azione Freestyle in piazza, applica il pop-up ad ogni azione se manca energia, aggiungici anche un'icona del fulmine, la stessa della navbar
+
+   **FATTO (07/09/2026)** — branch `task/popup-energia`. L'avviso c'era già, ma usciva
+   da un posto solo: i cartelli della mappa. Le mosse però si lanciano da **quattro**
+   posti — i cartelli, le card di «Eventi e attività di oggi», le tile della Settimana e
+   l'agenda del telefono — e negli altri tre il bottone si spegneva e basta: ci clicchi
+   sopra e non succede niente, senza che nessuno ti dica perché.
+
+   Adesso l'avviso è uno solo (`avvisoSenzaEnergia` in `actions.js`) e risponde da tutti
+   e quattro, col **fulmine della barra in alto**: non ricopiato, preso da `HIC.energia`,
+   così se un giorno cambia il fulmine cambia anche qui. Dice pure i numeri — quanta
+   energia chiede la mossa, quanta ne hai — e come si rimedia, cioè dormendo.
+
+   **La regola: solo l'energia si comporta così.** Gli altri «no» (sei in carcere, serve
+   un beat, servono i soldi, è l'ora sbagliata) sono cose che ti devi andare a prendere,
+   e il motivo è già scritto sul bottone: quelli restano spenti come prima. L'energia no,
+   torna da sola: è l'unico «no» che vale la pena spiegare. Quindi **solo** quando manca
+   *soltanto* l'energia (`soloSenzaEnergia`) la mossa resta cliccabile — spenta a
+   vedersi, con la classe `.spenta` che copia l'aspetto di `:disabled` — e risponde.
+   Se manca l'energia *e anche altro*, resta disabilitata: un avviso che parla di
+   energia mentre il vero problema è che sei in carcere farebbe più danni che altro.
+
+   Provato in Chrome su tutti e quattro i punti d'ingresso: l'avviso esce col fulmine e
+   **l'energia non viene toccata**. Controllati anche i casi che non devono cambiare —
+   con l'energia piena ma senza beat «Registra» resta disabilitata e muta, senza energia
+   *e* senza beat pure, e con l'energia che basta la mossa parte come sempre (energia
+   scalata, scena aperta). `npm run prova` 70/70, audit 260/260, `verifica:build` 33/33.
 
 4. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
    Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il
@@ -178,13 +204,15 @@ CARLO:
 
 7. aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
 
+8.
+
 /_ DA DISCUTERE _/
 
 2. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles? Per forza a los angeles, però può decidere di tornare nelle città prima
 
 3. DA DISCUTERE Non è più: "Faccio un pezzo → +10 fama", ma diventa:
 
-TRACK
+TRACK (sezione studio)
 │
 ├── Beat
 ├── Producer
@@ -192,9 +220,9 @@ TRACK
 ├── Mix
 ├── Testo
 ├── Cover (influenza meno, ma ha 3 opzioni: caricamento file da telefono/computer, assets preimpostati e personalizzazione stile emblema black ops 2)
-├── Featuring
-├── Marketing
-└── Timing
+├── Featuring (può esserci come no, nelle canzoni, nel caso abbiamoo un feat nemlle canzoni, non è obbligatorio che il feat venga alla sessione, ovviamente se svolge la sessione con noi molto probabilmente i pezzo avrà più qualità)
+├── Marketing (dimmi te come lo svilupperesti, dammi una terza opzione, le prime due sono: in discografia sul telefono tramite app, in studio in una sezione dedicata)
+└── Timing (app discografia)
 
 E ogni elemento influenza il risultato.
 
