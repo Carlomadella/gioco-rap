@@ -303,7 +303,23 @@
 
   function entraSlot(s){
     if(!s || !s.artista){ landDillo("Nessuna partita da caricare"); return; }
-    selezionaSlot(s.n);
+
+    /* ADF_AUDIO_CONTINUA_FADE_V2
+       Una carriera già esistente non deve AVVIARE Dream Catcher.
+       Se però Dream Catcher stava già suonando, la lasciamo uscire
+       con un fade che in futuro sarà coperto dalla transition. */
+    let attesaAudioContinua = 0;
+
+    try{
+      const m = window.ADF_AUDIO && ADF_AUDIO.music;
+
+      if(m && m.playing && typeof m.stopForGameplay === "function"){
+        m.stopForGameplay(1.2);
+        attesaAudioContinua = 1200;
+      }
+    }catch(e){}
+
+        selezionaSlot(s.n);
     A = Object.assign(DEF(), s.a || {});
     G = Object.assign(START(), s.g || {});
     if(!G.difficolta || !DIFFICOLTA[G.difficolta]) G.difficolta = diffCorrente(s);
@@ -316,7 +332,11 @@
        nelle impostazioni e la carriera è già sul disco: la pagina del gioco
        riapre esattamente questa, senza bisogno di portarsi dietro niente.
        Anche il carcere lo ritrova da sé, guardando G.strada.arresto. */
-    vaiAlGioco();
+    if(attesaAudioContinua > 0){
+      setTimeout(() => vaiAlGioco(), attesaAudioContinua);
+    }else{
+      vaiAlGioco();
+    }
   }
 
   function continuaUltima(){
@@ -415,6 +435,14 @@
   function aggiornaLanding(){
     const u = ultimoSlot();
     const s = slotAttivo().artista ? slotAttivo() : u;
+
+    /* Il listener musicale lavora in capture: deve sapere già al
+       pointerdown se il grande pulsante significa CONTINUA. */
+    const mainPlay = $("m-play");
+    if(mainPlay){
+      if(u) mainPlay.setAttribute("data-audio-direct-gameplay","1");
+      else mainPlay.removeAttribute("data-audio-direct-gameplay");
+    }
 
     /* Il grosso pulsante è la scorciatoia intelligente: CONTINUA se esiste
        almeno un salvataggio, INIZIA quando il gioco è ancora vuoto. */

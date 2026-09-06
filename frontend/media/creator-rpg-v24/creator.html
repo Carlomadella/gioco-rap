@@ -2341,6 +2341,11 @@ $('storyNext').onclick = ()=>{
 
 $('editChoices').onclick = ()=> setProgress(1);
 $('startCareer').onclick = ()=> {
+  /* ADF_AUDIO_CINEMATIC_START_V1_1 */
+  try{
+    if(window.parent!==window)
+      window.parent.postMessage({type:'adf-rpg-v24-career-intro-start'},'*');
+  }catch(e){}
   playCareerIntro();
 };
 
