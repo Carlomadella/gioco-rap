@@ -500,7 +500,13 @@ function schermataInventario(){
   return nav + corpo;
 }
 
-/* ---- Statistiche: gli stessi numeri della testata e dei dettagli ---- */
+/* ---- Statistiche: gli stessi numeri della testata e dei dettagli, più
+   l'archivio di carriera (Da smistare, punto 14 di ALE — "l'app statistiche
+   ora riporta cose che già trovi in game, ne vorrei altre: brani pubblicati,
+   contatti fatti, videoclip registrati, impression totali, un vero archivio
+   delle statistiche più importanti"). La prima parte resta "come stai
+   adesso"; l'archivio è "cosa hai fatto finora", numeri che altrove nel
+   gioco non stanno da nessuna parte tutti insieme. */
 function schermataStatistiche(){
   const lb = lifeBonus();
   const righe = [
@@ -518,7 +524,18 @@ function schermataStatistiche(){
     (G.obligation ? '<br>Devi consegnare ' +
       (G.obligation.need - G.songs.filter(x => x.released && x.week > G.obligation.from).length) +
       ' uscite in ' + G.obligation.left + ' settimane.' : '') + '</div>';
-  return extra + '<div class="tlist tlist-stat">' + stat + '</div>';
+
+  const totaleStream = G.songs.reduce((a, s) => a + (s.streams || 0), 0);
+  const archivio = [
+    ["nota", "#38BDF8", "Brani pubblicati", fmt(G.songs.filter(s => s.released).length), null],
+    ["persona", "#A78BFA", "Contatti fatti", fmt(chatAttivi().length), null],
+    ["mirino", "#F472B6", "Videoclip registrati", fmt(G.songs.filter(s => s.video).length), null],
+    ["giornale", "#4ADE80", "Impression totali", short(totaleStream), null]
+  ].map(([ic, k, n, v, barra]) => rigaStat(ic, k, n, v, barra)).join("");
+
+  return extra + '<div class="tlist tlist-stat">' + stat + '</div>' +
+    '<div class="tnote"><b>Archivio</b></div>' +
+    '<div class="tlist tlist-stat">' + archivio + '</div>';
 }
 
 /* ---- Classifiche, Discografia, Contratti: prestate, non ricopiate ----
