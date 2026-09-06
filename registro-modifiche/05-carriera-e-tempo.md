@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:36bfe04 -->
+## 06/09/26, 22:11 â€” feature/telefono-archivio-statistiche â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@Mac.Home)  
+**Merge commit:** `36bfe04`
+
+### Cosa Ã¨ entrato
+
+- `57301d0` â€” feat(telefono): archivio statistiche di carriera (punto 14 ALE) â€” **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/telefono.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:328eb81 -->
 ## 06/09/26, 21:22 â€” task/telefono-nuovo â†’ main
 
