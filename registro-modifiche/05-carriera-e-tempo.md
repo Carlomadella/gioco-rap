@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:8860b08 -->
+## 06/09/26, 12:17 â€” task/8-chat-limite-giornaliero â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.53)  
+**Merge commit:** `8860b08`
+
+### Cosa Ã¨ entrato
+
+- `f72dd92` â€” chat: un contatto al giorno, non un farm infinito (punto 1 ALE / punto 8) â€” **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/chat.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:cdc13d5 -->
 ## 06/09/26, 11:50 â€” task/6-7-hype-e-farming â†’ main
 
