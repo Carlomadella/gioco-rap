@@ -1,21 +1,18 @@
-/* L'ingresso in partita — Anni di Fame.
+﻿/* L'ingresso in partita — Anni di Fame.
 
    Punto 27: la landing è una pagina a parte, e questa è la porta di quella del
    gioco. Prima non serviva a niente di tutto questo, perché «entrare» voleva
-   dire togliere una classe a una `<section>` e tutto lo stato era già lì, in
-   memoria, dall'altra schermata. Adesso fra le due c'è un caricamento vero: la
-   landing scrive sul disco quello che ha deciso — quale slot, che difficoltà —
-   e passa qui una parola sola nell'indirizzo per dire cosa voleva fare.
+   dire togliere una classe a una <section> e tutto lo stato era già lì, in
+   memoria, dall'altra schermata. Adesso fra le due c'è un caricamento vero.
 
      (niente)             riprendi la carriera dello slot attivo → la città
-     ?vai=profilo         apri il tuo artista, senza far partire la settimana
-     ?vai=classifiche     entra e apri le classifiche sul telefono
-     ?nuova=rapido        artista a caso e via in città
-     ?nuova=creatore      apri il creatore; quando salvi, si entra
+     ?vai=profilo         apri il tuo artista
+     ?vai=classifiche     entra e apri le classifiche
+     ?nuova=rapido        preset temporaneo + RPG automatico + cinematic
+     ?nuova=creatore      apri il creator normale
 
-   La carriera non viaggia nell'indirizzo: è già su localStorage e i file del
-   gioco (js/creator/state.js, js/game/state.js) l'hanno già letta quando questo
-   file gira. Qui si decide solo cosa far vedere per primo. */
+   Il creator approvato resta proprietario di RPG, profilo e cinematic.
+*/
 "use strict";
 
 (() => {
@@ -23,76 +20,384 @@
   const vai = q.get("vai") || "";
   const nuova = q.get("nuova") || "";
 
-  /* ADF_AUDIO_INGRESSO_V1: una sola fonte decide quando finisce il pre-game. */
   function audioPregame(){
     if(!window.ADF_AUDIO) return;
     ADF_AUDIO.setMode("pregame");
     if(ADF_AUDIO.music) ADF_AUDIO.music.ensureMenu();
   }
+
   function audioGameplay(){
     if(!window.ADF_AUDIO) return;
     ADF_AUDIO.setMode("gameplay");
     if(ADF_AUDIO.music) ADF_AUDIO.music.stopForGameplay(1.4);
   }
 
-  /* Ricaricare la pagina non deve rifare «nuova partita» un'altra volta: dopo
-     aver letto la richiesta, l'indirizzo torna pulito. */
   function pulisci(){
-    try{ history.replaceState(null, "", location.pathname); }catch(e){}
+    try{
+      history.replaceState(null, "", location.pathname);
+    }catch(e){}
   }
 
   function entraInCitta(){
     audioGameplay();
     goto("hub");
+
     if(window.GAME) window.GAME.enter();
-    /* Chi era dentro quando ha chiuso, dentro si risveglia. */
-    if(G.strada && G.strada.arresto && typeof window.apriCarcere === "function"){
-      setTimeout(() => window.apriCarcere({direct:true, reason:"resume"}), 0);
+
+    if(
+      G.strada &&
+      G.strada.arresto &&
+      typeof window.apriCarcere === "function"
+    ){
+      setTimeout(
+        () => window.apriCarcere({
+          direct:true,
+          reason:"resume"
+        }),
+        0
+      );
     }
   }
 
-  /* ---- artista a caso, per l'avvio rapido ----
-     Lo slot l'ha già preparato la landing (svuotato e con la difficoltà
-     dentro): qui manca solo la faccia. */
-  function artistaACaso(){
-    try{ $("rand").click(); }catch(e){}
-    try{ localStorage.setItem(CHIAVE_ARTISTA(), JSON.stringify(A)); }catch(e){}
-    try{ firstRun = false; applyMode(); }catch(e){}
-    window.ARTIST = A;
+  /* -------------------------------------------------------
+     Accesso sicuro al creator iframe.
+     Non modifichiamo bridge o creator.html.
+     ------------------------------------------------------- */
+
+  function frameCreator(){
+    return document.getElementById("adf-rpg-v24-frame");
   }
 
-  /* ---- il creatore, quando la partita è nuova ----
-     Salvato l'artista si entra in città senza passare dal menu; se invece si
-     torna indietro senza averlo creato, lo slot preparato va liberato, se no
-     resta occupato da una carriera che non esiste. */
-  function creatorePoiCitta(){
-    audioPregame();
-    window.__ADF_DOPO_CREAZIONE = entraInCitta;
-    const indietro = $("to-menu");
-    if(indietro) indietro.addEventListener("click", () => {
-      if(A.name.trim()) return;
-      try{ localStorage.removeItem(CHIAVE_PARTITA()); }catch(e){}
-    }, true);
+  function eseguiNelCreator(frame, codice){
+    const doc = frame && frame.contentDocument;
+    if(!doc) return false;
 
-    if(window.ADF_RPG_V24 && typeof window.ADF_RPG_V24.open === "function"){
-      /* il creatore 3D si chiude da solo sulla città (js/creator/rpg-v24-bridge.js) */
-      goto("profile");
-      window.ADF_RPG_V24.open();
+    const script = doc.createElement("script");
+    script.textContent = codice;
+
+    (doc.body || doc.documentElement).appendChild(script);
+    script.remove();
+
+    return true;
+  }
+
+  function quandoCreatorPronto(callback, tentativo){
+    tentativo = tentativo || 0;
+
+    const frame = frameCreator();
+
+    try{
+      if(
+        frame &&
+        frame.contentDocument &&
+        frame.contentWindow &&
+        typeof frame.contentWindow.playCareerIntro === "function"
+      ){
+        callback(frame);
+        return;
+      }
+    }catch(e){}
+
+    if(tentativo >= 120){
+      console.error("[ADF] Creator RPG: caricamento non completato.");
       return;
     }
-    goto("profile");
-    setTimeout(() => { try{ $("name").focus(); }catch(e){} }, 80);
+
+    setTimeout(
+      () => quandoCreatorPronto(callback, tentativo + 1),
+      50
+    );
   }
+
+  /* -------------------------------------------------------
+     Provider temporaneo.
+
+     Il vecchio editor locale NON viene più aperto.
+     Quando arriverà MakeHuman sostituiremo soltanto questo
+     piccolo adattatore.
+     ------------------------------------------------------- */
+
+  function installaPresetTemporaneo(frame){
+    const codice = `
+      (() => {
+        if(window.__ADF_TEMP_PRESET_INSTALLED__) return;
+        window.__ADF_TEMP_PRESET_INSTALLED__ = true;
+
+        const localButton =
+          document.querySelector('[data-avatar-source="local"]');
+
+        if(localButton){
+          const id = localButton.querySelector('.id');
+          const nome = localButton.querySelector('.n');
+          const desc = localButton.querySelector('.d');
+          const mini = localButton.querySelector('.mini');
+          const features =
+            localButton.querySelector('.avatar-features');
+
+          if(id) id.textContent = '02 · temporaneo';
+          if(nome) nome.textContent = 'Personaggio preimpostato';
+
+          if(desc){
+            desc.textContent =
+              'Usa temporaneamente il personaggio base e continua con identità, storia e profilo.';
+          }
+
+          if(mini){
+            mini.textContent = 'Usa personaggio base';
+          }
+
+          if(features){
+            features.innerHTML =
+              '<span>Nessun editor</span>' +
+              '<span>Preset base</span>' +
+              '<span>MakeHuman in arrivo</span>';
+          }
+        }
+
+        /* Questa funzione esiste già nel creator.
+           La sostituiamo soltanto runtime. */
+        openLocalEditor = function(){
+          state.avatarSource = 'local';
+          state.avatarPendingSource = null;
+
+          state.avatarData = {
+            provider:'temporary-placeholder',
+            localAvatar:{
+              preset:'base',
+              version:1
+            }
+          };
+
+          renderAvatarSource();
+
+          /* Nessun vecchio editor, nessun camerino.
+             Il personaggio è già deciso. */
+          setProgress(1);
+          validateIdentity();
+        };
+      })();
+    `;
+
+    return eseguiNelCreator(frame, codice);
+  }
+
+  /* -------------------------------------------------------
+     Creator normale
+     ------------------------------------------------------- */
+
+  function creatorePoiCitta(){
+    audioPregame();
+
+    window.__ADF_DOPO_CREAZIONE = entraInCitta;
+
+    const indietro = $("to-menu");
+
+    if(indietro){
+      indietro.addEventListener(
+        "click",
+        () => {
+          if(A.name.trim()) return;
+
+          try{
+            localStorage.removeItem(CHIAVE_PARTITA());
+          }catch(e){}
+        },
+        true
+      );
+    }
+
+    if(
+      window.ADF_RPG_V24 &&
+      typeof window.ADF_RPG_V24.open === "function"
+    ){
+      goto("profile");
+
+      window.ADF_RPG_V24.open();
+
+      const frame = frameCreator();
+
+      /* Evita di mostrare per un istante la scritta
+         "Editor locale" prima della sostituzione. */
+      if(frame) frame.style.visibility = "hidden";
+
+      quandoCreatorPronto(f => {
+        installaPresetTemporaneo(f);
+        f.style.visibility = "";
+      });
+
+      return;
+    }
+
+    goto("profile");
+
+    setTimeout(
+      () => {
+        try{
+          $("name").focus();
+        }catch(e){}
+      },
+      80
+    );
+  }
+
+  /* -------------------------------------------------------
+     AVVIO RAPIDO
+     ------------------------------------------------------- */
+
+  function scegli(lista){
+    return lista[
+      Math.floor(Math.random() * lista.length)
+    ];
+  }
+
+  function datiRapidi(){
+    const nomi = [
+      "Ali","Zero","Kobra","Nino","Sette","Lupo",
+      "Ghiaccio","Trenta","Vetro","Fame","Neve","Ferro"
+    ];
+
+    const suffissi = [
+      "Fame","Zero","93","Uno","Nero",
+      "Sette","OG","Vento","Boy"
+    ];
+
+    const citta = [
+      "Milano","Roma","Napoli","Torino","Bologna",
+      "Palermo","Bari","Brescia","Sesto San Giovanni"
+    ];
+
+    return {
+      name: scegli(nomi) + " " + scegli(suffissi),
+      city: scegli(citta)
+    };
+  }
+
+  function avvioRapido(){
+    audioPregame();
+
+    window.__ADF_DOPO_CREAZIONE = entraInCitta;
+
+    if(
+      !window.ADF_RPG_V24 ||
+      typeof window.ADF_RPG_V24.open !== "function"
+    ){
+      console.error(
+        "[ADF] Avvio rapido: creator RPG non disponibile."
+      );
+      return;
+    }
+
+    const rapido = datiRapidi();
+
+    goto("profile");
+
+    window.ADF_RPG_V24.open();
+
+    const frame = frameCreator();
+
+    /* Nessun flash di avatar / identità / RPG. */
+    if(frame) frame.style.visibility = "hidden";
+
+    quandoCreatorPronto(f => {
+      installaPresetTemporaneo(f);
+
+      const payload = JSON.stringify(rapido);
+
+      const codice = `
+        (() => {
+          const rapido = ${payload};
+
+          state.avatarSource = 'local';
+          state.avatarPendingSource = null;
+
+          state.avatarData = {
+            provider:'temporary-placeholder',
+            localAvatar:{
+              preset:'base',
+              version:1
+            }
+          };
+
+          state.name = rapido.name;
+          state.city = rapido.city;
+
+          /* STESSI generi del creator normale. */
+          state.genre =
+            GENRES[
+              Math.floor(Math.random() * GENRES.length)
+            ].id;
+
+          /* STESSE 3 domande e risposte canoniche. */
+          state.answers =
+            STORY.map(scene =>
+              scene.choices[
+                Math.floor(
+                  Math.random() * scene.choices.length
+                )
+              ]
+            );
+
+          $('name').value = state.name;
+          $('city').value = state.city;
+
+          renderAvatarSource();
+          renderGenres();
+          validateIdentity();
+
+          /* Stesso trigger audio della nuova partita normale. */
+          try{
+            if(window.parent !== window){
+              window.parent.postMessage({
+                type:'adf-rpg-v24-career-intro-start'
+              }, '*');
+            }
+          }catch(e){}
+
+          /* STESSA cinematic già approvata. */
+          window.playCareerIntro();
+        })();
+      `;
+
+      eseguiNelCreator(f, codice);
+
+      /* playCareerIntro è già partita prima che il frame
+         torni visibile. */
+      f.style.visibility = "";
+    });
+  }
+
+  /* ------------------------------------------------------- */
 
   pulisci();
 
-  if(nuova === "rapido"){ artistaACaso(); entraInCitta(); return; }
-  if(nuova === "creatore"){ creatorePoiCitta(); return; }
-  if(vai === "profilo"){ audioPregame(); goto("profile"); return; }
-  if(vai === "classifiche"){
-    entraInCitta();
-    if(typeof telVaiApp === "function") setTimeout(() => telVaiApp("classifiche"), 60);
+  if(nuova === "rapido"){
+    avvioRapido();
     return;
   }
+
+  if(nuova === "creatore"){
+    creatorePoiCitta();
+    return;
+  }
+
+  if(vai === "profilo"){
+    audioPregame();
+    goto("profile");
+    return;
+  }
+
+  if(vai === "classifiche"){
+    entraInCitta();
+
+    if(typeof telVaiApp === "function"){
+      setTimeout(
+        () => telVaiApp("classifiche"),
+        60
+      );
+    }
+
+    return;
+  }
+
   entraInCitta();
 })();
