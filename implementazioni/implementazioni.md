@@ -122,7 +122,17 @@ di fare hype a inizio carriera, che oggi non esistono ancora come luogo/azione.
 `npm run prova` (70/70) più una verifica dedicata fuori dal browser sui tetti per
 fase e sul tetto settimanale della promo.
 
-8.
+8.  Le card sulla mappa come studio, fabbrica, pizzeria, la sala ecc hanno una card cliccabile troppo grande, LE VOGLIO TUTTE COME STUDIO. Inoltre noto che l'ultima cosa dove entri resta una sorte di pallino gialla come se t'indicasse l'ulitma cosa schiacciata. Non la voglio.
+
+9. Ci sono dei tastini sul in centro sotto della mappa che fan muovere la mappa. Levali. La mappa non voglio si veda muoveree. dev'essere ferma
+
+10. Lo shop dev'essere un vero e proprio shop, come gli shop di fortnite o nba2k.. LEVA STI CAZZO DI INTERFACCIA MENU! RENDILO UNO SHOP DA VIDEOGIOCO NEL 2026
+
+11. Avaturn voglio lo rendiamo UN 50/50 , Cioè chi non vuole andare a farsi tutta la trafila per fare avaturn (anche se ovviamente dobbiamo fare di tutto per consigliarli a farlo) può benissimamente creare il suo avatar in game. FAI COESISTERE LE COSE.
+
+12. Studio, casa e attività criminiali sulla mappa sono TROPPO VICINE LE CARD tra di loro. Anche se gli edifici sono abbastanza vicini falle in un modo MOOOOLTO più clean. Così sono troppo ammassate.
+
+13. Ti ricordo che i pulsanti sopra la mappa sono ANCORA TROPPO GRANDI rispetto ai quadratini stessi. Rivedilo.
 
 CARLO:
 
