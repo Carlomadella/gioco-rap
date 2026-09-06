@@ -98,7 +98,7 @@ const chatPezzo = m => m.ultimo ? "«" + m.ultimo.t + "»" : "il pezzo";
 
 /* scorciatoie per gli effetti, così le opzioni restano leggibili */
 const chBene = n => { G.wellbeing = clamp(G.wellbeing + n, 0, 100); };
-const chHype = n => { G.hype = clamp(G.hype + n, 0, 100); };
+const chHype = n => { G.hype = clamp(G.hype + n, 0, (typeof hypeCap==="function"?hypeCap():100)); };
 const chRete = n => { G.skills.rete = clamp(G.skills.rete + n, 0, 999); };
 const chPalco = n => { G.skills.presenza = clamp(G.skills.presenza + n, 0, 999); };
 const chEnergia = n => { G.energy = clamp(G.energy + n, 0, G.maxEnergy); };
@@ -730,7 +730,7 @@ function chatSpuntiVideomaker(p){
      testo: () => "Non esce niente da un po'. Vuoi che monti qualcosa con il girato vecchio, tanto per far vedere che ci sei?",
      opts:[
        {n:"Montalo", d:"+hype",
-        run(){ G.hype = clamp((G.hype || 0) + 3, 0, 100); chatAvvicina(p, 1);
+        run(){ G.hype = clamp((G.hype || 0) + 3, 0, (typeof hypeCap==="function"?hypeCap():100)); chatAvvicina(p, 1);
           return "Ci penso io. Domani sera è online."; }},
        {n:"Preferisco aspettare la roba nuova", d:"+lucidità",
         run(){ addLuc(3); return "Rispetto. Però non sparire."; }}

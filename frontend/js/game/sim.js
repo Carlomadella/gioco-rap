@@ -123,7 +123,7 @@ function advanceWeek(){
   const lb = lifeBonus();
   const vissuto = clamp(1 - (G.shifts||0) * 0.20, 0.25, 1);
   G.fans += Math.round(newFans * (lb.fan - 1) * vissuto);
-  G.hype = clamp(G.hype * 0.87 + lb.hype * vissuto, 0, 100);
+  G.hype = clamp(G.hype * 0.87 + lb.hype * vissuto, 0, (typeof hypeCap==="function"?hypeCap():100));
 
   // il benessere tende al livello naturale del tuo tenore di vita, non sale all'infinito
   const naturale = clamp(34 + lb.well * 4.6 * vissuto - (G.money < 0 ? 12 : 0), 12, 100);
@@ -163,7 +163,22 @@ function advanceWeek(){
 
   const pos = chartPosition(streams);
   G.streamsPrev = streams;
-  if(streams > 0 && pos <= G.best.chart) G.best.chart = pos;
+  /* Da smistare, punto 7: l'hype vero si fa quando il nome comincia a
+     contare in classifica, non ripetendo la stessa mossa. Un salto vero
+     (non un pareggio con la posizione migliore già raggiunta) vale hype,
+     tanto più quanto sei salito in alto — entrare in top 10, o essere primi,
+     vale un morso in più. */
+  if(streams > 0 && pos <= G.best.chart){
+    if(pos < G.best.chart){
+      const salto = Math.min(G.best.chart, 99) - pos;
+      const bonus = Math.round(clamp(salto * 0.4 + (pos <= 10 ? 6 : 0) + (pos === 1 ? 10 : 0), 0, 40));
+      if(bonus > 0){
+        G.hype = clamp(G.hype + bonus, 0, (typeof hypeCap==="function"?hypeCap():100));
+        pushLog("<b>Sali in classifica.</b> Sei #" + pos + ", hype +" + bonus + ".", "good");
+      }
+    }
+    G.best.chart = pos;
+  }
   G.best.fans = Math.max(G.best.fans, G.fans);
 
   if(streams > 0)
@@ -328,7 +343,7 @@ function checkGoals(){
     if(G.goals[g.id]) continue;
     if(!g.ok(G)) continue;
     G.goals[g.id] = true;
-    if(g.rw.hype) G.hype = clamp(G.hype + g.rw.hype, 0, 100);
+    if(g.rw.hype) G.hype = clamp(G.hype + g.rw.hype, 0, (typeof hypeCap==="function"?hypeCap():100));
     if(g.rw.money) G.money += g.rw.money;
     if(g.rw.wellbeing) G.wellbeing = clamp(G.wellbeing + g.rw.wellbeing, 0, 100);
     pushLog("<b>Traguardo:</b> " + g.n + ".", "good");

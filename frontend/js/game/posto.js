@@ -851,16 +851,21 @@ function azionePosto(tipo, id){
   if(tipo === "sessione"){
     if(G.energy < PO_COSTO.sessione || G.money < 60) return;
     G.energy -= PO_COSTO.sessione; G.money -= 60;
+    /* Da smistare, punto 6: se questa sessione è "Sessione lunga alla Sala"
+       segnata in agenda per oggi, vale il suo peso — la sera vera è
+       migliore, non solo più lunga sulla carta. */
+    const peso = (window.AGENDA && typeof AGENDA.consumaPeso === "function")
+      ? AGENDA.consumaPeso("sala") : 1;
     const presi = G.market.map(b => b.n).concat(G.beats.map(b => b.n));
-    const q = rnd(46, 62) + p.fama * 0.35 + p.rel * 8 + G.skills.rete * 0.3;
+    const q = (rnd(46, 62) + p.fama * 0.35 + p.rel * 8 + G.skills.rete * 0.3) * peso;
     const b = creaBeat(p.gen || mioGenere(), q, presi);
     b.da = p.n; b.price = 0;
     G.beats.push(b);
-    gain("rete", 0.8); addLuc(4);
+    gain("rete", 0.8 * peso); addLuc(4);
     G.wellbeing = clamp(G.wellbeing - 2, 0, 100);
     p.pt += 1;
     pushLog("Pomeriggio in sala con <b>" + p.n + "</b>: ne è uscito «" + b.n +
-      "», qualità " + b.q + ". È tuo, non lo paghi.", "big");
+      "», qualità " + b.q + ". È tuo, non lo paghi." + (peso > 1 ? " Serata giusta per esserci." : ""), "big");
     toast("Sessione con " + p.n + ": «" + b.n + "» q" + b.q, "good", "★", ["#7C3AED", "#4C1D95"]);
     SFX.rec();
   }
@@ -883,7 +888,7 @@ function azionePosto(tipo, id){
     p.feat = sett;
     const h = Math.round(6 + p.fama * 0.22 + p.rel * 2);
     const f = Math.round(rnd(20, 60) + p.fama * 4 + G.fans * 0.05);
-    G.hype = clamp(G.hype + h, 0, 100); G.fans += f;
+    G.hype = clamp(G.hype + h, 0, (typeof hypeCap==="function"?hypeCap():100)); G.fans += f;
     gain("rete", 1); gain("flow", 0.5);
     pushLog("Pezzo insieme a <b>" + p.n + "</b>: +" + h + " hype, +" + fmt(f) + " fan.", "big");
     toast("Feat con " + p.n + " · +" + fmt(f) + " fan", "good", "★", ["#A855F7", "#4C1D95"]);
@@ -901,7 +906,7 @@ function azionePosto(tipo, id){
     s.video = Math.min(1.75, 1 + 0.16 + p.rel * 0.06 + p.fama * 0.004 + G.skills.presenza * 0.002);
     s.videoDa = p.n;
     const h = Math.round(5 + p.fama * 0.18 + p.rel * 2);
-    G.hype = clamp(G.hype + h, 0, 100);
+    G.hype = clamp(G.hype + h, 0, (typeof hypeCap==="function"?hypeCap():100));
     G.fans += Math.round(rnd(10, 40) + G.fans * 0.012);
     gain("rete", 0.6); gain("presenza", 0.4);
     p.pt += 1;
@@ -915,7 +920,7 @@ function azionePosto(tipo, id){
     if(G.energy < PO_COSTO.intervista) return;
     G.energy -= PO_COSTO.intervista;
     const h = Math.round(4 + p.fama * 0.16 + p.rel * 2);
-    G.hype = clamp(G.hype + h, 0, 100);
+    G.hype = clamp(G.hype + h, 0, (typeof hypeCap==="function"?hypeCap():100));
     G.fans += Math.round(rnd(5, 25) + G.fans * 0.01);
     gain("rete", 0.5);
     pushLog("<b>" + p.n + "</b> ha scritto di te: +" + h + " hype.", "");

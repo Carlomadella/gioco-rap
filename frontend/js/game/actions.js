@@ -37,6 +37,29 @@ function adfSegnaOggi(id){
   return c[id];
 }
 
+/* Da smistare, punto 6: lo stesso contenitore, ma a settimana invece che a
+   giorno — serve alle mosse che diventano "evento esclusivo" (una volta a
+   settimana, non una volta al giorno), come la battle di freestyle vera. */
+function adfSettimanaChiave(){
+  return [Number(G.year||1), Number(G.week||1)].join(":");
+}
+function adfSettimanaCounts(){
+  const key = adfSettimanaChiave();
+  if(!G.adfWeeklyActions || G.adfWeeklyActions.key !== key ||
+     !G.adfWeeklyActions.counts || typeof G.adfWeeklyActions.counts !== "object"){
+    G.adfWeeklyActions = {key:key, counts:{}};
+  }
+  return G.adfWeeklyActions.counts;
+}
+function adfSettimana(id){
+  return Number(adfSettimanaCounts()[id] || 0);
+}
+function adfSegnaSettimana(id){
+  const c = adfSettimanaCounts();
+  c[id] = Number(c[id] || 0) + 1;
+  return c[id];
+}
+
 /* Punto 2 - Promo.
    La prima promo del giorno rende pieno, poi il pubblico si satura.
    La componente percentuale non puo' inoltre crescere all'infinito
@@ -44,6 +67,11 @@ function adfSegnaOggi(id){
 const ADF_PROMO_DAILY_MULT = Object.freeze([1, 0.5, 0.2]);
 const ADF_PROMO_DAILY_FLOOR = 0.1;
 const ADF_PROMO_WEEKLY_PCT_CAP = 0.015;
+/* Da smistare, punto 7: la promo può ripetersi tutti i giorni della settimana
+   (ogni giorno riparte al massimo), ma l'hype no — se no basta fare promo ogni
+   giorno per farmarlo comunque, solo più lentamente. Questo è il tetto vero,
+   settimanale, oltre al quale la promo continua a dare follower ma non hype. */
+const ADF_PROMO_WEEKLY_HYPE_CAP = 22;
 
 function promoSettimanaKey(){
   return [Number(G.year||1), Number(G.week||1)].join(":");
@@ -55,7 +83,8 @@ function promoSettimana(){
     G.promoSaturation = {
       key:key,
       baseFans:Math.max(0, Number(G.fans||0)),
-      pctUsed:0
+      pctUsed:0,
+      hypeUsed:0
     };
   }
 
@@ -63,6 +92,8 @@ function promoSettimana(){
     Math.max(0, Number(G.promoSaturation.baseFans||0));
   G.promoSaturation.pctUsed =
     Math.max(0, Number(G.promoSaturation.pctUsed||0));
+  G.promoSaturation.hypeUsed =
+    Math.max(0, Number(G.promoSaturation.hypeUsed||0));
 
   return G.promoSaturation;
 }
@@ -184,6 +215,25 @@ function palestraTesto(){
   return s + (s === 1 ? " giorno di fila" : " giorni di fila");
 }
 
+/* Da smistare, punto 6: la battle di freestyle vera (il minigioco della
+   piazza, quello che vale ×1,5) diventa un evento esclusivo — una volta a
+   settimana, e solo la sera, fra le 21:00 e le 00:30 (lo stesso orario che
+   la card degli eventi dell'hub usa già, orari.js). Farla dieci volte al
+   giorno per farmare hype non è più possibile: fuori da lì resta comunque
+   il giro veloce, più modesto, sempre disponibile. */
+function freestyleBattagliaOk(){
+  if(adfSettimana("free_battle") >= 1)
+    return {ok:false, motivo:"Il palco vero l'hai già tenuto questa settimana. Torna la prossima."};
+  const st = (window.GAME_HOURS && typeof GAME_HOURS.eventStatus === "function")
+    ? GAME_HOURS.eventStatus("free") : {open:true};
+  if(!st.open){
+    const quando = st.phase === "before" ? "apre alle " + st.nextText
+      : "riapre stasera alle " + st.nextText;
+    return {ok:false, motivo:"Il palco vero è solo la sera, fra le 21:00 e le 00:30 (" + quando + ")."};
+  }
+  return {ok:true};
+}
+
 const ACTIONS = [
   {id:"scrivi", n:"Scrivi barre", e:28, luc:3,
    d:"Il foglio, la penna e quello che hai in testa.",
@@ -274,7 +324,7 @@ const ACTIONS = [
      const s = ready().sort((a,b) => b.q-a.q)[0];
      if(!s.mixed) s.q = clamp(s.q - 8, 5, 100);
      s.released = true; s.week = totalWeeks();
-     G.hype = clamp(G.hype + 6 + s.q*0.12, 0, 100);
+     G.hype = clamp(G.hype + 6 + s.q*0.12, 0, (typeof hypeCap==="function"?hypeCap():100));
      return "«" + s.t + "» è fuori" + (s.mixed ? "." : ", ma non era mixato: qualità " + s.q + ".");
    }},
 
@@ -288,17 +338,22 @@ const ACTIONS = [
    },
    run(){
      const mult = promoDailyMult();
-
-     const h = (6 + G.skills.rete*0.12) * RITMO * mult;
-     G.hype = clamp(G.hype + h, 0, 100);
+     const peso = (window.AGENDA && typeof AGENDA.consumaPeso === "function")
+       ? AGENDA.consumaPeso("promo") : 1;
 
      const p = promoSettimana();
-     const pctWanted = G.fans * 0.012 * RITMO * mult;
+     const hWanted = (6 + G.skills.rete*0.12) * RITMO * mult * peso;
+     const hBudget = Math.max(0, ADF_PROMO_WEEKLY_HYPE_CAP - p.hypeUsed);
+     const h = Math.min(hWanted, hBudget);
+     p.hypeUsed += h;
+     G.hype = clamp(G.hype + h, 0, (typeof hypeCap==="function"?hypeCap():100));
+
+     const pctWanted = G.fans * 0.012 * RITMO * mult * peso;
      const pctCap = p.baseFans * ADF_PROMO_WEEKLY_PCT_CAP;
      const pctBudget = Math.max(0, pctCap - p.pctUsed);
      const pctGain = Math.min(pctWanted, pctBudget);
 
-     const flatGain = rnd(4,24) * RITMO * mult;
+     const flatGain = rnd(4,24) * RITMO * mult * peso;
      const f = Math.max(0, Math.round(flatGain + pctGain));
 
      p.pctUsed += pctGain;
@@ -312,27 +367,50 @@ const ACTIONS = [
      const satWeek = pctCap > 0 && p.pctUsed >= pctCap - 1e-9
        ? " La crescita percentuale della settimana \u00e8 satura."
        : "";
+     const satHype = hWanted > hBudget + 1e-9
+       ? " L'hype non sale pi\u00f9: la settimana ha gi\u00e0 dato il massimo."
+       : "";
+     const bonusPeso = peso > 1 ? " Oggi vale di pi\u00f9." : "";
 
      return "Hype +" + Math.round(h) + ", " + f +
-       " nuovi follower." + satToday + satWeek;
+       " nuovi follower." + bonusPeso + satToday + satWeek + satHype;
    }},
 
   {id:"free", n:"Freestyle in piazza", e:26, luc:3,
    d:"Solo il beat e la gente che passa.",
-   give:() => "veloce · oppure giocala ×1,5",
+   give:() => {
+     const bok = freestyleBattagliaOk();
+     return bok.ok ? "veloce · oppure la battle vera ×1,5" : "veloce · battle vera: " + bok.motivo;
+   },
    run(){
+     const battaglia = freestyleBattagliaOk();
      scegliModo({
        t:"Freestyle in piazza",
        d:"Puoi farti il tuo giro e tornare a casa, oppure metterti lì davvero: andare a tempo e rispondere a chi ti provoca, con la folla che cresce o se ne va.",
        dv:"Un clic. Presenza e qualche fan, senza rischi.",
-       dg:"Vai a tempo col beat e scegli le risposte giuste. Quello che guadagni dipende da quanta gente resta, e vale 1,5 volte.",
+       dg: battaglia.ok
+         ? "Vai a tempo col beat e scegli le risposte giuste. Quello che guadagni dipende da quanta gente resta, e vale 1,5 volte."
+         : "La battle vera è un evento esclusivo: " + battaglia.motivo,
        veloce(){
          gain("presenza", 1.4);
          const f = Math.round((rnd(2,12) + G.skills.presenza*0.5) * RITMO);
          G.fans += f; G.wellbeing = clamp(G.wellbeing-2,0,100);
          return {t:"Giro veloce in piazza: " + f + " persone si sono fermate.", c:""};
        },
-       gioca(){ apriPiazza(BOOST); }
+       gioca(){
+         if(!battaglia.ok){
+           if(typeof toast === "function")
+             toast("<b>Non è ancora il momento.</b> " + battaglia.motivo, "bad", "!", ["#B91C1C","#7F1D1D"]);
+           gain("presenza", 1.4);
+           const f = Math.round((rnd(2,12) + G.skills.presenza*0.5) * RITMO);
+           G.fans += f; G.wellbeing = clamp(G.wellbeing-2,0,100);
+           azioneFatta();
+           pushLog("Il palco vero non c'è ancora: giro veloce lo stesso, " + f + " persone si sono fermate.", "");
+           save(); renderGioco();
+           return;
+         }
+         apriPiazza(BOOST);
+       }
      });
      return "";
    }},
@@ -340,14 +418,21 @@ const ACTIONS = [
   {id:"live", n:"Serata open mic", e:42, luc:2,
    d:"Palco piccolo, ma la gente ti vede in faccia.",
    need:() => G.songs.some(s => s.released) ? null : "1 pezzo fuori",
-   give:() => "~" + Math.round((20 + G.hype*1.4 + 40) * RITMO) + " € · fan · presenza",
+   give:() => "~" + Math.round((20 + G.hype*1.4 + 40) * RITMO) + " € · fan · presenza" +
+     (adfOggi("live") > 0 ? " · resa ridotta, già fatta oggi" : ""),
    run(){
-     const f = Math.round((rnd(8,30) + G.skills.presenza*1.4 + G.hype*0.7) * RITMO);
-     const m = Math.round((rnd(20,60) + G.hype*1.4) * RITMO);
+     const peso = (window.AGENDA && typeof AGENDA.consumaPeso === "function")
+       ? AGENDA.consumaPeso("live") : 1;
+     const giaOggi = adfOggi("live") > 0;
+     const molt = (giaOggi ? 0.45 : 1) * peso;
+     const f = Math.round((rnd(8,30) + G.skills.presenza*1.4 + G.hype*0.7) * RITMO * molt);
+     const m = Math.round((rnd(20,60) + G.hype*1.4) * RITMO * molt);
      const lbb = lifeBonus();
      G.fans += Math.round(f*lbb.live); G.money += Math.round(m*lbb.live);
-     gain("presenza", 1.2); G.wellbeing -= 3;
-     return "Serata fatta: +" + f + " fan, +" + m + " €.";
+     gain("presenza", 1.2 * (giaOggi ? 0.5 : 1)); G.wellbeing -= 3;
+     adfSegnaOggi("live");
+     return "Serata fatta: +" + f + " fan, +" + m + " €." +
+       (giaOggi ? " Il palco lo conoscevano già: oggi rende meno." : "");
    }},
 
   {id:"turno", n:"Vai al turno", e:18, luc:-3,
@@ -409,11 +494,14 @@ const ACTIONS = [
        gain("presenza", 0.1);
        return "Il corpo non recupera due volte lo stesso giorno: benessere −" + p + ". Hai solo strapazzato quello che avevi già costruito prima.";
      }
-     const b = Math.round(rnd(10,16) * molt);
-     const pr = Math.round(0.6 * molt * 10) / 10;
+     const peso = (window.AGENDA && typeof AGENDA.consumaPeso === "function")
+       ? AGENDA.consumaPeso("palestra_pesi") : 1;
+     const b = Math.round(rnd(10,16) * molt * peso);
+     const pr = Math.round(0.6 * molt * peso * 10) / 10;
      G.wellbeing = clamp(G.wellbeing + b, 0, 100);
      gain("presenza", pr);
-     let s = "Serie pesante: benessere +" + b + ", presenza +" + pr + "." + palestraFlavor(streak);
+     let s = "Serie pesante: benessere +" + b + ", presenza +" + pr + "." + palestraFlavor(streak) +
+       (peso > 1 ? " Porte aperte oggi: si sente." : "");
      if(Math.random() < .15){ gain("rete", 0.8); s += " In sala pesi c'era gente del giro."; }
      return s;
    }},

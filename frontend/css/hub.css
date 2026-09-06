@@ -848,22 +848,26 @@ body.in-hub .topnav {
 .pspot {
   overflow: visible;
 }
+/* Un edificio, UN cartello. Nome sopra, orario sotto: prima erano due cose
+   separate — la targhetta qui e l'orario in uno pseudo-elemento di orari.js —
+   che si sovrapponevano fra loro e finivano dentro la maschera degli angoli.
+   `--tagx/--tagy` le scrive hub.js quando il cartello sborderebbe dalla foto. */
 .pspot-tag {
   opacity: 0;
   position: absolute;
-  z-index: 3;
+  z-index: 6;
   left: 50%;
   top: 7px;
-  transform: translateX(-50%);
+  transform: translate(calc(-50% + var(--tagx, 0px)), var(--tagy, 0px));
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   min-height: 28px;
-  padding: 5px 9px;
-  border-radius: 9px;
+  padding: 6px 10px;
+  border-radius: 10px;
   white-space: nowrap;
   pointer-events: none;
-  background: rgba(7, 9, 14, 0.91);
+  background: rgba(7, 9, 14, 0.92);
   border: 1px solid rgba(255,255,255,.17);
   box-shadow: 0 7px 18px rgba(0,0,0,.42), inset 0 0 0 1px rgba(255,255,255,.025);
   color: #f7f8fb;
@@ -882,13 +886,48 @@ body.in-hub .topnav {
   background: var(--pk);
   box-shadow: 0 0 10px var(--pk);
 }
+.pspot-txt {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+}
 .pspot-tag b {
   font: inherit;
+}
+/* La riga dell'orario: più piccola del nome e di un altro colore, se no sono
+   due nomi. Il puntino a sinistra dice lo stato prima ancora di leggere. */
+.pspot-ore {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font: 800 clamp(7px, .55vw, 9px)/1 Figtree, system-ui, sans-serif;
+  letter-spacing: .07em;
+  font-style: normal;
+  color: #9fd9b4;
+}
+.pspot-ore s {
+  display: block;
+  width: 5px;
+  height: 5px;
+  flex: none;
+  border-radius: 50%;
+  text-decoration: none;
+  background: #4ade80;
+  box-shadow: 0 0 7px rgba(74,222,128,.75);
+}
+.pspot-ore.ore-chiuso {
+  color: #f3b4ab;
+}
+.pspot-ore.ore-chiuso s {
+  background: #ef4444;
+  box-shadow: 0 0 7px rgba(239,68,68,.7);
 }
 .pspot:hover .pspot-tag,
 .pspot:focus-visible .pspot-tag,
 .pspot.district-active .pspot-tag {
-  transform: translateX(-50%) translateY(-2px);
+  transform: translate(calc(-50% + var(--tagx, 0px)), calc(var(--tagy, 0px) - 2px));
   border-color: var(--pk);
   background: rgba(7, 9, 14, 0.97);
 }

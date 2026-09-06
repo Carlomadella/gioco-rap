@@ -33,23 +33,29 @@
      giorno e a un'ora loro, e non capitano tutte le settimane le stesse. Ogni
      voce punta a una cosa che nel gioco esiste già — un'azione, La Sala, la
      Strada — perché un evento che non porta da nessuna parte è una scritta. */
+  /* `peso`, Da smistare punto 6: non tutti e sei valgono uguale — un evento
+     più importante della settimana dà di più, uno minore dà meno. È il
+     moltiplicatore che l'azione vera (actions.js/posto.js/strada-crimine.js)
+     applica quando la giochi segnata in agenda, nel giorno giusto: vedi
+     consumaPeso() più sotto. Il giro grosso rischia di più e rende di più;
+     le porte aperte in palestra sono la cosa più piccola delle sei. */
   const SETTIMANALI = [
-    {id:"free", ic:"mic", k:"#A855F7", n:"Battle di quartiere",
+    {id:"free", ic:"mic", k:"#A855F7", n:"Battle di quartiere", peso:1.3,
      d:"Una sera sola: si sfida chi si presenta.", giorno:5, ora:"22:00",
      righe:[["hype", "Hype se tieni il palco"], ["gente", "Ti vedono in tanti"]]},
-    {id:"live", ic:"corona", k:"#F97316", n:"Serata open mic",
+    {id:"live", ic:"corona", k:"#F97316", n:"Serata open mic", peso:1.15,
      d:"Il locale apre il palco a chi ha qualcosa da far sentire.", giorno:6, ora:"21:30",
      righe:[["fama", "Fama vera"], ["soldi", "Qualche soldo"]]},
-    {id:"sala", ic:"nota", k:"#38BDF8", n:"Sessione lunga alla Sala",
+    {id:"sala", ic:"nota", k:"#38BDF8", n:"Sessione lunga alla Sala", peso:1.2,
      d:"Tutta la sera, e gira gente che conta.", giorno:3, ora:"20:00", posto:true,
      righe:[["gente", "Gente da conoscere"], ["cursori", "Beat sul tavolo"]]},
-    {id:"promo", ic:"hype", k:"#FB923C", n:"Giornata di lanci",
+    {id:"promo", ic:"hype", k:"#FB923C", n:"Giornata di lanci", peso:1.25,
      d:"Oggi i social girano: quello che spingi lo vedono di più.", giorno:2, ora:"18:00",
      righe:[["hype", "Vale di più oggi"], ["fama", "Occhi addosso"]]},
-    {id:"colpo", ic:"maschera", k:"#EF4444", n:"Il giro grosso",
+    {id:"colpo", ic:"maschera", k:"#EF4444", n:"Il giro grosso", peso:1.6,
      d:"Passa una cosa più seria del solito. Rischio più serio.", giorno:4, ora:"01:00", strada:true,
      righe:[["soldi", "Soldi veri"], ["rischio", "Guai veri"]]},
-    {id:"palestra_pesi", ic:"manubrio", k:"#57C98B", n:"Porte aperte in palestra",
+    {id:"palestra_pesi", ic:"manubrio", k:"#57C98B", n:"Porte aperte in palestra", peso:1.1,
      d:"Un giorno a settimana si entra senza pagare.", giorno:1, ora:"17:00",
      righe:[["cuore", "Benessere"], ["scudo", "Tieni la striscia"]]}
   ];
@@ -140,6 +146,33 @@
     return {segnato:true, voce:v};
   }
 
+  /* ==================== IL PESO DELL'EVENTO (punto 6) ====================
+     Non tutti gli eventi della settimana valgono uguale, e ognuno vale il
+     suo solo se: l'hai segnato in agenda come evento della settimana, ed è
+     proprio oggi il suo giorno — non prima, non "un po' dopo perché non
+     hai fatto in tempo". Un bonus preso una volta non si ripete nella
+     stessa settimana: consumaPeso() lo marca subito. */
+  function vociDaConsumare(id){
+    return voci().filter(v => v.tipo === "settimana" && v.id === id && !v.bonusUsato &&
+      v.anno === (G.year || 1) && v.settimana === (G.week || 1) && v.giorno === (G.day || 1));
+  }
+  function pesoDiOggi(id){
+    if(!vociDaConsumare(id).length) return 1;
+    const def = SETTIMANALI.find(s => s.id === id);
+    return def && def.peso ? def.peso : 1;
+  }
+  function consumaPeso(id){
+    const trovate = vociDaConsumare(id);
+    if(!trovate.length) return 1;
+    const def = SETTIMANALI.find(s => s.id === id);
+    const peso = def && def.peso ? def.peso : 1;
+    if(peso > 1){
+      trovate.forEach(v => { v.bonusUsato = true; });
+      if(typeof save === "function") save();
+    }
+    return peso;
+  }
+
   /* ==================== GLI AVVISI ==================== */
   function avvisa(v, testo, sottotesto){
     try{
@@ -197,6 +230,7 @@
   /* ==================== QUELLO CHE SERVE FUORI ==================== */
   window.AGENDA = {
     settimanali, voci, segnato, segna, togli, tocca,
+    pesoDiOggi, consumaPeso,
     minutiDi:oraInMinuti,
     /* è già passata? serve alla card, per non far segnare l'impossibile */
     passata(e, tipo){
