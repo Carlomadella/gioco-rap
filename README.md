@@ -54,9 +54,18 @@ npm run demo      # → dist/anni-di-fame.html: il gioco in un file solo, da far
 Il file unico non è il modo in cui il gioco esce: è lo strumento per una demo o un playtest
 — si manda il file e la gente gioca, senza installare niente.
 
-I documenti di progetto stanno qui in radice: `ROADMAP.md` (il disegno d'insieme),
-`implementazioni/` (i punti da fare, un file per argomento),
-`stili interfaccia schermata di gioco.md` (il riferimento visivo).
+I documenti di progetto stanno in cartelle, una per famiglia — in radice restano solo
+questo README e la ROADMAP:
+
+| dove | cosa c'è dentro |
+| --- | --- |
+| [`ROADMAP.md`](ROADMAP.md) | il disegno d'insieme: le fasi, dove sta andando il gioco |
+| [`implementazioni/`](implementazioni/README.md) | i punti da fare e quelli chiusi, un file per argomento |
+| [`documentazione/`](documentazione/README.md) | i comandi del terminale, i riferimenti visivi, i problemi trovati |
+| [`prompt/`](prompt/README.md) | i prompt per farsi fare le immagini: ambientazioni e app del telefono |
+| [`registro-modifiche/`](registro-modifiche) | cosa è cambiato, commit per commit |
+| [`brainstorming-miglioramenti-ai/`](brainstorming-miglioramenti-ai) | le idee arrivate dalle altre AI, tenute e scartate |
+| [`frontend/README.md`](frontend/README.md) · [`backend/README.md`](backend/README.md) | le due metà: il gioco e il server |
 
 ## Dove sta andando: l'hub è una mappa
 

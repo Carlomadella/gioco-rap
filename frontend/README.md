@@ -381,5 +381,5 @@ senza spiegazioni. Comodo per un playtest o per farlo vedere a un editore.
 - **Il `?v=` nei tag** serve solo mentre si sviluppa senza `npm run dev`: nel build i nomi
   hanno già l'impronta dentro e la cache si sistema da sola.
 - **Prima di impacchettare**: `npm run build && npm run prova`.
-- **Riferimento visivo**: `../stili interfaccia schermata di gioco.md` e le foto in
+- **Riferimento visivo**: `../documentazione/stili-interfaccia.md` e le foto in
   `media/photo/`.

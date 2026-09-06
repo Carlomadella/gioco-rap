@@ -61,13 +61,65 @@ Insomma, come le cose che vanno davvero in hype IRL, non se fai un feat con pink
 
 CARLO:
 
-1. aggiungere la reputazione cioè quanto sei affidabile, il massimo è real/real oppure OG, e il minimo tipo figlio di troia quando ti comporti da figlio di troia (detto meglio) O TENERE SOLO LA FAMa
+6. togli il parametro «lucidità» e tutto ciò che ne consegue
+
+7. dividi tutti i file .md sparsi in cartelle con nomi coerenti, inoltre smista le task fatte da implementazioni.md
+
+   **FATTO (06/09/2026)** — in radice restano solo `README.md` e `ROADMAP.md`, che sono le
+   due porte d'ingresso. Gli altri sono andati in due cartelle nuove, ognuna col suo README:
+   **`documentazione/`** (i comandi del terminale, i riferimenti visivi, i problemi trovati)
+   e **`prompt/`** (i prompt per farsi fare le immagini: ambientazioni, app del telefono,
+   foto da creare). `stili interfaccia schermata di gioco.md` ha perso gli spazi nel nome ed
+   è `documentazione/stili-interfaccia.md`: con gli spazi ogni collegamento diventava
+   `stili%20interfaccia%20...`. Aggiornati tutti i rimandi — README, ROADMAP, frontend, i
+   file di implementazioni — e la mappa dei documenti in cima al README di radice. Restano
+   dove sono `PROVARE.md` e `backend.md`: sono appunti locali fuori da git apposta, e
+   spostarli vorrebbe dire rompere le righe che li tengono fuori. Lo smistamento delle task
+   fatte è la seconda metà del punto, ed era già stato fatto: i punti chiusi stanno nel file
+   del loro argomento e l'indice è [`README.md`](README.md).
+
+
+8. gli eventi in basso sono cliccabili, e puoi segnarli nell'agenda, quando scatta l'ora o poco prima, arriva una notifica
+
+   **FATTO (06/09/2026)** — ogni card degli eventi ha adesso un quadratino in alto a destra:
+   toccalo e l'evento finisce in agenda. **Un quarto d'ora prima dell'ora arriva la
+   notifica** — un toast a schermo e una riga nel centro notifiche del telefono, quello che
+   c'era già. Se nel frattempo il tempo è saltato oltre (una mossa lunga, un +1 ora) la
+   notifica arriva lo stesso e cambia parole: «è cominciata» invece di «fra poco». Il motore
+   è `frontend/js/game/agenda.js` e ascolta l'orologio del gioco (`game-time:advanced`), non
+   un timer suo: se il tempo non si muove, non succede niente. Per esteso in
+   [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#8-e-9--lagenda-gli-appuntamenti-e-le-notifiche).
+
+
+9. possono verificarsi eventi settimanali, da segnare in agenda anche quelli e la matina del giorno stesso arriva la notifica
+
+   **FATTO (06/09/2026)** — al posto del riquadro «Più avanti…», che prometteva senza dire
+   cosa, adesso c'è **«Questa settimana»** con due eventi veri: giorno, ora e a cosa
+   portano. Sono sei in tutto e ne escono due per settimana, sempre le stesse due per quella
+   settimana lì (il seme è il numero della settimana, non il caso: la plancia si ridisegna
+   in continuazione e col caso cambierebbero sotto gli occhi). Si segnano come gli altri, e
+   **la mattina del giorno stesso arriva la notifica**. Stessa cosa per esteso in
+   [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#8-e-9--lagenda-gli-appuntamenti-e-le-notifiche).
+
+
+10. implementare il telefono nuovo, si vede nei media la foto
+
+11. mi piace il po-up che esce quando non hai energia e clicchi sull'azione Freestyle in piazza, applica il pop-up ad ogni azione se manca energia, aggiungici anche un'icona dele fulmine, la stessa della navbar
+
+12. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
+    Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il
+    secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su
+    "stacca la spina", il quinto su "registra un pezzo".
+
+/_ DA DISCUTERE _/
+
+1. DA DISCUTERE aggiungere la reputazione cioè quanto sei affidabile, il massimo è real/real oppure OG, e il minimo tipo figlio di troia quando ti comporti da figlio di troia (detto meglio) O TENERE SOLO LA FAMa
 
 2. DA DISCUTERE aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
 
 3. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles?
 
-4. Non è più: "Faccio un pezzo → +10 fama", ma diventa:
+4. DA DISCUTERE Non è più: "Faccio un pezzo → +10 fama", ma diventa:
 
 TRACK
 │
@@ -108,21 +160,6 @@ NETWORK 64
 → 43.000 streams.
 
 è possibile controllare come stanno andando le canzoni nel tempo da un'app del telefono per sapere se stanno invecchiando bene o male e magari farci delle remastered o parti 2 di una canzone o di un album
-
-5. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
-    Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il
-    secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su
-    "stacca la spina", il quinto su "registra un pezzo".
-
-6. togli il parametro «lucidità» e tutto ciò che ne consegue
-
-7. dividi tutti i file .md sparsi in cartelle con nomi coerenti, inoltre smista le task fatte da implementazioni.md
-
-8. gli eventi in basso sono cliccabili, e puoi segnarli nell'agenda, quando scatta l'ora o poco prima, arriva una notifica
-
-9. possono verificarsi eventi settimanali, da segnare in agenda anche quelli e la matina del giorno stesso arriva la notifica
-
-10. implementare il telefono nuovo, si vede nei media la foto
 
 /_ PAGINA DI LANDING: _/
 

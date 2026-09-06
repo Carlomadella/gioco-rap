@@ -52,6 +52,7 @@ const accesso = leggi("pagine/accesso.html");
 const porta = leggi("index.html");
 const avvio = leggi("js/avvio.js");
 const ingresso = leggi("js/gioco-ingresso.js");
+const agenda = leggi("js/game/agenda.js");
 const jailBg = leggi("js/game/jail-backgrounds.js");
 const menuSystem = leggi("js/menu-sistema.js");
 const cat = JSON.parse(leggi("js/game/eventi-master-1000-v1.2.13.json"));
@@ -1266,7 +1267,86 @@ test("punto 28: ma costa tempo, che è il freno vero",
 test("punto 28: una mossa da zero energia si scrive «gratis», non «0 energia»",
   ui.includes("(en2 ? '<i>' + en2 + '</i>energia' : 'gratis')"));
 
-for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js"]){
+console.log("\nPunti 8 e 9 — l'agenda: gli appuntamenti e le notifiche");
+test("punto 8: ogni evento della plancia ha il quadratino per segnarlo",
+  hub.includes("function hubTastoAgenda(") &&
+  hub.includes('hubTastoAgenda(e, "oggi")') &&
+  index.includes('id="hb-eventi"') &&
+  leggi("css/hub.css").includes(".pevseg {"));
+test("punto 8: il tasto sta accanto alla card, non dentro al bottone",
+  hub.includes('<div class="pevbox"') &&
+  leggi("css/hub.css").includes(".pevbox {") &&
+  !/pevseg[\s\S]{0,400}<\/button>[\s\S]{0,40}pevfoot/.test(hub));
+test("punto 8: l'avviso arriva un quarto d'ora prima, e se il tempo è saltato lo dice",
+  agenda.includes("const PREAVVISO = 15") &&
+  agenda.includes("function controllaOggi(") &&
+  agenda.includes("Fra poco: ") && agenda.includes("È cominciata: "));
+test("punto 9: gli eventi della settimana ci sono, e sono sempre quelli per quella settimana",
+  agenda.includes("const SETTIMANALI = [") &&
+  agenda.includes("function settimanali(") &&
+  agenda.includes("(Number(G.year) || 1) * 53") &&
+  /* «sempre quelli» vuol dire che il seme è la settimana e non il caso:
+     Math.random dentro a settimanali() li farebbe cambiare a ogni disegno */
+  !/function settimanali[\s\S]{0,700}Math\.random/.test(agenda));
+test("punto 9: l'avviso della settimana arriva la mattina del giorno stesso",
+  agenda.includes("function controllaGiorno(") &&
+  agenda.includes("ultimoGiorno") &&
+  agenda.includes("Oggi: "));
+test("l'agenda ascolta l'orologio del gioco, non un timer suo",
+  agenda.includes('window.addEventListener("game-time:advanced"') &&
+  !agenda.includes("setInterval"));
+test("le notifiche dell'agenda finiscono nel centro notifiche che c'è già",
+  agenda.includes("ADF_EVENTI.addNotification") &&
+  !agenda.includes("notifications.unshift"));
+test("gli appuntamenti stanno nel salvataggio, e le voci vecchie si buttano",
+  state.includes("agenda:{voci:[], ultimoGiorno:0}") &&
+  agenda.includes("function pulisci(") &&
+  index.includes('js/game/agenda.js'));
+test("l'app Agenda del telefono mostra quello che ti sei segnato",
+  tel.includes("function segnatiInAgenda(") &&
+  tel.includes("segnatiInAgenda() +") &&
+  tel.includes("data-agendavia"));
+
+console.log("\nPunto 7 — i file .md in cartelle con nomi coerenti");
+test("in radice restano solo README e ROADMAP",
+  (() => {
+    const fuori = fs.readdirSync(path.join(ROOT, ".."))
+      .filter(f => /\.md$/i.test(f) && f !== "README.md" && f !== "ROADMAP.md")
+      /* PROVARE.md e backend.md sono appunti locali, fuori da git apposta */
+      .filter(f => f !== "PROVARE.md" && f !== "backend.md");
+    if(fuori.length) console.log("      " + fuori.join(", "));
+    return fuori.length === 0;
+  })());
+test("le due cartelle nuove ci sono, con dentro un README che dice cosa c'è",
+  ["documentazione", "prompt"].every(d =>
+    fs.existsSync(path.join(ROOT, "..", d, "README.md"))));
+test("i file spostati sono dove dice il README di radice",
+  ["documentazione/comandidelterminale.md", "documentazione/stili-interfaccia.md",
+   "documentazione/problemi-riscontrati.md", "prompt/prompt-ambientazioni.md",
+   "prompt/prompt-app-telefono.md"].every(f => fs.existsSync(path.join(ROOT, "..", f))));
+test("nessun documento punta più ai vecchi percorsi in radice",
+  (() => {
+    const morti = [];
+    const guarda = d => {
+      for(const v of fs.readdirSync(d, {withFileTypes:true})){
+        if(v.name === "node_modules" || v.name === ".git" || v.name === "dist" ||
+           v.name === "registro-modifiche") continue;
+        const f = path.join(d, v.name);
+        if(v.isDirectory()){ guarda(f); continue; }
+        if(!/\.(md|js|html)$/i.test(v.name)) continue;
+        /* questo file no: i vecchi nomi ce li ha dentro apposta, per cercarli */
+        if(v.name === "audit-regressioni.js") continue;
+        const t = fs.readFileSync(f, "utf8");
+        if(/\]\(\.\.?\/?(comandidelterminale|prompt-ambientazioni|prompt-app-telefono|problemi_riscontrati)\.md\)/.test(t) ||
+           /\]\([^)]*stili%20interfaccia/.test(t)) morti.push(path.relative(path.join(ROOT, ".."), f));
+      }
+    };
+    guarda(path.join(ROOT, ".."));
+    if(morti.length) console.log("      " + morti.join("\n      "));
+    return morti.length === 0;
+  })());
+
+for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }

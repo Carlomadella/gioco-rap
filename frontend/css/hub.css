@@ -935,6 +935,9 @@ body.in-hub .topnav {
   display: flex;
   align-items: flex-start;
   gap: 6px;
+  /* il quadratino dell'agenda sta nell'angolo in alto a destra: il titolo si
+     ferma prima, se no ci finisce sotto (punto 8) */
+  padding-right: 26px;
   font-size: 10.5px;
   font-weight: 800;
   line-height: 1.1;
@@ -953,12 +956,19 @@ body.in-hub .topnav {
   font-size: 11px;
   color: #c9ceda;
   line-height: 1.2;
+  /* Se la card si stringe — e dal punto 9 si stringe, perché accanto c'è la
+     colonna della settimana — a cedere è il testo in mezzo, non il piede: sotto
+     ci sono l'ora e il tasto, cioè le due cose per cui la card esiste. */
+  min-height: 0;
+  overflow: hidden;
 }
 .pevl {
   margin-top: 7px;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-height: 0;
+  overflow: hidden;
 }
 .pevl span {
   display: flex;
@@ -976,6 +986,7 @@ body.in-hub .topnav {
 }
 .pevfoot {
   margin-top: auto;
+  flex: none;
   padding-top: 7px;
   display: flex;
   align-items: center;
@@ -1003,6 +1014,150 @@ body.in-hub .topnav {
   background: #2a2e3a;
   color: #8a90a0;
 }
+/* ---- l'agenda sulla plancia (punti 8 e 9) ----
+   La card resta il bottone di prima; la scatola serve solo a tenerle accanto
+   il quadratino per segnarsi l'appuntamento, che non può stargli dentro (un
+   bottone dentro a un bottone non è HTML valido). */
+.pevbox {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  display: flex;
+}
+.pevbox .pev {
+  flex: 1;
+  min-width: 0;
+}
+.pevseg {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(10, 12, 18, 0.82);
+  color: #8a90a0;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+.pevseg .hicon {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+.pevseg:hover {
+  background: #171b26;
+  border-color: var(--k);
+  color: #e8eaf0;
+}
+/* segnato: il quadratino prende il colore dell'evento e resta acceso */
+.pevseg.on {
+  background: var(--k);
+  border-color: var(--k);
+  color: #0a0a0f;
+}
+.pevseg.on:hover {
+  color: #0a0a0f;
+  filter: brightness(1.08);
+}
+
+/* ---- gli eventi della settimana (punto 9) ----
+   Stanno dove stava «Più avanti…»: stessa aria — bordo tratteggiato, niente
+   fondo — ma con dentro roba vera. Qui non si «fa» niente: si segna e basta,
+   perché sono in un altro giorno. */
+.pevsett {
+  flex: 0 0 184px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9px 10px 10px;
+  border-radius: 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+}
+.pevsett > b {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7b8395;
+}
+.pevsr {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 7px 8px;
+  border-radius: 8px;
+  text-align: left;
+  background: #0e1119;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+.pevsr:hover:not(:disabled) {
+  background: #141826;
+  border-color: var(--k);
+}
+.pevsr:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.pevsr.on {
+  border-color: var(--k);
+}
+.pevsi {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--k) 22%, transparent);
+}
+.pevsi .hicon {
+  width: 14px;
+  height: 14px;
+  fill: var(--k);
+}
+.pevst {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pevst b {
+  font-size: 11px;
+  font-weight: 700;
+  color: #e8eaf0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pevst i {
+  font-style: normal;
+  font-size: 10px;
+  color: #7b8395;
+}
+.pevsg {
+  flex: none;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #7b8395;
+}
+.pevsr.on .pevsg {
+  color: var(--k);
+}
+
 .pevpiu {
   flex: 0 0 96px;
   display: flex;
@@ -1256,6 +1411,9 @@ body.in-hub .topnav {
   .pev {
     flex: 1 1 46%;
     min-height: 128px;
+  }
+  .pevsett {
+    flex: 1 0 100%;
   }
   .pevpiu {
     flex: 1 1 100%;
