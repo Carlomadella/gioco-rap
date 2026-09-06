@@ -177,10 +177,13 @@
       .adf-jail-main{position:relative;z-index:2;height:calc(100% - 72px);display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px;padding:clamp(34px,5vw,82px)}
       .adf-jail-copy{align-self:center;max-width:920px}
       .adf-jail-k{color:#ff315b;font:900 13px/1 IBM Plex Mono,monospace;letter-spacing:.15em;text-transform:uppercase}
-      .adf-jail h1{margin:14px 0 18px;font-family:"Big Shoulders Stencil Display","League Gothic",Impact,sans-serif;font-size:clamp(86px,10vw,190px);line-height:.72;letter-spacing:-.025em;text-transform:uppercase}
+      /* line-height .86 e non .72: sotto quel valore «dentro.» finiva sopra a «Sei» */
+      .adf-jail h1{margin:14px 0 18px;font-family:"Big Shoulders Stencil Display","League Gothic",Impact,sans-serif;font-size:clamp(70px,8.4vw,164px);line-height:.86;letter-spacing:-.025em;text-transform:uppercase}
       .adf-jail h1 span{display:block;color:#ff315b}
       .adf-jail-copy>p{max-width:690px;margin:0;color:#c8c2c3;font-size:17px;line-height:1.55}
-      .adf-jail-card{align-self:center;padding:28px;border:1px solid rgba(255,49,91,.42);background:rgba(16,12,17,.82);backdrop-filter:blur(18px);box-shadow:0 26px 80px rgba(0,0,0,.42)}
+      /* la scheda scorre: a 768 di altezza non ci sta tutta, e quello che
+         restava fuori (gli eventi, il tasto per uscire) non si raggiungeva */
+      .adf-jail-card{align-self:center;max-height:100%;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,49,91,.42) transparent;padding:28px;border:1px solid rgba(255,49,91,.42);background:rgba(16,12,17,.82);backdrop-filter:blur(18px);box-shadow:0 26px 80px rgba(0,0,0,.42)}
       .adf-jail-card small{display:block;color:#a39ca0;font:850 10px/1 IBM Plex Mono,monospace;letter-spacing:.13em;text-transform:uppercase}
       .adf-jail-weeks{margin:10px 0 20px;font-family:"Big Shoulders Stencil Display",Impact,sans-serif;font-size:78px;line-height:.9;color:#fff}
       .adf-jail-weeks span{display:block;margin-top:8px;color:#ff315b;font:900 12px/1.2 Figtree,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase}

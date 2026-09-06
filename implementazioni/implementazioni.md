@@ -61,65 +61,36 @@ Insomma, come le cose che vanno davvero in hype IRL, non se fai un feat con pink
 
 CARLO:
 
-6. togli il parametro «lucidità» e tutto ciò che ne consegue
+/_ GIORNALIERE _/
 
-7. dividi tutti i file .md sparsi in cartelle con nomi coerenti, inoltre smista le task fatte da implementazioni.md
+1. creare canzoni con l'ia, guarda cartella musica nei segnalibri, task giornaliera quindi da non smistare
 
-   **FATTO (06/09/2026)** — in radice restano solo `README.md` e `ROADMAP.md`, che sono le
-   due porte d'ingresso. Gli altri sono andati in due cartelle nuove, ognuna col suo README:
-   **`documentazione/`** (i comandi del terminale, i riferimenti visivi, i problemi trovati)
-   e **`prompt/`** (i prompt per farsi fare le immagini: ambientazioni, app del telefono,
-   foto da creare). `stili interfaccia schermata di gioco.md` ha perso gli spazi nel nome ed
-   è `documentazione/stili-interfaccia.md`: con gli spazi ogni collegamento diventava
-   `stili%20interfaccia%20...`. Aggiornati tutti i rimandi — README, ROADMAP, frontend, i
-   file di implementazioni — e la mappa dei documenti in cima al README di radice. Restano
-   dove sono `PROVARE.md` e `backend.md`: sono appunti locali fuori da git apposta, e
-   spostarli vorrebbe dire rompere le righe che li tengono fuori. Lo smistamento delle task
-   fatte è la seconda metà del punto, ed era già stato fatto: i punti chiusi stanno nel file
-   del loro argomento e l'indice è [`README.md`](README.md).
+/_ DA FARE _/
 
+2. voglio creare una pagina per praticamente ogni azione, con interfaccia e bottoni cliccabili a schermo (anche trasparenti ma non per forza), secondo te ha senso questa cosa? crea un README che analizzi e progetti tutto ciò, segna anche i pro e i contro e come vorresti sviluppare ogni pagina.
 
-8. gli eventi in basso sono cliccabili, e puoi segnarli nell'agenda, quando scatta l'ora o poco prima, arriva una notifica
+3. implementare il telefono nuovo, si vede nei media la foto
 
-   **FATTO (06/09/2026)** — ogni card degli eventi ha adesso un quadratino in alto a destra:
-   toccalo e l'evento finisce in agenda. **Un quarto d'ora prima dell'ora arriva la
-   notifica** — un toast a schermo e una riga nel centro notifiche del telefono, quello che
-   c'era già. Se nel frattempo il tempo è saltato oltre (una mossa lunga, un +1 ora) la
-   notifica arriva lo stesso e cambia parole: «è cominciata» invece di «fra poco». Il motore
-   è `frontend/js/game/agenda.js` e ascolta l'orologio del gioco (`game-time:advanced`), non
-   un timer suo: se il tempo non si muove, non succede niente. Per esteso in
-   [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#8-e-9--lagenda-gli-appuntamenti-e-le-notifiche).
+4. mi piace il po-up che esce quando non hai energia e clicchi sull'azione Freestyle in piazza, applica il pop-up ad ogni azione se manca energia, aggiungici anche un'icona dele fulmine, la stessa della navbar
 
+5. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
+   Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il
+   secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su
+   "stacca la spina", il quinto su "registra un pezzo".
 
-9. possono verificarsi eventi settimanali, da segnare in agenda anche quelli e la matina del giorno stesso arriva la notifica
-
-   **FATTO (06/09/2026)** — al posto del riquadro «Più avanti…», che prometteva senza dire
-   cosa, adesso c'è **«Questa settimana»** con due eventi veri: giorno, ora e a cosa
-   portano. Sono sei in tutto e ne escono due per settimana, sempre le stesse due per quella
-   settimana lì (il seme è il numero della settimana, non il caso: la plancia si ridisegna
-   in continuazione e col caso cambierebbero sotto gli occhi). Si segnano come gli altri, e
-   **la mattina del giorno stesso arriva la notifica**. Stessa cosa per esteso in
-   [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#8-e-9--lagenda-gli-appuntamenti-e-le-notifiche).
-
-
-10. implementare il telefono nuovo, si vede nei media la foto
-
-11. mi piace il po-up che esce quando non hai energia e clicchi sull'azione Freestyle in piazza, applica il pop-up ad ogni azione se manca energia, aggiungici anche un'icona dele fulmine, la stessa della navbar
-
-12. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
-    Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il
-    secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su
-    "stacca la spina", il quinto su "registra un pezzo".
+6. quando skippi tante ore ci mette troppo a simulare
 
 /_ DA DISCUTERE _/
 
 1. DA DISCUTERE aggiungere la reputazione cioè quanto sei affidabile, il massimo è real/real oppure OG, e il minimo tipo figlio di troia quando ti comporti da figlio di troia (detto meglio) O TENERE SOLO LA FAMa
 
-2. DA DISCUTERE aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
+2. DA DISCUTERE togli il parametro «lucidità» e tutto ciò che ne consegue
 
-3. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles?
+3. DA DISCUTERE aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
 
-4. DA DISCUTERE Non è più: "Faccio un pezzo → +10 fama", ma diventa:
+4. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles?
+
+5. DA DISCUTERE Non è più: "Faccio un pezzo → +10 fama", ma diventa:
 
 TRACK
 │
@@ -163,11 +134,11 @@ NETWORK 64
 
 /_ PAGINA DI LANDING: _/
 
-11. migliorare graficamente la schermata opzioni
+1. migliorare graficamente la schermata opzioni
 
-12. creare una schermata per le classifiche che si apre anche dall'app del telefono
+2. creare una schermata per le classifiche che si apre anche dall'app del telefono
 
-13. DA DISCUTERE collegare la pagina di mycol togliere la sezione il tuo artista dalla pagina di landing o , oltre che da nuova partita. e collegarla allo shop?
+3. DA DISCUTERE collegare la pagina di mycol togliere la sezione il tuo artista dalla pagina di landing o , oltre che da nuova partita. e collegarla allo shop?
 
 /_ NUOVE MODALITA' _/
 
@@ -175,14 +146,70 @@ Nelle cose da mettere dopo aver masterizzato il gioco, creiamo delle nuove modal
 
 ESEMPI NUOVE MODALITA' DI GIOCO:
 
-MODALITA' CARRIERA STUDIO:
+1. MODALITA' CARRIERA STUDIO:
 
 - Il personaggio creato dall'utente è un rapper di uno studio e devi portare lo studio al top (es. La fame studio) e avere lo studio migliore contro altri studi gestiti da altri player attivi
 
-MODALITA' A SCELTA DI CITTA' DI PARTENZA E LIBERA: puoi decidere in che città nascere e in base a quello hai pro o contro. Il player sceglie tra un numero di città predefinito e poi si può spostare in tutto il mondo (forse meno)
+2. MODALITA' A SCELTA DI CITTA' DI PARTENZA E LIBERA: puoi decidere in che città nascere e in base a quello hai pro o contro. Il player sceglie tra un numero di città predefinito e poi si può spostare in tutto il mondo (forse meno)
 
-MODALITA' CON PIU' CITTA' FINALI: dopo esserti stabilizzato a Los Angeles e, dopo aver creato contatti con personaggi di altre città o che lavoro in altre città o inviti per telefono che ti ha fatto ricevere il manager sblocchi la possibilità di andare o trasferirti in altre città come:
+3. MODALITA' CON PIU' CITTA' FINALI: dopo esserti stabilizzato a Los Angeles e, dopo aver creato contatti con personaggi di altre città o che lavoro in altre città o inviti per telefono che ti ha fatto ricevere il manager sblocchi la possibilità di andare o trasferirti in altre città come:
 
 - Chicago i crimini sono più facili ma c'è più criminalità/concorrenza ed è più difficile affermarsi
 - Las vegas: per avere i casinò migliori e i locali top per massimizzare il lifestyle così puoi averlo al massimo e sbloccare un'altra cosa es. un titolo da esporre nella descrizione del profilo tipo: JOHN GOTTI
 - Atlanta/New York: più focalizzata sul conoscere artisti famosi come 21 Savage, Future, Young Thug
+
+/_ FATTE _/
+
+1. PRIMA DI TUTTO, risolvere problema con pagina di attività criminali.
+
+   **FATTO (06/09/2026)** — la pagina **tagliava i pezzi**, e a qualsiasi misura: a
+   1366 × 768 «Molla il giro» non c'era proprio e il TRAPHONE era segato a metà, a
+   1440 × 900 «Molla il giro» era tagliato, perfino a 1920 × 1080 la frase in fondo alla
+   colonna destra finiva a metà parola. E i due titoloni — «Qui niente è pulito.» e il «Sei
+   dentro.» del carcere — si scrivevano addosso da soli, con l'accento di «È» dentro la riga
+   di sopra. Motivo: la schermata è alta quanto la finestra e ogni pannello ha
+   `overflow:hidden`, così quello che non ci sta non si vede **e non si raggiunge**; l'ultimo
+   ritocco ai caratteri aveva alzato tutti i corpi e il conto non tornava più. Adesso le due
+   colonne scorrono (la rete di sicurezza), sotto i 900 e sotto i 760 di altezza la colonna
+   di sinistra si stringe quel tanto che basta perché «Molla il giro» si veda senza scorrere,
+   sotto gli 800 il titolone restituisce ai quattro colpi lo spazio delle targhette, e la
+   riga delle città prende l'altezza che le serve. **Le regole di gioco non sono state
+   toccate.** Provata tutta la partita nella pagina, e il carcere, a quattro misure. Per
+   esteso in
+   [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md#21--la-professione-del-criminale).
+
+4. dividi tutti i file .md sparsi in cartelle con nomi coerenti, inoltre smista le task fatte da implementazioni.md
+
+   **FATTO (06/09/2026)** — in radice restano solo `README.md` e `ROADMAP.md`, che sono le
+   due porte d'ingresso. Gli altri sono andati in due cartelle nuove, ognuna col suo README:
+   **`documentazione/`** (i comandi del terminale, i riferimenti visivi, i problemi trovati)
+   e **`prompt/`** (i prompt per farsi fare le immagini: ambientazioni, app del telefono,
+   foto da creare). `stili interfaccia schermata di gioco.md` ha perso gli spazi nel nome ed
+   è `documentazione/stili-interfaccia.md`: con gli spazi ogni collegamento diventava
+   `stili%20interfaccia%20...`. Aggiornati tutti i rimandi — README, ROADMAP, frontend, i
+   file di implementazioni — e la mappa dei documenti in cima al README di radice. Restano
+   dove sono `PROVARE.md` e `backend.md`: sono appunti locali fuori da git apposta, e
+   spostarli vorrebbe dire rompere le righe che li tengono fuori. Lo smistamento delle task
+   fatte è la seconda metà del punto, ed era già stato fatto: i punti chiusi stanno nel file
+   del loro argomento e l'indice è [`README.md`](README.md).
+
+5. gli eventi in basso sono cliccabili, e puoi segnarli nell'agenda, quando scatta l'ora o poco prima, arriva una notifica
+
+   **FATTO (06/09/2026)** — ogni card degli eventi ha adesso un quadratino in alto a destra:
+   toccalo e l'evento finisce in agenda. **Un quarto d'ora prima dell'ora arriva la
+   notifica** — un toast a schermo e una riga nel centro notifiche del telefono, quello che
+   c'era già. Se nel frattempo il tempo è saltato oltre (una mossa lunga, un +1 ora) la
+   notifica arriva lo stesso e cambia parole: «è cominciata» invece di «fra poco». Il motore
+   è `frontend/js/game/agenda.js` e ascolta l'orologio del gioco (`game-time:advanced`), non
+   un timer suo: se il tempo non si muove, non succede niente. Per esteso in
+   [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#8-e-9--lagenda-gli-appuntamenti-e-le-notifiche).
+
+6. possono verificarsi eventi settimanali, da segnare in agenda anche quelli e la matina del giorno stesso arriva la notifica
+
+   **FATTO (06/09/2026)** — al posto del riquadro «Più avanti…», che prometteva senza dire
+   cosa, adesso c'è **«Questa settimana»** con due eventi veri: giorno, ora e a cosa
+   portano. Sono sei in tutto e ne escono due per settimana, sempre le stesse due per quella
+   settimana lì (il seme è il numero della settimana, non il caso: la plancia si ridisegna
+   in continuazione e col caso cambierebbero sotto gli occhi). Si segnano come gli altri, e
+   **la mattina del giorno stesso arriva la notifica**. Stessa cosa per esteso in
+   [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#8-e-9--lagenda-gli-appuntamenti-e-le-notifiche).

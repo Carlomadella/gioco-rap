@@ -60,6 +60,7 @@ per tutti e per tutto.
 | **19** | «Completa la canzone» deve costare qualcosa | da fare | [musica-e-suoni](04-musica-e-suoni.md) |
 | **20** | I produttori hanno abilità, fama e carattere | da fare | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
 | **21** | La professione del criminale | fatto | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
+| **—** | La pagina delle Attività criminali tagliava i pezzi | fatto | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
 | **22** | L'energia cresce col livello, e i livelli devono avere un senso | da fare | [carriera-e-tempo](05-carriera-e-tempo.md) |
 | **23** | Il menù delle impostazioni | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **24** | Gli slot anche nella schermata di avvio | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |

@@ -78,6 +78,54 @@ secondi, con la stessa lavorazione della landing.
 - **Da fare prima degli store**: le trenta immagini del fondale arrivano ancora da un CDN, vanno
   scaricate in `media/photo/` (punto 33), se no a gioco installato non si vedono.
 
+**FATTO (06/09/2026) — la pagina tagliava i pezzi, a qualsiasi misura.**
+La schermata è alta esattamente quanto la finestra (`.app` a `100svh`) e ogni pannello ha
+`overflow:hidden`: quello che non ci sta non si vede **e non si raggiunge in nessun modo**.
+Finché i corpi erano quelli di partenza il conto tornava; il blocco «V7 · font davvero nuovo»
+li ha alzati tutti («più leggibile ma senza gonfiare la UI») e da lì non torna più. Aperta la
+pagina in Chrome e misurato contenuto contro contenitore, una misura alla volta:
+
+| misura      | cosa restava fuori                                                  |
+| ----------- | ------------------------------------------------------------------- |
+| 1920 × 1080 | colonna destra 834 su 885 — la frase in fondo tagliata a metà        |
+| 1440 × 900  | colonna sinistra 600 su 625 — **«Molla il giro» tagliato**           |
+| 1366 × 768  | sinistra 564 su 625, destra 522 su 820 — **«Molla il giro» sparito**, il TRAPHONE segato |
+| 1280 × 720  | in più le targhette dei colpi (guadagno, energia, durata) fuori dalla card |
+
+E due titoli si scrivevano addosso da soli: sia «Qui niente è pulito.» sia il «Sei dentro.»
+del carcere avevano un'interlinea sotto lo `0.8`, e l'accento di «È» finiva dentro la riga
+di sopra.
+
+Cosa è cambiato (`frontend/css/strada-crimine-v2.css`, in fondo, e gli stili del carcere in
+`frontend/js/game/strada-crimine-ui.js`):
+
+- **Le due colonne scorrono.** È la rete di sicurezza: qualunque cosa cresca — un uomo in
+  più fra quelli che ti coprono, un'attività rilevata — resta raggiungibile. La barra si
+  vede solo quando serve.
+- **Sotto i 900 di altezza la colonna sinistra si stringe**, e sotto i 760 si stringe
+  ancora: sono margini e imbottiture, non corpi di testo. Da 1280 × 720 in su «Molla il
+  giro» adesso si vede **senza** scorrere.
+- **Sotto gli 800 il titolone si fa più piccolo** e restituisce ai quattro colpi i 44 px che
+  gli mancavano: a 1366 × 768 le card sono di nuovo intere.
+- **La riga delle città** non è più alta 66 px fissi ma quanto le serve (ne servivano 73).
+- **I due titoli**: interlinea `.92` sulla Strada, `.86` in carcere. Le righe non si toccano
+  più e la prima non è più tagliata in cima.
+- **La scheda del carcere scorre** anche lei: a 768 non ci stava, e il tasto per uscire
+  restava fuori dallo schermo.
+
+Le regole di gioco non sono state toccate: numeri, probabilità, pene, tutto com'era.
+Provata la partita intera nella pagina — apri il giro, scegli un colpo, scegli l'approccio,
+leggi l'esito — e il carcere, a 1280 × 720, 1366 × 768, 1440 × 900 e 1920 × 1080.
+
+Tre prove nuove in `strumenti/audit-regressioni.js` tengono aperta la via di fuga (le colonne
+che scorrono, le due interlinee), così la classe di bug non rientra in silenzio. `npm run
+verifica` pulito: prova 70/70, audit 257/257, build 33/33.
+
+> Una cosa vista mentre si provava e **non** toccata, perché è un altro punto: un colpo
+> riuscito alza la reputazione di strada di quasi 4 in un colpo solo, mentre le regole
+> scritte qui sotto dicono «al massimo 2 per colpo». Sta in **La criminalità è troppo
+> facile**, più in basso in questo file.
+
 ---
 
 ## Il beat maker diventa un posto: La Sala
