@@ -12,7 +12,7 @@ function scegliSalto(opts){
   $("m-k").textContent = "Il tempo";
   $("m-t").textContent = "Salta avanti";
   $("m-d").innerHTML = "Ti fermi e lasci correre il calendario. Non scrivi, non registri, " +
-    "non ti fai vedere da nessuno: recuperi le forze e perdi il resto.";
+    "non ti fai vedere da nessuno: recuperi le forze e perdi il resto." + avvisoAgenda();
   const w = $("m-opts"); w.innerHTML = "";
   opts.forEach(o => {
     const b = document.createElement("button");
@@ -22,6 +22,22 @@ function scegliSalto(opts){
     w.appendChild(b);
   });
   $("modal").classList.add("on");
+}
+
+/* Se c'è un appuntamento segnato, il salto non lo scavalca: si ferma alla sua
+   mattina (agenda.js incarta saltaGiorni). Meglio dirlo qui, prima che uno
+   scelga «Un mese» e si ritrovi avanzato di due giorni senza capire perché. */
+function avvisoAgenda(){
+  if(!window.AGENDA || typeof AGENDA.bloccoSalto !== "function") return "";
+  const b = AGENDA.bloccoSalto(28);
+  if(!b) return "";
+  const quando = b.giorni <= 0
+    ? "oggi alle " + b.voce.ora
+    : AGENDA.giornoNome(b.voce.giorno) + " alle " + b.voce.ora;
+  return '<br><b style="color:#F59E0B">In agenda: «' + b.voce.n + '», ' + quando + '.</b> ' +
+    (b.giorni <= 0
+      ? "Finché è segnato, il tempo non si salta."
+      : "Il salto si ferma lì, qualunque taglia scegli.");
 }
 
 function saltaTempo(){

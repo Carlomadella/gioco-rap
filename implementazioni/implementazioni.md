@@ -134,6 +134,22 @@ CARLO:
 
 1. gli eventi segnati in agenda bloccano lo skip
 
+   **FATTO (06/09/2026)** — branch `task/agenda-blocca-skip`. Un appuntamento segnato
+   ferma il salto del tempo: se è oggi il salto non parte, se è più avanti il salto
+   arriva alla sua mattina e lì si pianta, qualunque taglia avessi scelto.
+   - il taglio sta in `frontend/js/game/agenda.js`, che incarta `saltaGiorni()` una volta
+     sola: vale per il menu «Salta avanti», per i tasti +1/+7 del widget e per la
+     ripresa dopo un evento alto
+   - un'ora già passata non blocca niente, se no un appuntamento mancato alle 21:00
+     terrebbe fermo il tempo fino a mezzanotte
+   - lo dicono anche le scritte: il menu «Salta avanti» avvisa prima di scegliere, il
+     widget del tempo scrive chi ha fermato il calendario, e all'arrivo parte la
+     notifica «Oggi: …» invece di quella del mattino
+   - «Fine giornata» resta libero apposta: è una mossa sola e deliberata, e bloccarla
+     rischierebbe di incastrare la partita
+   - dettagli in
+     [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#8-e-9--lagenda-gli-appuntamenti-e-le-notifiche).
+
 3. implementare il telefono nuovo, si vede nei media la foto
 
 4. mi piace il po-up che esce quando non hai energia e clicchi sull'azione Freestyle in piazza, applica il pop-up ad ogni azione se manca energia, aggiungici anche un'icona dele fulmine, la stessa della navbar
