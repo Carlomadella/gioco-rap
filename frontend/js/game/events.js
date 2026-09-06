@@ -40,6 +40,7 @@ const EVENTS = [
         const f = Math.round(rnd(taglia.fan[0], taglia.fan[1]) + G.fans*0.15*taglia.peso);
         const h = Math.round(rnd(taglia.hype[0], taglia.hype[1]));
         G.fans += f; G.hype = clamp(G.hype + h, 0, (typeof hypeCap==="function"?hypeCap():100));
+        diarioBordo().feat++;
         return {t:"Feat con un artista " + taglia.n + ": +" + fmt(f) + " fan, hype +" + h +
           ". Metà del pezzo non è tua.", c:"good"}; }},
      {n:"Rifiuta", d:"Resti padrone di quello che fai",

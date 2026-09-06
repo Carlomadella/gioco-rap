@@ -39,7 +39,11 @@ const START = () => ({
   strFanHist:{bello:[], male:[]},
   /* punti 8 e 9: gli appuntamenti che ti sei segnato dalla plancia, e l'ultimo
      giorno in cui l'agenda ha guardato (js/game/agenda.js) */
-  agenda:{voci:[], ultimoGiorno:0}
+  agenda:{voci:[], ultimoGiorno:0},
+  /* Da smistare, punto 14: contatori di carriera che non stanno scritti da
+     nessun'altra parte — servono solo al diario di bordo del telefono
+     (telefono.js, schermataStatistiche()). Salgono e basta, mai giù. */
+  diario:{feat:0, colpi:0, live:0}
 });
 /* Livello ed esperienza: fan, skill e pezzi usciti in un numero solo.
    Lo leggono la testata della partita e la testata dell'hub, quindi sta qui
@@ -50,6 +54,17 @@ function livello(){
   let lvl = 1, need = 300, acc = 0;
   while(xp >= acc + need && lvl < 60){ acc += need; lvl++; need = Math.round(need*1.35); }
   return {lvl:lvl, into:xp - acc, need:need};
+}
+
+/* I contatori del diario di bordo (punto 14): una partita salvata prima che
+   esistessero non ha `G.diario`, quindi si ricostruisce alla prima lettura —
+   stesso schema difensivo di chatTraccia()/ag()/promoSettimana(). */
+function diarioBordo(){
+  if(!G.diario || typeof G.diario !== "object") G.diario = {feat:0, colpi:0, live:0};
+  if(typeof G.diario.feat !== "number") G.diario.feat = 0;
+  if(typeof G.diario.colpi !== "number") G.diario.colpi = 0;
+  if(typeof G.diario.live !== "number") G.diario.live = 0;
+  return G.diario;
 }
 
 /* la lucidità: quanto hai la testa dentro la musica. Sale quando lavori ai pezzi,

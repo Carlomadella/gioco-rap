@@ -213,6 +213,7 @@ function stradaTenta(colpoId, approccioId){
     G.money += pulito; s.sporchi += sporco;
     s.rep = clamp(s.rep + 3 + colpo.difficolta * 6, 0, 100);
     s.heat = clamp(s.heat + rumore * .6, 0, 100);
+    diarioBordo().colpi++;
     STRADA_SCENA = {k:"Com'è andata", titolo:"Andata bene", testo:"<b>" + colpo.n + "</b>: " + fmt(pulito) + " € in tasca, " +
         fmt(sporco) + " € sporchi da ripulire. In giro si comincia a parlarne.",
       opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};

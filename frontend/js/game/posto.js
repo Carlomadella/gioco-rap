@@ -890,6 +890,7 @@ function azionePosto(tipo, id){
     const f = Math.round(rnd(20, 60) + p.fama * 4 + G.fans * 0.05);
     G.hype = clamp(G.hype + h, 0, (typeof hypeCap==="function"?hypeCap():100)); G.fans += f;
     gain("rete", 1); gain("flow", 0.5);
+    diarioBordo().feat++;
     pushLog("Pezzo insieme a <b>" + p.n + "</b>: +" + h + " hype, +" + fmt(f) + " fan.", "big");
     toast("Feat con " + p.n + " · +" + fmt(f) + " fan", "good", "★", ["#A855F7", "#4C1D95"]);
     SFX.crowd();

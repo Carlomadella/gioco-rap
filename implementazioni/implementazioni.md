@@ -140,14 +140,26 @@ fase e sul tetto settimanale della promo.
     di sempre. Sbagliato: quei numeri (energia, benessere, hype, fan, soldi...)
     sono esattamente quello di cui l'utente si lamentava, e lasciarli lì sopra
     voleva dire non aver cambiato niente di quello che dava fastidio. Tolti del
-    tutto. Adesso `schermataStatistiche()` (`frontend/js/game/telefono.js`) è
-    **solo** un diario di bordo — due gruppi, undici righe, tutte cose che non
-    stavano scritte da nessuna parte tutte insieme e che non scendono mai:
-    **Carriera** (settimane di carriera, età, fase raggiunta, traguardi
-    raggiunti su quanti ce ne sono, record di fan, record in classifica) e
-    **Archivio** (brani pubblicati, dischi certificati, videoclip registrati,
-    contatti fatti, impression totali = somma degli stream di tutti i pezzi).
-    `npm run prova` (70/70) più una verifica dedicata delle undici formule.
+    tutto. Poi arricchito ancora, come richiesto: adesso `schermataStatistiche()`
+    (`frontend/js/game/telefono.js`) è **solo** un diario di bordo — tre gruppi,
+    quindici righe, tutte cose che non stavano scritte da nessuna parte tutte
+    insieme e che non scendono mai.
+    **Carriera**: settimane di carriera, età, fase raggiunta, traguardi
+    raggiunti su quanti ce ne sono, record di fan, record in classifica.
+    **Musica**: brani pubblicati, dischi certificati, videoclip registrati,
+    impression totali (somma degli stream di tutti i pezzi), punti abilità
+    totali (le quattro skill sommate).
+    **Palco e giro**: contatti fatti, e tre contatori del tutto nuovi che prima
+    non esistevano proprio — nessuna azione teneva il conto di quante volte
+    l'avevi fatta: **serate live fatte** (`actions.js`, azione «Serata open
+    mic»), **feat realizzati** (sia quello con un beatmaker della Sala,
+    `posto.js`, sia quello casuale, `events.js`) e **colpi messi a segno**
+    (`strada-crimine.js`, solo i colpi riusciti). Il contenitore è
+    `G.diario` — nuovo in `state.js` (`diarioBordo()`, con lo stesso schema
+    difensivo di `chatTraccia()`/`ag()`: un salvataggio vecchio senza il campo
+    se lo ricostruisce da solo). `npm run prova` (70/70) più due verifiche
+    dedicate fuori dal browser: le formule del diario, e i tre contatori nuovi
+    provati sul codice vero (azione live, feat alla Sala, colpo della Strada).
 
 CARLO:
 

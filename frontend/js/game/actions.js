@@ -431,6 +431,7 @@ const ACTIONS = [
      G.fans += Math.round(f*lbb.live); G.money += Math.round(m*lbb.live);
      gain("presenza", 1.2 * (giaOggi ? 0.5 : 1)); G.wellbeing -= 3;
      adfSegnaOggi("live");
+     diarioBordo().live++;
      return "Serata fatta: +" + f + " fan, +" + m + " €." +
        (giaOggi ? " Il palco lo conoscevano già: oggi rende meno." : "");
    }},

@@ -520,18 +520,33 @@ function schermataStatistiche(){
   ].map(([ic, k, n, v, barra]) => rigaStat(ic, k, n, v, barra)).join("");
 
   const totaleStream = G.songs.reduce((a, s) => a + (s.streams || 0), 0);
-  const archivio = [
+  const puntiAbilita = Math.round(G.skills.scrittura + G.skills.flow + G.skills.presenza + G.skills.rete);
+  const musica = [
     ["nota", "#38BDF8", "Brani pubblicati", fmt(G.songs.filter(s => s.released).length), null],
     ["corona", "#FACC15", "Dischi certificati", fmt(G.songs.filter(s => s.disco).length), null],
     ["mirino", "#F472B6", "Videoclip registrati", fmt(G.songs.filter(s => s.video).length), null],
-    ["persona", "#EF4444", "Contatti fatti", fmt(chatAttivi().length), null],
-    ["giornale", "#4ADE80", "Impression totali", short(totaleStream), null]
+    ["giornale", "#4ADE80", "Impression totali", short(totaleStream), null],
+    ["ingranaggio", "#60A5FA", "Punti abilità totali", fmt(puntiAbilita), null]
+  ].map(([ic, k, n, v, barra]) => rigaStat(ic, k, n, v, barra)).join("");
+
+  /* Palco e giro: quello che hai fatto muovendoti in città, non quello che hai
+     scritto in sala. Sono contatori nuovi (`diarioBordo()`, state.js) — non
+     stavano da nessuna parte prima, perché nessuna azione teneva il conto di
+     quante volte l'aveva fatta. */
+  const dr = diarioBordo();
+  const palco = [
+    ["mic", "#F97316", "Serate live fatte", fmt(dr.live), null],
+    ["duebolle", "#A855F7", "Feat realizzati", fmt(dr.feat), null],
+    ["maschera", "#EF4444", "Colpi messi a segno", fmt(dr.colpi), null],
+    ["persona", "#38BDF8", "Contatti fatti", fmt(chatAttivi().length), null]
   ].map(([ic, k, n, v, barra]) => rigaStat(ic, k, n, v, barra)).join("");
 
   return '<div class="tnote"><b>Carriera</b></div>' +
     '<div class="tlist tlist-stat">' + carriera + '</div>' +
-    '<div class="tnote"><b>Archivio</b></div>' +
-    '<div class="tlist tlist-stat">' + archivio + '</div>';
+    '<div class="tnote"><b>Musica</b></div>' +
+    '<div class="tlist tlist-stat">' + musica + '</div>' +
+    '<div class="tnote"><b>Palco e giro</b></div>' +
+    '<div class="tlist tlist-stat">' + palco + '</div>';
 }
 
 /* ---- Classifiche, Discografia, Contratti: prestate, non ricopiate ----
