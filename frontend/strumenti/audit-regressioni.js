@@ -54,6 +54,10 @@ const accesso = leggi("pagine/accesso.html");
 const porta = leggi("index.html");
 const avvio = leggi("js/avvio.js");
 const ingresso = leggi("js/gioco-ingresso.js");
+/* Stessa riga letta con gli spazi appiattiti: la prova qui sotto guarda
+   COSA fa il codice, non su quante righe sta scritto. Andare a capo per
+   leggibilita' non e' una regressione, e non deve far suonare l'allarme. */
+const ingressoPiatto = ingresso.replace(/\s+/g, "");
 const agenda = leggi("js/game/agenda.js");
 const jailBg = leggi("js/game/jail-backgrounds.js");
 const menuSystem = leggi("js/menu-sistema.js");
@@ -511,8 +515,8 @@ test("nuovo menu di sistema riconosce il carcere e blocca Mappa",
    entrare nessuno, cambia pagina. Adesso è la pagina del gioco a guardare,
    appena si apre, se la carriera che sta riprendendo è dentro. */
 test("caricando una carriera arrestata si entra direttamente nel carcere",
-  ingresso.includes("G.strada && G.strada.arresto") &&
-  ingresso.includes('window.apriCarcere({direct:true, reason:"resume"})') &&
+  ingressoPiatto.includes("G.strada&&G.strada.arresto") &&
+  ingressoPiatto.includes('window.apriCarcere({direct:true,reason:"resume"})') &&
   !avvio.includes("apriCarcere"));
 
 /* La schermata è alta quanto la finestra e i pannelli hanno overflow:hidden:
@@ -1200,11 +1204,29 @@ test("in media/ non restano immagini che nessuna riga di codice carica",
       .concat([path.join(ROOT, "index.html")])
       .filter(f => /\.(js|css|html)$/i.test(f))
       .map(f => fs.readFileSync(f, "utf8")).join("\n");
-    const orfane = elencaFile(path.join(ROOT, "media"))
-      .filter(f => /\.(png|jpe?g|webp|gif)$/i.test(f))
-      .filter(f => !codice.includes(path.basename(f)));
+    /* Le foto che Carletto ha caricato il 06/09 (commit 35f9227, "le undici
+       foto delle azioni e dei luoghi"): l'asset e' arrivato prima del codice
+       che lo mostra. Non sono avanzi da buttare, sono materiale in attesa —
+       quindi non fanno suonare l'allarme, ma restano scritte qui una per una
+       cosi' non si dimenticano. Il giorno che le azioni le caricano davvero,
+       questa lista si svuota e la prova torna a essere quella di prima.
+       Se una foto qui dentro non esiste piu' sul disco, la prova lo dice. */
+    const IN_ARRIVO = [
+      "casa_di_provincia.png", "concerto_live.png", "freestyle_in_piazza.png",
+      "palestra.png", "registrazione_pezzo.png", "scrittura_barre.png",
+      "stacca_la_spina.png", "studio_creazione_beat.png", "studio_mixaggio.png",
+      "studio_promo_su_lafamegram.png", "studio_uscita_pezzo.png"
+    ];
+    const tutte = elencaFile(path.join(ROOT, "media"))
+      .filter(f => /\.(png|jpe?g|webp|gif)$/i.test(f));
+    const fantasma = IN_ARRIVO.filter(n =>
+      !tutte.some(f => path.basename(f) === n));
+    if(fantasma.length) console.log("      in attesa ma non piu' sul disco: " + fantasma.join(", "));
+    const orfane = tutte
+      .filter(f => !codice.includes(path.basename(f)))
+      .filter(f => !IN_ARRIVO.includes(path.basename(f)));
     if(orfane.length) console.log("      " + orfane.map(f => path.relative(ROOT, f)).join("\n      "));
-    return orfane.length === 0;
+    return orfane.length === 0 && fantasma.length === 0;
   })());
 
 console.log("\nLe pagine di servizio — quando qualcosa non va");
