@@ -266,6 +266,39 @@ function hubInitQuartieri(){
     else hubSetQuartiere("");
   });
 }
+/* ================= TARGHETTE: RESTARE DENTRO ALLA FOTO =================
+   La targhetta esce dal bottone del posto (`overflow:visible`), ma la foto è
+   ritagliata (`.pfoto{overflow:hidden}`): un cartello su un edificio al bordo
+   veniva tagliato in due dal bordo dell'immagine. Qui si misura e si sposta
+   quel tanto che basta per rientrare — orizzontale e verticale — scrivendo due
+   variabili che la trasformazione CSS somma allo `-50%` di centratura.
+   Va richiamata DOPO che orari.js ha scritto la riga degli orari, perché è
+   quella che decide l'altezza vera del cartello. */
+function hubClampTarghette(){
+  const foto = document.getElementById("hb-foto");
+  if(!foto) return;
+  requestAnimationFrame(() => {
+    const f = foto.getBoundingClientRect();
+    if(!f.width || !f.height) return;
+    const bordo = 6;
+    foto.querySelectorAll(".pspot-tag").forEach(tag => {
+      tag.style.removeProperty("--tagx");
+      tag.style.removeProperty("--tagy");
+      const r = tag.getBoundingClientRect();
+      if(!r.width) return;
+      let dx = 0, dy = 0;
+      if(r.left < f.left + bordo) dx = (f.left + bordo) - r.left;
+      else if(r.right > f.right - bordo) dx = (f.right - bordo) - r.right;
+      if(r.bottom > f.bottom - bordo) dy = (f.bottom - bordo) - r.bottom;
+      else if(r.top < f.top + bordo) dy = (f.top + bordo) - r.top;
+      if(dx) tag.style.setProperty("--tagx", Math.round(dx) + "px");
+      if(dy) tag.style.setProperty("--tagy", Math.round(dy) + "px");
+    });
+  });
+}
+window.hubClampTarghette = hubClampTarghette;
+window.addEventListener("resize", () => hubClampTarghette());
+
 const HUB_EVENTI = [
   {id:"free", ic:"mic", k:"#A855F7", n:"Freestyle al bar centrale",
    d:"Freestyle contest aperto a tutti.", ora:"21:00",
@@ -623,7 +656,15 @@ function renderHub(){
     '" style="--x:' + l.x + '%;--y:' + l.y + '%;--w:' + l.w + '%;--h:' + l.h +
     '%;--pk:' + (HUB_PIN_COLOR[l.id] || "#C084FC") + '" ' +
     'aria-label="' + l.n + (l.chiuso ? " — chiuso" : "") + '" title="' + l.n + '">' +
-    '<span class="pspot-dot"></span><span class="pspot-tag"><i></i><b>' + l.n + '</b></span></button>').join("");
+    /* La targhetta è UN cartello solo: pallino del colore, nome, e sotto al
+       nome la riga degli orari (la riempie js/game/orari.js). Prima l'orario
+       era uno pseudo-elemento `::after` del bottone — lo stesso `::after` che
+       qui disegna il filo bianco degli angoli, maschera compresa: il testo
+       usciva ritagliato dai quattro quadratini del mirino, cioè tagliato a
+       metà. Adesso è un elemento vero dentro alla targhetta. */
+    '<span class="pspot-dot"></span><span class="pspot-tag"><i></i>' +
+    '<span class="pspot-txt"><b>' + l.n + '</b></span></span></button>').join("");
+  hubClampTarghette();
   hubInitQuartieri();
   hubSetQuartiere(HUB_QUARTIERE);
   /* ---- gli eventi di oggi (punto 8) ----

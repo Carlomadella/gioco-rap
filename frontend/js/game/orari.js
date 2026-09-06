@@ -180,14 +180,14 @@
     const s = document.createElement("style");
     s.id = "city-hours-css";
     s.textContent = `
-      .pspot[data-hours-label]::after{content:attr(data-hours-label);position:absolute;left:50%;top:39px;bottom:auto;
-        transform:translate(-50%,0);white-space:nowrap;pointer-events:none;opacity:0;
-        padding:4px 7px;border-radius:999px;background:rgba(7,8,10,.90);border:1px solid rgba(255,255,255,.18);
-        color:#f4ead5;font:800 9px/1 Figtree,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;
-        transition:opacity .16s ease,transform .16s ease;z-index:12}
-      .pspot:hover::after,.pspot:focus-visible::after,.pspot.district-active::after{opacity:1;transform:translate(-50%,3px)}
-      .pspot.orario-chiuso{filter:saturate(.45) brightness(.72)}
-      .pspot.orario-chiuso::after{color:#ffb2a8;border-color:rgba(239,68,68,.42);background:rgba(24,8,8,.92)}
+      /* L'orario NON e' piu' uno pseudo-elemento del bottone: .pspot::after in
+         hub.css e' il filo bianco degli angoli e porta con se' una maschera a
+         quattro quadratini — il testo ci finiva dentro e usciva tagliato.
+         Adesso e' la seconda riga della targhetta (.pspot-ore, stile in
+         hub.css) e il bottone chiuso si spegne solo nel pallino e negli
+         angoli, non nel cartello, che deve restare leggibile. */
+      .pspot.orario-chiuso{--col:rgba(255,255,255,.42);--alone:transparent}
+      .pspot.orario-chiuso .pspot-dot{filter:grayscale(.75) brightness(.8);opacity:.8}
       .tile .hourscost{position:absolute;right:9px;bottom:8px;z-index:4;padding:4px 7px;border-radius:999px;
         background:rgba(5,7,11,.78);border:1px solid rgba(255,255,255,.14);color:#cfd4de;
         font:700 10px/1 Figtree,system-ui,sans-serif;letter-spacing:.02em;backdrop-filter:blur(8px)}
@@ -206,9 +206,36 @@
       const id = btn.dataset.l;
       const st = placeStatus(id);
       btn.classList.toggle("orario-chiuso", !st.open);
-      btn.dataset.hoursLabel = st.open ? (st.allDay ? "Sempre aperto" : "Aperto · fino " + st.closeText)
-        : (st.phase === "before" ? "Chiuso · apre " + st.nextText : "Chiuso");
+
+      const testo = st.open
+        ? (st.allDay ? "Sempre aperto" : "Aperto · fino " + st.closeText)
+        : (st.phase === "before" ? "Chiuso · apre " + st.nextText
+          : st.phase === "too-late" ? "Chiude alle " + fmt(st.closeAt)
+          : "Chiuso per oggi");
+
+      /* La riga vive dentro alla targhetta: un cartello solo, nome sopra e
+         orario sotto. Se la targhetta non c'è (mappa vecchia) non si inventa
+         niente. */
+      const col = btn.querySelector(".pspot-txt");
+      if(col){
+        let riga = col.querySelector(".pspot-ore");
+        if(!riga){
+          riga = document.createElement("em");
+          riga.className = "pspot-ore";
+          riga.appendChild(document.createElement("s"));
+          riga.appendChild(document.createElement("span"));
+          col.appendChild(riga);
+        }
+        riga.classList.toggle("ore-chiuso", !st.open);
+        riga.lastChild.textContent = testo;
+      }
+
+      /* resta per i lettori di schermo e per il tooltip del browser */
+      btn.dataset.hoursLabel = testo;
+      const nome = btn.getAttribute("title") || id;
+      btn.setAttribute("aria-label", nome + " — " + testo.toLowerCase());
     });
+    if(typeof window.hubClampTarghette === "function") window.hubClampTarghette();
   }
 
   function decorateActions(){
