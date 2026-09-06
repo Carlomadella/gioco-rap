@@ -142,6 +142,7 @@ per tutti e per tutto.
 | **8** | Un README di tutte le rotte dell'API | fatto | [multiplayer-e-backend](07-multiplayer-e-backend.md) |
 | **21** | Registrazione, accesso, uscita | fatto | [multiplayer-e-backend](07-multiplayer-e-backend.md) |
 | **—** | La pulizia dei media, e i sessanta sfondi che sono dieci foto | fatto | [grafica-e-asset](09-grafica-e-asset.md) |
+| **68** | Il telefono nuovo, quello della foto | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 
 > Lo stato è letto dal testo dei punti: «fatto» vuol dire che c'è scritto cosa è
 > stato fatto e quando, «risposto» che c'è una risposta ragionata ma il codice

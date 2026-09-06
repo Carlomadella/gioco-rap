@@ -33,96 +33,15 @@ _(qui sotto finiscono i punti nuovi, appena scritti)_
 
 ALE:
 
-1. Le chat nel cellulare allo stato attuale sono infinite e sempre ripetitive. Volendo noi potremmo looppare all'infinito di parlare con nostra madre e farmare il (+benessere) con la solita conversazione. Non va bene, noi vogliamo che sia tutto più realistico possibile. dobbiamo far avere conversazioni uniche ogni volta e soprattutto non possiamo sentire più di una volta al giorno la stessa persona, tutt'anzi le persone ci scriveranno sporadicamente Nel cellulare volendo
+1. Rendi accessibile lo shop già dalla città iniziale, con limitazioni sui prodotti in vendita
 
-   **FATTO (06/09/2026)** — il loop era proprio quello descritto: `chatIniziaTu`
-   (il "scrivi tu" del telefono) non aveva nessun freno, quindi si poteva aprire
-   «Ciao ma', tutto bene?», rispondere «Mangio, tranquilla» (+4 benessere,
-   `chBene`), e ripetere all'infinito nello stesso istante. Adesso `chat.js`
-   tiene un identificatore di giorno per contatto (`chatGiornoChiave`,
-   anno:settimana:giorno, lo stesso schema di `actions.js` ma tenuto in proprio
-   perché il file deve reggere anche da solo — i test in `prova.js` lo caricano
-   fuori dal browser): la prima volta che **scrivi tu o ti scrive lui/lei**
-   quel giorno lì (`chatSegnaSentitoOggi`, chiamata sia da `chatIniziaTu` che
-   da `chatScrive`) resta segnato, e un secondo «scrivi tu» con la stessa
-   persona lo stesso giorno non parte — un toast lo dice («L'hai già sentito
-   oggi»), niente ricompensa doppia. Il giorno dopo torna disponibile. Non ho
-   toccato il lato «le persone scrivono sporadicamente»: `chatSettimana`/
-   `chatGiorno` (dado a testa, una persona sola al giorno) e la non-ripetizione
-   degli spunti (`chatSpunto`, mai lo stesso di fila, 6 settimane prima di
-   ripescarli) c'erano già e reggevano bene ai test — il buco era solo nel ramo
-   comandato dal giocatore. `npm run prova` (70/70) più una verifica dedicata
-   fuori dal browser sul nuovo limite (stesso giorno bloccato, giorno dopo
-   sbloccato, segnato anche quando scrivono loro, sopravvive al salvataggio).
+2. i rapporti con i beatmaker non vanno mai in negativo, puoi offenderli quanto vuoi e il rapporto resta uguale
 
-2. Rendi accessibile lo shop già dalla città iniziale, con limitazioni sui prodotti in vendita
+3. Ci sono i prezzi dei beat spropositati. Non ha senso che alcuni beat costino 700 euro al livello quattro. Facciamo prezzi realistici : da 100 a 250 euro beat da beatmaker emergenti , da 300 euro a 1000 per beatmaker affermati e da 1000 a 2000 per beatmaker famosissimi
 
-3. i rapporti con i beatmaker non vanno mai in negativo, puoi offenderli quanto vuoi e il rapporto resta uguale
+4. Il giocatore parte con tutti i parametri a 1
 
-4. Ci sono i prezzi dei beat spropositati. Non ha senso che alcuni beat costino 700 euro al livello quattro. Facciamo prezzi realistici : da 100 a 250 euro beat da beatmaker emergenti , da 300 euro a 1000 per beatmaker affermati e da 1000 a 2000 per beatmaker famosissimi
-
-5. Il giocatore parte con tutti i parametri a 1
-
-6. Le azioni ripetibili che facevano farmare facilmente senza avere un gameplay dinamico troviamo un modo per limitarle realisticamente nella possibilità di eseguirla ; Ad esempio la battle di freestyle potremmo metterlo come 'Evento esclusivo' Una sola volta alla settimana e in un orario specifico.
-   Inoltre, per aumentare la dinamicità, potremmo fare che NON tutti gli eventi danno gli stessi hype, soldi, fan.. dipende dall'importanza dell'evento stesso della settimana.
-
-   **FATTO (06/09/2026)** — la battle vera di «Freestyle in piazza» (il minigioco
-   della piazza, quello che vale ×1,5) è diventata l'evento esclusivo chiesto: **una
-   volta a settimana**, e solo la sera fra le **21:00 e le 00:30** (lo stesso orario
-   che l'hub usa già, `orari.js`). Il conto lo tiene `freestyleBattagliaOk()` in
-   `actions.js`, con un contatore settimanale nuovo (`adfSettimana`/`adfSegnaSettimana`,
-   lo stesso schema del contatore giornaliero che c'era già). Fuori da lì resta
-   sempre disponibile il giro veloce, più modesto — non si perde energia a vuoto se
-   provi a giocarla comunque, semplicemente non scatta il jackpot. Stessa cosa per
-   «Serata open mic»: la seconda volta nello stesso giorno rende la metà, sul
-   modello già collaudato dalla doppia sessione in palestra.
-   Per la seconda parte — **non tutti gli eventi valgono uguale** — i sei eventi
-   della settimana in agenda (`agenda.js`, `SETTIMANALI`) hanno adesso un `peso`
-   (da 1,1 per «Porte aperte in palestra» a 1,6 per «Il giro grosso»): se segni
-   l'evento in agenda e lo giochi proprio nel suo giorno, l'azione vera dietro
-   (`free`/`live`/`promo`/`palestra_pesi` in `actions.js`, la sessione della Sala in
-   `posto.js`, il colpo della Strada in `strada-crimine.js`) rende di più — una
-   volta sola a settimana, poi il bonus è consumato (`AGENDA.consumaPeso`). Se non
-   la segni o non è il giorno giusto, gioca come prima. `npm run prova` (70/70) più
-   una verifica dedicata fuori dal browser (esclusività settimanale, orario,
-   contatore che si azzera con la settimana nuova).
-
-7. Verissima la cosa dell'hype, fattore che dev'essere davvero primario nel gioco e i player dovran costantemente provare a inseguire ma con tanta fatica, Partiamo proprio dallo sviluppo dell'hype :
-
-L'hype è in scala internazionale, vuol dire che se sei al livello 100 è impossibile che tu sia ancora nel paesino di provincia.
-Probabilmente all'inizio l'unico modo per fare hype è andare al pub e pubblicare sui social pubblicità per la tua musica (DA SVILUPPARE QUESTO) , ma più di tanto HYPE all'inizio non si può fare, quindi è impossibile che al primo anno rimanendo nella prima città tu diventi 100 di hype
-
-Tutt'altro se non sei goat manco puoi averli 100 di hype
-
-L'hype vero si inizierà a fare quando i tuoi numeri social andranno forte e nelle classifiche il tuo nome inizierà a farsi valere sempre di più, quando farai feat con nomi più grandi dei tuoi e i pezzi andranno bene, quando prendiamo una macchina importante e molto costosa e la flexiamo sui social
-
-Insomma, come le cose che vanno davvero in hype IRL, non se fai un feat con pinko pallino a caso che nessuno conosce
-
-**FATTO (06/09/2026)** — l'hype adesso ha un **tetto che dipende dalla fase della
-carriera** (`PHASES[fase].hcap` in `phases.js`, letto da `hypeCap()`): 20 da
-Sconosciuto, 42 da esordiente, 55, 65, 80, 92, e solo da GOAT il tetto è 100. Non
-conta *come* l'hype sale — farmando o con un colpo di fortuna — il tetto tiene
-comunque, perché è applicato ovunque l'hype cresce (oltre 30 punti diversi nel
-codice, da `promo` alla Strada). I tetti restano sempre sopra alle soglie
-`G.hype >= 40/60/55` già richieste dalle prove di passaggio della carriera stessa
-(`phases.js`, `TRIALS`), quindi nessuna prova diventa impossibile da superare.
-Sulla fatica vera: la promo sui social aveva già un freno sui follower, ma
-**l'hype che dà continuava a salire ogni giorno senza limite** — adesso ha anche
-lui un tetto settimanale (22 punti, `actions.js`), verificato con 7 giorni di
-promo di fila. Sul lato "quando conta davvero": scalare in classifica adesso dà un
-bonus d'hype vero e proporzionato al salto (`sim.js`, vicino a `G.best.chart`), e
-un feat capitato per caso (`events.js`) non vale più sempre uguale: **la maggior
-parte delle volte è un nome piccolo** (hype modesto), **una volta ogni tanto è uno
-grosso davvero**, e lì l'hype si muove sul serio — non lo sai finché non firmi,
-come chiesto. Il "feat con nomi più grandi" esiste già anche come relazione vera
-con un beatmaker della Sala (`posto.js`, tipo `feat`, scala già con `p.fama`): non
-toccato, andava già bene. Restano fuori da questo giro — **da sviluppare a
-parte**, come segnalato nel punto stesso — il pub e la pubblicità come primo modo
-di fare hype a inizio carriera, che oggi non esistono ancora come luogo/azione.
-`npm run prova` (70/70) più una verifica dedicata fuori dal browser sui tetti per
-fase e sul tetto settimanale della promo.
-
-8.
+5.
 
 CARLO:
 
@@ -132,34 +51,16 @@ CARLO:
 
 /_ DA FARE _/
 
-1. gli eventi segnati in agenda bloccano lo skip
+1. mi piace il po-up che esce quando non hai energia e clicchi sull'azione Freestyle in piazza, applica lo stesso pop-up ad ogni azione se manca energia, aggiungici anche un'icona dele fulmine, la stessa della navbar
 
-   **FATTO (06/09/2026)** — branch `task/agenda-blocca-skip`. Un appuntamento segnato
-   ferma il salto del tempo: se è oggi il salto non parte, se è più avanti il salto
-   arriva alla sua mattina e lì si pianta, qualunque taglia avessi scelto.
-   - il taglio sta in `frontend/js/game/agenda.js`, che incarta `saltaGiorni()` una volta
-     sola: vale per il menu «Salta avanti», per i tasti +1/+7 del widget e per la
-     ripresa dopo un evento alto
-   - un'ora già passata non blocca niente, se no un appuntamento mancato alle 21:00
-     terrebbe fermo il tempo fino a mezzanotte
-   - lo dicono anche le scritte: il menu «Salta avanti» avvisa prima di scegliere, il
-     widget del tempo scrive chi ha fermato il calendario, e all'arrivo parte la
-     notifica «Oggi: …» invece di quella del mattino
-   - «Fine giornata» resta libero apposta: è una mossa sola e deliberata, e bloccarla
-     rischierebbe di incastrare la partita
-   - dettagli in
-     [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#8-e-9--lagenda-gli-appuntamenti-e-le-notifiche).
-
-3. implementare il telefono nuovo, si vede nei media la foto
-
-4. mi piace il po-up che esce quando non hai energia e clicchi sull'azione Freestyle in piazza, applica il pop-up ad ogni azione se manca energia, aggiungici anche un'icona dele fulmine, la stessa della navbar
-
-5. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
+2. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
    Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il
    secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su
    "stacca la spina", il quinto su "registra un pezzo".
 
-6. quando skippi tante ore ci mette troppo a simulare
+3. quando skippi tante ore ci mette troppo a simulare
+
+4. nei pulsanti dei luoghi della mappa tieni solo il riquadro con nome e sfondo nero e togli il bordo neon presente dietro (il quadrato con i lati tagliati e i bordi molto smussati)
 
 /_ DA DISCUTERE _/
 
@@ -179,9 +80,8 @@ TRACK
 ├── Producer
 ├── Studio
 ├── Mix
-├── Master
 ├── Testo
-├── Cover
+├── Cover (influenza meno, ma ha 3 opzioni: caricamento file da telefono/computer, assets preimpostati e personalizzazione stile emblema black ops 2)
 ├── Featuring
 ├── Marketing
 └── Timing
@@ -241,42 +141,6 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
 
 /_ FATTE _/
 
-2. voglio creare una pagina per praticamente ogni azione, con interfaccia e bottoni cliccabili a schermo (anche trasparenti ma non per forza), secondo te ha senso questa cosa? crea un README che analizzi e progetti tutto ciò, segna anche i pro e i contro e come vorresti sviluppare ogni pagina.
-
-   **FATTO (06/09/2026)** — il README è
-   [`documentazione/pagine-azioni/README.md`](../documentazione/pagine-azioni/README.md).
-   Tre parti: **l'analisi** (cosa c'è già, i pro, i contro coi numeri veri, il criterio),
-   **il telaio** (quello che serve prima e che tutte le pagine si dividono) e **il
-   progetto di ogni pagina** — tutte e tredici le mosse e tutti i posti, uno per uno, col
-   disegno della schermata, cosa si decide dentro, cosa serve, quanto costa e cosa ne
-   penso. Anche quelle che io lascerei leggere: il disegno c'è lo stesso, così la scelta
-   resta tua. In fondo la tabella di tutto e l'ordine in cui le farei.
-
-   **La risposta breve è sì all'idea, no al «per ogni
-   azione»:** una pagina non si dà a un'azione, si dà a un posto, e dentro al posto
-   si gioca una decisione. Le mosse che una decisione non ce l'hanno — il turno, la
-   palestra, staccare la spina — con una pagina diventano più lente, non più belle,
-   e se tutto pesa uguale il concerto smette di sembrare un evento.
-
-   Contate le mosse: sono **tredici**, e le uniche due che hanno già una pagina —
-   il foglio e la piazza — sono le uniche due che hanno una scelta dentro. Non è un
-   caso. Applicando lo stesso metro alle altre vengono fuori **cinque pagine, non
-   tredici**, e tre delle cinque sono **stanze dello Studio che esistono già e sono
-   mezze vuote**: al banco e in «Fuori» il pezzo lo sceglie il codice
-   (`sort()[0]`), non tu. Le due davvero nuove sono la scena del produttore (i beat
-   si ascoltano già, `beatplay.js`) e il Live Club. La promo non merita una pagina:
-   merita un'app del telefono.
-
-   **Ma prima va fatta una cosa che non si vede.** Oggi una schermata nuova va
-   iscritta a mano in **sette elenchi in sette file** (uscita, orologio, eventi,
-   trasferte, menu di sistema): chi ne dimentica uno rompe qualcosa in silenzio, ed
-   **è già successo tre volte** — la ✕ dello Studio (punto 15), `renderNegozio` che
-   non esisteva, e una terza trovata scrivendo il README, ancora aperta
-   (`strada-crimine` non è l'id di niente: sta in
-   [`documentazione/problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md)).
-   Un registro unico costa un paio di giorni, non cambia niente di quello che si
-   vede e dimezza il costo di ogni pagina fatta da lì in poi.
-
 1. PRIMA DI TUTTO, risolvere problema con pagina di attività criminali.
 
    **FATTO (06/09/2026)** — la pagina **tagliava i pezzi**, e a qualsiasi misura: a
@@ -330,3 +194,64 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
    in continuazione e col caso cambierebbero sotto gli occhi). Si segnano come gli altri, e
    **la mattina del giorno stesso arriva la notifica**. Stessa cosa per esteso in
    [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#8-e-9--lagenda-gli-appuntamenti-e-le-notifiche).
+
+5. ALE 1 — le chat nel cellulare erano infinite e sempre uguali: si poteva sentire la
+   stessa persona all'infinito e farmare il benessere con la solita conversazione.
+
+   **FATTO (06/09/2026)** — `chatIniziaTu` non aveva nessun limite: si apriva «Ciao ma',
+   tutto bene?», si rispondeva «Mangio, tranquilla» (+4 benessere) e si ricominciava, nello
+   stesso istante. Adesso **ogni contatto si sente una volta al giorno**: la prima volta che
+   scrivi tu o che ti scrivono resta segnata (`chatGiornoChiave` / `chatGiaSentitoOggi` /
+   `chatSegnaSentitoOggi` in `frontend/js/game/chat.js`), un secondo «scrivi tu» con la
+   stessa persona lo stesso giorno viene rifiutato con un avviso, e torna disponibile il
+   giorno dopo. Il limite sopravvive al salvataggio. La parte «ti scrivono loro
+   sporadicamente» — il dado giornaliero e settimanale, gli spunti che non si ripetono —
+   c'era già e non è stata toccata. Commit `f72dd92`.
+
+6. ALE 6 — le azioni ripetibili facevano farmare senza gameplay: la battle di freestyle
+   doveva diventare un evento esclusivo, e gli eventi non dovevano valere tutti uguale.
+
+   **FATTO (06/09/2026)** — la battle vera in piazza è **una volta a settimana, e solo fra
+   le 21:00 e le 00:30**, con un contatore settimanale suo (`adfSettimana` /
+   `adfSegnaSettimana`). «Serata open mic» la seconda volta nello stesso giorno rende la
+   metà. E i sei eventi settimanali dell'agenda hanno un **peso d'importanza** che scala
+   davvero la ricompensa quando li giochi nel loro giorno: freestyle, open mic, promo,
+   palestra, sessione alla Sala, colpo della Strada. Commit `a4073c3`.
+
+7. ALE 7 — l'hype: dev'essere il fattore primario, in scala internazionale, e impossibile
+   da avere alto restando nel paesino di provincia al primo anno.
+
+   **FATTO (06/09/2026)** — l'hype ha un **tetto legato alla fase della carriera** (da 20 a
+   100), applicato ovunque cresca, senza toccare le soglie delle prove di passaggio. La
+   promo ha anche un tetto settimanale sull'hype — i follower continuano a crescere lo
+   stesso, che è la cosa realistica. Scalare in classifica dà un bonus d'hype vero, e un
+   feat scala per la grandezza (rara) del collaboratore invece di valere sempre uguale:
+   con pinko pallino non si va in hype. Commit `a4073c3`.
+
+8. gli eventi segnati in agenda devono bloccare lo skip
+
+   **FATTO (06/09/2026)** — un appuntamento segnato ferma il salto del tempo: se prima
+   dell'ora a cui sei diretto c'è qualcosa in agenda, il tempo si ferma lì e te lo dice,
+   invece di scavalcarlo. Commit `efa2033`.
+
+9. una pagina per ogni azione, con interfaccia e bottoni cliccabili a schermo — ha senso?
+   Un README che analizzi e progetti tutto, coi pro e i contro.
+
+   **FATTO (06/09/2026)** — l'analisi e il progetto di ogni schermata, pro e contro
+   compresi, stanno in `frontend/pagine/README.md`. Commit `180960c` e `4925a82`.
+
+10. implementare il telefono nuovo, si vede nei media la foto
+
+    **FATTO (06/09/2026)** — la home del telefono nella plancia è adesso quella della foto
+    `frontend/media/photo/pagina di gioco/schermata_telefono.png`: **sfondo** (il rapper di
+    spalle davanti alla città di notte), **nove icone su quattro colonne**, **dock** in
+    fondo con Messaggi, Contatti, Notizie, Classifiche, e la barra di stato con l'isola
+    dentro allo schermo invece che in una fascia sopra al vetro. Le icone non sono
+    ridisegnate: sono **ritagliate dalla foto** e stanno in `frontend/media/telefono/`. Le
+    palline rosse della foto sono state cancellate una per una, perché quei numeri li deve
+    dire la partita — e infatti li dice. **Tutte e quindici le app aprono**, comprese le due
+    che si registrano a partita avviata (Notifiche, Trasferte): quelle non hanno una foto e
+    tengono il loro disegno, dentro a una piastrella copiata dalle altre. I widget che
+    stavano sopra la griglia non ci sono più: nella foto la home è solo icone e sfondo.
+    Per esteso in
+    [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#68--il-telefono-nuovo-quello-della-foto).

@@ -2,32 +2,52 @@
    schermo vero — sopra i 1180px un iPhone con home, widget, app e dock;
    sotto, la vecchia colonna che scorre (messaggi, griglia, notizie). */
 
-/* ================= IL GUSCIO ================= */
-/* Il telefono sta nella sua casella della griglia e prende l'altezza che ha:
-   non è più inchiodato a 824 px, se no su uno schermo basso usciva fuori. */
+/* ================= IL GUSCIO =================
+   Le misure vengono dalla foto — `media/photo/pagina di gioco/schermata_telefono.png`,
+   schermo 620 x 1333 px — e qui sono in percentuale della larghezza dello
+   schermo, così restano quelle a qualsiasi misura prenda la colonna. */
 .ptel{grid-area:tel;min-height:0;min-width:0;display:flex}
-.ptelframe{width:100%;height:100%;min-height:0;display:flex;flex-direction:column;
+.ptelframe{position:relative;width:100%;height:100%;min-height:0;display:flex;
+  container-type:inline-size;
   border-radius:38px;padding:11px;
   background:linear-gradient(160deg,#2A2E38,#0D0F14);
   box-shadow:0 20px 50px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.12)}
-.ptelbar{position:relative;height:26px;display:flex;align-items:center;gap:5px;
-  padding:0 14px;font-size:11px;color:#C9CEDA;font-variant-numeric:tabular-nums}
+
+/* La barra di stato sta SOPRA allo schermo, come in un telefono vero: non è
+   una fascia che ruba altezza al vetro, ci galleggia sopra allo sfondo. */
+.ptelbar{position:absolute;left:11px;right:11px;top:11px;z-index:3;pointer-events:none;
+  height:clamp(28px,10.2cqw,44px);display:flex;align-items:center;gap:1.6cqw;
+  padding:0 7cqw 0 8.4cqw;font-size:clamp(10px,4cqw,16px);font-weight:700;color:#fff;
+  font-variant-numeric:tabular-nums;text-shadow:0 1px 3px rgba(0,0,0,.7)}
 #hb-telora{margin-right:auto}
-.ptelnotch{position:absolute;left:50%;top:-1px;transform:translateX(-50%);
-  width:104px;height:19px;border-radius:0 0 12px 12px;background:#07080C}
-.ptelsig{margin-left:auto;width:46px;height:10px;border-radius:2px;
-  background:linear-gradient(90deg,#C9CEDA 0 12px,transparent 12px 16px,#C9CEDA 16px 28px,
-  transparent 28px 32px,#C9CEDA 32px 46px);opacity:.75}
-.ptelbatt{position:relative;width:22px;height:11px;border:1.4px solid #C9CEDA;
-  border-radius:3px;opacity:.85}
-.ptelbatt::before{content:"";position:absolute;left:1.5px;top:1.5px;bottom:1.5px;
-  width:70%;background:#C9CEDA;border-radius:1px}
-.ptelbatt::after{content:"";position:absolute;right:-4px;top:3px;width:2px;height:5px;
-  background:#C9CEDA;border-radius:0 2px 2px 0}
-.ptelscr{position:relative;height:calc(100% - 26px);border-radius:28px;background:#080A0F;
-  padding:14px;overflow:hidden;display:flex;flex-direction:column}
+/* l'isola, non più la tacca: pillola centrata, un quarto dello schermo come nella foto */
+.ptelnotch{position:absolute;left:50%;top:clamp(13px,5cqw,26px);transform:translateX(-50%);z-index:4;
+  width:24%;aspect-ratio:156/42;border-radius:99px;background:#000;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.045);
+  display:flex;align-items:center;justify-content:flex-end;padding-right:9%}
+.ptelnotch::after{content:"";width:14%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%,#243049,#0A0C12 70%)}
+.ptelsig{margin-left:auto;width:clamp(17px,7.1cqw,28px);aspect-ratio:46/10;border-radius:1px;
+  background:linear-gradient(90deg,#fff 0 26%,transparent 26% 35%,#fff 35% 61%,
+  transparent 61% 70%,#fff 70% 100%);opacity:.95}
+.ptelwifi{width:clamp(11px,4.4cqw,18px);aspect-ratio:1;opacity:.95;
+  background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff'%3E%3Cpath d='M12 20.6 8.5 16.4a5.4 5.4 0 0 1 7 0zM3 9.6l1.9 2.3a11.2 11.2 0 0 1 14.2 0L21 9.6a14.1 14.1 0 0 0-18 0zm3 3.6 1.9 2.3a6.7 6.7 0 0 1 8.2 0l1.9-2.3a9.7 9.7 0 0 0-12 0z'/%3E%3C/svg%3E")}
+.ptelbatt{position:relative;width:clamp(17px,5.9cqw,24px);aspect-ratio:22/11;
+  border:1.4px solid rgba(255,255,255,.85);border-radius:3px}
+.ptelbatt::before{content:"";position:absolute;left:1px;top:1px;bottom:1px;
+  width:72%;background:#fff;border-radius:1px}
+.ptelbatt::after{content:"";position:absolute;right:-3px;top:28%;bottom:28%;width:2px;
+  background:rgba(255,255,255,.85);border-radius:0 2px 2px 0}
+
+/* Lo schermo: nero, con la foto dello sfondo appoggiata in basso, alla stessa
+   altezza che ha nella foto (737 px su 620 di larghezza). */
+.ptelscr{position:relative;flex:1;min-width:0;height:100%;border-radius:28px;
+  container-type:inline-size;
+  background:#000 url("../media/telefono/sfondo.png") center bottom/100% auto no-repeat;
+  overflow:hidden;display:flex;flex-direction:column}
 
 /* ================= VECCHIO (sotto i 1180px) ================= */
+.pvecchio{height:100%;padding:14px;overflow-y:auto;background:#080A0F}
 .ptt{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#C9CEDA}
 .pmsg{margin-top:10px;border:1px solid rgba(255,255,255,.07);border-radius:10px;
   background:#0C0F16;overflow:hidden}
@@ -74,44 +94,57 @@
 .pnews p:last-child{margin-bottom:0}
 .pnews .hicon{width:14px;height:14px;flex:none;margin-top:1px;fill:var(--k,#FB923C)}
 
-/* ================= NUOVO — SCHERMATA HOME (dai 1180px in su) ================= */
-.thome{position:relative;height:100%;display:flex;flex-direction:column;gap:12px}
+/* ================= NUOVO — SCHERMATA HOME (dai 1180px in su) =================
+   Ricalcata sulla foto. Tutte le misure sono in percentuale della larghezza
+   dello schermo, così il telefono resta quello anche se la colonna cambia:
+   nella foto (schermo largo 620) la piastrella è 112, il passo fra una colonna
+   e l'altra 147, la griglia comincia 114 sotto al bordo alto, il dock è largo
+   572 e sta 32 sopra al fondo. */
+.thome{position:relative;height:100%;display:flex;flex-direction:column}
 
-.twidgets{display:flex;flex-direction:column;gap:8px}
-.twid{display:block;width:100%;text-align:left;border-radius:16px;padding:11px 12px;
-  background:linear-gradient(160deg,#171B26,#0D0F16);border:1px solid rgba(255,255,255,.08);
+.tgrid{display:grid;grid-template-columns:repeat(4,1fr);
+  column-gap:4.67%;row-gap:3.9%;padding:17.9% 4.6% 0}
+.tapp{display:flex;flex-direction:column;align-items:center;gap:2.1%;
+  background:none;border:none;padding:0;min-width:0}
+.tappic{position:relative;display:block;width:100%;aspect-ratio:1;
   transition:transform .12s}
-.twid:hover{transform:translateY(-1px)}
-.twhead{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:.08em;
-  text-transform:uppercase;color:#8A90A0}
-.twhead .hicon{width:13px;height:13px;fill:#8A90A0}
-.twbody{display:block;margin-top:5px}
-.twbody b{display:block;font-size:12.5px;font-weight:700;color:#E8EAF0}
-.twbody i{display:block;font-style:normal;font-size:11px;color:#9AA1B2;margin-top:2px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.twnum{display:block;margin-top:2px;font-size:22px;font-weight:900;color:#E8EAF0}
-.twfoot{display:flex;align-items:center;gap:4px;margin-top:6px;font-size:11px;font-weight:700;color:#8A90A0}
-.twfoot.up{color:#4ADE80}
-.twfoot.dn{color:#EF4444}
-.twrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.twrow .twid{padding:10px 11px}
-
-.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 4px;padding:2px 4px}
-.tapp{display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:none}
-.tappic{position:relative;width:52px;height:52px;border-radius:14px;display:flex;align-items:center;
-  justify-content:center;background:linear-gradient(160deg,var(--k),#000);
-  box-shadow:0 4px 10px rgba(0,0,0,.35);transition:transform .1s}
+.tapp:hover .tappic{transform:scale(1.05)}
 .tapp:active .tappic{transform:scale(.9)}
-.tappic .hicon{width:24px;height:24px;fill:#fff}
-.tbadge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;
-  border-radius:999px;background:#EF4444;color:#fff;font-size:9.5px;font-weight:800;
-  display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #080A0F}
-.tapplbl{font-size:9.5px;color:#C9CEDA;text-align:center;line-height:1.15}
+.tappic img{display:block;width:100%;height:100%;object-fit:contain;
+  -webkit-user-drag:none;user-select:none}
+/* Le app che si registrano a partita avviata (Notifiche, Trasferte) non hanno
+   la loro foto: tengono il disegno vettoriale, ma dentro a una piastrella
+   copiata da quelle della foto — nera, appena schiarita in alto a sinistra, col
+   filo di luce sul bordo — e col glifo dorato, così non stonano in mezzo alle
+   altre. */
+.tappsvg{display:flex;align-items:center;justify-content:center;width:84.7%;
+  height:84.7%;margin:7.65%;border-radius:24%;
+  background:linear-gradient(148deg,#1C1C21,#0A0A0C 62%);
+  box-shadow:0 5px 14px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.10),
+  inset 0 0 0 1px rgba(255,255,255,.05)}
+.tappsvg .hicon{width:50%;height:50%;fill:#D8AC66;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.55))}
+.tbadge{position:absolute;top:-4%;right:-4%;min-width:30%;height:30%;padding:0 4%;
+  border-radius:999px;background:#FF3B30;color:#fff;font-weight:800;
+  font-size:clamp(6.5px,3.4cqw,14px);line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 1px 4px rgba(0,0,0,.5)}
+/* Il carattere è condensato come nella foto: con un carattere normale
+   «IMPOSTAZIONI» e «LAFAMEGRAM» non ci stanno sotto alla loro icona e finivano
+   tagliate con i puntini. Qui ci stanno, e se una volta non ci stessero
+   escono nello spazio fra una colonna e l'altra invece di perdere lettere. */
+.tapplbl{width:auto;max-width:none;overflow:visible;white-space:nowrap;
+  font-family:"Roboto Condensed","Barlow Condensed",Figtree,system-ui,sans-serif;
+  font-size:clamp(7px,3.1cqw,14px);font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase;color:#fff;text-align:center;line-height:1.2;
+  text-shadow:0 1px 3px rgba(0,0,0,.85)}
 
-.tdock{margin-top:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
-  padding:10px 8px;border-radius:22px;background:rgba(255,255,255,.06)}
-.tdock .tapplbl{display:none}
-.tdock .tappic{width:46px;height:46px}
+/* Il dock: la piastra chiara in fondo, quattro app, le stesse etichette. */
+.tdock{display:grid;grid-template-columns:repeat(4,1fr);
+  column-gap:6.64%;margin:auto 3.55% 5.2%;padding:4.9% 1.57% 2.6%;
+  border-radius:clamp(16px,7.2cqw,32px);background:rgba(255,255,255,.10);
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
 
 /* ================= NUOVO — UNA APP APERTA ================= */
 .tscreen{position:absolute;inset:0;border-radius:28px;background:#0B0D13;
@@ -121,7 +154,7 @@
 @keyframes tin{from{opacity:0;transform:scale(.12)}to{opacity:1;transform:scale(1)}}
 @keyframes tout{to{opacity:0;transform:scale(.12)}}
 
-.tscreenhead{display:flex;align-items:center;gap:9px;padding:12px 12px 10px;flex:none;
+.tscreenhead{display:flex;align-items:center;gap:9px;padding:42px 12px 10px;flex:none;
   border-bottom:1px solid rgba(255,255,255,.07)}
 .tback{flex:none;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.08);
   position:relative;border:none}
