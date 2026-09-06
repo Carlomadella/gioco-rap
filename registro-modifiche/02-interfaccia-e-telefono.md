@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:458adc7 -->
+## 06/09/26, 21:57 â€” task/telefono-nuovo â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `458adc7`
+
+### Cosa Ã¨ entrato
+
+- `be6afa0` â€” feat(telefono): la scocca è quella della foto, con tanto di tasti (punto 68) â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/telefono.css`
+- **Modificato:** `frontend/pagine/gioco.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:328eb81 -->
 ## 06/09/26, 21:22 â€” task/telefono-nuovo â†’ main
 
