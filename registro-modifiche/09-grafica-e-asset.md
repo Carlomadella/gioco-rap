@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:cdc13d5 -->
+## 06/09/26, 11:50 â€” task/6-7-hype-e-farming â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.53)  
+**Merge commit:** `cdc13d5`
+
+### Cosa Ã¨ entrato
+
+- `a4073c3` â€” gioco: battle di freestyle esclusiva, peso degli eventi, tetto d'hype per fase (punti 6, 7) â€” **Sadyco La Fame**
+- `70adb5c` â€” fix(mappa): cartelli orari rifatti, non piu tagliati a meta â€” **Claude**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/hub.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:c9451d0 -->
 ## 06/09/26, 11:28 â€” branch non identificato â†’ main
 

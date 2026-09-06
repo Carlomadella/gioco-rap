@@ -6,6 +6,39 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:cdc13d5 -->
+## 06/09/26, 11:50 â€” task/6-7-hype-e-farming â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.53)  
+**Merge commit:** `cdc13d5`
+
+### Cosa Ã¨ entrato
+
+- `a4073c3` â€” gioco: battle di freestyle esclusiva, peso degli eventi, tetto d'hype per fase (punti 6, 7) â€” **Sadyco La Fame**
+- `70adb5c` â€” fix(mappa): cartelli orari rifatti, non piu tagliati a meta â€” **Claude**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/hub.css`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/agenda.js`
+- **Modificato:** `frontend/js/game/chat.js`
+- **Modificato:** `frontend/js/game/events.js`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/orari.js`
+- **Modificato:** `frontend/js/game/phases.js`
+- **Modificato:** `frontend/js/game/piazza.js`
+- **Modificato:** `frontend/js/game/posto.js`
+- **Modificato:** `frontend/js/game/rivals.js`
+- **Modificato:** `frontend/js/game/sim.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/js/game/strada.js`
+- **Modificato:** `frontend/js/game/ui.js`
+
+**File interessati in questa categoria:** 15
+
+---
+
 <!-- merge:66b0f10 -->
 ## 06/09/26, 09:48 â€” task/fix-render-e-agenti â†’ main
 
