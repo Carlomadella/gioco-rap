@@ -317,13 +317,20 @@ function finePiazza(){
   document.removeEventListener("keydown", tastoPiazza);
   const tempo = (FS.perfetti*1 + FS.buoni*0.55) / Math.max(1, FS.perfetti+FS.buoni+FS.persi);
   const resa = clamp(FS.folla/100 * 0.7 + tempo * 0.3, 0, 1);
-  const fan = Math.round((4 + G.skills.presenza*1.3 + G.hype*0.35) * resa * 2.2 * FS.boost);
-  const soldi = Math.round(rnd(2,9) * resa * 4 * FS.boost);
+  /* Da smistare, punto 6: questa è la battle esclusiva — una volta a
+     settimana (actions.js si occupa di non farla riaprire), e se coincide
+     con l'evento "Battle di quartiere" segnato in agenda vale anche il suo
+     peso d'importanza. */
+  const peso = (window.AGENDA && typeof AGENDA.consumaPeso === "function")
+    ? AGENDA.consumaPeso("free") : 1;
+  const fan = Math.round((4 + G.skills.presenza*1.3 + G.hype*0.35) * resa * 2.2 * FS.boost * peso);
+  const soldi = Math.round(rnd(2,9) * resa * 4 * FS.boost * peso);
   const pres = (0.8 + resa*1.8) * FS.boost;
-  const hype = Math.round(resa * 6 * FS.boost);
+  const hype = Math.round(resa * 6 * FS.boost * peso);
   G.fans += fan; G.money += soldi; gain("presenza", pres);
-  G.hype = clamp(G.hype + hype, 0, 100);
+  G.hype = clamp(G.hype + hype, 0, (typeof hypeCap==="function"?hypeCap():100));
   G.wellbeing = clamp(G.wellbeing - 2, 0, 100);
+  if(typeof adfSegnaSettimana === "function") adfSegnaSettimana("free_battle");
   const voto = resa >= .8 ? "Hai spaccato la piazza." : resa >= .55 ? "Ti sei fatto ascoltare."
     : resa >= .3 ? "Qualcuno si è fermato, molti no." : "È andata male. Capita.";
   $("p-body").innerHTML = '<div class="pres"><div class="big">' + Math.round(FS.folla) + '</div>' +
@@ -335,6 +342,7 @@ function finePiazza(){
     '<div class="wrow"><b>Bottino</b><span class="bar"><i style="width:' + Math.round(resa*100) + '%"></i></span>' +
       '<span>+' + fmt(fan) + ' fan · +' + soldi + ' € · presenza +' + pres.toFixed(1) + '</span></div>' +
     (FS.boost > 1 ? '<div class="wrow"><b>×1,5</b><span class="bar"><i style="width:100%"></i></span><span>perché te la sei giocata</span></div>' : '') +
+    (peso > 1 ? '<div class="wrow"><b>evento della settimana</b><span class="bar"><i style="width:100%"></i></span><span>vale di più</span></div>' : '') +
     '</div><button class="ptap" id="p-end">Torna alla settimana</button>';
   $("p-end").onclick = () => { chiudiPiazza(); save(); renderGioco(); };
   pushLog("Freestyle in piazza: <b>" + Math.round(FS.folla) + "</b> persone rimaste, +" + fmt(fan) + " fan.",

@@ -133,7 +133,7 @@ const INCONTRI = [
       opts:[
         {n:"Fatti la foto con lui", d:"Due minuti, gli fai piacere", run(){
           const art = window.ARTIST || {};
-          G.hype = clamp(G.hype + rnd(2,5), 0, 100);
+          G.hype = clamp(G.hype + rnd(2,5), 0, (typeof hypeCap==="function"?hypeCap():100));
           G.fans += Math.round(rnd(3,14));
           G.wellbeing = clamp(G.wellbeing + 1, 0, 100);
           postaEvento(nome, "Ho appena incontrato " + ((art.name || "un artista").trim() || "un artista") +
@@ -152,13 +152,13 @@ const INCONTRI = [
     return {t:"Un fan sopra le righe", d:sc.luogo + ". " + nome + " " + sc.comp,
       opts:[
         {n:"Fatti la foto lo stesso", d:"Non vale la pena litigare", run(){
-          G.hype = clamp(G.hype + rnd(1,3), 0, 100); G.wellbeing = clamp(G.wellbeing - 1, 0, 100);
+          G.hype = clamp(G.hype + rnd(1,3), 0, (typeof hypeCap==="function"?hypeCap():100)); G.wellbeing = clamp(G.wellbeing - 1, 0, 100);
           return {t:"Foto fatta, in fretta. Meglio chiuderla lì.", c:""};
         }},
         {n:"Gli dici di no, ha esagerato", d:"Rischi che la racconti a modo suo", run(){
           const art = window.ARTIST || {};
           if(Math.random() < .3){
-            G.hype = clamp(G.hype - rnd(3,8), 0, 100);
+            G.hype = clamp(G.hype - rnd(3,8), 0, (typeof hypeCap==="function"?hypeCap():100));
             postaEvento("La Voce del Giro", "Pare che " + ((art.name || "un artista").trim() || "un artista") +
               " si sia rifiutato di fare una foto a un fan. Bella storia.", rnd(15,40));
             return {t:"Qualcuno vicino ha visto tutto, e adesso gira una versione tutta sua.", c:"bad"};
@@ -175,7 +175,7 @@ const INCONTRI = [
         {n:"Rispondi a tono", d:"Rischi, ma se la fai buona ci guadagni", run(){
           const art = window.ARTIST || {};
           if(G.skills.flow + G.skills.presenza >= 24){
-            G.hype = clamp(G.hype + rnd(4,9), 0, 100);
+            G.hype = clamp(G.hype + rnd(4,9), 0, (typeof hypeCap==="function"?hypeCap():100));
             postaEvento("La Voce del Giro", "Video: la risposta di " + ((art.name || "un artista").trim() || "un artista") +
               " a uno che lo attaccava per strada. Distrutto.", rnd(40,90));
             return {t:"Gliene hai dette quattro belle. Qualcuno ha ripreso tutto.", c:"good"};
@@ -202,7 +202,7 @@ const INCONTRI = [
           const art = window.ARTIST || {};
           const vinci = G.fans + G.hype * 30 >= r.p * 0.8;
           if(vinci){
-            G.hype = clamp(G.hype + rnd(4,10), 0, 100);
+            G.hype = clamp(G.hype + rnd(4,10), 0, (typeof hypeCap==="function"?hypeCap():100));
             postaEvento("La Voce del Giro", ((art.name || "un artista").trim() || "un artista") + " e " + r.n +
               " se le sono dette per strada. Chi ha vinto lo sanno tutti.", rnd(30,70));
             return {t:"Gliel'hai fatta vedere. La gente intorno se lo ricorderà.", c:"good"};
@@ -225,12 +225,12 @@ const INCONTRI = [
         {n:"Rispondi a modo tuo, senza filtri", d:"Una frase a effetto: se la becchi bene fa notizia, se la sbagli pure", run(){
           const art = window.ARTIST || {};
           if(G.skills.flow + G.skills.presenza >= 24){
-            G.hype = clamp(G.hype + rnd(5,12), 0, 100);
+            G.hype = clamp(G.hype + rnd(5,12), 0, (typeof hypeCap==="function"?hypeCap():100));
             postaEvento("La Voce del Giro", ((art.name || "un artista").trim() || "un artista") +
               " a ruota libera con " + nome + ": la frase sta già girando.", rnd(35,80));
             return {t:"L'hai detta come la pensi. " + nome + " sorrideva mentre scriveva.", c:"good"};
           }
-          G.hype = clamp(G.hype - rnd(3,8), 0, 100);
+          G.hype = clamp(G.hype - rnd(3,8), 0, (typeof hypeCap==="function"?hypeCap():100));
           G.wellbeing = clamp(G.wellbeing - 3, 0, 100);
           postaEvento("La Voce del Giro", "Le parole di troppo di " + ((art.name || "un artista").trim() || "un artista") +
             " a " + nome + ". Non la prenderanno bene tutti.", rnd(20,55));

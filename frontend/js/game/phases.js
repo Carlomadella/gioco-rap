@@ -3,30 +3,42 @@
 
 /* ==================== FASI DELLA SCALATA ==================== */
 /* Ogni fase mette un tetto a quanto puoi arrivare lontano in una settimana.
-   Per salire di fase devi superare una PROVA: una scelta vera, con dei requisiti. */
+   Per salire di fase devi superare una PROVA: una scelta vera, con dei requisiti.
+   `hcap` (Da smistare, punto 7): il tetto d'hype della fase. L'hype è in scala
+   internazionale — non è credibile che chi è ancora a "Sconosciuto" veda le
+   stesse cifre di un GOAT, quindi anche tenendo il pulsante premuto non si va
+   oltre il tetto della fase in cui sei. Sale con te, una prova alla volta.
+   Le soglie restano sotto ai requisiti hype delle PROVE qui sotto (40, 60, 55)
+   con un margine, altrimenti una prova diventerebbe impossibile da superare
+   restando nella fase che la chiede. */
 const PHASES = [
-  {n:"Sconosciuto",        cap:800,     fmax:900,     d:"Suoni per gli amici e per nessun altro."},
-  {n:"Rapper esordiente",  cap:5200,    fmax:6000,    d:"Nel tuo giro sanno chi sei."},
-  {n:"Rapper emergente",   cap:34000,   fmax:45000,   d:"I locali ti chiamano loro."},
-  {n:"Rapper",             cap:210000,  fmax:300000,  d:"Vivi di questo. Fuori città sanno il tuo nome."},
-  {n:"Star",               cap:1300000, fmax:2000000, d:"Sei dentro al discorso grande."},
-  {n:"Man of the Year",    cap:6500000, fmax:9000000, d:"Quest'anno è stato il tuo."},
-  {n:"GOAT",               cap:1e9,     fmax:1e9,     d:"Non è più una carriera. È un nome che resta."}
+  {n:"Sconosciuto",        cap:800,     fmax:900,     hcap:20,  d:"Suoni per gli amici e per nessun altro."},
+  {n:"Rapper esordiente",  cap:5200,    fmax:6000,    hcap:42,  d:"Nel tuo giro sanno chi sei."},
+  {n:"Rapper emergente",   cap:34000,   fmax:45000,   hcap:55,  d:"I locali ti chiamano loro."},
+  {n:"Rapper",             cap:210000,  fmax:300000,  hcap:65,  d:"Vivi di questo. Fuori città sanno il tuo nome."},
+  {n:"Star",               cap:1300000, fmax:2000000, hcap:80,  d:"Sei dentro al discorso grande."},
+  {n:"Man of the Year",    cap:6500000, fmax:9000000, hcap:92,  d:"Quest'anno è stato il tuo."},
+  {n:"GOAT",               cap:1e9,     fmax:1e9,     hcap:100, d:"Non è più una carriera. È un nome che resta."}
 ];
+/* Il tetto d'hype vero, letto ovunque nel gioco invece del vecchio 100 fisso. */
+function hypeCap(){
+  const f = PHASES[G.phase] || PHASES[0];
+  return f.hcap != null ? f.hcap : 100;
+}
 const relCount = () => G.songs.filter(s => s.released).length;
 const bestRel = () => G.songs.filter(s => s.released).reduce((a,s) => Math.max(a,s.q), 0);
 
 function passTrial(msg){
   G.phase = Math.min(G.phase+1, PHASES.length-1);
   G.trialCd = 0;
-  G.hype = clamp(G.hype + 18, 0, 100);
+  G.hype = clamp(G.hype + 18, 0, (typeof hypeCap==="function"?hypeCap():100));
   pushLog("<b>" + PHASES[G.phase].n + ".</b> " + msg, "big");
   return {t:"", c:""};
 }
 function failTrial(msg, weeks){
   G.trialCd = weeks || 8;
   delete G.trialsDone[G.phase];
-  G.hype = clamp(G.hype - 8, 0, 100);
+  G.hype = clamp(G.hype - 8, 0, (typeof hypeCap==="function"?hypeCap():100));
   pushLog(msg, "bad");
   return {t:"", c:""};
 }

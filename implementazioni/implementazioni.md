@@ -46,6 +46,27 @@ ALE:
 6. Le azioni ripetibili che facevano farmare facilmente senza avere un gameplay dinamico troviamo un modo per limitarle realisticamente nella possibilità di eseguirla ; Ad esempio la battle di freestyle potremmo metterlo come 'Evento esclusivo' Una sola volta alla settimana e in un orario specifico.
    Inoltre, per aumentare la dinamicità, potremmo fare che NON tutti gli eventi danno gli stessi hype, soldi, fan.. dipende dall'importanza dell'evento stesso della settimana.
 
+   **FATTO (06/09/2026)** — la battle vera di «Freestyle in piazza» (il minigioco
+   della piazza, quello che vale ×1,5) è diventata l'evento esclusivo chiesto: **una
+   volta a settimana**, e solo la sera fra le **21:00 e le 00:30** (lo stesso orario
+   che l'hub usa già, `orari.js`). Il conto lo tiene `freestyleBattagliaOk()` in
+   `actions.js`, con un contatore settimanale nuovo (`adfSettimana`/`adfSegnaSettimana`,
+   lo stesso schema del contatore giornaliero che c'era già). Fuori da lì resta
+   sempre disponibile il giro veloce, più modesto — non si perde energia a vuoto se
+   provi a giocarla comunque, semplicemente non scatta il jackpot. Stessa cosa per
+   «Serata open mic»: la seconda volta nello stesso giorno rende la metà, sul
+   modello già collaudato dalla doppia sessione in palestra.
+   Per la seconda parte — **non tutti gli eventi valgono uguale** — i sei eventi
+   della settimana in agenda (`agenda.js`, `SETTIMANALI`) hanno adesso un `peso`
+   (da 1,1 per «Porte aperte in palestra» a 1,6 per «Il giro grosso»): se segni
+   l'evento in agenda e lo giochi proprio nel suo giorno, l'azione vera dietro
+   (`free`/`live`/`promo`/`palestra_pesi` in `actions.js`, la sessione della Sala in
+   `posto.js`, il colpo della Strada in `strada-crimine.js`) rende di più — una
+   volta sola a settimana, poi il bonus è consumato (`AGENDA.consumaPeso`). Se non
+   la segni o non è il giorno giusto, gioca come prima. `npm run prova` (70/70) più
+   una verifica dedicata fuori dal browser (esclusività settimanale, orario,
+   contatore che si azzera con la settimana nuova).
+
 7. Verissima la cosa dell'hype, fattore che dev'essere davvero primario nel gioco e i player dovran costantemente provare a inseguire ma con tanta fatica, Partiamo proprio dallo sviluppo dell'hype :
 
 L'hype è in scala internazionale, vuol dire che se sei al livello 100 è impossibile che tu sia ancora nel paesino di provincia.
@@ -56,6 +77,30 @@ Tutt'altro se non sei goat manco puoi averli 100 di hype
 L'hype vero si inizierà a fare quando i tuoi numeri social andranno forte e nelle classifiche il tuo nome inizierà a farsi valere sempre di più, quando farai feat con nomi più grandi dei tuoi e i pezzi andranno bene, quando prendiamo una macchina importante e molto costosa e la flexiamo sui social
 
 Insomma, come le cose che vanno davvero in hype IRL, non se fai un feat con pinko pallino a caso che nessuno conosce
+
+**FATTO (06/09/2026)** — l'hype adesso ha un **tetto che dipende dalla fase della
+carriera** (`PHASES[fase].hcap` in `phases.js`, letto da `hypeCap()`): 20 da
+Sconosciuto, 42 da esordiente, 55, 65, 80, 92, e solo da GOAT il tetto è 100. Non
+conta *come* l'hype sale — farmando o con un colpo di fortuna — il tetto tiene
+comunque, perché è applicato ovunque l'hype cresce (oltre 30 punti diversi nel
+codice, da `promo` alla Strada). I tetti restano sempre sopra alle soglie
+`G.hype >= 40/60/55` già richieste dalle prove di passaggio della carriera stessa
+(`phases.js`, `TRIALS`), quindi nessuna prova diventa impossibile da superare.
+Sulla fatica vera: la promo sui social aveva già un freno sui follower, ma
+**l'hype che dà continuava a salire ogni giorno senza limite** — adesso ha anche
+lui un tetto settimanale (22 punti, `actions.js`), verificato con 7 giorni di
+promo di fila. Sul lato "quando conta davvero": scalare in classifica adesso dà un
+bonus d'hype vero e proporzionato al salto (`sim.js`, vicino a `G.best.chart`), e
+un feat capitato per caso (`events.js`) non vale più sempre uguale: **la maggior
+parte delle volte è un nome piccolo** (hype modesto), **una volta ogni tanto è uno
+grosso davvero**, e lì l'hype si muove sul serio — non lo sai finché non firmi,
+come chiesto. Il "feat con nomi più grandi" esiste già anche come relazione vera
+con un beatmaker della Sala (`posto.js`, tipo `feat`, scala già con `p.fama`): non
+toccato, andava già bene. Restano fuori da questo giro — **da sviluppare a
+parte**, come segnalato nel punto stesso — il pub e la pubblicità come primo modo
+di fare hype a inizio carriera, che oggi non esistono ancora come luogo/azione.
+`npm run prova` (70/70) più una verifica dedicata fuori dal browser sui tetti per
+fase e sul tetto settimanale della promo.
 
 8.
 

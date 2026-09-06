@@ -16,7 +16,7 @@ const EVENTS = [
    d:"Un artista più grosso ti ha citato male in un'intervista. Il tuo nome sta girando, ma non per i motivi giusti.",
    opts:[
      {n:"Rispondi con un pezzo", d:"Hype alto, ma ti giochi la reputazione se è debole",
-      run(){ if(G.skills.scrittura > 30){ G.hype = clamp(G.hype+22,0,100); G.fans += Math.round(G.fans*0.08+120);
+      run(){ if(G.skills.scrittura > 30){ G.hype = clamp(G.hype+22,0,(typeof hypeCap==="function"?hypeCap():100)); G.fans += Math.round(G.fans*0.08+120);
           return {t:"Hai risposto e hai vinto lo scambio. Il tuo nome è ovunque.", c:"good"}; }
         G.hype = clamp(G.hype-8,0,100); G.wellbeing -= 8;
         return {t:"Hai risposto male. Ti hanno sotterrato nei commenti.", c:"bad"}; }},
@@ -24,12 +24,24 @@ const EVENTS = [
       run(){ G.skills.scrittura += 2; G.wellbeing += 4;
         return {t:"Hai lasciato correre e sei tornato al quaderno.", c:""}; }}
    ]},
+  /* Da smistare, punto 7: un feat non vale sempre uguale — "non se fai un feat
+     con pinko pallino a caso che nessuno conosce". La maggior parte delle volte
+     è un nome piccolo (hype modesto), ma una volta ogni tanto è uno grosso
+     davvero, ed è lì che l'hype si muove sul serio. Non lo sai finché non firmi. */
   {id:"feat", when:g => g.skills.rete >= 18, k:"Collaborazione", t:"Un feat sul tavolo",
-   d:"Un artista con più seguito di te propone un pezzo insieme. Vuole <b>metà dei diritti</b>.",
+   d:"Un artista con più seguito di te propone un pezzo insieme. Vuole <b>metà dei diritti</b>. Quanto pesa il suo nome lo scopri solo accettando.",
    opts:[
-     {n:"Accetta", d:"Tanti fan subito, metà degli incassi di quel pezzo",
-      run(){ const f = Math.round(rnd(400,1400) + G.fans*0.25); G.fans += f; G.hype = clamp(G.hype+14,0,100);
-        return {t:"Feat fatto: +" + fmt(f) + " fan. Metà del pezzo non è tua.", c:"good"}; }},
+     {n:"Accetta", d:"Fan e hype quanto vale il nome, metà degli incassi di quel pezzo",
+      run(){
+        const tiro = Math.random();
+        const taglia = tiro < 0.55 ? {n:"emergente", fan:[300,900], hype:[6,12], peso:1}
+          : tiro < 0.88 ? {n:"affermato", fan:[900,2600], hype:[16,26], peso:1.7}
+          : {n:"molto più grande di te", fan:[2600,6000], hype:[30,46], peso:2.6};
+        const f = Math.round(rnd(taglia.fan[0], taglia.fan[1]) + G.fans*0.15*taglia.peso);
+        const h = Math.round(rnd(taglia.hype[0], taglia.hype[1]));
+        G.fans += f; G.hype = clamp(G.hype + h, 0, (typeof hypeCap==="function"?hypeCap():100));
+        return {t:"Feat con un artista " + taglia.n + ": +" + fmt(f) + " fan, hype +" + h +
+          ". Metà del pezzo non è tua.", c:"good"}; }},
      {n:"Rifiuta", d:"Resti padrone di quello che fai",
       run(){ G.skills.rete -= 3;
         return {t:"Hai rifiutato. Si è offeso, ma i tuoi pezzi restano tuoi.", c:""}; }}
@@ -49,7 +61,7 @@ const EVENTS = [
    opts:[
      {n:"Paga", d:"−400 €, spinta reale",
       run(){ if(G.money < 400) return {t:"Non avevi i soldi. Hanno chiamato un altro.", c:"bad"};
-        G.money -= 400; const f = Math.round(rnd(600,2200)); G.fans += f; G.hype = clamp(G.hype+16,0,100);
+        G.money -= 400; const f = Math.round(rnd(600,2200)); G.fans += f; G.hype = clamp(G.hype+16,0,(typeof hypeCap==="function"?hypeCap():100));
         return {t:"Sei passato in radio: +" + fmt(f) + " fan.", c:"good"}; }},
      {n:"Rifiuta", d:"Non paghi per essere ascoltato",
       run(){ G.skills.rete += 1;
@@ -81,7 +93,7 @@ const EVENTS = [
       run(){ G.wellbeing = clamp(G.wellbeing+18,0,100); G.hype = clamp(G.hype-10,0,100);
         return {t:"Hai promesso che rallenti. Il quaderno è rimasto chiuso qualche giorno.", c:""}; }},
      {n:"Tieni il punto", d:"Nessuno ti capisce, ma la fame resta intera",
-      run(){ G.wellbeing = clamp(G.wellbeing-10,0,100); G.hype = clamp(G.hype+8,0,100);
+      run(){ G.wellbeing = clamp(G.wellbeing-10,0,100); G.hype = clamp(G.hype+8,0,(typeof hypeCap==="function"?hypeCap():100));
         gain("scrittura", 2);
         return {t:"Hai tenuto il punto. Quella sera hai scritto la strofa migliore del mese.", c:"good"}; }}
    ]},
@@ -105,7 +117,7 @@ const EVENTS = [
       run(){ G.money += 900; G.energy = Math.max(0, G.energy-60); gain("scrittura", 1.5);
         return {t:"Novecento euro e tre strofe che canterà un altro.", c:""}; }},
      {n:"Rifiuti", d:"Niente soldi, ma le tue barre restano tue",
-      run(){ G.hype = clamp(G.hype+4,0,100);
+      run(){ G.hype = clamp(G.hype+4,0,(typeof hypeCap==="function"?hypeCap():100));
         return {t:"Hai detto no. Quelle tre strofe le hai tenute per te.", c:""}; }}
    ]},
   {id:"facili", when:g => g.money < 0, k:"Bivio", t:"Soldi che arrivano subito",
@@ -123,7 +135,7 @@ const EVENTS = [
    d:"Dice che ti porta dove vuoi tu. Chiede il <b>15% su tutto</b>, per due anni.",
    opts:[
      {n:"Firma con lui", d:"Più opportunità, meno soldi in tasca",
-      run(){ G.manager = true; G.hype = clamp(G.hype+10,0,100);
+      run(){ G.manager = true; G.hype = clamp(G.hype+10,0,(typeof hypeCap==="function"?hypeCap():100));
         return {t:"Hai un manager. Il quindici per cento se ne va prima di arrivare a te.", c:""}; }},
      {n:"Fai da solo", d:"Tieni tutto, fai tutto",
       run(){ return {t:"Continui a gestirti da solo. Più fatica, più controllo.", c:""}; }}

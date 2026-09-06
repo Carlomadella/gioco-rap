@@ -567,12 +567,12 @@ function renderGioco(){
         if(G.money < t.w * 3){ toast("Servono almeno <b>" + fmt(t.w*3) + " €</b> in cassa per permettertelo.", "bad", "!", ["#FF5A36","#B026FF"]); return; }
         G.money -= t.w;
         G.life[cat.id] = lv;
-        G.hype = clamp(G.hype + 3, 0, 100);
+        G.hype = clamp(G.hype + 3, 0, (typeof hypeCap==="function"?hypeCap():100));
         SFX.cash();
         toast("<b>" + t.n + "</b> — adesso paghi " + fmt(t.w) + " € a settimana.", "good", cat.ic, cat.c);
       }else{
         G.life[cat.id] = lv;
-        G.hype = clamp(G.hype - 5, 0, 100);
+        G.hype = clamp(G.hype - 5, 0, (typeof hypeCap==="function"?hypeCap():100));
         SFX.fail();
         toast("Sei sceso a <b>" + t.n + "</b>. Qualcuno se ne accorgerà.", "bad", cat.ic, ["#5A6472","#2B2B34"]);
       }

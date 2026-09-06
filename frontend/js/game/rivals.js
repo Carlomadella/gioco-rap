@@ -85,7 +85,7 @@ function vitaRivali(mieiStream){
       r2.p *= rnd(.45,.68);
       pushLog("<b>" + r2.n + "</b> è sparito dai radar. Succede in fretta.", "");
     } else if(dado < .085 && mieiStream > 400 && Math.abs(r2.p - mieiStream) < mieiStream*0.4){
-      r2.mom += .2; G.hype = clamp(G.hype + 4, 0, 100);
+      r2.mom += .2; G.hype = clamp(G.hype + 4, 0, (typeof hypeCap==="function"?hypeCap():100));
       pushLog("<b>" + r2.n + "</b> ti ha nominato in un pezzo. Non in modo gentile.", "bad");
     }
     r2.p = Math.max(r2.p, mieiStream * rnd(0.18, 0.96));

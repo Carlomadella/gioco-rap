@@ -203,7 +203,12 @@ function stradaTenta(colpoId, approccioId){
   const rumore = clamp((6 + colpo.difficolta * 10) * approccio.rumore, 2, 30);
 
   if(successo){
-    const grezzo = rnd(colpo.min, colpo.max) * approccio.guadagno;
+    /* Da smistare, punto 6: "Il giro grosso" segnato in agenda per oggi vale
+       il suo peso — è il più rischioso dei sei eventi della settimana, e
+       deve rendere in proporzione quando capita davvero quel giorno lì. */
+    const peso = (window.AGENDA && typeof AGENDA.consumaPeso === "function")
+      ? AGENDA.consumaPeso("colpo") : 1;
+    const grezzo = rnd(colpo.min, colpo.max) * approccio.guadagno * peso;
     const pulito = Math.round(grezzo * .4), sporco = Math.round(grezzo * .6);
     G.money += pulito; s.sporchi += sporco;
     s.rep = clamp(s.rep + 3 + colpo.difficolta * 6, 0, 100);
@@ -712,7 +717,7 @@ function stradaSettimana(){
     s.arresto.settimane--;
     const persi = Math.round(G.fans * rnd(.06, .13));
     if(persi > 0){ G.fans = Math.max(0, G.fans - persi); pushLog(fmt(persi) + " fan spariti mentre eri dentro.", "bad"); }
-    G.hype = clamp(G.hype * .72, 0, 100);
+    G.hype = clamp(G.hype * .72, 0, (typeof hypeCap==="function"?hypeCap():100));
     G.money -= Math.round(weeklyCosts() * .6);
     if(G.contract && Math.random() < .20){
       pushLog("<b>L'etichetta ha rescisso.</b> I giornali ci sono andati pesante.", "bad");
@@ -730,7 +735,7 @@ function stradaSettimana(){
         annulla(){},
         opts:[
           {n:"Raccontala", d:"+lucidità, +hype: la trasformi in un pezzo",
-           run(){ addLuc(25); G.hype = clamp(G.hype + 14, 0, 100); return {t:"L'hai raccontata. La gente ascolta.", c:"good"}; }},
+           run(){ addLuc(25); G.hype = clamp(G.hype + 14, 0, (typeof hypeCap==="function"?hypeCap():100)); return {t:"L'hai raccontata. La gente ascolta.", c:"good"}; }},
           {n:"Torna dove avevi lasciato", d:"+reputazione di strada, ma +attenzione",
            run(){ s.rep = clamp(s.rep + 10, 0, 100); s.heat = clamp(s.heat + 8, 0, 100); return {t:"Sei tornato dove eri rimasto.", c:""}; }}
         ]});
@@ -818,7 +823,7 @@ function stradaOpp(){
       }},
       {n:"Li affronti", d:"Rischi, ma se vinci sali", run(){
         const vinci = Math.random() < clamp(.4 + s.rep/200 + Math.min(s.uomini,5) * .05, .15, .85);
-        if(vinci){ s.rep = clamp(s.rep + 6, 0, 100); G.hype = clamp(G.hype + 4, 0, 100);
+        if(vinci){ s.rep = clamp(s.rep + 6, 0, 100); G.hype = clamp(G.hype + 4, 0, (typeof hypeCap==="function"?hypeCap():100));
           return {t:"Li hai affrontati e hai vinto. La cosa gira.", c:"good"}; }
         G.wellbeing = clamp(G.wellbeing - 15, 0, 100);
         return {t:"Li hai affrontati e sei rimasto male. Settimana da dimenticare.", c:"bad"};
