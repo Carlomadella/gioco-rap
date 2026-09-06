@@ -6,6 +6,27 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:328eb81 -->
+## 06/09/26, 21:22 â€” task/telefono-nuovo â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `328eb81`
+
+### Cosa Ã¨ entrato
+
+- `1bbcd22` â€” feat(telefono): via l'app Messaggi, dock nuovo, sfondo a tutto schermo (punto 68) â€” **Carlomadella**
+- `f4f63a2` â€” assets: le schermate dei luoghi in una cartella loro â€” **Carlomadella**
+- `3b32ec8` â€” feat(telefono): la home è quella della foto (punto 3 «DA FARE» → punto 68) â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Rinominato:** `frontend/media/photo/studio_creazione_beat.png` â†’ `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/studio_creazione_beat.png`
+- **Aggiunto:** `frontend/media/photo/telefono/app-discografia.png`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:e4ad390 -->
 ## 06/09/26, 14:40 â€” origin/main â†’ main
 

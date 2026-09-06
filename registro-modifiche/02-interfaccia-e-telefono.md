@@ -6,6 +6,63 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:328eb81 -->
+## 06/09/26, 21:22 â€” task/telefono-nuovo â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `328eb81`
+
+### Cosa Ã¨ entrato
+
+- `1bbcd22` â€” feat(telefono): via l'app Messaggi, dock nuovo, sfondo a tutto schermo (punto 68) â€” **Carlomadella**
+- `f4f63a2` â€” assets: le schermate dei luoghi in una cartella loro â€” **Carlomadella**
+- `3b32ec8` â€” feat(telefono): la home è quella della foto (punto 3 «DA FARE» → punto 68) â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/telefono.css`
+- **Modificato:** `frontend/js/game/telefono.js`
+- **Aggiunto:** `frontend/media/photo/pagina di gioco/schermata_telefono.png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_32 (1).png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_32 (2).png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_32 (3).png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_33 (4).png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_33 (5).png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_34 (6).png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_34 (7).png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_34 (8).png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_35 (10).png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_35 (9).png`
+- **Rinominato:** `frontend/media/photo/casa_di_provincia.png` â†’ `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/casa_di_provincia.png`
+- **Rinominato:** `frontend/media/photo/concerto_live.png` â†’ `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/concerto_live.png`
+- **Rinominato:** `frontend/media/photo/freestyle_in_piazza.png` â†’ `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/freestyle_in_piazza.png`
+- **Rinominato:** `frontend/media/photo/palestra.png` â†’ `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/palestra.png`
+- **Rinominato:** `frontend/media/photo/registrazione_pezzo.png` â†’ `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/registrazione_pezzo.png`
+- **Rinominato:** `frontend/media/photo/scrittura_barre.png` â†’ `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/scrittura_barre.png`
+- **Rinominato:** `frontend/media/photo/stacca_la_spina.png` â†’ `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/stacca_la_spina.png`
+- **Rinominato:** `frontend/media/photo/studio_creazione_beat.png` â†’ `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/studio_creazione_beat.png`
+- **Rinominato:** `frontend/media/photo/studio_mixaggio.png` â†’ `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/studio_mixaggio.png`
+- **Rinominato:** `frontend/media/photo/studio_promo_su_lafamegram.png` â†’ `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/studio_promo_su_lafamegram.png`
+- **Rinominato:** `frontend/media/photo/studio_uscita_pezzo.png` â†’ `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/studio_uscita_pezzo.png`
+- **Aggiunto:** `frontend/media/photo/telefono/app-agenda.png`
+- **Aggiunto:** `frontend/media/photo/telefono/app-chat.png`
+- **Aggiunto:** `frontend/media/photo/telefono/app-classifiche.png`
+- **Aggiunto:** `frontend/media/photo/telefono/app-contatti.png`
+- **Aggiunto:** `frontend/media/photo/telefono/app-contratti.png`
+- **Aggiunto:** `frontend/media/photo/telefono/app-discografia.png`
+- **Aggiunto:** `frontend/media/photo/telefono/app-impostazioni.png`
+- **Aggiunto:** `frontend/media/photo/telefono/app-inventario.png`
+- **Aggiunto:** `frontend/media/photo/telefono/app-lafamegram.png`
+- **Aggiunto:** `frontend/media/photo/telefono/app-notizie.png`
+- **Aggiunto:** `frontend/media/photo/telefono/app-obiettivi.png`
+- **Aggiunto:** `frontend/media/photo/telefono/app-statistiche.png`
+- **Aggiunto:** `frontend/media/photo/telefono/sfondo.png`
+- **Modificato:** `frontend/pagine/gioco.html`
+
+**File interessati in questa categoria:** 38
+
+---
+
 <!-- merge:cdc13d5 -->
 ## 06/09/26, 11:50 â€” task/6-7-hype-e-farming â†’ main
 
