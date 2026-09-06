@@ -21,6 +21,7 @@ function elencaFile(dir){
 const build = leggi("strumenti/build.js");
 const ev = leggi("js/game/eventi-v2.js");
 const tel = leggi("js/game/telefono.js");
+const chatjs = leggi("js/game/chat.js");
 const actions = leggi("js/game/actions.js");
 const posto = leggi("js/game/posto.js");
 const studio = leggi("js/game/studio.js");
@@ -111,10 +112,16 @@ const load = ev.indexOf("const ADF_CATALOG_LOAD");
 test("Notifiche viene installata prima del caricamento catalogo", install >= 0 && load >= 0 && install < load);
 test("Messaggi ha uno store diretto separato", tel.includes("function telMessaggiDiretti()"));
 test("badge Messaggi non legge G.log", !tel.includes('badge:g => Math.max(0, g.log.length'));
-const s0 = tel.indexOf("function schermataMessaggi()");
-const s1 = tel.indexOf("/* ---- Contatti", s0);
-const msgScreen = s0 >= 0 && s1 > s0 ? tel.slice(s0,s1) : "";
-test("schermata Messaggi non legge G.log", !!msgScreen && !msgScreen.includes("G.log"));
+/* L'app Messaggi non c'e' piu': elencava le stesse conversazioni di Chat con
+   meno roba dentro. La garanzia pero' resta la stessa e si e' spostata su
+   Chat, che e' l'unica lista di conversazioni rimasta: le persone che ti
+   scrivono, mai il diario G.log. */
+test("l'app Messaggi non e' tornata a fare il doppione di Chat",
+  !tel.includes('id:"messaggi"') && !tel.includes("function schermataMessaggi()"));
+const s0 = chatjs.indexOf("function schermataChat()");
+const s1 = chatjs.indexOf("function schermataChatThread()", s0);
+const msgScreen = s0 >= 0 && s1 > s0 ? chatjs.slice(s0,s1) : "";
+test("schermata Chat non legge G.log", !!msgScreen && !msgScreen.includes("G.log"));
 test("da Messaggi si entra nella Chat vera", tel.includes('TEL_APP = "chat"; TEL_CHAT_APERTA = chatOpen.dataset.chat'));
 
 const mv0 = tel.indexOf("function renderTelefonoVecchio()");
@@ -128,8 +135,8 @@ test("anteprima mobile apre il thread Chat vero",
   mobilePhone.includes('data-chat="') &&
   mobilePhone.includes("m.id") &&
   tel.includes('TEL_APP = "chat"; TEL_CHAT_APERTA = chatOpen.dataset.chat'));
-test("telefono compatto può aprire la stessa schermata Messaggi del PC",
-  tel.includes('data-telapp="messaggi"') &&
+test("telefono compatto può aprire la stessa schermata Chat del PC",
+  tel.includes('data-telapp="chat"') &&
   tel.includes("(TEL_APP ? schermataWrap(TEL_APP) : '')") &&
   /* «via il quaderno»: renderTelefono() non può più uscire con un return
      secco — dopo aver ridisegnato deve riprendersi dal magazzino il
@@ -143,8 +150,8 @@ test("G.log mobile è esplicitamente Notifiche",
   /* punto 7: il bottone «Diario» non c'è più, il telefono chiama la funzione
      invece di simulare un click su un elemento che non esiste. */
   tel.includes('openDiary()'));
-test("Vedi tutti i messaggi non apre più il Diario",
-  mobilePhone.includes('data-telapp="messaggi"') &&
+test("Vedi tutte le chat non apre più il Diario",
+  mobilePhone.includes('data-telapp="chat"') &&
   !mobilePhone.includes('data-diario="1">Vedi tutti i messaggi'));
 test("Escape chiude una app anche sotto 1180",
   tel.includes('if(ev.key === "Escape" && TEL_APP) telHome();') &&
@@ -1215,15 +1222,48 @@ test("in media/ non restano immagini che nessuna riga di codice carica",
       "casa_di_provincia.png", "concerto_live.png", "freestyle_in_piazza.png",
       "palestra.png", "registrazione_pezzo.png", "scrittura_barre.png",
       "stacca_la_spina.png", "studio_creazione_beat.png", "studio_mixaggio.png",
-      "studio_promo_su_lafamegram.png", "studio_uscita_pezzo.png"
+      "studio_promo_su_lafamegram.png", "studio_uscita_pezzo.png",
+      /* Le stesse undici scene, ma senza gli elementi HTML sopra: servono per
+         capire cosa e' disegno e cosa e' foto quando si rifanno le pagine dei
+         luoghi. Materiale di riferimento, non ancora caricato da nessuno. */
+      "ChatGPT Image 6 set 2026, 19_43_32 (1).png",
+      "ChatGPT Image 6 set 2026, 19_43_32 (2).png",
+      "ChatGPT Image 6 set 2026, 19_43_32 (3).png",
+      "ChatGPT Image 6 set 2026, 19_43_33 (4).png",
+      "ChatGPT Image 6 set 2026, 19_43_33 (5).png",
+      "ChatGPT Image 6 set 2026, 19_43_34 (6).png",
+      "ChatGPT Image 6 set 2026, 19_43_34 (7).png",
+      "ChatGPT Image 6 set 2026, 19_43_34 (8).png",
+      "ChatGPT Image 6 set 2026, 19_43_35 (10).png",
+      "ChatGPT Image 6 set 2026, 19_43_35 (9).png"
     ];
     const tutte = elencaFile(path.join(ROOT, "media"))
       .filter(f => /\.(png|jpe?g|webp|gif)$/i.test(f));
     const fantasma = IN_ARRIVO.filter(n =>
       !tutte.some(f => path.basename(f) === n));
     if(fantasma.length) console.log("      in attesa ma non piu' sul disco: " + fantasma.join(", "));
+    /* Un nome puo' non comparire mai per intero: le icone del telefono le
+       monta il codice a pezzi — `'media/photo/telefono/app-' + a.id + '.png'`
+       — quindi cercare "app-agenda.png" non trova niente anche se quella
+       foto e' caricata eccome. Qui si cerca allora il pezzo fisso: la
+       cartella piu' l'inizio del nome, ma solo se nel codice la stringa
+       *finisce li'* (segue un apice, cioe' e' una concatenazione). Cosi'
+       "media/photo/telefono/app-" vale, mentre un file "m.png" buttato in
+       una cartella dove il codice nomina "mappa_citta_giorno.png" non si
+       salva per sbaglio: dopo la "m" li' non c'e' un apice, c'e' una "a". */
+    const montataAPezzi = f => {
+      const nome = path.basename(f);
+      const dir = path.relative(ROOT, f).split(path.sep).join("/").slice(0, -nome.length);
+      for(let n = 1; n < nome.length; n++){
+        const pezzo = dir + nome.slice(0, n);
+        if(codice.includes(pezzo + "'") || codice.includes(pezzo + '"') ||
+           codice.includes(pezzo + "`")) return true;
+      }
+      return false;
+    };
     const orfane = tutte
       .filter(f => !codice.includes(path.basename(f)))
+      .filter(f => !montataAPezzi(f))
       .filter(f => !IN_ARRIVO.includes(path.basename(f)));
     if(orfane.length) console.log("      " + orfane.map(f => path.relative(ROOT, f)).join("\n      "));
     return orfane.length === 0 && fantasma.length === 0;

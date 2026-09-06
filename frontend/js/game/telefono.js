@@ -5,10 +5,14 @@
    Notifiche. Le schermate Messaggi e Chat vengono riusate anche qui, senza
    creare un secondo sistema.
 
-   Dai 1180px in su diventa un iPhone vero: schermata home con widget veri,
-   griglia di icone, dock, e ogni app che si apre a schermo pieno dentro alla
-   cornice, con la sua interfaccia e un modo per tornare alla home (il
-   pallino/barra in basso, o Esc). hub.js chiama solo renderTelefono(). */
+   Dai 1180px in su è il telefono della foto (`media/photo/pagina di gioco/
+   schermata_telefono.png`): sfondo, griglia di icone su quattro colonne, dock
+   in fondo, e ogni app che si apre a schermo pieno dentro alla cornice, con la
+   sua interfaccia e un modo per tornare alla home (il pallino/barra in basso, o
+   Esc). I widget che stavano sopra la griglia non ci sono più: nella foto la
+   home è solo icone e sfondo, e quello che dicevano — classifica, ultimo
+   messaggio, il post più in vista — lo dicono le app che aprono.
+   hub.js chiama solo renderTelefono(). */
 "use strict";
 
 HIC.camera = '<path d="M4 7h3l1.6-2.2h6.8L17 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm8 3a4.4 4.4 0 1 0 0 8.8 4.4 4.4 0 0 0 0-8.8zm0 2.2a2.2 2.2 0 1 1 0 4.4 2.2 2.2 0 0 1 0-4.4zM17 8.4a.9.9 0 1 0 0 1.8.9.9 0 0 0 0-1.8z"/>';
@@ -118,13 +122,14 @@ function telSegnaVisto(id){
 }
 
 /* ================= LE APP — NUOVO (home dell'iPhone) ================= */
-/* Badge = un numero rosso sull'icona, solo dove ha senso «novità»: messaggi
-   non letti, obiettivi cambiati da quando li hai guardati, le notizie di
+/* Badge = un numero rosso sull'icona, solo dove ha senso «novità»: le chat non
+   lette, gli obiettivi cambiati da quando li hai guardati, le notizie di
    questa settimana se non le hai ancora aperte. Il resto dell'app si vede
    aprendola, non prima — e quello che hai gia' aperto non ha piu' pallina. */
+/* Messaggi non c'è più: elencava le stesse conversazioni di Chat, con meno roba
+   dentro (nessun ruolo accanto al nome, nessun modo di scrivere per primo). Due
+   icone per la stessa cosa. */
 const HUB_APP = [
-  {id:"messaggi", n:"Messaggi", ic:"chat", k:"#7C3AED",
-   badge:() => telMessaggiNonLetti()},
   {id:"contatti", n:"Contatti", ic:"gente", k:"#38BDF8"},
   /* punto 66: mamma e il migliore amico scrivono da subito, il resto arriva con la fama */
   {id:"chat", n:"Chat", ic:"duebolle", k:"#25D366", badge:() => chatNonLetti()},
@@ -140,23 +145,20 @@ const HUB_APP = [
   {id:"agenda", n:"Agenda", ic:"agenda", k:"#F87171"},
   {id:"impostazioni", n:"Impostazioni", ic:"ingranaggio", k:"#9AA1B2"}
 ];
-const TEL_DOCK = ["messaggi", "contatti", "lafamegram", "classifiche"];
+/* La home è quella della foto — `media/photo/pagina di gioco/schermata_telefono.png`:
+   otto icone in griglia su quattro colonne, quattro nel dock in fondo — Chat,
+   Contatti, LaFamegram e Inventario, cioè le quattro che si aprono di più. Le icone
+   sono ritagliate da quella foto (`media/photo/telefono/app-*.png`, vedi
+   `implementazioni/02-interfaccia-e-telefono.md`), le palline rosse invece no:
+   quelle le dice la partita, quindi nella foto sono state cancellate e qui si
+   ridisegnano coi numeri veri. */
+const TEL_DOCK = ["chat", "contatti", "lafamegram", "inventario"];
+const TEL_GRIGLIA = ["obiettivi", "notizie", "classifiche", "statistiche",
+                     "discografia", "contratti", "agenda", "impostazioni"];
+/* Chi non ha la sua foto (le app che si aggiungono a partita avviata, come
+   Notifiche di eventi-v2) tiene il disegno vettoriale di prima. */
+const TEL_FOTO = new Set(TEL_GRIGLIA.concat(TEL_DOCK));
 const TEL_RUOLI = {beatmaker:"Beatmaker", rapper:"Rapper", fonico:"Fonico", giornalista:"Giornalista"};
-
-/* ================= DATI CONDIVISI (widget + app) ================= */
-/* Stessa classifica che vedi nella scheda «Classifica» della partita
-   (ui.js): qui si legge soltanto, non si tocca G.chartPrev — lo aggiorna
-   già la scheda quando la apri. */
-function telClassifica(){
-  const art = window.ARTIST || {};
-  const my = G.songs.filter(x => x.released).reduce((a, x) => a + (x.last || 0), 0);
-  sistemaRivali();
-  const all = G.rivals.map(r => ({n:r.n, p:r.p, r}))
-    .concat([{n:(art.name || "Tu").trim(), p:my, me:true}]);
-  all.sort((a, b) => b.p - a.p);
-  const pos = all.findIndex(x => x.me) + 1;
-  return {all, pos, delta:(G.chartPrev || 99) - pos};
-}
 
 /* ================= LAFAMEGRAM — IL FEED (punti 52, 53) =================
    Il vero motore è sul server (`GET /api/feed`, backend/database/archivio.js
@@ -219,8 +221,7 @@ function telScrivi(testo){
 }
 /* Quello che il resto di telefono.js chiama: i tuoi post scritti a mano,
    poi il feed vero se c'è già risposto, il ripiego locale se no. L'ordine
-   è cronologico (come un feed vero, punto 53) — chi vuole il post più in
-   vista lo cerca da sé (telPostTop), non è detto sia il primo della lista. */
+   è cronologico, come un feed vero (punto 53). */
 function telPost(){
   if(TEL_FEED === null) telAggiornaFeed();
   const base = (TEL_FEED && TEL_FEED.length) ? TEL_FEED : telPostLocale();
@@ -229,7 +230,6 @@ function telPost(){
   const miei = G.lafamegramMiei || [], eventi = G.lafamegramEventi || [];
   return miei.concat(eventi, base);
 }
-const telPostTop = () => telPost().slice().sort((a, b) => b.like - a.like)[0];
 
 function golPremio(rw){
   const bits = [];
@@ -337,7 +337,10 @@ function renderTelefonoVecchio(){
   const msg = telMessaggiDiretti().slice(0, 2);
   const nuovi = telMessaggiNonLetti();
   $("hb-tel").className = "ptelscr";
+  /* La colonna sta dentro al suo riquadro: lo schermo non ha più il margine
+     interno di prima, che adesso è la home a darsi da sé. */
   $("hb-tel").innerHTML =
+    '<div class="pvecchio">' +
     '<span class="ptt">Il tuo telefono</span>' +
     '<div class="pmsg">' +
       '<div class="pmsghead">' + hsvg("chat") + '<b>Messaggi</b>' +
@@ -350,7 +353,7 @@ function renderTelefonoVecchio(){
         '</button>').join("")
         : '<div class="pmr"><span class="pmtx"><i>Nessun messaggio diretto. Gli eventi automatici sono in Notifiche.</i></span></div>') +
     '</div>' +
-    '<button class="plargo" data-telapp="messaggi">Vedi tutti i messaggi</button>' +
+    '<button class="plargo" data-telapp="chat">Vedi tutte le chat</button>' +
     '<div class="papp">' + HUB_APP_VECCHIO.map(a =>
       '<button class="pap" data-app="' + a.id + '" style="--k:' + a.k + '">' + hsvg(a.ic) +
       '<span><b>' + a.n + '</b>' + (a.sotto ? '<i>' + a.sotto(G) + '</i>' : '') + '</span></button>').join("") +
@@ -359,56 +362,38 @@ function renderTelefonoVecchio(){
       HUB_NOTIZIE.map(n => '<p style="--k:' + n.k + '">' + hsvg(n.ic) + n.t + '</p>').join("") +
     '</div>' +
     '<button class="plargo" data-news="1">Vedi tutte le notizie</button>' +
+    '</div>' +
     (TEL_APP ? schermataWrap(TEL_APP) : '');
 }
 
 /* ================= RENDER — HOME NUOVA ================= */
+/* L'ordine della griglia è quello della foto; le app che si registrano dopo
+   (Notifiche) vanno in coda, nel primo posto libero dell'ultima riga. */
+function telOrdineGriglia(){
+  const fuoriDock = HUB_APP.filter(a => TEL_DOCK.indexOf(a.id) < 0);
+  const dette = TEL_GRIGLIA.map(id => fuoriDock.find(a => a.id === id)).filter(Boolean);
+  return dette.concat(fuoriDock.filter(a => TEL_GRIGLIA.indexOf(a.id) < 0));
+}
+function telIconaApp(a, dock){
+  if(!a) return "";
+  const n = a.badge ? a.badge(G) : 0;
+  const disegno = TEL_FOTO.has(a.id)
+    ? '<img src="media/photo/telefono/app-' + a.id + '.png" alt="" draggable="false">'
+    : '<span class="tappsvg">' + hsvg(a.ic) + '</span>';
+  return '<button class="tapp' + (dock ? ' tappdock' : '') + '" data-app="' + a.id +
+    '" style="--k:' + a.k + '">' +
+    '<span class="tappic">' + disegno +
+      (n ? '<i class="tbadge">' + (n > 9 ? "9+" : n) + '</i>' : '') + '</span>' +
+    '<span class="tapplbl">' + a.n + '</span></button>';
+}
 function renderTelefonoHome(){
   const el = $("hb-tel");
   el.className = "ptelscr";
-  const messaggiDiretti = telMessaggiDiretti();
-  const nuoviMsg = telMessaggiNonLetti();
-  const ultimoMsg = messaggiDiretti[0] || null;
-  /* Il widget della posizione diceva un numero preso dai rivali finti di casa,
-     mentre la schermata diceva quello del server: due verità nello stesso
-     telefono. Adesso comanda il server quando risponde. */
-  const cl = telClassifica();
-  const cs = (typeof ONLINE !== "undefined" && ONLINE) ? ONLINE.classificaInCache() : null;
-  if(cs && cs.io && cs.io.pos){ cl.pos = cs.io.pos; cl.delta = 0; }
-  const top = telPostTop();
-
-  const widgets =
-    '<button class="twid twid-lg" data-app="lafamegram">' +
-      '<span class="twhead">' + hsvg("fama") + 'LaFamegram · più hype</span>' +
-      '<span class="twbody"><b>' + top.n + '</b><i>' + tronca(top.t, 52) + '</i></span>' +
-      '<span class="twfoot">' + hsvg("cuore") + ' ' + top.like + '</span></button>' +
-    '<div class="twrow">' +
-      '<button class="twid" data-app="classifiche">' +
-        '<span class="twhead">' + hsvg("coppa") + 'Classifica</span>' +
-        '<span class="twnum">#' + cl.pos + '</span>' +
-        '<span class="twfoot' + (cl.delta > 0 ? ' up' : cl.delta < 0 ? ' dn' : '') + '">' +
-          (cl.delta > 0 ? '▲ ' + cl.delta : cl.delta < 0 ? '▼ ' + (-cl.delta) : '— stabile') +
-        '</span></button>' +
-      '<button class="twid" data-app="messaggi">' +
-        '<span class="twhead">' + hsvg("chat") + 'Messaggi</span>' +
-        '<span class="twbody"><i>' + (ultimoMsg ? tronca(spoglia(ultimoMsg.t), 38) : "Nessun messaggio diretto") + '</i></span>' +
-        (nuoviMsg ? '<span class="twfoot up">' + nuoviMsg + ' nuovi</span>' : '') +
-      '</button>' +
-    '</div>';
-
-  const inDock = id => TEL_DOCK.indexOf(id) >= 0;
-  const iconaApp = a => {
-    const n = a.badge ? a.badge(G) : 0;
-    return '<button class="tapp" data-app="' + a.id + '" style="--k:' + a.k + '">' +
-      '<span class="tappic">' + hsvg(a.ic) + (n ? '<i class="tbadge">' + (n > 9 ? "9+" : n) + '</i>' : '') + '</span>' +
-      '<span class="tapplbl">' + a.n + '</span></button>';
-  };
-  const griglia = HUB_APP.filter(a => !inDock(a.id)).map(iconaApp).join("");
-  const dock = TEL_DOCK.map(id => iconaApp(HUB_APP.find(a => a.id === id))).join("");
+  const griglia = telOrdineGriglia().map(a => telIconaApp(a, false)).join("");
+  const dock = TEL_DOCK.map(id => telIconaApp(HUB_APP.find(a => a.id === id), true)).join("");
 
   el.innerHTML =
     '<div class="thome">' +
-      '<div class="twidgets">' + widgets + '</div>' +
       '<div class="tgrid">' + griglia + '</div>' +
       '<div class="tdock">' + dock + '</div>' +
     '</div>' +
@@ -427,7 +412,6 @@ function schermataWrap(id){
 }
 
 function schermataApp(id){
-  if(id === "messaggi") return schermataMessaggi();
   if(id === "contatti") return schermataContatti();
   if(id === "notizie") return schermataNotizie();
   if(id === "obiettivi") return schermataObiettivi();
@@ -441,18 +425,6 @@ function schermataApp(id){
   if(id === "lafamegram") return schermataLafamegram();
   if(id === "chat") return TEL_CHAT_APERTA ? schermataChatThread() : schermataChat();
   return "";
-}
-
-/* ---- Messaggi: solo messaggi di persone, mai il diario G.log ---- */
-function schermataMessaggi(){
-  const msg = telMessaggiDiretti();
-  if(!msg.length) return '<div class="tempty">Nessun messaggio diretto. Gli eventi automatici li trovi in Notifiche.</div>';
-  return '<div class="tlist">' + msg.map(m =>
-    '<button class="tli" data-chat="' + m.id + '">' +
-    '<span class="tliav">' + hsvg("persona") + '</span>' +
-    '<span class="tlitx"><b>' + m.n + '</b><i style="white-space:normal">' + spoglia(m.t) + '</i></span>' +
-    (m.nonLetti ? '<span class="ttag on">' + m.nonLetti + ' nuovi</span>' : '') +
-    '</button>').join("") + '</div>';
 }
 
 /* ---- Contatti: la rete vera, con grado e ruolo ----

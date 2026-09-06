@@ -162,6 +162,9 @@ CARLO:
 
 3. implementare il telefono nuovo, si vede nei media la foto
 
+   **FATTO (06/09/2026)** — per esteso al punto 10 delle FATTE qui sotto e in
+   [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#68--il-telefono-nuovo-quello-della-foto).
+
 4. mi piace il po-up che esce quando non hai energia e clicchi sull'azione Freestyle in piazza, applica il pop-up ad ogni azione se manca energia, aggiungici anche un'icona dele fulmine, la stessa della navbar
 
 5. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
@@ -170,6 +173,8 @@ CARLO:
    "stacca la spina", il quinto su "registra un pezzo".
 
 6. quando skippi tante ore ci mette troppo a simulare
+
+7. nei pulsanti dei luoghi della mappa tieni solo il riquadro con nome e sfondo nero e togli il bordo neon presente dietro (il quadrato con i lati tagliati e i bordi molto smussati)
 
 /_ DA DISCUTERE _/
 
@@ -191,7 +196,7 @@ TRACK
 ├── Mix
 ├── Master
 ├── Testo
-├── Cover
+├── Cover (influenza meno, ma ha 3 opzioni: caricamento file da telefono/computer, assets preimpostati e personalizzazione stile emblema black ops 2)
 ├── Featuring
 ├── Marketing
 └── Timing
@@ -340,3 +345,67 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
    in continuazione e col caso cambierebbero sotto gli occhi). Si segnano come gli altri, e
    **la mattina del giorno stesso arriva la notifica**. Stessa cosa per esteso in
    [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#8-e-9--lagenda-gli-appuntamenti-e-le-notifiche).
+
+5. ALE 1 — le chat nel cellulare erano infinite e sempre uguali: si poteva sentire la
+   stessa persona all'infinito e farmare il benessere con la solita conversazione.
+
+   **FATTO (06/09/2026)** — `chatIniziaTu` non aveva nessun limite: si apriva «Ciao ma',
+   tutto bene?», si rispondeva «Mangio, tranquilla» (+4 benessere) e si ricominciava, nello
+   stesso istante. Adesso **ogni contatto si sente una volta al giorno**: la prima volta che
+   scrivi tu o che ti scrivono resta segnata (`chatGiornoChiave` / `chatGiaSentitoOggi` /
+   `chatSegnaSentitoOggi` in `frontend/js/game/chat.js`), un secondo «scrivi tu» con la
+   stessa persona lo stesso giorno viene rifiutato con un avviso, e torna disponibile il
+   giorno dopo. Il limite sopravvive al salvataggio. La parte «ti scrivono loro
+   sporadicamente» — il dado giornaliero e settimanale, gli spunti che non si ripetono —
+   c'era già e non è stata toccata. Commit `f72dd92`.
+
+6. ALE 6 — le azioni ripetibili facevano farmare senza gameplay: la battle di freestyle
+   doveva diventare un evento esclusivo, e gli eventi non dovevano valere tutti uguale.
+
+   **FATTO (06/09/2026)** — la battle vera in piazza è **una volta a settimana, e solo fra
+   le 21:00 e le 00:30**, con un contatore settimanale suo (`adfSettimana` /
+   `adfSegnaSettimana`). «Serata open mic» la seconda volta nello stesso giorno rende la
+   metà. E i sei eventi settimanali dell'agenda hanno un **peso d'importanza** che scala
+   davvero la ricompensa quando li giochi nel loro giorno: freestyle, open mic, promo,
+   palestra, sessione alla Sala, colpo della Strada. Commit `a4073c3`.
+
+7. ALE 7 — l'hype: dev'essere il fattore primario, in scala internazionale, e impossibile
+   da avere alto restando nel paesino di provincia al primo anno.
+
+   **FATTO (06/09/2026)** — l'hype ha un **tetto legato alla fase della carriera** (da 20 a
+   100), applicato ovunque cresca, senza toccare le soglie delle prove di passaggio. La
+   promo ha anche un tetto settimanale sull'hype — i follower continuano a crescere lo
+   stesso, che è la cosa realistica. Scalare in classifica dà un bonus d'hype vero, e un
+   feat scala per la grandezza (rara) del collaboratore invece di valere sempre uguale:
+   con pinko pallino non si va in hype. Commit `a4073c3`.
+
+8. gli eventi segnati in agenda devono bloccare lo skip
+
+   **FATTO (06/09/2026)** — un appuntamento segnato ferma il salto del tempo: se prima
+   dell'ora a cui sei diretto c'è qualcosa in agenda, il tempo si ferma lì e te lo dice,
+   invece di scavalcarlo. Commit `efa2033`.
+
+9. una pagina per ogni azione, con interfaccia e bottoni cliccabili a schermo — ha senso?
+   Un README che analizzi e progetti tutto, coi pro e i contro.
+
+   **FATTO (06/09/2026)** — l'analisi e il progetto di ogni schermata, pro e contro
+   compresi, stanno in `frontend/pagine/README.md`. Commit `180960c` e `4925a82`.
+
+10. implementare il telefono nuovo, si vede nei media la foto
+
+    **FATTO (06/09/2026)** — la home del telefono nella plancia è adesso quella della foto
+    `frontend/media/photo/pagina di gioco/schermata_telefono.png`: **sfondo** (il rapper di
+    spalle davanti alla città di notte, che riempie tutto lo schermo da un bordo all'altro),
+    **otto icone su quattro colonne**, **dock** in fondo con Chat, Contatti, LaFamegram,
+    Inventario — le quattro che si aprono di più — e la barra di stato con l'isola
+    dentro allo schermo invece che in una fascia sopra al vetro. Le icone non sono
+    ridisegnate: sono **ritagliate dalla foto** e stanno in `frontend/media/photo/telefono/`.
+    Le palline rosse della foto sono state cancellate una per una, perché quei numeri li deve
+    dire la partita — e infatti li dice. **Tutte e quattordici le app aprono**, comprese le due
+    che si registrano a partita avviata (Notifiche, Trasferte): quelle non hanno una foto e
+    tengono il loro disegno, dentro a una piastrella copiata dalle altre. I widget che
+    stavano sopra la griglia non ci sono più: nella foto la home è solo icone e sfondo. E
+    l'app **Messaggi** è sparita: elencava le stesse conversazioni di Chat con meno roba
+    dentro, due icone per la stessa cosa.
+    Per esteso in
+    [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md#68--il-telefono-nuovo-quello-della-foto).
