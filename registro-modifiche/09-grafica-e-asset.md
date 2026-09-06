@@ -6,6 +6,27 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:41ac4ed -->
+## 06/09/26, 22:55 â€” task/popup-energia â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `41ac4ed`
+
+### Cosa Ã¨ entrato
+
+- `3d0a574` â€” feat(energia): l'avviso «non hai energia» esce da ogni mossa, col fulmine â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/game.css`
+- **Modificato:** `frontend/css/hub.css`
+- **Modificato:** `frontend/css/telefono.css`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/casa_di provincia_definitiva.png`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:458adc7 -->
 ## 06/09/26, 21:57 â€” task/telefono-nuovo â†’ main
 

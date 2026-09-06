@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:41ac4ed -->
+## 06/09/26, 22:55 â€” task/popup-energia â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `41ac4ed`
+
+### Cosa Ã¨ entrato
+
+- `3d0a574` â€” feat(energia): l'avviso «non hai energia» esce da ogni mossa, col fulmine â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:328eb81 -->
 ## 06/09/26, 21:22 â€” task/telefono-nuovo â†’ main
 
