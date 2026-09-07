@@ -40,7 +40,7 @@ Il progetto deve prima dimostrare di saper comporre 8 barre bene. Solo dopo si s
 
 # FASE 0 — Fondazione e separazione del progetto
 
-Stato: IN CORSO
+Stato: COMPLETATA
 
 ### Cosa facciamo
 - creare una cartella/documentazione esclusiva per FAME Neural;
@@ -66,7 +66,7 @@ Il progetto Neural ha una struttura propria e il PoC0 è riproducibile e testabi
 
 # FASE 1 — Linguaggio dei dati
 
-Stato: DA FARE
+Stato: COMPLETATA
 
 ### Perché serve
 Prima di insegnare musica a una rete dobbiamo decidere esattamente come rappresentiamo una composizione.
@@ -109,7 +109,7 @@ Una composizione può essere convertita avanti e indietro senza perdere informaz
 
 # FASE 2 — Pipeline MIDI e provenienza
 
-Stato: DA FARE
+Stato: IN CORSO
 
 ### Perché serve
 Il modello sarà buono quanto i dati che gli diamo.
@@ -566,6 +566,6 @@ Training model: NON INIZIATO
 Corpus reale FAME Neural: NON ANCORA COSTRUITO  
 Modello production: NON ESISTE  
 
-FASE CORRENTE: FASE 0 — Fondazione e separazione del progetto.
+FASE CORRENTE: FASE 2 — Pipeline MIDI e provenienza.
 
-PROSSIMO OBIETTIVO: chiudere FASE 0 e aprire FASE 1 — Linguaggio dei dati.
+PROSSIMO OBIETTIVO: costruire Dataset Schema V1 + importer MIDI + provenance record, senza aprire ancora il training.
