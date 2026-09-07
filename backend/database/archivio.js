@@ -16,7 +16,7 @@
 
 const crypto = require("crypto");
 const { apri: apriDb } = require("./db.js");
-const { nuovoBot, popolazione, settimanaBot, ricambio } = require("../bot.js");
+const { nuovoBot, popolazione, settimanaBot, ricambio, ritratto } = require("../bot.js");
 const { nomeDufficio } = require("../moderazione.js");
 const plausibilita = require("../plausibilita.js");
 
@@ -128,18 +128,35 @@ async function inserisciBot(b){
     b.id, b.slancio || 0, b.caldo || 0, b.carattere || "normale");
 }
 
+/* `a.bot` sta in fondo apposta ed è l'unico campo di questo elenco che **non
+   esce**: serve a `riga()` per sapere se i numeri del diario vanno letti dalla
+   colonna (un giocatore) o derivati (un bot). Fuori da `riga()` non ci va
+   nessuno: chi aggiunge una risposta che salta quella funzione si porta dietro
+   il campo che manda all'aria il punto 30. */
 const CAMPI_PUBBLICI = `a.id, a.nome, a.citta, a.genere, a.storia, a.stream, a.uscite, a.deal,
-  a.ultima_titolo, a.ultima_seed, a.seed, a.livello, a.fase, a.difficolta`;
+  a.ultima_titolo, a.ultima_seed, a.seed, a.livello, a.fase, a.difficolta, a.live, a.feat, a.bot`;
 
 /* La riga che il mondo può vedere. Qui dentro non passano né `bot` né le
-   chiavi né l'account: la prima è una regola di gioco, le altre di sicurezza. */
+   chiavi né l'account: la prima è una regola di gioco, le altre di sicurezza.
+
+   Livello, fase e diario di bordo di un bot non stanno scritti nel database:
+   si calcolano qui da quello che il bot ha davvero (`bot.js`, `ritratto()`).
+   Prima uscivano i valori di partenza — livello 1 e fase 0 per tutti — e la
+   classifica diceva a chiare lettere chi era finto. */
 function riga(r, ioId){
+  const suo = r.bot ? ritratto(r) : null;
   return {
     id: r.id, pos: r.pos, nome: r.nome, citta: r.citta, genere: r.genere,
     stream: r.stream, delta: (r.pos_prec == null || r.pos == null) ? null : r.pos_prec - r.pos,
     uscite: r.uscite, deal: !!r.deal, ultima: r.ultima_titolo || null,
     seed: r.ultima_seed || r.seed || 0, storia: r.storia || "",
-    livello: r.livello || 1, difficolta: r.difficolta || DIFFICOLTA_DIF,
+    livello: suo ? suo.livello : (r.livello || 1),
+    fase: suo ? suo.fase : (r.fase || 0),
+    /* il diario di bordo del gioco (punto 14 di ALE): le serate e i feat di una
+       carriera. `colpi` non esce di qui — vedi la migrazione 008. */
+    live: suo ? suo.live : (r.live || 0),
+    feat: suo ? suo.feat : (r.feat || 0),
+    difficolta: r.difficolta || DIFFICOLTA_DIF,
     io: ioId ? r.id === ioId : false
   };
 }
@@ -318,14 +335,17 @@ async function segnaPunteggio(id, d, ipHash){
     stream: Math.min(5e7, Number(d.stream) || 0),
     fan: d.fan != null ? d.fan : a.fan,
     livello: d.livello || a.livello,
-    uscite: d.uscite != null ? d.uscite : a.uscite
+    uscite: d.uscite != null ? d.uscite : a.uscite,
+    /* il diario di bordo del gioco. Chi manda un client vecchio non li ha:
+       `undefined` lascia il totale dov'era, non lo azzera. */
+    live: d.live, feat: d.feat
   });
   const limato = esame.limato;
   const stream = esame.stream;
   const set = await A.insieme(async () => {
     await A.fai(`UPDATE artista SET stream = ?, fan = ?, livello = ?, fase = ?, uscite = ?, deal = ?,
              ultima_titolo = coalesce(?, ultima_titolo), ultima_seed = coalesce(?, ultima_seed),
-             difficolta = ?, punteggio = ? WHERE id = ?`,
+             difficolta = ?, live = ?, feat = ?, punteggio = ? WHERE id = ?`,
       stream, esame.fan, esame.livello, d.fase != null ? d.fase : a.fase,
       d.uscite != null ? d.uscite : a.uscite, d.deal == null ? a.deal : (d.deal ? 1 : 0),
       d.ultima || null, d.seed || null,
@@ -333,7 +353,7 @@ async function segnaPunteggio(id, d, ipHash){
          ricominciata in un altro modo dentro allo stesso slot. Se non la manda
          (client vecchio) resta quella che c'era. */
       d.difficolta != null ? difficoltaBuona(d.difficolta) : (a.difficolta || DIFFICOLTA_DIF),
-      ora(), id);
+      esame.live, esame.feat, ora(), id);
     const s = await settimanaCorrente();
     await A.fai(`INSERT INTO punteggio_settimana (artista_id, settimana, stream, fan, livello, fase,
              uscite, deal, limato, origine, ip_hash, inviato)

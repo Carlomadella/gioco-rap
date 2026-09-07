@@ -103,4 +103,62 @@ function ricambio(bot, quanti, usati, notizie){
   }
 }
 
-module.exports = { nuovoBot, popolazione, settimanaBot, ricambio, idNuovo, CARATTERI };
+/* ==================== IL RITRATTO ====================
+
+   La regola del punto 30 dice che un bot non si deve riconoscere. Finché la
+   classifica diceva solo nome, città, ascolti e uscite era vero; poi il gioco
+   ha cominciato a mandare **il livello**, e i bot sono rimasti tutti a
+   `livello 1` — perché nessuno gliel'ha mai scritto. Uno con due milioni di
+   ascolti al livello 1 è un manichino con un'etichetta addosso: bastava
+   guardare la classifica per fare l'elenco dei finti.
+
+   Qui ci sono i numeri che un bot non ha nel database, calcolati da quello che
+   ha: quanto lo ascoltano e quanti pezzi ha fuori. **Non si scrivono da
+   nessuna parte** — si derivano quando qualcuno guarda, così non c'è una
+   seconda verità da tenere allineata e i bot che esistono già sono a posto dal
+   primo istante, senza travaso.
+
+   I conti sono gli stessi del gioco, non inventati qui:
+   - i fan si stimano dagli ascolti con la stessa relazione che usa
+     `plausibilita.js` per giudicare i numeri di un giocatore vero;
+   - il livello sale sulla scala di `frontend/js/game/state.js` (300 punti il
+     primo, ×1,35 ogni volta, tetto 60);
+   - la fase è la prima di `frontend/js/game/phases.js` che regge quegli
+     ascolti in una settimana.
+   Se un giorno il gioco cambia la scala, questi due elenchi vanno rifatti
+   uguali: sono copie, e stanno scritte qui apposta perché il server non può
+   leggere i file del gioco. */
+const { M } = require("./plausibilita.js");
+
+/* i tetti di stream settimanali delle fasi (PHASES[].cap del gioco) */
+const FASI_CAP = [800, 5200, 34000, 210000, 1300000, 6500000];
+
+function livelloDa(xp){
+  let lvl = 1, serve = 300, fatti = 0;
+  while(xp >= fatti + serve && lvl < 60){ fatti += serve; lvl++; serve = Math.round(serve * 1.35); }
+  return lvl;
+}
+
+function ritratto(r){
+  const stream = Math.max(0, Number(r.stream) || 0);
+  const uscite = Math.max(0, Number(r.uscite) || 0);
+  const seed = Math.abs(Number(r.seed) || 0);
+  const fan = stream / M.perFan;                       // chi ti ascolta, all'incirca
+  const livello = livelloDa(Math.round(fan + uscite * 140));
+  let fase = 0;
+  while(fase < FASI_CAP.length && stream > FASI_CAP[fase]) fase++;
+
+  /* Serate e feat: nessuno li ha contati per i bot, ma una carriera con dieci
+     pezzi fuori e un contratto le serate le ha fatte. Si tengono legati alle
+     uscite e alla fase — cioè a quanto è avanti — e il resto lo decide il
+     seme, che è fisso: due letture di fila danno lo stesso numero, se no il
+     diario di un bot ballerebbe a ogni schermata. */
+  return {
+    livello, fase,
+    live: Math.round(uscite * 1.6 + fase * 5 + (seed % 9)),
+    feat: Math.round(uscite * 0.45 + fase * 0.8 + (seed % 4))
+  };
+}
+
+module.exports = { nuovoBot, popolazione, settimanaBot, ricambio, idNuovo, CARATTERI,
+  ritratto, livelloDa, FASI_CAP };

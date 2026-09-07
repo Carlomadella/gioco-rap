@@ -182,8 +182,28 @@ const ONLINE = (() => {
       /* Con quali regole e' stata corsa questa settimana. Oggi le tre
          difficolta' pesano uguale, quindi non cambia niente in classifica: il
          server se la scrive e basta, per il giorno che peseranno. */
-      difficolta: G.difficolta || "anni-di-fame"
+      difficolta: G.difficolta || "anni-di-fame",
+      /* Il diario di bordo del telefono (punto 14 di ALE): le serate fatte e i
+         feat. Sono totali di carriera, non numeri della settimana — il server
+         li tiene per farli vedere accanto all'artista, e non li usa per
+         ordinare niente. **`colpi` non parte apposta**: e' l'unico dei tre che
+         non si racconta in una classifica pubblica.
+         `diarioBordo()` sta in `js/game/state.js`: se non c'e' (una partita
+         salvata prima) non si manda niente e il totale sul server resta dov'e'. */
+      live: diarioMio("live"),
+      feat: diarioMio("feat")
     };
+  }
+
+  /* Il diario si legge con la guardia alta: questo file deve reggere anche in
+     una pagina dove il gioco non e' caricato (la landing chiama la classifica
+     e basta), e li' `diarioBordo` non esiste. */
+  function diarioMio(quale){
+    try{
+      if(typeof diarioBordo !== "function") return undefined;
+      const d = diarioBordo();
+      return d && typeof d[quale] === "number" ? d[quale] : undefined;
+    }catch(e){ return undefined; }
   }
 
   /* Da chiamare a settimana chiusa. Senza argomenti si prende tutto da G. */

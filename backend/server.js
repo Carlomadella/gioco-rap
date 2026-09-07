@@ -374,7 +374,11 @@ async function rotta(req, res, url){
       stream: b.stream, fan: nInt(b.fan, 0, 5e7, null), livello: nInt(b.livello, 1, 60, null),
       fase: nInt(b.fase, 0, 8, null), uscite: nInt(b.uscite, 0, 5000, null), deal: b.deal,
       ultima: b.ultima != null ? nomePulito(b.ultima, 60) : null, seed: nInt(b.seed, 0, 2e9, null),
-      difficolta: b.difficolta
+      difficolta: b.difficolta,
+      /* il diario di bordo (punto 14 di ALE): serate live e feat di carriera.
+         `null` se non arrivano — un client vecchio non li ha, e il totale che
+         c'è non si tocca. Il freno vero sta in plausibilita.js. */
+      live: nInt(b.live, 0, 100000, null), feat: nInt(b.feat, 0, 100000, null)
     }, ipHash(req));
     return r ? invia(res, 200, r) : male(res, 404, "artista-sconosciuto");
   }

@@ -233,6 +233,52 @@ async function aspettaCheRisponda(figlio){
     const suo = await chiama("/api/artista/" + onestoId);
     controlla("e restano quelli che poteva avere", suo.dati.stream > 0);
 
+    console.log("\nil diario di bordo: serate e feat");
+    await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sessOnesto),
+      corpo: { id: onestoId, stream: 13000, live: 3, feat: 1 } });
+    const conDiario = await chiama("/api/artista/" + onestoId);
+    controlla("le serate e i feat arrivano dal gioco e si vedono",
+      conDiario.dati.live === 3 && conDiario.dati.feat === 1, conDiario.dati);
+
+    await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sessOnesto),
+      corpo: { id: onestoId, stream: 13500 } });
+    const senzaDiario = await chiama("/api/artista/" + onestoId);
+    controlla("un client vecchio che non li manda non li azzera",
+      senzaDiario.dati.live === 3 && senzaDiario.dati.feat === 1, senzaDiario.dati);
+
+    await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sessOnesto),
+      corpo: { id: onestoId, stream: 14000, live: 0, feat: 0 } });
+    const nonScende = await chiama("/api/artista/" + onestoId);
+    controlla("e non tornano indietro: è un totale di carriera",
+      nonScende.dati.live === 3 && nonScende.dati.feat === 1, nonScende.dati);
+
+    await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sessOnesto),
+      corpo: { id: onestoId, stream: 14500, live: 900, feat: 900 } });
+    const limatoDiario = await chiama("/api/artista/" + onestoId);
+    controlla("novecento serate in una settimana vengono limate al passo giusto",
+      limatoDiario.dati.live === 10 && limatoDiario.dati.feat === 6, limatoDiario.dati);
+
+    console.log("\ni bot non si riconoscono (punto 30)");
+    const cento = await chiama("/api/classifica?quanti=40");
+    const righe = cento.dati.righe;
+    controlla("ogni riga della classifica porta livello, fase e diario",
+      righe.every(r => typeof r.livello === "number" && typeof r.fase === "number" &&
+        typeof r.live === "number" && typeof r.feat === "number"), righe[0]);
+    /* La falla vera: i bot non hanno mai avuto un livello scritto, quindi
+       uscivano tutti a 1. Con un giocatore vero al livello 7 in mezzo, la
+       classifica diceva da sola chi era finto. */
+    const grossi = righe.filter(r => r.stream > 50000 && !r.io);
+    controlla("chi ha numeri da grosso non è rimasto al livello 1",
+      grossi.length > 0 && grossi.every(r => r.livello > 1),
+      grossi.slice(0, 3).map(r => ({ stream: r.stream, livello: r.livello })));
+    controlla("e nemmeno alla fase zero",
+      grossi.every(r => r.fase > 0), grossi.slice(0, 3).map(r => ({ stream: r.stream, fase: r.fase })));
+    const livelli = new Set(righe.map(r => r.livello));
+    controlla("i livelli non sono tutti uguali", livelli.size > 2, [...livelli]);
+    const dueVolte = await chiama("/api/classifica?quanti=40");
+    controlla("e riguardando la classifica i numeri sono gli stessi",
+      dueVolte.dati.righe.every((r, i) => r.livello === righe[i].livello && r.live === righe[i].live));
+
     console.log("\nchi insiste a barare");
     const furbo = await chiama("/api/artista", { metodo: "POST",
       corpo: { nome: "Tarocco", citta: "Latina", genere: "trap" } });

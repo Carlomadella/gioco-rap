@@ -24,7 +24,9 @@ const M = {
   fanPrimoInvio: 20000,// ...ma nemmeno lui può dichiarare un milione di fan al volo
   fanInPiu: 0.3,       // i fan possono crescere al massimo del 30%...
   fanFissi: 400,       // ...più questi, per chi parte da zero
-  livelliInPiu: 3      // livelli guadagnabili in una settimana
+  livelliInPiu: 3,     // livelli guadagnabili in una settimana
+  liveInPiu: 7,        // serate in una settimana: una al giorno e sei stato bravo
+  featInPiu: 5         // feat in una settimana: già tanti così
 };
 
 /* Il tetto per gli stream: la somma di quello che li può giustificare.
@@ -48,6 +50,21 @@ const tettoFan = prima =>
 
 /* Il livello sale con l'esperienza, non con la fantasia. */
 const tettoLivello = prima => (prima.livello || 1) + M.livelliInPiu;
+
+/* Il diario di bordo (serate e feat) non fa classifica: nessuno guadagna una
+   posizione dichiarando trenta concerti. Però è un numero che si vede, e un
+   numero che si vede va tenuto in piedi lo stesso — quindi due regole sole,
+   senza sospetti e senza sanzioni: **non scende mai** (è un totale di
+   carriera, non un valore della settimana) e **non salta** più di quanto una
+   settimana ne possa contenere. Chi manda un numero storto se lo vede limato e
+   basta: qui non c'è niente da rubare, e segnare un sospetto per una serata di
+   troppo vorrebbe dire sanzionare chi ha un salvataggio vecchio. */
+function contatore(prima, chiesto, passo){
+  const era = Math.max(0, Math.round(Number(prima) || 0));
+  const n = Math.round(Number(chiesto));
+  if(!Number.isFinite(n) || n < 0) return era;      // non l'ha mandato, o è spazzatura
+  return Math.max(era, Math.min(n, era + passo));
+}
 
 /* Guarda tutto insieme e torna cosa accettiamo davvero, più — se qualcosa non
    torna — quanto era fuori misura. La gravità è il rapporto fra quello che ha
@@ -83,6 +100,9 @@ function esamina(prima, adesso){
     stream: Math.min(chiesto, s.tetto),
     fan: Math.min(fanChiesti, tf),
     livello: Math.min(livChiesto, tl),
+    /* il diario di bordo: limato in silenzio, fuori dal conto dei sospetti */
+    live: contatore(prima.live, adesso.live, M.liveInPiu),
+    feat: contatore(prima.feat, adesso.feat, M.featInPiu),
     tetto: s.tetto,
     limato: fuori.length > 0,
     fuori,
@@ -99,4 +119,4 @@ function esamina(prima, adesso){
   };
 }
 
-module.exports = { esamina, tettoStream, tettoFan, tettoLivello, M };
+module.exports = { esamina, tettoStream, tettoFan, tettoLivello, contatore, M };
