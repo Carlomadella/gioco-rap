@@ -20,5 +20,16 @@
     "train": 0.8,
     "validation": 0.1,
     "test": 0.1
+  },
+  "quality": {
+    "minDuplicateEventExcess": 8,
+    "minDistinctDuplicateKeys": 6,
+    "minDuplicateTypes": 2,
+    "duplicateEventRatioBlocking": 0.15,
+    "repeatedBarReviewRatio": 0.75,
+    "repeatedBarMinBars": 4,
+    "maxEventsPerBarReview": 96,
+    "maxPitchRangeReview": 60,
+    "skippedMelodicNotesReview": 1
   }
 }

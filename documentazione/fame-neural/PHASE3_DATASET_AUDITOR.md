@@ -1,7 +1,7 @@
 # FAME Neural — FASE 3 Dataset Auditor
 
 Stato: IN CORSO
-Blocco corrente: BLOCCO 2 — near-duplicate fuzzy + similarity report
+Blocco corrente: BLOCCO 3 — duplicati interni + quality audit musicale
 
 ## BLOCCO 1 — fingerprint deterministici + split leakage-safe
 
@@ -138,3 +138,74 @@ Restano almeno:
 - verifica finale di dedup e leakage sul corpus reale completo.
 
 Prossimo lavoro previsto: BLOCCO 3 — duplicati interni + quality audit musicale.
+
+## BLOCCO 3 — duplicati interni + quality audit musicale
+
+Il BLOCCO 3 aggiunge un controllo interno a ogni dataset item.
+
+### Duplicate-layer ad alta confidenza
+
+L'auditor cerca eventi canonici perfettamente sovrapposti e valuta il sospetto di una traccia/layer duplicato usando insieme:
+
+- numero di eventi duplicati in eccesso;
+- numero di chiavi evento duplicate distinte;
+- presenza del problema su almeno due tipi evento;
+- rapporto tra duplicati e numero totale di eventi.
+
+Il caso diventa bloccante solo oltre soglie conservative. Questo evita di classificare automaticamente come errore una singola collisione di articolazioni drum o un flam.
+
+### Ripetizione interna delle barre
+
+Ogni barra riceve una firma relativa alla propria posizione.
+
+Se la stessa barra copre una quota molto alta dell'item, viene emesso un flag di review musicale. Non e' bloccante: nella Trap la ripetizione intenzionale e' normale e va giudicata nel contesto.
+
+### Quality review aggiuntiva
+
+Il report segnala inoltre:
+
+- densita' estrema di eventi in una singola barra;
+- range pitched eccezionalmente ampio;
+- note melodiche saltate dal track classifier;
+- molte barre completamente vuote.
+
+Questi segnali sono di curation, non verdetti musicali.
+
+### Output
+
+Il report principale aggiunge:
+
+- `block3Ready`;
+- `internalQuality` con schema `fame-neural-internal-quality-v1`;
+- `internalDuplicateBlockingItems`;
+- `repeatedBarReviewItems`;
+- `internalQualityReviewItems`.
+
+Il BLOCCO 3 resta compatibile con i controlli e gli split leakage-safe dei blocchi precedenti.
+
+### Test
+
+```powershell
+node .\frontend\strumenti\fame-neural-composer\phase3-block3-smoke-test.js
+```
+
+Il test verifica:
+
+- item interno pulito;
+- duplicate-layer sintetico bloccante;
+- ripetizione di barra segnalata ma non bloccante;
+- note melodiche saltate segnalate come review;
+- separazione corretta tra `block2Ready` e `block3Ready`.
+
+## Cosa NON chiude ancora
+
+Il BLOCCO 3 non chiude la FASE 3 e non chiude il GATE 1 — DATA READY.
+
+Restano soprattutto:
+
+- policy di curation/review dei candidati fuzzy e quality flag;
+- costruzione del primo corpus reale da circa 500–1.000 phrase;
+- audit finale del corpus;
+- split train/validation/test definitivo e leakage check finale.
+
+Prossimo lavoro previsto: BLOCCO 4 — curation policy + corpus manifest.
