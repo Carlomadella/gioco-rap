@@ -6,6 +6,7 @@ in radice fino al punto 7.
 
 | file | cosa c'è dentro |
 | --- | --- |
+| [`roadmap.md`](roadmap.md) | **a che punto siamo e cosa viene dopo**: le tappe, cosa blocca l'uscita, dove atterrano i punti nuovi. Si aggiorna a ogni task |
 | [`come-si-lavora.md`](come-si-lavora.md) | **le regole di lavoro**: i punti, i numeri che si spostano, `npm run verifica`, il giro di fine task, quello che gira da solo. In versione corta in [`../CLAUDE.md`](../CLAUDE.md) |
 | [`comandidelterminale.md`](comandidelterminale.md) | tutti i comandi: git, il frontend, il backend, e i guai comuni |
 | [`stili-interfaccia.md`](stili-interfaccia.md) | i riferimenti visivi di fuori (i link ai mock e ai concept) |
@@ -15,7 +16,8 @@ in radice fino al punto 7.
 
 Il resto sta dove è nato e ci resta, perché è lì che lo si cerca:
 [`../README.md`](../README.md) (la mappa del progetto), [`../ROADMAP.md`](../ROADMAP.md)
-(dove sta andando il gioco), [`../implementazioni/`](../implementazioni/README.md)
+(che gioco vogliamo — il disegno d'insieme, mentre [`roadmap.md`](roadmap.md) qui dentro
+dice a che punto è il cantiere), [`../implementazioni/`](../implementazioni/README.md)
 (i punti da fare e quelli chiusi), [`../registro-modifiche/`](../registro-modifiche)
 (cosa è cambiato, commit per commit), [`../frontend/README.md`](../frontend/README.md)
 e [`../backend/README.md`](../backend/README.md).

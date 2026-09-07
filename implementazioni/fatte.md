@@ -22,7 +22,7 @@ un'altra cosa.
 
 | quando | quante |
 | --- | --- |
-| 07/09/2026 | 5 |
+| 07/09/2026 | 6 |
 | 06/09/2026 | 10 |
 
 ---
@@ -140,6 +140,25 @@ _Da `implementazioni/00-come-si-lavora.md`, punto 56._
     Carletto proprio a metà lavoro (il ridisegno della plancia); niente da fare oltre a
     continuare a farlo a ogni giro, cosa già in corso. La regola sta in
     [`../documentazione/come-si-lavora.md`](../documentazione/come-si-lavora.md).
+
+### Una roadmap aggiornata e affidabile, da tenere aggiornata a ogni task
+
+_Chiesto a voce, non era in nessuna lista._
+
+1. crea un file nella cartella documentazione dove crei una roadmap aggiornata e super
+   affidabile del progetto, tieni in memoria di aggiornarla ogni task fatta
+
+   **FATTO (07/09/2026)** — [`../documentazione/roadmap.md`](../documentazione/roadmap.md).
+   Non è una copia di `ROADMAP.md`: quello dice **che gioco vogliamo**, questo dice **a che
+   punto è il cantiere**. Dentro: la fotografia di oggi (base verde, i punti ricontati —
+   112, di cui 76 chiusi — le due metà del repo), nove tappe in ordine da «la base» a
+   «l'uscita sugli store» con, per ognuna, cosa c'è già e cosa manca; i cinque lavori per
+   uscire con lo stato vero; le sei cose che oggi bloccano l'uscita, in ordine di peso; e i
+   punti aperti del foglio di Alessio e Carletto smistati sulle tappe. Ogni riga è stata
+   controllata sul repo — dove c'è un numero (le 1484 occorrenze di «lucidità», i 194 MB di
+   `media/`) è contato, non stimato. In cima c'è la regola: **si aggiorna prima del push,
+   insieme al commit della task**. Rimandi aggiunti da `documentazione/README.md`, da
+   `ROADMAP.md` e da [`README.md`](README.md), dove il conto dei punti diceva ancora 109/74.
 
 ---
 

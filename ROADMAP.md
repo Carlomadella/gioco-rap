@@ -10,6 +10,8 @@ Per farlo provare a qualcuno si ricompila tutto in un file solo con
 
 L'elenco puntuale dei lavori aperti sta nella cartella `implementazioni/`: lì i punti si spuntano uno a uno,
 qui c'è il disegno d'insieme.
+**A che punto siamo davvero** — le tappe, cosa blocca l'uscita, cosa conviene fare adesso —
+sta in [`documentazione/roadmap.md`](documentazione/roadmap.md), che si aggiorna a ogni task.
 
 ## Regole permanenti (valgono per ogni fase)
 
