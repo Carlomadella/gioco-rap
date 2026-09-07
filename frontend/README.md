@@ -1,8 +1,10 @@
 # Anni di Fame — il gioco (frontend)
 
 Il gioco vero e proprio: tutto quello che gira sullo schermo di chi gioca.
-HTML, CSS e JavaScript. L'unica dipendenza è esbuild, e serve solo al build: dentro al
-gioco non entra niente.
+HTML, CSS e JavaScript. Oggi l'unica dipendenza è esbuild, e serve solo al build: dentro
+al gioco non entra niente. Non è più un principio — le dipendenze si possono usare, e la
+regola per sceglierle sta nel **punto 4** di `implementazioni/implementazioni.md`: entra
+nel gioco o resta fuori, quanto si porta dietro, si può togliere in un giorno.
 
 Il server della classifica sta in `../backend/` e ha il suo README: da qui si parla solo
 del gioco. Il gioco funziona anche senza server.

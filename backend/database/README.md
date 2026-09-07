@@ -574,14 +574,20 @@ una connessione diversa, e allora la transazione non coprirebbe niente: il giro 
 settimana si scriverebbe a pezzi. `AsyncLocalStorage` tiene la connessione presa dalla
 transazione e la fa ritrovare a chi sta dentro, senza cambiare una riga di `archivio.js`.
 
-### Perché una dipendenza, in un server che non ne ha
+### Perché una dipendenza, e perché è stata la prima
 
 `pg` è l'unica, ed è una scelta, non una resa. Il protocollo di PostgreSQL si potrebbe
 scrivere a mano — è quello che abbiamo fatto per il server di sviluppo e per il build. Ma
 questo è il file che tiene le carriere della gente, e l'autenticazione SCRAM-SHA-256, il
 TLS, la decodifica dei tipi e le riconnessioni sono quattro posti dove un errore sottile
-non si vede subito e si paga sui dati veri. `pg` è la libreria più collaudata di Node: qui
-«zero dipendenze» conviene cederla, e questo è l'unico posto dove la cediamo.
+non si vede subito e si paga sui dati veri. `pg` è la libreria più collaudata di Node, e qui
+conviene cederla.
+
+Quando è stata scelta era l'eccezione a una regola che diceva «zero dipendenze». Quella
+regola non c'è più: adesso c'è un criterio scritto — entra nel prodotto o resta fuori,
+quanto si porta dietro, si può togliere in un giorno — e sta nel punto 4 di
+`implementazioni/implementazioni.md`. `pg` lo passa da tutte le parti, ed è per questo che
+resta: sta dietro a `database/postgres.js`, e se domani sparisse si cambierebbe un file.
 
 ### La copia di sicurezza cambia mestiere
 
