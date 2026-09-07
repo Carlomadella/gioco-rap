@@ -7,6 +7,9 @@ I punti nuovi si scrivono in [`implementazioni.md`](implementazioni.md), qui den
 resta lì come foglio dove buttare le idee: quando un punto è chiuso, si sposta nel
 file del suo argomento con dentro cosa è stato fatto.
 
+Quelli che erano rimasti indietro nel foglio — chiusi ma mai smistati — stanno in
+[`fatte.md`](fatte.md), verbatim, con la data e da quale lista venivano.
+
 ## Gli argomenti
 
 | file | cosa c'è dentro |
@@ -22,7 +25,8 @@ file del suo argomento con dentro cosa è stato fatto.
 | [`09-grafica-e-asset.md`](09-grafica-e-asset.md) | **La grafica, le ambientazioni e gli asset** — 7 voci |
 
 Più [`00-come-si-lavora.md`](00-come-si-lavora.md): le regole di lavoro, che valgono
-per tutti e per tutto.
+per tutti e per tutto, e [`fatte.md`](fatte.md): le task chiuse arrivate dal foglio dei
+punti nuovi.
 
 ## Tutti i punti
 
