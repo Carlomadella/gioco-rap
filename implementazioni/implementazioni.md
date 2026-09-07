@@ -209,41 +209,22 @@ CARLO:
    un beat, servono i soldi, è l'ora sbagliata) sono cose che ti devi andare a prendere,
    e il motivo è già scritto sul bottone: quelli restano spenti come prima. L'energia no,
    torna da sola: è l'unico «no» che vale la pena spiegare. Quindi **solo** quando manca
-   *soltanto* l'energia (`soloSenzaEnergia`) la mossa resta cliccabile — spenta a
+   _soltanto_ l'energia (`soloSenzaEnergia`) la mossa resta cliccabile — spenta a
    vedersi, con la classe `.spenta` che copia l'aspetto di `:disabled` — e risponde.
-   Se manca l'energia *e anche altro*, resta disabilitata: un avviso che parla di
+   Se manca l'energia _e anche altro_, resta disabilitata: un avviso che parla di
    energia mentre il vero problema è che sei in carcere farebbe più danni che altro.
 
    Provato in Chrome su tutti e quattro i punti d'ingresso: l'avviso esce col fulmine e
    **l'energia non viene toccata**. Controllati anche i casi che non devono cambiare —
    con l'energia piena ma senza beat «Registra» resta disabilitata e muta, senza energia
-   *e* senza beat pure, e con l'energia che basta la mossa parte come sempre (energia
+   _e_ senza beat pure, e con l'energia che basta la mossa parte come sempre (energia
    scalata, scena aperta). `npm run prova` 70/70, audit 260/260, `verifica:build` 33/33.
 
-4. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
-   Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il
-   secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su
-   "stacca la spina", il quinto su "registra un pezzo".
+4. Non è più: "Faccio un pezzo → +10 fama", ma diventa:
 
-5. quando skippi tante ore ci mette troppo a simulare
-
-6. togli il parametro «lucidità» e tutto ciò che ne consegue
-
-7. aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
-
-8.
-
-/_ DA DISCUTERE _/
-
-2. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles? Per forza a los angeles, però può decidere di tornare nelle città prima
-
-3. DA DISCUTERE Non è più: "Faccio un pezzo → +10 fama", ma diventa:
-
-TRACK (sezione studio)
+TRACK luogo: STUDIO
 │
-├── Beat
-├── Producer
-├── Studio
+├── Beat/Producer il beat puoi crearlo tu o chiedere ad un produttore di crearti il beat
 ├── Mix
 ├── Testo
 ├── Cover (influenza meno, ma ha 3 opzioni: caricamento file da telefono/computer, assets preimpostati e personalizzazione stile emblema black ops 2)
@@ -259,24 +240,41 @@ Esempio:
 
 Beat 82
 Testo 76
-Performance 91
-Studio 74
 Mix 68
 Feature 85
 Marketing 53
 ────────────────────
-QUALITÀ 78
+QUALITÀ tot
 
-Poi:
+Poi, ad esempio:
 
-QUALITÀ 78
+QUALITÀ tot
 HYPE 82
 FAMA 31
 NETWORK 64
 
 → 43.000 streams.
 
-è possibile controllare come stanno andando le canzoni nel tempo da un'app del telefono per sapere se stanno invecchiando bene o male e magari farci delle remastered o parti 2 di una canzone o di un album
+è possibile controllare come stanno andando le canzoni nel tempo da un'app del telefono per sapere se stanno invecchiando bene o male e magari farci delle remastered o parti 2 di una canzone o di un album (discografia)
+
+4. aggiungi le foto di background dei posti senza HTML, poi ricrea la schermata identica alle foto con elementi HTML
+
+5. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
+   Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il
+   secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su
+   "stacca la spina", il quinto su "registra un pezzo".
+
+6. quando skippi tante ore ci mette troppo a simulare
+
+7. togli il parametro «lucidità» e tutto ciò che ne consegue
+
+8. aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
+
+9. quando non sono fix, risoluzioni di bug o errori non modificare troppo i file già presenti ma crea un file nuovo collegato ai già presenti
+
+/_ DA DISCUTERE _/
+
+2. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles? Per forza a los angeles, però può decidere di tornare nelle città prima
 
 /_ PAGINA DI LANDING: _/
 
