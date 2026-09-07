@@ -1,4 +1,4 @@
-# FAME CURRENT STATE
+﻿# FAME CURRENT STATE
 
 Riferimento: V0.8 Rhythm & Arrangement Pass
 
@@ -6,28 +6,28 @@ Riferimento: V0.8 Rhythm & Arrangement Pass
 
 # APPROVATO / DA NON REGREDIRE
 
-## Sound Engine — direzione approvata
-Dalla V0.6 il salto qualitativo è stato enorme.
+## Sound Engine â€” direzione approvata
+Dalla V0.6 il salto qualitativo Ã¨ stato enorme.
 Feedback utente:
 - i suoni iniziano a sembrare "veri";
 - sensazione quasi da DAW;
-- il vecchio carattere MIDI è stato fortemente ridotto.
+- il vecchio carattere MIDI Ã¨ stato fortemente ridotto.
 
 NON tornare a:
 - lead additive toy;
 - rendering Python primitivo;
 - pochi sample pitch-shiftati come strumento completo.
 
-## Timing architecture — approvata come fondamento
+## Timing architecture â€” approvata come fondamento
 - 960 PPQ;
 - absolute tick scheduling;
 - humanize OFF;
 - swing OFF;
 - separazione grid / transient / latency / pocket.
 
-## Trap hats V0.8 — forte miglioramento
+## Trap hats V0.8 â€” forte miglioramento
 Feedback utente:
-- "già molto molto meglio".
+- "giÃ  molto molto meglio".
 
 La grammatica attuale:
 - skeleton closed-hat principalmente 1/8;
@@ -36,9 +36,9 @@ La grammatica attuale:
 - open hat raro;
 - closed/open choke;
 - crash come punctuation strutturale;
-- bus hats più basso.
+- bus hats piÃ¹ basso.
 
-## FX / production — direzione corretta
+## FX / production â€” direzione corretta
 - reverb;
 - tempo-sync delay;
 - chorus;
@@ -56,7 +56,7 @@ La grammatica attuale:
 L'utente percepisce ancora:
 - struttura da producer neofita;
 - posizionamento delle note da rivedere;
-- entrata/uscita degli elementi da rendere più musicale.
+- entrata/uscita degli elementi da rendere piÃ¹ musicale.
 
 ## Melody / motif
 Serve studiare:
@@ -81,7 +81,7 @@ Sample reali cablati nel launcher V0.8:
 6. rimshot
 7. crash/cymbal
 
-In più esistono sorgenti sintetiche interne:
+In piÃ¹ esistono sorgenti sintetiche interne:
 - 808/sub synth
 - chord saw layer
 - chord FM layer
@@ -113,14 +113,15 @@ La libreria deve essere ampliata e classificata con metadata.
 
 ---
 
-# ROADMAP LOCK — 2026-09-07
+# ROADMAP LOCK â€” 2026-09-07
 
-Priorità unica corrente:
+PrioritÃ  unica corrente:
 
-FASE 0 — MEMORIA E SICUREZZA.
+FASE 0 â€” MEMORIA E SICUREZZA.
 
 Dopo il commit della Bibbia:
-FASE 1 — TRAP PRODUCTION GRAMMAR V1.
+FASE 1 â€” TRAP PRODUCTION GRAMMAR V1.
 
 Non aprire Sound Library V1, altri generi, Intent Engine o integrazione nel gioco
 prima di aver completato il passo corrente, salvo piccoli test necessari alla fase.
+

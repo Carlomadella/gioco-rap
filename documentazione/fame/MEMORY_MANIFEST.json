@@ -12,12 +12,12 @@
                                                      "bytes":  1218
                                                  },
                   "docs/CHANGELOG.md":  {
-                                            "sha256":  "792edd5cbebe46b0831704a76aa4e522651e48a834d711cf5e7394025790e40b",
-                                            "bytes":  1235
+                                            "sha256":  "93dfd8e5822613cbf7b591b10eeb4dc902928c8c5edf0d35d8b4e31170050e66",
+                                            "bytes":  1589
                                         },
                   "docs/CURRENT_STATE.md":  {
-                                                "sha256":  "b3e1cc76e95621ec614ff594feaaf4b587d9269ee00928088d355d43436e4605",
-                                                "bytes":  2793
+                                                "sha256":  "422f63c0b1fa5af7b5d1996a37c86176e2a294f76bfe23178fa892b398a80346",
+                                                "bytes":  2847
                                             },
                   "docs/DECISIONS.md":  {
                                             "sha256":  "c1958b01401aad64f7a3ef1a9f82af78a12c9f3a627c0bf677721ea655dd2bf8",
@@ -36,16 +36,16 @@
                                                       "bytes":  1300
                                                   },
                   "docs/ROADMAP_FAME.md":  {
-                                               "sha256":  "d13c086819e809481bbc926910a74bf8ea357c3722cc437e2c720f36461c4dcc",
-                                               "bytes":  4699
+                                               "sha256":  "728a3779e70af632a685c4de12c5b6be952323c544c0d76e782c5a0617e1f2bb",
+                                               "bytes":  4801
                                            },
                   "docs/WORKFLOW_RULES.md":  {
                                                  "sha256":  "3324f1b8c55ae373671651dd634b75955dddc7d9cc7a094e0a10eaadad83fb7c",
                                                  "bytes":  1443
                                              },
                   "FAME_CONTEXT_INDEX.json":  {
-                                                  "sha256":  "e200bca24089d434cb0a2c7e4fb7226d94a4779cb2b70b8ca72f3a7fb5859718",
-                                                  "bytes":  1401
+                                                  "sha256":  "4cd8fee3ec1f6dd9a962274173ae75338535b65d7639454b30908d73a4e7544f",
+                                                  "bytes":  2223
                                               },
                   "MEMORY_VERSION.json":  {
                                               "sha256":  "c2830d79a7aff92fbd9348ded37f39b765bad67a03887e3a9f7586e5b281923a",
