@@ -585,8 +585,9 @@ conviene cederla.
 
 Quando è stata scelta era l'eccezione a una regola che diceva «zero dipendenze». Quella
 regola non c'è più: adesso c'è un criterio scritto — entra nel prodotto o resta fuori,
-quanto si porta dietro, si può togliere in un giorno — e sta nel punto 4 di
-`implementazioni/implementazioni.md`. `pg` lo passa da tutte le parti, ed è per questo che
+quanto si porta dietro, si può togliere in un giorno — e sta in
+[`documentazione/dipendenze.md`](../../documentazione/dipendenze.md), dove `pg` ha la sua
+riga. Il criterio lo passa da tutte le parti, ed è per questo che
 resta: sta dietro a `database/postgres.js`, e se domani sparisse si cambierebbe un file.
 
 ### La copia di sicurezza cambia mestiere

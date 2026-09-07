@@ -47,9 +47,11 @@ messaggi dei commit, e nessuno se lo ricordava più. Adesso hanno una riga che l
 
 ## Le dipendenze
 
-**Si possono usare.** Il principio «zero dipendenze» è caduto il 07/09/2026 (punto 4 di
-[`implementazioni.md`](implementazioni.md), dove c'è il ragionamento per esteso e l'elenco
-di tutto quello che si potrebbe installare). Al suo posto c'è una regola:
+**Si possono usare.** Il principio «zero dipendenze» è caduto il 07/09/2026. La regola che
+c'è al suo posto, il prezzo che si paga e **il registro di quello che è installato** stanno
+in [`../documentazione/dipendenze.md`](../documentazione/dipendenze.md); il ragionamento per
+esteso e l'elenco di tutto quello che si potrebbe installare stanno nel punto «togli il
+principio zero-dipendenze» di [`implementazioni.md`](implementazioni.md). In breve:
 
 > Ognuna si sceglie, si motiva in una riga e si può togliere.
 
@@ -78,6 +80,7 @@ quella dipendenza non doveva entrare.
 | [`../backend/README.md`](../backend/README.md) | il server: rotte, manopole, quanto regge |
 | `../backend.md` | il quaderno di bordo del server (fuori da git) |
 | [`../documentazione/stili-interfaccia.md`](../documentazione/stili-interfaccia.md) | il riferimento visivo |
+| [`../documentazione/dipendenze.md`](../documentazione/dipendenze.md) | la regola per sceglierle e il registro di quelle installate |
 
 ---
 

@@ -3,8 +3,8 @@
 Il gioco vero e proprio: tutto quello che gira sullo schermo di chi gioca.
 HTML, CSS e JavaScript. Oggi l'unica dipendenza è esbuild, e serve solo al build: dentro
 al gioco non entra niente. Non è più un principio — le dipendenze si possono usare, e la
-regola per sceglierle sta nel **punto 4** di `implementazioni/implementazioni.md`: entra
-nel gioco o resta fuori, quanto si porta dietro, si può togliere in un giorno.
+regola per sceglierle sta in [`documentazione/dipendenze.md`](../documentazione/dipendenze.md):
+entra nel gioco o resta fuori, quanto si porta dietro, si può togliere in un giorno.
 
 Il server della classifica sta in `../backend/` e ha il suo README: da qui si parla solo
 del gioco. Il gioco funziona anche senza server.
@@ -34,6 +34,8 @@ Gli altri comandi:
 | `npm run demo` | `dist/anni-di-fame.html`: il gioco in un file solo, da far provare a qualcuno |
 | `npm run prova` | i controlli che si possono fare senza browser (vedi in fondo) |
 | `npm run dev -- --dist` | serve la cartella `dist/`, per provare il build vero |
+| `npm run verifica` | tutto il giro: prova, audit delle regressioni, build, e `npm audit` sui pacchetti di qui e del backend |
+| `npm run verifica:dipendenze` | solo l'ultimo pezzo: `npm audit` sui due lockfile. È il prezzo scritto in [`documentazione/dipendenze.md`](../documentazione/dipendenze.md) |
 
 Serve un server locale e non il doppio clic sul file: con `file://` il `localStorage` è
 legato al percorso e le chiamate alla classifica non partono.
@@ -77,7 +79,7 @@ Adesso c'è `npm run build`, ottanta righe in `strumenti/build.js`:
 - tiene **tutti i percorsi relativi**, perché è così che la cartella viene aperta da
   Electron e da Capacitor (`file://`).
 
-Più `npm run dev` (server con ricarica automatica, zero dipendenze) e `npm run prova`, che
+Più `npm run dev` (server con ricarica automatica, scritto a mano con Node) e `npm run prova`, che
 prende gli errori scemi e costosi: un file aggiunto e mai messo in una pagina, un tag che
 punta a un file che non c'è più, un'immagine sparita da sotto a un CSS, un file che non
 compila. Provato: il build minificato apre il menu e la plancia intera — mappa, profilo,
@@ -198,7 +200,7 @@ js/gioco-ingresso.js  la porta della partita: legge come ci sei arrivato
 strumenti/build.js    il build: bundle minificato con l'impronta nel nome
 strumenti/dev.js      il server di sviluppo con la ricarica automatica
 strumenti/prova.js    i controlli che si fanno senza browser
-package.json          gli script (dev, build, demo, prova) e l'unica dipendenza: esbuild
+package.json          gli script (dev, build, demo, prova, verifica) e l'unica dipendenza: esbuild
 dist/                 quello che esce dal build (fuori da git)
 ```
 

@@ -11,7 +11,8 @@
     "prova": "node strumenti/prova.js",
     "setup:makehuman": "node strumenti/setup-makehuman.js",
     "verifica:build": "npm run build && npm run demo && node strumenti/verifica-build.js",
-    "verifica": "npm run prova && node strumenti/audit-regressioni.js && npm run verifica:build"
+    "verifica:dipendenze": "npm audit --audit-level=high && npm audit --audit-level=high --prefix ../backend",
+    "verifica": "npm run prova && node strumenti/audit-regressioni.js && npm run verifica:build && npm run verifica:dipendenze"
   },
   "engines": {
     "node": ">=18"

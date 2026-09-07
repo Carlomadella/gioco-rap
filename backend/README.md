@@ -294,8 +294,9 @@ curl -X PUT localhost:8787/api/carriera/1 -H 'content-type: application/json' \
 lo controlliamo contro le loro chiavi pubbliche — firma, emittente, destinatario, scadenza;
 Steam manda un biglietto e lo facciamo verificare a Steamworks. Oggi è tutto scritto a
 mano con Node; **è il primo posto che passerà a una libreria** (`jose`), perché la
-verifica di una firma è l'ultimo posto dove conviene tenere codice proprio — punto 4 di
-`implementazioni/implementazioni.md`.
+verifica di una firma è l'ultimo posto dove conviene tenere codice proprio. La regola per
+scegliere le dipendenze, e `jose` fra quelle già decise, stanno in
+[`documentazione/dipendenze.md`](../documentazione/dipendenze.md).
 
 Quello che manca sono **le chiavi**, che si prendono quando c'è l'app registrata sugli
 store. Perciò:
