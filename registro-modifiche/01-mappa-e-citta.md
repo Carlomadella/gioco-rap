@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:c493463 -->
+## 07/09/26, 21:29 â€” task/roadmap-affidabile â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `c493463`
+
+### Cosa Ã¨ entrato
+
+- `88009f9` â€” docs: una roadmap del cantiere in documentazione/, da aggiornare a ogni task â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/README.md`
+- **Aggiunto:** `documentazione/roadmap.md`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:cdc13d5 -->
 ## 06/09/26, 11:50 â€” task/6-7-hype-e-farming â†’ main
 
