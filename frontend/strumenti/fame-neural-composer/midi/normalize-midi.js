@@ -4,6 +4,7 @@ const { PPQ, BAR_TICKS, createSequence, validateSequence } = require("../core");
 const { classifyTrack, drumEventType } = require("./track-classifier");
 const { normalizeTrackOverrides, resolveTrackOverride } = require("./track-overrides");
 const { inferSimple808Glide } = require("./pitch-bend");
+const { summarizeHarmonyEvents } = require("./harmony-analysis");
 
 const MAJOR_KEY_PC_BY_SHARPS_FLATS = new Map([
   [-7, 11], [-6, 6], [-5, 1], [-4, 8], [-3, 3], [-2, 10], [-1, 5],
@@ -191,6 +192,8 @@ function normalizeParsedMidi(parsed, options = {}) {
   }
   for (const warning of validation.warnings) warnings.push({ code: "CANONICAL_WARNING", message: warning });
 
+  const harmonyNotes = summarizeHarmonyEvents(validation.sequence.events);
+
   return {
     ok: errors.length === 0,
     errors,
@@ -205,7 +208,8 @@ function normalizeParsedMidi(parsed, options = {}) {
       skippedTracks,
       pitchBendCount: parsed.tracks.reduce((sum, t) => sum + t.pitchBends.length, 0),
       mappedGlides,
-      trackOverrideCount: classifications.filter(c => c.override).length
+      trackOverrideCount: classifications.filter(c => c.override).length,
+      harmonyNotes
     }
   };
 }

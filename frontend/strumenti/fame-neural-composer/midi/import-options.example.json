@@ -1,4 +1,5 @@
 {
+  "tempoMapStrategy": "segment",
   "pitchBendRangeSemitones": 2,
   "trackOverrides": {
     "tracks": [
