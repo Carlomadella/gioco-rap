@@ -24,9 +24,12 @@ Quelli che erano rimasti indietro nel foglio — chiusi ma mai smistati — stan
 | [`08-uscita-sugli-store.md`](08-uscita-sugli-store.md) | **L'uscita su Steam e sugli store** — 3 voci |
 | [`09-grafica-e-asset.md`](09-grafica-e-asset.md) | **La grafica, le ambientazioni e gli asset** — 7 voci |
 
-Più [`00-come-si-lavora.md`](00-come-si-lavora.md): le regole di lavoro, che valgono
-per tutti e per tutto, e [`fatte.md`](fatte.md): le task chiuse arrivate dal foglio dei
-punti nuovi.
+Più [`fatte.md`](fatte.md): le task chiuse arrivate dal foglio dei punti nuovi.
+
+Le **regole di lavoro** non stanno più qui dentro: valgono per tutto il progetto, non solo
+per i punti, e sono in [`../documentazione/come-si-lavora.md`](../documentazione/come-si-lavora.md)
+— in versione corta, quella che ogni sessione si legge da sola, in
+[`../CLAUDE.md`](../CLAUDE.md).
 
 ## Tutti i punti
 
@@ -84,14 +87,14 @@ punti nuovi.
 | **46** | Le abilità sono troppe: i mix li fanno i fonici | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
 | **47** | Il negozio dei vestiti | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **48** | Meno cartelli chiusi sulla mappa, più roba che si apre | in parte | [mappa-e-citta](01-mappa-e-citta.md) |
-| **49** | Un file coi comandi del terminale | fatto | [come-si-lavora](00-come-si-lavora.md) |
+| **49** | Un file coi comandi del terminale | fatto | [fatte](fatte.md) |
 | **50** | Via i popup dalle card: scene vere | in parte | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **51** | Un prompt per ogni card, e dove sono finiti quelli del 38 | fatto | [grafica-e-asset](09-grafica-e-asset.md) |
 | **52** | LaFamegram con post veri, caricati dai giocatori | in parte | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **53** | Il feed di LaFamegram si scorre come quello vero | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **54** | Scenari veri, uguali nella forma e diversi nelle circostanze | in parte | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
 | **55** | Via la conferma «sei sicuro» per l'energia | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
-| **56** | Restare sempre aggiornati col repo | fatto | [come-si-lavora](00-come-si-lavora.md) |
+| **56** | Restare sempre aggiornati col repo | fatto | [fatte](fatte.md) |
 | **57** | «Attività criminali non si può più giocare, che è successo?» | risposto | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
 | **58** | Transizioni diverse per ogni scena | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **59** | Due lavori veri al posto di due cartelli chiusi: Pizzeria e Fabbrica | fatto | [mappa-e-citta](01-mappa-e-citta.md) |

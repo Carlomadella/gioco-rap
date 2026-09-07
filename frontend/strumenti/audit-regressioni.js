@@ -1435,10 +1435,13 @@ test("l'app Agenda del telefono mostra quello che ti sei segnato",
   tel.includes("data-agendavia"));
 
 console.log("\nPunto 7 — i file .md in cartelle con nomi coerenti");
-test("in radice restano solo README e ROADMAP",
+test("in radice restano solo README, ROADMAP e CLAUDE",
   (() => {
     const fuori = fs.readdirSync(path.join(ROOT, ".."))
       .filter(f => /\.md$/i.test(f) && f !== "README.md" && f !== "ROADMAP.md")
+      /* CLAUDE.md non e' un documento: e' la versione corta delle regole di lavoro,
+         e sta in radice perche' e' li' che ogni sessione la va a leggere */
+      .filter(f => f !== "CLAUDE.md")
       /* PROVARE.md e backend.md sono appunti locali, fuori da git apposta */
       .filter(f => f !== "PROVARE.md" && f !== "backend.md");
     if(fuori.length) console.log("      " + fuori.join(", "));
@@ -1469,6 +1472,48 @@ test("nessun documento punta più ai vecchi percorsi in radice",
       }
     };
     guarda(path.join(ROOT, ".."));
+    if(morti.length) console.log("      " + morti.join("\n      "));
+    return morti.length === 0;
+  })());
+
+console.log("\nLe regole di lavoro");
+const RADICE = path.join(ROOT, "..");
+test("stanno in documentazione/, e non piu' dentro a implementazioni/",
+  fs.existsSync(path.join(RADICE, "documentazione", "come-si-lavora.md")) &&
+  !fs.existsSync(path.join(RADICE, "implementazioni", "00-come-si-lavora.md")));
+test("la versione corta e' in radice, dove ogni sessione la legge",
+  fs.existsSync(path.join(RADICE, "CLAUDE.md")));
+test("CLAUDE.md dice le cose che non si possono dimenticare",
+  (() => {
+    const t = fs.readFileSync(path.join(RADICE, "CLAUDE.md"), "utf8");
+    /* il branch, la verifica giusta, il giro di fine task, i numeri che si spostano */
+    const manca = ["task/", "npm run verifica", "segnala-problemi", "backend-allineato",
+                   "registro-modifiche/"].filter(s => !t.includes(s));
+    if(manca.length) console.log("      manca: " + manca.join(", "));
+    return manca.length === 0;
+  })());
+test("il giro di fine task e' ancora acceso dopo il commit",
+  (() => {
+    const s = fs.readFileSync(path.join(RADICE, ".claude", "settings.json"), "utf8");
+    return fs.existsSync(path.join(RADICE, "scripts", "dopo-la-task.js")) &&
+           s.includes("dopo-la-task.js") && s.includes("PostToolUse");
+  })());
+test("nessun documento punta piu' al vecchio 00-come-si-lavora.md",
+  (() => {
+    const morti = [];
+    const guarda = d => {
+      for(const v of fs.readdirSync(d, {withFileTypes:true})){
+        if(v.name === "node_modules" || v.name === ".git" || v.name === "dist" ||
+           v.name === "registro-modifiche") continue;
+        const f = path.join(d, v.name);
+        if(v.isDirectory()){ guarda(f); continue; }
+        if(!/\.(md|js)$/i.test(v.name)) continue;
+        if(v.name === "audit-regressioni.js") continue;
+        if(/\]\([^)]*00-come-si-lavora\.md\)/.test(fs.readFileSync(f, "utf8")))
+          morti.push(path.relative(RADICE, f));
+      }
+    };
+    guarda(RADICE);
     if(morti.length) console.log("      " + morti.join("\n      "));
     return morti.length === 0;
   })());

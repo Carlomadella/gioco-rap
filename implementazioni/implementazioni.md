@@ -11,7 +11,6 @@ I punti di prima — tutti e sessantasette — stanno nella cartella
 
 |                                                                | argomento                                       |
 | -------------------------------------------------------------- | ----------------------------------------------- |
-| [`00-come-si-lavora.md`](00-come-si-lavora.md)                 | le regole di lavoro                             |
 | [`01-mappa-e-citta.md`](01-mappa-e-citta.md)                   | la plancia, la mappa, le tre città              |
 | [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | schermate, navigazione, il telefono, il negozio |
 | [`03-artista-e-avatar.md`](03-artista-e-avatar.md)             | la faccia, i vestiti, chi sei                   |

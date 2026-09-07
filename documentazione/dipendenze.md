@@ -356,7 +356,7 @@ finisce nel gioco e pesa; **[fuori]** che resta negli strumenti e non pesa nient
 
 `README.md`, `ROADMAP.md`, `frontend/README.md`, `backend/README.md`,
 `backend/database/README.md`, `backend/database/postgres.js`, `backend.md` e
-[`../implementazioni/00-come-si-lavora.md`](../implementazioni/00-come-si-lavora.md): dove
+[`come-si-lavora.md`](come-si-lavora.md): dove
 «zero dipendenze» era una _regola_ adesso c'è la regola nuova; dove era la _descrizione di
 com'è fatto oggi_ è rimasta, corretta (il backend una dipendenza ce l'ha, `pg`, e il gioco ha
 esbuild).

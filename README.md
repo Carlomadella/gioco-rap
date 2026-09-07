@@ -54,12 +54,14 @@ npm run demo      # → dist/anni-di-fame.html: il gioco in un file solo, da far
 Il file unico non è il modo in cui il gioco esce: è lo strumento per una demo o un playtest
 — si manda il file e la gente gioca, senza installare niente.
 
-I documenti di progetto stanno in cartelle, una per famiglia — in radice restano solo
-questo README e la ROADMAP:
+I documenti di progetto stanno in cartelle, una per famiglia — in radice restano questo
+README, la ROADMAP e le regole di casa:
 
 | dove | cosa c'è dentro |
 | --- | --- |
 | [`ROADMAP.md`](ROADMAP.md) | il disegno d'insieme: le fasi, dove sta andando il gioco |
+| [`CLAUDE.md`](CLAUDE.md) | **le regole di lavoro in versione corta**: branch, verifica, giro di fine task. Ogni sessione se lo legge da sola |
+| [`documentazione/come-si-lavora.md`](documentazione/come-si-lavora.md) | le stesse regole per esteso, col perché di ognuna |
 | [`implementazioni/`](implementazioni/README.md) | i punti da fare e quelli chiusi, un file per argomento |
 | [`documentazione/`](documentazione/README.md) | i comandi del terminale, i riferimenti visivi, i problemi trovati |
 | [`prompt/`](prompt/README.md) | i prompt per farsi fare le immagini: ambientazioni e app del telefono |
