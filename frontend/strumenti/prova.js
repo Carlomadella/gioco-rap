@@ -866,10 +866,22 @@ console.log("\nlo Studio: la gente della Sala conta");
       ];
       apriStudio("beat");
     `);
+    /* Da quando la pagina è disegnata sopra la foto (i riferimenti in
+       media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/) il
+       contenuto sta in **tre** colonne: a sinistra chi c'è, in mezzo la cosa
+       che stai facendo, a destra quello che ti aspetta. Le prove le guardano
+       tutte e tre insieme: quello che conta è che la cosa ci sia, non in
+       quale colonna sia finita — se no cambiare impaginazione fa suonare un
+       allarme che non è un guasto. */
+    const dipinto = () =>
+      (nodi["st-sx"].innerHTML || "") +
+      (nodi["st-corpo"].innerHTML || "") +
+      (nodi["st-dx"].innerHTML || "");
+
     controlla("si apre, e la stanza dei beat elenca chi conosci",
-      nodi["st-corpo"].innerHTML.indexOf("Bit") >= 0 &&
-      nodi["st-corpo"].innerHTML.indexOf('data-beat="bm"') >= 0,
-      nodi["st-corpo"].innerHTML.slice(0, 200));
+      dipinto().indexOf("Bit") >= 0 &&
+      dipinto().indexOf('data-beat="bm"') >= 0,
+      dipinto().slice(0, 200));
 
     /* tutte le sezioni si disegnano: una che esplode manderebbe giù lo Studio
        intero, e capiterebbe solo a chi ci clicca. Le sezioni sono otto da
@@ -885,7 +897,7 @@ console.log("\nlo Studio: la gente della Sala conta");
     for(const s of sezioni){
       try{
         dentro('STUDIO_SEZ = ' + JSON.stringify(s) + '; renderStudio();');
-        if(!nodi["st-corpo"].innerHTML) rotte.push(s + " (vuota)");
+        if(!dipinto()) rotte.push(s + " (vuota)");
       }catch(e){ rotte.push(s + " — " + e.message); }
     }
     controlla("tutte le sezioni si disegnano", rotte.length === 0, rotte);
@@ -948,18 +960,18 @@ console.log("\nlo Studio: la gente della Sala conta");
        cosa che adesso può davvero rompersi in silenzio: che la promo sia lì. */
     dentro("G.songs = [{t:'Uno', q:60, mixed:true, released:true, seed:1}]; STUDIO_SEZ = 'promo'; renderStudio();");
     controlla("la promo ha un posto: sta nello Studio, in «Marketing»",
-      nodi["st-corpo"].innerHTML.indexOf('data-az="promo"') >= 0,
-      nodi["st-corpo"].innerHTML.slice(0, 200));
+      dipinto().indexOf('data-az="promo"') >= 0,
+      dipinto().slice(0, 200));
     dentro("G.bars = []; G.beats = []; STUDIO_SEZ = 'cabina'; renderStudio();");
     controlla("e senza strofa la cabina non è un vicolo cieco: si scrive da lì",
-      nodi["st-corpo"].innerHTML.indexOf('data-az="scrivi"') >= 0,
-      nodi["st-corpo"].innerHTML.slice(0, 200));
+      dipinto().indexOf('data-az="scrivi"') >= 0,
+      dipinto().slice(0, 200));
     /* le barre hanno una stanza loro, non sono più il ripiego della cabina */
     dentro("G.bars = [{q:44, tema:'Il cortile'}]; STUDIO_SEZ = 'testo'; renderStudio();");
     controlla("il testo ha la sua sezione, e ci si vede quello che hai scritto",
-      nodi["st-corpo"].innerHTML.indexOf("Il cortile") >= 0 &&
-      nodi["st-corpo"].innerHTML.indexOf('data-az="scrivi"') >= 0,
-      nodi["st-corpo"].innerHTML.slice(0, 200));
+      dipinto().indexOf("Il cortile") >= 0 &&
+      dipinto().indexOf('data-az="scrivi"') >= 0,
+      dipinto().slice(0, 200));
 
     /* ---- il punto 4: ogni elemento influenza il risultato ----
        Il feat è l'elemento nuovo, ed è l'unico che tocca i numeri veri: se

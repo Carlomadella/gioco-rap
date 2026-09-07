@@ -33,7 +33,7 @@
 <link rel="stylesheet" href="css/creator.css?v=12">
 <link rel="stylesheet" href="css/actionbar.css?v=12">
 <link rel="stylesheet" href="css/posto.css?v=13">
-<link rel="stylesheet" href="css/studio.css?v=3">
+<link rel="stylesheet" href="css/studio.css?v=7">
 <link rel="stylesheet" href="css/abilita.css?v=1">
 <link rel="stylesheet" href="css/negozio.css?v=12">
 <link rel="stylesheet" href="css/strada-crimine.css?v=13">
@@ -333,15 +333,44 @@
      e restano ferme mentre il corpo scorre. Non rifà l'economia del gioco:
      chiama le stesse azioni della settimana, e ci mette dentro la gente
      conosciuta alla Sala. Il contenuto lo scrive js/game/studio.js. -->
-<div class="studio" id="studio"><div class="stwrap">
-  <div class="sthead"><div class="stk">Lo Studio</div>
-    <div class="strisorse" id="st-risorse"></div></div>
-  <div class="stscena" id="st-scena"></div>
-  <p class="stdove" id="st-dove"></p>
-  <div class="stcorpo" id="st-corpo"></div>
+<div class="studio" id="studio">
+  <!-- LA FOTO, A SCHERMO INTERO. Non è più una fascia in cima: è la stanza, e
+       tutto il resto ci galleggia sopra — come nei riferimenti in
+       media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/.
+       Il velo sopra non è un vezzo: senza, su una foto piena di lampade e
+       monitor accesi i pannelli non si leggono. -->
+  <div class="stsfondo" id="st-scena"></div>
+  <div class="stvelo" aria-hidden="true"></div>
+
+  <!-- LA FASCIA IN ALTO. `.sthead` resta il nome che si aspetta
+       js/menu-sistema.js, che ci infila dentro la nav globale (il tasto
+       sistema e «torna alla mappa», 256px a sinistra) e per questo la tiene
+       `position:relative`. Quindi la fascia fissa è il guscio qui fuori. -->
+  <div class="stbarra">
+    <div class="sthead">
+      <div class="stk">Studio</div>
+      <span class="stsep" aria-hidden="true"></span>
+      <div class="stnome" id="st-nome"></div>
+      <div class="strisorse" id="st-risorse"></div>
+    </div>
+  </div>
+
+  <!-- LE TRE COLONNE: a sinistra chi c'è o cosa hai, in mezzo la cosa che
+       stai facendo, a destra quello che ti aspetta. È lo scheletro del §2 di
+       documentazione/pagine-azioni/README.md, e le colonne scorrono tutte,
+       sempre: se il contenuto cresce non sparisce. -->
+  <div class="stwrap">
+    <aside class="stcol stsx" id="st-sx"></aside>
+    <main class="stcol stmid" id="st-corpo"></main>
+    <aside class="stcol stdx" id="st-dx"></aside>
+  </div>
+
+  <!-- la riga in basso che racconta com'è andata l'ultima cosa -->
+  <div class="stbanda" id="st-banda" hidden></div>
+
   <!-- la copertina caricata dall'utente: la prepara js/game/copertine.js -->
   <input type="file" id="st-file" accept="image/*" hidden>
-</div>
+
   <div class="sttabs" id="st-tabs"></div>
   <!-- «la striscia continua»: si accende solo se le linguette non ci stanno
        tutte in larghezza. Lo decide renderStudio(), misurando. -->
@@ -747,7 +776,7 @@
 <script src="js/game/entry.js?v=1"></script><!-- ADF_AUDIO_ENTRY_PAGE_V1 -->
 <script src="js/game/skip.js?v=14"></script>
 <script src="js/game/posto.js?v=14"></script>
-<script src="js/game/studio.js?v=6"></script>
+<script src="js/game/studio.js?v=9"></script>
 <script src="js/game/abilita.js?v=1"></script>
 <script src="js/game/strada.js?v=12"></script>
 <script src="js/game/strada-crimine.js?v=14"></script>

@@ -1230,14 +1230,13 @@ test("in media/ non restano immagini che nessuna riga di codice carica",
          luoghi. Erano dieci, tutte con il nome che gli aveva dato ChatGPT.
          Quattro adesso sono il fondale vero delle sezioni dello Studio
          (js/game/studio.js, STUDIO_FOTO) e sono uscite da questa lista: si
-         chiamano studio_beat / studio_testo / studio_cabina / studio_mix, e
+         chiamano studio_beat / studio_testo / studio_cabina / studio_mix /
+         studio_uscita / studio_promo, e
          se sparissero dal disco il gioco se ne accorgerebbe da solo. Queste
-         sei restano materiale in attesa — casa, strada, freestyle, live e la
-         scrivania vuota: i loro posti non hanno ancora una pagina che le
-         carichi. */
+         quattro restano materiale in attesa — le due di casa, il freestyle sotto
+         il cavalcavia e il live club: i loro posti non hanno ancora una
+         pagina che le carichi. */
       "ChatGPT Image 6 set 2026, 19_43_32 (2).png",
-      "ChatGPT Image 6 set 2026, 19_43_33 (4).png",
-      "ChatGPT Image 6 set 2026, 19_43_33 (5).png",
       "ChatGPT Image 6 set 2026, 19_43_34 (6).png",
       "ChatGPT Image 6 set 2026, 19_43_34 (8).png",
       "ChatGPT Image 6 set 2026, 19_43_35 (10).png"

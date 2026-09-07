@@ -51,10 +51,22 @@
    riga qui e basta. */
 const STUDIO_FOTO_DIR = "media/photo/schermate_luoghi/schermate luoghi_senza_HTML/";
 const STUDIO_FOTO = {
-  beat:   {f:"studio_beat.png",   pos:"center 42%"},
-  testo:  {f:"studio_testo.png",  pos:"center 55%"},
-  cabina: {f:"studio_cabina.png", pos:"center 44%"},
-  banco:  {f:"studio_mix.png",    pos:"center 40%"}
+  beat:   {f:"studio_beat.png",   pos:"center 45%"},
+  testo:  {f:"studio_testo.png",  pos:"center 58%"},
+  cabina: {f:"studio_cabina.png", pos:"center 46%"},
+  banco:  {f:"studio_mix.png",    pos:"center 44%"},
+  /* Queste due le ho ritrovate confrontando le foto senza interfaccia con i
+     riferimenti: lo sfondo di `studio_uscita_pezzo` è la strada bagnata, e
+     quello di `studio_promo_su_lafamegram` è la scrivania di notte. Erano
+     nella pila delle «in attesa» perché nessuno le aveva mai guardate. */
+  fuori:  {f:"studio_uscita.png", pos:"center 55%"},
+  promo:  {f:"studio_promo.png",  pos:"center 50%"},
+  /* Cover e Feat una foto loro non ce l'hanno, né con né senza interfaccia.
+     Si tengono quella della stanza più vicina — il banco per la copertina,
+     la cabina per il feat — perché un fondo nero in mezzo a sei fotografie
+     si vede molto più di una stanza presa in prestito. Vanno sostituite. */
+  cover:  {f:"studio_mix.png",    pos:"center 30%"},
+  feat:   {f:"studio_cabina.png", pos:"center 38%"}
 };
 
 const STUDIO_SEZIONI = [
@@ -343,245 +355,420 @@ function studioCoverCarica(file){
     },
     err => { toast(err, "bad", "!", ["#3A3F49", "#22262E"]); SFX.fail(); });
 }
+/* ==================== IL DISEGNO ====================
+   La forma della pagina è quella dei riferimenti in
+   `media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/`: la foto
+   riempie lo schermo, e sopra ci stanno **tre colonne** — a sinistra chi c'è
+   o cosa hai, in mezzo la cosa che stai facendo, a destra quello che ti
+   aspetta. Ogni sezione riempie le tre colonne e basta: il telaio, i colori e
+   i tasti sono gli stessi per tutte e otto, e stanno tutti in `studio.css`.
 
-/* ==================== IL DISEGNO ==================== */
+   Una colonna laterale che torna vuota sparisce da sola (`.stcol:empty`):
+   non tutte le sezioni hanno tre cose da dire, e un pannello vuoto è peggio
+   di un pannello che non c'è. */
 function studioEsc(s){
   return String(s == null ? "" : s).replace(/[&<>"]/g, ch =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
 }
 
-/* la scheda di una persona: la stessa faccia della Sala, così è chiaro che è
-   la stessa gente e non un altro elenco */
-function studioPersona(p, dentro, scelto){
-  return '<div class="stperso' + (scelto ? " scelta" : "") + '" style="--k:' + p.col + '">' +
-    '<span class="stav">' + faccia(p, 46) + '</span>' +
-    '<span class="stchi"><b>' + studioEsc(p.n) + '</b><span>' +
-      relNome(p) + ' · fama ' + p.fama +
-      (p.scoperto ? ' · ' + studioEsc(p.car) : '') +
-      (p.gen ? ' · ' + studioEsc(genBeat(p.gen).n.toLowerCase()) : '') +
-    '</span></span>' +
-    '<span class="stfa">' + dentro + '</span></div>';
+/* Le iconcine: disegnate qui, poche righe l'una, perché una libreria intera
+   per otto simboli non si porta dietro nessuno. Stesse forme dei riferimenti. */
+const STUDIO_ICONE = {
+  cartella:"M2 5.5A1.5 1.5 0 0 1 3.5 4h4.2l1.6 2h7.2A1.5 1.5 0 0 1 18 7.5v9A1.5 1.5 0 0 1 16.5 18h-13A1.5 1.5 0 0 1 2 16.5z",
+  invio:"M2 10 18 3l-4 15-4-5.4L15 6l-8 5z",
+  spunta:"M7.6 14.2 3.8 10.4l1.4-1.4 2.4 2.4 7-7 1.4 1.4z",
+  carrello:"M3 3h2.2l2.1 9.2h8.4l1.9-6.6H7.1M8.4 16.6a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6m7 0a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6",
+  matita:"M3 14.2 13.1 4.1l2.8 2.8L5.8 17H3zM14.3 2.9l1.5-1.5 2.8 2.8-1.5 1.5z",
+  foto:"M2.5 4h15A1.5 1.5 0 0 1 19 5.5v9A1.5 1.5 0 0 1 17.5 16h-15A1.5 1.5 0 0 1 1 14.5v-9A1.5 1.5 0 0 1 2.5 4m2 8.5 3-3.6 2.3 2.7 3-3.8 3.7 4.7z",
+  rinnova:"M10 3a7 7 0 0 1 6.7 5h-2.2A4.9 4.9 0 0 0 10 5.1 4.9 4.9 0 0 0 5.1 10H8l-3.5 4L1 10h2.1A6.9 6.9 0 0 1 10 3m0 14a7 7 0 0 1-6.7-5h2.2A4.9 4.9 0 0 0 10 14.9 4.9 4.9 0 0 0 14.9 10H12l3.5-4L19 10h-2.1A6.9 6.9 0 0 1 10 17",
+  bolla:"M3.5 3h13A1.5 1.5 0 0 1 18 4.5v8a1.5 1.5 0 0 1-1.5 1.5H8l-4 3.4V14h-.5A1.5 1.5 0 0 1 2 12.5v-8A1.5 1.5 0 0 1 3.5 3m2.9 5.6a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2m3.6 0a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2m3.6 0a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2",
+  mic:"M10 2a2.6 2.6 0 0 1 2.6 2.6v5A2.6 2.6 0 0 1 10 12.2 2.6 2.6 0 0 1 7.4 9.6v-5A2.6 2.6 0 0 1 10 2M5 9.2h1.7A3.4 3.4 0 0 0 10 12.5a3.4 3.4 0 0 0 3.3-3.3H15A5 5 0 0 1 10.8 14v2.4h2.4V18H6.8v-1.6h2.4V14A5 5 0 0 1 5 9.2",
+  cursori:"M3 5h8.2a2.4 2.4 0 0 1 4.6 0H17v1.6h-1.2a2.4 2.4 0 0 1-4.6 0H3zm0 8.4h4.2a2.4 2.4 0 0 1 4.6 0H17V15h-5.2a2.4 2.4 0 0 1-4.6 0H3z",
+  fulmine:"M11.4 1 3 11.6h5L8.2 19 17 8.2h-5.4z",
+  soldi:"M2.5 5h15A1.5 1.5 0 0 1 19 6.5v7A1.5 1.5 0 0 1 17.5 15h-15A1.5 1.5 0 0 1 1 13.5v-7A1.5 1.5 0 0 1 2.5 5M10 7.4A2.6 2.6 0 1 0 10 12.6 2.6 2.6 0 0 0 10 7.4",
+  orologio:"M10 1.6a8.4 8.4 0 1 0 0 16.8 8.4 8.4 0 0 0 0-16.8m.9 4.2v4.4l3.4 2-.9 1.5-4.2-2.5V5.8z"
+};
+function stIco(nome, cls){
+  const d = STUDIO_ICONE[nome];
+  if(!d) return "";
+  return '<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"' +
+    (cls ? ' class="' + cls + '"' : '') + ' aria-hidden="true"><path d="' + d + '"/></svg>';
+}
+
+/* Un pannello: il mattone di tutte e tre le colonne. */
+function stPan(titolo, corpo, icona, spalla){
+  return '<section class="stpan">' +
+    (titolo
+      ? '<h3 class="stpank">' + (icona ? stIco(icona) : "") + studioEsc(titolo) +
+        (spalla ? '<em>' + studioEsc(spalla) + '</em>' : '') + '</h3>'
+      : "") +
+    corpo + '</section>';
+}
+
+/* Una riga da scegliere: pallino, miniatura, nome, e a destra quanto vale.
+   `attr` è quello che la rende cliccabile; senza, è una riga da leggere e
+   basta e allora non si accende sotto al dito (`.muta`). */
+function stScelta(o){
+  const tag = o.attr ? "button" : "div";
+  return '<' + tag + ' class="stscelta' + (o.on ? " on" : "") + (o.attr ? "" : " muta") +
+      '"' + (o.attr || "") + (o.tag === "button" || o.attr ? ' type="button"' : "") + '>' +
+    (o.senzaPallino ? "" : '<span class="stdot"></span>') +
+    (o.mini ? '<span class="stmini' + (o.tondo ? " tonda" : "") + '">' + o.mini + '</span>' : "") +
+    '<span class="stchi"><b>' + studioEsc(o.n) + '</b>' +
+      (o.d ? '<span>' + o.d + '</span>' : "") + '</span>' +
+    (o.v ? '<span class="stval' + (o.vCls ? " " + o.vCls : "") + '">' + o.v + '</span>' : "") +
+    '</' + tag + '>';
 }
 
 function studioVuoto(t){
   return '<div class="stvuoto">' + t + '</div>';
 }
 
-function studioOppure(t){
-  return '<div class="stoppure"><span>' + t + '</span></div>';
+/* I due tasti. Uno solo per schermata è d'oro, ed è quello che fa succedere
+   la cosa: nei riferimenti è sempre così. */
+function stPrimo(attr, testo, icona, spento){
+  return '<button type="button" class="stprimo"' + attr + (spento ? " disabled" : "") + '>' +
+    (icona ? stIco(icona) : "") + studioEsc(testo) + '</button>';
+}
+function stSecondo(attr, testo, icona, spento){
+  return '<button type="button" class="stsecondo"' + attr + (spento ? " disabled" : "") + '>' +
+    (icona ? stIco(icona) : "") + studioEsc(testo) + '</button>';
+}
+function stAzioni(){
+  const b = [].slice.call(arguments).filter(Boolean);
+  return b.length ? '<div class="stazioni">' + b.join("") + '</div>' : "";
 }
 
-/* la riga di un pezzo che si può scegliere: copertina, titolo, e il perché */
-function studioRigaPezzo(s, scelto, sotto, attr){
-  return '<div class="stpezzo' + (scelto ? " scelto" : "") + (s.mixed ? " ok" : "") + '"' +
-      (attr || "") + '>' +
-    '<span class="stcov">' + cover(s.seed || 7, s.t, (window.ARTIST || {}).name || "", s.img) + '</span>' +
-    '<span class="stchi"><b>' + studioEsc(s.t) + '</b><span>' + sotto + '</span></span>' +
-    (scelto ? '<span class="stspunta">✓</span>' : '') +
-    '</div>';
+/* la testa del pannello centrale: il titolo grosso e la riga sotto */
+function stTitolo(t, sotto){
+  return '<h2 class="sttitolone">' + studioEsc(t) + '</h2>' +
+    (sotto ? '<p class="stsotto">' + sotto + '</p>' : "");
+}
+function stRighe(html){
+  return '<div class="strighe">' + html + '</div>';
 }
 
+const stNum = v => '<span class="num">' + v + '</span>';
+const stOro = v => '<span class="oro">' + v + '</span>';
+
+/* la copertina di un pezzo, per le miniature e per il centro */
+function stCover(s){
+  return cover(s.seed || 7, s.t, (window.ARTIST || {}).name || "", s.img);
+}
+
+/* ==================== LE OTTO SEZIONI ====================
+   Ognuna torna tre pezzi: `sx`, `mid`, `dx`. Chi non ha niente da mettere in
+   una colonna torna stringa vuota, e quella colonna sparisce. */
+
+/* ---- BEAT — «da chi te lo fa» ---- */
 function studioSezBeat(){
   const gente = studioGente("beatmaker");
-  const righe = gente.map(p => {
-    const st = studioBeatPronto(p);
-    const costo = studioBeatPrezzo(p);
-    /* Il bottone dice sempre cosa fa; **sotto** c'è o il prezzo o il motivo
-       per cui adesso non si può. Prima il motivo finiva sul bottone al posto
-       del verbo, e chi guardava vedeva un tasto grigio con scritto «35 €»
-       senza capire se era il prezzo o un errore. */
-    return studioPersona(p,
-      '<button class="stgo" data-beat="' + studioEsc(p.id) + '"' + (st.ok ? "" : " disabled") + '>' +
-        'Fattelo fare</button>' +
-        '<span class="stsub' + (st.ok ? "" : " no") + '">' + (st.ok
-          /* i due separatori qui in mezzo erano scritti con una barra di
-             troppo e finivano a schermo come lettere: «20 energia · 2h». */
-          ? (costo ? fmt(costo) + " € · " : "gratis · ") + STUDIO_BEAT_ENERGIA + " energia · " + studioBeatTempoTesto() + " · q~" +
-            Math.round(20 + p.fama * 0.55 + p.rel * 7 + (G.skills.rete || 0) * 0.4)
-          : studioEsc(st.perche)) + '</span>', false);
-  }).join("");
+  const scelto = gente.find(p => p.id === (G.studio || {}).bm) || gente[0] || null;
 
-  return '<p class="stdice">Un beat comprato è un beat di chiunque. Uno che ti fa una ' +
-    'persona che ti conosce è tuo — e più siete in confidenza, meglio viene e meno costa. ' +
-    'I beatmaker si conoscono <b>alla Sala</b>.</p>' +
-    (righe || studioVuoto("Non conosci ancora nessun beatmaker. Passa dalla Sala: è lì che si trovano.")) +
-    studioOppure("oppure") +
-    '<button class="stazione" data-az="beat">' +
-      '<b>Gira a cercare beat</b>' +
-      '<span>Tre beat sul banco dello Shop, da comprare. Non serve conoscere nessuno, ' +
-      'e non costa energia: ci vogliono solo due ore.</span>' +
-    '</button>';
+  const sx = stPan("Chi te li fa",
+    gente.length
+      ? gente.map(p => {
+          const st = studioBeatPronto(p);
+          const c = studioBeatPrezzo(p);
+          return stScelta({
+            attr:' data-bm="' + studioEsc(p.id) + '"',
+            on: scelto === p,
+            mini: faccia(p, 38), tondo:true,
+            n: p.n,
+            d: relNome(p) + (p.gen ? " · " + studioEsc(genBeat(p.gen).n.toLowerCase()) : ""),
+            v: st.ok ? (c ? fmt(c) + " €" : "gratis") : "—",
+            vCls: st.ok ? (c ? "" : "calmo") : "calmo"
+          });
+        }).join("")
+      : studioVuoto("Non conosci ancora nessun beatmaker. Passa <b>dalla Sala</b>: è lì che si trovano."),
+    "mic");
+
+  let mid;
+  if(scelto){
+    const st = studioBeatPronto(scelto);
+    const c = studioBeatPrezzo(scelto);
+    const q = Math.round(20 + scelto.fama * 0.55 + scelto.rel * 7 + (G.skills.rete || 0) * 0.4);
+    mid = stPan("",
+      stTitolo(scelto.n, 'te lo fa <b>' + relNome(scelto) + '</b>' +
+        (scelto.gen ? ' · ' + studioEsc(genBeat(scelto.gen).n.toLowerCase()) : '')) +
+      '<p class="stnota">Un beat comprato è un beat di chiunque. Uno che ti fa una persona che ' +
+        'ti conosce è <b>tuo</b> — e più siete in confidenza, meglio viene e meno costa.</p>' +
+      stRighe(
+        'costa ' + stOro(c ? fmt(c) + " €" : "niente") + ' · ' +
+        stNum(STUDIO_BEAT_ENERGIA) + ' energia · ' + stNum(studioBeatTempoTesto()) + '<br>' +
+        'ne esce un beat da circa ' + stNum("q" + q) + ', e te lo mette in cartella lui') +
+      stAzioni(
+        stPrimo(' data-beat="' + studioEsc(scelto.id) + '"', "Fattelo fare", "spunta", !st.ok),
+        stSecondo(' data-az="beat"', "Gira a cercare beat", "carrello")) +
+      (st.ok ? "" : '<p class="stperche">' + studioEsc(st.perche) + '</p>'));
+  } else {
+    mid = stPan("",
+      stTitolo("Nessuno, per ora", "il beat te lo devi comprare") +
+      '<p class="stnota">Senza qualcuno che te lo faccia resta lo Shop: tre beat sul banco, ' +
+      'da comprare. Non serve conoscere nessuno, e non costa energia — ci vogliono due ore.</p>' +
+      stAzioni(stPrimo(' data-az="beat"', "Gira a cercare beat", "carrello")));
+  }
+
+  const dx = stPan("Quello che hai in cartella",
+    (G.beats || []).length
+      ? (G.beats || []).map(b => stScelta({
+          senzaPallino:true, n:b.n,
+          d:"q" + b.q + (b.gen ? " · " + studioEsc(genBeat(b.gen).n.toLowerCase()) : "") +
+            (b.da ? " · " + studioEsc(b.da) : "")
+        })).join("")
+      : studioVuoto("Cartella vuota."),
+    "cartella", (G.beats || []).length ? (G.beats.length + " beat") : "");
+
+  return {sx, mid, dx};
 }
 
-/* ---- TESTO: le barre. Prima stava dentro alla Cabina come ripiego, quando
-   non avevi niente da incidere. Ma il testo è uno dei sette elementi del
-   punto 4, non il messaggio d'errore di un altro: qui ha la sua stanza, e si
-   vede quello che hai scritto invece di sapere solo che «c'è una strofa». */
+/* ---- TESTO — le barre ---- */
 function studioSezTesto(){
   const barre = (G.bars || []).slice().sort((a, b) => b.q - a.q);
-  const righe = barre.map((b, i) =>
-    '<div class="stbarra' + (i === 0 ? " top" : "") + '">' +
-      '<span class="stq">' + b.q + '</span>' +
-      '<span class="stchi"><b>' + studioEsc(b.tema || "strofa senza tema") + '</b>' +
-      '<span>' + (i === 0 ? "la prossima che entra in cabina" : "in cartella") + '</span></span>' +
-    '</div>').join("");
+  const top = barre[0];
 
-  return '<p class="stdice">Il beat lo puoi comprare, il testo no. È l\'unica parte del ' +
-    'pezzo che non può farti nessun altro — e nella qualità finale <b>pesa più di tutto ' +
-    'il resto</b>. In cabina ci entra la migliore che hai.</p>' +
-    (righe || studioVuoto("Non hai barre scritte. Finché il foglio è bianco, in cabina non si entra.")) +
-    studioOppure("e poi") +
-    '<button class="stazione" data-az="scrivi">' +
-      '<b>Scrivi le barre</b>' +
-      '<span>Ti siedi e ci lavori. Quanto viene buona dipende da scrittura, ' +
-      'benessere e da quanto sei lucido.</span>' +
-    '</button>';
+  const sx = stPan("Le tue barre",
+    barre.length
+      ? barre.map((b, i) => stScelta({
+          on:i === 0, senzaPallino:false, n:b.tema || "strofa senza tema",
+          d:i === 0 ? "la prossima che entra in cabina" : "in cartella",
+          v:"q" + b.q
+        })).join("")
+      : studioVuoto("Il foglio è bianco."),
+    "matita", barre.length ? (barre.length + (barre.length === 1 ? " strofa" : " strofe")) : "");
+
+  const mid = stPan("",
+    stTitolo(top ? (top.tema || "La strofa") : "Il foglio bianco",
+      top ? 'qualità ' + stOro("q" + top.q) + ' · è questa che entra in cabina'
+          : 'niente da incidere, per ora') +
+    '<p class="stnota">Il beat lo puoi comprare, il testo no. È l\'unica parte del pezzo che non ' +
+      'può farti nessun altro — e nella qualità finale <b>pesa più di tutto il resto</b>.</p>' +
+    stRighe('quanto viene buona dipende da ' + stNum("scrittura") + ', ' + stNum("benessere") +
+      ' e da quanto sei ' + stNum("lucido") + '.') +
+    stAzioni(stPrimo(' data-az="scrivi"', "Scrivi le barre", "matita")));
+
+  return {sx, mid, dx:""};
 }
 
+/* ---- CABINA — dove si incide ---- */
 function studioSezCabina(){
   const b = bestBar(), bt = bestBeat();
   const fon = studioFonico();
   const ft = studioFeat();
-  const aiuto = studioAiuto(fon);
-  const aiutoFt = studioAiutoFeat(ft);
+  const aiuto = studioAiuto(fon), aiutoFt = studioAiutoFeat(ft);
   const q = (b && bt) ? Math.round(songQ(b, bt)) + aiuto + aiutoFt : null;
-
   const gente = studioGente("fonico");
-  const righe = gente.map(p => studioPersona(p,
-    '<button class="stgo' + (studioFonico() === p ? " on" : "") + '" data-fonico="' + studioEsc(p.id) + '">' +
-      (studioFonico() === p ? "È lui" : "Chiamalo") + '</button>' +
-      '<span class="stsub">' + (studioAiuto(p) ? "+" + studioAiuto(p) + " qualità" : "ancora niente") + '</span>',
-    studioFonico() === p)).join("");
 
-  return '<p class="stdice">Dietro al vetro ci può stare qualcuno. Un fonico che ti ' +
-    'conosce sa dove metterti la voce prima che glielo chiedi: <b>vale qualità</b>, ' +
-    'in cabina e al banco, e cresce con quanto avete lavorato insieme.</p>' +
-    (righe || studioVuoto("Non conosci ancora nessun fonico. Alla Sala ce ne gira più di uno.")) +
-    studioOppure("e poi") +
-    (b && bt
-      ? '<button class="stazione" data-az="registra">' +
-          '<b>Registra il pezzo</b>' +
-          '<span>«' + studioEsc(b.tema || "la strofa") + '» su «' + studioEsc(bt.n) + '» · ' +
-          'qualità ~' + q + (fon ? ' · con ' + studioEsc(fon.n) + ' (+' + aiuto + ')' : ' · da solo') +
-          (ft ? ' · feat ' + studioEsc(ft.n) + ' (+' + aiutoFt + ')' : '') +
-          '</span></button>'
-      /* senza strofa la cabina non è un vicolo cieco: scrivere è la prima cosa
-         che si fa in studio, e da qui ci si arriva invece di andarla a cercare */
-      : !b
-        ? '<button class="stazione" data-az="scrivi">' +
-            '<b>Scrivi le barre</b>' +
-            '<span>Senza una strofa non c\'è niente da registrare. Si comincia dal foglio.</span>' +
-          '</button>' +
-          (!bt ? studioVuoto("E serve anche un beat: te lo fai fare al Beat.") : "")
-        : studioVuoto("Hai la strofa, manca il beat. Te lo fai fare al Beat, " +
-            "o lo compri allo Shop."));
+  const sx = stPan("Dietro al vetro",
+    gente.map(p => stScelta({
+      attr:' data-fonico="' + studioEsc(p.id) + '"',
+      on:fon === p, mini:faccia(p, 38), tondo:true,
+      n:p.n, d:relNome(p),
+      v:studioAiuto(p) ? "+" + studioAiuto(p) + " qual." : "—",
+      vCls:studioAiuto(p) ? "" : "calmo"
+    })).join("") +
+    stScelta({senzaPallino:false, on:!fon, n:"da solo",
+      d:"quello che sai fare tu", v:"+0", vCls:"calmo"}) +
+    (gente.length ? "" : studioVuoto("Non conosci ancora nessun fonico. <b>Alla Sala</b> ce ne gira più di uno.")),
+    "cursori");
+
+  let mid;
+  if(b && bt){
+    mid = stPan("",
+      stTitolo("Si incide", '«' + studioEsc(b.tema || "la strofa") + '» su «' + studioEsc(bt.n) + '»') +
+      '<p class="stnota">Un fonico che ti conosce sa dove metterti la voce prima che glielo ' +
+        'chiedi: <b>vale qualità</b>, in cabina e al banco.</p>' +
+      stRighe(
+        'ne esce una traccia da circa ' + stOro("q" + q) + '<br>' +
+        (fon ? 'con <b>' + studioEsc(fon.n) + '</b> dietro al vetro ' + stNum("+" + aiuto) : 'da solo, nessuno dietro al vetro') +
+        (ft ? '<br>e <b>' + studioEsc(ft.n) + '</b> in sessione ' + stNum("+" + aiutoFt) : '')) +
+      stAzioni(stPrimo(' data-az="registra"', "Registra il pezzo", "mic")));
+  } else if(!b){
+    mid = stPan("",
+      stTitolo("Manca la strofa", "senza foglio non si entra") +
+      '<p class="stnota">Non c\'è niente da registrare. Si comincia dal foglio, ' +
+        'e il foglio sta nel <b>Testo</b>.</p>' +
+      stAzioni(stPrimo(' data-az="scrivi"', "Scrivi le barre", "matita")) +
+      (!bt ? studioVuoto("E serve anche un beat: te lo fai fare al <b>Beat</b>.") : ""));
+  } else {
+    mid = stPan("",
+      stTitolo("Manca il beat", "hai la strofa, non su cosa metterla") +
+      '<p class="stnota">Te lo fai fare al <b>Beat</b>, da uno che conosci, ' +
+        'oppure lo compri allo Shop.</p>');
+  }
+
+  const dx = stPan("Che cosa incidi",
+    '<h4 class="stnota" style="margin:0 0 7px;letter-spacing:.08em;text-transform:uppercase;font-size:11px;font-weight:900;color:var(--stFaint)">Strofa</h4>' +
+    (b ? stScelta({on:true, n:b.tema || "strofa senza tema", d:"scritta da te", v:"q" + b.q})
+       : studioVuoto("Nessuna.")) +
+    '<h4 class="stnota" style="margin:12px 0 7px;letter-spacing:.08em;text-transform:uppercase;font-size:11px;font-weight:900;color:var(--stFaint)">Beat</h4>' +
+    (bt ? stScelta({on:true, n:bt.n,
+            d:(bt.gen ? studioEsc(genBeat(bt.gen).n.toLowerCase()) + " · " : "") + "q" + bt.q +
+              (bt.da ? " · " + studioEsc(bt.da) : "")})
+        : studioVuoto("Nessuno.")),
+    "cartella");
+
+  return {sx, mid, dx};
 }
 
+/* ---- MIX — dove il provino diventa pezzo ---- */
 function studioSezBanco(){
   const da = unmixed().sort((a, b) => b.q - a.q);
   const scelto = studioDaMixare() || da[0];
   const fon = studioFonico();
-  const lista = da.map(s => studioRigaPezzo(s, scelto === s,
-    'qualità ' + s.q + ' → ' + clamp(s.q + mixGain(), 5, 100) + ' se lo mixi',
-    ' data-mixa="' + s.seed + '"')).join("");
+  const g = mixGain();
 
-  return '<p class="stdice">Il mix è dove un provino diventa un pezzo. Da solo fai ' +
-    'quello che sai fare; con un fonico dietro, quello che sa fare lui. ' +
-    'Il provino <b>lo scegli tu</b>: non è detto che convenga sempre il migliore.</p>' +
+  const sx = stPan("Al banco",
     (fon
-      ? studioPersona(fon, '<span class="stsub">al banco · +' + studioAiuto(fon) + ' qualità</span>', true)
-      : studioVuoto("Nessuno al banco: il mix lo fai tu. Un fonico si chiama dalla Cabina.")) +
-    (lista ? studioOppure("da mixare") + lista : "") +
-    studioOppure("e poi") +
-    (scelto
-      ? '<button class="stazione" data-az="mixa">' +
-          '<b>Mixa «' + studioEsc(scelto.t) + '»</b>' +
-          '<span>qualità ' + scelto.q + ' → ' + clamp(scelto.q + mixGain(), 5, 100) +
-          ' · +' + mixGain() + (fon ? ', di cui ' + studioAiuto(fon) + ' suoi' : '') +
-          '</span></button>'
-      : studioVuoto("Non c'è niente da mixare. Prima si registra."));
+      ? stScelta({on:true, mini:faccia(fon, 38), tondo:true, n:fon.n, d:relNome(fon),
+          v:"+" + studioAiuto(fon) + " qual."})
+      : "") +
+    stScelta({on:!fon, n:"da solo", d:"il mix lo fai tu", v:"+0", vCls:"calmo"}) +
+    (fon ? "" : studioVuoto("Nessuno al banco. Un fonico si chiama <b>dalla Cabina</b>.")),
+    "cursori");
+
+  let mid;
+  if(scelto){
+    mid = stPan("",
+      stTitolo("Mixi «" + scelto.t + "»", 'adesso è ' + stOro("q" + scelto.q)) +
+      '<p class="stnota">Il mix è dove un provino diventa un pezzo. Da solo fai quello che sai ' +
+        'fare; con un fonico dietro, quello che sa fare lui. Il provino <b>lo scegli tu</b>: ' +
+        'non è detto che convenga sempre il migliore.</p>' +
+      stRighe(
+        'qualità ' + stNum(scelto.q) + ' → ' + stOro(clamp(scelto.q + g, 5, 100)) +
+        ' · ' + stNum("+" + g) +
+        (fon ? ', di cui ' + stNum(studioAiuto(fon)) + ' suoi' : '')) +
+      stAzioni(stPrimo(' data-az="mixa"', "Chiudi il mix", "spunta")));
+  } else {
+    mid = stPan("",
+      stTitolo("Niente da mixare", "il banco è spento") +
+      '<p class="stnota">Prima si registra. Il provino arriva <b>dalla Cabina</b>.</p>');
+  }
+
+  const dx = stPan("Da mixare",
+    da.length
+      ? da.map(s => stScelta({
+          attr:' data-mixa="' + s.seed + '"', on:scelto === s,
+          mini:stCover(s), n:s.t, d:"q" + s.q + " · grezzo",
+          v:"→ " + clamp(s.q + g, 5, 100)
+        })).join("")
+      : studioVuoto("Nessun provino."),
+    "cartella", da.length ? (da.length + (da.length === 1 ? " provino" : " provini")) : "");
+
+  return {sx, mid, dx};
 }
 
+/* ---- COVER — la faccia del pezzo ---- */
 function studioSezCover(){
   const pronti = ready();
   const s = studioPezzoCover();
-  const lista = pronti.map(x => studioRigaPezzo(x, s === x,
-    'qualità ' + x.q + (x.img ? " · copertina tua" : " · copertina generata"),
-    ' data-cover="' + x.seed + '"')).join("");
 
-  return '<p class="stdice">Sulla qualità <b>pesa poco</b>, su chi ti clicca pesa tutto: ' +
-    'la copertina è la prima cosa che si vede di un pezzo, spesso l\'unica. ' +
-    'Puoi tenere quella che genera il gioco o metterci una foto tua.</p>' +
-    (lista || studioVuoto("Non hai pezzi a cui cambiare la copertina. Si comincia dalla Cabina.")) +
-    (s
-      ? studioOppure("su «" + studioEsc(s.t) + "»") +
-        '<div class="stcopgrande">' +
-          '<span class="stcopbig">' + cover(s.seed || 7, s.t, (window.ARTIST || {}).name || "", s.img) + '</span>' +
-          '<div class="stcopaz">' +
-            '<button class="stgo" data-cov="carica">Carica una foto</button>' +
-            (s.img
-              ? '<button class="stgo" data-cov="togli">Togli la foto</button>'
-              : '<button class="stgo" data-cov="altra">Generane un\'altra</button>') +
-            '<span class="stsub">JPG o PNG. La ritaglio quadrata io, a 360×360.</span>' +
+  const sx = stPan("I tuoi pezzi",
+    pronti.length
+      ? pronti.map(x => stScelta({
+          attr:' data-cover="' + x.seed + '"', on:s === x,
+          mini:stCover(x), n:x.t,
+          d:"q" + x.q + (x.img ? " · copertina tua" : " · generata")
+        })).join("")
+      : studioVuoto("Non hai pezzi a cui cambiare la copertina."),
+    "cartella");
+
+  const mid = s
+    ? stPan("",
+        '<div class="stfianco">' +
+          '<span class="stcopertina">' + stCover(s) + '</span>' +
+          '<div>' +
+            stTitolo(s.t, 'qualità ' + stOro("q" + s.q) + ' · ' +
+              (s.mixed ? "mixato" : "grezzo")) +
+            '<p class="stnota">Sulla qualità <b>pesa poco</b>, su chi ti clicca pesa tutto: ' +
+              'è la prima cosa che si vede di un pezzo, spesso l\'unica.</p>' +
+            stAzioni(
+              stPrimo(' data-cov="carica"', "Carica una foto", "foto"),
+              s.img
+                ? stSecondo(' data-cov="togli"', "Togli la foto", "rinnova")
+                : stSecondo(' data-cov="altra"', "Generane un'altra", "rinnova")) +
           '</div>' +
         '</div>' +
-        studioVuoto("La terza strada — costruirtela a livelli, stile emblema di Black Ops 2 — " +
-          "non c'è ancora: è una pagina a parte, non un bottone.")
-      : "");
+        stRighe('JPG o PNG, la ritaglio quadrata io a ' + stNum("360×360") + '. ' +
+          'La terza strada del punto 4 — costruirtela a livelli, stile emblema di Black Ops 2 — ' +
+          'non c\'è ancora: è una pagina a parte, non un bottone.'))
+    : stPan("",
+        stTitolo("Nessun pezzo", "niente da vestire") +
+        '<p class="stnota">La copertina si mette a un pezzo registrato. Si comincia ' +
+          'dalla <b>Cabina</b>.</p>');
+
+  return {sx, mid, dx:""};
 }
 
+/* ---- FEAT — con chi lo fai ---- */
 function studioSezFeat(){
   const gente = studioGente("rapper");
   const ft = studioFeat();
-  const righe = gente.map(p => studioPersona(p,
-    '<button class="stgo' + (ft === p ? " on" : "") + '" data-feat="' + studioEsc(p.id) + '">' +
-      (ft === p ? "È dei nostri" : "Chiamalo") + '</button>' +
-      '<span class="stsub">' + (studioAiutoFeat(p) ? "+" + studioAiutoFeat(p) + " qualità" : "ancora niente") +
-      '</span>', ft === p)).join("");
 
-  return '<p class="stdice">Un feat non è obbligatorio. Ma se il pezzo lo fate <b>insieme, ' +
-    'in sessione</b>, si sente — quanto vale dipende da quanto è grosso lui e da quanto ' +
-    'vi conoscete. Vale per <b>un pezzo solo</b>: chi viene in studio ci viene per quello, ' +
-    'poi torna a fare il suo.</p>' +
-    (righe || studioVuoto("Non conosci ancora nessun altro rapper. Si incontrano alla Sala — " +
-      "e non tutti hanno voglia di dividere un pezzo.")) +
-    (ft
-      ? studioOppure("in sessione") +
-        studioVuoto("<b>" + studioEsc(ft.n) + "</b> è sul prossimo pezzo che registri: " +
-          "+" + studioAiutoFeat(ft) + " di qualità. Poi il posto torna libero.")
-      : "");
+  const sx = stPan("Chi può entrarci",
+    gente.length
+      ? gente.map(p => stScelta({
+          attr:' data-feat="' + studioEsc(p.id) + '"', on:ft === p,
+          mini:faccia(p, 38), tondo:true, n:p.n,
+          d:relNome(p) + " · fama " + p.fama,
+          v:studioAiutoFeat(p) ? "+" + studioAiutoFeat(p) + " qual." : "—",
+          vCls:studioAiutoFeat(p) ? "" : "calmo"
+        })).join("")
+      : studioVuoto("Non conosci ancora nessun altro rapper. Si incontrano <b>alla Sala</b> — " +
+          "e non tutti hanno voglia di dividere un pezzo."),
+    "mic");
+
+  const mid = ft
+    ? stPan("",
+        stTitolo(ft.n, 'è sul prossimo pezzo che registri') +
+        '<p class="stnota">Un feat non è obbligatorio. Ma se il pezzo lo fate <b>insieme, in ' +
+          'sessione</b>, si sente — quanto vale dipende da quanto è grosso lui e da quanto vi ' +
+          'conoscete.</p>' +
+        stRighe(
+          'vale ' + stOro("+" + studioAiutoFeat(ft)) + ' di qualità sulla prossima traccia<br>' +
+          'e vale per <b>un pezzo solo</b>: chi viene in studio ci viene per quello, ' +
+          'poi torna a fare il suo') +
+        stAzioni(stSecondo(' data-feat="' + studioEsc(ft.id) + '"', "Lascia perdere", "rinnova")))
+    : stPan("",
+        stTitolo("Nessun feat", "il pezzo lo fai tutto tu") +
+        '<p class="stnota">Va benissimo così: il feat è una scelta, non un passaggio. ' +
+          'Se ne chiami uno, la traccia che registri dopo vale di più.</p>');
+
+  return {sx, mid, dx:""};
 }
 
+/* ---- MARKETING — farlo sapere ---- */
 function studioSezMarketing(){
-  const fuori = (G.songs || []).filter(x => x.released);
-  const ultimo = fuori.slice().sort((a, b) => (b.week || 0) - (a.week || 0))[0];
+  const fuori = (G.songs || []).filter(x => x.released)
+    .sort((a, b) => (b.week || 0) - (a.week || 0));
+  const ultimo = fuori[0];
 
-  return '<p class="stdice">Il pezzo è uscito: adesso qualcuno lo deve sapere. ' +
-    'Questa è la promo che parte <b>da qui, dallo studio</b> — clip, provocazioni, ' +
-    'quello che si fa col telefono in mano appena finita la sessione.</p>' +
+  const sx = stPan("Cosa spingi",
+    fuori.length
+      ? fuori.slice(0, 6).map((x, i) => stScelta({
+          on:i === 0, mini:stCover(x), n:x.t,
+          d:"q" + x.q + " · " + fmt(x.streams || 0) + " stream"
+        })).join("")
+      : studioVuoto("Non hai ancora fatto uscire niente."),
+    "cartella");
+
+  const mid = stPan("",
+    stTitolo(ultimo ? "Promo di «" + ultimo.t + "»" : "Niente da spingere",
+      ultimo ? 'clip e provocazioni, dallo studio' : 'la promo accende un pezzo già uscito') +
+    '<p class="stnota">Il pezzo è uscito: adesso qualcuno lo deve sapere. Questa è la promo che ' +
+      'parte <b>da qui, dallo studio</b> — quello che si fa col telefono in mano appena finita ' +
+      'la sessione.</p>' +
     (ultimo
-      ? studioRigaPezzo(ultimo, false, 'l\'ultimo uscito · qualità ' + ultimo.q +
-          ' · ' + fmt(ultimo.streams || 0) + ' stream')
-      : studioVuoto("Niente da spingere: la promo accende un pezzo già uscito.")) +
-    studioOppure("e poi") +
-    /* Come al banco: se la mossa non si può fare, non si mette un bottone che
-       sembra vivo e poi risponde di no. */
-    (fuori.length
-      ? '<button class="stazione" data-az="promo">' +
-          '<b>Promo sui social</b>' +
-          '<span>Clip e provocazioni. Accende quello che hai già fuori.</span>' +
-        '</button>'
-      : studioVuoto("Prima esce un pezzo, poi lo si spinge. Si passa dal Timing.")) +
-    studioVuoto("Le altre due strade del marketing — la campagna dall\'app <b>Discografia</b> " +
-      "sul telefono, e il giro dei giornalisti — non sono ancora collegate qui.");
+      ? stAzioni(stPrimo(' data-az="promo"', "Promo sui social", "invio"))
+      : stAzioni(stPrimo(' data-az="promo"', "Promo sui social", "invio", true)) +
+        '<p class="stperche">Prima esce un pezzo, poi lo si spinge. Si passa dal Timing.</p>') +
+    stRighe('Le altre due strade — la campagna dall\'app <b>Discografia</b> sul telefono e il ' +
+      'giro dei giornalisti — non sono ancora collegate qui.'));
+
+  return {sx, mid, dx:""};
 }
 
-/* ---- TIMING: quale esce, e quando. Prima si chiamava «Fuori» e usciva
-   sempre il pezzo migliore, deciso da `sort()[0]`. Il punto 4 mette il timing
-   fra gli elementi che decidono come va un pezzo: la prima metà di quella
-   decisione — **quale** — è qui e funziona. La seconda — **quando**, cioè
-   programmare l'uscita al venerdì — vuole un gancio nell'orologio e sta
-   scritta nel progetto delle pagine, non qui. */
+/* ---- TIMING — quale esce, e quando ---- */
 function studioSezFuori(){
   const pronti = ready().sort((a, b) => b.q - a.q);
   const s = studioDaPubblicare() || pronti[0];
@@ -589,30 +776,81 @@ function studioSezFuori(){
   const ultimo = usciti.slice().sort((a, b) => (b.week || 0) - (a.week || 0))[0];
   const da = ultimo && typeof totalWeeks === "function"
     ? Math.max(0, totalWeeks() - (ultimo.week || 0)) : null;
+  const qFinale = s ? (s.mixed ? s.q : clamp(s.q - 8, 5, 100)) : 0;
 
-  return '<p class="stdice">Quello che è finito e aspetta solo di uscire. Un pezzo non ' +
-    'mixato esce lo stesso, ma ci perde otto punti: la fretta si sente. ' +
-    (da == null
-      ? 'Non hai ancora fatto uscire niente: il primo pezzo è quello che dice chi sei.'
-      : da === 0
-        ? '<b>Sei uscito questa settimana</b>: due pezzi ravvicinati si rubano l\'ascolto.'
-        : da === 1
-          ? 'È passata <b>una settimana</b> dall\'ultima uscita.'
-          : 'Sono passate <b>' + da + ' settimane</b> dall\'ultima uscita.') + '</p>' +
-    (pronti.length
-      ? pronti.map(x => studioRigaPezzo(x, s === x,
-          'qualità ' + x.q + (x.mixed ? " · mixato" : " · non mixato, −8 se esce così"),
-          ' data-esce="' + x.seed + '"')).join("")
-      : studioVuoto("Non hai niente di pronto. Si comincia dal beat.")) +
-    (s
-      ? studioOppure("e poi") +
-        '<button class="stazione" data-az="pubblica">' +
-          '<b>Manda fuori «' + studioEsc(s.t) + '»</b>' +
-          '<span>esce con qualità ' + (s.mixed ? s.q : clamp(s.q - 8, 5, 100)) +
-          '. Da qui in poi corre da solo: quello che succede dopo lo racconta la ' +
-          'Discografia.</span>' +
-        '</button>'
-      : "");
+  const sx = stPan("Quando",
+    stScelta({on:true, n:"adesso", d:"esce appena premi", v:"", }) +
+    studioVuoto("Le altre due strade del disegno — <b>aspettare il venerdì</b> per un pezzo di " +
+      "hype in più, e <b>tenerlo nel cassetto</b> per un progetto più avanti — vogliono un " +
+      "gancio nell'orologio, e quello non c'è ancora."),
+    "orologio");
+
+  let mid;
+  if(s){
+    mid = stPan("",
+      '<div class="stfianco">' +
+        '<span class="stcopertina">' + stCover(s) + '</span>' +
+        '<div>' +
+          stTitolo(s.t, 'esce con ' + stOro("q" + qFinale) + ' · ' +
+            (s.mixed ? "mixato" : "<b>non mixato</b>")) +
+          '<p class="stnota">' +
+            (da == null
+              ? 'Non hai ancora fatto uscire niente: il primo pezzo è quello che dice chi sei.'
+              : da === 0
+                ? '<b>Sei uscito questa settimana</b>: due pezzi ravvicinati si rubano l\'ascolto.'
+                : da === 1
+                  ? 'È passata <b>una settimana</b> dall\'ultima uscita.'
+                  : 'Sono passate <b>' + da + ' settimane</b> dall\'ultima uscita.') +
+          '</p>' +
+          stAzioni(stPrimo(' data-az="pubblica"', "Mandalo fuori", "invio")) +
+        '</div>' +
+      '</div>' +
+      stRighe(s.mixed
+        ? 'Da qui in poi corre da solo: quello che succede dopo lo racconta la Discografia.'
+        : 'Non è mixato: esce lo stesso, ma ci perde ' + stNum("8 punti") + '. La fretta si sente.'));
+  } else {
+    mid = stPan("",
+      stTitolo("Niente di pronto", "non c'è niente da mandare fuori") +
+      '<p class="stnota">Si comincia dal <b>Beat</b>, poi il <b>Testo</b>, ' +
+        'poi la <b>Cabina</b>.</p>');
+  }
+
+  const dx = stPan("Pronti",
+    pronti.length
+      ? pronti.map(x => stScelta({
+          attr:' data-esce="' + x.seed + '"', on:s === x,
+          mini:stCover(x), n:x.t,
+          /* l'avviso sta **sotto al nome**, non a fianco: a fianco si prende
+             la larghezza e il titolo del pezzo finisce troncato a metà */
+          d:"q" + x.q + (x.mixed
+            ? " · mixato"
+            : ' · grezzo · <span style="color:var(--stRosso)">−8 se esce così</span>')
+        })).join("")
+      : studioVuoto("Niente in coda."),
+    "cartella", pronti.length ? (pronti.length + (pronti.length === 1 ? " pezzo" : " pezzi")) : "");
+
+  return {sx, mid, dx};
+}
+
+/* ==================== LA PAGINA ==================== */
+/* energia · soldi · ora, come nella fascia dei riferimenti */
+function studioRisorse(){
+  const ora = (typeof GAME_TIME !== "undefined" && typeof GAME_TIME.text === "function")
+    ? GAME_TIME.text() : "";
+  const punto = '<span class="stpunto"><em>·</em></span>';
+  return '<span>' + stIco("fulmine") + '<i>energia</i><b>' + Math.round(G.energy) + '</b></span>' +
+    punto +
+    '<span>' + stIco("soldi") + '<b>' + fmt(G.money) + ' €</b></span>' +
+    (ora ? punto + '<span>' + stIco("orologio") + '<b>' + studioEsc(ora) + '</b></span>' : "");
+}
+
+/* La riga in basso: se il diario di bordo ha qualcosa da dire lo dice lui —
+   è la voce che nei riferimenti racconta com'è andata l'ultima cosa. Quando
+   tace, parla la sezione. */
+function studioBanda(sez){
+  const ultima = (G.log && G.log[0] && G.log[0].t) || "";
+  return '<span class="stbolla">' + stIco("bolla") + '</span>' +
+    '<span class="stdetto">' + (ultima || '<i>' + studioEsc(sez.d) + '</i>') + '</span>';
 }
 
 function renderStudio(){
@@ -620,7 +858,6 @@ function renderStudio(){
   if(!root || !root.classList.contains("on")) return;
 
   const sez = STUDIO_SEZIONI.find(x => x.id === STUDIO_SEZ) || STUDIO_SEZIONI[0];
-  const art = (typeof SC !== "undefined" && SC[sez.sc]) || ["#8B5CF6", "#1D1030", ""];
 
   const tabs = $("st-tabs");
   tabs.innerHTML = STUDIO_SEZIONI.map(x =>
@@ -638,28 +875,18 @@ function renderStudio(){
     acceso.scrollIntoView({block:"nearest", inline:"nearest"});
   studioOltre();
 
-  /* La foto se c'è, il disegno se no. Non tutte e due: sovrapporre una
-     scenetta a una fotografia le fa sembrare entrambe finte. */
-  const foto = STUDIO_FOTO[sez.id];
+  /* la foto della stanza, a schermo intero */
+  const foto = STUDIO_FOTO[sez.id] || null;
   const scena = $("st-scena");
-  scena.classList.toggle("foto", !!foto);
   scena.style.backgroundImage = foto ? 'url("' + STUDIO_FOTO_DIR + foto.f + '")' : "";
-  scena.style.backgroundPosition = foto ? foto.pos : "";
-  scena.innerHTML = (!foto && art[2])
-    /* `YMin` e non `YMid`: la fascia ritaglia, e quello che conta in queste
-       scenette sta in alto — centrando si tagliava la testa a chi c'è dentro. */
-    ? '<svg viewBox="0 0 200 128" preserveAspectRatio="xMidYMin slice" xmlns="http://www.w3.org/2000/svg">' +
-      art[2] + '</svg>'
-    : "";
-  scena.style.setProperty("--k", art[0]);
-  $("st-dove").innerHTML = '<b>' + sez.n + '</b> — ' + sez.d;
+  scena.style.backgroundPosition = foto ? foto.pos : "center";
 
-  $("st-risorse").innerHTML =
-    '<span><i>energia</i>' + Math.round(G.energy) + '</span>' +
-    '<span><i>soldi</i>' + fmt(G.money) + ' €</span>' +
-    '<span><i>lucidità</i>' + Math.round(typeof luc === "function" ? luc() : 0) + '</span>';
+  $("st-nome").innerHTML = studioEsc(sez.n) + '<i>· ' + studioEsc(sez.d) + '</i>';
+  $("st-risorse").innerHTML = studioRisorse();
+  $("st-banda").innerHTML = studioBanda(sez);
+  $("st-banda").hidden = false;
 
-  $("st-corpo").innerHTML =
+  const parti =
     (sez.id === "beat"   ? studioSezBeat() :
      sez.id === "testo"  ? studioSezTesto() :
      sez.id === "cabina" ? studioSezCabina() :
@@ -668,11 +895,10 @@ function renderStudio(){
      sez.id === "feat"   ? studioSezFeat() :
      sez.id === "promo"  ? studioSezMarketing() :
      studioSezFuori());
-    /* Qui in fondo c'era «Tutte le mosse della settimana →», la porta verso
-       l'elenco. Quell'elenco non è più una schermata: il palco sta al Live
-       Club, il turno in Pizzeria o in Fabbrica, staccare la spina a Casa,
-       pesi e cardio in Palestra, il lavoro al Centro per l'impiego. E la
-       promo è entrata qui sopra, in «Marketing». Non resta niente da linkare. */
+
+  $("st-sx").innerHTML = parti.sx || "";
+  $("st-corpo").innerHTML = parti.mid || "";
+  $("st-dx").innerHTML = parti.dx || "";
 }
 
 /* ==================== APRI E CHIUDI ====================
