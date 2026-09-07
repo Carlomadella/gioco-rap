@@ -5,8 +5,8 @@ I punti chiusi che stavano in [`implementazioni.md`](implementazioni.md), tolti 
 viene, non l'archivio.
 
 **Il racconto lungo di quasi tutte sta nel file del loro argomento** — è la regola scritta
-in [`00-come-si-lavora.md`](00-come-si-lavora.md), e l'indice di tutti i punti col loro
-stato è [`README.md`](README.md). Qui c'è quello che era rimasto indietro nel foglio dei
+in [`come-si-lavora.md`](../documentazione/come-si-lavora.md), e l'indice di tutti i punti
+col loro stato è [`README.md`](README.md). Qui c'è quello che era rimasto indietro nel foglio dei
 punti nuovi: la richiesta com'era scritta e la nota di cosa è stato fatto, verbatim, senza
 riscriverle.
 
@@ -22,7 +22,7 @@ un'altra cosa.
 
 | quando | quante |
 | --- | --- |
-| 07/09/2026 | 3 |
+| 07/09/2026 | 5 |
 | 06/09/2026 | 10 |
 
 ---
@@ -115,6 +115,31 @@ _Da `implementazioni.md`, ALE 14._
     se lo ricostruisce da solo). `npm run prova` (70/70) più due verifiche
     dedicate fuori dal browser: le formule del diario, e i tre contatori nuovi
     provati sul codice vero (azione live, feat alla Sala, colpo della Strada).
+
+### Un file coi comandi del terminale
+
+_Da `implementazioni/00-come-si-lavora.md`, punto 49 — stavano in coda alle regole di
+lavoro, che sono regole e non un archivio._
+
+49. Creami il file comandidelterminale.md in cui scrivi tutti i comandi da lanciare nel terminale per essere sempre aggiornati a vicenda con carletto e per fare partire il frontend e backend
+
+    **FATTO (01/09/2026).** `documentazione/comandidelterminale.md` (stava in radice fino al
+    punto sui file .md in cartelle con nomi coerenti): git (status/pull/push e cosa fare se
+    il push viene rifiutato), i quattro comandi del frontend (dev/build/demo/prova), i
+    cinque del backend (start/prova/postman/copia/travaso), come farli girare insieme in due
+    terminali, e i problemi comuni (porta occupata, Node troppo vecchio).
+
+### Restare sempre aggiornati col repo
+
+_Da `implementazioni/00-come-si-lavora.md`, punto 56._
+
+56. Assicurati sempre di essere aggiornato col mio github e quello di carletto.
+
+    **FATTO (01/09/2026)** — è già la regola fissa di ogni sessione: `git fetch` e verifica
+    prima di lavorare, e prima di ogni push. In quella sessione è arrivato un push di
+    Carletto proprio a metà lavoro (il ridisegno della plancia); niente da fare oltre a
+    continuare a farlo a ogni giro, cosa già in corso. La regola sta in
+    [`../documentazione/come-si-lavora.md`](../documentazione/come-si-lavora.md).
 
 ---
 
