@@ -1,7 +1,7 @@
 # FAME Neural — FASE 3 Dataset Auditor
 
 Stato: IN CORSO
-Blocco corrente: BLOCCO 6 — scale run + corpus mix policy + GATE 1
+Blocco corrente: SOURCE EXPANSION — intake Trap/Rap originale o cleared
 
 ## BLOCCO 1 — fingerprint deterministici + split leakage-safe
 
@@ -485,3 +485,60 @@ GATE 1 resta aperto finche' il corpus reale non soddisfa la policy.
 Il prossimo lavoro non e' aggiungere altri controlli artificiali: e' alimentare il corpus con materiale Trap/Rap originale o con training commerciale esplicitamente autorizzato, poi eseguire il gate sul mix reale.
 
 Prossimo lavoro previsto: SOURCE EXPANSION — materiale Trap originale/cleared + scale run finale.
+
+## SOURCE EXPANSION — intake Trap/Rap originale o cleared
+
+Dopo BLOCCO 6 il collo di bottiglia e' il contenuto, non altri gate.
+
+Il nuovo source intake accetta directory locali ricorsive e separa automaticamente:
+
+- `commercial-cleared`;
+- `analysis-only`;
+- `missing-provenance`;
+- `invalid-provenance`.
+
+Solo `commercial-cleared` viene copiato nello staging di training.
+
+### Regola rights
+
+Un MIDI non diventa utilizzabile per training soltanto perche' e' stato acquistato o scaricato legalmente.
+
+Per passare lo staging servono i campi di provenance gia' definiti dalla FASE 2 e:
+
+- `commercialTrainingAllowed = true`;
+- `commercialOutputAllowed = true`;
+- origin type non `third_party_unknown`;
+- rights evidence esplicita.
+
+Quindi pack commerciali con licenza ML non esplicita restano analysis/reference-only finche' non otteniamo un'autorizzazione chiara.
+
+### Materiale originale / commissionato
+
+Il template:
+
+`source-intake-template.provenance.json`
+
+puo' essere duplicato accanto ai MIDI originali o commissionati.
+
+La `compositionFamily` deve restare uguale tra versioni/arrangiamenti dello stesso brano.
+
+### Runner end-to-end
+
+`run-source-expansion.ps1` esegue:
+
+source folder
+-> recursive rights intake
+-> commercial staging
+-> batch MIDI import
+-> source curation
+-> phrase builder
+-> phrase audit
+-> DATA READY gate
+
+I file analysis-only o senza provenance non vengono cancellati: restano semplicemente fuori dallo staging di training.
+
+### Stato operativo
+
+La pipeline FASE 3 e' ora pronta a ricevere materiale Trap/Rap originale o con permesso ML commerciale esplicito.
+
+GATE 1 resta aperto fino a quando il mix reale non raggiunge quantita', diversita', coverage e leakage requirements del BLOCCO 6.

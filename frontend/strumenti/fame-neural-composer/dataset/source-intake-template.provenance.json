@@ -1,0 +1,14 @@
+{
+  "sourceId": "fame-original:beat-001",
+  "originType": "original",
+  "creator": "Nome autore / producer",
+  "licenseId": "FAME-ORIGINAL-OWNED",
+  "compositionFamily": "fame-original:beat-001",
+  "sourceUri": null,
+  "rightsEvidence": [
+    "Materiale originale creato per FAME; diritti di training commerciale confermati dal titolare."
+  ],
+  "commercialTrainingAllowed": true,
+  "commercialOutputAllowed": true,
+  "notes": "Duplicare questo sidecar accanto al MIDI e compilare tutti i campi. Non impostare true se il diritto ML/training non e' esplicito."
+}
