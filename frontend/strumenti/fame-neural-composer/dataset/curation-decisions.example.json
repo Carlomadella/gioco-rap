@@ -1,0 +1,12 @@
+{
+  "schema": "fame-neural-curation-decisions-v1",
+  "version": 1,
+  "reviewer": "nome-revisore",
+  "decisions": [
+    {
+      "itemId": "source-id:0123456789abcdef",
+      "action": "accept",
+      "reason": "review musicale completata: pattern intenzionale e utile al corpus"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "minAcceptedForTrainingSubset": 3,
+  "targetMinPhrases": 500
+}

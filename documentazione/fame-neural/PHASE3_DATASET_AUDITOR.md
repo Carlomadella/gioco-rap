@@ -1,7 +1,7 @@
 # FAME Neural — FASE 3 Dataset Auditor
 
 Stato: IN CORSO
-Blocco corrente: BLOCCO 3 — duplicati interni + quality audit musicale
+Blocco corrente: BLOCCO 4 — curation policy + corpus manifest
 
 ## BLOCCO 1 — fingerprint deterministici + split leakage-safe
 
@@ -209,3 +209,96 @@ Restano soprattutto:
 - split train/validation/test definitivo e leakage check finale.
 
 Prossimo lavoro previsto: BLOCCO 4 — curation policy + corpus manifest.
+
+## BLOCCO 4 — curation policy + corpus manifest
+
+Il BLOCCO 4 trasforma i risultati tecnici dell'auditor in una politica di curation riproducibile.
+
+### Disposition automatiche
+
+Ogni dataset item riceve uno stato esplicito:
+
+- `accepted`: item pulito e automaticamente ammissibile;
+- `hold`: richiede review o risoluzione di una relazione con altri item;
+- `rejected`: escluso con decisione esplicita;
+- `blocked`: difetto assoluto che non puo' essere accettato con una semplice review.
+
+I quality flag e i fuzzy-review non vengono auto-accettati: entrano nella review queue.
+
+### Duplicati relazionali
+
+Duplicati di sorgente, contenuto musicale, trasposizioni e fuzzy near-duplicate ad alta confidenza vengono trattati come relazioni.
+
+La policy permette di scegliere un keeper solo se tutti i peer collegati vengono esplicitamente `reject`.
+
+Questo evita sia di buttare via automaticamente entrambe le versioni sia di far entrare due copie nello stesso corpus.
+
+### Blocchi assoluti
+
+Un item con errore strutturale/invalidita' o duplicate-layer interno ad alta confidenza non puo' essere forzato in `accepted`.
+
+Va corretto a monte oppure escluso.
+
+### Decisioni manuali
+
+Formato:
+
+`fame-neural-curation-decisions-v1`
+
+Per accettare un item che aveva segnali di review servono:
+
+- reviewer;
+- reason;
+- decisione esplicita.
+
+### Corpus manifest
+
+Il BLOCCO 4 produce:
+
+`fame-neural-curated-corpus-manifest-v1`
+
+Il manifest contiene solo item `accepted`, con snapshot di provenance e split leakage-safe ricalcolato sul sottoinsieme realmente accettato.
+
+Produce anche:
+
+`fame-neural-curation-review-queue-v1`
+
+per gli item ancora in `hold`.
+
+### Gate
+
+`block4Ready` significa che la policy e il manifest sono stati costruiti senza errori di decisione o audit globale incompleto.
+
+NON equivale a GATE 1 DATA READY.
+
+Il report separa:
+
+- `curationComplete`;
+- `trainingSubsetReady`;
+- `manifest.targetReached`;
+- `gate1Candidate`.
+
+Con il target attuale, `gate1Candidate` richiede anche almeno 500 phrase curate e nessun hold/block residuo.
+
+### Test
+
+```powershell
+node .\frontend\strumenti\fame-neural-composer\phase3-block4-smoke-test.js
+```
+
+Il test copre:
+
+- auto-accept di corpus pulito;
+- review -> hold;
+- accept manuale con reviewer/reason;
+- impossibilita' di accettare un blocco assoluto;
+- scelta di un keeper in un gruppo duplicato relazionale;
+- ri-audit del sottoinsieme accepted e split leakage-safe.
+
+## Cosa NON chiude ancora
+
+Il BLOCCO 4 non chiude la FASE 3 e non chiude GATE 1 — DATA READY.
+
+La parte infrastrutturale di dedup, quality audit, split e curation e' ora predisposta. Resta soprattutto da costruire il primo corpus reale in scala e portarlo al target operativo della roadmap.
+
+Prossimo lavoro previsto: BLOCCO 5 — corpus builder e bootstrap verso 500–1.000 phrase.
