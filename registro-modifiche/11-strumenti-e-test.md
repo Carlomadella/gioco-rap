@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:4a2831e -->
+## 07/09/26, 18:17 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `4a2831e`
+
+### Cosa Ã¨ entrato
+
+- `9486590` â€” fix: la lineetta storta nel package.json, e il commento del build che diceva il falso â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/package.json`
+- **Modificato:** `frontend/strumenti/build.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:e69464e -->
 ## 07/09/26, 16:03 â€” branch non identificato â†’ main
 
