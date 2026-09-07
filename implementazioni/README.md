@@ -33,7 +33,9 @@ per i punti, e sono in [`../documentazione/come-si-lavora.md`](../documentazione
 
 ## Tutti i punti
 
-109 voci in tutto: **74 chiuse**, 13 a metà, il resto da fare.
+112 voci in tutto: **76 chiuse**, 13 a metà, 18 da fare e 5 con la sola risposta scritta
+(ricontate dalla tabella qui sotto il 07/09/2026). A che punto siamo nell'insieme, tappa per
+tappa, sta in [`../documentazione/roadmap.md`](../documentazione/roadmap.md).
 
 | | punto | stato | dove |
 | --- | --- | --- | --- |
