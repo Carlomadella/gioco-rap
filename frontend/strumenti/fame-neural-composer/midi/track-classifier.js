@@ -1,6 +1,7 @@
 "use strict";
 
 const DRUM_MAP = new Map([
+  [22, "hat_closed"], [26, "hat_open"],
   [35, "kick"], [36, "kick"],
   [37, "perc"], [38, "snare"], [39, "clap"], [40, "snare"],
   [41, "perc"], [42, "hat_closed"], [43, "perc"], [44, "hat_closed"],
