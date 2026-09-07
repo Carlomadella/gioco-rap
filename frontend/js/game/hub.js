@@ -442,6 +442,18 @@ function hubChiuso(l){
 function assumitiCome(jobId){
   const def = JOBS.find(j => j.id === jobId);
   if(!def) return;
+  /* Prima si guarda l'orologio, poi si firma: altrimenti ti assumevano alle
+     18:00 in fabbrica e il turno da 8 ore veniva rifiutato subito dopo —
+     assunto, giornata persa, zero euro. */
+  if(window.GAME_HOURS && typeof GAME_HOURS.jobStatus === "function" &&
+     (!G.job || G.job.id === jobId)){
+    const st = GAME_HOURS.jobStatus(jobId);
+    if(st && !st.open){
+      if(typeof SFX === "object" && SFX.fail) SFX.fail();
+      GAME_HOURS.showClosed(st);
+      return;
+    }
+  }
   if(!G.job || G.job.id !== jobId){
     if(G.job){
       hubChiuso({n:def.n, chiuso:"Lavori già come " + G.job.n.toLowerCase() +
@@ -456,8 +468,20 @@ function assumitiCome(jobId){
 function schedaLavoro(jobId, luogo){
   const def = JOBS.find(j => j.id === jobId);
   const mio = G.job && G.job.id === jobId;
+  /* Quanto dura davvero il turno e fino a che ora si può entrare: scritto
+     dove si decide, non scoperto dopo. */
+  let orario = "";
+  try{
+    if(window.GAME_HOURS && window.GAME_TIME){
+      const st = GAME_HOURS.jobStatus(jobId);
+      const dur = GAME_TIME.formatDuration(GAME_HOURS.jobDuration(jobId));
+      orario = "<br>Turno di <b>" + dur + "</b> · " +
+        (st.allDay ? "sempre" : (st.open ? "si entra fino alle <b>" +
+          GAME_TIME.format(st.closeAt - GAME_HOURS.jobDuration(jobId)) + "</b>" : st.label));
+    }
+  }catch(e){}
   showEvent({k:luogo, t:def.n,
-    d:mio ? "Sei già assunto qui." : def.d,
+    d:(mio ? "Sei già assunto qui." : def.d) + orario,
     annulla(){},
     opts:[
       {n:mio ? "Fai il turno" : "Fatti assumere e lavora", d:def.pay + " € · " + def.e + " energia",
