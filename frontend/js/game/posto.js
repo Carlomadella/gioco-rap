@@ -942,18 +942,14 @@ $("po-lista").addEventListener("click", ev => {
   /* punto 20 e 22: il beat sul tavolo si ascolta, si prende o si lascia da qui */
   const asc = ev.target.closest("[data-sent]");
   if(asc){ const b = G.market[+asc.dataset.sent]; if(b && typeof beatSuona === "function") beatSuona(b, asc); return; }
+  /* Comprare il beat e' la stessa cosa che si fa allo Studio, sulle schede
+     del banco: la mossa sta scritta una volta sola in
+     js/game/studio-elementi.js e le due pagine si ridisegnano per conto
+     loro, perche' La Sala e lo Studio non hanno la stessa schermata. */
   const prendi = ev.target.closest("[data-prendi]");
   if(prendi && !prendi.disabled){
-    const i = +prendi.dataset.prendi, b = G.market[i];
-    if(!b || G.money < b.price) return;
-    G.money -= b.price;
-    G.market.splice(i, 1);
-    G.beats.push({n:b.n, q:b.q, gen:beatGen(b), seed:beatSeed(b)});
-    const chi = G.gente.find(x => x.beatOff === b.n);
-    if(chi){ delete chi.beatOff; chi.pt += 1; }
-    pushLog("Preso il beat \u00ab" + b.n + "\u00bb (q" + b.q + ") per " + b.price + " \u20ac. \u00c8 nella tua cartella.", "");
-    toast("\u00ab" + b.n + "\u00bb \u00e8 tuo", "good", "\u266a", ["#4ADE80", "#166534"]);
-    SFX.tap(); save(); renderGioco(); renderPosto();
+    const b = G.market[+prendi.dataset.prendi];
+    if(b && prendiBeatDalBanco(b)) renderPosto();
     return;
   }
   const lascia = ev.target.closest("[data-lascia]");

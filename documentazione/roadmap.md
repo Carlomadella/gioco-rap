@@ -138,12 +138,27 @@ giornate e skip di quanto vuoi; le classifiche settimanali con le frecce.
   **1484 volte** fra `frontend/js` e `frontend/css`, dal catalogo eventi alla testata dello
   Studio.
 
-### D · La TRACK — fare un pezzo come catena di scelte _(da fare)_
+### D · La TRACK — fare un pezzo come catena di scelte _(cominciata)_
 
 Non più «faccio un pezzo → +10 fama», ma beat, mix, testo, cover, featuring, marketing e
 timing, ognuno con un suo numero, e la qualità che esce dalla somma; poi qualità + hype +
 fama + network → gli stream. Con un'app del telefono per vedere come invecchiano i pezzi, e
 farci remaster o parti 2.
+
+**C'è già** (08/09/2026): le otto sezioni dello Studio, e dentro le scelte che finora non
+c'erano. Il beat lo compri dalle tre schede sul banco o te lo fa una persona; la strofa e il
+beat che entrano in cabina li scegli tu; la registrazione non è più un dado invisibile ma un
+elenco di take fra cui prendere la buona; il mix ha i tre cursori del banco (voce, bassi,
+aria) e ne esce un carattere che resta scritto sul pezzo; il tema del testo si sceglie prima
+di aprire il foglio; e l'uscita ha un quando — stanotte, venerdì, o in cassaforte. Le
+schermate sono quelle delle foto di riferimento
+(`media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/`), e il codice sta in
+`frontend/js/game/studio-elementi.js`.
+
+**Manca**: i numeri per elemento scritti in chiaro — il riquadro *Beat 82 / Testo 76 / Mix 68
+/ Feature 85 / Marketing 53 → QUALITÀ tot* del foglio dei punti nuovi non c'è: la qualità
+esce da una somma sola, e quanto ci ha messo ogni pezzo non si legge da nessuna parte. E
+manca l'app della discografia che dice come invecchiano i pezzi.
 
 È il punto salito in cima al foglio dei punti nuovi il 07/09/2026 (commit *«il punto sulla
 TRACK sale fra le cose da fare»*). Tocca `sim.js`, `studio.js`, `posto.js` e la discografia:

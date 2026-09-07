@@ -831,7 +831,13 @@ console.log("\nlo Studio: la gente della Sala conta");
   const sorgenti = ["js/core.js", "js/game/state.js", "js/game/content.js",
                     "js/game/actions.js", "js/game/beats.js", "js/game/covers.js",
                     "js/game/rivals.js", "js/game/scene-art.js", "js/game/phases.js",
-                    "js/game/posto.js", "js/game/studio.js"];
+                    "js/game/posto.js", "js/game/studio.js",
+                    /* dopo studio.js, come nella pagina: e' il file che riempie
+                       i suoi pannelli (schede dei beat, take, cursori del banco,
+                       il quando di Fuori) e senza di lui le sezioni non
+                       disegnano */
+                    "js/game/studio-elementi.js", "js/game/writer.js",
+                    "js/game/beatplay.js"];
   let acceso = true, errore = null;
   try{
     /* i pochi appigli fuori dai file caricati: non devono fare niente */
