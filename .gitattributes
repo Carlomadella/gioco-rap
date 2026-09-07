@@ -1,1 +1,0 @@
-frontend/media/makehuman-editor-v1/data/targets/targets.bin filter=lfs diff=lfs merge=lfs -text

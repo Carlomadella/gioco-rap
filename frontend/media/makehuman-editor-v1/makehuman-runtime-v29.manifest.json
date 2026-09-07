@@ -3,7 +3,7 @@
     "version":  29,
     "source":  {
                    "repository":  "Carlomadella/gioco-rap",
-                   "commit":  "42dff542c9d581b9c38b97ff433f4b8343372caf"
+                   "originalCommitBeforeHistoryCleanup":  "42dff542c9d581b9c38b97ff433f4b8343372caf"
                },
     "archive":  {
                     "format":  "tar.gz",
