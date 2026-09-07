@@ -1,7 +1,7 @@
 # FAME Neural — FASE 3 Dataset Auditor
 
 Stato: IN CORSO
-Blocco corrente: BLOCCO 4 — curation policy + corpus manifest
+Blocco corrente: BLOCCO 5 — corpus builder verso 500–1.000 phrase
 
 ## BLOCCO 1 — fingerprint deterministici + split leakage-safe
 
@@ -302,3 +302,105 @@ Il BLOCCO 4 non chiude la FASE 3 e non chiude GATE 1 — DATA READY.
 La parte infrastrutturale di dedup, quality audit, split e curation e' ora predisposta. Resta soprattutto da costruire il primo corpus reale in scala e portarlo al target operativo della roadmap.
 
 Prossimo lavoro previsto: BLOCCO 5 — corpus builder e bootstrap verso 500–1.000 phrase.
+
+## BLOCCO 5 — corpus builder verso 500–1.000 phrase
+
+Il BLOCCO 5 introduce il primo builder dedicato alle phrase di training.
+
+### Perche' un nuovo livello
+
+Un dataset item rappresenta una sorgente MIDI importata e conserva provenance/rights.
+
+Una phrase e' invece un esempio derivato da 4, 8 o 16 barre. Non viene finta come nuova sorgente: mantiene sempre il riferimento al dataset item originale e al suo SHA.
+
+Schema:
+
+`fame-neural-phrase-item-v1`
+
+### Estrazione
+
+Il builder:
+
+- usa solo sorgenti commercial-training-cleared;
+- puo' essere filtrato dal manifest di curation BLOCCO 4;
+- supporta phrase da 4/8/16 barre;
+- evita phrase parziali;
+- taglia correttamente eventi che attraversano il confine della phrase;
+- non concatena clip indipendenti per gonfiare artificialmente il corpus;
+- preserva composition family, licenza, creator e source SHA.
+
+Il bootstrap GMD usa inizialmente phrase da 4 barre non sovrapposte per massimizzare il numero di esempi senza creare finestre quasi identiche.
+
+### Phrase-level audit
+
+Le phrase vengono ri-auditate separatamente dalle sorgenti.
+
+Il report:
+
+`fame-neural-phrase-corpus-audit-v1`
+
+controlla:
+
+- phraseId duplicati;
+- duplicati musicali esatti;
+- equivalenza per trasposizione;
+- fuzzy near-duplicate;
+- duplicate-layer interni;
+- quality review;
+- source leakage;
+- composition-family leakage;
+- split train/validation/test.
+
+Le phrase derivate dalla stessa composition family restano nello stesso split.
+
+### Target e gate
+
+Il report distingue:
+
+- `block5Ready`: tooling phrase-level completo e leakage-safe;
+- `corpusClean`: nessun duplicato bloccante rilevato;
+- `reviewComplete`: nessun item ancora da revisionare;
+- `targetReached`: almeno 500 phrase valide;
+- `gate1Candidate`: tutte le condizioni sopra soddisfatte.
+
+`gate1Candidate` e' una candidatura tecnica, non chiude automaticamente GATE 1.
+
+### Bootstrap GMD reale
+
+`bootstrap-gmd-phase3.ps1` riusa la pipeline GMD della FASE 2 invece di duplicare downloader/importer/provenance.
+
+Pipeline:
+
+GMD real MIDI
+-> FASE 2 importer/provenance
+-> source curation BLOCCO 4
+-> accepted sources only
+-> 4-bar phrase builder
+-> phrase-level audit
+-> leakage-safe split
+-> inventory verso target 500
+
+Il default del test di integrazione usa 12 sorgenti reali per restare veloce. Lo stesso comando puo' essere scalato aumentando `SourceCount`.
+
+### Test
+
+```powershell
+node .\frontend\strumenti\fame-neural-composer\phase3-block5-smoke-test.js
+```
+
+Copre:
+
+- clipping corretto ai confini;
+- filtro tramite curation manifest;
+- generazione phrase 4-bar;
+- split senza source leakage;
+- rilevamento duplicati phrase;
+- separazione tra tooling READY e corpus/target non ancora pronti.
+
+## Cosa NON chiude ancora
+
+BLOCCO 5 non dichiara artificialmente DATA READY.
+
+Il prossimo passo e' usare il builder in scala, leggere il vero rendimento GMD e integrare altre fonti commercialmente compatibili/originali fino a ottenere 500–1.000 phrase curate, non semplicemente 500 finestre generate.
+
+Prossimo lavoro previsto: BLOCCO 6 — scale run + corpus mix policy + GATE 1 finale.

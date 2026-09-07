@@ -1,0 +1,9 @@
+{
+  "phraseBars": [
+    4,
+    8,
+    16
+  ],
+  "strategy": "longest-first-exclusive",
+  "minEvents": 4
+}
