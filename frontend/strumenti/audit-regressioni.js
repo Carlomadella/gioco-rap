@@ -25,6 +25,7 @@ const chatjs = leggi("js/game/chat.js");
 const actions = leggi("js/game/actions.js");
 const posto = leggi("js/game/posto.js");
 const studio = leggi("js/game/studio.js");
+const studioEl = leggi("js/game/studio-elementi.js");
 const writer = leggi("js/game/writer.js");
 const piazza = leggi("js/game/piazza.js");
 const hub = leggi("js/game/hub.js");
@@ -470,6 +471,115 @@ test("le ACTION standard dello Studio non vengono addebitate due volte",
     return body.includes("hubAzione(id)") &&
       !body.includes("GAME_TIME.spend");
   })());
+
+/* ============================================================
+   Punto 4 di CARLO, seconda meta': «ricrea la schermata identica alle foto
+   con elementi HTML». Le quattro schermate di riferimento dello Studio
+   avevano dentro delle cose che il codice non disegnava — le schede dei
+   beat, le take, i cursori del banco, il QUANDO. Adesso ci sono, e stanno
+   in js/game/studio-elementi.js.
+
+   Queste prove non guardano se sono belle: guardano che le tre cose nuove
+   **non regalino niente**, che era la promessa scritta in cima al file. Se
+   qualcuno un giorno alza un numero senza accorgersene, qui si ferma.
+   ============================================================ */
+console.log("\nPunto 4 — gli elementi dentro alle schermate dello Studio");
+
+test("gli elementi dello Studio stanno in un file loro, caricato dopo studio.js",
+  index.includes('js/game/studio-elementi.js') &&
+  index.indexOf('js/game/studio-elementi.js') > index.indexOf('js/game/studio.js') &&
+  index.includes('css/studio-elementi.css'));
+
+test("la prima take e' lo stesso tiro di dado che registra faceva da sola",
+  studioEl.includes("d.take = {k, l:[Math.round(rnd(-5, 6))], s:0}") &&
+  actions.includes("typeof studioTakePresa === \"function\" ? studioTakePresa() : rnd(-5,6)") &&
+  /* e chi non ha take in corso ricade sullo stesso dado */
+  studioEl.includes("if(!d || !d.l || !d.l.length) return rnd(-5, 6);"));
+
+test("una take in piu' si paga in energia, e non e' gratis",
+  studioEl.includes("const STUDIO_TAKE_ENERGIA = 12") &&
+  studioEl.includes("G.energy -= STUDIO_TAKE_ENERGIA") &&
+  studioEl.includes("if(G.energy < STUDIO_TAKE_ENERGIA)") &&
+  studioEl.includes("const STUDIO_TAKE_MAX = 6"));
+
+test("i cursori del banco partono al centro e al centro valgono zero",
+  studioEl.includes("d.banco = {voce:2, bassi:2, aria:2}") &&
+  /* il carattere di ripiego, quello dei cursori fermi in mezzo, non da' punti */
+  /PULITO",\s*q:0/.test(studioEl) &&
+  actions.includes("+ studioBonus() + bancoBonus()"));
+
+test("nessun carattere del banco vale piu' di tre punti, in su o in giu'",
+  (() => {
+    const q = (studioEl.match(/n:"[A-Z]+",\s*q:(-?\d+)/g) || [])
+      .map(x => Number(x.split("q:")[1]));
+    return q.length >= 10 && q.every(v => v >= -3 && v <= 3);
+  })());
+
+test("un pezzo in cassaforte non esce per sbaglio dalla plancia",
+  actions.includes("ready().filter(s => !s.tenuto)") &&
+  actions.includes("need:() => ready().some(s => !s.tenuto)") &&
+  studio.includes("typeof studioPronti === \"function\" ? studioPronti() : ready()") &&
+  studioEl.includes("return ready().filter(s => !s.tenuto);"));
+
+test("le uscite messe in coda per venerdi' scattano da sole, dopo il giro di settimana",
+  studioEl.includes("function studioUscitePronte()") &&
+  sim.includes("if(typeof studioUscitePronte === \"function\") studioUscitePronte();") &&
+  /* dopo advanceWeek(), se no il pezzo risulta uscito nella settimana sbagliata */
+  sim.indexOf("advanceWeek();") < sim.indexOf("studioUscitePronte()") &&
+  studioEl.includes("const STUDIO_VENERDI_HYPE = 4"));
+
+test("la stima degli stream e' la formula vera di sim.js, non un numero inventato",
+  studioEl.includes("Math.pow(Math.max(0, q - 26) / 74, 2.6) * (35 + G.hype * 13) * push") &&
+  sim.includes("Math.pow(Math.max(0, s.q - 26)/74, 2.6) * (35 + G.hype*13) * push"));
+
+test("la strofa e il beat che si incidono sono quelli scelti in cabina",
+  actions.includes("const daIncidere = ()") &&
+  actions.includes("const beatDaIncidere = ()") &&
+  !/registra[\s\S]{0,900}?const b = bestBar\(\), bt = bestBeat\(\);/.test(actions) &&
+  studioEl.includes("function studioStrofa()") &&
+  studioEl.includes("function studioBeatSuCui()"));
+
+test("il tema del foglio lo sceglie lo Studio, e senza scelta resta il tiro a caso",
+  writer.includes("typeof studioTemaScelto === \"function\" ? studioTemaScelto() : null") &&
+  writer.includes("scelto || pick(TEMI)") &&
+  studioEl.includes("function studioTemaScelto()"));
+
+test("comprare un beat dal banco e' scritto una volta sola, non due",
+  studioEl.includes("function prendiBeatDalBanco(b)") &&
+  posto.includes("prendiBeatDalBanco(b)") &&
+  /* la vecchia copia dentro a posto.js non c'e' piu'. Si guarda la riga che
+     mette il beat in cartella, non lo `splice`: quello resta, perche' La
+     Sala ha anche il tasto per **lasciarlo li'**, che toglie il beat dal
+     banco senza comprarlo ed e' un'altra cosa. */
+  !posto.includes("G.beats.push({n:b.n"));
+
+/* Gli attributi `data-` sono globali quanto le variabili, e `eventi-v2.js`
+   ascolta i click su **tutto il documento**: un attributo riusato non rompe
+   niente di visibile, spara solo l'evento sbagliato in silenzio. È già
+   successo con `data-compra`, che il tasto «Compralo» dello Studio si era
+   preso dal guardaroba: ogni beat comprato raccontava al motore degli eventi
+   che ti eri comprato una felpa. */
+test("gli attributi dello Studio non rubano il nome a quelli che ascolta tutto il documento",
+  (() => {
+    /* quelli che eventi-v2 intercetta a livello di documento */
+    const suoi = (ev.match(/closest\("\[data-([a-z-]+)\]"\)/g) || [])
+      .map(x => x.replace(/.*data-([a-z-]+).*/, "$1"));
+    /* quelli che lo Studio si e' inventato in questa task */
+    const miei = ["stcompra","bcard","bplay","take","tplay","ancora","ascolta",
+                  "quando","manda","riprendi","vesti","curs","tema","strofa","incide"];
+    const rubati = miei.filter(m => suoi.indexOf(m) >= 0);
+    if(rubati.length) console.log("      nomi in comune: " + rubati.join(", "));
+    return rubati.length === 0 &&
+      /* e nessuno di loro e' rimasto scritto come `data-compra` */
+      !studioEl.includes('"[data-compra]"') && !studio.includes(' data-compra=');
+  })());
+
+test("dentro alle schede dei beat e alle take non ci sono bottoni annidati",
+  !studioEl.includes('<button type="button" class="stbcard') &&
+  !studioEl.includes('<button type="button" class="sttakeriga') &&
+  studioEl.includes('role="button" tabindex="0"') &&
+  /* e chi non e' piu' un bottone si prende lo stesso con la tastiera */
+  studioEl.includes('addEventListener("keydown"'));
 
 console.log("\nBlocco 3 — carcere separato");
 test("hub manda il detenuto alla schermata Carcere",
@@ -1518,7 +1628,7 @@ test("nessun documento punta piu' al vecchio 00-come-si-lavora.md",
     return morti.length === 0;
   })());
 
-for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js"]){
+for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }

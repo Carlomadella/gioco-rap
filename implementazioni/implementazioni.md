@@ -139,6 +139,29 @@ NETWORK 64
 
 4. aggiungi le foto di background dei posti senza HTML, poi ricrea la schermata identica alle foto con elementi HTML
 
+   **FATTO in parte (08/09/2026) — lo Studio.** Le foto sotto ci sono già da prima; adesso ci
+   sono anche gli elementi che nelle foto di riferimento ci stanno **sopra**, e che il codice
+   non disegnava. `studio_creazione_beat`: le tre schede dei beat sul banco, con copertina,
+   bpm, tasto per ascoltarli, onda e prezzo — «troppo caro» in rosso quando non ce li hai.
+   `registrazione_pezzo`: l'elenco delle take, con la barra a tacche e la migliore segnata;
+   la prima è il tiro di dado che `registra` faceva da sola, le altre si pagano in energia.
+   `studio_mixaggio`: i tre cursori (voce, bassi, aria) e il carattere che ne esce — al
+   centro valgono zero, il mix di prima non cambia di un punto. `studio_uscita_pezzo`: il
+   QUANDO con le tre scelte tutte vere (stanotte, venerdì che esce da solo quando arriva il
+   giorno, il cassetto che mette il pezzo in cassaforte), la stima degli stream presa dalla
+   formula vera di `sim.js`, e la cassaforte a destra. In più, dalle altre due foto: il tema
+   che si sceglie nel Testo (`scrittura_barre`) con la barra dell'ispirazione, e l'avviso
+   della promo già fatta oggi (`studio_promo_su_lafamegram` — quella schermata è del
+   telefono, non dello Studio, e il resto resta lì).
+   Sta in `frontend/js/game/studio-elementi.js` e `frontend/css/studio-elementi.css`, file
+   nuovi accanto a quelli che c'erano, come chiede il punto sui file già presenti.
+
+   **Cosa manca ancora, per chiudere il punto:** le altre sei foto di riferimento sono di
+   posti che non hanno ancora una pagina che le carichi — Casa (`casa_di provincia_definitiva`,
+   `scrittura_barre`), la Palestra, il freestyle in piazza, il concerto live e lo «stacca la
+   spina». E dentro allo Studio, Cover e Feat una foto loro non ce l'hanno né con né senza
+   interfaccia: si tengono in prestito quella della stanza più vicina.
+
 5. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
    Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il
    secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su

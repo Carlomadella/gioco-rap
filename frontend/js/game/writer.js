@@ -220,13 +220,18 @@ function boostAttuale(){ return 1 + 0.5 * quotaTua(); }
    opz.minimo:   la qualita' sotto cui non si scende, quella delle statistiche */
 function apriFoglio(opz){
   const o = opz || {};
-  WR = {righe: new Array(o.righe || 4).fill(""), tema: pick(TEMI), gen:{}, minimo: o.minimo || 0};
+  /* Il tema lo sceglie lo Studio, sezione Testo (`scrittura_barre`: «TEMA ·
+     scegli da dove partire»). Se non l'hai scelto se ne tira uno a caso, che
+     è quello che il gioco ha sempre fatto. */
+  const scelto = typeof studioTemaScelto === "function" ? studioTemaScelto() : null;
+  WR = {righe: new Array(o.righe || 4).fill(""), tema: scelto || pick(TEMI), tuo: !!scelto,
+    gen:{}, minimo: o.minimo || 0};
   if(o.generata){
     WR.righe = completaStrofa(WR.righe, WR.tema);
     WR.righe.forEach((r, i) => { WR.gen[i] = r; });
   }
-  $("w-tema").innerHTML = '<b>Tema della settimana: ' + WR.tema.t + '</b><span>' + WR.tema.d +
-    ' Se lo tocchi davvero, il pezzo pesa di più.</span>';
+  $("w-tema").innerHTML = '<b>' + (WR.tuo ? "Il tema che hai scelto: " : "Tema della settimana: ") +
+    WR.tema.t + '</b><span>' + WR.tema.d + ' Se lo tocchi davvero, il pezzo pesa di più.</span>';
   $("w-title").textContent = o.generata ? "Ecco cosa ho scritto" : "Scrivi la tua strofa";
   $("w-stanza").innerHTML = disegnaStanza();
   $("w-done").textContent = "Chiudi la strofa";

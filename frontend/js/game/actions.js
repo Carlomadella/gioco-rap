@@ -159,12 +159,27 @@ const featBonus = () => (typeof studioAiutoFeat === "function" ? studioAiutoFeat
    o se il pezzo che avevi scelto non è più lì — si torna a `sort()[0]`, che
    è quello che ha sempre fatto: nessuna partita vecchia si accorge di
    niente. */
+/* Stessa strada per la strofa e il beat che entrano in cabina: prima si
+   incideva sempre il migliore di ognuno, e la strofa tenuta da parte per un
+   altro pezzo spariva alla prima registrazione. Adesso li sceglie lo Studio
+   (`registrazione_pezzo`: la colonna «CHE COSA INCIDI» ha i pallini), e se
+   non hai scelto niente si torna al migliore, come prima. */
+const daIncidere = () => (typeof studioStrofa === "function" && studioStrofa()) || bestBar();
+const beatDaIncidere = () => (typeof studioBeatSuCui === "function" && studioBeatSuCui()) || bestBeat();
 const daMixare = () => (typeof studioDaMixare === "function" && studioDaMixare()) ||
   unmixed().sort((a,b) => b.q-a.q)[0];
+/* `s.tenuto` e' la cassaforte dello Studio: un pezzo messo da parte non deve
+   uscire per sbaglio dalla plancia, se no «tienilo nel cassetto» e' una
+   promessa che il gioco non mantiene. */
 const daPubblicare = () => (typeof studioDaPubblicare === "function" && studioDaPubblicare()) ||
-  ready().sort((a,b) => b.q-a.q)[0];
+  ready().filter(s => !s.tenuto).sort((a,b) => b.q-a.q)[0];
+/* punto 4: i tre cursori del banco (voce, bassi, aria) dello Studio. Al
+   centro valgono zero — chi non li tocca mixa esattamente come si mixava
+   prima che esistessero — e da lì si guadagnano o si perdono fino a tre
+   punti a seconda di quanto sta in piedi quello che hai fatto. */
+const bancoBonus = () => (typeof studioBancoGuadagno === "function" ? studioBancoGuadagno() : 0);
 const mixGain = () => Math.round(6 + (G.gear.monitor?5:0) + (G.gear.cuffie?3:0) + G.skills.flow*0.06)
-  + studioBonus();
+  + studioBonus() + bancoBonus();
 
 function offerJobs(){
   const pool = JOBS.filter(j => (!j.req || j.req(G)) && (!G.job || G.job.id !== j.id));
@@ -293,19 +308,24 @@ const ACTIONS = [
    d:"Strofa più beat, in sala. Esce una traccia grezza.",
    need:() => !G.bars.length ? "1 strofa" : !G.beats.length ? "1 beat" : null,
    give:() => {
-     const b = bestBar(), bt = bestBeat();
+     const b = daIncidere(), bt = beatDaIncidere();
      return (b && bt ? "1 traccia · qualità ~" + Math.round(songQ(b,bt) + studioBonus() + featBonus()) : "1 traccia grezza") +
        " · −3 benessere";
    },
    run(){
-     const b = bestBar(), bt = bestBeat();
+     const b = daIncidere(), bt = beatDaIncidere();
      chiediTitolo(title(), (nome, seed, img) => {
        G.bars.splice(G.bars.indexOf(b),1);
        G.beats.splice(G.beats.indexOf(bt),1);
        if(!G.gear.mic) G.money -= 50;
        /* punto 12: chi sta dietro al vetro conta anche in registrazione — un
           fonico che ti conosce sa dove metterti la voce prima che glielo chiedi */
-       const q = clamp(Math.round(songQ(b,bt) + studioBonus() + featBonus() + rnd(-5,6)), 5, 100);
+       /* punto 4: il tiro di dado della registrazione non e' piu' invisibile.
+          E' la take che hai scelto in cabina (`registrazione_pezzo`), e la
+          prima take e' esattamente questo `rnd(-5,6)` — chi non chiede altre
+          take registra con lo stesso dado di sempre. */
+       const q = clamp(Math.round(songQ(b,bt) + studioBonus() + featBonus() +
+         (typeof studioTakePresa === "function" ? studioTakePresa() : rnd(-5,6))), 5, 100);
        /* chi era in sessione resta scritto sul pezzo, e poi torna libero */
        const conMe = typeof studioConsumaFeat === "function" ? studioConsumaFeat() : "";
        const s2 = {t:nome, q, mixed:false, released:false, week:0, streams:0, last:0,
@@ -325,13 +345,17 @@ const ACTIONS = [
    run(){
      const s = daMixare();
      s.q = clamp(s.q + mixGain(), 5, 100); s.mixed = true;
+     /* com'e' venuto — «secco», «pesante», «aperto» — resta scritto sul pezzo:
+        e' quello che nel riferimento di Fuori si legge sotto al titolo,
+        «q78 · mixato · secco» */
+     if(typeof studioBancoCarattere === "function") s.car = studioBancoCarattere().n;
      gain("flow", 1.1);
      return "«" + s.t + "» mixato: qualità " + s.q + ". Pronto per uscire.";
    }},
 
   {id:"pubblica", n:"Pubblica il pezzo", e:0, luc:1,
    d:"Lo metti fuori. Da qui in poi corre da solo.",
-   need:() => ready().length ? null : "1 traccia",
+   need:() => ready().some(s => !s.tenuto) ? null : "1 traccia",
    give:() => {
      const s = daPubblicare();
      return s ? "esce «" + s.t + "» · q" + s.q + (s.mixed ? "" : " · non mixato, −8") : "un pezzo esce";

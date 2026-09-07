@@ -257,11 +257,14 @@ function avanzaGiorno(){
   syncEnergy();
   G.energy = clamp(G.energy + notte, 0, G.maxEnergy);
   G.day = (G.day || 1) + 1;
-  if(G.day > 7){
-    G.day = 1;
-    advanceWeek();
-    return true;   /* la settimana si è chiusa */
-  }
+  const chiusa = G.day > 7;
+  if(chiusa){ G.day = 1; advanceWeek(); }
+  /* punto 4: le uscite messe in coda dallo Studio («venerdì», nella sezione
+     Fuori) escono da sole quando arriva il giorno. Dopo advanceWeek(), non
+     prima: così `totalWeeks()` è già quella nuova e il pezzo risulta uscito
+     nella settimana in cui è uscito davvero. */
+  if(typeof studioUscitePronte === "function") studioUscitePronte();
+  if(chiusa) return true;   /* la settimana si è chiusa */
   /* punto 54: un incontro per strada, non ogni giorno e non se la settimana
      si è appena chiusa sopra (due finestre una sull'altra sono un fastidio,
      non un'atmosfera). Da smistare, punto 4: capita anche durante un salto —
