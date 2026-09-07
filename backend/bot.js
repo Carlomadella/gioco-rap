@@ -103,4 +103,123 @@ function ricambio(bot, quanti, usati, notizie){
   }
 }
 
-module.exports = { nuovoBot, popolazione, settimanaBot, ricambio, idNuovo, CARATTERI };
+/* ==================== IL DIRADAMENTO ====================
+
+   Il primo dei rischi segnati in `backend.md` § 8, con già scritta la regola e
+   mai fatta: «se un domani i giocatori veri diventano tanti e i bot restano
+   140, i bot vanno tolti dall'alto: un bot in top 10 quando ci sono mille
+   giocatori veri è una bugia che si vede».
+
+   I bot servono a non far trovare una classifica vuota. Man mano che arriva
+   gente vera servono meno, e quelli che danno più fastidio sono **quelli in
+   cima**: il primo posto tenuto da uno che non esiste, con mille persone vere
+   sotto, è la cosa che fa dire «ma allora è tutto finto».
+
+   Due mosse, e nessuna delle due è brusca:
+
+   - **il bersaglio scende**: la classifica resta grossa uguale, il posto lo
+     prendono i veri (`quantiServono`);
+   - **quando ce ne sono troppi va via il più in alto**, un pezzo alla volta —
+     un decimo dell'eccesso a giro, mai tutto insieme. Un mondo che perde metà
+     dei nomi grossi in una notte si nota più della bugia che stiamo togliendo.
+
+   E c'è una guardia: **finché i giocatori veri sono meno di dieci non si tocca
+   niente**. Con tre iscritti, togliere la cima vorrebbe dire lasciare la
+   classifica senza testa per far posto a nessuno — il contrario di quello che
+   serve. */
+
+/* Quanti bot ci vogliono, dato quanta gente vera sta giocando davvero. */
+const VERI_PER_DIRADARE = 10;
+function quantiServono(pieno, veri, minimo){
+  const min = Math.max(0, Math.min(minimo, pieno));
+  return Math.max(min, Math.min(pieno, pieno - Math.max(0, veri)));
+}
+
+/* Manda a casa i bot di troppo, dall'alto. Torna quanti ne ha tolti.
+   `bot` viene modificato sul posto, come fa già `ricambio`. */
+function dirada(bot, bersaglio, veri, usati, notizie){
+  if(veri < VERI_PER_DIRADARE) return 0;
+  const troppi = bot.length - bersaglio;
+  if(troppi <= 0) return 0;
+  /* un decimo per giro, e almeno uno: se no con cento di troppo non finisce mai */
+  const quanti = Math.min(troppi, Math.max(1, Math.round(troppi / 10)));
+  const dallAlto = bot.slice().sort((a, b) => b.stream - a.stream).slice(0, quanti);
+  for(const b of dallAlto){
+    const i = bot.indexOf(b);
+    if(i < 0) continue;
+    bot.splice(i, 1);
+    if(usati) usati.delete(String(b.nome).toLowerCase());
+    /* Uno che si ritira mentre sta in alto non «non ce l'ha fatta»: smette da
+       vincente, ed è una notizia normale come le altre. Da qui non deve
+       trapelare nemmeno adesso che era un bot. */
+    notizie.push({ id: b.id, tipo: "ritiro", testo: SALUTI[Math.floor(Math.random() * SALUTI.length)](b) });
+  }
+  return dallAlto.length;
+}
+
+const SALUTI = [
+  b => b.nome + " si ritira all'apice. Ha detto che voleva smettere da vincente.",
+  b => b.nome + " chiude e passa dall'altra parte: adesso produce e basta.",
+  b => b.nome + " lascia le scene. L'ultimo disco era il pezzo che voleva.",
+  b => b.nome + " molla tutto e torna a " + b.citta + ". Nessuno se l'aspettava."
+];
+
+/* ==================== IL RITRATTO ====================
+
+   La regola del punto 30 dice che un bot non si deve riconoscere. Finché la
+   classifica diceva solo nome, città, ascolti e uscite era vero; poi il gioco
+   ha cominciato a mandare **il livello**, e i bot sono rimasti tutti a
+   `livello 1` — perché nessuno gliel'ha mai scritto. Uno con due milioni di
+   ascolti al livello 1 è un manichino con un'etichetta addosso: bastava
+   guardare la classifica per fare l'elenco dei finti.
+
+   Qui ci sono i numeri che un bot non ha nel database, calcolati da quello che
+   ha: quanto lo ascoltano e quanti pezzi ha fuori. **Non si scrivono da
+   nessuna parte** — si derivano quando qualcuno guarda, così non c'è una
+   seconda verità da tenere allineata e i bot che esistono già sono a posto dal
+   primo istante, senza travaso.
+
+   I conti sono gli stessi del gioco, non inventati qui:
+   - i fan si stimano dagli ascolti con la stessa relazione che usa
+     `plausibilita.js` per giudicare i numeri di un giocatore vero;
+   - il livello sale sulla scala di `frontend/js/game/state.js` (300 punti il
+     primo, ×1,35 ogni volta, tetto 60);
+   - la fase è la prima di `frontend/js/game/phases.js` che regge quegli
+     ascolti in una settimana.
+   Se un giorno il gioco cambia la scala, questi due elenchi vanno rifatti
+   uguali: sono copie, e stanno scritte qui apposta perché il server non può
+   leggere i file del gioco. */
+const { M } = require("./plausibilita.js");
+
+/* i tetti di stream settimanali delle fasi (PHASES[].cap del gioco) */
+const FASI_CAP = [800, 5200, 34000, 210000, 1300000, 6500000];
+
+function livelloDa(xp){
+  let lvl = 1, serve = 300, fatti = 0;
+  while(xp >= fatti + serve && lvl < 60){ fatti += serve; lvl++; serve = Math.round(serve * 1.35); }
+  return lvl;
+}
+
+function ritratto(r){
+  const stream = Math.max(0, Number(r.stream) || 0);
+  const uscite = Math.max(0, Number(r.uscite) || 0);
+  const seed = Math.abs(Number(r.seed) || 0);
+  const fan = stream / M.perFan;                       // chi ti ascolta, all'incirca
+  const livello = livelloDa(Math.round(fan + uscite * 140));
+  let fase = 0;
+  while(fase < FASI_CAP.length && stream > FASI_CAP[fase]) fase++;
+
+  /* Serate e feat: nessuno li ha contati per i bot, ma una carriera con dieci
+     pezzi fuori e un contratto le serate le ha fatte. Si tengono legati alle
+     uscite e alla fase — cioè a quanto è avanti — e il resto lo decide il
+     seme, che è fisso: due letture di fila danno lo stesso numero, se no il
+     diario di un bot ballerebbe a ogni schermata. */
+  return {
+    livello, fase,
+    live: Math.round(uscite * 1.6 + fase * 5 + (seed % 9)),
+    feat: Math.round(uscite * 0.45 + fase * 0.8 + (seed % 4))
+  };
+}
+
+module.exports = { nuovoBot, popolazione, settimanaBot, ricambio, idNuovo, CARATTERI,
+  ritratto, livelloDa, FASI_CAP, quantiServono, dirada, VERI_PER_DIRADARE };

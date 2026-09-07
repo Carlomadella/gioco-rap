@@ -131,7 +131,8 @@ dentro a un ciclo — quattrocento milioni di confronti a ogni giro di settimana
 | `ADF_DATI` | file del database, quando sotto c'è SQLite | `database/dati/classifica.db` |
 | `ADF_PG` | se c'è, sotto va **PostgreSQL** invece di SQLite | vuota |
 | `ADF_PG_CONNESSIONI` | quante connessioni tiene aperte verso PostgreSQL | `10` |
-| `ADF_BOT` | quanti bot tenere in pista | `140` |
+| `ADF_BOT` | quanti bot tenere in pista quando la classifica è tutta nostra | `140` |
+| `ADF_BOT_MINIMO` | quanti bot restano comunque, per quanti giocatori veri arrivino | `20` |
 | `ADF_SETTIMANA_H` | ore vere di una settimana di classifica | `24` |
 | `ADF_ORIGINI` | CORS: `*` oppure origini separate da virgola | `*` |
 | `ADF_ADMIN` | chiave per le rotte di servizio | vuota (sono chiuse) |
@@ -402,10 +403,32 @@ Ogni `ADF_SETTIMANA_H` ore (di suo 24) il server fa un giro:
 3. i bot vivono: crescono secondo il loro **carattere** (costante, esplosivo, meteora),
    qualcuno esce con un pezzo, qualcuno firma, qualcuno sparisce dai radar;
 4. chi non manda un punteggio da più di una settimana e mezza perde l'8%;
-5. chi è sceso troppo in basso smette, e spunta qualcuno di nuovo dal niente.
+5. chi è sceso troppo in basso smette, e spunta qualcuno di nuovo dal niente;
+6. **i bot si diradano**: quanti ne servono lo dicono i giocatori veri.
 
 Non serve un cron: parte da sé alla prima richiesta utile dopo la scadenza, e se il server
 è stato spento tre giorni recupera i giri arretrati (fino a dodici, poi riparte da adesso).
+
+### Il diradamento (il punto 6)
+
+I bot servono a non far trovare una classifica vuota. Man mano che arriva gente vera
+servono meno — e quelli che danno più fastidio sono **quelli in cima**: il primo posto
+tenuto da uno che non esiste, con mille persone vere sotto, è la cosa che fa dire «ma
+allora è tutto finto».
+
+Quindi il bersaglio scende (`ADF_BOT` meno i giocatori **attivi**, mai sotto
+`ADF_BOT_MINIMO`) e, quando ce ne sono di troppo, **se ne va il più in alto**. Con tre
+regole che tengono la cosa gentile:
+
+- **un decimo dell'eccesso per giro**, mai tutto insieme: un mondo che perde metà dei nomi
+  grossi in una notte si nota più della bugia che stiamo togliendo;
+- **finché i giocatori veri sono meno di dieci non si tocca niente** — con tre iscritti,
+  togliere la cima vuol dire lasciare la classifica senza testa per far posto a nessuno;
+- si contano i giocatori **attivi**, non gli iscritti: chi ha provato il gioco a marzo e
+  non è più tornato non riempie nessuna classifica. È lo stesso metro del punto 4.
+
+Chi si ritira lascia una notizia normale — «si ritira all'apice», «passa dall'altra parte e
+adesso produce» — perché anche uscendo di scena un bot non deve farsi riconoscere.
 
 ## Sull'imbroglio, onestamente
 
