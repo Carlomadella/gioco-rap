@@ -344,7 +344,12 @@ function finePiazza(){
     (FS.boost > 1 ? '<div class="wrow"><b>×1,5</b><span class="bar"><i style="width:100%"></i></span><span>perché te la sei giocata</span></div>' : '') +
     (peso > 1 ? '<div class="wrow"><b>evento della settimana</b><span class="bar"><i style="width:100%"></i></span><span>vale di più</span></div>' : '') +
     '</div><button class="ptap" id="p-end">Torna alla settimana</button>';
-  $("p-end").onclick = () => { chiudiPiazza(); save(); renderGioco(); };
+  /* La transazione aperta da iniziaAzione() si chiude solo con azioneFatta():
+     qui si usciva con chiudiPiazza() e basta, cosi' TEMPO_AZIONE restava viva,
+     GAME_TIME.pending() restava vero e bloccava tempo, mappa e azioni per
+     sempre. uscitaPiazza() e' la sola via d'uscita corretta (con FS.fine vera
+     chiama azioneFatta()), la stessa che usano la X, Esc e il menu. */
+  $("p-end").onclick = () => { uscitaPiazza(); };
   pushLog("Freestyle in piazza: <b>" + Math.round(FS.folla) + "</b> persone rimaste, +" + fmt(fan) + " fan.",
     resa >= .6 ? "good" : "");
   SFX.crowd();
