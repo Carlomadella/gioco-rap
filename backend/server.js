@@ -18,6 +18,8 @@
      ADF_PORTA        porta di ascolto              (8787)
      ADF_DATI         file del database             (backend/database/dati/classifica.db)
      ADF_BOT          quanti bot tenere in pista    (140)
+     ADF_BOT_MINIMO   sotto questi non si scende    (20)  i bot si diradano
+                      man mano che arrivano giocatori veri: vedi bot.js
      ADF_SETTIMANA_H  ore vere di una settimana     (24)
      ADF_ORIGINI      CORS: * oppure lista di origini separate da virgola
      ADF_ADMIN        chiave per le rotte di servizio (se vuota, sono chiuse)
@@ -51,6 +53,7 @@ const CFG = {
   porta: Number(process.env.ADF_PORTA || 8787),
   file: process.env.ADF_DATI || path.join(__dirname, "database", "dati", "classifica.db"),
   quantiBot: Math.max(0, Number(process.env.ADF_BOT || 140)),
+  botMinimo: Math.max(0, Number(process.env.ADF_BOT_MINIMO || 20)),
   settimanaMs: Math.max(1, Number(process.env.ADF_SETTIMANA_H || 24)) * 3600e3,
   origini: process.env.ADF_ORIGINI || "*",
   admin: process.env.ADF_ADMIN || "",

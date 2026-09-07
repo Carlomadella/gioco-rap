@@ -16,12 +16,17 @@
 
 const crypto = require("crypto");
 const { apri: apriDb } = require("./db.js");
-const { nuovoBot, popolazione, settimanaBot, ricambio, ritratto } = require("../bot.js");
+const { nuovoBot, popolazione, settimanaBot, ricambio, ritratto,
+  quantiServono, dirada } = require("../bot.js");
 const { nomeDufficio } = require("../moderazione.js");
 const plausibilita = require("../plausibilita.js");
 
 let A = null;                                   // il motore del database (sqlite.js o postgres.js)
-let CFG = { quantiBot: 140, settimanaMs: 24 * 3600e3 };
+/* `quantiBot` è quanti bot tenere quando la classifica è tutta nostra;
+   `botMinimo` è il pavimento sotto cui non si scende nemmeno con mille
+   giocatori veri — due righe di gente che non conosci in fondo alla
+   graduatoria fanno mondo, e non tolgono il posto a nessuno. */
+let CFG = { quantiBot: 140, botMinimo: 20, settimanaMs: 24 * 3600e3 };
 
 const ora = () => Date.now();
 const uuid = () => crypto.randomUUID();
@@ -506,9 +511,20 @@ async function giroSettimana(){
 
     /* ricambio: chi non ce la fa smette, e spunta qualcuno dal niente */
     const usati = new Set((await A.tutti("SELECT nome FROM artista WHERE ritirato IS NULL")).map(r => r.nome.toLowerCase()));
-    const vivi = await A.tutti("SELECT a.id, a.nome, a.stream FROM artista a JOIN bot_stato b ON b.artista_id = a.id WHERE a.ritirato IS NULL");
+    const vivi = await A.tutti(`SELECT a.id, a.nome, a.citta, a.stream FROM artista a
+      JOIN bot_stato b ON b.artista_id = a.id WHERE a.ritirato IS NULL`);
     const dopo = vivi.slice();
-    ricambio(dopo, CFG.quantiBot, usati, notizie);
+
+    /* Il diradamento (backend.md § 8): i bot si fanno da parte man mano che
+       arriva gente vera, e si tolgono dall'alto. Si contano i giocatori
+       **attivi**, non gli iscritti: chi ha provato il gioco a marzo e non è
+       più tornato non è una persona che riempie la classifica — e il metro è
+       lo stesso che due righe più su fa scendere chi non si fa vivo. */
+    const veri = (await A.uno(`SELECT count(*) n FROM artista
+      WHERE bot = 0 AND ritirato IS NULL AND coalesce(punteggio, creato) >= ?`, fermoDa)).n;
+    const bersaglio = quantiServono(CFG.quantiBot, veri, CFG.botMinimo);
+    dirada(dopo, bersaglio, veri, usati, notizie);
+    ricambio(dopo, bersaglio, usati, notizie);
     /* Il confronto fra prima e dopo si fa con due insiemi di id, non con
        `indexOf` dentro a un ciclo: con ventimila bot quello erano quattrocento
        milioni di confronti a ogni giro di settimana — l'ha trovato
