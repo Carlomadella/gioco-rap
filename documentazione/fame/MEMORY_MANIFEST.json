@@ -1,0 +1,91 @@
+﻿{
+    "memory_version":  "1.2",
+    "reference_build":  "FAME V0.8 Rhythm \u0026 Arrangement Pass",
+    "hash_algorithm":  "SHA-256",
+    "files":  {
+                  "AGENT_BOOTSTRAP.md":  {
+                                             "sha256":  "6b8c44e38fe26ee53c7d3ffec45a49c83f2c0049d6184578f68d0fb0f7fd0fd1",
+                                             "bytes":  1018
+                                         },
+                  "AGGIORNA_MANIFEST_FAME.ps1":  {
+                                                     "sha256":  "58d5495ae2e4b833f358ede55e8091c569e02e9531bf3ce6511174e209887d40",
+                                                     "bytes":  1218
+                                                 },
+                  "docs/CHANGELOG.md":  {
+                                            "sha256":  "792edd5cbebe46b0831704a76aa4e522651e48a834d711cf5e7394025790e40b",
+                                            "bytes":  1235
+                                        },
+                  "docs/CURRENT_STATE.md":  {
+                                                "sha256":  "b3e1cc76e95621ec614ff594feaaf4b587d9269ee00928088d355d43436e4605",
+                                                "bytes":  2793
+                                            },
+                  "docs/DECISIONS.md":  {
+                                            "sha256":  "c1958b01401aad64f7a3ef1a9f82af78a12c9f3a627c0bf677721ea655dd2bf8",
+                                            "bytes":  2773
+                                        },
+                  "docs/FAME_MASTER_SPEC.md":  {
+                                                   "sha256":  "5b5f5ac16a3eaa5267a62dcd622b5703275181ef0ba5a195f00a313d4009ad4d",
+                                                   "bytes":  5726
+                                               },
+                  "docs/GENRE_RESEARCH.md":  {
+                                                 "sha256":  "e62372e818dbdff9433c67eb80954f25fdc7b04ec8d4f06311886485fea3ea36",
+                                                 "bytes":  1036
+                                             },
+                  "docs/REJECTED_APPROACHES.md":  {
+                                                      "sha256":  "b18b9d24b2177f3b46ab70a2d462901a6a75c6f5700916718199978df6d55e12",
+                                                      "bytes":  1300
+                                                  },
+                  "docs/ROADMAP_FAME.md":  {
+                                               "sha256":  "d13c086819e809481bbc926910a74bf8ea357c3722cc437e2c720f36461c4dcc",
+                                               "bytes":  4699
+                                           },
+                  "docs/WORKFLOW_RULES.md":  {
+                                                 "sha256":  "3324f1b8c55ae373671651dd634b75955dddc7d9cc7a094e0a10eaadad83fb7c",
+                                                 "bytes":  1443
+                                             },
+                  "FAME_CONTEXT_INDEX.json":  {
+                                                  "sha256":  "e200bca24089d434cb0a2c7e4fb7226d94a4779cb2b70b8ca72f3a7fb5859718",
+                                                  "bytes":  1401
+                                              },
+                  "MEMORY_VERSION.json":  {
+                                              "sha256":  "c2830d79a7aff92fbd9348ded37f39b765bad67a03887e3a9f7586e5b281923a",
+                                              "bytes":  285
+                                          },
+                  "specs/engine.json":  {
+                                            "sha256":  "f14962a3acd46bed455e05674369000d4ba305aca24036d1b2c1cb7f78412340",
+                                            "bytes":  563
+                                        },
+                  "specs/genres/trap.json":  {
+                                                 "sha256":  "a8879008fae6e7e89306b69bdcacdd9a65631ae82d40812e488a1e9f31a721c2",
+                                                 "bytes":  3232
+                                             },
+                  "specs/sound/sound-library.json":  {
+                                                         "sha256":  "6f1f6d6a74219530653d10ac5ad6ebb0abfe7ceabe7aca13e353dae77b93cf18",
+                                                         "bytes":  873
+                                                     },
+                  "specs/timing.json":  {
+                                            "sha256":  "f64513de87908685205c1723e7498caefbd26c2cd3f911168d60bd5dc12b76ec",
+                                            "bytes":  432
+                                        },
+                  "START_HERE.md":  {
+                                        "sha256":  "21bc51d8a72687d04ce27951f9349bfbd296f5c99c19cc4849a8c0b499841a66",
+                                        "bytes":  1052
+                                    },
+                  "templates/ADR_TEMPLATE.md":  {
+                                                    "sha256":  "57b88c04099adb13a27441f0ee5e21b4503a4c95bdd05c1fa3ba56939b99bc50",
+                                                    "bytes":  192
+                                                },
+                  "templates/CHANGE_CHECKLIST.md":  {
+                                                        "sha256":  "f55992f9fd12abbf7fac95d4f85c109c0d3a76641120374da1e2a946df8eee7b",
+                                                        "bytes":  351
+                                                    },
+                  "tests/REGRESSION_TESTS.md":  {
+                                                    "sha256":  "38c445a4548c185ef320897138c040ffcae8f9d1a0e532a1baeb35145f9b4a9c",
+                                                    "bytes":  1866
+                                                },
+                  "VERIFICA_MEMORIA_FAME.ps1":  {
+                                                    "sha256":  "22f9a6e08fbd4f21692a9176080976862beb6c568bbd18347699c103a83873b2",
+                                                    "bytes":  1166
+                                                }
+              }
+}

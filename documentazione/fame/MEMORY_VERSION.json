@@ -1,0 +1,8 @@
+{
+  "memory_version": "1.2",
+  "created_date": "2026-09-07",
+  "reference_build": "FAME V0.8 Rhythm & Arrangement Pass",
+  "install_target": "documentazione/fame",
+  "integrity": "SHA-256 manifest",
+  "update_policy": "code + specs + state + tests + changelog in same logical change"
+}

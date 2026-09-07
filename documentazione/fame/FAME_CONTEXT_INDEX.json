@@ -1,0 +1,37 @@
+{
+  "memory_version": "1.2",
+  "reference_build": "FAME V0.8 Rhythm & Arrangement Pass",
+  "mandatory_read_order": [
+    "START_HERE.md",
+    "AGENT_BOOTSTRAP.md",
+    "docs/FAME_MASTER_SPEC.md",
+    "docs/CURRENT_STATE.md",
+    "docs/DECISIONS.md",
+    "docs/REJECTED_APPROACHES.md",
+    "docs/ROADMAP_FAME.md",
+    "specs/genres/<active-genre>.json",
+    "tests/REGRESSION_TESTS.md"
+  ],
+  "locked_invariants": [
+    "FAME is generative; novice one-click UX remains default",
+    "ACE-Step is excluded from the core generator",
+    "Python toy renderer is diagnostic only",
+    "Tone.js/browser audio graph is the approved current direction",
+    "960 PPQ absolute musical scheduling",
+    "Humanize and swing remain OFF until straight pocket is approved",
+    "Genre grammar before randomness",
+    "Harmony before melody",
+    "Randomness is seeded/stable by phrase or section",
+    "No hard mute of musical layers at section boundaries",
+    "FX use musical/tempo-synced timing",
+    "Trap hats use skeleton + local ornaments",
+    "Open/closed hat choke logic",
+    "Crash is structural punctuation",
+    "Hat pitch automation is a Trap ornament, not a permanent effect",
+    "Grid correctness does not prove musical pocket"
+  ],
+  "current_priority": [
+    "FASE 0: commit official FAME memory to documentazione/fame",
+    "FASE 1: Trap Production Grammar V1 only after Phase 0 is closed"
+  ]
+}

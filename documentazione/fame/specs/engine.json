@@ -1,0 +1,28 @@
+{
+  "version": "1.0",
+  "modules": [
+    "intent_engine",
+    "genre_identity_engine",
+    "timing_engine",
+    "rhythm_engine",
+    "harmony_engine",
+    "motif_engine",
+    "performance_engine",
+    "sound_dna_engine",
+    "sound_engine",
+    "fx_engine",
+    "arrangement_engine",
+    "mix_engine"
+  ],
+  "ux_modes": [
+    "generate",
+    "guided",
+    "studio"
+  ],
+  "default_mode": "generate",
+  "core_backend_status": {
+    "ace_step": "excluded_from_core",
+    "python_toy_renderer": "diagnostic_only",
+    "tonejs_audio_graph": "approved_direction"
+  }
+}

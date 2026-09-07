@@ -1,0 +1,164 @@
+{
+  "version": "0.1",
+  "status": "research_in_progress",
+  "identity_model": {
+    "core_anchors": [
+      {
+        "id": "half_time_feel",
+        "weight": "REQUIRED_OR_HIGH"
+      },
+      {
+        "id": "808_bass_language",
+        "weight": "HIGH"
+      },
+      {
+        "id": "trap_hat_language",
+        "weight": "HIGH"
+      },
+      {
+        "id": "sparse_syncopated_kick",
+        "weight": "HIGH"
+      },
+      {
+        "id": "negative_space",
+        "weight": "HIGH"
+      }
+    ],
+    "strong_cliches": [
+      {
+        "id": "hat_rolls",
+        "weight": "MEDIUM_HIGH"
+      },
+      {
+        "id": "hat_pitch_automation",
+        "weight": "MEDIUM"
+      },
+      {
+        "id": "bells_plucks_mallets",
+        "weight": "MEDIUM"
+      },
+      {
+        "id": "dark_minor_tonality",
+        "weight": "MEDIUM_HIGH"
+      },
+      {
+        "id": "open_hat_pickup",
+        "weight": "LOW_MEDIUM"
+      }
+    ],
+    "style_cliches": [
+      {
+        "id": "marimba",
+        "weight": "LOW_MEDIUM"
+      },
+      {
+        "id": "dark_piano",
+        "weight": "MEDIUM"
+      },
+      {
+        "id": "flute",
+        "weight": "LOW"
+      },
+      {
+        "id": "guitar",
+        "weight": "LOW_MEDIUM"
+      },
+      {
+        "id": "choir_strings",
+        "weight": "LOW"
+      }
+    ],
+    "forbidden_automatisms": [
+      "same_hat_pattern_every_beat",
+      "constant_16th_hat_section",
+      "crash_every_4_bars_by_default",
+      "808_always_same_loudness",
+      "same_progression_for_every_generation"
+    ]
+  },
+  "hats": {
+    "closed": {
+      "role": "groove_skeleton",
+      "preferred_bases": [
+        "eighth_sparse",
+        "broken_eighth",
+        "eighth_with_holes"
+      ],
+      "velocity_variation": true,
+      "section_wide_fast_pattern": false
+    },
+    "rolls": {
+      "role": "local_ornament",
+      "allowed_grids": [
+        "1/16",
+        "1/32",
+        "triplet"
+      ],
+      "use_cases": [
+        "end_of_phrase",
+        "pickup",
+        "transition",
+        "accent"
+      ],
+      "constant_use": false
+    },
+    "pitch": {
+      "enabled": true,
+      "best_targets": [
+        "roll",
+        "pickup",
+        "accent"
+      ],
+      "main_skeleton_probability": "VERY_LOW",
+      "continuous_random_pitch": false
+    },
+    "open_hat": {
+      "role": [
+        "pickup",
+        "transition",
+        "accent"
+      ],
+      "frequency": "RARE_TO_LOW",
+      "choked_by_closed_hat": true
+    },
+    "crash": {
+      "role": "major_section_punctuation",
+      "frequency": "RARE",
+      "tail_should_survive": true
+    }
+  },
+  "bass": {
+    "type": "808",
+    "role": "central_but_variable",
+    "presence_profiles": [
+      "soft",
+      "medium",
+      "heavy",
+      "extreme"
+    ],
+    "glide": "style_dependent",
+    "kick_one_to_one": false
+  },
+  "harmony": {
+    "common_colors": [
+      "minor",
+      "min7",
+      "min9",
+      "add9"
+    ],
+    "complexity": "low_to_medium",
+    "space": "important"
+  },
+  "melody": {
+    "common_families": [
+      "bell",
+      "pluck",
+      "mallet",
+      "dark_piano",
+      "pad"
+    ],
+    "marimba": "valid_cliche_not_core_anchor",
+    "motif_memory": true,
+    "space": "important"
+  }
+}
