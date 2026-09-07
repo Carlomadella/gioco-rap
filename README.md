@@ -6,7 +6,7 @@ Il progetto è diviso in due metà che non si mescolano:
 | dove | cos'è | come si avvia |
 | --- | --- | --- |
 | [`frontend/`](frontend/README.md) | il gioco: HTML, CSS, JavaScript, dentro a un guscio nativo per gli store | `npm run dev` |
-| [`backend/`](backend/README.md) | il server: classifica, account, salvataggi in cloud. Node + SQLite, nessuna dipendenza | `npm start` |
+| [`backend/`](backend/README.md) | il server: classifica, account, salvataggi in cloud. Node + SQLite, una dipendenza sola (`pg`) | `npm start` |
 | [`backend/database/`](backend/database/README.md) | i dati: 20 tabelle, migrazioni, travaso (schema completo in `schema.md`) | — |
 
 **Il gioco funziona da solo.** Il backend serve alla classifica multiplayer: se non è

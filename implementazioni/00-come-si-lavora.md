@@ -45,6 +45,31 @@ Vale la pena scriverlo bene: sette punti di questa cartella risultavano chiusi s
 messaggi dei commit, e nessuno se lo ricordava più. Adesso hanno una riga che lo dice, ma
 è roba recuperata dalla storia di git — meglio non doverlo rifare.
 
+## Le dipendenze
+
+**Si possono usare.** Il principio «zero dipendenze» è caduto il 07/09/2026. La regola che
+c'è al suo posto, il prezzo che si paga e **il registro di quello che è installato** stanno
+in [`../documentazione/dipendenze.md`](../documentazione/dipendenze.md); il ragionamento per
+esteso e l'elenco di tutto quello che si potrebbe installare stanno nel punto «togli il
+principio zero-dipendenze» di [`implementazioni.md`](implementazioni.md). In breve:
+
+> Ognuna si sceglie, si motiva in una riga e si può togliere.
+
+Prima di installare, cinque domande:
+
+1. **entra nel gioco o resta fuori?** Negli strumenti la soglia è bassa, dentro a
+   `gioco-*.js` si misura il peso col build, prima e dopo;
+2. **la cosa che fa è difficile, e la difficoltà è di qualcun altro?** (crittografia,
+   protocolli, immagini, audio: sì; cinque funzioni di comodo: no);
+3. **quanti pacchetti si porta dietro?** — `npm ls --all`, l'albero, non la scheda;
+4. **si può togliere in un giorno?** Ogni dipendenza sta dietro a un file nostro;
+5. **è viva, e la licenza regge in un gioco venduto?** MIT/Apache/BSD sì, GPL/AGPL no.
+
+E il prezzo, che si paga sempre: lockfile committato e `npm ci` in CI, una dipendenza per
+commit col perché nel messaggio, `npm audit` nella verifica, aggiornamenti automatici
+accesi, e una riga nel registro delle dipendenze. Se quella riga non si riesce a scrivere,
+quella dipendenza non doveva entrare.
+
 ## Dove sta il resto
 
 | documento | cosa c'è dentro |
@@ -55,6 +80,7 @@ messaggi dei commit, e nessuno se lo ricordava più. Adesso hanno una riga che l
 | [`../backend/README.md`](../backend/README.md) | il server: rotte, manopole, quanto regge |
 | `../backend.md` | il quaderno di bordo del server (fuori da git) |
 | [`../documentazione/stili-interfaccia.md`](../documentazione/stili-interfaccia.md) | il riferimento visivo |
+| [`../documentazione/dipendenze.md`](../documentazione/dipendenze.md) | la regola per sceglierle e il registro di quelle installate |
 
 ---
 

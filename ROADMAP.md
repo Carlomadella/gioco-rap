@@ -128,8 +128,10 @@ dice mai chi è un bot — non è un dettaglio tecnico, è la regola che tiene i
 
 ### Il server _(fatto: 31/08/2026)_
 
-`backend/` — Node e basta, nessuna dipendenza e nessun build, come il gioco.
-Archivio in un file JSON (`backend/database/dati/`), scritto con temporaneo + rinomina.
+`backend/` — Node e basta, nessun build, e una dipendenza sola (`pg`, per PostgreSQL).
+Le dipendenze non sono più vietate per principio: la regola per sceglierle e il registro di
+quelle installate stanno in [`documentazione/dipendenze.md`](documentazione/dipendenze.md).
+Archivio in SQLite (`backend/database/dati/`, `node:sqlite`), con le migrazioni accanto.
 Le rotte e le manopole stanno in `backend/README.md`, il modello dei dati in
 `backend/database/README.md`. La prova completa dell'API: `cd backend && npm run prova`.
 
