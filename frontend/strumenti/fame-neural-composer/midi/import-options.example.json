@@ -1,0 +1,18 @@
+{
+  "pitchBendRangeSemitones": 2,
+  "trackOverrides": {
+    "tracks": [
+      {
+        "trackIndex": 2,
+        "melodicRole": "808",
+        "pitchBendRangeSemitones": 2,
+        "reason": "Confermato manualmente dal producer"
+      },
+      {
+        "trackName": "Mystery Keys",
+        "melodicRole": "harmony",
+        "reason": "Track ascoltata e verificata come accordi"
+      }
+    ]
+  }
+}

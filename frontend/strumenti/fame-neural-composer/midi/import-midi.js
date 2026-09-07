@@ -19,16 +19,17 @@ function loadJson(filePath) {
 }
 
 function main(argv = process.argv.slice(2)) {
-  const [midiPath, provenancePath, outputPath] = argv;
+  const [midiPath, provenancePath, outputPath, optionsPath] = argv;
   if (!midiPath || !provenancePath || !outputPath) {
-    console.error("Uso: node import-midi.js <input.mid> <provenance.json> <output.dataset-item.json>");
+    console.error("Uso: node import-midi.js <input.mid> <provenance.json> <output.dataset-item.json> [import-options.json]");
     process.exitCode = 64;
     return;
   }
 
   try {
     const provenance = loadJson(provenancePath);
-    const item = importMidiFile(midiPath, provenance);
+    const options = optionsPath ? loadJson(optionsPath) : {};
+    const item = importMidiFile(midiPath, provenance, options);
     fs.writeFileSync(outputPath, `${JSON.stringify(item, null, 2)}\n`, "utf8");
     console.log(`Dataset item: ${outputPath}`);
     console.log(`Import: ${item.import.status}`);

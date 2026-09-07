@@ -2,6 +2,8 @@
 
 const { PPQ, BAR_TICKS, createSequence, validateSequence } = require("../core");
 const { classifyTrack, drumEventType } = require("./track-classifier");
+const { normalizeTrackOverrides, resolveTrackOverride } = require("./track-overrides");
+const { inferSimple808Glide } = require("./pitch-bend");
 
 const MAJOR_KEY_PC_BY_SHARPS_FLATS = new Map([
   [-7, 11], [-6, 6], [-5, 1], [-4, 8], [-3, 3], [-2, 10], [-1, 5],
@@ -89,28 +91,66 @@ function normalizeParsedMidi(parsed, options = {}) {
   const bpm = resolveTempo(parsed, warnings, errors);
   const meter = resolveMeter(parsed, warnings, errors);
   const tonality = resolveTonality(parsed, warnings);
-  const classifications = parsed.tracks.map(classifyTrack);
+  const overrideState = normalizeTrackOverrides(options.trackOverrides);
+  if (!overrideState.valid) {
+    overrideState.errors.forEach(message => errors.push({ code: "TRACK_OVERRIDE_INVALID", message }));
+  }
+  const classifications = parsed.tracks.map(track => {
+    const automatic = classifyTrack(track);
+    const override = resolveTrackOverride(track, overrideState);
+    if (!override) return { ...automatic, override: false, pitchBendRangeSemitones: null };
+    return {
+      ...automatic,
+      melodicRole: override.melodicRole,
+      confidence: 1,
+      reasons: [`override esplicito: ${override.reason}`],
+      override: true,
+      automaticRole: automatic.melodicRole,
+      automaticConfidence: automatic.confidence,
+      pitchBendRangeSemitones: override.pitchBendRangeSemitones
+    };
+  });
   const events = [];
   const skippedTracks = [];
   let maxTick = 0;
+  let mappedGlides = 0;
 
   for (const track of parsed.tracks) {
     const classification = classifications.find(c => c.trackIndex === track.index);
     if (classification.mixedChannels) {
       warnings.push({ code: "MIXED_DRUM_MELODIC_TRACK", trackIndex: track.index, message: "Track contiene channel 10 e note melodiche: importo entrambe ma segnalo la struttura mista." });
     }
-    if (track.pitchBends.length) {
-      warnings.push({ code: "PITCH_BEND_NOT_MAPPED", trackIndex: track.index, count: track.pitchBends.length, message: "Pitch bend presente: parsing conservato, ma conversione a glide 808 rinviata a un blocco successivo della FASE 2." });
-    }
-
     let importedMelodic = 0;
+    let trackMappedGlides = 0;
     for (const note of track.notes) {
       const event = eventFromNote(note, classification.melodicRole, parsed.ppq);
+      if (event && event.type === "808") {
+        const glideResult = inferSimple808Glide(track, note, parsed.ppq, scaleTick, {
+          pitchBendRangeSemitones: classification.pitchBendRangeSemitones
+            ?? options.pitchBendRangeSemitones
+            ?? 2
+        });
+        if (glideResult.glide) {
+          event.glideTo = glideResult.glide.glideTo;
+          event.glideTicks = Math.min(event.durationTicks, glideResult.glide.glideTicks);
+          trackMappedGlides += 1;
+          mappedGlides += 1;
+        }
+        if (glideResult.warning) {
+          warnings.push({ code: "PITCH_BEND_GLIDE_QUANTIZED", trackIndex: track.index, note: note.note, message: glideResult.warning });
+        }
+      }
       if (event) {
         events.push(event);
         if (note.channel !== 9) importedMelodic += 1;
         maxTick = Math.max(maxTick, event.tick + (event.durationTicks || 1));
       }
+    }
+
+    if (track.pitchBends.length && classification.melodicRole !== "808") {
+      warnings.push({ code: "PITCH_BEND_NOT_MAPPED", trackIndex: track.index, count: track.pitchBends.length, message: "Pitch bend letto ma non convertito: la track non e' classificata 808." });
+    } else if (track.pitchBends.length && classification.melodicRole === "808" && trackMappedGlides === 0) {
+      warnings.push({ code: "PITCH_BEND_NO_SIMPLE_GLIDE", trackIndex: track.index, count: track.pitchBends.length, message: "Pitch bend 808 presente ma nessuna nota e' riducibile in modo affidabile a un singolo glide V1." });
     }
 
     if (classification.melodicRole === "unknown" && classification.melodicNoteCount > 0) {
@@ -163,7 +203,9 @@ function normalizeParsedMidi(parsed, options = {}) {
       tonality,
       classifications,
       skippedTracks,
-      pitchBendCount: parsed.tracks.reduce((sum, t) => sum + t.pitchBends.length, 0)
+      pitchBendCount: parsed.tracks.reduce((sum, t) => sum + t.pitchBends.length, 0),
+      mappedGlides,
+      trackOverrideCount: classifications.filter(c => c.override).length
     }
   };
 }

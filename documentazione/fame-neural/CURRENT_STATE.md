@@ -71,13 +71,25 @@ TRIPLET DURATIONS 160/320: OK
 FASE 1 SMOKE TEST: OK
 ```
 
-## Prossimo intervento — FASE 2
+## FASE 2 — stato implementazione
 
-Costruire il contratto del dataset e la pipeline MIDI/provenance senza aprire ancora il training:
+Completato finora:
 
 1. Dataset Schema V1;
-2. parser/importer MIDI;
-3. normalizzazione verso il formato canonico;
-4. provenance/rights record per sorgente;
-5. primi fixture MIDI di round-trip;
-6. error reporting per file non importabili o ambigui.
+2. parser SMF format 0/1;
+3. normalizzazione PPQ → 960;
+4. classificazione iniziale drums / 808 / harmony / lead / unknown;
+5. provenance/rights record obbligatorio;
+6. SHA-256 sorgente e eligibility tecnica/commerciale separate;
+7. track override espliciti per casi ambigui;
+8. pitch bend semplice 808 → glide canonico;
+9. batch importer con sidecar provenance e report;
+10. fixture SMF reali generate dai test e casi di blocco verificati.
+
+Restano aperti prima di chiudere la FASE 2:
+
+- tempo map variabile;
+- estrazione armonica/chord preservation verificata;
+- manifest di corpus riproducibile;
+- prova su piccolo set di MIDI originali/licenziati reali;
+- hardening sui casi trovati nei dati veri.
