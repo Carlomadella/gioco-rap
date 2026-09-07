@@ -248,6 +248,16 @@
   function bloccoSalto(n){
     n = Math.max(0, Math.floor(Number(n) || 0));
     if(n <= 0) return null;
+    /* DENTRO L'AGENDA NON VALE.
+       Un appuntamento segnato fuori ferma il calendario finche' non lo onori.
+       In carcere onorarlo e' impossibile: la partita restava incastrata per
+       sempre, senza nessun blocco visibile (tempo, eventi e carcere risultano
+       tutti liberi). Da detenuto gli impegni fuori decadono da soli, quindi
+       qui non bloccano piu' niente. */
+    try{
+      if(window.ADF_JAIL && typeof ADF_JAIL.inJail === "function" && ADF_JAIL.inJail())
+        return null;
+    }catch(_){}
     const oggi = oggiAssoluto(), ora = adesso();
     let primo = null, quando = Infinity;
     for(const v of voci()){
