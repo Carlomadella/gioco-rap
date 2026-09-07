@@ -6,8 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:d443364 -->
+## 07/09/26, 23:11 â€” task/come-si-lavora-aggiornato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `d443364`
+
+### Cosa Ã¨ entrato
+
+- `43876cc` â€” docs: le regole di lavoro escono da implementazioni/ e diventano anche CLAUDE.md â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:5bbd9fb -->
-## 07/09/26, 20:26 â€” branch non identificato â†’ main
+## 07/09/26, 20:26 â€” task/via-lo-zero-dipendenze â†’ main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `5bbd9fb`
