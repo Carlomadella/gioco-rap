@@ -472,8 +472,7 @@ test("le ACTION standard dello Studio non vengono addebitate due volte",
       !body.includes("GAME_TIME.spend");
   })());
 
-/* ============================================================
-   Punto 4 di CARLO, seconda meta': «ricrea la schermata identica alle foto
+/* =====================================================   Punto 4 di CARLO, seconda meta': «ricrea la schermata identica alle foto
    con elementi HTML». Le quattro schermate di riferimento dello Studio
    avevano dentro delle cose che il codice non disegnava — le schede dei
    beat, le take, i cursori del banco, il QUANDO. Adesso ci sono, e stanno
@@ -580,6 +579,30 @@ test("dentro alle schede dei beat e alle take non ci sono bottoni annidati",
   studioEl.includes('role="button" tabindex="0"') &&
   /* e chi non e' piu' un bottone si prende lo stesso con la tastiera */
   studioEl.includes('addEventListener("keydown"'));
+
+/* La stima del primo anno sotto alle offerte di contratto usava `my`, che in
+   quella funzione non e' mai esistito: era definito seicento righe piu' sotto,
+   dentro a chartDiCasa(). renderGioco() si piantava — schermata «Il gioco si e'
+   fermato» — appena arrivavi ai 1500 fan della prima offerta senza aver
+   firmato. Non lo prendeva nessuna prova perche' e' una riga dentro a una
+   `map()` che gira solo quando quell'elenco non e' vuoto. */
+console.log("\nLe offerte di contratto: la stima non usa una variabile che non c'e'");
+test("gli stream della settimana si calcolano in un posto solo, e i due che li usano lo chiamano",
+  ui.includes("const streamSettimana = () =>") &&
+  ui.includes("streamSettimana() * 52 * 0.0055 * o.share * o.push + o.advance") &&
+  ui.includes("const my = streamSettimana();"));
+
+test("dentro a renderGioco non e' rimasto nessun `my` senza padrone",
+  (() => {
+    const a = ui.indexOf("function renderGioco");
+    const b = ui.indexOf("function chartDiCasa");
+    if(a < 0 || b < 0 || b < a) return false;
+    const corpo = ui.slice(a, b);
+    /* `my` usato come variabile, non come pezzo di un'altra parola */
+    const usi = corpo.match(/(^|[^\w.$])my([^\w]|$)/g) || [];
+    if(usi.length) console.log("      `my` compare ancora " + usi.length + " volte");
+    return usi.length === 0;
+  })());
 
 console.log("\nBlocco 3 — carcere separato");
 test("hub manda il detenuto alla schermata Carcere",

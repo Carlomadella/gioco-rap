@@ -1,6 +1,15 @@
 /* renderGioco(): disegna HUD, pannelli, liste e collega i comandi. */
 "use strict";
 
+/* Gli stream dell'ultima settimana, sommati su tutti i pezzi usciti. Serve in
+   due posti lontani fra loro — la stima del primo anno sotto alle offerte di
+   contratto, e la tua riga in classifica — e per un pezzo era scritta in uno
+   solo dei due: nell'altro `my` era una variabile che non esisteva, e
+   renderGioco() si piantava appena arrivavi ai 1500 fan della prima offerta
+   senza aver firmato niente. Adesso e' una funzione sola, qui in cima. */
+const streamSettimana = () =>
+  (G.songs || []).filter(x => x.released).reduce((a, x) => a + (x.last || 0), 0);
+
 const SHOWN = {};
 /* quali categorie del lifestyle l'utente ha aperto: sopravvive ai ridisegni */
 const LAPERTE = new Set();
@@ -479,7 +488,7 @@ function renderGioco(){
   // contratti
   const avail = OFFERS.filter(o => G.fans >= o.need && !G.contract);
   $("g-offers").innerHTML = avail.length ? avail.map(o => {
-    const proj = Math.round(my * 52 * 0.0055 * o.share * o.push + o.advance);
+    const proj = Math.round(streamSettimana() * 52 * 0.0055 * o.share * o.push + o.advance);
     return '<div class="li"><span class="nm"><b>' + o.label + ' · ' + o.tag + '</b><span>' + o.pitch +
       '<br>' + o.catch + '<br>anticipo ' + fmt(o.advance) + ' € · a te il ' + Math.round(o.share*100) +
       '% · master ' + (o.masters ? "tuoi" : "loro") + (o.deliver ? " · " + o.deliver + " uscite in " + o.weeks + " settimane" : "") +
@@ -757,7 +766,7 @@ function chartDalServer(c){
 /* La classifica di casa: quella di sempre, per chi gioca senza server. */
 function chartDiCasa(){
   const art = window.ARTIST || {};
-  const my = G.songs.filter(x => x.released).reduce((a2, x) => a2 + (x.last || 0), 0);
+  const my = streamSettimana();
   sistemaRivali();
   const all = G.rivals.map(r => ({ n: r.n, p: r.p, r })).concat([{ n: (art.name || "Tu").trim(), p: my, me: true }]);
   all.sort((a2, b2) => b2.p - a2.p);
