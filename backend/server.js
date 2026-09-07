@@ -18,6 +18,8 @@
      ADF_PORTA        porta di ascolto              (8787)
      ADF_DATI         file del database             (backend/database/dati/classifica.db)
      ADF_BOT          quanti bot tenere in pista    (140)
+     ADF_BOT_MINIMO   sotto questi non si scende    (20)  i bot si diradano
+                      man mano che arrivano giocatori veri: vedi bot.js
      ADF_SETTIMANA_H  ore vere di una settimana     (24)
      ADF_ORIGINI      CORS: * oppure lista di origini separate da virgola
      ADF_ADMIN        chiave per le rotte di servizio (se vuota, sono chiuse)
@@ -51,6 +53,7 @@ const CFG = {
   porta: Number(process.env.ADF_PORTA || 8787),
   file: process.env.ADF_DATI || path.join(__dirname, "database", "dati", "classifica.db"),
   quantiBot: Math.max(0, Number(process.env.ADF_BOT || 140)),
+  botMinimo: Math.max(0, Number(process.env.ADF_BOT_MINIMO || 20)),
   settimanaMs: Math.max(1, Number(process.env.ADF_SETTIMANA_H || 24)) * 3600e3,
   origini: process.env.ADF_ORIGINI || "*",
   admin: process.env.ADF_ADMIN || "",
@@ -374,7 +377,11 @@ async function rotta(req, res, url){
       stream: b.stream, fan: nInt(b.fan, 0, 5e7, null), livello: nInt(b.livello, 1, 60, null),
       fase: nInt(b.fase, 0, 8, null), uscite: nInt(b.uscite, 0, 5000, null), deal: b.deal,
       ultima: b.ultima != null ? nomePulito(b.ultima, 60) : null, seed: nInt(b.seed, 0, 2e9, null),
-      difficolta: b.difficolta
+      difficolta: b.difficolta,
+      /* il diario di bordo (punto 14 di ALE): serate live e feat di carriera.
+         `null` se non arrivano — un client vecchio non li ha, e il totale che
+         c'è non si tocca. Il freno vero sta in plausibilita.js. */
+      live: nInt(b.live, 0, 100000, null), feat: nInt(b.feat, 0, 100000, null)
     }, ipHash(req));
     return r ? invia(res, 200, r) : male(res, 404, "artista-sconosciuto");
   }

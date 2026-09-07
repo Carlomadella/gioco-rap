@@ -21,3 +21,9 @@ note/
 
 # lo stato degli agenti: e' di questa macchina, non del progetto
 .claude/stato-agenti.json
+
+# MakeHuman: runtime installato da npm run setup:makehuman, mai nella history Git
+frontend/media/makehuman-editor-v1/data/
+frontend/media/makehuman-editor-v1/.runtime-cache-v29/
+frontend/media/makehuman-editor-v1/.runtime-install-v29-*
+frontend/media/makehuman-editor-v1/.runtime-old-v29-*

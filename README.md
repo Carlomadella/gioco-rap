@@ -7,7 +7,7 @@ Il progetto è diviso in due metà che non si mescolano:
 | --- | --- | --- |
 | [`frontend/`](frontend/README.md) | il gioco: HTML, CSS, JavaScript, dentro a un guscio nativo per gli store | `npm run dev` |
 | [`backend/`](backend/README.md) | il server: classifica, account, salvataggi in cloud. Node + SQLite, una dipendenza sola (`pg`) | `npm start` |
-| [`backend/database/`](backend/database/README.md) | i dati: 18 tabelle, migrazioni, travaso (schema completo in `schema.md`) | — |
+| [`backend/database/`](backend/database/README.md) | i dati: 20 tabelle, migrazioni, travaso (schema completo in `schema.md`) | — |
 
 **Il gioco funziona da solo.** Il backend serve alla classifica multiplayer: se non è
 acceso, la partita gira come ha sempre girato, con la classifica in locale.

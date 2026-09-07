@@ -150,6 +150,19 @@ const songQ = (bar, beat) => clamp((bar.q*0.45 + beat.q*0.33 + G.skills.flow*0.3
    Studio vale quanto il rapporto che avete costruito. `typeof` perché
    studio.js si carica dopo, e perché il gioco deve reggere anche senza. */
 const studioBonus = () => (typeof studioAiutoFonico === "function" ? studioAiutoFonico() : 0);
+/* punto 4: il feat. Stessa strada del fonico — lo Studio dice quanto vale,
+   qui si somma e basta. Vale per un pezzo solo: `studioConsumaFeat()` lo
+   stacca appena la traccia esce dalla cabina. */
+const featBonus = () => (typeof studioAiutoFeat === "function" ? studioAiutoFeat() : 0);
+/* Le due scelte dello Studio (punto 4: «ogni elemento influenza il
+   risultato», e sceglierlo è metà dell'elemento). Se non hai scelto niente —
+   o se il pezzo che avevi scelto non è più lì — si torna a `sort()[0]`, che
+   è quello che ha sempre fatto: nessuna partita vecchia si accorge di
+   niente. */
+const daMixare = () => (typeof studioDaMixare === "function" && studioDaMixare()) ||
+  unmixed().sort((a,b) => b.q-a.q)[0];
+const daPubblicare = () => (typeof studioDaPubblicare === "function" && studioDaPubblicare()) ||
+  ready().sort((a,b) => b.q-a.q)[0];
 const mixGain = () => Math.round(6 + (G.gear.monitor?5:0) + (G.gear.cuffie?3:0) + G.skills.flow*0.06)
   + studioBonus();
 
@@ -281,7 +294,7 @@ const ACTIONS = [
    need:() => !G.bars.length ? "1 strofa" : !G.beats.length ? "1 beat" : null,
    give:() => {
      const b = bestBar(), bt = bestBeat();
-     return (b && bt ? "1 traccia · qualità ~" + Math.round(songQ(b,bt) + studioBonus()) : "1 traccia grezza") +
+     return (b && bt ? "1 traccia · qualità ~" + Math.round(songQ(b,bt) + studioBonus() + featBonus()) : "1 traccia grezza") +
        " · −3 benessere";
    },
    run(){
@@ -292,11 +305,14 @@ const ACTIONS = [
        if(!G.gear.mic) G.money -= 50;
        /* punto 12: chi sta dietro al vetro conta anche in registrazione — un
           fonico che ti conosce sa dove metterti la voce prima che glielo chiedi */
-       const q = clamp(Math.round(songQ(b,bt) + studioBonus() + rnd(-5,6)), 5, 100);
+       const q = clamp(Math.round(songQ(b,bt) + studioBonus() + featBonus() + rnd(-5,6)), 5, 100);
+       /* chi era in sessione resta scritto sul pezzo, e poi torna libero */
+       const conMe = typeof studioConsumaFeat === "function" ? studioConsumaFeat() : "";
        const s2 = {t:nome, q, mixed:false, released:false, week:0, streams:0, last:0,
-         txt:b.txt||"", tema:b.tema||"", seed:seed, img:img||""};
+         txt:b.txt||"", tema:b.tema||"", seed:seed, img:img||"", feat:conMe};
        G.songs.push(s2); G.wellbeing = clamp(G.wellbeing-3,0,100);
-       pushLog("Registrato <b>«" + nome + "»</b> su «" + bt.n + "» — qualità " + q + ".", "");
+       pushLog("Registrato <b>«" + nome + "»</b> su «" + bt.n + "»" +
+         (conMe ? " con <b>" + conMe + "</b>" : "") + " — qualità " + q + ".", "");
        SFX.rec(); save(); renderGioco();
      });
      return "";
@@ -307,7 +323,7 @@ const ACTIONS = [
    need:() => unmixed().length ? null : "1 traccia da mixare",
    give:() => "+" + mixGain() + " qualità · +flow",
    run(){
-     const s = unmixed().sort((a,b) => b.q-a.q)[0];
+     const s = daMixare();
      s.q = clamp(s.q + mixGain(), 5, 100); s.mixed = true;
      gain("flow", 1.1);
      return "«" + s.t + "» mixato: qualità " + s.q + ". Pronto per uscire.";
@@ -317,11 +333,11 @@ const ACTIONS = [
    d:"Lo metti fuori. Da qui in poi corre da solo.",
    need:() => ready().length ? null : "1 traccia",
    give:() => {
-     const s = ready().sort((a,b) => b.q-a.q)[0];
+     const s = daPubblicare();
      return s ? "esce «" + s.t + "» · q" + s.q + (s.mixed ? "" : " · non mixato, −8") : "un pezzo esce";
    },
    run(){
-     const s = ready().sort((a,b) => b.q-a.q)[0];
+     const s = daPubblicare();
      if(!s.mixed) s.q = clamp(s.q - 8, 5, 100);
      s.released = true; s.week = totalWeeks();
      G.hype = clamp(G.hype + 6 + s.q*0.12, 0, (typeof hypeCap==="function"?hypeCap():100));

@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "ppq": 960,
+  "divisions": {
+    "quarter": 960,
+    "eighth": 480,
+    "sixteenth": 240,
+    "thirty_second": 120,
+    "eighth_triplet": 320,
+    "sixteenth_triplet": 160
+  },
+  "humanize_default": false,
+  "swing_default": false,
+  "rules": [
+    "absolute_tick_scheduling",
+    "quantize_note_on",
+    "quantize_note_off",
+    "separate_grid_transient_latency_pocket",
+    "ear_wins_over_grid_audit"
+  ]
+}

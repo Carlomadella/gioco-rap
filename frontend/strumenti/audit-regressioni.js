@@ -1191,6 +1191,17 @@ test("il foglio delle trasferte non si richiede da solo dentro al build",
   trasferte.includes('r.selectorText.indexOf(".trascosti")') &&
   trasferte.indexOf("if(regoleCaricate()) return;") <
     trasferte.indexOf('l.href = "css/trasferte.css'));
+/* La prova qui sotto e quella delle immagini orfane si reggono a vicenda: quella
+   là smette di guardare dentro al dataset degli avatar *perché* il build lo
+   salta. Se un giorno qualcuno toglie il salto dal build e non se ne accorge
+   nessuno, 2,8 GB tornano nel pacchetto in silenzio — che è il modo esatto in
+   cui i guai di questo progetto sono sempre arrivati: due liste scritte a mano
+   in due file, e una che resta indietro. Qui la seconda lista controlla la prima. */
+test("il dataset degli avatar resta fuori dal pacchetto per gli store",
+  build.includes("FUORI_DAL_PACCHETTO") &&
+  build.includes('path.join(RADICE, "media", "makehuman-editor-v1")') &&
+  /if\(FUORI_DAL_PACCHETTO\.has\(da\)\) return;/.test(build) &&
+  fs.existsSync(path.join(ROOT, "media", "makehuman-editor-v1")));
 test("i video delle transizioni stanno in una cartella sola, senza doppioni",
   (() => {
     const dir = path.join(ROOT, "media/video");
@@ -1225,21 +1236,34 @@ test("in media/ non restano immagini che nessuna riga di codice carica",
       "studio_promo_su_lafamegram.png", "studio_uscita_pezzo.png",
       /* la versione definitiva di Casa, arrivata dopo le altre */
       "casa_di provincia_definitiva.png",
-      /* Le stesse undici scene, ma senza gli elementi HTML sopra: servono per
-         capire cosa e' disegno e cosa e' foto quando si rifanno le pagine dei
-         luoghi. Materiale di riferimento, non ancora caricato da nessuno. */
-      "ChatGPT Image 6 set 2026, 19_43_32 (1).png",
+      /* Le stesse scene, ma senza gli elementi HTML sopra: servono per capire
+         cosa e' disegno e cosa e' foto quando si rifanno le pagine dei
+         luoghi. Erano dieci, tutte con il nome che gli aveva dato ChatGPT.
+         Quattro adesso sono il fondale vero delle sezioni dello Studio
+         (js/game/studio.js, STUDIO_FOTO) e sono uscite da questa lista: si
+         chiamano studio_beat / studio_testo / studio_cabina / studio_mix /
+         studio_uscita / studio_promo, e
+         se sparissero dal disco il gioco se ne accorgerebbe da solo. Queste
+         quattro restano materiale in attesa — le due di casa, il freestyle sotto
+         il cavalcavia e il live club: i loro posti non hanno ancora una
+         pagina che le carichi. */
       "ChatGPT Image 6 set 2026, 19_43_32 (2).png",
-      "ChatGPT Image 6 set 2026, 19_43_32 (3).png",
-      "ChatGPT Image 6 set 2026, 19_43_33 (4).png",
-      "ChatGPT Image 6 set 2026, 19_43_33 (5).png",
       "ChatGPT Image 6 set 2026, 19_43_34 (6).png",
-      "ChatGPT Image 6 set 2026, 19_43_34 (7).png",
       "ChatGPT Image 6 set 2026, 19_43_34 (8).png",
-      "ChatGPT Image 6 set 2026, 19_43_35 (10).png",
-      "ChatGPT Image 6 set 2026, 19_43_35 (9).png"
+      "ChatGPT Image 6 set 2026, 19_43_35 (10).png"
     ];
+    /* Il dataset degli avatar (`media/makehuman-editor-v1`) sta fuori dal conto,
+       e per due motivi diversi. Il primo: i suoi disegni non li nomina il
+       codice, li nominano i suoi cataloghi JSON — cercarli in js/css/html non
+       li troverebbe mai, e li chiamerebbe orfani tutti e 1.717. Il secondo, che
+       conta di più: questa prova esiste per non far finire nel pacchetto roba
+       che nessuno ha chiesto, e quel dataset nel pacchetto **non ci va** — lo
+       salta `strumenti/build.js` (`FUORI_DAL_PACCHETTO`). Quindi non c'è niente
+       da sorvegliare: qui dentro può restare quello che serve a chi lavora agli
+       avatar, tanto a chi installa il gioco non arriva. */
+    const DATASET_FUORI = path.join(ROOT, "media", "makehuman-editor-v1");
     const tutte = elencaFile(path.join(ROOT, "media"))
+      .filter(f => !f.startsWith(DATASET_FUORI))
       .filter(f => /\.(png|jpe?g|webp|gif)$/i.test(f));
     const fantasma = IN_ARRIVO.filter(n =>
       !tutte.some(f => path.basename(f) === n));

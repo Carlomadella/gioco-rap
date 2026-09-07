@@ -1,0 +1,57 @@
+{
+  "version": "0.1",
+  "status": "prototype",
+  "v0_8_real_samples": [
+    {
+      "role": "kick",
+      "count": 1
+    },
+    {
+      "role": "snare",
+      "count": 1
+    },
+    {
+      "role": "clap",
+      "count": 1
+    },
+    {
+      "role": "closed_hat",
+      "count": 1
+    },
+    {
+      "role": "open_hat",
+      "count": 1
+    },
+    {
+      "role": "rimshot",
+      "count": 1
+    },
+    {
+      "role": "crash_cymbal",
+      "count": 1
+    }
+  ],
+  "synthetic_sources": [
+    "808_sub_synth",
+    "chord_saw_layer",
+    "chord_fm_layer",
+    "chord_air_layer",
+    "lead_fm",
+    "lead_pluck",
+    "noise_riser",
+    "noise_downlifter"
+  ],
+  "target_metadata": [
+    "family",
+    "character",
+    "genres",
+    "brightness",
+    "hardness",
+    "weight",
+    "transient_offset_samples",
+    "root_note",
+    "attack_class",
+    "decay",
+    "license"
+  ]
+}

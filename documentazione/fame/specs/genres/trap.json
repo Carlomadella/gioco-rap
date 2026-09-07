@@ -1,0 +1,305 @@
+{
+  "version": "0.2",
+  "status": "phase_1_in_progress",
+  "reference_build": "FAME V0.15.1 Low-End Click Fix",
+  "identity_model": {
+    "core_anchors": [
+      {
+        "id": "half_time_feel",
+        "weight": "REQUIRED_OR_HIGH"
+      },
+      {
+        "id": "808_bass_language",
+        "weight": "HIGH"
+      },
+      {
+        "id": "trap_hat_language",
+        "weight": "HIGH"
+      },
+      {
+        "id": "kick_808_relationship",
+        "weight": "REQUIRED"
+      },
+      {
+        "id": "negative_space",
+        "weight": "HIGH"
+      },
+      {
+        "id": "rap_cadence_awareness",
+        "weight": "HIGH"
+      }
+    ],
+    "strong_cliches": [
+      {
+        "id": "hat_rolls",
+        "weight": "MEDIUM_HIGH"
+      },
+      {
+        "id": "hat_pitch_automation",
+        "weight": "MEDIUM"
+      },
+      {
+        "id": "bells_plucks_mallets",
+        "weight": "MEDIUM"
+      },
+      {
+        "id": "dark_minor_tonality",
+        "weight": "MEDIUM_HIGH"
+      },
+      {
+        "id": "open_hat_pickup",
+        "weight": "LOW_MEDIUM"
+      }
+    ],
+    "style_cliches": [
+      {
+        "id": "marimba",
+        "weight": "LOW_MEDIUM"
+      },
+      {
+        "id": "dark_piano",
+        "weight": "MEDIUM"
+      },
+      {
+        "id": "flute",
+        "weight": "LOW"
+      },
+      {
+        "id": "guitar",
+        "weight": "LOW_MEDIUM"
+      },
+      {
+        "id": "choir_strings",
+        "weight": "LOW"
+      }
+    ],
+    "lineage_profiles": [
+      "cinematic_street",
+      "musical_church",
+      "dark_minimal",
+      "psychedelic",
+      "bright_spacey",
+      "melodic_emo"
+    ],
+    "producer_decision_dna_dimensions": [
+      "space",
+      "drum_aggression",
+      "harmonic_complexity",
+      "ornament_rate",
+      "low_end_presence",
+      "brightness",
+      "rawness",
+      "transition_weight"
+    ],
+    "forbidden_automatisms": [
+      "same_hat_pattern_every_beat",
+      "constant_16th_hat_section",
+      "crash_every_4_bars_by_default",
+      "808_always_same_loudness",
+      "same_progression_for_every_generation",
+      "independent_kick_pattern_unaware_of_808",
+      "random_rim_click_to_fill_empty_space"
+    ]
+  },
+  "phrasing": {
+    "primary_cell_bars": 4,
+    "roles": [
+      "ESTABLISH",
+      "ANSWER",
+      "BREATHE",
+      "TURNAROUND"
+    ],
+    "principles": [
+      "repeat_then_vary",
+      "A_then_A_prime",
+      "subtraction_before_addition",
+      "phrase_end_ornaments",
+      "silence_can_strengthen_return"
+    ],
+    "benchmark_macro_form": {
+      "intro": 4,
+      "hook_a": 8,
+      "verse": 16,
+      "pre_hook": 4,
+      "hook_b": 8,
+      "outro": 4,
+      "status": "benchmark_not_universal_recipe"
+    }
+  },
+  "virtual_rap_cadence": {
+    "enabled": true,
+    "status": "ACCEPTED_DIRECTION",
+    "generates_audio": false,
+    "roles": [
+      "VOCAL_BUSY",
+      "VOCAL_MEDIUM",
+      "BREATH",
+      "PUNCHLINE_GAP",
+      "TURNAROUND_GAP"
+    ],
+    "use_cases": [
+      "hat_ornament_placement",
+      "negative_space",
+      "future_melody_response",
+      "future_kick_808_response"
+    ]
+  },
+  "hats": {
+    "closed": {
+      "role": "groove_skeleton",
+      "preferred_bases": [
+        "eighth_sparse",
+        "broken_eighth",
+        "eighth_with_holes"
+      ],
+      "velocity_variation": true,
+      "decay_variation": true,
+      "section_wide_fast_pattern": false
+    },
+    "rolls": {
+      "role": "local_ornament",
+      "allowed_grids": [
+        "1/16",
+        "1/32",
+        "triplet"
+      ],
+      "use_cases": [
+        "end_of_phrase",
+        "pickup",
+        "transition",
+        "accent",
+        "virtual_vocal_gap"
+      ],
+      "constant_use": false,
+      "pause_before_roll": "PREFERRED"
+    },
+    "pitch": {
+      "enabled": true,
+      "best_targets": [
+        "roll",
+        "pickup",
+        "accent"
+      ],
+      "main_skeleton_probability": "VERY_LOW",
+      "continuous_random_pitch": false
+    },
+    "open_hat": {
+      "role": [
+        "pickup",
+        "transition",
+        "accent"
+      ],
+      "frequency": "RARE_TO_LOW",
+      "choked_by_closed_hat": true
+    },
+    "crash": {
+      "role": "major_section_punctuation",
+      "frequency": "RARE",
+      "tail_should_survive": true
+    },
+    "rim_click": {
+      "default": "OFF",
+      "reason": "not_core_anchor_and_can_become_foreground_distraction"
+    }
+  },
+  "kick": {
+    "relationship_to_808": "MANDATORY",
+    "allowed_roles": [
+      "REINFORCE",
+      "ANTICIPATE",
+      "RESPONSE"
+    ],
+    "one_to_one_with_808": false,
+    "may_be_omitted": true,
+    "final_pattern_must_know_808_phrase": true
+  },
+  "bass": {
+    "type": "808",
+    "role": "central_but_variable",
+    "presence_profiles": [
+      "soft",
+      "medium",
+      "heavy",
+      "extreme"
+    ],
+    "glide": "style_dependent",
+    "kick_one_to_one": false,
+    "next_research_focus": [
+      "duration",
+      "rests",
+      "root_fifth_octave_language",
+      "passing_notes",
+      "glide_profiles",
+      "register_fitness",
+      "attack_character",
+      "harmonic_color",
+      "avoid_unmusical_truncation"
+    ]
+  },
+  "low_end_collision": {
+    "status": "MANDATORY",
+    "classes": [
+      "EXACT",
+      "NEAR_1_32",
+      "NEAR_1_16",
+      "SEPARATE"
+    ],
+    "benchmark_exact_policy": {
+      "kick": "TRANSIENT_OWNER",
+      "808": "SUSTAIN_BODY_OWNER"
+    },
+    "separate_events": "NO_DUCK_REQUIRED",
+    "timing_shift": false,
+    "automation_must_be_continuous": true,
+    "forbidden": [
+      "instantaneous_gain_jump_that_creates_click"
+    ]
+  },
+  "harmony": {
+    "common_colors": [
+      "minor",
+      "min7",
+      "min9",
+      "add9",
+      "maj7_style_dependent"
+    ],
+    "complexity": "lineage_dependent",
+    "space": "important",
+    "darkness": "NOT_REQUIRED"
+  },
+  "melody": {
+    "common_families": [
+      "bell",
+      "pluck",
+      "mallet",
+      "dark_piano",
+      "pad",
+      "organ",
+      "glass_synth",
+      "guitar_style_dependent"
+    ],
+    "marimba": "valid_cliche_not_core_anchor",
+    "motif_memory": true,
+    "space": "important",
+    "max_new_idea_rate": "LOW"
+  },
+  "mix": {
+    "current_scope": "minimal_support_only",
+    "already_available": [
+      "filters",
+      "master_compressor",
+      "limiter",
+      "tempo_sync_fx",
+      "collision_ducking"
+    ],
+    "deferred_to_phase_1_mix_tendencies": [
+      "source_eq",
+      "bus_eq",
+      "drum_bus_compression",
+      "dynamic_eq_kick_808",
+      "bus_glue",
+      "master_chain"
+    ],
+    "rule": "do_not_use_mix_processing_to_hide_bad_composition"
+  }
+}
