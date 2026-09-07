@@ -27,6 +27,10 @@ nel file giusto, con dentro scritto **cosa è stato fatto e quando**.
 Perché sia questo il verso e non il contrario: chi ha l'idea non deve fermarsi a decidere
 in quale file va. Quello è lavoro di dopo, e lo fa chi mette a posto.
 
+**Se un punto è chiuso ma non si sa in che argomento metterlo**, o è già raccontato per
+esteso da un'altra parte, va in [`fatte.md`](fatte.md) e basta: meglio lì che lasciato nel
+foglio dei punti nuovi a farlo diventare lungo un'altra volta.
+
 ## Come si segna un punto chiuso
 
 Sotto al punto, indentato, una riga che dice cosa è stato fatto:
@@ -47,11 +51,11 @@ messaggi dei commit, e nessuno se lo ricordava più. Adesso hanno una riga che l
 
 ## Le dipendenze
 
-**Si possono usare.** Il principio «zero dipendenze» è caduto il 07/09/2026. La regola che
-c'è al suo posto, il prezzo che si paga e **il registro di quello che è installato** stanno
-in [`../documentazione/dipendenze.md`](../documentazione/dipendenze.md); il ragionamento per
-esteso e l'elenco di tutto quello che si potrebbe installare stanno nel punto «togli il
-principio zero-dipendenze» di [`implementazioni.md`](implementazioni.md). In breve:
+**Si possono usare.** Il principio «zero dipendenze» è caduto il 07/09/2026. Sta tutto in
+[`../documentazione/dipendenze.md`](../documentazione/dipendenze.md): la regola che c'è al
+suo posto, il prezzo che si paga, **il registro di quello che è installato**, il
+ragionamento per esteso e l'elenco commentato di tutto quello che si potrebbe installare.
+Il punto da cui è nato è in [`fatte.md`](fatte.md). In breve:
 
 > Ognuna si sceglie, si motiva in una riga e si può togliere.
 
