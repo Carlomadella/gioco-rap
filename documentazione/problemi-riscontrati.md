@@ -130,17 +130,37 @@ Quel dataset pesa **2,8 GB** — più di tutto il resto del gioco messo insieme 
 gioco senza che nessuno l'avesse chiesto: esattamente la cosa che quella prova è
 lì per impedire.
 
-Cosa si è fatto, e cosa no. Il dataset **resta nel repo**: serve a chi lavora agli
-avatar, e non è roba da buttare. Semplicemente non parte col pacchetto — lo salta
-`build.js` (`FUORI_DAL_PACCHETTO`), e l'audit smette di guardarci dentro *perché*
-il build lo salta. Le due cose sono legate da una prova apposta («il dataset degli
-avatar resta fuori dal pacchetto per gli store»): se un giorno qualcuno toglie il
-salto dal build, l'audit se ne accorge invece di lasciar tornare 2,8 GB nel
-pacchetto in silenzio. Il pacchetto per gli store è passato da **3,0 GB a 194 MB**.
+Cosa si è fatto. Il dataset non parte col pacchetto — lo salta `build.js`
+(`FUORI_DAL_PACCHETTO`), e l'audit smette di guardarci dentro *perché* il build lo
+salta. Le due cose sono legate da una prova apposta («il dataset degli avatar
+resta fuori dal pacchetto per gli store»): se un giorno qualcuno toglie il salto
+dal build, l'audit se ne accorge invece di lasciar tornare 2,8 GB nel pacchetto in
+silenzio. Il pacchetto per gli store è passato da **3,0 GB a 194 MB**.
 
-Resta una cosa **non** sistemata, ed è una scelta, non una dimenticanza: quei 2,8
-GB stanno nella storia di git (`.git` pesa 2,4 GB, e solo `targets.bin` è in LFS).
-Ogni `git clone` se li porta dietro. Tirarli fuori vuol dire riscrivere la storia
-del repo — una cosa che si fa d'accordo con chi ci lavora, non di nascosto dentro
-a un fix. Se il dataset deve restare tracciato, il posto giusto è Git LFS per
-tutto, non solo per un file.
+Restava però una cosa fuori posto, ed era una scelta rimandata: quei 2,8 GB
+stavano anche nella **storia di git**, e ogni `git clone` se li portava dietro.
+
+---
+
+e stavano pure nella storia di git: ogni clone si portava dietro 2,8 GB
+
+**RISOLTO (07/09/2026)** — Mycol, history riscritta e `main` force-pushed. Il
+dataset è uscito anche da lì. Nel repo restano i cataloghi JSON, il manifest e i
+crediti; il dataset vero sta nella release GitHub **`makehuman-v29`**, spezzato in
+35 pezzi da 64 MB, e se lo tira giù chi gli serve con:
+
+```
+cd frontend && npm run setup:makehuman
+```
+
+Lo script (`frontend/strumenti/setup-makehuman.js`) controlla lo sha256 di ogni
+pezzo, poi dell'archivio ricostruito, poi di `targets.bin` estratto, e mette da
+parte il vecchio `data/` prima di sostituirlo: se qualcosa non torna si ferma
+senza aver toccato niente. `.gitignore` tiene fuori
+`frontend/media/makehuman-editor-v1/data/`, così non ci ricasca nessuno.
+
+**Attenzione a due cose.** La prima: su una macchina appena clonata il dataset
+**non c'è**, e finché non lanci il setup l'editor degli avatar non ha da dove
+pescare. La seconda: un branch nato prima della riscrittura può ancora portarsi
+dentro i 2,8 GB — prima di mergiarlo o pusharlo si controlla con
+`git ls-tree -r <branch> -- frontend/media/makehuman-editor-v1/data`.
