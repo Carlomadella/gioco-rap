@@ -6,6 +6,27 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:d443364 -->
+## 07/09/26, 21:11 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `d443364`
+
+### Cosa Ã¨ entrato
+
+- `43876cc` â€” docs: le regole di lavoro escono da implementazioni/ e diventano anche CLAUDE.md â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `.claude/settings.json`
+- **Modificato:** `documentazione/README.md`
+- **Aggiunto:** `documentazione/come-si-lavora.md`
+- **Modificato:** `documentazione/dipendenze.md`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:e69464e -->
 ## 07/09/26, 16:03 â€” branch non identificato â†’ main
 
