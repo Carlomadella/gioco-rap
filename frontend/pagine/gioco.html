@@ -33,7 +33,7 @@
 <link rel="stylesheet" href="css/creator.css?v=12">
 <link rel="stylesheet" href="css/actionbar.css?v=12">
 <link rel="stylesheet" href="css/posto.css?v=13">
-<link rel="stylesheet" href="css/studio.css?v=1">
+<link rel="stylesheet" href="css/studio.css?v=2">
 <link rel="stylesheet" href="css/abilita.css?v=1">
 <link rel="stylesheet" href="css/negozio.css?v=12">
 <link rel="stylesheet" href="css/strada-crimine.css?v=13">
@@ -327,18 +327,23 @@
 
 <!-- La Sala: il posto dove si conosce la gente. Il contenuto lo mette
      js/game/posto.js. -->
-<!-- Lo Studio (punti 10, 11, 12): le quattro stanze di un pezzo — il beat, la
-     cabina, il banco, fuori. Non rifà l'economia del gioco: chiama le stesse
-     azioni della settimana, e ci mette dentro la gente conosciuta alla Sala.
-     Il contenuto lo scrive js/game/studio.js. -->
+<!-- Lo Studio (punti 10, 11, 12 e il punto 4 di CARLO): le otto sezioni di un
+     pezzo — beat, testo, cabina, mix, cover, feat, marketing, timing. Le
+     linguette stanno **in basso**, dove sta il pollice col telefono in mano,
+     e restano ferme mentre il corpo scorre. Non rifà l'economia del gioco:
+     chiama le stesse azioni della settimana, e ci mette dentro la gente
+     conosciuta alla Sala. Il contenuto lo scrive js/game/studio.js. -->
 <div class="studio" id="studio"><div class="stwrap">
   <div class="sthead"><div class="stk">Lo Studio</div>
     <div class="strisorse" id="st-risorse"></div></div>
-  <div class="sttabs" id="st-tabs"></div>
   <div class="stscena" id="st-scena"></div>
   <p class="stdove" id="st-dove"></p>
   <div class="stcorpo" id="st-corpo"></div>
-</div></div>
+  <!-- la copertina caricata dall'utente: la prepara js/game/copertine.js -->
+  <input type="file" id="st-file" accept="image/*" hidden>
+</div>
+  <div class="sttabs" id="st-tabs"></div>
+</div>
 
 <div class="posto" id="posto"><div class="powrap">
   <div class="pohead"><div class="pok">La Sala</div><button class="pox" id="po-x">&#10005;</button></div>
@@ -722,7 +727,7 @@
 <script src="js/game/beats.js?v=12"></script>
 <script src="js/game/covers.js?v=12"></script>
 <script src="js/game/rivals.js?v=12"></script>
-<script src="js/game/actions.js?v=14"></script>
+<script src="js/game/actions.js?v=15"></script>
 <script src="js/game/events.js?v=12"></script>
 <script src="js/game/phases.js?v=12"></script>
 <script src="js/game/sim.js?v=13"></script>
@@ -739,7 +744,7 @@
 <script src="js/game/entry.js?v=1"></script><!-- ADF_AUDIO_ENTRY_PAGE_V1 -->
 <script src="js/game/skip.js?v=14"></script>
 <script src="js/game/posto.js?v=14"></script>
-<script src="js/game/studio.js?v=3"></script>
+<script src="js/game/studio.js?v=4"></script>
 <script src="js/game/abilita.js?v=1"></script>
 <script src="js/game/strada.js?v=12"></script>
 <script src="js/game/strada-crimine.js?v=14"></script>

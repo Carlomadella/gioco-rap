@@ -871,16 +871,33 @@ console.log("\nlo Studio: la gente della Sala conta");
       nodi["st-corpo"].innerHTML.indexOf('data-beat="bm"') >= 0,
       nodi["st-corpo"].innerHTML.slice(0, 200));
 
-    /* tutte e quattro le stanze si disegnano: una che esplode manderebbe giù
-       lo Studio intero, e capiterebbe solo a chi ci clicca */
+    /* tutte le sezioni si disegnano: una che esplode manderebbe giù lo Studio
+       intero, e capiterebbe solo a chi ci clicca. Le sezioni sono otto da
+       quando c'è il punto 4 (beat, testo, cabina, mix, cover, feat,
+       marketing, timing), e l'elenco si legge dal codice invece di essere
+       ricopiato: se domani se ne aggiunge una, questa prova la copre da
+       sola. */
+    const sezioni = dentro("STUDIO_SEZIONI.map(x => x.id)");
+    controlla("le sezioni sono le sette del punto 4, più la cabina",
+      sezioni.join(",") === "beat,testo,cabina,banco,cover,feat,promo,fuori",
+      sezioni.join(","));
     const rotte = [];
-    for(const s of ["beat", "cabina", "banco", "fuori"]){
+    for(const s of sezioni){
       try{
         dentro('STUDIO_SEZ = ' + JSON.stringify(s) + '; renderStudio();');
         if(!nodi["st-corpo"].innerHTML) rotte.push(s + " (vuota)");
       }catch(e){ rotte.push(s + " — " + e.message); }
     }
-    controlla("tutte e quattro le stanze si disegnano", rotte.length === 0, rotte);
+    controlla("tutte le sezioni si disegnano", rotte.length === 0, rotte);
+
+    /* le quattro foto senza interfaccia sono attaccate alle stanze giuste, e
+       stanno davvero sul disco: un fondale che non c'è non dà errore, lascia
+       un buco nero e nessuno se ne accorge finché non ci entra */
+    const fotoMancanti = Object.entries(dentro("STUDIO_FOTO"))
+      .filter(([id, f]) => !fs.existsSync(path.join(RADICE, dentro("STUDIO_FOTO_DIR"), f.f)))
+      .map(([id]) => id);
+    controlla("le foto delle stanze dello Studio sono dove il codice le cerca",
+      fotoMancanti.length === 0, fotoMancanti);
 
     /* il beat su misura: costa, arriva in cartella, e porta il nome di chi l'ha fatto */
     const soldiPrima = dentro("G.money"), energiaPrima = dentro("G.energy");
@@ -929,14 +946,59 @@ console.log("\nlo Studio: la gente della Sala conta");
        Live Club, i turni in Pizzeria/Fabbrica/Centro per l'impiego — e la
        promo è entrata nello Studio, in «Fuori». Il guardiano resta, sulla
        cosa che adesso può davvero rompersi in silenzio: che la promo sia lì. */
-    dentro("G.songs = [{t:'Uno', q:60, mixed:true, released:true, seed:1}]; STUDIO_SEZ = 'fuori'; renderStudio();");
-    controlla("la promo ha un posto: sta nello Studio, in «Fuori»",
+    dentro("G.songs = [{t:'Uno', q:60, mixed:true, released:true, seed:1}]; STUDIO_SEZ = 'promo'; renderStudio();");
+    controlla("la promo ha un posto: sta nello Studio, in «Marketing»",
       nodi["st-corpo"].innerHTML.indexOf('data-az="promo"') >= 0,
       nodi["st-corpo"].innerHTML.slice(0, 200));
     dentro("G.bars = []; G.beats = []; STUDIO_SEZ = 'cabina'; renderStudio();");
     controlla("e senza strofa la cabina non è un vicolo cieco: si scrive da lì",
       nodi["st-corpo"].innerHTML.indexOf('data-az="scrivi"') >= 0,
       nodi["st-corpo"].innerHTML.slice(0, 200));
+    /* le barre hanno una stanza loro, non sono più il ripiego della cabina */
+    dentro("G.bars = [{q:44, tema:'Il cortile'}]; STUDIO_SEZ = 'testo'; renderStudio();");
+    controlla("il testo ha la sua sezione, e ci si vede quello che hai scritto",
+      nodi["st-corpo"].innerHTML.indexOf("Il cortile") >= 0 &&
+      nodi["st-corpo"].innerHTML.indexOf('data-az="scrivi"') >= 0,
+      nodi["st-corpo"].innerHTML.slice(0, 200));
+
+    /* ---- il punto 4: ogni elemento influenza il risultato ----
+       Il feat è l'elemento nuovo, ed è l'unico che tocca i numeri veri: se
+       smettesse di arrivare dentro ad actions.js non se ne accorgerebbe
+       nessuno, perché il pezzo uscirebbe lo stesso, solo peggio. */
+    dentro(`
+      G.gente.push({ id:"rp", ruolo:"rapper", n:"Zeno", gen:"trap", eta:23, fama:40,
+        car:"aperto", scoperto:true, rel:3, pt:0, ult:-1, feat:-99,
+        skin:"#8D5524", hair:2, col:"#FF5A36" });
+    `);
+    controlla("senza feat il pezzo non prende niente in più",
+      dentro("featBonus()") === 0, dentro("featBonus()"));
+    dentro("studioScegliFeat('rp')");
+    const bFeat = dentro("featBonus()");
+    controlla("un feat in sessione alza la qualità del pezzo, e lo dice actions.js",
+      bFeat > 0 && bFeat === dentro("studioAiutoFeat()"),
+      "feat +" + bFeat);
+    dentro("studioConsumaFeat()");
+    controlla("e vale per un pezzo solo: dopo la registrazione il posto torna libero",
+      dentro("featBonus()") === 0 && dentro("studioFeat()") === null);
+
+    /* quale provino e quale pezzo: la scelta è dello Studio, il conto di
+       actions.js. Se il ponte si stacca, torna a uscire sempre il migliore
+       e la sezione Timing diventa un ornamento. */
+    dentro(`
+      G.songs = [
+        {t:'Buono',  q:80, mixed:false, released:false, seed:11},
+        {t:'Storto', q:40, mixed:false, released:false, seed:22}
+      ];
+      G.studio.mixa = null; G.studio.esce = null;
+    `);
+    controlla("senza scelta esce il migliore, come ha sempre fatto",
+      dentro("daMixare().t") === "Buono" && dentro("daPubblicare().t") === "Buono");
+    dentro("studioSegna('mixa', 22); studioSegna('esce', 22);");
+    controlla("ma se scegli tu, actions.js prende quello che hai scelto",
+      dentro("daMixare().t") === "Storto" && dentro("daPubblicare().t") === "Storto");
+    dentro("G.songs = G.songs.filter(x => x.seed !== 22);");
+    controlla("e se il pezzo scelto sparisce non si pianta: torna a decidere lei",
+      dentro("daMixare().t") === "Buono" && dentro("daPubblicare().t") === "Buono");
   }
 }
 

@@ -1225,19 +1225,22 @@ test("in media/ non restano immagini che nessuna riga di codice carica",
       "studio_promo_su_lafamegram.png", "studio_uscita_pezzo.png",
       /* la versione definitiva di Casa, arrivata dopo le altre */
       "casa_di provincia_definitiva.png",
-      /* Le stesse undici scene, ma senza gli elementi HTML sopra: servono per
-         capire cosa e' disegno e cosa e' foto quando si rifanno le pagine dei
-         luoghi. Materiale di riferimento, non ancora caricato da nessuno. */
-      "ChatGPT Image 6 set 2026, 19_43_32 (1).png",
+      /* Le stesse scene, ma senza gli elementi HTML sopra: servono per capire
+         cosa e' disegno e cosa e' foto quando si rifanno le pagine dei
+         luoghi. Erano dieci, tutte con il nome che gli aveva dato ChatGPT.
+         Quattro adesso sono il fondale vero delle sezioni dello Studio
+         (js/game/studio.js, STUDIO_FOTO) e sono uscite da questa lista: si
+         chiamano studio_beat / studio_testo / studio_cabina / studio_mix, e
+         se sparissero dal disco il gioco se ne accorgerebbe da solo. Queste
+         sei restano materiale in attesa — casa, strada, freestyle, live e la
+         scrivania vuota: i loro posti non hanno ancora una pagina che le
+         carichi. */
       "ChatGPT Image 6 set 2026, 19_43_32 (2).png",
-      "ChatGPT Image 6 set 2026, 19_43_32 (3).png",
       "ChatGPT Image 6 set 2026, 19_43_33 (4).png",
       "ChatGPT Image 6 set 2026, 19_43_33 (5).png",
       "ChatGPT Image 6 set 2026, 19_43_34 (6).png",
-      "ChatGPT Image 6 set 2026, 19_43_34 (7).png",
       "ChatGPT Image 6 set 2026, 19_43_34 (8).png",
-      "ChatGPT Image 6 set 2026, 19_43_35 (10).png",
-      "ChatGPT Image 6 set 2026, 19_43_35 (9).png"
+      "ChatGPT Image 6 set 2026, 19_43_35 (10).png"
     ];
     const tutte = elencaFile(path.join(ROOT, "media"))
       .filter(f => /\.(png|jpe?g|webp|gif)$/i.test(f));
