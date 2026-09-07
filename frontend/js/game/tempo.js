@@ -373,6 +373,25 @@
     };
   }
 
+  /* ADF_JAIL_CONTEXT_RESET_TIME
+     L'arresto e' un cambio di contesto duro: una ACTION della vita fuori
+     (anche sospesa da un evento alto) non puo' restare pendente dentro.
+     Se resta, GAME_TIME.pending() blocca sia Attendi sia +1/+7 e la
+     decisione che dovrebbe sbloccarla non e' piu' raggiungibile dal carcere. */
+  window.addEventListener("jail-ui:opened",()=>{
+    let changed=false;
+    if(TEMPO_AZIONE || AZIONE_ID_CATTURATA){
+      TEMPO_AZIONE=null;
+      AZIONE_ID_CATTURATA=null;
+      changed=true;
+    }
+    const r=runtime();
+    if(r.suspendedAction){
+      delete r.suspendedAction;
+      changed=true;
+    }
+    if(changed && typeof save === "function") save();
+  });
   if(typeof hubOra === "function") window.hubOra=function(){ return formatta(); };
 
   function css(){

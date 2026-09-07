@@ -289,6 +289,15 @@
     if(typeof save === "function") save();
   }
 
+  /* ADF_JAIL_CONTEXT_RESET_EVENTS
+     Gli HIGH di eventi-tempo appartengono alla vita fuori. showPending()
+     volutamente non li mostra in carcere; lasciarli pending, pero', fa
+     restare GAME_EVENTS.blocked() === true e congela i controlli del tempo.
+     Il carcere ha il suo pendingHigh separato in G.strada.carcere, quindi
+     questo reset non tocca le decisioni obbligatorie del carcere. */
+  window.addEventListener("jail-ui:opened",()=>{
+    if(inJail() && pending()) clearPending();
+  });
   function screenGameplay(){
     /* Punto 7: la schermata di gioco è una sola, la mappa. I pannelli dei
        luoghi le stanno sopra ma non la spengono, quindi basta guardare lei. */
