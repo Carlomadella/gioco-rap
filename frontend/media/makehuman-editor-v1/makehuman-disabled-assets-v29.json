@@ -1,0 +1,463 @@
+{
+  "schema": "adf.makehuman.disabled-assets.v29",
+  "updatedAt": "2026-09-07T02:42:24.380Z",
+  "sourceReport": "makehuman-visual-qa-all-v29.json",
+  "rule": "Blacklist esatta dal QA globale V2.9: solo FAIL. REVIEW restano attivi. Asset MakeHuman originali invariati.",
+  "proxyRaw": [
+    "clothes/Ballet_dress_The_Swan/Ballet_dress_The_Swan.json",
+    "clothes/Beard_Sigmund/Beard_Sigmund.json",
+    "clothes/DUDoc_balletFlat1/DUDoc_balletFlat1.json",
+    "clothes/DUDoc_domsjeans1/DUDoc_domsjeans1.json",
+    "clothes/DUDoc_maryjane1/DUDoc_maryjane1.json",
+    "clothes/DUDoc_sandals1/DUDoc_sandals1.json",
+    "clothes/Dress_Bodice_Ruffle_Skirt/Dress_Bodice_Ruffle_Skirt.json",
+    "clothes/Dress_Keyhole_Neck/Dress_Keyhole_Neck.json",
+    "clothes/Dress_Strapless_Ruffle_Top/Dress_Strapless_Ruffle_Top.json",
+    "clothes/F_Cardigan_Long_Open_Front/F_Cardigan_Long_Open_Front.json",
+    "clothes/F_Dress_01/F_Dress_01.json",
+    "clothes/F_Dress_02/F_Dress_02.json",
+    "clothes/F_Dress_03/F_Dress_03.json",
+    "clothes/F_Dress_05/F_Dress_05.json",
+    "clothes/F_Dress_06/F_Dress_06.json",
+    "clothes/F_Dress_10/F_Dress_10.json",
+    "clothes/F_Dress_11/F_Dress_11.json",
+    "clothes/F_Ninja/F_Ninja.json",
+    "clothes/Fem_Suit/Fem_Suit.json",
+    "clothes/Full_beard/Full_beard.json",
+    "clothes/M_Suit_01/M_Suit_01.json",
+    "clothes/M_Swimming_trunks_03/M_Swimming_trunks_03.json",
+    "clothes/Moustache/Moustache.json",
+    "clothes/RoundGlasses_leopard/RoundGlasses_leopard.json",
+    "clothes/Shoes_Biker_Boots_female/Shoes_Biker_Boots_female.json",
+    "clothes/Shoes_Biker_Boots_male/Shoes_Biker_Boots_male.json",
+    "clothes/Skirt_Full_Lace_Ruffle/Skirt_Full_Lace_Ruffle.json",
+    "clothes/Tactical_Vest_female/Tactical_Vest_female.json",
+    "clothes/Tactical_Vest_male/Tactical_Vest_male.json",
+    "clothes/Tank_Keyhole_Neck/Tank_Keyhole_Neck.json",
+    "clothes/Tank_Top_01/Tank_Top_01.json",
+    "clothes/Uncle_Joshi_s_hat/Uncle_Joshi_s_hat.json",
+    "clothes/dali_moustache/dali_moustache.json",
+    "clothes/m_opticals01/m_opticals01.json",
+    "hair/Bob_Blunt/Bob_Blunt.json",
+    "hair/Bob_Blunt_Bangs/Bob_Blunt_Bangs.json",
+    "hair/Bob_Curled_Under/Bob_Curled_Under.json",
+    "hair/Bob_Curled_Under_Bangs/Bob_Curled_Under_Bangs.json",
+    "hair/Bob_Inverted/Bob_Inverted.json",
+    "hair/Bob_Inverted_bangs/Bob_Inverted_bangs.json",
+    "hair/LITTLERIGHT_hair_BobCut/LITTLERIGHT_hair_BobCut.json",
+    "hair/Wig_bun_blonde/Wig_bun_blonde.json",
+    "hair/blondwithheadband/blondwithheadband.json",
+    "hair/junglebookhair/junglebookhair.json",
+    "hair/wig_bow_tie/wig_bow_tie.json"
+  ],
+  "skinRaw": [
+    "Caucasion_TatooedMale_Skin_Diffuse/Caucasion_TatooedMale_Skin_Diffuse.json",
+    "Zoey_Skin/Zoey_Skin.json",
+    "light_skin_makeupMaterial/light_skin_makeupMaterial.json",
+    "lightfemaleskinMaterial/lightfemaleskinMaterial.json",
+    "lightskinmaleMaterial/lightskinmaleMaterial.json"
+  ],
+  "targetIds": [],
+  "details": [
+    {
+      "kind": "proxy",
+      "key": "clothes/m_opticals01/m_opticals01.json",
+      "label": "Occhiali 07",
+      "group": "glasses",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/RoundGlasses_leopard/RoundGlasses_leopard.json",
+      "label": "Occhiali 08",
+      "group": "glasses",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/Uncle_Joshi_s_hat/Uncle_Joshi_s_hat.json",
+      "label": "Cappello 22",
+      "group": "hats",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/Beard_Sigmund/Beard_Sigmund.json",
+      "label": "Barba e baffi 01",
+      "group": "facialHair",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/dali_moustache/dali_moustache.json",
+      "label": "Barba e baffi 03",
+      "group": "facialHair",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/Full_beard/Full_beard.json",
+      "label": "Barba e baffi 06",
+      "group": "facialHair",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/Moustache/Moustache.json",
+      "label": "Barba e baffi 07",
+      "group": "facialHair",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "hair/blondwithheadband/blondwithheadband.json",
+      "label": "Stile 03",
+      "group": "hair",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "hair/Bob_Blunt_Bangs/Bob_Blunt_Bangs.json",
+      "label": "Stile 04",
+      "group": "hair",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "hair/Bob_Blunt/Bob_Blunt.json",
+      "label": "Stile 05",
+      "group": "hair",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "hair/Bob_Curled_Under_Bangs/Bob_Curled_Under_Bangs.json",
+      "label": "Stile 06",
+      "group": "hair",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "hair/Bob_Curled_Under/Bob_Curled_Under.json",
+      "label": "Stile 07",
+      "group": "hair",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "hair/Bob_Inverted_bangs/Bob_Inverted_bangs.json",
+      "label": "Stile 08",
+      "group": "hair",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "hair/Bob_Inverted/Bob_Inverted.json",
+      "label": "Stile 09",
+      "group": "hair",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "hair/junglebookhair/junglebookhair.json",
+      "label": "Stile 49",
+      "group": "hair",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "hair/LITTLERIGHT_hair_BobCut/LITTLERIGHT_hair_BobCut.json",
+      "label": "Stile 50",
+      "group": "hair",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "hair/wig_bow_tie/wig_bow_tie.json",
+      "label": "Stile 73",
+      "group": "hair",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "hair/Wig_bun_blonde/Wig_bun_blonde.json",
+      "label": "Stile 74",
+      "group": "hair",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/Skirt_Full_Lace_Ruffle/Skirt_Full_Lace_Ruffle.json",
+      "label": "Gonna 41",
+      "group": "bottoms",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/DUDoc_balletFlat1/DUDoc_balletFlat1.json",
+      "label": "Abbigliamento 14",
+      "group": "clothesOther",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/DUDoc_domsjeans1/DUDoc_domsjeans1.json",
+      "label": "Abbigliamento 15",
+      "group": "clothesOther",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/DUDoc_maryjane1/DUDoc_maryjane1.json",
+      "label": "Abbigliamento 16",
+      "group": "clothesOther",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/F_Ninja/F_Ninja.json",
+      "label": "Abbigliamento 25",
+      "group": "clothesOther",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/Fem_Suit/Fem_Suit.json",
+      "label": "Abbigliamento 28",
+      "group": "clothesOther",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/M_Suit_01/M_Suit_01.json",
+      "label": "Abbigliamento 50",
+      "group": "clothesOther",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/M_Swimming_trunks_03/M_Swimming_trunks_03.json",
+      "label": "Abbigliamento 53",
+      "group": "clothesOther",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/Tank_Keyhole_Neck/Tank_Keyhole_Neck.json",
+      "label": "Abbigliamento 77",
+      "group": "clothesOther",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/Ballet_dress_The_Swan/Ballet_dress_The_Swan.json",
+      "label": "Vestito 02",
+      "group": "dresses",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/Dress_Bodice_Ruffle_Skirt/Dress_Bodice_Ruffle_Skirt.json",
+      "label": "Vestito 06",
+      "group": "dresses",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/Dress_Keyhole_Neck/Dress_Keyhole_Neck.json",
+      "label": "Vestito 09",
+      "group": "dresses",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/Dress_Strapless_Ruffle_Top/Dress_Strapless_Ruffle_Top.json",
+      "label": "Vestito 14",
+      "group": "dresses",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/F_Dress_01/F_Dress_01.json",
+      "label": "Vestito 37",
+      "group": "dresses",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/F_Dress_02/F_Dress_02.json",
+      "label": "Vestito 38",
+      "group": "dresses",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/F_Dress_03/F_Dress_03.json",
+      "label": "Vestito 39",
+      "group": "dresses",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/F_Dress_05/F_Dress_05.json",
+      "label": "Vestito 41",
+      "group": "dresses",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/F_Dress_06/F_Dress_06.json",
+      "label": "Vestito 42",
+      "group": "dresses",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/F_Dress_10/F_Dress_10.json",
+      "label": "Vestito 46",
+      "group": "dresses",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/F_Dress_11/F_Dress_11.json",
+      "label": "Vestito 47",
+      "group": "dresses",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/DUDoc_sandals1/DUDoc_sandals1.json",
+      "label": "Scarpe 05",
+      "group": "shoes",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/Shoes_Biker_Boots_female/Shoes_Biker_Boots_female.json",
+      "label": "Stivali 37",
+      "group": "shoes",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/Shoes_Biker_Boots_male/Shoes_Biker_Boots_male.json",
+      "label": "Stivali 38",
+      "group": "shoes",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/Tank_Top_01/Tank_Top_01.json",
+      "label": "Canotta 35",
+      "group": "tops",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/F_Cardigan_Long_Open_Front/F_Cardigan_Long_Open_Front.json",
+      "label": "Maglione 09",
+      "group": "tops",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/Tactical_Vest_female/Tactical_Vest_female.json",
+      "label": "Top 33",
+      "group": "tops",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "proxy",
+      "key": "clothes/Tactical_Vest_male/Tactical_Vest_male.json",
+      "label": "Top 34",
+      "group": "tops",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "skin",
+      "key": "Caucasion_TatooedMale_Skin_Diffuse/Caucasion_TatooedMale_Skin_Diffuse.json",
+      "label": "Pelle 03",
+      "group": "skins",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "skin",
+      "key": "light_skin_makeupMaterial/light_skin_makeupMaterial.json",
+      "label": "Pelle 10",
+      "group": "skins",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "skin",
+      "key": "lightfemaleskinMaterial/lightfemaleskinMaterial.json",
+      "label": "Pelle 11",
+      "group": "skins",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "skin",
+      "key": "lightskinmaleMaterial/lightskinmaleMaterial.json",
+      "label": "Pelle 12",
+      "group": "skins",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    },
+    {
+      "kind": "skin",
+      "key": "Zoey_Skin/Zoey_Skin.json",
+      "label": "Pelle 46",
+      "group": "skins",
+      "reason": "geometria visibile, materiale non produce pixel",
+      "source": "makehuman-visual-qa-all-v29.json"
+    }
+  ]
+}
