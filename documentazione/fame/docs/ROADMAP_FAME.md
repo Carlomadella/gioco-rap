@@ -1,14 +1,14 @@
-﻿# FAME ROADMAP
+# FAME ROADMAP
 
 Versione roadmap: 1.1
 Data: 2026-09-07
 
 Obiettivo: evitare di sviluppare troppi sottosistemi contemporaneamente.
-Si procede per fasi, congelando ciÃ² che viene approvato prima di aprire la fase successiva.
+Si procede per fasi, congelando ciò che viene approvato prima di aprire la fase successiva.
 
 ---
 
-# FASE 0 â€” MEMORIA E SICUREZZA
+# FASE 0 — MEMORIA E SICUREZZA
 STATUS: IN CORSO
 
 Obiettivo:
@@ -25,16 +25,17 @@ Deliverable:
 - roadmap ufficiale.
 
 Definition of Done:
-- la cartella Ã¨ nella repo;
+- la cartella è nella repo;
 - commit dedicato;
-- integritÃ  verificata;
+- integrità verificata;
 - nessuna modifica al codice gioco nello stesso commit.
 
-NON si sviluppa altro finchÃ© questa fase non Ã¨ chiusa.
+FASE chiusa il 2026-09-07.
+La Bibbia ufficiale è su main in documentazione/fame, commit 923915b.
 
 ---
 
-# FASE 1 â€” TRAP PRODUCTION GRAMMAR V1
+# FASE 1 — TRAP PRODUCTION GRAMMAR V1
 STATUS: NEXT
 
 Obiettivo:
@@ -74,23 +75,23 @@ Deliverable:
 - test A/B udibili.
 
 Definition of Done:
-un beat generato deve essere riconoscibile come Trap senza affidarsi a un singolo clichÃ©.
+un beat generato deve essere riconoscibile come Trap senza affidarsi a un singolo cliché.
 
 ---
 
-# FASE 2 â€” SOUND LIBRARY V1
+# FASE 2 — SOUND LIBRARY V1
 STATUS: DOPO TRAP GRAMMAR
 
 Obiettivo:
-ampliare la tavolozza sonora senza mascherare problemi compositivi con piÃ¹ sample.
+ampliare la tavolozza sonora senza mascherare problemi compositivi con più sample.
 
 Prima milestone:
-- piÃ¹ kick;
-- piÃ¹ snare/clap;
-- piÃ¹ closed/open hat;
-- piÃ¹ perc;
-- piÃ¹ crash/FX;
-- piÃ¹ 808.
+- più kick;
+- più snare/clap;
+- più closed/open hat;
+- più perc;
+- più crash/FX;
+- più 808.
 
 Poi:
 - bells;
@@ -113,11 +114,11 @@ Ogni suono deve avere metadata:
 - license/source.
 
 Definition of Done:
-FAME puÃ² scegliere una famiglia sonora coerente col beat senza pescare WAV casualmente.
+FAME può scegliere una famiglia sonora coerente col beat senza pescare WAV casualmente.
 
 ---
 
-# FASE 3 â€” TRAP GENERATOR V1
+# FASE 3 — TRAP GENERATOR V1
 STATUS: DOPO SOUND LIBRARY V1
 
 Obiettivo:
@@ -137,21 +138,21 @@ Output:
 - composition plan.
 
 Test:
-- piÃ¹ seed;
+- più seed;
 - evitare beat-clone;
-- preservare identitÃ  Trap;
+- preservare identità Trap;
 - nessuna regressione del sound engine V0.6+.
 
 Definition of Done:
-piÃ¹ generazioni consecutive devono sembrare appartenere allo stesso genere ma non allo stesso template.
+più generazioni consecutive devono sembrare appartenere allo stesso genere ma non allo stesso template.
 
 ---
 
-# FASE 4 â€” GENRE IDENTITY FRAMEWORK
+# FASE 4 — GENRE IDENTITY FRAMEWORK
 STATUS: DOPO TRAP GENERATOR V1
 
 Obiettivo:
-generalizzare ciÃ² che ha funzionato sulla Trap.
+generalizzare ciò che ha funzionato sulla Trap.
 
 Per ogni genere:
 - Rhythm DNA;
@@ -182,7 +183,7 @@ NON aprire tutti i generi contemporaneamente.
 
 ---
 
-# FASE 5 â€” INTENT ENGINE / ONE-CLICK GENERATION
+# FASE 5 — INTENT ENGINE / ONE-CLICK GENERATION
 STATUS: FUTURE
 
 Obiettivo:
@@ -190,19 +191,19 @@ tradurre richieste semplici del giocatore in decisioni musicali.
 
 Esempio:
 "freddo e cattivo, per freestyle"
-â†“
+↓
 mood / energy / space / aggression / sound DNA
-â†“
+↓
 genre grammar
-â†“
+↓
 beat.
 
-La modalitÃ  one-click resta il default.
+La modalità one-click resta il default.
 I controlli avanzati sono opzionali.
 
 ---
 
-# FASE 6 â€” STUDIO / PARTIAL REGENERATION
+# FASE 6 — STUDIO / PARTIAL REGENERATION
 STATUS: FUTURE
 
 Obiettivo:
@@ -215,14 +216,14 @@ permettere di rigenerare soltanto:
 - section;
 - FX.
 
-Senza perdere seed e identitÃ  del resto del beat.
+Senza perdere seed e identità del resto del beat.
 
 ---
 
-# FASE 7 â€” INTEGRAZIONE IN ANNI DI FAME
+# FASE 7 — INTEGRAZIONE IN ANNI DI FAME
 STATUS: FUTURE
 
-Solo quando il generatore standalone Ã¨ sufficientemente stabile.
+Solo quando il generatore standalone è sufficientemente stabile.
 
 Obiettivi:
 - integrazione con studio in-game;
@@ -247,4 +248,3 @@ Obiettivi:
    - tests;
    - CHANGELOG;
    - questa ROADMAP.
-
