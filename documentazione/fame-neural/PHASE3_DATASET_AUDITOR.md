@@ -1,7 +1,7 @@
 # FAME Neural — FASE 3 Dataset Auditor
 
 Stato: IN CORSO
-Blocco corrente: BLOCCO 5 — corpus builder verso 500–1.000 phrase
+Blocco corrente: BLOCCO 6 — scale run + corpus mix policy + GATE 1
 
 ## BLOCCO 1 — fingerprint deterministici + split leakage-safe
 
@@ -404,3 +404,84 @@ BLOCCO 5 non dichiara artificialmente DATA READY.
 Il prossimo passo e' usare il builder in scala, leggere il vero rendimento GMD e integrare altre fonti commercialmente compatibili/originali fino a ottenere 500–1.000 phrase curate, non semplicemente 500 finestre generate.
 
 Prossimo lavoro previsto: BLOCCO 6 — scale run + corpus mix policy + GATE 1 finale.
+
+## BLOCCO 6 — scale run + corpus mix policy + GATE 1
+
+Il BLOCCO 6 rende esplicito un punto importante: 500 phrase non bastano se sono 500 esempi dello stesso tipo.
+
+GMD e' molto utile per il groove/drumming, ma un corpus GMD-only non puo' chiudere DATA READY per un composer che deve imparare anche 808, harmony e lead.
+
+### Corpus inventory
+
+Nuovo schema:
+
+`fame-neural-corpus-inventory-v1`
+
+L'inventory misura:
+
+- numero di phrase;
+- composition family;
+- dataset item sorgente;
+- source collection;
+- licenze;
+- distribuzione 4/8/16 barre;
+- copertura drums / 808 / harmony / lead;
+- phrase pitched;
+- rights commercial-training.
+
+### Mix policy
+
+La policy iniziale e' configurabile e non pretende di essere una legge musicale universale.
+
+Default operativo per il primo corpus:
+
+- almeno 500 phrase;
+- almeno 50 composition family;
+- almeno 2 source collection;
+- nessuna source collection oltre il 65%;
+- almeno 150 phrase drums;
+- almeno 75 phrase 808;
+- almeno 75 phrase harmony;
+- almeno 75 phrase lead;
+- almeno 150 phrase con contenuto pitched.
+
+Queste soglie servono a impedire che il gate venga superato gonfiando un solo dataset o una sola famiglia di eventi.
+
+Verranno rivalutate quando avremo il primo benchmark del modello.
+
+### GATE 1 finalizer
+
+Nuovo schema:
+
+`fame-neural-data-ready-gate-v1`
+
+Il gate richiede insieme:
+
+- BLOCCO 5 tooling READY;
+- corpus phrase clean;
+- review completata;
+- split leakage-safe;
+- nessun source leakage;
+- rights commercial-training puliti;
+- target phrase;
+- diversita' minima di composition family;
+- mix di source collection;
+- copertura minima dei ruoli musicali.
+
+Il gate produce sempre un elenco esplicito di blocker.
+
+### GMD scale runner
+
+`run-gmd-gate1.ps1` permette di aumentare `SourceCount` e misurare il contributo reale di GMD.
+
+Un risultato GMD-only `NOT READY` non e' un fallimento del tooling: e' il comportamento corretto se mancano 808/harmony/lead o diversita' di sorgente.
+
+### Stato dopo BLOCCO 6
+
+La parte tecnica necessaria per dichiarare DATA READY e' ora definita e automatizzabile.
+
+GATE 1 resta aperto finche' il corpus reale non soddisfa la policy.
+
+Il prossimo lavoro non e' aggiungere altri controlli artificiali: e' alimentare il corpus con materiale Trap/Rap originale o con training commerciale esplicitamente autorizzato, poi eseguire il gate sul mix reale.
+
+Prossimo lavoro previsto: SOURCE EXPANSION — materiale Trap originale/cleared + scale run finale.
