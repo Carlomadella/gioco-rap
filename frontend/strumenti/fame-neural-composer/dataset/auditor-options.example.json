@@ -3,6 +3,19 @@
   "minBars": 1,
   "timingQuantum": 1,
   "durationQuantum": 1,
+  "similarity": {
+    "enabled": true,
+    "timingToleranceTicks": 120,
+    "pitchToleranceSemitones": 2,
+    "durationToleranceTicks": 240,
+    "reviewThreshold": 0.78,
+    "blockingThreshold": 0.94,
+    "minComparableEvents": 8,
+    "minTypeCosine": 0.55,
+    "minRhythmSketchJaccard": 0.12,
+    "sketchQuantumTicks": 240,
+    "maxPairComparisons": 250000
+  },
   "splitRatios": {
     "train": 0.8,
     "validation": 0.1,

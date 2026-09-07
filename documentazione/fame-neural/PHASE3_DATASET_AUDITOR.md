@@ -1,99 +1,97 @@
 # FAME Neural — FASE 3 Dataset Auditor
 
 Stato: IN CORSO
-Blocco corrente: BLOCCO 1 — fingerprint deterministici + split leakage-safe
+Blocco corrente: BLOCCO 2 — near-duplicate fuzzy + similarity report
 
-## Obiettivo del blocco 1
+## BLOCCO 1 — fingerprint deterministici + split leakage-safe
 
-Costruire il primo strato del Dataset Auditor senza introdurre ML o dipendenze esterne.
+Il blocco 1 resta la base deterministica dell'auditor e continua a controllare:
 
-Il blocco 1 lavora sui `fame-neural-dataset-item-v1` già prodotti e validati dalla pipeline della FASE 2.
+- `itemId` e SHA-256 sorgente duplicati;
+- duplicati musicali esatti nel canonico;
+- equivalenza per trasposizione globale;
+- collisioni rhythm-only come candidati di review;
+- quality flag minimi;
+- split train / validation / test per componenti indivisibili.
 
-## Controlli implementati
+I componenti dello split uniscono almeno la stessa `compositionFamily`, i duplicati esatti e le equivalenze per trasposizione.
 
-### 1. Duplicati tecnici
+## BLOCCO 2 — similarità fuzzy
 
-- `itemId` duplicato;
-- SHA-256 della sorgente duplicato.
+Il BLOCCO 2 aggiunge un confronto graduato tra item che non sono già stati classificati come duplicati esatti o semplici trasposizioni.
 
-Questi casi sono bloccanti.
+### Obiettivo
 
-### 2. Duplicati musicali esatti nel canonico
+Trovare versioni che derivano probabilmente dalla stessa idea musicale anche quando presentano piccole modifiche, per esempio:
 
-Ogni item riceve un fingerprint del contenuto musicale canonico basato su:
+- note aggiunte o rimosse;
+- timing spostato leggermente;
+- pitch modificati di pochi semitoni;
+- intro/outro o layer aggiuntivi;
+- arrangiamenti parzialmente estesi;
+- varianti che mantengono gran parte dello stesso scheletro musicale.
 
-- tipo evento;
-- tick;
-- pitch quando presente;
-- durata;
-- glide 808;
-- PPQ;
-- BPM;
-- numero di barre.
+### Similarity score
 
-La velocity viene volutamente esclusa da questo fingerprint: due file che differiscono solo per dinamica non devono essere trattati come composizioni indipendenti.
+Il confronto usa segnali separati e spiegabili:
 
-Questi gruppi sono bloccanti finché non vengono deduplicati o revisionati.
+- match degli eventi per tipo e timing con tolleranza;
+- F1 ritmico;
+- containment ritmico, utile per versioni estese/ridotte;
+- confronto pitched transposition-invariant su `808`, `harmony` e `lead`;
+- distribuzione dei tipi evento;
+- vicinanza temporale/durata;
+- bilanciamento della quantità di eventi e della lunghezza.
 
-### 3. Equivalenza per trasposizione
+Il report non usa un embedding neurale: in questa fase vogliamo un criterio deterministico, riproducibile e ispezionabile.
 
-Per gli item con almeno 3 eventi pitched (`808`, `harmony`, `lead`) viene creato anche un fingerprint transposition-invariant.
+### Due soglie
 
-Il fingerprint mantiene:
+Default:
 
-- ritmo;
-- tipo degli eventi;
-- intervalli;
-- durate;
-- glide;
-- struttura delle sequence/segmenti;
+- `reviewThreshold = 0.78`: coppia sospetta da revisionare, NON bloccante;
+- `blockingThreshold = 0.94`: near-duplicate ad alta confidenza, bloccante.
 
-ma normalizza tutte le note rispetto allo stesso pitch anchor dell'item.
+Una coppia `blocking` deve inoltre avere copertura ritmica elevata e abbastanza eventi confrontabili. Questo riduce i falsi positivi dovuti a pattern molto corti.
 
-Questo rileva copie che differiscono soltanto per trasposizione globale. I gruppi sono bloccanti finché non vengono revisionati/deduplicati.
+### Prefiltro per scala
 
-### 4. Rhythm-review candidates
+Non vengono confrontate in dettaglio tutte le coppie in modo cieco.
 
-Viene prodotto un fingerprint che ignora il pitch e mantiene la struttura ritmica.
+Prima del matching completo vengono usati:
 
-Le collisioni di questo fingerprint NON sono bloccanti nel blocco 1: servono come candidati da analizzare nel blocco fuzzy/near-duplicate successivo.
+- similarità della distribuzione dei tipi;
+- Jaccard di uno sketch ritmico quantizzato;
+- rapporto minimo tra le quantità di eventi.
 
-Questo evita di considerare automaticamente duplicati due pattern che condividono solo lo scheletro ritmico.
+Il limite `maxPairComparisons` rende esplicito quando un audit non è stato esaustivo. Un similarity report troncato NON può dare `BLOCCO 2 READY`.
 
-### 5. Quality flag iniziali
+## Split leakage-safe aggiornato
 
-Il blocco segnala, senza bloccare automaticamente:
+I near-duplicate fuzzy ad alta confidenza vengono aggiunti ai componenti indivisibili dello split.
 
-- item con troppo pochi eventi;
-- item con durata inferiore alla soglia minima.
+Quindi due item marcati `blocking` dal BLOCCO 2 devono restare nello stesso split, anche se:
 
-Sono flag di curation, non giudizi musicali definitivi.
+- hanno SHA differenti;
+- appartengono a `compositionFamily` differenti;
+- non sono copie esatte;
+- non sono semplici trasposizioni.
 
-## Split leakage-safe
+Le coppie `review` vengono invece riportate senza unirle automaticamente: richiedono curation prima di diventare una regola bloccante.
 
-Lo split non viene fatto item per item in modo indipendente.
+## Output
 
-Prima vengono creati componenti indivisibili unendo item collegati da:
+Il report principale resta:
 
-- stessa `compositionFamily`;
-- fingerprint musicale esatto;
-- fingerprint equivalente per trasposizione.
+`fame-neural-dataset-audit-v1`
 
-Ogni componente viene poi assegnato interamente a uno solo tra:
+Il BLOCCO 2 aggiunge:
 
-- train;
-- validation;
-- test.
-
-Il manifest verifica esplicitamente che nessuna composition family o duplicate-group conosciuta attraversi più split.
-
-Ratio di default:
-
-- train 80%;
-- validation 10%;
-- test 10%.
-
-Su corpus piccoli la distribuzione può discostarsi dai ratio per preservare l'integrità dei componenti. La sicurezza anti-leakage ha priorità sulla percentuale esatta.
+- `block2Ready`;
+- `fuzzyComparedPairs`;
+- `fuzzyReviewPairs`;
+- `fuzzyBlockingPairs`;
+- `duplicates.fuzzyNearDuplicates` con schema `fame-neural-fuzzy-similarity-v1`.
 
 ## CLI
 
@@ -105,39 +103,38 @@ node .\frontend\strumenti\fame-neural-composer\dataset\auditor.js `
   [options.json]
 ```
 
-Schema report:
-
-`fame-neural-dataset-audit-v1`
-
-Schema split:
-
-`fame-neural-family-safe-split-v1`
-
 ## Test
+
+BLOCCO 1:
 
 ```powershell
 node .\frontend\strumenti\fame-neural-composer\phase3-block1-smoke-test.js
 ```
 
-Il test copre:
+BLOCCO 2:
 
-- corpus pulito;
-- duplicate canonicali esatti;
-- copie trasposte;
-- stessa composition family nello stesso split;
-- quality flag.
+```powershell
+node .\frontend\strumenti\fame-neural-composer\phase3-block2-smoke-test.js
+```
+
+Il test BLOCCO 2 verifica:
+
+- corpus realmente diverso non segnalato;
+- tier `review` per variante fuzzy;
+- variante/arrangiamento parziale ad alta confidenza bloccato;
+- near-duplicate bloccante tenuto nello stesso split;
+- guardia contro il falso positivo "stesso ritmo ma melodia diversa".
 
 ## Cosa NON chiude ancora
 
-Il BLOCCO 1 non chiude la FASE 3 e non chiude il GATE 1 — DATA READY.
+Il BLOCCO 2 non chiude la FASE 3 e non chiude il GATE 1 — DATA READY.
 
-Restano da costruire/verificare almeno:
+Restano almeno:
 
-- fuzzy near-duplicate con similarità graduata;
-- versioni/arrangiamenti parzialmente modificati;
-- duplicati di tracce/pattern interni;
+- duplicati di tracce/pattern interni allo stesso item;
 - quality audit musicale più ricco;
-- curation del primo corpus da circa 500–1.000 phrase;
-- verifica finale train/validation/test sul corpus reale completo.
+- strategia di curation/review dei candidati fuzzy;
+- costruzione del primo corpus da circa 500–1.000 phrase;
+- verifica finale di dedup e leakage sul corpus reale completo.
 
-Prossimo lavoro previsto: BLOCCO 2 — near-duplicate fuzzy e similarity report.
+Prossimo lavoro previsto: BLOCCO 3 — duplicati interni + quality audit musicale.

@@ -5,6 +5,7 @@ const path = require("node:path");
 const crypto = require("node:crypto");
 const { isDatasetItemFile, validateItem } = require("../midi/corpus-gate");
 const { itemFingerprint, eventSummary } = require("./fingerprint");
+const { normalizeSimilarityOptions, buildSimilarityReport, pairKey } = require("./similarity");
 
 const AUDIT_SCHEMA = "fame-neural-dataset-audit-v1";
 const SPLIT_SCHEMA = "fame-neural-family-safe-split-v1";
@@ -90,13 +91,14 @@ function normalizeSplitRatios(input = {}) {
   };
 }
 
-function buildLeakageComponents(items, exactGroups, transpositionGroups) {
+function buildLeakageComponents(items, exactGroups, transpositionGroups, fuzzyGroups = []) {
   const ids = items.map(item => item.itemId);
   const uf = new UnionFind(ids);
 
   for (const members of groupBy(items, item => item.compositionFamily).values()) unionMembers(uf, members);
   for (const group of exactGroups) unionMembers(uf, group.itemIds.map(id => items.find(item => item.itemId === id)).filter(Boolean));
   for (const group of transpositionGroups) unionMembers(uf, group.itemIds.map(id => items.find(item => item.itemId === id)).filter(Boolean));
+  for (const group of fuzzyGroups) unionMembers(uf, group.itemIds.map(id => items.find(item => item.itemId === id)).filter(Boolean));
 
   const components = new Map();
   for (const item of items) {
@@ -138,9 +140,9 @@ function assignComponentsToSplits(components, ratios) {
   return { assignments, counts, targets };
 }
 
-function buildSplitManifest(items, exactGroups, transpositionGroups, ratios = DEFAULT_SPLIT_RATIOS) {
+function buildSplitManifest(items, exactGroups, transpositionGroups, ratios = DEFAULT_SPLIT_RATIOS, fuzzyGroups = []) {
   const normalizedRatios = normalizeSplitRatios(ratios);
-  const components = buildLeakageComponents(items, exactGroups, transpositionGroups);
+  const components = buildLeakageComponents(items, exactGroups, transpositionGroups, fuzzyGroups);
   const assigned = assignComponentsToSplits(components, normalizedRatios);
   const splitByItemId = new Map();
   for (const component of assigned.assignments) {
@@ -165,7 +167,7 @@ function buildSplitManifest(items, exactGroups, transpositionGroups, ratios = DE
     .map(([compositionFamily, splits]) => ({ compositionFamily, splits: [...splits].sort() }));
 
   const duplicateLeakage = [];
-  for (const [kind, groups] of [["exact", exactGroups], ["transposition", transpositionGroups]]) {
+  for (const [kind, groups] of [["exact", exactGroups], ["transposition", transpositionGroups], ["fuzzy", fuzzyGroups]]) {
     for (const group of groups) {
       const splits = [...new Set(group.itemIds.map(itemId => splitByItemId.get(itemId)).filter(Boolean))].sort();
       if (splits.length > 1) duplicateLeakage.push({ kind, fingerprint: group.fingerprint, itemIds: group.itemIds, splits });
@@ -196,11 +198,13 @@ function normalizeOptions(input = {}) {
   const minBars = Number.isInteger(input.minBars) && input.minBars > 0 ? input.minBars : 1;
   const timingQuantum = Number.isInteger(input.timingQuantum) && input.timingQuantum > 0 ? input.timingQuantum : 1;
   const durationQuantum = Number.isInteger(input.durationQuantum) && input.durationQuantum > 0 ? input.durationQuantum : timingQuantum;
+  const similarity = normalizeSimilarityOptions(input.similarity);
   return {
     minEvents,
     minBars,
     timingQuantum,
     durationQuantum,
+    similarity,
     splitRatios: normalizeSplitRatios(input.splitRatios)
   };
 }
@@ -209,6 +213,7 @@ function auditItems(entries, options = {}) {
   const cfg = normalizeOptions(options);
   const invalidItems = [];
   const items = [];
+  const similarityEntries = [];
 
   for (const entry of entries) {
     const validation = validateItem(entry.item, entry.fileName);
@@ -217,6 +222,12 @@ function auditItems(entries, options = {}) {
       continue;
     }
     const summary = eventSummary(entry.item);
+    similarityEntries.push({
+      itemId: validation.itemId,
+      fileName: entry.fileName,
+      compositionFamily: validation.compositionFamily,
+      item: entry.item
+    });
     items.push({
       fileName: entry.fileName,
       itemId: validation.itemId,
@@ -239,6 +250,21 @@ function auditItems(entries, options = {}) {
   const rhythmCandidateGroups = duplicateGroups(items, "rhythmFingerprint")
     .filter(group => !exactSets.has(group.itemIds.join("|")) && !transpositionSets.has(group.itemIds.join("|")));
 
+  const knownPairKeys = new Set();
+  for (const group of [...exactMusicGroups, ...transpositionGroups]) {
+    for (let a = 0; a < group.itemIds.length; a += 1) {
+      for (let b = a + 1; b < group.itemIds.length; b += 1) knownPairKeys.add(pairKey(group.itemIds[a], group.itemIds[b]));
+    }
+  }
+  const similarityReport = buildSimilarityReport(similarityEntries, cfg.similarity, knownPairKeys);
+  const fuzzyBlockingGroups = similarityReport.blockingPairs.map(pair => ({
+    fingerprint: `fuzzy:${pairKey(pair.itemA, pair.itemB)}`,
+    count: 2,
+    itemIds: [pair.itemA, pair.itemB].sort(),
+    fileNames: [pair.fileA, pair.fileB].sort(),
+    compositionFamilies: [...new Set([pair.familyA, pair.familyB].filter(Boolean))].sort()
+  }));
+
   const qualityFlags = [];
   for (const item of items) {
     const issues = [];
@@ -247,20 +273,27 @@ function auditItems(entries, options = {}) {
     if (issues.length) qualityFlags.push({ itemId: item.itemId, fileName: item.fileName, issues });
   }
 
-  const splitManifest = buildSplitManifest(items, exactMusicGroups, transpositionGroups, cfg.splitRatios);
-  const blockingIssues = [];
-  if (invalidItems.length) blockingIssues.push(`${invalidItems.length} dataset item non validi per la pipeline FASE 2`);
-  if (duplicateItemIdGroups.length) blockingIssues.push(`${duplicateItemIdGroups.length} gruppi con itemId duplicato`);
-  if (exactSourceGroups.length) blockingIssues.push(`${exactSourceGroups.length} gruppi con SHA sorgente duplicato`);
-  if (exactMusicGroups.length) blockingIssues.push(`${exactMusicGroups.length} gruppi musicalmente identici nel canonico`);
-  if (transpositionGroups.length) blockingIssues.push(`${transpositionGroups.length} gruppi equivalenti per trasposizione da revisionare/deduplicare`);
-  if (!splitManifest.leakageSafe) blockingIssues.push("split non leakage-safe");
+  const block1SplitManifest = buildSplitManifest(items, exactMusicGroups, transpositionGroups, cfg.splitRatios);
+  const splitManifest = buildSplitManifest(items, exactMusicGroups, transpositionGroups, cfg.splitRatios, fuzzyBlockingGroups);
+  const block1BlockingIssues = [];
+  if (invalidItems.length) block1BlockingIssues.push(`${invalidItems.length} dataset item non validi per la pipeline FASE 2`);
+  if (duplicateItemIdGroups.length) block1BlockingIssues.push(`${duplicateItemIdGroups.length} gruppi con itemId duplicato`);
+  if (exactSourceGroups.length) block1BlockingIssues.push(`${exactSourceGroups.length} gruppi con SHA sorgente duplicato`);
+  if (exactMusicGroups.length) block1BlockingIssues.push(`${exactMusicGroups.length} gruppi musicalmente identici nel canonico`);
+  if (transpositionGroups.length) block1BlockingIssues.push(`${transpositionGroups.length} gruppi equivalenti per trasposizione da revisionare/deduplicare`);
+  if (!block1SplitManifest.leakageSafe) block1BlockingIssues.push("split non leakage-safe");
+
+  const blockingIssues = [...block1BlockingIssues];
+  if (!similarityReport.complete) blockingIssues.push("similarity report incompleto: aumentare maxPairComparisons o ridurre il corpus in blocchi candidati");
+  if (similarityReport.blockingPairs.length) blockingIssues.push(`${similarityReport.blockingPairs.length} coppie fuzzy near-duplicate ad alta confidenza da revisionare/deduplicare`);
+  if (!splitManifest.leakageSafe) blockingIssues.push("split non leakage-safe dopo i gruppi fuzzy");
 
   return {
     schema: AUDIT_SCHEMA,
     version: 1,
-    block: "phase3-block1",
-    block1Ready: blockingIssues.length === 0,
+    block: "phase3-block2",
+    block1Ready: block1BlockingIssues.length === 0,
+    block2Ready: blockingIssues.length === 0,
     dataReady: false,
     options: cfg,
     totals: {
@@ -272,6 +305,9 @@ function auditItems(entries, options = {}) {
       exactMusicDuplicateGroups: exactMusicGroups.length,
       transpositionDuplicateGroups: transpositionGroups.length,
       rhythmReviewGroups: rhythmCandidateGroups.length,
+      fuzzyComparedPairs: similarityReport.totals.comparedPairs,
+      fuzzyReviewPairs: similarityReport.totals.reviewPairs,
+      fuzzyBlockingPairs: similarityReport.totals.blockingPairs,
       qualityFlaggedItems: qualityFlags.length,
       splitComponents: splitManifest.totals.components
     },
@@ -282,7 +318,8 @@ function auditItems(entries, options = {}) {
       sourceSha256: exactSourceGroups,
       exactMusic: exactMusicGroups,
       transpositionEquivalent: transpositionGroups,
-      rhythmReviewCandidates: rhythmCandidateGroups
+      rhythmReviewCandidates: rhythmCandidateGroups,
+      fuzzyNearDuplicates: similarityReport
     },
     qualityFlags,
     splitManifest,
@@ -317,12 +354,16 @@ function main(argv = process.argv.slice(2)) {
     console.log(`Duplicati musicali esatti: ${report.totals.exactMusicDuplicateGroups}`);
     console.log(`Equivalenti per trasposizione: ${report.totals.transpositionDuplicateGroups}`);
     console.log(`Candidati rhythm-review: ${report.totals.rhythmReviewGroups}`);
+    console.log(`Fuzzy confronti completi: ${report.totals.fuzzyComparedPairs}`);
+    console.log(`Fuzzy review: ${report.totals.fuzzyReviewPairs}`);
+    console.log(`Fuzzy bloccanti: ${report.totals.fuzzyBlockingPairs}`);
     console.log(`Quality flag: ${report.totals.qualityFlaggedItems}`);
     console.log(`Split leakage-safe: ${report.splitManifest.leakageSafe ? "SI" : "NO"}`);
     console.log(`FASE 3 BLOCCO 1: ${report.block1Ready ? "READY" : "REVIEW/BLOCKED"}`);
+    console.log(`FASE 3 BLOCCO 2: ${report.block2Ready ? "READY" : "REVIEW/BLOCKED"}`);
     console.log(`Report: ${reportPath}`);
     if (splitPath) console.log(`Split: ${splitPath}`);
-    if (!report.block1Ready) process.exitCode = 2;
+    if (!report.block2Ready) process.exitCode = 2;
   } catch (error) {
     console.error(`${error.name || "Error"}: ${error.message}`);
     process.exitCode = 1;
