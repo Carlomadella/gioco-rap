@@ -28,9 +28,9 @@
   --stSoft:#9DB2C4;
   --stFaint:#6E8397;
   --stRosso:#FF6A5A;
-  --stPan:rgba(8,15,25,.80);
-  --stPanAlto:rgba(12,22,34,.90);
-  --stBordo:rgba(125,175,215,.22);
+  --stPan:rgba(6,13,22,.90);
+  --stPanAlto:rgba(8,17,28,.94);
+  --stBordo:rgba(125,175,215,.26);
   --stBordoOro:rgba(242,193,78,.85);
   --stAlta:58px;                                    /* la fascia in alto */
   --stBanda:52px;                                   /* la riga in basso */
@@ -75,14 +75,23 @@
 .stnome{flex:1;min-width:0;display:flex;align-items:baseline;gap:9px;
   font-size:19px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
   color:var(--stTesto);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stnome i{font-size:13.5px;font-weight:500;font-style:italic;letter-spacing:0;
+.stnome i{display:flex;align-items:center;gap:7px;
+  font-size:15px;font-weight:400;font-style:italic;letter-spacing:0;
   text-transform:none;color:var(--stSoft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* energia · soldi · ora, con i pallini in mezzo come nelle foto */
-.strisorse{flex:none;display:flex;align-items:center;gap:10px}
-.strisorse span{display:flex;align-items:baseline;gap:6px;font-size:14px;font-weight:800;
-  font-variant-numeric:tabular-nums;color:var(--stOro);white-space:nowrap}
-.strisorse i{font-style:normal;font-size:12.5px;font-weight:600;color:var(--stAzzSoft)}
-.strisorse em{font-style:normal;color:var(--stFaint);font-size:11px}
+/* Nei riferimenti l'etichetta è azzurra e il numero bianco; l'oro nella
+   fascia lo prende **solo** quello che si spende. Fra una voce e l'altra un
+   pallino azzurro, non un trattino. */
+.strisorse{flex:none;display:flex;align-items:center;gap:9px}
+.strisorse span{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:700;
+  font-variant-numeric:tabular-nums;color:#fff;white-space:nowrap}
+.strisorse svg{width:16px;height:16px;flex:none;fill:var(--stAzz)}
+.strisorse i{font-style:normal;font-size:14px;font-weight:500;color:var(--stAzzSoft)}
+.strisorse b{font-weight:800;color:#fff}
+.strisorse b.oro{color:var(--stOro)}
+/* il pallino di separazione, in fascia e sotto al nome della sezione */
+.stpunto{display:inline-block;width:4px;height:4px;border-radius:50%;flex:none;
+  background:var(--stAzz);opacity:.75;vertical-align:middle;margin:0 2px}
 
 /* ---- LE TRE COLONNE ----
    Ognuna scorre per conto suo: è quello che ha salvato le Attività criminali,
@@ -90,7 +99,7 @@
    pagina. Niente altezze fisse: se il contenuto cresce, scorre. */
 .stwrap{position:absolute;left:0;right:0;top:var(--stAlta);
   bottom:calc(var(--stTabs) + var(--stBanda));
-  display:grid;grid-template-columns:300px minmax(0,1fr) 300px;gap:16px;
+  display:grid;grid-template-columns:330px minmax(0,1fr) 330px;gap:16px;
   padding:16px 18px;
   /* **in basso**, non in alto: nei riferimenti il terzo alto dello schermo è
      solo stanza, e i pannelli si appoggiano al fondo. È quello che fa sembrare
@@ -105,8 +114,8 @@
 /* una colonna laterale vuota non lascia un buco: sparisce e le altre si
    allargano, se no la pagina sembra rotta invece che semplice */
 .stcol:empty{display:none}
-.stwrap:has(.stsx:empty){grid-template-columns:minmax(0,1fr) 320px}
-.stwrap:has(.stdx:empty){grid-template-columns:300px minmax(0,1fr)}
+.stwrap:has(.stsx:empty){grid-template-columns:minmax(0,1fr) 330px}
+.stwrap:has(.stdx:empty){grid-template-columns:330px minmax(0,1fr)}
 .stwrap:has(.stsx:empty):has(.stdx:empty){grid-template-columns:minmax(0,1fr);
   max-width:820px;margin:0 auto}
 
@@ -116,12 +125,15 @@
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   box-shadow:inset 0 0 0 1px var(--stBordo),0 18px 46px rgba(0,0,0,.5)}
 .stpan.alto{background:var(--stPanAlto)}
-.stpank{display:flex;align-items:center;gap:8px;margin:0 0 12px;
-  font-size:13px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;
+/* Nei riferimenti il titolo del pannello è grosso, d'oro e spaziato — «AL
+   BANCO», «DA MIXARE» — e l'icona a cartella ce l'ha solo la colonna di
+   destra, quella di quello che hai già. A sinistra è testo e basta. */
+.stpank{display:flex;align-items:center;gap:9px;margin:0 0 13px;
+  font-size:15.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
   line-height:1.25;color:var(--stOro)}
-.stpank svg{width:17px;height:17px;flex:none;fill:var(--stOro);opacity:.9}
-.stpank em{flex:none;margin-left:auto;font-style:normal;font-size:11px;font-weight:700;
-  letter-spacing:.04em;text-transform:none;white-space:nowrap;color:var(--stFaint)}
+.stpank svg{width:19px;height:19px;flex:none;fill:var(--stOro);opacity:.95}
+/* la riga di conto in fondo al pannello: «2 beat nella cartella» */
+.stpiede{margin:11px 2px 0;font-size:12.5px;font-weight:600;color:var(--stFaint)}
 /* la riga di spiegazione sotto al titolo di un pannello */
 .stnota{margin:-4px 0 12px;font-size:12.5px;line-height:1.5;color:var(--stSoft)}
 .stnota b{color:var(--stTesto);font-weight:700}
@@ -146,42 +158,61 @@
 .stscelta.on .stdot{box-shadow:inset 0 0 0 1.5px var(--stOro);
   background:radial-gradient(circle,var(--stOroChiaro) 0 42%,transparent 44%)}
 /* la miniatura: la copertina di un pezzo, la faccia di una persona */
-.stmini{flex:none;width:46px;height:34px;border-radius:7px;overflow:hidden;
+/* La miniatura è **rettangolare** per tutti — nei riferimenti è sempre una
+   fotografia sdraiata, che sia una faccia o una copertina. Le facce sono
+   disegni quadrati: entrano larghe quanto la casella e sbordano in basso,
+   così quello che resta in vista è la faccia e non le spalle. */
+.stmini{flex:none;width:62px;height:46px;border-radius:6px;overflow:hidden;
   background:#0A1018;line-height:0;
-  box-shadow:inset 0 0 0 1px rgba(125,175,215,.18)}
-.stmini.tonda{width:38px;height:38px;border-radius:9px}
-.stmini svg,.stmini img{display:block;width:100%;height:100%;object-fit:cover}
+  box-shadow:inset 0 0 0 1px rgba(125,175,215,.2)}
+.stmini svg,.stmini img{display:block;width:100%;height:auto}
+/* la casella di «da solo»: sfondo spento e una sagoma appena accennata */
+.stsolo{display:flex;align-items:center;justify-content:center;width:100%;height:100%;
+  background:linear-gradient(160deg,#101A26,#070D15)}
+.stsolo svg{width:22px;height:22px;fill:var(--stFaint);opacity:.7}
 .stchi{flex:1;min-width:0}
-.stchi b{display:block;font-size:14px;font-weight:800;letter-spacing:-.01em;color:var(--stTesto);
+.stchi b{display:block;font-size:16px;font-weight:700;letter-spacing:-.01em;color:#fff;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stchi span{display:block;margin-top:1px;font-size:12px;font-weight:600;color:var(--stAzzSoft);
+.stchi span{display:block;margin-top:2px;font-size:13.5px;font-weight:500;color:var(--stAzzSoft);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stscelta.on .stchi b{color:#fff}
+.stchi .ros{color:var(--stRosso)}
 /* quanto vale, a destra: «−20%», «gratis», «+6 qual.» */
-.stval{flex:none;font-size:12.5px;font-weight:800;color:var(--stOro);white-space:nowrap}
-.stval.no{color:var(--stRosso);font-size:11.5px;white-space:normal;max-width:112px;
-  text-align:right;line-height:1.25}
-.stval.calmo{color:var(--stAzzSoft)}
+.stval{flex:none;font-size:14px;font-weight:700;color:var(--stOro);white-space:nowrap}
+.stval.calmo{color:var(--stFaint)}
 
-/* ---- IL CENTRO: la cosa che stai facendo ---- */
+/* ---- IL CENTRO: la cosa che stai facendo ----
+   Il capo è la riga che nei riferimenti apre il pannello: «MIXI:
+   "Sottopasso" · q71». Verbo e cosa in bianco, il numero in azzurro. Il
+   titolone grosso lo usano solo la Copertina e Fuori, dove il pezzo ha una
+   faccia e un nome e sono loro la schermata. */
+.stcapo{margin:0 0 13px;font-size:22px;font-weight:700;line-height:1.25;color:#fff;
+  word-break:break-word}
+.stcapo .v{font-weight:800;text-transform:uppercase;letter-spacing:.03em}
+.stcapo .q{color:var(--stAzz);font-weight:800;font-variant-numeric:tabular-nums}
 .sttitolone{margin:0 0 3px;font-family:"Archivo Black","Figtree",sans-serif;
-  font-size:clamp(24px,3.2vw,38px);line-height:1.04;letter-spacing:-.01em;
+  font-size:clamp(24px,3.2vw,40px);line-height:1.04;letter-spacing:-.01em;
   text-transform:uppercase;color:#fff;word-break:break-word}
-.stsotto{margin:0 0 14px;font-size:14px;font-weight:700;color:var(--stAzzSoft)}
-.stsotto b{color:var(--stOro)}
+.stsottotitolo{margin:0 0 14px;font-size:15px;font-weight:600;color:var(--stAzzSoft)}
+.stsottotitolo b{color:var(--stRosso)}
+/* i sottotitoli della colonna di destra: STROFA, BEAT */
+.stsottotit{margin:14px 0 7px;font-size:11.5px;font-weight:900;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--stFaint)}
+.stsottotit:first-child{margin-top:0}
+/* il riquadro del risultato, sopra ai tasti: «→ q78 · carattere: SECCO» */
+.stesito{margin:14px 0 0;padding:12px 15px;border-radius:9px;text-align:center;
+  font-size:14.5px;line-height:1.5;color:var(--stSoft);
+  background:rgba(255,255,255,.035);
+  box-shadow:inset 0 0 0 1px rgba(125,175,215,.22)}
+.stesito b{color:#fff;font-weight:700}
+.stesito .num{color:var(--stAzz);font-weight:800;font-variant-numeric:tabular-nums}
+.stesito .oro{color:var(--stOro);font-weight:800;font-variant-numeric:tabular-nums}
+.strec{color:var(--stAzz);font-weight:800;margin-right:4px}
 /* la copertina grande del pezzo al centro */
 .stcopertina{width:180px;height:180px;flex:none;border-radius:10px;overflow:hidden;
   background:#0A1018;box-shadow:0 20px 50px rgba(0,0,0,.6),inset 0 0 0 1px rgba(125,175,215,.2)}
 .stcopertina svg{display:block;width:100%;height:100%}
 .stfianco{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
 .stfianco > div{flex:1;min-width:180px}
-/* le righe di conto: «qualità 71 → 85», «+14, di cui 8 suoi» */
-.strighe{margin:12px 0 0;padding-top:12px;font-size:13.5px;line-height:1.6;color:var(--stSoft);
-  box-shadow:inset 0 1px 0 rgba(125,175,215,.14)}
-.strighe b{color:var(--stTesto);font-weight:700}
-.strighe .num{color:var(--stAzz);font-weight:800;font-variant-numeric:tabular-nums}
-.strighe .oro{color:var(--stOro);font-weight:800}
-
 /* ---- I TASTI ----
    Uno solo è d'oro, ed è quello che fa succedere la cosa. Gli altri sono
    contorni: nei riferimenti è sempre così, e si capisce al volo dove premere. */
@@ -226,10 +257,17 @@
 .stbolla{flex:none;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;
   justify-content:center;background:rgba(61,199,255,.16)}
 .stbolla svg{width:15px;height:15px;fill:var(--stAzz)}
-.stdetto{flex:1;min-width:0;font-size:13px;line-height:1.45;color:var(--stTesto);
+.stdetto{flex:1;min-width:0;font-size:14.5px;line-height:1.45;color:var(--stTesto);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.stdetto b{color:var(--stOro);font-weight:800}
+.stdetto b{color:var(--stOro);font-weight:700}
 .stdetto i{color:var(--stSoft)}
+/* la freccia in fondo alla riga, come in tutti i riferimenti */
+.stavanti{flex:none;width:44px;height:36px;border-radius:9px;display:flex;align-items:center;
+  justify-content:center;background:rgba(255,255,255,.05);cursor:pointer;
+  box-shadow:inset 0 0 0 1px rgba(125,175,215,.24);transition:background .15s}
+.stavanti:hover:not(:disabled){background:rgba(255,255,255,.12)}
+.stavanti:disabled{opacity:.35;cursor:default}
+.stavanti svg{width:17px;height:17px;fill:var(--stAzz)}
 
 /* ---- LE LINGUETTE, IN BASSO ----
    Sono la richiesta di Carlo («le varie sezioni in alto o in basso dello
