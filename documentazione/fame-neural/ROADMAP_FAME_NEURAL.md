@@ -1,4 +1,4 @@
-# FAME Neural â€” Roadmap ufficiale V1
+# FAME Neural — Roadmap ufficiale V1
 
 Data: 7 settembre 2026  
 Stato: ROADMAP OPERATIVA  
@@ -6,7 +6,7 @@ Progetto: FAME Neural Composer
 
 ## 1. Regola di base
 
-FAME Neural Ã¨ un progetto separato dal vecchio FAME procedurale.
+FAME Neural è un progetto separato dal vecchio FAME procedurale.
 
 Il vecchio progetto resta congelato come:
 - archivio storico;
@@ -25,20 +25,20 @@ Costruire un compositore musicale neurale capace di generare beat Trap credibili
 Architettura target:
 
 USER INTENT
-â†’ PLANNER
-â†’ STRUCTURAL PLAN
-â†’ NEURAL PERFORMER
-â†’ CANDIDATES
-â†’ SELECTOR / AUDITOR
-â†’ SYMBOLIC SEQUENCE
-â†’ RENDERER
-â†’ STEMS / WAV
+→ PLANNER
+→ STRUCTURAL PLAN
+→ NEURAL PERFORMER
+→ CANDIDATES
+→ SELECTOR / AUDITOR
+→ SYMBOLIC SEQUENCE
+→ RENDERER
+→ STEMS / WAV
 
 Il progetto deve prima dimostrare di saper comporre 8 barre bene. Solo dopo si scala a forme lunghe, altri generi e integrazione nel gioco.
 
 ---
 
-# FASE 0 â€” Fondazione e separazione del progetto
+# FASE 0 — Fondazione e separazione del progetto
 
 Stato: COMPLETATA
 
@@ -50,7 +50,7 @@ Stato: COMPLETATA
 - definire un registro delle decisioni Neural;
 - definire test propri del Neural.
 
-### ResponsabilitÃ  mia
+### Responsabilità mia
 - verificare sempre la repo prima di modifiche significative;
 - non importare automaticamente vecchi vincoli;
 - aggiornare questa roadmap quando una fase cambia stato;
@@ -60,15 +60,15 @@ Stato: COMPLETATA
 Solo che l'obiettivo musicale rimanga quello giusto.
 
 ### Si passa oltre quando
-Il progetto Neural ha una struttura propria e il PoC0 Ã¨ riproducibile e testabile.
+Il progetto Neural ha una struttura propria e il PoC0 è riproducibile e testabile.
 
 ---
 
-# FASE 1 â€” Linguaggio dei dati
+# FASE 1 — Linguaggio dei dati
 
 Stato: COMPLETATA
 
-### PerchÃ© serve
+### Perché serve
 Prima di insegnare musica a una rete dobbiamo decidere esattamente come rappresentiamo una composizione.
 
 ### Cosa costruiamo
@@ -93,7 +93,7 @@ Un formato canonico FAME Neural per rappresentare:
 
 ### Lavori tecnici
 - chiudere encoder/decoder del PoC;
-- round-trip sequence â†’ token â†’ sequence;
+- round-trip sequence → token → sequence;
 - supportare correttamente triplet e duration;
 - formalizzare harmony e 808 glide;
 - stabilire un ordine canonico degli eventi simultanei;
@@ -103,34 +103,34 @@ Un formato canonico FAME Neural per rappresentare:
 Quasi nulla: questa fase deve essere musicalmente neutra.
 
 ### Si passa oltre quando
-Una composizione puÃ² essere convertita avanti e indietro senza perdere informazione musicale importante.
+Una composizione può essere convertita avanti e indietro senza perdere informazione musicale importante.
 
 ---
 
-# FASE 2 â€” Pipeline MIDI e provenienza
+# FASE 2 — Pipeline MIDI e provenienza
 
 Stato: COMPLETATA
 
-### PerchÃ© serve
-Il modello sarÃ  buono quanto i dati che gli diamo.
+### Perché serve
+Il modello sarà buono quanto i dati che gli diamo.
 
 ### Cosa costruiamo
 Una pipeline che prende MIDI grezzi e produce elementi normalizzati del dataset FAME Neural.
 
 RAW MIDI
-â†’ PARSER
-â†’ NORMALIZER
-â†’ TRACK CLASSIFIER
-â†’ ANALYZER
-â†’ RIGHTS/PROVENANCE CHECK
-â†’ DATASET ITEM
+→ PARSER
+→ NORMALIZER
+→ TRACK CLASSIFIER
+→ ANALYZER
+→ RIGHTS/PROVENANCE CHECK
+→ DATASET ITEM
 
 ### Ogni elemento deve sapere
 - da dove arriva;
 - chi lo ha creato;
 - con quale licenza/permesso lo usiamo;
-- se il training commerciale Ã¨ consentito;
-- se l'output commerciale Ã¨ consentito;
+- se il training commerciale è consentito;
+- se l'output commerciale è consentito;
 - a quale famiglia/composizione appartiene.
 
 ### Lavori tecnici
@@ -146,17 +146,18 @@ RAW MIDI
 Niente ML. Se serve, mi aiuti solo a riconoscere musicalmente tracce o esempi ambigui.
 
 ### Si passa oltre quando
-Possiamo importare un MIDI e sapere sia cosa contiene sia perchÃ© abbiamo diritto a usarlo.
+Possiamo importare un MIDI e sapere sia cosa contiene sia perché abbiamo diritto a usarlo.
 
 ### Verifica di chiusura FASE 2
-8 settembre 2026 â€” gate reale GMD superato: 6/6 dataset item validi, 6 composition family, 6 sequence canoniche, 0 duplicati SHA esatti, stato READY. Il GATE 1 â€” DATA READY globale resta aperto fino alla verifica di dedup/split/leakage della FASE 3.
+8 settembre 2026 — gate reale GMD superato: 6/6 dataset item validi, 6 composition family, 6 sequence canoniche, 0 duplicati SHA esatti, stato READY. Il GATE 1 — DATA READY globale resta aperto fino alla verifica di dedup/split/leakage della FASE 3.
 
 ---
-# FASE 3 â€” Dataset Auditor e corpus iniziale
+
+# FASE 3 — Dataset Auditor e corpus iniziale
 
 Stato: IN CORSO
 
-### PerchÃ© serve
+### Perché serve
 Non vogliamo addestrare il modello su duplicati, MIDI scadenti, materiale rubato o esempi musicalmente inutili.
 
 ### Cosa costruiamo
@@ -173,24 +174,24 @@ Un Dataset Auditor che rileva:
 ### Primo corpus
 Usiamo solo fonti con provenienza chiara e materiale originale/licenziato.
 
-Il corpus puÃ² combinare:
+Il corpus può combinare:
 - materiale FAME originale;
 - dataset permissivi verificati;
 - public domain verificato per armonia/struttura;
 - Trap/Rap originale o commissionata per il cuore stilistico.
 
 ### Primo target
-Circa 500â€“1.000 phrase curate da 4/8/16 barre.
+Circa 500–1.000 phrase curate da 4/8/16 barre.
 
-Ãˆ un target di esperimento, non un numero magico.
+È un target di esperimento, non un numero magico.
 
 ### Cosa devi valutare tu
-Questa Ã¨ una fase in cui il tuo giudizio conta molto:
+Questa è una fase in cui il tuo giudizio conta molto:
 - questa phrase sembra Trap?
-- Ã¨ credibile?
-- Ã¨ rappabile?
-- Ã¨ banale?
-- Ã¨ fatta male?
+- è credibile?
+- è rappabile?
+- è banale?
+- è fatta male?
 - vale la pena insegnarla al modello?
 
 ### Si passa oltre quando
@@ -198,11 +199,11 @@ Abbiamo un primo corpus piccolo ma pulito e abbastanza vario da fare un test ser
 
 ---
 
-# FASE 4 â€” Annotazione musicale automatica
+# FASE 4 — Annotazione musicale automatica
 
 Stato: DA FARE
 
-### PerchÃ© serve
+### Perché serve
 Il modello non deve vedere solo note: vogliamo che possa capire strutture e relazioni.
 
 ### Annotazioni iniziali
@@ -215,27 +216,27 @@ Il modello non deve vedere solo note: vogliamo che possa capire strutture e rela
 - motif return/variation;
 - harmonic plan;
 - 808 contour;
-- kickâ†”808 relations;
+- kick↔808 relations;
 - hat density/rolls;
 - transition strength.
 
 ### Regola
-Le annotazioni automatiche sono stime, non veritÃ  musicali.
+Le annotazioni automatiche sono stime, non verità musicali.
 
 ### Cosa devi valutare tu
 Su campioni selezionati controlleremo se le etichette automatiche hanno senso musicalmente.
 
 ### Si passa oltre quando
-Gli annotatori sono abbastanza affidabili da arricchire il dataset senza introdurre piÃ¹ rumore che informazione.
+Gli annotatori sono abbastanza affidabili da arricchire il dataset senza introdurre più rumore che informazione.
 
 ---
 
-# FASE 5 â€” Scelta della rappresentazione neurale
+# FASE 5 — Scelta della rappresentazione neurale
 
 Stato: DA FARE
 
-### PerchÃ© serve
-Non vogliamo scegliere tokenizer e architettura perchÃ© sono di moda.
+### Perché serve
+Non vogliamo scegliere tokenizer e architettura perché sono di moda.
 
 ### Confrontiamo almeno
 1. Flat token PoC;
@@ -247,24 +248,24 @@ Non vogliamo scegliere tokenizer e architettura perchÃ© sono di moda.
 - token per barra;
 - lunghezza contesto;
 - memoria GPU;
-- velocitÃ  training;
+- velocità training;
 - reconstruction accuracy;
 - invalid generation rate;
-- capacitÃ  di rappresentare Trap correttamente.
+- capacità di rappresentare Trap correttamente.
 
 ### Cosa devi valutare tu
-Non scegli il tokenizer. Ti farÃ² ascoltare solo eventuali differenze musicali rilevanti.
+Non scegli il tokenizer. Ti farò ascoltare solo eventuali differenze musicali rilevanti.
 
 ### Si passa oltre quando
 Abbiamo una rappresentazione scelta con dati concreti, non per intuizione.
 
 ---
 
-# FASE 6 â€” Baseline semplice
+# FASE 6 — Baseline semplice
 
 Stato: DA FARE
 
-### PerchÃ© serve
+### Perché serve
 Prima della rete serve qualcosa da battere.
 
 ### Costruiamo
@@ -276,7 +277,7 @@ Un generatore semplice e controllabile usando lo stesso dataset:
 Non deve essere il prodotto finale.
 
 ### Serve a rispondere
-Il Neural sta davvero imparando oppure stiamo complicando un problema che un sistema molto piÃ¹ semplice risolve allo stesso livello?
+Il Neural sta davvero imparando oppure stiamo complicando un problema che un sistema molto più semplice risolve allo stesso livello?
 
 ### Cosa devi valutare tu
 Ascolto A/B.
@@ -286,7 +287,7 @@ Abbiamo un benchmark ripetibile.
 
 ---
 
-# FASE 7 â€” Neural Planner V0
+# FASE 7 — Neural Planner V0
 
 Stato: DA FARE
 
@@ -300,7 +301,7 @@ Insegnare al sistema a pensare prima la struttura, non ancora ogni singolo hi-ha
 - energia;
 - spazio vocale;
 - BPM;
-- tonalitÃ  opzionale.
+- tonalità opzionale.
 
 ### Output per barra
 - energy;
@@ -334,7 +335,7 @@ Il Planner produce strutture diverse ma coerenti e controllabili.
 
 ---
 
-# FASE 8 â€” Neural Performer V0
+# FASE 8 — Neural Performer V0
 
 Stato: DA FARE
 
@@ -360,16 +361,16 @@ Le relazioni musicali devono poter essere apprese insieme.
 
 Non imponiamo automaticamente le vecchie regole FAME legacy.
 
-Se una relazione come kickâ†”808 risulta utile, la verifichiamo sul nuovo sistema e la adottiamo perchÃ© funziona, non perchÃ© era scritta nel progetto precedente.
+Se una relazione come kick↔808 risulta utile, la verifichiamo sul nuovo sistema e la adottiamo perché funziona, non perché era scritta nel progetto precedente.
 
 ### Primo modello
 Piccolo e interpretabile.
 
-Niente modello enorme finchÃ© non abbiamo dimostrato che dati e rappresentazione funzionano.
+Niente modello enorme finché non abbiamo dimostrato che dati e rappresentazione funzionano.
 
 ### Cosa devi valutare tu
 Ascolto puro:
-- Ã¨ Trap?
+- è Trap?
 - ci rapperesti sopra?
 - il groove funziona?
 - 808 e kick hanno senso?
@@ -382,28 +383,28 @@ Il sistema genera 8 barre musicalmente sensate con una frequenza sufficiente da 
 
 ---
 
-# FASE 9 â€” Selector, Auditor e primo benchmark ascoltabile
+# FASE 9 — Selector, Auditor e primo benchmark ascoltabile
 
 Stato: DA FARE
 
-### PerchÃ© serve
+### Perché serve
 Non obblighiamo il modello a trovare sempre la soluzione migliore al primo tentativo.
 
 ### Pipeline
 Planner
-â†’ Performer
-â†’ 3â€“4 candidati
-â†’ Selector/Auditor
-â†’ migliore candidato
+→ Performer
+→ 3–4 candidati
+→ Selector/Auditor
+→ migliore candidato
 
 ### L'Auditor controlla
 - ripetizioni letterali;
 - struttura incoerente;
 - motif che spariscono senza motivo;
-- densitÃ  eccessiva;
+- densità eccessiva;
 - spazio vocale;
 - low-end incoerente;
-- tonalitÃ /registro;
+- tonalità/registro;
 - transizioni;
 - somiglianza eccessiva col training set.
 
@@ -416,35 +417,35 @@ B = Neural
 Il confronto deve misurare la composizione, non chi ha i sample migliori.
 
 ### Cosa devi valutare tu
-Questa Ã¨ la decisione musicale piÃ¹ importante del primo ciclo.
+Questa è la decisione musicale più importante del primo ciclo.
 
 ### Gate fondamentale
-Il Neural NON diventa il nuovo composer solo perchÃ© funziona tecnicamente.
+Il Neural NON diventa il nuovo composer solo perché funziona tecnicamente.
 
 Deve produrre musica che preferiamo davvero.
 
 ---
 
-# FASE 10 â€” Scala, forma lunga e produzione
+# FASE 10 — Scala, forma lunga e produzione
 
 Stato: DA FARE
 
 Questa fase si apre solo se il Gate della fase 9 viene superato.
 
-### 10A â€” Corpus piÃ¹ grande
-Da ~1.000 phrase verso 5.000â€“10.000+ phrase curate.
+### 10A — Corpus più grande
+Da ~1.000 phrase verso 5.000–10.000+ phrase curate.
 
-### 10B â€” Modello V1
-Aumentare capacitÃ  solo se i benchmark lo giustificano.
+### 10B — Modello V1
+Aumentare capacità solo se i benchmark lo giustificano.
 
-### 10C â€” Contesto lungo
+### 10C — Contesto lungo
 Progressione:
 8 barre
-â†’ 16
-â†’ 32
-â†’ struttura completa.
+→ 16
+→ 32
+→ struttura completa.
 
-### 10D â€” Partial regeneration
+### 10D — Partial regeneration
 Rigenerare solo:
 - drums;
 - 808;
@@ -453,7 +454,7 @@ Rigenerare solo:
 - transition;
 - singola sezione.
 
-### 10E â€” Hardening
+### 10E — Hardening
 - seed deterministico;
 - checkpoint versioning;
 - performance;
@@ -462,23 +463,23 @@ Rigenerare solo:
 - recovery da errori;
 - CPU/GPU strategy.
 
-### 10F â€” Licensing/originality gate
+### 10F — Licensing/originality gate
 - audit completo delle sorgenti;
 - nearest-neighbour check;
 - controllo memorization;
 - reject/regenerate su output troppo simili.
 
-### 10G â€” Integrazione nel gioco
-Solo quando il generatore standalone Ã¨ stabile.
+### 10G — Integrazione nel gioco
+Solo quando il generatore standalone è stabile.
 
 ### Cosa devi valutare tu
-QualitÃ  musicale, varietÃ , identitÃ  e utilitÃ  reale nel gioco.
+Qualità musicale, varietà, identità e utilità reale nel gioco.
 
 ---
 
 # DOPO LA TRAP
 
-Gli altri generi restano chiusi finchÃ© la Trap non funziona davvero.
+Gli altri generi restano chiusi finché la Trap non funziona davvero.
 
 Ordine da rivalutare al momento opportuno:
 - UK Drill;
@@ -497,63 +498,63 @@ Lo decideremo con dati reali.
 
 # GATE UFFICIALI
 
-## GATE 1 â€” DATA READY
-Non facciamo training serio finchÃ© importer, provenance, dedup e split non sono affidabili.
+## GATE 1 — DATA READY
+Non facciamo training serio finché importer, provenance, dedup e split non sono affidabili.
 
-## GATE 2 â€” REPRESENTATION READY
-Non scaliamo il modello finchÃ© non abbiamo scelto la rappresentazione con benchmark reali.
+## GATE 2 — REPRESENTATION READY
+Non scaliamo il modello finché non abbiamo scelto la rappresentazione con benchmark reali.
 
-## GATE 3 â€” 8 BAR MUSICALITY
-Non passiamo a canzoni complete finchÃ© 8 barre non funzionano bene.
+## GATE 3 — 8 BAR MUSICALITY
+Non passiamo a canzoni complete finché 8 barre non funzionano bene.
 
-## GATE 4 â€” NEURAL MUST WIN
-Non sostituiamo nulla finchÃ© il Neural non supera i benchmark in ascolto reale.
+## GATE 4 — NEURAL MUST WIN
+Non sostituiamo nulla finché il Neural non supera i benchmark in ascolto reale.
 
-## GATE 5 â€” COMMERCIAL SAFETY
-Non integriamo il modello commerciale finchÃ© corpus e output non superano provenance/licensing/originality audit.
+## GATE 5 — COMMERCIAL SAFETY
+Non integriamo il modello commerciale finché corpus e output non superano provenance/licensing/originality audit.
 
 ---
 
 # RUOLI
 
-## ResponsabilitÃ  tecnica â€” Lead Architect / ChatGPT
+## Responsabilità tecnica — Lead Architect / ChatGPT
 - tenere aggiornata la roadmap;
 - verificare la repo prima di lavorare;
 - decidere e spiegare le scelte ML/architetturali;
 - costruire codice, test e benchmark;
 - controllare dataset e provenance;
-- non introdurre complessitÃ  inutile;
+- non introdurre complessità inutile;
 - segnalare quando una strada non sta funzionando;
 - non trasformare esperimenti in regole definitive senza evidenza;
-- non saltare fasi perchÃ© una tecnologia sembra promettente.
+- non saltare fasi perché una tecnologia sembra promettente.
 
-## ResponsabilitÃ  musicale â€” Utente
+## Responsabilità musicale — Utente
 Non devi diventare un ML engineer.
 
-Ti chiederÃ² soprattutto di giudicare:
+Ti chiederò soprattutto di giudicare:
 - se un beat funziona;
-- se Ã¨ credibile;
-- se Ã¨ rappabile;
-- se una ripetizione Ã¨ buona o noiosa;
+- se è credibile;
+- se è rappabile;
+- se una ripetizione è buona o noiosa;
 - se il groove ha senso;
-- se un 808 Ã¨ musicale;
+- se un 808 è musicale;
 - se una transizione funziona;
 - quale versione preferisci in un A/B.
 
-La traduzione delle tue valutazioni musicali in dataset, metriche, architettura o codice Ã¨ responsabilitÃ  tecnica mia.
+La traduzione delle tue valutazioni musicali in dataset, metriche, architettura o codice è responsabilità tecnica mia.
 
 ---
 
 # REGOLE DI LAVORO DA ORA IN POI
 
-1. Questa roadmap Ã¨ la sequenza di lavoro ufficiale di FAME Neural.
+1. Questa roadmap è la sequenza di lavoro ufficiale di FAME Neural.
 2. Prima di ogni nuovo intervento si identifica la fase corrente.
 3. Non si apre la fase successiva senza aver superato il gate della fase corrente, salvo micro-lavori preparatori che non creano dipendenze.
 4. Ogni modifica significativa aggiorna lo stato della roadmap.
 5. Le vecchie decisioni FAME legacy sono consultabili ma non vincolanti.
 6. Le decisioni Neural diventano vincolanti solo dopo verifica nel nuovo progetto.
 7. Se una decisione Neural diventa obsoleta, viene modificata esplicitamente nella roadmap/decision log: non la trasciniamo per inerzia.
-8. Nessun aumento di modello o dataset serve a nascondere un errore di rappresentazione o di qualitÃ  dei dati.
+8. Nessun aumento di modello o dataset serve a nascondere un errore di rappresentazione o di qualità dei dati.
 9. Nessun benchmark numerico sovrascrive automaticamente un giudizio musicale evidente.
 10. Il renderer e gli altri componenti legacy vengono riutilizzati solo dove ci conviene; non sono dogmi architetturali.
 
@@ -568,6 +569,6 @@ Training model: NON INIZIATO
 Corpus reale FAME Neural: NON ANCORA COSTRUITO  
 Modello production: NON ESISTE  
 
-FASE CORRENTE: FASE 2 â€” Pipeline MIDI e provenienza.
+FASE CORRENTE: FASE 2 — Pipeline MIDI e provenienza.
 
 PROSSIMO OBIETTIVO: costruire Dataset Schema V1 + importer MIDI + provenance record, senza aprire ancora il training.

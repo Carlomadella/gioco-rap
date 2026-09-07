@@ -1,4 +1,4 @@
-# FAME Neural â€” FASE 2 real-data gate (GMD)
+# FAME Neural — FASE 2 real-data gate (GMD)
 
 Data chiusura: 8 settembre 2026
 Stato: SUPERATO / FASE 2 COMPLETATA
@@ -7,7 +7,7 @@ Stato: SUPERATO / FASE 2 COMPLETATA
 
 Verificare la pipeline MIDI e provenance di FAME Neural su dati reali, non soltanto su fixture sintetiche.
 
-La sorgente scelta per il gate Ã¨ il **Groove MIDI Dataset (GMD) v1.0.0**, pubblicato da Google LLC con licenza **CC BY 4.0**.
+La sorgente scelta per il gate è il **Groove MIDI Dataset (GMD) v1.0.0**, pubblicato da Google LLC con licenza **CC BY 4.0**.
 
 - Pagina sorgente: `https://magenta.tensorflow.org/datasets/groove`
 - Archivio usato: `groove-v1.0.0-midionly.zip`
@@ -17,9 +17,9 @@ La sorgente scelta per il gate Ã¨ il **Groove MIDI Dataset (GMD) v1.0.0**, pub
 
 Il bootstrap usa `tar.exe`, incluso normalmente in Windows 10/11, per leggere lo ZIP ed estrarre selettivamente `info.csv` e i soli MIDI scelti.
 
-Questa scelta evita l'estrazione completa e non dipende da `Expand-Archive` / `System.IO.Compression`, che con questo archivio hanno mostrato incompatibilitÃ  su Windows durante il gate reale.
+Questa scelta evita l'estrazione completa e non dipende da `Expand-Archive` / `System.IO.Compression`, che con questo archivio hanno mostrato incompatibilità su Windows durante il gate reale.
 
-Il file operativo Ã¨:
+Il file operativo è:
 
 `frontend/strumenti/fame-neural-composer/midi/bootstrap-gmd-phase2.ps1`
 
@@ -35,14 +35,14 @@ Il gate seleziona per default 6 esempi reali che rispettano:
 
 Per ogni MIDI viene creato un sidecar di provenance con sorgente, licenza, creator, composition family, rights evidence e permessi commerciali compatibili con CC BY 4.0.
 
-## CompatibilitÃ  drum mapping emersa dal dato reale
+## Compatibilità drum mapping emersa dal dato reale
 
 Il mapping GMD ha richiesto di riconoscere anche:
 
-- MIDI pitch `22` â†’ `hat_closed`;
-- MIDI pitch `26` â†’ `hat_open`.
+- MIDI pitch `22` → `hat_closed`;
+- MIDI pitch `26` → `hat_open`.
 
-La correzione Ã¨ mantenuta nel classifier canonico, evitando che questi eventi finiscano genericamente in `perc`.
+La correzione è mantenuta nel classifier canonico, evitando che questi eventi finiscano genericamente in `perc`.
 
 ## Risultato verificato
 
@@ -73,7 +73,7 @@ Questi output di test non fanno parte della repository e non devono essere commi
 
 ## Cosa dimostra
 
-La FASE 2 Ã¨ chiusa perchÃ© la pipeline ha dimostrato su MIDI reali di poter:
+La FASE 2 è chiusa perché la pipeline ha dimostrato su MIDI reali di poter:
 
 - leggere il MIDI;
 - normalizzarlo nel formato canonico FAME Neural;
@@ -85,8 +85,8 @@ La FASE 2 Ã¨ chiusa perchÃ© la pipeline ha dimostrato su MIDI reali di poter
 
 ## Cosa NON dimostra ancora
 
-Questo risultato **non chiude ancora il GATE 1 â€” DATA READY globale** della roadmap.
+Questo risultato **non chiude ancora il GATE 1 — DATA READY globale** della roadmap.
 
 La FASE 3 deve ancora costruire e verificare Dataset Auditor, dedup musicale / near-duplicate, family split e leakage train/validation/test sul corpus iniziale.
 
-Prossimo stato operativo: **FASE 3 â€” Dataset Auditor e corpus iniziale | IN CORSO**.
+Prossimo stato operativo: **FASE 3 — Dataset Auditor e corpus iniziale | IN CORSO**.
