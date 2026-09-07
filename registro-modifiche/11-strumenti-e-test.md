@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:6ecd52f -->
+## 07/09/26, 23:50 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `6ecd52f`
+
+### Cosa Ã¨ entrato
+
+- `f000a36` â€” fix: la stima del primo anno usava «my», che in quella funzione non esisteva â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:d443364 -->
 ## 07/09/26, 23:11 â€” task/come-si-lavora-aggiornato â†’ main
 
