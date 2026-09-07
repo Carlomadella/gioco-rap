@@ -1,0 +1,14 @@
+{
+  "sourceId": "producer-pack-001",
+  "originType": "commissioned",
+  "creator": "Nome produttore",
+  "licenseId": "CONTRACT-2026-001",
+  "compositionFamily": "producer-001-session-a",
+  "sourceUri": "evidence:contract-2026-001",
+  "rightsEvidence": [
+    "Contratto firmato: ML training + commercial model/output rights."
+  ],
+  "commercialTrainingAllowed": true,
+  "commercialOutputAllowed": true,
+  "notes": "Esempio: sostituire con dati reali verificati."
+}
