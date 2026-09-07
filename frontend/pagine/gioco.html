@@ -33,7 +33,7 @@
 <link rel="stylesheet" href="css/creator.css?v=12">
 <link rel="stylesheet" href="css/actionbar.css?v=12">
 <link rel="stylesheet" href="css/posto.css?v=13">
-<link rel="stylesheet" href="css/studio.css?v=2">
+<link rel="stylesheet" href="css/studio.css?v=3">
 <link rel="stylesheet" href="css/abilita.css?v=1">
 <link rel="stylesheet" href="css/negozio.css?v=12">
 <link rel="stylesheet" href="css/strada-crimine.css?v=13">
@@ -343,6 +343,9 @@
   <input type="file" id="st-file" accept="image/*" hidden>
 </div>
   <div class="sttabs" id="st-tabs"></div>
+  <!-- «la striscia continua»: si accende solo se le linguette non ci stanno
+       tutte in larghezza. Lo decide renderStudio(), misurando. -->
+  <div class="stoltre" id="st-oltre" hidden aria-hidden="true"></div>
 </div>
 
 <div class="posto" id="posto"><div class="powrap">
@@ -744,7 +747,7 @@
 <script src="js/game/entry.js?v=1"></script><!-- ADF_AUDIO_ENTRY_PAGE_V1 -->
 <script src="js/game/skip.js?v=14"></script>
 <script src="js/game/posto.js?v=14"></script>
-<script src="js/game/studio.js?v=4"></script>
+<script src="js/game/studio.js?v=6"></script>
 <script src="js/game/abilita.js?v=1"></script>
 <script src="js/game/strada.js?v=12"></script>
 <script src="js/game/strada-crimine.js?v=14"></script>

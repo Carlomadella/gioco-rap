@@ -596,8 +596,9 @@ function studioSezFuori(){
       ? 'Non hai ancora fatto uscire niente: il primo pezzo è quello che dice chi sei.'
       : da === 0
         ? '<b>Sei uscito questa settimana</b>: due pezzi ravvicinati si rubano l\'ascolto.'
-        : 'Sono passate <b>' + da + (da === 1 ? ' settimana' : ' settimane') +
-          '</b> dall\'ultima uscita.') + '</p>' +
+        : da === 1
+          ? 'È passata <b>una settimana</b> dall\'ultima uscita.'
+          : 'Sono passate <b>' + da + ' settimane</b> dall\'ultima uscita.') + '</p>' +
     (pronti.length
       ? pronti.map(x => studioRigaPezzo(x, s === x,
           'qualità ' + x.q + (x.mixed ? " · mixato" : " · non mixato, −8 se esce così"),
@@ -621,9 +622,21 @@ function renderStudio(){
   const sez = STUDIO_SEZIONI.find(x => x.id === STUDIO_SEZ) || STUDIO_SEZIONI[0];
   const art = (typeof SC !== "undefined" && SC[sez.sc]) || ["#8B5CF6", "#1D1030", ""];
 
-  $("st-tabs").innerHTML = STUDIO_SEZIONI.map(x =>
+  const tabs = $("st-tabs");
+  tabs.innerHTML = STUDIO_SEZIONI.map(x =>
     '<button class="sttab' + (x.id === sez.id ? " on" : "") + '" data-sez="' + x.id + '">' +
     x.n + '</button>').join("");
+  /* Otto linguette non ci stanno in riga su un telefono: la striscia scorre.
+     Due cose, se no le ultime due sezioni sono una caccia al tesoro — che è
+     l'avvertimento scritto nel progetto delle pagine. Primo: quella accesa si
+     porta sempre in vista, così sai dove sei anche se ci sei arrivato da
+     un'altra parte. Secondo: quando c'è altro a destra si accende una
+     sfumatura sul bordo, che è l'unico modo di dire «continua» senza rubare
+     spazio ai tasti. */
+  const acceso = tabs.querySelector(".sttab.on");
+  if(acceso && typeof acceso.scrollIntoView === "function")
+    acceso.scrollIntoView({block:"nearest", inline:"nearest"});
+  studioOltre();
 
   /* La foto se c'è, il disegno se no. Non tutte e due: sovrapporre una
      scenetta a una fotografia le fa sembrare entrambe finte. */
@@ -717,6 +730,16 @@ if($("studio")){
     /* la porta verso l'elenco delle mosse non c'è più: non c'è più l'elenco */
   });
 }
+/* La sfumatura guarda **dove sei arrivato**, non solo quanto e' larga la
+   striscia: se sei gia' in fondo non c'e' piu' niente a destra e dirlo
+   sarebbe una bugia. Serve al disegno e a chi scorre a dito, quindi la stessa
+   riga risponde a tutti e due. */
+function studioOltre(){
+  const t = $("st-tabs"), o = $("st-oltre");
+  if(!t || !o) return;
+  o.hidden = t.scrollLeft + t.clientWidth >= t.scrollWidth - 1;
+}
+if($("st-tabs")) $("st-tabs").addEventListener("scroll", studioOltre);
 if($("st-file")){
   $("st-file").addEventListener("change", e => {
     const f = e.target.files && e.target.files[0];
