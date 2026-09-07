@@ -1,6 +1,6 @@
 {
-  "memory_version": "1.2",
-  "reference_build": "FAME V0.8 Rhythm & Arrangement Pass",
+  "memory_version": "1.3",
+  "reference_build": "FAME V0.15.1 Low-End Click Fix",
   "mandatory_read_order": [
     "START_HERE.md",
     "AGENT_BOOTSTRAP.md",
@@ -24,14 +24,25 @@
     "Randomness is seeded/stable by phrase or section",
     "No hard mute of musical layers at section boundaries",
     "FX use musical/tempo-synced timing",
-    "Trap hats use skeleton + local ornaments",
+    "Trap hats use skeleton + gap + local ornaments",
     "Open/closed hat choke logic",
     "Crash is structural punctuation",
-    "Hat pitch automation is a Trap ornament, not a permanent effect",
+    "Hat pitch automation is local, not continuous/random",
+    "Rim/click is OFF by default",
+    "Virtual Rap Cadence Mask is an accepted direction",
+    "Trap supports multiple lineage profiles",
+    "Kick must be generated in relationship with the 808 phrase",
+    "Low-end collisions require an explicit arbitration policy",
+    "SEPARATE kick/808 events do not require collision ducking",
+    "Audible automation must not create instantaneous gain discontinuities",
     "Grid correctness does not prove musical pocket"
   ],
   "current_priority": [
     "FASE 1: Trap Production Grammar V1",
-    "Current focus: structure and phrasing"
+    "Current focus: 808 language"
+  ],
+  "research_basis": [
+    "research/FAME_TRAP_DEEP_RESEARCH_V1.md",
+    "research/FAME_TRAP_RESEARCH_MATRIX_V2.md"
   ]
 }

@@ -19,6 +19,8 @@ Ogni genere deve essere studiato in queste aree:
    - glide
    - distortion
    - relazione col kick
+   - collision policy
+   - register fitness
 
 3. HARMONY DNA
    - scale
@@ -60,7 +62,28 @@ Ogni genere deve essere studiato in queste aree:
    - STYLE CLICHES
    - VARIATION SPACE
    - FORBIDDEN AUTOMATISMS
+   - LINEAGE PROFILES
+   - PRODUCER DECISION DNA
 
-## Stato attuale
-Trap: ricerca iniziale già avviata.
-Altri generi: da formalizzare sistematicamente.
+## Trap — stato attuale
+
+Ricerca approfondita completata in due passate:
+- `research/FAME_TRAP_DEEP_RESEARCH_V1.md`
+- `research/FAME_TRAP_RESEARCH_MATRIX_V2.md`
+
+Conclusioni consolidate:
+- Trap = famiglia di lineage, non singola ricetta;
+- half-time backbone;
+- fast-detail / hat language;
+- negative space;
+- 808 centrale ma variabile;
+- kick↔808 relationship mandatory;
+- rap cadence awareness;
+- harmony complexity lineage-dependent;
+- dark non mandatory;
+- bells/plucks/mallets strong family, marimba non core;
+- rawness intenzionale possibile;
+- producer identity = decision style, non preset.
+
+Altri generi:
+da formalizzare sistematicamente solo dopo aver chiuso il benchmark Trap.

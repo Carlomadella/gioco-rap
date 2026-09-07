@@ -1,8 +1,9 @@
 {
-  "memory_version": "1.2",
+  "memory_version": "1.3",
   "created_date": "2026-09-07",
-  "reference_build": "FAME V0.8 Rhythm & Arrangement Pass",
+  "reference_build": "FAME V0.15.1 Low-End Click Fix",
   "install_target": "documentazione/fame",
   "integrity": "SHA-256 manifest",
-  "update_policy": "code + specs + state + tests + changelog in same logical change"
+  "update_policy": "code + specs + state + tests + changelog in same logical change",
+  "next_focus": "808 language"
 }

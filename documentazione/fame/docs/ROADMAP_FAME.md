@@ -1,74 +1,64 @@
 # FAME ROADMAP
 
-Versione roadmap: 1.1
+Versione roadmap: 1.2
 Data: 2026-09-07
 
-Obiettivo: evitare di sviluppare troppi sottosistemi contemporaneamente.
+Obiettivo:
+evitare di sviluppare troppi sottosistemi contemporaneamente.
 Si procede per fasi, congelando ciò che viene approvato prima di aprire la fase successiva.
 
 ---
 
 # FASE 0 — MEMORIA E SICUREZZA
-STATUS: IN CORSO
+STATUS: COMPLETATA
 
 Obiettivo:
 rendere la Bibbia FAME la fonte ufficiale del progetto.
 
-Deliverable:
-- `documentazione/fame/` nella repo;
-- manifest SHA-256;
-- bootstrap per AI/dev;
-- changelog;
-- decision log;
-- rejected approaches;
-- regression tests;
-- roadmap ufficiale.
-
-Definition of Done:
-- la cartella è nella repo;
-- commit dedicato;
-- integrità verificata;
-- nessuna modifica al codice gioco nello stesso commit.
-
 FASE chiusa il 2026-09-07.
-La Bibbia ufficiale è su main in documentazione/fame, commit 923915b.
+La Bibbia ufficiale è su main in `documentazione/fame/`.
+Commit iniziale: `923915b`.
 
 ---
 
 # FASE 1 — TRAP PRODUCTION GRAMMAR V1
-STATUS: NEXT
+STATUS: IN CORSO
 
 Obiettivo:
 definire bene COME viene costruito un beat Trap competente prima di aggiungere molti altri generi.
 
 Ordine:
-1. struttura / frasi;
-2. kick + snare/clap pocket;
-3. hi-hat grammar;
-4. 808 language;
+1. struttura / frasi — BASELINE APPROVATA;
+2. kick + snare/clap pocket — DIREZIONE APPROVATA;
+3. hi-hat grammar — BASELINE APPROVATA;
+4. 808 language — PROSSIMO FOCUS;
 5. harmony;
 6. melody / motif;
 7. transitions;
 8. sound choices;
 9. mix tendencies.
 
-Da studiare e formalizzare:
-- strutture usate da producer forti;
-- 4/8/16-bar phrasing;
-- hook/verse contrast;
-- subtraction;
-- hat skeleton + holes;
-- local rolls;
-- triplet rolls;
-- pitch automation hats;
-- open-hat pickups;
-- crash punctuation;
-- 808 presence variabile;
-- glide quando musicalmente utile;
-- bells/plucks/mallets/piano come colori;
-- negative space.
+Decisioni trasversali già consolidate:
+- Virtual Rap Cadence Mask — ACCEPTED-DIRECTION;
+- kick↔808 relationship — MANDATORY;
+- low-end collision policy — MANDATORY;
+- smooth automation / no gain discontinuity — MANDATORY;
+- Trap lineage profiles — ACCEPTED-DIRECTION.
 
-Deliverable:
+Da studiare e formalizzare nel prossimo sottostep 808:
+- durata;
+- rests;
+- root / fifth / octave;
+- passing tones;
+- glide;
+- register fitness;
+- attack character;
+- harmonic color;
+- soft / medium / heavy / extreme;
+- evitare troncature sgradevoli;
+- relazione con kick già obbligatoria.
+
+Deliverable FASE 1:
 - `TRAP_PRODUCTION_PLAYBOOK.md`;
 - `trap.json` aggiornato;
 - pattern/variation pools;
@@ -248,3 +238,5 @@ Obiettivi:
    - tests;
    - CHANGELOG;
    - questa ROADMAP.
+6. Mixing Engine completo resta chiuso fino al sottostep `mix tendencies`;
+   sono ammessi soltanto processing necessari a diagnosticare/correggere problemi evidenti.
