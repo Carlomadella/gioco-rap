@@ -336,9 +336,10 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
    iscritta a mano in **sette elenchi in sette file** (uscita, orologio, eventi,
    trasferte, menu di sistema): chi ne dimentica uno rompe qualcosa in silenzio, ed
    **è già successo tre volte** — la ✕ dello Studio (punto 15), `renderNegozio` che
-   non esisteva, e una terza trovata scrivendo il README, ancora aperta
-   (`strada-crimine` non è l'id di niente: sta in
-   [`documentazione/problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md)).
+   non esisteva, e una terza trovata scrivendo il README (`strada-crimine` non era
+   l'id di niente), sistemata il 07/09/2026 e raccontata in
+   [`documentazione/problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md).
+   Tutte e tre chiuse cambiando una riga; nessuna delle tre ha tolto il motivo.
    Un registro unico costa un paio di giorni, non cambia niente di quello che si
    vede e dimezza il costo di ogni pagina fatta da lì in poi.
 

@@ -176,10 +176,15 @@ motivo — la stessa lista scritta a mano in posti diversi:
    funzione della Strada: sembrava un pulsante morto (punto 15).
 2. `refreshOtherViews()` chiamava `renderNegozio()`, **che non esiste**: guardaroba e
    vetrina non si sono mai riaggiornati col tempo. Sistemato il 06/09/2026.
-3. **Ancora aperta:** `eventi-v2.js:195` e `trasferte.js:705` nominano l'elemento
-   `strada-crimine`, che *non esiste* — l'id vero è `strada`. Quelle due guardie saltano
-   la pagina delle Attività criminali da sempre. Segnata in
+3. `eventi-v2.js:195` e `trasferte.js:705` nominavano l'elemento `strada-crimine`, che
+   *non esiste* — l'id vero è `strada`. Quelle due guardie saltavano la pagina delle
+   Attività criminali da sempre: con le Attività criminali aperte un evento poteva
+   uscirti sopra e una trasferta poteva partire. Sistemato il 07/09/2026, dettagli in
    [`problemi-riscontrati.md`](../problemi-riscontrati.md).
+
+Tre volte su tre la pezza è stata cambiare una riga. Tre volte su tre ha funzionato, e
+tre volte su tre non ha tolto il motivo: gli elenchi scritti a mano sono ancora lì, e
+il quarto caso aspetta solo la prossima pagina nuova.
 
 **La cura.** Un file nuovo, `js/game/pagine.js`, dove una pagina si dichiara una volta
 sola:

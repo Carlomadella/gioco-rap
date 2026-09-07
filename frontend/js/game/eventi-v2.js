@@ -192,7 +192,7 @@ function overlayBusy(){
       if(!soloReport) return true;
     }
   }catch(_){}
-  const ids=["modal","report","writer","piazza","scena","posto","strada-crimine","negozio","adf-result-overlay","adf-social-overlay"];
+  const ids=["modal","report","writer","piazza","scena","posto","strada","negozio","adf-result-overlay","adf-social-overlay"];
   for(const id of ids){
     if(id==="report" && detenuto) continue;
     const el=document.getElementById(id);
