@@ -1,21 +1,22 @@
 {
-  "name": "anni-di-fame",
-  "version": "0.1.0",
-  "private": true,
-  "description": "Anni di Fame — il gioco. HTML, CSS e JavaScript; il build lo impacchetta per gli store.",
-  "license": "UNLICENSED",
-  "scripts": {
-    "dev": "node strumenti/dev.js",
-    "build": "node strumenti/build.js",
-    "demo": "node strumenti/build.js --unico",
-    "prova": "node strumenti/prova.js",
-    "verifica:build": "npm run build && npm run demo && node strumenti/verifica-build.js",
-    "verifica": "npm run prova && node strumenti/audit-regressioni.js && npm run verifica:build"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "devDependencies": {
-    "esbuild": "^0.25.0"
-  }
+    "name":  "anni-di-fame",
+    "version":  "0.1.0",
+    "private":  true,
+    "description":  "Anni di Fame â€” il gioco. HTML, CSS e JavaScript; il build lo impacchetta per gli store.",
+    "license":  "UNLICENSED",
+    "scripts":  {
+                    "dev":  "node strumenti/dev.js",
+                    "build":  "node strumenti/build.js",
+                    "demo":  "node strumenti/build.js --unico",
+                    "prova":  "node strumenti/prova.js",
+                    "verifica:build":  "npm run build \u0026\u0026 npm run demo \u0026\u0026 node strumenti/verifica-build.js",
+                    "verifica":  "npm run prova \u0026\u0026 node strumenti/audit-regressioni.js \u0026\u0026 npm run verifica:build",
+                    "setup:makehuman":  "node strumenti/setup-makehuman.js"
+                },
+    "engines":  {
+                    "node":  "\u003e=18"
+                },
+    "devDependencies":  {
+                            "esbuild":  "^0.25.0"
+                        }
 }
