@@ -6,6 +6,34 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:2914885 -->
+## 07/09/26, 10:49 â€” task/backend-al-passo-col-gioco â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `2914885`
+
+### Cosa Ã¨ entrato
+
+- `5fe714f` â€” feat(backend): i bot si diradano quando arriva gente vera, e il punto 30 si controlla da solo â€” **Carlomadella**
+- `128b7c9` â€” feat(backend): il server sta al passo col gioco — diario di bordo e bot credibili â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `backend/README-API.md`
+- **Modificato:** `backend/README.md`
+- **Modificato:** `backend/bot.js`
+- **Modificato:** `backend/database/archivio.js`
+- **Aggiunto:** `backend/database/migrazioni-pg/008_diario.sql`
+- **Aggiunto:** `backend/database/migrazioni/008_diario.sql`
+- **Modificato:** `backend/plausibilita.js`
+- **Modificato:** `backend/prova.js`
+- **Modificato:** `backend/server.js`
+- **Modificato:** `frontend/js/net/online.js`
+
+**File interessati in questa categoria:** 10
+
+---
+
 <!-- merge:66b0f10 -->
 ## 06/09/26, 09:48 â€” task/fix-render-e-agenti â†’ main
 
