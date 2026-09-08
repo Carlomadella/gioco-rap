@@ -110,11 +110,12 @@
   }
 
   /* -------------------------------------------------------
-     Provider temporaneo.
+     Provider temporaneo SOLO per Avvio rapido.
 
-     Il vecchio editor locale NON viene più aperto.
-     Quando arriverà MakeHuman sostituiremo soltanto questo
-     piccolo adattatore.
+     La nuova partita normale usa il provider reale scelto
+     nel creator (Avaturn oppure MakeHuman). Il preset base
+     resta qui soltanto per saltare la creazione nell'avvio
+     rapido.
      ------------------------------------------------------- */
 
   function installaPresetTemporaneo(frame){
@@ -221,7 +222,8 @@
       if(frame) frame.style.visibility = "hidden";
 
       quandoCreatorPronto(f => {
-        installaPresetTemporaneo(f);
+        /* Nel flusso normale non installiamo più il placeholder:
+           il creator apre davvero Avaturn oppure MakeHuman. */
         f.style.visibility = "";
       });
 

@@ -4475,41 +4475,20 @@ function makePreviewImage(){
   };
 
   const tryHeadshotCamera = () => {
-    if(!cam || typeof THREE === "undefined") return false;
-    const subject = findMainSubject();
-    if(!subject) return false;
-
-    const size = subject.size;
-    const center = subject.center.clone();
-    const headCenter = center.clone();
-
-    /* testata del bbox umano: circa negli ultimi 12-16% superiori del corpo. */
-    headCenter.y = subject.box.max.y - (size.y * 0.12);
-
-    /* Manteniamo una minima presenza di spalle abbassando leggermente il target. */
-    const target = headCenter.clone();
-    target.y -= size.y * 0.03;
-
-    /* Usa la direzione attuale camera->target se c'e; altrimenti una frontale semplice. */
-    let dir = null;
-    if(ctl && ctl.target && cam.position){
-      dir = cam.position.clone().sub(ctl.target);
-    }else if(cam.position){
-      dir = cam.position.clone().sub(target);
+    if(!cam || typeof setCameraView!=='function') return false;
+    try{
+      /* La vista VOLTO è già parte del runtime di produzione ed è stata
+         verificata visivamente durante l'audit. Evitiamo stime bbox:
+         con alcuni corpi/proxy la V4 avvicinava la camera fino a entrare
+         nella mesh e il portrait diventava un rettangolo color pelle. */
+      setCameraView('face',{smooth:false});
+      if(typeof applyVisualCenter==='function') applyVisualCenter();
+      if(cam.updateProjectionMatrix) cam.updateProjectionMatrix();
+      if(ctl && ctl.update) ctl.update();
+      return true;
+    }catch(_e){
+      return false;
     }
-    if(!dir || dir.lengthSq() < 1e-6) dir = new THREE.Vector3(0.15, 0.02, 1);
-    dir.normalize();
-
-    /* Distanza molto piu stretta: testa + spalle. */
-    let distance = Math.max(size.y * 0.16, size.x * 0.9, 0.22);
-    distance = Math.min(distance, Math.max(size.y * 0.24, 0.38));
-
-    if(ctl && ctl.target && ctl.target.copy) ctl.target.copy(target);
-    if(cam.position && cam.position.copy) cam.position.copy(target.clone().add(dir.multiplyScalar(distance)));
-    if(cam.lookAt) cam.lookAt(target);
-    if(cam.updateProjectionMatrix) cam.updateProjectionMatrix();
-    if(ctl && ctl.update) ctl.update();
-    return true;
   };
 
   const capture = () => {
