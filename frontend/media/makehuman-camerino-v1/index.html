@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anni di Fame — MakeHuman Modifier Stack V2.13.6</title>
+<style>
+:root{
+  --paper:#f1eadb;--muted:#9d968b;--gold:#d3aa5e;--gold2:#f3d9a6;
+  --panel:rgba(13,13,15,.76);--line:rgba(255,255,255,.12);--soft:rgba(255,255,255,.045)
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent;color:var(--paper);font-family:Inter,Arial,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+#stage{position:fixed;inset:0;background:transparent}
+#stage canvas{width:100%;height:100%;display:block}
+
+.camera-switcher{
+  position:fixed;z-index:12;left:50%;top:28px;transform:translateX(-50%);
+  display:flex;gap:6px;padding:6px;border:1px solid var(--line);border-radius:18px;
+  background:rgba(13,13,15,.66);backdrop-filter:blur(18px);box-shadow:0 16px 45px rgba(0,0,0,.28)
+}
+.camera-switcher button{
+  min-width:82px;border:0;border-radius:12px;padding:10px 13px;background:transparent;color:#aaa397;
+  font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase
+}
+.camera-switcher button:hover{color:#fff;background:rgba(255,255,255,.06)}
+.camera-switcher button.active{color:var(--gold2);background:rgba(211,170,94,.13)}
+
+.editor-sidebar{
+  position:fixed;z-index:13;right:28px;top:78px;bottom:104px;width:clamp(330px,29vw,430px);
+  display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--line);border-radius:24px;
+  background:var(--panel);backdrop-filter:blur(23px);box-shadow:0 24px 70px rgba(0,0,0,.38);
+  transition:.28s opacity,.28s transform
+}
+.editor-head{padding:15px 15px 10px;border-bottom:1px solid rgba(255,255,255,.07)}
+.kicker{font-size:8px;font-weight:950;letter-spacing:.19em;text-transform:uppercase;color:var(--gold)}
+.editor-head h1{margin:5px 0 0;font-size:16px;letter-spacing:.08em;text-transform:uppercase}
+.editor-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:11px}
+.editor-tabs button{
+  min-width:0;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.025);
+  color:#918a80;padding:8px 5px;font-size:7.4px;font-weight:900;letter-spacing:.08em;text-transform:uppercase
+}
+.editor-tabs button:hover{color:#fff;background:rgba(255,255,255,.06)}
+.editor-tabs button.active{color:var(--gold2);border-color:rgba(211,170,94,.38);background:rgba(211,170,94,.11)}
+.editor-scroll{overflow:auto;overscroll-behavior:contain;padding:12px 13px 16px}
+.editor-section{display:none}
+.editor-section.active{display:block}
+.section-copy{margin:0 0 10px;color:#a69d91;font-size:10px;line-height:1.5}
+.box{margin:0 0 9px;padding:11px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.028)}
+.box h2{margin:0 0 9px;color:var(--gold);font-size:9px;letter-spacing:.14em;text-transform:uppercase}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.slot{min-width:0}
+.slot label,.row label{display:block;margin-bottom:5px;color:#d2c8ba;font-size:8px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
+select,input[type=text]{width:100%;min-width:0;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:#131216;color:#eee6dc;padding:9px;font-size:9px;outline:none}
+input[type=range]{width:100%}
+.row{margin:8px 0}
+.row-inline{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px}
+.small{color:#8f877e;font-size:8.5px;line-height:1.45}
+
+.customize-color,.minor-btn{
+  width:100%;margin-top:5px;border:1px solid rgba(255,255,255,.10);border-radius:9px;
+  background:rgba(255,255,255,.035);color:#cfc5b8;padding:7px;font-size:8px;font-weight:850;text-transform:uppercase;letter-spacing:.08em
+}
+.customize-color.active{border-color:var(--active-color,var(--gold));box-shadow:inset 3px 0 0 var(--active-color,var(--gold));color:#fff}
+
+.color-customizer{
+  position:absolute;z-index:3;left:12px;right:12px;bottom:12px;padding:11px;border:1px solid rgba(211,170,94,.30);
+  border-radius:14px;background:rgba(12,11,14,.98);box-shadow:0 14px 40px rgba(0,0,0,.35)
+}
+.color-customizer[hidden]{display:none}
+.color-customizer-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.color-customizer-head strong{color:var(--gold2);font-size:10px}
+.color-close{border:0;background:transparent;color:#bbb;font-size:18px}
+.color-picker-row{display:grid;grid-template-columns:44px auto 1fr;gap:8px;align-items:center}
+#colorPicker{width:44px;height:34px;border:1px solid var(--line);border-radius:8px;background:#111;padding:2px}
+#colorHex{font:9px ui-monospace,Consolas,monospace;color:#ddd}
+#colorReset{border:1px solid var(--line);border-radius:8px;background:var(--soft);color:#ddd;padding:7px;font-size:8px;font-weight:800}
+.color-swatches{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.color-swatch{width:27px;height:27px;padding:0;border-radius:50%;background:var(--swatch);border:2px solid rgba(255,255,255,.20)}
+.color-note{margin:8px 0 0;color:#857d73;font-size:8px}
+
+
+.modifier-summary{
+  display:flex;flex-wrap:wrap;gap:5px;margin:0 0 9px
+}
+.modifier-pill{
+  border:1px solid rgba(255,255,255,.09);border-radius:999px;padding:5px 7px;
+  color:#a69d91;background:rgba(255,255,255,.025);font-size:7.5px;font-weight:850;
+  letter-spacing:.06em;text-transform:uppercase
+}
+.gender-quick{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:9px}
+.gender-quick button{
+  border:1px solid rgba(255,255,255,.10);border-radius:9px;background:rgba(255,255,255,.03);
+  color:#9d968b;padding:8px 5px;font-size:7.5px;font-weight:900;text-transform:uppercase;letter-spacing:.07em
+}
+.gender-quick button.active{
+  color:var(--gold2);border-color:rgba(211,170,94,.38);background:rgba(211,170,94,.11)
+}
+.modifier-container{display:flex;flex-direction:column;gap:8px}
+.modifier-group{
+  border:1px solid rgba(255,255,255,.065);border-radius:12px;background:rgba(255,255,255,.018);overflow:hidden
+}
+.modifier-group-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 9px;
+  border-bottom:1px solid rgba(255,255,255,.055);color:var(--gold);font-size:8px;font-weight:950;
+  letter-spacing:.10em;text-transform:uppercase
+}
+.modifier-group-head span:last-child{color:#756f67;font-size:7px}
+.modifier-list{padding:4px 8px 7px}
+.modifier-row{padding:7px 0;border-bottom:1px solid rgba(255,255,255,.045)}
+.modifier-row:last-child{border-bottom:0}
+.modifier-label{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;margin-bottom:4px
+}
+.modifier-label b{
+  min-width:0;color:#d9d0c4;font-size:8.2px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.modifier-label output{
+  color:var(--gold2);font:8px ui-monospace,SFMono-Regular,Consolas,monospace
+}
+.modifier-raw{display:none!important}
+.modifier-row input[type=range]{display:block;width:100%;accent-color:#c69c54}
+.modifier-empty{padding:12px;color:#777067;font-size:8.5px;line-height:1.45;text-align:center}
+.custom-target-row{padding:7px 0;border-bottom:1px solid rgba(255,255,255,.045)}
+.custom-target-row:last-child{border-bottom:0}
+.modifier-help{margin:2px 0 6px;color:#8f877c;font-size:8px;line-height:1.45}
+.skin-description{margin-top:8px;padding:8px 9px;border:1px solid rgba(255,255,255,.06);border-radius:8px;background:rgba(255,255,255,.025);color:#9f9689;font-size:9px;line-height:1.5}
+.engine-progress{
+  padding:9px;border:1px solid rgba(211,170,94,.18);border-radius:11px;background:rgba(211,170,94,.045);
+  color:#9d958a;font-size:8px;line-height:1.45
+}
+.engine-progress b{color:var(--gold2)}
+
+.bottom-bar{
+  position:fixed;z-index:14;left:50%;bottom:22px;transform:translateX(-50%);
+  width:min(1080px,calc(100vw - 48px));display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1.18fr;gap:7px;
+  padding:7px;border:1px solid var(--line);border-radius:20px;background:rgba(13,13,15,.75);backdrop-filter:blur(22px);box-shadow:0 18px 55px rgba(0,0,0,.34)
+}
+.bottom-bar button{
+  min-height:52px;border:1px solid rgba(255,255,255,.08);border-radius:13px;background:rgba(255,255,255,.03);color:#aaa297;
+  font-size:8.5px;font-weight:950;letter-spacing:.11em;text-transform:uppercase
+}
+.bottom-bar button:hover{color:#fff;background:rgba(255,255,255,.065)}
+.bottom-bar .primary{border-color:rgba(211,170,94,.45);background:rgba(211,170,94,.14);color:var(--gold2)}
+.bottom-bar .primary:hover{background:rgba(211,170,94,.22)}
+
+.preview-mode .editor-sidebar{opacity:0;pointer-events:none;transform:translateX(22px)}
+.preview-mode .camera-switcher{opacity:.55}
+
+#runtimeHidden{display:none!important}
+
+@media(max-width:980px){
+  .editor-sidebar{right:14px;width:min(390px,calc(100vw - 28px));top:70px;bottom:94px}
+  .bottom-bar{width:calc(100vw - 24px);bottom:12px}
+  .bottom-bar button{min-height:47px;font-size:7.5px}
+}
+
+  .modifier-row-symmetric .modifier-label{display:flex;align-items:center;gap:7px}
+  .modifier-row-symmetric .modifier-label b{flex:0 1 auto}
+  .modifier-side-badge{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:30px;height:16px;padding:0 5px;border-radius:999px;
+    border:1px solid rgba(215,174,91,.35);
+    color:#d8b66e;background:rgba(215,174,91,.08);
+    font-size:8px;font-weight:800;letter-spacing:.08em;
+  }
+  .modifier-row-symmetric .modifier-label output{margin-left:auto}
+  .modifier-symmetric-help{opacity:.72}
+  .modifier-row-symmetric input[data-asymmetric="true"]{
+    outline:1px dashed rgba(215,174,91,.45);
+    outline-offset:3px;
+  }
+
+  .wardrobe-conflict-notice{
+    margin:0 0 10px;padding:8px 10px;border-radius:8px;
+    border:1px solid rgba(215,174,91,.28);
+    background:rgba(215,174,91,.08);color:#e5cf9d;
+    font-size:11px;line-height:1.35;
+  }
+  .wardrobe-conflict-notice.bad{
+    border-color:rgba(220,92,92,.36);
+    background:rgba(220,92,92,.08);color:#efb2b2;
+  }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+
+<div class="camera-switcher" aria-label="Viste camera">
+  <button type="button" data-camera-view="full" class="active">Intero</button>
+  <button type="button" data-camera-view="face">Volto</button>
+  <button type="button" data-camera-view="profile">Profilo</button>
+</div>
+
+<aside class="editor-sidebar" id="editorSidebar">
+  <div class="editor-head">
+    <div class="kicker">MakeHuman · controlli completi V2.13.6</div>
+    <h1 id="sectionTitle">Identità</h1>
+    <div class="editor-tabs">
+      <button type="button" data-editor-tab="identity" class="active">Identità</button>
+      <button type="button" data-editor-tab="face">Volto</button>
+      <button type="button" data-editor-tab="body">Corpo</button>
+      <button type="button" data-editor-tab="hair">Capelli</button>
+      <button type="button" data-editor-tab="wardrobe">Guardaroba</button>
+      <button type="button" data-editor-tab="skin">Pelle</button>
+      <button type="button" data-editor-tab="customization">Personalizza</button>
+      <button type="button" data-editor-tab="confirm">Conferma</button>
+    </div>
+  </div>
+
+  <div class="editor-scroll">
+    <section class="editor-section active" data-editor-section="identity">
+      <p class="section-copy">Qui imposti la struttura fisica MakeHuman. Nome d'arte, città e genere musicale restano nel passaggio Identità del gioco dopo la conferma.</p>
+      <div class="box">
+        <h2>Sesso / struttura fisica</h2>
+        <div class="gender-quick" id="genderQuick">
+          <button type="button" data-gender-value="0">Femminile</button>
+          <button type="button" data-gender-value=".5">Neutro</button>
+          <button type="button" data-gender-value="1">Maschile</button>
+        </div>
+        <div class="engine-progress" id="modifierEngineStatus"><b>Modifier MakeHuman</b><br>Caricamento del motore nativo…</div>
+      </div>
+      <div class="modifier-summary" id="identityModifierSummary"></div>
+      <div id="nativeIdentityModifiers" class="modifier-container"></div>
+    </section>
+
+    <section class="editor-section" data-editor-section="face">
+      <p class="section-copy">Tutti i controlli facciali MakeHuman restano disponibili. Occhi, sopracciglia e ciglia sono gestiti separatamente dalla forma del viso.</p>
+      <div class="box"><h2>Elementi del volto</h2><div class="grid2">
+        <div class="slot"><label>Occhi</label><select id="slot-eyes"></select><button id="customize-eyes" class="customize-color">Personalizza</button></div>
+        <div class="slot"><label>Sopracciglia</label><select id="slot-eyebrows"></select><button id="customize-eyebrows" class="customize-color">Personalizza</button></div>
+        <div class="slot"><label>Ciglia</label><select id="slot-eyelashes"></select></div>
+      </div></div>
+      <div class="modifier-summary" id="faceModifierSummary"></div>
+      <div id="nativeFaceModifiers" class="modifier-container"></div>
+    </section>
+
+    <section class="editor-section" data-editor-section="body">
+      <p class="section-copy">Corpo completo: torace, braccia, gambe, mani, piedi, bacino, addome e tutti gli altri controlli MakeHuman disponibili.</p>
+      <div class="box"><h2>Dettagli del corpo</h2><div class="grid2">
+        <div class="slot"><label>Dettagli corpo</label><select id="slot-bodyDetail"></select></div>
+        <div class="slot"><label>Genitali</label><select id="slot-genitals"></select></div>
+      </div></div>
+      <div class="modifier-summary" id="bodyModifierSummary"></div>
+      <div id="nativeBodyModifiers" class="modifier-container"></div>
+    </section>
+
+    <section class="editor-section" data-editor-section="hair">
+      <p class="section-copy">Capelli e dettagli del volto. Il colore è un livello del nostro renderer e non modifica gli asset MakeHuman.</p>
+      <div class="box"><h2>Capelli</h2><div class="grid2">
+        <div class="slot"><label>Stile capelli</label><select id="slot-hair"></select><button id="customize-hair" class="customize-color">Personalizza</button></div>
+        <div class="slot"><label>Barba e baffi</label><select id="slot-facialHair"></select></div>
+        <div class="slot"><label>Dentatura</label><select id="slot-teeth"></select></div>
+        <div class="slot"><label>Lingua</label><select id="slot-tongue"></select></div>
+      </div></div>
+    </section>
+
+    <section class="editor-section" data-editor-section="wardrobe">
+      <p class="section-copy">Gli slot del guardaroba condividono una sola logica di equipaggiamento: i capi incompatibili vengono sostituiti automaticamente senza modificare gli asset MakeHuman.</p>
+      <div id="wardrobeConflictNotice" class="wardrobe-conflict-notice" hidden></div>
+      <div class="box"><h2>Abbigliamento</h2><div class="grid2">
+        <div class="slot"><label>Parte alta</label><select id="slot-tops"></select></div>
+        <div class="slot"><label>Parte bassa</label><select id="slot-bottoms"></select></div>
+        <div class="slot"><label>Vestito intero</label><select id="slot-dresses"></select></div>
+        <div class="slot"><label>Intimo</label><select id="slot-underwear"></select></div>
+        <div class="slot"><label>Scarpe</label><select id="slot-shoes"></select></div>
+        <div class="slot"><label>Capospalla</label><select id="slot-outerwear"></select></div>
+        <div class="slot"><label>Altro</label><select id="slot-clothesOther"></select></div>
+      </div></div>
+      <div class="box"><h2>Accessori</h2><div class="grid2">
+        <div class="slot"><label>Maniche / braccia</label><select id="slot-armsleeves"></select></div>
+        <div class="slot"><label>Occhiali</label><select id="slot-glasses"></select></div>
+        <div class="slot"><label>Cappelli</label><select id="slot-hats"></select></div>
+        <div class="slot"><label>Guanti</label><select id="slot-gloves"></select></div>
+        <div class="slot"><label>Maschere</label><select id="slot-masks"></select></div>
+        <div class="slot"><label>Gioielli</label><select id="slot-jewelry"></select></div>
+        <div class="slot"><label>Altri accessori</label><select id="slot-equipment"></select></div>
+      </div></div>
+      <button id="clearWardrobeVisible" class="minor-btn" type="button">Svuota guardaroba</button>
+    </section>
+
+    <section class="editor-section" data-editor-section="skin">
+      <p class="section-copy">Le pelli restano materiali MakeHuman originali. Ora sono raggruppate e descritte in modo leggibile; nessun file sorgente viene rinominato.</p>
+      <div class="box"><h2>Pelle</h2><div class="slot"><label>Tipo di pelle</label><select id="skinSelect"></select><div id="skinDescription" class="skin-description">Pelle base del personaggio MakeHuman.</div></div></div>
+    </section>
+
+    <section class="editor-section" data-editor-section="customization">
+      <p class="section-copy">Ricerca trasversale su tutti i controlli MakeHuman. Le 37 forme extra sono cumulabili e ora hanno nomi e descrizioni leggibili.</p>
+      <div class="box"><h2>Cerca tra tutti i controlli</h2>
+        <div class="slot"><label>Ricerca controlli</label><input id="modifierSearch" type="text" placeholder="Naso, bocca, torace, mano…"></div>
+        <div id="nativeSearchResults" class="modifier-container" style="margin-top:8px"></div>
+      </div>
+      <div class="box"><h2>Forme extra importate</h2>
+        <div class="slot"><label>Ricerca forme extra</label><input id="customTargetSearch" type="text" placeholder="Cerca forme extra…"></div>
+        <div id="customTargetList" class="modifier-list" style="margin-top:6px"></div>
+      </div>
+    </section>
+
+    <section class="editor-section" data-editor-section="confirm">
+      <p class="section-copy">Controlla il personaggio con le tre viste camera o entra in Anteprima. Conferma artista salva lo stato MakeHuman e prosegue nel flusso esistente.</p>
+      <div class="box"><h2>Pronto</h2><div class="small">Il salvataggio mantiene i path raw MakeHuman, tutti i modifier nativi, i target extra cumulabili, gli slot, skin e colori dell'editor. Nessun asset viene rinominato o modificato.</div></div>
+    </section>
+  </div>
+
+  <div id="colorCustomizer" class="color-customizer" hidden>
+    <div class="color-customizer-head"><strong id="colorCustomizerTitle">Colore</strong><button id="colorClose" class="color-close" type="button">×</button></div>
+    <div class="color-picker-row"><input id="colorPicker" type="color" value="#6b3d26"><span id="colorHex">#6B3D26</span><button id="colorReset" type="button">Ripristina originale</button></div>
+    <div id="colorSwatches" class="color-swatches"></div>
+    <p class="color-note">Texture, alpha, fitting e materiali MakeHuman restano invariati.</p>
+  </div>
+</aside>
+
+<nav class="bottom-bar" aria-label="Azioni editor">
+  <button id="editorBack" type="button">Indietro</button>
+  <button id="editorRandom" type="button">Casuale</button>
+  <button id="editorReset" type="button">Reset sezione</button>
+  <button id="editorPreview" type="button">Anteprima</button>
+  <button id="editorConfirm" class="primary" type="button">Conferma artista</button>
+</nav>
+
+<div id="runtimeHidden" aria-hidden="true">
+  <input id="applyMask" type="checkbox" checked>
+  <input id="targetSearch" type="text">
+  <select id="targetSelect"></select>
+  <input id="targetStrength" type="range" min="0" max="1" step=".05" value="0">
+  <b id="targetValue">0.00</b>
+  <input id="showBody" type="checkbox" checked>
+  <input id="showProxies" type="checkbox" checked>
+  <button id="presetComplete"></button><button id="randomComplete"></button><button id="clearWardrobe"></button>
+  <button id="front"></button><button id="back"></button><button id="fit"></button>
+  <select id="qaGroup"><option value="all">all</option></select><button id="qaRun"></button><button id="qaCancel"></button><button id="qaExport"></button>
+  <div id="visualQaResults"></div><div id="auditSummary"></div><div id="status">Avvio…</div>
+</div>
+
+<script>
+window.addEventListener('error',e=>console.error('MAKEHUMAN CAMERINO',e.error||e.message));
+window.addEventListener('unhandledrejection',e=>console.error('MAKEHUMAN CAMERINO PROMISE',e.reason));
+</script>
+<script>
+(()=>{
+  const params=new URLSearchParams(location.search);
+  const version=params.get('v')||String(Date.now());
+  const script=document.createElement('script');
+  script.type='module';
+  script.src='./runtime.js?v='+encodeURIComponent(version);
+  script.onerror=()=>console.error('runtime.js non caricato',script.src);
+  document.body.appendChild(script);
+})();
+</script>
+<script>
+// Alias UI: il runtime conserva il comando storico ma l'utente usa quello visibile.
+document.getElementById('clearWardrobeVisible').addEventListener('click',()=>document.getElementById('clearWardrobe').click());
+</script>
+</body>
+</html>
