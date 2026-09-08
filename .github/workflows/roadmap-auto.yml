@@ -124,7 +124,9 @@ jobs:
           - Se la nuova richiesta è più ampia della candidata, usa overlap, non duplicate.
           - Più task strette che coprono pezzi diversi della richiesta implicano overlap, non duplicate.
           - Se usi duplicate su una richiesta inbox: related_task_ids deve avere ESATTAMENTE una task e intake_note deve contenere la stringa delta=nessuno spiegando l'equivalenza.
-          - Una richiesta ampia/cross-system in overlap deve avere plan.mode=auto se l'utente non ha già fornito V1...Vn. Il piano deve coprire il delta reale senza ricopiare il lavoro già coperto.
+          - Non creare un piano per una modifica piccola/localizzata solo perché tocca più file o ha più criteri.
+          - Per una inbox unique/overlap, considera obbligatorio il piano automatico solo quando emergono almeno DUE segnali forti: 4+ systems E 4+ watch_paths; 3+ criteri; 2+ related_task_ids che coprono parti differenti.
+          - Se serve un auto-plan e l’utente non ha fornito V1...Vn, usa plan.mode=auto con ALMENO due step ordinati (V1 e V2 minimo), coprendo solo il delta reale.
 
           FORMATO JSON OBBLIGATORIO:
           - acceptance_criteria[] = { id, description, verification, status, evidence }.
@@ -167,7 +169,7 @@ jobs:
           Correggi SOLO gli stessi JSON. Preserva id, origin e source.
           Mantieni l'analisi valida e correggi struttura/classificazione solo dove serve.
           Se una richiesta inbox è più ampia della task candidata, deve essere overlap e non duplicate.
-
+          Se il validatore richiede un auto-plan, crealo con ALMENO due step ordinati (V1 e V2 minimo); un solo step non è valido.
           ERRORI DEL VALIDATORE:
           $(cat "$RUNNER_TEMP/audit-validation.log")
 

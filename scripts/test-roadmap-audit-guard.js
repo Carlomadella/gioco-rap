@@ -75,6 +75,54 @@ try {
   writeTask(exactDuplicate);
   assert.ok(run([base.id]).includes('OK: 1 task'));
 
+  const localMulti = structuredClone(base);
+  localMulti.id = 'ADF-NEW-CCCCCCCCCCCC';
+  localMulti.plan = { mode: 'none', status: 'not_applicable', summary: '', steps: [], gaps: [], notes: [] };
+  localMulti.related_task_ids = ['ADF-LEG-BBBBBBBBBBBB'];
+  localMulti.systems = ['energia', 'hud', 'stato-player'];
+  localMulti.watch_paths = ['energia.js', 'hud.js', 'player.js', 'gioco.js'];
+  localMulti.acceptance_criteria = [
+    { id: 'C1', description: 'valore energia visibile', verification: 'code_audit', status: 'pending', evidence: [] },
+    { id: 'C2', description: 'warning sotto soglia', verification: 'code_audit', status: 'pending', evidence: [] },
+    { id: 'C3', description: 'ripristino sopra soglia', verification: 'code_audit', status: 'pending', evidence: [] }
+  ];
+  writeTask(localMulti);
+  assert.ok(run([localMulti.id]).includes('OK: 1 task'), 'una meccanica locale multi-file/multi-criterio deve poter restare plan=none');
+
+  const broad = structuredClone(base);
+  broad.id = 'ADF-NEW-DDDDDDDDDDDD';
+  broad.plan = { mode: 'none', status: 'not_applicable', summary: '', steps: [], gaps: [], notes: [] };
+  broad.systems = ['discografia', 'streaming', 'economia', 'carriera', 'classifica'];
+  broad.watch_paths = ['release.js', 'streaming.js', 'economy.js', 'career.js', 'charts.js'];
+  broad.acceptance_criteria = [
+    { id: 'C1', description: 'formula pubblicazione', verification: 'code_audit', status: 'pending', evidence: [] },
+    { id: 'C2', description: 'propagazione economica', verification: 'code_audit', status: 'pending', evidence: [] },
+    { id: 'C3', description: 'coerenza classifica', verification: 'code_audit', status: 'pending', evidence: [] }
+  ];
+  writeTask(broad);
+  assert.throws(() => run([broad.id]), /status|Command failed/, 'una inbox davvero cross-system + multi-criterio deve essere bloccata se plan=none');
+
+  const oneStep = structuredClone(broad);
+  oneStep.plan = {
+    mode: 'auto', status: 'ready', summary: 'Piano troppo corto', gaps: [], notes: [],
+    steps: [
+      { id: 'V1', title: 'Unico step', objective: 'Fare tutto', depends_on: [], systems: ['discografia'], watch_paths: ['release.js'], acceptance_criteria: ['C1'], status: 'planned' }
+    ]
+  };
+  writeTask(oneStep);
+  assert.throws(() => run([oneStep.id]), /status|Command failed/, 'un auto-plan con un solo step deve essere sempre rifiutato');
+
+  const broadValid = structuredClone(broad);
+  broadValid.plan = {
+    mode: 'auto', status: 'ready', summary: 'Piano minimo', gaps: [], notes: [],
+    steps: [
+      { id: 'V1', title: 'Contratto', objective: 'Definire il calcolo', depends_on: [], systems: ['discografia', 'classifica'], watch_paths: ['release.js', 'charts.js'], acceptance_criteria: ['C1'], status: 'planned' },
+      { id: 'V2', title: 'Propagazione', objective: 'Collegare economia e carriera', depends_on: ['V1'], systems: ['streaming', 'economia', 'carriera'], watch_paths: ['streaming.js', 'economy.js', 'career.js'], acceptance_criteria: ['C2', 'C3'], status: 'planned' }
+    ]
+  };
+  writeTask(broadValid);
+  assert.ok(run([broadValid.id]).includes('OK: 1 task'), 'la stessa task deve passare con auto-plan valido da almeno due step');
+
   console.log('roadmap-audit-guard: test OK');
 } finally {
   fs.rmSync(root, { recursive: true, force: true });
