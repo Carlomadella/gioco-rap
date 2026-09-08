@@ -45,7 +45,7 @@ ALE:
 
 5. Il giocatore parte con tutti i parametri a 1
 
-7. Verissima la cosa dell'hype, fattore che dev'essere davvero primario nel gioco e i player dovran costantemente provare a inseguire ma con tanta fatica, Partiamo proprio dallo sviluppo dell'hype :
+6. Verissima la cosa dell'hype, fattore che dev'essere davvero primario nel gioco e i player dovran costantemente provare a inseguire ma con tanta fatica, Partiamo proprio dallo sviluppo dell'hype :
 
 L'hype è in scala internazionale, vuol dire che se sei al livello 100 è impossibile che tu sia ancora nel paesino di provincia.
 Probabilmente all'inizio l'unico modo per fare hype è andare al pub e pubblicare sui social pubblicità per la tua musica (DA SVILUPPARE QUESTO) , ma più di tanto HYPE all'inizio non si può fare, quindi è impossibile che al primo anno rimanendo nella prima città tu diventi 100 di hype
@@ -162,18 +162,35 @@ NETWORK 64
    spina». E dentro allo Studio, Cover e Feat una foto loro non ce l'hanno né con né senza
    interfaccia: si tengono in prestito quella della stanza più vicina.
 
-5. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo
-   Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il
-   secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su
-   "stacca la spina", il quinto su "registra un pezzo".
+5. Il motore degli eventi non sa che hai comprato un beat se non lo compri dallo Shop. Non è di questa task, ma questa task la allarga (i posti muti sono due su tre invece di uno su due). Sistemarlo vuol dire decidere che nomi deve ascoltare eventi-v2.js: tocca il motore, non lo Studio.
 
-6. quando skippi tante ore ci mette troppo a simulare
+6. Il tasto d'oro in cabina. Nella foto registrazione_pezzo l'oro ce l'ha «UN'ALTRA TAKE», e la foto era la richiesta. Ma la regola scritta in css/studio.css dice che l'oro va alla mossa che fa succedere la cosa — ed è per quella regola che nella sezione Beat «Compralo» è d'oro e «Fattelo fare» no. Qui le due cose non vanno d'accordo: ha vinto la foto, e il risultato è che chi va di fretta preme l'oro e spende 12 di energia senza volerlo. Dimmi e la giro.
 
-7. togli il parametro «lucidità» e tutto ciò che ne consegue
+/_ RESPONSIVITA' _/
 
-8. aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
+Chiusa il 08/09/2026: i tre punti dello Studio (l'orologio galleggiante, la barra
+delle take, la fascia a 360), l'hover che restava acceso al tocco su tutti i CSS, e
+il giro largo sulle altre schermate — da cui e' uscita la Strada, che sotto ai 980
+punti non si impilava e sul telefono non si giocava. Il racconto per esteso sta in
+`implementazioni/02-interfaccia-e-telefono.md`, sotto «La responsivita': lo Studio,
+la Strada e l'hover al tocco».
 
-9. quando non sono fix, risoluzioni di bug o errori non modificare troppo i file già presenti ma crea un file nuovo collegato ai già presenti
+Resta da fare: il giro su un telefono vero con `prova-sul-telefono` — le misure sono
+state lette nel CSS, le schermate non sono state rifatte.
+
+7. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo. Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su "stacca la spina", il quinto su "registra un pezzo".
+
+8. quando skippi tante ore ci mette troppo a simulare
+
+9. togli il parametro «lucidità» e tutto ciò che ne consegue
+
+10. aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
+
+11. quando non sono fix, risoluzioni di bug o errori non modificare troppo i file già presenti ma crea un file nuovo collegato ai già presenti
+
+12. non sempre far scorrere una giornata ti ridà l'energia
+
+13. tieni tutto ciò che riguarda la parte smartphone separata dal resto del progetto
 
 /_ DA DISCUTERE _/
 

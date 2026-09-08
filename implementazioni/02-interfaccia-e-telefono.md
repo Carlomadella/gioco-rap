@@ -1315,3 +1315,73 @@ leggi di quella persona. Riscritta senza.
    uscire il dock dallo schermo. Sotto i 1180px, dove il telefono è ancora quello vecchio,
    «Vedi tutte le chat» apre Chat e la freccia riporta indietro. Nessun errore in console.
    `npm run prova` 70/70, `npm run build` pulito.
+
+## La responsività: lo Studio, la Strada e l'hover al tocco
+
+Tre punti nati da un giro di screenshot sul telefono, più il giro largo che ne è
+seguito. **FATTO (08/09/2026)** — commit `43623ca`, `ee4951c`, `df41c78`.
+
+1. ~~«L'orologio galleggiante copre lo Studio, e ruba il tocco»~~ **FATTO (08/09/2026)** —
+   la tabella `HOSTS` di `frontend/js/game/tempo-controlli.js` non aveva lo Studio, e
+   siccome lo Studio è un foglio sopra all'hub — che resta acceso sotto — la pastiglia si
+   agganciava all'hub e si prendeva lo `z-index:142` contro il 94 dello Studio: finiva
+   sopra alla riga «Il quartiere», al tasto d'oro «POSTA» e alla stima degli stream.
+   Adesso lo Studio ha una riga sua nella tabella, **muta** e messa **prima dell'hub**:
+   dove c'è un posto muto `activeHost()` torna `null` e il widget non si monta da nessuna
+   parte. L'ora nello Studio resta quella della fascia in alto (`studioRisorse()`), come
+   nelle foto di riferimento. Il costo della scelta, deciso insieme: dentro allo Studio
+   non ci sono più «Attendi», «+1 giorno» e «+7 giorni» — per aspettare si torna alla
+   mappa.
+
+2. ~~«La take migliore ha la barra più corta»~~ **FATTO (08/09/2026)** — sotto i 620px
+   `css/studio-elementi.css` lasciava collassare a zero la casella del «← buona»
+   (`.sttakeb{min-width:0}`), così la riga senza targhetta regalava una sessantina di
+   punti di larghezza alla sua barra e le due piste non erano più larghe uguali: q85
+   sembrava meno di q71, proprio la cosa per cui la barra esiste. La casella adesso si
+   stringe con lo schermo (56px sotto i 620, 50px sotto i 520) ma **non arriva mai a
+   zero**, e la larghezza riservata resta sempre più larga del testo che ci va dentro.
+
+3. ~~«La fascia in alto si taglia a 360px»~~ **FATTO (08/09/2026)** — la nav globale di
+   `js/menu-sistema.js` si prende 210 punti fissi e i tre numeri (energia, soldi, ora) ne
+   vogliono quasi 190: su una riga sola l'ora finiva fuori e si leggeva «09:». Sotto i
+   480px la fascia va su **due righe** — sopra la nav con la sezione di fianco, sotto i
+   numeri allineati a destra — e `--stAlta` cresce con lei, se no le colonne partono
+   sotto alla fascia e ci finiscono dentro.
+
+4. ~~«L'hover che resta acceso al tocco sul telefono. Va fatto in un giro solo su tutti i
+   CSS»~~ **FATTO (08/09/2026)** — tutte le regole `:hover` dei 24 fogli che ne avevano
+   stanno dentro a `@media (hover:hover)`. Dove un selettore ne teneva insieme due — per
+   esempio `.land-voce:hover,.land-voce.on` o
+   `.skill-hotspot:hover,.skill-hotspot:focus-visible` — la regola è stata divisa: nella
+   gabbia ci va solo la parte con `:hover`, il resto sta fuori e continua a valere anche
+   col dito. Conteggio per file prima e dopo: stesso numero di regole in ognuno. La
+   convenzione è scritta in cima a `css/tocco.css`.
+
+5. **La Strada si impila** **FATTO (08/09/2026)** — non era nell'elenco, l'ha trovata il
+   giro largo, ed era la falla più grossa: la Strada esisteva **solo larga**. Le tre
+   colonne sono `260px minmax(520px,1fr) 300px` e l'unico scalino di larghezza era a
+   1100px, che le stringe a 955 punti prima di distacchi e imbottitura. Sotto ai 980 la
+   pagina sbordava di lato, il colpo da scegliere finiva mezzo fuori dallo schermo e la
+   barra delle città non si raggiungeva: sul telefono la Strada non si giocava. Adesso
+   sotto i 980 si impila con l'ordine dello Studio (prima i colpi, poi «Adesso», poi il
+   contorno, in fondo le città), sotto i 620 la fascia va su due righe come nello Studio,
+   e sotto i 520 i quattro colpi vanno uno per riga.
+
+6. **Il rapporto di settimana a 360** **FATTO (08/09/2026)** — trenta punti d'imbottitura
+   più venti di cornice lasciano 260 punti veri: le tre caselle diventavano da 78, con
+   dentro un numero da 27px che a «12.4K» era già fuori. Sotto i 400 vanno a due per
+   riga, e la dispari si prende la riga intera.
+
+Guardate e già a posto, senza toccarle: la plancia si impila da sola sotto i 900 (e sotto
+i 1180 nasconde il telefono, per scelta già scritta lì), il negozio e i moduli usano
+griglie `auto-fill` che scendono a una colonna da sole, `.grid` di `base.css` collassa a
+820, e il telefono di `telefono.css` è disegnato in `cqw` dentro al suo contenitore.
+
+**Conferma dal giro di screenshot:** le schede dei beat vanno a capo una per riga a 390px,
+come erano state disegnate.
+
+I tre punti dello Studio e la regola dell'hover hanno il loro controllo in
+`frontend/strumenti/audit-regressioni.js` (da 290 a 294 prove). **Quello che manca:** il
+telefono vero. Qui l'estensione Chrome non era collegata, quindi queste sono misure lette
+nel CSS e nel codice, non schermate rifatte — il giro con `prova-sul-telefono` resta da
+fare.

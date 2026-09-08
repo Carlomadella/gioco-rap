@@ -1,6 +1,6 @@
 # La roadmap del progetto — a che punto siamo davvero
 
-**Aggiornata al 07/09/2026.** Ogni riga di questo file è stata controllata sul repo il
+**Aggiornata all'08/09/2026.** Ogni riga di questo file è stata controllata sul repo il
 giorno in cui è stata scritta: se qui c'è scritto «fatto», il codice c'è ed è stato
 guardato. Se c'è scritto «da fare», nel repo non c'è niente che lo faccia.
 
@@ -204,8 +204,16 @@ telefono in verticale no. Serve una disposizione sua (profilo, mappa e telefono 
 l'altro), aree da toccare di almeno 44 punti, niente `hover`, testi leggibili senza zoom.
 Sono i CSS e un pezzo di `hub.js`, ma è il lavoro più lungo dei cinque per uscire.
 
-*«Responsività di tutto il gioco»* è a metà: restano la prova su un telefono vero e il giro
-sugli `:hover`. Si prova con l'agente `prova-sul-telefono`.
+*«Responsività di tutto il gioco»* — **il giro sugli `:hover` è fatto (08/09/2026)**: tutte
+le regole `:hover` dei 24 fogli che ne avevano stanno dentro a `@media (hover:hover)`, e un
+controllo in `audit-regressioni.js` tiene ferma la convenzione. Nello stesso giro sono
+chiusi i tre punti dello Studio (l'orologio galleggiante che copriva i pannelli, la barra
+delle take che non si poteva confrontare, la fascia in alto tagliata a 360) e la Strada, che
+sotto ai 980 punti non si impilava — esisteva solo larga, e sul telefono non si giocava.
+
+**Resta la prova su un telefono vero**, con l'agente `prova-sul-telefono`: le misure di
+questo giro sono state lette nel CSS, non rifatte a schermo. Finché non è passata quella,
+questa tappa non è chiusa.
 
 ### H · Los Angeles _(da fare)_
 
