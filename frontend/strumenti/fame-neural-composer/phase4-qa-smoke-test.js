@@ -5,7 +5,8 @@ const {
   invariantIssues,
   runQa,
   markdownReport,
-  quantile
+  quantile,
+  reviewFlags
 } = require("./annotation/qa");
 
 function annotation(id, source, values, bars = 4) {
@@ -100,6 +101,12 @@ assert.ok(reportA.reviewSample.some(item => item.sourceCollection === "source-a"
 assert.ok(reportA.reviewSample.some(item => item.sourceCollection === "source-b"));
 assert.ok(markdownReport(reportA).includes("Campione stratificato"));
 assert.equal(reportA.calibration.decision, "HUMAN_REVIEW_REQUIRED");
+assert.equal(reportA.stats.global.kick808RelationStrength.count, 6, "kick↔808 stats devono includere solo phrase con relazione disponibile");
+const denseWithSpace = annotation("a:dense-space", "source-a", {
+  energy: 0.7, density: 0.9, tension: 0.2, vocalSpace: 0.95,
+  with808: false, kick808RelationStrength: 0, roll: false
+});
+assert.ok(!reviewFlags(denseWithSpace, reportA.stats.sources).includes("cross-check:dense-but-high-vocal-space"), "densita' alta + vocal space alto non e' una contraddizione automatica");
 
 const broken = JSON.parse(JSON.stringify(items[0]));
 broken.global.energy = 0.99;

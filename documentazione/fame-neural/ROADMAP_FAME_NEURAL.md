@@ -240,7 +240,7 @@ Chiusura FASE 3 / Gate 1 Data Ready:
 - GATE 1 DATA READY: READY.
 
 Priorita' successiva:
-1. FASE 4: completare revisione musicale Blocco 2B e calibrare solo se giustificato dal QA;
+1. FASE 5: avviare il benchmark delle rappresentazioni neurali sul corpus Gate 1 + overlay di esclusione umano;
 2. continuare in parallelo l'espansione non sintetica per ridurre la synthetic share verso l'advisory 40%;
 3. mantenere NeuralAcid/OpenScore/Harmony Whiz come espansioni future, non come prerequisito Gate 1.
 
@@ -265,7 +265,7 @@ Abbiamo un primo corpus piccolo ma pulito e abbastanza vario da fare un test ser
 
 # FASE 4 — Annotazione musicale automatica
 
-Stato: IN CORSO — BLOCCO 1 + BLOCCO 2A COMPLETATI
+Stato: COMPLETATA — ANNOTATORE V1 CONGELATO
 
 ### Perché serve
 Il modello non deve vedere solo note: vogliamo che possa capire strutture e relazioni.
@@ -293,9 +293,9 @@ Verifica sul corpus reale Gate 1 da 504 phrase:
 - due run complete indipendenti hanno prodotto lo stesso manifest SHA-256 `bb540e5103c6f0b79c688af59ec74b47c83282592cdc45a0e0c461a4e025aa89`;
 - le label restano stime euristiche con confidence esplicita, non ground truth musicale.
 
-Blocco 2A QA automatico COMPLETATO sul corpus reale: 504 annotazioni, 6 sorgenti, 0 violazioni invarianti, campione revisione 52.
+Blocco 2A QA automatico COMPLETATO sul corpus reale: 504 annotazioni, 6 sorgenti, 0 violazioni invarianti. La policy QA e' stata poi corretta per contare kick↔808 solo quando disponibile e per non trattare density alta + vocalSpace alto come contraddizione automatica.
 
-Prossimo Blocco 2B: revisione musicale del campione e calibrazione solo se giustificata dai risultati.
+Blocco 2B review umana COMPLETATO: 22/22 phrase, 19 pienamente coerenti, 2 escluse per qualita' musicale, 1 singola sovrastima tension, 0 pattern metrici ripetuti, 95% agreement sulle phrase usabili. Nessuna calibrazione globale; annotatore V1 congelato per FASE 5.
 
 ### Regola
 Le annotazioni automatiche sono stime, non verità musicali.

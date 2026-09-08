@@ -1,0 +1,18 @@
+{
+  "schema": "fame-neural-human-review-exclusions-v1",
+  "version": 1,
+  "reviewManifest": "339b42b15b89f1b8301a007ba35c15e2bff00e3c487069b7ba431355469c4154",
+  "policy": "exclude-from-neural-training-candidates-without-deleting-source",
+  "exclusions": [
+    {
+      "phraseId": "fame-original-seed-v1:sketch-021:d1d683a667f69e38:phrase:canonical:4+4",
+      "sourceCollection": "fame-original-seed-v1",
+      "reason": "Phrase molto densa ed energica, ma con struttura e disposizione delle note poco convincenti. Le note sembrano organizzate male e rendono difficile valutare correttamente il vocal space; la tensione percepita è comunque piuttosto bassa."
+    },
+    {
+      "phraseId": "waivops-nrg-cp:v1:3b807eaee23594ccc4:8db62131f58971ed:phrase:canonical:0+4",
+      "sourceCollection": "waivops-nrg-cp",
+      "reason": "Lead/arpeggio percepito come musicalmente incoerente: alcune note sembrano fuori tonalità o poco compatibili con la bassline. Le metriche generali possono essere corrette, ma la phrase suona “sbagliata” a livello melodico-armonico."
+    }
+  ]
+}

@@ -1,14 +1,51 @@
 # FAME Neural — Current State
 
-Data: 2026-09-07
+Data: 2026-09-08
 
 ## Stato roadmap
 
 - FASE 0 — Fondazione e separazione: **COMPLETATA**.
 - FASE 1 — Linguaggio dei dati: **COMPLETATA**.
-- FASE 2 — Pipeline MIDI e provenienza: **IN CORSO**.
-- Training reale: **NON INIZIATO**.
-- Corpus reale: **NON ANCORA COSTRUITO**.
+- FASE 2 — Pipeline MIDI e provenienza: **COMPLETATA**.
+- FASE 3 — Dataset Auditor e corpus iniziale: **COMPLETATA — GATE 1 DATA READY SUPERATO**.
+- FASE 4 — Annotazione musicale automatica: **COMPLETATA**.
+- FASE 5 — Scelta della rappresentazione neurale: **DA FARE**.
+- Training neurale reale: **NON INIZIATO**.
+
+## Corpus Gate 1
+
+- corpus verificato: **504 phrase**;
+- composition family: **285**;
+- source collection: **6**;
+- coverage drums / 808 / harmony / lead: **170 / 101 / 394 / 76**;
+- synthetic share: **45.04%** (advisory 40%, non blocker Gate 1);
+- human-review exclusion overlay: **2 phrase**;
+- candidati effettivi alla preparazione FASE 5 quando l'overlay viene applicato: **502 phrase**.
+
+Il corpus sorgente da 504 phrase resta immutato: le due esclusioni umane sono un overlay reversibile e machine-readable, non cancellazioni distruttive.
+
+## Annotazioni FASE 4
+
+Annotatore congelato per il passaggio alla FASE 5:
+
+- schema `fame-neural-musical-annotation-v1`;
+- metodo `fame-neural-auto-annotator-v1`;
+- 504/504 annotazioni prodotte, 0 fallite;
+- 0 violazioni invarianti nel QA finale;
+- 75 phrase con relazione kick↔808 realmente disponibile;
+- output deterministico; manifest annotazioni `c3917d3c628e1cf7fc178d3161a2dcbd7348b5d35e4aa08c2ad3a229a1890692`.
+
+Review umana Blocco 2B:
+
+- 22/22 phrase valutate;
+- 19 completamente coerenti;
+- 2 escluse per qualità musicale della phrase;
+- 1 singola sovrastima di `tension` su `free-midi-chords`;
+- nessun errore metrico ripetuto;
+- agreement sulle 20 phrase musicalmente usabili: **95%**;
+- nessuna calibrazione globale applicata.
+
+Le annotazioni restano feature euristiche con confidence, non ground truth musicale.
 
 ## Linguaggio simbolico corrente
 
@@ -16,80 +53,21 @@ Directory:
 
 `frontend/strumenti/fame-neural-composer/`
 
-Baseline:
+Baseline rilevante:
 
 - schema `fame-neural-sequence-v1`;
-- 960 PPQ nel formato simbolico canonico;
+- 960 PPQ canonici;
 - `tonality` separata dalla progressione armonica;
-- harmony segmentata con root, quality e bass/inversione;
 - event stream multitraccia;
-- evento 808 con glide target + glide duration;
-- ordine canonico degli eventi simultanei;
-- encoder + decoder;
-- token ↔ id lossless;
-- grammatica del token stream;
-- `allowedNextTokens()` per constrained generation futura;
+- 808 glide;
+- ordine canonico eventi simultanei;
+- encoder/decoder + token ↔ id lossless;
+- grammatica constrained;
 - duration straight/triplet;
-- pitch MIDI 0..127;
-- tre fixture sintetiche da 8 barre;
-- audit simbolici iniziali.
+- conditioning discretizzato.
 
-Vocabolario V1 corrente: **1019 token**.
+## Prossimo intervento ufficiale
 
-## Quantizzazioni ammesse
+FASE 5: confrontare Flat token PoC, REMI+, Compound Word e FAME Compound custom con benchmark di token/barra, contesto, memoria, velocità, reconstruction accuracy, invalid generation rate e capacità di rappresentare correttamente il dominio Trap.
 
-La rappresentazione neurale V1 è intenzionalmente discreta:
-
-- onset: nearest tra 1/32 straight, 1/16 triplet, 1/8 triplet;
-- duration: stesse famiglie fino a 2 barre;
-- velocity: 10 bin;
-- energy/vocalSpace/tension/density: 10 bin.
-
-La stabilità richiesta è canonica, non byte-identical rispetto all'input grezzo:
-
-`encode(decode(encode(sequence))) === encode(sequence)`.
-
-## Verifica corrente
-
-```powershell
-cd frontend
-node .\strumenti\fame-neural-composer\smoke-test.js
-```
-
-Esito baseline:
-
-```text
-FAME Neural Composer: 3 fixture base valide
-Vocabolario: 1019 token
-TOKEN GRAMMAR + CONSTRAINED PREFIX: OK
-HARMONY/CHORD ROUND-TRIP: OK
-808 GLIDE ROUND-TRIP: OK
-SIMULTANEOUS EVENT ORDER: OK
-BOUNDARY + CROSS-BAR DURATION: OK
-ROUND-TRIP TOKEN/ID/SEQUENCE: OK
-TRIPLET DURATIONS 160/320: OK
-FASE 1 SMOKE TEST: OK
-```
-
-## FASE 2 — stato implementazione
-
-Completato finora:
-
-1. Dataset Schema V1;
-2. parser SMF format 0/1;
-3. normalizzazione PPQ → 960;
-4. classificazione iniziale drums / 808 / harmony / lead / unknown;
-5. provenance/rights record obbligatorio;
-6. SHA-256 sorgente e eligibility tecnica/commerciale separate;
-7. track override espliciti per casi ambigui;
-8. pitch bend semplice 808 → glide canonico;
-9. batch importer con sidecar provenance e report;
-10. fixture SMF reali generate dai test e casi di blocco verificati.
-
-Restano aperti prima di chiudere la FASE 2:
-
-- tempo map variabile;
-- estrazione armonica/chord preservation verificata;
-- manifest di corpus riproducibile;
-- prova su piccolo set di MIDI originali/licenziati reali;
-- hardening sui casi trovati nei dati veri.
+L'espansione non sintetica del corpus può continuare in parallelo, ma non riapre il Gate 1 già superato.

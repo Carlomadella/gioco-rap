@@ -1,0 +1,316 @@
+{
+  "schema": "fame-neural-human-review-feedback-v1",
+  "version": 1,
+  "reviewManifest": "339b42b15b89f1b8301a007ba35c15e2bff00e3c487069b7ba431355469c4154",
+  "generatedAt": "2026-09-08T15:00:26.722Z",
+  "completed": 22,
+  "total": 22,
+  "items": [
+    {
+      "phraseId": "fame-original-seed-v1:sketch-006:572515491d5cfa72:phrase:canonical:4+4",
+      "sourceCollection": "fame-original-seed-v1",
+      "reasons": [
+        "extreme:max:tension",
+        "musical-review:hat-roll",
+        "source-high:tension",
+        "source-high:vocalSpace"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": ""
+    },
+    {
+      "phraseId": "fame-original-seed-v1:sketch-008:81036842572fd741:phrase:canonical:0+4",
+      "sourceCollection": "fame-original-seed-v1",
+      "reasons": [
+        "musical-review:hat-roll",
+        "source-high:density",
+        "source-high:energy",
+        "source-low:vocalSpace"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": ""
+    },
+    {
+      "phraseId": "fame-original-seed-v1:sketch-017:5f5407b35e6ee6fa:phrase:canonical:4+4",
+      "sourceCollection": "fame-original-seed-v1",
+      "reasons": [
+        "extreme:max:energy",
+        "extreme:max:density",
+        "musical-review:hat-roll",
+        "source-high:density",
+        "source-high:energy"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": ""
+    },
+    {
+      "phraseId": "fame-original-seed-v1:sketch-021:d1d683a667f69e38:phrase:canonical:4+4",
+      "sourceCollection": "fame-original-seed-v1",
+      "reasons": [
+        "extreme:min:energy",
+        "extreme:min:density",
+        "musical-review:hat-roll",
+        "source-low:density",
+        "source-low:energy"
+      ],
+      "labels": [
+        "source-bad"
+      ],
+      "note": "Phrase molto densa ed energica, ma con struttura e disposizione delle note poco convincenti. Le note sembrano organizzate male e rendono difficile valutare correttamente il vocal space; la tensione percepita è comunque piuttosto bassa.\n"
+    },
+    {
+      "phraseId": "free-midi-chords:v0.20260314:4d74b8f93235d42f:4d5d91eaa798e41d:phrase:canonical:0+4",
+      "sourceCollection": "free-midi-chords",
+      "reasons": [
+        "representative:source-medoid",
+        "extreme:min:energy",
+        "extreme:min:density",
+        "extreme:min:tension",
+        "extreme:max:vocalSpace",
+        "extreme:max:maxTransitionStrength"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": ""
+    },
+    {
+      "phraseId": "free-midi-chords:v0.20260314:8fa99f86ed1f010f:67139bc763a702d6:phrase:canonical:0+4",
+      "sourceCollection": "free-midi-chords",
+      "reasons": [
+        "extreme:max:energy",
+        "extreme:max:density",
+        "extreme:max:tension",
+        "extreme:min:vocalSpace",
+        "extreme:min:maxTransitionStrength"
+      ],
+      "labels": [
+        "tension-high"
+      ],
+      "note": "Rispetto alla phrase precedente c’è leggermente più movimento e una tensione un po’ maggiore, ma 0.502 sembra sovrastimato: la percezione resta comunque piuttosto tranquilla.\n"
+    },
+    {
+      "phraseId": "gmd-v1.0.0:drummer7/session1/17:84613ca6d3e77116:phrase:canonical:4+4",
+      "sourceCollection": "gmd-v1.0.0",
+      "reasons": [
+        "extreme:min:energy",
+        "musical-review:hat-roll",
+        "source-low:energy"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": ""
+    },
+    {
+      "phraseId": "gmd-v1.0.0:drummer7/session2/123:b6b633c6fea3f1e0:phrase:canonical:40+4",
+      "sourceCollection": "gmd-v1.0.0",
+      "reasons": [
+        "extreme:min:density",
+        "extreme:max:vocalSpace",
+        "musical-review:hat-roll",
+        "source-high:vocalSpace",
+        "source-low:density",
+        "source-low:energy"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": ""
+    },
+    {
+      "phraseId": "gmd-v1.0.0:drummer7/session2/92:10df8d8253356db5:phrase:canonical:0+4",
+      "sourceCollection": "gmd-v1.0.0",
+      "reasons": [
+        "musical-review:hat-roll"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": ""
+    },
+    {
+      "phraseId": "gmd-v1.0.0:drummer7/session3/24:90b6be44d1a69181:phrase:canonical:4+4",
+      "sourceCollection": "gmd-v1.0.0",
+      "reasons": [
+        "musical-review:hat-roll"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": ""
+    },
+    {
+      "phraseId": "hiphopdrummer:808:crunk:1ff544f311d0e0dd:ecd816406069d07e:phrase:canonical:0+4",
+      "sourceCollection": "hiphopdrummer",
+      "reasons": [
+        "extreme:max:energy",
+        "extreme:max:tension",
+        "musical-review:motif-variation-heavy",
+        "source-high:energy",
+        "source-high:tension"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": "Etichette coerenti e phrase rappabile, ma nel playback si percepisce un clipping/distorsione molto forte su alcuni colpi o elementi. Da verificare se il problema nasce dal rendering audio, dal gain/velocity o dalla sovrapposizione degli eventi."
+    },
+    {
+      "phraseId": "hiphopdrummer:808:miamibass:52821fd6c7014535:39e35e9b0c08247b:phrase:canonical:0+4",
+      "sourceCollection": "hiphopdrummer",
+      "reasons": [
+        "extreme:min:kick808RelationStrength",
+        "musical-review:motif-variation-heavy"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": "Il difetto sembra concentrato sui piattini/hi-hat: possibile sovrapposizione di colpi o code troppo lunghe che causano distorsione/saturazione nel playback. Da verificare nel renderer e negli eventi MIDI dei cymbal."
+    },
+    {
+      "phraseId": "hiphopdrummer:808:memphis:f0beccf210838211:daaac7110dd9bc11:phrase:canonical:4+4",
+      "sourceCollection": "hiphopdrummer",
+      "reasons": [
+        "extreme:max:kick808RelationStrength"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": ""
+    },
+    {
+      "phraseId": "hiphopdrummer:lead:gfunk_battlecat:7ce241c26338cddd:40925120fd50ac84:phrase:canonical:4+4",
+      "sourceCollection": "hiphopdrummer",
+      "reasons": [
+        "representative:source-medoid",
+        "source-low:maxTransitionStrength"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": ""
+    },
+    {
+      "phraseId": "pdmx-v2025:abc6410d08ea923168e6:405feb762657e2f2:phrase:canonical:12+4",
+      "sourceCollection": "pdmx-v2025",
+      "reasons": [
+        "extreme:max:energy",
+        "extreme:max:density",
+        "extreme:min:vocalSpace",
+        "extreme:min:kick808RelationStrength",
+        "musical-review:hat-roll",
+        "source-high:density",
+        "source-high:energy",
+        "source-low:vocalSpace"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": ""
+    },
+    {
+      "phraseId": "pdmx-v2025:fb88b62bc035ab9284ae:0b7a79fd8571b563:phrase:canonical:16+4",
+      "sourceCollection": "pdmx-v2025",
+      "reasons": [
+        "musical-review:motif-variation-heavy",
+        "source-high:density",
+        "source-high:energy",
+        "source-high:tension",
+        "source-low:vocalSpace"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": ""
+    },
+    {
+      "phraseId": "pdmx-v2025:fb88b62bc035ab9284ae:0b7a79fd8571b563:phrase:canonical:20+4",
+      "sourceCollection": "pdmx-v2025",
+      "reasons": [
+        "extreme:max:kick808RelationStrength",
+        "musical-review:motif-variation-heavy",
+        "source-high:density",
+        "source-high:energy",
+        "source-high:tension",
+        "source-low:vocalSpace"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": ""
+    },
+    {
+      "phraseId": "pdmx-v2025:fc726342c12c1fd2666f:1b029e364d671341:phrase:canonical:24+4",
+      "sourceCollection": "pdmx-v2025",
+      "reasons": [
+        "musical-review:motif-variation-heavy",
+        "source-high:density",
+        "source-high:energy",
+        "source-low:vocalSpace"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": ""
+    },
+    {
+      "phraseId": "waivops-nrg-cp:v1:1708e2761c7276fee0:d746f55c6d1b1e29:phrase:canonical:0+4",
+      "sourceCollection": "waivops-nrg-cp",
+      "reasons": [
+        "extreme:max:tension",
+        "musical-review:motif-variation-heavy",
+        "source-high:tension"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": ""
+    },
+    {
+      "phraseId": "waivops-nrg-cp:v1:3b807eaee23594ccc4:8db62131f58971ed:phrase:canonical:0+4",
+      "sourceCollection": "waivops-nrg-cp",
+      "reasons": [
+        "musical-review:motif-variation-heavy",
+        "source-high:density",
+        "source-high:energy"
+      ],
+      "labels": [
+        "source-bad"
+      ],
+      "note": "Lead/arpeggio percepito come musicalmente incoerente: alcune note sembrano fuori tonalità o poco compatibili con la bassline. Le metriche generali possono essere corrette, ma la phrase suona “sbagliata” a livello melodico-armonico."
+    },
+    {
+      "phraseId": "waivops-nrg-cp:v1:742ad37fd85700a983:8af4dd1ade59ad32:phrase:canonical:0+4",
+      "sourceCollection": "waivops-nrg-cp",
+      "reasons": [
+        "musical-review:motif-variation-heavy",
+        "source-high:density",
+        "source-high:energy",
+        "source-low:vocalSpace"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": ""
+    },
+    {
+      "phraseId": "waivops-nrg-cp:v1:daf8f7a0f8afe013fd:8c6749efca102a6e:phrase:canonical:0+4",
+      "sourceCollection": "waivops-nrg-cp",
+      "reasons": [
+        "musical-review:motif-variation-heavy",
+        "source-high:density",
+        "source-high:energy"
+      ],
+      "labels": [
+        "ok"
+      ],
+      "note": ""
+    }
+  ]
+}

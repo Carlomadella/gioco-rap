@@ -1,7 +1,7 @@
 # FAME Neural — FASE 4 / Annotazione musicale automatica
 
 Data avvio: 8 settembre 2026
-Stato: IN CORSO — BLOCCO 1 + BLOCCO 2A COMPLETATI
+Stato: COMPLETATA — ANNOTATORE V1 CONGELATO DOPO REVIEW UMANA
 
 ## Obiettivo
 
@@ -133,8 +133,32 @@ Verifica sul corpus reale Gate 1:
 
 Il QA controlla coerenza tra metriche globali e barre, boundary, transizioni, motif family, kick↔808, duplicati, distribuzioni/quantili per sorgente e casi estremi. Produce inoltre un campione deterministico per la revisione musicale.
 
-### Blocco 2B — prossimo intervento
+## Blocco 2B — review umana COMPLETATA
 
-Revisionare musicalmente il campione selezionato e modificare soglie/pesi **solo** se emerge un errore sistematico. Il tooling non applica calibrazioni automatiche.
+La review V2 ha ridotto il campione ai casi informativi e ha corretto due bias del QA, senza modificare l'annotatore musicale:
 
-La FASE 4 si chiude solo quando l'annotatore è abbastanza affidabile da aggiungere informazione senza introdurre più rumore che segnale.
+- `kick808RelationStrength` entra in statistiche ed estremi solo quando la relazione kick↔808 è realmente disponibile;
+- alta density + alto vocalSpace non viene più trattato come contraddizione automatica: una batteria densa può lasciare molto spazio alla voce.
+
+Feedback umano congelato con review manifest:
+
+`339b42b15b89f1b8301a007ba35c15e2bff00e3c487069b7ba431355469c4154`
+
+Esito 22/22 phrase:
+
+- **19**: etichette completamente coerenti;
+- **2**: phrase musicalmente poco utili/incoerenti, escluse tramite overlay non distruttivo;
+- **1**: `tension` percepita troppo alta su un caso `free-midi-chords`;
+- errori metrici ripetuti: **0**;
+- agreement sulle 20 phrase musicalmente usabili: **95%**;
+- note tecniche di playback/distorsione: **2**, entrambe su phrase con etichette giudicate coerenti e quindi separate dalla calibrazione dell'annotatore.
+
+Le due esclusioni umane sono registrate in `frontend/strumenti/fame-neural-composer/dataset/phase4-human-review-exclusions.json`. Il corpus sorgente resta da 504 phrase; applicando l'overlay alla preparazione del training restano **502 candidate**, ancora sopra il target minimo sperimentale di 500.
+
+### Decisione di calibrazione
+
+**Nessuna calibrazione globale.** Un singolo errore di tension su 20 phrase usabili non giustifica cambiare pesi o soglie per tutto il corpus. Il caso resta evidenza di un limite noto della tension euristica su materiale armonico molto scarno.
+
+L'annotatore `fame-neural-auto-annotator-v1` viene quindi **congelato per la FASE 5**. Le label restano feature euristiche con confidence, non ground truth.
+
+FASE 4: **COMPLETATA**.

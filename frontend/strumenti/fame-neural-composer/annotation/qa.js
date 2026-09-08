@@ -136,6 +136,17 @@ function rolePresence(annotation, role) {
   return (annotation.bars || []).some(bar => bar.roles && Boolean(bar.roles[role]));
 }
 
+function kick808Available(annotation) {
+  return (annotation.bars || []).some(bar => bar.kick808 && bar.kick808.available);
+}
+
+function metricAvailable(annotation, metric) {
+  const value = Number(annotation && annotation.global && annotation.global[metric]);
+  if (!Number.isFinite(value)) return false;
+  if (metric === "kick808RelationStrength") return kick808Available(annotation);
+  return true;
+}
+
 function reviewFlags(annotation, sourceStats) {
   const flags = [];
   const g = annotation.global || {};
@@ -151,7 +162,6 @@ function reviewFlags(annotation, sourceStats) {
   }
 
   if (Number(g.energy) >= 0.72 && Number(g.density) <= 0.20) flags.push("cross-check:high-energy-low-density");
-  if (Number(g.density) >= 0.78 && Number(g.vocalSpace) >= 0.88) flags.push("cross-check:dense-but-high-vocal-space");
   if (Number(g.maxTransitionStrength) >= 0.65) flags.push("cross-check:very-strong-transition");
   if (rolePresence(annotation, "808") && Number(g.kick808RelationStrength) === 0 && (annotation.bars || []).some(bar => bar.roles && bar.roles.drums)) {
     flags.push("cross-check:808-drums-zero-relation");
@@ -171,8 +181,8 @@ function metricStats(annotations) {
     const source = annotation.sourceCollection || "unknown";
     if (!bySource[source]) bySource[source] = {};
     for (const metric of METRICS) {
+      if (!metricAvailable(annotation, metric)) continue;
       const value = Number(annotation.global && annotation.global[metric]);
-      if (!Number.isFinite(value)) continue;
       global[metric].push(value);
       if (!bySource[source][metric]) bySource[source][metric] = [];
       bySource[source][metric].push(value);
@@ -256,7 +266,7 @@ function buildReviewSample(annotations, stats, options = {}) {
     if (medoid) addCandidate(candidates, medoid, "representative:source-medoid", 3);
 
     for (const metric of ["energy", "density", "tension", "vocalSpace", "maxTransitionStrength", "kick808RelationStrength"]) {
-      const eligible = sorted.filter(item => Number.isFinite(Number(item.global && item.global[metric])));
+      const eligible = sorted.filter(item => metricAvailable(item, metric));
       if (!eligible.length) continue;
       const asc = [...eligible].sort((a, b) => Number(a.global[metric]) - Number(b.global[metric]) || String(a.phraseId).localeCompare(String(b.phraseId)));
       addCandidate(candidates, asc[0], `extreme:min:${metric}`, 2);
@@ -427,6 +437,8 @@ module.exports = {
   quantile,
   invariantIssues,
   metricStats,
+  kick808Available,
+  metricAvailable,
   reviewFlags,
   buildReviewSample,
   calibrationSignals,

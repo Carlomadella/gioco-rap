@@ -52,3 +52,8 @@ Il formato runtime può restare più preciso del token stream. Le perdite ammess
 **Status:** ACCEPTED
 
 Il token stream ha una grammatica verificabile e può esporre i token ammessi come prossimo passo. Il futuro generatore non dovrà imparare inutilmente sintassi musicalmente impossibili solo dai dati.
+
+## NDR-011 — Annotazioni V1 congelate dopo review umana
+**Status:** ACCEPTED
+
+Le annotazioni FASE 4 sono feature euristiche ausiliarie con confidence, non ground truth. La review umana 22/22 ha trovato 19 phrase pienamente coerenti, 2 phrase da escludere per qualita' musicale e un solo errore metrico isolato sulla tension; non emerge un pattern sufficiente a giustificare una calibrazione globale. Le phrase scartate vengono gestite con un exclusion overlay reversibile senza cancellare il corpus sorgente.
