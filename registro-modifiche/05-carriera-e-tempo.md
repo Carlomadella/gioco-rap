@@ -6,6 +6,30 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:91438dd -->
+## 08/09/26, 10:36 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `91438dd`
+
+### Cosa Ã¨ entrato
+
+- `a36b5e8` â€” Merge branch 'main' into task/responsivita â€” **Carlomadella**
+- `b197884` â€” fix: le cinque cose trovate dal giro di fine task â€” **Carlomadella**
+- `4d688c8` â€” css: il gioco stretto in un foglio suo, css/stretto.css â€” **Carlomadella**
+- `1338348` â€” docs: i punti della responsività chiusi, spostati nel loro argomento â€” **Carlomadella**
+- `df41c78` â€” strada: si impila sul telefono, e il rapporto di settimana ci sta a 360 â€” **Carlomadella**
+- `ee4951c` â€” css: ogni :hover dentro a @media (hover:hover), su tutti i fogli â€” **Carlomadella**
+- `43623ca` â€” studio: l'orologio galleggiante non copre più lo Studio, e le take si confrontano â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/tempo-controlli.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:d443364 -->
 ## 07/09/26, 23:11 â€” task/come-si-lavora-aggiornato â†’ main
 
