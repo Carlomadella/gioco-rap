@@ -1,0 +1,29 @@
+{
+  "schema_version": 4,
+  "id": "ADF-LEG-F2279C3BBB14",
+  "origin": "legacy",
+  "title": "Gli asset arrivati da fuori",
+  "category": "09-grafica-e-asset",
+  "source": {
+    "point": "—",
+    "text": "Gli asset arrivati da fuori",
+    "file": "implementazioni/09-grafica-e-asset.md",
+    "source_status": "da_fare",
+    "source_status_raw": "da fare"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ]
+}

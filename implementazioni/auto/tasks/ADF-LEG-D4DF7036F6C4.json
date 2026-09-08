@@ -1,0 +1,29 @@
+{
+  "schema_version": 4,
+  "id": "ADF-LEG-D4DF7036F6C4",
+  "origin": "legacy",
+  "title": "Il gioco esce su Steam e sugli store, non dentro a un artifact",
+  "category": "08-uscita-sugli-store",
+  "source": {
+    "point": "32",
+    "text": "Il gioco esce su Steam e sugli store, non dentro a un artifact",
+    "file": "implementazioni/08-uscita-sugli-store.md",
+    "source_status": "da_fare",
+    "source_status_raw": "da fare"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ]
+}

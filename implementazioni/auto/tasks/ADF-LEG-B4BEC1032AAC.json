@@ -1,0 +1,29 @@
+{
+  "schema_version": 4,
+  "id": "ADF-LEG-B4BEC1032AAC",
+  "origin": "legacy",
+  "title": "Il quaderno non esiste più",
+  "category": "01-mappa-e-citta",
+  "source": {
+    "point": "—",
+    "text": "Il quaderno non esiste più",
+    "file": "implementazioni/01-mappa-e-citta.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ]
+}

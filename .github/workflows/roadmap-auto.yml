@@ -1,0 +1,260 @@
+name: Roadmap automatica implementazioni
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - implementazioni/implementazioni.md
+  workflow_run:
+    workflows:
+      - Registro automatico merge
+    types:
+      - completed
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  copilot-requests: write
+
+concurrency:
+  group: roadmap-auto-${{ github.event_name == 'push' && github.ref_name || 'main' }}
+  cancel-in-progress: false
+
+jobs:
+  aggiorna:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Scegli branch
+        id: branch
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "name=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=main" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Scarica repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.branch.outputs.name }}
+          fetch-depth: 0
+
+      - name: Configura Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Ricostruisci il commit reale da controllare
+        id: contesto
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            TARGET="${{ github.event.workflow_run.head_sha }}"
+          else
+            TARGET="$(git rev-parse HEAD)"
+          fi
+          echo "sha=$TARGET" >> "$GITHUB_OUTPUT"
+          git diff --name-only "$TARGET^1" "$TARGET" > "$RUNNER_TEMP/changed-files.txt" 2>/dev/null || :
+          git log -1 --format=%s "$TARGET" > "$RUNNER_TEMP/commit-subject.txt"
+
+      - name: Test motore roadmap
+        run: node scripts/test-roadmap-auto.js
+
+      - name: Importa tutto lo storico senza riscriverlo
+        run: node scripts/roadmap-auto.js bootstrap
+
+      - name: Prepara batch di audit
+        id: piano
+        shell: bash
+        env:
+          ADF_AUDIT_BATCH: "8"
+        run: |
+          export ADF_CHANGED_FILES="$(cat "$RUNNER_TEMP/changed-files.txt")"
+          export ADF_COMMIT_SUBJECT="$(cat "$RUNNER_TEMP/commit-subject.txt")"
+          node scripts/roadmap-auto.js prompt > "$RUNNER_TEMP/roadmap-prompt.txt"
+          if [ -s "$RUNNER_TEMP/roadmap-prompt.txt" ]; then
+            echo "serve_ai=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "serve_ai=false" >> "$GITHUB_OUTPUT"
+          fi
+          cp -a implementazioni/auto/tasks "$RUNNER_TEMP/tasks-prima-ai"
+
+      - name: Installa Copilot CLI
+        if: steps.piano.outputs.serve_ai == 'true'
+        run: npm install -g @github/copilot
+
+      - name: Espandi richieste e verifica criteri
+        id: ai
+        if: steps.piano.outputs.serve_ai == 'true'
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+        run: |
+          set +e
+          if [ -z "$COPILOT_GITHUB_TOKEN" ]; then unset COPILOT_GITHUB_TOKEN; fi
+          copilot -p "$(cat "$RUNNER_TEMP/roadmap-prompt.txt")" \
+            -s \
+            --available-tools='view,grep,glob,edit' \
+            --allow-tool='write' \
+            --no-ask-user
+          CODE=$?
+          set -e
+
+          if [ "$CODE" -ne 0 ]; then
+            echo "::warning::Audit AI non disponibile o non completato. Mantengo lo storico e lascio le task non auditate, senza inventare stati."
+            rm -rf implementazioni/auto/tasks
+            cp -a "$RUNNER_TEMP/tasks-prima-ai" implementazioni/auto/tasks
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Blocca scritture fuori dal perimetro automatico
+        shell: bash
+        run: |
+          FUORI=$(git diff --name-only | grep -Ev '^(implementazioni/auto/|implementazioni/implementazioni\.md)$' || true)
+          if [ -n "$FUORI" ]; then
+            echo "::error::L'agente ha modificato file non consentiti:"
+            echo "$FUORI"
+            exit 1
+          fi
+
+      - name: Rigenera cruscotto e valida
+        run: |
+          node scripts/roadmap-auto.js finalize
+          node scripts/roadmap-auto.js check
+          git diff --check
+
+      - name: Prepara eventuale manutenzione della roadmap ufficiale
+        id: roadmap
+        shell: bash
+        run: |
+          cp ROADMAP.md "$RUNNER_TEMP/ROADMAP.before.md"
+
+          node - <<'NODE' > "$RUNNER_TEMP/roadmap-maintenance-prompt.txt"
+          const fs = require('fs');
+          const path = require('path');
+          const dir = path.join(process.cwd(), 'implementazioni', 'auto', 'tasks');
+          if (!fs.existsSync(dir)) process.exit(0);
+
+          const tasks = fs.readdirSync(dir)
+            .filter(n => n.endsWith('.json'))
+            .map(n => JSON.parse(fs.readFileSync(path.join(dir, n), 'utf8')))
+            .filter(t => t.audit_state === 'audited' && t.roadmap_impact === 'minor' && String(t.roadmap_note || '').trim());
+
+          if (!tasks.length) process.exit(0);
+
+          console.log(`Sei il manutentore della roadmap UFFICIALE di Anni di Fame.
+
+          OBIETTIVO
+          Migliora ROADMAP.md solo dove l'audit del repository ha trovato buchi MINORI e verificabili.
+          ROADMAP.md resta la fonte ufficiale: non crearne una alternativa.
+
+          REGOLE RIGIDE
+          - Prima leggi ROADMAP.md, le task indicate e il codice collegato.
+          - Puoi modificare SOLO ROADMAP.md.
+          - Non cancellare macro-fasi, città, principi permanenti o decisioni già approvate.
+          - Non cambiare la direzione del gioco per "migliorarla".
+          - Puoi aggiungere o chiarire: prerequisiti, dipendenze tra sistemi, passaggi mancanti, criteri di uscita da una fase, lavoro necessario già emerso dal repo.
+          - Non duplicare contenuti già presenti.
+          - Se il buco è già coperto, non modificare niente.
+          - Se scopri che servirebbe cambiare una decisione strutturale, NON farlo: quello è impatto major e richiede revisione umana.
+          - Non segnare "fatto" qualcosa solo perché una task lo dice: verifica il repo.
+          - Mantieni tono, struttura e lingua italiana già usati in ROADMAP.md.
+          - Preferisci una modifica piccola e precisa a una riscrittura estesa.
+
+          BUCHI MINORI RILEVATI:
+          ${tasks.map(t => `- ${t.id} — ${t.title}: ${t.roadmap_note}`).join('\n')}
+          `);
+          NODE
+
+          if [ -s "$RUNNER_TEMP/roadmap-maintenance-prompt.txt" ]; then
+            echo "serve_ai=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "serve_ai=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Migliora la roadmap ufficiale dove mancano passaggi reali
+        if: steps.roadmap.outputs.serve_ai == 'true'
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+        run: |
+          set +e
+          if [ -z "$COPILOT_GITHUB_TOKEN" ]; then unset COPILOT_GITHUB_TOKEN; fi
+          copilot -p "$(cat "$RUNNER_TEMP/roadmap-maintenance-prompt.txt")"             -s             --available-tools='view,grep,glob,edit'             --allow-tool='write(ROADMAP.md)'             --no-ask-user
+          CODE=$?
+          set -e
+
+          if [ "$CODE" -ne 0 ]; then
+            echo "::warning::Manutenzione roadmap non completata: ripristino ROADMAP.md senza inventare modifiche."
+            cp "$RUNNER_TEMP/ROADMAP.before.md" ROADMAP.md
+          fi
+
+      - name: Proteggi la direzione ufficiale da riscritture automatiche
+        if: steps.roadmap.outputs.serve_ai == 'true'
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const before = fs.readFileSync(process.env.RUNNER_TEMP + '/ROADMAP.before.md', 'utf8');
+          const after = fs.readFileSync('ROADMAP.md', 'utf8');
+
+          const headings = before.match(/^##\s+.+$/gm) || [];
+          const missing = headings.filter(h => !after.includes(h));
+          if (missing.length) {
+            console.error('BLOCCO: la manutenzione ha rimosso sezioni ufficiali:');
+            console.error(missing.join('\n'));
+            process.exit(1);
+          }
+
+          if (after.length < before.length * 0.95) {
+            console.error('BLOCCO: ROADMAP.md si è accorciata troppo; possibile riscrittura distruttiva.');
+            process.exit(1);
+          }
+
+          const permanent = [
+            'Tutto dev\'essere interattivo',
+            'Tutto personalizzabile',
+            'Si sblocca un mondo, non un menu',
+            'Niente studio personale'
+          ];
+          const lost = permanent.filter(fragment => before.includes(fragment) && !after.includes(fragment));
+          if (lost.length) {
+            console.error('BLOCCO: sono state rimosse regole permanenti: ' + lost.join(' | '));
+            process.exit(1);
+          }
+          NODE
+
+          FUORI=$(git diff --name-only | grep -Ev '^(implementazioni/auto/|implementazioni/implementazioni\.md|ROADMAP\.md)$' || true)
+          if [ -n "$FUORI" ]; then
+            echo "::error::Modifica roadmap fuori perimetro:"
+            echo "$FUORI"
+            exit 1
+          fi
+
+          git diff --check -- ROADMAP.md
+
+      - name: Salva stato automatico e manutenzione roadmap
+        shell: bash
+        run: |
+          git config user.name "Anni di Fame Bot"
+          git config user.email "actions@github.com"
+
+          git add implementazioni/auto implementazioni/implementazioni.md ROADMAP.md
+          if git diff --cached --quiet; then
+            echo "Implementazioni già allineate."
+            exit 0
+          fi
+
+          git commit -m "docs: aggiorna implementazioni e roadmap ufficiale"
+          git pull --rebase origin "${{ steps.branch.outputs.name }}"
+          git push origin "HEAD:${{ steps.branch.outputs.name }}"

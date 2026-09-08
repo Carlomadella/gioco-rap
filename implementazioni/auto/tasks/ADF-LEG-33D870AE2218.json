@@ -1,0 +1,29 @@
+{
+  "schema_version": 4,
+  "id": "ADF-LEG-33D870AE2218",
+  "origin": "legacy",
+  "title": "Responsività di tutto il gioco",
+  "category": "02-interfaccia-e-telefono",
+  "source": {
+    "point": "—",
+    "text": "Responsività di tutto il gioco",
+    "file": "implementazioni/02-interfaccia-e-telefono.md",
+    "source_status": "in_parte",
+    "source_status_raw": "in parte"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ]
+}

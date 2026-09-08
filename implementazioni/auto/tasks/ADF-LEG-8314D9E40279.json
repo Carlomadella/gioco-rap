@@ -1,0 +1,29 @@
+{
+  "schema_version": 4,
+  "id": "ADF-LEG-8314D9E40279",
+  "origin": "legacy",
+  "title": "Scenari veri, uguali nella forma e diversi nelle circostanze",
+  "category": "06-mondo-e-personaggi",
+  "source": {
+    "point": "54",
+    "text": "Scenari veri, uguali nella forma e diversi nelle circostanze",
+    "file": "implementazioni/06-mondo-e-personaggi.md",
+    "source_status": "in_parte",
+    "source_status_raw": "in parte"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ]
+}

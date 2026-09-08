@@ -1,0 +1,29 @@
+{
+  "schema_version": 4,
+  "id": "ADF-LEG-79EF3A472134",
+  "origin": "legacy",
+  "title": "«Fatti sentire un beat» non faceva niente, e i beat non si vedevano",
+  "category": "04-musica-e-suoni",
+  "source": {
+    "point": "20, 22",
+    "text": "«Fatti sentire un beat» non faceva niente, e i beat non si vedevano",
+    "file": "implementazioni/04-musica-e-suoni.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ]
+}

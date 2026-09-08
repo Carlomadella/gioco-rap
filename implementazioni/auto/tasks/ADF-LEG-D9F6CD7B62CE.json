@@ -1,0 +1,29 @@
+{
+  "schema_version": 4,
+  "id": "ADF-LEG-D9F6CD7B62CE",
+  "origin": "legacy",
+  "title": "Il feed di LaFamegram si scorre come quello vero",
+  "category": "02-interfaccia-e-telefono",
+  "source": {
+    "point": "53",
+    "text": "Il feed di LaFamegram si scorre come quello vero",
+    "file": "implementazioni/02-interfaccia-e-telefono.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ]
+}

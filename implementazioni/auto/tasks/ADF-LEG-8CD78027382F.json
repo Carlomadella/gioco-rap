@@ -1,0 +1,29 @@
+{
+  "schema_version": 4,
+  "id": "ADF-LEG-8CD78027382F",
+  "origin": "legacy",
+  "title": "«Attività criminali non si può più giocare, che è successo?»",
+  "category": "06-mondo-e-personaggi",
+  "source": {
+    "point": "57",
+    "text": "«Attività criminali non si può più giocare, che è successo?»",
+    "file": "implementazioni/06-mondo-e-personaggi.md",
+    "source_status": "risposto",
+    "source_status_raw": "risposto"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ]
+}

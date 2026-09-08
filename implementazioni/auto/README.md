@@ -1,0 +1,145 @@
+# Stato automatico delle implementazioni
+
+> **`ROADMAP.md` resta la roadmap ufficiale di Anni di Fame.** Il cruscotto non la sostituisce: l'automazione può colmare **buchi minori** della roadmap quando sono supportati dal repo e coerenti con decisioni già approvate. Cambi di direzione, rimozioni di macro-fasi o decisioni strutturali restano invece da revisionare esplicitamente.
+
+## Copertura
+
+- **Schede importate:** 112
+- **Task effettive (duplicati esclusi):** 112
+- **Auditate contro il repo:** 0/112
+- **Duplicati intercettati:** 0
+- **Estensioni/sovrapposizioni:** 0
+- **Richieste già implementate senza task equivalente:** 0
+- **Auditate ma non complete:** 0
+- Stato storico importato: da_fare 18 · in_parte 13 · fatto 77 · risposto 4
+
+## Tutte le task e richieste
+
+| id | richiesta | ingresso | collegata a | fonte | stato storico | verifica repo | criteri |
+| --- | --- | --- | --- | --- | --- | --- | --- | ---: |
+| `ADF-LEG-043B012E6E3B` | I cinque lavori per uscire | storica | — | implementazioni/08-uscita-sugli-store.md | 🔶 in parte | — non ancora auditata | — |
+| `ADF-LEG-AC19FC8CC48F` | I dialoghi devono essere tanti e diversi | storica | — | implementazioni/06-mondo-e-personaggi.md | 🔶 in parte | — non ancora auditata | — |
+| `ADF-LEG-D6B7FB24808B` | Il banco dei suoni rifatto | storica | — | implementazioni/04-musica-e-suoni.md | 🔶 in parte | — non ancora auditata | — |
+| `ADF-LEG-6A7D3E986357` | Il beat maker diventa un posto: La Sala | storica | — | implementazioni/06-mondo-e-personaggi.md | 🔶 in parte | — non ancora auditata | — |
+| `ADF-LEG-C295A6327B74` | Il telefono è un iPhone vero, con LaFamegram | storica | — | implementazioni/02-interfaccia-e-telefono.md | 🔶 in parte | — non ancora auditata | — |
+| `ADF-LEG-9D8FB87EF413` | La carriera cresce con la mappa: Provincia → Milano → Los Angeles | storica | — | implementazioni/01-mappa-e-citta.md | 🔶 in parte | — non ancora auditata | — |
+| `ADF-LEG-3FF6C1268680` | La soundboard è ancora poca | storica | — | implementazioni/04-musica-e-suoni.md | 🔶 in parte | — non ancora auditata | — |
+| `ADF-LEG-B79B031D90FC` | LaFamegram con post veri, caricati dai giocatori | storica | — | implementazioni/02-interfaccia-e-telefono.md | 🔶 in parte | — non ancora auditata | — |
+| `ADF-LEG-D984E65BB868` | Meno cartelli chiusi sulla mappa, più roba che si apre | storica | — | implementazioni/01-mappa-e-citta.md | 🔶 in parte | — non ancora auditata | — |
+| `ADF-LEG-34C682253C87` | Meno colori nella schermata di gioco | storica | — | implementazioni/09-grafica-e-asset.md | 🔶 in parte | — non ancora auditata | — |
+| `ADF-LEG-33D870AE2218` | Responsività di tutto il gioco | storica | — | implementazioni/02-interfaccia-e-telefono.md | 🔶 in parte | — non ancora auditata | — |
+| `ADF-LEG-8314D9E40279` | Scenari veri, uguali nella forma e diversi nelle circostanze | storica | — | implementazioni/06-mondo-e-personaggi.md | 🔶 in parte | — non ancora auditata | — |
+| `ADF-LEG-EFB36E8B32DF` | Via i popup dalle card: scene vere | storica | — | implementazioni/02-interfaccia-e-telefono.md | 🔶 in parte | — non ancora auditata | — |
+| `ADF-LEG-8CD78027382F` | «Attività criminali non si può più giocare, che è successo?» | storica | — | implementazioni/06-mondo-e-personaggi.md | 📝 risposto | — non ancora auditata | — |
+| `ADF-LEG-D15F3599E2BE` | «Completa la canzone» deve costare qualcosa | storica | — | implementazioni/04-musica-e-suoni.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-5C8E4254268B` | Dal profilo si torna al gioco, non solo al menù | storica | — | implementazioni/02-interfaccia-e-telefono.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-F2279C3BBB14` | Gli asset arrivati da fuori | storica | — | implementazioni/09-grafica-e-asset.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-1E9D26813741` | Gli opps, i rapper rivali | storica | — | implementazioni/06-mondo-e-personaggi.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-0055AD364BF8` | I produttori hanno abilità, fama e carattere | storica | — | implementazioni/06-mondo-e-personaggi.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-5CBD9DE3CFE3` | Il freestyle in piazza, con la folla | storica | — | implementazioni/04-musica-e-suoni.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-99F7F334DFE9` | Il gioco alla giornata invece che alla settimana | storica | — | implementazioni/05-carriera-e-tempo.md | 📝 risposto | — non ancora auditata | — |
+| `ADF-LEG-D4DF7036F6C4` | Il gioco esce su Steam e sugli store, non dentro a un artifact | storica | — | implementazioni/08-uscita-sugli-store.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-BF470E3FC825` | Il telefono come telefono (la richiesta di partenza) | storica | — | implementazioni/02-interfaccia-e-telefono.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-352B92864406` | L'energia a 100 (il ragionamento sui costi) | storica | — | implementazioni/05-carriera-e-tempo.md | 📝 risposto | — non ancora auditata | — |
+| `ADF-LEG-B2D3FA6EC43B` | L'energia cresce col livello, e i livelli devono avere un senso | storica | — | implementazioni/05-carriera-e-tempo.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-BA8B65DA0C15` | La criminalità è troppo facile, e i soldi sporchi | storica | — | implementazioni/06-mondo-e-personaggi.md | 📝 risposto | — non ancora auditata | — |
+| `ADF-LEG-EA0648B57135` | La Fame Studio dentro al gioco, senza essere invadente | storica | — | implementazioni/09-grafica-e-asset.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-BD22F97801FD` | La grafica uguale alla foto, e l'avatar segnaposto | storica | — | implementazioni/09-grafica-e-asset.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-3EB6F5E9A3C4` | La richiesta finale sull'energia | storica | — | implementazioni/05-carriera-e-tempo.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-E864F3A305D2` | La scena del produttore quando cerchi un beat | storica | — | implementazioni/04-musica-e-suoni.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-8D4A4E38E6D5` | La vita simulata | storica | — | implementazioni/06-mondo-e-personaggi.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-9EBE87A3843F` | Le card sulla mappa, di lato invece che sopra agli edifici | storica | — | implementazioni/01-mappa-e-citta.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-7319DD550E0D` | Ogni parte del gioco deve avere la sua ambientazione | storica | — | implementazioni/09-grafica-e-asset.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-DDDE0E598F52` | Quello che al backend mancava per stare in piedi su uno store | storica | — | implementazioni/07-multiplayer-e-backend.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-CCBBA5CFE700` | Via il bottone del menù dalle CTA in basso | storica | — | implementazioni/02-interfaccia-e-telefono.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-314A919E7149` | «Chat»: mamma e il migliore amico, poi il resto con la fama | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-C9E047E25208` | «Disciplina» diventa «Condizione» | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-79EF3A472134` | «Fatti sentire un beat» non faceva niente, e i beat non si vedevano | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-99E4138ADC42` | «Torna alla mappa» non funzionava in alcune interfacce | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-75B536657B35` | «Vita quotidiana» diventa «Casa» | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-4D9FA3E54D62` | (riscritto) e lo schema del database | storica | — | implementazioni/08-uscita-sugli-store.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-0C844231FF05` | 10, 11, 12 · Lo Studio: una stanza sua, e il gameplay dentro | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-D5515C176B84` | 13 · I dischi: oro, platino, diamante | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-8C62DACB1DD3` | 14 · I dialoghi devono tornare fra di loro | storica | — | implementazioni/06-mondo-e-personaggi.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-47DD718310D1` | Al massimo una conversazione lunga al giorno | storica | — | implementazioni/06-mondo-e-personaggi.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-E489C02FFB9A` | Ascoltare un beat prima di comprarlo | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-B33697B9CA07` | Backend e frontend separati, e i README di ognuno | storica | — | implementazioni/07-multiplayer-e-backend.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-81ADE09AFBF8` | Controllo del codice: due nomi di classe che si pestavano i piedi | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-C60B1C321184` | Cosa si può simulare | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-DB2D56011EF3` | Crea il tuo avatar | storica | — | implementazioni/03-artista-e-avatar.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-0F2CA0831327` | Dallo Studio si esce solo con «Torna alla mappa» | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-4A0E889F7065` | Due lavori veri al posto di due cartelli chiusi: Pizzeria e Fabbrica | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-D7416EF2ABDA` | Energia a 100, giornate, e skip di quanto vuoi | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-2D026AB455EC` | Girare a cercare beat non costa più energia | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-9EEC32D93CE9` | Gli slot anche nella schermata di avvio | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-C0CE37354C6F` | I bordi delle aree cliccabili sulla mappa | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-CD410B7CEEEC` | I progressi si salvano, tre slot | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-58FD26A86453` | Il bottone per il menù principale | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-D9F6CD7B62CE` | Il feed di LaFamegram si scorre come quello vero | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-1D15D6A42A1B` | Il menù delle impostazioni | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-14754F33977B` | Il negozio dei vestiti | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-04F5044C7230` | Il profilo cliccabile dal menù, in stile character creator | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-B4BEC1032AAC` | Il quaderno non esiste più | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-93E84499EEED` | Il telefono nuovo, quello della foto | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-51700FF97239` | Il videomaker entra a La Sala | storica | — | implementazioni/06-mondo-e-personaggi.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-5CAED9545EC9` | L'albero delle abilità | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-DFB5850CB691` | L'autocompletamento della canzone | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-0D567376904B` | L'energia rimasta si deve vedere | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-CDA23C7523CF` | La chat del telefono non va più in loop | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-1C9755D43029` | La classifica con i giocatori veri, e i bot per fare numero | storica | — | implementazioni/07-multiplayer-e-backend.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-C1B3ECF0CCA4` | La difficoltà della carriera, scritta accanto all'artista | storica | — | implementazioni/07-multiplayer-e-backend.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-79AFC2282377` | La discografia | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-BA3490DBD709` | La landing è una pagina sua, staccata dall'accesso e dal gioco | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-CDB3942CE751` | La mappa allargata, senza bande nere | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-EB2F449A2619` | La mappa definitiva | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-799B2F4AEBC1` | La navbar | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-1C3B35082213` | La pagina delle Attività criminali tagliava i pezzi | storica | — | implementazioni/06-mondo-e-personaggi.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-198C6F76A3A5` | La pagina di landing | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-F1B3C07C3F50` | La palestra diventa un posto suo | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-A90B7B3817A1` | La plancia riempie lo schermo, come nella foto | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-38473F9C5563` | La professione del criminale | storica | — | implementazioni/06-mondo-e-personaggi.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-E101C11E0442` | La pulizia dei media, e i sessanta sfondi che sono dieci foto | storica | — | implementazioni/09-grafica-e-asset.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-DD3340048645` | La schermata di gioco era troppo affollata | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-73ADA46EE7DE` | La X dello Studio non tornava indietro | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-EF6752065345` | Le abilità sono troppe: i mix li fanno i fonici | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-451FE6BFCF44` | Le azioni in Studio non ti buttano più fuori | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-762C5E8D3415` | Le card sulla mappa, tutte come lo Studio | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-37539C9657D7` | Le classifiche ogni settimana, con le frecce | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-B26181D06979` | Le scene dei fan, tante e difficili da ripescare | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-E9E80D60406B` | Le trasferte fuori città | storica | — | implementazioni/06-mondo-e-personaggi.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-3C6EBF0C29F6` | Lo Shop diventa uno shop, non un menù | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-1225505FDE7F` | Niente «si sblocca a Milano» scritto in faccia | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-CA8E462F6E81` | Opp e giornalisti per strada | storica | — | implementazioni/06-mondo-e-personaggi.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-248E461B597F` | Registrazione, accesso, uscita | storica | — | implementazioni/07-multiplayer-e-backend.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-A828A3EF4F57` | Restare sempre aggiornati col repo | storica | — | implementazioni/fatte.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-88D1455F0A6A` | Scambiarsi il numero con fonici e beatmaker | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-21131A732695` | Suoni e beat più vari | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-0F40BC850A8A` | Transizioni diverse per ogni scena | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-D3280082098E` | Transizioni quando una card apre una pagina | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-45CDDF0E8B0C` | Tutte le rotte provate su Postman | storica | — | implementazioni/07-multiplayer-e-backend.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-305343621972` | Un file coi comandi del terminale | storica | — | implementazioni/fatte.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-E0EB8C25B06C` | Un prompt per ogni card, e dove sono finiti quelli del 38 | storica | — | implementazioni/09-grafica-e-asset.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-183C1DC214E1` | Un README di tutte le rotte dell'API | storica | — | implementazioni/07-multiplayer-e-backend.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-FE7C0E5204ED` | Un tasto per uscire al menu, scritto a lettere | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-F85F30006551` | Un'età per i personaggi | storica | — | implementazioni/06-mondo-e-personaggi.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-EC3A45E275D0` | Una gerarchia per gli incontri mentre si salta il tempo | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-0B4AD0DB48A7` | Uscire da un'azione senza doverla finire | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-3330FF8FDF48` | Via i doppioni dalla sidebar del profilo | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-4AFC47F37EBC` | Via i tastini che muovono la mappa | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-3D35569A22F9` | Via il Campetto dalla mappa | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-50728E0AEA00` | Via la conferma «sei sicuro» per l'energia | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-52F016BC8987` | Via la vecchia schermata di gioco, le info sulla mappa | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
+
+## Ridondanze e richieste già coperte
+
+_Nessuna ridondanza rilevata._
+
+## Impatto possibile sulla roadmap ufficiale
+
+_Nessuna task auditata richiede al momento una revisione della roadmap._
+
+> Gli impatti **minor** possono essere incorporati automaticamente nella roadmap ufficiale dal passaggio dedicato, con controlli anti-riscrittura. Gli impatti **major** restano segnalazioni da revisionare esplicitamente.
+
+## Nuove idee
+
+Scrivile nella sezione **Inbox automatica** di `../implementazioni.md` come checkbox, anche in una frase sola. Il workflow controllerà il repo, creerà i criteri e marcherà la riga solo dopo un audit riuscito.

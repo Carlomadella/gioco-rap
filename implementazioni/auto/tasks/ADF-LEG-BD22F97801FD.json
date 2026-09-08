@@ -1,0 +1,29 @@
+{
+  "schema_version": 4,
+  "id": "ADF-LEG-BD22F97801FD",
+  "origin": "legacy",
+  "title": "La grafica uguale alla foto, e l'avatar segnaposto",
+  "category": "09-grafica-e-asset",
+  "source": {
+    "point": "—",
+    "text": "La grafica uguale alla foto, e l'avatar segnaposto",
+    "file": "implementazioni/09-grafica-e-asset.md",
+    "source_status": "da_fare",
+    "source_status_raw": "da fare"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ]
+}

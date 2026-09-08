@@ -1,0 +1,29 @@
+{
+  "schema_version": 4,
+  "id": "ADF-LEG-AC19FC8CC48F",
+  "origin": "legacy",
+  "title": "I dialoghi devono essere tanti e diversi",
+  "category": "06-mondo-e-personaggi",
+  "source": {
+    "point": "43",
+    "text": "I dialoghi devono essere tanti e diversi",
+    "file": "implementazioni/06-mondo-e-personaggi.md",
+    "source_status": "in_parte",
+    "source_status_raw": "in parte"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ]
+}

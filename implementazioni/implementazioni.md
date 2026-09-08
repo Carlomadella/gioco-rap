@@ -33,6 +33,14 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 ## Da smistare
 
+### Inbox automatica
+
+**Scrivi qui le nuove richieste anche in una frase sola.** Prima di espanderle il sistema cerca duplicati, sovrapposizioni e cose già implementate; solo dopo costruisce i passaggi mancanti.
+La lista storica già presente sotto **rimane intatta** ed è importata automaticamente nel cruscotto: non viene riscritta né cancellata.
+
+<!-- ADF-AUTO-INBOX:BEGIN -->
+<!-- Esempio (non attivo): - [ ] voglio cambiare il tempo del turno in fabbrica -->
+<!-- ADF-AUTO-INBOX:END -->
 _(qui sotto finiscono i punti nuovi, appena scritti)_
 
 ALE:

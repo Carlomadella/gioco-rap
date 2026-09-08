@@ -1,0 +1,29 @@
+{
+  "schema_version": 4,
+  "id": "ADF-LEG-D15F3599E2BE",
+  "origin": "legacy",
+  "title": "«Completa la canzone» deve costare qualcosa",
+  "category": "04-musica-e-suoni",
+  "source": {
+    "point": "19",
+    "text": "«Completa la canzone» deve costare qualcosa",
+    "file": "implementazioni/04-musica-e-suoni.md",
+    "source_status": "da_fare",
+    "source_status_raw": "da fare"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ]
+}
