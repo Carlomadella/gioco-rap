@@ -240,7 +240,7 @@ Chiusura FASE 3 / Gate 1 Data Ready:
 - GATE 1 DATA READY: READY.
 
 Priorita' successiva:
-1. avviare FASE 4 — annotazione musicale automatica;
+1. FASE 4 avviata: completare QA e calibrazione del Blocco 2;
 2. continuare in parallelo l'espansione non sintetica per ridurre la synthetic share verso l'advisory 40%;
 3. mantenere NeuralAcid/OpenScore/Harmony Whiz come espansioni future, non come prerequisito Gate 1.
 
@@ -265,7 +265,7 @@ Abbiamo un primo corpus piccolo ma pulito e abbastanza vario da fare un test ser
 
 # FASE 4 — Annotazione musicale automatica
 
-Stato: DA FARE
+Stato: IN CORSO — BLOCCO 1 COMPLETATO
 
 ### Perché serve
 Il modello non deve vedere solo note: vogliamo che possa capire strutture e relazioni.
@@ -283,6 +283,17 @@ Il modello non deve vedere solo note: vogliamo che possa capire strutture e rela
 - kick↔808 relations;
 - hat density/rolls;
 - transition strength.
+
+### Blocco 1 — annotatore deterministico COMPLETATO
+Verifica sul corpus reale Gate 1 da 504 phrase:
+- 504/504 annotazioni prodotte, 0 fallite;
+- schema sidecar `fame-neural-musical-annotation-v1`;
+- energy, density, tension, vocalSpace, phrase boundaries e transition strength;
+- motif family/return/variation, harmonic plan, 808 contour, kick↔808 e hat rolls;
+- due run complete indipendenti hanno prodotto lo stesso manifest SHA-256 `bb540e5103c6f0b79c688af59ec74b47c83282592cdc45a0e0c461a4e025aa89`;
+- le label restano stime euristiche con confidence esplicita, non ground truth musicale.
+
+Prossimo Blocco 2: QA stratificato, casi estremi e calibrazione prima dell'uso in FASE 5.
 
 ### Regola
 Le annotazioni automatiche sono stime, non verità musicali.
