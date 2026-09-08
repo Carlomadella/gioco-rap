@@ -6,13 +6,13 @@
 
 - **Schede importate:** 114
 - **Task effettive (duplicati esclusi):** 114
-- **Auditate contro il repo:** 16/114
+- **Auditate contro il repo:** 23/114
 - **Duplicati intercettati:** 0
 - **Estensioni/sovrapposizioni:** 2
 - **Richieste già implementate senza task equivalente:** 0
-- **Progetti con piano V1→Vn:** 11 (forniti dall'utente: 0)
+- **Progetti con piano V1→Vn:** 14 (forniti dall'utente: 0)
 - **Piani con gap/conflitti da rivedere:** 0
-- **Auditate ma non complete:** 15
+- **Auditate ma non complete:** 19
 - Stato storico importato: da_fare 18 · in_parte 13 · fatto 77 · risposto 5 · nuova 1
 
 ## Tutte le task e richieste
@@ -35,13 +35,13 @@
 | `ADF-LEG-EFB36E8B32DF` | Via i popup dalle card: scene vere | storica | — | implementazioni/02-interfaccia-e-telefono.md | 🔶 in parte | 🔨 in sviluppo | 2/4 |
 | `ADF-LEG-8CD78027382F` | «Attività criminali non si può più giocare, che è successo?» | storica | — | implementazioni/06-mondo-e-personaggi.md | 📝 risposto | ✅ verificata | 3/3 |
 | `ADF-LEG-D15F3599E2BE` | «Completa la canzone» deve costare qualcosa | storica | — | implementazioni/04-musica-e-suoni.md | ⬜ da fare | 🔨 in sviluppo | 0/3 |
-| `ADF-LEG-5C8E4254268B` | Dal profilo si torna al gioco, non solo al menù | storica | — | implementazioni/02-interfaccia-e-telefono.md | ⬜ da fare | — non ancora auditata | — |
-| `ADF-LEG-F2279C3BBB14` | Gli asset arrivati da fuori | storica | — | implementazioni/09-grafica-e-asset.md | ⬜ da fare | — non ancora auditata | — |
-| `ADF-LEG-1E9D26813741` | Gli opps, i rapper rivali | storica | — | implementazioni/06-mondo-e-personaggi.md | ⬜ da fare | — non ancora auditata | — |
-| `ADF-LEG-0055AD364BF8` | I produttori hanno abilità, fama e carattere | storica | — | implementazioni/06-mondo-e-personaggi.md | ⬜ da fare | — non ancora auditata | — |
-| `ADF-LEG-5CBD9DE3CFE3` | Il freestyle in piazza, con la folla | storica | — | implementazioni/04-musica-e-suoni.md | ⬜ da fare | — non ancora auditata | — |
-| `ADF-LEG-99F7F334DFE9` | Il gioco alla giornata invece che alla settimana | storica | — | implementazioni/05-carriera-e-tempo.md | 📝 risposto | — non ancora auditata | — |
-| `ADF-LEG-D4DF7036F6C4` | Il gioco esce su Steam e sugli store, non dentro a un artifact | storica | — | implementazioni/08-uscita-sugli-store.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-5C8E4254268B` | Dal profilo si torna al gioco, non solo al menù | storica | — | implementazioni/02-interfaccia-e-telefono.md | ⬜ da fare | ✅ verificata | 2/2 |
+| `ADF-LEG-F2279C3BBB14` | Gli asset arrivati da fuori | storica | — | implementazioni/09-grafica-e-asset.md | ⬜ da fare | ✅ verificata | 2/2 |
+| `ADF-LEG-1E9D26813741` | Gli opps, i rapper rivali | storica | — | implementazioni/06-mondo-e-personaggi.md | ⬜ da fare | ✅ verificata | 2/2 |
+| `ADF-LEG-0055AD364BF8` | I produttori hanno abilità, fama e carattere | storica | — | implementazioni/06-mondo-e-personaggi.md | ⬜ da fare | 🔨 in sviluppo | 0/3 |
+| `ADF-LEG-5CBD9DE3CFE3` | Il freestyle in piazza, con la folla | storica | — | implementazioni/04-musica-e-suoni.md | ⬜ da fare | 🔨 in sviluppo | 1/4 |
+| `ADF-LEG-99F7F334DFE9` | Il gioco alla giornata invece che alla settimana | storica | — | implementazioni/05-carriera-e-tempo.md | 📝 risposto | 👁 da validare | 2/3 |
+| `ADF-LEG-D4DF7036F6C4` | Il gioco esce su Steam e sugli store, non dentro a un artifact | storica | — | implementazioni/08-uscita-sugli-store.md | ⬜ da fare | 🔨 in sviluppo | 2/4 |
 | `ADF-LEG-BF470E3FC825` | Il telefono come telefono (la richiesta di partenza) | storica | — | implementazioni/02-interfaccia-e-telefono.md | ⬜ da fare | — non ancora auditata | — |
 | `ADF-LEG-352B92864406` | L'energia a 100 (il ragionamento sui costi) | storica | — | implementazioni/05-carriera-e-tempo.md | 📝 risposto | — non ancora auditata | — |
 | `ADF-LEG-B2D3FA6EC43B` | L'energia cresce col livello, e i livelli devono avere un senso | storica | — | implementazioni/05-carriera-e-tempo.md | ⬜ da fare | — non ancora auditata | — |
@@ -141,6 +141,13 @@
 
 ## Piani tecnici dei progetti
 
+### ADF-LEG-0055AD364BF8 — I produttori hanno abilità, fama e carattere
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Modello comune del produttore** · planned
+- **V2 — Conseguenze nello Studio e nelle conversazioni** · planned · dipende da V1
+
 ### ADF-LEG-043B012E6E3B — I cinque lavori per uscire
 
 Piano: **auto** · stato: **ready**
@@ -162,6 +169,13 @@ Piano: **auto** · stato: **ready**
 
 - **V1 — Effetti dedicati** · complete
 - **V2 — Identità dei generi** · needs_validation · dipende da V1
+
+### ADF-LEG-5CBD9DE3CFE3 — Il freestyle in piazza, con la folla
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Barre e reazioni della piazza** · planned
+- **V2 — Modalità gara** · planned · dipende da V1
 
 ### ADF-LEG-6A7D3E986357 — Il beat maker diventa un posto: La Sala
 
@@ -208,6 +222,14 @@ Piano: **auto** · stato: **ready**
 - **V1 — Shell e navigazione** · complete
 - **V2 — LaFamegram** · complete · dipende da V1
 - **V3 — Touch reale** · needs_validation · dipende da V1, V2
+
+### ADF-LEG-D4DF7036F6C4 — Il gioco esce su Steam e sugli store, non dentro a un artifact
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Pacchetto e storage locale** · planned
+- **V2 — Sincronizzazione account** · planned · dipende da V1
+- **V3 — Canali Steam e mobile** · planned · dipende da V2
 
 ### ADF-LEG-D6B7FB24808B — Il banco dei suoni rifatto
 

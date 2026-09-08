@@ -11,28 +11,116 @@
     "source_status": "da_fare",
     "source_status_raw": "da fare"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "in_progress",
   "intake_state": "canonical",
   "related_task_ids": [],
-  "intake_note": "",
+  "intake_note": "La base dei produttori esiste, ma non dimostra ancora tutti i valori e le conseguenze conversazionali richiesti dalla voce storica.",
   "roadmap_impact": "none",
   "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "current_state": [
+    "G.gente contiene beatmaker con ruolo, rapporto e fama; lo Studio ordina i collaboratori e usa fama, rapporto e rete per prezzo e qualità del beat.",
+    "La Sala applica già risposte condizionate dal carattere e il sistema chat usa le persone conosciute, ma non emerge un modello completo di abilità, fama in crescita, genere e personalità del produttore che modifichi tutta la conversazione."
   ],
-  "roadmap_scope": "none",
+  "systems": [
+    "frontend/js/game/posto.js",
+    "frontend/js/game/studio.js",
+    "frontend/js/game/chat.js",
+    "frontend/js/game/content.js",
+    "frontend/js/game/eventi-v2.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/posto.js",
+    "frontend/js/game/studio.js",
+    "frontend/js/game/chat.js",
+    "frontend/js/game/content.js",
+    "frontend/js/game/eventi-v2.js",
+    "frontend/js/game/state.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Ogni produttore espone dati persistenti e distinguibili per abilità, fama, genere prodotto e carattere.",
+      "verification": "code_audit",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/studio.js: studioBeatQualita() usa fama, rapporto e rete; frontend/js/game/posto.js conserva il carattere, ma l’audit non trova ancora un contratto unico che esponga tutte le abilità richieste."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "La scelta e la conversazione con un produttore reagiscono al rapporto, alla fama reciproca, al genere e alla personalità.",
+      "verification": "code_audit",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/posto.js: il carattere influenza le risposte; frontend/js/game/studio.js: rapporto e fama influenzano prezzo/qualità; manca una verifica concreta dell’interazione con fama del rapper e genere."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Le differenze tra produttori restano leggibili e bilanciate durante l’incontro e la creazione del beat.",
+      "verification": "playtest",
+      "status": "pending",
+      "evidence": []
+    }
+  ],
+  "risks": [
+    "Aggiungere statistiche parallele a G.gente può rompere i salvataggi o duplicare rapporto e fama già esistenti.",
+    "Valori troppo visibili possono trasformare la conversazione in una schermata di numeri invece che in un incontro.",
+    "Il bilanciamento delle qualità richiede playtest."
+  ],
+  "notes": [],
   "plan": {
-    "mode": "none",
-    "status": "not_applicable",
-    "summary": "",
-    "steps": [],
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Completare il modello dei produttori riusando G.gente e collegarlo alle decisioni dello Studio e alle conversazioni.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Modello comune del produttore",
+        "objective": "Definire e persistire abilità, fama, genere e carattere senza duplicare i campi già presenti in G.gente.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/posto.js",
+          "frontend/js/game/content.js",
+          "frontend/js/game/state.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/posto.js",
+          "frontend/js/game/content.js",
+          "frontend/js/game/state.js"
+        ],
+        "acceptance_criteria": [
+          "AC1"
+        ],
+        "status": "planned"
+      },
+      {
+        "id": "V2",
+        "title": "Conseguenze nello Studio e nelle conversazioni",
+        "objective": "Usare i valori del produttore in scelta beat, prezzo, qualità e dialoghi coerenti con artista e genere.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "frontend/js/game/studio.js",
+          "frontend/js/game/chat.js",
+          "frontend/js/game/eventi-v2.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/studio.js",
+          "frontend/js/game/chat.js",
+          "frontend/js/game/eventi-v2.js"
+        ],
+        "acceptance_criteria": [
+          "AC2",
+          "AC3"
+        ],
+        "status": "planned"
+      }
+    ],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none"
 }

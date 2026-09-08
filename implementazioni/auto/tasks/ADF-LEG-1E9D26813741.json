@@ -11,28 +11,62 @@
     "source_status": "da_fare",
     "source_status_raw": "da fare"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "complete",
   "intake_state": "canonical",
   "related_task_ids": [],
-  "intake_note": "",
+  "intake_note": "La richiesta degli opps è coperta dal sistema di rivali locali e dalla relativa rotta backend.",
   "roadmap_impact": "none",
   "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "current_state": [
+    "Il gioco genera e fa crescere rapper rivali con nome, città, genere, storia, fama/stream, uscite e contratti.",
+    "Il backend espone gli opps dell’artista e le relazioni rivale, con controlli di identità."
   ],
-  "roadmap_scope": "none",
+  "systems": [
+    "frontend/js/game/rivals.js",
+    "frontend/js/game/ui.js",
+    "backend/server.js",
+    "backend/database/archivio.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/rivals.js",
+    "frontend/js/game/ui.js",
+    "frontend/pagine/gioco.html",
+    "backend/server.js",
+    "backend/database/archivio.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "La partita mantiene una popolazione di rapper rivali riconoscibili e la aggiorna nel tempo.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/rivals.js: nuovoRivale() crea artisti con identità e storia; sistemaRivali() mantiene il gruppo; vitaRivali() aggiorna carriera, uscite, contratti e abbandoni."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Gli opps possono essere consultati e le rivalità possono essere dichiarate o rimosse con il controllo dell’artista proprietario.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "backend/server.js: GET /api/opps e POST /api/relazione delegano ad archivio.opps()/dichiara()/scancella() e rifiutano artisti sconosciuti o non propri."
+      ]
+    }
+  ],
+  "risks": [
+    "Il bilanciamento della crescita dei rivali richiede una prova di gioco.",
+    "Il modello locale e quello backend devono restare coerenti quando si sincronizzano classifiche e relazioni."
+  ],
+  "notes": [],
   "plan": {
     "mode": "none",
     "status": "not_applicable",
-    "summary": "",
+    "summary": "Il sistema degli opps è già presente; non serve un nuovo piano tecnico.",
     "steps": [],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none"
 }

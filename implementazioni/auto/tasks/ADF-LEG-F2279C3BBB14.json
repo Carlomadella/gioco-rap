@@ -11,28 +11,64 @@
     "source_status": "da_fare",
     "source_status_raw": "da fare"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "complete",
   "intake_state": "canonical",
   "related_task_ids": [],
-  "intake_note": "",
+  "intake_note": "Voce storica sugli asset importati da concept esterni; il codice attuale dimostra che gli asset utili sono stati integrati senza lasciare il concept nel percorso di build.",
   "roadmap_impact": "none",
   "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "current_state": [
+    "La landing usa fotografie locali in frontend/media/photo/pagina di landing/.",
+    "Gli asset di concept non collegati sono separati in frontend/concept/ e il build non li include."
   ],
-  "roadmap_scope": "none",
+  "systems": [
+    "frontend/css/landing.css",
+    "frontend/pagine/landing.html",
+    "frontend/concept/README.md",
+    "frontend/strumenti/build.js"
+  ],
+  "watch_paths": [
+    "frontend/css/landing.css",
+    "frontend/pagine/landing.html",
+    "frontend/media/photo/pagina di landing",
+    "frontend/concept",
+    "frontend/strumenti/build.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Gli asset esterni destinati alla landing sono file locali e sono collegati dalla pagina o dal foglio di stile.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/css/landing.css: le sei scene della landing puntano a file JPEG locali in media/photo/pagina di landing/."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Gli asset di concept non usati non entrano automaticamente nel pacchetto distribuito.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/concept/README.md: documenta la separazione degli asset non collegati; frontend/strumenti/build.js copia media/ ma non frontend/concept/."
+      ]
+    }
+  ],
+  "risks": [
+    "Rinominare un’immagine senza aggiornare landing.css rompe la scena solo a runtime.",
+    "Spostare concept dentro media/ può gonfiare di nuovo il pacchetto."
+  ],
+  "notes": [
+    "La fonte storica non definisce un nuovo comportamento giocabile: l’audit registra l’integrazione degli asset e la separazione dei concept."
+  ],
   "plan": {
     "mode": "none",
     "status": "not_applicable",
-    "summary": "",
+    "summary": "Gli asset descritti dalla voce sono già integrati o isolati correttamente.",
     "steps": [],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none"
 }
