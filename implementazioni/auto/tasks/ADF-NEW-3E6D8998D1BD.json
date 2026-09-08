@@ -2,8 +2,8 @@
   "schema_version": 5,
   "id": "ADF-NEW-3E6D8998D1BD",
   "origin": "inbox",
-  "title": "voglio sistemare gli eventi ed il tempo in game",
-  "category": "da_classificare",
+  "title": "Sistemare gli eventi e il tempo in gioco",
+  "category": "05-carriera-e-tempo",
   "source": {
     "point": "",
     "text": "voglio sistemare gli eventi ed il tempo in game",
@@ -11,26 +11,117 @@
     "source_status": "nuova",
     "source_status_raw": "nuova"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
-  "intake_state": "pending",
-  "related_task_ids": [],
-  "intake_note": "",
+  "audit_state": "audited",
+  "verified_status": "in_progress",
+  "intake_state": "overlap",
+  "related_task_ids": [
+    "ADF-LEG-EC3A45E275D0",
+    "ADF-LEG-99F7F334DFE9"
+  ],
+  "intake_note": "La richiesta è più ampia delle task esistenti: EC3A45E275D0 copre la gerarchia degli incontri durante i salti e 99F7F334DFE9 il passaggio alla giornata; resta un delta reale di coerenza e prestazioni del motore eventi-tempo.",
   "roadmap_scope": "none",
   "roadmap_impact": "none",
   "roadmap_note": "",
+  "current_state": [
+    "Il tempo giornaliero è centralizzato in frontend/js/game/tempo.js, con giornata 08:00-04:00, durate per azione e blocco delle azioni sospese.",
+    "frontend/js/game/skip.js attraversa i giorni e ferma il salto sugli eventi alti, mentre eventi-v2.js ed eventi-tempo.js forniscono il catalogo e il coordinamento.",
+    "Il comportamento è quindi parzialmente presente; non è dimostrata da questi file una verifica completa della coerenza fra tutti gli eventi, né una simulazione veloce dei salti lunghi."
+  ],
+  "systems": [
+    "frontend/js/game/tempo.js",
+    "frontend/js/game/skip.js",
+    "frontend/js/game/eventi-tempo.js",
+    "frontend/js/game/eventi-v2.js",
+    "frontend/js/game/agenda.js",
+    "frontend/js/game/sim.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/tempo.js",
+    "frontend/js/game/skip.js",
+    "frontend/js/game/eventi-tempo.js",
+    "frontend/js/game/eventi-v2.js",
+    "frontend/js/game/agenda.js",
+    "frontend/js/game/sim.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Ogni avanzamento del tempo e ogni salto applicano una sola volta eventi, agenda, cambio giorno e cambio settimana, mantenendo i blocchi e gli eventi sospesi coerenti.",
+      "verification": "code_audit",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/tempo.js: avanza(), commitAzione() e il wrapper di avanzaGiorno() coordinano l'avanzamento.",
+        "frontend/js/game/skip.js: saltaGiorni() ferma il ciclo su SALTO_STOP e riprende dopo la scelta."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "I salti lunghi non aprono finestre intermedie inutili e terminano entro un tempo prevedibile senza perdere gli eventi che devono essere giocati.",
+      "verification": "automatic",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/skip.js: il ciclo discrimina l'ultimo giorno e rimanda il report alla fine."
+      ]
+    }
+  ],
+  "risks": [
+    "Cambiare l'ordine di avanzaGiorno(), advanceWeek() e del planner degli eventi può duplicare premi o saltare appuntamenti.",
+    "Ottimizzare il salto senza una regola esplicita per gli eventi alti può eliminare scelte di gameplay."
+  ],
+  "notes": [
+    "Il comportamento già coperto dalle task collegate non va ricopiato: questa task deve chiudere solo il delta di coerenza e prestazioni."
+  ],
   "plan": {
-    "mode": "none",
-    "status": "not_applicable",
-    "summary": "",
-    "steps": [],
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Auditare il contratto comune fra orologio, calendario, eventi e salti, poi rendere misurabile il percorso veloce senza perdere eventi interattivi.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Contratto unico di avanzamento",
+        "objective": "Definire e verificare l'ordine unico con cui un'azione, un giorno e una settimana notificano eventi, agenda e salvataggio.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/tempo.js",
+          "frontend/js/game/eventi-tempo.js",
+          "frontend/js/game/eventi-v2.js",
+          "frontend/js/game/agenda.js",
+          "frontend/js/game/sim.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/tempo.js",
+          "frontend/js/game/eventi-tempo.js",
+          "frontend/js/game/eventi-v2.js",
+          "frontend/js/game/agenda.js",
+          "frontend/js/game/sim.js"
+        ],
+        "acceptance_criteria": [
+          "AC1"
+        ],
+        "status": "planned"
+      },
+      {
+        "id": "V2",
+        "title": "Salto veloce verificabile",
+        "objective": "Ridurre il lavoro dei salti lunghi mantenendo gli eventi alti interattivi, gli appuntamenti e i riepiloghi corretti.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "frontend/js/game/skip.js",
+          "frontend/js/game/tempo.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/skip.js",
+          "frontend/js/game/tempo.js"
+        ],
+        "acceptance_criteria": [
+          "AC2"
+        ],
+        "status": "planned"
+      }
+    ],
     "gaps": [],
     "notes": []
-  },
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": []
+  }
 }

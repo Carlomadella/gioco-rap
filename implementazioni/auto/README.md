@@ -6,27 +6,27 @@
 
 - **Schede importate:** 114
 - **Task effettive (duplicati esclusi):** 114
-- **Auditate contro il repo:** 0/114
+- **Auditate contro il repo:** 8/114
 - **Duplicati intercettati:** 0
-- **Estensioni/sovrapposizioni:** 0
+- **Estensioni/sovrapposizioni:** 2
 - **Richieste già implementate senza task equivalente:** 0
-- **Progetti con piano V1→Vn:** 0 (forniti dall'utente: 0)
+- **Progetti con piano V1→Vn:** 8 (forniti dall'utente: 0)
 - **Piani con gap/conflitti da rivedere:** 0
-- **Auditate ma non complete:** 0
+- **Auditate ma non complete:** 8
 - Stato storico importato: da_fare 18 · in_parte 13 · fatto 77 · risposto 5 · nuova 1
 
 ## Tutte le task e richieste
 
 | id | richiesta | ingresso | collegata a | fonte | stato storico | verifica repo | criteri |
 | --- | --- | --- | --- | --- | --- | --- | --- | ---: |
-| `ADF-NEW-3E6D8998D1BD` | voglio sistemare gli eventi ed il tempo in game | da classificare | — | implementazioni/implementazioni.md | 💡 nuova | — non ancora auditata | — |
-| `ADF-LEG-043B012E6E3B` | I cinque lavori per uscire | storica | — | implementazioni/08-uscita-sugli-store.md | 🔶 in parte | — non ancora auditata | — |
-| `ADF-LEG-AC19FC8CC48F` | I dialoghi devono essere tanti e diversi | storica | — | implementazioni/06-mondo-e-personaggi.md | 🔶 in parte | — non ancora auditata | — |
-| `ADF-LEG-D6B7FB24808B` | Il banco dei suoni rifatto | storica | — | implementazioni/04-musica-e-suoni.md | 🔶 in parte | — non ancora auditata | — |
-| `ADF-LEG-6A7D3E986357` | Il beat maker diventa un posto: La Sala | storica | — | implementazioni/06-mondo-e-personaggi.md | 🔶 in parte | — non ancora auditata | — |
-| `ADF-LEG-C295A6327B74` | Il telefono è un iPhone vero, con LaFamegram | storica | — | implementazioni/02-interfaccia-e-telefono.md | 🔶 in parte | — non ancora auditata | — |
-| `ADF-LEG-9D8FB87EF413` | La carriera cresce con la mappa: Provincia → Milano → Los Angeles | storica | — | implementazioni/01-mappa-e-citta.md | 🔶 in parte | — non ancora auditata | — |
-| `ADF-LEG-3FF6C1268680` | La soundboard è ancora poca | storica | — | implementazioni/04-musica-e-suoni.md | 🔶 in parte | — non ancora auditata | — |
+| `ADF-NEW-3E6D8998D1BD` | Sistemare gli eventi e il tempo in gioco | 🟡 estensione | ADF-LEG-EC3A45E275D0, ADF-LEG-99F7F334DFE9 | implementazioni/implementazioni.md | 💡 nuova | 🔨 in sviluppo | 0/2 |
+| `ADF-LEG-043B012E6E3B` | I cinque lavori per uscire | storica | — | implementazioni/08-uscita-sugli-store.md | 🔶 in parte | 👁 da validare | 2/3 |
+| `ADF-LEG-AC19FC8CC48F` | I dialoghi devono essere tanti e diversi | storica | — | implementazioni/06-mondo-e-personaggi.md | 🔶 in parte | 👁 da validare | 2/3 |
+| `ADF-LEG-D6B7FB24808B` | Il banco dei suoni rifatto | storica | ADF-LEG-3FF6C1268680 | implementazioni/04-musica-e-suoni.md | 🔶 in parte | 👁 da validare | 2/3 |
+| `ADF-LEG-6A7D3E986357` | Il beat maker diventa un posto: La Sala | storica | — | implementazioni/06-mondo-e-personaggi.md | 🔶 in parte | 👁 da validare | 2/3 |
+| `ADF-LEG-C295A6327B74` | Il telefono è un iPhone vero, con LaFamegram | storica | — | implementazioni/02-interfaccia-e-telefono.md | 🔶 in parte | 👁 da validare | 2/3 |
+| `ADF-LEG-9D8FB87EF413` | La carriera cresce con la mappa: Provincia → Milano → Los Angeles | storica | — | implementazioni/01-mappa-e-citta.md | 🔶 in parte | 🔨 in sviluppo | 1/3 |
+| `ADF-LEG-3FF6C1268680` | La soundboard è ancora poca | 🟡 estensione | ADF-LEG-D6B7FB24808B | implementazioni/04-musica-e-suoni.md | 🔶 in parte | 👁 da validare | 1/2 |
 | `ADF-LEG-B79B031D90FC` | LaFamegram con post veri, caricati dai giocatori | storica | — | implementazioni/02-interfaccia-e-telefono.md | 🔶 in parte | — non ancora auditata | — |
 | `ADF-LEG-D984E65BB868` | Meno cartelli chiusi sulla mappa, più roba che si apre | storica | — | implementazioni/01-mappa-e-citta.md | 🔶 in parte | — non ancora auditata | — |
 | `ADF-LEG-34C682253C87` | Meno colori nella schermata di gioco | storica | — | implementazioni/09-grafica-e-asset.md | 🔶 in parte | — non ancora auditata | — |
@@ -136,11 +136,71 @@
 
 ## Ridondanze e richieste già coperte
 
-_Nessuna ridondanza rilevata._
+- **ADF-LEG-3FF6C1268680 — La soundboard è ancora poca**: overlap → ADF-LEG-D6B7FB24808B — La task D6B7FB24808B copre il rifacimento del banco audio; questa richiesta aggiunge suoni dedicati e la variazione timbrica dei beat, quindi è overlap e non duplicate.
+- **ADF-NEW-3E6D8998D1BD — Sistemare gli eventi e il tempo in gioco**: overlap → ADF-LEG-EC3A45E275D0, ADF-LEG-99F7F334DFE9 — La richiesta è più ampia delle task esistenti: EC3A45E275D0 copre la gerarchia degli incontri durante i salti e 99F7F334DFE9 il passaggio alla giornata; resta un delta reale di coerenza e prestazioni del motore eventi-tempo.
 
 ## Piani tecnici dei progetti
 
-_Nessun piano tecnico strutturato al momento._
+### ADF-LEG-043B012E6E3B — I cinque lavori per uscire
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Build e persistenza installabile** · needs_validation
+- **V2 — Integrazione account e store** · needs_validation · dipende da V1
+- **V3 — Prova mobile e negozio** · needs_validation · dipende da V1, V2
+
+### ADF-LEG-3FF6C1268680 — La soundboard è ancora poca
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Effetti dedicati** · complete
+- **V2 — Identità dei generi** · needs_validation · dipende da V1
+
+### ADF-LEG-6A7D3E986357 — Il beat maker diventa un posto: La Sala
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Luogo e rete** · complete
+- **V2 — Azioni integrate** · complete · dipende da V1
+- **V3 — Scene e percorso** · needs_validation · dipende da V2
+
+### ADF-LEG-9D8FB87EF413 — La carriera cresce con la mappa: Provincia → Milano → Los Angeles
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Stato geografico** · complete
+- **V2 — Milano e Los Angeles** · needs_validation · dipende da V1
+- **V3 — Effetti sulla carriera** · needs_validation · dipende da V2
+
+### ADF-LEG-AC19FC8CC48F — I dialoghi devono essere tanti e diversi
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Catalogo e conseguenze** · complete
+- **V2 — Scene mancanti e playtest** · needs_validation · dipende da V1
+
+### ADF-LEG-C295A6327B74 — Il telefono è un iPhone vero, con LaFamegram
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Shell e navigazione** · complete
+- **V2 — LaFamegram** · complete · dipende da V1
+- **V3 — Touch reale** · needs_validation · dipende da V1, V2
+
+### ADF-LEG-D6B7FB24808B — Il banco dei suoni rifatto
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Banco effetti** · complete
+- **V2 — Timbri dei beat** · needs_validation · dipende da V1
+
+### ADF-NEW-3E6D8998D1BD — Sistemare gli eventi e il tempo in gioco
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Contratto unico di avanzamento** · planned
+- **V2 — Salto veloce verificabile** · planned · dipende da V1
+
 
 ## Impatto possibile sulla roadmap ufficiale
 

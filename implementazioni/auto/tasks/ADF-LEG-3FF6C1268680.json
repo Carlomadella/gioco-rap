@@ -11,28 +11,104 @@
     "source_status": "in_parte",
     "source_status_raw": "in parte"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
-  "intake_state": "canonical",
-  "related_task_ids": [],
-  "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "audit_state": "audited",
+  "verified_status": "needs_validation",
+  "intake_state": "overlap",
+  "related_task_ids": [
+    "ADF-LEG-D6B7FB24808B"
   ],
-  "roadmap_scope": "none",
+  "intake_note": "La task D6B7FB24808B copre il rifacimento del banco audio; questa richiesta aggiunge suoni dedicati e la variazione timbrica dei beat, quindi è overlap e non duplicate.",
+  "current_state": [
+    "frontend/js/game/fx.js contiene suoni dedicati promo, palestra e giorno in entrambi i banchi morbido e retrò, oltre ai suoni preesistenti.",
+    "La fonte storica dichiara ancora aperta la parte principale della richiesta: i generi in frontend/js/game/beatplay.js condividono il timbro di base."
+  ],
+  "systems": [
+    "frontend/js/game/fx.js",
+    "frontend/js/game/beatplay.js",
+    "frontend/js/game/beats.js",
+    "frontend/js/game/skip.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/fx.js",
+    "frontend/js/game/beatplay.js",
+    "frontend/js/game/beats.js",
+    "frontend/js/game/skip.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Promo, palestra e fine giornata hanno effetti dedicati e vengono chiamati dal gameplay corretto.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/fx.js: SUONI.morbido e SUONI.retro espongono promo(), palestra() e giorno().",
+        "frontend/js/game/skip.js: sceglie SFX.week() o SFX.giorno() in base alla settimana chiusa."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "I beat dei diversi generi hanno identità sonora distinguibile, non soltanto variazioni di note e scala.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "implementazioni/04-musica-e-suoni.md: il timbro condiviso in beatplay.js è indicato come gap residuo."
+      ]
+    }
+  ],
+  "risks": [
+    "Una variazione timbrica aggressiva può rendere le anteprime incoerenti col beat usato nel pezzo o saturare il mix."
+  ],
+  "notes": [
+    "I tre effetti già presenti non vanno duplicati: il delta è il motore timbrico dei beat."
+  ],
   "plan": {
-    "mode": "none",
-    "status": "not_applicable",
-    "summary": "",
-    "steps": [],
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Mantenere i tre effetti dedicati e lavorare soltanto sull'identità sonora dei generi di beat.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Effetti dedicati",
+        "objective": "Verificare che promo, palestra e giorno siano distinti e integrati nei rispettivi flussi.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/fx.js",
+          "frontend/js/game/skip.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/fx.js",
+          "frontend/js/game/skip.js"
+        ],
+        "acceptance_criteria": [
+          "AC1"
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "V2",
+        "title": "Identità dei generi",
+        "objective": "Differenziare strumenti e inviluppi dei generi mantenendo la stessa anteprima e gli stessi dati musicali.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "frontend/js/game/beatplay.js",
+          "frontend/js/game/beats.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/beatplay.js",
+          "frontend/js/game/beats.js"
+        ],
+        "acceptance_criteria": [
+          "AC2"
+        ],
+        "status": "needs_validation"
+      }
+    ],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }

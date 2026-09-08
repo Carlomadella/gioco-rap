@@ -11,28 +11,131 @@
     "source_status": "in_parte",
     "source_status_raw": "in parte"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "needs_validation",
   "intake_state": "canonical",
   "related_task_ids": [],
-  "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "intake_note": "Task canonica sull'interfaccia telefono e sull'app LaFamegram.",
+  "current_state": [
+    "frontend/js/game/telefono.js costruisce home, dock, griglia app, badge e navigazione.",
+    "LaFamegram è un feed locale con post della carriera e possibilità di scrivere un post, con limite di 30 post personali.",
+    "La fonte storica indica che la parte mobile e la validazione su dispositivo reale restano parziali."
   ],
-  "roadmap_scope": "none",
+  "systems": [
+    "frontend/js/game/telefono.js",
+    "frontend/css/telefono.css",
+    "frontend/css/tocco.css",
+    "frontend/js/game/eventi-v2.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/telefono.js",
+    "frontend/css/telefono.css",
+    "frontend/css/tocco.css",
+    "frontend/js/game/eventi-v2.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Il telefono mostra home, dock, griglia di app, badge e ritorno alle schermate senza perdere lo stato della partita.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/telefono.js: renderTelefono(), renderTelefonoHome(), TEL_DOCK, TEL_GRIGLIA e gestione data-app."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "LaFamegram visualizza feed, post di eventi e post dell'utente e consente di pubblicare testo persistente.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/telefono.js: telFeed(), pubblicaSuLafamegram(), schermataLafamegram() e G.lafamegramMiei."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Il telefono è usabile con touch reale, testi leggibili e app senza sovrapposizioni sui formati target.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/css/tocco.css: regole per dispositivi coarse e larghezze ridotte.",
+        "implementazioni/02-interfaccia-e-telefono.md: la prova su telefono reale è ancora indicata come da fare."
+      ]
+    }
+  ],
+  "risks": [
+    "Rifinire il guscio grafico può rompere le coordinate delle app e dei badge che vengono montati dinamicamente."
+  ],
+  "notes": [],
   "plan": {
-    "mode": "none",
-    "status": "not_applicable",
-    "summary": "",
-    "steps": [],
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Conservare il telefono e il feed già funzionanti, poi validare touch e adattamento reale.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Shell e navigazione",
+        "objective": "Verificare home, dock, app e stato della navigazione.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/telefono.js",
+          "frontend/css/telefono.css"
+        ],
+        "watch_paths": [
+          "frontend/js/game/telefono.js",
+          "frontend/css/telefono.css"
+        ],
+        "acceptance_criteria": [
+          "AC1"
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "V2",
+        "title": "LaFamegram",
+        "objective": "Mantenere feed, eventi e pubblicazione persistente collegati al gameplay.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "frontend/js/game/telefono.js",
+          "frontend/js/game/eventi-v2.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/telefono.js",
+          "frontend/js/game/eventi-v2.js"
+        ],
+        "acceptance_criteria": [
+          "AC2"
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "V3",
+        "title": "Touch reale",
+        "objective": "Provare telefono, orientamenti e app su dispositivi target senza hover appiccicati.",
+        "depends_on": [
+          "V1",
+          "V2"
+        ],
+        "systems": [
+          "frontend/css/tocco.css",
+          "frontend/css/telefono.css"
+        ],
+        "watch_paths": [
+          "frontend/css/tocco.css",
+          "frontend/css/telefono.css"
+        ],
+        "acceptance_criteria": [
+          "AC3"
+        ],
+        "status": "needs_validation"
+      }
+    ],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }
