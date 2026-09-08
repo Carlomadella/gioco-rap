@@ -1,5 +1,16 @@
 "use strict";
 
+const PHASE4_FEATURE_NAMES = Object.freeze([
+  "energy",
+  "vocalSpace",
+  "tension",
+  "density",
+  "motifFamilies",
+  "kick808Relation",
+  "hatRolls",
+  "transitionStrength"
+]);
+
 function round(value, digits = 6) {
   const n = Number(value);
   if (!Number.isFinite(n)) return 0;
@@ -129,6 +140,47 @@ function compareSequences(source, decoded) {
   };
 }
 
+function flattenLeaves(value, prefix = "", output = new Map()) {
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => flattenLeaves(item, `${prefix}[${index}]`, output));
+    if (!value.length) output.set(`${prefix}[]`, "__EMPTY_ARRAY__");
+    return output;
+  }
+  if (value && typeof value === "object") {
+    const keys = Object.keys(value).sort();
+    keys.forEach(key => flattenLeaves(value[key], prefix ? `${prefix}.${key}` : key, output));
+    if (!keys.length) output.set(`${prefix}{}`, "__EMPTY_OBJECT__");
+    return output;
+  }
+  output.set(prefix, value);
+  return output;
+}
+
+function comparePhase4Snapshots(source, decoded) {
+  const a = flattenLeaves(source);
+  const b = flattenLeaves(decoded);
+  const keys = [...new Set([...a.keys(), ...b.keys()])].sort();
+  let exactLeaves = 0;
+  const numericErrors = [];
+  for (const key of keys) {
+    const av = a.get(key);
+    const bv = b.get(key);
+    if (typeof av === "number" && Number.isFinite(av) && typeof bv === "number" && Number.isFinite(bv)) {
+      const error = Math.abs(av - bv);
+      numericErrors.push(error);
+      if (error === 0) exactLeaves += 1;
+    } else if (Object.is(av, bv)) {
+      exactLeaves += 1;
+    }
+  }
+  return {
+    exact: exactLeaves === keys.length,
+    totalLeaves: keys.length,
+    exactLeaves,
+    numericErrors
+  };
+}
+
 function benchmarkRepresentation(inputs, adapter) {
   const started = process.hrtime.bigint();
   const phraseResults = [];
@@ -138,6 +190,7 @@ function benchmarkRepresentation(inputs, adapter) {
   const encodeNanos = [];
   const decodeNanos = [];
   const fidelity = [];
+  const phase4Fidelity = [];
   let grammarFailures = 0;
   let vocabularyFailures = 0;
   let canonicalRoundTripFailures = 0;
@@ -150,7 +203,7 @@ function benchmarkRepresentation(inputs, adapter) {
       const encodeEnd = process.hrtime.bigint();
 
       let vocabularyOk = true;
-      try { adapter.validateVocabulary(encoded); } catch (error) { vocabularyOk = false; vocabularyFailures += 1; }
+      try { adapter.validateVocabulary(encoded); } catch (_error) { vocabularyOk = false; vocabularyFailures += 1; }
       const grammar = adapter.validateEncoded(encoded);
       const grammarOk = Boolean(grammar && grammar.ok);
       if (!grammarOk) grammarFailures += 1;
@@ -165,6 +218,17 @@ function benchmarkRepresentation(inputs, adapter) {
       const bars = Math.max(1, Number(prepared.timing && prepared.timing.bars) || Number(input.phraseBars) || 1);
       const unitCount = encoded.length;
       const comparison = compareSequences(prepared, decoded);
+      let phase4Comparison = null;
+      if (typeof adapter.phase4Snapshot === "function"
+        && Array.isArray(adapter.phase4Features)
+        && adapter.phase4Features.length > 0) {
+        phase4Comparison = comparePhase4Snapshots(
+          adapter.phase4Snapshot(prepared),
+          adapter.phase4Snapshot(decoded)
+        );
+        phase4Fidelity.push(phase4Comparison);
+      }
+
       units.push(unitCount);
       unitsPerBar.push(unitCount / bars);
       encodeNanos.push(Number(encodeEnd - encodeStart));
@@ -179,7 +243,8 @@ function benchmarkRepresentation(inputs, adapter) {
         grammarOk,
         vocabularyOk,
         canonicalRoundTripStable: stable,
-        structureExact: comparison.structureExact
+        structureExact: comparison.structureExact,
+        phase4RoundTripExact: phase4Comparison ? phase4Comparison.exact : null
       });
     } catch (error) {
       failures.push({
@@ -199,16 +264,22 @@ function benchmarkRepresentation(inputs, adapter) {
   const structureExact = fidelity.filter(item => item.structureExact).length;
   const totalBars = phraseResults.reduce((sum, item) => sum + item.bars, 0);
   const elapsedMs = Number(process.hrtime.bigint() - started) / 1e6;
+  const supportedPhase4 = Array.isArray(adapter.phase4Features) ? [...adapter.phase4Features] : [];
+  const phase4ExactPhrases = phase4Fidelity.filter(item => item.exact).length;
+  const phase4Leaves = phase4Fidelity.reduce((sum, item) => sum + item.totalLeaves, 0);
+  const phase4ExactLeaves = phase4Fidelity.reduce((sum, item) => sum + item.exactLeaves, 0);
+  const phase4NumericErrors = phase4Fidelity.flatMap(item => item.numericErrors);
 
   return {
     schema: "fame-neural-representation-benchmark-v1",
-    version: 1,
+    version: 2,
     representation: {
       id: adapter.id,
       family: adapter.family,
       version: adapter.version,
       unitName: adapter.unitName,
       vocabSize: adapter.vocabSize,
+      metadata: adapter.metadata || null,
       capabilities: adapter.capabilities
     },
     totals: {
@@ -248,6 +319,18 @@ function benchmarkRepresentation(inputs, adapter) {
       velocityMae01: round(mean(flatten("velocityErrors"))),
       barConditioningMae01: round(mean(flatten("barFeatureErrors")))
     },
+    phase4: {
+      supportedFeatures: supportedPhase4,
+      supportedFeatureCount: supportedPhase4.length,
+      totalFeatureCount: PHASE4_FEATURE_NAMES.length,
+      featureCoverageRate: round(rate(supportedPhase4.length, PHASE4_FEATURE_NAMES.length)),
+      exactPhrases: phase4ExactPhrases,
+      exactPhraseRate: round(rate(phase4ExactPhrases, phase4Fidelity.length)),
+      exactLeaves: phase4ExactLeaves,
+      totalLeaves: phase4Leaves,
+      leafAccuracy: round(rate(phase4ExactLeaves, phase4Leaves)),
+      numericMae: round(mean(phase4NumericErrors))
+    },
     cpu: {
       elapsedMs: round(elapsedMs, 3),
       encodeMsTotal: round(encodeNanos.reduce((a, b) => a + b, 0) / 1e6, 3),
@@ -260,15 +343,19 @@ function benchmarkRepresentation(inputs, adapter) {
       "invalidGenerationRate",
       "validationLossComparableModel"
     ],
+    roundTripUnstableExamples: phraseResults.filter(item => !item.canonicalRoundTripStable).slice(0, 20).map(item => item.phraseId),
     failures: failures.slice(0, 100),
     phraseResults
   };
 }
 
 module.exports = {
+  PHASE4_FEATURE_NAMES,
   round,
   mean,
   quantile,
   compareSequences,
+  flattenLeaves,
+  comparePhase4Snapshots,
   benchmarkRepresentation
 };

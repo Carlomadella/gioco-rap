@@ -5,6 +5,9 @@ const tokenizer = require("../tokenizer");
 const vocabulary = require("../vocabulary");
 const { validateTokenGrammar } = require("../grammar");
 const { overlayFlatCompatibleAnnotations } = require("./input");
+const { phase4Snapshot } = require("./common");
+
+const PHASE4_FEATURES = ["energy", "vocalSpace", "tension"];
 
 const CAPABILITIES = Object.freeze({
   canonicalEvents: true,
@@ -50,7 +53,12 @@ module.exports = {
   version: 1,
   unitName: "token",
   vocabSize: vocabulary.vocabSize,
+  metadata: {
+    phase4FeatureCoverage: PHASE4_FEATURES.length
+  },
   capabilities: CAPABILITIES,
+  phase4Features: PHASE4_FEATURES,
+  phase4Snapshot: sequence => phase4Snapshot(sequence, PHASE4_FEATURES),
   prepare,
   encode,
   decode,

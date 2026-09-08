@@ -310,7 +310,7 @@ Gli annotatori sono abbastanza affidabili da arricchire il dataset senza introdu
 
 # FASE 5 — Scelta della rappresentazione neurale
 
-Stato: IN CORSO — BLOCCO 1 BASELINE FLAT MISURATA
+Stato: IN CORSO — BLOCCO 2 CONFRONTO SIMBOLICO COMPLETATO
 
 ### Perché serve
 Non vogliamo scegliere tokenizer e architettura perché sono di moda.
@@ -336,7 +336,20 @@ Sul corpus Gate 1 con overlay umano: **502 input**, **502 benchmarkati**, **0 fa
 
 Il Flat riusa direttamente energy/vocalSpace/tension per barra ma non codifica come feature FASE 4 esplicite density, motif families, kick↔808 relation, hat rolls e transition strength. VRAM, throughput training, invalid generation rate e validation loss restano rinviati al micro-training comparabile comune.
 
-**Prossimo Blocco 2:** implementare REMI+, Compound Word e FAME Compound custom sullo stesso representation input e sullo stesso harness; nessun vincitore e' ancora scelto.
+### Blocco 2 — confronto simbolico COMPLETATO
+
+Sul corpus effettivo da **502 candidate** tutte e quattro le rappresentazioni sono state portate sullo stesso harness.
+
+| Rappresentazione | unit/bar mean | P95 | RT fail | FASE4 coverage |
+|---|---:|---:|---:|---:|
+| flat-poc-v1 | 116.125996 | 187.75 | 110 | 3/8 |
+| remi-plus-v1 | 101.281375 | 164.975 | 0 | 0/8 |
+| compound-word-v1 | 20.191235 | 35.975 | 0 | 4/8 |
+| fame-compound-v1 | 20.229084 | 35.975 | 0 | 8/8 |
+
+Tutti gli adapter hanno chiuso il benchmark con **0 failure / 0 grammar failure / 0 vocabulary failure**. Nessun vincitore viene scelto dal solo benchmark simbolico.
+
+**Prossimo Blocco 3:** micro-training comparabile su stessa GPU, split e budget per misurare VRAM, throughput, validation loss e invalid generation rate; solo dopo si sceglie la rappresentazione.
 
 ### Cosa devi valutare tu
 Non scegli il tokenizer. Ti farò ascoltare solo eventuali differenze musicali rilevanti.

@@ -1,7 +1,7 @@
 # FAME Neural — FASE 5 / Benchmark rappresentazioni neurali
 
 Data avvio: 8 settembre 2026
-Stato: IN CORSO — BLOCCO 1 BASELINE FLAT MISURATA
+Stato: IN CORSO — BLOCCO 2 CONFRONTO SIMBOLICO COMPLETATO
 
 ## Obiettivo
 
@@ -78,10 +78,23 @@ Questo gap entra nel confronto: non viene corretto aggiungendo token al Flat pri
 
 VRAM peak durante training, throughput di training, validation loss comparabile e invalid generation rate richiedono lo stesso micro-modello e lo stesso protocollo di training per tutte le rappresentazioni. Il Blocco 1 le marca esplicitamente come **deferred** invece di stimarle.
 
-## Prossimo Blocco 2
+## Blocco 2 — confronto simbolico completato
 
-Implementare REMI+, Compound Word e FAME Compound custom come adapter dello stesso contratto e misurare sullo stesso set da 502 candidate le metriche simboliche già definite.
+Tutte e quattro le rappresentazioni sono state misurate sullo stesso corpus effettivo da **502 candidate** e sullo stesso harness. Nessun adapter ha prodotto failure, grammar failure o vocabulary failure.
 
-Solo dopo la parità del benchmark simbolico si apre il micro-training comparabile sulla GPU locale per memoria, velocità e validità generativa.
+| Rappresentazione | unit/bar mean | P95 | round-trip fail | event type | pitch | timing MAE | FASE4 coverage | FASE4 numeric MAE |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| flat-poc-v1 | 116.125996 | 187.75 | 110 | 0.950895 | 0.995139 | 4.954279 | 3/8 | 0.021358 |
+| remi-plus-v1 | 101.281375 | 164.975 | 0 | 0.950895 | 0.995139 | 4.954279 | 0/8 | 0 |
+| compound-word-v1 | 20.191235 | 35.975 | 0 | 0.950895 | 0.995139 | 4.954279 | 4/8 | 0.022622 |
+| fame-compound-v1 | 20.229084 | 35.975 | 0 | 0.950895 | 0.995139 | 4.954279 | 8/8 | 0.046852 |
+
+Nota: `round-trip fail` misura l'idempotenza seriale `encode -> decode -> encode`; non equivale automaticamente a phrase strutturalmente perse. La structure exact rate e le metriche di reconstruction restano separate.
+
+Il confronto resta **senza vincitore**: memoria GPU, throughput training, validation loss e invalid generation rate richiedono lo stesso micro-modello e lo stesso protocollo di training.
+
+## Prossimo Blocco 3
+
+Eseguire micro-training comparabile per Flat, REMI+, Compound Word e FAME Compound custom usando stesso split, stesso micro-modello per quanto compatibile, stesso budget di step e stessa GPU locale. Misurare VRAM peak, throughput, validation loss e invalid generation rate prima della scelta finale della rappresentazione.
 
 Nessun vincitore è ancora scelto.

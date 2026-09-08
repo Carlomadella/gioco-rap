@@ -9,7 +9,7 @@ Data: 2026-09-08
 - FASE 2 — Pipeline MIDI e provenienza: **COMPLETATA**.
 - FASE 3 — Dataset Auditor e corpus iniziale: **COMPLETATA — GATE 1 DATA READY SUPERATO**.
 - FASE 4 — Annotazione musicale automatica: **COMPLETATA**.
-- FASE 5 — Scelta della rappresentazione neurale: **IN CORSO — BLOCCO 1 BASELINE FLAT MISURATA**.
+- FASE 5 — Scelta della rappresentazione neurale: **IN CORSO — BLOCCO 2 CONFRONTO SIMBOLICO COMPLETATO**.
 - Training neurale reale: **NON INIZIATO**.
 
 ## Corpus Gate 1
@@ -72,8 +72,19 @@ Harness comune e baseline Flat misurati sul corpus effettivo da **502 candidate*
 
 Le metriche GPU/training non sono stimate dal benchmark simbolico e restano deferred fino al confronto con micro-modello identico.
 
+## FASE 5 — Blocco 2
+
+Confronto simbolico completato sulle **502 candidate**:
+
+- flat-poc-v1: **116.125996 unit/bar**, P95 **187.75**, RT **110**, FASE4 **3/8**;
+- remi-plus-v1: **101.281375 unit/bar**, P95 **164.975**, RT **0**, FASE4 **0/8**;
+- compound-word-v1: **20.191235 unit/bar**, P95 **35.975**, RT **0**, FASE4 **4/8**;
+- fame-compound-v1: **20.229084 unit/bar**, P95 **35.975**, RT **0**, FASE4 **8/8**;
+
+Tutti e quattro gli adapter: **502/502 benchmarkate**, **0 failure**, **0 grammar failure**, **0 vocabulary failure**. Il round-trip e' idempotenza seriale, non un conteggio di phrase strutturalmente perse. Nessun vincitore e' ancora scelto.
+
 ## Prossimo intervento ufficiale
 
-FASE 5 / Blocco 2: implementare e misurare REMI+, Compound Word e FAME Compound custom sullo stesso representation input e sullo stesso corpus da 502 candidate. Dopo la parità simbolica, eseguire micro-training comparabile per VRAM, throughput e invalid generation rate.
+FASE 5 / Blocco 3: micro-training comparabile sulle quattro rappresentazioni con stesso split e budget per misurare VRAM peak, throughput, validation loss e invalid generation rate prima della decisione finale.
 
 L'espansione non sintetica del corpus può continuare in parallelo, ma non riapre il Gate 1 già superato.
