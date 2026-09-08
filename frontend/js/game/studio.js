@@ -1168,13 +1168,14 @@ function apriStudio(sezione){
 function chiudiStudio(){ $("studio").classList.remove("on"); }
 
 /* Le mosse vere le fa `actions.js`, come dalla plancia: lo Studio è la stanza,
-   non un secondo motore. Si chiude, parte la mossa, e quello che succede lo
-   racconta la scena di sempre. */
+   non un secondo motore. Punto 14: non si chiude più prima — si resta dentro,
+   e quello che succede (toast, foglio, titolo del pezzo, scena) si racconta
+   sopra allo Studio, che aspetta già disegnato dietro. */
 function studioAzione(id){
   const st = hubPronta(id);
   if(!st.ok){ toast(st.perche, "bad", "!", ["#3A3F49", "#22262E"]); return; }
-  chiudiStudio();
   hubAzione(id);
+  renderStudio();
 }
 
 /* Si esce dallo Studio solo dal bottone globale «Torna alla mappa» (punto 1):

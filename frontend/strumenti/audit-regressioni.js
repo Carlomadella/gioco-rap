@@ -27,6 +27,10 @@ const posto = leggi("js/game/posto.js");
 const studio = leggi("js/game/studio.js");
 const studioEl = leggi("js/game/studio-elementi.js");
 const studioElCss = leggi("css/studio-elementi.css");
+const studioCss = leggi("css/studio.css");
+const overlaysCss = leggi("css/overlays.css");
+const effectsCss = leggi("css/effects.css");
+const modal = leggi("js/game/modal.js");
 const writer = leggi("js/game/writer.js");
 const piazza = leggi("js/game/piazza.js");
 const hub = leggi("js/game/hub.js");
@@ -1243,6 +1247,67 @@ test("«Torna alla mappa» chiude davvero lo Studio prima di andare all'hub",
   menuSystem.includes('if($id("studio") && $id("studio").classList.contains("on") && typeof chiudiStudio === "function") chiudiStudio();'));
 test("la barra globale si monta nella testata dello Studio, non sotto in hub",
   menuSystem.includes('{id:"studio",  root:"#studio.on",        head:".sthead"}'));
+
+/* Punto 14 di ALE: le azioni in Studio chiudevano lo Studio prima di partire,
+   e ogni mossa ti buttava alla mappa. Il fix vero (studioAzione() non chiude
+   più) è invisibile a "le ACTION standard dello Studio non vengono addebitate
+   due volte" qui sopra, che guarda solo il pezzo giusto del file — se qualcuno
+   rimette dentro chiudiStudio() prima di hubAzione(id), lì sopra continua a
+   passare. Questi controlli guardano proprio quello: che non chiuda più, che
+   lo Studio si aggiorni da solo dopo, e che le finestre che un'azione apre
+   sopra di sé (foglio, titolo del pezzo, scena a pagina piena) restino
+   davvero sopra allo Studio, non dietro, per via dello z-index. */
+console.log("\nPunto 14 — le azioni in Studio non chiudono più lo Studio");
+test("studioAzione() non chiude più lo Studio prima della mossa, e si ridisegna dopo",
+  (() => {
+    const a = studio.indexOf("function studioAzione(id)");
+    const b = studio.indexOf("\n}", a);
+    const body = a >= 0 && b > a ? studio.slice(a, b) : "";
+    return body.includes("hubAzione(id)") &&
+      body.includes("renderStudio()") &&
+      !body.includes("chiudiStudio()");
+  })());
+test("renderStudio() si aggiorna da sola solo se lo Studio è ancora aperto",
+  /function renderStudio\(\)\{\s*const root ?= ?\$\("studio"\);\s*if\(!root \|\| !root\.classList\.contains\("on"\)\) return;/
+    .test(studio.replace(/\n\s*/g, "\n")) ||
+  (() => {
+    const a = studio.indexOf("function renderStudio()");
+    const b = studio.indexOf("\n}", a);
+    const body = a >= 0 && b > a ? studio.slice(a, b) : "";
+    return body.includes('classList.contains("on")') && body.includes("return;");
+  })());
+test("lo z-index dello Studio sta sotto a modal, report/scena e foglio: quello che un'azione apre sopra di sé si vede",
+  (() => {
+    const zStudio = Number((/\.studio\{[^}]*z-index:(\d+)/.exec(studioCss) || [])[1]);
+    const zModal = Number((/\.modal\{[^}]*z-index:(\d+)/.exec(overlaysCss) || [])[1]);
+    const zScena = Number((/\.scenapiena\{[^}]*z-index:(\d+)/.exec(effectsCss) || [])[1]);
+    const zWriter = Number((/\.writer\{[^}]*z-index:(\d+)/.exec(overlaysCss) || [])[1]);
+    return zStudio > 0 && zStudio < zModal && zStudio < zScena && zStudio < zWriter;
+  })());
+test("il percorso sincrono di un'azione diretta (ui.js) ridisegna lo Studio dopo l'esito",
+  (() => {
+    const a = ui.indexOf("const esegui = () => {");
+    const b = ui.lastIndexOf("};", ui.indexOf("const pesa ="));
+    const body = a >= 0 && b > a ? ui.slice(a, b) : "";
+    return body.includes('if(typeof renderStudio === "function") renderStudio();');
+  })());
+test("scrivere le barre (writer.js) ridisegna lo Studio, sia a strofa chiusa sia lasciando perdere",
+  writer.includes('$("w-done").onclick = () => { chiudiFoglio(); save(); renderGioco(); if(typeof renderStudio === "function") renderStudio(); };') &&
+  writer.includes('$("w-x").onclick = () => { if(WR) annullaAzione(); chiudiFoglio(); renderGioco(); if(typeof renderStudio === "function") renderStudio(); };') &&
+  writer.includes('$("w-cancel").onclick = () => { annullaAzione(); chiudiFoglio(); renderGioco(); if(typeof renderStudio === "function") renderStudio(); };'));
+test("le finestre generiche (modal.js: conferma spesa, titolo del pezzo, «Come la fai») ridisegnano lo Studio dopo",
+  (() => {
+    const a = modal.indexOf("function showEvent(e)");
+    const b = modal.indexOf("\n}", a);
+    const bodyEvent = a >= 0 && b > a ? modal.slice(a, b) : "";
+    const c = modal.indexOf("function chiudiModale()");
+    const d = modal.indexOf("\n}", c);
+    const bodyChiudi = c >= 0 && d > c ? modal.slice(c, d) : "";
+    return bodyEvent.includes('if(typeof renderStudio === "function") renderStudio();') &&
+      bodyChiudi.includes('if(typeof renderStudio === "function") renderStudio();');
+  })());
+test("registrare il pezzo (actions.js) ridisegna lo Studio dopo il titolo",
+  actions.includes('SFX.rec(); save(); renderGioco();\n       if(typeof renderStudio === "function") renderStudio();'));
 
 console.log("\nPunto 1 (bis) — «Torna alla mappa» funziona in ogni stanza dove si vede");
 test("Piazza e Writer si mostravano nella barra HOSTS ma il menu non li riconosceva: ora sì",

@@ -15,7 +15,7 @@ Quelli che erano rimasti indietro nel foglio — chiusi ma mai smistati — stan
 | file | cosa c'è dentro |
 | --- | --- |
 | [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 16 voci |
-| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 33 voci |
+| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 34 voci |
 | [`03-artista-e-avatar.md`](03-artista-e-avatar.md) | **L'artista e il suo avatar** — 1 voce |
 | [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 14 voci |
 | [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 11 voci |
@@ -33,15 +33,16 @@ per i punti, e sono in [`../documentazione/come-si-lavora.md`](../documentazione
 
 ## Tutti i punti
 
-112 voci in tutto: **76 chiuse**, 13 a metà, 18 da fare e 5 con la sola risposta scritta
-(ricontate dalla tabella qui sotto il 07/09/2026). A che punto siamo nell'insieme, tappa per
-tappa, sta in [`../documentazione/roadmap.md`](../documentazione/roadmap.md).
+113 voci in tutto: **77 chiuse**, 13 a metà, 18 da fare e 5 con la sola risposta scritta
+(ricontate dalla tabella qui sotto il 07/09/2026, +1 chiusa l'08/09/2026). A che punto siamo
+nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../documentazione/roadmap.md).
 
 | | punto | stato | dove |
 | --- | --- | --- | --- |
 | **1** | Cosa si può simulare | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
 | **1** | Dallo Studio si esce solo con «Torna alla mappa» | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **1** | «Torna alla mappa» non funzionava in alcune interfacce | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **14** | Le azioni in Studio non ti buttano più fuori | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **2** | Ascoltare un beat prima di comprarlo | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
 | **3** | Crea il tuo avatar | fatto | [artista-e-avatar](03-artista-e-avatar.md) |
 | **4** | La pagina di landing | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |

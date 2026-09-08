@@ -365,15 +365,15 @@ function chiudiStrofa(){
     '</div><div class="wtxt">' + testo.replace(/</g,"&lt;") + '</div>';
   $("w-st").innerHTML = "In cartella hai <b>" + G.bars.length + "</b> strofe";
   $("w-done").textContent = "Metti via il foglio";
-  $("w-done").onclick = () => { chiudiFoglio(); save(); renderGioco(); };
+  $("w-done").onclick = () => { chiudiFoglio(); save(); renderGioco(); if(typeof renderStudio === "function") renderStudio(); };
   $("w-cancel").style.display = "none";
   SFX.publish();
   pushLog("Strofa scritta sul tema «" + WR.tema.t.toLowerCase() + "», qualità <b>" + q + "</b>.", q >= 60 ? "good" : "");
 }
 
-$("w-x").onclick = () => { if(WR) annullaAzione(); chiudiFoglio(); renderGioco(); };
+$("w-x").onclick = () => { if(WR) annullaAzione(); chiudiFoglio(); renderGioco(); if(typeof renderStudio === "function") renderStudio(); };
 $("p-x").onclick = () => uscitaPiazza();
 window.__FS = () => FS;
 window.__R = () => renderGioco();
-$("w-cancel").onclick = () => { annullaAzione(); chiudiFoglio(); renderGioco(); };
+$("w-cancel").onclick = () => { annullaAzione(); chiudiFoglio(); renderGioco(); if(typeof renderStudio === "function") renderStudio(); };
 $("w-done").onclick = () => chiudiStrofa();
