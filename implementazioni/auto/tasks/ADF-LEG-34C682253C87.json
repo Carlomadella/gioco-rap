@@ -11,22 +11,62 @@
     "source_status": "in_parte",
     "source_status_raw": "in parte"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "needs_validation",
   "intake_state": "canonical",
   "related_task_ids": [],
-  "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "intake_note": "Task canonica sulla riduzione della varietà cromatica dell'involucro delle card.",
+  "current_state": [
+    "frontend/js/game/scene-art.js: le dodici azioni sono raggruppate nelle quattro famiglie TINTA_STUDIO, TINTA_HUSTLE, TINTA_SUONO e TINTA_VITA.",
+    "frontend/js/game/ui.js e frontend/css/game.css: card e toast usano le stesse famiglie, mentre i dettagli interni degli SVG e la fascia HUD restano colorati.",
+    "La fonte storica segnala correttamente che la riduzione è parziale e non equivale a un ridisegno completo delle illustrazioni."
   ],
-  "roadmap_scope": "none",
+  "systems": [
+    "frontend/js/game/scene-art.js",
+    "frontend/js/game/ui.js",
+    "frontend/css/game.css",
+    "frontend/css/hud.css"
+  ],
+  "watch_paths": [
+    "frontend/js/game/scene-art.js",
+    "frontend/js/game/ui.js",
+    "frontend/css/game.css",
+    "frontend/css/hud.css"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Le card delle azioni condividono quattro famiglie cromatiche coerenti invece di dodici coppie indipendenti.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/scene-art.js: TINTA_STUDIO, TINTA_HUSTLE, TINTA_SUONO e TINTA_VITA sono riusate nelle definizioni SC."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il toast dell'azione mantiene la stessa famiglia cromatica della card che lo ha generato.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/ui.js: ART legge le quattro TINTA_* e mostra il toast con i colori della relativa azione."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "La schermata completa mantiene una gerarchia visiva pulita anche con SVG, HUD e card visibili insieme.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/scene-art.js e frontend/css/game.css: il codice riduce l'involucro ma conserva colori nei dettagli SVG e nella HUD; serve verifica manuale del risultato visivo."
+      ]
+    }
+  ],
+  "risks": [
+    "Ridurre i colori degli SVG può impoverire la leggibilità delle scene, non solo la decorazione.",
+    "Cambiare i colori della HUD può confondere metriche che oggi sono distinguibili intenzionalmente."
+  ],
+  "notes": [],
   "plan": {
     "mode": "none",
     "status": "not_applicable",
@@ -34,5 +74,8 @@
     "steps": [],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }

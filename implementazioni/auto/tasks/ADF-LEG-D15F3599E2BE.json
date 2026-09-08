@@ -11,22 +11,64 @@
     "source_status": "da_fare",
     "source_status_raw": "da fare"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "in_progress",
   "intake_state": "canonical",
   "related_task_ids": [],
-  "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "intake_note": "Task canonica sul costo o svantaggio dell'autocompletamento della canzone.",
+  "current_state": [
+    "frontend/js/game/actions.js: l'azione Scrivi barre apre il foglio generato con apriFoglio({generata:true, righe:6, minimo:qVeloce()}) senza costo aggiuntivo esplicito per il completamento.",
+    "frontend/js/game/writer.js: completaStrofa() riempie le righe mancanti e il pulsante w-auto consente di completare il testo durante la revisione.",
+    "frontend/js/game/writer.js: la quota di testo generato influenza il moltiplicatore tramite quotaTua() e boostAttuale(), ma non sostituisce uno svantaggio economico o di gameplay definito."
   ],
-  "roadmap_scope": "none",
+  "systems": [
+    "frontend/js/game/actions.js",
+    "frontend/js/game/writer.js",
+    "frontend/js/game/versi.js",
+    "frontend/js/game/uscita.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/actions.js",
+    "frontend/js/game/writer.js",
+    "frontend/js/game/versi.js",
+    "frontend/js/game/uscita.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Completa la canzone applica uno svantaggio esplicito e comprensibile rispetto alla scrittura manuale.",
+      "verification": "code_audit",
+      "status": "pending",
+      "evidence": [
+        "frontend/js/game/writer.js: boostAttuale() premia il testo scritto dall'utente, ma non esiste un costo o malus dedicato all'azione w-auto."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Lo svantaggio è applicato una sola volta, è compatibile con energia e salvataggio e non penalizza chi completa manualmente.",
+      "verification": "code_audit",
+      "status": "pending",
+      "evidence": [
+        "frontend/js/game/actions.js e frontend/js/game/uscita.js: esistono i gate comuni e il rimborso dell'azione abbandonata, ma manca una regola specifica da verificare."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Il costo o svantaggio risulta leggibile e bilanciato durante la revisione di una strofa generata.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/writer.js: il testo mostra qualità e moltiplicatore, ma non ancora il nuovo svantaggio richiesto."
+      ]
+    }
+  ],
+  "risks": [
+    "Scalare energia sia all'apertura dell'azione sia al completamento può applicare il costo due volte.",
+    "Un malus sulla qualità potrebbe rendere il testo automatico inutilizzabile invece di rappresentare una scelta con compromessi."
+  ],
+  "notes": [
+    "La richiesta non fissa l'entità né la forma dello svantaggio; l'implementazione deve scegliere una regola coerente con i gate esistenti prima del playtest."
+  ],
   "plan": {
     "mode": "none",
     "status": "not_applicable",
@@ -34,5 +76,8 @@
     "steps": [],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }

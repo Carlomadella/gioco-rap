@@ -11,22 +11,75 @@
     "source_status": "in_parte",
     "source_status_raw": "in parte"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "in_progress",
   "intake_state": "canonical",
   "related_task_ids": [],
-  "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "intake_note": "Task canonica sulle scene a pagina intera per le azioni delle card.",
+  "current_state": [
+    "frontend/js/game/ui.js: SCENA_PIENA e mostraScena() aprono una scena a schermo intero per mixa, pubblica, promo, live, turno, stacca e palestra.",
+    "frontend/js/game/scene-art.js e frontend/css/effects.css forniscono illustrazione, animazione, esito e chiusura.",
+    "Scrivi e freestyle hanno già foglio/piazza; cerca un beat attende ancora la scena del produttore e registra/cerca lavoro mantengono finestre decisionali appropriate."
   ],
-  "roadmap_scope": "none",
+  "systems": [
+    "frontend/js/game/ui.js",
+    "frontend/js/game/scene-art.js",
+    "frontend/css/effects.css",
+    "frontend/index.html",
+    "frontend/js/game/piazza.js",
+    "frontend/js/game/writer.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/ui.js",
+    "frontend/js/game/scene-art.js",
+    "frontend/css/effects.css",
+    "frontend/index.html",
+    "frontend/js/game/piazza.js",
+    "frontend/js/game/writer.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Le azioni previste aprono una scena vera con illustrazione, descrizione, esito e chiusura.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/ui.js: SCENA_PIENA e mostraScena() collegano le azioni all'overlay; frontend/css/effects.css definisce .scenapiena e .scwrap."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "La scena conserva gli effetti dell'azione e riporta il giocatore al gioco senza perdere il rendering.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/ui.js: avviaAzioneDiretta() applica costi, esito, log, salvataggio e renderGioco() prima di mostraScena()."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Anche cerca un beat presenta una scena del personaggio e del produttore invece di un semplice risultato testuale.",
+      "verification": "code_audit",
+      "status": "pending",
+      "evidence": [
+        "frontend/js/game/actions.js: l'azione beat chiama offriBeat() e restituisce un testo; frontend/js/game/ui.js la esclude da SCENA_PIENA."
+      ]
+    },
+    {
+      "id": "AC4",
+      "description": "Le scene delle azioni sono leggibili e chiudibili nei percorsi desktop e mobile.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/css/effects.css e frontend/js/game/ui.js: overlay e chiusura sono presenti; manca una nuova prova manuale multipiattaforma nell'audit corrente."
+      ]
+    }
+  ],
+  "risks": [
+    "Trasformare una finestra decisionale in una scena automatica può nascondere una scelta che il giocatore deve ancora fare.",
+    "Una scena globale con z-index o focus errati può bloccare il ritorno alla plancia."
+  ],
+  "notes": [],
   "plan": {
     "mode": "none",
     "status": "not_applicable",
@@ -34,5 +87,8 @@
     "steps": [],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }

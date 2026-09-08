@@ -6,13 +6,13 @@
 
 - **Schede importate:** 114
 - **Task effettive (duplicati esclusi):** 114
-- **Auditate contro il repo:** 8/114
+- **Auditate contro il repo:** 16/114
 - **Duplicati intercettati:** 0
 - **Estensioni/sovrapposizioni:** 2
 - **Richieste già implementate senza task equivalente:** 0
-- **Progetti con piano V1→Vn:** 8 (forniti dall'utente: 0)
+- **Progetti con piano V1→Vn:** 11 (forniti dall'utente: 0)
 - **Piani con gap/conflitti da rivedere:** 0
-- **Auditate ma non complete:** 8
+- **Auditate ma non complete:** 15
 - Stato storico importato: da_fare 18 · in_parte 13 · fatto 77 · risposto 5 · nuova 1
 
 ## Tutte le task e richieste
@@ -27,14 +27,14 @@
 | `ADF-LEG-C295A6327B74` | Il telefono è un iPhone vero, con LaFamegram | storica | — | implementazioni/02-interfaccia-e-telefono.md | 🔶 in parte | 👁 da validare | 2/3 |
 | `ADF-LEG-9D8FB87EF413` | La carriera cresce con la mappa: Provincia → Milano → Los Angeles | storica | — | implementazioni/01-mappa-e-citta.md | 🔶 in parte | 🔨 in sviluppo | 1/3 |
 | `ADF-LEG-3FF6C1268680` | La soundboard è ancora poca | 🟡 estensione | ADF-LEG-D6B7FB24808B | implementazioni/04-musica-e-suoni.md | 🔶 in parte | 👁 da validare | 1/2 |
-| `ADF-LEG-B79B031D90FC` | LaFamegram con post veri, caricati dai giocatori | storica | — | implementazioni/02-interfaccia-e-telefono.md | 🔶 in parte | — non ancora auditata | — |
-| `ADF-LEG-D984E65BB868` | Meno cartelli chiusi sulla mappa, più roba che si apre | storica | — | implementazioni/01-mappa-e-citta.md | 🔶 in parte | — non ancora auditata | — |
-| `ADF-LEG-34C682253C87` | Meno colori nella schermata di gioco | storica | — | implementazioni/09-grafica-e-asset.md | 🔶 in parte | — non ancora auditata | — |
-| `ADF-LEG-33D870AE2218` | Responsività di tutto il gioco | storica | — | implementazioni/02-interfaccia-e-telefono.md | 🔶 in parte | — non ancora auditata | — |
-| `ADF-LEG-8314D9E40279` | Scenari veri, uguali nella forma e diversi nelle circostanze | storica | — | implementazioni/06-mondo-e-personaggi.md | 🔶 in parte | — non ancora auditata | — |
-| `ADF-LEG-EFB36E8B32DF` | Via i popup dalle card: scene vere | storica | — | implementazioni/02-interfaccia-e-telefono.md | 🔶 in parte | — non ancora auditata | — |
-| `ADF-LEG-8CD78027382F` | «Attività criminali non si può più giocare, che è successo?» | storica | — | implementazioni/06-mondo-e-personaggi.md | 📝 risposto | — non ancora auditata | — |
-| `ADF-LEG-D15F3599E2BE` | «Completa la canzone» deve costare qualcosa | storica | — | implementazioni/04-musica-e-suoni.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-B79B031D90FC` | LaFamegram con post veri, caricati dai giocatori | storica | — | implementazioni/02-interfaccia-e-telefono.md | 🔶 in parte | 🔨 in sviluppo | 2/3 |
+| `ADF-LEG-D984E65BB868` | Meno cartelli chiusi sulla mappa, più roba che si apre | storica | — | implementazioni/01-mappa-e-citta.md | 🔶 in parte | 👁 da validare | 2/3 |
+| `ADF-LEG-34C682253C87` | Meno colori nella schermata di gioco | storica | — | implementazioni/09-grafica-e-asset.md | 🔶 in parte | 👁 da validare | 2/3 |
+| `ADF-LEG-33D870AE2218` | Responsività di tutto il gioco | storica | — | implementazioni/02-interfaccia-e-telefono.md | 🔶 in parte | 👁 da validare | 2/3 |
+| `ADF-LEG-8314D9E40279` | Scenari veri, uguali nella forma e diversi nelle circostanze | storica | — | implementazioni/06-mondo-e-personaggi.md | 🔶 in parte | 🔨 in sviluppo | 2/4 |
+| `ADF-LEG-EFB36E8B32DF` | Via i popup dalle card: scene vere | storica | — | implementazioni/02-interfaccia-e-telefono.md | 🔶 in parte | 🔨 in sviluppo | 2/4 |
+| `ADF-LEG-8CD78027382F` | «Attività criminali non si può più giocare, che è successo?» | storica | — | implementazioni/06-mondo-e-personaggi.md | 📝 risposto | ✅ verificata | 3/3 |
+| `ADF-LEG-D15F3599E2BE` | «Completa la canzone» deve costare qualcosa | storica | — | implementazioni/04-musica-e-suoni.md | ⬜ da fare | 🔨 in sviluppo | 0/3 |
 | `ADF-LEG-5C8E4254268B` | Dal profilo si torna al gioco, non solo al menù | storica | — | implementazioni/02-interfaccia-e-telefono.md | ⬜ da fare | — non ancora auditata | — |
 | `ADF-LEG-F2279C3BBB14` | Gli asset arrivati da fuori | storica | — | implementazioni/09-grafica-e-asset.md | ⬜ da fare | — non ancora auditata | — |
 | `ADF-LEG-1E9D26813741` | Gli opps, i rapper rivali | storica | — | implementazioni/06-mondo-e-personaggi.md | ⬜ da fare | — non ancora auditata | — |
@@ -149,6 +149,13 @@ Piano: **auto** · stato: **ready**
 - **V2 — Integrazione account e store** · needs_validation · dipende da V1
 - **V3 — Prova mobile e negozio** · needs_validation · dipende da V1, V2
 
+### ADF-LEG-33D870AE2218 — Responsività di tutto il gioco
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Cascata responsive** · complete
+- **V2 — Percorsi su schermi reali** · needs_validation · dipende da V1
+
 ### ADF-LEG-3FF6C1268680 — La soundboard è ancora poca
 
 Piano: **auto** · stato: **ready**
@@ -164,6 +171,14 @@ Piano: **auto** · stato: **ready**
 - **V2 — Azioni integrate** · complete · dipende da V1
 - **V3 — Scene e percorso** · needs_validation · dipende da V2
 
+### ADF-LEG-8314D9E40279 — Scenari veri, uguali nella forma e diversi nelle circostanze
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Forma e circostanze attuali** · complete
+- **V2 — Memoria delle relazioni** · planned · dipende da V1
+- **V3 — Percorso e varietà** · needs_validation · dipende da V2
+
 ### ADF-LEG-9D8FB87EF413 — La carriera cresce con la mappa: Provincia → Milano → Los Angeles
 
 Piano: **auto** · stato: **ready**
@@ -178,6 +193,13 @@ Piano: **auto** · stato: **ready**
 
 - **V1 — Catalogo e conseguenze** · complete
 - **V2 — Scene mancanti e playtest** · needs_validation · dipende da V1
+
+### ADF-LEG-B79B031D90FC — LaFamegram con post veri, caricati dai giocatori
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Feed e post locali** · complete
+- **V2 — Pubblicazione condivisa** · planned · dipende da V1
 
 ### ADF-LEG-C295A6327B74 — Il telefono è un iPhone vero, con LaFamegram
 

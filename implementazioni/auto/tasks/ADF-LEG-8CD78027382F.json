@@ -11,22 +11,64 @@
     "source_status": "risposto",
     "source_status_raw": "risposto"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "complete",
   "intake_state": "canonical",
   "related_task_ids": [],
-  "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "intake_note": "Task canonica di regressione sulle attività criminali, verificata contro il flusso reale già presente.",
+  "current_state": [
+    "frontend/js/game/hub.js: il luogo Attività criminali apre apriStrada() o apriCarcere() se il giocatore è arrestato.",
+    "frontend/js/game/strada-crimine-ui.js: open(), renderCrimes() e il listener dei colpi espongono le attività e collegano le decisioni al core.",
+    "frontend/js/game/strada-crimine.js: tentaColpo(), STRADA_SCENA e gli stati arresto, denaro, energia e attività gestiscono il percorso giocabile."
   ],
-  "roadmap_scope": "none",
+  "systems": [
+    "frontend/js/game/hub.js",
+    "frontend/js/game/strada-crimine.js",
+    "frontend/js/game/strada-crimine-ui.js",
+    "frontend/js/game/crime-backgrounds.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/hub.js",
+    "frontend/js/game/strada-crimine.js",
+    "frontend/js/game/strada-crimine-ui.js",
+    "frontend/js/game/crime-backgrounds.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Dalla mappa si può aprire Attività criminali e vedere le attività disponibili o il carcere quando applicabile.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/hub.js: HUB_LUOGHI contiene id crimin e il vai() sceglie apriCarcere() o apriStrada()."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Un colpo giocabile applica requisiti, costi, esito e ritorno alla schermata senza lasciare il gioco in uno stato incoerente.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/strada-crimine.js: tentaColpo() controlla energia, uomini e ferro, aggiorna denaro/stato e costruisce STRADA_SCENA per gli esiti."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "La schermata criminale mostra sfondi e decisioni coerenti con il tier e lo stato del giro.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/strada-crimine-ui.js: chooseBackground() pesa tier e tag da CRIME_BACKGROUNDS_LOCAL; renderScene() disegna le opzioni."
+      ]
+    }
+  ],
+  "risks": [
+    "Modifiche ai gate di arresto o ai costi possono rendere di nuovo irraggiungibile il percorso criminale.",
+    "Il flusso dipende dall'allineamento fra UI criminale e stato G.strada."
+  ],
+  "notes": [
+    "La fonte storica è risposto; l'audit conferma il comportamento nel codice senza aprire una nuova attività."
+  ],
   "plan": {
     "mode": "none",
     "status": "not_applicable",
@@ -34,5 +76,8 @@
     "steps": [],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }
