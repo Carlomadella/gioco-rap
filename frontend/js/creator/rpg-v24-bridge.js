@@ -98,7 +98,7 @@
 
     try{ localStorage.setItem(CHIAVE_ARTISTA(),JSON.stringify(A)); }catch(e){}
     window.ARTIST=A;
-    if(typeof renderArtista==="function") renderArtista();
+    if(typeof window.ADF_REFRESH_ARTIST_CHROME==="function") window.ADF_REFRESH_ARTIST_CHROME();
     if(typeof renderMenu==="function") renderMenu();
     return true;
   }

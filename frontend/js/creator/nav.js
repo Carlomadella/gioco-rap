@@ -13,7 +13,15 @@ function miniPortrait(){
 /* La landing sta fuori di qui: chi chiede "menu" sta chiedendo di uscire. */
 function vaiAllaLanding(){ vaiA("landing"); }
 function goto(screen){
-  if(screen === "menu"){ vaiAllaLanding(); return; }
+  if(screen === "profile"){
+    if(window.ADF_RPG_V24 && typeof window.ADF_RPG_V24.open === "function"){
+      window.ADF_RPG_V24.open();
+      return;
+    }
+    vaiAllaLanding();
+    return;
+  }
+if(screen === "menu"){ vaiAllaLanding(); return; }
   const target = $("s-" + screen);
   document.querySelectorAll(".screen").forEach(x => x.classList.toggle("on", x.id === "s-" + screen));
   /* Da smistare, punto 1: `.screen.on` ha la sua animazione (shell.css), ma
@@ -155,22 +163,19 @@ window.ARTIST_BODY = function(){
     '</g>';
 };
 window.GO = goto;
-document.addEventListener("click", ev => {
-  const v = ev.target.closest("[data-vista]");
-  if(!v) return;
-  vistaCorpo = v.dataset.vista === "intero";
-  renderArtista();
-});
 $("nav-avatar").onclick = () => goto("profile");
 $("nav-back").onclick = () => goto("menu");
-$("to-menu").onclick = () => goto("menu");
 $("brand").onclick = () => goto("menu");
 
 /* Il creatore si accende com'era: quello che stava qui sotto — la carriera
    in corso, le sei scene, il menu della landing — è andato in js/landing.js,
    che è l'unico posto dove quella roba esiste ancora. Chi decide su quale
    schermata aprirsi è js/gioco-ingresso.js, in fondo alla pagina. */
-applyMode();
-renderArtista();
-renderOpzioni();
-renderFondali();
+function refreshArtistChrome(){
+  const av = $("nav-avatar");
+  if(!av) return;
+  av.innerHTML = miniPortrait();
+  av.title = A.name.trim() ? A.name.trim() + " — apri il tuo artista" : "Il tuo artista";
+}
+window.ADF_REFRESH_ARTIST_CHROME = refreshArtistChrome;
+refreshArtistChrome();

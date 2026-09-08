@@ -98,7 +98,18 @@ $("brand").onclick = () => renderMenu();          // già qui: si aggiorna e bas
 /* Il profilo (il creatore dell'artista) sta nella pagina del gioco: ci si
    arriva chiedendolo, non cambiando una classe. Chi decide se si può è
    avvio.js, che sa quale slot è pieno. */
-function vaiAlProfilo(){ vaiAlGioco("vai=profilo"); }
+function vaiAlProfilo(){
+  if(window.ADF_RPG_V24 && typeof window.ADF_RPG_V24.open === "function"){
+    /* La vecchia schermata profilo non esiste più: il creator si apre
+       direttamente sopra la landing. A conferma completata si entra nel gioco,
+       come succedeva passando da ?vai=profilo. */
+    window.__ADF_DOPO_CREAZIONE = () => vaiAlGioco();
+    window.ADF_RPG_V24.open();
+    return;
+  }
+  /* Fallback solo se il bridge moderno non si è caricato. */
+  vaiAlGioco("vai=profilo");
+}
 window.vaiAlProfilo = vaiAlProfilo;
 
 /* Ricominciare cancella la carriera: si chiede conferma sul bottone stesso,

@@ -13,6 +13,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const cp = require("child_process");
 
 const RADICE = path.resolve(__dirname, "..");
 let passati = 0, falliti = 0;
@@ -59,7 +60,17 @@ controlla("ogni file citato dalle pagine esiste davvero", mancanti.length === 0,
 
 const cssSulDisco = tuttiIFile(path.join(RADICE, "css"), ".css");
 const jsSulDisco = tuttiIFile(path.join(RADICE, "js"), ".js");
-const dimenticati = [...cssSulDisco, ...jsSulDisco].filter(f => css.indexOf(f) < 0 && js.indexOf(f) < 0);
+/* ADF_PROVA_ESM_STANDALONE_V1
+   js/avatar/makehuman/ è una libreria ES-module, non un gruppo di <script>
+   classici direttamente incluso nelle tre pagine principali. */
+const MODULI_JS_STANDALONE = ["js/avatar/makehuman/"];
+const moduloJsStandalone = f => MODULI_JS_STANDALONE.some(radice => f.startsWith(radice));
+
+const dimenticati = [...cssSulDisco, ...jsSulDisco].filter(f =>
+  css.indexOf(f) < 0 &&
+  js.indexOf(f) < 0 &&
+  !moduloJsStandalone(f)
+);
 controlla("nessun file sul disco è rimasto fuori dalle pagine", dimenticati.length === 0, dimenticati);
 
 const doppi = pagine.flatMap(p => [...p.css, ...p.js]
@@ -81,11 +92,63 @@ controlla("la landing non si porta dietro il gioco", landingCol.length === 0, la
 
 console.log("\nil codice");
 const rotti = [];
+
 for(const f of jsSulDisco){
   const testo = fs.readFileSync(path.join(RADICE, f), "utf8");
-  try{ new Function(testo); }catch(e){ rotti.push(f + " — " + e.message); }
+
+  if(moduloJsStandalone(f)){
+    /* Parse come ES module senza eseguirlo. */
+    const check = cp.spawnSync(
+      process.execPath,
+      ["--input-type=module", "--check"],
+      { input:testo, encoding:"utf8" }
+    );
+
+    if(check.status !== 0){
+      const righe = String(check.stderr || check.stdout || "errore ES module")
+        .split(/\r?\n/)
+        .filter(Boolean);
+      rotti.push(f + " — " + (righe[righe.length - 1] || "errore ES module"));
+    }
+    continue;
+  }
+
+  try{ new Function(testo); }
+  catch(e){ rotti.push(f + " — " + e.message); }
 }
+
 controlla("ogni file di codice compila", rotti.length === 0, rotti);
+
+/* I moduli standalone non devono essere citati tutti da gioco.html, ma i loro
+   import relativi devono esistere davvero. */
+const importModuliMancanti = [];
+
+for(const f of jsSulDisco.filter(moduloJsStandalone)){
+  const testo = fs.readFileSync(path.join(RADICE, f), "utf8");
+  const specs = new Set();
+
+  for(const m of testo.matchAll(/\b(?:import|export)\s+(?:[^"'\x60;]*?\s+from\s+)?["'](\.[^"']+)["']/g))
+    specs.add(m[1]);
+
+  for(const m of testo.matchAll(/\bimport\(\s*["'](\.[^"']+)["']\s*\)/g))
+    specs.add(m[1]);
+
+  for(const spec of specs){
+    const base = path.resolve(RADICE, path.dirname(f), spec);
+    const candidati = path.extname(base)
+      ? [base]
+      : [base + ".js", path.join(base, "index.js")];
+
+    if(!candidati.some(p => fs.existsSync(p)))
+      importModuliMancanti.push(f + " → " + spec);
+  }
+}
+
+controlla(
+  "gli import relativi dei moduli MakeHuman esistono",
+  importModuliMancanti.length === 0,
+  importModuliMancanti
+);
 
 /* === START ZERO REGRESSION V1 START === */
 console.log("\nla nuova carriera parte da zero");
@@ -189,8 +252,7 @@ console.log("\nil creatore: ogni opzione si deve vedere");
   };
   scatola.window = scatola;
   vm.createContext(scatola);
-  const sorgenti = ["js/creator/data.js", "js/creator/avatar-presets.js",
-                    "js/creator/state.js", "js/creator/portrait.js"];
+  const sorgenti = ["js/creator/data.js", "js/creator/state.js", "js/creator/portrait.js"];
   let acceso = true;
   try{
     for(const f of sorgenti)
@@ -1042,6 +1104,32 @@ if(!fs.existsSync(path.join(dist, "pagine", "gioco.html"))){
   controlla("nel build non è rimasto nessun ?v= a mano", !/\?v=\d/.test(pagina));
   controlla("le immagini sono state copiate", fs.existsSync(path.join(dist, "media", "photo")));
 }
+
+
+/* === ADF_LEGACY_PROFILE_REMOVAL_V2 === */
+console.log("\nprofilo artista legacy rimosso");
+{
+  const html = fs.readFileSync(path.join(RADICE, "pagine/gioco.html"), "utf8");
+  const vecchi = [
+    "js/creator/avatar-presets.js",
+    "js/creator/options.js",
+    "js/creator/render.js",
+    "js/creator/events.js",
+    "css/creator.css"
+  ];
+
+  controlla(
+    "la pagina degli otto avatar non esiste più",
+    !html.includes('id="s-profile"') && !html.includes("Otto avatar da rapper")
+  );
+
+  controlla(
+    "gli asset UI esclusivi del vecchio editor sono eliminati",
+    vecchi.every(f => !fs.existsSync(path.join(RADICE, f))),
+    vecchi.filter(f => fs.existsSync(path.join(RADICE, f)))
+  );
+}
+/* === /ADF_LEGACY_PROFILE_REMOVAL_V2 === */
 
 console.log("\n" + passati + " a posto, " + falliti + " no.\n");
 process.exit(falliti ? 1 : 0);
