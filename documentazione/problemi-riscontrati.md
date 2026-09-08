@@ -131,7 +131,7 @@ gioco senza che nessuno l'avesse chiesto: esattamente la cosa che quella prova �
 lì per impedire.
 
 Cosa si è fatto. Il dataset non parte col pacchetto — lo salta `build.js`
-(`FUORI_DAL_PACCHETTO`), e l'audit smette di guardarci dentro *perché* il build lo
+(`FUORI_DAL_PACCHETTO`), e l'audit smette di guardarci dentro _perché_ il build lo
 salta. Le due cose sono legate da una prova apposta («il dataset degli avatar
 resta fuori dal pacchetto per gli store»): se un giorno qualcuno toglie il salto
 dal build, l'audit se ne accorge invece di lasciar tornare 2,8 GB nel pacchetto in
@@ -174,8 +174,7 @@ Giro di fine task sul lavoro degli **elementi HTML delle otto sezioni dello Stud
 `main` col merge `1196778`).
 
 Prima le cose che ho fatto girare e che sono **a posto**: `npm run prova` (79 su 79),
-`node strumenti/audit-regressioni.js` (280 su 280) e `npm run verifica:build` (33 su
-33) passano tutti e tre. Poi ho provato a mano, fuori dal browser, le cose nuove:
+`node strumenti/audit-regressioni.js` (280 su 280) e `npm run verifica:build` (33 su 33) passano tutti e tre. Poi ho provato a mano, fuori dal browser, le cose nuove:
 i tre cursori del banco lasciati al centro valgono **esattamente zero** (il mix resta
 quello di prima, 6 punti su una partita nuova) e in tutte le 125 posizioni non danno
 mai più di tre punti in su o in giù; un pezzo messo in cassaforte **non esce** né da
@@ -189,6 +188,7 @@ per uno, e anche i quattro ascoltatori che stanno su tutto il documento.
 Quello che non va è qui sotto.
 
 ### Il gioco si spegne appena arrivi a 1500 fan senza contratto
+
 - **dove** — `frontend/js/game/ui.js:482`
 - **cosa succede** — la riga che stima quanto rende il primo anno di contratto usa un
   numero, `my`, che in quel punto **non esiste** (esiste solo dentro a un'altra
@@ -205,6 +205,7 @@ Quello che non va è qui sotto.
 c'è `streamSettimana()`, che il conto se lo fa da sé.
 
 ### La take che paghi in cabina può finire sul pezzo sbagliato
+
 - **dove** — `frontend/js/game/studio-elementi.js:364` (`studioTakePresa`), e la
   targhetta che dovrebbe legarla al pezzo giusto sta a riga 279 (`studioTakeChiave`).
 - **cosa succede** — ogni take si porta dietro una targhetta che dice a quale strofa e
@@ -228,6 +229,7 @@ fatta con i **numeri di serie** della strofa e del beat, non col tema e il voto,
 due strofe gemelle non sono più la stessa cosa.
 
 ### I cursori del banco si spostano di una tacca sola per volta
+
 - **dove** — `frontend/js/game/studio-elementi.js:456` (`studioBancoMuovi`) con
   `frontend/js/game/studio.js:1152`
 - **cosa succede** — appena il cursore si muove di una tacca, il gioco ridisegna tutto
@@ -250,6 +252,7 @@ si aggiornava mai — adesso ripiega sul migliore come fa la sezione
 (`studioProvino()`).
 
 ### Dopo che metti un pezzo nel cassetto, il tasto grande resta «Tienilo da parte»
+
 - **dove** — `frontend/js/game/studio-elementi.js:564` (`studioMandaFuori`) e
   `frontend/js/game/studio.js:1013`
 - **cosa succede** — la scelta del «quando» non torna su «stanotte» dopo che l'hai
@@ -267,6 +270,7 @@ si aggiornava mai — adesso ripiega sul migliore come fa la sezione
 d'oro torna a dire «Mandalo fuori».
 
 ### Un pezzo di una partita vecchissima, messo in cassaforte, non si ritira più
+
 - **dove** — `frontend/js/game/studio-elementi.js:594` (`studioRiprendi`)
 - **cosa succede** — la cassaforte riconosce i pezzi dal loro numero di serie. I pezzi
   registrati da quando il gioco si è diviso in `frontend/` e `backend/` ce l'hanno
@@ -284,6 +288,7 @@ come si fa da sempre con i beat e adesso anche con le strofe. Vale per «ritira�
 «cambia copertina».
 
 ### Il tasto tondo per ascoltare è più piccolo di un dito
+
 - **dove** — `frontend/css/studio-elementi.css:42` (e `:169` per «cambia copertina»)
 - **cosa succede** — il tondo con il triangolo è 34 punti, e «cambia copertina» pure:
   la regola del progetto, quella scritta in `css/tocco.css`, dice **44** perché sotto
@@ -301,6 +306,7 @@ quello che si tocca è 44: un `::before` che sborda. «Cambia copertina» è pas
 `min-height:44px`.
 
 ### L'uscita di venerdì non costa niente, quella a mano sì
+
 - **dove** — `frontend/js/game/studio-elementi.js:608` (`studioUscitePronte`) contro
   `frontend/js/game/actions.js:356` (la mossa «Pubblica il pezzo»)
 - **cosa succede** — se mandi fuori un pezzo a mano spendi una mossa della giornata e
@@ -320,6 +326,7 @@ scrivere in modo onesto. Quindi un piccolo vantaggio venerdì ce l'ha ancora —
 adesso è il vantaggio di aspettare, non uno sconto.
 
 ### La stima degli stream promette più di quello che arriva
+
 - **dove** — `frontend/js/game/studio-elementi.js:538` (`studioStreamStima`) con
   `frontend/js/game/sim.js:65`
 - **cosa succede** — il «~ 1.200 – 2.900 stream» della sezione Fuori è la formula vera
@@ -336,6 +343,7 @@ adesso è il vantaggio di aspettare, non uno sconto.
 anche quello che il resto del catalogo ha già occupato.
 
 ### La scheda del beat che scegli si perde se ricarichi
+
 - **dove** — `frontend/js/game/studio-elementi.js:207` (`studioBeatSegna`)
 - **cosa succede** — tutte le altre scelte dello Studio (la strofa, il beat su cui
   incidi, il tema, il quando, i cursori) vengono salvate appena le fai. La scheda del
@@ -348,6 +356,7 @@ anche quello che il resto del catalogo ha già occupato.
 Studio.
 
 ### Chi compra un beat dallo Studio o dalla Sala non lo racconta al motore degli eventi
+
 - **dove** — `frontend/js/game/studio-elementi.js:141` (`prendiBeatDalBanco`),
   `frontend/js/game/eventi-v2.js:2567`, `frontend/js/game/ui.js:380`
 - **cosa succede** — il motore degli eventi si accorge che hai comprato un beat solo
@@ -368,6 +377,7 @@ tocca il motore degli eventi, non lo Studio. Segnato qui perché adesso i posti 
 sono due su tre invece di uno su due.
 
 ### Sul telefono i colori del «passaggio del mouse» restano accesi dopo il tocco
+
 - **dove** — `frontend/css/studio-elementi.css:46, 65, 99, 173` (e in tutto il resto
   del gioco: **nessun** foglio di stile fa la distinzione)
 - **cosa succede** — le schede dei beat, le righe delle take, il tondo di ascolto e
@@ -387,6 +397,7 @@ Va fatto in un giro solo su tutti i CSS: farlo qui e basta vorrebbe dire quattro
 righe diverse dalle altre trecento.
 
 ### Nota, non è un errore: in cabina il tasto d'oro è quello che spende
+
 - **dove** — `frontend/js/game/studio.js:726`
 - Nelle altre schermate dello Studio il tasto d'oro — quello grosso, uno per pagina —
   è la mossa che fa succedere la cosa. In cabina l'oro ce l'ha **«Un'altra take · 12
@@ -419,6 +430,7 @@ che aveva nascosto e sparisce la pastiglia; quando si chiude, torna da sola
 sull'hub. Sotto ci sono cinque cose che restano.
 
 ### La passata degli hover ha saltato quello che è scritto dentro al JavaScript
+
 - **dove** — `frontend/js/game/tempo-controlli.js:303, 347, 348`,
   `frontend/js/game/eventi-v2.js:2612, 2805`,
   `frontend/js/game/strada-crimine-ui.js:195`
@@ -442,7 +454,9 @@ sfugge uno lì dentro la prova diventa rossa. Provato togliendo apposta una
 gabbia: la prova fallisce.
 
 ### Nella Strada c'è una riga nuova che non tocca niente: quei pannelli si
+
 ### chiamano in un altro modo
+
 - **dove** — `frontend/css/strada-crimine-v2.css:2448`
 - **cosa succede** — la riga dice «i pannelli non si tagliano più il contenuto»
   e li chiama `panel`. Nella pagina vera (`frontend/pagine/gioco.html:497, 520, 530`)
@@ -459,7 +473,9 @@ in `frontend/css/stretto.css`. Le altre tre occorrenze sbagliate erano già lì
 da prima e non sono state toccate: non è roba di questo giro.
 
 ### Sul telefono la pastiglia del tempo si tiene 222 punti anche quando si è
+
 ### rimpicciolita
+
 - **dove** — `frontend/js/game/tempo-controlli.js:290` contro `:351`
 - **cosa succede** — c'è una riga che dice «sotto i 620 punti la pastiglia si
   stringe a 176», e ce n'è un'altra, scritta più precisa, che per la Strada (e
@@ -480,7 +496,9 @@ da prima e non sono state toccate: non è roba di questo giro.
 vengono dopo, quindi sul telefono vince la misura stretta.
 
 ### Nella Strada stretta il menu in alto e il titolo sotto non partono
+
 ### dallo stesso punto
+
 - **dove** — `frontend/css/strada-crimine-v2.css:2456` e `:2472`, contro
   `frontend/css/menu-sistema.css:447`
 - **cosa succede** — i blocchi nuovi portano il margine sinistro della fascia
@@ -497,7 +515,9 @@ vengono dopo, quindi sul telefono vince la misura stretta.
 il menu della Strada rientra a 12 come la fascia, e scende a 52 di altezza.
 
 ### Nota, non è un errore: adesso sul telefono toccare un tasto non fa più
+
 ### vedere niente
+
 - **dove** — tutto `frontend/css/`, per esempio `.stbcard` e `.sttakeriga` in
   `studio-elementi.css:71, 105`, `#strada .crime` in `strada-crimine-v2.css:119`,
   `.ptab` e `.pev` in `hub.css:545, 909`
@@ -514,7 +534,9 @@ il menu della Strada rientra a 12 come la fascia, e scende a 52 di altezza.
   «mentre premo» in un giro solo, come è stato fatto per la gabbia.
 
 ### Nota, non è un errore: nello Studio i due blocchi per gli schermi stretti
+
 ### sono scritti in ordine inverso
+
 - **dove** — `frontend/css/studio.css:354` e `:364`
 - Il blocco «sotto i 480» sta **prima** del blocco «sotto i 520». Su un telefono
   da 360 valgono tutti e due, e a parità di regola vince quello scritto dopo —
@@ -526,3 +548,80 @@ il menu della Strada rientra a 12 come la fascia, e scende a 52 di altezza.
 
 **RISOLTO (08/09/2026)** — scambiati. Adesso stanno in `frontend/css/stretto.css`,
 nella sezione STUDIO, in ordine dal più largo al più stretto: 900, 620, 520, 480.
+
+## Giro del 08/09/2026
+
+Giro di fine task sul branch `task/beat-e-tasto-oro`, commit `7dc2d70`: il tasto d'oro
+in cabina e il motore degli eventi che adesso sente i beat comprati dallo Studio.
+
+**Quello che ho controllato e che è a posto.** I controlli automatici: l'audit delle
+regressioni dà 296 a posto e 0 falliti, il build ne dà 33 a posto. Sullo scambio dei due
+tasti in cabina va tutto bene: lo «spento» quando hai poca energia è rimasto attaccato a
+«Un'altra take» e non a «Tieni questa e chiudi», quindi con poca energia chiudi la
+registrazione lo stesso; `stSecondo()` accetta lo spento esattamente come `stPrimo()`
+(`frontend/js/game/studio.js:484` e `:488`); il foglio di stile spegne tutti e due i tipi
+di tasto (`frontend/css/studio.css:236`); le icone sono rimaste sul tasto giusto, la
+spunta con «Tieni questa e chiudi» e il microfono con «Un'altra take». Sul motore degli
+eventi: i due file che servono si caricano prima (`beatplay.js` e `studio-elementi.js`
+stanno sopra a `eventi-v2.js` in `frontend/pagine/gioco.html`) e comunque il codice
+controlla prima di chiamarli. La cosa che più mi preoccupava — che il conteggio «i beat
+sono aumentati?» venisse fatto quando l'acquisto era già avvenuto, e quindi non partisse
+mai nessun evento — **non** succede: quell'ascoltatore è agganciato in modo da passare
+per primo (`frontend/js/game/eventi-v2.js:2626`, la riga si chiude con `},true)`), prima
+di quello dello Studio. Quindi il conto di partenza è quello giusto e anche il nome del
+beat è quello giusto. Il filtro sui beat già in cartella tiene: i beat li fa `creaBeat()`
+con un numero a caso e con un nome che non ripete quelli che hai già
+(`frontend/js/game/beats.js:99` e `:109`), quindi un beat della cartella non può essere
+scambiato per uno ancora in vendita. `beatSeed()` chiamato dal motore non combina guai:
+al massimo scrive un numero che sarebbe stato calcolato uguale un attimo dopo, e non fa
+salvare niente da solo. Un click solo non fa partire due eventi: i tasti in questione non
+sono uno dentro l'altro. Ho guardato tutti i punti in cui un beat finisce in cartella
+(sei) e gli altri quattro non passano dal banco dei beat, quindi il loro silenzio è
+coerente con la scelta già scritta nel commit. Anche il test aggiornato sui nomi rubati
+tiene: gli altri tredici nomi dello Studio restano protetti come prima, e in più adesso
+la prova cade anche se qualcuno smette di ascoltare i due nomi voluti.
+
+### Se compri un'attività nella Strada, il gioco crede che tu abbia comprato un beat
+
+- **dove** — `frontend/js/game/eventi-v2.js:2566`, contro
+  `frontend/js/game/strada-crimine-ui.js:412`
+- **cosa succede** — il motore degli eventi ascolta tutti i tasti che si chiamano
+  `data-buy` e ogni volta racconta «hai comprato un beat». Ma con quel nome lì c'è anche
+  il tasto «Rileva» delle tre attività della Strada (lavanderia, autolavaggio,
+  minimarket). Così quando ti compri una lavanderia il motore registra un acquisto di
+  beat, per giunta senza nome del beat, e può farti uscire l'evento del mercato dei beat
+  mentre sei nel bel mezzo della Strada. È esattamente lo stesso guaio che il commento
+  nello Studio racconta di aver evitato chiamando il suo tasto `data-stcompra` invece che
+  `data-compra` — solo che qui nessuno se n'era accorto. Non è di questo giro: c'era già
+  prima, il commit non l'ha creato. Vale la pena dirlo adesso perché la prova che
+  controlla i nomi rubati (`frontend/strumenti/audit-regressioni.js:577`) guarda solo i
+  nomi inventati dallo Studio, e questo le passa sotto il naso.
+- **come si vede** — vai nella Strada, compra una delle tre attività, e guarda se ti
+  spunta un evento sul mercato dei beat nei momenti dopo.
+- **quanto pesa** — si vede ma si gira intorno.
+
+### Due prove automatiche sono rosse, ma non per colpa di questo lavoro
+
+- **dove** — `frontend/js/avatar/makehuman/` (per esempio `adapter.js` e `contract.js`)
+- **cosa succede** — `npm run prova` chiude con «77 a posto, 2 no». Le due che non
+  passano sono «nessun file sul disco è rimasto fuori dalle pagine» e «ogni file di
+  codice compila», e le righe vere che stampa sono
+  `js/avatar/makehuman/adapter.js — Cannot use import statement outside a module` e
+  `js/avatar/makehuman/contract.js — Unexpected token 'export'`. Sono file scritti in un
+  modo che il controllo non sa leggere e che nessuna pagina richiama. Ho controllato che
+  su `main` sia già così: non le ha rotte questo lavoro. La segnalo lo stesso perché
+  finché sono rosse, `npm run verifica` non arriva mai in fondo, e quindi la prima cosa
+  che facciamo prima di chiudere una task si ferma sempre lì.
+- **come si vede** — da `frontend/`, `npm run prova`.
+- **quanto pesa** — da sistemare con calma.
+
+### Nota, non è un errore: il beat «Esclusiva» comprato dall'evento resta muto
+
+- **dove** — `frontend/js/game/events.js:10`
+- Il commit spiega bene perché «Fattelo fare» non racconta niente al motore: il beat non
+  viene dal banco, se lo fa il gioco. Girando fra tutti i punti in cui un beat finisce in
+  cartella ne ho trovato un altro che è un po' diverso dagli altri: nel vecchio evento
+  «Un beat che spacca» paghi **250 €** per un beat e resta muto anche lui. Non viene dal
+  banco, quindi con la regola scritta nel commit è giusto così — ma è l'unico caso in cui
+  tiri fuori dei soldi per un beat e il motore non lo sa. È una scelta da confermare, non
+  un guasto: oggi non rompe niente.
