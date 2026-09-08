@@ -25,9 +25,6 @@ function vaiAllAccesso(){ vaiA("accesso"); }
 window.vaiAlGioco = vaiAlGioco;
 
 /* ==================== LA CARRIERA, LETTA DA FUORI ==================== */
-function miniPortrait(){
-  return portrait().replace('class="portrait"', 'class="mini"');
-}
 /* Lo stato della partita: qui c'è sempre, perché game/state.js viene prima di
    questo file. Resta la prudenza di sempre — se un domani non ci fosse, la
    landing deve mostrare «nessuna carriera», non rompersi. */
@@ -72,7 +69,7 @@ function renderMenu(){
      Anche senza nome A ha un aspetto completo, quindi c'è sempre qualcosa da mostrare. */
   const av = $("nav-avatar");
   if(av){
-    av.innerHTML = miniPortrait();
+    av.innerHTML = "";
     av.title = nm ? nm + " — apri il tuo artista" : "Il tuo artista";
   }
 
@@ -99,15 +96,24 @@ $("brand").onclick = () => renderMenu();          // già qui: si aggiorna e bas
    arriva chiedendolo, non cambiando una classe. Chi decide se si può è
    avvio.js, che sa quale slot è pieno. */
 function vaiAlProfilo(){
-  if(window.ADF_RPG_V24 && typeof window.ADF_RPG_V24.open === "function"){
-    /* La vecchia schermata profilo non esiste più: il creator si apre
-       direttamente sopra la landing. A conferma completata si entra nel gioco,
-       come succedeva passando da ?vai=profilo. */
-    window.__ADF_DOPO_CREAZIONE = () => vaiAlGioco();
-    window.ADF_RPG_V24.open();
+  /* Regola landing:
+     - senza CONTINUA non esiste un artista modificabile;
+     - con CONTINUA si modifica SEMPRE lo stesso slot scelto da Continua. */
+  const slot = typeof window.ADF_PREPARA_ARTISTA_CONTINUA === "function"
+    ? window.ADF_PREPARA_ARTISTA_CONTINUA()
+    : null;
+
+  if(!slot){
+    landDillo("Nessuna partita salvata");
     return;
   }
-  /* Fallback solo se il bridge moderno non si è caricato. */
+
+  if(window.ADF_RPG_V24 && typeof window.ADF_RPG_V24.openAppearance === "function"){
+    window.ADF_RPG_V24.openAppearance();
+    return;
+  }
+
+  /* Fallback di compatibilità: la pagina gioco rilegge lo slot appena attivato. */
   vaiAlGioco("vai=profilo");
 }
 window.vaiAlProfilo = vaiAlProfilo;

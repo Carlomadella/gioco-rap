@@ -90,6 +90,51 @@ const landingCol = pagine[0].js.filter(f => f.startsWith("js/game/") &&
   f !== "js/game/state.js" && f !== "js/game/phases.js");
 controlla("la landing non si porta dietro il gioco", landingCol.length === 0, landingCol);
 
+/* ADF_LANDING_ARTIST_ACCESS_V1
+   "Il tuo artista" non crea un personaggio: modifica quello dello stesso slot
+   scelto da CONTINUA e delega l'aspetto al provider reale. */
+{
+  const landingHtml = fs.readFileSync(path.join(RADICE, "pagine/landing.html"), "utf8");
+  const landingJs = fs.readFileSync(path.join(RADICE, "js/landing.js"), "utf8");
+  const avvioJs = fs.readFileSync(path.join(RADICE, "js/avvio.js"), "utf8");
+  const bridgeJs = fs.readFileSync(path.join(RADICE, "js/creator/rpg-v24-bridge.js"), "utf8");
+  const creatorHtml = fs.readFileSync(path.join(RADICE, "media/creator-rpg-v24/creator.html"), "utf8");
+
+  controlla(
+    "Il tuo artista parte disabilitato finché non esiste CONTINUA",
+    /data-go="profile"[^>]*disabled[^>]*aria-disabled="true"/.test(landingHtml)
+  );
+
+  controlla(
+    "Il tuo artista usa lo stesso ultimoSlot di CONTINUA",
+    avvioJs.includes("window.ADF_PREPARA_ARTISTA_CONTINUA") &&
+    landingJs.includes("ADF_PREPARA_ARTISTA_CONTINUA")
+  );
+
+  controlla(
+    "la landing non dipende più dal ritratto 2D legacy",
+    !landingJs.includes("portrait()") &&
+    !landingHtml.includes("js/creator/portrait.js") &&
+    !landingHtml.includes("$1<script")
+  );
+
+  controlla(
+    "il bridge espone l'editing del solo aspetto",
+    bridgeJs.includes("openAppearance") &&
+    bridgeJs.includes("adf-rpg-v24-edit-appearance") &&
+    bridgeJs.includes("adf-rpg-v24-appearance-updated")
+  );
+
+  controlla(
+    "il creator apre il provider salvato in modalità modifica",
+    creatorHtml.includes("beginAppearanceEdit") &&
+    creatorHtml.includes("state.avatarSource===\"avaturn\"") &&
+    creatorHtml.includes("openDressingRoom(false)") &&
+    creatorHtml.includes("openLocalEditor()") &&
+    creatorHtml.includes("mode:appearanceEditOnly ? 'edit' : 'new'")
+  );
+}
+
 console.log("\nil codice");
 const rotti = [];
 

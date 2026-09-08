@@ -421,20 +421,29 @@
     }
   }
 
-  /* Il profilo si apre di là. Qui si sceglie solo *quale* carriera aprire: se
-     lo slot attivo è vuoto ma ce n'è un'altra, si passa a quella, così la
-     pagina del gioco la ritrova da sola leggendo lo slot. */
+  /* "Il tuo artista" deve puntare allo STESSO personaggio di CONTINUA.
+     Non allo slot che per caso era attivo quando la landing è stata caricata. */
   function preparaProfiloSeServe(){
-    let s = slotAttivo();
-    if(!s.artista) s = ultimoSlot();
-    if(!s || !s.artista) return false;
+    const s = ultimoSlot();
+    if(!s || !s.artista) return null;
+
     if(s.n !== +(SET.slot || 1)) selezionaSlot(s.n);
-    return true;
+
+    /* Il bridge vive già nella landing e legge A: allineiamo la memoria allo
+       slot scelto da CONTINUA prima di aprire Avaturn/MakeHuman. */
+    A = Object.assign(DEF(), s.a || {});
+    G = Object.assign(START(), s.g || {});
+    window.ARTIST = A;
+
+    return s;
   }
+
+  window.ADF_ULTIMO_SLOT = ultimoSlot;
+  window.ADF_PREPARA_ARTISTA_CONTINUA = preparaProfiloSeServe;
 
   function aggiornaLanding(){
     const u = ultimoSlot();
-    const s = slotAttivo().artista ? slotAttivo() : u;
+    const s = u;
 
     /* Il listener musicale lavora in capture: deve sapere già al
        pointerdown se il grande pulsante significa CONTINUA. */
@@ -460,11 +469,27 @@
 
     const prof = document.querySelector('.land-voce[data-go="profile"]');
     if(prof){
-      prof.classList.toggle("bloccata", !s);
-      prof.setAttribute("aria-disabled", s ? "false" : "true");
+      const disponibile = !!s;
+      prof.disabled = !disponibile;
+      prof.classList.toggle("bloccata", !disponibile);
+      prof.setAttribute("aria-disabled", disponibile ? "false" : "true");
+      prof.title = disponibile
+        ? "Modifica " + s.nome
+        : "Disponibile dopo aver salvato una partita";
+
       const f = prof.querySelector(".frec"), d = prof.querySelector(".des");
-      if(f) f.textContent = s ? "↗" : "🔒";
-      if(d) d.textContent = s ? "Aspetto, città, genere" : "Crea prima il tuo artista";
+      if(f) f.textContent = disponibile ? "↗" : "—";
+      if(d) d.textContent = disponibile
+        ? "Modifica l'aspetto di " + s.nome
+        : "Nessuna partita salvata";
+    }
+
+    /* Anche l'eventuale avatar in topnav segue la stessa regola, pur essendo
+       oggi nascosto dal concept della landing. */
+    const navAvatar = $("nav-avatar");
+    if(navAvatar){
+      navAvatar.disabled = !s;
+      navAvatar.setAttribute("aria-disabled", s ? "false" : "true");
     }
 
     if($("m-tag")){
@@ -494,14 +519,14 @@
     apri();
   }, true);
 
-  /* Il profilo è accessibile solo se esiste almeno un artista salvato. Se lo
-     slot attivo è vuoto ma esistono altre carriere, si apre l'ultima usata. */
+  /* Sicurezza oltre al disabled HTML: nessun ingresso a "Il tuo artista"
+     se CONTINUA non ha uno slot da aprire. */
   document.addEventListener("click", e => {
     const b = e.target.closest('[data-go="profile"]');
     if(!b) return;
-    if(!preparaProfiloSeServe()){
-      e.preventDefault(); e.stopImmediatePropagation();
-      landDillo("Crea prima il tuo artista");
+    if(!ultimoSlot()){
+      e.preventDefault();
+      e.stopImmediatePropagation();
     }
   }, true);
 

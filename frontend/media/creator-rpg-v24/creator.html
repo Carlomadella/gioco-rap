@@ -2378,6 +2378,64 @@ function heroScene(profile){ return FINAL_HERO[profile] || FINAL_HERO.visionario
 
 const state = {avatarSource:null, avatarPendingSource:null, avatarData:null, name:"", city:"", genre:null, answers:[]};
 let storyStep = 0;
+let appearanceEditOnly = false;
+
+function applyParentArtist(artist){
+  const a=artist||{};
+  state.avatarSource=a.avatarSource||null;
+  state.avatarPendingSource=state.avatarSource;
+  state.avatarData=a.avatarData||null;
+  state.name=a.name||"";
+  state.city=a.city||"";
+  state.genre=a.genre||null;
+  state.answers=Array.isArray(a.answers) ? a.answers : [];
+
+  if($("name")) $("name").value=state.name;
+  if($("city")) $("city").value=state.city;
+  renderAvatarSource();
+  renderGenres();
+  validateIdentity();
+}
+
+function postAppearanceResult(type){
+  const detail={
+    avatarSource:state.avatarSource||null,
+    avatarData:state.avatarData||null
+  };
+  appearanceEditOnly=false;
+  if(window.parent!==window) window.parent.postMessage({type,detail},"*");
+}
+
+function beginAppearanceEdit(artist){
+  applyParentArtist(artist);
+  appearanceEditOnly=true;
+
+  const d=state.avatarData||{};
+  const isMakeHuman =
+    state.avatarSource==="local" &&
+    (d.provider==="makehuman" ||
+     d.localAvatar?.provider==="makehuman" ||
+     !!d.makehumanState ||
+     !!d.localAvatar?.makehumanState);
+
+  if(state.avatarSource==="avaturn"){
+    state.avatarPendingSource="avaturn";
+    renderAvatarSource();
+    openDressingRoom(false);
+    return;
+  }
+
+  if(isMakeHuman){
+    state.avatarPendingSource="local";
+    renderAvatarSource();
+    openLocalEditor();
+    return;
+  }
+
+  /* Salvataggio molto vecchio/ignoto: non indoviniamo il provider. */
+  appearanceEditOnly=false;
+  setProgress(0);
+}
 
 function setBg(el, key){ el.style.backgroundImage = `url("${SCENES[key]}")`; }
 function makeCrossfade(aId,bId,initialKey,source){
@@ -2494,6 +2552,11 @@ window.completeAvatarCreation = function(source, avatarData={}){
   state.avatarData = avatarData;
   renderAvatarSource();
 
+  if(appearanceEditOnly){
+    postAppearanceResult('adf-rpg-v24-appearance-updated');
+    return;
+  }
+
   /* MakeHuman comprende già editor, guardaroba, anteprima e conferma finale.
      Il vecchio camerino locale sa mostrare soltanto una preview raster e,
      con MakeHuman, produceva il rettangolo/crop corrotto visto nel test.
@@ -2530,7 +2593,7 @@ function sendDressingRoomInit(previewOnly=false){
   const roomSource = state.avatarData && state.avatarSource ? state.avatarSource : selectedAvatarSource();
   frame.contentWindow.postMessage({
     type:'adf-avatar-room-init',
-    mode:'new',
+    mode:appearanceEditOnly ? 'edit' : 'new',
     source:roomSource,
     previewOnly:!!previewOnly,
     artist:normalizeAvatarForRoom()
@@ -2711,6 +2774,19 @@ window.addEventListener('message', e=>{
   const msg=e.data||{};
   const frame=$('dressingRoomFrame');
 
+  /* Il parent è il bridge della landing/gioco. Adesso il payload salvato viene
+     davvero caricato nel creator, e può chiedere l'editing del solo aspetto. */
+  if(e.source===window.parent){
+    if(msg.type==='adf-rpg-v24-init'){
+      applyParentArtist(msg.artist||{});
+      return;
+    }
+    if(msg.type==='adf-rpg-v24-edit-appearance'){
+      beginAppearanceEdit(msg.artist||{});
+      return;
+    }
+  }
+
   if(localEditorFrame && e.source===localEditorFrame.contentWindow){
     if(msg.type==='adf-makehuman-ready'){
       sendMakeHumanInit();
@@ -2737,6 +2813,10 @@ window.addEventListener('message', e=>{
 
     if(msg.type==='adf-makehuman-back'){
       closeLocalEditor();
+      if(appearanceEditOnly){
+        postAppearanceResult('adf-rpg-v24-appearance-cancel');
+        return;
+      }
       state.avatarPendingSource = state.avatarSource || 'local';
       if(state.avatarData) openDressingRoom(false); else setProgress(0);
       renderAvatarSource();
@@ -2753,6 +2833,10 @@ window.addEventListener('message', e=>{
     }
     if(msg.type==='adf-local-avatar-cancel'){
       closeLocalEditor();
+      if(appearanceEditOnly){
+        postAppearanceResult('adf-rpg-v24-appearance-cancel');
+        return;
+      }
       state.avatarPendingSource = state.avatarSource || 'local';
       if(state.avatarData) openDressingRoom(false); else setProgress(0);
       renderAvatarSource();
@@ -2775,11 +2859,19 @@ window.addEventListener('message', e=>{
       state.avatarSource='local'; state.avatarPendingSource=null; state.avatarData=Object.assign({},state.avatarData||{},art); renderAvatarSource();
     }
     if(!state.avatarData){ return; }
+    if(appearanceEditOnly){
+      postAppearanceResult('adf-rpg-v24-appearance-updated');
+      return;
+    }
     setProgress(1);
     validateIdentity();
     return;
   }
   if(msg.type==='adf-avatar-room-cancel'){
+    if(appearanceEditOnly){
+      postAppearanceResult('adf-rpg-v24-appearance-cancel');
+      return;
+    }
     setProgress(0);
     return;
   }
@@ -2789,6 +2881,10 @@ window.addEventListener('message', e=>{
     return;
   }
   if(msg.type==='adf-avatar-room-change-method'){
+    if(appearanceEditOnly){
+      postAppearanceResult('adf-rpg-v24-appearance-cancel');
+      return;
+    }
     state.avatarPendingSource = state.avatarSource || null;
     setProgress(0);
     renderAvatarSource();

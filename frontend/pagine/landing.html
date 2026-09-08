@@ -24,7 +24,7 @@
 <link rel="stylesheet" href="css/servizio.css?v=1">
 <link rel="stylesheet" href="css/preview.css?v=12">
 <link rel="stylesheet" href="css/shell.css?v=12">
-<link rel="stylesheet" href="css/landing.css?v=12">
+<link rel="stylesheet" href="css/landing.css?v=13">
 <link rel="stylesheet" href="css/avvio.css?v=2">
 <link rel="stylesheet" href="css/forms.css?v=12">
 <link rel="stylesheet" href="css/impostazioni.css?v=12">
@@ -148,7 +148,7 @@
           <span class="tit" id="m-voce-a">Inizia la carriera</span>
           <span class="des" id="m-voce-b">La prima settimana comincia qui</span>
         </button>
-        <button class="land-voce" data-scena="2" data-go="profile">
+        <button class="land-voce" data-scena="2" data-go="profile" disabled aria-disabled="true">
           <span class="su"><span class="n">02</span><span class="frec">↗</span></span>
           <span class="tit">Il tuo artista</span><span class="des">Aspetto, città, genere</span>
         </button>
@@ -251,14 +251,14 @@
      (quello sta nella pagina del gioco, insieme al resto). -->
 <script src="js/creator/data.js?v=15"></script>
 <script src="js/creator/state.js?v=15"></script>
-$1<script src="js/creator/rpg-v24-bridge.js?v=3"></script>
+<script src="js/creator/rpg-v24-bridge.js?v=4"></script>
 <!-- Della partita servono solo lo stato e le fasi: la landing legge il
      salvataggio per dire a che punto sei, non fa girare niente. -->
 <script src="js/game/state.js?v=12"></script>
 <script src="js/game/phases.js?v=12"></script>
 
-<script src="js/landing.js?v=1"></script>
-<script src="js/avvio.js?v=4"></script>
+<script src="js/landing.js?v=2"></script>
+<script src="js/avvio.js?v=5"></script>
 <script src="js/impostazioni-ui.js?v=14"></script>
 </body>
 </html>

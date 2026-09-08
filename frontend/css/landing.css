@@ -96,6 +96,25 @@
 .land-voce:first-child{background:rgba(211,170,94,.12)}
 .land-voce:first-child .tit{color:#f4d28e}
 
+/* ADF_LANDING_ARTIST_DISABLED_V1
+   "Il tuo artista" è un'azione su una partita esistente: senza CONTINUA
+   non è cliccabile e non reagisce all'hover. */
+.land-voce.bloccata,
+.land-voce:disabled{
+  opacity:.34;
+  cursor:not-allowed;
+  pointer-events:none;
+  filter:saturate(.45);
+  transform:none!important;
+}
+.land-voce.bloccata::after,
+.land-voce:disabled::after{
+  transform:scaleX(.25)!important;
+  background:rgba(255,255,255,.10)!important;
+}
+.land-voce.bloccata .frec,
+.land-voce:disabled .frec{opacity:.22}
+
 .land-piede{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:9px;
   padding:0 7px;font-size:10px;color:#9f988d;letter-spacing:.12em;text-transform:uppercase}
 .land-piede kbd{font-family:inherit;border:1px solid rgba(255,255,255,.22);border-radius:5px;
