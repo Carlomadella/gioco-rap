@@ -61,7 +61,7 @@
 #strada .session{justify-self:end;display:flex;align-items:center;gap:15px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#aaa096}
 #strada .session b{color:#fff}
 #strada .exit{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.32);font-size:17px}
-#strada .exit:hover{background:rgba(255,255,255,.1)}
+@media (hover:hover){#strada .exit:hover{background:rgba(255,255,255,.1)}}
 #strada .scene{
   height:calc(100svh - 72px);display:grid;grid-template-columns:260px minmax(520px,1fr) 300px;
   grid-template-rows:minmax(0,1fr) 66px;gap:16px;padding:18px 24px 18px;position:relative;z-index:5
@@ -79,7 +79,7 @@
 #strada .status-money span{display:block;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#aaa196}
 #strada .status-money strong{display:block;font-family:var(--cond);font-size:29px;line-height:1;margin:5px 0 9px}
 #strada .launder{width:100%;padding:9px 10px;border-radius:999px;background:var(--cream);color:#0b0b0c;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
-#strada .launder:hover{background:#fff}
+@media (hover:hover){#strada .launder:hover{background:#fff}}
 #strada .stat{margin-bottom:14px}
 #strada .stat-head{display:flex;justify-content:space-between;align-items:baseline;font-size:10px;color:#aaa196;text-transform:uppercase;letter-spacing:.08em}
 #strada .stat-head b{font-family:var(--cond);font-size:18px;color:#fff}
@@ -95,7 +95,7 @@
 #strada .risk b.hot{color:#ff5d78}
 #strada .street-note{margin-top:auto;padding-top:13px;border-top:1px solid rgba(255,255,255,.08);color:#9b9389;font-size:10.5px;line-height:1.45}
 #strada .quit{margin-top:11px;width:100%;padding:9px 12px;border:1px solid rgba(255,255,255,.12);border-radius:999px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#c1b9af}
-#strada .quit:hover{border-color:rgba(255,90,54,.5);color:#fff}
+@media (hover:hover){#strada .quit:hover{border-color:rgba(255,90,54,.5);color:#fff}}
 #strada .center{min-width:0;display:flex;flex-direction:column;padding:0;overflow:hidden;position:relative}
 #strada .center::before{
   content:"";position:absolute;inset:0;pointer-events:none;
@@ -116,7 +116,7 @@
   background:linear-gradient(155deg,rgba(35,10,25,.78),rgba(8,4,10,.90));overflow:hidden;transition:.2s
 }
 #strada .crime::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:rgba(197,46,95,.60)}
-#strada .crime:hover{transform:translateY(-2px);border-color:rgba(197,46,95,.46);background:linear-gradient(155deg,rgba(57,13,38,.90),rgba(13,5,14,.95))}
+@media (hover:hover){#strada .crime:hover{transform:translateY(-2px);border-color:rgba(197,46,95,.46);background:linear-gradient(155deg,rgba(57,13,38,.90),rgba(13,5,14,.95))}}
 #strada .crime .num{position:absolute;right:12px;top:10px;font-family:var(--cond);font-size:29px;line-height:1;color:rgba(255,255,255,.075);font-weight:800}
 #strada .crime b{display:block;font-family:var(--cond);font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:.015em;padding-right:30px}
 #strada .crime p{margin:5px 0 11px;color:#aaa196;font-size:10.5px;line-height:1.35;max-width:90%}
@@ -130,7 +130,7 @@
   position:absolute;right:12px;bottom:12px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
   background:var(--cream);color:#111;font-size:17px;font-weight:900;transition:.2s
 }
-#strada .crime:hover .go{transform:translateX(2px)}
+@media (hover:hover){#strada .crime:hover .go{transform:translateX(2px)}}
 #strada .right{padding:0;display:flex;flex-direction:column}
 #strada .tabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid rgba(255,255,255,.08)}
 #strada .tab{padding:14px 8px 12px;font-size:9.5px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;color:#8f887f;position:relative}
@@ -149,7 +149,7 @@
 }
 #strada .pill.on{background:var(--gold);border-color:var(--gold);color:#12110f}
 #strada .pill.danger{border-color:rgba(255,90,54,.35);color:#ff8fa4}
-#strada .pill:hover{border-color:rgba(255,255,255,.3)}
+@media (hover:hover){#strada .pill:hover{border-color:rgba(255,255,255,.3)}}
 #strada .activity{
   padding:10px 11px;margin-bottom:7px;border:1px solid rgba(255,255,255,.09);border-radius:13px;background:rgba(255,255,255,.025)
 }
@@ -191,7 +191,7 @@
 #strada .sheet-stats{display:flex;gap:7px;margin-top:12px}
 #strada .approaches{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:13px}
 #strada .approach{text-align:left;padding:13px;border:1px solid rgba(255,255,255,.09);border-radius:15px;background:rgba(255,255,255,.025);min-height:150px;position:relative}
-#strada .approach:hover{border-color:rgba(197,46,95,.40);background:rgba(107,28,95,.10)}
+@media (hover:hover){#strada .approach:hover{border-color:rgba(197,46,95,.40);background:rgba(107,28,95,.10)}}
 #strada .approach .a-num{font-family:var(--cond);font-size:11px;color:#77706a}
 #strada .approach b{display:block;font-family:var(--cond);font-size:19px;text-transform:uppercase;margin-top:11px}
 #strada .approach p{font-size:10px;margin-top:5px;max-width:90%}
@@ -219,7 +219,7 @@
   radial-gradient(circle at 18% 20%,rgba(92,22,92,.13),transparent 34%);pointer-events:none}
 
 #strada .map-return{height:100%;width:100%;min-height:50px;border:1px solid rgba(237,35,77,.46);border-radius:16px;background:linear-gradient(135deg,rgba(131,14,43,.86),rgba(61,17,66,.84));display:flex;align-items:center;justify-content:center;gap:10px;padding:0 18px;font-family:var(--cond);font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;box-shadow:0 12px 28px rgba(77,0,35,.28);transition:.2s}
-#strada .map-return:hover{transform:translateY(-1px);border-color:rgba(255,74,112,.75);background:linear-gradient(135deg,rgba(161,17,54,.94),rgba(80,21,84,.94));box-shadow:0 16px 35px rgba(105,0,44,.36)}
+@media (hover:hover){#strada .map-return:hover{transform:translateY(-1px);border-color:rgba(255,74,112,.75);background:linear-gradient(135deg,rgba(161,17,54,.94),rgba(80,21,84,.94));box-shadow:0 16px 35px rgba(105,0,44,.36)}}
 #strada .map-return .arrow{font-size:21px;line-height:1}
 
 @media(max-width:1100px){
@@ -227,7 +227,6 @@
   #strada .citybar{grid-template-columns:225px 1fr 260px;gap:10px}
   #strada .herohead h1{font-size:37px}
 }
-
 
 /* === V3 / atmosfera criminale: più opprimente, meno "dashboard" === */
 #strada{
@@ -348,19 +347,19 @@
 }
 #strada .crime::before{width:2px;background:#8d1d32}
 #strada .crime::after{content:"";position:absolute;inset:auto 0 0 0;height:32%;background:linear-gradient(0deg,rgba(96,10,29,.13),transparent);pointer-events:none}
-#strada .crime:hover{transform:translateY(-2px);border-color:rgba(198,42,70,.45);background:linear-gradient(145deg,rgba(49,12,21,.70),rgba(8,4,6,.84))}
+@media (hover:hover){#strada .crime:hover{transform:translateY(-2px);border-color:rgba(198,42,70,.45);background:linear-gradient(145deg,rgba(49,12,21,.70),rgba(8,4,6,.84))}}
 #strada .crime .num{font-family:var(--disp);font-size:44px;color:rgba(202,58,83,.11)}
 #strada .crime b{font-family:var(--cond);font-size:18px;font-weight:800;letter-spacing:.02em}
 #strada .crime p{font-family:"Inter Tight",sans-serif;color:#9f9296}
 #strada .chip{border-radius:2px;background:rgba(6,4,5,.45);color:#aaa0a3}#strada .chip.money{color:#d98293;border-color:rgba(189,42,69,.32)}
-#strada .go{border-radius:3px;background:#c9c0c2;color:#16080c}#strada .crime:hover .go{background:#d3304e;color:white}
+#strada .go{border-radius:3px;background:#c9c0c2;color:#16080c}@media (hover:hover){#strada .crime:hover .go{background:#d3304e;color:white}}
 #strada .tabs{border-color:rgba(255,255,255,.07)}#strada .tab.on::after{background:#b72540}#strada .tab.on{color:#e8dfe1}
 #strada .cover-row{border-color:rgba(255,255,255,.055)}#strada .cover-row .t strong{font-family:var(--cond);font-weight:700}
 #strada .pill{border-radius:2px;font-family:var(--mono)}#strada .pill.on{background:#7c1730;border-color:#8f1e37;color:#f2e7e9}#strada .pill.danger{color:#dc6b80}
 #strada .activity{border-radius:3px;background:rgba(9,5,7,.46)}#strada .activity strong{font-family:var(--cond);font-weight:800}#strada .activity .price{font-family:var(--mono);color:#c96679}
 #strada .city-note,#strada .cities{border-radius:4px;background:rgba(7,4,5,.58);backdrop-filter:blur(8px)}#strada .cities{padding:5px}#strada .city{border-radius:2px}#strada .city .n{font-family:var(--disp);font-size:22px;letter-spacing:.04em}#strada .city.on{background:rgba(104,15,34,.27);border-color:rgba(180,36,60,.42)}#strada .city.on .n{color:#d2435e}#strada .city.lock::after{font-family:var(--mono);color:#8d777c}
 #strada .map-return{border-radius:4px;background:linear-gradient(135deg,#8f172f,#53162f);border-color:#b32745;font-family:var(--cond);font-size:18px;font-weight:800;letter-spacing:.055em;box-shadow:0 14px 35px rgba(70,0,18,.34)}
-#strada .map-return:hover{background:linear-gradient(135deg,#b21e3a,#6b1739);box-shadow:0 16px 40px rgba(86,0,24,.42)}
+@media (hover:hover){#strada .map-return:hover{background:linear-gradient(135deg,#b21e3a,#6b1739);box-shadow:0 16px 40px rgba(86,0,24,.42)}}
 #strada .sheet{border-radius:6px;background:linear-gradient(160deg,rgba(31,9,16,.97),rgba(7,4,5,.99));border-color:rgba(202,79,101,.20)}
 #strada .sheet .k,#strada .approach .a-num,#strada .approach .riskline{font-family:var(--mono)}#strada .sheet h2{font-family:var(--disp);font-size:46px;letter-spacing:.015em}#strada .approach{border-radius:3px;background:rgba(16,7,10,.64)}#strada .approach b{font-family:var(--cond);font-weight:800}#strada .approach.hot b{color:#d43e5a}
 #strada .toast{border-radius:3px;font-family:var(--mono)}
@@ -368,7 +367,6 @@
 @keyframes ambientFlicker{0%,92%,100%{opacity:1}93%{opacity:.96}94%{opacity:1}97%{opacity:.985}}
 #strada .app{animation:ambientFlicker 9s infinite}
 @media(max-width:1100px){#strada .herohead h1{font-size:54px}#strada .scene{padding-top:36px}}
-
 
 /* === V4 / SOTTOBOSCO CRIMINALE: ansia, illegalità, notte === */
 #strada{
@@ -465,11 +463,11 @@
 #strada .crime{border-radius:3px;border-color:rgba(255,240,244,.13);background:linear-gradient(145deg,rgba(20,5,11,.48),rgba(5,3,6,.62));backdrop-filter:blur(5px);box-shadow:0 10px 30px rgba(0,0,0,.22);overflow:hidden}
 #strada .crime::before{width:3px;background:linear-gradient(#ff234c,#6c154f)}
 #strada .crime::after{height:48%;background:linear-gradient(0deg,rgba(119,0,32,.19),transparent)}
-#strada .crime:hover{transform:translateY(-3px) scale(1.008);border-color:rgba(255,48,84,.56);background:linear-gradient(145deg,rgba(67,6,26,.58),rgba(12,3,10,.70));box-shadow:0 16px 38px rgba(0,0,0,.30),0 0 0 1px rgba(255,35,76,.08)}
+@media (hover:hover){#strada .crime:hover{transform:translateY(-3px) scale(1.008);border-color:rgba(255,48,84,.56);background:linear-gradient(145deg,rgba(67,6,26,.58),rgba(12,3,10,.70));box-shadow:0 16px 38px rgba(0,0,0,.30),0 0 0 1px rgba(255,35,76,.08)}}
 #strada .crime .num{font-family:var(--impact);font-size:50px;color:rgba(255,38,78,.12)}
 #strada .crime b{font-family:var(--ui);font-size:22px;font-weight:800;letter-spacing:.025em;text-shadow:0 2px 12px #000}
 #strada .crime p{font-size:11px;color:#bcaab0}#strada .chip{font-family:var(--ui);border-radius:2px;background:rgba(3,2,4,.54);font-size:10px}#strada .chip.money{color:#ff8aa0;border-color:rgba(255,49,87,.35)}
-#strada .go{border-radius:2px;background:#ede5e7;color:#1d0209;font-size:19px}#strada .crime:hover .go{background:#ff234c;color:white;box-shadow:0 0 22px rgba(255,35,76,.30)}
+#strada .go{border-radius:2px;background:#ede5e7;color:#1d0209;font-size:19px}@media (hover:hover){#strada .crime:hover .go{background:#ff234c;color:white;box-shadow:0 0 22px rgba(255,35,76,.30)}}
 
 #strada .tabs{border-color:rgba(255,255,255,.08)}#strada .tab{font-family:var(--ui);font-size:11px}#strada .tab.on::after{background:var(--red);box-shadow:0 0 16px rgba(225,25,61,.35)}
 #strada .cover-row{border-color:rgba(255,255,255,.07)}#strada .cover-row .t strong{font-family:var(--ui);font-size:17px;font-weight:900}#strada .pill{font-family:var(--ui);border-radius:2px;font-weight:900}#strada .pill.on{background:#7b0d30;border-color:#af1744;color:#fff}#strada .pill.danger{color:#ff7890;border-color:rgba(255,35,76,.28)}
@@ -478,7 +476,7 @@
 #strada .citybar{gap:12px}#strada .city-note,#strada .cities{border-radius:3px;background:rgba(3,2,4,.54);backdrop-filter:blur(7px);border-color:rgba(255,255,255,.10)}
 #strada .city{border-radius:2px}#strada .city .n{font-family:var(--impact);font-size:24px;letter-spacing:.02em}#strada .city.on{background:linear-gradient(135deg,rgba(134,5,40,.38),rgba(94,21,82,.20));border-color:rgba(255,35,76,.43)}#strada .city.on .n{color:#ff4365}#strada .city.lock::after{font-family:var(--ui)}
 #strada .map-return{border-radius:3px;background:linear-gradient(135deg,#b40937,#6e0d5d);border:1px solid rgba(255,80,111,.78);font-family:var(--impact);font-size:22px;letter-spacing:.02em;box-shadow:0 12px 32px rgba(85,0,31,.38),0 0 30px rgba(166,0,53,.12)}
-#strada .map-return:hover{background:linear-gradient(135deg,#e11645,#8b176f);box-shadow:0 16px 42px rgba(113,0,39,.44),0 0 35px rgba(225,22,69,.20)}
+@media (hover:hover){#strada .map-return:hover{background:linear-gradient(135deg,#e11645,#8b176f);box-shadow:0 16px 42px rgba(113,0,39,.44),0 0 35px rgba(225,22,69,.20)}}
 #strada .map-return .arrow{font-size:28px}
 
 #strada .modal{background:rgba(2,1,3,.48);backdrop-filter:blur(6px)}
@@ -487,7 +485,6 @@
 #strada .toast{font-family:var(--ui);border-radius:2px}
 
 @media(max-width:1100px){#strada .scene{padding-top:14px}#strada .herohead h1{font-size:56px}#strada .where strong{font-size:27px}#strada .map-return{font-size:20px}}
-
 
 /* === V6 / TYPOGRAFIA LEGGIBILE + 30 SFONDI CRIME === */
 #strada{
@@ -558,7 +555,6 @@
   #strada .cover-row .t span,#strada .activity p{font-size:10.5px}
 }
 
-
 /* === V7 / FONT DAVVERO NUOVO + SLIDES PIU POLIZIA/CRIMINALITA === */
 #strada{
   --ui:"Roboto Condensed","Arial Narrow",Arial,sans-serif;
@@ -603,8 +599,6 @@
 }
 #strada .side,#strada .right{background:linear-gradient(180deg,rgba(6,4,7,.34),rgba(3,2,4,.44))}
 #strada .center{background:linear-gradient(180deg,rgba(5,3,6,.025),rgba(4,2,5,.11));backdrop-filter:blur(1px)}
-
-
 
 /* === V8 / SFONDI COERENTI CON LA LANDING ===
    Solo visual AI/illustrati: niente fotografie autentiche.
@@ -721,7 +715,6 @@
   backdrop-filter:blur(4px) !important;
 }
 
-
 /* =========================================================
    V13 TEST — BACKGROUND VISIBILITY
    Keep the scene dark, but remove the heavy black veil.
@@ -793,7 +786,6 @@
   backdrop-filter:blur(3px) !important;
 }
 
-
 /* V17 FIX — didascalie dinamiche */
 #strada .crime-caption-source{
   min-height:13px;
@@ -812,7 +804,6 @@
   opacity:0;
   transform:translateY(3px);
 }
-
 
 /* ==========================================================
    V21 · TRAP PHONE — candybar anni 2000, solo SMS + chiamate
@@ -838,7 +829,7 @@
   transition:transform .22s ease,filter .22s ease;
   user-select:none;
 }
-#strada .trap-wrap:hover{transform:rotate(.2deg) translateY(-3px);filter:drop-shadow(0 22px 34px rgba(0,0,0,.66))}
+@media (hover:hover){#strada .trap-wrap:hover{transform:rotate(.2deg) translateY(-3px);filter:drop-shadow(0 22px 34px rgba(0,0,0,.66))}}
 #strada .trap-wrap.focus{transform:rotate(0deg) scale(1.23) translate(-16px,-18px);filter:drop-shadow(0 30px 48px rgba(0,0,0,.75))}
 #strada .trap-wrap.ringing{animation:trapVibe .15s linear infinite}
 @keyframes trapVibe{
@@ -969,7 +960,8 @@
   font:700 9px/1.35 Figtree,Arial,sans-serif;letter-spacing:.02em;
   opacity:0;transform:translateX(6px);pointer-events:none;transition:.2s
 }
-#strada .trap-wrap:hover .trap-hint,#strada .trap-wrap.focus .trap-hint{opacity:1;transform:none}
+#strada .trap-wrap.focus .trap-hint{opacity:1;transform:none}
+@media (hover:hover){#strada .trap-wrap:hover .trap-hint{opacity:1;transform:none}}
 #strada .trap-hint b{color:#f1eadb}
 #strada .trap-toast{
   position:fixed;right:152px;bottom:104px;z-index:46;
@@ -986,12 +978,10 @@
   background:rgba(8,6,8,.72);color:#a99da2;font:800 8px/1 Figtree,Arial,sans-serif;
   letter-spacing:.08em;text-transform:uppercase;cursor:pointer;opacity:.72
 }
-#strada .trap-test:hover{opacity:1;color:#fff}
+@media (hover:hover){#strada .trap-test:hover{opacity:1;color:#fff}}
 @media(max-width:1180px){
   #strada .trap-wrap,#strada .trap-test,#strada .trap-toast{display:none!important}
 }
-
-
 
 /* ==========================================================
    V22 · TRAPHONE 16
@@ -1045,10 +1035,10 @@
   filter:drop-shadow(0 24px 25px rgba(0,0,0,.54));
   transition:transform .18s ease,filter .18s ease;
 }
-#strada .traphone-dock .trap-wrap:hover{
+@media (hover:hover){#strada .traphone-dock .trap-wrap:hover{
   transform:rotate(-.2deg) translateY(-2px);
   filter:drop-shadow(0 27px 29px rgba(0,0,0,.61));
-}
+}}
 #strada .traphone-dock .trap-wrap.focus{
   transform:rotate(0deg) scale(1.035);
   filter:drop-shadow(0 28px 33px rgba(0,0,0,.67));
@@ -1242,9 +1232,9 @@
     inset 0 1px 0 rgba(255,255,255,.07),
     0 1px 1px rgba(0,0,0,.72);
 }
-#strada .traphone-dock .trap-key:hover{
+@media (hover:hover){#strada .traphone-dock .trap-key:hover{
   background:linear-gradient(180deg,#3a3f3f,#2b2f2f);
-}
+}}
 #strada .traphone-dock .trap-soft{
   height:17px;
   border-radius:6px 6px 3px 3px;
@@ -1337,11 +1327,11 @@
   text-transform:uppercase;
   opacity:.72;
 }
-#strada .traphone-dock .trap-test:hover{
+@media (hover:hover){#strada .traphone-dock .trap-test:hover{
   color:#c5b8bc;
   border-color:rgba(255,255,255,.13);
   opacity:1;
-}
+}}
 
 /* toast vicino al pannello destro */
 #strada .trap-toast{
@@ -1377,8 +1367,6 @@
   #strada .traphone-dock .trap-num{min-height:16px;font-size:7px}
   #strada .traphone-dock .trap-test{margin-top:5px;padding:5px 7px}
 }
-
-
 
 /* ==========================================================
    V23 · TRAPHONE 16 — INTEGRATO NEL PANNELLO
@@ -1472,10 +1460,10 @@
   filter:drop-shadow(0 31px 32px rgba(0,0,0,.58));
   transition:transform .18s ease,filter .18s ease;
 }
-#strada .traphone-dock .trap-wrap:hover{
+@media (hover:hover){#strada .traphone-dock .trap-wrap:hover{
   transform:rotate(0deg) translateY(-2px);
   filter:drop-shadow(0 34px 37px rgba(0,0,0,.67));
-}
+}}
 #strada .traphone-dock .trap-wrap.focus{
   transform:rotate(0deg) scale(1.018);
   filter:drop-shadow(0 36px 42px rgba(0,0,0,.72));
@@ -1693,7 +1681,6 @@
   #strada .trap-dock-actions{margin-top:9px;padding-top:8px}
 }
 
-
 /* ==========================================================
    TRAPHONE 16 · MODALITÀ D'USO INGRANDITA
    ========================================================== */
@@ -1733,7 +1720,7 @@
   cursor:pointer;
   box-shadow:0 8px 24px rgba(0,0,0,.48);
 }
-#strada .trap-focus-close:hover{background:#25171b;color:#fff}
+@media (hover:hover){#strada .trap-focus-close:hover{background:#25171b;color:#fff}}
 
 #strada .trap-focus-overlay .traphone-dock{
   width:min(520px,92vw);
@@ -1805,8 +1792,6 @@
     50%{transform:scale(1.34) rotate(.18deg) translateX(1px)}
   }
 }
-
-
 
 /* ==========================================================
    TRAPHONE 16 · FOCUS IN LOCO
@@ -1892,8 +1877,6 @@
     50%{transform:translate(-46px,-85px) scale(1.34) rotate(.20deg)}
   }
 }
-
-
 
 /* ==========================================================
    TRAPHONE 16 · CALLOUT TELEFONATA
@@ -1994,11 +1977,16 @@
   text-transform:uppercase;
   cursor:pointer;
 }
-#strada .trap-call-popout .tcp-option:hover,#strada .trap-call-popout .tcp-option.sel{
+#strada .trap-call-popout .tcp-option.sel{
   border-color:rgba(202,45,79,.45);
   background:rgba(125,13,39,.22);
   color:#fff;
 }
+@media (hover:hover){#strada .trap-call-popout .tcp-option:hover{
+  border-color:rgba(202,45,79,.45);
+  background:rgba(125,13,39,.22);
+  color:#fff;
+}}
 #strada .trap-call-popout .tcp-option kbd{
   display:inline-flex;
   width:18px;
@@ -2018,8 +2006,6 @@
   }
   #strada .trap-call-popout .tcp-text{font-size:13px}
 }
-
-
 
 /* ==========================================================
    TRAPHONE 16 · LCD / SOFTKEY FIX
@@ -2097,8 +2083,6 @@
   }
 }
 
-
-
 /* TRAPHONE 16 · menu risposta SMS compatto */
 #strada .trap-view.reply-compact{
   padding-top:2px!important;
@@ -2124,10 +2108,8 @@
   text-overflow:clip;
 }
 
-
 /* TRAPHONE 16 · content engine */
 #strada .trap-dock-actions{flex-wrap:wrap!important;gap:6px!important}#strada .trap-dock-actions .trap-test{flex:0 0 auto}#strada .trap-dock-actions>span{margin-left:auto}
-
 
 /* ==========================================================
    TYPOGRAPHY RESTORE · V23 EXACT
@@ -2140,8 +2122,6 @@
 #strada,#strada{
   font-family:"Figtree",system-ui,sans-serif;
 }
-
-
 
 /* ==========================================================
    TRAPHONE 16 · QA STACKING FIX
@@ -2163,8 +2143,6 @@
 #strada .trap-call-popout{
   z-index:250!important;
 }
-
-
 
 /* ==========================================================
    TRAPHONE 16 · D-PAD HITBOX FIX
@@ -2237,8 +2215,6 @@
   }
 }
 
-
-
 /* ==========================================================
    TRAPHONE 16 · SMS AUTO-FIT
    Il testo si compatta solo quando supera realmente l'LCD.
@@ -2292,11 +2268,9 @@
   }
 }
 
-
 #strada .trap-dock-actions .trap-test{display:none!important}
 #strada .trap-dock-actions{justify-content:flex-end}
 #strada .session .exit{display:none}
-
 
 /* ==========================================================
    HOTFIX 03 · CHIAMATA IN ARRIVO — COMPATIBILITÀ INTEGRAZIONE
@@ -2316,7 +2290,6 @@
     transform:translate(-48px,-85px) scale(1.34)!important;
   }
 }
-
 
 /* ==========================================================
    HOTFIX 04 · LA PAGINA NON TAGLIA PIÙ I PEZZI
@@ -2357,8 +2330,7 @@
 #strada .tabpane.on::-webkit-scrollbar-thumb{
   background:rgba(197,46,95,.34);border-radius:999px
 }
-#strada .side:hover::-webkit-scrollbar-thumb,
-#strada .tabpane.on:hover::-webkit-scrollbar-thumb{background:rgba(197,46,95,.55)}
+@media (hover:hover){#strada .side:hover::-webkit-scrollbar-thumb,#strada .tabpane.on:hover::-webkit-scrollbar-thumb{background:rgba(197,46,95,.55)}}
 
 /* 2 · sotto i 900 la colonna sinistra si stringe: i 61 px che mancavano
        a 768 escono da qui, senza toccare i corpi del testo */
@@ -2410,3 +2382,9 @@
   #strada .herohead h1{font-size:clamp(40px,4.2vw,54px);margin:6px 0 4px}
   #strada .herohead p{margin-top:6px}
 }
+
+
+
+
+
+

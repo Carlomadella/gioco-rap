@@ -106,7 +106,7 @@
 .strada .session b{color:#fff}
 .strada .exit{width:34px;height:34px;border-radius:50%;border:1px solid rgba(225,25,61,.36);
   background:rgba(0,0,0,.32);font-size:17px}
-.strada .exit:hover{background:rgba(255,255,255,.1)}
+@media (hover:hover){.strada .exit:hover{background:rgba(255,255,255,.1)}}
 
 /* ==================== LA SCENA A TRE PANNELLI ==================== */
 .strada .scene{position:relative;z-index:10;height:calc(100% - 72px);
@@ -146,7 +146,7 @@
 .strada .launder{width:100%;padding:9px 10px;border-radius:2px;background:#eee6e8;color:#160309;
   font-family:var(--st-ui);font-size:12px;font-weight:900;text-transform:uppercase;
   letter-spacing:.04em;box-shadow:0 8px 24px rgba(0,0,0,.26)}
-.strada .launder:hover{background:#fff}
+@media (hover:hover){.strada .launder:hover{background:#fff}}
 .strada .launder.no{opacity:.45;cursor:default;box-shadow:none}
 
 .strada .stat{margin-bottom:14px}
@@ -173,7 +173,7 @@
 .strada .quit{margin-top:11px;width:100%;padding:9px 12px;border-radius:3px;
   border:1px solid rgba(225,25,61,.24);font-family:var(--st-ui);font-size:11.5px;font-weight:800;
   text-transform:uppercase;letter-spacing:.055em;color:#d594a2}
-.strada .quit:hover{border-color:rgba(255,90,54,.5);color:#fff}
+@media (hover:hover){.strada .quit:hover{border-color:rgba(255,90,54,.5);color:#fff}}
 
 /* ==================== AL CENTRO: I COLPI ==================== */
 .strada .herohead{position:relative;z-index:2;padding:22px 22px 12px}
@@ -201,9 +201,9 @@
   background:linear-gradient(#ff234c,#6c154f)}
 .strada .crime::after{content:"";position:absolute;inset:auto 0 0 0;height:48%;pointer-events:none;
   background:linear-gradient(0deg,rgba(119,0,32,.19),transparent)}
-.strada .crime:hover{transform:translateY(-3px) scale(1.008);border-color:rgba(255,48,84,.56);
+@media (hover:hover){.strada .crime:hover{transform:translateY(-3px) scale(1.008);border-color:rgba(255,48,84,.56);
   background:linear-gradient(145deg,rgba(67,6,26,.58),rgba(12,3,10,.70));
-  box-shadow:0 16px 38px rgba(0,0,0,.30),0 0 0 1px rgba(255,35,76,.08)}
+  box-shadow:0 16px 38px rgba(0,0,0,.30),0 0 0 1px rgba(255,35,76,.08)}}
 .strada .crime .num{position:absolute;right:12px;top:10px;font-family:var(--st-impact);font-size:50px;
   font-weight:800;line-height:1;color:rgba(255,38,78,.12)}
 .strada .crime b{display:block;font-family:var(--st-impact);font-size:23px;font-weight:800;
@@ -211,8 +211,8 @@
 .strada .crime p{margin:5px 0 11px;font-size:12.2px;line-height:1.4;color:#c9b8be;max-width:92%}
 /* senza energia il colpo resta lì, spento; nelle città chiuse pure */
 .strada .crime.no,.strada .crime.lock{opacity:.5;filter:grayscale(.5)}
-.strada .crime.no:hover,.strada .crime.lock:hover{transform:none;border-color:rgba(255,240,244,.13);
-  background:linear-gradient(145deg,rgba(20,5,11,.48),rgba(5,3,6,.62));box-shadow:0 10px 30px rgba(0,0,0,.22)}
+@media (hover:hover){.strada .crime.no:hover,.strada .crime.lock:hover{transform:none;border-color:rgba(255,240,244,.13);
+  background:linear-gradient(145deg,rgba(20,5,11,.48),rgba(5,3,6,.62));box-shadow:0 10px 30px rgba(0,0,0,.22)}}
 
 .strada .stchips{display:flex;gap:5px;flex-wrap:wrap}
 .strada .stchip{padding:4px 7px;border-radius:2px;border:1px solid rgba(255,255,255,.11);
@@ -223,8 +223,8 @@
 .strada .stchip.risk-high{color:#ff758e}
 .strada .go{position:absolute;right:12px;bottom:12px;width:30px;height:30px;border-radius:2px;
   display:grid;place-items:center;background:#ede5e7;color:#1d0209;font-size:19px;font-weight:900;transition:.2s}
-.strada .crime:hover .go{transform:translateX(2px);background:#ff234c;color:#fff;
-  box-shadow:0 0 22px rgba(255,35,76,.30)}
+@media (hover:hover){.strada .crime:hover .go{transform:translateX(2px);background:#ff234c;color:#fff;
+  box-shadow:0 0 22px rgba(255,35,76,.30)}}
 
 /* sei dentro: al posto dei colpi, il tempo che passa */
 .strada .dentro{position:relative;z-index:2;flex:1;min-height:0;margin:0 14px 14px;padding:26px;
@@ -254,7 +254,7 @@
 .strada .pill{padding:6px 8px;border-radius:2px;border:1px solid rgba(255,255,255,.12);
   font-family:var(--st-ui);font-size:10.5px;font-weight:900;text-transform:uppercase;
   letter-spacing:.035em;white-space:nowrap}
-.strada .pill:hover{border-color:rgba(255,255,255,.3)}
+@media (hover:hover){.strada .pill:hover{border-color:rgba(255,255,255,.3)}}
 .strada .pill.on{background:#7b0d30;border-color:#af1744;color:#fff}
 .strada .pill.danger{color:#ff7890;border-color:rgba(255,35,76,.28)}
 .strada .pill.no{opacity:.42;cursor:default}
@@ -290,8 +290,8 @@
   background:linear-gradient(135deg,#b40937,#6e0d5d);font-family:var(--st-impact);font-size:24px;
   font-weight:700;letter-spacing:.018em;text-transform:uppercase;color:#fff;
   box-shadow:0 12px 32px rgba(85,0,31,.38),0 0 30px rgba(166,0,53,.12);transition:.2s}
-.strada .map-return:hover{transform:translateY(-1px);background:linear-gradient(135deg,#e11645,#8b176f);
-  box-shadow:0 16px 42px rgba(113,0,39,.44),0 0 35px rgba(225,22,69,.20)}
+@media (hover:hover){.strada .map-return:hover{transform:translateY(-1px);background:linear-gradient(135deg,#e11645,#8b176f);
+  box-shadow:0 16px 42px rgba(113,0,39,.44),0 0 35px rgba(225,22,69,.20)}}
 .strada .map-return .arrow{font-size:28px;line-height:1}
 
 /* la città chiusa: i colpi si vedono spenti, sopra c'è scritto dove si apre */
@@ -323,7 +323,7 @@
 .strada .approaches{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:13px}
 .strada .approach{position:relative;min-height:150px;padding:13px;text-align:left;border-radius:2px;
   border:1px solid rgba(255,255,255,.09);background:rgba(7,3,7,.50)}
-.strada .approach:hover{border-color:rgba(197,46,95,.40);background:rgba(107,28,95,.10)}
+@media (hover:hover){.strada .approach:hover{border-color:rgba(197,46,95,.40);background:rgba(107,28,95,.10)}}
 .strada .approach .a-num{font-size:11.5px;color:#77706a}
 .strada .approach b{display:block;margin-top:11px;font-family:var(--st-impact);font-size:21px;
   font-weight:900;text-transform:uppercase}

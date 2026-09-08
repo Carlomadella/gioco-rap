@@ -2609,7 +2609,7 @@ css.textContent=`
   font:800 9px Figtree,system-ui,sans-serif;letter-spacing:.01em;white-space:nowrap}
 #adf-calendar-time button.seven{color:#fff;border-color:#A78BFA;background:linear-gradient(180deg,#7C3AED,#5B21B6);
   box-shadow:0 3px 12px rgba(91,33,182,.25)}
-#adf-calendar-time button:hover:not(:disabled){filter:brightness(1.12)}
+@media (hover:hover){#adf-calendar-time button:hover:not(:disabled){filter:brightness(1.12)}}
 #adf-calendar-time button:disabled{opacity:.48;cursor:not-allowed}
 #adf-chain{display:none;min-width:13px;height:13px;border-radius:99px;background:#C4B5FD;color:#17121F;
   font-size:8px;font-weight:900;align-items:center;justify-content:center}
@@ -2802,7 +2802,7 @@ socialInteractionCss.textContent=`
 .adf-social-actions{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:8px 0 2px}
 .adf-social-actions button{min-width:0;border:0;border-radius:7px;padding:7px 3px;background:#191C24;color:#8E95A5;
 font:800 7.4px Figtree,system-ui,sans-serif;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.adf-social-actions button:hover{background:#222631;color:#D8DCE5}
+@media (hover:hover){.adf-social-actions button:hover{background:#222631;color:#D8DCE5}}
 .adf-social-actions button.on{background:rgba(214,41,118,.12);color:#F09AC3}
 
 .adf-thread{margin:8px 0 2px;padding:8px;border-radius:9px;background:#0D0F14;border:1px solid rgba(255,255,255,.05)}

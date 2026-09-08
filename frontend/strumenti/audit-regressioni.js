@@ -632,6 +632,35 @@ test("il tondo per ascoltare e «cambia copertina» si toccano a 44 punti",
   studioElCss.includes("width:44px;height:44px;margin:-22px 0 0 -22px") &&
   /\.stlink\{[^}]*min-height:44px/.test(studioElCss));
 
+/* La barra a tacche serve a confrontare le take a colpo d'occhio: se la
+   casella del «← buona» collassa, la riga senza targhetta regala una
+   sessantina di punti di larghezza alla sua barra e il confronto diventa
+   falso — una q85 sembrava più corta di una q71. La casella si stringe con lo
+   schermo, ma a zero non ci va **mai**. */
+/* I blocchi stretti stanno in `css/stretto.css` dal 08/09/2026, non piu' nel
+   foglio di ognuno: la prova guarda tutti e due i posti, cosi' regge sia se il
+   blocco resta li' sia se un domani torna a casa sua. */
+const cssStretti = studioElCss + leggi("css/stretto.css");
+test("la casella del «← buona» non collassa: le barre delle take restano confrontabili",
+  !/\.sttakeb\{min-width:0\}/.test(cssStretti.replace(/\s+/g, "")) &&
+  /\.sttakeb\{min-width:56px/.test(cssStretti) &&
+  /\.sttakeb\{min-width:50px/.test(cssStretti));
+
+/* A 360 punti la nav globale si prende 210 punti fissi e i tre numeri della
+   fascia ne vogliono quasi 190: su una riga sola l'ora finiva fuori dallo
+   schermo e si leggeva «09:». Sotto i 480 la fascia va su due righe, e
+   `--stAlta` deve crescere con lei se no le colonne ci finiscono dentro. */
+test("sotto i 480px la fascia dello Studio va su due righe e l'ora resta dentro",
+  (() => {
+    const css = leggi("css/studio.css") + leggi("css/stretto.css");
+    const a = css.indexOf("@media (max-width:480px)");
+    if(a < 0) return false;
+    const corpo = css.slice(a, a + 700);
+    return corpo.includes("--stAlta:80px") &&
+      corpo.includes("flex-wrap:wrap") &&
+      /#studio \.strisorse\{flex:1 1 100%/.test(corpo);
+  })());
+
 test("dentro alle schede dei beat e alle take non ci sono bottoni annidati",
   !studioEl.includes('<button type="button" class="stbcard') &&
   !studioEl.includes('<button type="button" class="sttakeriga') &&
@@ -818,6 +847,16 @@ test("controller si monta nella testata della finestra attiva",
   timeControls.includes('head:".nghead"') &&
   timeControls.includes('head:".topbar"') &&
   timeControls.includes('head:".adf-jail-top"'));
+/* Lo Studio è un foglio sopra all'hub, e l'hub resta acceso sotto: senza una
+   riga sua la pastiglia si agganciava all'hub e con lo z-index 142 finiva
+   sopra ai pannelli dello Studio (z-index 94), coprendo «Il quartiere», il
+   tasto «POSTA» e la stima degli stream. L'ora nello Studio ce l'ha la fascia
+   in alto. Le due cose che devono restare vere: la riga muta c'è, e sta
+   **prima** di quella dell'hub. */
+test("lo Studio è muto e viene prima dell'hub: nessuna pastiglia sui pannelli",
+  timeControls.includes('{id:"studio", root:"#studio.on",          mute:true}') &&
+  timeControls.includes('if(spec.mute) return null;') &&
+  timeControls.indexOf('id:"studio"') < timeControls.indexOf('id:"hub"'));
 test("pannello fixed nel body viene riposizionato vicino al widget attivo",
   timeControls.includes('.adf-tc-panel{position:fixed') &&
   timeControls.includes('function positionPanel()') &&
@@ -1708,6 +1747,46 @@ test("nessun documento punta piu' al vecchio 00-come-si-lavora.md",
     guarda(RADICE);
     if(morti.length) console.log("      " + morti.join("\n      "));
     return morti.length === 0;
+  })());
+
+/* L'hover che resta acceso dopo il tocco. Su un telefono non esiste un
+   «passarci sopra»: il browser lascia la riga accesa dopo il tap, e ti ritrovi
+   la scheda evidenziata finché non tocchi da un'altra parte — sembra selezionata
+   e non lo è. Ogni regola :hover del progetto vive dentro a
+   `@media (hover:hover)`, così sul mouse resta identica e sul dito non parte.
+   La prova: tolti i blocchi della gabbia, di :hover non deve restare niente. */
+test("nessun :hover fuori da @media (hover:hover): sul telefono non resta acceso",
+  (() => {
+    const fuori = [];
+    /* Non basta guardare `css/`: sei pezzi di grafica sono scritti dentro al
+       JavaScript (la pastiglia del tempo, i tasti del pannello, il calendario,
+       i post di LaFamegram, il carcere) e la prima passata li aveva saltati —
+       e il controllo diceva «tutto a posto» lo stesso. Adesso guarda anche i
+       file di codice che si portano dentro un foglio di stile. */
+    const daGuardare = fs.readdirSync(path.join(ROOT, "css"))
+      .filter(n => n.endsWith(".css")).map(n => "css/" + n)
+      .concat(["js/game/tempo-controlli.js", "js/game/eventi-v2.js",
+        "js/game/strada-crimine-ui.js", "js/menu-sistema.js",
+        "js/game/telefono.js", "js/game/traphone16.js"]);
+    for(const nome of daGuardare){
+      const testo = leggi(nome);
+      /* via i blocchi @media (hover:hover){...}, contando le graffe */
+      let s = testo, i;
+      while((i = s.search(/@media\s*\(\s*hover\s*:\s*hover\s*\)\s*\{/)) >= 0){
+        let j = s.indexOf("{", i), d = 1, k = j + 1;
+        while(k < s.length && d > 0){
+          if(s[k] === "{") d++;
+          else if(s[k] === "}") d--;
+          k++;
+        }
+        s = s.slice(0, i) + s.slice(k);
+      }
+      /* i commenti non sono regole: possono nominare :hover liberamente */
+      s = s.replace(/\/\*[\s\S]*?\*\//g, "");
+      if(s.includes(":hover")) fuori.push(nome);
+    }
+    if(fuori.length) console.log("      " + fuori.join("\n      "));
+    return fuori.length === 0;
   })());
 
 for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js"]){

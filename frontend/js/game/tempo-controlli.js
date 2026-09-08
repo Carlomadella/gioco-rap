@@ -32,6 +32,14 @@
     {id:"posto",  root:"#posto.on",          head:".pohead",       mount:".pohead", before:".pox", accentVar:"--acid", accent:"#a3e635", panel:"linear-gradient(180deg,rgba(25,20,34,.985),rgba(12,10,17,.985))", border:"rgba(255,255,255,.14)"},
     {id:"negozio",root:"#negozio.on",        head:".nghead",       mount:".nghead", before:".ngx", accentVar:"--acid", accent:"#a3e635", panel:"linear-gradient(180deg,rgba(25,20,34,.985),rgba(12,10,17,.985))", border:"rgba(255,255,255,.14)"},
     {id:"pannello",root:"#pannello.on",      head:".pnhead",       mount:".pnhead", accentVar:"--c1", accent:"#7c3aed", panel:"linear-gradient(180deg,rgba(20,18,25,.985),rgba(10,10,14,.985))", border:"rgba(255,255,255,.14)"},
+    /* Lo Studio è **muto**: l'ora ce l'ha già sua, nella fascia in alto
+       (`studioRisorse()`), e nelle foto di riferimento la pastiglia non c'è.
+       Deve stare **prima dell'hub**: lo Studio è un foglio sopra all'hub, e
+       l'hub resta acceso sotto — senza questa riga la pastiglia si agganciava
+       all'hub, si prendeva lo z-index 142 contro il 94 dello Studio e finiva
+       in mezzo ai pannelli, coprendo «Il quartiere», «POSTA» e la stima degli
+       stream. Un posto muto non monta il widget da nessuna parte. */
+    {id:"studio", root:"#studio.on",          mute:true},
     {id:"hub",    root:"#s-hub.screen.on",   head:".pbarra",       mount:".pbarra", accent:"#c084fc", panel:"linear-gradient(180deg,rgba(16,18,27,.985),rgba(7,9,14,.985))", border:"rgba(192,132,252,.28)"}
   ];
 
@@ -47,6 +55,10 @@
     for(const spec of HOSTS){
       const scope=document.querySelector(spec.root);
       if(!scope) continue;
+      /* posto muto: è acceso, quindi comanda lui, e quello che dice è
+         «qui la pastiglia non ci va». Torna null come se non ci fosse
+         nessun host, e mount() nasconde widget e pannello. */
+      if(spec.mute) return null;
       const head=scope.querySelector(spec.head);
       if(!head) continue;
       const mount=scope.querySelector(spec.mount||spec.head)||head;
@@ -288,7 +300,7 @@
         box-shadow:inset 0 1px 0 rgba(255,255,255,.15),inset 0 -1px 0 rgba(0,0,0,.18);
         backdrop-filter:blur(16px) saturate(1.14);isolation:isolate;transition:border-color .18s ease,box-shadow .2s ease,transform .16s ease
       }
-      #${WIDGET_ID}:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.26);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -1px 0 rgba(0,0,0,.18),0 4px 12px rgba(0,0,0,.14)}
+      @media (hover:hover){#${WIDGET_ID}:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.26);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -1px 0 rgba(0,0,0,.18),0 4px 12px rgba(0,0,0,.14)}}
       #${WIDGET_ID}:focus-visible{outline:1px solid rgba(255,255,255,.68);outline-offset:2px}
       #${WIDGET_ID}.adf-tw-open{border-color:color-mix(in srgb,var(--tc-accent,#fff) 44%,rgba(255,255,255,.22))}
       .adf-tw-meta,.adf-tw-day,.adf-tw-time{position:relative;z-index:30;display:block;text-shadow:0 1px 8px rgba(0,0,0,.50),0 0 1px rgba(0,0,0,.7);white-space:nowrap}
@@ -332,11 +344,21 @@
       .adf-tc-panel{position:fixed;left:12px;top:12px;width:min(368px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;padding:15px;border-radius:16px;display:none;pointer-events:auto;background:var(--tc-panel,rgba(10,11,14,.985));border:1px solid var(--tc-border,rgba(255,255,255,.16));box-shadow:0 24px 80px rgba(0,0,0,.58);backdrop-filter:blur(18px);text-align:left}
       #${ROOT_ID}.adf-tc-open .adf-tc-panel{display:block;animation:adfTcIn .14s ease-out}@keyframes adfTcIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
       .adf-tc-head{display:flex;justify-content:space-between;gap:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.09)}.adf-tc-head small{display:block;color:#8d95a2;font:900 9px/1.2 Figtree,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase}.adf-tc-head b{display:block;margin-top:5px;font-size:12px}.adf-tc-head strong{font-size:24px;color:var(--tc-accent,#8b5cf6);font-variant-numeric:tabular-nums}.adf-tc-weather{margin-top:5px;color:#9ca4b1;font-size:10px;font-weight:750}
-      .adf-tc-select{padding:13px 0 11px}.adf-tc-target{display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:8px;margin-bottom:10px}.adf-tc-step{height:36px;border-radius:9px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.05);color:#fff;font:950 18px/1 Figtree,system-ui,sans-serif;cursor:pointer}.adf-tc-step:hover:not(:disabled){border-color:var(--tc-accent)}.adf-tc-step:disabled{opacity:.3;cursor:not-allowed}.adf-tc-target-mid{text-align:center}.adf-tc-target-mid span{display:block;color:#8f96a3;font-size:10px}.adf-tc-target-mid b{display:block;margin-top:3px;font-size:20px;font-variant-numeric:tabular-nums}.adf-tc-range{width:100%;accent-color:var(--tc-accent);cursor:pointer}.adf-tc-scale{display:flex;justify-content:space-between;margin-top:5px;color:#747b87;font:750 9px/1 Figtree,system-ui,sans-serif}
-      .adf-tc-actions{display:grid;gap:8px;margin-top:4px}.adf-tc-btn{min-height:44px;padding:9px 11px;border-radius:10px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.05);color:#fff;text-align:left;cursor:pointer;font:900 12px/1.15 Figtree,system-ui,sans-serif;transition:filter .14s ease,border-color .14s ease}.adf-tc-btn:hover:not(:disabled){border-color:color-mix(in srgb,var(--tc-accent) 55%,rgba(255,255,255,.18));filter:brightness(1.08)}.adf-tc-btn span{display:block;margin-top:4px;color:#aab0bc;font:700 10px/1.25 Figtree,system-ui,sans-serif}.adf-tc-btn.primary{background:color-mix(in srgb,var(--tc-accent) 74%,#111 26%);color:#fff;border-color:color-mix(in srgb,var(--tc-accent) 78%,#111 22%)}.adf-tc-btn.primary span{color:rgba(255,255,255,.82)}.adf-tc-btn:disabled{opacity:.38;cursor:not-allowed}.adf-tc-day-label{margin:3px 0 -2px;color:#8d95a2;font:900 9px/1 Figtree,system-ui,sans-serif;letter-spacing:.11em;text-transform:uppercase}.adf-tc-day-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.adf-tc-day-actions .adf-tc-btn{text-align:center;min-height:40px}.adf-tc-status{min-height:14px;margin-top:9px;color:#969da8;font:750 10px/1.35 Figtree,system-ui,sans-serif}.adf-tc-status.bad{color:#ff9b9b}.adf-tc-status.good{color:#bde9c8}
+      .adf-tc-select{padding:13px 0 11px}.adf-tc-target{display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:8px;margin-bottom:10px}.adf-tc-step{height:36px;border-radius:9px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.05);color:#fff;font:950 18px/1 Figtree,system-ui,sans-serif;cursor:pointer}@media (hover:hover){.adf-tc-step:hover:not(:disabled){border-color:var(--tc-accent)}}.adf-tc-step:disabled{opacity:.3;cursor:not-allowed}.adf-tc-target-mid{text-align:center}.adf-tc-target-mid span{display:block;color:#8f96a3;font-size:10px}.adf-tc-target-mid b{display:block;margin-top:3px;font-size:20px;font-variant-numeric:tabular-nums}.adf-tc-range{width:100%;accent-color:var(--tc-accent);cursor:pointer}.adf-tc-scale{display:flex;justify-content:space-between;margin-top:5px;color:#747b87;font:750 9px/1 Figtree,system-ui,sans-serif}
+      .adf-tc-actions{display:grid;gap:8px;margin-top:4px}.adf-tc-btn{min-height:44px;padding:9px 11px;border-radius:10px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.05);color:#fff;text-align:left;cursor:pointer;font:900 12px/1.15 Figtree,system-ui,sans-serif;transition:filter .14s ease,border-color .14s ease}@media (hover:hover){.adf-tc-btn:hover:not(:disabled){border-color:color-mix(in srgb,var(--tc-accent) 55%,rgba(255,255,255,.18));filter:brightness(1.08)}}.adf-tc-btn span{display:block;margin-top:4px;color:#aab0bc;font:700 10px/1.25 Figtree,system-ui,sans-serif}.adf-tc-btn.primary{background:color-mix(in srgb,var(--tc-accent) 74%,#111 26%);color:#fff;border-color:color-mix(in srgb,var(--tc-accent) 78%,#111 22%)}.adf-tc-btn.primary span{color:rgba(255,255,255,.82)}.adf-tc-btn:disabled{opacity:.38;cursor:not-allowed}.adf-tc-day-label{margin:3px 0 -2px;color:#8d95a2;font:900 9px/1 Figtree,system-ui,sans-serif;letter-spacing:.11em;text-transform:uppercase}.adf-tc-day-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.adf-tc-day-actions .adf-tc-btn{text-align:center;min-height:40px}.adf-tc-status{min-height:14px;margin-top:9px;color:#969da8;font:750 10px/1.35 Figtree,system-ui,sans-serif}.adf-tc-status.bad{color:#ff9b9b}.adf-tc-status.good{color:#bde9c8}
 
-      @media(max-width:900px){#adf-time-dock{flex-basis:202px;padding-inline:5px}#${WIDGET_ID}{width:192px;height:58px;padding:7px 9px 7px 70px;border-radius:15px}.adf-tw-sun{width:43px;height:43px;left:14px;top:7px}.adf-tw-moon{width:37px;height:37px;left:17px;top:10px}.adf-tw-time{font-size:23px}.adf-tw-meta{font-size:7.5px}.adf-tw-day{font-size:7.8px}}
-      @media(max-width:620px){#adf-time-dock{flex-basis:176px;padding-inline:4px}#${WIDGET_ID}{width:168px;height:54px;padding:6px 8px 6px 61px;border-radius:14px}.adf-tw-sun{width:38px;height:38px;left:12px;top:8px}.adf-tw-moon{width:33px;height:33px;left:14px;top:10px}.adf-tw-time{font-size:21px}.adf-tw-meta{font-size:6.7px}.adf-tw-day{font-size:7px;margin-top:3px}.adf-tc-panel{width:min(340px,calc(100vw - 16px));max-height:calc(100vh - 16px)}}
+      @media(max-width:900px){/* [data-host] e non #adf-time-dock e basta: le righe
+         per singolo posto (strada, jail, hub, posto...) sono scritte piu'
+         precise e vincevano anche sul telefono, cosi' l'orologio si
+         rimpiccioliva ma la casella che se lo tiene restava larga come su un
+         monitor. Stessa precisione, e viene dopo: adesso vince questa. */
+      #adf-time-dock[data-host]{flex-basis:202px;padding-inline:5px}#${WIDGET_ID}{width:192px;height:58px;padding:7px 9px 7px 70px;border-radius:15px}.adf-tw-sun{width:43px;height:43px;left:14px;top:7px}.adf-tw-moon{width:37px;height:37px;left:17px;top:10px}.adf-tw-time{font-size:23px}.adf-tw-meta{font-size:7.5px}.adf-tw-day{font-size:7.8px}}
+      @media(max-width:620px){/* [data-host] e non #adf-time-dock e basta: le righe
+         per singolo posto (strada, jail, hub, posto...) sono scritte piu'
+         precise e vincevano anche sul telefono, cosi' l'orologio si
+         rimpiccioliva ma la casella che se lo tiene restava larga come su un
+         monitor. Stessa precisione, e viene dopo: adesso vince questa. */
+      #adf-time-dock[data-host]{flex-basis:176px;padding-inline:4px}#${WIDGET_ID}{width:168px;height:54px;padding:6px 8px 6px 61px;border-radius:14px}.adf-tw-sun{width:38px;height:38px;left:12px;top:8px}.adf-tw-moon{width:33px;height:33px;left:14px;top:10px}.adf-tw-time{font-size:21px}.adf-tw-meta{font-size:6.7px}.adf-tw-day{font-size:7px;margin-top:3px}.adf-tc-panel{width:min(340px,calc(100vw - 16px));max-height:calc(100vh - 16px)}}
       @media(prefers-reduced-motion:reduce){#${WIDGET_ID},#${WIDGET_ID} *,#${ROOT_ID} *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
     `;
     document.head.appendChild(s);

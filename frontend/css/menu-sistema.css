@@ -13,12 +13,12 @@
 .adf-system-kicker{display:block;color:#b7aa98;font-size:9px;font-weight:900;letter-spacing:.2em;text-transform:uppercase}
 .adf-system-head h2{margin:5px 0 0;font-family:"Archivo Black",Figtree,sans-serif;font-size:34px;line-height:1;text-transform:uppercase;letter-spacing:-.04em}
 .adf-system-x{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#eee6da;font-size:18px;cursor:pointer}
-.adf-system-x:hover{background:rgba(255,255,255,.11)}
+@media (hover:hover){.adf-system-x:hover{background:rgba(255,255,255,.11)}}
 
 .adf-system-row,.adf-system-save{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;text-align:left;cursor:pointer}
 .adf-system-row{padding:15px 12px;border:0;border-top:1px solid rgba(255,255,255,.11);background:transparent;color:#eee7dd}
 .adf-system-row:last-of-type{border-bottom:1px solid rgba(255,255,255,.11)}
-.adf-system-row:hover{background:rgba(255,255,255,.055)}
+@media (hover:hover){.adf-system-row:hover{background:rgba(255,255,255,.055)}}
 .adf-system-row span,.adf-system-save span{display:flex;flex-direction:column;gap:3px}
 .adf-system-row b,.adf-system-save b{font-size:13px;font-weight:900;letter-spacing:.075em;text-transform:uppercase}
 .adf-system-row small,.adf-system-save small{font-size:10.5px;color:#999187;line-height:1.35}
@@ -38,13 +38,14 @@
 
 .adf-system-save{margin-top:14px;padding:15px 16px;border:1px solid rgba(215,176,106,.38);border-radius:15px;
   background:linear-gradient(90deg,rgba(215,176,106,.17),rgba(215,176,106,.055));color:#f5ead7}
-.adf-system-save:hover{border-color:rgba(215,176,106,.65);background:linear-gradient(90deg,rgba(215,176,106,.24),rgba(215,176,106,.08))}
+@media (hover:hover){.adf-system-save:hover{border-color:rgba(215,176,106,.65);background:linear-gradient(90deg,rgba(215,176,106,.24),rgba(215,176,106,.08))}}
 .adf-system-save i{color:#e4c27f}
 .adf-system-status{min-height:16px;margin:8px 4px 0;font-size:10.5px;line-height:1.4;color:#a9a095}
 .adf-system-status[data-tipo="bad"]{color:#e7a194}.adf-system-status[data-tipo="good"]{color:#a8d2af}
 .adf-system-nosave{display:block;margin:5px auto 0;padding:7px 10px;border:0;background:none;color:#746f69;font-size:9px;font-weight:800;
   letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
-.adf-system-nosave:hover,.adf-system-nosave.armato{color:#e19486;text-decoration:underline}
+.adf-system-nosave.armato{color:#e19486;text-decoration:underline}
+@media (hover:hover){.adf-system-nosave:hover{color:#e19486;text-decoration:underline}}
 
 body.adf-system-open{overflow:hidden}
 
@@ -57,7 +58,7 @@ body.adf-system-open{overflow:hidden}
 .adf-global-system,.adf-global-map{height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.15);
   box-shadow:0 9px 28px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.08);backdrop-filter:blur(14px);cursor:pointer}
 .adf-global-system{display:flex;align-items:center;gap:9px;padding:0 11px 0 7px;background:rgba(10,10,13,.91);color:#f3ede3}
-.adf-global-system:hover{background:rgba(20,19,22,.96);border-color:rgba(215,176,106,.38)}
+@media (hover:hover){.adf-global-system:hover{background:rgba(20,19,22,.96);border-color:rgba(215,176,106,.38)}}
 .adf-global-mark{width:27px;height:27px;border-radius:8px;display:grid;place-items:center;background:#d7b06a;color:#15110b;
   font:950 9px/1 Figtree,system-ui,sans-serif;letter-spacing:-.03em}
 .adf-global-name{font-size:10px;font-weight:950;letter-spacing:.14em;white-space:nowrap}
@@ -65,7 +66,7 @@ body.adf-system-open{overflow:hidden}
   background:rgba(255,255,255,.055);color:#837d75;font:800 7px/1 Figtree,system-ui,sans-serif;letter-spacing:.06em}
 .adf-global-map{display:flex;align-items:center;gap:7px;padding:0 13px;background:rgba(10,10,13,.82);color:#d8d0c5;
   font:900 9px/1 Figtree,system-ui,sans-serif;letter-spacing:.11em;text-transform:uppercase}
-.adf-global-map:hover:not(:disabled){background:rgba(25,24,28,.94);color:#fff;border-color:rgba(255,255,255,.28)}
+@media (hover:hover){.adf-global-map:hover:not(:disabled){background:rgba(25,24,28,.94);color:#fff;border-color:rgba(255,255,255,.28)}}
 .adf-global-map:disabled{opacity:.38;cursor:not-allowed}
 .adf-global-map[hidden]{display:none!important}
 
@@ -112,11 +113,11 @@ body.adf-system-open{overflow:hidden}
   box-shadow:none;
   backdrop-filter:none;
 }
-.adf-global-system:hover{
+@media (hover:hover){.adf-global-system:hover{
   background:rgba(255,255,255,.05);
   border:0;
   box-shadow:none;
-}
+}}
 .adf-global-system:focus-visible{
   outline:2px solid rgba(255,211,78,.48);
   outline-offset:-2px;
@@ -202,9 +203,9 @@ body.adf-system-open{overflow:hidden}
   box-shadow:none!important;
   background:transparent!important;
 }
-.adf-global-system:hover{
+@media (hover:hover){.adf-global-system:hover{
   background:rgba(255,255,255,.045)!important;
-}
+}}
 
 /* Secondo segmento: ritorno alla città. */
 .adf-global-map{
@@ -274,15 +275,15 @@ body.adf-system-open{overflow:hidden}
   letter-spacing:.17em;
 }
 
-.adf-global-map:hover:not(:disabled){
+@media (hover:hover){.adf-global-map:hover:not(:disabled){
   background:rgba(255,255,255,.045)!important;
   color:#fff;
-}
-.adf-global-map:hover:not(:disabled) > span:first-child{
+}}
+@media (hover:hover){.adf-global-map:hover:not(:disabled) > span:first-child{
   background:rgba(192,132,252,.13);
   border-color:rgba(192,132,252,.34);
   color:#d8b4fe;
-}
+}}
 
 .adf-global-map:focus-visible{
   outline:none;
@@ -377,9 +378,9 @@ body.adf-system-open{overflow:hidden}
   border-left:0!important;
   border-right:1px solid rgba(255,255,255,.075)!important;
 }
-.adf-system-host-v7 > .adf-global-nav > .adf-global-system:hover{
+@media (hover:hover){.adf-system-host-v7 > .adf-global-nav > .adf-global-system:hover{
   background:rgba(255,255,255,.04)!important;
-}
+}}
 
 /* MAPPA: niente quadratino/pill intorno alla freccia. */
 .adf-system-host-v7 > .adf-global-nav > .adf-global-map{
@@ -390,9 +391,9 @@ body.adf-system-open{overflow:hidden}
   border-left:0!important;
   border-right:1px solid rgba(255,255,255,.065)!important;
 }
-.adf-system-host-v7 > .adf-global-nav > .adf-global-map:hover:not(:disabled){
+@media (hover:hover){.adf-system-host-v7 > .adf-global-nav > .adf-global-map:hover:not(:disabled){
   background:rgba(255,255,255,.04)!important;
-}
+}}
 
 .adf-system-host-v7 .adf-global-map > span:first-child{
   width:19px!important;
@@ -455,14 +456,24 @@ body.adf-system-open{overflow:hidden}
   display:flex!important;
   pointer-events:none!important;
 }
+/* Sul telefono la fascia della Strada rientra a 12 punti (il blocco stretto in
+   css/stretto.css), ma i 30 qui sopra sono scritti con !important e restavano:
+   il menu partiva 18 punti piu' a destra del titolo e della riga sotto. Qui la
+   fascia e' anche piu' bassa, quindi scende pure l'altezza. */
+@media (max-width:620px){
+  #strada.on .topbar.adf-system-host-v7 > .adf-global-nav{
+    left:12px!important;
+    height:52px!important;
+  }
+}
 
 /* Il tema Strada resta rosso/rosa solo nell'hover e nella freccia. */
 #strada.on .topbar.adf-system-host-v7 .adf-global-map > span:first-child{
   color:var(--gold,#c52e5f)!important;
 }
-#strada.on .topbar.adf-system-host-v7 > .adf-global-nav > .adf-global-map:hover:not(:disabled){
+@media (hover:hover){#strada.on .topbar.adf-system-host-v7 > .adf-global-nav > .adf-global-map:hover:not(:disabled){
   background:rgba(197,46,95,.065)!important;
-}
+}}
 
 /* ============================================================
    CARCERE

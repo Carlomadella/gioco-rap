@@ -90,7 +90,7 @@
   font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
   border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);
   transition:background .15s,transform .12s}
-#servizio .tasti button:hover{background:rgba(255,255,255,.1)}
+@media (hover:hover){#servizio .tasti button:hover{background:rgba(255,255,255,.1)}}
 #servizio .tasti button:active{transform:translateY(1px)}
 #servizio .tasti button.primo{border-color:transparent;color:#1a1206;
   background:linear-gradient(180deg,#FFD980,#E0A32E)}
@@ -100,7 +100,7 @@
 #servizio details{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
 #servizio summary{cursor:pointer;font-family:var(--cond);font-size:13px;
   letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
-#servizio summary:hover{color:var(--soft)}
+@media (hover:hover){#servizio summary:hover{color:var(--soft)}}
 #servizio pre{margin:10px 0 0;padding:12px;border-radius:10px;max-height:210px;overflow:auto;
   background:#0A0A0E;border:1px solid var(--line);
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.5;
@@ -126,10 +126,5 @@
 #staccato button{flex:none;padding:8px 12px;border-radius:10px;border:1px solid var(--line);
   background:rgba(255,255,255,.05);font-family:var(--cond);font-size:13px;
   letter-spacing:.05em;text-transform:uppercase;color:var(--text)}
-#staccato button:hover{background:rgba(255,255,255,.1)}
+@media (hover:hover){#staccato button:hover{background:rgba(255,255,255,.1)}}
 
-@media (max-width:560px){
-  #servizio .foglio{padding:22px 18px 20px}
-  #staccato{flex-wrap:wrap}
-  #staccato .testo{flex:1 0 100%}
-}
