@@ -11,28 +11,42 @@
     "source_status": "da_fare",
     "source_status_raw": "da fare"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
-  "intake_state": "canonical",
-  "related_task_ids": [],
-  "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "duplicate",
+  "related_task_ids": [
+    "ADF-LEG-D7416EF2ABDA"
+  ],
+  "intake_note": "delta=nessuno: cambiare l'energia a 100 e adeguare giornate, costi e salti e' esattamente la consegna della task canonica sull'energia a 100.",
+  "current_state": [
+    "La task canonica ADF-LEG-D7416EF2ABDA rappresenta gia energia giornaliera, avanzamento a giorni, salti multipli e costi riproporzionati."
+  ],
+  "systems": [
+    "frontend/js/game/sim.js",
+    "frontend/js/game/skip.js",
+    "frontend/js/game/actions.js",
+    "frontend/js/game/lifestyle.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/sim.js",
+    "frontend/js/game/skip.js",
+    "frontend/js/game/actions.js",
+    "frontend/js/game/lifestyle.js"
+  ],
   "acceptance_criteria": [],
   "risks": [],
   "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+    "La taratura tramite playtest resta nella task canonica collegata."
   ],
-  "roadmap_scope": "none",
   "plan": {
     "mode": "none",
     "status": "not_applicable",
-    "summary": "",
+    "summary": "Nessun piano nuovo: la richiesta e' gia' rappresentata dalla task canonica.",
     "steps": [],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }

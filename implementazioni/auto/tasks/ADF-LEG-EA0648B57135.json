@@ -11,28 +11,111 @@
     "source_status": "da_fare",
     "source_status_raw": "da fare"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
-  "intake_state": "canonical",
+  "audit_state": "audited",
+  "verified_status": "planned",
+  "intake_state": "unique",
   "related_task_ids": [],
-  "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "intake_note": "Non emerge una task equivalente: il codice usa il marchio in metadata, landing e impostazioni, ma non dimostra branding organico dentro alle attivita' e agli studi.",
+  "current_state": [
+    "frontend/index.html, frontend/js/landing.js e frontend/js/impostazioni.js mostrano gia' il nome La Fame Studio in metadata, copyright e landing.",
+    "frontend/js/game/studio.js e frontend/js/game/hub.js hanno scenari e luogo Studio, ma non un'integrazione di branding La Fame Studio nelle esperienze di gioco."
   ],
-  "roadmap_scope": "none",
+  "systems": [
+    "frontend/js/game/studio.js",
+    "frontend/js/game/hub.js",
+    "frontend/js/game/posto.js",
+    "frontend/js/game/telefono.js",
+    "frontend/js/landing.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/studio.js",
+    "frontend/js/game/hub.js",
+    "frontend/js/game/posto.js",
+    "frontend/js/game/telefono.js",
+    "frontend/js/landing.js",
+    "frontend/css/studio.css",
+    "frontend/css/hub.css"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Il marchio compare in punti diegetici e coerenti, come nome di uno studio o dettaglio di scena, senza trasformare l'interfaccia in pubblicita'.",
+      "verification": "playtest",
+      "status": "pending",
+      "evidence": [
+        "frontend/js/game/studio.js: ambienti dello studio esistono, ma non contengono ancora il branding richiesto."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il branding resta leggibile e piacevole nelle schermate desktop e strette senza coprire azioni, statistiche o contenuti.",
+      "verification": "playtest",
+      "status": "pending",
+      "evidence": []
+    }
+  ],
+  "risks": [
+    "Un logo ripetuto puo' risultare invasivo o ridurre la leggibilita'.",
+    "Modificare scenari condivisi puo' rompere layout desktop e mobile."
+  ],
+  "notes": [],
   "plan": {
-    "mode": "none",
-    "status": "not_applicable",
-    "summary": "",
-    "steps": [],
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Inserire pochi riferimenti diegetici al marchio e validarli su tutte le schermate coinvolte.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Punti di branding",
+        "objective": "Selezionare e implementare i punti organici in Studio, La Sala e contenuti collegati senza duplicare il marchio.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/studio.js",
+          "frontend/js/game/hub.js",
+          "frontend/js/game/posto.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/studio.js",
+          "frontend/js/game/hub.js",
+          "frontend/js/game/posto.js",
+          "frontend/css/studio.css",
+          "frontend/css/hub.css"
+        ],
+        "acceptance_criteria": [
+          "AC1"
+        ],
+        "status": "planned"
+      },
+      {
+        "id": "V2",
+        "title": "Validazione non invasiva",
+        "objective": "Controllare gerarchia visiva, leggibilita' e ripetizione del branding su desktop e viewport strette.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "frontend/js/game/studio.js",
+          "frontend/js/game/telefono.js",
+          "frontend/css/studio.css",
+          "frontend/css/tocco.css"
+        ],
+        "watch_paths": [
+          "frontend/js/game/studio.js",
+          "frontend/js/game/telefono.js",
+          "frontend/css/studio.css",
+          "frontend/css/tocco.css"
+        ],
+        "acceptance_criteria": [
+          "AC1",
+          "AC2"
+        ],
+        "status": "planned"
+      }
+    ],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }

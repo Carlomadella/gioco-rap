@@ -11,28 +11,117 @@
     "source_status": "da_fare",
     "source_status_raw": "da fare"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
-  "intake_state": "canonical",
-  "related_task_ids": [],
-  "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "audit_state": "audited",
+  "verified_status": "planned",
+  "intake_state": "overlap",
+  "related_task_ids": [
+    "ADF-LEG-A90B7B3817A1",
+    "ADF-LEG-DB2D56011EF3"
   ],
-  "roadmap_scope": "none",
+  "intake_note": "Le task collegate coprono rispettivamente la plancia a schermo intero e la creazione dell'avatar; questa richiesta aggiunge il delta visivo di fedelta' alla foto e l'uso di un avatar segnaposto coerente.",
+  "current_state": [
+    "frontend/js/game/hub.js e frontend/css/hub.css ricostruiscono la plancia e usano il ritratto generato o salvato, ma la fedelta' alla foto richiede confronto visivo.",
+    "frontend/js/creator/portrait.js e frontend/js/game/hub.js supportano ritratti SVG o immagini avatar, ma non e' dimostrato che il segnaposto richiesto dalla foto sia il default corretto.",
+    "I concept di riferimento sono separati in frontend/concept/ e non vengono distribuiti come asset di gioco."
+  ],
+  "systems": [
+    "frontend/js/game/hub.js",
+    "frontend/css/hub.css",
+    "frontend/js/creator/portrait.js",
+    "frontend/js/game/state.js",
+    "frontend/concept/"
+  ],
+  "watch_paths": [
+    "frontend/js/game/hub.js",
+    "frontend/css/hub.css",
+    "frontend/js/creator/portrait.js",
+    "frontend/js/game/state.js",
+    "frontend/concept/",
+    "frontend/media/"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "La plancia e le sue gerarchie visive corrispondono alla foto di riferimento senza usare la foto come sfondo quando un'implementazione strutturale e' piu' adatta.",
+      "verification": "playtest",
+      "status": "pending",
+      "evidence": [
+        "frontend/js/game/hub.js e frontend/css/hub.css: struttura grafica esistente da confrontare con il concept."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il nuovo artista mostra un avatar segnaposto coerente con il riferimento finche' il giocatore non salva un avatar proprio.",
+      "verification": "playtest",
+      "status": "pending",
+      "evidence": [
+        "frontend/js/creator/portrait.js e frontend/js/game/hub.js: esistono percorsi per ritratto generato e avatar image, ma il comportamento default va validato."
+      ]
+    }
+  ],
+  "risks": [
+    "Una copia letterale della foto puo' irrigidire il responsive.",
+    "Cambiare il default dell'avatar puo' alterare salvataggi e anteprime esistenti."
+  ],
+  "notes": [],
   "plan": {
-    "mode": "none",
-    "status": "not_applicable",
-    "summary": "",
-    "steps": [],
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Confrontare la plancia esistente con il concept e fissare un default avatar senza duplicare i sistemi gia' presenti.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Confronto grafico e avatar",
+        "objective": "Auditare la plancia e il percorso di creazione per individuare soltanto le differenze rispetto alle due immagini di riferimento.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/hub.js",
+          "frontend/css/hub.css",
+          "frontend/js/creator/portrait.js",
+          "frontend/concept/"
+        ],
+        "watch_paths": [
+          "frontend/js/game/hub.js",
+          "frontend/css/hub.css",
+          "frontend/js/creator/portrait.js",
+          "frontend/concept/"
+        ],
+        "acceptance_criteria": [
+          "AC1",
+          "AC2"
+        ],
+        "status": "planned"
+      },
+      {
+        "id": "V2",
+        "title": "Rifinitura e prova viewport",
+        "objective": "Applicare il delta minimo e verificare default avatar, leggibilita' e adattamento della plancia su schermi ampi e stretti.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "frontend/js/game/hub.js",
+          "frontend/css/hub.css",
+          "frontend/js/game/state.js",
+          "frontend/css/tocco.css"
+        ],
+        "watch_paths": [
+          "frontend/js/game/hub.js",
+          "frontend/css/hub.css",
+          "frontend/js/game/state.js",
+          "frontend/css/tocco.css"
+        ],
+        "acceptance_criteria": [
+          "AC1",
+          "AC2"
+        ],
+        "status": "planned"
+      }
+    ],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }

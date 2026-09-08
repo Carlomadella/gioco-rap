@@ -13,148 +13,114 @@
   },
   "audit_state": "audited",
   "verified_status": "in_progress",
-  "intake_state": "canonical",
-  "related_task_ids": [],
-  "intake_note": "La direzione store è già recepita nei README e nel build, ma la consegna storica include integrazioni di piattaforma ancora mancanti.",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
+  "intake_state": "overlap",
+  "related_task_ids": [
+    "ADF-LEG-043B012E6E3B"
+  ],
+  "intake_note": "La task canonica copre i cinque lavori tecnici per gli store; questa richiesta mantiene il delta storico su README e schema database, gia' presente, oltre alla direzione di distribuzione.",
   "current_state": [
-    "Il frontend dichiara Steam, App Store e Google Play come destinazioni e produce dist per Electron/Capacitor.",
-    "Build, demo monofile, salvataggio cloud backend e account/sessioni sono presenti; il salvataggio frontend scrive ancora nel localStorage e non risultano integrazioni Steam Cloud o identità store operative."
+    "frontend/strumenti/build.js e frontend/package.json producono un build per la distribuzione e una demo separata.",
+    "backend/database/ e backend/README.md documentano database, migrazioni e schema; implementazioni/08-uscita-sugli-store.md registra i README e backend/database/schema.md come fatti.",
+    "frontend/js/game/state.js salva ancora nel localStorage e la fonte segnala come mancanti il percorso dispositivo/cloud completo e la validazione dei canali pubblicati."
   ],
   "systems": [
-    "frontend/README.md",
-    "frontend/package.json",
     "frontend/strumenti/build.js",
-    "frontend/js/servizio.js",
-    "frontend/js/net/online.js",
-    "backend/server.js",
-    "backend/database/archivio.js"
+    "frontend/package.json",
+    "frontend/strumenti/prova.js",
+    "backend/database/",
+    "backend/README.md",
+    "frontend/js/game/state.js"
   ],
   "watch_paths": [
-    "frontend/README.md",
-    "frontend/package.json",
     "frontend/strumenti/build.js",
+    "frontend/package.json",
     "frontend/strumenti/prova.js",
-    "frontend/js/servizio.js",
-    "frontend/js/net/online.js",
+    "backend/database/",
+    "backend/README.md",
     "frontend/js/game/state.js",
-    "backend/server.js",
-    "backend/database/archivio.js",
+    "frontend/js/net/online.js",
     "backend/accessi.js"
   ],
   "acceptance_criteria": [
     {
       "id": "AC1",
-      "description": "Il progetto produce un pacchetto installabile separato dalla demo monofile e coerente con Electron/Capacitor.",
+      "description": "La direzione store non dipende da un artifact monofile e la documentazione descrive build e schema database reali.",
       "verification": "code_audit",
       "status": "satisfied",
       "evidence": [
-        "frontend/strumenti/build.js e frontend/package.json: npm run build genera dist per gli store, mentre npm run demo genera esplicitamente la demo monofile."
+        "frontend/strumenti/build.js: build e demo sono percorsi distinti.",
+        "backend/database/schema.md e backend/README.md: schema e destinazione store documentati."
       ]
     },
     {
       "id": "AC2",
-      "description": "La partita usa salvataggi persistenti su dispositivo e cloud associati all’account, senza dipendere soltanto dal localStorage.",
+      "description": "La carriera viene salvata sul dispositivo e sincronizzata con il cloud dell'account senza dipendere soltanto dal localStorage.",
       "verification": "code_audit",
       "status": "needs_validation",
       "evidence": [
-        "backend/server.js: esistono PUT/GET /api/carriera/:slot e GET /api/carriere; frontend/js/net/online.js espone il ponte cloud, ma il salvataggio locale del gioco non è ancora sostituito dal percorso dispositivo/cloud."
+        "frontend/js/game/state.js: save() usa ancora localStorage.",
+        "frontend/js/net/online.js e backend/server.js: il ponte cloud esiste ma non sostituisce ancora il percorso di save()."
       ]
     },
     {
       "id": "AC3",
-      "description": "Steam, Apple e Google possono autenticare l’utente nel prodotto distribuito e la carriera può essere recuperata cambiando dispositivo.",
-      "verification": "code_audit",
+      "description": "I canali Steam, Apple e Google sono collegati al client del prodotto pubblicato e permettono il recupero della carriera.",
+      "verification": "playtest",
       "status": "needs_validation",
       "evidence": [
-        "backend/server.js accetta i canali steam/apple/google e backend/accessi.js ne verifica i biglietti quando configurato; mancano però le chiavi e il collegamento del client alle app pubblicate."
-      ]
-    },
-    {
-      "id": "AC4",
-      "description": "Il build distribuito conserva i controlli di regressione e non include asset di concept non richiesti.",
-      "verification": "automatic",
-      "status": "satisfied",
-      "evidence": [
-        "frontend/strumenti/prova.js: verifica build, riferimenti, immagini e assenza di cache-busting manuale; frontend/concept/README.md documenta la separazione dai contenuti distribuiti."
+        "backend/accessi.js: verifica dei token quando configurata; la configurazione delle app pubblicate e il flusso client end-to-end non sono dimostrati dal repository."
       ]
     }
   ],
   "risks": [
-    "Collegare save() al cloud senza gestione dei conflitti può sovrascrivere una carriera più avanti.",
-    "Le integrazioni store richiedono credenziali e test su piattaforme reali, non verificabili dal solo repository.",
-    "Electron e Capacitor hanno storage e ciclo di vita differenti."
+    "Il cloud puo' sovrascrivere la carriera sbagliata se il conflitto non resta esplicito.",
+    "Le credenziali e il test sugli store richiedono ambienti reali."
   ],
   "notes": [],
   "plan": {
     "mode": "auto",
     "status": "ready",
-    "summary": "Consolidare il percorso di distribuzione, collegare i salvataggi al dispositivo/cloud e poi attivare le identità store.",
+    "summary": "Conservare build e documentazione gia' presenti, poi chiudere persistenza cross-device e integrazione store.",
     "steps": [
       {
         "id": "V1",
-        "title": "Pacchetto e storage locale",
-        "objective": "Stabilizzare il build per Electron/Capacitor e sostituire il solo localStorage con un adapter persistente per dispositivo mantenendo la compatibilità dei salvataggi.",
+        "title": "Persistenza installabile",
+        "objective": "Collegare il salvataggio del gioco a uno storage dispositivo e al cloud mantenendo offline e conflitti espliciti.",
         "depends_on": [],
         "systems": [
-          "frontend/strumenti/build.js",
           "frontend/js/game/state.js",
-          "frontend/js/servizio.js"
+          "frontend/js/net/online.js",
+          "backend/server.js"
         ],
         "watch_paths": [
-          "frontend/strumenti/build.js",
-          "frontend/package.json",
           "frontend/js/game/state.js",
-          "frontend/js/servizio.js"
+          "frontend/js/net/online.js",
+          "backend/server.js",
+          "backend/database/"
         ],
         "acceptance_criteria": [
-          "AC1",
           "AC2"
         ],
         "status": "planned"
       },
       {
         "id": "V2",
-        "title": "Sincronizzazione account",
-        "objective": "Collegare il salvataggio di gioco alle API cloud con conflitti espliciti e recupero degli slot senza perdere la modalità offline.",
+        "title": "Canali pubblicati",
+        "objective": "Collegare client, autenticazione e recupero carriera agli adapter Steam, Apple e Google e provarli nei gusci pubblicati.",
         "depends_on": [
           "V1"
         ],
         "systems": [
-          "frontend/js/net/online.js",
-          "frontend/js/game/state.js",
-          "backend/server.js",
-          "backend/database/archivio.js"
-        ],
-        "watch_paths": [
-          "frontend/js/net/online.js",
-          "frontend/js/game/state.js",
-          "backend/server.js",
-          "backend/database/archivio.js"
-        ],
-        "acceptance_criteria": [
-          "AC2"
-        ],
-        "status": "planned"
-      },
-      {
-        "id": "V3",
-        "title": "Canali Steam e mobile",
-        "objective": "Configurare gli adapter di autenticazione e cloud delle piattaforme, verificando il recupero della carriera nei gusci pubblicati.",
-        "depends_on": [
-          "V2"
-        ],
-        "systems": [
           "backend/accessi.js",
           "backend/server.js",
-          "frontend/js/net/online.js"
+          "frontend/js/net/online.js",
+          "frontend/strumenti/build.js"
         ],
         "watch_paths": [
           "backend/accessi.js",
           "backend/server.js",
           "frontend/js/net/online.js",
-          "frontend/README.md"
+          "frontend/strumenti/build.js"
         ],
         "acceptance_criteria": [
           "AC3"
@@ -165,5 +131,7 @@
     "gaps": [],
     "notes": []
   },
-  "roadmap_scope": "none"
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }
