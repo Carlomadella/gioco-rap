@@ -6,6 +6,30 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:10a372d -->
+## 08/09/26, 21:17 â€” main â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `10a372d`
+
+### Cosa Ã¨ entrato
+
+- `354a383` â€” feat(makehuman): rifinisce zoom camerino â€” **Mycol**
+- `72b3118` â€” feat(makehuman): aggiorna sfondo camerino â€” **Mycol**
+- `d75b15b` â€” feat(makehuman): integra creator e ritratto nel gioco â€” **Mycol**
+- `2caed5c` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `b87ec1e` â€” merge: in Studio le azioni non ti buttano più fuori sulla mappa â€” **Sadyco La Fame**
+- `fd972b7` â€” test: un controllo automatico vero per il punto 14 dello Studio â€” **Sadyco La Fame**
+- `0b41d74` â€” fix: in Studio le azioni non ti buttano più fuori sulla mappa â€” **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/writer.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:b87ec1e -->
 ## 08/09/26, 11:09 â€” branch non identificato â†’ main
 
