@@ -8,6 +8,8 @@ on:
       - implementazioni/implementazioni.md
       - scripts/roadmap-auto.js
       - scripts/test-roadmap-auto.js
+      - scripts/roadmap-audit-guard.js
+      - scripts/test-roadmap-audit-guard.js
       - .github/workflows/roadmap-auto.yml
   workflow_run:
     workflows:
@@ -67,7 +69,9 @@ jobs:
           git log -1 --format=%s "$TARGET" > "$RUNNER_TEMP/commit-subject.txt"
 
       - name: Test motore roadmap
-        run: node scripts/test-roadmap-auto.js
+        run: |
+          node scripts/test-roadmap-auto.js
+          node scripts/test-roadmap-audit-guard.js
 
       - name: Importa tutto lo storico senza riscriverlo
         run: node scripts/roadmap-auto.js bootstrap
@@ -82,8 +86,6 @@ jobs:
           export ADF_COMMIT_SUBJECT="$(cat "$RUNNER_TEMP/commit-subject.txt")"
           node scripts/roadmap-auto.js prompt > "$RUNNER_TEMP/roadmap-prompt.txt"
 
-          # Gli ID compaiono una sola volta nelle righe "JSON:" del prompt.
-          # Li conserviamo per impedire un falso verde se l'AI risponde senza scrivere.
           sed -n 's#.*JSON: implementazioni/auto/tasks/\(ADF-\(LEG\|NEW\)-[A-F0-9]\{12\}\)\.json.*#\1#p' \
             "$RUNNER_TEMP/roadmap-prompt.txt" > "$RUNNER_TEMP/audit-ids.txt"
 
@@ -109,15 +111,35 @@ jobs:
           set +e
           if [ -z "$COPILOT_GITHUB_TOKEN" ]; then unset COPILOT_GITHUB_TOKEN; fi
 
-          CONTESTO_AUTOMAZIONE=$(cat <<'EOF'
+          CONTESTO_AUTOMAZIONE=$(cat <<'EOF_CONTEXT'
           CONTESTO OPERATIVO DEL WORKFLOW:
           - Sei già nel branch/worktree corretto predisposto da GitHub Actions.
-          - NON creare o cambiare branch.
-          - NON fare commit, pull o push.
-          - Le regole generiche del repository su creazione branch/commit sono già gestite dal workflow esterno.
-          - La tua unica operazione mutante autorizzata in questo passaggio è modificare i JSON task elencati nel prompt.
-          - Usa direttamente gli strumenti di scrittura file disponibili (edit/apply_patch/create) sui soli JSON autorizzati.
-          EOF
+          - NON creare o cambiare branch. NON fare commit, pull o push.
+          - Puoi modificare SOLO i JSON task elencati nel prompt.
+          - Usa direttamente edit/apply_patch/create sui soli JSON autorizzati.
+
+          REGOLE DI CLASSIFICAZIONE OBBLIGATORIE:
+          - duplicate è una classificazione STRETTA: UNA singola task canonica deve avere perimetro, obiettivo e risultato atteso sostanzialmente equivalenti.
+          - Parole, categoria o sistema in comune NON bastano per duplicate.
+          - Se la nuova richiesta è più ampia della candidata, usa overlap, non duplicate.
+          - Più task strette che coprono pezzi diversi della richiesta implicano overlap, non duplicate.
+          - Se usi duplicate su una richiesta inbox: related_task_ids deve avere ESATTAMENTE una task e intake_note deve contenere la stringa delta=nessuno spiegando l'equivalenza.
+          - Una richiesta ampia/cross-system in overlap deve avere plan.mode=auto se l'utente non ha già fornito V1...Vn. Il piano deve coprire il delta reale senza ricopiare il lavoro già coperto.
+
+          FORMATO JSON OBBLIGATORIO:
+          - acceptance_criteria[] = { id, description, verification, status, evidence }.
+          - verification ammessi: automatic, code_audit, playtest.
+          - status dei criteri ammessi: pending, satisfied, needs_validation, blocked.
+          - plan = { mode, status, summary, steps, gaps, notes }.
+          - plan.mode ammessi: none, auto, user_defined.
+          - plan.status ammessi: not_applicable, draft, ready, gap_found, conflict.
+          - plan.steps[] = { id, title, objective, depends_on, systems, watch_paths, acceptance_criteria, status }.
+          - plan.steps[].id deve essere V1, V2, ...
+          - plan.steps[].status ammessi: planned, in_progress, needs_validation, complete, blocked.
+          - NON usare pending o satisfied come status di plan.steps.
+          - depends_on, systems, watch_paths e acceptance_criteria di ogni step devono essere sempre array, anche vuoti.
+          - Ogni criterio deve avere description non vuota ed evidence array, anche vuoto.
+          EOF_CONTEXT
           )
 
           copilot -p "$CONTESTO_AUTOMAZIONE
@@ -127,50 +149,55 @@ jobs:
             --available-tools='view,grep,glob,edit,apply_patch,create' \
             --allow-tool='write' \
             --no-ask-user
-          CODE=$?
+          AI_CODE=$?
+          CODE=$AI_CODE
 
-          if [ "$CODE" -eq 0 ]; then
-            ADF_AUDIT_IDS_FILE="$RUNNER_TEMP/audit-ids.txt" node - <<'NODE'
-            const fs = require('fs');
-            const path = require('path');
-
-            const idsFile = process.env.ADF_AUDIT_IDS_FILE;
-            const ids = fs.existsSync(idsFile)
-              ? fs.readFileSync(idsFile, 'utf8').split(/\r?\n/).map(v => v.trim()).filter(Boolean)
-              : [];
-
-            const failures = [];
-            for (const id of ids) {
-              const file = path.join('implementazioni', 'auto', 'tasks', `${id}.json`);
-              if (!fs.existsSync(file)) {
-                failures.push(`${id}: JSON mancante`);
-                continue;
-              }
-              const task = JSON.parse(fs.readFileSync(file, 'utf8'));
-              if (task.audit_state !== 'audited') {
-                failures.push(`${id}: audit_state=${task.audit_state}`);
-              }
-            }
-
-            if (failures.length) {
-              console.error('Audit AI dichiarato riuscito ma il batch non è stato realmente completato:');
-              console.error(failures.join('\n'));
-              process.exit(1);
-            }
-            console.log(`[roadmap-auto] audit AI persistito: ${ids.length} task del batch risultano auditate.`);
-          NODE
+          if [ "$AI_CODE" -eq 0 ]; then
+            node scripts/roadmap-audit-guard.js validate-batch "$RUNNER_TEMP/audit-ids.txt" \
+              > "$RUNNER_TEMP/audit-validation.log" 2>&1
             CODE=$?
+          fi
+
+          if [ "$AI_CODE" -eq 0 ] && [ "$CODE" -ne 0 ]; then
+            echo "::warning::JSON AI non conformi: avvio un solo passaggio automatico di riparazione."
+            copilot -p "$CONTESTO_AUTOMAZIONE
+
+          RIPARAZIONE VINCOLATA DEL BATCH:
+          Il primo audit ha scritto i JSON ma il validatore deterministico li ha rifiutati.
+          Correggi SOLO gli stessi JSON. Preserva id, origin e source.
+          Mantieni l'analisi valida e correggi struttura/classificazione solo dove serve.
+          Se una richiesta inbox è più ampia della task candidata, deve essere overlap e non duplicate.
+
+          ERRORI DEL VALIDATORE:
+          $(cat "$RUNNER_TEMP/audit-validation.log")
+
+          PROMPT ORIGINALE:
+          $(cat "$RUNNER_TEMP/roadmap-prompt.txt")" \
+              -s \
+              --available-tools='view,grep,glob,edit,apply_patch,create' \
+              --allow-tool='write' \
+              --no-ask-user
+            REPAIR_CODE=$?
+            CODE=$REPAIR_CODE
+
+            if [ "$REPAIR_CODE" -eq 0 ]; then
+              node scripts/roadmap-audit-guard.js validate-batch "$RUNNER_TEMP/audit-ids.txt" \
+                > "$RUNNER_TEMP/audit-validation.log" 2>&1
+              CODE=$?
+            fi
           fi
           set -e
 
           if [ "$CODE" -ne 0 ]; then
-            echo "::error::Audit AI non completato o non persistito. Ripristino i JSON precedenti e fermo il workflow: niente falso verde."
+            echo "::error::Audit AI non completato o non conforme. Ripristino i JSON precedenti: niente falso verde."
+            cat "$RUNNER_TEMP/audit-validation.log" 2>/dev/null || true
             rm -rf implementazioni/auto/tasks
             cp -a "$RUNNER_TEMP/tasks-prima-ai" implementazioni/auto/tasks
             echo "ok=false" >> "$GITHUB_OUTPUT"
             exit "$CODE"
           fi
 
+          cat "$RUNNER_TEMP/audit-validation.log" 2>/dev/null || true
           echo "ok=true" >> "$GITHUB_OUTPUT"
 
       - name: Blocca scritture fuori dal perimetro automatico
