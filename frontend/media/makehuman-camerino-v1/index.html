@@ -10,10 +10,38 @@
   --panel:rgba(13,13,15,.76);--line:rgba(255,255,255,.12);--soft:rgba(255,255,255,.045)
 }
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent;color:var(--paper);font-family:Inter,Arial,sans-serif}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b0b0d;color:var(--paper);font-family:Inter,Arial,sans-serif}
 button,input,select{font:inherit}
 button{cursor:pointer}
-#stage{position:fixed;inset:0;background:transparent}
+
+/* ADF · SCENA CAMERINO
+   Riusa la scena clean già presente nel creator storico.
+   Il blur esiste solo come riempimento dietro ai bordi: la scena visibile
+   principale resta nitida e il canvas Three.js rimane trasparente sopra. */
+.room-backdrop{
+  position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#0b0b0d
+}
+.room-backdrop .room-blur{
+  display:none;
+}
+.room-backdrop .room-clean{
+  position:absolute;
+  inset:0;
+  background-image:url("./assets/camerino-makehuman-custom.png");
+  background-repeat:no-repeat;
+  background-position:center center;
+  background-size:100% 100%;
+  filter:none;
+}
+.room-backdrop .room-shade{
+  display:none;
+}
+.room-backdrop::after{
+  content:"";position:absolute;inset:0;opacity:.045;
+  background-image:radial-gradient(rgba(255,255,255,.20) .65px,transparent .65px);
+  background-size:4px 4px;
+}
+#stage{position:fixed;inset:0;z-index:1;background:transparent}
 #stage canvas{width:100%;height:100%;display:block}
 
 .camera-switcher{
@@ -184,8 +212,23 @@ input[type=range]{width:100%}
     background:rgba(220,92,92,.08);color:#efb2b2;
   }
 </style>
+
+<style id="adf-makehuman-stage-align">
+/* ADF · allineamento scena 3D allo specchio
+   Spostiamo solo lo stage WebGL: sfondo e UI restano fermi. */
+#stage{
+  transform:translateX(-8.5vw);
+  transform-origin:center center;
+}
+</style>
+
 </head>
 <body>
+<div class="room-backdrop" aria-hidden="true">
+  <div class="room-blur"></div>
+  <div class="room-clean"></div>
+  <div class="room-shade"></div>
+</div>
 <div id="stage"></div>
 
 <div class="camera-switcher" aria-label="Viste camera">
