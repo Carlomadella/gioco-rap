@@ -383,7 +383,7 @@ Abbiamo una rappresentazione scelta con dati concreti, non per intuizione.
 
 # FASE 6 — Baseline semplice
 
-Stato: DA FARE
+Stato: IN CORSO — BLOCCO 1 RETRIEVAL BASELINE MISURATO
 
 ### Perché serve
 Prima della rete serve qualcosa da battere.
@@ -395,6 +395,23 @@ Un generatore semplice e controllabile usando lo stesso dataset:
 - constrained procedural.
 
 Non deve essere il prodotto finale.
+
+### Blocco 1 — retrieval baseline V1 MISURATO
+
+- `fame-retrieval-baseline-v1`;
+- 0 parametri appresi;
+- rappresentazione `fame-compound-v1`;
+- split 401/58/43 identico alla FASE 5;
+- retrieval solo dal train set;
+- composition-family leakage 0;
+- valid generation 43/43;
+- plan MAE medio 0.031008;
+- 39 template unici su 43, massimo riuso 2;
+- 18 warning `DENSITY_VS_VOCAL_SPACE` su 5 sample.
+
+### Blocco 2 — prossimo
+
+Costruire una seconda baseline semplice ma generativa/constrained, capace di creare materiale nuovo senza rete neurale.
 
 ### Serve a rispondere
 Il Neural sta davvero imparando oppure stiamo complicando un problema che un sistema molto più semplice risolve allo stesso livello?

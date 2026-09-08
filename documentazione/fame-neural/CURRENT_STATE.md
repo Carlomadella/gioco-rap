@@ -10,6 +10,7 @@ Data: 2026-09-08
 - FASE 3 — Dataset Auditor e corpus iniziale: **COMPLETATA — GATE 1 DATA READY SUPERATO**.
 - FASE 4 — Annotazione musicale automatica: **COMPLETATA**.
 - FASE 5 — Scelta della rappresentazione neurale: **COMPLETATA — FAME COMPOUND V1 SELEZIONATA**.
+- FASE 6 — Baseline semplice: **IN CORSO — BLOCCO 1 RETRIEVAL BASELINE MISURATO**.
 - Training neurale reale: **MICRO-TRAINING BENCHMARK FASE 5 COMPLETATO; TRAINING MODELLO PRODOTTO NON INIZIATO**.
 
 ## Corpus Gate 1
@@ -104,8 +105,22 @@ Il contratto futuro resta quello già definito da NDR-010: generazione con gramm
 
 FAME Compound viene preferita perché mantiene la compattezza delle compound word, ha 0 round-trip failure e rappresenta **8/8** feature FASE 4. Compound Word rimane baseline tecnica secondaria.
 
+## FASE 6 — Blocco 1
+
+Retrieval baseline V1 misurata sul test set leakage-safe da **43 phrase**.
+
+- valid: **43/43**;
+- composition-family / phrase leakage: **0 / 0**;
+- plan MAE mean / P95: **0.031008 / 0.047619**;
+- template unici: **39/43**, max reuse **2**;
+- 18 warning `DENSITY_VS_VOCAL_SPACE` su 5 sample.
+
+Risultati: `documentazione/fame-neural/PHASE6_BLOCK1_RESULTS.json`.
+
+Protocollo: `documentazione/fame-neural/PHASE6_BASELINE.md`.
+
 ## Prossimo intervento ufficiale
 
-FASE 6 — costruire la baseline semplice e ripetibile usando la rappresentazione FAME Compound V1 come contratto Neural selezionato.
+FASE 6 / Blocco 2 — costruire una baseline generativa semplice constrained, senza rete neurale, da confrontare con la retrieval baseline V1.
 
 L'espansione non sintetica del corpus può continuare in parallelo, ma non riapre il Gate 1 già superato.

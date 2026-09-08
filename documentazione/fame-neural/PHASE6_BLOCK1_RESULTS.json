@@ -1,0 +1,76 @@
+{
+  "schema": "fame-neural-phase6-block1-retrieval-baseline-report-v1",
+  "version": 1,
+  "baseline": {
+    "id": "fame-retrieval-baseline-v1",
+    "representation": "fame-compound-v1",
+    "type": "deterministic-nearest-template-retrieval",
+    "learnedParameters": 0,
+    "constraints": [
+      "train-only template pool",
+      "composition-family leakage exclusion",
+      "same bar count required",
+      "same mode/lineage preferred",
+      "target BPM and key adaptation",
+      "pitch/chord transposition",
+      "full FAME Compound validation"
+    ]
+  },
+  "dataset": {
+    "source": "C:\\Users\\mycol\\Desktop\\FAME_NEURAL_PHASE5_BLOCK3\\phase5-microtrain-dataset.json",
+    "sha256": "abe10ee508a130668bc9adac0ff3ae29854aca6a01e82bd2863c16d6b1776fc1",
+    "phrases": 502,
+    "groups": 284,
+    "split": {
+      "train": {
+        "phrases": 401,
+        "groups": 225
+      },
+      "val": {
+        "phrases": 58,
+        "groups": 33
+      },
+      "test": {
+        "phrases": 43,
+        "groups": 26
+      }
+    },
+    "phase5Schema": "fame-neural-phase5-microtrain-dataset-v1"
+  },
+  "evaluation": {
+    "testPhrases": 43,
+    "validGenerations": 43,
+    "invalidGenerations": 0,
+    "sameGroupLeakage": 0,
+    "samePhraseLeakage": 0,
+    "retrieval": {
+      "meanDistance": 0.03307692307692307,
+      "p50Distance": 0.03008547008547009,
+      "p95Distance": 0.06153846153846154,
+      "tierCounts": {
+        "0": 43
+      }
+    },
+    "conditioning": {
+      "meanPlanMae01": 0.031007751937984506,
+      "p95PlanMae01": 0.04761904761904763,
+      "bpmExactRate": 1,
+      "keyExactRate": 1,
+      "modeExactRate": 1,
+      "lineageExactRate": 1,
+      "barsExactRate": 1
+    },
+    "diversity": {
+      "uniqueTemplates": 39,
+      "uniqueTemplateRate": 0.9069767441860465,
+      "maxTemplateReuse": 2
+    },
+    "audit": {
+      "warningFindings": 18,
+      "infoFindings": 4,
+      "samplesWithWarnings": 5,
+      "samplesWithWarningsRate": 0.11627906976744186
+    },
+    "generationManifestSha256": "a4f375a7ef5c80ae484c923e40043b6fcb8382beabeba533fa01833d3d8d2a59"
+  }
+}
