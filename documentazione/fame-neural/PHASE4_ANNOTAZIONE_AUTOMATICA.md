@@ -1,7 +1,7 @@
 # FAME Neural — FASE 4 / Annotazione musicale automatica
 
 Data avvio: 8 settembre 2026
-Stato: IN CORSO — BLOCCO 1 COMPLETATO
+Stato: IN CORSO — BLOCCO 1 + BLOCCO 2A COMPLETATI
 
 ## Obiettivo
 
@@ -115,14 +115,26 @@ Nota: questo manifest è relativo alla procedura di verifica locale del Blocco 1
 - transition strength confronta barre adiacenti e non conosce ancora sezioni di forma lunga;
 - l'affidabilità musicale non è ancora validata su campioni umani stratificati.
 
-## Blocco 2 — prossimo intervento
+## Blocco 2A — QA automatico stratificato COMPLETATO
 
-Prima di usare queste label per training o benchmark di rappresentazione:
+Implementato in:
 
-1. costruire un campione QA stratificato per sorgente e per estremi delle metriche;
-2. verificare automaticamente invarianti e casi patologici;
-3. preparare una revisione musicale compatta dei casi più informativi;
-4. calibrare soglie/pesi solo se la verifica mostra errori sistematici;
-5. congelare una versione delle annotazioni utilizzabile dalla FASE 5.
+- `frontend/strumenti/fame-neural-composer/annotation/qa.js`;
+- `frontend/strumenti/fame-neural-composer/phase4-qa-smoke-test.js`;
+- `frontend/strumenti/fame-neural-composer/run-phase4-qa-v1.js`.
+
+Verifica sul corpus reale Gate 1:
+
+- annotazioni QA: **504**;
+- sorgenti: **6**;
+- violazioni invarianti: **0**;
+- campione stratificato per revisione: **52**;
+- decisione automatica: **HUMAN_REVIEW_REQUIRED**.
+
+Il QA controlla coerenza tra metriche globali e barre, boundary, transizioni, motif family, kick↔808, duplicati, distribuzioni/quantili per sorgente e casi estremi. Produce inoltre un campione deterministico per la revisione musicale.
+
+### Blocco 2B — prossimo intervento
+
+Revisionare musicalmente il campione selezionato e modificare soglie/pesi **solo** se emerge un errore sistematico. Il tooling non applica calibrazioni automatiche.
 
 La FASE 4 si chiude solo quando l'annotatore è abbastanza affidabile da aggiungere informazione senza introdurre più rumore che segnale.
