@@ -2415,3 +2415,77 @@
   #strada .herohead h1{font-size:clamp(40px,4.2vw,54px);margin:6px 0 4px}
   #strada .herohead p{margin-top:6px}
 }
+
+/* ============================================================
+   7 · IL TELEFONO IN VERTICALE — la Strada si impila
+   ============================================================
+   Fino a qui la Strada esisteva **solo** larga: le tre colonne sono
+   `260px minmax(520px,1fr) 300px`, e la regola sotto ai 1100 le stringe a
+   `225px minmax(470px,1fr) 260px` — che fa comunque 955 punti prima dei
+   distacchi e dell'imbottitura. Sotto ai 980 le colonne non ci stanno più e
+   la pagina sbordava di lato: il colpo da scegliere finiva mezzo fuori dallo
+   schermo e la barra delle città non si raggiungeva. Non era una rifinitura
+   da sistemare, era la Strada che sul telefono non si giocava.
+
+   Si impila, con lo stesso ordine che usa lo Studio: prima quello che stai
+   facendo (i colpi), poi come stai (Adesso), poi il contorno, e in fondo le
+   città. Su un telefono la prima schermata è tutto quello che vedi senza
+   scorrere, e quello che vedi deve essere la cosa che si fa. */
+@media(max-width:980px){
+  /* la scena smette di essere alta quanto lo schermo e torna a essere una
+     pagina che scorre: con tre pannelli uno sotto l'altro un'altezza fissa
+     vorrebbe dire tre righelli interni, e non se ne prende nessuno */
+  #strada .scene{
+    height:auto;min-height:calc(100svh - 72px);
+    grid-template-columns:minmax(0,1fr);grid-template-rows:none;
+    gap:12px;padding:14px 12px 18px;align-content:start
+  }
+  #strada .center{order:1}
+  #strada .side{order:2}
+  #strada .right{order:3}
+  #strada .citybar{order:4;grid-template-columns:minmax(0,1fr);gap:10px}
+  /* i pannelli non si tagliano più il contenuto: cresce la pagina, non loro */
+  #strada .panel{overflow:visible}
+  #strada .center{overflow:hidden}          /* qui il velo interno serve */
+  /* i quattro colpi restano due per riga finché ci stanno: sotto vanno a uno.
+     `auto` e non `1fr`: impilati non c'è più un'altezza da spartire. */
+  #strada .crimes{grid-template-rows:auto;grid-auto-rows:auto}
+  /* la riga delle città: la nota sopra, i tre tasti sotto, larghi uguali */
+  #strada .city-note{padding:10px 14px}
+  /* la fascia in alto perde l'imbottitura da monitor */
+  #strada .topbar{padding:0 12px}
+  #strada .where strong{font-size:21px}
+  #strada .herohead h1{font-size:clamp(30px,7vw,40px)}
+}
+
+/* Sotto i 620 comanda la nav globale di js/menu-sistema.js, che nella fascia
+   si prende 210 punti fissi (il marchio della Strada è già nascosto da
+   menu-sistema: `#strada.on .topbar .logo{visibility:hidden}`). Nei punti che
+   restano non entrano il titolo e la riga di sessione, e la pastiglia del
+   tempo — che tempo-controlli.js aggancia dentro a `.session` — ci deve stare
+   anche lei. Quindi la fascia va su due righe, come nello Studio: sopra la
+   nav, sotto il titolo e la sessione. */
+@media(max-width:620px){
+  #strada .topbar{
+    height:auto;min-height:104px;
+    grid-template-columns:minmax(0,1fr);grid-template-rows:52px auto;
+    align-items:center;padding:0 12px 8px;row-gap:2px
+  }
+  #strada .where{grid-row:2;text-align:left}
+  #strada .where strong{font-size:19px}
+  #strada .session{grid-row:2;justify-self:end;align-self:center;gap:9px;font-size:9px}
+  /* la scena parte sotto a una fascia che adesso è più alta */
+  #strada .scene{min-height:calc(100svh - 104px)}
+}
+
+/* Il telefono stretto vero. Due colpi affiancati fanno due bersagli da 150
+   punti con dentro tre targhette: si legge male e si sbaglia. Uno per riga. */
+@media(max-width:520px){
+  #strada .crimes{grid-template-columns:minmax(0,1fr);padding:0 10px 12px;gap:8px}
+  #strada .cities{grid-template-columns:minmax(0,1fr);gap:6px}
+  #strada .tabs{grid-template-columns:1fr 1fr}
+  #strada .side{padding:13px}
+  #strada .scene{padding:12px 10px 16px}
+  #strada .where strong{font-size:17px}
+  #strada .session span:first-child{display:none}   /* la città è già sotto */
+}
