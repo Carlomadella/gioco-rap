@@ -59,6 +59,13 @@ Override:
 
 Il downloader rifiuta YELLOW/RED e verifica gli hash degli asset pin-hashati.
 
+Dal hardening NRG-CP V2 il downloader:
+- supporta mirror espliciti per asset;
+- ritenta errori temporanei 408/425/429/5xx;
+- applica timeout per singolo endpoint;
+- non promuove mai un file in cache senza checksum valido;
+- conserva nel manifest quale endpoint ha prodotto il file valido.
+
 Comandi:
 
 ```powershell

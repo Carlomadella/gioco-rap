@@ -1,6 +1,7 @@
 param(
   [int]$PdmxCount = 48,
   [int]$CandidatePool = 512,
+  [int]$SeedCount = 24,
   [string]$Workspace = ""
 )
 
@@ -44,6 +45,8 @@ function Download-Verified {
 }
 
 if ($PdmxCount -lt 8) { throw "PdmxCount deve essere almeno 8." }
+if ($SeedCount -lt 1 -or $SeedCount -gt 128) { throw "SeedCount deve essere tra 1 e 128." }
+if ($CandidatePool -lt $PdmxCount) { throw "CandidatePool deve essere >= PdmxCount." }
 
 $repoRoot = (& git rev-parse --show-toplevel 2>$null)
 if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace([string]$repoRoot)) {
@@ -126,10 +129,11 @@ New-Item -ItemType Directory -Path $downloadDir -Force | Out-Null
 Write-Host "=== FAME NEURAL / CORPUS EXPANSION V3 / PDMX ===" -ForegroundColor Cyan
 Write-Host "PDMX source target: $PdmxCount"
 Write-Host "PDMX candidate pool: $CandidatePool"
+Write-Host "FAME Original seed count: $SeedCount"
 Write-Host ""
 
 Write-Host "[1/10] Ricostruisco corpus GMD globale corrente..." -ForegroundColor Yellow
-& powershell -NoProfile -ExecutionPolicy Bypass -File $baseRunner -GmdCount 34 -SeedCount 24 -Workspace $baseWorkspace
+& powershell -NoProfile -ExecutionPolicy Bypass -File $baseRunner -GmdCount 34 -SeedCount $SeedCount -Workspace $baseWorkspace
 if ($LASTEXITCODE -ne 0) { throw "Corpus base GMD fallito." }
 
 $baseReviewed = Join-Path $baseWorkspace "global-reviewed-phrase-items"

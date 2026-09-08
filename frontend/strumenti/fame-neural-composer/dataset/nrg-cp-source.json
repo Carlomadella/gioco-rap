@@ -1,0 +1,12 @@
+{
+  "schema": "fame-neural-source-adapter-config-v1",
+  "version": 1,
+  "registryId": "waivops-nrg-cp",
+  "downloadAssetId": "midi",
+  "settings": {
+    "targetSources": 256,
+    "minPitchedEvents": 8,
+    "maxPhraseShare": 0.62,
+    "targetMinPhrases": 500
+  }
+}

@@ -38,6 +38,16 @@ function validateAsset(source, asset, errors) {
   if (!nonEmpty(asset && asset.id)) errors.push(`${prefix}: id obbligatorio`);
   if (!nonEmpty(asset && asset.name)) errors.push(`${prefix}: name obbligatorio`);
   if (!nonEmpty(asset && asset.url)) errors.push(`${prefix}: url obbligatorio`);
+  if (asset && asset.mirrors != null) {
+    if (!Array.isArray(asset.mirrors)) {
+      errors.push(`${prefix}: mirrors deve essere array`);
+    } else {
+      const mirrors = asset.mirrors.filter(nonEmpty);
+      if (mirrors.length !== asset.mirrors.length) errors.push(`${prefix}: mirrors contiene URL vuoti/non validi`);
+      if (new Set(mirrors).size !== mirrors.length) errors.push(`${prefix}: mirrors contiene duplicati`);
+      if (mirrors.some(url => url === asset.url)) errors.push(`${prefix}: mirrors non deve duplicare url primaria`);
+    }
+  }
   if (!asset || !asset.hash || !["sha256", "md5"].includes(String(asset.hash.algorithm || "").toLowerCase())) {
     errors.push(`${prefix}: hash algorithm deve essere sha256 o md5`);
   }
@@ -206,6 +216,7 @@ function resolveAdapterConfig(registry, adapter) {
     out.assetId = asset.id;
     out.assetName = asset.name;
     out.downloadUrl = asset.url;
+    out.downloadMirrors = Array.isArray(asset.mirrors) ? [...asset.mirrors] : [];
     const alg = String(asset.hash.algorithm).toLowerCase();
     out[alg] = asset.hash.value;
   }

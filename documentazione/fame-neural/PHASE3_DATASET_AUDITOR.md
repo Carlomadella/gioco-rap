@@ -770,3 +770,54 @@ Il preflight usa lo stesso importer FAME reale e accetta solo MIDI che:
 Il default estrae deterministicamente un pool di 512 candidate rights-safe e ne mantiene 48 compatibili. Le altre vengono escluse con report dei codici tecnici (per esempio meter/tempo map non supportate), senza indebolire `run-source-expansion.ps1`.
 
 La source expansion generica resta quindi strict e invariata.
+
+
+## DATA READY CLOSER V1
+
+Baseline verificata dopo PDMX V4:
+
+- phrase: 192 / 500;
+- composition family: 54, gia' oltre soglia;
+- source collections: 4;
+- drums: 114 / 150;
+- 808: 61 / 75;
+- harmony: 134 / 75, gia' oltre soglia;
+- lead: 48 / 75;
+- pitchedAny: 134 / 150.
+
+Il collo di bottiglia non e' piu' la provenance o la pulizia del corpus ma il volume utile nei ruoli Trap.
+
+La strategia del closer usa solo sistemi gia' validati:
+
+- scala FAME Original Seed da 24 a 120 composizioni per aggiungere materiale originale con drums, 808, harmony e lead;
+- scala PDMX da 48 a 200 sorgenti compatibili per aumentare volume e diversita' pitched;
+- amplia il candidate pool PDMX a 2048, mantenendo il preflight tecnico e rights-safe;
+- mantiene GMD a tutte le 34 performance hiphop/beat/4-4 disponibili;
+- mantiene free-midi-chords e tutte le review/dedup esistenti.
+
+I valori 120/200/2048 sono target operativi con margine, non riduzioni delle soglie Gate. Il closer rifiuta regressioni di corpusClean, reviewComplete, source dominance, composition families e harmony coverage.
+
+Il runner PDMX ora espone `SeedCount` invece di hardcodare 24, cosi' l'espansione e' riproducibile senza duplicare la pipeline.
+
+
+## WAIVOPS NRG-CP - CORPUS EXPANSION V2 / PREFLIGHT FIRST
+
+V2 sostituisce il runner NRG V1 come implementazione operativa.
+
+Hardening introdotto:
+- download gestito dal Source Registry downloader, non da Invoke-WebRequest ad hoc;
+- mirror Zenodo + retry/backoff + timeout + checksum obbligatorio;
+- download, MD5, tar listing, estrazione e selector reale avvengono PRIMA della ricostruzione baseline;
+- il selector riceve la configurazione RISOLTA dal Source Registry, non l'adapter-only JSON;
+- la source expansion NRG viene verificata prima della baseline;
+- la baseline PDMX viene riusata solo se coincide esattamente con la baseline verificata 192/54/4 e role coverage nota;
+- cache diversa/incompleta viene ricostruita, non riusata implicitamente;
+- il runner V1 resta come wrapper di compatibilita' verso V2;
+- cap NRG pre-review 62%, con margine rispetto al Gate source dominance 65%.
+
+Questo ordine serve a far fallire presto network/config/importer/source-specific issues, prima delle fasi costose.
+
+Root cause chiuse in V2:
+1. phrase-review usava `entry.item` fuori scope: ora usa `byId.get(id).item`;
+2. downloader single-shot Invoke-WebRequest: sostituito da downloader registry robusto;
+3. selector NRG riceveva `nrg-cp-source.json` adapter-only: ora riceve `nrg-resolved-source-config.json`.

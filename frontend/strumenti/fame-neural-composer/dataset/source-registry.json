@@ -352,7 +352,11 @@
             "hash": {
               "algorithm": "md5",
               "value": "7443fe30674ef149aa4c23580044f597"
-            }
+            },
+            "mirrors": [
+              "https://zenodo.org/api/records/15304989/files/nrgcp_midi_dataset.tar.gz/content",
+              "https://zenodo.org/records/15304989/files/nrgcp_midi_dataset.tar.gz"
+            ]
           }
         ]
       },
