@@ -310,7 +310,7 @@ Gli annotatori sono abbastanza affidabili da arricchire il dataset senza introdu
 
 # FASE 5 — Scelta della rappresentazione neurale
 
-Stato: IN CORSO — BLOCCO 2 CONFRONTO SIMBOLICO COMPLETATO
+Stato: IN CORSO — BLOCCO 3 MICRO-TRAINING COMPLETATO
 
 ### Perché serve
 Non vogliamo scegliere tokenizer e architettura perché sono di moda.
@@ -349,7 +349,11 @@ Sul corpus effettivo da **502 candidate** tutte e quattro le rappresentazioni so
 
 Tutti gli adapter hanno chiuso il benchmark con **0 failure / 0 grammar failure / 0 vocabulary failure**. Nessun vincitore viene scelto dal solo benchmark simbolico.
 
-**Prossimo Blocco 3:** micro-training comparabile su stessa GPU, split e budget per misurare VRAM, throughput, validation loss e invalid generation rate; solo dopo si sceglie la rappresentazione.
+### Blocco 3 — micro-training GPU COMPLETATO
+
+Stesso split per composition family, stesso backbone e **120 step** per rappresentazione. Risultati: flat-poc-v1 691.518 MiB / 1063.191 bars/s / 267.438852 bits-bar / invalid 6/12; remi-plus-v1 707.267 MiB / 1438.365 bars/s / 241.336572 bits-bar / invalid 11/12; compound-word-v1 137.539 MiB / 557.856 bars/s / 191.268692 bits-bar / invalid 12/12; fame-compound-v1 144.136 MiB / 359.363 bars/s / 205.256405 bits-bar / invalid 12/12.
+
+**Prossimo Blocco 4:** scelta finale della rappresentazione usando insieme Blocco 2 e Blocco 3; nessun vincitore viene deciso dalla sola loss o dalla sola compressione.
 
 ### Cosa devi valutare tu
 Non scegli il tokenizer. Ti farò ascoltare solo eventuali differenze musicali rilevanti.

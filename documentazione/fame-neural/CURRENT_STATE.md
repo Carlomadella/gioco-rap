@@ -9,8 +9,8 @@ Data: 2026-09-08
 - FASE 2 — Pipeline MIDI e provenienza: **COMPLETATA**.
 - FASE 3 — Dataset Auditor e corpus iniziale: **COMPLETATA — GATE 1 DATA READY SUPERATO**.
 - FASE 4 — Annotazione musicale automatica: **COMPLETATA**.
-- FASE 5 — Scelta della rappresentazione neurale: **IN CORSO — BLOCCO 2 CONFRONTO SIMBOLICO COMPLETATO**.
-- Training neurale reale: **NON INIZIATO**.
+- FASE 5 — Scelta della rappresentazione neurale: **IN CORSO — BLOCCO 3 MICRO-TRAINING COMPLETATO**.
+- Training neurale reale: **MICRO-TRAINING BENCHMARK FASE 5 COMPLETATO; TRAINING MODELLO PRODOTTO NON INIZIATO**.
 
 ## Corpus Gate 1
 
@@ -83,8 +83,19 @@ Confronto simbolico completato sulle **502 candidate**:
 
 Tutti e quattro gli adapter: **502/502 benchmarkate**, **0 failure**, **0 grammar failure**, **0 vocabulary failure**. Il round-trip e' idempotenza seriale, non un conteggio di phrase strutturalmente perse. Nessun vincitore e' ancora scelto.
 
+## FASE 5 — Blocco 3
+
+Micro-training GPU comparabile completato con **120 step per rappresentazione** sullo stesso split per composition family e sullo stesso backbone:
+
+- flat-poc-v1: **691.518 MiB peak**, **1063.191 bars/s**, **267.438852 bits/bar val**, invalid **6/12**;
+- remi-plus-v1: **707.267 MiB peak**, **1438.365 bars/s**, **241.336572 bits/bar val**, invalid **11/12**;
+- compound-word-v1: **137.539 MiB peak**, **557.856 bars/s**, **191.268692 bits/bar val**, invalid **12/12**;
+- fame-compound-v1: **144.136 MiB peak**, **359.363 bars/s**, **205.256405 bits/bar val**, invalid **12/12**;
+
+I risultati completi machine-readable sono in `documentazione/fame-neural/PHASE5_BLOCK3_RESULTS.json`.
+
 ## Prossimo intervento ufficiale
 
-FASE 5 / Blocco 3: micro-training comparabile sulle quattro rappresentazioni con stesso split e budget per misurare VRAM peak, throughput, validation loss e invalid generation rate prima della decisione finale.
+FASE 5 / Blocco 4: scegliere la rappresentazione finale leggendo insieme benchmark simbolico, costi GPU, validation bits/bar, invalid generation rate e copertura FASE 4. Nessun vincitore e' stato forzato automaticamente.
 
 L'espansione non sintetica del corpus può continuare in parallelo, ma non riapre il Gate 1 già superato.

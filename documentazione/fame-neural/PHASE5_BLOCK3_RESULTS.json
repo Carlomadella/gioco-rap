@@ -1,0 +1,119 @@
+{
+  "schema": "fame-neural-phase5-block3-results-v1",
+  "version": 1,
+  "decision": "ARCHITECT_REVIEW_REQUIRED",
+  "protocol": {
+    "sameBackbone": true,
+    "sameSplit": true,
+    "sameSteps": true,
+    "sameBatchSizePhrases": true,
+    "steps": 120,
+    "batchSizePhrases": 4,
+    "dModel": 192,
+    "heads": 6,
+    "layers": 4,
+    "ff": 768,
+    "maxLen": 1536,
+    "generationSamples": 12,
+    "generationTask": "continue-final-bar-from-valid-prefix",
+    "microVocabularyMode": "corpus-observed for every representation; full declared vocabulary/cardinalities remain measured in Block 2",
+    "note": "Compound representations use factorized field embeddings/heads over the same Transformer backbone; total parameter count is reported because representation heads are part of cost."
+  },
+  "dataset": {
+    "phrases": 502,
+    "groups": 284,
+    "split": {
+      "train": {
+        "phrases": 401,
+        "groups": 225,
+        "bars": 1604
+      },
+      "val": {
+        "phrases": 58,
+        "groups": 33,
+        "bars": 232
+      },
+      "test": {
+        "phrases": 43,
+        "groups": 26,
+        "bars": 172
+      }
+    }
+  },
+  "hardware": {
+    "python": "3.12.14",
+    "torch": "2.12.0+cu130",
+    "device": "cuda",
+    "cudaAvailable": true,
+    "cudaRuntime": "13.0",
+    "gpuName": "NVIDIA GeForce RTX 5070 Ti",
+    "gpuTotalMiB": 16275.438,
+    "computeCapability": [
+      12,
+      0
+    ],
+    "bf16Supported": true
+  },
+  "results": [
+    {
+      "representation": "flat-poc-v1",
+      "parameters": 2192947,
+      "amp": "bfloat16",
+      "peakAllocatedMiB": 691.518,
+      "peakReservedMiB": 1134,
+      "barsPerSecond": 1063.191,
+      "unitsPerSecond": 125078.362,
+      "validationNllPerTarget": 1.764819,
+      "validationBitsPerBar": 267.438852,
+      "generationSamples": 12,
+      "validGenerations": 6,
+      "invalidGenerations": 6,
+      "invalidGenerationRate": 0.5
+    },
+    {
+      "representation": "remi-plus-v1",
+      "parameters": 2179087,
+      "amp": "bfloat16",
+      "peakAllocatedMiB": 707.267,
+      "peakReservedMiB": 1234,
+      "barsPerSecond": 1438.365,
+      "unitsPerSecond": 147585.288,
+      "validationNllPerTarget": 1.840091,
+      "validationBitsPerBar": 241.336572,
+      "generationSamples": 12,
+      "validGenerations": 1,
+      "invalidGenerations": 11,
+      "invalidGenerationRate": 0.916667
+    },
+    {
+      "representation": "compound-word-v1",
+      "parameters": 2197952,
+      "amp": "bfloat16",
+      "peakAllocatedMiB": 137.539,
+      "peakReservedMiB": 152,
+      "barsPerSecond": 557.856,
+      "unitsPerSecond": 11342.488,
+      "validationNllPerTarget": 1.194994,
+      "validationBitsPerBar": 191.268692,
+      "generationSamples": 12,
+      "validGenerations": 0,
+      "invalidGenerations": 12,
+      "invalidGenerationRate": 1
+    },
+    {
+      "representation": "fame-compound-v1",
+      "parameters": 2249927,
+      "amp": "bfloat16",
+      "peakAllocatedMiB": 144.136,
+      "peakReservedMiB": 158,
+      "barsPerSecond": 359.363,
+      "unitsPerSecond": 7321.459,
+      "validationNllPerTarget": 1.137909,
+      "validationBitsPerBar": 205.256405,
+      "generationSamples": 12,
+      "validGenerations": 0,
+      "invalidGenerations": 12,
+      "invalidGenerationRate": 1
+    }
+  ]
+}

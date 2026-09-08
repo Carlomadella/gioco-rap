@@ -1,7 +1,7 @@
 # FAME Neural — FASE 5 / Benchmark rappresentazioni neurali
 
 Data avvio: 8 settembre 2026
-Stato: IN CORSO — BLOCCO 2 CONFRONTO SIMBOLICO COMPLETATO
+Stato: IN CORSO — BLOCCO 3 MICRO-TRAINING COMPLETATO
 
 ## Obiettivo
 
@@ -93,8 +93,21 @@ Nota: `round-trip fail` misura l'idempotenza seriale `encode -> decode -> encode
 
 Il confronto resta **senza vincitore**: memoria GPU, throughput training, validation loss e invalid generation rate richiedono lo stesso micro-modello e lo stesso protocollo di training.
 
-## Prossimo Blocco 3
+## Blocco 3 — micro-training comparabile completato
 
-Eseguire micro-training comparabile per Flat, REMI+, Compound Word e FAME Compound custom usando stesso split, stesso micro-modello per quanto compatibile, stesso budget di step e stessa GPU locale. Misurare VRAM peak, throughput, validation loss e invalid generation rate prima della scelta finale della rappresentazione.
+Protocollo reale: stesso split per composition family, stesso Transformer backbone, stesso seed, stesso batch in phrase e stesso budget di **120 step** per rappresentazione. Split: **401 train / 58 validation / 43 test phrase**. GPU: **NVIDIA GeForce RTX 5070 Ti**, PyTorch **2.12.0+cu130**, CUDA runtime **13.0**, AMP **bfloat16**.
 
-Nessun vincitore è ancora scelto.
+| Rappresentazione | parametri | peak VRAM MiB | bars/s | val bits/bar | invalid gen |
+|---|---:|---:|---:|---:|---:|
+| flat-poc-v1 | 2192947 | 691.518 | 1063.191 | 267.438852 | 6/12 (0.5) |
+| remi-plus-v1 | 2179087 | 707.267 | 1438.365 | 241.336572 | 11/12 (0.916667) |
+| compound-word-v1 | 2197952 | 137.539 | 557.856 | 191.268692 | 12/12 (1) |
+| fame-compound-v1 | 2249927 | 144.136 | 359.363 | 205.256405 | 12/12 (1) |
+
+La validation loss viene riportata anche come **bits/bar**, perché le rappresentazioni compound predicono più campi per singolo timestep e la sola loss per token/field non è direttamente confrontabile con Flat/REMI. L'invalid generation rate usa lo stesso task: completamento dell'ultima barra partendo da un prefisso canonico valido.
+
+Il Blocco 3 non sceglie automaticamente il vincitore: i numeri GPU/generativi devono essere letti insieme a compressione simbolica, reconstruction e copertura FASE 4 del Blocco 2.
+
+## Prossimo Blocco 4
+
+Decisione finale della rappresentazione FASE 5 usando insieme benchmark simbolico + micro-training GPU + validità generativa. Nessun retraining aggiuntivo è richiesto salvo regressioni emerse dai risultati.
