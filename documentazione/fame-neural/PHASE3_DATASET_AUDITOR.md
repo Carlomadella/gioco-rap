@@ -699,3 +699,32 @@ Policy:
 - quality/review signal non previsto: item rifiutato, mai auto-accettato.
 
 Quindi la curation generale resta severa e la source policy risolve automaticamente soltanto cio' che e' spiegabile dalla struttura nota di free-midi-chords.
+
+
+## PHRASE REVIEW — chiusura review esplicita
+
+Il COMMERCIAL MIX ha raggiunto un corpus clean e leakage-safe, ma il Gate 1 restava bloccato da `review phrase non completata`.
+
+La causa era architetturale: `phrase-corpus.js` rilevava quality/fuzzy review ma non disponeva di un canale per registrare una decisione esplicita.
+
+La pipeline ora separa:
+
+1. audit iniziale;
+2. phrase review;
+3. corpus reviewed;
+4. re-audit con decisioni;
+5. Gate 1.
+
+### Policy
+
+`phrase-review.js` e' conservativo:
+
+- `HIGH_BAR_REPETITION` su `free-midi-chords`: puo' essere accettato con decisione esplicita e reason, perche' la fonte e' un corpus strutturato di progressioni armoniche;
+- fuzzy review pair: non viene ignorato; viene mantenuto un sottoinsieme deterministico senza coppie conflittuali;
+- altri quality review, inclusi pitch range estremo, note melodiche saltate, densita' estrema o molte barre vuote: reject.
+
+Le phrase rifiutate vengono escluse dal corpus reviewed.
+
+`phrase-corpus.js` supporta ora un quinto argomento opzionale `review-decisions.json`. Un item in review e' considerato risolto solo con reviewer e reason espliciti. Un reject ancora presente nel corpus continua a impedire `reviewComplete`.
+
+Il Gate 1 continua quindi a usare `reviewComplete` come blocker reale; non viene forzato a true.

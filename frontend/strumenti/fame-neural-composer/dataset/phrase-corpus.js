@@ -9,6 +9,7 @@ const { buildSplitManifest } = require("./auditor");
 const { PHRASE_SCHEMA } = require("./phrase-builder");
 
 const PHRASE_CORPUS_SCHEMA = "fame-neural-phrase-corpus-audit-v1";
+const PHRASE_REVIEW_DECISIONS_SCHEMA = "fame-neural-phrase-review-decisions-v1";
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -79,7 +80,96 @@ function sourceLeakageFor(items, splitManifest) {
     .map(([sourceDatasetItemId, splits]) => ({ sourceDatasetItemId, splits: [...splits].sort() }));
 }
 
-function auditPhraseEntries(entries, options = {}) {
+function normalizeReviewDecisions(input = {}) {
+  const source = input && typeof input === "object" ? input : {};
+  const errors = [];
+  const warnings = [];
+  const reviewer = typeof source.reviewer === "string" ? source.reviewer.trim() : "";
+  const records = Array.isArray(source.decisions) ? source.decisions : [];
+  const byPhraseId = new Map();
+
+  if (source.schema && source.schema !== PHRASE_REVIEW_DECISIONS_SCHEMA) {
+    errors.push(`schema review decisions non valido: ${String(source.schema)}`);
+  }
+
+  for (let index = 0; index < records.length; index += 1) {
+    const record = records[index] || {};
+    const phraseId = typeof record.phraseId === "string" ? record.phraseId.trim() : "";
+    const action = typeof record.action === "string" ? record.action.trim().toLowerCase() : "";
+    const reason = typeof record.reason === "string" ? record.reason.trim() : "";
+
+    if (!phraseId) {
+      errors.push(`review decision ${index}: phraseId mancante`);
+      continue;
+    }
+    if (!["accept", "reject"].includes(action)) {
+      errors.push(`review decision ${phraseId}: action non valida`);
+      continue;
+    }
+    if (byPhraseId.has(phraseId)) {
+      errors.push(`review decision duplicata: ${phraseId}`);
+      continue;
+    }
+    byPhraseId.set(phraseId, { phraseId, action, reason });
+  }
+
+  return { reviewer, byPhraseId, errors, warnings };
+}
+
+function resolvePhraseReview(reviewItems, validItemIds, decisionsInput = {}) {
+  const decisions = normalizeReviewDecisions(decisionsInput);
+  const valid = validItemIds instanceof Set ? validItemIds : new Set(validItemIds || []);
+  const review = reviewItems instanceof Set ? reviewItems : new Set(reviewItems || []);
+  const errors = [...decisions.errors];
+  const warnings = [...decisions.warnings];
+  const accepted = [];
+  const unresolved = [];
+  const rejectedInCorpus = [];
+
+  for (const phraseId of decisions.byPhraseId.keys()) {
+    if (!valid.has(phraseId)) warnings.push(`review decision inutilizzata/non presente nel corpus: ${phraseId}`);
+  }
+
+  for (const phraseId of [...review].sort()) {
+    const decision = decisions.byPhraseId.get(phraseId);
+    if (!decision) {
+      unresolved.push(phraseId);
+      continue;
+    }
+    if (decision.action === "reject") {
+      rejectedInCorpus.push(phraseId);
+      continue;
+    }
+    if (!decisions.reviewer) {
+      errors.push(`accept review ${phraseId}: reviewer obbligatorio`);
+      continue;
+    }
+    if (!decision.reason) {
+      errors.push(`accept review ${phraseId}: reason obbligatoria`);
+      continue;
+    }
+    accepted.push(phraseId);
+  }
+
+  return {
+    schema: PHRASE_REVIEW_DECISIONS_SCHEMA,
+    reviewer: decisions.reviewer || null,
+    complete: unresolved.length === 0 && rejectedInCorpus.length === 0 && errors.length === 0,
+    totals: {
+      reviewItems: review.size,
+      accepted: accepted.length,
+      unresolved: unresolved.length,
+      rejectedInCorpus: rejectedInCorpus.length
+    },
+    accepted,
+    unresolved,
+    rejectedInCorpus,
+    errors,
+    warnings
+  };
+}
+
+function auditPhraseEntries(entries, options = {}, reviewDecisionsInput = {}) {
   const cfg = normalizeOptions(options);
   const invalidItems = [];
   const items = [];
@@ -159,10 +249,12 @@ function auditPhraseEntries(entries, options = {}) {
     reviewItems.add(pair.itemB);
   }
 
-  const block5Ready = blockers.length === 0;
+  const validItemIds = new Set(items.map(item => item.itemId));
+  const reviewResolution = resolvePhraseReview(reviewItems, validItemIds, reviewDecisionsInput);
+  const block5Ready = blockers.length === 0 && reviewResolution.errors.length === 0;
   const corpusClean = corpusIssues.length === 0;
   const targetReached = items.length >= cfg.targetMinPhrases;
-  const reviewComplete = reviewItems.size === 0;
+  const reviewComplete = reviewResolution.complete;
   const gate1Candidate = block5Ready && corpusClean && targetReached && reviewComplete;
 
   return {
@@ -172,6 +264,7 @@ function auditPhraseEntries(entries, options = {}) {
     block5Ready,
     corpusClean,
     reviewComplete,
+    reviewResolution,
     targetReached,
     gate1Candidate,
     options: cfg,
@@ -212,16 +305,17 @@ function readPhraseEntries(inputDir) {
 }
 
 function main(argv = process.argv.slice(2)) {
-  const [inputDir, reportPath, splitPath, optionsPath] = argv;
+  const [inputDir, reportPath, splitPath, optionsPath, reviewDecisionsPath] = argv;
   if (!inputDir || !reportPath || !splitPath) {
-    console.error("Uso: node phrase-corpus.js <phrase-items-dir> <audit-report.json> <split-manifest.json> [options.json]");
+    console.error("Uso: node phrase-corpus.js <phrase-items-dir> <audit-report.json> <split-manifest.json> [options.json] [review-decisions.json]");
     process.exitCode = 64;
     return;
   }
   try {
     const entries = readPhraseEntries(inputDir);
     const options = optionsPath ? readJson(optionsPath) : {};
-    const report = auditPhraseEntries(entries, options);
+    const reviewDecisions = reviewDecisionsPath ? readJson(reviewDecisionsPath) : {};
+    const report = auditPhraseEntries(entries, options, reviewDecisions);
     fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
     fs.writeFileSync(splitPath, `${JSON.stringify(report.splitManifest, null, 2)}\n`, "utf8");
 
@@ -250,7 +344,10 @@ if (require.main === module) main();
 
 module.exports = {
   PHRASE_CORPUS_SCHEMA,
+  PHRASE_REVIEW_DECISIONS_SCHEMA,
   normalizeOptions,
+  normalizeReviewDecisions,
+  resolvePhraseReview,
   validatePhraseItem,
   auditPhraseEntries,
   readPhraseEntries,

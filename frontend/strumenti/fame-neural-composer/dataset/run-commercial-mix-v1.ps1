@@ -32,12 +32,13 @@ $selector = Join-Path $datasetRoot "select-free-midi-chords.js"
 $merger = Join-Path $datasetRoot "merge-phrase-corpora.js"
 $sourceConfig = Join-Path $datasetRoot "free-midi-chords-source.json"
 $phraseCorpus = Join-Path $datasetRoot "phrase-corpus.js"
+$phraseReview = Join-Path $datasetRoot "phrase-review.js"
 $gate = Join-Path $datasetRoot "data-ready-gate.js"
 $gatePolicy = Join-Path $datasetRoot "data-ready-policy.example.json"
 $auditorOptions = Join-Path $datasetRoot "auditor-options.example.json"
 $freeMidiReviewer = Join-Path $datasetRoot "review-free-midi-chords.js"
 
-foreach ($required in @($sourceExpansion, $generator, $selector, $merger, $sourceConfig, $phraseCorpus, $gate, $gatePolicy, $auditorOptions, $freeMidiReviewer)) {
+foreach ($required in @($sourceExpansion, $generator, $selector, $merger, $sourceConfig, $phraseCorpus, $phraseReview, $gate, $gatePolicy, $auditorOptions, $freeMidiReviewer)) {
   if (-not (Test-Path $required)) { throw "File richiesto non trovato: $required" }
 }
 
@@ -49,11 +50,16 @@ $seedSource = Join-Path $Workspace "fame-original-seed"
 $chordsPipeline = Join-Path $Workspace "pipeline-free-midi-chords"
 $seedPipeline = Join-Path $Workspace "pipeline-original-seed"
 $combinedDir = Join-Path $Workspace "combined-phrase-items"
+$reviewedDir = Join-Path $Workspace "combined-reviewed-phrase-items"
 
 $zipPath = Join-Path $downloadDir $config.assetName
 $selectionReport = Join-Path $Workspace "free-midi-chords-selection.json"
 $mergeReport = Join-Path $Workspace "combined-merge-report.json"
 $phraseAuditOptions = Join-Path $Workspace "combined-phrase-audit-options.json"
+$initialAudit = Join-Path $Workspace "combined-phrase-audit-initial.json"
+$initialSplit = Join-Path $Workspace "combined-phrase-split-initial.json"
+$phraseReviewDecisions = Join-Path $Workspace "combined-phrase-review-decisions.json"
+$phraseReviewReport = Join-Path $Workspace "combined-phrase-review-report.json"
 $combinedAudit = Join-Path $Workspace "combined-phrase-audit.json"
 $combinedSplit = Join-Path $Workspace "combined-phrase-split.json"
 $gateReport = Join-Path $Workspace "combined-gate1-report.json"
@@ -142,12 +148,27 @@ $combinedCfg = [ordered]@{
 }
 Write-Utf8NoBom -Path $phraseAuditOptions -Text ($combinedCfg | ConvertTo-Json -Depth 10)
 
-Write-Host "[7/8] Audit combined corpus..." -ForegroundColor Yellow
-& node $phraseCorpus $combinedDir $combinedAudit $combinedSplit $phraseAuditOptions
-if ($LASTEXITCODE -ne 0) { throw "Combined phrase audit tooling non READY." }
+Write-Host "[7/10] Audit combined corpus iniziale..." -ForegroundColor Yellow
+& node $phraseCorpus $combinedDir $initialAudit $initialSplit $phraseAuditOptions
+if ($LASTEXITCODE -ne 0) { throw "Initial combined phrase audit tooling non READY." }
 
-Write-Host "[8/8] GATE 1 sul mix FAME + MIT harmony..." -ForegroundColor Yellow
-& node $gate $combinedDir $combinedAudit $gateReport $gatePolicy $inventoryReport
+Write-Host "[8/10] Review phrase..." -ForegroundColor Yellow
+if (Test-Path $reviewedDir) { Remove-Item $reviewedDir -Recurse -Force }
+New-Item -ItemType Directory -Path $reviewedDir -Force | Out-Null
+& node $phraseReview $combinedDir $initialAudit $reviewedDir $phraseReviewDecisions $phraseReviewReport
+if ($LASTEXITCODE -ne 0) { throw "Phrase review fallita. Controlla $phraseReviewReport" }
+
+Write-Host "[9/10] Re-audit corpus dopo review..." -ForegroundColor Yellow
+& node $phraseCorpus $reviewedDir $combinedAudit $combinedSplit $phraseAuditOptions $phraseReviewDecisions
+if ($LASTEXITCODE -ne 0) { throw "Final combined phrase audit tooling non READY." }
+
+$finalAuditData = Get-Content $combinedAudit -Raw | ConvertFrom-Json
+if (-not $finalAuditData.reviewComplete) {
+  throw "Review phrase ancora incompleta dopo la curation. Controlla $combinedAudit"
+}
+
+Write-Host "[10/10] GATE 1 sul mix reviewed..." -ForegroundColor Yellow
+& node $gate $reviewedDir $combinedAudit $gateReport $gatePolicy $inventoryReport
 if ($LASTEXITCODE -ne 0) { throw "GATE 1 tooling fallito." }
 
 $seedCuration = Get-Content (Join-Path $seedPipeline "source-curation-report.json") -Raw | ConvertFrom-Json
@@ -159,6 +180,8 @@ if (-not (Test-Path $chordsBuildPath)) {
   throw "free-midi-chords non ha prodotto phrase-build-report.json. Controlla review queue: $reviewPath"
 }
 $chordsBuild = Get-Content $chordsBuildPath -Raw | ConvertFrom-Json
+$initialCombined = Get-Content $initialAudit -Raw | ConvertFrom-Json
+$reviewData = Get-Content $phraseReviewReport -Raw | ConvertFrom-Json
 $combined = Get-Content $combinedAudit -Raw | ConvertFrom-Json
 $inventory = Get-Content $inventoryReport -Raw | ConvertFrom-Json
 $gateData = Get-Content $gateReport -Raw | ConvertFrom-Json
@@ -171,7 +194,10 @@ Write-Host "free-midi-chords sorgenti accepted: $($chordsCuration.totals.accepte
 Write-Host "FAME Original sorgenti accepted: $($seedCuration.totals.accepted)"
 Write-Host "Phrase free-midi-chords: $($chordsBuild.totals.phrasesProduced)"
 Write-Host "Phrase FAME Original: $($seedBuild.totals.phrasesProduced)"
-Write-Host "Phrase combined valide: $($combined.totals.valid)"
+Write-Host "Phrase combined raw: $($initialCombined.totals.valid)"
+Write-Host "Phrase review rejected: $($reviewData.totals.rejectedTotal)"
+Write-Host "Phrase combined reviewed: $($combined.totals.valid)"
+Write-Host "Review phrase complete: $($combined.reviewComplete)"
 Write-Host "Corpus combined clean: $($combined.corpusClean)"
 Write-Host "Source collections: $($inventory.totals.sourceCollections)"
 Write-Host "Coverage drums/808/harmony/lead: $($inventory.roleCoverage.drums)/$($inventory.roleCoverage.'808')/$($inventory.roleCoverage.harmony)/$($inventory.roleCoverage.lead)"
