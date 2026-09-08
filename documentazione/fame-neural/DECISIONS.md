@@ -68,3 +68,17 @@ La scelta deriva dal confronto simbolico e dal micro-training: compattezza circa
 L'invalid-generation rate del Blocco 3 non viene usato per il ranking finale: l'audit dei 41 sample invalidi ha mostrato esclusivamente violazioni di grammatica/stato prodotte dal sampling unconstrained. Questo comportamento viola il principio già accettato in NDR-010, secondo cui il generatore deve applicare una grammatica constrained.
 
 Compound Word resta baseline tecnica di controllo. Flat e REMI+ restano disponibili per benchmark e regressioni; non vengono eliminati.
+
+## NDR-013 — Due baseline complementari per il benchmark Neural
+**Status:** ACCEPTED
+
+La FASE 6 congela due controlli non neurali sullo stesso split leakage-safe e sulla rappresentazione ame-compound-v1:
+
+- ame-retrieval-baseline-v1, forte sulla coerenza di materiale reale;
+- ame-constrained-baseline-v1, generativa e senza copie esatte di phrase/bar del train nel test misurato.
+
+Il plan MAE zero della constrained baseline deriva dal conditioning diretto sul piano high-level e non misura il Planner end-to-end.
+
+Le metriche exact-match non vengono interpretate come prova generale di assenza di memorization.
+
+I limiti musicali osservati restano nel benchmark invece di essere corretti con nuove regole procedurali.

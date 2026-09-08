@@ -10,7 +10,7 @@ Data: 2026-09-08
 - FASE 3 — Dataset Auditor e corpus iniziale: **COMPLETATA — GATE 1 DATA READY SUPERATO**.
 - FASE 4 — Annotazione musicale automatica: **COMPLETATA**.
 - FASE 5 — Scelta della rappresentazione neurale: **COMPLETATA — FAME COMPOUND V1 SELEZIONATA**.
-- FASE 6 — Baseline semplice: **IN CORSO — BLOCCO 1 RETRIEVAL BASELINE MISURATO**.
+- FASE 6 — Baseline semplice: **COMPLETATA — RETRIEVAL + CONSTRAINED BASELINE CONGELATE**.
 - Training neurale reale: **MICRO-TRAINING BENCHMARK FASE 5 COMPLETATO; TRAINING MODELLO PRODOTTO NON INIZIATO**.
 
 ## Corpus Gate 1
@@ -119,8 +119,25 @@ Risultati: `documentazione/fame-neural/PHASE6_BLOCK1_RESULTS.json`.
 
 Protocollo: `documentazione/fame-neural/PHASE6_BASELINE.md`.
 
+## FASE 6 — Blocco 2
+
+Constrained generative baseline V1 misurata sul test set leakage-safe.
+
+- valid: **43/43**;
+- donor leakage: **0**;
+- plan MAE: **0 / 0** per costruzione;
+- exact train phrase: **0**;
+- exact train bar: **0/172**;
+- unique generation: **43/43**;
+- donor groups: **225**, media **45.9302** per generazione;
+- warning: **21** su 10 sample (`DENSITY_VS_VOCAL_SPACE` 14, `ABRUPT_808_GRAMMAR_SHIFT` 7).
+
+FASE 6 congelata con due baseline complementari.
+
+Risultati: `documentazione/fame-neural/PHASE6_BLOCK2_RESULTS.json`.
+
 ## Prossimo intervento ufficiale
 
-FASE 6 / Blocco 2 — costruire una baseline generativa semplice constrained, senza rete neurale, da confrontare con la retrieval baseline V1.
+FASE 7 — Neural Planner V0: costruire il primo modello che genera un piano strutturale di 8 barre prima della performance musicale.
 
 L'espansione non sintetica del corpus può continuare in parallelo, ma non riapre il Gate 1 già superato.

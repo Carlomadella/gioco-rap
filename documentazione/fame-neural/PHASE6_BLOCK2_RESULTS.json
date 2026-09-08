@@ -1,0 +1,80 @@
+{
+  "schema": "fame-neural-phase6-block2-constrained-baseline-report-v1",
+  "version": 1,
+  "baseline": {
+    "id": "fame-constrained-recombination-v1",
+    "representation": "fame-compound-v1",
+    "type": "seeded-constrained-empirical-recombination",
+    "neuralParameters": 0,
+    "learnedModelParameters": 0,
+    "empiricalTrainingTables": true,
+    "seed": 6201,
+    "constraints": [
+      "train-only empirical pools",
+      "composition-family split inherited from Phase 5",
+      "target header and high-level bar plan only",
+      "bar count profile from nearest train plan profiles",
+      "event/chord/hat words sampled independently from train pools",
+      "pitch/chord transposition to target key",
+      "derived kick-808 summary fields",
+      "FAME Compound grammar validation"
+    ]
+  },
+  "dataset": {
+    "source": "C:\\Users\\mycol\\Desktop\\FAME_NEURAL_PHASE5_BLOCK3\\phase5-microtrain-dataset.json",
+    "sha256": "abe10ee508a130668bc9adac0ff3ae29854aca6a01e82bd2863c16d6b1776fc1",
+    "phrases": 502,
+    "groups": 284,
+    "split": {
+      "train": {
+        "phrases": 401,
+        "groups": 225
+      },
+      "val": {
+        "phrases": 58,
+        "groups": 33
+      },
+      "test": {
+        "phrases": 43,
+        "groups": 26
+      }
+    },
+    "phase5Schema": "fame-neural-phase5-microtrain-dataset-v1"
+  },
+  "evaluation": {
+    "testPhrases": 43,
+    "validGenerations": 43,
+    "invalidGenerations": 0,
+    "donorLeakage": 0,
+    "conditioning": {
+      "meanPlanMae01": 0,
+      "p95PlanMae01": 0,
+      "barsExactRate": 1
+    },
+    "novelty": {
+      "exactTrainingPhraseMatches": 0,
+      "exactTrainingBarMatches": 0,
+      "totalGeneratedBars": 172,
+      "exactTrainingBarRate": 0,
+      "uniqueGenerations": 43,
+      "uniqueGenerationRate": 1
+    },
+    "donors": {
+      "uniqueDonorGroups": 225,
+      "meanDonorGroupsPerGeneration": 45.93023255813954,
+      "p50DonorGroupsPerGeneration": 46,
+      "p95DonorGroupsPerGeneration": 63
+    },
+    "audit": {
+      "warningFindings": 21,
+      "infoFindings": 9,
+      "samplesWithWarnings": 10,
+      "samplesWithWarningsRate": 0.23255813953488372,
+      "warningCodes": {
+        "DENSITY_VS_VOCAL_SPACE": 14,
+        "ABRUPT_808_GRAMMAR_SHIFT": 7
+      }
+    },
+    "generationManifestSha256": "a8ae2c2a24e5bb72e881dc9373e560f4bcd8771455b500894d1ac2db5b195550"
+  }
+}

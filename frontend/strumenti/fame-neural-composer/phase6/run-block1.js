@@ -136,7 +136,7 @@ function selfTest() {
     return {
       phraseId:id, groupId, sourceCollection:"selftest", bars:1,
       units:[
-        {kind:"HEADER",bpm,key,mode:"minor",lineage:"trap"}, bar(0,energy),
+        {kind:"HEADER",bpm,key,mode:"minor",lineage:"dark_minimal"}, bar(0,energy),
         {kind:"EVENT",bar:0,position:0,type:"808",velocityBin:7,note,duration:240,role:"root"}, {kind:"EOS"}
       ]
     };

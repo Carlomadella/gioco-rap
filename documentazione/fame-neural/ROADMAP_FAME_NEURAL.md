@@ -383,7 +383,7 @@ Abbiamo una rappresentazione scelta con dati concreti, non per intuizione.
 
 # FASE 6 — Baseline semplice
 
-Stato: IN CORSO — BLOCCO 1 RETRIEVAL BASELINE MISURATO
+Stato: COMPLETATA — RETRIEVAL + CONSTRAINED BASELINE CONGELATE
 
 ### Perché serve
 Prima della rete serve qualcosa da battere.
@@ -409,9 +409,25 @@ Non deve essere il prodotto finale.
 - 39 template unici su 43, massimo riuso 2;
 - 18 warning `DENSITY_VS_VOCAL_SPACE` su 5 sample.
 
-### Blocco 2 — prossimo
+### Blocco 2 — constrained generative baseline V1 MISURATO
 
-Costruire una seconda baseline semplice ma generativa/constrained, capace di creare materiale nuovo senza rete neurale.
+- `fame-constrained-baseline-v1`;
+- 0 parametri appresi;
+- rappresentazione `fame-compound-v1`;
+- stesso split 401/58/43;
+- donor solo dal train;
+- donor leakage 0;
+- valid generation 43/43;
+- plan MAE 0 per costruzione;
+- exact train phrase 0;
+- exact train bar 0/172;
+- 43/43 generazioni uniche;
+- 225 donor groups;
+- 21 warning su 10 sample.
+
+Le due baseline vengono congelate come riferimenti complementari.
+
+**FASE 6 COMPLETATA.**
 
 ### Serve a rispondere
 Il Neural sta davvero imparando oppure stiamo complicando un problema che un sistema molto più semplice risolve allo stesso livello?
