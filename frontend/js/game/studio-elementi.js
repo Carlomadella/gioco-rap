@@ -207,7 +207,9 @@ function studioBeatBanco(){
 function studioBeatSegna(seed){
   if(!G.studio) G.studio = {};
   G.studio.compra = seed;
-  SFX.tap(); renderStudio();
+  /* si salva come tutte le altre scelte dello Studio: era l'unica che non lo
+     faceva, e chiudendo il gioco ti ritrovavi segnata la prima delle tre */
+  SFX.tap(); save(); renderStudio();
 }
 function studioBeatAscolta(seed, btn){
   const b = (G.market || []).find(x => beatSeed(x) === seed) ||
@@ -254,6 +256,16 @@ function studioBarraSeme(b){
   if(b.sd == null) b.sd = Math.floor(Math.random() * 1e9);
   return b.sd;
 }
+/* Il numero di serie di un pezzo. I pezzi registrati da un pezzo in qua ce
+   l'hanno tutti; un salvataggio piu' vecchio del giorno in cui il gioco si e'
+   diviso in `frontend/` e `backend/` puo' averne senza, e senza numero la
+   cassaforte non sapeva piu' quale pezzo ritirare — ce lo mettevi dentro e
+   non usciva piu' ne' da li' ne' dalla plancia. Gliene si da' uno la prima
+   volta che serve, come si fa con le strofe qui sopra. */
+function studioPezzoSeme(s){
+  if(s.seed == null) s.seed = Math.floor(Math.random() * 1e9);
+  return s.seed;
+}
 function studioStrofa(){
   const l = (G.bars || []).slice().sort((a, b) => b.q - a.q);
   const s = (G.studio || {}).strofa;
@@ -276,10 +288,14 @@ function studioScegliIncide(seed){
 /* A cosa sono attaccate le take: se cambi strofa o beat non sono più le tue
    e si buttano da sole. Senza questa riga tenevi la take buona di un pezzo e
    te la ritrovavi su un altro. */
+/* La targhetta e' fatta con i **numeri di serie**, non con il tema e la
+   qualita': due strofe sullo stesso tema e con lo stesso voto sono due strofe
+   diverse, e prima per questa riga erano la stessa cosa — le take pagate su
+   una valevano anche sull'altra. */
 function studioTakeChiave(){
   const b = studioStrofa(), bt = studioBeatSuCui();
   if(!b || !bt) return "";
-  return (b.tema || "-") + "/" + b.q + "|" + bt.n + "/" + bt.q;
+  return studioBarraSeme(b) + "|" + beatSeed(bt);
 }
 
 function studioTake(){
@@ -360,13 +376,21 @@ function studioTakeAncora(){
 
 /* Quella che si tiene, e le altre si buttano. La chiama `registra` al posto
    del suo `rnd(-5,6)`: una riga sola, con la guardia `typeof` come già fa
-   per il fonico e per il feat. */
+   per il fonico e per il feat.
+
+   **La targhetta si guarda anche qui**, e non solo mentre stai in cabina.
+   Prima no: pagavi due take con la strofa che avevi, poi andavi a scriverne
+   una migliore e registravi dalla plancia senza ripassare dalla cabina, e
+   sul pezzo nuovo finiva la take pagata sul vecchio — in regalo se era
+   venuta buona, in faccia se era venuta male. Se la targhetta non combacia
+   la take non e' di questo pezzo: si butta, e si tira il dado di sempre. */
 function studioTakePresa(){
   const d = G.studio && G.studio.take;
   if(!d || !d.l || !d.l.length) return rnd(-5, 6);
-  const v = d.l[d.s] != null ? d.l[d.s] : d.l[0];
+  const mia = d.k === studioTakeChiave();
   delete G.studio.take;
-  return v;
+  if(!mia) return rnd(-5, 6);
+  return d.l[d.s] != null ? d.l[d.s] : d.l[0];
 }
 
 /* ==================== TESTO — il tema si sceglie ====================
@@ -453,11 +477,64 @@ function studioBanco(){
   if(!d.banco) d.banco = {voce:2, bassi:2, aria:2};
   return d.banco;
 }
-function studioBancoMuovi(k, v){
+/* Muovere un cursore **non ridisegna la pagina**. Prima si': a ogni tacca
+   `renderStudio()` rifaceva tutto il pannello di mezzo, e l'`input` che
+   stavi trascinando veniva buttato via e rifatto da capo — il dito restava a
+   trascinare una cosa che non c'era piu', e per spostarlo di due tacche
+   dovevi staccare e ripartire. Con la tastiera era peggio: dopo una freccia
+   il cursore perdeva il fuoco e le altre frecce non facevano piu' niente.
+
+   Quindi qui si cambiano **a mano** solo le cose che dipendono dal cursore —
+   la parte piena, il nodo, la frase sotto, e il riquadro del risultato — e
+   l'`input` che ha il dito sopra non si tocca. */
+function studioBancoMuovi(k, v, nodo){
   const b = studioBanco();
   if(!(k in b)) return;
-  b[k] = clamp(Math.round(Number(v) || 0), 0, 4);
-  save(); renderStudio();
+  const nuovo = clamp(Math.round(Number(v) || 0), 0, 4);
+  if(b[k] === nuovo && nodo) return;
+  b[k] = nuovo;
+  save();
+  if(!nodo){ renderStudio(); return; }
+  studioBancoRitocca(nodo, k, nuovo);
+}
+
+/* Qual e' il provino sul banco. `studioDaMixare()` da solo torna `null`
+   quando non ne hai scelto uno a mano — la sezione ripiega sul migliore, e
+   chi guarda il banco da fuori deve ripiegare sulla **stessa** cosa: senza
+   questa riga il riquadro del risultato non si aggiornava mai finche' non
+   avevi cliccato un provino, e restava a dire il carattere di prima. */
+function studioProvino(){
+  const scelto = typeof studioDaMixare === "function" ? studioDaMixare() : null;
+  return scelto || unmixed().sort((a, b) => b.q - a.q)[0] || null;
+}
+
+/* Il ritocco in posto: quello che si vede cambia, il pezzo che prende il
+   dito resta lo stesso nodo di prima. */
+function studioBancoRitocca(input, k, v){
+  const curs = input.closest(".stcurs");
+  if(!curs){ renderStudio(); return; }
+  const pos = v / 4 * 100;
+  const pieno = curs.querySelector(".stcurspieno");
+  const capo = curs.querySelector(".stcursnodo");
+  const nota = curs.querySelector(".stcursnota");
+  const c = STUDIO_CURSORI.find(x => x.k === k);
+  if(pieno) pieno.style.width = pos + "%";
+  if(capo) capo.style.left = pos + "%";
+  if(nota && c) nota.textContent = c.note[v];
+  curs.classList.toggle("mosso", v !== 2);
+
+  /* il riquadro del risultato: e' l'unica cosa fuori dal cursore che cambia
+     quando lo muovi, e va tenuta insieme se no dice il numero di prima */
+  const es = document.querySelector("#st-corpo .stesito");
+  const s = studioProvino();
+  if(es && s){
+    const car = studioBancoCarattere();
+    const g = mixGain();
+    const fon = typeof studioFonico === "function" ? studioFonico() : null;
+    es.innerHTML = stFreccia() + ' ' + stOro("q" + clamp(s.q + g, 5, 100)) +
+      ' · carattere: ' + stOro(car.n) + ' · ' + stNum("+" + g) +
+      (fon ? ', di cui ' + stNum(studioAiuto(fon)) + ' suoi' : '');
+  }
 }
 function studioBancoCarattere(){
   const b = studioBanco();
@@ -482,7 +559,7 @@ function studioBancoCursori(){
    una finta — `beatSuona` suona più pulito e più aperto quanto più il pezzo
    è buono, quindi il mix che stai facendo si sente davvero. */
 function studioBancoAscolta(btn){
-  const s = typeof studioDaMixare === "function" ? studioDaMixare() : null;
+  const s = studioProvino();
   const q = s ? clamp(s.q + (typeof mixGain === "function" ? mixGain() : 0), 5, 100) : 40;
   if(typeof beatSuona !== "function") return;
   beatSuona({n:(s && s.t) || "provino", q, gen:(s && s.gen) || mioGenere(),
@@ -541,9 +618,25 @@ function studioStreamStima(s){
   const push = G.contract ? G.contract.push : 1;
   const scoperta = Math.pow(Math.max(0, q - 26) / 74, 2.6) * (35 + G.hype * 13) * push;
   const fan = G.fans * (0.5 + q / 170);
+  /* Il lunedi', prima di darti i numeri, `advanceWeek()` passa il totale
+     sotto a un **tetto** che dipende dalla fase della carriera, e sopra a
+     quel tetto tiene solo un quinto di quello che avanza. Senza questa riga
+     la stima prometteva piu' di quello che arrivava, e tanto piu' quanto piu'
+     il catalogo tirava — cioe' proprio quando la guardi. */
+  const tetto = v => {
+    if(typeof PHASES === "undefined" || !PHASES[G.phase]) return v;
+    const cap = PHASES[G.phase].cap;
+    /* il tetto vale sul totale della settimana, non su questo pezzo da solo:
+       quello che gli altri hanno gia' occupato conta */
+    const altri = (G.songs || []).filter(x => x.released)
+      .reduce((a, x) => a + (x.last || 0), 0);
+    const tot = altri + v;
+    if(tot <= cap || tot <= 0) return v;
+    return Math.max(0, Math.round(v * ((cap + (tot - cap) * 0.2) / tot)));
+  };
   return {
-    min: Math.round((fan * 0.26 + scoperta) * 0.8),
-    max: Math.round((fan * 0.5 + scoperta) * 1.25)
+    min: tetto(Math.round((fan * 0.26 + scoperta) * 0.8)),
+    max: tetto(Math.round((fan * 0.5 + scoperta) * 1.25))
   };
 }
 
@@ -574,6 +667,11 @@ function studioMandaFuori(){
   if(q === "cassetto"){
     s.tenuto = true;
     delete s.esce;
+    /* la scelta torna su «stanotte»: la schermata passa da sola al pezzo
+       dopo, e se il tasto d'oro restasse su «Tienilo da parte» un secondo
+       tocco nello stesso punto metterebbe via anche quello — con niente che
+       cambia a schermo tranne il titolo */
+    studioDati().quando = "subito";
     pushLog("«" + s.t + "» messo da parte. Non esce: resta in cassaforte.", "");
     toast("«" + s.t + "» in cassaforte", "good", "◆", TINTA_SUONO);
     SFX.tap(); save(); renderStudio(); renderGioco();
@@ -592,7 +690,7 @@ function studioMandaFuori(){
 /* Toglierlo dalla coda o dalla cassaforte: la seconda metà della scelta, se
    no una cosa messa da parte non torna più. */
 function studioRiprendi(seed){
-  const s = (G.songs || []).find(x => x.seed === seed);
+  const s = (G.songs || []).find(x => studioPezzoSeme(x) === seed);
   if(!s) return;
   delete s.tenuto;
   delete s.esce;
@@ -617,6 +715,12 @@ function studioUscitePronte(){
     s.week = typeof totalWeeks === "function" ? totalWeeks() : (G.week || 1);
     const cap = typeof hypeCap === "function" ? hypeCap() : 100;
     G.hype = clamp(G.hype + 6 + s.q * 0.12 + STUDIO_VENERDI_HYPE, 0, cap);
+    /* Mandarlo fuori a mano costa un punto di lucidita' (la mossa «Pubblica
+       il pezzo», in actions.js): se metterlo in coda non costasse niente,
+       aspettare non sarebbe una scelta ma sempre la scelta giusta — l'hype in
+       piu' **e** una mossa risparmiata. La mossa della giornata no, quella
+       non gliela si puo' far pagare: il pezzo esce di notte, mentre dormi. */
+    if(typeof addLuc === "function") addLuc(-1);
     pushLog("<b>«" + s.t + "» è uscito</b>, di venerdì come avevi deciso" +
       (s.mixed ? "." : ", ma non era mixato: qualità " + s.q + "."), "good");
   }
@@ -685,7 +789,7 @@ if($("studio")){
      lasci il dito e la frase sotto arriva in ritardo su quello che vedi */
   $("studio").addEventListener("input", e => {
     const c = e.target.closest("[data-curs]");
-    if(c) studioBancoMuovi(c.dataset.curs, c.value);
+    if(c) studioBancoMuovi(c.dataset.curs, c.value, c);
   });
 
   /* Le schede dei beat e le righe delle take sono `div` con `role="button"`

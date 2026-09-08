@@ -26,6 +26,7 @@ const actions = leggi("js/game/actions.js");
 const posto = leggi("js/game/posto.js");
 const studio = leggi("js/game/studio.js");
 const studioEl = leggi("js/game/studio-elementi.js");
+const studioElCss = leggi("css/studio-elementi.css");
 const writer = leggi("js/game/writer.js");
 const piazza = leggi("js/game/piazza.js");
 const hub = leggi("js/game/hub.js");
@@ -572,6 +573,64 @@ test("gli attributi dello Studio non rubano il nome a quelli che ascolta tutto i
       /* e nessuno di loro e' rimasto scritto come `data-compra` */
       !studioEl.includes('"[data-compra]"') && !studio.includes(' data-compra=');
   })());
+
+/* Il giro di fine task del 08/09/2026 (documentazione/problemi-riscontrati.md)
+   ha trovato queste cose sulla roba nuova dello Studio. Sistemate: qui restano
+   le prove, che sono l'unico modo perche' non tornino. */
+test("la take vale solo per la strofa e il beat su cui l'hai pagata",
+  /* la targhetta si guarda anche al momento di registrare, non solo in cabina */
+  studioEl.includes("const mia = d.k === studioTakeChiave();") &&
+  studioEl.includes("if(!mia) return rnd(-5, 6);") &&
+  /* ed e' fatta coi numeri di serie: due strofe stesso tema e stesso voto
+     erano la stessa cosa per la riga di prima */
+  studioEl.includes('return studioBarraSeme(b) + "|" + beatSeed(bt);'));
+
+test("muovere un cursore del banco non ridisegna la pagina sotto al dito",
+  studioEl.includes("function studioBancoMuovi(k, v, nodo)") &&
+  studioEl.includes("if(!nodo){ renderStudio(); return; }") &&
+  studioEl.includes("function studioBancoRitocca(input, k, v)") &&
+  studioEl.includes("studioBancoMuovi(c.dataset.curs, c.value, c)") &&
+  /* e il riquadro del risultato lo ritocca guardando **lo stesso** provino
+     che guarda la sezione: `studioDaMixare()` da solo torna null finche' non
+     ne scegli uno a mano, e il riquadro restava fermo sul carattere di prima */
+  studioEl.includes("function studioProvino()") &&
+  studioEl.includes("const s = studioProvino();"));
+
+test("dopo il cassetto il tasto d'oro torna a «Mandalo fuori»",
+  (() => {
+    const a = studioEl.indexOf('if(q === "cassetto")');
+    const corpo = a >= 0 ? studioEl.slice(a, a + 700) : "";
+    return corpo.includes('studioDati().quando = "subito";');
+  })());
+
+test("la cassaforte funziona anche sui pezzi di un salvataggio senza numero di serie",
+  studioEl.includes("function studioPezzoSeme(s)") &&
+  studioEl.includes("(G.songs || []).find(x => studioPezzoSeme(x) === seed)") &&
+  studio.includes("data-riprendi=\"' + studioPezzoSeme(x) + '\"") &&
+  studio.includes("data-vesti=\"' + studioPezzoSeme(s) + '\""));
+
+test("la stima degli stream tiene conto del tetto della fase, come fa sim.js il lunedi'",
+  studioEl.includes("const cap = PHASES[G.phase].cap;") &&
+  studioEl.includes("return Math.max(0, Math.round(v * ((cap + (tot - cap) * 0.2) / tot)));") &&
+  studioEl.includes("min: tetto(") && studioEl.includes("max: tetto("));
+
+test("l'uscita di venerdi' costa la lucidita' come quella mandata fuori a mano",
+  (() => {
+    const a = studioEl.indexOf("function studioUscitePronte()");
+    const corpo = a >= 0 ? studioEl.slice(a, a + 1400) : "";
+    return corpo.includes('if(typeof addLuc === "function") addLuc(-1);');
+  })());
+
+test("la scheda del beat scelta si salva, come tutte le altre scelte dello Studio",
+  (() => {
+    const a = studioEl.indexOf("function studioBeatSegna(seed)");
+    const corpo = a >= 0 ? studioEl.slice(a, a + 400) : "";
+    return corpo.includes("save();");
+  })());
+
+test("il tondo per ascoltare e «cambia copertina» si toccano a 44 punti",
+  studioElCss.includes("width:44px;height:44px;margin:-22px 0 0 -22px") &&
+  /\.stlink\{[^}]*min-height:44px/.test(studioElCss));
 
 test("dentro alle schede dei beat e alle take non ci sono bottoni annidati",
   !studioEl.includes('<button type="button" class="stbcard') &&
