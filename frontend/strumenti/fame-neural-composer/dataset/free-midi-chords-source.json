@@ -1,0 +1,23 @@
+{
+  "schema": "fame-neural-external-source-v1",
+  "version": 1,
+  "sourceId": "free-midi-chords",
+  "repository": "ldrolez/free-midi-chords",
+  "releaseTag": "v0.20260314",
+  "assetName": "free-midi-chords-20260314.zip",
+  "downloadUrl": "https://github.com/ldrolez/free-midi-chords/releases/download/v0.20260314/free-midi-chords-20260314.zip",
+  "sha256": "d50d4cb3eb0f1bc6304c4bb0b3d8cacc1bfd7f670fe499f0e74facb30246d93f",
+  "licenseId": "MIT",
+  "licenseUrl": "https://github.com/ldrolez/free-midi-chords/blob/main/LICENSE",
+  "creator": "Ludovic Drolez",
+  "maxFamilies": 96,
+  "categories": [
+    "Minor",
+    "Modal"
+  ],
+  "styles": [
+    "hiphop2 style",
+    "soul style",
+    "pop2 style"
+  ]
+}

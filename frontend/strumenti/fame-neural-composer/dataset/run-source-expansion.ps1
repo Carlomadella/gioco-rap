@@ -1,6 +1,7 @@
 param(
   [Parameter(Mandatory=$true)][string]$SourceDir,
-  [string]$Workspace = ""
+  [string]$Workspace = "",
+  [string]$AutoReviewScript = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -25,6 +26,13 @@ if (-not (Test-Path $SourceDir)) {
   throw "SourceDir non trovato: $SourceDir"
 }
 $SourceDir = (Resolve-Path $SourceDir).Path
+
+if (-not [string]::IsNullOrWhiteSpace($AutoReviewScript)) {
+  if (-not (Test-Path $AutoReviewScript)) {
+    throw "AutoReviewScript non trovato: $AutoReviewScript"
+  }
+  $AutoReviewScript = (Resolve-Path $AutoReviewScript).Path
+}
 
 if ([string]::IsNullOrWhiteSpace($Workspace)) {
   $Workspace = Join-Path $env:TEMP "fame-neural-source-expansion"
@@ -58,6 +66,8 @@ $curationReport = Join-Path $Workspace "source-curation-report.json"
 $manifest = Join-Path $Workspace "accepted-source-manifest.json"
 $reviewQueue = Join-Path $Workspace "source-review-queue.json"
 $emptyDecisions = Join-Path $Workspace "empty-decisions.json"
+$autoDecisions = Join-Path $Workspace "auto-review-decisions.json"
+$autoReviewReport = Join-Path $Workspace "auto-review-policy-report.json"
 $curationOptions = Join-Path $Workspace "curation-options.json"
 $builderOptions = Join-Path $Workspace "phrase-builder-options.json"
 $phraseBuildReport = Join-Path $Workspace "phrase-build-report.json"
@@ -77,6 +87,9 @@ New-Item -ItemType Directory -Path $phraseItems -Force | Out-Null
 Write-Host "=== FAME NEURAL / SOURCE EXPANSION ===" -ForegroundColor Cyan
 Write-Host "SourceDir: $SourceDir"
 Write-Host "Workspace: $Workspace"
+if (-not [string]::IsNullOrWhiteSpace($AutoReviewScript)) {
+  Write-Host "Auto review policy: $AutoReviewScript"
+}
 
 Write-Host "[1/7] Intake ricorsivo + rights filter..." -ForegroundColor Yellow
 & node $intake $SourceDir $staging $intakeReport
@@ -116,11 +129,36 @@ if ($curationExit -ne 0 -and $curationExit -ne 2) {
 }
 
 $curationData = Get-Content $curationReport -Raw | ConvertFrom-Json
+
+if (-not [string]::IsNullOrWhiteSpace($AutoReviewScript) -and $curationData.totals.hold -gt 0) {
+  Write-Host "[3b/7] Auto review source-specifica sui soli HOLD..." -ForegroundColor Yellow
+  & node $AutoReviewScript $curationReport $reviewQueue $autoDecisions $autoReviewReport
+  if ($LASTEXITCODE -ne 0) {
+    throw "Auto review policy ha trovato segnali non autorizzati. Controlla $autoReviewReport"
+  }
+
+  & node $curation $datasetItems $curationReport $manifest $reviewQueue $autoDecisions $curationOptions $auditorOptions
+  $curationExit = $LASTEXITCODE
+  if ($curationExit -ne 0 -and $curationExit -ne 2) {
+    throw "Curation sorgenti dopo auto review fallita."
+  }
+  $curationData = Get-Content $curationReport -Raw | ConvertFrom-Json
+
+  Write-Host "Accepted dopo auto review: $($curationData.totals.accepted)"
+  Write-Host "Hold residui: $($curationData.totals.hold)"
+}
+
 if ($curationData.totals.accepted -lt 1) {
   Write-Host ""
-  Write-Host "Nessuna sorgente accepted automaticamente; serve review prima di creare phrase." -ForegroundColor Yellow
+  Write-Host "Nessuna sorgente accepted; serve review prima di creare phrase." -ForegroundColor Yellow
   Write-Host "Review queue: $reviewQueue"
   exit 0
+}
+
+if ($curationData.totals.hold -gt 0) {
+  Write-Host ""
+  Write-Host "ATTENZIONE: restano $($curationData.totals.hold) sorgenti in HOLD. Verranno escluse dal manifest accepted." -ForegroundColor Yellow
+  Write-Host "Review queue: $reviewQueue"
 }
 
 Write-Utf8NoBom -Path $builderOptions -Text (@{
@@ -162,6 +200,7 @@ Write-Host "Commercial cleared: $($intakeData.totals.commercialCleared)"
 Write-Host "Analysis-only: $($intakeData.totals.analysisOnly)"
 Write-Host "Missing provenance: $($intakeData.totals.missingProvenance)"
 Write-Host "Accepted source: $($curationData.totals.accepted)"
+Write-Host "Hold source: $($curationData.totals.hold)"
 Write-Host "Phrase prodotte: $($phraseBuild.totals.phrasesProduced)"
 Write-Host "GATE 1 DATA READY: $(if ($gateData.ready) { 'READY' } else { 'NOT READY' })"
 Write-Host "Gate report: $gateReport"

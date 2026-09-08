@@ -1,7 +1,7 @@
 # FAME Neural — FASE 3 Dataset Auditor
 
 Stato: IN CORSO
-Blocco corrente: SOURCE EXPANSION — intake Trap/Rap originale o cleared
+Blocco corrente: COMMERCIAL MIX V1 — FAME Original + free-midi-chords MIT
 
 ## BLOCCO 1 — fingerprint deterministici + split leakage-safe
 
@@ -542,3 +542,160 @@ I file analysis-only o senza provenance non vengono cancellati: restano semplice
 La pipeline FASE 3 e' ora pronta a ricevere materiale Trap/Rap originale o con permesso ML commerciale esplicito.
 
 GATE 1 resta aperto fino a quando il mix reale non raggiunge quantita', diversita', coverage e leakage requirements del BLOCCO 6.
+
+## COMMERCIAL MIX V1 — FAME Original + free-midi-chords MIT
+
+La prima espansione pitched commercialmente pulita usa due source collection complementari.
+
+### FAME Original Seed V1
+
+`generate-fame-original-seed.js` crea sketch originali multitraccia con drums, 808, harmony e lead.
+
+Il seed e' deterministico, non legge MIDI/loop/sample di terzi e viene marcato come materiale originale FAME.
+
+Serve come bootstrap tecnico e pitched, non come sostituto del corpus reale.
+
+### free-midi-chords
+
+Fonte:
+
+`ldrolez/free-midi-chords`
+
+Release fissata:
+
+`v0.20260314`
+
+Asset:
+
+`free-midi-chords-20260314.zip`
+
+SHA-256 fissato:
+
+`d50d4cb3eb0f1bc6304c4bb0b3d8cacc1bfd7f670fe499f0e74facb30246d93f`
+
+Licenza:
+
+`MIT`
+
+Il runner verifica sempre l'hash prima di usare l'archivio.
+
+### Policy di selezione
+
+Non importiamo tutte le migliaia di trasposizioni.
+
+`select-free-midi-chords.js` usa soltanto:
+
+- Progression / Minor;
+- Progression / Modal;
+- hiphop2 style;
+- soul style;
+- pop2 style.
+
+Le versioni della stessa progressione in tonalita' differenti vengono raggruppate nella stessa `compositionFamily`.
+
+Per ogni progression family viene selezionata una sola trasposizione rappresentativa, scelta deterministicamente.
+
+Default:
+
+`maxFamilies = 96`
+
+Questo evita di gonfiare il dataset con copie trasposte dello stesso pattern.
+
+### Attribution
+
+Ogni MIDI selezionato riceve provenance commerciale con:
+
+- repository;
+- release;
+- SHA-256 asset;
+- MIT license;
+- composition family;
+- SHA del MIDI selezionato.
+
+Nel workspace viene inoltre conservato `LICENSE.free-midi-chords.txt`.
+
+### Pipeline combinata
+
+`run-commercial-mix-v1.ps1` esegue:
+
+free-midi-chords official release
+-> SHA-256 verify
+-> extract
+-> family dedup / style selection
+-> provenance
+-> source expansion
+
+FAME Original Seed
+-> source expansion
+
+poi:
+
+accepted phrases
+-> combined phrase corpus
+-> dedup/fuzzy/quality audit
+-> leakage-safe split
+-> Gate 1 inventory
+-> blocker residui
+
+Il mix NON forza DATA READY.
+
+Il Gate 1 resta l'unica autorita' per quantita', source diversity, role coverage, rights e leakage.
+
+### Fonti escluse dal training
+
+Restano reference-only finche' i diritti non cambiano:
+
+- Cymatics con permesso ML non esplicito;
+- The Magic of MIDI;
+- josephding23/Free-Midi-Library.
+
+Non vengono usate per gonfiare il corpus commerciale.
+
+### Nota Windows recovery
+
+Estrazione Windows: `tar.exe` invece di `Expand-Archive`, per evitare i problemi gia' incontrati con ZIP MIDI e path profondi.
+
+
+## FREE-MIDI-CHORDS SOURCE-SPECIFIC REVIEW
+
+Il primo run reale ha mostrato un caso previsto ma non ancora codificato: 96/96 item free-midi-chords sono entrati in HOLD durante la curation.
+
+La causa non e' un rights block e non e' un errore di import:
+
+- 96/96 commercial-cleared;
+- 96/96 technical-ready;
+- 0 blocked;
+- review queue 96.
+
+free-midi-chords e' un dataset di progressioni armoniche generate con un piccolo insieme di pattern ritmici dichiarati. Quindi collisioni rhythm-only e alta ripetizione di barra possono essere caratteristiche strutturali attese della fonte, non prova sufficiente di duplicazione musicale.
+
+La policy generale di curation NON viene allentata.
+
+`review-free-midi-chords.js` puo' auto-accettare soltanto HOLD della source `free-midi-chords` quando:
+
+- non esiste alcun relational blocker;
+- tutti i segnali sono `RHYTHM_REVIEW_GROUP`;
+- oppure `QUALITY_REVIEW` esclusivamente per `ripetizione barre elevata`.
+
+Qualsiasi fuzzy blocker, exact/transposition relation, pitch-range estremo, melodic note skipped o altro segnale non previsto resta in review e blocca l'auto-policy.
+
+`run-source-expansion.ps1` accetta ora opzionalmente `-AutoReviewScript`. Senza parametro il comportamento precedente resta invariato.
+
+Il COMMERCIAL MIX usa questa policy solo per free-midi-chords; FAME Original e le altre fonti continuano con la curation standard.
+
+
+## FREE-MIDI-CHORDS REVIEW RESOLUTION V2
+
+Il run reale del COMMERCIAL MIX ha mostrato 96/96 free-midi-chords in HOLD, con rights/import corretti.
+
+La review source-specifica V2 non bypassa piu' i segnali sconosciuti.
+
+Policy:
+
+- `RHYTHM_REVIEW_GROUP`: segnale strutturale atteso, puo' essere accettato;
+- `QUALITY_REVIEW` per sola alta ripetizione barre: atteso, puo' essere accettato;
+- `FUZZY_REVIEW_PAIR`: costruisce un grafo di conflitto e mantiene un sottoinsieme deterministico di keeper, rifiutando i peer conflittuali;
+- exact/transposition/fuzzy blocking relation: un solo keeper per gruppo, peer rifiutati;
+- quality/review signal non previsto: item rifiutato, mai auto-accettato.
+
+Quindi la curation generale resta severa e la source policy risolve automaticamente soltanto cio' che e' spiegabile dalla struttura nota di free-midi-chords.
