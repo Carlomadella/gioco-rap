@@ -749,3 +749,24 @@ La phrase review ora tratta questi casi in modo conservativo:
 - altri quality signal: reject.
 
 Il Gate non viene forzato: dopo la rimozione viene eseguito un nuovo audit e `corpusClean` deve risultare realmente true prima di commit/push.
+
+
+## CORPUS EXPANSION V3 - PDMX SAFE + COMPATIBILITY FILTER
+
+Il primo run PDMX ha mostrato che `all_valid` indica file PDMX validi, ma non garantisce compatibilita' con il formato canonico FAME V1. Il batch importer e' correttamente strict: basta una sorgente technical-blocked per fermare la source expansion.
+
+Per questo PDMX viene ora trattato in due stadi distinti:
+
+1. rights-safe candidate pool:
+   `no_license_conflict AND deduplicated AND all_valid`;
+2. FAME compatibility preflight prima della source expansion.
+
+Il preflight usa lo stesso importer FAME reale e accetta solo MIDI che:
+
+- sono tecnicamente validi per il canonico corrente;
+- sono commercial-training-cleared dalla provenance PDMX;
+- producono almeno 4 eventi pitched tra harmony, lead e 808.
+
+Il default estrae deterministicamente un pool di 512 candidate rights-safe e ne mantiene 48 compatibili. Le altre vengono escluse con report dei codici tecnici (per esempio meter/tempo map non supportate), senza indebolire `run-source-expansion.ps1`.
+
+La source expansion generica resta quindi strict e invariata.

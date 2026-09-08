@@ -1,0 +1,29 @@
+{
+  "schema": "fame-neural-pdmx-source-v1",
+  "version": 1,
+  "recordId": 15571083,
+  "recordUrl": "https://zenodo.org/records/15571083",
+  "repositoryUrl": "https://github.com/pnlong/PDMX",
+  "releaseNote": "PDMX public-domain symbolic music dataset; use no_license_conflict subset as recommended by maintainers.",
+  "midArchive": {
+    "name": "mid.tar.gz",
+    "url": "https://zenodo.org/records/15571083/files/mid.tar.gz?download=1",
+    "md5": "d920a21b2fcd99a56d9c381b39debbb2"
+  },
+  "subsetArchive": {
+    "name": "subset_paths.tar.gz",
+    "url": "https://zenodo.org/records/15571083/files/subset_paths.tar.gz?download=1",
+    "md5": "092eee416ece8060f77d08575b94a43d"
+  },
+  "requiredSubsets": [
+    "no_license_conflict.txt",
+    "deduplicated.txt",
+    "all_valid.txt"
+  ],
+  "defaultSelectionCount": 48,
+  "licenseId": "PDMX-PUBLIC-DOMAIN-NO-LICENSE-CONFLICT",
+  "rightsEvidence": [
+    "https://zenodo.org/records/15571083",
+    "https://github.com/pnlong/PDMX"
+  ]
+}
