@@ -1,0 +1,124 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-D6B7FB24808B",
+  "origin": "legacy",
+  "title": "Il banco dei suoni rifatto",
+  "category": "04-musica-e-suoni",
+  "source": {
+    "point": "25",
+    "text": "Il banco dei suoni rifatto",
+    "file": "implementazioni/04-musica-e-suoni.md",
+    "source_status": "in_parte",
+    "source_status_raw": "in parte"
+  },
+  "audit_state": "audited",
+  "verified_status": "needs_validation",
+  "intake_state": "canonical",
+  "related_task_ids": [
+    "ADF-LEG-3FF6C1268680"
+  ],
+  "intake_note": "Task canonica del punto 25; la task 3FF6C1268680 copre un ampliamento successivo della stessa area, non sostituisce questa.",
+  "current_state": [
+    "frontend/js/game/fx.js implementa i banchi morbido e retrò, compressore, riverbero e suoni dedicati per interazioni, Sala, mix, uscita, folla, promo, palestra e giorno.",
+    "frontend/js/impostazioni-ui.js espone carattere audio, click e otto prove sonore.",
+    "La variazione timbrica dei beat per genere resta aperta: frontend/js/game/beatplay.js usa ancora una base condivisa."
+  ],
+  "systems": [
+    "frontend/js/game/fx.js",
+    "frontend/js/game/beatplay.js",
+    "frontend/js/game/beats.js",
+    "frontend/js/impostazioni-ui.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/fx.js",
+    "frontend/js/game/beatplay.js",
+    "frontend/js/game/beats.js",
+    "frontend/js/impostazioni-ui.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Gli effetti principali usano un banco coerente con carattere selezionabile, dinamica e riverbero senza rompere il fallback retrò.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/fx.js: SUONI.morbido, SUONI.retro, bus() con compressore e riverbero e dispatch SFX."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Le impostazioni permettono di attivare, disattivare e provare i suoni del banco.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/impostazioni-ui.js: corpoAudio() espone audio.on, audio.suoni, audio.click e i pulsanti prova."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "I generi di beat hanno timbri riconoscibilmente differenziati oltre a giro e scala.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "implementazioni/04-musica-e-suoni.md: la variazione dei timbri per genere è dichiarata ancora da fare."
+      ]
+    }
+  ],
+  "risks": [
+    "Cambiare la sintesi dei beat può alterare volume, latenza e riconoscibilità delle anteprime."
+  ],
+  "notes": [
+    "La parte già rifatta non va riscritta; il gap è limitato alla differenziazione dei beat."
+  ],
+  "plan": {
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Preservare il banco effetti funzionante e completare soltanto la differenziazione sonora dei generi.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Banco effetti",
+        "objective": "Mantenere verificati banco, impostazioni e fallback esistenti.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/fx.js",
+          "frontend/js/impostazioni-ui.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/fx.js",
+          "frontend/js/impostazioni-ui.js"
+        ],
+        "acceptance_criteria": [
+          "AC1",
+          "AC2"
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "V2",
+        "title": "Timbri dei beat",
+        "objective": "Dare ai generi strumenti e inviluppi distinti mantenendo la stessa API di anteprima e gameplay.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "frontend/js/game/beatplay.js",
+          "frontend/js/game/beats.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/beatplay.js",
+          "frontend/js/game/beats.js"
+        ],
+        "acceptance_criteria": [
+          "AC3"
+        ],
+        "status": "needs_validation"
+      }
+    ],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

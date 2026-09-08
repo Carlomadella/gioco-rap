@@ -33,6 +33,15 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 ## Da smistare
 
+### Inbox automatica
+
+**Scrivi qui le nuove richieste anche in una frase sola.** Prima di espanderle il sistema cerca duplicati, sovrapposizioni e cose già implementate; solo dopo costruisce i passaggi mancanti.
+La lista storica già presente sotto **rimane intatta** ed è importata automaticamente nel cruscotto: non viene riscritta né cancellata.
+
+<!-- ADF-AUTO-INBOX:BEGIN -->
+- [x] voglio sistemare gli eventi ed il tempo in game <!-- ADF-TASK:ADF-NEW-3E6D8998D1BD --> — **🟡 ESTENSIONE → ADF-LEG-EC3A45E275D0, ADF-LEG-99F7F334DFE9** · La richiesta è più ampia delle task esistenti: EC3A45E275D0 copre la gerarchia degli incontri durante i salti e 99F7F334DFE9 il passaggio alla giornata; resta un delta reale di coerenza e prestazioni del motore eventi-tempo.
+<!-- Esempio (non attivo): - [ ] voglio cambiare il tempo del turno in fabbrica -->
+<!-- ADF-AUTO-INBOX:END -->
 _(qui sotto finiscono i punti nuovi, appena scritti)_
 
 ALE:

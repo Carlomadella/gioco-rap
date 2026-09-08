@@ -1,0 +1,38 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-4D9FA3E54D62",
+  "origin": "legacy",
+  "title": "(riscritto) e lo schema del database",
+  "category": "08-uscita-sugli-store",
+  "source": {
+    "point": "32",
+    "text": "(riscritto) e lo schema del database",
+    "file": "implementazioni/08-uscita-sugli-store.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  }
+}

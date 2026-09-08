@@ -18,6 +18,9 @@ qui, cambiala anche lì.
 
 ## Mentre lavori
 
+<!-- ADF-AUTO-RULES -->
+> **Stato automatico implementazioni:** `ROADMAP.md` resta la roadmap ufficiale. Il bot può **migliorarla e completarla** quando trova buchi minori verificabili e coerenti con la direzione già approvata; non può cancellare macro-fasi, ribaltare decisioni o trasformare una proposta strutturale in decisione senza revisione. Le nuove richieste possono essere messe nell'Inbox automatica di `implementazioni/implementazioni.md`. Prima di creare una task, il sistema cerca duplicati, sovrapposizioni e funzionalità già implementate. `scripts/roadmap-auto.js` importa anche tutte le voci già presenti in `implementazioni/README.md`, conserva il loro stato storico e aggiunge in `implementazioni/auto/` un audit separato contro il codice reale. Una differenza tra stato storico e audit va segnalata, non nascosta.
+
 - **I punti nuovi si scrivono in `implementazioni/implementazioni.md`.** Quando sono
   chiusi si spostano nel file del loro argomento, con sotto **cosa è stato fatto e
   quando**: `**FATTO (gg/mm/aaaa)** — in una frase`. A metà si scrive `FATTO in parte` e

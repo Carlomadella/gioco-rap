@@ -1,0 +1,139 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-6A7D3E986357",
+  "origin": "legacy",
+  "title": "Il beat maker diventa un posto: La Sala",
+  "category": "06-mondo-e-personaggi",
+  "source": {
+    "point": "—",
+    "text": "Il beat maker diventa un posto: La Sala",
+    "file": "implementazioni/06-mondo-e-personaggi.md",
+    "source_status": "in_parte",
+    "source_status_raw": "in parte"
+  },
+  "audit_state": "audited",
+  "verified_status": "needs_validation",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "Task canonica sul luogo fisico, sulle relazioni e sulle azioni dei professionisti.",
+  "current_state": [
+    "frontend/js/game/posto.js implementa La Sala, persone per ruolo, relazioni a gradini, dialoghi, beat sul tavolo e azioni per beatmaker, fonico, rapper e videomaker.",
+    "Il tempo delle azioni è integrato con GAME_TIME e la sessione produce un beat legato al contatto.",
+    "La fonte storica segnala ancora scene più complete e contenuti collegati da ampliare."
+  ],
+  "systems": [
+    "frontend/js/game/posto.js",
+    "frontend/js/game/tempo.js",
+    "frontend/js/game/hub.js",
+    "frontend/css/posto.css"
+  ],
+  "watch_paths": [
+    "frontend/js/game/posto.js",
+    "frontend/js/game/tempo.js",
+    "frontend/js/game/hub.js",
+    "frontend/css/posto.css"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "La Sala è un luogo navigabile distinto dallo Shop e mostra contatti, ruoli e stato delle relazioni.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/posto.js: apriPosto(), presentiOggi(), renderPosto() e REL_NOMI gestiscono luogo, persone e gradini."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Le relazioni sbloccano azioni con costi, tempi e risultati coerenti, inclusi beat, sessione e mix.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/posto.js: PO_COSTO, PO_TEMPO, azioniDi() e azionePosto() applicano gate, effetti e GAME_TIME."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Le scene della Sala, le transizioni e la leggibilità delle azioni sono validate durante un percorso di gioco completo.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/posto.js: scenaSala() e renderPosto() sono presenti; la fonte storica mantiene il lavoro in parte."
+      ]
+    }
+  ],
+  "risks": [
+    "Aggiungere azioni alla Sala senza passare dai gate comuni può creare costi o avanzamenti temporali duplicati."
+  ],
+  "notes": [],
+  "plan": {
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Auditare la Sala già giocabile e completare solo le scene e la validazione di percorso ancora mancanti.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Luogo e rete",
+        "objective": "Consolidare persone, ruoli, relazioni e ingresso dalla mappa.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/posto.js",
+          "frontend/js/game/hub.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/posto.js",
+          "frontend/js/game/hub.js"
+        ],
+        "acceptance_criteria": [
+          "AC1"
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "V2",
+        "title": "Azioni integrate",
+        "objective": "Mantenere costi, tempi e risultati delle azioni allineati ai sistemi centrali.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "frontend/js/game/posto.js",
+          "frontend/js/game/tempo.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/posto.js",
+          "frontend/js/game/tempo.js"
+        ],
+        "acceptance_criteria": [
+          "AC2"
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "V3",
+        "title": "Scene e percorso",
+        "objective": "Completare le scene mancanti e verificare la Sala dalla mappa a un'azione conclusa.",
+        "depends_on": [
+          "V2"
+        ],
+        "systems": [
+          "frontend/js/game/posto.js",
+          "frontend/css/posto.css"
+        ],
+        "watch_paths": [
+          "frontend/js/game/posto.js",
+          "frontend/css/posto.css"
+        ],
+        "acceptance_criteria": [
+          "AC3"
+        ],
+        "status": "needs_validation"
+      }
+    ],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-E101C11E0442",
+  "origin": "legacy",
+  "title": "La pulizia dei media, e i sessanta sfondi che sono dieci foto",
+  "category": "09-grafica-e-asset",
+  "source": {
+    "point": "—",
+    "text": "La pulizia dei media, e i sessanta sfondi che sono dieci foto",
+    "file": "implementazioni/09-grafica-e-asset.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  }
+}

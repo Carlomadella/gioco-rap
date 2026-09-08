@@ -1,0 +1,38 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-DB2D56011EF3",
+  "origin": "legacy",
+  "title": "Crea il tuo avatar",
+  "category": "03-artista-e-avatar",
+  "source": {
+    "point": "3",
+    "text": "Crea il tuo avatar",
+    "file": "implementazioni/03-artista-e-avatar.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  }
+}

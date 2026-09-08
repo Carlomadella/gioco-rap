@@ -138,6 +138,15 @@ toccate schermate, CSS o card. Se ne occupa un promemoria suo, all'inizio della 
 
 ## Quello che gira da solo
 
+<!-- ADF-AUTO-WORKFLOW -->
+### Stato automatico delle implementazioni
+
+`ROADMAP.md` rimane **la roadmap ufficiale**. L'automazione la legge e può anche mantenerla: se dall'audit emerge un **buco minore** (un passaggio mancante, un prerequisito, una dipendenza, un chiarimento coerente con una decisione già presa), un passaggio dedicato può aggiornare `ROADMAP.md`. Le modifiche strutturali (`major`) non vengono applicate automaticamente: restano evidenziate nel cruscotto finché non vengono revisionate.
+
+Il bootstrap importa **tutte le righe già presenti** in `implementazioni/README.md` dentro `implementazioni/auto/tasks/`, mantenendo titolo, file sorgente e stato storico. I file storici in `implementazioni/*.md` non vengono riscritti. Le task vengono poi auditate contro il repository a piccoli batch: prima quelle nuove, a metà o da fare, poi quelle già segnate come fatte. Lo stato storico e lo stato verificato restano separati, così il sistema non cancella lavoro precedente e non finge che una verifica sia avvenuta quando non è avvenuta.
+
+Per le nuove idee basta una checkbox nell'Inbox automatica di `implementazioni/implementazioni.md`. Prima di trasformarla in lavoro, il sistema la confronta con tutte le task, la roadmap e il codice: può classificarla come nuova, duplicata, estensione di una task esistente o già implementata. I duplicati non vengono conteggiati come nuove task. Se l'audit AI non è disponibile, la richiesta resta pendente e lo storico rimane intatto. I criteri di UI, bilanciamento e gameplay non possono chiudersi automaticamente senza una prova manuale.
+
 Nel progetto ci sono cose che si muovono senza che nessuno le lanci. Conviene sapere quali
 sono, se non altro per non rifarle a mano:
 

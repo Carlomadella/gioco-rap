@@ -1,0 +1,157 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-043B012E6E3B",
+  "origin": "legacy",
+  "title": "I cinque lavori per uscire",
+  "category": "08-uscita-sugli-store",
+  "source": {
+    "point": "—",
+    "text": "I cinque lavori per uscire",
+    "file": "implementazioni/08-uscita-sugli-store.md",
+    "source_status": "in_parte",
+    "source_status_raw": "in parte"
+  },
+  "audit_state": "audited",
+  "verified_status": "needs_validation",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "Task canonica che raggruppa i cinque prerequisiti tecnici di uscita.",
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [
+    "Il build è presente in frontend/strumenti/build.js ed è esposto da frontend/package.json come npm run build.",
+    "Il backend espone account, sessioni, cloud e database SQLite/PostgreSQL tramite backend/accessi.js e backend/database/.",
+    "La responsività mobile ha regole in frontend/css/tocco.css, ma la fonte storica segnala ancora hover, telefono reale e parte del negozio da validare.",
+    "La migrazione a PostgreSQL multi-server e il collegamento dei salvataggi locali al cloud/store non risultano chiusi dalla fonte né dimostrati come percorso end-to-end."
+  ],
+  "systems": [
+    "frontend/strumenti/build.js",
+    "frontend/package.json",
+    "frontend/css/tocco.css",
+    "frontend/js/net/online.js",
+    "backend/accessi.js",
+    "backend/database/"
+  ],
+  "watch_paths": [
+    "frontend/strumenti/build.js",
+    "frontend/package.json",
+    "frontend/css/tocco.css",
+    "frontend/js/net/online.js",
+    "backend/accessi.js",
+    "backend/database/"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Il gioco produce un pacchetto installabile con asset e codice referenziati senza dipendere dalla lista di script sorgente.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/package.json: script build -> node strumenti/build.js.",
+        "frontend/strumenti/build.js: genera bundle di codice e stile con impronta."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Account, sessioni, salvataggi cloud e database persistente hanno percorsi server reali e separati.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "backend/accessi.js: verifica dei canali di accesso e gestione delle sessioni.",
+        "backend/database/db.js: selezione e migrazione dei motori SQLite/PostgreSQL.",
+        "backend/database/README.md: archivio unico e migrazioni per entrambi i motori."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "L'interfaccia mobile, il negozio e il collegamento del salvataggio locale al cloud sono pronti per una prova di prodotto sugli store.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/css/tocco.css: regole per pointer coarse e bersagli minimi.",
+        "implementazioni/08-uscita-sugli-store.md: la fonte dichiara il lavoro mobile e il negozio ancora parziali."
+      ]
+    }
+  ],
+  "risks": [
+    "Un build valido non dimostra da solo la compatibilità con wrapper Steam, iOS e Android.",
+    "Il passaggio a PostgreSQL e il cloud richiedono migrazioni e gestione dei conflitti senza perdere carriere."
+  ],
+  "notes": [
+    "La fonte storica in parte è preservata: l'audit separa ciò che il codice dimostra dai punti ancora da validare."
+  ],
+  "plan": {
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Conservare il build e il backend già presenti, quindi chiudere in ordine persistenza cross-device, packaging store e validazione mobile.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Build e persistenza installabile",
+        "objective": "Stabilizzare bundle, salvataggio locale, cloud e conflitti per una carriera che sopravvive al cambio dispositivo.",
+        "depends_on": [],
+        "systems": [
+          "frontend/strumenti/build.js",
+          "frontend/js/net/online.js",
+          "backend/database/"
+        ],
+        "watch_paths": [
+          "frontend/strumenti/build.js",
+          "frontend/js/net/online.js",
+          "backend/database/"
+        ],
+        "acceptance_criteria": [
+          "AC1",
+          "AC2"
+        ],
+        "status": "needs_validation"
+      },
+      {
+        "id": "V2",
+        "title": "Integrazione account e store",
+        "objective": "Collegare autenticazione, cancellazione account e packaging ai canali Steam, Apple e Google senza fallback non verificati.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "backend/accessi.js",
+          "frontend/js/net/online.js"
+        ],
+        "watch_paths": [
+          "backend/accessi.js",
+          "frontend/js/net/online.js"
+        ],
+        "acceptance_criteria": [
+          "AC2"
+        ],
+        "status": "needs_validation"
+      },
+      {
+        "id": "V3",
+        "title": "Prova mobile e negozio",
+        "objective": "Validare layout, touch, hover e shop sui dispositivi target e registrare i gap residui.",
+        "depends_on": [
+          "V1",
+          "V2"
+        ],
+        "systems": [
+          "frontend/css/tocco.css",
+          "frontend/js/game/negozio.js",
+          "frontend/js/game/telefono.js"
+        ],
+        "watch_paths": [
+          "frontend/css/tocco.css",
+          "frontend/js/game/negozio.js",
+          "frontend/js/game/telefono.js"
+        ],
+        "acceptance_criteria": [
+          "AC3"
+        ],
+        "status": "needs_validation"
+      }
+    ],
+    "gaps": [],
+    "notes": []
+  }
+}

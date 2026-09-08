@@ -1,0 +1,38 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-CCBBA5CFE700",
+  "origin": "legacy",
+  "title": "Via il bottone del menù dalle CTA in basso",
+  "category": "02-interfaccia-e-telefono",
+  "source": {
+    "point": "11",
+    "text": "Via il bottone del menù dalle CTA in basso",
+    "file": "implementazioni/02-interfaccia-e-telefono.md",
+    "source_status": "da_fare",
+    "source_status_raw": "da fare"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  }
+}

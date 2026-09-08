@@ -1,0 +1,38 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-47DD718310D1",
+  "origin": "legacy",
+  "title": "Al massimo una conversazione lunga al giorno",
+  "category": "06-mondo-e-personaggi",
+  "source": {
+    "point": "6",
+    "text": "Al massimo una conversazione lunga al giorno",
+    "file": "implementazioni/06-mondo-e-personaggi.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  }
+}

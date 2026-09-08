@@ -1,0 +1,81 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-D984E65BB868",
+  "origin": "legacy",
+  "title": "Meno cartelli chiusi sulla mappa, più roba che si apre",
+  "category": "01-mappa-e-citta",
+  "source": {
+    "point": "48",
+    "text": "Meno cartelli chiusi sulla mappa, più roba che si apre",
+    "file": "implementazioni/01-mappa-e-citta.md",
+    "source_status": "in_parte",
+    "source_status_raw": "in parte"
+  },
+  "audit_state": "audited",
+  "verified_status": "needs_validation",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "Task canonica sulla mappa navigabile e sulla sostituzione dei cartelli senza gameplay.",
+  "current_state": [
+    "frontend/js/game/hub.js: HUB_LUOGHI collega Studio, Live Club, La Sala, Casa, Attività criminali, lavori, Palestra e Shop a destinazioni o azioni reali.",
+    "Le condizioni residue sono applicate all'azione, non a cartelli muti: il Live Club spiega il requisito del pezzo pubblicato e il centro per l'impiego evita di duplicare lavori già attivi.",
+    "La fonte storica resta in parte perché il bilanciamento delle aperture e la leggibilità della mappa richiedono prova di gioco."
+  ],
+  "systems": [
+    "frontend/js/game/hub.js",
+    "frontend/css/hub.css",
+    "frontend/js/game/spostamenti.js",
+    "frontend/js/game/orari.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/hub.js",
+    "frontend/css/hub.css",
+    "frontend/js/game/spostamenti.js",
+    "frontend/js/game/orari.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "I principali cartelli della mappa portano a un luogo, un lavoro o un'azione realmente giocabile.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/hub.js: HUB_LUOGHI definisce ingressi con vai() per studio, live, sala, casa, crimine, fabbrica, pizzeria, palestra e shop."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Quando un'attività non è ancora disponibile, la mappa comunica il requisito invece di presentare un cartello morto.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/hub.js: il Live Club usa hubPronta() e hubChiuso() con il motivo; hubChiuso() centralizza il messaggio dei requisiti."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Il percorso dalla mappa all'attività è leggibile e non lascia destinazioni inutilmente chiuse sui dispositivi supportati.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/hub.js e frontend/css/hub.css: ingressi, targhette e stati chiuso sono presenti; manca una nuova evidenza manuale di percorso dopo l'ultimo audit."
+      ]
+    }
+  ],
+  "risks": [
+    "Aprire un luogo senza collegare orari, spostamento e requisiti può creare ingressi giocabili solo graficamente.",
+    "Rimuovere tutti i gate eliminerebbe progressione e leggibilità dei requisiti."
+  ],
+  "notes": [],
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}
