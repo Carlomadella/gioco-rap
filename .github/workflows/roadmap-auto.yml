@@ -176,7 +176,7 @@ jobs:
       - name: Blocca scritture fuori dal perimetro automatico
         shell: bash
         run: |
-          FUORI=$(git diff --name-only | grep -Ev '^(implementazioni/auto/|implementazioni/implementazioni\.md)$' || true)
+          FUORI=$(git diff --name-only | grep -Ev '^(implementazioni/auto/.*|implementazioni/implementazioni\.md)$' || true)
           if [ -n "$FUORI" ]; then
             echo "::error::L'agente ha modificato file non consentiti:"
             echo "$FUORI"
@@ -298,7 +298,7 @@ jobs:
           }
           NODE
 
-          FUORI=$(git diff --name-only | grep -Ev '^(implementazioni/auto/|implementazioni/implementazioni\.md|ROADMAP\.md)$' || true)
+          FUORI=$(git diff --name-only | grep -Ev '^(implementazioni/auto/.*|implementazioni/implementazioni\.md|ROADMAP\.md)$' || true)
           if [ -n "$FUORI" ]; then
             echo "::error::Modifica roadmap fuori perimetro:"
             echo "$FUORI"
