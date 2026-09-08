@@ -821,3 +821,28 @@ Root cause chiuse in V2:
 1. phrase-review usava `entry.item` fuori scope: ora usa `byId.get(id).item`;
 2. downloader single-shot Invoke-WebRequest: sostituito da downloader registry robusto;
 3. selector NRG riceveva `nrg-cp-source.json` adapter-only: ora riceve `nrg-resolved-source-config.json`.
+
+
+## HIP HOP DRUMMER - ROLE CLOSER V1
+
+Generator pinned: 4cbf33aef786338b5a991e716fb82879fe47a6c7.
+
+Final result:
+- phrase globali: 370;
+- composition family: 233;
+- source collections: 6;
+- drums/808/harmony/lead: 161/82/264/76;
+- pitchedAny: 313;
+- Gate 1: ANCORA APERTO.
+
+Policy:
+- upstream tests.js obbligatorio prima della generazione;
+- checkout e blob critici pin-hashati;
+- seed per-item deterministici;
+- MIDI drums+role separati come SMF format1;
+- real FAME importer su ogni candidato;
+- bass -> 808 solo per source style dichiarato 808sub;
+- lead solo per G-Funk lead-capable;
+- rhythm groups del generatore deduplicati;
+- HHD max 20% pre-review;
+- uso mirato ai role blocker, non al target numerico 500.

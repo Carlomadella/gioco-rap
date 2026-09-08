@@ -1,0 +1,67 @@
+{
+  "schema": "fame-neural-generator-adapter-v1",
+  "version": 1,
+  "registryId": "hiphopdrummer",
+  "generator": {
+    "repository": "https://github.com/keithadler/hiphopdrummer.git",
+    "commit": "4cbf33aef786338b5a991e716fb82879fe47a6c7",
+    "criticalBlobs": {
+      "README.md": "06a6e0518e4075219e104ee5dfaff97c037081db",
+      "LICENSE": "9d8b234cdea6238b7a724716c724efb61eb73964",
+      "package.json": "f6dba2f7c621011b5cadbe8fc25328c934ea9b95",
+      "tests.js": "93a67789ea6b34c70d749c3633f518dfbc0d8f78",
+      "patterns.js": "2e239acf7c77d28205870bec3e960b30fad22ed9",
+      "ai.js": "df539267691ed283aac6a1faf766f9d029db81ab",
+      "bass.js": "48d1228399195959b70cd9f34ef784f2f72f1b6c",
+      "lead.js": "ecd7babcc9ce92aa60b4b95c8b8dfca4892c8d29",
+      "midi-export.js": "febfe21dca832ba85ada9294afef886b6f2b78be"
+    }
+  },
+  "pool": {
+    "candidates808": 32,
+    "candidatesLead": 40,
+    "maxAttemptsPerCandidate": 16,
+    "styles808": [
+      "crunk",
+      "memphis",
+      "phonk",
+      "miamibass",
+      "nolimit",
+      "cashmoney",
+      "poprap",
+      "ratchet"
+    ],
+    "stylesLead": [
+      "gfunk",
+      "gfunk_dre",
+      "gfunk_quik",
+      "gfunk_battlecat"
+    ]
+  },
+  "semantic": {
+    "minDrumEvents": 16,
+    "minRoleEvents": 4,
+    "requiredBars": 8
+  },
+  "slice": {
+    "maxPhraseShare": 0.2,
+    "attempts": [
+      {
+        "buffer808": 8,
+        "bufferLead": 10,
+        "bufferDrums": 10
+      },
+      {
+        "buffer808": 16,
+        "bufferLead": 20,
+        "bufferDrums": 20
+      }
+    ]
+  },
+  "gateTargets": {
+    "drums": 150,
+    "808": 75,
+    "lead": 75,
+    "phrases": 500
+  }
+}

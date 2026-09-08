@@ -131,3 +131,25 @@ Non è un blocker Gate 1: è una guardia di governance da misurare nei benchmark
 5. Harmony Whiz — quarantena finché non esiste licenza/permesso commerciale ML esplicito.
 
 GMD, free-midi-chords e PDMX sono già sorgenti attive/validate nel corpus.
+
+
+## Hip Hop Drummer — generated-output source
+
+Pinned generator commit:
+
+`4cbf33aef786338b5a991e716fb82879fe47a6c7`
+
+Operational policy:
+- upstream `node tests.js` must pass before generation;
+- critical Git blob SHAs are verified against the pinned commit;
+- generated outputs use deterministic per-item seeds and a generation manifest;
+- only styles whose `BASS_STYLES[style].instrument` is exactly `808sub` may populate the FAME `808` role;
+- lead examples are restricted to the source's G-Funk lead-capable styles;
+- every generated MIDI is merged as separate format-1 tracks and passed through the real FAME importer before intake;
+- same-rhythm groups are deduplicated conservatively because the source is rule-generated;
+- HHD contribution is capped at 20% of the pre-review global corpus and is used to close role deficits, not to inflate the 500-phrase target.
+
+Rights evidence:
+- repository `LICENSE` and README declare MIT;
+- README explicitly states generated beats are user-owned and may be used commercially without attribution, royalties or restrictions;
+- `package.json` currently declares `ISC`, which conflicts with repository LICENSE metadata. This discrepancy is recorded and the generated-output ownership statement is the operational basis for generated examples.

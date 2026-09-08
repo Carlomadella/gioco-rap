@@ -219,12 +219,20 @@ Strategia di migrazione:
 - GMD, free-midi-chords e PDMX legacy restano funzionanti;
 - gli adapter esistenti vengono migrati quando vengono toccati per modifiche reali, senza refactoring distruttivi.
 
-Priorita' dopo la baseline PDMX:
-1. WaivOps NRG-CP;
-2. hiphopdrummer con seed/provenance e cap sintetico;
-3. NeuralAcid dopo verifica rights e mapping bass/808;
-4. OpenScore Lieder / String Quartets dopo verifica rights;
-5. Harmony Whiz solo dopo permesso/licenza commerciale ML esplicita.
+Stato corpus dopo NRG-CP + Hip Hop Drummer:
+- WaivOps NRG-CP: INTEGRATO;
+- Hip Hop Drummer: INTEGRATO come role closer sintetico controllato, commit 4cbf33aef786338b5a991e716fb82879fe47a6c7;
+- corpus: 370 phrase, 233 composition family, 6 source collections;
+- coverage drums/808/harmony/lead: 161/82/264/76;
+- pitchedAny: 313;
+- HHD usato con seed deterministici, real-import preflight, dedup conservativo e cap 20%;
+- il sintetico NON viene usato per gonfiare artificialmente il target 500.
+
+Priorita' successiva:
+1. volume non-sintetico/licenziato per avvicinare 500 phrase;
+2. NeuralAcid solo dopo verifica rights e mapping bass/808;
+3. OpenScore Lieder / String Quartets dopo verifica rights;
+4. Harmony Whiz solo dopo permesso/licenza commerciale ML esplicita.
 
 ### Primo target
 Circa 500–1.000 phrase curate da 4/8/16 barre.

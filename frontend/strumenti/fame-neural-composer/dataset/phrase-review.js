@@ -111,7 +111,7 @@ function mergeGraphs(...graphs) {
 function isSafeHighRepetition(entry, quality) {
   if (!quality || !quality.codes.length) return false;
   const collection = sourceCollection(entry.item);
-  if (!["free-midi-chords", "gmd-v1.0.0", "waivops-nrg-cp"].includes(collection)) return false;
+  if (!["free-midi-chords", "gmd-v1.0.0", "waivops-nrg-cp", "hiphopdrummer"].includes(collection)) return false;
   return quality.codes.every(code => code === "HIGH_BAR_REPETITION");
 }
 
@@ -229,7 +229,7 @@ function reviewPhrases(entries, audit) {
     schema: PHRASE_REVIEW_SCHEMA,
     version: 1,
     policy: {
-      highBarRepetition: "accept-with-explicit-review for free-midi-chords, gmd-v1.0.0 and waivops-nrg-cp",
+      highBarRepetition: "accept-with-explicit-review for free-midi-chords, gmd-v1.0.0, waivops-nrg-cp and hiphopdrummer",
       exactDuplicates: "deterministic-independent-set; reject conflicting peers",
       transpositionDuplicates: "deterministic-independent-set; reject conflicting peers",
       fuzzyBlockingPairs: "deterministic-independent-set; reject conflicting peers",

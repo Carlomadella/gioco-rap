@@ -389,7 +389,8 @@
       "license": {
         "code": "MIT",
         "dataset": null,
-        "outputs": "generated beats are declared user-owned / no attribution / no royalties / no restrictions"
+        "outputs": "generated beats are declared user-owned / no attribution / no royalties / no restrictions",
+        "metadataNote": "Repository LICENSE/README declare MIT; package.json metadata declares ISC. Generated-output rights are governed operationally by the explicit README output-ownership statement."
       },
       "rights": {
         "mlTrainingExplicit": false,
@@ -401,21 +402,28 @@
         "level": "verified",
         "verifiedAt": "2026-09-08",
         "evidence": [
-          "https://github.com/keithadler/hiphopdrummer/blob/main/README.md",
-          "README states MIT and that generated beats are yours with no restrictions"
+          "https://github.com/keithadler/hiphopdrummer/tree/4cbf33aef786338b5a991e716fb82879fe47a6c7",
+          "https://github.com/keithadler/hiphopdrummer/blob/4cbf33aef786338b5a991e716fb82879fe47a6c7/README.md — generated beats declared user-owned, commercial use allowed, no attribution/royalties/restrictions",
+          "https://github.com/keithadler/hiphopdrummer/blob/4cbf33aef786338b5a991e716fb82879fe47a6c7/LICENSE — MIT",
+          "https://github.com/keithadler/hiphopdrummer/blob/4cbf33aef786338b5a991e716fb82879fe47a6c7/package.json — metadata license field says ISC; recorded as discrepancy, not used as generated-output grant"
         ]
       },
       "links": {
-        "repository": "https://github.com/keithadler/hiphopdrummer"
+        "repository": "https://github.com/keithadler/hiphopdrummer",
+        "pinnedCommit": "4cbf33aef786338b5a991e716fb82879fe47a6c7"
       },
       "pipeline": {
-        "currentSymbolic": false,
+        "currentSymbolic": true,
         "requiresAdapter": true,
         "requirements": [
-          "pin generator commit",
-          "record generator seed/settings",
-          "cap synthetic share",
-          "dedup generated outputs"
+          "pin generator commit 4cbf33aef786338b5a991e716fb82879fe47a6c7",
+          "run upstream zero-dependency test suite before generation",
+          "deterministic per-item seed and generation manifest",
+          "only instrument=808sub bass styles may map to FAME 808",
+          "lead source restricted to the G-Funk lead-capable family",
+          "real FAME importer preflight on every generated MIDI",
+          "source-specific rhythm/exact/transposition/fuzzy dedup",
+          "HHD phrase share capped at 20% of pre-review global corpus"
         ]
       },
       "download": {
@@ -424,7 +432,26 @@
       },
       "stats": {
         "styles": 37,
-        "instruments": 9
+        "instruments": 9,
+        "pinnedCommit": "4cbf33aef786338b5a991e716fb82879fe47a6c7",
+        "roleCloserPool": {
+          "808Styles": [
+            "crunk",
+            "memphis",
+            "phonk",
+            "miamibass",
+            "nolimit",
+            "cashmoney",
+            "poprap",
+            "ratchet"
+          ],
+          "leadStyles": [
+            "gfunk",
+            "gfunk_dre",
+            "gfunk_quik",
+            "gfunk_battlecat"
+          ]
+        }
       }
     },
     {
