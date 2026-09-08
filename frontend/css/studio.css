@@ -147,11 +147,11 @@
   background:rgba(255,255,255,.035);cursor:pointer;
   box-shadow:inset 0 0 0 1px rgba(125,175,215,.16);
   transition:background .15s,box-shadow .15s}
-.stscelta:hover{background:rgba(255,255,255,.075)}
+@media (hover:hover){.stscelta:hover{background:rgba(255,255,255,.075)}}
 .stscelta.on{background:linear-gradient(170deg,rgba(242,193,78,.16),rgba(242,193,78,.05));
   box-shadow:inset 0 0 0 1.5px var(--stBordoOro),0 8px 22px rgba(0,0,0,.35)}
 .stscelta.muta{cursor:default}
-.stscelta.muta:hover{background:rgba(255,255,255,.035)}
+@media (hover:hover){.stscelta.muta:hover{background:rgba(255,255,255,.035)}}
 /* il pallino: vuoto, e pieno d'oro quando è quello scelto */
 .stdot{flex:none;width:16px;height:16px;border-radius:50%;
   box-shadow:inset 0 0 0 1.5px rgba(125,175,215,.45)}
@@ -227,11 +227,11 @@
 .stprimo{color:#12100A;
   background:linear-gradient(180deg,#FFDD84,#E0A92E);
   box-shadow:0 10px 26px rgba(224,169,46,.32),inset 0 1px 0 rgba(255,255,255,.5)}
-.stprimo:hover{background:linear-gradient(180deg,#FFE79E,#EDB63A)}
+@media (hover:hover){.stprimo:hover{background:linear-gradient(180deg,#FFE79E,#EDB63A)}}
 .stprimo:active{transform:translateY(1px)}
 .stsecondo{color:var(--stTesto);background:rgba(255,255,255,.05);
   box-shadow:inset 0 0 0 1px rgba(125,175,215,.34)}
-.stsecondo:hover{background:rgba(255,255,255,.11)}
+@media (hover:hover){.stsecondo:hover{background:rgba(255,255,255,.11)}}
 .stsecondo:active{transform:translateY(1px)}
 .stprimo:disabled,.stsecondo:disabled{opacity:.45;cursor:default;transform:none}
 .stprimo svg,.stsecondo svg{width:18px;height:18px;flex:none;fill:currentColor}
@@ -265,7 +265,7 @@
 .stavanti{flex:none;width:44px;height:36px;border-radius:9px;display:flex;align-items:center;
   justify-content:center;background:rgba(255,255,255,.05);cursor:pointer;
   box-shadow:inset 0 0 0 1px rgba(125,175,215,.24);transition:background .15s}
-.stavanti:hover:not(:disabled){background:rgba(255,255,255,.12)}
+@media (hover:hover){.stavanti:hover:not(:disabled){background:rgba(255,255,255,.12)}}
 .stavanti:disabled{opacity:.35;cursor:default}
 .stavanti svg{width:17px;height:17px;fill:var(--stAzz)}
 
@@ -290,7 +290,7 @@
   color:var(--stSoft);background:rgba(255,255,255,.045);
   box-shadow:inset 0 0 0 1px rgba(125,175,215,.14);cursor:pointer;white-space:nowrap;
   transition:background .15s,color .15s,box-shadow .15s}
-.sttab:hover{background:rgba(255,255,255,.10);color:#fff}
+@media (hover:hover){.sttab:hover{background:rgba(255,255,255,.10);color:#fff}}
 .sttab.on{color:#12100A;background:linear-gradient(180deg,#FFDD84,#E0A92E);
   box-shadow:0 6px 18px rgba(224,169,46,.28)}
 /* il bordo che dice «c'è dell'altro»: sta sopra la barra, non dentro la

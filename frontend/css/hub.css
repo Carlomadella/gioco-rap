@@ -120,9 +120,9 @@ body.in-hub .topnav {
   gap: 6px;
   transition: background 0.15s;
 }
-.plogo:hover {
+@media (hover:hover){.plogo:hover{
   background: rgba(255, 255, 255, 0.05);
-}
+}}
 .plogo span {
   display: flex;
   flex-direction: column;
@@ -165,11 +165,14 @@ body.in-hub .topnav {
   color: #727a8c;
   transition: background 0.15s, color 0.15s;
 }
-.pmenu:hover,
-.pmenu:focus-visible {
+.pmenu:focus-visible{
   background: rgba(255, 255, 255, 0.05);
   color: #e8eaf0;
 }
+@media (hover:hover){.pmenu:hover{
+  background: rgba(255, 255, 255, 0.05);
+  color: #e8eaf0;
+}}
 .pmenu .hicon {
   width: 22px;
   height: 22px;
@@ -539,10 +542,10 @@ body.in-hub .topnav {
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
-.ptab:hover {
+@media (hover:hover){.ptab:hover{
   background: rgba(255, 255, 255, 0.05);
   color: #c9ceda;
-}
+}}
 .ptab.on {
   background: rgba(168, 85, 247, 0.16);
   color: #c084fc;
@@ -749,12 +752,14 @@ body.in-hub .topnav {
   opacity: .94;
   transition: transform .15s ease, opacity .15s ease;
 }
-.pspot:hover .pspot-dot,
-.pspot:focus-visible .pspot-dot,
-.pspot.district-active .pspot-dot {
+.pspot:focus-visible .pspot-dot,.pspot.district-active .pspot-dot{
   transform: translate(-50%,-50%) scale(1.22);
   opacity: 1;
 }
+@media (hover:hover){.pspot:hover .pspot-dot{
+  transform: translate(-50%,-50%) scale(1.22);
+  opacity: 1;
+}}
 
 /* MAPPA V2 — targhette HTML */
 .pspot {
@@ -847,13 +852,7 @@ body.in-hub .topnav {
   background: #ef4444;
   box-shadow: 0 0 7px rgba(239,68,68,.7);
 }
-/* La targhetta si vede sempre: quello che cambia col mouse sopra (e col
-   Tab, e quando risponde il quartiere) e' che si stacca di due pixel e
-   prende il bordo del colore del posto. E' tutta la risposta che c'e':
-   sulla foto non si disegna niente. */
-.pspot:hover .pspot-tag,
-.pspot:focus-visible .pspot-tag,
-.pspot.district-active .pspot-tag {
+.pspot:focus-visible .pspot-tag,.pspot.district-active .pspot-tag{
   transform: translate(
     calc(-50% + var(--tagx, 0px)),
     calc(-100% - 10px + var(--tagy, 0px))
@@ -861,6 +860,18 @@ body.in-hub .topnav {
   border-color: var(--pk);
   background: rgba(7, 9, 14, 0.97);
 }
+@media (hover:hover){/* La targhetta si vede sempre: quello che cambia col mouse sopra (e col
+   Tab, e quando risponde il quartiere) e' che si stacca di due pixel e
+   prende il bordo del colore del posto. E' tutta la risposta che c'e':
+   sulla foto non si disegna niente. */
+.pspot:hover .pspot-tag{
+  transform: translate(
+    calc(-50% + var(--tagx, 0px)),
+    calc(-100% - 10px + var(--tagy, 0px))
+  );
+  border-color: var(--pk);
+  background: rgba(7, 9, 14, 0.97);
+}}
 .pspot:focus-visible .pspot-tag {
   border-color: var(--acid);
   box-shadow: 0 0 0 2px var(--acid), 0 7px 18px rgba(0, 0, 0, 0.42);
@@ -895,10 +906,10 @@ body.in-hub .topnav {
     transform 0.12s,
     background 0.15s;
 }
-.pev:hover {
+@media (hover:hover){.pev:hover{
   background: #141826;
   transform: translateY(-2px);
-}
+}}
 .pev:disabled {
   opacity: 0.5;
   transform: none;
@@ -1023,21 +1034,21 @@ body.in-hub .topnav {
   height: 14px;
   fill: currentColor;
 }
-.pevseg:hover {
+@media (hover:hover){.pevseg:hover{
   background: #171b26;
   border-color: var(--k);
   color: #e8eaf0;
-}
+}}
 /* segnato: il quadratino prende il colore dell'evento e resta acceso */
 .pevseg.on {
   background: var(--k);
   border-color: var(--k);
   color: #0a0a0f;
 }
-.pevseg.on:hover {
+@media (hover:hover){.pevseg.on:hover{
   color: #0a0a0f;
   filter: brightness(1.08);
-}
+}}
 
 /* ---- gli eventi della settimana (punto 9) ----
    Stanno dove stava «Più avanti…»: stessa aria — bordo tratteggiato, niente
@@ -1074,10 +1085,10 @@ body.in-hub .topnav {
     background 0.15s,
     border-color 0.15s;
 }
-.pevsr:hover:not(:disabled) {
+@media (hover:hover){.pevsr:hover:not(:disabled){
   background: #141826;
   border-color: var(--k);
-}
+}}
 .pevsr:disabled {
   opacity: 0.45;
   cursor: default;
@@ -1180,9 +1191,9 @@ body.in-hub .topnav {
   color: #fff;
   box-shadow: 0 6px 26px rgba(124, 58, 237, 0.45);
 }
-.tornamenu.mappa:hover {
+@media (hover:hover){.tornamenu.mappa:hover{
   background: linear-gradient(180deg, #8b4bf5, #6d28d9);
-}
+}}
 
 /* ================= SCHERMI PICCOLI =================
    La plancia si stringe per gradi invece di rompersi tutta insieme:
@@ -1465,9 +1476,9 @@ body.in-hub .topnav {
   transform: none;
   cursor: help;
 }
-.pev.spenta:hover {
+@media (hover:hover){.pev.spenta:hover{
   transform: none;
-}
+}}
 .pev.spenta .pevgo {
   background: #2a2e3a;
   color: #8a90a0;

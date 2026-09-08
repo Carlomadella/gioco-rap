@@ -49,7 +49,7 @@
   justify-content:center;background:rgba(255,255,255,.06);cursor:pointer;
   box-shadow:inset 0 0 0 1.5px rgba(230,240,250,.55);
   transition:background .15s,box-shadow .15s,transform .12s}
-.stplay:hover{background:rgba(255,255,255,.16)}
+@media (hover:hover){.stplay:hover{background:rgba(255,255,255,.16)}}
 .stplay:active{transform:scale(.94)}
 .stplay svg{width:15px;height:15px;fill:#fff;margin-left:1px}
 .stplay.on{background:var(--stOro);box-shadow:inset 0 0 0 1.5px var(--stOro)}
@@ -68,7 +68,7 @@
   background:rgba(255,255,255,.035);
   box-shadow:inset 0 0 0 1px rgba(125,175,215,.16);
   transition:background .15s,box-shadow .15s}
-.stbcard:hover{background:rgba(255,255,255,.075)}
+@media (hover:hover){.stbcard:hover{background:rgba(255,255,255,.075)}}
 .stbcard.on{background:linear-gradient(170deg,rgba(242,193,78,.16),rgba(242,193,78,.05));
   box-shadow:inset 0 0 0 1.5px var(--stBordoOro),0 10px 26px rgba(0,0,0,.4)}
 /* la copertina in cima: una striscia sdraiata, ritagliata dal quadrato */
@@ -102,7 +102,7 @@
   background:rgba(255,255,255,.035);cursor:pointer;
   box-shadow:inset 0 0 0 1px rgba(125,175,215,.16);
   transition:background .15s,box-shadow .15s}
-.sttakeriga:hover{background:rgba(255,255,255,.075)}
+@media (hover:hover){.sttakeriga:hover{background:rgba(255,255,255,.075)}}
 .sttakeriga.on{background:linear-gradient(170deg,rgba(242,193,78,.14),rgba(242,193,78,.04));
   box-shadow:inset 0 0 0 1.5px var(--stBordoOro)}
 .sttaken{flex:none;font-size:14px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
@@ -181,7 +181,7 @@
   border-radius:8px;font:inherit;font-size:13.5px;font-weight:700;cursor:pointer;
   color:var(--stAzz);background:rgba(61,199,255,.09);
   box-shadow:inset 0 0 0 1px rgba(61,199,255,.34);transition:background .15s}
-.stlink:hover{background:rgba(61,199,255,.19)}
+@media (hover:hover){.stlink:hover{background:rgba(61,199,255,.19)}}
 .stlink svg{width:16px;height:16px;flex:none;fill:var(--stAzz)}
 
 /* ============================================================

@@ -13,7 +13,7 @@
   color:var(--acid)}
 .pox{margin-left:auto;width:34px;height:34px;border-radius:11px;
   background:rgba(255,255,255,.08);color:#fff;font-size:15px}
-.pox:hover{background:rgba(255,255,255,.16)}
+@media (hover:hover){.pox:hover{background:rgba(255,255,255,.16)}}
 
 .poscena{border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.55)}
 .poscena svg{display:block;width:100%;height:auto}
@@ -26,7 +26,7 @@
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);margin-bottom:10px;overflow:hidden}
 .poperso.aperta{box-shadow:inset 0 0 0 1px var(--k),0 10px 30px rgba(0,0,0,.4)}
 .potesta{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;text-align:left}
-.potesta:hover{background:rgba(255,255,255,.04)}
+@media (hover:hover){.potesta:hover{background:rgba(255,255,255,.04)}}
 .poav{width:46px;height:46px;flex:none;border-radius:14px;overflow:hidden;display:block}
 .poav svg{display:block;width:100%;height:100%}
 .potx{flex:1;min-width:0}
@@ -44,7 +44,7 @@
 .poaz{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 12px}
 .poazione{text-align:left;padding:10px 12px;border-radius:12px;background:#1C1826;
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);transition:background .15s,transform .12s}
-.poazione:hover{background:#251F33;transform:translateY(-1px)}
+@media (hover:hover){.poazione:hover{background:#251F33;transform:translateY(-1px)}}
 .poazione.no{opacity:.45;cursor:default;transform:none}
 .poazione .n{display:block;font-size:13.5px;font-weight:800}
 .poazione .d{display:block;font-size:11.5px;color:var(--soft);margin-top:3px;line-height:1.3}
@@ -64,11 +64,11 @@
 .pobnm span{display:block;font-size:11px;color:var(--soft);margin-top:2px}
 .pobplay,.pobno{width:32px;height:32px;flex:none;border-radius:10px;font-size:13px;
   background:rgba(255,255,255,.08);transition:background .15s}
-.pobplay:hover,.pobno:hover{background:rgba(255,255,255,.18)}
+@media (hover:hover){.pobplay:hover,.pobno:hover{background:rgba(255,255,255,.18)}}
 .pobno{color:var(--faint)}
 .pobbuy{flex:none;padding:7px 13px;border-radius:10px;font-size:12px;font-weight:800;
   color:#0B0B0D;background:var(--acid);transition:filter .15s}
-.pobbuy:hover{filter:brightness(1.08)}
+@media (hover:hover){.pobbuy:hover{filter:brightness(1.08)}}
 .pobbuy:disabled{opacity:.4;filter:none;cursor:default}
 
 .poruolo{margin:0;padding:0 14px 14px;font-size:12px;color:var(--faint)}
@@ -80,7 +80,7 @@
 .porisp{display:block;width:100%;text-align:left;padding:13px 15px;border-radius:13px;
   background:#221B2E;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);
   font-size:14px;line-height:1.35;margin-bottom:9px;transition:background .15s,transform .12s}
-.porisp:hover{background:#2C2340;transform:translateX(3px)}
+@media (hover:hover){.porisp:hover{background:#2C2340;transform:translateX(3px)}}
 .porisp:last-child{margin-bottom:0}
 
 /* ---- il riepilogo della rete ---- */

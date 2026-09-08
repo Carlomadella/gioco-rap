@@ -28,19 +28,19 @@
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{padding:10px 16px;border-radius:999px;background:var(--card-2);font-size:14.5px;font-weight:700;
   transition:background .15s,color .15s;border:1.5px solid transparent}
-.chip:hover{background:#26262F}
+@media (hover:hover){.chip:hover{background:#26262F}}
 .chip.on{background:#fff;color:#0B0B0D}
 
 
 .swatches{display:flex;gap:9px;flex-wrap:wrap}
 .sw-btn{width:44px;height:44px;border-radius:12px;border:2.5px solid transparent;transition:transform .12s}
-.sw-btn:hover{transform:scale(1.08)}
+@media (hover:hover){.sw-btn:hover{transform:scale(1.08)}}
 .sw-btn.on{border-color:#fff}
 
 .genres{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:10px}
 .gcard{background:var(--card-2);border-radius:13px;padding:14px;text-align:left;
   border:2px solid transparent;transition:border-color .15s,background .15s}
-.gcard:hover{background:#26262F}
+@media (hover:hover){.gcard:hover{background:#26262F}}
 .gcard.on{border-color:#fff}
 .gcard .gn{font-size:16px;font-weight:800;letter-spacing:-.015em}
 .gcard .gd{font-size:12.5px;color:var(--soft);line-height:1.35;margin-top:3px;font-weight:500}

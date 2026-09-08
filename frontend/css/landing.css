@@ -63,7 +63,7 @@
   border:0;border-radius:999px;padding:16px 25px 16px 19px;background:#f1eadb;color:#101012;
   box-shadow:0 10px 40px rgba(0,0,0,.28);cursor:pointer;
   transition:transform .22s,background .22s}
-.land-hero .mrow.big:hover{transform:translateY(-3px);background:#fff}
+@media (hover:hover){.land-hero .mrow.big:hover{transform:translateY(-3px);background:#fff}}
 .land-hero .mrow.big .ic{width:34px;height:34px;border-radius:50%;background:#111;color:#fff;
   display:grid;place-items:center;font-size:14px;flex:none}
 .land-hero .mrow.big .tx{display:flex;flex-direction:column;gap:2px;text-align:left}
@@ -82,8 +82,10 @@
 .land-voce::after{content:"";position:absolute;left:16px;right:16px;bottom:10px;height:1px;
   background:rgba(255,255,255,.14);transform-origin:left;transform:scaleX(.25);
   transition:transform .25s,background .25s}
-.land-voce:hover,.land-voce.on{background:rgba(255,255,255,.095);transform:translateY(-2px);color:#fff}
-.land-voce:hover::after,.land-voce.on::after{transform:scaleX(1);background:var(--gold-land)}
+.land-voce.on{background:rgba(255,255,255,.095);transform:translateY(-2px);color:#fff}
+@media (hover:hover){.land-voce:hover{background:rgba(255,255,255,.095);transform:translateY(-2px);color:#fff}}
+.land-voce.on::after{transform:scaleX(1);background:var(--gold-land)}
+@media (hover:hover){.land-voce:hover::after{transform:scaleX(1);background:var(--gold-land)}}
 .land-voce .su{display:flex;align-items:center;justify-content:space-between;gap:9px}
 .land-voce .n{font-size:10px;letter-spacing:.16em;color:#a9a195}
 .land-voce .frec{opacity:.45}
@@ -110,7 +112,7 @@
 .land-giu{position:absolute;left:50%;bottom:6px;z-index:13;transform:translateX(-50%);
   font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#9f988d;
   background:none;border:0;cursor:pointer;padding:6px 12px}
-.land-giu:hover{color:#fff}
+@media (hover:hover){.land-giu:hover{color:#fff}}
 
 /* ==================== SUL MENU NON C'È NIENTE SOPRA ====================
    Nella foto di partenza la scena arriva fino in cima: nessuna barra, nessun

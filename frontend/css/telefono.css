@@ -148,7 +148,7 @@
 .pmr{display:flex;align-items:center;gap:9px;width:100%;padding:11px;text-align:left;
   border-bottom:1px solid rgba(255,255,255,.05);transition:background .15s}
 .pmr:last-child{border-bottom:none}
-.pmr:hover{background:rgba(255,255,255,.04)}
+@media (hover:hover){.pmr:hover{background:rgba(255,255,255,.04)}}
 .pmav{width:32px;height:32px;flex:none;border-radius:50%;overflow:hidden;background:#1A1B24}
 .pmav svg{width:100%;height:100%;display:block}
 .pmtx{flex:1;min-width:0}
@@ -162,13 +162,13 @@
   border:1px solid rgba(255,255,255,.09);background:#0C0F16;
   font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#C9CEDA;
   transition:background .15s}
-.plargo:hover{background:#141826}
+@media (hover:hover){.plargo:hover{background:#141826}}
 
 .papp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
 .pap{display:flex;align-items:center;gap:10px;padding:17px 11px;border-radius:10px;
   background:#0C0F16;border:1px solid rgba(255,255,255,.07);text-align:left;
   transition:background .15s,transform .12s}
-.pap:hover{background:#151A26;transform:translateY(-1px)}
+@media (hover:hover){.pap:hover{background:#151A26;transform:translateY(-1px)}}
 .pap .hicon{width:26px;height:26px;flex:none;fill:var(--k)}
 .pap b{display:block;font-size:12px;font-weight:700;color:#E8EAF0;letter-spacing:.02em}
 .pap i{display:block;font-style:normal;font-size:10.5px;color:#8A90A0;margin-top:2px}
@@ -195,7 +195,7 @@
   background:none;border:none;padding:0;min-width:0}
 .tappic{position:relative;display:block;width:100%;aspect-ratio:1;
   transition:transform .12s}
-.tapp:hover .tappic{transform:scale(1.05)}
+@media (hover:hover){.tapp:hover .tappic{transform:scale(1.05)}}
 .tapp:active .tappic{transform:scale(.9)}
 .tappic img{display:block;width:100%;height:100%;object-fit:contain;
   -webkit-user-drag:none;user-select:none}
@@ -259,7 +259,7 @@
 .tli{display:flex;align-items:center;gap:9px;width:100%;padding:10px;border-radius:11px;
   background:#12151F;border:1px solid rgba(255,255,255,.06);text-align:left}
 .tli.static{cursor:default}
-.tli:not(.static):hover{background:#171B26}
+@media (hover:hover){.tli:not(.static):hover{background:#171B26}}
 .tli:disabled{opacity:.45}
 /* manca solo l'energia: resta cliccabile per poterlo dire (vedi `.tile.spenta`
    in game.css), ma si veste da spenta come le altre */

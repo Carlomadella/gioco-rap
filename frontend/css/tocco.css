@@ -17,7 +17,16 @@
      identico, quello che si prende diventa grande.
 
    Caricato per ultimo apposta: deve vincere sulla cascata di tutti gli altri.
-   È il punto 36 di `implementazioni/02-interfaccia-e-telefono.md`. */
+   È il punto 36 di `implementazioni/02-interfaccia-e-telefono.md`.
+
+   L'altra metà del toccare non sta qui, ma vale per tutti i CSS del progetto:
+   **ogni regola `:hover` sta dentro a `@media (hover:hover)`**. Sul telefono
+   un «passarci sopra» non esiste, e il browser lascia acceso l'hover dopo il
+   tap: la scheda che hai appena toccato resta evidenziata finché non tocchi
+   da un'altra parte, e sembra selezionata quando non lo è. Dentro alla gabbia
+   col mouse non cambia niente e col dito non parte. Se ne aggiungi una nuova
+   mettila nella gabbia: `audit-regressioni.js` controlla che non ne resti
+   fuori nessuna. */
 
 @media (pointer:coarse), (max-width:900px){
 

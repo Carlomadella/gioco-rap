@@ -39,7 +39,7 @@ html.compatto .phase{padding:9px 13px 10px;margin-bottom:11px}
 .shead h2{margin:2px 0 0;font-size:30px;letter-spacing:-.03em}
 .sx{width:38px;height:38px;flex:none;border-radius:50%;background:rgba(0,0,0,.35);
   font-size:16px;line-height:1;transition:background .15s,transform .12s}
-.sx:hover{background:rgba(0,0,0,.55);transform:scale(1.06)}
+@media (hover:hover){.sx:hover{background:rgba(0,0,0,.55);transform:scale(1.06)}}
 
 .stabs{display:flex;gap:6px;padding:12px 16px;overflow-x:auto;background:#101015;
   border-bottom:1px solid var(--line);scrollbar-width:none}
@@ -48,7 +48,7 @@ html.compatto .phase{padding:9px 13px 10px;margin-bottom:11px}
   border-radius:999px;font-size:13.5px;font-weight:700;color:var(--soft);
   background:rgba(255,255,255,.05);transition:background .15s,color .15s}
 .stab i{font-style:normal;font-size:13px;opacity:.8}
-.stab:hover{background:rgba(255,255,255,.1);color:#fff}
+@media (hover:hover){.stab:hover{background:rgba(255,255,255,.1);color:#fff}}
 .stab.on{background:#fff;color:#0B0B0D}
 .stab.on i{opacity:1}
 
@@ -69,7 +69,7 @@ html.compatto .phase{padding:9px 13px 10px;margin-bottom:11px}
 .seg{display:inline-flex;background:rgba(0,0,0,.32);border-radius:999px;padding:3px;gap:2px}
 .seg button{padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:700;
   color:var(--soft);white-space:nowrap;transition:background .15s,color .15s}
-.seg button:hover{color:#fff}
+@media (hover:hover){.seg button:hover{color:#fff}}
 .seg button.on{background:#fff;color:#0B0B0D}
 
 /* manopole */
@@ -90,20 +90,20 @@ html.compatto .phase{padding:9px 13px 10px;margin-bottom:11px}
 .sw2row{display:inline-flex;flex-wrap:wrap;gap:7px;max-width:230px;justify-content:flex-end}
 .sw2{width:28px;height:28px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);
   transition:transform .12s,box-shadow .15s}
-.sw2:hover{transform:scale(1.12)}
+@media (hover:hover){.sw2:hover{transform:scale(1.12)}}
 .sw2.on{box-shadow:0 0 0 2px #fff,inset 0 0 0 1px rgba(0,0,0,.3)}
 
 /* bottoni del pannello */
 .sbtn{padding:9px 15px;border-radius:999px;background:rgba(255,255,255,.09);
   font-size:12.5px;font-weight:700;transition:background .15s,color .15s}
-.sbtn:hover{background:rgba(255,255,255,.17)}
+@media (hover:hover){.sbtn:hover{background:rgba(255,255,255,.17)}}
 .sbtn.danger{color:#FF8B6E}
-.sbtn.danger:hover{background:rgba(255,90,54,.2)}
+@media (hover:hover){.sbtn.danger:hover{background:rgba(255,90,54,.2)}}
 .sbtn.armato{background:var(--hot);color:#0B0B0D;font-weight:800}
 .sacts{display:flex;flex-wrap:wrap;gap:8px;padding:0 0 16px}
 .sprove{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;max-width:300px}
 .sprove .sbtn{padding:7px 11px;font-size:11.5px;font-weight:700;color:var(--soft)}
-.sprove .sbtn:hover{color:#fff}
+@media (hover:hover){.sprove .sbtn:hover{color:#fff}}
 
 /* slot di salvataggio */
 .sslot{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid var(--line)}

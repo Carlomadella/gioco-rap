@@ -1745,6 +1745,37 @@ test("nessun documento punta piu' al vecchio 00-come-si-lavora.md",
     return morti.length === 0;
   })());
 
+/* L'hover che resta acceso dopo il tocco. Su un telefono non esiste un
+   «passarci sopra»: il browser lascia la riga accesa dopo il tap, e ti ritrovi
+   la scheda evidenziata finché non tocchi da un'altra parte — sembra selezionata
+   e non lo è. Ogni regola :hover del progetto vive dentro a
+   `@media (hover:hover)`, così sul mouse resta identica e sul dito non parte.
+   La prova: tolti i blocchi della gabbia, di :hover non deve restare niente. */
+test("nessun :hover fuori da @media (hover:hover): sul telefono non resta acceso",
+  (() => {
+    const fuori = [];
+    for(const nome of fs.readdirSync(path.join(ROOT, "css"))){
+      if(!nome.endsWith(".css")) continue;
+      const testo = leggi("css/" + nome);
+      /* via i blocchi @media (hover:hover){...}, contando le graffe */
+      let s = testo, i;
+      while((i = s.search(/@media\s*\(\s*hover\s*:\s*hover\s*\)\s*\{/)) >= 0){
+        let j = s.indexOf("{", i), d = 1, k = j + 1;
+        while(k < s.length && d > 0){
+          if(s[k] === "{") d++;
+          else if(s[k] === "}") d--;
+          k++;
+        }
+        s = s.slice(0, i) + s.slice(k);
+      }
+      /* i commenti non sono regole: possono nominare :hover liberamente */
+      s = s.replace(/\/\*[\s\S]*?\*\//g, "");
+      if(s.includes(":hover")) fuori.push("css/" + nome);
+    }
+    if(fuori.length) console.log("      " + fuori.join("\n      "));
+    return fuori.length === 0;
+  })());
+
 for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
