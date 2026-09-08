@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:b87ec1e -->
+## 08/09/26, 11:09 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.58)  
+**Merge commit:** `b87ec1e`
+
+### Cosa Ã¨ entrato
+
+- `fd972b7` â€” test: un controllo automatico vero per il punto 14 dello Studio â€” **Sadyco La Fame**
+- `0b41d74` â€” fix: in Studio le azioni non ti buttano più fuori sulla mappa â€” **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/writer.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:e69464e -->
 ## 07/09/26, 16:03 â€” branch non identificato â†’ main
 
