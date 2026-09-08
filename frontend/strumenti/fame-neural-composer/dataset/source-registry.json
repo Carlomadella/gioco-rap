@@ -1,0 +1,949 @@
+{
+  "schema": "fame-neural-source-registry-v1",
+  "version": 1,
+  "updatedAt": "2026-09-08",
+  "policy": {
+    "statusMeaning": {
+      "green": "commercial training allowed after source-specific adapter/filter",
+      "yellow": "quarantine/reference only until rights or provenance are resolved",
+      "red": "not allowed in the commercial training corpus"
+    },
+    "greenRequirements": [
+      "verification.level=verified",
+      "rights.commercialTrainingAllowed=true",
+      "rights.commercialOutputAllowed=true",
+      "rights.trainingBasis is explicit and non-pending",
+      "at least one verification evidence item"
+    ],
+    "downloadPolicy": "green-only; explicit source selection; cache outside repository",
+    "cacheEnv": "FAME_NEURAL_SOURCE_CACHE",
+    "defaultWindowsCache": "%LOCALAPPDATA%/FAME-Neural/source-cache",
+    "repoStorageAllowed": false,
+    "synthetic": {
+      "advisoryMaxTrainingShare": 0.4,
+      "isGate1Blocker": false,
+      "reason": "initial governance guard; revisit only after model/listening benchmark"
+    },
+    "strata": [
+      "human_groove",
+      "harmony",
+      "hiphop_style",
+      "adf_synthetic",
+      "general_symbolic",
+      "audio_style",
+      "reference_only"
+    ]
+  },
+  "sources": [
+    {
+      "id": "fame-original-seed-v1",
+      "name": "FAME Original Seed V1",
+      "status": "green",
+      "stratum": "adf_synthetic",
+      "dataKinds": [
+        "symbolic"
+      ],
+      "formats": [
+        "fame-neural-sequence-v1"
+      ],
+      "roles": [
+        "drums",
+        "808",
+        "harmony",
+        "lead",
+        "pitchedAny"
+      ],
+      "originClass": "adf_synthetic",
+      "creator": "Anni di Fame / FAME Neural",
+      "license": {
+        "code": null,
+        "dataset": "FAME-ORIGINAL-SEED-V1",
+        "outputs": "project-owned"
+      },
+      "rights": {
+        "mlTrainingExplicit": true,
+        "commercialTrainingAllowed": true,
+        "commercialOutputAllowed": true,
+        "trainingBasis": "internal-original"
+      },
+      "verification": {
+        "level": "verified",
+        "verifiedAt": "2026-09-08",
+        "evidence": [
+          "project-generated source with deterministic seed/provenance"
+        ]
+      },
+      "pipeline": {
+        "currentSymbolic": true,
+        "requiresAdapter": false
+      },
+      "download": {
+        "autoDownload": false,
+        "assets": []
+      }
+    },
+    {
+      "id": "gmd-v1.0.0",
+      "name": "Google Groove MIDI Dataset v1.0.0",
+      "status": "green",
+      "stratum": "human_groove",
+      "dataKinds": [
+        "symbolic"
+      ],
+      "formats": [
+        "midi"
+      ],
+      "roles": [
+        "drums"
+      ],
+      "originClass": "human_performed",
+      "creator": "Google LLC / Magenta",
+      "license": {
+        "code": null,
+        "dataset": "CC-BY-4.0",
+        "outputs": "CC-BY-4.0 source obligations"
+      },
+      "rights": {
+        "mlTrainingExplicit": true,
+        "commercialTrainingAllowed": true,
+        "commercialOutputAllowed": true,
+        "trainingBasis": "explicit-license"
+      },
+      "verification": {
+        "level": "verified",
+        "verifiedAt": "2026-09-08",
+        "evidence": [
+          "https://magenta.tensorflow.org/datasets/groove",
+          "repo bootstrap pins the official MIDI-only archive SHA-256"
+        ]
+      },
+      "links": {
+        "homepage": "https://magenta.tensorflow.org/datasets/groove"
+      },
+      "pipeline": {
+        "currentSymbolic": true,
+        "requiresAdapter": true,
+        "requirements": [
+          "hiphop",
+          "beat",
+          "4-4",
+          "composition-family-safe split"
+        ],
+        "legacyRunnerPath": "frontend/strumenti/fame-neural-composer/midi/bootstrap-gmd-phase2.ps1"
+      },
+      "download": {
+        "autoDownload": true,
+        "assets": [
+          {
+            "id": "midi-only",
+            "name": "groove-v1.0.0-midionly.zip",
+            "url": "https://storage.googleapis.com/magentadata/datasets/groove/groove-v1.0.0-midionly.zip",
+            "hash": {
+              "algorithm": "sha256",
+              "value": "651cbc524ffb891be1a3e46d89dc82a1cecb09a57c748c7b45b844c4841dcc1e"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "free-midi-chords",
+      "name": "Free MIDI Chords",
+      "status": "green",
+      "stratum": "harmony",
+      "dataKinds": [
+        "symbolic"
+      ],
+      "formats": [
+        "midi"
+      ],
+      "roles": [
+        "harmony",
+        "pitchedAny"
+      ],
+      "originClass": "external_symbolic",
+      "creator": "Ludovic Drolez",
+      "license": {
+        "code": "MIT",
+        "dataset": "MIT",
+        "outputs": "MIT source obligations"
+      },
+      "rights": {
+        "mlTrainingExplicit": false,
+        "commercialTrainingAllowed": true,
+        "commercialOutputAllowed": true,
+        "trainingBasis": "explicit-license"
+      },
+      "verification": {
+        "level": "verified",
+        "verifiedAt": "2026-09-08",
+        "evidence": [
+          "https://github.com/ldrolez/free-midi-chords/blob/main/LICENSE",
+          "pinned project source config/release hash"
+        ]
+      },
+      "links": {
+        "repository": "https://github.com/ldrolez/free-midi-chords",
+        "releaseTag": "v0.20260314"
+      },
+      "pipeline": {
+        "currentSymbolic": true,
+        "requiresAdapter": true,
+        "requirements": [
+          "Minor/Modal",
+          "hiphop2/soul/pop2",
+          "one representative transposition per family"
+        ],
+        "legacyConfigPath": "frontend/strumenti/fame-neural-composer/dataset/free-midi-chords-source.json"
+      },
+      "download": {
+        "autoDownload": true,
+        "assets": [
+          {
+            "id": "release",
+            "name": "free-midi-chords-20260314.zip",
+            "url": "https://github.com/ldrolez/free-midi-chords/releases/download/v0.20260314/free-midi-chords-20260314.zip",
+            "hash": {
+              "algorithm": "sha256",
+              "value": "d50d4cb3eb0f1bc6304c4bb0b3d8cacc1bfd7f670fe499f0e74facb30246d93f"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "pdmx-v2025",
+      "name": "PDMX safe subset",
+      "status": "green",
+      "stratum": "general_symbolic",
+      "dataKinds": [
+        "symbolic"
+      ],
+      "formats": [
+        "midi",
+        "musicxml"
+      ],
+      "roles": [
+        "harmony",
+        "lead",
+        "pitchedAny"
+      ],
+      "originClass": "public_domain",
+      "creator": "PDMX contributors / Phillip Long et al.",
+      "license": {
+        "code": "MIT",
+        "dataset": "PDMX-PUBLIC-DOMAIN-NO-LICENSE-CONFLICT",
+        "outputs": "public-domain source subset"
+      },
+      "rights": {
+        "mlTrainingExplicit": false,
+        "commercialTrainingAllowed": true,
+        "commercialOutputAllowed": true,
+        "trainingBasis": "public-domain"
+      },
+      "verification": {
+        "level": "verified",
+        "verifiedAt": "2026-09-08",
+        "evidence": [
+          "https://zenodo.org/records/15571083",
+          "https://github.com/pnlong/PDMX",
+          "maintainer-recommended no_license_conflict semantics"
+        ]
+      },
+      "links": {
+        "repository": "https://github.com/pnlong/PDMX",
+        "zenodoRecord": 15571083,
+        "doi": "10.5281/zenodo.15571083"
+      },
+      "pipeline": {
+        "currentSymbolic": true,
+        "requiresAdapter": true,
+        "requirements": [
+          "no_license_conflict",
+          "deduplicated",
+          "all_valid",
+          "FAME compatibility preflight"
+        ],
+        "legacyConfigPath": "frontend/strumenti/fame-neural-composer/dataset/pdmx-source.json"
+      },
+      "download": {
+        "autoDownload": false,
+        "assets": [
+          {
+            "id": "midi",
+            "name": "mid.tar.gz",
+            "url": "https://zenodo.org/records/15571083/files/mid.tar.gz?download=1",
+            "hash": {
+              "algorithm": "md5",
+              "value": "d920a21b2fcd99a56d9c381b39debbb2"
+            }
+          },
+          {
+            "id": "subset-paths",
+            "name": "subset_paths.tar.gz",
+            "url": "https://zenodo.org/records/15571083/files/subset_paths.tar.gz?download=1",
+            "hash": {
+              "algorithm": "md5",
+              "value": "092eee416ece8060f77d08575b94a43d"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "waivops-nrg-cp",
+      "name": "WaivOps NRG-CP",
+      "status": "green",
+      "stratum": "harmony",
+      "dataKinds": [
+        "symbolic"
+      ],
+      "formats": [
+        "midi"
+      ],
+      "roles": [
+        "harmony",
+        "pitchedAny",
+        "phrase"
+      ],
+      "originClass": "external_synthetic",
+      "creator": "Patchbanks / WaivOps",
+      "license": {
+        "code": null,
+        "dataset": "CC-BY-4.0",
+        "outputs": "CC-BY-4.0 source obligations"
+      },
+      "rights": {
+        "mlTrainingExplicit": true,
+        "commercialTrainingAllowed": true,
+        "commercialOutputAllowed": true,
+        "trainingBasis": "explicit-license"
+      },
+      "verification": {
+        "level": "verified",
+        "verifiedAt": "2026-09-08",
+        "evidence": [
+          "https://zenodo.org/records/15304989",
+          "https://github.com/patchbanks/WaivOps-NRG-CP"
+        ]
+      },
+      "links": {
+        "repository": "https://github.com/patchbanks/WaivOps-NRG-CP",
+        "zenodoRecord": 15304989,
+        "doi": "10.5281/zenodo.15304989"
+      },
+      "pipeline": {
+        "currentSymbolic": true,
+        "requiresAdapter": true,
+        "requirements": [
+          "real FAME importer preflight",
+          "transposition-family dedup",
+          "source-specific rhythm review",
+          "global source-dominance cap"
+        ]
+      },
+      "download": {
+        "autoDownload": true,
+        "assets": [
+          {
+            "id": "midi",
+            "name": "nrgcp_midi_dataset.tar.gz",
+            "url": "https://zenodo.org/records/15304989/files/nrgcp_midi_dataset.tar.gz?download=1",
+            "hash": {
+              "algorithm": "md5",
+              "value": "7443fe30674ef149aa4c23580044f597"
+            }
+          }
+        ]
+      },
+      "stats": {
+        "midiFiles": 30943,
+        "barsPerFile": 8,
+        "bpm": 120,
+        "sourcePpq": 96
+      }
+    },
+    {
+      "id": "hiphopdrummer",
+      "name": "Hip Hop Drummer",
+      "status": "green",
+      "stratum": "adf_synthetic",
+      "dataKinds": [
+        "generator"
+      ],
+      "formats": [
+        "midi-output"
+      ],
+      "roles": [
+        "drums",
+        "bass",
+        "harmony",
+        "lead"
+      ],
+      "originClass": "external_rule_generator",
+      "creator": "Keith Adler",
+      "license": {
+        "code": "MIT",
+        "dataset": null,
+        "outputs": "generated beats are declared user-owned / no attribution / no royalties / no restrictions"
+      },
+      "rights": {
+        "mlTrainingExplicit": false,
+        "commercialTrainingAllowed": true,
+        "commercialOutputAllowed": true,
+        "trainingBasis": "owned-generated-output"
+      },
+      "verification": {
+        "level": "verified",
+        "verifiedAt": "2026-09-08",
+        "evidence": [
+          "https://github.com/keithadler/hiphopdrummer/blob/main/README.md",
+          "README states MIT and that generated beats are yours with no restrictions"
+        ]
+      },
+      "links": {
+        "repository": "https://github.com/keithadler/hiphopdrummer"
+      },
+      "pipeline": {
+        "currentSymbolic": false,
+        "requiresAdapter": true,
+        "requirements": [
+          "pin generator commit",
+          "record generator seed/settings",
+          "cap synthetic share",
+          "dedup generated outputs"
+        ]
+      },
+      "download": {
+        "autoDownload": false,
+        "assets": []
+      },
+      "stats": {
+        "styles": 37,
+        "instruments": 9
+      }
+    },
+    {
+      "id": "waivops-hh-trp",
+      "name": "WaivOps HH-TRP",
+      "status": "green",
+      "stratum": "audio_style",
+      "dataKinds": [
+        "audio",
+        "labels"
+      ],
+      "formats": [
+        "wav",
+        "json"
+      ],
+      "roles": [
+        "drums"
+      ],
+      "originClass": "external_audio_dataset",
+      "creator": "Patchbanks / WaivOps",
+      "license": {
+        "code": null,
+        "dataset": "CC-BY-4.0",
+        "outputs": "CC-BY-4.0 source obligations"
+      },
+      "rights": {
+        "mlTrainingExplicit": true,
+        "commercialTrainingAllowed": true,
+        "commercialOutputAllowed": true,
+        "trainingBasis": "explicit-license"
+      },
+      "verification": {
+        "level": "verified",
+        "verifiedAt": "2026-09-08",
+        "evidence": [
+          "https://github.com/patchbanks/WaivOps-HH-TRP"
+        ]
+      },
+      "links": {
+        "repository": "https://github.com/patchbanks/WaivOps-HH-TRP"
+      },
+      "pipeline": {
+        "currentSymbolic": false,
+        "requiresAdapter": true,
+        "requirements": [
+          "future audio/style performer pipeline; do not count as symbolic MIDI corpus"
+        ]
+      },
+      "download": {
+        "autoDownload": false,
+        "assets": []
+      }
+    },
+    {
+      "id": "neuralacid-basslines",
+      "name": "NeuralAcid Basslines",
+      "status": "yellow",
+      "stratum": "hiphop_style",
+      "dataKinds": [
+        "symbolic"
+      ],
+      "formats": [
+        "symbolic-bass"
+      ],
+      "roles": [
+        "bass",
+        "pitchedAny"
+      ],
+      "originClass": "external_symbolic",
+      "creator": "external",
+      "license": {
+        "code": null,
+        "dataset": null,
+        "outputs": null
+      },
+      "rights": {
+        "mlTrainingExplicit": null,
+        "commercialTrainingAllowed": false,
+        "commercialOutputAllowed": false,
+        "trainingBasis": "pending-verification"
+      },
+      "verification": {
+        "level": "pending",
+        "verifiedAt": null,
+        "evidence": [
+          "candidate from 2026-09-08 corpus research; verify authoritative dataset card before intake"
+        ]
+      },
+      "pipeline": {
+        "currentSymbolic": false,
+        "requiresAdapter": true,
+        "requirements": [
+          "verify license",
+          "benchmark bass-to-808 classifier mapping"
+        ]
+      },
+      "download": {
+        "autoDownload": false,
+        "assets": []
+      }
+    },
+    {
+      "id": "harmony-whiz",
+      "name": "Harmony Whiz Synthetic MIDI Corpus",
+      "status": "yellow",
+      "stratum": "hiphop_style",
+      "dataKinds": [
+        "symbolic"
+      ],
+      "formats": [
+        "midi"
+      ],
+      "roles": [
+        "harmony",
+        "lead",
+        "pitchedAny"
+      ],
+      "originClass": "external_synthetic",
+      "creator": "external",
+      "license": {
+        "code": null,
+        "dataset": "non-standard rights statement",
+        "outputs": null
+      },
+      "rights": {
+        "mlTrainingExplicit": false,
+        "commercialTrainingAllowed": false,
+        "commercialOutputAllowed": false,
+        "trainingBasis": "pending-explicit-permission"
+      },
+      "verification": {
+        "level": "pending",
+        "verifiedAt": null,
+        "evidence": [
+          "candidate research reports original synthetic/no copyright restrictions but no standard license was verified"
+        ]
+      },
+      "pipeline": {
+        "currentSymbolic": false,
+        "requiresAdapter": true,
+        "requirements": [
+          "obtain CC0/MIT or explicit commercial ML permission before ingestion"
+        ]
+      },
+      "download": {
+        "autoDownload": false,
+        "assets": []
+      }
+    },
+    {
+      "id": "openscore-lieder",
+      "name": "OpenScore Lieder",
+      "status": "yellow",
+      "stratum": "general_symbolic",
+      "dataKinds": [
+        "score"
+      ],
+      "formats": [
+        "musicxml"
+      ],
+      "roles": [
+        "lead",
+        "harmony",
+        "pitchedAny"
+      ],
+      "originClass": "public_domain_candidate",
+      "creator": "OpenScore contributors",
+      "license": {
+        "code": null,
+        "dataset": null,
+        "outputs": null
+      },
+      "rights": {
+        "mlTrainingExplicit": null,
+        "commercialTrainingAllowed": false,
+        "commercialOutputAllowed": false,
+        "trainingBasis": "pending-verification"
+      },
+      "verification": {
+        "level": "pending",
+        "verifiedAt": null,
+        "evidence": [
+          "candidate research; verify repository/content licensing before green promotion"
+        ]
+      },
+      "pipeline": {
+        "currentSymbolic": false,
+        "requiresAdapter": true,
+        "requirements": [
+          "MusicXML-to-MIDI adapter",
+          "style quota"
+        ]
+      },
+      "download": {
+        "autoDownload": false,
+        "assets": []
+      }
+    },
+    {
+      "id": "openscore-string-quartets",
+      "name": "OpenScore String Quartets",
+      "status": "yellow",
+      "stratum": "general_symbolic",
+      "dataKinds": [
+        "score"
+      ],
+      "formats": [
+        "musicxml"
+      ],
+      "roles": [
+        "harmony",
+        "lead",
+        "pitchedAny"
+      ],
+      "originClass": "public_domain_candidate",
+      "creator": "OpenScore contributors",
+      "license": {
+        "code": null,
+        "dataset": null,
+        "outputs": null
+      },
+      "rights": {
+        "mlTrainingExplicit": null,
+        "commercialTrainingAllowed": false,
+        "commercialOutputAllowed": false,
+        "trainingBasis": "pending-verification"
+      },
+      "verification": {
+        "level": "pending",
+        "verifiedAt": null,
+        "evidence": [
+          "candidate research; verify repository/content licensing before green promotion"
+        ]
+      },
+      "pipeline": {
+        "currentSymbolic": false,
+        "requiresAdapter": true,
+        "requirements": [
+          "MusicXML-to-MIDI adapter",
+          "style quota"
+        ]
+      },
+      "download": {
+        "autoDownload": false,
+        "assets": []
+      }
+    },
+    {
+      "id": "bach-doodle",
+      "name": "Bach Doodle Dataset",
+      "status": "yellow",
+      "stratum": "general_symbolic",
+      "dataKinds": [
+        "symbolic"
+      ],
+      "formats": [
+        "midi"
+      ],
+      "roles": [
+        "lead",
+        "harmony",
+        "pitchedAny"
+      ],
+      "originClass": "external_symbolic",
+      "creator": "Google Magenta / contributors",
+      "license": {
+        "code": null,
+        "dataset": null,
+        "outputs": null
+      },
+      "rights": {
+        "mlTrainingExplicit": null,
+        "commercialTrainingAllowed": false,
+        "commercialOutputAllowed": false,
+        "trainingBasis": "pending-operational-review"
+      },
+      "verification": {
+        "level": "pending",
+        "verifiedAt": null,
+        "evidence": [
+          "candidate research; legal/semantic fit must be re-verified before promotion"
+        ]
+      },
+      "pipeline": {
+        "currentSymbolic": false,
+        "requiresAdapter": true,
+        "requirements": [
+          "aggressive curation",
+          "style quota"
+        ]
+      },
+      "download": {
+        "autoDownload": false,
+        "assets": []
+      }
+    },
+    {
+      "id": "cymatics-user-packs",
+      "name": "Cymatics user-owned packs",
+      "status": "yellow",
+      "stratum": "hiphop_style",
+      "dataKinds": [
+        "symbolic",
+        "audio"
+      ],
+      "formats": [
+        "midi",
+        "wav"
+      ],
+      "roles": [
+        "drums",
+        "808",
+        "harmony",
+        "lead"
+      ],
+      "originClass": "commercial_pack",
+      "creator": "Cymatics / pack creators",
+      "license": {
+        "code": null,
+        "dataset": "royalty-free music-production terms",
+        "outputs": null
+      },
+      "rights": {
+        "mlTrainingExplicit": false,
+        "commercialTrainingAllowed": false,
+        "commercialOutputAllowed": false,
+        "trainingBasis": "pending-explicit-permission"
+      },
+      "verification": {
+        "level": "pending",
+        "verifiedAt": null,
+        "evidence": [
+          "AI/ML permission request pending; do not generate fake provenance"
+        ]
+      },
+      "pipeline": {
+        "currentSymbolic": false,
+        "requiresAdapter": true,
+        "requirements": [
+          "written AI/ML permission"
+        ]
+      },
+      "download": {
+        "autoDownload": false,
+        "assets": []
+      }
+    },
+    {
+      "id": "free-midi-library",
+      "name": "josephding23/Free-Midi-Library",
+      "status": "yellow",
+      "stratum": "reference_only",
+      "dataKinds": [
+        "symbolic"
+      ],
+      "formats": [
+        "midi"
+      ],
+      "roles": [],
+      "originClass": "web_crawled_unknown",
+      "creator": "multiple/unknown",
+      "license": {
+        "code": null,
+        "dataset": null,
+        "outputs": null
+      },
+      "rights": {
+        "mlTrainingExplicit": false,
+        "commercialTrainingAllowed": false,
+        "commercialOutputAllowed": false,
+        "trainingBasis": "unknown-provenance"
+      },
+      "verification": {
+        "level": "pending",
+        "verifiedAt": "2026-09-08",
+        "evidence": [
+          "repository has no dataset license and crawler targets public MIDI websites"
+        ]
+      },
+      "pipeline": {
+        "currentSymbolic": false,
+        "requiresAdapter": false,
+        "requirements": [
+          "reference/dedup/memorization benchmark only"
+        ]
+      },
+      "download": {
+        "autoDownload": false,
+        "assets": []
+      }
+    },
+    {
+      "id": "lakh-midi",
+      "name": "Lakh MIDI Dataset",
+      "status": "yellow",
+      "stratum": "reference_only",
+      "dataKinds": [
+        "symbolic"
+      ],
+      "formats": [
+        "midi"
+      ],
+      "roles": [],
+      "originClass": "web_crawled_derivative_risk",
+      "creator": "multiple",
+      "license": {
+        "code": null,
+        "dataset": "wrapper license not sufficient for underlying compositions",
+        "outputs": null
+      },
+      "rights": {
+        "mlTrainingExplicit": false,
+        "commercialTrainingAllowed": false,
+        "commercialOutputAllowed": false,
+        "trainingBasis": "provenance-risk"
+      },
+      "verification": {
+        "level": "pending",
+        "verifiedAt": "2026-09-08",
+        "evidence": [
+          "quarantined due underlying composition/provenance risk"
+        ]
+      },
+      "pipeline": {
+        "currentSymbolic": false,
+        "requiresAdapter": false,
+        "requirements": [
+          "reference only unless per-item rights are resolved"
+        ]
+      },
+      "download": {
+        "autoDownload": false,
+        "assets": []
+      }
+    },
+    {
+      "id": "dali",
+      "name": "DALI",
+      "status": "red",
+      "stratum": "reference_only",
+      "dataKinds": [
+        "symbolic",
+        "annotations"
+      ],
+      "formats": [],
+      "roles": [],
+      "originClass": "external_dataset",
+      "creator": "external",
+      "license": {
+        "code": null,
+        "dataset": "CC-BY-NC-SA-4.0",
+        "outputs": null
+      },
+      "rights": {
+        "mlTrainingExplicit": false,
+        "commercialTrainingAllowed": false,
+        "commercialOutputAllowed": false,
+        "trainingBasis": "non-commercial-license"
+      },
+      "verification": {
+        "level": "blocked",
+        "verifiedAt": "2026-09-08",
+        "evidence": [
+          "non-commercial license"
+        ]
+      },
+      "pipeline": {
+        "currentSymbolic": false,
+        "requiresAdapter": false,
+        "requirements": [
+          "exclude from commercial training"
+        ]
+      },
+      "download": {
+        "autoDownload": false,
+        "assets": []
+      }
+    },
+    {
+      "id": "maestro",
+      "name": "MAESTRO",
+      "status": "red",
+      "stratum": "reference_only",
+      "dataKinds": [
+        "symbolic",
+        "audio"
+      ],
+      "formats": [
+        "midi",
+        "wav"
+      ],
+      "roles": [],
+      "originClass": "external_dataset",
+      "creator": "Google Magenta / contributors",
+      "license": {
+        "code": null,
+        "dataset": "CC-BY-NC-SA-4.0",
+        "outputs": null
+      },
+      "rights": {
+        "mlTrainingExplicit": false,
+        "commercialTrainingAllowed": false,
+        "commercialOutputAllowed": false,
+        "trainingBasis": "non-commercial-license"
+      },
+      "verification": {
+        "level": "blocked",
+        "verifiedAt": "2026-09-08",
+        "evidence": [
+          "non-commercial license"
+        ]
+      },
+      "pipeline": {
+        "currentSymbolic": false,
+        "requiresAdapter": false,
+        "requirements": [
+          "exclude from commercial training"
+        ]
+      },
+      "download": {
+        "autoDownload": false,
+        "assets": []
+      }
+    }
+  ]
+}

@@ -180,6 +180,52 @@ Il corpus può combinare:
 - public domain verificato per armonia/struttura;
 - Trap/Rap originale o commissionata per il cuore stilistico.
 
+
+### Source Registry e governance delle sorgenti
+
+Stato: OPERATIVO IN FASE 3
+
+Per evitare che ogni nuova fonte introduca regole, downloader e interpretazioni legali isolate, FAME Neural usa un Source Registry machine-readable centrale.
+
+Il registry registra per ogni sorgente:
+- stato GREEN / YELLOW / RED;
+- licenza del codice, dei dati e degli output come campi separati;
+- permesso ML esplicito quando disponibile;
+- training commerciale e output commerciale;
+- base della decisione sui diritti;
+- evidenze e data di verifica;
+- formato, ruoli e strato del corpus;
+- asset scaricabili con hash;
+- compatibilita' con la pipeline simbolica corrente;
+- adapter e filtri richiesti.
+
+Regole operative:
+- solo GREEN puo' entrare nel training commerciale;
+- YELLOW resta quarantena/reference;
+- RED e' escluso;
+- i dataset sono scaricati in cache esterna alla repository;
+- il downloader automatico accetta solo GREEN con asset pin-hashati;
+- provenance per-file e Dataset Auditor restano obbligatori anche per le GREEN;
+- una licenza della repository NON viene estesa automaticamente ai dati musicali;
+- il sintetico e' tracciato separatamente da human-performed e symbolic esterno.
+
+Quota sintetica:
+- advisory iniziale: massimo 40% del training corpus;
+- NON e' un blocker Gate 1 finche' non viene validata da benchmark;
+- non si modifica il Gate per gonfiare artificialmente i conteggi.
+
+Strategia di migrazione:
+- le nuove source usano il registry da subito;
+- GMD, free-midi-chords e PDMX legacy restano funzionanti;
+- gli adapter esistenti vengono migrati quando vengono toccati per modifiche reali, senza refactoring distruttivi.
+
+Priorita' dopo la baseline PDMX:
+1. WaivOps NRG-CP;
+2. hiphopdrummer con seed/provenance e cap sintetico;
+3. NeuralAcid dopo verifica rights e mapping bass/808;
+4. OpenScore Lieder / String Quartets dopo verifica rights;
+5. Harmony Whiz solo dopo permesso/licenza commerciale ML esplicita.
+
 ### Primo target
 Circa 500–1.000 phrase curate da 4/8/16 barre.
 
