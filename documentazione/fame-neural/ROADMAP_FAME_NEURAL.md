@@ -310,7 +310,7 @@ Gli annotatori sono abbastanza affidabili da arricchire il dataset senza introdu
 
 # FASE 5 — Scelta della rappresentazione neurale
 
-Stato: IN CORSO — BLOCCO 3 MICRO-TRAINING COMPLETATO
+Stato: COMPLETATA — FAME COMPOUND V1 SELEZIONATA
 
 ### Perché serve
 Non vogliamo scegliere tokenizer e architettura perché sono di moda.
@@ -353,7 +353,25 @@ Tutti gli adapter hanno chiuso il benchmark con **0 failure / 0 grammar failure 
 
 Stesso split per composition family, stesso backbone e **120 step** per rappresentazione. Risultati: flat-poc-v1 691.518 MiB / 1063.191 bars/s / 267.438852 bits-bar / invalid 6/12; remi-plus-v1 707.267 MiB / 1438.365 bars/s / 241.336572 bits-bar / invalid 11/12; compound-word-v1 137.539 MiB / 557.856 bars/s / 191.268692 bits-bar / invalid 12/12; fame-compound-v1 144.136 MiB / 359.363 bars/s / 205.256405 bits-bar / invalid 12/12.
 
-**Prossimo Blocco 4:** scelta finale della rappresentazione usando insieme Blocco 2 e Blocco 3; nessun vincitore viene deciso dalla sola loss o dalla sola compressione.
+### Blocco 4 — decisione finale COMPLETATA
+
+**Rappresentazione scelta: `fame-compound-v1`.**
+
+La decisione usa insieme Blocco 2, Blocco 3 e audit degli errori generativi.
+
+Motivi principali:
+- circa **20.229084 unit/bar**, sostanzialmente pari a Compound Word;
+- **0 round-trip failure**;
+- copertura **8/8** delle feature FASE 4;
+- peak GPU micro-training **144.136 MiB**;
+- validation NLL/target **1.137909**;
+- supporto esplicito per motif family, kick↔808, hat roll e transition strength.
+
+Il valore **205.256405 bits/bar** viene letto tenendo conto che FAME Compound predice più campi informativi per barra rispetto a Compound Word; non rappresenta quindi la stessa quantità di informazione target.
+
+L'invalid-generation rate unconstrained del Blocco 3 NON viene usato per il ranking finale. L'audit dei 41 sample invalidi ha mostrato esclusivamente errori di grammatica/stato (boundary, barra errata, ordine token/evento), coerenti con un decoder che campionava senza applicare il contratto constrained già stabilito da NDR-010.
+
+Il decoding neurale futuro deve quindi applicare grammar/state masking. Compound Word resta disponibile come baseline di controllo; gli altri adapter benchmark non vengono rimossi.
 
 ### Cosa devi valutare tu
 Non scegli il tokenizer. Ti farò ascoltare solo eventuali differenze musicali rilevanti.

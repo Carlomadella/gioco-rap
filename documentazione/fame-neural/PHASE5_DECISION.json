@@ -1,0 +1,37 @@
+{
+  "schema": "fame-neural-phase5-decision-v1",
+  "version": 1,
+  "status": "ACCEPTED",
+  "selectedRepresentation": "fame-compound-v1",
+  "retainedControlRepresentation": "compound-word-v1",
+  "evidence": {
+    "symbolic": {
+      "unitsPerBarMean": 20.229084,
+      "unitsPerBarP95": 35.975,
+      "roundTripFailures": 0,
+      "phase4FeatureCoverage": "8/8"
+    },
+    "microTraining": {
+      "parameters": 2249927,
+      "peakAllocatedMiB": 144.136,
+      "barsPerSecond": 359.363,
+      "validationNllPerTarget": 1.137909,
+      "validationBitsPerBar": 205.256405
+    },
+    "generationAudit": {
+      "block3InvalidSamples": 41,
+      "rankingMetricAccepted": false,
+      "allObservedFailuresAreGrammarOrState": true,
+      "reason": "Block 3 sampled without grammar/state constraints; NDR-010 already requires constrained generation."
+    }
+  },
+  "rationale": [
+    "Near-identical symbolic compactness to generic Compound Word.",
+    "Full Phase 4 feature coverage for the Trap domain.",
+    "Zero round-trip failures.",
+    "Low GPU memory cost.",
+    "Lower validation NLL per active target than generic Compound Word.",
+    "Invalid-generation ranking discarded because the decoder protocol was unconstrained."
+  ],
+  "futureConstraint": "Neural decoding must apply grammar/state masking; structural fields such as bar identity are not sampled freely when fixed by context."
+}

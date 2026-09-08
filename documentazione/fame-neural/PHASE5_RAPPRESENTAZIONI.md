@@ -1,7 +1,7 @@
 # FAME Neural — FASE 5 / Benchmark rappresentazioni neurali
 
 Data avvio: 8 settembre 2026
-Stato: IN CORSO — BLOCCO 3 MICRO-TRAINING COMPLETATO
+Stato: COMPLETATA — FAME COMPOUND V1 SELEZIONATA
 
 ## Obiettivo
 
@@ -108,6 +108,23 @@ La validation loss viene riportata anche come **bits/bar**, perché le rappresen
 
 Il Blocco 3 non sceglie automaticamente il vincitore: i numeri GPU/generativi devono essere letti insieme a compressione simbolica, reconstruction e copertura FASE 4 del Blocco 2.
 
-## Prossimo Blocco 4
+## Blocco 4 — decisione finale
 
-Decisione finale della rappresentazione FASE 5 usando insieme benchmark simbolico + micro-training GPU + validità generativa. Nessun retraining aggiuntivo è richiesto salvo regressioni emerse dai risultati.
+**Winner: `fame-compound-v1`.**
+
+L'audit successivo al micro-training ha mostrato che tutti i 41 output classificati invalidi nel Blocco 3 fallivano per stato/grammatica del sampling unconstrained. La metrica invalid-generation del Blocco 3 viene quindi mantenuta come diagnostica del decoder, non come misura comparativa della qualità delle rappresentazioni.
+
+La scelta FAME Compound è sostenuta da:
+- **20.229084 unit/bar**;
+- P95 **35.975**;
+- **0 round-trip failure**;
+- **8/8** feature FASE 4;
+- **144.136 MiB** peak GPU;
+- validation NLL/target **1.137909**;
+- validation **205.256405 bits/bar**, interpretata considerando il maggior numero di campi informativi predetti.
+
+Compound Word resta la baseline compound generica di controllo. Flat e REMI+ restano benchmark storici.
+
+Il generatore neurale successivo deve usare decoding grammar/state constrained, in coerenza con NDR-010.
+
+**FASE 5 CHIUSA.**

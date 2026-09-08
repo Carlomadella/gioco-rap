@@ -57,3 +57,14 @@ Il token stream ha una grammatica verificabile e può esporre i token ammessi co
 **Status:** ACCEPTED
 
 Le annotazioni FASE 4 sono feature euristiche ausiliarie con confidence, non ground truth. La review umana 22/22 ha trovato 19 phrase pienamente coerenti, 2 phrase da escludere per qualita' musicale e un solo errore metrico isolato sulla tension; non emerge un pattern sufficiente a giustificare una calibrazione globale. Le phrase scartate vengono gestite con un exclusion overlay reversibile senza cancellare il corpus sorgente.
+
+## NDR-012 — FAME Compound V1 è la rappresentazione neurale selezionata
+**Status:** ACCEPTED
+
+La FASE 5 seleziona `fame-compound-v1` come contratto di rappresentazione per il Neural successivo.
+
+La scelta deriva dal confronto simbolico e dal micro-training: compattezza circa 20.23 unit/bar, 0 round-trip failure, copertura 8/8 delle feature FASE 4 e costo GPU contenuto.
+
+L'invalid-generation rate del Blocco 3 non viene usato per il ranking finale: l'audit dei 41 sample invalidi ha mostrato esclusivamente violazioni di grammatica/stato prodotte dal sampling unconstrained. Questo comportamento viola il principio già accettato in NDR-010, secondo cui il generatore deve applicare una grammatica constrained.
+
+Compound Word resta baseline tecnica di controllo. Flat e REMI+ restano disponibili per benchmark e regressioni; non vengono eliminati.

@@ -9,7 +9,7 @@ Data: 2026-09-08
 - FASE 2 — Pipeline MIDI e provenienza: **COMPLETATA**.
 - FASE 3 — Dataset Auditor e corpus iniziale: **COMPLETATA — GATE 1 DATA READY SUPERATO**.
 - FASE 4 — Annotazione musicale automatica: **COMPLETATA**.
-- FASE 5 — Scelta della rappresentazione neurale: **IN CORSO — BLOCCO 3 MICRO-TRAINING COMPLETATO**.
+- FASE 5 — Scelta della rappresentazione neurale: **COMPLETATA — FAME COMPOUND V1 SELEZIONATA**.
 - Training neurale reale: **MICRO-TRAINING BENCHMARK FASE 5 COMPLETATO; TRAINING MODELLO PRODOTTO NON INIZIATO**.
 
 ## Corpus Gate 1
@@ -94,8 +94,18 @@ Micro-training GPU comparabile completato con **120 step per rappresentazione** 
 
 I risultati completi machine-readable sono in `documentazione/fame-neural/PHASE5_BLOCK3_RESULTS.json`.
 
+## FASE 5 — Blocco 4
+
+Decisione finale completata: **`fame-compound-v1`** è la rappresentazione neurale scelta.
+
+L'audit degli errori generativi del Blocco 3 ha verificato che i **41/41 sample invalidi** fallivano per errori di grammatica/stato del decoder unconstrained, non per token o valori fuori vocabolario. Questa metrica non viene quindi usata per classificare le rappresentazioni.
+
+Il contratto futuro resta quello già definito da NDR-010: generazione con grammar/state constraints.
+
+FAME Compound viene preferita perché mantiene la compattezza delle compound word, ha 0 round-trip failure e rappresenta **8/8** feature FASE 4. Compound Word rimane baseline tecnica secondaria.
+
 ## Prossimo intervento ufficiale
 
-FASE 5 / Blocco 4: scegliere la rappresentazione finale leggendo insieme benchmark simbolico, costi GPU, validation bits/bar, invalid generation rate e copertura FASE 4. Nessun vincitore e' stato forzato automaticamente.
+FASE 6 — costruire la baseline semplice e ripetibile usando la rappresentazione FAME Compound V1 come contratto Neural selezionato.
 
 L'espansione non sintetica del corpus può continuare in parallelo, ma non riapre il Gate 1 già superato.
