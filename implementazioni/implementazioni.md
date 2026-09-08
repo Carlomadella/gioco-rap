@@ -39,6 +39,7 @@ L'indice con **tutti i punti e il loro stato** sta in
 La lista storica già presente sotto **rimane intatta** ed è importata automaticamente nel cruscotto: non viene riscritta né cancellata.
 
 <!-- ADF-AUTO-INBOX:BEGIN -->
+- [ ] voglio sistemare gli eventi ed il tempo in game
 <!-- Esempio (non attivo): - [ ] voglio cambiare il tempo del turno in fabbrica -->
 <!-- ADF-AUTO-INBOX:END -->
 _(qui sotto finiscono i punti nuovi, appena scritti)_
