@@ -565,11 +565,34 @@ function hubOra(){
 }
 
 /* ---- la colonna di sinistra, quattro viste ---- */
+function hubRitrattoArtista(art){
+  const preview = art && art.avatarSource === "local"
+    ? (art.avatarPreviewImage ||
+       art.avatarData?.avatarPreviewImage ||
+       art.avatarData?.previewImage ||
+       "")
+    : "";
+
+  /* Il portrait MakeHuman salvato dal runtime è un data URL raster.
+     Accettiamo solo immagini base64: salvataggi importati non possono
+     iniettare markup/URL arbitrari nell'HUB. */
+  if(/^data:image\/(?:png|jpeg|webp);base64,/i.test(preview)){
+    const safe = String(preview)
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+    return '<img class="pport-img" src="' + safe + '" alt="">';
+  }
+
+  return window.ARTIST_PORTRAIT ? window.ARTIST_PORTRAIT() : "";
+}
+
 function vistaProfilo(L, ph){
   const art = window.ARTIST || {};
   return '<span class="ptit">Il tuo profilo</span>' +
     '<div class="pface">' +
-      '<div class="pport">' + (window.ARTIST_PORTRAIT ? window.ARTIST_PORTRAIT() : '') + '</div>' +
+      '<div class="pport">' + hubRitrattoArtista(art) + '</div>' +
       '<div class="pwho">' +
         '<div class="pnome">' + ((art.name || "senza nome").toUpperCase()) + hsvg("matita") + '</div>' +
         '<div class="plv">Lv. ' + L.lvl + '</div>' +

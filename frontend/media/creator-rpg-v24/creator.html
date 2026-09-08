@@ -1867,7 +1867,7 @@ body::before{
         <div class="content">
           <div class="eyebrow">Creazione personaggio</div>
           <h1>Come vuoi creare il tuo artista?</h1>
-          <p class="lead">Puoi partire da Avaturn per una creazione più completa oppure usare l’editor locale con preset pronti e personalizzazione rapida. Dopo aver creato o scelto il personaggio passerai sempre dal camerino, dove potrai vederlo e confermarlo prima di entrare nell’identità.</p>
+          <p class="lead">Puoi partire da Avaturn oppure creare il personaggio direttamente nel gioco con MakeHuman. Dopo aver creato o scelto il personaggio passerai sempre dal camerino, dove potrai vederlo e confermarlo prima di entrare nell’identità.</p>
 
           <div class="avatar-method-grid">
             <button class="card avatar-method" type="button" data-avatar-source="avaturn">
@@ -1882,12 +1882,12 @@ body::before{
 
             <button class="card avatar-method" type="button" data-avatar-source="local">
               <div class="id">02 · editor del gioco</div>
-              <span class="n">Editor locale</span>
-              <div class="d">Per chi vuole iniziare più velocemente: scegli un preset pronto e modifica solo gli elementi principali del personaggio.</div>
+              <span class="n">MakeHuman</span>
+              <div class="d">Crea il personaggio direttamente nel gioco: volto, corpo, capelli, pelle, vestiti e accessori restano modificabili prima della conferma.</div>
               <div class="avatar-features">
-                <span>Nessun selfie</span><span>Preset pronti</span><span>Personalizzazione rapida</span>
+                <span>Nessun selfie</span><span>Editor completo</span><span>Nel gioco</span>
               </div>
-              <div class="mini">Scelta rapida</div>
+              <div class="mini">Crea con MakeHuman</div>
             </button>
           </div>
 
@@ -2074,7 +2074,7 @@ body::before{
 </div>
 
 <div class="local-editor-overlay" id="localEditorOverlay" aria-hidden="true">
-  <iframe id="localEditorFrame" src="local-editor.html" title="Editor locale personaggio"></iframe>
+  <iframe id="localEditorFrame" src="about:blank" data-makehuman-src="../makehuman-camerino-v1/index.html" title="Editor MakeHuman personaggio"></iframe>
 </div>
 <button type="button" class="creator-exit-game" id="creatorExitGame">← Menu</button>
 
@@ -2451,26 +2451,26 @@ function renderAvatarSource(){
 
   const hasConfirmedAvatar = !!(state.avatarSource && state.avatarData);
   const switchingMethod = hasConfirmedAvatar && selected!==state.avatarSource;
-  const selectedName = selected==='avaturn' ? 'Avaturn' : 'Editor locale';
-  const currentName = state.avatarSource==='avaturn' ? 'Avaturn' : (state.avatarSource==='local' ? 'Editor locale' : '');
+  const selectedName = selected==='avaturn' ? 'Avaturn' : 'MakeHuman';
+  const currentName = state.avatarSource==='avaturn' ? 'Avaturn' : (state.avatarSource==='local' ? 'MakeHuman' : '');
 
   if(switchingMethod){
     note.innerHTML = `<b>Passaggio a ${selectedName}</b><span>Il personaggio attuale creato con ${currentName} resta salvato finché non completi il nuovo avatar. Se esci dal nuovo editor senza confermare, non perdi quello che hai già.</span>`;
-    go.textContent = selected==='avaturn' ? 'Passa ad Avaturn →' : 'Passa all’editor locale →';
+    go.textContent = selected==='avaturn' ? 'Passa ad Avaturn →' : 'Passa a MakeHuman →';
     go.disabled = false;
     return;
   }
 
   if(selected==='avaturn'){
     note.innerHTML = hasConfirmedAvatar
-      ? '<b>Avatar Avaturn attuale</b><span>Puoi riaprire Avaturn oppure scegliere l’editor locale senza dover ricominciare la partita.</span>'
+      ? '<b>Avatar Avaturn attuale</b><span>Puoi riaprire Avaturn oppure scegliere MakeHuman senza dover ricominciare la partita.</span>'
       : '<b>Avaturn selezionato</b><span>Crei il personaggio con Avaturn; al termine lo rivedi nel camerino e poi continui con l’identità.</span>';
     go.textContent = hasConfirmedAvatar ? 'Riapri Avaturn →' : 'Continua con Avaturn →';
   } else {
     note.innerHTML = hasConfirmedAvatar
-      ? '<b>Avatar locale attuale</b><span>Puoi riaprire l’editor locale oppure passare ad Avaturn senza dover ricominciare la partita.</span>'
-      : '<b>Editor locale selezionato</b><span>Scegli e personalizzi un preset locale; al termine lo rivedi nel camerino e poi continui con l’identità.</span>';
-    go.textContent = hasConfirmedAvatar ? 'Riapri editor locale →' : 'Continua con editor locale →';
+      ? '<b>Avatar MakeHuman attuale</b><span>Puoi riaprire MakeHuman oppure passare ad Avaturn senza dover ricominciare la partita.</span>'
+      : '<b>MakeHuman selezionato</b><span>Crei e personalizzi il personaggio direttamente nel gioco; al termine lo rivedi nel camerino e poi continui con l’identità.</span>';
+    go.textContent = hasConfirmedAvatar ? 'Riapri MakeHuman →' : 'Continua con MakeHuman →';
   }
   go.disabled = false;
 }
@@ -2493,6 +2493,17 @@ window.completeAvatarCreation = function(source, avatarData={}){
   state.avatarPendingSource = null;
   state.avatarData = avatarData;
   renderAvatarSource();
+
+  /* MakeHuman comprende già editor, guardaroba, anteprima e conferma finale.
+     Il vecchio camerino locale sa mostrare soltanto una preview raster e,
+     con MakeHuman, produceva il rettangolo/crop corrotto visto nel test.
+     Avaturn e gli altri provider mantengono il flusso storico. */
+  if(source==='local' && avatarData?.provider==='makehuman'){
+    setProgress(1);
+    validateIdentity();
+    return;
+  }
+
   openDressingRoom(false);
 };
 
@@ -2633,13 +2644,41 @@ document.querySelectorAll('[data-avatar-source]').forEach(btn=>{
 
 const localEditorOverlay = $('localEditorOverlay');
 const localEditorFrame = $('localEditorFrame');
+
+function currentMakeHumanState(){
+  const d = state.avatarData || {};
+  return d.makehumanState ||
+    d.localAvatar?.makehumanState ||
+    d.localAvatar?.state ||
+    null;
+}
+
+function sendMakeHumanInit(){
+  if(!localEditorFrame?.contentWindow) return;
+  try{
+    localEditorFrame.contentWindow.postMessage({
+      type:'adf-makehuman-init',
+      state:currentMakeHumanState()
+    },'*');
+  }catch(e){}
+}
+
 function openLocalEditor(){
   if(!localEditorOverlay) return;
+
+  /* MakeHuman pesa molto più del vecchio editor: non lo carichiamo
+     mentre l'utente sta ancora scegliendo fra Avaturn e MakeHuman. */
+  if(localEditorFrame && localEditorFrame.dataset.makehumanLoaded!=='1'){
+    localEditorFrame.dataset.makehumanLoaded='1';
+    localEditorFrame.src=localEditorFrame.dataset.makehumanSrc;
+  }
+
   localEditorOverlay.classList.add('on');
   localEditorOverlay.setAttribute('aria-hidden','false');
-  setTimeout(()=>{
-    try{ localEditorFrame.contentWindow.postMessage({type:'adf-local-avatar-init',artist:state.avatarData||{}},'*'); }catch(e){}
-  },60);
+
+  /* Best effort immediato. Il vero handshake avviene anche quando
+     il runtime MakeHuman emette adf-makehuman-ready. */
+  setTimeout(sendMakeHumanInit,60);
 }
 function closeLocalEditor(){
   if(!localEditorOverlay) return;
@@ -2657,13 +2696,56 @@ $('goIdentity').onclick = ()=>{
   openDressingRoom(false);
 };
 
-$('backAppearance').onclick = ()=> state.avatarData ? openDressingRoom(false) : setProgress(0);
+$('backAppearance').onclick = ()=>{
+  const d=state.avatarData||{};
+  if(state.avatarSource==='local' && d.provider==='makehuman'){
+    state.avatarPendingSource='local';
+    renderAvatarSource();
+    openLocalEditor();
+    return;
+  }
+  state.avatarData ? openDressingRoom(false) : setProgress(0);
+};
 
 window.addEventListener('message', e=>{
   const msg=e.data||{};
   const frame=$('dressingRoomFrame');
 
   if(localEditorFrame && e.source===localEditorFrame.contentWindow){
+    if(msg.type==='adf-makehuman-ready'){
+      sendMakeHumanInit();
+      return;
+    }
+
+    if(msg.type==='adf-makehuman-confirm'){
+      const makehumanState = msg.state || null;
+      const previewImage = msg.previewImage || '';
+
+      closeLocalEditor();
+      window.completeAvatarCreation('local',{
+        provider:'makehuman',
+        makehumanState,
+        avatarPreviewImage:previewImage,
+        previewImage,
+        localAvatar:{
+          provider:'makehuman',
+          makehumanState
+        }
+      });
+      return;
+    }
+
+    if(msg.type==='adf-makehuman-back'){
+      closeLocalEditor();
+      state.avatarPendingSource = state.avatarSource || 'local';
+      if(state.avatarData) openDressingRoom(false); else setProgress(0);
+      renderAvatarSource();
+      return;
+    }
+
+    /* Compatibilità: il vecchio editor locale resta nel repository e il
+       contratto storico continua a essere riconosciuto se viene richiamato
+       esplicitamente da una pagina di test/legacy. */
     if(msg.type==='adf-local-avatar-complete'){
       closeLocalEditor();
       window.completeAvatarCreation('local', msg.artist||{});

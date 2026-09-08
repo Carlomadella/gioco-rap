@@ -61,6 +61,7 @@ class OrbitControls {
 
     this._onPointerDown=e=>{
       if(!this.enabled || e.button!==0) return;
+      resetWheelZoomBridge();
       this._drag=true;
       this._lastX=e.clientX;
       this._lastY=e.clientY;
@@ -98,15 +99,90 @@ class OrbitControls {
       if(!this.enabled) return;
       e.preventDefault();
 
+      const deltaY=Number(e.deltaY)||0;
+      if(deltaY===0) return;
+
+      const zoomIn=deltaY<0;
+      const zoomOut=deltaY>0;
+      const step=wheelTargetStep(deltaY);
+
+      /* Bridge già avviato: la rotellina cambia solo la destinazione.
+         Se inverti subito lo scroll, il target cambia verso opposto ma
+         posizione e velocità correnti restano continue. */
+      if(wheelZoomBridgeActive && wheelZoomBridgeOriginView){
+        wheelZoomBridgeTarget=clamp01(
+          wheelZoomBridgeTarget+(zoomIn?step:-step)
+        );
+        return;
+      }
+
+      /* Volto -> vista precedente.
+         Se siamo più vicini del default Volto, prima torniamo normalmente
+         al default; appena lo raggiungiamo parte il damping al contrario. */
+      if(currentCameraView==='face' && zoomOut){
+        const faceDest=cameraDestination('face');
+        const originView=wheelZoomBridgeOriginView || lastNonFaceCameraView || 'full';
+
+        if(faceDest){
+          const offset=this.object.position.clone().sub(this.target);
+          const currentDistance=offset.length();
+          const faceDistance=faceDest.position.distanceTo(faceDest.target);
+          const requested=currentDistance*Math.exp(deltaY*0.001);
+
+          if(currentDistance<faceDistance*0.997){
+            cancelCameraTransition();
+            offset.setLength(Math.min(faceDistance,requested));
+            this.object.position.copy(this.target).add(offset);
+            this.object.lookAt(this.target);
+            return;
+          }
+
+          beginWheelZoomBridge(originView,1);
+          wheelZoomBridgeTarget=clamp01(1-step);
+          return;
+        }
+      }
+
+      /* Intero/Profilo -> Volto.
+         Sopra la distanza default lo zoom resta normale. Dal default in poi
+         entra nel percorso continuo, quindi non si finisce più sul torso. */
+      if((currentCameraView==='full' || currentCameraView==='profile') && zoomIn){
+        const originView=currentCameraView;
+        const bridgeOrigin=cameraBridgeOriginDestination(originView);
+
+        if(bridgeOrigin){
+          const offset=this.object.position.clone().sub(this.target);
+          const currentDistance=offset.length();
+          const bridgeStartDistance=bridgeOrigin.position.distanceTo(bridgeOrigin.target);
+          const requested=currentDistance*Math.exp(deltaY*0.001);
+
+          if(currentDistance<=bridgeStartDistance*1.004 || requested<=bridgeStartDistance){
+            beginWheelZoomBridge(originView,0);
+            wheelZoomBridgeTarget=clamp01(step);
+            return;
+          }
+        }
+      }
+
+      /* Zoom ordinario al di fuori del bridge. */
       cancelCameraTransition();
 
       const offset=this.object.position.clone().sub(this.target);
-      const factor=Math.exp(e.deltaY*0.001);
-      const min=Number(cameraZoomLimits?.min)||0.25;
+      const factor=Math.exp(deltaY*0.001);
+      let min=Number(cameraZoomLimits?.min)||0.25;
       const max=Number(cameraZoomLimits?.max)||120;
-      const next=Math.max(min,Math.min(max,offset.length()*factor));
 
-      // Conserva l'orizzonte anche durante lo zoom.
+      /* Non lasciamo Intero/Profilo oltrepassare il proprio default:
+         da lì deve iniziare il bridge verso la testa. */
+      if((currentCameraView==='full' || currentCameraView==='profile') && zoomIn){
+        const bridgeOrigin=cameraBridgeOriginDestination(currentCameraView);
+        if(bridgeOrigin) min=Math.max(
+          min,
+          bridgeOrigin.position.distanceTo(bridgeOrigin.target)
+        );
+      }
+
+      const next=Math.max(min,Math.min(max,offset.length()*factor));
       const spherical=new THREE.Spherical().setFromVector3(offset);
       spherical.phi=Math.PI/2;
       offset.setFromSpherical(spherical).setLength(next);
@@ -261,6 +337,19 @@ let currentEditorSection='identity';
 let currentCameraView='full';
 let previewMode=false;
 let cameraTransition=null;
+
+/* ADF_MAKEHUMAN_ZOOM_DAMPING_V4
+   La rotellina aggiorna soltanto una destinazione 0..1.
+   La camera la rincorre ogni frame con damping critico: niente tween
+   per-evento, niente reset quando si inverte lo scroll. */
+let wheelZoomBridgeOriginView=null;
+let wheelZoomBridgeProgress=0;
+let wheelZoomBridgeTarget=0;
+let wheelZoomBridgeVelocity=0;
+let wheelZoomBridgeLastTime=0;
+let wheelZoomBridgeActive=false;
+let lastNonFaceCameraView='full';
+
 let cameraZoomLimits={min:1,max:100};
 let runtimeReady=false;
 let pendingRestoreState=null;
@@ -840,6 +929,7 @@ function initScene() {
 
   renderer.setAnimationLoop((time) => {
     updateCameraTransition(time);
+    updateWheelZoomDamping(time);
     controls.update();
     renderer.render(scene,camera);
   });
@@ -2546,7 +2636,7 @@ function cameraDestination(view='full') {
   if(!b) return null;
   const {box,center,size}=b;
   const max=Math.max(size.x,size.y,size.z,0.001);
-  const fullDistance=max*1.72;
+  const fullDistance=max*1.77;
   const fullTarget=new THREE.Vector3(center.x,box.min.y+size.y*0.50,center.z);
   const faceTarget=new THREE.Vector3(center.x,box.min.y+size.y*0.84,center.z);
 
@@ -2566,8 +2656,8 @@ function cameraDestination(view='full') {
     position=new THREE.Vector3(target.x,target.y,target.z+distance);
   }
 
-  const minFactor=view==='face'?0.72:0.76;
-  const maxFactor=view==='face'?1.38:1.30;
+  const minFactor=view==='face'?0.72:0.73;
+  const maxFactor=view==='face'?1.38:1.035;
 
   return {
     view,
@@ -2580,6 +2670,223 @@ function cameraDestination(view='full') {
   };
 }
 
+
+/* ADF_MAKEHUMAN_ZOOM_DAMPING_V4 · helpers */
+const WHEEL_ZOOM_TARGET_GAIN=0.00082;
+const WHEEL_ZOOM_MAX_TARGET_STEP=0.11;
+const WHEEL_ZOOM_SMOOTH_TIME=0.24;
+const WHEEL_ZOOM_MAX_SPEED=4.5;
+const WHEEL_ZOOM_EPSILON=0.0008;
+
+function clamp01(v){ return Math.max(0,Math.min(1,Number(v)||0)); }
+
+function smootherStep(v){
+  const t=clamp01(v);
+  return t*t*t*(t*(t*6-15)+10);
+}
+
+function resetWheelZoomBridge(){
+  wheelZoomBridgeOriginView=null;
+  wheelZoomBridgeProgress=0;
+  wheelZoomBridgeTarget=0;
+  wheelZoomBridgeVelocity=0;
+  wheelZoomBridgeLastTime=0;
+  wheelZoomBridgeActive=false;
+}
+
+function wheelTargetStep(deltaY){
+  const raw=Math.abs(Number(deltaY)||0)*WHEEL_ZOOM_TARGET_GAIN;
+  return Math.min(WHEEL_ZOOM_MAX_TARGET_STEP,Math.max(0.006,raw));
+}
+
+function cameraBridgeOriginDestination(originView){
+  const b=characterBounds();
+  if(!b) return null;
+
+  const base=cameraDestination(originView);
+  if(!base) return null;
+
+  const {size}=b;
+  const max=Math.max(size.x,size.y,size.z,0.001);
+  const distance=max*1.30;
+  const target=base.target.clone();
+  const position=originView==='profile'
+    ? new THREE.Vector3(target.x+distance,target.y,target.z)
+    : new THREE.Vector3(target.x,target.y,target.z+distance);
+
+  return {
+    ...base,
+    target,
+    position
+  };
+}
+
+function cameraBridgePose(originView,progress){
+  const from=cameraBridgeOriginDestination(originView);
+  const face=cameraDestination('face');
+  if(!from || !face) return null;
+
+  const t=smootherStep(progress);
+  const target=from.target.clone().lerp(face.target,t);
+
+  const fromOffset=from.position.clone().sub(from.target);
+  const faceOffset=face.position.clone().sub(face.target);
+  const distance=THREE.MathUtils.lerp(fromOffset.length(),faceOffset.length(),t);
+
+  /* Profilo -> Volto: rotazione progressiva sul piano orizzontale.
+     Intero -> Volto: l'angolo resta frontale. */
+  const fromAngle=Math.atan2(fromOffset.x,fromOffset.z);
+  const faceAngle=Math.atan2(faceOffset.x,faceOffset.z);
+  const angle=THREE.MathUtils.lerp(fromAngle,faceAngle,t);
+
+  const offset=new THREE.Vector3(
+    Math.sin(angle)*distance,
+    0,
+    Math.cos(angle)*distance
+  );
+
+  return {
+    position:target.clone().add(offset),
+    target,
+    near:THREE.MathUtils.lerp(from.near,face.near,t),
+    far:THREE.MathUtils.lerp(from.far,face.far,t)
+  };
+}
+
+/* SmoothDamp scalare criticamente smorzato.
+   Restituisce valore + velocità, così l'inversione di direzione conserva
+   l'inerzia residua invece di ripartire da zero. */
+function smoothDampScalar(current,target,currentVelocity,smoothTime,maxSpeed,deltaTime){
+  smoothTime=Math.max(0.0001,smoothTime);
+  deltaTime=Math.max(0,Math.min(0.05,deltaTime));
+
+  const omega=2/smoothTime;
+  const x=omega*deltaTime;
+  const exp=1/(1+x+0.48*x*x+0.235*x*x*x);
+
+  let change=current-target;
+  const originalTarget=target;
+  const maxChange=Math.max(0,maxSpeed)*smoothTime;
+  change=Math.max(-maxChange,Math.min(maxChange,change));
+  target=current-change;
+
+  const temp=(currentVelocity+omega*change)*deltaTime;
+  let velocity=(currentVelocity-omega*temp)*exp;
+  let output=target+(change+temp)*exp;
+
+  /* Evita overshoot agli estremi. */
+  if((originalTarget-current>0)===(output>originalTarget)){
+    output=originalTarget;
+    velocity=deltaTime>0?(output-originalTarget)/deltaTime:0;
+  }
+
+  return {value:output,velocity};
+}
+
+function beginWheelZoomBridge(originView,startProgress){
+  const origin=(originView==='profile')?'profile':'full';
+  wheelZoomBridgeOriginView=origin;
+  lastNonFaceCameraView=origin;
+  wheelZoomBridgeProgress=clamp01(startProgress);
+  wheelZoomBridgeTarget=wheelZoomBridgeProgress;
+  wheelZoomBridgeVelocity=0;
+  wheelZoomBridgeLastTime=performance.now();
+  wheelZoomBridgeActive=true;
+  cancelCameraTransition();
+  applyVisualCenter();
+}
+
+function updateWheelZoomDamping(time){
+  if(!wheelZoomBridgeActive || !wheelZoomBridgeOriginView) return;
+
+  const now=Number(time)||performance.now();
+  const dt=wheelZoomBridgeLastTime
+    ? Math.max(0.001,Math.min(0.05,(now-wheelZoomBridgeLastTime)/1000))
+    : 1/60;
+  wheelZoomBridgeLastTime=now;
+
+  const next=smoothDampScalar(
+    wheelZoomBridgeProgress,
+    wheelZoomBridgeTarget,
+    wheelZoomBridgeVelocity,
+    WHEEL_ZOOM_SMOOTH_TIME,
+    WHEEL_ZOOM_MAX_SPEED,
+    dt
+  );
+
+  wheelZoomBridgeProgress=clamp01(next.value);
+  wheelZoomBridgeVelocity=next.velocity;
+
+  const pose=cameraBridgePose(wheelZoomBridgeOriginView,wheelZoomBridgeProgress);
+  if(!pose) {
+    resetWheelZoomBridge();
+    return;
+  }
+
+  camera.near=pose.near;
+  camera.far=pose.far;
+  camera.position.copy(pose.position);
+  controls.target.copy(pose.target);
+  camera.updateProjectionMatrix();
+
+  /* Il bottone segue ciò che l'utente sta realmente vedendo, non il target
+     futuro impartito dalla rotellina. */
+  currentCameraView=wheelZoomBridgeProgress>=0.68
+    ? 'face'
+    : wheelZoomBridgeOriginView;
+  updateCameraViewButtons();
+
+  const settled=
+    Math.abs(wheelZoomBridgeProgress-wheelZoomBridgeTarget)<WHEEL_ZOOM_EPSILON &&
+    Math.abs(wheelZoomBridgeVelocity)<0.004;
+
+  if(!settled) return;
+
+  wheelZoomBridgeProgress=wheelZoomBridgeTarget;
+  wheelZoomBridgeVelocity=0;
+
+  if(wheelZoomBridgeTarget>=1-WHEEL_ZOOM_EPSILON){
+    const face=cameraDestination('face');
+    if(face){
+      wheelZoomBridgeProgress=1;
+      currentCameraView='face';
+      cameraZoomLimits={min:face.minDistance,max:face.maxDistance};
+      camera.position.copy(face.position);
+      controls.target.copy(face.target);
+      camera.near=face.near;
+      camera.far=face.far;
+      camera.updateProjectionMatrix();
+      updateCameraViewButtons();
+    }
+    /* Conserviamo originView per poter tornare indietro con la rotellina. */
+    wheelZoomBridgeActive=false;
+    wheelZoomBridgeLastTime=0;
+    return;
+  }
+
+  if(wheelZoomBridgeTarget<=WHEEL_ZOOM_EPSILON){
+    const originView=wheelZoomBridgeOriginView;
+    const originDefault=cameraDestination(originView);
+    const bridgeOrigin=cameraBridgeOriginDestination(originView);
+
+    if(originDefault && bridgeOrigin){
+      currentCameraView=originView;
+      lastNonFaceCameraView=originView;
+      cameraZoomLimits={
+        min:originDefault.minDistance,
+        max:originDefault.maxDistance
+      };
+      camera.position.copy(bridgeOrigin.position);
+      controls.target.copy(bridgeOrigin.target);
+      camera.near=bridgeOrigin.near;
+      camera.far=bridgeOrigin.far;
+      camera.updateProjectionMatrix();
+      updateCameraViewButtons();
+    }
+    resetWheelZoomBridge();
+  }
+}
+
 function updateCameraViewButtons() {
   document.querySelectorAll('[data-camera-view]').forEach(btn=>{
     btn.classList.toggle('active',btn.dataset.cameraView===currentCameraView);
@@ -2587,6 +2894,8 @@ function updateCameraViewButtons() {
 }
 
 function setCameraView(view='full',{smooth=true}={}) {
+  if(view==='full' || view==='profile') lastNonFaceCameraView=view;
+  resetWheelZoomBridge();
   const dest=cameraDestination(view);
   if(!dest) return;
   currentCameraView=view;
@@ -4475,41 +4784,20 @@ function makePreviewImage(){
   };
 
   const tryHeadshotCamera = () => {
-    if(!cam || typeof THREE === "undefined") return false;
-    const subject = findMainSubject();
-    if(!subject) return false;
-
-    const size = subject.size;
-    const center = subject.center.clone();
-    const headCenter = center.clone();
-
-    /* testata del bbox umano: circa negli ultimi 12-16% superiori del corpo. */
-    headCenter.y = subject.box.max.y - (size.y * 0.12);
-
-    /* Manteniamo una minima presenza di spalle abbassando leggermente il target. */
-    const target = headCenter.clone();
-    target.y -= size.y * 0.03;
-
-    /* Usa la direzione attuale camera->target se c'e; altrimenti una frontale semplice. */
-    let dir = null;
-    if(ctl && ctl.target && cam.position){
-      dir = cam.position.clone().sub(ctl.target);
-    }else if(cam.position){
-      dir = cam.position.clone().sub(target);
+    if(!cam || typeof setCameraView!=='function') return false;
+    try{
+      /* La vista VOLTO è già parte del runtime di produzione ed è stata
+         verificata visivamente durante l'audit. Evitiamo stime bbox:
+         con alcuni corpi/proxy la V4 avvicinava la camera fino a entrare
+         nella mesh e il portrait diventava un rettangolo color pelle. */
+      setCameraView('face',{smooth:false});
+      if(typeof applyVisualCenter==='function') applyVisualCenter();
+      if(cam.updateProjectionMatrix) cam.updateProjectionMatrix();
+      if(ctl && ctl.update) ctl.update();
+      return true;
+    }catch(_e){
+      return false;
     }
-    if(!dir || dir.lengthSq() < 1e-6) dir = new THREE.Vector3(0.15, 0.02, 1);
-    dir.normalize();
-
-    /* Distanza molto piu stretta: testa + spalle. */
-    let distance = Math.max(size.y * 0.16, size.x * 0.9, 0.22);
-    distance = Math.min(distance, Math.max(size.y * 0.24, 0.38));
-
-    if(ctl && ctl.target && ctl.target.copy) ctl.target.copy(target);
-    if(cam.position && cam.position.copy) cam.position.copy(target.clone().add(dir.multiplyScalar(distance)));
-    if(cam.lookAt) cam.lookAt(target);
-    if(cam.updateProjectionMatrix) cam.updateProjectionMatrix();
-    if(ctl && ctl.update) ctl.update();
-    return true;
   };
 
   const capture = () => {
