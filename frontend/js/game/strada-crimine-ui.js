@@ -192,7 +192,7 @@
       .adf-jail-tools>small,.adf-jail-feed>small{display:block;margin-bottom:8px;color:#9aa0aa;font-size:10px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}
       .adf-jail-actions{display:grid;gap:7px}.adf-jail-act{width:100%;padding:10px 11px;text-align:left;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.055);color:#f5f1ea;cursor:pointer}
       .adf-jail-act b{display:block;font-size:12px}.adf-jail-act span{display:block;margin-top:3px;color:#aeb3bd;font-size:10px;line-height:1.3}
-      .adf-jail-act:disabled{opacity:.42;cursor:not-allowed}.adf-jail-act:not(:disabled):hover{border-color:#ff315b;background:rgba(255,49,91,.09)}
+      .adf-jail-act:disabled{opacity:.42;cursor:not-allowed}@media (hover:hover){.adf-jail-act:not(:disabled):hover{border-color:#ff315b;background:rgba(255,49,91,.09)}}
       .adf-jail-result{min-height:18px;margin-top:8px;color:#d9dde4;font-size:11px;line-height:1.35}
       .adf-jail-feed{margin-top:15px;padding-top:12px;border-top:1px solid rgba(255,255,255,.10)}
       .adf-jail-event{padding:7px 0;border-top:1px solid rgba(255,255,255,.07)}.adf-jail-event:first-of-type{border-top:0}

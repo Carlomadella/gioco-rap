@@ -217,6 +217,16 @@
   #studio .strisorse svg{width:14px;height:14px}
 }
 
+@media (max-width:520px){
+  .sttabs{gap:5px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px))}
+  .sttab{min-width:0;padding:10px;font-size:12px}
+  .stoltre{width:30px}
+  .stbanda{left:10px;right:10px}
+  .stfianco{gap:12px}
+  .stcopertina{width:110px;height:110px}
+  .stazioni .stprimo,.stazioni .stsecondo{flex:1 1 100%}
+}
+
 /* Sotto i 480px una riga sola non basta più. La nav globale si prende 210
    punti fissi, e i tre numeri — energia, soldi, ora — ne vogliono quasi 190:
    a 360 la somma sfonda lo schermo e l'ora si legge «09:» e basta. Quindi la
@@ -237,16 +247,6 @@
   /* i numeri, riga loro, a destra: sotto alla nav e larghi quanto serve */
   #studio .strisorse{flex:1 1 100%;margin:0 0 4px;justify-content:flex-end;gap:10px}
   #studio .strisorse span{font-size:13px}
-}
-
-@media (max-width:520px){
-  .sttabs{gap:5px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px))}
-  .sttab{min-width:0;padding:10px;font-size:12px}
-  .stoltre{width:30px}
-  .stbanda{left:10px;right:10px}
-  .stfianco{gap:12px}
-  .stcopertina{width:110px;height:110px}
-  .stazioni .stprimo,.stazioni .stsecondo{flex:1 1 100%}
 }
 
 
@@ -321,7 +321,7 @@
   #strada .right{order:3}
   #strada .citybar{order:4;grid-template-columns:minmax(0,1fr);gap:10px}
   /* i pannelli non si tagliano più il contenuto: cresce la pagina, non loro */
-  #strada .panel{overflow:visible}
+  #strada .stpan{overflow:visible}
   #strada .center{overflow:hidden}          /* qui il velo interno serve */
   /* i quattro colpi restano due per riga finché ci stanno: sotto vanno a uno.
      `auto` e non `1fr`: impilati non c'è più un'altezza da spartire. */

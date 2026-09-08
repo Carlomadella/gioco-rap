@@ -456,6 +456,16 @@ body.adf-system-open{overflow:hidden}
   display:flex!important;
   pointer-events:none!important;
 }
+/* Sul telefono la fascia della Strada rientra a 12 punti (il blocco stretto in
+   css/stretto.css), ma i 30 qui sopra sono scritti con !important e restavano:
+   il menu partiva 18 punti piu' a destra del titolo e della riga sotto. Qui la
+   fascia e' anche piu' bassa, quindi scende pure l'altezza. */
+@media (max-width:620px){
+  #strada.on .topbar.adf-system-host-v7 > .adf-global-nav{
+    left:12px!important;
+    height:52px!important;
+  }
+}
 
 /* Il tema Strada resta rosso/rosa solo nell'hover e nella freccia. */
 #strada.on .topbar.adf-system-host-v7 .adf-global-map > span:first-child{

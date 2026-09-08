@@ -1758,9 +1758,18 @@ test("nessun documento punta piu' al vecchio 00-come-si-lavora.md",
 test("nessun :hover fuori da @media (hover:hover): sul telefono non resta acceso",
   (() => {
     const fuori = [];
-    for(const nome of fs.readdirSync(path.join(ROOT, "css"))){
-      if(!nome.endsWith(".css")) continue;
-      const testo = leggi("css/" + nome);
+    /* Non basta guardare `css/`: sei pezzi di grafica sono scritti dentro al
+       JavaScript (la pastiglia del tempo, i tasti del pannello, il calendario,
+       i post di LaFamegram, il carcere) e la prima passata li aveva saltati —
+       e il controllo diceva «tutto a posto» lo stesso. Adesso guarda anche i
+       file di codice che si portano dentro un foglio di stile. */
+    const daGuardare = fs.readdirSync(path.join(ROOT, "css"))
+      .filter(n => n.endsWith(".css")).map(n => "css/" + n)
+      .concat(["js/game/tempo-controlli.js", "js/game/eventi-v2.js",
+        "js/game/strada-crimine-ui.js", "js/menu-sistema.js",
+        "js/game/telefono.js", "js/game/traphone16.js"]);
+    for(const nome of daGuardare){
+      const testo = leggi(nome);
       /* via i blocchi @media (hover:hover){...}, contando le graffe */
       let s = testo, i;
       while((i = s.search(/@media\s*\(\s*hover\s*:\s*hover\s*\)\s*\{/)) >= 0){
@@ -1774,7 +1783,7 @@ test("nessun :hover fuori da @media (hover:hover): sul telefono non resta acceso
       }
       /* i commenti non sono regole: possono nominare :hover liberamente */
       s = s.replace(/\/\*[\s\S]*?\*\//g, "");
-      if(s.includes(":hover")) fuori.push("css/" + nome);
+      if(s.includes(":hover")) fuori.push(nome);
     }
     if(fuori.length) console.log("      " + fuori.join("\n      "));
     return fuori.length === 0;

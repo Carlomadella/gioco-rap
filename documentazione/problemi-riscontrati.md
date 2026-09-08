@@ -400,3 +400,129 @@ righe diverse dalle altre trecento.
   mossa che fa succedere la cosa, ed è per quella regola che nella sezione Beat «Compralo»
   è d'oro e «Fattelo fare» no. Le due cose qui non vanno d'accordo: ha vinto la foto,
   perché era la richiesta. Basta dirlo e si gira.
+
+---
+
+## Giro del 08/09/2026 (secondo giro: responsività)
+
+Controllato: `npm run prova` e `node strumenti/audit-regressioni.js` (294 ok, 0
+falliti), le graffe di tutti e 27 i fogli di stile in `frontend/css/` (tutte in
+pari), la passata degli `:hover` file per file, la riga muta dello Studio in
+`tempo-controlli.js`, e i blocchi nuovi in fondo a `strada-crimine-v2.css` e
+`effects.css` selettore per selettore contro il vero markup (`frontend/pagine/gioco.html`).
+
+Il grosso è a posto: nessuna graffa storta, nessuna gabbia annidata male,
+nessuna regola `:hover` rimasta fuori e nessun pezzo non-hover finito dentro
+alla gabbia per sbaglio. La riga muta dello Studio pulisce bene: quando lo
+Studio si apre il gioco chiude il pannello, rimette a posto i vecchi orologi
+che aveva nascosto e sparisce la pastiglia; quando si chiude, torna da sola
+sull'hub. Sotto ci sono cinque cose che restano.
+
+### La passata degli hover ha saltato quello che è scritto dentro al JavaScript
+- **dove** — `frontend/js/game/tempo-controlli.js:303, 347, 348`,
+  `frontend/js/game/eventi-v2.js:2612, 2805`,
+  `frontend/js/game/strada-crimine-ui.js:195`
+- **cosa succede** — sei pezzi di grafica non stanno nei fogli di stile ma sono
+  scritti dentro al codice, e la passata non li ha toccati: la pastiglia del
+  tempo, i tasti «+» e «−» e i tasti del pannello del tempo, i tasti del
+  calendario, i tasti dei post di LaFamegram e i tasti del carcere. Su quelli,
+  sul telefono, il colore si accende al tocco e ci resta — che è esattamente la
+  cosa che questo giro doveva togliere. Peggio: il controllo automatico nuovo
+  guarda solo dentro a `frontend/css/`, quindi dice «tutto a posto» e continuerà
+  a dirlo anche se se ne aggiungono altri lì dentro.
+- **come si vede** — su un telefono vero: tocca la pastiglia dell'ora e guarda
+  dove rimane il chiarore; stessa cosa sui tasti di un post di LaFamegram.
+- **quanto pesa** — si vede ma si gira intorno.
+
+**RISOLTO (08/09/2026)** — branch `task/responsivita`. I sei pezzi adesso stanno
+nella gabbia come quelli dei fogli di stile. E il controllo in
+`audit-regressioni.js` non guarda più solo `frontend/css/`: legge anche i file
+di codice che si portano dentro un foglio di stile, quindi da adesso se ne
+sfugge uno lì dentro la prova diventa rossa. Provato togliendo apposta una
+gabbia: la prova fallisce.
+
+### Nella Strada c'è una riga nuova che non tocca niente: quei pannelli si
+### chiamano in un altro modo
+- **dove** — `frontend/css/strada-crimine-v2.css:2448`
+- **cosa succede** — la riga dice «i pannelli non si tagliano più il contenuto»
+  e li chiama `panel`. Nella pagina vera (`frontend/pagine/gioco.html:497, 520, 530`)
+  quei tre pannelli si chiamano `stpan`, non `panel`: la riga non trova nessuno
+  e non fa niente. Il taglio del contenuto continua ad arrivare da
+  `frontend/css/strada-crimine.css:115`, che è rimasto com'era. Non è colpa di
+  questo giro: lo stesso nome sbagliato era già lì tre volte da prima
+  (righe 69, 307, 434 dello stesso file), adesso sono quattro.
+- **come si vede** — si vede solo dai file: quel nome non esiste nella pagina.
+- **quanto pesa** — da sistemare con calma.
+
+**RISOLTO (08/09/2026)** — la riga adesso dice `stpan`, che è il nome vero, ed è
+in `frontend/css/stretto.css`. Le altre tre occorrenze sbagliate erano già lì
+da prima e non sono state toccate: non è roba di questo giro.
+
+### Sul telefono la pastiglia del tempo si tiene 222 punti anche quando si è
+### rimpicciolita
+- **dove** — `frontend/js/game/tempo-controlli.js:290` contro `:351`
+- **cosa succede** — c'è una riga che dice «sotto i 620 punti la pastiglia si
+  stringe a 176», e ce n'è un'altra, scritta più precisa, che per la Strada (e
+  per l'hub, il carcere, il Posto e il negozio) dice 222. Vince la più precisa,
+  sempre, anche sul telefono: quindi l'orologio disegnato si rimpicciolisce
+  davvero ma la casella che se lo tiene resta larga come su un monitor. Su uno
+  schermo da 360 punti quella casella più la crocetta per chiudere si mangiano
+  quasi tutta la seconda riga della fascia, e al titolo della schermata
+  restano una sessantina di punti. Non è di questo giro — quelle righe non sono
+  state toccate — ma è proprio la riga che il blocco nuovo a 620 doveva far
+  entrare.
+- **come si vede** — apri la Strada su uno schermo stretto e guarda quanto
+  spazio vuoto c'è intorno all'orologio, e quanto ne resta al titolo.
+- **quanto pesa** — si vede ma si gira intorno.
+
+**RISOLTO (08/09/2026)** — le due righe responsive adesso dicono
+`#adf-time-dock[data-host]`: stessa precisione delle righe per singolo posto, e
+vengono dopo, quindi sul telefono vince la misura stretta.
+
+### Nella Strada stretta il menu in alto e il titolo sotto non partono
+### dallo stesso punto
+- **dove** — `frontend/css/strada-crimine-v2.css:2456` e `:2472`, contro
+  `frontend/css/menu-sistema.css:447`
+- **cosa succede** — i blocchi nuovi portano il margine sinistro della fascia
+  della Strada da 30 punti a 12. Il menu in alto (quello con la corona e
+  «MAPPA») però è inchiodato a 30 punti da un'altra regola, scritta con la
+  parola che vince su tutto, e per la Strada non c'è nessuna eccezione per gli
+  schermi stretti. Risultato: su un telefono il menu parte 18 punti più a
+  destra del titolo e della riga sotto. Non rompe niente, si vede e basta.
+- **come si vede** — apri la Strada su uno schermo da 360 punti e guarda il
+  bordo sinistro: il menu è rientrato, quello che c'è sotto no.
+- **quanto pesa** — da sistemare con calma.
+
+**RISOLTO (08/09/2026)** — in `frontend/css/menu-sistema.css`, sotto i 620 punti
+il menu della Strada rientra a 12 come la fascia, e scende a 52 di altezza.
+
+### Nota, non è un errore: adesso sul telefono toccare un tasto non fa più
+### vedere niente
+- **dove** — tutto `frontend/css/`, per esempio `.stbcard` e `.sttakeriga` in
+  `studio-elementi.css:71, 105`, `#strada .crime` in `strada-crimine-v2.css:119`,
+  `.ptab` e `.pev` in `hub.css:545, 909`
+- Chiudere gli `:hover` nella gabbia era giusto e toglie il chiarore che
+  rimaneva acceso dopo il tocco. Il rovescio della medaglia è che su 138 cose
+  che si accendevano col mouse, **123 non hanno nessun'altra risposta al
+  tocco**: né un colore che si abbassa mentre premi, né altro. Prima almeno
+  lampeggiavano storto; adesso premi e, finché la schermata non cambia, non
+  succede niente a vedersi. Dove il tocco sceglie qualcosa (le schede dei beat,
+  le linguette) il colore da «scelto» arriva lo stesso, quindi lì si capisce;
+  dove il tocco fa partire un'azione — un colpo nella Strada, un evento
+  sull'hub — no. Funziona tutto: è una scelta su quanto risponde il gioco al
+  dito, e va decisa, non è un guasto. Se si vuole si mette una risposta al
+  «mentre premo» in un giro solo, come è stato fatto per la gabbia.
+
+### Nota, non è un errore: nello Studio i due blocchi per gli schermi stretti
+### sono scritti in ordine inverso
+- **dove** — `frontend/css/studio.css:354` e `:364`
+- Il blocco «sotto i 480» sta **prima** del blocco «sotto i 520». Su un telefono
+  da 360 valgono tutti e due, e a parità di regola vince quello scritto dopo —
+  cioè il più largo, che è il contrario di quello che ci si aspetta. Oggi non
+  fa danni perché i due blocchi non si contendono niente: uno sposta la fascia
+  in alto, l'altro le linguette in basso. Ma è una trappola: chi domani
+  aggiunge una riga a quello da 480 può vedersela mangiare da quello da 520
+  senza capire perché. Basta scambiarli di posto, e non è urgente.
+
+**RISOLTO (08/09/2026)** — scambiati. Adesso stanno in `frontend/css/stretto.css`,
+nella sezione STUDIO, in ordine dal più largo al più stretto: 900, 620, 520, 480.
