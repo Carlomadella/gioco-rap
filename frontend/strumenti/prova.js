@@ -58,6 +58,20 @@ controlla("ogni pagina cita dei fogli di stile e del codice", mute.length === 0,
 const mancanti = [...css, ...js].filter(f => !fs.existsSync(path.join(RADICE, f)));
 controlla("ogni file citato dalle pagine esiste davvero", mancanti.length === 0, mancanti);
 
+/* ADF_NEGOZIO_PREVIEW_DECOUPLED_V2
+   Regressione: il negozio non deve tornare a chiamare il ritaglio del vecchio
+   editor 2D eliminato. */
+{
+  const negozio = fs.readFileSync(path.join(RADICE, "js/game/negozio.js"), "utf8");
+  controlla(
+    "il negozio vestiti è scollegato dal ritaglio legacy",
+    !negozio.includes("cropRitratto({fit:f.id}") &&
+    !negozio.includes("CROP.busto") &&
+    negozio.includes("function ngAnteprimaVestito(") &&
+    negozio.includes("const anteprima = ngAnteprimaVestito(f.id);")
+  );
+}
+
 const cssSulDisco = tuttiIFile(path.join(RADICE, "css"), ".css");
 const jsSulDisco = tuttiIFile(path.join(RADICE, "js"), ".js");
 /* ADF_PROVA_ESM_STANDALONE_V1

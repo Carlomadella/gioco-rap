@@ -22,12 +22,38 @@ const NG_PREZZI = {
 const ngPosseduto = id => id === (window.ARTIST || {}).fit || !!(G.vestiti && G.vestiti[id]);
 const ngIndossato = id => id === (window.ARTIST || {}).fit;
 
+/* ADF_NEGOZIO_PREVIEW_DECOUPLED_V2
+   Il vecchio editor 2D forniva anche la funzione usata per ritagliare le
+   anteprime dei vestiti. Quell'editor è stato rimosso: il negozio mantiene
+   qui solo il minimo necessario per una preview SVG del busto, senza
+   dipendere dai file legacy del creator. */
+const NG_CROP_BUSTO = "-100 -34 200 134";
+
+function ngAnteprimaVestito(id){
+  if(typeof portrait !== "function") return "";
+
+  const vecchioFit = A.fit;
+  try{
+    A.fit = id;
+    return portrait(false, true)
+      .replace(
+        'class="portrait" viewBox="-100 -155 200 255"',
+        'class="mini" viewBox="' + NG_CROP_BUSTO + '"'
+      )
+      .replace(' aria-label="ritratto del personaggio"', ' aria-hidden="true"')
+      .replace(/<filter id="morb[\s\S]*?<\/filter>/g, "")
+      .replace(/ filter="url\(#morb[^"]*\)"/g, "");
+  }finally{
+    A.fit = vecchioFit;
+  }
+}
+
 /* `shop`: true nello Shop (mostra anche i capi da comprare), false nel
    guardaroba (mostra solo equip — un capo non posseduto non compare proprio). */
 function ngCard(f, shop){
   const posseduto = ngPosseduto(f.id), indossato = ngIndossato(f.id);
   const prezzo = NG_PREZZI[f.id] || 200;
-  const anteprima = cropRitratto({fit:f.id}, CROP.busto, true);
+  const anteprima = ngAnteprimaVestito(f.id);
   const azione = indossato ? '<span class="ngtag">Indossato</span>'
     : posseduto ? '<button class="ngbtn" data-indossa="' + f.id + '">Indossa</button>'
     : shop ? '<button class="ngbtn buy' + (G.money < prezzo ? " no" : "") + '" data-compra="' +
