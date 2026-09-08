@@ -811,6 +811,37 @@ leggi di quella persona. Riscritta senza.
 
 ---
 
+## 14 · Le azioni in Studio non ti buttano più fuori
+
+14. Quando vado in studio e faccio un'azione poi ogni volta mi fa uscire e tornare nel menù.
+
+Non voglio questo, dallo studio si esce solo col pulsantino torna alla mappa che già abbiamo nell'interfaccia, non voglio che ogni volta mi fai riuscire dopo che svolgo qualcosa
+
+> **Fatto (08/09/2026).** `studioAzione()` (`frontend/js/game/studio.js`) chiudeva lo Studio
+> (`chiudiStudio()`) **prima** di far partire la mossa vera (`hubAzione()`): ogni «Scrivi
+> barre», «Cerca un beat», «Registra», «Mixa» o «Promo sui social» ti riportava alla mappa, e
+> per la mossa successiva dovevi rientrare da capo. Tolta quella riga: lo Studio resta
+> aperto, la mossa parte sopra di lui, e la sua testata (energia, soldi) si aggiorna sul
+> posto (`renderStudio()`, chiamata dopo ogni esito).
+>
+> Il motivo per cui prima si chiudeva: lo Studio aveva lo z-index più alto fra tutti i
+> pannelli a schermo intero (`css/studio.css`), più alto perfino del foglio per scrivere le
+> barre, del titolo che chiede il nome del pezzo e della scena a pagina piena del mix/della
+> promo — le tre cose che un'azione in Studio può aprire sopra di sé. Restando aperto, quelle
+> finestre ci sarebbero finite *dietro*, invisibili. Abbassato lo z-index dello Studio
+> (94 → 55, sotto a modal/report-scena/foglio, ma sempre sopra alla plancia di base): nessun
+> altro pannello apre lo Studio al suo interno, quindi non tocca nessun altro flusso.
+> `frontend/js/game/ui.js`, `writer.js`, `modal.js` e `actions.js` chiamano ora
+> `renderStudio()` (si aggiorna da sola solo se lo Studio è ancora aperto) in ogni punto dove
+> prima aggiornavano solo la plancia, così lo stato resta fresco anche a finestra chiusa
+> sopra di lui.
+> Si esce ancora solo con «Torna alla mappa» (punto sopra): non toccato.
+> `npm run verifica`: prova 77/79 (gli stessi 2 «no» di makehuman, presenti anche su `main`
+> pulito, non miei), audit-regressioni 294/294, build 33/33, dipendenze 0 vulnerabilità.
+> Non provato dal vivo in Chrome in questa sessione — l'estensione non era connessa.
+
+---
+
 ## 1 · «Torna alla mappa» non funzionava in alcune interfacce
 
 1. In alcune interfacce il pulsante in alto a sx 'torna alla mappa' che abbiamo fatto non

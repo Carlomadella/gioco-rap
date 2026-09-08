@@ -37,7 +37,13 @@
   --stTabs:calc(62px + env(safe-area-inset-bottom,0px));
 }
 
-.studio{position:fixed;inset:0;z-index:94;display:none;overflow:hidden;background:#05070B}
+/* Punto 14: le azioni non chiudono più lo Studio (studio.js, studioAzione),
+   quindi quello che aprono — il foglio per scrivere, il titolo del pezzo, la
+   scena a pagina piena del mix o della promo — deve restare visibile sopra
+   di lui invece di sparire dietro. z-index abbassato sotto a modal(60),
+   report/scenapiena(80) e writer(90): lo Studio resta comunque sopra alla
+   plancia di base, che è tutto quello che gli serviva davvero. */
+.studio{position:fixed;inset:0;z-index:55;display:none;overflow:hidden;background:#05070B}
 .studio.on{display:block}
 
 /* ---- LA FOTO ----

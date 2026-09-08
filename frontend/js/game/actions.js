@@ -334,6 +334,7 @@ const ACTIONS = [
        pushLog("Registrato <b>«" + nome + "»</b> su «" + bt.n + "»" +
          (conMe ? " con <b>" + conMe + "</b>" : "") + " — qualità " + q + ".", "");
        SFX.rec(); save(); renderGioco();
+       if(typeof renderStudio === "function") renderStudio();
      });
      return "";
    }},
