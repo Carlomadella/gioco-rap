@@ -1,0 +1,1142 @@
+{
+  "schema": "adf.makehuman.ui-overrides.v2136",
+  "version": "2.13.6",
+  "rule": "UI taxonomy + naming overrides. MakeHuman raw paths/categories/metadata are never modified. V2.13.5 classifies all 77 V29 clothesOther entries; 17 ambiguous items were manually identified by the project owner.",
+  "skins": {
+    "aksel_skin/aksel_skin.json": {
+      "label": "Realistica · dettagliata",
+      "description": "Pelle realistica ad alto dettaglio.",
+      "family": "Speciali"
+    },
+    "Alana_Caucasian_Female_with_Genitals_skin/Alana_Caucasian_Female_with_Genitals_skin.json": {
+      "label": "Donna chiara · anatomica",
+      "description": "Pelle femminile chiara con dettagli anatomici integrati.",
+      "family": "Speciali"
+    },
+    "creamy_female/creamy_female.json": {
+      "label": "Donna chiara · crema",
+      "description": "Pelle femminile chiara dal tono morbido e uniforme.",
+      "family": "Speciali"
+    },
+    "darthfurby_caucasian_female/darthfurby_caucasian_female.json": {
+      "label": "Donna chiara · naturale",
+      "description": "Variante femminile chiara dall'aspetto naturale.",
+      "family": "Speciali"
+    },
+    "default.json": {
+      "label": "Base neutra",
+      "description": "Pelle neutra predefinita di MakeHuman.",
+      "family": "Base"
+    },
+    "Grey_Skinned_Person/Grey_Skinned_Person.json": {
+      "label": "Grigia · stilizzata",
+      "description": "Pelle grigia non realistica per personaggi stilizzati.",
+      "family": "Speciali"
+    },
+    "Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter/Jartur_mid_old_Slavic_Male_with_Genitals_and_Beard_lsdif_lighter.json": {
+      "label": "Uomo maturo · chiara · barba",
+      "description": "Pelle maschile matura e chiara con barba e dettagli anatomici.",
+      "family": "Adulti"
+    },
+    "Jartur_old_Slavic_Male_with_Genitals_and_beard_lsdif/Jartur_old_Slavic_Male_with_Genitals_and_beard_lsdif.json": {
+      "label": "Uomo anziano · barba",
+      "description": "Pelle maschile anziana con barba e dettagli anatomici.",
+      "family": "Anziani"
+    },
+    "middleage_african_female/middleage_african_female.json": {
+      "label": "Donna adulta · tono scuro",
+      "description": "Pelle femminile adulta dal tono scuro.",
+      "family": "Adulti"
+    },
+    "middleage_african_male/middleage_african_male.json": {
+      "label": "Uomo adulto · tono scuro",
+      "description": "Pelle maschile adulta dal tono scuro.",
+      "family": "Adulti"
+    },
+    "middleage_asian_female/middleage_asian_female.json": {
+      "label": "Donna adulta · tono chiaro · B",
+      "description": "Seconda resa femminile adulta dal tono chiaro.",
+      "family": "Adulti"
+    },
+    "middleage_asian_male/middleage_asian_male.json": {
+      "label": "Uomo adulto · tono chiaro · B",
+      "description": "Seconda resa maschile adulta dal tono chiaro.",
+      "family": "Adulti"
+    },
+    "middleage_caucasian_female/middleage_caucasian_female.json": {
+      "label": "Donna adulta · tono chiaro · A",
+      "description": "Prima resa femminile adulta dal tono chiaro.",
+      "family": "Adulti"
+    },
+    "middleage_caucasian_male/middleage_caucasian_male.json": {
+      "label": "Uomo adulto · tono chiaro · A",
+      "description": "Prima resa maschile adulta dal tono chiaro.",
+      "family": "Adulti"
+    },
+    "middleage_eurasian_female/middleage_eurasian_female.json": {
+      "label": "Donna adulta · tono neutro",
+      "description": "Pelle femminile adulta dalla resa neutra.",
+      "family": "Adulti"
+    },
+    "old_african_female/old_african_female.json": {
+      "label": "Donna anziana · tono scuro",
+      "description": "Pelle femminile anziana dal tono scuro.",
+      "family": "Anziani"
+    },
+    "old_african_male/old_african_male.json": {
+      "label": "Uomo anziano · tono scuro",
+      "description": "Pelle maschile anziana dal tono scuro.",
+      "family": "Anziani"
+    },
+    "old_asian_female/old_asian_female.json": {
+      "label": "Donna anziana · tono chiaro · B",
+      "description": "Seconda resa femminile anziana dal tono chiaro.",
+      "family": "Anziani"
+    },
+    "old_asian_male/old_asian_male.json": {
+      "label": "Uomo anziano · tono chiaro · B",
+      "description": "Seconda resa maschile anziana dal tono chiaro.",
+      "family": "Anziani"
+    },
+    "old_caucasian_female/old_caucasian_female.json": {
+      "label": "Donna anziana · tono chiaro · A",
+      "description": "Prima resa femminile anziana dal tono chiaro.",
+      "family": "Anziani"
+    },
+    "old_caucasian_male/old_caucasian_male.json": {
+      "label": "Uomo anziano · tono chiaro · A",
+      "description": "Prima resa maschile anziana dal tono chiaro.",
+      "family": "Anziani"
+    },
+    "old_eurasian_female/old_eurasian_female.json": {
+      "label": "Donna anziana · tono neutro",
+      "description": "Pelle femminile anziana dalla resa neutra.",
+      "family": "Anziani"
+    },
+    "old_eurasian_male/old_eurasian_male.json": {
+      "label": "Uomo anziano · tono neutro",
+      "description": "Pelle maschile anziana dalla resa neutra.",
+      "family": "Anziani"
+    },
+    "RedHeadSkin/RedHeadSkin.json": {
+      "label": "Chiara · sottotono caldo",
+      "description": "Pelle chiara con resa calda.",
+      "family": "Speciali"
+    },
+    "skin_male_african_middleage/skin_male_african_middleage.json": {
+      "label": "Uomo adulto · tono scuro · dettagliata",
+      "description": "Pelle maschile adulta dal tono scuro con dettaglio aggiuntivo.",
+      "family": "Adulti"
+    },
+    "skin_texture/skin_texture.json": {
+      "label": "Neutra · naturale",
+      "description": "Texture pelle generica e neutra.",
+      "family": "Base"
+    },
+    "summerglow/summerglow.json": {
+      "label": "Dorata · estiva",
+      "description": "Pelle dalla resa calda e dorata.",
+      "family": "Speciali"
+    },
+    "toon01/toon01.json": {
+      "label": "Cartoon · stilizzata",
+      "description": "Pelle volutamente non realistica e stilizzata.",
+      "family": "Speciali"
+    },
+    "viking_male/viking_male.json": {
+      "label": "Uomo · ruvida",
+      "description": "Pelle maschile dal carattere più ruvido.",
+      "family": "Speciali"
+    },
+    "young_african_female/young_african_female.json": {
+      "label": "Donna giovane · tono scuro",
+      "description": "Pelle femminile giovane dal tono scuro.",
+      "family": "Giovani"
+    },
+    "young_african_male/young_african_male.json": {
+      "label": "Uomo giovane · tono scuro",
+      "description": "Pelle maschile giovane dal tono scuro.",
+      "family": "Giovani"
+    },
+    "young_asian_female/young_asian_female.json": {
+      "label": "Donna giovane · tono chiaro · B",
+      "description": "Seconda resa femminile giovane dal tono chiaro.",
+      "family": "Giovani"
+    },
+    "young_asian_male/young_asian_male.json": {
+      "label": "Uomo giovane · tono chiaro · B",
+      "description": "Seconda resa maschile giovane dal tono chiaro.",
+      "family": "Giovani"
+    },
+    "young_caucasian_female_genitals/young_caucasian_female_genitals.json": {
+      "label": "Donna giovane · chiara · anatomica",
+      "description": "Pelle femminile giovane e chiara con dettagli anatomici.",
+      "family": "Giovani"
+    },
+    "young_caucasian_female/young_caucasian_female_special_suit.json": {
+      "label": "Donna giovane · chiara · completa",
+      "description": "Variante femminile giovane e chiara con mappa corpo completa.",
+      "family": "Giovani"
+    },
+    "young_caucasian_female/young_caucasian_female.json": {
+      "label": "Donna giovane · tono chiaro · A",
+      "description": "Prima resa femminile giovane dal tono chiaro.",
+      "family": "Giovani"
+    },
+    "young_caucasian_female/young_caucasian_female2.json": {
+      "label": "Donna giovane · tono chiaro · alternativa",
+      "description": "Resa alternativa femminile giovane dal tono chiaro.",
+      "family": "Giovani"
+    },
+    "young_caucasian_male/young_caucasian_male_special_suit.json": {
+      "label": "Uomo giovane · chiaro · completa",
+      "description": "Variante maschile giovane e chiara con mappa corpo completa.",
+      "family": "Giovani"
+    },
+    "young_caucasian_male/young_caucasian_male.json": {
+      "label": "Uomo giovane · tono chiaro · A",
+      "description": "Prima resa maschile giovane dal tono chiaro.",
+      "family": "Giovani"
+    },
+    "young_caucasian_male/young_caucasian_male2.json": {
+      "label": "Uomo giovane · tono chiaro · alternativa",
+      "description": "Resa alternativa maschile giovane dal tono chiaro.",
+      "family": "Giovani"
+    },
+    "young_eurasian_female/young_eurasian_female.json": {
+      "label": "Donna giovane · tono neutro",
+      "description": "Pelle femminile giovane dalla resa neutra.",
+      "family": "Giovani"
+    }
+  },
+  "targets": {
+    "arms01/elvs_ladies_elbow_dimples": {
+      "label": "Fossette dei gomiti",
+      "description": "Aumenta il dettaglio delle fossette nella zona del gomito.",
+      "group": "Braccia · dettagli"
+    },
+    "arms01/mindfront_arm_lower_shape": {
+      "label": "Forma avambraccio",
+      "description": "Modifica il profilo generale dell'avambraccio.",
+      "group": "Braccia · forma"
+    },
+    "arms01/mindfront_arm_upper_shape": {
+      "label": "Forma braccio superiore",
+      "description": "Modifica il profilo generale del braccio superiore.",
+      "group": "Braccia · forma"
+    },
+    "arms01/mindfront_arm_wrist_ulna": {
+      "label": "Ulna al polso più marcata",
+      "description": "Aumenta la prominenza dell'ulna nella zona del polso.",
+      "group": "Braccia · dettagli"
+    },
+    "arms01/mindfront_armpit": {
+      "label": "Forma dell'ascella",
+      "description": "Rifinisce il volume e la forma dell'ascella.",
+      "group": "Braccia · dettagli"
+    },
+    "cheek01/elvs_chipmunk_cheeks_high_1": {
+      "label": "Guance piene · parte alta",
+      "description": "Aumenta il volume nella parte alta delle guance.",
+      "group": "Guance · volume"
+    },
+    "cheek01/elvs_chipmunk_cheeks_low_1": {
+      "label": "Guance piene · parte bassa",
+      "description": "Aumenta il volume nella parte bassa delle guance.",
+      "group": "Guance · volume"
+    },
+    "cheek01/elvs_high_chubby_cheekbones_1": {
+      "label": "Zigomi alti e pieni",
+      "description": "Rende la zona degli zigomi più alta e piena.",
+      "group": "Guance · zigomi"
+    },
+    "cheek01/elvs_jowls_1": {
+      "label": "Guance cadenti",
+      "description": "Aggiunge volume rilassato nella parte bassa delle guance, verso la mandibola.",
+      "group": "Guance · volume"
+    },
+    "cheek01/elvs_sunken_cheeks_1": {
+      "label": "Guance scavate",
+      "description": "Riduce il volume centrale delle guance creando un aspetto più scavato.",
+      "group": "Guance · volume"
+    },
+    "hands01/jujube_knobby_knuckles": {
+      "label": "Nocche marcate",
+      "description": "Rende le nocche più evidenti.",
+      "group": "Mani · dettagli"
+    },
+    "hands01/mindfront_hand_fingers_correction": {
+      "label": "Correzione proporzioni dita",
+      "description": "Rifinisce forma e proporzioni delle dita.",
+      "group": "Mani · forma"
+    },
+    "hands01/mindfront_hand_hypothenar": {
+      "label": "Volume lato mignolo del palmo",
+      "description": "Modifica l'eminenza del palmo sul lato del mignolo.",
+      "group": "Mani · palmo"
+    },
+    "hands01/mindfront_hand_thenar_eminence": {
+      "label": "Volume base del pollice",
+      "description": "Modifica l'eminenza del palmo alla base del pollice.",
+      "group": "Mani · palmo"
+    },
+    "nose01/elvs_bulbous_nose_1": {
+      "label": "Punta bulbosa",
+      "description": "Rende la punta del naso più rotonda e piena.",
+      "group": "Naso · punta"
+    },
+    "nose01/elvs_nose_widening_1": {
+      "label": "Naso più largo",
+      "description": "Aumenta la larghezza complessiva del naso.",
+      "group": "Naso · larghezza"
+    },
+    "nose01/habanero_nostril_alar_rounding": {
+      "label": "Ali nasali arrotondate",
+      "description": "Arrotonda il profilo esterno delle ali del naso.",
+      "group": "Naso · narici"
+    },
+    "nose01/jujube_greek_statue_nose": {
+      "label": "Profilo greco",
+      "description": "Rende il dorso del naso più lineare, in stile profilo greco.",
+      "group": "Naso · profilo"
+    },
+    "nose01/jujube_nasiolabial_sharp_angle": {
+      "label": "Angolo naso-labbro marcato",
+      "description": "Rende più netto l'angolo tra base del naso e labbro superiore.",
+      "group": "Naso · base"
+    },
+    "nose01/jujube_nasolabial_angle_crease": {
+      "label": "Piega naso-labbro",
+      "description": "Aumenta la piega nell'angolo tra naso e labbro superiore.",
+      "group": "Naso · base"
+    },
+    "nose01/jujube_nose_straight_columella": {
+      "label": "Columella più dritta",
+      "description": "Raddrizza la columella, la parte centrale tra le narici.",
+      "group": "Naso · base"
+    },
+    "nose01/jujube_nostril_bean_shape": {
+      "label": "Narici a fagiolo",
+      "description": "Modifica la forma delle narici verso un profilo più curvo e allungato.",
+      "group": "Naso · narici"
+    },
+    "nose01/jujube_nostril_deepen": {
+      "label": "Narici più profonde",
+      "description": "Aumenta la profondità visiva delle aperture delle narici.",
+      "group": "Naso · narici"
+    },
+    "nose01/jujube_nostril_rim_sharp": {
+      "label": "Bordo narici definito",
+      "description": "Rende più netto il bordo delle narici.",
+      "group": "Naso · narici"
+    },
+    "nose01/jujube_nostril_shrink": {
+      "label": "Narici più piccole",
+      "description": "Riduce la dimensione delle aperture delle narici.",
+      "group": "Naso · narici"
+    },
+    "nose01/jujube_nostril_up": {
+      "label": "Narici rialzate",
+      "description": "Sposta verso l'alto il profilo delle narici.",
+      "group": "Naso · narici"
+    },
+    "nose01/mindfront_nose_alar_crease": {
+      "label": "Solco delle ali nasali",
+      "description": "Aumenta il solco tra ala nasale e guancia.",
+      "group": "Naso · base"
+    },
+    "nose01/mindfront_nose_hole_center": {
+      "label": "Apertura narici centrata",
+      "description": "Riposiziona l'apertura delle narici verso il centro.",
+      "group": "Naso · narici"
+    },
+    "nose01/mindfront_nose_hole_up": {
+      "label": "Apertura narici più alta",
+      "description": "Sposta verso l'alto l'apertura delle narici.",
+      "group": "Naso · narici"
+    },
+    "ears01/elvs_ear_flap_bottom_out": {
+      "label": "Parte bassa dell'orecchio sporgente",
+      "description": "Aumenta la sporgenza della zona inferiore del padiglione.",
+      "group": "Orecchie · forma"
+    },
+    "ears01/elvs_flap_ears_1": {
+      "label": "Orecchie a sventola · lieve",
+      "description": "Prima intensità della sporgenza laterale delle orecchie.",
+      "group": "Orecchie · sporgenza"
+    },
+    "ears01/elvs_flap_ears_2": {
+      "label": "Orecchie a sventola · media",
+      "description": "Seconda intensità della sporgenza laterale delle orecchie.",
+      "group": "Orecchie · sporgenza"
+    },
+    "ears01/elvs_flap_ears_3": {
+      "label": "Orecchie a sventola · marcata",
+      "description": "Terza intensità della sporgenza laterale delle orecchie.",
+      "group": "Orecchie · sporgenza"
+    },
+    "ears01/jujube_ear_canal": {
+      "label": "Canale uditivo più definito",
+      "description": "Aggiunge definizione alla zona del canale uditivo.",
+      "group": "Orecchie · dettagli"
+    },
+    "ears01/mindfront_ear_details": {
+      "label": "Dettagli del padiglione",
+      "description": "Rifinisce pieghe e volumi interni dell'orecchio.",
+      "group": "Orecchie · dettagli"
+    },
+    "ears01/mindfront_ear_in": {
+      "label": "Orecchie più aderenti",
+      "description": "Riduce la sporgenza laterale avvicinando le orecchie alla testa.",
+      "group": "Orecchie · sporgenza"
+    },
+    "ears01/rehmanpolanski_ear_flatten": {
+      "label": "Padiglione più piatto",
+      "description": "Appiattisce parte del volume del padiglione auricolare.",
+      "group": "Orecchie · forma"
+    }
+  },
+  "assets": {
+    "clothes/Jacket_Tie_Pants/Jacket_Tie_Pants.json": {
+      "group": "dresses",
+      "section": "Guardaroba",
+      "label": "Completo giacca, cravatta e pantaloni",
+      "description": "Completo coordinato a corpo intero."
+    },
+    "clothes/mens_shirt_tie_tuck_elv1f/mens_shirt_tie_tuck_elv1f.json": {
+      "group": "tops",
+      "section": "Guardaroba",
+      "label": "Camicia uomo con cravatta",
+      "description": "Camicia maschile infilata nei pantaloni con cravatta."
+    },
+    "clothes/bandana_mask/bandana_mask.json": {
+      "group": "masks",
+      "section": "Accessori",
+      "label": "Bandana / maschera",
+      "description": "Bandana indossata sul volto."
+    },
+    "clothes/collar-chain/collar-chain.json": {
+      "group": "jewelry",
+      "section": "Accessori",
+      "label": "Collare a catena",
+      "description": "Accessorio a catena per il collo."
+    },
+    "clothes/Beard_Sigmund/Beard_Sigmund.json": {
+      "group": "facialHair",
+      "section": "Aspetto",
+      "label": "Barba Sigmund",
+      "description": "Barba completa stile Sigmund."
+    },
+    "clothes/BeardViking/BeardViking.json": {
+      "group": "facialHair",
+      "section": "Aspetto",
+      "label": "Barba vichinga",
+      "description": "Barba folta a tema vichingo."
+    },
+    "clothes/dali_moustache/dali_moustache.json": {
+      "group": "facialHair",
+      "section": "Aspetto",
+      "label": "Baffi Dalí",
+      "description": "Baffi sottili e arcuati verso l'alto."
+    },
+    "clothes/3dglasses/3dglasses.json": {
+      "label": "Occhiali tridimensionali",
+      "description": "Occhiali a montatura tridimensionale."
+    },
+    "clothes/Sagerfrog_s_Glasses_01/Sagerfrog_s_Glasses_01.json": {
+      "label": "Occhiali Sagerfrog · A",
+      "description": "Prima montatura della famiglia Sagerfrog."
+    },
+    "clothes/Sagerfrog_s_Glasses_02/Sagerfrog_s_Glasses_02.json": {
+      "label": "Occhiali Sagerfrog · B",
+      "description": "Seconda montatura della famiglia Sagerfrog."
+    },
+    "clothes/Sagerfrog_s_Glasses_03/Sagerfrog_s_Glasses_03.json": {
+      "label": "Occhiali Sagerfrog · C",
+      "description": "Terza montatura della famiglia Sagerfrog."
+    },
+    "clothes/Sagerfrog_s_Glasses_04/Sagerfrog_s_Glasses_04.json": {
+      "label": "Occhiali Sagerfrog · D",
+      "description": "Quarta montatura della famiglia Sagerfrog."
+    },
+    "clothes/TBM_Glasses_Frames_01/TBM_Glasses_Frames_01.json": {
+      "label": "Montatura TBM",
+      "description": "Montatura da vista della famiglia TBM."
+    },
+    "clothes/hero-heroine_gloves_1/hero-heroine_gloves_1.json": {
+      "label": "Guanti eroe · A",
+      "description": "Prima variante della famiglia guanti eroe."
+    },
+    "clothes/hero-heroine_gloves_2/hero-heroine_gloves_2.json": {
+      "label": "Guanti eroe · B",
+      "description": "Seconda variante della famiglia guanti eroe."
+    },
+    "clothes/hero-heroine_gloves_3/hero-heroine_gloves_3.json": {
+      "label": "Guanti eroe · C",
+      "description": "Terza variante della famiglia guanti eroe."
+    },
+    "clothes/hero-heroine_gloves_4/hero-heroine_gloves_4.json": {
+      "label": "Guanti eroe · D",
+      "description": "Quarta variante della famiglia guanti eroe."
+    },
+    "clothes/hero-heroine_gloves_5/hero-heroine_gloves_5.json": {
+      "label": "Guanti eroe · E",
+      "description": "Quinta variante della famiglia guanti eroe."
+    },
+    "clothes/female_top_01/female_top_01.json": {
+      "label": "Top donna",
+      "description": "Top femminile."
+    },
+    "clothes/Knitted_Sweater_01/Knitted_Sweater_01.json": {
+      "label": "Maglione lavorato · A",
+      "description": "Prima variante di maglione lavorato."
+    },
+    "clothes/Knitted_Sweater_02/Knitted_Sweater_02.json": {
+      "label": "Maglione lavorato · B",
+      "description": "Seconda variante di maglione lavorato."
+    },
+    "clothes/shoes01/shoes01.json": {
+      "label": "Scarpe MakeHuman · A",
+      "description": "Prima forma della famiglia scarpe MakeHuman."
+    },
+    "clothes/shoes02/shoes02.json": {
+      "label": "Scarpe MakeHuman · B",
+      "description": "Seconda forma della famiglia scarpe MakeHuman."
+    },
+    "clothes/shoes03/shoes03.json": {
+      "label": "Scarpe MakeHuman · C",
+      "description": "Terza forma della famiglia scarpe MakeHuman."
+    },
+    "clothes/shoes04/shoes04.json": {
+      "label": "Scarpe MakeHuman · D",
+      "description": "Quarta forma della famiglia scarpe MakeHuman."
+    },
+    "clothes/shoes05/shoes05.json": {
+      "label": "Scarpe MakeHuman · E",
+      "description": "Quinta forma della famiglia scarpe MakeHuman."
+    },
+    "clothes/shoes06/shoes06.json": {
+      "label": "Scarpe MakeHuman · F",
+      "description": "Sesta forma della famiglia scarpe MakeHuman."
+    },
+    "hair/bob01/bob01.json": {
+      "label": "Caschetto · A",
+      "description": "Prima variante di caschetto."
+    },
+    "hair/bob02/bob02.json": {
+      "label": "Caschetto · B",
+      "description": "Seconda variante di caschetto."
+    },
+    "hair/curly/curly.json": {
+      "label": "Ricci · A",
+      "description": "Prima variante di capelli ricci."
+    },
+    "hair/curly2/curly2.json": {
+      "label": "Ricci · B",
+      "description": "Seconda variante di capelli ricci."
+    },
+    "hair/fhair01/fhair01.json": {
+      "label": "Capelli donna · classici",
+      "description": "Taglio femminile della libreria MakeHuman."
+    },
+    "hair/hair1/hair1.json": {
+      "label": "Capelli MakeHuman · base",
+      "description": "Taglio base della libreria MakeHuman."
+    },
+    "hair/hair_01/hair_01.json": {
+      "label": "Capelli MakeHuman · A",
+      "description": "Variante della famiglia capelli MakeHuman."
+    },
+    "hair/hair_02/hair_02.json": {
+      "label": "Capelli MakeHuman · B",
+      "description": "Variante della famiglia capelli MakeHuman."
+    },
+    "hair/hair_03/hair_03.json": {
+      "label": "Capelli MakeHuman · C",
+      "description": "Variante della famiglia capelli MakeHuman."
+    },
+    "hair/hair_04/hair_04.json": {
+      "label": "Capelli MakeHuman · D",
+      "description": "Variante della famiglia capelli MakeHuman."
+    },
+    "hair/hair_05/hair_05.json": {
+      "label": "Capelli MakeHuman · E",
+      "description": "Variante della famiglia capelli MakeHuman."
+    },
+    "hair/hair_06/hair_06.json": {
+      "label": "Capelli MakeHuman · F",
+      "description": "Variante della famiglia capelli MakeHuman."
+    },
+    "hair/hair_07/hair_07.json": {
+      "label": "Capelli MakeHuman · G",
+      "description": "Variante della famiglia capelli MakeHuman."
+    },
+    "hair/hair_08/hair_08.json": {
+      "label": "Capelli MakeHuman · H",
+      "description": "Variante della famiglia capelli MakeHuman."
+    },
+    "hair/long01/long01.json": {
+      "label": "Lunghi · A",
+      "description": "Prima variante di capelli lunghi."
+    },
+    "hair/long_alpha7/long_alpha7.json": {
+      "label": "Lunghi · B",
+      "description": "Seconda variante di capelli lunghi."
+    },
+    "hair/long2_alpha7/long2_alpha7.json": {
+      "label": "Lunghi · C",
+      "description": "Terza variante di capelli lunghi."
+    },
+    "hair/mhair02/mhair02.json": {
+      "label": "Capelli uomo · classici",
+      "description": "Taglio maschile della libreria MakeHuman."
+    },
+    "hair/o4saken_chinesebob01/o4saken_chinesebob01.json": {
+      "label": "Caschetto Saken",
+      "description": "Caschetto della famiglia sorgente Saken."
+    },
+    "hair/o4saken_curly01/o4saken_curly01.json": {
+      "label": "Ricci Saken",
+      "description": "Capelli ricci della famiglia sorgente Saken."
+    },
+    "hair/o4saken_long01/o4saken_long01.json": {
+      "label": "Lunghi Saken",
+      "description": "Capelli lunghi della famiglia sorgente Saken."
+    },
+    "hair/ponytail01/ponytail01.json": {
+      "label": "Coda di cavallo",
+      "description": "Capelli raccolti a coda di cavallo."
+    },
+    "hair/short01/short01.json": {
+      "label": "Corti · A",
+      "description": "Prima variante di capelli corti."
+    },
+    "hair/short02/short02.json": {
+      "label": "Corti · B",
+      "description": "Seconda variante di capelli corti."
+    },
+    "hair/short03/short03.json": {
+      "label": "Corti · C",
+      "description": "Terza variante di capelli corti."
+    },
+    "hair/short04/short04.json": {
+      "label": "Corti · D",
+      "description": "Quarta variante di capelli corti."
+    },
+    "hair/elv_50supdo1/elv_50supdo1.json": {
+      "label": "Raccolto vintage",
+      "description": "Acconciatura raccolta di ispirazione vintage."
+    },
+    "hair/elvs_that80sbabe_m1/elvs_that80sbabe_m1.json": {
+      "label": "Taglio rétro",
+      "description": "Acconciatura rétro."
+    },
+    "hair/witchybob_elv2/witchybob_elv2.json": {
+      "label": "Caschetto Witchy",
+      "description": "Caschetto della famiglia Witchy."
+    },
+    "teeth/Teeth_Base/Teeth_Base.json": {
+      "label": "Dentatura naturale",
+      "description": "Dentatura base MakeHuman."
+    },
+    "teeth/Teeth_Shape01/Teeth_Shape01.json": {
+      "label": "Dentatura · A",
+      "description": "Prima variante di forma della dentatura."
+    },
+    "teeth/Teeth_Shape02/Teeth_Shape02.json": {
+      "label": "Dentatura · B",
+      "description": "Seconda variante di forma della dentatura."
+    },
+    "teeth/Teeth_Shape03/Teeth_Shape03.json": {
+      "label": "Dentatura · C",
+      "description": "Terza variante di forma della dentatura."
+    },
+    "teeth/Teeth_Shape04/Teeth_Shape04.json": {
+      "label": "Dentatura · D",
+      "description": "Quarta variante di forma della dentatura."
+    },
+    "teeth/Teeth_Shape05/Teeth_Shape05.json": {
+      "label": "Dentatura · E",
+      "description": "Quinta variante di forma della dentatura."
+    },
+    "tongue/tongue01/tongue01.json": {
+      "label": "Lingua naturale",
+      "description": "Lingua base MakeHuman."
+    },
+    "clothes/armsleeve_fishnet_medium/armsleeve_fishnet_medium.json": {
+      "section": "Accessori",
+      "group": "armsleeves",
+      "label": "Manica a rete",
+      "description": "Manica separata senza maglia."
+    },
+    "clothes/armsleeve_white_s/armsleeve_white_s.json": {
+      "section": "Accessori",
+      "group": "armsleeves",
+      "label": "Manica bianca",
+      "description": "Manica separata senza maglia."
+    },
+    "clothes/Asymmetric_Tunic_and_Sash/Asymmetric_Tunic_and_Sash.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Tunica asimmetrica con fascia",
+      "description": "Capo lungo che arriva circa a metà ginocchio."
+    },
+    "clothes/bandbikinibra/bandbikinibra.json": {
+      "section": "Guardaroba",
+      "group": "underwear",
+      "label": "Bikini a fascia · sopra",
+      "description": "Parte superiore del bikini a fascia."
+    },
+    "clothes/bandbikinislip/bandbikinislip.json": {
+      "section": "Guardaroba",
+      "group": "underwear",
+      "label": "Bikini a fascia · sotto",
+      "description": "Parte inferiore del bikini a fascia."
+    },
+    "clothes/Botas_102/Botas_102.json": {
+      "section": "Guardaroba",
+      "group": "shoes",
+      "label": "Stivali classici",
+      "description": "Stivali."
+    },
+    "clothes/BotasTaconBajo/BotasTaconBajo.json": {
+      "section": "Guardaroba",
+      "group": "shoes",
+      "label": "Stivali con tacco basso",
+      "description": "Stivali a tacco basso."
+    },
+    "clothes/brave_feathers/brave_feathers.json": {
+      "section": "Accessori",
+      "group": "hats",
+      "label": "Copricapo con piume",
+      "description": "Accessorio da testa con piume."
+    },
+    "clothes/BrazBikiniBra/BrazBikiniBra.json": {
+      "section": "Guardaroba",
+      "group": "underwear",
+      "label": "Bikini brasiliano · sopra",
+      "description": "Parte superiore del bikini."
+    },
+    "clothes/BrazBikiniSlip/BrazBikiniSlip.json": {
+      "section": "Guardaroba",
+      "group": "underwear",
+      "label": "Bikini brasiliano · sotto",
+      "description": "Parte inferiore del bikini."
+    },
+    "clothes/CrudeFemaleTshirt/CrudeFemaleTshirt.json": {
+      "section": "Guardaroba",
+      "group": "tops",
+      "label": "T-shirt donna basic",
+      "description": "Maglietta donna semplice."
+    },
+    "clothes/Diver_Scuba_Rig/Diver_Scuba_Rig.json": {
+      "section": "Accessori",
+      "group": "equipment",
+      "label": "Imbracatura da sub",
+      "description": "Attrezzatura da immersione."
+    },
+    "clothes/Diver_Suit/Diver_Suit.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Muta da sub completa",
+      "description": "Completo da immersione."
+    },
+    "clothes/ElectricGuitar/ElectricGuitar.json": {
+      "section": "Accessori",
+      "group": "equipment",
+      "label": "Chitarra elettrica",
+      "description": "Strumento musicale indossabile."
+    },
+    "clothes/elv_maidonnet1/elv_maidonnet1.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Completo Maidonnette",
+      "description": "Vestito completo."
+    },
+    "clothes/elvs_basic_elfshoe1/elvs_basic_elfshoe1.json": {
+      "section": "Guardaroba",
+      "group": "shoes",
+      "label": "Scarpe elfiche",
+      "description": "Scarpe a tema elfico."
+    },
+    "clothes/elvs_heelboot1/elvs_heelboot1.json": {
+      "section": "Guardaroba",
+      "group": "shoes",
+      "label": "Stivali con tacco",
+      "description": "Stivali con tacco."
+    },
+    "clothes/elvs_lady_apron1/elvs_lady_apron1.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Completo con grembiule",
+      "description": "Vestito completo con grembiule."
+    },
+    "clothes/elvs_race_suit_female1/elvs_race_suit_female1.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Tuta da gara donna",
+      "description": "Tuta completa da gara."
+    },
+    "clothes/elvs_race_suit_male1/elvs_race_suit_male1.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Tuta da gara uomo",
+      "description": "Tuta completa da gara."
+    },
+    "clothes/F_Bikini_01/F_Bikini_01.json": {
+      "section": "Guardaroba",
+      "group": "underwear",
+      "label": "Bikini donna",
+      "description": "Bikini classificato come intimo/costume."
+    },
+    "clothes/F_One-piece_Swimsuit_01/F_One-piece_Swimsuit_01.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Costume intero donna",
+      "description": "Costume da bagno intero."
+    },
+    "clothes/Fem_Suit_Double_Breasted/Fem_Suit_Double_Breasted.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Completo doppiopetto donna",
+      "description": "Completo donna doppiopetto."
+    },
+    "clothes/Fem_Suit2/Fem_Suit2.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Completo donna · B",
+      "description": "Completo donna."
+    },
+    "clothes/female_casualsuit01/female_casualsuit01.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Completo casual donna · A",
+      "description": "Completo casual donna."
+    },
+    "clothes/female_casualsuit02/female_casualsuit02.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Completo casual donna · B",
+      "description": "Completo casual donna."
+    },
+    "clothes/female_elegantsuit01/female_elegantsuit01.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Completo elegante donna",
+      "description": "Completo elegante donna."
+    },
+    "clothes/female_sportsuit01/female_sportsuit01.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Tuta sportiva donna",
+      "description": "Tuta completa sportiva."
+    },
+    "clothes/Flats_ballet_bow/Flats_ballet_bow.json": {
+      "section": "Guardaroba",
+      "group": "shoes",
+      "label": "Ballerine con fiocco",
+      "description": "Ballerine con fiocco."
+    },
+    "clothes/Flats_ballet_flower/Flats_ballet_flower.json": {
+      "section": "Guardaroba",
+      "group": "shoes",
+      "label": "Ballerine con fiore",
+      "description": "Ballerine con decorazione floreale."
+    },
+    "clothes/Flats_ballet/Flats_ballet.json": {
+      "section": "Guardaroba",
+      "group": "shoes",
+      "label": "Ballerine classiche",
+      "description": "Ballerine."
+    },
+    "clothes/goggles/goggles.json": {
+      "section": "Accessori",
+      "group": "glasses",
+      "label": "Occhiali protettivi",
+      "description": "Occhiali protettivi."
+    },
+    "clothes/Harvey_MadScientistGlovesV1/Harvey_MadScientistGlovesV1.json": {
+      "section": "Accessori",
+      "group": "gloves",
+      "label": "Guanti da scienziato",
+      "description": "Guanti stile scienziato."
+    },
+    "clothes/Harvey_PantsBootsV1/Harvey_PantsBootsV1.json": {
+      "section": "Guardaroba",
+      "group": "bottoms",
+      "label": "Pantaloni Harvey",
+      "description": "Asset combinato pantaloni/stivali classificato come parte bassa.",
+      "wardrobe": {
+        "occupies": [
+          "bottoms",
+          "shoes"
+        ],
+        "reason": "Questo asset contiene pantaloni e stivali nello stesso proxy."
+      }
+    },
+    "clothes/Harvey_PSkirt01/Harvey_PSkirt01.json": {
+      "section": "Guardaroba",
+      "group": "bottoms",
+      "label": "Gonna Harvey",
+      "description": "Gonna."
+    },
+    "clothes/Harvey_ShoeSaddle1/Harvey_ShoeSaddle1.json": {
+      "section": "Guardaroba",
+      "group": "shoes",
+      "label": "Scarpe saddle Harvey",
+      "description": "Scarpe saddle."
+    },
+    "clothes/Harvey_VestV1/Harvey_VestV1.json": {
+      "section": "Guardaroba",
+      "group": "tops",
+      "label": "Gilet Harvey",
+      "description": "Gilet."
+    },
+    "clothes/HarveyCapeV1/HarveyCapeV1.json": {
+      "section": "Guardaroba",
+      "group": "outerwear",
+      "label": "Mantello Harvey",
+      "description": "Mantello / capospalla."
+    },
+    "clothes/headmirror/headmirror.json": {
+      "section": "Accessori",
+      "group": "hats",
+      "label": "Specchio frontale medico",
+      "description": "Accessorio da testa da medico."
+    },
+    "clothes/Headset/Headset.json": {
+      "section": "Accessori",
+      "group": "hats",
+      "label": "Headset",
+      "description": "Accessorio indossato sulla testa."
+    },
+    "clothes/hero_gem/hero_gem.json": {
+      "section": "Accessori",
+      "group": "jewelry",
+      "label": "Gemma da collo",
+      "description": "Accessorio/gioiello indossato al collo."
+    },
+    "clothes/LaceChoker/LaceChoker.json": {
+      "section": "Accessori",
+      "group": "jewelry",
+      "label": "Girocollo in pizzo",
+      "description": "Accessorio da collo."
+    },
+    "clothes/ladieshoodiedown1/ladieshoodiedown1.json": {
+      "section": "Guardaroba",
+      "group": "tops",
+      "label": "Felpa donna",
+      "description": "Felpa donna."
+    },
+    "clothes/ladiestank1elv/ladiestank1elv.json": {
+      "section": "Guardaroba",
+      "group": "tops",
+      "label": "Canotta donna",
+      "description": "Canotta donna."
+    },
+    "clothes/M_Swimming_trunks_01/M_Swimming_trunks_01.json": {
+      "section": "Guardaroba",
+      "group": "underwear",
+      "label": "Costume uomo · A",
+      "description": "Costume da bagno uomo."
+    },
+    "clothes/M_Swimming_trunks_02/M_Swimming_trunks_02.json": {
+      "section": "Guardaroba",
+      "group": "underwear",
+      "label": "Costume uomo · B",
+      "description": "Costume da bagno uomo."
+    },
+    "clothes/m_wifebeater_elv1/m_wifebeater_elv1.json": {
+      "section": "Guardaroba",
+      "group": "tops",
+      "label": "Canotta uomo",
+      "description": "Canotta uomo."
+    },
+    "clothes/male_casualsuit01/male_casualsuit01.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Completo casual uomo · A",
+      "description": "Completo casual uomo."
+    },
+    "clothes/male_casualsuit02/male_casualsuit02.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Completo casual uomo · B",
+      "description": "Completo casual uomo."
+    },
+    "clothes/male_casualsuit03/male_casualsuit03.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Completo casual uomo · C",
+      "description": "Completo casual uomo."
+    },
+    "clothes/male_casualsuit04/male_casualsuit04.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Completo casual uomo · D",
+      "description": "Completo casual uomo."
+    },
+    "clothes/male_casualsuit05/male_casualsuit05.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Completo casual uomo · E",
+      "description": "Completo casual uomo."
+    },
+    "clothes/male_casualsuit06/male_casualsuit06.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Completo casual uomo · F",
+      "description": "Completo casual uomo."
+    },
+    "clothes/male_elegantsuit01/male_elegantsuit01.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Completo elegante uomo",
+      "description": "Completo elegante uomo."
+    },
+    "clothes/male_worksuit01/male_worksuit01.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Completo da lavoro uomo",
+      "description": "Completo da lavoro uomo."
+    },
+    "clothes/Mars-Suit/Mars-Suit.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Tuta Mars",
+      "description": "Completo/tuta a corpo intero."
+    },
+    "clothes/mens_teeshirt1j/mens_teeshirt1j.json": {
+      "section": "Guardaroba",
+      "group": "tops",
+      "label": "T-shirt uomo",
+      "description": "Maglietta uomo."
+    },
+    "clothes/Microphone/Microphone.json": {
+      "section": "Accessori",
+      "group": "equipment",
+      "label": "Microfono",
+      "description": "Microfono indossabile."
+    },
+    "clothes/Mycenaean_Tunic/Mycenaean_Tunic.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Tunica micenea",
+      "description": "Completo/tunica a corpo intero."
+    },
+    "clothes/pillow_man/pillow_man.json": {
+      "section": "Aspetto",
+      "group": "bodyDetail",
+      "label": "Skin Pillow Man",
+      "description": "Skin/corpo speciale Pillow Man."
+    },
+    "clothes/Rucksack1/Rucksack1.json": {
+      "section": "Accessori",
+      "group": "equipment",
+      "label": "Zaino",
+      "description": "Zaino."
+    },
+    "clothes/ruffle_sleeve_peasantblouse/ruffle_sleeve_peasantblouse.json": {
+      "section": "Guardaroba",
+      "group": "tops",
+      "label": "Blusa contadina",
+      "description": "Blusa con maniche arricciate."
+    },
+    "clothes/Sari1/Sari1.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Sari",
+      "description": "Sari completo."
+    },
+    "clothes/sarong_coverup1/sarong_coverup1.json": {
+      "section": "Guardaroba",
+      "group": "bottoms",
+      "label": "Pareo",
+      "description": "Pareo / copertura parte bassa."
+    },
+    "clothes/stethoscope/stethoscope.json": {
+      "section": "Accessori",
+      "group": "equipment",
+      "label": "Stetoscopio",
+      "description": "Accessorio medico."
+    },
+    "clothes/Suit_Double_Breasted/Suit_Double_Breasted.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Completo doppiopetto",
+      "description": "Completo doppiopetto."
+    },
+    "clothes/Suit3/Suit3.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Completo classico",
+      "description": "Completo."
+    },
+    "clothes/suitcase/suitcase.json": {
+      "section": "Accessori",
+      "group": "equipment",
+      "label": "Valigia",
+      "description": "Valigia."
+    },
+    "clothes/SunVisor/SunVisor.json": {
+      "section": "Accessori",
+      "group": "hats",
+      "label": "Visiera",
+      "description": "Visiera da testa."
+    },
+    "clothes/tbar/tbar.json": {
+      "section": "Accessori",
+      "group": "equipment",
+      "label": "Accessorio T-bar",
+      "description": "Accessorio generico T-bar."
+    },
+    "clothes/Tennisdress/Tennisdress.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Vestito da tennis",
+      "description": "Vestito completo da tennis."
+    },
+    "clothes/tennisracket/tennisracket.json": {
+      "section": "Accessori",
+      "group": "equipment",
+      "label": "Racchetta da tennis",
+      "description": "Racchetta da tennis."
+    },
+    "clothes/triathlon_suit/triathlon_suit.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Tuta da triathlon",
+      "description": "Tuta completa da triathlon."
+    },
+    "clothes/Turtleneck_Halter/Turtleneck_Halter.json": {
+      "section": "Guardaroba",
+      "group": "tops",
+      "label": "Top halter a collo alto",
+      "description": "Top halter a collo alto."
+    },
+    "clothes/WeddingRing/WeddingRing.json": {
+      "section": "Accessori",
+      "group": "jewelry",
+      "label": "Fede nuziale",
+      "description": "Anello/fede nuziale."
+    },
+    "clothes/wetsuit/wetsuit.json": {
+      "section": "Guardaroba",
+      "group": "dresses",
+      "label": "Muta",
+      "description": "Muta a corpo intero."
+    },
+    "clothes/xmascap/xmascap.json": {
+      "section": "Accessori",
+      "group": "hats",
+      "label": "Cappello natalizio",
+      "description": "Cappello natalizio."
+    }
+  },
+  "labelPolicy": {
+    "visibleDigits": false,
+    "rawIdsUntouched": true,
+    "fallback": "Rimuove numeri tecnici e disambigua duplicati con A/B/C.",
+    "fakePhysicalDescriptions": false
+  }
+}

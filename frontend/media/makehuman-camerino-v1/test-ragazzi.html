@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anni di Fame — Test editor MakeHuman</title>
+<style>
+:root{--bg:#090a0c;--panel:#111317;--line:#292b31;--text:#ece8df;--muted:#8e8a82;--gold:#d7aa5c}
+*{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:13px Arial,sans-serif}
+body{display:grid;grid-template-rows:54px 1fr}header{display:flex;align-items:center;gap:16px;padding:0 18px;border-bottom:1px solid var(--line);background:#0c0d10}
+header b{letter-spacing:.08em}header span,p{color:var(--muted)}main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 340px}
+.viewer{min-height:0;background:#000}iframe{width:100%;height:100%;border:0}
+aside{overflow:auto;border-left:1px solid var(--line);background:var(--panel);padding:16px}h1{font-size:17px}h2{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin:20px 0 8px}
+.field{margin:9px 0}label{display:block;color:#b9b4aa;font-size:11px;margin-bottom:5px}
+input[type=text],textarea,select{width:100%;border:1px solid var(--line);border-radius:8px;background:#0b0d10;color:var(--text);padding:9px}
+textarea{min-height:100px;resize:vertical}.check{display:grid;grid-template-columns:22px 1fr;gap:7px;padding:7px 0;border-bottom:1px solid #202228}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px}button{border:1px solid var(--line);border-radius:8px;padding:9px;background:#17191e;color:var(--text);cursor:pointer}
+button.primary{border-color:#6a532c;background:#2a2113;color:#f1d69d}#status{margin-top:10px;color:var(--muted);font-size:11px}
+@media(max-width:980px){main{grid-template-columns:1fr;grid-template-rows:65vh auto}aside{border-left:0;border-top:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<header><b>ANNI DI FAME · TEST MAKEHUMAN V2.13.6</b><span>Pagina QA per tester</span></header>
+<main>
+<section class="viewer"><iframe id="editor" src="./index.html?qa=1"></iframe></section>
+<aside>
+<h1>Sessione di test</h1>
+<p>Provate liberamente l'editor. Segnate solo problemi riproducibili.</p>
+<div class="field"><label>Tester</label><input id="tester" type="text" placeholder="Nome / nickname"></div>
+<div class="field"><label>Dispositivo / browser</label><input id="device" type="text"></div>
+<h2>Checklist</h2><div id="checks"></div>
+<h2>Problemi trovati</h2>
+<div class="field"><label>Sezione</label><select id="section"><option>Identità</option><option>Volto</option><option>Corpo</option><option>Capelli & dettagli</option><option>Guardaroba</option><option>Pelle</option><option>Personalizzazione</option><option>Conferma</option></select></div>
+<div class="field"><label>Descrizione / come riprodurlo</label><textarea id="notes" placeholder="1. Vai su…&#10;2. Sposta…&#10;3. Succede…"></textarea></div>
+<div class="actions"><button id="save">Salva note</button><button id="export" class="primary">Esporta JSON</button><button id="reload">Ricarica editor</button><button id="clear">Azzera sessione</button></div>
+<div id="status">Pronto.</div>
+</aside></main>
+<script>
+(()=>{const KEY='adf-makehuman-qa-v2131';const items=[
+'Il personaggio compare correttamente','Tutti i controlli visibili sono in italiano','Identità contiene solo controlli generali',
+'Volto non contiene controlli del corpo','Corpo non contiene controlli del volto','Più slider restano applicati insieme',
+'Occhi/sopracciglia/capelli funzionano','Pelle e guardaroba funzionano','Intero/Volto/Profilo funzionano',
+'Rotazione e zoom funzionano','Casuale non rompe il personaggio','Reset sezione agisce solo sulla sezione',
+'Anteprima funziona','Conferma mantiene il personaggio'];const $=id=>document.getElementById(id);const checks=$('checks');
+items.forEach((t,i)=>{const l=document.createElement('label');l.className='check';l.innerHTML=`<input type="checkbox" data-check="${i}"><span>${t}</span>`;checks.appendChild(l)});
+function collect(){return{schema:'adf.makehuman.qa.session.v1',build:'V2.13.6',savedAt:new Date().toISOString(),tester:$('tester').value.trim(),device:$('device').value.trim(),section:$('section').value,notes:$('notes').value,checklist:[...document.querySelectorAll('[data-check]')].map((x,i)=>({item:items[i],ok:x.checked}))}}
+function save(){localStorage.setItem(KEY,JSON.stringify(collect()))}function restore(){let d={};try{d=JSON.parse(localStorage.getItem(KEY)||'{}')}catch{};$('tester').value=d.tester||'';$('device').value=d.device||navigator.userAgent;$('section').value=d.section||'Identità';$('notes').value=d.notes||'';(d.checklist||[]).forEach((x,i)=>{const e=document.querySelector(`[data-check="${i}"]`);if(e)e.checked=!!x.ok})}
+$('save').onclick=()=>{save();$('status').textContent='Sessione salvata.'};$('export').onclick=()=>{const d=collect();save();const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`adf-makehuman-test-${(d.tester||'tester').replace(/[^a-z0-9_-]+/gi,'-')}-${Date.now()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);$('status').textContent='JSON esportato.'};
+$('reload').onclick=()=>{$('editor').src=`./index.html?qa=1&t=${Date.now()}`};$('clear').onclick=()=>{if(confirm('Azzero la sessione?')){localStorage.removeItem(KEY);location.reload()}};addEventListener('beforeunload',save);restore()})();
+</script>
+</body></html>
