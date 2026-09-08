@@ -21,7 +21,7 @@ const PORTA = Number(arg("--porta") || 8000);
 const RADICE = path.resolve(__dirname, "..", process.argv.includes("--dist") ? "dist" : ".");
 
 const TIPI = {
-  ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8",
+  ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8",
   ".css": "text/css; charset=utf-8", ".json": "application/json; charset=utf-8",
   ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp",
   ".gif": "image/gif", ".svg": "image/svg+xml", ".ico": "image/x-icon",

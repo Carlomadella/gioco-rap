@@ -155,6 +155,7 @@ function avviaAzioneDiretta(id){
     save();
     renderGioco();
     if(typeof renderHub === "function") renderHub();
+    if(typeof renderStudio === "function") renderStudio();
     return true;
   };
 
