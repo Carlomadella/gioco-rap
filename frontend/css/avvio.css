@@ -101,24 +101,6 @@
 @media (hover:hover){.land-voce.bloccata:hover::after{transform:scaleX(.25);background:rgba(255,255,255,.14)}}
 .land-voce.bloccata .frec{opacity:.72;font-size:11px;filter:grayscale(1)}
 
-@media (max-width:900px){
-  .land-avvio{top:auto;bottom:9px;max-height:calc(100% - 28px);transform:translateY(18px);width:100%}
-  .land.avvio-aperto .land-avvio{transform:translateY(0)}.land.avvio-aperto .land-dock{opacity:0;visibility:hidden}
-  .avv-testa{margin-bottom:12px}.avv-testa h2{font-size:clamp(28px,8vw,44px)}.avv-testa p{font-size:12.5px}
-  .avv-riga,.avv-slot{min-height:60px}.avv-diff{grid-template-columns:1fr;gap:7px}
-  .avv-diff-card{min-height:0;padding:13px 45px 13px 14px;border-radius:13px}.avv-diff-card b{font-size:15px}
-  .avv-diff-card p{margin-top:5px;font-size:10.5px}.avv-diff-tag{margin-bottom:5px}.avv-diff-card em{position:static;display:inline-block;margin-top:7px}
-  .avv-diff-go{right:14px;bottom:50%;transform:translateY(50%)}
-}
-@media (max-width:560px){
-  .land-avvio{bottom:5px;width:100%;max-height:calc(100% - 12px);overflow:auto;padding-right:4px}
-  .avv-testa h2{font-size:30px}.avv-testa p{font-size:11.5px;line-height:1.35}
-  .avv-riga,.avv-slot{grid-template-columns:38px minmax(0,1fr) 24px;gap:9px;min-height:55px;padding-top:7px;padding-bottom:7px}
-  .avv-slot-scelta{grid-template-columns:38px minmax(0,1fr) 24px}.avv-slot-scelta .avv-slot-stato{display:none}
-  .avv-ic{width:31px;height:31px;font-size:12px}.avv-tx b,.avv-slot-tx b{font-size:12px}.avv-tx small,.avv-slot-tx small{font-size:9.5px}
-  .avv-importa small{display:none}.avv-conferma-azioni{justify-content:stretch}.avv-conferma-azioni button{flex:1}
-  .avv-slot-row{grid-template-columns:minmax(0,1fr) auto}.avv-slot-row .avv-elimina{margin-left:6px;padding:7px 8px;font-size:8px}
-}
 @media (prefers-reduced-motion:reduce){
   .land-avvio,.land-kick,.land-hero h1,.land-sub,.land-hero .mrow.big,.land-dock,.avv-diff-card{transition:none!important}
   .land-avvio.step-in > *{animation:none!important}

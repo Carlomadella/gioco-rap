@@ -63,7 +63,7 @@
 .meter i.ok{background:linear-gradient(90deg,var(--acid),#8BD44B)}
 
 .gcols{display:grid;grid-template-columns:1fr;gap:16px;align-items:start}
-@media (max-width:900px){.gcols{grid-template-columns:1fr}}
+
 .gpane{display:none}
 .gpane.on{display:block}
 
@@ -179,15 +179,6 @@
   font-variant-numeric:tabular-nums}
 .dnota{margin:0;padding:13px 16px 15px;font-size:12px;line-height:1.6;color:var(--faint);
   border-top:1px solid rgba(255,255,255,.055)}
-
-@media (max-width:700px){
-  .dtesta{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .drow{flex-wrap:wrap;gap:10px}
-  .dnm{flex:1 1 auto}
-  .dcurva{order:4;flex:1 1 100%;width:auto}
-  .dand{order:3;width:auto;flex:1 1 auto;text-align:left}
-  .dnum{order:2;width:auto}
-}
 
 .crow{display:flex;align-items:center;gap:11px;padding:10px 14px;cursor:pointer;transition:background .15s}
 @media (hover:hover){.crow:hover{background:rgba(255,255,255,.045)}}
@@ -338,10 +329,6 @@
 .shbuy{margin:0 12px 12px;padding:9px;border-radius:10px;background:#fff;color:#0B0B0D;
   font-size:13px;font-weight:800;text-align:center}
 .shbuy:disabled{opacity:.35;cursor:not-allowed}
-@media (max-width:640px){
-  .shbar{position:static}
-  .shgrid{grid-template-columns:repeat(auto-fill,minmax(136px,1fr))}
-}
 
 /* La fase: una fascia, non una scheda. Dove sei a sinistra, i gradini a destra,
    e sotto l'unica riga che ti serve davvero — cosa fare adesso. */

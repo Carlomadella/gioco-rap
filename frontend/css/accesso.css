@@ -61,8 +61,3 @@
 .acc-piede a{color:inherit}
 .acc-nota{margin:18px 0 0; font-size:12.5px; line-height:1.5; color:var(--muted,#9aa0ab)}
 
-@media (max-width:520px){
-  .accesso{padding-top:80px}
-  .acc-scheda{padding:24px 20px 22px; border-radius:18px}
-  .acc-scheda h1{font-size:26px}
-}

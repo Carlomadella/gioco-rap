@@ -128,8 +128,3 @@
   letter-spacing:.05em;text-transform:uppercase;color:var(--text)}
 @media (hover:hover){#staccato button:hover{background:rgba(255,255,255,.1)}}
 
-@media (max-width:560px){
-  #servizio .foglio{padding:22px 18px 20px}
-  #staccato{flex-wrap:wrap}
-  #staccato .testo{flex:1 0 100%}
-}

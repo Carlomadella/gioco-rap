@@ -25,7 +25,6 @@
 .tile.hit{animation:hit .42s cubic-bezier(.2,.8,.3,1)}
 @keyframes hit{0%{transform:scale(1)}30%{transform:scale(1.05)}100%{transform:scale(1)}}
 
-
 /* rapporto di fine settimana */
 .report{position:fixed;inset:0;z-index:80;display:none;place-items:center;padding:20px;
   background:rgba(6,6,9,.9);backdrop-filter:blur(10px)}
@@ -111,28 +110,5 @@
 @media (hover:hover){.mutebtn:hover{background:rgba(255,255,255,.16)}}
 @media (prefers-reduced-motion:reduce){.toast,.rcard,.flash.on,.bigport{animation:none!important}}
 
-/* ---- SCHERMI STRETTI ----
-   Il rapporto di settimana e la scenetta della mossa sono due riquadri con
-   trenta punti d'imbottitura e tre caselle affiancate. Su un telefono da 360
-   quei trenta punti per lato, più i venti della cornice, lasciano 260 punti
-   veri: le tre caselle diventano da settantotto, e dentro ci va un numero da
-   27px che a «12.4K» è già fuori. Si stringe l'imbottitura e, sotto ai 400,
-   le caselle vanno a due per riga — l'ultima si prende la riga intera, che è
-   meglio di tre numeri tagliati. */
-@media (max-width:520px){
-  .report,.scenapiena{padding:12px}
-  .rcard,.scwrap{padding:20px 16px;border-radius:20px}
-  .rcard h2{font-size:34px;margin:5px 0 16px}
-  .rgrid{gap:8px}
-  .rbox{padding:12px 8px;border-radius:13px}
-  .rbox .v{font-size:22px}
-  .rbox .l{font-size:11px}
-  .rpos{padding:13px}
-  .rpos b{font-size:28px}
-}
-@media (max-width:400px){
-  .rgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  /* dispari: l'ultima casella si prende tutta la riga invece di restare
-     mezza vuota di fianco a un buco */
-  .rbox:last-child:nth-child(odd){grid-column:1/-1}
-}
+
+

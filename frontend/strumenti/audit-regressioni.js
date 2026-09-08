@@ -637,10 +637,14 @@ test("il tondo per ascoltare e «cambia copertina» si toccano a 44 punti",
    sessantina di punti di larghezza alla sua barra e il confronto diventa
    falso — una q85 sembrava più corta di una q71. La casella si stringe con lo
    schermo, ma a zero non ci va **mai**. */
+/* I blocchi stretti stanno in `css/stretto.css` dal 08/09/2026, non piu' nel
+   foglio di ognuno: la prova guarda tutti e due i posti, cosi' regge sia se il
+   blocco resta li' sia se un domani torna a casa sua. */
+const cssStretti = studioElCss + leggi("css/stretto.css");
 test("la casella del «← buona» non collassa: le barre delle take restano confrontabili",
-  !/\.sttakeb\{min-width:0\}/.test(studioElCss.replace(/\s+/g, "")) &&
-  /\.sttakeb\{min-width:56px/.test(studioElCss) &&
-  /\.sttakeb\{min-width:50px/.test(studioElCss));
+  !/\.sttakeb\{min-width:0\}/.test(cssStretti.replace(/\s+/g, "")) &&
+  /\.sttakeb\{min-width:56px/.test(cssStretti) &&
+  /\.sttakeb\{min-width:50px/.test(cssStretti));
 
 /* A 360 punti la nav globale si prende 210 punti fissi e i tre numeri della
    fascia ne vogliono quasi 190: su una riga sola l'ora finiva fuori dallo
@@ -648,7 +652,7 @@ test("la casella del «← buona» non collassa: le barre delle take restano con
    `--stAlta` deve crescere con lei se no le colonne ci finiscono dentro. */
 test("sotto i 480px la fascia dello Studio va su due righe e l'ora resta dentro",
   (() => {
-    const css = leggi("css/studio.css");
+    const css = leggi("css/studio.css") + leggi("css/stretto.css");
     const a = css.indexOf("@media (max-width:480px)");
     if(a < 0) return false;
     const corpo = css.slice(a, a + 700);
