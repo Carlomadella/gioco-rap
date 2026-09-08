@@ -4,21 +4,22 @@
 
 ## Copertura
 
-- **Schede importate:** 113
-- **Task effettive (duplicati esclusi):** 113
-- **Auditate contro il repo:** 0/113
+- **Schede importate:** 114
+- **Task effettive (duplicati esclusi):** 114
+- **Auditate contro il repo:** 0/114
 - **Duplicati intercettati:** 0
 - **Estensioni/sovrapposizioni:** 0
 - **Richieste già implementate senza task equivalente:** 0
 - **Progetti con piano V1→Vn:** 0 (forniti dall'utente: 0)
 - **Piani con gap/conflitti da rivedere:** 0
 - **Auditate ma non complete:** 0
-- Stato storico importato: da_fare 18 · in_parte 13 · fatto 77 · risposto 5
+- Stato storico importato: da_fare 18 · in_parte 13 · fatto 77 · risposto 5 · nuova 1
 
 ## Tutte le task e richieste
 
 | id | richiesta | ingresso | collegata a | fonte | stato storico | verifica repo | criteri |
 | --- | --- | --- | --- | --- | --- | --- | --- | ---: |
+| `ADF-NEW-3E6D8998D1BD` | voglio sistemare gli eventi ed il tempo in game | da classificare | — | implementazioni/implementazioni.md | 💡 nuova | — non ancora auditata | — |
 | `ADF-LEG-043B012E6E3B` | I cinque lavori per uscire | storica | — | implementazioni/08-uscita-sugli-store.md | 🔶 in parte | — non ancora auditata | — |
 | `ADF-LEG-AC19FC8CC48F` | I dialoghi devono essere tanti e diversi | storica | — | implementazioni/06-mondo-e-personaggi.md | 🔶 in parte | — non ancora auditata | — |
 | `ADF-LEG-D6B7FB24808B` | Il banco dei suoni rifatto | storica | — | implementazioni/04-musica-e-suoni.md | 🔶 in parte | — non ancora auditata | — |

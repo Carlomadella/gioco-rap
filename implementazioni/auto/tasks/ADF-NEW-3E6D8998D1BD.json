@@ -1,0 +1,36 @@
+{
+  "schema_version": 5,
+  "id": "ADF-NEW-3E6D8998D1BD",
+  "origin": "inbox",
+  "title": "voglio sistemare gli eventi ed il tempo in game",
+  "category": "da_classificare",
+  "source": {
+    "point": "",
+    "text": "voglio sistemare gli eventi ed il tempo in game",
+    "file": "implementazioni/implementazioni.md",
+    "source_status": "nuova",
+    "source_status_raw": "nuova"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "pending",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": []
+}
