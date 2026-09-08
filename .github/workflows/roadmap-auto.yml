@@ -158,7 +158,7 @@ jobs:
               process.exit(1);
             }
             console.log(`[roadmap-auto] audit AI persistito: ${ids.length} task del batch risultano auditate.`);
-            NODE
+          NODE
             CODE=$?
           fi
           set -e
