@@ -340,6 +340,27 @@
   #studio .strisorse .stpunto{display:none}
   #studio .strisorse svg{width:14px;height:14px}
 }
+/* Sotto i 480px una riga sola non basta più. La nav globale si prende 210
+   punti fissi, e i tre numeri — energia, soldi, ora — ne vogliono quasi 190:
+   a 360 la somma sfonda lo schermo e l'ora si legge «09:» e basta. Quindi la
+   fascia diventa **due righe**: sopra la nav con la sezione di fianco, sotto
+   i numeri allineati a destra. Non è un ripiego — a questa larghezza è
+   l'unico modo di tenere leggibili tutte e due le cose, e la fascia resta
+   una fascia sola perché a crescere è la sua altezza, non il numero di
+   barre. La nav è `position:absolute` dentro a `.sthead` (menu-sistema.js),
+   quindi non occupa posto nel flusso: la prima riga se lo deve riservare da
+   sola, ed è il `min-height` su `.stnome` a farlo. `--stAlta` cresce con lei,
+   se no le colonne partono sotto alla fascia e ci finiscono dentro. */
+@media (max-width:480px){
+  :root{--stAlta:80px}
+  #studio .sthead{flex-wrap:wrap;align-items:flex-start;padding-right:12px}
+  /* la riga della nav: alta quanto la nav, se no i numeri le finiscono sotto */
+  #studio .stnome{flex:1 1 100%;min-height:52px;align-items:center;
+    margin-left:210px;font-size:13.5px}
+  /* i numeri, riga loro, a destra: sotto alla nav e larghi quanto serve */
+  #studio .strisorse{flex:1 1 100%;margin:0 0 4px;justify-content:flex-end;gap:10px}
+  #studio .strisorse span{font-size:13px}
+}
 @media (max-width:520px){
   .sttabs{gap:5px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px))}
   .sttab{min-width:0;padding:10px;font-size:12px}

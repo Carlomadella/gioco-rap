@@ -110,7 +110,12 @@
 .sttakeq{flex:none;min-width:38px;text-align:right;font-size:15px;font-weight:800;
   font-variant-numeric:tabular-nums;color:#fff}
 /* «← buona»: la casella c'è sempre, anche vuota, se no le righe si spostano
-   di lato appena una diventa la migliore */
+   di lato appena una diventa la migliore — e, peggio, la barra a tacche della
+   riga segnata resta più corta di quella delle altre. La barra esiste per
+   confrontare le take a colpo d'occhio: se le piste non sono larghe uguali il
+   confronto è falso, e una q85 sembra meno di una q71. Per questo la casella
+   si restringe con lo schermo ma non arriva **mai** a zero, e la larghezza
+   riservata resta sempre più larga del testo che ci va dentro. */
 .sttakeb{flex:none;min-width:62px;font-size:13px;font-weight:700;color:var(--stOro);
   white-space:nowrap}
 
@@ -236,7 +241,10 @@
   .stcurs{padding:8px 4px 6px}
   .stcurs + .stcurs{box-shadow:inset 0 1px 0 rgba(125,175,215,.16)}
   .stcursnota{min-height:0;margin-bottom:4px}
-  .sttakeb{min-width:0}
+  /* NON `min-width:0`: azzerare la casella vuota regalava una sessantina di
+     punti di larghezza alla barra della riga senza targhetta, e le take non
+     erano più confrontabili. Si stringe, non sparisce. */
+  .sttakeb{min-width:56px;font-size:12px}
   .sttacche{min-width:40px}
   .ststream{font-size:14.5px}
 }
@@ -245,5 +253,8 @@
   .stbcov{height:88px}
   .sttakeriga{gap:8px;padding-right:9px}
   .sttaken{font-size:13px}
+  /* stessa regola di sopra, un gradino più stretta: 11.5px di testo stanno
+     dentro ai 50 riservati, quindi le due piste restano larghe uguali */
+  .sttakeb{min-width:50px;font-size:11.5px}
   .stbarrona{gap:8px;padding:10px 11px}
 }

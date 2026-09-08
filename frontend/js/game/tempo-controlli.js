@@ -32,6 +32,14 @@
     {id:"posto",  root:"#posto.on",          head:".pohead",       mount:".pohead", before:".pox", accentVar:"--acid", accent:"#a3e635", panel:"linear-gradient(180deg,rgba(25,20,34,.985),rgba(12,10,17,.985))", border:"rgba(255,255,255,.14)"},
     {id:"negozio",root:"#negozio.on",        head:".nghead",       mount:".nghead", before:".ngx", accentVar:"--acid", accent:"#a3e635", panel:"linear-gradient(180deg,rgba(25,20,34,.985),rgba(12,10,17,.985))", border:"rgba(255,255,255,.14)"},
     {id:"pannello",root:"#pannello.on",      head:".pnhead",       mount:".pnhead", accentVar:"--c1", accent:"#7c3aed", panel:"linear-gradient(180deg,rgba(20,18,25,.985),rgba(10,10,14,.985))", border:"rgba(255,255,255,.14)"},
+    /* Lo Studio è **muto**: l'ora ce l'ha già sua, nella fascia in alto
+       (`studioRisorse()`), e nelle foto di riferimento la pastiglia non c'è.
+       Deve stare **prima dell'hub**: lo Studio è un foglio sopra all'hub, e
+       l'hub resta acceso sotto — senza questa riga la pastiglia si agganciava
+       all'hub, si prendeva lo z-index 142 contro il 94 dello Studio e finiva
+       in mezzo ai pannelli, coprendo «Il quartiere», «POSTA» e la stima degli
+       stream. Un posto muto non monta il widget da nessuna parte. */
+    {id:"studio", root:"#studio.on",          mute:true},
     {id:"hub",    root:"#s-hub.screen.on",   head:".pbarra",       mount:".pbarra", accent:"#c084fc", panel:"linear-gradient(180deg,rgba(16,18,27,.985),rgba(7,9,14,.985))", border:"rgba(192,132,252,.28)"}
   ];
 
@@ -47,6 +55,10 @@
     for(const spec of HOSTS){
       const scope=document.querySelector(spec.root);
       if(!scope) continue;
+      /* posto muto: è acceso, quindi comanda lui, e quello che dice è
+         «qui la pastiglia non ci va». Torna null come se non ci fosse
+         nessun host, e mount() nasconde widget e pannello. */
+      if(spec.mute) return null;
       const head=scope.querySelector(spec.head);
       if(!head) continue;
       const mount=scope.querySelector(spec.mount||spec.head)||head;
