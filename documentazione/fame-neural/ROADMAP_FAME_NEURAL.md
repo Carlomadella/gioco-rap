@@ -310,7 +310,7 @@ Gli annotatori sono abbastanza affidabili da arricchire il dataset senza introdu
 
 # FASE 5 — Scelta della rappresentazione neurale
 
-Stato: DA FARE
+Stato: IN CORSO — BLOCCO 1 BASELINE FLAT MISURATA
 
 ### Perché serve
 Non vogliamo scegliere tokenizer e architettura perché sono di moda.
@@ -329,6 +329,14 @@ Non vogliamo scegliere tokenizer e architettura perché sono di moda.
 - reconstruction accuracy;
 - invalid generation rate;
 - capacità di rappresentare Trap correttamente.
+
+### Blocco 1 — baseline Flat PoC MISURATA
+
+Sul corpus Gate 1 con overlay umano: **502 input**, **502 benchmarkati**, **0 failure**, media **116.125996 token/bar**, P95 **187.75**, grammar/vocab/round-trip failures **0/0/110**.
+
+Il Flat riusa direttamente energy/vocalSpace/tension per barra ma non codifica come feature FASE 4 esplicite density, motif families, kick↔808 relation, hat rolls e transition strength. VRAM, throughput training, invalid generation rate e validation loss restano rinviati al micro-training comparabile comune.
+
+**Prossimo Blocco 2:** implementare REMI+, Compound Word e FAME Compound custom sullo stesso representation input e sullo stesso harness; nessun vincitore e' ancora scelto.
 
 ### Cosa devi valutare tu
 Non scegli il tokenizer. Ti farò ascoltare solo eventuali differenze musicali rilevanti.

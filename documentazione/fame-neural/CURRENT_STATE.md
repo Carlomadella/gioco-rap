@@ -9,7 +9,7 @@ Data: 2026-09-08
 - FASE 2 — Pipeline MIDI e provenienza: **COMPLETATA**.
 - FASE 3 — Dataset Auditor e corpus iniziale: **COMPLETATA — GATE 1 DATA READY SUPERATO**.
 - FASE 4 — Annotazione musicale automatica: **COMPLETATA**.
-- FASE 5 — Scelta della rappresentazione neurale: **DA FARE**.
+- FASE 5 — Scelta della rappresentazione neurale: **IN CORSO — BLOCCO 1 BASELINE FLAT MISURATA**.
 - Training neurale reale: **NON INIZIATO**.
 
 ## Corpus Gate 1
@@ -66,8 +66,14 @@ Baseline rilevante:
 - duration straight/triplet;
 - conditioning discretizzato.
 
+## FASE 5 — Blocco 1
+
+Harness comune e baseline Flat misurati sul corpus effettivo da **502 candidate**: **502 benchmarkate**, **0 failure**, media **116.125996 token/bar**, P95 **187.75**, max **1265 token/phrase**. Grammar/vocabulary/canonical-round-trip failures: **0/0/110**.
+
+Le metriche GPU/training non sono stimate dal benchmark simbolico e restano deferred fino al confronto con micro-modello identico.
+
 ## Prossimo intervento ufficiale
 
-FASE 5: confrontare Flat token PoC, REMI+, Compound Word e FAME Compound custom con benchmark di token/barra, contesto, memoria, velocità, reconstruction accuracy, invalid generation rate e capacità di rappresentare correttamente il dominio Trap.
+FASE 5 / Blocco 2: implementare e misurare REMI+, Compound Word e FAME Compound custom sullo stesso representation input e sullo stesso corpus da 502 candidate. Dopo la parità simbolica, eseguire micro-training comparabile per VRAM, throughput e invalid generation rate.
 
 L'espansione non sintetica del corpus può continuare in parallelo, ma non riapre il Gate 1 già superato.
