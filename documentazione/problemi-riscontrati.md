@@ -526,3 +526,67 @@ il menu della Strada rientra a 12 come la fascia, e scende a 52 di altezza.
 
 **RISOLTO (08/09/2026)** — scambiati. Adesso stanno in `frontend/css/stretto.css`,
 nella sezione STUDIO, in ordine dal più largo al più stretto: 900, 620, 520, 480.
+
+---
+
+## Giro del 08/09/2026 (terzo giro: lo Studio che resta aperto dopo un'azione)
+
+Controllato sul branch `task/studio-non-esce-dopo-azione`, commit `098ddfc` (non
+ancora pushato): `studioAzione()` (`frontend/js/game/studio.js`) non chiude più lo
+Studio prima di far partire un'azione, lo z-index dello Studio è sceso da 94 a 55
+(`frontend/css/studio.css`), e `ui.js`, `writer.js`, `modal.js` e `actions.js`
+chiamano `renderStudio()` dopo ogni esito.
+
+Rifatti girare i tre controlli automatici: `npm run prova` (77 a posto, gli stessi
+due «no» di `js/avatar/makehuman/*.js` che ci sono anche su `main` pulito, non
+legati a questo lavoro), `node strumenti/audit-regressioni.js` (294 a posto, 0
+falliti) e `npm run verifica:build` (33 a posto, 0 falliti). Tutti puliti.
+
+Poi ho seguito a mano, file per file, il percorso di ognuna delle cinque azioni
+dello Studio (Scrivi barre, Cerca un beat, Registra il pezzo, Mixa il pezzo, Promo
+sui social): che finestra apre, chi la chiude, e se dopo viene richiamato
+`renderStudio()`. Ho controllato anche che gli elementi coinvolti (`#studio`,
+`#modal`, `#writer`, `#scena`, `#report`) siano tutti figli diretti di `<body>`,
+senza un genitore in mezzo con `transform`/`opacity`/`filter` che cambierebbe il
+conto dello z-index — quindi il confronto fra i numeri (studio 55, modal 60,
+report/scena 80, writer/flash 90) è quello vero. Ho controllato anche
+`tornaMappa()` (`frontend/js/menu-sistema.js:361`): chiude Studio, foglio, La
+Sala, negozio, piazza, pannello e Strada uno per uno, non si affida al solo
+z-index — quindi dovrebbe funzionare anche se dentro allo Studio è rimasta aperta
+una di quelle finestre. Da questa lettura non è saltata fuori una rottura vera nel
+codice toccato da questa task.
+
+### Nota, non un errore: questo giro non ha un browser vero, solo la lettura del codice
+- In questo ambiente non c'è un Chrome né un Playwright/Puppeteer da far partire:
+  quello scritto sopra viene da una lettura attenta dei file (chi apre cosa, chi
+  chiude cosa, quale numero di z-index vince), non da un clic vero sui cinque
+  bottoni dello Studio, né su desktop né su telefono. La stessa cosa la scrive chi
+  ha fatto la task, in `implementazioni/02-interfaccia-e-telefono.md`, voce 14:
+  «Non provato dal vivo in Chrome in questa sessione — l'estensione non era
+  connessa». Prima di considerare la cosa chiusa per davvero, un giro vero in un
+  browser — Scrivi, Beat, Registra, Mixa, Promo, uno per uno, e «Torna alla
+  mappa» da dentro ognuna di quelle finestre — resta da fare.
+
+### I test automatici non passano mai dentro alla parte che questa task ha cambiato
+- **dove** — `frontend/strumenti/prova.js:844-851`
+- **cosa succede** — il test «lo Studio: la gente della Sala conta» carica il vero
+  `studio.js`, ma per farlo girare senza un browser finge che due funzioni non
+  facciano niente: `function hubAzione(){}` e `function chiediTitolo(){}` (righe
+  847-848). Sono proprio le due funzioni al centro di questa task — `hubAzione()`
+  è quella che prima veniva chiamata dopo aver chiuso lo Studio, e `chiediTitolo()`
+  è la finestra del titolo del pezzo che deve restare sopra allo Studio. Con
+  quelle due finte a vuoto, `npm run prova` non fa mai girare `studioAzione()` con
+  un'azione vera: se in futuro qualcuno rimette per sbaglio `chiudiStudio()` prima
+  di `hubAzione()`, o toglie una delle chiamate a `renderStudio()` aggiunte da
+  questa task, il test continua a dire che va tutto bene.
+- **come si vede** — si vede solo dai file, non si vede a schermo.
+- **quanto pesa** — da sistemare con calma.
+
+**RISOLTO (08/09/2026)** — aggiunto un blocco nuovo a `frontend/strumenti/audit-regressioni.js`
+(«Punto 14 — le azioni in Studio non chiudono più lo Studio»), che non passa dentro alle due
+funzioni finte di `prova.js` ma legge il file vero: controlla che `studioAzione()` non chiami
+più `chiudiStudio()` e chiami `hubAzione(id)` + `renderStudio()`, che lo z-index dello Studio
+resti sotto a modal/report-scena/foglio, e che `ui.js`, `writer.js`, `modal.js` e `actions.js`
+richiamino `renderStudio()` nei punti giusti. Provato apposta: rimessa a mano la vecchia
+`chiudiStudio()` prima di `hubAzione(id)`, il test nuovo si è acceso rosso da solo; rimesso a
+posto, torna verde. `node strumenti/audit-regressioni.js`: 301 a posto, 0 falliti.
