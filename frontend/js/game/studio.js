@@ -985,7 +985,7 @@ function studioSezFuori(){
             (s.car ? ' · ' + studioEsc(s.car.toLowerCase()) : "")) +
           /* «cambia copertina», come nel riferimento: porta alla sezione
              della copertina con questo pezzo già scelto */
-          '<p class="stazlink"><button type="button" class="stlink" data-vesti="' + s.seed + '">' +
+          '<p class="stazlink"><button type="button" class="stlink" data-vesti="' + studioPezzoSeme(s) + '">' +
             stIco("foto") + 'cambia copertina</button></p>' +
           '<p class="stnota">' +
             (quando === "venerdi"
@@ -1050,7 +1050,7 @@ function studioSezFuori(){
     (tenuti.length
       ? stSotto("In cassaforte") +
         tenuti.map(x => stScelta({
-          attr:' data-riprendi="' + x.seed + '"', senzaPallino:true,
+          attr:' data-riprendi="' + studioPezzoSeme(x) + '"', senzaPallino:true,
           mini:stCover(x), n:x.t, d:"q" + x.q + " · tenuto",
           v:"ritira", vCls:"calmo"
         })).join("")
