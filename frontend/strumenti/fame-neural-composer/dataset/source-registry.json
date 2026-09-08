@@ -276,7 +276,11 @@
             "hash": {
               "algorithm": "md5",
               "value": "d920a21b2fcd99a56d9c381b39debbb2"
-            }
+            },
+            "mirrors": [
+              "https://zenodo.org/api/records/15571083/files/mid.tar.gz/content",
+              "https://zenodo.org/records/15571083/files/mid.tar.gz"
+            ]
           },
           {
             "id": "subset-paths",
@@ -285,7 +289,11 @@
             "hash": {
               "algorithm": "md5",
               "value": "092eee416ece8060f77d08575b94a43d"
-            }
+            },
+            "mirrors": [
+              "https://zenodo.org/api/records/15571083/files/subset_paths.tar.gz/content",
+              "https://zenodo.org/records/15571083/files/subset_paths.tar.gz"
+            ]
           }
         ]
       }

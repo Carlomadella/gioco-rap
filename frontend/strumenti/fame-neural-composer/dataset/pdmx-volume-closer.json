@@ -1,0 +1,74 @@
+{
+  "schema": "fame-neural-pdmx-volume-closer-v1",
+  "version": 1,
+  "baseline": {
+    "phrases": 370,
+    "compositionFamilies": 233,
+    "sourceCollections": 6,
+    "roleCoverage": {
+      "drums": 161,
+      "808": 82,
+      "harmony": 264,
+      "lead": 76,
+      "pitchedAny": 313
+    }
+  },
+  "candidatePools": [
+    2048,
+    4096
+  ],
+  "incrementalSourceTarget": 160,
+  "minPitchedEvents": 4,
+  "targetMinPhrases": 500,
+  "syntheticAdvisoryMaxShare": 0.4,
+  "sliceTargets": [
+    300,
+    320
+  ],
+  "maxPdmxPreReviewShare": 0.6,
+  "replayVerification": {
+    "baselineHead": "451bdb7d0d8ff2dc46e54d3289d3d1b24be7d969",
+    "realBundleBaselinePhrases": 370,
+    "realBundlePdmxCandidatePhrases": 455,
+    "verifiedSlice300FinalPhrases": 504,
+    "verifiedSlice320FinalPhrases": 510,
+    "baselinePhraseManifestSha256": "235a3771f8181c9e6056972a05639691f2b8265256147f45da4bfdfd22457b02",
+    "pdmxCandidatePhraseManifestSha256": "5efef00b7ae15135618da195a983a1622c5ae5e5c3b9ba62ba73f0b3a636d4e7",
+    "attempts": [
+      {
+        "sliceTarget": 300,
+        "sliceManifestSha256": "27457f9e48b1e4e0847401d0463d0c04167cf8f2f8394a459e8da056a454e49e",
+        "finalReviewedManifestSha256": "292ec7741a232f75d4111a4edd822a490cb300e0aaf1da23c60c9362b4e86fc8",
+        "expected": {
+          "phrases": 504,
+          "compositionFamilies": 285,
+          "sourceCollections": 6,
+          "drums": 170,
+          "808": 101,
+          "harmony": 394,
+          "lead": 76,
+          "pitchedAny": 447,
+          "pdmxCount": 218,
+          "syntheticCount": 227
+        }
+      },
+      {
+        "sliceTarget": 320,
+        "sliceManifestSha256": "a1d05c2f533ad40f395382882489766d852ad506c85bb381249b58de004e7f00",
+        "finalReviewedManifestSha256": "dfedf083c6f287209fa5d6d9c99c1655cf628f79140b1fedc624cfe8b9042c30",
+        "expected": {
+          "phrases": 510,
+          "compositionFamilies": 285,
+          "sourceCollections": 6,
+          "drums": 170,
+          "808": 101,
+          "harmony": 400,
+          "lead": 76,
+          "pitchedAny": 453,
+          "pdmxCount": 224,
+          "syntheticCount": 227
+        }
+      }
+    ]
+  }
+}

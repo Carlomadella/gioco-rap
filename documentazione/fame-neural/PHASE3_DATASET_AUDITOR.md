@@ -846,3 +846,28 @@ Policy:
 - rhythm groups del generatore deduplicati;
 - HHD max 20% pre-review;
 - uso mirato ai role blocker, non al target numerico 500.
+
+
+## PDMX VOLUME CLOSER V1 — CHIUSURA GATE 1
+
+Risultato reale:
+- phrase: 504;
+- composition family: 285;
+- source collections: 6;
+- drums/808/harmony/lead: 170/101/394/76;
+- pitchedAny: 447;
+- synthetic share: 45.04%;
+- PDMX share: 43.25%;
+- candidate pool: 2048;
+- nuove source PDMX compatibili: 160;
+- Gate 1 Data Ready: READY.
+
+Policy:
+- usa solo PDMX no_license_conflict + deduplicated + all_valid;
+- esclude sourceId PDMX gia' presenti nel baseline reviewed;
+- ogni nuova source passa dal real FAME importer;
+- il volume slice e' family-round-robin;
+- target minimo 500 NON viene abbassato;
+- synthetic advisory 40% resta una guardia informativa e NON un Gate 1 blocker;
+- il replay reale ha verificato slice 300 -> 504 phrase e slice 320 -> 510 phrase;
+- il PDMX resta ampiamente sotto il vero Gate source-dominance 65%.

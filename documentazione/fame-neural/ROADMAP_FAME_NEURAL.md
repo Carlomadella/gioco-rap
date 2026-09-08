@@ -155,7 +155,7 @@ Possiamo importare un MIDI e sapere sia cosa contiene sia perché abbiamo diritt
 
 # FASE 3 — Dataset Auditor e corpus iniziale
 
-Stato: IN CORSO
+Stato: COMPLETATA — GATE 1 DATA READY SUPERATO
 
 ### Perché serve
 Non vogliamo addestrare il modello su duplicati, MIDI scadenti, materiale rubato o esempi musicalmente inutili.
@@ -228,11 +228,21 @@ Stato corpus dopo NRG-CP + Hip Hop Drummer:
 - HHD usato con seed deterministici, real-import preflight, dedup conservativo e cap 20%;
 - il sintetico NON viene usato per gonfiare artificialmente il target 500.
 
+Chiusura FASE 3 / Gate 1 Data Ready:
+- corpus finale: 504 phrase;
+- composition family: 285;
+- source collections: 6;
+- coverage drums/808/harmony/lead: 170/101/394/76;
+- pitchedAny: 447;
+- synthetic share: 45.04% (advisory 40% non ancora raggiunto; NON Gate 1 blocker);
+- PDMX share: 43.25%;
+- PDMX incremental volume closer: public-domain rights-safe + incremental source exclusion + real-import preflight;
+- GATE 1 DATA READY: READY.
+
 Priorita' successiva:
-1. volume non-sintetico/licenziato per avvicinare 500 phrase;
-2. NeuralAcid solo dopo verifica rights e mapping bass/808;
-3. OpenScore Lieder / String Quartets dopo verifica rights;
-4. Harmony Whiz solo dopo permesso/licenza commerciale ML esplicita.
+1. avviare FASE 4 — annotazione musicale automatica;
+2. continuare in parallelo l'espansione non sintetica per ridurre la synthetic share verso l'advisory 40%;
+3. mantenere NeuralAcid/OpenScore/Harmony Whiz come espansioni future, non come prerequisito Gate 1.
 
 ### Primo target
 Circa 500–1.000 phrase curate da 4/8/16 barre.
