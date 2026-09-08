@@ -1,5 +1,5 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "id": "ADF-LEG-E0EB8C25B06C",
   "origin": "legacy",
   "title": "Un prompt per ogni card, e dove sono finiti quelli del 38",
@@ -25,5 +25,14 @@
   "risks": [],
   "notes": [
     "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
-  ]
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  }
 }

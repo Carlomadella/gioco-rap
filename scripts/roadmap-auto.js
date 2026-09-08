@@ -17,25 +17,16 @@ const ROADMAP = path.join(ROOT, 'ROADMAP.md');
 
 const BEGIN = '<!-- ADF-AUTO-INBOX:BEGIN -->';
 const END = '<!-- ADF-AUTO-INBOX:END -->';
-const SCHEMA_VERSION = 4;
-const CATEGORY_FILES = new Set([
-  '01-mappa-e-citta.md',
-  '02-interfaccia-e-telefono.md',
-  '03-artista-e-avatar.md',
-  '04-musica-e-suoni.md',
-  '05-carriera-e-tempo.md',
-  '06-mondo-e-personaggi.md',
-  '07-multiplayer-e-backend.md',
-  '08-uscita-sugli-store.md',
-  '09-grafica-e-asset.md',
-  'fatte.md',
-  'implementazioni.md'
-]);
+const SCHEMA_VERSION = 5;
 const CRITERION_STATUS = new Set(['pending', 'satisfied', 'needs_validation', 'blocked']);
 const VERIFICATION = new Set(['automatic', 'code_audit', 'playtest']);
 const VERIFIED_STATUS = new Set(['planned', 'in_progress', 'needs_validation', 'complete', 'blocked']);
 const AUDIT_STATE = new Set(['not_audited', 'audited']);
 const INTAKE_STATE = new Set(['canonical', 'pending', 'unique', 'duplicate', 'overlap', 'already_implemented']);
+const PLAN_MODE = new Set(['none', 'auto', 'user_defined']);
+const PLAN_STATUS = new Set(['not_applicable', 'draft', 'ready', 'gap_found', 'conflict']);
+const PLAN_STEP_STATUS = new Set(['planned', 'in_progress', 'needs_validation', 'complete', 'blocked']);
+const ROADMAP_SCOPE = new Set(['none', 'official_gap', 'major_proposal']);
 
 function die(message) {
   console.error(`[roadmap-auto] ${message}`);
@@ -68,6 +59,31 @@ function comparisonKey(text) {
 function stableId(kind, sourceFile, title) {
   return `ADF-${kind}-${shortHash(`${sourceFile}\n${title}`).toUpperCase()}`;
 }
+function emptyPlan() {
+  return { mode: 'none', status: 'not_applicable', summary: '', steps: [], gaps: [], notes: [] };
+}
+function detectUserDefinedPlan(text) {
+  const steps = [];
+  const lines = String(text || '').replace(/\r/g, '').split('\n');
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    const match = line.match(/^(?:\d+[.)]\s*)?\*{0,2}(V\d+)\*{0,2}\s*(?:[—–:\-]\s*)?(.+)$/i);
+    if (!match) continue;
+    const id = match[1].toUpperCase();
+    const title = match[2].replace(/\*+/g, '').trim();
+    if (!title || steps.some(s => s.id === id)) continue;
+    steps.push({ id, title, objective: '', depends_on: [], systems: [], watch_paths: [], acceptance_criteria: [], status: 'planned' });
+  }
+  if (steps.length < 2) return emptyPlan();
+  return {
+    mode: 'user_defined',
+    status: 'draft',
+    summary: 'Piano tecnico fornito dall’utente: preservare numerazione, ordine e perimetro; eventuali buchi vanno segnalati, non aggiunti automaticamente.',
+    steps,
+    gaps: [],
+    notes: []
+  };
+}
 function normalizeLegacyStatus(raw) {
   const v = String(raw || '').toLowerCase().replace(/\*+/g, '').trim();
   if (v === 'fatto' || v.startsWith('fatto ')) return 'fatto';
@@ -76,15 +92,44 @@ function normalizeLegacyStatus(raw) {
   if (v.startsWith('risposto')) return 'risposto';
   return v || 'sconosciuto';
 }
-function categoryFromFile(file) {
-  return file.replace(/\.md$/i, '');
+function splitMarkdownRow(line) {
+  const cells = [];
+  let current = '';
+  let escaped = false;
+  for (let i = 1; i < line.length - 1; i++) {
+    const ch = line[i];
+    if (escaped) { current += ch; escaped = false; continue; }
+    if (ch === '\\') { current += ch; escaped = true; continue; }
+    if (ch === '|') { cells.push(current.trim()); current = ''; continue; }
+    current += ch;
+  }
+  cells.push(current.trim());
+  return cells;
+}
+function resolveLegacySource(link) {
+  const raw = String(link || '').replace(/\\/g, '/').replace(/^\.\/+/, '');
+  const repoRelative = path.posix.normalize(path.posix.join('implementazioni', raw));
+  if (!repoRelative.endsWith('.md')) return null;
+  if (repoRelative.startsWith('../') || path.posix.isAbsolute(repoRelative)) return null;
+  if (!(repoRelative.startsWith('implementazioni/') || repoRelative.startsWith('documentazione/'))) return null;
+  if (!fs.existsSync(path.join(ROOT, ...repoRelative.split('/')))) return null;
+  return repoRelative;
+}
+function categoryFromSource(file) {
+  if (file.startsWith('implementazioni/')) return path.posix.basename(file).replace(/\.md$/i, '');
+  const dir = path.posix.dirname(file);
+  return path.posix.basename(dir) || path.posix.basename(file).replace(/\.md$/i, '');
+}
+function legacyHeadlineTotal() {
+  const match = read(LEGACY_INDEX).match(/(\d+)\s+voci in tutto/i);
+  return match ? Number(match[1]) : null;
 }
 function parseLegacyIndex() {
   const text = read(LEGACY_INDEX);
   const rows = [];
   for (const line of text.split(/\r?\n/)) {
     if (!line.startsWith('|')) continue;
-    const cols = line.split('|').slice(1, -1).map(v => v.trim());
+    const cols = splitMarkdownRow(line);
     if (cols.length < 4) continue;
     const point = cols[0].replace(/\*+/g, '').trim();
     const title = cols[1].replace(/\\\|/g, '|').trim();
@@ -93,15 +138,15 @@ function parseLegacyIndex() {
     if (!title || title === 'punto' || /^-+$/.test(title)) continue;
     const match = where.match(/\]\(([^)]+\.md)\)/i);
     if (!match) continue;
-    const sourceFile = match[1].replace(/^\.\//, '');
-    if (!CATEGORY_FILES.has(sourceFile)) continue;
+    const sourceFile = resolveLegacySource(match[1]);
+    if (!sourceFile) continue;
     rows.push({
       point,
       title,
       source_status: normalizeLegacyStatus(statusRaw),
       source_status_raw: statusRaw.replace(/\*+/g, '').trim(),
-      source_file: `implementazioni/${sourceFile}`,
-      category: categoryFromFile(sourceFile)
+      source_file: sourceFile,
+      category: categoryFromSource(sourceFile)
     });
   }
   return rows;
@@ -126,8 +171,10 @@ function legacyTaskSeed(row) {
     intake_state: 'canonical',
     related_task_ids: [],
     intake_note: '',
+    roadmap_scope: 'none',
     roadmap_impact: 'none',
     roadmap_note: '',
+    plan: emptyPlan(),
     current_state: [],
     systems: [],
     watch_paths: [],
@@ -179,8 +226,10 @@ function inboxTaskSeed(item) {
     intake_state: 'pending',
     related_task_ids: [],
     intake_note: '',
+    roadmap_scope: 'none',
     roadmap_impact: 'none',
     roadmap_note: '',
+    plan: detectUserDefinedPlan(item.text),
     current_state: [], systems: [], watch_paths: [], acceptance_criteria: [], risks: [], notes: []
   };
 }
@@ -196,7 +245,7 @@ function validateTask(task, file = '(task)') {
   const errors = [];
   const rel = path.relative(ROOT, file);
   const reqString = key => { if (typeof task[key] !== 'string' || !task[key].trim()) errors.push(`${key} mancante`); };
-  if (![2,3,SCHEMA_VERSION].includes(task.schema_version)) errors.push(`schema_version deve essere 2, 3 o ${SCHEMA_VERSION}`);
+  if (![2,3,4,SCHEMA_VERSION].includes(task.schema_version)) errors.push(`schema_version deve essere 2, 3, 4 o ${SCHEMA_VERSION}`);
   reqString('id'); reqString('origin'); reqString('title'); reqString('category');
   if (!/^ADF-(LEG|NEW)-[A-F0-9]{12}$/.test(task.id || '')) errors.push('id non valido');
   if (!task.source || typeof task.source !== 'object') errors.push('source mancante');
@@ -207,6 +256,31 @@ function validateTask(task, file = '(task)') {
   if (!AUDIT_STATE.has(task.audit_state)) errors.push(`audit_state non valido: ${task.audit_state}`);
   if (task.verified_status !== null && !VERIFIED_STATUS.has(task.verified_status)) errors.push(`verified_status non valido: ${task.verified_status}`);
   if (!INTAKE_STATE.has(task.intake_state)) errors.push(`intake_state non valido: ${task.intake_state}`);
+  if (!ROADMAP_SCOPE.has(task.roadmap_scope)) errors.push(`roadmap_scope non valido: ${task.roadmap_scope}`);
+  if (!task.plan || typeof task.plan !== 'object') errors.push('plan mancante');
+  else {
+    if (!PLAN_MODE.has(task.plan.mode)) errors.push(`plan.mode non valido: ${task.plan.mode}`);
+    if (!PLAN_STATUS.has(task.plan.status)) errors.push(`plan.status non valido: ${task.plan.status}`);
+    if (typeof task.plan.summary !== 'string') errors.push('plan.summary deve essere stringa');
+    if (!Array.isArray(task.plan.steps)) errors.push('plan.steps deve essere un array');
+    if (!Array.isArray(task.plan.gaps)) errors.push('plan.gaps deve essere un array');
+    if (!Array.isArray(task.plan.notes)) errors.push('plan.notes deve essere un array');
+    const stepIds = new Set();
+    for (let i = 0; i < (task.plan.steps || []).length; i++) {
+      const step = task.plan.steps[i];
+      const pp = `plan.steps[${i}]`;
+      if (!step || typeof step !== 'object') { errors.push(`${pp} non valido`); continue; }
+      if (!/^V\d+$/.test(step.id || '')) errors.push(`${pp}.id deve essere V1, V2...`);
+      if (stepIds.has(step.id)) errors.push(`${pp}.id duplicato`);
+      stepIds.add(step.id);
+      if (typeof step.title !== 'string' || !step.title.trim()) errors.push(`${pp}.title mancante`);
+      if (typeof step.objective !== 'string') errors.push(`${pp}.objective deve essere stringa`);
+      for (const key of ['depends_on','systems','watch_paths','acceptance_criteria']) if (!Array.isArray(step[key])) errors.push(`${pp}.${key} deve essere array`);
+      if (!PLAN_STEP_STATUS.has(step.status)) errors.push(`${pp}.status non valido: ${step.status}`);
+    }
+    if (task.plan.mode === 'none' && task.plan.steps.length) errors.push('plan.mode none non può avere steps');
+    if (task.plan.mode !== 'none' && task.plan.steps.length < 2) errors.push('un piano tecnico richiede almeno due step');
+  }
   if (!Array.isArray(task.related_task_ids)) errors.push('related_task_ids deve essere un array');
   if (typeof task.intake_note !== 'string') errors.push('intake_note deve essere una stringa');
   for (const key of ['current_state','systems','watch_paths','acceptance_criteria','risks','notes']) if (!Array.isArray(task[key])) errors.push(`${key} deve essere un array`);
@@ -248,6 +322,17 @@ function normalizeTask(task) {
   if (!next.intake_state) next.intake_state = next.origin === 'legacy' ? 'canonical' : 'pending';
   if (!Array.isArray(next.related_task_ids)) next.related_task_ids = [];
   if (typeof next.intake_note !== 'string') next.intake_note = '';
+  if (!ROADMAP_SCOPE.has(next.roadmap_scope)) next.roadmap_scope = 'none';
+  if (!next.plan || typeof next.plan !== 'object') next.plan = next.origin === 'inbox' ? detectUserDefinedPlan(next.source && next.source.text) : emptyPlan();
+  else {
+    next.plan = {
+      ...emptyPlan(),
+      ...next.plan,
+      steps: Array.isArray(next.plan.steps) ? next.plan.steps : [],
+      gaps: Array.isArray(next.plan.gaps) ? next.plan.gaps : [],
+      notes: Array.isArray(next.plan.notes) ? next.plan.notes : []
+    };
+  }
   if (next.schema_version < SCHEMA_VERSION) next.schema_version = SCHEMA_VERSION;
   if (next.audit_state === 'audited') next.verified_status = recomputeVerifiedStatus(next);
   else next.verified_status = null;
@@ -355,7 +440,7 @@ function buildPrompt() {
   const batch = selectAuditBatch(tasks);
   if (!batch.length) return '';
   const changed = changedFiles();
-  return `Sei l'auditor automatico delle implementazioni di Anni di Fame.\n\nFONTE DI VERITA' E VINCOLI\n- La repository checkout corrente, soprattutto main, e' la fonte tecnica.\n- ROADMAP.md e' la roadmap UFFICIALE: leggila per capire la direzione. In QUESTO audit task non modificarla; un secondo passaggio dedicato puo' colmare buchi minori coerenti con la direzione approvata.\n- Non modificare nessun file storico in implementazioni/*.md e non riscrivere il lavoro esistente.\n- Puoi modificare SOLO i JSON elencati sotto dentro implementazioni/auto/tasks/.\n- Prima di cambiare una task apri il suo source.file, cerca il testo originale, poi controlla il codice reale e i sistemi collegati.\n- Non trasformare deduzioni in fatti. Ogni criterio code_audit/automatic soddisfatto deve avere evidence concreta: percorso + funzione/simbolo/comportamento verificato.\n- Se una cosa richiede gusto, bilanciamento, browser, telefono o gameplay, usa verification=playtest e non segnarla satisfied senza evidence che inizi per manual:.\n- Se la vecchia documentazione dice FATTO ma il codice non lo dimostra, NON cancellare source.source_status: quello e' lo storico. Metti invece i criteri e verified_status verra' ricalcolato dallo script.\n- Per ogni task origin="inbox", PRIMA di espanderla fai un controllo di ridondanza contro TUTTE le task in implementazioni/auto/tasks/, i file storici implementazioni/*.md, ROADMAP.md e il codice pertinente.\n- Classifica intake_state così: unique = requisito realmente nuovo; duplicate = la stessa esigenza esiste già sostanzialmente in una task; overlap = una task esistente copre una parte ma la nuova richiesta aggiunge un requisito reale; already_implemented = non trovi una task equivalente ma il comportamento richiesto è già presente nel codice reale.\n- Per duplicate: related_task_ids deve indicare la task canonica e intake_note deve spiegare il match. Se esiste una task equivalente, preferisci duplicate anche se è già FATTA.\n- Per overlap: collega related_task_ids alla task esistente e crea criteri SOLO per la parte nuova, senza ricopiare ciò che è già coperto.\n- Per already_implemented: intake_note e current_state devono citare file/simboli/comportamento che lo provano; usalo solo se non esiste già una task equivalente.\n- Per duplicate e already_implemented imposta audit_state="audited" e acceptance_criteria=[]; non inventare una nuova roadmap di lavoro. Per unique e overlap continua con l'audit normale.\n- Spezza la richiesta in tutti i passaggi realmente necessari, ma non inventare sistemi non coinvolti.\n- watch_paths deve coprire i file/cartelle che devono riattivare l'audit in futuro.\n- roadmap_impact: none, minor o major. roadmap_note spiega l'impatto. Usa minor quando manca un passaggio, prerequisito, dipendenza o chiarimento coerente con la roadmap esistente; usa major quando servirebbe cambiare una decisione, una macro-fase o la direzione del gioco.\n- Alla fine imposta audit_state="audited". Non forzare verified_status: lo ricalcola lo script.\n\nStati criterio: pending, satisfied, needs_validation, blocked. Verification: automatic, code_audit, playtest.\n\nULTIMO COMMIT: ${commitSubject() || '(non disponibile)'}\nFILE CAMBIATI:\n${changed.map(f=>`- ${f}`).join('\n') || '- nessuno / bootstrap'}\n\nTASK DA ANALIZZARE (${batch.length}):\n${batch.map(({task}) => `- ${task.id} — ${task.title}\n  JSON: implementazioni/auto/tasks/${task.id}.json\n  Fonte: ${task.source.file}\n  Stato storico: ${task.source.source_status_raw || task.source.source_status}`).join('\n')}\n\nPer ogni JSON: preserva id, origin e source; aggiorna title/category se necessario, intake_state, related_task_ids, intake_note, current_state, systems, watch_paths, acceptance_criteria, risks, notes, roadmap_impact, roadmap_note e audit_state. Per le nuove richieste il controllo duplicate/overlap/already_implemented viene PRIMA della scomposizione tecnica. Non creare né modificare altri file.`;
+  return `Sei l'auditor automatico delle implementazioni di Anni di Fame.\n\nFONTE DI VERITA' E VINCOLI\n- La repository checkout corrente, soprattutto main, e' la fonte tecnica.\n- ROADMAP.md e' la roadmap UFFICIALE: leggila per capire la direzione. In QUESTO audit task non modificarla; un secondo passaggio dedicato puo' colmare buchi minori coerenti con la direzione approvata.\n- Non modificare nessun file storico in implementazioni/*.md e non riscrivere il lavoro esistente.\n- Puoi modificare SOLO i JSON elencati sotto dentro implementazioni/auto/tasks/.\n- Prima di cambiare una task apri il suo source.file, cerca il testo originale, poi controlla il codice reale e i sistemi collegati.\n- Non trasformare deduzioni in fatti. Ogni criterio code_audit/automatic soddisfatto deve avere evidence concreta: percorso + funzione/simbolo/comportamento verificato.\n- Se una cosa richiede gusto, bilanciamento, browser, telefono o gameplay, usa verification=playtest e non segnarla satisfied senza evidence che inizi per manual:.\n- Se la vecchia documentazione dice FATTO ma il codice non lo dimostra, NON cancellare source.source_status: quello e' lo storico. Metti invece i criteri e verified_status verra' ricalcolato dallo script.\n- Per ogni task origin="inbox", PRIMA di espanderla fai un controllo di ridondanza contro TUTTE le task in implementazioni/auto/tasks/, i file storici implementazioni/*.md, ROADMAP.md e il codice pertinente.\n- Classifica intake_state così: unique = requisito realmente nuovo; duplicate = la stessa esigenza esiste già sostanzialmente in una task; overlap = una task esistente copre una parte ma la nuova richiesta aggiunge un requisito reale; already_implemented = non trovi una task equivalente ma il comportamento richiesto è già presente nel codice reale.\n- Per duplicate: related_task_ids deve indicare la task canonica e intake_note deve spiegare il match. Se esiste una task equivalente, preferisci duplicate anche se è già FATTA.\n- Per overlap: collega related_task_ids alla task esistente e crea criteri SOLO per la parte nuova, senza ricopiare ciò che è già coperto.\n- Per already_implemented: intake_note e current_state devono citare file/simboli/comportamento che lo provano; usalo solo se non esiste già una task equivalente.\n- Per duplicate e already_implemented imposta audit_state="audited" e acceptance_criteria=[]; non inventare una nuova roadmap di lavoro. Per unique e overlap continua con l'audit normale.\n- DOPO il controllo ridondanza, decidi se serve un piano tecnico ordinato.\n- Richiesta piccola/localizzata: plan.mode="none". Non creare V1/V2 inutili.\n- Richiesta ampia, cross-system, migrazione o refactor che richiede ordine: se l'utente NON ha fornito un piano, usa plan.mode="auto" e costruisci il MINIMO numero di step V1...Vn realmente necessario. Ogni step deve avere obiettivo, dipendenze, sistemi/file da osservare, criteri e stato.\n- Se plan.mode="user_defined", il piano V1...Vn arriva dall'utente: NON aggiungere, rimuovere, rinumerare o riordinare step. Puoi arricchire obiettivi/dipendenze/criteri. Se il repo mostra lavoro indispensabile non coperto, aggiungilo a plan.gaps e usa plan.status="gap_found"; non inventare V(n+1). Se il piano contraddice il repo usa plan.status="conflict". Se copre tutto usa plan.status="ready".\n- Per plan.mode="auto", non continuare a cascata: quando gli step coprono il percorso necessario imposta plan.status="ready". Aggiungi nuovi step solo se un gap tecnico reale e verificato lo richiede.\n- Spezza acceptance_criteria nella task per le condizioni globali; usa i criteri degli step per il progresso della singola V.\n- watch_paths deve coprire i file/cartelle che devono riattivare l'audit in futuro.\n- ROADMAP.md ufficiale NON e' il backlog tecnico. Bugfix, patch, regressioni, fix CSS/UI locali, correzioni di null/errori, refactor interni, migrazioni tecniche, test, tooling e manutenzione devono avere roadmap_scope="none" e roadmap_impact="none".\n- Usa roadmap_scope="official_gap" + roadmap_impact="minor" SOLO quando manca nella roadmap ufficiale un passaggio di evoluzione del GIOCO coerente con una decisione gia' approvata (nuovo sistema di gameplay, prerequisito di una macro-fase, progressione del mondo/citta', capacita' strutturale visibile al giocatore).\n- Usa roadmap_scope="major_proposal" + roadmap_impact="major" se servirebbe cambiare direzione, macro-fase o decisione ufficiale. Non applicarlo automaticamente.\n- Un piano tecnico V1...Vn di un progetto NON va copiato automaticamente in ROADMAP.md: puo' restare interamente nelle implementazioni.\n- roadmap_note deve spiegare l'eventuale impatto ufficiale; con roadmap_scope="none" lascialo vuoto.\n- Alla fine imposta audit_state="audited". Non forzare verified_status: lo ricalcola lo script.\n\nStati criterio: pending, satisfied, needs_validation, blocked. Verification: automatic, code_audit, playtest.\n\nULTIMO COMMIT: ${commitSubject() || '(non disponibile)'}\nFILE CAMBIATI:\n${changed.map(f=>`- ${f}`).join('\n') || '- nessuno / bootstrap'}\n\nTASK DA ANALIZZARE (${batch.length}):\n${batch.map(({task}) => `- ${task.id} — ${task.title}\n  JSON: implementazioni/auto/tasks/${task.id}.json\n  Fonte: ${task.source.file}\n  Stato storico: ${task.source.source_status_raw || task.source.source_status}`).join('\n')}\n\nPer ogni JSON: preserva id, origin e source; aggiorna title/category se necessario, intake_state, related_task_ids, intake_note, current_state, systems, watch_paths, acceptance_criteria, risks, notes, plan, roadmap_scope, roadmap_impact, roadmap_note e audit_state. Per le nuove richieste: prima ridondanza, poi piano tecnico se serve, poi criteri. Se plan.mode="user_defined" preserva rigorosamente gli ID V1...Vn esistenti e segnala i gap senza aggiungere step. Non creare né modificare altri file.`;
 }
 function intakeAnnotation(task) {
   const related = (task.related_task_ids || []).join(', ');
@@ -401,7 +486,10 @@ function renderReadme(tasks) {
   const alreadyImplemented = tasks.filter(x=>x.task.intake_state==='already_implemented').length;
   const effectiveTasks = tasks.filter(x=>x.task.intake_state!=='duplicate');
   const openVerified = tasks.filter(x=>x.task.audit_state==='audited' && x.task.verified_status!=='complete' && x.task.intake_state!=='duplicate').length;
-  const roadmapImpacts = tasks.filter(x=>x.task.audit_state==='audited' && x.task.roadmap_impact && x.task.roadmap_impact!=='none');
+  const roadmapImpacts = tasks.filter(x=>x.task.audit_state==='audited' && x.task.roadmap_scope && x.task.roadmap_scope!=='none');
+  const plannedProjects = tasks.filter(x=>x.task.plan && x.task.plan.mode!=='none').length;
+  const userPlans = tasks.filter(x=>x.task.plan && x.task.plan.mode==='user_defined').length;
+  const planGaps = tasks.filter(x=>x.task.plan && ['gap_found','conflict'].includes(x.task.plan.status)).length;
   const lines = [
     '# Stato automatico delle implementazioni', '',
     "> **`ROADMAP.md` resta la roadmap ufficiale di Anni di Fame.** Il cruscotto non la sostituisce: l'automazione può colmare **buchi minori** della roadmap quando sono supportati dal repo e coerenti con decisioni già approvate. Cambi di direzione, rimozioni di macro-fasi o decisioni strutturali restano invece da revisionare esplicitamente.", '',
@@ -412,6 +500,8 @@ function renderReadme(tasks) {
     `- **Duplicati intercettati:** ${duplicates}`,
     `- **Estensioni/sovrapposizioni:** ${overlaps}`,
     `- **Richieste già implementate senza task equivalente:** ${alreadyImplemented}`,
+    `- **Progetti con piano V1→Vn:** ${plannedProjects} (forniti dall'utente: ${userPlans})`,
+    `- **Piani con gap/conflitti da rivedere:** ${planGaps}`,
     `- **Auditate ma non complete:** ${openVerified}`,
     `- Stato storico importato: ${Object.entries(sourceCounts).map(([k,v])=>`${k} ${v}`).join(' · ') || '—'}`,
     '',
@@ -431,10 +521,20 @@ function renderReadme(tasks) {
     const related = (task.related_task_ids || []).join(', ');
     lines.push(`- **${task.id} — ${task.title}**: ${task.intake_state}${related ? ` → ${related}` : ''}${task.intake_note ? ` — ${task.intake_note}` : ''}`);
   }
+  const plans = tasks.filter(x => x.task.plan && x.task.plan.mode !== 'none');
+  lines.push('', '## Piani tecnici dei progetti', '');
+  if (!plans.length) lines.push('_Nessun piano tecnico strutturato al momento._');
+  else for (const {task} of plans) {
+    const plan = task.plan;
+    lines.push(`### ${task.id} — ${task.title}`, '', `Piano: **${plan.mode}** · stato: **${plan.status}**`, '');
+    for (const step of plan.steps) lines.push(`- **${step.id} — ${step.title}** · ${step.status}${step.depends_on.length ? ` · dipende da ${step.depends_on.join(', ')}` : ''}`);
+    for (const gap of plan.gaps || []) lines.push(`- ⚠️ Gap: ${typeof gap === 'string' ? gap : JSON.stringify(gap)}`);
+    lines.push('');
+  }
   lines.push('', '## Impatto possibile sulla roadmap ufficiale', '');
   if (!roadmapImpacts.length) lines.push('_Nessuna task auditata richiede al momento una revisione della roadmap._');
-  else for (const {task} of roadmapImpacts) lines.push(`- **${task.id} — ${task.title}** (${task.roadmap_impact}): ${task.roadmap_note || 'da valutare'}`);
-  lines.push('', '> Gli impatti **minor** possono essere incorporati automaticamente nella roadmap ufficiale dal passaggio dedicato, con controlli anti-riscrittura. Gli impatti **major** restano segnalazioni da revisionare esplicitamente.', '', '## Nuove idee', '', 'Scrivile nella sezione **Inbox automatica** di `../implementazioni.md` come checkbox, anche in una frase sola. Il workflow controllerà il repo, creerà i criteri e marcherà la riga solo dopo un audit riuscito.');
+  else for (const {task} of roadmapImpacts) lines.push(`- **${task.id} — ${task.title}** (${task.roadmap_scope}/${task.roadmap_impact}): ${task.roadmap_note || 'da valutare'}`);
+  lines.push('', '> La roadmap ufficiale contiene evoluzione del gioco, non bugfix/patch/refactor. Solo `official_gap/minor` può essere incorporato automaticamente; `major_proposal/major` richiede revisione esplicita.', '', '## Nuove idee', '', 'Scrivile nella sezione **Inbox automatica** di `../implementazioni.md` come checkbox, anche in una frase sola. Il workflow controllerà ridondanze, repo reale e ampiezza: task piccola oppure piano tecnico V1→Vn quando serve.');
   return lines.join('\n') + '\n';
 }
 function finalize() {
@@ -455,6 +555,10 @@ function check() {
     }
   }
   const legacyRows = parseLegacyIndex();
+  const headlineTotal = legacyHeadlineTotal();
+  if (headlineTotal !== null && legacyRows.length !== headlineTotal) {
+    die(`inventario storico incompleto: README dichiara ${headlineTotal} voci ma il parser ne riconosce ${legacyRows.length}`);
+  }
   const missingLegacy = legacyRows
     .map(legacyTaskSeed)
     .filter(seed => !byId.has(seed.id));

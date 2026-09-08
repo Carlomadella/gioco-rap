@@ -4,14 +4,16 @@
 
 ## Copertura
 
-- **Schede importate:** 112
-- **Task effettive (duplicati esclusi):** 112
-- **Auditate contro il repo:** 0/112
+- **Schede importate:** 113
+- **Task effettive (duplicati esclusi):** 113
+- **Auditate contro il repo:** 0/113
 - **Duplicati intercettati:** 0
 - **Estensioni/sovrapposizioni:** 0
 - **Richieste già implementate senza task equivalente:** 0
+- **Progetti con piano V1→Vn:** 0 (forniti dall'utente: 0)
+- **Piani con gap/conflitti da rivedere:** 0
 - **Auditate ma non complete:** 0
-- Stato storico importato: da_fare 18 · in_parte 13 · fatto 77 · risposto 4
+- Stato storico importato: da_fare 18 · in_parte 13 · fatto 77 · risposto 5
 
 ## Tutte le task e richieste
 
@@ -51,6 +53,7 @@
 | `ADF-LEG-9EBE87A3843F` | Le card sulla mappa, di lato invece che sopra agli edifici | storica | — | implementazioni/01-mappa-e-citta.md | ⬜ da fare | — non ancora auditata | — |
 | `ADF-LEG-7319DD550E0D` | Ogni parte del gioco deve avere la sua ambientazione | storica | — | implementazioni/09-grafica-e-asset.md | ⬜ da fare | — non ancora auditata | — |
 | `ADF-LEG-DDDE0E598F52` | Quello che al backend mancava per stare in piedi su uno store | storica | — | implementazioni/07-multiplayer-e-backend.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-95F95C753984` | Una pagina per ogni azione? | storica | — | documentazione/pagine-azioni/README.md | 📝 risposto | — non ancora auditata | — |
 | `ADF-LEG-CCBBA5CFE700` | Via il bottone del menù dalle CTA in basso | storica | — | implementazioni/02-interfaccia-e-telefono.md | ⬜ da fare | — non ancora auditata | — |
 | `ADF-LEG-314A919E7149` | «Chat»: mamma e il migliore amico, poi il resto con la fama | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
 | `ADF-LEG-C9E047E25208` | «Disciplina» diventa «Condizione» | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
@@ -134,12 +137,16 @@
 
 _Nessuna ridondanza rilevata._
 
+## Piani tecnici dei progetti
+
+_Nessun piano tecnico strutturato al momento._
+
 ## Impatto possibile sulla roadmap ufficiale
 
 _Nessuna task auditata richiede al momento una revisione della roadmap._
 
-> Gli impatti **minor** possono essere incorporati automaticamente nella roadmap ufficiale dal passaggio dedicato, con controlli anti-riscrittura. Gli impatti **major** restano segnalazioni da revisionare esplicitamente.
+> La roadmap ufficiale contiene evoluzione del gioco, non bugfix/patch/refactor. Solo `official_gap/minor` può essere incorporato automaticamente; `major_proposal/major` richiede revisione esplicita.
 
 ## Nuove idee
 
-Scrivile nella sezione **Inbox automatica** di `../implementazioni.md` come checkbox, anche in una frase sola. Il workflow controllerà il repo, creerà i criteri e marcherà la riga solo dopo un audit riuscito.
+Scrivile nella sezione **Inbox automatica** di `../implementazioni.md` come checkbox, anche in una frase sola. Il workflow controllerà ridondanze, repo reale e ampiezza: task piccola oppure piano tecnico V1→Vn quando serve.

@@ -1,5 +1,5 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "id": "ADF-LEG-8C62DACB1DD3",
   "origin": "legacy",
   "title": "14 · I dialoghi devono tornare fra di loro",
@@ -25,5 +25,14 @@
   "risks": [],
   "notes": [
     "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
-  ]
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  }
 }

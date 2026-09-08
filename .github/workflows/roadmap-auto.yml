@@ -147,7 +147,7 @@ jobs:
           const tasks = fs.readdirSync(dir)
             .filter(n => n.endsWith('.json'))
             .map(n => JSON.parse(fs.readFileSync(path.join(dir, n), 'utf8')))
-            .filter(t => t.audit_state === 'audited' && t.roadmap_impact === 'minor' && String(t.roadmap_note || '').trim());
+            .filter(t => t.audit_state === 'audited' && t.roadmap_scope === 'official_gap' && t.roadmap_impact === 'minor' && String(t.roadmap_note || '').trim());
 
           if (!tasks.length) process.exit(0);
 
@@ -162,7 +162,9 @@ jobs:
           - Puoi modificare SOLO ROADMAP.md.
           - Non cancellare macro-fasi, città, principi permanenti o decisioni già approvate.
           - Non cambiare la direzione del gioco per "migliorarla".
-          - Puoi aggiungere o chiarire: prerequisiti, dipendenze tra sistemi, passaggi mancanti, criteri di uscita da una fase, lavoro necessario già emerso dal repo.
+          - Puoi aggiungere o chiarire solo evoluzione reale del gioco: prerequisiti di macro-fasi, nuovi sistemi di gameplay, progressione del mondo/città o capacità strutturali visibili al giocatore.
+          - NON aggiungere bugfix, patch, regressioni, fix CSS/UI locali, refactor interni, migrazioni tecniche, test, tooling o manutenzione.
+          - NON copiare nella roadmap ufficiale i singoli step V1...Vn di un piano tecnico: il piano può restare nelle implementazioni.
           - Non duplicare contenuti già presenti.
           - Se il buco è già coperto, non modificare niente.
           - Se scopri che servirebbe cambiare una decisione strutturale, NON farlo: quello è impatto major e richiede revisione umana.

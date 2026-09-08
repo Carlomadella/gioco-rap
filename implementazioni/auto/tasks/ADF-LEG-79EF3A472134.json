@@ -1,5 +1,5 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "id": "ADF-LEG-79EF3A472134",
   "origin": "legacy",
   "title": "«Fatti sentire un beat» non faceva niente, e i beat non si vedevano",
@@ -25,5 +25,14 @@
   "risks": [],
   "notes": [
     "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
-  ]
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  }
 }
