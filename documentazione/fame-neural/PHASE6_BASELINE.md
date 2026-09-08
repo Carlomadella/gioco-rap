@@ -23,7 +23,7 @@ La retrieval baseline è forte sulla coerenza perché recupera materiale reale, 
 
 ## Baseline 2 — Constrained generative V1
 
-ID: `fame-constrained-baseline-v1`
+ID: `fame-constrained-recombination-v1`
 
 - rappresentazione `fame-compound-v1`;
 - parametri appresi: 0;

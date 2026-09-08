@@ -72,10 +72,10 @@ Compound Word resta baseline tecnica di controllo. Flat e REMI+ restano disponib
 ## NDR-013 — Due baseline complementari per il benchmark Neural
 **Status:** ACCEPTED
 
-La FASE 6 congela due controlli non neurali sullo stesso split leakage-safe e sulla rappresentazione ame-compound-v1:
+La FASE 6 congela due controlli non neurali sullo stesso split leakage-safe e sulla rappresentazione `fame-compound-v1`:
 
-- ame-retrieval-baseline-v1, forte sulla coerenza di materiale reale;
-- ame-constrained-baseline-v1, generativa e senza copie esatte di phrase/bar del train nel test misurato.
+- `fame-retrieval-baseline-v1`, forte sulla coerenza di materiale reale;
+- `fame-constrained-recombination-v1`, generativa e senza copie esatte di phrase/bar del train nel test misurato.
 
 Il plan MAE zero della constrained baseline deriva dal conditioning diretto sul piano high-level e non misura il Planner end-to-end.
 

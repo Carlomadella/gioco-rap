@@ -411,7 +411,7 @@ Non deve essere il prodotto finale.
 
 ### Blocco 2 — constrained generative baseline V1 MISURATO
 
-- `fame-constrained-baseline-v1`;
+- `fame-constrained-recombination-v1`;
 - 0 parametri appresi;
 - rappresentazione `fame-compound-v1`;
 - stesso split 401/58/43;
