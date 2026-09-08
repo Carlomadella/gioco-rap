@@ -60,9 +60,58 @@ function fuzzyGraph(audit) {
   return graph;
 }
 
+function addGraphEdge(graph, a, b) {
+  if (!a || !b || a === b) return;
+  if (!graph.has(a)) graph.set(a, new Set());
+  if (!graph.has(b)) graph.set(b, new Set());
+  graph.get(a).add(b);
+  graph.get(b).add(a);
+}
+
+function addGraphClique(graph, ids) {
+  const unique = [...new Set((ids || []).filter(Boolean))].sort();
+  for (let a = 0; a < unique.length; a += 1) {
+    for (let b = a + 1; b < unique.length; b += 1) {
+      addGraphEdge(graph, unique[a], unique[b]);
+    }
+  }
+}
+
+function blockingGraph(audit) {
+  const graph = new Map();
+
+  for (const group of audit && audit.duplicates && audit.duplicates.exactMusic || []) {
+    addGraphClique(graph, group.itemIds || []);
+  }
+  for (const group of audit && audit.duplicates && audit.duplicates.transpositionEquivalent || []) {
+    addGraphClique(graph, group.itemIds || []);
+  }
+
+  const blockingPairs = audit && audit.duplicates && audit.duplicates.fuzzyNearDuplicates &&
+    audit.duplicates.fuzzyNearDuplicates.blockingPairs || [];
+  for (const pair of blockingPairs) {
+    if (!pair || !pair.itemA || !pair.itemB) continue;
+    addGraphEdge(graph, pair.itemA, pair.itemB);
+  }
+
+  return graph;
+}
+
+function mergeGraphs(...graphs) {
+  const merged = new Map();
+  for (const graph of graphs) {
+    for (const [id, peers] of graph.entries()) {
+      if (!merged.has(id)) merged.set(id, new Set());
+      for (const peer of peers) addGraphEdge(merged, id, peer);
+    }
+  }
+  return merged;
+}
+
 function isSafeHighRepetition(entry, quality) {
   if (!quality || !quality.codes.length) return false;
-  if (sourceCollection(entry.item) !== "free-midi-chords") return false;
+  const collection = sourceCollection(entry.item);
+  if (!["free-midi-chords", "gmd-v1.0.0"].includes(collection)) return false;
   return quality.codes.every(code => code === "HIGH_BAR_REPETITION");
 }
 
@@ -97,14 +146,22 @@ function reviewPhrases(entries, audit) {
     .map(entry => [entry.item.phraseId, entry]));
 
   const quality = qualityByPhrase(audit);
-  const graph = fuzzyGraph(audit);
+  const graph = mergeGraphs(fuzzyGraph(audit), blockingGraph(audit));
+  const blockingQualityIds = new Set(
+    (audit && audit.internalQuality && audit.internalQuality.blockingFindings || [])
+      .map(item => item && item.itemId)
+      .filter(Boolean)
+  );
   const reviewIds = new Set([
     ...quality.keys(),
-    ...graph.keys()
+    ...graph.keys(),
+    ...blockingQualityIds
   ]);
 
-  const forcedReject = new Set();
-  const rejectionReasons = new Map();
+  const forcedReject = new Set(blockingQualityIds);
+  const rejectionReasons = new Map(
+    [...blockingQualityIds].map(id => [id, "internal quality blocking: duplicate-layer suspect"])
+  );
   const safeQualityAccept = new Set();
 
   for (const id of reviewIds) {
@@ -172,8 +229,12 @@ function reviewPhrases(entries, audit) {
     schema: PHRASE_REVIEW_SCHEMA,
     version: 1,
     policy: {
-      freeMidiChordsHighBarRepetition: "accept-with-explicit-review",
+      highBarRepetition: "accept-with-explicit-review for free-midi-chords and gmd-v1.0.0",
+      exactDuplicates: "deterministic-independent-set; reject conflicting peers",
+      transpositionDuplicates: "deterministic-independent-set; reject conflicting peers",
+      fuzzyBlockingPairs: "deterministic-independent-set; reject conflicting peers",
       fuzzyReviewPairs: "deterministic-independent-set; reject conflicting peers",
+      duplicateLayerSuspect: "reject",
       otherQualityReview: "reject"
     },
     totals: {
@@ -248,6 +309,10 @@ module.exports = {
   sourceCollection,
   qualityByPhrase,
   fuzzyGraph,
+  addGraphEdge,
+  addGraphClique,
+  blockingGraph,
+  mergeGraphs,
   isSafeHighRepetition,
   chooseFuzzyKeepers,
   reviewPhrases,

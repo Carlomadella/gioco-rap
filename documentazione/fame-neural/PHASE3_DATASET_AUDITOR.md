@@ -728,3 +728,24 @@ Le phrase rifiutate vengono escluse dal corpus reviewed.
 `phrase-corpus.js` supporta ora un quinto argomento opzionale `review-decisions.json`. Un item in review e' considerato risolto solo con reviewer e reason espliciti. Un reject ancora presente nel corpus continua a impedire `reviewComplete`.
 
 Il Gate 1 continua quindi a usare `reviewComplete` come blocker reale; non viene forzato a true.
+
+
+## CORPUS EXPANSION V2 - GMD GLOBALE
+
+Il release GMD v1.0.0 espone 34 performance che soddisfano contemporaneamente i filtri hiphop, beat e 4/4 usati dalla pipeline. Il corpus expansion usa tutte e 34 e non allarga il filtro a generi estranei per fare volume.
+
+Il primo run globale ha inoltre mostrato un limite architetturale della phrase review: gestiva quality review e fuzzy review pair, ma non ripuliva i blocker che definiscono `corpusClean`:
+
+- exact duplicate groups;
+- transposition-equivalent groups;
+- fuzzy blocking pairs;
+- duplicate-layer interno.
+
+La phrase review ora tratta questi casi in modo conservativo:
+
+- exact / transposition / fuzzy: mantiene un solo keeper deterministico per gruppo/conflitto;
+- duplicate-layer suspect: reject;
+- HIGH_BAR_REPETITION su free-midi-chords e GMD: accept esplicito se e' l'unico quality signal;
+- altri quality signal: reject.
+
+Il Gate non viene forzato: dopo la rimozione viene eseguito un nuovo audit e `corpusClean` deve risultare realmente true prima di commit/push.
