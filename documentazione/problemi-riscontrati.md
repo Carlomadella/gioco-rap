@@ -625,3 +625,80 @@ la prova cade anche se qualcuno smette di ascoltare i due nomi voluti.
   banco, quindi con la regola scritta nel commit è giusto così — ma è l'unico caso in cui
   tiri fuori dei soldi per un beat e il motore non lo sa. È una scelta da confermare, non
   un guasto: oggi non rompe niente.
+
+---
+
+## Giro del 10/09/2026
+
+Giro di fine task sul branch `task/turno-fabbrica-8-ore-e-mute-musica`, due commit:
+`531df10` (il turno in fabbrica durava 60 minuti fissi invece della durata vera, per
+qualunque azione avviata da un luogo della mappa) e `9536374` (pulsante muta/smuta la
+musica dal menu principale, `pagine/landing.html` + `js/landing.js` + `css/shell.css`).
+
+**Controlli automatici**: `npm run prova` dà 94 a posto e 0 no (compreso il nuovo blocco
+che controlla i minuti veri per turno). `npm run verifica:build` dà 33 a posto e 0 no.
+`node strumenti/audit-regressioni.js` dà 298 a posto e **3 no** — ma ho controllato con
+un worktree sul commit `3d32737` (l'ultimo prima di questa task) e gli stessi 3 fallivano
+già lì: non li ha rotti questo lavoro, ma restano rossi adesso e li segno sotto perché non
+risultavano ancora scritti in questo file.
+
+**Sul fix del turno**: ho riletto `avviaAzioneDiretta()` (`ui.js`) e `GAME_TIME.captureAction`
+(`tempo.js`), e seguito tutte le strade che ci passano — Fabbrica e Pizzeria (`assumitiCome`),
+Palestra (`hub.js:146,148`), «Stacca la spina» e Live Club (`hub.js:102,107,123`), più il
+centro per l'impiego. Tutte chiamano `captureAction` col vero id prima di `iniziaAzione()`, e
+`DURATE_LAVORO` ha i minuti giusti per ogni lavoro (`lavapiatti:300`, `operaio:480`, eccetera).
+Non ho trovato altre strade che avviano un'azione senza passare né dal click sulla tile né da
+`avviaAzioneDiretta()`.
+
+**Sul pulsante muta/smuta**: il bottone è un fratello di `.brand` dentro `.navleft`, quindi
+resta visibile anche quando `body.su-menu` nasconde il marchio — coerente con «un pulsantino
+in parte a sx». `SET.audio.on` arriva davvero al motore audio (`js/audio/engine.js`, `livelli()`
+azzera il gain master quando è spento), quindi il tasto non è solo cosmetico. Ho anche caricato
+`pagine/landing.html` con Chrome in modalità headless: la pagina arriva fino in fondo a
+`js/landing.js` senza eccezioni bloccanti (il bottone compare nel DOM con `aria-pressed="false"`
+di default) e nessun file JS del progetto ha errori di sintassi.
+
+Un problema trovato, sotto. Poi tre cose vecchie (non di questa task) mai segnate qui prima.
+
+### Il pulsante muta/smuta rischia di restare senza stile o senza funzione dopo un aggiornamento
+
+- **dove** — `frontend/pagine/landing.html:26` (`css/shell.css?v=12`) e `:277`
+  (`js/landing.js?v=2`)
+- **cosa succede** — il commit `9536374` cambia sia `css/shell.css` (le regole del nuovo
+  bottone tondo) sia `js/landing.js` (il click che lo fa funzionare), ma il numero dopo
+  `?v=` nei due `<script>`/`<link>` di `pagine/landing.html` è rimasto lo stesso di prima.
+  In questo stesso progetto, quando si tocca `js/game/ui.js` o `js/game/tempo.js` quel
+  numero si alza sempre (l'altro commit di questa stessa task lo fa, `ui.js?v=19→20` e
+  `tempo.js?v=11→12`): qui non è successo. Chi ha ancora in cache la vecchia copia di
+  `shell.css` o di `landing.js` — il browser di chi prova il gioco, o un giorno un CDN in
+  produzione — continua a vedere la pagina vecchia finché non fa un refresh forzato: il
+  bottone può comparire senza stile (un cerchio senza il suo aspetto) o comparire ma non
+  rispondere al click, a seconda di quale dei due file è rimasto vecchio.
+- **come si vede** — si vede dai file: `git show 9536374 --stat` cambia `css/shell.css` e
+  `js/landing.js`, ma `git show 9536374 -- pagine/landing.html` non tocca le righe con
+  `?v=`.
+- **quanto pesa** — si vede ma si gira intorno (basta un refresh forzato una volta).
+
+### Lo Shop promette tre reparti a schede, ce ne sono solo due
+
+- **dove** — `frontend/pagine/gioco.html:281-288` e `frontend/js/game/negozio.js`
+- **cosa succede** — non è di questa task: l'ho trovato perché uno dei 3 controlli
+  automatici rossi lo riguarda. Le schede dello Shop sono due sole, Attrezzatura e Beat
+  (`data-sh="gear"` e `data-sh="beat"` in `gioco.html`); un terzo reparto per i Vestiti,
+  con la sua scheda e la sua griglia riscritta, non esiste — quello che c'è di Vestiti è
+  ancora la vecchia griglia impilata (`<div class="nggrid" id="g-fit">`), non dietro a
+  nessuna linguetta.
+- **come si vede** — apri lo Shop dalla mappa: le linguette in alto sono solo due.
+- **quanto pesa** — da sistemare con calma.
+
+### Un file fuori da `js/pagine.js` si tiene scritto a mano il nome di una pagina
+
+- **dove** — `frontend/js/creator/rpg-v24-bridge.js:158`
+- **cosa succede** — non è di questa task. La regola del progetto è che i nomi dei tre
+  file delle pagine (`landing.html`, `accesso.html`, `gioco.html`) stanno scritti in un
+  posto solo, `js/pagine.js`, così il giorno che cambiano nome si riscrive un file e
+  basta. `rpg-v24-bridge.js` ha una riga (`location.href="pagine/landing.html"`) che se lo
+  costruisce da sé, fuori da quella regola.
+- **come si vede** — si vede solo dai file: è l'unica riga fuori da `js/pagine.js` che
+  nomina una delle tre pagine per intero.
+- **quanto pesa** — da sistemare con calma.
