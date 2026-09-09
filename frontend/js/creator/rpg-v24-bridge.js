@@ -155,7 +155,7 @@
       close();
       modalita="normal";
 
-      if(nuovaAnnullata) location.href="landing.html";
+      if(nuovaAnnullata) location.href="pagine/landing.html";
       return;
     }
 
