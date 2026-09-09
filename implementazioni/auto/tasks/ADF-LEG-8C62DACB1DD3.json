@@ -11,20 +11,51 @@
     "source_status": "fatto",
     "source_status_raw": "fatto"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "complete",
   "intake_state": "canonical",
   "related_task_ids": [],
   "intake_note": "",
   "roadmap_impact": "none",
   "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
+  "current_state": [
+    "La correzione del rapporto e' implementata in frontend/js/game/posto.js: il bonus del carattere si applica solo a una risposta che ha gia' un esito positivo.",
+    "La prova automatica in frontend/strumenti/prova.js gioca tutte le combinazioni dei dialoghi e controlla che un rifiuto non aumenti il rapporto."
+  ],
+  "systems": [
+    "frontend/js/game/posto.js",
+    "frontend/strumenti/prova.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/posto.js",
+    "frontend/strumenti/prova.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Una risposta negativa o non positiva non aumenta il rapporto anche quando coincide con il carattere del personaggio.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/posto.js: poRispondi() applica il bonus del carattere solo agli esiti positivi.",
+        "frontend/strumenti/prova.js: simulazione di 684 conversazioni controlla i rifiuti."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Le situazioni e le risposte dei dialoghi hanno struttura coerente e personaggi esistenti.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/strumenti/prova.js: verifica di testi, risposte, punteggi e caratteri per ogni voce di DIALOGHI."
+      ]
+    }
+  ],
+  "risks": [
+    "Un nuovo dialogo potrebbe introdurre un esito incoerente se non viene coperto dalla prova automatica."
+  ],
   "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+    "La documentazione storica resta invariata; l'audit si basa sul comportamento e sulla prova presente nel frontend."
   ],
   "roadmap_scope": "none",
   "plan": {

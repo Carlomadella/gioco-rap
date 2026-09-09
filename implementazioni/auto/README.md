@@ -6,13 +6,13 @@
 
 - **Schede importate:** 114
 - **Task effettive (duplicati esclusi):** 111
-- **Auditate contro il repo:** 45/114
+- **Auditate contro il repo:** 52/114
 - **Duplicati intercettati:** 3
 - **Estensioni/sovrapposizioni:** 8
 - **Richieste già implementate senza task equivalente:** 5
 - **Progetti con piano V1→Vn:** 20 (forniti dall'utente: 0)
 - **Piani con gap/conflitti da rivedere:** 0
-- **Auditate ma non complete:** 26
+- **Auditate ma non complete:** 28
 - Stato storico importato: da_fare 18 · in_parte 13 · fatto 77 · risposto 5 · nuova 1
 
 ## Tutte le task e richieste
@@ -64,13 +64,13 @@
 | `ADF-LEG-4D9FA3E54D62` | (riscritto) e lo schema del database | storica | — | implementazioni/08-uscita-sugli-store.md | ✅ fatto | ✅ verificata | 3/3 |
 | `ADF-LEG-0C844231FF05` | 10, 11, 12 · Lo Studio: una stanza sua, e il gameplay dentro | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | ✅ verificata | 4/4 |
 | `ADF-LEG-D5515C176B84` | 13 · I dischi: oro, platino, diamante | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | ✅ verificata | 4/4 |
-| `ADF-LEG-8C62DACB1DD3` | 14 · I dialoghi devono tornare fra di loro | storica | — | implementazioni/06-mondo-e-personaggi.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-47DD718310D1` | Al massimo una conversazione lunga al giorno | storica | — | implementazioni/06-mondo-e-personaggi.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-E489C02FFB9A` | Ascoltare un beat prima di comprarlo | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-B33697B9CA07` | Backend e frontend separati, e i README di ognuno | storica | — | implementazioni/07-multiplayer-e-backend.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-81ADE09AFBF8` | Controllo del codice: due nomi di classe che si pestavano i piedi | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-C60B1C321184` | Cosa si può simulare | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-DB2D56011EF3` | Crea il tuo avatar | storica | — | implementazioni/03-artista-e-avatar.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-8C62DACB1DD3` | 14 · I dialoghi devono tornare fra di loro | storica | — | implementazioni/06-mondo-e-personaggi.md | ✅ fatto | ✅ verificata | 2/2 |
+| `ADF-LEG-47DD718310D1` | Al massimo una conversazione lunga al giorno | storica | — | implementazioni/06-mondo-e-personaggi.md | ✅ fatto | ✅ verificata | 2/2 |
+| `ADF-LEG-E489C02FFB9A` | Ascoltare un beat prima di comprarlo | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | 👁 da validare | 1/2 |
+| `ADF-LEG-B33697B9CA07` | Backend e frontend separati, e i README di ognuno | storica | — | implementazioni/07-multiplayer-e-backend.md | ✅ fatto | ✅ verificata | 2/2 |
+| `ADF-LEG-81ADE09AFBF8` | Controllo del codice: due nomi di classe che si pestavano i piedi | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | ✅ verificata | 2/2 |
+| `ADF-LEG-C60B1C321184` | Cosa si può simulare | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | 👁 da validare | 2/3 |
+| `ADF-LEG-DB2D56011EF3` | Crea il tuo avatar | storica | — | implementazioni/03-artista-e-avatar.md | ✅ fatto | ✅ verificata | 2/2 |
 | `ADF-LEG-0F2CA0831327` | Dallo Studio si esce solo con «Torna alla mappa» | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
 | `ADF-LEG-4A0E889F7065` | Due lavori veri al posto di due cartelli chiusi: Pizzeria e Fabbrica | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
 | `ADF-LEG-D7416EF2ABDA` | Energia a 100, giornate, e skip di quanto vuoi | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | — non ancora auditata | — |

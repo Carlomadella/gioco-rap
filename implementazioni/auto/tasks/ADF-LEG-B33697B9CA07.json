@@ -11,20 +11,56 @@
     "source_status": "fatto",
     "source_status_raw": "fatto"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "complete",
   "intake_state": "canonical",
   "related_task_ids": [],
   "intake_note": "",
   "roadmap_impact": "none",
   "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
+  "current_state": [
+    "Il repository contiene frontend e backend separati, README dedicati e backend/database con documentazione propria; il controllo regressioni verifica la separazione."
+  ],
+  "systems": [
+    "frontend/",
+    "backend/",
+    "backend/database/",
+    "frontend/strumenti/audit-regressioni.js"
+  ],
+  "watch_paths": [
+    "frontend/",
+    "backend/",
+    "backend/database/",
+    "README.md",
+    "frontend/strumenti/audit-regressioni.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Frontend, backend e database hanno cartelle e README distinti.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "README.md: la mappa del progetto collega frontend/README.md, backend/README.md e backend/database/README.md.",
+        "frontend/strumenti/audit-regressioni.js: il controllo verifica le tre cartelle e i README."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il server usa il proprio strato database senza spostare la logica del gioco nel backend.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "backend/server.js: il server importa backend/database/archivio.js.",
+        "backend/README.md: documenta server e strato database separati."
+      ]
+    }
+  ],
+  "risks": [
+    "Spostamenti futuri di file possono rompere i percorsi relativi e il build del frontend."
+  ],
   "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+    "Il dossier backend.md resta documentazione locale ignorata da git; non e' stato trattato come file di prodotto."
   ],
   "roadmap_scope": "none",
   "plan": {
