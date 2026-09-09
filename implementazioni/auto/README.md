@@ -5,14 +5,14 @@
 ## Copertura
 
 - **Schede importate:** 114
-- **Task effettive (duplicati esclusi):** 112
-- **Auditate contro il repo:** 30/114
-- **Duplicati intercettati:** 2
-- **Estensioni/sovrapposizioni:** 6
-- **Richieste già implementate senza task equivalente:** 1
-- **Progetti con piano V1→Vn:** 18 (forniti dall'utente: 0)
+- **Task effettive (duplicati esclusi):** 111
+- **Auditate contro il repo:** 37/114
+- **Duplicati intercettati:** 3
+- **Estensioni/sovrapposizioni:** 8
+- **Richieste già implementate senza task equivalente:** 5
+- **Progetti con piano V1→Vn:** 20 (forniti dall'utente: 0)
 - **Piani con gap/conflitti da rivedere:** 0
-- **Auditate ma non complete:** 23
+- **Auditate ma non complete:** 26
 - Stato storico importato: da_fare 18 · in_parte 13 · fatto 77 · risposto 5 · nuova 1
 
 ## Tutte le task e richieste
@@ -35,7 +35,7 @@
 | `ADF-LEG-EFB36E8B32DF` | Via i popup dalle card: scene vere | storica | — | implementazioni/02-interfaccia-e-telefono.md | 🔶 in parte | 🔨 in sviluppo | 2/4 |
 | `ADF-LEG-8CD78027382F` | «Attività criminali non si può più giocare, che è successo?» | storica | — | implementazioni/06-mondo-e-personaggi.md | 📝 risposto | ✅ verificata | 3/3 |
 | `ADF-LEG-D15F3599E2BE` | «Completa la canzone» deve costare qualcosa | storica | — | implementazioni/04-musica-e-suoni.md | ⬜ da fare | 🔨 in sviluppo | 0/3 |
-| `ADF-LEG-5C8E4254268B` | Dal profilo si torna al gioco, non solo al menù | storica | — | implementazioni/02-interfaccia-e-telefono.md | ⬜ da fare | ✅ verificata | 2/2 |
+| `ADF-LEG-5C8E4254268B` | Dal profilo si torna al gioco, non solo al menù | ✅ già implementata | — | implementazioni/02-interfaccia-e-telefono.md | ⬜ da fare | ✅ verificata | 0/0 |
 | `ADF-LEG-F2279C3BBB14` | Gli asset arrivati da fuori | storica | — | implementazioni/09-grafica-e-asset.md | ⬜ da fare | ✅ verificata | 2/2 |
 | `ADF-LEG-1E9D26813741` | Gli opps, i rapper rivali | storica | — | implementazioni/06-mondo-e-personaggi.md | ⬜ da fare | ✅ verificata | 2/2 |
 | `ADF-LEG-0055AD364BF8` | I produttori hanno abilità, fama e carattere | storica | — | implementazioni/06-mondo-e-personaggi.md | ⬜ da fare | 🔨 in sviluppo | 0/3 |
@@ -49,13 +49,13 @@
 | `ADF-LEG-EA0648B57135` | La Fame Studio dentro al gioco, senza essere invadente | nuova | — | implementazioni/09-grafica-e-asset.md | ⬜ da fare | ⬜ da fare | 0/2 |
 | `ADF-LEG-BD22F97801FD` | La grafica uguale alla foto, e l'avatar segnaposto | 🟡 estensione | ADF-LEG-A90B7B3817A1, ADF-LEG-DB2D56011EF3 | implementazioni/09-grafica-e-asset.md | ⬜ da fare | ⬜ da fare | 0/2 |
 | `ADF-LEG-3EB6F5E9A3C4` | La richiesta finale sull'energia | 🔁 duplicata | ADF-LEG-D7416EF2ABDA | implementazioni/05-carriera-e-tempo.md | ⬜ da fare | ✅ verificata | 0/0 |
-| `ADF-LEG-E864F3A305D2` | La scena del produttore quando cerchi un beat | storica | — | implementazioni/04-musica-e-suoni.md | ⬜ da fare | — non ancora auditata | — |
-| `ADF-LEG-8D4A4E38E6D5` | La vita simulata | storica | — | implementazioni/06-mondo-e-personaggi.md | ⬜ da fare | — non ancora auditata | — |
-| `ADF-LEG-9EBE87A3843F` | Le card sulla mappa, di lato invece che sopra agli edifici | storica | — | implementazioni/01-mappa-e-citta.md | ⬜ da fare | — non ancora auditata | — |
-| `ADF-LEG-7319DD550E0D` | Ogni parte del gioco deve avere la sua ambientazione | storica | — | implementazioni/09-grafica-e-asset.md | ⬜ da fare | — non ancora auditata | — |
-| `ADF-LEG-DDDE0E598F52` | Quello che al backend mancava per stare in piedi su uno store | storica | — | implementazioni/07-multiplayer-e-backend.md | ⬜ da fare | — non ancora auditata | — |
-| `ADF-LEG-95F95C753984` | Una pagina per ogni azione? | storica | — | documentazione/pagine-azioni/README.md | 📝 risposto | — non ancora auditata | — |
-| `ADF-LEG-CCBBA5CFE700` | Via il bottone del menù dalle CTA in basso | storica | — | implementazioni/02-interfaccia-e-telefono.md | ⬜ da fare | — non ancora auditata | — |
+| `ADF-LEG-E864F3A305D2` | La scena del produttore quando cerchi un beat | 🔁 duplicata | ADF-LEG-EFB36E8B32DF | implementazioni/04-musica-e-suoni.md | ⬜ da fare | ✅ verificata | 0/0 |
+| `ADF-LEG-8D4A4E38E6D5` | La vita simulata | nuova | — | implementazioni/06-mondo-e-personaggi.md | ⬜ da fare | ⬜ da fare | 0/3 |
+| `ADF-LEG-9EBE87A3843F` | Le card sulla mappa, di lato invece che sopra agli edifici | 🟡 estensione | ADF-LEG-762C5E8D3415 | implementazioni/01-mappa-e-citta.md | ⬜ da fare | ⬜ da fare | 0/2 |
+| `ADF-LEG-7319DD550E0D` | Ogni parte del gioco deve avere la sua ambientazione | ✅ già implementata | — | implementazioni/09-grafica-e-asset.md | ⬜ da fare | ✅ verificata | 0/0 |
+| `ADF-LEG-DDDE0E598F52` | Quello che al backend mancava per stare in piedi su uno store | 🟡 estensione | ADF-LEG-043B012E6E3B | implementazioni/07-multiplayer-e-backend.md | ⬜ da fare | ⬜ da fare | 0/3 |
+| `ADF-LEG-95F95C753984` | Una pagina per ogni azione? | ✅ già implementata | — | documentazione/pagine-azioni/README.md | 📝 risposto | ✅ verificata | 0/0 |
+| `ADF-LEG-CCBBA5CFE700` | Via il bottone del menù dalle CTA in basso | ✅ già implementata | — | implementazioni/02-interfaccia-e-telefono.md | ⬜ da fare | ✅ verificata | 0/0 |
 | `ADF-LEG-314A919E7149` | «Chat»: mamma e il migliore amico, poi il resto con la fama | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
 | `ADF-LEG-C9E047E25208` | «Disciplina» diventa «Condizione» | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
 | `ADF-LEG-79EF3A472134` | «Fatti sentire un beat» non faceva niente, e i beat non si vedevano | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | — non ancora auditata | — |
@@ -139,11 +139,18 @@
 - **ADF-LEG-352B92864406 — L'energia a 100 (il ragionamento sui costi)**: overlap → ADF-LEG-D7416EF2ABDA — La task canonica copre l'implementazione dell'energia a 100 e dei costi giornalieri; questa aggiunge il delta di bilanciamento proposto nella risposta storica, che non coincide esattamente con i valori oggi nel codice.
 - **ADF-LEG-3EB6F5E9A3C4 — La richiesta finale sull'energia**: duplicate → ADF-LEG-D7416EF2ABDA — delta=nessuno: cambiare l'energia a 100 e adeguare giornate, costi e salti e' esattamente la consegna della task canonica sull'energia a 100.
 - **ADF-LEG-3FF6C1268680 — La soundboard è ancora poca**: overlap → ADF-LEG-D6B7FB24808B — La task D6B7FB24808B copre il rifacimento del banco audio; questa richiesta aggiunge suoni dedicati e la variazione timbrica dei beat, quindi è overlap e non duplicate.
+- **ADF-LEG-5C8E4254268B — Dal profilo si torna al gioco, non solo al menù**: already_implemented — Il comportamento richiesto e' gia' presente nel codice reale; non esiste una task equivalente separata da collegare.
+- **ADF-LEG-7319DD550E0D — Ogni parte del gioco deve avere la sua ambientazione**: already_implemented — Il deliverable storico richiesto, prompt separati per le ambientazioni delle pagine, e' gia' presente; non emerge una task equivalente distinta.
+- **ADF-LEG-95F95C753984 — Una pagina per ogni azione?**: already_implemented — La richiesta di analisi e progettazione e' gia' stata risposta nel README indicato; non emerge una task equivalente distinta.
+- **ADF-LEG-9EBE87A3843F — Le card sulla mappa, di lato invece che sopra agli edifici**: overlap → ADF-LEG-762C5E8D3415 — La task collegata copre la forma e la dimensione uniforme delle card; questa aggiunge il delta reale dello spostamento laterale rispetto agli edifici e richiede un asset mappa coerente.
 - **ADF-LEG-B2D3FA6EC43B — L'energia cresce col livello, e i livelli devono avere un senso**: overlap → ADF-LEG-D7416EF2ABDA — La task canonica copre energia giornaliera e costi; questa aggiunge il requisito non coperto di legare la crescita dell'energia al livello e dare un senso alla progressione anti-farming.
 - **ADF-LEG-BA8B65DA0C15 — La criminalità è troppo facile, e i soldi sporchi**: already_implemented — Il codice reale dimostra gia' il rallentamento e la separazione dei soldi: reputazione limitata e in calo, soldi puliti/sporchi distinti, riciclaggio limitato, calore e controlli.
 - **ADF-LEG-BD22F97801FD — La grafica uguale alla foto, e l'avatar segnaposto**: overlap → ADF-LEG-A90B7B3817A1, ADF-LEG-DB2D56011EF3 — Le task collegate coprono rispettivamente la plancia a schermo intero e la creazione dell'avatar; questa richiesta aggiunge il delta visivo di fedelta' alla foto e l'uso di un avatar segnaposto coerente.
 - **ADF-LEG-BF470E3FC825 — Il telefono come telefono (la richiesta di partenza)**: duplicate → ADF-LEG-C295A6327B74 — delta=nessuno: la richiesta del telefono in stile iPhone con sole app cliccabili e LaFamegram equivale alla task canonica sul telefono e LaFamegram.
+- **ADF-LEG-CCBBA5CFE700 — Via il bottone del menù dalle CTA in basso**: already_implemented — La CTA di ritorno al menu e' gia' stata rimossa dalla barra inferiore; il ritorno e' esposto nella testata superiore e nel menu di sistema.
 - **ADF-LEG-D4DF7036F6C4 — Il gioco esce su Steam e sugli store, non dentro a un artifact**: overlap → ADF-LEG-043B012E6E3B — La task canonica copre i cinque lavori tecnici per gli store; questa richiesta mantiene il delta storico su README e schema database, gia' presente, oltre alla direzione di distribuzione.
+- **ADF-LEG-DDDE0E598F52 — Quello che al backend mancava per stare in piedi su uno store**: overlap → ADF-LEG-043B012E6E3B — La task collegata copre il progetto complessivo di uscita sugli store e parte del backend; questa fonte aggiunge il delta operativo di chiudere i percorsi server residui e la loro integrazione cross-device.
+- **ADF-LEG-E864F3A305D2 — La scena del produttore quando cerchi un beat**: duplicate → ADF-LEG-EFB36E8B32DF — delta=nessuno: la task canonica copre gia' la scena del personaggio e del produttore per l'azione cerca un beat, con lo stesso obiettivo e risultato atteso.
 - **ADF-NEW-3E6D8998D1BD — Sistemare gli eventi e il tempo in gioco**: overlap → ADF-LEG-EC3A45E275D0, ADF-LEG-99F7F334DFE9 — La richiesta è più ampia delle task esistenti: EC3A45E275D0 copre la gerarchia degli incontri durante i salti e 99F7F334DFE9 il passaggio alla giornata; resta un delta reale di coerenza e prestazioni del motore eventi-tempo.
 
 ## Piani tecnici dei progetti
@@ -207,6 +214,13 @@ Piano: **auto** · stato: **ready**
 - **V2 — Memoria delle relazioni** · planned · dipende da V1
 - **V3 — Percorso e varietà** · needs_validation · dipende da V2
 
+### ADF-LEG-8D4A4E38E6D5 — La vita simulata
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Nucleo della simulazione** · planned
+- **V2 — Conseguenze nel mondo** · planned · dipende da V1
+
 ### ADF-LEG-9D8FB87EF413 — La carriera cresce con la mappa: Provincia → Milano → Los Angeles
 
 Piano: **auto** · stato: **ready**
@@ -264,6 +278,13 @@ Piano: **auto** · stato: **ready**
 
 - **V1 — Banco effetti** · complete
 - **V2 — Timbri dei beat** · needs_validation · dipende da V1
+
+### ADF-LEG-DDDE0E598F52 — Quello che al backend mancava per stare in piedi su uno store
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Account e cloud end-to-end** · planned
+- **V2 — Provider e pacchetto store** · planned · dipende da V1
 
 ### ADF-LEG-EA0648B57135 — La Fame Studio dentro al gioco, senza essere invadente
 

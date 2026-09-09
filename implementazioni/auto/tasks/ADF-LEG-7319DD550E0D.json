@@ -11,28 +11,44 @@
     "source_status": "da_fare",
     "source_status_raw": "da fare"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
-  "intake_state": "canonical",
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "already_implemented",
   "related_task_ids": [],
-  "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "intake_note": "Il deliverable storico richiesto, prompt separati per le ambientazioni delle pagine, e' gia' presente; non emerge una task equivalente distinta.",
+  "current_state": [
+    "prompt/prompt-ambientazioni.md contiene prompt separati per landing, avatar, casa, vicolo, Sala e le azioni/card principali.",
+    "La fonte stessa documenta sedici prompt che coprono le dodici card e le pagine di contesto richieste."
   ],
-  "roadmap_scope": "none",
+  "systems": [
+    "prompt/prompt-ambientazioni.md",
+    "frontend/pagine/",
+    "frontend/js/game/scene-art.js",
+    "frontend/js/game/studio.js"
+  ],
+  "watch_paths": [
+    "prompt/prompt-ambientazioni.md",
+    "frontend/pagine/",
+    "frontend/js/game/scene-art.js",
+    "frontend/js/game/studio.js",
+    "frontend/media/"
+  ],
+  "acceptance_criteria": [],
+  "risks": [
+    "La presenza dei prompt non dimostra che ogni asset sia stato prodotto o integrato nel gioco."
+  ],
+  "notes": [
+    "L'audit classifica il contenuto documentale come gia' presente; la realizzazione grafica degli asset resta fuori da questa task."
+  ],
   "plan": {
     "mode": "none",
     "status": "not_applicable",
-    "summary": "",
+    "summary": "Nessun piano: i prompt separati richiesti sono gia' nel repository.",
     "steps": [],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }

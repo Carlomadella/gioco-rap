@@ -11,28 +11,47 @@
     "source_status": "da_fare",
     "source_status_raw": "da fare"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
-  "intake_state": "canonical",
-  "related_task_ids": [],
-  "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "duplicate",
+  "related_task_ids": [
+    "ADF-LEG-EFB36E8B32DF"
   ],
-  "roadmap_scope": "none",
+  "intake_note": "delta=nessuno: la task canonica copre gia' la scena del personaggio e del produttore per l'azione cerca un beat, con lo stesso obiettivo e risultato atteso.",
+  "current_state": [
+    "La task canonica ADF-LEG-EFB36E8B32DF ha gia' il criterio specifico per la scena di cerca un beat.",
+    "Nel codice actions.js continua a chiamare offriBeat(), mentre ui.js esclude beat da SCENA_PIENA: l'implementazione non e' ancora chiusa."
+  ],
+  "systems": [
+    "frontend/js/game/actions.js",
+    "frontend/js/game/ui.js",
+    "frontend/js/game/scene-art.js",
+    "frontend/css/effects.css"
+  ],
+  "watch_paths": [
+    "frontend/js/game/actions.js",
+    "frontend/js/game/ui.js",
+    "frontend/js/game/scene-art.js",
+    "frontend/css/effects.css",
+    "frontend/pagine/gioco.html",
+    "implementazioni/auto/tasks/ADF-LEG-EFB36E8B32DF.json"
+  ],
+  "acceptance_criteria": [],
+  "risks": [
+    "La scena non deve sostituire la scelta del genere, l'ascolto del beat o il controllo degli opps."
+  ],
+  "notes": [
+    "La classificazione e' duplicate stretta: il perimetro della richiesta coincide con il criterio AC3 della task canonica."
+  ],
   "plan": {
     "mode": "none",
     "status": "not_applicable",
-    "summary": "",
+    "summary": "Nessun piano autonomo: il lavoro resta nella task canonica collegata.",
     "steps": [],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }

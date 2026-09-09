@@ -11,28 +11,64 @@
     "source_status": "da_fare",
     "source_status_raw": "da fare"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
-  "intake_state": "canonical",
-  "related_task_ids": [],
-  "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "audit_state": "audited",
+  "verified_status": "planned",
+  "intake_state": "overlap",
+  "related_task_ids": [
+    "ADF-LEG-762C5E8D3415"
   ],
-  "roadmap_scope": "none",
+  "intake_note": "La task collegata copre la forma e la dimensione uniforme delle card; questa aggiunge il delta reale dello spostamento laterale rispetto agli edifici e richiede un asset mappa coerente.",
+  "current_state": [
+    "hub.js usa HUB_LUOGHI e HUB_SAGOME per le zone cliccabili, mentre le targhette sono raster nella mappa.",
+    "La fonte dichiara il lavoro bloccato perche' l'asset mappa attuale incorpora le card e non puo' essere riposizionato dal layout."
+  ],
+  "systems": [
+    "frontend/js/game/hub.js",
+    "frontend/css/hub.css",
+    "frontend/media/photo/mappa_citta.jpg",
+    "frontend/concept/"
+  ],
+  "watch_paths": [
+    "frontend/js/game/hub.js",
+    "frontend/css/hub.css",
+    "frontend/media/photo/mappa_citta.jpg",
+    "frontend/concept/",
+    "implementazioni/auto/tasks/ADF-LEG-762C5E8D3415.json"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "La nuova mappa lascia visibili gli edifici e colloca ogni card leggermente piu' piccola a lato del relativo edificio.",
+      "verification": "playtest",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "AC2",
+      "description": "Le aree di interazione in HUB_SAGOME restano allineate agli edifici e alle card nel nuovo asset.",
+      "verification": "code_audit",
+      "status": "pending",
+      "evidence": []
+    }
+  ],
+  "risks": [
+    "Senza un asset nuovo non e' possibile spostare elementi gia' disegnati nella foto con il solo CSS.",
+    "Cambiare la prospettiva puo' richiedere di rimisurare tutte le sagome e le aree touch."
+  ],
+  "notes": [
+    "Il delta e' solo il posizionamento laterale e l'allineamento al nuovo asset; la forma comune delle card resta nella task collegata."
+  ],
   "plan": {
     "mode": "none",
     "status": "not_applicable",
-    "summary": "",
+    "summary": "Richiesta localizzata ma bloccata da un asset grafico esterno al codice.",
     "steps": [],
-    "gaps": [],
+    "gaps": [
+      "Manca un nuovo asset della mappa con edifici visibili e card laterali."
+    ],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }

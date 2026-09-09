@@ -11,28 +11,126 @@
     "source_status": "da_fare",
     "source_status_raw": "da fare"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
-  "intake_state": "canonical",
+  "audit_state": "audited",
+  "verified_status": "planned",
+  "intake_state": "unique",
   "related_task_ids": [],
-  "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "intake_note": "Non emerge una task equivalente: le persone e gli eventi esistono, ma la richiesta di una simulazione di vita molto sviluppata resta piu' ampia del codice attuale.",
+  "current_state": [
+    "posto.js genera persone persistenti con ruoli, caratteri, relazioni ed eta'.",
+    "rivals.js e sim.js gestiscono rivali e avanzamento della carriera; eventi e lifestyle coprono solo parti della vita.",
+    "La fonte e documentazione/roadmap.md descrivono il mondo vivo come cominciato, ma non dimostrano una simulazione generale e coerente."
   ],
-  "roadmap_scope": "none",
+  "systems": [
+    "frontend/js/game/posto.js",
+    "frontend/js/game/rivals.js",
+    "frontend/js/game/sim.js",
+    "frontend/js/game/events.js",
+    "frontend/js/game/eventi-tempo.js",
+    "frontend/js/game/lifestyle.js",
+    "frontend/js/game/strada-crimine.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/posto.js",
+    "frontend/js/game/rivals.js",
+    "frontend/js/game/sim.js",
+    "frontend/js/game/events.js",
+    "frontend/js/game/eventi-tempo.js",
+    "frontend/js/game/lifestyle.js",
+    "frontend/js/game/strada-crimine.js",
+    "frontend/js/game/state.js",
+    "documentazione/roadmap.md"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Le persone e i rivali persistenti hanno stato, relazioni e conseguenze che evolvono nel tempo invece di essere solo testo occasionale.",
+      "verification": "code_audit",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "AC2",
+      "description": "La simulazione collega carriera, luoghi, eventi, benessere e relazioni con aggiornamenti coerenti e leggibili dal giocatore.",
+      "verification": "code_audit",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "AC3",
+      "description": "Il mondo continua a produrre variazioni significative nel tempo senza introdurre eventi scollegati o ripetitivi.",
+      "verification": "playtest",
+      "status": "pending",
+      "evidence": []
+    }
+  ],
+  "risks": [
+    "Una simulazione troppo ampia puo' moltiplicare stato, salvataggi e casi limite senza aumentare il gameplay.",
+    "Gli eventi automatici possono togliere agency se modificano carriera o relazioni senza una scelta leggibile."
+  ],
+  "notes": [
+    "La roadmap ufficiale contiene gia' la direzione del mondo vivo; l'audit non propone una nuova macro-fase."
+  ],
   "plan": {
-    "mode": "none",
-    "status": "not_applicable",
-    "summary": "",
-    "steps": [],
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Definire il nucleo minimo della simulazione, poi collegarlo ai sistemi persistenti e provarne le conseguenze.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Nucleo della simulazione",
+        "objective": "Mappare stati, attori, relazioni e tick temporali gia' presenti, scegliendo il minimo modello condiviso per la vita simulata.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/posto.js",
+          "frontend/js/game/rivals.js",
+          "frontend/js/game/sim.js",
+          "frontend/js/game/state.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/posto.js",
+          "frontend/js/game/rivals.js",
+          "frontend/js/game/sim.js",
+          "frontend/js/game/state.js"
+        ],
+        "acceptance_criteria": [
+          "AC1",
+          "AC2"
+        ],
+        "status": "planned"
+      },
+      {
+        "id": "V2",
+        "title": "Conseguenze nel mondo",
+        "objective": "Collegare il nucleo a eventi, luoghi, benessere e relazioni, mantenendo scelte esplicite e salvataggi compatibili.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "frontend/js/game/events.js",
+          "frontend/js/game/eventi-tempo.js",
+          "frontend/js/game/lifestyle.js",
+          "frontend/js/game/strada-crimine.js",
+          "frontend/js/game/sim.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/events.js",
+          "frontend/js/game/eventi-tempo.js",
+          "frontend/js/game/lifestyle.js",
+          "frontend/js/game/strada-crimine.js",
+          "frontend/js/game/sim.js"
+        ],
+        "acceptance_criteria": [
+          "AC2",
+          "AC3"
+        ],
+        "status": "planned"
+      }
+    ],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }

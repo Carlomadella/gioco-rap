@@ -11,28 +11,44 @@
     "source_status": "da_fare",
     "source_status_raw": "da fare"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
-  "intake_state": "canonical",
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "already_implemented",
   "related_task_ids": [],
-  "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "intake_note": "La CTA di ritorno al menu e' gia' stata rimossa dalla barra inferiore; il ritorno e' esposto nella testata superiore e nel menu di sistema.",
+  "current_state": [
+    "gioco.html contiene il bottone Menu nella testata hb-menu e non una CTA Menu nella barra inferiore.",
+    "menu-sistema.js espone il percorso Salva ed esci e la barra globale; game.css documenta la CTA inferiore come uscita dalla partita senza duplicare il menu."
   ],
-  "roadmap_scope": "none",
+  "systems": [
+    "frontend/pagine/gioco.html",
+    "frontend/js/menu-sistema.js",
+    "frontend/css/game.css",
+    "frontend/css/menu-sistema.css"
+  ],
+  "watch_paths": [
+    "frontend/pagine/gioco.html",
+    "frontend/js/menu-sistema.js",
+    "frontend/css/game.css",
+    "frontend/css/menu-sistema.css",
+    "frontend/js/game/ui.js"
+  ],
+  "acceptance_criteria": [],
+  "risks": [
+    "Rimuovere anche le CTA di chiusura delle singole scene confonderebbe il ritorno alla mappa con il ritorno al menu."
+  ],
+  "notes": [
+    "L'audit distingue il comando globale Menu dalle CTA locali che chiudono una scena o riportano alla mappa."
+  ],
   "plan": {
     "mode": "none",
     "status": "not_applicable",
-    "summary": "",
+    "summary": "Nessun piano: la duplicazione del bottone Menu in basso non risulta presente.",
     "steps": [],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }

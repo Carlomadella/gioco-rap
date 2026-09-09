@@ -13,63 +13,43 @@
   },
   "audit_state": "audited",
   "verified_status": "complete",
-  "intake_state": "canonical",
+  "intake_state": "already_implemented",
   "related_task_ids": [],
-  "intake_note": "La richiesta storica è coperta dal percorso di profilo della landing e dall’ingresso in partita.",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
+  "intake_note": "Il comportamento richiesto e' gia' presente nel codice reale; non esiste una task equivalente separata da collegare.",
   "current_state": [
-    "Il profilo della landing attiva il creator in modalità aspetto quando esiste una partita.",
-    "Il fallback apre gioco.html?vai=profilo e il gioco carica lo slot attivo senza limitarsi al menu."
+    "Il profilo della landing prepara lo slot attivo e chiama ADF_RPG_V24.openAppearance().",
+    "Il fallback usa gioco.html?vai=profilo e gioco-ingresso.js entraInCitta() porta a hub e GAME.enter()."
   ],
   "systems": [
     "frontend/js/landing.js",
     "frontend/js/avvio.js",
-    "frontend/js/gioco-ingresso.js",
-    "frontend/js/creator/rpg-v24-bridge.js"
+    "frontend/js/creator/rpg-v24-bridge.js",
+    "frontend/js/gioco-ingresso.js"
   ],
   "watch_paths": [
     "frontend/js/landing.js",
     "frontend/js/avvio.js",
-    "frontend/js/gioco-ingresso.js",
     "frontend/js/creator/rpg-v24-bridge.js",
+    "frontend/js/gioco-ingresso.js",
     "frontend/pagine/landing.html",
     "frontend/pagine/gioco.html"
   ],
-  "acceptance_criteria": [
-    {
-      "id": "AC1",
-      "description": "Con una partita esistente, il comando del profilo consente di modificare l’artista e di rientrare nella partita attiva.",
-      "verification": "code_audit",
-      "status": "satisfied",
-      "evidence": [
-        "frontend/js/landing.js: vaiAlProfilo() chiama ADF_RPG_V24.openAppearance(); il bridge salva l’aspetto e il percorso gioco conserva lo slot attivo."
-      ]
-    },
-    {
-      "id": "AC2",
-      "description": "Il ritorno dal profilo apre la plancia di gioco e non lascia l’utente soltanto nel menu.",
-      "verification": "code_audit",
-      "status": "satisfied",
-      "evidence": [
-        "frontend/js/gioco-ingresso.js: entraInCitta() esegue goto(\"hub\") e GAME.enter(); il fallback di landing.js usa vaiAlGioco(\"vai=profilo\")."
-      ]
-    }
-  ],
+  "acceptance_criteria": [],
   "risks": [
-    "Un cambio al caricamento dello slot può disallineare artista, carriera e creator.",
-    "La modalità appearance deve continuare a distinguersi dalla creazione di una nuova partita."
+    "Un cambio al caricamento dello slot puo' disallineare artista, carriera e creator."
   ],
   "notes": [
-    "Il codice dimostra il collegamento; la resa visuale del ritorno resta una verifica manuale se cambiano le schermate."
+    "La fonte storica resta da fare come storico; l'audit separato registra che il comportamento e' gia' dimostrato."
   ],
   "plan": {
     "mode": "none",
     "status": "not_applicable",
-    "summary": "Nessun piano tecnico: il percorso richiesto è già collegato.",
+    "summary": "Nessun piano: il percorso dal profilo alla partita e' gia' implementato.",
     "steps": [],
     "gaps": [],
     "notes": []
   },
-  "roadmap_scope": "none"
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }
