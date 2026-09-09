@@ -1044,17 +1044,31 @@ La verifica reale del Blocco 3 conferma che le 47 phrase seed risultano `debug=a
 Il nuovo selettore richiede permesso positivo per il proprio uso: assenza di policy, `candidate` o `unknown` non diventano autorizzazione implicita. Il seed continua a non contribuire ai gate musicali full-arrangement.
 ## 7C — Drum Dataset V2
 
-Costruire una vista drum dedicata con:
+**Stato: IN CORSO — Blocco 1 Drum View V2 completato nel suo scope tecnico.**
 
-- voci drum separate;
-- simultaneous joint frame;
+Il Blocco 1 introduce e verifica una vista drum dedicata derivata da `sourceFidelity`:
+
+- joint frame su griglia 16th come baseline iniziale;
+- voci/mapping versionati e source-aware;
+- raw MIDI note + `sourceEventId` sempre mantenuti;
 - velocity;
-- griglia metrica + microtiming offset quando disponibile;
-- fill flag;
-- loop/core candidate;
-- source/style metadata;
-- group leakage-safe;
-- boundary metadata.
+- microtiming/offset continuo da source tick/PPQ;
+- più hit della stessa lane nello stesso frame preservati, non ridotti al solo hit più forte;
+- provenance/composition family;
+- semantics `core/fill/variation/loopability/boundary` lasciate `unknown` finché non esiste evidenza.
+
+Sul campione reale GMD: 2382/2382 source/view hit, 15 note MIDI uniche, 0 fallback sul profilo `gmd-9-v1`, 65 lane/frame con multi-hit preservato.
+
+La griglia 16th è una baseline comparabile, non una quantizzazione distruttiva della sorgente. Il mapping `gmd-9-v1` è un adapter GMD, non la tassonomia Trap universale.
+
+Restano aperti dentro 7C e nei blocchi collegati:
+
+- metadata enrichment style/beat/split;
+- tassonomia/adaptor Trap dopo sorgenti Trap simboliche affidabili;
+- scelta e verifica di window/core candidate task-specifiche;
+- integrazione con policy boundary/loopability 7G;
+- export task-admissible finale e split leakage-safe sul corpus espanso;
+- scala/diversità sufficienti per il gate `DRUM DATA READY V2`.
 
 ## 7D — Espansione GMD
 

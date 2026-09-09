@@ -1,0 +1,43 @@
+{
+  "schema": "fame-neural-drum-mapping-registry-v1",
+  "version": 1,
+  "profiles": {
+    "gm-raw-v1": {
+      "version": 1,
+      "scope": "generic-gm-fallback",
+      "description": "Lossless fallback: each MIDI note keeps its own lane identity.",
+      "unmappedPolicy": "raw-note-lane",
+      "notes": {}
+    },
+    "gmd-9-v1": {
+      "version": 1,
+      "scope": "groove-midi-dataset-adapter",
+      "description": "Nine-voice adapter used for GMD comparability. Raw MIDI identity remains in sourceFidelity.",
+      "unmappedPolicy": "raw-note-lane",
+      "notes": {
+        "36": "kick",
+        "38": "snare",
+        "37": "snare",
+        "40": "snare",
+        "42": "hat_closed",
+        "22": "hat_closed",
+        "44": "hat_closed",
+        "46": "hat_open",
+        "26": "hat_open",
+        "43": "tom_low",
+        "58": "tom_low",
+        "47": "tom_mid",
+        "45": "tom_mid",
+        "50": "tom_high",
+        "48": "tom_high",
+        "49": "crash",
+        "52": "crash",
+        "55": "crash",
+        "57": "crash",
+        "51": "ride",
+        "53": "ride",
+        "59": "ride"
+      }
+    }
+  }
+}

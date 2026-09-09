@@ -119,6 +119,43 @@ Limite conservato: le 502 phrase storiche già materializzate restano artefatti 
 
 Dettaglio e ricerca di chiusura: [PHASE7A_BLOCK4_CHIUSURA_2026-09-09.md](PHASE7A_BLOCK4_CHIUSURA_2026-09-09.md).
 
+## Aggiornamento operativo — FASE 7C Blocco 1
+
+**Stato del Blocco 1: COMPLETATO NEL SUO SCOPE TECNICO. FASE 7C: ANCORA APERTA.**
+
+È disponibile il primo contratto `fame-neural-drum-view-v2`, derivato direttamente da `sourceFidelity` senza passare dalla perdita strumentale/timing del canonico V1.
+
+Proprietà verificate:
+
+- joint frame su griglia 16th come baseline di rappresentazione;
+- raw MIDI note e `sourceEventId` preservati per ogni hit;
+- velocity preservata;
+- microtiming derivato dal source tick/PPQ e conservato come offset continuo;
+- mapping versionato e source-aware;
+- `gmd-9-v1` usato soltanto come adapter GMD;
+- fallback raw-note lane disponibile per note non mappate;
+- multi-hit nella stessa lane/frame preservati come eventi distinti;
+- `fill/core/variation/loopability/boundary` restano `unknown` senza evidenza;
+- metadata style/beat/split restano non arricchiti.
+
+Verifica reale GMD:
+
+- 6 MIDI reali;
+- 2382 source hits e 2382 view hits;
+- 15 MIDI note uniche;
+- 0 fallback hit sul profilo GMD-9;
+- 65 lane/frame con multi-hit preservato;
+- 8 proiezioni verso il bordo della window marcate come clipped, senza perdita del raw timing;
+- accounting source-hit lossless: OK.
+
+È stato verificato anche il percorso di export reale: 6 dataset item → 6 file Drum View V2, report valido, source/view hit accounting coerente e 0 raw fallback hit sul campione GMD.
+
+Le 8 proiezioni boundary-clipped **non chiudono la policy di boundary**: il raw timing e il nearest-step pre-clamp restano disponibili, ma clamp/wrap/boundary-frame sono ancora materia della 7G. Il Blocco 1 non trasforma questa scelta provvisoria in ground truth.
+
+Questo successo tecnico non dichiara `DRUM DATA READY V2` e non apre training serio.
+
+Dettaglio e ricerca di chiusura: [PHASE7C_BLOCK1_CHIUSURA_2026-09-09.md](PHASE7C_BLOCK1_CHIUSURA_2026-09-09.md).
+
 ## Stato roadmap
 
 Roadmap ufficiale: **V2 — ricalibrata dopo i primi gate musicali**.

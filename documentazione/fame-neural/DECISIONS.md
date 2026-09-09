@@ -531,3 +531,24 @@ Regole:
 - uguaglianza dei conteggi raw/canonical è un'invariante tecnica utile, non una prova di qualità musicale.
 
 La decisione implementa NDR-033 e NDR-036 senza revocare NDR-017/FAME Compound come common representation.
+
+## NDR-044 — Drum View V2 preserva gli hit prima di comprimere il modello
+**Status:** ACCEPTED
+
+La Drum View V2 usa una griglia metrica come **riferimento**, non come autorizzazione a distruggere eventi sorgente.
+
+Regole:
+
+- ogni hit mantiene raw MIDI note, velocity, source timing e `sourceEventId`;
+- il microtiming viene derivato da source tick/PPQ e mantenuto come offset continuo;
+- più hit che ricadono sulla stessa lane e sullo stesso frame restano eventi distinti nel dataset task view;
+- eventuali encoding di modello più compatti possono essere confrontati dopo, ma la loro perdita non viene incorporata silenziosamente nel dataset;
+- mapping strumentali sono versionati e source-aware;
+- `gmd-9-v1` è un adapter di comparabilità per GMD, non una tassonomia universale Trap;
+- note non coperte da un adapter devono mantenere una raw-note lane o produrre un errore esplicito secondo la policy del mapping;
+- `fill/core/variation/loopability/boundary` non vengono inferiti dalla sola finestra fissa;
+- la gestione della proiezione a ridosso del bordo resta una policy separata da chiudere in 7G.
+
+Sul campione GMD reale il Block1 conserva 2382/2382 hit, 15 note MIDI uniche e 65 lane/frame con multi-hit. Le 8 proiezioni marcate al bordo conservano raw timing e nearest-step originale e vengono trattate come evidenza che la boundary policy non è ancora congelata.
+
+Questa decisione restringe la rappresentazione del **dataset/task view**, non anticipa il formato interno del futuro modello.
