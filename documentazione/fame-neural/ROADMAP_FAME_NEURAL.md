@@ -1,7 +1,7 @@
 # FAME Neural — Roadmap ufficiale V2
 
 Data: 9 settembre 2026<br>
-Stato: ROADMAP OPERATIVA RICALIBRATA DOPO I PRIMI GATE MUSICALI<br>
+Stato: ROADMAP OPERATIVA V2 — PRECISATA DOPO AUDIT HANDOFF E SONIC PI<br>
 Progetto: FAME Neural Composer
 
 > Questa V2 sostituisce la sequenza operativa della V1 dalla FASE 7 in avanti.
@@ -11,6 +11,8 @@ Progetto: FAME Neural Composer
 ---
 
 # 0. Come si legge questa roadmap
+
+Revisione documentale successiva al commit `02bc708`: [confronto handoff e roadmap](REVISIONE_HANDOFF_SONIC_PI_2026-09-09.md). Le conseguenze sono adottate in NDR-035…040. Il rapporto conserva evidenze e proposte al commit analizzato; questa roadmap e CURRENT_STATE indicano decisioni e stato correnti. La revisione non modifica il codice né chiude i gate musicali.
 
 ## Precisazioni vincolanti dall'audit del 9 settembre 2026
 
@@ -63,7 +65,7 @@ Nel Neural una regola diventa vincolante solo quando viene verificata nel nuovo 
 
 Costruire un compositore musicale neurale capace di generare beat Trap credibili, vari, strutturati e utilizzabili per rap/freestyle, imparando dai dati invece di dipendere da una lunga catena di regole manuali.
 
-Il target di runtime resta gerarchico, ma viene raffinato:
+Il diagramma seguente conserva la topologia di riferimento V2 come **ipotesi di implementazione**. I ruoli musicali non impongono altrettante reti separate: Core/Arranger, Tonal Context/Performer e Refiner devono essere confrontati con accorpamenti o alternative joint/condizionali. La coerenza si verifica già quando si introduce la seconda parte, non soltanto alla Fase 14. Il contratto dei controlli disponibili viene definito prima dei Performer, anche con un piano minimo fornito, mentre il training del Planner può restare successivo.
 
 ```text
 USER INTENT
@@ -693,15 +695,12 @@ Da non ripetere:
 
 La conversione deve essere tracciabile:
 
-```text
-CANONICAL SOURCE
-      ↓
-FAME COMMON REPRESENTATION
-      ↓
-TASK VIEW
-      ↓
-MODEL
-```
+La sorgente preservata, con provenance e payload di fedeltà quando necessario, alimenta due derivazioni tracciabili:
+
+- rappresentazione comune per interoperabilità e benchmark;
+- Task View con l'informazione richiesta dal modello.
+
+Il passaggio attraverso una versione già quantizzata o impoverita NON è obbligatorio per costruire la Task View. Un'estensione versionata del canonico e un sidecar sono alternative da verificare con prove di collegamento e compatibilità. Conservare gli originali non implica introdurre subito tutti i loro campi nel modello.
 
 Nessuna Task View può inventare ground truth non presente.
 
@@ -1012,7 +1011,11 @@ Costruire il primo corpus realmente task-specifico e musicalmente difendibile.
 
 ## 7A — Content capabilities ufficiali
 
-Aggiungere metadata espliciti per evitare che:
+**Contratto iniziale implementato al commit `02bc708`; integrazione operativa e ammissibilità per task ancora aperte.** Il builder distingue osservazioni, capability, uso, qualità ed evidenza. Lo smoke test passa, ma il normalizzatore verifica la struttura e i riferimenti, non la sufficienza musicale dell'evidenza.
+
+Completare il percorso di selezione/export con un controllo di ammissibilità per task: usi esplicitamente consentiti, restrizioni sorgente, diritti, capability e qualità pertinenti. `unknown` e `candidate` non autorizzano automaticamente un training. La policy deve essere applicata dal percorso effettivo, senza dipendere da un'opzione dimenticata dal chiamante. Verificare record consentiti, bloccati e sconosciuti sul percorso di export; non imporre qualità di prodotto agli usi di debug.
+
+Applicare metadata espliciti per evitare che:
 
 - drums-only;
 - tonal-only;
@@ -1027,7 +1030,7 @@ Policy:
 
 `DEBUG_SYNTHETIC_ONLY` salvo nuova review esplicita.
 
-Non contribuisce ai gate musicali full-arrangement.
+Non contribuisce ai gate musicali full-arrangement. La policy iniziale blocca `musicalTarget`; gli altri usi non autorizzati restano `unknown`. Il futuro selettore deve richiedere permesso positivo per il proprio uso: nessuna promozione implicita a pretraining/augmentation musicale.
 
 ## 7C — Drum Dataset V2
 
@@ -1094,6 +1097,12 @@ Chiudere il test in corso 4-bar loop vs 8-bar contiguous come diagnostica.
 
 Poi implementare un criterio di boundary/loopability task-specifico invece di scegliere una durata solo per convenzione.
 
+## Fattibilità delle fasi successive e piste candidate
+
+Prima di impegnare il progetto nell'intera catena di modelli, verificare la disponibilità di sequenze continue e di parti drums/808/armonia realmente abbinate per le Fasi 9–12. Dataset separati per ruolo non costituiscono da soli supervisione delle loro interazioni. Registrare pool, diritti, famiglie indipendenti e qualità; se insufficienti, dichiarare il collo di bottiglia e valutare acquisizione mirata o trasferimento compatibile.
+
+Sonic Pi resta una **sorgente programmatica candidata di ricerca**, non una nuova fase né un prerequisito generale. Un pilot isolato richiede scope, budget, fixture ammissibili, stato iniziale, versione runtime e gate di fedeltà dichiarati. Eventi e controllo restano separati; niente nuove capability o modifica obbligatoria del canonico prima della prova. Il confronto musicale più naturale è nella Fase 9 e segue NDR-038/039. Dettagli e limiti: [rapporto di revisione](REVISIONE_HANDOFF_SONIC_PI_2026-09-09.md).
+
 ## Gate FASE 7 — DRUM DATA READY V2
 
 Prima dell'esecuzione del gate fissare pool ammissibile, unità indipendente/famiglia, split, regole di campionamento, numerosità, criteri di qualità e trattamento degli incerti. “Abbastanza grande” e “quota sufficiente” sotto sono obiettivi da rendere operativi, non soglie già definite. Label diretti, label di fonte, inferenze e review devono essere distinguibili (NDR-032…034).
@@ -1101,7 +1110,7 @@ Prima dell'esecuzione del gate fissare pool ammissibile, unità indipendente/fam
 Non si passa a training serio finché:
 
 - corpus drum è abbastanza grande rispetto ai benchmark comparabili;
-- source roles sono corretti;
+- source roles sono corretti e il percorso reale di selezione/export applica gli usi consentiti;
 - leakage 0;
 - instrument identity/microtiming policy è definita;
 - loop/core/fill policy è definita;
@@ -1110,6 +1119,8 @@ Non si passa a training serio finché:
 - la ricerca di chiusura non evidenzia un buco architetturale grave.
 
 ---
+
+Le attività della Fase 7 sono valutate per il task che supportano. Una prova tecnica circoscritta può usare un pool già ammissibile, con scope esplicito; non equivale all'apertura del training serio né alla promozione Trap. PDMX tonale e Sonic Pi non sono automaticamente prerequisiti di ogni prova drum. Il gate completo sopra resta necessario per la promozione prevista: nessuna separazione informale permette di saltarlo.
 
 # 10. FASE 8 — DRUM CORE V0
 
@@ -1133,6 +1144,8 @@ Imparare un groove drum coerente, loopabile e con relazioni simultanee tra voci.
 Finestra corta task-specifica.
 
 Baseline forte da testare: 2 barre, ma la ricerca di apertura deve riconfermarla.
+
+Prima del confronto fissare input disponibili all'inferenza, vista, baseline, split, budget e criteri di stop. Primo confronto limitato, per esempio autoregressivo vs masked con informazione equivalente; diffusion è un'alternativa quando risponde a una domanda concreta. Confrontare pretraining generale con baseline pertinente e misurare separatamente qualità generale e dominio Trap. Nessuna superiorità è presunta.
 
 ## Human gate
 
@@ -1168,6 +1181,8 @@ Deve imparare:
 - continuità tra boundary.
 
 Il modello non deve cambiare donor ogni 2 barre solo per aumentare diversità.
+
+Prima di congelare un Arranger separato, confrontare Core+Arranger con un modello condizionato unico sulle otto barre. Servono sequenze continue con evidenza delle variazioni e dei confini. Il pilot Sonic Pi, se giustificato, confronta eventi/controlli comuni, descrittori semplici e program trace sugli stessi esempi e sulle stesse famiglie. Il trace del bersaglio completo non può essere presentato come input autonomamente disponibile alla generazione.
 
 Gate:
 
@@ -1227,6 +1242,8 @@ Regola:
 
 **808 Performer non è indipendente dal drum groove.**
 
+Il primo benchmark richiede parti abbinate: confrontare con contesto drums/armonia fissato e poi con contesto generato. Misurare già qui l'interazione; la Fase 14 non è una promessa di riparazione successiva. Il ruolo `lowEnd` nel canonico non certifica da solo articolazione, glide o identità di una vera parte 808.
+
 ---
 
 # 14. FASE 12 — TONAL PERFORMER V0
@@ -1243,7 +1260,7 @@ Produrre harmony/melody/lead coerenti con:
 - structure;
 - vocal space.
 
-Il modello può essere specializzato ma deve ricevere contesto cross-track.
+Il modello può essere specializzato ma deve ricevere contesto cross-track. Valutare accorpamenti con Tonal Context o generazione joint quando i dati lo consentono. Il gate comprende l'effetto sul beat completo e lo spazio per la voce; la qualità della traccia isolata non è sufficiente.
 
 ---
 
@@ -1251,7 +1268,7 @@ Il modello può essere specializzato ma deve ricevere contesto cross-track.
 
 Stato: **RINVIATA FINO AI GATE PRECEDENTI**
 
-Il Planner torna qui.
+Il training del Planner torna qui; il contratto dei controlli viene definito prima dei Performer. Per ciascun controllo dichiarare se è fornito, estratto da una sorgente disponibile o generato. Valutare separatamente contesti reali e generati. Un piano minimo manuale/predefinito è una baseline di controllo, non ground truth musicale inventata. La necessità di una rete Planner separata resta da confrontare con alternative più semplici.
 
 ## Obiettivo
 
@@ -1298,7 +1315,7 @@ un piano “corretto” numericamente ma che produce musica peggiore non è prom
 
 # 16. FASE 14 — JOINT REFINER / CROSS-TRACK COHERENCE
 
-Stato: **DA FARE**
+Stato: **COERENZA DA VERIFICARE PROGRESSIVAMENTE; REFINER SEPARATO OPZIONALE**
 
 ## Obiettivo
 
@@ -1315,7 +1332,7 @@ Controllare e/o correggere:
 
 Non deve diventare un altro procedural rule engine.
 
-La tecnologia viene scelta con ricerca + benchmark.
+La tecnologia viene scelta con ricerca + benchmark. Un modulo separato si implementa solo se porta un miglioramento aggiuntivo rispetto al conditioning o al modello joint, includendo il costo. Il gate di coerenza rimane obbligatorio anche se il Refiner viene accorpato o non adottato.
 
 ---
 
@@ -1323,14 +1340,9 @@ La tecnologia viene scelta con ricerca + benchmark.
 
 Stato: **DA FARE**
 
-Pipeline:
+Pipeline da valutare: controlli disponibili → generatore scelto (joint o componenti condizionati, con eventuale Refiner) → candidati → Selector/Auditor → risultato scelto.
 
-Planner<br>
-→ Performer specialistici<br>
-→ Joint Refiner<br>
-→ 3–4 candidates<br>
-→ Selector/Auditor<br>
-→ best candidate
+La vecchia previsione di 3–4 candidati è una configurazione da benchmarkare, non un vantaggio gratuito. Dichiarare lo stesso budget di generazione/selezione per i concorrenti, oppure misurare esplicitamente il compromesso costo/qualità. Riportare sia il candidato singolo sia il risultato con selector. I confronti intermedi iniziano già nei singoli componenti.
 
 Auditor:
 
@@ -1384,6 +1396,8 @@ Non fissare ora 5k/10k come numero magico: la scala viene definita task per task
 - melody;
 - transition;
 - section.
+
+Il budget di hardware, memoria, durata di training e latenza d'inferenza deve essere definito già all'apertura del primo modello. Questa fase completa l'hardening; non rimanda tutte le misure di costo alla fine.
 
 ## 16D — Hardening
 
@@ -1448,6 +1462,8 @@ Ogni modello deve dimostrare:
 - diversity;
 - leakage safety;
 - representation suitability.
+
+Prima di ogni gate musicale definire numerosità motivata per famiglie, campionamento, soglia o miglioramento minimo utile, trattamento di pareggi/incerti, renderer e palette, numero di candidati e regola di arresto. La conferma finale usa famiglie non impiegate per scegliere ipotesi/configurazioni. Gli esiti comprendono anche **INCONCLUDENTE**: nessuna evidenza di beneficio non dimostra automaticamente impossibilità. Ricerca di chiusura obbligatoria sul blocco effettivamente svolto.
 
 ## GATE 4 — COMPONENT MUSICALITY
 
@@ -1598,12 +1614,12 @@ Questi numeri certificano il contratto tecnico, non il training readiness.
 
 ## Prossimi interventi ufficiali
 
-1. aprire il blocco 7A/7B con ricerca specifica, contratto delle capacità d'uso ed evidenza dei label, applicando l'audit e NDR-028…034;
-2. progettare e implementare Drum View / Drum Dataset V2 con conservazione sorgente; recuperare o rieseguire con nuova identità il diagnostico aperto in 7G prima di congelare boundary/loopability, senza trasformarlo in dogma 4-vs-8;
-3. espandere GMD come general human groove pretraining source;
-4. audit approfondito HH-TRP prima di qualsiasi intake;
-5. rendere PDMX quality-aware/role-aware;
-6. solo dopo rivalutare l'apertura del Drum Core training.
+1. consolidare lo stato del contratto 7A/blocco 1 già implementato e aprire il completamento della selezione/export con ricerca e gate propri;
+2. completare ammissibilità per task e fedeltà della Drum View, con conservazione sorgente e verifica del percorso effettivo;
+3. verificare fonti Trap e fattibilità delle parti allineate per le fasi successive; espandere GMD nel ruolo generale dichiarato e auditare HH-TRP prima dell'intake;
+4. recuperare o rieseguire con nuova identità il diagnostico boundary prima di congelare la policy; rendere PDMX quality-aware per i task pertinenti;
+5. congelare benchmark, input disponibili e criteri del gate dati/musicale; soltanto dopo aprire il modello minimo previsto;
+6. confrontare presto il risultato su otto barre e nel contesto delle altre parti. Sonic Pi resta un pilot facoltativo legato a una domanda specifica, non un blocco obbligatorio aggiunto alla sequenza.
 
 Il **Neural Planner V0 resta sospeso** finché i nuovi task gate non sono superati.
 

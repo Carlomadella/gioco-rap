@@ -1,5 +1,7 @@
 # FAME Neural — Ricerca di apertura della Fase 7
 
+> **Fotografia storica di apertura al commit `1372467`.** Il contratto iniziale 7A è stato successivamente introdotto in `02bc708` e verificato nel [confronto handoff](REVISIONE_HANDOFF_SONIC_PI_2026-09-09.md). Le indicazioni sul prossimo intervento e sull'assenza di risultati sotto si riferiscono all'apertura. Stato corrente e ordine operativo sono in CURRENT_STATE e ROADMAP; questa nota non certifica la chiusura della Fase 7A o del gate dati.
+
 ## Esito operativo
 
 La Fase 7 resta **Task Data Reset + Drum Dataset V2**. Il primo blocco implementativo deve rendere espliciti ruolo d’uso, qualità nota e fedeltà dei dati drum. Espandere il corpus prima di questa verifica rischia di moltiplicare esempi con informazione già perduta. Il Neural Planner e il training di prodotto restano rinviati.

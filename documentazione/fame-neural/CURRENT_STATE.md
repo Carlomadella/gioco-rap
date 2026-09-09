@@ -20,6 +20,22 @@ Data: 2026-09-09
 
 I numeri delle Fasi 0–6 sotto restano **storico documentato**, non risultati rieseguiti durante l'audit. I casi già usati per prendere decisioni rimangono utili per sviluppo/regressioni; non vengono presentati come test finale nuovamente indipendente.
 
+## Aggiornamento dopo il confronto handoff / Sonic Pi
+
+Base implementativa verificata: `02bc708e1f1f8797b9cb5aef8dc24fd45a92393e`. [Rapporto di revisione](REVISIONE_HANDOFF_SONIC_PI_2026-09-09.md). NDR-035…040 adottano le correzioni di protocollo; questa integrazione è documentale.
+
+- **7A / blocco 1 IMPLEMENTATO:** modulo `content-capabilities`, policy iniziale e smoke test; test originale rieseguito con esito positivo nell'audit.
+- **Ammissibilità semantica APERTA:** il normalizzatore controlla schema/riferimenti, non adeguatezza delle prove musicali. La prova mirata dell'audit accetta una promozione FULL_ARRANGEMENT sostenuta soltanto dalla presenza di un kick; il builder normale non la produce automaticamente.
+- **Applicazione nella pipeline APERTA:** i percorsi controllati di phrase building, gate dati ed export microtrain non applicano ancora il contratto. La policy è opzionale nel builder; `unknown` non autorizza il training. Nessuna esclusione globale già implementata viene dedotta dalla sola policy.
+- **Chiusura di 7A non dichiarata:** manca una chiusura operativa completa con selezione/export verificati. Il test del contratto non chiude la fase dati.
+- **Fedeltà Drum View APERTA:** sorgente preservata, conversioni e collegamenti da verificare; nessuna derivazione obbligatoria attraverso informazione già persa.
+- **Corpus allineato 8-bar APERTO:** verificare parti drums/808/armonia abbinate prima di impegnare l'intera catena dei modelli.
+- **Input di controllo DA SPECIFICARE:** distinguere forniti, estratti e generati; Planner neurale rinviato, contratto dei controlli anticipato.
+- **Sonic Pi RESEARCH CANDIDATE:** nessun intake, tracer FAME, nuovo modello o gate musicale chiuso. L'audit verifica codice ufficiale e fonti; non esegue Sonic Pi né certifica i diritti di ogni asset. La richiesta a Sam Aaron è riportata dall'handoff, non prova di permesso ricevuto.
+- **Architettura IPOTESI:** confronto Core+Arranger vs modello unico; Refiner separato opzionale, coerenza richiesta già nelle interazioni iniziali.
+
+I rapporti di ricerca restano fotografie al commit dichiarato. Questa sezione è lo stato corrente; non riscrive i vecchi risultati e non attribuisce alla documentazione correzioni di codice ancora aperte.
+
 ## Stato roadmap
 
 Roadmap ufficiale: **V2 — ricalibrata dopo i primi gate musicali**.
@@ -450,16 +466,13 @@ dataset Trap/Drill potenzialmente utile per drum specialization, ma di natura al
 
 Ordine:
 
-1. usare l'audit integrato e completare la ricerca specifica del blocco prima del codice: assunzioni, alternative, benchmark e gate;
-2. definire `contentCapabilities`, usi consentiti ed evidenza dei label (7A/7B);
-3. definire la conservazione dei dati sorgente per Drum View / Drum Dataset V2, senza inventare informazione persa;
-4. recuperare il boundary diagnostic aperto oppure eseguirne uno nuovo identificabile nell'ambito 7G, prima di congelare boundary/loopability;
-5. espandere GMD per general human groove;
-6. audit HH-TRP;
-7. rendere PDMX quality-aware/role-aware;
-8. blind quality gate;
-9. ricerca di chiusura FASE 7;
-10. solo dopo decidere se aprire Drum Core training.
+1. ricerca di apertura del completamento 7A: requisiti di ammissibilità per task, percorsi reali e prove consentito/bloccato/unknown;
+2. completare enforcement selezione/export e fedeltà sorgente per Drum View, con verifiche pertinenti;
+3. verificare fonti Trap e disponibilità di parti abbinate per otto barre; espandere GMD per groove generale e auditare HH-TRP;
+4. chiudere boundary/loopability recuperando il vecchio diagnostico o identificandone uno nuovo; PDMX quality-aware per i task pertinenti;
+5. definire pool, split, input disponibili all'inferenza, campionamento, criteri musicali, budget e casi inconcludenti prima del benchmark;
+6. blind data gate e ricerca di chiusura; solo dopo apertura del Drum Core previsto;
+7. confronto precoce su otto barre, con alternative di accorpamento e interazioni tra parti. Sonic Pi resta facoltativo e non blocca la Drum Dataset V2.
 
 Il **Neural Planner V0 resta rinviato**.
 

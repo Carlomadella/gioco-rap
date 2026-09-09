@@ -23,3 +23,7 @@ Prima di riprendere un blocco leggere roadmap, current state e decision log, seg
 La documentazione legacy può essere consultata come storico, benchmark o sorgente di idee, ma non impone automaticamente regressioni, regole o architetture a FAME Neural.
 
 Una scelta diventa vincolante nel Neural soltanto dopo una decisione esplicita registrata qui.
+
+## Revisione handoff e pista Sonic Pi
+
+[Confronto critico del 9 settembre 2026](REVISIONE_HANDOFF_SONIC_PI_2026-09-09.md), riferito al commit `02bc708`: stato 7A, limiti del validatore, applicazione delle policy, fedeltà, dati allineati e protocollo del pilot programmatico. Le decisioni adottate sono NDR-035…040; CURRENT_STATE distingue implementazione e azioni ancora aperte. La versione estesa dell'handoff sostituisce quella preliminare come contesto, senza diventare una roadmap autonoma.

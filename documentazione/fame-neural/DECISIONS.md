@@ -398,3 +398,61 @@ Ogni esperimento decisionale deve associare commit del codice, configurazione, i
 Si privilegiano strumenti versionati e punti di ingresso stabili; gli errori operativi documentati non giustificano una proliferazione di launcher temporanei. Una correzione è chiusa solo dopo modifica e verifica pertinente: aggiornare un documento non corregge un bug.
 
 L'audit conserva la fotografia e le fonti; DECISIONS conserva le regole; CURRENT_STATE conserva lo stato corrente; ROADMAP conserva ordine e gate. La ricerca di apertura e chiusura richiesta da NDR-026 collega evidenze, alternative e risultati, senza creare un secondo registro di avanzamento. Le fonti sostengono il proprio contesto sperimentale: non validano automaticamente FAME.
+
+## Revisione handoff e Sonic Pi — 9 settembre 2026
+
+Base verificata: `02bc708`. Evidenze e limiti: [rapporto di confronto](REVISIONE_HANDOFF_SONIC_PI_2026-09-09.md). Le decisioni seguenti sono adottate come protocollo; non dichiarano implementati i controlli ancora aperti in CURRENT_STATE. Integrano NDR-001…034 senza cancellarne lo storico.
+
+## NDR-035 — Schema, evidenza e ammissibilità per task sono controlli distinti
+**Status:** ACCEPTED
+
+Un payload con schema valido ed evidenceRef risolte non certifica la sufficienza dell'evidenza musicale. Il builder iniziale evita promozioni automatiche, ma il normalizzatore non è il gate di ammissibilità.
+
+Il percorso effettivo di selezione/export deve verificare uso consentito, restrizioni sorgente, diritti, capability e qualità pertinenti al task. `unknown` e `candidate` non equivalgono a permesso; una policy opzionale omessa non deve autorizzare implicitamente un training. Verificare esempi consentiti, bloccati e sconosciuti sul percorso reale, con motivazioni tracciabili. I criteri di qualità per debug, pretraining generale e target musicale di prodotto sono diversi.
+
+Il contratto 7A/blocco 1 esiste in `02bc708`; enforcement e ammissibilità restano da completare. Il risultato dello smoke test non chiude l'intera fase.
+
+## NDR-036 — La Task View deriva dall'informazione preservata necessaria
+**Status:** ACCEPTED
+
+FAME Compound rimane formato comune. Una Task View non deve obbligatoriamente attraversare una versione già quantizzata o impoverita prima di accedere alla fedeltà richiesta. Conservare sorgente e provenance e verificare derivazioni, collegamenti stabili e perdite esplicite.
+
+Sidecar ed estensione versionata del canonico restano alternative implementative. Conservare un campo sorgente non obbliga a usarlo nel modello; eliminarlo dal modello non autorizza a dichiararlo conservato dal suo round-trip.
+
+## NDR-037 — Contratti di controllo e coerenza precedono il congelamento dei moduli
+**Status:** ACCEPTED
+
+Prima dei Performer definire origine e disponibilità dei controlli: forniti, estratti da una sorgente disponibile oppure generati. Il Planner può restare il primo ruolo concettuale del runtime senza imporre subito una rete separata. Un piano minimo esplicito è una baseline, non un teacher musicale inventato.
+
+Verificare presto la disponibilità di sequenze continue e parti drums/808/armonia abbinate. Pool separati per ruolo non creano automaticamente supervisione delle interazioni. Misurare il comportamento con contesto reale e generato già introducendo la seconda parte.
+
+Confrontare Core+Arranger con un modello condizionato unico a otto barre; valutare accorpamenti tonali quando pertinenti. Il Refiner separato è opzionale e richiede beneficio aggiuntivo rispetto a joint/conditioning, costo incluso. Il gate di coerenza rimane obbligatorio anche quando il modulo non viene adottato.
+
+## NDR-038 — Sonic Pi è una sorgente candidata, non un prerequisito della roadmap
+**Status:** ACCEPTED
+
+La pista programmatica resta ricerca facoltativa, preferibilmente su variation/arrangement di otto barre. Non introduce automaticamente una fase, una capability ufficiale o un modello di code generation. Non blocca la Drum Dataset V2 quando non è necessaria al suo task.
+
+Prima del pilot definire domanda, budget, fixture ammissibili, versione runtime, stato iniziale e copertura. Separare eventi realizzati, fatti statici e osservazioni di controllo; non dedurre funzione musicale o causalità dalla sola sintassi. Definire tempo globale/locale, metro, seed policy uniforme, identità eventi/istanze, `synth`/`control`, silenzi, layer, sample loop ed effetti secondo lo scope. Ampiezza sorgente non equivale automaticamente a velocity MIDI. Una sostituzione audio non è equivalente senza verifica delle dipendenze.
+
+Codice headless disponibile non significa esecuzione FAME già verificata. Il seed non garantisce da solo riproducibilità. Licenza codice, esempi e asset si valutano separatamente; un chiarimento richiesto non è un permesso ricevuto. Programmi, varianti, fork e seed condividono gruppi coerenti prima degli split. Il numero di take non misura le famiglie indipendenti.
+
+## NDR-039 — Il confronto dei controlli dichiara l'informazione disponibile
+**Status:** ACCEPTED
+
+Il benchmark programmatico distingue eventi/controlli comuni, descrittori semplici e struttura programmatica, con sorgenti, famiglie, esempi e budget comparabili. Per ogni campo dichiarare disponibilità prima della generazione e dipendenza dal bersaglio.
+
+Se il trace è un ausilio disponibile solo in training, il test finale non riceve il trace del target. Se è conditioning all'uso, dichiarare chi lo fornisce. Programma completo, note future o scelte random della take bersaglio non diventano input di generazione autonoma senza esplicita ridefinizione del task. L'esecuzione diretta di un programma disponibile è un controllo pertinente quando misura lo stesso problema.
+
+Prima di adottare un grafo complesso verificare il beneficio rispetto a descrittori più semplici. Un eventuale successo promuove soltanto task e condizioni testati; il trasferimento ad altre modalità richiede una verifica propria. Sono possibili esiti favorevoli, sfavorevoli e inconcludenti.
+
+## NDR-040 — Gate, budget e stato devono seguire il percorso realmente verificato
+**Status:** ACCEPTED
+
+Prima dei risultati definire unità indipendente, pool, campionamento, numerosità motivata, miglioramento minimo utile o soglia, pareggi/incerti, renderer, palette e regola di arresto. Distinguere qualità generale, qualità Trap e utilità del beat completo. I vecchi esempi decisionali restano regressioni; il test finale usa famiglie non impiegate nella selezione delle ipotesi.
+
+Misurare candidato singolo e sistema con selector. Dichiarare budget equivalente di candidati/selezione oppure il compromesso costo/qualità. Fissare hardware, memoria, durata di training e latenza prima del modello, senza rimandare questi vincoli alla produzione.
+
+Le attività dati sono prerequisiti del task che supportano: PDMX tonale o Sonic Pi non bloccano automaticamente ogni prova drum. Le prove tecniche circoscritte non aprono implicitamente training serio o promozione Trap e non aggirano i gate della V2.
+
+CURRENT_STATE deve registrare il blocco effettivamente implementato, prove, limiti e azioni aperte. I dossier precedenti restano fotografie al commit dichiarato. Ricerca di apertura e chiusura si applicano al blocco concreto: uno smoke test o una revisione documentale non chiudono un gate musicale.
