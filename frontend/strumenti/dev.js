@@ -82,7 +82,19 @@ http.createServer((req, res) => {
        del gioco. */
     if(err){ res.writeHead(404, { "content-type": "text/plain; charset=utf-8" }).end("non c'è: " + rel); return; }
     const tipo = TIPI[path.extname(f).toLowerCase()] || "application/octet-stream";
-    if(tipo.startsWith("text/html")){
+
+    /* ADF_DEV_RELOAD_IFRAME_CONNECTION_FIX_V1
+       Il live reload serve una sola volta, sul documento top-level.
+       Prima veniva iniettato anche in ogni iframe annidato (gioco -> creator
+       -> camerino -> MakeHuman -> modifier engine). Ogni pagina apriva un
+       EventSource /__ricarica permanente e, su HTTP/1.1 localhost, poteva
+       saturare le connessioni disponibili dello stesso origin: i moduli e
+       gli asset successivi restavano Pending a 0 byte.
+       Ricaricando il top-level si ricarica comunque tutta la gerarchia iframe. */
+    const fetchDest = String(req.headers["sec-fetch-dest"] || "").toLowerCase();
+    const eIframe = fetchDest === "iframe" || fetchDest === "frame";
+
+    if(tipo.startsWith("text/html") && !eIframe){
       dato = Buffer.from(String(dato).replace("</body>", RICARICA + "\n</body>"));
     }
     res.writeHead(200, { "content-type": tipo, "cache-control": "no-store" });
