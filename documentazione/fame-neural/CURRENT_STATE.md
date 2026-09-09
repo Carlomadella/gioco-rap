@@ -74,6 +74,26 @@ Digest corpus: `fec26d6184548454b94abd452032b29dab8417e47d0058595646282aee7e7f79
 
 Dettaglio: [PHASE7A_BLOCK2_CHIUSURA_2026-09-09.md](PHASE7A_BLOCK2_CHIUSURA_2026-09-09.md).
 
+## Aggiornamento operativo — FASE 7A Blocco 3
+
+**Stato del Blocco 3: COMPLETATO NEL SUO SCOPE. FASE 7A: ANCORA APERTA.**
+
+Il nuovo percorso Phase 7 introduce un gate di ammissibilità task-specifico separato dal phrase builder generico e dai gate storici. La decisione per phrase è `allowed | blocked | unknown`, con reason code ed evidenceRef tracciabili.
+
+Verifica end-to-end sulle 502 candidate reali:
+
+- `debug-smoke-v1`: 47 allowed / 0 blocked / 455 unknown; `taskReady=true`; `trainingReady=N/A`;
+- `drum-groove-pretraining-v1`: 0 allowed / 333 blocked / 169 unknown; `taskReady=false`; `trainingReady=false`;
+- `drum-musical-target-v1`: 0 allowed / 380 blocked / 122 unknown; `taskReady=false`; `trainingReady=false`.
+
+Lo smoke verifica anche che `candidate` e capability/qualità mancanti restino fail-closed e che soltanto decisioni `allowed` entrino nel manifest task-specifico. La regressione del Blocco 2 resta verde.
+
+Questo aggiornamento **supera lo stato precedente che indicava ammissibilità ed enforcement selezione/export come aperti**: tali punti sono chiusi nel nuovo percorso Phase 7. I vecchi exporter Fase 5 e il Gate storico restano storici/generalisti e non diventano implicitamente percorsi autorizzati per nuovi training.
+
+Resta aperto per completare 7A il punto di fedeltà sorgente/derivazione della Drum View secondo NDR-036: preservazione dell'identità drum, timing/PPQ e collegamento tracciabile tra sorgente e Task View.
+
+Dettaglio e ricerca di chiusura: [PHASE7A_BLOCK3_CHIUSURA_2026-09-09.md](PHASE7A_BLOCK3_CHIUSURA_2026-09-09.md).
+
 ## Stato roadmap
 
 Roadmap ufficiale: **V2 — ricalibrata dopo i primi gate musicali**.

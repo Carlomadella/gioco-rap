@@ -1011,31 +1011,30 @@ Costruire il primo corpus realmente task-specifico e musicalmente difendibile.
 
 ## 7A — Content capabilities ufficiali
 
-**Aggiornamento Blocco 2:** overlay/consumer/audit verificati sulle 502 candidate reali: 301 source ID granulari → 6 collection, 284 composition family, 0 unresolved, 0 capability musicali auto-promosse. **Questo chiude il Blocco 2, non l'intera 7A.** Ammissibilità task-specifica ed enforcement selezione/export restano aperti secondo NDR-035. Digest: `fec26d6184548454b94abd452032b29dab8417e47d0058595646282aee7e7f79`.
+**Aggiornamento Blocco 3:** ammissibilità task-specifica ed enforcement del nuovo percorso Phase 7 sono implementati e verificati end-to-end sulle 502 candidate. Il gate produce `allowed | blocked | unknown`, conserva motivazioni/evidenceRef e il manifest include soltanto record `allowed`. `candidate` e `unknown` non autorizzano training.
 
-**Contratto iniziale implementato al commit `02bc708`; integrazione operativa e ammissibilità per task ancora aperte.** Il builder distingue osservazioni, capability, uso, qualità ed evidenza. Lo smoke test passa, ma il normalizzatore verifica la struttura e i riferimenti, non la sufficienza musicale dell'evidenza.
+Risultati reali:
 
-Completare il percorso di selezione/export con un controllo di ammissibilità per task: usi esplicitamente consentiti, restrizioni sorgente, diritti, capability e qualità pertinenti. `unknown` e `candidate` non autorizzano automaticamente un training. La policy deve essere applicata dal percorso effettivo, senza dipendere da un'opzione dimenticata dal chiamante. Verificare record consentiti, bloccati e sconosciuti sul percorso di export; non imporre qualità di prodotto agli usi di debug.
+- debug: 47 allowed / 0 blocked / 455 unknown, task ready ma non training task;
+- drum groove pretraining: 0 allowed / 333 blocked / 169 unknown;
+- drum musical target: 0 allowed / 380 blocked / 122 unknown.
 
-Applicare metadata espliciti per evitare che:
+Il fatto che i due task musicali abbiano 0 allowed è un esito corretto del gate: la policy corrente non promuove GMD `candidate`, capability sconosciute o qualità non verificate a training data.
 
-- drums-only;
-- tonal-only;
-- low-end;
-- full-layered;
+Il phrase builder resta generico; il vecchio `data-ready-gate.js` resta un gate storico/data-engineering; gli exporter Fase 5 restano esperimenti storici. I nuovi percorsi Phase 7 devono passare dal Task Admissibility Gate fail-closed.
 
-vengano scambiati fra loro.
+Il Blocco 3 chiude quindi **ammissibilità per task + enforcement selezione/export + prova allowed/blocked/unknown**. L'intera 7A resta aperta soltanto per la fedeltà sorgente/derivazione Drum View prevista da NDR-036.
 
+Restano validi il contratto content capabilities e il Blocco 2: osservazioni, capability, uso, qualità ed evidenza sono distinti; source record e source collection restano identità separate; nessuna capability musicale viene auto-promossa.
 ## 7B — `fame-original-seed-v1`
-
-**Verifica Blocco 2:** sulle 47 phrase `fame-original-seed-v1` la policy produce `debug=allowed`; nessuna phrase risulta `musicalTarget=allowed`. L'enforcement globale nei futuri export musicali resta parte del completamento 7A.
 
 Policy:
 
 `DEBUG_SYNTHETIC_ONLY` salvo nuova review esplicita.
 
-Non contribuisce ai gate musicali full-arrangement. La policy iniziale blocca `musicalTarget`; gli altri usi non autorizzati restano `unknown`. Il futuro selettore deve richiedere permesso positivo per il proprio uso: nessuna promozione implicita a pretraining/augmentation musicale.
+La verifica reale del Blocco 3 conferma che le 47 phrase seed risultano `debug=allowed` e possono entrare nel task `debug-smoke-v1`; non sono un training task e `trainingReady` è quindi N/A. Nessuna phrase seed viene promossa a pretraining o musical target.
 
+Il nuovo selettore richiede permesso positivo per il proprio uso: assenza di policy, `candidate` o `unknown` non diventano autorizzazione implicita. Il seed continua a non contribuire ai gate musicali full-arrangement.
 ## 7C — Drum Dataset V2
 
 Costruire una vista drum dedicata con:

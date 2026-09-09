@@ -1,0 +1,78 @@
+{
+  "schema": "fame-neural-task-admissibility-policy-registry-v1",
+  "version": 1,
+  "status": "phase7a-block3",
+  "tasks": {
+    "debug-smoke-v1": {
+      "taskId": "debug-smoke-v1",
+      "usageKey": "debug",
+      "requireProvenance": true,
+      "rights": {
+        "commercialTrainingAllowed": false,
+        "commercialOutputAllowed": false
+      },
+      "observedContent": {},
+      "capabilities": {},
+      "quality": {},
+      "sourceCollections": {
+        "allow": [],
+        "block": []
+      },
+      "notes": "Percorso tecnico/debug. Non richiede qualità musicale o capability di prodotto.",
+      "trainingTask": false
+    },
+    "drum-groove-pretraining-v1": {
+      "taskId": "drum-groove-pretraining-v1",
+      "usageKey": "pretraining",
+      "requireProvenance": true,
+      "rights": {
+        "commercialTrainingAllowed": true,
+        "commercialOutputAllowed": false
+      },
+      "observedContent": {
+        "drums": "present"
+      },
+      "capabilities": {
+        "DRUM_GROOVE": "verified"
+      },
+      "quality": {
+        "technical": "pass",
+        "roleFit": "pass"
+      },
+      "sourceCollections": {
+        "allow": [],
+        "block": []
+      },
+      "notes": "Pretraining groove umano/generalista. Candidate/unknown restano fuori finché evidenza e qualità non sono sufficienti.",
+      "trainingTask": true
+    },
+    "drum-musical-target-v1": {
+      "taskId": "drum-musical-target-v1",
+      "usageKey": "musicalTarget",
+      "requireProvenance": true,
+      "rights": {
+        "commercialTrainingAllowed": true,
+        "commercialOutputAllowed": false
+      },
+      "observedContent": {
+        "drums": "present"
+      },
+      "capabilities": {
+        "DRUM_GROOVE": "verified"
+      },
+      "quality": {
+        "technical": "pass",
+        "roleFit": "pass",
+        "domainTrap": "pass",
+        "musicalCoherence": "pass",
+        "rappability": "pass"
+      },
+      "sourceCollections": {
+        "allow": [],
+        "block": []
+      },
+      "notes": "Target musicale Trap/Rap: policy volutamente severa e fail-closed.",
+      "trainingTask": true
+    }
+  }
+}

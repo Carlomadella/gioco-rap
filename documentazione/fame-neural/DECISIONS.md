@@ -476,3 +476,28 @@ Regola:
 Digest corpus verificato: `fec26d6184548454b94abd452032b29dab8417e47d0058595646282aee7e7f79`.
 
 Questa decisione riguarda identità e tracciabilità. Non promuove capability, qualità o usi musicali e non sostituisce l'ammissibilità task-specifica di NDR-035.
+
+## NDR-042 — Task Admissibility separata dal corpus generico e fail-closed sugli export Phase 7
+**Status:** ACCEPTED
+
+Il phrase corpus comune, il phrase builder e i gate storici restano riusabili e non incorporano automaticamente le policy di ogni task. L'autorizzazione a usare una phrase in un nuovo export/training Phase 7 viene decisa da un gate task-specifico separato.
+
+La decisione V1 è:
+
+- `allowed`: tutti i requisiti necessari del task risultano soddisfatti;
+- `blocked`: esiste un divieto o un requisito esplicitamente fallito;
+- `unknown`: manca evidenza necessaria oppure lo stato è soltanto `candidate`.
+
+Solo `allowed` entra nel manifest task-specifico. `candidate`, `unknown`, policy assente o capability/qualità non dimostrate non equivalgono a permesso.
+
+Il gate combina almeno usage policy, diritti richiesti dal task, contenuto osservato, capability, qualità pertinente, restrizioni source e provenance/linkage. Le motivazioni sono machine-readable e mantengono evidenceRef.
+
+Readiness del task e readiness del training sono concetti distinti: un task tecnico/debug può essere `taskReady=true` senza essere un training task; in quel caso `trainingReady=N/A`.
+
+Verifica reale sulle 502 candidate:
+
+- debug: 47 allowed / 0 blocked / 455 unknown;
+- drum groove pretraining: 0 allowed / 333 blocked / 169 unknown;
+- drum musical target: 0 allowed / 380 blocked / 122 unknown.
+
+I due zeri musicali non vengono aggirati: indicano che l'evidenza corrente non basta ancora ad autorizzare quei training.
