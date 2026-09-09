@@ -11,18 +11,53 @@
     "source_status": "fatto",
     "source_status_raw": "fatto"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "complete",
   "intake_state": "canonical",
   "related_task_ids": [],
   "intake_note": "",
   "roadmap_impact": "none",
   "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
+  "current_state": [
+    "Il comando globale Torna alla mappa chiude lo Studio e riporta all'hub; i contesti decisionali restano bloccati intenzionalmente."
+  ],
+  "systems": [
+    "frontend/js/menu-sistema.js",
+    "frontend/js/game/studio.js",
+    "frontend/pagine/gioco.html",
+    "frontend/strumenti/audit-regressioni.js"
+  ],
+  "watch_paths": [
+    "frontend/js/menu-sistema.js",
+    "frontend/js/game/studio.js",
+    "frontend/pagine/gioco.html",
+    "frontend/strumenti/audit-regressioni.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Lo Studio espone il comando Torna alla mappa.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/pagine/gioco.html: il bottone #returnToMap ha etichetta Torna alla mappa.",
+        "frontend/js/menu-sistema.js: il comando globale riconosce l'host Studio."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il comando chiude lo Studio prima di mostrare nuovamente la mappa.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/menu-sistema.js: hostAttivo(), tornaMappa() e la chiusura dell'host coordinano il ritorno.",
+        "frontend/strumenti/audit-regressioni.js: controlli dedicati alla chiusura dello Studio e degli host."
+      ]
+    }
+  ],
+  "risks": [
+    "Un nuovo host deve essere aggiunto al riconoscimento globale per non lasciare una schermata aperta."
+  ],
   "notes": [
     "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
   ],

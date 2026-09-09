@@ -11,18 +11,56 @@
     "source_status": "fatto",
     "source_status_raw": "fatto"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "complete",
   "intake_state": "canonical",
   "related_task_ids": [],
   "intake_note": "",
   "roadmap_impact": "none",
   "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
+  "current_state": [
+    "La mappa espone Pizzeria e Fabbrica come luoghi reali e i rispettivi turni sono vincolati al luogo corretto."
+  ],
+  "systems": [
+    "frontend/js/game/hub.js",
+    "frontend/js/game/actions.js",
+    "frontend/js/game/orari.js",
+    "frontend/js/game/spostamenti.js",
+    "frontend/strumenti/audit-regressioni.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/hub.js",
+    "frontend/js/game/actions.js",
+    "frontend/js/game/orari.js",
+    "frontend/js/game/spostamenti.js",
+    "frontend/strumenti/audit-regressioni.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Pizzeria e Fabbrica sono edifici selezionabili sulla mappa.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/hub.js: definisce le voci pizzeria e fabbrica, coordinate, colore e ambientazione.",
+        "frontend/strumenti/audit-regressioni.js: verifica gli edifici con id pizzeria e fabbrica."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "I lavori Lavapiatti e Operaio richiedono il rispettivo edificio e rispettano gli orari.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/spostamenti.js: associa lavapiatti a pizzeria e operaio a fabbrica.",
+        "frontend/js/game/orari.js: definisce gli orari di pizzeria, fabbrica, lavapiatti e operaio.",
+        "frontend/strumenti/audit-regressioni.js: prova il vincolo di luogo del turno lavapiatti."
+      ]
+    }
+  ],
+  "risks": [
+    "Cambiare gli id dei lavori o dei luoghi rompe le associazioni di viaggio e i salvataggi."
+  ],
   "notes": [
     "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
   ],

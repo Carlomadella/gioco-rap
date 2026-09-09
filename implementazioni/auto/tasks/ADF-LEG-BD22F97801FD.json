@@ -21,7 +21,8 @@
   "intake_note": "Le task collegate coprono rispettivamente la plancia a schermo intero e la creazione dell'avatar; questa richiesta aggiunge il delta visivo di fedelta' alla foto e l'uso di un avatar segnaposto coerente. Il commit piu' recente aggiunge inoltre il flusso Avaturn dal camerino, quindi il default va verificato senza confonderlo con la creazione dell'avatar.",
   "current_state": [
     "frontend/js/game/hub.js e frontend/css/hub.css ricostruiscono la plancia e usano il ritratto generato o salvato, ma la fedelta' alla foto richiede confronto visivo.",
-    "frontend/js/creator/portrait.js e frontend/js/game/hub.js supportano ritratti SVG o immagini avatar; frontend/js/creator/rpg-v24-bridge.js persiste avatarSource, avatarData e i metadati Avaturn ricevuti dal camerino, ma non e' dimostrato che il segnaposto richiesto dalla foto sia il default corretto.",
+    "frontend/js/creator/portrait.js e frontend/js/game/hub.js supportano ritratti SVG o immagini avatar; frontend/js/creator/rpg-v24-bridge.js persiste avatarSource, avatarData e i metadati ricevuti dal camerino.",
+    "frontend/media/creator-rpg-v24/camerino.html ora uniforma il flusso MakeHuman, ma il repository non dimostra ancora che il segnaposto della foto sia il default richiesto.",
     "I concept di riferimento sono separati in frontend/concept/ e non vengono distribuiti come asset di gioco."
   ],
   "systems": [
@@ -55,7 +56,7 @@
       "verification": "playtest",
       "status": "pending",
       "evidence": [
-        "frontend/js/creator/rpg-v24-bridge.js: applica avatarSource e i dati Avaturn/local dal camerino; frontend/js/creator/portrait.js e frontend/js/game/hub.js: il comportamento default e la resa del segnaposto vanno ancora validati."
+        "frontend/js/creator/rpg-v24-bridge.js: applica avatarSource e avatarData dal camerino; frontend/js/game/hub.js: il ritratto usa i dati salvati oppure il renderer SVG, senza prova del default della foto."
       ]
     }
   ],

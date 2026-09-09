@@ -15,23 +15,25 @@
   "verified_status": "complete",
   "intake_state": "already_implemented",
   "related_task_ids": [],
-  "intake_note": "already_implemented: il deliverable storico richiesto, prompt separati per le ambientazioni delle pagine, e' gia' presente; non emerge una task equivalente distinta.",
+  "intake_note": "already_implemented: il deliverable richiesto e' la raccolta di prompt separati per le ambientazioni; non emerge una task equivalente distinta e il file richiesto e' gia' presente.",
   "current_state": [
     "prompt/prompt-ambientazioni.md contiene prompt separati per landing, avatar, casa, vicolo, Sala e le azioni/card principali.",
-    "La fonte stessa documenta sedici prompt che coprono le dodici card e le pagine di contesto richieste."
+    "implementazioni/09-grafica-e-asset.md documenta sedici prompt che coprono le dodici card e le pagine di contesto richieste."
   ],
   "systems": [
     "prompt/prompt-ambientazioni.md",
     "frontend/pagine/",
     "frontend/js/game/scene-art.js",
-    "frontend/js/game/studio.js"
+    "frontend/js/game/studio.js",
+    "implementazioni/09-grafica-e-asset.md"
   ],
   "watch_paths": [
     "prompt/prompt-ambientazioni.md",
     "frontend/pagine/",
     "frontend/js/game/scene-art.js",
     "frontend/js/game/studio.js",
-    "frontend/media/"
+    "frontend/media/",
+    "implementazioni/09-grafica-e-asset.md"
   ],
   "acceptance_criteria": [],
   "risks": [

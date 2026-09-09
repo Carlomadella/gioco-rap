@@ -6,13 +6,13 @@
 
 - **Schede importate:** 114
 - **Task effettive (duplicati esclusi):** 111
-- **Auditate contro il repo:** 52/114
+- **Auditate contro il repo:** 57/114
 - **Duplicati intercettati:** 3
 - **Estensioni/sovrapposizioni:** 8
 - **Richieste già implementate senza task equivalente:** 5
 - **Progetti con piano V1→Vn:** 20 (forniti dall'utente: 0)
 - **Piani con gap/conflitti da rivedere:** 0
-- **Auditate ma non complete:** 28
+- **Auditate ma non complete:** 29
 - Stato storico importato: da_fare 18 · in_parte 13 · fatto 77 · risposto 5 · nuova 1
 
 ## Tutte le task e richieste
@@ -71,11 +71,11 @@
 | `ADF-LEG-81ADE09AFBF8` | Controllo del codice: due nomi di classe che si pestavano i piedi | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | ✅ verificata | 2/2 |
 | `ADF-LEG-C60B1C321184` | Cosa si può simulare | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | 👁 da validare | 2/3 |
 | `ADF-LEG-DB2D56011EF3` | Crea il tuo avatar | storica | — | implementazioni/03-artista-e-avatar.md | ✅ fatto | ✅ verificata | 2/2 |
-| `ADF-LEG-0F2CA0831327` | Dallo Studio si esce solo con «Torna alla mappa» | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-4A0E889F7065` | Due lavori veri al posto di due cartelli chiusi: Pizzeria e Fabbrica | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-D7416EF2ABDA` | Energia a 100, giornate, e skip di quanto vuoi | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-2D026AB455EC` | Girare a cercare beat non costa più energia | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-9EEC32D93CE9` | Gli slot anche nella schermata di avvio | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-0F2CA0831327` | Dallo Studio si esce solo con «Torna alla mappa» | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | ✅ verificata | 2/2 |
+| `ADF-LEG-4A0E889F7065` | Due lavori veri al posto di due cartelli chiusi: Pizzeria e Fabbrica | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | ✅ verificata | 2/2 |
+| `ADF-LEG-D7416EF2ABDA` | Energia a 100, giornate, e skip di quanto vuoi | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | 👁 da validare | 2/3 |
+| `ADF-LEG-2D026AB455EC` | Girare a cercare beat non costa più energia | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | ✅ verificata | 2/2 |
+| `ADF-LEG-9EEC32D93CE9` | Gli slot anche nella schermata di avvio | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | ✅ verificata | 2/2 |
 | `ADF-LEG-C0CE37354C6F` | I bordi delle aree cliccabili sulla mappa | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
 | `ADF-LEG-CD410B7CEEEC` | I progressi si salvano, tre slot | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | — non ancora auditata | — |
 | `ADF-LEG-58FD26A86453` | Il bottone per il menù principale | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
@@ -140,7 +140,7 @@
 - **ADF-LEG-3EB6F5E9A3C4 — La richiesta finale sull'energia**: duplicate → ADF-LEG-D7416EF2ABDA — delta=nessuno: cambiare l'energia a 100 e adeguare giornate, costi e salti e' esattamente la consegna della task canonica sull'energia a 100.
 - **ADF-LEG-3FF6C1268680 — La soundboard è ancora poca**: overlap → ADF-LEG-D6B7FB24808B — La task D6B7FB24808B copre il rifacimento del banco audio; questa richiesta aggiunge suoni dedicati e la variazione timbrica dei beat, quindi è overlap e non duplicate.
 - **ADF-LEG-5C8E4254268B — Dal profilo si torna al gioco, non solo al menù**: already_implemented — already_implemented: il comportamento richiesto e' gia' presente nel codice reale; non esiste una task equivalente separata da collegare.
-- **ADF-LEG-7319DD550E0D — Ogni parte del gioco deve avere la sua ambientazione**: already_implemented — already_implemented: il deliverable storico richiesto, prompt separati per le ambientazioni delle pagine, e' gia' presente; non emerge una task equivalente distinta.
+- **ADF-LEG-7319DD550E0D — Ogni parte del gioco deve avere la sua ambientazione**: already_implemented — already_implemented: il deliverable richiesto e' la raccolta di prompt separati per le ambientazioni; non emerge una task equivalente distinta e il file richiesto e' gia' presente.
 - **ADF-LEG-95F95C753984 — Una pagina per ogni azione?**: already_implemented — La richiesta di analisi e progettazione e' gia' stata risposta nel README indicato; non emerge una task equivalente distinta.
 - **ADF-LEG-9EBE87A3843F — Le card sulla mappa, di lato invece che sopra agli edifici**: overlap → ADF-LEG-762C5E8D3415 — La task collegata copre la forma e la dimensione uniforme delle card; questa aggiunge il delta reale dello spostamento laterale rispetto agli edifici e richiede un asset mappa coerente.
 - **ADF-LEG-B2D3FA6EC43B — L'energia cresce col livello, e i livelli devono avere un senso**: overlap → ADF-LEG-D7416EF2ABDA — La task canonica copre energia giornaliera e costi; questa aggiunge il requisito non coperto di legare la crescita dell'energia al livello e dare un senso alla progressione anti-farming.

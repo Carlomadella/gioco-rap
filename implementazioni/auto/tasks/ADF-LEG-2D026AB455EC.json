@@ -11,18 +11,55 @@
     "source_status": "fatto",
     "source_status_raw": "fatto"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "complete",
   "intake_state": "canonical",
   "related_task_ids": [],
   "intake_note": "",
   "roadmap_impact": "none",
   "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
+  "current_state": [
+    "La mossa Cerca un beat ha costo energia zero; conserva costo temporale, apertura dello Studio e incremento di lucidita'.",
+    "Il beatmaker dello Studio e' un flusso diverso: Fattelo fare resta una sessione con costo energetico."
+  ],
+  "systems": [
+    "frontend/js/game/actions.js",
+    "frontend/js/game/tempo.js",
+    "frontend/js/game/orari.js",
+    "frontend/js/game/studio.js",
+    "frontend/js/game/hub.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/actions.js",
+    "frontend/js/game/tempo.js",
+    "frontend/js/game/orari.js",
+    "frontend/js/game/studio.js",
+    "frontend/js/game/hub.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Cerca un beat non sottrae energia.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/actions.js: l'azione con id beat ha e:0 e conserva luc:1."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "La ricerca continua a consumare tempo e a rispettare apertura e raggiungibilita' dello Studio.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/tempo.js: DURATE.beat definisce la durata della ricerca.",
+        "frontend/js/game/orari.js: beat e' associato allo Studio; frontend/js/game/spostamenti.js gestisce il tragitto."
+      ]
+    }
+  ],
+  "risks": [
+    "Confondere Cerca un beat con Fattelo fare reintroduce un costo sul flusso sbagliato."
+  ],
   "notes": [
     "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
   ],
