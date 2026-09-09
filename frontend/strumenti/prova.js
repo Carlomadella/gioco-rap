@@ -1206,5 +1206,115 @@ console.log("\nprofilo artista legacy rimosso");
 }
 /* === /ADF_LEGACY_PROFILE_REMOVAL_V2 === */
 
+/* Il turno in fabbrica durava un'ora invece di otto (punto 14 di
+   `implementazioni.md`). Il valore giusto (480 minuti) c'era già in
+   DURATE_LAVORO: il bug era che le azioni avviate da un luogo della mappa
+   (avviaAzioneDiretta, in ui.js — Fabbrica, Pizzeria, Palestra, Casa, Live
+   Club, il telefono) non passavano mai per il click sulla tile che fa
+   scattare la cattura dell'id in tempo.js, quindi durataAzione() non
+   sapeva più che lavoro fosse e tornava il fallback da 60 minuti. */
+console.log("\nil turno in fabbrica dura 8 ore, non 1 (punto 14)");
+{
+  const vm = require("vm");
+  const zitto = () => {};
+
+  function creaFinestra(){
+    const ascolta = {};
+    const bersaglio = {
+      addEventListener(tipo, fn){ (ascolta[tipo] = ascolta[tipo] || []).push(fn); },
+      removeEventListener(){},
+      dispatchEvent(ev){ (ascolta[ev.type] || []).forEach(fn => fn(ev)); return true; }
+    };
+    return bersaglio;
+  }
+
+  const scatola = Object.assign({
+    console: { log: zitto, warn: zitto, error: zitto },
+    Math, JSON, Object, Array, String, Number, Boolean, Date, Set, Map,
+    parseInt, parseFloat, isNaN, isFinite,
+    localStorage: { getItem: () => null, setItem: zitto },
+    CustomEvent: function(tipo, opts){ this.type = tipo; this.detail = opts && opts.detail; },
+    document: {
+      getElementById: () => ({
+        addEventListener: zitto, removeEventListener: zitto,
+        classList: { contains: () => false, add: zitto, remove: zitto }
+      }),
+      querySelectorAll: () => [], addEventListener: zitto
+    }
+  }, creaFinestra());
+  scatola.window = scatola;
+  vm.createContext(scatola);
+
+  let acceso = true, errore = null;
+  try{
+    for(const f of ["js/core.js", "js/game/state.js"])
+      vm.runInContext(fs.readFileSync(path.join(RADICE, f), "utf8"), scatola, { filename: f });
+    vm.runInContext("G = START();", scatola);
+    for(const f of ["js/game/uscita.js", "js/game/tempo.js"])
+      vm.runInContext(fs.readFileSync(path.join(RADICE, f), "utf8"), scatola, { filename: f });
+  }catch(e){ acceso = false; errore = e; }
+  controlla("l'orologio si carica fuori dal browser", acceso, errore ? [errore.message] : []);
+
+  if(acceso){
+    const dentro = c => vm.runInContext(c, scatola);
+
+    /* simula avviaAzioneDiretta("turno"): cattura l'id vero prima di
+       iniziaAzione, come fa adesso ui.js, poi chiude l'azione e legge
+       quanti minuti sono passati dall'evento che tempo.js manda in giro */
+    const minutiTurno = jobId => dentro(`
+      (function(){
+        G.job = {id:${JSON.stringify(jobId)}};
+        let minuti = null;
+        const ascolto = ev => { minuti = ev.detail.minutes; };
+        window.addEventListener("game-time:advanced", ascolto);
+        GAME_TIME.captureAction("turno");
+        iniziaAzione(18);
+        azioneFatta();
+        window.removeEventListener("game-time:advanced", ascolto);
+        return minuti;
+      })()
+    `);
+
+    const mOperaio = minutiTurno("operaio");
+    controlla("un turno da operaio (Fabbrica) dura 480 minuti, 8 ore",
+      mOperaio === 480, "minuti: " + mOperaio);
+    const mLavapiatti = minutiTurno("lavapiatti");
+    controlla("un turno da lavapiatti (Pizzeria) dura 300 minuti, non è rimasto sul fallback da un'ora",
+      mLavapiatti === 300, "minuti: " + mLavapiatti);
+
+    /* le azioni dirette senza lavoro (Palestra, Casa, Live Club) prendono
+       l'id vero da DURATE, non più il fallback da 60 minuti */
+    const minutiAzione = id => dentro(`
+      (function(){
+        let minuti = null;
+        const ascolto = ev => { minuti = ev.detail.minutes; };
+        window.addEventListener("game-time:advanced", ascolto);
+        GAME_TIME.captureAction(${JSON.stringify(id)});
+        iniziaAzione(0);
+        azioneFatta();
+        window.removeEventListener("game-time:advanced", ascolto);
+        return minuti;
+      })()
+    `);
+
+    const mStacca = minutiAzione("stacca");
+    controlla("«stacca la spina» resta a 180 minuti, non è stata toccata",
+      mStacca === 180, "minuti: " + mStacca);
+
+    controlla("senza cattura dell'id (il bug di prima) si tornava a 60 minuti fissi",
+      dentro(`
+        (function(){
+          let minuti = null;
+          const ascolto = ev => { minuti = ev.detail.minutes; };
+          window.addEventListener("game-time:advanced", ascolto);
+          iniziaAzione(0);
+          azioneFatta();
+          window.removeEventListener("game-time:advanced", ascolto);
+          return minuti;
+        })()
+      `) === 60);
+  }
+}
+
 console.log("\n" + passati + " a posto, " + falliti + " no.\n");
 process.exit(falliti ? 1 : 0);

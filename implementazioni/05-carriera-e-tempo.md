@@ -88,6 +88,44 @@ a 84 di lucidità e ~12 di hype, settimana avanzata di 4, energia tornata a 100.
 
 ---
 
+## 14 · Il turno in fabbrica dura 8 ore, non 1
+
+14. Il turno in fabbrica dura un'ora. ERRORE ASSURDO. Dev'essere di 8 ore sempre il turno in fabbrica. modifica questo, assicurandoti che non rovini assolutamente niente per quanto riguarda gli orari e tocchi solo questa piccolezza.
+
+   **FATTO (10/09/2026)** — la durata giusta (480 minuti, 8 ore) c'era già in
+   `DURATE_LAVORO.operaio` (`frontend/js/game/tempo.js`): non era quello il numero
+   sbagliato. Il bug stava un passo prima. `tempo.js` sa che azione è appena partita
+   solo intercettando il click su una tile con `data-id` (`.tile[data-id]`); ma le
+   azioni avviate da un luogo della mappa — Fabbrica, Pizzeria, Palestra, Casa
+   («Stacca la spina»), Live Club, e le stesse mosse dal telefono — passano tutte da
+   `avviaAzioneDiretta()` (`frontend/js/game/ui.js`), che apre l'azione **senza**
+   simulare quel click, com'è scritto nel suo stesso commento. Risultato: l'id vero
+   non arrivava mai a `tempo.js`, che quindi non sapeva più durataAzione() di quale
+   lavoro si trattasse e tornava sul fallback generico da **60 minuti fissi** —
+   sempre, per qualunque azione diretta, non solo per la Fabbrica.
+
+   La correzione tocca un solo punto d'innesto: `GAME_TIME.captureAction(id)`, una
+   funzione nuova esposta da `tempo.js` che imposta l'id catturato allo stesso modo
+   del listener sulle tile, e una riga in `avviaAzioneDiretta()` che la chiama con
+   l'id vero dell'azione appena prima di `iniziaAzione()`. Non tocca `DURATE`,
+   `DURATE_LAVORO` né `orari.js`: gli orari di apertura restano quelli di sempre
+   (Fabbrica 08:00-19:00), e nessun altro numero è stato cambiato.
+
+   **Effetto collaterale voluto, non un rischio**: lo stesso bug affliggeva
+   identico anche Pizzeria (300 min invece di 60), Palestra (75/45), «Stacca la
+   spina» (180), Live Club/freestyle (180/120) e il Centro per l'impiego — tutte le
+   azioni dirette avevano la stessa durata farlocca da un'ora. La correzione le
+   sistema tutte insieme perché condividono lo stesso codice, non perché si sia
+   allargato il punto.
+
+   **Verificato**: `npm run prova` (94/94), con un blocco di prova dedicato che
+   carica `core.js`/`state.js`/`uscita.js`/`tempo.js` fuori dal browser e controlla
+   che un turno da operaio duri davvero 480 minuti, uno da lavapiatti 300, che
+   «stacca la spina» resti a 180 (non toccata), e che senza la cattura dell'id si
+   torni al vecchio fallback da 60 — la controprova che il bug esisteva davvero.
+
+---
+
 ## Il gioco alla giornata invece che alla settimana
 
 Stiamo inoltre pensando di mettere il gioco alla giornata. Cioè si skippa di 1 gg alla volta. Così che magari negli eventi della giornata ci sia : 12 palestra con CHARLIE (fidanzata storicaa ad esempio), alle 19 vado in studio e alle 23 vado a fare un colpo con la banda. Che ne pensi?
