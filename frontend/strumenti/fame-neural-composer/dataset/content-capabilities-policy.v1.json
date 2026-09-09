@@ -1,0 +1,43 @@
+{
+  "schema": "fame-neural-content-usage-policy-v1",
+  "version": 1,
+  "status": "phase7a-block1",
+  "sources": {
+    "fame-original-seed-v1": {
+      "usage": {
+        "debug": {
+          "state": "allowed",
+          "source": "documentazione/fame-neural/DECISIONS.md#NDR-016",
+          "method": "accepted-project-decision",
+          "notes": "DEBUG_SYNTHETIC_ONLY: debug/grammar/determinism/encode-decode/smoke restano consentiti."
+        },
+        "musicalTarget": {
+          "state": "blocked",
+          "source": "documentazione/fame-neural/DECISIONS.md#NDR-016",
+          "method": "accepted-project-decision",
+          "notes": "Non contribuisce ai gate musicali full-arrangement salvo futura rivalidazione umana esplicita."
+        }
+      }
+    },
+    "gmd-v1.0.0": {
+      "usage": {
+        "pretraining": {
+          "state": "candidate",
+          "source": "documentazione/fame-neural/CURRENT_STATE.md#Source-interpretation-corrente",
+          "method": "current-project-policy",
+          "notes": "Candidato per general human groove/performance pretraining; non certifica Trap specialization."
+        }
+      }
+    },
+    "hiphopdrummer": {
+      "usage": {
+        "augmentation": {
+          "state": "candidate",
+          "source": "documentazione/fame-neural/CURRENT_STATE.md#Source-interpretation-corrente",
+          "method": "current-project-policy",
+          "notes": "Synthetic/rule-generated role augmentation; non viene usato per gonfiare training readiness."
+        }
+      }
+    }
+  }
+}
