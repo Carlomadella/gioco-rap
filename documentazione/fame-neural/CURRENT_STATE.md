@@ -1,143 +1,448 @@
 # FAME Neural — Current State
 
-Data: 2026-09-08
+Data: 2026-09-09
 
 ## Stato roadmap
 
-- FASE 0 — Fondazione e separazione: **COMPLETATA**.
-- FASE 1 — Linguaggio dei dati: **COMPLETATA**.
-- FASE 2 — Pipeline MIDI e provenienza: **COMPLETATA**.
-- FASE 3 — Dataset Auditor e corpus iniziale: **COMPLETATA — GATE 1 DATA READY SUPERATO**.
-- FASE 4 — Annotazione musicale automatica: **COMPLETATA**.
-- FASE 5 — Scelta della rappresentazione neurale: **COMPLETATA — FAME COMPOUND V1 SELEZIONATA**.
-- FASE 6 — Baseline semplice: **COMPLETATA — RETRIEVAL + CONSTRAINED BASELINE CONGELATE**.
-- Training neurale reale: **MICRO-TRAINING BENCHMARK FASE 5 COMPLETATO; TRAINING MODELLO PRODOTTO NON INIZIATO**.
+Roadmap ufficiale: **V2 — ricalibrata dopo i primi gate musicali**.
 
-## Corpus Gate 1
+- FASE 0 — Fondazione e separazione: **COMPLETATA**.
+- FASE 1 — Linguaggio dei dati: **COMPLETATA PER V1; HARDENING TASK-SPECIFIC APERTO**.
+- FASE 2 — Pipeline MIDI e provenienza: **COMPLETATA**.
+- FASE 3 — Dataset Auditor e corpus iniziale: **COMPLETATA STORICAMENTE; GATE 1 REINTERPRETATO COME PIPELINE / DATA ENGINEERING READY**.
+- FASE 4 — Annotazione musicale automatica: **COMPLETATA; ANNOTATORE V1 = AUXILIARY FEATURES, NON GROUND TRUTH**.
+- FASE 5 — Scelta della rappresentazione neurale: **COMPLETATA; FAME COMPOUND V1 = COMMON REPRESENTATION**.
+- FASE 6 — Baseline semplice: **COMPLETATA; RETRIEVAL + CONSTRAINED BASELINE CONGELATE, CON POST-HOC MUSICAL INTERPRETATION**.
+- FASE 7 — Task Data Reset + Drum Dataset V2: **CORRENTE**.
+- Neural Planner V0: **RINVIATO; NON È PIÙ IL PROSSIMO TRAINING**.
+- Training modello prodotto: **NON INIZIATO**.
+
+## Regola metodologica nuova
+
+Da questa revisione ogni blocco significativo richiede:
+
+1. ricerca approfondita di apertura prima dell'implementazione;
+2. ricerca approfondita di chiusura prima di dichiarare il blocco completo;
+3. aggiornamento di roadmap/current state/decision log quando cambia una conclusione;
+4. registrazione dei negative result e delle ipotesi falsificate.
+
+Dettaglio operativo: `ROADMAP_FAME_NEURAL.md`, sezione Protocollo obbligatorio di ricerca.
+
+---
+
+## Gate storici — interpretazione corretta
+
+### Gate 1
+
+Storicamente superato sul corpus da 504 phrase.
+
+Da V2 significa:
+
+**PIPELINE / DATA ENGINEERING READY**
+
+Certifica:
+
+- importer;
+- provenance;
+- rights;
+- dedup;
+- split;
+- leakage;
+- technical integrity.
+
+NON certifica:
+
+- Trap readiness;
+- full-arrangement readiness;
+- Planner readiness;
+- Performer readiness;
+- musicality.
+
+### Gate 2
+
+FAME Compound V1 resta selezionata come common representation.
+
+Non viene più interpretata come task representation universale.
+
+---
+
+## Corpus storico Gate 1
 
 - corpus verificato: **504 phrase**;
 - composition family: **285**;
 - source collection: **6**;
 - coverage drums / 808 / harmony / lead: **170 / 101 / 394 / 76**;
-- synthetic share: **45.04%** (advisory 40%, non blocker Gate 1);
+- pitchedAny: **447**;
+- synthetic share: **45.04%**;
+- PDMX share: **43.25%**;
 - human-review exclusion overlay: **2 phrase**;
-- candidati effettivi alla preparazione FASE 5 quando l'overlay viene applicato: **502 phrase**.
+- candidate effettive successive: **502**.
 
-Il corpus sorgente da 504 phrase resta immutato: le due esclusioni umane sono un overlay reversibile e machine-readable, non cancellazioni distruttive.
+Il corpus sorgente resta immutato. Le esclusioni umane restano overlay reversibili.
+
+---
+
+## Role audit post-hoc sulle 502 candidate
+
+Distribuzione:
+
+- `TONAL_ONLY`: **307**;
+- `DRUMS_ONLY`: **57**;
+- `FULL_LAYERED`: **53**;
+- `DRUMS_TONAL`: **38**;
+- `LOWEND_TONAL`: **22**;
+- `DRUMS_LOWEND`: **21**;
+- `LOWEND_ONLY`: **4**.
+
+Per source:
+
+### `fame-original-seed-v1`
+- 47 phrase;
+- 47/47 `FULL_LAYERED`.
+
+### `free-midi-chords`
+- 2 phrase;
+- 2/2 `TONAL_ONLY`.
+
+### `gmd-v1.0.0`
+- 57 phrase;
+- 57/57 `DRUMS_ONLY`;
+- ruolo corrente: human groove / performance, non full beat.
+
+### `hiphopdrummer`
+- 49 phrase;
+- 28 `DRUMS_TONAL`;
+- 21 `DRUMS_LOWEND`;
+- synthetic/rule-generated role material.
+
+### `pdmx-v2025`
+- 218 phrase;
+- 176 `TONAL_ONLY`;
+- 22 `LOWEND_TONAL`;
+- 10 `DRUMS_TONAL`;
+- 6 `FULL_LAYERED`;
+- 4 `LOWEND_ONLY`.
+
+### `waivops-nrg-cp`
+- 129 phrase;
+- 129/129 `TONAL_ONLY`.
+
+Conclusione:
+
+il corpus non è un insieme omogeneo di beat; da V2 ogni source/record deve essere usato per capacità compatibili.
+
+---
+
+## Full-layer blind quality gate
+
+Review:
+
+- 10 sample deterministici da 47 `fame-original-seed-v1` full-layer;
+- tutti i 6 PDMX full-layer;
+- sorgente nascosta durante l'ascolto.
+
+Risultato umano:
+
+### `fame-original-seed-v1`
+- 10/10 giudicati come materiale messo a caso;
+- non promosso come full-arrangement training target.
+
+Policy corrente:
+
+`DEBUG_SYNTHETIC_ONLY`
+
+Uso consentito:
+
+- debug;
+- grammar;
+- determinism;
+- encode/decode;
+- smoke.
+
+### PDMX full-layer
+- 6/6 riconosciuti come musica coerente;
+- 2/6 giudicati rappabili;
+- 4/6 coerenti ma non rappabili.
+
+Conclusione:
+
+PDMX ha segnale musicale utile, ma il pool corrente è troppo piccolo e non abbastanza target-specifico.
+
+---
 
 ## Annotazioni FASE 4
 
-Annotatore congelato per il passaggio alla FASE 5:
+Annotatore V1 storico:
 
 - schema `fame-neural-musical-annotation-v1`;
-- metodo `fame-neural-auto-annotator-v1`;
-- 504/504 annotazioni prodotte, 0 fallite;
-- 0 violazioni invarianti nel QA finale;
-- 75 phrase con relazione kick↔808 realmente disponibile;
-- output deterministico; manifest annotazioni `c3917d3c628e1cf7fc178d3161a2dcbd7348b5d35e4aa08c2ad3a229a1890692`.
-
-Review umana Blocco 2B:
-
-- 22/22 phrase valutate;
+- 504/504 annotazioni;
+- 0 failure;
+- 0 violation invariants;
+- 75 phrase con kick↔808 disponibile;
+- deterministico;
+- human review 22/22;
 - 19 completamente coerenti;
-- 2 escluse per qualità musicale della phrase;
-- 1 singola sovrastima di `tension` su `free-midi-chords`;
-- nessun errore metrico ripetuto;
-- agreement sulle 20 phrase musicalmente usabili: **95%**;
-- nessuna calibrazione globale applicata.
+- 2 exclusion;
+- 1 sovrastima tension;
+- 95% agreement sulle 20 phrase usabili.
 
-Le annotazioni restano feature euristiche con confidence, non ground truth musicale.
+Interpretazione V2:
 
-## Linguaggio simbolico corrente
+le annotazioni restano feature euristiche con confidence.
 
-Directory:
+Non sono prova della qualità musicale del corpus e non diventano automaticamente target ground-truth del Planner.
 
-`frontend/strumenti/fame-neural-composer/`
+---
 
-Baseline rilevante:
+## FAME Compound V1
 
-- schema `fame-neural-sequence-v1`;
-- 960 PPQ canonici;
-- `tonality` separata dalla progressione armonica;
-- event stream multitraccia;
-- 808 glide;
-- ordine canonico eventi simultanei;
-- encoder/decoder + token ↔ id lossless;
-- grammatica constrained;
-- duration straight/triplet;
-- conditioning discretizzato.
+Risultato FASE 5 resta valido:
 
-## FASE 5 — Blocco 1
+- compact;
+- 0 RT failure nel benchmark selezionato;
+- 8/8 FASE4 feature coverage;
+- common grammar/state contract;
+- grammar masking resta richiesto in generazione.
 
-Harness comune e baseline Flat misurati sul corpus effettivo da **502 candidate**: **502 benchmarkate**, **0 failure**, media **116.125996 token/bar**, P95 **187.75**, max **1265 token/phrase**. Grammar/vocabulary/canonical-round-trip failures: **0/0/110**.
+Nuova interpretazione:
 
-Le metriche GPU/training non sono stimate dal benchmark simbolico e restano deferred fino al confronto con micro-modello identico.
+`fame-compound-v1` = common representation.
 
-## FASE 5 — Blocco 2
+Sono ammesse Task View specializzate.
 
-Confronto simbolico completato sulle **502 candidate**:
+Primo target: `Drum View V2`.
 
-- flat-poc-v1: **116.125996 unit/bar**, P95 **187.75**, RT **110**, FASE4 **3/8**;
-- remi-plus-v1: **101.281375 unit/bar**, P95 **164.975**, RT **0**, FASE4 **0/8**;
-- compound-word-v1: **20.191235 unit/bar**, P95 **35.975**, RT **0**, FASE4 **4/8**;
-- fame-compound-v1: **20.229084 unit/bar**, P95 **35.975**, RT **0**, FASE4 **8/8**;
+---
 
-Tutti e quattro gli adapter: **502/502 benchmarkate**, **0 failure**, **0 grammar failure**, **0 vocabulary failure**. Il round-trip e' idempotenza seriale, non un conteggio di phrase strutturalmente perse. Nessun vincitore e' ancora scelto.
+## Canonical vs FAME listening diagnostic
 
-## FASE 5 — Blocco 3
+A/B su casi problematici con stesso renderer:
 
-Micro-training GPU comparabile completato con **120 step per rappresentazione** sullo stesso split per composition family e sullo stesso backbone:
+- canonical source sequence;
+- FAME Compound decoded sequence.
 
-- flat-poc-v1: **691.518 MiB peak**, **1063.191 bars/s**, **267.438852 bits/bar val**, invalid **6/12**;
-- remi-plus-v1: **707.267 MiB peak**, **1438.365 bars/s**, **241.336572 bits/bar val**, invalid **11/12**;
-- compound-word-v1: **137.539 MiB peak**, **557.856 bars/s**, **191.268692 bits/bar val**, invalid **12/12**;
-- fame-compound-v1: **144.136 MiB peak**, **359.363 bars/s**, **205.256405 bits/bar val**, invalid **12/12**;
+Verdetto umano:
 
-I risultati completi machine-readable sono in `documentazione/fame-neural/PHASE5_BLOCK3_RESULTS.json`.
+le versioni sono state percepite come fondamentalmente uguali.
 
-## FASE 5 — Blocco 4
+Conclusione:
 
-Decisione finale completata: **`fame-compound-v1`** è la rappresentazione neurale scelta.
+la quantizzazione FAME Compound NON è supportata come causa principale del caos musicale osservato.
 
-L'audit degli errori generativi del Blocco 3 ha verificato che i **41/41 sample invalidi** fallivano per errori di grammatica/stato del decoder unconstrained, non per token o valori fuori vocabolario. Questa metrica non viene quindi usata per classificare le rappresentazioni.
+Resta possibile migliorare la representation per task specifici, soprattutto groove/microtiming, ma non si attribuisce a FAME Compound un problema già presente nel materiale sorgente.
 
-Il contratto futuro resta quello già definito da NDR-010: generazione con grammar/state constraints.
+---
 
-FAME Compound viene preferita perché mantiene la compattezza delle compound word, ha 0 round-trip failure e rappresenta **8/8** feature FASE 4. Compound Word rimane baseline tecnica secondaria.
+## FASE 6 — Baseline tecniche
 
-## FASE 6 — Blocco 1
+### Retrieval V1
 
-Retrieval baseline V1 misurata sul test set leakage-safe da **43 phrase**.
+- split **401/58/43**;
+- valid **43/43**;
+- leakage **0**;
+- plan MAE mean/P95 **0.031008 / 0.047619**;
+- template unici **39/43**;
+- max reuse **2**;
+- warning density/vocal-space: 18 su 5 sample.
 
-- valid: **43/43**;
-- composition-family / phrase leakage: **0 / 0**;
-- plan MAE mean / P95: **0.031008 / 0.047619**;
-- template unici: **39/43**, max reuse **2**;
-- 18 warning `DENSITY_VS_VOCAL_SPACE` su 5 sample.
+### Constrained V1
 
-Risultati: `documentazione/fame-neural/PHASE6_BLOCK1_RESULTS.json`.
+- valid **43/43**;
+- donor leakage **0**;
+- plan MAE **0/0 per costruzione**;
+- exact train phrase **0**;
+- exact train bar **0/172**;
+- unique **43/43**;
+- donor groups **225**;
+- mean donor groups/generation **45.9302**;
+- warning **21** su 10 sample.
 
-Protocollo: `documentazione/fame-neural/PHASE6_BASELINE.md`.
+### Post-hoc human gate
 
-## FASE 6 — Blocco 2
+Blind A/B/C su 5 casi:
 
-Constrained generative baseline V1 misurata sul test set leakage-safe.
+- Retrieval preferito: **3**;
+- Coupled Block V2: **1**;
+- Constrained: **0**;
+- nessuno: **1**.
 
-- valid: **43/43**;
+Conclusione:
+
+Retrieval resta controllo musicale più forte.
+
+Constrained e Coupled non sono promossi come strada musicale principale.
+
+---
+
+## Planner profiler V0 — contratto valido, training non ready
+
+Profilo costruito sulle 502 candidate:
+
+- native phrase length: **502 × 4 bar**;
+- adjacent 4+4 candidates: **124**;
+- non-overlap selected: **92**;
+- final 8-bar sample: **92**;
+- split: **71 / 13 / 8**;
+- unique groups: **68**;
+- header mismatch: **0**;
+- leakage: **0**;
+- planner bars: **736**;
+- direct measured field coverage: **736/736**.
+
+Conclusione:
+
+pipeline/contract tecnicamente validi.
+
+**71 train sample non vengono considerati sufficienti per un serio Planner generalizzabile da zero.**
+
+Planner training sospeso.
+
+---
+
+## Drum Groove Contract / Retrieval Control V1
+
+Corpus:
+
+- source records: **502**;
+- eligible grooves: **116**;
+- unique groups: **60**;
+- GMD: **57**;
+- Hip Hop Drummer: **49**;
+- PDMX: **10**;
+- split: **99 / 6 / 11**;
+- group leakage: **0**;
+- bars with kick: **447/464**;
+- bars with backbeat: **452/464**;
+- drum hits mean/P95: **91.328 / 141**;
+- joint simultaneous frames: **2921/6545**.
+
+Retrieval control:
+
+- valid: **11/11**;
 - donor leakage: **0**;
-- plan MAE: **0 / 0** per costruzione;
-- exact train phrase: **0**;
-- exact train bar: **0/172**;
-- unique generation: **43/43**;
-- donor groups: **225**, media **45.9302** per generazione;
-- warning: **21** su 10 sample (`DENSITY_VS_VOCAL_SPACE` 14, `ABRUPT_808_GRAMMAR_SHIFT` 7).
+- distance mean/P95: **0.031031 / 0.049612**;
+- same-lineage rate: **1.0**, non interpretabile come vera style match quando lineage è generico/default;
+- unique templates: **10/11**;
+- max reuse: **2**.
 
-FASE 6 congelata con due baseline complementari.
+Blind listening target vs retrieval:
 
-Risultati: `documentazione/fame-neural/PHASE6_BLOCK2_RESULTS.json`.
+- retrieval preferito: **4**;
+- original target preferito: **3**;
+- entrambi: **2**;
+- nessuno: **2**.
+
+Conclusione:
+
+il retrieval di groove intero preserva molto meglio la coerenza rispetto alla recombination indipendente.
+
+Il corpus resta però musicalmente misto e non è ancora promosso a `DRUM DATA READY`.
+
+---
+
+## `perc` collapse ablation
+
+Blind `FULL` vs stesso groove senza `perc`.
+
+Verdetti:
+
+- `UGUALI`: **4**;
+- `NESSUNO`: **4**;
+- preferenza chiara `NO_PERC`: **1**;
+- preferenza chiara `FULL`: **1**;
+- altri commenti qualitativi misti.
+
+Conclusione:
+
+rimuovere `perc` NON è un fix generale.
+
+Problema residuo reale:
+
+nel contratto corrente diverse classi GM possono collassare in `perc`, quindi la Drum View V2 deve preservare meglio instrument identity quando disponibile.
+
+---
+
+## Boundary / loopability diagnostic
+
+Test 4-bar loop vs 8-bar contiguous: **IN CORSO / DIAGNOSTICO**.
+
+Non è consentito concludere automaticamente:
+
+- “4 barre sono sbagliate”;
+- “8 barre sono sempre giuste”.
+
+La V2 considera boundary e loopability proprietà task-specifiche.
+
+---
+
+## Source interpretation corrente
+
+### GMD
+Uso: **GENERAL HUMAN GROOVE / PERFORMANCE PRETRAINING**.
+
+Non viene interpretato come ground truth Trap sufficiente.
+
+### Hip Hop Drummer
+Uso: **synthetic/rule-generated role augmentation**.
+
+Pinned generator commit storico:
+
+`4cbf33aef786338b5a991e716fb82879fe47a6c7`
+
+Non viene usato per gonfiare training readiness.
+
+### WaivOps NRG-CP
+Uso: **tonal/pitched material**.
+
+### PDMX
+Uso: **general symbolic / harmony / arrangement candidate**.
+
+Prossimo hardening:
+
+quality-aware + role-aware selection.
+
+### HH-TRP
+Stato: **CANDIDATE DA AUDITARE**.
+
+Motivo:
+
+dataset Trap/Drill potenzialmente utile per drum specialization, ma di natura algorithmic/synthetic; intake vietato finché non supera rights/diversity/human quality gate.
+
+---
+
+## Problemi aperti prioritari
+
+- scala insufficiente per training serio da zero sui task correnti;
+- drum corpus non abbastanza Trap-specific;
+- full-arrangement corpus troppo piccolo;
+- `fame-original-seed-v1` non valido come musical target;
+- PDMX non ancora quality-aware;
+- drum class identity da preservare meglio;
+- microtiming/offset da valutare nella Drum View V2;
+- boundary/loopability da definire;
+- fill/core distinction da introdurre;
+- Planner targets troppo euristici e dataset troppo piccolo;
+- cross-track conditioning non ancora implementato.
+
+---
 
 ## Prossimo intervento ufficiale
 
-FASE 7 — Neural Planner V0: costruire il primo modello che genera un piano strutturale di 8 barre prima della performance musicale.
+**FASE 7 — TASK DATA RESET + DRUM DATASET V2**
 
-L'espansione non sintetica del corpus può continuare in parallelo, ma non riapre il Gate 1 già superato.
+Ordine:
+
+1. completare il boundary diagnostic già aperto come semplice misura;
+2. ricerca di apertura FASE 7 secondo protocollo V2;
+3. definire `contentCapabilities`;
+4. progettare Drum View / Drum Dataset V2;
+5. espandere GMD per general human groove;
+6. audit HH-TRP;
+7. rendere PDMX quality-aware/role-aware;
+8. blind quality gate;
+9. ricerca di chiusura FASE 7;
+10. solo dopo decidere se aprire Drum Core training.
+
+Il **Neural Planner V0 resta rinviato**.
+
+Nessun training serio viene aperto per compensare un problema di dati.
