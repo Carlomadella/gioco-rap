@@ -456,3 +456,23 @@ Misurare candidato singolo e sistema con selector. Dichiarare budget equivalente
 Le attività dati sono prerequisiti del task che supportano: PDMX tonale o Sonic Pi non bloccano automaticamente ogni prova drum. Le prove tecniche circoscritte non aprono implicitamente training serio o promozione Trap e non aggirano i gate della V2.
 
 CURRENT_STATE deve registrare il blocco effettivamente implementato, prove, limiti e azioni aperte. I dossier precedenti restano fotografie al commit dichiarato. Ricerca di apertura e chiusura si applicano al blocco concreto: uno smoke test o una revisione documentale non chiudono un gate musicale.
+
+## NDR-041 — Source record e source collection sono identità distinte
+**Status:** ACCEPTED
+
+`provenance.sourceId` identifica il record/composizione concreta e resta granulare. Source Registry e usage policy possono invece identificare una collection più ampia.
+
+L'audit reale del Blocco 2 sulle 502 candidate ha trovato **301 provenance source ID** appartenenti a **6 source collection**. Il confronto diretto fra i due livelli produceva 301 falsi unresolved; dopo la correzione il risultato è **0 unresolved**.
+
+Regola:
+
+- preservare il `sourceId` granulare originale;
+- non duplicare il Source Registry per ogni record;
+- risolvere la collection soltanto con exact match o prefisso delimitato da `:`;
+- non usare fuzzy matching;
+- mantenere tracciabili `subjectSourceId` e `policySourceId`;
+- non confondere source record, source collection e composition family nei futuri split/gate.
+
+Digest corpus verificato: `fec26d6184548454b94abd452032b29dab8417e47d0058595646282aee7e7f79`.
+
+Questa decisione riguarda identità e tracciabilità. Non promuove capability, qualità o usi musicali e non sostituisce l'ammissibilità task-specifica di NDR-035.

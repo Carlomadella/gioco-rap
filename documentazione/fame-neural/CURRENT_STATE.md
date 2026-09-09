@@ -36,6 +36,44 @@ Base implementativa verificata: `02bc708e1f1f8797b9cb5aef8dc24fd45a92393e`. [Rap
 
 I rapporti di ricerca restano fotografie al commit dichiarato. Questa sezione è lo stato corrente; non riscrive i vecchi risultati e non attribuisce alla documentazione correzioni di codice ancora aperte.
 
+## Aggiornamento operativo — FASE 7A/7B Blocco 2
+
+**Stato del Blocco 2: COMPLETATO NEL SUO SCOPE. FASE 7A: ANCORA APERTA.**
+
+Verifica reale sul corpus dopo le 2 esclusioni umane:
+
+- 502 phrase candidate;
+- 301 provenance source ID granulari;
+- 6 source collection;
+- 284 composition family;
+- 0 errori / 0 warning overlay;
+- 0 unresolved source ID;
+- 0 source ID mancanti;
+- 0 composition family mancanti;
+- 0 canonical observation mancanti;
+- 0 capability musicali auto-promosse;
+- 0 violazioni `DEBUG_SYNTHETIC_ONLY`;
+- 47 seed `debug=allowed`;
+- 57 GMD `pretraining=candidate`;
+- 49 Hip Hop Drummer `augmentation=candidate`;
+- 0 `musicalTarget=allowed`;
+- `READY FOR EVIDENCE ENRICHMENT = SI`.
+
+Il Blocco 2 chiude il collegamento **contratto → corpus reale → overlay/consumer → audit**.
+
+Restano aperti per completare 7A, coerentemente con NDR-035:
+
+1. ammissibilità task-specifica;
+2. enforcement nel percorso reale selezione/export;
+3. test end-to-end consentito/bloccato/unknown;
+4. fedeltà sorgente per Drum View secondo NDR-036.
+
+Correzione emersa dal test reale: `provenance.sourceId` è identità granulare del record/composizione, mentre Source Registry e policy possono operare a livello collection. Dopo la correzione: **301 source ID → 6 collection → 0 unresolved**.
+
+Digest corpus: `fec26d6184548454b94abd452032b29dab8417e47d0058595646282aee7e7f79`.
+
+Dettaglio: [PHASE7A_BLOCK2_CHIUSURA_2026-09-09.md](PHASE7A_BLOCK2_CHIUSURA_2026-09-09.md).
+
 ## Stato roadmap
 
 Roadmap ufficiale: **V2 — ricalibrata dopo i primi gate musicali**.

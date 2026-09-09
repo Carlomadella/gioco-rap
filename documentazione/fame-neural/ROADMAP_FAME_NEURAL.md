@@ -1011,6 +1011,8 @@ Costruire il primo corpus realmente task-specifico e musicalmente difendibile.
 
 ## 7A — Content capabilities ufficiali
 
+**Aggiornamento Blocco 2:** overlay/consumer/audit verificati sulle 502 candidate reali: 301 source ID granulari → 6 collection, 284 composition family, 0 unresolved, 0 capability musicali auto-promosse. **Questo chiude il Blocco 2, non l'intera 7A.** Ammissibilità task-specifica ed enforcement selezione/export restano aperti secondo NDR-035. Digest: `fec26d6184548454b94abd452032b29dab8417e47d0058595646282aee7e7f79`.
+
 **Contratto iniziale implementato al commit `02bc708`; integrazione operativa e ammissibilità per task ancora aperte.** Il builder distingue osservazioni, capability, uso, qualità ed evidenza. Lo smoke test passa, ma il normalizzatore verifica la struttura e i riferimenti, non la sufficienza musicale dell'evidenza.
 
 Completare il percorso di selezione/export con un controllo di ammissibilità per task: usi esplicitamente consentiti, restrizioni sorgente, diritti, capability e qualità pertinenti. `unknown` e `candidate` non autorizzano automaticamente un training. La policy deve essere applicata dal percorso effettivo, senza dipendere da un'opzione dimenticata dal chiamante. Verificare record consentiti, bloccati e sconosciuti sul percorso di export; non imporre qualità di prodotto agli usi di debug.
@@ -1025,6 +1027,8 @@ Applicare metadata espliciti per evitare che:
 vengano scambiati fra loro.
 
 ## 7B — `fame-original-seed-v1`
+
+**Verifica Blocco 2:** sulle 47 phrase `fame-original-seed-v1` la policy produce `debug=allowed`; nessuna phrase risulta `musicalTarget=allowed`. L'enforcement globale nei futuri export musicali resta parte del completamento 7A.
 
 Policy:
 

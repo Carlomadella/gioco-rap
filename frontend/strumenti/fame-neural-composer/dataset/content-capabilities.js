@@ -63,6 +63,23 @@ function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
+function resolveSourceCollectionId(sourceId, sourceKeys) {
+  if (!nonEmptyString(sourceId)) return null;
+  const value = sourceId.trim();
+  const keys = Array.isArray(sourceKeys)
+    ? sourceKeys
+    : Object.keys(sourceKeys && typeof sourceKeys === "object" ? sourceKeys : {});
+
+  if (keys.includes(value)) return value;
+
+  const matches = keys
+    .filter(nonEmptyString)
+    .filter(key => value.startsWith(`${key}:`))
+    .sort((a, b) => b.length - a.length || a.localeCompare(b));
+
+  return matches[0] || null;
+}
+
 function emptyAssertionMap(keys) {
   return Object.fromEntries(keys.map(key => [key, { state: "unknown", evidenceRefs: [] }]));
 }
@@ -307,21 +324,31 @@ function applySourceUsagePolicy(payload, registry) {
   }
 
   const sourceId = payload.subject.sourceId;
-  const sourcePolicy = sourceId && registry.sources && registry.sources[sourceId];
+  const policySourceId = sourceId && registry.sources
+    ? resolveSourceCollectionId(sourceId, registry.sources)
+    : null;
+  const sourcePolicy = policySourceId && registry.sources[policySourceId];
   if (!sourcePolicy || !sourcePolicy.usage) return payload;
 
   const out = clone(payload);
 
   for (const [usageKey, record] of Object.entries(sourcePolicy.usage)) {
     if (!USAGE_KEYS.includes(usageKey)) continue;
-    const evidenceId = `policy:${sourceId}:${usageKey}`;
+    const evidenceId = `policy:${policySourceId}:${usageKey}`;
     out.evidence.push({
       id: evidenceId,
       kind: "source_policy",
       scope: "source",
       method: record.method.trim(),
       source: record.source.trim(),
-      value: record.value == null ? { usage: usageKey, state: record.state } : clone(record.value),
+      value: record.value == null
+        ? {
+            usage: usageKey,
+            state: record.state,
+            policySourceId,
+            subjectSourceId: sourceId
+          }
+        : clone(record.value),
       confidence: null,
       notes: nonEmptyString(record.notes) ? record.notes.trim() : ""
     });
@@ -379,6 +406,7 @@ module.exports = {
   EVIDENCE_KINDS,
   EVIDENCE_SCOPES,
   OBSERVED_DRUM_TYPES,
+  resolveSourceCollectionId,
   normalizeContentCapabilities,
   validateUsagePolicyRegistry,
   observeCanonicalContent,
