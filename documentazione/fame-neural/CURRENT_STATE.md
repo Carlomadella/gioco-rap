@@ -1,6 +1,6 @@
 # FAME Neural — Current State
 
-Data: 2026-09-09
+Data: 2026-09-10
 
 ## Audit V2 integrato — stato delle correzioni
 
@@ -155,6 +155,31 @@ Le 8 proiezioni boundary-clipped **non chiudono la policy di boundary**: il raw 
 Questo successo tecnico non dichiara `DRUM DATA READY V2` e non apre training serio.
 
 Dettaglio e ricerca di chiusura: [PHASE7C_BLOCK1_CHIUSURA_2026-09-09.md](PHASE7C_BLOCK1_CHIUSURA_2026-09-09.md).
+
+## Aggiornamento operativo — FASE 7C Blocco 2
+
+**Stato del Blocco 2: COMPLETATO NEL SUO SCOPE TECNICO. FASE 7C: ANCORA APERTA.**
+
+Il percorso Block2 preserva ora in forma strutturata i metadata ufficiali GMD (`style`, BPM, `beat_type`, time signature, split, drummer/session/id) e li propaga additivamente nella Drum View V2 senza modificare il contratto Block1.
+
+Verifica reale su campione espanso:
+
+- 24 MIDI reali importati;
+- 24/24 dataset item enriched;
+- 24/24 Drum View enriched;
+- 896/896 source/view hits;
+- 0 raw fallback hit sul profilo `gmd-9-v1`;
+- metadata coverage completa;
+- style primary: `hiphop=24`;
+- beat type: `beat=24`;
+- source split osservato: `train=18`, `validation=1`, `test=5`;
+- source-hit accounting lossless.
+
+`sourceSplit` resta esplicitamente `source-reference-only`: non viene promosso a split FAME definitivo. Analogamente `beat_type` è preservato come label di fonte e non diventa automaticamente ground truth `core/fill`.
+
+Il campione resta intenzionalmente confinato al selector storico `hiphop/beat/4-4`; quindi questo risultato verifica enrichment e robustezza oltre i 6 file, **non** scala/diversità general-GMD e non chiude 7D.
+
+Dettaglio e ricerca di chiusura: [PHASE7C_BLOCK2_CHIUSURA_2026-09-10.md](PHASE7C_BLOCK2_CHIUSURA_2026-09-10.md).
 
 ## Stato roadmap
 

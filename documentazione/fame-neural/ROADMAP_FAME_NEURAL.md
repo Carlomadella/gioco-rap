@@ -1,6 +1,6 @@
 # FAME Neural — Roadmap ufficiale V2
 
-Data: 9 settembre 2026<br>
+Data: 10 settembre 2026<br>
 Stato: ROADMAP OPERATIVA V2 — PRECISATA DOPO AUDIT HANDOFF E SONIC PI<br>
 Progetto: FAME Neural Composer
 
@@ -1044,8 +1044,7 @@ La verifica reale del Blocco 3 conferma che le 47 phrase seed risultano `debug=a
 Il nuovo selettore richiede permesso positivo per il proprio uso: assenza di policy, `candidate` o `unknown` non diventano autorizzazione implicita. Il seed continua a non contribuire ai gate musicali full-arrangement.
 ## 7C — Drum Dataset V2
 
-**Stato: IN CORSO — Blocco 1 Drum View V2 completato nel suo scope tecnico.**
-
+**Stato: IN CORSO — Blocchi 1 e 2 completati nel proprio scope tecnico; scala/diversità e gate finali ancora aperti.**
 Il Blocco 1 introduce e verifica una vista drum dedicata derivata da `sourceFidelity`:
 
 - joint frame su griglia 16th come baseline iniziale;
@@ -1069,6 +1068,43 @@ Restano aperti dentro 7C e nei blocchi collegati:
 - integrazione con policy boundary/loopability 7G;
 - export task-admissible finale e split leakage-safe sul corpus espanso;
 - scala/diversità sufficienti per il gate `DRUM DATA READY V2`.
+
+### Blocco 2 — Metadata GMD + prima espansione controllata
+
+**COMPLETATO NEL PROPRIO SCOPE TECNICO.**
+
+Il Block2 aggiunge un percorso additivo di enrichment da `info.csv` ufficiale GMD senza modificare il builder Drum View del Block1:
+
+- `style` raw + primary/secondary;
+- BPM;
+- `beat_type`;
+- time signature;
+- source split;
+- drummer/session/performance id;
+- validazione e join deterministico `sourceId ↔ info.csv.id`;
+- propagazione nella Drum View con `metadataStatus=source-enriched`;
+- `sourceSplitRole=source-reference-only`.
+
+Verifica reale con 24 MIDI `hiphop/beat/4-4`:
+
+- 24/24 dataset item enriched;
+- 24/24 Drum View enriched;
+- 896/896 source/view hits;
+- 0 raw fallback;
+- metadata coverage completa;
+- split sorgente osservato: 18 train / 1 validation / 5 test.
+
+Il campione da 24 file supera il gate tecnico del Block2 ma non è una prova di scala: GMD contiene 1.150 MIDI, 22.214 misure e 445.494 hit complessivi. Inoltre il selector del blocco resta deliberatamente limitato a hip-hop beat 4/4.
+
+Quindi:
+
+- `hiphop` non viene reinterpretato come Trap;
+- `beat_type` non viene automaticamente promosso a `core/fill`;
+- lo split GMD non è lo split FAME definitivo;
+- `DRUM DATA READY V2` resta aperto;
+- la 7D deve ora affrontare inventory, sampling, diversità e leakage sul GMD generale.
+
+Dettaglio: [PHASE7C_BLOCK2_CHIUSURA_2026-09-10.md](PHASE7C_BLOCK2_CHIUSURA_2026-09-10.md).
 
 ## 7D — Espansione GMD
 
