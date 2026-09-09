@@ -1403,6 +1403,34 @@ seguito. **FATTO (08/09/2026)** — commit `43623ca`, `ee4951c`, `df41c78`.
    dentro un numero da 27px che a «12.4K» era già fuori. Sotto i 400 vanno a due per
    riga, e la dispari si prende la riga intera.
 
+---
+
+## 15 · Muta/smuta la musica dal menu principale
+
+15. Dal menù principale mettiamo un pulsantino in parte a sx che permette di mutare la musica di sottofondo, o smutarla.
+
+   **FATTO (10/09/2026)** — un bottone tondo (36px, stesso stile di `.avatarbtn`) accanto
+   al marchio, in `pagine/landing.html`. Riusa l'interruttore che già esisteva
+   (`SET.audio.on`, `js/impostazioni.js`): lo stesso «Audio ON/OFF» del menu di sistema in
+   game, non un secondo stato per conto suo — mutare da qui vale anche dentro alla
+   partita, e viceversa. Il click chiama `setSalva()` e `applicaImpostazioni()`, che già
+   spegne `ADF_AUDIO` (`js/audio/engine.js`) insieme a tutto il resto.
+
+   **Due intoppi trovati provando davvero nel browser, non solo leggendo il codice:**
+   - `css/landing.css` mette `pointer-events:none` su tutta `.topnav` mentre si è sul
+     menu («sul menu non c'è niente sopra» — il marchio stesso è `display:none` lì): il
+     bottone si vedeva ma il click non arrivava mai. Serviva un `pointer-events:auto`
+     dedicato, in `css/shell.css`.
+   - Le due icone (nota / nota barrata) si scambiavano con l'attributo `hidden` sull'
+     `<svg>`, ma in Chrome **`.hidden` non riflette l'attributo sugli elementi SVG** — si
+     legge `el.hidden === true` e intanto l'attributo non c'è, quindi il CSS `[hidden]`
+     non scatta mai. Le icone adesso si scambiano da CSS puro, in base a
+     `aria-pressed` sul bottone, senza toccare `hidden`.
+
+   Verificato in Chrome, avanti e indietro: si vede, si clicca, cambia icona, resta muto
+   dopo un refresh (persiste su `localStorage`), e funziona identico su una finestra a
+   misura di telefono (390×844). `npm run prova` 94/94.
+
 Guardate e già a posto, senza toccarle: la plancia si impila da sola sotto i 900 (e sotto
 i 1180 nasconde il telefono, per scelta già scritta lì), il negozio e i moduli usano
 griglie `auto-fill` che scendono a una colonna da sole, `.grid` di `base.css` collassa a

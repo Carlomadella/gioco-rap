@@ -92,6 +92,27 @@ function renderMenu(){
 $("nav-avatar").onclick = () => vaiAlProfilo();
 $("brand").onclick = () => renderMenu();          // già qui: si aggiorna e basta
 
+/* Punto 15: muta/smuta la musica di sottofondo, in alto a sinistra.
+   Stesso interruttore dell'audio in game (SET.audio.on, js/impostazioni.js):
+   toccarlo qui vale anche dentro, e viceversa. */
+function aggiornaMuteLanding(){
+  const b = $("landing-mute");
+  if(!b) return;
+  const on = !SET.audio || SET.audio.on !== false;
+  /* le due icone si scambiano da css/shell.css, in base a questo attributo */
+  b.setAttribute("aria-pressed", on ? "false" : "true");
+  b.setAttribute("aria-label", on ? "Muta la musica di sottofondo" : "Riattiva la musica di sottofondo");
+}
+if($("landing-mute")){
+  $("landing-mute").onclick = () => {
+    SET.audio.on = !SET.audio.on;
+    setSalva();
+    applicaImpostazioni();
+    aggiornaMuteLanding();
+  };
+  aggiornaMuteLanding();
+}
+
 /* Il profilo (il creatore dell'artista) sta nella pagina del gioco: ci si
    arriva chiedendolo, non cambiando una classe. Chi decide se si può è
    avvio.js, che sa quale slot è pieno. */
