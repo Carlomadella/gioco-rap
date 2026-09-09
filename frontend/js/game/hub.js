@@ -154,7 +154,7 @@ const HUB_LUOGHI = [
      che come linguetta a sé non aveva senso: un negozio è un posto. */
   {id:"shop", n:"Shop",
    vai:() => apriPannello("Shop", "shop",
-     "Attrezzatura, beat da comprare e roba da mettersi addosso.")},
+     "Attrezzatura e beat da comprare.")},
   /* punto 6: il centro per l'impiego, arrivato con la mappa definitiva.
      Apre tutti i lavori (JOBS), non solo i due che hanno già un edificio —
      rispetta i requisiti, non finge che siano tutti presi al volo.
@@ -722,7 +722,7 @@ function renderHub(){
 
   $("hb-sxtab").innerHTML = [
     ["profilo", "Profilo", "persona"], ["abilita", "Abilità", "matita"],
-    ["vestiti", "Vestiti", "maglietta"], ["condizione", "Condizione", "cuore"]
+    ["condizione", "Condizione", "cuore"]
   ].map(([id, n, ic]) =>
     '<button class="ptab' + (HUB_VISTA === id ? " on" : "") + '" data-v="' + id + '">' +
     hsvg(ic) + '<span>' + n + '</span></button>').join("");
@@ -814,10 +814,6 @@ $("hb-pins").addEventListener("click", ev => {
 $("hb-sxtab").addEventListener("click", ev => {
   const b = ev.target.closest(".ptab"); if(!b) return;
   hubTap();
-  /* punto 7: la linguetta «Vestiti» è il guardaroba — solo equip, mai
-     acquisto. I capi nuovi si comprano allo Shop → Abbigliamento, o
-     arrivano da un evento. */
-  if(b.dataset.v === "vestiti"){ apriArmadio(); return; }
   /* punto 13: «Abilità» apre l'albero dei talenti e basta. Prima disegnava una
      vista in colonna con dentro un tasto per aprirlo: due passaggi per una
      cosa sola, e le quattro barre le ripeteva mentre l'albero le ha già in

@@ -58,17 +58,33 @@ controlla("ogni pagina cita dei fogli di stile e del codice", mute.length === 0,
 const mancanti = [...css, ...js].filter(f => !fs.existsSync(path.join(RADICE, f)));
 controlla("ogni file citato dalle pagine esiste davvero", mancanti.length === 0, mancanti);
 
-/* ADF_NEGOZIO_PREVIEW_DECOUPLED_V2
-   Regressione: il negozio non deve tornare a chiamare il ritaglio del vecchio
-   editor 2D eliminato. */
+/* ADF_ABBIGLIAMENTO_HIBERNATE_V2
+   Il vecchio abbigliamento 2D deve restare non raggiungibile e inerte finché
+   non verrà sostituito da un sistema cosmetico compatibile con i provider. */
 {
-  const negozio = fs.readFileSync(path.join(RADICE, "js/game/negozio.js"), "utf8");
+  const giocoHtml = fs.readFileSync(path.join(RADICE, "pagine/gioco.html"), "utf8");
+  const hubJs = fs.readFileSync(path.join(RADICE, "js/game/hub.js"), "utf8");
+  const uiJs = fs.readFileSync(path.join(RADICE, "js/game/ui.js"), "utf8");
+  const negozioJs = fs.readFileSync(path.join(RADICE, "js/game/negozio.js"), "utf8");
+
   controlla(
-    "il negozio vestiti è scollegato dal ritaglio legacy",
-    !negozio.includes("cropRitratto({fit:f.id}") &&
-    !negozio.includes("CROP.busto") &&
-    negozio.includes("function ngAnteprimaVestito(") &&
-    negozio.includes("const anteprima = ngAnteprimaVestito(f.id);")
+    "guardaroba e reparto vestiti legacy non sono raggiungibili dalla UI",
+    !giocoHtml.includes('data-sh="fit"') &&
+    !giocoHtml.includes('id="g-fit"') &&
+    !giocoHtml.includes('id="ng-grid"') &&
+    !hubJs.includes('["vestiti", "Vestiti"') &&
+    !hubJs.includes('b.dataset.v === "vestiti"')
+  );
+
+  controlla(
+    "il runtime vestiti legacy resta inerte",
+    negozioJs.includes("ADF_ABBIGLIAMENTO_HIBERNATE_V2") &&
+    negozioJs.includes("window.ADF_ABBIGLIAMENTO_LEGACY_ACTIVE = false") &&
+    !uiJs.includes('renderAbbigliamento === "function"') &&
+    !/\bG\.vestiti\b/.test(negozioJs) &&
+    !/\bA\.fit\b/.test(negozioJs) &&
+    !/\bportrait\s*\(/.test(negozioJs) &&
+    !negozioJs.includes("data-compra")
   );
 }
 

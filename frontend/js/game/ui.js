@@ -475,9 +475,6 @@ function renderGioco(){
     };
   });
 
-  /* punto 7: i vestiti si comprano qui, non dal guardaroba della plancia */
-  if(typeof renderAbbigliamento === "function") renderAbbigliamento();
-
   /* punto 4: la cassa dello shop, sempre in vista sopra le linguette —
      in un negozio vero non si scorre a caso per sapere quanto si ha. */
   const shCash = $("sh-cash");
