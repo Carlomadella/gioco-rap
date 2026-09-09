@@ -1467,6 +1467,69 @@ function fitFace(){
   controls.update();
 }
 
+/* ADF_AVATURN_PROPIC_V1
+   La propic viene dal viewer locale del camerino, non da API Avaturn a pagamento.
+   Portiamo temporaneamente la camera sul volto, renderizziamo nello stesso task,
+   ritagliamo un quadrato e poi ripristiniamo esattamente la camera dell'utente. */
+function captureAvatarPreview(){
+  if(
+    currentSource!=='avaturn' ||
+    !avatarRoot ||
+    !renderer ||
+    !renderer.domElement ||
+    !scene ||
+    !camera ||
+    !controls
+  ) return '';
+
+  const oldPosition=camera.position.clone();
+  const oldQuaternion=camera.quaternion.clone();
+  const oldZoom=camera.zoom;
+  const oldTarget=controls.target.clone();
+
+  try{
+    fitFace();
+    camera.updateProjectionMatrix();
+    controls.update();
+
+    /* Il readback avviene subito dopo render(), prima di lasciare il task:
+       non serve preserveDrawingBuffer e non penalizziamo il render continuo. */
+    renderer.render(scene,camera);
+
+    const source=renderer.domElement;
+    const sw=source.width;
+    const sh=source.height;
+    const side=Math.min(sw,sh);
+    if(!side) return '';
+
+    const sx=Math.max(0,Math.floor((sw-side)/2));
+    const sy=Math.max(0,Math.floor((sh-side)/2));
+    const output=document.createElement('canvas');
+    output.width=384;
+    output.height=384;
+
+    const ctx=output.getContext('2d',{alpha:true});
+    if(!ctx) return '';
+
+    ctx.clearRect(0,0,384,384);
+    ctx.drawImage(source,sx,sy,side,side,0,0,384,384);
+
+    const preview=output.toDataURL('image/png');
+    return /^data:image\/png;base64,/i.test(preview) ? preview : '';
+  }catch(err){
+    console.warn('[ADF Avaturn] preview propic non acquisita',err);
+    return '';
+  }finally{
+    camera.position.copy(oldPosition);
+    camera.quaternion.copy(oldQuaternion);
+    camera.zoom=oldZoom;
+    camera.updateProjectionMatrix();
+    controls.target.copy(oldTarget);
+    controls.update();
+    renderer.render(scene,camera);
+  }
+}
+
 async function loadAvatar(data,force=false){
   if(!data?.url) return;
   if(!force && currentUrl===data.url) return;
@@ -1644,6 +1707,14 @@ $('identityScene').addEventListener('change',updateIdentityInfo);
 $('identityGenre').addEventListener('change',updateIdentityInfo);
 $('identityBack').onclick=closeIdentity;
 continueCreator.onclick=()=>{
+  if(currentSource==='avaturn'){
+    const preview=captureAvatarPreview();
+    if(preview){
+      currentArtist.avatarPreviewImage=preview;
+      currentArtist.previewImage=preview;
+    }
+  }
+
   if(window.parent!==window){
     window.parent.postMessage({type:'adf-avatar-room-continue',source:currentSource,artist:currentArtist},'*');
   }else{

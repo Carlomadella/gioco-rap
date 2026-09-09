@@ -566,7 +566,7 @@ function hubOra(){
 
 /* ---- la colonna di sinistra, quattro viste ---- */
 function hubRitrattoArtista(art){
-  const preview = art && art.avatarSource === "local"
+  const preview = art
     ? (art.avatarPreviewImage ||
        art.avatarData?.avatarPreviewImage ||
        art.avatarData?.previewImage ||
@@ -582,7 +582,8 @@ function hubRitrattoArtista(art){
       .replace(/"/g, "&quot;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
-    return '<img class="pport-img" src="' + safe + '" alt="">';
+    const providerClass = art?.avatarSource === "avaturn" ? " pport-img-avaturn" : "";
+    return '<img class="pport-img' + providerClass + '" src="' + safe + '" alt="">';
   }
 
   return window.ARTIST_PORTRAIT ? window.ARTIST_PORTRAIT() : "";

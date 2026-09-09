@@ -101,8 +101,8 @@
       A.avatarBodyId=av.avatarBodyId||av.bodyId||"";
       A.avatarGender=av.avatarGender||av.gender||"";
       A.avatarFaceAnimations=!!(av.avatarFaceAnimations||av.faceAnimations);
+      A.avatarPreviewImage=av.avatarPreviewImage||av.previewImage||"";
       delete A.localAvatar;
-      delete A.avatarPreviewImage;
     }else if(source==="local"){
       A.localAvatar=av.localAvatar||null;
       A.avatarPreviewImage=av.avatarPreviewImage||av.previewImage||"";

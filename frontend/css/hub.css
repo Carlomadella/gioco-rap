@@ -350,6 +350,16 @@ body.in-hub .topnav {
   transform: translate(45%, -22%) scale(2);
   transform-origin: 50% 0%;
 }
+
+/* ADF_AVATURN_PROPIC_CROP_V1
+   La preview Avaturn nasce già come ritratto dal camerino.
+   Manteniamo intatto il crop MakeHuman e correggiamo soltanto Avaturn:
+   più a sinistra e leggermente più in basso. */
+.pport .pport-img.pport-img-avaturn {
+  object-position: 50% 0%;
+  transform: translate(3%, -10%) scale(2);
+  transform-origin: 50% 0%;
+}
 .pwho {
   flex: 1;
   min-width: 0;
