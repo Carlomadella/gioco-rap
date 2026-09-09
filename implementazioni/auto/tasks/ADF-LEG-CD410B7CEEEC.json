@@ -11,22 +11,54 @@
     "source_status": "fatto",
     "source_status_raw": "fatto"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "verified_status": "complete",
   "intake_state": "canonical",
   "related_task_ids": [],
   "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "current_state": [
+    "La schermata di avvio gestisce tre slot distinti; slotKey mantiene la compatibilita' dello slot 1 e aggiunge -s2/-s3."
   ],
-  "roadmap_scope": "none",
+  "systems": [
+    "frontend/js/avvio.js",
+    "frontend/js/impostazioni.js",
+    "frontend/js/menu-sistema.js",
+    "localStorage"
+  ],
+  "watch_paths": [
+    "frontend/js/avvio.js",
+    "frontend/js/impostazioni.js",
+    "frontend/js/game/state.js",
+    "frontend/js/menu-sistema.js",
+    "frontend/strumenti/audit-regressioni.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Esistono al massimo tre slot separati per artista e partita.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/impostazioni.js: N_SLOT = 3 e slotKey distingue le chiavi dello slot 1 dagli slot successivi.",
+        "frontend/js/avvio.js: slots() costruisce tre slot e infoSlot legge artista e partita per ciascuno."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Dalla schermata di avvio si puo' continuare, creare, caricare o eliminare una carriera senza sovrascrivere gli altri slot.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/avvio.js: htmlMenu/htmlCarica e i gestori data-avvio distinguono continua, nuova, carica, elimina e sostituzione.",
+        "frontend/js/menu-sistema.js: scriviCheckpoint salva artista, partita e slot attivo."
+      ]
+    }
+  ],
+  "risks": [
+    "Cambiare le chiavi localStorage puo' rendere invisibili salvataggi storici."
+  ],
+  "notes": [
+    "Lo slot 1 conserva le chiavi storiche per evitare una migrazione distruttiva."
+  ],
   "plan": {
     "mode": "none",
     "status": "not_applicable",
@@ -34,5 +66,9 @@
     "steps": [],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "audit_state": "audited"
 }

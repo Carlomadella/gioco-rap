@@ -6,13 +6,13 @@
 
 - **Schede importate:** 114
 - **Task effettive (duplicati esclusi):** 111
-- **Auditate contro il repo:** 57/114
+- **Auditate contro il repo:** 64/114
 - **Duplicati intercettati:** 3
 - **Estensioni/sovrapposizioni:** 8
 - **Richieste già implementate senza task equivalente:** 5
 - **Progetti con piano V1→Vn:** 20 (forniti dall'utente: 0)
 - **Piani con gap/conflitti da rivedere:** 0
-- **Auditate ma non complete:** 29
+- **Auditate ma non complete:** 35
 - Stato storico importato: da_fare 18 · in_parte 13 · fatto 77 · risposto 5 · nuova 1
 
 ## Tutte le task e richieste
@@ -76,13 +76,13 @@
 | `ADF-LEG-D7416EF2ABDA` | Energia a 100, giornate, e skip di quanto vuoi | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | 👁 da validare | 2/3 |
 | `ADF-LEG-2D026AB455EC` | Girare a cercare beat non costa più energia | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | ✅ verificata | 2/2 |
 | `ADF-LEG-9EEC32D93CE9` | Gli slot anche nella schermata di avvio | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | ✅ verificata | 2/2 |
-| `ADF-LEG-C0CE37354C6F` | I bordi delle aree cliccabili sulla mappa | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-CD410B7CEEEC` | I progressi si salvano, tre slot | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-58FD26A86453` | Il bottone per il menù principale | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-D9F6CD7B62CE` | Il feed di LaFamegram si scorre come quello vero | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-1D15D6A42A1B` | Il menù delle impostazioni | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-14754F33977B` | Il negozio dei vestiti | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-04F5044C7230` | Il profilo cliccabile dal menù, in stile character creator | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-C0CE37354C6F` | I bordi delle aree cliccabili sulla mappa | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | 👁 da validare | 1/2 |
+| `ADF-LEG-CD410B7CEEEC` | I progressi si salvano, tre slot | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | ✅ verificata | 2/2 |
+| `ADF-LEG-58FD26A86453` | Il bottone per il menù principale | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | 👁 da validare | 1/2 |
+| `ADF-LEG-D9F6CD7B62CE` | Il feed di LaFamegram si scorre come quello vero | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | 👁 da validare | 1/2 |
+| `ADF-LEG-1D15D6A42A1B` | Il menù delle impostazioni | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | 👁 da validare | 2/3 |
+| `ADF-LEG-14754F33977B` | Il negozio dei vestiti | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | ⛔ bloccata | 0/3 |
+| `ADF-LEG-04F5044C7230` | Il profilo cliccabile dal menù, in stile character creator | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | 👁 da validare | 2/3 |
 | `ADF-LEG-B4BEC1032AAC` | Il quaderno non esiste più | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
 | `ADF-LEG-93E84499EEED` | Il telefono nuovo, quello della foto | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
 | `ADF-LEG-51700FF97239` | Il videomaker entra a La Sala | storica | — | implementazioni/06-mondo-e-personaggi.md | ✅ fatto | — non ancora auditata | — |

@@ -11,22 +11,52 @@
     "source_status": "fatto",
     "source_status_raw": "fatto"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "verified_status": "needs_validation",
   "intake_state": "canonical",
   "related_task_ids": [],
   "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "current_state": [
+    "La fascia della partita espone il pulsante Menu e il sistema salva il checkpoint prima di tornare alla landing."
   ],
-  "roadmap_scope": "none",
+  "systems": [
+    "frontend/pagine/gioco.html",
+    "frontend/css/hub.css",
+    "frontend/js/menu-sistema.js"
+  ],
+  "watch_paths": [
+    "frontend/pagine/gioco.html",
+    "frontend/css/hub.css",
+    "frontend/js/menu-sistema.js",
+    "frontend/js/pagine.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "La schermata di gioco mostra un pulsante riconoscibile per il menu principale.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/pagine/gioco.html: #hb-menu ha icona, etichetta Menu e title esplicito.",
+        "frontend/css/hub.css: .pmenu definisce la posizione e lo stato focus/hover."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "L'azione salva la partita e torna al menu principale.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/menu-sistema.js: salvaEdEsci chiama scriviCheckpoint e tornaAlMenu.",
+        "manual: implementazioni/02-interfaccia-e-telefono.md, punto 17, registra il test storico del bottone."
+      ]
+    }
+  ],
+  "risks": [
+    "Un ritorno senza checkpoint puo' perdere modifiche recenti della carriera."
+  ],
+  "notes": [
+    "La prova runtime resta distinta dall'audit del markup e del flusso JavaScript."
+  ],
   "plan": {
     "mode": "none",
     "status": "not_applicable",
@@ -34,5 +64,9 @@
     "steps": [],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "audit_state": "audited"
 }

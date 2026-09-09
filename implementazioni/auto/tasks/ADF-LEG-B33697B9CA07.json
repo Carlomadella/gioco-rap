@@ -11,16 +11,13 @@
     "source_status": "fatto",
     "source_status_raw": "fatto"
   },
-  "audit_state": "audited",
   "verified_status": "complete",
   "intake_state": "canonical",
   "related_task_ids": [],
   "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
   "current_state": [
-    "Il repository contiene frontend e backend separati, README dedicati e backend/database con documentazione propria; il controllo regressioni verifica la separazione.",
-    "backend/backend.md e' documentato come dossier locale ignorato, senza essere trattato come file di prodotto."
+    "Il progetto separa frontend, backend e backend/database con README dedicati.",
+    "Il backend espone il proprio strato dati tramite backend/database/archivio.js."
   ],
   "systems": [
     "frontend/",
@@ -29,10 +26,10 @@
     "frontend/strumenti/audit-regressioni.js"
   ],
   "watch_paths": [
+    "README.md",
     "frontend/",
     "backend/",
     "backend/database/",
-    "README.md",
     "frontend/strumenti/audit-regressioni.js"
   ],
   "acceptance_criteria": [
@@ -42,30 +39,28 @@
       "verification": "automatic",
       "status": "satisfied",
       "evidence": [
-        "README.md: la mappa del progetto collega frontend/README.md, backend/README.md e backend/database/README.md.",
-        "frontend/strumenti/audit-regressioni.js: il controllo verifica le tre cartelle e i README.",
-        "backend/README.md e backend/database/README.md: documentazione distinta del server e dello strato dati."
+        "README.md: collega frontend/README.md, backend/README.md e backend/database/README.md.",
+        "frontend/strumenti/audit-regressioni.js: verifica cartelle e README della separazione."
       ]
     },
     {
       "id": "AC2",
-      "description": "Il server usa il proprio strato database senza spostare la logica del gioco nel backend.",
+      "description": "Il server usa lo strato database separato dal routing HTTP.",
       "verification": "code_audit",
       "status": "satisfied",
       "evidence": [
-        "backend/server.js: il server importa backend/database/archivio.js.",
-        "backend/README.md: documenta server e strato database separati.",
-        "backend/database/archivio.js: lo strato dati e' separato dal routing HTTP."
+        "backend/server.js: importa il modulo dati.",
+        "backend/database/archivio.js: concentra l'accesso al database.",
+        "backend/README.md: documenta la separazione server/database."
       ]
     }
   ],
   "risks": [
-    "Spostamenti futuri di file possono rompere i percorsi relativi e il build del frontend."
+    "Spostamenti futuri possono rompere percorsi relativi e build del frontend."
   ],
   "notes": [
-    "Il dossier backend.md resta documentazione locale ignorata da git; non e' stato trattato come file di prodotto."
+    "backend.md e' documentazione locale ignorata da git, non un file di prodotto."
   ],
-  "roadmap_scope": "none",
   "plan": {
     "mode": "none",
     "status": "not_applicable",
@@ -73,5 +68,9 @@
     "steps": [],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "audit_state": "audited"
 }
