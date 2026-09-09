@@ -11,18 +11,52 @@
     "source_status": "fatto",
     "source_status_raw": "fatto"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "complete",
   "intake_state": "canonical",
   "related_task_ids": [],
   "intake_note": "",
   "roadmap_impact": "none",
   "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
+  "current_state": [
+    "Il luogo interno vita è presentato nella mappa e nei sottomenu come Casa; continua a contenere lifestyle, spese e azioni della vita quotidiana."
+  ],
+  "systems": [
+    "mappa",
+    "casa",
+    "lifestyle",
+    "spostamenti"
+  ],
+  "watch_paths": [
+    "frontend/js/game/hub.js",
+    "frontend/js/game/spostamenti.js",
+    "frontend/js/game/orari.js",
+    "frontend/pagine/gioco.html",
+    "frontend/strumenti/audit-regressioni.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "La card e l'ingresso sulla mappa mostrano Casa al posto di Vita quotidiana.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/hub.js: HUB_LUOGHI contiene {id:\"vita\", n:\"Casa\"} e apre la scheda Casa."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Casa conserva le azioni e i costi del sistema lifestyle senza cambiare l'identificatore interno vita.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/hub.js: il sottomenu Casa contiene spese e attività; frontend/js/game/spostamenti.js: HOME e orari restano collegati all'ID vita."
+      ]
+    }
+  ],
+  "risks": [
+    "Il nome interno vita è ancora usato da salvataggi e movimento e non va rinominato senza migrazione."
+  ],
   "notes": [
     "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
   ],
@@ -33,6 +67,8 @@
     "summary": "",
     "steps": [],
     "gaps": [],
-    "notes": []
+    "notes": [
+      "Task storica già implementata; nessun piano tecnico residuo."
+    ]
   }
 }

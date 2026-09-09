@@ -11,18 +11,62 @@
     "source_status": "fatto",
     "source_status_raw": "fatto"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "complete",
   "intake_state": "canonical",
   "related_task_ids": [],
   "intake_note": "",
   "roadmap_impact": "none",
   "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
+  "current_state": [
+    "Il beat creato dalla conversazione viene conservato sul beatmaker e visualizzato nel banco/mercato con ascolto, acquisto e rifiuto; la conferma è portata sopra le scene."
+  ],
+  "systems": [
+    "dialoghi",
+    "mercato-beat",
+    "audio",
+    "toast"
+  ],
+  "watch_paths": [
+    "frontend/js/game/posto.js",
+    "frontend/js/game/beatplay.js",
+    "frontend/css/posto.css",
+    "frontend/css/effects.css",
+    "frontend/index.html",
+    "frontend/strumenti/prova.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Fatti sentire un beat crea una sola offerta persistente nel mercato.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/posto.js: il beatmaker conserva p.beatOff e il flusso blocca una nuova offerta finché quella esistente non viene presa o lasciata; frontend/strumenti/prova.js: verifica dell'offerta nel market."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "L'offerta è visibile con genere, qualità, BPM e azioni ascolta/compra/lascia.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/posto.js: renderizza la scheda del beatmaker con dati del beat e prendiBeatDalBanco(); frontend/js/game/beatplay.js: beatSuona() schedula l'anteprima."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "La conferma dell'azione resta sopra le interfacce della Sala e della Strada.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/css/effects.css: .toast ha z-index:130; frontend/strumenti/prova.js: i controlli di regressione includono il flusso del beatmaker."
+      ]
+    }
+  ],
+  "risks": [
+    "La resa sonora dell'anteprima resta una verifica manuale con audio attivo."
+  ],
   "notes": [
     "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
   ],
@@ -33,6 +77,8 @@
     "summary": "",
     "steps": [],
     "gaps": [],
-    "notes": []
+    "notes": [
+      "Task storica già implementata; nessun piano tecnico residuo."
+    ]
   }
 }

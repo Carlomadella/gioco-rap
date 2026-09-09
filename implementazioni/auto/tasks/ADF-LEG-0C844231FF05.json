@@ -11,18 +11,73 @@
     "source_status": "fatto",
     "source_status_raw": "fatto"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "complete",
   "intake_state": "canonical",
   "related_task_ids": [],
   "intake_note": "",
   "roadmap_impact": "none",
   "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
+  "current_state": [
+    "Lo Studio è una stanza dedicata con sezioni per beat, testo/cabina, banco di mix, copertina/feat/marketing e uscita; usa le azioni e le relazioni del gioco invece di un menu parallelo."
+  ],
+  "systems": [
+    "studio",
+    "beatmaker",
+    "fonici",
+    "registrazione",
+    "mix",
+    "pubblicazione"
+  ],
+  "watch_paths": [
+    "frontend/js/game/studio.js",
+    "frontend/css/studio.css",
+    "frontend/js/game/actions.js",
+    "frontend/js/game/orari.js",
+    "frontend/js/game/hub.js",
+    "frontend/strumenti/prova.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Lo Studio apre un'interfaccia propria con fasi distinguibili del lavoro musicale.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/studio.js: STUDIO_SEZIONI e renderStudio() gestiscono beat, cabina, banco, cover, feat, marketing e fuori."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il beatmaker fornisce un beat legato alla persona e al rapporto, con prezzo e qualità calcolati.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/studio.js: studioBeatPronto(), studioBeatPrezzo(), studioBeatQualita() e studioFattiUnBeat(); frontend/strumenti/prova.js: verifica beat in cartella, costo e rapporto."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Il fonico selezionato modifica il risultato del mix e resta collegato al pezzo.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/studio.js: studioScegliFonico(), studioFonico() e studioAiutoFonico(); frontend/strumenti/prova.js: verifica che il fonico aumenti mixGain()."
+      ]
+    },
+    {
+      "id": "AC4",
+      "description": "Lo Studio resta accessibile senza la chiusura oraria degli altri luoghi.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/orari.js: lo Studio ha apertura continua; frontend/js/game/hub.js: l'ingresso apreStudio()."
+      ]
+    }
+  ],
+  "risks": [
+    "Le formule di qualità, costi e rapporto sono bilanciamento di gameplay e richiedono playtest per modifiche future."
+  ],
   "notes": [
     "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
   ],
@@ -33,6 +88,8 @@
     "summary": "",
     "steps": [],
     "gaps": [],
-    "notes": []
+    "notes": [
+      "Task storica già implementata; nessun piano tecnico residuo."
+    ]
   }
 }

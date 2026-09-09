@@ -6,7 +6,7 @@
 
 - **Schede importate:** 114
 - **Task effettive (duplicati esclusi):** 111
-- **Auditate contro il repo:** 37/114
+- **Auditate contro il repo:** 45/114
 - **Duplicati intercettati:** 3
 - **Estensioni/sovrapposizioni:** 8
 - **Richieste già implementate senza task equivalente:** 5
@@ -56,14 +56,14 @@
 | `ADF-LEG-DDDE0E598F52` | Quello che al backend mancava per stare in piedi su uno store | 🟡 estensione | ADF-LEG-043B012E6E3B | implementazioni/07-multiplayer-e-backend.md | ⬜ da fare | ⬜ da fare | 0/3 |
 | `ADF-LEG-95F95C753984` | Una pagina per ogni azione? | ✅ già implementata | — | documentazione/pagine-azioni/README.md | 📝 risposto | ✅ verificata | 0/0 |
 | `ADF-LEG-CCBBA5CFE700` | Via il bottone del menù dalle CTA in basso | ✅ già implementata | — | implementazioni/02-interfaccia-e-telefono.md | ⬜ da fare | ✅ verificata | 0/0 |
-| `ADF-LEG-314A919E7149` | «Chat»: mamma e il migliore amico, poi il resto con la fama | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-C9E047E25208` | «Disciplina» diventa «Condizione» | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-79EF3A472134` | «Fatti sentire un beat» non faceva niente, e i beat non si vedevano | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-99E4138ADC42` | «Torna alla mappa» non funzionava in alcune interfacce | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-75B536657B35` | «Vita quotidiana» diventa «Casa» | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-4D9FA3E54D62` | (riscritto) e lo schema del database | storica | — | implementazioni/08-uscita-sugli-store.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-0C844231FF05` | 10, 11, 12 · Lo Studio: una stanza sua, e il gameplay dentro | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-D5515C176B84` | 13 · I dischi: oro, platino, diamante | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-314A919E7149` | «Chat»: mamma e il migliore amico, poi il resto con la fama | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | ✅ verificata | 3/3 |
+| `ADF-LEG-C9E047E25208` | «Disciplina» diventa «Condizione» | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | ✅ verificata | 2/2 |
+| `ADF-LEG-79EF3A472134` | «Fatti sentire un beat» non faceva niente, e i beat non si vedevano | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | ✅ verificata | 3/3 |
+| `ADF-LEG-99E4138ADC42` | «Torna alla mappa» non funzionava in alcune interfacce | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | ✅ verificata | 3/3 |
+| `ADF-LEG-75B536657B35` | «Vita quotidiana» diventa «Casa» | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | ✅ verificata | 2/2 |
+| `ADF-LEG-4D9FA3E54D62` | (riscritto) e lo schema del database | storica | — | implementazioni/08-uscita-sugli-store.md | ✅ fatto | ✅ verificata | 3/3 |
+| `ADF-LEG-0C844231FF05` | 10, 11, 12 · Lo Studio: una stanza sua, e il gameplay dentro | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | ✅ verificata | 4/4 |
+| `ADF-LEG-D5515C176B84` | 13 · I dischi: oro, platino, diamante | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | ✅ verificata | 4/4 |
 | `ADF-LEG-8C62DACB1DD3` | 14 · I dialoghi devono tornare fra di loro | storica | — | implementazioni/06-mondo-e-personaggi.md | ✅ fatto | — non ancora auditata | — |
 | `ADF-LEG-47DD718310D1` | Al massimo una conversazione lunga al giorno | storica | — | implementazioni/06-mondo-e-personaggi.md | ✅ fatto | — non ancora auditata | — |
 | `ADF-LEG-E489C02FFB9A` | Ascoltare un beat prima di comprarlo | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | — non ancora auditata | — |

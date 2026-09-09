@@ -11,18 +11,62 @@
     "source_status": "fatto",
     "source_status_raw": "fatto"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "complete",
   "intake_state": "canonical",
   "related_task_ids": [],
   "intake_note": "",
   "roadmap_impact": "none",
   "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
+  "current_state": [
+    "Il repository documenta il passaggio dal prototipo/artifact a frontend, backend e database; il backend applica migrazioni SQLite/PostgreSQL con account, carriere, relazioni, traguardi e acquisti."
+  ],
+  "systems": [
+    "backend",
+    "database",
+    "account",
+    "salvataggi-cloud"
+  ],
+  "watch_paths": [
+    "backend/README.md",
+    "backend/database/README.md",
+    "backend/database/db.js",
+    "backend/database/migrazioni",
+    "backend/database/migrazioni-pg",
+    "frontend/README.md"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "La documentazione descrive il prodotto per Steam e store mobile e non lo tratta più come artifact unico.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "backend/README.md: descrive frontend/backend, database e distribuzione; frontend/README.md: documenta build e salvataggi/account necessari agli store."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il database ha uno schema applicato tramite migrazioni con relazioni e vincoli per account, artisti, carriere e dati collegati.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "backend/database/migrazioni/001_iniziale.sql: CREATE TABLE account, artista, carriera, relazione e acquisto con foreign key; backend/database/db.js: seleziona il motore e applica le migrazioni."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Sono mantenute le varianti SQLite e PostgreSQL dello schema.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "backend/database/db.js: sceglie cartella migrazioni o migrazioni-pg; backend/database/README.md: documenta entrambi i percorsi e le tabelle."
+      ]
+    }
+  ],
+  "risks": [
+    "La pubblicazione sugli store richiede ancora integrazione operativa di build, cloud e credenziali, distinta dallo schema dati."
+  ],
   "notes": [
     "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
   ],
@@ -33,6 +77,8 @@
     "summary": "",
     "steps": [],
     "gaps": [],
-    "notes": []
+    "notes": [
+      "Task storica già implementata; nessun piano tecnico residuo."
+    ]
   }
 }
