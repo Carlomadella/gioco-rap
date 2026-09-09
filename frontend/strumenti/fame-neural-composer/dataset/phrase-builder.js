@@ -3,6 +3,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
+const { buildPhraseSourceFidelity } = require("../midi/source-fidelity");
 
 const PHRASE_SCHEMA = "fame-neural-phrase-item-v1";
 const BUILD_REPORT_SCHEMA = "fame-neural-phrase-build-report-v1";
@@ -36,13 +37,22 @@ function deepClone(value) {
 function canonicalSequencesFromSource(item) {
   const sequences = [];
   if (item && item.canonical && item.canonical.schema === "fame-neural-sequence-v1") {
-    sequences.push({ sourceSegmentId: "canonical", sequence: item.canonical });
+    sequences.push({
+      sourceSegmentId: "canonical",
+      sourceSegmentStartTick: 0,
+      sourceSegmentEndTick: null,
+      sequence: item.canonical
+    });
   }
   if (Array.isArray(item && item.canonicalSegments)) {
     item.canonicalSegments.forEach((segment, index) => {
       if (segment && segment.canonical && segment.canonical.schema === "fame-neural-sequence-v1") {
         sequences.push({
           sourceSegmentId: segment.segmentId || `tempo-${index}`,
+          sourceSegmentStartTick: Math.max(0, Math.round(Number(segment.sourceStartTick) || 0)),
+          sourceSegmentEndTick: Number.isFinite(Number(segment.sourceEndTick))
+            ? Math.max(0, Math.round(Number(segment.sourceEndTick)))
+            : null,
           sequence: segment.canonical
         });
       }
@@ -162,11 +172,21 @@ function outputFileName(phraseId, index) {
   return `${String(index + 1).padStart(5, "0")}-${hash}.phrase-item.json`;
 }
 
-function buildPhraseItem(sourceItem, sourceFileName, segmentId, sequence, startBar, bars) {
+function buildPhraseItem(sourceItem, sourceFileName, segmentId, sequence, startBar, bars, sourceSegmentStartTick = 0) {
   const phraseId = phraseIdFor(sourceItem.itemId, segmentId, startBar, bars);
   const canonical = sliceSequence(sequence, startBar, bars);
   const provenance = sourceItem.provenance || {};
-  return {
+  const sourceFidelity = sourceItem.sourceFidelity
+    ? buildPhraseSourceFidelity(sourceItem.sourceFidelity, {
+      sourceDatasetItemId: sourceItem.itemId,
+      sourceSegmentId: segmentId,
+      sourceSegmentStartTick,
+      startBar,
+      phraseBars: bars
+    })
+    : null;
+
+  const phrase = {
     schema: PHRASE_SCHEMA,
     version: 1,
     phraseId,
@@ -196,6 +216,9 @@ function buildPhraseItem(sourceItem, sourceFileName, segmentId, sequence, startB
     },
     canonical
   };
+
+  if (sourceFidelity) phrase.sourceFidelity = sourceFidelity;
+  return phrase;
 }
 
 function acceptedSourceIds(manifest) {
@@ -233,7 +256,7 @@ function buildPhrases(entries, sourceManifest = null, options = {}) {
     }
 
     let producedFromSource = 0;
-    for (const { sourceSegmentId, sequence } of sequences) {
+    for (const { sourceSegmentId, sourceSegmentStartTick, sequence } of sequences) {
       const totalBars = Math.max(1, Math.round(Number(sequence && sequence.timing && sequence.timing.bars) || 1));
       const windows = plannedWindows(totalBars, cfg);
       if (!windows.length) {
@@ -247,7 +270,15 @@ function buildPhrases(entries, sourceManifest = null, options = {}) {
       }
 
       for (const window of windows) {
-        const phrase = buildPhraseItem(item, entry.fileName, sourceSegmentId, sequence, window.startBar, window.bars);
+        const phrase = buildPhraseItem(
+          item,
+          entry.fileName,
+          sourceSegmentId,
+          sequence,
+          window.startBar,
+          window.bars,
+          sourceSegmentStartTick
+        );
         const events = phraseEventCount(phrase.canonical);
         if (events < cfg.minEvents) {
           skipped.push({

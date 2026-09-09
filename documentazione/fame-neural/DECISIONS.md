@@ -501,3 +501,33 @@ Verifica reale sulle 502 candidate:
 - drum musical target: 0 allowed / 380 blocked / 122 unknown.
 
 I due zeri musicali non vengono aggirati: indicano che l'evidenza corrente non basta ancora ad autorizzare quei training.
+
+## NDR-043 — Source fidelity versionata fuori dal canonico V1; Task View derivata senza ricostruzione
+**Status:** ACCEPTED
+
+La fedeltà MIDI necessaria a una Task View viene preservata **prima** della normalizzazione lossy e mantenuta come payload `sourceFidelity` versionato nel dataset item. `fame-neural-sequence-v1` resta la common representation e non viene modificato per trasportare automaticamente tutti i dettagli raw.
+
+Per gli eventi drum la source fidelity V1 conserva almeno:
+
+- `sourceEventId` deterministico;
+- track/channel;
+- MIDI note originale;
+- source `startTick` e `durationTicks`;
+- velocity/velocityOff;
+- source PPQ;
+- mapping id/version;
+- proiezione canonica tracciabile.
+
+La phrase derivata conserva una slice della source fidelity riferita alla propria finestra e mantiene gli ID degli eventi sorgente. Una Task View può quindi usare l'informazione raw necessaria senza passare attraverso `perc` già aggregato e senza inventare la nota originale.
+
+Verifica reale su GMD: 6/6 MIDI importati, 2382 raw drum events preservati e 35/35 phrase con linkage source fidelity.
+
+Regole:
+
+- il canonico V1 resta intenzionalmente più compatto e può essere lossy per classi drum/timing sorgente;
+- una perdita del modello non equivale a perdita della sorgente se il sidecar resta disponibile e tracciabile;
+- gli artefatti storici già materializzati senza source fidelity non vengono retroattivamente “riparati” per inferenza;
+- una Task View che richiede informazione non presente deve reimportare la sorgente o dichiarare il dato non disponibile;
+- uguaglianza dei conteggi raw/canonical è un'invariante tecnica utile, non una prova di qualità musicale.
+
+La decisione implementa NDR-033 e NDR-036 senza revocare NDR-017/FAME Compound come common representation.

@@ -1011,21 +1011,28 @@ Costruire il primo corpus realmente task-specifico e musicalmente difendibile.
 
 ## 7A — Content capabilities ufficiali
 
-**Aggiornamento Blocco 3:** ammissibilità task-specifica ed enforcement del nuovo percorso Phase 7 sono implementati e verificati end-to-end sulle 502 candidate. Il gate produce `allowed | blocked | unknown`, conserva motivazioni/evidenceRef e il manifest include soltanto record `allowed`. `candidate` e `unknown` non autorizzano training.
+**Stato: COMPLETATA NEL SUO SCOPE dopo il Blocco 4.**
 
-Risultati reali:
+La 7A dispone ora del percorso completo necessario prima della costruzione del Drum Dataset V2:
 
-- debug: 47 allowed / 0 blocked / 455 unknown, task ready ma non training task;
-- drum groove pretraining: 0 allowed / 333 blocked / 169 unknown;
-- drum musical target: 0 allowed / 380 blocked / 122 unknown.
+- content capabilities/evidence separate da schema e rights;
+- distinzione source record / source collection con risoluzione deterministica;
+- Task Admissibility Gate fail-closed con `allowed | blocked | unknown`;
+- enforcement sul nuovo export Phase 7: soltanto `allowed` entra nel manifest;
+- source fidelity drum preservata prima della normalizzazione lossy;
+- linkage deterministico dataset item → source event → phrase slice;
+- `fame-neural-sequence-v1` resta common representation compatibile e non viene gonfiato con payload raw.
 
-Il fatto che i due task musicali abbiano 0 allowed è un esito corretto del gate: la policy corrente non promuove GMD `candidate`, capability sconosciute o qualità non verificate a training data.
+Verifica reale source fidelity su GMD:
 
-Il phrase builder resta generico; il vecchio `data-ready-gate.js` resta un gate storico/data-engineering; gli exporter Fase 5 restano esperimenti storici. I nuovi percorsi Phase 7 devono passare dal Task Admissibility Gate fail-closed.
+- 6/6 MIDI reali importati;
+- 2382 raw drum events preservati;
+- 2382 canonical drum events corrispondenti;
+- 35/35 phrase con source fidelity;
+- canonical V1 non contiene la MIDI note drum originale e non viene usato per ricostruirla.
 
-Il Blocco 3 chiude quindi **ammissibilità per task + enforcement selezione/export + prova allowed/blocked/unknown**. L'intera 7A resta aperta soltanto per la fedeltà sorgente/derivazione Drum View prevista da NDR-036.
+La 7A chiude quindi il **contratto e la pipeline di controllo**, non il gate `DRUM DATA READY V2`. Le 502 phrase storiche restano storiche e non vengono reinterpretate come se avessero source fidelity. La Fase 7 continua con 7C–7G: Drum View V2, scala/diversità, GMD expansion, Trap specialization, quality/domain evidence, boundary/loopability e human gate.
 
-Restano validi il contratto content capabilities e il Blocco 2: osservazioni, capability, uso, qualità ed evidenza sono distinti; source record e source collection restano identità separate; nessuna capability musicale viene auto-promossa.
 ## 7B — `fame-original-seed-v1`
 
 Policy:

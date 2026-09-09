@@ -11,7 +11,7 @@ Data: 2026-09-09
 | Codec micro-training derivati da `records["all"]` | APERTO NEL CODICE; esposizione di validation/test nel preprocessing, non training dimostrato sui loro target | Specifica fissa oppure fit sul solo train e verifica del protocollo |
 | “Vincitore neurale” della Fase 5 | INTERPRETAZIONE CORRETTA | FAME Compound resta formato comune; confronto generativo equo ancora da eseguire quando necessario |
 | Generazione senza grammatica/stato vincolati nel micro-benchmark | APERTO; fallimento storico conservato | Decoder previsto verificato; validità e musicalità misurate separatamente |
-| Identità delle note drum persa nel canonico | APERTO | Dati sorgente conservati e conversioni verificabili; nessuna ricostruzione arbitraria di `perc` |
+| Identità delle note drum persa nel canonico | RISOLTA NEL NUOVO PERCORSO SOURCE FIDELITY; il canonico V1 resta lossy per design | `sourceFidelity` versionato + re-import sorgente per Task View che richiedono nota/timing originali |
 | Richiesta di finestre 2-bar sostituita con 4-bar dal builder V1 | LIMITE DEL CONTRATTO V1 | Supporto task-specifico verificato prima di dichiarare disponibile 2-bar |
 | Soglie e campionamento dei nuovi gate musicali | DA SPECIFICARE PER BLOCCO | Criteri definiti prima dei risultati e test finale separato dallo sviluppo |
 | Topologia dei Performer/Refiner | IPOTESI DI IMPLEMENTAZIONE | Confronto con alternativa joint/condizionale più semplice prima di congelare i moduli |
@@ -93,6 +93,31 @@ Questo aggiornamento **supera lo stato precedente che indicava ammissibilità ed
 Resta aperto per completare 7A il punto di fedeltà sorgente/derivazione della Drum View secondo NDR-036: preservazione dell'identità drum, timing/PPQ e collegamento tracciabile tra sorgente e Task View.
 
 Dettaglio e ricerca di chiusura: [PHASE7A_BLOCK3_CHIUSURA_2026-09-09.md](PHASE7A_BLOCK3_CHIUSURA_2026-09-09.md).
+
+## Aggiornamento operativo — FASE 7A Blocco 4
+
+**Stato del Blocco 4: COMPLETATO NEL SUO SCOPE. FASE 7A: COMPLETATA NEL SUO SCOPE.**
+
+Il percorso MIDI Phase 7 preserva ora la fedeltà sorgente drum **prima** della normalizzazione lossy, senza modificare `fame-neural-sequence-v1`. Il dataset item espone un `sourceFidelity` versionato con identità evento stabile, MIDI note originale, source tick/duration, velocity, source PPQ, mapping/versione e proiezione canonica. Il phrase builder propaga una slice tracciabile della stessa informazione nella phrase derivata.
+
+Verifica reale su Groove MIDI Dataset:
+
+- 6/6 MIDI reali hiphop/4-4 importati;
+- 2382 raw drum events preservati;
+- 2382 canonical drum events prodotti senza introdurre raw note nel canonico V1;
+- 35/35 phrase derivate con source fidelity completa;
+- regressione Fase 2 Blocco 2: OK;
+- regressione Blocco 3: OK;
+- smoke source fidelity: OK;
+- test reale GMD: OK.
+
+La Fase 7A è quindi chiusa nel suo perimetro: capability/evidence, risoluzione source collection, task admissibility/enforcement e source fidelity/derivazione Drum View dispongono ora di contratti e test verificati.
+
+Questo **non** rende il dataset drum Training Ready e non apre training serio. Restano nelle attività 7C–7G: costruzione Drum View V2, espansione GMD, sorgente Trap-specifica, qualità/domain evidence, boundary/loopability e gate umano.
+
+Limite conservato: le 502 phrase storiche già materializzate restano artefatti storici privi della nuova source fidelity; non vengono “riparate” ricostruendo note da `perc`. I nuovi dataset/task view che richiedono questa informazione devono derivare da sorgenti reimportabili o da payload che la preservano esplicitamente.
+
+Dettaglio e ricerca di chiusura: [PHASE7A_BLOCK4_CHIUSURA_2026-09-09.md](PHASE7A_BLOCK4_CHIUSURA_2026-09-09.md).
 
 ## Stato roadmap
 

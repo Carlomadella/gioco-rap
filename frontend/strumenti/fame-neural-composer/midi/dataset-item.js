@@ -6,6 +6,7 @@ const { parseSmf } = require("./smf-parser");
 const { normalizeParsedMidi } = require("./normalize-midi");
 const { validateProvenance } = require("./provenance");
 const { buildTempoSegments, requiresTempoSegmentation } = require("./tempo-segments");
+const { buildSourceFidelity } = require("./source-fidelity");
 
 const DATASET_SCHEMA = "fame-neural-dataset-item-v1";
 const TEMPO_MAP_STRATEGIES = new Set(["block", "segment"]);
@@ -122,6 +123,7 @@ function buildDatasetItem(input) {
   const commercialTrainingReady = technicalReady && provenance.commerciallyCleared;
   const sourceHash = sha256(buffer);
   const itemId = `${provenance.record.sourceId || "unknown"}:${sourceHash.slice(0, 16)}`;
+  const sourceFidelity = buildSourceFidelity(parsed, itemId);
 
   return {
     schema: DATASET_SCHEMA,
@@ -138,6 +140,7 @@ function buildDatasetItem(input) {
         tracks: summarizeTracks(parsed)
       }
     },
+    sourceFidelity,
     provenance: provenance.record,
     rights: {
       status: provenance.rightsStatus,
