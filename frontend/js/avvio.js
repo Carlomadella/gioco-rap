@@ -135,25 +135,27 @@
     let rows = "";
     for(const s of slots()){
       const libero = s.vuoto;
-      rows += '<button class="avv-slot avv-slot-scelta' + (libero ? ' libero' : ' occupato') + '" data-avvio="slot-nuova" data-arg="' + s.n + '">' +
+      rows += '<button class="avv-slot avv-slot-scelta' + (libero ? ' libero' : ' occupato') + '"' +
+        (libero ? ' data-avvio="slot-nuova" data-arg="' + s.n + '"' : ' disabled aria-disabled="true"') + '>' +
         '<span class="avv-slot-num">0' + s.n + '</span>' +
         '<span class="avv-slot-tx"><b>' + (libero ? 'Slot libero' : esc(s.nome)) + '</b><small>' +
-        (libero ? '+ Nuova carriera' : metaSlot(s, true)) + '</small></span>' +
-        '<span class="avv-slot-stato">' + (libero ? 'LIBERO' : 'OCCUPATO') + '</span><span class="avv-freccia">→</span></button>';
+        (libero ? '+ Nuova carriera' : metaSlot(s, true) + ' · elimina da Carica partita per riutilizzarlo') + '</small></span>' +
+        '<span class="avv-slot-stato">' + (libero ? 'LIBERO' : 'OCCUPATO') + '</span><span class="avv-freccia">' + (libero ? '→' : '—') + '</span></button>';
     }
-    return testa("Nuova partita", "Scegli lo slot", "Hai tre carriere indipendenti. Uno slot occupato può essere sostituito solo dopo conferma.", true) +
+    return testa("Nuova partita", "Scegli uno slot libero", "Una nuova carriera non sovrascrive mai uno slot occupato. Per liberarne uno usa Carica partita → Elimina.", true) +
       '<div class="avv-slots">' + rows + '</div>';
   }
 
   function htmlNessunSlot(){
     let rows = "";
     for(const s of slots()){
-      rows += '<button class="avv-slot avv-slot-scelta occupato" data-avvio="rapido-sostituisci" data-arg="' + s.n + '">' +
+      rows += '<div class="avv-slot-row"><button class="avv-slot occupato" disabled aria-disabled="true">' +
         '<span class="avv-slot-num">0' + s.n + '</span><span class="avv-slot-tx"><b>' + esc(s.nome) + '</b>' +
-        '<small>' + metaSlot(s, true) + '</small></span><span class="avv-slot-stato">LIBERA E USA</span><span class="avv-freccia">→</span></button>';
+        '<small>' + metaSlot(s, true) + '</small></span><span class="avv-slot-stato">OCCUPATO</span><span class="avv-freccia">—</span></button></div>';
     }
-    return testa("Avvio rapido", "Nessuno slot libero", "Tutte e tre le carriere sono occupate. Scegli quale liberare: prima di cancellarla ti chiederemo conferma.", true) +
-      '<div class="avv-slots">' + rows + '</div>';
+    return testa("Avvio rapido", "Nessuno slot libero", "Le tre carriere sono occupate. Per crearne una nuova devi prima eliminarne una da Carica partita.", true) +
+      '<div class="avv-slots">' + rows + '</div>' +
+      '<div class="avv-conferma-azioni"><button data-avvio="vai-carica">Vai a Carica partita</button></div>';
   }
 
   function htmlConferma(){
@@ -284,13 +286,26 @@
   }
 
   function preparaNuovoSlot(n, id){
+    const s = infoSlot(n);
+
+    /* ADF_SLOT_NO_OVERWRITE_V1 */
+    if(!s.vuoto){
+      landDillo("Slot occupato. Eliminalo da Carica partita prima di riutilizzarlo.");
+      return false;
+    }
+
     selezionaSlot(n);
-    eliminaSlot(n);
-    /* eliminaSlot resetta l'editor solo se lo slot era quello attivo; se si
-       sta passando da un altro slot, va comunque ripulita la memoria. */
+
+    /* Pulisce solo eventuali residui tecnici di uno slot già libero. */
+    try{
+      localStorage.removeItem(s.k.artista);
+      localStorage.removeItem(s.k.partita);
+    }catch(e){}
+
     resetMemoriaEditor();
     G.difficolta = id;
     try{ localStorage.setItem(chiavi(n).partita, JSON.stringify(G)); }catch(e){}
+    return true;
   }
 
   function segnaUltimo(n){
@@ -348,7 +363,7 @@
   function avviaNuova(n){
     const modo = modalita;
     const id = salvaDifficolta(difficoltaScelta);
-    preparaNuovoSlot(n, id);
+    if(!preparaNuovoSlot(n, id)) return;
     chiudi();
 
     /* Punto 27: l'artista non si crea più qui. Il creatore — sia quello a
@@ -391,14 +406,14 @@
     if(az === "difficolta"){ scegliDifficolta(arg); return; }
     if(az === "slot-nuova"){
       targetSlot = +arg;
-      if(infoSlot(targetSlot).artista){ passo = "conferma"; disegna(); }
-      else avviaNuova(targetSlot);
+      if(infoSlot(targetSlot).artista){
+        landDillo("Slot occupato. Eliminalo da Carica partita prima di riutilizzarlo.");
+        return;
+      }
+      avviaNuova(targetSlot);
       return;
     }
-    if(az === "rapido-sostituisci"){
-      targetSlot = +arg; passo = "conferma"; disegna(); return;
-    }
-    if(az === "sostituisci"){ avviaNuova(targetSlot); return; }
+    if(az === "vai-carica"){ passo = "carica"; disegna(); return; }
     if(az === "slot"){ entraSlot(infoSlot(+arg)); return; }
     if(az === "elimina"){
       targetSlot = +arg; ritornoElimina = "carica"; passo = "elimina"; disegna(); return;

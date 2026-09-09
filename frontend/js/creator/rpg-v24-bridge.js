@@ -147,7 +147,19 @@
       return;
     }
 
-    if(m.type==="adf-rpg-v24-cancel" || m.type==="adf-rpg-v24-appearance-cancel"){
+    if(m.type==="adf-rpg-v24-cancel"){
+      const nuovaAnnullata =
+        typeof window.ADF_ANNULLA_NUOVO_SLOT === "function" &&
+        window.ADF_ANNULLA_NUOVO_SLOT();
+
+      close();
+      modalita="normal";
+
+      if(nuovaAnnullata) location.href="landing.html";
+      return;
+    }
+
+    if(m.type==="adf-rpg-v24-appearance-cancel"){
       close();
       modalita="normal";
       return;

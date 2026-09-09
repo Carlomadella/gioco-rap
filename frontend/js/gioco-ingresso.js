@@ -20,6 +20,21 @@
   const vai = q.get("vai") || "";
   const nuova = q.get("nuova") || "";
 
+  /* ADF_SLOT_NO_OVERWRITE_V1 */
+  function annullaNuovoSlot(){
+    if(!nuova || (A && A.name && A.name.trim())) return false;
+    try{
+      localStorage.removeItem(CHIAVE_ARTISTA());
+      localStorage.removeItem(CHIAVE_PARTITA());
+      return true;
+    }catch(e){
+      console.error("[ADF] Pulizia slot provvisorio fallita",e);
+      return false;
+    }
+  }
+
+  window.ADF_ANNULLA_NUOVO_SLOT = annullaNuovoSlot;
+
   function audioPregame(){
     if(!window.ADF_AUDIO) return;
     ADF_AUDIO.setMode("pregame");
@@ -198,10 +213,7 @@
         "click",
         () => {
           if(A.name.trim()) return;
-
-          try{
-            localStorage.removeItem(CHIAVE_PARTITA());
-          }catch(e){}
+          annullaNuovoSlot();
         },
         true
       );
