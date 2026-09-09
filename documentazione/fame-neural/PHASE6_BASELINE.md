@@ -54,4 +54,8 @@ Le due baseline restano volutamente semplici e i limiti musicali osservati non v
 
 **FASE 6 COMPLETATA.**
 
-Prossimo intervento: **FASE 7 — Neural Planner V0**.
+Indicazione storica V1: **FASE 7 — Neural Planner V0** — SUPERATA dalla Roadmap V2 del 9 settembre 2026.
+
+Prossimo intervento corrente: **FASE 7 — Task Data Reset + Drum Dataset V2**. Il Planner resta rinviato. Per ordine operativo e problemi aperti leggere `ROADMAP_FAME_NEURAL.md` e `CURRENT_STATE.md`.
+
+Le baseline e i risultati sopra sono conservati come storico. Il fallimento musicale di Constrained V1/Coupled V2 riguarda le implementazioni e i test documentati; non dimostra l'impossibilità generale della generazione condizionale per parti. Vedi [audit V2](AUDIT_ROADMAP_V2_2026-09-09.md) e NDR-031.

@@ -343,3 +343,58 @@ Negative lesson ufficiali del primo ciclo includono:
 - `fame-original-seed-v1` non valido come full-arrangement training target;
 - Planner-first non necessario;
 - 4-bar fixed slicing non equivalente a phrase musicale.
+
+## Integrazione dell'audit V2 — 9 settembre 2026
+
+Le decisioni seguenti recepiscono l'[audit del commit 1372467](AUDIT_ROADMAP_V2_2026-09-09.md). **ACCEPTED significa regola adottata, non efficacia dimostrata né correzione già implementata.** Lo stato delle azioni è in CURRENT_STATE.md. NDR-001…027 restano storia del progetto; le precisazioni seguenti prevalgono sulle interpretazioni incompatibili.
+
+## NDR-028 — Preprocessing indipendente dal validation/test
+**Status:** ACCEPTED
+
+Vocabolari e schemi di valutazione devono essere fissati da una specifica indipendente dai dati oppure costruiti esclusivamente sul train. Vanno dichiarati e verificati il comportamento sugli elementi sconosciuti e la separazione per famiglie/sorgenti. La separazione dei batch di training non basta a garantire la separazione del preprocessing.
+
+Nel micro-training Fase 5 i codec ricevono `records["all"]`: il riscontro riguarda l'esposizione del preprocessing ai dati di validation/test, non dimostra che quei record siano stati usati come target nei batch di training. L'entità dell'effetto sui risultati non è misurata. La correzione del codice rimane aperta e precede nuovi confronti neurali.
+
+## NDR-029 — Confronti equivalenti e interpretazione limitata delle metriche
+**Status:** ACCEPTED
+
+Un confronto tra rappresentazioni deve dichiarare task, sorgenti, informazione conservata, budget, split, decoder e unità delle metriche. Perdite su campi diversi non costituiscono da sole una classifica. Un micro-training di 120 step non dimostra convergenza o superiorità generale; costi e velocità restano misure della configurazione osservata.
+
+`encode → decode → encode` verifica idempotenza della serializzazione: non prova la conservazione di tutta l'informazione MIDI. La copertura delle famiglie misura trasportabilità, non qualità musicale. FAME Compound resta la scelta pragmatica per il formato comune; la migliore rappresentazione per un task neurale resta da verificare. Non è richiesto rifare ogni esperimento storico: un nuovo confronto serve quando la decisione futura ne dipende.
+
+## NDR-030 — Valutare il decoder effettivamente previsto
+**Status:** ACCEPTED
+
+Quando il contratto richiede vincoli grammaticali, il benchmark deve verificare il decoder con quei vincoli e documentarne l'applicazione. Escludere dalla selezione una metrica prodotta da un sampler inadeguato non equivale a validare il sampler corretto. I risultati unconstrained storici restano registrati.
+
+Validità strutturale e qualità musicale sono gate distinti. Le dipendenze tra campi di una parola compound dipendono anche dal modello e dal decoder, non soltanto dal formato. Eventuali modifiche vanno confrontate sullo stesso task; la verifica del decoder previsto rimane aperta.
+
+## NDR-031 — Limiti delle falsificazioni e delle decisioni architetturali
+**Status:** ACCEPTED
+
+Un risultato negativo falsifica l'ipotesi operativa nelle condizioni provate; non dimostra l'impossibilità universale di una famiglia di metodi. Le conclusioni storiche su recombination, seed, conditioning e Planner vanno lette con questo limite. Conditioning estratto da una sorgente può servire un benchmark condizionato, ma non dimostra generazione autonoma.
+
+La coerenza tra tracce è un requisito musicale. Un Joint Refiner separato è una possibile soluzione, non una necessità provata. Prima di congelarne l'implementazione si confrontano alternative più semplici, incluse generazione congiunta o condizionata, con dati e criteri comparabili. La sequenza della V2 resta una strategia di lavoro: non certifica l'efficacia anticipata di tutti i componenti.
+
+## NDR-032 — Gate definiti prima dei risultati e valutazione indipendente
+**Status:** ACCEPTED
+
+Prima del test si registrano pool candidato, unità di campionamento, numerosità e sua motivazione, criteri di inclusione, soglie di accettazione, gestione dei casi dubbi e protocollo d'ascolto. Nessun numero universale di esempi viene assunto sufficiente senza relazione al task.
+
+I casi già ascoltati e usati per prendere decisioni sono esempi di sviluppo/regressione; non costituiscono da soli un nuovo test finale indipendente. Si riserva un insieme finale separato per famiglie/sorgenti, controllando duplicati e derivazioni. Il giudizio del responsabile musicale resta valido per il prodotto; numero e profilo degli ascoltatori delimitano le conclusioni, senza trasformarle in consenso universale.
+
+## NDR-033 — Preservare le sorgenti e non inventare capacità musicali
+**Status:** ACCEPTED
+
+Le capacità ammesse di un contenuto devono distinguere proprietà osservate, inferenze e giudizi d'ascolto, con evidenza, ambito e incertezza. Licenza utilizzabile, rating o etichetta di genere non certificano groove, arrangiamento o rappabilità. Un valore assente non equivale a una valutazione negativa; un fallback non diventa un'etichetta fattuale.
+
+Prima di normalizzazioni distruttive si preservano identità della nota drum originale, timing e PPQ sorgente, provenienza e versione del mapping. Sidecar o estensione versionata sono scelte implementative da verificare. Non si ricostruisce arbitrariamente una nota originale dal ruolo aggregato `perc`. La DrumView va valutata sul suo task; la rappresentazione comune non garantisce da sola la fedeltà necessaria. I synthetic sono ammessi per ruoli espliciti e gate specifici, senza assumere che più file equivalgano a più famiglie musicali indipendenti.
+
+## NDR-034 — Tracciabilità, memoria e chiusura verificabile
+**Status:** ACCEPTED
+
+Ogni esperimento decisionale deve associare commit del codice, configurazione, identità/hash degli input, split, seed, renderer, risultati e artefatti necessari alla riproduzione. Per gli ascolti si conservano manifest, chiave delle etichette blind e feedback. Un artefatto mancante resta dichiarato mancante: non si ricostruisce la cronologia per supposizione. Se il vecchio boundary test non è recuperabile, il nuovo test riceve identità propria.
+
+Si privilegiano strumenti versionati e punti di ingresso stabili; gli errori operativi documentati non giustificano una proliferazione di launcher temporanei. Una correzione è chiusa solo dopo modifica e verifica pertinente: aggiornare un documento non corregge un bug.
+
+L'audit conserva la fotografia e le fonti; DECISIONS conserva le regole; CURRENT_STATE conserva lo stato corrente; ROADMAP conserva ordine e gate. La ricerca di apertura e chiusura richiesta da NDR-026 collega evidenze, alternative e risultati, senza creare un secondo registro di avanzamento. Le fonti sostengono il proprio contesto sperimentale: non validano automaticamente FAME.

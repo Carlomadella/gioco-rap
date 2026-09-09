@@ -3,6 +3,19 @@
 Data avvio: 8 settembre 2026
 Stato: COMPLETATA — FAME COMPOUND V1 SELEZIONATA
 
+## Precisazione dell'audit V2 — interpretazione corrente
+
+FAME Compound resta selezionato come **formato comune per compatibilità, compattezza e costo locale**. Le sezioni successive conservano il benchmark e la decisione storici: non certificano superiorità generativa o training readiness per ogni task.
+
+- Il micro-training dura 120 step × 4 phrase: 480 presentazioni, circa 1,20 epoche nominali sul train da 401 phrase; non è una prova di convergenza.
+- `microtrain.py` costruisce codec/vocabolario/schemi da `records["all"]`, comprendendo validation e test. Il batcher addestra sul train: il riscontro è esposizione nel preprocessing, non prova di training sui target del test. L'effetto sui vecchi punteggi non è quantificato.
+- Le rappresentazioni predicono campi diversi: NLL per target e bits/bar non bastano al ranking quando cambia l'informazione rappresentata. La copertura 8/8 è copertura del contratto Fase 4, non prova di qualità musicale.
+- Zero round-trip failure misura idempotenza seriale, non assenza di perdita rispetto al MIDI sorgente.
+- Escludere il ranking degli output invalidi per sampling unconstrained non equivale ad aver validato il decoder constrained previsto.
+- Costi GPU e risultati restano misure storiche del protocollo dichiarato. In particolare FAME Compound non è il più veloce nel report di throughput.
+
+Prima di usare un nuovo benchmark per scegliere un modello applicare NDR-028…030. Nessun retraining viene richiesto per riscrivere lo storico; la verifica va eseguita quando sostiene una nuova decisione. Evidenze e alternative: [audit V2](AUDIT_ROADMAP_V2_2026-09-09.md).
+
 ## Obiettivo
 
 Scegliere la rappresentazione neurale di FAME Neural con misure comparabili sullo stesso corpus e sullo stesso contratto di input, non per preferenza architetturale.
@@ -110,7 +123,7 @@ Il Blocco 3 non sceglie automaticamente il vincitore: i numeri GPU/generativi de
 
 ## Blocco 4 — decisione finale
 
-**Winner: `fame-compound-v1`.**
+**Selezione storica: `fame-compound-v1`.** Interpretazione corrente: formato comune selezionato, non vincitore neurale generale dimostrato (vedi precisazione dell'audit sopra).
 
 L'audit successivo al micro-training ha mostrato che tutti i 41 output classificati invalidi nel Blocco 3 fallivano per stato/grammatica del sampling unconstrained. La metrica invalid-generation del Blocco 3 viene quindi mantenuta come diagnostica del decoder, non come misura comparativa della qualità delle rappresentazioni.
 

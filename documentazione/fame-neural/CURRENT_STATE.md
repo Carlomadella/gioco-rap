@@ -2,6 +2,24 @@
 
 Data: 2026-09-09
 
+## Audit V2 integrato — stato delle correzioni
+
+[Rapporto completo](AUDIT_ROADMAP_V2_2026-09-09.md), codice verificato al commit `1372467`. Sono integrate le precisazioni documentali e le regole NDR-028…034; **nessuna correzione di codice, nuovo intake o nuovo training è implicata da questo aggiornamento**.
+
+| Riscontro | Stato corrente | Condizione per considerarlo risolto |
+|---|---|---|
+| Codec micro-training derivati da `records["all"]` | APERTO NEL CODICE; esposizione di validation/test nel preprocessing, non training dimostrato sui loro target | Specifica fissa oppure fit sul solo train e verifica del protocollo |
+| “Vincitore neurale” della Fase 5 | INTERPRETAZIONE CORRETTA | FAME Compound resta formato comune; confronto generativo equo ancora da eseguire quando necessario |
+| Generazione senza grammatica/stato vincolati nel micro-benchmark | APERTO; fallimento storico conservato | Decoder previsto verificato; validità e musicalità misurate separatamente |
+| Identità delle note drum persa nel canonico | APERTO | Dati sorgente conservati e conversioni verificabili; nessuna ricostruzione arbitraria di `perc` |
+| Richiesta di finestre 2-bar sostituita con 4-bar dal builder V1 | LIMITE DEL CONTRATTO V1 | Supporto task-specifico verificato prima di dichiarare disponibile 2-bar |
+| Soglie e campionamento dei nuovi gate musicali | DA SPECIFICARE PER BLOCCO | Criteri definiti prima dei risultati e test finale separato dallo sviluppo |
+| Topologia dei Performer/Refiner | IPOTESI DI IMPLEMENTAZIONE | Confronto con alternativa joint/condizionale più semplice prima di congelare i moduli |
+| Indicazione Planner obsoleta nel documento Fase 6 | CORRETTA DOCUMENTALMENTE | Sequenza V1 marcata come superata |
+| Boundary 4-bar loop vs 8-bar contiguous | APERTO; chiusura non recuperata | Manifest e feedback recuperati, oppure nuovo diagnostico con propria identità |
+
+I numeri delle Fasi 0–6 sotto restano **storico documentato**, non risultati rieseguiti durante l'audit. I casi già usati per prendere decisioni rimangono utili per sviluppo/regressioni; non vengono presentati come test finale nuovamente indipendente.
+
 ## Stato roadmap
 
 Roadmap ufficiale: **V2 — ricalibrata dopo i primi gate musicali**.
@@ -432,10 +450,10 @@ dataset Trap/Drill potenzialmente utile per drum specialization, ma di natura al
 
 Ordine:
 
-1. completare il boundary diagnostic già aperto come semplice misura;
-2. ricerca di apertura FASE 7 secondo protocollo V2;
-3. definire `contentCapabilities`;
-4. progettare Drum View / Drum Dataset V2;
+1. usare l'audit integrato e completare la ricerca specifica del blocco prima del codice: assunzioni, alternative, benchmark e gate;
+2. definire `contentCapabilities`, usi consentiti ed evidenza dei label (7A/7B);
+3. definire la conservazione dei dati sorgente per Drum View / Drum Dataset V2, senza inventare informazione persa;
+4. recuperare il boundary diagnostic aperto oppure eseguirne uno nuovo identificabile nell'ambito 7G, prima di congelare boundary/loopability;
 5. espandere GMD per general human groove;
 6. audit HH-TRP;
 7. rendere PDMX quality-aware/role-aware;

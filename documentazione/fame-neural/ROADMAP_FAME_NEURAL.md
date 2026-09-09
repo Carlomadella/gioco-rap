@@ -12,6 +12,19 @@ Progetto: FAME Neural Composer
 
 # 0. Come si legge questa roadmap
 
+## Precisazioni vincolanti dall'audit del 9 settembre 2026
+
+[Audit completo](AUDIT_ROADMAP_V2_2026-09-09.md). L'audit non sostituisce questa roadmap: le sue conseguenze operative sono registrate in NDR-028…034 e nello stato corrente.
+
+- Una decisione accettata per procedere non equivale a efficacia sperimentale dimostrata. Architettura e soglie restano ipotesi finché il relativo confronto non le sostiene.
+- La Fase 5 conserva i risultati storici, ma seleziona FAME Compound come formato comune: non dimostra una vittoria neurale generale. Vocabolario/schemi del micro-training derivati anche da validation/test e sampling unconstrained sono limiti aperti del vecchio protocollo.
+- “Zero round-trip failure” significa idempotenza seriale; “8/8 feature” significa copertura del contratto; “zero group leakage” non certifica assenza di ogni forma di esposizione del test.
+- Le formulazioni “FALSIFICATO” nelle lezioni storiche vanno lette nel perimetro dei test descritti. Non dichiarano impossibilità universali o proprietà di esempi non ascoltati.
+- Coerenza cross-track è un obiettivo; la topologia disegnata, incluso un Refiner separato, è un'ipotesi da confrontare con alternative joint/condizionali più semplici prima di congelarne i componenti.
+- Nessun gate task-specifico si chiude senza criteri e campionamento definiti prima dei risultati. I casi già usati per decidere sono sviluppo/regressione, non un nuovo test finale indipendente.
+
+L'integrazione è documentale: lo stato delle correzioni nel codice resta esplicito in `CURRENT_STATE.md`. I benchmark storici non vengono riscritti per farli apparire conformi al nuovo protocollo.
+
 Ogni affermazione importante deve essere classificabile come una delle seguenti:
 
 - **VERIFICATO** — supportato da codice, dati, benchmark o ascolto documentato;
@@ -1083,6 +1096,8 @@ Poi implementare un criterio di boundary/loopability task-specifico invece di sc
 
 ## Gate FASE 7 — DRUM DATA READY V2
 
+Prima dell'esecuzione del gate fissare pool ammissibile, unità indipendente/famiglia, split, regole di campionamento, numerosità, criteri di qualità e trattamento degli incerti. “Abbastanza grande” e “quota sufficiente” sotto sono obiettivi da rendere operativi, non soglie già definite. Label diretti, label di fonte, inferenze e review devono essere distinguibili (NDR-032…034).
+
 Non si passa a training serio finché:
 
 - corpus drum è abbastanza grande rispetto ai benchmark comparabili;
@@ -1583,8 +1598,8 @@ Questi numeri certificano il contratto tecnico, non il training readiness.
 
 ## Prossimi interventi ufficiali
 
-1. chiudere il boundary diagnostic già avviato, senza trasformarlo in dogma 4-vs-8;
-2. progettare e implementare Drum View / Drum Dataset V2;
+1. aprire il blocco 7A/7B con ricerca specifica, contratto delle capacità d'uso ed evidenza dei label, applicando l'audit e NDR-028…034;
+2. progettare e implementare Drum View / Drum Dataset V2 con conservazione sorgente; recuperare o rieseguire con nuova identità il diagnostico aperto in 7G prima di congelare boundary/loopability, senza trasformarlo in dogma 4-vs-8;
 3. espandere GMD come general human groove pretraining source;
 4. audit approfondito HH-TRP prima di qualsiasi intake;
 5. rendere PDMX quality-aware/role-aware;
