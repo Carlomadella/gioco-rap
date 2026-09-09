@@ -15,7 +15,7 @@
   "verified_status": "complete",
   "intake_state": "already_implemented",
   "related_task_ids": [],
-  "intake_note": "Il comportamento richiesto e' gia' presente nel codice reale; non esiste una task equivalente separata da collegare.",
+  "intake_note": "already_implemented: il comportamento richiesto e' gia' presente nel codice reale; non esiste una task equivalente separata da collegare.",
   "current_state": [
     "Il profilo della landing prepara lo slot attivo e chiama ADF_RPG_V24.openAppearance().",
     "Il fallback usa gioco.html?vai=profilo e gioco-ingresso.js entraInCitta() porta a hub e GAME.enter()."

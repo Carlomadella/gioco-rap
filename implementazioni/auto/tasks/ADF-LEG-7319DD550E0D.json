@@ -15,7 +15,7 @@
   "verified_status": "complete",
   "intake_state": "already_implemented",
   "related_task_ids": [],
-  "intake_note": "Il deliverable storico richiesto, prompt separati per le ambientazioni delle pagine, e' gia' presente; non emerge una task equivalente distinta.",
+  "intake_note": "already_implemented: il deliverable storico richiesto, prompt separati per le ambientazioni delle pagine, e' gia' presente; non emerge una task equivalente distinta.",
   "current_state": [
     "prompt/prompt-ambientazioni.md contiene prompt separati per landing, avatar, casa, vicolo, Sala e le azioni/card principali.",
     "La fonte stessa documenta sedici prompt che coprono le dodici card e le pagine di contesto richieste."
