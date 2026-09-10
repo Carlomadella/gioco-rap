@@ -900,3 +900,97 @@ stesso numero (`tocco.css?v=13`, `impostazioni-ui.js?v=15`). Non è rimasta ness
 indietro.
 
 Niente di nuovo trovato: le due correzioni fanno quello che dicono e non hanno smosso altro.
+
+---
+
+## Giro del 10/09/2026 (quinto giro: dopo il merge da main, commit `1cccf23`)
+
+Giro mirato su `fix/durata-azioni-e-orari-fabbrica`, appena tornato da un merge di `main`
+che ha portato dentro il riallineamento di Studio/Shop (`2f05b11`) e le correzioni
+MakeHuman/Avaturn (`4427e77` e dintorni). Ho guardato tre cose: se la logica nuova di
+`assumitiCome()`/`schedaLavoro()` (in `hub.js`) si scontra con qualcosa toccato da quei due
+branch, se `GAME_HOURS.jobStatus/jobDuration/placeJobStatus` (`orari.js`) sono coerenti con
+com'è usato `orari.js` altrove, e se la doppia cattura dell'id (il wrapper di `tempo.js` +
+la chiamata esplicita in `ui.js:128`) crea problemi.
+
+**Controlli automatici, tutti verdi**: `npm run prova` 96 a posto e 0 no, `node
+strumenti/audit-regressioni.js` 301 a posto e 0 no, `npm run verifica:build` 33 a posto e
+0 no.
+
+**Sul riallineamento di Studio/Shop e MakeHuman**: il commit `2f05b11` non tocca
+`hub.js`, `orari.js`, `tempo.js` né `spostamenti.js` — cambia solo `css/game.css` (le
+linguette dello Shop) e `pagine/gioco.html`. I commit MakeHuman (`4427e77`, `4eabf0b`,
+`d9bc704`, `d75b15b`) toccano `hub.js` ma solo `vistaProfilo()`/il ritratto e la lista
+delle linguette del profilo (tolta «Vestiti»): non toccano `assumitiCome()`,
+`schedaLavoro()` né i punti dove entra `GAME_HOURS`. Confrontato riga per riga il diff di
+`34a45f8` (il commit che ha introdotto `jobStatus`/`jobDuration`/`placeJobStatus`) con lo
+stato attuale di `orari.js`: è arrivato intatto, `GAME_HOURS.showClosed` è esportato (prima
+non lo era, ed `assumitiCome()` lo chiama) e i nomi dei lavori in `JOB_HOURS` combaciano
+uno a uno con `JOBS` in `actions.js` e con `DURATE_LAVORO` in `tempo.js`. Nessuno scontro
+trovato con quello che è arrivato dagli altri due branch.
+
+**Sulla doppia cattura dell'id**: confermato che sono ridondanti ma non in conflitto, come
+già scritto nel commit. Il wrapper di `tempo.js:323` cattura l'id appena parte
+`avviaAzioneDiretta(id)`; la chiamata esplicita di `ui.js:128` lo ricattura, con lo stesso
+valore, appena prima di `iniziaAzione()` dentro `esegui()`. Anche quando l'azione passa
+dalla finestra «Confermi?» (costa soldi veri) l'id resta lo stesso finché non si conferma:
+non c'è un punto in cui la mossa cambia proprietario a metà.
+
+Un problema serio, trovato leggendo il codice (non l'ho cliccato dal vivo nel browser: qui
+non ho un browser da aprire, quindi questa è una lettura, da confermare a mano prima di
+fidarsene del tutto — ma ho seguito ogni singolo punto del codice che tocca
+`G.currentPlace` e non ce n'è uno che manca).
+
+### Il gioco chiede di essere «al posto giusto» per registrare, mixare, fare live, palestra e i turni in Fabbrica/Pizzeria — ma non ti ci porta mai
+
+- **dove** — `frontend/js/game/spostamenti.js:190-226` (`actionAccess`, il controllo
+  «sei nel posto giusto?») contro `frontend/js/game/hub.js:833-845` (il click sui cartelli
+  della mappa) e `frontend/js/game/state.js:13-47` (`START()`, la partita nuova)
+- **cosa succede** — dal commit `dc49c91` (3/09) ogni mossa che passa da
+  `avviaAzioneDiretta()` (quindi anche «Cerca un beat», «Registra il pezzo», «Mixa il
+  pezzo» dentro lo Studio, «Fai la serata» al Live Club, le due mosse della Palestra, e
+  «Fai il turno» in Fabbrica/Pizzeria — è la stessa mossa che questo branch ha appena
+  sistemato per la durata) controlla anche `G.currentPlace`: se non sei fisicamente nel
+  posto richiesto (`studio`, `concerti`, `palestra`, `fabbrica`, `pizzeria`) la mossa viene
+  rifiutata con «Per fare questa mossa devi prima raggiungere X sulla mappa», prima ancora
+  di toccare energia o soldi. Il problema è che **niente, in tutto il codice, sposta
+  `G.currentPlace` quando clicchi un cartello della mappa**: `START()` (partita nuova) non
+  lo mette nello stato iniziale, e l'unico punto che lo scrive davvero è `esegui(toId)` in
+  `spostamenti.js:297` (`GAME_TRAVEL.go`) — che ho cercato in tutto `frontend/js/` e non è
+  chiamato da nessuna parte: non dal click sui cartelli (`hub.js:833`, che chiama solo
+  `l.vai()`, cioè apre direttamente lo Studio/la Pizzeria/eccetera), non da `apriStudio()`,
+  non da `schedaLavoro()`. Quindi `G.currentPlace` resta sempre `"vita"` (Casa) per tutta
+  la partita, tranne quando vai in carcere. Il risultato: **«Cerca un beat», «Registra il
+  pezzo», «Mixa il pezzo», «Fai la serata», le due mosse della Palestra e «Fai il turno» in
+  Fabbrica/Pizzeria falliscono sempre**, con l'avviso che ti manda a un posto in cui sei
+  già entrato (lo Studio, per dire) senza mai spendere energia, soldi o tempo. Per il
+  lavoro di questo branch nello specifico: `assumitiCome()` ti assume regolarmente (quel
+  controllo guarda solo l'orario), ma la riga subito dopo che chiama `hubAzione("turno")`
+  per farti davvero lavorare va a sbattere su questo stesso muro — la paga non arriva mai.
+  Lo stesso identico scenario è già scritto, come test isolato, dentro
+  `strumenti/audit-regressioni.js:1163-1194` (`currentPlace:"vita"` → `wrong-place`): il
+  test conferma che il blocco funziona come progettato, ma nessun test verifica che il
+  gioco vero porti mai `currentPlace` fuori da `"vita"`.
+- **come si vede** — non l'ho provato in un browser vero (qui non ne ho uno). Da
+  controllare a mano: partita nuova, vai in Studio dalla mappa, prova «Cerca un beat» (o
+  in Fabbrica, fatti assumere e prova «Fai il turno»); se il sospetto è giusto, esce
+  l'avviso «devi prima raggiungere Studio/Fabbrica sulla mappa» anche stando già lì dentro.
+- **quanto pesa** — blocca la partita (se confermato: tutta la produzione musicale, la
+  palestra e i due lavori con un edificio fisico diventerebbero impossibili da usare).
+  Non è nato con questo branch — il controllo sul luogo è del 3/09 (`dc49c91`), prima che
+  `fix/durata-azioni-e-orari-fabbrica` esistesse — ma il pezzo che questo branch ha appena
+  sistemato (il turno in Fabbrica) ci sbatte contro in pieno, e vale la pena controllarlo
+  subito insieme.
+
+**RISPOSTA (10/09/2026)** — falso allarme, controllato a mano in `frontend/js/game/spostamenti.js`.
+`esegui(toId)` **è chiamato**: riga 347, dentro `mostraConferma()`, quando si clicca «Vai»
+nella finestra di conferma dello spostamento. Quella finestra si apre dal click su un pin
+della mappa (`#hb-pins`, listener a riga 413-435): click su `.pspot[data-l]` → `piano(id)` →
+se il tragitto è valido e non sei già lì, `mostraConferma(p, onArrive)` → sull'opzione «Vai»
+(riga 346-350) chiama `esegui(p.toId)`, che scrive `G.currentPlace = toId` (riga 297) e
+salva. Il giro precedente ha cercato la stringa letterale `GAME_TRAVEL.go(...)` (il nome con
+cui la funzione è esposta all'esterno, riga 482: `go:esegui`) e non l'ha trovata in giro per
+`frontend/js/`, senza accorgersi che dentro allo stesso modulo la funzione si richiama per
+il suo nome locale, `esegui(...)`, non tramite l'alias pubblico. `G.currentPlace` si muove
+davvero quando ci si sposta sulla mappa: «Cerca un beat», «Fai il turno» in Fabbrica e le
+altre mosse legate al luogo non sono bloccate in modo strutturale.
