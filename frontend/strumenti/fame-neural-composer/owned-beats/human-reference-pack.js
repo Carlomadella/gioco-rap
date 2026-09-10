@@ -426,26 +426,103 @@ function validateSubmissionCore(submission, manifest, protocolInfo, expectedReco
   };
 }
 
+function quantizeTapTimes(values, durationSeconds) {
+  const duration = Number(durationSeconds);
+  if (!Array.isArray(values) || !Number.isFinite(duration) || duration <= 0) {
+    return { ok: false, reason: "INVALID_INPUT" };
+  }
+  const taps = values.map(Number).filter(Number.isFinite).sort((a, b) => a - b)
+    .filter((v, i, a) => i === 0 || v - a[i - 1] > 0.02);
+  if (taps.length < 4) return { ok: false, reason: "NEED_AT_LEAST_4_TAPS" };
+
+  const median = list => {
+    const a = list.slice().sort((x, y) => x - y);
+    const m = Math.floor(a.length / 2);
+    return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
+  };
+
+  const diffs = [];
+  for (let i = 1; i < taps.length; i++) {
+    const d = taps[i] - taps[i - 1];
+    if (d >= 0.12 && d <= 2.5) diffs.push(d);
+  }
+  if (diffs.length < 3) return { ok: false, reason: "INSUFFICIENT_VALID_INTERVALS" };
+
+  let rough = median(diffs);
+  const gridIndex = [0];
+  let k = 0;
+  for (let i = 1; i < taps.length; i++) {
+    const step = Math.max(1, Math.round((taps[i] - taps[i - 1]) / rough));
+    k += step;
+    gridIndex.push(k);
+  }
+
+  const normalizedPeriods = [];
+  for (let i = 1; i < taps.length; i++) {
+    const dk = gridIndex[i] - gridIndex[i - 1];
+    if (dk > 0) normalizedPeriods.push((taps[i] - taps[i - 1]) / dk);
+  }
+  rough = median(normalizedPeriods);
+
+  const meanK = gridIndex.reduce((s, v) => s + v, 0) / gridIndex.length;
+  const meanT = taps.reduce((s, v) => s + v, 0) / taps.length;
+  let num = 0, den = 0;
+  for (let i = 0; i < taps.length; i++) {
+    num += (gridIndex[i] - meanK) * (taps[i] - meanT);
+    den += (gridIndex[i] - meanK) ** 2;
+  }
+  let period = den > 0 ? num / den : rough;
+  if (!Number.isFinite(period) || period < rough * 0.75 || period > rough * 1.25) period = rough;
+  if (period <= 0.12 || period >= 2.5) return { ok: false, reason: "UNSTABLE_PERIOD" };
+
+  const phaseOffsets = taps.map((t, i) => t - gridIndex[i] * period);
+  let phase = median(phaseOffsets);
+
+  // La reference può riempire beat mancati DENTRO la zona realmente tappata,
+  // ma non deve inventare beat prima/dopo il supporto umano (es. code silenziose).
+  const firstK = Math.min(...gridIndex);
+  const lastK = Math.max(...gridIndex);
+  const quantized = [];
+  for (let gi = firstK; gi <= lastK; gi++) {
+    const t = Math.round((phase + gi * period) * 1e6) / 1e6;
+    if (t >= 0 && t <= duration) quantized.push(t);
+  }
+  if (quantized.length < 2) return { ok: false, reason: "GRID_OUTSIDE_WINDOW" };
+
+  const residuals = taps.map((t, i) => Math.abs(t - (phase + gridIndex[i] * period)));
+  return {
+    ok: true,
+    times: quantized,
+    bpm: Math.round((60 / period) * 1e6) / 1e6,
+    periodSeconds: Math.round(period * 1e6) / 1e6,
+    medianTapCorrectionMs: Math.round(median(residuals) * 1000),
+    inputTapCount: taps.length,
+    outputBeatCount: quantized.length
+  };
+}
+
 function renderHtml(submission, protocol) {
   const data = JSON.stringify(submission).replace(/</g, "\\u003c");
   const meterOptions = JSON.stringify(protocol.references.meter.allowedValues);
   const levels = JSON.stringify(METRIC_LEVELS);
+  const quantizerSource = quantizeTapTimes.toString();
   return `<!doctype html>
 <html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FAME Neural — Human Reference</title>
 <style>
-:root{font-family:Inter,system-ui,sans-serif;color-scheme:dark;background:#0d0d0f;color:#eee}*{box-sizing:border-box}body{margin:0;background:#0d0d0f;min-height:100vh}.wrap{max-width:1180px;margin:auto;padding:24px}.top,.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}.badge{font:700 12px ui-monospace,monospace;border:1px solid #555;padding:7px 10px;border-radius:999px}.grid{display:grid;grid-template-columns:250px 1fr;gap:18px;margin-top:18px}.panel,.card{background:#151519;border:1px solid #2d2d34;border-radius:14px;padding:16px}.card{margin:12px 0;background:#111115}.families button{width:100%;text-align:left;margin:5px 0;padding:10px;border-radius:9px;border:1px solid #333;background:#1d1d22;color:#eee;cursor:pointer}.families button.active{outline:2px solid #aaa}label{display:block;font-size:12px;color:#aaa;margin:8px 0 4px}input,select,textarea,button{font:inherit}input,select,textarea{background:#0d0d10;color:#eee;border:1px solid #3a3a43;border-radius:8px;padding:9px}button.action{border:1px solid #555;background:#25252b;color:#fff;border-radius:9px;padding:9px 12px;cursor:pointer}.muted{color:#999;font-size:13px}audio{width:100%;margin:8px 0}.beats{font:12px ui-monospace,monospace;color:#bdbdc8;word-break:break-word}.wave-editor{position:relative;height:132px;margin:10px 0;border:1px solid #3a3a43;border-radius:9px;overflow:hidden;background:#111115 center/100% 100% no-repeat;cursor:crosshair}.beat-marker{position:absolute;top:0;bottom:0;width:7px;transform:translateX(-50%);border:0;border-left:2px solid #f0f0f0;background:transparent;padding:0;cursor:pointer}.beat-marker.selected{border-left-width:4px}.precision{justify-content:flex-start}.precision .action{padding:6px 9px}.selected-time{min-width:145px;font:12px ui-monospace,monospace;color:#ddd}.wave-help{font-size:12px;color:#9b9ba6;margin-top:4px}.footer{position:sticky;bottom:8px;margin-top:16px;display:flex;justify-content:flex-end}@media(max-width:800px){.grid{grid-template-columns:1fr}.families{display:flex;overflow:auto}.families button{min-width:170px}}
+:root{font-family:Inter,system-ui,sans-serif;color-scheme:dark;background:#0d0d0f;color:#eee}*{box-sizing:border-box}body{margin:0;background:#0d0d0f;min-height:100vh}.wrap{max-width:1180px;margin:auto;padding:24px}.top,.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}.badge{font:700 12px ui-monospace,monospace;border:1px solid #555;padding:7px 10px;border-radius:999px}.grid{display:grid;grid-template-columns:250px 1fr;gap:18px;margin-top:18px}.panel,.card{background:#151519;border:1px solid #2d2d34;border-radius:14px;padding:16px}.card{margin:12px 0;background:#111115}.families button{width:100%;text-align:left;margin:5px 0;padding:10px;border-radius:9px;border:1px solid #333;background:#1d1d22;color:#eee;cursor:pointer}.families button.active{outline:2px solid #aaa}label{display:block;font-size:12px;color:#aaa;margin:8px 0 4px}input,select,textarea,button{font:inherit}input,select,textarea{background:#0d0d10;color:#eee;border:1px solid #3a3a43;border-radius:8px;padding:9px}button.action{border:1px solid #555;background:#25252b;color:#fff;border-radius:9px;padding:9px 12px;cursor:pointer}.muted{color:#999;font-size:13px}audio{width:100%;margin:8px 0}.beats{font:12px ui-monospace,monospace;color:#bdbdc8;word-break:break-word}.wave-editor{position:relative;height:132px;margin:10px 0;border:1px solid #3a3a43;border-radius:9px;overflow:hidden;background:#111115 center/100% 100% no-repeat;cursor:crosshair}.beat-marker{position:absolute;top:0;bottom:0;width:9px;transform:translateX(-50%);border:0;border-left:3px solid #ffbf47;background:transparent;padding:0;cursor:pointer;z-index:3}.beat-marker.selected{border-left:5px solid #ff6bcb}.wave-playhead{position:absolute;top:0;bottom:0;width:2px;background:#46d7ff;transform:translateX(-50%);pointer-events:none;z-index:2}.wave-editor.active{outline:2px solid #46d7ff}.quantize-status{font:12px ui-monospace,monospace;color:#d0d0da;min-width:210px}.precision{justify-content:flex-start}.precision .action{padding:6px 9px}.selected-time{min-width:145px;font:12px ui-monospace,monospace;color:#ddd}.wave-help{font-size:12px;color:#9b9ba6;margin-top:4px}.footer{position:sticky;bottom:8px;margin-top:16px;display:flex;justify-content:flex-end}@media(max-width:800px){.grid{grid-template-columns:1fr}.families{display:flex;overflow:auto}.families button{min-width:170px}}
 </style></head><body><div class="wrap">
 <div class="top"><div><h1>FAME Neural — Human Reference</h1><div class="muted">Solo development. Nessun output V1/V2 mostrato.</div></div><span class="badge">HOLDOUT BLOCCATO</span></div>
 <div class="grid"><aside class="panel families" id="familyList"></aside><main class="panel" id="editor"></main></div>
 <div class="footer"><button class="action" id="exportBtn">Esporta JSON</button></div></div>
 <script>
+${quantizerSource}
 const STORAGE_KEY="fame-human-reference:${submission.reviewId}";
 const initial=${data};
 const meters=${meterOptions};
 const levels=${levels};
 let state=(function(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||initial}catch(e){return initial}})();
-let current=0,timerStarted=null,selectedBeat=null;
+let current=0,timerStarted=null,selectedBeat=null,activeWindow=null,playheadRaf=null;
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));renderList()}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":c===">"?"&gt;":"&quot;"})}
 function done(f){return f.beatReference.reviewed&&f.beatReference.windows.every(function(w){return w.reviewed})&&f.meter.reviewed&&f.sections.reviewed&&Number(f.reviewCostSeconds)>0}
@@ -454,6 +531,17 @@ function waveformPath(f,w){return 'waveforms/'+f.sourceRecordId+'/'+String(w.pos
 function selectedFor(wi){return selectedBeat&&selectedBeat.family===current&&selectedBeat.window===wi?selectedBeat:null}
 function markerHtml(w,wi){var s=selectedFor(wi);return w.beatTimesSeconds.map(function(t,bi){var left=Math.max(0,Math.min(100,(Number(t)/Number(w.durationSeconds))*100));return '<button type="button" class="beat-marker'+(s&&s.index===bi?' selected':'')+'" data-w="'+wi+'" data-b="'+bi+'" style="left:'+left.toFixed(5)+'%" title="'+Number(t).toFixed(6)+' s"></button>'}).join('')}
 function selectedText(wi){var s=selectedFor(wi),w=state.families[current].beatReference.windows[wi];return s&&w.beatTimesSeconds[s.index]!=null?'marker '+Number(w.beatTimesSeconds[s.index]).toFixed(6)+' s':'marker —'}
+function bindMarkerEventsGlobal(wi){var wave=document.getElementById('wave'+wi);if(!wave)return;wave.querySelectorAll('.beat-marker').forEach(function(m){m.onclick=function(ev){ev.stopPropagation();selectedBeat={family:current,window:wi,index:Number(m.dataset.b)};refreshBeatUiGlobal(wi)}})}
+function refreshBeatUiGlobal(wi){var f=state.families[current],w=f.beatReference.windows[wi],wave=document.getElementById('wave'+wi);if(wave){wave.innerHTML=waveContentHtml(w,wi);bindMarkerEventsGlobal(wi)}var beats=document.getElementById('beats'+wi);if(beats)beats.textContent=w.beatTimesSeconds.join(', ')||'—';var selected=document.getElementById('selected'+wi);if(selected)selected.textContent=selectedText(wi)}
+function addBeatAtGlobal(wi,time){var f=state.families[current],w=f.beatReference.windows[wi],t=Number(Math.max(0,Math.min(w.durationSeconds,Number(time))).toFixed(6));if(w.beatTimesSeconds.some(function(v){return Math.abs(Number(v)-t)<0.0005}))return false;w.beatTimesSeconds.push(t);w.beatTimesSeconds.sort(function(a,b){return a-b});selectedBeat={family:current,window:wi,index:w.beatTimesSeconds.indexOf(t)};save();refreshBeatUiGlobal(wi);return true}
+
+function waveContentHtml(w,wi){var a=document.getElementById('wa'+wi),t=a?Number(a.currentTime):0,left=Math.max(0,Math.min(100,(t/Number(w.durationSeconds))*100));return '<div class="wave-playhead" id="playhead'+wi+'" style="left:'+left.toFixed(5)+'%"></div>'+markerHtml(w,wi)}
+function updatePlayhead(wi,time){var w=state.families[current].beatReference.windows[wi],p=document.getElementById('playhead'+wi),wave=document.getElementById('wave'+wi);if(!w||!p)return;p.style.left=Math.max(0,Math.min(100,(Number(time)/Number(w.durationSeconds))*100)).toFixed(5)+'%';document.querySelectorAll('.wave-editor').forEach(function(x){x.classList.toggle('active',Number(x.dataset.w)===wi&&activeWindow===wi)})}
+function followAudio(wi,a){activeWindow=wi;if(playheadRaf)cancelAnimationFrame(playheadRaf);function frame(){updatePlayhead(wi,a.currentTime);if(!a.paused&&!a.ended&&activeWindow===wi)playheadRaf=requestAnimationFrame(frame)}playheadRaf=requestAnimationFrame(frame)}
+function setQuantizeStatus(wi,text){var el=document.getElementById('qstatus'+wi);if(el)el.textContent=text}
+function quantizeWindow(wi){var f=state.families[current],w=f.beatReference.windows[wi],r=quantizeTapTimes(w.beatTimesSeconds,w.durationSeconds);if(!r.ok){setQuantizeStatus(wi,r.reason==='NEED_AT_LEAST_4_TAPS'?'servono almeno 4 tap':'quantizzazione non stabile');return false}w.beatTimesSeconds=r.times;selectedBeat=null;save();refreshBeatUiGlobal(wi);setQuantizeStatus(wi,'AUTO: '+r.bpm.toFixed(3)+' BPM · '+r.inputTapCount+' tap → '+r.outputBeatCount+' beat · correzione mediana '+r.medianTapCorrectionMs+' ms');return true}
+function shiftWholeGrid(wi,delta){var f=state.families[current],w=f.beatReference.windows[wi];if(!w.beatTimesSeconds.length)return;var shifted=w.beatTimesSeconds.map(function(t){return Number((Number(t)+Number(delta)).toFixed(6))});if(shifted.some(function(t){return t<0||t>w.durationSeconds}))return;w.beatTimesSeconds=shifted;save();refreshBeatUiGlobal(wi);setQuantizeStatus(wi,'griglia spostata '+(delta>0?'+':'')+Math.round(delta*1000)+' ms')}
+
 
 function renderList(){var root=document.getElementById('familyList');root.innerHTML=state.families.map(function(f,i){return '<button data-i="'+i+'" class="'+(i===current?'active':'')+'">'+(done(f)?'✓ ':'')+esc(f.sourceRecordId)+'<br><span class="muted">'+esc(f.compositionFamilyId)+'</span></button>'}).join('');root.querySelectorAll('button').forEach(function(b){b.onclick=function(){current=Number(b.dataset.i);render()}})}
 function render(){renderList();var f=state.families[current],e=document.getElementById('editor');
@@ -462,15 +550,15 @@ h+='<div class="card"><h3>Traccia completa / sezioni</h3><audio id="fullAudio" c
 h+='<div class="card"><h3>Beat reference</h3><div class="row"><div><label>BPM reference</label><input id="bpm" type="number" min="20" max="400" step="0.001" value="'+(f.beatReference.referenceBpm==null?'':f.beatReference.referenceBpm)+'"></div><div><label>Metric level</label><select id="metricLevel">'+opts(levels,f.beatReference.metricLevel)+'</select></div><button class="action" id="calcBpm">Calcola BPM dai marker</button><label><input type="checkbox" id="beatReviewed" '+(f.beatReference.reviewed?'checked':'')+'> beat reference revisionata</label></div><div id="windows"></div></div>';
 h+='<div class="card"><h3>Meter</h3><div class="row"><select id="meter">'+opts(meters,f.meter.value)+'</select><label><input type="checkbox" id="meterReviewed" '+(f.meter.reviewed?'checked':'')+'> meter revisionato</label></div></div>';
 h+='<div class="card"><h3>Costo review</h3><div class="row"><button class="action" id="timerStart">Avvia timer</button><button class="action" id="timerStop">Ferma timer</button><span>'+Number(f.reviewCostSeconds||0).toFixed(1)+' s</span></div><label>Note</label><textarea id="notes" rows="3" style="width:100%">'+esc(f.notes||'')+'</textarea></div>';e.innerHTML=h;
-var wr=document.getElementById('windows');wr.innerHTML=f.beatReference.windows.map(function(w,i){return '<div class="card"><b>'+esc(w.position)+'</b> · assoluto '+w.startSeconds+'s → '+(w.startSeconds+w.durationSeconds).toFixed(3)+'s<audio controls id="wa'+i+'" src="'+esc(w.audioPath)+'"></audio><div class="wave-help">Clicca sulla waveform per aggiungere un marker. Clicca un marker per selezionarlo e correggerlo.</div><div class="wave-editor" id="wave'+i+'" data-w="'+i+'" style="background-image:url(&quot;'+esc(waveformPath(f,w))+'&quot;)">'+markerHtml(w,i)+'</div><div class="row"><button class="action tap" data-w="'+i+'">Registra beat (tap)</button><button class="action clear" data-w="'+i+'">Azzera beat</button><label><input class="wreview" data-w="'+i+'" type="checkbox" '+(w.reviewed?'checked':'')+'> finestra revisionata</label></div><div class="row precision"><span class="selected-time" id="selected'+i+'">'+selectedText(i)+'</span><button class="action nudge" data-w="'+i+'" data-step="-0.01">-10 ms</button><button class="action nudge" data-w="'+i+'" data-step="-0.001">-1 ms</button><button class="action nudge" data-w="'+i+'" data-step="0.001">+1 ms</button><button class="action nudge" data-w="'+i+'" data-step="0.01">+10 ms</button><button class="action delete-marker" data-w="'+i+'">Elimina marker</button></div><div class="beats" id="beats'+i+'">'+(w.beatTimesSeconds.join(', ')||'—')+'</div></div>'}).join('');
-function bindMarkerEvents(wi){var wave=document.getElementById('wave'+wi);if(!wave)return;wave.querySelectorAll('.beat-marker').forEach(function(m){m.onclick=function(ev){ev.stopPropagation();selectedBeat={family:current,window:wi,index:Number(m.dataset.b)};refreshBeatUi(wi)}})}
-function refreshBeatUi(wi){var w=f.beatReference.windows[wi],wave=document.getElementById('wave'+wi);if(wave){wave.innerHTML=markerHtml(w,wi);bindMarkerEvents(wi)}var beats=document.getElementById('beats'+wi);if(beats)beats.textContent=w.beatTimesSeconds.join(', ')||'—';var selected=document.getElementById('selected'+wi);if(selected)selected.textContent=selectedText(wi)}
+var wr=document.getElementById('windows');wr.innerHTML=f.beatReference.windows.map(function(w,i){return '<div class="card"><b>'+esc(w.position)+'</b> · assoluto '+w.startSeconds+'s → '+(w.startSeconds+w.durationSeconds).toFixed(3)+'s<audio class="beat-window-audio" controls id="wa'+i+'" src="'+esc(w.audioPath)+'"></audio><div class="wave-help"><b>Metodo consigliato:</b> avvia questa finestra e premi T a ritmo. Il contatore TAP deve cambiare a ogni pressione. Poi premi Quantizza finestra.</div><div class="wave-editor" tabindex="-1" id="wave'+i+'" data-w="'+i+'" style="background-image:url(&quot;'+esc(waveformPath(f,w))+'&quot;)">'+waveContentHtml(w,i)+'</div><div class="row"><button class="action tap" data-w="'+i+'">Registra beat (tap)</button><button class="action quantize" data-w="'+i+'">Quantizza finestra</button><button class="action clear" data-w="'+i+'">Azzera beat</button><label><input class="wreview" data-w="'+i+'" type="checkbox" '+(w.reviewed?'checked':'')+'> finestra revisionata</label></div><div class="row precision"><span class="quantize-status" id="qstatus'+i+'">T = tap da tastiera</span><button class="action shift-grid" data-w="'+i+'" data-step="-0.01">Griglia -10 ms</button><button class="action shift-grid" data-w="'+i+'" data-step="0.01">Griglia +10 ms</button><span class="selected-time" id="selected'+i+'">'+selectedText(i)+'</span><button class="action nudge" data-w="'+i+'" data-step="-0.01">marker -10 ms</button><button class="action nudge" data-w="'+i+'" data-step="-0.001">marker -1 ms</button><button class="action nudge" data-w="'+i+'" data-step="0.001">marker +1 ms</button><button class="action nudge" data-w="'+i+'" data-step="0.01">marker +10 ms</button><button class="action delete-marker" data-w="'+i+'">Elimina marker</button></div><div class="beats" id="beats'+i+'">'+(w.beatTimesSeconds.join(', ')||'—')+'</div></div>'}).join('');
+function bindMarkerEvents(wi){var wave=document.getElementById('wave'+wi);if(!wave)return;wave.querySelectorAll('.beat-marker').forEach(function(m){m.onclick=function(ev){ev.stopPropagation();activeWindow=wi;selectedBeat={family:current,window:wi,index:Number(m.dataset.b)};refreshBeatUi(wi)}})}
+function refreshBeatUi(wi){var w=f.beatReference.windows[wi],wave=document.getElementById('wave'+wi);if(wave){wave.innerHTML=waveContentHtml(w,wi);bindMarkerEvents(wi)}var beats=document.getElementById('beats'+wi);if(beats)beats.textContent=w.beatTimesSeconds.join(', ')||'—';var selected=document.getElementById('selected'+wi);if(selected)selected.textContent=selectedText(wi)}
 function addBeatAt(wi,time){var w=f.beatReference.windows[wi],t=Number(Math.max(0,Math.min(w.durationSeconds,Number(time))).toFixed(6));if(w.beatTimesSeconds.some(function(v){return Math.abs(Number(v)-t)<0.0005}))return;w.beatTimesSeconds.push(t);w.beatTimesSeconds.sort(function(a,b){return a-b});selectedBeat={family:current,window:wi,index:w.beatTimesSeconds.indexOf(t)};save();refreshBeatUi(wi)}
 function nudgeSelected(wi,delta){var s=selectedFor(wi),w=f.beatReference.windows[wi];if(!s||w.beatTimesSeconds[s.index]==null)return;var next=Number((Number(w.beatTimesSeconds[s.index])+Number(delta)).toFixed(6));if(next<0||next>w.durationSeconds)return;if(s.index>0&&next<=Number(w.beatTimesSeconds[s.index-1]))return;if(s.index<w.beatTimesSeconds.length-1&&next>=Number(w.beatTimesSeconds[s.index+1]))return;w.beatTimesSeconds[s.index]=next;save();refreshBeatUi(wi)}
 function bind(id,fn){document.getElementById(id).onchange=fn}
 bind('bpm',function(x){f.beatReference.referenceBpm=x.target.value===''?null:Number(x.target.value);save()});bind('metricLevel',function(x){f.beatReference.metricLevel=x.target.value;save()});bind('sectionsReviewed',function(x){f.sections.reviewed=x.target.checked;save()});bind('beatReviewed',function(x){f.beatReference.reviewed=x.target.checked;save()});bind('meter',function(x){f.meter.value=x.target.value;save()});bind('meterReviewed',function(x){f.meter.reviewed=x.target.checked;save()});bind('notes',function(x){f.notes=x.target.value;save()});
 document.getElementById('addBoundary').onclick=function(){var a=document.getElementById('fullAudio'),t=Number(a.currentTime.toFixed(6));if(t>0&&t<f.decodedDurationSeconds&&!f.sections.boundariesSeconds.includes(t)){f.sections.boundariesSeconds.push(t);f.sections.boundariesSeconds.sort(function(a,b){return a-b});save();render()}};document.getElementById('clearBoundaries').onclick=function(){f.sections.boundariesSeconds=[];save();render()};
-wr.querySelectorAll('.wave-editor').forEach(function(wave){wave.onclick=function(ev){if(ev.target.classList.contains('beat-marker'))return;var i=Number(wave.dataset.w),w=f.beatReference.windows[i],rect=wave.getBoundingClientRect();if(!rect.width)return;var x=Math.max(0,Math.min(rect.width,ev.clientX-rect.left));addBeatAt(i,(x/rect.width)*w.durationSeconds)}});wr.querySelectorAll('.tap').forEach(function(b){b.onclick=function(){var i=Number(b.dataset.w),a=document.getElementById('wa'+i);addBeatAt(i,a.currentTime)}});wr.querySelectorAll('.clear').forEach(function(b){b.onclick=function(){var i=Number(b.dataset.w),w=f.beatReference.windows[i];w.beatTimesSeconds=[];if(selectedFor(i))selectedBeat=null;save();refreshBeatUi(i)}});wr.querySelectorAll('.nudge').forEach(function(b){b.onclick=function(){nudgeSelected(Number(b.dataset.w),Number(b.dataset.step))}});wr.querySelectorAll('.delete-marker').forEach(function(b){b.onclick=function(){var i=Number(b.dataset.w),s=selectedFor(i),w=f.beatReference.windows[i];if(!s||w.beatTimesSeconds[s.index]==null)return;w.beatTimesSeconds.splice(s.index,1);selectedBeat=null;save();refreshBeatUi(i)}});wr.querySelectorAll('.wreview').forEach(function(x){x.onchange=function(){f.beatReference.windows[Number(x.dataset.w)].reviewed=x.checked;save()}});f.beatReference.windows.forEach(function(_,i){bindMarkerEvents(i)});
+wr.querySelectorAll('.wave-editor').forEach(function(wave){wave.onclick=function(ev){if(ev.target.classList.contains('beat-marker'))return;var i=Number(wave.dataset.w),w=f.beatReference.windows[i],rect=wave.getBoundingClientRect();activeWindow=i;if(!rect.width)return;var x=Math.max(0,Math.min(rect.width,ev.clientX-rect.left));addBeatAt(i,(x/rect.width)*w.durationSeconds)}});wr.querySelectorAll('.beat-window-audio').forEach(function(a){var i=Number(a.id.slice(2));a.onplay=function(){activeWindow=i;var wave=document.getElementById('wave'+i);if(wave&&wave.focus){try{wave.focus({preventScroll:true})}catch(e){wave.focus()}}followAudio(i,a);setQuantizeStatus(i,'T ARMATA · premi T a ritmo')};a.ontimeupdate=function(){updatePlayhead(i,a.currentTime)};a.onended=function(){updatePlayhead(i,a.duration);if(f.beatReference.windows[i].beatTimesSeconds.length>=4)quantizeWindow(i)}});wr.querySelectorAll('.tap').forEach(function(b){b.onclick=function(){var i=Number(b.dataset.w),a=document.getElementById('wa'+i);activeWindow=i;addBeatAt(i,a.currentTime);setQuantizeStatus(i,'TAP '+f.beatReference.windows[i].beatTimesSeconds.length+' · '+Number(a.currentTime).toFixed(3)+' s')}});wr.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('.quantize');if(!b||!wr.contains(b))return;ev.preventDefault();ev.stopPropagation();var i=Number(b.dataset.w);activeWindow=i;setQuantizeStatus(i,'Quantizzazione in corso…');quantizeWindow(i);b.blur();},true);wr.querySelectorAll('.shift-grid').forEach(function(b){b.onclick=function(){shiftWholeGrid(Number(b.dataset.w),Number(b.dataset.step))}});wr.querySelectorAll('.clear').forEach(function(b){b.onclick=function(){var i=Number(b.dataset.w),w=f.beatReference.windows[i];w.beatTimesSeconds=[];if(selectedFor(i))selectedBeat=null;save();refreshBeatUi(i);setQuantizeStatus(i,'T = tap da tastiera')}});wr.querySelectorAll('.nudge').forEach(function(b){b.onclick=function(){nudgeSelected(Number(b.dataset.w),Number(b.dataset.step))}});wr.querySelectorAll('.delete-marker').forEach(function(b){b.onclick=function(){var i=Number(b.dataset.w),s=selectedFor(i),w=f.beatReference.windows[i];if(!s||w.beatTimesSeconds[s.index]==null)return;w.beatTimesSeconds.splice(s.index,1);selectedBeat=null;save();refreshBeatUi(i)}});wr.querySelectorAll('.wreview').forEach(function(x){x.onchange=function(){f.beatReference.windows[Number(x.dataset.w)].reviewed=x.checked;save()}});f.beatReference.windows.forEach(function(_,i){bindMarkerEvents(i)});window.__fameTapHandler=function(ev){if(ev.repeat||(ev.code!=='KeyT'&&String(ev.key).toLowerCase()!=='t'))return;var tag=(ev.target&&ev.target.tagName||'').toLowerCase();if(tag==='input'||tag==='textarea'||tag==='select')return;var playing=Array.from(document.querySelectorAll('.beat-window-audio')).find(function(x){return !x.paused&&!x.ended});var i=playing?Number(playing.id.slice(2)):activeWindow;var a=playing||(i==null?null:document.getElementById('wa'+i));if(i==null||!a)return;if(a.paused||a.ended){setQuantizeStatus(i,'T rilevata · premi Play sulla finestra');return}activeWindow=i;ev.preventDefault();ev.stopPropagation();var added=addBeatAtGlobal(i,a.currentTime);setQuantizeStatus(i,(added?'TAP ':'T rilevata · marker già presente · ')+state.families[current].beatReference.windows[i].beatTimesSeconds.length+' · '+Number(a.currentTime).toFixed(3)+' s');};if(!window.__fameTapCaptureBound){window.__fameTapCaptureBound=true;window.addEventListener('keydown',function(ev){if(typeof window.__fameTapHandler==='function')window.__fameTapHandler(ev)},true)};
 document.getElementById('calcBpm').onclick=function(){var d=[];f.beatReference.windows.forEach(function(w){for(var i=1;i<w.beatTimesSeconds.length;i++)d.push(w.beatTimesSeconds[i]-w.beatTimesSeconds[i-1])});d=d.filter(function(x){return x>0.1&&x<3}).sort(function(a,b){return a-b});if(!d.length)return;var med=d[Math.floor(d.length/2)];f.beatReference.referenceBpm=Number((60/med).toFixed(6));save();render()};
 document.getElementById('timerStart').onclick=function(){if(timerStarted===null)timerStarted=performance.now()};document.getElementById('timerStop').onclick=function(){if(timerStarted!==null){f.reviewCostSeconds=Number((Number(f.reviewCostSeconds||0)+(performance.now()-timerStarted)/1000).toFixed(3));timerStarted=null;save();render()}};
 }
@@ -671,6 +759,7 @@ module.exports = {
   makeSubmission,
   validateSubmissionCore,
   renderHtml,
+  quantizeTapTimes,
   waveformSvgFromPcm,
   assertSafeReviewId,
   sha256Text,

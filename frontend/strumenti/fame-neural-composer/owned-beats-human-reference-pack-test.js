@@ -10,6 +10,7 @@ const {
   makeSubmission,
   validateSubmissionCore,
   renderHtml,
+  quantizeTapTimes,
   waveformSvgFromPcm,
   sha256Text
 } = require("./owned-beats/human-reference-pack");
@@ -65,6 +66,35 @@ const waveformSvg = waveformSvgFromPcm(pcmFixture, 100, 40);
 assert.match(waveformSvg, /^<svg /);
 assert.match(waveformSvg, /viewBox="0 0 100 40"/);
 assert.match(waveformSvg, /<line /);
+
+const quantized = quantizeTapTimes([0.12, 0.63, 1.12, 2.13, 2.62], 3);
+assert.equal(quantized.ok, true);
+assert.ok(Math.abs(quantized.bpm - 120) < 2);
+assert.ok(quantized.outputBeatCount > quantized.inputTapCount);
+for (let i = 2; i < quantized.times.length; i++) {
+  const a = quantized.times[i - 1] - quantized.times[i - 2];
+  const b = quantized.times[i] - quantized.times[i - 1];
+  assert.ok(Math.abs(a - b) < 0.002);
+}
+assert.equal(quantizeTapTimes([0.1, 0.6, 1.1], 3).ok, false);
+
+const tailGuard = quantizeTapTimes([0.15, 0.65, 1.15, 1.65], 3);
+assert.equal(tailGuard.ok, true);
+assert.equal(tailGuard.inputTapCount, 4);
+assert.equal(tailGuard.outputBeatCount, 4);
+assert.ok(
+  Math.max(...tailGuard.times) < 2,
+  "quantizer must not extrapolate a beat grid into an untapped/silent tail"
+);
+
+const internalGap = quantizeTapTimes([0.15, 0.65, 1.65, 2.15], 3);
+assert.equal(internalGap.ok, true);
+assert.equal(internalGap.inputTapCount, 4);
+assert.equal(internalGap.outputBeatCount, 5);
+assert.ok(
+  internalGap.times.some((t, i, a) => i > 0 && i < a.length - 1),
+  "quantizer must still fill missing beats inside human-supported range"
+);
 
 
 const badManifest = JSON.parse(JSON.stringify(manifest));
@@ -139,6 +169,29 @@ assert.match(html, /-10 ms/);
 assert.match(html, /\+1 ms/);
 assert.match(html, /Elimina marker/);
 assert.match(html, /Calcola BPM dai marker/);
+assert.match(html, /Quantizza finestra/);
+assert.match(html, /T = tap da tastiera/);
+assert.match(html, /wave-playhead/);
+assert.match(html, /Griglia -10 ms/);
+assert.match(html, /quantizeTapTimes/);
+assert.match(html, /marker -1 ms/);
+assert.match(html, /marker \+1 ms/);
+assert.match(html, /__fameTapCaptureBound/);
+assert.match(html, /addEventListener\('keydown'/);
+assert.match(html, /Quantizzazione in corso/);
+assert.match(html, /TAP /);
+assert.match(html, /function refreshBeatUiGlobal/);
+assert.match(html, /function addBeatAtGlobal/);
+assert.match(html, /refreshBeatUiGlobal\(wi\)/);
+assert.match(html, /addBeatAtGlobal\(i,a\.currentTime\)/);
+assert.match(html, /T rilevata · premi Play sulla finestra/);
+assert.match(html, /tabindex="-1"/);
+assert.match(html, /T ARMATA · premi T a ritmo/);
+assert.match(html, /wave\.focus/);
+assert.doesNotMatch(html, /save\(\);refreshBeatUi\(wi\);setQuantizeStatus/);
+assert.match(html, /function quantizeWindow\(wi\)\{var f=state\.families\[current\]/);
+assert.match(html, /function shiftWholeGrid\(wi,delta\)\{var f=state\.families\[current\]/);
+assert.doesNotMatch(html, /function quantizeWindow\(wi\)\{var w=f\.beatReference/);
 const inlineScriptMatch = html.match(/<script>([\s\S]*?)<\/script>/);
 assert.ok(inlineScriptMatch, "generated HTML must contain inline script");
 assert.doesNotThrow(
