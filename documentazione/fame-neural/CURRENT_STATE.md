@@ -181,6 +181,29 @@ Il campione resta intenzionalmente confinato al selector storico `hiphop/beat/4-
 
 Dettaglio e ricerca di chiusura: [PHASE7C_BLOCK2_CHIUSURA_2026-09-10.md](PHASE7C_BLOCK2_CHIUSURA_2026-09-10.md).
 
+## Aggiornamento operativo — FASE 7D Blocco 1
+
+**Stato del Blocco 1: COMPLETATO NEL SUO SCOPE DI INVENTORY. FASE 7D: ANCORA APERTA.**
+
+Inventory reale completo di `info.csv` GMD v1.0.0:
+
+- 1.150/1.150 record validi;
+- 0 invalidi / 0 duplicati;
+- 10 drummer;
+- 18 primary style;
+- 503 beat / 647 fill;
+- source split: 897 train / 124 validation / 129 test;
+- meter: 1.138 record 4/4 e 12 non-4/4;
+- hiphop: 95 record, di cui 34 `beat/4-4`;
+- cross-split: 9 drummer e 17 session;
+- `eval_session`: 10 template / 40 record, tutti nel source test;
+- reference checks ufficiali: PASS;
+- `readyForSamplingDesign=true`.
+
+Il risultato conferma che lo split GMD resta `source-reference-only`: è preservato per comparabilità, ma non viene promosso automaticamente a split FAME. Il Block2 confronterà grouping per session e drummer e terrà separati i pool source-labeled beat/fill senza trasformarli automaticamente in semantica `core/fill`.
+
+Dettaglio: [PHASE7D_BLOCK1_CHIUSURA_2026-09-10.md](PHASE7D_BLOCK1_CHIUSURA_2026-09-10.md).
+
 ## Stato roadmap
 
 Roadmap ufficiale: **V2 — ricalibrata dopo i primi gate musicali**.

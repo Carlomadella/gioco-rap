@@ -1116,6 +1116,43 @@ Ruolo:
 
 L'hip-hop subset può essere specialization intermedia, ma non viene etichettato automaticamente Trap.
 
+### Blocco 1 — Inventory GMD + split/sampling audit
+
+**COMPLETATO NEL PROPRIO SCOPE.**
+
+Inventory reale completo:
+
+- 1.150/1.150 record validi, 0 invalidi, 0 duplicati;
+- 503 beat / 647 fill;
+- 10 drummer / 18 primary style;
+- split sorgente 897/124/129;
+- 1.138 record in 4/4, 12 in altri meter;
+- 95 hiphop totali, 34 hiphop+beat+4/4;
+- 9 drummer e 17 session attraversano più source split;
+- 10 `eval_session` template / 40 record, tutti nel source test;
+- conteggi ufficiali di riferimento: PASS.
+
+Conclusione: lo split ufficiale GMD resta riferimento di fonte/benchmark, non split FAME automatico. La presenza di gruppi cross-split è diagnostica e richiede una policy task-specifica prima di parlare di leakage FAME.
+
+I fill vengono preservati come pool separato e non promossi automaticamente a `semantics.fill`; analogamente `beat` non significa automaticamente `core`.
+
+Dettaglio: [PHASE7D_BLOCK1_CHIUSURA_2026-09-10.md](PHASE7D_BLOCK1_CHIUSURA_2026-09-10.md).
+
+### Blocco 2 — Grouping + Candidate Manifest Design
+
+**DA ESEGUIRE.**
+
+Confrontare sui dati reali almeno:
+
+- pool general beat 4/4;
+- pool fill 4/4 separato;
+- `eval_session` preservata come holdout candidato;
+- split session-grouped;
+- split drummer-held-out;
+- coverage e distribuzioni per entrambe le strategie.
+
+Nessun training e nessuna promozione `DRUM DATA READY V2` prima del confronto.
+
 ## 7E — Trap-specific drum source
 
 Candidate primaria da auditare:
