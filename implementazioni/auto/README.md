@@ -5,14 +5,14 @@
 ## Copertura
 
 - **Schede importate:** 114
-- **Task effettive (duplicati esclusi):** 111
+- **Task effettive (duplicati esclusi):** 112
 - **Auditate contro il repo:** 69/114
-- **Duplicati intercettati:** 3
-- **Estensioni/sovrapposizioni:** 8
+- **Duplicati intercettati:** 2
+- **Estensioni/sovrapposizioni:** 9
 - **Richieste già implementate senza task equivalente:** 5
-- **Progetti con piano V1→Vn:** 21 (forniti dall'utente: 0)
+- **Progetti con piano V1→Vn:** 22 (forniti dall'utente: 0)
 - **Piani con gap/conflitti da rivedere:** 0
-- **Auditate ma non complete:** 38
+- **Auditate ma non complete:** 39
 - Stato storico importato: da_fare 18 · in_parte 13 · fatto 77 · risposto 5 · nuova 1
 
 ## Tutte le task e richieste
@@ -49,7 +49,7 @@
 | `ADF-LEG-EA0648B57135` | La Fame Studio dentro al gioco, senza essere invadente | nuova | — | implementazioni/09-grafica-e-asset.md | ⬜ da fare | ⬜ da fare | 0/2 |
 | `ADF-LEG-BD22F97801FD` | La grafica uguale alla foto, e l'avatar segnaposto | 🟡 estensione | ADF-LEG-A90B7B3817A1, ADF-LEG-DB2D56011EF3 | implementazioni/09-grafica-e-asset.md | ⬜ da fare | ⬜ da fare | 0/2 |
 | `ADF-LEG-3EB6F5E9A3C4` | La richiesta finale sull'energia | 🔁 duplicata | ADF-LEG-D7416EF2ABDA | implementazioni/05-carriera-e-tempo.md | ⬜ da fare | ✅ verificata | 0/0 |
-| `ADF-LEG-E864F3A305D2` | La scena del produttore quando cerchi un beat | 🔁 duplicata | ADF-LEG-EFB36E8B32DF | implementazioni/04-musica-e-suoni.md | ⬜ da fare | ✅ verificata | 0/0 |
+| `ADF-LEG-E864F3A305D2` | La scena del produttore quando cerchi un beat | 🟡 estensione | ADF-LEG-EFB36E8B32DF | implementazioni/04-musica-e-suoni.md | ⬜ da fare | ⬜ da fare | 0/2 |
 | `ADF-LEG-8D4A4E38E6D5` | La vita simulata | nuova | — | implementazioni/06-mondo-e-personaggi.md | ⬜ da fare | ⬜ da fare | 0/3 |
 | `ADF-LEG-9EBE87A3843F` | Le card sulla mappa, di lato invece che sopra agli edifici | 🟡 estensione | ADF-LEG-762C5E8D3415 | implementazioni/01-mappa-e-citta.md | ⬜ da fare | ⬜ da fare | 0/2 |
 | `ADF-LEG-7319DD550E0D` | Ogni parte del gioco deve avere la sua ambientazione | ✅ già implementata | — | implementazioni/09-grafica-e-asset.md | ⬜ da fare | ✅ verificata | 0/0 |
@@ -150,7 +150,7 @@
 - **ADF-LEG-CCBBA5CFE700 — Via il bottone del menù dalle CTA in basso**: already_implemented — La CTA di ritorno al menu e' gia' stata rimossa dalla barra inferiore; il ritorno e' esposto nella testata superiore e nel menu di sistema.
 - **ADF-LEG-D4DF7036F6C4 — Il gioco esce su Steam e sugli store, non dentro a un artifact**: overlap → ADF-LEG-043B012E6E3B — La task canonica copre i cinque lavori tecnici per gli store; questa richiesta mantiene il delta storico su README e schema database, gia' presente, oltre alla direzione di distribuzione.
 - **ADF-LEG-DDDE0E598F52 — Quello che al backend mancava per stare in piedi su uno store**: overlap → ADF-LEG-043B012E6E3B — La task collegata copre il progetto complessivo di uscita sugli store e parte del backend; questa fonte aggiunge il delta operativo di chiudere i percorsi server residui e la loro integrazione cross-device.
-- **ADF-LEG-E864F3A305D2 — La scena del produttore quando cerchi un beat**: duplicate → ADF-LEG-EFB36E8B32DF — delta=nessuno: la task canonica copre gia' la scena del personaggio e del produttore per l'azione cerca un beat, con lo stesso obiettivo e risultato atteso.
+- **ADF-LEG-E864F3A305D2 — La scena del produttore quando cerchi un beat**: overlap → ADF-LEG-EFB36E8B32DF — La task canonica copre la scena del personaggio e del produttore, ma questa richiesta aggiunge la scelta del genere specializzato e il veto quando il produttore collabora con un opp.
 - **ADF-NEW-3E6D8998D1BD — Sistemare gli eventi e il tempo in gioco**: overlap → ADF-LEG-EC3A45E275D0, ADF-LEG-99F7F334DFE9 — La richiesta è più ampia delle task esistenti: EC3A45E275D0 copre la gerarchia degli incontri durante i salti e 99F7F334DFE9 il passaggio alla giornata; resta un delta reale di coerenza e prestazioni del motore eventi-tempo.
 
 ## Piani tecnici dei progetti
@@ -292,6 +292,13 @@ Piano: **auto** · stato: **ready**
 
 - **V1 — Account e cloud end-to-end** · planned
 - **V2 — Provider e pacchetto store** · planned · dipende da V1
+
+### ADF-LEG-E864F3A305D2 — La scena del produttore quando cerchi un beat
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Regole del produttore** · planned
+- **V2 — Scelta nella scena beat** · planned · dipende da V1
 
 ### ADF-LEG-EA0648B57135 — La Fame Studio dentro al gioco, senza essere invadente
 
