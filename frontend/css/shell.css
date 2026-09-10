@@ -40,6 +40,23 @@
 .navback .arw{font-size:17px;line-height:1;margin-top:-2px}
 .navback[hidden],.avatarbtn[hidden],.ghost[hidden]{display:none}
 
+/* ---- punto 15: muta/smuta la musica dal menu principale ---- */
+.brand-mute{width:36px;height:36px;border-radius:50%;flex:none;display:grid;place-items:center;
+  background:#1A1A20;border:2px solid rgba(255,255,255,.18);color:rgba(255,255,255,.75);
+  transition:border-color .15s,transform .15s,color .15s;
+  /* sulla landing .topnav ha pointer-events:none (css/landing.css, «sul menu non
+     c'è niente sopra»): senza questo il bottone si vede ma non si può toccare */
+  pointer-events:auto}
+@media (hover:hover){.brand-mute:hover{border-color:#fff;color:#fff;transform:scale(1.06)}}
+.brand-mute:active{transform:scale(.94)}
+.brand-mute svg{width:18px;height:18px;display:block}
+/* niente hidden sull'svg: su alcuni Chrome .hidden non riflette l'attributo
+   per gli elementi SVG (verificato) — l'interruttore è aria-pressed */
+.brand-mute .bmute-off{display:none}
+.brand-mute[aria-pressed="true"]{color:rgba(255,255,255,.4);border-color:rgba(255,255,255,.1)}
+.brand-mute[aria-pressed="true"] .bmute-on{display:none}
+.brand-mute[aria-pressed="true"] .bmute-off{display:block}
+
 /* ---- il cerchio dell'avatar ---- */
 /* Ci sta sempre la faccia dell'artista dell'utente, anche prima che abbia un
    nome: A ha comunque un aspetto completo, e quello si mostra. */

@@ -125,6 +125,7 @@ function avviaAzioneDiretta(id){
     const moneyBefore = G.money;
 
     G.energy -= en2;
+    if(window.GAME_TIME && typeof GAME_TIME.captureAction === "function") GAME_TIME.captureAction(a.id);
     iniziaAzione(en2);
 
     const msg = a.run();

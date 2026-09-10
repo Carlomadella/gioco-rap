@@ -657,3 +657,246 @@ quindi non l'ho ricontrollato punto per punto oltre ai controlli automatici sopr
   banco, quindi con la regola scritta nel commit è giusto così — ma è l'unico caso in cui
   tiri fuori dei soldi per un beat e il motore non lo sa. È una scelta da confermare, non
   un guasto: oggi non rompe niente.
+
+---
+
+## Giro del 10/09/2026
+
+Giro di fine task sul branch `task/turno-fabbrica-8-ore-e-mute-musica`, due commit:
+`531df10` (il turno in fabbrica durava 60 minuti fissi invece della durata vera, per
+qualunque azione avviata da un luogo della mappa) e `9536374` (pulsante muta/smuta la
+musica dal menu principale, `pagine/landing.html` + `js/landing.js` + `css/shell.css`).
+
+**Controlli automatici**: `npm run prova` dà 94 a posto e 0 no (compreso il nuovo blocco
+che controlla i minuti veri per turno). `npm run verifica:build` dà 33 a posto e 0 no.
+`node strumenti/audit-regressioni.js` dà 298 a posto e **3 no** — ma ho controllato con
+un worktree sul commit `3d32737` (l'ultimo prima di questa task) e gli stessi 3 fallivano
+già lì: non li ha rotti questo lavoro, ma restano rossi adesso e li segno sotto perché non
+risultavano ancora scritti in questo file.
+
+**Sul fix del turno**: ho riletto `avviaAzioneDiretta()` (`ui.js`) e `GAME_TIME.captureAction`
+(`tempo.js`), e seguito tutte le strade che ci passano — Fabbrica e Pizzeria (`assumitiCome`),
+Palestra (`hub.js:146,148`), «Stacca la spina» e Live Club (`hub.js:102,107,123`), più il
+centro per l'impiego. Tutte chiamano `captureAction` col vero id prima di `iniziaAzione()`, e
+`DURATE_LAVORO` ha i minuti giusti per ogni lavoro (`lavapiatti:300`, `operaio:480`, eccetera).
+Non ho trovato altre strade che avviano un'azione senza passare né dal click sulla tile né da
+`avviaAzioneDiretta()`.
+
+**Sul pulsante muta/smuta**: il bottone è un fratello di `.brand` dentro `.navleft`, quindi
+resta visibile anche quando `body.su-menu` nasconde il marchio — coerente con «un pulsantino
+in parte a sx». `SET.audio.on` arriva davvero al motore audio (`js/audio/engine.js`, `livelli()`
+azzera il gain master quando è spento), quindi il tasto non è solo cosmetico. Ho anche caricato
+`pagine/landing.html` con Chrome in modalità headless: la pagina arriva fino in fondo a
+`js/landing.js` senza eccezioni bloccanti (il bottone compare nel DOM con `aria-pressed="false"`
+di default) e nessun file JS del progetto ha errori di sintassi.
+
+Un problema trovato, sotto. Poi tre cose vecchie (non di questa task) mai segnate qui prima.
+
+### Il pulsante muta/smuta rischia di restare senza stile o senza funzione dopo un aggiornamento
+
+- **dove** — `frontend/pagine/landing.html:26` (`css/shell.css?v=12`) e `:277`
+  (`js/landing.js?v=2`)
+- **cosa succede** — il commit `9536374` cambia sia `css/shell.css` (le regole del nuovo
+  bottone tondo) sia `js/landing.js` (il click che lo fa funzionare), ma il numero dopo
+  `?v=` nei due `<script>`/`<link>` di `pagine/landing.html` è rimasto lo stesso di prima.
+  In questo stesso progetto, quando si tocca `js/game/ui.js` o `js/game/tempo.js` quel
+  numero si alza sempre (l'altro commit di questa stessa task lo fa, `ui.js?v=19→20` e
+  `tempo.js?v=11→12`): qui non è successo. Chi ha ancora in cache la vecchia copia di
+  `shell.css` o di `landing.js` — il browser di chi prova il gioco, o un giorno un CDN in
+  produzione — continua a vedere la pagina vecchia finché non fa un refresh forzato: il
+  bottone può comparire senza stile (un cerchio senza il suo aspetto) o comparire ma non
+  rispondere al click, a seconda di quale dei due file è rimasto vecchio.
+- **come si vede** — si vede dai file: `git show 9536374 --stat` cambia `css/shell.css` e
+  `js/landing.js`, ma `git show 9536374 -- pagine/landing.html` non tocca le righe con
+  `?v=`.
+- **quanto pesa** — si vede ma si gira intorno (basta un refresh forzato una volta).
+
+**RISOLTO (10/09/2026)** — il commit `5dcdfec` ha alzato `css/shell.css?v=12→13` e
+`js/landing.js?v=2→3` in `pagine/landing.html`. Lo racconta anche il giro successivo qui
+sotto, che però ha trovato lo stesso guaio ripresentarsi su un terzo commit.
+
+### Lo Shop promette tre reparti a schede, ce ne sono solo due
+
+- **dove** — `frontend/pagine/gioco.html:281-288` e `frontend/js/game/negozio.js`
+- **cosa succede** — non è di questa task: l'ho trovato perché uno dei 3 controlli
+  automatici rossi lo riguarda. Le schede dello Shop sono due sole, Attrezzatura e Beat
+  (`data-sh="gear"` e `data-sh="beat"` in `gioco.html`); un terzo reparto per i Vestiti,
+  con la sua scheda e la sua griglia riscritta, non esiste — quello che c'è di Vestiti è
+  ancora la vecchia griglia impilata (`<div class="nggrid" id="g-fit">`), non dietro a
+  nessuna linguetta.
+- **come si vede** — apri lo Shop dalla mappa: le linguette in alto sono solo due.
+- **quanto pesa** — da sistemare con calma.
+
+### Un file fuori da `js/pagine.js` si tiene scritto a mano il nome di una pagina
+
+- **dove** — `frontend/js/creator/rpg-v24-bridge.js:158`
+- **cosa succede** — non è di questa task. La regola del progetto è che i nomi dei tre
+  file delle pagine (`landing.html`, `accesso.html`, `gioco.html`) stanno scritti in un
+  posto solo, `js/pagine.js`, così il giorno che cambiano nome si riscrive un file e
+  basta. `rpg-v24-bridge.js` ha una riga (`location.href="pagine/landing.html"`) che se lo
+  costruisce da sé, fuori da quella regola.
+- **come si vede** — si vede solo dai file: è l'unica riga fuori da `js/pagine.js` che
+  nomina una delle tre pagine per intero.
+- **quanto pesa** — da sistemare con calma.
+
+---
+
+## Giro del 10/09/2026 (controllo mirato sul commit in più, `346c955`)
+
+Sopra ai due commit già controllati in questo stesso giro (`0f7b4a4` e `5dcdfec`) è
+arrivato un terzo commit, `346c955` — dodici righe in più nel click del pulsante
+muta/smuta della landing, per far ripartire davvero la musica (contesto audio e traccia)
+quando prima si era fermata da sola. Ho riletto il diff, seguito a mano dove portano
+`ADF_AUDIO.unlock()`, `ADF_AUDIO.music.playing` ed `ensureMenu()` (sia nella versione vera
+in `js/audio/music.js`, sia in quella "a ponte" usata quando la pagina sta dentro alla
+cornice del gioco), e rifatto girare `npm run prova` (94/94 a posto). Il codice aggiunto di
+per sé non rompe niente e non introduce comportamenti strani nel motore audio.
+
+Un problema trovato, legato proprio a questo commit — lo stesso già segnato e sistemato
+una volta per il commit precedente, ripresentato qui. Poi una nota, non un errore.
+
+### Il numero di cache-busting di `landing.js` non si è alzato neanche questa volta
+
+- **dove** — `frontend/pagine/landing.html:277` (`js/landing.js?v=3`)
+- **cosa succede** — il commit `346c955` cambia il contenuto di `js/landing.js` (il click
+  del pulsante muta/smuta) ma il numero dopo `?v=` in `landing.html` resta `3`, lo stesso
+  di prima. È lo stesso identico problema segnato in questo file per il commit precedente
+  (`0f7b4a4`) e poi sistemato dal commit `5dcdfec` alzando quel numero a `v=3` — solo che
+  adesso il contenuto del file è cambiato di nuovo e il numero no. Chi ha già in cache la
+  vecchia copia di `landing.js` (presa dopo `5dcdfec` e prima di `346c955`) continua a
+  vedere il pulsante muta/smuta col comportamento vecchio, senza la nuova correzione,
+  finché non fa un refresh forzato.
+- **come si vede** — si vede dai file: `git show 346c955 --stat` cambia solo
+  `frontend/js/landing.js`, e `landing.html` non è nel diff.
+- **quanto pesa** — si vede ma si gira intorno (basta un refresh forzato una volta).
+
+**RISOLTO (10/09/2026)** — il commit `1d0f737` ha alzato `js/landing.js?v=3→4`. Verificato
+adesso in `frontend/pagine/landing.html:277`: dice `v=4`.
+
+### Nota, non un errore: la stessa correzione non è arrivata al pulsante gemello nelle Impostazioni
+
+- **dove** — `frontend/js/impostazioni-ui.js:312-319` (l'interruttore `sw("audio.on")`,
+  che chiama `dopoModifica()` a riga 260-265)
+- **cosa succede** — non è un guasto di questo commit, è una scelta che vale la pena
+  segnare: il pannello Impostazioni (raggiungibile sia da `landing.html` sia da
+  `gioco.html`) ha un secondo interruttore che fa esattamente la stessa cosa del
+  pulsante muta/smuta della landing — scrive su `SET.audio.on` e chiama
+  `applicaImpostazioni()`. Il commit `346c955` ha aggiunto `ADF_AUDIO.unlock()` e
+  `ADF_AUDIO.music.ensureMenu()` solo al pulsante della landing, non a questo secondo
+  interruttore: se il sintomo descritto nel commit (si smuta ma la musica resta ferma)
+  capita di nuovo, può ancora capitare passando dalle Impostazioni invece che dal
+  pulsantino in alto a sinistra.
+- **come si vede** — non l'ho provato dal vivo (il commit dice di non essere riuscito a
+  riprodurre il sintomo neanche lui): è una lettura del codice, da tenere d'occhio.
+- **quanto pesa** — da sistemare con calma.
+
+---
+
+## Giro del 10/09/2026 (terzo giro: verifica finale dopo il merge da main)
+
+Giro di fine task sul branch `task/turno-fabbrica-8-ore-e-mute-musica`, dopo il merge da
+`main` (arrivate nel frattempo le correzioni MakeHuman/Avaturn e il riallineamento di
+Studio/Shop/navigazione — non toccate da questo giro).
+
+**Controlli automatici, tutti verdi**: `npm run prova` dà 96 a posto e 0 no, `node
+strumenti/audit-regressioni.js` dà 301 a posto e 0 no (i 3 che fallivano nel giro
+precedente — Shop a linguette e nomi dei file di pagina — sono arrivati sistemati col
+merge da main), `npm run verifica:build` dà 33 a posto e 0 no.
+
+**Sul turno in fabbrica**: riletto `avviaAzioneDiretta()` in `frontend/js/game/ui.js:128`
+e `GAME_TIME.captureAction()` in `frontend/js/game/tempo.js:477`. La cattura dell'id
+avviene subito prima di `iniziaAzione()`, dentro alla stessa funzione sincrona `esegui()`
+— anche passando dalla conferma («Confermi?» quando costa soldi) non c'è modo che un altro
+clic su una tile la sporchi nel mezzo. Il controllo vero e proprio se c'è abbastanza
+giornata per iniziare un turno (`actionAccess()` in `frontend/js/game/spostamenti.js:190`)
+non passava mai dall'id catturato — usa sempre l'id esplicito — quindi su quel fronte non
+c'era mai stato il bug: il numero sbagliato usciva solo nel conteggio del tempo "occupato"
+dopo l'avvio, come dice giustamente il commit.
+
+**Sul pulsante muta/smuta**: confermato che i due file (`css/shell.css`, `js/landing.js`)
+sono richiamati con lo stesso `?v=` del loro contenuto — vedi le due righe RISOLTO qui
+sopra. `ADF_AUDIO.unlock()` e `ADF_AUDIO.music.ensureMenu()` esistono davvero con quei nomi
+sia nel motore vero (`js/audio/music.js:217,71`) sia nel ponte usato dentro alla cornice
+del gioco (`js/audio/music.js:70-99`), quindi le chiamate del fix non puntano a funzioni
+inventate.
+
+Due problemi trovati, nessuno dei due blocca la partita.
+
+### L'icona del pulsante muta/smuta non si aggiorna se spegni l'audio dalle Impostazioni
+
+- **dove** — `frontend/js/impostazioni-ui.js:260-265` (`dopoModifica()`), contro
+  `frontend/js/landing.js:98-103` (`aggiornaMuteLanding()`)
+- **cosa succede** — sulla landing ci sono **due** interruttori per lo stesso
+  `SET.audio.on`: il pulsante tondo in alto a sinistra, e l'interruttore «Audio» dentro al
+  pannello Impostazioni (si apre dal bottone `m-setts` della landing stessa). Quando tocchi
+  quello delle Impostazioni, `dopoModifica()` salva, applica i volumi e richiama
+  `renderMenu()` — ma non richiama `aggiornaMuteLanding()`. Il pulsante tondo in alto
+  resta con l'icona di prima: se l'audio era acceso e lo spegni dalle Impostazioni, il
+  pulsante in alto continua a mostrare l'altoparlante «acceso». Chi a quel punto ci clicca
+  sopra pensando di spegnerlo lo **riaccende** invece, perché il pulsante parte dal suo
+  stato vecchio, non da quello vero.
+- **come si vede** — sulla landing apri le Impostazioni (l'ingranaggio), spegni «Audio»,
+  chiudi il pannello: il pulsantino in alto a sinistra resta con l'icona dell'altoparlante
+  acceso invece di quella barrata.
+- **quanto pesa** — si vede ma si gira intorno.
+
+**RISOLTO (10/09/2026)** — `dopoModifica()` (`frontend/js/impostazioni-ui.js:260`) adesso
+richiama anche `aggiornaMuteLanding()`, se esiste, subito dopo `renderMenu()`. Il pulsante
+tondo in alto si allinea da solo ogni volta che l'interruttore «Audio» delle Impostazioni
+cambia, senza bisogno di ricaricare la pagina.
+
+### Il pulsante muta/smuta è più piccolo di un dito, sul telefono
+
+- **dove** — `frontend/css/shell.css:44` (`.brand-mute`), contro
+  `frontend/css/tocco.css:40-42`
+- **cosa succede** — il progetto ha una regola scritta apposta per il telefono: sotto i
+  900 punti o dove si tocca con un dito, ogni bottone della barra in alto sale a 44×44,
+  perché sotto quella misura il dito sbaglia bersaglio — la regola lo dice esplicitamente
+  per `.brand` e per `.avatarbtn`, che stanno proprio accanto a questo nuovo pulsante.
+  Il pulsante muta/smuta però è rimasto a **36×36** in `shell.css` e non è mai stato
+  aggiunto all'elenco di `tocco.css`, quindi su un telefono resta piccolo mentre i suoi
+  vicini nella stessa barra crescono.
+- **come si vede** — apri la landing su uno schermo stretto (o con `tocco.css` attivo,
+  sotto i 900 punti): il pulsante muta/smuta è visibilmente più piccolo del marchio e
+  dell'avatar accanto a lui.
+- **quanto pesa** — da sistemare con calma.
+
+**RISOLTO (10/09/2026)** — aggiunta `.brand-mute{width:44px;height:44px}` in
+`frontend/css/tocco.css:43`, accanto ad `.avatarbtn`. Sotto i 900 punti o col dito cresce
+alla misura giusta come i suoi vicini nella barra; l'icona SVG dentro resta 18×18 e
+centrata, quindi non cambia aspetto.
+
+---
+
+## Giro del 10/09/2026 (quarto giro: controllo del commit `35db690`)
+
+Giro di fine task, sempre su `task/turno-fabbrica-8-ore-e-mute-musica`, solo per
+controllare che il commit `35db690` (le due correzioni annotate qui sopra) non abbia
+portato dentro qualcos'altro di rotto. Non ho riaperto il resto del giro precedente, già
+fatto.
+
+**Controlli automatici, tutti verdi**: `npm run prova` 96 a posto e 0 no, `node
+strumenti/audit-regressioni.js` 301 a posto e 0 no, `npm run verifica:build` 33 a posto e
+0 no.
+
+**`dopoModifica()`** (`frontend/js/impostazioni-ui.js:267`) — la chiamata a
+`aggiornaMuteLanding()` è protetta da `typeof ... === "function"`, la stessa guardia già
+usata due righe sopra per `renderMenu()`. Serve perché `impostazioni-ui.js` è caricato sia
+in `landing.html` che in `gioco.html`, ma `aggiornaMuteLanding()` esiste solo in
+`js/landing.js`, che sta solo sulla landing: dentro alla partita la funzione non c'è, e la
+guardia evita che il pannello Impostazioni si rompa lì. Controllato anche `js/landing.js:98`:
+`aggiornaMuteLanding()` esiste davvero con quel nome, non è un richiamo a vuoto.
+
+**`.brand-mute{width:44px;height:44px}`** (`frontend/css/tocco.css:43`) — la regola gemella
+in `frontend/css/shell.css:44` fissa il pulsante a 36×36 con `display:grid;place-items:center`,
+e l'icona SVG dentro (`shell.css:52`) resta a 18×18 per conto suo: la regola nuova cambia solo
+la scatola esterna, non l'icona, quindi non la deforma. `tocco.css` è caricato per ultimo sia
+in `landing.html:35` che in `gioco.html:53` (dopo `shell.css`), quindi vince lui come deve
+essere.
+
+**I numeri `?v=`** — cercato `tocco.css` e `impostazioni-ui.js` in tutte le pagine del
+progetto: solo `landing.html` e `gioco.html` li caricano, ed entrambe sono state alzate allo
+stesso numero (`tocco.css?v=13`, `impostazioni-ui.js?v=15`). Non è rimasta nessuna pagina
+indietro.
+
+Niente di nuovo trovato: le due correzioni fanno quello che dicono e non hanno smosso altro.
