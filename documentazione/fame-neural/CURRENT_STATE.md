@@ -11,9 +11,10 @@ Data: 2026-09-10
 | Bootstrap / inventory corpus proprietario | **COMPLETATO** | 133 file sorgente → 131 asset unici; manifest e copie verificate |
 | Verifica export nativi | **COMPLETATO** | 131/131 `NONE_AVAILABLE`; si procede dall'audio |
 | Selezione cohort pilot | **COMPLETATO** | 8 beat registrati in `owned-beats-pilot-v1` |
-| Verifica composition family / diversità pilot | **DA COMPLETARE** | `compositionFamilyId` non ancora assegnato; nessuna family viene inferita automaticamente |
+| Composition family pilot | **COMPLETATO** | 8/8 beat del cohort `owned-beats-pilot-v1` confermati umanamente come composizioni uniche e distinti; family ID registrati nel manifest |
+| Diversità musicale pilot | **DA COMPLETARE** | tempo, densità, low-end, articolazioni e difficoltà ancora da verificare sul pilot |
 | Ambiente tecnico Audio Analysis | **COMPLETATO** | FFmpeg/ffprobe 9.0.1 + Python 3.14 + stack audio verificata |
-| Audio Analysis pilot | **IN CORSO** | durata, BPM/beat grid, meter candidato, sezioni candidate |
+| Audio Analysis pilot | **IN CORSO** | smoke PASS + preview reale 8/8; BPM/beat grid promettenti, meter e segmentazione ancora da validare/tarare; nessun apply |
 | Source Separation pilot | **DA FARE** | successiva all'Audio Analysis |
 | Trascrizione Audio→MIDI pilot | **DA FARE** | drums/low-end prima; tonal successivamente |
 | QA pilot | **DA FARE** | metriche automatiche e giudizio umano separati |
