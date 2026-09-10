@@ -6,6 +6,30 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:d47ff01 -->
+## 10/09/26, 15:37 â€” origin/main â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `d47ff01`
+
+### Cosa Ã¨ entrato
+
+- `0def10f` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `cd741e5` â€” merge: nasconde dentatura e lingua editor MakeHuman â€” **Mycol**
+- `4e975be` â€” feat(makehuman): nasconde dentatura e lingua dall'editor â€” **Mycol**
+- `6bdb84d` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `6604e22` â€” merge: migliora leggibilità e coerenza editor MakeHuman â€” **Mycol**
+- `a501325` â€” feat(makehuman): migliora leggibilità e coerenza dell'editor â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/makehuman-camerino-v1/index.html`
+- **Modificato:** `frontend/media/makehuman-camerino-v1/runtime.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:6604e22 -->
 ## 10/09/26, 14:18 â€” task/makehuman-ui-readability â†’ main
 
