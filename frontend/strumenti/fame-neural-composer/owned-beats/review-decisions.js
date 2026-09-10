@@ -6,7 +6,7 @@ const { validate } = require("./bootstrap");
 
 const REVIEW_SCHEMA = "fame-owned-beats-review-v1";
 const ROLES = ["drums", "lowend", "tonal", "full"];
-const SETTABLE = new Set(["compositionFamilyId", "familyStatus", "nativeExports", "metadataStatus"]);
+const SETTABLE = new Set(["compositionFamilyId", "familyStatus", "nativeExports", "metadataStatus", "split"]);
 
 function atomic(file, content) {
   const temp = `${file}.${crypto.randomUUID()}.tmp`;
@@ -22,13 +22,13 @@ function csv(m) {
   const columns = [
     "sourceRecordId", "sourceAssetId", "compositionFamilyId", "familyStatus", "sha256",
     "localPath", "sourcePaths", "presentInScan", "nativeExports", "metadataStatus",
-    "taskAdmissibility", "pilotCohorts", "drums", "lowend", "tonal", "full"
+    "taskAdmissibility", "split", "pilotCohorts", "drums", "lowend", "tonal", "full"
   ];
   const quote = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
   return [columns, ...m.records.map(r => [
     r.sourceRecordId, r.sourceAssetId, r.compositionFamilyId, r.familyStatus, r.sha256,
     r.localPath, r.sourcePaths.join(" | "), r.presentInScan, r.nativeExports, r.metadataStatus,
-    r.taskAdmissibility, (r.pilotCohorts || []).join(" | "), ...ROLES.map(k => r.roles[k].review)
+    r.taskAdmissibility, r.split, (r.pilotCohorts || []).join(" | "), ...ROLES.map(k => r.roles[k].review)
   ])].map(row => row.map(quote).join(",")).join("\r\n") + "\r\n";
 }
 

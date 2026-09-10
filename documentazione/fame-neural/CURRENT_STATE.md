@@ -11,8 +11,9 @@ Data: 2026-09-10
 | Bootstrap / inventory corpus proprietario | **COMPLETATO** | 133 file sorgente → 131 asset unici; manifest e copie verificate |
 | Verifica export nativi | **COMPLETATO** | 131/131 `NONE_AVAILABLE`; si procede dall'audio |
 | Selezione cohort pilot | **COMPLETATO** | 8 beat registrati in `owned-beats-pilot-v1` |
-| Composition family pilot | **COMPLETATO** | 8/8 beat del cohort `owned-beats-pilot-v1` confermati umanamente come composizioni uniche e distinti; family ID registrati nel manifest |
+| Composition family corpus proprietario | **COMPLETATO** | 131/131 record confermati umanamente come composizioni distinte; 131 `compositionFamilyId` unici, 0 record senza family |
 | Diversità musicale pilot | **DA COMPLETARE** | tempo, densità, low-end, articolazioni e difficoltà ancora da verificare sul pilot |
+| Evaluation holdout | **COMPLETATO** | 10 composition family congelate in `evaluation-holdout` prima del tuning V2; 8 development, overlap 0, 113 record ancora senza split |
 | Ambiente tecnico Audio Analysis | **COMPLETATO** | FFmpeg/ffprobe 9.0.1 + Python 3.14 + stack audio verificata |
 | Audio Analysis pilot | **IN CORSO** | smoke PASS + preview reale 8/8; BPM/beat grid promettenti, meter e segmentazione ancora da validare/tarare; nessun apply |
 | Source Separation pilot | **DA FARE** | successiva all'Audio Analysis |
@@ -21,7 +22,7 @@ Data: 2026-09-10
 | Espansione batch corpus | **BLOCCATA** | subordinata ai risultati/gate del pilot |
 | Training serio | **CHIUSO** | nessun training autorizzato da questo avanzamento |
 
-Il cohort pilot è selezionato, ma la selezione di 8 beat non equivale ancora alla verifica formale di 8 composition family distinte. `familyStatus`, QA e task admissibility restano separati e non vengono auto-promossi.
+Le 131 composition family del corpus proprietario sono state confermate umanamente e registrate. Il cohort di sviluppo contiene 8 family e l'evaluation holdout 10 family distinte, senza overlap. I 113 record rimanenti non hanno ancora uno split assegnato. `familyStatus`, QA e task admissibility restano separati e non vengono auto-promossi.
 
 ## Audit V2 integrato — stato delle correzioni
 

@@ -43,7 +43,7 @@ const { review } = require("./owned-beats/review-decisions");
           decisions: [
             {
               scope: "all-active",
-              set: { nativeExports: "NONE_AVAILABLE" },
+              set: { nativeExports: "NONE_AVAILABLE", split: "development" },
               note: "No native exports"
             },
             {
@@ -80,6 +80,9 @@ const { review } = require("./owned-beats/review-decisions");
     );
     assert.ok(
       m.records.every(x => x.nativeExports === "NONE_AVAILABLE")
+    );
+    assert.ok(
+      m.records.every(x => x.split === "development")
     );
     assert.equal(m.reviewLog.length, 1);
 
