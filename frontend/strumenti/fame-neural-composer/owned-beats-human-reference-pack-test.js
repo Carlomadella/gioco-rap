@@ -121,6 +121,12 @@ assert.match(html, /HOLDOUT BLOCCATO/);
 assert.match(html, /Nessun output V1\/V2 mostrato/);
 assert.doesNotMatch(html, /bpmCandidate|alternativeBpms|meterCandidate|sectionCandidates/);
 assert.match(html, /Esporta JSON/);
+const inlineScriptMatch = html.match(/<script>([\s\S]*?)<\/script>/);
+assert.ok(inlineScriptMatch, "generated HTML must contain inline script");
+assert.doesNotThrow(
+  () => new Function(inlineScriptMatch[1]),
+  "generated Human Reference inline script must compile"
+);
 
 console.log("OWNED BEATS HUMAN REFERENCE PACK: PASS");
 console.log("Development families: 8");

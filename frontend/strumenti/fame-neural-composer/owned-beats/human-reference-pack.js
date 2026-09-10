@@ -403,7 +403,7 @@ const levels=${levels};
 let state=(function(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||initial}catch(e){return initial}})();
 let current=0,timerStarted=null;
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));renderList()}
-function esc(s){return String(s).replace(/[&<>\"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]})}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":c===">"?"&gt;":"&quot;"})}
 function done(f){return f.beatReference.reviewed&&f.beatReference.windows.every(function(w){return w.reviewed})&&f.meter.reviewed&&f.sections.reviewed&&Number(f.reviewCostSeconds)>0}
 function opts(values,value){return values.map(function(v){return '<option'+(v===value?' selected':'')+'>'+esc(v)+'</option>'}).join('')}
 function renderList(){var root=document.getElementById('familyList');root.innerHTML=state.families.map(function(f,i){return '<button data-i="'+i+'" class="'+(i===current?'active':'')+'">'+(done(f)?'✓ ':'')+esc(f.sourceRecordId)+'<br><span class="muted">'+esc(f.compositionFamilyId)+'</span></button>'}).join('');root.querySelectorAll('button').forEach(function(b){b.onclick=function(){current=Number(b.dataset.i);render()}})}
