@@ -6,6 +6,40 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:f6f76da -->
+## 10/09/26, 16:27 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.58)  
+**Merge commit:** `f6f76da`
+
+### Cosa Ã¨ entrato
+
+- `6602293` â€” docs: registra il quarto giro di controllo sul commit 35db690 â€” **Sadyco La Fame**
+- `35db690` â€” fix(landing): il pulsante muta/smuta si allinea dalle Impostazioni e tocca 44px sul telefono â€” **Sadyco La Fame**
+- `7648cc8` â€” Merge remote-tracking branch 'origin/main' into task/turno-fabbrica-8-ore-e-mute-musica â€” **Sadyco La Fame**
+- `1d0f737` â€” chore: alza il ?v= di landing.js dopo il fix del mute, registra il controllo â€” **Sadyco La Fame**
+- `346c955` â€” fix(landing): il pulsante mute riattiva anche il contesto audio â€” **Sadyco La Fame**
+- `5dcdfec` â€” chore: alza il ?v= di shell.css e landing.js, registra il giro di controllo â€” **Sadyco La Fame**
+- `0f7b4a4` â€” feat(landing): pulsante muta/smuta la musica dal menu principale â€” **Sadyco La Fame**
+- `a586824` â€” fix(tempo): il turno in fabbrica dura 8 ore, non 1 â€” **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `frontend/css/shell.css`
+- **Modificato:** `frontend/css/tocco.css`
+- **Modificato:** `frontend/js/game/tempo.js`
+- **Modificato:** `frontend/js/game/ui.js`
+- **Modificato:** `frontend/js/impostazioni-ui.js`
+- **Modificato:** `frontend/js/landing.js`
+- **Modificato:** `frontend/pagine/accesso.html`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 10
+
+---
+
 <!-- merge:d47ff01 -->
 ## 10/09/26, 15:37 â€” origin/main â†’ main
 
