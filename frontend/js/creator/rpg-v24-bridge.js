@@ -155,7 +155,7 @@
       close();
       modalita="normal";
 
-      if(nuovaAnnullata) location.href="pagine/landing.html";
+      if(nuovaAnnullata) vaiA("landing");
       return;
     }
 

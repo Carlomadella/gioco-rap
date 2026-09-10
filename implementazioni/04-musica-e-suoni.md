@@ -334,3 +334,17 @@ cliccando sopra si ferma, come dice il codice.
 > prima e 30/100 dopo, l'orologio da 16:15 a 18:00 (45 minuti di tragitto più le
 > due ore), lucidità da 96 a 97, tre beat nuovi sul banco dello Shop (da 6 a 9) e
 > la riga nel diario. Prima quella stessa mossa lasciava 5 di energia.
+
+---
+
+## Studio · Si possono scegliere tutti i beatmaker
+
+> «non si riesce a cliccare gli altri beatmaker oltre a quello selezionato»
+
+**FATTO (10/09/2026)** — il listener dello Studio ora intercetta anche le righe
+`data-bm`: toccando un altro beatmaker aggiorna `G.studio.bm`, ridisegna subito la
+scheda centrale con nome, qualità e prezzo corretti e salva la scelta. Aggiunta in
+`strumenti/prova.js` una regressione che clicca davvero il secondo di due beatmaker e
+controlla il cambio di stato e interfaccia. Provato sul gioco reale in Google Chrome,
+Mozilla Firefox e WebKit (motore Safari), compresa la persistenza dopo il reload e senza
+errori in console.

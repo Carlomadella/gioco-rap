@@ -263,7 +263,7 @@ function freestyleBattagliaOk(){
 }
 
 const ACTIONS = [
-  {id:"scrivi", n:"Scrivi barre", e:28, luc:3,
+  {id:"scrivi", n:"Scrivi barre", e:15, luc:3,
    d:"Il foglio, la penna e quello che hai in testa.",
    need:() => adfOggi("scrivi") >= ADF_MAX_SCRITTURE_GIORNO ? "TORNARE DOMANI" : null,
    give:() => adfOggi("scrivi") === 1

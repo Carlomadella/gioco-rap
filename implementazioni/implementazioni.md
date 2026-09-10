@@ -39,10 +39,11 @@ L'indice con **tutti i punti e il loro stato** sta in
 La lista storica già presente sotto **rimane intatta** ed è importata automaticamente nel cruscotto: non viene riscritta né cancellata.
 
 <!-- ADF-AUTO-INBOX:BEGIN -->
+
 - [x] voglio sistemare gli eventi ed il tempo in game <!-- ADF-TASK:ADF-NEW-3E6D8998D1BD --> — **🟡 ESTENSIONE → ADF-LEG-EC3A45E275D0, ADF-LEG-99F7F334DFE9** · La richiesta è più ampia delle task esistenti: EC3A45E275D0 copre la gerarchia degli incontri durante i salti e 99F7F334DFE9 il passaggio alla giornata; resta un delta reale di coerenza e prestazioni del motore eventi-tempo.
-<!-- Esempio (non attivo): - [ ] voglio cambiare il tempo del turno in fabbrica -->
-<!-- ADF-AUTO-INBOX:END -->
-_(qui sotto finiscono i punti nuovi, appena scritti)_
+  <!-- Esempio (non attivo): - [ ] voglio cambiare il tempo del turno in fabbrica -->
+  <!-- ADF-AUTO-INBOX:END -->
+  _(qui sotto finiscono i punti nuovi, appena scritti)_
 
 ALE:
 
@@ -101,6 +102,24 @@ fase e sul tetto settimanale della promo.
 
 13. Ti ricordo che i pulsanti sopra la mappa sono ANCORA TROPPO GRANDI rispetto ai quadratini stessi. Rivedilo.
 
+14. Togli che nello studio, per comprare un beat, consumi 20 di energia. Non è realistico, toglilo.
+
+**FATTO (10/09/2026)** — tolto il costo di 20 energia per farsi fare un beat su misura da
+un beatmaker (`STUDIO_BEAT_ENERGIA` in `js/game/studio.js`, sezione «Fattelo fare»): resta
+il costo in soldi, il tempo (2 ore) e il limite di un beat a settimana per beatmaker. Il
+testo dell'interfaccia che mostrava «20 energia» è sparito insieme al conto. Non toccato
+«Cerca un beat» allo Shop, che non costava energia già prima.
+
+15. Scrivere barre in studio non deve dare nessun malus, né di stanchezza né fisico,
+NESSUNO. Lasciamo solo che costi 15 di energia, per ora. Non toccare nient'altro di quello
+che c'era già.
+
+**FATTO (10/09/2026)** — tolto il calo di benessere (−1) che scattava chiudendo una strofa
+scritta al foglio (`chiudiStrofa` in `js/game/writer.js`): scrivere barre non stanca più.
+Il costo in energia dell'azione «Scrivi barre» (`js/game/actions.js`) è sceso da 28 a 15.
+Non toccato altro: il bonus di lucidità che l'azione già dava, il tempo che richiede, e come
+benessere e lucidità pesano sulla qualità del testo restano com'erano.
+
 CARLO:
 
 /_ GIORNALIERE _/
@@ -146,7 +165,15 @@ NETWORK 64
 
 è possibile controllare come stanno andando le canzoni nel tempo da un'app del telefono per sapere se stanno invecchiando bene o male e magari farci delle remastered o parti 2 di una canzone o di un album (discografia)
 
-4. aggiungi le foto di background dei posti senza HTML, poi ricrea la schermata identica alle foto con elementi HTML
+4. Non funziona più la pagina attività criminali, questo è ciò che segna in console:
+   Feature policy: ignorato nome caratteristica non supportato “autoplay”. pagine.js:68:11
+   Feature policy: ignorato nome caratteristica non supportato “autoplay”. pagine.js:90:19
+   Feature policy: ignorato nome caratteristica non supportato “autoplay”. pagine.js:106:5
+   [Anni di Fame] Eventi v1.2.13 pronti: 1000 eventi eventi-v2.js:3010:13
+   Problema di sicurezza: i contenuti in http://localhost:8000/pagine/landing.html non possono caricare o avere link che rimandino a file:///.
+   Problema di sicurezza: i contenuti in http://localhost:8000/pagine/gioco.html non possono caricare o avere link che rimandino a file:///.
+
+5. aggiungi le foto di background dei posti senza HTML, poi ricrea la schermata identica alle foto con elementi HTML
 
    **FATTO in parte (08/09/2026) — lo Studio.** Le foto sotto ci sono già da prima; adesso ci
    sono anche gli elementi che nelle foto di riferimento ci stanno **sopra**, e che il codice
@@ -171,35 +198,47 @@ NETWORK 64
    spina». E dentro allo Studio, Cover e Feat una foto loro non ce l'hanno né con né senza
    interfaccia: si tengono in prestito quella della stanza più vicina.
 
-5. Il motore degli eventi non sa che hai comprato un beat se non lo compri dallo Shop. Non è di questa task, ma questa task la allarga (i posti muti sono due su tre invece di uno su due). Sistemarlo vuol dire decidere che nomi deve ascoltare eventi-v2.js: tocca il motore, non lo Studio.
+6. Il motore degli eventi non sa che hai comprato un beat se non lo compri dallo Shop. Non è di questa task, ma questa task la allarga (i posti muti sono due su tre invece di uno su due). Sistemarlo vuol dire decidere che nomi deve ascoltare eventi-v2.js: tocca il motore, non lo Studio.
 
-6. Il tasto d'oro in cabina. Nella foto registrazione_pezzo l'oro ce l'ha «UN'ALTRA TAKE», e la foto era la richiesta. Ma la regola scritta in css/studio.css dice che l'oro va alla mossa che fa succedere la cosa — ed è per quella regola che nella sezione Beat «Compralo» è d'oro e «Fattelo fare» no. Qui le due cose non vanno d'accordo: ha vinto la foto, e il risultato è che chi va di fretta preme l'oro e spende 12 di energia senza volerlo. Dimmi e la giro.
+7. Il tasto d'oro in cabina. Nella foto registrazione_pezzo l'oro ce l'ha «UN'ALTRA TAKE», e la foto era la richiesta. Ma la regola scritta in css/studio.css dice che l'oro va alla mossa che fa succedere la cosa — ed è per quella regola che nella sezione Beat «Compralo» è d'oro e «Fattelo fare» no. Qui le due cose non vanno d'accordo: ha vinto la foto, e il risultato è che chi va di fretta preme l'oro e spende 12 di energia senza volerlo. Dimmi e la giro.
 
-/_ RESPONSIVITA' _/
+8. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo. Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su "stacca la spina", il quinto su "registra un pezzo".
 
-Chiusa il 08/09/2026: i tre punti dello Studio (l'orologio galleggiante, la barra
-delle take, la fascia a 360), l'hover che restava acceso al tocco su tutti i CSS, e
-il giro largo sulle altre schermate — da cui e' uscita la Strada, che sotto ai 980
-punti non si impilava e sul telefono non si giocava. Il racconto per esteso sta in
-`implementazioni/02-interfaccia-e-telefono.md`, sotto «La responsivita': lo Studio,
-la Strada e l'hover al tocco».
+9. quando skippi tante ore ci mette troppo a simulare
 
-Resta da fare: il giro su un telefono vero con `prova-sul-telefono` — le misure sono
-state lette nel CSS, le schermate non sono state rifatte.
+10. togli il parametro «lucidità» e tutto ciò che ne consegue
 
-7. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo. Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su "stacca la spina", il quinto su "registra un pezzo".
+11. aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
 
-8. quando skippi tante ore ci mette troppo a simulare
+12. quando non sono fix, risoluzioni di bug o errori non modificare troppo i file già presenti ma crea un file nuovo collegato ai già presenti
 
-9. togli il parametro «lucidità» e tutto ciò che ne consegue
+13. non sempre far scorrere una giornata ti ridà l'energia
 
-10. aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
+14. tieni tutto ciò che riguarda la parte smartphone separata dal resto del progetto
 
-11. quando non sono fix, risoluzioni di bug o errori non modificare troppo i file già presenti ma crea un file nuovo collegato ai già presenti
+15. non ci si può licenziare dal lavoro corrente, implementalo per tutti i lavori.
 
-12. non sempre far scorrere una giornata ti ridà l'energia
+16. quando si segna un evento in agenda poi non si riesce a far passare il giorno
 
-13. tieni tutto ciò che riguarda la parte smartphone separata dal resto del progetto
+17. se partecipo ad un evento segnato, dopo che ho partecipato l'evento si toglie automaticamente dall'agenda e non deve essere più segnato
+
+18. sull'app lafamegram non posta nessuno
+
+/_ LUOGO: STUDIO _/
+
+2. c'è un bug visivo che quando si stoppa il beat o la canzone si ferma la musica ma visivamente il tasto non cambia.
+
+3. Quando scegli la take esce un container che ti deve chiedere solo il nome del pezzo e non la copertina, quella viene dopo nella sezione cover
+
+4. nella sezione mix non si può cliccare su "da solo"
+
+5. non c'è un tasto di conferma della copertina
+
+6. non posso scegliere i feat, e inoltre non posso fare canzoni senza feat
+
+7. marketing deve essere dopo timing
+
+8. non posso spingere una canzone che non è ancora uscita, al massimo faccio uscire una preview
 
 /_ DA DISCUTERE _/
 
@@ -212,6 +251,18 @@ state lette nel CSS, le schermate non sono state rifatte.
 2. creare una schermata per le classifiche che si apre anche dall'app del telefono
 
 3. DA DISCUTERE collegare la pagina di mycol togliere la sezione il tuo artista dalla pagina di landing o , oltre che da nuova partita. e collegarla allo shop, se shoppi qualcosa ti va nell'inventario
+
+/_ RESPONSIVITA' _/
+
+Chiusa il 08/09/2026: i tre punti dello Studio (l'orologio galleggiante, la barra
+delle take, la fascia a 360), l'hover che restava acceso al tocco su tutti i CSS, e
+il giro largo sulle altre schermate — da cui e' uscita la Strada, che sotto ai 980
+punti non si impilava e sul telefono non si giocava. Il racconto per esteso sta in
+`implementazioni/02-interfaccia-e-telefono.md`, sotto «La responsivita': lo Studio,
+la Strada e l'hover al tocco».
+
+Resta da fare: il giro su un telefono vero con `prova-sul-telefono` — le misure sono
+state lette nel CSS, le schermate non sono state rifatte.
 
 /_ NUOVE MODALITA' _/
 

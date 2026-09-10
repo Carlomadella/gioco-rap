@@ -113,6 +113,13 @@ function studioDati(){
   return G.studio;
 }
 
+/* Il beatmaker scelto nella colonna a sinistra resta quello con cui stai
+   lavorando finche' non ne tocchi un altro, come il fonico e il featuring. */
+function studioScegliBeatmaker(id){
+  studioDati().bm = id;
+  SFX.tap(); save(); renderStudio();
+}
+
 /* Il fonico che hai scelto di tenere dietro al vetro. Si sceglie una volta e
    resta finché non lo cambi: è la persona con cui lavori, non un'opzione da
    rimettere ogni volta. Se se ne va dalla scena, torna `null` da solo. */
@@ -211,8 +218,6 @@ function studioDaPubblicare(){
    comprato, te l'ha fatto uno che ti conosce.
 
    Un beat a testa per settimana: un beatmaker non è un distributore. */
-const STUDIO_BEAT_ENERGIA = 20;
-
 const STUDIO_BEAT_MINUTI = 120;
 
 function studioBeatTempoGate(){
@@ -273,8 +278,6 @@ function studioBeatFatto(p){
 function studioBeatPronto(p){
   if(p.rel < 1) return {ok:false, perche:"Prima diventate contatti, alla Sala"};
   if(studioBeatFatto(p)) return {ok:false, perche:"Ci ha già lavorato questa settimana"};
-  if(G.energy < STUDIO_BEAT_ENERGIA)
-    return {ok:false, perche:"Ti serve energia: " + STUDIO_BEAT_ENERGIA + ", ne hai " + Math.round(G.energy)};
   const c = studioBeatPrezzo(p);
   if(G.money < c) return {ok:false, perche:"Ti servono " + fmt(c) + " €, ne hai " + fmt(G.money)};
 
@@ -302,7 +305,6 @@ function studioFattiUnBeat(id){
   if(!st.ok){ toast(st.perche, "bad", "!", ["#3A3F49", "#22262E"]); return; }
 
   const costo = studioBeatPrezzo(p);
-  G.energy -= STUDIO_BEAT_ENERGIA;
   G.money -= costo;
   const sett = typeof totalWeeks === "function" ? totalWeeks() : G.week;
   p.beatSett = sett;
@@ -577,7 +579,7 @@ function studioSezBeat(){
       '<p class="stnota">Un beat comprato è un beat di chiunque. Uno che ti fa una persona che ' +
         'ti conosce è <b>tuo</b> — e più siete in confidenza, meglio viene e meno costa.</p>' +
       banco +
-      stEsito((c ? fmt(c) + " €" : "gratis") + ' · ' + stNum(STUDIO_BEAT_ENERGIA) + ' energia · ' +
+      stEsito((c ? fmt(c) + " €" : "gratis") + ' · ' +
         stNum(studioBeatTempoTesto()) + ' · te lo mette in cartella lui') +
       stAzioni(
         /* Uno solo d'oro per schermata, come in tutti i riferimenti: qui è
@@ -1185,6 +1187,8 @@ if($("studio")){
   $("studio").addEventListener("click", e => {
     const t = e.target.closest("[data-sez]");
     if(t){ STUDIO_SEZ = t.dataset.sez; STUDIO_DIARIO = 0; SFX.tap(); renderStudio(); return; }
+    const bm = e.target.closest("[data-bm]");
+    if(bm){ studioScegliBeatmaker(bm.dataset.bm); return; }
     const b = e.target.closest("[data-beat]");
     if(b){ studioFattiUnBeat(b.dataset.beat); return; }
     const f = e.target.closest("[data-fonico]");

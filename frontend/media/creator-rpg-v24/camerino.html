@@ -1716,10 +1716,10 @@ function fitFace({visualCenter=true}={}){
   controls.update();
 }
 
-/* ADF_AVATURN_PROPIC_V1
-   La propic viene dal viewer locale del camerino, non da API Avaturn a pagamento.
-   Portiamo temporaneamente la camera sul volto, renderizziamo nello stesso task,
-   ritagliamo un quadrato e poi ripristiniamo esattamente la camera dell'utente. */
+/* ADF_AVATURN_DETERMINISTIC_PROPIC_V1
+   La propic Avaturn viene renderizzata in un frame fisso 384x384.
+   Non dipende da viewport, sidebar, DPR o zoom browser.
+   La camera live del camerino non viene modificata. */
 function captureAvatarPreview(){
   if(
     currentSource!=='avaturn' ||
@@ -1731,60 +1731,104 @@ function captureAvatarPreview(){
     !controls
   ) return '';
 
-  const oldPosition=camera.position.clone();
-  const oldQuaternion=camera.quaternion.clone();
-  const oldZoom=camera.zoom;
-  const oldNear=camera.near;
-  const oldFar=camera.far;
-  const oldMinDistance=controls.minDistance;
-  const oldMaxDistance=controls.maxDistance;
-  const oldTarget=controls.target.clone();
+  const OUT=384;
+
+  const poseState=Object.values(bones)
+    .filter(Boolean)
+    .map(b=>({
+      bone:b,
+      position:b.position.clone(),
+      quaternion:b.quaternion.clone(),
+      scale:b.scale.clone()
+    }));
+
+  const oldPixelRatio=renderer.getPixelRatio();
+  const oldSize=renderer.getSize(new THREE.Vector2());
+  const oldRenderTarget=renderer.getRenderTarget?.() || null;
 
   try{
-    fitFace({visualCenter:false});
-    camera.updateProjectionMatrix();
-    controls.update();
+    /* Evita che il frame dell'idle cambi la propic da un PC all'altro. */
+    naturalPose();
+    avatarRoot.updateMatrixWorld(true);
 
-    /* Il readback avviene subito dopo render(), prima di lasciare il task:
-       non serve preserveDrawingBuffer e non penalizziamo il render continuo. */
-    renderer.render(scene,camera);
+    const box=new THREE.Box3().setFromObject(avatarRoot);
+    const center=box.getCenter(new THREE.Vector3());
+    const size=box.getSize(new THREE.Vector3());
+    const max=Math.max(size.x,size.y,size.z,0.001);
+
+    /* Stessa geometria della precedente vista Volto Avaturn,
+       ma su camera dedicata e aspect ratio fisso 1:1. */
+    const target=new THREE.Vector3(
+      center.x,
+      box.min.y+size.y*.84,
+      center.z
+    );
+
+    const distance=max*.72;
+
+    const portraitCamera=new THREE.PerspectiveCamera(
+      32,
+      1,
+      Math.max(.01,max/1000),
+      Math.max(200,max*10)
+    );
+
+    portraitCamera.position.set(
+      target.x,
+      target.y,
+      target.z+distance
+    );
+
+    portraitCamera.up.copy(camera.up);
+    portraitCamera.layers.mask=camera.layers.mask;
+    portraitCamera.lookAt(target);
+    portraitCamera.updateProjectionMatrix();
+    portraitCamera.updateMatrixWorld(true);
+
+    renderer.setRenderTarget(null);
+    renderer.setPixelRatio(1);
+    renderer.setSize(OUT,OUT,false);
+    renderer.render(scene,portraitCamera);
 
     const source=renderer.domElement;
-    const sw=source.width;
-    const sh=source.height;
-    const side=Math.min(sw,sh);
-    if(!side) return '';
 
-    const sx=Math.max(0,Math.floor((sw-side)/2));
-    const sy=Math.max(0,Math.floor((sh-side)/2));
-    const output=document.createElement('canvas');
-    output.width=384;
-    output.height=384;
+    if(
+      !source ||
+      source.width!==OUT ||
+      source.height!==OUT
+    ) return '';
 
-    const ctx=output.getContext('2d',{alpha:true});
-    if(!ctx) return '';
+    const preview=source.toDataURL('image/png');
 
-    ctx.clearRect(0,0,384,384);
-    ctx.drawImage(source,sx,sy,side,side,0,0,384,384);
+    return /^data:image\/png;base64,/i.test(preview)
+      ? preview
+      : '';
 
-    const preview=output.toDataURL('image/png');
-    return /^data:image\/png;base64,/i.test(preview) ? preview : '';
   }catch(err){
-    console.warn('[ADF Avaturn] preview propic non acquisita',err);
+    console.warn(
+      '[ADF Avaturn] preview propic deterministica non acquisita',
+      err
+    );
     return '';
+
   }finally{
-    camera.position.copy(oldPosition);
-    camera.quaternion.copy(oldQuaternion);
-    camera.zoom=oldZoom;
-    camera.near=oldNear;
-    camera.far=oldFar;
-    controls.minDistance=oldMinDistance;
-    controls.maxDistance=oldMaxDistance;
-    controls.target.copy(oldTarget);
-    applyRoomVisualCenter();
-    camera.updateProjectionMatrix();
-    controls.update();
-    renderer.render(scene,camera);
+    /* Ripristina esattamente la posa che l'utente stava vedendo. */
+    for(const state of poseState){
+      state.bone.position.copy(state.position);
+      state.bone.quaternion.copy(state.quaternion);
+      state.bone.scale.copy(state.scale);
+    }
+
+    avatarRoot.updateMatrixWorld(true);
+
+    /* Ripristina il renderer del camerino.
+       Camera e OrbitControls live non sono mai stati modificati. */
+    try{
+      renderer.setPixelRatio(oldPixelRatio);
+      renderer.setSize(oldSize.x,oldSize.y,false);
+      renderer.setRenderTarget(oldRenderTarget);
+      renderer.render(scene,camera);
+    }catch(_e){}
   }
 }
 

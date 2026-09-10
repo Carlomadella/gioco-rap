@@ -22,15 +22,17 @@
   "current_state": [
     "frontend/js/game/hub.js e frontend/css/hub.css ricostruiscono la plancia e usano il ritratto generato o salvato, ma la fedelta' alla foto richiede confronto visivo.",
     "frontend/js/creator/portrait.js e frontend/js/game/hub.js supportano ritratti SVG o immagini avatar; frontend/js/creator/rpg-v24-bridge.js persiste avatarSource, avatarData e i metadati ricevuti dal camerino.",
-    "frontend/media/creator-rpg-v24/camerino.html ora uniforma il flusso MakeHuman, ma il repository non dimostra ancora che il segnaposto della foto sia il default richiesto.",
+    "frontend/media/creator-rpg-v24/camerino.html e frontend/media/makehuman-camerino-v1/ ora uniformano il flusso del camerino; il commit piu' recente rende locale Three.js e aggiunge diagnostica, ma il repository non dimostra ancora che il segnaposto della foto sia il default richiesto.",
     "I concept di riferimento sono separati in frontend/concept/ e non vengono distribuiti come asset di gioco."
   ],
   "systems": [
     "frontend/js/game/hub.js",
     "frontend/css/hub.css",
     "frontend/js/creator/portrait.js",
+    "frontend/js/creator/rpg-v24-bridge.js",
     "frontend/js/game/state.js",
-    "frontend/concept/"
+    "frontend/concept/",
+    "frontend/media/makehuman-camerino-v1/"
   ],
   "watch_paths": [
     "frontend/js/game/hub.js",
@@ -38,6 +40,8 @@
     "frontend/js/creator/portrait.js",
     "frontend/js/game/state.js",
     "frontend/concept/",
+    "frontend/media/creator-rpg-v24/",
+    "frontend/media/makehuman-camerino-v1/",
     "frontend/media/"
   ],
   "acceptance_criteria": [
@@ -56,7 +60,8 @@
       "verification": "playtest",
       "status": "pending",
       "evidence": [
-        "frontend/js/creator/rpg-v24-bridge.js: applica avatarSource e avatarData dal camerino; frontend/js/game/hub.js: il ritratto usa i dati salvati oppure il renderer SVG, senza prova del default della foto."
+        "frontend/js/creator/rpg-v24-bridge.js: applica avatarSource e avatarData dal camerino; frontend/js/game/hub.js: il ritratto usa i dati salvati oppure il renderer SVG, senza prova del default della foto.",
+        "frontend/media/makehuman-camerino-v1/index.html e runtime.js: il bootstrap locale di Three.js è presente, ma non dimostra da solo il default visivo richiesto."
       ]
     }
   ],

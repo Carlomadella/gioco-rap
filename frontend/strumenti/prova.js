@@ -933,10 +933,12 @@ console.log("\nlo Studio: la gente della Sala conta");
   const vm = require("vm");
   const zitto = () => {};
   const nodi = {};
+  let scrittureStorage = 0;
   /* un DOM finto ma con le classi vere: `apriStudio` mette "on" e
      `renderStudio` non disegna niente se non la trova */
   function finto(){
     const cls = new Set();
+    const ascoltatori = {};
     return {
       innerHTML: "", textContent: "", value: "", dataset: {}, hidden: false,
       style: { setProperty: zitto, removeProperty: zitto },
@@ -946,7 +948,10 @@ console.log("\nlo Studio: la gente della Sala conta");
         toggle: (c, v) => (v === undefined ? (cls.has(c) ? cls.delete(c) : cls.add(c))
                                            : (v ? cls.add(c) : cls.delete(c)))
       },
-      offsetWidth: 0, addEventListener: zitto, removeEventListener: zitto,
+      offsetWidth: 0,
+      addEventListener: (tipo, fn) => (ascoltatori[tipo] || (ascoltatori[tipo] = [])).push(fn),
+      removeEventListener: zitto,
+      scatena: (tipo, evento) => (ascoltatori[tipo] || []).forEach(fn => fn(evento)),
       querySelector: () => finto(), querySelectorAll: () => [], appendChild: zitto,
       set onclick(v){}, get onclick(){ return null; }
     };
@@ -955,7 +960,7 @@ console.log("\nlo Studio: la gente della Sala conta");
     console: { log: zitto, warn: zitto, error: zitto },
     Math, JSON, Object, Array, String, Number, Boolean, Date, Set, Map,
     parseInt, parseFloat, isNaN, isFinite, setTimeout: zitto, clearTimeout: zitto,
-    localStorage: { getItem: () => null, setItem: zitto, removeItem: zitto },
+    localStorage: { getItem: () => null, setItem: () => { scrittureStorage++; }, removeItem: zitto },
     document: {
       getElementById: id => nodi[id] || (nodi[id] = finto()),
       querySelector: () => finto(), querySelectorAll: () => [], addEventListener: zitto,
@@ -979,7 +984,7 @@ console.log("\nlo Studio: la gente della Sala conta");
   try{
     /* i pochi appigli fuori dai file caricati: non devono fare niente */
     vm.runInContext(`
-      function toast(){} function pushLog(){} function save(){} function renderGioco(){}
+      function toast(){} function pushLog(){} function renderGioco(){}
       function gain(){} function addLuc(){} function totalWeeks(){ return G.week; }
       function chiediTitolo(){} function hubPronta(){ return {ok:true, perche:""}; }
       function hubAzione(){} function apriFoglio(){} function scegliModo(){}
@@ -999,13 +1004,15 @@ console.log("\nlo Studio: la gente della Sala conta");
   if(acceso){
     const dentro = c => vm.runInContext(c, scatola);
 
-    /* due persone conosciute alla Sala: un beatmaker in confidenza e un fonico */
+    /* tre persone conosciute alla Sala: due beatmaker e un fonico */
     dentro(`
       G.gente = [
         { id:"bm", ruolo:"beatmaker", n:"Bit", gen:"trap", eta:24, fama:30, car:"pratico",
           scoperto:true, rel:2, pt:0, ult:-1, feat:-99, skin:"#C68A5C", hair:1, col:"#B026FF" },
         { id:"fo", ruolo:"fonico", n:"Gigi", gen:"", eta:40, fama:22, car:"aperto",
-          scoperto:false, rel:3, pt:0, ult:-1, feat:-99, skin:"#E8B991", hair:0, col:"#3DC7FF" }
+          scoperto:false, rel:3, pt:0, ult:-1, feat:-99, skin:"#E8B991", hair:0, col:"#3DC7FF" },
+        { id:"bm2", ruolo:"beatmaker", n:"Loop", gen:"drill", eta:27, fama:45, car:"aperto",
+          scoperto:true, rel:1, pt:0, ult:-1, feat:-99, skin:"#8D5524", hair:2, col:"#FF5A36" }
       ];
       apriStudio("beat");
     `);
@@ -1025,6 +1032,31 @@ console.log("\nlo Studio: la gente della Sala conta");
       dipinto().indexOf("Bit") >= 0 &&
       dipinto().indexOf('data-beat="bm"') >= 0,
       dipinto().slice(0, 200));
+
+    /* Regressione: le righe espongono `data-bm`, quindi il click deve passare
+       dal listener vero dello Studio e cambiare anche la scheda centrale. */
+    const centroPrima = nodi["st-corpo"].innerHTML;
+    const salvataggiPrima = scrittureStorage;
+    controlla("la riga del secondo beatmaker porta il collegamento cliccabile",
+      dipinto().indexOf('data-bm="bm2"') >= 0,
+      dipinto().slice(0, 200));
+    nodi.studio.scatena("click", {
+      target: { closest: selettore => selettore === "[data-bm]"
+        ? { dataset:{ bm:"bm2" } }
+        : null }
+    });
+    controlla("si può scegliere un beatmaker diverso da quello già selezionato",
+      dentro("G.studio.bm") === "bm2" &&
+      centroPrima.indexOf("Bit") >= 0 &&
+      nodi["st-corpo"].innerHTML.indexOf("Loop") >= 0 &&
+      scrittureStorage > salvataggiPrima,
+      JSON.stringify({
+        scelto:dentro("G.studio.bm"),
+        centroPrimaBit:centroPrima.indexOf("Bit") >= 0,
+        centroDopoLoop:nodi["st-corpo"].innerHTML.indexOf("Loop") >= 0,
+        salvataggiPrima,
+        salvataggiDopo:scrittureStorage
+      }));
 
     /* tutte le sezioni si disegnano: una che esplode manderebbe giù lo Studio
        intero, e capiterebbe solo a chi ci clicca. Le sezioni sono otto da
@@ -1054,14 +1086,15 @@ console.log("\nlo Studio: la gente della Sala conta");
     controlla("le foto delle stanze dello Studio sono dove il codice le cerca",
       fotoMancanti.length === 0, fotoMancanti);
 
-    /* il beat su misura: costa, arriva in cartella, e porta il nome di chi l'ha fatto */
+    /* il beat su misura: costa in soldi, arriva in cartella, e porta il nome di chi l'ha
+       fatto — comprare un beat non consuma più energia, non era realistico */
     const soldiPrima = dentro("G.money"), energiaPrima = dentro("G.energy");
     dentro("studioFattiUnBeat('bm')");
     const beats = dentro("G.beats");
     controlla("un beatmaker in confidenza ti fa un beat, e finisce in cartella",
       beats.length === 1 && beats[0].da === "Bit", JSON.stringify(beats));
-    controlla("e costa: soldi ed energia scendono",
-      dentro("G.money") < soldiPrima && dentro("G.energy") === energiaPrima - 20,
+    controlla("costa in soldi, non in energia",
+      dentro("G.money") < soldiPrima && dentro("G.energy") === energiaPrima,
       "soldi " + soldiPrima + " → " + dentro("G.money") +
       ", energia " + energiaPrima + " → " + dentro("G.energy"));
     dentro("studioFattiUnBeat('bm')");

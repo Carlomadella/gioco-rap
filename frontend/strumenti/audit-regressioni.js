@@ -1307,7 +1307,12 @@ test("le finestre generiche (modal.js: conferma spesa, titolo del pezzo, «Come 
       bodyChiudi.includes('if(typeof renderStudio === "function") renderStudio();');
   })());
 test("registrare il pezzo (actions.js) ridisegna lo Studio dopo il titolo",
-  actions.includes('SFX.rec(); save(); renderGioco();\n       if(typeof renderStudio === "function") renderStudio();'));
+  (() => {
+    const a = actions.indexOf('{id:"registra"');
+    const b = actions.indexOf('{id:"mixa"', a);
+    const body = a >= 0 && b > a ? actions.slice(a, b) : "";
+    return /SFX\.rec\(\);\s*save\(\);\s*renderGioco\(\);\s*if\(typeof renderStudio === "function"\) renderStudio\(\);/.test(body);
+  })());
 
 console.log("\nPunto 1 (bis) — «Torna alla mappa» funziona in ogni stanza dove si vede");
 test("Piazza e Writer si mostravano nella barra HOSTS ma il menu non li riconosceva: ora sì",
@@ -1420,12 +1425,21 @@ test("ogni pezzo di attrezzatura ha un'icona propria (cuffie, mic, manopole, alt
   hub.includes("cuffie:'<path") && hub.includes("altoparlante:'<path"));
 test("la cassa dello shop si vede sempre, non solo scorrendo fino in fondo",
   ui.includes('$("sh-cash")') && ui.includes("fmt(G.money)"));
-test("Attrezzatura, Beat e Vestiti sono tre reparti dietro tre linguette, non tre liste impilate",
-  index.includes('data-sh="gear"') && index.includes('data-sh="beat"') && index.includes('data-sh="fit"') &&
-  index.includes('data-shsec="gear"') && index.includes('data-shsec="beat"') && index.includes('data-shsec="fit"') &&
-  negozio.includes('$("sh-tabs").addEventListener("click"'));
-test("il tab dei vestiti mostra ancora la stessa griglia di sempre (nggrid/ngcard), non riscritta",
-  index.includes('<div class="nggrid" id="g-fit">') && negozio.includes("function renderAbbigliamento()"));
+test("Attrezzatura e Beat sono due reparti dietro due linguette, non due liste impilate",
+  index.includes('data-sh="gear"') && index.includes('data-sh="beat"') &&
+  index.includes('data-shsec="gear"') && index.includes('data-shsec="beat"') &&
+  (index.match(/\bdata-sh="/g) || []).length === 2 &&
+  (index.match(/\bdata-shsec="/g) || []).length === 2 &&
+  !index.includes('data-sh="fit"') && !index.includes('data-shsec="fit"') &&
+  negozio.includes('const shTabs = $("sh-tabs")') &&
+  negozio.includes('shTabs.addEventListener("click"') &&
+  negozio.includes("s.dataset.shsec === b.dataset.sh"));
+test("il reparto Vestiti legacy resta nascosto e inerte finché manca il nuovo catalogo cosmetico",
+  negozio.includes("ADF_ABBIGLIAMENTO_HIBERNATE_V2") &&
+  negozio.includes("window.ADF_ABBIGLIAMENTO_LEGACY_ACTIVE = false") &&
+  negozio.includes("function renderAbbigliamento(){ return; }") &&
+  negozio.includes("function ngCompra(){ return false; }") &&
+  !index.includes('id="g-fit"') && !negozio.includes("data-compra"));
 test("comprare attrezzatura e beat resta la stessa economia di prima: stesso costo, stesso G.money, stesso G.gear/G.beats",
   ui.includes("G.money -= g2.p; G.gear[g2.id] = true;") &&
   ui.includes("G.money -= b.price; G.market.splice(i,1); G.beats.push("));

@@ -179,6 +179,21 @@ input[type=range]{width:100%}
 
 #runtimeHidden{display:none!important}
 
+/* ADF_MAKEHUMAN_VISIBLE_BOOT_ERROR_V2_1
+   Se il modulo 3D o un errore di bootstrap blocca l'editor, l'errore non
+   resta più nascosto nel runtimeHidden/console. */
+.bootstrap-fatal{
+  position:fixed;z-index:1000;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(680px,calc(100vw - 36px));max-height:min(520px,calc(100vh - 36px));
+  overflow:auto;padding:18px 20px;border:1px solid rgba(220,92,92,.55);
+  border-radius:16px;background:rgba(13,13,15,.96);color:#f1eadb;
+  box-shadow:0 24px 80px rgba(0,0,0,.65);font-size:12px;line-height:1.5;
+  white-space:pre-wrap
+}
+.bootstrap-fatal[hidden]{display:none!important}
+.bootstrap-fatal b{display:block;margin-bottom:7px;color:#efb2b2;font-size:13px}
+.bootstrap-fatal small{display:block;margin-top:10px;color:#9d968b}
+
 @media(max-width:980px){
   .editor-sidebar{right:14px;width:min(390px,calc(100vw - 28px));top:70px;bottom:94px}
   .bottom-bar{width:calc(100vw - 24px);bottom:12px}
@@ -213,6 +228,189 @@ input[type=range]{width:100%}
   }
 </style>
 
+<style id="adf-makehuman-sidebar-readability">
+/* ADF_MAKEHUMAN_SIDEBAR_READABILITY_V1
+   Ingrandimento esclusivamente della UI laterale MakeHuman. */
+
+.editor-sidebar{
+  right:24px;
+  top:60px;
+  bottom:88px;
+  width:clamp(460px,38vw,600px);
+}
+
+.editor-head{
+  padding:20px 20px 15px;
+}
+
+.kicker{
+  font-size:10px;
+  line-height:1.3;
+}
+
+.editor-head h1{
+  margin-top:7px;
+  font-size:21px;
+}
+
+.editor-tabs{
+  gap:7px;
+  margin-top:14px;
+}
+
+.editor-tabs button{
+  padding:11px 8px;
+  font-size:10px;
+  line-height:1.2;
+}
+
+.editor-scroll{
+  padding:17px 19px 24px;
+}
+
+.section-copy{
+  margin-bottom:14px;
+  font-size:13px;
+  line-height:1.55;
+}
+
+.box{
+  margin-bottom:13px;
+  padding:15px;
+  border-radius:16px;
+}
+
+.box h2{
+  margin-bottom:12px;
+  font-size:11px;
+  line-height:1.3;
+}
+
+.grid2{
+  gap:11px;
+}
+
+.slot label,
+.row label{
+  margin-bottom:7px;
+  font-size:10.5px;
+  line-height:1.3;
+}
+
+select,
+input[type=text]{
+  padding:12px;
+  font-size:11.5px;
+  line-height:1.3;
+}
+
+.small{
+  font-size:11px;
+  line-height:1.55;
+}
+
+.customize-color,
+.minor-btn{
+  padding:10px;
+  font-size:10px;
+}
+
+.gender-quick{
+  gap:7px;
+  margin-bottom:12px;
+}
+
+.gender-quick button{
+  padding:11px 7px;
+  font-size:10px;
+}
+
+.modifier-container{
+  gap:11px;
+}
+
+.modifier-group{
+  border-radius:14px;
+}
+
+.modifier-group-head{
+  padding:11px 12px;
+  font-size:10.5px;
+  line-height:1.35;
+}
+
+.modifier-group-head span:last-child{
+  font-size:9px;
+}
+
+.modifier-list{
+  padding:7px 11px 10px;
+}
+
+.modifier-row{
+  padding:10px 0;
+}
+
+.modifier-label{
+  gap:10px;
+  margin-bottom:7px;
+}
+
+.modifier-label b{
+  font-size:11.5px;
+  line-height:1.35;
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+}
+
+.modifier-label output{
+  font-size:10.5px;
+}
+
+.modifier-row input[type=range]{
+  min-height:28px;
+}
+
+.modifier-help{
+  margin:4px 0 9px;
+  font-size:10px;
+  line-height:1.5;
+}
+
+.modifier-pill{
+  padding:7px 9px;
+  font-size:9.5px;
+}
+
+.skin-description{
+  margin-top:11px;
+  padding:11px 12px;
+  font-size:11px;
+  line-height:1.55;
+}
+
+.engine-progress{
+  padding:12px;
+  font-size:11px;
+  line-height:1.5;
+}
+
+.modifier-side-badge{
+  min-width:36px;
+  height:20px;
+  font-size:9.5px;
+}
+
+@media(max-width:980px){
+  .editor-sidebar{
+    right:14px;
+    top:64px;
+    bottom:88px;
+    width:min(500px,calc(100vw - 28px));
+  }
+}
+</style>
 <style id="adf-makehuman-stage-align">
 /* ADF · allineamento scena 3D allo specchio
    Spostiamo solo lo stage WebGL: sfondo e UI restano fermi. */
@@ -222,7 +420,286 @@ input[type=range]{width:100%}
 }
 </style>
 
-</head>
+<style id="adf-makehuman-slider-readability-v2">
+/* ADF_MAKEHUMAN_SLIDER_READABILITY_V2
+   Migliora la leggibilità dei modifier senza modificarne valori o logica. */
+
+.modifier-row{
+  padding:13px 0 15px;
+}
+
+.modifier-label{
+  margin-bottom:5px;
+}
+
+.modifier-label b{
+  color:#eee7dd;
+  font-size:13.5px;
+  font-weight:800;
+  line-height:1.35;
+  letter-spacing:0;
+}
+
+/*
+  I valori numerici restano nel DOM e continuano ad essere aggiornati
+  dal runtime, ma non vengono mostrati nell'editor destinato al giocatore.
+*/
+.modifier-label output{
+  display:none;
+}
+
+.modifier-help{
+  margin:0 0 10px;
+  color:#b9b1a7;
+  font-size:13px;
+  line-height:1.5;
+  font-weight:450;
+  letter-spacing:0;
+}
+
+.modifier-row input[type=range]{
+  display:block;
+  width:100%;
+  min-height:30px;
+  margin:1px 0 0;
+}
+
+.modifier-group-head{
+  font-size:11.5px;
+}
+
+.modifier-group-head span:last-child{
+  font-size:10px;
+}
+
+.custom-target-row{
+  padding:12px 0 14px;
+}
+
+.modifier-empty{
+  font-size:11px;
+  line-height:1.5;
+}
+</style>
+<style id="adf-makehuman-ui-uniformity-v3">
+/* ADF_MAKEHUMAN_UI_UNIFORMITY_V3
+   Uniforma slider, select, input e pulsanti della sidebar MakeHuman. */
+
+.editor-sidebar{
+  --adf-ui-text:#eee7dd;
+  --adf-ui-muted:#b9b1a7;
+  --adf-ui-line:rgba(255,255,255,.12);
+  --adf-ui-soft:rgba(255,255,255,.045);
+  --adf-ui-gold:#d3aa5e;
+  --adf-ui-gold-2:#f3d9a6;
+}
+
+/* ---------- tipografia e controlli ---------- */
+
+.editor-sidebar,
+.editor-sidebar select,
+.editor-sidebar input,
+.editor-sidebar button,
+.editor-sidebar label,
+.editor-sidebar .small,
+.editor-sidebar .section-copy,
+.editor-sidebar .modifier-help,
+.editor-sidebar .modifier-label b{
+  font-family:inherit;
+}
+
+.editor-sidebar select,
+.editor-sidebar input[type=text]{
+  min-height:46px;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid var(--adf-ui-line);
+  background:rgba(10,10,12,.9);
+  color:var(--adf-ui-text);
+  font-size:13px;
+  line-height:1.3;
+}
+
+.editor-sidebar select{
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+}
+
+.editor-sidebar .minor-btn,
+.editor-sidebar .customize-color,
+.editor-sidebar .editor-tabs button,
+.editor-sidebar .gender-quick button,
+.editor-sidebar .slot button,
+.editor-sidebar .box button{
+  min-height:42px;
+  padding:10px 12px;
+  border-radius:12px;
+  font-size:10.5px;
+  line-height:1.2;
+  font-weight:800;
+  letter-spacing:.04em;
+}
+
+.editor-sidebar .slot label,
+.editor-sidebar .row label{
+  font-size:10.5px;
+  line-height:1.35;
+  color:var(--adf-ui-text);
+}
+
+.editor-sidebar .section-copy,
+.editor-sidebar .small,
+.editor-sidebar .modifier-help{
+  color:var(--adf-ui-muted);
+}
+
+/* ---------- slider uniformi ---------- */
+
+.editor-sidebar input[type=range]{
+  -webkit-appearance:none;
+  appearance:none;
+  width:100%;
+  height:20px;
+  background:transparent;
+  margin:4px 0 0;
+}
+
+.editor-sidebar input[type=range]::-webkit-slider-runnable-track{
+  height:6px;
+  border-radius:999px;
+  background:linear-gradient(
+    to right,
+    var(--adf-ui-gold) 0%,
+    var(--adf-ui-gold) var(--value,50%),
+    rgba(255,255,255,.82) var(--value,50%),
+    rgba(255,255,255,.82) 100%
+  );
+}
+
+.editor-sidebar input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  appearance:none;
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  background:var(--adf-ui-gold);
+  border:2px solid #1a1714;
+  box-shadow:0 0 0 1px rgba(243,217,166,.35);
+  margin-top:-5px;
+}
+
+.editor-sidebar input[type=range]::-moz-range-track{
+  height:6px;
+  border:none;
+  border-radius:999px;
+  background:rgba(255,255,255,.82);
+}
+
+.editor-sidebar input[type=range]::-moz-range-progress{
+  height:6px;
+  border-radius:999px;
+  background:var(--adf-ui-gold);
+}
+
+.editor-sidebar input[type=range]::-moz-range-thumb{
+  width:16px;
+  height:16px;
+  border:none;
+  border-radius:50%;
+  background:var(--adf-ui-gold);
+  box-shadow:0 0 0 2px #1a1714, 0 0 0 3px rgba(243,217,166,.35);
+}
+
+.editor-sidebar input[type=range]:focus{
+  outline:none;
+}
+
+.editor-sidebar input[type=range]:focus::-webkit-slider-thumb{
+  box-shadow:0 0 0 2px #1a1714, 0 0 0 4px rgba(243,217,166,.4);
+}
+
+.editor-sidebar input[type=range]:focus::-moz-range-thumb{
+  box-shadow:0 0 0 2px #1a1714, 0 0 0 4px rgba(243,217,166,.4);
+}
+
+/* fallback uniforme anche se il JS non imposta --value */
+.editor-sidebar .modifier-row input[type=range],
+.editor-sidebar .custom-target-row input[type=range]{
+  accent-color:var(--adf-ui-gold);
+}
+
+/* ---------- piccoli aggiustamenti visivi ---------- */
+
+.editor-sidebar .modifier-group-head{
+  font-size:11px;
+  line-height:1.35;
+}
+
+.editor-sidebar .modifier-label b{
+  font-size:13.5px;
+  line-height:1.35;
+  color:var(--adf-ui-text);
+}
+
+.editor-sidebar .modifier-help{
+  font-size:13px;
+  line-height:1.5;
+}
+
+.editor-sidebar .box{
+  border-color:var(--adf-ui-line);
+}
+
+.editor-sidebar .editor-tabs button,
+.editor-sidebar .minor-btn,
+.editor-sidebar .customize-color{
+  border:1px solid var(--adf-ui-line);
+}
+
+/* stato attivo coerente */
+.editor-sidebar .editor-tabs button.active,
+.editor-sidebar .gender-quick button.active,
+.editor-sidebar .minor-btn.active,
+.editor-sidebar .customize-color.active{
+  border-color:rgba(211,170,94,.6);
+  box-shadow:inset 0 0 0 1px rgba(243,217,166,.18);
+}
+</style>
+
+<script>
+/* ADF_MAKEHUMAN_UI_UNIFORMITY_V3
+   Aggiorna la percentuale visiva degli slider WebKit. */
+document.addEventListener('input', function(ev){
+  const el = ev.target;
+  if(!(el instanceof HTMLInputElement)) return;
+  if(el.type !== 'range') return;
+
+  const min = Number(el.min || 0);
+  const max = Number(el.max || 100);
+  const val = Number(el.value || 0);
+  const pct = max > min ? ((val - min) / (max - min)) * 100 : 50;
+
+  el.style.setProperty('--value', pct + '%');
+}, true);
+
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.editor-sidebar input[type="range"]').forEach(function(el){
+    const min = Number(el.min || 0);
+    const max = Number(el.max || 100);
+    const val = Number(el.value || 0);
+    const pct = max > min ? ((val - min) / (max - min)) * 100 : 50;
+    el.style.setProperty('--value', pct + '%');
+  });
+});
+</script><style id="adf-makehuman-hide-teeth-tongue">
+/* ADF_MAKEHUMAN_HIDE_TEETH_TONGUE_V1
+   Dentatura e lingua restano nel runtime MakeHuman ma non sono controlli
+   esposti al giocatore. */
+.adf-hidden-player-control{
+  display:none !important;
+}
+</style></head>
 <body>
 <div class="room-backdrop" aria-hidden="true">
   <div class="room-blur"></div>
@@ -295,8 +772,8 @@ input[type=range]{width:100%}
       <div class="box"><h2>Capelli</h2><div class="grid2">
         <div class="slot"><label>Stile capelli</label><select id="slot-hair"></select><button id="customize-hair" class="customize-color">Personalizza</button></div>
         <div class="slot"><label>Barba e baffi</label><select id="slot-facialHair"></select></div>
-        <div class="slot"><label>Dentatura</label><select id="slot-teeth"></select></div>
-        <div class="slot"><label>Lingua</label><select id="slot-tongue"></select></div>
+        <div class="slot adf-hidden-player-control" hidden><label>Dentatura</label><select id="slot-teeth"></select></div>
+        <div class="slot adf-hidden-player-control" hidden><label>Lingua</label><select id="slot-tongue"></select></div>
       </div></div>
     </section>
 
@@ -363,6 +840,12 @@ input[type=range]{width:100%}
   <button id="editorConfirm" class="primary" type="button">Conferma artista</button>
 </nav>
 
+<div id="bootstrapFatal" class="bootstrap-fatal" role="alert" hidden>
+  <b>MakeHuman non è riuscito ad avviarsi</b>
+  <span id="bootstrapFatalMessage">Errore di bootstrap sconosciuto.</span>
+  <small>Questo messaggio identifica il punto reale del blocco: non serve aprire la console per sapere cosa è fallito.</small>
+</div>
+
 <div id="runtimeHidden" aria-hidden="true">
   <input id="applyMask" type="checkbox" checked>
   <input id="targetSearch" type="text">
@@ -378,8 +861,26 @@ input[type=range]{width:100%}
 </div>
 
 <script>
-window.addEventListener('error',e=>console.error('MAKEHUMAN CAMERINO',e.error||e.message));
-window.addEventListener('unhandledrejection',e=>console.error('MAKEHUMAN CAMERINO PROMISE',e.reason));
+(()=>{
+  const showBootstrapError=value=>{
+    const box=document.getElementById('bootstrapFatal');
+    const message=document.getElementById('bootstrapFatalMessage');
+    const text=String(value?.stack||value?.message||value||'Errore sconosciuto');
+    console.error('MAKEHUMAN CAMERINO',value);
+    if(message) message.textContent=text;
+    if(box) box.hidden=false;
+  };
+
+  window.__ADF_MH_SHOW_BOOT_ERROR=showBootstrapError;
+
+  window.addEventListener('error',e=>{
+    showBootstrapError(e.error||e.message||e);
+  });
+
+  window.addEventListener('unhandledrejection',e=>{
+    showBootstrapError(e.reason||e);
+  });
+})();
 </script>
 <script>
 (()=>{
@@ -388,7 +889,9 @@ window.addEventListener('unhandledrejection',e=>console.error('MAKEHUMAN CAMERIN
   const script=document.createElement('script');
   script.type='module';
   script.src='./runtime.js?v='+encodeURIComponent(version);
-  script.onerror=()=>console.error('runtime.js non caricato',script.src);
+  script.onerror=()=>window.__ADF_MH_SHOW_BOOT_ERROR?.(
+    'runtime.js non caricato: '+script.src
+  );
   document.body.appendChild(script);
 })();
 </script>

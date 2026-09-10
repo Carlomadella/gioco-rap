@@ -346,7 +346,6 @@ function chiudiStrofa(){
   G.bars.push({q, txt:testo, tema:WR.tema.t});
   if(typeof adfSegnaOggi === "function") adfSegnaOggi("scrivi");
   gain("scrittura", 1.2 + a.qTesto/100 * 1.4);
-  G.wellbeing = clamp(G.wellbeing - 1, 0, 100);
 
   const giudizio = q >= 72 ? "Questa è roba seria." : q >= 55 ? "Regge. Su un beat giusto funziona."
     : q >= 38 ? "Si può usare, ma non è il tuo pezzo migliore." : "È un abbozzo. In studio si sentirà.";

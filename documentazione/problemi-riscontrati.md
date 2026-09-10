@@ -615,6 +615,38 @@ la prova cade anche se qualcuno smette di ascoltare i due nomi voluti.
 - **come si vede** — da `frontend/`, `npm run prova`.
 - **quanto pesa** — da sistemare con calma.
 
+## Giro del 10/09/2026
+
+Giro fatto sul branch `task/beat-energia-e-barre-senza-malus`, dopo le modifiche a
+`studio.js` (tolto il costo di 20 energia per farsi fare un beat su misura), `writer.js`
+(tolto il calo di benessere quando chiudi una strofa) e `actions.js` (costo di «Scrivi
+barre» sceso da 28 a 15 di energia).
+
+- `npm run prova`: 89 a posto, 0 no — tutto verde.
+- `node strumenti/audit-regressioni.js`: 298 a posto, 3 no. I tre falliti sono quelli già
+  noti da prima (lo shop a linguette per Attrezzatura/Beat/Vestiti e i nomi dei file delle
+  pagine sparsi in più punti) — li ho controllati uno per uno e non c'entrano con questo
+  lavoro.
+- `npm run verifica:build`: 33 a posto, 0 no — build e file unico a posto.
+- Cercato in tutto `frontend/js/` un residuo di `STUDIO_BEAT_ENERGIA` o del vecchio testo
+  «20 energia» nello Studio: non ne è rimasto nessuno. La card «Fattelo fare» adesso mostra
+  solo prezzo e tempo, senza il pezzo di energia che c'era prima.
+- Cercato in tutto `frontend/js/game/` un altro punto che levasse benessere quando si
+  scrivono le barre (eventi, achievement, dialoghi): non ne ho trovato. C'è un evento di
+  prova finale (`js/game/phases.js:143`, «Lo scrivi da solo, tutto») che toglie 25 di
+  benessere per scrivere da soli l'ultimo disco della carriera, ma è una scena a sé, non
+  legata a `chiudiStrofa()`, e non l'ha toccata questo lavoro — la segnalo solo perché
+  Carletto sappia che esiste, non perché sia da correggere.
+- Il costo in energia di «Scrivi barre» in `actions.js:266` è letto dalla plancia in modo
+  automatico (`hub.js:509`, `const e = a.dyn ? a.dyn() : a.e`), quindi il numero mostrato
+  nella card è già 15 senza bisogno di toccare altro testo.
+- Il test aggiornato in `strumenti/prova.js:1057-1064` controlla adesso che l'energia non
+  scenda comprando o facendosi fare un beat, coerente col codice.
+
+Non ho trovato problemi nuovi da questa task. Tutto il resto (JavaScript che si rompe
+all'avvio, collegamenti fra schermate, telefono) non è stato toccato da queste modifiche,
+quindi non l'ho ricontrollato punto per punto oltre ai controlli automatici sopra.
+
 ### Nota, non è un errore: il beat «Esclusiva» comprato dall'evento resta muto
 
 - **dove** — `frontend/js/game/events.js:10`

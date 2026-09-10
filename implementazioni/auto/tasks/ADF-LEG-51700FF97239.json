@@ -11,28 +11,75 @@
     "source_status": "fatto",
     "source_status_raw": "fatto"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "needs_validation",
   "intake_state": "canonical",
   "related_task_ids": [],
   "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "current_state": [
+    "La Sala include il ruolo videomaker, lo rende eleggibile dopo l'uscita di un pezzo e lo integra con dialoghi, contatti e chat.",
+    "Il videomaker può girare un video per un brano pubblicato; il risultato resta sul brano e viene letto dalla simulazione settimanale."
   ],
-  "roadmap_scope": "none",
+  "systems": [
+    "frontend/js/game/posto.js",
+    "frontend/js/game/chat.js",
+    "frontend/js/game/sim.js",
+    "frontend/js/game/ui.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/posto.js",
+    "frontend/js/game/chat.js",
+    "frontend/js/game/sim.js",
+    "frontend/js/game/ui.js",
+    "frontend/js/game/trasferte.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Il videomaker compare a La Sala con ruolo, eleggibilità e dialoghi propri.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/posto.js: POSTO_RUOLI.videomaker, DIALOGHI.videomaker e la selezione in presentiOggi() inseriscono il ruolo nel luogo.",
+        "frontend/js/game/chat.js: chatSpuntiVideomaker() e CHAT_MESTIERI collegano il contatto alla chat."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "L'azione del videomaker applica costi e vincoli, associa il video a un pezzo uscito e ne prolunga la resa.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/posto.js: PO_COSTO.video, PO_TEMPO.video e azionePosto() richiedono relazione, energia, denaro e un brano senza video.",
+        "frontend/js/game/posto.js e frontend/js/game/sim.js: s.video/s.videoDa vengono salvati e songWeekly() usa il moltiplicatore nelle settimane successive."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Il percorso mappa → La Sala → videomaker → video è leggibile e giocabile senza sovrapposizioni di scena.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/posto.js: scenaSala(), renderPosto() e azionePosto() coprono il percorso; la validazione percettiva richiede manual: un playtest completo."
+      ]
+    }
+  ],
+  "risks": [
+    "Rimuovere il vincolo del pezzo pubblicato o del rapporto può rendere l'azione ripetibile senza il contesto narrativo.",
+    "Cambiare il moltiplicatore video senza passare da songWeekly() può alterare il bilanciamento degli stream."
+  ],
+  "notes": [
+    "La presenza del videomaker nelle trasferte è precedente e non sostituisce l'integrazione richiesta a La Sala."
+  ],
   "plan": {
     "mode": "none",
     "status": "not_applicable",
-    "summary": "",
+    "summary": "Nessun piano: ruolo, dialoghi, azione e conseguenze sono già collegati.",
     "steps": [],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }
