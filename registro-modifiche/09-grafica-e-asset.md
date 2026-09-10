@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:cd741e5 -->
+## 10/09/26, 14:56 â€” task/makehuman-hide-teeth-tongue â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `cd741e5`
+
+### Cosa Ã¨ entrato
+
+- `4e975be` â€” feat(makehuman): nasconde dentatura e lingua dall'editor â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/makehuman-camerino-v1/index.html`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:6604e22 -->
 ## 10/09/26, 14:18 â€” task/makehuman-ui-readability â†’ main
 
