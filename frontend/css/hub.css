@@ -360,6 +360,15 @@ body.in-hub .topnav {
   transform: translate(3%, -10%) scale(2);
   transform-origin: 50% 0%;
 }
+
+/* ADF_MAKEHUMAN_DETERMINISTIC_PROPIC_V1_2
+   I nuovi portrait MakeHuman sono già composti a 420x560.
+   Nessuna compensazione del vecchio canvas live. */
+.pport .pport-img.pport-img-makehuman-deterministic {
+  object-position: 50% 50%;
+  transform: none;
+  transform-origin: 50% 50%;
+}
 .pwho {
   flex: 1;
   min-width: 0;

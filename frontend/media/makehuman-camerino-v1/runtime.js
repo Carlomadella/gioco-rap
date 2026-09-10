@@ -4720,144 +4720,79 @@ function adfPersistMakeHumanPortrait(dataUrl){
 }
 
 function makePreviewImage(){
-  /* ADF_MAKEHUMAN_FACE_CAPTURE_V4
-     Fix vero: niente crop casuale del full body.
-     Qui generiamo un headshot dedicato del personaggio:
-     - troviamo il bbox del soggetto nella scena Three.js
-     - stimiamo il centro della testa
-     - spostiamo temporaneamente la camera molto piu vicino
-     - salviamo una preview portrait del volto
-     - ripristiniamo tutto subito dopo */
-  const getCanvas = () =>
-    ((typeof renderer !== "undefined" && renderer && renderer.domElement) ||
-     document.querySelector('#viewer canvas, .viewer canvas, canvas'));
+  /* ADF_MAKEHUMAN_DETERMINISTIC_PROPIC_V1_2
+     Portrait MakeHuman indipendente da viewport/sidebar/DPR/browser zoom.
+     Usiamo un render fisso 420x560 e una camera portrait dedicata.
+     La camera live dell'editor non viene modificata. */
+  const OUT_W=420;
+  const OUT_H=560;
 
-  const renderNow = () => {
-    try{
-      if(typeof renderer !== "undefined" && renderer && typeof scene !== "undefined" && scene && typeof camera !== "undefined" && camera){
-        renderer.render(scene, camera);
-      }
-    }catch(_e){}
-  };
+  if(
+    typeof renderer==="undefined" || !renderer ||
+    typeof scene==="undefined" || !scene ||
+    typeof camera==="undefined" || !camera ||
+    typeof THREE==="undefined" ||
+    typeof characterBounds!=="function"
+  ) return "";
 
-  const cloneVec3 = v => (v && v.clone) ? v.clone() : null;
-  const cam = (typeof camera !== "undefined" && camera) ? camera : null;
-  const ctl = (typeof controls !== "undefined" && controls) ? controls : null;
-  const cameraState = cam ? {
-    position: cloneVec3(cam.position),
-    quaternion: cam.quaternion && cam.quaternion.clone ? cam.quaternion.clone() : null,
-    up: cloneVec3(cam.up),
-    zoom: cam.zoom,
-    fov: cam.fov,
-    target: ctl && ctl.target && ctl.target.clone ? ctl.target.clone() : null
-  } : null;
+  const bounds=characterBounds();
+  if(!bounds) return "";
 
-  const restoreCamera = () => {
-    if(!cam || !cameraState) return;
-    try{
-      if(cameraState.position && cam.position && cam.position.copy) cam.position.copy(cameraState.position);
-      if(cameraState.quaternion && cam.quaternion && cam.quaternion.copy) cam.quaternion.copy(cameraState.quaternion);
-      if(cameraState.up && cam.up && cam.up.copy) cam.up.copy(cameraState.up);
-      if(Number.isFinite(cameraState.zoom)) cam.zoom = cameraState.zoom;
-      if(Number.isFinite(cameraState.fov)) cam.fov = cameraState.fov;
-      if(cameraState.target && ctl && ctl.target && ctl.target.copy) ctl.target.copy(cameraState.target);
-      if(cam.updateProjectionMatrix) cam.updateProjectionMatrix();
-      if(ctl && ctl.update) ctl.update();
-    }catch(_e){}
-  };
+  const {box,center,size}=bounds;
+  const max=Math.max(size.x,size.y,size.z,0.001);
 
-  const findMainSubject = () => {
-    try{
-      if(typeof scene === "undefined" || !scene || typeof THREE === "undefined") return null;
-      let best = null;
-      scene.traverse(obj => {
-        if(!obj || obj.visible === false) return;
-        if(!(obj.isMesh || obj.isSkinnedMesh || obj.type === 'Group' || obj.type === 'Object3D')) return;
-        try{
-          const box = new THREE.Box3().setFromObject(obj);
-          if(!box || !isFinite(box.min.x) || box.isEmpty()) return;
-          const size = new THREE.Vector3();
-          const center = new THREE.Vector3();
-          box.getSize(size);
-          box.getCenter(center);
-          const volume = Math.max(0, size.x * size.y * size.z);
-          const plausibleHuman = size.y > 0.5 && size.y < 3.5 && size.x > 0.1;
-          if(!plausibleHuman) return;
-          if(!best || volume > best.volume) best = {obj, box, size, center, volume};
-        }catch(_e){}
-      });
-      return best;
-    }catch(_e){ return null; }
-  };
+  const target=new THREE.Vector3(
+    center.x,
+    box.min.y+size.y*0.91,
+    center.z
+  );
+  const distance=max*0.34;
 
-  const tryHeadshotCamera = () => {
-    if(!cam || typeof setCameraView!=='function') return false;
-    try{
-      /* La vista VOLTO è già parte del runtime di produzione ed è stata
-         verificata visivamente durante l'audit. Evitiamo stime bbox:
-         con alcuni corpi/proxy la V4 avvicinava la camera fino a entrare
-         nella mesh e il portrait diventava un rettangolo color pelle. */
-      setCameraView('face',{smooth:false});
-      if(typeof applyVisualCenter==='function') applyVisualCenter();
-      if(cam.updateProjectionMatrix) cam.updateProjectionMatrix();
-      if(ctl && ctl.update) ctl.update();
-      return true;
-    }catch(_e){
-      return false;
-    }
-  };
+  const portraitCamera=new THREE.PerspectiveCamera(
+    32,
+    OUT_W/OUT_H,
+    Math.max(.01,max/1000),
+    Math.max(200,max*10)
+  );
 
-  const capture = () => {
-    renderNow();
-    const src = getCanvas();
-    if(!src || !src.width || !src.height) return "";
+  portraitCamera.position.set(target.x,target.y,target.z+distance);
+  portraitCamera.up.copy(camera.up);
+  portraitCamera.layers.mask=camera.layers.mask;
+  portraitCamera.lookAt(target);
+  portraitCamera.updateProjectionMatrix();
+  portraitCamera.updateMatrixWorld(true);
 
-    const OUT_W = 420, OUT_H = 560, RATIO = OUT_W / OUT_H;
+  const oldPixelRatio=renderer.getPixelRatio();
+  const oldSize=renderer.getSize(new THREE.Vector2());
+  const oldRenderTarget=renderer.getRenderTarget?.() || null;
 
-    /* Dopo il zoom camera facciamo comunque un crop leggero e alto per tenere il volto al centro. */
-    let cropH = src.height * 0.88;
-    let cropW = cropH * RATIO;
-    if(cropW > src.width * 0.92){
-      cropW = src.width * 0.92;
-      cropH = cropW / RATIO;
-    }
-    let sx = (src.width - cropW) / 2;
-    let sy = Math.max(0, (src.height - cropH) * 0.18);
-    if(sy + cropH > src.height) sy = src.height - cropH;
-
-    /* Fallback molto aggressivo se la camera non si e avvicinata davvero. */
-    if(cropH > src.height * 0.90){
-      cropH = src.height * 0.52;
-      cropW = cropH * RATIO;
-      sx = (src.width - cropW) / 2;
-      sy = src.height * 0.02;
-    }
-
-    const out = document.createElement("canvas");
-    out.width = OUT_W;
-    out.height = OUT_H;
-    const ctx = out.getContext("2d");
-    if(!ctx) return "";
-    ctx.drawImage(src, sx, sy, cropW, cropH, 0, 0, OUT_W, OUT_H);
-    const data = out.toDataURL("image/png");
-    return (typeof adfPersistMakeHumanPortrait === "function") ? adfPersistMakeHumanPortrait(data) : data;
-  };
-
-  let preview = "";
   try{
-    const ok = tryHeadshotCamera();
-    renderNow();
-    preview = capture();
-    if(!ok && !preview){ preview = capture(); }
-  }catch(_e){
-    preview = capture();
-  }finally{
-    restoreCamera();
-    renderNow();
-  }
-  return preview;
-}
+    renderer.setRenderTarget(null);
+    renderer.setPixelRatio(1);
+    renderer.setSize(OUT_W,OUT_H,false);
+    renderer.render(scene,portraitCamera);
 
+    const canvas=renderer.domElement;
+    if(!canvas || canvas.width!==OUT_W || canvas.height!==OUT_H) return "";
+
+    const data=canvas.toDataURL("image/png");
+    if(!/^data:image\/png;base64,/i.test(data)) return "";
+
+    return (typeof adfPersistMakeHumanPortrait==="function")
+      ? adfPersistMakeHumanPortrait(data)
+      : data;
+  }catch(e){
+    try{ console.warn("[ADF] propic MakeHuman deterministica non acquisita",e); }catch(_e){}
+    return "";
+  }finally{
+    try{
+      renderer.setPixelRatio(oldPixelRatio);
+      renderer.setSize(oldSize.x,oldSize.y,false);
+      renderer.setRenderTarget(oldRenderTarget);
+      renderer.render(scene,camera);
+    }catch(_e){}
+  }
+}
 function emitToRoom(type,extra={}) {
   window.parent.postMessage({type,...extra},'*');
 }
@@ -4875,7 +4810,10 @@ function bindEditorShell() {
   E('editorPreview')?.addEventListener('click',()=>setPreviewMode(!previewMode));
   E('editorConfirm')?.addEventListener('click',()=>{
     emitToRoom('adf-makehuman-confirm',{
-      state:snapshotCharacterState(),
+      state:{
+        ...snapshotCharacterState(),
+        previewFraming:'makehuman-deterministic-v1'
+      },
       previewImage:makePreviewImage()
     });
   });

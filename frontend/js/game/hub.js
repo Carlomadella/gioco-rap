@@ -582,7 +582,15 @@ function hubRitrattoArtista(art){
       .replace(/"/g, "&quot;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
-    const providerClass = art?.avatarSource === "avaturn" ? " pport-img-avaturn" : "";
+    let providerClass = "";
+    if(art?.avatarSource === "avaturn"){
+      providerClass = " pport-img-avaturn";
+    }else if(
+      art?.avatarSource === "local" &&
+      art?.avatarData?.makehumanState?.previewFraming === "makehuman-deterministic-v1"
+    ){
+      providerClass = " pport-img-makehuman-deterministic"; /* ADF_MAKEHUMAN_DETERMINISTIC_PROPIC_V1_2 */
+    }
     return '<img class="pport-img' + providerClass + '" src="' + safe + '" alt="">';
   }
 
