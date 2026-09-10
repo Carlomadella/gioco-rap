@@ -2279,7 +2279,7 @@ function makeSymmetricModifierRow(leftMeta,rightMeta) {
 
   const help=document.createElement('div');
   help.className='modifier-help modifier-symmetric-help';
-  help.textContent='Simmetrico · controlla insieme lato sinistro e destro';
+  help.textContent='Controlla insieme lato sinistro e destro';
 
   row.title=`${leftMeta.fullName}\n${rightMeta.fullName}`;
 
@@ -2508,7 +2508,7 @@ function renderCustomTargetList(query='') {
 
     const help=document.createElement('div');
     help.className='modifier-help';
-    help.textContent=[meta?.uiGroup,meta?.uiDescription].filter(Boolean).join(' — ');
+    help.textContent=meta?.uiDescription||'';
 
     head.append(label,output);
     row.append(head,help,input,raw);
