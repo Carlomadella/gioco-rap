@@ -41,7 +41,9 @@
       },
       "sourceCollections": {
         "allow": [],
-        "block": []
+        "block": [
+          "fame-owned-beats-v1"
+        ]
       },
       "notes": "Pretraining groove umano/generalista. Candidate/unknown restano fuori finché evidenza e qualità non sono sufficienti.",
       "trainingTask": true
@@ -69,7 +71,9 @@
       },
       "sourceCollections": {
         "allow": [],
-        "block": []
+        "block": [
+          "fame-owned-beats-v1"
+        ]
       },
       "notes": "Target musicale Trap/Rap: policy volutamente severa e fail-closed.",
       "trainingTask": true

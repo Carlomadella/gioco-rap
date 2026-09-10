@@ -17,18 +17,28 @@ function safeName(id) {
 }
 
 function exportEnrichedDrumViews(inputDir, outputDir, options = {}) {
+  options = { ...options,
+    mappingProfileId: options.mappingProfileId ?? "gmd-9-v1",
+    bars: options.bars ?? 2,
+    gridDivisionPerQuarter: options.gridDivisionPerQuarter ?? 4
+  };
+  if (typeof options.mappingProfileId !== "string" || !options.mappingProfileId.trim()
+    || !Number.isInteger(options.bars) || options.bars <= 0
+    || !Number.isInteger(options.gridDivisionPerQuarter) || options.gridDivisionPerQuarter <= 0) {
+    throw new Error("Invalid mapping/bars/grid options: explicit values must be valid.");
+  }
   const files = fs.readdirSync(inputDir)
     .filter(name => /\.dataset-item\.json$/i.test(name))
     .sort((a, b) => a.localeCompare(b));
 
-  fs.mkdirSync(outputDir, { recursive: true });
+  require("./dataset/fresh-output-directory").prepareFreshOutput(inputDir, outputDir);
   const report = {
     schema: "fame-neural-drum-view-v2-enriched-export-report-v1",
     version: 1,
     options: {
-      mappingProfileId: options.mappingProfileId || "gmd-9-v1",
-      bars: options.bars || 2,
-      gridDivisionPerQuarter: options.gridDivisionPerQuarter || 4
+      mappingProfileId: options.mappingProfileId,
+      bars: options.bars,
+      gridDivisionPerQuarter: options.gridDivisionPerQuarter
     },
     totals: {
       discovered: files.length,
@@ -46,14 +56,14 @@ function exportEnrichedDrumViews(inputDir, outputDir, options = {}) {
   };
 
   for (const fileName of files) {
-    const item = readJson(path.join(inputDir, fileName));
-    if (!item.sourceFidelity) {
-      report.totals.skippedNoSourceFidelity += 1;
-      report.items.push({ fileName, status: "skipped", reason: "source-fidelity-missing" });
-      continue;
-    }
-
     try {
+      const item = readJson(path.join(inputDir, fileName));
+      if (!item.sourceFidelity) {
+        report.totals.skippedNoSourceFidelity += 1;
+        report.items.push({ fileName, status: "skipped", reason: "source-fidelity-missing" });
+        continue;
+      }
+
       const view = buildEnrichedDrumViewV2(item, options);
       const validation = validateDrumViewV2(view);
       if (!validation.ok) throw new Error(validation.errors.join("; "));
@@ -88,8 +98,10 @@ function exportEnrichedDrumViews(inputDir, outputDir, options = {}) {
   }
 
   report.losslessSourceHitAccounting = report.totals.sourceHits === report.totals.viewHits;
-  report.completeMetadataCoverage = report.totals.exported > 0
+  report.exportedMetadataCoverage = report.totals.exported > 0
     && report.totals.metadataEnriched === report.totals.exported;
+  report.completeInputCoverage = files.length > 0 && report.totals.exported === files.length;
+  report.completeMetadataCoverage = report.exportedMetadataCoverage && report.completeInputCoverage;
   return report;
 }
 

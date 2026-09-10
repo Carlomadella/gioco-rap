@@ -1062,7 +1062,7 @@ La griglia 16th è una baseline comparabile, non una quantizzazione distruttiva 
 
 Restano aperti dentro 7C e nei blocchi collegati:
 
-- metadata enrichment style/beat/split;
+- estendere la copertura metadata style/beat/split oltre il batch tecnico già chiuso in 7C Block2;
 - tassonomia/adaptor Trap dopo sorgenti Trap simboliche affidabili;
 - scelta e verifica di window/core candidate task-specifiche;
 - integrazione con policy boundary/loopability 7G;
@@ -1817,3 +1817,9 @@ PRONTO PER IL PRODOTTO
 ```
 
 FAME Neural avanza solo quando sappiamo quale di queste proprietà abbiamo realmente dimostrato.
+
+## Recezione operativa — 10 settembre 2026
+
+7D Block1 chiuso; Block2 da iniziare. Il protocollo W1–W10 del playbook owned-beats e NDR-045 sono recepiti. Il bootstrap prepara inventario e copie, non converte o apre training. Owned-beats è candidata per relazioni cross-track; pilot drums/low-end prima del tonale. HH-TRP conserva il ruolo ufficiale di candidata, da confrontare con l’effettiva resa del pilot; il playbook non la declassa autonomamente. GMD resta fonte generale. Il percorso si colloca nei task dati esistenti e nei gate 7D/7E pertinenti; nessuna nuova fase per hardening o bootstrap.
+
+La selezione session-grouped / drummer-held-out in Block2 deve riflettere la domanda di generalizzazione e i vincoli dei dati; non si sceglie usando i risultati del test finale. Il training resta chiuso.

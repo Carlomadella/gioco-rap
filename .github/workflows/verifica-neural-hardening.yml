@@ -1,0 +1,29 @@
+name: Verifica Neural hardening
+on:
+  push:
+    paths:
+      - 'frontend/strumenti/fame-neural-composer/**'
+      - '.github/workflows/verifica-neural-hardening.yml'
+  pull_request:
+    paths:
+      - 'frontend/strumenti/fame-neural-composer/**'
+      - '.github/workflows/verifica-neural-hardening.yml'
+permissions:
+  contents: read
+jobs:
+  neural:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node frontend/strumenti/fame-neural-composer/hardening-owned-beats-test.js
+      - run: node frontend/strumenti/fame-neural-composer/phase7c-block1-smoke-test.js
+      - run: node frontend/strumenti/fame-neural-composer/phase7c-block2-smoke-test.js
+      - run: node frontend/strumenti/fame-neural-composer/phase7d-block1-smoke-test.js
+      - run: node frontend/strumenti/fame-neural-composer/phase3-source-registry-smoke-test.js
+      - run: node frontend/strumenti/fame-neural-composer/phase7a-block3-smoke-test.js

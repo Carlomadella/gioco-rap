@@ -2,7 +2,7 @@
 
 Data: 10 settembre 2026
 Base repository del blocco: `7a49b31a32369caeb69bdf8a8f7c934d9c593bd1`
-Stato finale: Block1 completato nel proprio scope; Fase 7D, `DRUM DATA READY V2` e training serio restano aperti.
+Stato finale: Block1 completato nel proprio scope; Fase 7D resta aperta; `DRUM DATA READY V2` non superato e training serio chiuso.
 
 ## Domanda del blocco
 
@@ -73,10 +73,10 @@ Una presenza cross-split viene registrata come **diagnostico**, non chiamata aut
 
 ## Risultato sul sampling
 
-L'inventory falsifica due scorciatoie:
+L'inventory segnala due scorciatoie da evitare senza una policy esplicita:
 
 1. **“Usiamo semplicemente tutto GMD come un unico pool.”**
-   Non è appropriato: i fill sono 647, più dei 503 beat, e hanno ruolo/durata diversi.
+   I fill sono 647 e i beat 503, con ruolo/durata diversi. Questo motiva confrontare pool distinti e uso completo con condizionamento/pesi: il solo conteggio non falsifica ogni uso dell’intero GMD; misurare anche durata e finestre.
 
 2. **“Usiamo solo hip-hop perché FAME è rap/trap.”**
    Non è appropriato per il pretraining generale: GMD ha 18 primary style e il ruolo della 7D è `GENERAL_HUMAN_GROOVE_PRETRAIN`. Inoltre hiphop GMD non equivale a Trap.

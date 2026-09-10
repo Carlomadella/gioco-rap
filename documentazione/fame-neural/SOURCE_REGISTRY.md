@@ -153,3 +153,7 @@ Rights evidence:
 - repository `LICENSE` and README declare MIT;
 - README explicitly states generated beats are user-owned and may be used commercially without attribution, royalties or restrictions;
 - `package.json` currently declares `ISC`, which conflicts with repository LICENSE metadata. This discrepancy is recorded and the generated-output ownership statement is the operational basis for generated examples.
+
+## Owned-beats — candidata operativa, 10 settembre 2026
+
+`fame-owned-beats-v1` è registrata come audio proprietario dichiarato dall’utente, 131 file verificati nell’inventario. La revisione per record/famiglia resta da completare (`yellow`, pending-operational-review); non vengono richieste nuove email né negate dichiarazioni già fornite. Nessun auto-download. Policy training blocca esplicitamente la collection finché un aggiornamento versionato non recepisce provenance, capability e QA richiesti. Bootstrap locale disponibile; conversione e validazione non dichiarate complete.

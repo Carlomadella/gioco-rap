@@ -27,3 +27,7 @@ Una scelta diventa vincolante nel Neural soltanto dopo una decisione esplicita r
 ## Revisione handoff e pista Sonic Pi
 
 [Confronto critico del 9 settembre 2026](REVISIONE_HANDOFF_SONIC_PI_2026-09-09.md), riferito al commit `02bc708`: stato 7A, limiti del validatore, applicazione delle policy, fedeltà, dati allineati e protocollo del pilot programmatico. Le decisioni adottate sono NDR-035…040; CURRENT_STATE distingue implementazione e azioni ancora aperte. La versione estesa dell'handoff sostituisce quella preliminare come contesto, senza diventare una roadmap autonoma.
+
+## Hardening e owned-beats (10 settembre 2026)
+
+Vedi [protocollo](FAME_OWNED_BEATS_AUDIO_TO_MIDI_PLAYBOOK.md), sezioni W1–W10, e [verifiche/limiti](HARDENING_OWNED_BEATS_2026-09-10.md). Il bootstrap inventaria/copia soltanto; Block2 7D e conversione da iniziare.

@@ -24,7 +24,7 @@ function enrichDirectory(inputDir, infoCsvPath, outputDir) {
     .filter(name => /\.dataset-item\.json$/i.test(name))
     .sort((a, b) => a.localeCompare(b));
 
-  fs.mkdirSync(outputDir, { recursive: true });
+  require("./dataset/fresh-output-directory").prepareFreshOutput(inputDir, outputDir);
   const report = {
     schema: "fame-neural-gmd-metadata-enrichment-report-v1",
     version: 1,

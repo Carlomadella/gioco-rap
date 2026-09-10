@@ -59,3 +59,7 @@ FASE 2 dovrà aggiungere test per:
 - provenance schema;
 - import failure deterministico;
 - round-trip di fixture MIDI controllate.
+
+## Hardening e owned-beats (10 settembre 2026)
+
+Vedi [protocollo](FAME_OWNED_BEATS_AUDIO_TO_MIDI_PLAYBOOK.md), sezioni W1–W10, e [verifiche/limiti](HARDENING_OWNED_BEATS_2026-09-10.md). Il bootstrap inventaria/copia soltanto; Block2 7D e conversione da iniziare.

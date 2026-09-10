@@ -24,6 +24,21 @@ function enrichDrumViewWithGmdMetadata(view, datasetItem) {
   }
 
   const enriched = deepClone(view);
+  const timing = view.timing;
+  const conflicts = [];
+  if (timing) {
+    const tempos = timing.tempoEvents || [];
+    let active = null;
+    for (const event of tempos) if (event.tick <= timing.sourceStartTick) active = event;
+    // 0.01 BPM is only a numerical comparison tolerance, not a musical QA gate.
+    if (active && Math.abs(active.bpm - metadata.bpm) > 0.01) {
+      conflicts.push({ field: "bpm", csv: metadata.bpm, midi: active.bpm, implicitFallback: !!active.implicitFallback });
+    }
+    if (timing.meter && (timing.meter.numerator !== metadata.timeSignature.numerator
+      || timing.meter.denominator !== metadata.timeSignature.denominator)) {
+      conflicts.push({ field: "meter", csv: deepClone(metadata.timeSignature), midi: deepClone(timing.meter) });
+    }
+  }
   enriched.metadata = {
     ...(enriched.metadata || {}),
     style: deepClone(metadata.style),
@@ -34,7 +49,10 @@ function enrichDrumViewWithGmdMetadata(view, datasetItem) {
     sourceRecordId: metadata.recordId,
     sourceMetadataSchema: GMD_METADATA_SCHEMA,
     metadataStatus: "source-enriched",
-    sourceSplitRole: "source-reference-only"
+    sourceSplitRole: "source-reference-only",
+    timingAuthority: "source-midi",
+    timingConsistency: { status: !timing ? "not-evaluated" : conflicts.length ? "conflict" : "consistent", conflicts }
+
   };
   return enriched;
 }
@@ -46,7 +64,12 @@ function buildEnrichedDrumViewV2(datasetItem, options = {}) {
   if (!baseValidation.ok) {
     throw new Error(`Drum View V2 base non valida: ${baseValidation.errors.join("; ")}`);
   }
-  return enrichDrumViewWithGmdMetadata(view, datasetItem);
+  const enriched = enrichDrumViewWithGmdMetadata(view, datasetItem);
+  if (enriched.metadata?.timingConsistency?.status === "conflict") {
+    throw new Error("CSV/MIDI timing conflict; preserve source and resolve before export: "
+      + JSON.stringify(enriched.metadata.timingConsistency.conflicts));
+  }
+  return enriched;
 }
 
 module.exports = {

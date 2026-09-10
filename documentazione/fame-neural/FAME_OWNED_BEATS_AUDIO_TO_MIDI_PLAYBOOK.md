@@ -3,6 +3,8 @@
 **Stato:** documento operativo vivo  
 **Data iniziale:** 10 settembre 2026  
 **Progetto:** FAME Neural Composer / Anni di Fame  
+**Aggiornamento operativo 10 settembre 2026:** il protocollo W1–W10 in fondo a questo documento prevale sui precedenti esempi di stati e naming. Bootstrap disponibile per inventario/copia; conversione non avviata.
+
 **Scopo:** fonte unica per la conversione dei beat audio proprietari in materiale simbolico utilizzabile da FAME Neural.  
 **Collocazione:** documento tecnico standalone in `documentazione/fame-neural/`; non modifica, estende o vincola la roadmap ufficiale finché una decisione non viene esplicitamente recepita altrove.  
 
@@ -15,6 +17,8 @@
 Durante il primo esperimento serio di conversione audio→MIDI abbiamo verificato che una parte importante delle informazioni musicali di un beat prodotto può essere recuperata con una fedeltà utile a FAME, soprattutto per batteria e low-end.
 
 Il problema è che il processo ha richiesto più iterazioni e ha fatto emergere diverse regole che sarebbe facile perdere tra una chat e l'altra: allineamento kick↔808, ritardo del pitch tracker, falsi crash dovuti agli open hat, distinzione tra errore simbolico ed errore di rendering, colpi low-end mancanti rilevati all'ascolto, sincronizzazione snare↔808 e altre correzioni.
+
+Le correzioni del prototipo sono osservazioni sul caso e regole candidate, salvo principi di tracciabilità e conservazione. La loro generalizzazione richiede il pilot; la qualità V1–V9 non viene ricertificata da questa revisione.
 
 Da ora in avanti questo file è il **punto di partenza obbligatorio** per ogni nuova conversione dei beat proprietari. Prima di modificare la pipeline bisogna controllare qui cosa è già stato scoperto.
 
@@ -30,7 +34,7 @@ Cartella Dropbox:
 
 Inventario verificato il 10 settembre 2026:
 
-- **131 beat audio**;
+- **131 file audio (numero di famiglie compositive ancora da verificare)**;
 - formati presenti: principalmente `.mp3` e `.wav`;
 - dimensione complessiva della cartella: circa **1,47 GB**;
 - naming prevalente: `(BEAT) <titolo> @inarteless`;
@@ -78,15 +82,15 @@ La Fase 7 è un **TASK DATA RESET**: ogni sorgente viene usata per ciò che sa r
 Ruoli attuali/proposti:
 
 - **GMD** → `GENERAL_HUMAN_GROOVE_PRETRAIN`;
-- **fame-owned-beats-v1** → `PRIMARY_TRAP_RAP_OWNED_SPECIALIZATION`;
-- **HH-TRP** → sorgente Trap drum complementare/candidate secondaria, non più unica candidata primaria;
+- **fame-owned-beats-v1** → candidata per specializzazione e parti abbinate; priorità finale subordinata al pilot;
+- **HH-TRP** → conserva la priorità candidata definita dalla roadmap; eventuale ruolo complementare da decidere dopo il confronto;
 - **PDMX** → general symbolic / harmony / arrangement con selezione quality-aware;
 - **NRG-CP** → materiale tonale/armonico generale;
 - **fame-original-seed-v1** → debug/grammar, non target musicale.
 
 ### 3.1 Regola importante
 
-I 131 beat devono entrare **adesso nell'architettura dati**, ma non devono essere dichiarati `TASK DATA READY` solo perché esistono.
+I 131 file entrano **come fonte candidata nell'architettura dati**, ma non devono essere dichiarati `TASK DATA READY` solo perché esistono.
 
 Stato iniziale corretto:
 
@@ -94,11 +98,11 @@ Stato iniziale corretto:
 
 Poi, progressivamente:
 
-`RAW_AUDIO → STEMMED → TRANSCRIBED → VALIDATED → TASK_DATA_READY`
+`inventario → elaborazione per ruolo → QA per artefatto → gate di ammissibilità per task`
 
 È accettabile che il corpus cresca a blocchi, ad esempio:
 
-`131 RAW → 5/10 VALIDATED → 30 → 60 → 131`
+`inventario dei file → pilot 5–10 famiglie → espansione subordinata ai gate, senza quota obbligatoria di promozione`
 
 La conversione completa dei beat può procedere progressivamente. Questo playbook non modifica autonomamente la roadmap né lo stato delle sue fasi.
 
@@ -387,7 +391,7 @@ Finora il prototipo ha validato soprattutto:
 - 808/low-end;
 - percussion/hats.
 
-I 131 beat proprietari contengono però anche il materiale tonale necessario a FAME.
+I file proprietari possono contenere materiale tonale utile a FAME; disponibilità, pertinenza e fedeltà di estrazione vanno verificate per record.
 
 Target futuri:
 
@@ -673,7 +677,7 @@ Tuttavia va sempre registrato il numero reale di **source families**.
 
 Regola:
 
-**100.000 training examples derivati da 131 beat restano 131 famiglie sorgente, non 100.000 composizioni indipendenti.**
+**100.000 esempi derivati dai 131 file non diventano 100.000 composizioni indipendenti: il numero delle famiglie deve essere verificato.**
 
 L'augmentation non deve falsificare la diversità reale del corpus.
 
@@ -773,7 +777,7 @@ Per drums aggiungere:
 
 ### D-001 — Corpus proprietario centrale
 
-**DECISIONE:** i 131 beat della cartella `STUFF BY @inarteless` vengono trattati come nuova sorgente proprietaria centrale candidata per la specializzazione FAME Trap/Rap.
+**DECISIONE:** i 131 file della cartella `STUFF BY @inarteless` vengono trattati come nuova sorgente proprietaria centrale candidata per la specializzazione FAME Trap/Rap.
 
 ### D-002 — Audio originale fuori dal repository Git
 
@@ -793,7 +797,7 @@ Per drums aggiungere:
 
 ---
 
-## 23. Regole congelate dal primo prototipo
+## 23. Lezioni del primo prototipo — generalizzazione da verificare
 
 Queste regole restano operative fino a quando un nuovo test non le falsifica:
 
@@ -973,3 +977,103 @@ Creato il playbook iniziale. Integrati:
 - batch strategy;
 - protocollo di aggiornamento continuo.
 
+
+
+---
+
+## Protocollo operativo vincolante — revisione 10 settembre 2026
+
+### W1. Automazione e responsabilità umana
+
+
+> Le operazioni ripetitive di inventario, assegnazione ID, creazione cartelle, trasferimento, naming, esecuzione, raccolta metriche ed esportazione sono eseguite da strumenti ripetibili. L’umano fornisce giudizi musicali e risolve ambiguità; tali decisioni sono registrate dagli strumenti. Nessuna promozione a validato o ammesso al task deriva dal solo successo tecnico di uno script. Le correzioni manuali necessarie sono conservate come annotazioni o patch tracciate, non come modifiche anonime ai derivati.
+
+Non promettere che ogni errore musicale sia automatizzabile. Le eccezioni utili diventano regressioni; non costringere l’utente a gestire cartelle, CSV o centinaia di file a mano.
+
+### W2. Identità: file, composizione, esecuzione e artefatto
+
+Distinguere almeno:
+
+- `sourceCollectionId`: raccolta di provenienza;
+- `sourceRecordId`: identità del record sorgente, coerente con NDR-041 e gli schemi esistenti;
+- `compositionFamilyId`: composizione e sue versioni, usata per grouping/split;
+- `sourceAssetId`: file acquisito, con nome originale, URI/percorso relativo, SHA256, formato e metadata audio;
+- `runId`: esecuzione con input, strumenti e configurazione identificabili;
+- `artifactId`: output di un run e relativi parent.
+
+Definire la corrispondenza di `sourceBeatId` con lo schema esistente prima di introdurre alias. Non rinumerare gli ID al riordino della cartella. Nuovi file ricevono nuove identità persistite; gli ID non vengono riciclati. Il titolo è solo un’etichetta.
+
+131 è il numero di file attualmente inventariati, non una quantità hardcoded, né il numero verificato di composizioni indipendenti. WAV e MP3 dello stesso brano possono appartenere alla stessa famiglia pur avendo hash diversi. SHA256 identifica uguaglianza dei byte; una proposta di raggruppamento musicale richiede evidenza ulteriore. Famiglia incerta: revisione prima del manifest task-specifico.
+
+### W3. Workspace e naming
+
+Usare un parametro `WorkspaceRoot`. `D:\FAME_NEURAL` è un esempio configurabile: non presumere disco D disponibile. Workspace fuori da repo e cartelle temporanee. Originali non modificati o rinominati sullo storage sorgente; eventuale copia locale conserva i byte ed è verificata con hash. Un MP3 non viene rinominato `.wav`.
+
+Struttura logica proposta: `manifest/`, `sources/<sourceAssetId>/`, `runs/<runId>/<sourceRecordId>/{stems,midi,qa}/`, `exports/<releaseId>/`. Ogni cartella può avere un titolo leggibile aggiuntivo, ma l’identità risiede nel manifest. È accettabile anche la struttura per beat già proposta, purché contenga run separati e non un’unica cartella MIDI sovrascritta.
+
+Nome derivato proposto: `<sourceRecordId>_<role>_<runId>.mid`. `v1` da solo non identifica strumenti e parametri. Il manifest conserva converter commit/versione, modello/checksum, configurazione/hash, schema/mapping, input/hash e dipendenze. Evitare percorsi assoluti del singolo PC come unica referenza condivisa.
+
+Definire persistenza e recupero di manifest, feedback e output approvati: fuori da Git non deve significare unica copia temporanea. Audio/stems pesanti fuori dal repository; manifest e report committati sono snapshot privi di credenziali e URL temporanei.
+
+### W4. Bootstrap ripetibile, incrementale e recuperabile
+
+Il bootstrap inventaria e prepara; non avvia automaticamente conversione o training. Prevedere preview delle operazioni, controllo spazio, errori leggibili, supporto a nomi Windows problematici, ripresa da interruzione e protezione da due processi che aggiornano insieme il registro.
+
+Seconda esecuzione sugli stessi input: stessi ID, nessun duplicato, nessuna sovrascrittura di feedback. Un file aggiunto non cambia gli ID precedenti. Un file modificato non eredita silenziosamente la validazione del vecchio contenuto. Scritture manifest/output completate in modo atomico; tentativi falliti registrati senza marchiarli come conclusi. I consumer leggono il manifest del run, non tutti i file trovati ricorsivamente nella directory.
+
+Prove di accettazione necessarie: doppio avvio; aggiunta/rinomina sorgente; doppio byte-identico; due formati della stessa famiglia; interruzione durante copia; file modificato; collisione nome; output preesistente; feedback conservato. Usare fixture piccole, senza elaborare 131 audio per provare il bootstrap.
+
+### W5. Un registro canonico, CSV come vista
+
+Contratto implementato per il bootstrap: manifest JSON versionato e validato dallo schema, aggiornato dagli strumenti; CSV generato per consultazione. Niente due fonti modificabili indipendentemente. Le revisioni umane entrano da un comando/modulo che aggiorna il registro e rigenera il CSV.
+
+Campi minimi: identità/parent, nome e hash sorgente, disponibilità MIDI/DAW/stems nativi, metadata tecnici, dominio musicale con evidenza, provenance/rights già dichiarati, famiglia/split, run/configurazione, artefatti, stato per ruolo, QA/feedback, ammissibilità per task, versione schema. Valori sconosciuti espliciti, non inventati.
+
+### W6. Stati separati, senza validazione globale implicita
+
+Separare stato esecuzione (`PENDING/RUNNING/SUCCEEDED/FAILED`), valutazione del ruolo (`NOT_PROCESSED/DRAFT/NEEDS_REVIEW/VALIDATED/REJECTED`) e ammissibilità task con gli enum già ufficiali (`allowed/candidate/unknown/...`). Registrare inoltre ruolo assente confermato e ruolo non valutato come condizioni distinte.
+
+`VALIDATED` vale per esatto input, artefatto, ruolo, run e protocollo QA. Drums validati non promuovono automaticamente basso, tonale o FULL. `TASK_DATA_READY` è un gate task-specifico già previsto dal progetto, non l’ultimo stato automatico del workflow di copia/conversione. Una nuova versione diventa candidata alla sostituzione, non eredita il verdetto precedente.
+
+### W7. Tassonomia e vista combinata
+
+Separare gli stem prodotti dal separatore dai ruoli musicali. `DRUMS` può già includere kick/percussioni; `BASS` può contenere attacchi ambigui. Non imporre che ogni beat produca tutte le tracce.
+
+Ogni evento possiede un’identità canonica. Le viste KICK/PERCUSSION possono essere proiezioni del drum event set; FULL non concatena DRUMS+KICK duplicando gli stessi eventi. Non eliminare invece colpi distinti solo perché simultanei. Un FULL parziale dichiara i ruoli inclusi e mancanti; non è implicitamente un arrangiamento completo.
+
+Conservare un’origine temporale comune, sample rate, eventuale trimming/padding, tempo map e trasformazioni. Nessuna rimozione indipendente del silenzio iniziale degli stem senza registrare l’offset.
+
+### W8. Pilot e ordine di lavorazione
+
+Prima inventario e verifica disponibilità di export nativi. Poi 5–10 famiglie diversificate per tempo, densità, low-end, articolazioni e difficoltà. Non scegliere Brazy solo perché primo nome disponibile. Questo lotto è sviluppo: non usarlo anche come prova finale di generalizzazione.
+
+Definire famiglie riservate alla valutazione e criteri prima del tuning. Il pilot drums/low-end non obbliga ad attendere la soluzione tonale per ogni avanzamento drum. Congelare la prima pipeline ammessa al batch solo dopo i risultati; documentare configurazioni e limiti. La separazione per gruppi e il rischio di tuning sul test sono sostenuti dalla [documentazione scikit-learn](https://scikit-learn.org/stable/modules/cross_validation.html). La scelta concreta del gruppo resta task-specifica.
+
+### W9. QA e promozione
+
+Recepire le correzioni della revisione precedente: un attacco dell’808 non prova un kick separato; niente anchoring universale né offset fisso universale. Il conteggio di coincidenze dopo un allineamento non misura la fedeltà della trascrizione.
+
+Servono riferimenti controllati, metriche evento per ruolo (precision/recall/F1), errore onset, pitch/offset del basso, articolazioni, confusioni drum, struttura/allineamento tra tracce, errori sfuggiti ai flag, tempo manuale per minuto audio. Misurare fidelity separatamente dalla musicalità del rendering; confidence non calibrata non è probabilità di correttezza. Controllare anche campioni non segnalati.
+
+Definire soglie per il task nella ricerca di apertura del pilot, prima del confronto; qui non inventiamo numeri universali. [mir_eval](https://mir-eval.readthedocs.io/latest/api/transcription.html) fornisce matching e metriche di riferimento. Il gate richiede evidenze tecniche, ascolto previsto dal protocollo, provenance e policy task `allowed`. Ruoli insufficienti restano sperimentali.
+
+### W10. Lezioni, rigenerazione e augmentation
+
+Registrare anche failure locali importanti, senza aspettare che diventino regole generali. Etichettare ogni conclusione: osservazione, ipotesi candidata, verificata sul pilot, adottata, sostituita. Associare input/output/hash/config e feedback. Gli esperimenti passati restano datati; non cancellare risultati negativi.
+
+Una modifica al convertitore crea un nuovo run. Rigenerare automaticamente i derivati interessati dalle dipendenze; mantenere quelli approvati fino a confronto e nuova accettazione. Non rilanciare inutilmente separazione se cambia solo un exporter, e non applicare automaticamente vecchie correzioni manuali a eventi non più corrispondenti.
+
+Augmentation coordinata quando il task richiede relazioni armoniche/ritmiche. Registrare parent e trasformazione; derivati nello stesso split della famiglia. Aggiunte di fill/ghost note sono materiale sintetico, non eventi osservati nell’audio sorgente.
+
+La tracciabilità proposta segue i concetti di input, output e attività dei [workflow RO-Crate](https://www.researchobject.org/ro-crate/specification/1.2/workflows.html); non richiede introdurre oggi l’intero standard o un nuovo sistema complesso.
+
+
+## Implementazione disponibile e limiti
+
+Il bootstrap Node `owned-beats/bootstrap.js`, con wrapper PowerShell, implementa inventario ricorsivo WAV/MP3, hash streaming, ID persistenti, dedup byte-identico, preview, copie verificate, lock, controllo spazio, manifest JSON/CSV e ripresa senza sovrascrivere feedback. Non analizza BPM/durata, non assegna famiglie musicali, non converte audio e non valida MIDI. I metadata non analizzati e le famiglie restano esplicitamente da revisionare. SourceRecordId identifica per ora il record di acquisizione byte-unico; `sourceBeatId` è deprecato come alias ambiguo, mentre `compositionFamilyId` rappresenta il brano e le sue versioni.
+
+Tutte le operazioni sul manifest devono passare dagli strumenti. La futura interfaccia di review/import decisioni è un requisito prima del pilot, non una funzionalità già implementata dal bootstrap. Nessuna compilazione manuale ripetitiva dei CSV è richiesta. Non si produce ancora un corpus task-ready.
+
+Un lock rimasto dopo arresto forzato richiede verificare che nessun bootstrap sia in esecuzione prima di rimuoverlo; non viene eliminato automaticamente. Il bootstrap rifiuta symlink nelle sorgenti; usa cartelle di lavoro ordinarie. Le copie verificate dopo un’interruzione possono essere riutilizzate. Manifest e feedback vanno conservati con il workspace su storage persistente con backup.
+
+Versioni del convertitore, review e QA potranno essere registrate soltanto quando i relativi strumenti esistono: non anticipare stati di successo.

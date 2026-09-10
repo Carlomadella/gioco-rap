@@ -552,3 +552,13 @@ Regole:
 Sul campione GMD reale il Block1 conserva 2382/2382 hit, 15 note MIDI uniche e 65 lane/frame con multi-hit. Le 8 proiezioni marcate al bordo conservano raw timing e nearest-step originale e vengono trattate come evidenza che la boundary policy non è ancora congelata.
 
 Questa decisione restringe la rappresentazione del **dataset/task view**, non anticipa il formato interno del futuro modello.
+
+## NDR-045 — Owned-beats: automazione, fedeltà e promozione per task
+
+Data: 10 settembre 2026. Stato: adottata come contratto operativo; conversione/pilot non ancora eseguiti.
+
+Si recepisce il protocollo W1–W10 del playbook: operazioni ripetitive automatizzate; originali intatti; identità asset/record/famiglia/run/artefatto distinte; manifest canonico; stati tecnici, QA per ruolo e ammissibilità separati. NDR-041/042/043/044 restano in vigore. Famiglie ignote, mapping ambiguo o eventi non dimostrati non sono promossi automaticamente. La coincidenza kick–808 dopo anchoring non prova fedeltà; il pilot misura omissioni, falsi positivi, timing, pitch e costo di correzione.
+
+Le lezioni del prototipo diventano candidate con evidenze, poi regole adottate dopo verifica; la rigenerazione conserva versioni e revisioni. FULL deriva da eventi identificati e non somma viste sovrapposte. I derivati condividono lo split della famiglia; augmentation coerente col task.
+
+Owned-beats è candidata operativa per parti abbinate, non corpus già ammesso. GMD generale e HH-TRP candidata restano nel percorso ufficiale. Bootstrap disponibile per inventario/copia soltanto; training chiuso; Block2 7D da iniziare.

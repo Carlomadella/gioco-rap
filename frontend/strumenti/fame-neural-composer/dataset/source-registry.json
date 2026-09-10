@@ -1,7 +1,7 @@
 {
   "schema": "fame-neural-source-registry-v1",
   "version": 1,
-  "updatedAt": "2026-09-08",
+  "updatedAt": "2026-09-10",
   "policy": {
     "statusMeaning": {
       "green": "commercial training allowed after source-specific adapter/filter",
@@ -983,6 +983,51 @@
         "autoDownload": false,
         "assets": []
       }
+    },
+    {
+      "id": "fame-owned-beats-v1",
+      "name": "FAME Owned Beats — inventory candidate",
+      "status": "yellow",
+      "stratum": "audio_style",
+      "dataKinds": [
+        "audio"
+      ],
+      "formats": [
+        "wav",
+        "mp3"
+      ],
+      "roles": [
+        "drums",
+        "808",
+        "harmony",
+        "lead"
+      ],
+      "originClass": "owner_declared_production",
+      "creator": "@inarteless / proprieta dichiarata dall’utente",
+      "license": {
+        "dataset": "owner-declared",
+        "outputs": "subject-to-record-provenance"
+      },
+      "rights": {
+        "commercialTrainingAllowed": true,
+        "commercialOutputAllowed": true,
+        "trainingBasis": "pending-operational-review"
+      },
+      "verification": {
+        "level": "pending",
+        "evidence": [
+          "FAME_OWNED_BEATS_AUDIO_TO_MIDI_PLAYBOOK.md: dichiarazione proprietà; inventario fisico 131 file verificato il 2026-09-10; record/famiglie da inventariare"
+        ]
+      },
+      "pipeline": {
+        "currentSymbolic": false,
+        "requiresAdapter": true
+      },
+      "download": {
+        "autoDownload": false,
+        "assets": []
+      },
+      "notes": "Yellow indica intake/provenance per record da completare, non revoca della dichiarazione utente. Nessun download automatico. Validazione musicale e ammissibilita task ancora da dimostrare."
     }
   ]
 }

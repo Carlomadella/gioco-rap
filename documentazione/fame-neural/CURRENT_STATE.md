@@ -61,7 +61,7 @@ Verifica reale sul corpus dopo le 2 esclusioni umane:
 
 Il Blocco 2 chiude il collegamento **contratto → corpus reale → overlay/consumer → audit**.
 
-Restano aperti per completare 7A, coerentemente con NDR-035:
+Fotografia storica, superata dalla chiusura 7A riportata sotto: erano aperti, coerentemente con NDR-035:
 
 1. ammissibilità task-specifica;
 2. enforcement nel percorso reale selezione/export;
@@ -630,18 +630,12 @@ dataset Trap/Drill potenzialmente utile per drum specialization, ma di natura al
 
 ## Prossimo intervento ufficiale
 
-**FASE 7 — TASK DATA RESET + DRUM DATASET V2**
+**7D Block1 chiuso e pushato; 7D Block2 — Grouping + Candidate Manifest Design DA INIZIARE.**
 
-Ordine:
+1. Integrare hardening exporter e protocollo owned-beats con le verifiche indicate in `HARDENING_OWNED_BEATS_2026-09-10.md`.
+2. Ricerca di apertura Block2: definire generalizzazione per sessione/per drummer e compatibilità dei template; confrontare copertura e distribuzioni prima di scegliere la policy.
+3. Costruire manifest candidati riproducibili, preservando sourceSplit e separandolo dal taskSplit; ricerca di chiusura sullo scope effettivamente verificato.
+4. Owned-beats: bootstrap di inventario disponibile, pilot drums/low-end da progettare; famiglie, export nativi, QA e strumenti di review ancora da completare prima della conversione.
+5. HH-TRP resta candidata secondo roadmap; owned-beats entra come candidata per parti abbinate. Nessuna sostituzione automatica delle priorità; GMD resta generale.
 
-1. ricerca di apertura del completamento 7A: requisiti di ammissibilità per task, percorsi reali e prove consentito/bloccato/unknown;
-2. completare enforcement selezione/export e fedeltà sorgente per Drum View, con verifiche pertinenti;
-3. verificare fonti Trap e disponibilità di parti abbinate per otto barre; espandere GMD per groove generale e auditare HH-TRP;
-4. chiudere boundary/loopability recuperando il vecchio diagnostico o identificandone uno nuovo; PDMX quality-aware per i task pertinenti;
-5. definire pool, split, input disponibili all'inferenza, campionamento, criteri musicali, budget e casi inconcludenti prima del benchmark;
-6. blind data gate e ricerca di chiusura; solo dopo apertura del Drum Core previsto;
-7. confronto precoce su otto barre, con alternative di accorpamento e interazioni tra parti. Sonic Pi resta facoltativo e non blocca la Drum Dataset V2.
-
-Il **Neural Planner V0 resta rinviato**.
-
-Nessun training serio viene aperto per compensare un problema di dati.
+Training serio chiuso; DRUM DATA READY V2 non superato; Planner rinviato. Non servono nuove fasi per questi fix.
