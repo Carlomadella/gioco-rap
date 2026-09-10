@@ -111,8 +111,8 @@ testo dell'interfaccia che mostrava «20 energia» è sparito insieme al conto. 
 «Cerca un beat» allo Shop, che non costava energia già prima.
 
 15. Scrivere barre in studio non deve dare nessun malus, né di stanchezza né fisico,
-NESSUNO. Lasciamo solo che costi 15 di energia, per ora. Non toccare nient'altro di quello
-che c'era già.
+    NESSUNO. Lasciamo solo che costi 15 di energia, per ora. Non toccare nient'altro di quello
+    che c'era già.
 
 **FATTO (10/09/2026)** — tolto il calo di benessere (−1) che scattava chiudendo una strofa
 scritta al foglio (`chiudiStrofa` in `js/game/writer.js`): scrivere barre non stanca più.
@@ -237,6 +237,8 @@ NETWORK 64
 7. marketing deve essere dopo timing
 
 8. non posso spingere una canzone che non è ancora uscita, al massimo faccio uscire una preview
+
+9. Come nell'interfaccia dei beatmaker, nella sezione dove si posta il pezzo per hype' non fa cliccare su nessun pezzo se non su quello già selezionato.
 
 /_ DA DISCUTERE _/
 
