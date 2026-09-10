@@ -21,7 +21,7 @@
 /* ---- il marchio ---- */
 .brand{display:inline-flex;align-items:center;gap:9px;padding:3px 8px 3px 3px;border-radius:12px;
   transition:background .15s,transform .12s}
-.brand:hover{background:rgba(255,255,255,.06)}
+@media (hover:hover){.brand:hover{background:rgba(255,255,255,.06)}}
 .brand:active{transform:scale(.97)}
 .bmark{width:32px;height:32px;flex:none;display:block}
 .bmark svg{width:100%;height:100%;display:block}
@@ -31,35 +31,51 @@
 .bword{font-family:var(--cond);font-size:18px;font-weight:700;letter-spacing:.1em;
   text-transform:uppercase;color:rgba(255,255,255,.66);white-space:nowrap;line-height:1}
 .bword b{font-weight:800;color:#fff}
-@media (max-width:520px){.bword{display:none}}
 
 .navback{display:inline-flex;align-items:center;gap:7px;font-family:var(--cond);font-size:14px;
   font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#0B0B0D;
   padding:8px 16px;border-radius:999px;background:#fff;border:none;
   transition:background .15s,border-color .15s,transform .12s}
-.navback:hover{background:#E9E9EE;transform:translateX(-2px)}
+@media (hover:hover){.navback:hover{background:#E9E9EE;transform:translateX(-2px)}}
 .navback .arw{font-size:17px;line-height:1;margin-top:-2px}
 .navback[hidden],.avatarbtn[hidden],.ghost[hidden]{display:none}
+
+/* ---- punto 15: muta/smuta la musica dal menu principale ---- */
+.brand-mute{width:36px;height:36px;border-radius:50%;flex:none;display:grid;place-items:center;
+  background:#1A1A20;border:2px solid rgba(255,255,255,.18);color:rgba(255,255,255,.75);
+  transition:border-color .15s,transform .15s,color .15s;
+  /* sulla landing .topnav ha pointer-events:none (css/landing.css, «sul menu non
+     c'è niente sopra»): senza questo il bottone si vede ma non si può toccare */
+  pointer-events:auto}
+@media (hover:hover){.brand-mute:hover{border-color:#fff;color:#fff;transform:scale(1.06)}}
+.brand-mute:active{transform:scale(.94)}
+.brand-mute svg{width:18px;height:18px;display:block}
+/* niente hidden sull'svg: su alcuni Chrome .hidden non riflette l'attributo
+   per gli elementi SVG (verificato) — l'interruttore è aria-pressed */
+.brand-mute .bmute-off{display:none}
+.brand-mute[aria-pressed="true"]{color:rgba(255,255,255,.4);border-color:rgba(255,255,255,.1)}
+.brand-mute[aria-pressed="true"] .bmute-on{display:none}
+.brand-mute[aria-pressed="true"] .bmute-off{display:block}
 
 /* ---- il cerchio dell'avatar ---- */
 /* Ci sta sempre la faccia dell'artista dell'utente, anche prima che abbia un
    nome: A ha comunque un aspetto completo, e quello si mostra. */
 .avatarbtn{width:36px;height:36px;border-radius:50%;overflow:hidden;flex:none;position:relative;
   background:#1A1A20;border:2px solid rgba(255,255,255,.18);transition:border-color .15s,transform .15s}
-.avatarbtn:hover{border-color:#fff;transform:scale(1.06)}
+@media (hover:hover){.avatarbtn:hover{border-color:#fff;transform:scale(1.06)}}
 .avatarbtn svg{position:absolute;left:50%;top:6%;height:150%;transform:translateX(-50%)}
 
 .menu{max-width:1040px;margin:0 auto;padding:6px 22px 90px}
 .mrow{display:flex;align-items:center;gap:14px;background:var(--card);border-radius:var(--r);
   padding:18px 20px;text-align:left;transition:background .15s,transform .12s}
-.mrow:hover{background:var(--card-2);transform:translateY(-2px)}
+@media (hover:hover){.mrow:hover{background:var(--card-2);transform:translateY(-2px)}}
 .mrow .ic{width:44px;height:44px;border-radius:13px;flex:none;display:grid;place-items:center;
   font-size:20px;font-weight:900;color:#0B0B0D}
 .mrow .tx{min-width:0;display:flex;flex-direction:column;gap:3px}
 .mrow .tx .a{display:block;font-size:17px;font-weight:800;letter-spacing:-.015em}
 .mrow .tx .b{display:block;font-size:13px;color:var(--soft);font-weight:500}
 .mrow.big{background:#fff;color:#0B0B0D}
-.mrow.big:hover{background:#F0F0F2}
+@media (hover:hover){.mrow.big:hover{background:#F0F0F2}}
 .mrow.big .tx .b{color:rgba(11,11,13,.62)}
 .mrow.big .ic{background:#0B0B0D;color:#fff}
 
@@ -71,7 +87,7 @@
 .mcorso h2{font-size:20px;margin:0;letter-spacing:-.02em}
 .mreset{font-size:12.5px;font-weight:700;color:var(--soft);padding:8px 14px;border-radius:999px;
   background:rgba(255,255,255,.06);transition:background .15s,color .15s}
-.mreset:hover{background:rgba(255,90,54,.16);color:#FF8B6E}
+@media (hover:hover){.mreset:hover{background:rgba(255,90,54,.16);color:#FF8B6E}}
 .mreset.armato{background:var(--hot);color:#0B0B0D;font-weight:800}
 .mstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px}
 .mstat{background:var(--card-2);border-radius:14px;padding:13px 14px}
@@ -107,5 +123,5 @@
   text-transform:uppercase;color:rgba(255,255,255,.72);background:transparent;
   border:1px solid rgba(255,255,255,.18);padding:8px 14px;border-radius:999px;flex:none;
   transition:background .15s,border-color .15s,color .15s}
-.navacc:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.4);color:#fff}
-@media (max-width:520px){.navacc{padding:7px 11px;font-size:12px}}
+@media (hover:hover){.navacc:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.4);color:#fff}}
+

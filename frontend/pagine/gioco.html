@@ -24,16 +24,17 @@
 <link rel="stylesheet" href="css/base.css?v=12">
 <link rel="stylesheet" href="css/servizio.css?v=1">
 <link rel="stylesheet" href="css/preview.css?v=12">
-<link rel="stylesheet" href="css/shell.css?v=12">
+<link rel="stylesheet" href="css/shell.css?v=13">
 <link rel="stylesheet" href="css/game.css?v=16">
 <link rel="stylesheet" href="css/overlays.css?v=13">
 <link rel="stylesheet" href="css/effects.css?v=13">
 <link rel="stylesheet" href="css/hud.css?v=12">
 <link rel="stylesheet" href="css/forms.css?v=12">
-<link rel="stylesheet" href="css/creator.css?v=12">
 <link rel="stylesheet" href="css/actionbar.css?v=12">
 <link rel="stylesheet" href="css/posto.css?v=13">
-<link rel="stylesheet" href="css/studio.css?v=1">
+<link rel="stylesheet" href="css/studio.css?v=12">
+<!-- dopo studio.css: e' quello che riempie i suoi pannelli, e ne usa le variabili -->
+<link rel="stylesheet" href="css/studio-elementi.css?v=1">
 <link rel="stylesheet" href="css/abilita.css?v=1">
 <link rel="stylesheet" href="css/negozio.css?v=12">
 <link rel="stylesheet" href="css/strada-crimine.css?v=13">
@@ -42,9 +43,14 @@
 <link rel="stylesheet" href="css/telefono.css?v=13">
 <link rel="stylesheet" href="css/trasferte.css?v=1">
 <link rel="stylesheet" href="css/impostazioni.css?v=12">
+<!-- il gioco visto sul telefono: tutti i blocchi @media stretti, tirati fuori dai
+     fogli qui sopra e messi in uno solo. Va dopo tutti loro, se no non correggono
+     piu' niente, e prima di menu-sistema.css, che resta com'era (il perche' e'
+     scritto in cima a stretto.css). -->
+<link rel="stylesheet" href="css/stretto.css?v=1">
 <!-- per ultimo: le aree da toccare devono vincere sulla cascata di tutti gli altri -->
 <link rel="stylesheet" href="css/menu-sistema.css?v=11">
-<link rel="stylesheet" href="css/tocco.css?v=12">
+<link rel="stylesheet" href="css/tocco.css?v=13">
 
 </head>
 <body>
@@ -265,23 +271,21 @@
   <div class="list" data-mag="lifestyle"><h3>Le tue spese fisse</h3><div id="g-lifesum"></div></div>
   <div data-mag="lifestyle" id="g-life"></div>
 
-  <!-- il banco e la vetrina → lo Shop della mappa. Punto 4: tre reparti dietro
-       tre linguette (Attrezzatura/Beat/Vestiti), non tre liste impilate — e
+  <!-- il banco e la vetrina → lo Shop della mappa. Punto 4: i due reparti
+       attivi dietro due linguette (Attrezzatura/Beat), non due liste impilate — e
        la cassa sempre in vista, non serve più uscire per sapere quanto hai.
        Un solo `data-mag="shop"` sul contenitore: prendiDalMagazzino() lo sposta
-       intero nel pannello, coi tre reparti dentro. -->
+       intero nel pannello, coi due reparti dentro. -->
   <div class="shshop" data-mag="shop">
     <div class="shbar">
       <div class="shtabs" id="sh-tabs">
         <button class="shtab on" data-sh="gear">Attrezzatura</button>
         <button class="shtab" data-sh="beat">Beat</button>
-        <button class="shtab" data-sh="fit">Vestiti</button>
       </div>
       <span class="shcash" id="sh-cash"></span>
     </div>
     <div class="shsec on" data-shsec="gear"><div id="g-shop" class="shgrid"></div></div>
     <div class="shsec" data-shsec="beat"><div id="g-market"></div></div>
-    <div class="shsec" data-shsec="fit"><div class="nggrid" id="g-fit"></div></div>
   </div>
 
   <!-- nessuno li apre più: li dice l'Inventario del telefono -->
@@ -327,18 +331,55 @@
 
 <!-- La Sala: il posto dove si conosce la gente. Il contenuto lo mette
      js/game/posto.js. -->
-<!-- Lo Studio (punti 10, 11, 12): le quattro stanze di un pezzo — il beat, la
-     cabina, il banco, fuori. Non rifà l'economia del gioco: chiama le stesse
-     azioni della settimana, e ci mette dentro la gente conosciuta alla Sala.
-     Il contenuto lo scrive js/game/studio.js. -->
-<div class="studio" id="studio"><div class="stwrap">
-  <div class="sthead"><div class="stk">Lo Studio</div>
-    <div class="strisorse" id="st-risorse"></div></div>
+<!-- Lo Studio (punti 10, 11, 12 e il punto 4 di CARLO): le otto sezioni di un
+     pezzo — beat, testo, cabina, mix, cover, feat, marketing, timing. Le
+     linguette stanno **in basso**, dove sta il pollice col telefono in mano,
+     e restano ferme mentre il corpo scorre. Non rifà l'economia del gioco:
+     chiama le stesse azioni della settimana, e ci mette dentro la gente
+     conosciuta alla Sala. Il contenuto lo scrive js/game/studio.js. -->
+<div class="studio" id="studio">
+  <!-- LA FOTO, A SCHERMO INTERO. Non è più una fascia in cima: è la stanza, e
+       tutto il resto ci galleggia sopra — come nei riferimenti in
+       media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/.
+       Il velo sopra non è un vezzo: senza, su una foto piena di lampade e
+       monitor accesi i pannelli non si leggono. -->
+  <div class="stsfondo" id="st-scena"></div>
+  <div class="stvelo" aria-hidden="true"></div>
+
+  <!-- LA FASCIA IN ALTO. `.sthead` resta il nome che si aspetta
+       js/menu-sistema.js, che ci infila dentro la nav globale (il tasto
+       sistema e «torna alla mappa», 256px a sinistra) e per questo la tiene
+       `position:relative`. Quindi la fascia fissa è il guscio qui fuori. -->
+  <div class="stbarra">
+    <div class="sthead">
+      <div class="stk">Studio</div>
+      <span class="stsep" aria-hidden="true"></span>
+      <div class="stnome" id="st-nome"></div>
+      <div class="strisorse" id="st-risorse"></div>
+    </div>
+  </div>
+
+  <!-- LE TRE COLONNE: a sinistra chi c'è o cosa hai, in mezzo la cosa che
+       stai facendo, a destra quello che ti aspetta. È lo scheletro del §2 di
+       documentazione/pagine-azioni/README.md, e le colonne scorrono tutte,
+       sempre: se il contenuto cresce non sparisce. -->
+  <div class="stwrap">
+    <aside class="stcol stsx" id="st-sx"></aside>
+    <main class="stcol stmid" id="st-corpo"></main>
+    <aside class="stcol stdx" id="st-dx"></aside>
+  </div>
+
+  <!-- la riga in basso che racconta com'è andata l'ultima cosa -->
+  <div class="stbanda" id="st-banda" hidden></div>
+
+  <!-- la copertina caricata dall'utente: la prepara js/game/copertine.js -->
+  <input type="file" id="st-file" accept="image/*" hidden>
+
   <div class="sttabs" id="st-tabs"></div>
-  <div class="stscena" id="st-scena"></div>
-  <p class="stdove" id="st-dove"></p>
-  <div class="stcorpo" id="st-corpo"></div>
-</div></div>
+  <!-- «la striscia continua»: si accende solo se le linguette non ci stanno
+       tutte in larghezza. Lo decide renderStudio(), misurando. -->
+  <div class="stoltre" id="st-oltre" hidden aria-hidden="true"></div>
+</div>
 
 <div class="posto" id="posto"><div class="powrap">
   <div class="pohead"><div class="pok">La Sala</div><button class="pox" id="po-x">&#10005;</button></div>
@@ -348,14 +389,6 @@
   <div class="porete" id="po-rete"></div>
 </div></div>
 
-<!-- Il guardaroba: dalla linguetta «Vestiti» della plancia, solo equip — quello
-     che possiedi già. Si compra altrove: Catalogo → Abbigliamento, o un evento
-     in game (punto 7). Il contenuto lo mette js/game/negozio.js. -->
-<div class="negozio" id="negozio"><div class="ngwrap">
-  <div class="nghead"><div class="ngk">Il tuo guardaroba</div><button class="ngx" id="ng-x">&#10005;</button></div>
-  <p class="ngdove">Quello che indossi entra nelle foto, nelle copertine, in ogni scena. Quello che hai già sbloccato — nuovi capi si comprano al Catalogo, sotto «Abbigliamento», o arrivano da un evento.</p>
-  <div class="nggrid" id="ng-grid"></div>
-</div></div>
 
 <!-- L'ALBERO DELLE ABILITÀ (punto 13) — arriva da `abilita(11).html`.
 
@@ -563,131 +596,6 @@
   <span class="k" id="m-k"></span><h2 id="m-t"></h2><p id="m-d"></p><div id="m-opts"></div>
 </div></div>
 
-<section class="screen" id="s-profile">
-<div class="wrap avwrap">
-  <div class="avhead">
-    <div class="kicker">Anni di Fame</div>
-    <h1>Otto avatar da rapper <em>totalmente personalizzabili</em></h1>
-    <p>Parti da uno e cambia ogni elemento: capelli, cappelli, occhi, accessori, vestiti, tatuaggi.</p>
-  </div>
-
-  <!-- gli otto pronti: uno per fondale -->
-  <div class="galleria" id="galleria"></div>
-
-  <div class="grid">
-    <!-- anteprima -->
-    <div class="preview">
-      <div class="stage" id="stage">
-        <div class="stagebg" id="stagebg"></div>
-        <div class="vista"><button class="vb on" data-vista="volto">Volto</button><button class="vb" data-vista="intero">Figura intera</button></div>
-        <div id="figure"></div>
-        <div class="nameplate">
-          <div class="nm" id="pv-name">Senza Nome</div>
-          <div class="sub" id="pv-sub">&mdash;</div>
-        </div>
-      </div>
-      <div class="silh"><div id="silh"></div><div class="sc" id="silh-txt"></div></div>
-      <div class="readout">
-        <div class="line"><span>Altezza</span><span id="pv-h">178 cm</span></div>
-        <div class="line"><span>Peso</span><span id="pv-w">72 kg</span></div>
-        <div class="line"><span>Corporatura</span><span id="pv-build">normale</span></div>
-        <div class="line"><span>Vestito</span><span id="pv-fit">Hoodie</span></div>
-      </div>
-      <p class="desc" id="pv-desc"></p>
-    </div>
-
-    <!-- moduli -->
-    <div>
-      <!-- la barra: sei categorie, ogni opzione è la tua faccia con quell'elemento -->
-      <div class="catbar" id="catbar"></div>
-
-      <div class="panel">
-        <h2>Dove ti fai vedere</h2>
-        <p class="hint">Il fondale del tuo ritratto: quello che si vede dietro di te nelle foto.</p>
-        <div class="fondali" id="fondali"></div>
-      </div>
-
-      <div class="panel">
-        <h2>Identità</h2>
-        <p class="hint">Il nome con cui ti chiameranno. Puoi cambiarlo, ma i fan si affezionano.</p>
-
-        <div class="field">
-          <label for="name">Nome d'arte</label>
-          <input class="txt" id="name" maxlength="22" placeholder="Scrivi il tuo nome" autocomplete="off">
-        </div>
-
-        <div class="field">
-          <label for="city">Citt&agrave; di provenienza <span class="sub">non si cambia pi&ugrave;</span></label>
-          <input class="txt" id="city" maxlength="28" placeholder="Scrivi da dove vieni" autocomplete="off">
-        </div>
-
-        <div class="field">
-          <label>Com'&egrave; la scena dove sei cresciuto</label>
-          <div class="chips" id="scenes"></div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2>Corpo e faccia</h2>
-        <p class="hint">Cambia solo come appari e come ti descrivono. Nessun bonus, nessun malus.</p>
-        <div class="field">
-          <label>Carnagione</label>
-          <div class="swatches" id="skins"></div>
-        </div>
-        <div class="field">
-          <label for="h">Altezza</label>
-          <div class="slider"><input type="range" id="h" min="155" max="205" value="178"><span class="val" id="hv">178 cm</span></div>
-        </div>
-        <div class="field">
-          <label for="w">Peso</label>
-          <div class="slider"><input type="range" id="w" min="45" max="140" value="72"><span class="val" id="wv">72 kg</span></div>
-        </div>
-        <div class="field">
-          <label>Forma del viso</label>
-          <div class="chips" id="faces"></div>
-        </div>
-        <div class="field">
-          <label>Bocca</label>
-          <div class="chips" id="mouths"></div>
-        </div>
-        <div class="field">
-          <label>Espressione <span class="sub">come ti presenti al mondo</span></label>
-          <div class="chips" id="moods"></div>
-        </div>
-        <div class="field">
-          <label>Colore principale <span class="sub">tinge tutto il gioco</span></label>
-          <div class="swatches" id="colors"></div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2>Il tuo stile</h2>
-        <p class="hint">Il genere che fai. Da dove parti: puoi cambiare strada pi&ugrave; avanti, ma perdi parte del pubblico.</p>
-        <div class="genres" id="genres"></div>
-      </div>
-
-      <div class="effects">
-        <h2>Che artista sei</h2>
-        <div id="effects"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="bar">
-  <div class="in">
-    <div class="who">
-      <div class="a" id="bar-name">Senza Nome</div>
-      <div class="b" id="bar-sub">Completa il nome per iniziare</div>
-    </div>
-    <span class="saved" id="saved" hidden>Salvato</span>
-    <button class="ghost" id="to-menu">Menu principale</button>
-    <button class="ghost" id="rand">Casuale</button>
-    <button class="solid" id="save" disabled>Salva artista</button>
-  </div>
-</div>
-</section>
-
 <!-- Script classici, caricati in ordine: ogni file usa quello che viene prima. -->
 <script src="js/core.js?v=12"></script>
 <!-- Dove stanno le tre pagine e come si passa dall'una all'altra. -->
@@ -709,12 +617,8 @@
 <script src="js/creator/data.js?v=15"></script>
 <script src="js/creator/state.js?v=15"></script>
 <script src="js/creator/portrait.js?v=15"></script>
-<script src="js/creator/avatar-presets.js?v=12"></script>
-<script src="js/creator/options.js?v=15"></script>
-<script src="js/creator/render.js?v=12"></script>
-<script src="js/creator/events.js?v=12"></script>
 <script src="js/creator/nav.js?v=14"></script>
-<script src="js/creator/rpg-v24-bridge.js?v=2"></script>
+<script src="js/creator/rpg-v24-bridge.js?v=5"></script>
 
 <!-- Partita -->
 <script src="js/game/state.js?v=12"></script>
@@ -722,7 +626,7 @@
 <script src="js/game/beats.js?v=12"></script>
 <script src="js/game/covers.js?v=12"></script>
 <script src="js/game/rivals.js?v=12"></script>
-<script src="js/game/actions.js?v=14"></script>
+<script src="js/game/actions.js?v=15"></script>
 <script src="js/game/events.js?v=12"></script>
 <script src="js/game/phases.js?v=12"></script>
 <script src="js/game/sim.js?v=13"></script>
@@ -733,25 +637,27 @@
 <script src="js/game/modal.js?v=12"></script>
 <script src="js/game/scene-art.js?v=13"></script>
 <script src="js/game/beatplay.js?v=12"></script>
-<script src="js/game/ui.js?v=19"></script>
+<script src="js/game/ui.js?v=20"></script>
 <script src="js/game/lifestyle.js?v=12"></script>
 <script src="js/game/fx.js?v=14"></script>
 <script src="js/game/entry.js?v=1"></script><!-- ADF_AUDIO_ENTRY_PAGE_V1 -->
 <script src="js/game/skip.js?v=14"></script>
 <script src="js/game/posto.js?v=14"></script>
-<script src="js/game/studio.js?v=3"></script>
+<script src="js/game/studio.js?v=13"></script>
+<!-- subito dopo: le schede dei beat, le take, i cursori del banco e il quando -->
+<script src="js/game/studio-elementi.js?v=1"></script>
 <script src="js/game/abilita.js?v=1"></script>
 <script src="js/game/strada.js?v=12"></script>
 <script src="js/game/strada-crimine.js?v=14"></script>
-<script src="js/game/negozio.js?v=14"></script>
+<script src="js/game/negozio.js?v=15"></script>
 <script src="js/game/uscita.js?v=12"></script>
 <script src="js/game/hub.js?v=19"></script>
 <script src="js/game/chat.js?v=13"></script>
 <script src="js/game/telefono.js?v=15"></script>
 
 <!-- Integrazione tempo/eventi/crime 2026-09-02 — ordine intenzionale -->
-<script src="js/game/tempo.js?v=13"></script>
-<script src="js/game/orari.js?v=11"></script>
+<script src="js/game/tempo.js?v=14"></script>
+<script src="js/game/orari.js?v=12"></script>
 <script src="js/game/spostamenti.js?v=8"></script>
 <script src="js/game/interruzioni.js?v=8"></script>
 <!-- Eventi V2 prima di eventi-tempo: proprietario di skip e Notifiche. -->
@@ -775,7 +681,7 @@
 <script src="js/game/mappa-luce.js?v=1"></script>
 
 <!-- Il pannello delle impostazioni: per ultimo, tocca roba definita ovunque. -->
-<script src="js/impostazioni-ui.js?v=14"></script>
+<script src="js/impostazioni-ui.js?v=15"></script>
 <script src="js/menu-sistema.js?v=9"></script>
 
 <!-- L'ingresso in partita, per ultimo di tutti: legge dall'indirizzo come si è

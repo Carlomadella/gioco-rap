@@ -1,0 +1,152 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-8314D9E40279",
+  "origin": "legacy",
+  "title": "Scenari veri, uguali nella forma e diversi nelle circostanze",
+  "category": "06-mondo-e-personaggi",
+  "source": {
+    "point": "54",
+    "text": "Scenari veri, uguali nella forma e diversi nelle circostanze",
+    "file": "implementazioni/06-mondo-e-personaggi.md",
+    "source_status": "in_parte",
+    "source_status_raw": "in parte"
+  },
+  "audit_state": "audited",
+  "verified_status": "in_progress",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "Task canonica sugli incontri stradali con forma comune e circostanze differenti.",
+  "current_state": [
+    "frontend/js/game/strada.js: INCONTRI usa una forma comune di scena e opzioni per fan, hater, opp, giornalista, amici, manager e nemico.",
+    "Le circostanze comuni usano dati reali: G.rivals, G.manager, settimane di carriera e postaEvento() per LaFamegram.",
+    "La fonte storica e il codice segnalano due limiti: il manager non ha stato ex-manager e gli amici precedenti non hanno un elenco persistente."
+  ],
+  "systems": [
+    "frontend/js/game/strada.js",
+    "frontend/js/game/sim.js",
+    "frontend/js/game/telefono.js",
+    "frontend/js/game/state.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/strada.js",
+    "frontend/js/game/sim.js",
+    "frontend/js/game/telefono.js",
+    "frontend/js/game/state.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Gli incontri stradali condividono una scena decisionale ma presentano circostanze e conseguenze differenti.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/strada.js: INCONTRI e mostraIncontro() riusano il formato t/d/opts con sette id e risultati distinti."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Gli incontri applicano requisiti, livelli di rischio e risultati collegati allo stato reale della carriera.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/strada.js: req() consulta G.fans, G.hype, G.rivals, G.manager e totalWeeks(); provaIncontro() gestisce liv basso/medio/alto e SALTO_STOP."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Esistono circostanze persistenti per un ex manager e per amicizie precedenti, non solo facce generate al momento.",
+      "verification": "code_audit",
+      "status": "pending",
+      "evidence": [
+        "frontend/js/game/strada.js: manager usa solo !!G.manager e amici solo totalWeeks(); non sono presenti stato di separazione o lista di amicizie storiche."
+      ]
+    },
+    {
+      "id": "AC4",
+      "description": "Gli incontri e i loro esiti risultano vari e comprensibili durante un percorso di gioco reale.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/strada.js: strScenaFan() combina luoghi e comportamenti e mantiene storico; manca una nuova evidenza manuale dell'intero percorso."
+      ]
+    }
+  ],
+  "risks": [
+    "Aggiungere stato storico agli incontri senza migrazione può rompere salvataggi già esistenti.",
+    "Aumentare la casualità senza conservare i gate di livello può rendere gli incontri frequenti o sproporzionati."
+  ],
+  "notes": [],
+  "plan": {
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Conservare il formato comune già implementato e colmare solo gli stati storici mancanti prima del playtest.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Forma e circostanze attuali",
+        "objective": "Mantenere scene, requisiti, livelli e risultati già collegati alla carriera.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/strada.js",
+          "frontend/js/game/sim.js",
+          "frontend/js/game/telefono.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/strada.js",
+          "frontend/js/game/sim.js",
+          "frontend/js/game/telefono.js"
+        ],
+        "acceptance_criteria": [
+          "AC1",
+          "AC2"
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "V2",
+        "title": "Memoria delle relazioni",
+        "objective": "Aggiungere solo gli stati persistenti necessari per ex manager e amicizie precedenti, con compatibilità dei salvataggi.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "frontend/js/game/strada.js",
+          "frontend/js/game/state.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/strada.js",
+          "frontend/js/game/state.js"
+        ],
+        "acceptance_criteria": [
+          "AC3"
+        ],
+        "status": "planned"
+      },
+      {
+        "id": "V3",
+        "title": "Percorso e varietà",
+        "objective": "Provare gli incontri normali e quelli durante il salto, verificando che la varietà resti leggibile e bilanciata.",
+        "depends_on": [
+          "V2"
+        ],
+        "systems": [
+          "frontend/js/game/strada.js",
+          "frontend/js/game/telefono.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/strada.js",
+          "frontend/js/game/telefono.js"
+        ],
+        "acceptance_criteria": [
+          "AC4"
+        ],
+        "status": "needs_validation"
+      }
+    ],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

@@ -1,0 +1,71 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-C0CE37354C6F",
+  "origin": "legacy",
+  "title": "I bordi delle aree cliccabili sulla mappa",
+  "category": "01-mappa-e-citta",
+  "source": {
+    "point": "—",
+    "text": "I bordi delle aree cliccabili sulla mappa",
+    "file": "implementazioni/01-mappa-e-citta.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "verified_status": "needs_validation",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "current_state": [
+    "Le aree della mappa usano sagome e poligoni in frontend/js/game/hub.js.",
+    "frontend/css/hub.css implementa angoli corti, ombra, stato hover e comportamento touch."
+  ],
+  "systems": [
+    "frontend/js/game/hub.js",
+    "frontend/css/hub.css",
+    "frontend/strumenti/audit-regressioni.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/hub.js",
+    "frontend/css/hub.css",
+    "frontend/css/tocco.css",
+    "frontend/strumenti/audit-regressioni.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Le zone cliccabili seguono la sagoma dell'edificio invece di un rettangolo generico.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/hub.js: HUB_SAGOME definisce i poligoni delle aree e il rendering usa la sagoma."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il bordo comunica l'area senza coprire la foto e resta visibile sui dispositivi touch.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "manual: implementazioni/01-mappa-e-citta.md, sezione 'I bordi delle aree cliccabili sulla mappa', riporta prove Chrome ma richiede controllo visuale futuro."
+      ]
+    }
+  ],
+  "risks": [
+    "Un cambio di scala o di coordinate puo' disallineare sagome e cartelli della foto."
+  ],
+  "notes": [
+    "Il requisito e' visivo: l'audit non sostituisce la prova su mouse e touch."
+  ],
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "audit_state": "audited"
+}

@@ -20,6 +20,21 @@
   const vai = q.get("vai") || "";
   const nuova = q.get("nuova") || "";
 
+  /* ADF_SLOT_NO_OVERWRITE_V1 */
+  function annullaNuovoSlot(){
+    if(!nuova || (A && A.name && A.name.trim())) return false;
+    try{
+      localStorage.removeItem(CHIAVE_ARTISTA());
+      localStorage.removeItem(CHIAVE_PARTITA());
+      return true;
+    }catch(e){
+      console.error("[ADF] Pulizia slot provvisorio fallita",e);
+      return false;
+    }
+  }
+
+  window.ADF_ANNULLA_NUOVO_SLOT = annullaNuovoSlot;
+
   function audioPregame(){
     if(!window.ADF_AUDIO) return;
     ADF_AUDIO.setMode("pregame");
@@ -110,11 +125,12 @@
   }
 
   /* -------------------------------------------------------
-     Provider temporaneo.
+     Provider temporaneo SOLO per Avvio rapido.
 
-     Il vecchio editor locale NON viene più aperto.
-     Quando arriverà MakeHuman sostituiremo soltanto questo
-     piccolo adattatore.
+     La nuova partita normale usa il provider reale scelto
+     nel creator (Avaturn oppure MakeHuman). Il preset base
+     resta qui soltanto per saltare la creazione nell'avvio
+     rapido.
      ------------------------------------------------------- */
 
   function installaPresetTemporaneo(frame){
@@ -197,10 +213,7 @@
         "click",
         () => {
           if(A.name.trim()) return;
-
-          try{
-            localStorage.removeItem(CHIAVE_PARTITA());
-          }catch(e){}
+          annullaNuovoSlot();
         },
         true
       );
@@ -221,7 +234,8 @@
       if(frame) frame.style.visibility = "hidden";
 
       quandoCreatorPronto(f => {
-        installaPresetTemporaneo(f);
+        /* Nel flusso normale non installiamo più il placeholder:
+           il creator apre davvero Avaturn oppure MakeHuman. */
         f.style.visibility = "";
       });
 

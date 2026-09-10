@@ -145,6 +145,21 @@ function nomeBranchMerge() {
         if (match) return match[1];
     } catch {}
 
+    // Il reflog dura poco: basta un checkout dopo il merge e il nome sparisce, e il
+    // messaggio del merge non e' sempre quello che scrive git. Il ramo pero' e' ancora
+    // li': e' il branch che finisce sul secondo genitore del merge.
+    try {
+        const secondo = git(["rev-parse", "HEAD^2"]);
+        const righe = git(["branch", "-a", "--format=%(refname:short) %(objectname)"]);
+
+        for (const riga of righe.split("\n")) {
+            const [nome, hash] = riga.trim().split(" ");
+            if (hash !== secondo) continue;
+            if (nome === "main" || nome === "origin/main" || nome === "origin/HEAD") continue;
+            return nome.replace(/^origin\//, "");
+        }
+    } catch {}
+
     return "branch non identificato";
 }
 

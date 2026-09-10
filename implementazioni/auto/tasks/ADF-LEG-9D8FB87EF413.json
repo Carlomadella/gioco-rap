@@ -1,0 +1,144 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-9D8FB87EF413",
+  "origin": "legacy",
+  "title": "La carriera cresce con la mappa: Provincia → Milano → Los Angeles",
+  "category": "01-mappa-e-citta",
+  "source": {
+    "point": "26",
+    "text": "La carriera cresce con la mappa: Provincia → Milano → Los Angeles",
+    "file": "implementazioni/01-mappa-e-citta.md",
+    "source_status": "in_parte",
+    "source_status_raw": "in parte"
+  },
+  "audit_state": "audited",
+  "verified_status": "in_progress",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "Task canonica sulla progressione geografica della carriera.",
+  "current_state": [
+    "frontend/js/game/hub.js mostra la città dell'artista e le fasi della carriera.",
+    "frontend/js/game/trasferte.js contiene città esterne, soglie per fan/hype/reputazione, visite, reputazione locale e contatti.",
+    "La trasferta non equivale ancora a una progressione completa dell'hub Provincia → Milano → Los Angeles: il codice documenta visite temporanee e la fonte storica resta in parte."
+  ],
+  "systems": [
+    "frontend/js/game/hub.js",
+    "frontend/js/game/trasferte.js",
+    "frontend/js/game/phases.js",
+    "frontend/js/creator/data.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/hub.js",
+    "frontend/js/game/trasferte.js",
+    "frontend/js/game/phases.js",
+    "frontend/js/creator/data.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "La provincia resta il punto di partenza e la mappa mostra chiaramente città, fase e stato corrente della carriera.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/hub.js: renderHub() legge ARTIST.city e PHASES[G.phase].",
+        "frontend/js/creator/data.js: definisce il contesto di partenza provincia."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Milano e Los Angeles hanno sblocco, attività e ritorno coerenti con soglie di carriera e con la mappa.",
+      "verification": "code_audit",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/trasferte.js: CITTA, cittaAperta() e tipoAperto() gestiscono città e soglie, ma il codice rilevato descrive trasferte e non un hub finale completo."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Il passaggio fra città modifica opportunità, rete e costi senza perdere lo stato della partita.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/trasferte.js: cittaStato(), applicaEvento() e rete() persistono visite, fan e contatti locali."
+      ]
+    }
+  ],
+  "risks": [
+    "Confondere una trasferta con il cambio di città dell'hub può rendere incoerenti mappa, città dell'artista e requisiti di fase."
+  ],
+  "notes": [],
+  "plan": {
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Separare chiaramente visite e trasferimenti permanenti, poi completare la progressione geografica e provarne gli effetti.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Stato geografico",
+        "objective": "Definire il contratto fra città dell'artista, fase, hub e stato delle trasferte.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/hub.js",
+          "frontend/js/game/trasferte.js",
+          "frontend/js/game/phases.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/hub.js",
+          "frontend/js/game/trasferte.js",
+          "frontend/js/game/phases.js"
+        ],
+        "acceptance_criteria": [
+          "AC1"
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "V2",
+        "title": "Milano e Los Angeles",
+        "objective": "Completare sblocchi, attività, ritorno e condizioni delle due città senza riusare la trasferta come falso trasferimento.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "frontend/js/game/hub.js",
+          "frontend/js/game/trasferte.js",
+          "frontend/js/game/phases.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/hub.js",
+          "frontend/js/game/trasferte.js",
+          "frontend/js/game/phases.js"
+        ],
+        "acceptance_criteria": [
+          "AC2"
+        ],
+        "status": "needs_validation"
+      },
+      {
+        "id": "V3",
+        "title": "Effetti sulla carriera",
+        "objective": "Verificare rete, costi, opportunità e ritorno su una carriera completa.",
+        "depends_on": [
+          "V2"
+        ],
+        "systems": [
+          "frontend/js/game/trasferte.js",
+          "frontend/js/game/hub.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/trasferte.js",
+          "frontend/js/game/hub.js"
+        ],
+        "acceptance_criteria": [
+          "AC3"
+        ],
+        "status": "needs_validation"
+      }
+    ],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

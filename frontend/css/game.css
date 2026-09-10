@@ -29,7 +29,7 @@
   background:rgba(255,255,255,.06);color:#e8eaf0;font-size:15px;cursor:pointer;
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
   transition:background .15s,color .15s}
-.pnx:hover{background:rgba(255,255,255,.12);color:#fff}
+@media (hover:hover){.pnx:hover{background:rgba(255,255,255,.12);color:#fff}}
 /* lo slot dentro al telefono lo veste `telefono.css`, dove sta il resto */
 
 /* Torna al menu: sta in cima al contenuto, non nella barra fissa e non fra le
@@ -41,7 +41,7 @@
   font-family:var(--cond);font-size:20px;font-weight:800;letter-spacing:.1em;
   text-transform:uppercase;box-shadow:0 6px 26px rgba(0,0,0,.5);
   transition:background .15s,transform .12s,box-shadow .15s}
-.tornamenu:hover{background:#E6E6EC;transform:translateX(-3px);box-shadow:0 9px 30px rgba(0,0,0,.62)}
+@media (hover:hover){.tornamenu:hover{background:#E6E6EC;transform:translateX(-3px);box-shadow:0 9px 30px rgba(0,0,0,.62)}}
 .tornamenu:active{transform:translateX(-1px) scale(.98)}
 .tornamenu .arw{font-size:24px;line-height:1;margin-top:-3px}
 .sbox{position:relative;overflow:hidden;border-radius:13px;padding:10px 13px;
@@ -63,7 +63,7 @@
 .meter i.ok{background:linear-gradient(90deg,var(--acid),#8BD44B)}
 
 .gcols{display:grid;grid-template-columns:1fr;gap:16px;align-items:start}
-@media (max-width:900px){.gcols{grid-template-columns:1fr}}
+
 .gpane{display:none}
 .gpane.on{display:block}
 
@@ -76,9 +76,9 @@
     0 5px 0 #08080C,
     0 14px 28px rgba(0,0,0,.55);
   transition:transform .13s cubic-bezier(.2,.9,.3,1),box-shadow .13s}
-.tile:hover:not(:disabled){transform:translateY(-4px);
+@media (hover:hover){.tile:hover:not(:disabled){transform:translateY(-4px);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.3), inset 0 0 0 1.5px color-mix(in srgb,var(--a) 55%, transparent),
-    0 9px 0 #08080C, 0 22px 40px rgba(0,0,0,.62)}
+    0 9px 0 #08080C, 0 22px 40px rgba(0,0,0,.62)}}
 .tile:active:not(:disabled){transform:translateY(2px);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.2), inset 0 0 0 1.5px rgba(255,255,255,.1),
     0 2px 0 #08080C, 0 8px 18px rgba(0,0,0,.5)}
@@ -180,17 +180,8 @@
 .dnota{margin:0;padding:13px 16px 15px;font-size:12px;line-height:1.6;color:var(--faint);
   border-top:1px solid rgba(255,255,255,.055)}
 
-@media (max-width:700px){
-  .dtesta{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .drow{flex-wrap:wrap;gap:10px}
-  .dnm{flex:1 1 auto}
-  .dcurva{order:4;flex:1 1 100%;width:auto}
-  .dand{order:3;width:auto;flex:1 1 auto;text-align:left}
-  .dnum{order:2;width:auto}
-}
-
 .crow{display:flex;align-items:center;gap:11px;padding:10px 14px;cursor:pointer;transition:background .15s}
-.crow:hover{background:rgba(255,255,255,.045)}
+@media (hover:hover){.crow:hover{background:rgba(255,255,255,.045)}}
 .crow + .crow{border-top:1px solid rgba(255,255,255,.055)}
 .crow.me{background:linear-gradient(90deg,rgba(255,90,54,.22),rgba(176,38,255,.08))}
 .crow .pz{width:26px;flex:none;font-size:18px;font-weight:900;color:var(--faint);font-variant-numeric:tabular-nums}
@@ -219,7 +210,7 @@
 .chartpiu{width:100%;padding:11px 14px;border-radius:10px;font:inherit;font-size:13px;
   font-weight:800;color:var(--soft);background:rgba(255,255,255,.045);
   border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:background .15s,color .15s}
-.chartpiu:hover{background:rgba(255,255,255,.09);color:#fff}
+@media (hover:hover){.chartpiu:hover{background:rgba(255,255,255,.09);color:#fff}}
 .chartnota{margin-top:9px;font-size:12px;color:var(--faint);text-align:center}
 .hotdot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--hot);
   margin-left:6px;vertical-align:middle}
@@ -245,13 +236,13 @@
 .play{width:36px;height:36px;flex:none;border-radius:50%;font-size:12px;line-height:1;
   display:grid;place-items:center;color:#fff;background:rgba(255,255,255,.09);
   box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.16);transition:background .15s,transform .1s}
-.play:hover{background:rgba(255,255,255,.2)}
+@media (hover:hover){.play:hover{background:rgba(255,255,255,.2)}}
 .play:active{transform:scale(.92)}
 .play.on{background:var(--acid);color:#0B0B0D;box-shadow:none;animation:playpulse 1.15s ease-out infinite}
 /* rifiuta il beat: sta lontano dal tasto che compra ed è spento finché non ci passi sopra */
 .play.no{width:30px;height:30px;font-size:11px;color:var(--faint);background:transparent;
   box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.1)}
-.play.no:hover{color:#fff;background:var(--hot);box-shadow:none}
+@media (hover:hover){.play.no:hover{color:#fff;background:var(--hot);box-shadow:none}}
 /* divisorio di genere dentro al banco dei beat */
 .gsep{display:flex;align-items:center;gap:9px;padding:13px 16px 7px;
   border-top:1px solid rgba(255,255,255,.055)}
@@ -266,8 +257,8 @@
 /* ==== LO SHOP (punto 4) ====
    Prima erano tre `.list` — la stessa scatola grigia delle Offerte sul
    tavolo, del Contratto, delle Spese fisse — impilate una sopra l'altra:
-   un menù di impostazioni travestito da negozio. Qui sotto tre reparti
-   dietro tre linguette (`.shtabs`), la cassa sempre in vista (`.shcash`),
+   un menù di impostazioni travestito da negozio. Qui sotto i due reparti attivi
+   dietro due linguette (`.shtabs`), la cassa sempre in vista (`.shcash`),
    e le card (`.shcard`/`.shbeat`) sono le stesse ossa delle tile delle
    azioni — fondale colorato, prezzo in un angolo, titolo sotto — perché
    quelle già leggono come "roba da prendere", non come una riga di lista. */
@@ -278,7 +269,7 @@
 .shtab{padding:9px 18px;border-radius:999px;font-family:var(--cond);font-size:13px;font-weight:800;
   letter-spacing:.06em;text-transform:uppercase;color:var(--soft);background:rgba(255,255,255,.05);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);transition:background .15s,color .15s,box-shadow .15s}
-.shtab:hover{color:#fff;background:rgba(255,255,255,.09)}
+@media (hover:hover){.shtab:hover{color:#fff;background:rgba(255,255,255,.09)}}
 .shtab.on{color:#0B0B0D;background:var(--acid);box-shadow:none}
 .shcash{margin-left:auto;display:inline-flex;align-items:center;gap:7px;padding:8px 16px 8px 8px;
   border-radius:999px;background:rgba(255,197,61,.1);color:var(--acid);font-weight:800;font-size:14px;
@@ -295,9 +286,9 @@
   box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1.5px rgba(255,255,255,.08),
     0 4px 0 #08080C, 0 12px 24px rgba(0,0,0,.5);
   transition:transform .13s cubic-bezier(.2,.9,.3,1),box-shadow .13s}
-.shcard:hover:not(:disabled){transform:translateY(-4px);
+@media (hover:hover){.shcard:hover:not(:disabled){transform:translateY(-4px);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.26), inset 0 0 0 1.5px color-mix(in srgb,var(--a) 55%,transparent),
-    0 7px 0 #08080C, 0 18px 32px rgba(0,0,0,.58)}
+    0 7px 0 #08080C, 0 18px 32px rgba(0,0,0,.58)}}
 .shcard:active:not(:disabled){transform:translateY(1px)}
 .shcard:disabled{cursor:default}
 .shcard.owned{filter:saturate(.7) brightness(.86)}
@@ -322,26 +313,22 @@
   box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1.5px rgba(255,255,255,.08),
     0 4px 0 #08080C, 0 12px 24px rgba(0,0,0,.5);
   transition:transform .13s cubic-bezier(.2,.9,.3,1)}
-.shbeat:hover{transform:translateY(-4px)}
+@media (hover:hover){.shbeat:hover{transform:translateY(-4px)}}
 .shbeat.no .shbuy{opacity:.4;cursor:not-allowed}
 .shbeat .shart{height:88px}
 .shplay{width:42px;height:42px;border-radius:50%;font-size:13px;color:#fff;
   background:rgba(6,6,10,.55);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35);
   display:grid;place-items:center;backdrop-filter:blur(3px);transition:background .15s,transform .1s}
-.shplay:hover{background:rgba(6,6,10,.75)}
+@media (hover:hover){.shplay:hover{background:rgba(6,6,10,.75)}}
 .shplay:active{transform:scale(.92)}
 .shplay.on{background:var(--acid);color:#0B0B0D;box-shadow:none;animation:playpulse 1.15s ease-out infinite}
 .shdrop{position:absolute;top:7px;right:7px;z-index:2;width:24px;height:24px;border-radius:50%;
   font-size:10.5px;color:rgba(255,255,255,.75);background:rgba(6,6,10,.6);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);display:grid;place-items:center;transition:background .15s,color .15s}
-.shdrop:hover{color:#fff;background:var(--hot)}
+@media (hover:hover){.shdrop:hover{color:#fff;background:var(--hot)}}
 .shbuy{margin:0 12px 12px;padding:9px;border-radius:10px;background:#fff;color:#0B0B0D;
   font-size:13px;font-weight:800;text-align:center}
 .shbuy:disabled{opacity:.35;cursor:not-allowed}
-@media (max-width:640px){
-  .shbar{position:static}
-  .shgrid{grid-template-columns:repeat(auto-fill,minmax(136px,1fr))}
-}
 
 /* La fase: una fascia, non una scheda. Dove sei a sinistra, i gradini a destra,
    e sotto l'unica riga che ti serve davvero — cosa fare adesso. */
@@ -378,7 +365,7 @@
   font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
   color:var(--soft);background:rgba(255,255,255,.055);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);transition:background .15s,color .15s}
-.sb:hover{background:rgba(255,255,255,.12);color:#fff}
+@media (hover:hover){.sb:hover{background:rgba(255,255,255,.12);color:#fff}}
 .sb.on{background:#fff;color:#0B0B0D;box-shadow:0 5px 16px rgba(0,0,0,.45)}
 .sb .sbdg{display:inline-grid;place-items:center;font-style:normal;margin-left:7px;
   min-width:17px;height:17px;padding:0 5px;border-radius:9px;vertical-align:middle;
@@ -398,5 +385,5 @@
    cambia solo il cursore: non è «vietato», è «adesso no, e ti spiego». */
 .tile.spenta{filter:grayscale(.7) brightness(.62);cursor:help;
   box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.05), 0 3px 0 #08080C}
-.tile.spenta:hover{transform:none}
+@media (hover:hover){.tile.spenta:hover{transform:none}}
 .tile.spenta:active{transform:scale(.985)}

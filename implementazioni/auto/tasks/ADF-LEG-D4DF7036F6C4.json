@@ -1,0 +1,137 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-D4DF7036F6C4",
+  "origin": "legacy",
+  "title": "Il gioco esce su Steam e sugli store, non dentro a un artifact",
+  "category": "08-uscita-sugli-store",
+  "source": {
+    "point": "32",
+    "text": "Il gioco esce su Steam e sugli store, non dentro a un artifact",
+    "file": "implementazioni/08-uscita-sugli-store.md",
+    "source_status": "da_fare",
+    "source_status_raw": "da fare"
+  },
+  "audit_state": "audited",
+  "verified_status": "in_progress",
+  "intake_state": "overlap",
+  "related_task_ids": [
+    "ADF-LEG-043B012E6E3B"
+  ],
+  "intake_note": "La task canonica copre i cinque lavori tecnici per gli store; questa richiesta mantiene il delta storico su README e schema database, gia' presente, oltre alla direzione di distribuzione.",
+  "current_state": [
+    "frontend/strumenti/build.js e frontend/package.json producono un build per la distribuzione e una demo separata.",
+    "backend/database/ e backend/README.md documentano database, migrazioni e schema; implementazioni/08-uscita-sugli-store.md registra i README e backend/database/schema.md come fatti.",
+    "frontend/js/game/state.js salva ancora nel localStorage e la fonte segnala come mancanti il percorso dispositivo/cloud completo e la validazione dei canali pubblicati."
+  ],
+  "systems": [
+    "frontend/strumenti/build.js",
+    "frontend/package.json",
+    "frontend/strumenti/prova.js",
+    "backend/database/",
+    "backend/README.md",
+    "frontend/js/game/state.js"
+  ],
+  "watch_paths": [
+    "frontend/strumenti/build.js",
+    "frontend/package.json",
+    "frontend/strumenti/prova.js",
+    "backend/database/",
+    "backend/README.md",
+    "frontend/js/game/state.js",
+    "frontend/js/net/online.js",
+    "backend/accessi.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "La direzione store non dipende da un artifact monofile e la documentazione descrive build e schema database reali.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/strumenti/build.js: build e demo sono percorsi distinti.",
+        "backend/database/schema.md e backend/README.md: schema e destinazione store documentati."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "La carriera viene salvata sul dispositivo e sincronizzata con il cloud dell'account senza dipendere soltanto dal localStorage.",
+      "verification": "code_audit",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/state.js: save() usa ancora localStorage.",
+        "frontend/js/net/online.js e backend/server.js: il ponte cloud esiste ma non sostituisce ancora il percorso di save()."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "I canali Steam, Apple e Google sono collegati al client del prodotto pubblicato e permettono il recupero della carriera.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "backend/accessi.js: verifica dei token quando configurata; la configurazione delle app pubblicate e il flusso client end-to-end non sono dimostrati dal repository."
+      ]
+    }
+  ],
+  "risks": [
+    "Il cloud puo' sovrascrivere la carriera sbagliata se il conflitto non resta esplicito.",
+    "Le credenziali e il test sugli store richiedono ambienti reali."
+  ],
+  "notes": [],
+  "plan": {
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Conservare build e documentazione gia' presenti, poi chiudere persistenza cross-device e integrazione store.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Persistenza installabile",
+        "objective": "Collegare il salvataggio del gioco a uno storage dispositivo e al cloud mantenendo offline e conflitti espliciti.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/state.js",
+          "frontend/js/net/online.js",
+          "backend/server.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/state.js",
+          "frontend/js/net/online.js",
+          "backend/server.js",
+          "backend/database/"
+        ],
+        "acceptance_criteria": [
+          "AC2"
+        ],
+        "status": "planned"
+      },
+      {
+        "id": "V2",
+        "title": "Canali pubblicati",
+        "objective": "Collegare client, autenticazione e recupero carriera agli adapter Steam, Apple e Google e provarli nei gusci pubblicati.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "backend/accessi.js",
+          "backend/server.js",
+          "frontend/js/net/online.js",
+          "frontend/strumenti/build.js"
+        ],
+        "watch_paths": [
+          "backend/accessi.js",
+          "backend/server.js",
+          "frontend/js/net/online.js",
+          "frontend/strumenti/build.js"
+        ],
+        "acceptance_criteria": [
+          "AC3"
+        ],
+        "status": "planned"
+      }
+    ],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

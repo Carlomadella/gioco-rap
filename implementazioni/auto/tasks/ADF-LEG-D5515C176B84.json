@@ -1,0 +1,92 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-D5515C176B84",
+  "origin": "legacy",
+  "title": "13 · I dischi: oro, platino, diamante",
+  "category": "04-musica-e-suoni",
+  "source": {
+    "point": "—",
+    "text": "13 · I dischi: oro, platino, diamante",
+    "file": "implementazioni/04-musica-e-suoni.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [
+    "Le certificazioni appartengono al singolo pezzo: oro a 500.000 stream, platino a 1.000.000 e diamante a 10.000.000; i multipli di platino vengono mostrati e il passaggio di soglia viene notificato al cambio settimana."
+  ],
+  "systems": [
+    "discografia",
+    "stream",
+    "simulazione-settimanale",
+    "diario"
+  ],
+  "watch_paths": [
+    "frontend/js/game/content.js",
+    "frontend/js/game/sim.js",
+    "frontend/js/game/ui.js",
+    "frontend/pagine/gioco.html",
+    "frontend/strumenti/prova.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Il codice applica le tre soglie di certificazione del pezzo.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/content.js: DISCHI definisce oro 500000, platino 1000000 e diamante 10000000; certificazione() seleziona il gradino."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "I multipli oltre il platino sono calcolati e mostrati come 2×, 3× e così via.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/content.js: certificazione() calcola volte e etichetta per oro/platino; frontend/js/game/ui.js: discoQuando() e renderDiscografia() mostrano la certificazione."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Il passaggio di soglia viene rilevato durante advanceWeek() e registrato nel diario.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/sim.js: advanceWeek() confronta gradinoDisco prima/dopo, salva s.disco e chiama pushLog()/toast()."
+      ]
+    },
+    {
+      "id": "AC4",
+      "description": "La discografia conserva lo storico settimanale e visualizza andamento e certificazione del brano.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/sim.js: mantiene s.storia a 26 settimane; frontend/js/game/ui.js: discoCurva(), discoAndamento() e renderDiscografia(); frontend/pagine/gioco.html: contenitore #g-disco."
+      ]
+    }
+  ],
+  "risks": [
+    "La scala 10M per il diamante è un'interpretazione della richiesta storica e va mantenuta coerente con la documentazione finché non viene deciso diversamente."
+  ],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": [
+      "Task storica già implementata; nessun piano tecnico residuo."
+    ]
+  }
+}

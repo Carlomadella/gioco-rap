@@ -1,0 +1,119 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-352B92864406",
+  "origin": "legacy",
+  "title": "L'energia a 100 (il ragionamento sui costi)",
+  "category": "05-carriera-e-tempo",
+  "source": {
+    "point": "—",
+    "text": "L'energia a 100 (il ragionamento sui costi)",
+    "file": "implementazioni/05-carriera-e-tempo.md",
+    "source_status": "risposto",
+    "source_status_raw": "risposto, da fare"
+  },
+  "audit_state": "audited",
+  "verified_status": "in_progress",
+  "intake_state": "overlap",
+  "related_task_ids": [
+    "ADF-LEG-D7416EF2ABDA"
+  ],
+  "intake_note": "La task canonica copre l'implementazione dell'energia a 100 e dei costi giornalieri; questa aggiunge il delta di bilanciamento proposto nella risposta storica, che non coincide esattamente con i valori oggi nel codice.",
+  "current_state": [
+    "frontend/js/game/lifestyle.js: ENERGIA_K e syncEnergy() portano il massimo base a 100 e scalano i bonus.",
+    "frontend/js/game/actions.js e frontend/js/game/posto.js contengono costi giornalieri gia' riproporzionati; frontend/js/game/skip.js gestisce il recupero notturno.",
+    "La proposta storica indicava costi 10-15, 25-30, 40-50 e una taratura di guadagni e soglie; i valori reali sono un primo tentativo e richiedono bilanciamento."
+  ],
+  "systems": [
+    "frontend/js/game/lifestyle.js",
+    "frontend/js/game/actions.js",
+    "frontend/js/game/posto.js",
+    "frontend/js/game/sim.js",
+    "frontend/js/game/skip.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/lifestyle.js",
+    "frontend/js/game/actions.js",
+    "frontend/js/game/posto.js",
+    "frontend/js/game/sim.js",
+    "frontend/js/game/skip.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "I costi delle azioni e il recupero giornaliero sono bilanciati rispetto a una riserva di 100 energia, senza accelerare indebitamente la carriera.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/lifestyle.js: energia massima e recupero sono parametrizzati, ma la proporzione numerica richiede gioco reale."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Guadagni ripetibili e soglie di progressione mantengono una settimana piena comparabile al ritmo precedente.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/actions.js: RITMO e ricompense sono il punto tecnico da confrontare durante il playtest."
+      ]
+    }
+  ],
+  "risks": [
+    "Ridurre troppo i guadagni puo' rendere la progressione lenta; lasciarli invariati puo' far esplodere soldi e fan con 21 mosse settimanali."
+  ],
+  "notes": [],
+  "plan": {
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Usare il sistema energia esistente e validare soltanto il delta di bilanciamento indicato dalla risposta storica.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Confronto dei parametri",
+        "objective": "Confrontare costi, recupero, guadagni ripetibili e soglie con la scala giornaliera reale.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/lifestyle.js",
+          "frontend/js/game/actions.js",
+          "frontend/js/game/posto.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/lifestyle.js",
+          "frontend/js/game/actions.js",
+          "frontend/js/game/posto.js"
+        ],
+        "acceptance_criteria": [
+          "AC1"
+        ],
+        "status": "planned"
+      },
+      {
+        "id": "V2",
+        "title": "Bilanciamento giocato",
+        "objective": "Provare giornate e settimane complete e correggere solo i parametri che fanno divergere il ritmo.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "frontend/js/game/sim.js",
+          "frontend/js/game/skip.js",
+          "frontend/js/game/actions.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/sim.js",
+          "frontend/js/game/skip.js",
+          "frontend/js/game/actions.js"
+        ],
+        "acceptance_criteria": [
+          "AC1",
+          "AC2"
+        ],
+        "status": "planned"
+      }
+    ],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

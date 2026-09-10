@@ -139,7 +139,25 @@ function immagini(testo, dentro){
   });
 }
 
+/* Roba che sta in media/ ma non deve finire addosso a chi installa il gioco.
+   media/ si copia intera, ed è comodo finché dentro ci sono solo le foto e i
+   suoni del gioco. `makehuman-editor-v1` non è quello: è il dataset da cui si
+   pescano i pezzi dell'avatar — 2,8 GB fra proxy, texture e target, più di
+   tutto il resto del gioco messo insieme — e nessuna riga di codice lo nomina.
+   Serve a chi lavora agli avatar, non a chi gioca. Dal 07/09/2026 sta fuori
+   anche dalla storia di git: qui dentro restano i cataloghi JSON e il manifest,
+   il dataset vero se lo scarica chi gli serve con `npm run setup:makehuman`
+   (finisce in `data/`, che .gitignore tiene fuori). Il salto qui sotto vale
+   comunque: chi ha già fatto il setup ha di nuovo 2,8 GB in media/, e nel
+   pacchetto per gli store non ci devono finire. Il giorno che il gioco lo
+   carica davvero, si toglie da qui — ma allora si caricherà il pezzo che
+   serve, non 2,8 GB. */
+const FUORI_DAL_PACCHETTO = new Set([
+  path.join(RADICE, "media", "makehuman-editor-v1")
+]);
+
 function copiaCartella(da, a){
+  if(FUORI_DAL_PACCHETTO.has(da)) return;
   fs.mkdirSync(a, { recursive: true });
   for(const voce of fs.readdirSync(da, { withFileTypes: true })){
     const dentro = path.join(da, voce.name), fuori = path.join(a, voce.name);

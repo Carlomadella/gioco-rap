@@ -25,9 +25,6 @@ function vaiAllAccesso(){ vaiA("accesso"); }
 window.vaiAlGioco = vaiAlGioco;
 
 /* ==================== LA CARRIERA, LETTA DA FUORI ==================== */
-function miniPortrait(){
-  return portrait().replace('class="portrait"', 'class="mini"');
-}
 /* Lo stato della partita: qui c'è sempre, perché game/state.js viene prima di
    questo file. Resta la prudenza di sempre — se un domani non ci fosse, la
    landing deve mostrare «nessuna carriera», non rompersi. */
@@ -72,7 +69,7 @@ function renderMenu(){
      Anche senza nome A ha un aspetto completo, quindi c'è sempre qualcosa da mostrare. */
   const av = $("nav-avatar");
   if(av){
-    av.innerHTML = miniPortrait();
+    av.innerHTML = "";
     av.title = nm ? nm + " — apri il tuo artista" : "Il tuo artista";
   }
 
@@ -95,10 +92,63 @@ function renderMenu(){
 $("nav-avatar").onclick = () => vaiAlProfilo();
 $("brand").onclick = () => renderMenu();          // già qui: si aggiorna e basta
 
+/* Punto 15: muta/smuta la musica di sottofondo, in alto a sinistra.
+   Stesso interruttore dell'audio in game (SET.audio.on, js/impostazioni.js):
+   toccarlo qui vale anche dentro, e viceversa. */
+function aggiornaMuteLanding(){
+  const b = $("landing-mute");
+  if(!b) return;
+  const on = !SET.audio || SET.audio.on !== false;
+  /* le due icone si scambiano da css/shell.css, in base a questo attributo */
+  b.setAttribute("aria-pressed", on ? "false" : "true");
+  b.setAttribute("aria-label", on ? "Muta la musica di sottofondo" : "Riattiva la musica di sottofondo");
+}
+if($("landing-mute")){
+  $("landing-mute").onclick = () => {
+    SET.audio.on = !SET.audio.on;
+    setSalva();
+    applicaImpostazioni();
+    aggiornaMuteLanding();
+    /* applicaImpostazioni() aggiorna solo i volumi (ADF_AUDIO.refresh): se il
+       contesto audio si era sospeso da solo, o la traccia si era fermata,
+       il volume torna giusto ma resta muto lo stesso. Riattivando, ci si
+       assicura anche che il contesto sia sveglio e la musica stia girando
+       davvero, non solo che il volume sia quello giusto sulla carta. */
+    if(SET.audio.on){
+      try{ if(window.ADF_AUDIO && ADF_AUDIO.unlock) ADF_AUDIO.unlock(); }catch(e){}
+      try{
+        if(window.ADF_AUDIO && ADF_AUDIO.music && !ADF_AUDIO.music.playing)
+          ADF_AUDIO.music.ensureMenu();
+      }catch(e){}
+    }
+  };
+  aggiornaMuteLanding();
+}
+
 /* Il profilo (il creatore dell'artista) sta nella pagina del gioco: ci si
    arriva chiedendolo, non cambiando una classe. Chi decide se si può è
    avvio.js, che sa quale slot è pieno. */
-function vaiAlProfilo(){ vaiAlGioco("vai=profilo"); }
+function vaiAlProfilo(){
+  /* Regola landing:
+     - senza CONTINUA non esiste un artista modificabile;
+     - con CONTINUA si modifica SEMPRE lo stesso slot scelto da Continua. */
+  const slot = typeof window.ADF_PREPARA_ARTISTA_CONTINUA === "function"
+    ? window.ADF_PREPARA_ARTISTA_CONTINUA()
+    : null;
+
+  if(!slot){
+    landDillo("Nessuna partita salvata");
+    return;
+  }
+
+  if(window.ADF_RPG_V24 && typeof window.ADF_RPG_V24.openAppearance === "function"){
+    window.ADF_RPG_V24.openAppearance();
+    return;
+  }
+
+  /* Fallback di compatibilità: la pagina gioco rilegge lo slot appena attivato. */
+  vaiAlGioco("vai=profilo");
+}
 window.vaiAlProfilo = vaiAlProfilo;
 
 /* Ricominciare cancella la carriera: si chiede conferma sul bottone stesso,

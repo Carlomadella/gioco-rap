@@ -1,0 +1,72 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-DB2D56011EF3",
+  "origin": "legacy",
+  "title": "Crea il tuo avatar",
+  "category": "03-artista-e-avatar",
+  "source": {
+    "point": "3",
+    "text": "Crea il tuo avatar",
+    "file": "implementazioni/03-artista-e-avatar.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [
+    "Il creatore espone categorie per capelli, cappelli, occhi, accessori, vestiti e tatuaggi; i dati sono in data.js e il ritratto viene prodotto da portrait.js."
+  ],
+  "systems": [
+    "frontend/js/creator/data.js",
+    "frontend/js/creator/portrait.js",
+    "frontend/strumenti/prova.js"
+  ],
+  "watch_paths": [
+    "frontend/js/creator/data.js",
+    "frontend/js/creator/portrait.js",
+    "frontend/js/creator/state.js",
+    "frontend/strumenti/prova.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Il creatore offre le sei categorie estetiche richieste con le opzioni previste.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/creator/data.js: elenchi HAIRS, HATS, EYES, GLASSES/EARS/GRILLZ/CUFFIE/CHAINS, FITS e TATTOOS.",
+        "frontend/strumenti/prova.js: verifica delle sei categorie e dei nomi richiesti."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Le opzioni selezionabili producono un ritratto effettivamente diverso, salvo equivalenze intenzionali.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/creator/portrait.js: le scelte vengono trasformate in elementi SVG del ritratto.",
+        "frontend/strumenti/prova.js: confronto dei disegni per ogni opzione e controllo dell'equivalenza degli occhi automatici."
+      ]
+    }
+  ],
+  "risks": [
+    "Aggiungere un'opzione ai dati senza implementarla nel renderer del ritratto crea una scelta muta."
+  ],
+  "notes": [
+    "La verifica automatica copre la presenza e la resa delle opzioni; il giudizio estetico resta fuori dall'audit."
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  }
+}

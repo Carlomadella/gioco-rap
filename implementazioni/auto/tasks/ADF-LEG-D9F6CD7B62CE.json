@@ -1,0 +1,72 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-D9F6CD7B62CE",
+  "origin": "legacy",
+  "title": "Il feed di LaFamegram si scorre come quello vero",
+  "category": "02-interfaccia-e-telefono",
+  "source": {
+    "point": "53",
+    "text": "Il feed di LaFamegram si scorre come quello vero",
+    "file": "implementazioni/02-interfaccia-e-telefono.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "verified_status": "needs_validation",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "current_state": [
+    "LaFamegram produce post in ordine cronologico dentro un contenitore scrollabile; il post piu' popolare e' calcolato separatamente per i widget."
+  ],
+  "systems": [
+    "frontend/js/game/telefono.js",
+    "frontend/css/telefono.css",
+    "frontend/js/game/strada.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/telefono.js",
+    "frontend/css/telefono.css",
+    "frontend/js/game/strada.js",
+    "frontend/js/game/state.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Il feed ordina i post cronologicamente invece di ordinarli per cuori.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/telefono.js: schermataLafamegram usa telPost() per il feed.",
+        "frontend/js/game/strada.js: postaEvento aggiunge eventi al feed con unshift; telPostTop resta una selezione separata."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il feed si puo' scorrere verticalmente come una schermata social.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/css/telefono.css: .tscreenbody usa overflow-y:auto.",
+        "manual: implementazioni/02-interfaccia-e-telefono.md, punto 53, registra la verifica storica dell'ordine del feed."
+      ]
+    }
+  ],
+  "risks": [
+    "Post generati senza contenimento possono degradare leggibilita' o prestazioni del feed."
+  ],
+  "notes": [
+    "La sensazione di scorrimento e' un requisito d'interazione e non viene dichiarata soddisfatta dal solo CSS."
+  ],
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "audit_state": "audited"
+}

@@ -6,6 +6,209 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:6604e22 -->
+## 10/09/26, 14:18 â€” task/makehuman-ui-readability â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `6604e22`
+
+### Cosa Ã¨ entrato
+
+- `a501325` â€” feat(makehuman): migliora leggibilità e coerenza dell'editor â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/makehuman-camerino-v1/index.html`
+- **Modificato:** `frontend/media/makehuman-camerino-v1/runtime.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
+<!-- merge:10a372d -->
+## 08/09/26, 21:17 â€” main â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `10a372d`
+
+### Cosa Ã¨ entrato
+
+- `354a383` â€” feat(makehuman): rifinisce zoom camerino â€” **Mycol**
+- `72b3118` â€” feat(makehuman): aggiorna sfondo camerino â€” **Mycol**
+- `d75b15b` â€” feat(makehuman): integra creator e ritratto nel gioco â€” **Mycol**
+- `2caed5c` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `b87ec1e` â€” merge: in Studio le azioni non ti buttano più fuori sulla mappa â€” **Sadyco La Fame**
+- `fd972b7` â€” test: un controllo automatico vero per il punto 14 dello Studio â€” **Sadyco La Fame**
+- `0b41d74` â€” fix: in Studio le azioni non ti buttano più fuori sulla mappa â€” **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/hub.css`
+- **Modificato:** `frontend/css/studio.css`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/modal.js`
+- **Modificato:** `frontend/js/game/studio.js`
+- **Modificato:** `frontend/js/game/ui.js`
+- **Modificato:** `frontend/js/game/writer.js`
+- **Modificato:** `frontend/js/gioco-ingresso.js`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+- **Aggiunto:** `frontend/media/makehuman-camerino-v1/assets/camerino-makehuman-custom.png`
+- **Modificato:** `frontend/media/makehuman-camerino-v1/index.html`
+- **Modificato:** `frontend/media/makehuman-camerino-v1/runtime.js`
+
+**File interessati in questa categoria:** 13
+
+---
+
+<!-- merge:b87ec1e -->
+## 08/09/26, 11:09 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.58)  
+**Merge commit:** `b87ec1e`
+
+### Cosa Ã¨ entrato
+
+- `fd972b7` â€” test: un controllo automatico vero per il punto 14 dello Studio â€” **Sadyco La Fame**
+- `0b41d74` â€” fix: in Studio le azioni non ti buttano più fuori sulla mappa â€” **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/modal.js`
+- **Modificato:** `frontend/js/game/ui.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
+<!-- merge:91438dd -->
+## 08/09/26, 10:36 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `91438dd`
+
+### Cosa Ã¨ entrato
+
+- `a36b5e8` â€” Merge branch 'main' into task/responsivita â€” **Carlomadella**
+- `b197884` â€” fix: le cinque cose trovate dal giro di fine task â€” **Carlomadella**
+- `4d688c8` â€” css: il gioco stretto in un foglio suo, css/stretto.css â€” **Carlomadella**
+- `1338348` â€” docs: i punti della responsività chiusi, spostati nel loro argomento â€” **Carlomadella**
+- `df41c78` â€” strada: si impila sul telefono, e il rapporto di settimana ci sta a 360 â€” **Carlomadella**
+- `ee4951c` â€” css: ogni :hover dentro a @media (hover:hover), su tutti i fogli â€” **Carlomadella**
+- `43623ca` â€” studio: l'orologio galleggiante non copre più lo Studio, e le take si confrontano â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/css/abilita.css`
+- **Modificato:** `frontend/css/accesso.css`
+- **Modificato:** `frontend/css/actionbar.css`
+- **Modificato:** `frontend/css/avvio.css`
+- **Modificato:** `frontend/css/base.css`
+- **Modificato:** `frontend/css/creator.css`
+- **Modificato:** `frontend/css/effects.css`
+- **Modificato:** `frontend/css/forms.css`
+- **Modificato:** `frontend/css/game.css`
+- **Modificato:** `frontend/css/hub.css`
+- **Modificato:** `frontend/css/hud.css`
+- **Modificato:** `frontend/css/impostazioni.css`
+- **Modificato:** `frontend/css/landing.css`
+- **Modificato:** `frontend/css/menu-sistema.css`
+- **Modificato:** `frontend/css/negozio.css`
+- **Modificato:** `frontend/css/overlays.css`
+- **Modificato:** `frontend/css/posto.css`
+- **Modificato:** `frontend/css/preview.css`
+- **Modificato:** `frontend/css/servizio.css`
+- **Modificato:** `frontend/css/shell.css`
+- **Modificato:** `frontend/css/strada-crimine-v2.css`
+- **Modificato:** `frontend/css/strada-crimine.css`
+- **Aggiunto:** `frontend/css/stretto.css`
+- **Modificato:** `frontend/css/studio-elementi.css`
+- **Modificato:** `frontend/css/studio.css`
+- **Modificato:** `frontend/css/telefono.css`
+- **Modificato:** `frontend/css/tocco.css`
+- **Modificato:** `frontend/css/trasferte.css`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/strada-crimine-ui.js`
+- **Modificato:** `frontend/js/game/tempo-controlli.js`
+- **Modificato:** `frontend/pagine/accesso.html`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 36
+
+---
+
+<!-- merge:6ecd52f -->
+## 07/09/26, 23:50 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `6ecd52f`
+
+### Cosa Ã¨ entrato
+
+- `f000a36` â€” fix: la stima del primo anno usava «my», che in quella funzione non esisteva â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/ui.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:d443364 -->
+## 07/09/26, 23:11 â€” task/come-si-lavora-aggiornato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `d443364`
+
+### Cosa Ã¨ entrato
+
+- `43876cc` â€” docs: le regole di lavoro escono da implementazioni/ e diventano anche CLAUDE.md â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `.claude/settings.json`
+- **Modificato:** `documentazione/README.md`
+- **Aggiunto:** `documentazione/come-si-lavora.md`
+- **Modificato:** `documentazione/dipendenze.md`
+
+**File interessati in questa categoria:** 4
+
+---
+
+<!-- merge:e69464e -->
+## 07/09/26, 16:03 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `e69464e`
+
+### Cosa Ã¨ entrato
+
+- `d59c876` â€” style(studio): la pagina si allinea al riferimento, dettaglio per dettaglio â€” **Carlomadella**
+- `5c58187` â€” feat(studio): la foto a schermo intero, e sopra la schermata dei riferimenti â€” **Carlomadella**
+- `a4a6936` â€” fix(studio): 44 punti sulle linguette, la striscia dice che continua, e una frase in italiano â€” **Carlomadella**
+- `89bb7f8` â€” feat(studio): le sette sezioni del punto 4, in una barra in basso â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/studio.css`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/studio.js`
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_32 (1).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/studio_beat.png`
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_35 (9).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/studio_cabina.png`
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_32 (3).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/studio_mix.png`
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_33 (5).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/studio_promo.png`
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_34 (7).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/studio_testo.png`
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_33 (4).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/studio_uscita.png`
+- **Modificato:** `frontend/pagine/gioco.html`
+
+**File interessati in questa categoria:** 10
+
+---
+
 <!-- merge:41ac4ed -->
 ## 06/09/26, 22:55 â€” task/popup-energia â†’ main
 

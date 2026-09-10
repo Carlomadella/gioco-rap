@@ -1,0 +1,70 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-47DD718310D1",
+  "origin": "legacy",
+  "title": "Al massimo una conversazione lunga al giorno",
+  "category": "06-mondo-e-personaggi",
+  "source": {
+    "point": "6",
+    "text": "Al massimo una conversazione lunga al giorno",
+    "file": "implementazioni/06-mondo-e-personaggi.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [
+    "chatSettimana() raccoglie i contatti che superano il proprio dado e ne sceglie uno solo.",
+    "avanzaGiorno() usa chatGiorno() nei giorni ordinari e non sovrappone il flusso al cambio settimana."
+  ],
+  "systems": [
+    "frontend/js/game/chat.js",
+    "frontend/js/game/sim.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/chat.js",
+    "frontend/js/game/sim.js",
+    "frontend/strumenti/prova.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Al massimo una persona avvia una conversazione lunga per giorno.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/chat.js: chatSettimana() chiama chatScrive() una sola volta su pick(idonei).",
+        "frontend/strumenti/prova.js: 20 simulazioni con tutti i dadi favorevoli verificano che non si formi un coro."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il limite riguarda l'iniziativa dei contatti e non interrompe le risposte a una conversazione gia' aperta.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/chat.js: chatScrive() gestisce l'apertura, mentre chatRispondi() prosegue il ramo gia' aperto."
+      ]
+    }
+  ],
+  "risks": [
+    "Modificare l'ordine con cui avanzaGiorno() chiama chatSettimana() e chatGiorno() potrebbe reintrodurre due iniziative nello stesso giorno."
+  ],
+  "notes": [
+    "Il limite e' per chi scrive per primo; chatIniziaTu() resta intenzionalmente fuori dal vincolo storico."
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  }
+}

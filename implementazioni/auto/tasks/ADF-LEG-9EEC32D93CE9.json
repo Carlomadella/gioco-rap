@@ -1,0 +1,73 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-9EEC32D93CE9",
+  "origin": "legacy",
+  "title": "Gli slot anche nella schermata di avvio",
+  "category": "05-carriera-e-tempo",
+  "source": {
+    "point": "24",
+    "text": "Gli slot anche nella schermata di avvio",
+    "file": "implementazioni/05-carriera-e-tempo.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [
+    "La schermata di avvio mostra tre slot, consente di scegliere una nuova carriera o caricare una carriera esistente e conserva lo slot attivo."
+  ],
+  "systems": [
+    "frontend/js/avvio.js",
+    "frontend/js/landing.js",
+    "frontend/js/impostazioni.js",
+    "frontend/css/avvio.css"
+  ],
+  "watch_paths": [
+    "frontend/js/avvio.js",
+    "frontend/js/landing.js",
+    "frontend/js/impostazioni.js",
+    "frontend/css/avvio.css",
+    "frontend/strumenti/audit-regressioni.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Prima dell'ingresso nel gioco la schermata di avvio espone esattamente tre slot e ne indica stato e contenuto.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/avvio.js: slots() usa nSlot() e htmlScegliSlot()/htmlCarica() disegnano i tre slot con stato."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Una nuova partita e il caricamento usano lo slot selezionato senza sovrascrivere gli altri salvataggi.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/avvio.js: selezionaSlot(), entraSlot() e il passaggio slot= conservano la scelta e distinguono nuovo/caricamento.",
+        "frontend/js/landing.js: ADF_PREPARA_ARTISTA_CONTINUA prepara lo stesso slot scelto da Continua."
+      ]
+    }
+  ],
+  "risks": [
+    "Modificare la chiave dello slot attivo o la normalizzazione dei salvataggi puo' rendere invisibili carriere esistenti."
+  ],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  }
+}

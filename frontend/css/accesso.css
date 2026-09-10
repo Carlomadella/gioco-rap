@@ -38,7 +38,7 @@
 .acc-vai{width:100%; margin-top:6px; border:0; border-radius:12px; cursor:pointer;
   padding:14px; background:#FF5A36; color:#fff; font:800 15px/1 Figtree,system-ui,sans-serif}
 .acc-vai:disabled{opacity:.55; cursor:default}
-.acc-vai:not(:disabled):hover{filter:brightness(1.08)}
+@media (hover:hover){.acc-vai:not(:disabled):hover{filter:brightness(1.08)}}
 
 /* il messaggio: una riga sola, che dice cos'è successo davvero */
 .acc-dice{margin:16px 0 0; padding:12px 14px; border-radius:11px; font-size:13.5px; line-height:1.45;
@@ -55,14 +55,9 @@
 .acc-chi dd{margin:0; font-weight:600; overflow-wrap:anywhere}
 .acc-esci{width:100%; border:1px solid var(--line); background:transparent; color:#fff;
   border-radius:12px; padding:13px; cursor:pointer; font:700 14px/1 Figtree,system-ui,sans-serif}
-.acc-esci:hover{background:var(--card-2)}
+@media (hover:hover){.acc-esci:hover{background:var(--card-2)}}
 
 .acc-piede{margin:22px 0 0; text-align:center; font-size:13px; color:var(--muted,#9aa0ab)}
 .acc-piede a{color:inherit}
 .acc-nota{margin:18px 0 0; font-size:12.5px; line-height:1.5; color:var(--muted,#9aa0ab)}
 
-@media (max-width:520px){
-  .accesso{padding-top:80px}
-  .acc-scheda{padding:24px 20px 22px; border-radius:18px}
-  .acc-scheda h1{font-size:26px}
-}

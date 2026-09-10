@@ -6,6 +6,122 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:de087c7 -->
+## 10/09/26, 01:07 â€” main â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `de087c7`
+
+### Cosa Ã¨ entrato
+
+- `a90a3d8` â€” docs: aggiorna implementazioni e roadmap ufficiale â€” **Anni di Fame Bot**
+- `fdb9378` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `0724440` â€” Merge branch 'task/beat-energia-e-barre-senza-malus' â€” **Sadyco La Fame**
+- `fb731d5` â€” fix(studio): via il costo in energia per farsi fare un beat, e via il malus di scrivere le barre â€” **Sadyco La Fame**
+- `231c0f1` â€” docs: aggiorna implementazioni e roadmap ufficiale â€” **Anni di Fame Bot**
+- `c2c0306` â€” fix(makehuman): rende Three.js locale e diagnostica il bootstrap â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/studio.js`
+- **Modificato:** `frontend/js/game/writer.js`
+- **Modificato:** `frontend/media/makehuman-camerino-v1/index.html`
+- **Modificato:** `frontend/media/makehuman-camerino-v1/runtime.js`
+- **Aggiunto:** `frontend/media/makehuman-camerino-v1/vendor/three-r179/LICENSE-three.txt`
+- **Aggiunto:** `frontend/media/makehuman-camerino-v1/vendor/three-r179/three.core.js`
+- **Aggiunto:** `frontend/media/makehuman-camerino-v1/vendor/three-r179/three.module.js`
+
+**File interessati in questa categoria:** 9
+
+---
+
+<!-- merge:0724440 -->
+## 10/09/26, 00:45 â€” task/beat-energia-e-barre-senza-malus â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.58)  
+**Merge commit:** `0724440`
+
+### Cosa Ã¨ entrato
+
+- `fb731d5` â€” fix(studio): via il costo in energia per farsi fare un beat, e via il malus di scrivere le barre â€” **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/studio.js`
+- **Modificato:** `frontend/js/game/writer.js`
+
+**File interessati in questa categoria:** 4
+
+---
+
+<!-- merge:10a372d -->
+## 08/09/26, 21:17 â€” main â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `10a372d`
+
+### Cosa Ã¨ entrato
+
+- `354a383` â€” feat(makehuman): rifinisce zoom camerino â€” **Mycol**
+- `72b3118` â€” feat(makehuman): aggiorna sfondo camerino â€” **Mycol**
+- `d75b15b` â€” feat(makehuman): integra creator e ritratto nel gioco â€” **Mycol**
+- `2caed5c` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `b87ec1e` â€” merge: in Studio le azioni non ti buttano più fuori sulla mappa â€” **Sadyco La Fame**
+- `fd972b7` â€” test: un controllo automatico vero per il punto 14 dello Studio â€” **Sadyco La Fame**
+- `0b41d74` â€” fix: in Studio le azioni non ti buttano più fuori sulla mappa â€” **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/writer.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:b87ec1e -->
+## 08/09/26, 11:09 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.58)  
+**Merge commit:** `b87ec1e`
+
+### Cosa Ã¨ entrato
+
+- `fd972b7` â€” test: un controllo automatico vero per il punto 14 dello Studio â€” **Sadyco La Fame**
+- `0b41d74` â€” fix: in Studio le azioni non ti buttano più fuori sulla mappa â€” **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/writer.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:e69464e -->
+## 07/09/26, 16:03 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `e69464e`
+
+### Cosa Ã¨ entrato
+
+- `d59c876` â€” style(studio): la pagina si allinea al riferimento, dettaglio per dettaglio â€” **Carlomadella**
+- `5c58187` â€” feat(studio): la foto a schermo intero, e sopra la schermata dei riferimenti â€” **Carlomadella**
+- `a4a6936` â€” fix(studio): 44 punti sulle linguette, la striscia dice che continua, e una frase in italiano â€” **Carlomadella**
+- `89bb7f8` â€” feat(studio): le sette sezioni del punto 4, in una barra in basso â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_32 (1).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/studio_beat.png`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:328eb81 -->
 ## 06/09/26, 21:22 â€” task/telefono-nuovo â†’ main
 

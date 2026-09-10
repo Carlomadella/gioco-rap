@@ -1,0 +1,55 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-5C8E4254268B",
+  "origin": "legacy",
+  "title": "Dal profilo si torna al gioco, non solo al menù",
+  "category": "02-interfaccia-e-telefono",
+  "source": {
+    "point": "10",
+    "text": "Dal profilo si torna al gioco, non solo al menù",
+    "file": "implementazioni/02-interfaccia-e-telefono.md",
+    "source_status": "da_fare",
+    "source_status_raw": "da fare"
+  },
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "already_implemented",
+  "related_task_ids": [],
+  "intake_note": "already_implemented: il comportamento richiesto e' gia' presente nel codice reale; non esiste una task equivalente separata da collegare.",
+  "current_state": [
+    "Il profilo della landing prepara lo slot attivo e chiama ADF_RPG_V24.openAppearance().",
+    "Il fallback usa gioco.html?vai=profilo e gioco-ingresso.js entraInCitta() porta a hub e GAME.enter()."
+  ],
+  "systems": [
+    "frontend/js/landing.js",
+    "frontend/js/avvio.js",
+    "frontend/js/creator/rpg-v24-bridge.js",
+    "frontend/js/gioco-ingresso.js"
+  ],
+  "watch_paths": [
+    "frontend/js/landing.js",
+    "frontend/js/avvio.js",
+    "frontend/js/creator/rpg-v24-bridge.js",
+    "frontend/js/gioco-ingresso.js",
+    "frontend/pagine/landing.html",
+    "frontend/pagine/gioco.html"
+  ],
+  "acceptance_criteria": [],
+  "risks": [
+    "Un cambio al caricamento dello slot puo' disallineare artista, carriera e creator."
+  ],
+  "notes": [
+    "La fonte storica resta da fare come storico; l'audit separato registra che il comportamento e' gia' dimostrato."
+  ],
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "Nessun piano: il percorso dal profilo alla partita e' gia' implementato.",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

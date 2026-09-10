@@ -15,7 +15,7 @@
   box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1.5px rgba(255,255,255,.09),
     0 4px 0 #0A0A0F, 0 8px 16px rgba(0,0,0,.45);
   transition:transform .1s, box-shadow .1s}
-.ghost:hover{background:linear-gradient(180deg,#373746,#22222D)}
+@media (hover:hover){.ghost:hover{background:linear-gradient(180deg,#373746,#22222D)}}
 .ghost:active{transform:translateY(3px);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.15), inset 0 0 0 1.5px rgba(255,255,255,.09), 0 1px 0 #0A0A0F}
 .solid{position:relative;font-family:var(--cond);padding:13px 30px;border-radius:14px;
@@ -28,7 +28,7 @@
   background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);
   animation:sweep 3.4s ease-in-out infinite}
 @keyframes sweep{0%,72%{left:-60%}100%{left:130%}}
-.solid:hover{filter:brightness(1.06)}
+@media (hover:hover){.solid:hover{filter:brightness(1.06)}}
 .solid:active{transform:translateY(4px);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.6), 0 1px 0 #8A5B04}
 .solid:disabled{filter:grayscale(.8) brightness(.7);transform:none;cursor:not-allowed;
   box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.14), 0 3px 0 #17171D}

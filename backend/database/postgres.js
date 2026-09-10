@@ -11,14 +11,19 @@
    Senza quella variabile questo file non viene nemmeno caricato, e il server
    resta su SQLite come sempre.
 
-   **Perché una dipendenza, in un progetto che non ne ha.** Il protocollo di
+   **Perché una dipendenza, e perché è stata la prima.** Il protocollo di
    PostgreSQL si potrebbe scrivere a mano — è quello che abbiamo fatto per il
    server di sviluppo e per il build. Ma questo è il file che tiene le carriere
    della gente, e l'autenticazione SCRAM-SHA-256, il TLS, la decodifica dei
    tipi e le riconnessioni sono quattro posti dove un errore sottile non si
    vede subito e si paga sui dati veri. `pg` è la libreria più collaudata di
-   Node: qui «zero dipendenze» è una regola che conviene cedere, e questo è
-   l'unico posto dove la cediamo.
+   Node, e qui conviene cederla.
+
+   Quando è stata scelta era l'eccezione a una regola che diceva «zero
+   dipendenze». Quella regola non c'è più: adesso c'è un criterio scritto, e
+   sta in `documentazione/dipendenze.md`, dove `pg` ha la sua riga. Fra le
+   cinque domande c'è «si può togliere in un giorno?»: la risposta per `pg` è
+   questo file, ed è l'unico che cambierebbe.
 
    ---
 

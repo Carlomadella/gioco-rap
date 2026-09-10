@@ -154,7 +154,7 @@ const HUB_LUOGHI = [
      che come linguetta a sé non aveva senso: un negozio è un posto. */
   {id:"shop", n:"Shop",
    vai:() => apriPannello("Shop", "shop",
-     "Attrezzatura, beat da comprare e roba da mettersi addosso.")},
+     "Attrezzatura e beat da comprare.")},
   /* punto 6: il centro per l'impiego, arrivato con la mappa definitiva.
      Apre tutti i lavori (JOBS), non solo i due che hanno già un edificio —
      rispetta i requisiti, non finge che siano tutti presi al volo.
@@ -589,11 +589,43 @@ function hubOra(){
 }
 
 /* ---- la colonna di sinistra, quattro viste ---- */
+function hubRitrattoArtista(art){
+  const preview = art
+    ? (art.avatarPreviewImage ||
+       art.avatarData?.avatarPreviewImage ||
+       art.avatarData?.previewImage ||
+       "")
+    : "";
+
+  /* Il portrait MakeHuman salvato dal runtime è un data URL raster.
+     Accettiamo solo immagini base64: salvataggi importati non possono
+     iniettare markup/URL arbitrari nell'HUB. */
+  if(/^data:image\/(?:png|jpeg|webp);base64,/i.test(preview)){
+    const safe = String(preview)
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+    let providerClass = "";
+    if(art?.avatarSource === "avaturn"){
+      providerClass = " pport-img-avaturn";
+    }else if(
+      art?.avatarSource === "local" &&
+      art?.avatarData?.makehumanState?.previewFraming === "makehuman-deterministic-v1"
+    ){
+      providerClass = " pport-img-makehuman-deterministic"; /* ADF_MAKEHUMAN_DETERMINISTIC_PROPIC_V1_2 */
+    }
+    return '<img class="pport-img' + providerClass + '" src="' + safe + '" alt="">';
+  }
+
+  return window.ARTIST_PORTRAIT ? window.ARTIST_PORTRAIT() : "";
+}
+
 function vistaProfilo(L, ph){
   const art = window.ARTIST || {};
   return '<span class="ptit">Il tuo profilo</span>' +
     '<div class="pface">' +
-      '<div class="pport">' + (window.ARTIST_PORTRAIT ? window.ARTIST_PORTRAIT() : '') + '</div>' +
+      '<div class="pport">' + hubRitrattoArtista(art) + '</div>' +
       '<div class="pwho">' +
         '<div class="pnome">' + ((art.name || "senza nome").toUpperCase()) + hsvg("matita") + '</div>' +
         '<div class="plv">Lv. ' + L.lvl + '</div>' +
@@ -723,7 +755,7 @@ function renderHub(){
 
   $("hb-sxtab").innerHTML = [
     ["profilo", "Profilo", "persona"], ["abilita", "Abilità", "matita"],
-    ["vestiti", "Vestiti", "maglietta"], ["condizione", "Condizione", "cuore"]
+    ["condizione", "Condizione", "cuore"]
   ].map(([id, n, ic]) =>
     '<button class="ptab' + (HUB_VISTA === id ? " on" : "") + '" data-v="' + id + '">' +
     hsvg(ic) + '<span>' + n + '</span></button>').join("");
@@ -815,10 +847,6 @@ $("hb-pins").addEventListener("click", ev => {
 $("hb-sxtab").addEventListener("click", ev => {
   const b = ev.target.closest(".ptab"); if(!b) return;
   hubTap();
-  /* punto 7: la linguetta «Vestiti» è il guardaroba — solo equip, mai
-     acquisto. I capi nuovi si comprano allo Shop → Abbigliamento, o
-     arrivano da un evento. */
-  if(b.dataset.v === "vestiti"){ apriArmadio(); return; }
   /* punto 13: «Abilità» apre l'albero dei talenti e basta. Prima disegnava una
      vista in colonna con dentro un tasto per aprirlo: due passaggi per una
      cosa sola, e le quattro barre le ripeteva mentre l'albero le ha già in

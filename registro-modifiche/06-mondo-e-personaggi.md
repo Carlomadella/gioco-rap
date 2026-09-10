@@ -6,6 +6,91 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:91438dd -->
+## 08/09/26, 10:36 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `91438dd`
+
+### Cosa Ã¨ entrato
+
+- `a36b5e8` â€” Merge branch 'main' into task/responsivita â€” **Carlomadella**
+- `b197884` â€” fix: le cinque cose trovate dal giro di fine task â€” **Carlomadella**
+- `4d688c8` â€” css: il gioco stretto in un foglio suo, css/stretto.css â€” **Carlomadella**
+- `1338348` â€” docs: i punti della responsività chiusi, spostati nel loro argomento â€” **Carlomadella**
+- `df41c78` â€” strada: si impila sul telefono, e il rapporto di settimana ci sta a 360 â€” **Carlomadella**
+- `ee4951c` â€” css: ogni :hover dentro a @media (hover:hover), su tutti i fogli â€” **Carlomadella**
+- `43623ca` â€” studio: l'orologio galleggiante non copre più lo Studio, e le take si confrontano â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/css/abilita.css`
+- **Modificato:** `frontend/css/accesso.css`
+- **Modificato:** `frontend/css/actionbar.css`
+- **Modificato:** `frontend/css/avvio.css`
+- **Modificato:** `frontend/css/base.css`
+- **Modificato:** `frontend/css/creator.css`
+- **Modificato:** `frontend/css/effects.css`
+- **Modificato:** `frontend/css/forms.css`
+- **Modificato:** `frontend/css/game.css`
+- **Modificato:** `frontend/css/hub.css`
+- **Modificato:** `frontend/css/hud.css`
+- **Modificato:** `frontend/css/impostazioni.css`
+- **Modificato:** `frontend/css/landing.css`
+- **Modificato:** `frontend/css/menu-sistema.css`
+- **Modificato:** `frontend/css/negozio.css`
+- **Modificato:** `frontend/css/overlays.css`
+- **Modificato:** `frontend/css/posto.css`
+- **Modificato:** `frontend/css/preview.css`
+- **Modificato:** `frontend/css/servizio.css`
+- **Modificato:** `frontend/css/shell.css`
+- **Modificato:** `frontend/css/strada-crimine-v2.css`
+- **Modificato:** `frontend/css/strada-crimine.css`
+- **Aggiunto:** `frontend/css/stretto.css`
+- **Modificato:** `frontend/css/studio-elementi.css`
+- **Modificato:** `frontend/css/studio.css`
+- **Modificato:** `frontend/css/telefono.css`
+- **Modificato:** `frontend/css/tocco.css`
+- **Modificato:** `frontend/css/trasferte.css`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/strada-crimine-ui.js`
+- **Modificato:** `frontend/js/game/tempo-controlli.js`
+- **Modificato:** `frontend/pagine/accesso.html`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 36
+
+---
+
+<!-- merge:5bbd9fb -->
+## 07/09/26, 20:26 â€” task/via-lo-zero-dipendenze â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `5bbd9fb`
+
+### Cosa Ã¨ entrato
+
+- `2c44f85` â€” docs(dipendenze): il registro, e i rimandi agganciati al testo invece che al numero â€” **Carlomadella**
+- `af8f0e0` â€” merge: main dentro al branch delle dipendenze â€” **Carlomadella**
+- `8b82f2f` â€” docs(punto 4): via il principio zero-dipendenze, al suo posto una regola â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `backend/README.md`
+- **Modificato:** `backend/database/README.md`
+- **Modificato:** `backend/database/postgres.js`
+- **Modificato:** `documentazione/README.md`
+- **Aggiunto:** `documentazione/dipendenze.md`
+- **Modificato:** `frontend/README.md`
+- **Modificato:** `frontend/package.json`
+
+**File interessati in questa categoria:** 7
+
+---
+
 <!-- merge:328eb81 -->
 ## 06/09/26, 21:22 â€” task/telefono-nuovo â†’ main
 

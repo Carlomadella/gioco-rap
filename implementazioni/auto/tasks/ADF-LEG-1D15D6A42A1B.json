@@ -1,0 +1,83 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-1D15D6A42A1B",
+  "origin": "legacy",
+  "title": "Il menù delle impostazioni",
+  "category": "02-interfaccia-e-telefono",
+  "source": {
+    "point": "23",
+    "text": "Il menù delle impostazioni",
+    "file": "implementazioni/02-interfaccia-e-telefono.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "verified_status": "needs_validation",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "current_state": [
+    "Il pannello e' aperto dal menu principale e organizza audio, aspetto, gioco, partite, lingua e diritti."
+  ],
+  "systems": [
+    "frontend/js/impostazioni.js",
+    "frontend/js/impostazioni-ui.js",
+    "frontend/css/impostazioni.css",
+    "frontend/pagine/landing.html"
+  ],
+  "watch_paths": [
+    "frontend/js/impostazioni.js",
+    "frontend/js/impostazioni-ui.js",
+    "frontend/css/impostazioni.css",
+    "frontend/js/lingua.js",
+    "frontend/pagine/landing.html"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Il menu principale espone l'accesso alle impostazioni.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/pagine/landing.html: #m-setts e' la voce Impostazioni.",
+        "frontend/js/impostazioni-ui.js: collega #m-setts ad apriImpostazioni()."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Le impostazioni coprono audio, aspetto, gioco, salvataggi, lingua e diritti.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/impostazioni-ui.js: SEZIONI contiene audio, look, gioco, dati, lingua e info.",
+        "frontend/js/impostazioni.js: SET_DEF definisce configurazione persistente e tre slot."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Il pannello e le modifiche sono utilizzabili senza rompere il menu o la partita.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "manual: implementazioni/02-interfaccia-e-telefono.md, punto 23, elenca il test storico del menu."
+      ]
+    }
+  ],
+  "risks": [
+    "Impostazioni applicate globalmente possono alterare audio, scala o salvataggio mentre una partita e' aperta."
+  ],
+  "notes": [
+    "La copertura delle sezioni e' verificabile dal codice; ergonomia e persistenza richiedono interazione."
+  ],
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "audit_state": "audited"
+}

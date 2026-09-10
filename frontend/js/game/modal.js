@@ -28,6 +28,7 @@ function showEvent(e){
       const r = o.run() || {t:"", c:""};
       if(r.t) pushLog(r.t, r.c);
       save(); renderGioco();
+      if(typeof renderStudio === "function") renderStudio();
     };
     w.appendChild(b);
   });
@@ -43,6 +44,7 @@ function chiudiModale(){
   $("modal").classList.remove("on");
   annulla();
   renderGioco();
+  if(typeof renderStudio === "function") renderStudio();
   return true;
 }
 $("m-x").onclick = () => chiudiModale();

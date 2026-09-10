@@ -1,0 +1,84 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-04F5044C7230",
+  "origin": "legacy",
+  "title": "Il profilo cliccabile dal menù, in stile character creator",
+  "category": "02-interfaccia-e-telefono",
+  "source": {
+    "point": "64",
+    "text": "Il profilo cliccabile dal menù, in stile character creator",
+    "file": "implementazioni/02-interfaccia-e-telefono.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "verified_status": "needs_validation",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "current_state": [
+    "Il menu landing espone l'avatar e il flusso porta al profilo/creator della pagina di gioco per modificare l'artista."
+  ],
+  "systems": [
+    "frontend/pagine/landing.html",
+    "frontend/js/landing.js",
+    "frontend/js/gioco-ingresso.js",
+    "frontend/js/creator/",
+    "frontend/media/creator-rpg-v24/"
+  ],
+  "watch_paths": [
+    "frontend/pagine/landing.html",
+    "frontend/js/landing.js",
+    "frontend/js/gioco-ingresso.js",
+    "frontend/js/creator/",
+    "frontend/media/creator-rpg-v24/"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Dalla landing l'avatar apre il profilo dell'artista salvato.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/landing.js: #nav-avatar chiama vaiAlProfilo(), che prepara lo slot e apre openAppearance o la pagina gioco.",
+        "frontend/pagine/landing.html: #nav-avatar e' presente nella topnav."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il profilo offre un editor di personalizzazione coerente con un character creator.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/gioco-ingresso.js: il flusso profilo apre ADF_RPG_V24 e il relativo frame creator.",
+        "frontend/js/creator/: contiene stato, dati, navigazione e ritratto del creator."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Click, apertura dell'editor e modifica dell'aspetto funzionano nel browser.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "manual: implementazioni/02-interfaccia-e-telefono.md, punto 64, riporta una prova Chrome del click sull'avatar."
+      ]
+    }
+  ],
+  "risks": [
+    "Senza una carriera salvata il profilo non e' modificabile e deve mostrare un messaggio invece di aprire uno slot errato."
+  ],
+  "notes": [
+    "Il controllo automatico puo' verificare il wiring, non la qualita' visiva del character creator."
+  ],
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "audit_state": "audited"
+}

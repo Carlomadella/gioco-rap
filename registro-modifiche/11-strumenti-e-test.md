@@ -6,6 +6,239 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:de087c7 -->
+## 10/09/26, 01:07 â€” main â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `de087c7`
+
+### Cosa Ã¨ entrato
+
+- `a90a3d8` â€” docs: aggiorna implementazioni e roadmap ufficiale â€” **Anni di Fame Bot**
+- `fdb9378` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `0724440` â€” Merge branch 'task/beat-energia-e-barre-senza-malus' â€” **Sadyco La Fame**
+- `fb731d5` â€” fix(studio): via il costo in energia per farsi fare un beat, e via il malus di scrivere le barre â€” **Sadyco La Fame**
+- `231c0f1` â€” docs: aggiorna implementazioni e roadmap ufficiale â€” **Anni di Fame Bot**
+- `c2c0306` â€” fix(makehuman): rende Three.js locale e diagnostica il bootstrap â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/prova.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:0724440 -->
+## 10/09/26, 00:45 â€” task/beat-energia-e-barre-senza-malus â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.58)  
+**Merge commit:** `0724440`
+
+### Cosa Ã¨ entrato
+
+- `fb731d5` â€” fix(studio): via il costo in energia per farsi fare un beat, e via il malus di scrivere le barre â€” **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/prova.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:10a372d -->
+## 08/09/26, 21:17 â€” main â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `10a372d`
+
+### Cosa Ã¨ entrato
+
+- `354a383` â€” feat(makehuman): rifinisce zoom camerino â€” **Mycol**
+- `72b3118` â€” feat(makehuman): aggiorna sfondo camerino â€” **Mycol**
+- `d75b15b` â€” feat(makehuman): integra creator e ritratto nel gioco â€” **Mycol**
+- `2caed5c` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `b87ec1e` â€” merge: in Studio le azioni non ti buttano più fuori sulla mappa â€” **Sadyco La Fame**
+- `fd972b7` â€” test: un controllo automatico vero per il punto 14 dello Studio â€” **Sadyco La Fame**
+- `0b41d74` â€” fix: in Studio le azioni non ti buttano più fuori sulla mappa â€” **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/hub.css`
+- **Modificato:** `frontend/css/studio.css`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/modal.js`
+- **Modificato:** `frontend/js/game/studio.js`
+- **Modificato:** `frontend/js/game/ui.js`
+- **Modificato:** `frontend/js/game/writer.js`
+- **Modificato:** `frontend/js/gioco-ingresso.js`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+- **Aggiunto:** `frontend/media/makehuman-camerino-v1/assets/camerino-makehuman-custom.png`
+- **Modificato:** `frontend/media/makehuman-camerino-v1/index.html`
+- **Modificato:** `frontend/media/makehuman-camerino-v1/runtime.js`
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+- **Modificato:** `frontend/strumenti/dev.js`
+
+**File interessati in questa categoria:** 15
+
+---
+
+<!-- merge:b87ec1e -->
+## 08/09/26, 11:09 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.58)  
+**Merge commit:** `b87ec1e`
+
+### Cosa Ã¨ entrato
+
+- `fd972b7` â€” test: un controllo automatico vero per il punto 14 dello Studio â€” **Sadyco La Fame**
+- `0b41d74` â€” fix: in Studio le azioni non ti buttano più fuori sulla mappa â€” **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `frontend/css/studio.css`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/modal.js`
+- **Modificato:** `frontend/js/game/studio.js`
+- **Modificato:** `frontend/js/game/ui.js`
+- **Modificato:** `frontend/js/game/writer.js`
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 8
+
+---
+
+<!-- merge:91438dd -->
+## 08/09/26, 10:36 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `91438dd`
+
+### Cosa Ã¨ entrato
+
+- `a36b5e8` â€” Merge branch 'main' into task/responsivita â€” **Carlomadella**
+- `b197884` â€” fix: le cinque cose trovate dal giro di fine task â€” **Carlomadella**
+- `4d688c8` â€” css: il gioco stretto in un foglio suo, css/stretto.css â€” **Carlomadella**
+- `1338348` â€” docs: i punti della responsività chiusi, spostati nel loro argomento â€” **Carlomadella**
+- `df41c78` â€” strada: si impila sul telefono, e il rapporto di settimana ci sta a 360 â€” **Carlomadella**
+- `ee4951c` â€” css: ogni :hover dentro a @media (hover:hover), su tutti i fogli â€” **Carlomadella**
+- `43623ca` â€” studio: l'orologio galleggiante non copre più lo Studio, e le take si confrontano â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:6ecd52f -->
+## 07/09/26, 23:50 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `6ecd52f`
+
+### Cosa Ã¨ entrato
+
+- `f000a36` â€” fix: la stima del primo anno usava «my», che in quella funzione non esisteva â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:d443364 -->
+## 07/09/26, 23:11 â€” task/come-si-lavora-aggiornato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `d443364`
+
+### Cosa Ã¨ entrato
+
+- `43876cc` â€” docs: le regole di lavoro escono da implementazioni/ e diventano anche CLAUDE.md â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:5bbd9fb -->
+## 07/09/26, 20:26 â€” task/via-lo-zero-dipendenze â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `5bbd9fb`
+
+### Cosa Ã¨ entrato
+
+- `2c44f85` â€” docs(dipendenze): il registro, e i rimandi agganciati al testo invece che al numero â€” **Carlomadella**
+- `af8f0e0` â€” merge: main dentro al branch delle dipendenze â€” **Carlomadella**
+- `8b82f2f` â€” docs(punto 4): via il principio zero-dipendenze, al suo posto una regola â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `backend/README.md`
+- **Modificato:** `backend/database/README.md`
+- **Modificato:** `backend/database/postgres.js`
+- **Modificato:** `documentazione/README.md`
+- **Aggiunto:** `documentazione/dipendenze.md`
+- **Modificato:** `frontend/README.md`
+- **Modificato:** `frontend/package.json`
+
+**File interessati in questa categoria:** 7
+
+---
+
+<!-- merge:4a2831e -->
+## 07/09/26, 18:17 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `4a2831e`
+
+### Cosa Ã¨ entrato
+
+- `9486590` â€” fix: la lineetta storta nel package.json, e il commento del build che diceva il falso â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/package.json`
+- **Modificato:** `frontend/strumenti/build.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
+<!-- merge:e69464e -->
+## 07/09/26, 16:03 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `e69464e`
+
+### Cosa Ã¨ entrato
+
+- `d59c876` â€” style(studio): la pagina si allinea al riferimento, dettaglio per dettaglio â€” **Carlomadella**
+- `5c58187` â€” feat(studio): la foto a schermo intero, e sopra la schermata dei riferimenti â€” **Carlomadella**
+- `a4a6936` â€” fix(studio): 44 punti sulle linguette, la striscia dice che continua, e una frase in italiano â€” **Carlomadella**
+- `89bb7f8` â€” feat(studio): le sette sezioni del punto 4, in una barra in basso â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_34 (7).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/studio_testo.png`
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+- **Modificato:** `frontend/strumenti/prova.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:41ac4ed -->
 ## 06/09/26, 22:55 â€” task/popup-energia â†’ main
 

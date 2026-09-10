@@ -1,0 +1,121 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-B79B031D90FC",
+  "origin": "legacy",
+  "title": "LaFamegram con post veri, caricati dai giocatori",
+  "category": "02-interfaccia-e-telefono",
+  "source": {
+    "point": "52",
+    "text": "LaFamegram con post veri, caricati dai giocatori",
+    "file": "implementazioni/02-interfaccia-e-telefono.md",
+    "source_status": "in_parte",
+    "source_status_raw": "in parte"
+  },
+  "audit_state": "audited",
+  "verified_status": "in_progress",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "Task canonica sul feed LaFamegram e sui post scritti dai giocatori.",
+  "current_state": [
+    "frontend/js/game/telefono.js: schermataLafamegram() mostra il feed, telScrivi() salva i post dell'utente e telPost() li mette in testa insieme agli eventi.",
+    "frontend/js/game/telefono.js: telAggiornaFeed() usa /api/feed con fallback locale; un intervallo di 120 secondi aggiorna il feed mentre l'app è visibile.",
+    "Il post manuale è persistente solo nel salvataggio locale: non esiste ancora un endpoint POST condiviso fra giocatori."
+  ],
+  "systems": [
+    "frontend/js/game/telefono.js",
+    "frontend/js/game/state.js",
+    "backend"
+  ],
+  "watch_paths": [
+    "frontend/js/game/telefono.js",
+    "frontend/js/game/state.js",
+    "backend"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "LaFamegram mostra post automatici, eventi di gioco e post scritti dall'utente in ordine coerente.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/telefono.js: schermataLafamegram(), telScrivi() e telPost() compongono il feed con post manuali, eventi e sorgenti locali/server."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il feed remoto viene aggiornato periodicamente e conserva un fallback quando il server non risponde o non ha contenuti.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/telefono.js: telApriApp() richiama telAggiornaFeed(), il timer usa 120000 ms e telPost() ripiega su telPostLocale()."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Un post pubblicato dall'utente è inviato al backend e può essere visto dagli altri giocatori.",
+      "verification": "code_audit",
+      "status": "pending",
+      "evidence": [
+        "frontend/js/game/telefono.js: telScrivi() aggiorna G.lafamegramMiei e save(), ma l'audit non trova una chiamata POST per pubblicare il contenuto sul server."
+      ]
+    }
+  ],
+  "risks": [
+    "Un endpoint di pubblicazione dovrà validare lunghezza, identità e frequenza dei post senza duplicare quelli già salvati localmente.",
+    "Il fallback locale non deve mascherare errori di sincronizzazione una volta introdotta la pubblicazione remota."
+  ],
+  "notes": [
+    "La richiesta include un requisito backend reale: non è sufficiente considerare soddisfatta la sola visualizzazione locale."
+  ],
+  "plan": {
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Mantenere il feed frontend già vivo e completare il passaggio dei post manuali al backend condiviso.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Feed e post locali",
+        "objective": "Conservare composizione, ordinamento, fallback e persistenza locale del feed.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/telefono.js",
+          "frontend/js/game/state.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/telefono.js",
+          "frontend/js/game/state.js"
+        ],
+        "acceptance_criteria": [
+          "AC1",
+          "AC2"
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "V2",
+        "title": "Pubblicazione condivisa",
+        "objective": "Aggiungere il contratto di pubblicazione autenticato e collegarlo al comando Pubblica senza perdere il fallback.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "backend",
+          "frontend/js/game/telefono.js"
+        ],
+        "watch_paths": [
+          "backend",
+          "frontend/js/game/telefono.js"
+        ],
+        "acceptance_criteria": [
+          "AC3"
+        ],
+        "status": "planned"
+      }
+    ],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

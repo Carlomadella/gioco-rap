@@ -25,6 +25,12 @@ const chatjs = leggi("js/game/chat.js");
 const actions = leggi("js/game/actions.js");
 const posto = leggi("js/game/posto.js");
 const studio = leggi("js/game/studio.js");
+const studioEl = leggi("js/game/studio-elementi.js");
+const studioElCss = leggi("css/studio-elementi.css");
+const studioCss = leggi("css/studio.css");
+const overlaysCss = leggi("css/overlays.css");
+const effectsCss = leggi("css/effects.css");
+const modal = leggi("js/game/modal.js");
 const writer = leggi("js/game/writer.js");
 const piazza = leggi("js/game/piazza.js");
 const hub = leggi("js/game/hub.js");
@@ -471,6 +477,225 @@ test("le ACTION standard dello Studio non vengono addebitate due volte",
       !body.includes("GAME_TIME.spend");
   })());
 
+/* =====================================================   Punto 4 di CARLO, seconda meta': «ricrea la schermata identica alle foto
+   con elementi HTML». Le quattro schermate di riferimento dello Studio
+   avevano dentro delle cose che il codice non disegnava — le schede dei
+   beat, le take, i cursori del banco, il QUANDO. Adesso ci sono, e stanno
+   in js/game/studio-elementi.js.
+
+   Queste prove non guardano se sono belle: guardano che le tre cose nuove
+   **non regalino niente**, che era la promessa scritta in cima al file. Se
+   qualcuno un giorno alza un numero senza accorgersene, qui si ferma.
+   ============================================================ */
+console.log("\nPunto 4 — gli elementi dentro alle schermate dello Studio");
+
+test("gli elementi dello Studio stanno in un file loro, caricato dopo studio.js",
+  index.includes('js/game/studio-elementi.js') &&
+  index.indexOf('js/game/studio-elementi.js') > index.indexOf('js/game/studio.js') &&
+  index.includes('css/studio-elementi.css'));
+
+test("la prima take e' lo stesso tiro di dado che registra faceva da sola",
+  studioEl.includes("d.take = {k, l:[Math.round(rnd(-5, 6))], s:0}") &&
+  actions.includes("typeof studioTakePresa === \"function\" ? studioTakePresa() : rnd(-5,6)") &&
+  /* e chi non ha take in corso ricade sullo stesso dado */
+  studioEl.includes("if(!d || !d.l || !d.l.length) return rnd(-5, 6);"));
+
+test("una take in piu' si paga in energia, e non e' gratis",
+  studioEl.includes("const STUDIO_TAKE_ENERGIA = 12") &&
+  studioEl.includes("G.energy -= STUDIO_TAKE_ENERGIA") &&
+  studioEl.includes("if(G.energy < STUDIO_TAKE_ENERGIA)") &&
+  studioEl.includes("const STUDIO_TAKE_MAX = 6"));
+
+test("i cursori del banco partono al centro e al centro valgono zero",
+  studioEl.includes("d.banco = {voce:2, bassi:2, aria:2}") &&
+  /* il carattere di ripiego, quello dei cursori fermi in mezzo, non da' punti */
+  /PULITO",\s*q:0/.test(studioEl) &&
+  actions.includes("+ studioBonus() + bancoBonus()"));
+
+test("nessun carattere del banco vale piu' di tre punti, in su o in giu'",
+  (() => {
+    const q = (studioEl.match(/n:"[A-Z]+",\s*q:(-?\d+)/g) || [])
+      .map(x => Number(x.split("q:")[1]));
+    return q.length >= 10 && q.every(v => v >= -3 && v <= 3);
+  })());
+
+test("un pezzo in cassaforte non esce per sbaglio dalla plancia",
+  actions.includes("ready().filter(s => !s.tenuto)") &&
+  actions.includes("need:() => ready().some(s => !s.tenuto)") &&
+  studio.includes("typeof studioPronti === \"function\" ? studioPronti() : ready()") &&
+  studioEl.includes("return ready().filter(s => !s.tenuto);"));
+
+test("le uscite messe in coda per venerdi' scattano da sole, dopo il giro di settimana",
+  studioEl.includes("function studioUscitePronte()") &&
+  sim.includes("if(typeof studioUscitePronte === \"function\") studioUscitePronte();") &&
+  /* dopo advanceWeek(), se no il pezzo risulta uscito nella settimana sbagliata */
+  sim.indexOf("advanceWeek();") < sim.indexOf("studioUscitePronte()") &&
+  studioEl.includes("const STUDIO_VENERDI_HYPE = 4"));
+
+test("la stima degli stream e' la formula vera di sim.js, non un numero inventato",
+  studioEl.includes("Math.pow(Math.max(0, q - 26) / 74, 2.6) * (35 + G.hype * 13) * push") &&
+  sim.includes("Math.pow(Math.max(0, s.q - 26)/74, 2.6) * (35 + G.hype*13) * push"));
+
+test("la strofa e il beat che si incidono sono quelli scelti in cabina",
+  actions.includes("const daIncidere = ()") &&
+  actions.includes("const beatDaIncidere = ()") &&
+  !/registra[\s\S]{0,900}?const b = bestBar\(\), bt = bestBeat\(\);/.test(actions) &&
+  studioEl.includes("function studioStrofa()") &&
+  studioEl.includes("function studioBeatSuCui()"));
+
+test("il tema del foglio lo sceglie lo Studio, e senza scelta resta il tiro a caso",
+  writer.includes("typeof studioTemaScelto === \"function\" ? studioTemaScelto() : null") &&
+  writer.includes("scelto || pick(TEMI)") &&
+  studioEl.includes("function studioTemaScelto()"));
+
+test("comprare un beat dal banco e' scritto una volta sola, non due",
+  studioEl.includes("function prendiBeatDalBanco(b)") &&
+  posto.includes("prendiBeatDalBanco(b)") &&
+  /* la vecchia copia dentro a posto.js non c'e' piu'. Si guarda la riga che
+     mette il beat in cartella, non lo `splice`: quello resta, perche' La
+     Sala ha anche il tasto per **lasciarlo li'**, che toglie il beat dal
+     banco senza comprarlo ed e' un'altra cosa. */
+  !posto.includes("G.beats.push({n:b.n"));
+
+/* Gli attributi `data-` sono globali quanto le variabili, e `eventi-v2.js`
+   ascolta i click su **tutto il documento**: un attributo riusato non rompe
+   niente di visibile, spara solo l'evento sbagliato in silenzio. È già
+   successo con `data-compra`, che il tasto «Compralo» dello Studio si era
+   preso dal guardaroba: ogni beat comprato raccontava al motore degli eventi
+   che ti eri comprato una felpa. */
+test("gli attributi dello Studio non rubano il nome a quelli che ascolta tutto il documento",
+  (() => {
+    /* quelli che eventi-v2 intercetta a livello di documento */
+    const suoi = (ev.match(/closest\("\[data-([a-z-]+)\]"\)/g) || [])
+      .map(x => x.replace(/.*data-([a-z-]+).*/, "$1"));
+    /* quelli che lo Studio si e' inventato in questa task */
+    const miei = ["stcompra","bcard","bplay","take","tplay","ancora","ascolta",
+                  "quando","manda","riprendi","vesti","curs","tema","strofa","incide"];
+    const rubati = miei.filter(m => suoi.indexOf(m) >= 0);
+    if(rubati.length) console.log("      nomi in comune: " + rubati.join(", "));
+    return rubati.length === 0 &&
+      /* e nessuno di loro e' rimasto scritto come `data-compra` */
+      !studioEl.includes('"[data-compra]"') && !studio.includes(' data-compra=');
+  })());
+
+/* Il giro di fine task del 08/09/2026 (documentazione/problemi-riscontrati.md)
+   ha trovato queste cose sulla roba nuova dello Studio. Sistemate: qui restano
+   le prove, che sono l'unico modo perche' non tornino. */
+test("la take vale solo per la strofa e il beat su cui l'hai pagata",
+  /* la targhetta si guarda anche al momento di registrare, non solo in cabina */
+  studioEl.includes("const mia = d.k === studioTakeChiave();") &&
+  studioEl.includes("if(!mia) return rnd(-5, 6);") &&
+  /* ed e' fatta coi numeri di serie: due strofe stesso tema e stesso voto
+     erano la stessa cosa per la riga di prima */
+  studioEl.includes('return studioBarraSeme(b) + "|" + beatSeed(bt);'));
+
+test("muovere un cursore del banco non ridisegna la pagina sotto al dito",
+  studioEl.includes("function studioBancoMuovi(k, v, nodo)") &&
+  studioEl.includes("if(!nodo){ renderStudio(); return; }") &&
+  studioEl.includes("function studioBancoRitocca(input, k, v)") &&
+  studioEl.includes("studioBancoMuovi(c.dataset.curs, c.value, c)") &&
+  /* e il riquadro del risultato lo ritocca guardando **lo stesso** provino
+     che guarda la sezione: `studioDaMixare()` da solo torna null finche' non
+     ne scegli uno a mano, e il riquadro restava fermo sul carattere di prima */
+  studioEl.includes("function studioProvino()") &&
+  studioEl.includes("const s = studioProvino();"));
+
+test("dopo il cassetto il tasto d'oro torna a «Mandalo fuori»",
+  (() => {
+    const a = studioEl.indexOf('if(q === "cassetto")');
+    const corpo = a >= 0 ? studioEl.slice(a, a + 700) : "";
+    return corpo.includes('studioDati().quando = "subito";');
+  })());
+
+test("la cassaforte funziona anche sui pezzi di un salvataggio senza numero di serie",
+  studioEl.includes("function studioPezzoSeme(s)") &&
+  studioEl.includes("(G.songs || []).find(x => studioPezzoSeme(x) === seed)") &&
+  studio.includes("data-riprendi=\"' + studioPezzoSeme(x) + '\"") &&
+  studio.includes("data-vesti=\"' + studioPezzoSeme(s) + '\""));
+
+test("la stima degli stream tiene conto del tetto della fase, come fa sim.js il lunedi'",
+  studioEl.includes("const cap = PHASES[G.phase].cap;") &&
+  studioEl.includes("return Math.max(0, Math.round(v * ((cap + (tot - cap) * 0.2) / tot)));") &&
+  studioEl.includes("min: tetto(") && studioEl.includes("max: tetto("));
+
+test("l'uscita di venerdi' costa la lucidita' come quella mandata fuori a mano",
+  (() => {
+    const a = studioEl.indexOf("function studioUscitePronte()");
+    const corpo = a >= 0 ? studioEl.slice(a, a + 1400) : "";
+    return corpo.includes('if(typeof addLuc === "function") addLuc(-1);');
+  })());
+
+test("la scheda del beat scelta si salva, come tutte le altre scelte dello Studio",
+  (() => {
+    const a = studioEl.indexOf("function studioBeatSegna(seed)");
+    const corpo = a >= 0 ? studioEl.slice(a, a + 400) : "";
+    return corpo.includes("save();");
+  })());
+
+test("il tondo per ascoltare e «cambia copertina» si toccano a 44 punti",
+  studioElCss.includes("width:44px;height:44px;margin:-22px 0 0 -22px") &&
+  /\.stlink\{[^}]*min-height:44px/.test(studioElCss));
+
+/* La barra a tacche serve a confrontare le take a colpo d'occhio: se la
+   casella del «← buona» collassa, la riga senza targhetta regala una
+   sessantina di punti di larghezza alla sua barra e il confronto diventa
+   falso — una q85 sembrava più corta di una q71. La casella si stringe con lo
+   schermo, ma a zero non ci va **mai**. */
+/* I blocchi stretti stanno in `css/stretto.css` dal 08/09/2026, non piu' nel
+   foglio di ognuno: la prova guarda tutti e due i posti, cosi' regge sia se il
+   blocco resta li' sia se un domani torna a casa sua. */
+const cssStretti = studioElCss + leggi("css/stretto.css");
+test("la casella del «← buona» non collassa: le barre delle take restano confrontabili",
+  !/\.sttakeb\{min-width:0\}/.test(cssStretti.replace(/\s+/g, "")) &&
+  /\.sttakeb\{min-width:56px/.test(cssStretti) &&
+  /\.sttakeb\{min-width:50px/.test(cssStretti));
+
+/* A 360 punti la nav globale si prende 210 punti fissi e i tre numeri della
+   fascia ne vogliono quasi 190: su una riga sola l'ora finiva fuori dallo
+   schermo e si leggeva «09:». Sotto i 480 la fascia va su due righe, e
+   `--stAlta` deve crescere con lei se no le colonne ci finiscono dentro. */
+test("sotto i 480px la fascia dello Studio va su due righe e l'ora resta dentro",
+  (() => {
+    const css = leggi("css/studio.css") + leggi("css/stretto.css");
+    const a = css.indexOf("@media (max-width:480px)");
+    if(a < 0) return false;
+    const corpo = css.slice(a, a + 700);
+    return corpo.includes("--stAlta:80px") &&
+      corpo.includes("flex-wrap:wrap") &&
+      /#studio \.strisorse\{flex:1 1 100%/.test(corpo);
+  })());
+
+test("dentro alle schede dei beat e alle take non ci sono bottoni annidati",
+  !studioEl.includes('<button type="button" class="stbcard') &&
+  !studioEl.includes('<button type="button" class="sttakeriga') &&
+  studioEl.includes('role="button" tabindex="0"') &&
+  /* e chi non e' piu' un bottone si prende lo stesso con la tastiera */
+  studioEl.includes('addEventListener("keydown"'));
+
+/* La stima del primo anno sotto alle offerte di contratto usava `my`, che in
+   quella funzione non e' mai esistito: era definito seicento righe piu' sotto,
+   dentro a chartDiCasa(). renderGioco() si piantava — schermata «Il gioco si e'
+   fermato» — appena arrivavi ai 1500 fan della prima offerta senza aver
+   firmato. Non lo prendeva nessuna prova perche' e' una riga dentro a una
+   `map()` che gira solo quando quell'elenco non e' vuoto. */
+console.log("\nLe offerte di contratto: la stima non usa una variabile che non c'e'");
+test("gli stream della settimana si calcolano in un posto solo, e i due che li usano lo chiamano",
+  ui.includes("const streamSettimana = () =>") &&
+  ui.includes("streamSettimana() * 52 * 0.0055 * o.share * o.push + o.advance") &&
+  ui.includes("const my = streamSettimana();"));
+
+test("dentro a renderGioco non e' rimasto nessun `my` senza padrone",
+  (() => {
+    const a = ui.indexOf("function renderGioco");
+    const b = ui.indexOf("function chartDiCasa");
+    if(a < 0 || b < 0 || b < a) return false;
+    const corpo = ui.slice(a, b);
+    /* `my` usato come variabile, non come pezzo di un'altra parola */
+    const usi = corpo.match(/(^|[^\w.$])my([^\w]|$)/g) || [];
+    if(usi.length) console.log("      `my` compare ancora " + usi.length + " volte");
+    return usi.length === 0;
+  })());
+
 console.log("\nBlocco 3 — carcere separato");
 test("hub manda il detenuto alla schermata Carcere",
   hub.includes('G.strada && G.strada.arresto && typeof apriCarcere === "function"'));
@@ -626,6 +851,16 @@ test("controller si monta nella testata della finestra attiva",
   timeControls.includes('head:".nghead"') &&
   timeControls.includes('head:".topbar"') &&
   timeControls.includes('head:".adf-jail-top"'));
+/* Lo Studio è un foglio sopra all'hub, e l'hub resta acceso sotto: senza una
+   riga sua la pastiglia si agganciava all'hub e con lo z-index 142 finiva
+   sopra ai pannelli dello Studio (z-index 94), coprendo «Il quartiere», il
+   tasto «POSTA» e la stima degli stream. L'ora nello Studio ce l'ha la fascia
+   in alto. Le due cose che devono restare vere: la riga muta c'è, e sta
+   **prima** di quella dell'hub. */
+test("lo Studio è muto e viene prima dell'hub: nessuna pastiglia sui pannelli",
+  timeControls.includes('{id:"studio", root:"#studio.on",          mute:true}') &&
+  timeControls.includes('if(spec.mute) return null;') &&
+  timeControls.indexOf('id:"studio"') < timeControls.indexOf('id:"hub"'));
 test("pannello fixed nel body viene riposizionato vicino al widget attivo",
   timeControls.includes('.adf-tc-panel{position:fixed') &&
   timeControls.includes('function positionPanel()') &&
@@ -1013,6 +1248,72 @@ test("«Torna alla mappa» chiude davvero lo Studio prima di andare all'hub",
 test("la barra globale si monta nella testata dello Studio, non sotto in hub",
   menuSystem.includes('{id:"studio",  root:"#studio.on",        head:".sthead"}'));
 
+/* Punto 14 di ALE: le azioni in Studio chiudevano lo Studio prima di partire,
+   e ogni mossa ti buttava alla mappa. Il fix vero (studioAzione() non chiude
+   più) è invisibile a "le ACTION standard dello Studio non vengono addebitate
+   due volte" qui sopra, che guarda solo il pezzo giusto del file — se qualcuno
+   rimette dentro chiudiStudio() prima di hubAzione(id), lì sopra continua a
+   passare. Questi controlli guardano proprio quello: che non chiuda più, che
+   lo Studio si aggiorni da solo dopo, e che le finestre che un'azione apre
+   sopra di sé (foglio, titolo del pezzo, scena a pagina piena) restino
+   davvero sopra allo Studio, non dietro, per via dello z-index. */
+console.log("\nPunto 14 — le azioni in Studio non chiudono più lo Studio");
+test("studioAzione() non chiude più lo Studio prima della mossa, e si ridisegna dopo",
+  (() => {
+    const a = studio.indexOf("function studioAzione(id)");
+    const b = studio.indexOf("\n}", a);
+    const body = a >= 0 && b > a ? studio.slice(a, b) : "";
+    return body.includes("hubAzione(id)") &&
+      body.includes("renderStudio()") &&
+      !body.includes("chiudiStudio()");
+  })());
+test("renderStudio() si aggiorna da sola solo se lo Studio è ancora aperto",
+  /function renderStudio\(\)\{\s*const root ?= ?\$\("studio"\);\s*if\(!root \|\| !root\.classList\.contains\("on"\)\) return;/
+    .test(studio.replace(/\n\s*/g, "\n")) ||
+  (() => {
+    const a = studio.indexOf("function renderStudio()");
+    const b = studio.indexOf("\n}", a);
+    const body = a >= 0 && b > a ? studio.slice(a, b) : "";
+    return body.includes('classList.contains("on")') && body.includes("return;");
+  })());
+test("lo z-index dello Studio sta sotto a modal, report/scena e foglio: quello che un'azione apre sopra di sé si vede",
+  (() => {
+    const zStudio = Number((/\.studio\{[^}]*z-index:(\d+)/.exec(studioCss) || [])[1]);
+    const zModal = Number((/\.modal\{[^}]*z-index:(\d+)/.exec(overlaysCss) || [])[1]);
+    const zScena = Number((/\.scenapiena\{[^}]*z-index:(\d+)/.exec(effectsCss) || [])[1]);
+    const zWriter = Number((/\.writer\{[^}]*z-index:(\d+)/.exec(overlaysCss) || [])[1]);
+    return zStudio > 0 && zStudio < zModal && zStudio < zScena && zStudio < zWriter;
+  })());
+test("il percorso sincrono di un'azione diretta (ui.js) ridisegna lo Studio dopo l'esito",
+  (() => {
+    const a = ui.indexOf("const esegui = () => {");
+    const b = ui.lastIndexOf("};", ui.indexOf("const pesa ="));
+    const body = a >= 0 && b > a ? ui.slice(a, b) : "";
+    return body.includes('if(typeof renderStudio === "function") renderStudio();');
+  })());
+test("scrivere le barre (writer.js) ridisegna lo Studio, sia a strofa chiusa sia lasciando perdere",
+  writer.includes('$("w-done").onclick = () => { chiudiFoglio(); save(); renderGioco(); if(typeof renderStudio === "function") renderStudio(); };') &&
+  writer.includes('$("w-x").onclick = () => { if(WR) annullaAzione(); chiudiFoglio(); renderGioco(); if(typeof renderStudio === "function") renderStudio(); };') &&
+  writer.includes('$("w-cancel").onclick = () => { annullaAzione(); chiudiFoglio(); renderGioco(); if(typeof renderStudio === "function") renderStudio(); };'));
+test("le finestre generiche (modal.js: conferma spesa, titolo del pezzo, «Come la fai») ridisegnano lo Studio dopo",
+  (() => {
+    const a = modal.indexOf("function showEvent(e)");
+    const b = modal.indexOf("\n}", a);
+    const bodyEvent = a >= 0 && b > a ? modal.slice(a, b) : "";
+    const c = modal.indexOf("function chiudiModale()");
+    const d = modal.indexOf("\n}", c);
+    const bodyChiudi = c >= 0 && d > c ? modal.slice(c, d) : "";
+    return bodyEvent.includes('if(typeof renderStudio === "function") renderStudio();') &&
+      bodyChiudi.includes('if(typeof renderStudio === "function") renderStudio();');
+  })());
+test("registrare il pezzo (actions.js) ridisegna lo Studio dopo il titolo",
+  (() => {
+    const a = actions.indexOf('{id:"registra"');
+    const b = actions.indexOf('{id:"mixa"', a);
+    const body = a >= 0 && b > a ? actions.slice(a, b) : "";
+    return /SFX\.rec\(\);\s*save\(\);\s*renderGioco\(\);\s*if\(typeof renderStudio === "function"\) renderStudio\(\);/.test(body);
+  })());
+
 console.log("\nPunto 1 (bis) — «Torna alla mappa» funziona in ogni stanza dove si vede");
 test("Piazza e Writer si mostravano nella barra HOSTS ma il menu non li riconosceva: ora sì",
   menuSystem.includes('if(document.querySelector("#piazza.on")) return "piazza";') &&
@@ -1124,12 +1425,21 @@ test("ogni pezzo di attrezzatura ha un'icona propria (cuffie, mic, manopole, alt
   hub.includes("cuffie:'<path") && hub.includes("altoparlante:'<path"));
 test("la cassa dello shop si vede sempre, non solo scorrendo fino in fondo",
   ui.includes('$("sh-cash")') && ui.includes("fmt(G.money)"));
-test("Attrezzatura, Beat e Vestiti sono tre reparti dietro tre linguette, non tre liste impilate",
-  index.includes('data-sh="gear"') && index.includes('data-sh="beat"') && index.includes('data-sh="fit"') &&
-  index.includes('data-shsec="gear"') && index.includes('data-shsec="beat"') && index.includes('data-shsec="fit"') &&
-  negozio.includes('$("sh-tabs").addEventListener("click"'));
-test("il tab dei vestiti mostra ancora la stessa griglia di sempre (nggrid/ngcard), non riscritta",
-  index.includes('<div class="nggrid" id="g-fit">') && negozio.includes("function renderAbbigliamento()"));
+test("Attrezzatura e Beat sono due reparti dietro due linguette, non due liste impilate",
+  index.includes('data-sh="gear"') && index.includes('data-sh="beat"') &&
+  index.includes('data-shsec="gear"') && index.includes('data-shsec="beat"') &&
+  (index.match(/\bdata-sh="/g) || []).length === 2 &&
+  (index.match(/\bdata-shsec="/g) || []).length === 2 &&
+  !index.includes('data-sh="fit"') && !index.includes('data-shsec="fit"') &&
+  negozio.includes('const shTabs = $("sh-tabs")') &&
+  negozio.includes('shTabs.addEventListener("click"') &&
+  negozio.includes("s.dataset.shsec === b.dataset.sh"));
+test("il reparto Vestiti legacy resta nascosto e inerte finché manca il nuovo catalogo cosmetico",
+  negozio.includes("ADF_ABBIGLIAMENTO_HIBERNATE_V2") &&
+  negozio.includes("window.ADF_ABBIGLIAMENTO_LEGACY_ACTIVE = false") &&
+  negozio.includes("function renderAbbigliamento(){ return; }") &&
+  negozio.includes("function ngCompra(){ return false; }") &&
+  !index.includes('id="g-fit"') && !negozio.includes("data-compra"));
 test("comprare attrezzatura e beat resta la stessa economia di prima: stesso costo, stesso G.money, stesso G.gear/G.beats",
   ui.includes("G.money -= g2.p; G.gear[g2.id] = true;") &&
   ui.includes("G.money -= b.price; G.market.splice(i,1); G.beats.push("));
@@ -1191,6 +1501,17 @@ test("il foglio delle trasferte non si richiede da solo dentro al build",
   trasferte.includes('r.selectorText.indexOf(".trascosti")') &&
   trasferte.indexOf("if(regoleCaricate()) return;") <
     trasferte.indexOf('l.href = "css/trasferte.css'));
+/* La prova qui sotto e quella delle immagini orfane si reggono a vicenda: quella
+   là smette di guardare dentro al dataset degli avatar *perché* il build lo
+   salta. Se un giorno qualcuno toglie il salto dal build e non se ne accorge
+   nessuno, 2,8 GB tornano nel pacchetto in silenzio — che è il modo esatto in
+   cui i guai di questo progetto sono sempre arrivati: due liste scritte a mano
+   in due file, e una che resta indietro. Qui la seconda lista controlla la prima. */
+test("il dataset degli avatar resta fuori dal pacchetto per gli store",
+  build.includes("FUORI_DAL_PACCHETTO") &&
+  build.includes('path.join(RADICE, "media", "makehuman-editor-v1")') &&
+  /if\(FUORI_DAL_PACCHETTO\.has\(da\)\) return;/.test(build) &&
+  fs.existsSync(path.join(ROOT, "media", "makehuman-editor-v1")));
 test("i video delle transizioni stanno in una cartella sola, senza doppioni",
   (() => {
     const dir = path.join(ROOT, "media/video");
@@ -1225,21 +1546,34 @@ test("in media/ non restano immagini che nessuna riga di codice carica",
       "studio_promo_su_lafamegram.png", "studio_uscita_pezzo.png",
       /* la versione definitiva di Casa, arrivata dopo le altre */
       "casa_di provincia_definitiva.png",
-      /* Le stesse undici scene, ma senza gli elementi HTML sopra: servono per
-         capire cosa e' disegno e cosa e' foto quando si rifanno le pagine dei
-         luoghi. Materiale di riferimento, non ancora caricato da nessuno. */
-      "ChatGPT Image 6 set 2026, 19_43_32 (1).png",
+      /* Le stesse scene, ma senza gli elementi HTML sopra: servono per capire
+         cosa e' disegno e cosa e' foto quando si rifanno le pagine dei
+         luoghi. Erano dieci, tutte con il nome che gli aveva dato ChatGPT.
+         Quattro adesso sono il fondale vero delle sezioni dello Studio
+         (js/game/studio.js, STUDIO_FOTO) e sono uscite da questa lista: si
+         chiamano studio_beat / studio_testo / studio_cabina / studio_mix /
+         studio_uscita / studio_promo, e
+         se sparissero dal disco il gioco se ne accorgerebbe da solo. Queste
+         quattro restano materiale in attesa — le due di casa, il freestyle sotto
+         il cavalcavia e il live club: i loro posti non hanno ancora una
+         pagina che le carichi. */
       "ChatGPT Image 6 set 2026, 19_43_32 (2).png",
-      "ChatGPT Image 6 set 2026, 19_43_32 (3).png",
-      "ChatGPT Image 6 set 2026, 19_43_33 (4).png",
-      "ChatGPT Image 6 set 2026, 19_43_33 (5).png",
       "ChatGPT Image 6 set 2026, 19_43_34 (6).png",
-      "ChatGPT Image 6 set 2026, 19_43_34 (7).png",
       "ChatGPT Image 6 set 2026, 19_43_34 (8).png",
-      "ChatGPT Image 6 set 2026, 19_43_35 (10).png",
-      "ChatGPT Image 6 set 2026, 19_43_35 (9).png"
+      "ChatGPT Image 6 set 2026, 19_43_35 (10).png"
     ];
+    /* Il dataset degli avatar (`media/makehuman-editor-v1`) sta fuori dal conto,
+       e per due motivi diversi. Il primo: i suoi disegni non li nomina il
+       codice, li nominano i suoi cataloghi JSON — cercarli in js/css/html non
+       li troverebbe mai, e li chiamerebbe orfani tutti e 1.717. Il secondo, che
+       conta di più: questa prova esiste per non far finire nel pacchetto roba
+       che nessuno ha chiesto, e quel dataset nel pacchetto **non ci va** — lo
+       salta `strumenti/build.js` (`FUORI_DAL_PACCHETTO`). Quindi non c'è niente
+       da sorvegliare: qui dentro può restare quello che serve a chi lavora agli
+       avatar, tanto a chi installa il gioco non arriva. */
+    const DATASET_FUORI = path.join(ROOT, "media", "makehuman-editor-v1");
     const tutte = elencaFile(path.join(ROOT, "media"))
+      .filter(f => !f.startsWith(DATASET_FUORI))
       .filter(f => /\.(png|jpe?g|webp|gif)$/i.test(f));
     const fantasma = IN_ARRIVO.filter(n =>
       !tutte.some(f => path.basename(f) === n));
@@ -1411,10 +1745,13 @@ test("l'app Agenda del telefono mostra quello che ti sei segnato",
   tel.includes("data-agendavia"));
 
 console.log("\nPunto 7 — i file .md in cartelle con nomi coerenti");
-test("in radice restano solo README e ROADMAP",
+test("in radice restano solo README, ROADMAP e CLAUDE",
   (() => {
     const fuori = fs.readdirSync(path.join(ROOT, ".."))
       .filter(f => /\.md$/i.test(f) && f !== "README.md" && f !== "ROADMAP.md")
+      /* CLAUDE.md non e' un documento: e' la versione corta delle regole di lavoro,
+         e sta in radice perche' e' li' che ogni sessione la va a leggere */
+      .filter(f => f !== "CLAUDE.md")
       /* PROVARE.md e backend.md sono appunti locali, fuori da git apposta */
       .filter(f => f !== "PROVARE.md" && f !== "backend.md");
     if(fuori.length) console.log("      " + fuori.join(", "));
@@ -1449,7 +1786,89 @@ test("nessun documento punta più ai vecchi percorsi in radice",
     return morti.length === 0;
   })());
 
-for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js"]){
+console.log("\nLe regole di lavoro");
+const RADICE = path.join(ROOT, "..");
+test("stanno in documentazione/, e non piu' dentro a implementazioni/",
+  fs.existsSync(path.join(RADICE, "documentazione", "come-si-lavora.md")) &&
+  !fs.existsSync(path.join(RADICE, "implementazioni", "00-come-si-lavora.md")));
+test("la versione corta e' in radice, dove ogni sessione la legge",
+  fs.existsSync(path.join(RADICE, "CLAUDE.md")));
+test("CLAUDE.md dice le cose che non si possono dimenticare",
+  (() => {
+    const t = fs.readFileSync(path.join(RADICE, "CLAUDE.md"), "utf8");
+    /* il branch, la verifica giusta, il giro di fine task, i numeri che si spostano */
+    const manca = ["task/", "npm run verifica", "segnala-problemi", "backend-allineato",
+                   "registro-modifiche/"].filter(s => !t.includes(s));
+    if(manca.length) console.log("      manca: " + manca.join(", "));
+    return manca.length === 0;
+  })());
+test("il giro di fine task e' ancora acceso dopo il commit",
+  (() => {
+    const s = fs.readFileSync(path.join(RADICE, ".claude", "settings.json"), "utf8");
+    return fs.existsSync(path.join(RADICE, "scripts", "dopo-la-task.js")) &&
+           s.includes("dopo-la-task.js") && s.includes("PostToolUse");
+  })());
+test("nessun documento punta piu' al vecchio 00-come-si-lavora.md",
+  (() => {
+    const morti = [];
+    const guarda = d => {
+      for(const v of fs.readdirSync(d, {withFileTypes:true})){
+        if(v.name === "node_modules" || v.name === ".git" || v.name === "dist" ||
+           v.name === "registro-modifiche") continue;
+        const f = path.join(d, v.name);
+        if(v.isDirectory()){ guarda(f); continue; }
+        if(!/\.(md|js)$/i.test(v.name)) continue;
+        if(v.name === "audit-regressioni.js") continue;
+        if(/\]\([^)]*00-come-si-lavora\.md\)/.test(fs.readFileSync(f, "utf8")))
+          morti.push(path.relative(RADICE, f));
+      }
+    };
+    guarda(RADICE);
+    if(morti.length) console.log("      " + morti.join("\n      "));
+    return morti.length === 0;
+  })());
+
+/* L'hover che resta acceso dopo il tocco. Su un telefono non esiste un
+   «passarci sopra»: il browser lascia la riga accesa dopo il tap, e ti ritrovi
+   la scheda evidenziata finché non tocchi da un'altra parte — sembra selezionata
+   e non lo è. Ogni regola :hover del progetto vive dentro a
+   `@media (hover:hover)`, così sul mouse resta identica e sul dito non parte.
+   La prova: tolti i blocchi della gabbia, di :hover non deve restare niente. */
+test("nessun :hover fuori da @media (hover:hover): sul telefono non resta acceso",
+  (() => {
+    const fuori = [];
+    /* Non basta guardare `css/`: sei pezzi di grafica sono scritti dentro al
+       JavaScript (la pastiglia del tempo, i tasti del pannello, il calendario,
+       i post di LaFamegram, il carcere) e la prima passata li aveva saltati —
+       e il controllo diceva «tutto a posto» lo stesso. Adesso guarda anche i
+       file di codice che si portano dentro un foglio di stile. */
+    const daGuardare = fs.readdirSync(path.join(ROOT, "css"))
+      .filter(n => n.endsWith(".css")).map(n => "css/" + n)
+      .concat(["js/game/tempo-controlli.js", "js/game/eventi-v2.js",
+        "js/game/strada-crimine-ui.js", "js/menu-sistema.js",
+        "js/game/telefono.js", "js/game/traphone16.js"]);
+    for(const nome of daGuardare){
+      const testo = leggi(nome);
+      /* via i blocchi @media (hover:hover){...}, contando le graffe */
+      let s = testo, i;
+      while((i = s.search(/@media\s*\(\s*hover\s*:\s*hover\s*\)\s*\{/)) >= 0){
+        let j = s.indexOf("{", i), d = 1, k = j + 1;
+        while(k < s.length && d > 0){
+          if(s[k] === "{") d++;
+          else if(s[k] === "}") d--;
+          k++;
+        }
+        s = s.slice(0, i) + s.slice(k);
+      }
+      /* i commenti non sono regole: possono nominare :hover liberamente */
+      s = s.replace(/\/\*[\s\S]*?\*\//g, "");
+      if(s.includes(":hover")) fuori.push(nome);
+    }
+    if(fuori.length) console.log("      " + fuori.join("\n      "));
+    return fuori.length === 0;
+  })());
+
+for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }

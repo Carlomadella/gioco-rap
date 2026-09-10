@@ -1,0 +1,68 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-E489C02FFB9A",
+  "origin": "legacy",
+  "title": "Ascoltare un beat prima di comprarlo",
+  "category": "04-musica-e-suoni",
+  "source": {
+    "point": "2",
+    "text": "Ascoltare un beat prima di comprarlo",
+    "file": "implementazioni/04-musica-e-suoni.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "audited",
+  "verified_status": "needs_validation",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [
+    "La scheda del beat espone il comando di ascolto e beatSuona() sintetizza il beat prima dell'acquisto; l'acquisto resta un'azione separata."
+  ],
+  "systems": [
+    "frontend/js/game/posto.js",
+    "frontend/js/game/beatplay.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/posto.js",
+    "frontend/js/game/beatplay.js",
+    "frontend/js/game/negozio.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Ogni beat in vendita offre ascolto, acquisto e scarto come azioni distinte.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/posto.js: renderPosto() collega il comando data-sent a beatSuona(), con comandi separati per prendi e lascia."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il comando di ascolto avvia e interrompe la riproduzione sintetizzata del beat senza acquistarlo.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/beatplay.js: beatSuona() crea il trasporto audio e richiama beatStop() quando si riclicca sullo stesso beat."
+      ]
+    }
+  ],
+  "risks": [
+    "La disponibilita' dell'AudioContext e il mute globale possono cambiare l'esito percepito dell'ascolto."
+  ],
+  "notes": [
+    "L'audit del codice conferma il percorso; la verifica dell'esperienza sonora resta manuale."
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  }
+}

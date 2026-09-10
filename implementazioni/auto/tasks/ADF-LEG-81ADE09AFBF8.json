@@ -1,0 +1,72 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-81ADE09AFBF8",
+  "origin": "legacy",
+  "title": "Controllo del codice: due nomi di classe che si pestavano i piedi",
+  "category": "02-interfaccia-e-telefono",
+  "source": {
+    "point": "—",
+    "text": "Controllo del codice: due nomi di classe che si pestavano i piedi",
+    "file": "implementazioni/02-interfaccia-e-telefono.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [
+    "Gli stili della schermata Abilita' sono confinati sotto #abilita; la classe scena della schermata e' distinta dalla classe .scena dei riquadri."
+  ],
+  "systems": [
+    "frontend/css/abilita.css",
+    "frontend/css/effects.css",
+    "frontend/css/overlays.css",
+    "frontend/strumenti/audit-regressioni.js"
+  ],
+  "watch_paths": [
+    "frontend/css/abilita.css",
+    "frontend/css/effects.css",
+    "frontend/css/overlays.css",
+    "frontend/strumenti/audit-regressioni.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "I nomi di classe usati dalle due interfacce non applicano piu' stili globali in conflitto.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/css/effects.css: documenta e usa .scenapiena per il layer fullscreen, lasciando .scena al riquadro.",
+        "frontend/css/abilita.css: gli stili della nuova schermata sono prefissati da #abilita."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il controllo regressioni mantiene il confinamento degli stili della schermata Abilita'.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/strumenti/audit-regressioni.js: controlli sui selettori #abilita e sul layer di navigazione."
+      ]
+    }
+  ],
+  "risks": [
+    "Nuovi selettori globali in CSS possono ricreare la collisione senza alterare i nomi esistenti."
+  ],
+  "notes": [
+    "Il testo storico non specifica i nomi originari; l'audit registra il confinamento verificabile nello stato attuale."
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  }
+}

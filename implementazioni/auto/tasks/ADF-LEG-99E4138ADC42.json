@@ -1,0 +1,84 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-99E4138ADC42",
+  "origin": "legacy",
+  "title": "«Torna alla mappa» non funzionava in alcune interfacce",
+  "category": "02-interfaccia-e-telefono",
+  "source": {
+    "point": "1",
+    "text": "«Torna alla mappa» non funzionava in alcune interfacce",
+    "file": "implementazioni/02-interfaccia-e-telefono.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [
+    "Il ritorno globale alla mappa riconosce hub, Studio, Pannello, Piazza, Writer, Strada e gli altri host non bloccati; i dialoghi decisionali e il carcere restano correttamente esclusi."
+  ],
+  "systems": [
+    "navigazione",
+    "hub",
+    "stanze",
+    "menu-globale"
+  ],
+  "watch_paths": [
+    "frontend/js/menu-sistema.js",
+    "frontend/js/game/studio.js",
+    "frontend/js/game/piazza.js",
+    "frontend/js/game/writer.js",
+    "frontend/js/game/strada-crimine.js",
+    "frontend/strumenti/audit-regressioni.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Il comando Torna alla mappa è presente nella schermata di gioco.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/pagine/gioco.html: bottone #returnToMap con etichetta Torna alla mappa."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il ritorno chiude l'host attivo prima di riportare la schermata all'hub.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/menu-sistema.js: hostAttivo(), mappaBloccata() e tornaMappa() coordinano gli host e impediscono il ritorno solo nei contesti decisionali o nel carcere."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Studio, Piazza e Writer hanno una chiusura funzionante e non lasciano azioni pendenti.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/strumenti/audit-regressioni.js: controlli dedicati a Studio, Piazza/Writer, Pannello e alla copertura degli host riconosciuti."
+      ]
+    }
+  ],
+  "risks": [
+    "Nuovi host di gioco devono essere aggiunti sia al riconoscimento sia alla chiusura globale."
+  ],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": [
+      "Task storica già implementata; nessun piano tecnico residuo."
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-95F95C753984",
+  "origin": "legacy",
+  "title": "Una pagina per ogni azione?",
+  "category": "pagine-azioni",
+  "source": {
+    "point": "—",
+    "text": "Una pagina per ogni azione?",
+    "file": "documentazione/pagine-azioni/README.md",
+    "source_status": "risposto",
+    "source_status_raw": "risposto, da fare"
+  },
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "already_implemented",
+  "related_task_ids": [],
+  "intake_note": "La richiesta di analisi e progettazione e' gia' stata risposta nel README indicato; non emerge una task equivalente distinta.",
+  "current_state": [
+    "documentazione/pagine-azioni/README.md analizza pro, contro, telaio e pagine per azioni e luoghi.",
+    "La decisione documentata e' usare pagine per luoghi o decisioni reali, non una pagina automatica per ogni azione."
+  ],
+  "systems": [
+    "documentazione/pagine-azioni/README.md",
+    "frontend/js/game/ui.js",
+    "frontend/js/game/studio.js",
+    "frontend/js/game/piazza.js"
+  ],
+  "watch_paths": [
+    "documentazione/pagine-azioni/README.md",
+    "frontend/js/game/ui.js",
+    "frontend/js/game/studio.js",
+    "frontend/js/game/piazza.js",
+    "frontend/js/game/scene-art.js"
+  ],
+  "acceptance_criteria": [],
+  "risks": [
+    "Una futura modifica puo' confondere il piano documentale con un requisito di implementare una schermata per ogni azione."
+  ],
+  "notes": [
+    "La nota storica risposto, da fare viene preservata in source.source_status_raw; l'audit registra il README come risposta disponibile."
+  ],
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "Nessun piano: analisi e progetto sono gia' documentati.",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

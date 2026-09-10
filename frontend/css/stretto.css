@@ -1,0 +1,644 @@
+/* IL GIOCO STRETTO — tutto quello che cambia quando lo schermo e' un telefono.
+
+   Qui dentro c'e' **una cosa sola**: i blocchi `@media (max-width: N)` con N
+   fino a 1000, tirati fuori dai fogli che li tenevano sparsi. Prima erano in
+   diciotto file diversi e per capire come si comporta una schermata sul
+   telefono bisognava aprirli tutti; adesso si apre questo.
+
+   **Il confine e' 1000 punti.** Sopra, fino a 1500, ci sono altri `@media`
+   che pero' non parlano del telefono: parlano di una finestra stretta su un
+   monitor (la plancia che perde una colonna a 1180, la Strada che stringe le
+   sue a 1100). Quelli restano dove sono, accanto alla regola che correggono.
+   Il numero non e' inventato: 900 e' gia' il punto in cui la plancia si
+   impila e quello che usa `tocco.css`, e fra 1000 e 1100 non c'e' niente —
+   il confine cade in mezzo al vuoto, non dentro a un gruppo.
+
+   **Cosa NON e' finito qui, e perche':**
+
+   - Le regole `:hover`, che pure sono roba da telefono: `@media (hover:hover)`
+     deve avvolgere la regola dov'e' scritta, non si puo' spegnere un hover da
+     un altro foglio. Stanno dove stanno, e `css/tocco.css` racconta la regola.
+   - I bersagli da 44 punti: sono gia' separati loro, in `css/tocco.css`, che
+     si carica **dopo** questo perche' deve vincere su tutti.
+   - `css/menu-sistema.css`. I suoi blocchi a 620 sono seguiti, nello stesso
+     file, da regole semplici che oggi li battono — il wordmark e il tasto
+     MAPPA vengono ridisegnati piu' sotto. Portandoli qui, in fondo alla
+     cascata, quelle dichiarazioni tornerebbero a vincere e la nav globale
+     cambierebbe da sola, senza che nessuno l'abbia chiesto. Restano li'.
+
+   **Va caricato per penultimo**, subito prima di `tocco.css`: deve venire
+   dopo ogni foglio da cui sono usciti questi blocchi, se no non correggono
+   piu' niente. Se aggiungi un foglio nuovo con dentro un `@media` stretto,
+   o lo metti qui, o lo carichi dopo di questo.
+
+   L'ordine qui sotto e' quello con cui i fogli si caricano in
+   `pagine/gioco.html`, e poi quello che compare solo in landing e accesso:
+   dentro a ogni sezione i blocchi sono nell'ordine in cui stavano nel loro
+   file. Non e' pignoleria: fra due blocchi che toccano la stessa cosa vince
+   il secondo, e cambiare l'ordine vuol dire cambiare la pagina. */
+
+/* ==========================================================
+   BASE
+   ========================================================== */
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+
+
+/* ==========================================================
+   SERVIZIO
+   ========================================================== */
+@media (max-width:560px){
+  #servizio .foglio{padding:22px 18px 20px}
+  #staccato{flex-wrap:wrap}
+  #staccato .testo{flex:1 0 100%}
+}
+
+
+/* ==========================================================
+   PREVIEW
+   ========================================================== */
+@media (max-width:820px){.preview{position:static}}
+
+
+/* ==========================================================
+   SHELL
+   ========================================================== */
+@media (max-width:520px){.bword{display:none}}
+
+@media (max-width:520px){.navacc{padding:7px 11px;font-size:12px}}
+
+
+/* ==========================================================
+   GAME
+   ========================================================== */
+@media (max-width:900px){.gcols{grid-template-columns:1fr}}
+
+@media (max-width:700px){
+  .dtesta{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .drow{flex-wrap:wrap;gap:10px}
+  .dnm{flex:1 1 auto}
+  .dcurva{order:4;flex:1 1 100%;width:auto}
+  .dand{order:3;width:auto;flex:1 1 auto;text-align:left}
+  .dnum{order:2;width:auto}
+}
+
+@media (max-width:640px){
+  .shbar{position:static}
+  .shgrid{grid-template-columns:repeat(auto-fill,minmax(136px,1fr))}
+}
+
+
+/* ==========================================================
+   EFFECTS
+   ========================================================== */
+/* ---- SCHERMI STRETTI ----
+   Il rapporto di settimana e la scenetta della mossa sono due riquadri con
+   trenta punti d'imbottitura e tre caselle affiancate. Su un telefono da 360
+   quei trenta punti per lato, più i venti della cornice, lasciano 260 punti
+   veri: le tre caselle diventano da settantotto, e dentro ci va un numero da
+   27px che a «12.4K» è già fuori. Si stringe l'imbottitura e, sotto ai 400,
+   le caselle vanno a due per riga — l'ultima si prende la riga intera, che è
+   meglio di tre numeri tagliati. */
+@media (max-width:520px){
+  .report,.scenapiena{padding:12px}
+  .rcard,.scwrap{padding:20px 16px;border-radius:20px}
+  .rcard h2{font-size:34px;margin:5px 0 16px}
+  .rgrid{gap:8px}
+  .rbox{padding:12px 8px;border-radius:13px}
+  .rbox .v{font-size:22px}
+  .rbox .l{font-size:11px}
+  .rpos{padding:13px}
+  .rpos b{font-size:28px}
+}
+
+@media (max-width:400px){
+  .rgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  /* dispari: l'ultima casella si prende tutta la riga invece di restare
+     mezza vuota di fianco a un buco */
+  .rbox:last-child:nth-child(odd){grid-column:1/-1}
+}
+
+
+/* ==========================================================
+   HUD
+   ========================================================== */
+@media (max-width:620px){
+  .tline{flex-wrap:wrap}
+  .tlvl{width:100%;flex-direction:row;align-items:center;gap:9px}
+  .tlvl .xp{flex:1}
+}
+
+@media (max-width:560px){
+  .vitali{flex-wrap:wrap;gap:11px 0}
+  .vit{flex:1 0 50%;padding:0 8px}
+  .vit:nth-child(odd){border-left:none}
+}
+
+/* sullo stretto resta il numero e i trattini: la parola si capisce lo stesso */
+@media (max-width:720px){
+  .barenergia{gap:7px}
+  .barenergia .n em{display:none}
+}
+
+/* sullo stretto le cinque linguette si stringono invece di uscire dallo
+   schermo: restano tutte visibili senza doverle trascinare */
+@media (max-width:620px){
+  .nav2{gap:5px}
+  .nb{min-width:62px;padding:8px 4px 6px;gap:3px}
+  .nb svg{width:18px;height:18px}
+  .nb span{font-size:11px;letter-spacing:.03em}
+  .nb .bdg{top:3px;right:5px;min-width:15px;height:15px;font-size:9.5px}
+}
+
+@media (max-width:400px){
+  .nb{min-width:56px}
+  .nb span{font-size:10px}
+}
+
+
+/* ==========================================================
+   POSTO
+   ========================================================== */
+@media (max-width:520px){
+  .poaz{grid-template-columns:1fr}
+  .porel{width:104px}
+  .potx b{font-size:15px}
+}
+
+
+/* ==========================================================
+   STUDIO
+   ========================================================== */
+/* ============================================================
+   SCHERMI STRETTI — il telefono in verticale.
+   Le tre colonne diventano una pila: l'ordine è quello del lavoro, prima
+   quello che stai facendo e poi il contorno, perché su un telefono la prima
+   schermata è tutto quello che vedi senza scorrere.
+   ============================================================ */
+@media (max-width:900px){
+  :root{--stAlta:54px}
+  .stwrap{grid-template-columns:minmax(0,1fr);gap:12px;padding:12px 12px;
+    overflow-y:auto;align-content:start}
+  .stwrap:has(.stsx:empty),.stwrap:has(.stdx:empty),
+  .stwrap:has(.stsx:empty):has(.stdx:empty){grid-template-columns:minmax(0,1fr);
+    max-width:none;margin:0}
+  /* in mezzo prima di tutto: è la cosa che si fa */
+  .stmid{order:1}
+  .stsx{order:2}
+  .stdx{order:3}
+  .stcol{max-height:none;overflow:visible}
+  .stcopertina{width:140px;height:140px}
+  .sthead{gap:9px;padding-right:12px}
+  .sthead .stk{font-size:17px}
+  .stnome{font-size:15px}
+  .stnome i{display:none}
+  .strisorse span{font-size:13px}
+  .strisorse i{display:none}
+}
+
+/* Sotto i 620px la fascia in alto non ci sta più: la nav globale di
+   js/menu-sistema.js si prende 210px fissi, e nei 220 che restano non entrano
+   il nome del luogo, quello della sezione e tre numeri. Sparisce **il nome
+   del luogo**: è l'unica delle tre cose che non cambia mai e che sai già —
+   ci sei entrato tu. Restano la sezione, che è dove sei, e i numeri, che
+   sono quello che ti serve per decidere. Il margine che menu-sistema mette
+   su `.stk` passa a `.stnome`, se no il titolo finisce sotto alla nav. */
+@media (max-width:620px){
+  #studio .sthead .stk,#studio .stsep{display:none}
+  #studio .stnome{margin-left:210px;font-size:14px;letter-spacing:.03em}
+  #studio .strisorse{gap:7px}
+  #studio .strisorse span{font-size:12.5px;gap:4px}
+  #studio .strisorse .stpunto{display:none}
+  #studio .strisorse svg{width:14px;height:14px}
+}
+
+@media (max-width:520px){
+  .sttabs{gap:5px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px))}
+  .sttab{min-width:0;padding:10px;font-size:12px}
+  .stoltre{width:30px}
+  .stbanda{left:10px;right:10px}
+  .stfianco{gap:12px}
+  .stcopertina{width:110px;height:110px}
+  .stazioni .stprimo,.stazioni .stsecondo{flex:1 1 100%}
+}
+
+/* Sotto i 480px una riga sola non basta più. La nav globale si prende 210
+   punti fissi, e i tre numeri — energia, soldi, ora — ne vogliono quasi 190:
+   a 360 la somma sfonda lo schermo e l'ora si legge «09:» e basta. Quindi la
+   fascia diventa **due righe**: sopra la nav con la sezione di fianco, sotto
+   i numeri allineati a destra. Non è un ripiego — a questa larghezza è
+   l'unico modo di tenere leggibili tutte e due le cose, e la fascia resta
+   una fascia sola perché a crescere è la sua altezza, non il numero di
+   barre. La nav è `position:absolute` dentro a `.sthead` (menu-sistema.js),
+   quindi non occupa posto nel flusso: la prima riga se lo deve riservare da
+   sola, ed è il `min-height` su `.stnome` a farlo. `--stAlta` cresce con lei,
+   se no le colonne partono sotto alla fascia e ci finiscono dentro. */
+@media (max-width:480px){
+  :root{--stAlta:80px}
+  #studio .sthead{flex-wrap:wrap;align-items:flex-start;padding-right:12px}
+  /* la riga della nav: alta quanto la nav, se no i numeri le finiscono sotto */
+  #studio .stnome{flex:1 1 100%;min-height:52px;align-items:center;
+    margin-left:210px;font-size:13.5px}
+  /* i numeri, riga loro, a destra: sotto alla nav e larghi quanto serve */
+  #studio .strisorse{flex:1 1 100%;margin:0 0 4px;justify-content:flex-end;gap:10px}
+  #studio .strisorse span{font-size:13px}
+}
+
+
+/* ==========================================================
+   STUDIO-ELEMENTI
+   ========================================================== */
+/* ============================================================
+   SCHERMI STRETTI
+   ============================================================ */
+@media (max-width:900px){
+  .stbcards{grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:9px}
+  .stbcov{height:64px}
+  .stbprezzo b{font-size:18px}
+}
+
+@media (max-width:620px){
+  /* i tre cursori uno sotto l'altro: affiancati diventano tre bersagli da
+     sessanta punti, e su un telefono non si prendono */
+  .stcursi{grid-template-columns:minmax(0,1fr)}
+  .stcurs{padding:8px 4px 6px}
+  .stcurs + .stcurs{box-shadow:inset 0 1px 0 rgba(125,175,215,.16)}
+  .stcursnota{min-height:0;margin-bottom:4px}
+  /* NON `min-width:0`: azzerare la casella vuota regalava una sessantina di
+     punti di larghezza alla barra della riga senza targhetta, e le take non
+     erano più confrontabili. Si stringe, non sparisce. */
+  .sttakeb{min-width:56px;font-size:12px}
+  .sttacche{min-width:40px}
+  .ststream{font-size:14.5px}
+}
+
+@media (max-width:520px){
+  .stbcards{grid-template-columns:minmax(0,1fr)}
+  .stbcov{height:88px}
+  .sttakeriga{gap:8px;padding-right:9px}
+  .sttaken{font-size:13px}
+  /* stessa regola di sopra, un gradino più stretta: 11.5px di testo stanno
+     dentro ai 50 riservati, quindi le due piste restano larghe uguali */
+  .sttakeb{min-width:50px;font-size:11.5px}
+  .stbarrona{gap:8px;padding:10px 11px}
+}
+
+
+/* ==========================================================
+   STRADA-CRIMINE-V2
+   ========================================================== */
+/* ============================================================
+   7 · IL TELEFONO IN VERTICALE — la Strada si impila
+   ============================================================
+   Fino a qui la Strada esisteva **solo** larga: le tre colonne sono
+   `260px minmax(520px,1fr) 300px`, e la regola sotto ai 1100 le stringe a
+   `225px minmax(470px,1fr) 260px` — che fa comunque 955 punti prima dei
+   distacchi e dell'imbottitura. Sotto ai 980 le colonne non ci stanno più e
+   la pagina sbordava di lato: il colpo da scegliere finiva mezzo fuori dallo
+   schermo e la barra delle città non si raggiungeva. Non era una rifinitura
+   da sistemare, era la Strada che sul telefono non si giocava.
+
+   Si impila, con lo stesso ordine che usa lo Studio: prima quello che stai
+   facendo (i colpi), poi come stai (Adesso), poi il contorno, e in fondo le
+   città. Su un telefono la prima schermata è tutto quello che vedi senza
+   scorrere, e quello che vedi deve essere la cosa che si fa. */
+@media(max-width:980px){
+  /* la scena smette di essere alta quanto lo schermo e torna a essere una
+     pagina che scorre: con tre pannelli uno sotto l'altro un'altezza fissa
+     vorrebbe dire tre righelli interni, e non se ne prende nessuno */
+  #strada .scene{
+    height:auto;min-height:calc(100svh - 72px);
+    grid-template-columns:minmax(0,1fr);grid-template-rows:none;
+    gap:12px;padding:14px 12px 18px;align-content:start
+  }
+  #strada .center{order:1}
+  #strada .side{order:2}
+  #strada .right{order:3}
+  #strada .citybar{order:4;grid-template-columns:minmax(0,1fr);gap:10px}
+  /* i pannelli non si tagliano più il contenuto: cresce la pagina, non loro */
+  #strada .stpan{overflow:visible}
+  #strada .center{overflow:hidden}          /* qui il velo interno serve */
+  /* i quattro colpi restano due per riga finché ci stanno: sotto vanno a uno.
+     `auto` e non `1fr`: impilati non c'è più un'altezza da spartire. */
+  #strada .crimes{grid-template-rows:auto;grid-auto-rows:auto}
+  /* la riga delle città: la nota sopra, i tre tasti sotto, larghi uguali */
+  #strada .city-note{padding:10px 14px}
+  /* la fascia in alto perde l'imbottitura da monitor */
+  #strada .topbar{padding:0 12px}
+  #strada .where strong{font-size:21px}
+  #strada .herohead h1{font-size:clamp(30px,7vw,40px)}
+}
+
+/* Sotto i 620 comanda la nav globale di js/menu-sistema.js, che nella fascia
+   si prende 210 punti fissi (il marchio della Strada è già nascosto da
+   menu-sistema: `#strada.on .topbar .logo{visibility:hidden}`). Nei punti che
+   restano non entrano il titolo e la riga di sessione, e la pastiglia del
+   tempo — che tempo-controlli.js aggancia dentro a `.session` — ci deve stare
+   anche lei. Quindi la fascia va su due righe, come nello Studio: sopra la
+   nav, sotto il titolo e la sessione. */
+@media(max-width:620px){
+  #strada .topbar{
+    height:auto;min-height:104px;
+    grid-template-columns:minmax(0,1fr);grid-template-rows:52px auto;
+    align-items:center;padding:0 12px 8px;row-gap:2px
+  }
+  #strada .where{grid-row:2;text-align:left}
+  #strada .where strong{font-size:19px}
+  #strada .session{grid-row:2;justify-self:end;align-self:center;gap:9px;font-size:9px}
+  /* la scena parte sotto a una fascia che adesso è più alta */
+  #strada .scene{min-height:calc(100svh - 104px)}
+}
+
+/* Il telefono stretto vero. Due colpi affiancati fanno due bersagli da 150
+   punti con dentro tre targhette: si legge male e si sbaglia. Uno per riga. */
+@media(max-width:520px){
+  #strada .crimes{grid-template-columns:minmax(0,1fr);padding:0 10px 12px;gap:8px}
+  #strada .cities{grid-template-columns:minmax(0,1fr);gap:6px}
+  #strada .tabs{grid-template-columns:1fr 1fr}
+  #strada .side{padding:13px}
+  #strada .scene{padding:12px 10px 16px}
+  #strada .where strong{font-size:17px}
+  #strada .session span:first-child{display:none}   /* la città è già sotto */
+}
+
+
+/* ==========================================================
+   HUB
+   ========================================================== */
+@media (max-width: 1000px) {
+  .pstat .ps:last-child {
+    display: none;
+  } /* il benessere sta anche nel profilo */
+  .psett {
+    width: 104px;
+    padding-left: 12px;
+  }
+}
+
+/* ---- il telefono in mano: si impila ---- */
+@media (max-width: 900px) {
+  /* Il palco smette di essere inchiodato allo schermo e torna a essere un
+     pezzo di pagina. Serve a due cose, tutte e due solo sul telefono vero:
+     scorrendo la pagina il browser si tira su la sua barra e ti restituisce
+     quei 60-90 px (dentro a un riquadro che scorre per conto suo, non lo fa
+     mai), e lo scorrimento e' quello di sistema, con la sua inerzia.
+     L'altezza minima e' `100svh` — la misura *piccola*, quella con le barre
+     visibili: cosi' la plancia entra dal primo momento e non si vede niente
+     tagliato mentre la barra e' ancora fuori. */
+  .palco {
+    position: static;
+    overflow: visible;
+  }
+  .plancia {
+    height: auto;
+    min-height: 100svh;
+    gap: 10px;
+    padding: 0 8px 12px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas: "barra" "centro" "sx" "sugg";
+  }
+
+  .pbarra {
+    height: auto;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 8px 6px;
+    gap: 6px 0;
+  }
+  .plogo {
+    width: auto;
+    padding: 0 10px 0 4px;
+  }
+  /* sullo schermo stretto resta la casetta: la parola la mangia la riga */
+  .pmenu {
+    padding: 0 12px;
+    margin-left: auto;
+  }
+  .pmenu .pk {
+    display: none;
+  }
+  .pcitta {
+    width: auto;
+    flex: 1;
+    border-left: 0;
+    padding-left: 12px;
+  }
+  .psett {
+    width: auto;
+    padding-left: 12px;
+  }
+  .pstat {
+    flex: 1 0 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  .pstat .ps {
+    border-left: 0;
+    padding: 2px 4px;
+    gap: 8px;
+  }
+  .pstat .ps:last-child {
+    display: flex;
+  }
+  .ps .pbar {
+    width: 100%;
+    max-width: 88px;
+  }
+
+  .pcolsx,
+  .pcolcentro {
+    grid-template-rows: auto auto;
+  }
+  /* La mappa non scende più sotto la soglia in cui si legge. I cartelli —
+     Studio, Beat Maker, Attività criminali — sono disegnati *dentro* alla
+     foto, quindi rimpiccioliscono con lei: a 375 px di schermo diventavano
+     quattro pixel di testo, e una città che non si legge non si gioca.
+     Sotto i 900 la foto tiene almeno 620 px e la città si sposta col dito,
+     come una cartina vera. Dove lo schermo è più largo di 620 non cambia
+     niente: `max()` la lascia riempire la colonna. */
+  .pmappa {
+    overflow-x: auto;
+    place-items: start;
+    overscroll-behavior-x: contain;
+  }
+  /* la foto adesso è più larga del riquadro e lo copre tutta: lo sfondo
+     sfocato del punto 62 non si vedrebbe comunque, e con `inset:-40px` dentro
+     a un riquadro che scorre si porterebbe dietro quaranta pixel di vuoto da
+     scorrere. Via — è anche una sfocatura da 46 px in meno da disegnare sul
+     telefono. */
+  .pmappa::before {
+    display: none;
+  }
+  .pfoto {
+    /* La citta' non scende sotto una misura in cui i cartelli restano
+       leggibili: sotto i 900 px la foto tiene i suoi 900 e ci si sposta col
+       dito, come una cartina vera. Le targhette si misurano sulla foto
+       (`cqw`), quindi a questa larghezza occupano la stessa fetta di citta'
+       che occupano sul monitor grande: non coprono piu' mezzo quartiere. */
+    width: max(100%, 900px);
+    height: auto;
+    max-width: none;
+  }
+  .psx {
+    overflow: visible;
+    max-height: none;
+  }
+  .psxtab {
+    height: 88px;
+  }
+  .peventi {
+    height: auto;
+  }
+  .pevrow {
+    height: auto;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pev {
+    flex: 1 1 46%;
+    min-height: 128px;
+  }
+  .pevsett {
+    flex: 1 0 100%;
+  }
+  .pevpiu {
+    flex: 1 1 100%;
+    padding: 10px;
+    flex-direction: row;
+    gap: 12px;
+  }
+  .psugg {
+    height: auto;
+    padding: 10px 12px;
+    text-align: center;
+    line-height: 1.35;
+  }
+}
+
+@media (max-width: 560px) {
+  .pev {
+    flex: 1 1 100%;
+  }
+  .pcitta .pcn {
+    font-size: 15px;
+  }
+  .pstat {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .psxtab {
+    height: 78px;
+  }
+  .ptab .hicon {
+    width: 22px;
+    height: 22px;
+  }
+  .ptab span {
+    font-size: 9.5px;
+  }
+}
+
+
+/* ==========================================================
+   TRASFERTE
+   ========================================================== */
+@media (max-width:520px){
+  #tras-overlay{padding:0}
+  .trascard{max-height:100vh;height:100%;border-radius:0;border:none}
+}
+
+
+/* ==========================================================
+   IMPOSTAZIONI
+   ========================================================== */
+/* sullo stretto le linguette si stringono: si scorrono lo stesso, ma quasi
+   tutte ci stanno */
+@media (max-width:560px){
+  .stabs{padding:10px 12px;gap:5px}
+  .stab{padding:8px 11px;font-size:12.5px;gap:6px}
+  .stab i{font-size:12px}
+}
+
+@media (max-width:620px){
+  .setts{padding:0}
+  .swrap{border-radius:0;min-height:100%}
+  .srow{flex-direction:column;align-items:flex-start;gap:10px}
+  .srow .sctl{width:100%}
+  .sld input[type=range]{width:100%;flex:1}
+  .sld{width:100%}
+  .sw2row{max-width:none;justify-content:flex-start}
+  .sslot{flex-wrap:wrap}
+}
+
+
+/* ==========================================================
+   LANDING
+   ========================================================== */
+@media (max-width:820px){body.su-menu .navmeta{display:none}}
+
+@media (max-width:820px){body.su-menu .navacc{margin-left:auto}}
+
+/* ---- in mano: il menu diventa una griglia, non un nastro da scorrere ---- */
+@media (max-width:900px){
+  .land{height:100svh;min-height:520px}
+  .land-hero{margin-left:6vw;width:88vw;justify-content:flex-end;padding-bottom:16px}
+  .land-hero h1{font-size:clamp(52px,15vw,96px)}
+  .land-sub{font-size:15px;max-width:none}
+  .land-dock{margin:0 12px 12px}
+  .land-dock nav{width:auto;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:7px}
+  .land-voce{min-height:64px;padding:9px 10px 8px}
+  .land-voce .tit{margin-top:6px;font-size:11.5px}
+  .land-voce .des{font-size:9.5px;margin-top:2px}
+  .land-piede{display:none}
+}
+
+@media (max-width:560px){
+  .land-hero h1{font-size:clamp(44px,14vw,72px)}
+  .land-sub{font-size:13.5px;line-height:1.35;margin-top:14px}
+  .land-hero .mrow.big{margin-top:16px;padding:12px 18px 12px 14px;gap:12px}
+  .land-hero .mrow.big .ic{width:28px;height:28px}
+  .land-hero .mrow.big .a{font-size:13px}
+  .land-hero .mrow.big .b{font-size:11px}
+  .land-dock nav{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .land-voce{min-height:54px;padding:8px 10px}
+  .land-voce .n,.land-voce .frec{display:none}
+  .land-voce .tit{margin-top:0}
+  .land-voce .des{font-size:9px}
+  .land-giu{display:none}
+}
+
+
+/* ==========================================================
+   AVVIO
+   ========================================================== */
+@media (max-width:900px){
+  .land-avvio{top:auto;bottom:9px;max-height:calc(100% - 28px);transform:translateY(18px);width:100%}
+  .land.avvio-aperto .land-avvio{transform:translateY(0)}.land.avvio-aperto .land-dock{opacity:0;visibility:hidden}
+  .avv-testa{margin-bottom:12px}.avv-testa h2{font-size:clamp(28px,8vw,44px)}.avv-testa p{font-size:12.5px}
+  .avv-riga,.avv-slot{min-height:60px}.avv-diff{grid-template-columns:1fr;gap:7px}
+  .avv-diff-card{min-height:0;padding:13px 45px 13px 14px;border-radius:13px}.avv-diff-card b{font-size:15px}
+  .avv-diff-card p{margin-top:5px;font-size:10.5px}.avv-diff-tag{margin-bottom:5px}.avv-diff-card em{position:static;display:inline-block;margin-top:7px}
+  .avv-diff-go{right:14px;bottom:50%;transform:translateY(50%)}
+}
+
+@media (max-width:560px){
+  .land-avvio{bottom:5px;width:100%;max-height:calc(100% - 12px);overflow:auto;padding-right:4px}
+  .avv-testa h2{font-size:30px}.avv-testa p{font-size:11.5px;line-height:1.35}
+  .avv-riga,.avv-slot{grid-template-columns:38px minmax(0,1fr) 24px;gap:9px;min-height:55px;padding-top:7px;padding-bottom:7px}
+  .avv-slot-scelta{grid-template-columns:38px minmax(0,1fr) 24px}.avv-slot-scelta .avv-slot-stato{display:none}
+  .avv-ic{width:31px;height:31px;font-size:12px}.avv-tx b,.avv-slot-tx b{font-size:12px}.avv-tx small,.avv-slot-tx small{font-size:9.5px}
+  .avv-importa small{display:none}.avv-conferma-azioni{justify-content:stretch}.avv-conferma-azioni button{flex:1}
+  .avv-slot-row{grid-template-columns:minmax(0,1fr) auto}.avv-slot-row .avv-elimina{margin-left:6px;padding:7px 8px;font-size:8px}
+}
+
+
+/* ==========================================================
+   ACCESSO
+   ========================================================== */
+@media (max-width:520px){
+  .accesso{padding-top:80px}
+  .acc-scheda{padding:24px 20px 22px; border-radius:18px}
+  .acc-scheda h1{font-size:26px}
+}

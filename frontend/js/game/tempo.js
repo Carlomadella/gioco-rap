@@ -497,6 +497,10 @@
     bandAt:fasciaPer,
     suspended:()=>runtime().suspendedAction ? Object.assign({},runtime().suspendedAction) : null,
     resumeAction,
+    /* Le azioni dirette (avviaAzioneDiretta in ui.js) non passano da un click
+       su ".tile[data-id]": senza questo, durataAzione() non trova l'id vero e
+       torna il fallback di 60 minuti (vedi il turno in fabbrica). */
+    captureAction:id=>{ AZIONE_ID_CATTURATA=id||null; },
     DAY_START,DAY_END,SLOT
   });
 

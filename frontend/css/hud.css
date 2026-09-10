@@ -49,11 +49,6 @@
 /* il riempimento finisce in bianco: senza contorno i numeri ci si perdono dentro */
 .xp span{position:absolute;inset:0;display:grid;place-items:center;font-size:9.5px;font-weight:900;
   color:#fff;text-shadow:0 0 2px rgba(0,0,0,.95), 0 0 4px rgba(0,0,0,.8), 0 1px 2px rgba(0,0,0,.9)}
-@media (max-width:620px){
-  .tline{flex-wrap:wrap}
-  .tlvl{width:100%;flex-direction:row;align-items:center;gap:9px}
-  .tlvl .xp{flex:1}
-}
 
 /* ---- i tre numeri, in riga dentro la testata ---- */
 .vitali{display:flex;align-items:stretch;gap:0;margin-top:13px;
@@ -72,18 +67,13 @@
 .vit u{display:block;text-decoration:none;font-family:var(--cond);font-size:10.5px;font-weight:700;
   letter-spacing:.11em;text-transform:uppercase;color:var(--faint);margin-top:3px;white-space:nowrap}
 .vit.neg b{color:var(--hot)}
-@media (max-width:560px){
-  .vitali{flex-wrap:wrap;gap:11px 0}
-  .vit{flex:1 0 50%;padding:0 8px}
-  .vit:nth-child(odd){border-left:none}
-}
 
 /* ---- i numeri di contorno, chiusi finché non li chiedi ---- */
 .dettbtn{display:flex;align-items:center;gap:7px;margin:11px 0 0;padding:6px 12px;border-radius:999px;
   font-family:var(--cond);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
   color:var(--soft);background:rgba(255,255,255,.06);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);transition:background .15s,color .15s}
-.dettbtn:hover{background:rgba(255,255,255,.13);color:#fff}
+@media (hover:hover){.dettbtn:hover{background:rgba(255,255,255,.13);color:#fff}}
 .dettbtn i{font-style:normal;font-size:11px;transition:transform .18s}
 .dettbtn.aperto i{transform:rotate(180deg)}
 /* se benessere o lucidità sono a terra il bottone lo dice: chiudere un numero
@@ -107,11 +97,6 @@
 .barenergia.vuota .n b{color:var(--hot)}
 .barenergia.vuota .enpips i{background:var(--hot);box-shadow:0 0 9px rgba(255,90,54,.55)}
 .barenergia .n em{font-style:normal}
-/* sullo stretto resta il numero e i trattini: la parola si capisce lo stesso */
-@media (max-width:720px){
-  .barenergia{gap:7px}
-  .barenergia .n em{display:none}
-}
 
 /* ---- navigazione ---- */
 .nav2{display:flex;gap:7px;overflow-x:auto;padding:2px 0 12px;margin-bottom:6px}
@@ -120,7 +105,7 @@
   background:linear-gradient(170deg,#191922,#111116);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.055);
   transition:background .15s,transform .12s,box-shadow .15s}
-.nb:hover{transform:translateY(-2px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+@media (hover:hover){.nb:hover{transform:translateY(-2px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}}
 .nb.on{background:linear-gradient(170deg,#fff,#D8D8DF);color:#0B0B0D;transform:translateY(-3px);
   box-shadow:0 10px 24px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.5)}
 .nb svg{width:21px;height:21px;fill:currentColor;opacity:.92}
@@ -129,21 +114,6 @@
   background:var(--hot);color:#fff;font-size:11px;font-weight:900;display:grid;place-items:center;
   padding:0 5px;box-shadow:0 0 0 2px #0C0C11, 0 0 14px rgba(255,90,54,.7)}
 
-
-/* sullo stretto le cinque linguette si stringono invece di uscire dallo
-   schermo: restano tutte visibili senza doverle trascinare */
-@media (max-width:620px){
-  .nav2{gap:5px}
-  .nb{min-width:62px;padding:8px 4px 6px;gap:3px}
-  .nb svg{width:18px;height:18px}
-  .nb span{font-size:11px;letter-spacing:.03em}
-  .nb .bdg{top:3px;right:5px;min-width:15px;height:15px;font-size:9.5px}
-}
-@media (max-width:400px){
-  .nb{min-width:56px}
-  .nb span{font-size:10px}
-}
-
 /* ---- lifestyle ---- */
 .lcat{background:var(--card);border-radius:20px;overflow:hidden;margin-bottom:11px}
 /* chiusa vedi dove stai e quanto paghi; i gradini si aprono su richiesta */
@@ -151,7 +121,7 @@
 .lhead{width:100%;text-align:left;display:flex;align-items:center;gap:12px;padding:14px 18px;
   background:linear-gradient(120deg,var(--a),transparent 70%);
   transition:filter .15s}
-.lhead:hover{filter:brightness(1.14)}
+@media (hover:hover){.lhead:hover{filter:brightness(1.14)}}
 .lhead .lar{flex:none;font-size:13px;color:var(--soft);transition:transform .18s}
 .lcat.aperta .lhead .lar{transform:rotate(180deg)}
 .lhead .ic{width:40px;height:40px;border-radius:13px;background:rgba(0,0,0,.32);display:grid;

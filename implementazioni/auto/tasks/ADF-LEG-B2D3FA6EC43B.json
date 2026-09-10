@@ -1,0 +1,116 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-B2D3FA6EC43B",
+  "origin": "legacy",
+  "title": "L'energia cresce col livello, e i livelli devono avere un senso",
+  "category": "05-carriera-e-tempo",
+  "source": {
+    "point": "22",
+    "text": "L'energia cresce col livello, e i livelli devono avere un senso",
+    "file": "implementazioni/05-carriera-e-tempo.md",
+    "source_status": "da_fare",
+    "source_status_raw": "da fare"
+  },
+  "audit_state": "audited",
+  "verified_status": "planned",
+  "intake_state": "overlap",
+  "related_task_ids": [
+    "ADF-LEG-D7416EF2ABDA"
+  ],
+  "intake_note": "La task canonica copre energia giornaliera e costi; questa aggiunge il requisito non coperto di legare la crescita dell'energia al livello e dare un senso alla progressione anti-farming.",
+  "current_state": [
+    "frontend/js/game/state.js: livello() calcola il livello da fan, abilita' e pezzi pubblicati, ma non modifica maxEnergy.",
+    "frontend/js/game/lifestyle.js: syncEnergy() calcola maxEnergy da citta', lifestyle e difficolta', senza usare livello().",
+    "frontend/js/game/actions.js: RITMO e limiti settimanali riducono il farming ripetitivo, ma non costituiscono ancora una progressione esplicita dei livelli."
+  ],
+  "systems": [
+    "frontend/js/game/state.js",
+    "frontend/js/game/lifestyle.js",
+    "frontend/js/game/actions.js",
+    "frontend/js/game/sim.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/state.js",
+    "frontend/js/game/lifestyle.js",
+    "frontend/js/game/actions.js",
+    "frontend/js/game/sim.js",
+    "frontend/js/game/ui.js",
+    "frontend/css/hud.css"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Il massimo di energia cresce in modo deterministico con il livello senza rompere salvataggi, difficolta' o bonus lifestyle.",
+      "verification": "code_audit",
+      "status": "pending",
+      "evidence": [
+        "frontend/js/game/state.js e frontend/js/game/lifestyle.js: livello ed energia sono sistemi separati da collegare."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "I livelli aggiungono obiettivi o vantaggi che rendono la progressione significativa e limitano il farming ripetitivo.",
+      "verification": "playtest",
+      "status": "pending",
+      "evidence": []
+    }
+  ],
+  "risks": [
+    "Un bonus energia troppo rapido puo' accelerare fan e soldi; soglie troppo alte possono rendere inutile il livello.",
+    "I vecchi salvataggi devono ricevere una migrazione deterministica."
+  ],
+  "notes": [],
+  "plan": {
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Separare il collegamento tecnico livello-energia dal bilanciamento della progressione.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Contratto livello-energia",
+        "objective": "Definire e implementare il calcolo del massimo energia basato sul livello, compatibile con lifestyle, difficolta' e salvataggi esistenti.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/state.js",
+          "frontend/js/game/lifestyle.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/state.js",
+          "frontend/js/game/lifestyle.js"
+        ],
+        "acceptance_criteria": [
+          "AC1"
+        ],
+        "status": "planned"
+      },
+      {
+        "id": "V2",
+        "title": "Progressione anti-farming",
+        "objective": "Dare ai livelli vantaggi e obiettivi leggibili, poi provare ritmo, costi e ricompense lungo una carriera.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "frontend/js/game/actions.js",
+          "frontend/js/game/sim.js",
+          "frontend/js/game/ui.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/actions.js",
+          "frontend/js/game/sim.js",
+          "frontend/js/game/ui.js",
+          "frontend/css/hud.css"
+        ],
+        "acceptance_criteria": [
+          "AC2"
+        ],
+        "status": "planned"
+      }
+    ],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

@@ -1,0 +1,81 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-314A919E7149",
+  "origin": "legacy",
+  "title": "«Chat»: mamma e il migliore amico, poi il resto con la fama",
+  "category": "02-interfaccia-e-telefono",
+  "source": {
+    "point": "66",
+    "text": "«Chat»: mamma e il migliore amico, poi il resto con la fama",
+    "file": "implementazioni/02-interfaccia-e-telefono.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [
+    "La chat è attiva nel telefono: mamma e Dario sono sempre disponibili, mentre fan, hater e contatti del giro vengono aggiunti secondo fama, palco, soldi o contatto acquisito."
+  ],
+  "systems": [
+    "chat",
+    "telefono",
+    "progressione-fama"
+  ],
+  "watch_paths": [
+    "frontend/js/game/chat.js",
+    "frontend/js/game/telefono.js",
+    "frontend/js/game/sim.js",
+    "frontend/js/game/state.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Mamma e migliore amico sono disponibili fin dall'inizio nella lista Chat.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/chat.js: CHAT_GENTE definisce mamma e Dario con sempre:true; chatAttivi() li include."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Le chat ulteriori si sbloccano con condizioni di carriera invece di apparire tutte subito.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/chat.js: CHAT_GENTE usa apri(m) con soglie su fan, palco e soldi; chatAttivi() valuta chatMondo()."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "La Chat del telefono apre conversazioni interattive distinte dal diario.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/telefono.js: l'app chat usa schermataChat()/schermataChatThread() e chatRispondi(); frontend/js/game/chat.js: lo stato G.chat conserva messaggi e rami aperti."
+      ]
+    }
+  ],
+  "risks": [
+    "Le soglie e il bilanciamento delle conversazioni richiedono playtest se cambiano i valori di fama."
+  ],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": [
+      "Task storica già implementata; nessun piano tecnico residuo."
+    ]
+  }
+}

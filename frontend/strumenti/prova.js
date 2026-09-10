@@ -13,6 +13,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const cp = require("child_process");
 
 const RADICE = path.resolve(__dirname, "..");
 let passati = 0, falliti = 0;
@@ -57,9 +58,49 @@ controlla("ogni pagina cita dei fogli di stile e del codice", mute.length === 0,
 const mancanti = [...css, ...js].filter(f => !fs.existsSync(path.join(RADICE, f)));
 controlla("ogni file citato dalle pagine esiste davvero", mancanti.length === 0, mancanti);
 
+/* ADF_ABBIGLIAMENTO_HIBERNATE_V2
+   Il vecchio abbigliamento 2D deve restare non raggiungibile e inerte finché
+   non verrà sostituito da un sistema cosmetico compatibile con i provider. */
+{
+  const giocoHtml = fs.readFileSync(path.join(RADICE, "pagine/gioco.html"), "utf8");
+  const hubJs = fs.readFileSync(path.join(RADICE, "js/game/hub.js"), "utf8");
+  const uiJs = fs.readFileSync(path.join(RADICE, "js/game/ui.js"), "utf8");
+  const negozioJs = fs.readFileSync(path.join(RADICE, "js/game/negozio.js"), "utf8");
+
+  controlla(
+    "guardaroba e reparto vestiti legacy non sono raggiungibili dalla UI",
+    !giocoHtml.includes('data-sh="fit"') &&
+    !giocoHtml.includes('id="g-fit"') &&
+    !giocoHtml.includes('id="ng-grid"') &&
+    !hubJs.includes('["vestiti", "Vestiti"') &&
+    !hubJs.includes('b.dataset.v === "vestiti"')
+  );
+
+  controlla(
+    "il runtime vestiti legacy resta inerte",
+    negozioJs.includes("ADF_ABBIGLIAMENTO_HIBERNATE_V2") &&
+    negozioJs.includes("window.ADF_ABBIGLIAMENTO_LEGACY_ACTIVE = false") &&
+    !uiJs.includes('renderAbbigliamento === "function"') &&
+    !/\bG\.vestiti\b/.test(negozioJs) &&
+    !/\bA\.fit\b/.test(negozioJs) &&
+    !/\bportrait\s*\(/.test(negozioJs) &&
+    !negozioJs.includes("data-compra")
+  );
+}
+
 const cssSulDisco = tuttiIFile(path.join(RADICE, "css"), ".css");
 const jsSulDisco = tuttiIFile(path.join(RADICE, "js"), ".js");
-const dimenticati = [...cssSulDisco, ...jsSulDisco].filter(f => css.indexOf(f) < 0 && js.indexOf(f) < 0);
+/* ADF_PROVA_ESM_STANDALONE_V1
+   js/avatar/makehuman/ è una libreria ES-module, non un gruppo di <script>
+   classici direttamente incluso nelle tre pagine principali. */
+const MODULI_JS_STANDALONE = ["js/avatar/makehuman/"];
+const moduloJsStandalone = f => MODULI_JS_STANDALONE.some(radice => f.startsWith(radice));
+
+const dimenticati = [...cssSulDisco, ...jsSulDisco].filter(f =>
+  css.indexOf(f) < 0 &&
+  js.indexOf(f) < 0 &&
+  !moduloJsStandalone(f)
+);
 controlla("nessun file sul disco è rimasto fuori dalle pagine", dimenticati.length === 0, dimenticati);
 
 const doppi = pagine.flatMap(p => [...p.css, ...p.js]
@@ -79,13 +120,110 @@ const landingCol = pagine[0].js.filter(f => f.startsWith("js/game/") &&
   f !== "js/game/state.js" && f !== "js/game/phases.js");
 controlla("la landing non si porta dietro il gioco", landingCol.length === 0, landingCol);
 
+/* ADF_LANDING_ARTIST_ACCESS_V1
+   "Il tuo artista" non crea un personaggio: modifica quello dello stesso slot
+   scelto da CONTINUA e delega l'aspetto al provider reale. */
+{
+  const landingHtml = fs.readFileSync(path.join(RADICE, "pagine/landing.html"), "utf8");
+  const landingJs = fs.readFileSync(path.join(RADICE, "js/landing.js"), "utf8");
+  const avvioJs = fs.readFileSync(path.join(RADICE, "js/avvio.js"), "utf8");
+  const bridgeJs = fs.readFileSync(path.join(RADICE, "js/creator/rpg-v24-bridge.js"), "utf8");
+  const creatorHtml = fs.readFileSync(path.join(RADICE, "media/creator-rpg-v24/creator.html"), "utf8");
+
+  controlla(
+    "Il tuo artista parte disabilitato finché non esiste CONTINUA",
+    /data-go="profile"[^>]*disabled[^>]*aria-disabled="true"/.test(landingHtml)
+  );
+
+  controlla(
+    "Il tuo artista usa lo stesso ultimoSlot di CONTINUA",
+    avvioJs.includes("window.ADF_PREPARA_ARTISTA_CONTINUA") &&
+    landingJs.includes("ADF_PREPARA_ARTISTA_CONTINUA")
+  );
+
+  controlla(
+    "la landing non dipende più dal ritratto 2D legacy",
+    !landingJs.includes("portrait()") &&
+    !landingHtml.includes("js/creator/portrait.js") &&
+    !landingHtml.includes("$1<script")
+  );
+
+  controlla(
+    "il bridge espone l'editing del solo aspetto",
+    bridgeJs.includes("openAppearance") &&
+    bridgeJs.includes("adf-rpg-v24-edit-appearance") &&
+    bridgeJs.includes("adf-rpg-v24-appearance-updated")
+  );
+
+  controlla(
+    "il creator apre il provider salvato in modalità modifica",
+    creatorHtml.includes("beginAppearanceEdit") &&
+    creatorHtml.includes("state.avatarSource===\"avaturn\"") &&
+    creatorHtml.includes("openDressingRoom(false)") &&
+    creatorHtml.includes("openLocalEditor()") &&
+    creatorHtml.includes("mode:appearanceEditOnly ? 'edit' : 'new'")
+  );
+}
+
 console.log("\nil codice");
 const rotti = [];
+
 for(const f of jsSulDisco){
   const testo = fs.readFileSync(path.join(RADICE, f), "utf8");
-  try{ new Function(testo); }catch(e){ rotti.push(f + " — " + e.message); }
+
+  if(moduloJsStandalone(f)){
+    /* Parse come ES module senza eseguirlo. */
+    const check = cp.spawnSync(
+      process.execPath,
+      ["--input-type=module", "--check"],
+      { input:testo, encoding:"utf8" }
+    );
+
+    if(check.status !== 0){
+      const righe = String(check.stderr || check.stdout || "errore ES module")
+        .split(/\r?\n/)
+        .filter(Boolean);
+      rotti.push(f + " — " + (righe[righe.length - 1] || "errore ES module"));
+    }
+    continue;
+  }
+
+  try{ new Function(testo); }
+  catch(e){ rotti.push(f + " — " + e.message); }
 }
+
 controlla("ogni file di codice compila", rotti.length === 0, rotti);
+
+/* I moduli standalone non devono essere citati tutti da gioco.html, ma i loro
+   import relativi devono esistere davvero. */
+const importModuliMancanti = [];
+
+for(const f of jsSulDisco.filter(moduloJsStandalone)){
+  const testo = fs.readFileSync(path.join(RADICE, f), "utf8");
+  const specs = new Set();
+
+  for(const m of testo.matchAll(/\b(?:import|export)\s+(?:[^"'\x60;]*?\s+from\s+)?["'](\.[^"']+)["']/g))
+    specs.add(m[1]);
+
+  for(const m of testo.matchAll(/\bimport\(\s*["'](\.[^"']+)["']\s*\)/g))
+    specs.add(m[1]);
+
+  for(const spec of specs){
+    const base = path.resolve(RADICE, path.dirname(f), spec);
+    const candidati = path.extname(base)
+      ? [base]
+      : [base + ".js", path.join(base, "index.js")];
+
+    if(!candidati.some(p => fs.existsSync(p)))
+      importModuliMancanti.push(f + " → " + spec);
+  }
+}
+
+controlla(
+  "gli import relativi dei moduli MakeHuman esistono",
+  importModuliMancanti.length === 0,
+  importModuliMancanti
+);
 
 /* === START ZERO REGRESSION V1 START === */
 console.log("\nla nuova carriera parte da zero");
@@ -189,8 +327,7 @@ console.log("\nil creatore: ogni opzione si deve vedere");
   };
   scatola.window = scatola;
   vm.createContext(scatola);
-  const sorgenti = ["js/creator/data.js", "js/creator/avatar-presets.js",
-                    "js/creator/state.js", "js/creator/portrait.js"];
+  const sorgenti = ["js/creator/data.js", "js/creator/state.js", "js/creator/portrait.js"];
   let acceso = true;
   try{
     for(const f of sorgenti)
@@ -796,10 +933,12 @@ console.log("\nlo Studio: la gente della Sala conta");
   const vm = require("vm");
   const zitto = () => {};
   const nodi = {};
+  let scrittureStorage = 0;
   /* un DOM finto ma con le classi vere: `apriStudio` mette "on" e
      `renderStudio` non disegna niente se non la trova */
   function finto(){
     const cls = new Set();
+    const ascoltatori = {};
     return {
       innerHTML: "", textContent: "", value: "", dataset: {}, hidden: false,
       style: { setProperty: zitto, removeProperty: zitto },
@@ -809,7 +948,10 @@ console.log("\nlo Studio: la gente della Sala conta");
         toggle: (c, v) => (v === undefined ? (cls.has(c) ? cls.delete(c) : cls.add(c))
                                            : (v ? cls.add(c) : cls.delete(c)))
       },
-      offsetWidth: 0, addEventListener: zitto, removeEventListener: zitto,
+      offsetWidth: 0,
+      addEventListener: (tipo, fn) => (ascoltatori[tipo] || (ascoltatori[tipo] = [])).push(fn),
+      removeEventListener: zitto,
+      scatena: (tipo, evento) => (ascoltatori[tipo] || []).forEach(fn => fn(evento)),
       querySelector: () => finto(), querySelectorAll: () => [], appendChild: zitto,
       set onclick(v){}, get onclick(){ return null; }
     };
@@ -818,7 +960,7 @@ console.log("\nlo Studio: la gente della Sala conta");
     console: { log: zitto, warn: zitto, error: zitto },
     Math, JSON, Object, Array, String, Number, Boolean, Date, Set, Map,
     parseInt, parseFloat, isNaN, isFinite, setTimeout: zitto, clearTimeout: zitto,
-    localStorage: { getItem: () => null, setItem: zitto, removeItem: zitto },
+    localStorage: { getItem: () => null, setItem: () => { scrittureStorage++; }, removeItem: zitto },
     document: {
       getElementById: id => nodi[id] || (nodi[id] = finto()),
       querySelector: () => finto(), querySelectorAll: () => [], addEventListener: zitto,
@@ -831,12 +973,18 @@ console.log("\nlo Studio: la gente della Sala conta");
   const sorgenti = ["js/core.js", "js/game/state.js", "js/game/content.js",
                     "js/game/actions.js", "js/game/beats.js", "js/game/covers.js",
                     "js/game/rivals.js", "js/game/scene-art.js", "js/game/phases.js",
-                    "js/game/posto.js", "js/game/studio.js"];
+                    "js/game/posto.js", "js/game/studio.js",
+                    /* dopo studio.js, come nella pagina: e' il file che riempie
+                       i suoi pannelli (schede dei beat, take, cursori del banco,
+                       il quando di Fuori) e senza di lui le sezioni non
+                       disegnano */
+                    "js/game/studio-elementi.js", "js/game/writer.js",
+                    "js/game/beatplay.js"];
   let acceso = true, errore = null;
   try{
     /* i pochi appigli fuori dai file caricati: non devono fare niente */
     vm.runInContext(`
-      function toast(){} function pushLog(){} function save(){} function renderGioco(){}
+      function toast(){} function pushLog(){} function renderGioco(){}
       function gain(){} function addLuc(){} function totalWeeks(){ return G.week; }
       function chiediTitolo(){} function hubPronta(){ return {ok:true, perche:""}; }
       function hubAzione(){} function apriFoglio(){} function scegliModo(){}
@@ -856,40 +1004,97 @@ console.log("\nlo Studio: la gente della Sala conta");
   if(acceso){
     const dentro = c => vm.runInContext(c, scatola);
 
-    /* due persone conosciute alla Sala: un beatmaker in confidenza e un fonico */
+    /* tre persone conosciute alla Sala: due beatmaker e un fonico */
     dentro(`
       G.gente = [
         { id:"bm", ruolo:"beatmaker", n:"Bit", gen:"trap", eta:24, fama:30, car:"pratico",
           scoperto:true, rel:2, pt:0, ult:-1, feat:-99, skin:"#C68A5C", hair:1, col:"#B026FF" },
         { id:"fo", ruolo:"fonico", n:"Gigi", gen:"", eta:40, fama:22, car:"aperto",
-          scoperto:false, rel:3, pt:0, ult:-1, feat:-99, skin:"#E8B991", hair:0, col:"#3DC7FF" }
+          scoperto:false, rel:3, pt:0, ult:-1, feat:-99, skin:"#E8B991", hair:0, col:"#3DC7FF" },
+        { id:"bm2", ruolo:"beatmaker", n:"Loop", gen:"drill", eta:27, fama:45, car:"aperto",
+          scoperto:true, rel:1, pt:0, ult:-1, feat:-99, skin:"#8D5524", hair:2, col:"#FF5A36" }
       ];
       apriStudio("beat");
     `);
-    controlla("si apre, e la stanza dei beat elenca chi conosci",
-      nodi["st-corpo"].innerHTML.indexOf("Bit") >= 0 &&
-      nodi["st-corpo"].innerHTML.indexOf('data-beat="bm"') >= 0,
-      nodi["st-corpo"].innerHTML.slice(0, 200));
+    /* Da quando la pagina è disegnata sopra la foto (i riferimenti in
+       media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/) il
+       contenuto sta in **tre** colonne: a sinistra chi c'è, in mezzo la cosa
+       che stai facendo, a destra quello che ti aspetta. Le prove le guardano
+       tutte e tre insieme: quello che conta è che la cosa ci sia, non in
+       quale colonna sia finita — se no cambiare impaginazione fa suonare un
+       allarme che non è un guasto. */
+    const dipinto = () =>
+      (nodi["st-sx"].innerHTML || "") +
+      (nodi["st-corpo"].innerHTML || "") +
+      (nodi["st-dx"].innerHTML || "");
 
-    /* tutte e quattro le stanze si disegnano: una che esplode manderebbe giù
-       lo Studio intero, e capiterebbe solo a chi ci clicca */
+    controlla("si apre, e la stanza dei beat elenca chi conosci",
+      dipinto().indexOf("Bit") >= 0 &&
+      dipinto().indexOf('data-beat="bm"') >= 0,
+      dipinto().slice(0, 200));
+
+    /* Regressione: le righe espongono `data-bm`, quindi il click deve passare
+       dal listener vero dello Studio e cambiare anche la scheda centrale. */
+    const centroPrima = nodi["st-corpo"].innerHTML;
+    const salvataggiPrima = scrittureStorage;
+    controlla("la riga del secondo beatmaker porta il collegamento cliccabile",
+      dipinto().indexOf('data-bm="bm2"') >= 0,
+      dipinto().slice(0, 200));
+    nodi.studio.scatena("click", {
+      target: { closest: selettore => selettore === "[data-bm]"
+        ? { dataset:{ bm:"bm2" } }
+        : null }
+    });
+    controlla("si può scegliere un beatmaker diverso da quello già selezionato",
+      dentro("G.studio.bm") === "bm2" &&
+      centroPrima.indexOf("Bit") >= 0 &&
+      nodi["st-corpo"].innerHTML.indexOf("Loop") >= 0 &&
+      scrittureStorage > salvataggiPrima,
+      JSON.stringify({
+        scelto:dentro("G.studio.bm"),
+        centroPrimaBit:centroPrima.indexOf("Bit") >= 0,
+        centroDopoLoop:nodi["st-corpo"].innerHTML.indexOf("Loop") >= 0,
+        salvataggiPrima,
+        salvataggiDopo:scrittureStorage
+      }));
+
+    /* tutte le sezioni si disegnano: una che esplode manderebbe giù lo Studio
+       intero, e capiterebbe solo a chi ci clicca. Le sezioni sono otto da
+       quando c'è il punto 4 (beat, testo, cabina, mix, cover, feat,
+       marketing, timing), e l'elenco si legge dal codice invece di essere
+       ricopiato: se domani se ne aggiunge una, questa prova la copre da
+       sola. */
+    const sezioni = dentro("STUDIO_SEZIONI.map(x => x.id)");
+    controlla("le sezioni sono le sette del punto 4, più la cabina",
+      sezioni.join(",") === "beat,testo,cabina,banco,cover,feat,promo,fuori",
+      sezioni.join(","));
     const rotte = [];
-    for(const s of ["beat", "cabina", "banco", "fuori"]){
+    for(const s of sezioni){
       try{
         dentro('STUDIO_SEZ = ' + JSON.stringify(s) + '; renderStudio();');
-        if(!nodi["st-corpo"].innerHTML) rotte.push(s + " (vuota)");
+        if(!dipinto()) rotte.push(s + " (vuota)");
       }catch(e){ rotte.push(s + " — " + e.message); }
     }
-    controlla("tutte e quattro le stanze si disegnano", rotte.length === 0, rotte);
+    controlla("tutte le sezioni si disegnano", rotte.length === 0, rotte);
 
-    /* il beat su misura: costa, arriva in cartella, e porta il nome di chi l'ha fatto */
+    /* le quattro foto senza interfaccia sono attaccate alle stanze giuste, e
+       stanno davvero sul disco: un fondale che non c'è non dà errore, lascia
+       un buco nero e nessuno se ne accorge finché non ci entra */
+    const fotoMancanti = Object.entries(dentro("STUDIO_FOTO"))
+      .filter(([id, f]) => !fs.existsSync(path.join(RADICE, dentro("STUDIO_FOTO_DIR"), f.f)))
+      .map(([id]) => id);
+    controlla("le foto delle stanze dello Studio sono dove il codice le cerca",
+      fotoMancanti.length === 0, fotoMancanti);
+
+    /* il beat su misura: costa in soldi, arriva in cartella, e porta il nome di chi l'ha
+       fatto — comprare un beat non consuma più energia, non era realistico */
     const soldiPrima = dentro("G.money"), energiaPrima = dentro("G.energy");
     dentro("studioFattiUnBeat('bm')");
     const beats = dentro("G.beats");
     controlla("un beatmaker in confidenza ti fa un beat, e finisce in cartella",
       beats.length === 1 && beats[0].da === "Bit", JSON.stringify(beats));
-    controlla("e costa: soldi ed energia scendono",
-      dentro("G.money") < soldiPrima && dentro("G.energy") === energiaPrima - 20,
+    controlla("costa in soldi, non in energia",
+      dentro("G.money") < soldiPrima && dentro("G.energy") === energiaPrima,
       "soldi " + soldiPrima + " → " + dentro("G.money") +
       ", energia " + energiaPrima + " → " + dentro("G.energy"));
     dentro("studioFattiUnBeat('bm')");
@@ -929,14 +1134,59 @@ console.log("\nlo Studio: la gente della Sala conta");
        Live Club, i turni in Pizzeria/Fabbrica/Centro per l'impiego — e la
        promo è entrata nello Studio, in «Fuori». Il guardiano resta, sulla
        cosa che adesso può davvero rompersi in silenzio: che la promo sia lì. */
-    dentro("G.songs = [{t:'Uno', q:60, mixed:true, released:true, seed:1}]; STUDIO_SEZ = 'fuori'; renderStudio();");
-    controlla("la promo ha un posto: sta nello Studio, in «Fuori»",
-      nodi["st-corpo"].innerHTML.indexOf('data-az="promo"') >= 0,
-      nodi["st-corpo"].innerHTML.slice(0, 200));
+    dentro("G.songs = [{t:'Uno', q:60, mixed:true, released:true, seed:1}]; STUDIO_SEZ = 'promo'; renderStudio();");
+    controlla("la promo ha un posto: sta nello Studio, in «Marketing»",
+      dipinto().indexOf('data-az="promo"') >= 0,
+      dipinto().slice(0, 200));
     dentro("G.bars = []; G.beats = []; STUDIO_SEZ = 'cabina'; renderStudio();");
     controlla("e senza strofa la cabina non è un vicolo cieco: si scrive da lì",
-      nodi["st-corpo"].innerHTML.indexOf('data-az="scrivi"') >= 0,
-      nodi["st-corpo"].innerHTML.slice(0, 200));
+      dipinto().indexOf('data-az="scrivi"') >= 0,
+      dipinto().slice(0, 200));
+    /* le barre hanno una stanza loro, non sono più il ripiego della cabina */
+    dentro("G.bars = [{q:44, tema:'Il cortile'}]; STUDIO_SEZ = 'testo'; renderStudio();");
+    controlla("il testo ha la sua sezione, e ci si vede quello che hai scritto",
+      dipinto().indexOf("Il cortile") >= 0 &&
+      dipinto().indexOf('data-az="scrivi"') >= 0,
+      dipinto().slice(0, 200));
+
+    /* ---- il punto 4: ogni elemento influenza il risultato ----
+       Il feat è l'elemento nuovo, ed è l'unico che tocca i numeri veri: se
+       smettesse di arrivare dentro ad actions.js non se ne accorgerebbe
+       nessuno, perché il pezzo uscirebbe lo stesso, solo peggio. */
+    dentro(`
+      G.gente.push({ id:"rp", ruolo:"rapper", n:"Zeno", gen:"trap", eta:23, fama:40,
+        car:"aperto", scoperto:true, rel:3, pt:0, ult:-1, feat:-99,
+        skin:"#8D5524", hair:2, col:"#FF5A36" });
+    `);
+    controlla("senza feat il pezzo non prende niente in più",
+      dentro("featBonus()") === 0, dentro("featBonus()"));
+    dentro("studioScegliFeat('rp')");
+    const bFeat = dentro("featBonus()");
+    controlla("un feat in sessione alza la qualità del pezzo, e lo dice actions.js",
+      bFeat > 0 && bFeat === dentro("studioAiutoFeat()"),
+      "feat +" + bFeat);
+    dentro("studioConsumaFeat()");
+    controlla("e vale per un pezzo solo: dopo la registrazione il posto torna libero",
+      dentro("featBonus()") === 0 && dentro("studioFeat()") === null);
+
+    /* quale provino e quale pezzo: la scelta è dello Studio, il conto di
+       actions.js. Se il ponte si stacca, torna a uscire sempre il migliore
+       e la sezione Timing diventa un ornamento. */
+    dentro(`
+      G.songs = [
+        {t:'Buono',  q:80, mixed:false, released:false, seed:11},
+        {t:'Storto', q:40, mixed:false, released:false, seed:22}
+      ];
+      G.studio.mixa = null; G.studio.esce = null;
+    `);
+    controlla("senza scelta esce il migliore, come ha sempre fatto",
+      dentro("daMixare().t") === "Buono" && dentro("daPubblicare().t") === "Buono");
+    dentro("studioSegna('mixa', 22); studioSegna('esce', 22);");
+    controlla("ma se scegli tu, actions.js prende quello che hai scelto",
+      dentro("daMixare().t") === "Storto" && dentro("daPubblicare().t") === "Storto");
+    dentro("G.songs = G.songs.filter(x => x.seed !== 22);");
+    controlla("e se il pezzo scelto sparisce non si pianta: torna a decidere lei",
+      dentro("daMixare().t") === "Buono" && dentro("daPubblicare().t") === "Buono");
   }
 }
 
@@ -961,6 +1211,142 @@ if(!fs.existsSync(path.join(dist, "pagine", "gioco.html"))){
   }catch(e){ controlla("il codice minificato compila", false, [e.message]); }
   controlla("nel build non è rimasto nessun ?v= a mano", !/\?v=\d/.test(pagina));
   controlla("le immagini sono state copiate", fs.existsSync(path.join(dist, "media", "photo")));
+}
+
+
+/* === ADF_LEGACY_PROFILE_REMOVAL_V2 === */
+console.log("\nprofilo artista legacy rimosso");
+{
+  const html = fs.readFileSync(path.join(RADICE, "pagine/gioco.html"), "utf8");
+  const vecchi = [
+    "js/creator/avatar-presets.js",
+    "js/creator/options.js",
+    "js/creator/render.js",
+    "js/creator/events.js",
+    "css/creator.css"
+  ];
+
+  controlla(
+    "la pagina degli otto avatar non esiste più",
+    !html.includes('id="s-profile"') && !html.includes("Otto avatar da rapper")
+  );
+
+  controlla(
+    "gli asset UI esclusivi del vecchio editor sono eliminati",
+    vecchi.every(f => !fs.existsSync(path.join(RADICE, f))),
+    vecchi.filter(f => fs.existsSync(path.join(RADICE, f)))
+  );
+}
+/* === /ADF_LEGACY_PROFILE_REMOVAL_V2 === */
+
+/* Il turno in fabbrica durava un'ora invece di otto (punto 14 di
+   `implementazioni.md`). Il valore giusto (480 minuti) c'era già in
+   DURATE_LAVORO: il bug era che le azioni avviate da un luogo della mappa
+   (avviaAzioneDiretta, in ui.js — Fabbrica, Pizzeria, Palestra, Casa, Live
+   Club, il telefono) non passavano mai per il click sulla tile che fa
+   scattare la cattura dell'id in tempo.js, quindi durataAzione() non
+   sapeva più che lavoro fosse e tornava il fallback da 60 minuti. */
+console.log("\nil turno in fabbrica dura 8 ore, non 1 (punto 14)");
+{
+  const vm = require("vm");
+  const zitto = () => {};
+
+  function creaFinestra(){
+    const ascolta = {};
+    const bersaglio = {
+      addEventListener(tipo, fn){ (ascolta[tipo] = ascolta[tipo] || []).push(fn); },
+      removeEventListener(){},
+      dispatchEvent(ev){ (ascolta[ev.type] || []).forEach(fn => fn(ev)); return true; }
+    };
+    return bersaglio;
+  }
+
+  const scatola = Object.assign({
+    console: { log: zitto, warn: zitto, error: zitto },
+    Math, JSON, Object, Array, String, Number, Boolean, Date, Set, Map,
+    parseInt, parseFloat, isNaN, isFinite,
+    localStorage: { getItem: () => null, setItem: zitto },
+    CustomEvent: function(tipo, opts){ this.type = tipo; this.detail = opts && opts.detail; },
+    document: {
+      getElementById: () => ({
+        addEventListener: zitto, removeEventListener: zitto,
+        classList: { contains: () => false, add: zitto, remove: zitto }
+      }),
+      querySelectorAll: () => [], addEventListener: zitto
+    }
+  }, creaFinestra());
+  scatola.window = scatola;
+  vm.createContext(scatola);
+
+  let acceso = true, errore = null;
+  try{
+    for(const f of ["js/core.js", "js/game/state.js"])
+      vm.runInContext(fs.readFileSync(path.join(RADICE, f), "utf8"), scatola, { filename: f });
+    vm.runInContext("G = START();", scatola);
+    for(const f of ["js/game/uscita.js", "js/game/tempo.js"])
+      vm.runInContext(fs.readFileSync(path.join(RADICE, f), "utf8"), scatola, { filename: f });
+  }catch(e){ acceso = false; errore = e; }
+  controlla("l'orologio si carica fuori dal browser", acceso, errore ? [errore.message] : []);
+
+  if(acceso){
+    const dentro = c => vm.runInContext(c, scatola);
+
+    /* simula avviaAzioneDiretta("turno"): cattura l'id vero prima di
+       iniziaAzione, come fa adesso ui.js, poi chiude l'azione e legge
+       quanti minuti sono passati dall'evento che tempo.js manda in giro */
+    const minutiTurno = jobId => dentro(`
+      (function(){
+        G.job = {id:${JSON.stringify(jobId)}};
+        let minuti = null;
+        const ascolto = ev => { minuti = ev.detail.minutes; };
+        window.addEventListener("game-time:advanced", ascolto);
+        GAME_TIME.captureAction("turno");
+        iniziaAzione(18);
+        azioneFatta();
+        window.removeEventListener("game-time:advanced", ascolto);
+        return minuti;
+      })()
+    `);
+
+    const mOperaio = minutiTurno("operaio");
+    controlla("un turno da operaio (Fabbrica) dura 480 minuti, 8 ore",
+      mOperaio === 480, "minuti: " + mOperaio);
+    const mLavapiatti = minutiTurno("lavapiatti");
+    controlla("un turno da lavapiatti (Pizzeria) dura 300 minuti, non è rimasto sul fallback da un'ora",
+      mLavapiatti === 300, "minuti: " + mLavapiatti);
+
+    /* le azioni dirette senza lavoro (Palestra, Casa, Live Club) prendono
+       l'id vero da DURATE, non più il fallback da 60 minuti */
+    const minutiAzione = id => dentro(`
+      (function(){
+        let minuti = null;
+        const ascolto = ev => { minuti = ev.detail.minutes; };
+        window.addEventListener("game-time:advanced", ascolto);
+        GAME_TIME.captureAction(${JSON.stringify(id)});
+        iniziaAzione(0);
+        azioneFatta();
+        window.removeEventListener("game-time:advanced", ascolto);
+        return minuti;
+      })()
+    `);
+
+    const mStacca = minutiAzione("stacca");
+    controlla("«stacca la spina» resta a 180 minuti, non è stata toccata",
+      mStacca === 180, "minuti: " + mStacca);
+
+    controlla("senza cattura dell'id (il bug di prima) si tornava a 60 minuti fissi",
+      dentro(`
+        (function(){
+          let minuti = null;
+          const ascolto = ev => { minuti = ev.detail.minutes; };
+          window.addEventListener("game-time:advanced", ascolto);
+          iniziaAzione(0);
+          azioneFatta();
+          window.removeEventListener("game-time:advanced", ascolto);
+          return minuti;
+        })()
+      `) === 60);
+  }
 }
 
 console.log("\n" + passati + " a posto, " + falliti + " no.\n");

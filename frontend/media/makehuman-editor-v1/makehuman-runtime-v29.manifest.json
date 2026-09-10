@@ -1,0 +1,199 @@
+{
+    "schema":  "adf.makehuman.runtime-pack.v1",
+    "version":  29,
+    "source":  {
+                   "repository":  "Carlomadella/gioco-rap",
+                   "originalCommitBeforeHistoryCleanup":  "42dff542c9d581b9c38b97ff433f4b8343372caf"
+               },
+    "archive":  {
+                    "format":  "tar.gz",
+                    "bytes":  2334203927,
+                    "sha256":  "3d40fa60ec3b95e7a90a3543df3ff28d82f3d70c48dea09532a58b3c0f245f4e"
+                },
+    "chunks":  [
+                   {
+                       "file":  "makehuman-runtime-v29.part000",
+                       "bytes":  67108864,
+                       "sha256":  "bfac12f0cfda3c201bf7f8f5d38dc54dc60ebac132eb1ec881ce22cc35d573ac"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part001",
+                       "bytes":  67108864,
+                       "sha256":  "2a1bb8c2d25007f5453714991ada553467eaae5064b63fbd62a262bbc0440b31"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part002",
+                       "bytes":  67108864,
+                       "sha256":  "483229a63a57cdad5ecea1a5e8274b53b81ea3120cb5a7a83eec2d635824a0f0"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part003",
+                       "bytes":  67108864,
+                       "sha256":  "ae8857dd3b5613039be3ee200c3a370a3dd883720783f6413673f6008f908177"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part004",
+                       "bytes":  67108864,
+                       "sha256":  "efff18d98d14b6d612a42691fb7d2661c876d915f270e635004c82e5efcb9e49"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part005",
+                       "bytes":  67108864,
+                       "sha256":  "f97abc52c0a8c598e115093bd406a74816b8ecd4278f89d2e4fb5db05e96117e"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part006",
+                       "bytes":  67108864,
+                       "sha256":  "fccce54c877cb84cbb0a3bfea85e8b6d7eef1b41d9f0c38483dbedbb8bc37eef"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part007",
+                       "bytes":  67108864,
+                       "sha256":  "098b841243973dab73d0de493b60dedeabef23d020e97fada7c83f6b801221c9"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part008",
+                       "bytes":  67108864,
+                       "sha256":  "283690b93e734f26440e11c0a874eac983e1c6f9f8fdc9dabef95e87c587502b"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part009",
+                       "bytes":  67108864,
+                       "sha256":  "1f1c5105b0bd0155f462e0ec508321b618c6bf49299be6889b735da0cd260112"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part010",
+                       "bytes":  67108864,
+                       "sha256":  "6b7a460a4daee0968e9bf948b0215f150fdb510d8520d8361f641315a6c724cb"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part011",
+                       "bytes":  67108864,
+                       "sha256":  "3b9de952814e9c35efe3325258c505896344d0278cb9dab69ee465e82d5f1b8d"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part012",
+                       "bytes":  67108864,
+                       "sha256":  "cf33f9ac57b3a14e7a9171aab5b36726d60463a028596076ea5c1d689a32a987"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part013",
+                       "bytes":  67108864,
+                       "sha256":  "5f751f5f036c96f320991504b1b9ef9ba157a6a336db767731e657f8d3d5fd1b"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part014",
+                       "bytes":  67108864,
+                       "sha256":  "78e4014dbcb46012893d0f4f5920860fbf6181aa5c0b9a78fb4c96543c2d3cd0"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part015",
+                       "bytes":  67108864,
+                       "sha256":  "e1dd79d33077eda64b4015ad3e316e6a001901c9e87423e845f50190b3bb193b"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part016",
+                       "bytes":  67108864,
+                       "sha256":  "64b0914ac442ec6d400b298c7cd97cf38b2194ecaa2adc8df1210813b0f61a7e"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part017",
+                       "bytes":  67108864,
+                       "sha256":  "fc99378988519e1d8f66a583509f52192946346c55cf02b727ca60238e64ee91"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part018",
+                       "bytes":  67108864,
+                       "sha256":  "2d2537af5a152dcddeb1d9a4b9c4842081fc9573cf837062e642a2aef264df5d"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part019",
+                       "bytes":  67108864,
+                       "sha256":  "1366b1a5d8f9fbc2371cd71e13cf6f89a8c32eaf36477e3e6e704e37ea0abac0"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part020",
+                       "bytes":  67108864,
+                       "sha256":  "bf1aa68bf12735d4ce2f64f9787db0e4294482c753d9b625fbb102835e4086f5"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part021",
+                       "bytes":  67108864,
+                       "sha256":  "62df1e0901e8e608628bdcd92431118b601bdcaf8b5f7407bccd70cef2b90aa1"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part022",
+                       "bytes":  67108864,
+                       "sha256":  "9657fc73f1f7719fc53185b54b08c076577f38a516e7bcff997a3d6baa63489a"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part023",
+                       "bytes":  67108864,
+                       "sha256":  "639d36bafb43aedf012f2a0a75d2e986d160c1af10165b69b94c8d8515e92b5b"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part024",
+                       "bytes":  67108864,
+                       "sha256":  "b35605ded8f38691a507641051fdde57ae680769d0e1bb8173f0b782c9b52243"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part025",
+                       "bytes":  67108864,
+                       "sha256":  "40a02b435ac66a493e2f94d6fb9e15ac1397eaac4e92774d124e17427d39376a"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part026",
+                       "bytes":  67108864,
+                       "sha256":  "e5e1ebe848b4a9e9480472686843fd337ceffeb5c501624316186092486db311"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part027",
+                       "bytes":  67108864,
+                       "sha256":  "26c9f267a76b47fa052c0872b1caafb377a42279d3a2c8e1fcbb92ee64bdd8ce"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part028",
+                       "bytes":  67108864,
+                       "sha256":  "77f39c7a1a7010b9cce1cbe997f319f4963a1ea16450791b469da5434f13ad1b"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part029",
+                       "bytes":  67108864,
+                       "sha256":  "3757e1ddbde7f1a6e07f7436841c0b73d1f62e1282059079380106ace9a9751d"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part030",
+                       "bytes":  67108864,
+                       "sha256":  "cf7b2eeb655bacf46d02ad12ffee807c5235533b0cc6dfeaab804e33280ba050"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part031",
+                       "bytes":  67108864,
+                       "sha256":  "e899eea04e156628bb76e4eada4f4e9644161d3db6d17f0d53cca647b6b510c7"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part032",
+                       "bytes":  67108864,
+                       "sha256":  "4ab705fad5443a4d27a46a1c517e75cbebc70c99978820d00783f554ad2f5392"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part033",
+                       "bytes":  67108864,
+                       "sha256":  "8dcd55641e21077998b8e438a9c955c30f3030b7e3093138cebdf0e5bd122d3f"
+                   },
+                   {
+                       "file":  "makehuman-runtime-v29.part034",
+                       "bytes":  52502551,
+                       "sha256":  "55b29220d56f811ea5c46d9ff973406e3bb598a98a4d8a95d3b29bbb0efa8a46"
+                   }
+               ],
+    "install":  {
+                    "destination":  "frontend/media/makehuman-editor-v1/data",
+                    "persistent":  true
+                },
+    "verification":  {
+                         "targetsBinBytes":  144604584,
+                         "targetsBinSha256":  "4e5d28afe2cfb764a554179e38478f7ff8eb3c452d1773e093f560e59a56cd52"
+                     },
+    "credits":  "CREDITS-ASSETS.md"
+}

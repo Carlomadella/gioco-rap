@@ -1,0 +1,129 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-DDDE0E598F52",
+  "origin": "legacy",
+  "title": "Quello che al backend mancava per stare in piedi su uno store",
+  "category": "07-multiplayer-e-backend",
+  "source": {
+    "point": "—",
+    "text": "Quello che al backend mancava per stare in piedi su uno store",
+    "file": "implementazioni/07-multiplayer-e-backend.md",
+    "source_status": "da_fare",
+    "source_status_raw": "da fare"
+  },
+  "audit_state": "audited",
+  "verified_status": "planned",
+  "intake_state": "overlap",
+  "related_task_ids": [
+    "ADF-LEG-043B012E6E3B"
+  ],
+  "intake_note": "La task collegata copre il progetto complessivo di uscita sugli store e parte del backend; questa fonte aggiunge il delta operativo di chiudere i percorsi server residui e la loro integrazione cross-device.",
+  "current_state": [
+    "backend/server.js, accessi.js e database/ espongono classifiche, account, accessi, cloud, moderazione e motori SQLite/PostgreSQL.",
+    "La prova backend copre le rotte e i casi principali, ma la fonte non dimostra il collegamento end-to-end del client locale al cloud/store ne' la configurazione delle chiavi dei provider in produzione.",
+    "La task ADF-LEG-043B012E6E3B mantiene questi gap nel percorso piu' ampio di uscita."
+  ],
+  "systems": [
+    "backend/server.js",
+    "backend/accessi.js",
+    "backend/database/",
+    "frontend/js/net/online.js",
+    "frontend/strumenti/build.js"
+  ],
+  "watch_paths": [
+    "backend/server.js",
+    "backend/accessi.js",
+    "backend/database/",
+    "backend/prova.js",
+    "frontend/js/net/online.js",
+    "frontend/strumenti/build.js",
+    "implementazioni/auto/tasks/ADF-LEG-043B012E6E3B.json"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Il client collega autenticazione, salvataggio locale e salvataggio cloud con gestione esplicita di conflitti e assenza del server.",
+      "verification": "automatic",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "AC2",
+      "description": "I canali Steam, Apple e Google hanno configurazione di produzione verificabile e rifiutano biglietti invalidi senza fallback ambiguo.",
+      "verification": "automatic",
+      "status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "AC3",
+      "description": "Il packaging dello store include frontend, asset e configurazione necessaria senza dipendenze locali non dichiarate.",
+      "verification": "code_audit",
+      "status": "pending",
+      "evidence": []
+    }
+  ],
+  "risks": [
+    "Un errore di sincronizzazione puo' sovrascrivere una carriera o lasciare account e slot incoerenti.",
+    "Le chiavi dei provider non possono essere inserite nel repository e richiedono ambiente di produzione separato."
+  ],
+  "notes": [
+    "Sono criteri solo per il delta backend/store non gia' dimostrato dalla task collegata; non duplicano la classifica gia' funzionante."
+  ],
+  "plan": {
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Chiudere prima il percorso account-cloud e poi verificare provider e pacchetto store sul percorso esistente.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Account e cloud end-to-end",
+        "objective": "Collegare e provare autenticazione, slot locale, cloud e conflitti mantenendo il fallback offline.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/net/online.js",
+          "backend/server.js",
+          "backend/accessi.js",
+          "backend/database/"
+        ],
+        "watch_paths": [
+          "frontend/js/net/online.js",
+          "backend/server.js",
+          "backend/accessi.js",
+          "backend/database/"
+        ],
+        "acceptance_criteria": [
+          "AC1"
+        ],
+        "status": "planned"
+      },
+      {
+        "id": "V2",
+        "title": "Provider e pacchetto store",
+        "objective": "Validare configurazione dei provider e build/installazione con asset completi e senza segreti nel codice.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "backend/accessi.js",
+          "backend/ambiente.js",
+          "frontend/strumenti/build.js"
+        ],
+        "watch_paths": [
+          "backend/accessi.js",
+          "backend/ambiente.js",
+          "frontend/strumenti/build.js"
+        ],
+        "acceptance_criteria": [
+          "AC2",
+          "AC3"
+        ],
+        "status": "planned"
+      }
+    ],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

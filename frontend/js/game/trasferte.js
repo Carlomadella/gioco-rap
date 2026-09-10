@@ -702,7 +702,7 @@ function schermoLibero(){
   if(typeof G === "undefined" || G.ended) return false;
   const hub = document.getElementById("s-hub");
   if(!(hub && hub.classList.contains("on"))) return false;
-  for(const id of ["modal", "report", "writer", "piazza", "scena", "posto", "strada-crimine",
+  for(const id of ["modal", "report", "writer", "piazza", "scena", "posto", "strada",
                    "negozio", "pannello", "adf-result-overlay", "adf-social-overlay", "tras-overlay"]){
     const el = document.getElementById(id);
     if(el && el.classList.contains("on")) return false;

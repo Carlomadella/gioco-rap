@@ -220,13 +220,18 @@ function boostAttuale(){ return 1 + 0.5 * quotaTua(); }
    opz.minimo:   la qualita' sotto cui non si scende, quella delle statistiche */
 function apriFoglio(opz){
   const o = opz || {};
-  WR = {righe: new Array(o.righe || 4).fill(""), tema: pick(TEMI), gen:{}, minimo: o.minimo || 0};
+  /* Il tema lo sceglie lo Studio, sezione Testo (`scrittura_barre`: «TEMA ·
+     scegli da dove partire»). Se non l'hai scelto se ne tira uno a caso, che
+     è quello che il gioco ha sempre fatto. */
+  const scelto = typeof studioTemaScelto === "function" ? studioTemaScelto() : null;
+  WR = {righe: new Array(o.righe || 4).fill(""), tema: scelto || pick(TEMI), tuo: !!scelto,
+    gen:{}, minimo: o.minimo || 0};
   if(o.generata){
     WR.righe = completaStrofa(WR.righe, WR.tema);
     WR.righe.forEach((r, i) => { WR.gen[i] = r; });
   }
-  $("w-tema").innerHTML = '<b>Tema della settimana: ' + WR.tema.t + '</b><span>' + WR.tema.d +
-    ' Se lo tocchi davvero, il pezzo pesa di più.</span>';
+  $("w-tema").innerHTML = '<b>' + (WR.tuo ? "Il tema che hai scelto: " : "Tema della settimana: ") +
+    WR.tema.t + '</b><span>' + WR.tema.d + ' Se lo tocchi davvero, il pezzo pesa di più.</span>';
   $("w-title").textContent = o.generata ? "Ecco cosa ho scritto" : "Scrivi la tua strofa";
   $("w-stanza").innerHTML = disegnaStanza();
   $("w-done").textContent = "Chiudi la strofa";
@@ -341,7 +346,6 @@ function chiudiStrofa(){
   G.bars.push({q, txt:testo, tema:WR.tema.t});
   if(typeof adfSegnaOggi === "function") adfSegnaOggi("scrivi");
   gain("scrittura", 1.2 + a.qTesto/100 * 1.4);
-  G.wellbeing = clamp(G.wellbeing - 1, 0, 100);
 
   const giudizio = q >= 72 ? "Questa è roba seria." : q >= 55 ? "Regge. Su un beat giusto funziona."
     : q >= 38 ? "Si può usare, ma non è il tuo pezzo migliore." : "È un abbozzo. In studio si sentirà.";
@@ -360,15 +364,15 @@ function chiudiStrofa(){
     '</div><div class="wtxt">' + testo.replace(/</g,"&lt;") + '</div>';
   $("w-st").innerHTML = "In cartella hai <b>" + G.bars.length + "</b> strofe";
   $("w-done").textContent = "Metti via il foglio";
-  $("w-done").onclick = () => { chiudiFoglio(); save(); renderGioco(); };
+  $("w-done").onclick = () => { chiudiFoglio(); save(); renderGioco(); if(typeof renderStudio === "function") renderStudio(); };
   $("w-cancel").style.display = "none";
   SFX.publish();
   pushLog("Strofa scritta sul tema «" + WR.tema.t.toLowerCase() + "», qualità <b>" + q + "</b>.", q >= 60 ? "good" : "");
 }
 
-$("w-x").onclick = () => { if(WR) annullaAzione(); chiudiFoglio(); renderGioco(); };
+$("w-x").onclick = () => { if(WR) annullaAzione(); chiudiFoglio(); renderGioco(); if(typeof renderStudio === "function") renderStudio(); };
 $("p-x").onclick = () => uscitaPiazza();
 window.__FS = () => FS;
 window.__R = () => renderGioco();
-$("w-cancel").onclick = () => { annullaAzione(); chiudiFoglio(); renderGioco(); };
+$("w-cancel").onclick = () => { annullaAzione(); chiudiFoglio(); renderGioco(); if(typeof renderStudio === "function") renderStudio(); };
 $("w-done").onclick = () => chiudiStrofa();

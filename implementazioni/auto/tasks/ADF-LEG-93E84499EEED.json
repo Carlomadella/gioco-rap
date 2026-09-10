@@ -1,0 +1,86 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-93E84499EEED",
+  "origin": "legacy",
+  "title": "Il telefono nuovo, quello della foto",
+  "category": "02-interfaccia-e-telefono",
+  "source": {
+    "point": "68",
+    "text": "Il telefono nuovo, quello della foto",
+    "file": "implementazioni/02-interfaccia-e-telefono.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "audited",
+  "verified_status": "needs_validation",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "current_state": [
+    "La home del telefono usa lo sfondo e le icone ritagliate dalla foto di riferimento, con griglia, dock e applicazioni aperte dentro allo schermo.",
+    "I badge non sono più numeri stampati nell'immagine: telefono.js li calcola dallo stato della partita; le app aggiunte a runtime usano il fallback vettoriale."
+  ],
+  "systems": [
+    "frontend/js/game/telefono.js",
+    "frontend/css/telefono.css",
+    "frontend/pagine/gioco.html",
+    "frontend/media/photo/pagina di gioco/schermata_telefono.png",
+    "frontend/media/photo/telefono/"
+  ],
+  "watch_paths": [
+    "frontend/js/game/telefono.js",
+    "frontend/css/telefono.css",
+    "frontend/pagine/gioco.html",
+    "frontend/media/photo/pagina di gioco/",
+    "frontend/media/photo/telefono/"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "La home del telefono riproduce la struttura della foto: sfondo, otto icone in quattro colonne e dock con quattro app.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/telefono.js: TEL_GRIGLIA e TEL_DOCK definiscono l'ordine della griglia e del dock; renderizza gli asset app-*.",
+        "frontend/css/telefono.css: .ptelscr usa telefono/sfondo.png come sfondo cover a tutto schermo."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Le app del telefono aprono contenuti reali e i badge riflettono lo stato corrente invece dei numeri fissi della foto.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/telefono.js: telVaiApp(), telSegnaVisto() e la costruzione delle app collegano apertura, stato letto e contenuti di gioco.",
+        "frontend/js/game/telefono.js: telMessaggiNonLetti(), telNotizieNuove() e telObiettiviNuovi() calcolano i badge dai dati della partita."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "La resa visiva del telefono resta leggibile e coerente su viewport grandi e compatti.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/css/telefono.css: esistono i layout distinti per la soglia TEL_SOGLIA e lo schermo grande usa cover; la verifica percettiva richiede manual: un percorso su viewport reali."
+      ]
+    }
+  ],
+  "risks": [
+    "Cambiare ritagli o soglie responsive può disallineare le icone dalla foto o rendere il dock difficile da toccare.",
+    "Aggiungere un'app senza aggiornare ordine e fallback può produrre una piastrella incoerente."
+  ],
+  "notes": [
+    "La fonte storica resta fatto; l'audit separa l'implementazione strutturale dalla validazione visiva manuale."
+  ],
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "Nessun piano tecnico: l'implementazione è presente; resta solo una validazione percettiva.",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

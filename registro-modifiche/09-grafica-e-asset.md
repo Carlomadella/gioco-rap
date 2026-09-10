@@ -6,6 +6,220 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:d47ff01 -->
+## 10/09/26, 15:37 â€” origin/main â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `d47ff01`
+
+### Cosa Ã¨ entrato
+
+- `0def10f` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `cd741e5` â€” merge: nasconde dentatura e lingua editor MakeHuman â€” **Mycol**
+- `4e975be` â€” feat(makehuman): nasconde dentatura e lingua dall'editor â€” **Mycol**
+- `6bdb84d` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `6604e22` â€” merge: migliora leggibilità e coerenza editor MakeHuman â€” **Mycol**
+- `a501325` â€” feat(makehuman): migliora leggibilità e coerenza dell'editor â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/makehuman-camerino-v1/index.html`
+- **Modificato:** `frontend/media/makehuman-camerino-v1/runtime.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
+<!-- merge:cd741e5 -->
+## 10/09/26, 14:56 â€” task/makehuman-hide-teeth-tongue â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `cd741e5`
+
+### Cosa Ã¨ entrato
+
+- `4e975be` â€” feat(makehuman): nasconde dentatura e lingua dall'editor â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/makehuman-camerino-v1/index.html`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:6604e22 -->
+## 10/09/26, 14:18 â€” task/makehuman-ui-readability â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `6604e22`
+
+### Cosa Ã¨ entrato
+
+- `a501325` â€” feat(makehuman): migliora leggibilità e coerenza dell'editor â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/makehuman-camerino-v1/index.html`
+- **Modificato:** `frontend/media/makehuman-camerino-v1/runtime.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
+<!-- merge:de087c7 -->
+## 10/09/26, 01:07 â€” main â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `de087c7`
+
+### Cosa Ã¨ entrato
+
+- `a90a3d8` â€” docs: aggiorna implementazioni e roadmap ufficiale â€” **Anni di Fame Bot**
+- `fdb9378` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `0724440` â€” Merge branch 'task/beat-energia-e-barre-senza-malus' â€” **Sadyco La Fame**
+- `fb731d5` â€” fix(studio): via il costo in energia per farsi fare un beat, e via il malus di scrivere le barre â€” **Sadyco La Fame**
+- `231c0f1` â€” docs: aggiorna implementazioni e roadmap ufficiale â€” **Anni di Fame Bot**
+- `c2c0306` â€” fix(makehuman): rende Three.js locale e diagnostica il bootstrap â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/makehuman-camerino-v1/index.html`
+- **Modificato:** `frontend/media/makehuman-camerino-v1/runtime.js`
+- **Aggiunto:** `frontend/media/makehuman-camerino-v1/vendor/three-r179/LICENSE-three.txt`
+- **Aggiunto:** `frontend/media/makehuman-camerino-v1/vendor/three-r179/three.core.js`
+- **Aggiunto:** `frontend/media/makehuman-camerino-v1/vendor/three-r179/three.module.js`
+
+**File interessati in questa categoria:** 5
+
+---
+
+<!-- merge:10a372d -->
+## 08/09/26, 21:17 â€” main â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `10a372d`
+
+### Cosa Ã¨ entrato
+
+- `354a383` â€” feat(makehuman): rifinisce zoom camerino â€” **Mycol**
+- `72b3118` â€” feat(makehuman): aggiorna sfondo camerino â€” **Mycol**
+- `d75b15b` â€” feat(makehuman): integra creator e ritratto nel gioco â€” **Mycol**
+- `2caed5c` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `b87ec1e` â€” merge: in Studio le azioni non ti buttano più fuori sulla mappa â€” **Sadyco La Fame**
+- `fd972b7` â€” test: un controllo automatico vero per il punto 14 dello Studio â€” **Sadyco La Fame**
+- `0b41d74` â€” fix: in Studio le azioni non ti buttano più fuori sulla mappa â€” **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/hub.css`
+- **Modificato:** `frontend/css/studio.css`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+- **Aggiunto:** `frontend/media/makehuman-camerino-v1/assets/camerino-makehuman-custom.png`
+- **Modificato:** `frontend/media/makehuman-camerino-v1/index.html`
+- **Modificato:** `frontend/media/makehuman-camerino-v1/runtime.js`
+
+**File interessati in questa categoria:** 6
+
+---
+
+<!-- merge:b87ec1e -->
+## 08/09/26, 11:09 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.58)  
+**Merge commit:** `b87ec1e`
+
+### Cosa Ã¨ entrato
+
+- `fd972b7` â€” test: un controllo automatico vero per il punto 14 dello Studio â€” **Sadyco La Fame**
+- `0b41d74` â€” fix: in Studio le azioni non ti buttano più fuori sulla mappa â€” **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/studio.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:91438dd -->
+## 08/09/26, 10:36 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `91438dd`
+
+### Cosa Ã¨ entrato
+
+- `a36b5e8` â€” Merge branch 'main' into task/responsivita â€” **Carlomadella**
+- `b197884` â€” fix: le cinque cose trovate dal giro di fine task â€” **Carlomadella**
+- `4d688c8` â€” css: il gioco stretto in un foglio suo, css/stretto.css â€” **Carlomadella**
+- `1338348` â€” docs: i punti della responsività chiusi, spostati nel loro argomento â€” **Carlomadella**
+- `df41c78` â€” strada: si impila sul telefono, e il rapporto di settimana ci sta a 360 â€” **Carlomadella**
+- `ee4951c` â€” css: ogni :hover dentro a @media (hover:hover), su tutti i fogli â€” **Carlomadella**
+- `43623ca` â€” studio: l'orologio galleggiante non copre più lo Studio, e le take si confrontano â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/abilita.css`
+- **Modificato:** `frontend/css/accesso.css`
+- **Modificato:** `frontend/css/actionbar.css`
+- **Modificato:** `frontend/css/avvio.css`
+- **Modificato:** `frontend/css/base.css`
+- **Modificato:** `frontend/css/creator.css`
+- **Modificato:** `frontend/css/effects.css`
+- **Modificato:** `frontend/css/forms.css`
+- **Modificato:** `frontend/css/game.css`
+- **Modificato:** `frontend/css/hub.css`
+- **Modificato:** `frontend/css/hud.css`
+- **Modificato:** `frontend/css/impostazioni.css`
+- **Modificato:** `frontend/css/landing.css`
+- **Modificato:** `frontend/css/menu-sistema.css`
+- **Modificato:** `frontend/css/negozio.css`
+- **Modificato:** `frontend/css/overlays.css`
+- **Modificato:** `frontend/css/posto.css`
+- **Modificato:** `frontend/css/preview.css`
+- **Modificato:** `frontend/css/servizio.css`
+- **Modificato:** `frontend/css/shell.css`
+- **Modificato:** `frontend/css/strada-crimine-v2.css`
+- **Modificato:** `frontend/css/strada-crimine.css`
+- **Aggiunto:** `frontend/css/stretto.css`
+- **Modificato:** `frontend/css/studio-elementi.css`
+- **Modificato:** `frontend/css/studio.css`
+- **Modificato:** `frontend/css/telefono.css`
+- **Modificato:** `frontend/css/tocco.css`
+- **Modificato:** `frontend/css/trasferte.css`
+
+**File interessati in questa categoria:** 28
+
+---
+
+<!-- merge:e69464e -->
+## 07/09/26, 16:03 â€” branch non identificato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `e69464e`
+
+### Cosa Ã¨ entrato
+
+- `d59c876` â€” style(studio): la pagina si allinea al riferimento, dettaglio per dettaglio â€” **Carlomadella**
+- `5c58187` â€” feat(studio): la foto a schermo intero, e sopra la schermata dei riferimenti â€” **Carlomadella**
+- `a4a6936` â€” fix(studio): 44 punti sulle linguette, la striscia dice che continua, e una frase in italiano â€” **Carlomadella**
+- `89bb7f8` â€” feat(studio): le sette sezioni del punto 4, in una barra in basso â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/studio.css`
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_32 (1).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/studio_beat.png`
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_35 (9).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/studio_cabina.png`
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_32 (3).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/studio_mix.png`
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_33 (5).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/studio_promo.png`
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_34 (7).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/studio_testo.png`
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_33 (4).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/studio_uscita.png`
+
+**File interessati in questa categoria:** 7
+
+---
+
 <!-- merge:41ac4ed -->
 ## 06/09/26, 22:55 â€” task/popup-energia â†’ main
 

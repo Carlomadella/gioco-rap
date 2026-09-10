@@ -23,13 +23,16 @@
 <link rel="stylesheet" href="css/base.css?v=12">
 <link rel="stylesheet" href="css/servizio.css?v=1">
 <link rel="stylesheet" href="css/preview.css?v=12">
-<link rel="stylesheet" href="css/shell.css?v=12">
-<link rel="stylesheet" href="css/landing.css?v=12">
+<link rel="stylesheet" href="css/shell.css?v=13">
+<link rel="stylesheet" href="css/landing.css?v=13">
 <link rel="stylesheet" href="css/avvio.css?v=2">
 <link rel="stylesheet" href="css/forms.css?v=12">
 <link rel="stylesheet" href="css/impostazioni.css?v=12">
+<!-- il gioco visto sul telefono: i blocchi @media stretti di tutti i fogli qui
+     sopra, in uno solo. Va dopo di loro. -->
+<link rel="stylesheet" href="css/stretto.css?v=1">
 <!-- per ultimo: le aree da toccare devono vincere sulla cascata di tutti gli altri -->
-<link rel="stylesheet" href="css/tocco.css?v=12">
+<link rel="stylesheet" href="css/tocco.css?v=13">
 
 </head>
 <body>
@@ -96,6 +99,23 @@
       </span>
       <span class="bword">Anni di <b>Fame</b></span>
     </button>
+    <!-- Punto 15: muta/smuta la musica di sottofondo dal menu principale. -->
+    <button class="brand-mute" id="landing-mute" type="button"
+      aria-label="Muta la musica di sottofondo" aria-pressed="false">
+      <svg class="bmute-on" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M9 17V5l10-2v12" fill="none" stroke="currentColor" stroke-width="1.7"
+          stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="6.5" cy="17" r="2.6" fill="currentColor"/>
+        <circle cx="16.5" cy="15" r="2.6" fill="currentColor"/>
+      </svg>
+      <svg class="bmute-off" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M9 17V5l10-2v12" fill="none" stroke="currentColor" stroke-width="1.7"
+          stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="6.5" cy="17" r="2.6" fill="currentColor"/>
+        <circle cx="16.5" cy="15" r="2.6" fill="currentColor"/>
+        <path d="M3 3l18 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+      </svg>
+    </button>
   </div>
   <!-- Sulla landing, a destra, quello che dice il concept: a che punto sei e
        di chi è il gioco. Dentro al gioco sparisce e resta solo l'avatar. -->
@@ -145,7 +165,7 @@
           <span class="tit" id="m-voce-a">Inizia la carriera</span>
           <span class="des" id="m-voce-b">La prima settimana comincia qui</span>
         </button>
-        <button class="land-voce" data-scena="2" data-go="profile">
+        <button class="land-voce" data-scena="2" data-go="profile" disabled aria-disabled="true">
           <span class="su"><span class="n">02</span><span class="frec">↗</span></span>
           <span class="tit">Il tuo artista</span><span class="des">Aspetto, città, genere</span>
         </button>
@@ -248,16 +268,14 @@
      (quello sta nella pagina del gioco, insieme al resto). -->
 <script src="js/creator/data.js?v=15"></script>
 <script src="js/creator/state.js?v=15"></script>
-<script src="js/creator/portrait.js?v=15"></script>
-<script src="js/creator/avatar-presets.js?v=12"></script>
-
+<script src="js/creator/rpg-v24-bridge.js?v=5"></script>
 <!-- Della partita servono solo lo stato e le fasi: la landing legge il
      salvataggio per dire a che punto sei, non fa girare niente. -->
 <script src="js/game/state.js?v=12"></script>
 <script src="js/game/phases.js?v=12"></script>
 
-<script src="js/landing.js?v=1"></script>
-<script src="js/avvio.js?v=4"></script>
-<script src="js/impostazioni-ui.js?v=14"></script>
+<script src="js/landing.js?v=4"></script>
+<script src="js/avvio.js?v=5"></script>
+<script src="js/impostazioni-ui.js?v=15"></script>
 </body>
 </html>

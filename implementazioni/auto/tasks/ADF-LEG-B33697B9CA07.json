@@ -1,0 +1,76 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-B33697B9CA07",
+  "origin": "legacy",
+  "title": "Backend e frontend separati, e i README di ognuno",
+  "category": "07-multiplayer-e-backend",
+  "source": {
+    "point": "31",
+    "text": "Backend e frontend separati, e i README di ognuno",
+    "file": "implementazioni/07-multiplayer-e-backend.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "verified_status": "complete",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "current_state": [
+    "Il progetto separa frontend, backend e backend/database con README dedicati.",
+    "Il backend espone il proprio strato dati tramite backend/database/archivio.js."
+  ],
+  "systems": [
+    "frontend/",
+    "backend/",
+    "backend/database/",
+    "frontend/strumenti/audit-regressioni.js"
+  ],
+  "watch_paths": [
+    "README.md",
+    "frontend/",
+    "backend/",
+    "backend/database/",
+    "frontend/strumenti/audit-regressioni.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Frontend, backend e database hanno cartelle e README distinti.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "README.md: collega frontend/README.md, backend/README.md e backend/database/README.md.",
+        "frontend/strumenti/audit-regressioni.js: verifica cartelle e README della separazione."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il server usa lo strato database separato dal routing HTTP.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "backend/server.js: importa il modulo dati.",
+        "backend/database/archivio.js: concentra l'accesso al database.",
+        "backend/README.md: documenta la separazione server/database."
+      ]
+    }
+  ],
+  "risks": [
+    "Spostamenti futuri possono rompere percorsi relativi e build del frontend."
+  ],
+  "notes": [
+    "backend.md e' documentazione locale ignorata da git, non un file di prodotto."
+  ],
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "audit_state": "audited"
+}

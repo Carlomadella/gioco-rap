@@ -1,0 +1,52 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-3EB6F5E9A3C4",
+  "origin": "legacy",
+  "title": "La richiesta finale sull'energia",
+  "category": "05-carriera-e-tempo",
+  "source": {
+    "point": "—",
+    "text": "La richiesta finale sull'energia",
+    "file": "implementazioni/05-carriera-e-tempo.md",
+    "source_status": "da_fare",
+    "source_status_raw": "da fare"
+  },
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "duplicate",
+  "related_task_ids": [
+    "ADF-LEG-D7416EF2ABDA"
+  ],
+  "intake_note": "delta=nessuno: cambiare l'energia a 100 e adeguare giornate, costi e salti e' esattamente la consegna della task canonica sull'energia a 100.",
+  "current_state": [
+    "La task canonica ADF-LEG-D7416EF2ABDA rappresenta gia energia giornaliera, avanzamento a giorni, salti multipli e costi riproporzionati."
+  ],
+  "systems": [
+    "frontend/js/game/sim.js",
+    "frontend/js/game/skip.js",
+    "frontend/js/game/actions.js",
+    "frontend/js/game/lifestyle.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/sim.js",
+    "frontend/js/game/skip.js",
+    "frontend/js/game/actions.js",
+    "frontend/js/game/lifestyle.js"
+  ],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "La taratura tramite playtest resta nella task canonica collegata."
+  ],
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "Nessun piano nuovo: la richiesta e' gia' rappresentata dalla task canonica.",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

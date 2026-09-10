@@ -1,0 +1,56 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-7319DD550E0D",
+  "origin": "legacy",
+  "title": "Ogni parte del gioco deve avere la sua ambientazione",
+  "category": "09-grafica-e-asset",
+  "source": {
+    "point": "38",
+    "text": "Ogni parte del gioco deve avere la sua ambientazione",
+    "file": "implementazioni/09-grafica-e-asset.md",
+    "source_status": "da_fare",
+    "source_status_raw": "da fare"
+  },
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "already_implemented",
+  "related_task_ids": [],
+  "intake_note": "already_implemented: il deliverable richiesto e' la raccolta di prompt separati per le ambientazioni; non emerge una task equivalente distinta e il file richiesto e' gia' presente.",
+  "current_state": [
+    "prompt/prompt-ambientazioni.md contiene prompt separati per landing, avatar, casa, vicolo, Sala e le azioni/card principali.",
+    "implementazioni/09-grafica-e-asset.md documenta sedici prompt che coprono le dodici card e le pagine di contesto richieste."
+  ],
+  "systems": [
+    "prompt/prompt-ambientazioni.md",
+    "frontend/pagine/",
+    "frontend/js/game/scene-art.js",
+    "frontend/js/game/studio.js",
+    "implementazioni/09-grafica-e-asset.md"
+  ],
+  "watch_paths": [
+    "prompt/prompt-ambientazioni.md",
+    "frontend/pagine/",
+    "frontend/js/game/scene-art.js",
+    "frontend/js/game/studio.js",
+    "frontend/media/",
+    "implementazioni/09-grafica-e-asset.md"
+  ],
+  "acceptance_criteria": [],
+  "risks": [
+    "La presenza dei prompt non dimostra che ogni asset sia stato prodotto o integrato nel gioco."
+  ],
+  "notes": [
+    "L'audit classifica il contenuto documentale come gia' presente; la realizzazione grafica degli asset resta fuori da questa task."
+  ],
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "Nessun piano: i prompt separati richiesti sono gia' nel repository.",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

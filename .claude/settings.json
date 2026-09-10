@@ -23,6 +23,32 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git commit*)",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/scripts/dopo-la-task.js\" --hook 2>/dev/null || true",
+            "timeout": 15,
+            "statusMessage": "Task chiusa: preparo il giro di controllo..."
+          }
+        ]
+      },
+      {
+        "matcher": "PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "PowerShell(git commit*)",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/scripts/dopo-la-task.js\" --hook 2>/dev/null || true",
+            "timeout": 15,
+            "statusMessage": "Task chiusa: preparo il giro di controllo..."
+          }
+        ]
+      }
     ]
   }
 }

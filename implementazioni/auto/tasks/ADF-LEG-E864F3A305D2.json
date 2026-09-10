@@ -1,0 +1,129 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-E864F3A305D2",
+  "origin": "legacy",
+  "title": "La scena del produttore quando cerchi un beat",
+  "category": "04-musica-e-suoni",
+  "source": {
+    "point": "8",
+    "text": "La scena del produttore quando cerchi un beat",
+    "file": "implementazioni/04-musica-e-suoni.md",
+    "source_status": "da_fare",
+    "source_status_raw": "da fare"
+  },
+  "audit_state": "audited",
+  "verified_status": "planned",
+  "intake_state": "overlap",
+  "related_task_ids": [
+    "ADF-LEG-EFB36E8B32DF"
+  ],
+  "intake_note": "La task canonica copre la scena del personaggio e del produttore, ma questa richiesta aggiunge la scelta del genere specializzato e il veto quando il produttore collabora con un opp.",
+  "current_state": [
+    "La task canonica ADF-LEG-EFB36E8B32DF copre gia' la scena del personaggio e del produttore per cerca un beat; quel perimetro non viene duplicato qui.",
+    "Nel codice actions.js continua a chiamare offriBeat(), mentre ui.js esclude beat da SCENA_PIENA: la scena e' ancora da implementare.",
+    "posto.js conserva genere del produttore e rete/relazioni, ma non emerge un flusso che faccia scegliere il genere nella scena o blocchi il beat per una collaborazione con un opp."
+  ],
+  "systems": [
+    "frontend/js/game/actions.js",
+    "frontend/js/game/posto.js",
+    "frontend/js/game/rivals.js",
+    "frontend/js/game/content.js",
+    "frontend/js/game/ui.js",
+    "frontend/js/game/scene-art.js",
+    "frontend/css/effects.css"
+  ],
+  "watch_paths": [
+    "frontend/js/game/actions.js",
+    "frontend/js/game/posto.js",
+    "frontend/js/game/rivals.js",
+    "frontend/js/game/content.js",
+    "frontend/js/game/ui.js",
+    "frontend/js/game/scene-art.js",
+    "frontend/css/effects.css",
+    "frontend/pagine/gioco.html",
+    "implementazioni/auto/tasks/ADF-LEG-EFB36E8B32DF.json"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Durante la ricerca del beat il giocatore può scegliere un genere e l'offerta viene prodotta da un produttore specializzato in quel genere.",
+      "verification": "code_audit",
+      "status": "pending",
+      "evidence": [
+        "frontend/js/game/actions.js e frontend/js/game/posto.js: il genere è disponibile nei dati del produttore o nella ricerca, ma non è ancora dimostrato un collegamento nella scena."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Se il produttore collabora spesso con uno degli opps, la scena impedisce esplicitamente di ottenere il beat.",
+      "verification": "code_audit",
+      "status": "pending",
+      "evidence": [
+        "frontend/js/game/posto.js e frontend/js/game/rivals.js: esistono produttori, rapporti e rivali, ma non è presente una regola verificata che blocchi l'offerta per la collaborazione con un opp."
+      ]
+    }
+  ],
+  "risks": [
+    "La scena non deve sostituire la scelta del genere, l'ascolto del beat o il controllo degli opps."
+  ],
+  "notes": [
+    "La scena base resta nella task canonica; questa scheda conserva solo genere specializzato e veto degli opps."
+  ],
+  "plan": {
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Completare soltanto il delta di genere specializzato e veto degli opps sopra la scena prevista dalla task canonica.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Regole del produttore",
+        "objective": "Definire genere specializzato e collaborazione con gli opps nei dati e nelle regole di eleggibilita' del produttore.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/posto.js",
+          "frontend/js/game/rivals.js",
+          "frontend/js/game/content.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/posto.js",
+          "frontend/js/game/rivals.js",
+          "frontend/js/game/content.js"
+        ],
+        "acceptance_criteria": [
+          "AC1",
+          "AC2"
+        ],
+        "status": "planned"
+      },
+      {
+        "id": "V2",
+        "title": "Scelta nella scena beat",
+        "objective": "Collegare le regole al flusso di cerca un beat senza duplicare la scena base prevista dalla task canonica.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "frontend/js/game/actions.js",
+          "frontend/js/game/posto.js",
+          "frontend/js/game/ui.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/actions.js",
+          "frontend/js/game/posto.js",
+          "frontend/js/game/ui.js",
+          "frontend/js/game/scene-art.js"
+        ],
+        "acceptance_criteria": [
+          "AC1",
+          "AC2"
+        ],
+        "status": "planned"
+      }
+    ],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

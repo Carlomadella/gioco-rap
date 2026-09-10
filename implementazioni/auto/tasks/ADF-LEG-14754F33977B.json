@@ -1,0 +1,85 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-14754F33977B",
+  "origin": "legacy",
+  "title": "Il negozio dei vestiti",
+  "category": "02-interfaccia-e-telefono",
+  "source": {
+    "point": "47",
+    "text": "Il negozio dei vestiti",
+    "file": "implementazioni/02-interfaccia-e-telefono.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "verified_status": "blocked",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "current_state": [
+    "La fonte storica descrive un guardaroba e un catalogo separati, ma il codice corrente conserva in negozio.js solo stub legacy e non dimostra il flusso completo."
+  ],
+  "systems": [
+    "frontend/js/game/negozio.js",
+    "frontend/js/game/ui.js",
+    "frontend/js/creator/data.js",
+    "frontend/css/negozio.css"
+  ],
+  "watch_paths": [
+    "frontend/js/game/negozio.js",
+    "frontend/js/game/ui.js",
+    "frontend/js/creator/data.js",
+    "frontend/css/negozio.css",
+    "frontend/js/game/hub.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Il catalogo presenta capi acquistabili e il guardaroba mostra solo capi posseduti/equipaggiabili.",
+      "verification": "code_audit",
+      "status": "blocked",
+      "evidence": [
+        "frontend/js/game/negozio.js: renderArmadio(), renderAbbigliamento(), ngCompra() e ngEquipaggia() sono stub e restituiscono senza implementare il flusso.",
+        "frontend/js/creator/data.js: FITS esiste, ma da sola non dimostra acquisto o guardaroba.",
+        "implementazioni/02-interfaccia-e-telefono.md, punto 47: la documentazione storica dichiara il comportamento completato, in contrasto con gli stub correnti."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il negozio e' disponibile dalla citta' iniziale senza uno sblocco di fase aggiuntivo.",
+      "verification": "code_audit",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/hub.js: il luogo Shop apre il pannello del catalogo.",
+        "implementazioni/02-interfaccia-e-telefono.md, punto 47: documenta lo sblocco immediato, ma il contenuto del pannello non e' dimostrato dagli stub correnti."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Comprare, indossare e conservare il capo iniziale funzionano durante una partita.",
+      "verification": "playtest",
+      "status": "blocked",
+      "evidence": [
+        "frontend/js/game/negozio.js: ngCompra() e ngEquipaggia() restituiscono false.",
+        "manual: implementazioni/02-interfaccia-e-telefono.md, punto 47, riporta una prova storica che non e' coerente con il codice corrente."
+      ]
+    }
+  ],
+  "risks": [
+    "Il contratto tra G.vestiti, FITS e il renderer puo' perdere capi dopo un cambio outfit."
+  ],
+  "notes": [
+    "Il file negozio.js contiene anche compatibilita' legacy; la scheda descrive il flusso attuale documentato."
+  ],
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "audit_state": "audited"
+}

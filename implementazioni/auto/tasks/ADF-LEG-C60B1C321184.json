@@ -1,0 +1,78 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-C60B1C321184",
+  "origin": "legacy",
+  "title": "Cosa si può simulare",
+  "category": "05-carriera-e-tempo",
+  "source": {
+    "point": "1",
+    "text": "Cosa si può simulare",
+    "file": "implementazioni/05-carriera-e-tempo.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "audited",
+  "verified_status": "needs_validation",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [
+    "Salta il tempo offre 1 giorno, 2 giorni, una settimana o un mese; tutte le durate passano da saltaGiorni(), che richiama avanzaGiorno() e advanceWeek()."
+  ],
+  "systems": [
+    "frontend/js/game/skip.js",
+    "frontend/js/game/sim.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/skip.js",
+    "frontend/js/game/sim.js",
+    "frontend/js/game/tempo.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Il giocatore puo' simulare un giorno, due giorni, una settimana o un mese.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/skip.js: saltaTempo() espone saltaGiorni(1), saltaGiorni(2), saltaGiorni(7) e saltaGiorni(28)."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il salto applica le conseguenze del tempo tramite il motore normale dei giorni e delle settimane.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/skip.js: saltaGiorni() itera avanzaGiorno().",
+        "frontend/js/game/sim.js: avanzaGiorno() ricarica energia e chiama advanceWeek() ogni sette giorni."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Gli effetti di un salto lungo sul bilanciamento e sull'esperienza restano da valutare giocando.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/skip.js: il mese e' implementato come 28 giorni consecutivi con logica eventi e report."
+      ]
+    }
+  ],
+  "risks": [
+    "Salti lunghi attraversano settimane, eventi e report; modifiche al bilanciamento richiedono prova di gioco."
+  ],
+  "notes": [
+    "La richiesta e' una funzione di simulazione, non una nuova macro-fase della roadmap ufficiale."
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  }
+}

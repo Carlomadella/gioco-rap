@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>ADF MakeHuman Modifier Engine</title>
+<style>html,body{margin:0;background:#000;color:#aaa;font:12px monospace}#log{white-space:pre-wrap;padding:8px}</style>
+</head>
+<body>
+<pre id="log">BOOT modifier engine…</pre>
+<script src="/media/makehuman-editor-v1/vendor/makehuman.js"></script>
+<script>
+(() => {
+  'use strict';
+
+  const logEl=document.getElementById('log');
+  const log=(s)=>{ logEl.textContent += '\n'+s; console.log('[ADF MH ENGINE]',s); };
+  const fail=(err)=>{
+    const message=String(err?.stack||err?.message||err);
+    log('ERRORE: '+message);
+    parent.postMessage({type:'adf-mh-engine-error',message},'*');
+  };
+
+  let human=null;
+  let modifiers=[];
+  let baseFlat=null;
+  let targetData=null;
+  let vertexCoordCount=0;
+
+  function valuesObject(){
+    const out={};
+    for(const meta of modifiers){
+      const mod=human.modifiers.children[meta.fullName];
+      try{ out[meta.fullName]=Number(mod.getValue())||0; }
+      catch{ out[meta.fullName]=Number(meta.defaultValue)||0; }
+    }
+    return out;
+  }
+
+  function modifierMeta(){
+    return Object.values(human.modifiers.children).map(mod=>({
+      fullName:String(mod.fullName||''),
+      groupName:String(mod.groupName||''),
+      name:String(mod.name||mod.fullName||''),
+      min:Number.isFinite(Number(mod.min))?Number(mod.min):0,
+      max:Number.isFinite(Number(mod.max))?Number(mod.max):1,
+      defaultValue:Number.isFinite(Number(mod.defaultValue))?Number(mod.defaultValue):0,
+      isMacro:typeof mod.isMacro==='function' ? !!mod.isMacro() : !!mod.macroVariable,
+      macroVariable:mod.macroVariable||null
+    })).filter(x=>x.fullName).sort((a,b)=>a.fullName.localeCompare(b.fullName));
+  }
+
+  function bakeFast(){
+    if(!human || !targetData || !baseFlat) throw new Error('engine non pronto');
+    const influences=human.morphTargetInfluences;
+    const out=new Float32Array(baseFlat);
+    const m=vertexCoordCount;
+    let active=0;
+
+    for(let j=0;j<influences.length;j++){
+      const w=Number(influences[j])||0;
+      if(Math.abs(w)<1e-8) continue;
+      active++;
+      const off=j*m;
+      for(let i=0;i<m;i++){
+        const d=targetData[off+i];
+        if(d) out[i]+=d*w*1e-3;
+      }
+    }
+    return {vertices:out,activeTargets:active};
+  }
+
+  function sendGeometry(requestId=null){
+    const baked=bakeFast();
+    const values=valuesObject();
+    parent.postMessage({
+      type:'adf-mh-engine-update',
+      requestId,
+      values,
+      activeTargets:baked.activeTargets,
+      vertices:baked.vertices
+    },'*',[baked.vertices.buffer]);
+  }
+
+  function setOne(fullName,value){
+    const mod=human.modifiers.children[fullName];
+    if(!mod) throw new Error('modifier non trovato: '+fullName);
+    const n=Number(value);
+    if(!Number.isFinite(n)) throw new Error('valore non valido per '+fullName);
+    mod.setValue(n);
+  }
+
+  function setMany(values){
+    const entries=Object.entries(values||{}).filter(([name])=>human.modifiers.children[name]);
+    // Macro first: dependent target weights then use the correct factors.
+    entries.sort((a,b)=>{
+      const ma=human.modifiers.children[a[0]], mb=human.modifiers.children[b[0]];
+      const aa=(typeof ma.isMacro==='function'&&ma.isMacro())?0:1;
+      const bb=(typeof mb.isMacro==='function'&&mb.isMacro())?0:1;
+      return aa-bb;
+    });
+    for(const [name,value] of entries) setOne(name,value);
+  }
+
+  async function boot(){
+    if(!window.makehuman?.Human) throw new Error('vendor/makehuman.js non espone makehuman.Human');
+
+    log('Carico resources.json…');
+    const resources=await fetch('/media/makehuman-editor-v1/data/resources.json',{cache:'no-store'}).then(r=>{
+      if(!r.ok) throw new Error('resources.json HTTP '+r.status);
+      return r.json();
+    });
+
+    resources.baseUrl='/media/makehuman-editor-v1/data/';
+
+    log('Carico modello MakeHuman…');
+    human=new makehuman.Human(resources);
+    await human.loadModel();
+
+    log('Carico targets.bin (~145 MB)…');
+    await human.loadTargets(resources.baseUrl+'targets/'+resources.targets);
+
+    modifiers=modifierMeta();
+    targetData=human.targets.targetData;
+    const reference=human.targets.referenceVertices;
+    vertexCoordCount=reference.length*3;
+    baseFlat=new Float32Array(vertexCoordCount);
+    for(let i=0;i<reference.length;i++){
+      baseFlat[i*3]=reference[i].x;
+      baseFlat[i*3+1]=reference[i].y;
+      baseFlat[i*3+2]=reference[i].z;
+    }
+
+    const targetCount=human.morphTargetInfluences.length;
+    const expected=targetCount*vertexCoordCount;
+    if(targetData.length!==expected){
+      throw new Error(`targets.bin incoerente: ${targetData.length} != ${targetCount}*${vertexCoordCount}`);
+    }
+
+    // Apply MakeHuman's macro defaults to the target influence stack.
+    // Non-macro defaults are zero.
+    for(const meta of modifiers.filter(m=>m.isMacro)){
+      const mod=human.modifiers.children[meta.fullName];
+      let value=meta.defaultValue;
+      try{
+        const current=Number(mod.getValue());
+        if(Number.isFinite(current)) value=current;
+      }catch{}
+      mod.setValue(value);
+    }
+
+    const baked=bakeFast();
+    const baseCopy=new Float32Array(baseFlat);
+
+    log(`PRONTO: ${modifiers.length} modifier · ${targetCount} target · ${reference.length} vertici`);
+
+    parent.postMessage({
+      type:'adf-mh-engine-ready',
+      modifiers,
+      values:valuesObject(),
+      targetCount,
+      vertexCount:reference.length,
+      activeTargets:baked.activeTargets,
+      baseVertices:baseCopy,
+      vertices:baked.vertices
+    },'*',[baseCopy.buffer,baked.vertices.buffer]);
+  }
+
+  addEventListener('message',e=>{
+    const msg=e.data||{};
+    if(!human) return;
+
+    try{
+      if(msg.type==='adf-mh-engine-set'){
+        setOne(String(msg.fullName||''),msg.value);
+        sendGeometry(msg.requestId||null);
+      }else if(msg.type==='adf-mh-engine-set-many'){
+        setMany(msg.values||{});
+        sendGeometry(msg.requestId||null);
+      }else if(msg.type==='adf-mh-engine-reset-all'){
+        const values={};
+        for(const meta of modifiers) values[meta.fullName]=meta.defaultValue;
+        setMany(values);
+        sendGeometry(msg.requestId||null);
+      }
+    }catch(err){
+      parent.postMessage({
+        type:'adf-mh-engine-request-error',
+        requestId:msg.requestId||null,
+        message:String(err?.stack||err?.message||err)
+      },'*');
+    }
+  });
+
+  boot().catch(fail);
+})();
+</script>
+</body>
+</html>

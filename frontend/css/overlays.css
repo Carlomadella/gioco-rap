@@ -33,7 +33,7 @@
 .pline{display:block;width:100%;background:var(--card);border:0;border-radius:14px;padding:15px 17px;
   color:#fff;font-family:inherit;font-size:15px;font-weight:700;text-align:left;cursor:pointer;
   margin-bottom:9px;line-height:1.45;transition:.15s}
-.pline:hover{background:#22222A;transform:translateX(3px)}
+@media (hover:hover){.pline:hover{background:#22222A;transform:translateX(3px)}}
 .ptimer{height:5px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;margin-bottom:12px}
 .ptimer i{display:block;height:100%;background:var(--hot);transition:width .1s linear}
 .pres{background:var(--card);border-radius:18px;padding:22px;text-align:left;margin-bottom:14px}
@@ -75,10 +75,10 @@
 .wline.auto input{color:#D9D4C6;font-style:italic}
 .waddrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
 .wadd.auto{flex:2 1 190px;background:rgba(255,197,61,.14);color:var(--acid);font-weight:800}
-.wadd.auto:hover{background:rgba(255,197,61,.24)}
+@media (hover:hover){.wadd.auto:hover{background:rgba(255,197,61,.24)}}
 .wadd{flex:1;background:rgba(255,255,255,.06);border:0;color:var(--soft);border-radius:12px;padding:11px;
   font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
-.wadd:hover{background:rgba(255,255,255,.11);color:#fff}
+@media (hover:hover){.wadd:hover{background:rgba(255,255,255,.11);color:#fff}}
 .wmeters{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
 .wm{background:var(--card);border-radius:14px;padding:12px 13px}
 .wm .l{font-size:10.5px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;color:var(--faint)}
@@ -132,7 +132,7 @@
   font-size:19px;box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 4px 0 #0A0A0F}
 .titolo .dado:active{transform:translateY(3px);box-shadow:0 1px 0 #0A0A0F}
 .rinomina{background:none;border:0;color:var(--faint);font-size:14px;padding:4px 7px;border-radius:8px;flex:none}
-.rinomina:hover{color:#fff;background:rgba(255,255,255,.1)}
+@media (hover:hover){.rinomina:hover{color:#fff;background:rgba(255,255,255,.1)}}
 .drawer{position:fixed;inset:0;z-index:70;pointer-events:none}
 .drawer::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.6);opacity:0;transition:opacity .22s}
 .drawer.on{pointer-events:auto}
@@ -146,7 +146,7 @@
 .dhead h3{margin:0;font-size:18px;font-weight:900;letter-spacing:-.02em}
 .dclose{background:rgba(255,255,255,.08);border:0;color:#fff;width:34px;height:34px;border-radius:11px;
   font-size:15px;cursor:pointer}
-.dclose:hover{background:rgba(255,255,255,.16)}
+@media (hover:hover){.dclose:hover{background:rgba(255,255,255,.16)}}
 /* Il bollino dei nuovi appunti stava attaccato al bottone «Diario», che non
    c'è più (punto 7): il diario si apre dal telefono. La classe resta pronta,
    senza il suo aggancio. */
@@ -173,7 +173,7 @@
 .sheet2 .mx{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;
   background:rgba(255,255,255,.08);color:#fff;font-size:15px;line-height:1;display:grid;place-items:center;
   transition:background .15s,transform .12s}
-.sheet2 .mx:hover{background:rgba(255,255,255,.18);transform:scale(1.06)}
+@media (hover:hover){.sheet2 .mx:hover{background:rgba(255,255,255,.18);transform:scale(1.06)}}
 .sheet2 .mx[hidden]{display:none}
 .sheet2 .k{padding-right:40px;font-size:12.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--acid)}
 .sheet2 h2{font-size:30px;font-weight:900;letter-spacing:-.03em;margin:6px 0 10px;line-height:1.05}
@@ -185,7 +185,7 @@
   box-shadow:inset 0 1px 0 rgba(255,255,255,.16), inset 0 0 0 1.5px rgba(255,255,255,.08),
     0 4px 0 #0A0A0F;
   transition:transform .1s, box-shadow .1s, background .15s}
-.opt2:hover{background:linear-gradient(180deg,#31313F,#20202B)}
+@media (hover:hover){.opt2:hover{background:linear-gradient(180deg,#31313F,#20202B)}}
 .opt2:active{transform:translateY(3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 1px 0 #0A0A0F}
 .opt2 .n{font-family:var(--disp);font-size:15.5px;font-weight:400;letter-spacing:-.01em}
 .opt2 .d{display:block;font-size:12.5px;color:var(--soft);margin-top:3px;line-height:1.4;font-weight:500}

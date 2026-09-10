@@ -16,12 +16,17 @@
 
 const crypto = require("crypto");
 const { apri: apriDb } = require("./db.js");
-const { nuovoBot, popolazione, settimanaBot, ricambio } = require("../bot.js");
+const { nuovoBot, popolazione, settimanaBot, ricambio, ritratto,
+  quantiServono, dirada } = require("../bot.js");
 const { nomeDufficio } = require("../moderazione.js");
 const plausibilita = require("../plausibilita.js");
 
 let A = null;                                   // il motore del database (sqlite.js o postgres.js)
-let CFG = { quantiBot: 140, settimanaMs: 24 * 3600e3 };
+/* `quantiBot` è quanti bot tenere quando la classifica è tutta nostra;
+   `botMinimo` è il pavimento sotto cui non si scende nemmeno con mille
+   giocatori veri — due righe di gente che non conosci in fondo alla
+   graduatoria fanno mondo, e non tolgono il posto a nessuno. */
+let CFG = { quantiBot: 140, botMinimo: 20, settimanaMs: 24 * 3600e3 };
 
 const ora = () => Date.now();
 const uuid = () => crypto.randomUUID();
@@ -128,18 +133,35 @@ async function inserisciBot(b){
     b.id, b.slancio || 0, b.caldo || 0, b.carattere || "normale");
 }
 
+/* `a.bot` sta in fondo apposta ed è l'unico campo di questo elenco che **non
+   esce**: serve a `riga()` per sapere se i numeri del diario vanno letti dalla
+   colonna (un giocatore) o derivati (un bot). Fuori da `riga()` non ci va
+   nessuno: chi aggiunge una risposta che salta quella funzione si porta dietro
+   il campo che manda all'aria il punto 30. */
 const CAMPI_PUBBLICI = `a.id, a.nome, a.citta, a.genere, a.storia, a.stream, a.uscite, a.deal,
-  a.ultima_titolo, a.ultima_seed, a.seed, a.livello, a.fase, a.difficolta`;
+  a.ultima_titolo, a.ultima_seed, a.seed, a.livello, a.fase, a.difficolta, a.live, a.feat, a.bot`;
 
 /* La riga che il mondo può vedere. Qui dentro non passano né `bot` né le
-   chiavi né l'account: la prima è una regola di gioco, le altre di sicurezza. */
+   chiavi né l'account: la prima è una regola di gioco, le altre di sicurezza.
+
+   Livello, fase e diario di bordo di un bot non stanno scritti nel database:
+   si calcolano qui da quello che il bot ha davvero (`bot.js`, `ritratto()`).
+   Prima uscivano i valori di partenza — livello 1 e fase 0 per tutti — e la
+   classifica diceva a chiare lettere chi era finto. */
 function riga(r, ioId){
+  const suo = r.bot ? ritratto(r) : null;
   return {
     id: r.id, pos: r.pos, nome: r.nome, citta: r.citta, genere: r.genere,
     stream: r.stream, delta: (r.pos_prec == null || r.pos == null) ? null : r.pos_prec - r.pos,
     uscite: r.uscite, deal: !!r.deal, ultima: r.ultima_titolo || null,
     seed: r.ultima_seed || r.seed || 0, storia: r.storia || "",
-    livello: r.livello || 1, difficolta: r.difficolta || DIFFICOLTA_DIF,
+    livello: suo ? suo.livello : (r.livello || 1),
+    fase: suo ? suo.fase : (r.fase || 0),
+    /* il diario di bordo del gioco (punto 14 di ALE): le serate e i feat di una
+       carriera. `colpi` non esce di qui — vedi la migrazione 008. */
+    live: suo ? suo.live : (r.live || 0),
+    feat: suo ? suo.feat : (r.feat || 0),
+    difficolta: r.difficolta || DIFFICOLTA_DIF,
     io: ioId ? r.id === ioId : false
   };
 }
@@ -318,14 +340,17 @@ async function segnaPunteggio(id, d, ipHash){
     stream: Math.min(5e7, Number(d.stream) || 0),
     fan: d.fan != null ? d.fan : a.fan,
     livello: d.livello || a.livello,
-    uscite: d.uscite != null ? d.uscite : a.uscite
+    uscite: d.uscite != null ? d.uscite : a.uscite,
+    /* il diario di bordo del gioco. Chi manda un client vecchio non li ha:
+       `undefined` lascia il totale dov'era, non lo azzera. */
+    live: d.live, feat: d.feat
   });
   const limato = esame.limato;
   const stream = esame.stream;
   const set = await A.insieme(async () => {
     await A.fai(`UPDATE artista SET stream = ?, fan = ?, livello = ?, fase = ?, uscite = ?, deal = ?,
              ultima_titolo = coalesce(?, ultima_titolo), ultima_seed = coalesce(?, ultima_seed),
-             difficolta = ?, punteggio = ? WHERE id = ?`,
+             difficolta = ?, live = ?, feat = ?, punteggio = ? WHERE id = ?`,
       stream, esame.fan, esame.livello, d.fase != null ? d.fase : a.fase,
       d.uscite != null ? d.uscite : a.uscite, d.deal == null ? a.deal : (d.deal ? 1 : 0),
       d.ultima || null, d.seed || null,
@@ -333,7 +358,7 @@ async function segnaPunteggio(id, d, ipHash){
          ricominciata in un altro modo dentro allo stesso slot. Se non la manda
          (client vecchio) resta quella che c'era. */
       d.difficolta != null ? difficoltaBuona(d.difficolta) : (a.difficolta || DIFFICOLTA_DIF),
-      ora(), id);
+      esame.live, esame.feat, ora(), id);
     const s = await settimanaCorrente();
     await A.fai(`INSERT INTO punteggio_settimana (artista_id, settimana, stream, fan, livello, fase,
              uscite, deal, limato, origine, ip_hash, inviato)
@@ -486,9 +511,20 @@ async function giroSettimana(){
 
     /* ricambio: chi non ce la fa smette, e spunta qualcuno dal niente */
     const usati = new Set((await A.tutti("SELECT nome FROM artista WHERE ritirato IS NULL")).map(r => r.nome.toLowerCase()));
-    const vivi = await A.tutti("SELECT a.id, a.nome, a.stream FROM artista a JOIN bot_stato b ON b.artista_id = a.id WHERE a.ritirato IS NULL");
+    const vivi = await A.tutti(`SELECT a.id, a.nome, a.citta, a.stream FROM artista a
+      JOIN bot_stato b ON b.artista_id = a.id WHERE a.ritirato IS NULL`);
     const dopo = vivi.slice();
-    ricambio(dopo, CFG.quantiBot, usati, notizie);
+
+    /* Il diradamento (backend.md § 8): i bot si fanno da parte man mano che
+       arriva gente vera, e si tolgono dall'alto. Si contano i giocatori
+       **attivi**, non gli iscritti: chi ha provato il gioco a marzo e non è
+       più tornato non è una persona che riempie la classifica — e il metro è
+       lo stesso che due righe più su fa scendere chi non si fa vivo. */
+    const veri = (await A.uno(`SELECT count(*) n FROM artista
+      WHERE bot = 0 AND ritirato IS NULL AND coalesce(punteggio, creato) >= ?`, fermoDa)).n;
+    const bersaglio = quantiServono(CFG.quantiBot, veri, CFG.botMinimo);
+    dirada(dopo, bersaglio, veri, usati, notizie);
+    ricambio(dopo, bersaglio, usati, notizie);
     /* Il confronto fra prima e dopo si fa con due insiemi di id, non con
        `indexOf` dentro a un ciclo: con ventimila bot quello erano quattrocento
        milioni di confronti a ogni giro di settimana — l'ha trovato

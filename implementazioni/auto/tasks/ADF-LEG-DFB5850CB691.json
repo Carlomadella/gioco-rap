@@ -1,0 +1,83 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-DFB5850CB691",
+  "origin": "legacy",
+  "title": "L'autocompletamento della canzone",
+  "category": "04-musica-e-suoni",
+  "source": {
+    "point": "6",
+    "text": "L'autocompletamento della canzone",
+    "file": "implementazioni/04-musica-e-suoni.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "current_state": [
+    "Il foglio consente di partire da poche barre, completare la strofa e modificare il testo generato prima di chiuderla.",
+    "La modalità veloce genera e mostra subito una strofa modificabile; la qualità e il moltiplicatore distinguono il testo generato da quello scritto dal giocatore."
+  ],
+  "systems": [
+    "frontend/js/game/writer.js",
+    "frontend/js/game/versi.js",
+    "frontend/js/game/actions.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/writer.js",
+    "frontend/js/game/versi.js",
+    "frontend/js/game/actions.js",
+    "frontend/pagine/gioco.html"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Completa la canzone riempie le righe mancanti e porta la strofa ad almeno otto righe modificabili.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/writer.js: il comando w-auto estende WR.righe fino a otto e chiama completaStrofa() sulle righe mancanti.",
+        "frontend/js/game/versi.js: completaStrofa() genera il contenuto della strofa."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "La modalità veloce mostra il testo prodotto e lascia al giocatore la possibilità di modificarlo o conservarlo.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/writer.js: apriFoglio({generata:true}) popola WR.gen, imposta il titolo Ecco cosa ho scritto e renderizza input editabili.",
+        "frontend/js/game/writer.js: chiudiStrofa() salva il testo corrente in G.bars, quindi conserva le modifiche."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Il contributo del testo generato e di quello scritto dal giocatore produce una qualità coerente e leggibile.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/writer.js: quotaTua(), boostAttuale() e qualitaStrofa() distinguono testo automatico, testo modificato e testo scritto interamente dal giocatore."
+      ]
+    }
+  ],
+  "risks": [
+    "Cambiare completaStrofa() senza aggiornare WR.gen può far sembrare modificato un testo ancora generato.",
+    "Il costo o lo svantaggio specifico del completamento è una richiesta separata nella task canonica ADF-LEG-D15F3599E2BE."
+  ],
+  "notes": [
+    "La scheda copre il completamento e la revisione del testo, non il costo aggiuntivo ancora aperto del punto 19."
+  ],
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "Nessun piano: il flusso di autocompletamento è già implementato.",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

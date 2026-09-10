@@ -1,0 +1,84 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-99F7F334DFE9",
+  "origin": "legacy",
+  "title": "Il gioco alla giornata invece che alla settimana",
+  "category": "05-carriera-e-tempo",
+  "source": {
+    "point": "—",
+    "text": "Il gioco alla giornata invece che alla settimana",
+    "file": "implementazioni/05-carriera-e-tempo.md",
+    "source_status": "risposto",
+    "source_status_raw": "risposto, da fare"
+  },
+  "audit_state": "audited",
+  "verified_status": "needs_validation",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "La richiesta è stata implementata nel motore tempo: il giorno è l’unità giocabile e la settimana resta il ciclo di chiusura.",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [
+    "G.day convive con G.week; avanzaGiorno() ricarica energia, passa al giorno successivo e chiude la settimana ogni sette giorni.",
+    "saltaGiorni() usa lo stesso motore per salti di più giorni e settimane; eventi, agenda e uscite dello Studio si agganciano al cambio di giorno."
+  ],
+  "systems": [
+    "frontend/js/game/sim.js",
+    "frontend/js/game/skip.js",
+    "frontend/js/game/agenda.js",
+    "frontend/js/game/tempo.js",
+    "frontend/js/game/studio.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/sim.js",
+    "frontend/js/game/skip.js",
+    "frontend/js/game/eventi-v2.js",
+    "frontend/js/game/agenda.js",
+    "frontend/js/game/tempo.js",
+    "frontend/js/game/studio.js",
+    "frontend/pagine/gioco.html"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Il gioco avanza di un giorno alla volta e chiude la settimana solo dopo il settimo giorno.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/sim.js: avanzaGiorno() incrementa G.day, resetta il giorno a 1 oltre 7 e chiama advanceWeek()."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il giocatore può saltare più giorni usando la stessa logica dell’avanzamento manuale.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/eventi-v2.js e frontend/js/game/skip.js: saltaGiorni(n) richiama avanzaGiorno() per ogni giorno e gestisce gli eventi intermedi."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Il bilanciamento del nuovo ritmo e la leggibilità degli eventi giornalieri restano adeguati durante una partita completa.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "manual: non disponibile nell’audit automatico; il codice contiene costi, ricarica e calendario ma non sostituisce una partita osservata."
+      ]
+    }
+  ],
+  "risks": [
+    "Salti lunghi possono produrre molti eventi e devono fermarsi sugli eventi alti senza duplicare notifiche.",
+    "Il bilanciamento energia/ricompense richiede gameplay reale."
+  ],
+  "notes": [],
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "Il motore giornaliero è già collegato; resta solo la validazione di bilanciamento.",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none"
+}

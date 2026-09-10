@@ -1,0 +1,54 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-BA8B65DA0C15",
+  "origin": "legacy",
+  "title": "La criminalità è troppo facile, e i soldi sporchi",
+  "category": "06-mondo-e-personaggi",
+  "source": {
+    "point": "—",
+    "text": "La criminalità è troppo facile, e i soldi sporchi",
+    "file": "implementazioni/06-mondo-e-personaggi.md",
+    "source_status": "risposto",
+    "source_status_raw": "risposto, da fare"
+  },
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "already_implemented",
+  "related_task_ids": [],
+  "intake_note": "Il codice reale dimostra gia' il rallentamento e la separazione dei soldi: reputazione limitata e in calo, soldi puliti/sporchi distinti, riciclaggio limitato, calore e controlli.",
+  "current_state": [
+    "frontend/js/game/strada-crimine.js: stradaTenta() assegna una quota pulita e una sporca, limita la reputazione a 100 e consuma energia.",
+    "frontend/js/game/strada-crimine.js: stradaSettimana() riduce reputazione e calore, applica costi e controlli; frontend/js/game/strada-crimine-ui.js mostra casse separate e il limite di riciclaggio.",
+    "frontend/js/game/sim.js: stradaSettimana() viene eseguita alla chiusura della settimana e mantiene gli effetti della criminalita' separati dalla fama musicale."
+  ],
+  "systems": [
+    "frontend/js/game/strada-crimine.js",
+    "frontend/js/game/strada-crimine-ui.js",
+    "frontend/js/game/sim.js",
+    "frontend/js/game/state.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/strada-crimine.js",
+    "frontend/js/game/strada-crimine-ui.js",
+    "frontend/js/game/sim.js",
+    "frontend/js/game/state.js"
+  ],
+  "acceptance_criteria": [],
+  "risks": [
+    "Il bilanciamento numerico richiede comunque playtest, ma non e' una lacuna di implementazione di questa richiesta."
+  ],
+  "notes": [
+    "La task canonica ADF-LEG-38473F9C5563 copre il sistema criminale; questa richiesta specifica e' gia' verificabile nel codice reale."
+  ],
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "Nessun piano nuovo: il comportamento richiesto e' gia' implementato.",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

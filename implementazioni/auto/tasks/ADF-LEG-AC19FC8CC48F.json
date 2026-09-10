@@ -1,0 +1,121 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-AC19FC8CC48F",
+  "origin": "legacy",
+  "title": "I dialoghi devono essere tanti e diversi",
+  "category": "06-mondo-e-personaggi",
+  "source": {
+    "point": "43",
+    "text": "I dialoghi devono essere tanti e diversi",
+    "file": "implementazioni/06-mondo-e-personaggi.md",
+    "source_status": "in_parte",
+    "source_status_raw": "in parte"
+  },
+  "audit_state": "audited",
+  "verified_status": "needs_validation",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "Task canonica sui contenuti e sulla varietà delle conversazioni.",
+  "current_state": [
+    "frontend/js/game/posto.js contiene persone, ruoli, caratteri, molte situazioni e risposte con effetti positivi e negativi.",
+    "La stessa implementazione applica relazione, carattere scoperto e rivalità, ma la fonte storica segnala che le scene vere e i post di LaFamegram restano parziali."
+  ],
+  "systems": [
+    "frontend/js/game/posto.js",
+    "frontend/js/game/events.js",
+    "frontend/js/game/eventi-v2.js",
+    "frontend/js/game/telefono.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/posto.js",
+    "frontend/js/game/events.js",
+    "frontend/js/game/eventi-v2.js",
+    "frontend/js/game/telefono.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "Le conversazioni disponibili variano per personaggio, ruolo, carattere e contesto e non usano sempre la stessa sequenza.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/posto.js: presentiOggi(), scenaSala(), dati delle situazioni e renderDialogo() selezionano persone e risposte diverse."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Le risposte modificano coerentemente rapporto, carattere scoperto, rivalità e risultati delle azioni.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/posto.js: risolviDialogo() applica o[1], il controllo del carattere e la creazione del rivale."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Le scene e i dialoghi non ancora coperti sono verificati in gioco senza ripetizioni eccessive o esiti incoerenti.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "implementazioni/06-mondo-e-personaggi.md: le scene di gioco vere sono dichiarate ancora da fare."
+      ]
+    }
+  ],
+  "risks": [
+    "Aggiungere battute senza legarle allo stato può creare ricompense ripetibili o contraddizioni con la rete dei contatti."
+  ],
+  "notes": [
+    "Il criterio di varietà estetica e di ritmo richiede playtest; non viene dichiarato chiuso dal solo catalogo."
+  ],
+  "plan": {
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Consolidare il catalogo esistente e completare le scene mancanti mantenendo coerenti stato e conseguenze.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Catalogo e conseguenze",
+        "objective": "Verificare copertura per ruolo, carattere e stato e preservare gli effetti coerenti.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/posto.js",
+          "frontend/js/game/events.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/posto.js",
+          "frontend/js/game/events.js"
+        ],
+        "acceptance_criteria": [
+          "AC1",
+          "AC2"
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "V2",
+        "title": "Scene mancanti e playtest",
+        "objective": "Aggiungere o verificare le scene non coperte e testarne ripetizione, tono e conseguenze.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "frontend/js/game/eventi-v2.js",
+          "frontend/js/game/telefono.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/eventi-v2.js",
+          "frontend/js/game/telefono.js"
+        ],
+        "acceptance_criteria": [
+          "AC3"
+        ],
+        "status": "needs_validation"
+      }
+    ],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
+}

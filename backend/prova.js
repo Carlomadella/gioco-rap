@@ -233,6 +233,90 @@ async function aspettaCheRisponda(figlio){
     const suo = await chiama("/api/artista/" + onestoId);
     controlla("e restano quelli che poteva avere", suo.dati.stream > 0);
 
+    console.log("\nil diario di bordo: serate e feat");
+    await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sessOnesto),
+      corpo: { id: onestoId, stream: 13000, live: 3, feat: 1 } });
+    const conDiario = await chiama("/api/artista/" + onestoId);
+    controlla("le serate e i feat arrivano dal gioco e si vedono",
+      conDiario.dati.live === 3 && conDiario.dati.feat === 1, conDiario.dati);
+
+    await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sessOnesto),
+      corpo: { id: onestoId, stream: 13500 } });
+    const senzaDiario = await chiama("/api/artista/" + onestoId);
+    controlla("un client vecchio che non li manda non li azzera",
+      senzaDiario.dati.live === 3 && senzaDiario.dati.feat === 1, senzaDiario.dati);
+
+    await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sessOnesto),
+      corpo: { id: onestoId, stream: 14000, live: 0, feat: 0 } });
+    const nonScende = await chiama("/api/artista/" + onestoId);
+    controlla("e non tornano indietro: è un totale di carriera",
+      nonScende.dati.live === 3 && nonScende.dati.feat === 1, nonScende.dati);
+
+    await chiama("/api/punteggio", { metodo: "POST", testate: conSessione(sessOnesto),
+      corpo: { id: onestoId, stream: 14500, live: 900, feat: 900 } });
+    const limatoDiario = await chiama("/api/artista/" + onestoId);
+    controlla("novecento serate in una settimana vengono limate al passo giusto",
+      limatoDiario.dati.live === 10 && limatoDiario.dati.feat === 6, limatoDiario.dati);
+
+    console.log("\ni bot non si riconoscono (punto 30)");
+    const cento = await chiama("/api/classifica?quanti=40");
+    const righe = cento.dati.righe;
+    controlla("ogni riga della classifica porta livello, fase e diario",
+      righe.every(r => typeof r.livello === "number" && typeof r.fase === "number" &&
+        typeof r.live === "number" && typeof r.feat === "number"), righe[0]);
+    /* La falla vera: i bot non hanno mai avuto un livello scritto, quindi
+       uscivano tutti a 1. Con un giocatore vero al livello 7 in mezzo, la
+       classifica diceva da sola chi era finto. */
+    const grossi = righe.filter(r => r.stream > 50000 && !r.io);
+    controlla("chi ha numeri da grosso non è rimasto al livello 1",
+      grossi.length > 0 && grossi.every(r => r.livello > 1),
+      grossi.slice(0, 3).map(r => ({ stream: r.stream, livello: r.livello })));
+    controlla("e nemmeno alla fase zero",
+      grossi.every(r => r.fase > 0), grossi.slice(0, 3).map(r => ({ stream: r.stream, fase: r.fase })));
+    const livelli = new Set(righe.map(r => r.livello));
+    controlla("i livelli non sono tutti uguali", livelli.size > 2, [...livelli]);
+    const dueVolte = await chiama("/api/classifica?quanti=40");
+    controlla("e riguardando la classifica i numeri sono gli stessi",
+      dueVolte.dati.righe.every((r, i) => r.livello === righe[i].livello && r.live === righe[i].live));
+
+    /* La regola del punto 30 stava scritta in un commento sopra a `riga()`, e un
+       commento non ha mai fermato nessuno: la classifica la controllavamo, le
+       altre cinque rotte che tirano fuori artisti no. Adesso si passano tutte,
+       e si guardano due cose insieme — quello che non deve uscire mai, e i
+       campi che devono esserci per **tutti**, se no la mancanza stessa dice chi
+       è finto. Una rotta nuova che porta artisti va aggiunta a questo elenco. */
+    const CHE_PORTANO_ARTISTI = [
+      "/api/classifica?quanti=40",
+      "/api/classifica?quanti=10&io=" + onestoId,
+      "/api/classifica/intorno/" + onestoId + "?raggio=6",
+      "/api/artista/" + onestoId,
+      "/api/opps?io=" + onestoId + "&quanti=5",
+      "/api/feed?quanti=20&io=" + onestoId,
+      "/api/notizie?quante=20"
+    ];
+    const VIETATE = ['"bot"', '"account_id"', '"accountId"', '"chiave_hash"', '"segreto"', '"ip_hash"'];
+    let sporca = null, senzaCampi = null;
+    for(const rotta of CHE_PORTANO_ARTISTI){
+      const r = await chiama(rotta);
+      const testo = JSON.stringify(r.dati || {});
+      for(const v of VIETATE) if(testo.indexOf(v) >= 0) sporca = { rotta, campo: v };
+      /* gli artisti dentro alla risposta, dovunque stiano annidati */
+      const dentro = [];
+      (function cerca(x){
+        if(!x || typeof x !== "object") return;
+        if(Array.isArray(x)) return x.forEach(cerca);
+        if(x.id && x.nome && typeof x.stream === "number") dentro.push(x);
+        Object.values(x).forEach(cerca);
+      })(r.dati);
+      for(const a of dentro)
+        if(typeof a.livello !== "number" || typeof a.fase !== "number" ||
+           typeof a.live !== "number" || typeof a.feat !== "number")
+          senzaCampi = { rotta, chi: Object.keys(a) };
+    }
+    controlla("nessuna rotta pubblica si lascia sfuggire bot, account o chiavi", !sporca, sporca);
+    controlla("e ogni artista che esce, da qualunque rotta, ha livello, fase e diario",
+      !senzaCampi, senzaCampi);
+
     console.log("\nchi insiste a barare");
     const furbo = await chiama("/api/artista", { metodo: "POST",
       corpo: { nome: "Tarocco", citta: "Latina", genere: "trap" } });
@@ -692,6 +776,54 @@ async function aspettaCheRisponda(figlio){
       traduci('SELECT "col?" FROM t WHERE a = ?'));
     controlla("una query senza parametri resta identica",
       traduci("SELECT count(*) n FROM artista") === "SELECT count(*) n FROM artista");
+
+    /* ============ IL DIRADAMENTO DEI BOT (bot.js) ============
+       I bot si fanno da parte man mano che arriva gente vera, e si tolgono
+       dall'alto (backend.md § 8). Sono due funzioni pure: si provano qui, senza
+       aspettare che passino cinquanta settimane di mondo. */
+    console.log("\nil diradamento dei bot");
+    const { quantiServono, dirada, VERI_PER_DIRADARE } = require("./bot.js");
+    controlla("senza nessun giocatore vero i bot restano tutti",
+      quantiServono(140, 0, 20) === 140, quantiServono(140, 0, 20));
+    controlla("ogni giocatore vero si prende il posto di un bot",
+      quantiServono(140, 30, 20) === 110, quantiServono(140, 30, 20));
+    controlla("con mille giocatori veri resta solo il minimo",
+      quantiServono(140, 1000, 20) === 20, quantiServono(140, 1000, 20));
+    controlla("il minimo non può essere più alto del pieno",
+      quantiServono(10, 1000, 20) === 10, quantiServono(10, 10000, 20));
+
+    const finti = (quanti, da) => Array.from({ length: quanti }, (_, i) => ({
+      id: "b" + i, nome: "Nino " + i, citta: "Milano", stream: (da || 1000) * (quanti - i) }));
+
+    const pochiVeri = finti(40); const nienteNotizie = [];
+    dirada(pochiVeri, 20, VERI_PER_DIRADARE - 1, new Set(), nienteNotizie);
+    controlla("con pochi giocatori veri non si tocca niente: la classifica resterebbe senza testa",
+      pochiVeri.length === 40 && nienteNotizie.length === 0, pochiVeri.length);
+
+    const tanti = finti(40); const dette = [];
+    const andati = dirada(tanti, 20, 500, new Set(), dette);
+    controlla("con la gente vera i bot di troppo cominciano ad andarsene",
+      andati === 2 && tanti.length === 38, { andati, restano: tanti.length });
+    controlla("e se ne va un decimo per volta, non mezzo mondo in una notte",
+      andati <= 40 / 10, andati);
+    controlla("se ne vanno quelli in alto, che è dove la bugia si vede",
+      tanti.every(b => b.stream <= 38000) && tanti[0].id === "b2",
+      tanti.slice(0, 3).map(b => b.id));
+    controlla("chi se ne va lascia una notizia, e non dice di essere un bot",
+      dette.length === 2 && dette.every(n => n.tipo === "ritiro" && n.testo.length > 10 &&
+        !/bot/i.test(n.testo)), dette);
+
+    const giusti = finti(20);
+    controlla("quando il numero è quello giusto non se ne va nessuno",
+      dirada(giusti, 20, 500, new Set(), []) === 0 && giusti.length === 20, giusti.length);
+    const sotto = finti(12);
+    controlla("e se sono già meno del bersaglio, men che meno",
+      dirada(sotto, 20, 500, new Set(), []) === 0 && sotto.length === 12, sotto.length);
+
+    const nomi = new Set(["nino 0", "nino 1", "nino 2"]);
+    dirada(finti(40), 20, 500, nomi, []);
+    controlla("e il nome di chi si ritira torna libero",
+      !nomi.has("nino 0") && !nomi.has("nino 1"), [...nomi]);
 
     /* ============ LE RISPOSTE E LA CATENA (risposte.js) ============
        Lo stesso errore, due vestiti: JSON per il gioco, una pagina per una

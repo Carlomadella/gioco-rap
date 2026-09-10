@@ -150,8 +150,36 @@ const songQ = (bar, beat) => clamp((bar.q*0.45 + beat.q*0.33 + G.skills.flow*0.3
    Studio vale quanto il rapporto che avete costruito. `typeof` perché
    studio.js si carica dopo, e perché il gioco deve reggere anche senza. */
 const studioBonus = () => (typeof studioAiutoFonico === "function" ? studioAiutoFonico() : 0);
+/* punto 4: il feat. Stessa strada del fonico — lo Studio dice quanto vale,
+   qui si somma e basta. Vale per un pezzo solo: `studioConsumaFeat()` lo
+   stacca appena la traccia esce dalla cabina. */
+const featBonus = () => (typeof studioAiutoFeat === "function" ? studioAiutoFeat() : 0);
+/* Le due scelte dello Studio (punto 4: «ogni elemento influenza il
+   risultato», e sceglierlo è metà dell'elemento). Se non hai scelto niente —
+   o se il pezzo che avevi scelto non è più lì — si torna a `sort()[0]`, che
+   è quello che ha sempre fatto: nessuna partita vecchia si accorge di
+   niente. */
+/* Stessa strada per la strofa e il beat che entrano in cabina: prima si
+   incideva sempre il migliore di ognuno, e la strofa tenuta da parte per un
+   altro pezzo spariva alla prima registrazione. Adesso li sceglie lo Studio
+   (`registrazione_pezzo`: la colonna «CHE COSA INCIDI» ha i pallini), e se
+   non hai scelto niente si torna al migliore, come prima. */
+const daIncidere = () => (typeof studioStrofa === "function" && studioStrofa()) || bestBar();
+const beatDaIncidere = () => (typeof studioBeatSuCui === "function" && studioBeatSuCui()) || bestBeat();
+const daMixare = () => (typeof studioDaMixare === "function" && studioDaMixare()) ||
+  unmixed().sort((a,b) => b.q-a.q)[0];
+/* `s.tenuto` e' la cassaforte dello Studio: un pezzo messo da parte non deve
+   uscire per sbaglio dalla plancia, se no «tienilo nel cassetto» e' una
+   promessa che il gioco non mantiene. */
+const daPubblicare = () => (typeof studioDaPubblicare === "function" && studioDaPubblicare()) ||
+  ready().filter(s => !s.tenuto).sort((a,b) => b.q-a.q)[0];
+/* punto 4: i tre cursori del banco (voce, bassi, aria) dello Studio. Al
+   centro valgono zero — chi non li tocca mixa esattamente come si mixava
+   prima che esistessero — e da lì si guadagnano o si perdono fino a tre
+   punti a seconda di quanto sta in piedi quello che hai fatto. */
+const bancoBonus = () => (typeof studioBancoGuadagno === "function" ? studioBancoGuadagno() : 0);
 const mixGain = () => Math.round(6 + (G.gear.monitor?5:0) + (G.gear.cuffie?3:0) + G.skills.flow*0.06)
-  + studioBonus();
+  + studioBonus() + bancoBonus();
 
 function offerJobs(){
   const pool = JOBS.filter(j => (!j.req || j.req(G)) && (!G.job || G.job.id !== j.id));
@@ -235,7 +263,7 @@ function freestyleBattagliaOk(){
 }
 
 const ACTIONS = [
-  {id:"scrivi", n:"Scrivi barre", e:28, luc:3,
+  {id:"scrivi", n:"Scrivi barre", e:15, luc:3,
    d:"Il foglio, la penna e quello che hai in testa.",
    need:() => adfOggi("scrivi") >= ADF_MAX_SCRITTURE_GIORNO ? "TORNARE DOMANI" : null,
    give:() => adfOggi("scrivi") === 1
@@ -280,24 +308,33 @@ const ACTIONS = [
    d:"Strofa più beat, in sala. Esce una traccia grezza.",
    need:() => !G.bars.length ? "1 strofa" : !G.beats.length ? "1 beat" : null,
    give:() => {
-     const b = bestBar(), bt = bestBeat();
-     return (b && bt ? "1 traccia · qualità ~" + Math.round(songQ(b,bt) + studioBonus()) : "1 traccia grezza") +
+     const b = daIncidere(), bt = beatDaIncidere();
+     return (b && bt ? "1 traccia · qualità ~" + Math.round(songQ(b,bt) + studioBonus() + featBonus()) : "1 traccia grezza") +
        " · −3 benessere";
    },
    run(){
-     const b = bestBar(), bt = bestBeat();
+     const b = daIncidere(), bt = beatDaIncidere();
      chiediTitolo(title(), (nome, seed, img) => {
        G.bars.splice(G.bars.indexOf(b),1);
        G.beats.splice(G.beats.indexOf(bt),1);
        if(!G.gear.mic) G.money -= 50;
        /* punto 12: chi sta dietro al vetro conta anche in registrazione — un
           fonico che ti conosce sa dove metterti la voce prima che glielo chiedi */
-       const q = clamp(Math.round(songQ(b,bt) + studioBonus() + rnd(-5,6)), 5, 100);
+       /* punto 4: il tiro di dado della registrazione non e' piu' invisibile.
+          E' la take che hai scelto in cabina (`registrazione_pezzo`), e la
+          prima take e' esattamente questo `rnd(-5,6)` — chi non chiede altre
+          take registra con lo stesso dado di sempre. */
+       const q = clamp(Math.round(songQ(b,bt) + studioBonus() + featBonus() +
+         (typeof studioTakePresa === "function" ? studioTakePresa() : rnd(-5,6))), 5, 100);
+       /* chi era in sessione resta scritto sul pezzo, e poi torna libero */
+       const conMe = typeof studioConsumaFeat === "function" ? studioConsumaFeat() : "";
        const s2 = {t:nome, q, mixed:false, released:false, week:0, streams:0, last:0,
-         txt:b.txt||"", tema:b.tema||"", seed:seed, img:img||""};
+         txt:b.txt||"", tema:b.tema||"", seed:seed, img:img||"", feat:conMe};
        G.songs.push(s2); G.wellbeing = clamp(G.wellbeing-3,0,100);
-       pushLog("Registrato <b>«" + nome + "»</b> su «" + bt.n + "» — qualità " + q + ".", "");
+       pushLog("Registrato <b>«" + nome + "»</b> su «" + bt.n + "»" +
+         (conMe ? " con <b>" + conMe + "</b>" : "") + " — qualità " + q + ".", "");
        SFX.rec(); save(); renderGioco();
+       if(typeof renderStudio === "function") renderStudio();
      });
      return "";
    }},
@@ -307,21 +344,25 @@ const ACTIONS = [
    need:() => unmixed().length ? null : "1 traccia da mixare",
    give:() => "+" + mixGain() + " qualità · +flow",
    run(){
-     const s = unmixed().sort((a,b) => b.q-a.q)[0];
+     const s = daMixare();
      s.q = clamp(s.q + mixGain(), 5, 100); s.mixed = true;
+     /* com'e' venuto — «secco», «pesante», «aperto» — resta scritto sul pezzo:
+        e' quello che nel riferimento di Fuori si legge sotto al titolo,
+        «q78 · mixato · secco» */
+     if(typeof studioBancoCarattere === "function") s.car = studioBancoCarattere().n;
      gain("flow", 1.1);
      return "«" + s.t + "» mixato: qualità " + s.q + ". Pronto per uscire.";
    }},
 
   {id:"pubblica", n:"Pubblica il pezzo", e:0, luc:1,
    d:"Lo metti fuori. Da qui in poi corre da solo.",
-   need:() => ready().length ? null : "1 traccia",
+   need:() => ready().some(s => !s.tenuto) ? null : "1 traccia",
    give:() => {
-     const s = ready().sort((a,b) => b.q-a.q)[0];
+     const s = daPubblicare();
      return s ? "esce «" + s.t + "» · q" + s.q + (s.mixed ? "" : " · non mixato, −8") : "un pezzo esce";
    },
    run(){
-     const s = ready().sort((a,b) => b.q-a.q)[0];
+     const s = daPubblicare();
      if(!s.mixed) s.q = clamp(s.q - 8, 5, 100);
      s.released = true; s.week = totalWeeks();
      G.hype = clamp(G.hype + 6 + s.q*0.12, 0, (typeof hypeCap==="function"?hypeCap():100));

@@ -1,0 +1,72 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-C9E047E25208",
+  "origin": "legacy",
+  "title": "«Disciplina» diventa «Condizione»",
+  "category": "02-interfaccia-e-telefono",
+  "source": {
+    "point": "25",
+    "text": "«Disciplina» diventa «Condizione»",
+    "file": "implementazioni/02-interfaccia-e-telefono.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "audited",
+  "verified_status": "complete",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [
+    "La voce dell'interfaccia è stata rinominata in Condizione; i riferimenti disciplinari restano solo nei sistemi specifici della criminalità, dove hanno un significato diverso."
+  ],
+  "systems": [
+    "profilo",
+    "telefono",
+    "localizzazione"
+  ],
+  "watch_paths": [
+    "frontend/js/game/hub.js",
+    "frontend/js/game/ui.js",
+    "frontend/js/game/telefono.js",
+    "frontend/strumenti/audit-regressioni.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "La scheda del profilo mostra Condizione e non Disciplina.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/hub.js: vistaCondizione(), titolo La tua condizione e voce condizione nella navigazione."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Il telefono apre la stessa vista Condizione.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/telefono.js: l'app profilo imposta HUB_VISTA = \"condizione\"; frontend/strumenti/audit-regressioni.js: controllo del punto 25 sui riferimenti UI."
+      ]
+    }
+  ],
+  "risks": [
+    "Il termine disciplinare rimane corretto negli eventi e nelle sanzioni criminali e non va sostituito globalmente."
+  ],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": [
+      "Task storica già implementata; nessun piano tecnico residuo."
+    ]
+  }
+}

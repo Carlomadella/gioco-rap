@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Anni di Fame — Crea il tuo artista</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="creator-shell">
+    <section class="creator-stage">
+      <div class="room-backdrop" aria-hidden="true"></div>
+      <div class="room-vignette" aria-hidden="true"></div>
+      <div id="viewport" class="viewport" aria-label="Anteprima 3D personaggio"></div>
+
+      <header class="game-header">
+        <div class="brand-lockup">
+          <span class="brand-dot"></span>
+          <div>
+            <div class="kicker">ANNI DI FAME · CREATOR</div>
+            <h1>CREA IL TUO ARTISTA</h1>
+          </div>
+        </div>
+        <div id="statusPill" class="status-pill busy">Caricamento…</div>
+      </header>
+
+      <div class="camera-dock" aria-label="Camera">
+        <button class="camera-btn active" data-view="full" type="button"><span>◉</span>Intero</button>
+        <button class="camera-btn" data-view="face" type="button"><span>◎</span>Volto</button>
+        <button class="camera-btn" data-view="side" type="button"><span>◐</span>Profilo</button>
+      </div>
+
+      <div class="load-card" id="loadCard">
+        <strong id="loadTitle">Carico MakeHuman</strong>
+        <span id="loadDetail">Mesh base…</span>
+        <div class="load-track"><i id="loadBar"></i></div>
+        <small>Il primo caricamento può richiedere qualche secondo.</small>
+      </div>
+
+      <aside class="creator-panel" id="creatorPanel">
+        <div class="panel-head">
+          <div>
+            <span id="sectionEyebrow">01 · IDENTITÀ</span>
+            <h2 id="sectionTitle">Costruisci la base</h2>
+          </div>
+          <p id="sectionHint">Parti dall'identità del personaggio. Tutto resta modificabile.</p>
+        </div>
+
+        <nav class="section-nav" aria-label="Sezioni editor">
+          <button class="section-tab active" data-tab="identity" type="button"><b>01</b><span>Identità</span></button>
+          <button class="section-tab" data-tab="face" type="button"><b>02</b><span>Volto</span></button>
+          <button class="section-tab" data-tab="body" type="button"><b>03</b><span>Corpo</span></button>
+          <button class="section-tab" data-tab="details" type="button"><b>04</b><span>Capelli & dettagli</span></button>
+          <button class="section-tab" data-tab="wardrobe" type="button"><b>05</b><span>Guardaroba</span></button>
+          <button class="section-tab" data-tab="skin" type="button"><b>06</b><span>Pelle</span></button>
+          <button class="section-tab" data-tab="custom" type="button"><b>07</b><span>Personalizzazione</span></button>
+          <button class="section-tab" data-tab="confirm" type="button"><b>08</b><span>Conferma</span></button>
+        </nav>
+
+        <div class="panel-scroll">
+          <section class="tab-page active" data-page="identity">
+            <div class="section-block hero-block">
+              <div class="block-title"><span>BASE</span><b>Identità</b></div>
+              <div class="segmented">
+                <button id="sexFemale" type="button">Donna</button>
+                <button id="sexNeutral" class="active" type="button">Neutro</button>
+                <button id="sexMale" type="button">Uomo</button>
+              </div>
+            </div>
+
+            <div class="section-block">
+              <div class="block-title"><span>ETÀ</span><b>Aspetto generale</b></div>
+              <div id="identityMorphs" class="quick-morphs"></div>
+            </div>
+
+            <div class="section-block">
+              <div class="block-title"><span>TRATTI</span><b>Origine / phenotype</b></div>
+              <div id="ethnicControls" class="quick-morphs"></div>
+            </div>
+          </section>
+
+          <section class="tab-page" data-page="face">
+            <div class="section-block">
+              <div class="block-title"><span>PRESET</span><b>Volto rapido</b></div>
+              <div id="facePresets" class="preset-grid face-presets"></div>
+            </div>
+
+            <div class="section-block">
+              <div class="block-title"><span>AREA</span><b>Modifica il volto</b></div>
+              <select id="faceAreaFilter" class="select"></select>
+              <div id="faceMorphs" class="quick-morphs face-morphs"></div>
+            </div>
+          </section>
+
+          <section class="tab-page" data-page="body">
+            <div class="section-block">
+              <div class="block-title"><span>PRESET</span><b>Fisico</b></div>
+              <div id="bodyPresets" class="preset-grid"></div>
+            </div>
+
+            <div class="section-block">
+              <div class="block-title"><span>FORMA</span><b>Controlli principali</b></div>
+              <div id="bodyMorphs" class="quick-morphs"></div>
+            </div>
+          </section>
+
+          <section class="tab-page" data-page="details">
+            <div class="section-block wardrobe-block">
+              <div class="block-title"><span>STILE</span><b>Capelli & dettagli</b></div>
+              <div id="detailCategories" class="category-chips"></div>
+              <input id="detailSearch" class="search" type="search" placeholder="Cerca capelli, sopracciglia, occhi…">
+              <div class="wardrobe-toolbar">
+                <span id="detailResultCount">0 asset</span>
+                <button id="btnClearDetails" class="text-btn warn" type="button">Rimuovi dettagli</button>
+              </div>
+              <div id="detailGrid" class="wardrobe-grid"></div>
+            </div>
+          </section>
+
+          <section class="tab-page" data-page="wardrobe">
+            <div class="section-block wardrobe-block">
+              <div class="block-title"><span>OUTFIT</span><b>Guardaroba</b></div>
+              <div id="wardrobeCategories" class="category-chips"></div>
+              <input id="wardrobeSearch" class="search" type="search" placeholder="Cerca un capo…">
+              <div class="wardrobe-toolbar">
+                <span id="wardrobeResultCount">0 capi</span>
+                <button id="btnClearWardrobe" class="text-btn warn" type="button">Rimuovi vestiti</button>
+              </div>
+              <div id="wardrobeGrid" class="wardrobe-grid"></div>
+            </div>
+          </section>
+
+          <section class="tab-page" data-page="skin">
+            <div class="section-block">
+              <div class="block-title"><span>PELLE</span><b>Tonalità & materiale</b></div>
+              <div id="skinGrid" class="skin-grid"></div>
+            </div>
+          </section>
+
+          <section class="tab-page" data-page="custom">
+            <div class="section-block">
+              <div class="block-title"><span>FINE TUNING</span><b>Personalizzazione completa</b></div>
+              <p class="block-copy">Qui restano disponibili tutti i modifier reali MakeHuman. I preset non sostituiscono mai gli slider.</p>
+              <div class="filter-stack">
+                <input id="morphSearch" class="search" type="search" placeholder="Cerca naso, bocca, torso, gambe…">
+                <select id="groupFilter" class="select"><option value="">Tutti i gruppi</option></select>
+              </div>
+              <div class="morph-summary">
+                <span id="morphVisibleCount">0 controlli</span>
+                <button id="btnCollapseGroups" class="text-btn" type="button">Comprimi gruppi</button>
+              </div>
+              <div id="allMorphs" class="all-morphs"></div>
+            </div>
+          </section>
+
+          <section class="tab-page" data-page="confirm">
+            <div class="section-block confirm-block">
+              <div class="block-title"><span>FINALE</span><b>Il tuo artista</b></div>
+              <p class="block-copy">Controlla il personaggio, poi conferma. La configurazione viene salvata come stato MakeHuman del personaggio.</p>
+              <div id="confirmSummary" class="confirm-summary"></div>
+              <button id="btnConfirmInside" class="confirm-card" type="button">
+                <span>CONFERMA PERSONAGGIO</span>
+                <b>Questo sarà il tuo artista</b>
+              </button>
+            </div>
+          </section>
+        </div>
+      </aside>
+
+      <button id="previewExit" class="preview-exit" type="button">Torna all'editor</button>
+    </section>
+
+    <footer class="bottom-bar">
+      <div id="footerStatus" class="footer-status">Inizializzazione…</div>
+      <div class="bottom-actions">
+        <button id="btnBack" class="bottom-btn" type="button">← Indietro</button>
+        <button id="btnRandom" class="bottom-btn" type="button">Casuale</button>
+        <button id="btnResetSection" class="bottom-btn" type="button">Reset sezione</button>
+        <button id="btnPreview" class="bottom-btn" type="button">Anteprima</button>
+        <button id="btnConfirmArtist" class="bottom-btn primary" type="button">Conferma artista</button>
+      </div>
+    </footer>
+
+    <div class="dev-only" hidden>
+      <span id="morphCount">0</span><span id="proxyCount">0</span><span id="wornCount">0</span>
+      <button id="btnSaveLocal" type="button"></button>
+      <button id="btnLoadLocal" type="button"></button>
+      <button id="btnExport" type="button"></button>
+      <input id="fileImport" type="file" accept="application/json,.json">
+    </div>
+  </div>
+
+  <script src="./vendor/three.js"></script>
+  <script src="./vendor/OrbitControls.js"></script>
+  <script src="./vendor/makehuman.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

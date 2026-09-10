@@ -1,0 +1,85 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-D7416EF2ABDA",
+  "origin": "legacy",
+  "title": "Energia a 100, giornate, e skip di quanto vuoi",
+  "category": "05-carriera-e-tempo",
+  "source": {
+    "point": "39",
+    "text": "Energia a 100, giornate, e skip di quanto vuoi",
+    "file": "implementazioni/05-carriera-e-tempo.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "audited",
+  "verified_status": "needs_validation",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [
+    "Il gioco usa G.day e avanzaGiorno() per il ritmo giornaliero, con chiusura settimanale automatica.",
+    "saltaGiorni() gestisce 1, 2, 7 e 28 giorni; syncEnergy() normalizza i salvataggi precedenti e la riserva base e' 100.",
+    "I costi e RITMO sono gia' riproporzionati, ma il bilanciamento resta da giocare."
+  ],
+  "systems": [
+    "frontend/js/game/sim.js",
+    "frontend/js/game/skip.js",
+    "frontend/js/game/actions.js",
+    "frontend/js/game/lifestyle.js",
+    "frontend/js/game/posto.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/sim.js",
+    "frontend/js/game/skip.js",
+    "frontend/js/game/actions.js",
+    "frontend/js/game/lifestyle.js",
+    "frontend/js/game/posto.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "La riserva energetica base e' 100 e il recupero avviene al cambio di giornata.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/lifestyle.js: ENERGIA_K e syncEnergy() parametrizzano il massimo e normalizzano i valori salvati.",
+        "frontend/js/game/sim.js: avanzaGiorno() applica il recupero notturno e chiude la settimana ogni sette giorni."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Lo skip consente giorni multipli, settimana e mese senza saltare la logica dei giorni attraversati.",
+      "verification": "automatic",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/skip.js: saltaGiorni(n) ripete avanzaGiorno() e gestisce le interruzioni durante il salto."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Costi, recuperi e ricompense mantengono un ritmo di carriera proporzionato alla scala giornaliera.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/actions.js: RITMO e costi delle azioni sono parametrizzati; serve una sessione manuale per validare il bilanciamento."
+      ]
+    }
+  ],
+  "risks": [
+    "Con sette volte le occasioni di azione, costi troppo bassi accelerano soldi e fan; costi troppo alti rendono la progressione lenta."
+  ],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ],
+  "roadmap_scope": "none",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  }
+}

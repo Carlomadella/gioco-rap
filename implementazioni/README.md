@@ -7,12 +7,15 @@ I punti nuovi si scrivono in [`implementazioni.md`](implementazioni.md), qui den
 resta lì come foglio dove buttare le idee: quando un punto è chiuso, si sposta nel
 file del suo argomento con dentro cosa è stato fatto.
 
+Quelli che erano rimasti indietro nel foglio — chiusi ma mai smistati — stanno in
+[`fatte.md`](fatte.md), verbatim, con la data e da quale lista venivano.
+
 ## Gli argomenti
 
 | file | cosa c'è dentro |
 | --- | --- |
 | [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 16 voci |
-| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 33 voci |
+| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 34 voci |
 | [`03-artista-e-avatar.md`](03-artista-e-avatar.md) | **L'artista e il suo avatar** — 1 voce |
 | [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 14 voci |
 | [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 11 voci |
@@ -21,18 +24,25 @@ file del suo argomento con dentro cosa è stato fatto.
 | [`08-uscita-sugli-store.md`](08-uscita-sugli-store.md) | **L'uscita su Steam e sugli store** — 3 voci |
 | [`09-grafica-e-asset.md`](09-grafica-e-asset.md) | **La grafica, le ambientazioni e gli asset** — 7 voci |
 
-Più [`00-come-si-lavora.md`](00-come-si-lavora.md): le regole di lavoro, che valgono
-per tutti e per tutto.
+Più [`fatte.md`](fatte.md): le task chiuse arrivate dal foglio dei punti nuovi.
+
+Le **regole di lavoro** non stanno più qui dentro: valgono per tutto il progetto, non solo
+per i punti, e sono in [`../documentazione/come-si-lavora.md`](../documentazione/come-si-lavora.md)
+— in versione corta, quella che ogni sessione si legge da sola, in
+[`../CLAUDE.md`](../CLAUDE.md).
 
 ## Tutti i punti
 
-109 voci in tutto: **74 chiuse**, 13 a metà, il resto da fare.
+113 voci in tutto: **77 chiuse**, 13 a metà, 18 da fare e 5 con la sola risposta scritta
+(ricontate dalla tabella qui sotto il 07/09/2026, +1 chiusa l'08/09/2026). A che punto siamo
+nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../documentazione/roadmap.md).
 
 | | punto | stato | dove |
 | --- | --- | --- | --- |
 | **1** | Cosa si può simulare | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
 | **1** | Dallo Studio si esce solo con «Torna alla mappa» | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **1** | «Torna alla mappa» non funzionava in alcune interfacce | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **14** | Le azioni in Studio non ti buttano più fuori | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **2** | Ascoltare un beat prima di comprarlo | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
 | **3** | Crea il tuo avatar | fatto | [artista-e-avatar](03-artista-e-avatar.md) |
 | **4** | La pagina di landing | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
@@ -80,14 +90,14 @@ per tutti e per tutto.
 | **46** | Le abilità sono troppe: i mix li fanno i fonici | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
 | **47** | Il negozio dei vestiti | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **48** | Meno cartelli chiusi sulla mappa, più roba che si apre | in parte | [mappa-e-citta](01-mappa-e-citta.md) |
-| **49** | Un file coi comandi del terminale | fatto | [come-si-lavora](00-come-si-lavora.md) |
+| **49** | Un file coi comandi del terminale | fatto | [fatte](fatte.md) |
 | **50** | Via i popup dalle card: scene vere | in parte | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **51** | Un prompt per ogni card, e dove sono finiti quelli del 38 | fatto | [grafica-e-asset](09-grafica-e-asset.md) |
 | **52** | LaFamegram con post veri, caricati dai giocatori | in parte | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **53** | Il feed di LaFamegram si scorre come quello vero | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **54** | Scenari veri, uguali nella forma e diversi nelle circostanze | in parte | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
 | **55** | Via la conferma «sei sicuro» per l'energia | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
-| **56** | Restare sempre aggiornati col repo | fatto | [come-si-lavora](00-come-si-lavora.md) |
+| **56** | Restare sempre aggiornati col repo | fatto | [fatte](fatte.md) |
 | **57** | «Attività criminali non si può più giocare, che è successo?» | risposto | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
 | **58** | Transizioni diverse per ogni scena | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **59** | Due lavori veri al posto di due cartelli chiusi: Pizzeria e Fabbrica | fatto | [mappa-e-citta](01-mappa-e-citta.md) |

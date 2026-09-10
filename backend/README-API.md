@@ -198,6 +198,10 @@ finisce nei log, mai nella risposta — tranne quando l'errore è di chi chiama
   "seed": 12345,
   "storia": "Comincia da zero.",
   "livello": 5,
+  "fase": 2,
+  "live": 12,
+  "feat": 3,
+  "difficolta": "anni-di-fame",
   "io": false
 }
 ```
@@ -205,6 +209,14 @@ finisce nei log, mai nella risposta — tranne quando l'errore è di chi chiama
 `delta` è positivo quando l'artista è salito, negativo quando è sceso e `null` se non
 esiste ancora una fotografia precedente. Le risposte pubbliche non espongono mai `bot`,
 `account_id`, `chiave_hash` o altri dati privati.
+
+`live` e `feat` sono il **diario di bordo** del gioco (le serate fatte e i feat di
+carriera, punto 14 di ALE): totali che crescono e non scendono mai, e che non entrano
+nell'ordinamento della classifica. `livello`, `fase`, `live` e `feat` **ci sono per tutti,
+sempre**: per i giocatori arrivano dal gioco, per i bot li calcola il server dai loro
+numeri. Non è un dettaglio di comodo — è la regola del punto 30: se i bot uscissero coi
+valori di partenza (livello 1, fase 0), chiunque legga questa risposta saprebbe dire in
+un colpo d'occhio chi è finto.
 
 ### Account
 
@@ -599,14 +611,25 @@ Accesso: artista proprio tramite `x-sessione` o `x-chiave`.
   "uscite": 3,
   "deal": false,
   "ultima": "Il primo pezzo",
-  "seed": 12345
+  "seed": 12345,
+  "difficolta": "anni-di-fame",
+  "live": 12,
+  "feat": 3
 }
 ```
 
 Limiti applicati: `stream` massimo 50.000.000 prima del controllo di plausibilità,
 `fan` 0–50.000.000, `livello` 1–60, `fase` 0–8, `uscite` 0–5.000, titolo fino a
-60 caratteri, `seed` 0–2.000.000.000. Il modello di plausibilità può abbassare gli
-stream richiesti e registrare un sospetto.
+60 caratteri, `seed` 0–2.000.000.000, `live` e `feat` 0–100.000. Il modello di
+plausibilità può abbassare gli stream richiesti e registrare un sospetto.
+
+**`live` e `feat` sono facoltativi e si comportano diversamente dagli altri campi**: sono
+totali di carriera, non numeri della settimana. Se non arrivano — un client vecchio non li
+ha — il totale sul server **resta dov'è**, non si azzera. Se arrivano più bassi di quello
+che c'è, vince quello che c'è. Se arrivano con un salto assurdo vengono limati al passo di
+una settimana (al massimo +7 serate e +5 feat) **in silenzio**: non fanno classifica, non
+c'è niente da rubare, e segnare un sospetto per una serata di troppo vorrebbe dire punire
+chi ha ripreso un salvataggio vecchio.
 
 Risposta:
 
@@ -883,7 +906,7 @@ salva la base URL in `localStorage`.
 | `ONLINE.io()` | `GET /api/io` |
 | `ONLINE.cancellaAccount()` | `DELETE /api/account` con conferma e pulizia dell'identità locale |
 | `ONLINE.piattaforma()` | rileva localmente `android`, `ios`, `mac`, `windows`, `linux` o `web` |
-| `ONLINE.punteggioDaPartita()` | costruisce localmente il payload leggendo l'oggetto globale `G` |
+| `ONLINE.punteggioDaPartita()` | costruisce localmente il payload leggendo l'oggetto globale `G` (diario di bordo compreso: `live` e `feat` da `diarioBordo()`, `colpi` mai) |
 | `ONLINE.invia(dati?)` | `POST /api/punteggio`; senza argomenti usa `punteggioDaPartita()` |
 | `ONLINE.salvaCarriera(slot?, forza?)` | `PUT /api/carriera/:slot` con l'intero oggetto `G` |
 | `ONLINE.carriera(slot?)` | `GET /api/carriera/:slot` |

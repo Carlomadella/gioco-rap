@@ -1,0 +1,137 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-5CBD9DE3CFE3",
+  "origin": "legacy",
+  "title": "Il freestyle in piazza, con la folla",
+  "category": "04-musica-e-suoni",
+  "source": {
+    "point": "14",
+    "text": "Il freestyle in piazza, con la folla",
+    "file": "implementazioni/04-musica-e-suoni.md",
+    "source_status": "da_fare",
+    "source_status_raw": "da fare"
+  },
+  "audit_state": "audited",
+  "verified_status": "in_progress",
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "La scena e il minigioco di piazza sono presenti, ma la richiesta storica comprende ancora contenuti vocali e una gara contro computer o amico non dimostrati.",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "current_state": [
+    "piazza.js costruisce scena, avatar, passanti, folla dinamica, battute a tempo, giudizi e scelte narrative.",
+    "Il minigioco usa la performance del giocatore e la folla, ma non risultano barre prese dalle canzoni, sintesi vocale/cori della folla o una gara multiplayer/contro rivale."
+  ],
+  "systems": [
+    "frontend/js/game/piazza.js",
+    "frontend/js/game/fx.js",
+    "frontend/js/game/actions.js",
+    "frontend/js/game/rivals.js",
+    "backend/server.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/piazza.js",
+    "frontend/js/game/fx.js",
+    "frontend/js/game/actions.js",
+    "frontend/js/game/rivals.js",
+    "frontend/pagine/gioco.html",
+    "backend/server.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "L’azione Freestyle in piazza mostra il personaggio del giocatore, una folla reattiva e un giudizio legato alla qualità della performance.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/piazza.js: costruisciScena() monta avatar e passanti; aggiornaPed()/cambiaFolla() reagiscono al pubblico; colpo() assegna IN POCKET, a tempo o fuori tempo."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Le barre usate nel freestyle possono provenire dai pezzi scritti oppure essere generate e restano modificabili dal sistema di gioco.",
+      "verification": "code_audit",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/piazza.js: SITUAZIONI contiene risposte narrative predefinite; l’audit non trova un collegamento alle barre salvate o a una generazione di versi dentro la piazza."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "È possibile una gara di freestyle contro un avversario controllato dal gioco o da un altro giocatore.",
+      "verification": "code_audit",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/piazza.js: il minigioco è attualmente singolo; frontend/js/game/rivals.js gestisce rivali ma non un avversario della sessione di piazza e backend/server.js non espone una gara freestyle."
+      ]
+    },
+    {
+      "id": "AC4",
+      "description": "La resa della folla, dei fischi e delle reazioni è convincente durante una partita reale.",
+      "verification": "playtest",
+      "status": "pending",
+      "evidence": []
+    }
+  ],
+  "risks": [
+    "Inserire barre salvate nella scena deve evitare HTML non sicuro e contenuti troppo lunghi.",
+    "Una gara online richiederebbe sincronizzazione e regole anti-abuso, non solo una seconda UI.",
+    "Audio e reazioni della folla vanno bilanciati con il motore SFX esistente."
+  ],
+  "notes": [],
+  "plan": {
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Conservare il minigioco già funzionante e completare contenuti delle barre e modalità di gara.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Barre e reazioni della piazza",
+        "objective": "Collegare versi del giocatore o generati al giudizio, mantenendo la scena e rendendo esplicite le reazioni audio/visive.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/piazza.js",
+          "frontend/js/game/fx.js",
+          "frontend/js/game/actions.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/piazza.js",
+          "frontend/js/game/fx.js",
+          "frontend/js/game/actions.js",
+          "frontend/pagine/gioco.html"
+        ],
+        "acceptance_criteria": [
+          "AC2",
+          "AC4"
+        ],
+        "status": "planned"
+      },
+      {
+        "id": "V2",
+        "title": "Modalità gara",
+        "objective": "Aggiungere un avversario locale/CPU e valutare il perimetro backend necessario prima di proporre una gara tra amici online.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "frontend/js/game/piazza.js",
+          "frontend/js/game/rivals.js",
+          "backend/server.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/piazza.js",
+          "frontend/js/game/rivals.js",
+          "backend/server.js",
+          "backend/database/archivio.js"
+        ],
+        "acceptance_criteria": [
+          "AC3"
+        ],
+        "status": "planned"
+      }
+    ],
+    "gaps": [],
+    "notes": []
+  },
+  "roadmap_scope": "none"
+}
