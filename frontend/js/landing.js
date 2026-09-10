@@ -109,6 +109,18 @@ if($("landing-mute")){
     setSalva();
     applicaImpostazioni();
     aggiornaMuteLanding();
+    /* applicaImpostazioni() aggiorna solo i volumi (ADF_AUDIO.refresh): se il
+       contesto audio si era sospeso da solo, o la traccia si era fermata,
+       il volume torna giusto ma resta muto lo stesso. Riattivando, ci si
+       assicura anche che il contesto sia sveglio e la musica stia girando
+       davvero, non solo che il volume sia quello giusto sulla carta. */
+    if(SET.audio.on){
+      try{ if(window.ADF_AUDIO && ADF_AUDIO.unlock) ADF_AUDIO.unlock(); }catch(e){}
+      try{
+        if(window.ADF_AUDIO && ADF_AUDIO.music && !ADF_AUDIO.music.playing)
+          ADF_AUDIO.music.ensureMenu();
+      }catch(e){}
+    }
   };
   aggiornaMuteLanding();
 }
