@@ -95,7 +95,10 @@ function beatStop(){
   if(window.ADF_AUDIO && ADF_AUDIO.transport) ADF_AUDIO.transport.stop();
   const p = BEAT_PLAY;
   BEAT_PLAY = null;
-  document.querySelectorAll(".play.on").forEach(b => { b.classList.remove("on"); b.textContent = "▶"; });
+  if(p && p.btn){
+    p.btn.classList.remove("on");
+    p.btn.innerHTML = p.btnHtml;
+  }
   if(!p) return;
   clearTimeout(p.timer);
   try{
@@ -192,6 +195,7 @@ function beatSuona(b, btn){
   }
 
   const durata = (bars * spb * 4 + .6) * 1000;
-  BEAT_PLAY = {key, c, master, nodes, timer:setTimeout(beatStop, durata)};
+  BEAT_PLAY = {key, c, master, nodes, timer:setTimeout(beatStop, durata),
+    btn:btn || null, btnHtml:btn ? btn.innerHTML : ""};
   if(btn){ btn.classList.add("on"); btn.textContent = "■"; }
 }

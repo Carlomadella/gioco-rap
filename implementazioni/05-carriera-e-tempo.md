@@ -238,6 +238,19 @@ L'energia stiam pensando di metterla a 100 al giorno. Ovviamente riproporzionere
 
 cambia l'energia a 100 e anche tutto ciò ce ne deriva da questo cambiamento, tu prova a farlo al meglio poi ti dico io testando come mi pare.
 
+**FATTO (10/09/2026)** — Ogni nuovo giorno riparte con l'energia piena.
+`avanzaGiorno()` richiama prima `syncEnergy()` e poi assegna direttamente
+`G.energy = G.maxEnergy`: nella scala base significa **100/100**.
+
+La regola vale sia per **Fine giornata** sia per **Salta il tempo**, perché
+entrambi passano dallo stesso motore. Il massimo dinamico resta intatto: se
+una progressione o un bonus porta `G.maxEnergy` sopra 100, il giorno riparte
+comunque pieno.
+
+Questa decisione sostituisce la vecchia ricarica notturna parziale +60/+90.
+Aggiunte due prove automatiche in `frontend/strumenti/prova.js`, una sul
+massimo base e una su un massimo aumentato.
+
 ---
 
 ## Una gerarchia per gli incontri mentre si salta il tempo

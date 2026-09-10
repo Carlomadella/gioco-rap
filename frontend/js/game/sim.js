@@ -253,9 +253,9 @@ function advanceWeek(){
    fila) — così i due modi di far passare il tempo restano una sola verità. */
 function avanzaGiorno(){
   if(G.ended) return false;
-  const notte = 60 + (G.wellbeing > 60 ? 30 : 0);
   syncEnergy();
-  G.energy = clamp(G.energy + notte, 0, G.maxEnergy);
+  /* Ogni nuovo giorno riparte con tutta la riserva disponibile. */
+  G.energy = G.maxEnergy;
   G.day = (G.day || 1) + 1;
   const chiusa = G.day > 7;
   if(chiusa){ G.day = 1; advanceWeek(); }

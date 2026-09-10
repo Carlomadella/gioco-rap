@@ -43,8 +43,8 @@ function avvisoAgenda(){
 function saltaTempo(){
   if(G.ended) return;
   scegliSalto([
-    {n:"1 giorno", d:"Una notte di ricarica: energia su, e basta.", run:() => saltaGiorni(1)},
-    {n:"2 giorni", d:"Due notti. Il corpo si riprende un po' di più.", run:() => saltaGiorni(2)},
+    {n:"1 giorno", d:"Una notte: il nuovo giorno parte con l'energia piena.", run:() => saltaGiorni(1)},
+    {n:"2 giorni", d:"Due giorni fuori dai giochi: l'energia resta piena mentre il calendario avanza.", run:() => saltaGiorni(2)},
     {n:"Una settimana", d:"7 giorni fuori dai giochi: la settimana si chiude da sola, con le sue spese e i suoi stream.", run:() => saltaGiorni(7)},
     {n:"Un mese", d:"28 giorni di silenzio. Benessere pieno, ma lucidità e hype ne risentono davvero.", run:() => saltaGiorni(28)},
     {n:"Lascia stare", d:"Torni a quello che stavi facendo.", run(){}}

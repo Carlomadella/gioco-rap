@@ -348,3 +348,18 @@ scheda centrale con nome, qualità e prezzo corretti e salva la scelta. Aggiunta
 controlla il cambio di stato e interfaccia. Provato sul gioco reale in Google Chrome,
 Mozilla Firefox e WebKit (motore Safari), compresa la persistenza dopo il reload e senza
 errori in console.
+
+---
+
+## Studio · Il tasto di ascolto torna su Play quando il beat si ferma
+
+> «quando si stoppa il beat o la canzone si ferma la musica ma visivamente il
+> tasto non cambia»
+
+**FATTO (10/09/2026)** — `beatStop()` ora ripristina direttamente il pulsante
+che ha avviato l'ascolto, qualunque sia la sua variante grafica (Shop, Sala,
+beat, take o anteprima del pezzo nello Studio). Conserva l'icona originale,
+compreso l'SVG usato nello Studio, e rimuove lo stato acceso quando si ripreme
+il tasto, parte un altro beat o termina l'anteprima. Una regressione in
+`strumenti/prova.js` riproduce il doppio click e verifica insieme arresto,
+classe visuale e ripristino dell'icona.

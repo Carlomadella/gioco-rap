@@ -1190,6 +1190,112 @@ console.log("\nlo Studio: la gente della Sala conta");
   }
 }
 
+/* Il player dei beat serve pulsanti diversi: quello semplice dello Shop e
+   quelli con SVG dello Studio. Ripremere lo stesso tasto deve fermare il
+   suono e riportare proprio quel tasto all'aspetto iniziale. */
+console.log("\nil tasto di ascolto segue davvero il beat");
+{
+  const vm = require("vm");
+  const zitto = () => {};
+  const parametro = () => ({
+    value:1,
+    setValueAtTime:zitto,
+    linearRampToValueAtTime:zitto,
+    exponentialRampToValueAtTime:zitto,
+    cancelScheduledValues:zitto
+  });
+  const nodoAudio = () => ({
+    connect:zitto, start:zitto, stop:zitto,
+    gain:parametro(), frequency:parametro()
+  });
+  const contestoAudio = {
+    sampleRate:8000, currentTime:1,
+    destination:nodoAudio(),
+    createBuffer(_canali, lunghezza){
+      const dati = new Float32Array(lunghezza);
+      return { getChannelData(){ return dati; } };
+    },
+    createBufferSource(){ return Object.assign(nodoAudio(), {buffer:null}); },
+    createBiquadFilter(){ return Object.assign(nodoAudio(), {type:""}); },
+    createGain:nodoAudio,
+    createOscillator(){ return Object.assign(nodoAudio(), {type:""}); }
+  };
+  function tastoAudio(html){
+    const classi = new Set(["stplay"]);
+    let contenuto = html;
+    return {
+      classList:{
+        add:c => classi.add(c), remove:c => classi.delete(c),
+        contains:c => classi.has(c)
+      },
+      get innerHTML(){ return contenuto; },
+      set innerHTML(v){ contenuto = String(v); },
+      get textContent(){ return contenuto.replace(/<[^>]*>/g, ""); },
+      set textContent(v){ contenuto = String(v); }
+    };
+  }
+
+  const scatola = {
+    console:{log:zitto, warn:zitto, error:zitto},
+    Math, Object, Array, String, Number, Set, Map, Float32Array,
+    setTimeout:() => 1, clearTimeout:zitto,
+    document:{querySelectorAll:() => []},
+    muted:false, clamp:(v, min, max) => Math.max(min, Math.min(max, v)),
+    ac:() => contestoAudio, volBeat:() => 1, toast:zitto,
+    ADF_AUDIO:{
+      canPlay:() => true,
+      legacy:{bus:() => contestoAudio.destination},
+      transport:{start:zitto, stop:zitto}
+    }
+  };
+  scatola.window = scatola;
+  vm.createContext(scatola);
+  for(const f of ["js/game/beats.js", "js/game/beatplay.js"])
+    vm.runInContext(fs.readFileSync(path.join(RADICE, f), "utf8"), scatola, {filename:f});
+
+  const playOriginale = '<svg viewBox="0 0 20 20"><path d="M7 4.6 15.4 10 7 15.4z"/></svg>';
+  const tasto = tastoAudio(playOriginale);
+  scatola.tasto = tasto;
+  vm.runInContext("beatSuona({n:'Provino', q:60, gen:'trap', seed:17}, tasto)", scatola);
+  const partito = tasto.classList.contains("on") && tasto.innerHTML !== playOriginale;
+  vm.runInContext("beatSuona({n:'Provino', q:60, gen:'trap', seed:17}, tasto)", scatola);
+  controlla("ripremendo un provino lo stop ripristina icona e stato del suo tasto",
+    partito && !tasto.classList.contains("on") && tasto.innerHTML === playOriginale,
+    JSON.stringify({partito, ancoraAttivo:tasto.classList.contains("on"), html:tasto.innerHTML}));
+}
+
+/* Il massimo dell'energia può cambiare con la progressione: il nuovo giorno
+   deve riempire la riserva disponibile, non aggiungere una quota fissa. */
+console.log("\nl'energia torna piena a ogni nuovo giorno");
+{
+  const vm = require("vm");
+  const scatola = {
+    console, Math, Object, Array, String, Number, Boolean, Date, Set, Map,
+    parseInt, parseFloat, isNaN, isFinite,
+    clamp:(v, min, max) => Math.max(min, Math.min(max, v))
+  };
+  scatola.window = scatola;
+  vm.createContext(scatola);
+  vm.runInContext(`
+    function syncEnergy(){ G.maxEnergy = G.__testMax; }
+  `, scatola);
+  vm.runInContext(fs.readFileSync(path.join(RADICE, "js/game/sim.js"), "utf8"),
+    scatola, {filename:"js/game/sim.js"});
+
+  for(const caso of [{wellbeing:20, max:100}, {wellbeing:80, max:130}]){
+    scatola.caso = caso;
+    const risultato = vm.runInContext(`
+      G = {ended:false, energy:0, maxEnergy:caso.max, __testMax:caso.max,
+        wellbeing:caso.wellbeing, day:1, strada:null};
+      avanzaGiorno();
+      ({energy:G.energy, maxEnergy:G.maxEnergy, day:G.day})
+    `, scatola);
+    controlla("nuovo giorno: energia piena con massimo " + caso.max,
+      risultato.energy === caso.max && risultato.maxEnergy === caso.max && risultato.day === 2,
+      JSON.stringify(risultato));
+  }
+}
+
 console.log("\nil build");
 const dist = path.join(RADICE, "dist");
 if(!fs.existsSync(path.join(dist, "pagine", "gioco.html"))){

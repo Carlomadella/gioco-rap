@@ -113,7 +113,7 @@ nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../docume
 | **—** | Il telefono come telefono (la richiesta di partenza) | da fare | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Il gioco alla giornata invece che alla settimana | risposto, da fare | [carriera-e-tempo](05-carriera-e-tempo.md) |
 | **—** | L'energia a 100 (il ragionamento sui costi) | risposto, da fare | [carriera-e-tempo](05-carriera-e-tempo.md) |
-| **—** | La richiesta finale sull'energia | da fare | [carriera-e-tempo](05-carriera-e-tempo.md) |
+| **—** | La richiesta finale sull'energia | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
 | **—** | Il beat maker diventa un posto: La Sala | in parte | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
 | **—** | La criminalità è troppo facile, e i soldi sporchi | risposto, da fare | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
 | **—** | La vita simulata | da fare | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
