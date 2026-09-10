@@ -257,8 +257,8 @@
 /* ==== LO SHOP (punto 4) ====
    Prima erano tre `.list` — la stessa scatola grigia delle Offerte sul
    tavolo, del Contratto, delle Spese fisse — impilate una sopra l'altra:
-   un menù di impostazioni travestito da negozio. Qui sotto tre reparti
-   dietro tre linguette (`.shtabs`), la cassa sempre in vista (`.shcash`),
+   un menù di impostazioni travestito da negozio. Qui sotto i due reparti attivi
+   dietro due linguette (`.shtabs`), la cassa sempre in vista (`.shcash`),
    e le card (`.shcard`/`.shbeat`) sono le stesse ossa delle tile delle
    azioni — fondale colorato, prezzo in un angolo, titolo sotto — perché
    quelle già leggono come "roba da prendere", non come una riga di lista. */
