@@ -994,3 +994,9 @@ cui la funzione è esposta all'esterno, riga 482: `go:esegui`) e non l'ha trovat
 il suo nome locale, `esegui(...)`, non tramite l'alias pubblico. `G.currentPlace` si muove
 davvero quando ci si sposta sulla mappa: «Cerca un beat», «Fai il turno» in Fabbrica e le
 altre mosse legate al luogo non sono bloccate in modo strutturale.
+
+---
+
+## Giro del 10/09/2026 (sesto giro: controllo mirato del commit `c6d44df`)
+
+Controllati lo stop dei provini in Shop, La Sala e Studio e la ricarica fino al massimo dinamico a ogni nuovo giorno, sia con «Fine giornata» sia con gli skip: tutto a posto. Anche i controlli automatici sono verdi (`npm run prova`: 99 a posto, `audit-regressioni`: 301 a posto, `verifica:build`: 33 a posto).
