@@ -865,3 +865,38 @@ cambia, senza bisogno di ricaricare la pagina.
 `frontend/css/tocco.css:43`, accanto ad `.avatarbtn`. Sotto i 900 punti o col dito cresce
 alla misura giusta come i suoi vicini nella barra; l'icona SVG dentro resta 18×18 e
 centrata, quindi non cambia aspetto.
+
+---
+
+## Giro del 10/09/2026 (quarto giro: controllo del commit `35db690`)
+
+Giro di fine task, sempre su `task/turno-fabbrica-8-ore-e-mute-musica`, solo per
+controllare che il commit `35db690` (le due correzioni annotate qui sopra) non abbia
+portato dentro qualcos'altro di rotto. Non ho riaperto il resto del giro precedente, già
+fatto.
+
+**Controlli automatici, tutti verdi**: `npm run prova` 96 a posto e 0 no, `node
+strumenti/audit-regressioni.js` 301 a posto e 0 no, `npm run verifica:build` 33 a posto e
+0 no.
+
+**`dopoModifica()`** (`frontend/js/impostazioni-ui.js:267`) — la chiamata a
+`aggiornaMuteLanding()` è protetta da `typeof ... === "function"`, la stessa guardia già
+usata due righe sopra per `renderMenu()`. Serve perché `impostazioni-ui.js` è caricato sia
+in `landing.html` che in `gioco.html`, ma `aggiornaMuteLanding()` esiste solo in
+`js/landing.js`, che sta solo sulla landing: dentro alla partita la funzione non c'è, e la
+guardia evita che il pannello Impostazioni si rompa lì. Controllato anche `js/landing.js:98`:
+`aggiornaMuteLanding()` esiste davvero con quel nome, non è un richiamo a vuoto.
+
+**`.brand-mute{width:44px;height:44px}`** (`frontend/css/tocco.css:43`) — la regola gemella
+in `frontend/css/shell.css:44` fissa il pulsante a 36×36 con `display:grid;place-items:center`,
+e l'icona SVG dentro (`shell.css:52`) resta a 18×18 per conto suo: la regola nuova cambia solo
+la scatola esterna, non l'icona, quindi non la deforma. `tocco.css` è caricato per ultimo sia
+in `landing.html:35` che in `gioco.html:53` (dopo `shell.css`), quindi vince lui come deve
+essere.
+
+**I numeri `?v=`** — cercato `tocco.css` e `impostazioni-ui.js` in tutte le pagine del
+progetto: solo `landing.html` e `gioco.html` li caricano, ed entrambe sono state alzate allo
+stesso numero (`tocco.css?v=13`, `impostazioni-ui.js?v=15`). Non è rimasta nessuna pagina
+indietro.
+
+Niente di nuovo trovato: le due correzioni fanno quello che dicono e non hanno smosso altro.
