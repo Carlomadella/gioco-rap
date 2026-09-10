@@ -6,6 +6,31 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:f3c7c40 -->
+## 10/09/26, 16:55 â€” fix/durata-azioni-e-orari-fabbrica â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.58)  
+**Merge commit:** `f3c7c40`
+
+### Cosa Ã¨ entrato
+
+- `d9bd32a` â€” docs: registra il quinto giro (merge da main) e corregge un falso allarme â€” **Sadyco La Fame**
+- `1cccf23` â€” Merge branch 'main' into fix/durata-azioni-e-orari-fabbrica â€” **Sadyco La Fame**
+- `34a45f8` â€” fix: le azioni durano quanto dichiarano, e la Fabbrica rispetta l'orario â€” **Alessio (LaFame)**
+- `68f8e3c` â€” fix: chiudi l'azione a fine freestyle in piazza (e agenda in carcere) â€” **Alessio**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/orari.js`
+- **Modificato:** `frontend/js/game/tempo.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:91438dd -->
 ## 08/09/26, 10:36 â€” branch non identificato â†’ main
 
