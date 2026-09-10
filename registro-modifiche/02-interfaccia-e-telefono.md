@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:6604e22 -->
+## 10/09/26, 14:18 â€” task/makehuman-ui-readability â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `6604e22`
+
+### Cosa Ã¨ entrato
+
+- `a501325` â€” feat(makehuman): migliora leggibilità e coerenza dell'editor â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/makehuman-camerino-v1/index.html`
+- **Modificato:** `frontend/media/makehuman-camerino-v1/runtime.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:10a372d -->
 ## 08/09/26, 21:17 â€” main â†’ main
 
