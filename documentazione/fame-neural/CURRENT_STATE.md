@@ -2,6 +2,26 @@
 
 Data: 2026-09-10
 
+## Owned Beats — stato operativo
+
+**Stato aggiornato: 10/09/2026. Conversione audio→MIDI non ancora avviata (`converted: 0`).**
+
+| Attività | Stato | Evidenza / prossimo vincolo |
+|---|---|---|
+| Bootstrap / inventory corpus proprietario | **COMPLETATO** | 133 file sorgente → 131 asset unici; manifest e copie verificate |
+| Verifica export nativi | **COMPLETATO** | 131/131 `NONE_AVAILABLE`; si procede dall'audio |
+| Selezione cohort pilot | **COMPLETATO** | 8 beat registrati in `owned-beats-pilot-v1` |
+| Verifica composition family / diversità pilot | **DA COMPLETARE** | `compositionFamilyId` non ancora assegnato; nessuna family viene inferita automaticamente |
+| Ambiente tecnico Audio Analysis | **COMPLETATO** | FFmpeg/ffprobe 9.0.1 + Python 3.14 + stack audio verificata |
+| Audio Analysis pilot | **IN CORSO** | durata, BPM/beat grid, meter candidato, sezioni candidate |
+| Source Separation pilot | **DA FARE** | successiva all'Audio Analysis |
+| Trascrizione Audio→MIDI pilot | **DA FARE** | drums/low-end prima; tonal successivamente |
+| QA pilot | **DA FARE** | metriche automatiche e giudizio umano separati |
+| Espansione batch corpus | **BLOCCATA** | subordinata ai risultati/gate del pilot |
+| Training serio | **CHIUSO** | nessun training autorizzato da questo avanzamento |
+
+Il cohort pilot è selezionato, ma la selezione di 8 beat non equivale ancora alla verifica formale di 8 composition family distinte. `familyStatus`, QA e task admissibility restano separati e non vengono auto-promossi.
+
 ## Audit V2 integrato — stato delle correzioni
 
 [Rapporto completo](AUDIT_ROADMAP_V2_2026-09-09.md), codice verificato al commit `1372467`. Sono integrate le precisazioni documentali e le regole NDR-028…034; **nessuna correzione di codice, nuovo intake o nuovo training è implicata da questo aggiornamento**.
