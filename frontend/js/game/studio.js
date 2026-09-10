@@ -113,6 +113,13 @@ function studioDati(){
   return G.studio;
 }
 
+/* Il beatmaker scelto nella colonna a sinistra resta quello con cui stai
+   lavorando finche' non ne tocchi un altro, come il fonico e il featuring. */
+function studioScegliBeatmaker(id){
+  studioDati().bm = id;
+  SFX.tap(); save(); renderStudio();
+}
+
 /* Il fonico che hai scelto di tenere dietro al vetro. Si sceglie una volta e
    resta finché non lo cambi: è la persona con cui lavori, non un'opzione da
    rimettere ogni volta. Se se ne va dalla scena, torna `null` da solo. */
@@ -1180,6 +1187,8 @@ if($("studio")){
   $("studio").addEventListener("click", e => {
     const t = e.target.closest("[data-sez]");
     if(t){ STUDIO_SEZ = t.dataset.sez; STUDIO_DIARIO = 0; SFX.tap(); renderStudio(); return; }
+    const bm = e.target.closest("[data-bm]");
+    if(bm){ studioScegliBeatmaker(bm.dataset.bm); return; }
     const b = e.target.closest("[data-beat]");
     if(b){ studioFattiUnBeat(b.dataset.beat); return; }
     const f = e.target.closest("[data-fonico]");

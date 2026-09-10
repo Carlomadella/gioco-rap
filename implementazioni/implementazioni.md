@@ -226,8 +226,6 @@ NETWORK 64
 
 /_ LUOGO: STUDIO _/
 
-1. non si riesce a cliccare gli altri beatmaker oltre a quello selezionato
-
 2. c'è un bug visivo che quando si stoppa il beat o la canzone si ferma la musica ma visivamente il tasto non cambia.
 
 3. Quando scegli la take esce un container che ti deve chiedere solo il nome del pezzo e non la copertina, quella viene dopo nella sezione cover
