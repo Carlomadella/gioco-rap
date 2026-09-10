@@ -82,6 +82,13 @@
      una volta dentro (decorateActions). */
   const DIRECT_PLACE_ACTION = Object.freeze({concerti:"live", palestra:"palestra_cardio"});
 
+  /* I due edifici che sono un posto di lavoro: entrarci vuol dire fare il
+     turno, quindi il cartello sulla mappa deve rispettare la finestra del
+     lavoro e la sua durata, non solo l'orario di apertura del palazzo.
+     Vale solo se quel lavoro è il tuo (o se non ne hai ancora uno): chi
+     lavora altrove entra lo stesso, ma non gli fanno fare il turno. */
+  const PLACE_JOB = Object.freeze({fabbrica:"operaio", pizzeria:"lavapiatti"});
+
   function parseClock(text){
     const m = String(text || "").match(/^(\d{1,2}):(\d{2})$/);
     if(!m) return null;
@@ -155,6 +162,42 @@
     return st;
   }
 
+  /* Lo stato di un LAVORO per id, senza passare da G.job: finestra del turno
+     più durata del turno. È quello che serve alla Fabbrica e alla Pizzeria
+     per dire «apre alle 08:00» o «troppo tardi, non lo finisci» prima ancora
+     dell'assunzione. */
+  function jobDuration(jid){
+    const d = typeof GAME_TIME.durationForJob === "function" ? GAME_TIME.durationForJob(jid) : null;
+    return d == null ? GAME_TIME.durationFor("turno") : d;
+  }
+
+  function jobStatus(jid, at){
+    const def = JOB_HOURS[jid];
+    const st = statusWindow(def, at);
+    if(!def || !st.open) return st;
+    const duration = jobDuration(jid);
+    const finish = st.now + duration;
+    if(st.closeAt != null && finish > st.closeAt){
+      return Object.assign({}, st, {
+        open:false, phase:"too-late", duration, finish,
+        label:"Troppo tardi: il turno dura " +
+          (GAME_TIME.formatDuration ? GAME_TIME.formatDuration(duration) : duration + " min") +
+          " e qui si chiude alle " + fmt(st.closeAt)
+      });
+    }
+    st.duration = duration;
+    st.finish = finish;
+    return st;
+  }
+
+  /* Il turno di questo edificio, se è un lavoro che puoi davvero fare adesso. */
+  function placeJobStatus(placeId, at){
+    const jid = PLACE_JOB[normalizePlace(placeId)];
+    if(!jid) return null;
+    if(G.job && G.job.id !== jid) return null;
+    return jobStatus(jid, at);
+  }
+
   function eventStatus(id, at){
     const def = EVENT_HOURS[id];
     const st = statusWindow(def, at);
@@ -206,13 +249,19 @@
     injectCss();
     document.querySelectorAll(".pspot[data-l]").forEach(btn => {
       const id = btn.dataset.l;
-      const st = placeStatus(id);
+      let st = placeStatus(id);
+      /* Un posto di lavoro aperto ma dove il turno non ci sta più dentro va
+         segnato chiuso: la promessa del cartello dev'essere vera. */
+      if(st.open){
+        const lavoro = placeJobStatus(id);
+        if(lavoro && !lavoro.open) st = lavoro;
+      }
       btn.classList.toggle("orario-chiuso", !st.open);
 
       const testo = st.open
         ? (st.allDay ? "Sempre aperto" : "Aperto · fino " + st.closeText)
         : (st.phase === "before" ? "Chiuso · apre " + st.nextText
-          : st.phase === "too-late" ? "Chiude alle " + fmt(st.closeAt)
+          : st.phase === "too-late" ? "Turno finito · chiude " + fmt(st.closeAt)
           : "Chiuso per oggi");
 
       /* La riga vive dentro alla targhetta: un cartello solo, nome sopra e
@@ -292,7 +341,13 @@
 
   function closedMessage(st){
     if(st.phase === "before") return "È ancora presto. Questo punto della città apre alle <b>" + st.nextText + "</b>.";
-    if(st.phase === "too-late") return "Per oggi è troppo tardi: non c'è abbastanza tempo per finire prima della chiusura.";
+    if(st.phase === "too-late"){
+      if(st.duration && st.closeAt != null)
+        return "Non fai più in tempo: servono <b>" +
+          (GAME_TIME.formatDuration ? GAME_TIME.formatDuration(st.duration) : st.duration + " min") +
+          "</b> e qui si chiude alle <b>" + fmt(st.closeAt) + "</b>.";
+      return "Per oggi è troppo tardi: non c'è abbastanza tempo per finire prima della chiusura.";
+    }
     return "Per oggi ha chiuso. Torna domani dopo le <b>" + st.nextText + "</b>.";
   }
 
@@ -309,13 +364,33 @@
 
   /* Blocca il click PRIMA del listener originale di hub.js. Non usa l.n e non
      modifica le scritte fotografiche della mappa. */
+  /* Quando c'è GAME_TRAVEL il viaggio costa minuti: la porta va guardata
+     all'ORA IN CUI ARRIVI, non a quella in cui premi. Se il tragitto stesso
+     non è fattibile lasciamo parlare spostamenti.js, che ha il messaggio suo. */
+  function oraDiValutazione(id){
+    try{
+      if(window.GAME_TRAVEL && typeof GAME_TRAVEL.plan === "function"){
+        const p = GAME_TRAVEL.plan(id);
+        if(!p || !p.ok) return null;
+        if(p.arrival != null) return p.arrival;
+      }
+    }catch(e){}
+    return GAME_TIME.now();
+  }
+
   const pins = document.getElementById("hb-pins");
   if(pins) pins.addEventListener("click", ev => {
     const btn = ev.target && ev.target.closest ? ev.target.closest(".pspot[data-l]") : null;
     if(!btn) return;
     const id = btn.dataset.l;
-    let st = placeStatus(id);
-    if(st.open && DIRECT_PLACE_ACTION[id]) st = actionStatus(DIRECT_PLACE_ACTION[id]);
+    const at = oraDiValutazione(id);
+    if(at == null) return;
+    let st = placeStatus(id, at);
+    if(st.open && DIRECT_PLACE_ACTION[id]) st = actionStatus(DIRECT_PLACE_ACTION[id], at);
+    if(st.open){
+      const lavoro = placeJobStatus(id, at);
+      if(lavoro && !lavoro.open) st = lavoro;
+    }
     if(st.open) return;
     ev.preventDefault();
     ev.stopImmediatePropagation();
@@ -361,9 +436,15 @@
     parse:parseClock,
     normalizePlace,
     samePlace:(a,b) => normalizePlace(a) === normalizePlace(b),
+    placeJobs:PLACE_JOB,
     placeStatus,
     actionStatus,
     eventStatus,
+    jobStatus,
+    jobDuration,
+    placeJobStatus,
+    jobForPlace:(id) => PLACE_JOB[normalizePlace(id)] || null,
+    showClosed,
     placeForAction:(id) => ACTION_PLACE[id] || null,
     directActionForPlace:(id) => DIRECT_PLACE_ACTION[normalizePlace(id)] || null
   });

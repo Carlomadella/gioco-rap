@@ -308,6 +308,28 @@
     if(tile) AZIONE_ID_CATTURATA=tile.dataset.id;
   },true);
 
+  /* La mappa non passa dalle tile: hub.js chiama avviaAzioneDiretta(id) e il
+     clic vero è su un cartello della città, non su `.tile[data-id]`. Senza
+     questo l'id arrivava a iniziaAzione come "azione" e OGNI mossa lanciata
+     dalla mappa durava il default di 60 minuti: un turno in fabbrica da 8 ore
+     faceva scorrere un'ora sola. Qui l'id lo dichiara chi avvia la mossa. */
+  function marcaAzione(id){
+    AZIONE_ID_CATTURATA = id ? String(id) : null;
+    return AZIONE_ID_CATTURATA;
+  }
+
+  if(typeof avviaAzioneDiretta === "function"){
+    const originaleDiretta=avviaAzioneDiretta;
+    window.avviaAzioneDiretta=function(id){
+      marcaAzione(id);
+      const out=originaleDiretta.apply(this,arguments);
+      /* Mossa rifiutata (energia, soldi, luogo, orario): l'id non è stato
+         consumato da iniziaAzione e non deve restare appeso alla prossima. */
+      if(out === false) AZIONE_ID_CATTURATA=null;
+      return out;
+    };
+  }
+
   if(typeof iniziaAzione === "function"){
     const originaleInizia=iniziaAzione;
     window.iniziaAzione=function(energia){
@@ -464,6 +486,10 @@
     spend:spendi,
     travel:spostamento,
     durationFor:durataAzione,
+    /* La durata del turno di un lavoro **anche se non sei ancora assunto**:
+       serve a chi deve dire «non fai in tempo» prima di farti firmare. */
+    durationForJob:(jid)=>DURATE_LAVORO[jid] || 300,
+    markAction:marcaAzione,
     canStart:puoIniziare,
     pending:azionePendente,
     remaining:minutiRimasti,
