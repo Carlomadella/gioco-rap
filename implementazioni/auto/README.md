@@ -6,13 +6,13 @@
 
 - **Schede importate:** 114
 - **Task effettive (duplicati esclusi):** 111
-- **Auditate contro il repo:** 64/114
+- **Auditate contro il repo:** 69/114
 - **Duplicati intercettati:** 3
 - **Estensioni/sovrapposizioni:** 8
 - **Richieste già implementate senza task equivalente:** 5
-- **Progetti con piano V1→Vn:** 20 (forniti dall'utente: 0)
+- **Progetti con piano V1→Vn:** 21 (forniti dall'utente: 0)
 - **Piani con gap/conflitti da rivedere:** 0
-- **Auditate ma non complete:** 35
+- **Auditate ma non complete:** 38
 - Stato storico importato: da_fare 18 · in_parte 13 · fatto 77 · risposto 5 · nuova 1
 
 ## Tutte le task e richieste
@@ -83,11 +83,11 @@
 | `ADF-LEG-1D15D6A42A1B` | Il menù delle impostazioni | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | 👁 da validare | 2/3 |
 | `ADF-LEG-14754F33977B` | Il negozio dei vestiti | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | ⛔ bloccata | 0/3 |
 | `ADF-LEG-04F5044C7230` | Il profilo cliccabile dal menù, in stile character creator | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | 👁 da validare | 2/3 |
-| `ADF-LEG-B4BEC1032AAC` | Il quaderno non esiste più | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-93E84499EEED` | Il telefono nuovo, quello della foto | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-51700FF97239` | Il videomaker entra a La Sala | storica | — | implementazioni/06-mondo-e-personaggi.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-5CAED9545EC9` | L'albero delle abilità | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | — non ancora auditata | — |
-| `ADF-LEG-DFB5850CB691` | L'autocompletamento della canzone | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | — non ancora auditata | — |
+| `ADF-LEG-B4BEC1032AAC` | Il quaderno non esiste più | storica | — | implementazioni/01-mappa-e-citta.md | ✅ fatto | ✅ verificata | 2/2 |
+| `ADF-LEG-93E84499EEED` | Il telefono nuovo, quello della foto | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | 👁 da validare | 2/3 |
+| `ADF-LEG-51700FF97239` | Il videomaker entra a La Sala | storica | — | implementazioni/06-mondo-e-personaggi.md | ✅ fatto | 👁 da validare | 2/3 |
+| `ADF-LEG-5CAED9545EC9` | L'albero delle abilità | storica | — | implementazioni/05-carriera-e-tempo.md | ✅ fatto | ⛔ bloccata | 2/4 |
+| `ADF-LEG-DFB5850CB691` | L'autocompletamento della canzone | storica | — | implementazioni/04-musica-e-suoni.md | ✅ fatto | ✅ verificata | 3/3 |
 | `ADF-LEG-0D567376904B` | L'energia rimasta si deve vedere | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
 | `ADF-LEG-CDA23C7523CF` | La chat del telefono non va più in loop | storica | — | implementazioni/02-interfaccia-e-telefono.md | ✅ fatto | — non ancora auditata | — |
 | `ADF-LEG-1C9755D43029` | La classifica con i giocatori veri, e i bot per fare numero | storica | — | implementazioni/07-multiplayer-e-backend.md | ✅ fatto | — non ancora auditata | — |
@@ -190,6 +190,13 @@ Piano: **auto** · stato: **ready**
 
 - **V1 — Effetti dedicati** · complete
 - **V2 — Identità dei generi** · needs_validation · dipende da V1
+
+### ADF-LEG-5CAED9545EC9 — L'albero delle abilità
+
+Piano: **auto** · stato: **ready**
+
+- **V1 — Definire stato ed effetti** · planned
+- **V2 — Collegare e provare la progressione** · planned · dipende da V1
 
 ### ADF-LEG-5CBD9DE3CFE3 — Il freestyle in piazza, con la folla
 

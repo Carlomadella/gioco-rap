@@ -11,28 +11,66 @@
     "source_status": "fatto",
     "source_status_raw": "fatto"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "complete",
   "intake_state": "canonical",
   "related_task_ids": [],
   "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "current_state": [
+    "La vecchia pagina unica del quaderno è nascosta e non viene più mostrata come schermata di gioco.",
+    "Le funzioni esistenti continuano a usare i contenitori condivisi, mentre scrittura, discografia e classifiche sono raggiungibili dallo Studio, dalla mappa o dalle app del telefono."
   ],
-  "roadmap_scope": "none",
+  "systems": [
+    "frontend/pagine/gioco.html",
+    "frontend/js/game/hub.js",
+    "frontend/js/game/ui.js",
+    "frontend/js/game/studio.js",
+    "frontend/js/game/telefono.js"
+  ],
+  "watch_paths": [
+    "frontend/pagine/gioco.html",
+    "frontend/js/game/hub.js",
+    "frontend/js/game/ui.js",
+    "frontend/js/game/studio.js",
+    "frontend/js/game/telefono.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "La vecchia schermata unica del quaderno non è visibile né raggiungibile come menu principale.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/pagine/gioco.html: il contenitore g-magazzino è hidden e la pagina documenta che il quaderno a sette linguette non esiste più.",
+        "frontend/js/game/hub.js: la mappa apre luoghi e azioni direttamente invece del vecchio pannello."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "Le funzioni conservate restano accessibili dai nuovi percorsi senza duplicare il vecchio quaderno.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/studio.js: le azioni di scrittura sono esposte nella stanza dello Studio.",
+        "frontend/js/game/telefono.js: inventario, discografia e classifiche sono app del telefono; frontend/js/game/ui.js continua a riempire i contenitori condivisi."
+      ]
+    }
+  ],
+  "risks": [
+    "Rimuovere i contenitori condivisi insieme alla vecchia schermata romperebbe funzioni che li riusano per il rendering."
+  ],
+  "notes": [
+    "La scheda descrive la rimozione dell'interfaccia, non la cancellazione dei dati o dei renderer riutilizzati."
+  ],
   "plan": {
     "mode": "none",
     "status": "not_applicable",
-    "summary": "",
+    "summary": "Nessun piano: la vecchia interfaccia è già rimossa e i percorsi sostitutivi sono presenti.",
     "steps": [],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }
