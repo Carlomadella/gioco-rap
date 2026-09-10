@@ -6,6 +6,27 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:0724440 -->
+## 10/09/26, 00:45 â€” task/beat-energia-e-barre-senza-malus â†’ main
+
+**Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.58)  
+**Merge commit:** `0724440`
+
+### Cosa Ã¨ entrato
+
+- `fb731d5` â€” fix(studio): via il costo in energia per farsi fare un beat, e via il malus di scrivere le barre â€” **Sadyco La Fame**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/studio.js`
+- **Modificato:** `frontend/js/game/writer.js`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:10a372d -->
 ## 08/09/26, 21:17 â€” main â†’ main
 

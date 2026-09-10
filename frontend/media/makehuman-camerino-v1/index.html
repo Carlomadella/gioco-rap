@@ -179,6 +179,21 @@ input[type=range]{width:100%}
 
 #runtimeHidden{display:none!important}
 
+/* ADF_MAKEHUMAN_VISIBLE_BOOT_ERROR_V2_1
+   Se il modulo 3D o un errore di bootstrap blocca l'editor, l'errore non
+   resta più nascosto nel runtimeHidden/console. */
+.bootstrap-fatal{
+  position:fixed;z-index:1000;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(680px,calc(100vw - 36px));max-height:min(520px,calc(100vh - 36px));
+  overflow:auto;padding:18px 20px;border:1px solid rgba(220,92,92,.55);
+  border-radius:16px;background:rgba(13,13,15,.96);color:#f1eadb;
+  box-shadow:0 24px 80px rgba(0,0,0,.65);font-size:12px;line-height:1.5;
+  white-space:pre-wrap
+}
+.bootstrap-fatal[hidden]{display:none!important}
+.bootstrap-fatal b{display:block;margin-bottom:7px;color:#efb2b2;font-size:13px}
+.bootstrap-fatal small{display:block;margin-top:10px;color:#9d968b}
+
 @media(max-width:980px){
   .editor-sidebar{right:14px;width:min(390px,calc(100vw - 28px));top:70px;bottom:94px}
   .bottom-bar{width:calc(100vw - 24px);bottom:12px}
@@ -363,6 +378,12 @@ input[type=range]{width:100%}
   <button id="editorConfirm" class="primary" type="button">Conferma artista</button>
 </nav>
 
+<div id="bootstrapFatal" class="bootstrap-fatal" role="alert" hidden>
+  <b>MakeHuman non è riuscito ad avviarsi</b>
+  <span id="bootstrapFatalMessage">Errore di bootstrap sconosciuto.</span>
+  <small>Questo messaggio identifica il punto reale del blocco: non serve aprire la console per sapere cosa è fallito.</small>
+</div>
+
 <div id="runtimeHidden" aria-hidden="true">
   <input id="applyMask" type="checkbox" checked>
   <input id="targetSearch" type="text">
@@ -378,8 +399,26 @@ input[type=range]{width:100%}
 </div>
 
 <script>
-window.addEventListener('error',e=>console.error('MAKEHUMAN CAMERINO',e.error||e.message));
-window.addEventListener('unhandledrejection',e=>console.error('MAKEHUMAN CAMERINO PROMISE',e.reason));
+(()=>{
+  const showBootstrapError=value=>{
+    const box=document.getElementById('bootstrapFatal');
+    const message=document.getElementById('bootstrapFatalMessage');
+    const text=String(value?.stack||value?.message||value||'Errore sconosciuto');
+    console.error('MAKEHUMAN CAMERINO',value);
+    if(message) message.textContent=text;
+    if(box) box.hidden=false;
+  };
+
+  window.__ADF_MH_SHOW_BOOT_ERROR=showBootstrapError;
+
+  window.addEventListener('error',e=>{
+    showBootstrapError(e.error||e.message||e);
+  });
+
+  window.addEventListener('unhandledrejection',e=>{
+    showBootstrapError(e.reason||e);
+  });
+})();
 </script>
 <script>
 (()=>{
@@ -388,7 +427,9 @@ window.addEventListener('unhandledrejection',e=>console.error('MAKEHUMAN CAMERIN
   const script=document.createElement('script');
   script.type='module';
   script.src='./runtime.js?v='+encodeURIComponent(version);
-  script.onerror=()=>console.error('runtime.js non caricato',script.src);
+  script.onerror=()=>window.__ADF_MH_SHOW_BOOT_ERROR?.(
+    'runtime.js non caricato: '+script.src
+  );
   document.body.appendChild(script);
 })();
 </script>

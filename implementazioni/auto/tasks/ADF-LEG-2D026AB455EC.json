@@ -20,7 +20,7 @@
   "roadmap_note": "",
   "current_state": [
     "La mossa Cerca un beat ha costo energia zero; conserva costo temporale, apertura dello Studio e incremento di lucidita'.",
-    "Il beatmaker dello Studio e' un flusso diverso: Fattelo fare resta una sessione con costo energetico."
+    "Il beatmaker dello Studio e' un flusso diverso: Fattelo fare resta una sessione che consuma denaro, mentre l'energia resta invariata."
   ],
   "systems": [
     "frontend/js/game/actions.js",
@@ -58,7 +58,7 @@
     }
   ],
   "risks": [
-    "Confondere Cerca un beat con Fattelo fare reintroduce un costo sul flusso sbagliato."
+    "Confondere Cerca un beat con Fattelo fare reintroduce un costo energetico sul flusso di esplorazione o altera il costo in denaro della sessione su misura."
   ],
   "notes": [
     "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."

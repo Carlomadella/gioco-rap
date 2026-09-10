@@ -11,28 +11,132 @@
     "source_status": "fatto",
     "source_status_raw": "fatto"
   },
-  "audit_state": "not_audited",
-  "verified_status": null,
+  "audit_state": "audited",
+  "verified_status": "blocked",
   "intake_state": "canonical",
   "related_task_ids": [],
   "intake_note": "",
-  "roadmap_impact": "none",
-  "roadmap_note": "",
-  "current_state": [],
-  "systems": [],
-  "watch_paths": [],
-  "acceptance_criteria": [],
-  "risks": [],
-  "notes": [
-    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  "current_state": [
+    "frontend/js/game/abilita.js espone una schermata a tutto schermo con 32 nodi, quattro rami, requisiti, costi e collegamento dalla linguetta Abilità della plancia.",
+    "Lo stato dei nodi vive in ABILITA_CHIAVE/localStorage e gli effetti descritti nei nodi non modificano ancora G, le skill o la progressione della carriera."
   ],
-  "roadmap_scope": "none",
+  "systems": [
+    "frontend/js/game/abilita.js",
+    "frontend/css/abilita.css",
+    "frontend/js/game/hub.js",
+    "frontend/js/game/state.js"
+  ],
+  "watch_paths": [
+    "frontend/js/game/abilita.js",
+    "frontend/css/abilita.css",
+    "frontend/js/game/hub.js",
+    "frontend/js/game/state.js",
+    "frontend/js/game/actions.js",
+    "frontend/js/game/sim.js"
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC1",
+      "description": "La sezione Abilità apre un albero a quattro rami con i 32 nodi e i requisiti visibili.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/abilita.js: ABILITA_DATI contiene i quattro rami e i nodi; il renderer costruisce la schermata e i relativi requisiti.",
+        "frontend/js/game/hub.js: la linguetta Abilità apre la schermata dell'albero."
+      ]
+    },
+    {
+      "id": "AC2",
+      "description": "I nodi acquistabili persistono il loro stato e rispettano costi, prerequisiti e bivi.",
+      "verification": "code_audit",
+      "status": "satisfied",
+      "evidence": [
+        "frontend/js/game/abilita.js: stato(), ABILITA_CHIAVE e le funzioni di selezione/acquisto persistono i nodi e gestiscono costi e opzioni."
+      ]
+    },
+    {
+      "id": "AC3",
+      "description": "Gli effetti acquistati modificano davvero le skill o i sistemi di carriera descritti dai nodi.",
+      "verification": "code_audit",
+      "status": "blocked",
+      "evidence": [
+        "frontend/js/game/abilita.js: gli effect dei nodi sono testi della schermata e lo stato resta separato da G; non è presente un ponte verso skill, azioni o simulazione."
+      ]
+    },
+    {
+      "id": "AC4",
+      "description": "L'albero è leggibile e utilizzabile in un percorso completo dalla plancia all'acquisto e ritorno.",
+      "verification": "playtest",
+      "status": "needs_validation",
+      "evidence": [
+        "frontend/js/game/abilita.js e frontend/css/abilita.css: renderer e layout sono presenti; la verifica percettiva richiede manual: playtest su viewport reali."
+      ]
+    }
+  ],
+  "risks": [
+    "Collegare gli effetti senza una fonte di verità condivisa può creare skill diverse fra hub, azioni e albero.",
+    "Portare uno stato demo nel salvataggio di carriera può contaminare gli slot esistenti prima di definire valuta e migrazione."
+  ],
+  "notes": [
+    "La fonte storica resta fatto per la schermata; l'audit segnala esplicitamente la differenza fra UI acquistabile ed effetti di gameplay non ancora collegati."
+  ],
   "plan": {
-    "mode": "none",
-    "status": "not_applicable",
-    "summary": "",
-    "steps": [],
+    "mode": "auto",
+    "status": "ready",
+    "summary": "Completare il ponte fra albero e carriera solo dopo aver definito stato persistente, valuta ed effetti applicabili.",
+    "steps": [
+      {
+        "id": "V1",
+        "title": "Definire stato ed effetti",
+        "objective": "Mappare nodi, costi, prerequisiti e modificatori su uno stato di carriera persistente compatibile con G.",
+        "depends_on": [],
+        "systems": [
+          "frontend/js/game/abilita.js",
+          "frontend/js/game/state.js",
+          "frontend/js/game/actions.js"
+        ],
+        "watch_paths": [
+          "frontend/js/game/abilita.js",
+          "frontend/js/game/state.js",
+          "frontend/js/game/actions.js"
+        ],
+        "acceptance_criteria": [
+          "AC3"
+        ],
+        "status": "planned"
+      },
+      {
+        "id": "V2",
+        "title": "Collegare e provare la progressione",
+        "objective": "Applicare gli effetti ai calcoli della carriera, migrare i salvataggi senza dati demo e verificare acquisto, ricarica e ritorno dalla schermata.",
+        "depends_on": [
+          "V1"
+        ],
+        "systems": [
+          "frontend/js/game/abilita.js",
+          "frontend/js/game/state.js",
+          "frontend/js/game/actions.js",
+          "frontend/js/game/sim.js",
+          "frontend/css/abilita.css"
+        ],
+        "watch_paths": [
+          "frontend/js/game/abilita.js",
+          "frontend/js/game/state.js",
+          "frontend/js/game/actions.js",
+          "frontend/js/game/sim.js",
+          "frontend/css/abilita.css"
+        ],
+        "acceptance_criteria": [
+          "AC3",
+          "AC4"
+        ],
+        "status": "planned"
+      }
+    ],
     "gaps": [],
     "notes": []
-  }
+  },
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": ""
 }
