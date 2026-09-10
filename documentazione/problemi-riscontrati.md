@@ -702,3 +702,51 @@ Un problema trovato, sotto. Poi tre cose vecchie (non di questa task) mai segnat
 - **come si vede** — si vede solo dai file: è l'unica riga fuori da `js/pagine.js` che
   nomina una delle tre pagine per intero.
 - **quanto pesa** — da sistemare con calma.
+
+---
+
+## Giro del 10/09/2026 (controllo mirato sul commit in più, `346c955`)
+
+Sopra ai due commit già controllati in questo stesso giro (`0f7b4a4` e `5dcdfec`) è
+arrivato un terzo commit, `346c955` — dodici righe in più nel click del pulsante
+muta/smuta della landing, per far ripartire davvero la musica (contesto audio e traccia)
+quando prima si era fermata da sola. Ho riletto il diff, seguito a mano dove portano
+`ADF_AUDIO.unlock()`, `ADF_AUDIO.music.playing` ed `ensureMenu()` (sia nella versione vera
+in `js/audio/music.js`, sia in quella "a ponte" usata quando la pagina sta dentro alla
+cornice del gioco), e rifatto girare `npm run prova` (94/94 a posto). Il codice aggiunto di
+per sé non rompe niente e non introduce comportamenti strani nel motore audio.
+
+Un problema trovato, legato proprio a questo commit — lo stesso già segnato e sistemato
+una volta per il commit precedente, ripresentato qui. Poi una nota, non un errore.
+
+### Il numero di cache-busting di `landing.js` non si è alzato neanche questa volta
+
+- **dove** — `frontend/pagine/landing.html:277` (`js/landing.js?v=3`)
+- **cosa succede** — il commit `346c955` cambia il contenuto di `js/landing.js` (il click
+  del pulsante muta/smuta) ma il numero dopo `?v=` in `landing.html` resta `3`, lo stesso
+  di prima. È lo stesso identico problema segnato in questo file per il commit precedente
+  (`0f7b4a4`) e poi sistemato dal commit `5dcdfec` alzando quel numero a `v=3` — solo che
+  adesso il contenuto del file è cambiato di nuovo e il numero no. Chi ha già in cache la
+  vecchia copia di `landing.js` (presa dopo `5dcdfec` e prima di `346c955`) continua a
+  vedere il pulsante muta/smuta col comportamento vecchio, senza la nuova correzione,
+  finché non fa un refresh forzato.
+- **come si vede** — si vede dai file: `git show 346c955 --stat` cambia solo
+  `frontend/js/landing.js`, e `landing.html` non è nel diff.
+- **quanto pesa** — si vede ma si gira intorno (basta un refresh forzato una volta).
+
+### Nota, non un errore: la stessa correzione non è arrivata al pulsante gemello nelle Impostazioni
+
+- **dove** — `frontend/js/impostazioni-ui.js:312-319` (l'interruttore `sw("audio.on")`,
+  che chiama `dopoModifica()` a riga 260-265)
+- **cosa succede** — non è un guasto di questo commit, è una scelta che vale la pena
+  segnare: il pannello Impostazioni (raggiungibile sia da `landing.html` sia da
+  `gioco.html`) ha un secondo interruttore che fa esattamente la stessa cosa del
+  pulsante muta/smuta della landing — scrive su `SET.audio.on` e chiama
+  `applicaImpostazioni()`. Il commit `346c955` ha aggiunto `ADF_AUDIO.unlock()` e
+  `ADF_AUDIO.music.ensureMenu()` solo al pulsante della landing, non a questo secondo
+  interruttore: se il sintomo descritto nel commit (si smuta ma la musica resta ferma)
+  capita di nuovo, può ancora capitare passando dalle Impostazioni invece che dal
+  pulsantino in alto a sinistra.
+- **come si vede** — non l'ho provato dal vivo (il commit dice di non essere riuscito a
+  riprodurre il sintomo neanche lui): è una lettura del codice, da tenere d'occhio.
+- **quanto pesa** — da sistemare con calma.
