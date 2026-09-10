@@ -1,0 +1,217 @@
+{
+  "schema": "fame-owned-beats-audio-analysis-v2-evaluation-protocol",
+  "version": 1,
+  "status": "FROZEN_PRE_TUNING",
+  "frozenOn": "2026-09-10",
+  "scope": {
+    "system": "owned-beats-audio-analysis-v2",
+    "baseline": "owned-beats-audio-analysis-v1",
+    "stage": "AUDIO_ANALYSIS_ONLY",
+    "sourceCollection": "fame-owned-beats-v1",
+    "trainingAuthorized": false,
+    "sourceSeparationAuthorized": false,
+    "audioToMidiAuthorized": false
+  },
+  "splits": {
+    "groupBy": "compositionFamilyId",
+    "development": {
+      "name": "development",
+      "expectedFamilies": 8,
+      "allowedDuringTuning": true
+    },
+    "evaluationHoldout": {
+      "name": "evaluation-holdout",
+      "expectedFamilies": 10,
+      "allowedDuringTuning": false,
+      "requiresFrozenCandidate": true,
+      "maxFinalEvaluationRuns": 1,
+      "retuningAfterViewingResults": "REQUIRES_NEW_UNTOUCHED_HOLDOUT"
+    },
+    "crossSplitFamilyOverlapAllowed": false
+  },
+  "references": {
+    "beatGrid": {
+      "coverage": "SAMPLED_WINDOWS",
+      "windowsPerFamily": 3,
+      "windowSeconds": 12,
+      "positions": [
+        "EARLY",
+        "MIDDLE",
+        "LATE"
+      ],
+      "edgeMarginSeconds": 5,
+      "minimumDurationForThreeNonOverlappingWindowsSeconds": 46,
+      "shortTrackFallback": "FULL_TRACK_REFERENCE",
+      "selection": "DETERMINISTIC_FROM_DECODED_DURATION",
+      "selectionFormula": {
+        "earlyStartSeconds": "edgeMarginSeconds",
+        "middleStartSeconds": "(decodedDurationSeconds - windowSeconds) / 2",
+        "lateStartSeconds": "decodedDurationSeconds - edgeMarginSeconds - windowSeconds"
+      },
+      "sameReferenceForV1AndV2": true,
+      "metricLevelAnnotationRequired": true
+    },
+    "sections": {
+      "coverage": "FULL_TRACK",
+      "labelsRequired": false,
+      "internalBoundariesOnly": true,
+      "sameReferenceForV1AndV2": true
+    },
+    "meter": {
+      "coverage": "FULL_TRACK_HUMAN_VERDICT",
+      "allowedValues": [
+        "3/4",
+        "4/4",
+        "6/8",
+        "AMBIGUOUS",
+        "UNKNOWN"
+      ],
+      "candidateScoreIsProbability": false
+    }
+  },
+  "metrics": {
+    "bpm": {
+      "relativeTolerance": 0.03,
+      "tolerancePurpose": "FAME_OPERATIONAL_CATEGORY_ONLY",
+      "categories": [
+        "EXACT_METRIC_LEVEL",
+        "HALF_TIME",
+        "DOUBLE_TIME",
+        "OTHER",
+        "UNKNOWN"
+      ],
+      "halfTimeRatio": 0.5,
+      "doubleTimeRatio": 2,
+      "halfDoubleNeverCountsAsExact": true
+    },
+    "beatGrid": {
+      "primary": {
+        "metric": "F_MEASURE",
+        "matchingWindowSeconds": 0.07
+      },
+      "secondary": [
+        {
+          "metric": "CEMGIL",
+          "sigmaSeconds": 0.04
+        },
+        {
+          "metric": "CONTINUITY",
+          "outputs": [
+            "CMLc",
+            "CMLt",
+            "AMLc",
+            "AMLt"
+          ]
+        },
+        {
+          "metric": "ABSOLUTE_TIMING_ERROR",
+          "summaries": [
+            "median",
+            "p95"
+          ]
+        }
+      ],
+      "exactMetricLevelPrimary": true
+    },
+    "sections": {
+      "primary": {
+        "metric": "BOUNDARY_F_MEASURE",
+        "matchingWindowSeconds": 0.5
+      },
+      "secondary": [
+        {
+          "metric": "BOUNDARY_F_MEASURE",
+          "matchingWindowSeconds": 3,
+          "purpose": "PERMISSIVE_DIAGNOSTIC_ONLY"
+        },
+        {
+          "metric": "BOUNDARY_DEVIATION"
+        },
+        {
+          "metric": "ERROR_COUNTS",
+          "outputs": [
+            "falsePositives",
+            "omissions"
+          ]
+        }
+      ]
+    },
+    "reviewCost": {
+      "metric": "HUMAN_REVIEW_SECONDS_PER_AUDIO_MINUTE",
+      "minimumComparableDevelopmentFamilies": 6,
+      "automaticWinBlockedIfMedianRelativeIncreaseExceeds": 0.25,
+      "missingDataPolicy": "REPORT_MISSING_DO_NOT_USE_AS_TIE_BREAK"
+    }
+  },
+  "tuning": {
+    "developmentOnly": true,
+    "maxV2CandidateConfigurations": 8,
+    "candidateIdentityRequired": [
+      "candidateId",
+      "codeCommit",
+      "configHash",
+      "dependencyLockHash"
+    ],
+    "resultsAreAppendOnly": true,
+    "earlyStop": "FIRST_V2_WIN_WITH_COMPLETE_REQUIRED_REVIEW",
+    "holdoutObservationForbidden": true
+  },
+  "decision": {
+    "aggregation": "MEDIAN_PAIRED_FAMILY_DELTA_V2_MINUS_V1",
+    "targetMetrics": {
+      "beatFMeasure70ms": {
+        "materialImprovement": 0.03,
+        "nonInferiorityFloor": -0.02
+      },
+      "sectionFMeasure500ms": {
+        "materialImprovement": 0.05,
+        "nonInferiorityFloor": -0.03
+      }
+    },
+    "developmentRule": {
+      "V2_WINS": [
+        "technical_integrity_passes",
+        "all_available_target_metrics_are_non_inferior",
+        "at_least_one_target_metric_is_materially_improved",
+        "review_cost_does_not_trigger_automatic_win_block",
+        "no_required_human_reference_is_missing"
+      ],
+      "V1_WINS": [
+        "technical_integrity_fails_or_any_target_metric_breaks_non_inferiority"
+      ],
+      "INCONCLUSIVE": [
+        "all_other_cases",
+        "mixed_or_missing_evidence_never_forces_a_winner"
+      ],
+      "holdoutMayOpenOnlyFor": "V2_WINS"
+    },
+    "holdoutRule": {
+      "compare": [
+        "V1_BASELINE",
+        "FROZEN_V2_CANDIDATE"
+      ],
+      "applySameMetricRule": true,
+      "V2_PROMOTE": "V2_WINS",
+      "KEEP_V1": "V1_WINS",
+      "INCONCLUSIVE_GENERALIZATION": "INCONCLUSIVE",
+      "retuneAfterViewingHoldoutAllowed": false
+    }
+  },
+  "candidateFreeze": {
+    "requiredBeforeHoldout": true,
+    "requiredFields": [
+      "candidateId",
+      "codeCommit",
+      "configHash",
+      "dependencyLockHash",
+      "developmentSummaryDigest",
+      "frozenAt"
+    ],
+    "configurationImmutableDuringHoldout": true
+  },
+  "sources": {
+    "mirEvalBeat": "https://mir-eval.readthedocs.io/latest/api/beat.html",
+    "mirEvalSegment": "https://mir-eval.readthedocs.io/latest/api/segment.html",
+    "note": "70 ms beat F-measure, 40 ms Cemgil sigma and 0.5 s section boundary window follow mir_eval defaults/examples. Sampling, BPM categorization, V1/V2 deltas, tuning budget and review-cost policy are FAME-specific frozen pilot rules, not universal MIR standards."
+  }
+}
