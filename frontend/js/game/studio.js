@@ -211,8 +211,6 @@ function studioDaPubblicare(){
    comprato, te l'ha fatto uno che ti conosce.
 
    Un beat a testa per settimana: un beatmaker non è un distributore. */
-const STUDIO_BEAT_ENERGIA = 20;
-
 const STUDIO_BEAT_MINUTI = 120;
 
 function studioBeatTempoGate(){
@@ -273,8 +271,6 @@ function studioBeatFatto(p){
 function studioBeatPronto(p){
   if(p.rel < 1) return {ok:false, perche:"Prima diventate contatti, alla Sala"};
   if(studioBeatFatto(p)) return {ok:false, perche:"Ci ha già lavorato questa settimana"};
-  if(G.energy < STUDIO_BEAT_ENERGIA)
-    return {ok:false, perche:"Ti serve energia: " + STUDIO_BEAT_ENERGIA + ", ne hai " + Math.round(G.energy)};
   const c = studioBeatPrezzo(p);
   if(G.money < c) return {ok:false, perche:"Ti servono " + fmt(c) + " €, ne hai " + fmt(G.money)};
 
@@ -302,7 +298,6 @@ function studioFattiUnBeat(id){
   if(!st.ok){ toast(st.perche, "bad", "!", ["#3A3F49", "#22262E"]); return; }
 
   const costo = studioBeatPrezzo(p);
-  G.energy -= STUDIO_BEAT_ENERGIA;
   G.money -= costo;
   const sett = typeof totalWeeks === "function" ? totalWeeks() : G.week;
   p.beatSett = sett;
@@ -577,7 +572,7 @@ function studioSezBeat(){
       '<p class="stnota">Un beat comprato è un beat di chiunque. Uno che ti fa una persona che ' +
         'ti conosce è <b>tuo</b> — e più siete in confidenza, meglio viene e meno costa.</p>' +
       banco +
-      stEsito((c ? fmt(c) + " €" : "gratis") + ' · ' + stNum(STUDIO_BEAT_ENERGIA) + ' energia · ' +
+      stEsito((c ? fmt(c) + " €" : "gratis") + ' · ' +
         stNum(studioBeatTempoTesto()) + ' · te lo mette in cartella lui') +
       stAzioni(
         /* Uno solo d'oro per schermata, come in tutti i riferimenti: qui è
