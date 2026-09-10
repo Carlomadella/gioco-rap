@@ -45,13 +45,15 @@ runs/human-reference-v1/<review-id>/
   submission-template.json
   PACK_INFO.txt
   clips/<sourceRecordId>/{early,middle,late}.wav
+  waveforms/<sourceRecordId>/{early,middle,late}.svg
 ```
 
 L'HTML è locale e senza dipendenze esterne. Permette di:
 
 - ascoltare traccia completa e finestre;
-- registrare manualmente i beat sul tempo corrente dell'audio;
-- ricavare il BPM dai tap come semplice supporto, senza leggere candidati automatici;
+- registrare manualmente i beat sul tempo corrente dell'audio come scorciatoia di tap;
+- piazzare i marker direttamente sulla waveform e rifinirli con nudge da ±1 ms / ±10 ms;
+- ricavare il BPM dai marker umani come semplice supporto, senza leggere candidati automatici;
 - indicare il metric level umano;
 - inserire boundary di sezione sulla full track;
 - registrare il verdetto meter;

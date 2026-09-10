@@ -10,6 +10,7 @@ const {
   makeSubmission,
   validateSubmissionCore,
   renderHtml,
+  waveformSvgFromPcm,
   sha256Text
 } = require("./owned-beats/human-reference-pack");
 
@@ -55,6 +56,16 @@ const windows45 = computeReferenceWindows(45, protocol);
 assert.equal(windows45.length, 1);
 assert.equal(windows45[0].position, "FULL_TRACK");
 assert.equal(windows45[0].durationSeconds, 45);
+
+const pcmFixture = Buffer.alloc(400);
+for (let i = 0; i < pcmFixture.length / 2; i++) {
+  pcmFixture.writeInt16LE(i % 2 === 0 ? 12000 : -12000, i * 2);
+}
+const waveformSvg = waveformSvgFromPcm(pcmFixture, 100, 40);
+assert.match(waveformSvg, /^<svg /);
+assert.match(waveformSvg, /viewBox="0 0 100 40"/);
+assert.match(waveformSvg, /<line /);
+
 
 const badManifest = JSON.parse(JSON.stringify(manifest));
 badManifest.records[8].pilotCohorts = ["owned-beats-pilot-v1"];
@@ -121,6 +132,13 @@ assert.match(html, /HOLDOUT BLOCCATO/);
 assert.match(html, /Nessun output V1\/V2 mostrato/);
 assert.doesNotMatch(html, /bpmCandidate|alternativeBpms|meterCandidate|sectionCandidates/);
 assert.match(html, /Esporta JSON/);
+assert.match(html, /wave-editor/);
+assert.match(html, /waveforms\//);
+assert.match(html, /Registra beat \(tap\)/);
+assert.match(html, /-10 ms/);
+assert.match(html, /\+1 ms/);
+assert.match(html, /Elimina marker/);
+assert.match(html, /Calcola BPM dai marker/);
 const inlineScriptMatch = html.match(/<script>([\s\S]*?)<\/script>/);
 assert.ok(inlineScriptMatch, "generated HTML must contain inline script");
 assert.doesNotThrow(
