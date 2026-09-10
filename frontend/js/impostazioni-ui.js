@@ -261,6 +261,10 @@ function dopoModifica(ridisegna){
   setSalva();
   applicaImpostazioni();
   if(typeof renderMenu === "function") renderMenu();
+  /* il pulsante muta/smuta della landing (js/landing.js) ha una sua icona
+     staccata da qui: senza questa chiamata resta com'era se l'audio si
+     spegne o si riaccende da questo pannello, e mente a chi la guarda. */
+  if(typeof aggiornaMuteLanding === "function") aggiornaMuteLanding();
   if(ridisegna !== false) disegnaImpostazioni();
 }
 

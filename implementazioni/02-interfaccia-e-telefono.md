@@ -1431,6 +1431,13 @@ seguito. **FATTO (08/09/2026)** — commit `43623ca`, `ee4951c`, `df41c78`.
    dopo un refresh (persiste su `localStorage`), e funziona identico su una finestra a
    misura di telefono (390×844). `npm run prova` 94/94.
 
+   **Due problemi trovati dal giro di controllo finale, sistemati nello stesso task**
+   (`documentazione/problemi-riscontrati.md`, giro del 10/09/2026): l'icona non si
+   aggiornava se l'audio si spegneva dal secondo interruttore, quello delle Impostazioni
+   (`dopoModifica()` in `js/impostazioni-ui.js` non richiamava `aggiornaMuteLanding()`);
+   e il bottone restava a 36×36 sul telefono invece dei 44 richiesti da `css/tocco.css`.
+   `npm run verifica` torna verde dopo entrambe le correzioni.
+
 Guardate e già a posto, senza toccarle: la plancia si impila da sola sotto i 900 (e sotto
 i 1180 nasconde il telefono, per scelta già scritta lì), il negozio e i moduli usano
 griglie `auto-fill` che scendono a una colonna da sole, `.grid` di `base.css` collassa a

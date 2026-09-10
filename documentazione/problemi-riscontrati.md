@@ -711,6 +711,10 @@ Un problema trovato, sotto. Poi tre cose vecchie (non di questa task) mai segnat
   `?v=`.
 - **quanto pesa** — si vede ma si gira intorno (basta un refresh forzato una volta).
 
+**RISOLTO (10/09/2026)** — il commit `5dcdfec` ha alzato `css/shell.css?v=12→13` e
+`js/landing.js?v=2→3` in `pagine/landing.html`. Lo racconta anche il giro successivo qui
+sotto, che però ha trovato lo stesso guaio ripresentarsi su un terzo commit.
+
 ### Lo Shop promette tre reparti a schede, ce ne sono solo due
 
 - **dove** — `frontend/pagine/gioco.html:281-288` e `frontend/js/game/negozio.js`
@@ -766,6 +770,9 @@ una volta per il commit precedente, ripresentato qui. Poi una nota, non un error
   `frontend/js/landing.js`, e `landing.html` non è nel diff.
 - **quanto pesa** — si vede ma si gira intorno (basta un refresh forzato una volta).
 
+**RISOLTO (10/09/2026)** — il commit `1d0f737` ha alzato `js/landing.js?v=3→4`. Verificato
+adesso in `frontend/pagine/landing.html:277`: dice `v=4`.
+
 ### Nota, non un errore: la stessa correzione non è arrivata al pulsante gemello nelle Impostazioni
 
 - **dove** — `frontend/js/impostazioni-ui.js:312-319` (l'interruttore `sw("audio.on")`,
@@ -782,3 +789,79 @@ una volta per il commit precedente, ripresentato qui. Poi una nota, non un error
 - **come si vede** — non l'ho provato dal vivo (il commit dice di non essere riuscito a
   riprodurre il sintomo neanche lui): è una lettura del codice, da tenere d'occhio.
 - **quanto pesa** — da sistemare con calma.
+
+---
+
+## Giro del 10/09/2026 (terzo giro: verifica finale dopo il merge da main)
+
+Giro di fine task sul branch `task/turno-fabbrica-8-ore-e-mute-musica`, dopo il merge da
+`main` (arrivate nel frattempo le correzioni MakeHuman/Avaturn e il riallineamento di
+Studio/Shop/navigazione — non toccate da questo giro).
+
+**Controlli automatici, tutti verdi**: `npm run prova` dà 96 a posto e 0 no, `node
+strumenti/audit-regressioni.js` dà 301 a posto e 0 no (i 3 che fallivano nel giro
+precedente — Shop a linguette e nomi dei file di pagina — sono arrivati sistemati col
+merge da main), `npm run verifica:build` dà 33 a posto e 0 no.
+
+**Sul turno in fabbrica**: riletto `avviaAzioneDiretta()` in `frontend/js/game/ui.js:128`
+e `GAME_TIME.captureAction()` in `frontend/js/game/tempo.js:477`. La cattura dell'id
+avviene subito prima di `iniziaAzione()`, dentro alla stessa funzione sincrona `esegui()`
+— anche passando dalla conferma («Confermi?» quando costa soldi) non c'è modo che un altro
+clic su una tile la sporchi nel mezzo. Il controllo vero e proprio se c'è abbastanza
+giornata per iniziare un turno (`actionAccess()` in `frontend/js/game/spostamenti.js:190`)
+non passava mai dall'id catturato — usa sempre l'id esplicito — quindi su quel fronte non
+c'era mai stato il bug: il numero sbagliato usciva solo nel conteggio del tempo "occupato"
+dopo l'avvio, come dice giustamente il commit.
+
+**Sul pulsante muta/smuta**: confermato che i due file (`css/shell.css`, `js/landing.js`)
+sono richiamati con lo stesso `?v=` del loro contenuto — vedi le due righe RISOLTO qui
+sopra. `ADF_AUDIO.unlock()` e `ADF_AUDIO.music.ensureMenu()` esistono davvero con quei nomi
+sia nel motore vero (`js/audio/music.js:217,71`) sia nel ponte usato dentro alla cornice
+del gioco (`js/audio/music.js:70-99`), quindi le chiamate del fix non puntano a funzioni
+inventate.
+
+Due problemi trovati, nessuno dei due blocca la partita.
+
+### L'icona del pulsante muta/smuta non si aggiorna se spegni l'audio dalle Impostazioni
+
+- **dove** — `frontend/js/impostazioni-ui.js:260-265` (`dopoModifica()`), contro
+  `frontend/js/landing.js:98-103` (`aggiornaMuteLanding()`)
+- **cosa succede** — sulla landing ci sono **due** interruttori per lo stesso
+  `SET.audio.on`: il pulsante tondo in alto a sinistra, e l'interruttore «Audio» dentro al
+  pannello Impostazioni (si apre dal bottone `m-setts` della landing stessa). Quando tocchi
+  quello delle Impostazioni, `dopoModifica()` salva, applica i volumi e richiama
+  `renderMenu()` — ma non richiama `aggiornaMuteLanding()`. Il pulsante tondo in alto
+  resta con l'icona di prima: se l'audio era acceso e lo spegni dalle Impostazioni, il
+  pulsante in alto continua a mostrare l'altoparlante «acceso». Chi a quel punto ci clicca
+  sopra pensando di spegnerlo lo **riaccende** invece, perché il pulsante parte dal suo
+  stato vecchio, non da quello vero.
+- **come si vede** — sulla landing apri le Impostazioni (l'ingranaggio), spegni «Audio»,
+  chiudi il pannello: il pulsantino in alto a sinistra resta con l'icona dell'altoparlante
+  acceso invece di quella barrata.
+- **quanto pesa** — si vede ma si gira intorno.
+
+**RISOLTO (10/09/2026)** — `dopoModifica()` (`frontend/js/impostazioni-ui.js:260`) adesso
+richiama anche `aggiornaMuteLanding()`, se esiste, subito dopo `renderMenu()`. Il pulsante
+tondo in alto si allinea da solo ogni volta che l'interruttore «Audio» delle Impostazioni
+cambia, senza bisogno di ricaricare la pagina.
+
+### Il pulsante muta/smuta è più piccolo di un dito, sul telefono
+
+- **dove** — `frontend/css/shell.css:44` (`.brand-mute`), contro
+  `frontend/css/tocco.css:40-42`
+- **cosa succede** — il progetto ha una regola scritta apposta per il telefono: sotto i
+  900 punti o dove si tocca con un dito, ogni bottone della barra in alto sale a 44×44,
+  perché sotto quella misura il dito sbaglia bersaglio — la regola lo dice esplicitamente
+  per `.brand` e per `.avatarbtn`, che stanno proprio accanto a questo nuovo pulsante.
+  Il pulsante muta/smuta però è rimasto a **36×36** in `shell.css` e non è mai stato
+  aggiunto all'elenco di `tocco.css`, quindi su un telefono resta piccolo mentre i suoi
+  vicini nella stessa barra crescono.
+- **come si vede** — apri la landing su uno schermo stretto (o con `tocco.css` attivo,
+  sotto i 900 punti): il pulsante muta/smuta è visibilmente più piccolo del marchio e
+  dell'avatar accanto a lui.
+- **quanto pesa** — da sistemare con calma.
+
+**RISOLTO (10/09/2026)** — aggiunta `.brand-mute{width:44px;height:44px}` in
+`frontend/css/tocco.css:43`, accanto ad `.avatarbtn`. Sotto i 900 punti o col dito cresce
+alla misura giusta come i suoi vicini nella barra; l'icona SVG dentro resta 18×18 e
+centrata, quindi non cambia aspetto.
