@@ -8,7 +8,11 @@ import {
 
 async function loadThreeModule() {
   const status=document.getElementById('status');
+  /* ADF_MAKEHUMAN_LOCAL_THREE_V2_1
+     Three.js è parte del runtime locale del camerino.
+     I CDN restano fallback di emergenza, non un requisito di avvio. */
   const urls=[
+    './vendor/three-r179/three.module.js',
     'https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js',
     'https://unpkg.com/three@0.179.1/build/three.module.js?module'
   ];
@@ -33,13 +37,16 @@ async function loadThreeModule() {
     }
   }
 
-  throw new Error(
-    'Impossibile caricare Three.js 0.179.1 da entrambi i CDN.\n' +
-    errors.join('\n')
-  );
+  const message=
+    'Impossibile caricare Three.js 0.179.1 locale o dai fallback.\n' +
+    errors.join('\n');
+
+  window.__ADF_MH_SHOW_BOOT_ERROR?.(message);
+  throw new Error(message);
 }
 
 const THREE=await loadThreeModule();
+window.__ADF_MH_THREE_READY=true;
 
 /**
  * Controller orbitale minimale e locale.
