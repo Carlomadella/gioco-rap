@@ -22,6 +22,7 @@ jobs:
         with:
           node-version: 20
       - run: node frontend/strumenti/fame-neural-composer/hardening-owned-beats-test.js
+      - run: node frontend/strumenti/fame-neural-composer/owned-beats-review-test.js
       - run: node frontend/strumenti/fame-neural-composer/phase7c-block1-smoke-test.js
       - run: node frontend/strumenti/fame-neural-composer/phase7c-block2-smoke-test.js
       - run: node frontend/strumenti/fame-neural-composer/phase7d-block1-smoke-test.js

@@ -3,9 +3,9 @@ const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
 const { validate } = require("./bootstrap");
+const { csv } = require("./manifest-csv");
 
 const REVIEW_SCHEMA = "fame-owned-beats-review-v1";
-const ROLES = ["drums", "lowend", "tonal", "full"];
 const SETTABLE = new Set(["compositionFamilyId", "familyStatus", "nativeExports", "metadataStatus", "split"]);
 
 function atomic(file, content) {
@@ -16,20 +16,6 @@ function atomic(file, content) {
   } finally {
     if (fs.existsSync(temp)) fs.unlinkSync(temp);
   }
-}
-
-function csv(m) {
-  const columns = [
-    "sourceRecordId", "sourceAssetId", "compositionFamilyId", "familyStatus", "sha256",
-    "localPath", "sourcePaths", "presentInScan", "nativeExports", "metadataStatus",
-    "taskAdmissibility", "split", "pilotCohorts", "drums", "lowend", "tonal", "full"
-  ];
-  const quote = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
-  return [columns, ...m.records.map(r => [
-    r.sourceRecordId, r.sourceAssetId, r.compositionFamilyId, r.familyStatus, r.sha256,
-    r.localPath, r.sourcePaths.join(" | "), r.presentInScan, r.nativeExports, r.metadataStatus,
-    r.taskAdmissibility, r.split, (r.pilotCohorts || []).join(" | "), ...ROLES.map(k => r.roles[k].review)
-  ])].map(row => row.map(quote).join(",")).join("\r\n") + "\r\n";
 }
 
 function parseDecisions(file) {
@@ -181,66 +167,90 @@ function review(workspaceRoot, decisionsFile, apply = false) {
     "manifest",
     "owned-beats-manifest.json"
   );
-
-  if (!fs.existsSync(manifestPath)) {
-    throw new Error("Owned-beats manifest not found");
-  }
-
-  const original = validate(
-    JSON.parse(fs.readFileSync(manifestPath, "utf8"))
-  );
-  const doc = parseDecisions(path.resolve(decisionsFile));
+  const decisionsPath = path.resolve(decisionsFile);
+  const doc = parseDecisions(decisionsPath);
   const docDigest = digest(doc);
 
-  const prior = (original.reviewLog || []).find(
-    x => x.reviewId === doc.reviewId
-  );
-
-  if (prior) {
-    if (prior.decisionDigest !== docDigest) {
-      throw new Error(
-        `reviewId already exists with different content: ${doc.reviewId}`
-      );
+  function executeWithCurrentManifest() {
+    if (!fs.existsSync(manifestPath)) {
+      throw new Error("Owned-beats manifest not found");
     }
 
-    return {
-      mode: apply ? "APPLIED" : "PREVIEW",
-      reviewId: doc.reviewId,
-      alreadyApplied: true,
-      targetedRecords: 0,
-      changedRecords: 0,
-      manifest: manifestPath
-    };
-  }
+    const original = validate(
+      JSON.parse(fs.readFileSync(manifestPath, "utf8"))
+    );
 
-  const m = JSON.parse(JSON.stringify(original));
-  const changedIds = new Set();
-  const targetedIds = new Set();
+    const prior = (original.reviewLog || []).find(
+      x => x.reviewId === doc.reviewId
+    );
 
-  for (const decision of doc.decisions) {
-    const targets = targetRecords(m, decision);
+    if (prior) {
+      if (prior.decisionDigest !== docDigest) {
+        throw new Error(
+          `reviewId already exists with different content: ${doc.reviewId}`
+        );
+      }
 
-    for (const r of targets) {
-      targetedIds.add(r.sourceRecordId);
-      if (applyDecision(r, decision, doc.reviewId)) {
-        changedIds.add(r.sourceRecordId);
+      return {
+        mode: apply ? "APPLIED" : "PREVIEW",
+        reviewId: doc.reviewId,
+        alreadyApplied: true,
+        targetedRecords: 0,
+        changedRecords: 0,
+        manifest: manifestPath
+      };
+    }
+
+    const m = JSON.parse(JSON.stringify(original));
+    const changedIds = new Set();
+    const targetedIds = new Set();
+
+    for (const decision of doc.decisions) {
+      const targets = targetRecords(m, decision);
+
+      for (const r of targets) {
+        targetedIds.add(r.sourceRecordId);
+        if (applyDecision(r, decision, doc.reviewId)) {
+          changedIds.add(r.sourceRecordId);
+        }
       }
     }
+
+    // validate() include anche il vincolo compositionFamilyId -> un solo split.
+    validate(m);
+
+    const result = {
+      mode: apply ? "APPLIED" : "PREVIEW",
+      reviewId: doc.reviewId,
+      alreadyApplied: false,
+      targetedRecords: targetedIds.size,
+      changedRecords: changedIds.size,
+      changedIds: [...changedIds].sort(),
+      manifest: manifestPath
+    };
+
+    if (!apply) return result;
+
+    m.reviewLog ||= [];
+    m.reviewLog.push({
+      reviewId: doc.reviewId,
+      decisionDigest: docDigest,
+      appliedAt: new Date().toISOString(),
+      sourceFile: path.basename(decisionsPath)
+    });
+
+    atomic(manifestPath, JSON.stringify(m, null, 2) + "\n");
+    atomic(
+      path.join(workspace, "manifest", "owned-beats-manifest.csv"),
+      csv(m)
+    );
+
+    return result;
   }
 
-  validate(m);
-
-  const result = {
-    mode: apply ? "APPLIED" : "PREVIEW",
-    reviewId: doc.reviewId,
-    alreadyApplied: false,
-    targetedRecords: targetedIds.size,
-    changedRecords: changedIds.size,
-    changedIds: [...changedIds].sort(),
-    manifest: manifestPath
-  };
-
-  if (!apply) return result;
+  if (!apply) {
+    return executeWithCurrentManifest();
+  }
 
   const lock = path.join(workspace, "bootstrap.lock");
   let lockFd;
@@ -256,21 +266,8 @@ function review(workspaceRoot, decisionsFile, apply = false) {
       })
     );
 
-    m.reviewLog ||= [];
-    m.reviewLog.push({
-      reviewId: doc.reviewId,
-      decisionDigest: docDigest,
-      appliedAt: new Date().toISOString(),
-      sourceFile: path.basename(decisionsFile)
-    });
-
-    atomic(manifestPath, JSON.stringify(m, null, 2) + "\n");
-    atomic(
-      path.join(workspace, "manifest", "owned-beats-manifest.csv"),
-      csv(m)
-    );
-
-    return result;
+    // Lettura + modifica + scrittura avvengono tutte sotto lo stesso lock.
+    return executeWithCurrentManifest();
   } finally {
     if (lockFd !== undefined) {
       fs.closeSync(lockFd);

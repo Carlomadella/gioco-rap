@@ -1,6 +1,7 @@
 "use strict";
 // Inventory/copy only. No audio decoding, conversion, family inference or training.
 const fs = require("node:fs"), path = require("node:path"), crypto = require("node:crypto");
+const { csv } = require("./manifest-csv");
 const SCHEMA = "fame-owned-beats-workspace-v1";
 const roles = ["drums", "lowend", "tonal", "full"];
 function hash(file) {
@@ -39,6 +40,7 @@ function scan(dir, prefix = "") {
 function validate(m) {
   if (m.schema !== SCHEMA || m.version !== 1 || !Array.isArray(m.records)) throw new Error("Unsupported manifest schema");
   const ids = new Set(), hashes = new Set();
+  const familySplits = new Map();
   for (const r of m.records) {
     if (!/^FAME\d{6,}$/.test(r.sourceRecordId) || !/^[a-f0-9]{64}$/.test(r.sha256)
       || ids.has(r.sourceRecordId) || hashes.has(r.sha256)
@@ -47,6 +49,15 @@ function validate(m) {
       || !/^sources\/[a-f0-9]{64}\/source\.(wav|mp3)$/.test(r.localPath)
       || r.localPath.split("/")[1] !== r.sha256 || !r.roles) throw new Error("Invalid or duplicate manifest record");
     ids.add(r.sourceRecordId); hashes.add(r.sha256);
+    if (r.compositionFamilyId && r.split) {
+      const priorSplit = familySplits.get(r.compositionFamilyId);
+      if (priorSplit && priorSplit !== r.split) {
+        throw new Error(
+          `Composition family crosses splits: ${r.compositionFamilyId} (${priorSplit} vs ${r.split})`
+        );
+      }
+      familySplits.set(r.compositionFamilyId, r.split);
+    }
   }
   return m;
 }
@@ -54,11 +65,6 @@ function atomic(file, content) {
   const temp = `${file}.${crypto.randomUUID()}.tmp`;
   try { fs.writeFileSync(temp, content, { flag: "wx" }); fs.renameSync(temp, file); }
   finally { if (fs.existsSync(temp)) fs.unlinkSync(temp); }
-}
-function csv(m) {
-  const columns = ["sourceRecordId", "sourceAssetId", "compositionFamilyId", "sha256", "localPath", "sourcePaths", "presentInScan", "drums", "lowend", "tonal", "full"];
-  const quote = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
-  return [columns, ...m.records.map(r => [r.sourceRecordId,r.sourceAssetId,r.compositionFamilyId,r.sha256,r.localPath,r.sourcePaths.join(" | "),r.presentInScan,...roles.map(k=>r.roles[k].review)])].map(row=>row.map(quote).join(",")).join("\r\n") + "\r\n";
 }
 async function bootstrap(sourceRoot, workspaceRoot, apply = false) {
   const source = fs.realpathSync(path.resolve(sourceRoot));
