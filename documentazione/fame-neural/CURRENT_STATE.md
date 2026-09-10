@@ -661,3 +661,30 @@ dataset Trap/Drill potenzialmente utile per drum specialization, ma di natura al
 5. HH-TRP resta candidata secondo roadmap; owned-beats entra come candidata per parti abbinate. Nessuna sostituzione automatica delle priorità; GMD resta generale.
 
 Training serio chiuso; DRUM DATA READY V2 non superato; Planner rinviato. Non servono nuove fasi per questi fix.
+
+## Aggiornamento operativo - FASE 7D Blocco 2
+
+**Stato del Blocco 2: COMPLETATO NEL PROPRIO SCOPE TECNICO. FASE 7D: ANCORA APERTA.**
+
+Run reale GMD:
+
+- 1.150 record nel candidate manifest;
+- 451 `general-beat-4/4` non-eval;
+- 647 `fill-4/4` non-eval;
+- 12 non-4/4 non-eval;
+- 40 `eval_session` preservati come holdout candidato;
+- 1.098 record 4/4 non-eval eleggibili.
+
+Confronto candidate task split:
+
+- session-grouped: `878 / 111 / 109`, 20 session group, 0 cross-task-split;
+- drummer-held-out: `930 / 98 / 70`, 10 drummer group, 0 cross-task-split;
+- representative drummer holdout: validation `drummer3`, test `drummer8`.
+
+Il `sourceSplit` ufficiale GMD resta separato e `source-reference-only`.
+
+Il Block2 non seleziona automaticamente lo split FAME finale: session-grouped e' molto piu' bilanciato numericamente; drummer-held-out offre invece separazione completa dell'identita' performer. La decisione operativa resta da fissare prima della materializzazione del corpus.
+
+Digest candidate manifest reale: `8bf3e1e107c3d634ff2637d15950f617b3d8541420ced02fb692c0b80d4c78a2`.
+
+`DRUM DATA READY V2` resta aperto e il training serio resta chiuso.
