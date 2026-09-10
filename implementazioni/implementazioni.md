@@ -101,6 +101,24 @@ fase e sul tetto settimanale della promo.
 
 13. Ti ricordo che i pulsanti sopra la mappa sono ANCORA TROPPO GRANDI rispetto ai quadratini stessi. Rivedilo.
 
+14. Togli che nello studio, per comprare un beat, consumi 20 di energia. Non è realistico, toglilo.
+
+**FATTO (10/09/2026)** — tolto il costo di 20 energia per farsi fare un beat su misura da
+un beatmaker (`STUDIO_BEAT_ENERGIA` in `js/game/studio.js`, sezione «Fattelo fare»): resta
+il costo in soldi, il tempo (2 ore) e il limite di un beat a settimana per beatmaker. Il
+testo dell'interfaccia che mostrava «20 energia» è sparito insieme al conto. Non toccato
+«Cerca un beat» allo Shop, che non costava energia già prima.
+
+15. Scrivere barre in studio non deve dare nessun malus, né di stanchezza né fisico,
+NESSUNO. Lasciamo solo che costi 15 di energia, per ora. Non toccare nient'altro di quello
+che c'era già.
+
+**FATTO (10/09/2026)** — tolto il calo di benessere (−1) che scattava chiudendo una strofa
+scritta al foglio (`chiudiStrofa` in `js/game/writer.js`): scrivere barre non stanca più.
+Il costo in energia dell'azione «Scrivi barre» (`js/game/actions.js`) è sceso da 28 a 15.
+Non toccato altro: il bonus di lucidità che l'azione già dava, il tempo che richiede, e come
+benessere e lucidità pesano sulla qualità del testo restano com'erano.
+
 CARLO:
 
 /_ GIORNALIERE _/

@@ -1054,14 +1054,15 @@ console.log("\nlo Studio: la gente della Sala conta");
     controlla("le foto delle stanze dello Studio sono dove il codice le cerca",
       fotoMancanti.length === 0, fotoMancanti);
 
-    /* il beat su misura: costa, arriva in cartella, e porta il nome di chi l'ha fatto */
+    /* il beat su misura: costa in soldi, arriva in cartella, e porta il nome di chi l'ha
+       fatto — comprare un beat non consuma più energia, non era realistico */
     const soldiPrima = dentro("G.money"), energiaPrima = dentro("G.energy");
     dentro("studioFattiUnBeat('bm')");
     const beats = dentro("G.beats");
     controlla("un beatmaker in confidenza ti fa un beat, e finisce in cartella",
       beats.length === 1 && beats[0].da === "Bit", JSON.stringify(beats));
-    controlla("e costa: soldi ed energia scendono",
-      dentro("G.money") < soldiPrima && dentro("G.energy") === energiaPrima - 20,
+    controlla("costa in soldi, non in energia",
+      dentro("G.money") < soldiPrima && dentro("G.energy") === energiaPrima,
       "soldi " + soldiPrima + " → " + dentro("G.money") +
       ", energia " + energiaPrima + " → " + dentro("G.energy"));
     dentro("studioFattiUnBeat('bm')");
