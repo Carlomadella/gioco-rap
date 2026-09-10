@@ -1823,3 +1823,30 @@ FAME Neural avanza solo quando sappiamo quale di queste proprietà abbiamo realm
 7D Block1 chiuso; Block2 da iniziare. Il protocollo W1–W10 del playbook owned-beats e NDR-045 sono recepiti. Il bootstrap prepara inventario e copie, non converte o apre training. Owned-beats è candidata per relazioni cross-track; pilot drums/low-end prima del tonale. HH-TRP conserva il ruolo ufficiale di candidata, da confrontare con l’effettiva resa del pilot; il playbook non la declassa autonomamente. GMD resta fonte generale. Il percorso si colloca nei task dati esistenti e nei gate 7D/7E pertinenti; nessuna nuova fase per hardening o bootstrap.
 
 La selezione session-grouped / drummer-held-out in Block2 deve riflettere la domanda di generalizzazione e i vincoli dei dati; non si sceglie usando i risultati del test finale. Il training resta chiuso.
+
+### Checkpoint operativo owned-beats — 10 settembre 2026
+
+Stato raggiunto nel percorso proprietario audio→MIDI:
+
+- bootstrap completato: 133 file sorgente, 131 asset unici;
+- export nativi verificati: 131/131 `NONE_AVAILABLE`;
+- 131/131 record confermati umanamente come composition family distinte, con 131 `compositionFamilyId` unici;
+- cohort di sviluppo congelato a 8 composition family (`development`);
+- evaluation holdout congelato prima del tuning a 10 composition family (`evaluation-holdout`);
+- overlap development/evaluation: 0;
+- 113 record restano senza split assegnato;
+- review/import delle decisioni umane disponibile e testato, incluso il campo `split`;
+- baseline `owned-beats-audio-analysis-v1` implementata e smoke-tested;
+- preview reale Audio Analysis completato sugli 8 development;
+- meter e section detection restano candidate e non ancora validate;
+- nessun risultato Audio Analysis è stato promosso a ground truth o task-ready;
+- evaluation holdout escluso dal tuning della V2;
+- Source Separation resta successiva all'Audio Analysis;
+- conversione audio→MIDI non ancora avviata;
+- training serio resta chiuso.
+
+Questo checkpoint congela baseline V1 e split prima del tuning successivo. Non chiude autonomamente 7D Block2, non dichiara DRUM DATA READY V2 e non modifica i gate task-specifici esistenti.
+
+Prossimo passo owned-beats:
+
+AUDIO ANALYSIS V2 sui soli development → congelamento pipeline candidata → valutazione separata sugli evaluation-holdout → SOURCE SEPARATION → AUDIO→MIDI drums/low-end → QA.
