@@ -692,7 +692,14 @@ document.addEventListener('DOMContentLoaded', function(){
     el.style.setProperty('--value', pct + '%');
   });
 });
-</script></head>
+</script><style id="adf-makehuman-hide-teeth-tongue">
+/* ADF_MAKEHUMAN_HIDE_TEETH_TONGUE_V1
+   Dentatura e lingua restano nel runtime MakeHuman ma non sono controlli
+   esposti al giocatore. */
+.adf-hidden-player-control{
+  display:none !important;
+}
+</style></head>
 <body>
 <div class="room-backdrop" aria-hidden="true">
   <div class="room-blur"></div>
@@ -765,8 +772,8 @@ document.addEventListener('DOMContentLoaded', function(){
       <div class="box"><h2>Capelli</h2><div class="grid2">
         <div class="slot"><label>Stile capelli</label><select id="slot-hair"></select><button id="customize-hair" class="customize-color">Personalizza</button></div>
         <div class="slot"><label>Barba e baffi</label><select id="slot-facialHair"></select></div>
-        <div class="slot"><label>Dentatura</label><select id="slot-teeth"></select></div>
-        <div class="slot"><label>Lingua</label><select id="slot-tongue"></select></div>
+        <div class="slot adf-hidden-player-control" hidden><label>Dentatura</label><select id="slot-teeth"></select></div>
+        <div class="slot adf-hidden-player-control" hidden><label>Lingua</label><select id="slot-tongue"></select></div>
       </div></div>
     </section>
 
