@@ -4,6 +4,8 @@ Data: 2026-09-11
 
 ## Owned Beats — stato operativo
 
+> Checkpoint corrente Block E: [Reference precision-v3 — 11/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_BLOCK_E_REFERENCE_PRECISION_V3_CHECKPOINT_2026-09-11.md).
+
 **Stato aggiornato: 11/09/2026. Conversione audio→MIDI non ancora avviata (`converted: 0`).**
 
 | Attività | Stato | Evidenza / prossimo vincolo |
@@ -14,9 +16,9 @@ Data: 2026-09-11
 | Composition family corpus proprietario | **COMPLETATO** | 131/131 record confermati umanamente come composizioni distinte; 131 `compositionFamilyId` unici, 0 record senza family |
 | Diversità musicale pilot | **DA COMPLETARE** | tempo, densità, low-end, articolazioni e difficoltà ancora da verificare sul pilot |
 | Evaluation holdout | **COMPLETATO** | 10 composition family congelate in `evaluation-holdout` prima del tuning V2; 8 development, overlap 0, 113 record ancora senza split |
-| Human Reference development | **COMPLETATA** | reference definitiva post-hardening: 8/8 family, 24/24 finestre `COMPLETE`; reviewId `audio-analysis-v2-dev-reference-precision-v2`; digest `f63c37bf557a82e32c5a1c58b381501e043ff6e08832b7a3434742521521fa18`; precision-v1 preservata come storico; holdout non osservato |
+| Human Reference development | **REVISIONE VERSIONATA IN CORSO** | `precision-v2` resta snapshot immutabile usata da baseline001; `precision-v3` è stata riascoltata 24/24 con metronomo sui marker reali ed esportata completa, ma non è ancora finalizzata/digestata; holdout non osservato |
 | Ambiente tecnico Audio Analysis | **COMPLETATO** | FFmpeg/ffprobe 9.0.1 + Python 3.14 + stack audio verificata |
-| Audio Analysis pilot | **IN CORSO** | V1 preview reale 8/8 già disponibile; Human Reference finalizzata; prossimo step baseline V1 reference-scored prima del tuning V2; nessun holdout aperto |
+| Audio Analysis pilot | **IN CORSO** | baseline001 V1 reference-scored congelata contro `precision-v2`; QA reference successivo ha prodotto `precision-v3` revisionata ma non finalizzata; prossimo step: check/diff/finalize v3 → baseline002 V1-v3 → diagnostica sections; nessun holdout aperto |
 | Source Separation pilot | **DA FARE** | successiva all'Audio Analysis |
 | Trascrizione Audio→MIDI pilot | **DA FARE** | drums/low-end prima; tonal successivamente |
 | QA pilot | **DA FARE** | metriche automatiche e giudizio umano separati |

@@ -575,3 +575,22 @@ Si recepisce la sezione «Hardening reference umane» del playbook: riascolto no
 Lo stato operativo successivo supera il solo riferimento temporale «gate umano aperto» della precisazione del 10 settembre. La prima snapshot `audio-analysis-v2-dev-reference-precision-v1` resta preservata come storico, ma l'hardening del commit `4bed0ffacc82402bbf1737b308d14cc87c950431` ha reso obbligatoria la dichiarazione di copertura delle finestre. Le stesse 8 composition family sono state quindi riconfermate senza ricostruire artificialmente raw tap o quantization history.
 
 La reference development definitiva per il confronto è `audio-analysis-v2-dev-reference-precision-v2`, 8/8 family e 24/24 finestre `COMPLETE`, submission digest `f63c37bf557a82e32c5a1c58b381501e043ff6e08832b7a3434742521521fa18`. La regola resta invariata: il tempo registrato durante la raccolta misura la creazione/verifica della reference e **non** il costo di correzione di V1/V2. Il costo di correzione delle candidate viene raccolto separatamente quando il confronto lo rende possibile. Nessun holdout è stato osservato e la finalizzazione della reference non autorizza tuning, Source Separation, Audio→MIDI o training.
+## NDR-046 — Audio Analysis: confronto paired sulla stessa reference versionata
+
+Data: 11 settembre 2026. Stato: adottata.
+
+La baseline `v1-baseline-development-001` e il relativo contratto restano immutabili contro `audio-analysis-v2-dev-reference-precision-v2`. La successiva revisione musicale della Human Reference non riscrive quello storico.
+
+Se `audio-analysis-v2-dev-reference-precision-v3` viene finalizzata e diventa la reference di scoring per una candidata V2, V1 deve essere rieseguito append-only contro la **stessa** snapshot v3 (`v1-baseline-development-002` o run successiva esplicitamente versionata). È vietato interpretare come confronto paired `V1-v2` contro `V2-v3`.
+
+La correzione della reference precede il tuning ed è ammessa soltanto per motivazione musicale/di integrità, mai per inseguire il punteggio del baseline/candidato. Holdout e output candidato restano separati dalla costruzione della reference.
+
+## NDR-047 — Human Reference beat: `beatTimesSeconds` è l'unica timeline autorevole
+
+Data: 11 settembre 2026. Stato: adottata.
+
+Nell'editor Human Reference i marker reali (`beatTimesSeconds`) costituiscono l'unica fonte di verità temporale. Metronomo/bip, nudge, shift globale, quantizzazione e ogni futura trasformazione di periodo devono leggere e modificare direttamente lo stesso array.
+
+Sono escluse ghost grid, shadow grid o seconde timeline persistenti che possano divergere dai marker reali. Un eventuale futuro stretch deve trasformare direttamente i marker autorevoli. Stato browser/localStorage non viene azzerato o ripristinato sopra il lavoro corrente senza scelta esplicita dell'utente.
+
+`Calcola BPM dai marker` resta una derivazione dal set di marker corrente (mediana degli intervalli validi sulle tre finestre), non un'analisi dell'audio e non una trasformazione della griglia. Differenze diagnostiche fra finestre non vengono normalizzate a forza quando il riascolto con bip conferma coerenza musicale.
