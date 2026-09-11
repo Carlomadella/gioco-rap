@@ -49,6 +49,10 @@ jobs:
         run: python -m pip install -r frontend/strumenti/fame-neural-composer/owned-beats/requirements-audio-analysis-lock.txt
       - name: Owned beats Audio Analysis V1 baseline smoke
         run: python frontend/strumenti/fame-neural-composer/owned-beats-audio-analysis-test.py
+      - name: Audio Analysis V1 evaluator precision-v2 regression
+        run: python frontend/strumenti/fame-neural-composer/owned-beats/audio-analysis-v1-evaluate-test.py
+      - name: Audio Analysis V1 evaluator precision-v3 regression
+        run: python frontend/strumenti/fame-neural-composer/owned-beats/audio-analysis-v1-evaluate-v2-test.py
       - name: Owned beats Audio Analysis V2 pre-tuning hardening
         run: python frontend/strumenti/fame-neural-composer/owned-beats-audio-analysis-v2-test.py
 

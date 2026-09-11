@@ -1,0 +1,56 @@
+{
+  "schema": "fame-owned-beats-audio-analysis-evaluation-implementation-v2",
+  "version": 2,
+  "status": "FROZEN_BEFORE_BASELINE_OBSERVATION",
+  "frozenOn": "2026-09-11",
+  "split": "development",
+  "holdoutAccessAllowed": false,
+  "reviewId": "audio-analysis-v2-dev-reference-precision-v3",
+  "submissionDigestSha256": "6e80e998cf2e5725f346989f707cb59a0b44f218d8909012171d0b9ebbec91af",
+  "protocolDigestSha256": "a85cb06f34108fe60f9d0bc40db754a429403500d32bfc48a06a76c7965bb254",
+  "protocolGitBlobSha1": "aebd54b0da41d6726d209e5fc22b5f59b2df0847",
+  "baselineToolVersion": "owned-beats-audio-analysis-v1",
+  "baselineSourceGitBlobSha1": "fcabcf8b069fe2a65edc6ce171d86226e1bcaecb",
+  "mirEvalVersion": "0.8.2",
+  "purpose": "REBASE_V1_ON_PRECISION_V3_FOR_VALID_PAIRED_V2_COMPARISON",
+  "previousEvaluationContract": "audio-analysis-evaluation-implementation-v1.json",
+  "previousBaselineRun": "v1-baseline-development-001",
+  "implementation": {
+    "baselineMutationAllowed": false,
+    "beatPrediction": "RUN_V1_FULL_TRACK_THEN_CROP_PREDICTED_BEATS_TO_FROZEN_REFERENCE_WINDOWS",
+    "beatWindowInclusion": "START_AND_END_INCLUSIVE",
+    "beatPrimaryFamilyAggregation": "MICRO_MATCH_COUNTS_ACROSS_3_WINDOWS",
+    "beatCemgilFamilyAggregation": "ARITHMETIC_MEAN_ACROSS_WINDOWS",
+    "beatContinuityFamilyAggregation": "ARITHMETIC_MEAN_ACROSS_WINDOWS_PER_OUTPUT",
+    "beatAbsoluteTimingErrorAggregation": "POOLED_70MS_MATCHED_EVENTS_ACROSS_WINDOWS",
+    "sectionsPrediction": "RUN_V1_FULL_TRACK_INTERNAL_BOUNDARIES",
+    "sectionsScoring": "MIR_EVAL_SEGMENT_DETECTION_TRIM_TRUE",
+    "sectionsDeviation": "MIR_EVAL_SEGMENT_DEVIATION_TRIM_TRUE",
+    "bpmPrediction": "V1_PRIMARY_BPM_CANDIDATE_FULL_TRACK",
+    "meterPrediction": "V1_TOP_ACCENT_CYCLE_CANDIDATE_DIAGNOSTIC_ONLY",
+    "decisionAggregationLater": "MEDIAN_PAIRED_FAMILY_DELTA_V2_MINUS_V1",
+    "candidateReviewCost": "NOT_MEASURED_BY_AUTOMATIC_BASELINE_RUN",
+    "results": "APPEND_ONLY_WORKSPACE_RUN_DIRECTORY",
+    "beatMacroWindowMean": "DIAGNOSTIC_ONLY",
+    "humanReferenceDigestVerification": "RECOMPUTE_WITH_NODE_JSON_STRINGIFY_TO_MATCH_FINALIZER",
+    "referenceAnnotationCost": "GROUND_TRUTH_CREATION_COST_NOT_V1_V2_CORRECTION_COST",
+    "referenceCoverageValidation": "REQUIRE_POST_HARDENING_COVERAGE_REVIEW_RAW_TAP_AND_QUANTIZATION_HISTORY_FIELDS",
+    "referenceFinalCoverage": "PENDING_AND_AMBIGUOUS_REJECTED; COMPLETE_OR_NO_BEAT_ONLY"
+  },
+  "humanReference": {
+    "status": "FINALIZED_PRECISION_REVIEW_V3",
+    "families": 8,
+    "windows": 24,
+    "requiredCoverage": [
+      "COMPLETE",
+      "NO_BEAT"
+    ],
+    "definitiveSnapshot": "audio-analysis-v2-dev-reference-precision-v3.json",
+    "historicalSnapshotsPreserved": [
+      "audio-analysis-v2-dev-reference-precision-v2.json",
+      "audio-analysis-v2-dev-reference-precision-v1.json"
+    ],
+    "rawTapHistoryReconstructionAllowed": false,
+    "quantizationHistoryReconstructionAllowed": false
+  }
+}
