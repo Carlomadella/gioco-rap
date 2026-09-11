@@ -7,6 +7,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from candidate_freeze import verify_freeze, reserve_holdout
+
 import librosa
 import numpy as np
 import scipy
@@ -759,12 +762,17 @@ def main():
         action="store_true"
     )
 
+    parser.add_argument("--candidate-freeze", default=None)
     args = parser.parse_args()
 
     authorize_analysis_mode(
         args.analysis_mode,
         args.confirm_evaluation_holdout
     )
+
+    freeze = None
+    if args.analysis_mode == EVALUATION_SPLIT:
+        freeze = verify_freeze(args.candidate_freeze, Path(__file__).parent, CONFIG)
 
     workspace = Path(
         args.workspace
@@ -790,7 +798,13 @@ def main():
         args.cohort
     )
 
+    reservation = None
+    if freeze is not None:
+        reservation = reserve_holdout(workspace, freeze, records)
+
     result = {
+        "candidateFreeze": freeze,
+        "holdoutReservation": reservation,
         "schema": OUTPUT_SCHEMA,
         "version": OUTPUT_VERSION,
         "mode": "PREVIEW",

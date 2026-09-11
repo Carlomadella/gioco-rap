@@ -121,7 +121,8 @@ for (const family of submission.families) {
   family.beatReference.referenceBpm = 120;
   family.beatReference.reviewed = true;
   for (const window of family.beatReference.windows) {
-    window.beatTimesSeconds = [0.25, 0.75, 1.25, 1.75];
+    window.beatTimesSeconds = Array.from({length: 24}, (_, i) => 0.25 + i * 0.5);
+    window.coverage = "COMPLETE";
     window.reviewed = true;
   }
   family.meter = { value: "4/4", reviewed: true };
@@ -135,6 +136,17 @@ assert.equal(summary.expectedFamilies, 8);
 assert.equal(summary.reviewCompleteFamilies, 8);
 assert.equal(summary.beatMetricUsableFamilies, 8);
 assert.equal(summary.finalizationReady, true);
+
+const sparseReference = JSON.parse(JSON.stringify(submission));
+sparseReference.families[0].beatReference.windows[0].beatTimesSeconds = [0.25, 0.75];
+assert.equal(validateSubmissionCore(sparseReference, manifest, protocolInfo, selected, durations).finalizationReady, false);
+sparseReference.families[0].beatReference.windows[0].coverageNotes = "Long silent passage checked against audio";
+assert.equal(validateSubmissionCore(sparseReference, manifest, protocolInfo, selected, durations).finalizationReady, true);
+const noBeat = sparseReference.families[0].beatReference.windows[0];
+noBeat.beatTimesSeconds = []; noBeat.coverage = "NO_BEAT";
+assert.equal(validateSubmissionCore(sparseReference, manifest, protocolInfo, selected, durations).finalizationReady, true);
+noBeat.coverage = "AMBIGUOUS";
+assert.equal(validateSubmissionCore(sparseReference, manifest, protocolInfo, selected, durations).finalizationReady, false);
 
 const tamperedWindow = JSON.parse(JSON.stringify(submission));
 tamperedWindow.families[0].beatReference.windows[0].startSeconds = 6;

@@ -84,3 +84,8 @@ La finalizzazione non modifica il manifest Owned Beats e non promuove nessun ass
 Dopo questa implementazione il tooling è pronto, ma il gate umano resta **APERTO** finché non viene eseguita e finalizzata una review reale delle 8 family development.
 
 Solo dopo quella raccolta si potrà costruire il confronto V1/V2 sul development. Il holdout resta chiuso fino a un eventuale `V2_WINS` e al freeze del candidato previsto dal protocollo.
+
+
+### Correzioni integrità del tooling
+
+Applicare le regole della sezione «Hardening reference umane — 10 settembre 2026» del playbook: quantizzazione esplicita, invalidazione revisioni, copertura dichiarata, timer per family e conservazione degli inserimenti originali. Gli smoke test sono affiancati da una regressione browser sulle interazioni. Tooling implementato non significa reference reali raccolte: il blocco rimane aperto.

@@ -652,13 +652,13 @@ dataset Trap/Drill potenzialmente utile per drum specialization, ma di natura al
 
 ## Prossimo intervento ufficiale
 
-**7D Block1 chiuso e pushato; 7D Block2 — Grouping + Candidate Manifest Design DA INIZIARE.**
+**7D Block2 completato nel proprio scope tecnico; Fase 7D ancora aperta. Owned Beats: raccolta human reference development aperta.**
 
-1. Integrare hardening exporter e protocollo owned-beats con le verifiche indicate in `HARDENING_OWNED_BEATS_2026-09-10.md`.
-2. Ricerca di apertura Block2: definire generalizzazione per sessione/per drummer e compatibilità dei template; confrontare copertura e distribuzioni prima di scegliere la policy.
-3. Costruire manifest candidati riproducibili, preservando sourceSplit e separandolo dal taskSplit; ricerca di chiusura sullo scope effettivamente verificato.
-4. Owned-beats: bootstrap di inventario disponibile, pilot drums/low-end da progettare; famiglie, export nativi, QA e strumenti di review ancora da completare prima della conversione.
-5. HH-TRP resta candidata secondo roadmap; owned-beats entra come candidata per parti abbinate. Nessuna sostituzione automatica delle priorità; GMD resta generale.
+1. Completare e verificare le reference sulle 8 family development con il tool corretto; nessun tuning o conversione avviato da questo hardening.
+2. Confrontare V1/V2 secondo `owned-beats/audio-analysis-v2-protocol.json`, conservando anche esiti negativi e reference incerte.
+3. Holdout accessibile solo dopo `V2_WINS` documentato e verifica del freeze di codice/configurazione/ambiente; nessuna apertura effettuata da questa patch.
+4. Per GMD, confrontare copertura e distribuzione separatamente per beat/fill prima di scegliere lo split finale; i manifest Block2 restano candidati.
+5. HH-TRP resta candidata secondo roadmap; bootstrap Owned Beats disponibile. Nessuna promozione automatica a dataset pronto.
 
 Training serio chiuso; DRUM DATA READY V2 non superato; Planner rinviato. Non servono nuove fasi per questi fix.
 

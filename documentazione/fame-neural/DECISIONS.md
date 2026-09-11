@@ -562,3 +562,10 @@ Si recepisce il protocollo W1–W10 del playbook: operazioni ripetitive automati
 Le lezioni del prototipo diventano candidate con evidenze, poi regole adottate dopo verifica; la rigenerazione conserva versioni e revisioni. FULL deriva da eventi identificati e non somma viste sovrapposte. I derivati condividono lo split della famiglia; augmentation coerente col task.
 
 Owned-beats è candidata operativa per parti abbinate, non corpus già ammesso. GMD generale e HH-TRP candidata restano nel percorso ufficiale. Bootstrap disponibile per inventario/copia soltanto; training chiuso; Block2 7D da iniziare.
+
+
+### Precisazione operativa NDR-045 — integrità delle reference (10 settembre 2026)
+
+Il riferimento storico «Block2 7D da iniziare» sopra descrive lo stato all'adozione: Block2 è ora completato nel proprio scope tecnico, come registrato in CURRENT_STATE. I candidati di split non sono uno split finale autorizzato.
+
+Si recepisce la sezione «Hardening reference umane» del playbook: riascolto non mutante, quantizzazione esplicita con storico, copertura dichiarata, invalidazione delle revisioni dopo le modifiche e tempo di annotazione distinto dal costo di correzione V1/V2. Il runner holdout verifica il freeze e riserva le famiglie prima dell'audio. Queste sono correzioni del contratto operativo esistente, non nuove fasi né prova di qualità delle reference. Il gate umano resta aperto.

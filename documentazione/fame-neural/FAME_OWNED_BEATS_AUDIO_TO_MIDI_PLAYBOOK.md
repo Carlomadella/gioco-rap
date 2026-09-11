@@ -1077,3 +1077,37 @@ Tutte le operazioni sul manifest devono passare dagli strumenti. La futura inter
 Un lock rimasto dopo arresto forzato richiede verificare che nessun bootstrap sia in esecuzione prima di rimuoverlo; non viene eliminato automaticamente. Il bootstrap rifiuta symlink nelle sorgenti; usa cartelle di lavoro ordinarie. Le copie verificate dopo un’interruzione possono essere riutilizzate. Manifest e feedback vanno conservati con il workspace su storage persistente con backup.
 
 Versioni del convertitore, review e QA potranno essere registrate soltanto quando i relativi strumenti esistono: non anticipare stati di successo.
+
+
+## Hardening reference umane — 10 settembre 2026
+
+Regole vincolanti per il tooling di annotazione (nessuna nuova fase roadmap):
+
+- Il riascolto non cambia i marker. Quantizzazione solo esplicita e facoltativa; una griglia regolare stimata dai tap non è prova di correttezza musicale.
+- Conservare gli inserimenti manuali originali (`rawTapTimesSeconds`, inclusi click sulla waveform) e lo storico input/output delle quantizzazioni. Le modifiche pregresse prive di storico non vengono ricostruite artificialmente.
+- Ogni modifica dei marker, della copertura o del riferimento BPM/livello metrico invalida la relativa revisione. Riascoltare e ricontrollare prima di confermare.
+- Ogni finestra richiede copertura `COMPLETE`, `NO_BEAT` o `AMBIGUOUS`; `PENDING` e `AMBIGUOUS` impediscono la finalizzazione. `NO_BEAT` richiede zero marker e una spiegazione sull'audio ascoltato.
+- Due marker non dimostrano copertura di 12 secondi. Per `COMPLETE`, una densità inferiore al 50% del conteggio nominale durata × BPM/60 richiede una nota esplicita (almeno 10 caratteri). È un allarme operativo di completezza, non una soglia musicale o una certificazione automatica: non aggiungere beat artificiali per superarlo.
+- Finestre senza beat devono restare esplicite nel futuro valutatore; non eliminarle dai risultati né assegnare automaticamente un punteggio perfetto ai casi vuoti. La politica metrica dei casi vuoti va fissata prima del confronto.
+- Il timer appartiene alla family sulla quale è partito e si ferma al cambio family o all'export. Misura il costo dell'annotazione della reference; il confronto del costo di correzione V1/V2 richiede misure separate per candidato.
+- Le vecchie submission senza copertura non sono finalizzabili finché non vengono revisionate con questi campi. Conservare i JSON originali: nessuna rigenerazione dei MIDI o riscrittura delle reference pregresse implicita.
+- Per usare la UI aggiornata, preparare un nuovo pack con un nuovo `reviewId`; gli HTML già generati contengono il vecchio codice. Non cancellare i pack e JSON precedenti.
+
+### Holdout: verifica eseguibile del freeze
+
+Il runner V2 richiede `--candidate-freeze <file.json>` insieme alla conferma esplicita. Prima dell'audio verifica commit corrente, checkout Owned Beats pulito, configurazione, protocollo, lock, versioni Python/pacchetti e FFmpeg. Il riepilogo development deve avere digest verificabile, stesso candidato e decisione `V2_WINS`.
+
+Campi freeze: `candidateId`, `codeCommit`, `configHash`, `dependencyLockHash`, `developmentSummaryDigest`, `developmentSummaryPath` (relativo al freeze), `frozenAt` (ISO con timezone), `protocolDigestSha256`, `ffmpegVersion`. Gli hash file sono SHA256 dei byte; `configHash` usa `candidate_freeze.config_digest(CONFIG)`. Il riepilogo contiene `decision`, `split` e gli stessi campi di identità del candidato.
+
+Il gate verifica identità e integrità, non ricalcola la decisione scientifica: il valutatore paired, ancora da completare, dovrà produrre evidenze e digest delle reference. Non compilare un `V2_WINS` fittizio per avviare il runner.
+
+Prima dell'accesso all'audio il runner riserva le family in `runs/evaluation-holdout-usage`. Un secondo tentativo che riusa anche una sola family viene bloccato, anche cambiando candidato. Un errore dopo la prenotazione resta registrato: non eliminare la prenotazione per ritentare automaticamente; documentare l'incidente. La riserva copre il runner V2, non orchestra il futuro confronto completo V1/V2.
+
+### Ricerca di apertura e verifica di chiusura del fix
+
+Fonti primarie consultate il 10 settembre 2026:
+
+- [mir_eval beat](https://mir-eval.readthedocs.io/latest/api/beat.html): la valutazione confronta eventi temporali con reference; F-measure 70 ms e Cemgil 40 ms non giustificano la sostituzione delle annotazioni con una griglia quantizzata.
+- [scikit-learn, cross-validation](https://scikit-learn.org/stable/modules/cross_validation.html): scegliere parametri usando il test contamina la misura di generalizzazione; da qui freeze verificabile e separazione development/holdout.
+
+Conclusione della revisione: le correzioni proteggono la provenienza delle reference e l'indipendenza del test. Nessun risultato musicale validato, nessun nuovo gate di dataset/training superato. Il protocollo pre-tuning conserva le metriche e il budget originari.
