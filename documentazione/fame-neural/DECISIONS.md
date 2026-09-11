@@ -631,3 +631,33 @@ Questo risultato dimostra un miglioramento materiale delle sections secondo la s
 Prima di qualsiasi `config-002` o apertura holdout viene completato il required human correction-cost review della config-001 su almeno 6 development family comparabili. Se l'aumento relativo mediano del costo candidato supera `+25%`, la vittoria automatica è bloccata. Fino a quel review, config-001 resta immutata e l'holdout resta chiuso.
 
 L'eventuale `V2_WINS` finale viene dichiarato soltanto dopo il completamento del review richiesto e la verifica con le regole frozen. Source Separation, Audio→MIDI e training serio restano chiusi.
+
+## NDR-050 — Easy sanity set separato: difficoltà del pilot plausibile, V1 debole anche sul semplice, localization V2 da distinguere dalla detection
+
+Data: 11 settembre 2026. Stato: adottata.
+
+Dopo il freeze e il metric gate positivo di `audio-analysis-v2-config-001`, tre beat boom bap intenzionalmente semplici e ripetitivi sono stati usati come sanity set **separato**. Non appartengono al development ufficiale, non appartengono all'holdout, non autorizzano training e non modificano il budget V2.
+
+La prima Human Reference ha annotato 27 boundary interne, 9 per traccia, con `candidateOutputsExposed=false`. V1 propone soltanto 3 boundary totali e ottiene Section F1 @0,5 s pari a `0` su tutte e tre le tracce. Quindi la debolezza V1 sulle sections non è spiegabile soltanto dalla difficoltà delle 8 family development.
+
+`config-001` propone 25 boundary totali contro le 27 umane. Prima del raffinamento waveform ottiene median family Section F1 `0.333333` @0,5 s e `0.777778` @3 s. Il conteggio vicino alla reference e il forte risultato permissivo supportano una sensibilità strutturale reale, non una semplice oversegmentation casuale.
+
+Un secondo passaggio cieco con waveform ha preservato identità e numero delle stesse 27 boundary, senza permettere add/delete e senza mostrare output V1/config-001. Dopo questo raffinamento:
+
+- V1 median Section F1 @0,5 s: `0.000000`;
+- config-001 median Section F1 @0,5 s: `0.222222`;
+- config-001 median Section F1 @3 s: `0.777778`.
+
+`Street Candy` è il failure mode più chiaro: la correzione umana con waveform sposta le boundary di soli `0.067 s` mediani (`0.107 s` massimo), ma config-001 resta `0` @0,5 s e `0.875` @3 s. I sette match @3 s sono spostati prevalentemente di circa `0.61–0.70 s`, con un caso `1.328 s`, coerenti con circa uno o due beat a ~92 BPM.
+
+La conclusione adottata è:
+
+1. il development ufficiale può essere comparativamente più difficile del sanity set semplice; questa è evidenza di supporto, non una misura formale completa della difficoltà del pilot;
+2. V1 resta insufficiente sulle sections anche su materiale semplice;
+3. `config-001` migliora la detection della zona strutturale;
+4. la localizzazione sul beat esatto è un failure mode separato e reale;
+5. un eventuale futuro intervento potrà valutare un boundary-refinement/localization stage senza assumere che il detector contestuale debba essere sostituito.
+
+Questo sanity set non cambia la decisione protocollo: `V2_WINS_METRICALLY / INCONCLUSIVE_REVIEW_PENDING`. `config-001` resta congelata, `config-002` non viene aperta prima del required human correction-cost review e l'holdout resta chiuso.
+
+I file audio e gli artefatti diagnostici restano esterni a Git; la repository conserva soltanto il checkpoint, gli SHA256 delle sorgenti/artefatti e le conclusioni verificabili.
