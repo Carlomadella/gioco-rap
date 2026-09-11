@@ -62,4 +62,28 @@ FASE 2 dovrà aggiungere test per:
 
 ## Hardening e owned-beats (10 settembre 2026)
 
-Vedi [protocollo](FAME_OWNED_BEATS_AUDIO_TO_MIDI_PLAYBOOK.md), sezioni W1–W10, e [verifiche/limiti](HARDENING_OWNED_BEATS_2026-09-10.md). Il bootstrap inventaria/copia soltanto; Block2 7D e conversione da iniziare.
+Vedi [protocollo](FAME_OWNED_BEATS_AUDIO_TO_MIDI_PLAYBOOK.md), sezioni W1–W10, e [verifiche/limiti](HARDENING_OWNED_BEATS_2026-09-10.md). Il bootstrap inventaria/copia soltanto; 7D Block2 è completato nel proprio scope tecnico, Human Reference development 8/8 finalizzata, conversione audio→MIDI non avviata.
+## Audio Analysis — baseline V1 reference-scored (11 settembre 2026)
+
+Prima di osservare i punteggi della baseline:
+
+- V1 source blob deve restare `fcabcf8b069fe2a65edc6ce171d86226e1bcaecb`;
+- protocollo deve restare `FROZEN_PRE_TUNING`;
+- Human Reference development deve essere `audio-analysis-v2-dev-reference-precision-v2`, digest `f63c37bf557a82e32c5a1c58b381501e043ff6e08832b7a3434742521521fa18`;
+- le finestre della reference definitiva devono rispettare il contratto post-hardening (coverage, review, raw/history espliciti);
+- `mir_eval==0.8.2`;
+- evaluation holdout non deve essere letto.
+
+Test evaluator:
+
+```powershell
+D:\FAME_NEURAL\venv-audio-analysis\Scripts\python.exe .\frontend\strumenti\fame-neural-composer\owned-beats\audio-analysis-v1-evaluate-test.py
+```
+
+Preflight senza esecuzione della baseline:
+
+```powershell
+D:\FAME_NEURAL\venv-audio-analysis\Scripts\python.exe .\frontend\strumenti\fame-neural-composer\owned-beats\audio-analysis-v1-evaluate.py D:\FAME_NEURAL --preflight
+```
+
+La prima run reale `v1-baseline-development-001` viene eseguita solo dopo commit/push dell'evaluator e del contratto di scoring.

@@ -30,4 +30,4 @@ Una scelta diventa vincolante nel Neural soltanto dopo una decisione esplicita r
 
 ## Hardening e owned-beats (10 settembre 2026)
 
-Vedi [protocollo](FAME_OWNED_BEATS_AUDIO_TO_MIDI_PLAYBOOK.md), sezioni W1–W10, e [verifiche/limiti](HARDENING_OWNED_BEATS_2026-09-10.md). Il bootstrap inventaria/copia soltanto; Block2 7D e conversione da iniziare.
+Vedi [protocollo](FAME_OWNED_BEATS_AUDIO_TO_MIDI_PLAYBOOK.md), sezioni W1–W10, e [verifiche/limiti](HARDENING_OWNED_BEATS_2026-09-10.md). Il bootstrap inventaria/copia soltanto; 7D Block2 è completato nel proprio scope tecnico, la Human Reference development è finalizzata 8/8 e la conversione audio→MIDI non è ancora iniziata.

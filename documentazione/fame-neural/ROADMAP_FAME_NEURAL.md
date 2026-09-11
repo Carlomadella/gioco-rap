@@ -1,6 +1,6 @@
 # FAME Neural — Roadmap ufficiale V2
 
-Data: 10 settembre 2026<br>
+Data: 11 settembre 2026<br>
 Stato: ROADMAP OPERATIVA V2 — PRECISATA DOPO AUDIT HANDOFF E SONIC PI<br>
 Progetto: FAME Neural Composer
 
@@ -1140,18 +1140,28 @@ Dettaglio: [PHASE7D_BLOCK1_CHIUSURA_2026-09-10.md](PHASE7D_BLOCK1_CHIUSURA_2026-
 
 ### Blocco 2 — Grouping + Candidate Manifest Design
 
-**DA ESEGUIRE.**
+**COMPLETATO NEL PROPRIO SCOPE TECNICO. FASE 7D ANCORA APERTA.**
 
-Confrontare sui dati reali almeno:
+Run reale sul GMD completo:
 
-- pool general beat 4/4;
-- pool fill 4/4 separato;
-- `eval_session` preservata come holdout candidato;
-- split session-grouped;
-- split drummer-held-out;
-- coverage e distribuzioni per entrambe le strategie.
+- 1.150 record nel candidate manifest;
+- 451 `general-beat-4/4` non-eval;
+- 647 `fill-4/4` non-eval;
+- 12 non-4/4 non-eval;
+- 40 `eval_session` preservati come holdout candidato;
+- 1.098 record 4/4 non-eval eleggibili.
 
-Nessun training e nessuna promozione `DRUM DATA READY V2` prima del confronto.
+Candidate split confrontate:
+
+- session-grouped: `878 / 111 / 109`, 20 session group, 0 cross-task-split;
+- drummer-held-out: `930 / 98 / 70`, 10 drummer group, 0 cross-task-split;
+- holdout performer candidati: validation `drummer3`, test `drummer8`.
+
+Il `sourceSplit` ufficiale GMD resta `source-reference-only`. Il Block2 non sceglie automaticamente lo split FAME finale: la policy resta da fissare in base alla domanda di generalizzazione prima della materializzazione del corpus.
+
+`DRUM DATA READY V2` resta aperto e il training serio resta chiuso.
+
+Dettaglio: [PHASE7D_BLOCK2_CHIUSURA_2026-09-10.md](PHASE7D_BLOCK2_CHIUSURA_2026-09-10.md).
 
 ## 7E — Trap-specific drum source
 
@@ -1820,11 +1830,11 @@ FAME Neural avanza solo quando sappiamo quale di queste proprietà abbiamo realm
 
 ## Recezione operativa — 10 settembre 2026
 
-7D Block2 completato nel proprio scope tecnico; scelta dello split finale e gate 7D ancora aperti. Owned Beats: human reference development aperta, con hardening di integrità descritto nel playbook. Il protocollo W1–W10 del playbook owned-beats e NDR-045 sono recepiti. Il bootstrap prepara inventario e copie, non converte o apre training. Owned-beats è candidata per relazioni cross-track; pilot drums/low-end prima del tonale. HH-TRP conserva il ruolo ufficiale di candidata, da confrontare con l’effettiva resa del pilot; il playbook non la declassa autonomamente. GMD resta fonte generale. Il percorso si colloca nei task dati esistenti e nei gate 7D/7E pertinenti; nessuna nuova fase per hardening o bootstrap.
+7D Block2 completato nel proprio scope tecnico; scelta dello split finale e gate 7D ancora aperti. Owned Beats: Human Reference development finalizzata 8/8, con snapshot append-only e holdout non osservato; l'hardening di integrità resta descritto nel playbook. Il protocollo W1–W10 del playbook owned-beats e NDR-045 sono recepiti. Il bootstrap prepara inventario e copie, non converte o apre training. Owned-beats è candidata per relazioni cross-track; pilot drums/low-end prima del tonale. HH-TRP conserva il ruolo ufficiale di candidata, da confrontare con l’effettiva resa del pilot; il playbook non la declassa autonomamente. GMD resta fonte generale. Il percorso si colloca nei task dati esistenti e nei gate 7D/7E pertinenti; nessuna nuova fase per hardening o bootstrap.
 
 La selezione session-grouped / drummer-held-out in Block2 deve riflettere la domanda di generalizzazione e i vincoli dei dati; non si sceglie usando i risultati del test finale. Il training resta chiuso.
 
-### Checkpoint operativo owned-beats — 10 settembre 2026
+### Checkpoint operativo owned-beats — aggiornato 11 settembre 2026
 
 Stato raggiunto nel percorso proprietario audio→MIDI:
 
@@ -1838,7 +1848,8 @@ Stato raggiunto nel percorso proprietario audio→MIDI:
 - review/import delle decisioni umane disponibile e testato, incluso il campo `split`;
 - baseline `owned-beats-audio-analysis-v1` implementata e smoke-tested;
 - preview reale Audio Analysis completato sugli 8 development;
-- meter e section detection restano candidate e non ancora validate;
+- Human Reference development finalizzata e riconfermata post-hardening: 8/8 family, 24/24 finestre `COMPLETE`, reviewId `audio-analysis-v2-dev-reference-precision-v2`, digest `f63c37bf557a82e32c5a1c58b381501e043ff6e08832b7a3434742521521fa18`; la precision-v1 resta storico immutato;
+- meter e section detection restano candidate fino al confronto reference-scored V1/V2;
 - nessun risultato Audio Analysis è stato promosso a ground truth o task-ready;
 - evaluation holdout escluso dal tuning della V2;
 - Source Separation resta successiva all'Audio Analysis;
@@ -1849,4 +1860,4 @@ Questo checkpoint congela baseline V1 e split prima del tuning successivo. Non c
 
 Prossimo passo owned-beats:
 
-AUDIO ANALYSIS V2 sui soli development → congelamento pipeline candidata → valutazione separata sugli evaluation-holdout → SOURCE SEPARATION → AUDIO→MIDI drums/low-end → QA.
+BASELINE V1 reference-scored sui soli development → candidate AUDIO ANALYSIS V2 sui soli development → confronto paired V2−V1 → solo con `V2_WINS`, freeze immutabile della candidata → singola valutazione separata sugli evaluation-holdout → SOURCE SEPARATION → AUDIO→MIDI drums/low-end → QA.

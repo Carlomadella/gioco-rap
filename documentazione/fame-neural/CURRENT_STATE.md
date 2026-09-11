@@ -1,10 +1,10 @@
 # FAME Neural — Current State
 
-Data: 2026-09-10
+Data: 2026-09-11
 
 ## Owned Beats — stato operativo
 
-**Stato aggiornato: 10/09/2026. Conversione audio→MIDI non ancora avviata (`converted: 0`).**
+**Stato aggiornato: 11/09/2026. Conversione audio→MIDI non ancora avviata (`converted: 0`).**
 
 | Attività | Stato | Evidenza / prossimo vincolo |
 |---|---|---|
@@ -14,8 +14,9 @@ Data: 2026-09-10
 | Composition family corpus proprietario | **COMPLETATO** | 131/131 record confermati umanamente come composizioni distinte; 131 `compositionFamilyId` unici, 0 record senza family |
 | Diversità musicale pilot | **DA COMPLETARE** | tempo, densità, low-end, articolazioni e difficoltà ancora da verificare sul pilot |
 | Evaluation holdout | **COMPLETATO** | 10 composition family congelate in `evaluation-holdout` prima del tuning V2; 8 development, overlap 0, 113 record ancora senza split |
+| Human Reference development | **COMPLETATA** | reference definitiva post-hardening: 8/8 family, 24/24 finestre `COMPLETE`; reviewId `audio-analysis-v2-dev-reference-precision-v2`; digest `f63c37bf557a82e32c5a1c58b381501e043ff6e08832b7a3434742521521fa18`; precision-v1 preservata come storico; holdout non osservato |
 | Ambiente tecnico Audio Analysis | **COMPLETATO** | FFmpeg/ffprobe 9.0.1 + Python 3.14 + stack audio verificata |
-| Audio Analysis pilot | **IN CORSO** | smoke PASS + preview reale 8/8; BPM/beat grid promettenti, meter e segmentazione ancora da validare/tarare; nessun apply |
+| Audio Analysis pilot | **IN CORSO** | V1 preview reale 8/8 già disponibile; Human Reference finalizzata; prossimo step baseline V1 reference-scored prima del tuning V2; nessun holdout aperto |
 | Source Separation pilot | **DA FARE** | successiva all'Audio Analysis |
 | Trascrizione Audio→MIDI pilot | **DA FARE** | drums/low-end prima; tonal successivamente |
 | QA pilot | **DA FARE** | metriche automatiche e giudizio umano separati |
@@ -652,9 +653,9 @@ dataset Trap/Drill potenzialmente utile per drum specialization, ma di natura al
 
 ## Prossimo intervento ufficiale
 
-**7D Block2 completato nel proprio scope tecnico; Fase 7D ancora aperta. Owned Beats: raccolta human reference development aperta.**
+**7D Block2 completato nel proprio scope tecnico; Fase 7D ancora aperta. Owned Beats: Human Reference development finalizzata 8/8; baseline V1 reference-scored da congelare/eseguire prima del tuning V2.**
 
-1. Completare e verificare le reference sulle 8 family development con il tool corretto; nessun tuning o conversione avviato da questo hardening.
+1. Human Reference development completata e finalizzata sulle 8 family; congelare ora evaluator/contratto della baseline V1 prima di osservare i punteggi. Nessun tuning o conversione è stato aperto dalla raccolta.
 2. Confrontare V1/V2 secondo `owned-beats/audio-analysis-v2-protocol.json`, conservando anche esiti negativi e reference incerte.
 3. Holdout accessibile solo dopo `V2_WINS` documentato e verifica del freeze di codice/configurazione/ambiente; nessuna apertura effettuata da questa patch.
 4. Per GMD, confrontare copertura e distribuzione separatamente per beat/fill prima di scegliere lo split finale; i manifest Block2 restano candidati.
