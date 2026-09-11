@@ -594,3 +594,14 @@ Nell'editor Human Reference i marker reali (`beatTimesSeconds`) costituiscono l'
 Sono escluse ghost grid, shadow grid o seconde timeline persistenti che possano divergere dai marker reali. Un eventuale futuro stretch deve trasformare direttamente i marker autorevoli. Stato browser/localStorage non viene azzerato o ripristinato sopra il lavoro corrente senza scelta esplicita dell'utente.
 
 `Calcola BPM dai marker` resta una derivazione dal set di marker corrente (mediana degli intervalli validi sulle tre finestre), non un'analisi dell'audio e non una trasformazione della griglia. Differenze diagnostiche fra finestre non vengono normalizzate a forza quando il riascolto con bip conferma coerenza musicale.
+## NDR-048 — precision-v3 e baseline002 sono il riferimento paired corrente di Audio Analysis
+
+Data: 11 settembre 2026. Stato: adottata.
+
+`audio-analysis-v2-dev-reference-precision-v3` è finalizzata con submission digest `6e80e998cf2e5725f346989f707cb59a0b44f218d8909012171d0b9ebbec91af`. La baseline V1 coerente con questa reference è `v1-baseline-development-002`, report SHA256 `4bebe4af0ed4bd8b0d1796432c54099c1705a3494d258c2eb10bc85033e2b714`, congelata sul commit `4cd217a2baa50565b16997ab8cbee8308fc93222`.
+
+Per ogni futura decisione V2 sul development, il confronto paired valido è `V1-v3` contro `V2-v3`. `baseline001 / precision-v2` resta storico e non viene usata come control arm contro una candidata valutata sulla v3.
+
+Il calo osservato fra baseline001 e baseline002 non è una regressione di V1: il sorgente baseline è rimasto congelato. È l'effetto della revisione della reference. La diagnostica delle sezioni può rieseguire le feature V1 ed esporre curve/picchi/scarti, ma non modifica soglie e non conta come configurazione V2. La prima configurazione V2 viene numerata soltanto quando cambia il comportamento candidato.
+
+Holdout, Source Separation, Audio→MIDI e training serio restano chiusi.

@@ -53,6 +53,8 @@ jobs:
         run: python frontend/strumenti/fame-neural-composer/owned-beats/audio-analysis-v1-evaluate-test.py
       - name: Audio Analysis V1 evaluator precision-v3 regression
         run: python frontend/strumenti/fame-neural-composer/owned-beats/audio-analysis-v1-evaluate-v2-test.py
+      - name: Audio Analysis section diagnostics regression
+        run: python frontend/strumenti/fame-neural-composer/owned-beats/audio-analysis-section-diagnostics-v1-test.py
       - name: Owned beats Audio Analysis V2 pre-tuning hardening
         run: python frontend/strumenti/fame-neural-composer/owned-beats-audio-analysis-v2-test.py
 
