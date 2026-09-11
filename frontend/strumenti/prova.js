@@ -1264,6 +1264,428 @@ console.log("\nil tasto di ascolto segue davvero il beat");
     JSON.stringify({partito, ancoraAttivo:tasto.classList.contains("on"), html:tasto.innerHTML}));
 }
 
+/* L'audio nasce in modalita' pregame su ogni nuova pagina. Qualunque percorso
+   porti davvero nella citta' passa poi da GAME.enter(): e' quel confine, non
+   ogni singolo bottone dello Studio, che deve consegnare tutti i canali al
+   gameplay e spegnere la musica del menu. */
+console.log("\nl'ingresso in citta consegna l'audio al gameplay");
+{
+  const vm = require("vm");
+  const zitto = () => {};
+  const scatola = {
+    console:{log:zitto, warn:zitto, error:zitto},
+    Math, Object, Array, String, Number, Boolean, Date, Set, Map, Promise,
+    SET:{audio:{on:true, master:80, music:70, sfx:80, ui:80, beat:85, ambient:70}},
+    document:{addEventListener:zitto},
+    syncEnergy:zitto, openWeek:zitto, pushLog:zitto,
+    renderGioco:zitto, renderHub:zitto,
+    goto:schermata => { scatola.schermata = schermata; },
+    G:{log:[], strada:null},
+    stopMenu:null, schermata:null
+  };
+  scatola.window = scatola;
+  vm.createContext(scatola);
+  vm.runInContext(fs.readFileSync(path.join(RADICE, "js/audio/engine.js"), "utf8"),
+    scatola, {filename:"js/audio/engine.js"});
+  scatola.ADF_AUDIO.music = {
+    stopForGameplay:secondi => { scatola.stopMenu = secondi; }
+  };
+  vm.runInContext(fs.readFileSync(path.join(RADICE, "js/game/entry.js"), "utf8"),
+    scatola, {filename:"js/game/entry.js"});
+
+  const prima = vm.runInContext("ADF_AUDIO.canPlay('beat')", scatola);
+  vm.runInContext("GAME.enter()", scatola);
+  const dopo = vm.runInContext("({mode:ADF_AUDIO.mode, beat:ADF_AUDIO.canPlay('beat')})", scatola);
+
+  controlla("GAME.enter abilita il canale beat anche se il motore nasce in pregame",
+    !prima && dopo.mode === "gameplay" && dopo.beat && scatola.schermata === "hub",
+    JSON.stringify({prima, dopo, schermata:scatola.schermata}));
+  controlla("GAME.enter ferma la musica pregame prima di mostrare la citta",
+    scatola.stopMenu === 1.4,
+    JSON.stringify({stopMenu:scatola.stopMenu}));
+}
+
+/* Aprire il creator sopra una partita gia' avviata non e' un ritorno al menu.
+   Il ponte dell'iframe deve sbloccare il contesto al gesto, senza usare
+   ensureMenu() e risopprimere beat/SFX quando si torna alla schermata sotto. */
+console.log("\nl'editor artista conserva la modalita audio della partita");
+{
+  const vm = require("vm");
+  const zitto = () => {};
+  const eventiWindow = {}, eventiFrame = {};
+  const schermate = [];
+  let ingressi = 0;
+  const documentoFrame = {
+    addEventListener(tipo, fn){ eventiFrame[tipo] = fn; }
+  };
+  let frameCreato = null;
+  function elemento(tag){
+    const attributi = {}, eventi = {};
+    const nodo = {
+      style:{},
+      setAttribute(k, v){ attributi[k] = String(v); },
+      getAttribute(k){ return attributi[k] || null; },
+      appendChild:zitto,
+      addEventListener(tipo, fn){ eventi[tipo] = fn; },
+      __eventi:eventi
+    };
+    if(tag === "iframe"){
+      nodo.contentDocument = documentoFrame;
+      nodo.contentWindow = {postMessage:zitto};
+      frameCreato = nodo;
+    }
+    return nodo;
+  }
+  const scatola = {
+    console:{log:zitto, warn:zitto, error:zitto},
+    Math, Object, Array, String, Number, Boolean, Date, Set, Map, Promise, URLSearchParams,
+    SET:{audio:{on:true, master:80, music:70, sfx:80, ui:80, beat:85, ambient:70}},
+    location:{search:"", pathname:"/pagine/gioco.html"},
+    history:{replaceState:zitto},
+    localStorage:{setItem:zitto, removeItem:zitto},
+    CHIAVE_ARTISTA:() => "artista-test",
+    CHIAVE_PARTITA:() => "partita-test",
+    A:{name:"Artista", city:"Milano", genre:"rap"},
+    G:{log:[], strada:null},
+    syncEnergy:zitto, openWeek:zitto, pushLog:zitto,
+    renderGioco(){ ingressi++; }, renderHub:zitto,
+    goto(schermata){ schermate.push(schermata); },
+    setTimeout:fn => { fn(); return 1; }, clearTimeout:zitto,
+    document:{
+      readyState:"complete",
+      createElement:elemento,
+      addEventListener:zitto,
+      body:{style:{overflow:"scroll"}, appendChild:zitto}
+    },
+    addEventListener(tipo, fn){ eventiWindow[tipo] = fn; }
+  };
+  scatola.window = scatola;
+  vm.createContext(scatola);
+  vm.runInContext(fs.readFileSync(path.join(RADICE, "js/audio/engine.js"), "utf8"),
+    scatola, {filename:"js/audio/engine.js"});
+  scatola.ADF_AUDIO.music = {
+    ensureMenu(){ scatola.ADF_AUDIO.setMode("pregame"); },
+    stopForGameplay:secondi => { scatola.stopMenu = secondi; }
+  };
+  vm.runInContext("ADF_AUDIO.setMode('gameplay')", scatola);
+  vm.runInContext(fs.readFileSync(path.join(RADICE, "js/creator/rpg-v24-bridge.js"), "utf8"),
+    scatola, {filename:"js/creator/rpg-v24-bridge.js"});
+
+  vm.runInContext("ADF_RPG_V24.openAppearance()", scatola);
+  frameCreato.__eventi.load();
+  eventiFrame.pointerdown();
+  const frameAspettoChiuso = frameCreato;
+  eventiWindow.message({source:frameCreato.contentWindow,
+    data:{type:"adf-rpg-v24-appearance-cancel"}});
+  const risultato = vm.runInContext(
+    "({mode:ADF_AUDIO.mode, beat:ADF_AUDIO.canPlay('beat')})", scatola);
+
+  controlla("chiudere l'editor dell'aspetto lascia disponibili i beat",
+    risultato.mode === "gameplay" && risultato.beat,
+    JSON.stringify(risultato));
+
+  eventiWindow.message({source:frameAspettoChiuso.contentWindow,
+    data:{type:"adf-rpg-v24-career-intro-start"}});
+  const dopoMessaggioVecchio = vm.runInContext(
+    "({mode:ADF_AUDIO.mode, beat:ADF_AUDIO.canPlay('beat')})", scatola);
+  controlla("i messaggi di una sessione creator chiusa vengono ignorati",
+    dopoMessaggioVecchio.mode === "gameplay" && dopoMessaggioVecchio.beat,
+    JSON.stringify(dopoMessaggioVecchio));
+
+  vm.runInContext("ADF_AUDIO.setMode('gameplay'); ADF_RPG_V24.openAppearance()", scatola);
+  const frameMenuAspetto = frameCreato;
+  eventiWindow.message({source:frameMenuAspetto.contentWindow,
+    data:{type:"adf-rpg-v24-career-intro-start"}});
+  const duranteAspetto = vm.runInContext("ADF_AUDIO.mode", scatola);
+  controlla("l'editor aspetto non puo avviare la fase cinematic",
+    duranteAspetto === "gameplay", JSON.stringify({duranteAspetto}));
+  eventiWindow.message({source:frameMenuAspetto.contentWindow,
+    data:{type:"adf-rpg-v24-cancel"}});
+  eventiWindow.message({source:frameMenuAspetto.contentWindow,
+    data:{type:"adf-rpg-v24-appearance-updated", detail:{
+      avatarSource:"local", avatarData:{localAvatar:{preset:"tardivo"}}
+    }}});
+  controlla("il tasto Menu chiude e invalida anche una sessione solo aspetto",
+    scatola.document.body.style.overflow === "scroll" &&
+      scatola.A.localAvatar?.preset !== "tardivo",
+    JSON.stringify({overflow:scatola.document.body.style.overflow,
+      preset:scatola.A.localAvatar?.preset||null}));
+
+  /* Anche la close pubblica puo' interrompere un creator durante l'intro:
+     deve ripristinare la fase precedente e invalidare quel WindowProxy. */
+  vm.runInContext("ADF_AUDIO.setMode('gameplay'); ADF_RPG_V24.open()", scatola);
+  const frameIntroChiuso = frameCreato;
+  eventiWindow.message({source:frameIntroChiuso.contentWindow,
+    data:{type:"adf-rpg-v24-career-intro-start"}});
+  vm.runInContext("ADF_RPG_V24.close()", scatola);
+  const dopoClosePubblica = vm.runInContext(
+    "({mode:ADF_AUDIO.mode, beat:ADF_AUDIO.canPlay('beat')})", scatola);
+  controlla("la close pubblica ripristina l'audio precedente anche durante l'intro",
+    dopoClosePubblica.mode === "gameplay" && dopoClosePubblica.beat,
+    JSON.stringify(dopoClosePubblica));
+
+  vm.runInContext("ADF_RPG_V24.open()", scatola);
+  eventiWindow.message({source:frameIntroChiuso.contentWindow,
+    data:{type:"adf-rpg-v24-complete", detail:{
+      name:"Sessione vecchia", city:"Roma", genre:"trap", avatarSource:"local",
+      avatarData:{localAvatar:{preset:"vecchio"}}, answers:[]
+    }}});
+  controlla("un complete tardivo non puo entrare in gioco dopo la close",
+    ingressi === 0 && scatola.A.name === "Artista",
+    JSON.stringify({ingressi, nome:scatola.A.name}));
+  vm.runInContext("ADF_RPG_V24.close()", scatola);
+
+  let callbackAnnullato = 0;
+  scatola.__ADF_DOPO_CREAZIONE = () => { callbackAnnullato++; };
+  vm.runInContext("ADF_RPG_V24.open()", scatola);
+  eventiWindow.message({source:frameCreato.contentWindow,
+    data:{type:"adf-rpg-v24-cancel"}});
+  controlla("annullare una creazione elimina il callback della sessione",
+    scatola.__ADF_DOPO_CREAZIONE == null && callbackAnnullato === 0,
+    JSON.stringify({callbackPresente:scatola.__ADF_DOPO_CREAZIONE != null, callbackAnnullato}));
+
+  ingressi = 0;
+  schermate.length = 0;
+
+  /* Il percorso "Il tuo artista" entra nel creator senza il callback usato
+     dalla nuova partita: al completamento passa dal fallback del bridge. */
+  scatola.location.search = "?vai=profilo";
+  vm.runInContext(fs.readFileSync(path.join(RADICE, "js/game/entry.js"), "utf8"),
+    scatola, {filename:"js/game/entry.js"});
+  vm.runInContext(fs.readFileSync(path.join(RADICE, "js/gioco-ingresso.js"), "utf8"),
+    scatola, {filename:"js/gioco-ingresso.js"});
+  const primaProfilo = vm.runInContext("ADF_AUDIO.canPlay('beat')", scatola);
+  vm.runInContext("ADF_RPG_V24.open()", scatola);
+  eventiWindow.message({
+    source:frameCreato.contentWindow,
+    data:{
+      type:"adf-rpg-v24-complete",
+      detail:{name:"Artista", city:"Milano", genre:"rap", avatarSource:"local",
+        avatarData:{localAvatar:{preset:"base"}}, answers:[]}
+    }
+  });
+  const dopoProfilo = vm.runInContext(
+    "({mode:ADF_AUDIO.mode, beat:ADF_AUDIO.canPlay('beat')})", scatola);
+
+  controlla("tornare dal profilo entra una volta in gameplay con i beat disponibili",
+    !primaProfilo && ingressi === 1 && schermate.at(-1) === "hub" &&
+      dopoProfilo.mode === "gameplay" && dopoProfilo.beat,
+    JSON.stringify({primaProfilo, ingressi, schermate, dopoProfilo}));
+}
+
+/* Un retry nato per un iframe non deve mai proseguire sul creator aperto dopo:
+   altrimenti l'avvio rapido o lo sblocco visuale della vecchia sessione si
+   applicano a quella nuova. */
+console.log("\nil polling del creator appartiene a una sola sessione");
+{
+  const vm = require("vm");
+  const zitto = () => {};
+  const timer = [];
+  const frameVecchio = {style:{}, contentDocument:{}, contentWindow:{}};
+  const frameNuovo = {
+    style:{visibility:"hidden"},
+    contentDocument:{},
+    contentWindow:{playCareerIntro:zitto}
+  };
+  let frameCorrente = null;
+  const scatola = {
+    console:{log:zitto, warn:zitto, error:zitto},
+    Math, JSON, URLSearchParams,
+    location:{search:"?nuova=creatore", pathname:"/pagine/gioco.html"},
+    history:{replaceState:zitto},
+    localStorage:{removeItem:zitto},
+    CHIAVE_ARTISTA:() => "artista-test", CHIAVE_PARTITA:() => "partita-test",
+    A:{name:"", city:"", genre:null}, G:{strada:null},
+    $:() => null, goto:zitto,
+    ADF_AUDIO:{setMode:zitto, music:{ensureMenu:zitto}},
+    ADF_RPG_V24:{open(){ frameCorrente = frameVecchio; }},
+    document:{
+      getElementById:id => id === "adf-rpg-v24-frame" ? frameCorrente : null,
+      createElement:() => ({}),
+      readyState:"complete", addEventListener:zitto
+    },
+    setTimeout:fn => { timer.push(fn); return timer.length; }, clearTimeout:zitto
+  };
+  scatola.window = scatola;
+  vm.createContext(scatola);
+  vm.runInContext(fs.readFileSync(path.join(RADICE, "js/gioco-ingresso.js"), "utf8"),
+    scatola, {filename:"js/gioco-ingresso.js"});
+
+  frameCorrente = frameNuovo;
+  const retryVecchio = timer.shift();
+  if(retryVecchio) retryVecchio();
+
+  controlla("un retry vecchio non puo sbloccare l'iframe della sessione nuova",
+    frameNuovo.style.visibility === "hidden",
+    JSON.stringify({visibility:frameNuovo.style.visibility, retryCreato:!!retryVecchio}));
+}
+
+/* Le funzioni del player applicano una transizione, ma non devono inventarla:
+   ensureMenu appartiene esclusivamente al pregame; stopForGameplay deve invece
+   consegnare al gameplay anche il vero proprietario del player nella shell. */
+console.log("\nla musica rispetta la fase audio corrente");
+{
+  const vm = require("vm");
+  const zitto = () => {};
+  let ultimoAudio = null;
+  function AudioFinto(){
+    ultimoAudio = this;
+    this.currentTime = 0;
+    this.duration = 377;
+    this.paused = true;
+    this.ended = false;
+    this.volume = 1;
+  }
+  AudioFinto.prototype.addEventListener = zitto;
+  AudioFinto.prototype.removeEventListener = zitto;
+  AudioFinto.prototype.play = function(){ this.paused = false; };
+  AudioFinto.prototype.pause = function(){ this.paused = true; };
+  const memoria = new Map();
+  const scatola = {
+    console:{log:zitto, warn:zitto, error:zitto},
+    Math, Object, Array, String, Number, Boolean, Date, Set, Map, Promise, URL,
+    Audio:AudioFinto,
+    SET:{audio:{on:true, master:80, music:70, sfx:80, ui:80, beat:85, ambient:70}},
+    location:{pathname:"/pagine/landing.html"},
+    navigator:{userActivation:{isActive:false}},
+    sessionStorage:{
+      getItem:k => memoria.has(k) ? memoria.get(k) : null,
+      setItem:(k, v) => memoria.set(k, String(v)),
+      removeItem:k => memoria.delete(k)
+    },
+    document:{
+      baseURI:"https://example.test/",
+      addEventListener:zitto,
+      getElementById:() => null
+    },
+    addEventListener:zitto, dispatchEvent:zitto,
+    CustomEvent:function(tipo, opzioni){ this.type = tipo; this.detail = opzioni.detail; },
+    setInterval:() => 1, clearInterval:zitto,
+    setTimeout:() => 1, clearTimeout:zitto
+  };
+  scatola.window = scatola;
+  scatola.parent = scatola;
+  vm.createContext(scatola);
+  vm.runInContext(fs.readFileSync(path.join(RADICE, "js/audio/engine.js"), "utf8"),
+    scatola, {filename:"js/audio/engine.js"});
+  vm.runInContext(fs.readFileSync(path.join(RADICE, "js/audio/music.js"), "utf8"),
+    scatola, {filename:"js/audio/music.js"});
+
+  vm.runInContext("ADF_AUDIO.setMode('gameplay'); ADF_AUDIO.music.ensureMenu()", scatola);
+  const dopoEnsure = vm.runInContext("ADF_AUDIO.mode", scatola);
+  vm.runInContext("ADF_AUDIO.setMode('cinematic'); ADF_AUDIO.music.stopForGameplay(0)", scatola);
+  const dopoStop = vm.runInContext("ADF_AUDIO.mode", scatola);
+
+  controlla("ensureMenu non puo retrocedere una partita attiva a pregame",
+    dopoEnsure === "gameplay", JSON.stringify({dopoEnsure}));
+  controlla("stopForGameplay sincronizza il proprietario del player su gameplay",
+    dopoStop === "gameplay", JSON.stringify({dopoStop}));
+
+  vm.runInContext(
+    "ADF_AUDIO.setMode('pregame'); ADF_AUDIO.music.ensureMenu();" +
+    "ADF_AUDIO.music.startCinematic(2); ADF_AUDIO.setMode('pregame');" +
+    "ADF_AUDIO.music.ensureMenu()",
+    scatola);
+  controlla("annullare un fade rende di nuovo udibile la musica menu",
+    ultimoAudio && ultimoAudio.volume > 0,
+    JSON.stringify({volume:ultimoAudio && ultimoAudio.volume}));
+}
+
+/* Anche il proxy installato nel documento figlio deve rispettare lo stesso
+   contratto: non delega richieste menu nate nel gameplay e propaga al parent
+   soltanto transizioni deliberate. */
+{
+  const vm = require("vm");
+  const zitto = () => {};
+  let delegheMenu = 0, delegheGameplay = 0;
+  const parentAudio = {
+    mode:"gameplay",
+    setMode(next){ this.mode = next; },
+    music:{
+      ensureMenu(){ delegheMenu++; return Promise.resolve(true); },
+      stopForGameplay(){ delegheGameplay++; parentAudio.setMode("gameplay"); },
+      startCinematic(){ parentAudio.setMode("cinematic"); },
+      get playing(){ return false; },
+      track:"dream-catcher"
+    }
+  };
+  const parent = {ADF_APP_SHELL:{}, ADF_AUDIO:parentAudio};
+  const scatola = {
+    console:{log:zitto, warn:zitto, error:zitto},
+    Math, Object, Array, String, Number, Boolean, Date, Set, Map, Promise,
+    SET:{audio:{on:true, master:80, music:70, sfx:80, ui:80, beat:85, ambient:70}},
+    document:{addEventListener:zitto},
+    addEventListener:zitto, dispatchEvent:zitto,
+    CustomEvent:function(tipo, opzioni){ this.type = tipo; this.detail = opzioni.detail; }
+  };
+  scatola.window = scatola;
+  scatola.parent = parent;
+  vm.createContext(scatola);
+  vm.runInContext(fs.readFileSync(path.join(RADICE, "js/audio/engine.js"), "utf8"),
+    scatola, {filename:"js/audio/engine.js"});
+  vm.runInContext(fs.readFileSync(path.join(RADICE, "js/audio/music.js"), "utf8"),
+    scatola, {filename:"js/audio/music.js"});
+
+  vm.runInContext("ADF_AUDIO.setMode('gameplay'); ADF_AUDIO.music.ensureMenu()", scatola);
+  controlla("il proxy non riaccende la musica menu dal gameplay",
+    delegheMenu === 0, JSON.stringify({delegheMenu}));
+
+  delegheMenu = 0;
+  parentAudio.setMode("gameplay");
+  vm.runInContext("ADF_AUDIO.setMode('pregame'); ADF_AUDIO.music.ensureMenu()", scatola);
+  controlla("una transizione pregame esplicita sincronizza anche il parent",
+    delegheMenu === 1 && parentAudio.mode === "pregame",
+    JSON.stringify({delegheMenu, parentMode:parentAudio.mode}));
+
+  vm.runInContext("ADF_AUDIO.setMode('cinematic'); ADF_AUDIO.music.stopForGameplay(0)", scatola);
+  const childDopoStop = vm.runInContext("ADF_AUDIO.mode", scatola);
+  controlla("il proxy stopForGameplay sincronizza anche il documento figlio",
+    delegheGameplay === 1 && childDopoStop === "gameplay" && parentAudio.mode === "gameplay",
+    JSON.stringify({delegheGameplay, childDopoStop, parentMode:parentAudio.mode}));
+}
+
+/* La landing resta viva sotto la shell e possiede il player reale. Quando il
+   frame viene chiuso deve tornare esplicitamente al pregame e riattivare la
+   musica menu, qualunque fosse la fase lasciata dal documento figlio. */
+console.log("\nla shell ripristina la landing quando il gioco si chiude");
+{
+  const vm = require("vm");
+  const zitto = () => {};
+  let menuRipreso = 0;
+  const frame = {
+    style:{},
+    setAttribute:zitto,
+    remove(){ this.rimosso = true; },
+    contentWindow:{focus:zitto}
+  };
+  const scatola = {
+    console:{log:zitto, warn:zitto, error:zitto}, URL, Object,
+    location:{href:"https://example.test/pagine/landing.html"},
+    document:{
+      baseURI:"https://example.test/",
+      documentElement:{style:{overflow:"auto"}},
+      body:{style:{overflow:"auto"}, appendChild:zitto},
+      createElement:() => frame
+    },
+    ADF_AUDIO:{
+      mode:"gameplay",
+      setMode(next){ this.mode = next; },
+      music:{ensureMenu(){ menuRipreso++; return Promise.resolve(true); }}
+    }
+  };
+  scatola.window = scatola;
+  scatola.parent = scatola;
+  vm.createContext(scatola);
+  vm.runInContext(fs.readFileSync(path.join(RADICE, "js/pagine.js"), "utf8"),
+    scatola, {filename:"js/pagine.js"});
+  vm.runInContext("ADF_APP_SHELL.navigate('https://example.test/pagine/gioco.html')", scatola);
+  vm.runInContext("ADF_APP_SHELL.close()", scatola);
+
+  controlla("chiudere la shell rimette il parent in pregame e riprende la musica",
+    scatola.ADF_AUDIO.mode === "pregame" && menuRipreso === 1 && frame.rimosso === true,
+    JSON.stringify({mode:scatola.ADF_AUDIO.mode, menuRipreso, rimosso:frame.rimosso}));
+}
+
 /* Il massimo dell'energia può cambiare con la progressione: il nuovo giorno
    deve riempire la riserva disponibile, non aggiungere una quota fissa. */
 console.log("\nl'energia torna piena a ogni nuovo giorno");

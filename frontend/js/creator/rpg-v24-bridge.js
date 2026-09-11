@@ -4,6 +4,7 @@
   const SRC_NORMALE = "media/creator-rpg-v24/creator.html?v=25";
   let overlay=null, frame=null;
   let modalita="normal";
+  let aperta=false, overflowPrima="", faseAudioPrima=null;
 
   function ensure(){
     if(overlay) return;
@@ -27,8 +28,16 @@
         const wake = () => {
           try{
             if(!window.ADF_AUDIO) return;
-            if(ADF_AUDIO.mode === "cinematic"){ ADF_AUDIO.unlock(); return; }
-            if(ADF_AUDIO.music) ADF_AUDIO.music.ensureMenu();
+            /* Il creator puo' aprirsi sia prima della carriera sia sopra una
+               partita gia' attiva. Solo il pregame possiede la musica menu:
+               durante gameplay/cinematic il gesto deve sbloccare il contesto
+               senza cambiare modalita' e sopprimere beat o SFX. */
+            if(ADF_AUDIO.mode === "pregame" && ADF_AUDIO.music &&
+               typeof ADF_AUDIO.music.ensureMenu === "function"){
+              ADF_AUDIO.music.ensureMenu();
+            }else{
+              ADF_AUDIO.unlock();
+            }
           }catch(e){}
         };
         doc.addEventListener("pointerdown", wake, {capture:true});
@@ -49,6 +58,9 @@
 
   function mostra(){
     ensure();
+    overflowPrima=document.body?.style?.overflow||"";
+    faseAudioPrima=window.ADF_AUDIO?.mode||null;
+    aperta=true;
     overlay.style.display="block";
     overlay.setAttribute("aria-hidden","false");
     document.body.style.overflow="hidden";
@@ -72,21 +84,76 @@
     }catch(e){}
   }
 
-  function open(){
-    modalita="normal";
+  function avvia(tipo){
+    if(aperta){
+      if(modalita===tipo) return;
+      terminaSessione(true);
+    }
+    modalita=tipo;
     mostra();
   }
 
-  function openAppearance(){
-    modalita="appearance";
-    mostra();
+  function open(){ avvia("normal"); }
+
+  function openAppearance(){ avvia("appearance"); }
+
+  function ripristinaAudio(fase){
+    try{
+      const audio=window.ADF_AUDIO;
+      if(!audio || !fase) return;
+
+      if(fase==="pregame"){
+        audio.setMode("pregame");
+        if(audio.music && typeof audio.music.ensureMenu==="function")
+          audio.music.ensureMenu();
+        return;
+      }
+
+      if(fase==="gameplay"){
+        audio.setMode("gameplay");
+        if(audio.music && typeof audio.music.stopForGameplay==="function")
+          audio.music.stopForGameplay(0);
+        return;
+      }
+
+      if(fase==="cinematic" && audio.music &&
+         typeof audio.music.startCinematic==="function"){
+        audio.music.startCinematic(0);
+      }else{
+        audio.setMode(fase);
+      }
+    }catch(e){}
+  }
+
+  /* Ogni apertura e' una sessione isolata. Rimuovere l'iframe distrugge il
+     suo browsing context, quindi timer e postMessage tardivi non possono
+     contaminare la sessione successiva. */
+  function terminaSessione(deveRipristinareAudio){
+    if(!aperta && !overlay) return;
+    const faseDaRipristinare=faseAudioPrima;
+    aperta=false;
+
+    if(overlay){
+      overlay.style.display="none";
+      overlay.setAttribute("aria-hidden","true");
+      try{ overlay.remove(); }
+      catch(e){
+        try{ overlay.parentNode?.removeChild(overlay); }catch(err){}
+      }
+    }
+
+    document.body.style.overflow=overflowPrima;
+    overlay=null;
+    frame=null;
+    modalita="normal";
+    faseAudioPrima=null;
+
+    if(deveRipristinareAudio) ripristinaAudio(faseDaRipristinare);
   }
 
   function close(){
-    if(!overlay) return;
-    overlay.style.display="none";
-    overlay.setAttribute("aria-hidden","true");
-    document.body.style.overflow="";
+    if(aperta && modalita==="normal") window.__ADF_DOPO_CREAZIONE=null;
+    terminaSessione(true);
   }
 
   function applicaAvatar(source,av){
@@ -139,7 +206,7 @@
   }
 
   window.addEventListener("message",e=>{
-    if(!frame || e.source!==frame.contentWindow) return;
+    if(!aperta || !frame || e.source!==frame.contentWindow) return;
     const m=e.data||{};
 
     if(m.type==="adf-rpg-v24-ready"){
@@ -148,32 +215,34 @@
     }
 
     if(m.type==="adf-rpg-v24-cancel"){
+      const eraCreazione=modalita==="normal";
       const nuovaAnnullata =
+        eraCreazione &&
         typeof window.ADF_ANNULLA_NUOVO_SLOT === "function" &&
         window.ADF_ANNULLA_NUOVO_SLOT();
 
-      close();
-      modalita="normal";
+      if(eraCreazione) window.__ADF_DOPO_CREAZIONE=null;
+      terminaSessione(true);
 
       if(nuovaAnnullata) vaiA("landing");
       return;
     }
 
     if(m.type==="adf-rpg-v24-appearance-cancel"){
-      close();
-      modalita="normal";
+      if(modalita!=="appearance") return;
+      terminaSessione(true);
       return;
     }
 
     if(m.type==="adf-rpg-v24-appearance-updated"){
       if(modalita!=="appearance") return;
       if(!salvaAspetto(m.detail||{})) return;
-      close();
-      modalita="normal";
+      terminaSessione(true);
       return;
     }
 
     if(m.type==="adf-rpg-v24-career-intro-start"){
+      if(modalita!=="normal") return;
       try{
         if(window.ADF_AUDIO){
           if(ADF_AUDIO.music && typeof ADF_AUDIO.music.startCinematic === "function"){
@@ -188,9 +257,9 @@
     }
 
     if(m.type==="adf-rpg-v24-complete"){
+      if(modalita!=="normal") return;
       if(!salvaRisultato(m.detail||{})) return;
-      close();
-      modalita="normal";
+      terminaSessione(false);
 
       if(typeof window.__ADF_DOPO_CREAZIONE === "function"){
         const dopo = window.__ADF_DOPO_CREAZIONE;
@@ -199,7 +268,6 @@
         return;
       }
 
-      if(typeof goto==="function") goto("hub");
       if(window.GAME) window.GAME.enter();
     }
   });

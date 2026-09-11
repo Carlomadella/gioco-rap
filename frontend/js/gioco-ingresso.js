@@ -41,12 +41,6 @@
     if(ADF_AUDIO.music) ADF_AUDIO.music.ensureMenu();
   }
 
-  function audioGameplay(){
-    if(!window.ADF_AUDIO) return;
-    ADF_AUDIO.setMode("gameplay");
-    if(ADF_AUDIO.music) ADF_AUDIO.music.stopForGameplay(1.4);
-  }
-
   function pulisci(){
     try{
       history.replaceState(null, "", location.pathname);
@@ -54,9 +48,6 @@
   }
 
   function entraInCitta(){
-    audioGameplay();
-    goto("hub");
-
     if(window.GAME) window.GAME.enter();
 
     if(
@@ -96,19 +87,20 @@
     return true;
   }
 
-  function quandoCreatorPronto(callback, tentativo){
+  function quandoCreatorPronto(frameAtteso, callback, tentativo){
     tentativo = tentativo || 0;
 
-    const frame = frameCreator();
+    /* Il bridge distrugge l'iframe a ogni chiusura. Un retry nato per una
+       sessione non deve mai agganciarsi al frame creato da quella seguente. */
+    if(!frameAtteso || frameCreator() !== frameAtteso) return;
 
     try{
       if(
-        frame &&
-        frame.contentDocument &&
-        frame.contentWindow &&
-        typeof frame.contentWindow.playCareerIntro === "function"
+        frameAtteso.contentDocument &&
+        frameAtteso.contentWindow &&
+        typeof frameAtteso.contentWindow.playCareerIntro === "function"
       ){
-        callback(frame);
+        callback(frameAtteso);
         return;
       }
     }catch(e){}
@@ -119,7 +111,7 @@
     }
 
     setTimeout(
-      () => quandoCreatorPronto(callback, tentativo + 1),
+      () => quandoCreatorPronto(frameAtteso, callback, tentativo + 1),
       50
     );
   }
@@ -233,7 +225,7 @@
          "Editor locale" prima della sostituzione. */
       if(frame) frame.style.visibility = "hidden";
 
-      quandoCreatorPronto(f => {
+      quandoCreatorPronto(frame, f => {
         /* Nel flusso normale non installiamo più il placeholder:
            il creator apre davvero Avaturn oppure MakeHuman. */
         f.style.visibility = "";
@@ -312,7 +304,7 @@
     /* Nessun flash di avatar / identità / RPG. */
     if(frame) frame.style.visibility = "hidden";
 
-    quandoCreatorPronto(f => {
+    quandoCreatorPronto(frame, f => {
       installaPresetTemporaneo(f);
 
       const payload = JSON.stringify(rapido);

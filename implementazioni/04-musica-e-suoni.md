@@ -363,3 +363,39 @@ compreso l'SVG usato nello Studio, e rimuove lo stato acceso quando si ripreme
 il tasto, parte un altro beat o termina l'anteprima. Una regressione in
 `strumenti/prova.js` riproduce il doppio click e verifica insieme arresto,
 classe visuale e ripristino dell'icona.
+
+---
+
+## Studio · I beat restano disponibili in ogni ingresso alla partita
+
+> «Nella sezione Beat dello Studio, quando clicco sul tasto play di un beat mi
+> dice: “L'audio dei beat è spento o non disponibile in questa fase”.»
+
+**FATTO (11/09/2026)** — il problema non era nel singolo pulsante: alcune
+strade mostravano Hub e Studio lasciando il motore audio in `pregame` o
+`cinematic`, modalità che sopprimono intenzionalmente il canale `beat`.
+
+La fase `gameplay` viene ora consegnata da un unico confine, `GAME.enter()`,
+prima di mostrare l'Hub. Questo vale per ripresa, nuova carriera, avvio rapido,
+classifiche e ritorno dal profilo. La musica non può più cambiare fase come
+effetto collaterale: `ensureMenu()` funziona soltanto in `pregame`, mentre
+`stopForGameplay()` sincronizza `gameplay` anche tra iframe e parent della app
+shell. Chiudendo il gioco, la landing torna esplicitamente in `pregame` e
+riprende la sua musica.
+
+È stato sistemato anche il lifecycle completo del creator. Aprire l'editor
+aspetto sopra una partita non spegne più beat e SFX; annulla, Menu e close
+ripristinano la fase audio precedente. Ogni chiusura distrugge l'iframe della
+sessione, così timer e `postMessage` tardivi non possono salvare dati, avviare
+una cinematic o entrare in gioco dopo un annullamento o una riapertura.
+
+Le regressioni in `strumenti/prova.js` esercitano il motore reale e verificano
+ingresso dal profilo, editor aspetto, close durante la cinematic, messaggi di
+sessioni vecchie, callback annullati, sincronizzazione parent/child e ritorno
+alla landing. Coprono inoltre il ritorno al menu durante un fade e impediscono
+ai retry di un vecchio iframe di pilotare una nuova sessione creator. Totale
+prova mirata: **117 controlli superati, 0 errori**.
+
+File toccati: `js/audio/music.js`, `js/creator/rpg-v24-bridge.js`,
+`js/game/entry.js`, `js/gioco-ingresso.js`, `js/pagine.js`, le tre pagine HTML
+per il cache busting e `strumenti/prova.js`.

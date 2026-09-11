@@ -124,6 +124,18 @@ function creaAppShell(){
         bodyOverflow;
 
     navigazioneInCorso = false;
+
+    /* La landing top-level e il suo player sono rimasti vivi sotto il frame.
+       Il ritorno e' una vera transizione al pregame, anche se il gioco aveva
+       lasciato il parent in gameplay o cinematic. */
+    try{
+      const audio = window.ADF_AUDIO;
+      if(audio){
+        audio.setMode("pregame");
+        if(audio.music && typeof audio.music.ensureMenu === "function")
+          audio.music.ensureMenu();
+      }
+    }catch(e){}
   }
 
   const api = {

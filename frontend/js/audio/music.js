@@ -64,13 +64,30 @@
     }
 
     function proxyStopGameplay(seconds){
+      try{
+        ADF_AUDIO.setMode("gameplay");
+      }catch(e){}
+
       return parentMusic.stopForGameplay(seconds);
     }
 
+    function proxyEnsureMenu(){
+      /* Il player del parent non deve trasformare una richiesta accidentale
+         in una transizione di fase del documento figlio. */
+      if(ADF_AUDIO.mode !== "pregame"){
+        try{ ADF_AUDIO.unlock(); }catch(e){}
+        return Promise.resolve(false);
+      }
+
+      try{
+        window.parent.ADF_AUDIO.setMode("pregame");
+      }catch(e){}
+
+      return parentMusic.ensureMenu();
+    }
+
     ADF_AUDIO.music = {
-      ensureMenu(){
-        return parentMusic.ensureMenu();
-      },
+      ensureMenu:proxyEnsureMenu,
 
       preparePageHandoff(){
         /* Il player è nel parent: nessun handoff necessario. */
@@ -215,11 +232,21 @@
     pending = false; revealAfterPlay(); saveState(); return Promise.resolve(true);
   }
   function ensureMenu(){
-    /* Durante la intro un gesto non deve riaccendere Dream Catcher. */
-    if(ADF_AUDIO.mode === "cinematic") return Promise.resolve(false);
+    /* Avviare la musica e cambiare fase sono responsabilita' diverse: solo
+       chi ha gia' dichiarato il pregame puo' chiedere Dream Catcher. */
+    if(ADF_AUDIO.mode !== "pregame") return Promise.resolve(false);
+
+    /* Se torniamo al menu durante il fade, il timer non deve lasciare lo
+       stream vivo ma definitivamente a gain zero. Il prossimo play completa
+       un nuovo reveal a partire dal livello raggiunto. */
+    const stopInCorso = !!stopTimer;
+    clearTimeout(stopTimer);
+    clearTimeout(handoffRestoreTimer);
+    stopTimer = 0;
+    handoffRestoreTimer = 0;
     wanted = true;
-    ADF_AUDIO.setMode("pregame");
     restore(); make();
+    if(stopInCorso) revealDone = false;
     if(!timer) timer = setInterval(() => {
       if(pending && navigator.userActivation && navigator.userActivation.isActive) attemptPlay();
       if(stream && wanted){
@@ -242,6 +269,8 @@
     clearState();
     clearTimeout(stopTimer);
     clearTimeout(handoffRestoreTimer);
+    stopTimer = 0;
+    handoffRestoreTimer = 0;
 
     if(!stream) return;
 
@@ -256,6 +285,7 @@
     stream.setLocalGain(0, d);
 
     stopTimer = setTimeout(() => {
+      stopTimer = 0;
       if(!stream || wanted) return;
       stream.pause();
       stream.seek(TRACK.loopStart);
@@ -270,6 +300,7 @@
   }
 
   function stopForGameplay(seconds){
+    ADF_AUDIO.setMode("gameplay");
     fadeOutAndStop(seconds);
   }
   function resumeHandoff(){
