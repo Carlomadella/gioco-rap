@@ -700,3 +700,33 @@ Fino al completamento di questo review:
 - config-002 non viene aperta;
 - holdout resta chiuso e non osservato;
 - nessun Source Separation, Audio→MIDI o training serio viene autorizzato da questo avanzamento.
+
+## NDR-052 — Correction-cost reviewer: playhead waveform obbligatorio, nessun cambio al protocollo
+
+Data: 11 settembre 2026. Stato: adottata.
+
+Al primo utilizzo operativo del correction-cost reviewer è emerso un difetto UI: la waveform mostrava i marker di section ma non la posizione corrente della riproduzione. Questo rendeva inutilmente difficile localizzare temporalmente una boundary durante l'ascolto.
+
+La correzione è esclusivamente di interfaccia:
+
+- aggiunge un playhead verticale sincronizzato con `audio.currentTime`;
+- aggiunge il timestamp corrente sopra la waveform;
+- aggiorna il playhead durante play, pause, seek e scrub;
+- al cambio sessione la posizione audio torna a zero;
+- un eventuale draft **non completato** creato con la UI precedente non viene ripreso: il passaggio corrente riparte da tempo zero e dai marker iniziali; i passaggi già completati, se presenti, restano preservati.
+
+Non cambiano:
+
+- candidate V1/config-001;
+- marker iniziali;
+- assegnazione cieca e ordine 4/4 già materializzati;
+- `packageIdentityDigestSha256` `690d1661d45f43e6a517b476ba43dfa16f5f4b6d46eddc7f4a83bf44dbacc8ed`;
+- Human Reference;
+- metrica `HUMAN_REVIEW_SECONDS_PER_AUDIO_MINUTE`;
+- soglia `> +25%`;
+- regole del timer;
+- protocollo;
+- config budget;
+- holdout, che resta non osservato.
+
+La patch viene applicata sia al tool versionato sia al `web/index.html` del package cieco già preparato. `review-package.json` e la chiave privata non vengono rigenerati.

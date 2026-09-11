@@ -57,3 +57,11 @@ assert "CANDIDATE" not in m.REVIEW_HTML
 assert "reference congelata non è mostrata" in m.REVIEW_HTML
 
 print("audio-analysis-correction-cost-review-test: OK")
+
+# UI regression: the reviewer must show the live audio position on the waveform.
+assert 'UI_REVISION="playhead-v2"' in m.REVIEW_HTML
+assert 'id="audioPos"' in m.REVIEW_HTML
+assert "function drawPlayhead()" in m.REVIEW_HTML
+assert 'strokeStyle="#ff4d6d"' in m.REVIEW_HTML
+assert "requestAnimationFrame(updatePlayhead)" in m.REVIEW_HTML
+assert 'audio.addEventListener("seeked"' in m.REVIEW_HTML
