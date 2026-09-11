@@ -605,3 +605,29 @@ Per ogni futura decisione V2 sul development, il confronto paired valido è `V1-
 Il calo osservato fra baseline001 e baseline002 non è una regressione di V1: il sorgente baseline è rimasto congelato. È l'effetto della revisione della reference. La diagnostica delle sezioni può rieseguire le feature V1 ed esporre curve/picchi/scarti, ma non modifica soglie e non conta come configurazione V2. La prima configurazione V2 viene numerata soltanto quando cambia il comportamento candidato.
 
 Holdout, Source Separation, Audio→MIDI e training serio restano chiusi.
+
+## NDR-049 — config-001 supera il gate metrico ma resta congelata in attesa del review umano
+
+Data: 11 settembre 2026. Stato: adottata.
+
+La prima configurazione V2, `audio-analysis-v2-config-001`, è stata congelata prima dell'osservazione dei risultati al commit `43530f44c5e753a1ab024a5be235dc2363c2f7ba` e conta come configurazione **1/8** del budget frozen.
+
+Sul development `precision-v3`, contro `v1-baseline-development-002`, il confronto paired produce:
+
+- Beat F1: delta mediano `0.0`;
+- Section F1 @0,5 s: `0 → 0.171429`;
+- Section F1 paired median delta: `+0.071429`;
+- beat/BPM/meter invarianti;
+- metric gate: `V2_WINS_METRICALLY`;
+- decisione development: `INCONCLUSIVE_REVIEW_PENDING`;
+- holdout osservato: no.
+
+Candidate report SHA256: `3047e7e15cd0efff7a4c7840b25b7c8a7e78e9fa583800861ae3f806eb2324e8`.
+
+Paired comparison report SHA256: `8459bd85d01d47b34152ba63c862734dfb4a272ac3728506aea78892e179f398`.
+
+Questo risultato dimostra un miglioramento materiale delle sections secondo la soglia frozen `+0.05`, senza regressione del target beat. Non dimostra ancora una vittoria finale della V2 né che il detector sections sia soddisfacente in assoluto.
+
+Prima di qualsiasi `config-002` o apertura holdout viene completato il required human correction-cost review della config-001 su almeno 6 development family comparabili. Se l'aumento relativo mediano del costo candidato supera `+25%`, la vittoria automatica è bloccata. Fino a quel review, config-001 resta immutata e l'holdout resta chiuso.
+
+L'eventuale `V2_WINS` finale viene dichiarato soltanto dopo il completamento del review richiesto e la verifica con le regole frozen. Source Separation, Audio→MIDI e training serio restano chiusi.

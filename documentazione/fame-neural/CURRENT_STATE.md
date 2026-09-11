@@ -4,7 +4,7 @@ Data: 2026-09-11
 
 ## Owned Beats — stato operativo
 
-> Checkpoint corrente Block E: [Baseline002 su precision-v3 — 11/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_BLOCK_E_BASELINE002_CHIUSURA_2026-09-11.md).
+> Checkpoint corrente Block E: [V2 config-001 — metric gate — 11/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_V2_CONFIG001_METRIC_GATE_2026-09-11.md).
 
 **Stato aggiornato: 11/09/2026. Conversione audio→MIDI non ancora avviata (`converted: 0`).**
 
@@ -18,7 +18,7 @@ Data: 2026-09-11
 | Evaluation holdout | **COMPLETATO** | 10 composition family congelate in `evaluation-holdout` prima del tuning V2; 8 development, overlap 0, 113 record ancora senza split |
 | Human Reference development | **COMPLETATA / VERSIONATA** | `precision-v3` finalizzata: 8/8 family, 24/24 finestre `COMPLETE` + reviewed, digest `6e80e998cf2e5725f346989f707cb59a0b44f218d8909012171d0b9ebbec91af`; `precision-v2`/`precision-v1` preservate come storico; holdout non osservato |
 | Ambiente tecnico Audio Analysis | **COMPLETATO** | FFmpeg/ffprobe 9.0.1 + Python 3.14 + stack audio verificata |
-| Audio Analysis pilot | **IN CORSO** | `v1-baseline-development-002` congelata contro `precision-v3`: median Beat F1 `0.724060`, Cemgil `0.494389`, Section F1 @0,5 s `0`; BPM 5 EXACT / 1 DOUBLE / 2 OTHER; prossimo step: diagnostica osservativa sezioni V1 → prima candidata V2; holdout chiuso |
+| Audio Analysis pilot | **IN CORSO — CONFIG-001 SUPERA IL GATE METRICO** | `audio-analysis-v2-config-001` (1/8) congelata al commit `43530f44`; Beat F1 paired delta `0.0`, Section F1 `0 → 0.171429`, paired median delta `+0.071429`; `V2_WINS_METRICALLY` ma decisione ufficiale `INCONCLUSIVE_REVIEW_PENDING`; prossimo step: human correction-cost review su almeno 6 family comparabili; `config-002` e holdout chiusi |
 | Source Separation pilot | **DA FARE** | successiva all'Audio Analysis |
 | Trascrizione Audio→MIDI pilot | **DA FARE** | drums/low-end prima; tonal successivamente |
 | QA pilot | **DA FARE** | metriche automatiche e giudizio umano separati |
