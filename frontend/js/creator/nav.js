@@ -12,28 +12,44 @@ function miniPortrait(){
 }
 /* La landing sta fuori di qui: chi chiede "menu" sta chiedendo di uscire. */
 function vaiAllaLanding(){ vaiA("landing"); }
+/* "Il tuo artista" modifica un personaggio giÃ  esistente: non deve mai
+   riaprire il creator come nuova creazione e, soprattutto, non deve usare la
+   landing come fallback. Con l'app shell la landing Ã¨ il documento padre:
+   tornarci significa chiudere la partita e produce esattamente il rimbalzo
+   segnalato. */
+function apriAspettoArtista(){
+  const bridge = window.ADF_RPG_V24;
+  if(bridge && typeof bridge.openAppearance === "function"){
+    bridge.openAppearance();
+    return true;
+  }
+  console.error("[ADF] Il tuo artista: modalitÃ  modifica aspetto non disponibile.");
+  return false;
+}
+
 function goto(screen){
   if(screen === "profile"){
-    if(window.ADF_RPG_V24 && typeof window.ADF_RPG_V24.open === "function"){
-      window.ADF_RPG_V24.open();
+    if(window.ADF_RPG_V24 && typeof window.ADF_RPG_V24.openAppearance === "function"){
+      window.ADF_RPG_V24.openAppearance();
       return;
     }
-    vaiAllaLanding();
+    console.error("[ADF] Il tuo artista: editor aspetto non disponibile.");
     return;
   }
-if(screen === "menu"){ vaiAllaLanding(); return; }
+  if(screen === "menu"){ vaiAllaLanding(); return; }
+
   const target = $("s-" + screen);
-  document.querySelectorAll(".screen").forEach(x => x.classList.toggle("on", x.id === "s-" + screen));
-  /* Da smistare, punto 1: `.screen.on` ha la sua animazione (shell.css), ma
-     il nodo resta lo stesso ad ogni giro — senza forzare un reflow il
-     browser a volte non la fa ripartire, se il cambio di classe avviene
-     tutto nello stesso istante di script (come qui). */
-  if(target){ target.style.animation = "none"; void target.offsetWidth; target.style.animation = ""; }
-  /* In partita il tasto per il menu non sta quassù: il marchio a sinistra fa
-     già quel mestiere, e la barra deve restare fuori dai piedi mentre giochi. */
+  document.querySelectorAll(".screen").forEach(x =>
+    x.classList.toggle("on", x.id === "s-" + screen)
+  );
+
+  if(target){
+    target.style.animation = "none";
+    void target.offsetWidth;
+    target.style.animation = "";
+  }
+
   $("nav-back").hidden = (screen === "hub");
-  /* L'hub ha una testata sua, con il marchio e le risorse: la barra di sopra
-     sparisce, se no ce ne sono due una sull'altra. */
   document.body.classList.toggle("in-hub", screen === "hub");
   window.scrollTo({top:0});
 }

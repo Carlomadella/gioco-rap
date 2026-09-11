@@ -223,8 +223,6 @@
       window.ADF_RPG_V24 &&
       typeof window.ADF_RPG_V24.open === "function"
     ){
-      goto("profile");
-
       window.ADF_RPG_V24.open();
 
       const frame = frameCreator();
@@ -242,7 +240,8 @@
       return;
     }
 
-    goto("profile");
+    console.error("[ADF] Nuova partita: creator RPG non disponibile.");
+    return;
 
     setTimeout(
       () => {
@@ -302,8 +301,6 @@
     }
 
     const rapido = datiRapidi();
-
-    goto("profile");
 
     window.ADF_RPG_V24.open();
 
@@ -395,8 +392,16 @@
   }
 
   if(vai === "profilo"){
-    audioPregame();
-    goto("profile");
+    entraInCitta();
+
+    if(
+      window.ADF_RPG_V24 &&
+      typeof window.ADF_RPG_V24.openAppearance === "function"
+    ){
+      window.ADF_RPG_V24.openAppearance();
+    }else{
+      console.error("[ADF] Il tuo artista: editor aspetto non disponibile.");
+    }
     return;
   }
 

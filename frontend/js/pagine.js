@@ -22,7 +22,12 @@ const PAGINE = {
 /* L'indirizzo di una pagina, con la domanda attaccata se serve
    (`vaiA("gioco", "vai=profilo")`). */
 function indirizzoPagina(quale, domanda){
-  const f = PAGINE[quale] || PAGINE.landing;
+  const f = PAGINE[quale];
+  if(!f){
+    const msg = "[ADF] Navigazione: pagina sconosciuta: " + String(quale);
+    console.error(msg);
+    throw new Error(msg);
+  }
   return new URL(f + (domanda ? "?" + domanda : ""), document.baseURI).href;
 }
 function vaiA(quale, domanda){ location.href = indirizzoPagina(quale, domanda); }

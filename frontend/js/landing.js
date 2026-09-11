@@ -96,25 +96,10 @@ $("brand").onclick = () => renderMenu();          // già qui: si aggiorna e bas
    arriva chiedendolo, non cambiando una classe. Chi decide se si può è
    avvio.js, che sa quale slot è pieno. */
 function vaiAlProfilo(){
-  /* Regola landing:
-     - senza CONTINUA non esiste un artista modificabile;
-     - con CONTINUA si modifica SEMPRE lo stesso slot scelto da Continua. */
-  const slot = typeof window.ADF_PREPARA_ARTISTA_CONTINUA === "function"
-    ? window.ADF_PREPARA_ARTISTA_CONTINUA()
-    : null;
-
-  if(!slot){
-    landDillo("Nessuna partita salvata");
-    return;
-  }
-
-  if(window.ADF_RPG_V24 && typeof window.ADF_RPG_V24.openAppearance === "function"){
-    window.ADF_RPG_V24.openAppearance();
-    return;
-  }
-
-  /* Fallback di compatibilità: la pagina gioco rilegge lo slot appena attivato. */
-  vaiAlGioco("vai=profilo");
+  /* Se il bridge manca è un errore di caricamento, non un motivo per
+     imboccare un secondo percorso di navigazione. */
+  console.error("[ADF] Il tuo artista: editor aspetto non disponibile sulla landing.");
+  landDillo("Editor artista non disponibile");
 }
 window.vaiAlProfilo = vaiAlProfilo;
 
@@ -137,6 +122,7 @@ $("m-reset").onclick = function(){
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-go]");
   if(!b) return;
+  if(b.tagName === "A") e.preventDefault();
   const g = partita();
   const viva = A.name.trim() && carrieraIniziata(g);
   if(b.dataset.go === "gioca") $("m-play").click();

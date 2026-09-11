@@ -61,6 +61,9 @@ const accesso = leggi("pagine/accesso.html");
 const porta = leggi("index.html");
 const avvio = leggi("js/avvio.js");
 const ingresso = leggi("js/gioco-ingresso.js");
+const pagineJs = leggi("js/pagine.js");
+const landingJs = leggi("js/landing.js");
+const creatorNav = leggi("js/creator/nav.js");
 /* Stessa riga letta con gli spazi appiattiti: la prova qui sotto guarda
    COSA fa il codice, non su quante righe sta scritto. Andare a capo per
    leggibilita' non e' una regressione, e non deve far suonare l'allarme. */
@@ -72,6 +75,19 @@ const cat = JSON.parse(leggi("js/game/eventi-master-1000-v1.2.13.json"));
 const pkg = JSON.parse(leggi("package.json"));
 const verifyBuild = leggi("strumenti/verifica-build.js");
 const ciWorkflow = fs.readFileSync(path.resolve(ROOT,"..",".github","workflows","verifica-gioco.yml"),"utf8");
+
+console.log("\nNavigazione — route uniche e profilo artista");
+test("route sconosciuta non ricade sulla landing",
+  !pagineJs.includes("PAGINE[quale] || PAGINE.landing") &&
+  pagineJs.includes("[ADF] Navigazione: pagina sconosciuta:"));
+test("Il tuo artista in partita usa appearance",
+  creatorNav.includes("ADF_RPG_V24.openAppearance()"));
+test("ingresso nuova partita non usa goto profile",
+  !ingresso.includes('goto("profile")'));
+test("landing non usa il gioco come fallback del profilo",
+  !landingJs.includes('vaiAlGioco("vai=profilo")'));
+test("account footer usa il router App Shell",
+  landing.includes('data-go="accesso"'));
 
 console.log("\nCI / build — verifica automatica");
 test("package espone un comando verifica unico",
