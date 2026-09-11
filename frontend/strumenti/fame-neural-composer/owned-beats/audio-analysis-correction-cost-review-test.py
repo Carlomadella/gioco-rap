@@ -59,9 +59,20 @@ assert "reference congelata non è mostrata" in m.REVIEW_HTML
 print("audio-analysis-correction-cost-review-test: OK")
 
 # UI regression: the reviewer must show the live audio position on the waveform.
-assert 'UI_REVISION="playhead-v2"' in m.REVIEW_HTML
 assert 'id="audioPos"' in m.REVIEW_HTML
 assert "function drawPlayhead()" in m.REVIEW_HTML
 assert 'strokeStyle="#ff4d6d"' in m.REVIEW_HTML
 assert "requestAnimationFrame(updatePlayhead)" in m.REVIEW_HTML
 assert 'audio.addEventListener("seeked"' in m.REVIEW_HTML
+
+
+# UI regression: marker selection, move and delete must have explicit working state.
+assert 'UI_REVISION="controls-v3"' in m.REVIEW_HTML
+assert 'id="selectionStatus"' in m.REVIEW_HTML
+assert "function hasValidSelection()" in m.REVIEW_HTML
+assert "function moveSelectedTo(timeSeconds)" in m.REVIEW_HTML
+assert "function deleteSelected()" in m.REVIEW_HTML
+assert "function markerIndexNearCanvasX" in m.REVIEW_HTML
+assert 'document.getElementById("moveBtn").onclick=()=>{moveSelectedTo(audio.currentTime)}' in m.REVIEW_HTML
+assert 'document.getElementById("deleteBtn").onclick=()=>{deleteSelected()}' in m.REVIEW_HTML
+assert 'for(const id of ["moveBtn","deleteBtn","deselectBtn"])document.getElementById(id).disabled=!hasSelection;' in m.REVIEW_HTML

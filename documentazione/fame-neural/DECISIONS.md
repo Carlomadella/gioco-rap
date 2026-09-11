@@ -730,3 +730,25 @@ Non cambiano:
 - holdout, che resta non osservato.
 
 La patch viene applicata sia al tool versionato sia al `web/index.html` del package cieco già preparato. `review-package.json` e la chiave privata non vengono rigenerati.
+
+
+
+## NDR-053 — Correction-cost reviewer: selezione marker resa esplicita e controlli Move/Delete corretti
+
+Data: 12 settembre 2026. Stato: adottata.
+
+Nel primo utilizzo del reviewer con playhead funzionante è emerso un secondo difetto UX/logico: `Sposta selezionata` ed `Elimina selezionata` venivano abilitati appena iniziava la sessione, ma i relativi handler operavano soltanto quando `selectedMarker != null`. Senza una selezione esplicita i pulsanti risultavano quindi cliccabili ma non producevano alcun effetto.
+
+La correzione:
+
+- abilita Move/Delete/Deseleziona soltanto quando esiste davvero una boundary selezionata;
+- mostra sempre lo stato della selezione e il timestamp della boundary attiva;
+- permette di selezionare una boundary cliccando direttamente la sua linea sulla waveform;
+- centralizza move/delete in funzioni condivise usate sia dai pulsanti globali sia dalla lista marker;
+- rinomina `Sposta selezionata al cursore` in `Sposta selezionata al playhead`, eliminando l'ambiguità fra mouse e posizione audio;
+- mantiene il click su waveform: con marker selezionato sposta, senza marker selezionato aggiunge una boundary;
+- cambia la revisione UI a `controls-v3`, per cui un draft incompleto della UI precedente non viene riutilizzato; le sessioni già chiuse restano preservate.
+
+Non cambiano candidate, marker iniziali, assegnazione cieca, ordine 4/4, Human Reference, protocollo, metrica, soglia, config budget o holdout.
+
+`review-package.json` e la chiave privata non vengono rigenerati; `packageIdentityDigestSha256` resta `690d1661d45f43e6a517b476ba43dfa16f5f4b6d46eddc7f4a83bf44dbacc8ed`.
