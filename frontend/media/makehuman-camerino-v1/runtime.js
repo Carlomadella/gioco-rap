@@ -5027,6 +5027,10 @@ init();
    Non toccano accessori. Gli slider restano poi modificabili.
    ============================================================ */
 
+/* ADF_MAKEHUMAN_PRESETS_FACE_PROFILES_V5 · ADF_MAKEHUMAN_PRESETS_FACE_IDENTITY_V6
+   14 identità facciali volutamente differenziate.
+   I valori continuano a pilotare gli slider MakeHuman reali
+   e restano modificabili manualmente dopo il preset. */
 const ADF_MH_PRESETS = [
   {
     id:'uomo-affilato',
@@ -5045,7 +5049,7 @@ const ADF_MH_PRESETS = [
       outerwear:{patterns:['bomber','jacket','coat'],allowEmpty:true},
       clothesOther:{patterns:[],allowEmpty:true}
     },
-    mods:{age:.28,height:.64,weight:.34,muscle:.42,jawWidth:.70,chinSize:.62,cheekFullness:.30,noseWidth:.40,noseLength:.58,eyeSize:.44,browProminence:.62,lipFullness:.36,shoulder:.58,waist:.42,hip:.34,faceRoundness:.30}
+    mods:{age:.28,height:.64,weight:.34,muscle:.42,jawWidth:.82,chinSize:.74,cheekFullness:.14,noseWidth:.3,noseLength:.72,eyeSize:.38,browProminence:.76,lipFullness:.26,shoulder:.58,waist:.42,hip:.34,faceRoundness:.1,neck:.46,headWidth:.32,headHeight:.62,headDepth:.36,foreheadHeight:.66,foreheadProjection:.58,eyeSpacing:.6,eyeVertical:.5,eyeCorner:.7,browHeight:.42,browAngle:.7,cheekHeight:.78,chinProminence:.76,noseDepth:.62,noseTip:.6,noseCurve:.56,mouthWidth:.42,mouthHeight:.32,headSquare:.42,headOval:.62}
   },
   {
     id:'uomo-atletico',
@@ -5064,7 +5068,7 @@ const ADF_MH_PRESETS = [
       outerwear:{patterns:['hoodie','jacket'],allowEmpty:true},
       clothesOther:{patterns:[],allowEmpty:true}
     },
-    mods:{age:.26,height:.66,weight:.48,muscle:.76,jawWidth:.62,chinSize:.56,cheekFullness:.34,noseWidth:.46,noseLength:.54,eyeSize:.48,browProminence:.58,lipFullness:.38,shoulder:.72,waist:.40,hip:.36,faceRoundness:.34}
+    mods:{age:.26,height:.66,weight:.48,muscle:.76,jawWidth:.68,chinSize:.58,cheekFullness:.28,noseWidth:.44,noseLength:.48,eyeSize:.46,browProminence:.62,lipFullness:.36,shoulder:.72,waist:.40,hip:.36,faceRoundness:.26,neck:.62,headWidth:.56,headHeight:.54,headDepth:.56,foreheadHeight:.54,foreheadProjection:.54,eyeSpacing:.52,eyeVertical:.5,eyeCorner:.56,browHeight:.48,browAngle:.56,cheekHeight:.6,chinProminence:.6,noseDepth:.52,noseTip:.52,noseCurve:.48,mouthWidth:.56,mouthHeight:.44,headSquare:.46,headOval:.34}
   },
   {
     id:'uomo-robusto',
@@ -5083,7 +5087,7 @@ const ADF_MH_PRESETS = [
       outerwear:{patterns:['jacket','coat'],allowEmpty:true},
       clothesOther:{patterns:[],allowEmpty:true}
     },
-    mods:{age:.42,height:.56,weight:.70,muscle:.58,jawWidth:.66,chinSize:.58,cheekFullness:.60,noseWidth:.54,noseLength:.52,eyeSize:.46,browProminence:.56,lipFullness:.42,shoulder:.68,waist:.58,hip:.44,faceRoundness:.62}
+    mods:{age:.42,height:.56,weight:.70,muscle:.58,jawWidth:.76,chinSize:.64,cheekFullness:.76,noseWidth:.64,noseLength:.46,eyeSize:.36,browProminence:.58,lipFullness:.42,shoulder:.68,waist:.58,hip:.44,faceRoundness:.78,neck:.7,headWidth:.74,headHeight:.44,headDepth:.72,foreheadHeight:.46,foreheadProjection:.58,eyeSpacing:.44,eyeVertical:.47,eyeCorner:.4,browHeight:.42,browAngle:.46,cheekHeight:.44,chinProminence:.7,noseDepth:.66,noseTip:.42,noseCurve:.6,mouthWidth:.66,mouthHeight:.46,headSquare:.72,headOval:.12}
   },
   {
     id:'uomo-slanciato',
@@ -5102,7 +5106,7 @@ const ADF_MH_PRESETS = [
       outerwear:{patterns:['coat','jacket','blazer'],allowEmpty:true},
       clothesOther:{patterns:[],allowEmpty:true}
     },
-    mods:{age:.34,height:.78,weight:.28,muscle:.34,jawWidth:.54,chinSize:.50,cheekFullness:.26,noseWidth:.38,noseLength:.60,eyeSize:.50,browProminence:.48,lipFullness:.40,shoulder:.50,waist:.34,hip:.32,faceRoundness:.24}
+    mods:{age:.34,height:.78,weight:.28,muscle:.34,jawWidth:.44,chinSize:.62,cheekFullness:.12,noseWidth:.24,noseLength:.78,eyeSize:.48,browProminence:.44,lipFullness:.32,shoulder:.50,waist:.34,hip:.32,faceRoundness:.08,neck:.38,headWidth:.22,headHeight:.76,headDepth:.3,foreheadHeight:.72,foreheadProjection:.48,eyeSpacing:.64,eyeVertical:.54,eyeCorner:.62,browHeight:.54,browAngle:.54,cheekHeight:.74,chinProminence:.62,noseDepth:.58,noseTip:.62,noseCurve:.52,mouthWidth:.36,mouthHeight:.36,headSquare:.08,headOval:.86}
   },
   {
     id:'uomo-giovane',
@@ -5121,7 +5125,7 @@ const ADF_MH_PRESETS = [
       outerwear:{patterns:['hoodie','jacket'],allowEmpty:true},
       clothesOther:{patterns:[],allowEmpty:true}
     },
-    mods:{age:.18,height:.58,weight:.32,muscle:.34,jawWidth:.42,chinSize:.38,cheekFullness:.42,noseWidth:.36,noseLength:.42,eyeSize:.60,browProminence:.42,lipFullness:.48,shoulder:.46,waist:.36,hip:.34,faceRoundness:.48}
+    mods:{age:.18,height:.58,weight:.32,muscle:.34,jawWidth:.28,chinSize:.26,cheekFullness:.52,noseWidth:.24,noseLength:.3,eyeSize:.78,browProminence:.3,lipFullness:.56,shoulder:.46,waist:.36,hip:.34,faceRoundness:.6,neck:.34,headWidth:.44,headHeight:.46,headDepth:.48,foreheadHeight:.68,foreheadProjection:.42,eyeSpacing:.6,eyeVertical:.6,eyeCorner:.64,browHeight:.62,browAngle:.46,cheekHeight:.56,chinProminence:.24,noseDepth:.32,noseTip:.6,noseCurve:.38,mouthWidth:.54,mouthHeight:.62,headSquare:.06,headOval:.38}
   },
   {
     id:'uomo-maturo',
@@ -5140,7 +5144,7 @@ const ADF_MH_PRESETS = [
       outerwear:{patterns:['coat','jacket','blazer'],allowEmpty:true},
       clothesOther:{patterns:[],allowEmpty:true}
     },
-    mods:{age:.62,height:.58,weight:.44,muscle:.40,jawWidth:.60,chinSize:.56,cheekFullness:.38,noseWidth:.48,noseLength:.62,eyeSize:.40,browProminence:.54,lipFullness:.34,shoulder:.56,waist:.48,hip:.36,faceRoundness:.36}
+    mods:{age:.62,height:.58,weight:.44,muscle:.40,jawWidth:.7,chinSize:.76,cheekFullness:.24,noseWidth:.52,noseLength:.78,eyeSize:.28,browProminence:.74,lipFullness:.24,shoulder:.56,waist:.48,hip:.36,faceRoundness:.22,neck:.56,headWidth:.58,headHeight:.6,headDepth:.64,foreheadHeight:.5,foreheadProjection:.66,eyeSpacing:.46,eyeVertical:.42,eyeCorner:.42,browHeight:.36,browAngle:.62,cheekHeight:.64,chinProminence:.82,noseDepth:.74,noseTip:.44,noseCurve:.72,mouthWidth:.48,mouthHeight:.28,headSquare:.6,headOval:.36}
   },
   {
     id:'uomo-massiccio',
@@ -5159,7 +5163,7 @@ const ADF_MH_PRESETS = [
       outerwear:{patterns:['jacket','coat'],allowEmpty:true},
       clothesOther:{patterns:[],allowEmpty:true}
     },
-    mods:{age:.46,height:.60,weight:.82,muscle:.82,jawWidth:.72,chinSize:.64,cheekFullness:.58,noseWidth:.56,noseLength:.54,eyeSize:.42,browProminence:.60,lipFullness:.40,shoulder:.82,waist:.62,hip:.44,faceRoundness:.52,neck:.72}
+    mods:{age:.46,height:.60,weight:.82,muscle:.82,jawWidth:.92,chinSize:.84,cheekFullness:.7,noseWidth:.76,noseLength:.44,eyeSize:.24,browProminence:.8,lipFullness:.34,shoulder:.82,waist:.62,hip:.44,faceRoundness:.66,neck:.88,headWidth:.88,headHeight:.38,headDepth:.84,foreheadHeight:.4,foreheadProjection:.68,eyeSpacing:.4,eyeVertical:.44,eyeCorner:.34,browHeight:.34,browAngle:.72,cheekHeight:.38,chinProminence:.92,noseDepth:.82,noseTip:.36,noseCurve:.64,mouthWidth:.74,mouthHeight:.4,headSquare:.92,headOval:.04}
   },
 
   {
@@ -5179,7 +5183,7 @@ const ADF_MH_PRESETS = [
       outerwear:{patterns:['jacket','coat'],allowEmpty:true},
       clothesOther:{patterns:[],allowEmpty:true}
     },
-    mods:{age:.30,height:.66,weight:.28,muscle:.32,cheekFullness:.24,jawWidth:.34,chinSize:.40,noseWidth:.32,noseLength:.54,eyeSize:.58,browProminence:.44,lipFullness:.54,waist:.24,hip:.58,shoulder:.34,bust:.48,faceRoundness:.24}
+    mods:{age:.30,height:.66,weight:.28,muscle:.32,cheekFullness:.1,jawWidth:.2,chinSize:.44,noseWidth:.18,noseLength:.66,eyeSize:.66,browProminence:.54,lipFullness:.58,waist:.24,hip:.58,shoulder:.34,bust:.48,faceRoundness:.08,neck:.28,headWidth:.2,headHeight:.7,headDepth:.3,foreheadHeight:.72,foreheadProjection:.48,eyeSpacing:.64,eyeVertical:.56,eyeCorner:.74,browHeight:.58,browAngle:.68,cheekHeight:.82,chinProminence:.5,noseDepth:.42,noseTip:.64,noseCurve:.38,mouthWidth:.42,mouthHeight:.46,headSquare:.04,headOval:.78}
   },
   {
     id:'donna-atletica',
@@ -5198,7 +5202,7 @@ const ADF_MH_PRESETS = [
       outerwear:{patterns:['hoodie','jacket'],allowEmpty:true},
       clothesOther:{patterns:[],allowEmpty:true}
     },
-    mods:{age:.28,height:.64,weight:.40,muscle:.66,cheekFullness:.30,jawWidth:.40,chinSize:.44,noseWidth:.38,noseLength:.50,eyeSize:.56,browProminence:.46,lipFullness:.50,waist:.30,hip:.52,shoulder:.46,bust:.42,faceRoundness:.30}
+    mods:{age:.28,height:.64,weight:.40,muscle:.66,cheekFullness:.26,jawWidth:.42,chinSize:.48,noseWidth:.32,noseLength:.46,eyeSize:.52,browProminence:.52,lipFullness:.44,waist:.30,hip:.52,shoulder:.46,bust:.42,faceRoundness:.22,neck:.44,headWidth:.44,headHeight:.56,headDepth:.48,foreheadHeight:.58,foreheadProjection:.5,eyeSpacing:.54,eyeVertical:.54,eyeCorner:.58,browHeight:.52,browAngle:.56,cheekHeight:.64,chinProminence:.48,noseDepth:.48,noseTip:.56,noseCurve:.44,mouthWidth:.54,mouthHeight:.48,headSquare:.24,headOval:.46}
   },
   {
     id:'donna-morbida',
@@ -5217,7 +5221,7 @@ const ADF_MH_PRESETS = [
       outerwear:{patterns:['cardigan','coat','jacket'],allowEmpty:true},
       clothesOther:{patterns:[],allowEmpty:true}
     },
-    mods:{age:.36,height:.54,weight:.58,muscle:.26,cheekFullness:.62,jawWidth:.38,chinSize:.40,noseWidth:.40,noseLength:.48,eyeSize:.58,browProminence:.40,lipFullness:.60,waist:.40,hip:.68,shoulder:.34,bust:.60,faceRoundness:.66}
+    mods:{age:.36,height:.54,weight:.58,muscle:.26,cheekFullness:.82,jawWidth:.28,chinSize:.3,noseWidth:.42,noseLength:.36,eyeSize:.64,browProminence:.3,lipFullness:.74,waist:.40,hip:.68,shoulder:.34,bust:.60,faceRoundness:.86,neck:.34,headWidth:.64,headHeight:.4,headDepth:.68,foreheadHeight:.52,foreheadProjection:.4,eyeSpacing:.5,eyeVertical:.6,eyeCorner:.54,browHeight:.6,browAngle:.42,cheekHeight:.42,chinProminence:.28,noseDepth:.38,noseTip:.58,noseCurve:.34,mouthWidth:.62,mouthHeight:.68,headSquare:.02,headOval:.24}
   },
   {
     id:'donna-slanciata',
@@ -5236,7 +5240,7 @@ const ADF_MH_PRESETS = [
       outerwear:{patterns:['coat','jacket','blazer'],allowEmpty:true},
       clothesOther:{patterns:[],allowEmpty:true}
     },
-    mods:{age:.34,height:.80,weight:.26,muscle:.24,cheekFullness:.24,jawWidth:.30,chinSize:.38,noseWidth:.32,noseLength:.56,eyeSize:.54,browProminence:.42,lipFullness:.48,waist:.22,hip:.50,shoulder:.32,bust:.42,faceRoundness:.22}
+    mods:{age:.34,height:.80,weight:.26,muscle:.24,cheekFullness:.08,jawWidth:.16,chinSize:.42,noseWidth:.16,noseLength:.76,eyeSize:.56,browProminence:.46,lipFullness:.42,waist:.22,hip:.50,shoulder:.32,bust:.42,faceRoundness:.06,neck:.24,headWidth:.16,headHeight:.82,headDepth:.26,foreheadHeight:.76,foreheadProjection:.48,eyeSpacing:.66,eyeVertical:.56,eyeCorner:.7,browHeight:.56,browAngle:.62,cheekHeight:.78,chinProminence:.44,noseDepth:.46,noseTip:.66,noseCurve:.42,mouthWidth:.36,mouthHeight:.44,headSquare:.02,headOval:.92}
   },
   {
     id:'donna-giovane',
@@ -5255,7 +5259,7 @@ const ADF_MH_PRESETS = [
       outerwear:{patterns:['hoodie','jacket'],allowEmpty:true},
       clothesOther:{patterns:[],allowEmpty:true}
     },
-    mods:{age:.18,height:.58,weight:.28,muscle:.22,cheekFullness:.40,jawWidth:.28,chinSize:.34,noseWidth:.30,noseLength:.40,eyeSize:.64,browProminence:.40,lipFullness:.56,waist:.28,hip:.54,shoulder:.30,bust:.38,faceRoundness:.46}
+    mods:{age:.18,height:.58,weight:.28,muscle:.22,cheekFullness:.5,jawWidth:.12,chinSize:.22,noseWidth:.16,noseLength:.26,eyeSize:.84,browProminence:.26,lipFullness:.68,waist:.28,hip:.54,shoulder:.30,bust:.38,faceRoundness:.58,neck:.24,headWidth:.4,headHeight:.46,headDepth:.44,foreheadHeight:.72,foreheadProjection:.38,eyeSpacing:.62,eyeVertical:.64,eyeCorner:.68,browHeight:.64,browAngle:.5,cheekHeight:.56,chinProminence:.2,noseDepth:.28,noseTip:.66,noseCurve:.3,mouthWidth:.52,mouthHeight:.7,headSquare:.01,headOval:.34}
   },
   {
     id:'donna-matura',
@@ -5274,7 +5278,7 @@ const ADF_MH_PRESETS = [
       outerwear:{patterns:['coat','cardigan','jacket'],allowEmpty:true},
       clothesOther:{patterns:[],allowEmpty:true}
     },
-    mods:{age:.64,height:.56,weight:.46,muscle:.24,cheekFullness:.38,jawWidth:.34,chinSize:.42,noseWidth:.40,noseLength:.58,eyeSize:.44,browProminence:.46,lipFullness:.44,waist:.36,hip:.56,shoulder:.34,bust:.50,faceRoundness:.34}
+    mods:{age:.64,height:.56,weight:.46,muscle:.24,cheekFullness:.28,jawWidth:.4,chinSize:.56,noseWidth:.44,noseLength:.72,eyeSize:.32,browProminence:.6,lipFullness:.34,waist:.36,hip:.56,shoulder:.34,bust:.50,faceRoundness:.24,neck:.42,headWidth:.5,headHeight:.62,headDepth:.6,foreheadHeight:.52,foreheadProjection:.62,eyeSpacing:.48,eyeVertical:.42,eyeCorner:.44,browHeight:.38,browAngle:.62,cheekHeight:.62,chinProminence:.64,noseDepth:.66,noseTip:.46,noseCurve:.68,mouthWidth:.48,mouthHeight:.36,headSquare:.3,headOval:.5}
   },
   {
     id:'donna-formosa',
@@ -5293,7 +5297,7 @@ const ADF_MH_PRESETS = [
       outerwear:{patterns:['jacket','coat'],allowEmpty:true},
       clothesOther:{patterns:[],allowEmpty:true}
     },
-    mods:{age:.40,height:.56,weight:.66,muscle:.28,cheekFullness:.56,jawWidth:.36,chinSize:.42,noseWidth:.42,noseLength:.50,eyeSize:.56,browProminence:.40,lipFullness:.62,waist:.34,hip:.76,shoulder:.36,bust:.72,faceRoundness:.58}
+    mods:{age:.40,height:.56,weight:.66,muscle:.28,cheekFullness:.78,jawWidth:.34,chinSize:.4,noseWidth:.54,noseLength:.42,eyeSize:.58,browProminence:.36,lipFullness:.82,waist:.34,hip:.76,shoulder:.36,bust:.72,faceRoundness:.78,neck:.4,headWidth:.7,headHeight:.42,headDepth:.72,foreheadHeight:.48,foreheadProjection:.42,eyeSpacing:.46,eyeVertical:.58,eyeCorner:.52,browHeight:.56,browAngle:.44,cheekHeight:.44,chinProminence:.32,noseDepth:.46,noseTip:.54,noseCurve:.38,mouthWidth:.7,mouthHeight:.74,headSquare:.06,headOval:.2}
   }
 ];
 
@@ -5896,27 +5900,252 @@ for(const preset of ADF_MH_PRESETS){
    slider facciali contemporaneamente. La V2 non lo fa.
    ------------------------------------------------------------ */
 
-const ADF_MH_PRESET_MACROS_V2 = Object.freeze({
-  age:'macrodetails/Age',
-  height:'macrodetails-height/Height',
-  weight:'macrodetails-universal/Weight',
-  muscle:'macrodetails-universal/Muscle'
+/* ADF_MAKEHUMAN_PRESETS_FACE_IDENTITY_V6
+   Morph facciali estesi basati sui modifier MakeHuman reali.
+   Nessun fuzzy matching.
+   Nessun fallback semantico.
+*/
+const ADF_MH_PRESET_EXACT_MODIFIERS_V6=Object.freeze({
+
+  age:[
+    {name:'macrodetails/Age',gain:1},
+    {name:'head/head-age-decr|incr',gain:1.25}
+  ],
+
+  height:[
+    {name:'macrodetails-height/Height',gain:1}
+  ],
+
+  weight:[
+    {name:'macrodetails-universal/Weight',gain:1},
+    {name:'head/head-fat-decr|incr',gain:1.20}
+  ],
+
+  muscle:[
+    {name:'macrodetails-universal/Muscle',gain:1}
+  ],
+
+
+  headWidth:[
+    {name:'head/head-scale-horiz-decr|incr',gain:1.55}
+  ],
+
+  headHeight:[
+    {name:'head/head-scale-vert-decr|incr',gain:1.48}
+  ],
+
+  headDepth:[
+    {name:'head/head-scale-depth-decr|incr',gain:1.45}
+  ],
+
+  headSquare:[
+    {name:'head/head-square',gain:1,direct:true}
+  ],
+
+  headOval:[
+    {name:'head/head-oval',gain:1,direct:true}
+  ],
+
+  faceRoundness:[
+    {name:'head/head-round',gain:1,direct:true}
+  ],
+
+
+  foreheadHeight:[
+    {name:'forehead/forehead-scale-vert-decr|incr',gain:1.42}
+  ],
+
+  foreheadProjection:[
+    {name:'forehead/forehead-trans-backward|forward',gain:1.35}
+  ],
+
+
+  eyeSpacing:[
+    {name:'eyes/l-eye-trans-in|out',gain:1.45},
+    {name:'eyes/r-eye-trans-in|out',gain:1.45}
+  ],
+
+  eyeVertical:[
+    {name:'eyes/l-eye-trans-down|up',gain:1.32},
+    {name:'eyes/r-eye-trans-down|up',gain:1.32}
+  ],
+
+  eyeSize:[
+    {name:'eyes/l-eye-scale-decr|incr',gain:1.55},
+    {name:'eyes/r-eye-scale-decr|incr',gain:1.55},
+    {name:'eyes/l-eye-height1-decr|incr',gain:1.35},
+    {name:'eyes/r-eye-height1-decr|incr',gain:1.35},
+    {name:'eyes/l-eye-height2-decr|incr',gain:1.30},
+    {name:'eyes/r-eye-height2-decr|incr',gain:1.30}
+  ],
+
+  eyeCorner:[
+    {name:'eyes/l-eye-corner1-down|up',gain:1.38},
+    {name:'eyes/r-eye-corner1-down|up',gain:1.38},
+    {name:'eyes/l-eye-corner2-down|up',gain:1.24},
+    {name:'eyes/r-eye-corner2-down|up',gain:1.24}
+  ],
+
+
+  browProminence:[
+    {name:'eyebrows/eyebrows-trans-backward|forward',gain:1.40}
+  ],
+
+  browHeight:[
+    {name:'eyebrows/eyebrows-trans-down|up',gain:1.38}
+  ],
+
+  browAngle:[
+    {name:'eyebrows/eyebrows-angle-down|up',gain:1.42}
+  ],
+
+
+  cheekFullness:[
+    {name:'cheek/l-cheek-volume-decr|incr',gain:1.62},
+    {name:'cheek/r-cheek-volume-decr|incr',gain:1.62},
+    {name:'cheek/l-cheek-inner-decr|incr',gain:1.26},
+    {name:'cheek/r-cheek-inner-decr|incr',gain:1.26}
+  ],
+
+  cheekHeight:[
+    {name:'cheek/l-cheek-trans-down|up',gain:1.50},
+    {name:'cheek/r-cheek-trans-down|up',gain:1.50},
+    {name:'cheek/l-cheek-bones-decr|incr',gain:1.34},
+    {name:'cheek/r-cheek-bones-decr|incr',gain:1.34}
+  ],
+
+
+  jawWidth:[
+    {name:'chin/chin-width-decr|incr',gain:1.72},
+    {name:'chin/chin-bones-decr|incr',gain:1.42}
+  ],
+
+  chinSize:[
+    {name:'chin/chin-height-decr|incr',gain:1.55}
+  ],
+
+  chinProminence:[
+    {name:'chin/chin-prominent-decr|incr',gain:1.60},
+    {name:'chin/chin-prognathism-decr|incr',gain:1.22}
+  ],
+
+
+  noseWidth:[
+    {name:'nose/nose-scale-horiz-decr|incr',gain:1.55},
+    {name:'nose/nose-nostrils-width-decr|incr',gain:1.48},
+    {name:'nose/nose-point-width-decr|incr',gain:1.34}
+  ],
+
+  noseLength:[
+    {name:'nose/nose-scale-vert-decr|incr',gain:1.52}
+  ],
+
+  noseDepth:[
+    {name:'nose/nose-scale-depth-decr|incr',gain:1.55}
+  ],
+
+  noseTip:[
+    {name:'nose/nose-point-down|up',gain:1.46},
+    {name:'nose/nose-base-down|up',gain:1.22}
+  ],
+
+  noseCurve:[
+    {name:'nose/nose-curve-concave|convex',gain:1.52},
+    {name:'nose/nose-hump-decr|incr',gain:1.18}
+  ],
+
+
+  mouthWidth:[
+    {name:'mouth/mouth-scale-horiz-decr|incr',gain:1.58},
+    {name:'mouth/mouth-upperlip-width-decr|incr',gain:1.26},
+    {name:'mouth/mouth-lowerlip-width-decr|incr',gain:1.26}
+  ],
+
+  mouthHeight:[
+    {name:'mouth/mouth-scale-vert-decr|incr',gain:1.48},
+    {name:'mouth/mouth-upperlip-height-decr|incr',gain:1.24},
+    {name:'mouth/mouth-lowerlip-height-decr|incr',gain:1.24}
+  ],
+
+  lipFullness:[
+    {name:'mouth/mouth-upperlip-volume-decr|incr',gain:1.60},
+    {name:'mouth/mouth-lowerlip-volume-decr|incr',gain:1.60}
+  ],
+
+
+  shoulder:[
+    {name:'torso/torso-vshape-decr|incr',gain:1.18}
+  ],
+
+  hip:[
+    {name:'hip/hip-scale-horiz-decr|incr',gain:1.15}
+  ],
+
+  bust:[
+    {name:'breast/BreastSize',gain:1}
+  ],
+
+  neck:[
+    {name:'neck/neck-scale-horiz-decr|incr',gain:1.38},
+    {name:'neck/neck-scale-depth-decr|incr',gain:1.26}
+  ]
 });
 
-adfMhApplySemantic = function(modifiers,key,normalized){
 
-  const fullName=ADF_MH_PRESET_MACROS_V2[key];
+function adfMhPresetMorphValueV6(value,spec){
 
-  /* Tutte le chiavi facciali/body-detail della V1 vengono
-     deliberatamente ignorate nella V2 finché non avranno
-     mapping espliciti uno-a-uno. */
-  if(!fullName) return 0;
+  const n=Math.max(0,Math.min(1,Number(value)));
 
-  const meta=nativeModifierMeta.find(m=>m.fullName===fullName);
-  if(!meta) return 0;
+  if(spec.direct){
+    return Math.max(
+      0,
+      Math.min(1,n*(Number(spec.gain)||1))
+    );
+  }
 
-  modifiers[fullName]=adfMhMapNormalizedToMeta(meta,normalized);
-  return 1;
+  const gain=Math.max(0,Number(spec.gain)||1);
+
+  return Math.max(
+    0,
+    Math.min(
+      1,
+      .5+((n-.5)*gain)
+    )
+  );
+}
+
+
+adfMhApplySemantic=function(modifiers,key,normalized){
+
+  const specs=ADF_MH_PRESET_EXACT_MODIFIERS_V6[key];
+
+  if(!Array.isArray(specs) || !specs.length){
+    return 0;
+  }
+
+  let applied=0;
+
+  for(const spec of specs){
+
+    const meta=nativeModifierMeta.find(
+      item=>item.fullName===spec.name
+    );
+
+    /*
+      Il runtime MakeHuman decide cosa esiste davvero.
+      Nessun tentativo di indovinare un modifier mancante.
+    */
+    if(!meta) continue;
+
+    modifiers[spec.name]=adfMhMapNormalizedToMeta(
+      meta,
+      adfMhPresetMorphValueV6(normalized,spec)
+    );
+
+    applied++;
+  }
+
+  return applied;
 };
 
 
