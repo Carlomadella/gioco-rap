@@ -661,3 +661,42 @@ La conclusione adottata è:
 Questo sanity set non cambia la decisione protocollo: `V2_WINS_METRICALLY / INCONCLUSIVE_REVIEW_PENDING`. `config-001` resta congelata, `config-002` non viene aperta prima del required human correction-cost review e l'holdout resta chiuso.
 
 I file audio e gli artefatti diagnostici restano esterni a Git; la repository conserva soltanto il checkpoint, gli SHA256 delle sorgenti/artefatti e le conclusioni verificabili.
+
+## NDR-051 — Correction-cost review config-001 congelato prima dell'osservazione
+
+Data: 11 settembre 2026. Stato: adottata.
+
+`audio-analysis-v2-config-001` ha superato il gate metrico development ma resta `INCONCLUSIVE_REVIEW_PENDING` finché non viene completato il required human correction-cost review previsto dal protocollo frozen.
+
+Prima di osservare qualsiasi tempo di review vengono congelati metodo e tool:
+
+- tutte le 8 family development vengono pianificate; il minimo protocollo resta 6 comparabili;
+- review limitata alle section boundary perché beat/BPM/meter sono esattamente invarianti fra V1 e config-001;
+- due passaggi per family, uno V1 e uno config-001, con identità arm nascosta;
+- Human Reference frozen non mostrata al reviewer;
+- ordine family randomizzato alla preparazione del package;
+- ordine arm controbilanciato 4 family V1-first / 4 family V2-first;
+- chiave V1/V2 privata fuori dalla web root;
+- azioni consentite: move/add/delete boundary;
+- timer attivo da START esplicito a chiusura passaggio, includendo ascolto/ispezione/editing/verifica ed escludendo pausa e tab in background.
+
+La metrica è `HUMAN_REVIEW_SECONDS_PER_AUDIO_MINUTE`.
+
+Per ogni family comparabile:
+
+`relativeIncrease = (candidateSecondsPerAudioMinute / baselineSecondsPerAudioMinute) - 1`.
+
+Se il costo baseline è zero il pair non viene forzato con epsilon e viene marcato non comparabile.
+
+L'aggregazione è la mediana delle family comparabili. Il veto scatta solo se la mediana **supera** `+25%`; esattamente `+25%` non supera la soglia.
+
+Il finalizer confronta inoltre le boundary corrette con la Human Reference frozen a `0,5 s` e `3 s` come QA diagnostico, senza mostrare la reference durante il review.
+
+Se il metric gate resta `V2_WINS_METRICALLY`, almeno 6 family sono comparabili e il veto costo non scatta, la decisione development diventa `V2_WINS`. In caso di review mancante o veto costo, la decisione resta `INCONCLUSIVE`; non viene forzato `V1_WINS`.
+
+Fino al completamento di questo review:
+
+- config-001 resta immutata;
+- config-002 non viene aperta;
+- holdout resta chiuso e non osservato;
+- nessun Source Separation, Audio→MIDI o training serio viene autorizzato da questo avanzamento.

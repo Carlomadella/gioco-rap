@@ -1,0 +1,96 @@
+{
+  "schema": "fame-owned-beats-audio-analysis-correction-cost-review-method",
+  "version": 1,
+  "status": "FROZEN_BEFORE_REVIEW_OBSERVATION",
+  "frozenOn": "2026-09-11",
+  "scope": {
+    "stage": "AUDIO_ANALYSIS_ONLY",
+    "split": "development",
+    "candidateId": "audio-analysis-v2-config-001",
+    "configurationIndex": 1,
+    "expectedDevelopmentFamilies": 8,
+    "minimumComparableDevelopmentFamilies": 6,
+    "reviewedTarget": "SECTIONS_ONLY",
+    "reasonSectionsOnly": "beat/BPM/meter outputs are frozen V1 and exactly invariant in config-001"
+  },
+  "inputs": {
+    "baselineRunId": "v1-baseline-development-002",
+    "baselineReportSha256": "4bebe4af0ed4bd8b0d1796432c54099c1705a3494d258c2eb10bc85033e2b714",
+    "candidateRunId": "v2-config-001-development-001",
+    "candidateReportSha256": "3047e7e15cd0efff7a4c7840b25b7c8a7e78e9fa583800861ae3f806eb2324e8",
+    "pairedComparisonRunId": "v2-config-001-vs-v1-baseline002-001",
+    "pairedComparisonReportSha256": "8459bd85d01d47b34152ba63c862734dfb4a272ac3728506aea78892e179f398",
+    "referenceReviewId": "audio-analysis-v2-dev-reference-precision-v3",
+    "referenceDigestSha256": "6e80e998cf2e5725f346989f707cb59a0b44f218d8909012171d0b9ebbec91af",
+    "protocolDigestSha256": "a85cb06f34108fe60f9d0bc40db754a429403500d32bfc48a06a76c7965bb254",
+    "baselineSourceGitBlobSha1": "fcabcf8b069fe2a65edc6ce171d86226e1bcaecb",
+    "candidateSourceGitBlobSha1": "2940f7ef71b5b165903e3371c1b7d14e116538bf",
+    "configHash": "04e00482802c46dda876733b7210992cab9eadbafa33153266a483b4a90b81b3"
+  },
+  "blinding": {
+    "armIdentityHiddenFromReviewer": true,
+    "humanReferenceHiddenFromReviewer": true,
+    "sameAudioForPairedArms": true,
+    "familyOrderRandomizedAtPackagePreparation": true,
+    "withinFamilyArmOrderCounterbalanced": true,
+    "baselineFirstFamilies": 4,
+    "candidateFirstFamilies": 4,
+    "privateAssignmentStoredOutsideServedWebRoot": true,
+    "packageFrozenBeforeReview": true
+  },
+  "reviewProcedure": {
+    "oneFamilyAtATime": true,
+    "twoPassesPerFamily": true,
+    "initialMarkersAreCandidateOutput": true,
+    "allowedCorrections": [
+      "MOVE",
+      "ADD",
+      "DELETE"
+    ],
+    "waveformVisible": true,
+    "reviewerMayListenFreely": true,
+    "reviewerInstruction": "Correct the displayed section boundaries until they match your musical judgment. Do not try to infer which algorithm produced the markers.",
+    "explicitStartRequiredPerPass": true,
+    "timerIncludes": [
+      "listening",
+      "inspection",
+      "marker editing",
+      "final verification"
+    ],
+    "timerExcludes": [
+      "time before START",
+      "manual pause",
+      "document hidden/background time"
+    ],
+    "pauseOnDocumentHidden": true,
+    "completionRequiresReviewerAttestation": true,
+    "allEightFamiliesPlanned": true
+  },
+  "metric": {
+    "name": "HUMAN_REVIEW_SECONDS_PER_AUDIO_MINUTE",
+    "perArmFormula": "activeReviewSeconds / (decodedDurationSeconds / 60)",
+    "pairedRelativeIncreaseFormula": "(candidateSecondsPerAudioMinute / baselineSecondsPerAudioMinute) - 1",
+    "baselineZeroPolicy": "PAIR_NOT_COMPARABLE",
+    "aggregate": "MEDIAN_ACROSS_COMPARABLE_DEVELOPMENT_FAMILIES",
+    "automaticWinBlockedIfMedianRelativeIncreaseStrictlyExceeds": 0.25,
+    "exactlyPlus25PercentBlocks": false,
+    "minimumComparableFamilies": 6,
+    "missingDataPolicy": "REPORT_MISSING_DO_NOT_USE_AS_TIE_BREAK"
+  },
+  "qa": {
+    "finalCorrectedMarkersComparedToFrozenReference": true,
+    "referenceComparisonIsDiagnosticNotShownDuringReview": true,
+    "primaryBoundaryWindowSeconds": 0.5,
+    "diagnosticBoundaryWindowSeconds": 3.0,
+    "operationCountsRecorded": true
+  },
+  "decisionIntegration": {
+    "requiresMetricGate": "V2_WINS_METRICALLY",
+    "reviewPassIf": "at least 6 comparable families and median relative increase <= 0.25",
+    "reviewVetoResult": "INCONCLUSIVE",
+    "reviewMissingResult": "INCONCLUSIVE",
+    "developmentV2WinsOnlyIfReviewPasses": true,
+    "holdoutMayOpenOnlyAfterDevelopmentV2WinsAndCandidateFreeze": true
+  },
+  "holdoutObserved": false
+}
