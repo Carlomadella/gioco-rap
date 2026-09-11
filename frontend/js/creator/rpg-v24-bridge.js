@@ -38,13 +38,61 @@
   }
 
   function payloadIniziale(){
+    const avatarSource=A?.avatarSource||null;
+    let avatarData=A?.avatarData||null;
+
+    /* ADF_CREATOR_SESSION_STABILITY_V1
+       I salvataggi precedenti possono avere ancora i dati avatar sui campi
+       storici dell'artista. Li ricostruiamo qui senza modificare il save. */
+    if(!avatarData && avatarSource==="local" && A?.localAvatar){
+      avatarData={
+        provider:A.localAvatar.provider||"makehuman",
+        localAvatar:A.localAvatar,
+        makehumanState:
+          A.localAvatar.makehumanState||
+          A.localAvatar.state||
+          null,
+        avatarPreviewImage:A.avatarPreviewImage||"",
+        previewImage:A.avatarPreviewImage||""
+      };
+    }
+
+    if(!avatarData && avatarSource==="avaturn" && (A?.avatarUrl || A?.avatarPreviewImage)){
+      avatarData={
+        provider:"avaturn",
+        avatarUrl:A.avatarUrl||"",
+        avatarUrlType:A.avatarUrlType||"",
+        avatarId:A.avatarId||"",
+        avatarSessionId:A.avatarSessionId||"",
+        avatarBodyId:A.avatarBodyId||"",
+        avatarGender:A.avatarGender||"",
+        avatarFaceAnimations:!!A.avatarFaceAnimations,
+        avatarPreviewImage:A.avatarPreviewImage||"",
+        previewImage:A.avatarPreviewImage||""
+      };
+    }
+
     return {
       name:A?.name||"", city:A?.city||"", genre:A?.genre||null,
-      avatarSource:A?.avatarSource||null,
-      avatarData:A?.avatarData||null,
+      avatarSource,
+      avatarData,
       profile:A?.artistProfile||null,
       answers:A?.rpgAnswers||[]
     };
+  }
+
+  function artistaEsistente(){
+    const artist=payloadIniziale();
+    return !!(
+      artist.name &&
+      artist.name.trim() &&
+      artist.avatarSource &&
+      artist.avatarData
+    );
+  }
+
+  function creatorAperto(){
+    return !!(overlay && overlay.style.display==="block");
   }
 
   function mostra(){
@@ -64,29 +112,46 @@
   function inviaStato(){
     if(!frame?.contentWindow) return;
     const artist=payloadIniziale();
+    const type=modalita==="appearance"
+      ? "adf-rpg-v24-edit-appearance"
+      : "adf-rpg-v24-init";
+
+    /* Una sessione riceve un solo comando iniziale. In modalità appearance
+       non mandiamo prima anche init: era una doppia inizializzazione dello
+       stesso creator e poteva riportarlo al primo step. */
     try{
-      frame.contentWindow.postMessage({type:"adf-rpg-v24-init",artist},"*");
-      if(modalita==="appearance"){
-        frame.contentWindow.postMessage({type:"adf-rpg-v24-edit-appearance",artist},"*");
-      }
+      frame.contentWindow.postMessage({type,artist},"*");
     }catch(e){}
   }
 
   function open(){
-    modalita="normal";
+    /* gioco-ingresso.js oggi chiama open anche dopo goto("profile"), che
+       apre già il creator. La seconda apertura deve essere idempotente. */
+    if(creatorAperto()) return;
+
+    modalita=artistaEsistente() ? "appearance" : "normal";
     mostra();
   }
 
   function openAppearance(){
+    if(creatorAperto()) return;
     modalita="appearance";
     mostra();
   }
 
   function close(){
     if(!overlay) return;
-    overlay.style.display="none";
-    overlay.setAttribute("aria-hidden","true");
+
     document.body.style.overflow="";
+
+    /* Non teniamo in vita un creator nascosto fra due aperture: Avaturn,
+       MakeHuman, iframe annidati e listener ripartono da uno stato pulito. */
+    try{ if(frame) frame.src="about:blank"; }catch(e){}
+    try{ overlay.remove(); }catch(e){}
+
+    frame=null;
+    overlay=null;
+    modalita="normal";
   }
 
   function applicaAvatar(source,av){
@@ -155,7 +220,7 @@
       close();
       modalita="normal";
 
-      if(nuovaAnnullata) location.href="pagine/landing.html";
+      if(nuovaAnnullata) vaiA("landing");
       return;
     }
 
