@@ -1,0 +1,51 @@
+{
+  "schema": "fame-owned-beats-audio-analysis-v2-development-config",
+  "version": 1,
+  "candidateId": "audio-analysis-v2-config-001",
+  "configurationIndex": 1,
+  "status": "FROZEN_BEFORE_DEVELOPMENT_OBSERVATION",
+  "frozenOn": "2026-09-11",
+  "split": "development",
+  "holdoutAccessAllowed": false,
+  "developmentReferenceReviewId": "audio-analysis-v2-dev-reference-precision-v3",
+  "developmentReferenceDigestSha256": "6e80e998cf2e5725f346989f707cb59a0b44f218d8909012171d0b9ebbec91af",
+  "baselineRunId": "v1-baseline-development-002",
+  "baselineReportSha256": "4bebe4af0ed4bd8b0d1796432c54099c1705a3494d258c2eb10bc85033e2b714",
+  "protocolDigestSha256": "a85cb06f34108fe60f9d0bc40db754a429403500d32bfc48a06a76c7965bb254",
+  "baselineSourceGitBlobSha1": "fcabcf8b069fe2a65edc6ce171d86226e1bcaecb",
+  "candidateSourceFile": "audio-analysis-v2-config-001.py",
+  "candidateSourceGitBlobSha1": "2940f7ef71b5b165903e3371c1b7d14e116538bf",
+  "configHash": "04e00482802c46dda876733b7210992cab9eadbafa33153266a483b4a90b81b3",
+  "diagnosticBasis": {
+    "runId": "sections-v1-baseline002-diagnostic-001",
+    "reportSha256": "ce8b90f926e7c3379433c8c5ebd102b6c8f1065574014d676eec36c4f504f2a6",
+    "referenceBoundaries": 52,
+    "v1SelectedBoundaries": 8,
+    "matches500ms": 2,
+    "matches3s": 5,
+    "zeroSelectedFamilies": 5,
+    "referenceClassifications": {
+      "LOCAL_PEAK_BELOW_HEIGHT": 13,
+      "LOCAL_PEAK_WITHIN_3S_NOT_SELECTED": 31,
+      "MATCH_3S_ONLY": 3,
+      "MATCH_500MS": 2,
+      "NO_LOCAL_PEAK_WITHIN_3S": 3
+    }
+  },
+  "algorithmConfig": {
+    "sectionMethod": "beat-context-contrast-v2-config-001",
+    "featureSet": "MFCC13_PLUS_CHROMA12_BEAT_SYNC_SAME_AS_V1",
+    "contextBeatsEachSide": 8,
+    "contrast": "EUCLIDEAN_DISTANCE_BETWEEN_LEFT_AND_RIGHT_CONTEXT_MEANS",
+    "robustNormalization": "MEDIAN_MAD_1_4826",
+    "peakHeightRobustZ": 1.5,
+    "peakProminenceRobustZ": 1.0,
+    "peakDistanceBeats": 8,
+    "edgeMarginSeconds": 2.0,
+    "beatTracker": "FROZEN_V1_UNCHANGED",
+    "bpm": "FROZEN_V1_UNCHANGED",
+    "meter": "FROZEN_V1_UNCHANGED",
+    "perTrackParametersAllowed": false
+  },
+  "hypothesis": "Adjacent-beat novelty plus a 2.5 robust-z threshold is too selective and does not model passage-level structural contrast. Compare fixed 8-beat contexts while preserving the V1 beat grid and a single global peak policy."
+}
