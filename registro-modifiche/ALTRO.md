@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:5f88dac -->
+## 12/09/26, 16:46 â€” task/avvio-rapido-paesi-province-v4 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `5f88dac`
+
+### Cosa Ã¨ entrato
+
+- `1580cbe` â€” feat(avvio-rapido): amplia il pool di provenienza â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/gioco-ingresso.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:7979f69 -->
 ## 12/09/26, 13:21 â€” origin/fix/anti-regressione-git-gate-v2 â†’ main
 
