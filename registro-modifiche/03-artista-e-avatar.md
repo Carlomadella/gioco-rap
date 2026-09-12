@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:e39d737 -->
+## 12/09/26, 15:37 â€” task/avvio-rapido-nomi-artista â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `e39d737`
+
+### Cosa Ã¨ entrato
+
+- `8a8ca64` â€” feat(avvio rapido): migliora i nomi artista â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/gioco-ingresso.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:8dffa9f -->
 ## 12/09/26, 12:54 â€” fix/account-artista-cloud-20260912-145418 â†’ main
 
