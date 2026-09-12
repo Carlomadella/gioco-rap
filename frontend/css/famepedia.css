@@ -168,3 +168,81 @@ body.famepedia-aperta{overflow:hidden}
   .fp-main{background:rgba(8,8,11,.46)}
   .fp-home,.fp-article-view{max-width:none;padding:28px 17px 68px}
 }
+
+/* ==================== FAMEPEDIA V3 — TIPOGRAFIA MAKEHUMAN ====================
+   Scala presa dalla sidebar MakeHuman attuale:
+   - testo principale / modifier-label: 13.5px
+   - testo secondario / modifier-help:   13px
+   - micro-label / controlli:            10.5px
+
+   Gli articoli restano volutamente piu' grandi (15px+), perche' sono testo
+   di lettura e non controlli dell'editor. */
+.famepedia{
+  --fp-mh-primary:13.5px;
+  --fp-mh-secondary:13px;
+  --fp-mh-label:10.5px;
+}
+
+/* indice sinistro */
+.fp-rail-label,
+.fp-rail-title{
+  font-size:var(--fp-mh-label);
+}
+.fp-rail-title i,
+.fp-cat i{
+  font-size:var(--fp-mh-label);
+}
+.fp-cat{
+  font-size:var(--fp-mh-primary);
+  line-height:1.35;
+}
+.fp-nav-item{
+  padding-top:12px;
+  padding-bottom:13px;
+  gap:4px;
+}
+.fp-nav-item-cat{
+  font-size:var(--fp-mh-label);
+  line-height:1.35;
+  letter-spacing:.12em;
+}
+.fp-nav-item-title{
+  font-size:var(--fp-mh-primary);
+  line-height:1.35;
+  font-weight:800;
+}
+.fp-nav-empty,
+.fp-rail-note{
+  font-size:var(--fp-mh-secondary);
+  line-height:1.5;
+}
+
+/* micro-testi che nella V2 erano ancora sotto la scala MakeHuman */
+.fp-related-label{
+  font-size:var(--fp-mh-label);
+}
+.fp-related-btn{
+  font-size:var(--fp-mh-secondary);
+}
+.fp-home-hint p{
+  font-size:var(--fp-mh-secondary);
+  line-height:1.55;
+}
+
+/* I testi da leggere NON vengono ridotti alla misura dei controlli.
+   Restano almeno quanto sono gia' oggi. */
+.fp-copy p{
+  font-size:15px;
+  line-height:1.72;
+}
+.fp-article-lead{
+  font-size:18px;
+  line-height:1.62;
+}
+
+@media (max-width:820px){
+  .fp-cat{font-size:var(--fp-mh-primary)}
+  .fp-nav-item-cat{font-size:var(--fp-mh-label)}
+  .fp-nav-item-title{font-size:var(--fp-mh-primary)}
+  .fp-rail-note{font-size:var(--fp-mh-secondary)}
+}
