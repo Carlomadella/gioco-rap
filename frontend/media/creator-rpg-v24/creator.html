@@ -160,6 +160,39 @@ body::before{
 }
 .field input::placeholder{color:#464b55}
 
+/* ADF_IDENTITY_CAPITAL_BLOCK_V1
+   La provenienza iniziale non può essere un capoluogo:
+   messaggio piccolo sotto il campo, senza cambiare il layout dei due input. */
+.city-error-row{
+  grid-column:2;
+  display:none;
+  margin-top:-7px;
+  padding:0 3px;
+  color:#d99a85;
+  font-size:9px;
+  font-weight:700;
+  line-height:1.35;
+  letter-spacing:.025em;
+}
+.city-error-row.on{display:block}
+.field.city-invalid{
+  border-color:rgba(217,154,133,.52);
+  box-shadow:
+    inset 0 0 0 1px rgba(217,154,133,.08),
+    0 0 0 1px rgba(217,154,133,.025);
+}
+.field.city-invalid input{color:#fff4ef}
+@media(max-width:980px){
+  .city-error-row{grid-column:1;margin-top:-6px}
+}
+@media(max-height:740px) and (min-width:801px){
+  .city-error-row{
+    margin-top:-8px;
+    font-size:8px;
+    line-height:1.2;
+  }
+}
+
 /* ADF_IDENTITY_RANDOM_BUTTONS_V1
    Azioni piccole integrate nei campi: stessa grammatica visiva del creator,
    senza rubare spazio alla sezione generi sottostante. */
@@ -2313,9 +2346,10 @@ body::before{
             </div>
             <div class="field field-random">
               <label>Città di provenienza · obbligatoria</label>
-              <input id="city" placeholder="es. Torino">
+              <input id="city" placeholder="es. Varenna" aria-describedby="cityError" aria-invalid="false">
               <button class="field-random-btn" id="randomCity" type="button" aria-label="Genera una città di provenienza casuale">Casuale</button>
             </div>
+            <div class="city-error-row" id="cityError" role="status" aria-live="polite"></div>
           </div>
 
           <div class="section-head">
@@ -2984,10 +3018,76 @@ function openDressingRoom(previewOnly=false){
   setTimeout(()=>sendDressingRoomInit(previewOnly),60);
 }
 
+/* ADF_IDENTITY_CAPITAL_BLOCK_V1
+   Blocchiamo i capoluoghi italiani come provenienza iniziale.
+   La lista comprende capoluoghi regionali/provinciali/metropolitani e,
+   per robustezza, le sedi sarde recenti/storiche che potrebbero essere
+   inserite dall'utente come capoluogo. */
+const START_BLOCKED_CAPITALS = new Set([
+  "agrigento","alessandria","ancona","andria","aosta","aoste","arezzo",
+  "ascoli piceno","asti","avellino","bari","barletta","belluno","benevento",
+  "bergamo","biella","bologna","bolzano","bozen","brescia","brindisi",
+  "cagliari","caltanissetta","campobasso","carbonia","caserta","catania",
+  "catanzaro","chieti","como","cosenza","cremona","crotone","cuneo","enna",
+  "fermo","ferrara","firenze","florence","foggia","forli","frosinone",
+  "genova","genoa","gorizia","grosseto","iglesias","imperia","isernia",
+  "l aquila","la spezia","lanusei","latina","lecce","lecco","livorno",
+  "lodi","lucca","macerata","mantova","massa","matera","messina","milano",
+  "milan","modena","monza","napoli","naples","novara","nuoro","olbia",
+  "oristano","padova","palermo","parma","pavia","perugia","pesaro","pescara",
+  "piacenza","pisa","pistoia","pordenone","potenza","prato","ragusa",
+  "ravenna","reggio calabria","reggio di calabria","reggio emilia",
+  "reggio nell emilia","rieti","rimini","roma","rome","rovigo","salerno",
+  "sanluri","sassari","savona","siena","siracusa","sondrio","taranto",
+  "tempio pausania","teramo","terni","torino","turin","tortoli","trani",
+  "trapani","trento","treviso","trieste","udine","varese","venezia","venice",
+  "verbania","vercelli","verona","vibo valentia","vicenza","villacidro",
+  "viterbo"
+]);
+
+function normalizeStartCity(value){
+  return String(value || "")
+    .trim()
+    .replace(/\s*\([^)]*\)\s*$/, "")
+    .replace(/\s*,\s*[A-Za-z]{2}\s*$/, "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[’'´]/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+function cityTooLargeToStart(value){
+  const normalized = normalizeStartCity(value);
+  return !!normalized && START_BLOCKED_CAPITALS.has(normalized);
+}
+
 function validateIdentity(){
-  state.name = $('name').value.trim();
-  state.city = $('city').value.trim();
-  $('goStory').disabled = !(state.name && state.city && state.genre);
+  const nameInput = $('name');
+  const cityInput = $('city');
+  const cityError = $('cityError');
+  const cityField = cityInput?.closest('.field') || null;
+
+  state.name = nameInput.value.trim();
+  state.city = cityInput.value.trim();
+
+  const blockedCity = cityTooLargeToStart(state.city);
+
+  if(cityError){
+    cityError.textContent = blockedCity
+      ? 'questa città è troppo grande per iniziare'
+      : '';
+    cityError.classList.toggle('on', blockedCity);
+  }
+
+  cityInput.setAttribute('aria-invalid', blockedCity ? 'true' : 'false');
+  if(cityField) cityField.classList.toggle('city-invalid', blockedCity);
+
+  const valid = !!(state.name && state.city && state.genre && !blockedCity);
+  $('goStory').disabled = !valid;
+  return valid;
 }
 
 function renderStory(){
@@ -3418,6 +3518,7 @@ $('name').addEventListener('input', validateIdentity);
 $('city').addEventListener('input', validateIdentity);
 
 $('goStory').onclick = ()=>{
+  if(!validateIdentity()) return;
   setProgress(2);
   storyStep = 0;
   renderStory();
