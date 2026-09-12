@@ -43,6 +43,8 @@ jobs:
           cache-dependency-path: 'frontend/strumenti/fame-neural-composer/owned-beats/requirements-audio-analysis-lock.txt'
       - name: Candidate freeze integrity
         run: python frontend/strumenti/fame-neural-composer/owned-beats-candidate-freeze-test.py
+      - name: Audio Analysis holdout boundary gate regression
+        run: python -B frontend/strumenti/fame-neural-composer/owned-beats/audio-analysis-holdout-gate-test.py
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Install audio-analysis Python environment

@@ -799,3 +799,28 @@ Artefatti congelati:
 Il candidate freeze e stato verificato dopo la correzione semantica del validator documentata in NDR-054. Candidate source, config e protocollo restano invariati.
 
 Da questo punto config-001 non viene piu modificata, config-002 non viene aperta per migliorare il risultato corrente, l'holdout resta non osservato fino alla singola evaluation finale e dopo l'osservazione non e consentito tuning sullo stesso set. L'audit di diversita/difficolta del pilot resta separato e non deve usare l'holdout come set di sviluppo.
+
+## NDR-056 — Holdout Audio Analysis: preflight metadata-only e reservation one-shot separata dall'accesso audio
+
+Data: 12 settembre 2026. Stato: adottata prima di qualunque accesso holdout.
+
+Dopo la chiusura development di `audio-analysis-v2-config-001` con `V2_WINS` e candidate freeze verificato, viene introdotto un boundary gate dedicato alla futura evaluation holdout.
+
+Il gate separa due operazioni:
+
+- `preflight`: verifica protocollo, candidate freeze, config congelata, integrità degli split nel manifest, presenza di esattamente 10 composition family holdout e assenza di utilizzi/reservation precedenti;
+- `reserve`: crea la reservation one-shot mediante `candidate_freeze.reserve_holdout()` prima di qualunque accesso futuro agli audio holdout.
+
+Il `preflight` è esplicitamente metadata-only: non apre, non hash-a, non prova e non decodifica `localPath` degli asset holdout. La reservation è un comando separato, esplicito e irreversibile; non viene eseguita durante sviluppo, test o preflight.
+
+Il test di regressione usa path audio volutamente inesistenti e verifica che selezione e reservation metadata funzionino senza accesso audio. Verifica inoltre:
+
+- 10 family holdout esatte;
+- nessun overlap di `compositionFamilyId` tra development e holdout;
+- esattamente un source record per family holdout;
+- blocco su reservation/uso precedente anche con candidateId differente;
+- semantica one-shot della reservation.
+
+Questa modifica non osserva l'holdout, non genera Human Reference holdout, non esegue V1/V2 sulle 10 tracce e non cambia candidate, config, protocollo o freeze.
+
+Il prossimo passaggio consentito, solo dopo `HOLDOUT_PREFLIGHT_PASS`, è preparare il percorso di Human Reference holdout cieca e poi eseguire una singola evaluation finale secondo il protocollo congelato.
