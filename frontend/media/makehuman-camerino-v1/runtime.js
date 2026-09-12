@@ -4961,6 +4961,10 @@ async function init() {
 
     initialCharacterState=snapshotCharacterState();
     runtimeReady=true;
+    /* ADF_MAKEHUMAN_PRESETS_MOUNT_V2
+       La UI preset viene montata quando il runtime MakeHuman è realmente pronto.
+       Non dipende da DOMContentLoaded, perché runtime.js è un modulo dinamico. */
+    adfMhMountPresetBox();
     if(pendingRestoreState) {
       const restore=pendingRestoreState; pendingRestoreState=null;
       await restoreCharacterState(restore,{refit:true});
@@ -5010,3 +5014,1323 @@ bindColorCustomizer();
 bindEditorShell();
 
 init();
+
+/* ============================================================
+   ADF_MAKEHUMAN_PRESETS_V1
+   14 preset MakeHuman:
+   - 7 uomo
+   - 7 donna
+   Cambiano: sesso, shape, modifier, pelle, capelli, vestiti.
+   Non toccano accessori. Gli slider restano poi modificabili.
+   ============================================================ */
+
+/* ADF_MAKEHUMAN_PRESETS_FACE_PROFILES_V5 · ADF_MAKEHUMAN_PRESETS_FACE_IDENTITY_V6
+   14 identità facciali volutamente differenziate.
+   I valori continuano a pilotare gli slider MakeHuman reali
+   e restano modificabili manualmente dopo il preset. */
+const ADF_MH_PRESETS = [
+  {
+    id:'uomo-affilato',
+    gender:'male',
+    label:'Affilato',
+    blurb:'Lineamenti netti, fisico asciutto, look urbano.',
+    skin:['olive','light','tan'],
+    hair:['fade','short','crop','undercut','buzz'],
+    facialHair:{patterns:['stubble','goatee','short beard','beard'],allowEmpty:false},
+    wardrobe:{
+      tops:{patterns:['hood','hoodie','jacket','shirt','tee','t-shirt'],allowEmpty:false},
+      bottoms:{patterns:['jean','pants','trouser','cargo'],allowEmpty:false},
+      dresses:{patterns:[],allowEmpty:true},
+      underwear:{patterns:['boxer','brief'],allowEmpty:true},
+      shoes:{patterns:['sneaker','boot','trainer'],allowEmpty:false},
+      outerwear:{patterns:['bomber','jacket','coat'],allowEmpty:true},
+      clothesOther:{patterns:[],allowEmpty:true}
+    },
+    mods:{age:.28,height:.64,weight:.34,muscle:.42,jawWidth:.82,chinSize:.74,cheekFullness:.14,noseWidth:.3,noseLength:.72,eyeSize:.38,browProminence:.76,lipFullness:.26,shoulder:.58,waist:.42,hip:.34,faceRoundness:.1,neck:.46,headWidth:.32,headHeight:.62,headDepth:.36,foreheadHeight:.66,foreheadProjection:.58,eyeSpacing:.6,eyeVertical:.5,eyeCorner:.7,browHeight:.42,browAngle:.7,cheekHeight:.78,chinProminence:.76,noseDepth:.62,noseTip:.6,noseCurve:.56,mouthWidth:.42,mouthHeight:.32,headSquare:.42,headOval:.62}
+  },
+  {
+    id:'uomo-atletico',
+    gender:'male',
+    label:'Atletico',
+    blurb:'Corpo tonico, spalle aperte, volto energico.',
+    skin:['tan','olive','light'],
+    hair:['short','crew','fade','sport'],
+    facialHair:{patterns:['stubble','short beard'],allowEmpty:true},
+    wardrobe:{
+      tops:{patterns:['tank','tee','t-shirt','hoodie','sweat'],allowEmpty:false},
+      bottoms:{patterns:['jogger','sport','track','pants','short'],allowEmpty:false},
+      dresses:{patterns:[],allowEmpty:true},
+      underwear:{patterns:['boxer','brief'],allowEmpty:true},
+      shoes:{patterns:['sneaker','trainer','running'],allowEmpty:false},
+      outerwear:{patterns:['hoodie','jacket'],allowEmpty:true},
+      clothesOther:{patterns:[],allowEmpty:true}
+    },
+    mods:{age:.26,height:.66,weight:.48,muscle:.76,jawWidth:.68,chinSize:.58,cheekFullness:.28,noseWidth:.44,noseLength:.48,eyeSize:.46,browProminence:.62,lipFullness:.36,shoulder:.72,waist:.40,hip:.36,faceRoundness:.26,neck:.62,headWidth:.56,headHeight:.54,headDepth:.56,foreheadHeight:.54,foreheadProjection:.54,eyeSpacing:.52,eyeVertical:.5,eyeCorner:.56,browHeight:.48,browAngle:.56,cheekHeight:.6,chinProminence:.6,noseDepth:.52,noseTip:.52,noseCurve:.48,mouthWidth:.56,mouthHeight:.44,headSquare:.46,headOval:.34}
+  },
+  {
+    id:'uomo-robusto',
+    gender:'male',
+    label:'Robusto',
+    blurb:'Corporatura solida, guance più piene, presenza forte.',
+    skin:['olive','tan','brown'],
+    hair:['short','wavy','messy','medium'],
+    facialHair:{patterns:['beard','full beard','short beard'],allowEmpty:false},
+    wardrobe:{
+      tops:{patterns:['flannel','shirt','tee','t-shirt','jacket'],allowEmpty:false},
+      bottoms:{patterns:['jean','cargo','pants'],allowEmpty:false},
+      dresses:{patterns:[],allowEmpty:true},
+      underwear:{patterns:['boxer','brief'],allowEmpty:true},
+      shoes:{patterns:['boot','sneaker'],allowEmpty:false},
+      outerwear:{patterns:['jacket','coat'],allowEmpty:true},
+      clothesOther:{patterns:[],allowEmpty:true}
+    },
+    mods:{age:.42,height:.56,weight:.70,muscle:.58,jawWidth:.76,chinSize:.64,cheekFullness:.76,noseWidth:.64,noseLength:.46,eyeSize:.36,browProminence:.58,lipFullness:.42,shoulder:.68,waist:.58,hip:.44,faceRoundness:.78,neck:.7,headWidth:.74,headHeight:.44,headDepth:.72,foreheadHeight:.46,foreheadProjection:.58,eyeSpacing:.44,eyeVertical:.47,eyeCorner:.4,browHeight:.42,browAngle:.46,cheekHeight:.44,chinProminence:.7,noseDepth:.66,noseTip:.42,noseCurve:.6,mouthWidth:.66,mouthHeight:.46,headSquare:.72,headOval:.12}
+  },
+  {
+    id:'uomo-slanciato',
+    gender:'male',
+    label:'Slanciato',
+    blurb:'Più alto, asciutto e con linee eleganti.',
+    skin:['light','olive','tan'],
+    hair:['medium','swept','wavy','side'],
+    facialHair:{patterns:['goatee','stubble'],allowEmpty:true},
+    wardrobe:{
+      tops:{patterns:['shirt','blazer','coat','jacket'],allowEmpty:false},
+      bottoms:{patterns:['trouser','pants','slim','jean'],allowEmpty:false},
+      dresses:{patterns:[],allowEmpty:true},
+      underwear:{patterns:['boxer','brief'],allowEmpty:true},
+      shoes:{patterns:['boot','shoe','sneaker'],allowEmpty:false},
+      outerwear:{patterns:['coat','jacket','blazer'],allowEmpty:true},
+      clothesOther:{patterns:[],allowEmpty:true}
+    },
+    mods:{age:.34,height:.78,weight:.28,muscle:.34,jawWidth:.44,chinSize:.62,cheekFullness:.12,noseWidth:.24,noseLength:.78,eyeSize:.48,browProminence:.44,lipFullness:.32,shoulder:.50,waist:.34,hip:.32,faceRoundness:.08,neck:.38,headWidth:.22,headHeight:.76,headDepth:.3,foreheadHeight:.72,foreheadProjection:.48,eyeSpacing:.64,eyeVertical:.54,eyeCorner:.62,browHeight:.54,browAngle:.54,cheekHeight:.74,chinProminence:.62,noseDepth:.58,noseTip:.62,noseCurve:.52,mouthWidth:.36,mouthHeight:.36,headSquare:.08,headOval:.86}
+  },
+  {
+    id:'uomo-giovane',
+    gender:'male',
+    label:'Giovane',
+    blurb:'Tratti freschi, occhi un po’ più grandi, street casual.',
+    skin:['light','olive','tan'],
+    hair:['short','messy','fringe','crop'],
+    facialHair:{patterns:[],allowEmpty:true},
+    wardrobe:{
+      tops:{patterns:['hoodie','tee','t-shirt','sweat'],allowEmpty:false},
+      bottoms:{patterns:['jogger','jean','pants'],allowEmpty:false},
+      dresses:{patterns:[],allowEmpty:true},
+      underwear:{patterns:['boxer','brief'],allowEmpty:true},
+      shoes:{patterns:['sneaker','trainer'],allowEmpty:false},
+      outerwear:{patterns:['hoodie','jacket'],allowEmpty:true},
+      clothesOther:{patterns:[],allowEmpty:true}
+    },
+    mods:{age:.18,height:.58,weight:.32,muscle:.34,jawWidth:.28,chinSize:.26,cheekFullness:.52,noseWidth:.24,noseLength:.3,eyeSize:.78,browProminence:.3,lipFullness:.56,shoulder:.46,waist:.36,hip:.34,faceRoundness:.6,neck:.34,headWidth:.44,headHeight:.46,headDepth:.48,foreheadHeight:.68,foreheadProjection:.42,eyeSpacing:.6,eyeVertical:.6,eyeCorner:.64,browHeight:.62,browAngle:.46,cheekHeight:.56,chinProminence:.24,noseDepth:.32,noseTip:.6,noseCurve:.38,mouthWidth:.54,mouthHeight:.62,headSquare:.06,headOval:.38}
+  },
+  {
+    id:'uomo-maturo',
+    gender:'male',
+    label:'Maturo',
+    blurb:'Età più adulta, volto definito, outfit più pulito.',
+    skin:['olive','tan','light'],
+    hair:['short','classic','comb','side'],
+    facialHair:{patterns:['short beard','beard','goatee'],allowEmpty:true},
+    wardrobe:{
+      tops:{patterns:['shirt','polo','knit','jacket'],allowEmpty:false},
+      bottoms:{patterns:['trouser','pants','chino','jean'],allowEmpty:false},
+      dresses:{patterns:[],allowEmpty:true},
+      underwear:{patterns:['boxer','brief'],allowEmpty:true},
+      shoes:{patterns:['shoe','boot','loafer'],allowEmpty:false},
+      outerwear:{patterns:['coat','jacket','blazer'],allowEmpty:true},
+      clothesOther:{patterns:[],allowEmpty:true}
+    },
+    mods:{age:.62,height:.58,weight:.44,muscle:.40,jawWidth:.7,chinSize:.76,cheekFullness:.24,noseWidth:.52,noseLength:.78,eyeSize:.28,browProminence:.74,lipFullness:.24,shoulder:.56,waist:.48,hip:.36,faceRoundness:.22,neck:.56,headWidth:.58,headHeight:.6,headDepth:.64,foreheadHeight:.5,foreheadProjection:.66,eyeSpacing:.46,eyeVertical:.42,eyeCorner:.42,browHeight:.36,browAngle:.62,cheekHeight:.64,chinProminence:.82,noseDepth:.74,noseTip:.44,noseCurve:.72,mouthWidth:.48,mouthHeight:.28,headSquare:.6,headOval:.36}
+  },
+  {
+    id:'uomo-massiccio',
+    gender:'male',
+    label:'Massiccio',
+    blurb:'Spalle ampie, collo più spesso, fisico grande.',
+    skin:['brown','tan','olive'],
+    hair:['buzz','short','crew'],
+    facialHair:{patterns:['full beard','beard','short beard'],allowEmpty:false},
+    wardrobe:{
+      tops:{patterns:['hoodie','jacket','tee','t-shirt'],allowEmpty:false},
+      bottoms:{patterns:['cargo','pants','jean'],allowEmpty:false},
+      dresses:{patterns:[],allowEmpty:true},
+      underwear:{patterns:['boxer','brief'],allowEmpty:true},
+      shoes:{patterns:['boot','sneaker'],allowEmpty:false},
+      outerwear:{patterns:['jacket','coat'],allowEmpty:true},
+      clothesOther:{patterns:[],allowEmpty:true}
+    },
+    mods:{age:.46,height:.60,weight:.82,muscle:.82,jawWidth:.92,chinSize:.84,cheekFullness:.7,noseWidth:.76,noseLength:.44,eyeSize:.24,browProminence:.8,lipFullness:.34,shoulder:.82,waist:.62,hip:.44,faceRoundness:.66,neck:.88,headWidth:.88,headHeight:.38,headDepth:.84,foreheadHeight:.4,foreheadProjection:.68,eyeSpacing:.4,eyeVertical:.44,eyeCorner:.34,browHeight:.34,browAngle:.72,cheekHeight:.38,chinProminence:.92,noseDepth:.82,noseTip:.36,noseCurve:.64,mouthWidth:.74,mouthHeight:.4,headSquare:.92,headOval:.04}
+  },
+
+  {
+    id:'donna-affilata',
+    gender:'female',
+    label:'Affilata',
+    blurb:'Tratti fini, silhouette asciutta, look deciso.',
+    skin:['light','olive','tan'],
+    hair:['bob','straight','long','sleek'],
+    facialHair:{patterns:[],allowEmpty:true},
+    wardrobe:{
+      tops:{patterns:['top','blouse','shirt','crop'],allowEmpty:false},
+      bottoms:{patterns:['pants','trouser','skirt','jean'],allowEmpty:false},
+      dresses:{patterns:[],allowEmpty:true},
+      underwear:{patterns:['bra','brief','underwear'],allowEmpty:true},
+      shoes:{patterns:['boot','heel','shoe'],allowEmpty:false},
+      outerwear:{patterns:['jacket','coat'],allowEmpty:true},
+      clothesOther:{patterns:[],allowEmpty:true}
+    },
+    mods:{age:.30,height:.66,weight:.28,muscle:.32,cheekFullness:.1,jawWidth:.2,chinSize:.44,noseWidth:.18,noseLength:.66,eyeSize:.66,browProminence:.54,lipFullness:.58,waist:.24,hip:.58,shoulder:.34,bust:.48,faceRoundness:.08,neck:.28,headWidth:.2,headHeight:.7,headDepth:.3,foreheadHeight:.72,foreheadProjection:.48,eyeSpacing:.64,eyeVertical:.56,eyeCorner:.74,browHeight:.58,browAngle:.68,cheekHeight:.82,chinProminence:.5,noseDepth:.42,noseTip:.64,noseCurve:.38,mouthWidth:.42,mouthHeight:.46,headSquare:.04,headOval:.78}
+  },
+  {
+    id:'donna-atletica',
+    gender:'female',
+    label:'Atletica',
+    blurb:'Fisico tonico, postura energica, abbigliamento sportivo.',
+    skin:['tan','olive','light'],
+    hair:['ponytail','sport','short','braid'],
+    facialHair:{patterns:[],allowEmpty:true},
+    wardrobe:{
+      tops:{patterns:['tank','top','hoodie','tee','t-shirt'],allowEmpty:false},
+      bottoms:{patterns:['legging','jogger','sport','pants','short'],allowEmpty:false},
+      dresses:{patterns:[],allowEmpty:true},
+      underwear:{patterns:['bra','brief','underwear'],allowEmpty:true},
+      shoes:{patterns:['sneaker','trainer','running'],allowEmpty:false},
+      outerwear:{patterns:['hoodie','jacket'],allowEmpty:true},
+      clothesOther:{patterns:[],allowEmpty:true}
+    },
+    mods:{age:.28,height:.64,weight:.40,muscle:.66,cheekFullness:.26,jawWidth:.42,chinSize:.48,noseWidth:.32,noseLength:.46,eyeSize:.52,browProminence:.52,lipFullness:.44,waist:.30,hip:.52,shoulder:.46,bust:.42,faceRoundness:.22,neck:.44,headWidth:.44,headHeight:.56,headDepth:.48,foreheadHeight:.58,foreheadProjection:.5,eyeSpacing:.54,eyeVertical:.54,eyeCorner:.58,browHeight:.52,browAngle:.56,cheekHeight:.64,chinProminence:.48,noseDepth:.48,noseTip:.56,noseCurve:.44,mouthWidth:.54,mouthHeight:.48,headSquare:.24,headOval:.46}
+  },
+  {
+    id:'donna-morbida',
+    gender:'female',
+    label:'Morbida',
+    blurb:'Linee più dolci, volto pieno, presenza delicata.',
+    skin:['light','tan','olive'],
+    hair:['wavy','curly','long','soft'],
+    facialHair:{patterns:[],allowEmpty:true},
+    wardrobe:{
+      tops:{patterns:['blouse','knit','top'],allowEmpty:false},
+      bottoms:{patterns:['skirt','pants','jean'],allowEmpty:true},
+      dresses:{patterns:['dress'],allowEmpty:true},
+      underwear:{patterns:['bra','brief','underwear'],allowEmpty:true},
+      shoes:{patterns:['boot','flat','shoe','heel'],allowEmpty:false},
+      outerwear:{patterns:['cardigan','coat','jacket'],allowEmpty:true},
+      clothesOther:{patterns:[],allowEmpty:true}
+    },
+    mods:{age:.36,height:.54,weight:.58,muscle:.26,cheekFullness:.82,jawWidth:.28,chinSize:.3,noseWidth:.42,noseLength:.36,eyeSize:.64,browProminence:.3,lipFullness:.74,waist:.40,hip:.68,shoulder:.34,bust:.60,faceRoundness:.86,neck:.34,headWidth:.64,headHeight:.4,headDepth:.68,foreheadHeight:.52,foreheadProjection:.4,eyeSpacing:.5,eyeVertical:.6,eyeCorner:.54,browHeight:.6,browAngle:.42,cheekHeight:.42,chinProminence:.28,noseDepth:.38,noseTip:.58,noseCurve:.34,mouthWidth:.62,mouthHeight:.68,headSquare:.02,headOval:.24}
+  },
+  {
+    id:'donna-slanciata',
+    gender:'female',
+    label:'Slanciata',
+    blurb:'Più alta e longilinea, look pulito e verticale.',
+    skin:['olive','light','tan'],
+    hair:['long','straight','side','sleek'],
+    facialHair:{patterns:[],allowEmpty:true},
+    wardrobe:{
+      tops:{patterns:['blouse','shirt','top','coat'],allowEmpty:false},
+      bottoms:{patterns:['trouser','pants','slim'],allowEmpty:false},
+      dresses:{patterns:['dress'],allowEmpty:true},
+      underwear:{patterns:['bra','brief','underwear'],allowEmpty:true},
+      shoes:{patterns:['heel','boot','shoe'],allowEmpty:false},
+      outerwear:{patterns:['coat','jacket','blazer'],allowEmpty:true},
+      clothesOther:{patterns:[],allowEmpty:true}
+    },
+    mods:{age:.34,height:.80,weight:.26,muscle:.24,cheekFullness:.08,jawWidth:.16,chinSize:.42,noseWidth:.16,noseLength:.76,eyeSize:.56,browProminence:.46,lipFullness:.42,waist:.22,hip:.50,shoulder:.32,bust:.42,faceRoundness:.06,neck:.24,headWidth:.16,headHeight:.82,headDepth:.26,foreheadHeight:.76,foreheadProjection:.48,eyeSpacing:.66,eyeVertical:.56,eyeCorner:.7,browHeight:.56,browAngle:.62,cheekHeight:.78,chinProminence:.44,noseDepth:.46,noseTip:.66,noseCurve:.42,mouthWidth:.36,mouthHeight:.44,headSquare:.02,headOval:.92}
+  },
+  {
+    id:'donna-giovane',
+    gender:'female',
+    label:'Giovane',
+    blurb:'Tratti freschi, occhi un po’ più grandi, casual moderno.',
+    skin:['light','olive','tan'],
+    hair:['ponytail','bob','messy','fringe','long'],
+    facialHair:{patterns:[],allowEmpty:true},
+    wardrobe:{
+      tops:{patterns:['hoodie','tee','t-shirt','top','crop'],allowEmpty:false},
+      bottoms:{patterns:['jean','skirt','jogger','pants'],allowEmpty:false},
+      dresses:{patterns:[],allowEmpty:true},
+      underwear:{patterns:['bra','brief','underwear'],allowEmpty:true},
+      shoes:{patterns:['sneaker','shoe','boot'],allowEmpty:false},
+      outerwear:{patterns:['hoodie','jacket'],allowEmpty:true},
+      clothesOther:{patterns:[],allowEmpty:true}
+    },
+    mods:{age:.18,height:.58,weight:.28,muscle:.22,cheekFullness:.5,jawWidth:.12,chinSize:.22,noseWidth:.16,noseLength:.26,eyeSize:.84,browProminence:.26,lipFullness:.68,waist:.28,hip:.54,shoulder:.30,bust:.38,faceRoundness:.58,neck:.24,headWidth:.4,headHeight:.46,headDepth:.44,foreheadHeight:.72,foreheadProjection:.38,eyeSpacing:.62,eyeVertical:.64,eyeCorner:.68,browHeight:.64,browAngle:.5,cheekHeight:.56,chinProminence:.2,noseDepth:.28,noseTip:.66,noseCurve:.3,mouthWidth:.52,mouthHeight:.7,headSquare:.01,headOval:.34}
+  },
+  {
+    id:'donna-matura',
+    gender:'female',
+    label:'Matura',
+    blurb:'Età più adulta, lineamenti composti, outfit più sobrio.',
+    skin:['tan','olive','light'],
+    hair:['medium','wavy','classic','long'],
+    facialHair:{patterns:[],allowEmpty:true},
+    wardrobe:{
+      tops:{patterns:['blouse','shirt','knit'],allowEmpty:false},
+      bottoms:{patterns:['trouser','pants','skirt'],allowEmpty:false},
+      dresses:{patterns:['dress'],allowEmpty:true},
+      underwear:{patterns:['bra','brief','underwear'],allowEmpty:true},
+      shoes:{patterns:['shoe','boot','heel'],allowEmpty:false},
+      outerwear:{patterns:['coat','cardigan','jacket'],allowEmpty:true},
+      clothesOther:{patterns:[],allowEmpty:true}
+    },
+    mods:{age:.64,height:.56,weight:.46,muscle:.24,cheekFullness:.28,jawWidth:.4,chinSize:.56,noseWidth:.44,noseLength:.72,eyeSize:.32,browProminence:.6,lipFullness:.34,waist:.36,hip:.56,shoulder:.34,bust:.50,faceRoundness:.24,neck:.42,headWidth:.5,headHeight:.62,headDepth:.6,foreheadHeight:.52,foreheadProjection:.62,eyeSpacing:.48,eyeVertical:.42,eyeCorner:.44,browHeight:.38,browAngle:.62,cheekHeight:.62,chinProminence:.64,noseDepth:.66,noseTip:.46,noseCurve:.68,mouthWidth:.48,mouthHeight:.36,headSquare:.3,headOval:.5}
+  },
+  {
+    id:'donna-formosa',
+    gender:'female',
+    label:'Formosa',
+    blurb:'Curve più marcate, volto pieno, stile deciso.',
+    skin:['brown','tan','olive'],
+    hair:['curly','wavy','long','braid'],
+    facialHair:{patterns:[],allowEmpty:true},
+    wardrobe:{
+      tops:{patterns:['top','blouse','shirt'],allowEmpty:true},
+      bottoms:{patterns:['skirt','pants','jean'],allowEmpty:true},
+      dresses:{patterns:['dress'],allowEmpty:true},
+      underwear:{patterns:['bra','brief','underwear'],allowEmpty:true},
+      shoes:{patterns:['heel','boot','shoe'],allowEmpty:false},
+      outerwear:{patterns:['jacket','coat'],allowEmpty:true},
+      clothesOther:{patterns:[],allowEmpty:true}
+    },
+    mods:{age:.40,height:.56,weight:.66,muscle:.28,cheekFullness:.78,jawWidth:.34,chinSize:.4,noseWidth:.54,noseLength:.42,eyeSize:.58,browProminence:.36,lipFullness:.82,waist:.34,hip:.76,shoulder:.36,bust:.72,faceRoundness:.78,neck:.4,headWidth:.7,headHeight:.42,headDepth:.72,foreheadHeight:.48,foreheadProjection:.42,eyeSpacing:.46,eyeVertical:.58,eyeCorner:.52,browHeight:.56,browAngle:.44,cheekHeight:.44,chinProminence:.32,noseDepth:.46,noseTip:.54,noseCurve:.38,mouthWidth:.7,mouthHeight:.74,headSquare:.06,headOval:.2}
+  }
+];
+
+const ADF_MH_SEMANTIC_PATTERNS = {
+  age:[['age'],['old'],['young']],
+  height:[['height'],['stature']],
+  weight:[['weight'],['fat']],
+  muscle:[['muscle'],['muscular']],
+  bust:[['breast'],['bust'],['chest']],
+  jawWidth:[['jaw','width'],['mandible','width'],['jaw']],
+  chinSize:[['chin'],['menton']],
+  cheekFullness:[['cheek'],['cheekbone']],
+  noseWidth:[['nose','width']],
+  noseLength:[['nose','length'],['nose','size']],
+  eyeSize:[['eye','size'],['eyes']],
+  browProminence:[['brow'],['eyebrow']],
+  lipFullness:[['lip'],['mouth']],
+  shoulder:[['shoulder']],
+  waist:[['waist']],
+  hip:[['hip'],['pelvis']],
+  neck:[['neck']],
+  faceRoundness:[['round'],['roundness'],['face','shape']]
+};
+
+function adfMhDelay(ms){
+  return new Promise(resolve=>setTimeout(resolve,ms));
+}
+function adfMhNorm(value){
+  return String(value||'')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .trim();
+}
+function adfMhMetaText(meta){
+  return adfMhNorm([
+    meta?.fullName,
+    meta?.uiGroup,
+    meta?.uiLabel,
+    meta?.group,
+    meta?.rawGroup
+  ].filter(Boolean).join(' '));
+}
+function adfMhMatchesAny(text,patterns){
+  const hay=adfMhNorm(text);
+  if(!hay || !Array.isArray(patterns) || !patterns.length) return false;
+  return patterns.some(pattern=>{
+    if(Array.isArray(pattern)){
+      return pattern.every(token=>hay.includes(adfMhNorm(token)));
+    }
+    return hay.includes(adfMhNorm(pattern));
+  });
+}
+function adfMhPickOptionValue(select,patterns,{allowEmpty=false}={}){
+  if(!select) return '';
+  const options=[...select.options];
+  if(allowEmpty){
+    const empty=options.find(o=>!String(o.value||'').trim());
+    if(empty && (!patterns || !patterns.length)) return empty.value;
+  }
+  const nonEmpty=options.filter(o=>String(o.value||'').trim());
+  const match=nonEmpty.find(o=>{
+    const hay=`${o.value} ${o.textContent||''}`;
+    return adfMhMatchesAny(hay,patterns||[]);
+  });
+  if(match) return match.value;
+  if(allowEmpty && (!patterns || !patterns.length)){
+    const empty=options.find(o=>!String(o.value||'').trim());
+    if(empty) return empty.value;
+  }
+  return nonEmpty[0]?.value||'';
+}
+function adfMhPickEntryRaw(uiGroup,patterns,{allowEmpty=false}={}){
+  const entries=typeof entriesForUiGroup==='function' ? entriesForUiGroup(uiGroup) : [];
+  if(!Array.isArray(entries) || !entries.length){
+    return allowEmpty ? '' : '';
+  }
+  const match=entries.find(entry=>{
+    const hay=[entry?.raw,entry?.label,entry?.name,entry?.displayName].filter(Boolean).join(' ');
+    return adfMhMatchesAny(hay,patterns||[]);
+  });
+  if(match) return match.raw||'';
+  return allowEmpty ? '' : (entries[0]?.raw||'');
+}
+function adfMhMapNormalizedToMeta(meta,normalized){
+  const min=Number(meta?.min);
+  const max=Number(meta?.max);
+  const lo=Number.isFinite(min) ? min : 0;
+  const hi=Number.isFinite(max) ? max : 1;
+  const n=Math.max(0,Math.min(1,Number(normalized)));
+  return lo + ((hi-lo)*n);
+}
+function adfMhApplySemantic(modifiers,key,normalized){
+  const patterns=ADF_MH_SEMANTIC_PATTERNS[key];
+  if(!patterns || !Array.isArray(nativeModifierMeta)) return 0;
+  let count=0;
+  for(const meta of nativeModifierMeta){
+    const text=adfMhMetaText(meta);
+    if(!adfMhMatchesAny(text,patterns)) continue;
+    modifiers[meta.fullName]=adfMhMapNormalizedToMeta(meta,normalized);
+    count++;
+  }
+  return count;
+}
+function adfMhSetSkinFromPatterns(state,preset){
+  const select=(typeof skinSelect!=='undefined' && skinSelect) ? skinSelect : document.querySelector('#skinSelect, select[id*="skin"]');
+  if(!select) return;
+  const value=adfMhPickOptionValue(select,preset.skin||[],{allowEmpty:false});
+  if(value){
+    select.value=value;
+    state.skin=value;
+  }
+}
+function adfMhSetNonWardrobeSlots(state,preset){
+  state.slots=state.slots||{};
+  const slotPatterns={
+    hair:preset.hair||[],
+    facialHair:(preset.facialHair?.patterns)||[]
+  };
+  for(const [slotId,patterns] of Object.entries(slotPatterns)){
+    const select=(typeof E==='function' ? E(`slot-${slotId}`) : null) || document.getElementById(`slot-${slotId}`);
+    if(!select) continue;
+    const value=adfMhPickOptionValue(
+      select,
+      patterns,
+      {allowEmpty:Boolean(preset.facialHair?.allowEmpty && slotId==='facialHair')}
+    );
+    select.value=value;
+    state.slots[slotId]=value;
+  }
+}
+function adfMhSetClothingSlots(state,preset){
+  state.slots=state.slots||{};
+  if(!Array.isArray(SLOT_DEFS)) return;
+  for(const def of SLOT_DEFS){
+    if(!WARDROBE_SLOT_SET?.has(def.id)) continue;
+    if(!['tops','bottoms','dresses','underwear','shoes','outerwear','clothesOther'].includes(def.uiGroup)) continue;
+    const rule=preset.wardrobe?.[def.uiGroup];
+    if(!rule) continue;
+    const raw=adfMhPickEntryRaw(def.uiGroup,rule.patterns||[],{allowEmpty:Boolean(rule.allowEmpty)});
+    state.slots[def.id]=raw;
+  }
+}
+async function adfMhSwitchGender(gender){
+  const buttons=[...document.querySelectorAll('.gender-quick button')];
+  if(!buttons.length) return false;
+  const want=gender==='female' ? ['donna','femmina','female'] : ['uomo','maschio','male'];
+  const btn=buttons.find(button=>{
+    const text=adfMhNorm(button.textContent||'');
+    return want.some(token=>text.includes(token));
+  });
+  if(!btn) return false;
+  if(!btn.classList.contains('active')){
+    btn.click();
+    await adfMhDelay(260);
+  }
+  return true;
+}
+function adfMhBaseState(){
+  const snapshot=typeof snapshotCharacterState==='function'
+    ? snapshotCharacterState()
+    : {schema:'adf.makehuman.character.v2',slots:{},modifiers:{},customTargets:{},appearanceColors:{}};
+
+  return {
+    schema:snapshot?.schema||'adf.makehuman.character.v2',
+    slots:{...(snapshot?.slots||{})},
+    skin:snapshot?.skin||'',
+    modifiers:{...((nativeModifierDefaults && Object.keys(nativeModifierDefaults).length) ? nativeModifierDefaults : (snapshot?.modifiers||{}))},
+    customTargets:{},
+    appearanceColors:{...(snapshot?.appearanceColors||{})}
+  };
+}
+async function adfMhApplyPreset(presetId){
+  /* ADF_MAKEHUMAN_PRESETS_INPLACE_V4
+     I preset vengono applicati NELLA sessione corrente.
+     Niente restoreCharacterState(): quello è un restore completo
+     e può riportare temporaneamente l'editor allo stato iniziale. */
+  const preset=ADF_MH_PRESETS.find(p=>p.id===presetId);
+  if(!preset || !runtimeReady || !nativeEngineReady) return;
+
+  const sectionBefore=currentEditorSection;
+  const cameraBefore=currentCameraView;
+
+  adfMhSetPresetStatus(`Applico preset "${preset.label}"…`,'info');
+  adfMhSetPresetButtonsEnabled(false);
+
+  try{
+    const state=adfMhBaseState();
+
+    state.modifiers={
+      ...(state.modifiers||{}),
+      'macrodetails/Gender':preset.gender==='female' ? 0 : 1
+    };
+
+    adfMhSetSkinFromPatterns(state,preset);
+    adfMhSetNonWardrobeSlots(state,preset);
+    adfMhSetClothingSlots(state,preset);
+
+    for(const [key,value] of Object.entries(preset.mods||{})){
+      adfMhApplySemantic(state.modifiers,key,value);
+    }
+
+    /*
+      Applichiamo gli slot normali direttamente ai select correnti.
+      Non tocchiamo sezione, navigazione o lifecycle del camerino.
+    */
+    for(const def of SLOT_DEFS){
+      if(WARDROBE_SLOT_SET.has(def.id)) continue;
+
+      const select=E(`slot-${def.id}`);
+      const value=state.slots?.[def.id];
+
+      if(
+        select &&
+        typeof value==='string' &&
+        [...select.options].some(o=>o.value===value)
+      ){
+        select.value=value;
+      }
+    }
+
+    /*
+      Il guardaroba usa la sua API esistente: stessa logica degli
+      slider/select manuali, senza ripristinare l'intero personaggio.
+    */
+    applyWardrobeSelections(state.slots||{},{notify:false});
+
+    if(
+      typeof state.skin==='string' &&
+      skinSelect &&
+      [...skinSelect.options].some(o=>o.value===state.skin)
+    ){
+      skinSelect.value=state.skin;
+      currentSkin=state.skin||null;
+    }
+
+    /*
+      Un solo set-many al motore MakeHuman.
+      È l'unica operazione morfologica del preset.
+    */
+    await requestNativeModifiers(state.modifiers);
+
+    if(typeof syncGenderQuick==='function') syncGenderQuick();
+    if(typeof syncModifierControls==='function') syncModifierControls();
+
+    /*
+      Il click sul preset non può cambiare pagina/sezione/camera.
+      Manteniamo esplicitamente il contesto in cui l'utente si trovava.
+    */
+    if(
+      sectionBefore &&
+      typeof setEditorSection==='function'
+    ){
+      setEditorSection(sectionBefore,{autoFrame:false});
+    }
+
+    if(
+      cameraBefore &&
+      typeof setCameraView==='function'
+    ){
+      setCameraView(cameraBefore,{smooth:false});
+    }
+
+    if(typeof applyVisualCenter==='function') applyVisualCenter();
+
+    adfMhSetPresetStatus(`Preset applicato: ${preset.label}`,'ok');
+
+  }catch(err){
+    console.error('[ADF PRESET]',err);
+    adfMhSetPresetStatus(
+      `Errore preset: ${err?.message||'sconosciuto'}`,
+      'bad'
+    );
+  }finally{
+    adfMhSetPresetButtonsEnabled(true);
+  }
+}
+
+function adfMhInjectPresetStyles(){
+  if(document.getElementById('adf-mh-presets-style')) return;
+  const style=document.createElement('style');
+  style.id='adf-mh-presets-style';
+  style.textContent=`
+    .adf-mh-preset-box{
+      margin-top:12px;
+    }
+    .adf-mh-preset-head{
+      margin:0 0 10px;
+      color:#eee7dd;
+      font-size:13px;
+      line-height:1.45;
+    }
+    .adf-mh-preset-note{
+      margin:0 0 12px;
+      color:#b9b1a7;
+      font-size:11.5px;
+      line-height:1.55;
+    }
+    .adf-mh-preset-group{
+      margin-top:12px;
+      padding-top:12px;
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+    .adf-mh-preset-group:first-of-type{
+      margin-top:0;
+      padding-top:0;
+      border-top:0;
+    }
+    .adf-mh-preset-group h3{
+      margin:0 0 8px;
+      color:#f3d9a6;
+      font-size:10px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .adf-mh-preset-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+    }
+    .adf-mh-preset-btn{
+      appearance:none;
+      width:100%;
+      min-height:54px;
+      padding:10px 11px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:12px;
+      background:rgba(255,255,255,.04);
+      color:#eee7dd;
+      text-align:left;
+      cursor:pointer;
+    }
+    .adf-mh-preset-btn:hover{
+      border-color:rgba(211,170,94,.5);
+      background:rgba(243,217,166,.08);
+    }
+    .adf-mh-preset-btn strong{
+      display:block;
+      font-size:11.5px;
+      line-height:1.25;
+    }
+    .adf-mh-preset-btn span{
+      display:block;
+      margin-top:4px;
+      color:#b9b1a7;
+      font-size:10px;
+      line-height:1.35;
+    }
+    .adf-mh-preset-status{
+      margin-top:10px;
+      color:#b9b1a7;
+      font-size:11px;
+      line-height:1.45;
+      min-height:16px;
+    }
+    .adf-mh-preset-status[data-tone="ok"]{ color:#d9c089; }
+    .adf-mh-preset-status[data-tone="bad"]{ color:#e39a9a; }
+  `;
+  document.head.appendChild(style);
+}
+function adfMhSetPresetStatus(message,tone='info'){
+  const el=document.getElementById('adf-mh-preset-status');
+  if(el){
+    el.textContent=message||'';
+    el.dataset.tone=tone;
+  }
+  if(typeof setStatus==='function' && tone==='bad'){
+    setStatus(message||'Errore preset','bad');
+  }
+}
+function adfMhSetPresetButtonsEnabled(enabled){
+  document.querySelectorAll('.adf-mh-preset-btn').forEach(button=>{
+    button.disabled=!enabled;
+    button.style.opacity=enabled ? '1' : '.65';
+    button.style.cursor=enabled ? 'pointer' : 'wait';
+  });
+}
+function adfMhPresetButtonHtml(preset){
+  return `
+    <button type="button" class="adf-mh-preset-btn" data-preset-id="${preset.id}">
+      <strong>${preset.label}</strong>
+      <span>${preset.blurb}</span>
+    </button>
+  `;
+}
+function adfMhBuildPresetBox(){
+  if(document.getElementById('adf-mh-preset-box')) return document.getElementById('adf-mh-preset-box');
+
+  const male=ADF_MH_PRESETS.filter(p=>p.gender==='male');
+  const female=ADF_MH_PRESETS.filter(p=>p.gender==='female');
+
+  const box=document.createElement('div');
+  box.id='adf-mh-preset-box';
+  box.className='box adf-mh-preset-box';
+  box.innerHTML=`
+    <h2>Preset rapidi</h2>
+    <p class="adf-mh-preset-head">14 preset base: 7 uomo + 7 donna.</p>
+    <p class="adf-mh-preset-note">Impostano volto, corpo, pelle, capelli e vestiti. Gli accessori non vengono toccati e tutto resta modificabile a mano.</p>
+
+    <div class="adf-mh-preset-group">
+      <h3>Uomo</h3>
+      <div class="adf-mh-preset-grid">${male.map(adfMhPresetButtonHtml).join('')}</div>
+    </div>
+
+    <div class="adf-mh-preset-group">
+      <h3>Donna</h3>
+      <div class="adf-mh-preset-grid">${female.map(adfMhPresetButtonHtml).join('')}</div>
+    </div>
+
+    <div id="adf-mh-preset-status" class="adf-mh-preset-status"></div>
+  `;
+
+  box.addEventListener('click',ev=>{
+    const button=ev.target.closest?.('.adf-mh-preset-btn');
+    if(!button) return;
+
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    const presetId=button.getAttribute('data-preset-id');
+    void adfMhApplyPreset(presetId);
+  });
+
+  return box;
+}
+function adfMhMountPresetBox(){
+  if(document.getElementById('adf-mh-preset-box')) return true;
+
+  adfMhInjectPresetStyles();
+
+  const genderQuick=document.querySelector('.gender-quick');
+  const anchorBox=genderQuick ? genderQuick.closest('.box') : null;
+  const box=adfMhBuildPresetBox();
+
+  if(anchorBox){
+    anchorBox.insertAdjacentElement('afterend',box);
+    return true;
+  }
+
+  const identityFallback=
+    document.querySelector('.editor-scroll') ||
+    document.querySelector('.editor-sidebar');
+
+  if(identityFallback){
+    identityFallback.prepend(box);
+    return true;
+  }
+
+  return false;
+}
+function adfMhInitPresets(){
+  let attempts=0;
+  const timer=setInterval(()=>{
+    attempts++;
+    const mounted=adfMhMountPresetBox();
+    if(mounted || attempts>=20){
+      clearInterval(timer);
+    }
+  },220);
+}
+
+document.addEventListener('DOMContentLoaded',adfMhInitPresets);
+
+
+
+/* ============================================================
+   ADF_MAKEHUMAN_PRESETS_SAFE_V2
+
+   Hardening artistico dei preset:
+   - niente matching fuzzy sugli asset;
+   - niente fallback al primo asset disponibile;
+   - niente modifica massiva dei modifier facciali;
+   - solo macro MakeHuman note e stabili;
+   - capelli + top/bottom deterministici;
+   - barba rimossa automaticamente;
+   - scarpe/outerwear/dress/clothesOther azzerati per evitare
+     combinazioni incompatibili della V1;
+   - accessori NON toccati.
+   ============================================================ */
+
+const ADF_MH_PRESET_SAFE_ASSETS_V2 = Object.freeze({
+
+  'uomo-affilato': {
+    hair:'hair/short01/short01.json',
+    tops:'clothes/mens_shirt_untuck_elvbhp1f/mens_shirt_untuck_elvbhp1f.json',
+    bottoms:'clothes/mens_elv_jeans2slf/mens_elv_jeans2slf.json'
+  },
+
+  'uomo-atletico': {
+    hair:'hair/short02/short02.json',
+    tops:'clothes/mens_tanks_elvmuscle1f/mens_tanks_elvmuscle1f.json',
+    bottoms:'clothes/mens_elv_jeans1f/mens_elv_jeans1f.json'
+  },
+
+  'uomo-robusto': {
+    hair:'hair/short_messy/short_messy.json',
+    tops:'clothes/mens_boho_top1elv/mens_boho_top1elv.json',
+    bottoms:'clothes/male-classic-jeans/male-classic-jeans.json'
+  },
+
+  'uomo-slanciato': {
+    hair:'hair/maxwell_hair_mh/maxwell_hair_mh.json',
+    tops:'clothes/mens_shirt_untuck_elvbhp1f/mens_shirt_untuck_elvbhp1f.json',
+    bottoms:'clothes/mens_trouser_f_elv_chr/mens_trouser_f_elv_chr.json'
+  },
+
+  'uomo-giovane': {
+    hair:'hair/short03/short03.json',
+    tops:'clothes/mens_tanks_elv1f/mens_tanks_elv1f.json',
+    bottoms:'clothes/mens_elv_jeans2slf/mens_elv_jeans2slf.json'
+  },
+
+  'uomo-maturo': {
+    hair:'hair/mhair02/mhair02.json',
+    tops:'clothes/mens_boho_top1elv/mens_boho_top1elv.json',
+    bottoms:'clothes/mens_trouser_f_elv1/mens_trouser_f_elv1.json'
+  },
+
+  'uomo-massiccio': {
+    hair:'hair/short04/short04.json',
+    tops:'clothes/mens_tanks_elvmuscle1f/mens_tanks_elvmuscle1f.json',
+    bottoms:'clothes/male-classic-jeans/male-classic-jeans.json'
+  },
+
+
+  'donna-affilata': {
+    hair:'hair/bob01/bob01.json',
+    tops:'clothes/Rolled_neck_blouse/Rolled_neck_blouse.json',
+    bottoms:'clothes/Tightjeans/Tightjeans.json'
+  },
+
+  'donna-atletica': {
+    hair:'hair/ponytail01/ponytail01.json',
+    tops:'clothes/Sleeveless/Sleeveless.json',
+    bottoms:'clothes/Tightjeans/Tightjeans.json'
+  },
+
+  'donna-morbida': {
+    hair:'hair/curly/curly.json',
+    tops:'clothes/lace_up_blouse/lace_up_blouse.json',
+    bottoms:'clothes/Skirt_Full_Long/Skirt_Full_Long.json'
+  },
+
+  'donna-slanciata': {
+    hair:'hair/long01/long01.json',
+    tops:'clothes/Rolled_neck_blouse/Rolled_neck_blouse.json',
+    bottoms:'clothes/Tightjeans/Tightjeans.json'
+  },
+
+  'donna-giovane': {
+    hair:'hair/bob02/bob02.json',
+    tops:'clothes/SleevelessCropTop/SleevelessCropTop.json',
+    bottoms:'clothes/JeansSkirt/JeansSkirt.json'
+  },
+
+  'donna-matura': {
+    hair:'hair/frenchbraid1mh01/frenchbraid1mh01.json',
+    tops:'clothes/lace_up_blouse/lace_up_blouse.json',
+    bottoms:'clothes/Skirt_Full_Long/Skirt_Full_Long.json'
+  },
+
+  'donna-formosa': {
+    hair:'hair/curly2/curly2.json',
+    tops:'clothes/Sleeveless/Sleeveless.json',
+    bottoms:'clothes/JeansSkirt/JeansSkirt.json'
+  }
+});
+
+
+/* Testo coerente con ciò che la V2 modifica davvero. */
+const ADF_MH_PRESET_SAFE_COPY_V2 = Object.freeze({
+  'uomo-affilato':'Fisico asciutto, look pulito e contemporaneo.',
+  'uomo-atletico':'Corporatura atletica e più muscolosa.',
+  'uomo-robusto':'Fisico più pieno e struttura solida.',
+  'uomo-slanciato':'Più alto, leggero e longilineo.',
+  'uomo-giovane':'Corporatura giovane e leggera.',
+  'uomo-maturo':'Età più adulta e corporatura equilibrata.',
+  'uomo-massiccio':'Peso e massa muscolare più marcati.',
+
+  'donna-affilata':'Fisico asciutto e look essenziale.',
+  'donna-atletica':'Corporatura atletica e tonica.',
+  'donna-morbida':'Corporatura più morbida e piena.',
+  'donna-slanciata':'Più alta, leggera e longilinea.',
+  'donna-giovane':'Corporatura giovane e leggera.',
+  'donna-matura':'Età più adulta e proporzioni equilibrate.',
+  'donna-formosa':'Corporatura più piena e curve più marcate.'
+});
+
+for(const preset of ADF_MH_PRESETS){
+  if(ADF_MH_PRESET_SAFE_COPY_V2[preset.id]){
+    preset.blurb=ADF_MH_PRESET_SAFE_COPY_V2[preset.id];
+  }
+}
+
+
+/* ------------------------------------------------------------
+   MODIFIER: solo macro sicure.
+
+   La V1 cercava token generici e poteva quindi modificare molti
+   slider facciali contemporaneamente. La V2 non lo fa.
+   ------------------------------------------------------------ */
+
+/* ADF_MAKEHUMAN_PRESETS_FACE_IDENTITY_V6
+   Morph facciali estesi basati sui modifier MakeHuman reali.
+   Nessun fuzzy matching.
+   Nessun fallback semantico.
+*/
+const ADF_MH_PRESET_EXACT_MODIFIERS_V6=Object.freeze({
+
+  age:[
+    {name:'macrodetails/Age',gain:1},
+    {name:'head/head-age-decr|incr',gain:1.25}
+  ],
+
+  height:[
+    {name:'macrodetails-height/Height',gain:1}
+  ],
+
+  weight:[
+    {name:'macrodetails-universal/Weight',gain:1},
+    {name:'head/head-fat-decr|incr',gain:1.20}
+  ],
+
+  muscle:[
+    {name:'macrodetails-universal/Muscle',gain:1}
+  ],
+
+
+  headWidth:[
+    {name:'head/head-scale-horiz-decr|incr',gain:1.55}
+  ],
+
+  headHeight:[
+    {name:'head/head-scale-vert-decr|incr',gain:1.48}
+  ],
+
+  headDepth:[
+    {name:'head/head-scale-depth-decr|incr',gain:1.45}
+  ],
+
+  headSquare:[
+    {name:'head/head-square',gain:1,direct:true}
+  ],
+
+  headOval:[
+    {name:'head/head-oval',gain:1,direct:true}
+  ],
+
+  faceRoundness:[
+    {name:'head/head-round',gain:1,direct:true}
+  ],
+
+
+  foreheadHeight:[
+    {name:'forehead/forehead-scale-vert-decr|incr',gain:1.42}
+  ],
+
+  foreheadProjection:[
+    {name:'forehead/forehead-trans-backward|forward',gain:1.35}
+  ],
+
+
+  eyeSpacing:[
+    {name:'eyes/l-eye-trans-in|out',gain:1.45},
+    {name:'eyes/r-eye-trans-in|out',gain:1.45}
+  ],
+
+  eyeVertical:[
+    {name:'eyes/l-eye-trans-down|up',gain:1.32},
+    {name:'eyes/r-eye-trans-down|up',gain:1.32}
+  ],
+
+  eyeSize:[
+    {name:'eyes/l-eye-scale-decr|incr',gain:1.55},
+    {name:'eyes/r-eye-scale-decr|incr',gain:1.55},
+    {name:'eyes/l-eye-height1-decr|incr',gain:1.35},
+    {name:'eyes/r-eye-height1-decr|incr',gain:1.35},
+    {name:'eyes/l-eye-height2-decr|incr',gain:1.30},
+    {name:'eyes/r-eye-height2-decr|incr',gain:1.30}
+  ],
+
+  eyeCorner:[
+    {name:'eyes/l-eye-corner1-down|up',gain:1.38},
+    {name:'eyes/r-eye-corner1-down|up',gain:1.38},
+    {name:'eyes/l-eye-corner2-down|up',gain:1.24},
+    {name:'eyes/r-eye-corner2-down|up',gain:1.24}
+  ],
+
+
+  browProminence:[
+    {name:'eyebrows/eyebrows-trans-backward|forward',gain:1.40}
+  ],
+
+  browHeight:[
+    {name:'eyebrows/eyebrows-trans-down|up',gain:1.38}
+  ],
+
+  browAngle:[
+    {name:'eyebrows/eyebrows-angle-down|up',gain:1.42}
+  ],
+
+
+  cheekFullness:[
+    {name:'cheek/l-cheek-volume-decr|incr',gain:1.62},
+    {name:'cheek/r-cheek-volume-decr|incr',gain:1.62},
+    {name:'cheek/l-cheek-inner-decr|incr',gain:1.26},
+    {name:'cheek/r-cheek-inner-decr|incr',gain:1.26}
+  ],
+
+  cheekHeight:[
+    {name:'cheek/l-cheek-trans-down|up',gain:1.50},
+    {name:'cheek/r-cheek-trans-down|up',gain:1.50},
+    {name:'cheek/l-cheek-bones-decr|incr',gain:1.34},
+    {name:'cheek/r-cheek-bones-decr|incr',gain:1.34}
+  ],
+
+
+  jawWidth:[
+    {name:'chin/chin-width-decr|incr',gain:1.72},
+    {name:'chin/chin-bones-decr|incr',gain:1.42}
+  ],
+
+  chinSize:[
+    {name:'chin/chin-height-decr|incr',gain:1.55}
+  ],
+
+  chinProminence:[
+    {name:'chin/chin-prominent-decr|incr',gain:1.60},
+    {name:'chin/chin-prognathism-decr|incr',gain:1.22}
+  ],
+
+
+  noseWidth:[
+    {name:'nose/nose-scale-horiz-decr|incr',gain:1.55},
+    {name:'nose/nose-nostrils-width-decr|incr',gain:1.48},
+    {name:'nose/nose-point-width-decr|incr',gain:1.34}
+  ],
+
+  noseLength:[
+    {name:'nose/nose-scale-vert-decr|incr',gain:1.52}
+  ],
+
+  noseDepth:[
+    {name:'nose/nose-scale-depth-decr|incr',gain:1.55}
+  ],
+
+  noseTip:[
+    {name:'nose/nose-point-down|up',gain:1.46},
+    {name:'nose/nose-base-down|up',gain:1.22}
+  ],
+
+  noseCurve:[
+    {name:'nose/nose-curve-concave|convex',gain:1.52},
+    {name:'nose/nose-hump-decr|incr',gain:1.18}
+  ],
+
+
+  mouthWidth:[
+    {name:'mouth/mouth-scale-horiz-decr|incr',gain:1.58},
+    {name:'mouth/mouth-upperlip-width-decr|incr',gain:1.26},
+    {name:'mouth/mouth-lowerlip-width-decr|incr',gain:1.26}
+  ],
+
+  mouthHeight:[
+    {name:'mouth/mouth-scale-vert-decr|incr',gain:1.48},
+    {name:'mouth/mouth-upperlip-height-decr|incr',gain:1.24},
+    {name:'mouth/mouth-lowerlip-height-decr|incr',gain:1.24}
+  ],
+
+  lipFullness:[
+    {name:'mouth/mouth-upperlip-volume-decr|incr',gain:1.60},
+    {name:'mouth/mouth-lowerlip-volume-decr|incr',gain:1.60}
+  ],
+
+
+  shoulder:[
+    {name:'torso/torso-vshape-decr|incr',gain:1.18}
+  ],
+
+  hip:[
+    {name:'hip/hip-scale-horiz-decr|incr',gain:1.15}
+  ],
+
+  bust:[
+    {name:'breast/BreastSize',gain:1}
+  ],
+
+  neck:[
+    {name:'neck/neck-scale-horiz-decr|incr',gain:1.38},
+    {name:'neck/neck-scale-depth-decr|incr',gain:1.26}
+  ]
+});
+
+
+function adfMhPresetMorphValueV6(value,spec){
+
+  const n=Math.max(0,Math.min(1,Number(value)));
+
+  if(spec.direct){
+    return Math.max(
+      0,
+      Math.min(1,n*(Number(spec.gain)||1))
+    );
+  }
+
+  const gain=Math.max(0,Number(spec.gain)||1);
+
+  return Math.max(
+    0,
+    Math.min(
+      1,
+      .5+((n-.5)*gain)
+    )
+  );
+}
+
+
+adfMhApplySemantic=function(modifiers,key,normalized){
+
+  const specs=ADF_MH_PRESET_EXACT_MODIFIERS_V6[key];
+
+  if(!Array.isArray(specs) || !specs.length){
+    return 0;
+  }
+
+  let applied=0;
+
+  for(const spec of specs){
+
+    const meta=nativeModifierMeta.find(
+      item=>item.fullName===spec.name
+    );
+
+    /*
+      Il runtime MakeHuman decide cosa esiste davvero.
+      Nessun tentativo di indovinare un modifier mancante.
+    */
+    if(!meta) continue;
+
+    modifiers[spec.name]=adfMhMapNormalizedToMeta(
+      meta,
+      adfMhPresetMorphValueV6(normalized,spec)
+    );
+
+    applied++;
+  }
+
+  return applied;
+};
+
+
+/* ------------------------------------------------------------
+   Pelle: la V2 la PRESERVA.
+
+   Evitiamo che un preset di corporatura cambi involontariamente
+   texture/età/etnia tramite un nome fuzzy.
+   ------------------------------------------------------------ */
+
+adfMhSetSkinFromPatterns = function(state){
+  if(typeof skinSelect!=='undefined' && skinSelect){
+    state.skin=skinSelect.value||state.skin||'';
+  }
+};
+
+
+/* ------------------------------------------------------------
+   Slot aspetto:
+   - capello esatto;
+   - barba sempre vuota;
+   - nessun fallback automatico.
+   ------------------------------------------------------------ */
+
+function adfMhPresetExactSelectValueV2(slotId,raw){
+
+  const select=E(`slot-${slotId}`);
+  if(!select) return null;
+
+  const exists=[...select.options].some(
+    option=>String(option.value||'')===String(raw||'')
+  );
+
+  return exists ? raw : null;
+}
+
+adfMhSetNonWardrobeSlots = function(state,preset){
+
+  state.slots=state.slots||{};
+
+  const config=ADF_MH_PRESET_SAFE_ASSETS_V2[preset.id];
+  if(!config) return;
+
+  const hair=adfMhPresetExactSelectValueV2('hair',config.hair);
+
+  if(hair!==null){
+    state.slots.hair=hair;
+  }
+
+  /*
+    V2 volutamente clean-shaven.
+    Le barbe si potranno comunque aggiungere manualmente dopo.
+  */
+  const facialHair=E('slot-facialHair');
+
+  if(
+    facialHair &&
+    [...facialHair.options].some(o=>String(o.value||'')==='')
+  ){
+    state.slots.facialHair='';
+  }
+};
+
+
+/* ------------------------------------------------------------
+   Guardaroba:
+   - cambia SOLO abbigliamento;
+   - accessori conservati;
+   - top/bottom esatti;
+   - niente fallback;
+   - niente scarpe automatiche per questa V2: alcuni asset
+     del catalogo hanno fitting molto aggressivo sui piedi.
+   ------------------------------------------------------------ */
+
+function adfMhPresetRawExistsV2(group,raw){
+
+  if(!raw) return false;
+
+  const entries=entriesForUiGroup(group);
+
+  return Array.isArray(entries) &&
+    entries.some(entry=>String(entry?.raw||'')===String(raw));
+}
+
+adfMhSetClothingSlots = function(state,preset){
+
+  state.slots=state.slots||{};
+
+  const config=ADF_MH_PRESET_SAFE_ASSETS_V2[preset.id];
+  if(!config) return;
+
+  if(adfMhPresetRawExistsV2('tops',config.tops)){
+    state.slots.tops=config.tops;
+  }
+
+  if(adfMhPresetRawExistsV2('bottoms',config.bottoms)){
+    state.slots.bottoms=config.bottoms;
+  }
+
+  /*
+    Pulizia esclusivamente degli slot di abbigliamento che
+    potrebbero essere rimasti da un preset precedente.
+    Intimo resta quello corrente.
+    Accessori non vengono toccati.
+  */
+  state.slots.dresses='';
+  state.slots.shoes='';
+  state.slots.outerwear='';
+  state.slots.clothesOther='';
+};
+
+
+/* Diagnostica non invasiva: segnala eventuali asset mancanti. */
+function adfMhAuditPresetAssetsV2(){
+
+  const missing=[];
+
+  for(const preset of ADF_MH_PRESETS){
+
+    const config=ADF_MH_PRESET_SAFE_ASSETS_V2[preset.id];
+    if(!config){
+      missing.push(`${preset.id}: configurazione`);
+      continue;
+    }
+
+    const hairSelect=E('slot-hair');
+
+    if(
+      hairSelect &&
+      ![...hairSelect.options].some(o=>o.value===config.hair)
+    ){
+      missing.push(`${preset.id}: hair ${config.hair}`);
+    }
+
+    if(!adfMhPresetRawExistsV2('tops',config.tops)){
+      missing.push(`${preset.id}: top ${config.tops}`);
+    }
+
+    if(!adfMhPresetRawExistsV2('bottoms',config.bottoms)){
+      missing.push(`${preset.id}: bottom ${config.bottoms}`);
+    }
+  }
+
+  if(missing.length){
+    console.warn(
+      '[ADF PRESET V2] asset mancanti:',
+      missing
+    );
+  }else{
+    console.info(
+      '[ADF PRESET V2] 14/14 configurazioni asset valide'
+    );
+  }
+
+  return missing;
+}
+
+
+/* Quando MakeHuman è pronto facciamo soltanto l'audit.
+   Nessuna modifica automatica al personaggio. */
+(function adfMhPresetSafeV2Boot(){
+
+  let attempts=0;
+
+  const timer=setInterval(()=>{
+
+    attempts++;
+
+    if(runtimeReady){
+
+      clearInterval(timer);
+
+      const missing=adfMhAuditPresetAssetsV2();
+
+      if(!missing.length){
+        adfMhSetPresetStatus(
+          'Preset V2 pronti · 14 configurazioni controllate',
+          'ok'
+        );
+      }
+
+      return;
+    }
+
+    if(attempts>=40){
+      clearInterval(timer);
+    }
+
+  },250);
+
+})();
