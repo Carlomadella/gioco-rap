@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:f356840 -->
+## 12/09/26, 19:59 â€” task/creator-blocco-capoluoghi-v3 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `f356840`
+
+### Cosa Ã¨ entrato
+
+- `5e5933c` â€” feat(creator): blocca i capoluoghi come città iniziale â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:c41c257 -->
 ## 12/09/26, 19:40 â€” origin/feat/famepedia-v1-v2-20260912-194005 â†’ main
 

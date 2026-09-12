@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:f356840 -->
+## 12/09/26, 19:59 â€” task/creator-blocco-capoluoghi-v3 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `f356840`
+
+### Cosa Ã¨ entrato
+
+- `5e5933c` â€” feat(creator): blocca i capoluoghi come città iniziale â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:249d509 -->
 ## 12/09/26, 18:57 â€” task/creator-aspetto-sfondo-boutique-v1 â†’ main
 
