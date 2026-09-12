@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:36deb6e -->
+## 12/09/26, 21:09 â€” origin/fix/famepedia-tipografia-makehuman-20260912-210829 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `36deb6e`
+
+### Cosa Ã¨ entrato
+
+- `4dbe467` â€” fix(famepedia): allinea tipografia a MakeHuman â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/famepedia.css`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:54b8289 -->
 ## 12/09/26, 20:54 â€” origin/feat/famepedia-layout-v2-20260912-205354 â†’ main
 
