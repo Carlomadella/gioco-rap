@@ -595,27 +595,46 @@ function makeSubmission(context, reviewId, families) {
 function renderBlindHtml(submission, protocol) {
   let html = base.renderHtml(submission, protocol);
 
-  const replacements = [
-    [
-      "Solo development. Nessun output V1/V2 mostrato.",
-      "Human Reference holdout cieca. Nessun output V1/V2 o comparator mostrato."
-    ],
-    ["HOLDOUT BLOCCATO", "HOLDOUT · HUMAN REFERENCE"],
-    [
-      "esc(f.sourceRecordId)+'<br><span class=\"muted\">'+esc(f.compositionFamilyId)+'</span>'",
-      "esc(f.blindId)"
-    ],
-    [
-      "var h='<h2>'+esc(f.sourceRecordId)+' — '+esc(f.compositionFamilyId)+'</h2><div class=\"muted\">durata decoded '+f.decodedDurationSeconds+'s · SHA '+f.sourceSha256.slice(0,12)+'…</div>';",
-      "var h='<h2>'+esc(f.blindId)+'</h2><div class=\"muted\">durata decoded '+f.decodedDurationSeconds+'s · identità sorgente nascosta durante la review</div>';"
-    ]
-  ];
+  if (!html.includes("Solo development. Nessun output V1/V2 mostrato.")) {
+    throw new Error("Blind UI source marker missing: development subtitle");
+  }
+  if (!html.includes("HOLDOUT BLOCCATO")) {
+    throw new Error("Blind UI source marker missing: holdout badge");
+  }
+  html = html.replace(
+    "Solo development. Nessun output V1/V2 mostrato.",
+    "Human Reference holdout cieca. Nessun output V1/V2 o comparator mostrato."
+  );
+  html = html.replace("HOLDOUT BLOCCATO", "HOLDOUT · HUMAN REFERENCE");
 
-  for (const [from, to] of replacements) {
-    if (!html.includes(from)) {
-      throw new Error(`Blind UI hardening replacement not found: ${from.slice(0, 60)}`);
-    }
-    html = html.replace(from, to);
+  // Replace the whole list-rendering function instead of depending on the exact
+  // quote escaping emitted by the development HTML template. The previous
+  // implementation matched a fragile substring and failed across equivalent
+  // escaped/unescaped HTML source representations.
+  const listPattern = /function renderList\(\)\{[\s\S]*?\}\s*function render\(\)\{/;
+  const listMatches = html.match(new RegExp(listPattern.source, "g")) || [];
+  if (listMatches.length !== 1) {
+    throw new Error(`Blind UI renderList marker count mismatch: ${listMatches.length}`);
+  }
+  html = html.replace(
+    listPattern,
+    "function renderList(){var root=document.getElementById('familyList');root.innerHTML=state.families.map(function(f,i){return '<button data-i=\\\"'+i+'\\\" class=\\\"'+(i===current?'active':'')+'\\\">'+(done(f)?'✓ ':'')+esc(f.blindId)+'</button>'}).join('');root.querySelectorAll('button').forEach(function(b){b.onclick=function(){stopReviewTimer();current=Number(b.dataset.i);render()}})}\nfunction render(){"
+  );
+
+  // Replace only the editor heading assignment. All paths and internal source ids
+  // remain untouched so audio/waveform loading keeps the existing implementation.
+  const headingPattern = /var h='<h2>'[^\n;]*;/;
+  const headingMatches = html.match(new RegExp(headingPattern.source, "g")) || [];
+  if (headingMatches.length !== 1) {
+    throw new Error(`Blind UI heading marker count mismatch: ${headingMatches.length}`);
+  }
+  html = html.replace(
+    headingPattern,
+    "var h='<h2>'+esc(f.blindId)+'</h2><div class=\\\"muted\\\">durata decoded '+f.decodedDurationSeconds+'s · identità sorgente nascosta durante la review</div>';"
+  );
+
+  if (!html.includes("esc(f.blindId)")) {
+    throw new Error("Blind UI did not bind visible family labels to blindId");
   }
   return html;
 }
