@@ -1,0 +1,109 @@
+{
+  "schema": "fame-owned-beats-holdout-cohort-reference-v2",
+  "version": 2,
+  "cohortId": "audio-analysis-holdout-r1-v2",
+  "status": "FROZEN_NEW_UNTOUCHED_HOLDOUT_BEFORE_OBSERVATION",
+  "purpose": "R1_REMEDIATION_NEW_HOLDOUT",
+  "createdAt": "2026-09-12T10:51:11.887878+00:00",
+  "expectedFamilies": 10,
+  "plannedSplit": "evaluation-holdout-r1-v2",
+  "identityFields": [
+    "compositionFamilyId",
+    "sourceRecordId",
+    "sourceAssetId",
+    "sha256"
+  ],
+  "legacyOriginalHoldout": {
+    "auditVerdict": "PARTIAL",
+    "auditBoundaryCommit": "22376c645e428dddebe7170b6ac44173ffa7ce34",
+    "policy": "PROVENANCE_INSUFFICIENT_DO_NOT_USE_AS_FINAL_HOLDOUT",
+    "reusedInNewCohort": false
+  },
+  "selection": {
+    "algorithm": "opaque-identity-sha256-rank-v1",
+    "seed": "fame-neural-r1-remediation-v2|2026-09-12|post-audit",
+    "usesAudioContentOrDerivedMetrics": false,
+    "sourceUniverse": "active + composition-family-confirmed + currently-unsplit + no recorded processing/pilot/QA/run/export use",
+    "eligibleFamilyCount": 113,
+    "eligibleUniverseDigestSha256": "569f8387858e78fdb4109b954e8304ee307c8e0db7e897724d3d52323173c9ed"
+  },
+  "sourceManifest": {
+    "schema": "fame-owned-beats-workspace-v1",
+    "version": 1,
+    "sha256": "681222e20a76d380f7d5c11b6d54872964afcc8ba26edc0600bef35cc136a897",
+    "recordCount": 131
+  },
+  "repo": {
+    "commitAtFreeze": "7008d0fa439f03f6f6bbb1cbb4c9b6cd4cb5e23b"
+  },
+  "cohortDigestSha256": "887ac3aee76ac65b710381bc428bd8bb7cd5708e94a4dbd9449dbea9386866e6",
+  "records": [
+    {
+      "compositionFamilyId": "FAM-FAME000013",
+      "sourceRecordId": "FAME000013",
+      "sourceAssetId": "sha256:18f6df4839fcd81dd2814b8163eb8a6bd7b085bf58e707b04843c0dcc6c0fbf4",
+      "sha256": "18f6df4839fcd81dd2814b8163eb8a6bd7b085bf58e707b04843c0dcc6c0fbf4"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000015",
+      "sourceRecordId": "FAME000015",
+      "sourceAssetId": "sha256:977abc062ba006e4fb280f1d211687e5c8ddccd05c9c7608d9c3dc291ffbc358",
+      "sha256": "977abc062ba006e4fb280f1d211687e5c8ddccd05c9c7608d9c3dc291ffbc358"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000025",
+      "sourceRecordId": "FAME000025",
+      "sourceAssetId": "sha256:35464f537ca36f9a99d64fb76785c34dddf2687627b0b01401428ba62bf7acb4",
+      "sha256": "35464f537ca36f9a99d64fb76785c34dddf2687627b0b01401428ba62bf7acb4"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000027",
+      "sourceRecordId": "FAME000027",
+      "sourceAssetId": "sha256:fe3a3cc5991474acd688280377d2ab459ea73a3057d90b59d3c00f6556be6469",
+      "sha256": "fe3a3cc5991474acd688280377d2ab459ea73a3057d90b59d3c00f6556be6469"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000037",
+      "sourceRecordId": "FAME000037",
+      "sourceAssetId": "sha256:ed0ced4b1042e3296e8746f3a07cd9948f7175961de4df44d6898d0065bbfde9",
+      "sha256": "ed0ced4b1042e3296e8746f3a07cd9948f7175961de4df44d6898d0065bbfde9"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000039",
+      "sourceRecordId": "FAME000039",
+      "sourceAssetId": "sha256:154df728c37a17797bca1138ff691a04d1d78828af1e851e23fb963c7b8e7e17",
+      "sha256": "154df728c37a17797bca1138ff691a04d1d78828af1e851e23fb963c7b8e7e17"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000059",
+      "sourceRecordId": "FAME000059",
+      "sourceAssetId": "sha256:693bc61524aa587de9411b647c389aa2485eaa612e237834f79ad1f0426681af",
+      "sha256": "693bc61524aa587de9411b647c389aa2485eaa612e237834f79ad1f0426681af"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000103",
+      "sourceRecordId": "FAME000103",
+      "sourceAssetId": "sha256:0f75c7f2d993792ba2ec28b40c168cc35658a2410e9e167431e2536df38bfb4b",
+      "sha256": "0f75c7f2d993792ba2ec28b40c168cc35658a2410e9e167431e2536df38bfb4b"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000110",
+      "sourceRecordId": "FAME000110",
+      "sourceAssetId": "sha256:54901a31e9131b07b5122b9b8a6c1aa3dc01253f2ea3bce3e33cbd7edcc7e70e",
+      "sha256": "54901a31e9131b07b5122b9b8a6c1aa3dc01253f2ea3bce3e33cbd7edcc7e70e"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000131",
+      "sourceRecordId": "FAME000131",
+      "sourceAssetId": "sha256:21e904d2656b2239bd832ac601fa5ebd7de22dbae40076347e58f0d4860b1178",
+      "sha256": "21e904d2656b2239bd832ac601fa5ebd7de22dbae40076347e58f0d4860b1178"
+    }
+  ],
+  "safety": {
+    "holdoutAudioAccessPerformed": false,
+    "holdoutObserved": false,
+    "reservationCreated": false,
+    "sourceManifestMutated": false,
+    "existingSplitAssignmentsChanged": false
+  }
+}
