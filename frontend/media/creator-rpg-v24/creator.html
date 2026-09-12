@@ -591,6 +591,171 @@ body::before{
 }
 
 /* =========================================================
+   ADF_IDENTITY_BACKGROUND_V1 — 02 IDENTITÀ
+   Stessa grammatica visiva di stage e profilo finale:
+   - immagine unica a tutto schermo
+   - contenuto a destra sopra overlay scuro
+   - fotografia pulita a sinistra
+   - nessuna modifica a logica, testi, random o generi
+   ========================================================= */
+
+#pageIdentity .layout{
+  position:absolute;
+  inset:0;
+  display:block;
+  overflow:hidden;
+  background:#08090d;
+}
+
+#pageIdentity .visual{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  overflow:hidden;
+  border:0;
+  background:#08090d;
+}
+
+#pageIdentity .visual-inner{
+  position:absolute;
+  inset:0;
+  border:0;
+  border-radius:0;
+  overflow:hidden;
+  box-shadow:none;
+  background:#08090d;
+}
+
+#pageIdentity .visual-art{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center center;
+  background-repeat:no-repeat;
+  opacity:0;
+  transition:opacity .38s ease;
+}
+
+#pageIdentity .visual-art.on{
+  opacity:1;
+}
+
+#pageIdentity .visual-overlay{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(7,8,10,.06) 0%,
+      rgba(7,8,10,.10) 38%,
+      rgba(7,8,10,.26) 53%,
+      rgba(7,8,10,.58) 68%,
+      rgba(7,8,10,.84) 84%,
+      rgba(7,8,10,.94) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(7,8,10,.06) 0%,
+      rgba(7,8,10,.10) 55%,
+      rgba(7,8,10,.28) 100%
+    );
+}
+
+#pageIdentity .visual-kicker,
+#pageIdentity .visual-copy{
+  z-index:2;
+}
+
+#pageIdentity .content{
+  position:relative;
+  z-index:3;
+  margin-left:auto;
+  width:58%;
+  min-width:0;
+  height:100%;
+  padding:42px 52px 34px;
+  display:flex;
+  flex-direction:column;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(7,8,10,.08) 0%,
+      rgba(7,8,10,.30) 10%,
+      rgba(7,8,10,.58) 28%,
+      rgba(7,8,10,.80) 58%,
+      rgba(7,8,10,.92) 100%
+    );
+  backdrop-filter:blur(5px);
+}
+
+#pageIdentity .visual-copy{
+  right:62%;
+  max-width:520px;
+}
+
+@media(max-width:1100px){
+  #pageIdentity .content{
+    width:62%;
+    padding:34px 34px 28px;
+  }
+
+  #pageIdentity .visual-copy{
+    right:66%;
+  }
+}
+
+@media(max-width:800px){
+  #pageIdentity .layout{
+    min-height:calc(100vh - 70px);
+  }
+
+  #pageIdentity .visual{
+    position:absolute;
+    inset:0;
+    height:auto;
+    min-height:0;
+    border:0;
+  }
+
+  #pageIdentity .visual-inner{
+    inset:0;
+    border-radius:0;
+  }
+
+  #pageIdentity .content{
+    width:100%;
+    height:100%;
+    padding:26px 18px;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(7,8,10,.30) 0%,
+        rgba(7,8,10,.72) 34%,
+        rgba(7,8,10,.94) 100%
+      );
+  }
+
+  #pageIdentity .visual-copy{
+    display:none;
+  }
+}
+
+@media(max-height:900px) and (min-width:801px){
+  #pageIdentity .content{
+    padding:24px 34px 18px;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    scrollbar-gutter:stable;
+  }
+}
+
+@media(max-height:740px) and (min-width:801px){
+  #pageIdentity .content{
+    padding:14px 24px 10px;
+  }
+}
+
+/* =========================================================
    V14 — SOLO LAYOUT DEI 3 STAGE DECISIONALI
    Allineato alla schermata finale:
    - immagine unica a tutto schermo
@@ -3123,7 +3288,7 @@ $('startCareer').onclick = ()=> {
 };
 
 setBg($('appearanceArt'), 'hero');
-setBg($('identityArt'), 'setvideo');
+$('identityArt').style.backgroundImage = 'url("assets/creator-identity-provenienza-v1.png")';
 renderAvatarSource();
 renderGenres();
 validateIdentity();
