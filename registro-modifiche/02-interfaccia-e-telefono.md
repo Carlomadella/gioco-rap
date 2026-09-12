@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:1fc1984 -->
+## 12/09/26, 18:38 â€” task/creator-identita-sfondo-v3 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `1fc1984`
+
+### Cosa Ã¨ entrato
+
+- `61ef1bb` â€” feat(creator): aggiunge sfondo alla schermata identita â€” **Mycol**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/media/creator-rpg-v24/assets/creator-identity-provenienza-v1.png`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:48dc367 -->
 ## 12/09/26, 17:55 â€” origin/feat/stato-account-landing-v2-20260912-175446 â†’ main
 
