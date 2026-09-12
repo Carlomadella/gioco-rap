@@ -88,7 +88,7 @@
   }
 
   function icona(nome){
-    const map = {continua:"▶", nuova:"＋", rapido:"↗", carica:"▤", importa:"↓"};
+    const map = {nuova:"＋", rapido:"↗", carica:"▤", importa:"↓"};
     return map[nome] || "→";
   }
 
@@ -109,10 +109,8 @@
   }
 
   function htmlMenu(){
-    const u = ultimoSlot();
     return testa("Partita", "Da dove vuoi partire?", "Scegli il modo in cui entrare nella tua storia.", false) +
       '<div class="avv-lista">' +
-      riga("continua", "Continua", u ? dettaglioSlot(u) : "Nessuna partita da riprendere", {prima:!!u, disabled:!u}) +
       riga("nuova", "Nuova partita", "Crea il tuo artista e scegli in quale dei 3 slot salvarlo") +
       riga("rapido", "Avvio rapido", "Usa automaticamente il primo slot libero e vai subito in città") +
       riga("carica", "Carica partita", "Apri o elimina una delle carriere salvate") +
@@ -394,7 +392,7 @@
     if(!b || b.disabled) return;
     const az = b.dataset.avvio, arg = b.dataset.arg;
 
-    if(az === "continua"){ continuaUltima(); return; }
+    /* CONTINUA vive solo sul pulsante principale della landing. */
     if(az === "nuova" || az === "rapido"){
       modalita = az;
       const u = ultimoSlot();
