@@ -752,3 +752,30 @@ La correzione:
 Non cambiano candidate, marker iniziali, assegnazione cieca, ordine 4/4, Human Reference, protocollo, metrica, soglia, config budget o holdout.
 
 `review-package.json` e la chiave privata non vengono rigenerati; `packageIdentityDigestSha256` resta `690d1661d45f43e6a517b476ba43dfa16f5f4b6d46eddc7f4a83bf44dbacc8ed`.
+
+
+
+## NDR-054 — Candidate freeze: configHash allineato all'identità algoritmica e commit tooling discendenti ammessi
+
+Data: 12 settembre 2026. Stato: adottata prima di qualunque accesso holdout.
+
+Durante la verifica del `candidate-freeze.json` di `audio-analysis-v2-config-001` è emersa un'incoerenza nel validatore `candidate_freeze.py`.
+
+La configurazione V2 congelata e l'evaluator definiscono `configHash` come SHA-256 canonico di `algorithmConfig`. Per config-001 il valore ufficiale è:
+
+`04e00482802c46dda876733b7210992cab9eadbafa33153266a483b4a90b81b3`.
+
+Il validatore del freeze, invece, stava calcolando il digest dell'intero envelope JSON della config, includendo metadati e lo stesso campo `configHash`. Questo rendeva impossibile validare correttamente un freeze coerente con lo sviluppo già concluso.
+
+La correzione:
+
+- `config_digest()` usa `algorithmConfig` quando presente, mantenendo compatibilità con le fixture generiche;
+- il `configHash` dichiarato nella config deve coincidere con freeze e development summary;
+- il `candidateId` della config deve coincidere con il freeze;
+- il commit development congelato può essere un antenato dell'HEAD corrente, così commit successivi esclusivamente di tooling/validazione non invalidano retroattivamente il candidato;
+- l'integrità del candidato viene comunque chiusa verificando il Git blob della sorgente corrente contro `evaluatedCandidateSourceGitBlobSha1` della development summary e `candidateSourceGitBlobSha1` della config;
+- dependency lock, protocol digest, ambiente Python, FFmpeg, development summary digest e checkout pulito restano obbligatori.
+
+Questa modifica non cambia `audio-analysis-v2-config-001.py`, `algorithmConfig`, risultati development, correction-cost review, candidate identity o holdout policy. Il candidate freeze già scritto non viene rigenerato: viene verificato con il validatore corretto.
+
+L'holdout resta non osservato fino al completamento con esito positivo della verifica del freeze.

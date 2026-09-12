@@ -10,6 +10,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / 'owned-beats'))
 import candidate_freeze as gate
 
 class FreezeTests(unittest.TestCase):
+    def test_config_digest_tracks_algorithm_config_not_metadata_envelope(self):
+        algorithm = {"hop": 512, "threshold": 1.5}
+        envelope = {
+            "candidateId": "candidate-1",
+            "configHash": "metadata-field-not-part-of-identity",
+            "algorithmConfig": algorithm,
+        }
+        self.assertEqual(gate.config_digest(envelope), gate.config_digest(algorithm))
+
     def test_identity_and_one_shot(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -34,6 +43,14 @@ class FreezeTests(unittest.TestCase):
             def command(args, **kw):
                 return 'ffmpeg fixture\n' if args[0]=='ffmpeg' else real(args,**kw)
             with patch.object(gate,'version',return_value='1.0'), patch.object(gate.subprocess,'check_output',side_effect=command):
+                verified=gate.verify_freeze(file,repo,config)
+                # Un commit successivo che modifica solo tooling/infrastruttura e' ammesso:
+                # il commit development resta antenato e l'identita' candidate viene
+                # verificata separatamente.
+                (repo / 'infra.txt').write_text('tooling only\n')
+                git('add', 'infra.txt')
+                git('-c', 'user.name=Test', '-c', 'user.email=test@example.invalid',
+                    'commit', '-m', 'infra-only')
                 verified=gate.verify_freeze(file,repo,config)
                 with self.assertRaisesRegex(RuntimeError,'candidate-freeze'):
                     gate.verify_freeze(None,repo,config)

@@ -14,7 +14,15 @@ def digest_file(file):
 
 
 def config_digest(config):
-    return hashlib.sha256(json.dumps(config, sort_keys=True, separators=(",", ":"),
+    # Le config V2 includono anche metadati/provenance; il configHash ufficiale
+    # e' definito sull'algorithmConfig, come nell'evaluator V2. Le fixture legacy
+    # senza algorithmConfig continuano a hashare direttamente il valore passato.
+    value = (
+        config["algorithmConfig"]
+        if isinstance(config, dict) and "algorithmConfig" in config
+        else config
+    )
+    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"),
                                      ensure_ascii=True).encode()).hexdigest()
 
 
@@ -37,13 +45,31 @@ def verify_freeze(file, tool_dir, config):
         raise RuntimeError("Invalid frozenAt")
     def git(*args):
         return subprocess.check_output(["git", *args], cwd=tool_dir, text=True).strip()
-    if freeze["codeCommit"] != git("rev-parse", "HEAD"):
-        raise RuntimeError("Frozen codeCommit differs from checkout")
+    current_head = git("rev-parse", "HEAD")
+    if freeze["codeCommit"] != current_head:
+        ancestry = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", freeze["codeCommit"], current_head],
+            cwd=tool_dir,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+        if ancestry.returncode != 0:
+            raise RuntimeError("Frozen codeCommit is not an ancestor of checkout")
+    # Infrastructure-only descendant commits are allowed; candidate/config/protocol
+    # identity is verified independently below.
     # Includes staged, unstaged and untracked implementation/configuration files.
     if git("status", "--porcelain", "--untracked-files=all", "--", "."):
         raise RuntimeError("Owned-beats code/config checkout is dirty")
     if freeze["configHash"] != config_digest(config):
         raise RuntimeError("Frozen configHash mismatch")
+    if isinstance(config, dict):
+        declared_hash = config.get("configHash")
+        if declared_hash is not None and declared_hash != freeze["configHash"]:
+            raise RuntimeError("Config-declared configHash differs from freeze")
+        declared_candidate = config.get("candidateId")
+        if declared_candidate is not None and declared_candidate != freeze["candidateId"]:
+            raise RuntimeError("Config candidateId differs from freeze")
     lock = tool_dir / "requirements-audio-analysis-lock.txt"
     if freeze["dependencyLockHash"] != digest_file(lock):
         raise RuntimeError("Frozen dependencyLockHash mismatch")
@@ -70,6 +96,28 @@ def verify_freeze(file, tool_dir, config):
     for field in ("candidateId", "codeCommit", "configHash", "dependencyLockHash", "protocolDigestSha256"):
         if summary.get(field) != freeze[field]:
             raise RuntimeError(f"Development summary candidate mismatch: {field}")
+
+    # Un commit tooling-only successivo alla review development non deve invalidare
+    # il candidate, ma la sorgente valutata deve restare byte-identica come Git blob.
+    if isinstance(config, dict) and config.get("candidateSourceFile"):
+        candidate_rel = config["candidateSourceFile"]
+        expected_blob = summary.get("evaluatedCandidateSourceGitBlobSha1")
+        declared_blob = config.get("candidateSourceGitBlobSha1")
+        if not isinstance(expected_blob, str) or not re.fullmatch(r"[0-9a-f]{40}", expected_blob):
+            raise RuntimeError("Development summary missing evaluated candidate blob")
+        if declared_blob != expected_blob:
+            raise RuntimeError("Config candidate source blob differs from development summary")
+        candidate_file = (tool_dir / candidate_rel).resolve()
+        try:
+            candidate_file.relative_to(tool_dir)
+        except ValueError as exc:
+            raise RuntimeError("Candidate source path escapes tool directory") from exc
+        if not candidate_file.is_file():
+            raise RuntimeError("Candidate source file missing")
+        actual_blob = git("hash-object", str(candidate_file))
+        if actual_blob != expected_blob:
+            raise RuntimeError("Candidate source blob differs from development evaluation")
+
     # Integrity/identity gate only: the future evaluator must produce and substantiate
     # this decision using the paired metrics, reference digests and review policy.
     return {**freeze, "freezeDigestSha256": digest_file(file)}
