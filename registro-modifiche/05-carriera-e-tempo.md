@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:5e40f69 -->
+## 12/09/26, 16:05 â€” task/fix-propic-preset-makehuman â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `5e40f69`
+
+### Cosa Ã¨ entrato
+
+- `865bd06` â€” fix(makehuman): sincronizza propic con preset rapido â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/makehuman-camerino-v1/runtime.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:f3c7c40 -->
 ## 10/09/26, 16:55 â€” fix/durata-azioni-e-orari-fabbrica â†’ main
 
