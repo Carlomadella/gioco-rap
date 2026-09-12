@@ -77,9 +77,15 @@ const ONLINE = (() => {
   }
 
   /* ==================== CHI SEI ==================== */
+  /* La sessione account esiste anche prima che il player abbia creato un
+     artista. Non va dedotta da K_ID: account e artista sono due concetti
+     diversi e la pagina Account deve poter riconoscere chi ha fatto login
+     anche con zero carriere/artisti locali. */
+  const sessione = () => leggi(K_SESSIONE);
+
   function identita(){
     const id = leggi(K_ID);
-    return id ? { id, chiave: leggi(K_CHIAVE), sessione: leggi(K_SESSIONE) } : null;
+    return id ? { id, chiave: leggi(K_CHIAVE), sessione: sessione() } : null;
   }
 
   /* Iscrive l'artista alla classifica. Il server apre anche un account da
@@ -435,7 +441,7 @@ const ONLINE = (() => {
   return {
     get url(){ return base; },
     get staccato(){ return staccato; },
-    collega, scollega, identita, adottaArtista, registra, assicura, assicuraArtistaLocale, scambiaVecchiaChiave,
+    collega, scollega, sessione, identita, adottaArtista, registra, assicura, assicuraArtistaLocale, scambiaVecchiaChiave,
     registraConMail, entra, esci, io, cancellaAccount, piattaforma,
     punteggioDaPartita, invia,
     salvaCarriera, carriera, carriere,
