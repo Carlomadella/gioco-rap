@@ -211,7 +211,7 @@ document.addEventListener("click", e => {
   if(b.dataset.go === "gioca") $("m-play").click();
   else if(b.dataset.go === "profile") vaiAlProfilo();
   else if(b.dataset.go === "accesso") vaiAllAccesso();
-  else if(b.dataset.go === "regole") $("m-regole").scrollIntoView({behavior:"smooth", block:"start"});
+  else if(b.dataset.go === "famepedia"){ if(window.FAMEPEDIA) FAMEPEDIA.apri(); else landDillo("FAMEpedia non disponibile"); }
   /* Le classifiche stanno dentro alla partita: se una carriera c'è, si entra
      lì; se non c'è, non si finge che ci sia una schermata da aprire. */
   else if(b.dataset.go === "classifiche"){

@@ -33,6 +33,7 @@
 <link rel="stylesheet" href="css/stretto.css?v=1">
 <!-- per ultimo: le aree da toccare devono vincere sulla cascata di tutti gli altri -->
 <link rel="stylesheet" href="css/tocco.css?v=13">
+<link rel="stylesheet" href="css/famepedia.css?v=1">
 
 </head>
 <body>
@@ -169,9 +170,9 @@
           <span class="su"><span class="n">02</span><span class="frec">↗</span></span>
           <span class="tit">Il tuo artista</span><span class="des">Aspetto, città, genere</span>
         </button>
-        <button class="land-voce" data-scena="3" data-go="regole">
+        <button class="land-voce" data-scena="3" data-go="famepedia">
           <span class="su"><span class="n">03</span><span class="frec">↗</span></span>
-          <span class="tit">Come si gioca</span><span class="des">Energia, giornate, lucidità</span>
+          <span class="tit">FAMEpedia</span><span class="des">Regole, sistemi, mondo</span>
         </button>
         <button class="land-voce" data-scena="4" data-go="classifiche">
           <span class="su"><span class="n">04</span><span class="frec">↗</span></span>
@@ -195,7 +196,7 @@
     </div>
 
     <div class="land-toast" id="land-toast"></div>
-    <button class="land-giu" data-go="regole">↓ come si gioca</button>
+    <button class="land-giu" data-go="famepedia">↓ apri FAMEpedia</button>
   </div>
 
   <div class="menu">
@@ -208,39 +209,14 @@
       <div class="mstats" id="m-stats"></div>
       <div class="mlast" id="m-last"></div>
     </div>
-
-    <!-- Le regole, in chiaro: è la domanda che si fa chiunque apra il gioco. -->
-    <div class="mregole" id="m-regole">
-      <h2>Come si gioca</h2>
-      <p class="rsub">Nessuno diventa qualcuno in una settimana. Il gioco è tutto qui:
-        poche mosse alla volta, per anni, finché il nome non gira da solo.</p>
-      <div class="mrgrid">
-        <div class="mrcard">
-          <span class="mrnum">01</span>
-          <h3>Cento energie al giorno</h3>
-          <p>Scrivere, registrare, salire su un palco: ogni mossa costa energia, poca
-            o tanta a seconda di quanto pesa. La notte la ricarichi, non del tutto.</p>
-        </div>
-        <div class="mrcard">
-          <span class="mrnum">02</span>
-          <h3>La settimana si chiude da sola</h3>
-          <p>Ogni sette giorni gli stream si muovono, i fan arrivano o se ne vanno,
-            l'affitto va pagato lo stesso — tu intanto continui a vivere un giorno alla volta.</p>
-        </div>
-        <div class="mrcard">
-          <span class="mrnum">03</span>
-          <h3>La lucidità si consuma</h3>
-          <p>Lavorare ai pezzi te la alza. I turni al lavoro, le settimane vuote e il
-            tempo che salti te la abbassano. Sotto zero non scrivi più niente di buono.</p>
-        </div>
-        <div class="mrcard">
-          <span class="mrnum">04</span>
-          <h3>Si sale per prove</h3>
-          <p>Da sconosciuto a GOAT ci sono sette gradini. Ognuno ha una prova da superare,
-            con dei requisiti veri: fan, pezzi pubblicati, settimane di gavetta.</p>
-        </div>
-      </div>
+    <div class="mfame-teaser">
+      <span class="mfame-kicker">FAMEpedia · Manuale vivo</span>
+      <h2>Non devi ricordarti tutto.</h2>
+      <p>Tempo, energia, studio, carriera, città, online: le regole stanno in un posto solo
+        e crescono insieme al gioco. Cerca una parola o entra per categoria.</p>
+      <button class="mfame-open" data-go="famepedia">Apri FAMEpedia <span>→</span></button>
     </div>
+
 
     <p class="mfoot">La Fame Studio · prototipo. La partita è salvata su questo dispositivo:
       se svuoti i dati del browser, la carriera se ne va con loro.
@@ -248,6 +224,30 @@
     <p class="mcopy">© 2026 La Fame Studio — Anni di Fame. Tutti i diritti riservati.</p>
   </div>
 </section>
+
+
+<div class="famepedia" id="famepedia" hidden aria-hidden="true">
+  <div class="fp-shell">
+    <header class="fp-top">
+      <div class="fp-brand"><span class="fp-brand-mark" aria-hidden="true">F</span><span class="fp-brand-copy"><b>FAMEpedia</b><span>Anni di Fame · manuale vivo</span></span></div>
+      <label class="fp-search-wrap"><span class="sr-only">Cerca nella FAMEpedia</span><input class="fp-search" id="fp-search" type="search" placeholder="Cerca: energia, studio, classifica..." autocomplete="off"><span class="fp-search-key">/</span></label>
+      <button class="fp-close" id="fp-close" type="button" data-fp-close>Chiudi</button>
+    </header>
+    <div class="fp-body">
+      <aside class="fp-rail"><div class="fp-rail-label">Categorie</div><div id="fp-categorie"></div><div class="fp-rail-note">Le voci descrivono i sistemi attuali del gioco. Quando una meccanica cambia, cambia anche FAMEpedia.</div></aside>
+      <main class="fp-main">
+        <section class="fp-home" id="fp-home">
+          <div class="fp-home-head"><div class="fp-kicker">Manuale · Enciclopedia · Glossario</div><h1>Tutta la <em>fame</em><br>in un posto.</h1><p class="fp-home-intro">Non è un tutorial che ti prende per mano. È il posto dove torni quando vuoi capire una regola, preparare una scelta o ricordarti come funziona un sistema.</p></div>
+          <div class="fp-results-line"><b>Voci</b><span id="fp-count"></span></div><div class="fp-grid" id="fp-list"></div>
+        </section>
+        <article class="fp-article-view" id="fp-article-view" hidden>
+          <button class="fp-back" type="button" data-fp-back>← Tutte le voci</button><div class="fp-article-meta"><span id="fp-article-cat"></span><span class="sep"></span><span>FAMEpedia</span></div>
+          <h1 class="fp-article-title" id="fp-article-title"></h1><p class="fp-article-lead" id="fp-article-lead"></p><div class="fp-copy" id="fp-copy"></div><div class="fp-related" id="fp-related"></div>
+        </article>
+      </main>
+    </div>
+  </div>
+</div>
 
 <!-- Script della landing. Qui non entra niente del gioco vero: solo quello
      che serve a far vedere a che punto sei e a mandarti dentro. -->
@@ -274,7 +274,8 @@
 <script src="js/game/state.js?v=12"></script>
 <script src="js/game/phases.js?v=12"></script>
 
-<script src="js/landing.js?v=6"></script>
+<script src="js/famepedia.js?v=1"></script>
+<script src="js/landing.js?v=7"></script>
 <script src="js/avvio.js?v=5"></script>
 <script src="js/impostazioni-ui.js?v=15"></script>
 </body>

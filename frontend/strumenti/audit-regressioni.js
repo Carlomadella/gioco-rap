@@ -62,6 +62,8 @@ const accesso = leggi("pagine/accesso.html");
 const accessoJs = leggi("js/accesso.js");
 const landingJs = leggi("js/landing.js");
 const shellCss = leggi("css/shell.css");
+const famepediaJs = leggi("js/famepedia.js");
+const famepediaCss = leggi("css/famepedia.css");
 const porta = leggi("index.html");
 const avvio = leggi("js/avvio.js");
 const ingresso = leggi("js/gioco-ingresso.js");
@@ -142,7 +144,31 @@ test("landing aggiorna il badge quando cambia la sessione",
   landingJs.includes("window.ADF_ACCOUNT_STATUS"));
 test("landing carica asset aggiornati del badge account",
   landing.includes('css/shell.css?v=14') &&
-  landing.includes('js/landing.js?v=6'));
+  landing.includes('js/landing.js?v=7'));
+
+console.log("\nFAMEpedia — enciclopedia di gioco");
+test("voce 03 apre FAMEpedia e non la vecchia sezione Come si gioca",
+  landing.includes('data-go="famepedia"') &&
+  landing.includes('<span class="tit">FAMEpedia</span>') &&
+  !landing.includes('data-go="regole"'));
+test("FAMEpedia ha catalogo, ricerca e almeno 18 voci",
+  famepediaJs.includes("const FAME_ARTICOLI = [") &&
+  famepediaJs.includes('addEventListener("input"') &&
+  famepediaJs.includes("function articoliFiltrati()") &&
+  (famepediaJs.match(/\{id:"/g) || []).length >= 18);
+test("FAMEpedia copre i nuclei gameplay principali",
+  ["giornata","energia","lucidita","scrittura","studio","fasi","classifiche","strada","account-cloud","slot"]
+    .every(id => famepediaJs.includes('id:"' + id + '"')));
+test("FAMEpedia usa UI dedicata coerente e responsive",
+  famepediaCss.includes(".famepedia") &&
+  famepediaCss.includes("font-family:var(--disp)") &&
+  famepediaCss.includes("var(--c1)") &&
+  famepediaCss.includes("@media (max-width:820px)") &&
+  landing.includes('css/famepedia.css?v=1') &&
+  landing.includes('js/famepedia.js?v=1'));
+test("controller landing apre FAMEpedia dal menu",
+  landingJs.includes('b.dataset.go === "famepedia"') &&
+  landingJs.includes("FAMEPEDIA.apri()"));
 
 console.log("\nBlocco 1 — Eventi V2 / telefono / dist");
 test("catalogo contiene esattamente 1000 eventi", Array.isArray(cat) && cat.length === 1000);
