@@ -779,3 +779,23 @@ La correzione:
 Questa modifica non cambia `audio-analysis-v2-config-001.py`, `algorithmConfig`, risultati development, correction-cost review, candidate identity o holdout policy. Il candidate freeze già scritto non viene rigenerato: viene verificato con il validatore corretto.
 
 L'holdout resta non osservato fino al completamento con esito positivo della verifica del freeze.
+
+## NDR-055 — Audio Analysis V2 config-001 chiude development con V2_WINS e apre solo il gate holdout one-shot
+
+Data: 12 settembre 2026. Stato: adottata.
+
+La correction-cost review cieca di `audio-analysis-v2-config-001` e stata finalizzata su 8/8 family comparabili. La mediana dell'incremento relativo del costo di correzione e `-0.010704` (~-1,07%), quindi non scatta il veto congelato `> +25%`.
+
+Con il metric gate gia `V2_WINS_METRICALLY`, la decisione development ufficiale diventa **`V2_WINS`**.
+
+Artefatti congelati:
+
+- correction-cost report SHA256 `51a9a08a33d5ee0e7464f38170aef9b54637bdb5fd8c7576836acf916baa4464`;
+- development summary SHA256 `cd4abdfbea40619249559469ec73dcdd730824db349ecb7a8fd7b8a731a3fb5a`;
+- candidate freeze SHA256 `5ab2e4d996123f6a22a15a8b3fa1f6eafb0f0097b3f0c074aefe59c6928b50a3`;
+- configHash `04e00482802c46dda876733b7210992cab9eadbafa33153266a483b4a90b81b3`;
+- development commit `8702e8e72969b8f3decc3636b3aeff310fcbef9d`.
+
+Il candidate freeze e stato verificato dopo la correzione semantica del validator documentata in NDR-054. Candidate source, config e protocollo restano invariati.
+
+Da questo punto config-001 non viene piu modificata, config-002 non viene aperta per migliorare il risultato corrente, l'holdout resta non osservato fino alla singola evaluation finale e dopo l'osservazione non e consentito tuning sullo stesso set. L'audit di diversita/difficolta del pilot resta separato e non deve usare l'holdout come set di sviluppo.

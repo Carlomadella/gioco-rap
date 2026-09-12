@@ -1,14 +1,15 @@
 # FAME Neural — Current State
 
-Data: 2026-09-11
+Data: 2026-09-12
 
 ## Owned Beats — stato operativo
 
-> Checkpoint corrente Block E: [V2 config-001 — metric gate — 11/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_V2_CONFIG001_METRIC_GATE_2026-09-11.md).
+> Checkpoint corrente Audio Analysis: [V2 config-001 — development V2_WINS + candidate freeze — 12/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_V2_DEVELOPMENT_WIN_CANDIDATE_FREEZE_2026-09-12.md).
+> Checkpoint precedente Block E: [V2 config-001 — metric gate — 11/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_V2_CONFIG001_METRIC_GATE_2026-09-11.md).
 > Diagnostica complementare: [Easy sanity set e localization audit — 11/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_EASY_SANITY_CHECKPOINT_2026-09-11.md).
-> Review gate: [Freeze correction-cost review config-001 — 11/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_CORRECTION_COST_REVIEW_FREEZE_2026-09-11.md).
+> Metodo review congelato: [Freeze correction-cost review config-001 — 11/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_CORRECTION_COST_REVIEW_FREEZE_2026-09-11.md).
 
-**Stato aggiornato: 11/09/2026. Conversione audio→MIDI non ancora avviata (`converted: 0`).**
+**Stato aggiornato: 12/09/2026. Conversione audio→MIDI non ancora avviata (`converted: 0`).**
 
 | Attività | Stato | Evidenza / prossimo vincolo |
 |---|---|---|
@@ -17,10 +18,10 @@ Data: 2026-09-11
 | Selezione cohort pilot | **COMPLETATO** | 8 beat registrati in `owned-beats-pilot-v1` |
 | Composition family corpus proprietario | **COMPLETATO** | 131/131 record confermati umanamente come composizioni distinte; 131 `compositionFamilyId` unici, 0 record senza family |
 | Diversità musicale pilot | **DA COMPLETARE** | audit formale del pilot ancora da fare; sanity set separato di 3 boom bap volutamente semplici supporta l'ipotesi che il development congelato sia comparativamente più difficile, ma non sostituisce una verifica sistematica di difficoltà/diversità |
-| Evaluation holdout | **COMPLETATO** | 10 composition family congelate in `evaluation-holdout` prima del tuning V2; 8 development, overlap 0, 113 record ancora senza split |
+| Evaluation holdout | **SET CONGELATO / NON OSSERVATO** | 10 composition family congelate in `evaluation-holdout` prima del tuning V2; 8 development, overlap 0, 113 record ancora senza split; candidate freeze verificato, prossimo accesso consentito solo come singola valutazione finale |
 | Human Reference development | **COMPLETATA / VERSIONATA** | `precision-v3` finalizzata: 8/8 family, 24/24 finestre `COMPLETE` + reviewed, digest `6e80e998cf2e5725f346989f707cb59a0b44f218d8909012171d0b9ebbec91af`; `precision-v2`/`precision-v1` preservate come storico; holdout non osservato |
 | Ambiente tecnico Audio Analysis | **COMPLETATO** | FFmpeg/ffprobe 9.0.1 + Python 3.14 + stack audio verificata |
-| Audio Analysis pilot | **IN CORSO — CORRECTION-COST REVIEW PRONTO** | `audio-analysis-v2-config-001` (1/8) resta `V2_WINS_METRICALLY / INCONCLUSIVE_REVIEW_PENDING`; sanity set e localization audit registrati; metodologia/tool correction-cost congelati prima dei risultati: review cieca sections-only su tutte le 8 family, minimo 6 comparabili, ordine arm controbilanciato 4/4, veto automatico solo se median relative cost increase `> +25%`; risultati review ancora non osservati; `config-002` e holdout chiusi |
+| Audio Analysis pilot | **SVILUPPO CHIUSO — V2_WINS / CANDIDATE FROZEN** | `audio-analysis-v2-config-001` (1/8) ha chiuso development con `V2_WINS`: correction-cost review 8/8 family comparabili, median relative increase `-0.010704` (~-1,07%), nessun veto; report `51a9a08a…`, development summary `cd4abdf…`; candidate freeze verificato SHA256 `5ab2e4d9…`; source/config/protocol invariati; holdout non osservato; prossimo vincolo = singola evaluation holdout finale, senza tuning post-osservazione |
 | Source Separation pilot | **DA FARE** | successiva all'Audio Analysis |
 | Trascrizione Audio→MIDI pilot | **DA FARE** | drums/low-end prima; tonal successivamente |
 | QA pilot | **DA FARE** | metriche automatiche e giudizio umano separati |
