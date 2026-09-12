@@ -92,29 +92,31 @@ function renderMenu(){
 $("nav-avatar").onclick = () => vaiAlProfilo();
 $("brand").onclick = () => renderMenu();          // già qui: si aggiorna e basta
 
-/* Punto 15: muta/smuta la musica di sottofondo, in alto a sinistra.
-   Stesso interruttore dell'audio in game (SET.audio.on, js/impostazioni.js):
-   toccarlo qui vale anche dentro, e viceversa. */
+/* Punto 15: muta/smuta soltanto la musica di sottofondo, in alto a sinistra.
+   Il master `SET.audio.on` resta indipendente: fermare Dream Catcher non deve
+   lasciare senza beat la carriera quando si entra nello Studio. */
 function aggiornaMuteLanding(){
   const b = $("landing-mute");
   if(!b) return;
-  const on = !SET.audio || SET.audio.on !== false;
+  const on = typeof musicaMenuAbilitata === "function"
+    ? musicaMenuAbilitata()
+    : (!SET.audio || SET.audio.musicMenuOn !== false);
   /* le due icone si scambiano da css/shell.css, in base a questo attributo */
   b.setAttribute("aria-pressed", on ? "false" : "true");
   b.setAttribute("aria-label", on ? "Muta la musica di sottofondo" : "Riattiva la musica di sottofondo");
 }
 if($("landing-mute")){
   $("landing-mute").onclick = () => {
-    SET.audio.on = !SET.audio.on;
-    setSalva();
-    applicaImpostazioni();
+    const musicaOn = typeof commutaMusicaMenu === "function"
+      ? commutaMusicaMenu()
+      : true;
     aggiornaMuteLanding();
     /* applicaImpostazioni() aggiorna solo i volumi (ADF_AUDIO.refresh): se il
        contesto audio si era sospeso da solo, o la traccia si era fermata,
        il volume torna giusto ma resta muto lo stesso. Riattivando, ci si
        assicura anche che il contesto sia sveglio e la musica stia girando
        davvero, non solo che il volume sia quello giusto sulla carta. */
-    if(SET.audio.on){
+    if(musicaOn && SET.audio.on){
       try{ if(window.ADF_AUDIO && ADF_AUDIO.unlock) ADF_AUDIO.unlock(); }catch(e){}
       try{
         if(window.ADF_AUDIO && ADF_AUDIO.music && !ADF_AUDIO.music.playing)

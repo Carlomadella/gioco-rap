@@ -108,6 +108,15 @@ function creaAppShell(){
   }
 
   function close(){
+    /* Gioco/accesso vivono in un iframe con una propria copia di SET. Prima
+       di riattivare il player persistente, il parent rilegge sincronicamente
+       il localStorage condiviso: master, volumi e mute menu non restano quelli
+       presenti quando il frame era stato aperto. */
+    try{
+      if(window.ADF_SETTINGS && typeof ADF_SETTINGS.reload === "function")
+        ADF_SETTINGS.reload();
+    }catch(e){}
+
     if(frame){
       try{
         frame.remove();

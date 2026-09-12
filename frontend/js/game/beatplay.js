@@ -98,6 +98,13 @@ function beatStop(){
   if(p && p.btn){
     p.btn.classList.remove("on");
     p.btn.innerHTML = p.btnHtml;
+    try{ p.btn.setAttribute("aria-pressed", "false"); }catch(e){}
+    try{
+      if(p.btnLabel == null) p.btn.setAttribute("aria-label", "Ascolta il beat");
+      else p.btn.setAttribute("aria-label", p.btnLabel);
+      if(p.btnTitle == null) p.btn.removeAttribute("title");
+      else p.btn.setAttribute("title", p.btnTitle);
+    }catch(e){}
   }
   if(!p) return;
   clearTimeout(p.timer);
@@ -196,6 +203,22 @@ function beatSuona(b, btn){
 
   const durata = (bars * spb * 4 + .6) * 1000;
   BEAT_PLAY = {key, c, master, nodes, timer:setTimeout(beatStop, durata),
-    btn:btn || null, btnHtml:btn ? btn.innerHTML : ""};
-  if(btn){ btn.classList.add("on"); btn.textContent = "■"; }
+    btn:btn || null, btnHtml:btn ? btn.innerHTML : "",
+    btnLabel:btn && btn.getAttribute ? btn.getAttribute("aria-label") : null,
+    btnTitle:btn && btn.getAttribute ? btn.getAttribute("title") : null};
+  if(btn){
+    btn.classList.add("on");
+    btn.textContent = "■";
+    try{ btn.setAttribute("aria-pressed", "true"); }catch(e){}
+    try{ btn.setAttribute("aria-label", "Ferma il beat"); }catch(e){}
+    try{ btn.setAttribute("title", "Ferma il beat"); }catch(e){}
+  }
 }
+
+/* Un cambio di fase azzera il bus immediatamente. Anche l'interfaccia deve
+   fermarsi nello stesso istante, senza aspettare il timer delle quattro barre. */
+try{
+  window.addEventListener("adf:audio-mode", () => {
+    if(window.ADF_AUDIO && ADF_AUDIO.canPlay && !ADF_AUDIO.canPlay("beat")) beatStop();
+  });
+}catch(e){}

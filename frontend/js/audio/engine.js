@@ -6,7 +6,7 @@
    cambiare il formato dei beat né la logica delle schermate. */
 "use strict";
 (() => {
-  const CANALI = ["music", "sfx", "ui", "beat", "ambient", "cinematic"];
+  const CANALI = ["music", "menuMusic", "sfx", "ui", "beat", "ambient", "cinematic"];
   const MODI = new Set(["pregame", "cinematic", "gameplay"]); /* ADF_AUDIO_MODES_V1_1 */
   let modo = "pregame";
   let backend = null;
@@ -20,6 +20,7 @@
     return {
       master,
       music: pct(a.music == null ? 70 : a.music),
+      menuMusic: a.musicMenuOn === false ? 0 : pct(a.music == null ? 70 : a.music),
       sfx,
       ui: pct(a.ui == null ? (a.sfx == null ? 80 : a.sfx) : a.ui),
       beat: pct(a.beat == null ? 85 : a.beat),
@@ -29,11 +30,11 @@
     };
   }
   function soppresso(canale){
-    /* Pregame: soltanto Dream Catcher.
-       Cinematic: musica in uscita + effetti delle scene.
+    /* Pregame: soltanto Dream Catcher sul suo bus dedicato.
+       Cinematic: musica menu in uscita + effetti delle scene.
        Gameplay: tutti i bus disponibili. */
-    if(modo === "pregame") return canale !== "music";
-    if(modo === "cinematic") return canale !== "music" && canale !== "cinematic";
+    if(modo === "pregame") return canale !== "menuMusic";
+    if(modo === "cinematic") return canale !== "menuMusic" && canale !== "cinematic";
     return false;
   }
 

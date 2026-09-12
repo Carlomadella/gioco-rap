@@ -79,7 +79,7 @@ function stTacche(q, tot){
 /* Il tasto tondo con il triangolo: sulle schede dei beat e su ogni take. */
 function stPlay(attr, etichetta){
   return '<button type="button" class="stplay"' + (attr || "") +
-    ' aria-label="' + studioEsc(etichetta || "Ascolta") + '">' +
+    ' aria-label="' + studioEsc(etichetta || "Ascolta") + '" aria-pressed="false">' +
     '<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
     '<path d="M7 4.6 15.4 10 7 15.4z"/></svg></button>';
 }

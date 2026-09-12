@@ -399,3 +399,35 @@ prova mirata: **117 controlli superati, 0 errori**.
 File toccati: `js/audio/music.js`, `js/creator/rpg-v24-bridge.js`,
 `js/game/entry.js`, `js/gioco-ingresso.js`, `js/pagine.js`, le tre pagine HTML
 per il cache busting e `strumenti/prova.js`.
+
+---
+
+## Landing · Fermare la musica non spegne i beat
+
+> «I beat non partono ancora.»
+
+**FATTO (11/09/2026)** — individuata la causa rimasta fuori dalla correzione
+precedente: il pulsante della landing era descritto come “Muta la musica di
+sottofondo”, ma salvava `audio.on = false`, cioè il master dell’intero gioco.
+Quello stato restava nel browser e bloccava il canale beat una volta arrivati
+nello Studio.
+
+Dalla versione 2 delle impostazioni, musica menu e master generale sono due
+stati distinti. Il pulsante della landing modifica soltanto `musicMenuOn`;
+beat ed effetti restano disponibili. Una migrazione una tantum converte anche
+le impostazioni già salvate col vecchio pulsante: mantiene Dream Catcher muta,
+ma riattiva i canali di gameplay. Le regressioni riproducono sia lo stato
+legacy sia il nuovo click e verificano che il beat rimanga riproducibile.
+
+La v1 non registrava se `audio.on = false` provenisse dalla landing o da un
+vero comando master. Non essendoci un indicatore affidabile, la migrazione
+sceglie esplicitamente di riparare il caso segnalato una sola volta; da v2 in
+poi un master spento resta spento e il comando della landing non può più
+riaccenderlo.
+
+Dream Catcher usa inoltre un bus `menuMusic` dedicato: disattivarla non azzera
+il bus `music` destinato a eventuale colonna sonora futura. Nella shell, la
+copia di impostazioni dell'iframe aggiorna subito quella della landing e il
+parent rilegge comunque il salvataggio prima di riaprire il menu. I tasti di
+ascolto dei beat ora riallineano icona, `aria-pressed` e descrizione su stop,
+fine naturale, cambio fase e volume/master portati a zero.

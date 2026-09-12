@@ -14,28 +14,49 @@ const SET_KEY = "adf-impostazioni-v1";
 const N_SLOT = 3;
 
 const SET_DEF = () => ({
-  v: 1,
+  v: 2,
   lingua: "it",
   slot: 1,
-  audio: {on:true, master:80, music:70, sfx:80, beat:85, ui:80, ambient:70, suoni:"morbido", click:true}, /* ADF_AUDIO_SETTINGS_V1 */
+  audio: {on:true, musicMenuOn:true, master:80, music:70, sfx:80, beat:85, ui:80, ambient:70, suoni:"morbido", click:true}, /* ADF_AUDIO_SETTINGS_V2 */
   look:  {tema:"notte", accento:"artista", col:"#FF5A36", grana:55, alone:52,
           scala:100, anim:true, compatto:false},
   gioco: {difficolta:"anni-di-fame", preset:"normale", energia:0, spese:1, fan:1, rivali:1, conferme:true}
 });
 
 let SET = SET_DEF();
-(function caricaSet(){
+function caricaSet(){
   let r = null;
   try{ r = JSON.parse(localStorage.getItem(SET_KEY) || "null"); }catch(e){ r = null; }
-  if(!r || typeof r !== "object") return;
   const d = SET_DEF();
+  if(!r || typeof r !== "object"){
+    SET = d;
+    return false;
+  }
+  const versioneSalvata = Number(r.v) || 1;
   for(const k in d){
     if(r[k] === undefined) continue;
     if(d[k] && typeof d[k] === "object" && !Array.isArray(d[k]) && r[k] && typeof r[k] === "object")
-      SET[k] = Object.assign(d[k], r[k]);
-    else SET[k] = r[k];
+      d[k] = Object.assign(d[k], r[k]);
+    else d[k] = r[k];
   }
-})();
+  SET = d;
+
+  /* Fino alla v1 il pulsante della landing prometteva di mutare soltanto la
+     musica di sottofondo, ma salvava `audio.on=false` e spegneva anche beat
+     ed effetti. Siccome la v1 non registrava da quale interfaccia arrivasse
+     quel `false`, la compatibilita' privilegia il caso rotto segnalato: una
+     sola volta conserva la musica menu spenta e riattiva i canali gameplay.
+     Un master spento nuovamente in v2 resta invece spento. */
+  if(versioneSalvata < 2){
+    const audioLegacySpento = !!(r.audio && r.audio.on === false);
+    SET.audio.musicMenuOn = !audioLegacySpento;
+    if(audioLegacySpento) SET.audio.on = true;
+    SET.v = 2;
+    try{ localStorage.setItem(SET_KEY, JSON.stringify(SET)); }catch(e){}
+  }
+  return true;
+}
+caricaSet();
 function setSalva(){ try{ localStorage.setItem(SET_KEY, JSON.stringify(SET)); }catch(e){} }
 
 /* ==================== SLOT DI SALVATAGGIO ====================
@@ -44,14 +65,28 @@ function setSalva(){ try{ localStorage.setItem(SET_KEY, JSON.stringify(SET)); }c
 function slotKey(base){ return (SET.slot > 1) ? base + "-s" + SET.slot : base; }
 
 /* ==================== AUDIO ====================
-   Un solo interruttore (SET.audio.on) e tre manopole. I volumi tornano come
-   moltiplicatori, così chi suona non deve sapere niente delle impostazioni. */
+   `SET.audio.on` resta il master; `musicMenuOn` controlla soltanto la musica
+   pre-game. I volumi tornano come moltiplicatori, così chi suona non deve
+   sapere niente delle impostazioni. */
 const volMaster = () => (SET.audio.on ? SET.audio.master / 100 : 0);
 const volMusic  = () => volMaster() * ((SET.audio.music == null ? 70 : SET.audio.music) / 100);
+const volMenuMusic = () => volMusic() * (SET.audio.musicMenuOn === false ? 0 : 1);
 const volSfx    = () => volMaster() * (SET.audio.sfx / 100);
 const volUi     = () => volMaster() * ((SET.audio.ui == null ? SET.audio.sfx : SET.audio.ui) / 100);
 const volBeat   = () => volMaster() * (SET.audio.beat / 100);
 const volAmbient= () => volMaster() * ((SET.audio.ambient == null ? 70 : SET.audio.ambient) / 100); /* ADF_AUDIO_LEVELS_V1 */
+
+/* Il tasto con l'altoparlante nella landing appartiene esclusivamente alla
+   musica menu. Il master `audio.on` resta il comando generale di gioco. */
+function musicaMenuAbilitata(){
+  return SET.audio.musicMenuOn !== false;
+}
+function commutaMusicaMenu(){
+  SET.audio.musicMenuOn = !musicaMenuAbilitata();
+  setSalva();
+  applicaImpostazioni();
+  return musicaMenuAbilitata();
+}
 
 /* ==================== DIFFICOLTÀ ====================
    Tre manopole vere (spese, crescita dei fan, rivali) più le energie in più.
@@ -98,6 +133,29 @@ function applicaImpostazioni(){
      continua a funzionare come prima (fx.js lo dichiara, qui lo si allinea) */
   try{ if(typeof muted !== "undefined") muted = !SET.audio.on; }catch(e){}
   try{ if(typeof ADF_AUDIO !== "undefined" && ADF_AUDIO.refresh) ADF_AUDIO.refresh(); }catch(e){} /* ADF_AUDIO_REFRESH_V1 */
+  /* Un beat diventato inudibile per master/volume/fase non deve continuare a
+     mostrare il quadrato di stop fino alla fine del timer. */
+  try{
+    const beatBloccato = (typeof muted !== "undefined" && muted) ||
+      (typeof ADF_AUDIO !== "undefined" && ADF_AUDIO.canPlay && !ADF_AUDIO.canPlay("beat"));
+    if(beatBloccato && typeof beatStop === "function") beatStop();
+  }catch(e){}
   try{ if(typeof aggiornaTastoAudio === "function") aggiornaTastoAudio(); }catch(e){}
+  try{ if(typeof aggiornaMuteLanding === "function") aggiornaMuteLanding(); }catch(e){}
+
+  /* Nella shell il player reale resta nella landing parent, mentre accesso e
+     gioco hanno una seconda copia di SET nell'iframe. Il reload diretto e'
+     sincrono e aggiorna subito il gain del player proprietario. */
+  try{
+    const p = window.parent;
+    if(p && p !== window && p.ADF_SETTINGS && typeof p.ADF_SETTINGS.reload === "function")
+      p.ADF_SETTINGS.reload();
+  }catch(e){}
 }
+function ricaricaImpostazioni(){
+  caricaSet();
+  applicaImpostazioni();
+  return true;
+}
+window.ADF_SETTINGS = {reload:ricaricaImpostazioni};
 applicaImpostazioni();

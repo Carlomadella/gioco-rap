@@ -191,7 +191,7 @@
     if(stream) return stream;
     stream = ADF_AUDIO.createStream({
       src:sourceUrl(),
-      channel:"music",
+      channel:"menuMusic",
       preload:"auto"
     });
 

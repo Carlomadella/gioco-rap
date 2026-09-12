@@ -1197,6 +1197,8 @@ console.log("\nil tasto di ascolto segue davvero il beat");
 {
   const vm = require("vm");
   const zitto = () => {};
+  let fineBeat = null;
+  const eventiWindow = {};
   const parametro = () => ({
     value:1,
     setValueAtTime:zitto,
@@ -1222,12 +1224,19 @@ console.log("\nil tasto di ascolto segue davvero il beat");
   };
   function tastoAudio(html){
     const classi = new Set(["stplay"]);
+    const attributi = new Map([
+      ["aria-label", "Ascolta il provino"],
+      ["aria-pressed", "false"]
+    ]);
     let contenuto = html;
     return {
       classList:{
         add:c => classi.add(c), remove:c => classi.delete(c),
         contains:c => classi.has(c)
       },
+      getAttribute:n => attributi.has(n) ? attributi.get(n) : null,
+      setAttribute:(n, v) => attributi.set(n, String(v)),
+      removeAttribute:n => attributi.delete(n),
       get innerHTML(){ return contenuto; },
       set innerHTML(v){ contenuto = String(v); },
       get textContent(){ return contenuto.replace(/<[^>]*>/g, ""); },
@@ -1238,7 +1247,8 @@ console.log("\nil tasto di ascolto segue davvero il beat");
   const scatola = {
     console:{log:zitto, warn:zitto, error:zitto},
     Math, Object, Array, String, Number, Set, Map, Float32Array,
-    setTimeout:() => 1, clearTimeout:zitto,
+    setTimeout:fn => { fineBeat = fn; return 1; }, clearTimeout:zitto,
+    addEventListener:(tipo, fn) => { eventiWindow[tipo] = fn; },
     document:{querySelectorAll:() => []},
     muted:false, clamp:(v, min, max) => Math.max(min, Math.min(max, v)),
     ac:() => contestoAudio, volBeat:() => 1, toast:zitto,
@@ -1257,11 +1267,33 @@ console.log("\nil tasto di ascolto segue davvero il beat");
   const tasto = tastoAudio(playOriginale);
   scatola.tasto = tasto;
   vm.runInContext("beatSuona({n:'Provino', q:60, gen:'trap', seed:17}, tasto)", scatola);
-  const partito = tasto.classList.contains("on") && tasto.innerHTML !== playOriginale;
+  const partito = tasto.classList.contains("on") && tasto.innerHTML !== playOriginale &&
+    tasto.getAttribute("aria-pressed") === "true" &&
+    tasto.getAttribute("aria-label") === "Ferma il beat";
   vm.runInContext("beatSuona({n:'Provino', q:60, gen:'trap', seed:17}, tasto)", scatola);
   controlla("ripremendo un provino lo stop ripristina icona e stato del suo tasto",
-    partito && !tasto.classList.contains("on") && tasto.innerHTML === playOriginale,
-    JSON.stringify({partito, ancoraAttivo:tasto.classList.contains("on"), html:tasto.innerHTML}));
+    partito && !tasto.classList.contains("on") && tasto.innerHTML === playOriginale &&
+      tasto.getAttribute("aria-pressed") === "false" &&
+      tasto.getAttribute("aria-label") === "Ascolta il provino",
+    JSON.stringify({partito, ancoraAttivo:tasto.classList.contains("on"),
+      aria:tasto.getAttribute("aria-pressed"), label:tasto.getAttribute("aria-label"), html:tasto.innerHTML}));
+
+  vm.runInContext("beatSuona({n:'Provino', q:60, gen:'trap', seed:17}, tasto)", scatola);
+  if(fineBeat) fineBeat();
+  controlla("alla fine naturale del beat il tasto torna visivamente fermo",
+    !tasto.classList.contains("on") && tasto.innerHTML === playOriginale &&
+      tasto.getAttribute("aria-pressed") === "false",
+    JSON.stringify({attivo:tasto.classList.contains("on"), aria:tasto.getAttribute("aria-pressed")}));
+
+  scatola.ADF_AUDIO.canPlay = () => true;
+  vm.runInContext("beatSuona({n:'Provino', q:60, gen:'trap', seed:17}, tasto)", scatola);
+  scatola.ADF_AUDIO.canPlay = () => false;
+  if(eventiWindow["adf:audio-mode"])
+    eventiWindow["adf:audio-mode"]({detail:{mode:"pregame"}});
+  controlla("se la fase audio disabilita i beat, anche il tasto attivo si ferma",
+    !tasto.classList.contains("on") && tasto.getAttribute("aria-pressed") === "false",
+    JSON.stringify({listener:!!eventiWindow["adf:audio-mode"],
+      attivo:tasto.classList.contains("on"), aria:tasto.getAttribute("aria-pressed")}));
 }
 
 /* L'audio nasce in modalita' pregame su ogni nuova pagina. Qualunque percorso
@@ -1652,6 +1684,7 @@ console.log("\nla shell ripristina la landing quando il gioco si chiude");
   const vm = require("vm");
   const zitto = () => {};
   let menuRipreso = 0;
+  const ordineAudio = [];
   const frame = {
     style:{},
     setAttribute:zitto,
@@ -1669,9 +1702,10 @@ console.log("\nla shell ripristina la landing quando il gioco si chiude");
     },
     ADF_AUDIO:{
       mode:"gameplay",
-      setMode(next){ this.mode = next; },
-      music:{ensureMenu(){ menuRipreso++; return Promise.resolve(true); }}
-    }
+      setMode(next){ ordineAudio.push("modo:" + next); this.mode = next; },
+      music:{ensureMenu(){ ordineAudio.push("menu"); menuRipreso++; return Promise.resolve(true); }}
+    },
+    ADF_SETTINGS:{reload(){ ordineAudio.push("impostazioni"); return true; }}
   };
   scatola.window = scatola;
   scatola.parent = scatola;
@@ -1684,10 +1718,291 @@ console.log("\nla shell ripristina la landing quando il gioco si chiude");
   controlla("chiudere la shell rimette il parent in pregame e riprende la musica",
     scatola.ADF_AUDIO.mode === "pregame" && menuRipreso === 1 && frame.rimosso === true,
     JSON.stringify({mode:scatola.ADF_AUDIO.mode, menuRipreso, rimosso:frame.rimosso}));
+  controlla("prima di riaprire la musica la shell rilegge le impostazioni condivise",
+    ordineAudio.join("|") === "impostazioni|modo:pregame|menu",
+    JSON.stringify({ordineAudio}));
+}
+
+/* Il tasto in landing promette di fermare soltanto la musica di sottofondo.
+   Prima invece salvava `audio.on=false`: quel valore seguiva la carriera e,
+   una volta nello Studio, spegneva anche il canale beat. La migrazione deve
+   riparare lo stato gia' salvato e il nuovo comando deve tenere separati i
+   due canali. */
+console.log("\nla musica del menu non spegne i beat dello Studio");
+{
+  const vm = require("vm");
+  const zitto = () => {};
+  let salvato = "";
+  let sincronizzazioniParent = 0;
+  let arrestiNodi = 0;
+  let memoriaImpostazioni = JSON.stringify({
+    v:1,
+    audio:{on:false, master:80, music:70, sfx:80, beat:85, click:true}
+  });
+  const parametro = () => ({
+    value:1,
+    setTargetAtTime(v){ this.value=v; },
+    setValueAtTime(v){ this.value=v; },
+    linearRampToValueAtTime(v){ this.value=v; },
+    exponentialRampToValueAtTime(v){ this.value=v; },
+    cancelScheduledValues:zitto
+  });
+  const nodo = () => ({
+    connect:zitto, disconnect:zitto, start:zitto,
+    stop(){ arrestiNodi++; },
+    gain:parametro(), frequency:parametro()
+  });
+  function ContestoAudioFinto(){
+    this.currentTime=0; this.state="running"; this.sampleRate=8000; this.destination=nodo();
+  }
+  ContestoAudioFinto.prototype.createGain = nodo;
+  ContestoAudioFinto.prototype.createBuffer = function(_canali, lunghezza){
+    const dati = new Float32Array(lunghezza);
+    return {getChannelData(){ return dati; }};
+  };
+  ContestoAudioFinto.prototype.createBufferSource = function(){
+    return Object.assign(nodo(), {buffer:null});
+  };
+  ContestoAudioFinto.prototype.createBiquadFilter = function(){
+    return Object.assign(nodo(), {type:""});
+  };
+  ContestoAudioFinto.prototype.createOscillator = function(){
+    return Object.assign(nodo(), {type:""});
+  };
+  ContestoAudioFinto.prototype.createDynamicsCompressor = function(){
+    return Object.assign(nodo(), {
+      threshold:parametro(), knee:parametro(), ratio:parametro(),
+      attack:parametro(), release:parametro()
+    });
+  };
+  ContestoAudioFinto.prototype.resume = () => Promise.resolve();
+  ContestoAudioFinto.prototype.close = zitto;
+  const parentFinto = {ADF_SETTINGS:{reload(){ sincronizzazioniParent++; return true; }}};
+  const scatola = {
+    console:{log:zitto, warn:zitto, error:zitto},
+    Math, Object, Array, String, Number, Boolean, Date, Set, Map, Promise, Float32Array,
+    AudioContext:ContestoAudioFinto,
+    CustomEvent:function(tipo, opzioni){ this.type=tipo; this.detail=opzioni && opzioni.detail; },
+    localStorage:{
+      getItem:chiave => chiave === "adf-impostazioni-v1" ? memoriaImpostazioni : null,
+      setItem:(_chiave, valore) => {
+        salvato=String(valore); memoriaImpostazioni=String(valore);
+      },
+      removeItem:chiave => { if(chiave === "adf-impostazioni-v1") memoriaImpostazioni=null; }
+    },
+    document:{
+      documentElement:{
+        lang:"it", style:{setProperty:zitto, zoom:""},
+        classList:{toggle:zitto}
+      },
+      addEventListener:zitto
+    },
+    addEventListener:zitto, dispatchEvent:zitto,
+    setTimeout:() => 1, clearTimeout:zitto,
+    muted:false, clamp:(v, min, max) => Math.max(min, Math.min(max, v)),
+    ac:() => scatola.ADF_AUDIO.legacy.context(), toast:zitto
+  };
+  scatola.window=scatola;
+  scatola.parent=parentFinto;
+  vm.createContext(scatola);
+  vm.runInContext(fs.readFileSync(path.join(RADICE,"js/impostazioni.js"),"utf8"),
+    scatola,{filename:"js/impostazioni.js"});
+  vm.runInContext(fs.readFileSync(path.join(RADICE,"js/audio/engine.js"),"utf8"),
+    scatola,{filename:"js/audio/engine.js"});
+  for(const f of ["js/game/beats.js", "js/game/beatplay.js"])
+    vm.runInContext(fs.readFileSync(path.join(RADICE, f),"utf8"), scatola,{filename:f});
+
+  const migrato=vm.runInContext(
+    "ADF_AUDIO.setMode('gameplay'); ({v:SET.v,on:SET.audio.on,"+
+    "musicaMenu:SET.audio.musicMenuOn,beat:ADF_AUDIO.canPlay('beat'),"+
+    "menuBus:ADF_AUDIO.canPlay('menuMusic'),musica:ADF_AUDIO.canPlay('music')})",scatola);
+  controlla("il vecchio mute della landing viene migrato senza lasciare spenti i beat",
+    migrato.v >= 2 && migrato.on === true && migrato.musicaMenu === false &&
+      migrato.beat === true && migrato.menuBus === false && migrato.musica === true &&
+      /\"v\":2/.test(salvato),
+    JSON.stringify({migrato,salvato}));
+
+  const livelliMigrati=vm.runInContext(
+    "({menu:ADF_AUDIO.legacy.bus('menuMusic').gain.value,"+
+    "musica:ADF_AUDIO.legacy.bus('music').gain.value,"+
+    "beat:ADF_AUDIO.legacy.bus('beat').gain.value})",scatola);
+  controlla("il mute menu azzera solo il suo bus, non musica futura o beat",
+    livelliMigrati.menu === 0 && livelliMigrati.musica === .7 && livelliMigrati.beat === .85,
+    JSON.stringify(livelliMigrati));
+
+  const haComando=vm.runInContext("typeof commutaMusicaMenu === 'function'",scatola);
+  const syncPrima = sincronizzazioniParent;
+  const separato=haComando ? vm.runInContext(
+    "SET.audio.on=true; SET.audio.musicMenuOn=true; commutaMusicaMenu();"+
+    "ADF_AUDIO.setMode('gameplay'); ({on:SET.audio.on,"+
+    "musicaMenu:SET.audio.musicMenuOn,beat:ADF_AUDIO.canPlay('beat'),"+
+    "menuBus:ADF_AUDIO.canPlay('menuMusic'),musica:ADF_AUDIO.canPlay('music')})",scatola) : {};
+  controlla("fermare la musica del menu lascia riproducibile il canale beat",
+    haComando && separato.on === true && separato.musicaMenu === false &&
+      separato.beat === true && separato.menuBus === false && separato.musica === true,
+    JSON.stringify(separato));
+  controlla("una modifica audio nell'iframe aggiorna subito il player del parent",
+    sincronizzazioniParent > syncPrima,
+    JSON.stringify({syncPrima,sincronizzazioniParent}));
+
+  const riattivato=haComando ? vm.runInContext(
+    "SET.audio.on=false; SET.audio.musicMenuOn=false; commutaMusicaMenu();"+
+    "ADF_AUDIO.setMode('gameplay'); ({on:SET.audio.on,"+
+    "musicaMenu:SET.audio.musicMenuOn,beat:ADF_AUDIO.canPlay('beat'),"+
+    "menuBus:ADF_AUDIO.canPlay('menuMusic'),musica:ADF_AUDIO.canPlay('music')})",scatola) : {};
+  controlla("riattivare la musica menu non riaccende implicitamente il master generale",
+    haComando && riattivato.on === false && riattivato.musicaMenu === true &&
+      riattivato.beat === false && riattivato.menuBus === false && riattivato.musica === false,
+    JSON.stringify(riattivato));
+
+  const haReload=vm.runInContext(
+    "typeof ADF_SETTINGS === 'object' && typeof ADF_SETTINGS.reload === 'function'",scatola);
+  memoriaImpostazioni=JSON.stringify({
+    v:2,
+    audio:{on:false,musicMenuOn:true,master:35,music:25,sfx:40,beat:45,ui:30,ambient:20,click:true}
+  });
+  if(haReload) vm.runInContext("ADF_SETTINGS.reload()",scatola);
+  const riletto=haReload ? vm.runInContext(
+    "({on:SET.audio.on,menu:SET.audio.musicMenuOn,master:SET.audio.master,beat:SET.audio.beat})",scatola) : {};
+  controlla("il parent puo rileggere sincronicamente le impostazioni salvate dall'iframe",
+    haReload && riletto.on === false && riletto.menu === true &&
+      riletto.master === 35 && riletto.beat === 45,
+    JSON.stringify({haReload,riletto}));
+
+  memoriaImpostazioni=null;
+  if(haReload) vm.runInContext("ADF_SETTINGS.reload()",scatola);
+  const azzerato=haReload ? vm.runInContext(
+    "({v:SET.v,on:SET.audio.on,menu:SET.audio.musicMenuOn,master:SET.audio.master})",scatola) : {};
+  controlla("dopo Cancella tutto il parent torna alle impostazioni audio predefinite",
+    haReload && azzerato.v === 2 && azzerato.on === true &&
+      azzerato.menu === true && azzerato.master === 80,
+    JSON.stringify({haReload,azzerato}));
+
+  function tastoBeatAttivo(){
+    const classi = new Set(["stplay"]);
+    const attributi = new Map([
+      ["aria-label", "Ascolta il beat"], ["aria-pressed", "false"],
+      ["title", "Ascolta questo beat"]
+    ]);
+    let contenuto = '<svg viewBox="0 0 20 20"><path d="M7 4.6 15.4 10 7 15.4z"/></svg>';
+    return {
+      originale:contenuto,
+      classList:{
+        add:c => classi.add(c), remove:c => classi.delete(c),
+        contains:c => classi.has(c)
+      },
+      getAttribute:n => attributi.has(n) ? attributi.get(n) : null,
+      setAttribute:(n, v) => attributi.set(n, String(v)),
+      removeAttribute:n => attributi.delete(n),
+      get innerHTML(){ return contenuto; },
+      set innerHTML(v){ contenuto=String(v); },
+      get textContent(){ return contenuto.replace(/<[^>]*>/g, ""); },
+      set textContent(v){ contenuto=String(v); }
+    };
+  }
+  function verificaStopDaImpostazioni(nome, modifica){
+    vm.runInContext(
+      "SET.audio.on=true; SET.audio.master=80; SET.audio.beat=85;"+
+      "ADF_AUDIO.setMode('gameplay'); applicaImpostazioni()",scatola);
+    const tasto = tastoBeatAttivo();
+    scatola.tastoBeat = tasto;
+    vm.runInContext(
+      "beatSuona({n:'Beat impostazioni',q:60,gen:'trap',seed:91},tastoBeat)",scatola);
+    const partito = tasto.classList.contains("on") &&
+      tasto.getAttribute("aria-pressed") === "true" &&
+      tasto.getAttribute("aria-label") === "Ferma il beat" &&
+      tasto.getAttribute("title") === "Ferma il beat";
+    arrestiNodi = 0;
+    vm.runInContext(modifica + "; applicaImpostazioni()",scatola);
+    const fermo = vm.runInContext("BEAT_PLAY === null",scatola) && arrestiNodi > 0 &&
+      !tasto.classList.contains("on") && tasto.innerHTML === tasto.originale &&
+      tasto.getAttribute("aria-pressed") === "false" &&
+      tasto.getAttribute("aria-label") === "Ascolta il beat" &&
+      tasto.getAttribute("title") === "Ascolta questo beat";
+    controlla(nome, partito && fermo,
+      JSON.stringify({partito,fermo,arrestiNodi,attivo:tasto.classList.contains("on"),
+        aria:tasto.getAttribute("aria-pressed"),label:tasto.getAttribute("aria-label"),
+        title:tasto.getAttribute("title"),html:tasto.innerHTML}));
+  }
+  verificaStopDaImpostazioni(
+    "spegnere il master audio ferma il beat e ripristina tutto il tasto",
+    "SET.audio.on=false");
+  verificaStopDaImpostazioni(
+    "portare il volume master a zero ferma il beat e ripristina tutto il tasto",
+    "SET.audio.master=0");
+  verificaStopDaImpostazioni(
+    "portare il volume beat a zero ferma il beat e ripristina tutto il tasto",
+    "SET.audio.beat=0");
 }
 
 /* Il massimo dell'energia può cambiare con la progressione: il nuovo giorno
    deve riempire la riserva disponibile, non aggiungere una quota fissa. */
+/* Il contratto non vive soltanto nell'helper: deve usarlo il vero onclick
+   installato da landing.js e lo stato accessibile deve descrivere il toggle
+   della musica menu, non il master generale. */
+console.log("\nil vero tasto musica della landing resta indipendente dal master");
+{
+  const vm = require("vm");
+  const {JSDOM} = require("jsdom");
+  const dom = new JSDOM(`<!doctype html><html><body>
+    <div class="land"></div><div id="mhero"></div><div id="m-tag"></div>
+    <div id="m-play-a"></div><div id="m-voce-a"></div><div id="m-voce-b"></div>
+    <div id="m-play-b"></div><div id="m-corso"></div><div id="m-stats"></div>
+    <div id="m-last"></div><button id="nav-avatar"></button><button id="brand"></button>
+    <button id="landing-mute" aria-label="Muta la musica di sottofondo" aria-pressed="false"></button>
+    <button id="m-reset"></button><div id="land-toast"></div>
+  </body></html>`, {url:"https://example.test/pagine/landing.html", runScripts:"outside-only"});
+  const w = dom.window;
+  const ctx = dom.getInternalVMContext();
+  w.console = {log(){}, warn(){}, error(){}};
+  w.setTimeout = () => 1;
+  w.clearTimeout = () => {};
+  w.$ = id => w.document.getElementById(id);
+  w.A = {name:"", color:"#FF5A36"};
+  w.PHASES = {};
+  w.__G = () => ({week:1, year:1, fans:0, songs:[], bars:[], log:[]});
+  w.short = String;
+  w.fmt = String;
+  w.vaiA = () => {};
+  w.ADF_AUDIO = {
+    refresh(){}, unlock(){ return Promise.resolve(); },
+    music:{playing:true, ensureMenu(){ return Promise.resolve(true); }}
+  };
+  vm.runInContext(fs.readFileSync(path.join(RADICE,"js/impostazioni.js"),"utf8"),
+    ctx,{filename:"js/impostazioni.js"});
+  vm.runInContext(fs.readFileSync(path.join(RADICE,"js/landing.js"),"utf8"),
+    ctx,{filename:"js/landing.js"});
+
+  const tasto = w.document.getElementById("landing-mute");
+  const prima = vm.runInContext("({on:SET.audio.on,menu:SET.audio.musicMenuOn})",ctx);
+  tasto.click();
+  const muta = vm.runInContext("({on:SET.audio.on,menu:SET.audio.musicMenuOn})",ctx);
+  const ariaMuta = {pressed:tasto.getAttribute("aria-pressed"), label:tasto.getAttribute("aria-label")};
+  tasto.click();
+  const riaccende = vm.runInContext("({on:SET.audio.on,menu:SET.audio.musicMenuOn})",ctx);
+  const ariaRiaccende = {pressed:tasto.getAttribute("aria-pressed"), label:tasto.getAttribute("aria-label")};
+  controlla("il click reale cambia flag, icona e label senza toccare il master",
+    prima.on === true && prima.menu === true &&
+      muta.on === true && muta.menu === false && ariaMuta.pressed === "true" &&
+      /Riattiva/.test(ariaMuta.label) &&
+      riaccende.on === true && riaccende.menu === true && ariaRiaccende.pressed === "false" &&
+      /^Muta/.test(ariaRiaccende.label),
+    JSON.stringify({prima,muta,ariaMuta,riaccende,ariaRiaccende}));
+
+  vm.runInContext(
+    "SET.audio.on=false; SET.audio.musicMenuOn=true; applicaImpostazioni(); aggiornaMuteLanding()",ctx);
+  const masterSpentoPrima = tasto.getAttribute("aria-pressed");
+  tasto.click();
+  const masterSpentoDopo = vm.runInContext(
+    "({on:SET.audio.on,menu:SET.audio.musicMenuOn})",ctx);
+  controlla("col master spento il tasto rappresenta e modifica solo la propria preferenza",
+    masterSpentoPrima === "false" && masterSpentoDopo.on === false &&
+      masterSpentoDopo.menu === false && tasto.getAttribute("aria-pressed") === "true",
+    JSON.stringify({masterSpentoPrima,masterSpentoDopo,
+      pressed:tasto.getAttribute("aria-pressed")}));
+  dom.window.close();
+}
+
 console.log("\nl'energia torna piena a ogni nuovo giorno");
 {
   const vm = require("vm");

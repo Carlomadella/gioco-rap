@@ -586,7 +586,7 @@ function rigaBeatSala(b){
   return '<div class="pobeat">' +
     '<span class="pobcov" style="background:' + beatCov(b) + '"></span>' +
     '<span class="pobnm"><b>' + b.n + '</b><span>qualit\u00e0 ' + b.q + ' \u00b7 ' + info.bpm + ' bpm</span></span>' +
-    '<button class="pobplay" data-sent="' + i + '" title="Ascolta il beat">\u25b6</button>' +
+    '<button class="pobplay" data-sent="' + i + '" title="Ascolta il beat" aria-label="Ascolta il beat" aria-pressed="false">\u25b6</button>' +
     '<button class="pobbuy" data-prendi="' + i + '"' + (G.money < b.price ? ' disabled' : '') + '>' +
       b.price + ' \u20ac</button>' +
     '<button class="pobno" data-lascia="' + i + '" title="Lascialo dov\u2019e\u0300">\u2715</button>' +

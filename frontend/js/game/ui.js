@@ -371,7 +371,7 @@ function renderGioco(){
     (G.beats.length
       ? G.beats.map((b,i) => '<div class="li"><span class="cov" style="background:' + beatCov(b) + '"></span>' +
           '<span class="nm"><b>' + b.n + '</b><span>qualità ' + b.q + ' · ' + beatEtichetta(b) + '</span></span>' +
-          '<button class="play" data-mine="' + i + '" title="Ascolta">▶</button>' +
+          '<button class="play" data-mine="' + i + '" title="Ascolta" aria-label="Ascolta il beat" aria-pressed="false">▶</button>' +
           '<span class="tag">tuo</span></div>').join("")
       : '<div class="li"><span class="nm"><b>Beat comprati</b><span>nessuno: i beat si comprano qui sotto</span></span><span class="v">0</span></div>');
 
@@ -383,7 +383,7 @@ function renderGioco(){
      ascolta e rifiuta stanno sopra di lei, comprare è un tasto pieno sotto. */
   const rigaBeat = (b, i) => '<div class="shbeat' + (G.money < b.price ? " no" : "") + '">' +
     '<span class="shart" style="background:' + beatCov(b) + '">' +
-      '<button class="shplay" data-hear="' + i + '" title="Ascolta il beat">▶</button>' +
+      '<button class="shplay" data-hear="' + i + '" title="Ascolta il beat" aria-label="Ascolta il beat" aria-pressed="false">▶</button>' +
       '<button class="shdrop" data-drop="' + i + '" title="Rifiuta: sparisce dal catalogo">✕</button>' +
     '</span>' +
     '<span class="sht">' + b.n + '</span>' +
