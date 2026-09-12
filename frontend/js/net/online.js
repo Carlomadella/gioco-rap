@@ -38,10 +38,14 @@ const ONLINE = (() => {
   const scrivi = (k, v) => { try{ localStorage.setItem(chiave(k), v); }catch(e){} };
   const togli = k => { try{ localStorage.removeItem(chiave(k)); }catch(e){} };
 
+  /* Il gioco distribuito deve parlare col backend pubblico senza chiedere al
+     player di avviare Node o configurare Neon. Chi sviluppa in locale può
+     sempre sovrascrivere l'URL con ONLINE.collega("http://localhost:8787"). */
+  const DEFAULT_BASE = "https://anni-di-fame-api.onrender.com";
   let staccato = false;
   let base = null;
   try{ base = localStorage.getItem(K_URL); }catch(e){}
-  if(!base) base = "http://localhost:8787";
+  if(!base) base = DEFAULT_BASE;
 
   async function chiama(rotta, opzioni){
     const o = opzioni || {};
@@ -164,6 +168,7 @@ const ONLINE = (() => {
   /* Legare l'account a una mail: è quello che fa sopravvivere la carriera a un
      telefono nuovo, finché non ci sono Steam, Apple e Google. */
   const registraConMail = (email, segreto) => chiama("/api/account", {
+    attesa: 60000,
     /* Se stiamo già giocando come ospite, il backend promuove QUELLO stesso
        account a email: non va nascosta la sessione corrente. */
     metodo: "POST",
@@ -171,6 +176,7 @@ const ONLINE = (() => {
   }).then(r => { if(r && r.token) scrivi(K_SESSIONE, r.token); return r; });
 
   const entra = (email, segreto) => chiama("/api/sessione", {
+    attesa: 60000,
     metodo: "POST", senzaSessione: true,
     corpo: { tipo: "email", email, segreto, dispositivo: { piattaforma: piattaforma(), versione: window.VERSIONE_GIOCO } }
   }).then(r => { if(r && r.token) scrivi(K_SESSIONE, r.token); return r; });
@@ -419,7 +425,7 @@ const ONLINE = (() => {
 
   /* ==================== IMPOSTAZIONI ==================== */
   function collega(url){
-    base = String(url || "").replace(/\/+$/, "") || "http://localhost:8787";
+    base = String(url || "").replace(/\/+$/, "") || DEFAULT_BASE;
     try{ localStorage.setItem(K_URL, base); }catch(e){}
     CACHE = null;   /* un altro server è un'altra classifica */
     return base;

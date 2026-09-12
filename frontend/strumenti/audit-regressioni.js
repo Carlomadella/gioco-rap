@@ -41,6 +41,7 @@ const travel = leggi("js/game/spostamenti.js");
 const crimeui = leggi("js/game/strada-crimine-ui.js");
 const abilita = leggi("js/game/abilita.js");
 const servizio = leggi("js/servizio.js");
+const online = leggi("js/net/online.js");
 const servizioCss = leggi("css/servizio.css");
 const abilitaCss = leggi("css/abilita.css");
 const cssCrimeV2 = leggi("css/strada-crimine-v2.css").replace(/\s+/g, " ");
@@ -106,6 +107,19 @@ test("workflow di verifica è read-only sul repository",
   ciWorkflow.includes("permissions:") &&
   ciWorkflow.includes("contents: read") &&
   !ciWorkflow.includes("contents: write"));
+
+console.log("\nOnline — backend condiviso");
+test("client usa Render come backend pubblico di default",
+  online.includes('const DEFAULT_BASE = "https://anni-di-fame-api.onrender.com"') &&
+  online.includes("if(!base) base = DEFAULT_BASE") &&
+  !online.includes('if(!base) base = "http://localhost:8787"'));
+test("override backend resta disponibile per sviluppo locale",
+  online.includes("localStorage.setItem(K_URL, base)") &&
+  online.includes("|| DEFAULT_BASE;"));
+test("account e login tollerano il cold start del backend pubblico",
+  (online.match(/attesa: 60000/g) || []).length >= 2);
+test("le tre pagine caricano la nuova versione del ponte online",
+  [landing, accesso, index].every(p => p.includes('js/net/online.js?v=15')));
 
 console.log("\nBlocco 1 — Eventi V2 / telefono / dist");
 test("catalogo contiene esattamente 1000 eventi", Array.isArray(cat) && cat.length === 1000);
