@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:1595560 -->
+## 12/09/26, 17:24 â€” origin/fix/backend-online-player-default-20260912-172324 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `1595560`
+
+### Cosa Ã¨ entrato
+
+- `cff0c0f` â€” fix(online): usa backend pubblico per i player â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:8dffa9f -->
 ## 12/09/26, 12:54 â€” fix/account-artista-cloud-20260912-145418 â†’ main
 
