@@ -193,6 +193,16 @@ test("controller landing apre FAMEpedia dal menu",
   landingJs.includes('b.dataset.go === "famepedia"') &&
   landingJs.includes("FAMEPEDIA.apri()"));
 
+console.log("\nLanding — menu di avvio");
+test("menu secondario non mostra piu la riga Continua",
+  avvio.includes('function htmlMenu()') &&
+  !avvio.includes('riga("continua", "Continua"'));
+test("Continua resta sul pulsante principale della landing",
+  avvio.includes("function continuaUltima()") &&
+  avvio.includes('if(play) play.onclick = () => ultimoSlot() ? continuaUltima() : apri();'));
+test("landing carica la nuova versione del menu di avvio",
+  landing.includes('js/avvio.js?v=6'));
+
 console.log("\nBlocco 1 — Eventi V2 / telefono / dist");
 test("catalogo contiene esattamente 1000 eventi", Array.isArray(cat) && cat.length === 1000);
 test("build demo incorpora il catalogo", build.includes("window.__ADF_EVENT_CATALOG__"));
