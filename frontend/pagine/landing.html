@@ -33,7 +33,7 @@
 <link rel="stylesheet" href="css/stretto.css?v=1">
 <!-- per ultimo: le aree da toccare devono vincere sulla cascata di tutti gli altri -->
 <link rel="stylesheet" href="css/tocco.css?v=13">
-<link rel="stylesheet" href="css/famepedia.css?v=1">
+<link rel="stylesheet" href="css/famepedia.css?v=2">
 
 </head>
 <body>
@@ -234,14 +234,34 @@
       <button class="fp-close" id="fp-close" type="button" data-fp-close>Chiudi</button>
     </header>
     <div class="fp-body">
-      <aside class="fp-rail"><div class="fp-rail-label">Categorie</div><div id="fp-categorie"></div><div class="fp-rail-note">Le voci descrivono i sistemi attuali del gioco. Quando una meccanica cambia, cambia anche FAMEpedia.</div></aside>
+      <aside class="fp-rail">
+        <div class="fp-rail-scroll">
+          <div class="fp-rail-label">Categorie</div>
+          <div id="fp-categorie"></div>
+          <div class="fp-rail-sep"></div>
+          <div class="fp-rail-title"><span>Voci</span><i id="fp-count"></i></div>
+          <div class="fp-nav-list" id="fp-nav-list"></div>
+          <div class="fp-rail-note">Le voci descrivono i sistemi attuali del gioco. Quando una meccanica cambia, cambia anche FAMEpedia.</div>
+        </div>
+      </aside>
       <main class="fp-main">
         <section class="fp-home" id="fp-home">
-          <div class="fp-home-head"><div class="fp-kicker">Manuale · Enciclopedia · Glossario</div><h1>Tutta la <em>fame</em><br>in un posto.</h1><p class="fp-home-intro">Non è un tutorial che ti prende per mano. È il posto dove torni quando vuoi capire una regola, preparare una scelta o ricordarti come funziona un sistema.</p></div>
-          <div class="fp-results-line"><b>Voci</b><span id="fp-count"></span></div><div class="fp-grid" id="fp-list"></div>
+          <div class="fp-home-head">
+            <div class="fp-kicker">Manuale · Enciclopedia · Glossario</div>
+            <h1>Tutta la <em>fame</em><br>in un posto.</h1>
+            <p class="fp-home-intro">L'indice resta sempre aperto sulla sinistra. Scegli una voce e il contenuto cambia qui, senza perdere il punto in cui sei nella FAMEpedia.</p>
+          </div>
+          <div class="fp-home-hint">
+            <span class="fp-home-hint-num">01</span>
+            <div><b>Scegli una categoria</b><p>Filtra l'indice, oppure cerca direttamente una parola dalla barra in alto.</p></div>
+          </div>
+          <div class="fp-home-hint">
+            <span class="fp-home-hint-num">02</span>
+            <div><b>Apri una voce</b><p>L'articolo si apre qui a destra e l'indice rimane sempre visibile.</p></div>
+          </div>
         </section>
         <article class="fp-article-view" id="fp-article-view" hidden>
-          <button class="fp-back" type="button" data-fp-back>← Tutte le voci</button><div class="fp-article-meta"><span id="fp-article-cat"></span><span class="sep"></span><span>FAMEpedia</span></div>
+          <button class="fp-back" type="button" data-fp-back>← Panoramica FAMEpedia</button><div class="fp-article-meta"><span id="fp-article-cat"></span><span class="sep"></span><span>FAMEpedia</span></div>
           <h1 class="fp-article-title" id="fp-article-title"></h1><p class="fp-article-lead" id="fp-article-lead"></p><div class="fp-copy" id="fp-copy"></div><div class="fp-related" id="fp-related"></div>
         </article>
       </main>
@@ -274,7 +294,7 @@
 <script src="js/game/state.js?v=12"></script>
 <script src="js/game/phases.js?v=12"></script>
 
-<script src="js/famepedia.js?v=1"></script>
+<script src="js/famepedia.js?v=2"></script>
 <script src="js/landing.js?v=7"></script>
 <script src="js/avvio.js?v=5"></script>
 <script src="js/impostazioni-ui.js?v=15"></script>

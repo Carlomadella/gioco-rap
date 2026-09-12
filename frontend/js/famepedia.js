@@ -30,7 +30,7 @@
   ];
 
   const byId = new Map(FAME_ARTICOLI.map(a => [a.id,a]));
-  let cat = "tutto", query = "", ultimoFocus = null;
+  let cat = "tutto", query = "", ultimoFocus = null, articoloAttivo = null;
   const $fp = id => document.getElementById(id);
   const norm = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 
@@ -51,18 +51,30 @@
     }).join("");
   }
   function disegnaLista(){
-    const dati=articoliFiltrati(), host=$fp("fp-list"), conta=$fp("fp-count");
-    if(conta) conta.textContent=dati.length+(dati.length===1?" voce":" voci");
+    const dati=articoliFiltrati(), host=$fp("fp-nav-list"), conta=$fp("fp-count");
+    if(conta) conta.textContent=String(dati.length);
     if(!host) return;
-    if(!dati.length){host.innerHTML='<div class="fp-empty"><b>Nessun risultato.</b><br>Prova una parola più semplice o cambia categoria.</div>';return;}
-    host.innerHTML=dati.map(a=>'<button class="fp-card" data-fp-open="'+a.id+'"><span class="fp-card-cat">'+nomeCategoria(a.cat)+'</span><h3>'+a.titolo+'</h3><p>'+a.breve+'</p></button>').join("");
+    if(!dati.length){
+      host.innerHTML='<div class="fp-nav-empty">Nessuna voce trovata.</div>';
+      return;
+    }
+    host.innerHTML=dati.map(a =>
+      '<button class="fp-nav-item'+(articoloAttivo===a.id?' on':'')+'" data-fp-open="'+a.id+'">' +
+        '<span class="fp-nav-item-cat">'+nomeCategoria(a.cat)+'</span>' +
+        '<span class="fp-nav-item-title">'+a.titolo+'</span>' +
+      '</button>'
+    ).join("");
   }
   function home(){
-    const h=$fp("fp-home"),v=$fp("fp-article-view"); if(h)h.hidden=false;if(v)v.hidden=true;
+    articoloAttivo=null;
+    const h=$fp("fp-home"),v=$fp("fp-article-view");if(h)h.hidden=false;if(v)v.hidden=true;
     disegnaCategorie();disegnaLista();const main=document.querySelector(".fp-main");if(main)main.scrollTop=0;
   }
   function articolo(id){
     const a=byId.get(id);if(!a)return home();
+    articoloAttivo=id;
+    disegnaCategorie();
+    disegnaLista();
     const h=$fp("fp-home"),v=$fp("fp-article-view");if(h)h.hidden=true;if(v)v.hidden=false;
     $fp("fp-article-cat").textContent=nomeCategoria(a.cat);$fp("fp-article-title").textContent=a.titolo;$fp("fp-article-lead").textContent=a.lead;
     $fp("fp-copy").innerHTML=a.sez.map(s=>"<h2>"+s[0]+"</h2><p>"+s[1]+"</p>").join("")+(a.nota?'<div class="fp-callout">'+a.nota+'</div>':"");
@@ -87,7 +99,7 @@
     if(e.target.closest("[data-fp-close]")){chiudi();return;}
   });
   const search=$fp("fp-search");
-  if(search)search.addEventListener("input",()=>{query=search.value;const h=$fp("fp-home");if(h&&h.hidden)home();else disegnaLista();});
+  if(search)search.addEventListener("input",()=>{query=search.value;disegnaLista();});
   window.addEventListener("keydown",e=>{
     const root=$fp("famepedia"),aperta=root&&!root.hidden;
     if(aperta&&e.key==="Escape"){e.preventDefault();chiudi();return;}
