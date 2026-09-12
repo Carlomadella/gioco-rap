@@ -14,11 +14,21 @@ function entraAudioGameplay(){
     ADF_AUDIO.music.stopForGameplay(1.4);
 }
 
+/* La città è anche il punto in cui l'artista diventa un giocatore online.
+   Non si aspetta la rete: se Render non risponde, il gameplay parte uguale. */
+function assicuraArtistaOnline(){
+  try{
+    if(typeof ONLINE === "undefined" || !ONLINE ||
+       typeof ONLINE.assicuraArtistaLocale !== "function") return;
+    Promise.resolve(ONLINE.assicuraArtistaLocale()).catch(() => {});
+  }catch(e){}
+}
+
 window.GAME = {
   enter(){
     entraAudioGameplay();
     if(typeof goto === "function") goto("hub");
-    const art = window.ARTIST || {};
+    assicuraArtistaOnline();
     syncEnergy();
     openWeek();
     if(!G.log.length) pushLog("<b>Si comincia.</b> Zero fan, zero contatti, una settimana davanti.", "big");

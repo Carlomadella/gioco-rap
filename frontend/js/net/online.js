@@ -99,7 +99,9 @@ const ONLINE = (() => {
 
   async function registra(nome, citta, genere){
     const r = await chiama("/api/artista", {
-      metodo: "POST", senzaSessione: true,
+      /* Se c'è già una sessione (email oppure ospite), il server deve usarla:
+         senzaSessione qui separava l'artista dall'account appena aperto. */
+      metodo: "POST",
       corpo: { nome, citta, genere: GENERE_SERVER[genere] || genere,
         difficolta: (typeof G !== "undefined" && G && G.difficolta) || "anni-di-fame",
         dispositivo: { piattaforma: piattaforma(), nome: "questo dispositivo", versione: window.VERSIONE_GIOCO } }
@@ -118,6 +120,35 @@ const ONLINE = (() => {
     return r && !r.errore ? identita() : r;
   }
 
+  /* Il creator salva già nome/città/genere nello stato locale A. L'online non
+     deve chiedere una seconda volta gli stessi dati: quando serve la classifica
+     o il cloud, prende l'artista locale e lo assicura sul server. */
+  function artistaLocale(){
+    try{
+      const a = (typeof A === "object" && A) ? A : (window.ARTIST || null);
+      if(!a || !String(a.name || "").trim()) return null;
+      return {
+        nome: String(a.name).trim(),
+        citta: String(a.city || "").trim(),
+        genere: String(a.genre || "").trim() || "trap"
+      };
+    }catch(e){ return null; }
+  }
+
+  let assicuraArtistaInCorso = null;
+  async function assicuraArtistaLocale(){
+    const mia = identita();
+    if(mia) return mia;
+    if(assicuraArtistaInCorso) return assicuraArtistaInCorso;
+
+    const a = artistaLocale();
+    if(!a) return null;
+
+    assicuraArtistaInCorso = Promise.resolve(assicura(a.nome, a.citta, a.genere))
+      .finally(() => { assicuraArtistaInCorso = null; });
+    return assicuraArtistaInCorso;
+  }
+
   /* Chi ha ancora solo la vecchia chiave se la scambia con una sessione: serve
      a chi giocava prima che gli account esistessero. */
   async function scambiaVecchiaChiave(){
@@ -133,7 +164,9 @@ const ONLINE = (() => {
   /* Legare l'account a una mail: è quello che fa sopravvivere la carriera a un
      telefono nuovo, finché non ci sono Steam, Apple e Google. */
   const registraConMail = (email, segreto) => chiama("/api/account", {
-    metodo: "POST", senzaSessione: true,
+    /* Se stiamo già giocando come ospite, il backend promuove QUELLO stesso
+       account a email: non va nascosta la sessione corrente. */
+    metodo: "POST",
     corpo: { tipo: "email", email, segreto, dispositivo: { piattaforma: piattaforma(), versione: window.VERSIONE_GIOCO } }
   }).then(r => { if(r && r.token) scrivi(K_SESSIONE, r.token); return r; });
 
@@ -208,8 +241,12 @@ const ONLINE = (() => {
 
   /* Da chiamare a settimana chiusa. Senza argomenti si prende tutto da G. */
   async function invia(dati){
-    const mia = identita();
-    if(!mia) return null;
+    let mia = identita();
+    if(!mia){
+      const assicurata = await assicuraArtistaLocale();
+      if(!assicurata || assicurata.errore) return assicurata || null;
+      mia = identita();
+    }
     const p = dati || punteggioDaPartita();
     if(!p) return null;
     return chiama("/api/punteggio", {
@@ -223,7 +260,12 @@ const ONLINE = (() => {
      come quelli in locale, e in conflitto vince la partita più avanti. */
   async function salvaCarriera(slot, forza){
     if(typeof G === "undefined" || !G) return null;
-    const mia = identita();
+    let mia = identita();
+    if(!mia){
+      const assicurata = await assicuraArtistaLocale();
+      if(assicurata && assicurata.errore) return assicurata;
+      mia = identita();
+    }
     return chiama("/api/carriera/" + (slot || slotAttuale()), {
       metodo: "PUT",
       corpo: {
@@ -347,7 +389,7 @@ const ONLINE = (() => {
   return {
     get url(){ return base; },
     get staccato(){ return staccato; },
-    collega, scollega, identita, registra, assicura, scambiaVecchiaChiave,
+    collega, scollega, identita, registra, assicura, assicuraArtistaLocale, scambiaVecchiaChiave,
     registraConMail, entra, esci, io, cancellaAccount, piattaforma,
     punteggioDaPartita, invia,
     salvaCarriera, carriera, carriere,
