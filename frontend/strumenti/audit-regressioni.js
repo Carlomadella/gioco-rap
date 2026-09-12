@@ -60,6 +60,8 @@ const index = leggi("pagine/gioco.html");
 const landing = leggi("pagine/landing.html");
 const accesso = leggi("pagine/accesso.html");
 const accessoJs = leggi("js/accesso.js");
+const landingJs = leggi("js/landing.js");
+const shellCss = leggi("css/shell.css");
 const porta = leggi("index.html");
 const avvio = leggi("js/avvio.js");
 const ingresso = leggi("js/gioco-ingresso.js");
@@ -128,6 +130,19 @@ test("le tre pagine caricano la nuova versione del ponte online",
   [landing, accesso, index].every(p => p.includes('js/net/online.js?v=16')));
 test("pagina Account carica la logica accesso aggiornata",
   accesso.includes('js/accesso.js?v=2'));
+test("landing mostra rosso/verde in base a una sessione confermata dal server",
+  landingJs.includes("function aggiornaStatoAccountLanding()") &&
+  landingJs.includes('typeof ONLINE.sessione !== "function"') &&
+  landingJs.includes("const dati = await ONLINE.io()") &&
+  landingJs.includes('b.classList.toggle("connesso", !!connesso)') &&
+  shellCss.includes(".navacc::before") &&
+  shellCss.includes(".navacc.connesso::before"));
+test("landing aggiorna il badge quando cambia la sessione",
+  landingJs.includes('e.key.indexOf("adf-online-sessione") === 0') &&
+  landingJs.includes("window.ADF_ACCOUNT_STATUS"));
+test("landing carica asset aggiornati del badge account",
+  landing.includes('css/shell.css?v=14') &&
+  landing.includes('js/landing.js?v=6'));
 
 console.log("\nBlocco 1 — Eventi V2 / telefono / dist");
 test("catalogo contiene esattamente 1000 eventi", Array.isArray(cat) && cat.length === 1000);

@@ -24,6 +24,40 @@ function vaiAlGioco(q){ vaiA("gioco", q); }
 function vaiAllAccesso(){ vaiA("accesso"); }
 window.vaiAlGioco = vaiAlGioco;
 
+/* Il pallino Account rappresenta una sessione realmente valida:
+   - rosso senza token;
+   - verde solo dopo conferma di /api/io.
+   La pagina Account e la landing usano così la stessa verità del server. */
+function impostaStatoAccountLanding(connesso){
+  const b = $("nav-accesso");
+  if(!b) return false;
+  b.classList.toggle("connesso", !!connesso);
+  b.setAttribute("aria-label", connesso ? "Account — connesso" : "Account — non connesso");
+  b.title = connesso ? "Account connesso" : "Account non connesso";
+  return !!connesso;
+}
+
+async function aggiornaStatoAccountLanding(){
+  try{
+    if(!window.ONLINE || typeof ONLINE.sessione !== "function" || !ONLINE.sessione())
+      return impostaStatoAccountLanding(false);
+
+    const dati = await ONLINE.io();
+    return impostaStatoAccountLanding(!!(dati && !dati.errore));
+  }catch(e){
+    return impostaStatoAccountLanding(false);
+  }
+}
+window.ADF_ACCOUNT_STATUS = { refresh: aggiornaStatoAccountLanding };
+
+/* Login/logout avvengono nell'iframe Account: localStorage è condiviso ma
+   l'evento storage arriva agli altri contesti, quindi la landing rimasta viva
+   sotto il frame aggiorna il pallino appena cambia la sessione. */
+window.addEventListener("storage", e => {
+  if(!e.key || e.key.indexOf("adf-online-sessione") === 0)
+    aggiornaStatoAccountLanding();
+});
+
 /* ==================== LA CARRIERA, LETTA DA FUORI ==================== */
 /* Lo stato della partita: qui c'è sempre, perché game/state.js viene prima di
    questo file. Resta la prudenza di sempre — se un domani non ci fosse, la
@@ -259,4 +293,5 @@ if(landApp) landApp.addEventListener("pointermove", e => {
 document.body.classList.add("su-menu");
 landScena(0);
 renderMenu();
-document.addEventListener("DOMContentLoaded", renderMenu);
+aggiornaStatoAccountLanding();
+document.addEventListener("DOMContentLoaded", () => { renderMenu(); aggiornaStatoAccountLanding(); });
