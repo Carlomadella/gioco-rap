@@ -376,6 +376,12 @@ let nativeEngineReadyReject=null;
 let nativeRequestCounter=0;
 const nativePendingRequests=new Map();
 let nativeRebuildQueued=false;
+/* ADF_MAKEHUMAN_PRESET_PROPIC_SYNC_V1
+   Il modifier engine risponde prima che il rebuild Three.js schedulato sia
+   necessariamente concluso. Teniamo quindi traccia del rebuild effettivo:
+   la propic dei preset deve essere catturata solo dopo che la scena mostra
+   davvero il personaggio aggiornato. */
+let nativeRebuildPromise=Promise.resolve(true);
 let customTargetValues={};
 const modifierControls=new Map();
 const symmetricModifierControls=[];
@@ -2076,12 +2082,39 @@ function syncModifierControls() {
 }
 
 function scheduleNativeRebuild() {
-  if(nativeRebuildQueued) return;
+  if(nativeRebuildQueued) return nativeRebuildPromise;
+
   nativeRebuildQueued=true;
-  requestAnimationFrame(async()=>{
-    nativeRebuildQueued=false;
-    await rebuildAll(true);
+  nativeRebuildPromise=new Promise((resolve,reject)=>{
+    requestAnimationFrame(async()=>{
+      nativeRebuildQueued=false;
+      try{
+        await rebuildAll(true);
+        resolve(true);
+      }catch(err){
+        reject(err);
+      }
+    });
   });
+
+  return nativeRebuildPromise;
+}
+
+async function waitForNativeRebuildSettled() {
+  /* Se durante un rebuild arriva un secondo aggiornamento del modifier
+     engine, scheduleNativeRebuild() può creare una nuova promise. Aspettiamo
+     finché quella osservata resta davvero l'ultima. */
+  while(true){
+    const pending=nativeRebuildPromise;
+    await pending;
+
+    if(
+      pending===nativeRebuildPromise &&
+      !nativeRebuildQueued
+    ){
+      return true;
+    }
+  }
 }
 
 function handleNativeEngineMessage(e) {
@@ -4861,11 +4894,9 @@ function bindEditorShell() {
             throw new Error('Applicazione preset MakeHuman fallita.');
           }
 
-          /* La propic deve fotografare il personaggio già ricostruito,
-             non il frame precedente al rebuild del preset. */
-          return rebuildAll(false);
-        })
-        .then(()=>{
+          /* adfMhApplyPreset() ora termina soltanto dopo il rebuild Three.js
+             effettivamente completato: makePreviewImage() fotografa quindi
+             lo stesso preset che si vede nel camerino. */
           emitToRoom('adf-makehuman-quick-preset-result',{
             presetId:preset.id,
             state:{
@@ -5628,6 +5659,11 @@ async function adfMhApplyPreset(presetId){
       È l'unica operazione morfologica del preset.
     */
     await requestNativeModifiers(state.modifiers);
+
+    /* requestNativeModifiers() risolve quando arrivano i nuovi vertici, ma
+       il renderer li applica tramite un rebuild schedulato al frame seguente.
+       Aspettiamo quel rebuild prima di considerare il preset applicato. */
+    await waitForNativeRebuildSettled();
 
     if(typeof syncGenderQuick==='function') syncGenderQuick();
     if(typeof syncModifierControls==='function') syncModifierControls();
