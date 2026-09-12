@@ -258,6 +258,32 @@ const ONLINE = (() => {
   /* ==================== LA CARRIERA IN CLOUD ==================== */
   /* Lo stato del gioco è l'oggetto G: si manda com'è. Il server tiene tre slot
      come quelli in locale, e in conflitto vince la partita più avanti. */
+  /* ADF_CLOUD_RESTORE_UI_V1
+     Il cloud deve poter ricostruire non solo G ma anche l'artista. Il backend
+     conserva già lo stato come JSON, quindi il profilo viaggia in una busta
+     interna che viene tolta quando si ripristina in locale. Non si cambia lo
+     schema del database e i vecchi salvataggi restano leggibili. */
+  function artistaPerCloud(){
+    try{
+      const a = (typeof A === "object" && A) ? A : (window.ARTIST || null);
+      if(!a || typeof a !== "object" || !String(a.name || "").trim()) return null;
+      const copia = JSON.parse(JSON.stringify(a));
+      const av = copia.avatarData;
+      if(av && typeof av === "object" && copia.avatarPreviewImage){
+        if(av.previewImage === copia.avatarPreviewImage) delete av.previewImage;
+        if(av.avatarPreviewImage === copia.avatarPreviewImage) delete av.avatarPreviewImage;
+      }
+      return copia;
+    }catch(e){ return null; }
+  }
+  function statoPerCloud(){
+    let stato = null;
+    try{ stato = JSON.parse(JSON.stringify(G)); }catch(e){ return G; }
+    const artista = artistaPerCloud();
+    if(artista) stato.__adfCloud = { v:1, artista };
+    return stato;
+  }
+
   async function salvaCarriera(slot, forza){
     if(typeof G === "undefined" || !G) return null;
     let mia = identita();
@@ -269,7 +295,7 @@ const ONLINE = (() => {
     return chiama("/api/carriera/" + (slot || slotAttuale()), {
       metodo: "PUT",
       corpo: {
-        stato: G, settimana: G.week || 1, anno: G.year || 1,
+        stato: statoPerCloud(), settimana: G.week || 1, anno: G.year || 1,
         artistaId: mia ? mia.id : null,
         versioneGioco: (window.VERSIONE_GIOCO || ""), forza: !!forza
       }
@@ -278,6 +304,20 @@ const ONLINE = (() => {
   const carriera = slot => chiama("/api/carriera/" + (slot || slotAttuale()));
   const carriere = () => chiama("/api/carriere");
   const slotAttuale = () => (typeof SET === "object" && SET && SET.slot) ? SET.slot : 1;
+
+  /* Un restore autenticato può adottare l'artista già legato a quella carriera.
+     La sessione account resta dov'è; cambia solo l'identità artista dello slot. */
+  function adottaArtista(id){
+    const pulito = String(id || "").trim();
+    if(!pulito){
+      togli(K_ID);
+      togli(K_CHIAVE);
+      return false;
+    }
+    scrivi(K_ID, pulito);
+    togli(K_CHIAVE);
+    return true;
+  }
 
   /* ==================== TRAGUARDI ==================== */
   const traguardi = () => chiama("/api/traguardi");
@@ -389,7 +429,7 @@ const ONLINE = (() => {
   return {
     get url(){ return base; },
     get staccato(){ return staccato; },
-    collega, scollega, identita, registra, assicura, assicuraArtistaLocale, scambiaVecchiaChiave,
+    collega, scollega, identita, adottaArtista, registra, assicura, assicuraArtistaLocale, scambiaVecchiaChiave,
     registraConMail, entra, esci, io, cancellaAccount, piattaforma,
     punteggioDaPartita, invia,
     salvaCarriera, carriera, carriere,
