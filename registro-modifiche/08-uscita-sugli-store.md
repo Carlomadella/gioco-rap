@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:0ac2c93 -->
+## 12/09/26, 14:35 â€” feat/cloud-restore-ui-20260912-163446 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `0ac2c93`
+
+### Cosa Ã¨ entrato
+
+- `80d4812` â€” feat(cloud): aggiunge salvataggio e ripristino dalla UI â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/impostazioni-ui.js`
+- **Modificato:** `frontend/js/net/online.js`
+- **Modificato:** `frontend/pagine/accesso.html`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:3170d23 -->
 ## 04/09/26, 10:08 â€” main â†’ main
 
