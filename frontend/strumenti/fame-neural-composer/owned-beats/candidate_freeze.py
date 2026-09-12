@@ -9,6 +9,14 @@ from pathlib import Path
 import sys
 
 
+IDENTITY_FIELDS = (
+    "compositionFamilyId",
+    "sourceRecordId",
+    "sourceAssetId",
+    "sha256",
+)
+
+
 def digest_file(file):
     return hashlib.sha256(Path(file).read_bytes()).hexdigest()
 
@@ -123,29 +131,182 @@ def verify_freeze(file, tool_dir, config):
     return {**freeze, "freezeDigestSha256": digest_file(file)}
 
 
-def reserve_holdout(workspace, freeze, records):
-    """One attempt per family set, even if candidateId changes; never auto-release."""
-    identities = sorted({r["compositionFamilyId"] for r in records})
-    if not identities or any(not f for f in identities):
-        raise RuntimeError("Missing holdout families")
-    key = config_digest(identities)
+def stable_json(value):
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
+def holdout_identity(record):
+    family_id = record.get("compositionFamilyId")
+    record_id = record.get("sourceRecordId")
+    asset_id = record.get("sourceAssetId")
+    source_sha = record.get("sha256")
+    if (
+        not isinstance(family_id, str) or not family_id.strip()
+        or not isinstance(record_id, str) or not record_id.strip()
+        or not isinstance(asset_id, str) or not asset_id.strip()
+        or not isinstance(source_sha, str)
+        or not re.fullmatch(r"[0-9a-f]{64}", source_sha)
+        or asset_id != f"sha256:{source_sha}"
+    ):
+        raise RuntimeError("Incomplete or inconsistent holdout identity metadata")
+    return {
+        "compositionFamilyId": family_id,
+        "sourceRecordId": record_id,
+        "sourceAssetId": asset_id,
+        "sha256": source_sha,
+    }
+
+
+def sorted_holdout_identities(records):
+    identities = [holdout_identity(record) for record in records]
+    return sorted(
+        identities,
+        key=lambda item: (
+            item["compositionFamilyId"],
+            item["sourceRecordId"],
+            item["sourceAssetId"],
+            item["sha256"],
+        ),
+    )
+
+
+def cohort_digest(records):
+    return hashlib.sha256(
+        stable_json(sorted_holdout_identities(records)).encode("utf-8")
+    ).hexdigest()
+
+
+def identity_sets(records):
+    identities = sorted_holdout_identities(records)
+    return {
+        "families": {item["compositionFamilyId"] for item in identities},
+        "sourceRecordIds": {item["sourceRecordId"] for item in identities},
+        "sourceAssetIds": {item["sourceAssetId"] for item in identities},
+        "sha256s": {item["sha256"] for item in identities},
+    }
+
+
+def prior_identity_sets(payload):
+    prior_records = payload.get("records")
+    if isinstance(prior_records, list):
+        return identity_sets(prior_records)
+    return {
+        "families": set(payload.get("families") or []),
+        "sourceRecordIds": set(payload.get("sourceRecordIds") or []),
+        "sourceAssetIds": set(payload.get("sourceAssetIds") or []),
+        "sha256s": set(payload.get("sha256s") or []),
+    }
+
+
+def reserve_holdout(
+    workspace,
+    freeze,
+    records,
+    cohort_reference=None,
+    *,
+    config_hash=None,
+    protocol_digest_sha256=None,
+    cohort_reference_digest_sha256=None,
+):
+    """Reserve the exact frozen cohort once, using full identities.
+
+    The legacy family-only reservation path is intentionally rejected.
+    """
+    if not isinstance(cohort_reference, dict):
+        raise RuntimeError("R1 hardened reservation requires frozen cohort reference")
+
+    identities = sorted_holdout_identities(records)
+    if not identities:
+        raise RuntimeError("Missing holdout identities")
+
+    for field in IDENTITY_FIELDS:
+        values = [item[field] for item in identities]
+        if len(values) != len(set(values)):
+            raise RuntimeError(f"Duplicate holdout identity: {field}")
+
+    reference_records = cohort_reference.get("records")
+    if not isinstance(reference_records, list):
+        raise RuntimeError("Frozen cohort reference missing records")
+    reference_identities = sorted_holdout_identities(reference_records)
+    if identities != reference_identities:
+        raise RuntimeError("Reservation records differ from frozen cohort reference")
+
+    actual_cohort_digest = cohort_digest(records)
+    if cohort_reference.get("cohortDigestSha256") != actual_cohort_digest:
+        raise RuntimeError("Reservation cohort digest mismatch")
+
+    if not isinstance(config_hash, str) or not re.fullmatch(r"[0-9a-f]{64}", config_hash):
+        raise RuntimeError("Reservation requires valid configHash")
+    if freeze.get("configHash") != config_hash:
+        raise RuntimeError("Reservation configHash differs from candidate freeze")
+
+    if (
+        not isinstance(protocol_digest_sha256, str)
+        or not re.fullmatch(r"[0-9a-f]{64}", protocol_digest_sha256)
+    ):
+        raise RuntimeError("Reservation requires valid protocol digest")
+    if freeze.get("protocolDigestSha256") != protocol_digest_sha256:
+        raise RuntimeError("Reservation protocol digest differs from candidate freeze")
+
+    if (
+        not isinstance(cohort_reference_digest_sha256, str)
+        or not re.fullmatch(r"[0-9a-f]{64}", cohort_reference_digest_sha256)
+    ):
+        raise RuntimeError("Reservation requires valid cohort reference digest")
+
+    cohort_id = cohort_reference.get("cohortId")
+    if not isinstance(cohort_id, str) or not cohort_id.strip():
+        raise RuntimeError("Reservation requires cohortId")
+
+    current = identity_sets(records)
+    key = config_digest({
+        "cohortId": cohort_id,
+        "cohortDigestSha256": actual_cohort_digest,
+    })
     root = Path(workspace) / "runs" / "evaluation-holdout-usage"
     root.mkdir(parents=True, exist_ok=True)
     lock = root / "reservation.lock"
-    # A single writer checks ALL prior sets: subsets or expanded sets must not
-    # silently reuse observed families under another candidate identity.
+
+    # A single writer checks every prior reservation. Any family/record/asset/SHA
+    # overlap blocks reuse, even if a later manifest renames the family.
     handle = lock.open("x", encoding="utf-8")
     try:
         for previous in root.glob("*.json"):
-            used = json.loads(previous.read_text(encoding="utf-8"))
-            if set(identities).intersection(used["families"]):
-                raise RuntimeError("Holdout families already reserved/observed")
+            used = json.loads(previous.read_text(encoding="utf-8-sig"))
+            if used.get("cohortDigestSha256") == actual_cohort_digest:
+                raise RuntimeError("Holdout cohort already reserved/observed")
+            previous_sets = prior_identity_sets(used)
+            for field in current:
+                if current[field].intersection(previous_sets[field]):
+                    raise RuntimeError(
+                        f"Holdout identities already reserved/observed: overlap in {field}"
+                    )
+
         reservation = root / (key + ".json")
+        payload = {
+            "status": "RESERVED_BEFORE_AUDIO_ACCESS",
+            "cohortId": cohort_id,
+            "cohortDigestSha256": actual_cohort_digest,
+            "cohortReferenceDigestSha256": cohort_reference_digest_sha256,
+            "records": identities,
+            "families": sorted(current["families"]),
+            "sourceRecordIds": sorted(current["sourceRecordIds"]),
+            "sourceAssetIds": sorted(current["sourceAssetIds"]),
+            "sha256s": sorted(current["sha256s"]),
+            "freezeDigestSha256": freeze["freezeDigestSha256"],
+            "candidateId": freeze["candidateId"],
+            "configHash": config_hash,
+            "protocolDigestSha256": protocol_digest_sha256,
+            "reservedAt": datetime.now(timezone.utc).isoformat(),
+        }
         with reservation.open("x", encoding="utf-8") as out:
-            json.dump({"status": "RESERVED_BEFORE_AUDIO_ACCESS", "families": identities,
-                       "freezeDigestSha256": freeze["freezeDigestSha256"],
-                       "candidateId": freeze["candidateId"],
-                       "reservedAt": datetime.now(timezone.utc).isoformat()}, out, indent=2)
+            json.dump(payload, out, indent=2)
+            out.write("\n")
     finally:
         handle.close()
         lock.unlink()
