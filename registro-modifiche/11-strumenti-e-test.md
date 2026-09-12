@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:8a27fba -->
+## 12/09/26, 17:43 â€” origin/fix/sessione-account-senza-artista-20260912-174303 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `8a27fba`
+
+### Cosa Ã¨ entrato
+
+- `bd79730` â€” fix(account): conserva login senza artista locale â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:1595560 -->
 ## 12/09/26, 17:24 â€” origin/fix/backend-online-player-default-20260912-172324 â†’ main
 

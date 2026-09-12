@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:8a27fba -->
+## 12/09/26, 17:43 â€” origin/fix/sessione-account-senza-artista-20260912-174303 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `8a27fba`
+
+### Cosa Ã¨ entrato
+
+- `bd79730` â€” fix(account): conserva login senza artista locale â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/accesso.js`
+- **Modificato:** `frontend/js/net/online.js`
+- **Modificato:** `frontend/pagine/accesso.html`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:ea17bec -->
 ## 12/09/26, 17:11 â€” task/creator-casuale-nome-citta-v1 â†’ main
 
