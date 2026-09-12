@@ -182,22 +182,64 @@ def verify_reference_freeze_commit(reference):
     frozen = (reference.get("repo") or {}).get("commitAtFreeze")
     if not isinstance(frozen, str) or not re.fullmatch(r"[0-9a-f]{40}", frozen):
         raise RuntimeError("Holdout reference missing valid commitAtFreeze")
-    current = subprocess.check_output(
-        ["git", "rev-parse", "HEAD"],
-        cwd=HERE,
-        text=True,
-    ).strip()
-    if frozen == current:
-        return
-    ancestry = subprocess.run(
-        ["git", "merge-base", "--is-ancestor", frozen, current],
+
+    source_commit = subprocess.run(
+        ["git", "cat-file", "-e", f"{frozen}^{{commit}}"],
         cwd=HERE,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         check=False,
     )
+    if source_commit.returncode != 0:
+        raise RuntimeError("Holdout reference commitAtFreeze is not available in repository")
+
+    repo_root = Path(
+        subprocess.check_output(
+            ["git", "rev-parse", "--show-toplevel"],
+            cwd=HERE,
+            text=True,
+        ).strip()
+    ).resolve()
+    try:
+        reference_rel = HOLDOUT_REFERENCE_FILE.resolve().relative_to(repo_root).as_posix()
+    except ValueError as exc:
+        raise RuntimeError("Holdout reference is outside repository") from exc
+
+    status = subprocess.check_output(
+        ["git", "status", "--porcelain", "--", reference_rel],
+        cwd=repo_root,
+        text=True,
+    ).strip()
+    if status:
+        raise RuntimeError("Holdout reference must be committed and clean")
+
+    history = [
+        line.strip()
+        for line in subprocess.check_output(
+            ["git", "log", "--format=%H", "--", reference_rel],
+            cwd=repo_root,
+            text=True,
+        ).splitlines()
+        if line.strip()
+    ]
+    if len(history) != 1:
+        raise RuntimeError("Holdout reference must be immutable after introduction")
+
+    reference_commit = history[0]
+    current = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"],
+        cwd=repo_root,
+        text=True,
+    ).strip()
+    ancestry = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", reference_commit, current],
+        cwd=repo_root,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
     if ancestry.returncode != 0:
-        raise RuntimeError("Holdout reference freeze commit is not an ancestor of checkout")
+        raise RuntimeError("Holdout reference introduction commit is not an ancestor of checkout")
 
 
 def validate_holdout_reference(reference, protocol):

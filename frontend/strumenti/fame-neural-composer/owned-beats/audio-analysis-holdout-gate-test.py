@@ -2,6 +2,7 @@
 """Regression tests for R1-hardened metadata-only one-shot holdout gate."""
 import importlib.util
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -113,6 +114,58 @@ class HoldoutGateTests(unittest.TestCase):
 
     def tearDown(self):
         gate.verify_reference_freeze_commit = self._verify_reference_freeze_commit
+
+    def test_reference_lineage_uses_reference_introduction_commit(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            subprocess.check_call(["git", "init", "-q"], cwd=repo)
+            subprocess.check_call(["git", "config", "user.email", "r1-test@example.invalid"], cwd=repo)
+            subprocess.check_call(["git", "config", "user.name", "R1 Test"], cwd=repo)
+
+            (repo / "base.txt").write_text("base\n", encoding="utf-8")
+            subprocess.check_call(["git", "add", "base.txt"], cwd=repo)
+            subprocess.check_call(["git", "commit", "-q", "-m", "base"], cwd=repo)
+            base = subprocess.check_output(
+                ["git", "rev-parse", "HEAD"], cwd=repo, text=True
+            ).strip()
+
+            subprocess.check_call(["git", "checkout", "-q", "-b", "selection-source"], cwd=repo)
+            (repo / "source.txt").write_text("selection source\n", encoding="utf-8")
+            subprocess.check_call(["git", "add", "source.txt"], cwd=repo)
+            subprocess.check_call(["git", "commit", "-q", "-m", "selection source"], cwd=repo)
+            source_commit = subprocess.check_output(
+                ["git", "rev-parse", "HEAD"], cwd=repo, text=True
+            ).strip()
+
+            subprocess.check_call(["git", "checkout", "-q", "-b", "evaluation-branch", base], cwd=repo)
+            reference_path = repo / "audio-analysis-holdout-cohort-r1-v2.json"
+            reference_path.write_text("{}\n", encoding="utf-8")
+            subprocess.check_call(
+                ["git", "add", "audio-analysis-holdout-cohort-r1-v2.json"], cwd=repo
+            )
+            subprocess.check_call(["git", "commit", "-q", "-m", "freeze reference"], cwd=repo)
+
+            old_here = gate.HERE
+            old_reference = gate.HOLDOUT_REFERENCE_FILE
+            try:
+                gate.HERE = repo
+                gate.HOLDOUT_REFERENCE_FILE = reference_path
+                self._verify_reference_freeze_commit(
+                    {"repo": {"commitAtFreeze": source_commit}}
+                )
+
+                reference_path.write_text('{"tampered":true}\n', encoding="utf-8")
+                subprocess.check_call(
+                    ["git", "add", "audio-analysis-holdout-cohort-r1-v2.json"], cwd=repo
+                )
+                subprocess.check_call(["git", "commit", "-q", "-m", "tamper reference"], cwd=repo)
+                with self.assertRaisesRegex(RuntimeError, "immutable after introduction"):
+                    self._verify_reference_freeze_commit(
+                        {"repo": {"commitAtFreeze": source_commit}}
+                    )
+            finally:
+                gate.HERE = old_here
+                gate.HOLDOUT_REFERENCE_FILE = old_reference
 
     def test_selects_exact_frozen_remediated_cohort_without_audio(self):
         m = manifest()
