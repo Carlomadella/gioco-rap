@@ -59,6 +59,7 @@ const timeControls = leggi("js/game/tempo-controlli.js");
 const index = leggi("pagine/gioco.html");
 const landing = leggi("pagine/landing.html");
 const accesso = leggi("pagine/accesso.html");
+const accessoJs = leggi("js/accesso.js");
 const porta = leggi("index.html");
 const avvio = leggi("js/avvio.js");
 const ingresso = leggi("js/gioco-ingresso.js");
@@ -118,8 +119,15 @@ test("override backend resta disponibile per sviluppo locale",
   online.includes("|| DEFAULT_BASE;"));
 test("account e login tollerano il cold start del backend pubblico",
   (online.match(/attesa: 60000/g) || []).length >= 2);
+test("sessione account e identita artista sono controlli separati",
+  online.includes("const sessione = () => leggi(K_SESSIONE)") &&
+  online.includes("collega, scollega, sessione, identita") &&
+  accessoJs.includes("const sessione = ONLINE.sessione()") &&
+  !accessoJs.includes("const mia = ONLINE.identita()"));
 test("le tre pagine caricano la nuova versione del ponte online",
-  [landing, accesso, index].every(p => p.includes('js/net/online.js?v=15')));
+  [landing, accesso, index].every(p => p.includes('js/net/online.js?v=16')));
+test("pagina Account carica la logica accesso aggiornata",
+  accesso.includes('js/accesso.js?v=2'));
 
 console.log("\nBlocco 1 — Eventi V2 / telefono / dist");
 test("catalogo contiene esattamente 1000 eventi", Array.isArray(cat) && cat.length === 1000);

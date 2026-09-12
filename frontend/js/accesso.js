@@ -87,8 +87,11 @@
      Se il server non risponde non si dice niente di brutto — si lascia il
      modulo, e ci pensa la fascia in fondo a spiegare che è staccato. */
   async function guarda(){
-    const mia = ONLINE.identita();
-    if(!mia || !mia.sessione){ mostraFuori(); return; }
+    /* Un account valido puo' esistere prima dell'artista locale. Controllare
+       ONLINE.identita() qui faceva sparire il login appena si tornava alla
+       home e si riapriva Account se K_ID non esisteva ancora. */
+    const sessione = ONLINE.sessione();
+    if(!sessione){ mostraFuori(); return; }
     const dati = await ONLINE.io();
     if(dati && !dati.errore){ mostraDentro(dati); return; }
     mostraFuori();
