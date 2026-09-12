@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:fecae36 -->
+## 12/09/26, 14:21 â€” task/fix-dev-live-reload-makehuman â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `fecae36`
+
+### Cosa Ã¨ entrato
+
+- `18269dd` â€” fix(dev): evita reload falsi durante MakeHuman â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/dev.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:7979f69 -->
 ## 12/09/26, 13:21 â€” origin/fix/anti-regressione-git-gate-v2 â†’ main
 
