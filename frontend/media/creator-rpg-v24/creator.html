@@ -159,6 +159,53 @@ body::before{
   color:#fff;font-size:19px;font-weight:750;padding:4px 1px;
 }
 .field input::placeholder{color:#464b55}
+
+/* ADF_IDENTITY_RANDOM_BUTTONS_V1
+   Azioni piccole integrate nei campi: stessa grammatica visiva del creator,
+   senza rubare spazio alla sezione generi sottostante. */
+.field-random{position:relative}
+.field-random input{padding-right:82px}
+.field-random-btn{
+  position:absolute;
+  right:10px;
+  bottom:10px;
+  min-width:70px;
+  height:28px;
+  padding:0 10px;
+  border:1px solid rgba(211,170,94,.30);
+  border-radius:9px;
+  background:linear-gradient(180deg,rgba(211,170,94,.11),rgba(211,170,94,.045));
+  color:#d9c59f;
+  font-family:"Barlow Condensed",sans-serif;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:.16s border-color,.16s background,.16s color,.16s transform;
+}
+.field-random-btn:hover{
+  border-color:rgba(211,170,94,.56);
+  background:linear-gradient(180deg,rgba(211,170,94,.18),rgba(211,170,94,.07));
+  color:var(--gold2);
+}
+.field-random-btn:active{transform:translateY(1px)}
+.field-random-btn:focus-visible{
+  outline:2px solid rgba(241,216,167,.50);
+  outline-offset:2px;
+}
+@media(max-height:740px) and (min-width:801px){
+  .field-random input{padding-right:74px}
+  .field-random-btn{
+    right:7px;
+    bottom:7px;
+    min-width:64px;
+    height:24px;
+    padding:0 8px;
+    font-size:8px;
+    border-radius:7px;
+  }
+}
 .section-head{
   display:flex;align-items:end;justify-content:space-between;gap:12px;
   margin-top:28px;margin-bottom:12px;
@@ -1929,13 +1976,15 @@ body::before{
           <p class="lead">Questa parte non tocca la difficoltà. Serve a definire l’identità narrativa del personaggio e a costruire il profilo finale di <em>Che artista sei</em>.</p>
 
           <div class="form">
-            <div class="field">
+            <div class="field field-random">
               <label>Nome d’arte · obbligatorio</label>
               <input id="name" placeholder="es. NOIR">
+              <button class="field-random-btn" id="randomName" type="button" aria-label="Genera un nome d’arte casuale">Casuale</button>
             </div>
-            <div class="field">
+            <div class="field field-random">
               <label>Città di provenienza · obbligatoria</label>
               <input id="city" placeholder="es. Torino">
+              <button class="field-random-btn" id="randomCity" type="button" aria-label="Genera una città di provenienza casuale">Casuale</button>
             </div>
           </div>
 
@@ -3005,6 +3054,35 @@ window.addEventListener('message', e=>{
 $('creatorExitGame').onclick=()=>{
   window.parent.postMessage({type:'adf-rpg-v24-cancel'},'*');
 };
+
+function applyRandomIdentityField(kind){
+  const input =
+    kind==='name' ? $('name') :
+    kind==='city' ? $('city') :
+    null;
+
+  if(!input) return;
+
+  let value = '';
+  try{
+    const randomField =
+      window.parent!==window &&
+      window.parent.ADF_CREATOR_RANDOM_FIELD;
+
+    if(typeof randomField==='function'){
+      value = String(randomField(kind) || '');
+    }
+  }catch(e){}
+
+  if(!value) return;
+
+  input.value = value;
+  input.dispatchEvent(new Event('input',{bubbles:true}));
+  input.focus();
+}
+
+$('randomName').addEventListener('click',()=>applyRandomIdentityField('name'));
+$('randomCity').addEventListener('click',()=>applyRandomIdentityField('city'));
 
 $('name').addEventListener('input', validateIdentity);
 $('city').addEventListener('input', validateIdentity);

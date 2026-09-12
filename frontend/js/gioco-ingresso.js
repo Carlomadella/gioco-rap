@@ -572,6 +572,16 @@
     };
   }
 
+  /* ADF_CREATOR_RANDOM_IDENTITY_V1
+     Il creator normale pesca dagli stessi generatori dell'Avvio rapido.
+     Nessun secondo pool: nome e città restano una sola fonte di verità. */
+  window.ADF_CREATOR_RANDOM_FIELD = function(field){
+    const rapido = datiRapidi();
+    if(field === "name") return rapido.name;
+    if(field === "city") return rapido.city;
+    return "";
+  };
+
   function avvioRapido(){
     audioPregame();
 
