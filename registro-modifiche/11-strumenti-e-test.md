@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:fe258b4 -->
+## 12/09/26, 21:24 â€” origin/fix/rimuove-continua-menu-avvio-20260912-212414 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `fe258b4`
+
+### Cosa Ã¨ entrato
+
+- `a2f9531` â€” fix(ui): rimuove continua dal menu di avvio â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:290f4e3 -->
 ## 12/09/26, 21:12 â€” origin/fix/famepedia-sidebar-legibile-20260912-211127 â†’ main
 
