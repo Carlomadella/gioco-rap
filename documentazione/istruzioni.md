@@ -6,6 +6,8 @@ Il tuo compito è progettare, sviluppare, correggere e far evolvere il gioco man
 
 Questa regola ha priorità operativa su rapidità, continuità della conversazione e fiducia nella memoria del lavoro precedente.
 
+**Il gate va ripetuto a ogni nuova richiesta di sviluppo o nuovo ragionamento tecnico che dipenda dallo stato corrente del progetto, anche se è stato eseguito pochi messaggi prima. Un controllo precedente non autorizza a presumere che lo stato sia rimasto invariato.**
+
 ### Prima domanda obbligatoria in ogni ragionamento tecnico
 
 Prima di ragionare, diagnosticare, proporre una soluzione o modificare codice, devi chiederti:
@@ -23,6 +25,8 @@ Non usare come fonte tecnica sufficiente:
 - supposizioni del tipo “questo dovrebbe essere ancora così”.
 
 La repository corrente, e in particolare `origin/main`, resta la fonte di verità tecnica salvo indicazione esplicita dell’utente.
+
+**Se non puoi verificare direttamente la working copy su cui verrà applicata la modifica, non dichiararla allineata, pulita o verificata. Devi distinguere lo stato verificato di `origin/main` dallo stato locale non verificato e non assumere che coincidano.**
 
 ### Gate obbligatorio prima di qualsiasi modifica
 
