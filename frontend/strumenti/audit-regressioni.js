@@ -164,7 +164,7 @@ test("FAMEpedia usa UI dedicata coerente e responsive",
   famepediaCss.includes("font-family:var(--disp)") &&
   famepediaCss.includes("var(--c1)") &&
   famepediaCss.includes("@media (max-width:820px)") &&
-  landing.includes('css/famepedia.css?v=2') &&
+  landing.includes('css/famepedia.css?v=3') &&
   landing.includes('js/famepedia.js?v=2'));
 test("FAMEpedia V2 mantiene indice voci persistente a sinistra",
   landing.includes('id="fp-nav-list"') &&
@@ -175,6 +175,15 @@ test("FAMEpedia V2 mantiene indice voci persistente a sinistra",
 test("FAMEpedia V2 usa come sfondo la scena Info Point esistente",
   famepediaCss.includes('landing_a_infopoint.jpg') &&
   famepediaCss.includes("FAMEPEDIA V2 — INDICE PERSISTENTE"));
+test("FAMEpedia usa la stessa scala tipografica della sidebar MakeHuman",
+  famepediaCss.includes("FAMEPEDIA V3 — TIPOGRAFIA MAKEHUMAN") &&
+  famepediaCss.includes("--fp-mh-primary:13.5px") &&
+  famepediaCss.includes("--fp-mh-secondary:13px") &&
+  famepediaCss.includes("--fp-mh-label:10.5px") &&
+  famepediaCss.includes(".fp-nav-item-title") &&
+  famepediaCss.includes("font-size:var(--fp-mh-primary)") &&
+  famepediaCss.includes(".fp-nav-item-cat") &&
+  famepediaCss.includes("font-size:var(--fp-mh-label)"));
 test("controller landing apre FAMEpedia dal menu",
   landingJs.includes('b.dataset.go === "famepedia"') &&
   landingJs.includes("FAMEPEDIA.apri()"));
