@@ -342,6 +342,35 @@ async function aspettaCheRisponda(figlio){
       registro.dati.sospetti.length);
 
     console.log("\ngli account");
+
+    /* Un giocatore può nascere ospite quando entra in classifica e aggiungere
+       la mail dopo. Deve restare LO STESSO account, con lo stesso artista. */
+    const upgradeMail = await chiama("/api/account", {
+      metodo: "POST", testate: conSessione(sess1),
+      corpo: { tipo: "email", email: "upgrade@esempio.it", segreto: "upgrade-segreto" }
+    });
+    controlla("un account ospite si promuove a email senza crearne un altro",
+      upgradeMail.stato === 200 && upgradeMail.dati && upgradeMail.dati.account &&
+      upgradeMail.dati.account.email === "upgrade@esempio.it" &&
+      upgradeMail.dati.token === sess1, upgradeMail.dati);
+
+    const upgradeIo = await chiama("/api/io", { testate: conSessione(sess1) });
+    controlla("dopo la promozione l'artista resta sullo stesso account",
+      upgradeIo.dati && upgradeIo.dati.artisti.length === 1 &&
+      upgradeIo.dati.artisti[0].id === io1, upgradeIo.dati);
+
+    const upgradeLogin = await chiama("/api/sessione", { metodo: "POST",
+      corpo: { tipo: "email", email: "upgrade@esempio.it", segreto: "upgrade-segreto" } });
+    controlla("la mail aggiunta entra davvero e ritrova l'artista",
+      upgradeLogin.stato === 200 && upgradeLogin.dati && upgradeLogin.dati.token,
+      upgradeLogin.dati);
+    const upgradeIoLogin = await chiama("/api/io", {
+      testate: conSessione(upgradeLogin.dati.token)
+    });
+    controlla("il login email rientra nello stesso artista",
+      upgradeIoLogin.dati && upgradeIoLogin.dati.artisti.length === 1 &&
+      upgradeIoLogin.dati.artisti[0].id === io1, upgradeIoLogin.dati);
+
     const conMail = await chiama("/api/account", { metodo: "POST",
       corpo: { tipo: "email", email: "Prova@Esempio.it", segreto: "unasegretalunga" } });
     controlla("ci si iscrive con una mail", conMail.stato === 201 && conMail.dati.token, conMail.dati);

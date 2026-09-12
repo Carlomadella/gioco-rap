@@ -225,6 +225,39 @@ controlla("la landing non si porta dietro il gioco", landingCol.length === 0, la
   );
 }
 
+/* ADF_ONLINE_ACCOUNT_ARTIST_LINK_V1
+   Account, artista e cloud devono condividere la stessa identità online. */
+{
+  const onlineJs = fs.readFileSync(path.join(RADICE, "js/net/online.js"), "utf8");
+  const entryJs = fs.readFileSync(path.join(RADICE, "js/game/entry.js"), "utf8");
+
+  const bloccoRegistra = onlineJs.match(/async function registra\([\s\S]*?\n  }/);
+  controlla(
+    "la registrazione artista non nasconde la sessione account",
+    !!bloccoRegistra && !bloccoRegistra[0].includes("senzaSessione: true")
+  );
+
+  const bloccoMail = onlineJs.match(/const registraConMail[\s\S]*?\n  \}\)\.then/);
+  controlla(
+    "aggiungere la mail conserva la sessione ospite da promuovere",
+    !!bloccoMail && !bloccoMail[0].includes("senzaSessione: true")
+  );
+
+  controlla(
+    "punteggio e cloud assicurano prima l'artista locale",
+    onlineJs.includes("async function assicuraArtistaLocale()") &&
+    onlineJs.includes("const assicurata = await assicuraArtistaLocale();") &&
+    onlineJs.includes("artistaId: mia ? mia.id : null")
+  );
+
+  controlla(
+    "l'ingresso gameplay assicura l'artista online senza bloccare la città",
+    entryJs.includes("function assicuraArtistaOnline()") &&
+    entryJs.includes("Promise.resolve(ONLINE.assicuraArtistaLocale()).catch(() => {})") &&
+    entryJs.includes("assicuraArtistaOnline();")
+  );
+}
+
 console.log("\nil codice");
 const rotti = [];
 

@@ -750,8 +750,19 @@ const account = async id => await A.uno(
   "SELECT id, email, stato, lingua, creato, visto FROM account WHERE id = ? AND cancellato IS NULL", id);
 
 async function collegaIdentita(accountId, d){
-  await A.fai("INSERT INTO identita (id, account_id, tipo, id_esterno, segreto_hash, creato) VALUES (?,?,?,?,?,?)",
-    uuid(), accountId, d.tipo, d.idEsterno, d.segreto ? impasta(d.segreto) : null, ora());
+  return await A.insieme(async () => {
+    await A.fai("INSERT INTO identita (id, account_id, tipo, id_esterno, segreto_hash, creato) VALUES (?,?,?,?,?,?)",
+      uuid(), accountId, d.tipo, d.idEsterno, d.segreto ? impasta(d.segreto) : null, ora());
+
+    /* Un account nato ospite non deve diventare un secondo account quando
+       l'utente aggiunge la mail: si aggiunge l'identità allo stesso account.
+       L'artista e gli eventuali salvataggi restano quindi sotto lo stesso id. */
+    if(d.tipo === "email"){
+      await A.fai("UPDATE account SET email = ?, visto = ? WHERE id = ? AND cancellato IS NULL",
+        d.idEsterno, ora(), accountId);
+    }
+    return await account(accountId);
+  });
 }
 
 /* L'ingresso: torna l'account se il segreto combacia. Per Steam, Apple e

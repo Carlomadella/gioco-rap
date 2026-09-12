@@ -237,6 +237,20 @@ async function rotta(req, res, url){
          cos'era successo. L'unico che conta qui è se la mail è già presa. */
       if(await archivio.identitaEsiste("email", email)) return male(res, 409, "email-gia-usata");
       idEsterno = email;
+
+      /* Se esiste già una sessione senza mail, è l'account ospite creato dal
+         gioco. Lo promuoviamo invece di creare un secondo account: così artista,
+         classifica e cloud restano sotto la stessa identità. */
+      const sessioneEsistente = await chi(req);
+      if(sessioneEsistente && !sessioneEsistente.account.email){
+        const acc = await archivio.collegaIdentita(sessioneEsistente.account.id, {
+          tipo: "email", idEsterno: email, segreto: b.segreto
+        });
+        return invia(res, 200, {
+          account: acc,
+          token: req.headers["x-sessione"] || ""
+        });
+      }
     } else if(tipo === "ospite"){
       idEsterno = crypto.randomUUID();
     } else {
