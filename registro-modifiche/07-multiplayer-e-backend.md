@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:813dae0 -->
+## 12/09/26, 12:03 â€” fix/postgres-bigint-cloud-20260912-140328 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `813dae0`
+
+### Cosa Ã¨ entrato
+
+- `2ef0aed` â€” fix(backend): normalizza bigint PostgreSQL â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `backend/database/postgres.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:5bbd9fb -->
 ## 07/09/26, 20:26 â€” task/via-lo-zero-dipendenze â†’ main
 
