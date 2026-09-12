@@ -164,8 +164,17 @@ test("FAMEpedia usa UI dedicata coerente e responsive",
   famepediaCss.includes("font-family:var(--disp)") &&
   famepediaCss.includes("var(--c1)") &&
   famepediaCss.includes("@media (max-width:820px)") &&
-  landing.includes('css/famepedia.css?v=1') &&
-  landing.includes('js/famepedia.js?v=1'));
+  landing.includes('css/famepedia.css?v=2') &&
+  landing.includes('js/famepedia.js?v=2'));
+test("FAMEpedia V2 mantiene indice voci persistente a sinistra",
+  landing.includes('id="fp-nav-list"') &&
+  famepediaJs.includes('host=$fp("fp-nav-list")') &&
+  famepediaJs.includes("articoloAttivo=id") &&
+  famepediaCss.includes("grid-template-columns:330px minmax(0,1fr)") &&
+  famepediaCss.includes(".fp-nav-item.on"));
+test("FAMEpedia V2 usa come sfondo la scena Info Point esistente",
+  famepediaCss.includes('landing_a_infopoint.jpg') &&
+  famepediaCss.includes("FAMEPEDIA V2 — INDICE PERSISTENTE"));
 test("controller landing apre FAMEpedia dal menu",
   landingJs.includes('b.dataset.go === "famepedia"') &&
   landingJs.includes("FAMEPEDIA.apri()"));

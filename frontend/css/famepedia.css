@@ -62,3 +62,109 @@ body.famepedia-aperta{overflow:hidden}
 @media (max-width:820px){.fp-top{padding:11px 13px;gap:10px;flex-wrap:wrap}.fp-brand{min-width:auto;flex:1}.fp-brand-copy span{display:none}.fp-search-wrap{order:3;flex-basis:100%;max-width:none}.fp-body{grid-template-columns:1fr;grid-template-rows:auto 1fr}.fp-rail{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:10px 13px;border-right:0;border-bottom:1px solid rgba(255,255,255,.075)}.fp-rail-label,.fp-rail-note{display:none}.fp-cat{width:auto;flex:none;padding:8px 11px;border:1px solid rgba(255,255,255,.075)}.fp-cat i{display:none}.fp-home,.fp-article-view{padding:30px 17px 70px}.fp-home h1{font-size:clamp(42px,14vw,68px)}.fp-grid{grid-template-columns:1fr}.fp-card{min-height:136px}.fp-article-title{font-size:clamp(39px,12vw,64px)}.fp-article-lead{font-size:16px}}
 @media (max-width:460px){.fp-brand-mark{width:34px;height:34px;border-radius:10px;font-size:19px}.fp-brand-copy b{font-size:14px}.fp-close{font-size:0;width:36px;height:36px;padding:0;justify-content:center}.fp-close::after{content:"×";font-size:22px;line-height:1}.fp-search-key{display:none}.mfame-teaser{padding:24px 20px}}
 @media (prefers-reduced-motion:reduce){.fp-card,.mfame-open{transition:none}}
+
+/* ==================== FAMEPEDIA V2 — INDICE PERSISTENTE ====================
+   Desktop: indice sempre visibile a sinistra, articolo a destra.
+   Lo sfondo usa la scena Info Point già presente nella landing, quindi non
+   introduce una seconda direzione artistica. */
+.famepedia{
+  background:
+    linear-gradient(90deg,rgba(5,5,7,.94) 0%,rgba(5,5,7,.84) 38%,rgba(5,5,7,.72) 72%,rgba(5,5,7,.87) 100%),
+    url("../media/photo/pagina di landing/landing_a_infopoint.jpg") center/cover no-repeat
+}
+.famepedia::before{
+  z-index:0;
+  background:
+    radial-gradient(70% 55% at 14% 0%,color-mix(in srgb,var(--c1) 16%,transparent),transparent 66%),
+    linear-gradient(180deg,rgba(9,9,12,.12),rgba(9,9,12,.4));
+  pointer-events:none
+}
+.famepedia::after{z-index:0;opacity:.075}
+.fp-shell{position:relative;z-index:1;background:linear-gradient(90deg,rgba(8,8,11,.38),rgba(8,8,11,.12))}
+.fp-top{background:rgba(8,8,11,.78)}
+.fp-body{grid-template-columns:330px minmax(0,1fr);max-width:none}
+.fp-rail{
+  padding:0;
+  overflow:hidden;
+  background:rgba(10,10,13,.76);
+  backdrop-filter:blur(18px);
+  border-right:1px solid rgba(255,255,255,.1)
+}
+.fp-rail-scroll{height:100%;overflow:auto;padding:24px 15px 34px 20px}
+.fp-rail-sep{height:1px;background:rgba(255,255,255,.08);margin:18px 9px}
+.fp-rail-title{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:0 9px 9px;font-family:var(--cond);font-size:10px;font-weight:800;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--faint)
+}
+.fp-rail-title i{
+  font-style:normal;min-width:22px;height:22px;border-radius:999px;display:grid;place-items:center;
+  background:rgba(255,255,255,.065);color:#aaa8b1;font-size:10px
+}
+.fp-nav-list{display:flex;flex-direction:column;gap:5px}
+.fp-nav-item{
+  position:relative;width:100%;display:flex;flex-direction:column;align-items:flex-start;
+  gap:3px;padding:11px 12px 12px;border-radius:11px;text-align:left;
+  color:#b3b2bb;border:1px solid transparent;
+  transition:background .15s,border-color .15s,color .15s,transform .15s
+}
+.fp-nav-item::before{
+  content:"";position:absolute;left:0;top:10px;bottom:10px;width:2px;border-radius:2px;
+  background:transparent;transition:background .15s
+}
+.fp-nav-item-cat{
+  font-family:var(--cond);font-size:9px;font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;color:#696974
+}
+.fp-nav-item-title{font-size:13px;font-weight:750;line-height:1.25}
+.fp-nav-item.on{
+  background:rgba(255,255,255,.075);border-color:rgba(255,255,255,.09);color:#fff
+}
+.fp-nav-item.on::before{background:var(--gold-land,#d3aa5e)}
+.fp-nav-item.on .fp-nav-item-cat{color:var(--gold-land,#d3aa5e)}
+@media (hover:hover){
+  .fp-nav-item:hover{
+    background:rgba(255,255,255,.055);color:#fff;transform:translateX(2px)
+  }
+}
+.fp-nav-empty{padding:15px 10px;color:var(--faint);font-size:12px;line-height:1.45}
+.fp-main{background:linear-gradient(90deg,rgba(9,9,12,.3),rgba(9,9,12,.55))}
+.fp-home,.fp-article-view{max-width:920px;margin:0;padding:52px 56px 84px}
+.fp-home-head{max-width:760px}
+.fp-home-hint{
+  max-width:720px;display:flex;align-items:flex-start;gap:16px;margin-top:12px;
+  padding:17px 18px;border:1px solid rgba(255,255,255,.085);border-radius:15px;
+  background:rgba(15,15,19,.58);backdrop-filter:blur(10px)
+}
+.fp-home-hint-num{
+  flex:none;font-family:var(--cond);font-size:11px;font-weight:800;letter-spacing:.12em;
+  color:var(--gold-land,#d3aa5e);padding-top:2px
+}
+.fp-home-hint b{font-size:14px}
+.fp-home-hint p{margin:5px 0 0;color:#8f8f9a;font-size:12.5px;line-height:1.55}
+.fp-article-view{background:linear-gradient(90deg,rgba(7,7,10,.16),rgba(7,7,10,.38))}
+.fp-article-title{max-width:16ch}
+.fp-copy{max-width:820px}
+
+@media (max-width:820px){
+  .famepedia{
+    background:
+      linear-gradient(180deg,rgba(5,5,7,.9),rgba(5,5,7,.82)),
+      url("../media/photo/pagina di landing/landing_a_infopoint.jpg") center/cover no-repeat
+  }
+  .fp-body{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .fp-rail{
+    display:block;max-height:230px;padding:0;
+    border-right:0;border-bottom:1px solid rgba(255,255,255,.09)
+  }
+  .fp-rail-scroll{padding:10px 13px 12px;overflow:auto}
+  #fp-categorie{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px}
+  .fp-rail-sep,.fp-rail-label,.fp-rail-note{display:none}
+  .fp-rail-title{padding:2px 2px 7px}
+  .fp-nav-list{flex-direction:row;gap:7px;overflow-x:auto;padding-bottom:2px}
+  .fp-nav-item{width:180px;min-width:180px;padding:9px 10px 10px;background:rgba(255,255,255,.04)}
+  .fp-nav-item::before{display:none}
+  .fp-nav-item.on{border-color:color-mix(in srgb,var(--gold-land,#d3aa5e) 45%,transparent)}
+  .fp-main{background:rgba(8,8,11,.46)}
+  .fp-home,.fp-article-view{max-width:none;padding:28px 17px 68px}
+}
