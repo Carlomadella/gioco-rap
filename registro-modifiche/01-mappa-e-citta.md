@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:ea17bec -->
+## 12/09/26, 17:11 â€” task/creator-casuale-nome-citta-v1 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `ea17bec`
+
+### Cosa Ã¨ entrato
+
+- `e952df8` â€” feat(creator): aggiunge nome e città casuali â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/gioco-ingresso.js`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:de087c7 -->
 ## 10/09/26, 01:07 â€” main â†’ main
 
