@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:7979f69 -->
+## 12/09/26, 13:21 â€” origin/fix/anti-regressione-git-gate-v2 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `7979f69`
+
+### Cosa Ã¨ entrato
+
+- `66c8d70` â€” fix(git): impedisce regressioni da main e branch obsoleti â€” **Mycol**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/strumenti/configura-git-hooks.js`
+- **Aggiunto:** `frontend/strumenti/verifica-git.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:f6f76da -->
 ## 10/09/26, 16:27 â€” branch non identificato â†’ main
 
