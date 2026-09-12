@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:8dffa9f -->
+## 12/09/26, 12:54 â€” fix/account-artista-cloud-20260912-145418 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `8dffa9f`
+
+### Cosa Ã¨ entrato
+
+- `cb502a7` â€” fix(online): collega account artista e cloud â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `backend/database/archivio.js`
+- **Modificato:** `backend/prova.js`
+- **Modificato:** `backend/server.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:813dae0 -->
 ## 12/09/26, 12:03 â€” fix/postgres-bigint-cloud-20260912-140328 â†’ main
 

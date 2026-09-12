@@ -6,6 +6,31 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:8dffa9f -->
+## 12/09/26, 12:54 â€” fix/account-artista-cloud-20260912-145418 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `8dffa9f`
+
+### Cosa Ã¨ entrato
+
+- `cb502a7` â€” fix(online): collega account artista e cloud â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `backend/database/archivio.js`
+- **Modificato:** `backend/prova.js`
+- **Modificato:** `backend/server.js`
+- **Modificato:** `frontend/js/game/entry.js`
+- **Modificato:** `frontend/js/net/online.js`
+- **Modificato:** `frontend/pagine/accesso.html`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 8
+
+---
+
 <!-- merge:10a372d -->
 ## 08/09/26, 21:17 â€” main â†’ main
 
