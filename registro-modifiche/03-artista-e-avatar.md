@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:249d509 -->
+## 12/09/26, 18:57 â€” task/creator-aspetto-sfondo-boutique-v1 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `249d509`
+
+### Cosa Ã¨ entrato
+
+- `e20e411` â€” feat(creator): aggiunge sfondo boutique alla scelta avatar â€” **Mycol**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/media/creator-rpg-v24/assets/creator-appearance-boutique-v1.png`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:1fc1984 -->
 ## 12/09/26, 18:38 â€” task/creator-identita-sfondo-v3 â†’ main
 
