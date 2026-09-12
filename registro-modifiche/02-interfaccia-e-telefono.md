@@ -6,6 +6,27 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:c41c257 -->
+## 12/09/26, 19:40 â€” origin/feat/famepedia-v1-v2-20260912-194005 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `c41c257`
+
+### Cosa Ã¨ entrato
+
+- `bf80cbf` â€” feat(ui): aggiunge FAMEpedia alla landing â€” **Mycol**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/css/famepedia.css`
+- **Aggiunto:** `frontend/js/famepedia.js`
+- **Modificato:** `frontend/js/landing.js`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:1fc1984 -->
 ## 12/09/26, 18:38 â€” task/creator-identita-sfondo-v3 â†’ main
 

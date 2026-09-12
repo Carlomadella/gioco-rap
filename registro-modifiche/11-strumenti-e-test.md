@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:c41c257 -->
+## 12/09/26, 19:40 â€” origin/feat/famepedia-v1-v2-20260912-194005 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `c41c257`
+
+### Cosa Ã¨ entrato
+
+- `bf80cbf` â€” feat(ui): aggiunge FAMEpedia alla landing â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:48dc367 -->
 ## 12/09/26, 17:55 â€” origin/feat/stato-account-landing-v2-20260912-175446 â†’ main
 
