@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:290f4e3 -->
+## 12/09/26, 21:12 â€” origin/fix/famepedia-sidebar-legibile-20260912-211127 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `290f4e3`
+
+### Cosa Ã¨ entrato
+
+- `0052ef6` â€” fix(famepedia): rende leggibile la sidebar â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/famepedia.css`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:c41c257 -->
 ## 12/09/26, 19:40 â€” origin/feat/famepedia-v1-v2-20260912-194005 â†’ main
 
