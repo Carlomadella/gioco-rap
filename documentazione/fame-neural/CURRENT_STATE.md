@@ -30,6 +30,25 @@ Data: 2026-09-12
 
 Le 131 composition family del corpus proprietario sono state confermate umanamente e registrate. Il cohort di sviluppo contiene 8 family e l'evaluation holdout 10 family distinte, senza overlap. I 113 record rimanenti non hanno ancora uno split assegnato. `familyStatus`, QA e task admissibility restano separati e non vengono auto-promossi.
 
+## Addendum operativo — audit tecnico 12/09/2026
+
+> Documento corrente: [Audit tecnico integrato 12/09/2026](AUDIT_TECNICO_FAME_NEURAL_2026-09-12.md).
+>
+> Questo addendum **non riscrive lo storico** del file. Per le prossime azioni prevale sulle sezioni operative più vecchie presenti sotto.
+
+Nuovi riscontri integrati:
+
+- **R1 — BLOCCANTE holdout:** il gate corrente non lega ancora le 10 family a uno snapshot/digest indipendente del cohort originale pre-tuning. Prima della reservation reale va recuperata/provata l'identità `compositionFamilyId / sourceRecordId / sourceAssetId / sha256`, aggiungendo anche controllo asset cross-split e reservation asset-aware.
+- **R2 — Drum View:** `resolveWindow()` richiede oggi, indirettamente, metro stabile sull'intera sorgente; va corretto prima dell'espansione a sorgenti con cambi di metro.
+- **R3 — `trainingReady`:** oggi equivale sostanzialmente ad “almeno un record allowed”; non deve essere interpretato come dataset pronto al training.
+- **R4 — microtrain storico:** i codec sono costruiti da `records["all"]`; il debito va chiuso prima di riusare quel benchmark per nuove conclusioni.
+- **R5 — documentazione:** alcune istruzioni storiche più sotto sono superate; restano archiviate ma non costituiscono la prossima azione corrente.
+- **R6 — percorso holdout:** preflight/reservation non equivalgono ancora alla evaluation completa; servono reference cieca, V1, config-001 e paired comparison sotto un'unica reservation one-shot.
+
+**Priorità corrente:** chiudere R1 senza osservare il vero holdout. Development `V2_WINS`, candidate freeze, config e protocollo restano invariati.
+
+---
+
 ## Audit V2 integrato — stato delle correzioni
 
 [Rapporto completo](AUDIT_ROADMAP_V2_2026-09-09.md), codice verificato al commit `1372467`. Sono integrate le precisazioni documentali e le regole NDR-028…034; **nessuna correzione di codice, nuovo intake o nuovo training è implicata da questo aggiornamento**.
