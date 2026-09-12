@@ -1479,30 +1479,37 @@ console.log("\nl'editor artista conserva la modalita audio della partita");
   ingressi = 0;
   schermate.length = 0;
 
-  /* Il percorso "Il tuo artista" entra nel creator senza il callback usato
-     dalla nuova partita: al completamento passa dal fallback del bridge. */
+  /* "Il tuo artista" è modifica aspetto, non una nuova creazione.
+     La città viene avviata una volta sola sotto l'editor; il salvataggio
+     dell'aspetto chiude la sessione senza un secondo ingresso in gameplay. */
   scatola.location.search = "?vai=profilo";
   vm.runInContext(fs.readFileSync(path.join(RADICE, "js/game/entry.js"), "utf8"),
     scatola, {filename:"js/game/entry.js"});
   vm.runInContext(fs.readFileSync(path.join(RADICE, "js/gioco-ingresso.js"), "utf8"),
     scatola, {filename:"js/gioco-ingresso.js"});
-  const primaProfilo = vm.runInContext("ADF_AUDIO.canPlay('beat')", scatola);
-  vm.runInContext("ADF_RPG_V24.open()", scatola);
+
+  const duranteProfilo = vm.runInContext(
+    "({mode:ADF_AUDIO.mode, beat:ADF_AUDIO.canPlay('beat')})", scatola);
+  const frameProfilo = frameCreato;
+
   eventiWindow.message({
-    source:frameCreato.contentWindow,
+    source:frameProfilo.contentWindow,
     data:{
-      type:"adf-rpg-v24-complete",
-      detail:{name:"Artista", city:"Milano", genre:"rap", avatarSource:"local",
-        avatarData:{localAvatar:{preset:"base"}}, answers:[]}
+      type:"adf-rpg-v24-appearance-updated",
+      detail:{avatarSource:"local", avatarData:{localAvatar:{preset:"base"}}}
     }
   });
+
   const dopoProfilo = vm.runInContext(
     "({mode:ADF_AUDIO.mode, beat:ADF_AUDIO.canPlay('beat')})", scatola);
 
-  controlla("tornare dal profilo entra una volta in gameplay con i beat disponibili",
-    !primaProfilo && ingressi === 1 && schermate.at(-1) === "hub" &&
-      dopoProfilo.mode === "gameplay" && dopoProfilo.beat,
-    JSON.stringify({primaProfilo, ingressi, schermate, dopoProfilo}));
+  controlla("Il tuo artista entra una volta in gameplay e chiude l'aspetto senza secondo ingresso",
+    ingressi === 1 && schermate.filter(x => x === "hub").length === 1 &&
+      duranteProfilo.mode === "gameplay" && duranteProfilo.beat &&
+      dopoProfilo.mode === "gameplay" && dopoProfilo.beat &&
+      scatola.A.localAvatar?.preset === "base",
+    JSON.stringify({duranteProfilo, ingressi, schermate, dopoProfilo,
+      preset:scatola.A.localAvatar?.preset||null}));
 }
 
 /* Un retry nato per un iframe non deve mai proseguire sul creator aperto dopo:

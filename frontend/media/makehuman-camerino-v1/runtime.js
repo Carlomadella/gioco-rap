@@ -4823,10 +4823,28 @@ function bindEditorShell() {
   window.addEventListener('message',e=>{
     const msg=e.data||{};
     if(msg.type!=='adf-makehuman-init') return;
+
+    /* ADF_MAKEHUMAN_INIT_ONCE_V1
+       Il creator può tentare l'init sia poco dopo l'apertura sia dopo il
+       messaggio ready. Per uno stesso iframe accettiamo UN solo init: un
+       secondo restore tardivo non deve sovrascrivere il primo preset cliccato. */
+    if(window.__ADF_MAKEHUMAN_INIT_ACCEPTED__) return;
+    window.__ADF_MAKEHUMAN_INIT_ACCEPTED__=true;
+
     if(msg.state) {
-      if(runtimeReady) restoreCharacterState(msg.state,{refit:true});
-      else pendingRestoreState=msg.state;
+      if(runtimeReady) {
+        Promise.resolve(restoreCharacterState(msg.state,{refit:true}))
+          .then(()=>adfMhMountPresetBox())
+          .catch(err=>console.error('[ADF] restore MakeHuman iniziale fallito',err));
+      } else {
+        pendingRestoreState=msg.state;
+      }
+      return;
     }
+
+    /* Nuova creazione senza stato precedente: l'handshake è comunque
+       concluso, quindi da questo momento i preset possono diventare cliccabili. */
+    if(runtimeReady) adfMhMountPresetBox();
   });
 }
 
@@ -4961,10 +4979,10 @@ async function init() {
 
     initialCharacterState=snapshotCharacterState();
     runtimeReady=true;
-    /* ADF_MAKEHUMAN_PRESETS_MOUNT_V2
-       La UI preset viene montata quando il runtime MakeHuman è realmente pronto.
-       Non dipende da DOMContentLoaded, perché runtime.js è un modulo dinamico. */
-    adfMhMountPresetBox();
+
+    /* Prima completiamo l'eventuale restore iniziale del creator. I preset
+       non devono essere cliccabili mentre questa fase può ancora riscrivere
+       lo stato del personaggio o riportare l'editor alla sezione iniziale. */
     if(pendingRestoreState) {
       const restore=pendingRestoreState; pendingRestoreState=null;
       await restoreCharacterState(restore,{refit:true});
@@ -4972,6 +4990,14 @@ async function init() {
     setEditorSection('identity',{autoFrame:false});
     setCameraView('full',{smooth:false});
     applyVisualCenter();
+
+    /* In standalone non esiste un parent da cui attendere l'init. Nel gioco,
+       invece, montiamo i preset solo quando l'handshake iniziale è già stato
+       accettato; se arriverà dopo ready sarà il message handler a montarli. */
+    if(window.parent===window || window.__ADF_MAKEHUMAN_INIT_ACCEPTED__){
+      adfMhMountPresetBox();
+    }
+
     emitToRoom('adf-makehuman-ready',{state:snapshotCharacterState()});
 
     const params=new URLSearchParams(location.search);

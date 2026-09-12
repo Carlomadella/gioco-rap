@@ -215,8 +215,6 @@
       window.ADF_RPG_V24 &&
       typeof window.ADF_RPG_V24.open === "function"
     ){
-      goto("profile");
-
       window.ADF_RPG_V24.open();
 
       const frame = frameCreator();
@@ -234,16 +232,8 @@
       return;
     }
 
-    goto("profile");
-
-    setTimeout(
-      () => {
-        try{
-          $("name").focus();
-        }catch(e){}
-      },
-      80
-    );
+    console.error("[ADF] Nuova partita: creator RPG non disponibile.");
+    return;
   }
 
   /* -------------------------------------------------------
@@ -294,8 +284,6 @@
     }
 
     const rapido = datiRapidi();
-
-    goto("profile");
 
     window.ADF_RPG_V24.open();
 
@@ -387,8 +375,20 @@
   }
 
   if(vai === "profilo"){
-    audioPregame();
-    goto("profile");
+    /* Il tuo artista modifica l'aspetto sopra la partita reale.
+       Entriamo una sola volta nel gameplay PRIMA di aprire l'editor:
+       quando l'editor si chiude, sotto c'è già la città e non serve un
+       secondo GAME.enter(). */
+    entraInCitta();
+
+    if(
+      window.ADF_RPG_V24 &&
+      typeof window.ADF_RPG_V24.openAppearance === "function"
+    ){
+      window.ADF_RPG_V24.openAppearance();
+    }else{
+      console.error("[ADF] Il tuo artista: editor aspetto non disponibile.");
+    }
     return;
   }
 

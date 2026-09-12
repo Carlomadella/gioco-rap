@@ -14,11 +14,11 @@ function miniPortrait(){
 function vaiAllaLanding(){ vaiA("landing"); }
 function goto(screen){
   if(screen === "profile"){
-    if(window.ADF_RPG_V24 && typeof window.ADF_RPG_V24.open === "function"){
-      window.ADF_RPG_V24.open();
+    if(window.ADF_RPG_V24 && typeof window.ADF_RPG_V24.openAppearance === "function"){
+      window.ADF_RPG_V24.openAppearance();
       return;
     }
-    vaiAllaLanding();
+    console.error("[ADF] Il tuo artista: editor aspetto non disponibile.");
     return;
   }
 if(screen === "menu"){ vaiAllaLanding(); return; }
