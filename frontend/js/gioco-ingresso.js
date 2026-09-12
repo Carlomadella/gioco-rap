@@ -8,7 +8,7 @@
      (niente)             riprendi la carriera dello slot attivo → la città
      ?vai=profilo         apri il tuo artista
      ?vai=classifiche     entra e apri le classifiche
-     ?nuova=rapido        preset temporaneo + RPG automatico + cinematic
+     ?nuova=rapido        preset MakeHuman uomo casuale + RPG automatico + cinematic
      ?nuova=creatore      apri il creator normale
 
    Il creator approvato resta proprietario di RPG, profilo e cinematic.
@@ -117,76 +117,130 @@
   }
 
   /* -------------------------------------------------------
-     Provider temporaneo SOLO per Avvio rapido.
+     AVVIO RAPIDO + MAKEHUMAN
 
-     La nuova partita normale usa il provider reale scelto
-     nel creator (Avaturn oppure MakeHuman). Il preset base
-     resta qui soltanto per saltare la creazione nell'avvio
-     rapido.
+     Il creator resta nascosto mentre MakeHuman applica un preset
+     maschile reale e genera la propic. Nome, città, genere, storia
+     e cinematic restano quelli dell'avvio rapido già approvato.
      ------------------------------------------------------- */
 
-  function installaPresetTemporaneo(frame){
+  function completaProfiloRapido(frame, rapido){
+    const payload = JSON.stringify(rapido);
+
     const codice = `
       (() => {
-        if(window.__ADF_TEMP_PRESET_INSTALLED__) return;
-        window.__ADF_TEMP_PRESET_INSTALLED__ = true;
+        const rapido = ${payload};
 
-        const localButton =
-          document.querySelector('[data-avatar-source="local"]');
+        state.name = rapido.name;
+        state.city = rapido.city;
 
-        if(localButton){
-          const id = localButton.querySelector('.id');
-          const nome = localButton.querySelector('.n');
-          const desc = localButton.querySelector('.d');
-          const mini = localButton.querySelector('.mini');
-          const features =
-            localButton.querySelector('.avatar-features');
+        /* STESSI generi del creator normale. */
+        state.genre =
+          GENRES[
+            Math.floor(Math.random() * GENRES.length)
+          ].id;
 
-          if(id) id.textContent = '02 · temporaneo';
-          if(nome) nome.textContent = 'Personaggio preimpostato';
+        /* STESSE 3 domande e risposte canoniche. */
+        state.answers =
+          STORY.map(scene =>
+            scene.choices[
+              Math.floor(
+                Math.random() * scene.choices.length
+              )
+            ]
+          );
 
-          if(desc){
-            desc.textContent =
-              'Usa temporaneamente il personaggio base e continua con identità, storia e profilo.';
+        $('name').value = state.name;
+        $('city').value = state.city;
+
+        renderAvatarSource();
+        renderGenres();
+        validateIdentity();
+
+        /* Stesso trigger audio della nuova partita normale. */
+        try{
+          if(window.parent !== window){
+            window.parent.postMessage({
+              type:'adf-rpg-v24-career-intro-start'
+            }, '*');
           }
+        }catch(e){}
 
-          if(mini){
-            mini.textContent = 'Usa personaggio base';
-          }
-
-          if(features){
-            features.innerHTML =
-              '<span>Nessun editor</span>' +
-              '<span>Preset base</span>' +
-              '<span>MakeHuman in arrivo</span>';
-          }
-        }
-
-        /* Questa funzione esiste già nel creator.
-           La sostituiamo soltanto runtime. */
-        openLocalEditor = function(){
-          state.avatarSource = 'local';
-          state.avatarPendingSource = null;
-
-          state.avatarData = {
-            provider:'temporary-placeholder',
-            localAvatar:{
-              preset:'base',
-              version:1
-            }
-          };
-
-          renderAvatarSource();
-
-          /* Nessun vecchio editor, nessun camerino.
-             Il personaggio è già deciso. */
-          setProgress(1);
-          validateIdentity();
-        };
+        /* STESSA cinematic già approvata. */
+        window.playCareerIntro();
       })();
     `;
 
     return eseguiNelCreator(frame, codice);
+  }
+
+  function richiediMakeHumanRapido(frame, rapido){
+    let concluso = false;
+
+    const cleanup = () => {
+      window.removeEventListener("message", onMessage);
+      clearTimeout(timeout);
+    };
+
+    const fallisci = message => {
+      if(concluso) return;
+      concluso = true;
+      cleanup();
+
+      if(frameCreator() === frame){
+        frame.style.visibility = "";
+      }
+
+      console.error(
+        "[ADF] Avvio rapido MakeHuman:",
+        message || "generazione personaggio fallita."
+      );
+    };
+
+    const onMessage = e => {
+      if(!frame?.contentWindow || e.source !== frame.contentWindow) return;
+      const msg = e.data || {};
+
+      if(msg.type === "adf-rpg-v24-quick-makehuman-error"){
+        fallisci(msg.message || "errore MakeHuman.");
+        return;
+      }
+
+      if(msg.type !== "adf-rpg-v24-quick-makehuman-ready") return;
+
+      if(concluso) return;
+      concluso = true;
+      cleanup();
+
+      /* Se la sessione è cambiata, non completiamo il creator nuovo. */
+      if(frameCreator() !== frame) return;
+
+      if(!completaProfiloRapido(frame, rapido)){
+        frame.style.visibility = "";
+        console.error(
+          "[ADF] Avvio rapido: impossibile completare identità/RPG nel creator."
+        );
+        return;
+      }
+
+      /* La cinematic è già partita prima che il frame torni visibile. */
+      frame.style.visibility = "";
+    };
+
+    window.addEventListener("message", onMessage);
+
+    const timeout = setTimeout(
+      () => fallisci("timeout generazione preset MakeHuman."),
+      120000
+    );
+
+    try{
+      frame.contentWindow.postMessage({
+        type:"adf-rpg-v24-quick-makehuman"
+      },"*");
+    }catch(e){
+      fallisci(e?.message || "postMessage MakeHuman fallito.");
+    }
   }
 
   /* -------------------------------------------------------
@@ -293,70 +347,10 @@
     if(frame) frame.style.visibility = "hidden";
 
     quandoCreatorPronto(frame, f => {
-      installaPresetTemporaneo(f);
-
-      const payload = JSON.stringify(rapido);
-
-      const codice = `
-        (() => {
-          const rapido = ${payload};
-
-          state.avatarSource = 'local';
-          state.avatarPendingSource = null;
-
-          state.avatarData = {
-            provider:'temporary-placeholder',
-            localAvatar:{
-              preset:'base',
-              version:1
-            }
-          };
-
-          state.name = rapido.name;
-          state.city = rapido.city;
-
-          /* STESSI generi del creator normale. */
-          state.genre =
-            GENRES[
-              Math.floor(Math.random() * GENRES.length)
-            ].id;
-
-          /* STESSE 3 domande e risposte canoniche. */
-          state.answers =
-            STORY.map(scene =>
-              scene.choices[
-                Math.floor(
-                  Math.random() * scene.choices.length
-                )
-              ]
-            );
-
-          $('name').value = state.name;
-          $('city').value = state.city;
-
-          renderAvatarSource();
-          renderGenres();
-          validateIdentity();
-
-          /* Stesso trigger audio della nuova partita normale. */
-          try{
-            if(window.parent !== window){
-              window.parent.postMessage({
-                type:'adf-rpg-v24-career-intro-start'
-              }, '*');
-            }
-          }catch(e){}
-
-          /* STESSA cinematic già approvata. */
-          window.playCareerIntro();
-        })();
-      `;
-
-      eseguiNelCreator(f, codice);
-
-      /* playCareerIntro è già partita prima che il frame
-         torni visibile. */
-      f.style.visibility = "";
+      /* Niente placeholder: chiediamo al creator un MakeHuman reale.
+         Nome/città/RPG/cinematic vengono completati solo dopo che il
+         preset e la propic sono pronti. */
+      richiediMakeHumanRapido(f, rapido);
     });
   }
 

@@ -2707,6 +2707,8 @@ document.querySelectorAll('[data-avatar-source]').forEach(btn=>{
 
 const localEditorOverlay = $('localEditorOverlay');
 const localEditorFrame = $('localEditorFrame');
+let quickMakeHumanPending = false;
+let quickMakeHumanRequested = false;
 
 function currentMakeHumanState(){
   const d = state.avatarData || {};
@@ -2724,6 +2726,39 @@ function sendMakeHumanInit(){
       state:currentMakeHumanState()
     },'*');
   }catch(e){}
+}
+
+function requestQuickMakeHumanPreset(){
+  if(
+    !quickMakeHumanPending ||
+    quickMakeHumanRequested ||
+    !localEditorFrame?.contentWindow
+  ) return;
+
+  quickMakeHumanRequested = true;
+
+  try{
+    localEditorFrame.contentWindow.postMessage({
+      type:'adf-makehuman-quick-preset',
+      gender:'male'
+    },'*');
+  }catch(e){
+    quickMakeHumanRequested = false;
+    if(window.parent!==window){
+      window.parent.postMessage({
+        type:'adf-rpg-v24-quick-makehuman-error',
+        message:e?.message || 'Richiesta preset MakeHuman fallita.'
+      },'*');
+    }
+  }
+}
+
+function startQuickMakeHuman(){
+  if(quickMakeHumanPending) return;
+  quickMakeHumanPending = true;
+  quickMakeHumanRequested = false;
+  state.avatarPendingSource = 'local';
+  openLocalEditor();
 }
 
 function openLocalEditor(){
@@ -2785,11 +2820,86 @@ window.addEventListener('message', e=>{
       beginAppearanceEdit(msg.artist||{});
       return;
     }
+    if(msg.type==='adf-rpg-v24-quick-makehuman'){
+      startQuickMakeHuman();
+      return;
+    }
   }
 
   if(localEditorFrame && e.source===localEditorFrame.contentWindow){
     if(msg.type==='adf-makehuman-ready'){
       sendMakeHumanInit();
+
+      /* Lo stesso iframe riceve prima l'init e, nel task successivo,
+         la richiesta del preset rapido. Così il fix INIT_ONCE resta
+         proprietario dell'handshake iniziale. */
+      if(quickMakeHumanPending){
+        setTimeout(requestQuickMakeHumanPreset,0);
+      }
+      return;
+    }
+
+    if(msg.type==='adf-makehuman-quick-preset-result'){
+      if(!quickMakeHumanPending) return;
+
+      const makehumanState = msg.state || null;
+      const previewImage = msg.previewImage || '';
+      const presetId = msg.presetId || '';
+
+      if(!makehumanState || !previewImage || !presetId){
+        quickMakeHumanPending = false;
+        quickMakeHumanRequested = false;
+        closeLocalEditor();
+
+        if(window.parent!==window){
+          window.parent.postMessage({
+            type:'adf-rpg-v24-quick-makehuman-error',
+            message:'Risultato preset MakeHuman incompleto.'
+          },'*');
+        }
+        return;
+      }
+
+      quickMakeHumanPending = false;
+      quickMakeHumanRequested = false;
+      closeLocalEditor();
+
+      /* Usiamo lo STESSO contratto ufficiale del MakeHuman manuale:
+         provider, stato modificabile e propic vengono salvati nel creator. */
+      window.completeAvatarCreation('local',{
+        provider:'makehuman',
+        presetId,
+        makehumanState,
+        avatarPreviewImage:previewImage,
+        previewImage,
+        localAvatar:{
+          provider:'makehuman',
+          presetId,
+          makehumanState
+        }
+      });
+
+      if(window.parent!==window){
+        window.parent.postMessage({
+          type:'adf-rpg-v24-quick-makehuman-ready',
+          presetId
+        },'*');
+      }
+      return;
+    }
+
+    if(msg.type==='adf-makehuman-quick-preset-error'){
+      if(!quickMakeHumanPending) return;
+      quickMakeHumanPending = false;
+      quickMakeHumanRequested = false;
+      closeLocalEditor();
+
+      if(window.parent!==window){
+        window.parent.postMessage({
+          type:'adf-rpg-v24-quick-makehuman-error',
+          message:msg.message || 'Preset MakeHuman rapido fallito.'
+        },'*');
+      }
       return;
     }
 

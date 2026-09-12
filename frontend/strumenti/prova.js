@@ -165,6 +165,66 @@ controlla("la landing non si porta dietro il gioco", landingCol.length === 0, la
   );
 }
 
+/* ADF_QUICK_MAKEHUMAN_V1
+   Avvio rapido deve usare uno dei preset MakeHuman maschili reali,
+   mantenendo identità casuale, scelte RPG e cinematic preesistenti. */
+{
+  const ingressoRapidoJs = fs.readFileSync(path.join(RADICE, "js/gioco-ingresso.js"), "utf8");
+  const creatorRapidoHtml = fs.readFileSync(path.join(RADICE, "media/creator-rpg-v24/creator.html"), "utf8");
+  const makeHumanRuntimeJs = fs.readFileSync(path.join(RADICE, "media/makehuman-camerino-v1/runtime.js"), "utf8");
+
+  controlla(
+    "avvio rapido non usa più il placeholder temporaneo",
+    !ingressoRapidoJs.includes("temporary-placeholder") &&
+    !ingressoRapidoJs.includes("installaPresetTemporaneo")
+  );
+
+  controlla(
+    "avvio rapido conserva nome/città, RPG casuale e cinematic approvati",
+    ingressoRapidoJs.includes("const nomi = [") &&
+    ingressoRapidoJs.includes("const citta = [") &&
+    ingressoRapidoJs.includes("GENRES[") &&
+    ingressoRapidoJs.includes("STORY.map(scene =>") &&
+    ingressoRapidoJs.includes("window.playCareerIntro()")
+  );
+
+  controlla(
+    "avvio rapido usa il contratto MakeHuman reale senza toccare Avaturn",
+    ingressoRapidoJs.includes("adf-rpg-v24-quick-makehuman") &&
+    creatorRapidoHtml.includes("adf-rpg-v24-quick-makehuman") &&
+    creatorRapidoHtml.includes("adf-makehuman-quick-preset") &&
+    creatorRapidoHtml.includes("provider:'makehuman'") &&
+    creatorRapidoHtml.includes("window.completeAvatarCreation('local'")
+  );
+
+  controlla(
+    "MakeHuman rapido sceglie solo preset maschili e genera stato più propic",
+    makeHumanRuntimeJs.includes("preset=>preset.gender==='male'") &&
+    makeHumanRuntimeJs.includes("adf-makehuman-quick-preset-result") &&
+    makeHumanRuntimeJs.includes("snapshotCharacterState()") &&
+    makeHumanRuntimeJs.includes("previewImage:makePreviewImage()")
+  );
+}
+
+/* ADF_MAKEHUMAN_PRESET_READY_GATE_V1
+   Regressione: i preset non devono essere montati da DOMContentLoaded mentre
+   MakeHuman/handshake possono ancora ripristinare lo stato del personaggio. */
+{
+  const makeHumanRuntimeJs = fs.readFileSync(
+    path.join(RADICE, "media/makehuman-camerino-v1/runtime.js"),
+    "utf8"
+  );
+
+  controlla(
+    "preset MakeHuman montati solo dopo runtime, motore e handshake iniziale",
+    makeHumanRuntimeJs.includes("function adfMhPresetMountReady()") &&
+    makeHumanRuntimeJs.includes("if(!runtimeReady || !nativeEngineReady) return false;") &&
+    makeHumanRuntimeJs.includes("!window.__ADF_MAKEHUMAN_INIT_ACCEPTED__") &&
+    !makeHumanRuntimeJs.includes("function adfMhInitPresets()") &&
+    !makeHumanRuntimeJs.includes("document.addEventListener('DOMContentLoaded',adfMhInitPresets)")
+  );
+}
+
 console.log("\nil codice");
 const rotti = [];
 
