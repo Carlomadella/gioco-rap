@@ -300,15 +300,61 @@
     ];
   }
 
+  function normalizzaNomeArtista(value){
+    return String(value || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]/g, "");
+  }
+
+  function combinazioneNomeValida(nome, secondoNome){
+    const a = normalizzaNomeArtista(nome);
+    const b = normalizzaNomeArtista(secondoNome);
+
+    if(!a || !b || a === b) return false;
+
+    if(
+      a.length >= 4 &&
+      b.length >= 4 &&
+      a.slice(0,3) === b.slice(0,3)
+    ){
+      return false;
+    }
+
+    return true;
+  }
+
+  function generaNomeArtista(nomi, secondiNomi){
+    for(let tentativo = 0; tentativo < 24; tentativo++){
+      const nome = scegli(nomi);
+      const secondoNome = scegli(secondiNomi);
+
+      if(combinazioneNomeValida(nome, secondoNome)){
+        return nome + " " + secondoNome;
+      }
+    }
+
+    return scegli(nomi) + " " + scegli(secondiNomi);
+  }
+
   function datiRapidi(){
     const nomi = [
-      "Ali","Zero","Kobra","Nino","Sette","Lupo",
-      "Ghiaccio","Trenta","Vetro","Fame","Neve","Ferro"
+      "Nico","Sami","Rami","Miro","Kiro","Lio","Neri","Santi",
+      "Alek","Teo","Dario","Milo","Tano","Reno","Riky","Elia",
+      "Vito","Samu","Dani","Manu","Edo","Gio","Loris","Matti",
+      "Tomi","Ivo","Riko","Nilo","Lele","Fede","Lenny","Yari",
+      "Ema","Mavi","Nox","Koda","Zeno","Ruen","Simo","Vale"
     ];
 
-    const suffissi = [
-      "Fame","Zero","93","Uno","Nero",
-      "Sette","OG","Vento","Boy"
+    const secondiNomi = [
+      "Montana","Santana","Carter","Banks","Kane","Stone","Miles","Saint",
+      "Vega","Cruz","Mendez","Leone","Riva","Costa","Ferri","Valente",
+      "Serra","Mason","Hayes","Reyes","Torres","Salazar","Navarro","Moreno",
+      "Cortez","Silva","Ventura","Mercer","Knox","Monroe","Savoy","Melo",
+      "Rocco","Vitale","Moretti","Fontana","Romano","Marino","Greco","Russo",
+      "De Luca","Valli","Cole","West","Lennox","Gallo","De Santis","Santos",
+      "Mora","Velas"
     ];
 
     const citta = [
@@ -317,7 +363,7 @@
     ];
 
     return {
-      name: scegli(nomi) + " " + scegli(suffissi),
+      name: generaNomeArtista(nomi, secondiNomi),
       city: scegli(citta)
     };
   }
