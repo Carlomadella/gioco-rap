@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:48dc367 -->
+## 12/09/26, 17:55 â€” origin/feat/stato-account-landing-v2-20260912-175446 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `48dc367`
+
+### Cosa Ã¨ entrato
+
+- `13864e6` â€” feat(account): mostra stato connessione nella landing â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/shell.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:ea17bec -->
 ## 12/09/26, 17:11 â€” task/creator-casuale-nome-citta-v1 â†’ main
 

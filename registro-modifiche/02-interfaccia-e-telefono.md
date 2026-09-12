@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:48dc367 -->
+## 12/09/26, 17:55 â€” origin/feat/stato-account-landing-v2-20260912-175446 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `48dc367`
+
+### Cosa Ã¨ entrato
+
+- `13864e6` â€” feat(account): mostra stato connessione nella landing â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/pagine/accesso.html`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:0ac2c93 -->
 ## 12/09/26, 14:35 â€” feat/cloud-restore-ui-20260912-163446 â†’ main
 
