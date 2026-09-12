@@ -43,7 +43,17 @@
 "use strict";
 
 const { AsyncLocalStorage } = require("node:async_hooks");
-const { Pool } = require("pg");
+const { Pool, types } = require("pg");
+
+/* PostgreSQL restituisce INT8/BIGINT (compreso count(*)) come stringhe.
+   Il resto del backend usa Number anche con SQLite: normalizziamo qui, nello
+   strato dati, così i due motori mantengono lo stesso contratto. */
+types.setTypeParser(20, valore => {
+  const n = Number(valore);
+  if(!Number.isSafeInteger(n))
+    throw new RangeError("BIGINT PostgreSQL fuori dall'intervallo sicuro JavaScript: " + valore);
+  return n;
+});
 
 /* ---- da `?` a `$1` ----
    Si cammina sul testo e si salta quello che sta fra apici: in SQL un apice
