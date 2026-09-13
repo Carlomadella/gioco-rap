@@ -334,6 +334,9 @@ function studioFattiUnBeat(id){
 /* ==================== IL FONICO DIETRO AL VETRO ==================== */
 function studioScegliFonico(id){
   if(!G.studio) G.studio = {};
+  /* null arriva da «da solo», e vuol dire togliere chi c'e' — non fare il
+     giro del toggle, che su null lo rimetterebbe. */
+  if(id === null){ G.studio.fonico = null; SFX.tap(); save(); renderStudio(); return; }
   G.studio.fonico = (G.studio.fonico === id) ? null : id;
   SFX.tap(); save(); renderStudio();
 }
@@ -705,7 +708,12 @@ function studioSezCabina(){
       v:studioAiuto(p) ? "+" + studioAiuto(p) + " qual." : "—",
       vCls:studioAiuto(p) ? "" : "calmo"
     })).join("") +
-    stScelta({on:!fon, mini:stSagoma(), n:"da solo", d:"quello che sai fare tu",
+    /* «da solo» e' una scelta come le altre, quindi si clicca come le altre:
+       `data-fonico` vuoto vuol dire «nessuno dietro al vetro». Prima era un
+       riquadro muto e per togliersi il fonico bisognava indovinare che si
+       ri-cliccava quello gia' scelto. */
+    stScelta({attr:' data-fonico=""', on:!fon, mini:stSagoma(),
+      n:"da solo", d:"quello che sai fare tu",
       v:"+0", vCls:"calmo"}) +
     (gente.length ? "" : studioVuoto("Non conosci ancora nessun fonico. <b>Alla Sala</b> ce ne gira più di uno.")));
 
@@ -795,14 +803,24 @@ function studioSezBanco(){
   const fon = studioFonico();
   const g = mixGain();
 
+  /* Al banco si sceglie, non si guarda soltanto. Qui le due caselle erano
+     tutte e due mute — `stScelta` fa un <button> solo se gli si da' un
+     attributo, se no e' un <div class="muta"> — e quindi dal Mix non si poteva
+     ne' togliersi il fonico ne' rimetterlo: bisognava tornare in Cabina.
+     Adesso sono le stesse caselle della Cabina, con lo stesso attributo e lo
+     stesso gestore. */
   const sx = stPan("Al banco",
-    (fon
-      ? stScelta({on:true, mini:faccia(fon, 40), n:fon.n, d:relNome(fon),
-          v:"+" + studioAiuto(fon) + " qual."})
-      : "") +
-    stScelta({on:!fon, mini:stSagoma(), n:"da solo", d:"il mix lo fai tu",
+    studioGente("fonico").map(p => stScelta({
+      attr:' data-fonico="' + studioEsc(p.id) + '"',
+      on:fon === p, mini:faccia(p, 40), n:p.n, d:relNome(p),
+      v:studioAiuto(p) ? "+" + studioAiuto(p) + " qual." : "—",
+      vCls:studioAiuto(p) ? "" : "calmo"
+    })).join("") +
+    stScelta({attr:' data-fonico=""', on:!fon, mini:stSagoma(),
+      n:"da solo", d:"il mix lo fai tu",
       v:"+0", vCls:"calmo"}) +
-    (fon ? "" : studioVuoto("Nessuno al banco. Un fonico si chiama <b>dalla Cabina</b>.")));
+    (studioGente("fonico").length ? ""
+      : studioVuoto("Non conosci ancora nessun fonico. <b>Alla Sala</b> ce ne gira più di uno.")));
 
   let mid;
   if(scelto){
@@ -1205,7 +1223,8 @@ if($("studio")){
     const b = e.target.closest("[data-beat]");
     if(b){ studioFattiUnBeat(b.dataset.beat); return; }
     const f = e.target.closest("[data-fonico]");
-    if(f){ studioScegliFonico(f.dataset.fonico); return; }
+    /* `data-fonico=""` e' «da solo»: non e' un id, e' l'assenza di uno. */
+    if(f){ studioScegliFonico(f.dataset.fonico || null); return; }
     const ft = e.target.closest("[data-feat]");
     if(ft){ studioScegliFeat(ft.dataset.feat); return; }
     const m = e.target.closest("[data-mixa]");
