@@ -310,9 +310,9 @@ try:
         "--confirm-evaluation-holdout"
     )
 
-    mod.authorize_analysis_mode(
-        "evaluation-holdout",
-        True
+    assert_raises(
+        lambda: mod.authorize_analysis_mode("evaluation-holdout", True),
+        "Legacy pre-tuning analyzer"
     )
 
     # Same composition family may never cross split boundaries.

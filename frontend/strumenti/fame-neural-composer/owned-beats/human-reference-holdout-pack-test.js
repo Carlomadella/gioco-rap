@@ -5,6 +5,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const crypto = require("node:crypto");
+const vm = require("node:vm");
 const tool = require("./human-reference-holdout-pack.js");
 
 function sha256Text(value) {
@@ -98,6 +99,22 @@ function run() {
     assert.ok(html.includes("Human Reference holdout cieca"));
     assert.ok(html.includes("HOLDOUT · HUMAN REFERENCE"));
     assert.ok(!html.includes("Solo development. Nessun output V1/V2 mostrato."));
+
+    // Execute the generated list renderer, not just HTML marker assertions.
+    for (const script of html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)) {
+      new vm.Script(script[1]);
+    }
+    const listSource = html.match(/function renderList\(\)\{[\s\S]*?\}\s*function render\(\)\{/)[0]
+      .replace(/function render\(\)\{$/, "");
+    const list = {innerHTML:"", querySelectorAll:()=>[]};
+    vm.runInNewContext(listSource + ";renderList()", {
+      document:{getElementById:()=>list}, state:sample, current:0,
+      done:()=>false, esc:value=>String(value)
+    });
+    assert.ok(list.innerHTML.includes('data-i="0"'));
+    assert.ok(list.innerHTML.includes('class="active"'));
+    assert.ok(list.innerHTML.includes(ids[0]));
+    assert.ok(!list.innerHTML.includes(records[0].sourceRecordId));
 
     const bad = { ...reservation, sourceRecordIds: reservation.sourceRecordIds.slice(1) };
     fs.unlinkSync(path.join(workspace, "runs", "evaluation-holdout-usage", "synthetic.json"));

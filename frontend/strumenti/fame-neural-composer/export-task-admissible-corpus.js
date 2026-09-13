@@ -144,6 +144,8 @@ function buildTaskExport(taskId, explicitCorpus = null) {
       reasonCodes: summary.reasonCodes,
       taskReady: readiness.taskReady,
       trainingReady: readiness.trainingReady,
+      readinessScope: "PER_ITEM_ADMISSIBILITY_ONLY",
+      trainingAuthorization: "NOT_GRANTED_REQUIRES_AGGREGATE_DATASET_GATE",
       decisionRecords: decisions
     },
     manifest: {

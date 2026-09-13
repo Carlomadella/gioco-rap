@@ -192,15 +192,12 @@ def identity_sets(records):
 
 
 def prior_identity_sets(payload):
+    if not isinstance(payload, dict):
+        raise RuntimeError("Incomplete prior holdout reservation: reconcile legacy history")
     prior_records = payload.get("records")
-    if isinstance(prior_records, list):
-        return identity_sets(prior_records)
-    return {
-        "families": set(payload.get("families") or []),
-        "sourceRecordIds": set(payload.get("sourceRecordIds") or []),
-        "sourceAssetIds": set(payload.get("sourceAssetIds") or []),
-        "sha256s": set(payload.get("sha256s") or []),
-    }
+    if not isinstance(prior_records, list) or not prior_records:
+        raise RuntimeError("Incomplete prior holdout reservation: reconcile legacy history")
+    return identity_sets(prior_records)
 
 
 def reserve_holdout(

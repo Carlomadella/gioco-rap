@@ -167,6 +167,25 @@ class HoldoutGateTests(unittest.TestCase):
                 gate.HERE = old_here
                 gate.HOLDOUT_REFERENCE_FILE = old_reference
 
+    def test_incomplete_prior_history_blocks_preflight_and_reservation(self):
+        ref = reference()
+        records = ref["records"]
+        freeze = dict(configHash="a"*64, protocolDigestSha256="b"*64,
+                      freezeDigestSha256="c"*64, candidateId="synthetic")
+        for prior in ({}, {"families":["renamed-legacy"]}, {"records":[]}):
+            with self.subTest(prior=prior), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp) / "runs" / "evaluation-holdout-usage"
+                root.mkdir(parents=True)
+                (root / "legacy.json").write_text(json.dumps(prior))
+                with self.assertRaisesRegex(RuntimeError, "Incomplete prior"):
+                    gate.assert_no_prior_holdout_usage(tmp, records, ref)
+                with self.assertRaisesRegex(RuntimeError, "Incomplete prior"):
+                    gate.freeze_gate.reserve_holdout(tmp, freeze, records, ref,
+                        config_hash="a"*64, protocol_digest_sha256="b"*64,
+                        cohort_reference_digest_sha256="d"*64)
+                self.assertEqual(len(list(root.glob("*.json"))), 1)
+                self.assertFalse((root / "reservation.lock").exists())
+
     def test_selects_exact_frozen_remediated_cohort_without_audio(self):
         m = manifest()
         selected = gate.select_holdout_records(m, protocol(), reference(m))

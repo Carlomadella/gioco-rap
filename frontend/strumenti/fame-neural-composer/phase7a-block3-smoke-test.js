@@ -180,7 +180,7 @@ assert.deepEqual(
 );
 assert.deepEqual(
   readinessForTask(pretraining, { allowed: 1, blocked: 0, unknown: 0 }),
-  { taskReady: true, trainingReady: true }
+  { taskReady: true, trainingReady: false }
 );
 
 assert.deepEqual(

@@ -1,6 +1,14 @@
 # FAME Neural — Current State
 
-Data: 2026-09-12
+Data: 2026-09-13
+
+## Checkpoint corrente — integrazione audit 13/09/2026
+
+**Per le prossime azioni prevale [Integrazione audit 13 settembre](INTEGRAZIONE_AUDIT_2026-09-13.md).**
+Le sezioni sottostanti restano storico della progressione e non autorizzano l'accesso al vecchio holdout.
+R1 usa il nuovo cohort sostitutivo `evaluation-holdout-r1-v2` con identità complete e digest; il vecchio holdout è escluso per provenienza insufficiente.
+Integrate le correzioni CI, Drum View, readiness, codec train-only, storico reservation e copertura UI cieca. Test locali e limiti nel checkpoint; CI remota da verificare dopo push.
+R6 finale resta aperto: reference cieca disponibile, scoring V1/config-001 e paired comparison finale ancora da collegare alla reservation. Training serio chiuso.
 
 ## Owned Beats — stato operativo
 

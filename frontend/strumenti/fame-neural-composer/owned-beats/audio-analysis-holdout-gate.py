@@ -400,20 +400,9 @@ def identity_sets(records):
 
 
 def prior_identity_sets(prior):
-    records = prior.get("records")
-    if isinstance(records, list):
-        try:
-            return identity_sets(records)
-        except RuntimeError:
-            raise RuntimeError("Malformed prior holdout reservation identity metadata")
-
-    # Legacy reservations may contain only family ids.
-    return {
-        "families": set(prior.get("families") or []),
-        "sourceRecordIds": set(prior.get("sourceRecordIds") or []),
-        "sourceAssetIds": set(prior.get("sourceAssetIds") or []),
-        "sha256s": set(prior.get("sha256s") or []),
-    }
+    # Use the same fail-closed policy as the reservation writer. A family-only
+    # journal cannot establish that an asset has never been observed.
+    return freeze_gate.prior_identity_sets(prior)
 
 
 def assert_no_prior_holdout_usage(workspace, records, reference):

@@ -114,7 +114,16 @@ function ticksPerBar(sourcePpq, meter) {
 
 function resolveWindow(sourceFidelity, options = {}) {
   const sourcePpq = sourceFidelity.sourcePpq;
-  const provisionalMeter = stableMeterForWindow(sourceFidelity, 0, Number.MAX_SAFE_INTEGER);
+  const hasStartTick = options.sourceStartTick != null;
+  const hasEndTick = options.sourceEndTick != null;
+  for (const key of ["sourceStartTick", "sourceEndTick"]) {
+    if (options[key] != null && (!Number.isFinite(Number(options[key])) || Number(options[key]) < 0)) {
+      throw new Error(`${key} deve essere un tick finito non negativo`);
+    }
+  }
+  // startBar is meaningful only with a stable meter up to that bar. Explicit
+  // source ticks allow extracting stable windows from mixed-meter sources.
+  const provisionalMeter = stableMeterForWindow(sourceFidelity, 0, 0);
   const barTicks = ticksPerBar(sourcePpq, provisionalMeter);
 
   const startBar = Number.isInteger(options.startBar) && options.startBar >= 0
@@ -124,13 +133,22 @@ function resolveWindow(sourceFidelity, options = {}) {
     ? options.bars
     : 2;
 
-  const sourceStartTick = Number.isFinite(Number(options.sourceStartTick))
+  const sourceStartTick = hasStartTick
     ? Math.max(0, Math.round(Number(options.sourceStartTick)))
     : Math.round(startBar * barTicks);
 
-  const sourceEndTick = Number.isFinite(Number(options.sourceEndTick))
-    ? Math.max(sourceStartTick + 1, Math.round(Number(options.sourceEndTick)))
-    : Math.round(sourceStartTick + bars * barTicks);
+  if (!hasStartTick && startBar > 0) {
+    const changes = (sourceFidelity.timeSignatures || []).some(event =>
+      event.tick > 0 && event.tick <= sourceStartTick &&
+      (event.numerator !== provisionalMeter.numerator || event.denominator !== provisionalMeter.denominator)
+    );
+    if (changes) throw new Error("startBar ambiguo con cambi di metro: usare sourceStartTick esplicito");
+  }
+  const startMeter = stableMeterForWindow(sourceFidelity, sourceStartTick, sourceStartTick);
+  const sourceEndTick = hasEndTick
+    ? Math.round(Number(options.sourceEndTick))
+    : Math.round(sourceStartTick + bars * ticksPerBar(sourcePpq, startMeter));
+  if (sourceEndTick <= sourceStartTick) throw new Error("sourceEndTick deve seguire sourceStartTick");
 
   const meter = stableMeterForWindow(sourceFidelity, sourceStartTick, sourceEndTick);
   const stableBarTicks = ticksPerBar(sourcePpq, meter);

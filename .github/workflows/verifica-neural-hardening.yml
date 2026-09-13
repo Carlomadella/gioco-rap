@@ -24,6 +24,8 @@ jobs:
       - run: node frontend/strumenti/fame-neural-composer/hardening-owned-beats-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-review-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-audio-analysis-v2-protocol-test.js
+      - run: node frontend/strumenti/fame-neural-composer/owned-beats/human-reference-holdout-pack-test.js
+      - run: node frontend/strumenti/fame-neural-composer/phase7c-window-regression-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-human-reference-pack-test.js
       - run: node frontend/strumenti/fame-neural-composer/phase7c-block1-smoke-test.js
       - run: node frontend/strumenti/fame-neural-composer/phase7c-block2-smoke-test.js
@@ -41,6 +43,8 @@ jobs:
           python-version-file: 'frontend/strumenti/fame-neural-composer/owned-beats/.python-version'
           cache: 'pip'
           cache-dependency-path: 'frontend/strumenti/fame-neural-composer/owned-beats/requirements-audio-analysis-lock.txt'
+      - name: Train-only codec regression
+        run: python -B frontend/strumenti/fame-neural-composer/phase5/microtrain-codecs-test.py
       - name: Candidate freeze integrity
         run: python frontend/strumenti/fame-neural-composer/owned-beats-candidate-freeze-test.py
       - name: Audio Analysis holdout boundary gate regression
@@ -80,4 +84,9 @@ jobs:
       - name: Human reference interaction regression
         env:
           NODE_PATH: ${{ runner.temp }}/fame-browser/node_modules
+        run: node frontend/strumenti/fame-neural-composer/owned-beats-human-reference-browser-test.js
+      - name: Blind holdout interaction regression
+        env:
+          NODE_PATH: ${{ runner.temp }}/fame-browser/node_modules
+          FAME_TEST_HOLDOUT: '1'
         run: node frontend/strumenti/fame-neural-composer/owned-beats-human-reference-browser-test.js

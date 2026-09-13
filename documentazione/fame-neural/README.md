@@ -1,5 +1,8 @@
 # FAME Neural
 
+> Aggiornamento corrente: [Integrazione audit 13/09/2026](INTEGRAZIONE_AUDIT_2026-09-13.md), con correzioni, test e limiti ancora aperti.
+
+
 Progetto autonomo rispetto al FAME procedurale legacy.
 
 ## Fonte operativa

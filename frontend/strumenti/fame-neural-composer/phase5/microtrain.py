@@ -10,10 +10,10 @@ import statistics
 import sys
 import time
 import warnings
-from collections import Counter, defaultdict
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+
+from microtrain_codecs import Record, TokenCodec, CompoundCodec, fit_train_codec
 
 import torch
 import torch.nn as nn
@@ -23,56 +23,6 @@ warnings.filterwarnings("ignore", message="enable_nested_tensor.*")
 
 SEED = 3407
 REPRESENTATIONS = ["flat-poc-v1", "remi-plus-v1", "compound-word-v1", "fame-compound-v1"]
-NA = "__FAME_NA__"
-FIELD_CARDINALITY_ALIAS = {
-    "kind": "kind",
-    "bpm": "bpm",
-    "key": "key",
-    "mode": "mode",
-    "lineage": "lineage",
-    "bar": "bar",
-    "position": "position",
-    "type": "eventType",
-    "velocityBin": "velocity",
-    "note": "note",
-    "duration": "duration",
-    "role": "role",
-    "motif": "motif",
-    "glideTo": "glideTo",
-    "glideDuration": "glideDuration",
-    "rootPitchClass": "chordRoot",
-    "quality": "chordQuality",
-    "bassPitchClass": "chordBass",
-    "energy": "energy",
-    "vocalSpace": "vocalSpace",
-    "tension": "tension",
-    "density": "density",
-    "transitionFrom": "scalar01",
-    "transitionTo": "scalar01",
-    "motifSimilarity": "scalar01",
-    "kickExact": "scalar01",
-    "kickProximity": "scalar01",
-    "kickStrength": "scalar01",
-    "motifFamily": "motifFamily",
-    "motifRelation": "motifRelation",
-    "kick808Available": "kick808Available",
-    "kickCount": "kickBassCount",
-    "bassCount": "kickBassCount",
-    "kickLag": "kickLag",
-    "hatRollCount": "hatRollCount",
-    "hatMaxRollNotes": "hatRollNotes",
-    "start": "position",
-    "end": "position",
-    "notes": "hatRollNotes",
-}
-
-
-def jdump(value: Any) -> str:
-    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-
-
-def jload(value: str) -> Any:
-    return json.loads(value)
 
 
 def sha_bucket(text: str) -> int:
@@ -98,121 +48,6 @@ def seed_all(seed: int = SEED) -> None:
 
 def human_mib(value: int) -> float:
     return round(value / (1024 * 1024), 3)
-
-
-@dataclass
-class Record:
-    phrase_id: str
-    group_id: str
-    source_collection: str
-    bars: int
-    units: list
-
-
-class TokenCodec:
-    kind = "token"
-
-    def __init__(self, all_records: Sequence[Record], declared_vocab_size: int):
-        observed = sorted({str(unit) for record in all_records for unit in record.units})
-        self.token_to_id = {token: idx + 1 for idx, token in enumerate(observed)}
-        self.id_to_token = {idx: token for token, idx in self.token_to_id.items()}
-        self.pad_id = 0
-        self.declared_vocab_size = int(declared_vocab_size or 0)
-        self.vocab_size = len(self.token_to_id) + 1
-
-    def encode(self, units: list) -> torch.Tensor:
-        return torch.tensor([self.token_to_id[str(unit)] for unit in units], dtype=torch.long)
-
-    def decode_ids(self, ids: Sequence[int]) -> list:
-        out = []
-        for idx in ids:
-            token = self.id_to_token.get(int(idx))
-            if token is None:
-                token = "<FAME_UNUSED_TOKEN>"
-            out.append(token)
-        return out
-
-    def eos_id(self) -> Optional[int]:
-        return self.token_to_id.get("<EOS>")
-
-    def final_bar_start(self, units: list) -> int:
-        indices = [i for i, unit in enumerate(units) if str(unit).startswith("BAR=")]
-        return indices[-1] if indices else max(1, len(units) - 2)
-
-
-class CompoundCodec:
-    kind = "compound"
-
-    def __init__(self, all_records: Sequence[Record], metadata: dict):
-        field_values: Dict[str, set] = defaultdict(set)
-        schema_counter: Dict[Tuple[str, Optional[str]], Counter] = defaultdict(Counter)
-        fields = set()
-        for record in all_records:
-            for word in record.units:
-                if not isinstance(word, dict):
-                    raise ValueError("Compound unit non oggetto")
-                kind = str(word.get("kind", ""))
-                event_type = str(word.get("type")) if kind == "EVENT" and word.get("type") is not None else None
-                signature = tuple(sorted(word.keys()))
-                schema_counter[(kind, event_type)][signature] += 1
-                for key, value in word.items():
-                    fields.add(key)
-                    field_values[key].add(jdump(value))
-        self.fields = sorted(fields, key=lambda x: (x != "kind", x))
-        self.value_to_id: Dict[str, Dict[str, int]] = {}
-        self.id_to_value: Dict[str, Dict[int, Any]] = {}
-        declared = metadata.get("fieldCardinalities", {}) if isinstance(metadata, dict) else {}
-        self.field_sizes: Dict[str, int] = {}
-        for field in self.fields:
-            values = sorted(field_values[field])
-            mapping = {value: idx + 1 for idx, value in enumerate(values)}
-            self.value_to_id[field] = mapping
-            self.id_to_value[field] = {idx: jload(value) for value, idx in mapping.items()}
-            alias = FIELD_CARDINALITY_ALIAS.get(field)
-            _declared_size = int(declared.get(alias, 0) or 0)
-            self.field_sizes[field] = len(mapping) + 1
-        self.schemas: Dict[str, list] = {}
-        for (kind, event_type), counter in schema_counter.items():
-            signature, _count = counter.most_common(1)[0]
-            key = self.schema_key(kind, event_type)
-            self.schemas[key] = list(signature)
-        self.kind_field = "kind"
-
-    @staticmethod
-    def schema_key(kind: str, event_type: Optional[str]) -> str:
-        return f"{kind}|{event_type or '*'}"
-
-    def encode(self, units: list) -> Dict[str, torch.Tensor]:
-        tensors = {field: [] for field in self.fields}
-        for word in units:
-            for field in self.fields:
-                if field not in word:
-                    tensors[field].append(0)
-                else:
-                    key = jdump(word[field])
-                    idx = self.value_to_id[field].get(key)
-                    if idx is None:
-                        raise KeyError(f"Valore compound fuori mapping {field}={word[field]!r}")
-                    tensors[field].append(idx)
-        return {field: torch.tensor(values, dtype=torch.long) for field, values in tensors.items()}
-
-    def kind_id(self, kind: str) -> Optional[int]:
-        return self.value_to_id.get("kind", {}).get(jdump(kind))
-
-    def value_from_id(self, field: str, idx: int) -> Any:
-        return self.id_to_value.get(field, {}).get(int(idx), None)
-
-    def schema_for(self, kind: str, event_type: Optional[str]) -> list:
-        key = self.schema_key(kind, event_type)
-        if key in self.schemas:
-            return self.schemas[key]
-        generic = self.schema_key(kind, None)
-        return self.schemas.get(generic, ["kind"])
-
-    def final_bar_start(self, units: list) -> int:
-        indices = [i for i, word in enumerate(units) if isinstance(word, dict) and word.get("kind") == "BAR"]
-        return indices[-1] if indices else max(1, len(units) - 2)
-
 
 class CausalBackbone(nn.Module):
     def __init__(self, d_model: int, nhead: int, layers: int, ff: int, dropout: float, max_len: int):
@@ -418,10 +253,8 @@ def count_parameters(model: nn.Module) -> int:
 
 
 def train_one(rep_id: str, records: Dict[str, List[Record]], adapter_meta: dict, args, device: torch.device) -> Tuple[dict, Any, Any]:
-    all_records = records["all"]
-    token_rep = all_records and (not isinstance(all_records[0].units[0], dict))
+    codec, token_rep = fit_train_codec(records, adapter_meta)
     if token_rep:
-        codec = TokenCodec(all_records, int(adapter_meta.get("vocabSize", 0)))
         model = TokenModel(
             vocab_size=codec.vocab_size,
             d_model=args.d_model,
@@ -433,7 +266,6 @@ def train_one(rep_id: str, records: Dict[str, List[Record]], adapter_meta: dict,
         )
         batcher = TokenBatcher(codec, records["train"], args.batch_size, SEED)
     else:
-        codec = CompoundCodec(all_records, adapter_meta.get("metadata") or {})
         model = CompoundModel(
             field_sizes=codec.field_sizes,
             d_model=args.d_model,
@@ -503,7 +335,7 @@ def train_one(rep_id: str, records: Dict[str, List[Record]], adapter_meta: dict,
             "maxLen": args.max_len,
             "parameters": count_parameters(model),
             "amp": amp_name,
-            "microVocabularyMode": "corpus-observed",
+            "microVocabularyMode": "train-only-observed-fail-on-oov",
             "inputOutputCardinality": codec.vocab_size if token_rep else sum(codec.field_sizes.values()),
         },
         "training": {
@@ -744,8 +576,11 @@ def hardware(device: torch.device) -> dict:
 def run_training(args) -> None:
     dataset_path = Path(args.dataset).resolve()
     output_dir = Path(args.output).resolve()
-    output_dir.mkdir(parents=True, exist_ok=True)
     payload, by_rep = parse_dataset(dataset_path)
+    for rep_id in REPRESENTATIONS:
+        fit_train_codec(by_rep[rep_id], payload.get("adapters", {}).get(rep_id, {}))
+    # Results from the historical all-split codec must never be overwritten.
+    output_dir.mkdir(parents=True, exist_ok=False)
 
     if args.device == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("CUDA non disponibile in PyTorch: il Blocco 3 richiede benchmark GPU reale")

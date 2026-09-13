@@ -319,7 +319,9 @@ function readinessForTask(taskPolicy, decisionCounts = {}) {
   const taskReady = Number(decisionCounts.allowed || 0) > 0;
   return {
     taskReady,
-    trainingReady: taskPolicy && taskPolicy.trainingTask === true ? taskReady : null
+    // Per-item admissibility does not certify split isolation, volume, domain
+    // diversity or the aggregate musical gate. This exporter cannot authorize training.
+    trainingReady: taskPolicy && taskPolicy.trainingTask === true ? false : null
   };
 }
 

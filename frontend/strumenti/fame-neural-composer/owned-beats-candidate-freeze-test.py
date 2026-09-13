@@ -65,9 +65,17 @@ class FreezeTests(unittest.TestCase):
                     with self.assertRaisesRegex(RuntimeError,'dependency'):gate.verify_freeze(file,repo,config)
                 lock.write_text('example==2.0\n')
                 with self.assertRaisesRegex(RuntimeError,'dirty'):gate.verify_freeze(file,repo,config)
-                records=[{'compositionFamilyId':'family-1'}]
-                gate.reserve_holdout(root,verified,records)
+                records=[{'compositionFamilyId':'family-1', 'sourceRecordId':'source-1',
+                          'sourceAssetId':'sha256:'+'a'*64, 'sha256':'a'*64}]
+                reference={'cohortId':'synthetic-cohort', 'records':records,
+                           'cohortDigestSha256':gate.cohort_digest(records)}
+                kwargs=dict(cohort_reference=reference, config_hash=verified['configHash'],
+                            protocol_digest_sha256=verified['protocolDigestSha256'],
+                            cohort_reference_digest_sha256='b'*64)
+                with self.assertRaisesRegex(RuntimeError, 'requires frozen cohort reference'):
+                    gate.reserve_holdout(root,verified,records)
+                gate.reserve_holdout(root,verified,records,**kwargs)
                 with self.assertRaises((FileExistsError,RuntimeError)):
-                    gate.reserve_holdout(root,{**verified,'candidateId':'other'},records)
+                    gate.reserve_holdout(root,{**verified,'candidateId':'other'},records,**kwargs)
 
 if __name__ == '__main__':unittest.main()

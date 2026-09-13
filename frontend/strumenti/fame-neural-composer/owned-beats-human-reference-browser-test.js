@@ -2,10 +2,11 @@
 const assert = require('node:assert/strict');
 const http = require('node:http');
 const { chromium } = require('playwright');
-const { renderHtml } = require('./owned-beats/human-reference-pack');
+const holdout = process.env.FAME_TEST_HOLDOUT === '1';
+const renderHtml = holdout ? require('./owned-beats/human-reference-holdout-pack').renderBlindHtml : require('./owned-beats/human-reference-pack').renderHtml;
 const protocol = require('./owned-beats/audio-analysis-v2-protocol.json');
 (async () => {
-  const families = [0,1].map(i => ({sourceRecordId:'FAME'+i,compositionFamilyId:'family'+i,
+  const families = [0,1].map(i => ({blindId:'HR-TEST'+i,sourceRecordId:'FAME'+i,compositionFamilyId:'family'+i,
     sourceSha256:'a'.repeat(64),decodedDurationSeconds:60,fullTrackPath:'audio.wav',
     beatReference:{referenceBpm:120,metricLevel:'PRIMARY_MUSICAL_BEAT',reviewed:true,
       windows:[{position:'EARLY',startSeconds:5,durationSeconds:12,audioPath:'clip.wav',
@@ -38,6 +39,21 @@ const protocol = require('./owned-beats/audio-analysis-v2-protocol.json');
     await page.locator('#familyList button').nth(1).click();
     assert.deepEqual(await page.evaluate(()=>state.families.map(f=>f.reviewCostSeconds)),[3,0]);
     assert.equal(await page.evaluate(()=>timerStarted),null);
+    if (holdout) {
+      assert.match(await page.locator('#familyList').innerText(), /HR-TEST1/);
+      assert.doesNotMatch(await page.locator('#familyList').innerText(), /FAME|family/);
+      assert.match(await page.locator('h2').innerText(), /HR-TEST1/);
+    }
+    const downloadPromise = page.waitForEvent('download');
+    await page.locator('#exportBtn').click();
+    const download = await downloadPromise;
+    const stream = await download.createReadStream();
+    const chunks = []; for await (const chunk of stream) chunks.push(chunk);
+    const exported = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+    assert.equal(exported.reviewId, 'browser-regression');
+    assert.deepEqual(exported.families.map(f=>f.reviewCostSeconds), [3,0]);
+    await page.reload();
+    assert.deepEqual(await page.evaluate(()=>state.families.map(f=>f.reviewCostSeconds)), [3,0]);
     assert.deepEqual(errors,[]);
     console.log('HUMAN REFERENCE BROWSER: PASS (replay, quantize, provenance, review invalidation, timer)');
   } finally {if(browser)await browser.close();await new Promise(resolve=>server.close(resolve))}

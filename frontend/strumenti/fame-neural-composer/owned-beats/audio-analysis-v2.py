@@ -579,12 +579,11 @@ def authorize_analysis_mode(
         return
 
     if mode == EVALUATION_SPLIT:
-        if not confirm_evaluation_holdout:
-            raise RuntimeError(
-                "evaluation-holdout analysis requires "
-                "--confirm-evaluation-holdout"
-            )
-        return
+        raise RuntimeError(
+            "Legacy pre-tuning analyzer cannot evaluate the frozen config-001 holdout. "
+            "Use the dedicated holdout workflow for the remediated R1 v2 cohort; "
+            "--confirm-evaluation-holdout cannot authorize this algorithm."
+        )
 
     raise RuntimeError(
         f"Unsupported analysis mode: {mode}"
