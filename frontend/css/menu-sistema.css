@@ -437,6 +437,20 @@ body.adf-system-open{overflow:hidden}
   display:flex!important;
   pointer-events:none!important;
 }
+/* Sul telefono la plancia si impila e `.pbarra` smette di essere una riga:
+   diventa alta 307 punti, perche' le sei statistiche vanno su tre righe. Il
+   `top:0;bottom:0` qui sopra stirava la nav per tutta quell'altezza e il
+   marchio, che dentro ci sta in mezzo, finiva **sopra alla casella HYPE** —
+   che infatti non si leggeva. Qui la nav torna alta quanto il suo contenuto e
+   si appoggia in alto, dove `#hb-logo` (invisibile ma che conserva il posto)
+   la aspetta. Trovato provando il gioco a 360 punti, non leggendo il CSS. */
+@media (max-width:900px){
+  #s-hub.screen.on .pbarra.adf-system-host-v7 > .adf-global-nav{
+    bottom:auto!important;
+    height:auto!important;
+    align-self:flex-start!important;
+  }
+}
 
 /* ============================================================
    ATTIVITÀ CRIMINALI

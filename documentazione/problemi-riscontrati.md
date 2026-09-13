@@ -1499,3 +1499,42 @@ non e' una prova che il test sia fragile: le prime due spiegazioni erano tutte e
 plausibili, tutte e due scritte con dei numeri veri a supporto, e tutte e due sbagliate. La
 domanda che ha risolto la faccenda non e' stata «quanto ci mette» ma «**chi** l'ha
 ricaricata», e costava un minuto farsela cinque ore prima.
+
+---
+
+## Giro del 13/09/2026 (`task/beat-e-tasto-oro` riapplicato a mano)
+
+Il ramo `task/beat-e-tasto-oro` era dell'08/09 e indietro di 153 commit. Conteneva quattro
+correzioni che `main` non aveva mai ricevuto, ma unirlo avrebbe riportato indietro
+`studioScegliBeatmaker` (sistemato dopo) e il «Punto 14» dello Studio. Quindi: riapplicate
+a mano, una per una, sul codice di adesso.
+
+**Tre su quattro sono entrate.**
+
+- **RISOLTO (13/09/2026) — il marchio non copre piu' HYPE sul telefono.** Misurato a 360
+  punti: nav alta 30 dentro una barra di 307, nessuna sovrapposizione.
+- **RISOLTO (13/09/2026) — «una lavanderia non e' un beat»**, piu' i due ascolti che
+  mancavano allo Studio (`data-stcompra` e `data-bplay`). Il controllo dell'audit sui nomi
+  doppi e' stato aggiornato: adesso distingue la **collisione** (un attributo rubato, che
+  spara l'evento sbagliato) dall'**ascolto voluto** (lo stesso banco, quindi lo stesso
+  evento), e se domani qualcuno stacca quei due lo dice.
+- **RISOLTO (13/09/2026) — in cabina l'oro ce l'ha «Tieni questa e chiudi».** Provato anche
+  in partita, non solo nel sorgente: il tasto `stprimo` e' quello che chiude.
+
+### Il quarto non e' stato riapplicato, ed e' la cosa da ricordare
+
+Il costo in energia per farsi fare un beat (`STUDIO_BEAT_ENERGIA = 20`) **non e' tornato, e
+non deve tornare**. Il 10/09 era stato tolto su richiesta esplicita — «Togli che nello
+studio, per comprare un beat, consumi 20 di energia. Non e' realistico, toglilo.», commit
+`fb731d5` — e rimetterlo sarebbe stato disfare quella decisione.
+
+Me ne sono accorto perche' l'avevo riapplicato e `npm run prova` e' andato rosso su un
+controllo che diceva gia' la regola: **«costa in soldi, non in energia»**. Senza quel
+controllo sarebbe passato, e il gioco sarebbe tornato indietro di tre giorni senza che
+nessuno se ne accorgesse.
+
+**E' esattamente il motivo per cui quel ramo andava riapplicato a mano invece che unito.**
+Un ramo vecchio non contiene solo lavoro che manca: contiene anche decisioni che nel
+frattempo sono state **cambiate apposta**, e l'unione le riporta indietro tutte insieme, in
+silenzio. La differenza fra le due strade non e' la fatica, e' che a mano ogni pezzo passa
+davanti a una domanda — «questo vale ancora?» — e unendo non ci passa nessuno.

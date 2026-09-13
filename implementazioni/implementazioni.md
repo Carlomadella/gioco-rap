@@ -199,10 +199,6 @@ NETWORK 64
    spina». E dentro allo Studio, Cover e Feat una foto loro non ce l'hanno né con né senza
    interfaccia: si tengono in prestito quella della stanza più vicina.
 
-6. Il motore degli eventi non sa che hai comprato un beat se non lo compri dallo Shop. Non è di questa task, ma questa task la allarga (i posti muti sono due su tre invece di uno su due). Sistemarlo vuol dire decidere che nomi deve ascoltare eventi-v2.js: tocca il motore, non lo Studio.
-
-7. Il tasto d'oro in cabina. Nella foto registrazione_pezzo l'oro ce l'ha «UN'ALTRA TAKE», e la foto era la richiesta. Ma la regola scritta in css/studio.css dice che l'oro va alla mossa che fa succedere la cosa — ed è per quella regola che nella sezione Beat «Compralo» è d'oro e «Fattelo fare» no. Qui le due cose non vanno d'accordo: ha vinto la foto, e il risultato è che chi va di fretta preme l'oro e spende 12 di energia senza volerlo. Dimmi e la giro.
-
 8. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo. Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su "stacca la spina", il quinto su "registra un pezzo".
 
 9. quando skippi tante ore ci mette troppo a simulare
@@ -287,9 +283,15 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
 
 Cosa resta aperto, per tua decisione
 
-- beat-e-tasto-oro è ancora lì intatto: contiene quattro fix buoni che main non ha mai ricevuto (il marchio sopra HYPE sul telefono, «una
-  lavanderia non è un beat», il costo energia del beat, l'oro sul tasto che chiude), ma mergiarlo così riporterebbe indietro
-  studioScegliBeatmaker e il «Punto 14». Vanno riapplicati a mano.
+- ~~beat-e-tasto-oro~~ **FATTO (13/09/2026)** — riapplicati a mano su main **tre** dei
+  quattro, non quattro: il marchio sopra HYPE sul telefono, «una lavanderia non è un beat»
+  (più i due ascolti che mancavano allo Studio) e l'oro sul tasto che chiude. Il quarto —
+  il costo in energia del beat — **non è stato riapplicato apposta**: il 10/09 era stato
+  tolto su richiesta («Togli che nello studio, per comprare un beat, consumi 20 di energia.
+  Non è realistico, toglilo.», commit fb731d5), e rimetterlo sarebbe stato disfare quella
+  decisione. Se ne è accorto `npm run prova`, che aveva la regola scritta: «costa in soldi,
+  non in energia». È esattamente il motivo per cui quel ramo andava riapplicato a mano
+  invece che unito: l'unione avrebbe riportato indietro anche quello, in silenzio.
 - L'avvio rapido ci mette 115 secondi e per i primi 50 non si muove niente. Funziona, ma il pulsante si chiama «rapido». È scritto in
   problemi-riscontrati.md.
 - jose e zod restano dove sono, come hai deciso.

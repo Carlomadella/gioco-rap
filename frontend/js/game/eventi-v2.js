@@ -2566,7 +2566,44 @@ document.addEventListener("click",ev=>{
   const buy=ev.target.closest&&ev.target.closest("[data-buy]");
   if(buy){
     const i=+buy.dataset.buy, b=G.market&&G.market[i];
-    setTimeout(()=>emitHook("after_beat_market_action",{action:"buy",beat:b&&b.n}),30);
+    /* `data-buy` non ce l'ha solo lo Shop: il tasto «Rileva» delle attivita'
+       della Strada (strada-crimine-ui.js) porta lo stesso nome, ma con dentro
+       un id testuale tipo "lavanderia". `+"lavanderia"` fa NaN, il beat non si
+       trova, e prima l'evento partiva lo stesso: comprare una lavanderia
+       raccontava al motore che avevi comprato un beat, con `beat: undefined`,
+       e in catalogo c'e' un evento che filtra proprio su action "buy". Si
+       emette solo se l'indice e' davvero un indice e il beat sul banco esiste. */
+    if(Number.isInteger(i) && b)
+      setTimeout(()=>emitHook("after_beat_market_action",{action:"buy",beat:b.n}),30);
+  }
+  /* Il banco dei beat non si guarda solo dallo Shop: la sezione Beat dello
+     Studio pesca dallo **stesso** `G.market` e fa la stessa identica
+     transazione — toglie il beat dal banco, scala i soldi, lo mette in
+     `G.beats`. Cambia solo il nome del tasto (`data-stcompra`), e siccome qui
+     si ascoltavano i nomi e non i fatti, chi comprava dallo Studio per il
+     motore non aveva comprato niente. Non e' un hook nuovo: e' lo stesso,
+     perche' e' la stessa transazione. */
+  const stbuy=ev.target.closest&&ev.target.closest("[data-stcompra]");
+  if(stbuy){
+    const b=typeof studioBeatScelto==="function"?studioBeatScelto():null;
+    const quanti=(G.beats||[]).length;
+    /* a differenza di `data-buy`, qui si guarda se l'acquisto e' andato in
+       porto: se i soldi non bastano la compera si ferma con un avviso, e un
+       evento su una compera mai avvenuta e' peggio di nessun evento. */
+    setTimeout(()=>{
+      if((G.beats||[]).length>quanti)
+        emitHook("after_beat_market_action",{action:"buy",beat:b&&b.n});
+    },30);
+  }
+  /* Stessa storia per l'ascolto: il tondo del banco dello Studio e' un
+     `data-bplay`. Lo stesso attributo ce l'hanno pero' anche i beat che hai
+     gia' in cartella, e quelli non sono catalogo: l'hook parte solo se il seme
+     corrisponde a un beat ancora sul banco. */
+  const stplay=ev.target.closest&&ev.target.closest("[data-bplay]");
+  if(stplay && typeof beatSeed==="function"){
+    const seme=String(stplay.dataset.bplay);
+    const b=(G.market||[]).find(x=>String(beatSeed(x))===seme);
+    if(b) setTimeout(()=>emitHook("after_beat_market_action",{action:"listen",beat:b.n}),20);
   }
   const gear=ev.target.closest&&ev.target.closest("[data-gear]");
   if(gear){
