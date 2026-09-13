@@ -1159,7 +1159,7 @@ console.log("\nlo Studio: la gente della Sala conta");
        sola. */
     const sezioni = dentro("STUDIO_SEZIONI.map(x => x.id)");
     controlla("le sezioni sono le sette del punto 4, più la cabina",
-      sezioni.join(",") === "beat,testo,cabina,banco,cover,feat,promo,fuori",
+      sezioni.join(",") === "beat,testo,cabina,banco,cover,feat,fuori,promo",
       sezioni.join(","));
     const rotte = [];
     for(const s of sezioni){

@@ -231,8 +231,6 @@ NETWORK 64
 
 6. non posso scegliere i feat, e inoltre non posso fare canzoni senza feat
 
-7. marketing deve essere dopo timing
-
 8. non posso spingere una canzone che non è ancora uscita, al massimo faccio uscire una preview
 
 9. Come nell'interfaccia dei beatmaker, nella sezione dove si posta il pezzo per hype' non fa cliccare su nessun pezzo se non su quello già selezionato.
