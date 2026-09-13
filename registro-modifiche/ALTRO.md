@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:bc14d1d -->
+## 13/09/26, 19:55 â€” task/tasto-compralo-fuori-schermo â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `bc14d1d`
+
+### Cosa Ã¨ entrato
+
+- `4a67409` â€” Merge branch 'main' into task/tasto-compralo-fuori-schermo â€” **Carlomadella**
+- `5f91dc2` â€” fix(studio): il tasto «Compralo» non finisce piu' fuori dallo schermo â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:48dc367 -->
 ## 12/09/26, 17:55 â€” origin/feat/stato-account-landing-v2-20260912-175446 â†’ main
 

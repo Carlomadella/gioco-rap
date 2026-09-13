@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:bc14d1d -->
+## 13/09/26, 19:55 â€” task/tasto-compralo-fuori-schermo â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `bc14d1d`
+
+### Cosa Ã¨ entrato
+
+- `4a67409` â€” Merge branch 'main' into task/tasto-compralo-fuori-schermo â€” **Carlomadella**
+- `5f91dc2` â€” fix(studio): il tasto «Compralo» non finisce piu' fuori dallo schermo â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/studio.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:18824d8 -->
 ## 13/09/26, 17:44 â€” task/beat-e-tasto-oro-riapplicato â†’ main
 
