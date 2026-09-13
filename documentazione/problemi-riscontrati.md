@@ -1362,3 +1362,22 @@ sta aspettando davanti allo schermo. Cosi' l'avvio rapido resta coperto — e' i
 dove il bug si era nascosto — senza che la verifica di tutti i giorni duri dieci minuti. Un
 controllo dell'audit tiene insieme le due meta': se il marchio sparisce dalla catena o il
 passaggio sparisce dalla CI, l'audit lo dice.
+
+**Nota del 13/09/2026, per chi ci ricasca.** Il giro lungo e' stato provato cinque volte di
+fila sulla macchina di sviluppo e cinque volte e' andato rosso, con punti di blocco diversi:
+una volta fermo sulla landing, una sulla schermata «Si sta accendendo tutto», una con
+MakeHuman a meta'. Prima di dare la colpa al codice conviene guardare due cose, perche' in
+questo caso erano tutte e due la spiegazione:
+
+1. **I file del gioco erano identici a `main`** — `git diff main -- frontend/js frontend/pagine
+   frontend/css frontend/media` non dava niente. Quel ramo non aveva toccato una riga di
+   gioco: tutto quello che riguardava l'avvio rapido era arrivato da `main` con l'unione.
+2. **La memoria libera era 2,2 GB su 16**, con un altro agente che lavorava in parallelo e
+   tredici processi del browser aperti. Il giro lungo carica 145 MB e ne costruisce 19158
+   vertici: con quella memoria non arriva in fondo nemmeno in dieci minuti. Con la macchina
+   scarica, lo stesso identico codice ci aveva messo 114, 115 e 126 secondi.
+
+Nel mezzo e' saltato fuori anche un errore vero, ma della prova e non del gioco: il controllo
+che doveva tollerare le navigazioni cercava «frame was detached» con la regex sensibile alle
+maiuscole, e l'errore che arriva davvero e' «**F**rame was detached». Passava oltre proprio
+il caso piu' frequente.
