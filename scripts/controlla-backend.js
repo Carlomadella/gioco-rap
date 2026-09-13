@@ -86,7 +86,9 @@ if (sq && pg) {
   if (mancaSq.length) segnala("tabelle che esistono solo in PostgreSQL", mancaSq);
 
   // 3. schema.md e' il disegno: se non conosce una tabella vera, e' rimasto indietro.
-  //    (Il file non sta in git: se manca, si salta il controllo.)
+  //    Dal 13/09/2026 sta in git, quindi c'e' su tutte le macchine e questo controllo
+  //    guarda davvero qualcosa dappertutto. La lettura difensiva resta per le copie
+  //    vecchie, dove il file non c'era.
   const schema = leggi(path.join(BE, "database", "schema.md"));
   if (schema) {
     const ignote = menoDi(tabSq, tabelle(schema));

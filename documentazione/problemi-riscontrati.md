@@ -1429,3 +1429,21 @@ file dietro.
 - **quanto pesa** — da decidere, ed e' una decisione, non una correzione: se in quel file
   non c'e' niente di sensibile, il suo posto e' in git. Finche' resta fuori, ogni giro di
   allineamento lo rifa' da capo uno solo, sulla sua copia.
+
+**RISOLTO (13/09/2026)** — `schema.md` e' in git. Prima di metterlo dentro il file e' stato
+letto per intero, tutte e 884 le righe, cercando credenziali, stringhe di connessione, host,
+indirizzi IP, chiavi, email e dati di persone: **nessun riscontro**. Anzi, il § 4 documenta
+proprio il contrario — che le password degli store non le vediamo mai, che l'IP sta solo
+come `ip_hash` con un sale che sta nella configurazione e non nel codice, e che le barre
+scritte dai giocatori non vengono ne' indicizzate ne' lette.
+
+E l'esclusione non era motivata: il commit che l'ha creato (`7b70be6`, 31/08/2026) lo mette
+fuori «come `backend.md`», per vicinanza, senza nessuna valutazione. Nel `.gitignore` le
+cose con le password hanno un blocco loro, con sopra scritto «mai in git»; `schema.md` non
+era li'.
+
+Insieme al file sono cambiate tre cose che altrimenti restavano false: la riga in testa
+diceva «questo file non si pusha», il commento di `scripts/controlla-backend.js` dava per
+scontato che il file potesse mancare, e le regole del § 5 parlavano di due file per
+migrazione. Adesso sono tre — le due gemelle **e questo documento**, nello stesso commit —
+ed e' la regola che nasce da questo giro.
