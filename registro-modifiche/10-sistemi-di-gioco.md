@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:4515ce0 -->
+## 13/09/26, 17:12 â€” task/watcher-uccide-la-partita â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `4515ce0`
+
+### Cosa Ã¨ entrato
+
+- `d4a33fd` â€” fix(dev): il watcher non ricarica piu' la pagina in mezzo alla partita â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/test/e2e/gameplay.spec.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:541eacc -->
 ## 13/09/26, 15:18 â€” test/vitest-playwright-gate â†’ main
 
