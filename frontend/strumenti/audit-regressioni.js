@@ -722,6 +722,17 @@ test("gli attributi dello Studio non rubano il nome a quelli che ascolta tutto i
 /* Il giro di fine task del 08/09/2026 (documentazione/problemi-riscontrati.md)
    ha trovato queste cose sulla roba nuova dello Studio. Sistemate: qui restano
    le prove, che sono l'unico modo perche' non tornino. */
+/* Il «Compralo» della sezione Beat finiva nove pixel sotto il bordo della
+   finestra a 1280x800, e duecentottanta su un telefono: c'erano tre schede e
+   nessun segno che sotto ci fosse un tasto. La barra dei tasti adesso si
+   appoggia al fondo della colonna che scorre. Se qualcuno toglie la regola,
+   il tasto torna fuori dallo schermo e nessuno se ne accorge finche' non
+   chiede «ma come si compra un beat?». */
+test("i tasti dello Studio restano nello schermo anche quando il pannello scorre",
+  studioCss.includes(".stcol .stpan .stazioni") &&
+  studioCss.includes("position:sticky") &&
+  studioCss.includes("bottom:0"));
+
 /* La regola dell'oro: uno solo per schermata, e ce l'ha la mossa che **fa
    succedere la cosa** — e' per quella che nel Beat «Compralo» e' d'oro e
    «Fattelo fare» no. In cabina aveva vinto la foto `registrazione_pezzo`,
