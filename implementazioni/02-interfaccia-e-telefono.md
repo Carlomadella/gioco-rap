@@ -1451,3 +1451,35 @@ I tre punti dello Studio e la regola dell'hover hanno il loro controllo in
 telefono vero. Qui l'estensione Chrome non era collegata, quindi queste sono misure lette
 nel CSS e nel codice, non schermate rifatte — il giro con `prova-sul-telefono` resta da
 fare.
+
+## Il tasto d'oro in cabina
+
+~~«Nella foto `registrazione_pezzo` l'oro ce l'ha "UN'ALTRA TAKE", e la foto era la
+richiesta. Ma la regola dice che l'oro va alla mossa che fa succedere la cosa — ed è per
+quella regola che nella sezione Beat "Compralo" è d'oro e "Fattelo fare" no. Ha vinto la
+foto, e il risultato è che chi va di fretta preme l'oro e spende 12 di energia senza
+volerlo. Dimmi e la giro.»~~
+**FATTO (13/09/2026)** — girata.
+
+In cabina l'oro ce l'ha adesso **«Tieni questa e chiudi»**, e «Un'altra take · 12 energia»
+è passata al tasto secondario. La regola vince sulla foto, e il perché è che la regola non
+è un gusto: sta scritta sopra a `stPrimo()` in `frontend/js/game/studio.js` — *«uno solo
+per schermata è d'oro, ed è quello che fa succedere la cosa»* — ed è la stessa che fa
+d'oro «Compralo» e non «Fattelo fare» due sezioni più in là. Tenere la foto qui voleva
+dire avere due sezioni dello Studio che usano l'oro per dire due cose diverse, e il danno
+non era estetico: il tasto grosso era quello che ti toglieva dodici di energia.
+
+Il controllo sta in `audit-regressioni.js` («in cabina l'oro ce l'ha «Tieni questa e
+chiudi», non «Un'altra take»») e guarda tutte e due le cose: che l'oro sia sul tasto
+giusto **e** che «Un'altra take» sia rimasta secondaria, se no basta rigirarla per metà.
+Provato anche in partita: il tasto `stprimo` è «Tieni questa e chiudi».
+
+## Il marchio non copre più HYPE sul telefono
+
+**FATTO (13/09/2026)** — sotto i 900 punti la plancia si impila e `.pbarra` smette di
+essere una riga: diventa alta 307 punti, perché le sei statistiche vanno su tre righe. Il
+`top:0;bottom:0` della nav la stirava per tutta quell'altezza e il marchio, che dentro ci
+sta in mezzo, finiva **sopra alla casella HYPE** — che infatti non si leggeva. Adesso una
+media query rimette la nav alta quanto il suo contenuto e la appoggia in alto, dove
+`#hb-logo` (invisibile ma che conserva il posto) la aspetta. Misurato a 360 punti: nav
+alta 30 punti dentro una barra di 307, e nessuna sovrapposizione con HYPE.

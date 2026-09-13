@@ -725,10 +725,19 @@ function studioSezCabina(){
         (ft ? ' · <b>' + studioEsc(ft.n) + '</b> in sessione ' + stNum("+" + aiutoFt) : '') +
         (t ? ' · ' + stFreccia() + ' esce con ' + stOro("q" + scelta) : '')) +
       stAzioni(
-        stPrimo(' data-ancora="1"',
+        /* L'oro ce l'ha «Tieni questa e chiudi», non «Un'altra take».
+           Nella foto `registrazione_pezzo` era il contrario, e per un po' ha
+           vinto la foto: ma la regola di questa pagina — scritta su `stPrimo`
+           e valida in tutte le altre sezioni — dice che l'oro va alla mossa
+           che **fa succedere la cosa**, ed e' per quella regola che nel Beat
+           «Compralo» e' d'oro e «Fattelo fare» no. Qui la mossa che fa
+           succedere la cosa e' chiudere: «Un'altra take» ripete e basta.
+           Con l'oro sull'altro, chi andava di fretta premeva il tasto grosso
+           e si ritrovava dodici di energia in meno senza volerlo. */
+        stPrimo(' data-az="registra"', "Tieni questa e chiudi", "spunta"),
+        stSecondo(' data-ancora="1"',
           "Un'altra take · " + STUDIO_TAKE_ENERGIA + " energia", "mic",
-          G.energy < STUDIO_TAKE_ENERGIA || (t && t.l.length >= STUDIO_TAKE_MAX)),
-        stSecondo(' data-az="registra"', "Tieni questa e chiudi", "spunta")) +
+          G.energy < STUDIO_TAKE_ENERGIA || (t && t.l.length >= STUDIO_TAKE_MAX))) +
       (G.energy < STUDIO_TAKE_ENERGIA
         ? '<p class="stperche">Per un\'altra take servono ' + STUDIO_TAKE_ENERGIA +
           ' di energia, ne hai ' + Math.round(G.energy) + '.</p>'

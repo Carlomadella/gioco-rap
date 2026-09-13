@@ -535,3 +535,25 @@ disegno sopra.
 > `chatSettimana()` venti volte, verificando che non scriva mai più di una persona per
 > chiamata. `npm run prova` pulito sulla parte chat; le due prove che risultano rotte
 > (`js/creator3d/*`) sono lavoro di un altro, non toccato da qui.
+
+## Il motore degli eventi e i beat comprati fuori dallo Shop
+
+~~«Il motore degli eventi non sa che hai comprato un beat se non lo compri dallo Shop.
+Sistemarlo vuol dire decidere che nomi deve ascoltare eventi-v2.js: tocca il motore, non lo
+Studio.»~~ **FATTO (13/09/2026)**
+
+`eventi-v2.js` ascolta i click su tutto il documento, e ascoltava i **nomi degli
+attributi** invece dei fatti. La sezione Beat dello Studio pesca dallo stesso `G.market`
+dello Shop e fa la stessa identica transazione, ma col tasto che si chiama
+`data-stcompra`: chi comprava di là, per il motore, non aveva comprato niente. Adesso
+l'hook è lo stesso — perché è la stessa transazione — e parte solo se l'acquisto è andato
+davvero in porto (se i soldi non bastano, niente evento). Stessa cosa per l'ascolto
+(`data-bplay`), che però parte solo se il seme corrisponde a un beat **ancora sul banco**:
+quelli che hai già in cartella non sono catalogo.
+
+E nello stesso giro è saltata fuori la faccia opposta del problema: **una lavanderia non è
+un beat**. Il tasto «Rileva» delle attività della Strada porta anche lui `data-buy`, ma con
+dentro un id testuale; `+"lavanderia"` fa `NaN`, il beat non si trovava e l'evento partiva
+lo stesso, con `beat: undefined` — e in catalogo c'è un evento che filtra proprio su
+`action: "buy"`. Adesso si emette solo se l'indice è davvero un indice e il beat sul banco
+esiste.

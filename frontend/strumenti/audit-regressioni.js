@@ -698,12 +698,23 @@ test("gli attributi dello Studio non rubano il nome a quelli che ascolta tutto i
     /* quelli che eventi-v2 intercetta a livello di documento */
     const suoi = (ev.match(/closest\("\[data-([a-z-]+)\]"\)/g) || [])
       .map(x => x.replace(/.*data-([a-z-]+).*/, "$1"));
-    /* quelli che lo Studio si e' inventato in questa task */
-    const miei = ["stcompra","bcard","bplay","take","tplay","ancora","ascolta",
-                  "quando","manda","riprendi","vesti","curs","tema","strofa","incide"];
+    /* quelli che lo Studio si e' inventato */
+    const tutti = ["stcompra","bcard","bplay","take","tplay","ancora","ascolta",
+                   "quando","manda","riprendi","vesti","curs","tema","strofa","incide"];
+    /* Due sono ascoltati **apposta**, e non sono una collisione: la sezione
+       Beat dello Studio pesca dallo stesso `G.market` dello Shop, quindi
+       comprare o ascoltare li' e' comprare o ascoltare sul banco, e il motore
+       deve sentirlo. La differenza con `data-compra` del guardaroba e' tutta
+       qui: quello sparava l'evento **sbagliato**, questi sparano quello
+       giusto. Restano fuori dal conto, ma devono davvero essere ascoltati: se
+       domani qualcuno li stacca, questa lista mente e la prova cade. */
+    const voluti = ["stcompra","bplay"];
+    const miei = tutti.filter(m => voluti.indexOf(m) < 0);
     const rubati = miei.filter(m => suoi.indexOf(m) >= 0);
+    const sordi = voluti.filter(m => suoi.indexOf(m) < 0);
     if(rubati.length) console.log("      nomi in comune: " + rubati.join(", "));
-    return rubati.length === 0 &&
+    if(sordi.length) console.log("      dati per ascoltati ma non lo sono: " + sordi.join(", "));
+    return rubati.length === 0 && sordi.length === 0 &&
       /* e nessuno di loro e' rimasto scritto come `data-compra` */
       !studioEl.includes('"[data-compra]"') && !studio.includes(' data-compra=');
   })());
@@ -711,6 +722,30 @@ test("gli attributi dello Studio non rubano il nome a quelli che ascolta tutto i
 /* Il giro di fine task del 08/09/2026 (documentazione/problemi-riscontrati.md)
    ha trovato queste cose sulla roba nuova dello Studio. Sistemate: qui restano
    le prove, che sono l'unico modo perche' non tornino. */
+/* La regola dell'oro: uno solo per schermata, e ce l'ha la mossa che **fa
+   succedere la cosa** — e' per quella che nel Beat «Compralo» e' d'oro e
+   «Fattelo fare» no. In cabina aveva vinto la foto `registrazione_pezzo`,
+   dove l'oro ce l'ha «UN'ALTRA TAKE»: chi andava di fretta premeva il tasto
+   grosso e si ritrovava 12 di energia in meno senza volerlo. */
+test("in cabina l'oro ce l'ha «Tieni questa e chiudi», non «Un'altra take»",
+  studio.includes(`stPrimo(' data-az="registra"', "Tieni questa e chiudi"`) &&
+  studio.includes(`stSecondo(' data-ancora="1"'`) &&
+  !studio.includes(`stPrimo(' data-ancora="1"'`));
+
+/* Il banco dello Studio e' lo stesso dello Shop, ma il motore ascoltava i nomi
+   degli attributi invece dei fatti: chi comprava dallo Studio, per gli eventi,
+   non aveva comprato niente. */
+test("il motore degli eventi sente il beat comprato anche dallo Studio",
+  ev.includes('closest("[data-stcompra]")') &&
+  /* e non spara l'evento se i soldi non bastavano */
+  ev.includes("if((G.beats||[]).length>quanti)"));
+
+/* `data-buy` non ce l'ha solo lo Shop: il tasto «Rileva» della Strada porta lo
+   stesso nome con dentro un id testuale. Comprare una lavanderia raccontava al
+   motore che avevi comprato un beat. */
+test("comprare un'attivita' della Strada non passa piu' per il mercato dei beat",
+  ev.includes("if(Number.isInteger(i) && b)"));
+
 test("la take vale solo per la strofa e il beat su cui l'hai pagata",
   /* la targhetta si guarda anche al momento di registrare, non solo in cabina */
   studioEl.includes("const mia = d.k === studioTakeChiave();") &&
