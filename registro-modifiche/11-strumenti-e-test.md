@@ -6,6 +6,41 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:541eacc -->
+## 13/09/26, 15:18 â€” test/vitest-playwright-gate â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `541eacc`
+
+### Cosa Ã¨ entrato
+
+- `fea873b` â€” docs: scrive la diagnosi del giro lungo, per chi ci ricasca â€” **Carlomadella**
+- `83a695f` â€” test: il controllo sulle navigazioni non prendeva l'errore piu' frequente â€” **Carlomadella**
+- `dad1c62` â€” test: il giro lungo nel browser esce dalla catena di ogni push â€” **Carlomadella**
+- `007de3d` â€” test: alza il tetto dell'attesa dell'avvio rapido a dieci minuti â€” **Carlomadella**
+- `8507075` â€” merge: porta il ramo del gate di prove sopra main â€” **Carlomadella**
+- `288fa6c` â€” docs: appunti nuovi in implementazioni â€” **Carlomadella**
+- `b4a6202` â€” docs(dipendenze): il registro dice quello che c'e' davvero, debito compreso â€” **Carlomadella**
+- `e78ed6d` â€” test: il gate di verifica fa girare prove vere, e trova l'avvio rapido rotto â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/dipendenze.md`
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `frontend/README.md`
+- **Modificato:** `frontend/package-lock.json`
+- **Modificato:** `frontend/package.json`
+- **Aggiunto:** `frontend/playwright.config.js`
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+- **Modificato:** `frontend/strumenti/dev.js`
+- **Aggiunto:** `frontend/test/e2e/gameplay.spec.js`
+- **Aggiunto:** `frontend/test/e2e/server-lifecycle.js`
+- **Aggiunto:** `frontend/test/unit/gameplay-regressions.test.js`
+
+**File interessati in questa categoria:** 11
+
+---
+
 <!-- merge:fe258b4 -->
 ## 12/09/26, 21:24 â€” origin/fix/rimuove-continua-menu-avvio-20260912-212414 â†’ main
 
