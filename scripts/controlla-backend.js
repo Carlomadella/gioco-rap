@@ -86,12 +86,31 @@ if (sq && pg) {
   if (mancaSq.length) segnala("tabelle che esistono solo in PostgreSQL", mancaSq);
 
   // 3. schema.md e' il disegno: se non conosce una tabella vera, e' rimasto indietro.
-  //    (Il file non sta in git: se manca, si salta il controllo.)
+  //    Dal 13/09/2026 sta in git, quindi c'e' su tutte le macchine e questo controllo
+  //    guarda davvero qualcosa dappertutto. La lettura difensiva resta per le copie
+  //    vecchie, dove il file non c'era.
   const schema = leggi(path.join(BE, "database", "schema.md"));
   if (schema) {
     const ignote = menoDi(tabSq, tabelle(schema));
     if (ignote.length) segnala("tabelle vere che schema.md non conosce", ignote);
   }
+}
+
+// 4. Le manopole che il codice legge davvero, contro quelle che il README elenca.
+//    Il 13/09/2026 ne mancavano sei su ventiquattro: tre indirizzi che si cambiano
+//    per provare senza uscire in rete, le due della manutenzione e quella della
+//    prova. Chi mette su il server le cerca li' e non le trova.
+const fontiEnv = ["server.js", "accessi.js", "prova.js", "risposte.js", "ambiente.js", "carico.js"]
+  .map(n => leggi(path.join(BE, n)))
+  .filter(Boolean)
+  .join(" ");
+const readmeBe = leggi(path.join(BE, "README.md"));
+if (fontiEnv && readmeBe) {
+  const usate = new Set(fontiEnv.match(/ADF_[A-Z_]+/g) || []);
+  const scritte = new Set(readmeBe.match(/ADF_[A-Z_]+/g) || []);
+  const senzaRiga = menoDi(usate, scritte);
+  if (senzaRiga.length)
+    segnala("manopole che il codice legge ma backend/README.md non elenca", senzaRiga);
 }
 
 if (!problemi.length) {

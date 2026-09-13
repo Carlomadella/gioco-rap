@@ -1381,3 +1381,69 @@ Nel mezzo e' saltato fuori anche un errore vero, ma della prova e non del gioco:
 che doveva tollerare le navigazioni cercava «frame was detached» con la regex sensibile alle
 maiuscole, e l'errore che arriva davvero e' «**F**rame was detached». Passava oltre proprio
 il caso piu' frequente.
+
+---
+
+## Giro del 13/09/2026 (branch `task/backend-schema-allineato`)
+
+Le quattro voci del giro di `backend-allineato`, una per una.
+
+**RISOLTO (13/09/2026) — «Quattro variabili d'ambiente che il codice legge e nessun
+documento nomina».** Erano **sei**, non quattro: oltre a `ADF_APPLE_JWKS`,
+`ADF_GOOGLE_JWKS`, `ADF_STEAM_URL` e `ADF_TIENI` mancavano anche `ADF_MANUTENZIONE` e
+`ADF_MANUTENZIONE_FINO`, cioe' le due che spengono il server quando si mette mano al
+database. Adesso la tabella di `backend/README.md` le ha tutte e ventiquattro, con una
+riga in piu' che spiega che le tre degli indirizzi (`...JWKS`, `ADF_STEAM_URL`) **non sono
+da riempire**: hanno gia' dentro l'indirizzo vero di Apple, Google e Steam, e si toccano
+solo per provare l'ingresso senza uscire in rete.
+
+E perche' non risucceda, `scripts/controlla-backend.js` ha un quarto controllo che
+confronta le `ADF_` lette dal codice con quelle elencate nel README. Provato che morda:
+tolta una riga a mano, dice «manopole che il codice legge ma backend/README.md non elenca:
+ADF_MANUTENZIONE» ed esce con errore.
+
+**APERTA per decisione, non per pigrizia — «`jose` e `zod` stanno fra le `dependencies`».**
+Confermato: non le importa nessuno, e stando fra le `dependencies` viaggiano nel pacchetto
+di produzione da peso morto. Non le ho tolte perche' la strada giusta non e' togliere:
+`jose` e' **la prima della lista** di quelle che devono entrare davvero, al posto della
+verifica dei token Apple e Google scritta a mano in `backend/accessi.js` — che e' il punto
+peggiore del progetto dove risparmiare. Disinstallarla vorrebbe dire cancellare una
+decisione gia' presa; usarla e' una task sua. Il registro in
+[`dipendenze.md`](dipendenze.md) lo dice gia', nella tabella di quelle entrate senza un
+file dietro.
+
+### `schema.md` non sta in git, ed e' il motivo per cui si e' disallineato
+
+- **dove** — `.gitignore` riga 9, e `backend/database/schema.md`.
+- **cosa succede** — il disegno del database **non e' tracciato**: sta nel `.gitignore`
+  insieme a `backend.md` e a `backend/.env.local`, quello delle password.
+  `git ls-files backend/database/schema.md` non torna niente. Chi clona il progetto quel
+  file non ce l'ha, e infatti `scripts/controlla-backend.js:88` mette in conto che possa
+  mancare e in quel caso salta il controllo. Non lo genera nessuno script: e' scritto a
+  mano. Ma lo citano cinque documenti che invece in git ci sono, fra cui
+  [`come-si-lavora.md`](come-si-lavora.md) e la scheda dell'agente `backend-allineato`.
+- **perche' conta** — e' la spiegazione delle altre due voci su `schema.md`. Un documento
+  che non passa da nessun merge non lo rilegge nessuno in revisione, e si allontana dal
+  codice senza che se ne accorga niente e nessuno: e' esattamente quello che e' successo,
+  fino ad avere nomi di colonna che il database non ha.
+- **quanto pesa** — da decidere, ed e' una decisione, non una correzione: se in quel file
+  non c'e' niente di sensibile, il suo posto e' in git. Finche' resta fuori, ogni giro di
+  allineamento lo rifa' da capo uno solo, sulla sua copia.
+
+**RISOLTO (13/09/2026)** — `schema.md` e' in git. Prima di metterlo dentro il file e' stato
+letto per intero, tutte e 884 le righe, cercando credenziali, stringhe di connessione, host,
+indirizzi IP, chiavi, email e dati di persone: **nessun riscontro**. Anzi, il § 4 documenta
+proprio il contrario — che le password degli store non le vediamo mai, che l'IP sta solo
+come `ip_hash` con un sale che sta nella configurazione e non nel codice, e che le barre
+scritte dai giocatori non vengono ne' indicizzate ne' lette.
+
+E l'esclusione non era motivata: il commit che l'ha creato (`7b70be6`, 31/08/2026) lo mette
+fuori «come `backend.md`», per vicinanza, senza nessuna valutazione. Nel `.gitignore` le
+cose con le password hanno un blocco loro, con sopra scritto «mai in git»; `schema.md` non
+era li'.
+
+Insieme al file sono cambiate tre cose che altrimenti restavano false: la riga in testa
+diceva «questo file non si pusha», il commento di `scripts/controlla-backend.js` dava per
+scontato che il file potesse mancare, e le regole del § 5 parlavano di due file per
+migrazione. Adesso sono tre — le due gemelle **e questo documento**, nello stesso commit —
+ed e' la regola che nasce da questo giro.

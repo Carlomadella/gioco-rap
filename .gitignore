@@ -6,7 +6,6 @@ frontend/blob-report/
 frontend/debug.log
 .DS_Store
 backend/database/dati/
-backend/database/schema.md
 backend/node_modules/
 backend.md
 
