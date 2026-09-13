@@ -110,8 +110,24 @@ function fileDavveroModificato(file){
 /* si guarda la cartella, ma si sta zitti per 80 ms: salvare un file fa
    scattare l'evento due o tre volte, e ricaricare tre volte e' fastidioso */
 let attesa = null;
-fs.watch(RADICE, { recursive: true }, (tipo, file) => {
-  if(!file || /node_modules|[\\/]dist[\\/]|\.tmp$|~$/.test(file)) return;
+
+/* DUE COSE NON SI GUARDANO PROPRIO, e il motivo e' lo stesso.
+
+   1. Le cartelle di dati (`data/`, `vendor/`, `.runtime-*`): li' dentro non c'e'
+      niente che si scrive a mano, ci sono gli asset che MakeHuman **legge**. Su
+      Windows fs.watch notifica anche le letture, e il controllo dell'impronta qui
+      sotto non le ferma: un file letto per la prima volta un'impronta non ce l'ha
+      ancora, e il ramo `prev === undefined` lo dava per modificato.
+      Costava caro. L'avvio rapido sceglie un preset a caso fra quattordici, quindi
+      carica una skin diversa ogni volta: la prima volta che ne toccava una nuova il
+      server diceva «cambiato», la landing si ricaricava e la partita appena avviata
+      moriva — con l'aria di essere colpa del gioco, e in modo intermittente, perche'
+      dipendeva da quale preset usciva. Misurato il 13/09/2026: evento del server 900
+      ms dopo l'avvio rapido, pagina ricaricata 200 ms dopo.
+   2. Con --playwright il watcher e' spento del tutto: mentre girano le prove nessuno
+      sta salvando file, e una ricarica a sorpresa non e' un aiuto, e' un falso rosso. */
+if(!PLAYWRIGHT) fs.watch(RADICE, { recursive: true }, (tipo, file) => {
+  if(!file || /node_modules|(?:^|[\\/])dist[\\/]|(?:^|[\\/])data[\\/]|(?:^|[\\/])vendor[\\/]|(?:^|[\\/])\.runtime|\.tmp$|~$/.test(file)) return;
   if(!/\.(?:html|css|js|json)$/i.test(String(file))) return;
 
   if(!fileDavveroModificato(file)) return;

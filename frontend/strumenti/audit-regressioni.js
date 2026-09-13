@@ -110,15 +110,25 @@ test("CI usa npm ci con Node 22 e cache del lockfile frontend",
   ciWorkflow.includes("node-version: 22") &&
   ciWorkflow.includes("run: npm ci") &&
   ciWorkflow.includes("frontend/package-lock.json"));
-/* La prova lunga sta fuori dalla catena di tutti i giorni, ma non deve
-   sparire: se non gira almeno in CI, l'avvio rapido torna scoperto — ed e'
-   il percorso dove il bug si era nascosto. */
-test("il giro lungo nel browser resta fuori dalla catena ma gira in CI",
+/* Il giro lungo sta DENTRO alla catena, e ci deve restare: e' il percorso
+   dove il bug si era nascosto. Era stato messo fuori il 13/09 credendolo
+   instabile; non lo era — a farlo fallire era il watcher del server di
+   sviluppo, che ricaricava la pagina in mezzo alla partita (vedi il commento
+   in strumenti/dev.js). Se qualcuno lo rimette fuori, questo controllo lo
+   dice, e la domanda da farsi e' se il motivo e' vero o e' un'altra diagnosi
+   sbagliata. */
+test("il giro lungo nel browser gira dentro alla catena",
   pkg.scripts && pkg.scripts["test:e2e"] &&
-  pkg.scripts["test:e2e"].includes("--grep-invert @lento") &&
+  pkg.scripts["test:e2e"] === "playwright test" &&
   pkg.scripts["test:e2e:lento"] &&
-  pkg.scripts["test:e2e:lento"].includes("--grep @lento") &&
-  ciWorkflow.includes("run: npm run test:e2e:lento"));
+  pkg.scripts["test:e2e:lento"].includes("--grep @lento"));
+/* Il watcher non deve tornare a guardare le cartelle dei dati: e' la causa
+   vera di quei rossi, e senza questo controllo ci si ricasca al primo che
+   "semplifica" quella riga. */
+test("il server di sviluppo non sorveglia le cartelle dei dati",
+  leggi("strumenti/dev.js").includes("data" + String.fromCharCode(91)) &&
+  leggi("strumenti/dev.js").includes("vendor" + String.fromCharCode(91)) &&
+  leggi("strumenti/dev.js").includes("if(!PLAYWRIGHT) fs.watch"));
 test("CI installa Chromium prima del gate completo",
   ciWorkflow.includes("run: npx playwright install --with-deps chromium") &&
   ciWorkflow.indexOf("run: npx playwright install --with-deps chromium") <

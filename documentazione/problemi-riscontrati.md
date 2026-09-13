@@ -1447,3 +1447,55 @@ diceva «questo file non si pusha», il commento di `scripts/controlla-backend.j
 scontato che il file potesse mancare, e le regole del § 5 parlavano di due file per
 migrazione. Adesso sono tre — le due gemelle **e questo documento**, nello stesso commit —
 ed e' la regola che nasce da questo giro.
+
+---
+
+## Giro del 13/09/2026 (la causa vera dei rossi del giro lungo)
+
+**Le due diagnosi scritte qui sopra erano sbagliate tutte e due, e vanno lette sapendolo.**
+Prima «la prova e' lenta, alziamo il tetto» (da 25 a 240 a 600 secondi). Poi «non e'
+fragile, e' pesante: dipende da quanto e' occupato il computer». Tutte e due erano
+ragionevoli e tutte e due guardavano dalla parte sbagliata.
+
+### Era il watcher del server di sviluppo a uccidere la partita
+
+- **dove** — `frontend/strumenti/dev.js`, il `fs.watch` e la funzione
+  `fileDavveroModificato()`.
+- **cosa succede** — il server di sviluppo sorveglia la cartella e, quando un file cambia,
+  dice al browser di ricaricare. Solo che su Windows `fs.watch` notifica **anche le
+  letture**, e MakeHuman di file ne legge tanti. Il controllo dell'impronta che stava li'
+  apposta non li fermava, per una ragione scritta nel suo stesso commento: le impronte si
+  registrano quando il server **serve** un file, e un file letto per la prima volta
+  un'impronta non ce l'ha ancora — il ramo `prev === undefined` lo dava per modificato. Il
+  risultato: il server mandava «cambiato», la landing si ricaricava e **la partita appena
+  avviata moriva**, iframe del creator compreso.
+- **perche' sembrava intermittente** — l'avvio rapido sceglie un preset a caso fra
+  quattordici, quindi carica una **skin diversa ogni volta**. Finche' usciva una skin gia'
+  letta, nessuna ricarica e la prova passava; alla prima skin nuova, ricarica e rosso. Da
+  qui i «a volte passa a volte no» che facevano pensare al carico della macchina.
+- **come si vede** — in un terminale, mentre gira l'avvio rapido:
+  `curl -N http://127.0.0.1:8000/__ricarica`. Il 13/09 l'evento `data: cambiato` arrivava
+  900 ms dopo l'avvio rapido, e 200 ms dopo la pagina era tornata alla landing. I file che
+  lo scatenavano, presi con un watcher gemello:
+  `media/makehuman-editor-v1/data/skins/<skin>/<skin>.json`.
+- **quanto pesava** — bloccava il giro lungo, e non solo: **capita anche a chi gioca dal
+  server di sviluppo**, non solo alle prove. Chi apriva l'avvio rapido e si vedeva tornare
+  alla landing non stava immaginando niente.
+
+**RISOLTO (13/09/2026)** — il watcher non guarda piu' le cartelle dei dati (`data/`,
+`vendor/`, `.runtime-*`, e `dist/` anche quando e' la prima voce del percorso: `fs.watch`
+li consegna relativi alla radice). Li' dentro non c'e' niente che si scrive a mano. In piu',
+con `--playwright` il watcher e' spento del tutto: mentre girano le prove nessuno sta
+salvando file. Provato subito dopo: il canale `/__ricarica` resta muto per tutto l'avvio
+rapido, e il giro lungo passa **tre volte su tre** (2,4 · 2,3 · 1,8 minuti).
+
+E siccome il motivo per cui era stato messo fuori dalla catena non esisteva, **il giro lungo
+e' tornato dentro `npm run verifica`**, dove deve stare: e' il percorso dove il bug si era
+nascosto. Due controlli dell'audit tengono ferme le due meta' — che la prova sia nella
+catena, e che il watcher non torni a guardare le cartelle dei dati.
+
+**La lezione, che vale piu' della correzione.** Un test che fallisce in modo intermittente
+non e' una prova che il test sia fragile: le prime due spiegazioni erano tutte e due
+plausibili, tutte e due scritte con dei numeri veri a supporto, e tutte e due sbagliate. La
+domanda che ha risolto la faccenda non e' stata «quanto ci mette» ma «**chi** l'ha
+ricaricata», e costava un minuto farsela cinque ore prima.

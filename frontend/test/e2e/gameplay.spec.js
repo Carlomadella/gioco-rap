@@ -39,21 +39,24 @@ test("GAME.enter riabilita i beat a ogni ingresso nel gameplay", async ({ page }
   expect(errori).toEqual([]);
 });
 
-/* Marchiata @lento, e quindi fuori da `npm run test:e2e` e dalla catena
-   `npm run verifica`: la fa girare `npm run test:e2e:lento`, a mano o in CI.
+/* Il marchio @lento serve solo a poterla lanciare da sola
+   (`npm run test:e2e:lento`): sta **dentro** alla catena `npm run verifica`,
+   perche' e' il percorso dove il bug si era nascosto.
 
-   Non e' una prova fragile, e' una prova **pesante**: l'avvio rapido non mette
-   piu' un avatar finto, carica MakeHuman vero — il log del browser dice
-   «targets.bin (~145 MB)», 269 modifier e 19158 vertici — e li tiene in
-   memoria. Misure del 13/09/2026 sulla stessa macchina, stesso codice, tutte
-   arrivate in fondo: 114, 115 e 126 secondi a macchina scarica; 288 secondi
-   dentro a `npm run verifica`; oltre 600 dentro all'hook di pre-push, con
-   l'altro agente che lavorava in parallelo e 3,4 GB di memoria libera. Non
-   scala col tetto: scala con quanto e' occupato il computer. Per questo sta
-   fuori dalla catena che gira a ogni push invece di avere un tetto sempre piu'
-   alto — un gate che ogni tanto e' rosso per il carico e non per il codice
-   smette di voler dire qualcosa. Il tetto qui sotto resta largo perche' quando
-   la prova parte deve poter finire. */
+   Dura fra uno e due minuti e mezzo: l'avvio rapido carica MakeHuman vero — il
+   log del browser dice «targets.bin (~145 MB)», 269 modifier e 19158 vertici.
+
+   **Attenzione a leggere i suoi rossi.** Il 13/09/2026 ha fallito cinque volte
+   di fila e la diagnosi era sbagliata due volte: prima «e' lenta, alziamo il
+   tetto», poi «e' pesante, il computer e' occupato». Non era ne' l'una ne'
+   l'altra: era il **watcher del server di sviluppo** che ricaricava la landing
+   in mezzo alla partita, perche' MakeHuman legge i suoi dati e su Windows
+   fs.watch scambia le letture per salvataggi (il perche' per esteso sta in
+   strumenti/dev.js, sopra a fs.watch). Sistemato quello, tre giri su tre
+   verdi. Se un giorno torna rossa: guarda **prima** se il server sta mandando
+   ricariche — ci si mette un minuto, basta ascoltare /__ricarica mentre gira —
+   e solo dopo sospetta del gioco. Il tetto qui sotto e' largo apposta, ma
+   allargarlo ancora non ha mai sistemato niente. */
 test("avvio rapido conclude la cinematic ed entra nell'hub @lento", async ({ page }) => {
   test.setTimeout(660000);
 

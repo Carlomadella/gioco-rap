@@ -284,3 +284,16 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
 - Chicago i crimini sono più facili ma c'è più criminalità/concorrenza ed è più difficile affermarsi
 - Las vegas: per avere i casinò migliori e i locali top per massimizzare il lifestyle così puoi averlo al massimo e sbloccare un'altra cosa es. un titolo da esporre nella descrizione del profilo tipo: JOHN GOTTI
 - Atlanta/New York: più focalizzata sul conoscere artisti famosi come 21 Savage, Future, Young Thug
+
+Cosa resta aperto, per tua decisione
+
+- beat-e-tasto-oro è ancora lì intatto: contiene quattro fix buoni che main non ha mai ricevuto (il marchio sopra HYPE sul telefono, «una
+  lavanderia non è un beat», il costo energia del beat, l'oro sul tasto che chiude), ma mergiarlo così riporterebbe indietro
+  studioScegliBeatmaker e il «Punto 14». Vanno riapplicati a mano.
+- L'avvio rapido ci mette 115 secondi e per i primi 50 non si muove niente. Funziona, ma il pulsante si chiama «rapido». È scritto in
+  problemi-riscontrati.md.
+- jose e zod restano dove sono, come hai deciso.
+- backend.md non l'ho esaminato — è ignorato nella stessa logica di schema.md, sono 16 KB. Se vuoi te lo controllo allo stesso modo.
+
+Se vuoi chiudere del tutto, posso cancellare i due branch ormai mergiati (test/vitest-playwright-gate e task/backend-schema-allineato),
+locali e remoti — ma essendo sul remoto te lo chiedo prima.
