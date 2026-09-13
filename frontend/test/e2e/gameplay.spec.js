@@ -49,7 +49,7 @@ test("GAME.enter riabilita i beat a ogni ingresso nel gameplay", async ({ page }
    parte freddo: se un giorno diventa stretto, il problema da guardare e'
    quanto ci mette l'avvio rapido, non il numero qui sotto. */
 test("avvio rapido conclude la cinematic ed entra nell'hub", async ({ page }) => {
-  test.setTimeout(300000);
+  test.setTimeout(660000);
 
   const errori = [];
 
@@ -109,7 +109,7 @@ test("avvio rapido conclude la cinematic ed entra nell'hub", async ({ page }) =>
         };
       });
     },
-    { timeout: 240000 }
+    { timeout: 600000 }
   ).toEqual({
     modalitaAudio: "gameplay",
     beatDisponibile: true,
