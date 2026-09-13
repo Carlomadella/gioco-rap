@@ -38,8 +38,4 @@ jobs:
       - name: Prova, regressioni, browser e build
         run: npm run verifica
 
-      # Fuori dalla catena `verifica` perche' sulla macchina di chi sviluppa
-      # dura fra i due e i dieci minuti (carica MakeHuman vero, ~145 MB) e
-      # bloccherebbe ogni push. Qui la macchina e' dedicata: la si fa girare.
-      - name: Il giro lungo nel browser (avvio rapido con MakeHuman)
-        run: npm run test:e2e:lento
+

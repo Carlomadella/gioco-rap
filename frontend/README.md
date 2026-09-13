@@ -38,9 +38,9 @@ Gli altri comandi:
 | `npm run verifica` | tutto il giro: prova, audit delle regressioni, le prove unitarie, il giro nel browser, build, e `npm audit` sui pacchetti di qui e del backend. **Vuole Chromium**: la prima volta `npm run setup:browser` |
 | `npm run setup:browser` | scarica Chromium per Playwright. Una volta sola per macchina; senza, `npm run verifica` si ferma sulle prove del browser |
 | `npm run test:unit` | solo le prove sulla logica (vitest + jsdom), veloci |
-| `npm run test:e2e` | il giro veloce nel browser (Playwright), quello che sta dentro a `npm run verifica` |
-| `npm run test:e2e:lento` | la prova dell'avvio rapido, che carica MakeHuman vero (~145 MB): **da due a oltre dieci minuti** a seconda di quanto e' occupata la macchina. Fuori dalla catena apposta, gira in CI a ogni push. Lanciala a mano prima di una consegna |
-| `npm run test:e2e:tutto` | tutte e due |
+| `npm run test:e2e` | il giro nel browser (Playwright), tutto, ed e' dentro a `npm run verifica` |
+| `npm run test:e2e:lento` | solo la prova dell'avvio rapido, che carica MakeHuman vero (~145 MB) e dura fra uno e due minuti e mezzo. Comoda quando si lavora proprio li' |
+| `npm run test:e2e:tutto` | come `test:e2e`: c'e' per chi si aspetta di trovarlo |
 | `npm run verifica:dipendenze` | solo l'ultimo pezzo: `npm audit` sui due lockfile. È il prezzo scritto in [`documentazione/dipendenze.md`](../documentazione/dipendenze.md) |
 
 Serve un server locale e non il doppio clic sul file: con `file://` il `localStorage` è
