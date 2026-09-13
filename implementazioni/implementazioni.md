@@ -225,8 +225,6 @@ NETWORK 64
 
 3. Quando scegli la take esce un container che ti deve chiedere solo il nome del pezzo e non la copertina, quella viene dopo nella sezione cover
 
-4. nella sezione mix non si può cliccare su "da solo"
-
 5. non c'è un tasto di conferma della copertina
 
 6. non posso scegliere i feat, e inoltre non posso fare canzoni senza feat

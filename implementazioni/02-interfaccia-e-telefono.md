@@ -1496,3 +1496,25 @@ stesso modo. Prima si sceglieva come spingerlo senza sapere quando sarebbe uscit
 L'ordine lo tiene `STUDIO_SEZIONI` in `frontend/js/game/studio.js`, e il controllo che lo
 difende sta in `strumenti/prova.js` («le sezioni sono le sette del punto 4, piu' la
 cabina»), che confronta l'elenco intero: se qualcuno le rimescola, lo dice.
+
+## Al banco del Mix si sceglie, non si guarda soltanto
+
+~~«nella sezione mix non si può cliccare su "da solo"»~~ **FATTO (13/09/2026)**
+
+Nel Mix **nessuna** delle due caselle era cliccabile, non solo «da solo»: `stScelta()` fa
+un `<button>` soltanto se gli si passa un attributo, se no tira fuori un
+`<div class="stscelta muta">`. Al banco non gliene passava nessuno, quindi la colonna di
+sinistra era una didascalia: per togliersi il fonico o rimetterlo bisognava tornare in
+Cabina, e il messaggio sotto lo diceva pure («un fonico si chiama dalla Cabina»).
+
+Adesso sono le stesse caselle della Cabina, con lo stesso attributo e lo stesso gestore: i
+fonici che conosci si scelgono da qui, e «da solo» toglie chi c'è.
+
+Sistemato anche in Cabina, perché era lo stesso difetto: lì «da solo» era muta e per
+restare senza fonico bisognava indovinare che si ri-cliccava quello già scelto. Il
+`data-fonico` vuoto vuol dire «nessuno dietro al vetro», e `studioScegliFonico(null)`
+toglie invece di fare il giro del toggle — che su `null` lo avrebbe rimesso.
+
+Provato in partita: le due caselle escono come `BUTTON`, il clic sul fonico lo sceglie
+(`G.studio.fonico` valorizzato) e il clic su «da solo» lo toglie (torna `null`), con la
+spunta che si sposta.
