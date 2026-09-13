@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:64db26c -->
+## 13/09/26, 20:20 â€” task/studio-mix-da-solo â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `64db26c`
+
+### Cosa Ã¨ entrato
+
+- `5566fbb` â€” fix(studio): al banco del Mix si sceglie il fonico, e «da solo» si clicca â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/studio.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:55a9083 -->
 ## 13/09/26, 20:08 â€” task/studio-marketing-dopo-timing â†’ main
 
