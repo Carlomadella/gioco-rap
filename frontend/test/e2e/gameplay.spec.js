@@ -121,7 +121,9 @@ test("avvio rapido conclude la cinematic ed entra nell'hub @lento", async ({ pag
         };
         });
       }catch(e){
-        if(/Execution context was destroyed|frame was detached|Target closed/.test(e.message))
+        /* La «F» di «Frame was detached» e' maiuscola: senza la /i questo
+           controllo non prendeva proprio l'errore piu' frequente. */
+        if(/execution context was destroyed|frame was detached|target closed|navigation/i.test(e.message))
           return null;
         throw e;
       }
