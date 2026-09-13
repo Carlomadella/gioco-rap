@@ -226,6 +226,31 @@
    una colonna laterale il pannello centrale si allarga, e senza questo tetto
    «Promo sui social» diventava una striscia lunga tutta la pagina. */
 .stazioni{display:flex;gap:11px;flex-wrap:wrap;margin-top:16px;max-width:620px}
+/* I TASTI NON ESCONO DALLO SCHERMO.
+   La colonna centrale scorre (`.stcol`), e i tasti stanno in fondo al
+   pannello: su uno schermo alto 800 il «Compralo» della sezione Beat finiva
+   **nove pixel sotto** il bordo della finestra, su un telefono duecentottanta.
+   Il banco mostrava tre schede e nient'altro, e non c'era nessun segno che
+   sotto ci fosse un tasto: la domanda «ma come si compra un beat?» nasce tutta
+   li'. Misurato il 13/09/2026 a 1280x800 e a 390x844.
+   Adesso la barra dei tasti si appoggia al fondo della colonna mentre il
+   contenuto le scorre sotto. Lo sfondo e' pieno apposta: senza, le schede che
+   passano dietro si leggono attraverso i tasti. */
+.stcol .stpan .stazioni{
+  position:sticky;
+  bottom:0;
+  z-index:2;
+  margin-top:16px;
+  padding-block:11px;
+  /* pieno, non var(--stPan): quello e' al 90% e le schede che scorrono
+     dietro si leggevano attraverso i tasti. */
+  background:#060D16;
+  box-shadow:0 -14px 20px -8px #060D16}
+/* Su schermi alti non c'e' niente da appiccicare: il pannello ci sta tutto,
+   e una barra incollata in fondo sarebbe solo un'ombra in mezzo al vuoto. */
+@media (min-height:1000px){
+  .stcol .stpan .stazioni{position:static;box-shadow:none;padding-block:0}
+}
 .stprimo,.stsecondo{display:flex;align-items:center;justify-content:center;gap:10px;
   flex:1 1 190px;min-height:48px;padding:12px 18px;border-radius:10px;font:inherit;
   font-size:14px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;

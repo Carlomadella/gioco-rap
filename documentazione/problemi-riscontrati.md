@@ -1538,3 +1538,44 @@ Un ramo vecchio non contiene solo lavoro che manca: contiene anche decisioni che
 frattempo sono state **cambiate apposta**, e l'unione le riporta indietro tutte insieme, in
 silenzio. La differenza fra le due strade non e' la fatica, e' che a mano ogni pezzo passa
 davanti a una domanda — «questo vale ancora?» — e unendo non ci passa nessuno.
+
+---
+
+## Giro del 13/09/2026 («come si compra un beat nello Studio?»)
+
+La domanda era questa, e la risposta e' che **si puo', ma il tasto non si vedeva**.
+
+### Il «Compralo» della sezione Beat finiva fuori dallo schermo
+
+- **dove** — `frontend/css/studio.css`, la barra `.stazioni` dentro alla colonna centrale
+  `.stcol`, che scorre.
+- **cosa succede** — nella sezione Beat il pannello centrale mostra le tre schede del banco,
+  una sotto l'altra, e i tasti stanno **in fondo**, dopo le schede. Misurato oggi: su una
+  finestra di 1280x800 il tasto «Compralo» stava **nove pixel sotto** il bordo; su un
+  telefono da 390x844, **duecentottanta**. Il pannello scorre, ma di quello che c'e' sotto
+  non c'era nessun segno: si vedevano tre schede e basta. Chi apriva la sezione Beat
+  concludeva ragionevolmente che comprare un beat da li' non si potesse.
+- **come si vede** — apri lo Studio, sezione Beat, su una finestra alta 800: le tre schede
+  ci sono, i tasti no.
+- **quanto pesa** — nascondeva una mossa che c'e' e funziona.
+
+**RISOLTO (13/09/2026)** — la barra dei tasti si appoggia al fondo della colonna che scorre
+(`position:sticky; bottom:0`), col fondo pieno perche' le schede che passano dietro non si
+leggano attraverso i tasti. Sopra i 1000 punti di altezza torna normale: li' il pannello ci
+sta tutto e una barra incollata sarebbe un'ombra in mezzo al vuoto. Misurato dopo: il tasto
+e' dentro lo schermo a 1280x800, a 1920x1080 e a 390x844. Controllate tutte e otto le
+sezioni dello Studio (Beat, Testo, Cabina, Mix, Cover, Feat, Marketing, Timing): nessun
+tasto fuori dallo schermo, nessun errore.
+
+### Per il resto il giro funziona, ed e' questo
+
+Provato in partita, dal principio: si clicca **Studio** sulla mappa, si conferma lo
+spostamento (30 minuti), si apre lo Studio sulla sezione **Beat**. Se il banco e' vuoto c'e'
+**«Gira a cercare beat»**, che porta tre beat sul banco; si sceglie la scheda che si vuole
+(la prima e' gia' scelta) e si preme **«Compralo»**. Il beat va in cartella e i soldi
+scalano: verificato, 5000 → 4565 con il banco che passa da tre a due.
+
+**Una cosa da sapere**: l'azione «Cerca un beat» e' legata al luogo. Se si apre lo Studio
+senza esserci arrivati dalla mappa, il gioco risponde «Non puoi iniziare questa mossa: per
+fare questa mossa devi prima raggiungere Studio sulla mappa» — ed e' corretto, non e' un
+errore.
