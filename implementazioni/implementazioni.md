@@ -124,7 +124,8 @@ CARLO:
 
 /_ GIORNALIERE _/
 
-1. creare canzoni con l'ia, guarda cartella musica nei segnalibri, task giornaliera quindi da non smistare
+1. creare canzoni con l'ia, guarda cartella musica nei segnalibri, task
+   giornaliera quindi da non smistare
 
 /_ DA FARE _/
 
@@ -239,6 +240,8 @@ NETWORK 64
 8. non posso spingere una canzone che non è ancora uscita, al massimo faccio uscire una preview
 
 9. Come nell'interfaccia dei beatmaker, nella sezione dove si posta il pezzo per hype' non fa cliccare su nessun pezzo se non su quello già selezionato.
+
+10. l'utente deve poter fare solo le sezioni Beat, Testo, e Cabina, poi il resto
 
 /_ DA DISCUTERE _/
 
