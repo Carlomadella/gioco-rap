@@ -78,6 +78,8 @@ test("package espone un comando verifica unico",
   pkg.scripts && pkg.scripts.verifica &&
   pkg.scripts.verifica.includes("npm run prova") &&
   pkg.scripts.verifica.includes("node strumenti/audit-regressioni.js") &&
+  pkg.scripts.verifica.includes("npm run test:unit") &&
+  pkg.scripts.verifica.includes("npm run test:e2e") &&
   pkg.scripts.verifica.includes("npm run verifica:build"));
 test("verifica build produce sia store sia demo e poi controlla dist",
   pkg.scripts && pkg.scripts["verifica:build"] &&
@@ -97,11 +99,15 @@ test("GitHub Actions esegue la verifica su push e pull request",
   ciWorkflow.includes("push:") &&
   ciWorkflow.includes("pull_request:") &&
   ciWorkflow.includes("run: npm run verifica"));
-test("CI usa npm ci con Node 20 e cache del lockfile frontend",
+test("CI usa npm ci con Node 22 e cache del lockfile frontend",
   ciWorkflow.includes("actions/setup-node@v4") &&
-  ciWorkflow.includes("node-version: 20") &&
+  ciWorkflow.includes("node-version: 22") &&
   ciWorkflow.includes("run: npm ci") &&
   ciWorkflow.includes("frontend/package-lock.json"));
+test("CI installa Chromium prima del gate completo",
+  ciWorkflow.includes("run: npx playwright install --with-deps chromium") &&
+  ciWorkflow.indexOf("run: npx playwright install --with-deps chromium") <
+    ciWorkflow.indexOf("run: npm run verifica"));
 test("workflow di verifica è read-only sul repository",
   ciWorkflow.includes("permissions:") &&
   ciWorkflow.includes("contents: read") &&

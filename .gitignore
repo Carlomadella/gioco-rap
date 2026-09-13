@@ -1,5 +1,9 @@
 frontend/dist/
 frontend/node_modules/
+frontend/test-results/
+frontend/playwright-report/
+frontend/blob-report/
+frontend/debug.log
 .DS_Store
 backend/database/dati/
 backend/database/schema.md

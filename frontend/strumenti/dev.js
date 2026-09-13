@@ -19,6 +19,8 @@ const path = require("path");
 const arg = n => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : null; };
 const PORTA = Number(arg("--porta") || 8000);
 const RADICE = path.resolve(__dirname, "..", process.argv.includes("--dist") ? "dist" : ".");
+const PLAYWRIGHT = process.argv.includes("--playwright");
+const PLAYWRIGHT_TOKEN = arg("--playwright-token") || "";
 
 const TIPI = {
   ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8",
@@ -101,8 +103,29 @@ function parseRange(header, size){
   return { start, end };
 }
 
-http.createServer((req, res) => {
+const server = http.createServer((req, res) => {
   const url = new URL(req.url, "http://localhost");
+
+  if(
+    PLAYWRIGHT &&
+    PLAYWRIGHT_TOKEN &&
+    url.pathname === "/__playwright" &&
+    req.headers["x-playwright-token"] === PLAYWRIGHT_TOKEN
+  ){
+    if(req.method === "GET"){
+      res.writeHead(200, { "content-type": "text/plain; charset=utf-8" }).end(PLAYWRIGHT_TOKEN);
+      return;
+    }
+
+    if(req.method === "POST"){
+      res.writeHead(200, { "content-type": "text/plain; charset=utf-8", connection: "close" });
+      res.end("chiuso", () => setImmediate(() => process.exit(0)));
+      return;
+    }
+
+    res.writeHead(405, { allow: "GET, POST" }).end();
+    return;
+  }
 
   if(url.pathname === "/__ricarica"){
     res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache",
@@ -195,7 +218,9 @@ http.createServer((req, res) => {
     });
     stream.pipe(res);
   });
-}).listen(PORTA, () => {
+});
+
+server.listen(PORTA, () => {
   console.log("Anni di Fame — http://localhost:" + PORTA);
   console.log("  cartella:  " + RADICE);
   console.log("  ricarica:  accesa (salva un file e la pagina si rifà da sola)");

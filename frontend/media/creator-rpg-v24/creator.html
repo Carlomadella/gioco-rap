@@ -2779,6 +2779,8 @@ window.addEventListener('message', e=>{
   if(e.source===window.parent){
     if(msg.type==='adf-rpg-v24-init'){
       applyParentArtist(msg.artist||{});
+      if(window.parent!==window)
+        window.parent.postMessage({type:'adf-rpg-v24-init-applied'},'*');
       return;
     }
     if(msg.type==='adf-rpg-v24-edit-appearance'){

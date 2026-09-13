@@ -116,6 +116,24 @@
     );
   }
 
+  function dopoInizializzazioneCreator(callback){
+    const ascolta = e => {
+      const frame = frameCreator();
+
+      if(
+        !frame ||
+        e.source !== frame.contentWindow ||
+        !e.data ||
+        e.data.type !== "adf-rpg-v24-init-applied"
+      ) return;
+
+      window.removeEventListener("message", ascolta);
+      quandoCreatorPronto(frame, callback);
+    };
+
+    window.addEventListener("message", ascolta);
+  }
+
   /* -------------------------------------------------------
      Provider temporaneo SOLO per Avvio rapido.
 
@@ -297,14 +315,7 @@
 
     goto("profile");
 
-    window.ADF_RPG_V24.open();
-
-    const frame = frameCreator();
-
-    /* Nessun flash di avatar / identità / RPG. */
-    if(frame) frame.style.visibility = "hidden";
-
-    quandoCreatorPronto(frame, f => {
+    dopoInizializzazioneCreator(f => {
       installaPresetTemporaneo(f);
 
       const payload = JSON.stringify(rapido);
@@ -370,6 +381,13 @@
          torni visibile. */
       f.style.visibility = "";
     });
+
+    window.ADF_RPG_V24.open();
+
+    const frame = frameCreator();
+
+    /* Nessun flash di avatar / identità / RPG. */
+    if(frame) frame.style.visibility = "hidden";
   }
 
   /* ------------------------------------------------------- */
