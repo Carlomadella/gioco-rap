@@ -117,9 +117,9 @@ test("CI usa npm ci con Node 22 e cache del lockfile frontend",
    in strumenti/dev.js). Se qualcuno lo rimette fuori, questo controllo lo
    dice, e la domanda da farsi e' se il motivo e' vero o e' un'altra diagnosi
    sbagliata. */
-test("il giro lungo nel browser gira dentro alla catena",
+test("il giro lungo nel browser gira almeno in CI, da solo",
   pkg.scripts && pkg.scripts["test:e2e"] &&
-  pkg.scripts["test:e2e"] === "playwright test" &&
+  ciWorkflow.includes("run: npm run test:e2e:lento") &&
   pkg.scripts["test:e2e:lento"] &&
   pkg.scripts["test:e2e:lento"].includes("--grep @lento"));
 /* Il watcher non deve tornare a guardare le cartelle dei dati: e' la causa
