@@ -376,6 +376,12 @@ let nativeEngineReadyReject=null;
 let nativeRequestCounter=0;
 const nativePendingRequests=new Map();
 let nativeRebuildQueued=false;
+/* ADF_MAKEHUMAN_PRESET_PROPIC_SYNC_V1
+   Il modifier engine risponde prima che il rebuild Three.js schedulato sia
+   necessariamente concluso. Teniamo quindi traccia del rebuild effettivo:
+   la propic dei preset deve essere catturata solo dopo che la scena mostra
+   davvero il personaggio aggiornato. */
+let nativeRebuildPromise=Promise.resolve(true);
 let customTargetValues={};
 const modifierControls=new Map();
 const symmetricModifierControls=[];
@@ -2076,12 +2082,39 @@ function syncModifierControls() {
 }
 
 function scheduleNativeRebuild() {
-  if(nativeRebuildQueued) return;
+  if(nativeRebuildQueued) return nativeRebuildPromise;
+
   nativeRebuildQueued=true;
-  requestAnimationFrame(async()=>{
-    nativeRebuildQueued=false;
-    await rebuildAll(true);
+  nativeRebuildPromise=new Promise((resolve,reject)=>{
+    requestAnimationFrame(async()=>{
+      nativeRebuildQueued=false;
+      try{
+        await rebuildAll(true);
+        resolve(true);
+      }catch(err){
+        reject(err);
+      }
+    });
   });
+
+  return nativeRebuildPromise;
+}
+
+async function waitForNativeRebuildSettled() {
+  /* Se durante un rebuild arriva un secondo aggiornamento del modifier
+     engine, scheduleNativeRebuild() può creare una nuova promise. Aspettiamo
+     finché quella osservata resta davvero l'ultima. */
+  while(true){
+    const pending=nativeRebuildPromise;
+    await pending;
+
+    if(
+      pending===nativeRebuildPromise &&
+      !nativeRebuildQueued
+    ){
+      return true;
+    }
+  }
 }
 
 function handleNativeEngineMessage(e) {
@@ -4822,11 +4855,93 @@ function bindEditorShell() {
 
   window.addEventListener('message',e=>{
     const msg=e.data||{};
-    if(msg.type!=='adf-makehuman-init') return;
-    if(msg.state) {
-      if(runtimeReady) restoreCharacterState(msg.state,{refit:true});
-      else pendingRestoreState=msg.state;
+
+    if(msg.type==='adf-makehuman-quick-preset'){
+      if(window.__ADF_MAKEHUMAN_QUICK_PRESET_BUSY__) return;
+
+      if(
+        !runtimeReady ||
+        !nativeEngineReady ||
+        !window.__ADF_MAKEHUMAN_INIT_ACCEPTED__
+      ){
+        emitToRoom('adf-makehuman-quick-preset-error',{
+          message:'MakeHuman non è ancora pronto per il preset rapido.'
+        });
+        return;
+      }
+
+      const malePresets=ADF_MH_PRESETS.filter(
+        preset=>preset.gender==='male'
+      );
+
+      const requested=String(msg.presetId||'');
+      const preset=
+        malePresets.find(item=>item.id===requested) ||
+        malePresets[Math.floor(Math.random()*malePresets.length)];
+
+      if(!preset){
+        emitToRoom('adf-makehuman-quick-preset-error',{
+          message:'Nessun preset maschile MakeHuman disponibile.'
+        });
+        return;
+      }
+
+      window.__ADF_MAKEHUMAN_QUICK_PRESET_BUSY__=true;
+
+      Promise.resolve(adfMhApplyPreset(preset.id))
+        .then(applied=>{
+          if(applied!==true){
+            throw new Error('Applicazione preset MakeHuman fallita.');
+          }
+
+          /* adfMhApplyPreset() ora termina soltanto dopo il rebuild Three.js
+             effettivamente completato: makePreviewImage() fotografa quindi
+             lo stesso preset che si vede nel camerino. */
+          emitToRoom('adf-makehuman-quick-preset-result',{
+            presetId:preset.id,
+            state:{
+              ...snapshotCharacterState(),
+              previewFraming:'makehuman-deterministic-v1'
+            },
+            previewImage:makePreviewImage()
+          });
+        })
+        .catch(err=>{
+          console.error('[ADF QUICK MAKEHUMAN]',err);
+          emitToRoom('adf-makehuman-quick-preset-error',{
+            message:err?.message||'Preset MakeHuman rapido fallito.'
+          });
+        })
+        .finally(()=>{
+          window.__ADF_MAKEHUMAN_QUICK_PRESET_BUSY__=false;
+        });
+
+      return;
     }
+
+    if(msg.type!=='adf-makehuman-init') return;
+
+    /* ADF_MAKEHUMAN_INIT_ONCE_V1
+       Il creator può tentare l'init sia poco dopo l'apertura sia dopo il
+       messaggio ready. Per uno stesso iframe accettiamo UN solo init: un
+       secondo restore tardivo non deve sovrascrivere il primo preset cliccato. */
+    if(window.__ADF_MAKEHUMAN_INIT_ACCEPTED__) return;
+    window.__ADF_MAKEHUMAN_INIT_ACCEPTED__=true;
+
+    if(msg.state) {
+      if(runtimeReady) {
+        Promise.resolve(restoreCharacterState(msg.state,{refit:true}))
+          .then(()=>adfMhMountPresetBox())
+          .catch(err=>console.error('[ADF] restore MakeHuman iniziale fallito',err));
+      } else {
+        pendingRestoreState=msg.state;
+      }
+      return;
+    }
+
+    /* Nuova creazione senza stato precedente: l'handshake è comunque
+       concluso, quindi da questo momento i preset possono diventare cliccabili. */
+    if(runtimeReady) adfMhMountPresetBox();
   });
 }
 
@@ -4961,10 +5076,10 @@ async function init() {
 
     initialCharacterState=snapshotCharacterState();
     runtimeReady=true;
-    /* ADF_MAKEHUMAN_PRESETS_MOUNT_V2
-       La UI preset viene montata quando il runtime MakeHuman è realmente pronto.
-       Non dipende da DOMContentLoaded, perché runtime.js è un modulo dinamico. */
-    adfMhMountPresetBox();
+
+    /* Prima completiamo l'eventuale restore iniziale del creator. I preset
+       non devono essere cliccabili mentre questa fase può ancora riscrivere
+       lo stato del personaggio o riportare l'editor alla sezione iniziale. */
     if(pendingRestoreState) {
       const restore=pendingRestoreState; pendingRestoreState=null;
       await restoreCharacterState(restore,{refit:true});
@@ -4972,6 +5087,14 @@ async function init() {
     setEditorSection('identity',{autoFrame:false});
     setCameraView('full',{smooth:false});
     applyVisualCenter();
+
+    /* In standalone non esiste un parent da cui attendere l'init. Nel gioco,
+       invece, montiamo i preset solo quando l'handshake iniziale è già stato
+       accettato; se arriverà dopo ready sarà il message handler a montarli. */
+    if(window.parent===window || window.__ADF_MAKEHUMAN_INIT_ACCEPTED__){
+      adfMhMountPresetBox();
+    }
+
     emitToRoom('adf-makehuman-ready',{state:snapshotCharacterState()});
 
     const params=new URLSearchParams(location.search);
@@ -5473,7 +5596,7 @@ async function adfMhApplyPreset(presetId){
      Niente restoreCharacterState(): quello è un restore completo
      e può riportare temporaneamente l'editor allo stato iniziale. */
   const preset=ADF_MH_PRESETS.find(p=>p.id===presetId);
-  if(!preset || !runtimeReady || !nativeEngineReady) return;
+  if(!preset || !runtimeReady || !nativeEngineReady) return false;
 
   const sectionBefore=currentEditorSection;
   const cameraBefore=currentCameraView;
@@ -5537,6 +5660,11 @@ async function adfMhApplyPreset(presetId){
     */
     await requestNativeModifiers(state.modifiers);
 
+    /* requestNativeModifiers() risolve quando arrivano i nuovi vertici, ma
+       il renderer li applica tramite un rebuild schedulato al frame seguente.
+       Aspettiamo quel rebuild prima di considerare il preset applicato. */
+    await waitForNativeRebuildSettled();
+
     if(typeof syncGenderQuick==='function') syncGenderQuick();
     if(typeof syncModifierControls==='function') syncModifierControls();
 
@@ -5561,6 +5689,7 @@ async function adfMhApplyPreset(presetId){
     if(typeof applyVisualCenter==='function') applyVisualCenter();
 
     adfMhSetPresetStatus(`Preset applicato: ${preset.label}`,'ok');
+    return true;
 
   }catch(err){
     console.error('[ADF PRESET]',err);
@@ -5568,6 +5697,7 @@ async function adfMhApplyPreset(presetId){
       `Errore preset: ${err?.message||'sconosciuto'}`,
       'bad'
     );
+    return false;
   }finally{
     adfMhSetPresetButtonsEnabled(true);
   }
@@ -5720,7 +5850,26 @@ function adfMhBuildPresetBox(){
 
   return box;
 }
+function adfMhPresetMountReady(){
+  /* ADF_MAKEHUMAN_PRESET_READY_GATE_V1
+     Un preset non deve essere cliccabile finché il motore e l'handshake
+     iniziale non sono davvero conclusi. Questo è l'unico gate di mount. */
+  if(!runtimeReady || !nativeEngineReady) return false;
+
+  /* Nel gioco MakeHuman è annidato nel creator: aspettiamo SEMPRE il primo
+     adf-makehuman-init. In standalone non esiste parent/handshake. */
+  if(
+    window.parent!==window &&
+    !window.__ADF_MAKEHUMAN_INIT_ACCEPTED__
+  ){
+    return false;
+  }
+
+  return true;
+}
+
 function adfMhMountPresetBox(){
+  if(!adfMhPresetMountReady()) return false;
   if(document.getElementById('adf-mh-preset-box')) return true;
 
   adfMhInjectPresetStyles();
@@ -5745,18 +5894,12 @@ function adfMhMountPresetBox(){
 
   return false;
 }
-function adfMhInitPresets(){
-  let attempts=0;
-  const timer=setInterval(()=>{
-    attempts++;
-    const mounted=adfMhMountPresetBox();
-    if(mounted || attempts>=20){
-      clearInterval(timer);
-    }
-  },220);
-}
-
-document.addEventListener('DOMContentLoaded',adfMhInitPresets);
+/* ADF_MAKEHUMAN_PRESET_READY_GATE_V1
+   Il vecchio timer DOMContentLoaded è stato rimosso: poteva montare i preset
+   prima di runtimeReady / nativeEngineReady / handshake iniziale.
+   Il mount avviene solo:
+   - dopo il restore iniziale in init();
+   - oppure quando arriva il primo adf-makehuman-init a runtime già pronto. */
 
 
 

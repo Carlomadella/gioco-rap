@@ -1,0 +1,35 @@
+#!/bin/sh
+set -eu
+
+BRANCH="$(git branch --show-current 2>/dev/null || true)"
+[ "$BRANCH" = "main" ] || exit 0
+
+# I merge locali devono poter creare il loro merge commit.
+if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
+  exit 0
+fi
+
+STAGED="$(git diff --cached --name-only --diff-filter=ACMR 2>/dev/null || true)"
+[ -n "$STAGED" ] || exit 0
+
+# Il post-merge genera automaticamente il registro su main: quella e' l'unica
+# eccezione ammessa ai commit diretti.
+NON_REGISTRY="$(printf '%s\n' "$STAGED" | grep -v '^registro-modifiche/' || true)"
+if [ -z "$NON_REGISTRY" ]; then
+  exit 0
+fi
+
+cat <<'MSG'
+
+[ADF GIT GATE] COMMIT BLOCCATO SU main
+
+Le regole del progetto vietano lavoro diretto su main.
+Crea/usa un branch di task e committa li'. Il merge su main resta consentito.
+
+Esempio:
+  git switch -c task/nome-lavoro
+  git add ...
+  git commit -m "..."
+
+MSG
+exit 1

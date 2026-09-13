@@ -1,7 +1,7 @@
 /* Creator RPG V24 — ponte isolato fra il creator approvato e la partita vera. */
 "use strict";
 (function(){
-  const SRC_NORMALE = "media/creator-rpg-v24/creator.html?v=26";
+  const SRC_NORMALE = "media/creator-rpg-v24/creator.html?v=25";
   let overlay=null, frame=null;
   let modalita="normal";
   let aperta=false, overflowPrima="", faseAudioPrima=null;
@@ -76,11 +76,16 @@
   function inviaStato(){
     if(!frame?.contentWindow) return;
     const artist=payloadIniziale();
+    const type=modalita==="appearance"
+      ? "adf-rpg-v24-edit-appearance"
+      : "adf-rpg-v24-init";
+
+    /* Una sessione riceve UN SOLO comando iniziale.
+       In appearance non parte prima il creator normale: quel doppio init
+       era capace di riportare il flusso allo step iniziale mentre MakeHuman
+       stava già lavorando. */
     try{
-      frame.contentWindow.postMessage({type:"adf-rpg-v24-init",artist},"*");
-      if(modalita==="appearance"){
-        frame.contentWindow.postMessage({type:"adf-rpg-v24-edit-appearance",artist},"*");
-      }
+      frame.contentWindow.postMessage({type,artist},"*");
     }catch(e){}
   }
 

@@ -6,6 +6,188 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:290f4e3 -->
+## 12/09/26, 21:12 â€” origin/fix/famepedia-sidebar-legibile-20260912-211127 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `290f4e3`
+
+### Cosa Ã¨ entrato
+
+- `0052ef6` â€” fix(famepedia): rende leggibile la sidebar â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/famepedia.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:36deb6e -->
+## 12/09/26, 21:09 â€” origin/fix/famepedia-tipografia-makehuman-20260912-210829 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `36deb6e`
+
+### Cosa Ã¨ entrato
+
+- `4dbe467` â€” fix(famepedia): allinea tipografia a MakeHuman â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/famepedia.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:54b8289 -->
+## 12/09/26, 20:54 â€” origin/feat/famepedia-layout-v2-20260912-205354 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `54b8289`
+
+### Cosa Ã¨ entrato
+
+- `5c7dfa6` â€” feat(famepedia): aggiunge indice persistente e sfondo â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/famepedia.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:f356840 -->
+## 12/09/26, 19:59 â€” task/creator-blocco-capoluoghi-v3 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `f356840`
+
+### Cosa Ã¨ entrato
+
+- `5e5933c` â€” feat(creator): blocca i capoluoghi come città iniziale â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:c41c257 -->
+## 12/09/26, 19:40 â€” origin/feat/famepedia-v1-v2-20260912-194005 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `c41c257`
+
+### Cosa Ã¨ entrato
+
+- `bf80cbf` â€” feat(ui): aggiunge FAMEpedia alla landing â€” **Mycol**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/css/famepedia.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:249d509 -->
+## 12/09/26, 18:57 â€” task/creator-aspetto-sfondo-boutique-v1 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `249d509`
+
+### Cosa Ã¨ entrato
+
+- `e20e411` â€” feat(creator): aggiunge sfondo boutique alla scelta avatar â€” **Mycol**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/media/creator-rpg-v24/assets/creator-appearance-boutique-v1.png`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
+<!-- merge:1fc1984 -->
+## 12/09/26, 18:38 â€” task/creator-identita-sfondo-v3 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `1fc1984`
+
+### Cosa Ã¨ entrato
+
+- `61ef1bb` â€” feat(creator): aggiunge sfondo alla schermata identita â€” **Mycol**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/media/creator-rpg-v24/assets/creator-identity-provenienza-v1.png`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
+<!-- merge:48dc367 -->
+## 12/09/26, 17:55 â€” origin/feat/stato-account-landing-v2-20260912-175446 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `48dc367`
+
+### Cosa Ã¨ entrato
+
+- `13864e6` â€” feat(account): mostra stato connessione nella landing â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/shell.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:ea17bec -->
+## 12/09/26, 17:11 â€” task/creator-casuale-nome-citta-v1 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `ea17bec`
+
+### Cosa Ã¨ entrato
+
+- `e952df8` â€” feat(creator): aggiunge nome e città casuali â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:5e40f69 -->
+## 12/09/26, 16:05 â€” task/fix-propic-preset-makehuman â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `5e40f69`
+
+### Cosa Ã¨ entrato
+
+- `865bd06` â€” fix(makehuman): sincronizza propic con preset rapido â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/makehuman-camerino-v1/runtime.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:f6f76da -->
 ## 10/09/26, 16:27 â€” branch non identificato â†’ main
 

@@ -6,6 +6,65 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:1595560 -->
+## 12/09/26, 17:24 â€” origin/fix/backend-online-player-default-20260912-172324 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `1595560`
+
+### Cosa Ã¨ entrato
+
+- `cff0c0f` â€” fix(online): usa backend pubblico per i player â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/net/online.js`
+- **Modificato:** `frontend/pagine/accesso.html`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 4
+
+---
+
+<!-- merge:8dffa9f -->
+## 12/09/26, 12:54 â€” fix/account-artista-cloud-20260912-145418 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `8dffa9f`
+
+### Cosa Ã¨ entrato
+
+- `cb502a7` â€” fix(online): collega account artista e cloud â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `backend/database/archivio.js`
+- **Modificato:** `backend/prova.js`
+- **Modificato:** `backend/server.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
+<!-- merge:813dae0 -->
+## 12/09/26, 12:03 â€” fix/postgres-bigint-cloud-20260912-140328 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `813dae0`
+
+### Cosa Ã¨ entrato
+
+- `2ef0aed` â€” fix(backend): normalizza bigint PostgreSQL â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `backend/database/postgres.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:5bbd9fb -->
 ## 07/09/26, 20:26 â€” task/via-lo-zero-dipendenze â†’ main
 

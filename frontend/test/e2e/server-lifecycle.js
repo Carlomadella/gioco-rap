@@ -7,18 +7,37 @@ const { setTimeout: pausa } = require("node:timers/promises");
 
 const BASE_URL = "http://127.0.0.1:8000";
 const GAME_URL = `${BASE_URL}/pagine/gioco.html`;
+/* Un file che esiste **solo** fra i sorgenti: il build non copia `js/` in
+   `dist/`, ci mette un bundle solo con l'impronta nel nome. Serve a non
+   adottare un server acceso su `--dist`, che risponderebbe alla pagina del
+   gioco come se niente fosse e farebbe girare le prove sul pacchetto vecchio
+   invece che sui file appena modificati. */
+const SORGENTE_URL = `${BASE_URL}/js/gioco-ingresso.js`;
 const ENDPOINT = `${BASE_URL}/__playwright`;
 const FRONTEND_ROOT = path.resolve(__dirname, "../..");
 
-async function giocoDisponibile(){
+async function risponde(url){
   try{
-    const risposta = await fetch(GAME_URL, {
-      signal: AbortSignal.timeout(1000)
-    });
+    const risposta = await fetch(url, { signal: AbortSignal.timeout(1000) });
     return risposta.ok;
   }catch(e){
     return false;
   }
+}
+
+/* Vero solo se sulla porta c'e' un server che serve i sorgenti: la pagina del
+   gioco da sola non basta a riconoscerlo. */
+async function giocoDisponibile(){
+  if(!(await risponde(GAME_URL))) return false;
+
+  if(!(await risponde(SORGENTE_URL)))
+    throw new Error(
+      `Sulla porta 8000 c'e' gia' un server, ma non serve i sorgenti: ${SORGENTE_URL} ` +
+      "non risponde. Se e' il server del pacchetto (`npm run dev -- --dist`) spegnilo, " +
+      "se no le prove girerebbero sul build vecchio invece che sui file di adesso."
+    );
+
+  return true;
 }
 
 async function endpointPosseduto(token){
@@ -61,6 +80,11 @@ async function attendiUscita(uscita, millisecondi){
 async function fermaServer(server, uscita, token){
   let erroreArresto = null;
   let risultato = null;
+  /* Se lo chiudiamo noi a forza, il processo non esce con zero ma con
+     «nessun codice, spento da fuori»: e' l'esito atteso di quella strada, non
+     un guasto. Senza questo la rete di sicurezza faceva fallire la verifica
+     proprio quando entrava in funzione. */
+  let chiusoAForza = false;
 
   try{
     const risposta = await fetch(ENDPOINT, {
@@ -79,6 +103,7 @@ async function fermaServer(server, uscita, token){
     risultato = await attendiUscita(uscita, 5000);
 
     if(!risultato){
+      chiusoAForza = true;
       server.kill();
       risultato = await attendiUscita(uscita, 2000);
     }
@@ -89,9 +114,9 @@ async function fermaServer(server, uscita, token){
       cause: erroreArresto
     });
 
-  if(erroreArresto) throw erroreArresto;
+  if(erroreArresto && !chiusoAForza) throw erroreArresto;
 
-  if(risultato.code !== 0)
+  if(!chiusoAForza && risultato.code !== 0)
     throw new Error(
       `Il server Playwright è terminato con codice ${risultato.code} (segnale ${risultato.signal || "nessuno"}).`
     );
@@ -107,13 +132,13 @@ module.exports = async function preparaCicloServer(){
     process.execPath,
     [
       path.join(FRONTEND_ROOT, "strumenti/dev.js"),
-      "--playwright",
-      "--playwright-token",
-      token
+      "--playwright"
     ],
     {
       cwd: FRONTEND_ROOT,
-      env: process.env,
+      /* Il codice passa di qui, non dalla riga di comando: vedi il commento
+         in strumenti/dev.js. */
+      env: { ...process.env, ADF_PLAYWRIGHT_TOKEN: token },
       shell: false,
       stdio: ["ignore", "inherit", "inherit"],
       windowsHide: true

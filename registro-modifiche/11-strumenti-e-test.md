@@ -6,6 +6,205 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:fe258b4 -->
+## 12/09/26, 21:24 â€” origin/fix/rimuove-continua-menu-avvio-20260912-212414 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `fe258b4`
+
+### Cosa Ã¨ entrato
+
+- `a2f9531` â€” fix(ui): rimuove continua dal menu di avvio â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:290f4e3 -->
+## 12/09/26, 21:12 â€” origin/fix/famepedia-sidebar-legibile-20260912-211127 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `290f4e3`
+
+### Cosa Ã¨ entrato
+
+- `0052ef6` â€” fix(famepedia): rende leggibile la sidebar â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:36deb6e -->
+## 12/09/26, 21:09 â€” origin/fix/famepedia-tipografia-makehuman-20260912-210829 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `36deb6e`
+
+### Cosa Ã¨ entrato
+
+- `4dbe467` â€” fix(famepedia): allinea tipografia a MakeHuman â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:54b8289 -->
+## 12/09/26, 20:54 â€” origin/feat/famepedia-layout-v2-20260912-205354 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `54b8289`
+
+### Cosa Ã¨ entrato
+
+- `5c7dfa6` â€” feat(famepedia): aggiunge indice persistente e sfondo â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:c41c257 -->
+## 12/09/26, 19:40 â€” origin/feat/famepedia-v1-v2-20260912-194005 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `c41c257`
+
+### Cosa Ã¨ entrato
+
+- `bf80cbf` â€” feat(ui): aggiunge FAMEpedia alla landing â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:48dc367 -->
+## 12/09/26, 17:55 â€” origin/feat/stato-account-landing-v2-20260912-175446 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `48dc367`
+
+### Cosa Ã¨ entrato
+
+- `13864e6` â€” feat(account): mostra stato connessione nella landing â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:8a27fba -->
+## 12/09/26, 17:43 â€” origin/fix/sessione-account-senza-artista-20260912-174303 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `8a27fba`
+
+### Cosa Ã¨ entrato
+
+- `bd79730` â€” fix(account): conserva login senza artista locale â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:1595560 -->
+## 12/09/26, 17:24 â€” origin/fix/backend-online-player-default-20260912-172324 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `1595560`
+
+### Cosa Ã¨ entrato
+
+- `cff0c0f` â€” fix(online): usa backend pubblico per i player â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:8dffa9f -->
+## 12/09/26, 12:54 â€” fix/account-artista-cloud-20260912-145418 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `8dffa9f`
+
+### Cosa Ã¨ entrato
+
+- `cb502a7` â€” fix(online): collega account artista e cloud â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/prova.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:fecae36 -->
+## 12/09/26, 14:21 â€” task/fix-dev-live-reload-makehuman â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `fecae36`
+
+### Cosa Ã¨ entrato
+
+- `18269dd` â€” fix(dev): evita reload falsi durante MakeHuman â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/dev.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:7979f69 -->
+## 12/09/26, 13:21 â€” origin/fix/anti-regressione-git-gate-v2 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `7979f69`
+
+### Cosa Ã¨ entrato
+
+- `66c8d70` â€” fix(git): impedisce regressioni da main e branch obsoleti â€” **Mycol**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/strumenti/configura-git-hooks.js`
+- **Aggiunto:** `frontend/strumenti/verifica-git.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:f6f76da -->
 ## 10/09/26, 16:27 â€” branch non identificato â†’ main
 

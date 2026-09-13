@@ -6,6 +6,60 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:48dc367 -->
+## 12/09/26, 17:55 â€” origin/feat/stato-account-landing-v2-20260912-175446 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `48dc367`
+
+### Cosa Ã¨ entrato
+
+- `13864e6` â€” feat(account): mostra stato connessione nella landing â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/landing.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:5f88dac -->
+## 12/09/26, 16:46 â€” task/avvio-rapido-paesi-province-v4 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `5f88dac`
+
+### Cosa Ã¨ entrato
+
+- `1580cbe` â€” feat(avvio-rapido): amplia il pool di provenienza â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/gioco-ingresso.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:7979f69 -->
+## 12/09/26, 13:21 â€” origin/fix/anti-regressione-git-gate-v2 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `7979f69`
+
+### Cosa Ã¨ entrato
+
+- `66c8d70` â€” fix(git): impedisce regressioni da main e branch obsoleti â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/package.json`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:dc0d94e -->
 ## 06/09/26, 10:09 â€” task/pagine-per-ogni-azione â†’ main
 

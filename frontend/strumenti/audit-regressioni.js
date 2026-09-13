@@ -41,6 +41,7 @@ const travel = leggi("js/game/spostamenti.js");
 const crimeui = leggi("js/game/strada-crimine-ui.js");
 const abilita = leggi("js/game/abilita.js");
 const servizio = leggi("js/servizio.js");
+const online = leggi("js/net/online.js");
 const servizioCss = leggi("css/servizio.css");
 const abilitaCss = leggi("css/abilita.css");
 const cssCrimeV2 = leggi("css/strada-crimine-v2.css").replace(/\s+/g, " ");
@@ -58,6 +59,11 @@ const timeControls = leggi("js/game/tempo-controlli.js");
 const index = leggi("pagine/gioco.html");
 const landing = leggi("pagine/landing.html");
 const accesso = leggi("pagine/accesso.html");
+const accessoJs = leggi("js/accesso.js");
+const landingJs = leggi("js/landing.js");
+const shellCss = leggi("css/shell.css");
+const famepediaJs = leggi("js/famepedia.js");
+const famepediaCss = leggi("css/famepedia.css");
 const porta = leggi("index.html");
 const avvio = leggi("js/avvio.js");
 const ingresso = leggi("js/gioco-ingresso.js");
@@ -108,10 +114,109 @@ test("CI installa Chromium prima del gate completo",
   ciWorkflow.includes("run: npx playwright install --with-deps chromium") &&
   ciWorkflow.indexOf("run: npx playwright install --with-deps chromium") <
     ciWorkflow.indexOf("run: npm run verifica"));
+/* Il browser di Playwright non lo tira giu' `npm ci`: e' l'unica dipendenza
+   che vuole un passaggio a parte, e chi scarica il progetto deve trovarlo
+   scritto. Se sparisce lo script, o sparisce dai README, la verifica si ferma
+   a meta' per chi arriva nuovo. */
+test("il comando per scaricare il browser esiste ed e' scritto nei README",
+  pkg.scripts && pkg.scripts["setup:browser"] &&
+  pkg.scripts["setup:browser"].includes("playwright install") &&
+  leggi("../README.md").includes("npm run setup:browser") &&
+  leggi("README.md").includes("npm run setup:browser"));
 test("workflow di verifica è read-only sul repository",
   ciWorkflow.includes("permissions:") &&
   ciWorkflow.includes("contents: read") &&
   !ciWorkflow.includes("contents: write"));
+
+console.log("\nOnline — backend condiviso");
+test("client usa Render come backend pubblico di default",
+  online.includes('const DEFAULT_BASE = "https://anni-di-fame-api.onrender.com"') &&
+  online.includes("if(!base) base = DEFAULT_BASE") &&
+  !online.includes('if(!base) base = "http://localhost:8787"'));
+test("override backend resta disponibile per sviluppo locale",
+  online.includes("localStorage.setItem(K_URL, base)") &&
+  online.includes("|| DEFAULT_BASE;"));
+test("account e login tollerano il cold start del backend pubblico",
+  (online.match(/attesa: 60000/g) || []).length >= 2);
+test("sessione account e identita artista sono controlli separati",
+  online.includes("const sessione = () => leggi(K_SESSIONE)") &&
+  online.includes("collega, scollega, sessione, identita") &&
+  accessoJs.includes("const sessione = ONLINE.sessione()") &&
+  !accessoJs.includes("const mia = ONLINE.identita()"));
+test("le tre pagine caricano la nuova versione del ponte online",
+  [landing, accesso, index].every(p => p.includes('js/net/online.js?v=16')));
+test("pagina Account carica la logica accesso aggiornata",
+  accesso.includes('js/accesso.js?v=2'));
+test("landing mostra rosso/verde in base a una sessione confermata dal server",
+  landingJs.includes("function aggiornaStatoAccountLanding()") &&
+  landingJs.includes('typeof ONLINE.sessione !== "function"') &&
+  landingJs.includes("const dati = await ONLINE.io()") &&
+  landingJs.includes('b.classList.toggle("connesso", !!connesso)') &&
+  shellCss.includes(".navacc::before") &&
+  shellCss.includes(".navacc.connesso::before"));
+test("landing aggiorna il badge quando cambia la sessione",
+  landingJs.includes('e.key.indexOf("adf-online-sessione") === 0') &&
+  landingJs.includes("window.ADF_ACCOUNT_STATUS"));
+test("landing carica asset aggiornati del badge account",
+  landing.includes('css/shell.css?v=14') &&
+  landing.includes('js/landing.js?v=7'));
+
+console.log("\nFAMEpedia — enciclopedia di gioco");
+test("voce 03 apre FAMEpedia e non la vecchia sezione Come si gioca",
+  landing.includes('data-go="famepedia"') &&
+  landing.includes('<span class="tit">FAMEpedia</span>') &&
+  !landing.includes('data-go="regole"'));
+test("FAMEpedia ha catalogo, ricerca e almeno 18 voci",
+  famepediaJs.includes("const FAME_ARTICOLI = [") &&
+  famepediaJs.includes('addEventListener("input"') &&
+  famepediaJs.includes("function articoliFiltrati()") &&
+  (famepediaJs.match(/\{id:"/g) || []).length >= 18);
+test("FAMEpedia copre i nuclei gameplay principali",
+  ["giornata","energia","lucidita","scrittura","studio","fasi","classifiche","strada","account-cloud","slot"]
+    .every(id => famepediaJs.includes('id:"' + id + '"')));
+test("FAMEpedia usa UI dedicata coerente e responsive",
+  famepediaCss.includes(".famepedia") &&
+  famepediaCss.includes("font-family:var(--disp)") &&
+  famepediaCss.includes("var(--c1)") &&
+  famepediaCss.includes("@media (max-width:820px)") &&
+  landing.includes('css/famepedia.css?v=4') &&
+  landing.includes('js/famepedia.js?v=2'));
+test("FAMEpedia V2 mantiene indice voci persistente a sinistra",
+  landing.includes('id="fp-nav-list"') &&
+  famepediaJs.includes('host=$fp("fp-nav-list")') &&
+  famepediaJs.includes("articoloAttivo=id") &&
+  famepediaCss.includes("grid-template-columns:330px minmax(0,1fr)") &&
+  famepediaCss.includes(".fp-nav-item.on"));
+test("FAMEpedia V2 usa come sfondo la scena Info Point esistente",
+  famepediaCss.includes('landing_a_infopoint.jpg') &&
+  famepediaCss.includes("FAMEPEDIA V2 — INDICE PERSISTENTE"));
+test("FAMEpedia conserva la scala MakeHuman come baseline tipografica",
+  famepediaCss.includes("FAMEPEDIA V3 — TIPOGRAFIA MAKEHUMAN") &&
+  famepediaCss.includes("--fp-mh-primary:13.5px") &&
+  famepediaCss.includes("--fp-mh-secondary:13px") &&
+  famepediaCss.includes("--fp-mh-label:10.5px"));
+test("FAMEpedia V4 rende la sidebar leggibile su desktop",
+  famepediaCss.includes("FAMEPEDIA V4 — SIDEBAR LEGGIBILE") &&
+  famepediaCss.includes("grid-template-columns:380px minmax(0,1fr)") &&
+  famepediaCss.includes(".fp-nav-item-title") &&
+  famepediaCss.includes("font-size:17px") &&
+  famepediaCss.includes(".fp-nav-item-cat") &&
+  famepediaCss.includes("font-size:12.5px") &&
+  famepediaCss.includes(".fp-cat") &&
+  famepediaCss.includes("font-size:16px"));
+test("controller landing apre FAMEpedia dal menu",
+  landingJs.includes('b.dataset.go === "famepedia"') &&
+  landingJs.includes("FAMEPEDIA.apri()"));
+
+console.log("\nLanding — menu di avvio");
+test("menu secondario non mostra piu la riga Continua",
+  avvio.includes('function htmlMenu()') &&
+  !avvio.includes('riga("continua", "Continua"'));
+test("Continua resta sul pulsante principale della landing",
+  avvio.includes("function continuaUltima()") &&
+  avvio.includes('if(play) play.onclick = () => ultimoSlot() ? continuaUltima() : apri();'));
+test("landing carica la nuova versione del menu di avvio",
+  landing.includes('js/avvio.js?v=6'));
 
 console.log("\nBlocco 1 — Eventi V2 / telefono / dist");
 test("catalogo contiene esattamente 1000 eventi", Array.isArray(cat) && cat.length === 1000);

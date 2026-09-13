@@ -6,6 +6,126 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:fe258b4 -->
+## 12/09/26, 21:24 â€” origin/fix/rimuove-continua-menu-avvio-20260912-212414 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `fe258b4`
+
+### Cosa Ã¨ entrato
+
+- `a2f9531` â€” fix(ui): rimuove continua dal menu di avvio â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/avvio.js`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
+<!-- merge:290f4e3 -->
+## 12/09/26, 21:12 â€” origin/fix/famepedia-sidebar-legibile-20260912-211127 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `290f4e3`
+
+### Cosa Ã¨ entrato
+
+- `0052ef6` â€” fix(famepedia): rende leggibile la sidebar â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/famepedia.css`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
+<!-- merge:c41c257 -->
+## 12/09/26, 19:40 â€” origin/feat/famepedia-v1-v2-20260912-194005 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `c41c257`
+
+### Cosa Ã¨ entrato
+
+- `bf80cbf` â€” feat(ui): aggiunge FAMEpedia alla landing â€” **Mycol**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/css/famepedia.css`
+- **Aggiunto:** `frontend/js/famepedia.js`
+- **Modificato:** `frontend/js/landing.js`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 4
+
+---
+
+<!-- merge:1fc1984 -->
+## 12/09/26, 18:38 â€” task/creator-identita-sfondo-v3 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `1fc1984`
+
+### Cosa Ã¨ entrato
+
+- `61ef1bb` â€” feat(creator): aggiunge sfondo alla schermata identita â€” **Mycol**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/media/creator-rpg-v24/assets/creator-identity-provenienza-v1.png`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
+<!-- merge:48dc367 -->
+## 12/09/26, 17:55 â€” origin/feat/stato-account-landing-v2-20260912-175446 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `48dc367`
+
+### Cosa Ã¨ entrato
+
+- `13864e6` â€” feat(account): mostra stato connessione nella landing â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/pagine/accesso.html`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 3
+
+---
+
+<!-- merge:0ac2c93 -->
+## 12/09/26, 14:35 â€” feat/cloud-restore-ui-20260912-163446 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `0ac2c93`
+
+### Cosa Ã¨ entrato
+
+- `80d4812` â€” feat(cloud): aggiunge salvataggio e ripristino dalla UI â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/impostazioni-ui.js`
+- **Modificato:** `frontend/js/net/online.js`
+- **Modificato:** `frontend/pagine/accesso.html`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:f6f76da -->
 ## 10/09/26, 16:27 â€” branch non identificato â†’ main
 

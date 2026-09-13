@@ -19,7 +19,8 @@ installa e si paga. Tutto quello che c'è scritto qui sotto discende da questa f
 
 ```bash
 cd frontend
-npm install          # una volta sola: serve solo esbuild, e solo per il build
+npm install          # una volta sola
+npm run setup:browser # una volta sola: scarica Chromium, serve a npm run verifica
 npm run dev          # → http://localhost:8000, con la ricarica automatica
 ```
 
@@ -34,7 +35,10 @@ Gli altri comandi:
 | `npm run demo` | `dist/anni-di-fame.html`: il gioco in un file solo, da far provare a qualcuno |
 | `npm run prova` | i controlli che si possono fare senza browser (vedi in fondo) |
 | `npm run dev -- --dist` | serve la cartella `dist/`, per provare il build vero |
-| `npm run verifica` | tutto il giro: prova, audit delle regressioni, build, e `npm audit` sui pacchetti di qui e del backend |
+| `npm run verifica` | tutto il giro: prova, audit delle regressioni, le prove unitarie, il giro nel browser, build, e `npm audit` sui pacchetti di qui e del backend. **Vuole Chromium**: la prima volta `npm run setup:browser` |
+| `npm run setup:browser` | scarica Chromium per Playwright. Una volta sola per macchina; senza, `npm run verifica` si ferma sulle prove del browser |
+| `npm run test:unit` | solo le prove sulla logica (vitest + jsdom), veloci |
+| `npm run test:e2e` | solo il giro nel browser (Playwright). L'avvio rapido carica MakeHuman vero e ci mette un paio di minuti |
 | `npm run verifica:dipendenze` | solo l'ultimo pezzo: `npm audit` sui due lockfile. È il prezzo scritto in [`documentazione/dipendenze.md`](../documentazione/dipendenze.md) |
 
 Serve un server locale e non il doppio clic sul file: con `file://` il `localStorage` è

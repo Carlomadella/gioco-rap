@@ -147,6 +147,191 @@ function letturaSlot(n){
   try{ a = JSON.parse(localStorage.getItem(k.artista) || "null"); }catch(e){}
   return {g, a, vuoto: !g && !(a && a.name)};
 }
+
+/* ADF_CLOUD_RESTORE_UI_V1
+   Il cloud lavora sullo slot aperto: così non si mescolano identità/sessioni
+   che oggi sono volutamente slot-scoped. Prima di sostituire dati locali si
+   conserva una copia recuperabile dallo stesso pannello. */
+const CLOUD_BACKUP_BASE = "adf-cloud-backup-v1";
+const cloudBackupKey = n => CLOUD_BACKUP_BASE + (n > 1 ? "-s" + n : "");
+let CLOUD = {caricando:false, caricato:false, dato:null, messaggio:""};
+
+function leggiBackupCloud(n){
+  try{ return JSON.parse(localStorage.getItem(cloudBackupKey(n)) || "null"); }
+  catch(e){ return null; }
+}
+function scriviSlotLocale(n, partita, artista){
+  const k = chiaviSlot(n);
+  if(partita) localStorage.setItem(k.partita, JSON.stringify(partita));
+  else localStorage.removeItem(k.partita);
+  if(artista) localStorage.setItem(k.artista, JSON.stringify(artista));
+  else localStorage.removeItem(k.artista);
+}
+function salvaBackupCloud(n){
+  const s = letturaSlot(n);
+  if(s.vuoto) return true;
+  let artistaId = null;
+  try{
+    const i = (typeof ONLINE !== "undefined" && ONLINE.identita) ? ONLINE.identita() : null;
+    artistaId = i && i.id ? i.id : null;
+    localStorage.setItem(cloudBackupKey(n), JSON.stringify({
+      quando:Date.now(), partita:s.g, artista:s.a, artistaId
+    }));
+    return true;
+  }catch(e){ return false; }
+}
+function ripristinaBackupCloud(n){
+  const b = leggiBackupCloud(n);
+  if(!b) return false;
+  try{
+    scriviSlotLocale(n, b.partita || null, b.artista || null);
+    if(typeof ONLINE !== "undefined" && ONLINE.adottaArtista) ONLINE.adottaArtista(b.artistaId || "");
+    localStorage.removeItem(cloudBackupKey(n));
+    return true;
+  }catch(e){ return false; }
+}
+function testoCloud(r){
+  if(!r) return L("Il server non risponde. La carriera locale non viene toccata.",
+                  "The server is not responding. The local career is untouched.");
+  if(!r.errore){
+    const kb = Math.max(1, Math.round((Number(r.byte) || 0) / 1024));
+    return L("Cloud: anno ","Cloud: year ") + (Number(r.anno) || 1) +
+      L(" · settimana "," · week ") + (Number(r.settimana) || 1) + " · " + kb + " KB";
+  }
+  if(r.errore === "slot-vuoto") return L("Nessun salvataggio cloud per questo slot.",
+                                          "No cloud save for this slot.");
+  if(r.errore === "sessione-scaduta" || r.stato === 403)
+    return L("Accedi al tuo account per usare il cloud.",
+             "Sign in to your account to use cloud saves.");
+  return L("Cloud non disponibile: ","Cloud unavailable: ") + r.errore;
+}
+function corpoCloud(){
+  const n = SET.slot;
+  const r = CLOUD.dato;
+  const backup = leggiBackupCloud(n);
+  const confermaRestore = ARMATO === "cloud-ripristina:" + n;
+  const confermaUndo = ARMATO === "cloud-annulla:" + n;
+  let stato = CLOUD.caricando
+    ? L("Sto controllando il cloud…","Checking the cloud…")
+    : (CLOUD.caricato ? testoCloud(r) : L("Controllo il cloud dello slot aperto.",
+                                           "Check the cloud save for the open slot."));
+  let azioni = bottone("cloud-aggiorna", L("Aggiorna","Refresh")) +
+    bottone("cloud-salva", L("Salva adesso","Save now"));
+  if(r && !r.errore && r.stato && typeof r.stato === "object"){
+    azioni += bottone("cloud-ripristina",
+      confermaRestore ? L("Sostituisci questo slot","Replace this slot") : L("Ripristina dal cloud","Restore from cloud"),
+      confermaRestore ? "danger" : "");
+  }
+  if(backup){
+    azioni += bottone("cloud-annulla",
+      confermaUndo ? L("Torna alla copia locale","Return to local backup") : L("Annulla ultimo ripristino","Undo last restore"),
+      confermaUndo ? "danger" : "");
+  }
+  return '<div class="scard">' +
+    '<b class="stit">' + L("Cloud · slot ","Cloud · slot ") + n + '</b>' +
+    '<p class="snote">' + stato + '</p>' +
+    (CLOUD.messaggio ? '<p class="snote">' + CLOUD.messaggio + '</p>' : '') +
+    '<span class="sacts">' + azioni + '</span></div>';
+}
+async function caricaCloud(messaggio){
+  if(CLOUD.caricando) return;
+  if(typeof ONLINE === "undefined" || !ONLINE.carriera){
+    CLOUD.caricato = true; CLOUD.dato = null;
+    CLOUD.messaggio = L("Modulo cloud non disponibile.","Cloud module unavailable.");
+    disegnaImpostazioni(); return;
+  }
+  CLOUD.caricando = true;
+  if(messaggio !== undefined) CLOUD.messaggio = messaggio;
+  disegnaImpostazioni();
+  const r = await ONLINE.carriera(SET.slot);
+  CLOUD.caricando = false;
+  CLOUD.caricato = true;
+  CLOUD.dato = r;
+  disegnaImpostazioni();
+}
+async function salvaCloudOra(){
+  if(CLOUD.caricando || typeof ONLINE === "undefined" || !ONLINE.salvaCarriera) return;
+  CLOUD.caricando = true;
+  CLOUD.messaggio = L("Salvataggio cloud in corso…","Saving to cloud…");
+  disegnaImpostazioni();
+  const r = await ONLINE.salvaCarriera(SET.slot);
+  CLOUD.caricando = false;
+  if(!r) CLOUD.messaggio = L("Server non raggiungibile: il locale resta salvo.",
+                              "Server unreachable: the local save is safe.");
+  else if(r.errore === "carriera-piu-avanti")
+    CLOUD.messaggio = L("Nel cloud c'è una carriera più avanti. Ripristinala prima di sovrascriverla.",
+                        "A newer career is already in the cloud. Restore it before overwriting.");
+  else if(r.errore === "carriera-troppo-grande")
+    CLOUD.messaggio = L("Il salvataggio è troppo grande per il cloud. Il locale resta salvo.",
+                        "This save is too large for cloud storage. The local save is safe.");
+  else if(r.errore)
+    CLOUD.messaggio = L("Salvataggio cloud non riuscito: ","Cloud save failed: ") + r.errore;
+  else
+    CLOUD.messaggio = L("Carriera salvata nel cloud.","Career saved to the cloud.");
+  CLOUD.caricato = false;
+  CLOUD.dato = null;
+  await caricaCloud(CLOUD.messaggio);
+}
+async function ripristinaCloudOra(n){
+  if(CLOUD.caricando || typeof ONLINE === "undefined" || !ONLINE.carriera) return false;
+  CLOUD.caricando = true;
+  CLOUD.messaggio = L("Ripristino cloud in corso…","Restoring from cloud…");
+  disegnaImpostazioni();
+  const r = await ONLINE.carriera(n);
+  CLOUD.caricando = false;
+  if(!r || r.errore || !r.stato || typeof r.stato !== "object"){
+    CLOUD.caricato = true; CLOUD.dato = r;
+    CLOUD.messaggio = testoCloud(r);
+    disegnaImpostazioni();
+    return false;
+  }
+
+  try{ if(typeof save === "function" && n === SET.slot) save(); }catch(e){}
+  const locale = letturaSlot(n);
+  let stato = null;
+  try{ stato = JSON.parse(JSON.stringify(r.stato)); }
+  catch(e){
+    CLOUD.messaggio = L("Il salvataggio cloud non è leggibile.","The cloud save cannot be read.");
+    disegnaImpostazioni(); return false;
+  }
+  const meta = stato.__adfCloud && typeof stato.__adfCloud === "object" ? stato.__adfCloud : null;
+  const artistaCloud = meta && meta.artista && typeof meta.artista === "object" ? meta.artista : null;
+  delete stato.__adfCloud;
+
+  /* Un vecchio cloud senza snapshot artista si può ripristinare se sul
+     dispositivo quell'artista esiste già. Su un dispositivo vuoto si ferma:
+     meglio non inventare un avatar o perdere l'identità del creator. */
+  if(!artistaCloud && !(locale.a && locale.a.name)){
+    CLOUD.messaggio = L(
+      "Questo è un salvataggio cloud precedente al backup dell'artista. Salvalo di nuovo dal dispositivo originale prima di ripristinarlo qui.",
+      "This cloud save predates artist backup. Save it again from the original device before restoring it here.");
+    CLOUD.caricato = true; CLOUD.dato = r; disegnaImpostazioni();
+    return false;
+  }
+
+  if(!locale.vuoto && !salvaBackupCloud(n)){
+    CLOUD.messaggio = L("Non riesco a creare la copia di sicurezza locale: nessun dato è stato modificato.",
+                        "I cannot create the local safety copy: no data was changed.");
+    CLOUD.caricato = true; CLOUD.dato = r; disegnaImpostazioni();
+    return false;
+  }
+
+  try{
+    scriviSlotLocale(n, stato, artistaCloud || locale.a || null);
+    if(r.artistaId && ONLINE.adottaArtista) ONLINE.adottaArtista(r.artistaId);
+  }catch(e){
+    if(!locale.vuoto) ripristinaBackupCloud(n);
+    else{
+      try{ scriviSlotLocale(n, null, null); }catch(_){}
+    }
+    CLOUD.messaggio = L("Ripristino non riuscito: è stata mantenuta la copia locale.",
+                        "Restore failed: the local copy was kept.");
+    CLOUD.caricato = true; CLOUD.dato = r; disegnaImpostazioni();
+    return false;
+  }
+  return true;
+}
+
 function corpoDati(){
   let out = '<div class="scard"><p class="snote">' + L(
     "Tre carriere in parallelo, ognuna col suo artista. Il gioco salva da solo su quella aperta.",
@@ -167,6 +352,7 @@ function corpoDati(){
       '</span></div>';
   }
   out += '</div>';
+  out += corpoCloud();
   out += '<div class="scard">' +
     '<b class="stit">' + L("Porta via la carriera","Take the career with you") + '</b>' +
     '<p class="snote">' + L(
@@ -240,6 +426,9 @@ function disegnaImpostazioni(){
     '<i>' + s.ic + '</i>' + s.n() + '</button>').join("");
   $("s-body").innerHTML = CORPI[SEZ]();
   $("s-foot").textContent = ADF_COPYRIGHT;
+  if(SEZ === "dati" && !CLOUD.caricato && !CLOUD.caricando){
+    setTimeout(() => { if(SEZ === "dati") caricaCloud(); }, 0);
+  }
   if(typeof passataLingua === "function") passataLingua($("setts"));
 }
 
@@ -342,6 +531,42 @@ document.addEventListener("click", e => {
 
   if(az === "prova"){ if(typeof SFX !== "undefined" && SFX[arg || "tap"]) SFX[arg || "tap"](); return; }
 
+  if(az === "cloud-aggiorna"){
+    CLOUD.caricato = false; CLOUD.dato = null; CLOUD.messaggio = "";
+    caricaCloud(); return;
+  }
+  if(az === "cloud-salva"){ salvaCloudOra(); return; }
+  if(az === "cloud-ripristina"){
+    const n = SET.slot, chiave = "cloud-ripristina:" + n;
+    if(!letturaSlot(n).vuoto && ARMATO !== chiave){
+      ARMATO = chiave;
+      CLOUD.messaggio = L("Il cloud sostituirà questo slot. Una copia locale verrà conservata per poter annullare.",
+                          "Cloud will replace this slot. A local backup will be kept so you can undo.");
+      disegnaImpostazioni();
+      setTimeout(() => { if(ARMATO === chiave){ ARMATO = ""; disegnaImpostazioni(); } }, 5000);
+      return;
+    }
+    ARMATO = "";
+    ripristinaCloudOra(n).then(ok => { if(ok) riparti(); });
+    return;
+  }
+  if(az === "cloud-annulla"){
+    const n = SET.slot, chiave = "cloud-annulla:" + n;
+    if(ARMATO !== chiave){
+      ARMATO = chiave;
+      CLOUD.messaggio = L("Questo rimetterà la copia locale precedente al ripristino cloud.",
+                          "This will restore the local copy from before the cloud restore.");
+      disegnaImpostazioni();
+      setTimeout(() => { if(ARMATO === chiave){ ARMATO = ""; disegnaImpostazioni(); } }, 5000);
+      return;
+    }
+    ARMATO = "";
+    if(ripristinaBackupCloud(n)){ riparti(); return; }
+    CLOUD.messaggio = L("La copia locale di sicurezza non è più disponibile.",
+                        "The local safety copy is no longer available.");
+    disegnaImpostazioni(); return;
+  }
+
   if(az === "slot"){
     try{ if(typeof save === "function") save(); }catch(e2){}
     SET.slot = +arg; setSalva(); riparti(); return;
@@ -364,7 +589,10 @@ document.addEventListener("click", e => {
     const t = $("s-codice");
     if(!t || !t.value.trim()){ d.textContent = L("Incolla prima il codice","Paste the code first");
       setTimeout(() => { d.textContent = L("Importa nello slot aperto","Import into the open slot"); }, 2200); return; }
-    if(importaCodice(t.value)){ riparti(); }
+    if(importaCodice(t.value)){
+      try{ localStorage.removeItem(cloudBackupKey(SET.slot)); }catch(e2){}
+      riparti();
+    }
     else{
       d.textContent = L("Codice non valido","Invalid code");
       setTimeout(() => { d.textContent = L("Importa nello slot aperto","Import into the open slot"); }, 2200);
@@ -387,6 +615,7 @@ document.addEventListener("click", e => {
       try{
         localStorage.removeItem(k.partita);
         localStorage.removeItem(k.artista);
+        localStorage.removeItem(cloudBackupKey(+arg));
       }catch(e2){}
       if(+arg === SET.slot){ riparti(); return; }
       disegnaImpostazioni(); return;

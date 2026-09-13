@@ -6,6 +6,103 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:290f4e3 -->
+## 12/09/26, 21:12 â€” origin/fix/famepedia-sidebar-legibile-20260912-211127 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `290f4e3`
+
+### Cosa Ã¨ entrato
+
+- `0052ef6` â€” fix(famepedia): rende leggibile la sidebar â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/famepedia.css`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
+<!-- merge:36deb6e -->
+## 12/09/26, 21:09 â€” origin/fix/famepedia-tipografia-makehuman-20260912-210829 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `36deb6e`
+
+### Cosa Ã¨ entrato
+
+- `4dbe467` â€” fix(famepedia): allinea tipografia a MakeHuman â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/famepedia.css`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
+<!-- merge:54b8289 -->
+## 12/09/26, 20:54 â€” origin/feat/famepedia-layout-v2-20260912-205354 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `54b8289`
+
+### Cosa Ã¨ entrato
+
+- `5c7dfa6` â€” feat(famepedia): aggiunge indice persistente e sfondo â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/famepedia.css`
+- **Modificato:** `frontend/js/famepedia.js`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 3
+
+---
+
+<!-- merge:c41c257 -->
+## 12/09/26, 19:40 â€” origin/feat/famepedia-v1-v2-20260912-194005 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `c41c257`
+
+### Cosa Ã¨ entrato
+
+- `bf80cbf` â€” feat(ui): aggiunge FAMEpedia alla landing â€” **Mycol**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/css/famepedia.css`
+- **Aggiunto:** `frontend/js/famepedia.js`
+- **Modificato:** `frontend/js/landing.js`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 4
+
+---
+
+<!-- merge:5e40f69 -->
+## 12/09/26, 16:05 â€” task/fix-propic-preset-makehuman â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `5e40f69`
+
+### Cosa Ã¨ entrato
+
+- `865bd06` â€” fix(makehuman): sincronizza propic con preset rapido â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/makehuman-camerino-v1/runtime.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:f3c7c40 -->
 ## 10/09/26, 16:55 â€” fix/durata-azioni-e-orari-fabbrica â†’ main
 

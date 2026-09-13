@@ -165,6 +165,99 @@ controlla("la landing non si porta dietro il gioco", landingCol.length === 0, la
   );
 }
 
+/* ADF_QUICK_MAKEHUMAN_V1
+   Avvio rapido deve usare uno dei preset MakeHuman maschili reali,
+   mantenendo identità casuale, scelte RPG e cinematic preesistenti. */
+{
+  const ingressoRapidoJs = fs.readFileSync(path.join(RADICE, "js/gioco-ingresso.js"), "utf8");
+  const creatorRapidoHtml = fs.readFileSync(path.join(RADICE, "media/creator-rpg-v24/creator.html"), "utf8");
+  const makeHumanRuntimeJs = fs.readFileSync(path.join(RADICE, "media/makehuman-camerino-v1/runtime.js"), "utf8");
+
+  controlla(
+    "avvio rapido non usa più il placeholder temporaneo",
+    !ingressoRapidoJs.includes("temporary-placeholder") &&
+    !ingressoRapidoJs.includes("installaPresetTemporaneo")
+  );
+
+  controlla(
+    "avvio rapido conserva nome/città, RPG casuale e cinematic approvati",
+    ingressoRapidoJs.includes("const nomi = [") &&
+    ingressoRapidoJs.includes("const citta = [") &&
+    ingressoRapidoJs.includes("GENRES[") &&
+    ingressoRapidoJs.includes("STORY.map(scene =>") &&
+    ingressoRapidoJs.includes("window.playCareerIntro()")
+  );
+
+  controlla(
+    "avvio rapido usa il contratto MakeHuman reale senza toccare Avaturn",
+    ingressoRapidoJs.includes("adf-rpg-v24-quick-makehuman") &&
+    creatorRapidoHtml.includes("adf-rpg-v24-quick-makehuman") &&
+    creatorRapidoHtml.includes("adf-makehuman-quick-preset") &&
+    creatorRapidoHtml.includes("provider:'makehuman'") &&
+    creatorRapidoHtml.includes("window.completeAvatarCreation('local'")
+  );
+
+  controlla(
+    "MakeHuman rapido sceglie solo preset maschili e genera stato più propic",
+    makeHumanRuntimeJs.includes("preset=>preset.gender==='male'") &&
+    makeHumanRuntimeJs.includes("adf-makehuman-quick-preset-result") &&
+    makeHumanRuntimeJs.includes("snapshotCharacterState()") &&
+    makeHumanRuntimeJs.includes("previewImage:makePreviewImage()")
+  );
+}
+
+/* ADF_MAKEHUMAN_PRESET_READY_GATE_V1
+   Regressione: i preset non devono essere montati da DOMContentLoaded mentre
+   MakeHuman/handshake possono ancora ripristinare lo stato del personaggio. */
+{
+  const makeHumanRuntimeJs = fs.readFileSync(
+    path.join(RADICE, "media/makehuman-camerino-v1/runtime.js"),
+    "utf8"
+  );
+
+  controlla(
+    "preset MakeHuman montati solo dopo runtime, motore e handshake iniziale",
+    makeHumanRuntimeJs.includes("function adfMhPresetMountReady()") &&
+    makeHumanRuntimeJs.includes("if(!runtimeReady || !nativeEngineReady) return false;") &&
+    makeHumanRuntimeJs.includes("!window.__ADF_MAKEHUMAN_INIT_ACCEPTED__") &&
+    !makeHumanRuntimeJs.includes("function adfMhInitPresets()") &&
+    !makeHumanRuntimeJs.includes("document.addEventListener('DOMContentLoaded',adfMhInitPresets)")
+  );
+}
+
+/* ADF_ONLINE_ACCOUNT_ARTIST_LINK_V1
+   Account, artista e cloud devono condividere la stessa identità online. */
+{
+  const onlineJs = fs.readFileSync(path.join(RADICE, "js/net/online.js"), "utf8");
+  const entryJs = fs.readFileSync(path.join(RADICE, "js/game/entry.js"), "utf8");
+
+  const bloccoRegistra = onlineJs.match(/async function registra\([\s\S]*?\n  }/);
+  controlla(
+    "la registrazione artista non nasconde la sessione account",
+    !!bloccoRegistra && !bloccoRegistra[0].includes("senzaSessione: true")
+  );
+
+  const bloccoMail = onlineJs.match(/const registraConMail[\s\S]*?\n  \}\)\.then/);
+  controlla(
+    "aggiungere la mail conserva la sessione ospite da promuovere",
+    !!bloccoMail && !bloccoMail[0].includes("senzaSessione: true")
+  );
+
+  controlla(
+    "punteggio e cloud assicurano prima l'artista locale",
+    onlineJs.includes("async function assicuraArtistaLocale()") &&
+    onlineJs.includes("const assicurata = await assicuraArtistaLocale();") &&
+    onlineJs.includes("artistaId: mia ? mia.id : null")
+  );
+
+  controlla(
+    "l'ingresso gameplay assicura l'artista online senza bloccare la città",
+    entryJs.includes("function assicuraArtistaOnline()") &&
+    entryJs.includes("Promise.resolve(ONLINE.assicuraArtistaLocale()).catch(() => {})") &&
+    entryJs.includes("assicuraArtistaOnline();")
+  );
+}
+
 console.log("\nil codice");
 const rotti = [];
 
@@ -1479,30 +1572,37 @@ console.log("\nl'editor artista conserva la modalita audio della partita");
   ingressi = 0;
   schermate.length = 0;
 
-  /* Il percorso "Il tuo artista" entra nel creator senza il callback usato
-     dalla nuova partita: al completamento passa dal fallback del bridge. */
+  /* "Il tuo artista" è modifica aspetto, non una nuova creazione.
+     La città viene avviata una volta sola sotto l'editor; il salvataggio
+     dell'aspetto chiude la sessione senza un secondo ingresso in gameplay. */
   scatola.location.search = "?vai=profilo";
   vm.runInContext(fs.readFileSync(path.join(RADICE, "js/game/entry.js"), "utf8"),
     scatola, {filename:"js/game/entry.js"});
   vm.runInContext(fs.readFileSync(path.join(RADICE, "js/gioco-ingresso.js"), "utf8"),
     scatola, {filename:"js/gioco-ingresso.js"});
-  const primaProfilo = vm.runInContext("ADF_AUDIO.canPlay('beat')", scatola);
-  vm.runInContext("ADF_RPG_V24.open()", scatola);
+
+  const duranteProfilo = vm.runInContext(
+    "({mode:ADF_AUDIO.mode, beat:ADF_AUDIO.canPlay('beat')})", scatola);
+  const frameProfilo = frameCreato;
+
   eventiWindow.message({
-    source:frameCreato.contentWindow,
+    source:frameProfilo.contentWindow,
     data:{
-      type:"adf-rpg-v24-complete",
-      detail:{name:"Artista", city:"Milano", genre:"rap", avatarSource:"local",
-        avatarData:{localAvatar:{preset:"base"}}, answers:[]}
+      type:"adf-rpg-v24-appearance-updated",
+      detail:{avatarSource:"local", avatarData:{localAvatar:{preset:"base"}}}
     }
   });
+
   const dopoProfilo = vm.runInContext(
     "({mode:ADF_AUDIO.mode, beat:ADF_AUDIO.canPlay('beat')})", scatola);
 
-  controlla("tornare dal profilo entra una volta in gameplay con i beat disponibili",
-    !primaProfilo && ingressi === 1 && schermate.at(-1) === "hub" &&
-      dopoProfilo.mode === "gameplay" && dopoProfilo.beat,
-    JSON.stringify({primaProfilo, ingressi, schermate, dopoProfilo}));
+  controlla("Il tuo artista entra una volta in gameplay e chiude l'aspetto senza secondo ingresso",
+    ingressi === 1 && schermate.filter(x => x === "hub").length === 1 &&
+      duranteProfilo.mode === "gameplay" && duranteProfilo.beat &&
+      dopoProfilo.mode === "gameplay" && dopoProfilo.beat &&
+      scatola.A.localAvatar?.preset === "base",
+    JSON.stringify({duranteProfilo, ingressi, schermate, dopoProfilo,
+      preset:scatola.A.localAvatar?.preset||null}));
 }
 
 /* Un retry nato per un iframe non deve mai proseguire sul creator aperto dopo:

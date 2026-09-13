@@ -20,7 +20,11 @@ const arg = n => { const i = process.argv.indexOf(n); return i > 0 ? process.arg
 const PORTA = Number(arg("--porta") || 8000);
 const RADICE = path.resolve(__dirname, "..", process.argv.includes("--dist") ? "dist" : ".");
 const PLAYWRIGHT = process.argv.includes("--playwright");
-const PLAYWRIGHT_TOKEN = arg("--playwright-token") || "";
+/* Il codice per spegnere il server arriva dall'ambiente, non dalla riga di
+   comando: su Windows la riga di comando di un processo la legge chiunque
+   abbia accesso alla macchina, l'ambiente di un processo altrui no. Lo passa
+   test/e2e/server-lifecycle.js, che e' l'unico che lo conosce. */
+const PLAYWRIGHT_TOKEN = process.env.ADF_PLAYWRIGHT_TOKEN || "";
 
 const TIPI = {
   ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8",
@@ -47,12 +51,71 @@ function avvisa(){
   for(const res of orecchie) res.write("data: cambiato\n\n");
 }
 
+/* ADF_DEV_WATCH_CONTENT_GUARD_V1
+   Su Windows fs.watch può notificare anche accessi/variazioni di metadati
+   mentre MakeHuman legge runtime e proxy JSON. Il vecchio server trattava
+   QUALSIASI notifica come "file sorgente modificato" e ricaricava il parent
+   della landing, distruggendo creator/app-shell.
+
+   Regola nuova: una notifica del filesystem NON basta. Ricarichiamo soltanto
+   se size o mtime del file sono realmente cambiati rispetto all'ultima
+   impronta nota. Le impronte vengono registrate quando il server serve il file,
+   quindi leggere lo stesso asset non può più essere scambiato per un salvataggio. */
+const impronteFile = new Map();
+
+function chiaveFile(f){
+  return path.resolve(f);
+}
+
+function improntaStat(stat){
+  return String(stat.size) + ":" + String(stat.mtimeMs);
+}
+
+function ricordaImpronta(f, stat){
+  try{
+    if(!stat || !stat.isFile()) return;
+    if(!/\.(?:html|css|js|json)$/i.test(String(f))) return;
+    impronteFile.set(chiaveFile(f), improntaStat(stat));
+  }catch(e){}
+}
+
+function fileDavveroModificato(file){
+  const f = path.resolve(RADICE, String(file));
+  const key = chiaveFile(f);
+
+  let stat;
+  try{
+    stat = fs.statSync(f);
+  }catch(e){
+    /* La rimozione di un file già noto è una modifica reale. */
+    const esisteva = impronteFile.delete(key);
+    return esisteva;
+  }
+
+  if(!stat.isFile()) return false;
+
+  const next = improntaStat(stat);
+  const prev = impronteFile.get(key);
+
+  impronteFile.set(key, next);
+
+  /* File mai visto: prudenza, consideriamo reale la notifica.
+     I file caricati dal gioco sono già improntati nel server HTTP prima
+     della lettura e quindi non passano da questo ramo. */
+  if(prev === undefined) return true;
+
+  return prev !== next;
+}
+
 /* si guarda la cartella, ma si sta zitti per 80 ms: salvare un file fa
    scattare l'evento due o tre volte, e ricaricare tre volte e' fastidioso */
 let attesa = null;
 fs.watch(RADICE, { recursive: true }, (tipo, file) => {
   if(!file || /node_modules|[\\/]dist[\\/]|\.tmp$|~$/.test(file)) return;
   if(!/\.(?:html|css|js|json)$/i.test(String(file))) return;
+
+  if(!fileDavveroModificato(file)) return;
+
   clearTimeout(attesa);
   attesa = setTimeout(() => {
     console.log("  ~ " + String(file).replace(/\\/g, "/"));
@@ -151,6 +214,11 @@ const server = http.createServer((req, res) => {
       res.writeHead(404, { "content-type": "text/plain; charset=utf-8" }).end("non c'è: " + rel);
       return;
     }
+
+    /* Baseline per il watcher PRIMA di qualunque read/stream del file.
+       Se Windows genera una notifica solo perché il browser lo sta leggendo,
+       size+mtime restano identici e la notifica viene ignorata. */
+    ricordaImpronta(f, stat);
 
     const tipo = TIPI[path.extname(f).toLowerCase()] || "application/octet-stream";
 

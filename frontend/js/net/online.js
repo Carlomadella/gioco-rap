@@ -38,10 +38,14 @@ const ONLINE = (() => {
   const scrivi = (k, v) => { try{ localStorage.setItem(chiave(k), v); }catch(e){} };
   const togli = k => { try{ localStorage.removeItem(chiave(k)); }catch(e){} };
 
+  /* Il gioco distribuito deve parlare col backend pubblico senza chiedere al
+     player di avviare Node o configurare Neon. Chi sviluppa in locale può
+     sempre sovrascrivere l'URL con ONLINE.collega("http://localhost:8787"). */
+  const DEFAULT_BASE = "https://anni-di-fame-api.onrender.com";
   let staccato = false;
   let base = null;
   try{ base = localStorage.getItem(K_URL); }catch(e){}
-  if(!base) base = "http://localhost:8787";
+  if(!base) base = DEFAULT_BASE;
 
   async function chiama(rotta, opzioni){
     const o = opzioni || {};
@@ -73,9 +77,15 @@ const ONLINE = (() => {
   }
 
   /* ==================== CHI SEI ==================== */
+  /* La sessione account esiste anche prima che il player abbia creato un
+     artista. Non va dedotta da K_ID: account e artista sono due concetti
+     diversi e la pagina Account deve poter riconoscere chi ha fatto login
+     anche con zero carriere/artisti locali. */
+  const sessione = () => leggi(K_SESSIONE);
+
   function identita(){
     const id = leggi(K_ID);
-    return id ? { id, chiave: leggi(K_CHIAVE), sessione: leggi(K_SESSIONE) } : null;
+    return id ? { id, chiave: leggi(K_CHIAVE), sessione: sessione() } : null;
   }
 
   /* Iscrive l'artista alla classifica. Il server apre anche un account da
@@ -99,7 +109,9 @@ const ONLINE = (() => {
 
   async function registra(nome, citta, genere){
     const r = await chiama("/api/artista", {
-      metodo: "POST", senzaSessione: true,
+      /* Se c'è già una sessione (email oppure ospite), il server deve usarla:
+         senzaSessione qui separava l'artista dall'account appena aperto. */
+      metodo: "POST",
       corpo: { nome, citta, genere: GENERE_SERVER[genere] || genere,
         difficolta: (typeof G !== "undefined" && G && G.difficolta) || "anni-di-fame",
         dispositivo: { piattaforma: piattaforma(), nome: "questo dispositivo", versione: window.VERSIONE_GIOCO } }
@@ -118,6 +130,35 @@ const ONLINE = (() => {
     return r && !r.errore ? identita() : r;
   }
 
+  /* Il creator salva già nome/città/genere nello stato locale A. L'online non
+     deve chiedere una seconda volta gli stessi dati: quando serve la classifica
+     o il cloud, prende l'artista locale e lo assicura sul server. */
+  function artistaLocale(){
+    try{
+      const a = (typeof A === "object" && A) ? A : (window.ARTIST || null);
+      if(!a || !String(a.name || "").trim()) return null;
+      return {
+        nome: String(a.name).trim(),
+        citta: String(a.city || "").trim(),
+        genere: String(a.genre || "").trim() || "trap"
+      };
+    }catch(e){ return null; }
+  }
+
+  let assicuraArtistaInCorso = null;
+  async function assicuraArtistaLocale(){
+    const mia = identita();
+    if(mia) return mia;
+    if(assicuraArtistaInCorso) return assicuraArtistaInCorso;
+
+    const a = artistaLocale();
+    if(!a) return null;
+
+    assicuraArtistaInCorso = Promise.resolve(assicura(a.nome, a.citta, a.genere))
+      .finally(() => { assicuraArtistaInCorso = null; });
+    return assicuraArtistaInCorso;
+  }
+
   /* Chi ha ancora solo la vecchia chiave se la scambia con una sessione: serve
      a chi giocava prima che gli account esistessero. */
   async function scambiaVecchiaChiave(){
@@ -133,11 +174,15 @@ const ONLINE = (() => {
   /* Legare l'account a una mail: è quello che fa sopravvivere la carriera a un
      telefono nuovo, finché non ci sono Steam, Apple e Google. */
   const registraConMail = (email, segreto) => chiama("/api/account", {
-    metodo: "POST", senzaSessione: true,
+    attesa: 60000,
+    /* Se stiamo già giocando come ospite, il backend promuove QUELLO stesso
+       account a email: non va nascosta la sessione corrente. */
+    metodo: "POST",
     corpo: { tipo: "email", email, segreto, dispositivo: { piattaforma: piattaforma(), versione: window.VERSIONE_GIOCO } }
   }).then(r => { if(r && r.token) scrivi(K_SESSIONE, r.token); return r; });
 
   const entra = (email, segreto) => chiama("/api/sessione", {
+    attesa: 60000,
     metodo: "POST", senzaSessione: true,
     corpo: { tipo: "email", email, segreto, dispositivo: { piattaforma: piattaforma(), versione: window.VERSIONE_GIOCO } }
   }).then(r => { if(r && r.token) scrivi(K_SESSIONE, r.token); return r; });
@@ -208,8 +253,12 @@ const ONLINE = (() => {
 
   /* Da chiamare a settimana chiusa. Senza argomenti si prende tutto da G. */
   async function invia(dati){
-    const mia = identita();
-    if(!mia) return null;
+    let mia = identita();
+    if(!mia){
+      const assicurata = await assicuraArtistaLocale();
+      if(!assicurata || assicurata.errore) return assicurata || null;
+      mia = identita();
+    }
     const p = dati || punteggioDaPartita();
     if(!p) return null;
     return chiama("/api/punteggio", {
@@ -221,13 +270,44 @@ const ONLINE = (() => {
   /* ==================== LA CARRIERA IN CLOUD ==================== */
   /* Lo stato del gioco è l'oggetto G: si manda com'è. Il server tiene tre slot
      come quelli in locale, e in conflitto vince la partita più avanti. */
+  /* ADF_CLOUD_RESTORE_UI_V1
+     Il cloud deve poter ricostruire non solo G ma anche l'artista. Il backend
+     conserva già lo stato come JSON, quindi il profilo viaggia in una busta
+     interna che viene tolta quando si ripristina in locale. Non si cambia lo
+     schema del database e i vecchi salvataggi restano leggibili. */
+  function artistaPerCloud(){
+    try{
+      const a = (typeof A === "object" && A) ? A : (window.ARTIST || null);
+      if(!a || typeof a !== "object" || !String(a.name || "").trim()) return null;
+      const copia = JSON.parse(JSON.stringify(a));
+      const av = copia.avatarData;
+      if(av && typeof av === "object" && copia.avatarPreviewImage){
+        if(av.previewImage === copia.avatarPreviewImage) delete av.previewImage;
+        if(av.avatarPreviewImage === copia.avatarPreviewImage) delete av.avatarPreviewImage;
+      }
+      return copia;
+    }catch(e){ return null; }
+  }
+  function statoPerCloud(){
+    let stato = null;
+    try{ stato = JSON.parse(JSON.stringify(G)); }catch(e){ return G; }
+    const artista = artistaPerCloud();
+    if(artista) stato.__adfCloud = { v:1, artista };
+    return stato;
+  }
+
   async function salvaCarriera(slot, forza){
     if(typeof G === "undefined" || !G) return null;
-    const mia = identita();
+    let mia = identita();
+    if(!mia){
+      const assicurata = await assicuraArtistaLocale();
+      if(assicurata && assicurata.errore) return assicurata;
+      mia = identita();
+    }
     return chiama("/api/carriera/" + (slot || slotAttuale()), {
       metodo: "PUT",
       corpo: {
-        stato: G, settimana: G.week || 1, anno: G.year || 1,
+        stato: statoPerCloud(), settimana: G.week || 1, anno: G.year || 1,
         artistaId: mia ? mia.id : null,
         versioneGioco: (window.VERSIONE_GIOCO || ""), forza: !!forza
       }
@@ -236,6 +316,20 @@ const ONLINE = (() => {
   const carriera = slot => chiama("/api/carriera/" + (slot || slotAttuale()));
   const carriere = () => chiama("/api/carriere");
   const slotAttuale = () => (typeof SET === "object" && SET && SET.slot) ? SET.slot : 1;
+
+  /* Un restore autenticato può adottare l'artista già legato a quella carriera.
+     La sessione account resta dov'è; cambia solo l'identità artista dello slot. */
+  function adottaArtista(id){
+    const pulito = String(id || "").trim();
+    if(!pulito){
+      togli(K_ID);
+      togli(K_CHIAVE);
+      return false;
+    }
+    scrivi(K_ID, pulito);
+    togli(K_CHIAVE);
+    return true;
+  }
 
   /* ==================== TRAGUARDI ==================== */
   const traguardi = () => chiama("/api/traguardi");
@@ -337,7 +431,7 @@ const ONLINE = (() => {
 
   /* ==================== IMPOSTAZIONI ==================== */
   function collega(url){
-    base = String(url || "").replace(/\/+$/, "") || "http://localhost:8787";
+    base = String(url || "").replace(/\/+$/, "") || DEFAULT_BASE;
     try{ localStorage.setItem(K_URL, base); }catch(e){}
     CACHE = null;   /* un altro server è un'altra classifica */
     return base;
@@ -347,7 +441,7 @@ const ONLINE = (() => {
   return {
     get url(){ return base; },
     get staccato(){ return staccato; },
-    collega, scollega, identita, registra, assicura, scambiaVecchiaChiave,
+    collega, scollega, sessione, identita, adottaArtista, registra, assicura, assicuraArtistaLocale, scambiaVecchiaChiave,
     registraConMail, entra, esci, io, cancellaAccount, piattaforma,
     punteggioDaPartita, invia,
     salvaCarriera, carriera, carriere,

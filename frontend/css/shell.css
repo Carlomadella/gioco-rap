@@ -122,6 +122,11 @@
 .navacc{font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:.08em;
   text-transform:uppercase;color:rgba(255,255,255,.72);background:transparent;
   border:1px solid rgba(255,255,255,.18);padding:8px 14px;border-radius:999px;flex:none;
+  display:inline-flex;align-items:center;gap:8px;
   transition:background .15s,border-color .15s,color .15s}
+.navacc::before{content:"";width:7px;height:7px;border-radius:50%;flex:none;
+  background:#FF5A5F;box-shadow:0 0 0 3px rgba(255,90,95,.12);
+  transition:background .15s,box-shadow .15s}
+.navacc.connesso::before{background:#48D985;box-shadow:0 0 0 3px rgba(72,217,133,.13)}
 @media (hover:hover){.navacc:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.4);color:#fff}}
 

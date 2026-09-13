@@ -6,6 +6,146 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:f356840 -->
+## 12/09/26, 19:59 â€” task/creator-blocco-capoluoghi-v3 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `f356840`
+
+### Cosa Ã¨ entrato
+
+- `5e5933c` â€” feat(creator): blocca i capoluoghi come città iniziale â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:249d509 -->
+## 12/09/26, 18:57 â€” task/creator-aspetto-sfondo-boutique-v1 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `249d509`
+
+### Cosa Ã¨ entrato
+
+- `e20e411` â€” feat(creator): aggiunge sfondo boutique alla scelta avatar â€” **Mycol**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/media/creator-rpg-v24/assets/creator-appearance-boutique-v1.png`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
+<!-- merge:1fc1984 -->
+## 12/09/26, 18:38 â€” task/creator-identita-sfondo-v3 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `1fc1984`
+
+### Cosa Ã¨ entrato
+
+- `61ef1bb` â€” feat(creator): aggiunge sfondo alla schermata identita â€” **Mycol**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/media/creator-rpg-v24/assets/creator-identity-provenienza-v1.png`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
+<!-- merge:8a27fba -->
+## 12/09/26, 17:43 â€” origin/fix/sessione-account-senza-artista-20260912-174303 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `8a27fba`
+
+### Cosa Ã¨ entrato
+
+- `bd79730` â€” fix(account): conserva login senza artista locale â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/accesso.js`
+- **Modificato:** `frontend/js/net/online.js`
+- **Modificato:** `frontend/pagine/accesso.html`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 5
+
+---
+
+<!-- merge:ea17bec -->
+## 12/09/26, 17:11 â€” task/creator-casuale-nome-citta-v1 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `ea17bec`
+
+### Cosa Ã¨ entrato
+
+- `e952df8` â€” feat(creator): aggiunge nome e città casuali â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/gioco-ingresso.js`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 2
+
+---
+
+<!-- merge:e39d737 -->
+## 12/09/26, 15:37 â€” task/avvio-rapido-nomi-artista â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `e39d737`
+
+### Cosa Ã¨ entrato
+
+- `8a8ca64` â€” feat(avvio rapido): migliora i nomi artista â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/gioco-ingresso.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:8dffa9f -->
+## 12/09/26, 12:54 â€” fix/account-artista-cloud-20260912-145418 â†’ main
+
+**Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
+**Merge commit:** `8dffa9f`
+
+### Cosa Ã¨ entrato
+
+- `cb502a7` â€” fix(online): collega account artista e cloud â€” **Mycol**
+
+### File di questa categoria
+
+- **Modificato:** `backend/database/archivio.js`
+- **Modificato:** `backend/prova.js`
+- **Modificato:** `backend/server.js`
+- **Modificato:** `frontend/js/game/entry.js`
+- **Modificato:** `frontend/js/net/online.js`
+- **Modificato:** `frontend/pagine/accesso.html`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 8
+
+---
+
 <!-- merge:10a372d -->
 ## 08/09/26, 21:17 â€” main â†’ main
 
