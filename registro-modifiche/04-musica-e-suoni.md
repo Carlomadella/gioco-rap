@@ -6,6 +6,27 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:18824d8 -->
+## 13/09/26, 17:44 â€” task/beat-e-tasto-oro-riapplicato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `18824d8`
+
+### Cosa Ã¨ entrato
+
+- `80108c7` â€” fix(studio): riapplica a mano tre delle quattro correzioni di beat-e-tasto-oro â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `frontend/css/menu-sistema.css`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/studio.js`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:f6f76da -->
 ## 10/09/26, 16:27 â€” branch non identificato â†’ main
 
