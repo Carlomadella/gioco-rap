@@ -6,6 +6,27 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:d6a7c64 -->
+## 13/09/26, 16:02 â€” task/backend-schema-allineato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `d6a7c64`
+
+### Cosa Ã¨ entrato
+
+- `cdd86d9` â€” docs(backend): schema.md entra in git, allineato alle migrazioni vere â€” **Carlomadella**
+- `7b8dfd0` â€” docs(backend): il README elenca tutte le manopole, e un controllo lo difende â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `backend/README.md`
+- **Aggiunto:** `backend/database/schema.md`
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:541eacc -->
 ## 13/09/26, 15:18 â€” test/vitest-playwright-gate â†’ main
 
