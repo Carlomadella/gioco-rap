@@ -87,10 +87,14 @@ const STUDIO_SEZIONI = [
    d:"la faccia del pezzo"},
   {id:"feat",   n:"Feat",      bar:"Il feat",      sc:"registra",
    d:"con chi lo fai"},
-  {id:"promo",  n:"Marketing", bar:"Il marketing", sc:"promo",
-   d:"farlo sapere"},
+  /* Timing prima di Marketing, e non e' un gusto: la spinta si decide
+     **dopo** aver deciso quando esce il pezzo, perche' «venerdi' fra 4 giorni»
+     e «stanotte» non si spingono allo stesso modo. Al contrario si sceglieva
+     come spingerlo prima di sapere quando usciva. */
   {id:"fuori",  n:"Timing",    bar:"Fuori",        sc:"pubblica",
-   d:"da qui in poi corre da solo"}
+   d:"quando esce"},
+  {id:"promo",  n:"Marketing", bar:"Il marketing", sc:"promo",
+   d:"farlo sapere"}
 ];
 
 let STUDIO_SEZ = "beat";

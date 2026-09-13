@@ -1483,3 +1483,16 @@ sta in mezzo, finiva **sopra alla casella HYPE** — che infatti non si leggeva.
 media query rimette la nav alta quanto il suo contenuto e la appoggia in alto, dove
 `#hb-logo` (invisibile ma che conserva il posto) la aspetta. Misurato a 360 punti: nav
 alta 30 punti dentro una barra di 307, e nessuna sovrapposizione con HYPE.
+
+## Timing prima di Marketing, nello Studio
+
+~~«marketing deve essere dopo timing»~~ **FATTO (13/09/2026)**
+
+Le linguette dello Studio adesso fanno Beat · Testo · Cabina · Mix · Cover · Feat ·
+**Timing** · **Marketing**. Non e' un gusto: la spinta si decide **dopo** aver deciso quando
+esce il pezzo, perche' «stanotte» e «venerdi' fra quattro giorni» non si spingono allo
+stesso modo. Prima si sceglieva come spingerlo senza sapere quando sarebbe uscito.
+
+L'ordine lo tiene `STUDIO_SEZIONI` in `frontend/js/game/studio.js`, e il controllo che lo
+difende sta in `strumenti/prova.js` («le sezioni sono le sette del punto 4, piu' la
+cabina»), che confronta l'elenco intero: se qualcuno le rimescola, lo dice.
