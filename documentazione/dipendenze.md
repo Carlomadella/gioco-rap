@@ -16,6 +16,7 @@ commentato di tutto quello che si potrebbe installare.
 | posso installare questa cosa? | [Le cinque domande](#le-cinque-domande) |
 | cosa devo fare il giorno che la installo | [Il prezzo](#il-prezzo-che-si-paga-sempre) |
 | cosa c'è dentro oggi, e come si toglie | [Il registro](#quello-che-cè-installato-oggi) |
+| cosa è entrato senza un file davanti | [Il debito](#quelle-entrate-senza-un-file-dietro-debito-13092026) |
 | perché il principio è caduto | [Il ragionamento](#perché-il-principio-è-caduto) |
 | cosa esiste là fuori e cosa fa | [L'elenco](#lelenco-tutto-quello-che-si-potrebbe-installare) |
 
@@ -54,24 +55,53 @@ Prima di installare. Se una risposta è storta, non si installa.
 
 ## Quello che c'è installato oggi
 
-Sono due. **[dentro]** vuol dire che finisce nel prodotto e pesa; **[fuori]** che resta
-negli strumenti e al giocatore costa zero.
+Sono **dodici**: nove nel frontend (tutte in `devDependencies`) e tre nel backend.
+**[dentro]** vuol dire che finisce nel prodotto e pesa; **[fuori]** che resta negli
+strumenti e al giocatore costa zero. Oggi sono **tutte fuori**: al giocatore costano zero
+KB, nessuna entra in `gioco-*.js`.
+
+Di queste dodici, **cinque hanno un file nostro davanti** e stanno qui sotto. Le altre
+sette sono installate ma non le usa nessuno: stanno nella tabella dopo, ed è un debito
+aperto, non una scelta.
 
 | pacchetto | dove | dentro/fuori | a cosa serve | perché non è scritta a mano | come si toglie |
 | --- | --- | --- | --- | --- | --- |
 | [`esbuild`](https://esbuild.github.io/) `^0.25.0` (MIT) | `frontend/package.json`, `devDependencies` | **fuori** | mette insieme e minifica i 13 CSS e i 72 JS in due file soli: è il motore di `npm run build`, cioè del pacchetto che va sugli store | un minificatore JavaScript corretto è un parser completo del linguaggio: si sbaglia in silenzio e si scopre in produzione | sta dietro alla funzione `esbuild()` di [`../frontend/strumenti/build.js`](../frontend/strumenti/build.js): un file solo, e il build senza minificazione continua a girare |
+| [`vitest`](https://vitest.dev/) `^5.0.0` (MIT) | `frontend/package.json`, `devDependencies` | **fuori** | il runner delle prove sul comportamento: è `npm run test:unit`, dentro a `npm run verifica` | far girare i test isolati, ricaricare i moduli fra un caso e l'altro e dire *quale* riga è saltata è infrastruttura, non gioco. L'alternativa a zero pacchetti è `node:test`, che Node ha già dentro ed è scritta nell'elenco più sotto | sta dietro agli script `test:unit` di [`../frontend/package.json`](../frontend/package.json) e ai file in `frontend/test/unit/`: si toglie il pezzo `npm run test:unit` dalla catena `verifica` e la cartella resta da riscrivere per `node:test` |
+| [`jsdom`](https://github.com/jsdom/jsdom) `^29.1.1` (MIT) | `frontend/package.json`, `devDependencies` | **fuori** | il DOM finto dentro Node — `document`, eventi, `localStorage` — con cui le prove aprono le schermate senza aprire Chrome | è un pezzo di browser: rifarlo a mano vuol dire rifare le specifiche HTML, e un DOM finto sbagliato fa passare prove che sul browser vero non passano | sta dietro a [`../frontend/test/unit/gameplay-regressions.test.js`](../frontend/test/unit/gameplay-regressions.test.js), l'unico file che la importa |
+| [`@playwright/test`](https://playwright.dev/) `^1.63.0` (Apache-2.0) | `frontend/package.json`, `devDependencies` | **fuori** | Chrome vero senza finestra: apre il gioco, ci clicca dentro dalla landing all'hub, e prende gli screenshot. È `npm run test:e2e`, dentro a `npm run verifica` | guidare un browser vero (protocollo CDP, aspettare che la pagina sia davvero pronta, screenshot) è il mestiere di un driver: a mano è un progetto suo, e sbagliarlo vuol dire prove che lampeggiano | sta dietro a [`../frontend/playwright.config.js`](../frontend/playwright.config.js) e alla cartella `frontend/test/e2e/`: si toglie il pezzo `npm run test:e2e` dalla catena `verifica` e il resto del gate continua a girare. **Vuole un browser scaricato a parte** (`npm run setup:browser`, una volta per macchina): e' la sola dipendenza del progetto che non basta `npm ci` a mettere a posto |
 | [`pg`](https://node-postgres.com/) `^8.23.0` (MIT) | `backend/package.json`, `dependencies` | **fuori** (server) | il client PostgreSQL: SCRAM-SHA-256, TLS, decodifica dei tipi, riconnessioni. Serve solo con `ADF_PG` acceso; di suo il server va a SQLite dentro a Node | è il file che tiene le carriere della gente: quattro punti dove un errore sottile non si vede subito e si paga sui dati veri. Il perché per esteso in [`../backend/database/README.md`](../backend/database/README.md) | sta dietro a [`../backend/database/postgres.js`](../backend/database/postgres.js): senza `ADF_PG` non viene nemmeno caricato |
+
+## Quelle entrate senza un file dietro _(debito, 13/09/2026)_
+
+La quarta domanda dice che ogni dipendenza sta **dietro a un file nostro**. Queste sette
+sono installate — stanno nei due `package.json` e nei lockfile, `npm ci` le tira giù in CI
+— ma **non le importa nessuno**: non c'è il file davanti, e per `eslint` non c'è nemmeno
+la configurazione né uno script che lo lanci. Verificato il 13/09/2026 cercando gli import
+in tutto il repo fuori da `node_modules/`.
+
+Non sono state tolte qui perché toglierle è una decisione, non una pulizia: per tre di
+loro il file davanti **era il piano** (sotto, «Quello che entrerebbe per prime»), e vanno
+o costruite o disinstallate — una per commit, col perché.
+
+| pacchetto | dove | doveva servire a | cosa manca | se si molla |
+| --- | --- | --- | --- | --- |
+| `eslint` `^10.10.0` (MIT) + `@eslint/js` `^10.0.1` (MIT) + `globals` `^17.12.0` (MIT) | `frontend`, `devDependencies` | trovare i nomi storti sui 72 file a scope condiviso | non c'è `eslint.config.js`, e nessuno script `lint` in `package.json`: oggi non gira mai | `npm rm eslint @eslint/js globals` nel frontend |
+| `sharp` `^0.35.4` (Apache-2.0) | `frontend`, `devDependencies` | comprimere e convertire le immagini nel build | nessun file la importa: il build non tocca le immagini | `npm rm sharp` nel frontend — ed è quella che pesa di più da scaricare |
+| `vite` `^6.4.3` (MIT) | `frontend`, `devDependencies` | niente di deciso: `vitest` se la tira già dietro da sola | non c'è nessun `vite.config.js` e nessuno la importa. Il dev server è `strumenti/dev.js`, scritto da noi | `npm rm vite` nel frontend: `vitest` continua a girare, la sua copia se la porta da sé |
+| `jose` `^6.2.12` (MIT) | `backend`, `dependencies` | verificare i token Apple e Google al posto della verifica scritta a mano | `backend/accessi.js` non la importa: la verifica a mano è ancora quella di prima, ed è **il punto peggiore dove risparmiare** | `npm rm jose` nel backend — ma qui la mossa giusta è l'opposto: usarla |
+| `zod` `^4.6.1` (MIT) | `backend`, `dependencies` | validare i corpi delle rotte, oggi fatta a mano rotta per rotta | nessuna rotta la importa | `npm rm zod` nel backend |
 
 ## Quello che entrerebbe per prime, e non è ancora entrato
 
-Nessuna delle tre entra nel gioco: al giocatore costano zero KB. Non sono installate: sono
-la decisione già presa su cosa viene dopo.
+`vitest` + `jsdom` sono entrate e hanno il loro file davanti: sono la riga di sopra, e il
+gate `npm run verifica` le fa girare a ogni giro. Restano queste due, e per tutte e due il
+pacchetto è già scaricato senza che nessuno lo usi (la tabella qui sopra):
 
 | pacchetto | a cosa servirebbe | perché prima delle altre |
 | --- | --- | --- |
 | `jose` | verifica dei token Apple e Google al posto di quella scritta a mano in `backend/accessi.js` | è il posto peggiore del progetto dove risparmiare: un errore lì non lo prende nessun test e si scopre quando qualcuno entra nell'account di un altro |
 | `eslint` (+ `globals`) | trova variabili mai dichiarate, roba assegnata e mai usata, `==` al posto di `===` | 72 file senza moduli che condividono lo stesso scope e non hanno **nessuna** rete: oggi un nome storto lo trova un giocatore |
-| `vitest` + `jsdom` | provare **il comportamento** invece di cercare stringhe dentro ai file | `strumenti/audit-regressioni.js` sono 260 grep: il giorno che sposti una cosa si spegne o urla a vuoto, ed è già successo |
 
 ## Se un giorno la tabella si svuota
 
@@ -155,6 +185,13 @@ che mancava, ed è quello che c'è qui sopra.
    abbia deciso niente. È esattamente per questo che al posto del principio c'è una regola, e
    non il vuoto.
 
+   > **Ed è già successo, in sei giorni.** Il 13/09/2026 sette pacchetti su dodici erano
+   > installati senza che nessuno li importasse: la tabella
+   > [Quelle entrate senza un file dietro](#quelle-entrate-senza-un-file-dietro-debito-13092026) dice quali e cosa manca. Non li ha
+   > messi il caso — sono le dipendenze «decise» che qualcuno ha scaricato prima di
+   > costruire il file che dovevano stare dietro. La quarta domanda esiste apposta, e non
+   > aver aspettato la sua risposta costa questo.
+
 ## Cosa cambia nel progetto, in ordine di quanto conta
 
 1. **Il guscio nativo** (Electron + electron-builder, Capacitor, steamworks.js). È il punto
@@ -163,10 +200,12 @@ che mancava, ed è quello che c'è qui sopra.
    e senza dipendenze non parte proprio.
 2. **`accessi.js` passa a `jose`**, e la validazione dei corpi delle rotte passa a `zod`
    (oggi è a mano, rotta per rotta). Meno codice nostro nel punto più delicato.
-3. **Le prove diventano prove**: `vitest` + `jsdom` per la logica, `playwright` per il giro
-   sul telefono (che oggi è a mano, e in [`problemi-riscontrati.md`](problemi-riscontrati.md)
-   si vede quanto è lungo). `audit-regressioni.js` non si butta: si converte un blocco alla
-   volta, e finché non è convertito resta dov'è.
+3. **Le prove diventano prove** — _fatto il 13/09/2026, ed è l'unico punto di questa lista
+   che è uscito._ `vitest` + `jsdom` per la logica e `@playwright/test` per il giro nel
+   browser girano dentro a `npm run verifica` e in CI. `audit-regressioni.js` non si è
+   buttato: sono ancora 302 controlli, si converte un blocco alla volta e finché non è
+   convertito resta dov'è. Il giro **sul telefono** invece è ancora a mano — in
+   [`problemi-riscontrati.md`](problemi-riscontrati.md) si vede quanto è lungo.
 4. **ESLint più `// @ts-check` con TypeScript usato solo come controllore** — niente
    riscrittura, niente file `.ts`: i tipi si scrivono nei commenti dove servono. Sui 72 file a
    scope condiviso è la rete che oggi manca del tutto.
@@ -194,17 +233,17 @@ finisce nel gioco e pesa; **[fuori]** che resta negli strumenti e non pesa nient
 
 - **esbuild** — _già installata._ Mette insieme e minifica i 13 CSS e i 72 JS in due file
   soli. È il motore di `npm run build`.
-- **vitest** — il runner di prove: guarda i file e rilancia da solo, dice cosa non è coperto,
+- **vitest** — _installata e in uso._ Il runner di prove: guarda i file e rilancia da solo, dice cosa non è coperto,
   e sa far finta di essere un browser. È il pezzo che manca per provare la logica del gioco
   senza aprire Chrome. _(Alternativa senza installare niente: `node:test`, che Node ha già
   dentro — meno comodo, zero pacchetti.)_
-- **jsdom** / **happy-dom** — un DOM finto dentro Node: `document`, `localStorage`, eventi.
+- **jsdom** — _installata e in uso_ / **happy-dom** — un DOM finto dentro Node: `document`, `localStorage`, eventi.
   Serve a `vitest` per provare le schermate. `happy-dom` è più veloce e meno completo.
-- **@playwright/test** — Chrome, Firefox e Safari veri, senza finestra: apre il gioco, ci
+- **@playwright/test** — _installata e in uso (solo Chromium)._ Chrome, Firefox e Safari veri, senza finestra: apre il gioco, ci
   clicca, fa gli screenshot, fa finta di essere un iPhone 13. È il giro dell'agente
   `prova-sul-telefono`, ma automatico e dentro alla CI. _Costo: si scarica qualche centinaio
   di MB di browser._
-- **eslint** (+ **globals**) — legge il codice e trova gli errori scemi: variabili mai
+- **eslint** (+ **globals**) — _scaricata, ma non configurata e mai lanciata._ Legge il codice e trova gli errori scemi: variabili mai
   dichiarate, roba assegnata e mai usata, `==` dove ci voleva `===`. Con 72 file che
   condividono lo scope è quella che rende di più.
 - **prettier** — riformatta da solo, così le virgole non diventano un argomento.

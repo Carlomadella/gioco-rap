@@ -1000,3 +1000,384 @@ altre mosse legate al luogo non sono bloccate in modo strutturale.
 ## Giro del 10/09/2026 (sesto giro: controllo mirato del commit `c6d44df`)
 
 Controllati lo stop dei provini in Shop, La Sala e Studio e la ricarica fino al massimo dinamico a ogni nuovo giorno, sia con «Fine giornata» sia con gli skip: tutto a posto. Anche i controlli automatici sono verdi (`npm run prova`: 99 a posto, `audit-regressioni`: 301 a posto, `verifica:build`: 33 a posto).
+
+---
+
+## Giro del 12/09/2026 (verifica reale Vitest/Playwright)
+
+RISOLTO
+
+### «Avvio rapido» completa l'introduzione del personaggio ma non entra nel gioco
+
+- **dove** — flusso reale dalla landing: «Avvio rapido» → difficoltà → creator
+  MakeHuman nell'iframe → conclusione dell'introduzione.
+- **cosa succede** — dopo circa 22 secondi l'introduzione del creator risulta
+  `done`, ma la cornice resta in modalità cinematica: l'hub non compare e il bus
+  audio resta in `pregame`, con i beat spenti. Il giocatore non arriva quindi alla
+  partita che il pulsante promette di avviare.
+- **come si vede** — apri la landing, premi «Avvio rapido», scegli una difficoltà e
+  attendi la fine dell'introduzione del personaggio: il gioco non passa all'hub.
+- **quanto pesa** — blocca uno dei due ingressi principali a una nuova partita.
+
+**RISOLTO (12/09/2026)** — il creator ora conferma al parent di avere applicato
+l'inizializzazione (`adf-rpg-v24-init-applied`), e il preset rapido parte solo dopo
+quella conferma.
+
+> **Aggiornamento del 13/09/2026: questa correzione non e' piu' nel codice, e non serve
+> piu'.** Unendo il ramo con `main` si e' visto che li' l'avvio rapido era gia' stato
+> riscritto da capo (`fb2b8d8`): niente piu' avatar finto, si chiede a MakeHuman un
+> personaggio vero e si aspetta `adf-rpg-v24-quick-makehuman-ready`, con una scadenza di
+> 120 secondi e un errore scritto in console se non arriva. E' la stessa cura, fatta meglio:
+> la versione qui sotto una scadenza non ce l'aveva (vedi il giro di `segnala-problemi` piu'
+> in basso). Il ramo ha quindi preso la versione di `main` e ha buttato la propria, insieme
+> al messaggio `adf-rpg-v24-init-applied` nel creator, che non lo ascoltava piu' nessuno.
+> Quello che resta di questa task e' il gate di prove che ha trovato il bug. Prima i due messaggi correvano uno contro l'altro: il preset scriveva
+nome, città, avatar e risposte, poi l'inizializzazione vuota del parent li cancellava;
+il risultato finale non era valido e il bridge restava correttamente fermo. Il test
+Playwright percorre la UI vera — pulsante «Avvio rapido», difficoltà consigliata,
+creator e cinematic — e controlla che l'hub compaia, l'artista sia salvato e audio e
+beat passino a `gameplay`.
+
+RISOLTO
+
+### Il test Playwright passa, ma su Windows non termina se deve avviare lui il server
+
+- **dove** — configurazione `webServer` di `frontend/playwright.config.js`.
+- **cosa succede** — con la porta 8000 inizialmente libera il test arriva a `1 passed`,
+  poi resta fermo su `Terminating the WebServer`. Su Windows Playwright usa un
+  `taskkill` sincrono per chiudere il processo: in questo ambiente quel comando resta
+  bloccato e il server Node continua a tenere aperta la porta. Togliere il wrapper
+  `npm` non basta; il blocco si riproduce anche lanciando direttamente
+  `node strumenti/dev.js`. Se sulla porta c'è già un server e viene riutilizzato, il
+  problema non compare perché Playwright non prova a terminarlo.
+- **come si vede** — chiudi ogni server sulla porta 8000 ed esegui
+  `npm run test:e2e`: il caso è verde, ma il comando non restituisce il controllo.
+- **quanto pesa** — blocca `npm run verifica` e la CI proprio nel percorso pulito che
+  devono usare.
+
+**RISOLTO (12/09/2026)** — Playwright non possiede più il processo `webServer`, quindi
+non può entrare nel percorso `taskkill` che si bloccava. Il `globalSetup` avvia invece
+direttamente e senza shell il processo Node esatto, aspetta che il gioco risponda e,
+nel cleanup, usa l'endpoint `--playwright` per fermarlo e attende l'uscita di quel
+processo. Un token casuale lega l'endpoint al child avviato dal test; anche nei percorsi
+di errore il cleanup tenta l'arresto volontario e, se serve, termina quel solo processo.
+Un server normale già aperto viene riconosciuto come esterno, riutilizzato e lasciato
+acceso. Verificati entrambi i casi: con porta libera i 2 E2E terminano da soli con
+codice 0; con un server normale già aperto i 2 E2E terminano con codice 0 e la porta
+resta in ascolto.
+
+---
+
+## Giro del 13/09/2026 (backend-allineato, fine task `test/vitest-playwright-gate`)
+
+La task non ha toccato `backend/`: questo e' il giro di routine.
+`node scripts/controlla-backend.js` e' verde (34 rotte, 8+8 migrazioni, 18 tabelle,
+schema riconosciuto) e `cd backend && npm run prova` fa 179 a posto, 0 no.
+Le due serie di migrazioni sono state confrontate riga per riga: le gemelle 001-008
+dicono la stessa cosa, e l'unica differenza e' di tipi (`INTEGER`→`BIGINT`,
+`REAL`→`DOUBLE PRECISION`, `AUTOINCREMENT`→`GENERATED BY DEFAULT AS IDENTITY`) piu'
+due adattamenti dichiarati nei commenti (`strftime` → `EXTRACT(EPOCH ...)` nella 004,
+niente `UPDATE ... = rowid` nella 006 perche' la tabella li' nasce vuota). Colonne,
+`NOT NULL`, `CHECK`, `UNIQUE` e indici parziali coincidono. **Niente che fermerebbe il
+passaggio a PostgreSQL.**
+
+### `schema.md` non conosce quattro colonne che esistono davvero
+
+- **dove** — `backend/database/schema.md`, sezioni 2.4 `artista` e 2.12 `traguardo`.
+- **cosa succede** — quattro colonne che stanno nelle migrazioni non sono nel disegno:
+  `artista.fuori` (migrazione 004, ed e' quella su cui poggia l'indice
+  `artista_classifica`), `artista.chiave_hash` (001, i client vecchi di prima degli
+  account), `artista.nome_prima` (002, il nome com'era prima del cambio d'ufficio) e
+  `traguardo.ordine` (006, l'ordine dichiarato che ha sostituito `rowid`). Il controllo
+  secco non le vede perche' confronta i nomi delle **tabelle**, non delle colonne.
+- **come si vede** — `grep -n "fuori\|chiave_hash\|nome_prima" backend/database/schema.md`:
+  nessuna delle tre esce come colonna, solo come parola in mezzo alla prosa.
+- **quanto pesa** — da sistemare con calma. Il disegno e' rimasto indietro, il codice sta
+  bene: chi legge `schema.md` per capire come si fa la classifica non trova la colonna
+  che la fa andare veloce.
+
+### `schema.md` descrive un PostgreSQL che `migrazioni-pg/` non costruisce
+
+- **dove** — `backend/database/schema.md`, sezione 7 («Le differenze su SQLite») e
+  sezione 8 («Come ci si arriva da oggi»).
+- **cosa succede** — la sezione 7 mette SQLite come variante e PostgreSQL come schema
+  vero, con `uuid`/`gen_random_uuid()`, `citext`, `timestamptz`/`now()`, `jsonb`,
+  `bigserial`. Le migrazioni PostgreSQL vere non fanno niente di tutto questo: gli id
+  sono `TEXT` generati da Node, i tempi sono `BIGINT` in millisecondi epoch, l'email e'
+  `TEXT` con `UNIQUE (lower(email))` e le chiavi crescenti sono `IDENTITY`. Cioe' la
+  colonna «SQLite» della tabella descrive tutti e due i database, e la colonna
+  «Postgres» nessuno dei due. La sezione 8, poi, e' ancora scritta al futuro («oggi
+  l'archivio e' un file JSON», «il travaso e' uno script che si scrive in mezz'ora»)
+  quando `backend/database/travaso.js`, le migrazioni e la tabella `migrazione`
+  esistono gia'; cita un `002_stagioni.sql` che non e' mai nato (la 002 e' le
+  segnalazioni) e non nomina mai `migrazioni-pg/`.
+- **come si vede** — `sed -n '641,700p' backend/database/schema.md` accanto a
+  `backend/database/migrazioni-pg/001_iniziale.sql`.
+- **quanto pesa** — da sistemare con calma, **ma e' la voce da guardare per prima delle
+  quattro**: e' il documento che si va a leggere il giorno del passaggio, ed e' quello
+  che oggi racconta la cosa meno vera del backend.
+
+### Quattro variabili d'ambiente che il codice legge e nessun documento nomina
+
+- **dove** — `backend/accessi.js` (`ADF_APPLE_JWKS`, `ADF_GOOGLE_JWKS`, `ADF_STEAM_URL`)
+  e `backend/prova.js` (`ADF_TIENI`).
+- **cosa succede** — la tabella delle variabili in `backend/README.md` ne elenca 18 su 24.
+  Le tre di `accessi.js` sono gli indirizzi da cui si scaricano le chiavi pubbliche di
+  Apple e Google e l'API di Steam: si sovrascrivono per provare senza uscire in rete, ed
+  e' un'informazione che serve a chi scrive le prove e a chi mette su un ambiente chiuso.
+  `ADF_TIENI` serve solo alla prova (non cancella il database alla fine) ed e' la meno
+  grave.
+- **come si vede** — confronta `grep -ohE "ADF_[A-Z_]+" backend/*.js backend/database/*.js | sort -u`
+  con la tabella di `backend/README.md`.
+- **quanto pesa** — da sistemare con calma.
+
+### `jose` e `zod` stanno fra le `dependencies`, non fra le `devDependencies`
+
+- **dove** — `backend/package.json`.
+- **cosa succede** — nessuna delle due e' importata da nessun file del repository (ne'
+  con `require`, ne' con `import`, ne' con un `require` costruito a mano: in tutto
+  `backend/` e `scripts/` non c'e' **nessun** require dinamico). Stando fra le
+  `dependencies` vengono pero' scaricate e messe nel pacchetto anche in produzione:
+  oggi e' peso morto che viaggia col server.
+- **come si vede** — `grep -rn --exclude-dir=node_modules --include=*.js -iE "jose|zod" .`
+  torna solo `backend/package.json` e i documenti che ne parlano.
+- **quanto pesa** — da sistemare con calma. Il registro in `documentazione/dipendenze.md`
+  lo dice gia' e dice anche cosa fare: `jose` va **usata** (e' la prima della lista), non
+  tolta.
+
+---
+
+## Giro del 13/09/2026 (segnala-problemi, fine task `test/vitest-playwright-gate`)
+
+Controlli automatici, tutti girati oggi su questo ramo: `npm run prova` 132 a posto e 0 no,
+`node strumenti/audit-regressioni.js` 302 ok e 0 falliti, `npm run test:unit` 3 su 3,
+`npm run test:e2e` 2 su 2, `npm run verifica:build` 33 ok e 0 falliti,
+`npm run verifica:dipendenze` 0 buchi di sicurezza. Niente da segnalare da lì.
+
+Controllato a mano l'endpoint `/__playwright` dentro al server di sviluppo, **e tiene**:
+senza il pezzo `--playwright` sulla riga di comando non esiste proprio (risponde «non c'è»),
+col pezzo acceso ma senza il codice segreto giusto risponde ancora «non c'è», con un metodo
+diverso da GET e POST risponde «non si può», e solo col codice giusto il POST chiude il
+server con uscita pulita. Il server normale di tutti i giorni (`npm run dev`) quel pulsante
+non ce l'ha: provato apposta, il POST non lo ferma. In più quei file di prova non finiscono
+nel pacchetto che va sugli store: il build copia solo `media/`, `assets/`, `pagine/` e i due
+file impacchettati, non `strumenti/` e non `test/`.
+
+### Se il creator non risponde all'appello, resta lo schermo nero e il gioco non dice niente
+
+- **dove** — `frontend/js/gioco-ingresso.js:119` (l'attesa) e `frontend/js/gioco-ingresso.js:318`
+  (l'avvio rapido); la risposta che si aspetta parte da
+  `frontend/media/creator-rpg-v24/creator.html:2783`.
+- **cosa succede** — l'avvio rapido adesso apre la creazione del personaggio nascosta e
+  aspetta che questa dica «ricevuto». L'attesa però non ha una scadenza: se quel «ricevuto»
+  non arriva mai — la pagina della creazione non si carica, oppure si ferma su un errore
+  prima di rispondere — il giocatore resta davanti a un rettangolo nero che copre tutto, per
+  sempre. Non c'è un tasto per uscire (quello sta dentro alla finestra nascosta), non compare
+  nessun messaggio, non si scrive niente nemmeno nella console per chi va a guardare. L'unica
+  via d'uscita è ricaricare la pagina. Il gioco intanto resta anche ad ascoltare quella
+  risposta che non arriverà, e la musica resta ferma sulla modalità menu.
+- **come si vede** — provato oggi: aperta la landing con un browser guidato, tolta di mezzo
+  solo la risposta «ricevuto» e premuto «Avvio rapido» + difficoltà. Dopo 20 secondi la
+  pagina del gioco ha ancora il rettangolo nero acceso (`display: block`, colore
+  `rgb(5, 6, 9)`), la finestra della creazione invisibile, **nessuna schermata accesa** e
+  l'audio ancora in modalità menu. Zero errori in console.
+- **quanto pesa** — blocca la partita.
+
+### Questo ramo non ha l'ultima correzione di `main`, e lo scontro cade proprio sull'avvio rapido
+
+- **dove** — `frontend/js/gioco-ingresso.js`, contro il commit `fb2b8d8` che sta già in `main`
+  («fix(makehuman): stabilizza navigazione e primo click preset», 12/09).
+- **cosa succede** — mentre si lavorava qui, su `main` è arrivata una correzione che tocca gli
+  stessi file: `js/creator/nav.js`, `js/creator/rpg-v24-bridge.js`, `js/gioco-ingresso.js`,
+  `media/makehuman-camerino-v1/runtime.js` e `strumenti/prova.js`. Quella correzione, fra le
+  altre cose, **toglie** la riga `goto("profile")` dall'avvio rapido (oggi quella riga apre
+  già lei la creazione del personaggio, e lo fa *prima* che il gioco si metta in ascolto
+  della risposta) e cambia il modo in cui si parla alla creazione quando si modifica solo
+  l'aspetto. Qui quella riga c'è ancora. Unendo i due rami il computer non riesce a decidere
+  da solo e si ferma: verificato con una prova di unione a vuoto, il file che va in conflitto
+  è esattamente `frontend/js/gioco-ingresso.js`. Se il conflitto si chiude a occhio si rischia
+  di rimettere dentro il pezzo che `main` ha appena tolto, o di perdere l'appello nuovo: in
+  tutti e due i casi l'avvio rapido torna rotto come prima.
+- **come si vede** — `git merge-tree --write-tree --name-only main HEAD` risponde
+  `CONFLICT (content): Merge conflict in frontend/js/gioco-ingresso.js`.
+- **quanto pesa** — blocca la partita.
+
+### I test del browser si attaccano al server che trovano acceso, qualunque esso sia
+
+- **dove** — `frontend/test/e2e/server-lifecycle.js:8` e `frontend/test/e2e/server-lifecycle.js:102`.
+- **cosa succede** — prima di partire, i test guardano se sulla porta 8000 c'è qualcuno che
+  risponde alla pagina del gioco: se sì lo usano e non ne accendono uno loro. È comodo, ma
+  l'unica cosa che controllano è che quella pagina risponda, non **cosa** stia servendo. Se hai
+  lasciato aperto il server che serve la cartella impacchettata (`node strumenti/dev.js --dist`),
+  le prove girano sul pacchetto vecchio invece che sui file che hai appena modificato, e
+  diventano verdi o rosse per un motivo che non c'entra niente. La stessa cosa vale per un
+  server di un altro progetto che per caso abbia quell'indirizzo. Il numero 8000 è scritto
+  fisso nel file e non si può cambiare da fuori. Oggi, per esempio, tutte le prove del browser
+  che ho fatto girare hanno usato il server che era già acceso sulla macchina, non uno loro.
+- **come si vede** — acceso `node strumenti/dev.js --dist` e chiesta la pagina del gioco:
+  risponde 200 e serve il file impacchettato (`gioco-46f7fb83.js`), cioè esattamente quello
+  che i test prendono per buono. **Da guardare, non l'ho provato:** cosa resta acceso se i
+  test si fermano a metà con Ctrl-C — il server acceso da loro potrebbe restare in piedi da
+  solo e farsi adottare al giro dopo.
+- **quanto pesa** — si vede ma si gira intorno.
+
+### La chiusura d'emergenza del server di prova viene contata come errore anche quando funziona
+
+- **dove** — `frontend/test/e2e/server-lifecycle.js:82` e `frontend/test/e2e/server-lifecycle.js:94`.
+- **cosa succede** — alla fine dei test si chiede al server di spegnersi da solo. Se non ce la
+  fa entro 5 secondi c'è una seconda strada: lo si chiude a forza. Solo che quando lo chiudi a
+  forza il sistema non restituisce «uscita pulita» ma «nessun numero, spento da fuori», e il
+  controllo che viene subito dopo si aspetta lo zero: così l'uscita di scorta, proprio quando
+  serve, fa comunque fallire tutta la verifica con un messaggio che sembra un guasto vero
+  («terminato con codice null»). La rete di sicurezza c'è ma non può mai finire bene.
+- **come si vede** — si legge nel file: il pezzo che chiude a forza e il controllo sul numero
+  di uscita sono uno sotto l'altro e si contraddicono. Non l'ho fatto scattare davvero, perché
+  serve un server che si rifiuti di spegnersi.
+- **quanto pesa** — da sistemare con calma.
+
+### Nessuno dice che prima della verifica va scaricato il browser di prova
+
+- **dove** — `frontend/package.json` (la catena `verifica`), `README.md` e
+  `documentazione/dipendenze.md`.
+- **cosa succede** — `npm run verifica` adesso apre un browser vero, e quel browser va
+  scaricato una volta con `npx playwright install chromium`. Nel computer che fa la verifica
+  in automatico il passaggio c'è scritto; per una persona che scarica il progetto e lancia la
+  verifica, no: non è nel README, non è nel registro delle dipendenze e non c'è un comando di
+  preparazione. La verifica si ferma a metà. Per fortuna il messaggio che compare è chiaro e
+  dice da solo cosa lanciare, quindi è una perdita di tempo, non un muro.
+- **come si vede** — fatto girare `npm run test:e2e` con la cartella dei browser vuota: i due
+  casi falliscono subito con «Executable doesn't exist… Please run: npx playwright install».
+- **quanto pesa** — da sistemare con calma.
+
+### La prova dell'avvio rapido ha 4 secondi di margine, e li sta consumando tutti
+
+- **dove** — `frontend/test/e2e/gameplay.spec.js:103` (attesa di 25 secondi) e
+  `frontend/test/e2e/gameplay.spec.js:43` (tetto di 40 secondi per il caso).
+- **cosa succede** — la prova aspetta al massimo 25 secondi che l'introduzione del personaggio
+  finisca e compaia l'hub. Il giro di oggi, su questa macchina e con il server già caldo, ci ha
+  messo 20,9 secondi; il giro del 12/09 annotava «circa 22 secondi». Su una macchina più lenta
+  o sul computer che fa la verifica in automatico — dove il browser parte freddo — quei 4
+  secondi di margine si mangiano facilmente, e la verifica diventa rossa senza che nel gioco
+  sia rotto niente. Il rischio è che ci si abitui a rilanciare invece che a guardare.
+- **come si vede** — l'ultima riga di `npm run test:e2e` di oggi: «avvio rapido conclude la
+  cinematic ed entra nell'hub (20.9s)».
+- **quanto pesa** — da sistemare con calma.
+
+### Nota, non è un errore: il codice segreto del server di prova passa dalla riga di comando
+
+- **dove** — `frontend/test/e2e/server-lifecycle.js:108` e `frontend/strumenti/dev.js:23`.
+- **cosa succede** — il codice che permette di spegnere il server di prova viene passato
+  scritto in chiaro nella riga di comando, e su Windows la riga di comando di un programma la
+  può leggere chiunque abbia accesso al computer. Va aggiunto che il server di sviluppo
+  ascolta su tutte le schede di rete, non solo sul computer stesso (`strumenti/dev.js:223`:
+  `server.listen(PORTA)` senza dire «solo qui»), quindi in un posto con la rete condivisa
+  qualcun altro può almeno sfogliarlo. Il codice è casuale e lungo, non si indovina, e la cosa
+  peggiore che ci si fa è spegnere un server di sviluppo: per questo lo scrivo come nota e non
+  come problema. Passarlo da una variabile d'ambiente invece che dalla riga di comando, e
+  legare il server al solo computer locale, sono due scelte da fare con calma — la seconda è
+  di prima di questa task.
+- **quanto pesa** — da sistemare con calma.
+
+---
+
+## Giro del 13/09/2026 (chiusura di `test/vitest-playwright-gate`: cosa e' stato sistemato)
+
+Il giro di `segnala-problemi` qui sopra ha trovato sette voci. Ecco cosa ne e' stato, prima
+del push.
+
+**RISOLTO (13/09/2026) — «Se il creator non risponde all'appello, resta lo schermo nero».**
+Non sistemando l'attesa, ma togliendola: unendo il ramo con `main` si e' visto che l'avvio
+rapido era gia' stato riscritto la', con una scadenza di 120 secondi e un errore in console
+(`richiediMakeHumanRapido`). Il ramo ha preso quella versione e ha buttato la propria — e
+con lei il messaggio `adf-rpg-v24-init-applied` nel creator, rimasto senza ascoltatori.
+
+**RISOLTO (13/09/2026) — «Questo ramo non ha l'ultima correzione di `main`».** Unione fatta,
+i due scontri erano `frontend/js/gioco-ingresso.js` (risolto prendendo `main` in blocco, per
+il motivo qui sopra) e `frontend/package.json`, dove `main` aveva aggiunto `verifica:git` in
+testa alla catena e questo ramo le due prove nuove: ci stanno tutte e due, e adesso la catena
+le ha entrambe.
+
+**RISOLTO (13/09/2026) — «I test del browser si attaccano al server che trovano acceso».**
+Adesso non basta che risponda la pagina del gioco: si chiede anche `/js/gioco-ingresso.js`,
+che esiste **solo** fra i sorgenti perche' il build non copia `js/` dentro a `dist/`. Se
+sulla porta c'e' un server acceso su `--dist` le prove non partono e dicono perche', invece
+di girare sul pacchetto vecchio facendo finta di niente.
+
+**RISOLTO (13/09/2026) — «La chiusura d'emergenza viene contata come errore anche quando
+funziona».** Chi chiude a forza adesso lo segna, e il controllo sul codice di uscita non si
+applica a quel caso: spegnere a forza vuol dire uscire senza codice, ed e' l'esito atteso di
+quella strada, non un guasto.
+
+**RISOLTO (13/09/2026) — «Nessuno dice che prima della verifica va scaricato il browser».**
+C'e' `npm run setup:browser`, ed e' scritto nel README di sopra, in quello del frontend
+(anche nella tabella dei comandi) e nella riga di `@playwright/test` del registro delle
+dipendenze.
+
+**RISOLTO (13/09/2026) — «La prova dell'avvio rapido ha 4 secondi di margine».** Il margine
+non era stretto: era sbagliato di un ordine di grandezza, e se ne e' accorto il merge. Vedi
+la voce qui sotto.
+
+**RISOLTO (13/09/2026) — la nota sul codice segreto del server di prova.** Non passa piu'
+dalla riga di comando ma dall'ambiente (`ADF_PLAYWRIGHT_TOKEN`), che su Windows un altro
+utente della macchina non legge. Che il server di sviluppo ascolti su tutte le schede di rete
+resta com'era: e' di prima di questa task e non e' stato toccato qui.
+
+### L'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore
+
+- **dove** — il percorso «Avvio rapido» dalla landing, dopo la riscrittura di `fb2b8d8`.
+- **cosa succede** — l'avvio rapido non mette piu' un avatar finto: carica MakeHuman vero.
+  Nel log del browser si legge `targets.bin (~145 MB)`, poi «PRONTO: 269 modifier · 1258
+  target · 19158 vertici», e solo dopo parte la cinematic. Misurato oggi con un browser
+  guidato, su questa macchina e col server gia' acceso: **115 secondi** dal clic all'hub.
+  Nei primi 50 secondi non si vede muovere niente. Funziona — l'artista arriva, l'hub si
+  apre, l'audio passa a `gameplay` — ma il pulsante si chiama «rapido», e chi lo preme non
+  ha modo di sapere se il gioco sta lavorando o si e' piantato.
+- **come si vede** — apri la landing, premi «Avvio rapido» e una difficolta', e guarda
+  l'orologio. Oppure `npm run test:e2e`, che ora quella attesa la mette in conto.
+- **quanto pesa** — non blocca, ma e' il primo minuto di gioco di chi prova il gioco per la
+  prima volta. Da guardare: o si mostra che sta caricando, o l'avvio rapido torna a non
+  aspettare MakeHuman.
+
+### La prova dell'avvio rapido non e' fragile, e' pesante: non sta in un gate a ogni push
+
+- **dove** — `frontend/test/e2e/gameplay.spec.js`, il caso «avvio rapido conclude la
+  cinematic ed entra nell'hub», e la catena `verifica` di `frontend/package.json`.
+- **cosa succede** — la prova carica MakeHuman vero e lo tiene in memoria. Misure di oggi,
+  stessa macchina e stesso codice, tutte arrivate in fondo quando ce l'hanno fatta: 114, 115
+  e 126 secondi a macchina scarica; **288 secondi** dentro a `npm run verifica`; **oltre 600
+  secondi** dentro all'hook di pre-push, con l'altro agente che lavorava in parallelo e 3,4
+  GB di memoria libera — e li' e' andata rossa con l'audio ancora in `pregame`, cioe' senza
+  che la cinematic fosse mai partita. Non e' un tetto da alzare: il tempo non dipende dal
+  codice ma da quanto e' occupato il computer, e un gate che ogni tanto e' rosso per il
+  carico smette di voler dire qualcosa. Da segnalare che il gate ha comunque fatto il suo
+  mestiere: il push e' stato **rifiutato**, non passato per sbaglio.
+- **come si vede** — `npm run test:e2e:lento` su una macchina occupata, oppure guardando
+  l'ora mentre gira `npm run verifica` con qualcos'altro di pesante acceso.
+- **quanto pesa** — non e' un difetto del gioco. E' una scelta di dove mettere la prova.
+
+**RISOLTO (13/09/2026)** — il caso porta il marchio `@lento`. `npm run test:e2e` (quello
+dentro a `npm run verifica`) lo salta, `npm run test:e2e:lento` fa girare solo lui, e la CI
+lo lancia comunque a ogni push in un passaggio suo, dove la macchina e' dedicata e nessuno
+sta aspettando davanti allo schermo. Cosi' l'avvio rapido resta coperto — e' il percorso
+dove il bug si era nascosto — senza che la verifica di tutti i giorni duri dieci minuti. Un
+controllo dell'audit tiene insieme le due meta': se il marchio sparisce dalla catena o il
+passaggio sparisce dalla CI, l'audit lo dice.
+
+**Nota del 13/09/2026, per chi ci ricasca.** Il giro lungo e' stato provato cinque volte di
+fila sulla macchina di sviluppo e cinque volte e' andato rosso, con punti di blocco diversi:
+una volta fermo sulla landing, una sulla schermata «Si sta accendendo tutto», una con
+MakeHuman a meta'. Prima di dare la colpa al codice conviene guardare due cose, perche' in
+questo caso erano tutte e due la spiegazione:
+
+1. **I file del gioco erano identici a `main`** — `git diff main -- frontend/js frontend/pagine
+   frontend/css frontend/media` non dava niente. Quel ramo non aveva toccato una riga di
+   gioco: tutto quello che riguardava l'avvio rapido era arrivato da `main` con l'unione.
+2. **La memoria libera era 2,2 GB su 16**, con un altro agente che lavorava in parallelo e
+   tredici processi del browser aperti. Il giro lungo carica 145 MB e ne costruisce 19158
+   vertici: con quella memoria non arriva in fondo nemmeno in dieci minuti. Con la macchina
+   scarica, lo stesso identico codice ci aveva messo 114, 115 e 126 secondi.
+
+Nel mezzo e' saltato fuori anche un errore vero, ma della prova e non del gioco: il controllo
+che doveva tollerare le navigazioni cercava «frame was detached» con la regex sensibile alle
+maiuscole, e l'errore che arriva davvero e' «**F**rame was detached». Passava oltre proprio
+il caso piu' frequente.

@@ -84,6 +84,8 @@ test("package espone un comando verifica unico",
   pkg.scripts && pkg.scripts.verifica &&
   pkg.scripts.verifica.includes("npm run prova") &&
   pkg.scripts.verifica.includes("node strumenti/audit-regressioni.js") &&
+  pkg.scripts.verifica.includes("npm run test:unit") &&
+  pkg.scripts.verifica.includes("npm run test:e2e") &&
   pkg.scripts.verifica.includes("npm run verifica:build"));
 test("verifica build produce sia store sia demo e poi controlla dist",
   pkg.scripts && pkg.scripts["verifica:build"] &&
@@ -103,11 +105,33 @@ test("GitHub Actions esegue la verifica su push e pull request",
   ciWorkflow.includes("push:") &&
   ciWorkflow.includes("pull_request:") &&
   ciWorkflow.includes("run: npm run verifica"));
-test("CI usa npm ci con Node 20 e cache del lockfile frontend",
+test("CI usa npm ci con Node 22 e cache del lockfile frontend",
   ciWorkflow.includes("actions/setup-node@v4") &&
-  ciWorkflow.includes("node-version: 20") &&
+  ciWorkflow.includes("node-version: 22") &&
   ciWorkflow.includes("run: npm ci") &&
   ciWorkflow.includes("frontend/package-lock.json"));
+/* La prova lunga sta fuori dalla catena di tutti i giorni, ma non deve
+   sparire: se non gira almeno in CI, l'avvio rapido torna scoperto — ed e'
+   il percorso dove il bug si era nascosto. */
+test("il giro lungo nel browser resta fuori dalla catena ma gira in CI",
+  pkg.scripts && pkg.scripts["test:e2e"] &&
+  pkg.scripts["test:e2e"].includes("--grep-invert @lento") &&
+  pkg.scripts["test:e2e:lento"] &&
+  pkg.scripts["test:e2e:lento"].includes("--grep @lento") &&
+  ciWorkflow.includes("run: npm run test:e2e:lento"));
+test("CI installa Chromium prima del gate completo",
+  ciWorkflow.includes("run: npx playwright install --with-deps chromium") &&
+  ciWorkflow.indexOf("run: npx playwright install --with-deps chromium") <
+    ciWorkflow.indexOf("run: npm run verifica"));
+/* Il browser di Playwright non lo tira giu' `npm ci`: e' l'unica dipendenza
+   che vuole un passaggio a parte, e chi scarica il progetto deve trovarlo
+   scritto. Se sparisce lo script, o sparisce dai README, la verifica si ferma
+   a meta' per chi arriva nuovo. */
+test("il comando per scaricare il browser esiste ed e' scritto nei README",
+  pkg.scripts && pkg.scripts["setup:browser"] &&
+  pkg.scripts["setup:browser"].includes("playwright install") &&
+  leggi("../README.md").includes("npm run setup:browser") &&
+  leggi("README.md").includes("npm run setup:browser"));
 test("workflow di verifica è read-only sul repository",
   ciWorkflow.includes("permissions:") &&
   ciWorkflow.includes("contents: read") &&

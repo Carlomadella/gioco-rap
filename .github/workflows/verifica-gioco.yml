@@ -25,12 +25,21 @@ jobs:
       - name: Configura Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
       - name: Installa dipendenze bloccate
         run: npm ci
 
-      - name: Prova, regressioni e build
+      - name: Installa Chromium per Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Prova, regressioni, browser e build
         run: npm run verifica
+
+      # Fuori dalla catena `verifica` perche' sulla macchina di chi sviluppa
+      # dura fra i due e i dieci minuti (carica MakeHuman vero, ~145 MB) e
+      # bloccherebbe ogni push. Qui la macchina e' dedicata: la si fa girare.
+      - name: Il giro lungo nel browser (avvio rapido con MakeHuman)
+        run: npm run test:e2e:lento

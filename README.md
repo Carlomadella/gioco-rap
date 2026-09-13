@@ -16,6 +16,9 @@ acceso, la partita gira come ha sempre girato, con la classifica in locale.
 # il gioco (la prima volta: npm install)
 cd frontend && npm run dev                     # → http://localhost:8000, si ricarica da solo
 
+# prima di `npm run verifica`, una volta sola: la verifica apre un browser vero
+cd frontend && npm run setup:browser           # scarica Chromium per Playwright
+
 # la classifica online, in un altro terminale (facoltativa)
 cd backend && npm start                        # → http://localhost:8787
 ```
