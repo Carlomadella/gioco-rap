@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:55a9083 -->
+## 13/09/26, 20:08 â€” task/studio-marketing-dopo-timing â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `55a9083`
+
+### Cosa Ã¨ entrato
+
+- `8cb498d` â€” feat(studio): Timing prima di Marketing â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/studio.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:4515ce0 -->
 ## 13/09/26, 17:12 â€” task/watcher-uccide-la-partita â†’ main
 

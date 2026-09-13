@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:55a9083 -->
+## 13/09/26, 20:08 â€” task/studio-marketing-dopo-timing â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `55a9083`
+
+### Cosa Ã¨ entrato
+
+- `8cb498d` â€” feat(studio): Timing prima di Marketing â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/prova.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:bc14d1d -->
 ## 13/09/26, 19:55 â€” task/tasto-compralo-fuori-schermo â†’ main
 
