@@ -39,16 +39,22 @@ test("GAME.enter riabilita i beat a ogni ingresso nel gameplay", async ({ page }
   expect(errori).toEqual([]);
 });
 
-/* Questa prova e' lunga, e deve esserlo: l'avvio rapido non mette piu' un
-   avatar finto come quando e' stata scritta, carica MakeHuman vero — il log
-   del browser dice «targets.bin (~145 MB)», 269 modifier e 19158 vertici — e
-   solo dopo fa partire la cinematic. Misurata il 13/09/2026 su una macchina
-   calda col server gia' acceso: 115 secondi dal clic all'hub. I 25 secondi di
-   prima erano tarati sul vecchio avatar finto e qui farebbero rosso un gioco
-   che invece funziona. Il margine e' largo apposta, perche' in CI il browser
-   parte freddo: se un giorno diventa stretto, il problema da guardare e'
-   quanto ci mette l'avvio rapido, non il numero qui sotto. */
-test("avvio rapido conclude la cinematic ed entra nell'hub", async ({ page }) => {
+/* Marchiata @lento, e quindi fuori da `npm run test:e2e` e dalla catena
+   `npm run verifica`: la fa girare `npm run test:e2e:lento`, a mano o in CI.
+
+   Non e' una prova fragile, e' una prova **pesante**: l'avvio rapido non mette
+   piu' un avatar finto, carica MakeHuman vero — il log del browser dice
+   «targets.bin (~145 MB)», 269 modifier e 19158 vertici — e li tiene in
+   memoria. Misure del 13/09/2026 sulla stessa macchina, stesso codice, tutte
+   arrivate in fondo: 114, 115 e 126 secondi a macchina scarica; 288 secondi
+   dentro a `npm run verifica`; oltre 600 dentro all'hook di pre-push, con
+   l'altro agente che lavorava in parallelo e 3,4 GB di memoria libera. Non
+   scala col tetto: scala con quanto e' occupato il computer. Per questo sta
+   fuori dalla catena che gira a ogni push invece di avere un tetto sempre piu'
+   alto — un gate che ogni tanto e' rosso per il carico e non per il codice
+   smette di voler dire qualcosa. Il tetto qui sotto resta largo perche' quando
+   la prova parte deve poter finire. */
+test("avvio rapido conclude la cinematic ed entra nell'hub @lento", async ({ page }) => {
   test.setTimeout(660000);
 
   const errori = [];
@@ -80,7 +86,13 @@ test("avvio rapido conclude la cinematic ed entra nell'hub", async ({ page }) =>
 
       if(!gioco) return null;
 
-      return gioco.evaluate(() => {
+      /* Mentre il gioco si accende la sua cornice naviga, e un `evaluate`
+         partito un attimo prima muore con «Execution context was destroyed».
+         Non e' un esito della prova: e' una domanda fatta nel momento
+         sbagliato, e la risposta giusta e' richiedere al giro dopo. Senza
+         questo la prova andava rossa per una navigazione riuscita. */
+      try{
+        return await gioco.evaluate(() => {
         let artistaPersistito = null;
 
         try{
@@ -107,7 +119,12 @@ test("avvio rapido conclude la cinematic ed entra nell'hub", async ({ page }) =>
               ARTIST.genre === artistaPersistito.genre
             )
         };
-      });
+        });
+      }catch(e){
+        if(/Execution context was destroyed|frame was detached|Target closed/.test(e.message))
+          return null;
+        throw e;
+      }
     },
     { timeout: 600000 }
   ).toEqual({

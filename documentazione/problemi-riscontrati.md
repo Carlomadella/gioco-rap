@@ -1337,3 +1337,28 @@ resta com'era: e' di prima di questa task e non e' stato toccato qui.
 - **quanto pesa** — non blocca, ma e' il primo minuto di gioco di chi prova il gioco per la
   prima volta. Da guardare: o si mostra che sta caricando, o l'avvio rapido torna a non
   aspettare MakeHuman.
+
+### La prova dell'avvio rapido non e' fragile, e' pesante: non sta in un gate a ogni push
+
+- **dove** — `frontend/test/e2e/gameplay.spec.js`, il caso «avvio rapido conclude la
+  cinematic ed entra nell'hub», e la catena `verifica` di `frontend/package.json`.
+- **cosa succede** — la prova carica MakeHuman vero e lo tiene in memoria. Misure di oggi,
+  stessa macchina e stesso codice, tutte arrivate in fondo quando ce l'hanno fatta: 114, 115
+  e 126 secondi a macchina scarica; **288 secondi** dentro a `npm run verifica`; **oltre 600
+  secondi** dentro all'hook di pre-push, con l'altro agente che lavorava in parallelo e 3,4
+  GB di memoria libera — e li' e' andata rossa con l'audio ancora in `pregame`, cioe' senza
+  che la cinematic fosse mai partita. Non e' un tetto da alzare: il tempo non dipende dal
+  codice ma da quanto e' occupato il computer, e un gate che ogni tanto e' rosso per il
+  carico smette di voler dire qualcosa. Da segnalare che il gate ha comunque fatto il suo
+  mestiere: il push e' stato **rifiutato**, non passato per sbaglio.
+- **come si vede** — `npm run test:e2e:lento` su una macchina occupata, oppure guardando
+  l'ora mentre gira `npm run verifica` con qualcos'altro di pesante acceso.
+- **quanto pesa** — non e' un difetto del gioco. E' una scelta di dove mettere la prova.
+
+**RISOLTO (13/09/2026)** — il caso porta il marchio `@lento`. `npm run test:e2e` (quello
+dentro a `npm run verifica`) lo salta, `npm run test:e2e:lento` fa girare solo lui, e la CI
+lo lancia comunque a ogni push in un passaggio suo, dove la macchina e' dedicata e nessuno
+sta aspettando davanti allo schermo. Cosi' l'avvio rapido resta coperto — e' il percorso
+dove il bug si era nascosto — senza che la verifica di tutti i giorni duri dieci minuti. Un
+controllo dell'audit tiene insieme le due meta': se il marchio sparisce dalla catena o il
+passaggio sparisce dalla CI, l'audit lo dice.
