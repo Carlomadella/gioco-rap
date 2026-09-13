@@ -144,9 +144,20 @@ dentro a un ciclo — quattrocento milioni di confronti a ogni giro di settimana
 | `ADF_STEAM_CHIAVE`, `ADF_STEAM_APPID` | per entrare con Steam | vuote |
 | `ADF_APPLE_AUD` | il bundle id dell'app, per Sign in with Apple | vuota |
 | `ADF_GOOGLE_CLIENT` | il client id, per Google | vuota |
+| `ADF_APPLE_JWKS` | da dove si scaricano le chiavi pubbliche di Apple. Si cambia per provare senza uscire in rete, o in un ambiente chiuso | `https://appleid.apple.com/auth/keys` |
+| `ADF_GOOGLE_JWKS` | le stesse, per Google | `https://www.googleapis.com/oauth2/v3/certs` |
+| `ADF_STEAM_URL` | l'indirizzo dell'API di Steam che controlla il biglietto. Stessa ragione delle due di sopra | `https://partner.steam-api.com/ISteamUserAuth/AuthenticateUserTicket/v1/` |
+| `ADF_MANUTENZIONE` | `1` e il server risponde 503 a tutto tranne al battito: si accende quando si mette mano al database | spento |
+| `ADF_MANUTENZIONE_FINO` | quando si torna, scritto a parole ("verso le 22"): il gioco lo fa vedere a chi bussa | vuota |
+| `ADF_TIENI` | serve solo a `npm run prova`: se c'è, il database della prova non viene cancellato alla fine. Da usare quando una prova va storta e si vuole guardarci dentro | vuota |
 
 In casa vanno bene così. Online si cambiano `ADF_ORIGINI` (solo il dominio del gioco),
 `ADF_ADMIN` e `ADF_SALE` (chiavi lunghe, mai dentro al codice).
+
+Le tre che finiscono in `JWKS` e `ADF_STEAM_URL` **non sono da riempire**: hanno già
+dentro l'indirizzo vero di Apple, Google e Steam. Si toccano solo per far finta, cioè per
+provare l'ingresso senza uscire in rete (`npm run prova` fa esattamente questo, tirando su
+un servitore di chiavi finto sulla macchina) o per un ambiente che in rete non ci va.
 
 **Dove si scrivono.** Tutte si possono mettere in un file `.env.local` qui accanto, una
 riga per manopola — ed è il posto giusto per quelle che sono password (`ADF_PG`,

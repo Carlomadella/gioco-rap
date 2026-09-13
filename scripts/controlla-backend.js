@@ -94,6 +94,23 @@ if (sq && pg) {
   }
 }
 
+// 4. Le manopole che il codice legge davvero, contro quelle che il README elenca.
+//    Il 13/09/2026 ne mancavano sei su ventiquattro: tre indirizzi che si cambiano
+//    per provare senza uscire in rete, le due della manutenzione e quella della
+//    prova. Chi mette su il server le cerca li' e non le trova.
+const fontiEnv = ["server.js", "accessi.js", "prova.js", "risposte.js", "ambiente.js", "carico.js"]
+  .map(n => leggi(path.join(BE, n)))
+  .filter(Boolean)
+  .join(" ");
+const readmeBe = leggi(path.join(BE, "README.md"));
+if (fontiEnv && readmeBe) {
+  const usate = new Set(fontiEnv.match(/ADF_[A-Z_]+/g) || []);
+  const scritte = new Set(readmeBe.match(/ADF_[A-Z_]+/g) || []);
+  const senzaRiga = menoDi(usate, scritte);
+  if (senzaRiga.length)
+    segnala("manopole che il codice legge ma backend/README.md non elenca", senzaRiga);
+}
+
 if (!problemi.length) {
   if (!soloHook) console.log("Backend allineato: rotte, migrazioni e schema si raccontano la stessa storia.");
   process.exit(0);
