@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:18f731f -->
+## 13/09/26, 19:47 â€” task/giro-lungo-fuori-dalla-catena â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `18f731f`
+
+### Cosa Ã¨ entrato
+
+- `540a4e4` â€” test: il giro lungo torna fuori dalla catena, e il perche' e' scritto â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `frontend/package.json`
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:18824d8 -->
 ## 13/09/26, 17:44 â€” task/beat-e-tasto-oro-riapplicato â†’ main
 
