@@ -11,7 +11,7 @@
     "prova": "node strumenti/prova.js",
     "test:unit": "vitest run test/unit",
     "test:unit:watch": "vitest test/unit",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --grep-invert @lento",
     "test:e2e:lento": "playwright test --grep @lento",
     "test:e2e:tutto": "playwright test",
     "test:e2e:headed": "playwright test --headed",

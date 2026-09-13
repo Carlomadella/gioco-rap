@@ -1538,3 +1538,35 @@ Un ramo vecchio non contiene solo lavoro che manca: contiene anche decisioni che
 frattempo sono state **cambiate apposta**, e l'unione le riporta indietro tutte insieme, in
 silenzio. La differenza fra le due strade non e' la fatica, e' che a mano ogni pezzo passa
 davanti a una domanda — «questo vale ancora?» — e unendo non ci passa nessuno.
+
+---
+
+## Giro del 13/09/2026 (il giro lungo fallisce solo quando gira insieme all'altro)
+
+**Serve una scelta, e non l'ho presa da solo.** Il problema e' nuovo e non e' quello di
+stamattina: il watcher e' escluso (il canale `/__ricarica` resta muto per tutto l'avvio
+rapido, verificato).
+
+- **dove** — `frontend/test/e2e/gameplay.spec.js`, il caso «avvio rapido conclude la
+  cinematic ed entra nell'hub @lento», dentro alla catena `npm run verifica`.
+- **cosa succede** — la prova **passa da sola** (`npm run test:e2e:lento`: 2,6 minuti) e
+  **fallisce quando gira dentro la catena**, cioe' dopo l'altro caso e2e, con lo stesso
+  server e lo stesso codice. Due volte su due, a 10,0 e 10,2 minuti, con lo stesso esito:
+  `Received: null` per tutto il tempo concesso. Non e' il carico — e' riproducibile.
+- **cosa non so ancora** — se sia il primo caso a lasciare qualcosa (il browser e' lo stesso
+  per tutti i casi, i contesti no), o se sia la prova stessa a non distinguere «la cornice
+  non c'e'» da «la domanda e' arrivata mentre la pagina navigava»: il `catch` che ho scritto
+  stamattina torna `null` in tutti e due i casi, e quel `null` e' esattamente quello che si
+  legge nel referto. **La prima cosa da fare, quando si riprende, e' separare quei due
+  casi**: finche' tornano lo stesso valore, il referto non dice dove guardare.
+- **quanto pesa** — blocca **ogni push**, perche' l'hook di pre-push fa girare la catena
+  intera.
+
+**Scelta presa adesso, ed e' una toppa dichiarata**: il caso torna fuori dalla catena di
+tutti i giorni (`npm run test:e2e` lo salta, `npm run test:e2e:lento` lo fa girare) e resta
+in CI in un passaggio suo, dove gira da solo — cioe' nella condizione in cui passa. Cosi' il
+lavoro non si ferma.
+
+**Ma va ripreso**, e la domanda a cui rispondere e' una: *perche' due casi che passano
+separati non passano insieme?* Finche' non si sa, il giro lungo protegge meno di quanto
+sembri.
