@@ -1584,3 +1584,33 @@ dentro alla riga piccola restano in riga (`.stchi span span{display:inline}` —
 capo anche «−8 se esce così» in Timing); un pezzo scelto più vecchio dei sei mostrati resta
 nell'elenco; la descrizione della promo dice che spinge il pezzo scelto; una riga senza seed
 esce muta (`stSeme()`) invece che come bottone che non fa niente.
+
+## Un pezzo non uscito non si spinge: se ne fa uscire un'anteprima
+
+~~«non posso spingere una canzone che non è ancora uscita, al massimo faccio uscire una preview»~~ **FATTO (14/09/2026)**
+
+La prima metà era già vera — al Marketing la promo vede solo i pezzi usciti — ma la
+seconda no: di un pezzo chiuso in cartella non si poteva fare niente finché non usciva.
+Adesso «Cosa spingi» ha sotto un secondo elenco, **«Non ancora fuori»**, con i pezzi
+registrati e non usciti (quelli in cassaforte no). Se ne tocchi uno il pannello centrale
+diventa **ANTEPRIMA** e il tasto d'oro è «Fai uscire una preview»; la promo non c'è, perché
+quella è per i pezzi fuori e basta. Se ritocchi un pezzo uscito si torna alla promo.
+
+L'anteprima è una mossa vera di `actions.js` (`anteprima`: 8 energia, 30 minuti in
+`tempo.js`, la stessa scena della promo): dà un po' di hype — pieno la prima volta, la
+metà la seconda, un terzo la terza, e alla terza si ferma: «l'hanno già sentito». Ogni
+anteprima resta scritta sul pezzo (`s.anteprime`) e **quando esce** — dall'azione
+`pubblica` o da `studioUscitePronte()` il venerdì — diventa la spinta della prima
+settimana: `s.spinta = 1 + 0,12 × anteprime`, la stessa spinta della promo, che poi
+scende da sola. Il riquadro lo dice prima («anteprime fatte: 1/3 · all'uscita parte al
+124%»). Le costanti stanno in cima ad `actions.js` (`ADF_ANTEPRIME_MAX`,
+`ADF_ANTEPRIMA_SPINTA`).
+
+La casella è la stessa `spingi` del punto sul Marketing: `studioDaSpingere()` la legge fra
+gli usciti (e ripiega sull'ultimo), `studioDaAnticipare()` fra i non usciti (e senza
+scelta è `null`: l'anteprima non parte da sola).
+
+Sei prove in `strumenti/prova.js` (sotto «al Marketing il pezzo non uscito sta sotto
+«Non ancora fuori»»). Provato in partita: scelto «Sangue» (non uscito) il centro passa
+all'anteprima, la mossa costa 8 energia e 30 minuti, apre la scena con «Anteprima di
+«Sangue»: hype +3. Quando esce parte al 112%», e la riga dice «1 anteprima».

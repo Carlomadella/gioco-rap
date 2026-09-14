@@ -26,6 +26,7 @@
     mixa:120,
     pubblica:15,
     promo:45,
+    anteprima:30,      /* punto 8 dello Studio: quindici secondi da girare e postare */
     free:120,
     live:180,
     cercalavoro:90,

@@ -1334,6 +1334,45 @@ console.log("\nlo Studio: la gente della Sala conta");
       dentro("G.studio.esce") === dentro("G.songs[0].seed") &&
       dentro("G.studio.coverProva") === null &&
       dentro("daPubblicare().t") === "Vestito");
+
+    /* Punto 8 dello Studio: un pezzo non ancora uscito non si spinge — al
+       massimo se ne fa uscire un'anteprima, che all'uscita diventa spinta. */
+    dentro(`
+      G.songs = [
+        {t:'Fuori',   q:60, mixed:true, released:true,  week:2, streams:100, seed:51},
+        {t:'Chiuso',  q:70, mixed:true, released:false, week:0, streams:0,   seed:52}
+      ];
+      G.week = 4; G.studio.spingi = null; G.hype = 10; G.energy = 100;
+      STUDIO_SEZ = "promo"; renderStudio();
+    `);
+    controlla("al Marketing il pezzo non uscito sta sotto «Non ancora fuori», e al centro c'e' la promo",
+      dipinto().indexOf("Non ancora fuori") >= 0 &&
+      dipinto().indexOf('data-spingi="52"') >= 0 &&
+      dipinto().indexOf('data-az="promo"') >= 0 &&
+      dipinto().indexOf('data-az="anteprima"') < 0);
+    controlla("senza un pezzo non uscito scelto, l'anteprima non parte",
+      typeof dentro("ACTIONS.find(a => a.id === 'anteprima').need()") === "string");
+    dentro("studioSegna('spingi', 52);");
+    controlla("scelto il pezzo chiuso, al centro c'e' l'anteprima e la promo resta sull'ultimo uscito",
+      dipinto().indexOf('data-az="anteprima"') >= 0 &&
+      dipinto().indexOf('data-az="promo"') < 0 &&
+      dentro("studioDaAnticipare().t") === "Chiuso" &&
+      dentro("studioDaSpingere().t") === "Fuori");
+    const hypePrima = dentro("G.hype");
+    dentro("ACTIONS.find(a => a.id === 'anteprima').run();");
+    controlla("l'anteprima da' hype e si segna sul pezzo, che resta non uscito",
+      dentro("G.hype") > hypePrima && dentro("G.songs[1].anteprime") === 1 &&
+      dentro("G.songs[1].released") === false);
+    dentro("ACTIONS.find(a => a.id === 'anteprima').run(); ACTIONS.find(a => a.id === 'anteprima').run();");
+    controlla("alla terza l'anteprima si ferma: l'hanno gia' sentito",
+      dentro("G.songs[1].anteprime") === 3 &&
+      typeof dentro("ACTIONS.find(a => a.id === 'anteprima').need()") === "string");
+    dentro("G.studio.esce = 52; ACTIONS.find(a => a.id === 'pubblica').run();");
+    controlla("quando esce, le anteprime diventano la spinta della prima settimana",
+      dentro("G.songs[1].released") === true &&
+      dentro("G.songs[1].anteprime") === undefined &&
+      Math.abs(dentro("G.songs[1].spinta") - 1.36) < 1e-9,
+      "spinta " + dentro("G.songs[1].spinta"));
   }
 }
 

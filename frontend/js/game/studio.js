@@ -212,7 +212,15 @@ function studioFuori(){
 }
 function studioDaSpingere(){
   const fuori = studioFuori();
-  return studioSceltoTra(fuori, "spingi") || fuori[0] || null;
+  const scelto = studioSceltoTra(fuori, "spingi");
+  return scelto || fuori[0] || null;
+}
+/* Punto 8: un pezzo che non e' ancora uscito non si spinge — al massimo se
+   ne fa uscire un'anteprima. La stessa casella `spingi` puo' segnare anche
+   un pezzo non uscito (la lista sotto a «Non ancora fuori»): allora al
+   centro c'e' l'anteprima, e la promo torna all'ultimo uscito. */
+function studioDaAnticipare(){
+  return studioSceltoTra(studioPronti(), "spingi");
 }
 /* Fuori vanno solo i pezzi che non stanno in cassaforte: un pezzo messo da
    parte non deve uscire per sbaglio dalla plancia, che è l'unico modo in cui
@@ -1009,6 +1017,8 @@ function studioSezFeat(){
 function studioSezMarketing(){
   const fuori = studioFuori();
   const ultimo = studioDaSpingere();
+  const ant = studioDaAnticipare();
+  const pronti = studioPronti().sort((a, b) => b.q - a.q);
   /* gli ultimi sei, piu' quello scelto se e' piu' vecchio: se no si spinge
      un pezzo che nell'elenco non c'e', e per cambiarlo non c'e' una riga
      da ri-toccare */
@@ -1017,16 +1027,26 @@ function studioSezMarketing(){
 
   /* Punto 9: le righe erano mute come al banco del Mix — senza `attr`
      `stScelta` non fa un bottone — e il pezzo acceso era sempre il primo.
-     Adesso si sceglie, e la scelta e' quella che la promo spinge davvero. */
+     Adesso si sceglie, e la scelta e' quella che la promo spinge davvero.
+     Punto 8: sotto ci sono i pezzi non ancora usciti, per l'anteprima. */
   const sx = stPan("Cosa spingi",
-    fuori.length
+    (fuori.length
       ? elenco.map(x => stScelta({
           attr:stSeme("spingi", x),
-          on:x === ultimo, mini:stCover(x), n:x.t,
+          on:!ant && x === ultimo, mini:stCover(x), n:x.t,
           d:"q" + x.q + " · " + fmt(x.streams || 0) + " stream" +
             (x.spinta > 1 ? ' · <span class="oro">in spinta</span>' : "")
         })).join("")
-      : studioVuoto("Non hai ancora fatto uscire niente."),
+      : studioVuoto("Non hai ancora fatto uscire niente.")) +
+    (pronti.length
+      ? stSotto("Non ancora fuori") +
+        pronti.map(x => stScelta({
+          attr:stSeme("spingi", x),
+          on:x === ant, mini:stCover(x), n:x.t,
+          d:"q" + x.q + " · solo anteprima" +
+            (x.anteprime ? ' · <span class="oro">' + x.anteprime + (x.anteprime === 1 ? " anteprima" : " anteprime") + '</span>' : "")
+        })).join("")
+      : ""),
     "cartella");
 
   /* Il riferimento `studio_promo_su_lafamegram` ha in cima «TELEFONO ·
@@ -1038,23 +1058,42 @@ function studioSezMarketing(){
   const oggi = typeof adfOggi === "function" ? adfOggi("promo") : 0;
   const mult = typeof promoDailyMult === "function" ? promoDailyMult() : 1;
 
-  const mid = stPan("",
-    stCapo("Spingi", ultimo ? ultimo.t : "niente, non hai pezzi fuori",
-      ultimo ? "q" + ultimo.q : "") +
-    '<p class="stnota">Il pezzo è uscito: adesso qualcuno lo deve sapere. Questa è la promo che ' +
-      'parte <b>da qui, dallo studio</b> — quello che si fa col telefono in mano appena finita ' +
-      'la sessione.</p>' +
-    (oggi > 0 && mult < 1
-      ? stAvviso("Hai già postato <b>" + oggi + (oggi === 1 ? " volta" : " volte") +
-          "</b> oggi: la gente comincia a scorrere oltre, e quello che spingi rende il <b>" +
-          Math.round(mult * 100) + "%</b>.")
-      : "") +
-    stEsito('le altre due strade — l\'app <b>Discografia</b> e il giro dei giornalisti — ' +
-      'non sono ancora collegate qui') +
-    (ultimo
-      ? stAzioni(stPrimo(' data-az="promo"', "Posta", "invio"))
-      : stAzioni(stPrimo(' data-az="promo"', "Posta", "invio", true)) +
-        '<p class="stperche">Prima esce un pezzo, poi lo si spinge. Si passa da Fuori.</p>'));
+  /* Punto 8: scelto un pezzo non ancora fuori, al centro c'e' l'anteprima
+     e non la promo — quella e' per i pezzi usciti, e basta. */
+  const fatte = ant ? (ant.anteprime || 0) : 0;
+  const mid = ant
+    ? stPan("",
+        stCapo("Anteprima", ant.t, "q" + ant.q) +
+        '<p class="stnota">Il pezzo <b>non è fuori</b>, e finché non esce non si spinge: al massimo ' +
+          'gliene fai sentire quindici secondi. Ogni anteprima dà un po\' di hype, e quando il ' +
+          'pezzo esce parte più forte — ma alla terza la gente l\'ha già sentito.</p>' +
+        stEsito('anteprime fatte: ' + stNum(fatte + "/" + ADF_ANTEPRIME_MAX) +
+          ' · all\'uscita parte al ' +
+          stNum(Math.round(100 * (1 + Math.min(ADF_ANTEPRIME_MAX, fatte + 1) * ADF_ANTEPRIMA_SPINTA)) + "%")) +
+        stAzioni(stPrimo(' data-az="anteprima"', "Fai uscire una preview", "invio",
+          fatte >= ADF_ANTEPRIME_MAX)) +
+        (fatte >= ADF_ANTEPRIME_MAX
+          ? '<p class="stperche">L\'hanno già sentito tre volte: adesso deve uscire. Si passa da Timing.</p>'
+          : ""))
+    : stPan("",
+        stCapo("Spingi", ultimo ? ultimo.t : "niente, non hai pezzi fuori",
+          ultimo ? "q" + ultimo.q : "") +
+        '<p class="stnota">Il pezzo è uscito: adesso qualcuno lo deve sapere. Questa è la promo che ' +
+          'parte <b>da qui, dallo studio</b> — quello che si fa col telefono in mano appena finita ' +
+          'la sessione.</p>' +
+        (oggi > 0 && mult < 1
+          ? stAvviso("Hai già postato <b>" + oggi + (oggi === 1 ? " volta" : " volte") +
+              "</b> oggi: la gente comincia a scorrere oltre, e quello che spingi rende il <b>" +
+              Math.round(mult * 100) + "%</b>.")
+          : "") +
+        stEsito('le altre due strade — l\'app <b>Discografia</b> e il giro dei giornalisti — ' +
+          'non sono ancora collegate qui') +
+        (ultimo
+          ? stAzioni(stPrimo(' data-az="promo"', "Posta", "invio"))
+          : stAzioni(stPrimo(' data-az="promo"', "Posta", "invio", true)) +
+            '<p class="stperche">Prima esce un pezzo, poi lo si spinge' +
+              (pronti.length ? ' — o gliene fai sentire un\'anteprima, qui sotto' : "") +
+              '. Si passa da Fuori.</p>'));
 
   return {sx, mid, dx:""};
 }

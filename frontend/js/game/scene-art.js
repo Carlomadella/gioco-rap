@@ -185,6 +185,10 @@ S.promo = [...TINTA_HUSTLE,
     '<path d="M142,46 c0-2.5 3.4-3.4 3.4-.9 0-2.5 3.4-1.2 3.4.9 0 3-3.4 5.5-3.4 5.5s-3.4-2.5-3.4-5.5z" opacity=".55"/></g>' +
   vign + grana];
 
+/* ANTEPRIMA (punto 8 dello Studio) — stessa ring light della promo: si gira
+   allo stesso modo, cambia solo che il pezzo non e' ancora fuori */
+S.anteprima = S.promo;
+
 /* FREESTYLE — la piazza in miniatura */
 S.free = [...TINTA_SUONO,
   cielo("#241A33","#0D0A14") +

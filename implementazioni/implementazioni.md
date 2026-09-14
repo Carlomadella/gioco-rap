@@ -225,8 +225,6 @@ NETWORK 64
 
 6. non posso scegliere i feat, e inoltre non posso fare canzoni senza feat
 
-8. non posso spingere una canzone che non è ancora uscita, al massimo faccio uscire una preview
-
 10. l'utente deve poter fare solo le sezioni Beat, Testo, e Cabina, poi il resto
 
 /_ DA DISCUTERE _/
