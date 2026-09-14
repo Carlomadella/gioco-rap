@@ -1702,3 +1702,97 @@ il pezzo che scegli al Marketing».
 d'agenda) fino a 1,5, e ogni settimana si dimezza quasi (`sim.js:63`, resta il 55% dell'eccesso
 sopra 1). Sono numeri scelti, non controllati contro niente: se il Marketing sembrera' troppo
 forte o troppo debole, e' li' che si gira la manopola.
+
+## Giro del 14/09/2026 (secondo)
+
+Fine task `task/studio-marketing-scegli-il-pezzo`, commit `28c6561` (solo il nome quando tieni
+la take, la conferma della copertina) e `fd90cd7` (l'anteprima di un pezzo non uscito).
+Controlli automatici tutti verdi: `npm run prova` 154 a posto e 0 no, `audit-regressioni.js`
+330 ok e 0 falliti, `verifica:build` 33 ok e 0 falliti. Letti per intero i due diff, e poi
+`copertine.js` (`chiediTitolo`, `salvaConCopertine`), `studio.js` (la Cover con la proposta,
+`studioDaAnticipare`, il Marketing, il click sui `data-cov`), `studio-elementi.js` (la
+cassaforte e `studioUscitePronte`), `actions.js` (`anteprima`, `anteprimeAllUscita`,
+`pubblica`), `telefono.js` («Le tue mosse»), `ui.js` (`avviaAzioneDiretta`), `fx.js`,
+`sim.js`, `eventi-v2.js:2444` e `state.js`/`online.js` per dove finisce il salvataggio.
+
+Le cose che la task chiedeva di guardare, in ordine:
+
+- **`G.studio.coverProva` con la foto dentro** — e' un problema vero, vedi la prima voce.
+- **Proposta rimasta su un pezzo che poi esce** — stessa voce: la proposta resta nel
+  salvataggio e non c'e' piu' un tasto per buttarla. Se il pezzo viene **rinominato dalla
+  plancia** invece va bene: `ui.js:449` rimette lo stesso seed (`chiediTitolo` con `pezzo` non
+  ne genera uno nuovo), la proposta resta agganciata e il titolo nel riquadro grande segue,
+  perche' e' letto da `s.t` al momento del disegno (`studio.js:951`).
+- **`s.anteprime` e la cassaforte** — a posto. Un pezzo `tenuto` sparisce da «Non ancora fuori»
+  (`studioPronti()` lo esclude) ma le anteprime restano scritte sul pezzo; quando lo riprendi
+  torna in elenco col suo conto, e all'uscita — le due sole strade, `actions.js:383` e
+  `studio-elementi.js:716` — `anteprimeAllUscita` le trasforma in spinta e le cancella. Se la
+  casella `spingi` e' rimasta su quel pezzo mentre e' in cassaforte, il Marketing torna alla
+  promo sull'ultimo uscito, senza righe accese: coerente, non rotto.
+- **L'agenda del telefono** — «Anteprima del pezzo» compare fra «Le tue mosse» come tutte le
+  altre, e funziona: `hubPronta` la spegne con il motivo finche' non scegli un pezzo al
+  Marketing, e col pezzo scelto parte da li' con la stessa scena. Il motivo pero' e' lungo per
+  la riga del telefono: seconda voce. (Il giro precedente diceva che la promo «si lancia solo
+  dal Marketing»: non e' esatto, il telefono elenca **tutte** le mosse e le fa partire,
+  `telefono.js:758`. Non cambia niente di quello che era stato detto, ma lo correggo qui.)
+- **`eventi-v2.js:2444`** — a posto. Avvolge ogni mossa, anche la nuova, e dopo manda
+  l'evento `after_action` con `action_id:"anteprima"`; il catalogo lo confronta con liste di
+  id (`hookMatches`, `:2152`) e un id che nessun evento conosce non fa scattare niente. Nessun
+  errore, solo silenzio: un'anteprima non puo' far nascere un evento social, la promo si.
+
+### La copertina proposta e non confermata resta nel salvataggio, foto compresa, e nessuno la toglie
+
+- **dove** — `frontend/js/game/studio.js:397-401` (`studioCoverProponi` mette la foto in
+  `G.studio.coverProva` e salva), `studio.js:382-385` (`studioPezzoCover` mostra la Cover solo
+  per i pezzi in `ready()`, cioe' non usciti), `frontend/js/game/copertine.js:29-38`
+  (`salvaConCopertine` sacrifica solo `s.img` dei pezzi).
+- **cosa succede** — carichi una foto nella Cover e non premi ne' «Conferma» ne' «Lascia
+  com'era»: la foto (un JPEG 360×360 in testo, decine di KB) vive in `G.studio.coverProva` e
+  viene salvata a ogni `save()`, insieme a tutto il resto. Due cose non tornano. **Uno**: se la
+  memoria del browser e' piena, `salvaConCopertine` toglie le copertine **confermate** dei pezzi,
+  una alla volta, per far posto — e lascia in piedi quella proposta e mai accettata; se poi le
+  foto sui pezzi sono finite torna `false` e il gioco smette di salvare in silenzio (`state.js:102`
+  ignora l'errore), con la proposta ancora li' dentro. **Due**: se nel frattempo il pezzo esce
+  (da Timing, o da solo il venerdi'), non e' piu' nella Cover, quindi il riquadro con «Conferma»
+  e «Lascia com'era» non si vede piu' e la proposta orfana resta nel salvataggio finche' non ne
+  fai un'altra su un altro pezzo (la casella e' una sola: la nuova sovrascrive la vecchia, senza
+  dirlo — anche se la vecchia era su un pezzo ancora in elenco, che perde la sua etichetta
+  «da confermare» senza una parola). Letto nel codice, non riprodotto con la memoria piena.
+- **come si vede** — Studio, Cover, «Carica una foto», poi vai in Timing e fai uscire quel
+  pezzo: torna in Cover, la proposta non c'e' piu' da nessuna parte ma nel salvataggio
+  (`localStorage`, chiave della partita) `studio.coverProva.img` e' ancora pieno.
+- **quanto pesa** — da sistemare con calma.
+
+### Sul telefono il motivo per cui l'anteprima e' spenta viene tagliato
+
+- **dove** — `frontend/js/game/actions.js:453` (`"1 pezzo non ancora uscito, scelto al
+  Marketing"`), che `hub.js:536` fa diventare «Serve 1 pezzo non ancora uscito, scelto al
+  Marketing» e `telefono.js:626` mette nella riga piccola `<i>`; `frontend/css/telefono.css:274`
+  la riga e' a una sola linea con i puntini (`white-space:nowrap; text-overflow:ellipsis`).
+- **cosa succede** — sono 52 caratteri a 10,5 punti dentro allo schermo del telefono, con a
+  destra il costo «8⚡»: la parte che serve — «scelto al Marketing», cioe' *dove* andare per
+  accenderla — e' proprio quella in fondo, quella che i puntini mangiano. Il giocatore legge
+  «Serve 1 pezzo non ancora uscito, sc…» e pensa di dover registrare un pezzo, che magari ha
+  gia'. Dedotto da misure del CSS, non visto su un telefono vero: va guardato.
+- **come si vede** — telefono, Agenda, «Le tue mosse», senza aver scelto niente al Marketing.
+- **quanto pesa** — da sistemare con calma.
+
+### L'anteprima fa il rumore di un tocco qualsiasi, non quello della promo
+
+- **dove** — `frontend/js/game/fx.js:267-269` (la tabella `SND` che lega ogni mossa al suo
+  suono: `promo:"promo"`, `anteprima` non c'e'), letta da `ui.js:140` con `|| "tap"`.
+- **cosa succede** — la nuova mossa ha la scena della promo (`scene-art.js:191`), il colore
+  della promo (`ui.js:25`) e i suoi minuti, ma quando parte suona il «tap» generico. E' l'unica
+  delle mosse con la scena a schermo pieno senza il suo suono.
+- **come si vede** — Studio, Marketing, scegli un pezzo sotto «Non ancora fuori», «Fai uscire
+  una preview», con l'audio acceso.
+- **quanto pesa** — da sistemare con calma.
+
+**Nota, non e' un errore**: la promo ha la saturazione del giorno (`adfOggi("promo")`: dal secondo
+post in poi rende meno) e il tetto di 1,5 sulla spinta. L'anteprima no: e' limitata a tre **per
+pezzo**, ma non per giornata, quindi con cinque pezzi registrati e non usciti si possono fare
+quindici anteprime di fila, ognuna con il suo hype (che scala solo dentro allo stesso pezzo) e i
+suoi 2–9 fan. Il freno e' l'energia (8 a colpo) e il tetto dell'hype. E' una scelta di
+bilanciamento, e sta tutta in `actions.js:449-475`; se il Marketing sembrera' una stampante di
+hype, la manopola e' li'. Stessa cosa per le anteprime fatte mesi prima su un pezzo tenuto in
+cassaforte: all'uscita valgono come se fossero di ieri.

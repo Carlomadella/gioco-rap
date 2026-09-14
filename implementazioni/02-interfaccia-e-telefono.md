@@ -1640,3 +1640,21 @@ Tre prove in `strumenti/prova.js` (sotto «senza pezzi Mix, Cover, Feat, Timing 
 Marketing sono chiuse»). Provato in partita: con la cartella vuota le cinque linguette
 hanno il lucchetto, il tocco su Marketing lascia il Beat e mostra l'avviso; col primo pezzo
 si aprono.
+
+## Le misure di un anno, dopo i sette ritocchi allo Studio
+
+Fatte il 14/09/2026 nel gioco vero, su una copia dello stato (fan 300, hype 15, un pezzo
+q70, fase Sconosciuto), rimettendo poi il salvataggio com'era.
+
+- **La spinta della promo** (punto «al Marketing si sceglie quale pezzo spingere»): 52
+  settimane con tre post a settimana sul pezzo. Con la spinta 2.211 stream, senza 1.900:
+  **+16 %**. La spinta si assesta a 1,2 (sale di 0,10 a post ma la resa del giorno la
+  frena e ogni settimana ne resta il 55 %), hype e follower identici nei due casi: la promo
+  dà quello che dava, in più il pezzo scelto gira un po' di più. Un anno di `advanceWeek()`
+  ci mette 1,4–2 secondi.
+- **Le anteprime** (punto «al massimo faccio uscire una preview»): media di 30 corse. Tre
+  anteprime prima dell'uscita (24 energia, 90 minuti) contro nessuna: prima settimana 285
+  stream contro 175 (**+63 %**), sei settimane 1.094 contro 872 (**+25 %**). Il +36 % è la
+  spinta all'uscita (1,36); il resto è l'hype che le anteprime stesse hanno dato (15 → 20,
+  che entra nella «scoperta» di `songWeekly()`). È un vantaggio vero per chi prepara
+  l'uscita, non un secondo motore.
