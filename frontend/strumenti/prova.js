@@ -839,6 +839,27 @@ console.log("\nla classifica vera nella schermata");
       nodi["g-chart"].innerHTML.indexOf('class="crow') >= 0 &&
       nodi["g-charthead"].textContent === "Top 10 della settimana",
       nodi["g-charthead"].textContent);
+
+    /* Il feat sul pezzo (brainstorming del 14/09/2026, idea D): non vale piu'
+       solo qualita' alla registrazione. `sim.js` legge la fama di chi c'e'
+       sopra e ci mette la sua gente che ascolta, e all'uscita muove l'hype.
+       Senza questo il feat resta «un +8 di qualita' con un nome scritto
+       sotto». */
+    controlla("la gente del feat ascolta il pezzo: featAscolti cresce con la fama, e senza feat e' zero",
+      dentro("featAscolti({featFama:40, q:60})") > 0 &&
+      dentro("featAscolti({featFama:80, q:60})") > dentro("featAscolti({featFama:40, q:60})") &&
+      dentro("featAscolti({q:60})") === 0);
+    dentro(`
+      G.week = 3; G.hype = 10; G.fans = 100; G.phase = 1;
+      G.songs = [{t:'Solo', q:60, mixed:true, released:false, seed:71, featFama:0},
+                 {t:'Con',  q:60, mixed:true, released:false, seed:72, featFama:50}];
+    `);
+    dentro("G.songs[0].released = true; G.songs[0].week = 3;");
+    const senzaFeat = dentro("(() => { const h = G.hype; G.hype = 10; G.songs[1].released = false; " +
+      "ACTIONS.find(a => a.id === 'pubblica').run(); const d = G.hype - 10; G.hype = h; return d; })()");
+    controlla("un nome grosso sul pezzo muove l'hype all'uscita: fama 50 vale +4",
+      dentro("featHypeUscita({featFama:50})") === 4 && senzaFeat > 13.2,
+      "hype all'uscita +" + senzaFeat);
   }
 }
 
@@ -1171,7 +1192,7 @@ console.log("\nlo Studio: la gente della Sala conta");
        aggiunge o toglie una, questa prova la copre da sola. */
     const sezioni = dentro("STUDIO_SEZIONI.map(x => x.id)");
     controlla("le sezioni sono quelle del punto 4 meno il Marketing, più la cabina",
-      sezioni.join(",") === "beat,testo,cabina,banco,cover,feat,fuori",
+      sezioni.join(",") === "beat,testo,cabina,banco,cover,fuori",
       sezioni.join(","));
     const rotte = [];
     for(const s of sezioni){
@@ -1277,9 +1298,62 @@ console.log("\nlo Studio: la gente della Sala conta");
     controlla("un feat in sessione alza la qualità del pezzo, e lo dice actions.js",
       bFeat > 0 && bFeat === dentro("studioAiutoFeat()"),
       "feat +" + bFeat);
-    dentro("studioConsumaFeat()");
+    const consumato = dentro("studioConsumaFeat()");
     controlla("e vale per un pezzo solo: dopo la registrazione il posto torna libero",
       dentro("featBonus()") === 0 && dentro("studioFeat()") === null);
+    controlla("chi c'era resta sul pezzo con nome e fama: e' quella che sim.js legge",
+      consumato && consumato.n === "Zeno" && consumato.fama === 40 &&
+      dentro("featHypeUscita({featFama:50})") === 4);
+
+    /* Dal 14/09/2026 (brainstorming, idea B + D3) il feat sta in Cabina,
+       accanto al fonico, e ha due porte: chi conosci viene gratis, i rapper
+       della classifica si pagano e possono dire di no — e se accettano
+       entrano fra i contatti. */
+    dentro(`
+      G.bars = [{q:44, tema:'Il cortile', seed:1}]; G.beats = [{n:'B', q:50, seed:2}];
+      G.rivals = [{n:'Kobra', p:2000, eta:25, city:'Milano', gen:'trap', col:'#FF5A36',
+        skin:'#C68A5C', hair:1, storia:'', prev:2000, mom:0, usc:1, deal:false, seed:5, ult:'X', hot:0}];
+      G.money = 5000; G.energy = 100; G.fans = 100; G.hype = 10;
+      STUDIO_SEZ = 'cabina'; renderStudio();
+    `);
+    controlla("in Cabina, sotto al fonico, c'e' «Con chi»: chi conosci e la classifica",
+      dipinto().indexOf("Con chi") >= 0 &&
+      dipinto().indexOf('data-feat="rp"') >= 0 &&
+      dipinto().indexOf('data-feat=""') >= 0 &&
+      dipinto().indexOf('data-rivale="Kobra"') >= 0 &&
+      dipinto().indexOf("viene gratis") >= 0,
+      dipinto().slice(0, 300));
+    controlla("e la linguetta Feat non c'e' piu'",
+      dentro("STUDIO_SEZIONI.some(x => x.id === 'feat')") === false);
+    const prezzoKobra = dentro("studioFeatPrezzo(G.rivals[0])");
+    const probKobra = dentro("studioFeatProbabilita(G.rivals[0])");
+    controlla("un rivale ha un prezzo e una probabilita' di si' fra 8% e 97%",
+      prezzoKobra > 0 && probKobra >= 0.08 && probKobra <= 0.97,
+      prezzoKobra + " € · " + Math.round(probKobra * 100) + "%");
+    /* il dado si tiene fermo: prima dice no, poi dice si' */
+    const dado = Math.random;
+    try{
+      Math.random = () => 0.999;
+      const soldiPrima = dentro("G.money"), energiaPrima = dentro("G.energy");
+      dentro("studioChiamaRivale('Kobra')");
+      controlla("se dice no non paghi, ma perdi un po' di energia, e resta in classifica",
+        dentro("G.money") === soldiPrima && dentro("G.energy") < energiaPrima &&
+        dentro("G.gente.some(p => p.n === 'Kobra')") === false &&
+        dentro("studioFeat()") === null);
+      Math.random = () => 0.0;
+      dentro("studioChiamaRivale('Kobra')");
+      controlla("se dice si' paghi, viene in sessione ed entra fra i contatti",
+        dentro("G.money") === soldiPrima - prezzoKobra &&
+        dentro("studioFeat() && studioFeat().n") === "Kobra" &&
+        dentro("G.gente.find(p => p.n === 'Kobra').rel") === 1 &&
+        dentro("G.gente.find(p => p.n === 'Kobra').ruolo") === "rapper",
+        "soldi " + soldiPrima + " → " + dentro("G.money"));
+    } finally { Math.random = dado; }
+    dentro("renderStudio();");
+    controlla("da contatto non sta piu' nella classifica da chiamare: sta fra chi conosci, gratis",
+      dipinto().indexOf('data-rivale="Kobra"') < 0 &&
+      /data-feat="p\d+"/.test(dipinto()));
+    dentro("studioScegliFeat(null); G.gente = G.gente.filter(p => p.n !== 'Kobra'); G.rivals = [];");
 
     /* quale provino e quale pezzo: la scelta è dello Studio, il conto di
        actions.js. Se il ponte si stacca, torna a uscire sempre il migliore
@@ -1362,8 +1436,8 @@ console.log("\nlo Studio: la gente della Sala conta");
        altre linguette restano chiuse finche' non c'e' il primo pezzo. */
     dentro("G.songs = []; STUDIO_SEZ = 'fuori'; renderStudio();");
     const linguette = () => nodi["st-tabs"].innerHTML || "";
-    controlla("senza pezzi Mix, Cover, Feat e Timing sono chiuse, e Beat/Testo/Cabina no",
-      ["banco", "cover", "feat", "fuori"].every(id =>
+    controlla("senza pezzi Mix, Cover e Timing sono chiuse, e Beat/Testo/Cabina no",
+      ["banco", "cover", "fuori"].every(id =>
         new RegExp('sttab[^"]*chiusa" data-sez="' + id + '"').test(linguette())) &&
       ["beat", "testo", "cabina"].every(id =>
         new RegExp('class="sttab( on)?" data-sez="' + id + '"').test(linguette())),

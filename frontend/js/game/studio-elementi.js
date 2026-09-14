@@ -618,6 +618,8 @@ function studioStreamStima(s){
   const push = G.contract ? G.contract.push : 1;
   const scoperta = Math.pow(Math.max(0, q - 26) / 74, 2.6) * (35 + G.hype * 13) * push;
   const fan = G.fans * (0.5 + q / 170);
+  /* la gente del feat, come in songWeekly() */
+  const feat = typeof featAscolti === "function" ? featAscolti(Object.assign({}, s, {q})) : 0;
   /* Il lunedi', prima di darti i numeri, `advanceWeek()` passa il totale
      sotto a un **tetto** che dipende dalla fase della carriera, e sopra a
      quel tetto tiene solo un quinto di quello che avanza. Senza questa riga
@@ -635,8 +637,8 @@ function studioStreamStima(s){
     return Math.max(0, Math.round(v * ((cap + (tot - cap) * 0.2) / tot)));
   };
   return {
-    min: tetto(Math.round((fan * 0.26 + scoperta) * 0.8)),
-    max: tetto(Math.round((fan * 0.5 + scoperta) * 1.25))
+    min: tetto(Math.round((fan * 0.26 + scoperta + feat) * 0.8)),
+    max: tetto(Math.round((fan * 0.5 + scoperta + feat) * 1.25))
   };
 }
 
@@ -715,7 +717,8 @@ function studioUscitePronte(){
     s.week = typeof totalWeeks === "function" ? totalWeeks() : (G.week || 1);
     if(typeof anteprimeAllUscita === "function") anteprimeAllUscita(s);
     const cap = typeof hypeCap === "function" ? hypeCap() : 100;
-    G.hype = clamp(G.hype + 6 + s.q * 0.12 + STUDIO_VENERDI_HYPE, 0, cap);
+    const feat = typeof featHypeUscita === "function" ? featHypeUscita(s) : 0;
+    G.hype = clamp(G.hype + 6 + s.q * 0.12 + STUDIO_VENERDI_HYPE + feat, 0, cap);
     /* Mandarlo fuori a mano costa un punto di lucidita' (la mossa «Pubblica
        il pezzo», in actions.js): se metterlo in coda non costasse niente,
        aspettare non sarebbe una scelta ma sempre la scelta giusta — l'hype in

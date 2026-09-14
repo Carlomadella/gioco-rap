@@ -17,15 +17,15 @@
    ingredienti stanno **dentro alle stanze in cui si decidono** invece di
    avere una linguetta a testa: il Marketing è una pagina del telefono
    (LaFamegram, `telefono.js`), perché lavora su pezzi già usciti e sul
-   telefono ci stava già nel riferimento. Le linguette, **in basso**, dove sta
+   telefono ci stava già nel riferimento; il Feat sta in Cabina, accanto al
+   fonico, perché si sceglie prima di incidere. Le linguette, **in basso**, dove sta
    il pollice quando il telefono è in mano:
 
      BEAT       da chi te lo fai — e con chi lo fai cambia com'è (punto 11)
      TESTO      le barre. Senza queste non c'è niente da incidere
-     CABINA     la strofa e il beat diventano una traccia
+     CABINA     la strofa e il beat diventano una traccia — e con chi (il feat)
      MIX        il fonico la mixa — e scegli tu quale provino
      COVER      la faccia del pezzo: generata, o una foto tua
-     FEAT       con chi lo fai. Non è obbligatorio, ma si sente
      TIMING     quale esce, e quando — e poi «fallo sapere», sul telefono
 
    **Qui non si rifà l'economia del gioco.** I numeri stanno tutti in
@@ -64,12 +64,11 @@ const STUDIO_FOTO = {
      scrivania di notte di `studio_promo.png` era il fondale del Marketing:
      con la promo passata al telefono è tornata fra le foto in attesa.) */
   fuori:  {f:"studio_uscita.png", pos:"center 55%"},
-  /* Cover e Feat una foto loro non ce l'hanno, né con né senza interfaccia.
-     Si tengono quella della stanza più vicina — il banco per la copertina,
-     la cabina per il feat — perché un fondo nero in mezzo a sei fotografie
-     si vede molto più di una stanza presa in prestito. Vanno sostituite. */
-  cover:  {f:"studio_mix.png",    pos:"center 30%"},
-  feat:   {f:"studio_cabina.png", pos:"center 38%"}
+  /* La Cover una foto sua non ce l'ha, né con né senza interfaccia. Si tiene
+     quella della stanza più vicina — il banco — perché un fondo nero in mezzo
+     a cinque fotografie si vede molto più di una stanza presa in prestito.
+     Va sostituita. */
+  cover:  {f:"studio_mix.png",    pos:"center 30%"}
 };
 
 /* `n` è il nome corto, quello della linguetta in basso — le sette voci del
@@ -92,8 +91,8 @@ const STUDIO_SEZIONI = [
    d:"dove il provino diventa pezzo", dopo:true},
   {id:"cover",  n:"Cover",     bar:"La copertina", sc:"pubblica",
    d:"la faccia del pezzo", dopo:true},
-  {id:"feat",   n:"Feat",      bar:"Il feat",      sc:"registra",
-   d:"con chi lo fai", dopo:true},
+  /* Il Feat non e' piu' una linguetta: si sceglie in Cabina, accanto al
+     fonico, che e' l'unico posto in cui ha senso — prima di incidere. */
   /* Il Marketing non e' piu' una linguetta: lavora su pezzi gia' usciti, cioe'
      su cose che non stanno piu' sul banco, e il suo riferimento
      (`studio_promo_su_lafamegram`) ha in cima «TELEFONO · LAFAMEGRAM». Sta
@@ -167,7 +166,19 @@ function studioAiutoFonico(){
    meno del fonico, che sta lì tutto il giorno tutti i giorni, e vale di più
    quanto più il rapper è grosso: un feat serve anche a farsi tirare su.
    Si consuma con la registrazione: uno che viene in studio ci viene per un
-   pezzo, non per sempre. */
+   pezzo, non per sempre.
+
+   Dal 14/09/2026 il feat non ha più una linguetta sua: si sceglie **in
+   Cabina, accanto al fonico**, che è l'unico posto della catena in cui ha
+   senso — era una linguetta *dopo* la Cabina che agiva sulla registrazione
+   *successiva*, il cancello chiuso dopo che i buoi sono usciti. E si sceglie
+   da **due porte** (brainstorming, idea D3): chi conosci dalla Sala accetta
+   sempre e non costa niente, perché il rapporto è già il prezzo pagato; i
+   rapper della classifica (`G.rivals`) si possono chiamare anche mai visti,
+   si pagano, e possono dire di no — uno più grosso di te quasi sempre. Se
+   accettano entrano fra i contatti: hai pagato un pezzo, ti resta un
+   conoscente. E sul pezzo il feat non vale più solo qualità: `sim.js` legge
+   `s.featFama` e ci mette la sua gente che ascolta. */
 function studioFeat(){
   if(!G.studio || !G.studio.feat) return null;
   const p = (G.gente || []).find(x => x.id === G.studio.feat);
@@ -177,20 +188,116 @@ function studioAiutoFeat(p){
   const q = p || studioFeat();
   return q ? Math.round(q.rel * 1.2 + q.fama * 0.12) : 0;
 }
-/* Chiamata da `actions.js` quando la traccia esce dalla cabina: il nome resta
-   attaccato al pezzo, e il feat torna libero. */
+/* Chiamata da `actions.js` quando la traccia esce dalla cabina: chi c'era
+   resta attaccato al pezzo (nome e fama), e il feat torna libero. */
 function studioConsumaFeat(){
   const p = studioFeat();
-  if(!p) return "";
+  if(!p) return null;
   p.pt += 1;
   while(p.pt >= relSoglia(p) && p.rel < 5){ p.pt -= relSoglia(p); p.rel++; }
   studioDati().feat = null;
-  return p.n;
+  return p;
 }
 function studioScegliFeat(id){
   const d = studioDati();
+  /* `null` arriva da «da solo»: toglie chi c'e', senza il giro del toggle */
+  if(id === null){ d.feat = null; SFX.tap(); save(); renderStudio(); return; }
   d.feat = (d.feat === id) ? null : id;
   SFX.tap(); save(); renderStudio();
+}
+
+/* ---- la seconda porta: i rapper della classifica ----
+   I rivali hanno `p`, gli ascolti della settimana, non una fama da persona:
+   la si ricava in scala di log, così Kobra da 3 milioni non vale
+   trentamila volte uno da cento. Con la stessa fama si calcola quanto
+   aiuta in cabina (`studioAiutoFeat`), come per chi conosci. */
+function studioFamaRivale(r){
+  return clamp(Math.round(14 * Math.log10(Math.max(120, r.p || 120))) - 14, 5, 100);
+}
+/* Il prezzo sale con la fama, a decine: un nome grosso costa un pezzo di
+   cassa, uno della tua misura una serata. Si paga solo se dice sì. */
+function studioFeatPrezzo(r){
+  return Math.round((30 + studioFamaRivale(r) * 5) / 10) * 10;
+}
+/* Quanto è probabile che dica sì: il rapporto fra la tua misura (ascolti
+   della settimana, hype, fan) e la sua. Uno più piccolo di te dice sì quasi
+   sempre, uno della tua misura spesso, uno molto più grosso quasi mai — ed è
+   esattamente il «feat con nomi più grandi» del foglio dell'hype: se lo
+   strappi, vale. */
+function studioFeatProbabilita(r){
+  const miei = (typeof streamSettimana === "function" ? streamSettimana() : 0) +
+    (G.hype || 0) * 10 + (G.fans || 0) * 0.2;
+  const rapporto = miei / Math.max(1, r.p || 1);
+  return clamp(0.08 + 0.62 * rapporto, 0.08, 0.97);
+}
+/* I rivali che si possono chiamare: quelli che non sono già fra i contatti
+   (chi ha accettato una volta sta in `G.gente`, e da lì costa zero). */
+function studioRivaliChiamabili(){
+  const noti = new Set((G.gente || []).map(p => p.n));
+  return (G.rivals || []).filter(r => r && r.n && !noti.has(r.n))
+    .slice().sort((a, b) => (b.p || 0) - (a.p || 0));
+}
+/* Il rivale che accetta diventa una persona come quelle della Sala: stessa
+   scheda, rapporto a «contatto», la sua faccia. Da qui in poi lo si chiama
+   gratis, come chi conosci — e alla Sala lo si trova. */
+function studioRivaleInGente(r){
+  const fama = studioFamaRivale(r);
+  const gen = (typeof BEAT_GEN !== "undefined" && BEAT_GEN[r.gen]) ? r.gen
+    : (typeof BEAT_IDS !== "undefined" ? pick(BEAT_IDS) : "trap");
+  const p = {
+    id:"p" + Math.floor(Math.random() * 1e9), ruolo:"rapper", n:r.n, gen,
+    eta:r.eta || Math.floor(rnd(18, 33)), fama,
+    car:(typeof CARATTERI !== "undefined" ? pick(CARATTERI).id : "aperto"),
+    scoperto:false, rel:1, pt:0, ult:-1, feat:-99,
+    skin:r.skin, hair:r.hair, col:r.col,
+    rivale:true                       /* viene dalla classifica, non dalla Sala */
+  };
+  if(!G.gente) G.gente = [];
+  G.gente.push(p);
+  return p;
+}
+const STUDIO_FEAT_NO_ENERGIA = 5;
+const STUDIO_FEAT_NO_MINUTI = 60;
+function studioChiamaRivale(nome){
+  const r = studioRivaliChiamabili().find(x => x.n === nome);
+  if(!r) return;
+  const prezzo = studioFeatPrezzo(r);
+  if(G.money < prezzo){
+    toast("Ti servono " + fmt(prezzo) + " €, ne hai " + fmt(G.money), "bad", "!", ["#3A3F49", "#22262E"]);
+    return;
+  }
+  const prob = studioFeatProbabilita(r);
+  const chiama = () => {
+    if(Math.random() < prob){
+      G.money -= prezzo;
+      const p = studioRivaleInGente(r);
+      studioDati().feat = p.id;
+      pushLog("<b>" + p.n + "</b> ha detto sì: viene in sessione per " + fmt(prezzo) +
+        " €. Adesso è fra i tuoi contatti.", "good");
+      toast(p.n + " ci sta · " + fmt(prezzo) + " €", "good", "★", ["#A855F7", "#4C1D95"]);
+      SFX.tap();
+    } else {
+      /* il no costa poco: un po' di energia e un'ora al telefono */
+      G.energy = clamp(G.energy - STUDIO_FEAT_NO_ENERGIA, 0, 100);
+      if(typeof GAME_TIME !== "undefined" && typeof GAME_TIME.spend === "function")
+        GAME_TIME.spend(STUDIO_FEAT_NO_MINUTI, "studio-feat-no");
+      pushLog("<b>" + r.n + "</b> ha detto no. Non è il momento: sei troppo piccolo per lui.", "bad");
+      toast(r.n + " ha detto no", "bad", "✕", ["#3A3F49", "#22262E"]);
+      SFX.fail();
+    }
+    save(); renderStudio(); if(typeof renderGioco === "function") renderGioco();
+  };
+  /* si spendono soldi veri: la conferma, come per le altre mosse */
+  if(typeof showEvent === "function" && typeof SET !== "undefined" && SET.gioco && SET.gioco.conferme){
+    showEvent({k:"Confermi?", t:"Chiami " + r.n,
+      d:"Dice sì al <b>" + Math.round(prob * 100) + "%</b>. Se ci sta ti costa <b>" + fmt(prezzo) +
+        " €</b> e viene in sessione; se dice no perdi " + STUDIO_FEAT_NO_ENERGIA + " di energia e un'ora.",
+      annulla(){},
+      opts:[{n:"Chiamalo", d:"Si prova", run(){ chiama(); return null; }},
+            {n:"Lascia stare", d:"Torni in cabina", run(){ return null; }}]});
+    return;
+  }
+  chiama();
 }
 
 /* ==================== QUALE PROVINO, QUALE PEZZO ====================
@@ -827,7 +934,11 @@ function studioSezCabina(){
     stScelta({attr:' data-fonico=""', on:!fon, mini:stSagoma(),
       n:"da solo", d:"quello che sai fare tu",
       v:"+0", vCls:"calmo"}) +
-    (gente.length ? "" : studioVuoto("Non conosci ancora nessun fonico. <b>Alla Sala</b> ce ne gira più di uno.")));
+    (gente.length ? "" : studioVuoto("Non conosci ancora nessun fonico. <b>Alla Sala</b> ce ne gira più di uno.")) +
+    /* «CON CHI»: il feat, sotto al fonico — stesse caselle, stesso «da solo».
+       Due porte (idea D3): chi conosci accetta sempre e non costa niente;
+       i rapper della classifica si pagano e possono dire di no. */
+    studioCabinaConChi(ft));
 
   let mid;
   if(b && bt){
@@ -1028,38 +1139,45 @@ function studioSezCover(){
   return {sx, mid, dx:""};
 }
 
-/* ---- IL FEAT — con chi lo fai ---- */
-function studioSezFeat(){
-  const gente = studioGente("rapper");
-  const ft = studioFeat();
-
-  const sx = stPan("Chi può entrarci",
-    gente.length
-      ? gente.map(p => stScelta({
-          attr:' data-feat="' + studioEsc(p.id) + '"', on:ft === p,
-          mini:faccia(p, 40), n:p.n,
-          d:relNome(p) + " · fama " + p.fama,
-          v:studioAiutoFeat(p) ? "+" + studioAiutoFeat(p) + " qual." : "—",
-          vCls:studioAiutoFeat(p) ? "" : "calmo"
-        })).join("")
-      : studioVuoto("Non conosci ancora nessun altro rapper. Si incontrano <b>alla Sala</b> — " +
-          "e non tutti hanno voglia di dividere un pezzo."));
-
-  const mid = ft
-    ? stPan("",
-        stCapo("In sessione", ft.n, "+" + studioAiutoFeat(ft)) +
-        '<p class="stnota">Un feat non è obbligatorio. Ma se il pezzo lo fate <b>insieme, in ' +
-          'sessione</b>, si sente — quanto vale dipende da quanto è grosso lui e da quanto vi ' +
-          'conoscete.</p>' +
-        stEsito(stFreccia() + ' ' + stOro("+" + studioAiutoFeat(ft)) +
-          ' sulla prossima traccia · poi il posto torna libero') +
-        stAzioni(stSecondo(' data-feat="' + studioEsc(ft.id) + '"', "Lascia perdere", "rinnova")))
-    : stPan("",
-        stCapo("In sessione", "nessuno", "") +
-        '<p class="stnota">Va benissimo così: il feat è una scelta, non un passaggio. ' +
-          'Se ne chiami uno, la traccia che registri dopo vale di più.</p>');
-
-  return {sx, mid, dx:""};
+/* ---- CON CHI — il feat, dentro alla Cabina ---- */
+/* Il blocco sotto al fonico. Prima era una linguetta a sé («Feat»), chiusa
+   finché non c'era un pezzo e vuota finché non conoscevi un rapper: una sala
+   d'attesa. Qui è una lista sola, con «da solo» in cima come per il fonico,
+   chi conosci subito sotto, e in fondo la classifica — che non è mai vuota,
+   quindi la schermata vuota non esiste più. */
+function studioCabinaConChi(ft){
+  const noti = studioGente("rapper");
+  const rivali = studioRivaliChiamabili().slice(0, 6);
+  return stSotto("Con chi") +
+    stScelta({attr:' data-feat=""', on:!ft, mini:stSagoma(),
+      n:"da solo", d:"il pezzo è tuo e basta",
+      v:"+0", vCls:"calmo"}) +
+    noti.map(p => stScelta({
+      attr:' data-feat="' + studioEsc(p.id) + '"', on:ft === p,
+      mini:faccia(p, 40), n:p.n,
+      d:relNome(p) + " · fama " + p.fama + " · viene gratis",
+      v:studioAiutoFeat(p) ? "+" + studioAiutoFeat(p) + " qual." : "—",
+      vCls:studioAiutoFeat(p) ? "" : "calmo"
+    })).join("") +
+    (rivali.length
+      ? stSotto("Dalla classifica") +
+        rivali.map(r => {
+          const fama = studioFamaRivale(r);
+          const stima = Math.round(1.2 + fama * 0.12);   /* da «contatto», com'è se accetta */
+          return stScelta({
+            attr:' data-rivale="' + studioEsc(r.n) + '"',
+            mini:faccia(r, 40), n:r.n,
+            d:"fama " + fama + " · " + fmt(studioFeatPrezzo(r)) + " € · dice sì al " +
+              Math.round(studioFeatProbabilita(r) * 100) + "%",
+            v:"+" + stima + " qual.", vCls:"calmo"
+          });
+        }).join("")
+      : "") +
+    (ft
+      ? '<p class="stnota"><b>' + studioEsc(ft.n) + '</b> è in sessione: vale sulla prossima traccia, ' +
+        'poi il posto torna libero.</p>'
+      : '<p class="stnota">Un feat non è obbligatorio. Chi conosci ci sta sempre; a uno della ' +
+        'classifica lo chiedi, e può dirti di no.</p>');
 }
 
 /* ---- FUORI — quale esce, e quando ---- */
@@ -1277,7 +1395,6 @@ function renderStudio(){
      sez.id === "cabina" ? studioSezCabina() :
      sez.id === "banco"  ? studioSezBanco() :
      sez.id === "cover"  ? studioSezCover() :
-     sez.id === "feat"   ? studioSezFeat() :
      studioSezFuori());
 
   $("st-sx").innerHTML = parti.sx || "";
@@ -1334,7 +1451,10 @@ if($("studio")){
     /* `data-fonico=""` e' «da solo»: non e' un id, e' l'assenza di uno. */
     if(f){ studioScegliFonico(f.dataset.fonico || null); return; }
     const ft = e.target.closest("[data-feat]");
-    if(ft){ studioScegliFeat(ft.dataset.feat); return; }
+    /* `data-feat=""` e' «da solo», come per il fonico */
+    if(ft){ studioScegliFeat(ft.dataset.feat || null); return; }
+    const rv = e.target.closest("[data-rivale]");
+    if(rv){ studioChiamaRivale(rv.dataset.rivale); return; }
     const m = e.target.closest("[data-mixa]");
     if(m){ studioSegna("mixa", Number(m.dataset.mixa)); return; }
     const u = e.target.closest("[data-esce]");

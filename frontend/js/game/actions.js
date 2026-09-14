@@ -170,6 +170,11 @@ const studioBonus = () => (typeof studioAiutoFonico === "function" ? studioAiuto
    qui si somma e basta. Vale per un pezzo solo: `studioConsumaFeat()` lo
    stacca appena la traccia esce dalla cabina. */
 const featBonus = () => (typeof studioAiutoFeat === "function" ? studioAiutoFeat() : 0);
+/* Quanto hype porta il feat all'uscita: la fama di chi c'e' sul pezzo
+   (`s.featFama`, scritta alla registrazione). Fama 50 → +4. La stessa
+   riga la usa l'uscita del venerdi' (studio-elementi.js). */
+const ADF_FEAT_HYPE = 0.08;
+function featHypeUscita(s){ return Math.round((s && s.featFama || 0) * ADF_FEAT_HYPE); }
 /* Le due scelte dello Studio (punto 4: «ogni elemento influenza il
    risultato», e sceglierlo è metà dell'elemento). Se non hai scelto niente —
    o se il pezzo che avevi scelto non è più lì — si torna a `sort()[0]`, che
@@ -342,13 +347,16 @@ const ACTIONS = [
           take registra con lo stesso dado di sempre. */
        const q = clamp(Math.round(songQ(b,bt) + studioBonus() + featBonus() +
          (typeof studioTakePresa === "function" ? studioTakePresa() : rnd(-5,6))), 5, 100);
-       /* chi era in sessione resta scritto sul pezzo, e poi torna libero */
-       const conMe = typeof studioConsumaFeat === "function" ? studioConsumaFeat() : "";
+       /* chi era in sessione resta scritto sul pezzo — il nome e la fama,
+          che e' quella che sim.js legge per far ascoltare il pezzo alla sua
+          gente — e poi torna libero */
+       const conMe = typeof studioConsumaFeat === "function" ? studioConsumaFeat() : null;
        const s2 = {t:nome, q, mixed:false, released:false, week:0, streams:0, last:0,
-         txt:b.txt||"", tema:b.tema||"", seed:seed, img:img||"", feat:conMe};
+         txt:b.txt||"", tema:b.tema||"", seed:seed, img:img||"",
+         feat:conMe ? conMe.n : "", featFama:conMe ? conMe.fama : 0};
        G.songs.push(s2); G.wellbeing = clamp(G.wellbeing-3,0,100);
        pushLog("Registrato <b>«" + nome + "»</b> su «" + bt.n + "»" +
-         (conMe ? " con <b>" + conMe + "</b>" : "") + " — qualità " + q + ".", "");
+         (conMe ? " con <b>" + conMe.n + "</b>" : "") + " — qualità " + q + ".", "");
        SFX.rec(); save(); renderGioco();
        if(typeof renderStudio === "function") renderStudio();
      });
@@ -382,7 +390,9 @@ const ACTIONS = [
      if(!s.mixed) s.q = clamp(s.q - 8, 5, 100);
      s.released = true; s.week = totalWeeks();
      anteprimeAllUscita(s);
-     G.hype = clamp(G.hype + 6 + s.q*0.12, 0, (typeof hypeCap==="function"?hypeCap():100));
+     /* un nome grosso sul pezzo muove l'hype quando esce: la sua gente lo
+        vede (foglio dell'hype, «feat con nomi piu' grandi») */
+     G.hype = clamp(G.hype + 6 + s.q*0.12 + featHypeUscita(s), 0, (typeof hypeCap==="function"?hypeCap():100));
      return "«" + s.t + "» è fuori" + (s.mixed ? "." : ", ma non era mixato: qualità " + s.q + ".");
    }},
 
