@@ -1335,6 +1335,22 @@ console.log("\nlo Studio: la gente della Sala conta");
       dentro("G.studio.coverProva") === null &&
       dentro("daPubblicare().t") === "Vestito");
 
+    /* Punto 10 dello Studio: prima Beat, Testo e Cabina, poi il resto. Le
+       altre cinque linguette restano chiuse finche' non c'e' il primo pezzo. */
+    dentro("G.songs = []; STUDIO_SEZ = 'promo'; renderStudio();");
+    const linguette = () => nodi["st-tabs"].innerHTML || "";
+    controlla("senza pezzi Mix, Cover, Feat, Timing e Marketing sono chiuse, e Beat/Testo/Cabina no",
+      ["banco", "cover", "feat", "fuori", "promo"].every(id =>
+        new RegExp('sttab[^"]*chiusa" data-sez="' + id + '"').test(linguette())) &&
+      ["beat", "testo", "cabina"].every(id =>
+        new RegExp('class="sttab( on)?" data-sez="' + id + '"').test(linguette())),
+      linguette().slice(0, 300));
+    controlla("e arrivando a una sezione chiusa si torna al Beat",
+      dentro("STUDIO_SEZ") === "beat");
+    dentro("G.songs = [{t:'Primo', q:50, mixed:false, released:false, seed:61}]; renderStudio();");
+    controlla("col primo pezzo registrato si apre tutto",
+      linguette().indexOf("chiusa") < 0);
+
     /* Punto 8 dello Studio: un pezzo non ancora uscito non si spinge — al
        massimo se ne fa uscire un'anteprima, che all'uscita diventa spinta. */
     dentro(`

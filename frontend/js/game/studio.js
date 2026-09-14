@@ -81,23 +81,35 @@ const STUDIO_SEZIONI = [
    d:"prima di tutto il resto"},
   {id:"cabina", n:"Cabina",    bar:"La cabina",    sc:"registra",
    d:"dove si incide"},
+  /* Punto 10 del foglio «LUOGO: STUDIO»: prima Beat, Testo e Cabina, poi il
+     resto. Le sezioni con `dopo` restano chiuse finche' non hai registrato
+     il primo pezzo — e' il percorso guidato, non un limite per sempre:
+     appena c'e' un pezzo si aprono tutte e per tutte le partite dopo. */
   {id:"banco",  n:"Mix",       bar:"Il banco",     sc:"mixa",
-   d:"dove il provino diventa pezzo"},
+   d:"dove il provino diventa pezzo", dopo:true},
   {id:"cover",  n:"Cover",     bar:"La copertina", sc:"pubblica",
-   d:"la faccia del pezzo"},
+   d:"la faccia del pezzo", dopo:true},
   {id:"feat",   n:"Feat",      bar:"Il feat",      sc:"registra",
-   d:"con chi lo fai"},
+   d:"con chi lo fai", dopo:true},
   /* Timing prima di Marketing, e non e' un gusto: la spinta si decide
      **dopo** aver deciso quando esce il pezzo, perche' «venerdi' fra 4 giorni»
      e «stanotte» non si spingono allo stesso modo. Al contrario si sceglieva
      come spingerlo prima di sapere quando usciva. */
   {id:"fuori",  n:"Timing",    bar:"Fuori",        sc:"pubblica",
-   d:"quando esce"},
+   d:"quando esce", dopo:true},
   {id:"promo",  n:"Marketing", bar:"Il marketing", sc:"promo",
-   d:"farlo sapere"}
+   d:"farlo sapere", dopo:true}
 ];
 
 let STUDIO_SEZ = "beat";
+
+/* Il resto si apre col primo pezzo registrato (punto 10). */
+function studioSbloccato(){
+  return (typeof G !== "undefined" && G && G.songs || []).length > 0;
+}
+function studioSezAperta(x){
+  return !x.dopo || studioSbloccato();
+}
 
 /* ==================== LA GENTE CHE CI LAVORA ====================
    Solo chi è ancora in giro: chi ha mollato la scena (`via`) non è più dietro
@@ -1258,11 +1270,15 @@ function renderStudio(){
   const root = $("studio");
   if(!root || !root.classList.contains("on")) return;
 
-  const sez = STUDIO_SEZIONI.find(x => x.id === STUDIO_SEZ) || STUDIO_SEZIONI[0];
+  let sez = STUDIO_SEZIONI.find(x => x.id === STUDIO_SEZ) || STUDIO_SEZIONI[0];
+  /* una sezione chiusa non si disegna nemmeno arrivandoci da fuori (un
+     cartello della mappa, un salvataggio): si torna al Beat */
+  if(!studioSezAperta(sez)){ sez = STUDIO_SEZIONI[0]; STUDIO_SEZ = sez.id; }
 
   const tabs = $("st-tabs");
   tabs.innerHTML = STUDIO_SEZIONI.map(x =>
-    '<button class="sttab' + (x.id === sez.id ? " on" : "") + '" data-sez="' + x.id + '">' +
+    '<button class="sttab' + (x.id === sez.id ? " on" : "") + (studioSezAperta(x) ? "" : " chiusa") +
+    '" data-sez="' + x.id + '"' + (studioSezAperta(x) ? "" : ' aria-disabled="true"') + '>' +
     x.n + '</button>').join("");
   /* Otto linguette non ci stanno in riga su un telefono: la striscia scorre.
      Due cose, se no le ultime due sezioni sono una caccia al tesoro — che è
@@ -1334,7 +1350,16 @@ function studioAzione(id){
 if($("studio")){
   $("studio").addEventListener("click", e => {
     const t = e.target.closest("[data-sez]");
-    if(t){ STUDIO_SEZ = t.dataset.sez; STUDIO_DIARIO = 0; SFX.tap(); renderStudio(); return; }
+    if(t){
+      const x = STUDIO_SEZIONI.find(y => y.id === t.dataset.sez);
+      /* punto 10: chiusa finche' non c'e' il primo pezzo — lo dice, non tace */
+      if(x && !studioSezAperta(x)){
+        SFX.fail();
+        toast("Prima il pezzo: <b>Beat, Testo, Cabina</b>. Poi il resto.", "bad", "!", ["#3A3F49", "#22262E"]);
+        return;
+      }
+      STUDIO_SEZ = t.dataset.sez; STUDIO_DIARIO = 0; SFX.tap(); renderStudio(); return;
+    }
     const bm = e.target.closest("[data-bm]");
     if(bm){ studioScegliBeatmaker(bm.dataset.bm); return; }
     const b = e.target.closest("[data-beat]");

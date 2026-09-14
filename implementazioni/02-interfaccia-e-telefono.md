@@ -1614,3 +1614,29 @@ Sei prove in `strumenti/prova.js` (sotto «al Marketing il pezzo non uscito sta 
 «Non ancora fuori»»). Provato in partita: scelto «Sangue» (non uscito) il centro passa
 all'anteprima, la mossa costa 8 energia e 30 minuti, apre la scena con «Anteprima di
 «Sangue»: hype +3. Quando esce parte al 112%», e la riga dice «1 anteprima».
+
+## Prima Beat, Testo e Cabina; il resto si apre col primo pezzo
+
+~~«l'utente deve poter fare solo le sezioni Beat, Testo, e Cabina, poi il resto»~~ **FATTO (14/09/2026)** — nella lettura più semplice, e la lettura è una scelta: vedi sotto.
+
+Le cinque linguette dopo la Cabina — Mix, Cover, Feat, Timing, Marketing — restano
+**chiuse finché non hai registrato il primo pezzo**: spente, col lucchetto, al loro posto
+(`.sttab.chiusa`). Toccarle dice «Prima il pezzo: Beat, Testo, Cabina. Poi il resto» e non
+cambia sezione; arrivarci da fuori (un cartello della mappa, un salvataggio) riporta al
+Beat. Appena c'è un pezzo (`G.songs.length > 0`) si apre tutto, e resta aperto: è il
+percorso guidato della prima volta, non un vincolo per sempre. Le sezioni portano
+`dopo:true` in `STUDIO_SEZIONI`, e `studioSezAperta()` decide.
+
+**La scelta che ho preso, e che puoi ribaltare**: il punto si può leggere in due modi.
+*Prima volta* — le tre sezioni sono l'inizio, poi lo Studio è tutto tuo (quello che c'è
+adesso). *Ogni pezzo* — per ogni canzone si passa da Beat → Testo → Cabina e solo dopo si
+mixa, si veste, si fa uscire: ma le sezioni dopo la Cabina già oggi lavorano solo su un
+pezzo registrato (senza pezzi dicono «Si comincia dalla Cabina»), quindi il vincolo per
+pezzo c'è già nei fatti, e chiuderle di nuovo a ogni pezzo avrebbe tolto la possibilità
+di mixare il pezzo di ieri mentre scrivi quello di oggi. Se volevi la seconda, si cambia
+`studioSbloccato()` e basta.
+
+Tre prove in `strumenti/prova.js` (sotto «senza pezzi Mix, Cover, Feat, Timing e
+Marketing sono chiuse»). Provato in partita: con la cartella vuota le cinque linguette
+hanno il lucchetto, il tocco su Marketing lascia il Beat e mostra l'avviso; col primo pezzo
+si aprono.
