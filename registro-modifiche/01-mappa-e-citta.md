@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:c7f1b9b -->
+## 14/09/26, 07:53 â€” task/brainstorming-studio-sezioni â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `c7f1b9b`
+
+### Cosa Ã¨ entrato
+
+- `9261edd` â€” docs(studio): brainstorming per togliere Cover, Feat e Marketing, e il punto 10 «ad ogni pezzo» â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:90d1ea3 -->
 ## 14/09/26, 06:06 â€” task/studio-marketing-scegli-il-pezzo â†’ main
 
