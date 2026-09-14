@@ -1012,9 +1012,17 @@ function studioSezCabina(){
        con la barra a tacche e la migliore segnata. La prima è il tiro di
        dado che `registra` faceva da solo e non ti faceva vedere; le altre le
        chiedi tu e le paghi in energia. Sotto, i due tasti del riferimento:
-       un'altra take, oppure ti tieni questa e si chiude. */
+       un'altra take, oppure ti tieni questa e si chiude.
+
+       L'energia la chiede la take, non la chiusura (15/09/2026): la cabina
+       si apre vuota e la prima take costa la sessione intera
+       (`STUDIO_TAKE_PRIMA`), le altre `STUDIO_TAKE_ENERGIA`; «Tieni questa
+       e chiudi» non costa niente, cosi' non si resta con la take buona in
+       mano e non abbastanza energia per tenerla. */
     const t = studioTake();
-    const scelta = t ? studioTakeQ(t.l[t.s]) : q;
+    const prese = t ? t.l.length : 0;
+    const costo = studioTakeCosto(t);
+    const scelta = prese ? studioTakeQ(t.l[t.s]) : q;
     mid = stPan("",
       stCapo("Incidi", (b.tema || "la strofa") + "» su «" + bt.n, "q~" + q) +
       '<p class="stnota">Un fonico che ti conosce sa dove metterti la voce prima che glielo ' +
@@ -1024,7 +1032,7 @@ function studioSezCabina(){
         (fon ? '<b>' + studioEsc(fon.n) + '</b> dietro al vetro ' + stNum("+" + aiuto)
              : 'da solo, nessuno dietro al vetro') +
         (ft ? ' · <b>' + studioEsc(ft.n) + '</b> in sessione ' + stNum("+" + aiutoFt) : '') +
-        (t ? ' · ' + stFreccia() + ' esce con ' + stOro("q" + scelta) : '')) +
+        (prese ? ' · ' + stFreccia() + ' esce con ' + stOro("q" + scelta) : '')) +
       stAzioni(
         /* L'oro ce l'ha «Tieni questa e chiudi», non «Un'altra take».
            Nella foto `registrazione_pezzo` era il contrario, e per un po' ha
@@ -1034,14 +1042,22 @@ function studioSezCabina(){
            «Compralo» e' d'oro e «Fattelo fare» no. Qui la mossa che fa
            succedere la cosa e' chiudere: «Un'altra take» ripete e basta.
            Con l'oro sull'altro, chi andava di fretta premeva il tasto grosso
-           e si ritrovava dodici di energia in meno senza volerlo. */
-        stPrimo(' data-az="registra"', "Tieni questa e chiudi", "spunta"),
-        stSecondo(' data-ancora="1"',
-          "Un'altra take · " + STUDIO_TAKE_ENERGIA + " energia", "mic",
-          G.energy < STUDIO_TAKE_ENERGIA || (t && t.l.length >= STUDIO_TAKE_MAX))) +
-      (G.energy < STUDIO_TAKE_ENERGIA
-        ? '<p class="stperche">Per un\'altra take servono ' + STUDIO_TAKE_ENERGIA +
-          ' di energia, ne hai ' + Math.round(G.energy) + '.</p>'
+           e si ritrovava dodici di energia in meno senza volerlo.
+
+           Finche' di take non ce n'e' nessuna, la cosa che deve succedere e'
+           la prima take: l'oro sta li', ed e' l'unico tasto. */
+        prese
+          ? stPrimo(' data-az="registra"', "Tieni questa e chiudi", "spunta")
+          : stPrimo(' data-ancora="1"', "Registra la take · " + costo + " energia", "mic",
+              G.energy < costo),
+        prese
+          ? stSecondo(' data-ancora="1"',
+              "Un'altra take · " + costo + " energia", "mic",
+              G.energy < costo || prese >= STUDIO_TAKE_MAX)
+          : "") +
+      (G.energy < costo && prese < STUDIO_TAKE_MAX
+        ? '<p class="stperche">Per ' + (prese ? 'un\'altra take' : 'la prima take') + ' servono ' +
+          costo + ' di energia, ne hai ' + Math.round(G.energy) + '.</p>'
         : ""));
   } else if(!b){
     mid = stPan("",

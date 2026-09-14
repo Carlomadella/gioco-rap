@@ -324,10 +324,16 @@ const ACTIONS = [
        ". Si comprano allo Shop.";
    }},
 
-  {id:"registra", n:"Registra il pezzo", e:45, luc:3,
+  /* Non costa energia (era 45): l'energia si paga in cabina, take per take —
+     la prima vale la sessione intera, `STUDIO_TAKE_PRIMA` in
+     studio-elementi.js — e **tenere** la take buona e' gratis. Prima chi
+     insisteva con le take arrivava a «Tieni questa e chiudi» senza i 45 per
+     premerlo (15/09/2026). Il tempo in sala e la sala stessa restano qui. */
+  {id:"registra", n:"Registra il pezzo", e:0, luc:3,
    money:() => G.gear.mic ? 0 : 50,
    d:"Strofa più beat, in sala. Esce una traccia grezza.",
-   need:() => !G.bars.length ? "1 strofa" : !G.beats.length ? "1 beat" : null,
+   need:() => !G.bars.length ? "1 strofa" : !G.beats.length ? "1 beat"
+     : (typeof studioTakeManca === "function" && studioTakeManca()) ? "una take, in cabina" : null,
    give:() => {
      const b = daIncidere(), bt = beatDaIncidere();
      return (b && bt ? "1 traccia · qualità ~" + Math.round(songQ(b,bt) + studioBonus() + featBonus()) : "1 traccia grezza") +

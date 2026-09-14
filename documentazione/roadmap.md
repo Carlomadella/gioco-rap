@@ -1,6 +1,6 @@
 # La roadmap del progetto — a che punto siamo davvero
 
-**Aggiornata al 14/09/2026.** Ogni riga di questo file è stata controllata sul repo il
+**Aggiornata al 15/09/2026.** Ogni riga di questo file è stata controllata sul repo il
 giorno in cui è stata scritta: se qui c'è scritto «fatto», il codice c'è ed è stato
 guardato. Se c'è scritto «da fare», nel repo non c'è niente che lo faccia.
 
@@ -180,6 +180,15 @@ aprono e chiudono con lui (il punto 10 «ad ogni pezzo»). E il riquadro dei num
 foglio c'è, diviso in due righe come dice l'idea E: *QUALITÀ = Beat · Testo · Fonico · Feat
 · Mix → q* e *ASCOLTI = copertina · venerdì · anteprime · la gente del feat · hype · fan*.
 Sta in `implementazioni/02-interfaccia-e-telefono.md`, «Lo Studio a cinque linguette».
+
+**FATTO (15/09/2026)** — **l'energia si spende per fare la take, mai per tenerla**: la
+cabina si apre vuota, la prima take costa la sessione (45), le altre 12, e «Tieni questa e
+chiudi» è gratis — prima era `registra` a 45, e chi aveva insistito con le take restava
+senza energia per tenere quella buona. E sul telefono c'è **Sputa**, la seconda app per
+postare: il finto X, 140 caratteri, dove i rivali sputano barre col dado fermo e la prima
+barra del giorno dà +1 hype (`frontend/js/game/sputa.js`). Tutte e due in
+`implementazioni/`: «Non si spende energia per tenere una take» in `04-musica-e-suoni.md`,
+«Sputa» in `02-interfaccia-e-telefono.md`.
 
 **Manca**: l'app della discografia che dice come invecchiano i pezzi; e sotto i 1180px,
 dove il telefono della plancia non c'è, «Che post fai?» non si raggiunge (il tasto «fallo

@@ -169,8 +169,11 @@ function avviaAzioneDiretta(id){
   showEvent({
     k:"Confermi?",
     t:a.n,
-    d:"Ti costa <b>" + en2 + (en2 === 1 ? " energia" : " energie") + "</b>" +
-      (c ? " e <b>" + fmt(c) + " €</b>" : "") + ". " + a.d,
+    /* una mossa che di energia non ne chiede (registra: si paga in cabina,
+       take per take) non deve dire «ti costa 0 energie» */
+    d:"Ti costa " +
+      (en2 ? "<b>" + en2 + (en2 === 1 ? " energia" : " energie") + "</b>" + (c ? " e " : "") : "") +
+      (c ? "<b>" + fmt(c) + " €</b>" : "") + ". " + a.d,
     annulla(){},
     opts:[
       {n:"Vai", d:"Fai la mossa adesso", run(){ esegui(); return null; }},

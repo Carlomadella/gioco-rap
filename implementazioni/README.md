@@ -126,6 +126,8 @@ nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../docume
 | **—** | Una pagina per ogni azione? | risposto, da fare | [pagine-azioni](../documentazione/pagine-azioni/README.md) |
 | **—** | Le scene dei fan, tante e difficili da ripescare | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | La chat del telefono non va più in loop | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | Sputa: la seconda app del telefono per postare | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | Studio · Non si spende energia per tenere una take | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
 | **—** | Scambiarsi il numero con fonici e beatmaker | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Una gerarchia per gli incontri mentre si salta il tempo | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
 | **—** | Tutte le rotte provate su Postman | fatto | [multiplayer-e-backend](07-multiplayer-e-backend.md) |

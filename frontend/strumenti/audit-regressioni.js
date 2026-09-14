@@ -627,16 +627,30 @@ test("gli elementi dello Studio stanno in un file loro, caricato dopo studio.js"
   index.includes('css/studio-elementi.css'));
 
 test("la prima take e' lo stesso tiro di dado che registra faceva da sola",
-  studioEl.includes("d.take = {k, l:[Math.round(rnd(-5, 6))], s:0}") &&
+  /* la cabina si apre vuota e ogni take, la prima compresa, e' quel dado */
+  studioEl.includes("d.take = {k, l:[], s:0}") &&
+  studioEl.includes("t.l.push(Math.round(rnd(-5, 6)))") &&
   actions.includes("typeof studioTakePresa === \"function\" ? studioTakePresa() : rnd(-5,6)") &&
   /* e chi non ha take in corso ricade sullo stesso dado */
   studioEl.includes("if(!d || !d.l || !d.l.length) return rnd(-5, 6);"));
 
 test("una take in piu' si paga in energia, e non e' gratis",
   studioEl.includes("const STUDIO_TAKE_ENERGIA = 12") &&
-  studioEl.includes("G.energy -= STUDIO_TAKE_ENERGIA") &&
-  studioEl.includes("if(G.energy < STUDIO_TAKE_ENERGIA)") &&
+  studioEl.includes("G.energy -= costo") &&
+  studioEl.includes("if(G.energy < costo)") &&
   studioEl.includes("const STUDIO_TAKE_MAX = 6"));
+
+/* L'energia si spende per fare la take, mai per tenerla (15/09/2026): prima
+   «Tieni questa e chiudi» era `registra` a 45 di energia, e chi aveva pagato
+   le take per insistere arrivava alla fine senza i 45 per tenere quella
+   buona. La sessione adesso la paga la prima take. */
+test("tenere una take non costa energia: la sessione la paga la prima take",
+  studioEl.includes("const STUDIO_TAKE_PRIMA = 45") &&
+  studioEl.includes("return t && t.l.length ? STUDIO_TAKE_ENERGIA : STUDIO_TAKE_PRIMA;") &&
+  /id:"registra", n:"Registra il pezzo", e:0,/.test(actions) &&
+  /* e senza take non si registra: sarebbe un pezzo gratis */
+  actions.includes("studioTakeManca()) ? \"una take, in cabina\"") &&
+  studio.includes(`stPrimo(' data-ancora="1"', "Registra la take · " + costo + " energia"`));
 
 test("i cursori del banco partono al centro e al centro valgono zero",
   studioEl.includes("d.banco = {voce:2, bassi:2, aria:2}") &&
@@ -664,6 +678,24 @@ test("un pezzo in cassaforte non esce per sbaglio dalla plancia",
    tre sparite non sono sparite: sono finite dentro alle stanze giuste, e se
    una di queste righe salta e' perche' qualcuno ha rimesso una linguetta o
    ha staccato un pezzo che adesso sta altrove. */
+/* Sputa, la seconda app del telefono per postare (15/09/2026): un file suo,
+   caricato dopo telefono.js perche' si registra da sola in HUB_APP; il
+   telefono la apre e basta. La prima barra del giorno da' +1 hype, le altre
+   niente: e' il freno contro il giro da sfruttare, e va tenuto. */
+console.log("\nSputa — la seconda app per postare (15/09/2026)");
+const sputa = fs.existsSync(path.join(ROOT, "js/game/sputa.js")) ? leggi("js/game/sputa.js") : "";
+test("Sputa sta in un file suo, caricato dopo telefono.js, e il telefono la apre",
+  sputa.includes('HUB_APP.push({id:"sputa"') &&
+  index.includes("js/game/sputa.js") &&
+  index.indexOf("js/game/sputa.js") > index.indexOf("js/game/telefono.js") &&
+  telefono.includes('if(id === "sputa") return typeof schermataSputa === "function" ? schermataSputa() : "";'));
+test("su Sputa i rivali sputano col dado fermo, e solo la prima barra del giorno da' hype",
+  sputa.includes("function sputaDado(seme)") &&
+  sputa.includes("sputaDado((Number(r.seed) || 0) + sett * 7919)") &&
+  sputa.includes('adfOggi("sputa") === 0') &&
+  sputa.includes("const SPUTA_HYPE_PRIMA = 1") &&
+  sputa.includes("const SPUTA_MAX = 140"));
+
 console.log("\nLo Studio a cinque linguette (14/09/2026)");
 test("le linguette dello Studio sono cinque: Beat, Testo, Cabina, Mix, Uscita",
   (() => {
@@ -799,7 +831,9 @@ test("i tasti dello Studio restano nello schermo anche quando il pannello scorre
 test("in cabina l'oro ce l'ha «Tieni questa e chiudi», non «Un'altra take»",
   studio.includes(`stPrimo(' data-az="registra"', "Tieni questa e chiudi"`) &&
   studio.includes(`stSecondo(' data-ancora="1"'`) &&
-  !studio.includes(`stPrimo(' data-ancora="1"'`));
+  /* l'oro sulla take ce l'ha solo la prima, quando di take non ce n'e' */
+  !studio.includes(`stPrimo(' data-ancora="1"',\n              "Un'altra take`) &&
+  !studio.includes(`stPrimo(' data-ancora="1"', "Un'altra take`));
 
 /* Il banco dello Studio e' lo stesso dello Shop, ma il motore ascoltava i nomi
    degli attributi invece dei fatti: chi comprava dallo Studio, per gli eventi,

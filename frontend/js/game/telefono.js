@@ -156,7 +156,8 @@ const TEL_DOCK = ["chat", "contatti", "lafamegram", "inventario"];
 const TEL_GRIGLIA = ["obiettivi", "notizie", "classifiche", "statistiche",
                      "discografia", "contratti", "agenda", "impostazioni"];
 /* Chi non ha la sua foto (le app che si aggiungono a partita avviata, come
-   Notifiche di eventi-v2) tiene il disegno vettoriale di prima. */
+   Notifiche di eventi-v2, o Sputa di sputa.js) tiene il disegno vettoriale
+   di prima. */
 const TEL_FOTO = new Set(TEL_GRIGLIA.concat(TEL_DOCK));
 const TEL_RUOLI = {beatmaker:"Beatmaker", rapper:"Rapper", fonico:"Fonico", giornalista:"Giornalista"};
 
@@ -423,6 +424,8 @@ function schermataApp(id){
   if(id === "agenda") return schermataAgenda();
   if(id === "impostazioni") return schermataImpostazioni();
   if(id === "lafamegram") return schermataLafamegram();
+  /* Sputa, il finto X: sta in sputa.js, che si registra da solo in HUB_APP */
+  if(id === "sputa") return typeof schermataSputa === "function" ? schermataSputa() : "";
   if(id === "chat") return TEL_CHAT_APERTA ? schermataChatThread() : schermataChat();
   return "";
 }
