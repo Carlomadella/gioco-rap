@@ -242,6 +242,13 @@ NETWORK 64
    toglierlo, e forse è quello — in quel caso basta un «da solo» in Cabina come per il
    fonico.
 
+   **Carletto (14/09/2026):** «Sto pensando di voler togliere le sezioni cover, feat,
+   marketing». Le idee su come farlo — via del tutto o fuse nelle stanze giuste, da chi si
+   sceglie il feat (solo chi conosci, tutti con costo e rifiuto, le due porte, dal
+   telefono), e la lettura «ad ogni pezzo» del punto 10 — stanno in
+   `documentazione/brainstorming-studio-cover-feat-marketing.md`, con in fondo le domande
+   a cui rispondere prima di cominciare. Il punto resta aperto fin lì.
+
 /_ DA DISCUTERE _/
 
 2. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles? Per forza a los angeles, però può decidere di tornare nelle città prima

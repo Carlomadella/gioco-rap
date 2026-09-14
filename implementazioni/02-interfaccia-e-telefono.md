@@ -1617,7 +1617,7 @@ all'anteprima, la mossa costa 8 energia e 30 minuti, apre la scena con «Antepri
 
 ## Prima Beat, Testo e Cabina; il resto si apre col primo pezzo
 
-~~«l'utente deve poter fare solo le sezioni Beat, Testo, e Cabina, poi il resto»~~ **FATTO (14/09/2026)** — nella lettura più semplice, e la lettura è una scelta: vedi sotto.
+«l'utente deve poter fare solo le sezioni Beat, Testo, e Cabina, poi il resto» **FATTO in parte (14/09/2026)** — fatta la lettura «prima volta»; Carletto ha poi detto che intendeva **«ad ogni pezzo»**, e quella manca. Come farla (una riga in `studioSbloccato()`, o «un pezzo sul banco») è scritto in `documentazione/brainstorming-studio-cover-feat-marketing.md`, idea F, perché dipende da quali linguette restano dopo la Cabina: si decide lì, poi si fa.
 
 Le cinque linguette dopo la Cabina — Mix, Cover, Feat, Timing, Marketing — restano
 **chiuse finché non hai registrato il primo pezzo**: spente, col lucchetto, al loro posto

@@ -168,6 +168,14 @@ volta — la lettura «a ogni pezzo» è scritta come alternativa). Resta aperto
 foglio, «non posso scegliere i feat»: non si riproduce, e la domanda — da chi si sceglie
 il feat, solo da chi conosci o da tutti — è scritta sotto al punto, in attesa di risposta.
 
+**In discussione (14/09/2026)** — Carletto pensa di **togliere Cover, Feat e Marketing**
+dallo Studio, e il punto 10 lo intendeva «ad ogni pezzo», non solo la prima volta. Le
+idee, il prezzo di ognuna e le domande da chiudere prima di toccare il codice stanno in
+[`brainstorming-studio-cover-feat-marketing.md`](brainstorming-studio-cover-feat-marketing.md).
+La strada proposta lì: Marketing sul telefono, Feat in Cabina accanto al fonico (chi
+conosci gratis, i rivali a pagamento e con rifiuto), Cover dentro all'Uscita, e «un pezzo
+sul banco» per la lettura ad ogni pezzo — cinque linguette invece di otto.
+
 **Manca**: i numeri per elemento scritti in chiaro — il riquadro *Beat 82 / Testo 76 / Mix 68
 / Feature 85 / Marketing 53 → QUALITÀ tot* del foglio dei punti nuovi non c'è: la qualità
 esce da una somma sola, e quanto ci ha messo ogni pezzo non si legge da nessuna parte. E
