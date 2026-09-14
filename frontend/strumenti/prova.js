@@ -1082,7 +1082,7 @@ console.log("\nlo Studio: la gente della Sala conta");
       function chiediTitolo(){} function hubPronta(){ return {ok:true, perche:""}; }
       function hubAzione(){} function apriFoglio(){} function scegliModo(){}
       function offriBeat(){ return []; } function adfOggi(){ return 0; }
-      SFX = { tap(){}, rec(){}, fanfare(){}, fail(){} };
+      SFX = { tap(){}, rec(){}, fanfare(){}, fail(){}, publish(){} };
     `, scatola);
     for(const f of sorgenti)
       vm.runInContext(fs.readFileSync(path.join(RADICE, f), "utf8"), scatola, { filename: f });
@@ -1306,6 +1306,34 @@ console.log("\nlo Studio: la gente della Sala conta");
     controlla("e la promo lascia la spinta sul pezzo scelto, non sugli altri",
       dentro("G.songs[0].spinta") > 1 && dentro("G.songs[1].spinta") === undefined,
       "spinta " + dentro("G.songs[0].spinta"));
+
+    /* Punto 5 dello Studio: «non c'e' un tasto di conferma della copertina».
+       Generarne un'altra e' una proposta: il pezzo cambia solo con Conferma,
+       e le scelte dello Studio che lo segnavano col vecchio seed lo seguono. */
+    dentro(`
+      G.songs = [{t:'Vestito', q:70, mixed:true, released:false, seed:41, img:''}];
+      G.studio.coverProva = null; G.studio.esce = 41; G.studio.cover = 41;
+      STUDIO_SEZ = "cover"; renderStudio();
+    `);
+    controlla("senza proposta la Cover offre foto e rigenera, e nessuna conferma",
+      dipinto().indexOf('data-cov="carica"') >= 0 &&
+      dipinto().indexOf('data-cov="conferma"') < 0);
+    dentro("studioCoverAltra();");
+    controlla("«Generane un'altra» non tocca il pezzo: e' una proposta da confermare",
+      dentro("G.songs[0].seed") === 41 &&
+      dentro("G.studio.coverProva && G.studio.coverProva.per") === 41 &&
+      dipinto().indexOf('data-cov="conferma"') >= 0 &&
+      dipinto().indexOf('data-cov="lascia"') >= 0 &&
+      dipinto().indexOf("da confermare") >= 0);
+    dentro("studioCoverLascia();");
+    controlla("«Lascia com'era» la butta",
+      dentro("G.studio.coverProva") === null && dentro("G.songs[0].seed") === 41);
+    dentro("studioCoverAltra(); studioCoverConferma();");
+    controlla("«Conferma» la mette sul pezzo, e Timing continua a puntare a quel pezzo",
+      dentro("G.songs[0].seed") !== 41 &&
+      dentro("G.studio.esce") === dentro("G.songs[0].seed") &&
+      dentro("G.studio.coverProva") === null &&
+      dentro("daPubblicare().t") === "Vestito");
   }
 }
 

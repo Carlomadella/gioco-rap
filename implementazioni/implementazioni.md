@@ -223,10 +223,6 @@ NETWORK 64
 
 /_ LUOGO: STUDIO _/
 
-3. Quando scegli la take esce un container che ti deve chiedere solo il nome del pezzo e non la copertina, quella viene dopo nella sezione cover
-
-5. non c'è un tasto di conferma della copertina
-
 6. non posso scegliere i feat, e inoltre non posso fare canzoni senza feat
 
 8. non posso spingere una canzone che non è ancora uscita, al massimo faccio uscire una preview

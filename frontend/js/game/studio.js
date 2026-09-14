@@ -364,30 +364,66 @@ function studioPezzoCover(){
   const s = (G.studio || {}).cover;
   return l.find(x => x.seed === s) || l[0] || null;
 }
+/* Punto 5 del foglio «LUOGO: STUDIO»: «non c'e' un tasto di conferma della
+   copertina». Prima «Generane un'altra» e la foto caricata andavano sul pezzo
+   nell'istante in cui le toccavi, e per tornare indietro non c'era niente.
+   Adesso sono una **proposta** (`G.studio.coverProva`, legata al pezzo dal
+   suo seed): si vede grande accanto a quella di adesso, e va sul pezzo solo
+   con «Conferma». «Lascia com'era» la butta. */
+function studioCoverProva(s){
+  const p = (G.studio || {}).coverProva;
+  return (p && s && p.per === s.seed) ? p : null;
+}
+function studioCoverProponi(seed, img){
+  const s = studioPezzoCover();
+  if(!s) return;
+  studioDati().coverProva = {per:s.seed, seed, img:img || ""};
+  save(); renderStudio();
+}
 function studioCoverAltra(){
   const s = studioPezzoCover();
   if(!s) return;
-  s.seed = Math.floor(Math.random() * 1e9);
-  s.img = "";
-  studioDati().cover = s.seed;
-  SFX.tap(); save(); renderStudio();
+  SFX.tap();
+  studioCoverProponi(Math.floor(Math.random() * 1e9), "");
 }
 function studioCoverTogli(){
   const s = studioPezzoCover();
   if(!s || !s.img) return;
-  s.img = "";
-  SFX.tap(); save(); renderStudio();
+  SFX.tap();
+  studioCoverProponi(s.seed, "");
 }
 function studioCoverCarica(file){
   const s = studioPezzoCover();
   if(!s || !file) return;
   caricaCopertina(file,
     dataUrl => {
-      s.img = dataUrl;
-      toast("Copertina tua su «" + s.t + "»", "good", "★", TINTA_SUONO);
-      SFX.publish(); save(); renderStudio();
+      toast("Foto pronta: guardala, poi <b>Conferma</b>", "good", "★", TINTA_SUONO);
+      SFX.tap(); studioCoverProponi(s.seed, dataUrl);
     },
     err => { toast(err, "bad", "!", ["#3A3F49", "#22262E"]); SFX.fail(); });
+}
+function studioCoverConferma(){
+  const s = studioPezzoCover();
+  const p = studioCoverProva(s);
+  if(!p) return;
+  const vecchio = s.seed;
+  s.seed = p.seed;
+  s.img = p.img || "";
+  /* il seed e' anche l'identita' del pezzo per le scelte dello Studio (Mix,
+     Timing, Marketing, questa): se cambia, le scelte lo seguono — se no il
+     pezzo scelto in Timing «spariva» appena gli cambiavi copertina */
+  if(p.seed !== vecchio){
+    const d = studioDati();
+    for(const k of ["mixa", "esce", "cover", "spingi"]) if(d[k] === vecchio) d[k] = p.seed;
+  }
+  studioDati().coverProva = null;
+  toast("Copertina " + (s.img ? "tua" : "nuova") + " su «" + s.t + "»", "good", "★", TINTA_SUONO);
+  SFX.publish(); save(); renderStudio();
+}
+function studioCoverLascia(){
+  if(!(G.studio || {}).coverProva) return;
+  studioDati().coverProva = null;
+  SFX.tap(); save(); renderStudio();
 }
 /* ==================== IL DISEGNO ====================
    La forma della pagina è quella dei riferimenti in
@@ -477,6 +513,14 @@ function stScelta(o){
 /* Il capo del pannello centrale, la riga che nei riferimenti dice cosa stai
    facendo: «MIXI: "Sottopasso" · q71». Verbo in stampatello, la cosa fra
    virgolette in bianco, il numero in azzurro dopo il puntino. */
+/* L'attributo che lega una riga al suo pezzo. Un pezzo senza seed (solo un
+   salvataggio ritoccato a mano: ogni pezzo nasce col suo) non puo' essere
+   segnato, e allora la riga esce muta invece che come un bottone che al tocco
+   non fa niente. */
+function stSeme(campo, x){
+  return Number.isFinite(x.seed) ? ' data-' + campo + '="' + x.seed + '"' : "";
+}
+
 function stCapo(verbo, cosa, valore){
   return '<p class="stcapo"><span class="v">' + studioEsc(verbo) + ':</span> ' +
     '<span class="c">«' + studioEsc(cosa) + '»</span>' +
@@ -859,7 +903,7 @@ function studioSezBanco(){
   const dx = stPan("Da mixare",
     da.length
       ? da.map(s => stScelta({
-          attr:' data-mixa="' + s.seed + '"', on:scelto === s,
+          attr:stSeme("mixa", s), on:scelto === s,
           mini:stCover(s), n:s.t, d:"q" + s.q + " · grezzo",
           v:"→ " + clamp(s.q + g, 5, 100)
         })).join("")
@@ -875,33 +919,47 @@ function studioSezBanco(){
 function studioSezCover(){
   const pronti = ready();
   const s = studioPezzoCover();
+  const p = studioCoverProva(s);
 
   const sx = stPan("I tuoi pezzi",
     pronti.length
       ? pronti.map(x => stScelta({
-          attr:' data-cover="' + x.seed + '"', on:s === x,
+          attr:stSeme("cover", x), on:s === x,
           mini:stCover(x), n:x.t,
-          d:"q" + x.q + (x.img ? " · copertina tua" : " · generata")
+          d:"q" + x.q + (x.img ? " · copertina tua" : " · generata") +
+            (studioCoverProva(x) ? ' · <span class="oro">da confermare</span>' : "")
         })).join("")
       : studioVuoto("Non hai pezzi a cui cambiare la copertina."),
     "cartella");
 
+  /* con una proposta in piedi, al centro sta **lei**, grande, e quella di
+     adesso le sta accanto piccola: si confrontano, e si decide */
+  const proposta = p ? {seed:p.seed, t:s.t, img:p.img} : null;
   const mid = s
     ? stPan("",
         '<div class="stfianco">' +
-          '<span class="stcopertina">' + stCover(s) + '</span>' +
+          '<span class="stcopertina">' + stCover(proposta || s) + '</span>' +
+          (p ? '<span class="stcopertina stprima" title="Quella di adesso">' + stCover(s) +
+               '<i>adesso</i></span>' : "") +
           '<div>' +
             stTitolo(s.t, 'q' + s.q + ' · ' + (s.mixed ? "mixato" : "grezzo")) +
             '<p class="stnota">Sulla qualità <b>pesa poco</b>, su chi ti clicca pesa tutto: ' +
               'è la prima cosa che si vede di un pezzo, spesso l\'unica.</p>' +
-            stAzioni(
-              stPrimo(' data-cov="carica"', "Carica una foto", "foto"),
-              s.img
-                ? stSecondo(' data-cov="togli"', "Togli la foto", "rinnova")
-                : stSecondo(' data-cov="altra"', "Generane un'altra", "rinnova")) +
+            (p
+              ? stEsito((p.img ? "la <b>tua foto</b>" : "una copertina <b>nuova</b>") +
+                  " — non è ancora sul pezzo") +
+                stAzioni(
+                  stPrimo(' data-cov="conferma"', "Conferma la copertina", "spunta"),
+                  p.img ? "" : stSecondo(' data-cov="altra"', "Generane un'altra", "rinnova"),
+                  stSecondo(' data-cov="lascia"', "Lascia com'era", "rinnova"))
+              : stAzioni(
+                  stPrimo(' data-cov="carica"', "Carica una foto", "foto"),
+                  s.img
+                    ? stSecondo(' data-cov="togli"', "Togli la foto", "rinnova")
+                    : stSecondo(' data-cov="altra"', "Generane un'altra", "rinnova"))) +
           '</div>' +
         '</div>' +
-        stEsito('JPG o PNG · la ritaglio quadrata io a ' + stNum("360×360")) +
+        (p ? "" : stEsito('JPG o PNG · la ritaglio quadrata io a ' + stNum("360×360"))) +
         '<p class="stnota" style="margin:12px 0 0">La terza strada del punto 4 — costruirtela a ' +
           'livelli, stile emblema di Black Ops 2 — non c\'è ancora: è una pagina a parte, ' +
           'non un bottone.</p>')
@@ -951,17 +1009,22 @@ function studioSezFeat(){
 function studioSezMarketing(){
   const fuori = studioFuori();
   const ultimo = studioDaSpingere();
+  /* gli ultimi sei, piu' quello scelto se e' piu' vecchio: se no si spinge
+     un pezzo che nell'elenco non c'e', e per cambiarlo non c'e' una riga
+     da ri-toccare */
+  const elenco = fuori.slice(0, 6);
+  if(ultimo && elenco.indexOf(ultimo) < 0) elenco.push(ultimo);
 
   /* Punto 9: le righe erano mute come al banco del Mix — senza `attr`
      `stScelta` non fa un bottone — e il pezzo acceso era sempre il primo.
      Adesso si sceglie, e la scelta e' quella che la promo spinge davvero. */
   const sx = stPan("Cosa spingi",
     fuori.length
-      ? fuori.slice(0, 6).map(x => stScelta({
-          attr:' data-spingi="' + x.seed + '"',
+      ? elenco.map(x => stScelta({
+          attr:stSeme("spingi", x),
           on:x === ultimo, mini:stCover(x), n:x.t,
           d:"q" + x.q + " · " + fmt(x.streams || 0) + " stream" +
-            (x.spinta > 1 ? " · <b>in spinta</b>" : "")
+            (x.spinta > 1 ? ' · <span class="oro">in spinta</span>' : "")
         })).join("")
       : studioVuoto("Non hai ancora fatto uscire niente."),
     "cartella");
@@ -1084,7 +1147,7 @@ function studioSezFuori(){
   const dx = stPan("Pronti",
     (pronti.length
       ? pronti.map(x => stScelta({
-          attr:' data-esce="' + x.seed + '"', on:s === x,
+          attr:stSeme("esce", x), on:s === x,
           mini:stCover(x), n:x.t,
           d:"q" + x.q + (x.mixed
             ? " · mixato"
@@ -1254,6 +1317,8 @@ if($("studio")){
     if(cv){
       if(cv.dataset.cov === "altra") studioCoverAltra();
       else if(cv.dataset.cov === "togli") studioCoverTogli();
+      else if(cv.dataset.cov === "conferma") studioCoverConferma();
+      else if(cv.dataset.cov === "lascia") studioCoverLascia();
       else if(cv.dataset.cov === "carica" && $("st-file")) $("st-file").click();
       return;
     }

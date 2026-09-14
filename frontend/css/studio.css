@@ -181,7 +181,11 @@
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stchi span{display:block;margin-top:2px;font-size:13.5px;font-weight:500;color:var(--stAzzSoft);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* un pezzo colorato dentro alla riga piccola resta in riga: la regola qui
+   sopra lo metteva a capo da solo («−8 se esce così», «in coda») */
+.stchi span span{display:inline;margin:0}
 .stchi .ros{color:var(--stRosso)}
+.stchi .oro{color:var(--stOro)}
 /* quanto vale, a destra: «−20%», «gratis», «+6 qual.» */
 .stval{flex:none;font-size:14px;font-weight:700;color:var(--stOro);white-space:nowrap}
 .stval.calmo{color:var(--stFaint)}
@@ -217,6 +221,11 @@
 .stcopertina{width:180px;height:180px;flex:none;border-radius:10px;overflow:hidden;
   background:#0A1018;box-shadow:0 20px 50px rgba(0,0,0,.6),inset 0 0 0 1px rgba(125,175,215,.2)}
 .stcopertina svg{display:block;width:100%;height:100%}
+/* la copertina «di adesso», piccola accanto alla proposta da confermare */
+.stcopertina.stprima{position:relative;width:96px;height:96px;opacity:.72}
+.stcopertina.stprima i{position:absolute;left:0;right:0;bottom:0;padding:3px 0;
+  font-style:normal;font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  text-align:center;color:#fff;background:rgba(0,0,0,.55)}
 .stfianco{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
 .stfianco > div{flex:1;min-width:180px}
 /* ---- I TASTI ----

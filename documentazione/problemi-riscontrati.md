@@ -1608,3 +1608,97 @@ scalano: verificato, 5000 → 4565 con il banco che passa da tre a due.
 senza esserci arrivati dalla mappa, il gioco risponde «Non puoi iniziare questa mossa: per
 fare questa mossa devi prima raggiungere Studio sulla mappa» — ed e' corretto, non e' un
 errore.
+
+## Giro del 14/09/2026 (segnala-problemi, fine task `task/studio-marketing-scegli-il-pezzo`, commit `f09a99d`)
+
+Controlli automatici tutti verdi: `npm run prova` 144 a posto e 0 no, `audit-regressioni.js`
+330 ok e 0 falliti, `verifica:build` 33 ok e 0 falliti. Letti `studio.js` (righe di «Cosa
+spingi», `studioSegna`, `studioFuori`, `studioDaSpingere`, `stScelta`), `actions.js`
+(l'azione `promo`), `sim.js` (`songWeekly` e `advanceWeek`) e `css/studio.css`.
+
+Le quattro cose che la task chiedeva di guardare, in ordine:
+
+- **Pezzo senza `seed` al Marketing** — e' un caso che oggi non puo' succedere da solo: ogni
+  pezzo nasce in un punto solo (`actions.js:336`) e il seed glielo da' sempre `copertine.js:44`,
+  ed e' cosi' dal primo import del progetto. Ma se capita (un salvataggio ritoccato a mano) la
+  riga si comporta male: vedi la voce qui sotto.
+- **`s.spinta` che resta su un pezzo di un salvataggio** — a posto. `sim.js:36` la moltiplica
+  solo se c'e', `sim.js:63` la fa scendere ogni settimana e la toglie sotto 1,03; un pezzo
+  vecchio senza `spinta` non cambia niente. Se il pezzo segnato in `G.studio.spingi` non c'e'
+  piu', `studioSceltoTra` torna `null` e si ripiega sull'ultimo uscito.
+- **La promo lanciata senza Studio aperto** — non c'e' piu' una strada del genere: l'elenco
+  delle mosse non esiste, la promo si lancia solo dal Marketing (`studio.js:1002`). In
+  `actions.js:414` c'e' comunque la guardia `typeof studioDaSpingere === "function"`, e
+  `studio.js` e' caricato nella stessa pagina (`pagine/gioco.html:646`), quindi anche se un
+  domani la promo partisse da altrove il pezzo scelto sarebbe letto lo stesso.
+- **Il `<b>` dentro a `d`** — non e' coerente con le altre righe, e non e' solo estetica: vedi
+  la seconda voce.
+
+**RISOLTE (14/09/2026)** — tutte e quattro, sul branch `task/studio-marketing-scegli-il-pezzo`
+prima del push, insieme ai punti «solo il nome quando tieni la take» e «la conferma della
+copertina». In ordine: `.stchi span span{display:inline}` in `css/studio.css` (andava a capo
+anche «−8 se esce così» in Timing, misurato in partita: `display:block` sullo span
+annidato) e «in spinta» è uno `<span class="oro">`; `stSeme()` in `studio.js` dà
+l'attributo solo se il seed è un numero, se no la riga esce muta; l'elenco del Marketing
+aggiunge il pezzo scelto se è più vecchio dei sei; la descrizione della promo dice «Spinge
+il pezzo che scegli al Marketing».
+
+### «In spinta» esce come una seconda riga bianca grande quanto il titolo
+
+- **dove** — `frontend/js/game/studio.js:964` (il `<b>in spinta</b>` dentro a `d`) e
+  `frontend/css/studio.css:180` (la regola `.stchi b`).
+- **cosa succede** — la riga secondaria del pezzo («q60 · 1.234 stream · in spinta») e' un
+  `<span>` e il foglio di stile dice che **qualsiasi grassetto** dentro alla casella del nome
+  (`.stchi b`) va a capo da solo, a 16 punti e in bianco: e' la regola pensata per il titolo.
+  Cosi' «in spinta» non resta in coda alla riga piccola azzurra ma diventa una terza riga che
+  sembra un secondo titolo, e la scheda si alza. Le altre righe dello Studio che vogliono
+  colorare un pezzo di `d` usano `<span class="ros">` o `<span class="oro">`
+  (`studio.js:1091-1092`), mai `<b>`. Letto nel CSS, non misurato in partita.
+- **come si vede** — Studio, Marketing, con un pezzo fuori: premi «Posta» una volta, la riga
+  di quel pezzo in «Cosa spingi» cambia forma.
+- **quanto pesa** — da sistemare con calma.
+
+### Una riga di pezzo senza seed e' un bottone che non fa niente, e non lo dice
+
+- **dove** — `frontend/js/game/studio.js:961` (`data-spingi="' + x.seed + '"`) e
+  `studio.js:190-193` (`studioSegna` che scarta il `NaN` in silenzio). Lo stesso succede alle
+  righe del Mix (`:862`), della Cover (`:882`) e del Timing (`:1087`): e' una voce sola.
+- **cosa succede** — se un pezzo non ha il seed, l'attributo diventa `data-spingi="undefined"`.
+  La riga esce comunque come bottone (si accende sotto al dito, cursore a mano), ma al tocco
+  `Number("undefined")` e' `NaN`, `studioSegna` esce senza suono, senza salvare e senza
+  ridisegnare: il giocatore preme e non succede niente. Oggi non ci si arriva con un
+  salvataggio normale (vedi sopra), quindi e' una rete di sicurezza che manca, non un errore
+  che si vede.
+- **come si vede** — solo con un salvataggio a cui si toglie a mano il `seed` di un pezzo.
+- **quanto pesa** — da sistemare con calma.
+
+### Il pezzo scelto puo' sparire dall'elenco, ma resta quello che si spinge
+
+- **dove** — `frontend/js/game/studio.js:960` (`fuori.slice(0, 6)`) contro `studio.js:213-215`
+  (`studioDaSpingere` cerca in tutta la lista).
+- **cosa succede** — «Cosa spingi» mostra solo gli ultimi sei pezzi usciti, ma la scelta e'
+  cercata fra **tutti**. Scegli un pezzo, poi ne fai uscire altri sei: quello scelto non
+  compare piu' nell'elenco, nessuna riga e' accesa, eppure la testata dice ancora «Spingi
+  «quello»» e la promo continua a spingerlo. Per cambiare devi toccare un altro pezzo; per
+  «togliere» la scelta e tornare all'ultimo uscito non c'e' un modo visibile, perche' la riga
+  da ri-toccare non c'e'.
+- **come si vede** — con sette o piu' pezzi fuori, scelto il piu' vecchio prima che uscissero
+  gli ultimi.
+- **quanto pesa** — si vede ma si gira intorno.
+
+### Dopo il post la scena dice ancora «Accende quello che hai fuori»
+
+- **dove** — `frontend/js/game/actions.js:377` (`d:"Clip e provocazioni. Accende quello che
+  hai fuori."`), che `ui.js:54` mette nella scena a schermo pieno dopo la mossa e `ui.js:172`
+  nella finestra di conferma.
+- **cosa succede** — la promo adesso spinge **un** pezzo, quello scelto al Marketing, e il
+  messaggio di esito lo dice («Spingi «X»», `actions.js:429`). Ma la descrizione fissa della
+  mossa, che compare nella stessa scena una riga sopra, dice il contrario: che accende tutto
+  quello che hai fuori. Due frasi che si smentiscono nella stessa schermata.
+- **come si vede** — Studio, Marketing, «Posta»: leggi la scena che si apre.
+- **quanto pesa** — da sistemare con calma.
+
+**Nota, non e' un errore**: la spinta cresce di 0,10 a post (per la resa del giorno e il peso
+d'agenda) fino a 1,5, e ogni settimana si dimezza quasi (`sim.js:63`, resta il 55% dell'eccesso
+sopra 1). Sono numeri scelti, non controllati contro niente: se il Marketing sembrera' troppo
+forte o troppo debole, e' li' che si gira la manopola.

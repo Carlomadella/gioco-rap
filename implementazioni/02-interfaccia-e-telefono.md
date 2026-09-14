@@ -1545,3 +1545,42 @@ che finisce sul pezzo scelto e non sugli altri.
 Provato in partita: con due pezzi fuori è acceso l'ultimo, il clic sull'altro sposta la
 spunta e il titolo di «SPINGI», e «Posta» scrive «Spingi «Sottopasso»» con `spinta = 1.1`
 solo su quello.
+
+## Quando tieni la take si chiede solo il nome; la copertina si conferma nella Cover
+
+~~«Quando scegli la take esce un container che ti deve chiedere solo il nome del pezzo e non la copertina, quella viene dopo nella sezione cover»~~ **FATTO (14/09/2026)**
+
+~~«non c'è un tasto di conferma della copertina»~~ **FATTO (14/09/2026)**
+
+Sono lo stesso flusso, e si sono fatti insieme. `chiediTitolo()` in
+`frontend/js/game/copertine.js` chiede il titolo e basta: via la copertina, i tre tasti
+sotto e la nota sul ritaglio, e il testo dice dove si va per la copertina. Il pezzo nasce
+come prima con la copertina generata dal suo seed; chi passa un pezzo (la rinomina dalla
+plancia, `ui.js`) si riprende seed e foto intatti, quindi la firma non è cambiata. Le
+classi `.copbox/.cop/.copaz/.copbtn/.copnota` di `overlays.css` non le usava più nessuno e
+sono andate via nello stesso commit.
+
+Nella Cover dello Studio «Generane un'altra», la foto caricata e «Togli la foto» non
+toccano più il pezzo nell'istante in cui li premi: diventano una **proposta**
+(`G.studio.coverProva`, legata al pezzo dal suo seed) che si vede grande al centro, con
+quella di adesso piccola accanto e la scritta «adesso». Va sul pezzo solo con **«Conferma
+la copertina»**; «Lascia com'era» la butta. Nell'elenco a sinistra il pezzo con una
+proposta in piedi porta «da confermare».
+
+Una cosa che la conferma sistema e prima era rotta: il seed è anche l'identità del pezzo
+per le scelte dello Studio (Mix, Timing, Cover, Marketing). Rigenerare la copertina lo
+cambiava, e il pezzo scelto in Timing «spariva» — si tornava al migliore senza dirlo. Ora
+`studioCoverConferma()` sposta le scelte sul seed nuovo.
+
+Le prove stanno in `strumenti/prova.js` (quattro controlli sotto «senza proposta la Cover
+offre foto e rigenera»). Provato in partita: il container della take chiede solo il nome;
+nella Cover «Generane un'altra» apre la proposta con i due tasti, «Conferma» cambia il seed
+e `G.studio.esce` lo segue (Timing continua a dire «Sottopasso»), «Lascia com'era» rimette
+tutto com'era.
+
+Sistemate insieme le quattro cose che `segnala-problemi` aveva trovato sul Marketing (giro
+del 14/09 in `documentazione/problemi-riscontrati.md`): «in spinta» e ogni pezzo colorato
+dentro alla riga piccola restano in riga (`.stchi span span{display:inline}` — andava a
+capo anche «−8 se esce così» in Timing); un pezzo scelto più vecchio dei sei mostrati resta
+nell'elenco; la descrizione della promo dice che spinge il pezzo scelto; una riga senza seed
+esce muta (`stSeme()`) invece che come bottone che non fa niente.

@@ -155,14 +155,14 @@ schermate sono quelle delle foto di riferimento
 (`media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/`), e il codice sta in
 `frontend/js/game/studio-elementi.js`.
 
-**FATTO (13–14/09/2026)** — tre ritocchi sul foglio «LUOGO: STUDIO» di Carletto: le
+**FATTO (13–14/09/2026)** — cinque ritocchi sul foglio «LUOGO: STUDIO» di Carletto: le
 linguette fanno Timing *prima* di Marketing (la spinta si decide dopo aver deciso quando
 esce); al banco del Mix il fonico si sceglie e «da solo» si clicca, come in Cabina; al
 Marketing si sceglie **quale** pezzo spingere, e la promo lascia una spinta su quello
-(`s.spinta`, letta da `songWeekly()`) invece di accendere tutto insieme. Restano aperti,
-sullo stesso foglio: la conferma della copertina, il nome del pezzo senza la copertina
-quando tieni la take, i feat che non si scelgono, la preview di un pezzo non ancora uscito,
-e il percorso guidato Beat → Testo → Cabina.
+(`s.spinta`, letta da `songWeekly()`) invece di accendere tutto insieme; quando tieni la
+take si chiede solo il nome; la copertina si cambia nella Cover con una proposta e un tasto
+che la conferma. Restano aperti, sullo stesso foglio: la preview di un pezzo non ancora
+uscito, i feat che non si scelgono, e il percorso guidato Beat → Testo → Cabina.
 
 **Manca**: i numeri per elemento scritti in chiaro — il riquadro *Beat 82 / Testo 76 / Mix 68
 / Feature 85 / Marketing 53 → QUALITÀ tot* del foglio dei punti nuovi non c'è: la qualità

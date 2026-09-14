@@ -374,7 +374,7 @@ const ACTIONS = [
    }},
 
   {id:"promo", n:"Promo sui social", e:12,
-   d:"Clip e provocazioni. Accende quello che hai fuori.",
+   d:"Clip e provocazioni. Spinge il pezzo che scegli al Marketing.",
    need:() => G.songs.some(s => s.released) ? null : "1 pezzo fuori",
    give:() => {
      const mult = promoDailyMult();
