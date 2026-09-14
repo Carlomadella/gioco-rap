@@ -345,15 +345,19 @@ const ACTIONS = [
           E' la take che hai scelto in cabina (`registrazione_pezzo`), e la
           prima take e' esattamente questo `rnd(-5,6)` — chi non chiede altre
           take registra con lo stesso dado di sempre. */
-       const q = clamp(Math.round(songQ(b,bt) + studioBonus() + featBonus() +
-         (typeof studioTakePresa === "function" ? studioTakePresa() : rnd(-5,6))), 5, 100);
+       const presa = typeof studioTakePresa === "function" ? studioTakePresa() : rnd(-5,6);
+       const q = clamp(Math.round(songQ(b,bt) + studioBonus() + featBonus() + presa), 5, 100);
        /* chi era in sessione resta scritto sul pezzo — il nome e la fama,
           che e' quella che sim.js legge per far ascoltare il pezzo alla sua
           gente — e poi torna libero */
        const conMe = typeof studioConsumaFeat === "function" ? studioConsumaFeat() : null;
        const s2 = {t:nome, q, mixed:false, released:false, week:0, streams:0, last:0,
          txt:b.txt||"", tema:b.tema||"", seed:seed, img:img||"",
-         feat:conMe ? conMe.n : "", featFama:conMe ? conMe.fama : 0};
+         feat:conMe ? conMe.n : "", featFama:conMe ? conMe.fama : 0,
+         /* i numeri per elemento (foglio «LUOGO: STUDIO», idea E del 14/09):
+            da cosa e' fatta la qualita', letti poi in Fuori. Il mix li
+            completa quando arriva. */
+         parti:{beat:bt.q, testo:b.q, fonico:studioBonus(), feat:featBonus(), take:presa}};
        G.songs.push(s2); G.wellbeing = clamp(G.wellbeing-3,0,100);
        pushLog("Registrato <b>«" + nome + "»</b> su «" + bt.n + "»" +
          (conMe ? " con <b>" + conMe.n + "</b>" : "") + " — qualità " + q + ".", "");
@@ -374,6 +378,7 @@ const ACTIONS = [
         e' quello che nel riferimento di Fuori si legge sotto al titolo,
         «q78 · mixato · secco» */
      if(typeof studioBancoCarattere === "function") s.car = studioBancoCarattere().n;
+     if(s.parti) s.parti.mix = mixGain();
      gain("flow", 1.1);
      return "«" + s.t + "» mixato: qualità " + s.q + ". Pronto per uscire.";
    }},

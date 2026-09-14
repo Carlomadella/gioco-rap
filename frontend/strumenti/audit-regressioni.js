@@ -786,8 +786,7 @@ test("dopo il cassetto il tasto d'oro torna a «Mandalo fuori»",
 test("la cassaforte funziona anche sui pezzi di un salvataggio senza numero di serie",
   studioEl.includes("function studioPezzoSeme(s)") &&
   studioEl.includes("(G.songs || []).find(x => studioPezzoSeme(x) === seed)") &&
-  studio.includes("data-riprendi=\"' + studioPezzoSeme(x) + '\"") &&
-  studio.includes("data-vesti=\"' + studioPezzoSeme(s) + '\""));
+  studio.includes("data-riprendi=\"' + studioPezzoSeme(x) + '\""));
 
 test("la stima degli stream tiene conto del tetto della fase, come fa sim.js il lunedi'",
   studioEl.includes("const cap = PHASES[G.phase].cap;") &&

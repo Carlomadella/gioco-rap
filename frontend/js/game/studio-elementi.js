@@ -777,16 +777,6 @@ if($("studio")){
     if(sf){ studioScegliStrofa(Number(sf.dataset.strofa)); return; }
     const ic = e.target.closest("[data-incide]");
     if(ic){ studioScegliIncide(Number(ic.dataset.incide)); return; }
-    /* «cambia copertina» dalla schermata di Fuori: porta alla sezione della
-       copertina **con quel pezzo già scelto**, se no ci arrivi e devi
-       ritrovartelo in una lista */
-    const vs = e.target.closest("[data-vesti]");
-    if(vs){
-      studioDati().cover = Number(vs.dataset.vesti);
-      STUDIO_SEZ = "cover";
-      SFX.tap(); renderStudio();
-      return;
-    }
   });
 
   /* i cursori del banco: `input` e non `click`, se no si muovono solo quando

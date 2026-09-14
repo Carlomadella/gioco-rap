@@ -39,6 +39,10 @@ function songWeekly(s){
      dopo settimana, che è quello che fa un video per davvero. */
   if(s.video) out *= s.video;
   if(s.viral) out *= s.viral;
+  /* la copertina (idea E del brainstorming del 14/09): pesa sulla prima
+     settimana, cioe' su chi ti clicca prima di averti sentito. Dopo, il
+     pezzo gira per quello che e'. */
+  if(age === 0 && typeof coverResa === "function") out *= coverResa(s);
   /* la spinta della promo (punto 9 dello Studio): scelta su LaFamegram,
      messa da actions.js, scende di settimana in settimana qui sotto */
   if(s.spinta) out *= s.spinta;

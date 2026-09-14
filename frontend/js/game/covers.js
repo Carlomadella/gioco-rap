@@ -13,6 +13,21 @@ function shade2(hex, amt){
   if(amt >= 0){ r+=(255-r)*amt; g+=(255-g)*amt; b+=(255-b)*amt; } else { r*=(1+amt); g*=(1+amt); b*=(1+amt); }
   return "#" + [r,g,b].map(v => Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,"0")).join("");
 }
+/* Quanto **attira** una copertina (brainstorming del 14/09/2026, idea E).
+   Una cover non fa un pezzo migliore: fa cliccare di più. Quindi non entra
+   nella qualità — entra negli ascolti della prima settimana (songWeekly, in
+   sim.js), da ×0,92 a ×1,12. Per una generata dipende dal seed, che è la
+   stessa cosa che decide com'è fatta: «Generane un'altra» è una scelta
+   vera, perché ne cambia anche la resa e la resa si legge in Fuori. La
+   foto tua vale sempre ×1,08: una faccia vera si clicca. */
+const COVER_RESA_MIN = 0.92, COVER_RESA_MAX = 1.12, COVER_RESA_FOTO = 1.08;
+function coverResa(s){
+  if(!s) return 1;
+  if(s.img) return COVER_RESA_FOTO;
+  const r = rng(Number.isFinite(s.seed) ? s.seed : 7);
+  r(); r();                                  /* non le stesse due cifre del disegno */
+  return Math.round((COVER_RESA_MIN + r() * (COVER_RESA_MAX - COVER_RESA_MIN)) * 100) / 100;
+}
 /* copertina quadrata deterministica dal seed: 8 impaginazioni diverse, con grana */
 function cover(seed, titolo, artista, img){
   if(img) return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">' +

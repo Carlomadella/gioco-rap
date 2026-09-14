@@ -860,6 +860,21 @@ console.log("\nla classifica vera nella schermata");
     controlla("un nome grosso sul pezzo muove l'hype all'uscita: fama 50 vale +4",
       dentro("featHypeUscita({featFama:50})") === 4 && senzaFeat > 13.2,
       "hype all'uscita +" + senzaFeat);
+    /* la copertina (idea E): moltiplica gli ascolti della prima settimana e
+       basta — dopo il pezzo gira per quello che e'. Il dado si tiene fermo. */
+    const dado2 = Math.random;
+    try{
+      Math.random = () => 0.5;
+      const conFoto = dentro("G.week = 5; songWeekly({t:'A', q:60, week:5, released:true, seed:41, img:'data:x'})");
+      const senza = dentro("songWeekly({t:'A', q:60, week:5, released:true, seed:41, img:''})");
+      const dopo = dentro("songWeekly({t:'A', q:60, week:4, released:true, seed:41, img:'data:x'})");
+      const dopoSenza = dentro("songWeekly({t:'A', q:60, week:4, released:true, seed:41, img:''})");
+      const resa41 = dentro("coverResa({seed:41})");
+      controlla("la copertina moltiplica gli ascolti della prima settimana, e dalla seconda non conta piu'",
+        Math.abs(conFoto - dopo * 1.08) <= 1 && Math.abs(senza - dopo * resa41) <= 1 &&
+        conFoto !== dopo && dopo === dopoSenza,
+        "prima settimana " + senza + " → " + conFoto + " con la foto; dopo " + dopoSenza + " = " + dopo);
+    } finally { Math.random = dado2; }
   }
 }
 
@@ -1192,7 +1207,7 @@ console.log("\nlo Studio: la gente della Sala conta");
        aggiunge o toglie una, questa prova la copre da sola. */
     const sezioni = dentro("STUDIO_SEZIONI.map(x => x.id)");
     controlla("le sezioni sono quelle del punto 4 meno il Marketing, più la cabina",
-      sezioni.join(",") === "beat,testo,cabina,banco,cover,fuori",
+      sezioni.join(",") === "beat,testo,cabina,banco,fuori",
       sezioni.join(","));
     const rotte = [];
     for(const s of sezioni){
@@ -1403,27 +1418,42 @@ console.log("\nlo Studio: la gente della Sala conta");
 
     /* Punto 5 dello Studio: «non c'e' un tasto di conferma della copertina».
        Generarne un'altra e' una proposta: il pezzo cambia solo con Conferma,
-       e le scelte dello Studio che lo segnavano col vecchio seed lo seguono. */
+       e le scelte dello Studio che lo segnavano col vecchio seed lo seguono.
+       Dal 14/09/2026 la copertina sta dentro a Fuori (brainstorming, idea B):
+       la linguetta Cover non c'e' piu', il gesto si'. */
     dentro(`
-      G.songs = [{t:'Vestito', q:70, mixed:true, released:false, seed:41, img:''}];
-      G.studio.coverProva = null; G.studio.esce = 41; G.studio.cover = 41;
-      STUDIO_SEZ = "cover"; renderStudio();
+      G.songs = [{t:'Vestito', q:70, mixed:true, released:false, seed:41, img:'',
+        parti:{beat:60, testo:70, fonico:0, feat:0, take:2, mix:8}}];
+      G.studio.coverProva = null; G.studio.esce = 41;
+      STUDIO_SEZ = "fuori"; renderStudio();
     `);
-    controlla("senza proposta la Cover offre foto e rigenera, e nessuna conferma",
+    controlla("la linguetta Cover non c'e' piu': la copertina sta in Uscita",
+      dentro("STUDIO_SEZIONI.some(x => x.id === 'cover')") === false &&
+      dentro("STUDIO_SEZIONI.find(x => x.id === 'fuori').n") === "Uscita");
+    controlla("senza proposta l'Uscita offre foto e rigenera, nessuna conferma, e il tasto Mandalo fuori",
       dipinto().indexOf('data-cov="carica"') >= 0 &&
-      dipinto().indexOf('data-cov="conferma"') < 0);
+      dipinto().indexOf('data-cov="altra"') >= 0 &&
+      dipinto().indexOf('data-cov="conferma"') < 0 &&
+      dipinto().indexOf('data-manda="1"') >= 0,
+      dipinto().slice(0, 300));
+    controlla("e il riquadro dei numeri divide qualita' e ascolti: Beat, Testo, Mix da una parte, Copertina dall'altra",
+      dipinto().indexOf("Beat") >= 0 && dipinto().indexOf("Testo") >= 0 &&
+      dipinto().indexOf("Mix") >= 0 && dipinto().indexOf("Copertina") >= 0 &&
+      /×\d,\d\d/.test(dipinto()),
+      dipinto().slice(dipinto().indexOf("stnumeri"), dipinto().indexOf("stnumeri") + 400));
     dentro("studioCoverAltra();");
-    controlla("«Generane un'altra» non tocca il pezzo: e' una proposta da confermare",
+    controlla("«Generane un'altra» non tocca il pezzo: e' una proposta da confermare, e finche' c'e' il pezzo non esce",
       dentro("G.songs[0].seed") === 41 &&
       dentro("G.studio.coverProva && G.studio.coverProva.per") === 41 &&
       dipinto().indexOf('data-cov="conferma"') >= 0 &&
       dipinto().indexOf('data-cov="lascia"') >= 0 &&
-      dipinto().indexOf(">proposta<") >= 0);
+      dipinto().indexOf('data-manda="1"') < 0 &&
+      dipinto().indexOf("non è ancora sul pezzo") >= 0);
     dentro("studioCoverLascia();");
     controlla("«Lascia com'era» la butta",
       dentro("G.studio.coverProva") === null && dentro("G.songs[0].seed") === 41);
     dentro("studioCoverAltra(); studioCoverConferma();");
-    controlla("«Conferma» la mette sul pezzo, e Timing continua a puntare a quel pezzo",
+    controlla("«Conferma» la mette sul pezzo, e l'Uscita continua a puntare a quel pezzo",
       dentro("G.songs[0].seed") !== 41 &&
       dentro("G.studio.esce") === dentro("G.songs[0].seed") &&
       dentro("G.studio.coverProva") === null &&
@@ -1431,13 +1461,20 @@ console.log("\nlo Studio: la gente della Sala conta");
     dentro("studioCoverAltra(); G.songs[0].released = true; renderStudio();");
     controlla("una proposta il cui pezzo e' uscito si butta da sola al ridisegno",
       dentro("G.studio.coverProva") === null);
+    /* la copertina pesa (idea E): non sulla qualita', sugli ascolti della
+       prima settimana. Generata: dal seed; foto tua: sempre ×1,08. */
+    controlla("la resa della copertina sta fra ×0,92 e ×1,12, e la foto tua vale ×1,08",
+      dentro("coverResa({seed:41})") >= 0.92 && dentro("coverResa({seed:41})") <= 1.12 &&
+      dentro("coverResa({seed:41}) === coverResa({seed:41})") &&
+      dentro("coverResa({seed:41, img:'data:x'})") === 1.08 &&
+      dentro("coverResa(null)") === 1);
 
     /* Punto 10 dello Studio: prima Beat, Testo e Cabina, poi il resto. Le
        altre linguette restano chiuse finche' non c'e' il primo pezzo. */
     dentro("G.songs = []; STUDIO_SEZ = 'fuori'; renderStudio();");
     const linguette = () => nodi["st-tabs"].innerHTML || "";
-    controlla("senza pezzi Mix, Cover e Timing sono chiuse, e Beat/Testo/Cabina no",
-      ["banco", "cover", "fuori"].every(id =>
+    controlla("senza pezzi Mix e Uscita sono chiuse, e Beat/Testo/Cabina no",
+      ["banco", "fuori"].every(id =>
         new RegExp('sttab[^"]*chiusa" data-sez="' + id + '"').test(linguette())) &&
       ["beat", "testo", "cabina"].every(id =>
         new RegExp('class="sttab( on)?" data-sez="' + id + '"').test(linguette())),
