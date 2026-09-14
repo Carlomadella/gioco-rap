@@ -1280,6 +1280,32 @@ console.log("\nlo Studio: la gente della Sala conta");
     dentro("G.songs = G.songs.filter(x => x.seed !== 22);");
     controlla("e se il pezzo scelto sparisce non si pianta: torna a decidere lei",
       dentro("daMixare().t") === "Buono" && dentro("daPubblicare().t") === "Buono");
+
+    /* Punto 9 dello Studio: al Marketing si sceglie quale pezzo spingere.
+       Prima le righe erano mute come al banco del Mix, e la promo accendeva
+       «tutto quello che hai fuori»: se il collegamento si stacca, la scelta
+       torna a essere un ornamento. */
+    dentro(`
+      G.songs = [
+        {t:'Vecchio', q:70, mixed:true, released:true, week:1, streams:900, seed:31},
+        {t:'Nuovo',   q:60, mixed:true, released:true, week:3, streams:100, seed:32}
+      ];
+      G.week = 4; G.studio.spingi = null;
+      STUDIO_SEZ = "promo"; renderStudio();
+    `);
+    controlla("al Marketing i pezzi fuori si possono cliccare, e senza scelta e' acceso l'ultimo uscito",
+      dipinto().indexOf('data-spingi="31"') >= 0 &&
+      dipinto().indexOf('data-spingi="32"') >= 0 &&
+      dentro("studioDaSpingere().t") === "Nuovo",
+      dipinto().slice(0, 300));
+    dentro("studioSegna('spingi', 31);");
+    controlla("scelto il vecchio, e' lui che si spinge",
+      dentro("studioDaSpingere().t") === "Vecchio" &&
+      /class="stscelta on"[^>]*data-spingi="31"/.test(dipinto()));
+    dentro("ACTIONS.find(a => a.id === 'promo').run();");
+    controlla("e la promo lascia la spinta sul pezzo scelto, non sugli altri",
+      dentro("G.songs[0].spinta") > 1 && dentro("G.songs[1].spinta") === undefined,
+      "spinta " + dentro("G.songs[0].spinta"));
   }
 }
 

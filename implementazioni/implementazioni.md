@@ -231,8 +231,6 @@ NETWORK 64
 
 8. non posso spingere una canzone che non è ancora uscita, al massimo faccio uscire una preview
 
-9. Come nell'interfaccia dei beatmaker, nella sezione dove si posta il pezzo per hype' non fa cliccare su nessun pezzo se non su quello già selezionato.
-
 10. l'utente deve poter fare solo le sezioni Beat, Testo, e Cabina, poi il resto
 
 /_ DA DISCUTERE _/

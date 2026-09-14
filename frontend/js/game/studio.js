@@ -203,6 +203,17 @@ function studioSceltoTra(lista, campo){
   return lista.find(x => x.seed === s) || null;
 }
 function studioDaMixare(){ return studioSceltoTra(unmixed(), "mixa"); }
+/* Punto 9 dello Studio: al Marketing si sceglie **quale** pezzo spingere, e
+   la promo di `actions.js` lascia la spinta su quello. Senza scelta e' l'ultimo
+   uscito, che e' quello che la sezione ha sempre detto di spingere. */
+function studioFuori(){
+  return (G.songs || []).filter(x => x.released)
+    .sort((a, b) => (b.week || 0) - (a.week || 0));
+}
+function studioDaSpingere(){
+  const fuori = studioFuori();
+  return studioSceltoTra(fuori, "spingi") || fuori[0] || null;
+}
 /* Fuori vanno solo i pezzi che non stanno in cassaforte: un pezzo messo da
    parte non deve uscire per sbaglio dalla plancia, che è l'unico modo in cui
    «tenerlo nel cassetto» sarebbe una promessa non mantenuta. Se non hai
@@ -938,15 +949,19 @@ function studioSezFeat(){
 
 /* ---- IL MARKETING — farlo sapere ---- */
 function studioSezMarketing(){
-  const fuori = (G.songs || []).filter(x => x.released)
-    .sort((a, b) => (b.week || 0) - (a.week || 0));
-  const ultimo = fuori[0];
+  const fuori = studioFuori();
+  const ultimo = studioDaSpingere();
 
+  /* Punto 9: le righe erano mute come al banco del Mix — senza `attr`
+     `stScelta` non fa un bottone — e il pezzo acceso era sempre il primo.
+     Adesso si sceglie, e la scelta e' quella che la promo spinge davvero. */
   const sx = stPan("Cosa spingi",
     fuori.length
-      ? fuori.slice(0, 6).map((x, i) => stScelta({
-          on:i === 0, mini:stCover(x), n:x.t,
-          d:"q" + x.q + " · " + fmt(x.streams || 0) + " stream"
+      ? fuori.slice(0, 6).map(x => stScelta({
+          attr:' data-spingi="' + x.seed + '"',
+          on:x === ultimo, mini:stCover(x), n:x.t,
+          d:"q" + x.q + " · " + fmt(x.streams || 0) + " stream" +
+            (x.spinta > 1 ? " · <b>in spinta</b>" : "")
         })).join("")
       : studioVuoto("Non hai ancora fatto uscire niente."),
     "cartella");
@@ -1231,6 +1246,8 @@ if($("studio")){
     if(m){ studioSegna("mixa", Number(m.dataset.mixa)); return; }
     const u = e.target.closest("[data-esce]");
     if(u){ studioSegna("esce", Number(u.dataset.esce)); return; }
+    const sp = e.target.closest("[data-spingi]");
+    if(sp){ studioSegna("spingi", Number(sp.dataset.spingi)); return; }
     const c = e.target.closest("[data-cover]");
     if(c){ studioSegna("cover", Number(c.dataset.cover)); return; }
     const cv = e.target.closest("[data-cov]");

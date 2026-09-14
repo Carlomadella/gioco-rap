@@ -1518,3 +1518,30 @@ toglie invece di fare il giro del toggle — che su `null` lo avrebbe rimesso.
 Provato in partita: le due caselle escono come `BUTTON`, il clic sul fonico lo sceglie
 (`G.studio.fonico` valorizzato) e il clic su «da solo» lo toglie (torna `null`), con la
 spunta che si sposta.
+
+## Al Marketing si sceglie quale pezzo spingere
+
+~~«Come nell'interfaccia dei beatmaker, nella sezione dove si posta il pezzo per hype' non fa cliccare su nessun pezzo se non su quello già selezionato.»~~ **FATTO (14/09/2026)**
+
+Stesso difetto del banco del Mix: le righe di «Cosa spingi» erano `stScelta()` senza
+attributo, quindi `<div>` muti, e quella accesa era sempre la prima — l'ultimo uscito —
+qualunque cosa si toccasse. Ma renderle cliccabili e basta sarebbe stata una finta, perché
+la promo di `actions.js` non guardava nessun pezzo: dava hype e follower «a tutto quello
+che hai fuori», e scegliere non avrebbe cambiato un numero.
+
+Adesso le righe portano `data-spingi="<seed>"` e passano da `studioSegna("spingi", …)`, lo
+stesso meccanismo di Mix e Timing; `studioDaSpingere()` legge la scelta e, se non c'è o il
+pezzo è sparito, torna all'ultimo uscito come ha sempre fatto. La promo lascia sul pezzo
+scelto una **spinta** (`s.spinta`, +0,10 a post, non oltre 1,5), che `songWeekly()` in
+`sim.js` moltiplica sugli stream della settimana e che scende di settimana in settimana
+come la viralità — un post fa girare il pezzo, non lo rifa uscire. Nel riquadro il pezzo
+spinto porta «in spinta», e l'esito dice quale hai spinto. Hype e follower della promo non
+sono cambiati di un punto.
+
+La prova sta in `strumenti/prova.js` (tre controlli sotto «al Marketing i pezzi fuori si
+possono cliccare»): il collegamento, la scelta che vince sull'ultimo uscito, e la spinta
+che finisce sul pezzo scelto e non sugli altri.
+
+Provato in partita: con due pezzi fuori è acceso l'ultimo, il clic sull'altro sposta la
+spunta e il titolo di «SPINGI», e «Posta» scrive «Spingi «Sottopasso»» con `spinta = 1.1`
+solo su quello.

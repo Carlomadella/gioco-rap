@@ -72,6 +72,10 @@ const ADF_PROMO_WEEKLY_PCT_CAP = 0.015;
    giorno per farmarlo comunque, solo più lentamente. Questo è il tetto vero,
    settimanale, oltre al quale la promo continua a dare follower ma non hype. */
 const ADF_PROMO_WEEKLY_HYPE_CAP = 22;
+/* Quanto un post spinge il pezzo scelto (moltiplicatore sui suoi stream della
+   settimana, +0.10 a post, non oltre 1.5): un aiuto vero, non un secondo video. */
+const ADF_PROMO_SPINTA = 0.10;
+const ADF_PROMO_SPINTA_MAX = 1.5;
 
 function promoSettimanaKey(){
   return [Number(G.year||1), Number(G.week||1)].join(":");
@@ -402,6 +406,14 @@ const ACTIONS = [
      G.wellbeing -= 1;
      adfSegnaOggi("promo");
 
+     /* Punto 9 dello Studio: la promo non accende «tutto quello che hai
+        fuori» — spinge un pezzo, quello scelto al Marketing (o l'ultimo
+        uscito). La spinta resta attaccata al pezzo come il video
+        (`s.spinta`), sim.js la legge in songWeekly() e la fa scendere ogni
+        settimana: un post fa girare il pezzo, non lo rifa' uscire. */
+     const sp = typeof studioDaSpingere === "function" ? studioDaSpingere() : null;
+     if(sp) sp.spinta = Math.min(ADF_PROMO_SPINTA_MAX, (sp.spinta || 1) + ADF_PROMO_SPINTA * mult * peso);
+
      const satToday = mult < 1
        ? " Reach ridotta: oggi hai gi\u00e0 spinto parecchio."
        : "";
@@ -414,7 +426,8 @@ const ACTIONS = [
      const bonusPeso = peso > 1 ? " Oggi vale di pi\u00f9." : "";
 
      return "Hype +" + Math.round(h) + ", " + f +
-       " nuovi follower." + bonusPeso + satToday + satWeek + satHype;
+       " nuovi follower." + (sp ? " Spingi «" + sp.t + "»." : "") +
+       bonusPeso + satToday + satWeek + satHype;
    }},
 
   {id:"free", n:"Freestyle in piazza", e:26, luc:3,
