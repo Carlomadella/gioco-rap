@@ -634,9 +634,11 @@ function studioStreamStima(s){
     if(tot <= cap || tot <= 0) return v;
     return Math.max(0, Math.round(v * ((cap + (tot - cap) * 0.2) / tot)));
   };
+  /* e la copertina, che sulla prima settimana pesa (covers.js) */
+  const resa = typeof coverResa === "function" ? coverResa(s) : 1;
   return {
-    min: tetto(Math.round((fan * 0.26 + scoperta + feat) * 0.8)),
-    max: tetto(Math.round((fan * 0.5 + scoperta + feat) * 1.25))
+    min: tetto(Math.round((fan * 0.26 + scoperta + feat) * 0.8 * resa)),
+    max: tetto(Math.round((fan * 0.5 + scoperta + feat) * 1.25 * resa))
   };
 }
 

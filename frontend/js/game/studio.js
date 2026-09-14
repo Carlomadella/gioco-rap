@@ -287,8 +287,12 @@ function studioRivaleInGente(r){
   const fama = studioFamaRivale(r);
   const gen = (typeof BEAT_GEN !== "undefined" && BEAT_GEN[r.gen]) ? r.gen
     : (typeof BEAT_IDS !== "undefined" ? pick(BEAT_IDS) : "trap");
+  /* un id che non c'e' gia': la Sala li tira a caso, e due uguali farebbero
+     scegliere la persona sbagliata */
+  let id;
+  do id = "p" + Math.floor(Math.random() * 1e9); while((G.gente || []).some(x => x.id === id));
   const p = {
-    id:"p" + Math.floor(Math.random() * 1e9), ruolo:"rapper", n:r.n, gen,
+    id, ruolo:"rapper", n:r.n, gen,
     eta:r.eta || Math.floor(rnd(18, 33)), fama,
     car:(typeof CARATTERI !== "undefined" ? pick(CARATTERI).id : "aperto"),
     scoperto:false, rel:1, pt:0, ult:-1, feat:-99,
@@ -1159,10 +1163,13 @@ function studioCabinaConChi(ft){
     stScelta({attr:' data-feat=""', on:!ft, mini:stSagoma(),
       n:"da solo", d:"il pezzo è tuo e basta",
       v:"+0", vCls:"calmo"}) +
+    /* solo il rapporto sotto al nome, come nel Beat: la colonna e' da 300
+       e con «fama 40 · viene gratis» la riga si troncava a meta' parola.
+       Che venga gratis lo dice la nota in fondo. */
     noti.map(p => stScelta({
       attr:' data-feat="' + studioEsc(p.id) + '"', on:ft === p,
       mini:faccia(p, 40), n:p.n,
-      d:relNome(p) + " · fama " + p.fama + " · viene gratis",
+      d:relNome(p),
       v:studioAiutoFeat(p) ? "+" + studioAiutoFeat(p) + " qual." : "—",
       vCls:studioAiutoFeat(p) ? "" : "calmo"
     })).join("") +
@@ -1174,8 +1181,7 @@ function studioCabinaConChi(ft){
           return stScelta({
             attr:' data-rivale="' + studioEsc(r.n) + '"',
             mini:faccia(r, 40), n:r.n,
-            d:"fama " + fama + " · " + fmt(studioFeatPrezzo(r)) + " € · dice sì al " +
-              Math.round(studioFeatProbabilita(r) * 100) + "%",
+            d:fmt(studioFeatPrezzo(r)) + " € · sì al " + Math.round(studioFeatProbabilita(r) * 100) + "%",
             v:"+" + stima + " qual.", vCls:"calmo"
           });
         }).join("")
@@ -1361,9 +1367,7 @@ function studioSulBancoRighe(g){
       ? lista.map(x => stScelta({
           attr:stSeme("banco", x), on:banco === x,
           mini:stCover(x), n:x.t,
-          d:"q" + x.q + (x.mixed
-            ? " · mixato"
-            : ' · grezzo' + (g == null ? ' · <span class="ros">−8 se esce così</span>' : '')) +
+          d:"q" + x.q + (x.mixed ? " · mixato" : " · grezzo") +
             (x.esce != null ? ' · <span class="oro">in coda per venerdì</span>' : ""),
           v:(g != null && !x.mixed) ? "→ " + clamp(x.q + g, 5, 100) : ""
         })).join("")
