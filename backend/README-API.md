@@ -463,6 +463,12 @@ Nuovo account: `201 { account, identita, token }`. Per l'ospite
 `identita.idEsterno` è il valore da conservare per accedere di nuovo. Un'identità store
 già registrata risponde `200 { account, token }`.
 
+Terzo esito, con `tipo: "email"`: se la richiesta porta una `x-sessione` valida di un
+account **senza mail** (l'ospite creato dal gioco), il server **promuove quell'account**
+invece di crearne un secondo — gli collega l'identità email e risponde
+`200 { account, token }` con il token invariato. Artista, classifica e cloud restano
+sotto la stessa identità (dal 12/09/2026, commit `cb502a7`).
+
 Errori principali: `400 email-non-valida`, `400 segreto-troppo-corto`,
 `409 email-gia-usata`, `403 biglietto-rifiutato`, `501 accesso-non-ancora-collegato`.
 
@@ -1097,9 +1103,9 @@ Le variabili possono stare in `backend/.env.local`, che non deve essere committa
    non deve bloccare la partita.
 2. **`ONLINE.registra()` forza una richiesta senza sessione.** Anche se esiste già un
    token locale, il bridge non lo invia e il server crea un nuovo account ospite.
-3. **`ONLINE.registraConMail()` non converte l'account ospite corrente.** Crea un nuovo
-   account email e sostituisce il token locale; non trasferisce automaticamente artista
-   e carriera già associati all'ospite.
+3. **`ONLINE.registraConMail()` converte l'account ospite corrente**, se il bridge manda
+   la sua `x-sessione`: il server promuove l'ospite (vedi §6, terzo esito) e il token resta
+   quello. Senza sessione, o con una sessione che ha già una mail, crea un nuovo account.
 4. **Molte route esistono solo lato server.** In particolare relazioni, segnalazioni,
    stagioni e filtri classifica non hanno ancora un wrapper `ONLINE`.
 5. **La schermata classifica non è ancora connessa al backend.** Il ponte è pronto, ma
