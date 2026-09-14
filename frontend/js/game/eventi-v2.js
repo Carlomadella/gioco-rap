@@ -1889,8 +1889,12 @@ if(typeof schermataLafamegram==="function"){
     const allPosts=telPost().filter(p=>!p.expiresDay||p.expiresDay>=absDay());
     const feedPosts=allPosts.filter(p=>!(p.media&&p.media.format==="story"));
 
+    /* la promo dello Studio («Che post fai?», telefono.js) sta in cima anche
+       qui: questa e' la LaFamegram che si vede davvero, e senza questa riga
+       il blocco esisteva solo nella versione base */
     return adfSocialStoryTrayHTML()+
       adfSocialStoryViewerHTML()+
+      (typeof telPromo==="function"?telPromo():"")+
       '<div class="tigscrivi">'+
         '<textarea id="tig-testo" maxlength="220" placeholder="A cosa stai pensando?"></textarea>'+
         '<button class="tbtn" id="tig-pubblica">Pubblica</button>'+

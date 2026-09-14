@@ -168,18 +168,23 @@ volta — la lettura «a ogni pezzo» è scritta come alternativa). Resta aperto
 foglio, «non posso scegliere i feat»: non si riproduce, e la domanda — da chi si sceglie
 il feat, solo da chi conosci o da tutti — è scritta sotto al punto, in attesa di risposta.
 
-**In discussione (14/09/2026)** — Carletto pensa di **togliere Cover, Feat e Marketing**
-dallo Studio, e il punto 10 lo intendeva «ad ogni pezzo», non solo la prima volta. Le
-idee, il prezzo di ognuna e le domande da chiudere prima di toccare il codice stanno in
-[`brainstorming-studio-cover-feat-marketing.md`](brainstorming-studio-cover-feat-marketing.md).
-La strada proposta lì: Marketing sul telefono, Feat in Cabina accanto al fonico (chi
-conosci gratis, i rivali a pagamento e con rifiuto), Cover dentro all'Uscita, e «un pezzo
-sul banco» per la lettura ad ogni pezzo — cinque linguette invece di otto.
+**FATTO (15/09/2026)** — **lo Studio a cinque linguette**, la strada B + D3 + F2 + E del
+[`brainstorming-studio-cover-feat-marketing.md`](brainstorming-studio-cover-feat-marketing.md):
+*Beat · Testo · Cabina · Mix · Uscita*. Il Marketing è «Che post fai?» in LaFamegram, sul
+telefono; il feat si sceglie in Cabina accanto al fonico, da chi conosci (gratis) o dalla
+classifica (a pagamento, e può dire di no; chi accetta entra fra i contatti), e **conta sul
+pezzo**: la sua gente ascolta (`featAscolti` in `sim.js`) e all'uscita muove l'hype; la
+copertina sta nell'Uscita e **pesa sugli ascolti della prima settimana**, non sulla qualità
+(`coverResa`); lo Studio lavora **un pezzo alla volta**, quello sul banco, e Mix e Uscita si
+aprono e chiudono con lui (il punto 10 «ad ogni pezzo»). E il riquadro dei numeri del
+foglio c'è, diviso in due righe come dice l'idea E: *QUALITÀ = Beat · Testo · Fonico · Feat
+· Mix → q* e *ASCOLTI = copertina · venerdì · anteprime · la gente del feat · hype · fan*.
+Sta in `implementazioni/02-interfaccia-e-telefono.md`, «Lo Studio a cinque linguette».
 
-**Manca**: i numeri per elemento scritti in chiaro — il riquadro *Beat 82 / Testo 76 / Mix 68
-/ Feature 85 / Marketing 53 → QUALITÀ tot* del foglio dei punti nuovi non c'è: la qualità
-esce da una somma sola, e quanto ci ha messo ogni pezzo non si legge da nessuna parte. E
-manca l'app della discografia che dice come invecchiano i pezzi.
+**Manca**: l'app della discografia che dice come invecchiano i pezzi; e sotto i 1180px,
+dove il telefono della plancia non c'è, «Che post fai?» non si raggiunge (il tasto «fallo
+sapere» dello Studio lancia la promo diretta sull'ultimo uscito) — quando il telefono avrà
+una pagina intera anche da stretto, la promo va lì.
 
 È il punto salito in cima al foglio dei punti nuovi il 07/09/2026 (commit *«il punto sulla
 TRACK sale fra le cose da fare»*). Tocca `sim.js`, `studio.js`, `posto.js` e la discografia:

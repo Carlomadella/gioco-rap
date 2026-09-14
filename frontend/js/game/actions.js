@@ -170,6 +170,11 @@ const studioBonus = () => (typeof studioAiutoFonico === "function" ? studioAiuto
    qui si somma e basta. Vale per un pezzo solo: `studioConsumaFeat()` lo
    stacca appena la traccia esce dalla cabina. */
 const featBonus = () => (typeof studioAiutoFeat === "function" ? studioAiutoFeat() : 0);
+/* Quanto hype porta il feat all'uscita: la fama di chi c'e' sul pezzo
+   (`s.featFama`, scritta alla registrazione). Fama 50 → +4. La stessa
+   riga la usa l'uscita del venerdi' (studio-elementi.js). */
+const ADF_FEAT_HYPE = 0.08;
+function featHypeUscita(s){ return Math.round((s && s.featFama || 0) * ADF_FEAT_HYPE); }
 /* Le due scelte dello Studio (punto 4: «ogni elemento influenza il
    risultato», e sceglierlo è metà dell'elemento). Se non hai scelto niente —
    o se il pezzo che avevi scelto non è più lì — si torna a `sort()[0]`, che
@@ -340,15 +345,29 @@ const ACTIONS = [
           E' la take che hai scelto in cabina (`registrazione_pezzo`), e la
           prima take e' esattamente questo `rnd(-5,6)` — chi non chiede altre
           take registra con lo stesso dado di sempre. */
-       const q = clamp(Math.round(songQ(b,bt) + studioBonus() + featBonus() +
-         (typeof studioTakePresa === "function" ? studioTakePresa() : rnd(-5,6))), 5, 100);
-       /* chi era in sessione resta scritto sul pezzo, e poi torna libero */
-       const conMe = typeof studioConsumaFeat === "function" ? studioConsumaFeat() : "";
+       const presa = typeof studioTakePresa === "function" ? studioTakePresa() : rnd(-5,6);
+       /* il feat si legge **prima** di staccarlo (studioConsumaFeat qui
+          sotto lo libera): letto dopo vale zero, e in Fuori la riga della
+          qualita' non lo nominava mai — trovato da segnala-problemi il 15/09 */
+       const conFeat = featBonus(), conFonico = studioBonus();
+       const q = clamp(Math.round(songQ(b,bt) + conFonico + conFeat + presa), 5, 100);
+       /* chi era in sessione resta scritto sul pezzo — il nome e la fama,
+          che e' quella che sim.js legge per far ascoltare il pezzo alla sua
+          gente — e poi torna libero */
+       const conMe = typeof studioConsumaFeat === "function" ? studioConsumaFeat() : null;
        const s2 = {t:nome, q, mixed:false, released:false, week:0, streams:0, last:0,
-         txt:b.txt||"", tema:b.tema||"", seed:seed, img:img||"", feat:conMe};
+         txt:b.txt||"", tema:b.tema||"", seed:seed, img:img||"",
+         feat:conMe ? conMe.n : "", featFama:conMe ? conMe.fama : 0,
+         /* i numeri per elemento (foglio «LUOGO: STUDIO», idea E del 14/09):
+            da cosa e' fatta la qualita', letti poi in Fuori. Il mix li
+            completa quando arriva. */
+         parti:{beat:bt.q, testo:b.q, fonico:conFonico, feat:conFeat, take:presa}};
        G.songs.push(s2); G.wellbeing = clamp(G.wellbeing-3,0,100);
+       /* appena inciso e' lui sul banco dello Studio (punto 10 «ad ogni
+          pezzo»): Mix e Uscita si aprono su di lui */
+       if(typeof studioMettiSulBanco === "function") studioMettiSulBanco(seed);
        pushLog("Registrato <b>«" + nome + "»</b> su «" + bt.n + "»" +
-         (conMe ? " con <b>" + conMe + "</b>" : "") + " — qualità " + q + ".", "");
+         (conMe ? " con <b>" + conMe.n + "</b>" : "") + " — qualità " + q + ".", "");
        SFX.rec(); save(); renderGioco();
        if(typeof renderStudio === "function") renderStudio();
      });
@@ -366,6 +385,7 @@ const ACTIONS = [
         e' quello che nel riferimento di Fuori si legge sotto al titolo,
         «q78 · mixato · secco» */
      if(typeof studioBancoCarattere === "function") s.car = studioBancoCarattere().n;
+     if(s.parti) s.parti.mix = mixGain();
      gain("flow", 1.1);
      return "«" + s.t + "» mixato: qualità " + s.q + ". Pronto per uscire.";
    }},
@@ -382,12 +402,16 @@ const ACTIONS = [
      if(!s.mixed) s.q = clamp(s.q - 8, 5, 100);
      s.released = true; s.week = totalWeeks();
      anteprimeAllUscita(s);
-     G.hype = clamp(G.hype + 6 + s.q*0.12, 0, (typeof hypeCap==="function"?hypeCap():100));
+     /* uscito: il banco dello Studio si svuota, Mix e Uscita si richiudono */
+     if(typeof studioSvuotaBanco === "function") studioSvuotaBanco(s);
+     /* un nome grosso sul pezzo muove l'hype quando esce: la sua gente lo
+        vede (foglio dell'hype, «feat con nomi piu' grandi») */
+     G.hype = clamp(G.hype + 6 + s.q*0.12 + featHypeUscita(s), 0, (typeof hypeCap==="function"?hypeCap():100));
      return "«" + s.t + "» è fuori" + (s.mixed ? "." : ", ma non era mixato: qualità " + s.q + ".");
    }},
 
   {id:"promo", n:"Promo sui social", e:12,
-   d:"Clip e provocazioni. Spinge il pezzo che scegli al Marketing.",
+   d:"Clip e provocazioni. Spinge il pezzo che scegli su LaFamegram.",
    need:() => G.songs.some(s => s.released) ? null : "1 pezzo fuori",
    give:() => {
      const mult = promoDailyMult();
@@ -420,8 +444,8 @@ const ACTIONS = [
      adfSegnaOggi("promo");
 
      /* Punto 9 dello Studio: la promo non accende «tutto quello che hai
-        fuori» — spinge un pezzo, quello scelto al Marketing (o l'ultimo
-        uscito). La spinta resta attaccata al pezzo come il video
+        fuori» — spinge un pezzo, quello scelto su LaFamegram, dal telefono
+        (o l'ultimo uscito). La spinta resta attaccata al pezzo come il video
         (`s.spinta`), sim.js la legge in songWeekly() e la fa scendere ogni
         settimana: un post fa girare il pezzo, non lo rifa' uscire. */
      const sp = typeof studioDaSpingere === "function" ? studioDaSpingere() : null;
@@ -444,14 +468,14 @@ const ACTIONS = [
    }},
 
   /* Punto 8 dello Studio: «non posso spingere una canzone che non è ancora
-     uscita, al massimo faccio uscire una preview». Il pezzo lo si sceglie al
-     Marketing, fra quelli non ancora fuori; qui c'è il costo e quello che dà. */
+     uscita, al massimo faccio uscire una preview». Il pezzo lo si sceglie su
+     LaFamegram, fra quelli non ancora fuori; qui c'è il costo e quello che dà. */
   {id:"anteprima", n:"Anteprima del pezzo", e:8,
    d:"Quindici secondi sui social. Il pezzo non è fuori, ma la gente lo aspetta.",
    need:() => {
      const s = typeof studioDaAnticipare === "function" ? studioDaAnticipare() : null;
      /* corto: sul telefono la riga e' una sola, e i puntini mangiano la fine */
-     return !s ? "un pezzo scelto al Marketing"
+     return !s ? "un pezzo scelto su LaFamegram"
        : (s.anteprime || 0) >= ADF_ANTEPRIME_MAX ? "un pezzo che non hanno già sentito" : null;
    },
    give:() => {

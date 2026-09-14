@@ -839,6 +839,42 @@ console.log("\nla classifica vera nella schermata");
       nodi["g-chart"].innerHTML.indexOf('class="crow') >= 0 &&
       nodi["g-charthead"].textContent === "Top 10 della settimana",
       nodi["g-charthead"].textContent);
+
+    /* Il feat sul pezzo (brainstorming del 14/09/2026, idea D): non vale piu'
+       solo qualita' alla registrazione. `sim.js` legge la fama di chi c'e'
+       sopra e ci mette la sua gente che ascolta, e all'uscita muove l'hype.
+       Senza questo il feat resta «un +8 di qualita' con un nome scritto
+       sotto». */
+    controlla("la gente del feat ascolta il pezzo: featAscolti cresce con la fama, e senza feat e' zero",
+      dentro("featAscolti({featFama:40, q:60})") > 0 &&
+      dentro("featAscolti({featFama:80, q:60})") > dentro("featAscolti({featFama:40, q:60})") &&
+      dentro("featAscolti({q:60})") === 0);
+    dentro(`
+      G.week = 3; G.hype = 10; G.fans = 100; G.phase = 1;
+      G.songs = [{t:'Solo', q:60, mixed:true, released:false, seed:71, featFama:0},
+                 {t:'Con',  q:60, mixed:true, released:false, seed:72, featFama:50}];
+    `);
+    dentro("G.songs[0].released = true; G.songs[0].week = 3;");
+    const senzaFeat = dentro("(() => { const h = G.hype; G.hype = 10; G.songs[1].released = false; " +
+      "ACTIONS.find(a => a.id === 'pubblica').run(); const d = G.hype - 10; G.hype = h; return d; })()");
+    controlla("un nome grosso sul pezzo muove l'hype all'uscita: fama 50 vale +4",
+      dentro("featHypeUscita({featFama:50})") === 4 && senzaFeat > 13.2,
+      "hype all'uscita +" + senzaFeat);
+    /* la copertina (idea E): moltiplica gli ascolti della prima settimana e
+       basta — dopo il pezzo gira per quello che e'. Il dado si tiene fermo. */
+    const dado2 = Math.random;
+    try{
+      Math.random = () => 0.5;
+      const conFoto = dentro("G.week = 5; songWeekly({t:'A', q:60, week:5, released:true, seed:41, img:'data:x'})");
+      const senza = dentro("songWeekly({t:'A', q:60, week:5, released:true, seed:41, img:''})");
+      const dopo = dentro("songWeekly({t:'A', q:60, week:4, released:true, seed:41, img:'data:x'})");
+      const dopoSenza = dentro("songWeekly({t:'A', q:60, week:4, released:true, seed:41, img:''})");
+      const resa41 = dentro("coverResa({seed:41})");
+      controlla("la copertina moltiplica gli ascolti della prima settimana, e dalla seconda non conta piu'",
+        Math.abs(conFoto - dopo * 1.08) <= 1 && Math.abs(senza - dopo * resa41) <= 1 &&
+        conFoto !== dopo && dopo === dopoSenza,
+        "prima settimana " + senza + " → " + conFoto + " con la foto; dopo " + dopoSenza + " = " + dopo);
+    } finally { Math.random = dado2; }
   }
 }
 
@@ -1072,7 +1108,11 @@ console.log("\nlo Studio: la gente della Sala conta");
                        il quando di Fuori) e senza di lui le sezioni non
                        disegnano */
                     "js/game/studio-elementi.js", "js/game/writer.js",
-                    "js/game/beatplay.js"];
+                    "js/game/beatplay.js",
+                    /* la promo sta sul telefono (LaFamegram) dal 14/09/2026:
+                       qui si carica per provare che «Che post fai?» legga le
+                       stesse caselle dello Studio */
+                    "js/game/telefono.js"];
   let acceso = true, errore = null;
   try{
     /* i pochi appigli fuori dai file caricati: non devono fare niente */
@@ -1082,10 +1122,18 @@ console.log("\nlo Studio: la gente della Sala conta");
       function chiediTitolo(){} function hubPronta(){ return {ok:true, perche:""}; }
       function hubAzione(){} function apriFoglio(){} function scegliModo(){}
       function offriBeat(){ return []; } function adfOggi(){ return 0; }
+      function hsvg(){ return ""; } function spoglia(s){ return s; }
+      function chatNonLetti(){ return 0; } function soloSenzaEnergia(){ return false; }
+      function renderHub(){} function setInterval(){} function hubTap(){}
+      HUB_NOTIZIE = []; GOALS = []; TEL_CHAT_APERTA = null; HIC = {};
       SFX = { tap(){}, rec(){}, fanfare(){}, fail(){}, publish(){} };
     `, scatola);
+    scatola.addEventListener = zitto;
     for(const f of sorgenti)
       vm.runInContext(fs.readFileSync(path.join(RADICE, f), "utf8"), scatola, { filename: f });
+    /* il telefono intero non si disegna qui (gli serve la plancia): si prova
+       la sua promo, che e' una funzione a se' */
+    vm.runInContext("renderTelefono = function(){};", scatola);
     vm.runInContext(`
       G = START();
       G.money = 5000; G.energy = 100; G.skills.rete = 20;
@@ -1152,14 +1200,14 @@ console.log("\nlo Studio: la gente della Sala conta");
       }));
 
     /* tutte le sezioni si disegnano: una che esplode manderebbe giù lo Studio
-       intero, e capiterebbe solo a chi ci clicca. Le sezioni sono otto da
-       quando c'è il punto 4 (beat, testo, cabina, mix, cover, feat,
-       marketing, timing), e l'elenco si legge dal codice invece di essere
-       ricopiato: se domani se ne aggiunge una, questa prova la copre da
-       sola. */
+       intero, e capiterebbe solo a chi ci clicca. Erano otto dal punto 4
+       (beat, testo, cabina, mix, cover, feat, marketing, timing); dal
+       14/09/2026 il Marketing sta sul telefono (brainstorming, idea B). L'elenco
+       si legge dal codice invece di essere ricopiato: se domani se ne
+       aggiunge o toglie una, questa prova la copre da sola. */
     const sezioni = dentro("STUDIO_SEZIONI.map(x => x.id)");
-    controlla("le sezioni sono le sette del punto 4, più la cabina",
-      sezioni.join(",") === "beat,testo,cabina,banco,cover,feat,fuori,promo",
+    controlla("le sezioni sono quelle del punto 4 meno il Marketing, più la cabina",
+      sezioni.join(",") === "beat,testo,cabina,banco,fuori",
       sezioni.join(","));
     const rotte = [];
     for(const s of sezioni){
@@ -1225,12 +1273,19 @@ console.log("\nlo Studio: la gente della Sala conta");
        promo, il palco e i turni. Adesso l'elenco non esiste più e ognuna ha un
        posto suo — le barre nella cabina (il controllo qui sotto), il palco al
        Live Club, i turni in Pizzeria/Fabbrica/Centro per l'impiego — e la
-       promo è entrata nello Studio, in «Fuori». Il guardiano resta, sulla
-       cosa che adesso può davvero rompersi in silenzio: che la promo sia lì. */
-    dentro("G.songs = [{t:'Uno', q:60, mixed:true, released:true, seed:1}]; STUDIO_SEZ = 'promo'; renderStudio();");
-    controlla("la promo ha un posto: sta nello Studio, in «Marketing»",
-      dipinto().indexOf('data-az="promo"') >= 0,
+       promo sta sul telefono, in LaFamegram, con lo Studio che dopo l'uscita
+       ci manda. Il guardiano resta, sulla cosa che adesso può davvero
+       rompersi in silenzio: che la promo sia lì, e che da Fuori ci si arrivi. */
+    dentro("G.songs = [{t:'Uno', q:60, mixed:true, released:true, seed:1, week:1}]; G.week = 2; STUDIO_SEZ = 'fuori'; renderStudio();");
+    controlla("dopo l'uscita Fuori non fa la promo: rimanda al telefono",
+      dipinto().indexOf('data-lafamegram') >= 0 &&
+      dipinto().indexOf('data-az="promo"') < 0,
       dipinto().slice(0, 200));
+    controlla("e sul telefono, in LaFamegram, c'è «Che post fai?» col pezzo uscito e il tasto Posta",
+      (() => { const h = dentro("telPromo()");
+        return h.indexOf("Che post fai?") >= 0 && h.indexOf('data-spingi="1"') >= 0 &&
+          h.indexOf('data-azione="promo"') >= 0; })(),
+      dentro("telPromo()").slice(0, 200));
     dentro("G.bars = []; G.beats = []; STUDIO_SEZ = 'cabina'; renderStudio();");
     controlla("e senza strofa la cabina non è un vicolo cieco: si scrive da lì",
       dipinto().indexOf('data-az="scrivi"') >= 0,
@@ -1258,50 +1313,112 @@ console.log("\nlo Studio: la gente della Sala conta");
     controlla("un feat in sessione alza la qualità del pezzo, e lo dice actions.js",
       bFeat > 0 && bFeat === dentro("studioAiutoFeat()"),
       "feat +" + bFeat);
-    dentro("studioConsumaFeat()");
+    const consumato = dentro("studioConsumaFeat()");
     controlla("e vale per un pezzo solo: dopo la registrazione il posto torna libero",
       dentro("featBonus()") === 0 && dentro("studioFeat()") === null);
+    controlla("chi c'era resta sul pezzo con nome e fama: e' quella che sim.js legge",
+      consumato && consumato.n === "Zeno" && consumato.fama === 40 &&
+      dentro("featHypeUscita({featFama:50})") === 4);
+
+    /* Dal 14/09/2026 (brainstorming, idea B + D3) il feat sta in Cabina,
+       accanto al fonico, e ha due porte: chi conosci viene gratis, i rapper
+       della classifica si pagano e possono dire di no — e se accettano
+       entrano fra i contatti. */
+    dentro(`
+      G.bars = [{q:44, tema:'Il cortile', seed:1}]; G.beats = [{n:'B', q:50, seed:2}];
+      G.rivals = [{n:'Kobra', p:2000, eta:25, city:'Milano', gen:'trap', col:'#FF5A36',
+        skin:'#C68A5C', hair:1, storia:'', prev:2000, mom:0, usc:1, deal:false, seed:5, ult:'X', hot:0}];
+      G.money = 5000; G.energy = 100; G.fans = 100; G.hype = 10;
+      STUDIO_SEZ = 'cabina'; renderStudio();
+    `);
+    controlla("in Cabina, sotto al fonico, c'e' «Con chi»: chi conosci e la classifica",
+      dipinto().indexOf("Con chi") >= 0 &&
+      dipinto().indexOf('data-feat="rp"') >= 0 &&
+      dipinto().indexOf('data-feat=""') >= 0 &&
+      dipinto().indexOf('data-rivale="Kobra"') >= 0 &&
+      dipinto().indexOf("sì al ") >= 0,
+      dipinto().slice(0, 300));
+    controlla("e la linguetta Feat non c'e' piu'",
+      dentro("STUDIO_SEZIONI.some(x => x.id === 'feat')") === false);
+    const prezzoKobra = dentro("studioFeatPrezzo(G.rivals[0])");
+    const probKobra = dentro("studioFeatProbabilita(G.rivals[0])");
+    controlla("un rivale ha un prezzo e una probabilita' di si' fra 8% e 97%",
+      prezzoKobra > 0 && probKobra >= 0.08 && probKobra <= 0.97,
+      prezzoKobra + " € · " + Math.round(probKobra * 100) + "%");
+    /* il dado si tiene fermo: prima dice no, poi dice si' */
+    const dado = Math.random;
+    try{
+      Math.random = () => 0.999;
+      const soldiPrima = dentro("G.money"), energiaPrima = dentro("G.energy");
+      dentro("studioChiamaRivale('Kobra')");
+      controlla("se dice no non paghi, ma perdi un po' di energia, e resta in classifica",
+        dentro("G.money") === soldiPrima && dentro("G.energy") < energiaPrima &&
+        dentro("G.gente.some(p => p.n === 'Kobra')") === false &&
+        dentro("studioFeat()") === null);
+      Math.random = () => 0.0;
+      dentro("studioChiamaRivale('Kobra')");
+      controlla("se dice si' paghi, viene in sessione ed entra fra i contatti",
+        dentro("G.money") === soldiPrima - prezzoKobra &&
+        dentro("studioFeat() && studioFeat().n") === "Kobra" &&
+        dentro("G.gente.find(p => p.n === 'Kobra').rel") === 1 &&
+        dentro("G.gente.find(p => p.n === 'Kobra').ruolo") === "rapper",
+        "soldi " + soldiPrima + " → " + dentro("G.money"));
+    } finally { Math.random = dado; }
+    dentro("renderStudio();");
+    controlla("da contatto non sta piu' nella classifica da chiamare: sta fra chi conosci, gratis",
+      dipinto().indexOf('data-rivale="Kobra"') < 0 &&
+      /data-feat="p\d+"/.test(dipinto()));
+    dentro("studioScegliFeat(null); G.gente = G.gente.filter(p => p.n !== 'Kobra'); G.rivals = [];");
 
     /* quale provino e quale pezzo: la scelta è dello Studio, il conto di
        actions.js. Se il ponte si stacca, torna a uscire sempre il migliore
-       e la sezione Timing diventa un ornamento. */
+       e la sezione Uscita diventa un ornamento. Dal 14/09/2026 la scelta e'
+       una sola: il pezzo **sul banco** (idea F2). */
     dentro(`
       G.songs = [
         {t:'Buono',  q:80, mixed:false, released:false, seed:11},
         {t:'Storto', q:40, mixed:false, released:false, seed:22}
       ];
-      G.studio.mixa = null; G.studio.esce = null;
+      G.studio.banco = null;
     `);
-    controlla("senza scelta esce il migliore, come ha sempre fatto",
+    controlla("senza niente sul banco actions.js prende il migliore, come ha sempre fatto",
       dentro("daMixare().t") === "Buono" && dentro("daPubblicare().t") === "Buono");
-    dentro("studioSegna('mixa', 22); studioSegna('esce', 22);");
-    controlla("ma se scegli tu, actions.js prende quello che hai scelto",
+    dentro("studioMettiSulBanco(22);");
+    controlla("ma col pezzo sul banco, actions.js mixa e pubblica quello",
       dentro("daMixare().t") === "Storto" && dentro("daPubblicare().t") === "Storto");
     dentro("G.songs = G.songs.filter(x => x.seed !== 22);");
-    controlla("e se il pezzo scelto sparisce non si pianta: torna a decidere lei",
+    controlla("e se il pezzo sul banco sparisce non si pianta: torna a decidere lei",
       dentro("daMixare().t") === "Buono" && dentro("daPubblicare().t") === "Buono");
+    /* un salvataggio di prima del banco: le due caselle vecchie diventano il banco */
+    dentro("G.studio = {esce:11, mixa:null}; studioDati();");
+    controlla("un salvataggio con le caselle vecchie (mixa/esce) si ritrova il pezzo sul banco",
+      dentro("G.studio.banco") === 11 && dentro("G.studio.esce") === undefined);
+    dentro("G.studio = {}; studioDati();");
+    controlla("e uno senza scelte trova sul banco l'ultimo pezzo inciso e non uscito",
+      dentro("G.studio.banco") === 11);
 
-    /* Punto 9 dello Studio: al Marketing si sceglie quale pezzo spingere.
-       Prima le righe erano mute come al banco del Mix, e la promo accendeva
-       «tutto quello che hai fuori»: se il collegamento si stacca, la scelta
-       torna a essere un ornamento. */
+    /* Punto 9 dello Studio: si sceglie quale pezzo spingere — su LaFamegram,
+       dal 14/09/2026. Prima le righe erano mute come al banco del Mix, e la
+       promo accendeva «tutto quello che hai fuori»: se il collegamento fra
+       il telefono e la casella dello Studio si stacca, la scelta torna a
+       essere un ornamento. */
     dentro(`
       G.songs = [
         {t:'Vecchio', q:70, mixed:true, released:true, week:1, streams:900, seed:31},
         {t:'Nuovo',   q:60, mixed:true, released:true, week:3, streams:100, seed:32}
       ];
       G.week = 4; G.studio.spingi = null;
-      STUDIO_SEZ = "promo"; renderStudio();
     `);
-    controlla("al Marketing i pezzi fuori si possono cliccare, e senza scelta e' acceso l'ultimo uscito",
-      dipinto().indexOf('data-spingi="31"') >= 0 &&
-      dipinto().indexOf('data-spingi="32"') >= 0 &&
+    const promoTel = () => dentro("telPromo()");
+    controlla("su LaFamegram i pezzi fuori si possono cliccare, e senza scelta e' acceso l'ultimo uscito",
+      promoTel().indexOf('data-spingi="31"') >= 0 &&
+      promoTel().indexOf('data-spingi="32"') >= 0 &&
       dentro("studioDaSpingere().t") === "Nuovo",
-      dipinto().slice(0, 300));
-    dentro("studioSegna('spingi', 31);");
+      promoTel().slice(0, 300));
+    dentro("telSpingi(31);");
     controlla("scelto il vecchio, e' lui che si spinge",
       dentro("studioDaSpingere().t") === "Vecchio" &&
-      /class="stscelta on"[^>]*data-spingi="31"/.test(dipinto()));
+      /class="tli on"[^>]*data-spingi="31"/.test(promoTel()));
     dentro("ACTIONS.find(a => a.id === 'promo').run();");
     controlla("e la promo lascia la spinta sul pezzo scelto, non sugli altri",
       dentro("G.songs[0].spinta") > 1 && dentro("G.songs[1].spinta") === undefined,
@@ -1309,50 +1426,111 @@ console.log("\nlo Studio: la gente della Sala conta");
 
     /* Punto 5 dello Studio: «non c'e' un tasto di conferma della copertina».
        Generarne un'altra e' una proposta: il pezzo cambia solo con Conferma,
-       e le scelte dello Studio che lo segnavano col vecchio seed lo seguono. */
+       e le scelte dello Studio che lo segnavano col vecchio seed lo seguono.
+       Dal 14/09/2026 la copertina sta dentro a Fuori (brainstorming, idea B):
+       la linguetta Cover non c'e' piu', il gesto si'. */
     dentro(`
-      G.songs = [{t:'Vestito', q:70, mixed:true, released:false, seed:41, img:''}];
-      G.studio.coverProva = null; G.studio.esce = 41; G.studio.cover = 41;
-      STUDIO_SEZ = "cover"; renderStudio();
+      G.songs = [{t:'Vestito', q:70, mixed:true, released:false, seed:41, img:'',
+        parti:{beat:60, testo:70, fonico:0, feat:0, take:2, mix:8}}];
+      G.studio.coverProva = null; G.studio.banco = 41;
+      STUDIO_SEZ = "fuori"; renderStudio();
     `);
-    controlla("senza proposta la Cover offre foto e rigenera, e nessuna conferma",
+    controlla("la linguetta Cover non c'e' piu': la copertina sta in Uscita",
+      dentro("STUDIO_SEZIONI.some(x => x.id === 'cover')") === false &&
+      dentro("STUDIO_SEZIONI.find(x => x.id === 'fuori').n") === "Uscita");
+    controlla("senza proposta l'Uscita offre foto e rigenera, nessuna conferma, e il tasto Mandalo fuori",
       dipinto().indexOf('data-cov="carica"') >= 0 &&
-      dipinto().indexOf('data-cov="conferma"') < 0);
+      dipinto().indexOf('data-cov="altra"') >= 0 &&
+      dipinto().indexOf('data-cov="conferma"') < 0 &&
+      dipinto().indexOf('data-manda="1"') >= 0,
+      dipinto().slice(0, 300));
+    controlla("e il riquadro dei numeri divide qualita' e ascolti: Beat, Testo, Mix da una parte, Copertina dall'altra",
+      dipinto().indexOf("Beat") >= 0 && dipinto().indexOf("Testo") >= 0 &&
+      dipinto().indexOf("Mix") >= 0 && dipinto().indexOf("Copertina") >= 0 &&
+      /×\d,\d\d/.test(dipinto()),
+      dipinto().slice(dipinto().indexOf("stnumeri"), dipinto().indexOf("stnumeri") + 400));
     dentro("studioCoverAltra();");
-    controlla("«Generane un'altra» non tocca il pezzo: e' una proposta da confermare",
+    controlla("«Generane un'altra» non tocca il pezzo: e' una proposta da confermare, e finche' c'e' il pezzo non esce",
       dentro("G.songs[0].seed") === 41 &&
       dentro("G.studio.coverProva && G.studio.coverProva.per") === 41 &&
       dipinto().indexOf('data-cov="conferma"') >= 0 &&
       dipinto().indexOf('data-cov="lascia"') >= 0 &&
-      dipinto().indexOf(">proposta<") >= 0);
+      dipinto().indexOf('data-manda="1"') < 0 &&
+      dipinto().indexOf("non è ancora sul pezzo") >= 0);
     dentro("studioCoverLascia();");
     controlla("«Lascia com'era» la butta",
       dentro("G.studio.coverProva") === null && dentro("G.songs[0].seed") === 41);
     dentro("studioCoverAltra(); studioCoverConferma();");
-    controlla("«Conferma» la mette sul pezzo, e Timing continua a puntare a quel pezzo",
+    controlla("«Conferma» la mette sul pezzo, e l'Uscita continua a puntare a quel pezzo",
       dentro("G.songs[0].seed") !== 41 &&
-      dentro("G.studio.esce") === dentro("G.songs[0].seed") &&
+      dentro("G.studio.banco") === dentro("G.songs[0].seed") &&
       dentro("G.studio.coverProva") === null &&
       dentro("daPubblicare().t") === "Vestito");
     dentro("studioCoverAltra(); G.songs[0].released = true; renderStudio();");
     controlla("una proposta il cui pezzo e' uscito si butta da sola al ridisegno",
       dentro("G.studio.coverProva") === null);
+    /* la copertina pesa (idea E): non sulla qualita', sugli ascolti della
+       prima settimana. Generata: dal seed; foto tua: sempre ×1,08. */
+    controlla("la resa della copertina sta fra ×0,92 e ×1,12, e la foto tua vale ×1,08",
+      dentro("coverResa({seed:41})") >= 0.92 && dentro("coverResa({seed:41})") <= 1.12 &&
+      dentro("coverResa({seed:41}) === coverResa({seed:41})") &&
+      dentro("coverResa({seed:41, img:'data:x'})") === 1.08 &&
+      dentro("coverResa(null)") === 1);
 
     /* Punto 10 dello Studio: prima Beat, Testo e Cabina, poi il resto. Le
-       altre cinque linguette restano chiuse finche' non c'e' il primo pezzo. */
-    dentro("G.songs = []; STUDIO_SEZ = 'promo'; renderStudio();");
+       altre linguette restano chiuse finche' non c'e' il primo pezzo. */
+    dentro("G.songs = []; STUDIO_SEZ = 'fuori'; renderStudio();");
     const linguette = () => nodi["st-tabs"].innerHTML || "";
-    controlla("senza pezzi Mix, Cover, Feat, Timing e Marketing sono chiuse, e Beat/Testo/Cabina no",
-      ["banco", "cover", "feat", "fuori", "promo"].every(id =>
+    controlla("senza pezzi Mix e Uscita sono chiuse, e Beat/Testo/Cabina no",
+      ["banco", "fuori"].every(id =>
         new RegExp('sttab[^"]*chiusa" data-sez="' + id + '"').test(linguette())) &&
       ["beat", "testo", "cabina"].every(id =>
         new RegExp('class="sttab( on)?" data-sez="' + id + '"').test(linguette())),
       linguette().slice(0, 300));
     controlla("e arrivando a una sezione chiusa si torna al Beat",
       dentro("STUDIO_SEZ") === "beat");
-    dentro("G.songs = [{t:'Primo', q:50, mixed:false, released:false, seed:61}]; renderStudio();");
-    controlla("col primo pezzo registrato si apre tutto",
+    dentro("G.songs = [{t:'Primo', q:50, mixed:false, released:false, seed:61}]; studioMettiSulBanco(61); renderStudio();");
+    controlla("col pezzo appena inciso sul banco si apre tutto",
       linguette().indexOf("chiusa") < 0);
+    /* «ad ogni pezzo» (F2): quando esce, il banco si svuota e Mix e Uscita
+       si richiudono; un altro pezzo inciso prima si rimette sul banco da
+       una riga, ed e' la stessa riga in Cabina, Mix e Uscita. */
+    dentro(`
+      G.songs.push({t:'Secondo', q:55, mixed:true, released:false, seed:62});
+      G.studio.quando = "subito"; G.energy = 100; G.phase = 1;
+      STUDIO_SEZ = "fuori"; renderStudio();
+    `);
+    controlla("nell'Uscita la colonna «Sul banco» elenca i pezzi incisi, col banco acceso",
+      dipinto().indexOf("Sul banco") >= 0 &&
+      /class="stscelta on"[^>]*data-banco="61"/.test(dipinto()) &&
+      dipinto().indexOf('data-banco="62"') >= 0 &&
+      dentro("daPubblicare().t") === "Primo");
+    dentro("ACTIONS.find(a => a.id === 'pubblica').run(); renderStudio();");
+    controlla("uscito il pezzo, il banco si svuota, Mix e Uscita si richiudono e si torna in Cabina",
+      dentro("G.studio.banco") === null &&
+      ["banco", "fuori"].every(id =>
+        new RegExp('sttab[^"]*chiusa" data-sez="' + id + '"').test(linguette())) &&
+      dentro("STUDIO_SEZ") === "cabina" &&
+      dipinto().indexOf("data-lafamegram") >= 0,
+      linguette().slice(0, 300));
+    controlla("e in Cabina c'e' la riga per rimettere sul banco il pezzo inciso prima",
+      dipinto().indexOf('data-banco="62"') >= 0);
+    dentro("studioMettiSulBanco(62); STUDIO_SEZ = 'banco'; renderStudio();");
+    controlla("rimesso sul banco un pezzo gia' mixato, il Mix lo dice e manda all'Uscita",
+      linguette().indexOf("chiusa") < 0 &&
+      dipinto().indexOf("già mixato") >= 0 &&
+      dipinto().indexOf('data-az="mixa"') < 0 &&
+      dentro("daMixare() == null") &&
+      dentro("daPubblicare().t") === "Secondo");
+    /* la cassaforte svuota il banco, e ritirare il pezzo lo rimette sopra */
+    dentro("G.studio.quando = 'cassetto'; studioMandaFuori();");
+    controlla("in cassaforte il pezzo lascia il banco vuoto",
+      dentro("G.songs[1].tenuto") === true && dentro("G.studio.banco") === null &&
+      dentro("studioSbloccato()") === false);
+    dentro("studioRiprendi(62);");
+    controlla("e ritirato dalla cassaforte torna sul banco",
+      dentro("G.songs[1].tenuto") === undefined && dentro("G.studio.banco") === 62 &&
+      dentro("studioSbloccato()") === true);
 
     /* Punto 8 dello Studio: un pezzo non ancora uscito non si spinge — al
        massimo se ne fa uscire un'anteprima, che all'uscita diventa spinta. */
@@ -1362,19 +1540,18 @@ console.log("\nlo Studio: la gente della Sala conta");
         {t:'Chiuso',  q:70, mixed:true, released:false, week:0, streams:0,   seed:52}
       ];
       G.week = 4; G.studio.spingi = null; G.hype = 10; G.energy = 100;
-      STUDIO_SEZ = "promo"; renderStudio();
     `);
-    controlla("al Marketing il pezzo non uscito sta sotto «Non ancora fuori», e al centro c'e' la promo",
-      dipinto().indexOf("Non ancora fuori") >= 0 &&
-      dipinto().indexOf('data-spingi="52"') >= 0 &&
-      dipinto().indexOf('data-az="promo"') >= 0 &&
-      dipinto().indexOf('data-az="anteprima"') < 0);
+    controlla("su LaFamegram il pezzo non uscito sta sotto «Non ancora fuori», e il tasto e' la promo",
+      promoTel().indexOf("Non ancora fuori") >= 0 &&
+      promoTel().indexOf('data-spingi="52"') >= 0 &&
+      promoTel().indexOf('data-azione="promo"') >= 0 &&
+      promoTel().indexOf('data-azione="anteprima"') < 0);
     controlla("senza un pezzo non uscito scelto, l'anteprima non parte",
       typeof dentro("ACTIONS.find(a => a.id === 'anteprima').need()") === "string");
-    dentro("studioSegna('spingi', 52);");
-    controlla("scelto il pezzo chiuso, al centro c'e' l'anteprima e la promo resta sull'ultimo uscito",
-      dipinto().indexOf('data-az="anteprima"') >= 0 &&
-      dipinto().indexOf('data-az="promo"') < 0 &&
+    dentro("telSpingi(52);");
+    controlla("scelto il pezzo chiuso, il post e' l'anteprima e la promo resta sull'ultimo uscito",
+      promoTel().indexOf('data-azione="anteprima"') >= 0 &&
+      promoTel().indexOf('data-azione="promo"') < 0 &&
       dentro("studioDaAnticipare().t") === "Chiuso" &&
       dentro("studioDaSpingere().t") === "Fuori");
     const hypePrima = dentro("G.hype");

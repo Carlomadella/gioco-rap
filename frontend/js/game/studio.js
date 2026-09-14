@@ -11,19 +11,25 @@
       Beat/Producer, Mix, Testo, Cover, Featuring, Marketing, Timing.
       E ogni elemento influenza il risultato.»
 
-   Quelle sette sono adesso le **sezioni** dello Studio, più la Cabina che le
-   tiene insieme: le sette sono gli ingredienti di un pezzo, ma da qualche
-   parte il pezzo va anche inciso, e quel posto qui esisteva già. Otto
-   linguette, **in basso**, dove sta il pollice quando il telefono è in mano:
+   Quelle sette erano le **sezioni** dello Studio, più la Cabina che le
+   tiene insieme. Dal 14/09/2026 (il brainstorming in
+   `documentazione/brainstorming-studio-cover-feat-marketing.md`, idea B) gli
+   ingredienti stanno **dentro alle stanze in cui si decidono** invece di
+   avere una linguetta a testa: il Marketing è una pagina del telefono
+   (LaFamegram, `telefono.js`), perché lavora su pezzi già usciti e sul
+   telefono ci stava già nel riferimento; il Feat sta in Cabina, accanto al
+   fonico, perché si sceglie prima di incidere; la Cover sta nell'Uscita,
+   perché è lì che uno la guarda davvero, prima che il pezzo esca. E lo
+   Studio lavora **un pezzo alla volta**, quello sul banco (`G.studio.banco`,
+   idea F2): Mix e Uscita parlano di lui, e si chiudono quando esce. Le linguette, **in basso**, dove sta
+   il pollice quando il telefono è in mano:
 
      BEAT       da chi te lo fai — e con chi lo fai cambia com'è (punto 11)
      TESTO      le barre. Senza queste non c'è niente da incidere
-     CABINA     la strofa e il beat diventano una traccia
-     MIX        il fonico la mixa — e scegli tu quale provino
-     COVER      la faccia del pezzo: generata, o una foto tua
-     FEAT       con chi lo fai. Non è obbligatorio, ma si sente
-     MARKETING  farlo sapere. Un pezzo che non gira non esiste
-     TIMING     quale esce, e quando
+     CABINA     la strofa e il beat diventano una traccia — e con chi (il feat)
+     MIX        il fonico mixa il pezzo che sta sul banco
+     USCITA     com'è vestito (la copertina) e quando esce — e poi «fallo
+                sapere», sul telefono
 
    **Qui non si rifà l'economia del gioco.** I numeri stanno tutti in
    `actions.js` e ci restano: lo Studio chiama le stesse azioni della
@@ -55,18 +61,12 @@ const STUDIO_FOTO = {
   testo:  {f:"studio_testo.png",  pos:"center 58%"},
   cabina: {f:"studio_cabina.png", pos:"center 46%"},
   banco:  {f:"studio_mix.png",    pos:"center 44%"},
-  /* Queste due le ho ritrovate confrontando le foto senza interfaccia con i
-     riferimenti: lo sfondo di `studio_uscita_pezzo` è la strada bagnata, e
-     quello di `studio_promo_su_lafamegram` è la scrivania di notte. Erano
-     nella pila delle «in attesa» perché nessuno le aveva mai guardate. */
-  fuori:  {f:"studio_uscita.png", pos:"center 55%"},
-  promo:  {f:"studio_promo.png",  pos:"center 50%"},
-  /* Cover e Feat una foto loro non ce l'hanno, né con né senza interfaccia.
-     Si tengono quella della stanza più vicina — il banco per la copertina,
-     la cabina per il feat — perché un fondo nero in mezzo a sei fotografie
-     si vede molto più di una stanza presa in prestito. Vanno sostituite. */
-  cover:  {f:"studio_mix.png",    pos:"center 30%"},
-  feat:   {f:"studio_cabina.png", pos:"center 38%"}
+  /* Questa l'ho ritrovata confrontando le foto senza interfaccia con i
+     riferimenti: lo sfondo di `studio_uscita_pezzo` è la strada bagnata. Era
+     nella pila delle «in attesa» perché nessuno l'aveva mai guardata. (La
+     scrivania di notte di `studio_promo.png` era il fondale del Marketing:
+     con la promo passata al telefono è tornata fra le foto in attesa.) */
+  fuori:  {f:"studio_uscita.png", pos:"center 55%"}
 };
 
 /* `n` è il nome corto, quello della linguetta in basso — le sette voci del
@@ -82,33 +82,64 @@ const STUDIO_SEZIONI = [
   {id:"cabina", n:"Cabina",    bar:"La cabina",    sc:"registra",
    d:"dove si incide"},
   /* Punto 10 del foglio «LUOGO: STUDIO»: prima Beat, Testo e Cabina, poi il
-     resto. Le sezioni con `dopo` restano chiuse finche' non hai registrato
-     il primo pezzo — e' il percorso guidato, non un limite per sempre:
-     appena c'e' un pezzo si aprono tutte e per tutte le partite dopo. */
+     resto — letto «ad ogni pezzo» (brainstorming del 14/09/2026, idea F2).
+     Le sezioni con `dopo` parlano del pezzo **sul banco**: si aprono quando
+     ce n'e' uno (appena inciso, o rimesso sul banco dalla cartella) e si
+     richiudono quando esce o va in cassaforte. Non e' un limite: e' che
+     senza un pezzo sul banco Mix e Uscita non avrebbero niente da dire. */
   {id:"banco",  n:"Mix",       bar:"Il banco",     sc:"mixa",
    d:"dove il provino diventa pezzo", dopo:true},
-  {id:"cover",  n:"Cover",     bar:"La copertina", sc:"pubblica",
-   d:"la faccia del pezzo", dopo:true},
-  {id:"feat",   n:"Feat",      bar:"Il feat",      sc:"registra",
-   d:"con chi lo fai", dopo:true},
-  /* Timing prima di Marketing, e non e' un gusto: la spinta si decide
-     **dopo** aver deciso quando esce il pezzo, perche' «venerdi' fra 4 giorni»
-     e «stanotte» non si spingono allo stesso modo. Al contrario si sceglieva
-     come spingerlo prima di sapere quando usciva. */
-  {id:"fuori",  n:"Timing",    bar:"Fuori",        sc:"pubblica",
-   d:"quando esce", dopo:true},
-  {id:"promo",  n:"Marketing", bar:"Il marketing", sc:"promo",
-   d:"farlo sapere", dopo:true}
+  /* Il Feat non e' piu' una linguetta: si sceglie in Cabina, accanto al
+     fonico, che e' l'unico posto in cui ha senso — prima di incidere. La
+     Cover nemmeno: sta in Uscita, sopra al QUANDO — «com'e' vestito, e
+     quando esce». */
+  /* Il Marketing non e' piu' una linguetta: lavora su pezzi gia' usciti, cioe'
+     su cose che non stanno piu' sul banco, e il suo riferimento
+     (`studio_promo_su_lafamegram`) ha in cima «TELEFONO · LAFAMEGRAM». Sta
+     li', in `telefono.js`; da qui, dopo l'uscita, ci si arriva con un tasto. */
+  {id:"fuori",  n:"Uscita",    bar:"Fuori",        sc:"pubblica",
+   d:"com'è vestito, e quando esce", dopo:true}
 ];
 
 let STUDIO_SEZ = "beat";
 
-/* Il resto si apre col primo pezzo registrato (punto 10). */
+/* Il resto si apre quando c'e' un pezzo sul banco (punto 10, «ad ogni pezzo»). */
 function studioSbloccato(){
-  return (typeof G !== "undefined" && G && G.songs || []).length > 0;
+  return !!studioSulBanco();
 }
 function studioSezAperta(x){
   return !x.dopo || studioSbloccato();
+}
+
+/* ==================== IL PEZZO SUL BANCO (F2) ====================
+   Lo Studio lavora **un** pezzo alla volta: `G.studio.banco` e' il suo seed.
+   Beat, Testo e Cabina lo fanno nascere; appena inciso e' lui sul banco, Mix
+   e Uscita si aprono su di lui, e quando esce (o va in cassaforte) il banco
+   si svuota e si richiudono. I pezzi incisi prima, o ritirati dalla
+   cassaforte, si rimettono sul banco da una riga — la stessa in Cabina, Mix
+   e Uscita. Era l'obiezione del 14/09 («mixare il pezzo di ieri mentre
+   scrivi quello di oggi»): si fa scegliendo cosa c'e' sul banco, uno alla
+   volta, che si legge meglio di tre elenchi «I tuoi pezzi» ripetuti in tre
+   sezioni. */
+function studioListaBanco(){
+  return (G.songs || []).filter(s => !s.released && !s.tenuto).slice().reverse();
+}
+function studioSulBanco(){
+  if(typeof G === "undefined" || !G) return null;
+  const d = studioDati();
+  if(d.banco == null) return null;
+  return studioListaBanco().find(s => s.seed === d.banco) || null;
+}
+function studioMettiSulBanco(seed){
+  if(!Number.isFinite(seed)) return;
+  studioDati().banco = seed;
+}
+/* Il pezzo e' uscito, o e' finito in cassaforte: se era lui sul banco, il
+   banco si svuota. La chiamano `pubblica` (actions.js), l'uscita del venerdi'
+   e il cassetto (studio-elementi.js). */
+function studioSvuotaBanco(s){
+  const d = studioDati();
+  if(s && d.banco != null && s.seed === d.banco) d.banco = null;
 }
 
 /* ==================== LA GENTE CHE CI LAVORA ====================
@@ -126,7 +157,19 @@ function studioGente(ruolo){
    accorgersi di niente. */
 function studioDati(){
   if(!G.studio) G.studio = {};
-  return G.studio;
+  const d = G.studio;
+  /* Un salvataggio di prima del banco (14/09/2026) ha due caselle, `mixa` ed
+     `esce`: la prima che punta ancora a un pezzo diventa il banco; se
+     nessuna, sul banco ci va l'ultimo pezzo inciso e non uscito, cosi' chi
+     riapre la partita trova Mix e Uscita aperte come le aveva lasciate. */
+  if(d.banco === undefined){
+    const lista = (G.songs || []).filter(s => !s.released && !s.tenuto);
+    const vecchia = [d.esce, d.mixa].find(x => x != null && lista.some(s => s.seed === x));
+    const ultimo = lista[lista.length - 1];
+    d.banco = vecchia != null ? vecchia : (ultimo && Number.isFinite(ultimo.seed) ? ultimo.seed : null);
+    delete d.esce; delete d.mixa;
+  }
+  return d;
 }
 
 /* Il beatmaker scelto nella colonna a sinistra resta quello con cui stai
@@ -166,7 +209,19 @@ function studioAiutoFonico(){
    meno del fonico, che sta lì tutto il giorno tutti i giorni, e vale di più
    quanto più il rapper è grosso: un feat serve anche a farsi tirare su.
    Si consuma con la registrazione: uno che viene in studio ci viene per un
-   pezzo, non per sempre. */
+   pezzo, non per sempre.
+
+   Dal 14/09/2026 il feat non ha più una linguetta sua: si sceglie **in
+   Cabina, accanto al fonico**, che è l'unico posto della catena in cui ha
+   senso — era una linguetta *dopo* la Cabina che agiva sulla registrazione
+   *successiva*, il cancello chiuso dopo che i buoi sono usciti. E si sceglie
+   da **due porte** (brainstorming, idea D3): chi conosci dalla Sala accetta
+   sempre e non costa niente, perché il rapporto è già il prezzo pagato; i
+   rapper della classifica (`G.rivals`) si possono chiamare anche mai visti,
+   si pagano, e possono dire di no — uno più grosso di te quasi sempre. Se
+   accettano entrano fra i contatti: hai pagato un pezzo, ti resta un
+   conoscente. E sul pezzo il feat non vale più solo qualità: `sim.js` legge
+   `s.featFama` e ci mette la sua gente che ascolta. */
 function studioFeat(){
   if(!G.studio || !G.studio.feat) return null;
   const p = (G.gente || []).find(x => x.id === G.studio.feat);
@@ -176,20 +231,120 @@ function studioAiutoFeat(p){
   const q = p || studioFeat();
   return q ? Math.round(q.rel * 1.2 + q.fama * 0.12) : 0;
 }
-/* Chiamata da `actions.js` quando la traccia esce dalla cabina: il nome resta
-   attaccato al pezzo, e il feat torna libero. */
+/* Chiamata da `actions.js` quando la traccia esce dalla cabina: chi c'era
+   resta attaccato al pezzo (nome e fama), e il feat torna libero. */
 function studioConsumaFeat(){
   const p = studioFeat();
-  if(!p) return "";
+  if(!p) return null;
   p.pt += 1;
   while(p.pt >= relSoglia(p) && p.rel < 5){ p.pt -= relSoglia(p); p.rel++; }
   studioDati().feat = null;
-  return p.n;
+  return p;
 }
 function studioScegliFeat(id){
   const d = studioDati();
+  /* `null` arriva da «da solo»: toglie chi c'e', senza il giro del toggle */
+  if(id === null){ d.feat = null; SFX.tap(); save(); renderStudio(); return; }
   d.feat = (d.feat === id) ? null : id;
   SFX.tap(); save(); renderStudio();
+}
+
+/* ---- la seconda porta: i rapper della classifica ----
+   I rivali hanno `p`, gli ascolti della settimana, non una fama da persona:
+   la si ricava in scala di log, così Kobra da 3 milioni non vale
+   trentamila volte uno da cento. Con la stessa fama si calcola quanto
+   aiuta in cabina (`studioAiutoFeat`), come per chi conosci. */
+function studioFamaRivale(r){
+  return clamp(Math.round(14 * Math.log10(Math.max(120, r.p || 120))) - 14, 5, 100);
+}
+/* Il prezzo sale con la fama, a decine: un nome grosso costa un pezzo di
+   cassa, uno della tua misura una serata. Si paga solo se dice sì. */
+function studioFeatPrezzo(r){
+  return Math.round((30 + studioFamaRivale(r) * 5) / 10) * 10;
+}
+/* Quanto è probabile che dica sì: il rapporto fra la tua misura (ascolti
+   della settimana, hype, fan) e la sua. Uno più piccolo di te dice sì quasi
+   sempre, uno della tua misura spesso, uno molto più grosso quasi mai — ed è
+   esattamente il «feat con nomi più grandi» del foglio dell'hype: se lo
+   strappi, vale. */
+function studioFeatProbabilita(r){
+  const miei = (typeof streamSettimana === "function" ? streamSettimana() : 0) +
+    (G.hype || 0) * 10 + (G.fans || 0) * 0.2;
+  const rapporto = miei / Math.max(1, r.p || 1);
+  return clamp(0.08 + 0.62 * rapporto, 0.08, 0.97);
+}
+/* I rivali che si possono chiamare: quelli che non sono già fra i contatti
+   (chi ha accettato una volta sta in `G.gente`, e da lì costa zero). */
+function studioRivaliChiamabili(){
+  const noti = new Set((G.gente || []).map(p => p.n));
+  return (G.rivals || []).filter(r => r && r.n && !noti.has(r.n))
+    .slice().sort((a, b) => (b.p || 0) - (a.p || 0));
+}
+/* Il rivale che accetta diventa una persona come quelle della Sala: stessa
+   scheda, rapporto a «contatto», la sua faccia. Da qui in poi lo si chiama
+   gratis, come chi conosci — e alla Sala lo si trova. */
+function studioRivaleInGente(r){
+  const fama = studioFamaRivale(r);
+  const gen = (typeof BEAT_GEN !== "undefined" && BEAT_GEN[r.gen]) ? r.gen
+    : (typeof BEAT_IDS !== "undefined" ? pick(BEAT_IDS) : "trap");
+  /* un id che non c'e' gia': la Sala li tira a caso, e due uguali farebbero
+     scegliere la persona sbagliata */
+  let id;
+  do id = "p" + Math.floor(Math.random() * 1e9); while((G.gente || []).some(x => x.id === id));
+  const p = {
+    id, ruolo:"rapper", n:r.n, gen,
+    eta:r.eta || Math.floor(rnd(18, 33)), fama,
+    car:(typeof CARATTERI !== "undefined" ? pick(CARATTERI).id : "aperto"),
+    scoperto:false, rel:1, pt:0, ult:-1, feat:-99,
+    skin:r.skin, hair:r.hair, col:r.col,
+    rivale:true                       /* viene dalla classifica, non dalla Sala */
+  };
+  if(!G.gente) G.gente = [];
+  G.gente.push(p);
+  return p;
+}
+const STUDIO_FEAT_NO_ENERGIA = 5;
+const STUDIO_FEAT_NO_MINUTI = 60;
+function studioChiamaRivale(nome){
+  const r = studioRivaliChiamabili().find(x => x.n === nome);
+  if(!r) return;
+  const prezzo = studioFeatPrezzo(r);
+  if(G.money < prezzo){
+    toast("Ti servono " + fmt(prezzo) + " €, ne hai " + fmt(G.money), "bad", "!", ["#3A3F49", "#22262E"]);
+    return;
+  }
+  const prob = studioFeatProbabilita(r);
+  const chiama = () => {
+    if(Math.random() < prob){
+      G.money -= prezzo;
+      const p = studioRivaleInGente(r);
+      studioDati().feat = p.id;
+      pushLog("<b>" + p.n + "</b> ha detto sì: viene in sessione per " + fmt(prezzo) +
+        " €. Adesso è fra i tuoi contatti.", "good");
+      toast(p.n + " ci sta · " + fmt(prezzo) + " €", "good", "★", ["#A855F7", "#4C1D95"]);
+      SFX.tap();
+    } else {
+      /* il no costa poco: un po' di energia e un'ora al telefono */
+      G.energy = clamp(G.energy - STUDIO_FEAT_NO_ENERGIA, 0, 100);
+      if(typeof GAME_TIME !== "undefined" && typeof GAME_TIME.spend === "function")
+        GAME_TIME.spend(STUDIO_FEAT_NO_MINUTI, "studio-feat-no");
+      pushLog("<b>" + r.n + "</b> ha detto no. Non è il momento: sei troppo piccolo per lui.", "bad");
+      toast(r.n + " ha detto no", "bad", "✕", ["#3A3F49", "#22262E"]);
+      SFX.fail();
+    }
+    save(); renderStudio(); if(typeof renderGioco === "function") renderGioco();
+  };
+  /* si spendono soldi veri: la conferma, come per le altre mosse */
+  if(typeof showEvent === "function" && typeof SET !== "undefined" && SET.gioco && SET.gioco.conferme){
+    showEvent({k:"Confermi?", t:"Chiami " + r.n,
+      d:"Dice sì al <b>" + Math.round(prob * 100) + "%</b>. Se ci sta ti costa <b>" + fmt(prezzo) +
+        " €</b> e viene in sessione; se dice no perdi " + STUDIO_FEAT_NO_ENERGIA + " di energia e un'ora.",
+      annulla(){},
+      opts:[{n:"Chiamalo", d:"Si prova", run(){ chiama(); return null; }},
+            {n:"Lascia stare", d:"Torni in cabina", run(){ return null; }}]});
+    return;
+  }
+  chiama();
 }
 
 /* ==================== QUALE PROVINO, QUALE PEZZO ====================
@@ -207,17 +362,27 @@ function studioSegna(campo, seed){
   d[campo] = (d[campo] === seed) ? null : seed;
   SFX.tap(); save(); renderStudio();
 }
-/* Le due letture per `actions.js`: il pezzo scelto se c'è ancora ed è ancora
+/* Le letture per `actions.js`: il pezzo scelto se c'è ancora ed è ancora
    buono, se no `null` e decide lei come ha sempre fatto. */
 function studioSceltoTra(lista, campo){
   const s = (G.studio || {})[campo];
   if(s == null) return null;
   return lista.find(x => x.seed === s) || null;
 }
-function studioDaMixare(){ return studioSceltoTra(unmixed(), "mixa"); }
-/* Punto 9 dello Studio: al Marketing si sceglie **quale** pezzo spingere, e
-   la promo di `actions.js` lascia la spinta su quello. Senza scelta e' l'ultimo
-   uscito, che e' quello che la sezione ha sempre detto di spingere. */
+/* Da mixare e da pubblicare e' il pezzo sul banco: se e' gia' mixato non
+   c'e' niente da mixare, e se sta in cassaforte non esce. Fuori dallo
+   Studio (l'Agenda del telefono) `actions.js` continua a ripiegare sul
+   migliore che ha, come ha sempre fatto. */
+function studioDaMixare(){
+  const s = studioSulBanco();
+  return s && !s.mixed ? s : null;
+}
+/* Punto 9 dello Studio: si sceglie **quale** pezzo spingere, e la promo di
+   `actions.js` lascia la spinta su quello. Senza scelta e' l'ultimo uscito.
+   La scelta si fa **sul telefono**, in LaFamegram (`telPromo()` in
+   telefono.js): la casella e' sempre `G.studio.spingi`, e le tre letture
+   restano qui perche' e' qui che `actions.js` le viene a cercare — lo Studio
+   decide, le azioni fanno, anche quando a decidere e' il telefono. */
 function studioFuori(){
   return (G.songs || []).filter(x => x.released)
     .sort((a, b) => (b.week || 0) - (a.week || 0));
@@ -229,20 +394,36 @@ function studioDaSpingere(){
 }
 /* Punto 8: un pezzo che non e' ancora uscito non si spinge — al massimo se
    ne fa uscire un'anteprima. La stessa casella `spingi` puo' segnare anche
-   un pezzo non uscito (la lista sotto a «Non ancora fuori»): allora al
-   centro c'e' l'anteprima, e la promo torna all'ultimo uscito. */
+   un pezzo non uscito: allora il post e' l'anteprima («quindici secondi»), e
+   la promo torna all'ultimo uscito. */
 function studioDaAnticipare(){
   return studioSceltoTra(studioPronti(), "spingi");
 }
-/* Fuori vanno solo i pezzi che non stanno in cassaforte: un pezzo messo da
-   parte non deve uscire per sbaglio dalla plancia, che è l'unico modo in cui
-   «tenerlo nel cassetto» sarebbe una promessa non mantenuta. Se non hai
-   scelto niente si prende il primo dei liberi — `studioPronti()` sta in
-   `studio-elementi.js` insieme alla cassaforte che lo riempie. */
+/* Il tasto «Fallo sapere» di Fuori: chiude lo Studio e apre LaFamegram sul
+   telefono della plancia. Sotto i 1180px il telefono non c'e' (hub.css lo
+   toglie, per scelta scritta li'): allora la promo parte da qui, sull'ultimo
+   pezzo uscito, che e' quello che il telefono spingerebbe senza una scelta. */
+function studioFalloSapere(){
+  const telefono = typeof telPC === "function" && telPC() && typeof telVaiApp === "function";
+  if(!telefono){ studioAzione("promo"); return; }
+  chiudiStudio();
+  if(typeof renderHub === "function") renderHub();
+  telVaiApp("lafamegram");
+}
+/* la riga sotto al riquadro di Fuori quando c'e' un pezzo sul banco **e** uno
+   gia' fuori: l'ultimo uscito, con la strada per spingerlo */
+function studioFalloSapereRiga(ultimo, da){
+  return '<p class="stazlink"><button type="button" class="stlink" data-lafamegram="1">' +
+    stIco("invio") + 'fallo sapere: «' + studioEsc(ultimo.t) + '» è fuori' +
+    (da === 0 ? ' da questa settimana' : da === 1 ? ' da una settimana' : da ? ' da ' + da + ' settimane' : '') +
+    '</button></p>';
+}
+/* Fuori va il pezzo sul banco — e la lista del banco non ha i pezzi in
+   cassaforte, quindi un pezzo messo da parte non esce per sbaglio dalla
+   plancia, che è l'unico modo in cui «tenerlo nel cassetto» sarebbe una
+   promessa non mantenuta. */
 function studioDaPubblicare(){
-  const liberi = (typeof studioPronti === "function" ? studioPronti() : ready())
-    .slice().sort((a, b) => b.q - a.q);
-  return studioSceltoTra(liberi, "esce") || liberi[0] || null;
+  return studioSulBanco();
 }
 
 /* ==================== IL BEAT SU MISURA (punto 11) ====================
@@ -378,11 +559,15 @@ function studioScegliFonico(id){
    2.» Le prime due ci sono già e le fa `copertine.js`/`covers.js`: qui si
    cambia la copertina di un pezzo **dopo** averlo registrato, che prima non
    si poteva — la sceglievi al volo mentre davi il titolo e poi era quella per
-   sempre. La terza, l'editor a livelli, non c'è: è una pagina a parte. */
+   sempre. La terza, l'editor a livelli, non c'è: è una pagina a parte.
+
+   Dal 14/09/2026 la Cover non ha più una linguetta sua: sta dentro a
+   **Fuori**, sopra al QUANDO — «com'è vestito, e quando esce». È il momento
+   in cui uno guarda la copertina davvero: prima che esca. E pesa: non sulla
+   qualità (una cover non fa un pezzo migliore) ma sugli ascolti della prima
+   settimana (`coverResa()` in covers.js, letta da sim.js) — idea E. */
 function studioPezzoCover(){
-  const l = ready();
-  const s = (G.studio || {}).cover;
-  return l.find(x => x.seed === s) || l[0] || null;
+  return studioDaPubblicare();
 }
 /* Punto 5 del foglio «LUOGO: STUDIO»: «non c'e' un tasto di conferma della
    copertina». Prima «Generane un'altra» e la foto caricata andavano sul pezzo
@@ -394,7 +579,7 @@ function studioCoverProva(s){
   const p = (G.studio || {}).coverProva;
   return (p && s && p.per === s.seed) ? p : null;
 }
-/* Una proposta il cui pezzo non sta piu' nella Cover (e' uscito, o non c'e'
+/* Una proposta il cui pezzo non sta piu' in Fuori (e' uscito, o non c'e'
    piu') non ha nessun tasto che la butti: si butta da sola, se no resta nel
    salvataggio con la foto dentro. La chiama `renderStudio()`. */
 function studioCoverPulisci(){
@@ -448,7 +633,7 @@ function studioCoverConferma(){
      pezzo scelto in Timing «spariva» appena gli cambiavi copertina */
   if(p.seed !== vecchio){
     const d = studioDati();
-    for(const k of ["mixa", "esce", "cover", "spingi"]) if(d[k] === vecchio) d[k] = p.seed;
+    for(const k of ["banco", "spingi"]) if(d[k] === vecchio) d[k] = p.seed;
   }
   studioDati().coverProva = null;
   toast("Copertina " + (s.img ? "tua" : "nuova") + " su «" + s.t + "»", "good", "★", TINTA_SUONO);
@@ -465,7 +650,7 @@ function studioCoverLascia(){
    riempie lo schermo, e sopra ci stanno **tre colonne** — a sinistra chi c'è
    o cosa hai, in mezzo la cosa che stai facendo, a destra quello che ti
    aspetta. Ogni sezione riempie le tre colonne e basta: il telaio, i colori e
-   i tasti sono gli stessi per tutte e otto, e stanno tutti in `studio.css`.
+   i tasti sono gli stessi per tutte e cinque, e stanno tutti in `studio.css`.
 
    Una colonna laterale che torna vuota sparisce da sola (`.stcol:empty`):
    non tutte le sezioni hanno tre cose da dire, e un pannello vuoto è peggio
@@ -515,6 +700,12 @@ function stIco(nome, cls){
     (cls ? ' class="' + cls + '"' : '') + ' aria-hidden="true"><path d="' + d + '"/></svg>';
 }
 
+/* Una riga in fondo a un pannello gia' chiuso: si infila prima della
+   chiusura, cosi' resta dentro al riquadro e non sotto. */
+function stCoda(pannello, riga){
+  const i = pannello.lastIndexOf("</section>");
+  return i < 0 ? pannello + riga : pannello.slice(0, i) + riga + pannello.slice(i);
+}
 /* Un pannello: il mattone di tutte e tre le colonne. */
 function stPan(titolo, corpo, icona, piede){
   return '<section class="stpan">' +
@@ -620,8 +811,8 @@ function stCover(s){
    Il pannello centrale ha sempre la stessa forma, che è quella dei
    riferimenti: un **capo** breve in cima («MIXI: "Sottopasso" · q71»), la
    spiegazione, il **riquadro del risultato** («→ q78 · carattere: SECCO») e
-   in fondo i tasti. Il titolone grosso lo usano solo Copertina e Fuori,
-   perché lì il pezzo ha una faccia e un nome e sono loro la schermata. */
+   in fondo i tasti. Il titolone grosso lo usa solo Fuori, perché lì il
+   pezzo ha una faccia e un nome e sono loro la schermata. */
 
 /* ---- BEAT — «da chi te lo fa» ---- */
 function studioSezBeat(){
@@ -788,6 +979,11 @@ function studioSezCabina(){
   const aiuto = studioAiuto(fon), aiutoFt = studioAiutoFeat(ft);
   const q = (b && bt) ? Math.round(songQ(b, bt)) + aiuto + aiutoFt : null;
   const gente = studioGente("fonico");
+  /* dopo l'uscita si torna qui, col banco vuoto: l'ultimo pezzo fuori si
+     fa sapere sul telefono, e la strada sta in fondo al pannello */
+  const ultimo = studioSulBanco() ? null : studioFuori()[0] || null;
+  const da = ultimo && typeof totalWeeks === "function"
+    ? Math.max(0, totalWeeks() - (ultimo.week || 0)) : null;
 
   const sx = stPan("Dietro al vetro",
     gente.map(p => stScelta({
@@ -804,7 +1000,11 @@ function studioSezCabina(){
     stScelta({attr:' data-fonico=""', on:!fon, mini:stSagoma(),
       n:"da solo", d:"quello che sai fare tu",
       v:"+0", vCls:"calmo"}) +
-    (gente.length ? "" : studioVuoto("Non conosci ancora nessun fonico. <b>Alla Sala</b> ce ne gira più di uno.")));
+    (gente.length ? "" : studioVuoto("Non conosci ancora nessun fonico. <b>Alla Sala</b> ce ne gira più di uno.")) +
+    /* «CON CHI»: il feat, sotto al fonico — stesse caselle, stesso «da solo».
+       Due porte (idea D3): chi conosci accetta sempre e non costa niente;
+       i rapper della classifica si pagano e possono dire di no. */
+    studioCabinaConChi(ft));
 
   let mid;
   if(b && bt){
@@ -856,6 +1056,7 @@ function studioSezCabina(){
       '<p class="stnota">Hai la strofa, non su cosa metterla. Te lo fai fare al <b>Beat</b>, ' +
         'da uno che conosci, oppure lo compri allo Shop.</p>');
   }
+  if(ultimo) mid = stCoda(mid, studioFalloSapereRiga(ultimo, da));
 
   /* «CHE COSA INCIDI»: le strofe sotto al loro sottotitolo, i beat sotto al
      loro, ognuno con la sua miniatura e il suo pallino — e si sceglie, come
@@ -864,6 +1065,7 @@ function studioSezCabina(){
   const strofe = (G.bars || []).slice().sort((x, y) => y.q - x.q);
   const cartella = (G.beats || []).slice().sort((x, y) => y.q - x.q);
   const dx = stPan("Che cosa incidi",
+    studioSulBancoRighe() +
     stSotto("Strofa") +
     (strofe.length
       ? strofe.map(x => stScelta({
@@ -887,8 +1089,8 @@ function studioSezCabina(){
 
 /* ---- IL BANCO — dove il provino diventa pezzo ---- */
 function studioSezBanco(){
-  const da = unmixed().sort((a, b) => b.q - a.q);
-  const scelto = studioDaMixare() || da[0];
+  const banco = studioSulBanco();
+  const scelto = studioDaMixare();
   const fon = studioFonico();
   const g = mixGain();
 
@@ -928,206 +1130,136 @@ function studioSezBanco(){
       stAzioni(
         stPrimo(' data-ascolta="1"', "Ascolta", "play"),
         stSecondo(' data-az="mixa"', "Chiudi il mix", "spunta")));
+  } else if(banco){
+    /* il pezzo sul banco e' gia' mixato: qui non c'e' piu' niente da fare,
+       si passa all'Uscita — o si rimette sul banco un altro provino */
+    mid = stPan("",
+      stCapo("Mixi", banco.t, "q" + banco.q) +
+      '<p class="stnota">«<b>' + studioEsc(banco.t) + '</b>» è già mixato' +
+        (banco.car ? ' — ' + studioEsc(banco.car.toLowerCase()) : '') +
+        '. Adesso si veste e si manda fuori: è nell\'<b>Uscita</b>. Se hai un altro provino, ' +
+        'lo rimetti sul banco qui a destra.</p>');
   } else {
     mid = stPan("",
       stCapo("Mixi", "niente, il banco è spento", "") +
       '<p class="stnota">Prima si registra. Il provino arriva <b>dalla Cabina</b>.</p>');
   }
 
-  const dx = stPan("Da mixare",
-    da.length
-      ? da.map(s => stScelta({
-          attr:stSeme("mixa", s), on:scelto === s,
-          mini:stCover(s), n:s.t, d:"q" + s.q + " · grezzo",
-          v:"→ " + clamp(s.q + g, 5, 100)
-        })).join("")
-      : studioVuoto("Nessun provino."),
-    "cartella", da.length
-      ? (da.length + (da.length === 1 ? " provino da mixare" : " provini da mixare"))
-      : "");
+  const dx = stPan("", studioSulBancoRighe(g), "cartella");
 
   return {sx, mid, dx};
 }
 
-/* ---- LA COPERTINA — la faccia del pezzo ---- */
-function studioSezCover(){
-  const pronti = ready();
-  const s = studioPezzoCover();
-  const p = studioCoverProva(s);
-
-  const sx = stPan("I tuoi pezzi",
-    pronti.length
-      ? pronti.map(x => stScelta({
-          attr:stSeme("cover", x), on:s === x,
-          mini:stCover(x), n:x.t,
-          d:"q" + x.q + (x.img ? " · copertina tua" : " · generata") +
-            (studioCoverProva(x) ? ' · <span class="oro">proposta</span>' : "")
-        })).join("")
-      : studioVuoto("Non hai pezzi a cui cambiare la copertina."),
-    "cartella");
-
-  /* con una proposta in piedi, al centro sta **lei**, grande, e quella di
-     adesso le sta accanto piccola: si confrontano, e si decide */
-  const proposta = p ? {seed:p.seed, t:s.t, img:p.img} : null;
-  const mid = s
-    ? stPan("",
-        '<div class="stfianco">' +
-          '<span class="stcopertina">' + stCover(proposta || s) + '</span>' +
-          (p ? '<span class="stcopertina stprima" title="Quella di adesso">' + stCover(s) +
-               '<i>adesso</i></span>' : "") +
-          '<div>' +
-            stTitolo(s.t, 'q' + s.q + ' · ' + (s.mixed ? "mixato" : "grezzo")) +
-            '<p class="stnota">Sulla qualità <b>pesa poco</b>, su chi ti clicca pesa tutto: ' +
-              'è la prima cosa che si vede di un pezzo, spesso l\'unica.</p>' +
-            (p
-              ? stEsito((p.img ? "la <b>tua foto</b>" : "una copertina <b>nuova</b>") +
-                  " — non è ancora sul pezzo") +
-                stAzioni(
-                  stPrimo(' data-cov="conferma"', "Conferma la copertina", "spunta"),
-                  p.img ? "" : stSecondo(' data-cov="altra"', "Generane un'altra", "rinnova"),
-                  stSecondo(' data-cov="lascia"', "Lascia com'era", "rinnova"))
-              : stAzioni(
-                  stPrimo(' data-cov="carica"', "Carica una foto", "foto"),
-                  s.img
-                    ? stSecondo(' data-cov="togli"', "Togli la foto", "rinnova")
-                    : stSecondo(' data-cov="altra"', "Generane un'altra", "rinnova"))) +
-          '</div>' +
-        '</div>' +
-        (p ? "" : stEsito('JPG o PNG · la ritaglio quadrata io a ' + stNum("360×360"))) +
-        '<p class="stnota" style="margin:12px 0 0">La terza strada del punto 4 — costruirtela a ' +
-          'livelli, stile emblema di Black Ops 2 — non c\'è ancora: è una pagina a parte, ' +
-          'non un bottone.</p>')
-    : stPan("",
-        stCapo("Copertina", "nessun pezzo da vestire", "") +
-        '<p class="stnota">La copertina si mette a un pezzo registrato. Si comincia ' +
-          'dalla <b>Cabina</b>.</p>');
-
-  return {sx, mid, dx:""};
+/* ---- CON CHI — il feat, dentro alla Cabina ---- */
+/* Il blocco sotto al fonico. Prima era una linguetta a sé («Feat»), chiusa
+   finché non c'era un pezzo e vuota finché non conoscevi un rapper: una sala
+   d'attesa. Qui è una lista sola, con «da solo» in cima come per il fonico,
+   chi conosci subito sotto, e in fondo la classifica — che non è mai vuota,
+   quindi la schermata vuota non esiste più. */
+/* «al 40%», «all'8%»: l'articolo segue il numero */
+function studioPercento(p){
+  const n = Math.round(p * 100);
+  return (n === 8 || n === 11 || n >= 80 && n < 90 ? "all'" : "al ") + n + "%";
+}
+function studioCabinaConChi(ft){
+  const noti = studioGente("rapper");
+  /* tutta la classifica, dal piu' grosso: i primi sei dicono quasi sempre
+     no, e quelli della tua misura stanno in fondo — la colonna scorre */
+  const rivali = studioRivaliChiamabili();
+  return stSotto("Con chi") +
+    stScelta({attr:' data-feat=""', on:!ft, mini:stSagoma(),
+      n:"da solo", d:"il pezzo è tuo e basta",
+      v:"+0", vCls:"calmo"}) +
+    /* solo il rapporto sotto al nome, come nel Beat: la colonna e' da 300
+       e con «fama 40 · viene gratis» la riga si troncava a meta' parola.
+       Che venga gratis lo dice la nota in fondo. */
+    noti.map(p => stScelta({
+      attr:' data-feat="' + studioEsc(p.id) + '"', on:ft === p,
+      mini:faccia(p, 40), n:p.n,
+      d:relNome(p),
+      v:studioAiutoFeat(p) ? "+" + studioAiutoFeat(p) + " qual." : "—",
+      vCls:studioAiutoFeat(p) ? "" : "calmo"
+    })).join("") +
+    (rivali.length
+      ? stSotto("Dalla classifica") +
+        rivali.map(r => {
+          const fama = studioFamaRivale(r);
+          const stima = Math.round(1.2 + fama * 0.12);   /* da «contatto», com'è se accetta */
+          return stScelta({
+            attr:' data-rivale="' + studioEsc(r.n) + '"',
+            mini:faccia(r, 40), n:r.n,
+            d:fmt(studioFeatPrezzo(r)) + " € · sì " + studioPercento(studioFeatProbabilita(r)),
+            v:"+" + stima + " qual.", vCls:"calmo"
+          });
+        }).join("")
+      : "") +
+    (ft
+      ? '<p class="stnota"><b>' + studioEsc(ft.n) + '</b> è in sessione: vale sulla prossima traccia, ' +
+        'poi il posto torna libero.</p>'
+      : '<p class="stnota">Un feat non è obbligatorio. Chi conosci ci sta sempre; a uno della ' +
+        'classifica lo chiedi, e può dirti di no.</p>');
 }
 
-/* ---- IL FEAT — con chi lo fai ---- */
-function studioSezFeat(){
-  const gente = studioGente("rapper");
-  const ft = studioFeat();
-
-  const sx = stPan("Chi può entrarci",
-    gente.length
-      ? gente.map(p => stScelta({
-          attr:' data-feat="' + studioEsc(p.id) + '"', on:ft === p,
-          mini:faccia(p, 40), n:p.n,
-          d:relNome(p) + " · fama " + p.fama,
-          v:studioAiutoFeat(p) ? "+" + studioAiutoFeat(p) + " qual." : "—",
-          vCls:studioAiutoFeat(p) ? "" : "calmo"
-        })).join("")
-      : studioVuoto("Non conosci ancora nessun altro rapper. Si incontrano <b>alla Sala</b> — " +
-          "e non tutti hanno voglia di dividere un pezzo."));
-
-  const mid = ft
-    ? stPan("",
-        stCapo("In sessione", ft.n, "+" + studioAiutoFeat(ft)) +
-        '<p class="stnota">Un feat non è obbligatorio. Ma se il pezzo lo fate <b>insieme, in ' +
-          'sessione</b>, si sente — quanto vale dipende da quanto è grosso lui e da quanto vi ' +
-          'conoscete.</p>' +
-        stEsito(stFreccia() + ' ' + stOro("+" + studioAiutoFeat(ft)) +
-          ' sulla prossima traccia · poi il posto torna libero') +
-        stAzioni(stSecondo(' data-feat="' + studioEsc(ft.id) + '"', "Lascia perdere", "rinnova")))
-    : stPan("",
-        stCapo("In sessione", "nessuno", "") +
-        '<p class="stnota">Va benissimo così: il feat è una scelta, non un passaggio. ' +
-          'Se ne chiami uno, la traccia che registri dopo vale di più.</p>');
-
-  return {sx, mid, dx:""};
+/* ---- la copertina dentro a Fuori ----
+   Le tre mosse di prima (foto tua, generane un'altra, togli la foto) in una
+   riga di link sotto al titolo; la conferma sta nei tasti grossi. Con una
+   proposta in piedi la riga dice solo cos'e' la proposta. */
+function studioCoverTasti(s, p){
+  if(p)
+    return '<p class="stnota">' + (p.img ? 'La <b>tua foto</b>' : 'Una copertina <b>nuova</b>') +
+      ' — non è ancora sul pezzo. Attira ' + stOro("×" + studioResaTesto({seed:p.seed, img:p.img})) +
+      ' contro ' + stNum("×" + studioResaTesto(s)) + ' di quella di adesso.</p>';
+  return '<p class="stazlink">' +
+    '<button type="button" class="stlink" data-cov="carica">' + stIco("foto") + 'carica una foto</button>' +
+    (s.img
+      ? '<button type="button" class="stlink" data-cov="togli">' + stIco("rinnova") + 'togli la foto</button>'
+      : '<button type="button" class="stlink" data-cov="altra">' + stIco("rinnova") + 'generane un\'altra</button>') +
+    '</p>';
+}
+/* «×1,08», con la virgola, come si legge da noi */
+function studioResaTesto(s){
+  const r = typeof coverResa === "function" ? coverResa(s) : 1;
+  return r.toFixed(2).replace(".", ",");
 }
 
-/* ---- IL MARKETING — farlo sapere ---- */
-function studioSezMarketing(){
-  const fuori = studioFuori();
-  const ultimo = studioDaSpingere();
-  const ant = studioDaAnticipare();
-  const pronti = studioPronti().sort((a, b) => b.q - a.q);
-  /* gli ultimi sei, piu' quello scelto se e' piu' vecchio: se no si spinge
-     un pezzo che nell'elenco non c'e', e per cambiarlo non c'e' una riga
-     da ri-toccare */
-  const elenco = fuori.slice(0, 6);
-  if(ultimo && elenco.indexOf(ultimo) < 0) elenco.push(ultimo);
+/* Il riquadro dei numeri (idea E del brainstorming, e il «manca ancora»
+   della roadmap): il foglio dice «Beat 82 / Testo 76 / Mix 68 / Feature 85 /
+   Marketing 53 → QUALITÀ tot», ma una cover non fa un pezzo migliore, fa
+   cliccare di più, e il marketing idem. Quindi due righe:
 
-  /* Punto 9: le righe erano mute come al banco del Mix — senza `attr`
-     `stScelta` non fa un bottone — e il pezzo acceso era sempre il primo.
-     Adesso si sceglie, e la scelta e' quella che la promo spinge davvero.
-     Punto 8: sotto ci sono i pezzi non ancora usciti, per l'anteprima. */
-  const sx = stPan("Cosa spingi",
-    (fuori.length
-      ? elenco.map(x => stScelta({
-          attr:stSeme("spingi", x),
-          on:!ant && x === ultimo, mini:stCover(x), n:x.t,
-          d:"q" + x.q + " · " + fmt(x.streams || 0) + " stream" +
-            (x.spinta > 1 ? ' · <span class="oro">in spinta</span>' : "")
-        })).join("")
-      : studioVuoto("Non hai ancora fatto uscire niente.")) +
-    (pronti.length
-      ? stSotto("Non ancora fuori") +
-        pronti.map(x => stScelta({
-          attr:stSeme("spingi", x),
-          on:x === ant, mini:stCover(x), n:x.t,
-          d:"q" + x.q + " · solo anteprima" +
-            (x.anteprime ? ' · <span class="oro">' + x.anteprime + (x.anteprime === 1 ? " anteprima" : " anteprime") + '</span>' : "")
-        })).join("")
-      : ""),
-    "cartella");
+     QUALITÀ  = Beat · Testo · Fonico · Feat · Mix          → q
+     ASCOLTI  = copertina · quando · anteprime · hype/fan   → chi lo sente
 
-  /* Il riferimento `studio_promo_su_lafamegram` ha in cima «TELEFONO ·
-     LAFAMEGRAM», non «STUDIO»: quella schermata — il telefono in mano, i tre
-     tipi di post, «CHE POST FAI?» — è una pagina del telefono, e sta a
-     `telefono.js`. Quello che si prende da lì e vale anche qui è il riquadro
-     giallo della saturazione: postare si può sempre, ma dalla seconda volta
-     in un giorno rende meno, e prima non lo diceva nessuno. */
-  const oggi = typeof adfOggi === "function" ? adfOggi("promo") : 0;
-  const mult = typeof promoDailyMult === "function" ? promoDailyMult() : 1;
-
-  /* Punto 8: scelto un pezzo non ancora fuori, al centro c'e' l'anteprima
-     e non la promo — quella e' per i pezzi usciti, e basta. */
-  const fatte = ant ? (ant.anteprime || 0) : 0;
-  const mid = ant
-    ? stPan("",
-        stCapo("Anteprima", ant.t, "q" + ant.q) +
-        '<p class="stnota">Il pezzo <b>non è fuori</b>, e finché non esce non si spinge: al massimo ' +
-          'gliene fai sentire quindici secondi. Ogni anteprima dà un po\' di hype, e quando il ' +
-          'pezzo esce parte più forte — ma alla terza la gente l\'ha già sentito.</p>' +
-        stEsito('anteprime fatte: ' + stNum(fatte + "/" + ADF_ANTEPRIME_MAX) +
-          ' · all\'uscita parte al ' +
-          stNum(Math.round(100 * (1 + Math.min(ADF_ANTEPRIME_MAX, fatte + 1) * ADF_ANTEPRIMA_SPINTA)) + "%")) +
-        stAzioni(stPrimo(' data-az="anteprima"', "Fai uscire una preview", "invio",
-          fatte >= ADF_ANTEPRIME_MAX)) +
-        (fatte >= ADF_ANTEPRIME_MAX
-          ? '<p class="stperche">L\'hanno già sentito tre volte: adesso deve uscire. Si passa da Timing.</p>'
-          : ""))
-    : stPan("",
-        stCapo("Spingi", ultimo ? ultimo.t : "niente, non hai pezzi fuori",
-          ultimo ? "q" + ultimo.q : "") +
-        '<p class="stnota">Il pezzo è uscito: adesso qualcuno lo deve sapere. Questa è la promo che ' +
-          'parte <b>da qui, dallo studio</b> — quello che si fa col telefono in mano appena finita ' +
-          'la sessione.</p>' +
-        (oggi > 0 && mult < 1
-          ? stAvviso("Hai già postato <b>" + oggi + (oggi === 1 ? " volta" : " volte") +
-              "</b> oggi: la gente comincia a scorrere oltre, e quello che spingi rende il <b>" +
-              Math.round(mult * 100) + "%</b>.")
-          : "") +
-        stEsito('le altre due strade — l\'app <b>Discografia</b> e il giro dei giornalisti — ' +
-          'non sono ancora collegate qui') +
-        (ultimo
-          ? stAzioni(stPrimo(' data-az="promo"', "Posta", "invio"))
-          : stAzioni(stPrimo(' data-az="promo"', "Posta", "invio", true)) +
-            '<p class="stperche">Prima esce un pezzo, poi lo si spinge' +
-              (pronti.length ? ' — o gliene fai sentire un\'anteprima, qui sotto' : "") +
-              '. Si passa da Fuori.</p>'));
-
-  return {sx, mid, dx:""};
+   Le parti le scrive `registra` in actions.js (`s.parti`), il mix le
+   completa; un pezzo di un salvataggio vecchio non ce le ha, e allora la
+   prima riga dice solo la q. */
+function studioNumeri(s, qFinale, quando, proposta){
+  const pt = s.parti || null;
+  const voce = (n, v) => '<span class="stvoce">' + studioEsc(n) + ' ' + stNum(v) + '</span>';
+  const qualita = pt
+    ? voce("Beat", pt.beat) + voce("Testo", pt.testo) +
+      (pt.fonico ? voce("Fonico", "+" + pt.fonico) : "") +
+      (pt.feat ? voce(s.feat ? "con " + s.feat : "Feat", "+" + pt.feat) : "") +
+      (pt.mix != null ? voce("Mix", "+" + pt.mix) : (s.mixed ? "" : voce("Mix", "−8 se esce così")))
+    : voce("Qualità", "q" + s.q);
+  const fatte = s.anteprime || 0;
+  const resa = proposta ? {seed:proposta.seed, img:proposta.img} : s;
+  const ascolti =
+    voce("Copertina", "×" + studioResaTesto(resa)) +
+    (quando === "venerdi" ? voce("Venerdì", "+" + STUDIO_VENERDI_HYPE + " hype") : "") +
+    (fatte ? voce("Anteprime", "×" + (1 + Math.min(ADF_ANTEPRIME_MAX, fatte) * ADF_ANTEPRIMA_SPINTA).toFixed(2).replace(".", ",")) : "") +
+    (s.featFama ? voce("La gente di " + s.feat, "+" + (typeof featHypeUscita === "function" ? featHypeUscita(s) : 0) + " hype") : "") +
+    voce("Hype", Math.round(G.hype)) + voce("Fan", fmt(G.fans));
+  return stEsito(
+    '<div class="stnumeri">' +
+      '<div><b>Qualità</b>' + qualita + stFreccia() + ' ' + stOro("q" + qFinale) + '</div>' +
+      '<div><b>Ascolti</b>' + ascolti + '</div>' +
+    '</div>');
 }
 
 /* ---- FUORI — quale esce, e quando ---- */
 function studioSezFuori(){
-  const pronti = studioPronti().sort((a, b) => b.q - a.q);
-  const s = studioDaPubblicare() || pronti[0];
+  const s = studioDaPubblicare();
   const usciti = (G.songs || []).filter(x => x.released);
   const ultimo = usciti.slice().sort((a, b) => (b.week || 0) - (a.week || 0))[0];
   const da = ultimo && typeof totalWeeks === "function"
@@ -1153,17 +1285,23 @@ function studioSezFuori(){
   let mid;
   if(s){
     const st = studioStreamStima(s);
+    /* la copertina: con una proposta in piedi al centro sta **lei**, grande,
+       e quella di adesso le sta accanto piccola — si confrontano, e si
+       decide. Finche' la proposta e' in piedi il pezzo non esce: prima si
+       sceglie la faccia, poi il quando. */
+    const p = studioCoverProva(s);
+    const proposta = p ? {seed:p.seed, t:s.t, img:p.img} : null;
     mid = stPan("",
       '<div class="stfianco">' +
-        '<span class="stcopertina">' + stCover(s) + '</span>' +
+        '<span class="stcopertina">' + stCover(proposta || s) + '</span>' +
+        (p ? '<span class="stcopertina stprima" title="Quella di adesso">' + stCover(s) +
+             '<i>adesso</i></span>' : "") +
         '<div>' +
           stTitolo(s.t, 'q' + qFinale + ' · ' + (s.mixed ? "mixato" : "<b>non mixato</b>") +
-            (s.car ? ' · ' + studioEsc(s.car.toLowerCase()) : "")) +
-          /* «cambia copertina», come nel riferimento: porta alla sezione
-             della copertina con questo pezzo già scelto */
-          '<p class="stazlink"><button type="button" class="stlink" data-vesti="' + studioPezzoSeme(s) + '">' +
-            stIco("foto") + 'cambia copertina</button></p>' +
-          '<p class="stnota">' +
+            (s.car ? ' · ' + studioEsc(s.car.toLowerCase()) : "") +
+            (s.feat ? ' · con ' + studioEsc(s.feat) : "")) +
+          studioCoverTasti(s, p) +
+          (p ? "" : '<p class="stnota">' +
             (quando === "venerdi"
               ? (gVen === 0
                   ? 'Oggi <b>è venerdì</b>: esce stanotte, nel giorno che rende di più. '
@@ -1178,48 +1316,69 @@ function studioSezFuori(){
                 : da === 1
                   ? 'È passata <b>una settimana</b> dall\'ultima uscita.'
                   : 'Sono passate <b>' + da + ' settimane</b> dall\'ultima uscita.') +
-          '</p>' +
+          '</p>') +
           /* la stima degli stream della prima settimana: non è un numero di
              riempimento, è `songWeekly()` di sim.js presa ai due capi dei
              suoi tiri di dado */
-          (st && quando !== "cassetto"
+          (st && quando !== "cassetto" && !p
             ? '<p class="ststream">' + stIco("barre") + '~ <b>' + fmt(st.min) + ' – ' +
               fmt(st.max) + '</b> stream</p>'
             : "") +
-          stAzioni(stPrimo(' data-manda="1"',
-            quando === "cassetto" ? "Tienilo da parte" : "Mandalo fuori",
-            quando === "cassetto" ? "cartella" : "invio")) +
+          (p
+            ? stAzioni(
+                stPrimo(' data-cov="conferma"', "Conferma la copertina", "spunta"),
+                p.img ? "" : stSecondo(' data-cov="altra"', "Generane un'altra", "rinnova"),
+                stSecondo(' data-cov="lascia"', "Lascia com'era", "rinnova"))
+            : stAzioni(stPrimo(' data-manda="1"',
+                quando === "cassetto" ? "Tienilo da parte" : "Mandalo fuori",
+                quando === "cassetto" ? "cartella" : "invio"))) +
         '</div>' +
       '</div>' +
-      stEsito(stFreccia() + ' esce con ' + stOro("q" + qFinale) + ' · ' +
-        (quando === "venerdi"
-          ? 'venerdì vale ' + stNum("+" + STUDIO_VENERDI_HYPE) + ' hype · '
-          : '') +
-        (s.mixed
-          ? 'da qui in poi corre da solo'
-          : 'non è mixato, ci perde ' + stNum("8 punti"))));
+      /* i numeri per elemento del foglio (idea E): da cosa e' fatta la
+         qualita', e cosa lo fa ascoltare — due righe, perche' sono due cose */
+      studioNumeri(s, qFinale, quando, p) +
+      /* e l'ultimo uscito, intanto, va fatto sapere: il Marketing sta sul
+         telefono, e da qui ci si arriva con una riga */
+      (ultimo ? studioFalloSapereRiga(ultimo, da) : ""));
   } else {
+    /* Con F2 qui non si arriva: senza un pezzo sul banco l'Uscita e' chiusa
+       e `renderStudio()` porta in Cabina, dove sta anche la strada per
+       «fallo sapere». Il ripiego resta per un disegno chiamato a mano. */
     mid = stPan("",
-      stCapo("Fuori", tenuti.length ? "tutto in cassaforte" : "niente di pronto", "") +
+      stCapo("Fuori", tenuti.length ? "tutto in cassaforte" : "niente sul banco", "") +
       '<p class="stnota">' +
         (tenuti.length
           ? 'Quello che hai lo stai tenendo da parte. Ne <b>ritiri uno</b> dalla cassaforte, ' +
-            'qui a destra, e torna in coda.'
+            'qui a destra, e torna sul banco.'
           : 'Si comincia dal <b>Beat</b>, poi il <b>Testo</b>, poi la <b>Cabina</b>.') +
-      '</p>');
+      '</p>' +
+      (ultimo ? stAzioni(stPrimo(' data-lafamegram="1"', "Fallo sapere su LaFamegram", "invio")) : ""));
   }
 
-  const dx = stPan("Pronti",
-    (pronti.length
-      ? pronti.map(x => stScelta({
-          attr:stSeme("esce", x), on:s === x,
+  const dx = stPan("", studioSulBancoRighe(), "cartella");
+
+  return {sx, mid, dx};
+}
+
+/* «SUL BANCO» e «IN CASSAFORTE»: la stessa colonna in Cabina, Mix e Uscita.
+   Una riga per pezzo inciso e non uscito, quello sul banco acceso; sotto, i
+   pezzi tenuti da parte, che da qui si ritirano (e tornano sul banco). Con
+   `g` (il guadagno del mix) accanto a ogni provino grezzo c'e' quanto
+   diventerebbe. */
+function studioSulBancoRighe(g){
+  const banco = studioSulBanco();
+  const lista = studioListaBanco();
+  const tenuti = studioTenuti();
+  return stSotto("Sul banco") +
+    (lista.length
+      ? lista.map(x => stScelta({
+          attr:stSeme("banco", x), on:banco === x,
           mini:stCover(x), n:x.t,
-          d:"q" + x.q + (x.mixed
-            ? " · mixato"
-            : ' · grezzo · <span class="ros">−8 se esce così</span>') +
-            (x.esce != null ? ' · <span class="oro">in coda</span>' : "")
+          d:"q" + x.q + (x.mixed ? " · mixato" : " · grezzo") +
+            (x.esce != null ? ' · <span class="oro">in coda per venerdì</span>' : ""),
+          v:(g != null && !x.mixed) ? "→ " + clamp(x.q + g, 5, 100) : ""
         })).join("")
-      : studioVuoto("Niente in coda.")) +
+      : studioVuoto("Niente sul banco: si incide in <b>Cabina</b>.")) +
     /* «IN CASSAFORTE»: il secondo blocco della colonna di destra nel
        riferimento. Un pezzo tenuto da parte non sparisce e non esce per
        sbaglio — si ritira da qui, ed è la seconda metà della scelta. */
@@ -1230,12 +1389,11 @@ function studioSezFuori(){
           mini:stCover(x), n:x.t, d:"q" + x.q + " · tenuto",
           v:"ritira", vCls:"calmo"
         })).join("")
-      : ""),
-    "cartella", pronti.length
-      ? (pronti.length + (pronti.length === 1 ? " pezzo pronto" : " pezzi pronti"))
+      : "") +
+    (lista.length
+      ? '<p class="stpiede">' + lista.length + (lista.length === 1 ? " pezzo" : " pezzi") +
+        ' inciso' + (lista.length === 1 ? "" : "i") + ' e non ancora fuori</p>'
       : "");
-
-  return {sx, mid, dx};
 }
 
 /* ==================== LA PAGINA ==================== */
@@ -1287,16 +1445,22 @@ function renderStudio(){
   studioCoverPulisci();
   let sez = STUDIO_SEZIONI.find(x => x.id === STUDIO_SEZ) || STUDIO_SEZIONI[0];
   /* una sezione chiusa non si disegna nemmeno arrivandoci da fuori (un
-     cartello della mappa, un salvataggio): si torna al Beat */
-  if(!studioSezAperta(sez)){ sez = STUDIO_SEZIONI[0]; STUDIO_SEZ = sez.id; }
+     cartello della mappa, un salvataggio): si torna al Beat — o in Cabina,
+     se un pezzo e' gia' uscito: e' il banco che si e' svuotato, e la Cabina
+     e' dove lo si riempie (e da dove si va a farlo sapere) */
+  if(!studioSezAperta(sez)){
+    sez = STUDIO_SEZIONI.find(x => x.id === (studioFuori().length ? "cabina" : "beat")) || STUDIO_SEZIONI[0];
+    STUDIO_SEZ = sez.id;
+  }
 
   const tabs = $("st-tabs");
   tabs.innerHTML = STUDIO_SEZIONI.map(x =>
     '<button class="sttab' + (x.id === sez.id ? " on" : "") + (studioSezAperta(x) ? "" : " chiusa") +
     '" data-sez="' + x.id + '"' + (studioSezAperta(x) ? "" : ' aria-disabled="true"') + '>' +
     x.n + '</button>').join("");
-  /* Otto linguette non ci stanno in riga su un telefono: la striscia scorre.
-     Due cose, se no le ultime due sezioni sono una caccia al tesoro — che è
+  /* Cinque linguette a 390px ci stanno; sotto, o con una lingua piu' lunga,
+     la striscia scorre. Due cose, se no le ultime sezioni sono una caccia al
+     tesoro — che è
      l'avvertimento scritto nel progetto delle pagine. Primo: quella accesa si
      porta sempre in vista, così sai dove sei anche se ci sei arrivato da
      un'altra parte. Secondo: quando c'è altro a destra si accende una
@@ -1324,9 +1488,6 @@ function renderStudio(){
      sez.id === "testo"  ? studioSezTesto() :
      sez.id === "cabina" ? studioSezCabina() :
      sez.id === "banco"  ? studioSezBanco() :
-     sez.id === "cover"  ? studioSezCover() :
-     sez.id === "feat"   ? studioSezFeat() :
-     sez.id === "promo"  ? studioSezMarketing() :
      studioSezFuori());
 
   $("st-sx").innerHTML = parti.sx || "";
@@ -1367,10 +1528,12 @@ if($("studio")){
     const t = e.target.closest("[data-sez]");
     if(t){
       const x = STUDIO_SEZIONI.find(y => y.id === t.dataset.sez);
-      /* punto 10: chiusa finche' non c'e' il primo pezzo — lo dice, non tace */
+      /* punto 10: chiusa finche' non c'e' un pezzo sul banco — lo dice, non tace */
       if(x && !studioSezAperta(x)){
         SFX.fail();
-        toast("Prima il pezzo: <b>Beat, Testo, Cabina</b>. Poi il resto.", "bad", "!", ["#3A3F49", "#22262E"]);
+        toast(studioListaBanco().length
+          ? "Niente sul banco: <b>rimettici un pezzo</b>, dalla Cabina."
+          : "Prima il pezzo: <b>Beat, Testo, Cabina</b>. Poi il resto.", "bad", "!", ["#3A3F49", "#22262E"]);
         return;
       }
       STUDIO_SEZ = t.dataset.sez; STUDIO_DIARIO = 0; SFX.tap(); renderStudio(); return;
@@ -1383,15 +1546,13 @@ if($("studio")){
     /* `data-fonico=""` e' «da solo»: non e' un id, e' l'assenza di uno. */
     if(f){ studioScegliFonico(f.dataset.fonico || null); return; }
     const ft = e.target.closest("[data-feat]");
-    if(ft){ studioScegliFeat(ft.dataset.feat); return; }
-    const m = e.target.closest("[data-mixa]");
-    if(m){ studioSegna("mixa", Number(m.dataset.mixa)); return; }
-    const u = e.target.closest("[data-esce]");
-    if(u){ studioSegna("esce", Number(u.dataset.esce)); return; }
-    const sp = e.target.closest("[data-spingi]");
-    if(sp){ studioSegna("spingi", Number(sp.dataset.spingi)); return; }
-    const c = e.target.closest("[data-cover]");
-    if(c){ studioSegna("cover", Number(c.dataset.cover)); return; }
+    /* `data-feat=""` e' «da solo», come per il fonico */
+    if(ft){ studioScegliFeat(ft.dataset.feat || null); return; }
+    const rv = e.target.closest("[data-rivale]");
+    if(rv){ studioChiamaRivale(rv.dataset.rivale); return; }
+    const bn = e.target.closest("[data-banco]");
+    if(bn){ studioMettiSulBanco(Number(bn.dataset.banco)); SFX.tap(); save(); renderStudio(); return; }
+    if(e.target.closest("[data-lafamegram]")){ SFX.tap(); studioFalloSapere(); return; }
     const cv = e.target.closest("[data-cov]");
     if(cv){
       if(cv.dataset.cov === "altra") studioCoverAltra();

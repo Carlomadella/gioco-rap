@@ -18,6 +18,10 @@ function pushLog(text, cls){
   if(G.log.length > 80) G.log.length = 80;
 }
 
+const SIM_FEAT_ASCOLTI = 4;
+function featAscolti(s){
+  return (s && s.featFama || 0) * SIM_FEAT_ASCOLTI * (0.5 + (s.q || 0)/170);
+}
 function songWeekly(s){
   const age = totalWeeks() - s.week;
   const curve = age <= 1 ? 1 : Math.exp(-age/7.5);
@@ -25,13 +29,21 @@ function songWeekly(s){
   // chi ti segue già lo ascolta; gli altri ti scoprono solo se il pezzo è forte e c'è hype
   const fanPull = G.fans * rnd(0.26, 0.5) * (0.5 + s.q/170);
   const scoperta = Math.pow(Math.max(0, s.q - 26)/74, 2.6) * (35 + G.hype*13) * push;
-  let out = (fanPull + scoperta) * curve * rnd(0.8, 1.25);
+  /* il feat (brainstorming del 14/09, idea D): la sua gente ascolta il pezzo.
+     Vale la fama di chi c'e' sopra, scritta alla registrazione, e segue la
+     stessa curva del resto — non e' un colpo secco, e' pubblico in piu' */
+  const featPull = featAscolti(s);
+  let out = (fanPull + scoperta + featPull) * curve * rnd(0.8, 1.25);
   /* punto 10: il video girato dal videomaker de La Sala. Non è un colpo di
      hype che passa: resta attaccato al pezzo e lo tiene a galla settimana
      dopo settimana, che è quello che fa un video per davvero. */
   if(s.video) out *= s.video;
   if(s.viral) out *= s.viral;
-  /* la spinta della promo (punto 9 dello Studio): scelta al Marketing,
+  /* la copertina (idea E del brainstorming del 14/09): pesa sulla prima
+     settimana, cioe' su chi ti clicca prima di averti sentito. Dopo, il
+     pezzo gira per quello che e'. */
+  if(age === 0 && typeof coverResa === "function") out *= coverResa(s);
+  /* la spinta della promo (punto 9 dello Studio): scelta su LaFamegram,
      messa da actions.js, scende di settimana in settimana qui sotto */
   if(s.spinta) out *= s.spinta;
   return Math.round(out);

@@ -173,16 +173,28 @@
   font-size:16px;font-weight:600;color:var(--stAzzSoft)}
 .ststream svg{width:18px;height:18px;flex:none;fill:var(--stAzz)}
 .ststream b{font-weight:800;font-variant-numeric:tabular-nums;color:#fff}
-/* «cambia copertina»: un tasto scritto, non un rettangolo — nel riferimento
-   è una riga azzurra sotto al titolo, e deve restare più piccola dei due
-   tasti veri, se no sembra la mossa principale */
-.stazlink{margin:0 0 12px}
+/* i link della copertina («carica una foto», «generane un'altra») e «fallo
+   sapere»: tasti scritti, non rettangoli — nel riferimento è una riga
+   azzurra sotto al titolo, e deve restare più piccola dei tasti veri, se no
+   sembra la mossa principale. Piu' di uno in riga: vanno a capo. */
+.stazlink{margin:0 0 12px;display:flex;flex-wrap:wrap;gap:8px}
 .stlink{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:6px 13px;
   border-radius:8px;font:inherit;font-size:13.5px;font-weight:700;cursor:pointer;
   color:var(--stAzz);background:rgba(61,199,255,.09);
   box-shadow:inset 0 0 0 1px rgba(61,199,255,.34);transition:background .15s}
 @media (hover:hover){.stlink:hover{background:rgba(61,199,255,.19)}}
 .stlink svg{width:16px;height:16px;flex:none;fill:var(--stAzz)}
+
+/* Il riquadro dei numeri di Fuori (idea E del brainstorming del 14/09/2026):
+   due righe, QUALITÀ e ASCOLTI, ognuna con le sue voci. A sinistra
+   l'etichetta in stampatello, poi le voci che vanno a capo da sole quando
+   sono tante — sul telefono lo sono. */
+.stnumeri{display:flex;flex-direction:column;gap:8px;text-align:left;font-size:13.5px}
+.stnumeri > div{display:flex;flex-wrap:wrap;align-items:center;gap:5px 12px}
+.stnumeri > div > b{font-size:11px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--stAzzSoft);min-width:64px}
+.stvoce{white-space:nowrap;color:var(--stSoft)}
+.stvoce .num{margin-left:2px}
 
 /* ============================================================
    TESTO — la barra dell'ispirazione (`scrittura_barre`)

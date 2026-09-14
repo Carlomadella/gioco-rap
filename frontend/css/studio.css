@@ -312,7 +312,7 @@
 /* ---- LE LINGUETTE, IN BASSO ----
    Sono la richiesta di Carlo («le varie sezioni in alto o in basso dello
    schermo») e restano: nei riferimenti non ci sono perché lì ogni schermata è
-   un file a sé, qui invece le otto sezioni sono una pagina sola e da qualche
+   un file a sé, qui invece le cinque sezioni sono una pagina sola e da qualche
    parte ci si deve spostare. Sotto, dove sta il pollice col telefono in mano. */
 .sttabs{position:absolute;left:0;right:0;bottom:0;z-index:7;
   display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;

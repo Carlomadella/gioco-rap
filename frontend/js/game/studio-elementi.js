@@ -4,7 +4,7 @@
       schermata **identica** alle foto con elementi HTML»
 
    Il telaio l'ha già fatto `studio.js`: la foto a schermo intero, la fascia
-   in alto, le tre colonne, la riga in basso, le otto linguette. Quello che
+   in alto, le tre colonne, la riga in basso, le linguette. Quello che
    mancava per arrivare *identici* ai riferimenti sono le cose che stanno
    **dentro** ai pannelli, e che nelle foto sono la schermata vera:
 
@@ -19,7 +19,7 @@
 
    Sta in un file suo per la regola 9 di `implementazioni.md` («quando non
    sono fix […] non modificare troppo i file già presenti ma crea un file
-   nuovo collegato ai già presenti»): `studio.js` resta il telaio e le otto
+   nuovo collegato ai già presenti»): `studio.js` resta il telaio e le
    sezioni, qui ci sono i pezzi che ci vanno dentro. Le sezioni chiamano
    queste funzioni per nome, e il file si carica subito dopo il suo.
 
@@ -498,14 +498,12 @@ function studioBancoMuovi(k, v, nodo){
   studioBancoRitocca(nodo, k, nuovo);
 }
 
-/* Qual e' il provino sul banco. `studioDaMixare()` da solo torna `null`
-   quando non ne hai scelto uno a mano — la sezione ripiega sul migliore, e
-   chi guarda il banco da fuori deve ripiegare sulla **stessa** cosa: senza
-   questa riga il riquadro del risultato non si aggiornava mai finche' non
-   avevi cliccato un provino, e restava a dire il carattere di prima. */
+/* Qual e' il provino sul banco: dal 14/09/2026 e' **il pezzo sul banco**
+   (`studioDaMixare()`, F2), e basta — non c'e' piu' un ripiego sul
+   migliore, perche' il banco ne tiene uno solo. Chi guarda il banco da fuori
+   (i cursori, l'ascolto) deve guardare la stessa cosa della sezione. */
 function studioProvino(){
-  const scelto = typeof studioDaMixare === "function" ? studioDaMixare() : null;
-  return scelto || unmixed().sort((a, b) => b.q - a.q)[0] || null;
+  return typeof studioDaMixare === "function" ? studioDaMixare() : null;
 }
 
 /* Il ritocco in posto: quello che si vede cambia, il pezzo che prende il
@@ -618,6 +616,8 @@ function studioStreamStima(s){
   const push = G.contract ? G.contract.push : 1;
   const scoperta = Math.pow(Math.max(0, q - 26) / 74, 2.6) * (35 + G.hype * 13) * push;
   const fan = G.fans * (0.5 + q / 170);
+  /* la gente del feat, come in songWeekly() */
+  const feat = typeof featAscolti === "function" ? featAscolti(Object.assign({}, s, {q})) : 0;
   /* Il lunedi', prima di darti i numeri, `advanceWeek()` passa il totale
      sotto a un **tetto** che dipende dalla fase della carriera, e sopra a
      quel tetto tiene solo un quinto di quello che avanza. Senza questa riga
@@ -634,9 +634,11 @@ function studioStreamStima(s){
     if(tot <= cap || tot <= 0) return v;
     return Math.max(0, Math.round(v * ((cap + (tot - cap) * 0.2) / tot)));
   };
+  /* e la copertina, che sulla prima settimana pesa (covers.js) */
+  const resa = typeof coverResa === "function" ? coverResa(s) : 1;
   return {
-    min: tetto(Math.round((fan * 0.26 + scoperta) * 0.8)),
-    max: tetto(Math.round((fan * 0.5 + scoperta) * 1.25))
+    min: tetto(Math.round((fan * 0.26 + scoperta + feat) * 0.8 * resa)),
+    max: tetto(Math.round((fan * 0.5 + scoperta + feat) * 1.25 * resa))
   };
 }
 
@@ -667,6 +669,7 @@ function studioMandaFuori(){
   if(q === "cassetto"){
     s.tenuto = true;
     delete s.esce;
+    studioSvuotaBanco(s);                    /* il banco si svuota: e' in cassaforte */
     /* la scelta torna su «stanotte»: la schermata passa da sola al pezzo
        dopo, e se il tasto d'oro restasse su «Tienilo da parte» un secondo
        tocco nello stesso punto metterebbe via anche quello — con niente che
@@ -694,7 +697,7 @@ function studioRiprendi(seed){
   if(!s) return;
   delete s.tenuto;
   delete s.esce;
-  studioDati().esce = seed;
+  studioMettiSulBanco(seed);               /* ritirato = di nuovo sul banco */
   studioDati().quando = "subito";
   SFX.tap(); save(); renderStudio(); renderGioco();
 }
@@ -715,13 +718,15 @@ function studioUscitePronte(){
     s.week = typeof totalWeeks === "function" ? totalWeeks() : (G.week || 1);
     if(typeof anteprimeAllUscita === "function") anteprimeAllUscita(s);
     const cap = typeof hypeCap === "function" ? hypeCap() : 100;
-    G.hype = clamp(G.hype + 6 + s.q * 0.12 + STUDIO_VENERDI_HYPE, 0, cap);
+    const feat = typeof featHypeUscita === "function" ? featHypeUscita(s) : 0;
+    G.hype = clamp(G.hype + 6 + s.q * 0.12 + STUDIO_VENERDI_HYPE + feat, 0, cap);
     /* Mandarlo fuori a mano costa un punto di lucidita' (la mossa «Pubblica
        il pezzo», in actions.js): se metterlo in coda non costasse niente,
        aspettare non sarebbe una scelta ma sempre la scelta giusta — l'hype in
        piu' **e** una mossa risparmiata. La mossa della giornata no, quella
        non gliela si puo' far pagare: il pezzo esce di notte, mentre dormi. */
     if(typeof addLuc === "function") addLuc(-1);
+    if(typeof studioSvuotaBanco === "function") studioSvuotaBanco(s);
     pushLog("<b>«" + s.t + "» è uscito</b>, di venerdì come avevi deciso" +
       (s.mixed ? "." : ", ma non era mixato: qualità " + s.q + "."), "good");
   }
@@ -774,16 +779,6 @@ if($("studio")){
     if(sf){ studioScegliStrofa(Number(sf.dataset.strofa)); return; }
     const ic = e.target.closest("[data-incide]");
     if(ic){ studioScegliIncide(Number(ic.dataset.incide)); return; }
-    /* «cambia copertina» dalla schermata di Fuori: porta alla sezione della
-       copertina **con quel pezzo già scelto**, se no ci arrivi e devi
-       ritrovartelo in una lista */
-    const vs = e.target.closest("[data-vesti]");
-    if(vs){
-      studioDati().cover = Number(vs.dataset.vesti);
-      STUDIO_SEZ = "cover";
-      SFX.tap(); renderStudio();
-      return;
-    }
   });
 
   /* i cursori del banco: `input` e non `click`, se no si muovono solo quando

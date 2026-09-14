@@ -246,8 +246,14 @@ NETWORK 64
    marketing». Le idee su come farlo — via del tutto o fuse nelle stanze giuste, da chi si
    sceglie il feat (solo chi conosci, tutti con costo e rifiuto, le due porte, dal
    telefono), e la lettura «ad ogni pezzo» del punto 10 — stanno in
-   `documentazione/brainstorming-studio-cover-feat-marketing.md`, con in fondo le domande
-   a cui rispondere prima di cominciare. Il punto resta aperto fin lì.
+   `documentazione/brainstorming-studio-cover-feat-marketing.md`.
+
+   **FATTO (15/09/2026)** — scelta **B + D3 + F2 + E**: il feat si sceglie in Cabina,
+   accanto al fonico, da due porte (chi conosci gratis, i rapper della classifica a
+   pagamento e con rifiuto, e chi accetta entra fra i contatti); «da solo» si clicca come
+   per il fonico. Cover nell'Uscita, Marketing sul telefono, un pezzo sul banco alla volta.
+   Tutto scritto in `implementazioni/02-interfaccia-e-telefono.md`, «Lo Studio a cinque
+   linguette».
 
 /_ DA DISCUTERE _/
 

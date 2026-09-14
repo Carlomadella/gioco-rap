@@ -645,8 +645,96 @@ function schermataImpostazioni(){
 }
 
 /* ---- LaFamegram: il finto Instagram, oggi con post veri della carriera ---- */
+/* «CHE POST FAI?» — la promo. Stava nello Studio, sotto la linguetta
+   Marketing, ma il suo riferimento (`studio_promo_su_lafamegram.png`) ha in
+   cima «TELEFONO · LAFAMEGRAM» e lavora su pezzi gia' usciti, cioe' su cose
+   che nello Studio non stanno piu' sul banco (brainstorming del 14/09/2026,
+   idea B). Quello che fa e' lo stesso di prima: scegli **quale** pezzo
+   spingere (punto 9 dello Studio), di un pezzo non ancora fuori fai uscire
+   un'anteprima di quindici secondi invece della promo (punto 8), e se hai
+   gia' postato oggi te lo dice il riquadro giallo. La scelta resta in
+   `G.studio.spingi`, e la leggono `studioDaSpingere()`/`studioDaAnticipare()`
+   in studio.js, che e' dove `actions.js` le viene a cercare. */
+function telPromo(){
+  if(typeof studioFuori !== "function") return "";
+  const fuori = studioFuori();
+  const ultimo = studioDaSpingere();
+  const ant = studioDaAnticipare();
+  const pronti = (typeof studioPronti === "function" ? studioPronti() : []).slice()
+    .sort((a, b) => b.q - a.q);
+  /* gli ultimi sei, piu' quello scelto se e' piu' vecchio: se no si spinge un
+     pezzo che nell'elenco non c'e', e per cambiarlo non c'e' una riga */
+  const elenco = fuori.slice(0, 6);
+  if(ultimo && elenco.indexOf(ultimo) < 0) elenco.push(ultimo);
+  const art = window.ARTIST || {};
+  const mini = s => '<span class="tlicov">' + cover(s.seed || 7, s.t, art.name || "", s.img) + '</span>';
+  const seme = s => Number.isFinite(s.seed) ? ' data-spingi="' + s.seed + '"' : "";
+  const riga = (s, on, sotto) =>
+    '<button class="tli' + (on ? " on" : "") + '"' + seme(s) + '>' + mini(s) +
+      '<span class="tlitx"><b>' + s.t + '</b><i>' + sotto + '</i></span>' +
+      (on ? '<span class="ttag on">scelto</span>' : "") +
+    '</button>';
+
+  if(!fuori.length && !pronti.length)
+    return '<div class="tnote"><b>Che post fai?</b> Niente da spingere: prima si registra un pezzo, ' +
+      'in Studio. Poi da qui lo fai sapere.</div>';
+
+  const oggi = typeof adfOggi === "function" ? adfOggi("promo") : 0;
+  const mult = typeof promoDailyMult === "function" ? promoDailyMult() : 1;
+  const fatte = ant ? (ant.anteprime || 0) : 0;
+  const azione = ant ? "anteprima" : "promo";
+  const pronto = telAgendaAzione(azione);
+  const soloEnergia = !pronto.ok && soloSenzaEnergia(azione);
+  const a = ACTIONS.find(x => x.id === azione);
+
+  return '<div class="tpromo">' +
+    '<div class="tnote"><b>Che post fai?</b> ' +
+      (ant
+        ? 'Il pezzo <b>non è fuori</b>: gliene fai sentire quindici secondi. Ogni anteprima dà hype, ' +
+          'e all\'uscita parte più forte — ma alla terza l\'hanno già sentito.'
+        : 'La clip del pezzo che scegli. La prima del giorno rende piena, poi la gente scorre oltre.') +
+    '</div>' +
+    (fuori.length
+      ? '<div class="tlist">' + elenco.map(x => riga(x, !ant && x === ultimo,
+          "q" + x.q + " · " + fmt(x.streams || 0) + " stream" + (x.spinta > 1 ? " · in spinta" : ""))).join("") + '</div>'
+      : "") +
+    (pronti.length
+      ? '<div class="tnote" style="margin-top:9px"><b>Non ancora fuori</b> · solo anteprima</div>' +
+        '<div class="tlist">' + pronti.map(x => riga(x, x === ant,
+          "q" + x.q + (x.anteprime ? " · " + x.anteprime + (x.anteprime === 1 ? " anteprima" : " anteprime") : " · nessuna anteprima"))).join("") + '</div>'
+      : "") +
+    (oggi > 0 && mult < 1 && !ant
+      ? '<div class="tnote tpromo-avviso">⚠ Hai già postato <b>' + oggi + (oggi === 1 ? " volta" : " volte") +
+          '</b> oggi: la gente comincia a scorrere oltre, e quello che spingi rende il <b>' +
+          Math.round(mult * 100) + '%</b>.</div>'
+      : "") +
+    '<div class="tnote" style="margin-top:9px">' +
+      (ant
+        ? 'anteprime fatte: <b>' + fatte + "/" + ADF_ANTEPRIME_MAX + '</b> · all\'uscita parte al <b>' +
+          Math.round(100 * (1 + Math.min(ADF_ANTEPRIME_MAX, fatte + 1) * ADF_ANTEPRIMA_SPINTA)) + '%</b>'
+        : ultimo
+          ? 'spingi «<b>' + ultimo.t + '</b>» · ' + (a && a.give ? a.give() : "")
+          : 'Prima esce un pezzo, poi lo si spinge — o gliene fai sentire un\'anteprima, qui sopra.') +
+    '</div>' +
+    '<button class="tbtn tposta' + (soloEnergia ? ' spenta' : '') + '" data-azione="' + azione + '"' +
+      (pronto.ok || soloEnergia ? '' : ' disabled') + '>' +
+      (ant ? "Fai uscire una preview" : "Posta") +
+      (a ? ' · ' + a.e + '⚡' : '') + '</button>' +
+    (!pronto.ok && !soloEnergia && (ultimo || ant)
+      ? '<div class="tnote" style="margin-top:7px">' + pronto.perche + '</div>' : '') +
+  '</div>';
+}
+/* la scelta del pezzo da spingere: stessa casella dello Studio, ridisegnato
+   il telefono e non lo Studio */
+function telSpingi(seed){
+  if(!Number.isFinite(seed) || typeof studioDati !== "function") return;
+  const d = studioDati();
+  d.spingi = (d.spingi === seed) ? null : seed;
+  hubTap(); save(); renderTelefono();
+}
 function schermataLafamegram(){
-  return '<div class="tigscrivi">' +
+  return telPromo() +
+    '<div class="tigscrivi">' +
       '<textarea id="tig-testo" maxlength="220" placeholder="A cosa stai pensando?"></textarea>' +
       '<button class="tbtn" id="tig-pubblica">Pubblica</button>' +
     '</div>' +
@@ -710,6 +798,9 @@ $("hb-tel").addEventListener("click", ev => {
     if(ta && telScrivi(ta.value)){ hubTap(); renderTelefono(); }
     return;
   }
+  /* la promo di LaFamegram: quale pezzo spingere */
+  const sp = ev.target.closest("[data-spingi]");
+  if(sp){ telSpingi(Number(sp.dataset.spingi)); return; }
   if(ev.target.closest("[data-impostazioni]")){ if(window.IMPOSTAZIONI) window.IMPOSTAZIONI(); return; }
   if(ev.target.closest("[data-toggleaudio]")){
     SET.audio.on = !SET.audio.on; setSalva();
