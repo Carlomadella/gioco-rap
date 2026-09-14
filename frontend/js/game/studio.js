@@ -11,10 +11,14 @@
       Beat/Producer, Mix, Testo, Cover, Featuring, Marketing, Timing.
       E ogni elemento influenza il risultato.»
 
-   Quelle sette sono adesso le **sezioni** dello Studio, più la Cabina che le
-   tiene insieme: le sette sono gli ingredienti di un pezzo, ma da qualche
-   parte il pezzo va anche inciso, e quel posto qui esisteva già. Otto
-   linguette, **in basso**, dove sta il pollice quando il telefono è in mano:
+   Quelle sette erano le **sezioni** dello Studio, più la Cabina che le
+   tiene insieme. Dal 14/09/2026 (il brainstorming in
+   `documentazione/brainstorming-studio-cover-feat-marketing.md`, idea B) gli
+   ingredienti stanno **dentro alle stanze in cui si decidono** invece di
+   avere una linguetta a testa: il Marketing è una pagina del telefono
+   (LaFamegram, `telefono.js`), perché lavora su pezzi già usciti e sul
+   telefono ci stava già nel riferimento. Le linguette, **in basso**, dove sta
+   il pollice quando il telefono è in mano:
 
      BEAT       da chi te lo fai — e con chi lo fai cambia com'è (punto 11)
      TESTO      le barre. Senza queste non c'è niente da incidere
@@ -22,8 +26,7 @@
      MIX        il fonico la mixa — e scegli tu quale provino
      COVER      la faccia del pezzo: generata, o una foto tua
      FEAT       con chi lo fai. Non è obbligatorio, ma si sente
-     MARKETING  farlo sapere. Un pezzo che non gira non esiste
-     TIMING     quale esce, e quando
+     TIMING     quale esce, e quando — e poi «fallo sapere», sul telefono
 
    **Qui non si rifà l'economia del gioco.** I numeri stanno tutti in
    `actions.js` e ci restano: lo Studio chiama le stesse azioni della
@@ -55,12 +58,12 @@ const STUDIO_FOTO = {
   testo:  {f:"studio_testo.png",  pos:"center 58%"},
   cabina: {f:"studio_cabina.png", pos:"center 46%"},
   banco:  {f:"studio_mix.png",    pos:"center 44%"},
-  /* Queste due le ho ritrovate confrontando le foto senza interfaccia con i
-     riferimenti: lo sfondo di `studio_uscita_pezzo` è la strada bagnata, e
-     quello di `studio_promo_su_lafamegram` è la scrivania di notte. Erano
-     nella pila delle «in attesa» perché nessuno le aveva mai guardate. */
+  /* Questa l'ho ritrovata confrontando le foto senza interfaccia con i
+     riferimenti: lo sfondo di `studio_uscita_pezzo` è la strada bagnata. Era
+     nella pila delle «in attesa» perché nessuno l'aveva mai guardata. (La
+     scrivania di notte di `studio_promo.png` era il fondale del Marketing:
+     con la promo passata al telefono è tornata fra le foto in attesa.) */
   fuori:  {f:"studio_uscita.png", pos:"center 55%"},
-  promo:  {f:"studio_promo.png",  pos:"center 50%"},
   /* Cover e Feat una foto loro non ce l'hanno, né con né senza interfaccia.
      Si tengono quella della stanza più vicina — il banco per la copertina,
      la cabina per il feat — perché un fondo nero in mezzo a sei fotografie
@@ -91,14 +94,12 @@ const STUDIO_SEZIONI = [
    d:"la faccia del pezzo", dopo:true},
   {id:"feat",   n:"Feat",      bar:"Il feat",      sc:"registra",
    d:"con chi lo fai", dopo:true},
-  /* Timing prima di Marketing, e non e' un gusto: la spinta si decide
-     **dopo** aver deciso quando esce il pezzo, perche' «venerdi' fra 4 giorni»
-     e «stanotte» non si spingono allo stesso modo. Al contrario si sceglieva
-     come spingerlo prima di sapere quando usciva. */
+  /* Il Marketing non e' piu' una linguetta: lavora su pezzi gia' usciti, cioe'
+     su cose che non stanno piu' sul banco, e il suo riferimento
+     (`studio_promo_su_lafamegram`) ha in cima «TELEFONO · LAFAMEGRAM». Sta
+     li', in `telefono.js`; da qui, dopo l'uscita, ci si arriva con un tasto. */
   {id:"fuori",  n:"Timing",    bar:"Fuori",        sc:"pubblica",
-   d:"quando esce", dopo:true},
-  {id:"promo",  n:"Marketing", bar:"Il marketing", sc:"promo",
-   d:"farlo sapere", dopo:true}
+   d:"quando esce", dopo:true}
 ];
 
 let STUDIO_SEZ = "beat";
@@ -215,9 +216,12 @@ function studioSceltoTra(lista, campo){
   return lista.find(x => x.seed === s) || null;
 }
 function studioDaMixare(){ return studioSceltoTra(unmixed(), "mixa"); }
-/* Punto 9 dello Studio: al Marketing si sceglie **quale** pezzo spingere, e
-   la promo di `actions.js` lascia la spinta su quello. Senza scelta e' l'ultimo
-   uscito, che e' quello che la sezione ha sempre detto di spingere. */
+/* Punto 9 dello Studio: si sceglie **quale** pezzo spingere, e la promo di
+   `actions.js` lascia la spinta su quello. Senza scelta e' l'ultimo uscito.
+   La scelta si fa **sul telefono**, in LaFamegram (`telPromo()` in
+   telefono.js): la casella e' sempre `G.studio.spingi`, e le tre letture
+   restano qui perche' e' qui che `actions.js` le viene a cercare — lo Studio
+   decide, le azioni fanno, anche quando a decidere e' il telefono. */
 function studioFuori(){
   return (G.songs || []).filter(x => x.released)
     .sort((a, b) => (b.week || 0) - (a.week || 0));
@@ -229,10 +233,29 @@ function studioDaSpingere(){
 }
 /* Punto 8: un pezzo che non e' ancora uscito non si spinge — al massimo se
    ne fa uscire un'anteprima. La stessa casella `spingi` puo' segnare anche
-   un pezzo non uscito (la lista sotto a «Non ancora fuori»): allora al
-   centro c'e' l'anteprima, e la promo torna all'ultimo uscito. */
+   un pezzo non uscito: allora il post e' l'anteprima («quindici secondi»), e
+   la promo torna all'ultimo uscito. */
 function studioDaAnticipare(){
   return studioSceltoTra(studioPronti(), "spingi");
+}
+/* Il tasto «Fallo sapere» di Fuori: chiude lo Studio e apre LaFamegram sul
+   telefono della plancia. Sotto i 1180px il telefono non c'e' (hub.css lo
+   toglie, per scelta scritta li'): allora la promo parte da qui, sull'ultimo
+   pezzo uscito, che e' quello che il telefono spingerebbe senza una scelta. */
+function studioFalloSapere(){
+  const telefono = typeof telPC === "function" && telPC() && typeof telVaiApp === "function";
+  if(!telefono){ studioAzione("promo"); return; }
+  chiudiStudio();
+  if(typeof renderHub === "function") renderHub();
+  telVaiApp("lafamegram");
+}
+/* la riga sotto al riquadro di Fuori quando c'e' un pezzo sul banco **e** uno
+   gia' fuori: l'ultimo uscito, con la strada per spingerlo */
+function studioFalloSapereRiga(ultimo, da){
+  return '<p class="stazlink"><button type="button" class="stlink" data-lafamegram="1">' +
+    stIco("invio") + 'fallo sapere: «' + studioEsc(ultimo.t) + '» è fuori' +
+    (da === 0 ? ' da questa settimana' : da === 1 ? ' da una settimana' : da ? ' da ' + da + ' settimane' : '') +
+    '</button></p>';
 }
 /* Fuori vanno solo i pezzi che non stanno in cassaforte: un pezzo messo da
    parte non deve uscire per sbaglio dalla plancia, che è l'unico modo in cui
@@ -1039,91 +1062,6 @@ function studioSezFeat(){
   return {sx, mid, dx:""};
 }
 
-/* ---- IL MARKETING — farlo sapere ---- */
-function studioSezMarketing(){
-  const fuori = studioFuori();
-  const ultimo = studioDaSpingere();
-  const ant = studioDaAnticipare();
-  const pronti = studioPronti().sort((a, b) => b.q - a.q);
-  /* gli ultimi sei, piu' quello scelto se e' piu' vecchio: se no si spinge
-     un pezzo che nell'elenco non c'e', e per cambiarlo non c'e' una riga
-     da ri-toccare */
-  const elenco = fuori.slice(0, 6);
-  if(ultimo && elenco.indexOf(ultimo) < 0) elenco.push(ultimo);
-
-  /* Punto 9: le righe erano mute come al banco del Mix — senza `attr`
-     `stScelta` non fa un bottone — e il pezzo acceso era sempre il primo.
-     Adesso si sceglie, e la scelta e' quella che la promo spinge davvero.
-     Punto 8: sotto ci sono i pezzi non ancora usciti, per l'anteprima. */
-  const sx = stPan("Cosa spingi",
-    (fuori.length
-      ? elenco.map(x => stScelta({
-          attr:stSeme("spingi", x),
-          on:!ant && x === ultimo, mini:stCover(x), n:x.t,
-          d:"q" + x.q + " · " + fmt(x.streams || 0) + " stream" +
-            (x.spinta > 1 ? ' · <span class="oro">in spinta</span>' : "")
-        })).join("")
-      : studioVuoto("Non hai ancora fatto uscire niente.")) +
-    (pronti.length
-      ? stSotto("Non ancora fuori") +
-        pronti.map(x => stScelta({
-          attr:stSeme("spingi", x),
-          on:x === ant, mini:stCover(x), n:x.t,
-          d:"q" + x.q + " · solo anteprima" +
-            (x.anteprime ? ' · <span class="oro">' + x.anteprime + (x.anteprime === 1 ? " anteprima" : " anteprime") + '</span>' : "")
-        })).join("")
-      : ""),
-    "cartella");
-
-  /* Il riferimento `studio_promo_su_lafamegram` ha in cima «TELEFONO ·
-     LAFAMEGRAM», non «STUDIO»: quella schermata — il telefono in mano, i tre
-     tipi di post, «CHE POST FAI?» — è una pagina del telefono, e sta a
-     `telefono.js`. Quello che si prende da lì e vale anche qui è il riquadro
-     giallo della saturazione: postare si può sempre, ma dalla seconda volta
-     in un giorno rende meno, e prima non lo diceva nessuno. */
-  const oggi = typeof adfOggi === "function" ? adfOggi("promo") : 0;
-  const mult = typeof promoDailyMult === "function" ? promoDailyMult() : 1;
-
-  /* Punto 8: scelto un pezzo non ancora fuori, al centro c'e' l'anteprima
-     e non la promo — quella e' per i pezzi usciti, e basta. */
-  const fatte = ant ? (ant.anteprime || 0) : 0;
-  const mid = ant
-    ? stPan("",
-        stCapo("Anteprima", ant.t, "q" + ant.q) +
-        '<p class="stnota">Il pezzo <b>non è fuori</b>, e finché non esce non si spinge: al massimo ' +
-          'gliene fai sentire quindici secondi. Ogni anteprima dà un po\' di hype, e quando il ' +
-          'pezzo esce parte più forte — ma alla terza la gente l\'ha già sentito.</p>' +
-        stEsito('anteprime fatte: ' + stNum(fatte + "/" + ADF_ANTEPRIME_MAX) +
-          ' · all\'uscita parte al ' +
-          stNum(Math.round(100 * (1 + Math.min(ADF_ANTEPRIME_MAX, fatte + 1) * ADF_ANTEPRIMA_SPINTA)) + "%")) +
-        stAzioni(stPrimo(' data-az="anteprima"', "Fai uscire una preview", "invio",
-          fatte >= ADF_ANTEPRIME_MAX)) +
-        (fatte >= ADF_ANTEPRIME_MAX
-          ? '<p class="stperche">L\'hanno già sentito tre volte: adesso deve uscire. Si passa da Timing.</p>'
-          : ""))
-    : stPan("",
-        stCapo("Spingi", ultimo ? ultimo.t : "niente, non hai pezzi fuori",
-          ultimo ? "q" + ultimo.q : "") +
-        '<p class="stnota">Il pezzo è uscito: adesso qualcuno lo deve sapere. Questa è la promo che ' +
-          'parte <b>da qui, dallo studio</b> — quello che si fa col telefono in mano appena finita ' +
-          'la sessione.</p>' +
-        (oggi > 0 && mult < 1
-          ? stAvviso("Hai già postato <b>" + oggi + (oggi === 1 ? " volta" : " volte") +
-              "</b> oggi: la gente comincia a scorrere oltre, e quello che spingi rende il <b>" +
-              Math.round(mult * 100) + "%</b>.")
-          : "") +
-        stEsito('le altre due strade — l\'app <b>Discografia</b> e il giro dei giornalisti — ' +
-          'non sono ancora collegate qui') +
-        (ultimo
-          ? stAzioni(stPrimo(' data-az="promo"', "Posta", "invio"))
-          : stAzioni(stPrimo(' data-az="promo"', "Posta", "invio", true)) +
-            '<p class="stperche">Prima esce un pezzo, poi lo si spinge' +
-              (pronti.length ? ' — o gliene fai sentire un\'anteprima, qui sotto' : "") +
-              '. Si passa da Fuori.</p>'));
-
-  return {sx, mid, dx:""};
-}
-
 /* ---- FUORI — quale esce, e quando ---- */
 function studioSezFuori(){
   const pronti = studioPronti().sort((a, b) => b.q - a.q);
@@ -1197,16 +1135,30 @@ function studioSezFuori(){
           : '') +
         (s.mixed
           ? 'da qui in poi corre da solo'
-          : 'non è mixato, ci perde ' + stNum("8 punti"))));
+          : 'non è mixato, ci perde ' + stNum("8 punti"))) +
+      /* e l'ultimo uscito, intanto, va fatto sapere: il Marketing sta sul
+         telefono, e da qui ci si arriva con una riga */
+      (ultimo ? studioFalloSapereRiga(ultimo, da) : ""));
   } else {
+    /* «Adesso fallo sapere»: dopo l'uscita il banco e' vuoto, e la cosa da
+       fare non sta piu' qui — sta sul telefono, in LaFamegram. Il tasto
+       porta li'. */
     mid = stPan("",
-      stCapo("Fuori", tenuti.length ? "tutto in cassaforte" : "niente di pronto", "") +
+      stCapo("Fuori", tenuti.length ? "tutto in cassaforte" : ultimo ? "è fuori" : "niente di pronto", "") +
       '<p class="stnota">' +
         (tenuti.length
           ? 'Quello che hai lo stai tenendo da parte. Ne <b>ritiri uno</b> dalla cassaforte, ' +
             'qui a destra, e torna in coda.'
-          : 'Si comincia dal <b>Beat</b>, poi il <b>Testo</b>, poi la <b>Cabina</b>.') +
-      '</p>');
+          : ultimo
+            ? '«<b>' + studioEsc(ultimo.t) + '</b>» è fuori' +
+              (da === 0 ? ' da questa settimana' : da === 1 ? ' da una settimana' : da ? ' da ' + da + ' settimane' : '') +
+              '. Adesso <b>fallo sapere</b>: un pezzo che non gira non esiste. La promo si fa ' +
+              'col telefono in mano, su LaFamegram.'
+            : 'Si comincia dal <b>Beat</b>, poi il <b>Testo</b>, poi la <b>Cabina</b>.') +
+      '</p>' +
+      (ultimo && !tenuti.length
+        ? stAzioni(stPrimo(' data-lafamegram="1"', "Fallo sapere su LaFamegram", "invio"))
+        : ""));
   }
 
   const dx = stPan("Pronti",
@@ -1326,7 +1278,6 @@ function renderStudio(){
      sez.id === "banco"  ? studioSezBanco() :
      sez.id === "cover"  ? studioSezCover() :
      sez.id === "feat"   ? studioSezFeat() :
-     sez.id === "promo"  ? studioSezMarketing() :
      studioSezFuori());
 
   $("st-sx").innerHTML = parti.sx || "";
@@ -1388,8 +1339,7 @@ if($("studio")){
     if(m){ studioSegna("mixa", Number(m.dataset.mixa)); return; }
     const u = e.target.closest("[data-esce]");
     if(u){ studioSegna("esce", Number(u.dataset.esce)); return; }
-    const sp = e.target.closest("[data-spingi]");
-    if(sp){ studioSegna("spingi", Number(sp.dataset.spingi)); return; }
+    if(e.target.closest("[data-lafamegram]")){ SFX.tap(); studioFalloSapere(); return; }
     const c = e.target.closest("[data-cover]");
     if(c){ studioSegna("cover", Number(c.dataset.cover)); return; }
     const cv = e.target.closest("[data-cov]");

@@ -1072,7 +1072,11 @@ console.log("\nlo Studio: la gente della Sala conta");
                        il quando di Fuori) e senza di lui le sezioni non
                        disegnano */
                     "js/game/studio-elementi.js", "js/game/writer.js",
-                    "js/game/beatplay.js"];
+                    "js/game/beatplay.js",
+                    /* la promo sta sul telefono (LaFamegram) dal 14/09/2026:
+                       qui si carica per provare che «Che post fai?» legga le
+                       stesse caselle dello Studio */
+                    "js/game/telefono.js"];
   let acceso = true, errore = null;
   try{
     /* i pochi appigli fuori dai file caricati: non devono fare niente */
@@ -1082,10 +1086,18 @@ console.log("\nlo Studio: la gente della Sala conta");
       function chiediTitolo(){} function hubPronta(){ return {ok:true, perche:""}; }
       function hubAzione(){} function apriFoglio(){} function scegliModo(){}
       function offriBeat(){ return []; } function adfOggi(){ return 0; }
+      function hsvg(){ return ""; } function spoglia(s){ return s; }
+      function chatNonLetti(){ return 0; } function soloSenzaEnergia(){ return false; }
+      function renderHub(){} function setInterval(){} function hubTap(){}
+      HUB_NOTIZIE = []; GOALS = []; TEL_CHAT_APERTA = null; HIC = {};
       SFX = { tap(){}, rec(){}, fanfare(){}, fail(){}, publish(){} };
     `, scatola);
+    scatola.addEventListener = zitto;
     for(const f of sorgenti)
       vm.runInContext(fs.readFileSync(path.join(RADICE, f), "utf8"), scatola, { filename: f });
+    /* il telefono intero non si disegna qui (gli serve la plancia): si prova
+       la sua promo, che e' una funzione a se' */
+    vm.runInContext("renderTelefono = function(){};", scatola);
     vm.runInContext(`
       G = START();
       G.money = 5000; G.energy = 100; G.skills.rete = 20;
@@ -1152,14 +1164,14 @@ console.log("\nlo Studio: la gente della Sala conta");
       }));
 
     /* tutte le sezioni si disegnano: una che esplode manderebbe giù lo Studio
-       intero, e capiterebbe solo a chi ci clicca. Le sezioni sono otto da
-       quando c'è il punto 4 (beat, testo, cabina, mix, cover, feat,
-       marketing, timing), e l'elenco si legge dal codice invece di essere
-       ricopiato: se domani se ne aggiunge una, questa prova la copre da
-       sola. */
+       intero, e capiterebbe solo a chi ci clicca. Erano otto dal punto 4
+       (beat, testo, cabina, mix, cover, feat, marketing, timing); dal
+       14/09/2026 il Marketing sta sul telefono (brainstorming, idea B). L'elenco
+       si legge dal codice invece di essere ricopiato: se domani se ne
+       aggiunge o toglie una, questa prova la copre da sola. */
     const sezioni = dentro("STUDIO_SEZIONI.map(x => x.id)");
-    controlla("le sezioni sono le sette del punto 4, più la cabina",
-      sezioni.join(",") === "beat,testo,cabina,banco,cover,feat,fuori,promo",
+    controlla("le sezioni sono quelle del punto 4 meno il Marketing, più la cabina",
+      sezioni.join(",") === "beat,testo,cabina,banco,cover,feat,fuori",
       sezioni.join(","));
     const rotte = [];
     for(const s of sezioni){
@@ -1225,12 +1237,19 @@ console.log("\nlo Studio: la gente della Sala conta");
        promo, il palco e i turni. Adesso l'elenco non esiste più e ognuna ha un
        posto suo — le barre nella cabina (il controllo qui sotto), il palco al
        Live Club, i turni in Pizzeria/Fabbrica/Centro per l'impiego — e la
-       promo è entrata nello Studio, in «Fuori». Il guardiano resta, sulla
-       cosa che adesso può davvero rompersi in silenzio: che la promo sia lì. */
-    dentro("G.songs = [{t:'Uno', q:60, mixed:true, released:true, seed:1}]; STUDIO_SEZ = 'promo'; renderStudio();");
-    controlla("la promo ha un posto: sta nello Studio, in «Marketing»",
-      dipinto().indexOf('data-az="promo"') >= 0,
+       promo sta sul telefono, in LaFamegram, con lo Studio che dopo l'uscita
+       ci manda. Il guardiano resta, sulla cosa che adesso può davvero
+       rompersi in silenzio: che la promo sia lì, e che da Fuori ci si arrivi. */
+    dentro("G.songs = [{t:'Uno', q:60, mixed:true, released:true, seed:1, week:1}]; G.week = 2; STUDIO_SEZ = 'fuori'; renderStudio();");
+    controlla("dopo l'uscita Fuori non fa la promo: rimanda al telefono",
+      dipinto().indexOf('data-lafamegram') >= 0 &&
+      dipinto().indexOf('data-az="promo"') < 0,
       dipinto().slice(0, 200));
+    controlla("e sul telefono, in LaFamegram, c'è «Che post fai?» col pezzo uscito e il tasto Posta",
+      (() => { const h = dentro("telPromo()");
+        return h.indexOf("Che post fai?") >= 0 && h.indexOf('data-spingi="1"') >= 0 &&
+          h.indexOf('data-azione="promo"') >= 0; })(),
+      dentro("telPromo()").slice(0, 200));
     dentro("G.bars = []; G.beats = []; STUDIO_SEZ = 'cabina'; renderStudio();");
     controlla("e senza strofa la cabina non è un vicolo cieco: si scrive da lì",
       dipinto().indexOf('data-az="scrivi"') >= 0,
@@ -1281,27 +1300,28 @@ console.log("\nlo Studio: la gente della Sala conta");
     controlla("e se il pezzo scelto sparisce non si pianta: torna a decidere lei",
       dentro("daMixare().t") === "Buono" && dentro("daPubblicare().t") === "Buono");
 
-    /* Punto 9 dello Studio: al Marketing si sceglie quale pezzo spingere.
-       Prima le righe erano mute come al banco del Mix, e la promo accendeva
-       «tutto quello che hai fuori»: se il collegamento si stacca, la scelta
-       torna a essere un ornamento. */
+    /* Punto 9 dello Studio: si sceglie quale pezzo spingere — su LaFamegram,
+       dal 14/09/2026. Prima le righe erano mute come al banco del Mix, e la
+       promo accendeva «tutto quello che hai fuori»: se il collegamento fra
+       il telefono e la casella dello Studio si stacca, la scelta torna a
+       essere un ornamento. */
     dentro(`
       G.songs = [
         {t:'Vecchio', q:70, mixed:true, released:true, week:1, streams:900, seed:31},
         {t:'Nuovo',   q:60, mixed:true, released:true, week:3, streams:100, seed:32}
       ];
       G.week = 4; G.studio.spingi = null;
-      STUDIO_SEZ = "promo"; renderStudio();
     `);
-    controlla("al Marketing i pezzi fuori si possono cliccare, e senza scelta e' acceso l'ultimo uscito",
-      dipinto().indexOf('data-spingi="31"') >= 0 &&
-      dipinto().indexOf('data-spingi="32"') >= 0 &&
+    const promoTel = () => dentro("telPromo()");
+    controlla("su LaFamegram i pezzi fuori si possono cliccare, e senza scelta e' acceso l'ultimo uscito",
+      promoTel().indexOf('data-spingi="31"') >= 0 &&
+      promoTel().indexOf('data-spingi="32"') >= 0 &&
       dentro("studioDaSpingere().t") === "Nuovo",
-      dipinto().slice(0, 300));
-    dentro("studioSegna('spingi', 31);");
+      promoTel().slice(0, 300));
+    dentro("telSpingi(31);");
     controlla("scelto il vecchio, e' lui che si spinge",
       dentro("studioDaSpingere().t") === "Vecchio" &&
-      /class="stscelta on"[^>]*data-spingi="31"/.test(dipinto()));
+      /class="tli on"[^>]*data-spingi="31"/.test(promoTel()));
     dentro("ACTIONS.find(a => a.id === 'promo').run();");
     controlla("e la promo lascia la spinta sul pezzo scelto, non sugli altri",
       dentro("G.songs[0].spinta") > 1 && dentro("G.songs[1].spinta") === undefined,
@@ -1339,11 +1359,11 @@ console.log("\nlo Studio: la gente della Sala conta");
       dentro("G.studio.coverProva") === null);
 
     /* Punto 10 dello Studio: prima Beat, Testo e Cabina, poi il resto. Le
-       altre cinque linguette restano chiuse finche' non c'e' il primo pezzo. */
-    dentro("G.songs = []; STUDIO_SEZ = 'promo'; renderStudio();");
+       altre linguette restano chiuse finche' non c'e' il primo pezzo. */
+    dentro("G.songs = []; STUDIO_SEZ = 'fuori'; renderStudio();");
     const linguette = () => nodi["st-tabs"].innerHTML || "";
-    controlla("senza pezzi Mix, Cover, Feat, Timing e Marketing sono chiuse, e Beat/Testo/Cabina no",
-      ["banco", "cover", "feat", "fuori", "promo"].every(id =>
+    controlla("senza pezzi Mix, Cover, Feat e Timing sono chiuse, e Beat/Testo/Cabina no",
+      ["banco", "cover", "feat", "fuori"].every(id =>
         new RegExp('sttab[^"]*chiusa" data-sez="' + id + '"').test(linguette())) &&
       ["beat", "testo", "cabina"].every(id =>
         new RegExp('class="sttab( on)?" data-sez="' + id + '"').test(linguette())),
@@ -1362,19 +1382,18 @@ console.log("\nlo Studio: la gente della Sala conta");
         {t:'Chiuso',  q:70, mixed:true, released:false, week:0, streams:0,   seed:52}
       ];
       G.week = 4; G.studio.spingi = null; G.hype = 10; G.energy = 100;
-      STUDIO_SEZ = "promo"; renderStudio();
     `);
-    controlla("al Marketing il pezzo non uscito sta sotto «Non ancora fuori», e al centro c'e' la promo",
-      dipinto().indexOf("Non ancora fuori") >= 0 &&
-      dipinto().indexOf('data-spingi="52"') >= 0 &&
-      dipinto().indexOf('data-az="promo"') >= 0 &&
-      dipinto().indexOf('data-az="anteprima"') < 0);
+    controlla("su LaFamegram il pezzo non uscito sta sotto «Non ancora fuori», e il tasto e' la promo",
+      promoTel().indexOf("Non ancora fuori") >= 0 &&
+      promoTel().indexOf('data-spingi="52"') >= 0 &&
+      promoTel().indexOf('data-azione="promo"') >= 0 &&
+      promoTel().indexOf('data-azione="anteprima"') < 0);
     controlla("senza un pezzo non uscito scelto, l'anteprima non parte",
       typeof dentro("ACTIONS.find(a => a.id === 'anteprima').need()") === "string");
-    dentro("studioSegna('spingi', 52);");
-    controlla("scelto il pezzo chiuso, al centro c'e' l'anteprima e la promo resta sull'ultimo uscito",
-      dipinto().indexOf('data-az="anteprima"') >= 0 &&
-      dipinto().indexOf('data-az="promo"') < 0 &&
+    dentro("telSpingi(52);");
+    controlla("scelto il pezzo chiuso, il post e' l'anteprima e la promo resta sull'ultimo uscito",
+      promoTel().indexOf('data-azione="anteprima"') >= 0 &&
+      promoTel().indexOf('data-azione="promo"') < 0 &&
       dentro("studioDaAnticipare().t") === "Chiuso" &&
       dentro("studioDaSpingere().t") === "Fuori");
     const hypePrima = dentro("G.hype");

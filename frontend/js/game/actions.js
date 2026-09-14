@@ -387,7 +387,7 @@ const ACTIONS = [
    }},
 
   {id:"promo", n:"Promo sui social", e:12,
-   d:"Clip e provocazioni. Spinge il pezzo che scegli al Marketing.",
+   d:"Clip e provocazioni. Spinge il pezzo che scegli su LaFamegram.",
    need:() => G.songs.some(s => s.released) ? null : "1 pezzo fuori",
    give:() => {
      const mult = promoDailyMult();
@@ -420,8 +420,8 @@ const ACTIONS = [
      adfSegnaOggi("promo");
 
      /* Punto 9 dello Studio: la promo non accende «tutto quello che hai
-        fuori» — spinge un pezzo, quello scelto al Marketing (o l'ultimo
-        uscito). La spinta resta attaccata al pezzo come il video
+        fuori» — spinge un pezzo, quello scelto su LaFamegram, dal telefono
+        (o l'ultimo uscito). La spinta resta attaccata al pezzo come il video
         (`s.spinta`), sim.js la legge in songWeekly() e la fa scendere ogni
         settimana: un post fa girare il pezzo, non lo rifa' uscire. */
      const sp = typeof studioDaSpingere === "function" ? studioDaSpingere() : null;
@@ -444,14 +444,14 @@ const ACTIONS = [
    }},
 
   /* Punto 8 dello Studio: «non posso spingere una canzone che non è ancora
-     uscita, al massimo faccio uscire una preview». Il pezzo lo si sceglie al
-     Marketing, fra quelli non ancora fuori; qui c'è il costo e quello che dà. */
+     uscita, al massimo faccio uscire una preview». Il pezzo lo si sceglie su
+     LaFamegram, fra quelli non ancora fuori; qui c'è il costo e quello che dà. */
   {id:"anteprima", n:"Anteprima del pezzo", e:8,
    d:"Quindici secondi sui social. Il pezzo non è fuori, ma la gente lo aspetta.",
    need:() => {
      const s = typeof studioDaAnticipare === "function" ? studioDaAnticipare() : null;
      /* corto: sul telefono la riga e' una sola, e i puntini mangiano la fine */
-     return !s ? "un pezzo scelto al Marketing"
+     return !s ? "un pezzo scelto su LaFamegram"
        : (s.anteprime || 0) >= ADF_ANTEPRIME_MAX ? "un pezzo che non hanno già sentito" : null;
    },
    give:() => {

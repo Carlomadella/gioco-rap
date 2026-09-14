@@ -323,6 +323,21 @@
   border:1px solid rgba(255,255,255,.07);font-size:10.5px;font-weight:700;color:#9AA1B2}
 .tsubb.on{background:#7C3AED;border-color:#7C3AED;color:#fff}
 
+/* ---- la promo («CHE POST FAI?»), arrivata dallo Studio il 14/09/2026 ----
+   Il riferimento e' `studio_promo_su_lafamegram.png`: le righe da scegliere
+   col pallino, il riquadro giallo della saturazione, il tasto d'oro «POSTA».
+   La riga scelta si accende come nello Studio; la copertina del pezzo sta
+   dove nelle altre liste sta la faccia, ma quadrata, che una copertina
+   tonda non e' una copertina. */
+.tpromo{margin-bottom:14px}
+.tli.on{border-color:rgba(251,191,36,.55);background:#1A1710}
+.tlicov{flex:none;width:34px;height:34px;border-radius:7px;overflow:hidden;background:#1A1B24}
+.tlicov svg{display:block;width:100%;height:100%}
+.tpromo-avviso{margin-top:9px;border:1px solid rgba(251,191,36,.45);background:#1A1710;color:#E8D9A8}
+.tpromo-avviso b{color:#FBBF24}
+.tposta{background:linear-gradient(180deg,#FCD34D,#D97706);color:#1A1207;border:none;font-size:12px}
+.tposta:disabled{background:#12151F;color:#5C6376;border:1px solid rgba(255,255,255,.09)}
+
 .tigscrivi{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;padding:11px;
   border-radius:14px;background:#12151F;border:1px solid rgba(255,255,255,.07)}
 .tigscrivi textarea{resize:none;height:52px;padding:8px 10px;border-radius:9px;border:none;

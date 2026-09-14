@@ -1725,14 +1725,19 @@ test("in media/ non restano immagini che nessuna riga di codice carica",
       /* Le stesse scene, ma senza gli elementi HTML sopra: servono per capire
          cosa e' disegno e cosa e' foto quando si rifanno le pagine dei
          luoghi. Erano dieci, tutte con il nome che gli aveva dato ChatGPT.
-         Quattro adesso sono il fondale vero delle sezioni dello Studio
+         Cinque adesso sono il fondale vero delle sezioni dello Studio
          (js/game/studio.js, STUDIO_FOTO) e sono uscite da questa lista: si
          chiamano studio_beat / studio_testo / studio_cabina / studio_mix /
-         studio_uscita / studio_promo, e
+         studio_uscita, e
          se sparissero dal disco il gioco se ne accorgerebbe da solo. Queste
-         quattro restano materiale in attesa — le due di casa, il freestyle sotto
+         restano materiale in attesa — le due di casa, il freestyle sotto
          il cavalcavia e il live club: i loro posti non hanno ancora una
-         pagina che le carichi. */
+         pagina che le carichi. E la scrivania di notte (`studio_promo.png`):
+         era il fondale del Marketing dello Studio, e dal 14/09/2026 la promo
+         sta sul telefono, in LaFamegram, che un fondale non ce l'ha. Resta
+         qui finche' il telefono non avra' una pagina a schermo intero che
+         possa caricarla. */
+      "studio_promo.png",
       "ChatGPT Image 6 set 2026, 19_43_32 (2).png",
       "ChatGPT Image 6 set 2026, 19_43_34 (6).png",
       "ChatGPT Image 6 set 2026, 19_43_34 (8).png",

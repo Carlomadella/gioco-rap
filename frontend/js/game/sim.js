@@ -31,7 +31,7 @@ function songWeekly(s){
      dopo settimana, che è quello che fa un video per davvero. */
   if(s.video) out *= s.video;
   if(s.viral) out *= s.viral;
-  /* la spinta della promo (punto 9 dello Studio): scelta al Marketing,
+  /* la spinta della promo (punto 9 dello Studio): scelta su LaFamegram,
      messa da actions.js, scende di settimana in settimana qui sotto */
   if(s.spinta) out *= s.spinta;
   return Math.round(out);
