@@ -49,6 +49,8 @@ const crimeuiPiatto = crimeui.replace(/\s+/g, "");
 const crime = leggi("js/game/strada-crimine.js");
 const state = leggi("js/game/state.js");
 const sim = leggi("js/game/sim.js");
+const telefono = leggi("js/game/telefono.js");
+const covers = leggi("js/game/covers.js");
 const skip = leggi("js/game/skip.js");
 const transfers = leggi("js/game/trasferte.js");
 const time = leggi("js/game/tempo.js");
@@ -652,8 +654,61 @@ test("nessun carattere del banco vale piu' di tre punti, in su o in giu'",
 test("un pezzo in cassaforte non esce per sbaglio dalla plancia",
   actions.includes("ready().filter(s => !s.tenuto)") &&
   actions.includes("need:() => ready().some(s => !s.tenuto)") &&
-  studio.includes("typeof studioPronti === \"function\" ? studioPronti() : ready()") &&
+  /* dal 14/09/2026 fuori va il pezzo sul banco, e la lista del banco non ha
+     i pezzi in cassaforte */
+  studio.includes("return (G.songs || []).filter(s => !s.released && !s.tenuto).slice().reverse();") &&
   studioEl.includes("return ready().filter(s => !s.tenuto);"));
+
+/* Il 14/09/2026 (brainstorming «lo Studio senza Cover, Feat e Marketing»,
+   scelta B + D3 + F2 + E) lo Studio e' passato da otto linguette a cinque. Le
+   tre sparite non sono sparite: sono finite dentro alle stanze giuste, e se
+   una di queste righe salta e' perche' qualcuno ha rimesso una linguetta o
+   ha staccato un pezzo che adesso sta altrove. */
+console.log("\nLo Studio a cinque linguette (14/09/2026)");
+test("le linguette dello Studio sono cinque: Beat, Testo, Cabina, Mix, Uscita",
+  (() => {
+    const ids = (studio.match(/\{id:"([a-z]+)",\s*n:"[^"]+",\s*bar:/g) || [])
+      .map(m => m.match(/id:"([a-z]+)"/)[1]);
+    return ids.join(",") === "beat,testo,cabina,banco,fuori";
+  })());
+test("il Marketing sta sul telefono: «Che post fai?» in LaFamegram, e Fuori ci manda",
+  telefono.includes("function telPromo()") &&
+  telefono.includes("function telSpingi(seed)") &&
+  telefono.includes('data-azione="\' + azione + \'"') &&
+  studio.includes("function studioFalloSapere()") &&
+  studio.includes('data-lafamegram="1"') &&
+  !studio.includes("function studioSezMarketing()"));
+test("il feat si sceglie in Cabina, da due porte: chi conosci gratis, la classifica a pagamento e con rifiuto",
+  studio.includes("function studioCabinaConChi(ft)") &&
+  studio.includes("function studioChiamaRivale(nome)") &&
+  studio.includes("function studioFeatProbabilita(r)") &&
+  studio.includes("G.gente.push(p);") &&
+  !studio.includes("function studioSezFeat()"));
+test("il feat conta sul pezzo: la sua gente ascolta (sim.js) e all'uscita muove l'hype",
+  actions.includes("featFama:conMe ? conMe.fama : 0") &&
+  actions.includes("function featHypeUscita(s)") &&
+  actions.includes("+ featHypeUscita(s)") &&
+  sim.includes("function featAscolti(s)") &&
+  sim.includes("const featPull = featAscolti(s);") &&
+  studioEl.includes("featAscolti(Object.assign({}, s, {q}))"));
+test("la copertina sta nell'Uscita e pesa sugli ascolti della prima settimana, non sulla qualita'",
+  studio.includes("function studioCoverTasti(s, p)") &&
+  studio.includes("return studioDaPubblicare();") &&
+  !studio.includes("function studioSezCover()") &&
+  covers.includes("function coverResa(s)") &&
+  sim.includes('if(age === 0 && typeof coverResa === "function") out *= coverResa(s);'));
+test("il riquadro dei numeri divide qualita' e ascolti, con le parti scritte alla registrazione",
+  studio.includes("function studioNumeri(s, qFinale, quando, proposta)") &&
+  actions.includes("parti:{beat:bt.q, testo:b.q, fonico:studioBonus(), feat:featBonus(), take:presa}") &&
+  actions.includes("if(s.parti) s.parti.mix = mixGain();"));
+test("il pezzo sul banco (F2): Mix e Uscita si aprono su di lui e si chiudono quando esce o va in cassaforte",
+  studio.includes("function studioSulBanco()") &&
+  studio.includes("return !!studioSulBanco();") &&
+  actions.includes('if(typeof studioMettiSulBanco === "function") studioMettiSulBanco(seed);') &&
+  actions.includes('if(typeof studioSvuotaBanco === "function") studioSvuotaBanco(s);') &&
+  studioEl.includes("studioSvuotaBanco(s);                    /* il banco si svuota") &&
+  studioEl.includes('if(typeof studioSvuotaBanco === "function") studioSvuotaBanco(s);') &&
+  studioEl.includes("studioMettiSulBanco(seed);               /* ritirato"));
 
 test("le uscite messe in coda per venerdi' scattano da sole, dopo il giro di settimana",
   studioEl.includes("function studioUscitePronte()") &&

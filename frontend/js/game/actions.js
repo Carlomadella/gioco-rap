@@ -359,6 +359,9 @@ const ACTIONS = [
             completa quando arriva. */
          parti:{beat:bt.q, testo:b.q, fonico:studioBonus(), feat:featBonus(), take:presa}};
        G.songs.push(s2); G.wellbeing = clamp(G.wellbeing-3,0,100);
+       /* appena inciso e' lui sul banco dello Studio (punto 10 «ad ogni
+          pezzo»): Mix e Uscita si aprono su di lui */
+       if(typeof studioMettiSulBanco === "function") studioMettiSulBanco(seed);
        pushLog("Registrato <b>«" + nome + "»</b> su «" + bt.n + "»" +
          (conMe ? " con <b>" + conMe.n + "</b>" : "") + " — qualità " + q + ".", "");
        SFX.rec(); save(); renderGioco();
@@ -395,6 +398,8 @@ const ACTIONS = [
      if(!s.mixed) s.q = clamp(s.q - 8, 5, 100);
      s.released = true; s.week = totalWeeks();
      anteprimeAllUscita(s);
+     /* uscito: il banco dello Studio si svuota, Mix e Uscita si richiudono */
+     if(typeof studioSvuotaBanco === "function") studioSvuotaBanco(s);
      /* un nome grosso sul pezzo muove l'hype quando esce: la sua gente lo
         vede (foglio dell'hype, «feat con nomi piu' grandi») */
      G.hype = clamp(G.hype + 6 + s.q*0.12 + featHypeUscita(s), 0, (typeof hypeCap==="function"?hypeCap():100));

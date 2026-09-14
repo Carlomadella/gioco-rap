@@ -498,14 +498,12 @@ function studioBancoMuovi(k, v, nodo){
   studioBancoRitocca(nodo, k, nuovo);
 }
 
-/* Qual e' il provino sul banco. `studioDaMixare()` da solo torna `null`
-   quando non ne hai scelto uno a mano — la sezione ripiega sul migliore, e
-   chi guarda il banco da fuori deve ripiegare sulla **stessa** cosa: senza
-   questa riga il riquadro del risultato non si aggiornava mai finche' non
-   avevi cliccato un provino, e restava a dire il carattere di prima. */
+/* Qual e' il provino sul banco: dal 14/09/2026 e' **il pezzo sul banco**
+   (`studioDaMixare()`, F2), e basta — non c'e' piu' un ripiego sul
+   migliore, perche' il banco ne tiene uno solo. Chi guarda il banco da fuori
+   (i cursori, l'ascolto) deve guardare la stessa cosa della sezione. */
 function studioProvino(){
-  const scelto = typeof studioDaMixare === "function" ? studioDaMixare() : null;
-  return scelto || unmixed().sort((a, b) => b.q - a.q)[0] || null;
+  return typeof studioDaMixare === "function" ? studioDaMixare() : null;
 }
 
 /* Il ritocco in posto: quello che si vede cambia, il pezzo che prende il
@@ -669,6 +667,7 @@ function studioMandaFuori(){
   if(q === "cassetto"){
     s.tenuto = true;
     delete s.esce;
+    studioSvuotaBanco(s);                    /* il banco si svuota: e' in cassaforte */
     /* la scelta torna su «stanotte»: la schermata passa da sola al pezzo
        dopo, e se il tasto d'oro restasse su «Tienilo da parte» un secondo
        tocco nello stesso punto metterebbe via anche quello — con niente che
@@ -696,7 +695,7 @@ function studioRiprendi(seed){
   if(!s) return;
   delete s.tenuto;
   delete s.esce;
-  studioDati().esce = seed;
+  studioMettiSulBanco(seed);               /* ritirato = di nuovo sul banco */
   studioDati().quando = "subito";
   SFX.tap(); save(); renderStudio(); renderGioco();
 }
@@ -725,6 +724,7 @@ function studioUscitePronte(){
        piu' **e** una mossa risparmiata. La mossa della giornata no, quella
        non gliela si puo' far pagare: il pezzo esce di notte, mentre dormi. */
     if(typeof addLuc === "function") addLuc(-1);
+    if(typeof studioSvuotaBanco === "function") studioSvuotaBanco(s);
     pushLog("<b>«" + s.t + "» è uscito</b>, di venerdì come avevi deciso" +
       (s.mixed ? "." : ", ma non era mixato: qualità " + s.q + "."), "good");
   }
