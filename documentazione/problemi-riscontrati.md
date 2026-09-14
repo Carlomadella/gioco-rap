@@ -1802,3 +1802,215 @@ suoi 2–9 fan. Il freno e' l'energia (8 a colpo) e il tetto dell'hype. E' una s
 bilanciamento, e sta tutta in `actions.js:449-475`; se il Marketing sembrera' una stampante di
 hype, la manopola e' li'. Stessa cosa per le anteprime fatte mesi prima su un pezzo tenuto in
 cassaforte: all'uscita valgono come se fossero di ieri.
+
+## Giro del 14/09/2026 (terzo)
+
+Fine task `task/studio-marketing-scegli-il-pezzo`, commit `fcebe81` (prima Beat, Testo e
+Cabina; il resto si apre col primo pezzo) e `e288634` (la proposta di copertina non resta
+orfana, l'anteprima suona come la promo). Controlli automatici tutti verdi: `npm run prova`
+158 a posto e 0 no, `audit-regressioni.js` 330 ok e 0 falliti, `verifica:build` 33 ok e 0
+falliti. Letti per intero i due diff, e poi le cose chieste una per una:
+
+- **chi apre lo Studio con una sezione da fuori** — l'unico che lo fa è il cartello «Studio»
+  della mappa (`hub.js:78`: `apriStudio(G.bars.length ? "beat" : "cabina")`), e sono due
+  sezioni aperte. `menu-sistema.js`, `telefono.js`, `spostamenti.js`, `posto.js`, `chat.js`,
+  `eventi-v2.js`, `skip.js`, `sim.js` non chiamano `apriStudio` con una sezione e non toccano
+  `G.studio`. L'altro salto interno (`studio-elementi.js:783`, «cambia copertina» che porta in
+  Cover) parte da Timing, che senza pezzi è chiusa: non ci si arriva. Nessuno finisce sul Beat
+  senza saperlo.
+- **il cartello «Beat Maker»** — non esiste più come posto (`hub.js:113`, «La Sala» al suo
+  posto), e `spostamenti.js:72` porta chi aveva salvato lì nello Studio senza sezione. A posto.
+- **salvataggio vecchio senza pezzi ma con roba in `G.studio`** — `renderStudio()` riporta al
+  Beat prima di disegnare; le sezioni chiuse non leggono niente. I pezzi non si cancellano mai
+  (nessun `songs.splice`/riassegnazione in `js/`), quindi una volta aperto resta aperto.
+- **`studioOltre()` e lo scroll** — la linguetta accesa è sempre la prima quando le altre sono
+  chiuse, `scrollIntoView` la porta a sinistra e la sfumatura «c'è dell'altro» si accende
+  correttamente. Il lucchetto allunga le cinque linguette ma la striscia scorre lo stesso;
+  `css/stretto.css:216` ha `.sttab{min-width:0;...}` e non tocca `::after`.
+- **`studioCoverPulisci()` e `ready()`** — `ready` è in `actions.js:162`, caricato a
+  `pagine/gioco.html:629`, prima di `studio.js` (riga 646); e `renderStudio()` esce subito se
+  lo Studio non è acceso, quindi non gira mai all'avvio. A posto.
+- **`pushLog` in `salvaConCopertine` senza `G.log`** — `G.log` sta in `START()`
+  (`state.js:21`) e il caricamento fa `Object.assign(START(), salvato)`, quindi c'è sempre;
+  in più `save()` (`state.js:102`) incarta tutto in un `try`. Non si rompe.
+
+Un problema solo, piccolo, e una nota.
+
+**RISOLTO (14/09/2026)** — sul branch prima del push: con il mouse sopra la linguetta
+chiusa tiene lo stesso fondo e lo stesso colore di quando non la tocchi
+(`css/studio.css`, `.sttab.chiusa:hover`).
+
+### Passando col mouse su una linguetta chiusa, si accende invece di restare spenta
+
+- **dove** — `frontend/css/studio.css:338`
+  (`.sttab.chiusa:hover{background:transparent;color:inherit}`).
+- **cosa succede** — la riga vuole togliere l'effetto del passaggio del mouse sulle
+  linguette col lucchetto, ma lo fa mettendo valori diversi da quelli di riposo: a riposo la
+  linguetta ha lo sfondo grigio leggero e il testo azzurro spento (`studio.css:327-330`,
+  `color:var(--stSoft)`), col mouse sopra lo sfondo sparisce e il testo prende il colore della
+  pagina (più chiaro). Il risultato è che la linguetta chiusa **cambia** quando ci passi
+  sopra, come se fosse cliccabile — il contrario di quel che dice il commento sopra. Con
+  l'opacità al 42% è poco visibile, ma c'è. Solo col mouse (la regola sta dentro
+  `@media (hover:hover)`): sul telefono non si vede.
+- **come si vede** — sul computer, partita nuova senza pezzi, Studio, passa il mouse su
+  «Mix» o «Marketing».
+- **quanto pesa** — da sistemare con calma.
+
+**Nota, non è un errore**: quando tieni la prima take e il pezzo nasce, le cinque linguette
+perdono il lucchetto in silenzio — nessun avviso dice «adesso si è aperto il resto». Il
+giocatore che ha letto «Prima il pezzo: Beat, Testo, Cabina. Poi il resto» lo intuisce, ma
+chi non ha mai toccato una linguetta chiusa potrebbe non accorgersi che c'è altro da fare
+oltre alla Cabina. È una scelta di come si racconta lo sblocco (`studio.js:1291-1297`), non
+un guasto; se serve, un toast nel punto in cui `registra` aggiunge il pezzo basta.
+
+## Prova sul telefono del 14/09/2026 (Studio: Cover, Marketing, linguette)
+
+Misure: **390 × 844** e **360 × 800**. Branch `task/studio-marketing-scegli-il-pezzo`,
+partita salvata con quattro pezzi («Sottopasso», «Terzo piano», «Neve sporca», «Sangue»),
+nessuno uscito. Guardato solo lo Studio, nei tre punti cambiati oggi: la proposta di
+copertina (Cover), «Cosa spingi» / «Non ancora fuori» con l'anteprima (Marketing), e le
+cinque linguette chiuse col lucchetto. Console senza errori per tutto il giro. Gli
+screenshot stanno in `documentazione/prove-telefono/2026-09-14/`.
+
+**Come l'ho provato, per riprovarlo.** Chrome ha ignorato tre volte il ridimensionamento
+della finestra (restava a 1150 × 687: è massimizzata). Ho messo il gioco dentro a un
+`<iframe>` della stessa origine largo esattamente 390 (poi 360) e alto 844 (poi 800), in
+una scheda a parte: dentro all'iframe le media query e il layout vedono quella misura, i
+tocchi arrivano ai bottoni veri e la console è quella del gioco. Due cose da tenere a mente
+leggendo le figure: (1) c'è la barra di scorrimento del computer, 15 px, che sul telefono
+non c'è — quindi la colonna utile era 375 e 345, non 390 e 360; (2) la rotella del mouse
+non scorreva la colonna, l'ho scorsa da console (`.stwrap.scrollTop`): che *scorra* l'ho
+verificato dalle misure (`scrollHeight` > `clientHeight`, `overflow-y:auto`), non col dito.
+
+**Quello che funziona.** Cover: «Generane un'altra» mette la proposta al centro con
+quella di adesso accanto, i tre tasti sono uno sotto l'altro larghi tutta la colonna e
+alti 48 px, niente esce dallo schermo (nessuno scorrimento orizzontale a nessuna delle due
+misure), «Lascia com'era» risponde al tocco e rimette la copertina sola. Marketing: i due
+elenchi stanno uno sotto l'altro nella colonna che scorre, non si coprono, l'ultima riga
+resta sopra alla banda del diario, il tocco su un pezzo di «Non ancora fuori» fa
+comparire «ANTEPRIMA: «…»» e il tasto d'oro «Fai uscire una preview» (48 px) si raggiunge.
+Linguette: le cinque chiuse hanno il lucchetto, restano su una riga (44 px di altezza,
+la striscia scorre: 568 px su 345), toccandone una si resta sul Beat ed esce l'avviso
+«Prima il pezzo: Beat, Testo, Cabina. Poi il resto.»
+
+![Cover a 390: proposta, «adesso» e i tre tasti](prove-telefono/2026-09-14/cover-proposta-390.jpg)
+![Marketing a 390: «Cosa spingi» e «Non ancora fuori»](prove-telefono/2026-09-14/marketing-due-elenchi-390.jpg)
+![Linguette chiuse a 390](prove-telefono/2026-09-14/linguette-chiuse-390.jpg)
+
+**RISOLTO (14/09/2026)** — `.toast` in `css/effects.css` ha `width:max-content` (col
+tetto `max-width` che c'era già): `left:50%` da solo gli lasciava mezzo schermo. Vale per
+tutti gli avvisi del gioco, non solo per questo.
+
+### L'avviso «Prima il pezzo…» sul telefono è una colonnina di quattro righe
+
+- **dove** — `frontend/css/effects.css:14-17` (`.toast{position:fixed;left:50%;...
+  max-width:min(92vw,460px)}`), chiamato da `frontend/js/game/studio.js:1373`.
+- **cosa succede** — il toast è `position:fixed` con `left:50%` e nessuna larghezza: la
+  larghezza «a misura del contenuto» si ferma allo spazio che resta a destra della metà
+  dello schermo. A 390 il riquadro viene largo 188 px e alto 109 (quattro righe di testo),
+  a 360 viene 172 × 122 (cinque righe). Il `max-width` non serve a niente, perché il
+  vincolo vero è più stretto. Sul computer non si vede: 575 px bastano a tutto. È l'unico
+  avviso che il giocatore *deve* leggere nello Studio nuovo — è quello che spiega perché
+  le cinque linguette sono chiuse — e arriva così.
+- **come si vede** — 390 × 844, partita senza pezzi (o `G.songs = []; renderStudio()`),
+  Studio, tocca «Mix».
+  ![Toast stretto a 390](prove-telefono/2026-09-14/linguette-chiuse-toast-stretto-390.jpg)
+- **quanto pesa** — si legge, ma è brutto e sta sopra ai tasti del pannello. Non è di
+  oggi (vale per ogni toast del gioco sul telefono), ma oggi è diventato parte del
+  percorso. Da sistemare con calma.
+
+**RISOLTO (14/09/2026)** — l'etichetta è «proposta», che ci sta.
+
+### A 360 «da confermare» nell'elenco della Cover è tagliato: si legge «da conf…»
+
+- **dove** — `frontend/js/game/studio.js:964` (la riga piccola
+  `q71 · generata · da confermare`) con `frontend/css/studio.css:182-183`
+  (`.stchi span{...white-space:nowrap;overflow:hidden;text-overflow:ellipsis}`).
+- **cosa succede** — resta sulla riga piccola, come chiesto, ma non ci sta: il testo
+  vuole 184 px e la riga ne ha 154 (a 360 con la barra del computer) o circa 169 (su un
+  telefono vero a 360): in tutti e due i casi l'ultima parola, che è quella che dice
+  qualcosa, sparisce nei puntini. A 390 ci sta (184 su 184, giusto giusto: basta una
+  parola in più e salta anche lì).
+- **come si vede** — 360 × 800, Cover, «Generane un'altra», scorri all'elenco «I tuoi
+  pezzi».
+  ![«da conf…» a 360](prove-telefono/2026-09-14/cover-elenco-da-confermare-tagliato-360.jpg)
+- **quanto pesa** — si vede ma si gira intorno: al centro c'è scritto la stessa cosa
+  («non è ancora sul pezzo»). Da sistemare con calma.
+
+**RISOLTO (14/09/2026)** — in `css/stretto.css` la copertina «di adesso» scende a 72 punti
+(la proposta resta a 110): si vede subito quale è quale, e la fascia «ADESSO» copre meno.
+
+### Sul telefono la copertina «grande» e quella «di adesso» sono quasi uguali, e l'etichetta copre il titolo
+
+- **dove** — `frontend/css/stretto.css:220` (`.stcopertina{width:110px;height:110px}`
+  sotto i 520) contro `frontend/css/studio.css:225`
+  (`.stcopertina.stprima{...width:96px;height:96px}`), e `studio.css:226-228` per la
+  fascia «adesso».
+- **cosa succede** — sul computer la proposta è 180 e quella di adesso 96: si capisce al
+  volo qual è la nuova. Sotto i 520 la proposta scende a 110 ma `.stprima` resta a 96
+  (ha due classi, vince sempre): 110 contro 96, si vede a malapena chi è la grande, e la
+  gerarchia «al centro lei, accanto quella di adesso» si perde. In più la fascia scura con
+  scritto «ADESSO» sta in fondo alla copertina piccola, esattamente dove la copertina
+  generata scrive il titolo del pezzo: i due testi si sovrappongono e non si legge né
+  l'uno né l'altro (questo a tutte le misure, anche sul computer).
+- **come si vede** — 390 × 844 o 360 × 800, Cover, «Generane un'altra»: guarda le due
+  copertine in alto.
+  ![Le due copertine a 360](prove-telefono/2026-09-14/cover-proposta-360.jpg)
+- **quanto pesa** — si vede ma si gira intorno (c'è comunque l'etichetta e c'è il
+  riquadro «non è ancora sul pezzo»). Da sistemare con calma.
+
+**APERTO, di proposito** — non è di oggi: è come sono impilate le colonne sotto i 980 punti
+(`stretto.css`, il centro prima di tutto) e vale per ogni sezione con un elenco a sinistra
+(Cabina, Mix, Timing). Scorrere in cima a ogni tocco sarebbe una scelta di navigazione per
+tutto lo Studio, e va decisa una volta, non da dentro questa task.
+
+### Nel Marketing tocchi un pezzo in fondo e la risposta compare in cima, fuori dallo schermo
+
+- **dove** — `frontend/css/stretto.css:185-186` (`.stmid{order:1}` e `.stsx{order:2}`:
+  sul telefono il centro sta sopra e gli elenchi sotto) con `frontend/js/game/studio.js:202-209`
+  (`studioSegna` → `renderStudio()`, che ridisegna senza toccare lo scorrimento).
+- **cosa succede** — per arrivare a «Non ancora fuori» devi scorrere in fondo; tocchi
+  «Sangue» e il pannello che cambia («ANTEPRIMA: «Sangue» · q78» col suo testo) è quello
+  sopra, che a quel punto sta sotto alla fascia alta: a 390 il titolo è tagliato (si
+  vede solo «q66» che spunta), a 360 sta a −28 px, cioè del tutto fuori. Il tasto d'oro
+  resta in vista in tutti e due i casi perché il pannello dell'anteprima è corto, ma
+  quello che ti dice *cosa* stai per fare non lo vedi finché non risali. Con la Promo
+  (pannello più lungo) resta in vista ancora meno.
+- **come si vede** — 390 × 844, un pezzo fuori e tre no, Marketing, scorri in fondo e
+  tocca un pezzo di «Non ancora fuori».
+  ![Dopo il tocco a 390: il titolo è sopra](prove-telefono/2026-09-14/marketing-dopo-il-tocco-titolo-fuori-390.jpg)
+  ![Dopo il tocco a 360](prove-telefono/2026-09-14/marketing-dopo-il-tocco-360.jpg)
+- **quanto pesa** — si vede ma si gira intorno: la riga si accende d'oro e il pollice sa
+  che ha toccato. Ma è lo stesso problema per Mix, Timing e Cover (tutti gli elenchi
+  che stanno sotto al centro). Da sistemare con calma.
+
+**APERTO, di proposito** — è lo stesso `stCapo()` di tutte le sezioni («SPINGI: «Sottopasso»
+· q71», «MIXI: …»): il numero va a capo da solo con qualunque titolo lungo, non solo qui.
+Si sistema in `stCapo` per tutte insieme, con `white-space:nowrap` sul numero e il titolo
+che si accorcia — non l'ho fatto in questa task per non toccare otto schermate all'ultimo.
+
+### Il capo «ANTEPRIMA: «Neve sporca» · q66» va a capo lasciando «· q66» da solo
+
+- **dove** — `frontend/js/game/studio.js:1092` (`stCapo("Anteprima", ant.t, "q" + ant.q)`)
+  con `frontend/css/studio.css:198-199` (`.stcapo{font-size:22px;...word-break:break-word}`).
+- **cosa succede** — a 390 la riga è larga 306 e il capo non ci sta: la seconda riga è
+  solo «· q66», col puntino in testa. A 360 uguale con «Sangue». Cosmetico.
+- **come si vede** — Marketing, tocca un pezzo di «Non ancora fuori», scorri in cima.
+  ![Il capo a capo a 390](prove-telefono/2026-09-14/marketing-anteprima-titolo-a-capo-390.jpg)
+- **quanto pesa** — si vede ma si gira intorno.
+
+**RISOLTO (14/09/2026)** — `scroll-padding-inline:12px` su `.sttabs`: `scrollIntoView`
+rispetta il margine della striscia.
+
+### La prima linguetta si apre attaccata al bordo sinistro, senza il suo margine
+
+- **dove** — `frontend/js/game/studio.js:1305-1307`
+  (`acceso.scrollIntoView({block:"nearest", inline:"nearest"})`), con il `padding` della
+  striscia in `frontend/css/stretto.css:215` (`.sttabs{...padding:8px 10px ...}`).
+- **cosa succede** — con le cinque chiuse la linguetta accesa è «Beat», la prima. Lo
+  `scrollIntoView` la porta a filo del bordo del contenitore, cioè scorre la striscia di
+  10 px e si mangia il margine sinistro: «Beat» parte a x = 0, attaccata allo schermo,
+  mentre tutte le altre hanno il loro respiro. Si vede a 390 (12 px) e a 360 (10 px).
+- **come si vede** — Studio con la partita senza pezzi, guarda in basso a sinistra.
+  ![«Beat» a filo a 360](prove-telefono/2026-09-14/linguette-chiuse-beat-attaccato-al-bordo-360.jpg)
+- **quanto pesa** — si vede ma si gira intorno.

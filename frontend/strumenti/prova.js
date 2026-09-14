@@ -1324,7 +1324,7 @@ console.log("\nlo Studio: la gente della Sala conta");
       dentro("G.studio.coverProva && G.studio.coverProva.per") === 41 &&
       dipinto().indexOf('data-cov="conferma"') >= 0 &&
       dipinto().indexOf('data-cov="lascia"') >= 0 &&
-      dipinto().indexOf("da confermare") >= 0);
+      dipinto().indexOf(">proposta<") >= 0);
     dentro("studioCoverLascia();");
     controlla("«Lascia com'era» la butta",
       dentro("G.studio.coverProva") === null && dentro("G.songs[0].seed") === 41);

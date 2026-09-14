@@ -1565,7 +1565,7 @@ toccano più il pezzo nell'istante in cui li premi: diventano una **proposta**
 (`G.studio.coverProva`, legata al pezzo dal suo seed) che si vede grande al centro, con
 quella di adesso piccola accanto e la scritta «adesso». Va sul pezzo solo con **«Conferma
 la copertina»**; «Lascia com'era» la butta. Nell'elenco a sinistra il pezzo con una
-proposta in piedi porta «da confermare».
+proposta in piedi porta «proposta» (era «da confermare»: a 360 punti si tagliava).
 
 Una cosa che la conferma sistema e prima era rotta: il seed è anche l'identità del pezzo
 per le scelte dello Studio (Mix, Timing, Cover, Marketing). Rigenerare la copertina lo

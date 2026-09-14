@@ -317,6 +317,9 @@
 .sttabs{position:absolute;left:0;right:0;bottom:0;z-index:7;
   display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
   padding:9px 12px calc(9px + env(safe-area-inset-bottom,0px));
+  /* `scrollIntoView` sulla linguetta accesa scorreva via anche il margine:
+     Beat finiva a filo del bordo sinistro */
+  scroll-padding-inline:12px;
   background:linear-gradient(180deg,rgba(4,8,14,.72),rgba(4,8,14,.97));
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   box-shadow:inset 0 1px 0 rgba(125,175,215,.16),0 -18px 40px rgba(0,0,0,.5)}
@@ -335,7 +338,9 @@
    non e' ancora ora — spenta e col lucchetto — ma resta al suo posto. */
 .sttab.chiusa{opacity:.42;cursor:not-allowed}
 .sttab.chiusa::after{content:" \1F512";font-size:.8em}
-@media (hover:hover){.sttab.chiusa:hover{background:transparent;color:inherit}}
+/* col mouse sopra resta spenta com'e': stesso fondo e stesso colore di quando
+   non la tocchi, se no si accende proprio quella che non si puo' premere */
+@media (hover:hover){.sttab.chiusa:hover{background:rgba(255,255,255,.045);color:var(--stSoft)}}
 .sttab.on{color:#12100A;background:linear-gradient(180deg,#FFDD84,#E0A92E);
   box-shadow:0 6px 18px rgba(224,169,46,.28)}
 /* il bordo che dice «c'è dell'altro»: sta sopra la barra, non dentro la

@@ -961,7 +961,7 @@ function studioSezCover(){
           attr:stSeme("cover", x), on:s === x,
           mini:stCover(x), n:x.t,
           d:"q" + x.q + (x.img ? " · copertina tua" : " · generata") +
-            (studioCoverProva(x) ? ' · <span class="oro">da confermare</span>' : "")
+            (studioCoverProva(x) ? ' · <span class="oro">proposta</span>' : "")
         })).join("")
       : studioVuoto("Non hai pezzi a cui cambiare la copertina."),
     "cartella");
