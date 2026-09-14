@@ -265,7 +265,7 @@ SUONO_NOMI.forEach(k => {
 });
 
 const SND = {scrivi:"write", beat:"apri", registra:"rec", mixa:"mix", pubblica:"publish",
-  promo:"promo", free:"crowd", live:"crowd", turno:"cash", cercalavoro:"apri", stacca:"tap",
+  promo:"promo", anteprima:"promo", free:"crowd", live:"crowd", turno:"cash", cercalavoro:"apri", stacca:"tap",
   palestra_pesi:"palestra", palestra_cardio:"palestra"};
 
 /* ---- il click dei pulsanti ----

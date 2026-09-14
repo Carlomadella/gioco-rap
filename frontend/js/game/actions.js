@@ -450,7 +450,8 @@ const ACTIONS = [
    d:"Quindici secondi sui social. Il pezzo non è fuori, ma la gente lo aspetta.",
    need:() => {
      const s = typeof studioDaAnticipare === "function" ? studioDaAnticipare() : null;
-     return !s ? "1 pezzo non ancora uscito, scelto al Marketing"
+     /* corto: sul telefono la riga e' una sola, e i puntini mangiano la fine */
+     return !s ? "un pezzo scelto al Marketing"
        : (s.anteprime || 0) >= ADF_ANTEPRIME_MAX ? "un pezzo che non hanno già sentito" : null;
    },
    give:() => {

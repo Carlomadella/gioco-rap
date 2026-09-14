@@ -1334,6 +1334,9 @@ console.log("\nlo Studio: la gente della Sala conta");
       dentro("G.studio.esce") === dentro("G.songs[0].seed") &&
       dentro("G.studio.coverProva") === null &&
       dentro("daPubblicare().t") === "Vestito");
+    dentro("studioCoverAltra(); G.songs[0].released = true; renderStudio();");
+    controlla("una proposta il cui pezzo e' uscito si butta da sola al ridisegno",
+      dentro("G.studio.coverProva") === null);
 
     /* Punto 10 dello Studio: prima Beat, Testo e Cabina, poi il resto. Le
        altre cinque linguette restano chiuse finche' non c'e' il primo pezzo. */

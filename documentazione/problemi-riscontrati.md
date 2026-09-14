@@ -1722,7 +1722,7 @@ Le cose che la task chiedeva di guardare, in ordine:
   salvataggio e non c'e' piu' un tasto per buttarla. Se il pezzo viene **rinominato dalla
   plancia** invece va bene: `ui.js:449` rimette lo stesso seed (`chiediTitolo` con `pezzo` non
   ne genera uno nuovo), la proposta resta agganciata e il titolo nel riquadro grande segue,
-  perche' e' letto da `s.t` al momento del disegno (`studio.js:951`).
+  perche' e' letto da `s.t` al momento del disegno (`studio.js:957`).
 - **`s.anteprime` e la cassaforte** — a posto. Un pezzo `tenuto` sparisce da «Non ancora fuori»
   (`studioPronti()` lo esclude) ma le anteprime restano scritte sul pezzo; quando lo riprendi
   torna in elenco col suo conto, e all'uscita — le due sole strade, `actions.js:383` e
@@ -1739,6 +1739,12 @@ Le cose che la task chiedeva di guardare, in ordine:
   l'evento `after_action` con `action_id:"anteprima"`; il catalogo lo confronta con liste di
   id (`hookMatches`, `:2152`) e un id che nessun evento conosce non fa scattare niente. Nessun
   errore, solo silenzio: un'anteprima non puo' far nascere un evento social, la promo si.
+
+**RISOLTE (14/09/2026)** — tutte e tre, sul branch prima del push. `studioCoverPulisci()`
+(chiamata da `renderStudio()`) butta la proposta il cui pezzo non sta più nella Cover, e
+`salvaConCopertine` la sacrifica **prima** delle copertine confermate; proporre su un altro
+pezzo lo dice con un avviso. Il motivo della mossa spenta è «Serve un pezzo scelto al
+Marketing». `SND.anteprima = "promo"` in `fx.js`.
 
 ### La copertina proposta e non confermata resta nel salvataggio, foto compresa, e nessuno la toglie
 
@@ -1781,7 +1787,7 @@ Le cose che la task chiedeva di guardare, in ordine:
 
 - **dove** — `frontend/js/game/fx.js:267-269` (la tabella `SND` che lega ogni mossa al suo
   suono: `promo:"promo"`, `anteprima` non c'e'), letta da `ui.js:140` con `|| "tap"`.
-- **cosa succede** — la nuova mossa ha la scena della promo (`scene-art.js:191`), il colore
+- **cosa succede** — la nuova mossa ha la scena della promo (`scene-art.js:190`), il colore
   della promo (`ui.js:25`) e i suoi minuti, ma quando parte suona il «tap» generico. E' l'unica
   delle mosse con la scena a schermo pieno senza il suo suono.
 - **come si vede** — Studio, Marketing, scegli un pezzo sotto «Non ancora fuori», «Fai uscire

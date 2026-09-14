@@ -394,9 +394,23 @@ function studioCoverProva(s){
   const p = (G.studio || {}).coverProva;
   return (p && s && p.per === s.seed) ? p : null;
 }
+/* Una proposta il cui pezzo non sta piu' nella Cover (e' uscito, o non c'e'
+   piu') non ha nessun tasto che la butti: si butta da sola, se no resta nel
+   salvataggio con la foto dentro. La chiama `renderStudio()`. */
+function studioCoverPulisci(){
+  const p = (G.studio || {}).coverProva;
+  if(!p) return;
+  if(!ready().some(x => x.seed === p.per)) G.studio.coverProva = null;
+}
 function studioCoverProponi(seed, img){
   const s = studioPezzoCover();
   if(!s) return;
+  /* la casella e' una sola: se ce n'era una su un altro pezzo, lo si dice */
+  const prima = (G.studio || {}).coverProva;
+  if(prima && prima.per !== s.seed){
+    const altro = ready().find(x => x.seed === prima.per);
+    if(altro) toast("Lasciata la proposta su «" + altro.t + "»", "", "·", ["#3A3F49", "#22262E"]);
+  }
   studioDati().coverProva = {per:s.seed, seed, img:img || ""};
   save(); renderStudio();
 }
@@ -1270,6 +1284,7 @@ function renderStudio(){
   const root = $("studio");
   if(!root || !root.classList.contains("on")) return;
 
+  studioCoverPulisci();
   let sez = STUDIO_SEZIONI.find(x => x.id === STUDIO_SEZ) || STUDIO_SEZIONI[0];
   /* una sezione chiusa non si disegna nemmeno arrivandoci da fuori (un
      cartello della mappa, un salvataggio): si torna al Beat */

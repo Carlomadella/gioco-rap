@@ -29,6 +29,15 @@ function caricaCopertina(file, ok, ko){
 function salvaConCopertine(){
   try{ localStorage.setItem(CHIAVE_PARTITA(), JSON.stringify(G)); return true; }
   catch(e){
+    /* prima ancora delle copertine sui pezzi va via la **proposta** della
+       Cover (`G.studio.coverProva`), che una foto ce l'ha ma non e' ancora
+       di nessuno: sacrificare una confermata per tenere una in sospeso
+       sarebbe al contrario */
+    if(G.studio && G.studio.coverProva && G.studio.coverProva.img){
+      G.studio.coverProva = null;
+      pushLog("La memoria del browser è piena: ho lasciato la copertina che avevi proposto e non confermato.", "bad");
+      return salvaConCopertine();
+    }
     const conFoto = G.songs.filter(x => x.img);
     if(!conFoto.length) return false;
     delete conFoto[0].img;
