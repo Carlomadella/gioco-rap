@@ -1336,7 +1336,7 @@ console.log("\nlo Studio: la gente della Sala conta");
       dipinto().indexOf('data-feat="rp"') >= 0 &&
       dipinto().indexOf('data-feat=""') >= 0 &&
       dipinto().indexOf('data-rivale="Kobra"') >= 0 &&
-      dipinto().indexOf("viene gratis") >= 0,
+      dipinto().indexOf("sì al ") >= 0,
       dipinto().slice(0, 300));
     controlla("e la linguetta Feat non c'e' piu'",
       dentro("STUDIO_SEZIONI.some(x => x.id === 'feat')") === false);
