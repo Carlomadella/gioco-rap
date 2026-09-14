@@ -22,6 +22,7 @@ const ART = {
   scrivi:TINTA_STUDIO.concat("S"), beat:TINTA_SUONO.concat("B"),
   registra:TINTA_STUDIO.concat("R"), mixa:TINTA_STUDIO.concat("M"),
   pubblica:TINTA_STUDIO.concat("P"), promo:TINTA_HUSTLE.concat("O"),
+  anteprima:TINTA_HUSTLE.concat("A"),
   free:TINTA_SUONO.concat("F"), live:TINTA_SUONO.concat("L"),
   turno:TINTA_HUSTLE.concat("€"), cercalavoro:TINTA_HUSTLE.concat("C"),
   stacca:TINTA_VITA.concat("Z"), palestra_pesi:TINTA_VITA.concat("P"),
@@ -42,7 +43,7 @@ const SH_GEAR_ICONE = {
    pezzo, i due colloqui). Queste sette no: adesso aprono la scenetta che
    avevano già sulla card (scene-art.js), grande, con l'esito scritto
    sopra — non un'altra riga di testo che vola via in due secondi. */
-const SCENA_PIENA = new Set(["mixa","pubblica","promo","live","turno","stacca",
+const SCENA_PIENA = new Set(["mixa","pubblica","promo","anteprima","live","turno","stacca",
   "palestra_pesi","palestra_cardio"]);
 function mostraScena(a, sc, msg, extra){
   $("sc-art").innerHTML = sc[2]

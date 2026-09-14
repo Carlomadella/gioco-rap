@@ -1518,3 +1518,143 @@ toglie invece di fare il giro del toggle — che su `null` lo avrebbe rimesso.
 Provato in partita: le due caselle escono come `BUTTON`, il clic sul fonico lo sceglie
 (`G.studio.fonico` valorizzato) e il clic su «da solo» lo toglie (torna `null`), con la
 spunta che si sposta.
+
+## Al Marketing si sceglie quale pezzo spingere
+
+~~«Come nell'interfaccia dei beatmaker, nella sezione dove si posta il pezzo per hype' non fa cliccare su nessun pezzo se non su quello già selezionato.»~~ **FATTO (14/09/2026)**
+
+Stesso difetto del banco del Mix: le righe di «Cosa spingi» erano `stScelta()` senza
+attributo, quindi `<div>` muti, e quella accesa era sempre la prima — l'ultimo uscito —
+qualunque cosa si toccasse. Ma renderle cliccabili e basta sarebbe stata una finta, perché
+la promo di `actions.js` non guardava nessun pezzo: dava hype e follower «a tutto quello
+che hai fuori», e scegliere non avrebbe cambiato un numero.
+
+Adesso le righe portano `data-spingi="<seed>"` e passano da `studioSegna("spingi", …)`, lo
+stesso meccanismo di Mix e Timing; `studioDaSpingere()` legge la scelta e, se non c'è o il
+pezzo è sparito, torna all'ultimo uscito come ha sempre fatto. La promo lascia sul pezzo
+scelto una **spinta** (`s.spinta`, +0,10 a post, non oltre 1,5), che `songWeekly()` in
+`sim.js` moltiplica sugli stream della settimana e che scende di settimana in settimana
+come la viralità — un post fa girare il pezzo, non lo rifa uscire. Nel riquadro il pezzo
+spinto porta «in spinta», e l'esito dice quale hai spinto. Hype e follower della promo non
+sono cambiati di un punto.
+
+La prova sta in `strumenti/prova.js` (tre controlli sotto «al Marketing i pezzi fuori si
+possono cliccare»): il collegamento, la scelta che vince sull'ultimo uscito, e la spinta
+che finisce sul pezzo scelto e non sugli altri.
+
+Provato in partita: con due pezzi fuori è acceso l'ultimo, il clic sull'altro sposta la
+spunta e il titolo di «SPINGI», e «Posta» scrive «Spingi «Sottopasso»» con `spinta = 1.1`
+solo su quello.
+
+## Quando tieni la take si chiede solo il nome; la copertina si conferma nella Cover
+
+~~«Quando scegli la take esce un container che ti deve chiedere solo il nome del pezzo e non la copertina, quella viene dopo nella sezione cover»~~ **FATTO (14/09/2026)**
+
+~~«non c'è un tasto di conferma della copertina»~~ **FATTO (14/09/2026)**
+
+Sono lo stesso flusso, e si sono fatti insieme. `chiediTitolo()` in
+`frontend/js/game/copertine.js` chiede il titolo e basta: via la copertina, i tre tasti
+sotto e la nota sul ritaglio, e il testo dice dove si va per la copertina. Il pezzo nasce
+come prima con la copertina generata dal suo seed; chi passa un pezzo (la rinomina dalla
+plancia, `ui.js`) si riprende seed e foto intatti, quindi la firma non è cambiata. Le
+classi `.copbox/.cop/.copaz/.copbtn/.copnota` di `overlays.css` non le usava più nessuno e
+sono andate via nello stesso commit.
+
+Nella Cover dello Studio «Generane un'altra», la foto caricata e «Togli la foto» non
+toccano più il pezzo nell'istante in cui li premi: diventano una **proposta**
+(`G.studio.coverProva`, legata al pezzo dal suo seed) che si vede grande al centro, con
+quella di adesso piccola accanto e la scritta «adesso». Va sul pezzo solo con **«Conferma
+la copertina»**; «Lascia com'era» la butta. Nell'elenco a sinistra il pezzo con una
+proposta in piedi porta «proposta» (era «da confermare»: a 360 punti si tagliava).
+
+Una cosa che la conferma sistema e prima era rotta: il seed è anche l'identità del pezzo
+per le scelte dello Studio (Mix, Timing, Cover, Marketing). Rigenerare la copertina lo
+cambiava, e il pezzo scelto in Timing «spariva» — si tornava al migliore senza dirlo. Ora
+`studioCoverConferma()` sposta le scelte sul seed nuovo.
+
+Le prove stanno in `strumenti/prova.js` (quattro controlli sotto «senza proposta la Cover
+offre foto e rigenera»). Provato in partita: il container della take chiede solo il nome;
+nella Cover «Generane un'altra» apre la proposta con i due tasti, «Conferma» cambia il seed
+e `G.studio.esce` lo segue (Timing continua a dire «Sottopasso»), «Lascia com'era» rimette
+tutto com'era.
+
+Sistemate insieme le quattro cose che `segnala-problemi` aveva trovato sul Marketing (giro
+del 14/09 in `documentazione/problemi-riscontrati.md`): «in spinta» e ogni pezzo colorato
+dentro alla riga piccola restano in riga (`.stchi span span{display:inline}` — andava a
+capo anche «−8 se esce così» in Timing); un pezzo scelto più vecchio dei sei mostrati resta
+nell'elenco; la descrizione della promo dice che spinge il pezzo scelto; una riga senza seed
+esce muta (`stSeme()`) invece che come bottone che non fa niente.
+
+## Un pezzo non uscito non si spinge: se ne fa uscire un'anteprima
+
+~~«non posso spingere una canzone che non è ancora uscita, al massimo faccio uscire una preview»~~ **FATTO (14/09/2026)**
+
+La prima metà era già vera — al Marketing la promo vede solo i pezzi usciti — ma la
+seconda no: di un pezzo chiuso in cartella non si poteva fare niente finché non usciva.
+Adesso «Cosa spingi» ha sotto un secondo elenco, **«Non ancora fuori»**, con i pezzi
+registrati e non usciti (quelli in cassaforte no). Se ne tocchi uno il pannello centrale
+diventa **ANTEPRIMA** e il tasto d'oro è «Fai uscire una preview»; la promo non c'è, perché
+quella è per i pezzi fuori e basta. Se ritocchi un pezzo uscito si torna alla promo.
+
+L'anteprima è una mossa vera di `actions.js` (`anteprima`: 8 energia, 30 minuti in
+`tempo.js`, la stessa scena della promo): dà un po' di hype — pieno la prima volta, la
+metà la seconda, un terzo la terza, e alla terza si ferma: «l'hanno già sentito». Ogni
+anteprima resta scritta sul pezzo (`s.anteprime`) e **quando esce** — dall'azione
+`pubblica` o da `studioUscitePronte()` il venerdì — diventa la spinta della prima
+settimana: `s.spinta = 1 + 0,12 × anteprime`, la stessa spinta della promo, che poi
+scende da sola. Il riquadro lo dice prima («anteprime fatte: 1/3 · all'uscita parte al
+124%»). Le costanti stanno in cima ad `actions.js` (`ADF_ANTEPRIME_MAX`,
+`ADF_ANTEPRIMA_SPINTA`).
+
+La casella è la stessa `spingi` del punto sul Marketing: `studioDaSpingere()` la legge fra
+gli usciti (e ripiega sull'ultimo), `studioDaAnticipare()` fra i non usciti (e senza
+scelta è `null`: l'anteprima non parte da sola).
+
+Sei prove in `strumenti/prova.js` (sotto «al Marketing il pezzo non uscito sta sotto
+«Non ancora fuori»»). Provato in partita: scelto «Sangue» (non uscito) il centro passa
+all'anteprima, la mossa costa 8 energia e 30 minuti, apre la scena con «Anteprima di
+«Sangue»: hype +3. Quando esce parte al 112%», e la riga dice «1 anteprima».
+
+## Prima Beat, Testo e Cabina; il resto si apre col primo pezzo
+
+~~«l'utente deve poter fare solo le sezioni Beat, Testo, e Cabina, poi il resto»~~ **FATTO (14/09/2026)** — nella lettura più semplice, e la lettura è una scelta: vedi sotto.
+
+Le cinque linguette dopo la Cabina — Mix, Cover, Feat, Timing, Marketing — restano
+**chiuse finché non hai registrato il primo pezzo**: spente, col lucchetto, al loro posto
+(`.sttab.chiusa`). Toccarle dice «Prima il pezzo: Beat, Testo, Cabina. Poi il resto» e non
+cambia sezione; arrivarci da fuori (un cartello della mappa, un salvataggio) riporta al
+Beat. Appena c'è un pezzo (`G.songs.length > 0`) si apre tutto, e resta aperto: è il
+percorso guidato della prima volta, non un vincolo per sempre. Le sezioni portano
+`dopo:true` in `STUDIO_SEZIONI`, e `studioSezAperta()` decide.
+
+**La scelta che ho preso, e che puoi ribaltare**: il punto si può leggere in due modi.
+*Prima volta* — le tre sezioni sono l'inizio, poi lo Studio è tutto tuo (quello che c'è
+adesso). *Ogni pezzo* — per ogni canzone si passa da Beat → Testo → Cabina e solo dopo si
+mixa, si veste, si fa uscire: ma le sezioni dopo la Cabina già oggi lavorano solo su un
+pezzo registrato (senza pezzi dicono «Si comincia dalla Cabina»), quindi il vincolo per
+pezzo c'è già nei fatti, e chiuderle di nuovo a ogni pezzo avrebbe tolto la possibilità
+di mixare il pezzo di ieri mentre scrivi quello di oggi. Se volevi la seconda, si cambia
+`studioSbloccato()` e basta.
+
+Tre prove in `strumenti/prova.js` (sotto «senza pezzi Mix, Cover, Feat, Timing e
+Marketing sono chiuse»). Provato in partita: con la cartella vuota le cinque linguette
+hanno il lucchetto, il tocco su Marketing lascia il Beat e mostra l'avviso; col primo pezzo
+si aprono.
+
+## Le misure di un anno, dopo i sette ritocchi allo Studio
+
+Fatte il 14/09/2026 nel gioco vero, su una copia dello stato (fan 300, hype 15, un pezzo
+q70, fase Sconosciuto), rimettendo poi il salvataggio com'era.
+
+- **La spinta della promo** (punto «al Marketing si sceglie quale pezzo spingere»): 52
+  settimane con tre post a settimana sul pezzo. Con la spinta 2.211 stream, senza 1.900:
+  **+16 %**. La spinta si assesta a 1,2 (sale di 0,10 a post ma la resa del giorno la
+  frena e ogni settimana ne resta il 55 %), hype e follower identici nei due casi: la promo
+  dà quello che dava, in più il pezzo scelto gira un po' di più. Un anno di `advanceWeek()`
+  ci mette 1,4–2 secondi.
+- **Le anteprime** (punto «al massimo faccio uscire una preview»): media di 30 corse. Tre
+  anteprime prima dell'uscita (24 energia, 90 minuti) contro nessuna: prima settimana 285
+  stream contro 175 (**+63 %**), sei settimane 1.094 contro 872 (**+25 %**). Il +36 % è la
+  spinta all'uscita (1,36); il resto è l'hype che le anteprime stesse hanno dato (15 → 20,
+  che entra nella «scoperta» di `songWeekly()`). È un vantaggio vero per chi prepara
+  l'uscita, non un secondo motore.

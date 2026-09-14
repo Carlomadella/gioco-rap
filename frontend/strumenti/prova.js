@@ -1082,7 +1082,7 @@ console.log("\nlo Studio: la gente della Sala conta");
       function chiediTitolo(){} function hubPronta(){ return {ok:true, perche:""}; }
       function hubAzione(){} function apriFoglio(){} function scegliModo(){}
       function offriBeat(){ return []; } function adfOggi(){ return 0; }
-      SFX = { tap(){}, rec(){}, fanfare(){}, fail(){} };
+      SFX = { tap(){}, rec(){}, fanfare(){}, fail(){}, publish(){} };
     `, scatola);
     for(const f of sorgenti)
       vm.runInContext(fs.readFileSync(path.join(RADICE, f), "utf8"), scatola, { filename: f });
@@ -1280,6 +1280,118 @@ console.log("\nlo Studio: la gente della Sala conta");
     dentro("G.songs = G.songs.filter(x => x.seed !== 22);");
     controlla("e se il pezzo scelto sparisce non si pianta: torna a decidere lei",
       dentro("daMixare().t") === "Buono" && dentro("daPubblicare().t") === "Buono");
+
+    /* Punto 9 dello Studio: al Marketing si sceglie quale pezzo spingere.
+       Prima le righe erano mute come al banco del Mix, e la promo accendeva
+       «tutto quello che hai fuori»: se il collegamento si stacca, la scelta
+       torna a essere un ornamento. */
+    dentro(`
+      G.songs = [
+        {t:'Vecchio', q:70, mixed:true, released:true, week:1, streams:900, seed:31},
+        {t:'Nuovo',   q:60, mixed:true, released:true, week:3, streams:100, seed:32}
+      ];
+      G.week = 4; G.studio.spingi = null;
+      STUDIO_SEZ = "promo"; renderStudio();
+    `);
+    controlla("al Marketing i pezzi fuori si possono cliccare, e senza scelta e' acceso l'ultimo uscito",
+      dipinto().indexOf('data-spingi="31"') >= 0 &&
+      dipinto().indexOf('data-spingi="32"') >= 0 &&
+      dentro("studioDaSpingere().t") === "Nuovo",
+      dipinto().slice(0, 300));
+    dentro("studioSegna('spingi', 31);");
+    controlla("scelto il vecchio, e' lui che si spinge",
+      dentro("studioDaSpingere().t") === "Vecchio" &&
+      /class="stscelta on"[^>]*data-spingi="31"/.test(dipinto()));
+    dentro("ACTIONS.find(a => a.id === 'promo').run();");
+    controlla("e la promo lascia la spinta sul pezzo scelto, non sugli altri",
+      dentro("G.songs[0].spinta") > 1 && dentro("G.songs[1].spinta") === undefined,
+      "spinta " + dentro("G.songs[0].spinta"));
+
+    /* Punto 5 dello Studio: «non c'e' un tasto di conferma della copertina».
+       Generarne un'altra e' una proposta: il pezzo cambia solo con Conferma,
+       e le scelte dello Studio che lo segnavano col vecchio seed lo seguono. */
+    dentro(`
+      G.songs = [{t:'Vestito', q:70, mixed:true, released:false, seed:41, img:''}];
+      G.studio.coverProva = null; G.studio.esce = 41; G.studio.cover = 41;
+      STUDIO_SEZ = "cover"; renderStudio();
+    `);
+    controlla("senza proposta la Cover offre foto e rigenera, e nessuna conferma",
+      dipinto().indexOf('data-cov="carica"') >= 0 &&
+      dipinto().indexOf('data-cov="conferma"') < 0);
+    dentro("studioCoverAltra();");
+    controlla("«Generane un'altra» non tocca il pezzo: e' una proposta da confermare",
+      dentro("G.songs[0].seed") === 41 &&
+      dentro("G.studio.coverProva && G.studio.coverProva.per") === 41 &&
+      dipinto().indexOf('data-cov="conferma"') >= 0 &&
+      dipinto().indexOf('data-cov="lascia"') >= 0 &&
+      dipinto().indexOf(">proposta<") >= 0);
+    dentro("studioCoverLascia();");
+    controlla("«Lascia com'era» la butta",
+      dentro("G.studio.coverProva") === null && dentro("G.songs[0].seed") === 41);
+    dentro("studioCoverAltra(); studioCoverConferma();");
+    controlla("«Conferma» la mette sul pezzo, e Timing continua a puntare a quel pezzo",
+      dentro("G.songs[0].seed") !== 41 &&
+      dentro("G.studio.esce") === dentro("G.songs[0].seed") &&
+      dentro("G.studio.coverProva") === null &&
+      dentro("daPubblicare().t") === "Vestito");
+    dentro("studioCoverAltra(); G.songs[0].released = true; renderStudio();");
+    controlla("una proposta il cui pezzo e' uscito si butta da sola al ridisegno",
+      dentro("G.studio.coverProva") === null);
+
+    /* Punto 10 dello Studio: prima Beat, Testo e Cabina, poi il resto. Le
+       altre cinque linguette restano chiuse finche' non c'e' il primo pezzo. */
+    dentro("G.songs = []; STUDIO_SEZ = 'promo'; renderStudio();");
+    const linguette = () => nodi["st-tabs"].innerHTML || "";
+    controlla("senza pezzi Mix, Cover, Feat, Timing e Marketing sono chiuse, e Beat/Testo/Cabina no",
+      ["banco", "cover", "feat", "fuori", "promo"].every(id =>
+        new RegExp('sttab[^"]*chiusa" data-sez="' + id + '"').test(linguette())) &&
+      ["beat", "testo", "cabina"].every(id =>
+        new RegExp('class="sttab( on)?" data-sez="' + id + '"').test(linguette())),
+      linguette().slice(0, 300));
+    controlla("e arrivando a una sezione chiusa si torna al Beat",
+      dentro("STUDIO_SEZ") === "beat");
+    dentro("G.songs = [{t:'Primo', q:50, mixed:false, released:false, seed:61}]; renderStudio();");
+    controlla("col primo pezzo registrato si apre tutto",
+      linguette().indexOf("chiusa") < 0);
+
+    /* Punto 8 dello Studio: un pezzo non ancora uscito non si spinge — al
+       massimo se ne fa uscire un'anteprima, che all'uscita diventa spinta. */
+    dentro(`
+      G.songs = [
+        {t:'Fuori',   q:60, mixed:true, released:true,  week:2, streams:100, seed:51},
+        {t:'Chiuso',  q:70, mixed:true, released:false, week:0, streams:0,   seed:52}
+      ];
+      G.week = 4; G.studio.spingi = null; G.hype = 10; G.energy = 100;
+      STUDIO_SEZ = "promo"; renderStudio();
+    `);
+    controlla("al Marketing il pezzo non uscito sta sotto «Non ancora fuori», e al centro c'e' la promo",
+      dipinto().indexOf("Non ancora fuori") >= 0 &&
+      dipinto().indexOf('data-spingi="52"') >= 0 &&
+      dipinto().indexOf('data-az="promo"') >= 0 &&
+      dipinto().indexOf('data-az="anteprima"') < 0);
+    controlla("senza un pezzo non uscito scelto, l'anteprima non parte",
+      typeof dentro("ACTIONS.find(a => a.id === 'anteprima').need()") === "string");
+    dentro("studioSegna('spingi', 52);");
+    controlla("scelto il pezzo chiuso, al centro c'e' l'anteprima e la promo resta sull'ultimo uscito",
+      dipinto().indexOf('data-az="anteprima"') >= 0 &&
+      dipinto().indexOf('data-az="promo"') < 0 &&
+      dentro("studioDaAnticipare().t") === "Chiuso" &&
+      dentro("studioDaSpingere().t") === "Fuori");
+    const hypePrima = dentro("G.hype");
+    dentro("ACTIONS.find(a => a.id === 'anteprima').run();");
+    controlla("l'anteprima da' hype e si segna sul pezzo, che resta non uscito",
+      dentro("G.hype") > hypePrima && dentro("G.songs[1].anteprime") === 1 &&
+      dentro("G.songs[1].released") === false);
+    dentro("ACTIONS.find(a => a.id === 'anteprima').run(); ACTIONS.find(a => a.id === 'anteprima').run();");
+    controlla("alla terza l'anteprima si ferma: l'hanno gia' sentito",
+      dentro("G.songs[1].anteprime") === 3 &&
+      typeof dentro("ACTIONS.find(a => a.id === 'anteprima').need()") === "string");
+    dentro("G.studio.esce = 52; ACTIONS.find(a => a.id === 'pubblica').run();");
+    controlla("quando esce, le anteprime diventano la spinta della prima settimana",
+      dentro("G.songs[1].released") === true &&
+      dentro("G.songs[1].anteprime") === undefined &&
+      Math.abs(dentro("G.songs[1].spinta") - 1.36) < 1e-9,
+      "spinta " + dentro("G.songs[1].spinta"));
   }
 }
 

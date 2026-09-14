@@ -223,17 +223,24 @@ NETWORK 64
 
 /_ LUOGO: STUDIO _/
 
-3. Quando scegli la take esce un container che ti deve chiedere solo il nome del pezzo e non la copertina, quella viene dopo nella sezione cover
-
-5. non c'è un tasto di conferma della copertina
-
 6. non posso scegliere i feat, e inoltre non posso fare canzoni senza feat
 
-8. non posso spingere una canzone che non è ancora uscita, al massimo faccio uscire una preview
-
-9. Come nell'interfaccia dei beatmaker, nella sezione dove si posta il pezzo per hype' non fa cliccare su nessun pezzo se non su quello già selezionato.
-
-10. l'utente deve poter fare solo le sezioni Beat, Testo, e Cabina, poi il resto
+   **RISPOSTA (14/09/2026) — serve una scelta, e non l'ho presa da solo.** Ho provato in
+   partita e nel codice, e come guasto non si riproduce: nella sezione Feat i rapper che
+   conosci sono bottoni (`data-feat`), il clic li mette «in sessione», «Lascia perdere» li
+   toglie, e senza nessuno in sessione si registra lo stesso — il centro dice «Va benissimo
+   così: il feat è una scelta, non un passaggio», e il pezzo esce senza feat. Quello che
+   probabilmente hai visto è la lista **vuota**: si può chiamare solo un rapper che hai già
+   conosciuto alla Sala (`studioGente("rapper")` legge `G.gente`), e a inizio partita non
+   c'è nessuno — la sezione lo dice, «Non conosci ancora nessun altro rapper. Si incontrano
+   alla Sala». La domanda è di design, non di codice: **da chi si deve poter scegliere il
+   feat?** Solo da chi conosci (com'è ora, e allora il punto è solo che la lista vuota va
+   spiegata meglio), oppure da tutti i rapper della città, anche mai visti, con un costo o
+   un rifiuto per chi non ti conosce (come alla Sala, dove «Proponi un pezzo insieme»
+   chiede «collaboratori»). Se «non posso fare canzoni senza feat» voleva dire un'altra
+   cosa, dimmi dov'eri: con un feat scelto non si può registrare senza tornare in Feat a
+   toglierlo, e forse è quello — in quel caso basta un «da solo» in Cabina come per il
+   fonico.
 
 /_ DA DISCUTERE _/
 

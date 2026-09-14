@@ -1,6 +1,6 @@
 # La roadmap del progetto — a che punto siamo davvero
 
-**Aggiornata all'08/09/2026.** Ogni riga di questo file è stata controllata sul repo il
+**Aggiornata al 14/09/2026.** Ogni riga di questo file è stata controllata sul repo il
 giorno in cui è stata scritta: se qui c'è scritto «fatto», il codice c'è ed è stato
 guardato. Se c'è scritto «da fare», nel repo non c'è niente che lo faccia.
 
@@ -154,6 +154,19 @@ di aprire il foglio; e l'uscita ha un quando — stanotte, venerdì, o in cassaf
 schermate sono quelle delle foto di riferimento
 (`media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/`), e il codice sta in
 `frontend/js/game/studio-elementi.js`.
+
+**FATTO (13–14/09/2026)** — sette ritocchi sul foglio «LUOGO: STUDIO» di Carletto: le
+linguette fanno Timing *prima* di Marketing (la spinta si decide dopo aver deciso quando
+esce); al banco del Mix il fonico si sceglie e «da solo» si clicca, come in Cabina; al
+Marketing si sceglie **quale** pezzo spingere, e la promo lascia una spinta su quello
+(`s.spinta`, letta da `songWeekly()`) invece di accendere tutto insieme; quando tieni la
+take si chiede solo il nome; la copertina si cambia nella Cover con una proposta e un tasto
+che la conferma; di un pezzo non ancora uscito si fa uscire un'anteprima (mossa
+`anteprima`, al massimo tre, che all'uscita diventano spinta); Mix, Cover, Feat, Timing e
+Marketing restano chiuse finché non c'è il primo pezzo (percorso guidato della prima
+volta — la lettura «a ogni pezzo» è scritta come alternativa). Resta aperto, sullo stesso
+foglio, «non posso scegliere i feat»: non si riproduce, e la domanda — da chi si sceglie
+il feat, solo da chi conosci o da tutti — è scritta sotto al punto, in attesa di risposta.
 
 **Manca**: i numeri per elemento scritti in chiaro — il riquadro *Beat 82 / Testo 76 / Mix 68
 / Feature 85 / Marketing 53 → QUALITÀ tot* del foglio dei punti nuovi non c'è: la qualità

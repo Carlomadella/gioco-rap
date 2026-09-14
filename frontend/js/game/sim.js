@@ -31,6 +31,9 @@ function songWeekly(s){
      dopo settimana, che è quello che fa un video per davvero. */
   if(s.video) out *= s.video;
   if(s.viral) out *= s.viral;
+  /* la spinta della promo (punto 9 dello Studio): scelta al Marketing,
+     messa da actions.js, scende di settimana in settimana qui sotto */
+  if(s.spinta) out *= s.spinta;
   return Math.round(out);
 }
 
@@ -57,6 +60,7 @@ function advanceWeek(){
       pushLog("<b>«" + s.t + "» sta girando.</b> Qualcuno l'ha messo in una clip e sono partiti in tanti.", "good");
     }
     if(s.viral){ s.viral *= 0.72; if(s.viral < 1.08) delete s.viral; }
+    if(s.spinta){ s.spinta = 1 + (s.spinta - 1) * 0.55; if(s.spinta < 1.03) delete s.spinta; }
   }
 
   const grezzi = [];

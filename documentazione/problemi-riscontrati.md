@@ -1608,3 +1608,409 @@ scalano: verificato, 5000 → 4565 con il banco che passa da tre a due.
 senza esserci arrivati dalla mappa, il gioco risponde «Non puoi iniziare questa mossa: per
 fare questa mossa devi prima raggiungere Studio sulla mappa» — ed e' corretto, non e' un
 errore.
+
+## Giro del 14/09/2026 (segnala-problemi, fine task `task/studio-marketing-scegli-il-pezzo`, commit `f09a99d`)
+
+Controlli automatici tutti verdi: `npm run prova` 144 a posto e 0 no, `audit-regressioni.js`
+330 ok e 0 falliti, `verifica:build` 33 ok e 0 falliti. Letti `studio.js` (righe di «Cosa
+spingi», `studioSegna`, `studioFuori`, `studioDaSpingere`, `stScelta`), `actions.js`
+(l'azione `promo`), `sim.js` (`songWeekly` e `advanceWeek`) e `css/studio.css`.
+
+Le quattro cose che la task chiedeva di guardare, in ordine:
+
+- **Pezzo senza `seed` al Marketing** — e' un caso che oggi non puo' succedere da solo: ogni
+  pezzo nasce in un punto solo (`actions.js:336`) e il seed glielo da' sempre `copertine.js:44`,
+  ed e' cosi' dal primo import del progetto. Ma se capita (un salvataggio ritoccato a mano) la
+  riga si comporta male: vedi la voce qui sotto.
+- **`s.spinta` che resta su un pezzo di un salvataggio** — a posto. `sim.js:36` la moltiplica
+  solo se c'e', `sim.js:63` la fa scendere ogni settimana e la toglie sotto 1,03; un pezzo
+  vecchio senza `spinta` non cambia niente. Se il pezzo segnato in `G.studio.spingi` non c'e'
+  piu', `studioSceltoTra` torna `null` e si ripiega sull'ultimo uscito.
+- **La promo lanciata senza Studio aperto** — non c'e' piu' una strada del genere: l'elenco
+  delle mosse non esiste, la promo si lancia solo dal Marketing (`studio.js:1002`). In
+  `actions.js:414` c'e' comunque la guardia `typeof studioDaSpingere === "function"`, e
+  `studio.js` e' caricato nella stessa pagina (`pagine/gioco.html:646`), quindi anche se un
+  domani la promo partisse da altrove il pezzo scelto sarebbe letto lo stesso.
+- **Il `<b>` dentro a `d`** — non e' coerente con le altre righe, e non e' solo estetica: vedi
+  la seconda voce.
+
+**RISOLTE (14/09/2026)** — tutte e quattro, sul branch `task/studio-marketing-scegli-il-pezzo`
+prima del push, insieme ai punti «solo il nome quando tieni la take» e «la conferma della
+copertina». In ordine: `.stchi span span{display:inline}` in `css/studio.css` (andava a capo
+anche «−8 se esce così» in Timing, misurato in partita: `display:block` sullo span
+annidato) e «in spinta» è uno `<span class="oro">`; `stSeme()` in `studio.js` dà
+l'attributo solo se il seed è un numero, se no la riga esce muta; l'elenco del Marketing
+aggiunge il pezzo scelto se è più vecchio dei sei; la descrizione della promo dice «Spinge
+il pezzo che scegli al Marketing».
+
+### «In spinta» esce come una seconda riga bianca grande quanto il titolo
+
+- **dove** — `frontend/js/game/studio.js:964` (il `<b>in spinta</b>` dentro a `d`) e
+  `frontend/css/studio.css:180` (la regola `.stchi b`).
+- **cosa succede** — la riga secondaria del pezzo («q60 · 1.234 stream · in spinta») e' un
+  `<span>` e il foglio di stile dice che **qualsiasi grassetto** dentro alla casella del nome
+  (`.stchi b`) va a capo da solo, a 16 punti e in bianco: e' la regola pensata per il titolo.
+  Cosi' «in spinta» non resta in coda alla riga piccola azzurra ma diventa una terza riga che
+  sembra un secondo titolo, e la scheda si alza. Le altre righe dello Studio che vogliono
+  colorare un pezzo di `d` usano `<span class="ros">` o `<span class="oro">`
+  (`studio.js:1091-1092`), mai `<b>`. Letto nel CSS, non misurato in partita.
+- **come si vede** — Studio, Marketing, con un pezzo fuori: premi «Posta» una volta, la riga
+  di quel pezzo in «Cosa spingi» cambia forma.
+- **quanto pesa** — da sistemare con calma.
+
+### Una riga di pezzo senza seed e' un bottone che non fa niente, e non lo dice
+
+- **dove** — `frontend/js/game/studio.js:961` (`data-spingi="' + x.seed + '"`) e
+  `studio.js:190-193` (`studioSegna` che scarta il `NaN` in silenzio). Lo stesso succede alle
+  righe del Mix (`:862`), della Cover (`:882`) e del Timing (`:1087`): e' una voce sola.
+- **cosa succede** — se un pezzo non ha il seed, l'attributo diventa `data-spingi="undefined"`.
+  La riga esce comunque come bottone (si accende sotto al dito, cursore a mano), ma al tocco
+  `Number("undefined")` e' `NaN`, `studioSegna` esce senza suono, senza salvare e senza
+  ridisegnare: il giocatore preme e non succede niente. Oggi non ci si arriva con un
+  salvataggio normale (vedi sopra), quindi e' una rete di sicurezza che manca, non un errore
+  che si vede.
+- **come si vede** — solo con un salvataggio a cui si toglie a mano il `seed` di un pezzo.
+- **quanto pesa** — da sistemare con calma.
+
+### Il pezzo scelto puo' sparire dall'elenco, ma resta quello che si spinge
+
+- **dove** — `frontend/js/game/studio.js:960` (`fuori.slice(0, 6)`) contro `studio.js:213-215`
+  (`studioDaSpingere` cerca in tutta la lista).
+- **cosa succede** — «Cosa spingi» mostra solo gli ultimi sei pezzi usciti, ma la scelta e'
+  cercata fra **tutti**. Scegli un pezzo, poi ne fai uscire altri sei: quello scelto non
+  compare piu' nell'elenco, nessuna riga e' accesa, eppure la testata dice ancora «Spingi
+  «quello»» e la promo continua a spingerlo. Per cambiare devi toccare un altro pezzo; per
+  «togliere» la scelta e tornare all'ultimo uscito non c'e' un modo visibile, perche' la riga
+  da ri-toccare non c'e'.
+- **come si vede** — con sette o piu' pezzi fuori, scelto il piu' vecchio prima che uscissero
+  gli ultimi.
+- **quanto pesa** — si vede ma si gira intorno.
+
+### Dopo il post la scena dice ancora «Accende quello che hai fuori»
+
+- **dove** — `frontend/js/game/actions.js:377` (`d:"Clip e provocazioni. Accende quello che
+  hai fuori."`), che `ui.js:54` mette nella scena a schermo pieno dopo la mossa e `ui.js:172`
+  nella finestra di conferma.
+- **cosa succede** — la promo adesso spinge **un** pezzo, quello scelto al Marketing, e il
+  messaggio di esito lo dice («Spingi «X»», `actions.js:429`). Ma la descrizione fissa della
+  mossa, che compare nella stessa scena una riga sopra, dice il contrario: che accende tutto
+  quello che hai fuori. Due frasi che si smentiscono nella stessa schermata.
+- **come si vede** — Studio, Marketing, «Posta»: leggi la scena che si apre.
+- **quanto pesa** — da sistemare con calma.
+
+**Nota, non e' un errore**: la spinta cresce di 0,10 a post (per la resa del giorno e il peso
+d'agenda) fino a 1,5, e ogni settimana si dimezza quasi (`sim.js:63`, resta il 55% dell'eccesso
+sopra 1). Sono numeri scelti, non controllati contro niente: se il Marketing sembrera' troppo
+forte o troppo debole, e' li' che si gira la manopola.
+
+## Giro del 14/09/2026 (secondo)
+
+Fine task `task/studio-marketing-scegli-il-pezzo`, commit `28c6561` (solo il nome quando tieni
+la take, la conferma della copertina) e `fd90cd7` (l'anteprima di un pezzo non uscito).
+Controlli automatici tutti verdi: `npm run prova` 154 a posto e 0 no, `audit-regressioni.js`
+330 ok e 0 falliti, `verifica:build` 33 ok e 0 falliti. Letti per intero i due diff, e poi
+`copertine.js` (`chiediTitolo`, `salvaConCopertine`), `studio.js` (la Cover con la proposta,
+`studioDaAnticipare`, il Marketing, il click sui `data-cov`), `studio-elementi.js` (la
+cassaforte e `studioUscitePronte`), `actions.js` (`anteprima`, `anteprimeAllUscita`,
+`pubblica`), `telefono.js` («Le tue mosse»), `ui.js` (`avviaAzioneDiretta`), `fx.js`,
+`sim.js`, `eventi-v2.js:2444` e `state.js`/`online.js` per dove finisce il salvataggio.
+
+Le cose che la task chiedeva di guardare, in ordine:
+
+- **`G.studio.coverProva` con la foto dentro** — e' un problema vero, vedi la prima voce.
+- **Proposta rimasta su un pezzo che poi esce** — stessa voce: la proposta resta nel
+  salvataggio e non c'e' piu' un tasto per buttarla. Se il pezzo viene **rinominato dalla
+  plancia** invece va bene: `ui.js:449` rimette lo stesso seed (`chiediTitolo` con `pezzo` non
+  ne genera uno nuovo), la proposta resta agganciata e il titolo nel riquadro grande segue,
+  perche' e' letto da `s.t` al momento del disegno (`studio.js:957`).
+- **`s.anteprime` e la cassaforte** — a posto. Un pezzo `tenuto` sparisce da «Non ancora fuori»
+  (`studioPronti()` lo esclude) ma le anteprime restano scritte sul pezzo; quando lo riprendi
+  torna in elenco col suo conto, e all'uscita — le due sole strade, `actions.js:383` e
+  `studio-elementi.js:716` — `anteprimeAllUscita` le trasforma in spinta e le cancella. Se la
+  casella `spingi` e' rimasta su quel pezzo mentre e' in cassaforte, il Marketing torna alla
+  promo sull'ultimo uscito, senza righe accese: coerente, non rotto.
+- **L'agenda del telefono** — «Anteprima del pezzo» compare fra «Le tue mosse» come tutte le
+  altre, e funziona: `hubPronta` la spegne con il motivo finche' non scegli un pezzo al
+  Marketing, e col pezzo scelto parte da li' con la stessa scena. Il motivo pero' e' lungo per
+  la riga del telefono: seconda voce. (Il giro precedente diceva che la promo «si lancia solo
+  dal Marketing»: non e' esatto, il telefono elenca **tutte** le mosse e le fa partire,
+  `telefono.js:758`. Non cambia niente di quello che era stato detto, ma lo correggo qui.)
+- **`eventi-v2.js:2444`** — a posto. Avvolge ogni mossa, anche la nuova, e dopo manda
+  l'evento `after_action` con `action_id:"anteprima"`; il catalogo lo confronta con liste di
+  id (`hookMatches`, `:2152`) e un id che nessun evento conosce non fa scattare niente. Nessun
+  errore, solo silenzio: un'anteprima non puo' far nascere un evento social, la promo si.
+
+**RISOLTE (14/09/2026)** — tutte e tre, sul branch prima del push. `studioCoverPulisci()`
+(chiamata da `renderStudio()`) butta la proposta il cui pezzo non sta più nella Cover, e
+`salvaConCopertine` la sacrifica **prima** delle copertine confermate; proporre su un altro
+pezzo lo dice con un avviso. Il motivo della mossa spenta è «Serve un pezzo scelto al
+Marketing». `SND.anteprima = "promo"` in `fx.js`.
+
+### La copertina proposta e non confermata resta nel salvataggio, foto compresa, e nessuno la toglie
+
+- **dove** — `frontend/js/game/studio.js:397-401` (`studioCoverProponi` mette la foto in
+  `G.studio.coverProva` e salva), `studio.js:382-385` (`studioPezzoCover` mostra la Cover solo
+  per i pezzi in `ready()`, cioe' non usciti), `frontend/js/game/copertine.js:29-38`
+  (`salvaConCopertine` sacrifica solo `s.img` dei pezzi).
+- **cosa succede** — carichi una foto nella Cover e non premi ne' «Conferma» ne' «Lascia
+  com'era»: la foto (un JPEG 360×360 in testo, decine di KB) vive in `G.studio.coverProva` e
+  viene salvata a ogni `save()`, insieme a tutto il resto. Due cose non tornano. **Uno**: se la
+  memoria del browser e' piena, `salvaConCopertine` toglie le copertine **confermate** dei pezzi,
+  una alla volta, per far posto — e lascia in piedi quella proposta e mai accettata; se poi le
+  foto sui pezzi sono finite torna `false` e il gioco smette di salvare in silenzio (`state.js:102`
+  ignora l'errore), con la proposta ancora li' dentro. **Due**: se nel frattempo il pezzo esce
+  (da Timing, o da solo il venerdi'), non e' piu' nella Cover, quindi il riquadro con «Conferma»
+  e «Lascia com'era» non si vede piu' e la proposta orfana resta nel salvataggio finche' non ne
+  fai un'altra su un altro pezzo (la casella e' una sola: la nuova sovrascrive la vecchia, senza
+  dirlo — anche se la vecchia era su un pezzo ancora in elenco, che perde la sua etichetta
+  «da confermare» senza una parola). Letto nel codice, non riprodotto con la memoria piena.
+- **come si vede** — Studio, Cover, «Carica una foto», poi vai in Timing e fai uscire quel
+  pezzo: torna in Cover, la proposta non c'e' piu' da nessuna parte ma nel salvataggio
+  (`localStorage`, chiave della partita) `studio.coverProva.img` e' ancora pieno.
+- **quanto pesa** — da sistemare con calma.
+
+### Sul telefono il motivo per cui l'anteprima e' spenta viene tagliato
+
+- **dove** — `frontend/js/game/actions.js:453` (`"1 pezzo non ancora uscito, scelto al
+  Marketing"`), che `hub.js:536` fa diventare «Serve 1 pezzo non ancora uscito, scelto al
+  Marketing» e `telefono.js:626` mette nella riga piccola `<i>`; `frontend/css/telefono.css:274`
+  la riga e' a una sola linea con i puntini (`white-space:nowrap; text-overflow:ellipsis`).
+- **cosa succede** — sono 52 caratteri a 10,5 punti dentro allo schermo del telefono, con a
+  destra il costo «8⚡»: la parte che serve — «scelto al Marketing», cioe' *dove* andare per
+  accenderla — e' proprio quella in fondo, quella che i puntini mangiano. Il giocatore legge
+  «Serve 1 pezzo non ancora uscito, sc…» e pensa di dover registrare un pezzo, che magari ha
+  gia'. Dedotto da misure del CSS, non visto su un telefono vero: va guardato.
+- **come si vede** — telefono, Agenda, «Le tue mosse», senza aver scelto niente al Marketing.
+- **quanto pesa** — da sistemare con calma.
+
+### L'anteprima fa il rumore di un tocco qualsiasi, non quello della promo
+
+- **dove** — `frontend/js/game/fx.js:267-269` (la tabella `SND` che lega ogni mossa al suo
+  suono: `promo:"promo"`, `anteprima` non c'e'), letta da `ui.js:140` con `|| "tap"`.
+- **cosa succede** — la nuova mossa ha la scena della promo (`scene-art.js:190`), il colore
+  della promo (`ui.js:25`) e i suoi minuti, ma quando parte suona il «tap» generico. E' l'unica
+  delle mosse con la scena a schermo pieno senza il suo suono.
+- **come si vede** — Studio, Marketing, scegli un pezzo sotto «Non ancora fuori», «Fai uscire
+  una preview», con l'audio acceso.
+- **quanto pesa** — da sistemare con calma.
+
+**Nota, non e' un errore**: la promo ha la saturazione del giorno (`adfOggi("promo")`: dal secondo
+post in poi rende meno) e il tetto di 1,5 sulla spinta. L'anteprima no: e' limitata a tre **per
+pezzo**, ma non per giornata, quindi con cinque pezzi registrati e non usciti si possono fare
+quindici anteprime di fila, ognuna con il suo hype (che scala solo dentro allo stesso pezzo) e i
+suoi 2–9 fan. Il freno e' l'energia (8 a colpo) e il tetto dell'hype. E' una scelta di
+bilanciamento, e sta tutta in `actions.js:449-475`; se il Marketing sembrera' una stampante di
+hype, la manopola e' li'. Stessa cosa per le anteprime fatte mesi prima su un pezzo tenuto in
+cassaforte: all'uscita valgono come se fossero di ieri.
+
+## Giro del 14/09/2026 (terzo)
+
+Fine task `task/studio-marketing-scegli-il-pezzo`, commit `fcebe81` (prima Beat, Testo e
+Cabina; il resto si apre col primo pezzo) e `e288634` (la proposta di copertina non resta
+orfana, l'anteprima suona come la promo). Controlli automatici tutti verdi: `npm run prova`
+158 a posto e 0 no, `audit-regressioni.js` 330 ok e 0 falliti, `verifica:build` 33 ok e 0
+falliti. Letti per intero i due diff, e poi le cose chieste una per una:
+
+- **chi apre lo Studio con una sezione da fuori** — l'unico che lo fa è il cartello «Studio»
+  della mappa (`hub.js:78`: `apriStudio(G.bars.length ? "beat" : "cabina")`), e sono due
+  sezioni aperte. `menu-sistema.js`, `telefono.js`, `spostamenti.js`, `posto.js`, `chat.js`,
+  `eventi-v2.js`, `skip.js`, `sim.js` non chiamano `apriStudio` con una sezione e non toccano
+  `G.studio`. L'altro salto interno (`studio-elementi.js:783`, «cambia copertina» che porta in
+  Cover) parte da Timing, che senza pezzi è chiusa: non ci si arriva. Nessuno finisce sul Beat
+  senza saperlo.
+- **il cartello «Beat Maker»** — non esiste più come posto (`hub.js:113`, «La Sala» al suo
+  posto), e `spostamenti.js:72` porta chi aveva salvato lì nello Studio senza sezione. A posto.
+- **salvataggio vecchio senza pezzi ma con roba in `G.studio`** — `renderStudio()` riporta al
+  Beat prima di disegnare; le sezioni chiuse non leggono niente. I pezzi non si cancellano mai
+  (nessun `songs.splice`/riassegnazione in `js/`), quindi una volta aperto resta aperto.
+- **`studioOltre()` e lo scroll** — la linguetta accesa è sempre la prima quando le altre sono
+  chiuse, `scrollIntoView` la porta a sinistra e la sfumatura «c'è dell'altro» si accende
+  correttamente. Il lucchetto allunga le cinque linguette ma la striscia scorre lo stesso;
+  `css/stretto.css:216` ha `.sttab{min-width:0;...}` e non tocca `::after`.
+- **`studioCoverPulisci()` e `ready()`** — `ready` è in `actions.js:162`, caricato a
+  `pagine/gioco.html:629`, prima di `studio.js` (riga 646); e `renderStudio()` esce subito se
+  lo Studio non è acceso, quindi non gira mai all'avvio. A posto.
+- **`pushLog` in `salvaConCopertine` senza `G.log`** — `G.log` sta in `START()`
+  (`state.js:21`) e il caricamento fa `Object.assign(START(), salvato)`, quindi c'è sempre;
+  in più `save()` (`state.js:102`) incarta tutto in un `try`. Non si rompe.
+
+Un problema solo, piccolo, e una nota.
+
+**RISOLTO (14/09/2026)** — sul branch prima del push: con il mouse sopra la linguetta
+chiusa tiene lo stesso fondo e lo stesso colore di quando non la tocchi
+(`css/studio.css`, `.sttab.chiusa:hover`).
+
+### Passando col mouse su una linguetta chiusa, si accende invece di restare spenta
+
+- **dove** — `frontend/css/studio.css:338`
+  (`.sttab.chiusa:hover{background:transparent;color:inherit}`).
+- **cosa succede** — la riga vuole togliere l'effetto del passaggio del mouse sulle
+  linguette col lucchetto, ma lo fa mettendo valori diversi da quelli di riposo: a riposo la
+  linguetta ha lo sfondo grigio leggero e il testo azzurro spento (`studio.css:327-330`,
+  `color:var(--stSoft)`), col mouse sopra lo sfondo sparisce e il testo prende il colore della
+  pagina (più chiaro). Il risultato è che la linguetta chiusa **cambia** quando ci passi
+  sopra, come se fosse cliccabile — il contrario di quel che dice il commento sopra. Con
+  l'opacità al 42% è poco visibile, ma c'è. Solo col mouse (la regola sta dentro
+  `@media (hover:hover)`): sul telefono non si vede.
+- **come si vede** — sul computer, partita nuova senza pezzi, Studio, passa il mouse su
+  «Mix» o «Marketing».
+- **quanto pesa** — da sistemare con calma.
+
+**Nota, non è un errore**: quando tieni la prima take e il pezzo nasce, le cinque linguette
+perdono il lucchetto in silenzio — nessun avviso dice «adesso si è aperto il resto». Il
+giocatore che ha letto «Prima il pezzo: Beat, Testo, Cabina. Poi il resto» lo intuisce, ma
+chi non ha mai toccato una linguetta chiusa potrebbe non accorgersi che c'è altro da fare
+oltre alla Cabina. È una scelta di come si racconta lo sblocco (`studio.js:1291-1297`), non
+un guasto; se serve, un toast nel punto in cui `registra` aggiunge il pezzo basta.
+
+## Prova sul telefono del 14/09/2026 (Studio: Cover, Marketing, linguette)
+
+Misure: **390 × 844** e **360 × 800**. Branch `task/studio-marketing-scegli-il-pezzo`,
+partita salvata con quattro pezzi («Sottopasso», «Terzo piano», «Neve sporca», «Sangue»),
+nessuno uscito. Guardato solo lo Studio, nei tre punti cambiati oggi: la proposta di
+copertina (Cover), «Cosa spingi» / «Non ancora fuori» con l'anteprima (Marketing), e le
+cinque linguette chiuse col lucchetto. Console senza errori per tutto il giro. Gli
+screenshot stanno in `documentazione/prove-telefono/2026-09-14/`.
+
+**Come l'ho provato, per riprovarlo.** Chrome ha ignorato tre volte il ridimensionamento
+della finestra (restava a 1150 × 687: è massimizzata). Ho messo il gioco dentro a un
+`<iframe>` della stessa origine largo esattamente 390 (poi 360) e alto 844 (poi 800), in
+una scheda a parte: dentro all'iframe le media query e il layout vedono quella misura, i
+tocchi arrivano ai bottoni veri e la console è quella del gioco. Due cose da tenere a mente
+leggendo le figure: (1) c'è la barra di scorrimento del computer, 15 px, che sul telefono
+non c'è — quindi la colonna utile era 375 e 345, non 390 e 360; (2) la rotella del mouse
+non scorreva la colonna, l'ho scorsa da console (`.stwrap.scrollTop`): che *scorra* l'ho
+verificato dalle misure (`scrollHeight` > `clientHeight`, `overflow-y:auto`), non col dito.
+
+**Quello che funziona.** Cover: «Generane un'altra» mette la proposta al centro con
+quella di adesso accanto, i tre tasti sono uno sotto l'altro larghi tutta la colonna e
+alti 48 px, niente esce dallo schermo (nessuno scorrimento orizzontale a nessuna delle due
+misure), «Lascia com'era» risponde al tocco e rimette la copertina sola. Marketing: i due
+elenchi stanno uno sotto l'altro nella colonna che scorre, non si coprono, l'ultima riga
+resta sopra alla banda del diario, il tocco su un pezzo di «Non ancora fuori» fa
+comparire «ANTEPRIMA: «…»» e il tasto d'oro «Fai uscire una preview» (48 px) si raggiunge.
+Linguette: le cinque chiuse hanno il lucchetto, restano su una riga (44 px di altezza,
+la striscia scorre: 568 px su 345), toccandone una si resta sul Beat ed esce l'avviso
+«Prima il pezzo: Beat, Testo, Cabina. Poi il resto.»
+
+![Cover a 390: proposta, «adesso» e i tre tasti](prove-telefono/2026-09-14/cover-proposta-390.jpg)
+![Marketing a 390: «Cosa spingi» e «Non ancora fuori»](prove-telefono/2026-09-14/marketing-due-elenchi-390.jpg)
+![Linguette chiuse a 390](prove-telefono/2026-09-14/linguette-chiuse-390.jpg)
+
+**RISOLTO (14/09/2026)** — `.toast` in `css/effects.css` ha `width:max-content` (col
+tetto `max-width` che c'era già): `left:50%` da solo gli lasciava mezzo schermo. Vale per
+tutti gli avvisi del gioco, non solo per questo.
+
+### L'avviso «Prima il pezzo…» sul telefono è una colonnina di quattro righe
+
+- **dove** — `frontend/css/effects.css:14-17` (`.toast{position:fixed;left:50%;...
+  max-width:min(92vw,460px)}`), chiamato da `frontend/js/game/studio.js:1373`.
+- **cosa succede** — il toast è `position:fixed` con `left:50%` e nessuna larghezza: la
+  larghezza «a misura del contenuto» si ferma allo spazio che resta a destra della metà
+  dello schermo. A 390 il riquadro viene largo 188 px e alto 109 (quattro righe di testo),
+  a 360 viene 172 × 122 (cinque righe). Il `max-width` non serve a niente, perché il
+  vincolo vero è più stretto. Sul computer non si vede: 575 px bastano a tutto. È l'unico
+  avviso che il giocatore *deve* leggere nello Studio nuovo — è quello che spiega perché
+  le cinque linguette sono chiuse — e arriva così.
+- **come si vede** — 390 × 844, partita senza pezzi (o `G.songs = []; renderStudio()`),
+  Studio, tocca «Mix».
+  ![Toast stretto a 390](prove-telefono/2026-09-14/linguette-chiuse-toast-stretto-390.jpg)
+- **quanto pesa** — si legge, ma è brutto e sta sopra ai tasti del pannello. Non è di
+  oggi (vale per ogni toast del gioco sul telefono), ma oggi è diventato parte del
+  percorso. Da sistemare con calma.
+
+**RISOLTO (14/09/2026)** — l'etichetta è «proposta», che ci sta.
+
+### A 360 «da confermare» nell'elenco della Cover è tagliato: si legge «da conf…»
+
+- **dove** — `frontend/js/game/studio.js:964` (la riga piccola
+  `q71 · generata · da confermare`) con `frontend/css/studio.css:182-183`
+  (`.stchi span{...white-space:nowrap;overflow:hidden;text-overflow:ellipsis}`).
+- **cosa succede** — resta sulla riga piccola, come chiesto, ma non ci sta: il testo
+  vuole 184 px e la riga ne ha 154 (a 360 con la barra del computer) o circa 169 (su un
+  telefono vero a 360): in tutti e due i casi l'ultima parola, che è quella che dice
+  qualcosa, sparisce nei puntini. A 390 ci sta (184 su 184, giusto giusto: basta una
+  parola in più e salta anche lì).
+- **come si vede** — 360 × 800, Cover, «Generane un'altra», scorri all'elenco «I tuoi
+  pezzi».
+  ![«da conf…» a 360](prove-telefono/2026-09-14/cover-elenco-da-confermare-tagliato-360.jpg)
+- **quanto pesa** — si vede ma si gira intorno: al centro c'è scritto la stessa cosa
+  («non è ancora sul pezzo»). Da sistemare con calma.
+
+**RISOLTO (14/09/2026)** — in `css/stretto.css` la copertina «di adesso» scende a 72 punti
+(la proposta resta a 110): si vede subito quale è quale, e la fascia «ADESSO» copre meno.
+
+### Sul telefono la copertina «grande» e quella «di adesso» sono quasi uguali, e l'etichetta copre il titolo
+
+- **dove** — `frontend/css/stretto.css:220` (`.stcopertina{width:110px;height:110px}`
+  sotto i 520) contro `frontend/css/studio.css:225`
+  (`.stcopertina.stprima{...width:96px;height:96px}`), e `studio.css:226-228` per la
+  fascia «adesso».
+- **cosa succede** — sul computer la proposta è 180 e quella di adesso 96: si capisce al
+  volo qual è la nuova. Sotto i 520 la proposta scende a 110 ma `.stprima` resta a 96
+  (ha due classi, vince sempre): 110 contro 96, si vede a malapena chi è la grande, e la
+  gerarchia «al centro lei, accanto quella di adesso» si perde. In più la fascia scura con
+  scritto «ADESSO» sta in fondo alla copertina piccola, esattamente dove la copertina
+  generata scrive il titolo del pezzo: i due testi si sovrappongono e non si legge né
+  l'uno né l'altro (questo a tutte le misure, anche sul computer).
+- **come si vede** — 390 × 844 o 360 × 800, Cover, «Generane un'altra»: guarda le due
+  copertine in alto.
+  ![Le due copertine a 360](prove-telefono/2026-09-14/cover-proposta-360.jpg)
+- **quanto pesa** — si vede ma si gira intorno (c'è comunque l'etichetta e c'è il
+  riquadro «non è ancora sul pezzo»). Da sistemare con calma.
+
+**APERTO, di proposito** — non è di oggi: è come sono impilate le colonne sotto i 980 punti
+(`stretto.css`, il centro prima di tutto) e vale per ogni sezione con un elenco a sinistra
+(Cabina, Mix, Timing). Scorrere in cima a ogni tocco sarebbe una scelta di navigazione per
+tutto lo Studio, e va decisa una volta, non da dentro questa task.
+
+### Nel Marketing tocchi un pezzo in fondo e la risposta compare in cima, fuori dallo schermo
+
+- **dove** — `frontend/css/stretto.css:185-186` (`.stmid{order:1}` e `.stsx{order:2}`:
+  sul telefono il centro sta sopra e gli elenchi sotto) con `frontend/js/game/studio.js:202-209`
+  (`studioSegna` → `renderStudio()`, che ridisegna senza toccare lo scorrimento).
+- **cosa succede** — per arrivare a «Non ancora fuori» devi scorrere in fondo; tocchi
+  «Sangue» e il pannello che cambia («ANTEPRIMA: «Sangue» · q78» col suo testo) è quello
+  sopra, che a quel punto sta sotto alla fascia alta: a 390 il titolo è tagliato (si
+  vede solo «q66» che spunta), a 360 sta a −28 px, cioè del tutto fuori. Il tasto d'oro
+  resta in vista in tutti e due i casi perché il pannello dell'anteprima è corto, ma
+  quello che ti dice *cosa* stai per fare non lo vedi finché non risali. Con la Promo
+  (pannello più lungo) resta in vista ancora meno.
+- **come si vede** — 390 × 844, un pezzo fuori e tre no, Marketing, scorri in fondo e
+  tocca un pezzo di «Non ancora fuori».
+  ![Dopo il tocco a 390: il titolo è sopra](prove-telefono/2026-09-14/marketing-dopo-il-tocco-titolo-fuori-390.jpg)
+  ![Dopo il tocco a 360](prove-telefono/2026-09-14/marketing-dopo-il-tocco-360.jpg)
+- **quanto pesa** — si vede ma si gira intorno: la riga si accende d'oro e il pollice sa
+  che ha toccato. Ma è lo stesso problema per Mix, Timing e Cover (tutti gli elenchi
+  che stanno sotto al centro). Da sistemare con calma.
+
+**APERTO, di proposito** — è lo stesso `stCapo()` di tutte le sezioni («SPINGI: «Sottopasso»
+· q71», «MIXI: …»): il numero va a capo da solo con qualunque titolo lungo, non solo qui.
+Si sistema in `stCapo` per tutte insieme, con `white-space:nowrap` sul numero e il titolo
+che si accorcia — non l'ho fatto in questa task per non toccare otto schermate all'ultimo.
+
+### Il capo «ANTEPRIMA: «Neve sporca» · q66» va a capo lasciando «· q66» da solo
+
+- **dove** — `frontend/js/game/studio.js:1092` (`stCapo("Anteprima", ant.t, "q" + ant.q)`)
+  con `frontend/css/studio.css:198-199` (`.stcapo{font-size:22px;...word-break:break-word}`).
+- **cosa succede** — a 390 la riga è larga 306 e il capo non ci sta: la seconda riga è
+  solo «· q66», col puntino in testa. A 360 uguale con «Sangue». Cosmetico.
+- **come si vede** — Marketing, tocca un pezzo di «Non ancora fuori», scorri in cima.
+  ![Il capo a capo a 390](prove-telefono/2026-09-14/marketing-anteprima-titolo-a-capo-390.jpg)
+- **quanto pesa** — si vede ma si gira intorno.
+
+**RISOLTO (14/09/2026)** — `scroll-padding-inline:12px` su `.sttabs`: `scrollIntoView`
+rispetta il margine della striscia.
+
+### La prima linguetta si apre attaccata al bordo sinistro, senza il suo margine
+
+- **dove** — `frontend/js/game/studio.js:1305-1307`
+  (`acceso.scrollIntoView({block:"nearest", inline:"nearest"})`), con il `padding` della
+  striscia in `frontend/css/stretto.css:215` (`.sttabs{...padding:8px 10px ...}`).
+- **cosa succede** — con le cinque chiuse la linguetta accesa è «Beat», la prima. Lo
+  `scrollIntoView` la porta a filo del bordo del contenitore, cioè scorre la striscia di
+  10 px e si mangia il margine sinistro: «Beat» parte a x = 0, attaccata allo schermo,
+  mentre tutte le altre hanno il loro respiro. Si vede a 390 (12 px) e a 360 (10 px).
+- **come si vede** — Studio con la partita senza pezzi, guarda in basso a sinistra.
+  ![«Beat» a filo a 360](prove-telefono/2026-09-14/linguette-chiuse-beat-attaccato-al-bordo-360.jpg)
+- **quanto pesa** — si vede ma si gira intorno.

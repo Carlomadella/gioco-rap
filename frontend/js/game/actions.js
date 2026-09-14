@@ -72,6 +72,22 @@ const ADF_PROMO_WEEKLY_PCT_CAP = 0.015;
    giorno per farmarlo comunque, solo più lentamente. Questo è il tetto vero,
    settimanale, oltre al quale la promo continua a dare follower ma non hype. */
 const ADF_PROMO_WEEKLY_HYPE_CAP = 22;
+/* Quanto un post spinge il pezzo scelto (moltiplicatore sui suoi stream della
+   settimana, +0.10 a post, non oltre 1.5): un aiuto vero, non un secondo video. */
+const ADF_PROMO_SPINTA = 0.10;
+const ADF_PROMO_SPINTA_MAX = 1.5;
+/* Punto 8 dello Studio: l'anteprima di un pezzo non ancora uscito. Al massimo
+   tre per pezzo, e ognuna vale all'uscita +0,12 di spinta sulla prima
+   settimana — la stessa `s.spinta` della promo, che poi scende da sola. */
+const ADF_ANTEPRIME_MAX = 3;
+const ADF_ANTEPRIMA_SPINTA = 0.12;
+/* Quando il pezzo esce (l'azione `pubblica` qui sotto, o `studioUscitePronte`
+   il venerdì) le anteprime fatte diventano la spinta della prima settimana. */
+function anteprimeAllUscita(s){
+  if(!s || !s.anteprime) return;
+  s.spinta = Math.max(s.spinta || 1, 1 + Math.min(ADF_ANTEPRIME_MAX, s.anteprime) * ADF_ANTEPRIMA_SPINTA);
+  delete s.anteprime;
+}
 
 function promoSettimanaKey(){
   return [Number(G.year||1), Number(G.week||1)].join(":");
@@ -365,12 +381,13 @@ const ACTIONS = [
      const s = daPubblicare();
      if(!s.mixed) s.q = clamp(s.q - 8, 5, 100);
      s.released = true; s.week = totalWeeks();
+     anteprimeAllUscita(s);
      G.hype = clamp(G.hype + 6 + s.q*0.12, 0, (typeof hypeCap==="function"?hypeCap():100));
      return "«" + s.t + "» è fuori" + (s.mixed ? "." : ", ma non era mixato: qualità " + s.q + ".");
    }},
 
   {id:"promo", n:"Promo sui social", e:12,
-   d:"Clip e provocazioni. Accende quello che hai fuori.",
+   d:"Clip e provocazioni. Spinge il pezzo che scegli al Marketing.",
    need:() => G.songs.some(s => s.released) ? null : "1 pezzo fuori",
    give:() => {
      const mult = promoDailyMult();
@@ -402,6 +419,14 @@ const ACTIONS = [
      G.wellbeing -= 1;
      adfSegnaOggi("promo");
 
+     /* Punto 9 dello Studio: la promo non accende «tutto quello che hai
+        fuori» — spinge un pezzo, quello scelto al Marketing (o l'ultimo
+        uscito). La spinta resta attaccata al pezzo come il video
+        (`s.spinta`), sim.js la legge in songWeekly() e la fa scendere ogni
+        settimana: un post fa girare il pezzo, non lo rifa' uscire. */
+     const sp = typeof studioDaSpingere === "function" ? studioDaSpingere() : null;
+     if(sp) sp.spinta = Math.min(ADF_PROMO_SPINTA_MAX, (sp.spinta || 1) + ADF_PROMO_SPINTA * mult * peso);
+
      const satToday = mult < 1
        ? " Reach ridotta: oggi hai gi\u00e0 spinto parecchio."
        : "";
@@ -414,7 +439,40 @@ const ACTIONS = [
      const bonusPeso = peso > 1 ? " Oggi vale di pi\u00f9." : "";
 
      return "Hype +" + Math.round(h) + ", " + f +
-       " nuovi follower." + bonusPeso + satToday + satWeek + satHype;
+       " nuovi follower." + (sp ? " Spingi «" + sp.t + "»." : "") +
+       bonusPeso + satToday + satWeek + satHype;
+   }},
+
+  /* Punto 8 dello Studio: «non posso spingere una canzone che non è ancora
+     uscita, al massimo faccio uscire una preview». Il pezzo lo si sceglie al
+     Marketing, fra quelli non ancora fuori; qui c'è il costo e quello che dà. */
+  {id:"anteprima", n:"Anteprima del pezzo", e:8,
+   d:"Quindici secondi sui social. Il pezzo non è fuori, ma la gente lo aspetta.",
+   need:() => {
+     const s = typeof studioDaAnticipare === "function" ? studioDaAnticipare() : null;
+     /* corto: sul telefono la riga e' una sola, e i puntini mangiano la fine */
+     return !s ? "un pezzo scelto al Marketing"
+       : (s.anteprime || 0) >= ADF_ANTEPRIME_MAX ? "un pezzo che non hanno già sentito" : null;
+   },
+   give:() => {
+     const s = typeof studioDaAnticipare === "function" ? studioDaAnticipare() : null;
+     const n = s ? (s.anteprime || 0) + 1 : 1;
+     return "+" + (s ? Math.round((3 + s.q * 0.05) * RITMO / n) : "?") + " hype · all'uscita parte al " +
+       Math.round(100 * (1 + Math.min(ADF_ANTEPRIME_MAX, n) * ADF_ANTEPRIMA_SPINTA)) + "%";
+   },
+   run(){
+     const s = studioDaAnticipare();
+     if(!s) return "";
+     const n = (s.anteprime || 0) + 1;
+     s.anteprime = n;
+     /* la prima anteprima rende piena, la seconda la metà, la terza un terzo:
+        è un pezzo che non c'è, non si può farlo sentire all'infinito */
+     const h = Math.round((3 + s.q * 0.05) * RITMO / n);
+     G.hype = clamp(G.hype + h, 0, (typeof hypeCap==="function"?hypeCap():100));
+     G.fans += Math.round(rnd(2, 9) * RITMO);
+     return "Anteprima di «" + s.t + "»: hype +" + h + ". Quando esce parte al " +
+       Math.round(100 * (1 + n * ADF_ANTEPRIMA_SPINTA)) + "%." +
+       (n >= ADF_ANTEPRIME_MAX ? " L'hanno sentito abbastanza: adesso deve uscire." : "");
    }},
 
   {id:"free", n:"Freestyle in piazza", e:26, luc:3,

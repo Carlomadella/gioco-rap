@@ -181,7 +181,11 @@
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stchi span{display:block;margin-top:2px;font-size:13.5px;font-weight:500;color:var(--stAzzSoft);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* un pezzo colorato dentro alla riga piccola resta in riga: la regola qui
+   sopra lo metteva a capo da solo («−8 se esce così», «in coda») */
+.stchi span span{display:inline;margin:0}
 .stchi .ros{color:var(--stRosso)}
+.stchi .oro{color:var(--stOro)}
 /* quanto vale, a destra: «−20%», «gratis», «+6 qual.» */
 .stval{flex:none;font-size:14px;font-weight:700;color:var(--stOro);white-space:nowrap}
 .stval.calmo{color:var(--stFaint)}
@@ -217,6 +221,11 @@
 .stcopertina{width:180px;height:180px;flex:none;border-radius:10px;overflow:hidden;
   background:#0A1018;box-shadow:0 20px 50px rgba(0,0,0,.6),inset 0 0 0 1px rgba(125,175,215,.2)}
 .stcopertina svg{display:block;width:100%;height:100%}
+/* la copertina «di adesso», piccola accanto alla proposta da confermare */
+.stcopertina.stprima{position:relative;width:96px;height:96px;opacity:.72}
+.stcopertina.stprima i{position:absolute;left:0;right:0;bottom:0;padding:3px 0;
+  font-style:normal;font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  text-align:center;color:#fff;background:rgba(0,0,0,.55)}
 .stfianco{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
 .stfianco > div{flex:1;min-width:180px}
 /* ---- I TASTI ----
@@ -308,6 +317,9 @@
 .sttabs{position:absolute;left:0;right:0;bottom:0;z-index:7;
   display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
   padding:9px 12px calc(9px + env(safe-area-inset-bottom,0px));
+  /* `scrollIntoView` sulla linguetta accesa scorreva via anche il margine:
+     Beat finiva a filo del bordo sinistro */
+  scroll-padding-inline:12px;
   background:linear-gradient(180deg,rgba(4,8,14,.72),rgba(4,8,14,.97));
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   box-shadow:inset 0 1px 0 rgba(125,175,215,.16),0 -18px 40px rgba(0,0,0,.5)}
@@ -322,6 +334,13 @@
   box-shadow:inset 0 0 0 1px rgba(125,175,215,.14);cursor:pointer;white-space:nowrap;
   transition:background .15s,color .15s,box-shadow .15s}
 @media (hover:hover){.sttab:hover{background:rgba(255,255,255,.10);color:#fff}}
+/* punto 10: chiusa finche' non c'e' il primo pezzo. Si vede che c'e' e che
+   non e' ancora ora — spenta e col lucchetto — ma resta al suo posto. */
+.sttab.chiusa{opacity:.42;cursor:not-allowed}
+.sttab.chiusa::after{content:" \1F512";font-size:.8em}
+/* col mouse sopra resta spenta com'e': stesso fondo e stesso colore di quando
+   non la tocchi, se no si accende proprio quella che non si puo' premere */
+@media (hover:hover){.sttab.chiusa:hover{background:rgba(255,255,255,.045);color:var(--stSoft)}}
 .sttab.on{color:#12100A;background:linear-gradient(180deg,#FFDD84,#E0A92E);
   box-shadow:0 6px 18px rgba(224,169,46,.28)}
 /* il bordo che dice «c'è dell'altro»: sta sopra la barra, non dentro la

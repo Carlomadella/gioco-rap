@@ -713,6 +713,7 @@ function studioUscitePronte(){
     if(!s.mixed) s.q = clamp(s.q - 8, 5, 100);
     s.released = true;
     s.week = typeof totalWeeks === "function" ? totalWeeks() : (G.week || 1);
+    if(typeof anteprimeAllUscita === "function") anteprimeAllUscita(s);
     const cap = typeof hypeCap === "function" ? hypeCap() : 100;
     G.hype = clamp(G.hype + 6 + s.q * 0.12 + STUDIO_VENERDI_HYPE, 0, cap);
     /* Mandarlo fuori a mano costa un punto di lucidita' (la mossa «Pubblica
