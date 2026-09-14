@@ -6,6 +6,34 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:975839c -->
+## 15/09/26, 00:32 â€” task/studio-cinque-linguette â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `975839c`
+
+### Cosa Ã¨ entrato
+
+- `c4aa9e6` â€” fix(studio): il feat entra nei numeri di Fuori, tutta la classifica in «Con chi», «all'8%» â€” **Carlomadella**
+- `43e7555` â€” docs(backend): README-API sa che POST /api/account promuove l'ospite a email â€” **Carlomadella**
+- `b4d6a40` â€” docs(studio): «Lo Studio a cinque linguette» — B + D3 + F2 + E chiuso nei documenti â€” **Carlomadella**
+- `ea4359e` â€” test(studio): la prova di «Con chi» segue la riga accorciata â€” **Carlomadella**
+- `e3ace64` â€” fix(studio): la promo anche nella LaFamegram di eventi-v2, righe del feat che non si troncano â€” **Carlomadella**
+- `14eeee1` â€” feat(studio): il pezzo sul banco (F2) — Mix e Uscita ad ogni pezzo â€” **Carlomadella**
+- `3df6539` â€” feat(studio): la Cover dentro all'Uscita, e qualita' e ascolti divisi (E) â€” **Carlomadella**
+- `35c04b6` â€” feat(studio): il Feat in Cabina accanto al fonico, con le due porte (D3) â€” **Carlomadella**
+- `98cc918` â€” feat(studio): il Marketing passa sul telefono, in LaFamegram («Che post fai?») â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/studio-elementi.css`
+- **Modificato:** `frontend/css/studio.css`
+- **Modificato:** `frontend/css/telefono.css`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:90d1ea3 -->
 ## 14/09/26, 06:06 â€” task/studio-marketing-scegli-il-pezzo â†’ main
 
