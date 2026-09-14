@@ -1486,6 +1486,9 @@ alta 30 punti dentro una barra di 307, e nessuna sovrapposizione con HYPE.
 
 ## Timing prima di Marketing, nello Studio
 
+> Superato il 15/09/2026: il Marketing non è più una linguetta dello Studio, sta sul
+> telefono (vedi «Lo Studio a cinque linguette», in fondo). Quello che segue è com'era.
+
 ~~«marketing deve essere dopo timing»~~ **FATTO (13/09/2026)**
 
 Le linguette dello Studio adesso fanno Beat · Testo · Cabina · Mix · Cover · Feat ·
@@ -1617,7 +1620,7 @@ all'anteprima, la mossa costa 8 energia e 30 minuti, apre la scena con «Antepri
 
 ## Prima Beat, Testo e Cabina; il resto si apre col primo pezzo
 
-«l'utente deve poter fare solo le sezioni Beat, Testo, e Cabina, poi il resto» **FATTO in parte (14/09/2026)** — fatta la lettura «prima volta»; Carletto ha poi detto che intendeva **«ad ogni pezzo»**, e quella manca. Come farla (una riga in `studioSbloccato()`, o «un pezzo sul banco») è scritto in `documentazione/brainstorming-studio-cover-feat-marketing.md`, idea F, perché dipende da quali linguette restano dopo la Cabina: si decide lì, poi si fa.
+«l'utente deve poter fare solo le sezioni Beat, Testo, e Cabina, poi il resto» **FATTO (15/09/2026)** — anche nella lettura **«ad ogni pezzo»** che Carletto intendeva: lo Studio lavora un pezzo alla volta, quello **sul banco**, e Mix e Uscita si aprono su di lui e si richiudono quando esce (vedi «Lo Studio a cinque linguette», in fondo a questo file). Sotto resta com'era fatta la lettura «prima volta» del 14/09.
 
 Le cinque linguette dopo la Cabina — Mix, Cover, Feat, Timing, Marketing — restano
 **chiuse finché non hai registrato il primo pezzo**: spente, col lucchetto, al loro posto
@@ -1658,3 +1661,75 @@ q70, fase Sconosciuto), rimettendo poi il salvataggio com'era.
   spinta all'uscita (1,36); il resto è l'hype che le anteprime stesse hanno dato (15 → 20,
   che entra nella «scoperta» di `songWeekly()`). È un vantaggio vero per chi prepara
   l'uscita, non un secondo motore.
+## Lo Studio a cinque linguette: B + D3 + F2 + E
+
+«Sto pensando di voler togliere le sezioni cover, feat, marketing» + il punto 10 letto «ad
+ogni pezzo» **FATTO (15/09/2026)** — scelta **B + D3 + F2 + E** del
+[brainstorming](../documentazione/brainstorming-studio-cover-feat-marketing.md), fatta nei
+quattro passi scritti lì, un commit per passo. Alla fine: **Beat · Testo · Cabina · Mix ·
+Uscita**, cinque linguette, nessuna vuota, e a 390px ci stanno in riga senza scorrere.
+
+1. **Marketing sul telefono.** La linguetta non c'è più. In LaFamegram, in cima al feed,
+   c'è «**Che post fai?**» (`telPromo()` in `telefono.js`): la lista dei pezzi usciti da
+   spingere (con la riga scelta accesa), sotto «Non ancora fuori» per l'anteprima, il
+   riquadro giallo della saturazione, il tasto d'oro **Posta** — o «Fai uscire una
+   preview» se il pezzo scelto non è fuori. La scelta resta in `G.studio.spingi`, letta da
+   `studioDaSpingere()`/`studioDaAnticipare()`, che è dove `actions.js` la cerca: le mosse
+   `promo` e `anteprima` non sono cambiate di un numero. Lo Studio, dopo l'uscita, dice
+   «fallo sapere» con un tasto che chiude lo Studio e apre il telefono su LaFamegram
+   (`studioFalloSapere()`). Attenzione a una cosa: **eventi-v2.js sostituisce
+   `schermataLafamegram`** — la promo sta in cima anche lì, se no si vedeva solo nella
+   versione base. La foto `studio_promo.png` torna fra le «in attesa» dell'audit.
+2. **Feat in Cabina, con le due porte (D3).** Sotto «Dietro al vetro» c'è «**Con chi**»: «da
+   solo», i rapper che conosci dalla Sala (accettano sempre, non costano niente: il
+   rapporto è già il prezzo pagato) e «**Dalla classifica**», i sei rivali più grossi non
+   ancora fra i contatti. Un rivale ha una fama ricavata dai suoi ascolti in scala di log
+   (`studioFamaRivale`), un prezzo a decine (`studioFeatPrezzo`, 30 + fama × 5) e una
+   probabilità di sì (`studioFeatProbabilita`: la tua misura — ascolti della settimana,
+   hype × 10, fan × 0,2 — contro i suoi ascolti; da 8% a 97%). Si paga solo se dice sì; il no
+   costa 5 di energia e un'ora. Chi accetta **entra in `G.gente`** come rapper a «contatto»,
+   con la sua faccia, e da lì in poi viene gratis. Con le conferme accese la chiamata chiede
+   prima. Chiude la domanda «da chi si sceglie il feat» del punto 6.
+   **E il feat conta sul pezzo**: alla registrazione restano `s.feat` (nome) e `s.featFama`;
+   `songWeekly()` ci aggiunge la sua gente che ascolta (`featAscolti`, fama × 4 × (0,5 +
+   q/170), stessa curva del resto) e all'uscita — stanotte o venerdì — l'hype prende
+   `featHypeUscita` (fama × 0,08: fama 50 → +4). La stima degli stream di Fuori lo tiene in
+   conto. Era il «feat con nomi più grandi» del foglio dell'hype, che finora non muoveva
+   niente.
+3. **Cover dentro all'Uscita, e qualità/ascolti divisi (E).** La linguetta Timing si
+   chiama **Uscita** («com'è vestito, e quando esce»): la copertina grande, sotto al titolo
+   «carica una foto» e «generane un'altra» (o «togli la foto»), e la proposta con conferma
+   com'era — finché la proposta è in piedi il tasto «Mandalo fuori» sparisce, prima si
+   decide la faccia. **La copertina adesso pesa**: non sulla qualità (una cover non fa un
+   pezzo migliore) ma sugli **ascolti della prima settimana** — `coverResa()` in
+   `covers.js`, da ×0,92 a ×1,12 dal seed (quindi «generane un'altra» è una scelta vera, e
+   la resa si legge accanto), ×1,08 la foto tua; la legge `songWeekly()` con `age === 0`.
+   E il **riquadro dei numeri** del foglio, che alla roadmap mancava: due righe, *QUALITÀ =
+   Beat · Testo · Fonico · con X · Mix → q* e *ASCOLTI = Copertina · Venerdì · Anteprime ·
+   la gente del feat · Hype · Fan*. Le parti le scrive `registra` sul pezzo (`s.parti`) e
+   il mix le completa; un pezzo di un salvataggio vecchio mostra solo la q.
+4. **Il pezzo sul banco (F2).** `G.studio.banco` è il seed del pezzo in lavorazione. Appena
+   inciso è lui sul banco; Mix e Uscita si aprono su di lui (`studioSbloccato()` guarda il
+   banco, non «esiste un pezzo») e si richiudono quando esce o va in cassaforte — si torna
+   in Cabina, con la riga «fallo sapere». Le tre liste «I tuoi pezzi» di Mix, Cover e
+   Timing sono una sola, «**Sul banco**», uguale in Cabina, Mix e Uscita, con la cassaforte
+   sotto («ritira» rimette sul banco). Rimesso sul banco un pezzo già mixato, il Mix lo
+   dice e manda all'Uscita. Le due caselle vecchie `mixa`/`esce` migrano al primo
+   `studioDati()`: la prima che punta ancora a un pezzo diventa il banco, se no l'ultimo
+   pezzo inciso e non uscito — chi riapre la partita trova Mix e Uscita come le aveva.
+   Fuori dallo Studio (l'Agenda del telefono) `actions.js` ripiega sul migliore come
+   sempre.
+
+**Una cosa da sapere, non risolta qui**: sotto i 1180px il telefono della plancia non c'è
+(scelta scritta in `hub.css`), quindi «Che post fai?» non si raggiunge; il tasto «fallo
+sapere» dello Studio allora lancia la promo direttamente sull'ultimo pezzo uscito, senza
+la scelta del pezzo e senza l'anteprima. Quando il telefono avrà una pagina a schermo
+intero anche da stretto, il tasto va lì e la foto `studio_promo.png` può farle da fondale.
+
+Prove: 180 in `strumenti/prova.js` (i blocchi dello Studio e della classifica, riscritti
+sulle cinque linguette: la promo sul telefono, le due porte del feat con il dado fermo,
+la copertina in Uscita e la sua resa, il banco che si riempie, si svuota e migra) e un
+blocco nuovo dell'audit, «Lo Studio a cinque linguette (14/09/2026)», sette controlli che
+tengono ferma la riorganizzazione. Provato nel gioco vero con Playwright a 1440 e a 390px:
+anteprima dal telefono, feat dalla classifica che dice sì, uscita → Cabina → «fallo sapere»
+→ LaFamegram; niente errori in console, niente che sborda in larghezza.

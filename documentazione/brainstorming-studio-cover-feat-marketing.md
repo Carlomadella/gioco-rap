@@ -4,6 +4,14 @@ Scritto il 14/09/2026, dopo il giro dei sette ritocchi sul foglio «LUOGO: STUDI
 è una decisione: è il foglio su cui decidere. Ogni idea ha il suo pro, il suo contro e
 cosa tocca nel codice, così si sceglie sapendo il prezzo.
 
+> **Deciso e fatto (15/09/2026): B + D3 + F2 + E**, nell'ordine di lavoro scritto in
+> fondo. Cosa è venuto fuori sta in `implementazioni/02-interfaccia-e-telefono.md`, «Lo
+> Studio a cinque linguette». Delle domande in coda: togliere = **B**; il feat = **D3** e
+> pesa su ascolti e hype; ad ogni pezzo = **F2**; la Cover pesa sugli stream (**E**); la
+> «terza strada» della copertina (l'emblema a livelli) resta in lista, non è stata toccata.
+> Una cosa che il foglio non aveva pesato: sotto i 1180px il telefono della plancia non
+> c'è, e lì la promo parte dallo Studio senza la scelta del pezzo.
+
 Due cose nuove che arrivano da Carletto e che qui si tengono ferme:
 
 1. **«Sto pensando di voler togliere le sezioni Cover, Feat, Marketing.»**
