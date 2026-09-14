@@ -6,6 +6,55 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:90d1ea3 -->
+## 14/09/26, 06:06 â€” task/studio-marketing-scegli-il-pezzo â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `90d1ea3`
+
+### Cosa Ã¨ entrato
+
+- `4dd4a5b` â€” fix(studio): dopo il terzo giro e la prova sul telefono — avviso largo, linguette, copertine â€” **Carlomadella**
+- `e288634` â€” fix(studio): la proposta di copertina non resta orfana, e l'anteprima suona come la promo â€” **Carlomadella**
+- `ea69bd3` â€” docs(studio): le misure di un anno con la spinta e le anteprime â€” **Carlomadella**
+- `fcebe81` â€” feat(studio): prima Beat, Testo e Cabina; il resto si apre col primo pezzo â€” **Carlomadella**
+- `fd90cd7` â€” feat(studio): di un pezzo non uscito si fa uscire un'anteprima, dal Marketing â€” **Carlomadella**
+- `28c6561` â€” fix(studio): quando tieni la take si chiede solo il nome, e la copertina si conferma nella Cover â€” **Carlomadella**
+- `f09a99d` â€” fix(studio): al Marketing si sceglie quale pezzo spingere, e la promo lo spinge davvero â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-14/cover-elenco-da-confermare-tagliato-360.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-14/cover-proposta-360.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-14/cover-proposta-390.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-14/linguette-chiuse-390.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-14/linguette-chiuse-beat-attaccato-al-bordo-360.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-14/linguette-chiuse-toast-stretto-390.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-14/marketing-anteprima-titolo-a-capo-390.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-14/marketing-dopo-il-tocco-360.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-14/marketing-dopo-il-tocco-titolo-fuori-390.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-14/marketing-due-elenchi-390.jpg`
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/css/effects.css`
+- **Modificato:** `frontend/css/overlays.css`
+- **Modificato:** `frontend/css/stretto.css`
+- **Modificato:** `frontend/css/studio.css`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/copertine.js`
+- **Modificato:** `frontend/js/game/fx.js`
+- **Modificato:** `frontend/js/game/scene-art.js`
+- **Modificato:** `frontend/js/game/sim.js`
+- **Modificato:** `frontend/js/game/studio-elementi.js`
+- **Modificato:** `frontend/js/game/studio.js`
+- **Modificato:** `frontend/js/game/tempo.js`
+- **Modificato:** `frontend/js/game/ui.js`
+- **Modificato:** `frontend/strumenti/prova.js`
+
+**File interessati in questa categoria:** 26
+
+---
+
 <!-- merge:55a9083 -->
 ## 13/09/26, 20:08 â€” task/studio-marketing-dopo-timing â†’ main
 

@@ -6,6 +6,33 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:90d1ea3 -->
+## 14/09/26, 06:06 â€” task/studio-marketing-scegli-il-pezzo â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `90d1ea3`
+
+### Cosa Ã¨ entrato
+
+- `4dd4a5b` â€” fix(studio): dopo il terzo giro e la prova sul telefono — avviso largo, linguette, copertine â€” **Carlomadella**
+- `e288634` â€” fix(studio): la proposta di copertina non resta orfana, e l'anteprima suona come la promo â€” **Carlomadella**
+- `ea69bd3` â€” docs(studio): le misure di un anno con la spinta e le anteprime â€” **Carlomadella**
+- `fcebe81` â€” feat(studio): prima Beat, Testo e Cabina; il resto si apre col primo pezzo â€” **Carlomadella**
+- `fd90cd7` â€” feat(studio): di un pezzo non uscito si fa uscire un'anteprima, dal Marketing â€” **Carlomadella**
+- `28c6561` â€” fix(studio): quando tieni la take si chiede solo il nome, e la copertina si conferma nella Cover â€” **Carlomadella**
+- `f09a99d` â€” fix(studio): al Marketing si sceglie quale pezzo spingere, e la promo lo spinge davvero â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/effects.css`
+- **Modificato:** `frontend/css/overlays.css`
+- **Modificato:** `frontend/css/stretto.css`
+- **Modificato:** `frontend/css/studio.css`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:bc14d1d -->
 ## 13/09/26, 19:55 â€” task/tasto-compralo-fuori-schermo â†’ main
 
