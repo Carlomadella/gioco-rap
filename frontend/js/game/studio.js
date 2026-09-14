@@ -650,7 +650,7 @@ function studioCoverLascia(){
    riempie lo schermo, e sopra ci stanno **tre colonne** — a sinistra chi c'è
    o cosa hai, in mezzo la cosa che stai facendo, a destra quello che ti
    aspetta. Ogni sezione riempie le tre colonne e basta: il telaio, i colori e
-   i tasti sono gli stessi per tutte e otto, e stanno tutti in `studio.css`.
+   i tasti sono gli stessi per tutte e cinque, e stanno tutti in `studio.css`.
 
    Una colonna laterale che torna vuota sparisce da sola (`.stcol:empty`):
    non tutte le sezioni hanno tre cose da dire, e un pannello vuoto è peggio
@@ -1156,9 +1156,16 @@ function studioSezBanco(){
    d'attesa. Qui è una lista sola, con «da solo» in cima come per il fonico,
    chi conosci subito sotto, e in fondo la classifica — che non è mai vuota,
    quindi la schermata vuota non esiste più. */
+/* «al 40%», «all'8%»: l'articolo segue il numero */
+function studioPercento(p){
+  const n = Math.round(p * 100);
+  return (n === 8 || n === 11 || n >= 80 && n < 90 ? "all'" : "al ") + n + "%";
+}
 function studioCabinaConChi(ft){
   const noti = studioGente("rapper");
-  const rivali = studioRivaliChiamabili().slice(0, 6);
+  /* tutta la classifica, dal piu' grosso: i primi sei dicono quasi sempre
+     no, e quelli della tua misura stanno in fondo — la colonna scorre */
+  const rivali = studioRivaliChiamabili();
   return stSotto("Con chi") +
     stScelta({attr:' data-feat=""', on:!ft, mini:stSagoma(),
       n:"da solo", d:"il pezzo è tuo e basta",
@@ -1181,7 +1188,7 @@ function studioCabinaConChi(ft){
           return stScelta({
             attr:' data-rivale="' + studioEsc(r.n) + '"',
             mini:faccia(r, 40), n:r.n,
-            d:fmt(studioFeatPrezzo(r)) + " € · sì al " + Math.round(studioFeatProbabilita(r) * 100) + "%",
+            d:fmt(studioFeatPrezzo(r)) + " € · sì " + studioPercento(studioFeatProbabilita(r)),
             v:"+" + stima + " qual.", vCls:"calmo"
           });
         }).join("")
@@ -1451,8 +1458,9 @@ function renderStudio(){
     '<button class="sttab' + (x.id === sez.id ? " on" : "") + (studioSezAperta(x) ? "" : " chiusa") +
     '" data-sez="' + x.id + '"' + (studioSezAperta(x) ? "" : ' aria-disabled="true"') + '>' +
     x.n + '</button>').join("");
-  /* Otto linguette non ci stanno in riga su un telefono: la striscia scorre.
-     Due cose, se no le ultime due sezioni sono una caccia al tesoro — che è
+  /* Cinque linguette a 390px ci stanno; sotto, o con una lingua piu' lunga,
+     la striscia scorre. Due cose, se no le ultime sezioni sono una caccia al
+     tesoro — che è
      l'avvertimento scritto nel progetto delle pagine. Primo: quella accesa si
      porta sempre in vista, così sai dove sei anche se ci sei arrivato da
      un'altra parte. Secondo: quando c'è altro a destra si accende una

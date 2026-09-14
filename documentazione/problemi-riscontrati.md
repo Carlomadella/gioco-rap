@@ -2050,3 +2050,169 @@ presente (`README-API.md`, «Terzo esito, con `tipo: "email"`»).
   conosce), e nessun controllo automatico lo becca. Proposta: in §6 aggiungere il terzo
   esito (`200 { account, token }` quando la sessione corrente è un ospite senza mail,
   con token invariato) e riscrivere la nota 3 al presente, o toglierla.
+
+## Giro del 15/09/2026 (segnala-problemi, fine task `task/studio-cinque-linguette`)
+
+Controlli automatici tutti verdi: `npm run prova` 180 a posto e 0 no, `audit-regressioni.js`
+337 ok e 0 falliti, `verifica:build` 33 ok e 0 falliti. Letto per intero il diff
+`main...HEAD` (quindici file) e poi, riga per riga, `studio.js` (il banco, le due porte del
+feat, la Cover dentro a Fuori, `studioNumeri`, `renderStudio` e i click), `studio-elementi.js`
+(`studioMandaFuori`, `studioRiprendi`, `studioUscitePronte`, la stima degli stream),
+`actions.js` (`registra`, `mixa`, `pubblica`, `promo`, `anteprima`), `sim.js` (`songWeekly`,
+`advanceWeek`), `covers.js` (`coverResa`), `telefono.js` (`telPromo`, `telSpingi`, il click su
+`hb-tel`), `eventi-v2.js:1889`, e per i casi limite `posto.js` (`nuovaPersona`, `sistemaGente`,
+`diventaOpp`), `rivals.js` (`nuovoRivale`, `faccia`), `modal.js`, `tempo.js` (`spendi`),
+`hub.js` (`hubAzione`, `hubPronta`, `renderHub`) e `css/hub.css` (il telefono sotto i 1180).
+
+I casi limite chiesti, uno per uno:
+
+- **Salvataggi vecchi** — a posto. `studioDati()` (`studio.js:158-175`) migra `mixa`/`esce`
+  al primo giro e, se nessuna delle due punta ancora a un pezzo, mette sul banco l'ultimo
+  inciso e non uscito; una partita nuova parte con `banco = null`. Un pezzo senza `parti`
+  mostra solo la q (`studioNumeri`), un pezzo con `feat` scritto come nome (com'era su
+  `main`) si legge uguale.
+- **Pezzo sul banco che sparisce** — a posto. I pezzi non si cancellano mai (nessun
+  `songs.splice` in `js/`), il seed cambia solo in `studioCoverConferma` che sposta anche
+  `banco` e `spingi` (`studio.js:634-637`), e le tre strade con cui un pezzo lascia il banco
+  (`pubblica` in `actions.js:402`, il venerdì in `studio-elementi.js:729`, la cassaforte in
+  `:672`) svuotano tutte il banco. Se il banco resta a un seed di un pezzo `tenuto`, la
+  lettura torna `null` e le due linguette si chiudono: coerente.
+- **Promo senza pezzi** — a posto. `telPromo()` con niente fuori e niente pronto dice «Niente
+  da spingere» (`telefono.js:679`); con pezzi pronti ma niente fuori il tasto «Posta» è
+  spento e la riga sotto manda all'anteprima. Il tasto «fallo sapere» dello Studio compare
+  solo se c'è un pezzo uscito.
+- **`G.studio.spingi` su un pezzo uscito nel frattempo** — a posto, e anzi è la strada
+  giusta: `studioDaAnticipare` non lo trova più fra i pronti, `studioDaSpingere` lo trova fra
+  gli usciti, e la promo parte su quello senza toccare niente. Se invece finisce in
+  cassaforte, si ripiega sull'ultimo uscito senza righe accese — come già scritto nel giro
+  del 14/09.
+- **Rivale con lo stesso nome di uno in `G.gente`** — qui c'è un problema vero, vedi la
+  terza voce.
+
+Sei voci, nessuna blocca la partita. Le prime due sono quelle che contano.
+
+### Nel riquadro dei numeri di Fuori il feat non compare mai: la sua parte è sempre zero
+
+**Sistemato (15/09/2026), nello stesso giro:** `registra` legge `featBonus()` e `studioBonus()` in due costanti **prima** di `studioConsumaFeat()` e le scrive in `parti`; l'audit controlla l'ordine.
+
+- **dove** — `frontend/js/game/actions.js:353` (`studioConsumaFeat()`, che stacca il feat e
+  mette `G.studio.feat = null`) e subito dopo `actions.js:360` (`parti:{..., feat:featBonus(),
+  ...}`), letto da `studioNumeri` in `frontend/js/game/studio.js:1235`.
+- **cosa succede** — la qualità del pezzo il feat la conta giusta (`actions.js:349`, calcolata
+  prima di staccarlo), ma la riga «QUALITÀ = Beat · Testo · Fonico · con X · Mix» che il
+  documento promette non dirà mai «con X»: quando si scrive `parti.feat` il feat è già stato
+  consumato, `featBonus()` non trova più nessuno e scrive 0, e `studioNumeri` mostra la voce
+  solo se è diversa da zero. Chi paga 120 € un rapper della classifica vede in Fuori una riga
+  di numeri che non lo nomina, e sotto «ASCOLTI» compare «La gente di X» (quella legge
+  `featFama`, che è a posto): la seconda riga dice che c'è, la prima no. Letto nel codice, non
+  riprodotto in partita: il test di `prova.js:1434` usa un pezzo scritto a mano con `feat:0`.
+- **come si vede** — Cabina, scegli un feat (chi conosci va bene), tieni la take, vai
+  nell'Uscita: la riga «Qualità» non ha la voce del feat.
+- **quanto pesa** — da sistemare con calma.
+
+### Sul telefono la promo non si sceglie e l'anteprima non si raggiunge più
+
+- **dove** — `frontend/js/game/studio.js:407-408` (`studioFalloSapere`: senza `telPC()`
+  lancia `studioAzione("promo")` e basta), `frontend/css/hub.css:1273-1287` (sotto i 1180 px
+  `body.in-hub .ptel{display:none}`), `frontend/js/game/telefono.js:55-88` (`HUB_APP_VECCHIO`,
+  la griglia compatta, che LaFamegram non ce l'ha), `frontend/js/game/actions.js:474`
+  (`need` dell'anteprima: «un pezzo scelto su LaFamegram»).
+- **cosa succede** — «Che post fai?» vive solo nel telefono della plancia, e quel telefono
+  sotto i 1180 px non c'è. Su un telefono vero quindi: il tasto «fallo sapere» spinge
+  **sempre l'ultimo pezzo uscito**, senza la scelta del pezzo che il giro del 14/09 aveva
+  appena aggiunto; e la mossa «Anteprima del pezzo» non ha più nessuna strada, perché l'unico
+  posto in cui si sceglie il pezzo non uscito è LaFamegram. Ieri sul telefono a 390 la
+  linguetta Marketing con i due elenchi funzionava (prova del 14/09, qui sopra): oggi quel
+  pezzo di gioco sul telefono è sparito. Il documento della task lo sa e lo dice
+  (`implementazioni/02-interfaccia-e-telefono.md`, «Una cosa da sapere, non risolta qui»):
+  lo scrivo lo stesso perché il gioco esce sugli store del telefono ed è lì che conta.
+- **come si vede** — finestra più stretta di 1180 px, un pezzo fuori e uno no: Studio,
+  Uscita o Cabina, «fallo sapere» → parte la promo sull'ultimo uscito. Nessun posto dove
+  fare l'anteprima.
+- **quanto pesa** — si vede ma si gira intorno (la promo parte comunque); per l'anteprima
+  non c'è un giro.
+
+### Un rapper della classifica con lo stesso nome di uno della Sala non si può chiamare
+
+- **dove** — `frontend/js/game/studio.js:279-280` (`studioRivaliChiamabili` scarta i rivali
+  il cui **nome** sta già in `G.gente`), contro `frontend/js/game/posto.js:395-396` (i rapper
+  della Sala pescano i nomi dagli stessi trenta di `RIV_NOMI`, guardando solo `G.gente` e
+  mai `G.rivals`) e `rivals.js:46` (i rivali guardano solo `G.rivals`).
+- **cosa succede** — i due elenchi si passano lo stesso mazzo di nomi senza parlarsi, quindi
+  è normale che alla Sala giri un «Lupo» da fama 20 e in classifica ci sia un «Lupo» da tre
+  milioni di ascolti: due persone diverse. Il filtro per nome li prende per la stessa
+  persona e il Lupo della classifica sparisce da «Dalla classifica» senza dirlo; con tre
+  rapper alla Sala e nove-undici in classifica succede quasi in ogni partita. Stessa radice,
+  caso raro ma brutto: chiami un rivale, accetta, entra fra i contatti (`studio.js:303`), poi
+  ci litighi alla Sala fino a `diventaOpp` (`posto.js:780`, rapporto a zero e tre punti
+  sotto) — che crea un **secondo** rivale col suo nome in classifica, perché quello di
+  partenza non è mai stato tolto. Il legame giusto sarebbe una cosa che non cambia (il
+  `seed` del rivale, o un `rivale:true` con il suo nome), non il nome da solo.
+- **come si vede** — partita dove alla Sala c'è un rapper con un nome che sta anche in
+  classifica: in Cabina, sotto «Dalla classifica», quel nome manca.
+- **quanto pesa** — da sistemare con calma.
+
+### «Dalla classifica» mostra solo i sei più grossi, cioè quelli che dicono di no
+
+**Sistemato (15/09/2026), nello stesso giro:** la lista è tutta la classifica, dal più grosso in giù — quelli della tua misura stanno in fondo e la colonna scorre.
+
+- **dove** — `frontend/js/game/studio.js:1161` (`studioRivaliChiamabili().slice(0, 6)`), con
+  l'ordine per ascolti calanti in `studio.js:281`.
+- **cosa succede** — la classifica ha nove-undici nomi; in Cabina se ne vedono sei, i più
+  grossi. Ma la probabilità che uno dica sì è il rapporto fra la tua misura e la sua
+  (`studioFeatProbabilita`, `studio.js:270-276`): i sei più grossi sono esattamente quelli che
+  a un giocatore piccolo rispondono «sì al 8%» e costano di più; quelli della sua misura, che
+  direbbero sì e costerebbero una serata, stanno fuori dall'elenco e non c'è modo di
+  arrivarci. Nel primo anno di gioco la porta della classifica è quasi solo una vetrina.
+- **come si vede** — partita nuova, un paio di settimane, Cabina: sei righe con «sì al 8%»
+  e prezzi da 200 € in su, e in classifica altri quattro nomi che non ci sono.
+- **quanto pesa** — da sistemare con calma.
+
+### Chi accetta dalla classifica occupa un posto della Sala, e alla Sala arriva meno gente
+
+- **dove** — `frontend/js/game/studio.js:303` (`G.gente.push(p)`) contro
+  `frontend/js/game/posto.js:423-432` (`sistemaGente`: si aggiunge gente finché
+  `G.gente.length < quante`, tetto 8, e il videomaker e il giornalista prendono il loro
+  posto solo quando quel giro parte).
+- **cosa succede** — ogni rivale che dice sì entra in `G.gente` e conta nel tetto. Con due
+  feat comprati dalla classifica la Sala smette di far arrivare due persone: un beatmaker,
+  un fonico, o proprio il videomaker (che serve al video del pezzo) e il giornalista, che
+  arrivano solo se il giro di `sistemaGente` ha ancora posti liberi. Non si rompe niente,
+  ma è un costo nascosto che il gioco non dice e che probabilmente nessuno ha scelto.
+- **come si vede** — fai accettare due rivali nelle prime settimane, poi conta chi arriva
+  alla Sala nelle settimane dopo: un posto in meno per ognuno.
+- **quanto pesa** — da sistemare con calma.
+
+### «Sì al 8%» e «Dice sì al 8%»: davanti alla vocale ci va «all'»
+
+**Sistemato (15/09/2026), nello stesso giro:** `studioPercento()` mette «al» o «all'» secondo il numero (8, 11, 80–89).
+
+- **dove** — `frontend/js/game/studio.js:1184` (la riga della classifica in Cabina) e
+  `studio.js:340` (la finestra di conferma).
+- **cosa succede** — con probabilità 8, 11, 80 e simili si legge «sì al 8%», che in
+  italiano non si dice. Sono proprio i numeri che un giocatore piccolo vede di più.
+- **come si vede** — Cabina, «Dalla classifica», partita giovane.
+- **quanto pesa** — da sistemare con calma.
+
+**Nota, non è un errore**: un rivale che dice no si può richiamare subito, all'infinito. Il no
+costa 5 di energia e un'ora (`studio.js:327-331`), la probabilità non scende mai sotto l'8%
+(`studio.js:274`), non c'è un «oggi no» né un ricordo del rifiuto: a forza di chiamare, prima
+o poi dice sì, e dodici chiamate sono sessanta di energia. In più il sì non costa tempo, e il
+no a fine giornata (dopo le tre) costa l'energia ma non l'ora, perché `GAME_TIME.spend` si
+ferma prima delle 04:00 e non c'è un `canSpend` a monte come per il beat. È bilanciamento, e
+sta tutto in `studioChiamaRivale`; se la porta della classifica sembrerà troppo facile, la
+manopola è lì (un rifiuto che vale per la settimana basterebbe).
+
+**Nota, non è un errore**: due cose piccole che non valgono una voce. I commenti di
+`studio.js:653` («tutte e otto») e `studio.js:1454` («Otto linguette non ci stanno in riga»)
+parlano ancora delle otto linguette: sono cinque, il codice sotto è giusto. E in
+`telefono.js:674` e `:716` il titolo del pezzo entra nell'HTML senza passare da uno
+`studioEsc`: nello Studio i titoli passano tutti di lì, sul telefono no — ma sul telefono era
+già così prima di oggi (`telefono.js:492`, la discografia), e i titoli li scrive il giocatore
+in una casella che il gioco controlla.
+
+Due voci del 14/09 cambiano forma con questa task, senza essere risolte: «Nel Marketing
+tocchi un pezzo in fondo e la risposta compare in cima» non riguarda più il Marketing (che
+nello Studio non c'è) ma vale tale e quale per gli elenchi di Cabina, Mix e Uscita; «Il capo
+ANTEPRIMA … va a capo» non esiste più come schermata, ma lo `stCapo` che va a capo è lo
+stesso di «MIXI: «…» · q78» e resta aperto come scritto lì.

@@ -4,7 +4,7 @@
       schermata **identica** alle foto con elementi HTML»
 
    Il telaio l'ha già fatto `studio.js`: la foto a schermo intero, la fascia
-   in alto, le tre colonne, la riga in basso, le otto linguette. Quello che
+   in alto, le tre colonne, la riga in basso, le linguette. Quello che
    mancava per arrivare *identici* ai riferimenti sono le cose che stanno
    **dentro** ai pannelli, e che nelle foto sono la schermata vera:
 
@@ -19,7 +19,7 @@
 
    Sta in un file suo per la regola 9 di `implementazioni.md` («quando non
    sono fix […] non modificare troppo i file già presenti ma crea un file
-   nuovo collegato ai già presenti»): `studio.js` resta il telaio e le otto
+   nuovo collegato ai già presenti»): `studio.js` resta il telaio e le
    sezioni, qui ci sono i pezzi che ci vanno dentro. Le sezioni chiamano
    queste funzioni per nome, e il file si carica subito dopo il suo.
 

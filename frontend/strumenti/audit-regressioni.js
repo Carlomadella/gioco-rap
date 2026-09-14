@@ -699,7 +699,10 @@ test("la copertina sta nell'Uscita e pesa sugli ascolti della prima settimana, n
   sim.includes('if(age === 0 && typeof coverResa === "function") out *= coverResa(s);'));
 test("il riquadro dei numeri divide qualita' e ascolti, con le parti scritte alla registrazione",
   studio.includes("function studioNumeri(s, qFinale, quando, proposta)") &&
-  actions.includes("parti:{beat:bt.q, testo:b.q, fonico:studioBonus(), feat:featBonus(), take:presa}") &&
+  /* il feat si legge prima di staccarlo, se no in Fuori vale sempre zero */
+  actions.includes("const conFeat = featBonus(), conFonico = studioBonus();") &&
+  actions.indexOf("const conFeat = featBonus()") < actions.indexOf("studioConsumaFeat() : null") &&
+  actions.includes("parti:{beat:bt.q, testo:b.q, fonico:conFonico, feat:conFeat, take:presa}") &&
   actions.includes("if(s.parti) s.parti.mix = mixGain();"));
 test("il pezzo sul banco (F2): Mix e Uscita si aprono su di lui e si chiudono quando esce o va in cassaforte",
   studio.includes("function studioSulBanco()") &&

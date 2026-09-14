@@ -346,7 +346,11 @@ const ACTIONS = [
           prima take e' esattamente questo `rnd(-5,6)` — chi non chiede altre
           take registra con lo stesso dado di sempre. */
        const presa = typeof studioTakePresa === "function" ? studioTakePresa() : rnd(-5,6);
-       const q = clamp(Math.round(songQ(b,bt) + studioBonus() + featBonus() + presa), 5, 100);
+       /* il feat si legge **prima** di staccarlo (studioConsumaFeat qui
+          sotto lo libera): letto dopo vale zero, e in Fuori la riga della
+          qualita' non lo nominava mai — trovato da segnala-problemi il 15/09 */
+       const conFeat = featBonus(), conFonico = studioBonus();
+       const q = clamp(Math.round(songQ(b,bt) + conFonico + conFeat + presa), 5, 100);
        /* chi era in sessione resta scritto sul pezzo — il nome e la fama,
           che e' quella che sim.js legge per far ascoltare il pezzo alla sua
           gente — e poi torna libero */
@@ -357,7 +361,7 @@ const ACTIONS = [
          /* i numeri per elemento (foglio «LUOGO: STUDIO», idea E del 14/09):
             da cosa e' fatta la qualita', letti poi in Fuori. Il mix li
             completa quando arriva. */
-         parti:{beat:bt.q, testo:b.q, fonico:studioBonus(), feat:featBonus(), take:presa}};
+         parti:{beat:bt.q, testo:b.q, fonico:conFonico, feat:conFeat, take:presa}};
        G.songs.push(s2); G.wellbeing = clamp(G.wellbeing-3,0,100);
        /* appena inciso e' lui sul banco dello Studio (punto 10 «ad ogni
           pezzo»): Mix e Uscita si aprono su di lui */
