@@ -13,6 +13,7 @@ in radice fino al punto 7.
 | [`problemi-riscontrati.md`](problemi-riscontrati.md) | i problemi trovati leggendo il codice, e come sono stati chiusi |
 | [`dipendenze.md`](dipendenze.md) | la regola per scegliere una dipendenza, il prezzo che si paga, e il registro di quelle installate |
 | [`pagine-azioni/`](pagine-azioni/README.md) | una pagina per ogni azione: l'analisi, i pro e i contro, il telaio comune e il progetto di **ogni** schermata, mossa per mossa |
+| [`brainstorming-studio-cover-feat-marketing.md`](brainstorming-studio-cover-feat-marketing.md) | **da decidere**: lo Studio senza le linguette Cover, Feat e Marketing — le idee, il prezzo di ognuna, la domanda sui feat e il punto 10 letto «ad ogni pezzo» |
 
 Il resto sta dove è nato e ci resta, perché è lì che lo si cerca:
 [`../README.md`](../README.md) (la mappa del progetto), [`../ROADMAP.md`](../ROADMAP.md)
