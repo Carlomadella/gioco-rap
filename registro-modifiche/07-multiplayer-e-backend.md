@@ -6,6 +6,29 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:b39a7d2 -->
+## 15/09/26, 11:27 â€” task/documenti-backend-in-pari â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `b39a7d2`
+
+### Cosa Ã¨ entrato
+
+- `1a0d419` â€” docs(backend): la difficoltà si riscrive a ogni punteggio, e le roadmap contano tre dipendenze â€” **Carlomadella**
+- `1d59615` â€” docs(backend): README-API, README dei dati e README di radice rimessi in pari â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `.claude/agents/backend-allineato.md`
+- **Modificato:** `backend/README-API.md`
+- **Modificato:** `backend/database/README.md`
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/roadmap.md`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:975839c -->
 ## 15/09/26, 00:32 â€” task/studio-cinque-linguette â†’ main
 
