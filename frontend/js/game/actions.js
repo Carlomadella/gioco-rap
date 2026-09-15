@@ -347,16 +347,20 @@ const ACTIONS = [
    run(){
      const b = daIncidere(), bt = beatDaIncidere();
      chiediTitolo(title(), (nome, seed, img) => {
+       /* punto 4: il tiro di dado della registrazione non e' piu' invisibile.
+          E' la take che hai scelto in cabina (`registrazione_pezzo`), e la
+          prima take e' esattamente questo `rnd(-5,6)` — chi non chiede altre
+          take registra con lo stesso dado di sempre.
+          Si legge **prima** di togliere strofa e beat dalla lista: la take
+          porta la targhetta di quella coppia, e con la strofa gia' sfilata la
+          targhetta non combaciava piu' — la take scelta non arrivava mai sul
+          pezzo, dall'08/09 (controllo mirato del 15/09). */
+       const presa = typeof studioTakePresa === "function" ? studioTakePresa() : rnd(-5,6);
        G.bars.splice(G.bars.indexOf(b),1);
        G.beats.splice(G.beats.indexOf(bt),1);
        if(!G.gear.mic) G.money -= 50;
        /* punto 12: chi sta dietro al vetro conta anche in registrazione — un
           fonico che ti conosce sa dove metterti la voce prima che glielo chiedi */
-       /* punto 4: il tiro di dado della registrazione non e' piu' invisibile.
-          E' la take che hai scelto in cabina (`registrazione_pezzo`), e la
-          prima take e' esattamente questo `rnd(-5,6)` — chi non chiede altre
-          take registra con lo stesso dado di sempre. */
-       const presa = typeof studioTakePresa === "function" ? studioTakePresa() : rnd(-5,6);
        /* il feat si legge **prima** di staccarlo (studioConsumaFeat qui
           sotto lo libera): letto dopo vale zero, e in Fuori la riga della
           qualita' non lo nominava mai — trovato da segnala-problemi il 15/09 */

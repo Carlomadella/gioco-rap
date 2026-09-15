@@ -2560,3 +2560,91 @@ chiama `studioTakeManca()` dal suo `need`, che viene letto a ogni ridisegno dell
 dell'Agenda: `studioTake()` scrive in `G.studio` anche da lì, ma scrive sempre la stessa cosa
 che scriverebbe la Cabina, quindi non fa danni; lo segno perché un `need` che scrive nel
 salvataggio è una cosa da sapere.
+
+## Giro del 15/09/2026 (controllo mirato sul commit ac64bc4)
+
+Controlli automatici tutti verdi: `npm run prova` 180 a posto e 0 no, `audit-regressioni.js`
+343 ok e 0 falliti, `verifica:build` 33 ok e 0 falliti. Letto il diff del commit per intero e,
+attorno a quello che tocca, `studio-elementi.js` (`studioTake`, `studioTakeElenco`,
+`studioTakeAncora`, `studioTakeManca`, `studioTakePresa`, `studioStrofa`, `studioBeatSuCui`,
+`studioTakeChiave`), `actions.js` (`registra` tutta, `daIncidere`, `adfDailyCounts`),
+`ui.js` (la tile in `renderGioco`, `avviaAzioneDiretta`), `telefono.js` (`schermataAgenda`,
+`renderTelefono`, `telVaiApp`), `hub.js` (`renderHub`), `sputa.js` riga per riga,
+`rivals.js` (`nuovoRivale`, `vitaRivali`), `copertine.js` (`chiediTitolo`), `fx.js` (`toast`).
+
+Provato nel gioco vero con Playwright a 1400 px, col server di sviluppo. Le sei correzioni
+fanno quello che le note RISOLTO dicono:
+- la take pagata si mette da parte e torna (energia 200 → 155 alla prima take, cambio beat →
+  la take sta in `takeAltre` con la sua targhetta, ricambio → è di nuovo lì, identica);
+- la tile dice «45 energia» + «SERVE una take, in cabina» senza take e «gratis» con una take;
+  l'Agenda «45⚡» e poi «0⚡»; `costoScritto` è letto solo da quelle due righe,
+  `avviaAzioneDiretta` scala ancora `en2` (l'energia non si muove al «Registra»);
+- dopo la prima barra del giorno la fascia in alto passa da 5 a 6 con il numero, e l'app
+  resta aperta su Sputa (`renderHub` ridisegna il telefono tenendo `TEL_APP`); Sputa si
+  scrive solo dal telefono della plancia, quindi `renderHub` trova sempre i suoi pezzi;
+- al tetto (20 in «Sconosciuto») il riquadro e il fumetto dicono tutti e due «sei già al
+  tetto», l'hype resta 20;
+- cambiando `r.seed` e `r.ult` a un rivale, le barre della settimana scorsa restano con lo
+  stesso id e lo stesso testo.
+
+Due voci, nessuna blocca la partita. La prima è la più grossa che ho trovato in questi giri
+sulla Cabina, e **non l'ha aperta questo commit**: c'è da quando `studioTakePresa` guarda la
+targhetta (08/09/2026). La scrivo qui perché il commit tocca proprio quella funzione, e
+perché il giro precedente aveva scritto «il pezzo esce con la take scelta» — non era vero,
+avevo guardato che il pezzo uscisse, non con quale numero.
+
+### La take che scegli in Cabina non finisce mai sul pezzo: esce sempre col dado nuovo
+
+- **dove** — `frontend/js/game/actions.js:350-351` (`registra.run`: la strofa e il beat si
+  tolgono dalla lista **prima** di leggere la take, che sta alla riga `:359`) contro
+  `frontend/js/game/studio-elementi.js:427-435` (`studioTakePresa` confronta la targhetta
+  della take con `studioTakeChiave()`, che dopo quel `splice` è di un'altra coppia — o
+  vuota — e allora butta la take e tira `rnd(-5,6)`).
+- **cosa succede** — paghi 45 per la prima take e 12 per le altre, scegli la buona, la Cabina
+  scrive «esce con q76» e il pezzo esce con q69: il numero della take non conta niente, si
+  tira sempre un dado nuovo. Provato tre volte di fila con una strofa e un beat soli: take
+  scelte 4, 5 e 6 (q73, q75, q76 in Cabina), sul pezzo `parti.take` 4,99, 3,07 e −2,70 —
+  numeri con la virgola, cioè il dado, non una take (le take sono interi). Prima del commit
+  era uguale. In pratica tutta l'energia spesa in Cabina oltre alla prima take è buttata, e
+  la prima serve solo a sbloccare il tasto.
+- **come si vede** — Studio → Cabina, tre take, tieni la migliore e guarda il «q» che ti
+  promette; «Tieni questa e chiudi», titolo; in Uscita il pezzo ha un altro q.
+- **quanto pesa** — si vede ma si gira intorno (il pezzo esce lo stesso, ma la Cabina è una
+  presa in giro finché sta così: il giocatore paga per un numero che non arriva).
+
+
+**RISOLTO (15/09/2026)** — sullo stesso branch, prima del push. `registra` legge
+`studioTakePresa()` **prima** di sfilare strofa e beat dalla lista, così la targhetta combacia.
+Provato nel gioco vero tre volte con la take a +5 scelta in Cabina: il pezzo esce con
+`parti.take` 5 e la qualità uguale a quella promessa (74/75/75). Un controllo nell'audit
+guarda l'ordine delle due righe.
+### La barra della settimana scorsa di un rivale cambia frase quando lui esce con un pezzo
+
+- **dove** — `frontend/js/game/sputa.js:155` (`if(r.hot > 0 && i === 0) pool = "nuovo"`) e
+  `:168` (il fuoco ×1,6 se `hot`): le barre si rifanno da `sputaSemeRivale` a ogni apertura,
+  ma la scelta del **mazzo** legge `r.hot` di adesso, non di quella settimana.
+- **cosa succede** — è quello che resta della voce «Il dado fermo dei rivali si sblocca»: gli
+  id e il dado adesso tengono, ma quando un rivale passa da `hot` 0 a 3 (esce con un pezzo,
+  `rivals.js:78`) la sua prima barra della settimana scorsa cambia frase per intero, non solo
+  il nome del pezzo (provato su «Zeta»: «Da Roma con niente in tasca e tutto nella testa» →
+  «Pezzo nuovo. Tre giorni e già la cantano sotto casa mia»), e il fuoco che ci avevi messo
+  resta su una frase che non è più quella. La nota RISOLTO dice che «{ult}» può cambiare: qui
+  cambia tutta la barra. Vale anche al contrario, quando `hot` torna a zero tre settimane
+  dopo, e quando cominci a essere nominato (`sputaTiNominano` cambia i mazzi).
+- **come si vede** — Sputa, leggi una barra «flex» o «città» di un rivale, aspetta il log «X è
+  uscito con …», riapri Sputa.
+- **quanto pesa** — da sistemare con calma.
+
+
+**LASCIATO (15/09/2026)** — è la cosa piccola già scritta sotto alla voce del dado fermo:
+per tenerla ferma andrebbe salvato il testo della barra, e per una riga di un rivale non vale
+un campo nel salvataggio.
+**Nota, non è un errore**: cose viste che sono scelte o inezie. `studioTakePresa` cancella
+`takeAltre` quando un pezzo si chiude, come dice la nota RISOLTO: chi ha pagato take su due
+coppie e ne registra una perde l'altra, e la frase nella Cabina («se cambi, le ritrovi
+tornando qui») non dice che finiscono con il pezzo — è la scelta scritta nel commento, la
+segno perché il giocatore non la legge. Con una take in mano la plancia scrive «gratis» e
+l'Agenda «0⚡» per la stessa mossa: stessa cosa detta in due modi, come già per le altre
+mosse a zero. `studioTake()` adesso scrive anche `takeAltre` nel salvataggio quando lo chiama
+`costoScritto` a ogni ridisegno della plancia — sempre la stessa cosa, non fa danni, è la
+stessa nota del giro precedente su `need`.

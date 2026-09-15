@@ -703,6 +703,12 @@ test("Sputa aggiorna la fascia dell'hype e al tetto non promette +1",
   sputa.includes("alTetto"));
 /* la take pagata su una coppia strofa+beat non si butta cambiando coppia:
    si mette da parte e torna (15/09/2026). Le altre finiscono col pezzo. */
+test("la take scelta si legge prima di sfilare strofa e beat, se no non arriva sul pezzo",
+  (() => {
+    const run = actions.slice(actions.indexOf('id:"registra"'));
+    const presa = run.indexOf("studioTakePresa() : rnd(-5,6)"), sfila = run.indexOf("G.bars.splice(G.bars.indexOf(b),1)");
+    return presa > 0 && sfila > 0 && presa < sfila;
+  })());
 test("la take pagata si mette da parte cambiando strofa o beat, e torna",
   studioEl.includes("d.takeAltre[d.take.k] = d.take") &&
   studioEl.includes("d.take = d.takeAltre[k] || null;") &&
