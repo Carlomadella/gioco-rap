@@ -35,6 +35,10 @@ function telStrettoApri(){
   el.classList.add("on");
   document.body.classList.add("tel-aperto");
   telStrettoAggiorna();
+  /* da tastiera il fuoco entra nel telefono: se no resta sul tasto dietro
+     alla sovrapposizione e il Tab gira per la plancia nascosta */
+  const prima = el.querySelector(".tapp, .tback, button");
+  if(prima) try{ prima.focus({preventScroll:true}); }catch(e){}
   return true;
 }
 function telStrettoChiudi(){
@@ -44,6 +48,9 @@ function telStrettoChiudi(){
   document.body.classList.remove("tel-aperto");
   /* si mette giu' sulla home: riaperto, si riparte da li' */
   if(typeof TEL_APP !== "undefined" && TEL_APP && typeof telHome === "function") telHome();
+  /* e il fuoco torna al tasto da cui si e' partiti, non al body */
+  const btn = $("hb-telbtn");
+  if(btn) try{ btn.focus({preventScroll:true}); }catch(e){}
   return true;
 }
 window.telStrettoApri = telStrettoApri;
@@ -104,9 +111,23 @@ window.telStrettoAggiorna = telStrettoAggiorna;
    guarda `.on` sull'elemento con quell'id: il guscio non ha un id suo, quindi
    ESC si gestisce qui, in cattura, per passare **prima** di telefono.js e
    vedere TEL_APP com'era davvero al momento del tasto. */
+/* Sopra al telefono alzato puo' esserci un'altra finestra — un evento, la
+   Strada, le Trasferte, l'orologio: ESC e' suo, non del telefono. Le liste
+   sono quelle di uscita.js (overlayAperto) e di menu-sistema.js. */
+const TEL_SOPRA = "#tras-overlay.on, #adf-result-overlay.on, #adf-social-overlay.on, " +
+  "#crimeModal.on, #adf-time-controls.adf-tc-open, .adf-system-menu.on, #setts.on";
+function telStrettoQualcosaSopra(){
+  if(typeof overlayAperto === "function" && overlayAperto()) return true;
+  return !!document.querySelector(TEL_SOPRA);
+}
 document.addEventListener("keydown", ev => {
   if(ev.key !== "Escape" || !telStrettoAperto()) return;
-  if(typeof TEL_APP !== "undefined" && TEL_APP) return;
+  if(telStrettoQualcosaSopra()) return;
+  /* un'app aperta la chiude telefono.js (torna alla home) — ma se sta gia'
+     andando via (.tout, i 160 ms dell'animazione) il secondo ESC e' per noi:
+     TEL_APP si svuota solo a fine animazione, e senza questo un ESC ESC di
+     fila lasciava il telefono su */
+  if(typeof TEL_APP !== "undefined" && TEL_APP && !document.querySelector(".tscreen.tout")) return;
   if(telStrettoChiudi()){
     /* il tasto e' consumato: dopo di noi c'e' menu-sistema.js, che su un ESC
        «libero» apre il menu di sistema — e si troverebbe il telefono gia'

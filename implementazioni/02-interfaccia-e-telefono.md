@@ -1830,6 +1830,17 @@ Provato nel gioco vero con Playwright a 390 × 844, 1000 × 700 e 1400 × 900: t
 barra solo sotto i 1180, apertura, Sputa dalla griglia, ESC in due tempi senza menu di
 sistema, «fallo sapere» dallo Studio che alza il telefono su LaFamegram con «Che post fai?»,
 tocco fuori che mette giù; nessuno scorrimento orizzontale, nessun errore in console. A
-1400 niente è cambiato. **Da sapere**: a 1000 la barra in alto trabocca già di suo (1100
-punti di contenuto in 1000, il widget del tempo sopra allo stat) e il Menu finisce fuori;
-non è di questa task, è scritto in problemi-riscontrati.
+1400 niente è cambiato.
+
+**Il giro di chiusura** (`segnala-problemi` e `prova-sul-telefono`, dieci voci, nove sistemate
+prima del push): dentro al telefono alzato i bersagli salgono ai 44 di tocco e i caratteri a
+12-15 (solo da alzato: la colonna dai 1180 in su non cambia); di traverso (844 × 390) il guscio
+lascia le proporzioni dell'iPhone e si allarga fino a 560, la home scorre; ESC non mette giù il
+telefono se sopra c'è un'altra finestra (modale, Trasferte, orologio…) e due ESC di fila lo
+mettono giù davvero; «APRI» sulla fascia di LaFamegram alza il telefono; la pallina del tasto si
+accorge di una notifica appena arrivata; il fuoco da tastiera entra nel telefono e torna al
+tasto; il Menu accanto al tasto è alto 44; le scene delle azioni scorrono quando sono più alte
+dello schermo (`effects.css`). **Fra i 981 e i 1180** — tablet di traverso — la barra in alto
+trabocca già di suo (1100 punti in 1000) e il tasto in coda finiva fuori: lì il tasto
+**galleggia** in basso a destra, finché quella barra non avrà un disegno suo. Resta da decidere
+se il gioco sugli store gira anche in orizzontale.

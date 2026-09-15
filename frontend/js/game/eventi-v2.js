@@ -570,6 +570,8 @@ function adfNotificationBadgeRefresh(){
     if(count){ b.textContent=count>99?"99+":count; b.style.display="flex"; }
     else b.remove();
   }
+  /* e la pallina sul tasto della barra, sullo schermo stretto (telefono-stretto.js) */
+  try{ if(typeof telStrettoAggiorna==="function") telStrettoAggiorna(); }catch(_){}
 }
 function adfNotifTierLabel(t){ return t==="high"?"ALTO":t==="medium"?"MEDIO":"BASSO"; }
 function adfNotifCard(n){
@@ -1843,8 +1845,11 @@ function adfSocialOpenLatest(){
        ADF_SOCIAL_ALERT_POST.media.format==="story"){
       ADF_SOCIAL_STORY_OPEN=ADF_SOCIAL_ALERT_POST.sid;
     }
-    TEL_APP="lafamegram";
-    renderTelefono();
+    /* sullo schermo stretto il telefono va prima alzato: telVaiApp lo fa
+       (telefono-stretto.js); scrivere TEL_APP a mano apriva LaFamegram
+       dentro a un telefono che era giu', e sullo schermo non cambiava niente */
+    if(typeof telVaiApp==="function") telVaiApp("lafamegram");
+    else { TEL_APP="lafamegram"; renderTelefono(); }
   }catch(_){}
 }
 

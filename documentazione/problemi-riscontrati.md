@@ -20,11 +20,16 @@ che mette insieme i due fogli.
 6. **`jose` e `zod` stanno fra le `dependencies`** (13/09), aperta per decisione: `jose` va
    usata in `backend/accessi.js`, non tolta.
 7. **Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
-   telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra.
-8. **L'uscita di venerdì non costa niente, quella a mano sì** (08/09): risolto in parte per
+   telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra. Il tasto
+   del telefono lì galleggia in basso a destra, quindi si raggiunge; la barra resta da
+   disegnare. E sotto i 980 la barra è alta 307 su 844: un terzo dello schermo.
+8. **Di traverso** (844 × 390) il telefono alzato si usa, ma resta da **decidere se il gioco
+   sugli store gira anche in orizzontale**: nel repo non c'è un manifest né un
+   `orientation`.
+9. **L'uscita di venerdì non costa niente, quella a mano sì** (08/09): risolto in parte per
    scelta — il vantaggio di venerdì è quello di aspettare, non uno sconto. Sparisce del tutto
    con «togli il parametro lucidità» (CARLO).
-9. Aperti di proposito (14/09, prova sul telefono): la copertina «grande» e quella «di
+10. Aperti di proposito (14/09, prova sul telefono): la copertina «grande» e quella «di
    adesso» quasi uguali; nel Marketing la risposta compare in cima.
 
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
@@ -2771,3 +2776,295 @@ ancora; è storia, e lo stesso file le elenca poche righe sopra. Va bene così.
 - **quanto pesa** — si vede ma si gira intorno (il menu di sistema si apre anche con ESC).
   La soglia di `stretto.css` a 980 e quella del telefono a 1180 non si parlano: o la barra
   va a capo già sotto i 1180, o il logo e la città si stringono lì.
+
+## Prova sul telefono del 15/09/2026 (il telefono che si alza)
+
+Misure: **390 × 844**, **360 × 800** e **844 × 390** (orizzontale). Branch
+`task/telefono-sul-telefono`, commit `d97e8de`. Partita di prova di `gioco.html` (giorno 1,
+nessun pezzo), e per «Che post fai?» con l'elenco e il tasto «Posta» una partita con tre
+pezzi usciti («Sottopasso», «Terzo piano», «Neve sporca sul marciapiede di casa») e uno
+registrato non uscito («Sangue»). Console senza errori in tutti i giri. Gli screenshot stanno
+in `documentazione/prove-telefono/2026-09-15/`.
+
+**Come l'ho provato, per riprovarlo.** L'estensione Chrome non era collegata: ho usato
+Playwright da `frontend/node_modules`, con una finestra **davvero** di quella misura
+(`viewport` 390 × 844, `isMobile`, `hasTouch`, scala 2): niente iframe e niente barra di
+scorrimento del computer, quindi le misure qui sotto sono quelle di un telefono vero. I
+tocchi sono `page.tap` (eventi touch), non click; ESC da tastiera. Le app le ho aperte con
+`telVaiApp(...)` dopo aver alzato il telefono col tasto della barra. Il server era già acceso
+su `localhost:8000`, non l'ho spento.
+
+**Quello che funziona.** Il tasto nella barra è 44 × 44 a tutte e tre le misure, con la
+pallina «9+»; toccato, `.ptel` prende `.on` e copre lo schermo (390 × 844 → guscio 366 × 741,
+schermo 332 × 707; 360 × 800 → guscio 336 × 680). **Nessuno scorrimento orizzontale** in
+nessuna delle tre misure, né della pagina (`scrollWidth` = `innerWidth`) né dello schermo
+del telefono in verticale. La griglia: 11 icone da 65 (59 a 360), etichette non tagliate,
+nessuna fuori; il dock 4 icone da 60 (55). «Metti giù» è 138 × 44, sta sotto al guscio e
+dentro allo schermo (a 390 finisce a 820 su 844; a 360 a 767 su 800; in orizzontale a 378
+su 390), e mette giù; il tocco fuori dal guscio (touch, sul fondale) mette giù; ESC con
+un'app aperta torna alla home, il secondo ESC mette giù e il menu di sistema **non** si apre.
+La pastiglia del tempo sparisce col telefono alzato (`visibility:hidden`). LaFamegram: «Che
+post fai?» in cima, l'elenco dei pezzi con «scelto», il tocco su un pezzo lo sceglie
+(`G.studio.spingi`), «Posta · 12⚡» (295 × 38) fa l'azione (hype 0 → 7,4, scena «Promo sui
+social» sopra al telefono, che sotto resta alzato su LaFamegram dopo «Continua»); la
+casella «A cosa stai pensando?» e «Pubblica» ci sono. Sputa: casella, contatore (24/140 mentre
+scrivo) e tasto «Sputa» che pubblica (il post «Tu · oggi» compare in cima, con l'avviso «Prima
+barra del giorno»). Chat: due righe da 52 di altezza, la chat si apre, il tasto indietro
+c'è. Dallo Studio (Fuori) «fallo sapere: «Sottopasso» è fuori…» (388 × 44) alza il telefono
+su LaFamegram e chiude lo Studio; «Metti giù» da lì riporta alla plancia.
+
+![Home a 390: griglia, dock e «Metti giù»](prove-telefono/2026-09-15/telefono-home-390x844.jpg)
+![LaFamegram a 360 con i pezzi e «Posta»](prove-telefono/2026-09-15/lafamegram-pezzi-360x800.jpg)
+![Sputa a 390 dopo aver sputato](prove-telefono/2026-09-15/sputa-dopo-390x844.jpg)
+
+### In orizzontale (844 × 390) il telefono alzato è un francobollo: 154 di larghezza, icone da 27, etichette che si accavallano
+
+- **dove** — `frontend/css/telefono-stretto.css:56-71`:
+  `--telalto:calc(100dvh - 24px - 54px …)` e `--tellargo:min(100vw - 24px, var(--telalto) * .494)`,
+  con `.ptelframe{aspect-ratio:676/1369}`. Il guscio è alto quanto lo schermo e largo di
+  conseguenza: con 390 di altezza viene **154 × 312**, schermo interno 138 × 296.
+- **cosa succede** — dentro a 138 punti le misure in `cqw` scendono al minimo dei `clamp`
+  (icone 27 × 27, etichette a 7 px: `telefono.css:176-178`) e quelle fisse in px no: le
+  etichette «CLASSIFICHE» e «STATISTICHE», «DISCOGRAFIA CONTRATTI AGENDA IMPOSTAZIONI»,
+  «NOTIFICHE TRASFERTE» si scrivono una sopra all'altra (`white-space:nowrap;overflow:visible`);
+  il titolo dell'app si legge «LAFAMEGRAN»; il tasto «Sputa» (75 × 28, `telefono.css:362`) sta
+  in una colonna da 90 e tocca il bordo; lo schermo del telefono ha 5 punti di roba fuori
+  (`#hb-tel` `scrollWidth` 143 su 138: etichette, «Rispondi», «Settimana 3»), tagliati da
+  `overflow-x:hidden`. Il guscio **sta dentro allo schermo** (era la cosa da verificare: sì,
+  non esce) e «Metti giù» si raggiunge — ma non si usa niente di quello che c'è dentro:
+  nessuna icona arriva a 44, la home è 131 px di griglia e Sputa mostra tre righe e mezzo.
+- **come si vede** — 844 × 390, plancia, tocca il telefono in barra; poi Sputa.
+  ![Home in orizzontale](prove-telefono/2026-09-15/telefono-home-844x390.jpg)
+  ![Sputa in orizzontale](prove-telefono/2026-09-15/sputa-844x390.jpg)
+- **quanto pesa** — in orizzontale il telefono **non serve**: si apre, si chiude, ma non ci
+  si fa niente. Se il gioco sugli store gira solo in verticale (da decidere: nel repo non c'è nessun
+  manifest né un `orientation` dichiarato), è un problema che non c'è; se gira anche in orizzontale, il
+  guscio con le proporzioni dell'iPhone non ci sta, e lì il telefono va disegnato senza
+  cornice (schermo largo quanto serve, senza `aspect-ratio`) o non va offerto.
+
+
+**RISOLTO in parte (15/09/2026)** — sullo stesso branch, prima del push. Sotto i 560 di altezza il guscio lascia le
+proporzioni dell'iPhone: largo fino a 560, alto quanto c'è, la home scorre (`telefono-stretto.css`,
+l'ultima media query). A 844 × 390 viene 560 × 312, icone da 99, i tasti dentro da 44: si usa.
+**Resta la decisione** se il gioco sugli store gira anche di traverso: finché non c'è, di traverso
+si usa così.
+### Dentro al telefono alzato i bersagli e i caratteri sono quelli della colonna da computer
+
+- **dove** — `frontend/css/telefono.css`: `.tback` 28 × 28 (:199), `.tspbtn` padding 7 e
+  font 12 (:362), `.tsprisp` padding 3 (:392), `.tspfuoco` padding 3 (:385), `.tbtn` padding 12
+  e font 11 (:233-235), `.tlitx i` 10.5 (:227), `.tigw` 10 (:312), `.ttag` 9.5 (:240).
+  `telefono-stretto.css` non tocca niente di questo: sotto i 1180 il guscio cambia misura, il
+  contenuto no.
+- **cosa succede** — misurato a 390 × 844 (a 360 uguale, un punto in meno): il tasto
+  **indietro** in cima a ogni app è 28 × 28; **«Sputa»** 75 × 28; **«Rispondi»** 60 × 19;
+  il **fuoco** 44 × 21; **«Pubblica»** 284 × 37 e **«Posta · 12⚡»** 295 × 38. Sotto ai 44
+  tutti tranne le righe (chat 52, pezzi 54). I caratteri sono 10–12 px: l'11 di «Che post
+  fai?» e del tasto «Posta», il 10.5 di «q55 · 800 stream», il 9.5 di «scelto». Erano giusti
+  per una colonna da 300 sul computer, dove si clicca col mouse e si sta a mezzo metro; sul
+  telefono in mano sono i bersagli e i caratteri più piccoli di tutto il gioco (la plancia
+  intorno ha tasti da 44-48 e testi da 13-16). I tocchi arrivano — li ho fatti tutti — ma con
+  la punta, non col pollice.
+- **come si vede** — 390 × 844, telefono, Sputa: la casella, il tasto bianco «Sputa» e i
+  «Rispondi» sotto ai post; poi il tasto indietro in alto a sinistra.
+  ![Sputa a 390: «Sputa» 75 × 28, «Rispondi» 60 × 19](prove-telefono/2026-09-15/sputa-dopo-390x844.jpg)
+  ![LaFamegram a 390: «Pubblica» 37 di altezza, indietro 28](prove-telefono/2026-09-15/lafamegram-390x844.jpg)
+- **quanto pesa** — si usa ma si gira intorno. È la cosa da fare dopo questa task, non
+  dentro: sotto i 1180 `.ptel.on` può alzare i minimi (`.tback` e `.tspbtn` a 44, `.tbtn` con
+  padding 14, i font a 13-14), senza toccare la colonna dai 1180 in su.
+
+
+**RISOLTO (15/09/2026)** — sullo stesso branch, prima del push. Solo da alzato (`body.in-hub .ptel.on …` in
+`telefono-stretto.css`): indietro 44 × 44, «Sputa» 94 × 44, «Rispondi» e il fuoco 36 di altezza,
+`.tbtn` 48, la casella di Sputa 72 con caratteri da 15, il resto a 12-13. La colonna dai 1180 in
+su non cambia. Misurato a 390 e 360.
+### In orizzontale, dopo «Posta», la scena «Promo sui social» non ha il «Continua» sullo schermo
+
+- **dove** — `frontend/css/effects.css:62-66` (`.scenapiena{position:fixed;inset:0;
+  display:grid;place-items:center;padding:20px}` senza `overflow`, `.scwrap{max-width:560px}`),
+  la scena la apre `frontend/js/game/ui.js:60-67` (`#scena` di `gioco.html:584`), la chiude
+  `uscita.js:50` con ESC: è la scena delle azioni, non il telefono. Non è codice di questa task: ci si arriva da qui perché adesso «Posta»
+  sul telefono alzato la lancia.
+- **cosa succede** — a 844 × 390 la card della scena è alta 598 in uno schermo da 390:
+  centrata, parte a −104 e il tasto **«Continua» sta a 419–468, fuori** (misurato). La
+  scena non scorre (`overflow-y:visible`, `scrollHeight` 494 su 390, la rotella non muove
+  niente). La chiudono ESC e **il tocco fuori dalla card** (provato: sì, sul fondale scuro
+  a sinistra) — ma nessuno lo dice, e il testo del risultato («Hype +2, 5 nuovi follower…»)
+  è tagliato a metà in fondo: il giocatore vede una card senza tasto e senza fine.
+- **come si vede** — 844 × 390, partita con un pezzo uscito, telefono, LaFamegram, tocca
+  «Posta».
+  ![La scena dopo «Posta» in orizzontale: niente «Continua»](prove-telefono/2026-09-15/lafamegram-dopo-posta-844x390.jpg)
+- **quanto pesa** — si vede ma si gira intorno (toccando fuori), in orizzontale; in verticale
+  a 390 e 360 «Continua» è 282 × 49 e sta dentro. Vale per ogni scena delle azioni, non solo
+  per questa: `.scenapiena` vuole un `overflow-y:auto` (e `align-content:start` quando la
+  card non ci sta), oppure il gioco si blocca in verticale e la cosa non si pone.
+
+
+**RISOLTO (15/09/2026)** — sullo stesso branch, prima del push. `.scenapiena` ha `overflow-y:auto` e
+`place-items:safe center` (`effects.css`): la card più alta dello schermo parte dall'alto e
+scorre, il «Continua» si raggiunge. Vale per tutte le scene delle azioni.
+### Accanto al tasto del telefono (44 × 44) il Menu è alto 22
+
+- **dove** — `frontend/css/hub.css:156-167` (`.pmenu{padding:0 20px}` senza `min-height`),
+  di fianco a `.ptelbtn{min-width:44px;min-height:44px}` in `telefono-stretto.css:23-32`.
+- **cosa succede** — nella barra a 390 il Menu misura 47 × 22 e il telefono 44 × 44: a
+  vederli sono due icone uguali una accanto all'altra, ma uno si prende col pollice e
+  l'altro no (22 di altezza è la metà del minimo). C'era già; adesso che ha un vicino da 44
+  si nota.
+- **come si vede** — 390 × 844, plancia, in fondo alla barra a destra.
+  ![La barra a 390: telefono con «9+» e Menu](prove-telefono/2026-09-15/plancia-390x844.jpg)
+- **quanto pesa** — si vede ma si gira intorno (la casa si prende lo stesso, mirando).
+  Una riga: `.pmenu{min-height:44px}` sotto i 980, nello stesso file dell'altro.
+
+
+**RISOLTO (15/09/2026)** — sullo stesso branch, prima del push. `.pmenu{min-height:44px}` sotto i 980, in `stretto.css`.
+**Nota, non di questa task**: a 390 la barra della plancia (logo, città, sei statistiche in
+due colonne, la pastiglia del tempo, i due tasti) è alta **307 px** su 844 — più di un
+terzo dello schermo prima della città; in orizzontale 266 su 390, e della città resta una
+striscia. Lo si vede in `plancia-390x844.jpg` e `plancia-844x390.jpg`. È il punto aperto
+della barra sotto i 980 (`stretto.css`), non il telefono; lo segno perché col telefono che
+si alza da lì è la prima cosa che si vede.
+
+## Giro del 15/09/2026 (segnala-problemi, fine task `task/telefono-sul-telefono`, commit `d97e8de`)
+
+Controlli automatici tutti verdi: `npm run prova` 180 a posto, `audit-regressioni.js` 343 ok,
+`verifica:build` 33 ok. Nessun errore in console a nessuna misura. Cercati in tutto
+`frontend/` i nomi tolti (`.pvecchio`, `.papp`, `.pap`, `HUB_APP_VECCHIO`,
+`renderTelefonoVecchio`, `telAgendaDisponibili`): nessuno li chiama più. Provato nel gioco
+vero (server già acceso sulla 8000, Playwright) a 390 × 844, 1000 × 700, 1400 × 900 e
+844 × 390: il tasto nella barra c'è solo sotto i 1181 e sparisce a 1400; la pallina somma
+quelle delle app (9+ a inizio partita: 9 obiettivi + 4 notizie) e si azzera quando le hai
+viste; il telefono si alza, LaFamegram con «Che post fai?», Sputa, Notifiche, Trasferte e
+Impostazioni si aprono dentro; un evento (`showEvent`) esce sopra al telefono e si tocca; la
+Strada esce sopra; il salto di tempo col telefono su funziona, la pastiglia del tempo si
+nasconde e torna appena metti giù; il tocco fuori dal guscio mette giù anche col dito; «fallo
+sapere» dallo Studio a 390 chiude lo Studio e alza il telefono su LaFamegram; allargando la
+finestra a 1400 col telefono su e un'app aperta il telefono torna colonna e l'app si chiude,
+stringendo di nuovo torna il tasto; ESC col telefono su chiude prima l'app, poi mette giù, e
+il menu di sistema si apre solo al terzo. Il telefono girato di traverso (844 × 390: guscio
+da 154, icone da 27, nomi uno sull’altro, «LAFAMEGRAN») l’ho visto anch’io con gli stessi
+numeri: è già scritto nella «Prova sul telefono del 15/09/2026» qui sopra, non lo ripeto.
+Quello che segue è quello che non torna.
+
+### ESC col telefono alzato mette giù il telefono anche quando sopra c'è un'altra finestra
+
+- **dove** — `frontend/js/game/telefono-stretto.js:107-119` (l'ascolto di ESC «in cattura»,
+  che passa per primo e ferma il tasto), `frontend/js/game/trasferte.js:1657-1662` (l'ESC di
+  Trasferte, che arriva dopo), `frontend/js/game/uscita.js:66-72` (l'ESC della modale).
+- **cosa succede** — il tasto ESC nuovo guarda solo se il telefono è su e se dentro c'è
+  un'app: non guarda se sopra al telefono c'è già qualcos'altro. Così, con un evento
+  annullabile aperto sopra al telefono alla home, ESC mette giù il telefono e l'evento resta
+  lì (provato: modale ancora aperta, telefono giù). Peggio con Trasferte: si apre a schermo
+  pieno sopra al telefono e non segna nessuna app aperta (`TEL_APP` resta vuoto), quindi ESC
+  fa sparire il telefono dietro alle Trasferte, che restano aperte; le chiudi con la freccia e
+  ti ritrovi sulla plancia col telefono giù, da rialzare.
+- **come si vede** — finestra a 390: alza il telefono, tocca Trasferte, premi ESC, poi la
+  freccia in alto a sinistra.
+- **quanto pesa** — si vede ma si gira intorno (si rialza dal tasto).
+
+
+**RISOLTO (15/09/2026)** — sullo stesso branch, prima del push. `telStrettoQualcosaSopra()` guarda `overlayAperto()` di
+`uscita.js` e la lista delle finestre di eventi-v2, Trasferte, orologio, menu di sistema e
+impostazioni: se c'è qualcosa sopra, ESC non è del telefono. Provato con la modale sopra: resta
+tutto com'è.
+### «APRI» sulla fascia di LaFamegram non alza il telefono
+
+- **dove** — `frontend/js/game/eventi-v2.js:1840-1848` (`adfSocialOpenLatest`: scrive
+  `TEL_APP="lafamegram"` e ridisegna, senza passare da `telVaiApp`).
+- **cosa succede** — quando qualcuno posta su di te esce la fascia in alto con APRI e CHIUDI.
+  Sotto i 1181 APRI apre LaFamegram dentro a un telefono che è giù: sullo schermo non cambia
+  niente (provato a 390: telefono giù, `TEL_APP` = lafamegram). Il post lo vedi solo se poi
+  alzi il telefono dal tasto, e lì ti trovi dritto su LaFamegram senza sapere perché. Il
+  documento della task dice il contrario: «aprire un'app da fuori — “fallo sapere” dallo
+  Studio, una notifica — alza il telefono da solo» (`implementazioni/02-interfaccia-e-telefono.md`,
+  «Il telefono quando lo schermo è un telefono»): vale per lo Studio, non per la fascia.
+- **come si vede** — finestra a 390, aspetta un post su di te (o fai comparire la fascia),
+  tocca APRI.
+- **quanto pesa** — si vede ma si gira intorno.
+
+
+**RISOLTO (15/09/2026)** — sullo stesso branch, prima del push. `adfSocialOpenLatest` passa da `telVaiApp`, che sullo
+schermo stretto alza il telefono. Provato a 390: APRI → telefono su, LaFamegram aperta.
+### Fra i 980 e i 1110 punti il tasto del telefono è fuori dallo schermo: iPad di traverso compreso
+
+- **dove** — `frontend/css/telefono-stretto.css:23-31` (il tasto, `order:2` in coda alla
+  barra) e la barra che trabocca già di suo (`frontend/css/hub.css`, voce «Fra i 980 e i 1180
+  punti la barra della plancia trabocca» qui sopra).
+- **cosa succede** — la voce di prima dice che a 1000 «a destra c'è il telefono e basta»:
+  misurato, non è così. Il tasto del telefono sta a 993–1037 con una finestra da 980 a 1000
+  (se ne vedono 7 punti), e a 1110–1154 con una finestra da 1024 a 1110: cioè **tutto fuori**.
+  Un iPad tenuto di traverso è largo 1024: lì il telefono non si alza da nessuna parte, e
+  senza tastiera non c'è nemmeno ESC o Tab. Sputa, Notifiche, Chat, la Discografia tornano
+  irraggiungibili proprio come prima di questa task; «fallo sapere» dallo Studio invece
+  funziona, perché alza il telefono senza il tasto. Segnalo anche che fra 1181 e 1240 la
+  barra trabocca ancora di qualche punto (`scrollWidth` 1237 a 1181): è da prima, ma la voce
+  precedente dice «fra 980 e 1180».
+- **come si vede** — finestra a 1024 × 768: nella barra il tasto del telefono non c'è.
+- **quanto pesa** — si vede ma si gira intorno (da tastiera: Tab fino al tasto e Invio; su
+  tablet no).
+
+
+**RISOLTO (15/09/2026)** — sullo stesso branch, prima del push. Fra i 981 e i 1180 il tasto **galleggia** in basso a
+destra (56 × 56, `position:fixed`), dove c'è sempre: misurato a 1000 e a 1024. Ho provato prima a
+far andare a capo la barra come sotto i 980: la prima riga si tagliava e il logo finiva in
+seconda riga — quella barra vuole un disegno suo, e resta la voce «Fra i 980 e i 1180 punti la
+barra della plancia trabocca».
+### La pallina sul tasto della barra non si accorge di una notifica appena arrivata
+
+- **dove** — `frontend/js/game/eventi-v2.js:564-573` e `3081` (`adfNotificationBadgeRefresh`
+  aggiorna solo la pallina dell'icona dentro al telefono), `frontend/js/game/telefono-stretto.js:59-66`
+  (la pallina del tasto si rifà solo a ogni ridisegno del telefono).
+- **cosa succede** — con il telefono giù e tutto visto (pallina spenta), arriva una notifica
+  nuova: dentro al telefono la campanella segna 1, sul tasto della barra resta niente finché
+  qualcosa non ridisegna il telefono. Provato: subito dopo `addNotification` il tasto dice
+  0/nascosta e Notifiche dice 1; dopo un ridisegno torna giusto. Il salto +1 ridisegna da
+  sé, quindi lì non si vede; si vede con le notifiche dell'agenda e degli eventi a minuti
+  che arrivano fra un'azione e l'altra.
+- **come si vede** — a 390, telefono giù e pallina spenta, aspetta un avviso dell'agenda:
+  il tasto resta senza numero.
+- **quanto pesa** — da sistemare con calma.
+
+
+**RISOLTO (15/09/2026)** — sullo stesso branch, prima del push. `adfNotificationBadgeRefresh` chiama anche
+`telStrettoAggiorna`. Provato: telefono giù, pallina spenta, arriva una notifica → «1».
+### Da tastiera il fuoco resta dietro al telefono, e dopo «Metti giù» si perde
+
+- **dove** — `frontend/js/game/telefono-stretto.js:80-93` (il tasto nella barra e «Metti
+  giù»: nessuno sposta il fuoco).
+- **cosa succede** — Invio sul tasto della barra alza il telefono, ma il fuoco resta sul
+  tasto, sotto alla sovrapposizione; il Tab dopo va sul Menu (sempre dietro), non dentro al
+  telefono: da tastiera bisogna passare tutta la plancia nascosta prima di arrivare alle
+  app. Invio su «Metti giù» funziona, ma il tasto sparisce e il fuoco finisce sul `body`:
+  il Tab dopo riparte dall'inizio della pagina. Il tasto non ha un `:focus-visible` suo come
+  il Menu (`hub.css:168`): resta il bordo del browser, si vede, ma è diverso dal vicino.
+- **come si vede** — a 390, Tab fino al tasto del telefono, Invio, Tab.
+- **quanto pesa** — da sistemare con calma.
+
+
+**RISOLTO (15/09/2026)** — sullo stesso branch, prima del push. Alzato, il fuoco va sulla prima icona; messo giù, torna
+sul tasto della barra. Il tasto ha il suo `:focus-visible`, uguale al Menu.
+### Due ESC di fila in fretta: il telefono resta su
+
+- **dove** — `frontend/js/game/telefono.js:710-716` (`telHome` svuota `TEL_APP` solo dopo
+  i 160 ms dell'animazione), `frontend/js/game/telefono-stretto.js:107-109` (ESC guarda
+  `TEL_APP` sul momento).
+- **cosa succede** — con un'app aperta, il primo ESC avvia l'animazione di chiusura; se il
+  secondo arriva prima che siano passati 160 ms, `TEL_APP` è ancora pieno, il tasto nuovo
+  lascia passare e `telefono.js` richiama `telHome` un'altra volta: il telefono resta su e
+  ci vuole un terzo ESC. Provato: due ESC senza pausa dopo Sputa → app chiusa, telefono
+  ancora su.
+- **come si vede** — a 390, apri Sputa, ESC ESC veloci.
+- **quanto pesa** — da sistemare con calma.
+
+
+**RISOLTO (15/09/2026)** — sullo stesso branch, prima del push. Se l'app sta già andando via (`.tscreen.tout`, i 160 ms
+dell'animazione) il secondo ESC è del telefono e lo mette giù. Provato con ESC ESC senza pausa.
+**Nota, non è un errore**: tre cose viste e lasciate lì. In `telefono.js:721-739` restano i
+rami per `data-telapp`, `data-news` e `data-diario` dentro al telefono, ma dopo questo commit
+nessun pezzo del telefono produce più quegli attributi (cercato in tutto `frontend/js`): sono
+rami morti, non fanno danni. Lo Studio sta a z 55 e il telefono alzato a 58: se un giorno
+qualcosa dentro al telefono aprirà lo Studio, lo Studio si aprirà **dietro** (provato con
+`apriStudio` a mano); oggi lo Studio si apre solo dal segnaposto della città, che sotto al
+telefono non si tocca, quindi non c'è una strada per vederlo. `body.tel-aperto{overflow:hidden}`
+(`telefono-stretto.css:83`) ferma lo scorrimento della plancia dietro al telefono: su Safari
+di iPhone quel trucco spesso non basta e la pagina sotto scorre lo stesso — non l'ho provato
+su un telefono vero, va guardato lì.

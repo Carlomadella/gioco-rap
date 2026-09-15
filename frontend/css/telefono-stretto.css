@@ -33,6 +33,7 @@
   .ptelbtn + .pmenu{margin-left:0}
   @media (hover:hover){.ptelbtn:hover{color:#fff;background:rgba(255,255,255,.05)}}
   .ptelbtn:active{color:#fff}
+  .ptelbtn:focus-visible{background:rgba(255,255,255,.05);color:#e8eaf0;outline:none}
   .ptelbtn .hicon{width:22px;height:22px;fill:currentColor}
   /* la pallina rossa e' quella delle icone dentro (telefono.css .tbadge):
      stessa forma, cosi' fuori e dentro dicono la stessa cosa */
@@ -79,6 +80,23 @@
   .ptelgiu .hicon{width:16px;height:16px;fill:currentColor}
   .ptel:not(.on) .ptelgiu{display:none}
 
+  /* Dentro al telefono alzato si tocca col pollice, non si clicca col mouse:
+     i tasti della colonna da computer (indietro 28, «Sputa» 75 x 28,
+     «Rispondi» 60 x 19, caratteri da 10) qui salgono ai 44 di tocco.css e ai
+     caratteri della plancia intorno. Solo da alzato: la colonna dai 1180 in
+     su resta com'e' (prova sul telefono del 15/09/2026). */
+  body.in-hub .ptel.on .tback{width:44px;height:44px}
+  body.in-hub .ptel.on .tscreenhead b{font-size:13px}
+  body.in-hub .ptel.on .tbtn{min-height:48px;padding:14px;font-size:13px}
+  body.in-hub .ptel.on .tspbtn{min-height:44px;padding:10px 22px;font-size:14px}
+  body.in-hub .ptel.on .tspscrivi textarea{height:72px;font-size:15px}
+  body.in-hub .ptel.on .tspconto{font-size:12px}
+  body.in-hub .ptel.on .tsprisp,body.in-hub .ptel.on .tspfuoco{min-height:36px;padding:6px 12px;font-size:12px}
+  body.in-hub .ptel.on .tspfuoco .hicon{width:15px;height:15px}
+  body.in-hub .ptel.on .tlitx i,body.in-hub .ptel.on .tigw{font-size:12px}
+  body.in-hub .ptel.on .ttag{font-size:11px}
+  body.in-hub .ptel.on .tempty,body.in-hub .ptel.on .tnote{font-size:12.5px}
+
   /* sotto al telefono aperto la plancia non scorre */
   body.in-hub.tel-aperto{overflow:hidden}
   /* La pastiglia del tempo (tempo-controlli.js) sta nella barra a z-index 142,
@@ -86,6 +104,36 @@
      schermo. Il telefono non sale sopra alla modale — un evento che esce
      mentre posti deve vedersi — quindi e' la pastiglia che si fa da parte. */
   body.in-hub.tel-aperto #adf-time-dock{visibility:hidden}
+}
+
+/* Fra i 980 e i 1180 — il tablet di traverso, la finestra a meta' schermo — la
+   barra della plancia trabocca gia' di suo (1100 punti in 1000: e' scritto in
+   problemi-riscontrati) e il tasto in coda finiva fuori dallo schermo: su un iPad
+   da 1024 il telefono non si alzava da nessuna parte. Finche' quella barra non ha
+   un disegno suo, qui il tasto galleggia in basso a destra, dove c'e' sempre. */
+@media (min-width:981px) and (max-width:1180px){
+  .ptelbtn{
+    position:fixed;right:16px;bottom:16px;z-index:57;
+    width:56px;height:56px;padding:0;margin:0;border-radius:50%;
+    border:1px solid rgba(255,255,255,.14);
+    background:linear-gradient(180deg,#1A1E27,#0E1117);
+    box-shadow:0 10px 30px rgba(0,0,0,.55)}
+  .ptelbtn .hicon{width:26px;height:26px}
+  .ptelbadge{top:2px;right:2px}
+}
+
+/* Di traverso (un telefono girato: 844 x 390) il guscio con le proporzioni
+   dell'iPhone viene un francobollo da 154 di larghezza, e dentro non si tocca
+   niente. Qui il telefono si alza **senza le proporzioni**: largo quanto lo
+   schermo fino a 560, alto quanto c'e', e la home scorre. Se il gioco sugli
+   store girera' solo in verticale questa regola non lavora mai; finche' non e'
+   deciso, di traverso si usa lo stesso. */
+@media (max-width:1180px) and (max-height:560px){
+  body.in-hub .ptel.on{--tellargo:min(100vw - 24px, 560px)}
+  body.in-hub .ptel.on .ptelframe{aspect-ratio:auto;height:var(--telalto);max-height:none}
+  body.in-hub .ptel.on .ptelscr{overflow-y:auto}
+  body.in-hub .ptel.on .thome{height:auto;min-height:100%}
+  body.in-hub .ptel.on .tgrid{padding-top:9%}
 }
 
 /* dai 1180 in su il tasto «metti giu'» non ha senso: la colonna e' sempre li' */

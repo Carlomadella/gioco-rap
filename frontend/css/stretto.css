@@ -408,6 +408,12 @@
     padding: 8px 6px;
     gap: 6px 0;
   }
+  /* accanto al tasto del telefono (44 x 44) il Menu era alto 22: due icone
+     uguali, una si prende col pollice e l'altra no (prova sul telefono del
+     15/09/2026) */
+  .pmenu {
+    min-height: 44px;
+  }
   .plogo {
     width: auto;
     padding: 0 10px 0 4px;
