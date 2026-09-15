@@ -154,8 +154,9 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
    - **Testi leggibili senza zoom**: la mappa non scende più sotto i 620 px di
      larghezza e si sposta col dito — prima i cartelli disegnati dentro alla
      foto erano quattro pixel di testo.
-   - **Niente hover**: da fare. Gli effetti `:hover` ci sono ancora tutti e sul
-     tocco restano appiccicati dopo il tap.
+   - **Niente hover**: fatto l'08/09/2026, riconosciuto qui il 15/09. Tutte le
+     regole `:hover` stanno in `@media (hover:hover)`, sul dito non partono, e
+     l'audit lo controlla.
    - **Da fare**: provarlo su un telefono vero, non solo dentro al riquadro.
    Il dettaglio sta in [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md),
    in fondo.

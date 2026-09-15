@@ -1,6 +1,9 @@
-quando finisci una task committa e pusha e nel committ fai riferimento al punto del file completato. Se vedi che viene modificato il file non preoccuparti, sono io, tu continua con quello che stai facendo, ogni volta che finisci un task segnalo come completato
-
 # Punti nuovi
+
+> **Da Carletto, per chi lavora su questo foglio.** Quando finisci una task committa e
+> pusha, e nel commit fai riferimento al punto del foglio che hai chiuso. Se vedi che il
+> file viene modificato non preoccuparti, sono io: tu continua con quello che stai
+> facendo, e ogni volta che finisci una task segnala il punto come completato.
 
 **Scrivi qui.** Questo è il foglio dove si butta l'idea appena viene, senza pensare a dove
 va: un punto, una riga, anche di corsa. Poi si sposta nel file dell'argomento giusto, con
@@ -24,77 +27,143 @@ I punti di prima — tutti e sessantasette — stanno nella cartella
 Le task **chiuse** che stavano qui dentro sono in [`fatte.md`](fatte.md), con la richiesta
 com'era scritta e la nota di cosa è stato fatto. Qui restano solo i punti **aperti**: le
 liste hanno dei buchi dove stavano quelli chiusi, ed è voluto — i numeri non si rifanno,
-perché qualcuno li cita (vedi [`fatte.md`](fatte.md)).
+perché qualcuno li cita (vedi [`fatte.md`](fatte.md)). Per la stessa ragione un punto si
+cita sempre col suo **testo**, mai col numero da solo.
 
 L'indice con **tutti i punti e il loro stato** sta in
 [`implementazioni/README.md`](README.md).
+
+**Come si legge questo foglio.** Tre pezzi, dall'alto in basso:
+
+1. **Da fare adesso, in ordine** — l'ordine in cui si prendono i punti aperti, di questo
+   foglio e di [`problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md)
+   insieme. Si aggiorna a ogni giro: un punto chiuso resta nella lista, barrato, con la
+   data.
+2. **Inbox automatica** — le richieste nuove come checkbox, una frase basta: le legge
+   `scripts/roadmap-auto.js`, che prima cerca duplicati e cose già fatte.
+3. **Le liste per persona** (ALE, CARLO) — i punti scritti a mano, con sotto le note di
+   stato: `FATTO`, `FATTO in parte` e cosa manca, `RISPOSTA` se se n'è solo discusso.
 
 ---
 
 ## Da fare adesso, in ordine
 
 Smistato il 15/09/2026, dopo la chiusura di «Sputa» e della regola nuova sull'energia in
-Cabina. È l'ordine in cui si prendono i punti aperti di questo foglio **e** quelli ancora
-aperti in [`problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md): prima
-quello che tocca il gioco sul telefono (è lì che esce), poi quello che pesa nel pacchetto
-o blocca una partita, poi le cose piccole e chiare, in fondo quello che è una decisione
-prima che un lavoro. Ogni voce cita il **testo** del punto, non il numero.
+Cabina; riguardato lo stesso giorno dopo «Il telefono quando lo schermo è un telefono», da
+cui sono uscite due voci nuove. È l'ordine in cui si prendono i punti aperti di questo
+foglio **e** quelli ancora aperti in
+[`problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md): prima quello che
+tocca il gioco sul telefono (è lì che esce), poi quello che pesa nel pacchetto o blocca una
+partita, poi le cose piccole e chiare, poi i lavori lunghi, in fondo quello che è una
+decisione prima che un lavoro. Ogni voce cita il **testo** del punto, non il numero, e dice
+da quale lista viene.
+
+**Sul telefono**
 
 1. ~~**Il Marketing sul telefono vero**~~ **FATTO (15/09/2026)** — il telefono si alza a
    schermo pieno anche sotto i 1180: «Il telefono quando lo schermo è un telefono» in
    `02-interfaccia-e-telefono.md`.
-2. **Le transizioni video** — CARLO, «implementa le transizioni dentro al progetto, che
+2. **Fra i 980 e i 1180 punti la barra della plancia trabocca** — da problemi-riscontrati
+   (15/09, trovato chiudendo il punto sopra): 1100 punti di contenuto in 1000, il Menu
+   esce a destra; sotto i 980 la barra è alta un terzo dello schermo. Il tasto del
+   telefono galleggia e si raggiunge, la barra resta da disegnare.
+3. **Le tre del Marketing** — da problemi-riscontrati (14/09): «In spinta» che esce come
+   una seconda riga bianca, la riga di pezzo senza seed che è un bottone che non fa
+   niente, il pezzo scelto che può sparire dall'elenco ma resta quello che si spinge; più,
+   sul telefono, il motivo per cui l'anteprima è spenta che viene tagliato.
+4. ~~**Il giro unico sull'hover al tocco**~~ **FATTO (08/09/2026, riconosciuto il 15/09)** —
+   era chiuso da una settimana e tre elenchi lo davano ancora da fare: tutte le regole
+   `:hover` stanno in `@media (hover:hover)`, e l'audit lo controlla («La responsività: lo
+   Studio, la Strada e l'hover al tocco» in `02-interfaccia-e-telefono.md`).
+
+**Pesa nel pacchetto o blocca una partita**
+
+5. **Le transizioni video** — CARLO, «implementa le transizioni dentro al progetto, che
    partano cliccando sulla scheda collegata». I 12 video stanno già in
    `frontend/media/video/Transizioni di scena/` (28 MB) e **nessuna riga di codice li
    carica**: oggi partono col pacchetto per gli store da peso morto. O si collegano, come
    dice il punto, o escono dal pacchetto.
-3. **L'evento fatto esce dall'agenda** — CARLO, «se partecipo ad un evento segnato, dopo
+6. **L'avvio rapido ci mette due minuti e non lo dice** — da problemi-riscontrati. È il
+   primo minuto di chi prova il gioco: o una barra di caricamento, o l'avvio rapido torna
+   a non aspettare MakeHuman.
+7. **`jose` va usata, e `zod` va deciso** — da problemi-riscontrati (13/09) e dal registro
+   delle dipendenze: la verifica dei token Apple e Google in `backend/accessi.js` è scritta
+   a mano, ed è il posto peggiore dove risparmiare; `zod` sta fra le `dependencies` del
+   backend senza che nessuno la usi. Serve prima di uscire sugli store, non prima di
+   domani.
+
+**Piccole e chiare**
+
+8. **L'evento fatto esce dall'agenda** — CARLO, «se partecipo ad un evento segnato, dopo
    che ho partecipato l'evento si toglie automaticamente dall'agenda». In `agenda.js`
    `consumaPeso()` segna solo il bonus come usato: la voce resta segnata. Piccolo.
-4. **I prezzi dei beat per fama del beatmaker** — ALE, «da 100 a 250 euro beat da
+9. **I prezzi dei beat per fama del beatmaker** — ALE, «da 100 a 250 euro beat da
    beatmaker emergenti, da 300 a 1000 per beatmaker affermati e da 1000 a 2000 per
    beatmaker famosissimi». Oggi `prezzoBeat()` in `beats.js` guarda solo la qualità
    (da 15 a ~1800). I numeri sono già scritti, si tratta di metterli.
-5. **Si parte con tutti i parametri a 1** — ALE. In `state.js` le quattro abilità partono
-   a 0. Una riga, ma va guardato `livello()` che le somma.
-6. **Non ci si può licenziare** — CARLO, «non ci si può licenziare dal lavoro corrente,
-   implementalo per tutti i lavori». In `hub.js` c'è «lascialo o aspetta di essere
-   licenziato»: va tolto il «lascialo».
-7. **Via la lucidità** — CARLO, «togli il parametro «lucidità» e tutto ciò che ne
-   consegue». Tocca 15 file del gioco e le formule della qualità del testo: non è una
-   riga, va fatto in una task sua con l'audit aggiornato nello stesso commit.
-8. **I rapporti coi beatmaker che vanno in negativo** — ALE. In `posto.js` il rapporto
-   scende (`p.rel--`) ma è tenuto fra 0 e 5: sotto zero non va. Prima di farlo va deciso
-   cosa succede a −1 (non ti vende più? ti fa pagare di più?).
-9. **L'avvio rapido ci mette due minuti e non lo dice** — da problemi-riscontrati. È il
-   primo minuto di chi prova il gioco: o una barra di caricamento, o l'avvio rapido torna
-   a non aspettare MakeHuman.
-10. **Lo Shop promette tre reparti, ce ne sono due** — da problemi-riscontrati: i Vestiti
+10. **Si parte con tutti i parametri a 1** — ALE. In `state.js` le quattro abilità partono
+    a 0. Una riga, ma va guardato `livello()` che le somma.
+11. **Non ci si può licenziare** — CARLO, «non ci si può licenziare dal lavoro corrente,
+    implementalo per tutti i lavori». In `hub.js` c'è «lascialo o aspetta di essere
+    licenziato»: va tolto il «lascialo».
+12. **Avaturn e il creator in game, tutti e due** — ALE, «FAI COESISTERE LE COSE». Nel
+    codice convivono già (vedi la RISPOSTA sotto al punto): resta da confermarlo in
+    partita e scriverlo in `03-artista-e-avatar.md`, che oggi non ne parla.
+13. **Lo Shop promette tre reparti, ce ne sono due** — da problemi-riscontrati: i Vestiti
     sono ancora la griglia vecchia, non dietro a una linguetta.
-11. **Il giro unico sull'hover al tocco** — da problemi-riscontrati (08/09): nessun foglio
-    di stile distingue mouse e dito, e ogni task ne aggiunge qualche riga. Un giro solo
-    su tutti i CSS, poi `prova-sul-telefono`.
-12. **Le tre code dello Studio a cinque linguette** — da problemi-riscontrati (15/09):
+
+**Lavori lunghi**
+
+14. **Via la lucidità** — CARLO, «togli il parametro «lucidità» e tutto ciò che ne
+    consegue». Tocca 17 file del gioco e le formule della qualità del testo: non è una
+    riga, va fatto in una task sua con l'audit aggiornato nello stesso commit. Chiude da
+    sola anche «l'uscita di venerdì non costa niente, quella a mano sì» di
+    problemi-riscontrati.
+15. **Le tre code dello Studio a cinque linguette** — da problemi-riscontrati (15/09):
     l'omonimo della classifica che non si può chiamare, chi accetta dalla classifica che
     ruba un posto alla Sala, la copertina proposta e non confermata che resta nel
     salvataggio con la foto.
-13. **`jose` va usata** — dal registro delle dipendenze: la verifica dei token Apple e
-    Google in `backend/accessi.js` è scritta a mano, ed è il posto peggiore dove
-    risparmiare. Serve prima di uscire sugli store, non prima di domani.
-14. **Le card sulla mappa troppo vicine, i pulsanti sopra la mappa troppo grandi** — ALE.
-    Si giudicano a occhio: vanno guardate con uno screenshot, non dal CSS.
-15. **Quando skippi tante ore ci mette troppo** — CARLO. Prima si misura (quanti giorni,
+16. **Quello che manca alla catena del pezzo** — CARLO, la coda del punto «Non è più:
+    "Faccio un pezzo → +10 fama"» (FATTO in parte): la cover caricata da file e quella
+    «stile emblema», la discografia come app del telefono, le remastered e le parti 2.
+17. **Le foto dei posti che non hanno ancora una pagina** — CARLO, la coda di «aggiungi
+    le foto di background dei posti» (FATTO in parte): Casa, la Palestra, il freestyle in
+    piazza, il concerto live e lo «stacca la spina»; dentro allo Studio, Cover e Feat
+    senza una foto loro.
+18. **Le card sulla mappa troppo vicine, i pulsanti sopra la mappa troppo grandi** — ALE.
+    Si giudicano a occhio: vanno guardate con uno screenshot, non dal CSS. Stessa cosa per
+    **la schermata opzioni da migliorare graficamente** — CARLO, pagina di landing.
+19. **Quando skippi tante ore ci mette troppo** — CARLO. Prima si misura (quanti giorni,
     quanti secondi), poi si cerca dove.
-16. **Non sempre far scorrere una giornata ridà l'energia** e **la legacy** — CARLO. Sono
-    regole di gioco nuove: prima si scrive come funzionano, poi si fa.
-17. **Le decisioni tue**, senza le quali il resto non si muove: se dopo Milano e Los
-    Angeles si può tornare indietro (DA DISCUTERE), la pagina di Mycol e il «tuo artista»
-    nella landing, e se cancellare gli undici branch già uniti in `main` (`git branch
-    --merged main` li elenca, da `test/vitest-playwright-gate` a `task/studio-cinque-linguette`),
-    anche sul remoto.
+20. **Su LaFamegram non posta nessuno** — CARLO. Oggi gli altri compaiono nel feed solo
+    quando l'evento riguarda te (il fan, il giornalista, la Strada: `lafamegramEventi`);
+    nessun contatto della Sala o rivale posta per conto suo. Prima si decide chi posta e
+    cosa, poi si fa.
+21. **Il pub e la pubblicità come primo modo di fare hype** — ALE, la coda del punto
+    sull'hype (FATTO il 06/09 per il resto): oggi non esistono né come luogo né come
+    azione.
 
-Le **nuove modalità** (Carriera Studio, città di partenza, le città finali) restano dove
-sono, in fondo: sono per dopo, quando il gioco è masterizzato.
+**Decisioni prima che lavori**
+
+22. **I rapporti coi beatmaker che vanno in negativo** — ALE. In `posto.js` il rapporto
+    scende (`p.rel--`) ma è tenuto fra 0 e 5: sotto zero non va. Prima di farlo va deciso
+    cosa succede a −1 (non ti vende più? ti fa pagare di più?).
+23. **Non sempre far scorrere una giornata ridà l'energia** e **la legacy** — CARLO. Sono
+    regole di gioco nuove: prima si scrive come funzionano, poi si fa.
+24. **Lo Shop in provincia, con limitazioni** — ALE. Lo Shop c'è già dal primo giorno;
+    va deciso cosa **non** si vende in provincia (vedi la RISPOSTA sotto al punto).
+25. **Le decisioni tue**, senza le quali il resto non si muove: se dopo Milano e Los
+    Angeles si può tornare indietro (DA DISCUTERE); la pagina di Mycol e il «tuo artista»
+    nella landing; se il gioco sugli store gira anche **di traverso** (nel repo non c'è un
+    manifest né un `orientation`, da problemi-riscontrati); e se cancellare gli undici
+    branch già uniti in `main` (`git branch --merged main` li elenca, da
+    `test/vitest-playwright-gate` a `task/studio-cinque-linguette`), anche sul remoto.
+
+Restano fuori dall'ordine, di proposito: **le nuove modalità** (Carriera Studio, città di
+partenza, le città finali), che sono per dopo, quando il gioco è masterizzato; le canzoni
+con l'IA, che è una **giornaliera** e non si smista; e i due «aperti di proposito» di
+problemi-riscontrati (la copertina «grande» e quella «di adesso» quasi uguali, la risposta
+del Marketing in cima).
 
 Due punti di CARLO — «quando non sono fix… crea un file nuovo collegato ai già presenti»
 e «tieni tutto ciò che riguarda la parte smartphone separata dal resto del progetto» —
@@ -108,17 +177,24 @@ e «tieni tutto ciò che riguarda la parte smartphone separata dal resto del pro
 
 ### Inbox automatica
 
-**Scrivi qui le nuove richieste anche in una frase sola.** Prima di espanderle il sistema cerca duplicati, sovrapposizioni e cose già implementate; solo dopo costruisce i passaggi mancanti.
-La lista storica già presente sotto **rimane intatta** ed è importata automaticamente nel cruscotto: non viene riscritta né cancellata.
+**Scrivi qui le nuove richieste anche in una frase sola**, come checkbox. Prima di
+espanderle il sistema cerca duplicati, sovrapposizioni e cose già implementate; solo dopo
+costruisce i passaggi mancanti. Quando una richiesta è stata letta, lo script la segna
+`[x]` e ci scrive accanto cosa ha trovato. Le liste per persona qui sotto **restano
+intatte** e sono importate automaticamente nel cruscotto: non vengono riscritte né
+cancellate.
 
 <!-- ADF-AUTO-INBOX:BEGIN -->
 
 - [x] voglio sistemare gli eventi ed il tempo in game <!-- ADF-TASK:ADF-NEW-3E6D8998D1BD --> — **🟡 ESTENSIONE → ADF-LEG-EC3A45E275D0, ADF-LEG-99F7F334DFE9** · La richiesta è più ampia delle task esistenti: EC3A45E275D0 copre la gerarchia degli incontri durante i salti e 99F7F334DFE9 il passaggio alla giornata; resta un delta reale di coerenza e prestazioni del motore eventi-tempo.
-  <!-- Esempio (non attivo): - [ ] voglio cambiare il tempo del turno in fabbrica -->
-  <!-- ADF-AUTO-INBOX:END -->
-  _(qui sotto finiscono i punti nuovi, appena scritti)_
 
-ALE:
+<!-- Esempio (non attivo): - [ ] voglio cambiare il tempo del turno in fabbrica -->
+<!-- ADF-AUTO-INBOX:END -->
+
+### ALE
+
+_I numeri sono quelli di sempre: i buchi sono i punti chiusi, spostati in
+[`fatte.md`](fatte.md)._
 
 2. Rendi accessibile lo shop già dalla città iniziale, con limitazioni sui prodotti in vendita
 
@@ -135,41 +211,41 @@ ALE:
 
 6. Verissima la cosa dell'hype, fattore che dev'essere davvero primario nel gioco e i player dovran costantemente provare a inseguire ma con tanta fatica, Partiamo proprio dallo sviluppo dell'hype :
 
-L'hype è in scala internazionale, vuol dire che se sei al livello 100 è impossibile che tu sia ancora nel paesino di provincia.
-Probabilmente all'inizio l'unico modo per fare hype è andare al pub e pubblicare sui social pubblicità per la tua musica (DA SVILUPPARE QUESTO) , ma più di tanto HYPE all'inizio non si può fare, quindi è impossibile che al primo anno rimanendo nella prima città tu diventi 100 di hype
+   L'hype è in scala internazionale, vuol dire che se sei al livello 100 è impossibile che tu sia ancora nel paesino di provincia.
+   Probabilmente all'inizio l'unico modo per fare hype è andare al pub e pubblicare sui social pubblicità per la tua musica (DA SVILUPPARE QUESTO) , ma più di tanto HYPE all'inizio non si può fare, quindi è impossibile che al primo anno rimanendo nella prima città tu diventi 100 di hype
 
-Tutt'altro se non sei goat manco puoi averli 100 di hype
+   Tutt'altro se non sei goat manco puoi averli 100 di hype
 
-L'hype vero si inizierà a fare quando i tuoi numeri social andranno forte e nelle classifiche il tuo nome inizierà a farsi valere sempre di più, quando farai feat con nomi più grandi dei tuoi e i pezzi andranno bene, quando prendiamo una macchina importante e molto costosa e la flexiamo sui social
+   L'hype vero si inizierà a fare quando i tuoi numeri social andranno forte e nelle classifiche il tuo nome inizierà a farsi valere sempre di più, quando farai feat con nomi più grandi dei tuoi e i pezzi andranno bene, quando prendiamo una macchina importante e molto costosa e la flexiamo sui social
 
-Insomma, come le cose che vanno davvero in hype IRL, non se fai un feat con pinko pallino a caso che nessuno conosce
+   Insomma, come le cose che vanno davvero in hype IRL, non se fai un feat con pinko pallino a caso che nessuno conosce
 
-**FATTO (06/09/2026)** — l'hype adesso ha un **tetto che dipende dalla fase della
-carriera** (`PHASES[fase].hcap` in `phases.js`, letto da `hypeCap()`): 20 da
-Sconosciuto, 42 da esordiente, 55, 65, 80, 92, e solo da GOAT il tetto è 100. Non
-conta _come_ l'hype sale — farmando o con un colpo di fortuna — il tetto tiene
-comunque, perché è applicato ovunque l'hype cresce (oltre 30 punti diversi nel
-codice, da `promo` alla Strada). I tetti restano sempre sopra alle soglie
-`G.hype >= 40/60/55` già richieste dalle prove di passaggio della carriera stessa
-(`phases.js`, `TRIALS`), quindi nessuna prova diventa impossibile da superare.
-Sulla fatica vera: la promo sui social aveva già un freno sui follower, ma
-**l'hype che dà continuava a salire ogni giorno senza limite** — adesso ha anche
-lui un tetto settimanale (22 punti, `actions.js`), verificato con 7 giorni di
-promo di fila. Sul lato "quando conta davvero": scalare in classifica adesso dà un
-bonus d'hype vero e proporzionato al salto (`sim.js`, vicino a `G.best.chart`), e
-un feat capitato per caso (`events.js`) non vale più sempre uguale: **la maggior
-parte delle volte è un nome piccolo** (hype modesto), **una volta ogni tanto è uno
-grosso davvero**, e lì l'hype si muove sul serio — non lo sai finché non firmi,
-come chiesto. Il "feat con nomi più grandi" esiste già anche come relazione vera
-con un beatmaker della Sala (`posto.js`, tipo `feat`, scala già con `p.fama`): non
-toccato, andava già bene. Restano fuori da questo giro — **da sviluppare a
-parte**, come segnalato nel punto stesso — il pub e la pubblicità come primo modo
-di fare hype a inizio carriera, che oggi non esistono ancora come luogo/azione.
-`npm run prova` (70/70) più una verifica dedicata fuori dal browser sui tetti per
-fase e sul tetto settimanale della promo.
+   **FATTO (06/09/2026)** — l'hype adesso ha un **tetto che dipende dalla fase della
+   carriera** (`PHASES[fase].hcap` in `phases.js`, letto da `hypeCap()`): 20 da
+   Sconosciuto, 42 da esordiente, 55, 65, 80, 92, e solo da GOAT il tetto è 100. Non
+   conta _come_ l'hype sale — farmando o con un colpo di fortuna — il tetto tiene
+   comunque, perché è applicato ovunque l'hype cresce (oltre 30 punti diversi nel
+   codice, da `promo` alla Strada). I tetti restano sempre sopra alle soglie
+   `G.hype >= 40/60/55` già richieste dalle prove di passaggio della carriera stessa
+   (`phases.js`, `TRIALS`), quindi nessuna prova diventa impossibile da superare.
+   Sulla fatica vera: la promo sui social aveva già un freno sui follower, ma
+   **l'hype che dà continuava a salire ogni giorno senza limite** — adesso ha anche
+   lui un tetto settimanale (22 punti, `actions.js`), verificato con 7 giorni di
+   promo di fila. Sul lato "quando conta davvero": scalare in classifica adesso dà un
+   bonus d'hype vero e proporzionato al salto (`sim.js`, vicino a `G.best.chart`), e
+   un feat capitato per caso (`events.js`) non vale più sempre uguale: **la maggior
+   parte delle volte è un nome piccolo** (hype modesto), **una volta ogni tanto è uno
+   grosso davvero**, e lì l'hype si muove sul serio — non lo sai finché non firmi,
+   come chiesto. Il "feat con nomi più grandi" esiste già anche come relazione vera
+   con un beatmaker della Sala (`posto.js`, tipo `feat`, scala già con `p.fama`): non
+   toccato, andava già bene. Restano fuori da questo giro — **da sviluppare a
+   parte**, come segnalato nel punto stesso — il pub e la pubblicità come primo modo
+   di fare hype a inizio carriera, che oggi non esistono ancora come luogo/azione.
+   `npm run prova` (70/70) più una verifica dedicata fuori dal browser sui tetti per
+   fase e sul tetto settimanale della promo.
 
-_(Il punto resta qui apposta, per la coda che manca — il pub e la pubblicità; la nota
-breve sta in [`fatte.md`](fatte.md).)_
+   _(Il punto resta qui apposta, per la coda che manca — il pub e la pubblicità; la nota
+   breve sta in [`fatte.md`](fatte.md).)_
 
 11. Avaturn voglio lo rendiamo UN 50/50 , Cioè chi non vuole andare a farsi tutta la trafila per fare avaturn (anche se ovviamente dobbiamo fare di tutto per consigliarli a farlo) può benissimamente creare il suo avatar in game. FAI COESISTERE LE COSE.
 
@@ -183,51 +259,61 @@ breve sta in [`fatte.md`](fatte.md).)_
 
 13. Ti ricordo che i pulsanti sopra la mappa sono ANCORA TROPPO GRANDI rispetto ai quadratini stessi. Rivedilo.
 
-CARLO:
+### CARLO
 
-/_ GIORNALIERE _/
+_Stessa regola: i numeri non si rifanno. Ci sono due punti «4» — quello lungo sulla
+catena del pezzo è il «punto 4 di CARLO» che `studio.js` cita, l'altro è arrivato dopo
+con lo stesso numero e resta così._
+
+#### Giornaliere
 
 1. creare canzoni con l'ia, guarda cartella musica nei segnalibri, task
    giornaliera quindi da non smistare
 
-/_ DA FARE _/
+#### Da fare
 
 4. Non è più: "Faccio un pezzo → +10 fama", ma diventa:
 
-TRACK luogo: STUDIO
-│
-├── Beat/Producer il beat puoi crearlo tu o chiedere ad un produttore di crearti il beat
-├── Mix
-├── Testo
-├── Cover (influenza meno, ma ha 3 opzioni: caricamento file da telefono/computer, assets preimpostati e personalizzazione stile emblema black ops 2)
-├── Featuring (può esserci come no, nelle canzoni, nel caso abbiamoo un feat nemlle canzoni, non è obbligatorio che il feat venga alla sessione, ovviamente se svolge la sessione con noi molto probabilmente i pezzo avrà più qualità)
-├── Marketing (dimmi te come lo svilupperesti, dammi una terza opzione, le prime due sono: in discografia sul telefono tramite app, in studio in una sezione dedicata)
-└── Timing (app discografia)
+   ```
+   TRACK luogo: STUDIO
+   │
+   ├── Beat/Producer il beat puoi crearlo tu o chiedere ad un produttore di crearti il beat
+   ├── Mix
+   ├── Testo
+   ├── Cover (influenza meno, ma ha 3 opzioni: caricamento file da telefono/computer, assets preimpostati e personalizzazione stile emblema black ops 2)
+   ├── Featuring (può esserci come no, nelle canzoni, nel caso abbiamoo un feat nemlle canzoni, non è obbligatorio che il feat venga alla sessione, ovviamente se svolge la sessione con noi molto probabilmente i pezzo avrà più qualità)
+   ├── Marketing (dimmi te come lo svilupperesti, dammi una terza opzione, le prime due sono: in discografia sul telefono tramite app, in studio in una sezione dedicata)
+   └── Timing (app discografia)
+   ```
 
-E ogni elemento influenza il risultato.
+   E ogni elemento influenza il risultato.
 
-Esempio:
+   Esempio:
 
-"TUTTO O NIENTE"
+   ```
+   "TUTTO O NIENTE"
 
-Beat 82
-Testo 76
-Mix 68
-Feature 85
-Marketing 53
-────────────────────
-QUALITÀ tot
+   Beat 82
+   Testo 76
+   Mix 68
+   Feature 85
+   Marketing 53
+   ────────────────────
+   QUALITÀ tot
+   ```
 
-Poi, ad esempio:
+   Poi, ad esempio:
 
-QUALITÀ tot
-HYPE 82
-FAMA 31
-NETWORK 64
+   ```
+   QUALITÀ tot
+   HYPE 82
+   FAMA 31
+   NETWORK 64
 
-→ 43.000 streams.
+   → 43.000 streams.
+   ```
 
-è possibile controllare come stanno andando le canzoni nel tempo da un'app del telefono per sapere se stanno invecchiando bene o male e magari farci delle remastered o parti 2 di una canzone o di un album (discografia)
+   è possibile controllare come stanno andando le canzoni nel tempo da un'app del telefono per sapere se stanno invecchiando bene o male e magari farci delle remastered o parti 2 di una canzone o di un album (discografia)
 
    **FATTO in parte (15/09/2026)** — la catena c'è quasi tutta, e sta in
    [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md), «Lo Studio a cinque
@@ -239,12 +325,15 @@ NETWORK 64
    proposte generate), la discografia come app del telefono, e le remastered e le parti 2.
 
 4. Non funziona più la pagina attività criminali, questo è ciò che segna in console:
+
+   ```
    Feature policy: ignorato nome caratteristica non supportato “autoplay”. pagine.js:68:11
    Feature policy: ignorato nome caratteristica non supportato “autoplay”. pagine.js:90:19
    Feature policy: ignorato nome caratteristica non supportato “autoplay”. pagine.js:106:5
    [Anni di Fame] Eventi v1.2.13 pronti: 1000 eventi eventi-v2.js:3010:13
    Problema di sicurezza: i contenuti in http://localhost:8000/pagine/landing.html non possono caricare o avere link che rimandino a file:///.
    Problema di sicurezza: i contenuti in http://localhost:8000/pagine/gioco.html non possono caricare o avere link che rimandino a file:///.
+   ```
 
    **RISPOSTA (15/09/2026)** — quelle righe di console non sono il guasto: sono avvisi di
    Firefox e basta. «Feature policy … autoplay» è l'`allow="autoplay"` dell'iframe in
@@ -299,9 +388,13 @@ NETWORK 64
 
 12. quando non sono fix, risoluzioni di bug o errori non modificare troppo i file già presenti ma crea un file nuovo collegato ai già presenti
 
+    _Regola di lavoro, non task: vedi in testa a «Da fare adesso»._
+
 13. non sempre far scorrere una giornata ti ridà l'energia
 
 14. tieni tutto ciò che riguarda la parte smartphone separata dal resto del progetto
+
+    _Regola di lavoro, non task: vedi in testa a «Da fare adesso»._
 
 15. non ci si può licenziare dal lavoro corrente, implementalo per tutti i lavori.
 
@@ -318,31 +411,46 @@ NETWORK 64
 
 18. sull'app lafamegram non posta nessuno
 
-/_ DA DISCUTERE _/
+    **Stato (15/09/2026)** — nel feed (`telPost()` in `telefono.js`) ci sono i tuoi post,
+    quelli che nascono dagli incontri — il fan, il giornalista, la Strada, tutti in
+    `lafamegramEventi` e tutti **su di te** — e due notizie de «La Voce del Giro». Nessun
+    contatto della Sala, nessun rivale, posta per conto suo: è vero che «non posta
+    nessuno». Prima di farlo va deciso chi posta e cosa (i beatmaker i loro beat? gli opps
+    contro di te? chi scala la classifica?).
+
+#### Da discutere
 
 2. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles? Per forza a los angeles, però può decidere di tornare nelle città prima
 
-/_ PAGINA DI LANDING: _/
+#### Pagina di landing
 
 1. migliorare graficamente la schermata opzioni
 
 2. creare una schermata per le classifiche che si apre anche dall'app del telefono
 
+   **Stato (15/09/2026)** — sembra già fatto da prima: la landing ha la voce «Classifiche»
+   (`pagine/landing.html`, «Chi comanda questa settimana») e il telefono ha l'app
+   «Classifiche» (`telefono.js`, `schermataClassifiche()`, che risente il server quando
+   la apri). Se intendevi un'altra cosa — una schermata sola, uguale nei due posti? — va
+   riscritto il punto.
+
 3. DA DISCUTERE collegare la pagina di mycol togliere la sezione il tuo artista dalla pagina di landing o , oltre che da nuova partita. e collegarla allo shop, se shoppi qualcosa ti va nell'inventario
 
-/_ RESPONSIVITA' _/
+#### Responsività
 
 Chiusa il 08/09/2026: i tre punti dello Studio (l'orologio galleggiante, la barra
 delle take, la fascia a 360), l'hover che restava acceso al tocco su tutti i CSS, e
-il giro largo sulle altre schermate — da cui e' uscita la Strada, che sotto ai 980
+il giro largo sulle altre schermate — da cui è uscita la Strada, che sotto ai 980
 punti non si impilava e sul telefono non si giocava. Il racconto per esteso sta in
-`implementazioni/02-interfaccia-e-telefono.md`, sotto «La responsivita': lo Studio,
-la Strada e l'hover al tocco».
+[`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md), sotto «La responsività:
+lo Studio, la Strada e l'hover al tocco».
 
 Resta da fare: il giro su un telefono vero con `prova-sul-telefono` — le misure sono
-state lette nel CSS, le schermate non sono state rifatte.
+state lette nel CSS, le schermate non sono state rifatte. Il 15/09 il giro a misura di
+telefono (390 × 844) è stato fatto nel browser, chiudendo «Il telefono quando lo schermo
+è un telefono»; il telefono vero, in mano, ancora no.
 
-/_ NUOVE MODALITA' _/
+#### Nuove modalità
 
 Nelle cose da mettere dopo aver masterizzato il gioco, creiamo delle nuove modalità giocabili/DLC:
 
@@ -350,12 +458,12 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
 
 1. MODALITA' CARRIERA STUDIO:
 
-- Il personaggio creato dall'utente è un rapper di uno studio e devi portare lo studio al top (es. La fame studio) e avere lo studio migliore contro altri studi gestiti da altri player attivi
+   - Il personaggio creato dall'utente è un rapper di uno studio e devi portare lo studio al top (es. La fame studio) e avere lo studio migliore contro altri studi gestiti da altri player attivi
 
 2. MODALITA' A SCELTA DI CITTA' DI PARTENZA E LIBERA: puoi decidere in che città nascere e in base a quello hai pro o contro. Il player sceglie tra un numero di città predefinito e poi si può spostare in tutto il mondo (forse meno)
 
 3. MODALITA' CON PIU' CITTA' FINALI: dopo esserti stabilizzato a Los Angeles e, dopo aver creato contatti con personaggi di altre città o che lavoro in altre città o inviti per telefono che ti ha fatto ricevere il manager sblocchi la possibilità di andare o trasferirti in altre città come:
 
-- Chicago i crimini sono più facili ma c'è più criminalità/concorrenza ed è più difficile affermarsi
-- Las vegas: per avere i casinò migliori e i locali top per massimizzare il lifestyle così puoi averlo al massimo e sbloccare un'altra cosa es. un titolo da esporre nella descrizione del profilo tipo: JOHN GOTTI
-- Atlanta/New York: più focalizzata sul conoscere artisti famosi come 21 Savage, Future, Young Thug
+   - Chicago i crimini sono più facili ma c'è più criminalità/concorrenza ed è più difficile affermarsi
+   - Las vegas: per avere i casinò migliori e i locali top per massimizzare il lifestyle così puoi averlo al massimo e sbloccare un'altra cosa es. un titolo da esporre nella descrizione del profilo tipo: JOHN GOTTI
+   - Atlanta/New York: più focalizzata sul conoscere artisti famosi come 21 Savage, Future, Young Thug
