@@ -1,36 +1,40 @@
 ## Cosa resta aperto al 15/09/2026
 
 Smistato leggendo ogni voce contro il codice: sotto a ciascuna c'è scritto se e quando è
-stata chiusa. Qui solo quelle **ancora aperte**, in ordine d'importanza — l'ordine è lo stesso
-di «Da fare adesso» in [`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md),
-che mette insieme i due fogli.
+stata chiusa. Qui solo quelle **ancora aperte**, nello stesso ordine di «Da fare adesso» in
+[`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md), che mette
+insieme i due fogli: prima il telefono, poi quello che pesa nel pacchetto, poi le cose
+piccole, poi i lavori lunghi, in fondo le decisioni. Riordinato il 15/09 dopo il giro di
+fine task su quel foglio.
 
-1. **L'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore** (13/09).
-2. **Lo Shop promette tre reparti a schede, ce ne sono due** (10/09).
-3. **Sul telefono i colori del «passaggio del mouse» restano accesi dopo il tocco** (08/09):
-   il giro unico su tutti i CSS.
-4. Le code dello Studio a cinque linguette (15/09): **un rapper della classifica con lo
-   stesso nome di uno della Sala non si può chiamare**, **chi accetta dalla classifica occupa
-   un posto della Sala**; e dal 14/09 **la copertina proposta e non confermata resta nel
-   salvataggio, foto compresa**.
-5. Le tre del Marketing (14/09): **«In spinta» esce come una seconda riga bianca**, **una
-   riga di pezzo senza seed è un bottone che non fa niente**, **il pezzo scelto può sparire
-   dall'elenco, ma resta quello che si spinge**; più **sul telefono il motivo per cui
-   l'anteprima è spenta viene tagliato**.
-6. **`jose` e `zod` stanno fra le `dependencies`** (13/09), aperta per decisione: `jose` va
-   usata in `backend/accessi.js`, non tolta.
-7. **Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
+1. **Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
    telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra. Il tasto
    del telefono lì galleggia in basso a destra, quindi si raggiunge; la barra resta da
    disegnare. E sotto i 980 la barra è alta 307 su 844: un terzo dello schermo.
-8. **Di traverso** (844 × 390) il telefono alzato si usa, ma resta da **decidere se il gioco
-   sugli store gira anche in orizzontale**: nel repo non c'è un manifest né un
-   `orientation`.
-9. **L'uscita di venerdì non costa niente, quella a mano sì** (08/09): risolto in parte per
+2. Le tre del Marketing (14/09): **«In spinta» esce come una seconda riga bianca**, **una
+   riga di pezzo senza seed è un bottone che non fa niente**, **il pezzo scelto può sparire
+   dall'elenco, ma resta quello che si spinge**; più **sul telefono il motivo per cui
+   l'anteprima è spenta viene tagliato**.
+3. ~~**Sul telefono i colori del «passaggio del mouse» restano accesi dopo il tocco** (08/09):
+   il giro unico su tutti i CSS.~~ **RISOLTO (08/09/2026, riconosciuto il 15/09)** — era
+   chiuso lo stesso giorno e la riga sotto alla voce mancava: vedi il giro del 15/09 in fondo.
+4. **L'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore** (13/09).
+5. **`jose` e `zod` stanno fra le `dependencies`** (13/09), aperta per decisione: `jose` va
+   usata in `backend/accessi.js`, non tolta.
+6. **Lo Shop promette tre reparti a schede, ce ne sono due** (10/09).
+7. **L'uscita di venerdì non costa niente, quella a mano sì** (08/09): risolto in parte per
    scelta — il vantaggio di venerdì è quello di aspettare, non uno sconto. Sparisce del tutto
-   con «togli il parametro lucidità» (CARLO).
+   con «togli il parametro lucidità» (CARLO), che nell'altro foglio è fra i lavori lunghi.
+8. Le code dello Studio a cinque linguette (15/09): **un rapper della classifica con lo
+   stesso nome di uno della Sala non si può chiamare**, **chi accetta dalla classifica occupa
+   un posto della Sala**; e dal 14/09 **la copertina proposta e non confermata resta nel
+   salvataggio, foto compresa**.
+9. **Di traverso** (844 × 390) il telefono alzato si usa, ma resta da **decidere se il gioco
+   sugli store gira anche in orizzontale**: nel repo non c'è un manifest né un
+   `orientation`. Nell'altro foglio sta fra «le decisioni tue».
 10. Aperti di proposito (14/09, prova sul telefono): la copertina «grande» e quella «di
-   adesso» quasi uguali; nel Marketing la risposta compare in cima.
+   adesso» quasi uguali; nel Marketing la risposta compare in cima. Nell'altro foglio
+   restano fuori dall'ordine.
 
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
 
@@ -439,6 +443,16 @@ dallo Shop».
 distinzione, ed è già nell'elenco delle cose lasciate indietro sulla responsività.
 Va fatto in un giro solo su tutti i CSS: farlo qui e basta vorrebbe dire quattro
 righe diverse dalle altre trecento.
+
+**RISOLTO (08/09/2026, scritto il 15/09/2026)** — il giro unico è stato fatto lo stesso
+giorno, sul branch `task/responsivita`: lo dice il secondo giro dell'08/09 qui sotto («la
+passata degli `:hover` file per file … nessuna regola `:hover` rimasta fuori») e lo dice
+`implementazioni/02-interfaccia-e-telefono.md:1383` (**FATTO (08/09/2026)**). Nel codice
+torna: tutte le 161 regole `:hover` dei 27 fogli in `frontend/css/` stanno dentro alla
+gabbia `@media (hover:hover)`, e il controllo automatico «nessun :hover fuori da
+@media (hover:hover)» in `audit-regressioni.js` è verde anche sui pezzi di grafica scritti
+dentro al JavaScript. Questa riga mancava, ed è per questo che la voce è rimasta negli
+elenchi degli aperti: vedi il giro del 15/09 in fondo.
 
 ### Nota, non è un errore: in cabina il tasto d'oro è quello che spende
 
@@ -3068,3 +3082,72 @@ telefono non si tocca, quindi non c'è una strada per vederlo. `body.tel-aperto{
 (`telefono-stretto.css:83`) ferma lo scorrimento della plancia dietro al telefono: su Safari
 di iPhone quel trucco spesso non basta e la pagina sotto scorre lo stesso — non l'ho provato
 su un telefono vero, va guardato lì.
+
+---
+
+## Giro del 15/09/2026 (segnala-problemi, fine task `task/sistema-il-foglio-dei-punti-nuovi`, commit `167e22d`)
+
+La task ha toccato un file solo, `implementazioni/implementazioni.md` (359 righe cambiate,
+`git diff --stat main...HEAD`): il codice del gioco è identico a `main`. Controlli
+automatici tutti verdi: `npm run prova` 180 a posto, `audit-regressioni.js` 343 ok,
+`verifica:build` 33 ok. Sul JavaScript: ogni `<script>` e ogni foglio di stile citati
+dalle tre pagine esistono; ogni `onclick` scritto in `gioco.html` e ogni `onclick`
+costruito dal codice chiama una funzione che esiste (0 nomi orfani); i cinque nomi guardati
+con `typeof` e non definiti nel gioco (`aggiornaMuteLanding`, `renderMenu`, `onDone`,
+`onArrive`, `onContinue`) sono o funzioni della landing, che carica gli stessi file, o
+parametri locali: niente come il vecchio `renderNegozio`. Collegamenti e telefono non li
+ho riprovati a schermo: il codice è quello del giro precedente (`d97e8de`), che li ha
+già guardati uno per uno. Il grosso del giro è stato il confronto fra i due fogli degli
+aperti, come chiesto: sotto le due cose che non tornano.
+
+### «Cosa resta aperto» dice che il suo ordine è lo stesso di «Da fare adesso», e non lo è
+
+- **dove** — `documentazione/problemi-riscontrati.md:3-5` (la premessa dell'elenco in
+  testa) contro `implementazioni/implementazioni.md:49-158` («Da fare adesso, in ordine»).
+- **cosa succede** — le dieci voci di «Cosa resta aperto al 15/09/2026» compaiono **tutte**
+  in «Da fare adesso» (contate una per una: avvio rapido → 6, Shop → 13, hover → 4, code
+  dello Studio → 15, Marketing → 3, `jose`/`zod` → 7, barra della plancia → 2, di traverso
+  → 25, uscita di venerdì → dentro a 14, «aperti di proposito» → nel capoverso «Restano
+  fuori dall'ordine»). Ma la premessa qui dice «in ordine d'importanza — l'ordine è lo
+  stesso di «Da fare adesso»», e l'altro foglio le ordina in un altro modo (prima il
+  telefono, poi il pacchetto, poi le piccole, poi le lunghe, in fondo le decisioni): qui
+  l'avvio rapido è al primo posto e la barra al settimo, di là la barra è seconda e l'avvio
+  sesto; lo Shop qui è secondo, di là tredicesimo. Chi legge questo foglio e va a cercare la
+  stessa sequenza nell'altro non la trova. Due dettagli piccoli nello stesso confronto: di
+  là la voce 7 nomina solo `jose` (qui è «`jose` e `zod`», e `zod` sta ancora fra le
+  `dependencies` di `backend/package.json:23` senza che nessuno la usi), e la dice «dal
+  registro delle dipendenze» invece che da questo foglio.
+- **come si vede** — leggi i numeri 1-10 in testa a questo file e cerca la stessa sequenza
+  in «Da fare adesso».
+- **quanto pesa** — da sistemare con calma. Va deciso da che parte si aggiusta: o la
+  premessa qui smette di promettere lo stesso ordine (basta dire «tutte stanno in "Da fare
+  adesso", che le mette in fila con le altre»), o le dieci voci qui si riordinano come di
+  là. Non ho toccato né l'una né l'altra.
+
+### L'hover al tocco è chiuso dall'08/09, ma tre elenchi lo danno ancora da fare
+
+- **dove** — `documentazione/problemi-riscontrati.md:10-11` (voce 3 di «Cosa resta aperto»),
+  `implementazioni/implementazioni.md:74-76` (voce 4 di «Da fare adesso»: «nessun foglio
+  di stile distingue mouse e dito … un giro solo su tutti i CSS»),
+  `implementazioni/08-uscita-sugli-store.md:157` («**Niente hover**: da fare. Gli effetti
+  `:hover` ci sono ancora tutti»).
+- **cosa succede** — il lavoro che quei tre punti chiedono è già fatto, e da una settimana.
+  Nel codice tutte le 161 regole `:hover` dei 27 fogli in `frontend/css/` stanno dentro a
+  `@media (hover:hover)` (contate oggi), i sei pezzi di grafica scritti dentro al JavaScript
+  pure, e il controllo automatico «nessun :hover fuori da @media (hover:hover)» in
+  `frontend/strumenti/audit-regressioni.js:2148` è verde e diventerebbe rosso se ne
+  sfuggisse uno. Lo dicono anche i documenti, ma solo due: il secondo giro dell'08/09 in
+  questo file («nessuna regola `:hover` rimasta fuori») e
+  `implementazioni/02-interfaccia-e-telefono.md:1383` (**FATTO (08/09/2026)**). La voce di
+  questo file (riga 423, «Sul telefono i colori del «passaggio del mouse» restano accesi»)
+  era rimasta col solo **LASCIATO** della mattina e senza il RISOLTO del pomeriggio, e da lì
+  è finita negli elenchi degli aperti; il RISOLTO gliel'ho messo sotto adesso. Quello che
+  resta davvero aperto sull'argomento è un'altra cosa, ed è una **scelta**, non un lavoro:
+  la nota dell'08/09 «adesso sul telefono toccare un tasto non fa più vedere niente» (123
+  cose che si accendevano col mouse e al dito non rispondono in nessun modo).
+- **come si vede** — `cd frontend && node strumenti/audit-regressioni.js | grep hover`
+  → «ok nessun :hover fuori da @media (hover:hover)».
+- **quanto pesa** — da sistemare con calma: se qualcuno prende la voce 4 di «Da fare
+  adesso» si mette a rifare un giro già fatto. Da togliere dai tre elenchi (o da barrare
+  con la data, come fa quel foglio) e, se si vuole, da sostituire con la scelta sulla
+  risposta al «mentre premo». Non ho toccato nessuno dei tre.

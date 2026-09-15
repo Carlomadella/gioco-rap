@@ -71,9 +71,10 @@ da quale lista viene.
    una seconda riga bianca, la riga di pezzo senza seed che è un bottone che non fa
    niente, il pezzo scelto che può sparire dall'elenco ma resta quello che si spinge; più,
    sul telefono, il motivo per cui l'anteprima è spenta che viene tagliato.
-4. **Il giro unico sull'hover al tocco** — da problemi-riscontrati (08/09): nessun foglio
-   di stile distingue mouse e dito, e ogni task ne aggiunge qualche riga. Un giro solo
-   su tutti i CSS, poi `prova-sul-telefono`.
+4. ~~**Il giro unico sull'hover al tocco**~~ **FATTO (08/09/2026, riconosciuto il 15/09)** —
+   era chiuso da una settimana e tre elenchi lo davano ancora da fare: tutte le regole
+   `:hover` stanno in `@media (hover:hover)`, e l'audit lo controlla («La responsività: lo
+   Studio, la Strada e l'hover al tocco» in `02-interfaccia-e-telefono.md`).
 
 **Pesa nel pacchetto o blocca una partita**
 
@@ -85,9 +86,11 @@ da quale lista viene.
 6. **L'avvio rapido ci mette due minuti e non lo dice** — da problemi-riscontrati. È il
    primo minuto di chi prova il gioco: o una barra di caricamento, o l'avvio rapido torna
    a non aspettare MakeHuman.
-7. **`jose` va usata** — dal registro delle dipendenze: la verifica dei token Apple e
-   Google in `backend/accessi.js` è scritta a mano, ed è il posto peggiore dove
-   risparmiare. Serve prima di uscire sugli store, non prima di domani.
+7. **`jose` va usata, e `zod` va deciso** — da problemi-riscontrati (13/09) e dal registro
+   delle dipendenze: la verifica dei token Apple e Google in `backend/accessi.js` è scritta
+   a mano, ed è il posto peggiore dove risparmiare; `zod` sta fra le `dependencies` del
+   backend senza che nessuno la usi. Serve prima di uscire sugli store, non prima di
+   domani.
 
 **Piccole e chiare**
 
