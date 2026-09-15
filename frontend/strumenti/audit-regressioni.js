@@ -691,10 +691,26 @@ test("Sputa sta in un file suo, caricato dopo telefono.js, e il telefono la apre
   telefono.includes('if(id === "sputa") return typeof schermataSputa === "function" ? schermataSputa() : "";'));
 test("su Sputa i rivali sputano col dado fermo, e solo la prima barra del giorno da' hype",
   sputa.includes("function sputaDado(seme)") &&
-  sputa.includes("sputaDado((Number(r.seed) || 0) + sett * 7919)") &&
+  /* dal nome, non da r.seed: rivals.js lo rifa' a ogni pezzo nuovo */
+  sputa.includes("sputaDado(sputaSemeRivale(r) + sett * 7919)") &&
+  sputa.includes('id:"r" + sputaSemeRivale(r) + ":" + sett + ":" + i') &&
   sputa.includes('adfOggi("sputa") === 0') &&
   sputa.includes("const SPUTA_HYPE_PRIMA = 1") &&
   sputa.includes("const SPUTA_MAX = 140"));
+test("Sputa aggiorna la fascia dell'hype e al tetto non promette +1",
+  sputa.includes('if(typeof renderHub === "function") renderHub();') &&
+  sputa.includes("const sale = G.hype < tetto;") &&
+  sputa.includes("alTetto"));
+/* la take pagata su una coppia strofa+beat non si butta cambiando coppia:
+   si mette da parte e torna (15/09/2026). Le altre finiscono col pezzo. */
+test("la take pagata si mette da parte cambiando strofa o beat, e torna",
+  studioEl.includes("d.takeAltre[d.take.k] = d.take") &&
+  studioEl.includes("d.take = d.takeAltre[k] || null;") &&
+  studioEl.includes("delete G.studio.takeAltre;"));
+test("la plancia e l'Agenda dicono i 45 della take, non «gratis»",
+  actions.includes("costoScritto:() => (typeof studioTakeManca === \"function\" && studioTakeManca())") &&
+  ui.includes("const scritto = a.costoScritto ? a.costoScritto() : en2;") &&
+  telefono.includes("(a.costoScritto ? a.costoScritto() : a.e)"));
 
 console.log("\nLo Studio a cinque linguette (14/09/2026)");
 test("le linguette dello Studio sono cinque: Beat, Testo, Cabina, Mix, Uscita",
@@ -1974,7 +1990,8 @@ test("punto 28: girare a cercare beat non costa energia",
 test("punto 28: ma costa tempo, che è il freno vero",
   /beat:\s*120/.test(time) && hours.includes('beat:      {open:"13:00", close:"02:00"}'));
 test("punto 28: una mossa da zero energia si scrive «gratis», non «0 energia»",
-  ui.includes("(en2 ? '<i>' + en2 + '</i>energia' : 'gratis')"));
+  /* `scritto` e` en2, salvo le mosse che si pagano altrove (registra) */
+  ui.includes("(scritto ? '<i>' + scritto + '</i>energia' : 'gratis')"));
 
 console.log("\nPunti 8 e 9 — l'agenda: gli appuntamenti e le notifiche");
 test("punto 8: ogni evento della plancia ha il quadratino per segnarlo",

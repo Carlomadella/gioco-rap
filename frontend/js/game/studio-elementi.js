@@ -315,9 +315,20 @@ function studioTake(){
   const k = studioTakeChiave();
   if(!k) return null;
   const d = studioDati();
-  /* si apre vuota: la prima take la chiedi tu, con `studioTakeAncora` */
-  if(!d.take || d.take.k !== k)
-    d.take = {k, l:[], s:0};
+  if(!d.take || d.take.k !== k){
+    /* Cambi strofa o beat: la take che avevi non e' di questo pezzo, ma
+       l'hai pagata — si mette da parte con la sua targhetta, e se torni su
+       quella coppia la ritrovi. Prima si buttava e basta, e da quando la
+       prima take costa la sessione (45) buttarla voleva dire ripagarla
+       (15/09/2026, problemi-riscontrati). Le take da parte finiscono
+       quando chiudi un pezzo: la sessione e' quella. */
+    if(!d.takeAltre) d.takeAltre = {};
+    if(d.take && d.take.l && d.take.l.length) d.takeAltre[d.take.k] = d.take;
+    d.take = d.takeAltre[k] || null;
+    delete d.takeAltre[k];
+    /* si apre vuota: la prima take la chiedi tu, con `studioTakeAncora` */
+    if(!d.take) d.take = {k, l:[], s:0};
+  }
   return d.take;
 }
 
@@ -345,7 +356,8 @@ function studioTakeElenco(){
   if(!t.l.length)
     return '<div class="sttake"><p class="stnota">Nessuna take ancora: la prima costa ' +
       STUDIO_TAKE_PRIMA + ' di energia, è la sessione. Poi le altre ' +
-      STUDIO_TAKE_ENERGIA + ' l\'una, e tenere quella buona non costa niente.</p></div>';
+      STUDIO_TAKE_ENERGIA + ' l\'una, e tenere quella buona non costa niente. ' +
+      'Le take sono di questa strofa su questo beat: se cambi, le ritrovi tornando qui.</p></div>';
   const buona = studioTakeMigliore(t);
   return '<div class="sttake">' + t.l.map((d, i) => {
     const q = studioTakeQ(d);
@@ -417,6 +429,9 @@ function studioTakePresa(){
   if(!d || !d.l || !d.l.length) return rnd(-5, 6);
   const mia = d.k === studioTakeChiave();
   delete G.studio.take;
+  /* il pezzo e' chiuso, la sessione anche: le take messe da parte sugli
+     altri accoppiamenti non valgono piu' */
+  delete G.studio.takeAltre;
   if(!mia) return rnd(-5, 6);
   return d.l[d.s] != null ? d.l[d.s] : d.l[0];
 }

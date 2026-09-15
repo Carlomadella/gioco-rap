@@ -129,9 +129,20 @@ function sputaTiNominano(){
   return Number(G.hype || 0) >= 40 || chart <= 20 || Number(G.fans || 0) >= 5000;
 }
 
+/* il numero fisso di un rivale: dal nome, non da `r.seed`, perche' quello
+   rivals.js lo rifa' a ogni pezzo nuovo (e' il seme della copertina) e le
+   barre si rifacevano da capo, settimana scorsa compresa, col fuoco rimasto
+   su id spariti (15/09/2026) */
+function sputaSemeRivale(r){
+  const s = String(r.n || "");
+  let h = 2166136261;
+  for(let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+  return h >>> 0;
+}
+
 /* le barre di un rivale in una settimana: una o due, decise dal dado fisso */
 function sputaBarreRivale(r, sett){
-  const dado = sputaDado((Number(r.seed) || 0) + sett * 7919);
+  const dado = sputaDado(sputaSemeRivale(r) + sett * 7919);
   const quante = dado() < .45 ? 2 : 1;
   const out = [];
   const nome = sputaNomeTuo();
@@ -155,7 +166,7 @@ function sputaBarreRivale(r, sett){
        prende a migliaia, uno da trecento qualche decina */
     const fuoco = Math.round(Math.max(8, (Number(r.p) || 300) / 45) * (0.6 + dado() * 0.9) *
       (r.hot > 0 ? 1.6 : 1));
-    out.push({id:"r" + (r.seed || r.n) + ":" + sett + ":" + i, n:r.n, r, t,
+    out.push({id:"r" + sputaSemeRivale(r) + ":" + sett + ":" + i, n:r.n, r, t,
       sett, giorno, fuoco, aTe:pool === "tu"});
   }
   return out;
@@ -191,12 +202,18 @@ function sputaScrivi(testo){
     /* fino al tetto della fase, e mai sotto a dove stavi: un +1 che
        ti riportava al tetto se eri sopra era un meno */
     const tetto = typeof hypeCap === "function" ? hypeCap() : 100;
-    if(G.hype < tetto) G.hype = Math.min(tetto, Number(G.hype || 0) + SPUTA_HYPE_PRIMA);
+    const sale = G.hype < tetto;
+    if(sale) G.hype = Math.min(tetto, Number(G.hype || 0) + SPUTA_HYPE_PRIMA);
     if(typeof toast === "function")
-      toast("<b>Prima barra del giorno.</b> Il nome gira: +" + SPUTA_HYPE_PRIMA + " hype.",
+      toast(sale
+        ? "<b>Prima barra del giorno.</b> Il nome gira: +" + SPUTA_HYPE_PRIMA + " hype."
+        : "<b>Prima barra del giorno.</b> Il nome gira, ma qui sei già al tetto: serve il passo dopo.",
         "good", "🔥", ["#F97316", "#7C2D12"]);
   }
   save();
+  /* la fascia con l'hype e' della plancia, non della schermata di gioco:
+     senza renderHub il fumetto diceva +1 e il numero in alto restava fermo */
+  if(typeof renderHub === "function") renderHub();
   if(typeof renderGioco === "function") renderGioco();
   return true;
 }
@@ -229,6 +246,7 @@ function sputaBarraHTML(p){
 }
 function schermataSputa(){
   const oggi = typeof adfOggi === "function" ? adfOggi("sputa") : 0;
+  const alTetto = Number(G.hype || 0) >= (typeof hypeCap === "function" ? hypeCap() : 100);
   const feed = sputaFeed();
   return '<div class="tsputa">' +
     '<div class="tspscrivi">' +
@@ -239,7 +257,9 @@ function schermataSputa(){
       '</div>' +
       '<div class="tnote tspnota">' +
         (oggi === 0
-          ? 'La <b>prima barra del giorno</b> fa girare il nome: +' + SPUTA_HYPE_PRIMA + ' hype. Le altre le legge chi passa.'
+          ? (alTetto
+              ? 'La <b>prima barra del giorno</b> fa girare il nome — ma sei già al tetto dell\'hype di questa fase: per salire serve il passo dopo.'
+              : 'La <b>prima barra del giorno</b> fa girare il nome: +' + SPUTA_HYPE_PRIMA + ' hype. Le altre le legge chi passa.')
           : 'Oggi hai già sputato <b>' + oggi + (oggi === 1 ? ' barra' : ' barre') + '</b>: la gente scorre oltre.') +
       '</div>' +
     '</div>' +
@@ -256,7 +276,7 @@ if(typeof HUB_APP !== "undefined" && !HUB_APP.some(a => a.id === "sputa"))
   HUB_APP.push({id:"sputa", n:"Sputa", ic:"sputa", k:"#F97316"});
 if(typeof HUB_APP_VECCHIO !== "undefined" && !HUB_APP_VECCHIO.some(a => a.id === "sputa"))
   HUB_APP_VECCHIO.splice(3, 0, {id:"sputa", n:"Sputa", ic:"sputa", k:"#F97316",
-    sotto:g => (g.sputaMiei || []).length + (" barre tue"),
+    sotto:g => { const n = (g.sputaMiei || []).length; return n + (n === 1 ? " barra tua" : " barre tue"); },
     vai:() => telVaiApp("sputa")});
 
 /* i tocchi: il fuoco, «Rispondi», il tasto e il contatore dei caratteri */

@@ -31,6 +31,80 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 ---
 
+## Da fare adesso, in ordine
+
+Smistato il 15/09/2026, dopo la chiusura di «Sputa» e della regola nuova sull'energia in
+Cabina. È l'ordine in cui si prendono i punti aperti di questo foglio **e** quelli ancora
+aperti in [`problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md): prima
+quello che tocca il gioco sul telefono (è lì che esce), poi quello che pesa nel pacchetto
+o blocca una partita, poi le cose piccole e chiare, in fondo quello che è una decisione
+prima che un lavoro. Ogni voce cita il **testo** del punto, non il numero.
+
+1. **Il Marketing sul telefono vero** — da problemi-riscontrati, «Sul telefono la promo
+   non si sceglie e l'anteprima non si raggiunge più»: sotto i 1180 px il telefono della
+   plancia non c'è, quindi «Che post fai?» e l'anteprima del pezzo non hanno una strada.
+   È una regressione su una cosa appena fatta, ed è sul telefono che il gioco esce.
+2. **Le transizioni video** — CARLO, «implementa le transizioni dentro al progetto, che
+   partano cliccando sulla scheda collegata». I 12 video stanno già in
+   `frontend/media/video/Transizioni di scena/` (28 MB) e **nessuna riga di codice li
+   carica**: oggi partono col pacchetto per gli store da peso morto. O si collegano, come
+   dice il punto, o escono dal pacchetto.
+3. **L'evento fatto esce dall'agenda** — CARLO, «se partecipo ad un evento segnato, dopo
+   che ho partecipato l'evento si toglie automaticamente dall'agenda». In `agenda.js`
+   `consumaPeso()` segna solo il bonus come usato: la voce resta segnata. Piccolo.
+4. **I prezzi dei beat per fama del beatmaker** — ALE, «da 100 a 250 euro beat da
+   beatmaker emergenti, da 300 a 1000 per beatmaker affermati e da 1000 a 2000 per
+   beatmaker famosissimi». Oggi `prezzoBeat()` in `beats.js` guarda solo la qualità
+   (da 15 a ~1800). I numeri sono già scritti, si tratta di metterli.
+5. **Si parte con tutti i parametri a 1** — ALE. In `state.js` le quattro abilità partono
+   a 0. Una riga, ma va guardato `livello()` che le somma.
+6. **Non ci si può licenziare** — CARLO, «non ci si può licenziare dal lavoro corrente,
+   implementalo per tutti i lavori». In `hub.js` c'è «lascialo o aspetta di essere
+   licenziato»: va tolto il «lascialo».
+7. **Via la lucidità** — CARLO, «togli il parametro «lucidità» e tutto ciò che ne
+   consegue». Tocca 15 file del gioco e le formule della qualità del testo: non è una
+   riga, va fatto in una task sua con l'audit aggiornato nello stesso commit.
+8. **I rapporti coi beatmaker che vanno in negativo** — ALE. In `posto.js` il rapporto
+   scende (`p.rel--`) ma è tenuto fra 0 e 5: sotto zero non va. Prima di farlo va deciso
+   cosa succede a −1 (non ti vende più? ti fa pagare di più?).
+9. **L'avvio rapido ci mette due minuti e non lo dice** — da problemi-riscontrati. È il
+   primo minuto di chi prova il gioco: o una barra di caricamento, o l'avvio rapido torna
+   a non aspettare MakeHuman.
+10. **Lo Shop promette tre reparti, ce ne sono due** — da problemi-riscontrati: i Vestiti
+    sono ancora la griglia vecchia, non dietro a una linguetta.
+11. **Il giro unico sull'hover al tocco** — da problemi-riscontrati (08/09): nessun foglio
+    di stile distingue mouse e dito, e ogni task ne aggiunge qualche riga. Un giro solo
+    su tutti i CSS, poi `prova-sul-telefono`.
+12. **Le tre code dello Studio a cinque linguette** — da problemi-riscontrati (15/09):
+    l'omonimo della classifica che non si può chiamare, chi accetta dalla classifica che
+    ruba un posto alla Sala, la copertina proposta e non confermata che resta nel
+    salvataggio con la foto.
+13. **`jose` va usata** — dal registro delle dipendenze: la verifica dei token Apple e
+    Google in `backend/accessi.js` è scritta a mano, ed è il posto peggiore dove
+    risparmiare. Serve prima di uscire sugli store, non prima di domani.
+14. **Le card sulla mappa troppo vicine, i pulsanti sopra la mappa troppo grandi** — ALE.
+    Si giudicano a occhio: vanno guardate con uno screenshot, non dal CSS.
+15. **Quando skippi tante ore ci mette troppo** — CARLO. Prima si misura (quanti giorni,
+    quanti secondi), poi si cerca dove.
+16. **Non sempre far scorrere una giornata ridà l'energia** e **la legacy** — CARLO. Sono
+    regole di gioco nuove: prima si scrive come funzionano, poi si fa.
+17. **Le decisioni tue**, senza le quali il resto non si muove: se dopo Milano e Los
+    Angeles si può tornare indietro (DA DISCUTERE), la pagina di Mycol e il «tuo artista»
+    nella landing, e se cancellare gli undici branch già uniti in `main` (`git branch
+    --merged main` li elenca, da `test/vitest-playwright-gate` a `task/studio-cinque-linguette`),
+    anche sul remoto.
+
+Le **nuove modalità** (Carriera Studio, città di partenza, le città finali) restano dove
+sono, in fondo: sono per dopo, quando il gioco è masterizzato.
+
+Due punti di CARLO — «quando non sono fix… crea un file nuovo collegato ai già presenti»
+e «tieni tutto ciò che riguarda la parte smartphone separata dal resto del progetto» —
+**non sono task ma regole di lavoro**: il loro posto è
+[`come-si-lavora.md`](../documentazione/come-si-lavora.md) e la versione corta in
+`CLAUDE.md`. Finché non ci arrivano restano qui sotto, dove stavano.
+
+---
+
 ## Da smistare
 
 ### Inbox automatica
@@ -48,6 +122,11 @@ La lista storica già presente sotto **rimane intatta** ed è importata automati
 ALE:
 
 2. Rendi accessibile lo shop già dalla città iniziale, con limitazioni sui prodotti in vendita
+
+   **RISPOSTA (15/09/2026)** — lo Shop sta già nella città iniziale: in `hub.js` è un
+   cartello del quartiere «periferia», si apre dal primo giorno. Quello che manca è la
+   seconda metà, «con limitazioni sui prodotti in vendita»: va deciso cosa non si vende
+   in provincia (i beat sopra a una certa qualità? l'attrezzatura da studio grande?).
 
 3. i rapporti con i beatmaker non vanno mai in negativo, puoi offenderli quanto vuoi e il rapporto resta uguale
 
@@ -90,35 +169,20 @@ di fare hype a inizio carriera, che oggi non esistono ancora come luogo/azione.
 `npm run prova` (70/70) più una verifica dedicata fuori dal browser sui tetti per
 fase e sul tetto settimanale della promo.
 
-8.  Le card sulla mappa come studio, fabbrica, pizzeria, la sala ecc hanno una card cliccabile troppo grande, LE VOGLIO TUTTE COME STUDIO. Inoltre noto che l'ultima cosa dove entri resta una sorte di pallino gialla come se t'indicasse l'ulitma cosa schiacciata. Non la voglio.
-
-9.  Ci sono dei tastini sul in centro sotto della mappa che fan muovere la mappa. Levali. La mappa non voglio si veda muoveree. dev'essere ferma
-
-10. Lo shop dev'essere un vero e proprio shop, come gli shop di fortnite o nba2k.. LEVA STI CAZZO DI INTERFACCIA MENU! RENDILO UNO SHOP DA VIDEOGIOCO NEL 2026
+_(Il punto resta qui apposta, per la coda che manca — il pub e la pubblicità; la nota
+breve sta in [`fatte.md`](fatte.md).)_
 
 11. Avaturn voglio lo rendiamo UN 50/50 , Cioè chi non vuole andare a farsi tutta la trafila per fare avaturn (anche se ovviamente dobbiamo fare di tutto per consigliarli a farlo) può benissimamente creare il suo avatar in game. FAI COESISTERE LE COSE.
+
+    **RISPOSTA (15/09/2026)** — nel codice convivono già: `avvio.js` apre
+    «Avaturn/MakeHuman», `hub.js` distingue `avatarSource === "avaturn"` dall'altro, e
+    l'avvio rapido carica MakeHuman vero. Da confermare in partita che dal creator si
+    scelga davvero fra le due strade, e poi scriverlo in
+    [`03-artista-e-avatar.md`](03-artista-e-avatar.md), che oggi non ne parla.
 
 12. Studio, casa e attività criminiali sulla mappa sono TROPPO VICINE LE CARD tra di loro. Anche se gli edifici sono abbastanza vicini falle in un modo MOOOOLTO più clean. Così sono troppo ammassate.
 
 13. Ti ricordo che i pulsanti sopra la mappa sono ANCORA TROPPO GRANDI rispetto ai quadratini stessi. Rivedilo.
-
-14. Togli che nello studio, per comprare un beat, consumi 20 di energia. Non è realistico, toglilo.
-
-**FATTO (10/09/2026)** — tolto il costo di 20 energia per farsi fare un beat su misura da
-un beatmaker (`STUDIO_BEAT_ENERGIA` in `js/game/studio.js`, sezione «Fattelo fare»): resta
-il costo in soldi, il tempo (2 ore) e il limite di un beat a settimana per beatmaker. Il
-testo dell'interfaccia che mostrava «20 energia» è sparito insieme al conto. Non toccato
-«Cerca un beat» allo Shop, che non costava energia già prima.
-
-15. Scrivere barre in studio non deve dare nessun malus, né di stanchezza né fisico,
-    NESSUNO. Lasciamo solo che costi 15 di energia, per ora. Non toccare nient'altro di quello
-    che c'era già.
-
-**FATTO (10/09/2026)** — tolto il calo di benessere (−1) che scattava chiudendo una strofa
-scritta al foglio (`chiudiStrofa` in `js/game/writer.js`): scrivere barre non stanca più.
-Il costo in energia dell'azione «Scrivi barre» (`js/game/actions.js`) è sceso da 28 a 15.
-Non toccato altro: il bonus di lucidità che l'azione già dava, il tempo che richiede, e come
-benessere e lucidità pesano sulla qualità del testo restano com'erano.
 
 CARLO:
 
@@ -166,6 +230,15 @@ NETWORK 64
 
 è possibile controllare come stanno andando le canzoni nel tempo da un'app del telefono per sapere se stanno invecchiando bene o male e magari farci delle remastered o parti 2 di una canzone o di un album (discografia)
 
+   **FATTO in parte (15/09/2026)** — la catena c'è quasi tutta, e sta in
+   [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md), «Lo Studio a cinque
+   linguette»: Beat, Testo, Cabina (con il Feat accanto al fonico), Mix e Uscita (con dentro
+   la Cover e il QUANDO); il Marketing è passato sul telefono, in LaFamegram; la stima degli
+   stream esce dalla formula vera di `sim.js`. La discografia c'è (`04-musica-e-suoni.md`,
+   «19 · La discografia»: una linguetta della partita con la curva delle ultime 26 settimane
+   per pezzo). **Manca** la cover caricata da file e quella «stile emblema» (oggi solo
+   proposte generate), la discografia come app del telefono, e le remastered e le parti 2.
+
 4. Non funziona più la pagina attività criminali, questo è ciò che segna in console:
    Feature policy: ignorato nome caratteristica non supportato “autoplay”. pagine.js:68:11
    Feature policy: ignorato nome caratteristica non supportato “autoplay”. pagine.js:90:19
@@ -173,6 +246,16 @@ NETWORK 64
    [Anni di Fame] Eventi v1.2.13 pronti: 1000 eventi eventi-v2.js:3010:13
    Problema di sicurezza: i contenuti in http://localhost:8000/pagine/landing.html non possono caricare o avere link che rimandino a file:///.
    Problema di sicurezza: i contenuti in http://localhost:8000/pagine/gioco.html non possono caricare o avere link che rimandino a file:///.
+
+   **RISPOSTA (15/09/2026)** — quelle righe di console non sono il guasto: sono avvisi di
+   Firefox e basta. «Feature policy … autoplay» è l'`allow="autoplay"` dell'iframe in
+   `js/pagine.js` (Firefox non conosce quel nome, Chrome sì, e in tutti e due l'audio va);
+   il «problema di sicurezza» su `file:///` è un link che punta al disco, e nel frontend non
+   ce n'è nessuno — probabilmente la pagina era stata aperta prima da file. Nel codice non
+   trovo cosa fosse rotto: il 07/09 due guardie saltavano la Strada perché cercavano un id
+   che non esiste (`strada-crimine`, sistemato, sta in problemi-riscontrati), e l'08/09 il
+   giro sulla Strada la trovava giocabile. **Se succede ancora, serve cosa fai e cosa vedi**
+   (la pagina non si apre? si apre e non risponde?), perché la console non lo dice.
 
 5. aggiungi le foto di background dei posti senza HTML, poi ricrea la schermata identica alle foto con elementi HTML
 
@@ -201,6 +284,14 @@ NETWORK 64
 
 8. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo. Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su "stacca la spina", il quinto su "registra un pezzo".
 
+   **Stato (15/09/2026)** — non è fatto, e non è il punto delle dissolvenze CSS (quello sta
+   in `02-interfaccia-e-telefono.md`, «Transizioni quando una card apre una pagina», ed è
+   un'altra cosa). I video ci sono, dodici, in `frontend/media/video/Transizioni di scena/`
+   (`01_studio`, `02_ingresso_sala`, `03_ritorno_casa`, `04_stacca_la_spina`,
+   `05_registra_pezzo`, più palestra, Milano, club, shop, trasferta, live): **nessuna riga di
+   codice li carica**, e `media/` finisce intera nel pacchetto per gli store — 28 MB che
+   viaggiano per niente.
+
 9. quando skippi tante ore ci mette troppo a simulare
 
 10. togli il parametro «lucidità» e tutto ciò che ne consegue
@@ -217,43 +308,16 @@ NETWORK 64
 
 16. quando si segna un evento in agenda poi non si riesce a far passare il giorno
 
+    **RISPOSTA (15/09/2026)** — è l'effetto voluto di un tuo punto precedente, «gli eventi
+    segnati in agenda bloccano lo skip» (FATTO 06/09, in [`fatte.md`](fatte.md)): con un
+    appuntamento di oggi ancora da fare il salto non parte, e se è più avanti il salto si
+    ferma alla sua mattina. Un'ora già passata non blocca niente, e «Fine giornata» resta
+    libero apposta. Se il giorno non passa **dopo che l'evento l'hai fatto**, allora è il
+    punto qui sotto: la voce resta segnata anche dopo.
+
 17. se partecipo ad un evento segnato, dopo che ho partecipato l'evento si toglie automaticamente dall'agenda e non deve essere più segnato
 
 18. sull'app lafamegram non posta nessuno
-
-/_ LUOGO: STUDIO _/
-
-6. non posso scegliere i feat, e inoltre non posso fare canzoni senza feat
-
-   **RISPOSTA (14/09/2026) — serve una scelta, e non l'ho presa da solo.** Ho provato in
-   partita e nel codice, e come guasto non si riproduce: nella sezione Feat i rapper che
-   conosci sono bottoni (`data-feat`), il clic li mette «in sessione», «Lascia perdere» li
-   toglie, e senza nessuno in sessione si registra lo stesso — il centro dice «Va benissimo
-   così: il feat è una scelta, non un passaggio», e il pezzo esce senza feat. Quello che
-   probabilmente hai visto è la lista **vuota**: si può chiamare solo un rapper che hai già
-   conosciuto alla Sala (`studioGente("rapper")` legge `G.gente`), e a inizio partita non
-   c'è nessuno — la sezione lo dice, «Non conosci ancora nessun altro rapper. Si incontrano
-   alla Sala». La domanda è di design, non di codice: **da chi si deve poter scegliere il
-   feat?** Solo da chi conosci (com'è ora, e allora il punto è solo che la lista vuota va
-   spiegata meglio), oppure da tutti i rapper della città, anche mai visti, con un costo o
-   un rifiuto per chi non ti conosce (come alla Sala, dove «Proponi un pezzo insieme»
-   chiede «collaboratori»). Se «non posso fare canzoni senza feat» voleva dire un'altra
-   cosa, dimmi dov'eri: con un feat scelto non si può registrare senza tornare in Feat a
-   toglierlo, e forse è quello — in quel caso basta un «da solo» in Cabina come per il
-   fonico.
-
-   **Carletto (14/09/2026):** «Sto pensando di voler togliere le sezioni cover, feat,
-   marketing». Le idee su come farlo — via del tutto o fuse nelle stanze giuste, da chi si
-   sceglie il feat (solo chi conosci, tutti con costo e rifiuto, le due porte, dal
-   telefono), e la lettura «ad ogni pezzo» del punto 10 — stanno in
-   `documentazione/brainstorming-studio-cover-feat-marketing.md`.
-
-   **FATTO (15/09/2026)** — scelta **B + D3 + F2 + E**: il feat si sceglie in Cabina,
-   accanto al fonico, da due porte (chi conosci gratis, i rapper della classifica a
-   pagamento e con rifiuto, e chi accetta entra fra i contatti); «da solo» si clicca come
-   per il fonico. Cover nell'Uscita, Marketing sul telefono, un pezzo sul banco alla volta.
-   Tutto scritto in `implementazioni/02-interfaccia-e-telefono.md`, «Lo Studio a cinque
-   linguette».
 
 /_ DA DISCUTERE _/
 
@@ -296,22 +360,3 @@ ESEMPI NUOVE MODALITA' DI GIOCO:
 - Chicago i crimini sono più facili ma c'è più criminalità/concorrenza ed è più difficile affermarsi
 - Las vegas: per avere i casinò migliori e i locali top per massimizzare il lifestyle così puoi averlo al massimo e sbloccare un'altra cosa es. un titolo da esporre nella descrizione del profilo tipo: JOHN GOTTI
 - Atlanta/New York: più focalizzata sul conoscere artisti famosi come 21 Savage, Future, Young Thug
-
-Cosa resta aperto, per tua decisione
-
-- ~~beat-e-tasto-oro~~ **FATTO (13/09/2026)** — riapplicati a mano su main **tre** dei
-  quattro, non quattro: il marchio sopra HYPE sul telefono, «una lavanderia non è un beat»
-  (più i due ascolti che mancavano allo Studio) e l'oro sul tasto che chiude. Il quarto —
-  il costo in energia del beat — **non è stato riapplicato apposta**: il 10/09 era stato
-  tolto su richiesta («Togli che nello studio, per comprare un beat, consumi 20 di energia.
-  Non è realistico, toglilo.», commit fb731d5), e rimetterlo sarebbe stato disfare quella
-  decisione. Se ne è accorto `npm run prova`, che aveva la regola scritta: «costa in soldi,
-  non in energia». È esattamente il motivo per cui quel ramo andava riapplicato a mano
-  invece che unito: l'unione avrebbe riportato indietro anche quello, in silenzio.
-- L'avvio rapido ci mette 115 secondi e per i primi 50 non si muove niente. Funziona, ma il pulsante si chiama «rapido». È scritto in
-  problemi-riscontrati.md.
-- jose e zod restano dove sono, come hai deciso.
-- backend.md non l'ho esaminato — è ignorato nella stessa logica di schema.md, sono 16 KB. Se vuoi te lo controllo allo stesso modo.
-
-Se vuoi chiudere del tutto, posso cancellare i due branch ormai mergiati (test/vitest-playwright-gate e task/backend-schema-allineato),
-locali e remoti — ma essendo sul remoto te lo chiedo prima.

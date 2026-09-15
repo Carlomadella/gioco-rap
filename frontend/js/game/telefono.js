@@ -627,7 +627,7 @@ function schermataAgenda(){
     return '<button class="tli' + (soloEnergia ? ' spenta' : '') + '" data-azione="' + a.id + '"' +
       (pronto.ok || soloEnergia ? '' : ' disabled') + '>' +
       '<span class="tlitx"><b>' + a.n + '</b><i>' + (pronto.ok ? a.d : pronto.perche) + '</i></span>' +
-      '<span class="tliv">' + a.e + '⚡</span></button>';
+      '<span class="tliv">' + (a.costoScritto ? a.costoScritto() : a.e) + '⚡</span></button>';
   }).join("");
   return segnatiInAgenda() +
     '<div class="tnote" style="margin-top:12px"><b>Stasera</b></div><div class="tlist">' + oggi + '</div>' +

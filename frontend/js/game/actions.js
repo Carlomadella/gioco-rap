@@ -330,6 +330,11 @@ const ACTIONS = [
      insisteva con le take arrivava a «Tieni questa e chiudi» senza i 45 per
      premerlo (15/09/2026). Il tempo in sala e la sala stessa restano qui. */
   {id:"registra", n:"Registra il pezzo", e:0, luc:3,
+   /* la mossa in se' costa zero perche' i 45 li chiede la prima take in
+      Cabina: la plancia e l'Agenda pero' devono dirli, non scrivere
+      «gratis» (15/09/2026). Solo da mostrare — non si scala da qui. */
+   costoScritto:() => (typeof studioTakeManca === "function" && studioTakeManca())
+     ? (typeof STUDIO_TAKE_PRIMA !== "undefined" ? STUDIO_TAKE_PRIMA : 45) : 0,
    money:() => G.gear.mic ? 0 : 50,
    d:"Strofa più beat, in sala. Esce una traccia grezza.",
    need:() => !G.bars.length ? "1 strofa" : !G.beats.length ? "1 beat"

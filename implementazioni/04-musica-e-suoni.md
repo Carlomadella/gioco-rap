@@ -460,3 +460,9 @@ Sta in `frontend/js/game/studio-elementi.js` (`studioTakeCosto`, `studioTakeManc
 regola nuova e uno aggiunto, «tenere una take non costa energia». Provato nel gioco vero con
 Playwright: 100 → 55 alla prima take, 43 alla seconda, e a 3 di energia si chiude lo stesso
 e si arriva alla finestra del titolo.
+
+**Coda (15/09/2026), dal giro di `segnala-problemi`.** Con la prima take a 45, cambiare
+strofa o beat in Cabina buttava la take pagata: adesso si mette da parte con la sua targhetta
+(`d.takeAltre`) e torna se torni su quella coppia; le take da parte finiscono quando chiudi
+un pezzo. La plancia e l'Agenda non scrivono più «gratis» per «Registra il pezzo»: dicono i
+45 della take finché una take non c'è (`costoScritto` in `actions.js`, solo da mostrare).
