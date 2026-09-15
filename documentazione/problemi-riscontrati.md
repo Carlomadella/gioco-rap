@@ -2664,3 +2664,85 @@ l'Agenda «0⚡» per la stessa mossa: stessa cosa detta in due modi, come già 
 mosse a zero. `studioTake()` adesso scrive anche `takeAltre` nel salvataggio quando lo chiama
 `costoScritto` a ogni ridisegno della plancia — sempre la stessa cosa, non fa danni, è la
 stessa nota del giro precedente su `need`.
+
+
+## Giro del 15/09/2026 (backend-allineato, task `task/documenti-backend-in-pari`)
+
+Il commit `1d59615` è solo documenti. `node scripts/controlla-backend.js` verde, `npm run
+prova` 183 a posto, 0 no. Migrazioni e `server.js` non toccati dal `cb502a7` (12/09): le
+otto coppie SQLite/PostgreSQL restano quelle già confrontate colonna per colonna nel giro
+precedente — **niente che fermi il passaggio a PostgreSQL**. Verificato contro il codice
+tutto quello che il commit scrive: `difficolta` in `POST /api/artista` (`server.js:353`,
+`archivio.js:310-315` con `difficoltaBuona`, i tre valori e il ripiego su `anni-di-fame`
+di `archivio.js:39-41`); il filtro `?difficolta=` di `GET /api/classifica` (`server.js:409-413`,
+`archivio.js:213`), una graduatoria sola; `403 non-e-tuo` in `PUT /api/carriera/:slot`
+(`server.js:465-468`); le manopole sono ventiquattro in «Le manopole» (23 righe, una ne
+tiene due) ed è quella tabella che `controlla-backend.js:107-113` confronta col codice;
+`ADF_CATALOG_URL` è una costante di `frontend/js/game/eventi-v2.js:16`; `schema.md` è in
+git dal `cdd86d9` (13/09); le dipendenze del backend sono `jose`, `pg`, `zod`. I rimandi
+tengono: l'indice (`README-API.md:25`) punta a `#variabili-dambiente` e il titolo «## Variabili
+d'ambiente» c'è ancora (riga 1090); `README.md#le-manopole` trova «## Le manopole»
+(`backend/README.md:126`). Una sola voce, di documento, nata nel commit stesso.
+
+### §11 di `README-API.md` dice che la difficoltà «si sceglie una volta», ma `POST /api/punteggio` la riscrive a ogni invio
+
+- **dove** — `backend/README-API.md:578-581` («Si sceglie una volta, alla nascita
+  dell'artista, e da lì resta scritta accanto a lui (la legge `GET /api/artista/:id` e la
+  ripete `POST /api/punteggio`)») e §14 (`README-API.md:626`, `difficolta` nel corpo di
+  esempio senza una riga che dica cosa ne fa il server). Il vero è in
+  `backend/database/archivio.js:353-360` e in `backend/README.md:201` e `:209-210`.
+- **cosa succede** — il server la scrive **a ogni punteggio**, non una volta: l'`UPDATE` di
+  `segnaPunteggio` mette `difficolta = ?` con quello che arriva nel corpo (passato per
+  `difficoltaBuona`, quindi un valore sconosciuto ricasca su `anni-di-fame`), e solo se il
+  campo non arriva (`null`, client vecchio) resta quello che c'era. Il commento in
+  `archivio.js:357-359` lo dice apposta: «una carriera può essere ricominciata in un altro
+  modo dentro allo stesso slot». `backend/README.md:201` lo racconta giusto («all'iscrizione
+  e a ogni punteggio»); §11 di `README-API.md` no, e §14 tace: un giocatore che ricomincia
+  in «niente sconti» nello stesso slot cambia difficoltà in classifica al primo invio, e chi
+  legge README-API crede che non possa.
+- **come si vede** — `POST /api/artista` con `difficolta: "strada-aperta"`, poi
+  `POST /api/punteggio` sullo stesso id con `difficolta: "niente-sconti"`: `GET
+  /api/artista/:id` risponde `niente-sconti`.
+- **quanto pesa** — da sistemare con calma: una frase in §11 («la scrive l'iscrizione e la
+  riscrive ogni `POST /api/punteggio`; se non arriva resta quella che c'era») e una riga
+  ai limiti di §14. Non tocca il codice, che fa la cosa scritta in `backend/README.md`.
+
+
+**RISOLTO (15/09/2026)** — nello stesso branch, prima del push: §11 dice «la scrive
+l'iscrizione e la riscrive ogni `POST /api/punteggio`; se un invio non la manda resta quella
+che c'era», e §14 lo ripete fra i limiti («sostituisce quella scritta accanto all'artista»).
+## Giro del 15/09/2026 (segnala-problemi, controllo mirato sul commit 1d59615)
+
+Controllati solo i cinque documenti del commit, non il gioco (i controlli automatici erano
+già verdi). Verificato che i rimandi puntino a titoli veri e che le frasi nuove tornino col
+resto del repo: `README.md#le-manopole` esiste (`backend/README.md:126`) e la tabella elenca
+davvero **ventiquattro** `ADF_` (23 righe, una doppia per Steam); `#variabili-dambiente`
+dell'indice di `README-API.md:25` punta ancora al titolo di riga 1090; `scripts/controlla-backend.js`
+esiste, è acceso da `.claude/settings.json` e oggi passa; `schema.md` è entrato in git il
+13/09/2026 (commit `cdd86d9`); `backend/package.json` ha proprio `pg`, `jose`, `zod`;
+`ADF_CATALOG_URL` è una costante di `frontend/js/game/eventi-v2.js:16`; i tre valori della
+difficoltà e il ripiego su `anni-di-fame` sono gli stessi di `backend/README.md:196-210`;
+`403 non-e-tuo` su `PUT /api/carriera/:slot` c'è in `backend/server.js:484`. Una cosa sola
+non torna, e non è nei cinque file ma in quelli che adesso li contraddicono:
+
+### Il README di radice dice «tre dipendenze», le due roadmap dicono ancora «una sola»
+
+- **dove** — `documentazione/roadmap.md:63` («Node, una dipendenza sola (`pg`). SQLite dentro
+  a Node con 18 tabelle») e `ROADMAP.md:133` («una dipendenza sola (`pg`, per PostgreSQL)»).
+  Il vero è in `README.md:9` (corretto da questo commit), `backend/package.json` e
+  `documentazione/dipendenze.md:92-93`.
+- **cosa succede** — il commit ha messo a posto la riga del README di radice, ma la stessa
+  frase vecchia sta anche nelle due roadmap, che non sono state toccate: chi le legge trova
+  «una dipendenza sola» e «18 tabelle», mentre il README di radice dice tre dipendenze e
+  20 tabelle (e le migrazioni ne creano davvero 20). Stessa cosa, detta in due modi.
+- **come si vede** — apri `README.md` e `documentazione/roadmap.md` uno accanto all'altro,
+  riga 9 e riga 63.
+- **quanto pesa** — da sistemare con calma: due righe di documento.
+
+**RISOLTO (15/09/2026)** — nello stesso branch, prima del push: `documentazione/roadmap.md`
+e `ROADMAP.md` dicono «tre dipendenze» e «20 tabelle» come il README di radice (le tabelle
+sono venti: contate nei `CREATE TABLE` delle otto migrazioni).
+
+**Nota, non è un errore**: `documentazione/dipendenze.md:400` dice «il backend una
+dipendenza ce l'ha, `pg`» nel racconto di com'era il 07/09, quando `jose` e `zod` non c'erano
+ancora; è storia, e lo stesso file le elenca poche righe sopra. Va bene così.

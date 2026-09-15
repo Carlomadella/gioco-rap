@@ -576,9 +576,10 @@ Regole:
 - `storia`: fino a 120 caratteri; se assente viene generata;
 - `seed`: intero tra 0 e 2.000.000.000;
 - `difficolta`: `strada-aperta`, `anni-di-fame` o `niente-sconti`; qualunque altro
-  valore, o nessuno, vale `anni-di-fame`. Si sceglie una volta, alla nascita
-  dell'artista, e da lì resta scritta accanto a lui (la legge `GET /api/artista/:id` e la
-  ripete `POST /api/punteggio`);
+  valore, o nessuno, vale `anni-di-fame`. La scrive l'iscrizione e la **riscrive ogni
+  `POST /api/punteggio`** (una carriera si può ricominciare in un altro modo dentro allo
+  stesso slot); se un invio non la manda resta quella che c'era. La legge
+  `GET /api/artista/:id`;
 - massimo tre artisti attivi per account.
 
 Risposta `201`: modello pubblico dell'artista più `chiave` e, se è stato creato un
@@ -631,8 +632,10 @@ Accesso: artista proprio tramite `x-sessione` o `x-chiave`.
 
 Limiti applicati: `stream` massimo 50.000.000 prima del controllo di plausibilità,
 `fan` 0–50.000.000, `livello` 1–60, `fase` 0–8, `uscite` 0–5.000, titolo fino a
-60 caratteri, `seed` 0–2.000.000.000, `live` e `feat` 0–100.000. Il modello di
-plausibilità può abbassare gli stream richiesti e registrare un sospetto.
+60 caratteri, `seed` 0–2.000.000.000, `live` e `feat` 0–100.000. `difficolta` è uno
+dei tre valori di §11 e **sostituisce** quella scritta accanto all'artista; se manca (client
+vecchio) resta quella che c'era. Il modello di plausibilità può abbassare gli stream
+richiesti e registrare un sospetto.
 
 **`live` e `feat` sono facoltativi e si comportano diversamente dagli altri campi**: sono
 totali di carriera, non numeri della settimana. Se non arrivano — un client vecchio non li
