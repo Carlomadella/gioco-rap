@@ -6,6 +6,36 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:d33d43e -->
+## 15/09/26, 11:13 â€” task/app-post-e-take-senza-energia â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `d33d43e`
+
+### Cosa Ã¨ entrato
+
+- `ea060ac` â€” fix(studio): la take scelta in Cabina arriva davvero sul pezzo â€” **Carlomadella**
+- `ac64bc4` â€” fix(studio, telefono): la take pagata si mette da parte, e Sputa aggiorna l'hype â€” **Carlomadella**
+- `e89eea7` â€” feat(telefono, studio): «Sputa», la seconda app per postare, e «non si può spendere energia per tenere una take» â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/css/telefono.css`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Aggiunto:** `frontend/js/game/sputa.js`
+- **Modificato:** `frontend/js/game/state.js`
+- **Modificato:** `frontend/js/game/studio-elementi.js`
+- **Modificato:** `frontend/js/game/studio.js`
+- **Modificato:** `frontend/js/game/telefono.js`
+- **Modificato:** `frontend/js/game/ui.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+
+**File interessati in questa categoria:** 11
+
+---
+
 <!-- merge:975839c -->
 ## 15/09/26, 00:32 â€” task/studio-cinque-linguette â†’ main
 
