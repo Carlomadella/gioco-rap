@@ -130,7 +130,7 @@ dice mai chi è un bot — non è un dettaglio tecnico, è la regola che tiene i
 
 ### Il server _(fatto: 31/08/2026)_
 
-`backend/` — Node e basta, nessun build, e una dipendenza sola (`pg`, per PostgreSQL).
+`backend/` — Node e basta, nessun build, e tre dipendenze (`pg` per PostgreSQL; `jose` e `zod` installate e ancora da usare).
 Le dipendenze non sono più vietate per principio: la regola per sceglierle e il registro di
 quelle installate stanno in [`documentazione/dipendenze.md`](documentazione/dipendenze.md).
 Archivio in SQLite (`backend/database/dati/`, `node:sqlite`), con le migrazioni accanto.

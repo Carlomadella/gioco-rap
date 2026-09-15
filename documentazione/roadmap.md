@@ -60,8 +60,8 @@ niente di aperto — le cinque segnalazioni in elenco sono tutte chiuse.
   sta in `frontend/README.md`). 26 fogli di stile e 47 file di gioco, impacchettati da
   esbuild in due bundle con l'impronta nel nome. `media/` pesa 194 MB, dopo che il dataset
   degli avatar è uscito da git (07/09/2026).
-- **`backend/`** — Node, una dipendenza sola (`pg`). SQLite dentro a Node con 18 tabelle e
-  migrazioni numerate; classifica unica coi bot, account, salvataggi in cloud. Si prova con
+- **`backend/`** — Node, tre dipendenze (`pg`; `jose` e `zod` installate e ancora da
+  usare). SQLite dentro a Node, o PostgreSQL con `ADF_PG`, 20 tabelle e migrazioni numerate; classifica unica coi bot, account, salvataggi in cloud. Si prova con
   `cd backend && npm run prova`.
 
 ---

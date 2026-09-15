@@ -6,8 +6,10 @@ Dove guardare, in quest'ordine:
   questo file: tutte le colonne di tutte le tabelle, con che cosa vogliono dire. È in
   git, quindi lo vedono tutti e due.
 - **`schema.md`** — il documento di disegno, con il ragionamento dietro a ogni scelta,
-  il DDL per Postgres e come si cancella un account. **Non sta in git** (come
-  `backend.md`): è il foglio su cui si lavora, non il riferimento.
+  il DDL per Postgres e come si cancella un account. **Sta in git** dal 13/09/2026 (prima
+  era fuori, «come `backend.md`», e si era allontanato dalle migrazioni senza che nessuno
+  lo rileggesse): `scripts/controlla-backend.js` lo confronta con le tabelle vere, e ogni
+  migrazione nuova lo aggiorna nello stesso commit.
 - **`migrazioni/*.sql`** e **`migrazioni-pg/*.sql`** — lo schema come gira davvero, per
   SQLite e per PostgreSQL: stessi nomi di file, e `npm run prova` controlla che restino
   allineati.
@@ -638,7 +640,7 @@ mezza giornata di lavoro, il secondo adesso è una variabile.
 database/
   README.md            questo file
   copia.js             la copia di sicurezza (SQLite; con PostgreSQL si tira indietro)
-  schema.md            il foglio di disegno, commentato (fuori da git)
+  schema.md            il foglio di disegno, commentato (in git dal 13/09/2026)
   db.js                sceglie il motore e applica le migrazioni
   sqlite.js            il motore SQLite
   postgres.js          il motore PostgreSQL
