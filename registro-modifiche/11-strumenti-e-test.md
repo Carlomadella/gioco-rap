@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:b9bd794 -->
+## 15/09/26, 14:28 â€” task/telefono-sul-telefono â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `b9bd794`
+
+### Cosa Ã¨ entrato
+
+- `4d482f1` â€” fix(telefono): il giro di chiusura del telefono che si alza — nove voci su dieci â€” **Carlomadella**
+- `d97e8de` â€” feat(telefono): il telefono quando lo schermo è un telefono — sotto i 1180 si alza da un tasto â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:d33d43e -->
 ## 15/09/26, 11:13 â€” task/app-post-e-take-senza-energia â†’ main
 

@@ -6,6 +6,48 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:b9bd794 -->
+## 15/09/26, 14:28 â€” task/telefono-sul-telefono â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `b9bd794`
+
+### Cosa Ã¨ entrato
+
+- `4d482f1` â€” fix(telefono): il giro di chiusura del telefono che si alza — nove voci su dieci â€” **Carlomadella**
+- `d97e8de` â€” feat(telefono): il telefono quando lo schermo è un telefono — sotto i 1180 si alza da un tasto â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-15/lafamegram-390x844.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-15/lafamegram-dopo-posta-844x390.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-15/lafamegram-pezzi-360x800.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-15/plancia-390x844.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-15/sputa-844x390.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-15/sputa-dopo-390x844.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-15/telefono-home-390x844.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-15/telefono-home-844x390.jpg`
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/css/effects.css`
+- **Modificato:** `frontend/css/hub.css`
+- **Modificato:** `frontend/css/stretto.css`
+- **Aggiunto:** `frontend/css/telefono-stretto.css`
+- **Modificato:** `frontend/css/telefono.css`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/sputa.js`
+- **Modificato:** `frontend/js/game/studio.js`
+- **Aggiunto:** `frontend/js/game/telefono-stretto.js`
+- **Modificato:** `frontend/js/game/telefono.js`
+- **Modificato:** `frontend/js/game/trasferte.js`
+- **Modificato:** `frontend/js/menu-sistema.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+
+**File interessati in questa categoria:** 24
+
+---
+
 <!-- merge:d33d43e -->
 ## 15/09/26, 11:13 â€” task/app-post-e-take-senza-energia â†’ main
 

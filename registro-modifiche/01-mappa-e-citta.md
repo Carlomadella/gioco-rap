@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:b9bd794 -->
+## 15/09/26, 14:28 â€” task/telefono-sul-telefono â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `b9bd794`
+
+### Cosa Ã¨ entrato
+
+- `4d482f1` â€” fix(telefono): il giro di chiusura del telefono che si alza — nove voci su dieci â€” **Carlomadella**
+- `d97e8de` â€” feat(telefono): il telefono quando lo schermo è un telefono — sotto i 1180 si alza da un tasto â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/js/game/trasferte.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:b39a7d2 -->
 ## 15/09/26, 11:27 â€” task/documenti-backend-in-pari â†’ main
 
