@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:ae547dc -->
+## 15/09/26, 16:18 â€” task/sistema-il-foglio-dei-punti-nuovi â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `ae547dc`
+
+### Cosa Ã¨ entrato
+
+- `086a638` â€” fix(documenti): il giro di chiusura del foglio dei punti — l'hover era già chiuso, i due elenchi nello stesso ordine â€” **Carlomadella**
+- `167e22d` â€” docs(implementazioni): sistema il foglio dei punti nuovi — l'ordine copre tutti gli aperti â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:c7f1b9b -->
 ## 14/09/26, 07:53 â€” task/brainstorming-studio-sezioni â†’ main
 
