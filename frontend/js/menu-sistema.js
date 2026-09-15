@@ -52,6 +52,9 @@
 
     /* Nell'iPhone ESC torna prima alla home del telefono. */
     try{ if(typeof TEL_APP !== "undefined" && TEL_APP) return true; }catch(_){}
+    /* E sullo schermo stretto, col telefono alzato, ESC lo mette giù
+       (js/game/telefono-stretto.js). */
+    if(document.querySelector(".ptel.on")) return true;
     return false;
   }
 

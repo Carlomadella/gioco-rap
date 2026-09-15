@@ -40,10 +40,9 @@ quello che tocca il gioco sul telefono (è lì che esce), poi quello che pesa ne
 o blocca una partita, poi le cose piccole e chiare, in fondo quello che è una decisione
 prima che un lavoro. Ogni voce cita il **testo** del punto, non il numero.
 
-1. **Il Marketing sul telefono vero** — da problemi-riscontrati, «Sul telefono la promo
-   non si sceglie e l'anteprima non si raggiunge più»: sotto i 1180 px il telefono della
-   plancia non c'è, quindi «Che post fai?» e l'anteprima del pezzo non hanno una strada.
-   È una regressione su una cosa appena fatta, ed è sul telefono che il gioco esce.
+1. ~~**Il Marketing sul telefono vero**~~ **FATTO (15/09/2026)** — il telefono si alza a
+   schermo pieno anche sotto i 1180: «Il telefono quando lo schermo è un telefono» in
+   `02-interfaccia-e-telefono.md`.
 2. **Le transizioni video** — CARLO, «implementa le transizioni dentro al progetto, che
    partano cliccando sulla scheda collegata». I 12 video stanno già in
    `frontend/media/video/Transizioni di scena/` (28 MB) e **nessuna riga di codice li

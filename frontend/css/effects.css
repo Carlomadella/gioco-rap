@@ -59,8 +59,11 @@
    freestyle non si è vista per un pezzo, e nessuno se n'era accorto perché la
    piazza si apriva lo stesso, solo senza scena. Come `.rcard` e `.rgrid`:
    qui i nomi sono propri, non generici. */
-.scenapiena{position:fixed;inset:0;z-index:80;display:none;place-items:center;padding:20px;
-  background:rgba(6,6,9,.9);backdrop-filter:blur(10px)}
+/* «safe center» e overflow: se la card e' piu' alta dello schermo (un telefono di
+   traverso: 598 in 390) non si centra tagliando la testa e il «Continua», ma
+   parte dall'alto e scorre (prova sul telefono del 15/09/2026) */
+.scenapiena{position:fixed;inset:0;z-index:80;display:none;place-items:safe center;padding:20px;
+  overflow-y:auto;background:rgba(6,6,9,.9);backdrop-filter:blur(10px)}
 .scenapiena.on{display:grid}
 .scwrap{width:100%;max-width:560px;background:linear-gradient(160deg,#1B1B22,#121218);
   border-radius:26px;overflow:hidden;animation:rIn .45s cubic-bezier(.2,.9,.3,1)}

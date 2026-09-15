@@ -570,6 +570,8 @@ function adfNotificationBadgeRefresh(){
     if(count){ b.textContent=count>99?"99+":count; b.style.display="flex"; }
     else b.remove();
   }
+  /* e la pallina sul tasto della barra, sullo schermo stretto (telefono-stretto.js) */
+  try{ if(typeof telStrettoAggiorna==="function") telStrettoAggiorna(); }catch(_){}
 }
 function adfNotifTierLabel(t){ return t==="high"?"ALTO":t==="medium"?"MEDIO":"BASSO"; }
 function adfNotifCard(n){
@@ -639,14 +641,8 @@ function adfInstallNotificationApp(){
         badge:()=>adfNotifUnread()
       });
     }
-    if(typeof HUB_APP_VECCHIO!=="undefined" && Array.isArray(HUB_APP_VECCHIO) &&
-       !HUB_APP_VECCHIO.some(a=>a.id==="notifiche")){
-      HUB_APP_VECCHIO.splice(1,0,{
-        id:"notifiche",n:"Notifiche",ic:"campana",k:"#F59E0B",
-        sotto:()=>adfNotifUnread()?(adfNotifUnread()+" nuove"):(adfNotifStore().length+" archiviate"),
-        vai:()=>adfOpenNotifications()
-      });
-    }
+    /* la griglia compatta (HUB_APP_VECCHIO) non c'e' piu' dal 15/09/2026: il
+       telefono e' uno solo, e sotto i 1180 si alza (telefono-stretto.js) */
   }catch(err){
     console.warn("[ADF v1.2.13] impossibile registrare app Notifiche",err);
   }
@@ -1849,8 +1845,11 @@ function adfSocialOpenLatest(){
        ADF_SOCIAL_ALERT_POST.media.format==="story"){
       ADF_SOCIAL_STORY_OPEN=ADF_SOCIAL_ALERT_POST.sid;
     }
-    TEL_APP="lafamegram";
-    renderTelefono();
+    /* sullo schermo stretto il telefono va prima alzato: telVaiApp lo fa
+       (telefono-stretto.js); scrivere TEL_APP a mano apriva LaFamegram
+       dentro a un telefono che era giu', e sullo schermo non cambiava niente */
+    if(typeof telVaiApp==="function") telVaiApp("lafamegram");
+    else { TEL_APP="lafamegram"; renderTelefono(); }
   }catch(_){}
 }
 

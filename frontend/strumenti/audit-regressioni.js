@@ -262,38 +262,52 @@ const msgScreen = s0 >= 0 && s1 > s0 ? chatjs.slice(s0,s1) : "";
 test("schermata Chat non legge G.log", !!msgScreen && !msgScreen.includes("G.log"));
 test("da Messaggi si entra nella Chat vera", tel.includes('TEL_APP = "chat"; TEL_CHAT_APERTA = chatOpen.dataset.chat'));
 
-const mv0 = tel.indexOf("function renderTelefonoVecchio()");
-const mv1 = tel.indexOf("/* ================= RENDER — HOME NUOVA", mv0);
-const mobilePhone = mv0 >= 0 && mv1 > mv0 ? tel.slice(mv0,mv1) : "";
-test("telefono sotto 1180 usa messaggi diretti e non G.log",
-  mobilePhone.includes("telMessaggiDiretti().slice(0, 2)") &&
-  mobilePhone.includes("telMessaggiNonLetti()") &&
-  !mobilePhone.includes("G.log"));
-test("anteprima mobile apre il thread Chat vero",
-  mobilePhone.includes('data-chat="') &&
-  mobilePhone.includes("m.id") &&
-  tel.includes('TEL_APP = "chat"; TEL_CHAT_APERTA = chatOpen.dataset.chat'));
-test("telefono compatto può aprire la stessa schermata Chat del PC",
-  tel.includes('data-telapp="chat"') &&
+/* Il telefono e' uno solo (15/09/2026): la «colonna compatta» sotto i 1180
+   (renderTelefonoVecchio, HUB_APP_VECCHIO) non c'e' piu' — nessuno la vedeva,
+   hub.css nascondeva tutta la colonna — e lo stesso iPhone si alza a schermo
+   pieno da un tasto nella barra (js/game/telefono-stretto.js). I controlli che
+   stavano qui sulla colonna compatta (messaggi diretti, «Vedi tutte le chat»)
+   sono tolti insieme a lei; quello che promettevano vale ancora, nella Chat. */
+test("il telefono e' uno solo: la colonna compatta non c'e' piu'",
+  !tel.includes("function renderTelefonoVecchio") &&
+  !tel.includes("const HUB_APP_VECCHIO") &&
+  !leggi("css/telefono.css").includes(".pvecchio") &&
+  !leggi("js/game/sputa.js").includes("HUB_APP_VECCHIO.splice") &&
+  !ev.includes("HUB_APP_VECCHIO.") && !leggi("js/game/trasferte.js").includes("HUB_APP_VECCHIO.") &&
   tel.includes("(TEL_APP ? schermataWrap(TEL_APP) : '')") &&
-  /* «via il quaderno»: renderTelefono() non può più uscire con un return
-     secco — dopo aver ridisegnato deve riprendersi dal magazzino il
-     contenitore della schermata aperta (classifica, discografia, contratti).
-     Lo smistamento fra telefono compatto e da PC è lo stesso di prima. */
-  tel.includes('if(!telPC()) renderTelefonoVecchio();') &&
+  /* «via il quaderno»: renderTelefono() non può uscire con un return secco —
+     dopo aver ridisegnato deve riprendersi dal magazzino il contenitore della
+     schermata aperta (classifica, discografia, contratti). */
   tel.includes('riempiSlotTelefono();'));
-test("G.log mobile è esplicitamente Notifiche",
-  tel.includes('{id:"notifiche", n:"Notifiche"') &&
-  tel.includes('g.log.length - (g.seenLog || 0)') &&
-  /* punto 7: il bottone «Diario» non c'è più, il telefono chiama la funzione
-     invece di simulare un click su un elemento che non esiste. */
-  tel.includes('openDiary()'));
-test("Vedi tutte le chat non apre più il Diario",
-  mobilePhone.includes('data-telapp="chat"') &&
-  !mobilePhone.includes('data-diario="1">Vedi tutti i messaggi'));
-test("Escape chiude una app anche sotto 1180",
+const telStretto = fs.existsSync(path.join(ROOT, "js/game/telefono-stretto.js")) ? leggi("js/game/telefono-stretto.js") : "";
+const telStrettoCss = fs.existsSync(path.join(ROOT, "css/telefono-stretto.css")) ? leggi("css/telefono-stretto.css") : "";
+test("sullo schermo stretto il telefono si alza da un tasto nella barra, in un file suo",
+  index.includes("js/game/telefono-stretto.js") &&
+  index.indexOf("js/game/telefono-stretto.js") > index.indexOf("js/game/sputa.js") &&
+  index.includes("css/telefono-stretto.css") &&
+  telStretto.includes('btn.id = "hb-telbtn"') &&
+  telStretto.includes("menu.parentNode.insertBefore(btn, menu)") &&
+  telStrettoCss.includes("body.in-hub .ptel.on{") &&
+  /* sotto alla modale (60): un evento che esce mentre posti si deve vedere */
+  /z-index:5[0-9];/.test(telStrettoCss));
+test("aprire un'app alza il telefono, e il telefono si mette giu' in tre modi",
+  tel.includes('if(typeof telStrettoApri === "function") telStrettoApri();') &&
+  telStretto.includes('giu.className = "ptelgiu"') &&
+  telStretto.includes("if(ev.target !== tel) return;") &&
+  telStretto.includes('if(ev.key !== "Escape" || !telStrettoAperto()) return;') &&
+  /* ESC consumato: se no menu-sistema.js apre il menu di sistema sopra */
+  telStretto.includes("ev.stopImmediatePropagation();") &&
+  menuSystem.includes('if(document.querySelector(".ptel.on")) return true;'));
+test("«fallo sapere» dallo Studio passa sempre dal telefono, anche sotto i 1180",
+  studio.includes('if(typeof telVaiApp !== "function"){ studioAzione("promo"); return; }') &&
+  !studio.includes("telPC() && typeof telVaiApp"));
+test("Escape chiude una app del telefono",
   tel.includes('if(ev.key === "Escape" && TEL_APP) telHome();') &&
   !tel.includes('if(ev.key === "Escape" && TEL_APP && telPC())'));
+/* Notifiche e' l'app di eventi-v2, che si iscrive da sola in HUB_APP */
+test("G.log del telefono è esplicitamente Notifiche, l'app di eventi-v2",
+  ev.includes('id:"notifiche",n:"Notifiche"') &&
+  ev.includes("badge:()=>adfNotifUnread()"));
 
 console.log("\nAgenda — disponibilità reale");
 test("Agenda combina requisiti base e guardia runtime",
@@ -314,9 +328,9 @@ test("schermata Agenda usa i nuovi stati per eventi e mosse",
   tel.includes("const pronto = telAgendaAzione(a.id)") &&
   tel.includes("(st.ok ? e.d : st.perche)") &&
   tel.includes("(pronto.ok ? a.d : pronto.perche)"));
-test("contatore Agenda compatta conta solo mosse eseguibili ora",
-  tel.includes('sotto:() => telAgendaDisponibili() + " mosse ora"') &&
-  tel.includes("function telAgendaDisponibili()"));
+/* «contatore Agenda compatta conta solo mosse eseguibili ora»: era il sottotitolo
+   dell'icona nella griglia compatta, tolta il 15/09/2026 col telefono unico; il
+   conto sta ancora dentro all'app Agenda (telAgendaAzione), controllato sotto. */
 test("Agenda non usa più hubPronta da solo nel renderer",
   (() => {
     const a0=tel.indexOf("function schermataAgenda()");
@@ -1990,7 +2004,9 @@ test("punto 25: la scheda non si chiama più «Disciplina»",
   hub.includes('HUB_VISTA === "condizione" ? vistaCondizione()') &&
   hub.includes("La tua condizione") &&
   !hub.includes('["disciplina"') && !hub.includes('class="ptit">Disciplina') &&
-  tel.includes('HUB_VISTA = "condizione"'));
+  /* sul telefono Statistiche e' una schermata sua (schermataStatistiche): la
+     scorciatoia «HUB_VISTA = condizione» era della griglia compatta, tolta */
+  !tel.includes('HUB_VISTA = "disciplina"'));
 test("punto 28: girare a cercare beat non costa energia",
   /\{id:"beat", n:"Cerca un beat", e:0,/.test(actions));
 test("punto 28: ma costa tempo, che è il freno vero",

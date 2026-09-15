@@ -1,6 +1,7 @@
-/* Il telefono della plancia: il guscio (uguale sopra e sotto i 1180px) e lo
-   schermo vero — sopra i 1180px un iPhone con home, widget, app e dock;
-   sotto, la vecchia colonna che scorre (messaggi, griglia, notizie). */
+/* Il telefono della plancia: il guscio e lo schermo vero — un iPhone con home,
+   app e dock. Dai 1180px in su è la terza colonna; sotto, lo stesso telefono si
+   alza a schermo pieno da un tasto nella barra (css/telefono-stretto.css, che
+   è l'unico a saperne qualcosa). */
 
 /* ================= IL GUSCIO =================
    Le misure vengono dalla foto — `media/photo/pagina di gioco/schermata_telefono.png`,
@@ -133,55 +134,7 @@
     #000 url("../media/photo/telefono/sfondo.png") center center/cover no-repeat;
   overflow:hidden;display:flex;flex-direction:column}
 
-/* ================= VECCHIO (sotto i 1180px) ================= */
-.pvecchio{height:100%;padding:14px;overflow-y:auto;background:#080A0F}
-.ptt{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#C9CEDA}
-.pmsg{margin-top:10px;border:1px solid rgba(255,255,255,.07);border-radius:10px;
-  background:#0C0F16;overflow:hidden}
-.pmsghead{display:flex;align-items:center;gap:8px;padding:9px 11px;
-  border-bottom:1px solid rgba(255,255,255,.06)}
-.pmsghead .hicon{width:17px;height:17px;fill:#A855F7}
-.pmsghead b{flex:1;font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-  color:#C9CEDA}
-.pnuovi{padding:3px 9px;border-radius:999px;background:#7C3AED;color:#fff;
-  font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
-.pmr{display:flex;align-items:center;gap:9px;width:100%;padding:11px;text-align:left;
-  border-bottom:1px solid rgba(255,255,255,.05);transition:background .15s}
-.pmr:last-child{border-bottom:none}
-@media (hover:hover){.pmr:hover{background:rgba(255,255,255,.04)}}
-.pmav{width:32px;height:32px;flex:none;border-radius:50%;overflow:hidden;background:#1A1B24}
-.pmav svg{width:100%;height:100%;display:block}
-.pmtx{flex:1;min-width:0}
-.pmtx b{display:block;font-size:12px;font-weight:700;color:#E8EAF0}
-.pmtx i{display:block;font-style:normal;font-size:11px;color:#8A90A0;white-space:nowrap;
-  overflow:hidden;text-overflow:ellipsis}
-.pmrt{display:flex;flex-direction:column;align-items:flex-end;gap:5px;font-size:10.5px;color:#727A8C}
-.pmrt u{width:7px;height:7px;border-radius:50%;background:#A855F7}
-
-.plargo{display:block;width:100%;margin-top:12px;padding:13px;border-radius:9px;
-  border:1px solid rgba(255,255,255,.09);background:#0C0F16;
-  font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#C9CEDA;
-  transition:background .15s}
-@media (hover:hover){.plargo:hover{background:#141826}}
-
-.papp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
-.pap{display:flex;align-items:center;gap:10px;padding:17px 11px;border-radius:10px;
-  background:#0C0F16;border:1px solid rgba(255,255,255,.07);text-align:left;
-  transition:background .15s,transform .12s}
-@media (hover:hover){.pap:hover{background:#151A26;transform:translateY(-1px)}}
-.pap .hicon{width:26px;height:26px;flex:none;fill:var(--k)}
-.pap b{display:block;font-size:12px;font-weight:700;color:#E8EAF0;letter-spacing:.02em}
-.pap i{display:block;font-style:normal;font-size:10.5px;color:#8A90A0;margin-top:2px}
-
-.pnews{flex:1;min-height:0;margin-top:13px;border:1px solid rgba(255,255,255,.07);
-  border-radius:10px;background:#0C0F16;padding:13px}
-.pnews h4{margin:0 0 8px;font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;
-  text-transform:uppercase;color:#C9CEDA}
-.pnews p{display:flex;gap:8px;margin:0 0 11px;font-size:11.5px;color:#C9CEDA;line-height:1.35}
-.pnews p:last-child{margin-bottom:0}
-.pnews .hicon{width:14px;height:14px;flex:none;margin-top:1px;fill:var(--k,#FB923C)}
-
-/* ================= NUOVO — SCHERMATA HOME (dai 1180px in su) =================
+/* ================= SCHERMATA HOME =================
    Ricalcata sulla foto. Tutte le misure sono in percentuale della larghezza
    dello schermo, così il telefono resta quello anche se la colonna cambia:
    nella foto (schermo largo 620) la piastrella è 112, il passo fra una colonna
@@ -364,7 +317,7 @@
 /* I riquadri del telefono non devono allargare la colonna: la riga con
    «CLASSIFICA» e «MESSAGGI» aveva un testo che non va a capo, e senza questo
    si portava dietro tutta la colonna fuori dallo schermo. */
-.ptelframe,.ptelscr,.twidgets,.twid,.twrow > *,.papp > *{min-width:0}
+.ptelframe,.ptelscr,.twidgets,.twid,.twrow > *{min-width:0}
 .ptelscr{overflow-x:hidden}
 
 /* ================= I PANNELLI IN PRESTITO =================

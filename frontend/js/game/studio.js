@@ -400,12 +400,12 @@ function studioDaAnticipare(){
   return studioSceltoTra(studioPronti(), "spingi");
 }
 /* Il tasto «Fallo sapere» di Fuori: chiude lo Studio e apre LaFamegram sul
-   telefono della plancia. Sotto i 1180px il telefono non c'e' (hub.css lo
-   toglie, per scelta scritta li'): allora la promo parte da qui, sull'ultimo
-   pezzo uscito, che e' quello che il telefono spingerebbe senza una scelta. */
+   telefono. Sotto i 1180px la colonna del telefono non c'e', ma il telefono
+   si alza da solo a schermo pieno (telefono-stretto.js, dentro a telVaiApp):
+   fino al 15/09/2026 qui la promo partiva alla cieca sull'ultimo pezzo
+   uscito, senza «Che post fai?», e l'anteprima non aveva nessuna strada. */
 function studioFalloSapere(){
-  const telefono = typeof telPC === "function" && telPC() && typeof telVaiApp === "function";
-  if(!telefono){ studioAzione("promo"); return; }
+  if(typeof telVaiApp !== "function"){ studioAzione("promo"); return; }
   chiudiStudio();
   if(typeof renderHub === "function") renderHub();
   telVaiApp("lafamegram");

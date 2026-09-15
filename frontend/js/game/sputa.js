@@ -271,13 +271,11 @@ function schermataSputa(){
 
 /* ---- l'app sul telefono ---- */
 /* Sta nella griglia, dopo le otto della foto, con la piastrella nera e il
-   glifo dorato come Notifiche: la foto non la prevedeva, e si vede uguale. */
+   glifo dorato come Notifiche: la foto non la prevedeva, e si vede uguale.
+   Sullo schermo stretto è lo stesso telefono, alzato (telefono-stretto.js):
+   non c'è più una griglia a parte in cui iscriversi. */
 if(typeof HUB_APP !== "undefined" && !HUB_APP.some(a => a.id === "sputa"))
   HUB_APP.push({id:"sputa", n:"Sputa", ic:"sputa", k:"#F97316"});
-if(typeof HUB_APP_VECCHIO !== "undefined" && !HUB_APP_VECCHIO.some(a => a.id === "sputa"))
-  HUB_APP_VECCHIO.splice(3, 0, {id:"sputa", n:"Sputa", ic:"sputa", k:"#F97316",
-    sotto:g => { const n = (g.sputaMiei || []).length; return n + (n === 1 ? " barra tua" : " barre tue"); },
-    vai:() => telVaiApp("sputa")});
 
 /* i tocchi: il fuoco, «Rispondi», il tasto e il contatore dei caratteri */
 if($("hb-tel")){

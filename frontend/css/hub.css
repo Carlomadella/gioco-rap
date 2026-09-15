@@ -1281,7 +1281,9 @@ body.in-hub .topnav {
   /* telefono.css dichiara «.ptel{display:flex}» senza media query e viene
      caricato dopo: a parità di specificità vince l'ultimo, quindi qui serve
      un selettore più specifico, non solo l'ordine, o il telefono non si
-     nasconde mai e la città sotto resta a larghezza zero. */
+     nasconde mai e la città sotto resta a larghezza zero.
+     La colonna sparisce, il telefono no: telefono-stretto.css lo rialza a
+     schermo pieno con «.ptel.on», da un tasto nella barra. */
   body.in-hub .ptel {
     display: none;
   }
