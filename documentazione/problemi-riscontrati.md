@@ -22,14 +22,11 @@ che mette insieme i due fogli.
    l'anteprima è spenta viene tagliato**.
 7. **`jose` e `zod` stanno fra le `dependencies`** (13/09), aperta per decisione: `jose` va
    usata in `backend/accessi.js`, non tolta.
-8. Solo documenti, dal giro `backend-allineato` del 15/09 in fondo: `README-API.md` non
-   conosce tre cose del 03/09 e ha la tabella delle variabili a metà; `backend/database/README.md`
-   dice ancora che `schema.md` è fuori da git; il README di radice dice «una dipendenza sola».
-9. **L'uscita di venerdì non costa niente, quella a mano sì** (08/09): risolto in parte per
+8. **L'uscita di venerdì non costa niente, quella a mano sì** (08/09): risolto in parte per
    scelta — il vantaggio di venerdì è quello di aspettare, non uno sconto. Sparisce del tutto
    con «togli il parametro lucidità» (CARLO).
-10. Aperti di proposito (14/09, prova sul telefono): la copertina «grande» e quella «di
-    adesso» quasi uguali; nel Marketing la risposta compare in cima.
+9. Aperti di proposito (14/09, prova sul telefono): la copertina «grande» e quella «di
+   adesso» quasi uguali; nel Marketing la risposta compare in cima.
 
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
 
@@ -2354,6 +2351,11 @@ e `:131-133`, `backend/database/README.md:19` e `:514-632` («I due motori»),
   di §11 con la regola (uno dei tre valori, se no `anni-di-fame`), una riga `difficolta`
   alla tabella di §15, e `403 non-e-tuo` agli errori di §22.
 
+
+**RISOLTO (15/09/2026)** — branch `task/documenti-backend-in-pari`: `difficolta` nel corpo e
+nelle regole di §11 (i tre valori, il ripiego su `anni-di-fame`), una riga `difficolta` nella
+tabella di §15 con la frase «la graduatoria resta una sola per tutti», e `403 non-e-tuo` fra
+gli errori di §22 con il perché.
 ### La tabella «Variabili d'ambiente» di `README-API.md` è a metà, e ne cita una che non esiste
 
 - **dove** — `backend/README-API.md:1079-1098`. Il confronto è con `backend/README.md:125-160`
@@ -2372,6 +2374,12 @@ e `:131-133`, `backend/database/README.md:19` e `:514-632` («I due motori»),
   si toglie e si rimanda a quella di `backend/README.md`, che è l'unica difesa da un
   controllo; e a riga 969 si dice che `ADF_CATALOG_URL` è del gioco.
 
+
+**RISOLTO (15/09/2026)** — presa la strada «meglio»: la tabella è **tolta**, al suo posto il
+rimando a «Le manopole» di `backend/README.md`, l'unica difesa da `controlla-backend.js`, con
+scritto perché non ce ne sono due; restano nominate `ADF_PG` e `ADF_ADMIN`, che servono a
+leggere le rotte. Alla seconda `fetch()` c'è scritto che `ADF_CATALOG_URL` è una costante del
+gioco, non una manopola del server.
 ### `backend/database/README.md` dice ancora che `schema.md` «non sta in git»
 
 - **dove** — `backend/database/README.md:8-10` («**Non sta in git** (come `backend.md`): è
@@ -2386,6 +2394,10 @@ e `:131-133`, `backend/database/README.md:19` e `:514-632` («I due motori»),
 - **quanto pesa** — da sistemare con calma: due righe di README e una del prompt
   dell'agente.
 
+
+**RISOLTO (15/09/2026)** — le due righe del README dei dati e quella del prompt di
+`backend-allineato` dicono «in git dal 13/09/2026», e il README spiega anche perché ci è
+entrato (si era allontanato dalle migrazioni senza che nessuno lo rileggesse).
 ### Il README di radice dice «una dipendenza sola (`pg`)», il backend ne ha tre
 
 - **dove** — `README.md:9` («Node + SQLite, una dipendenza sola (`pg`)»). Il vero è in
@@ -2401,6 +2413,10 @@ e `:131-133`, `backend/database/README.md:19` e `:514-632` («I due motori»),
   `dipendenze.md:201` (usare `jose` in `accessi.js`, `zod` nelle rotte), che è un lavoro
   vero e non di documento.
 
+
+**RISOLTO (15/09/2026)** — la riga dice «tre dipendenze: `pg`, `jose`, `zod` — le ultime due
+installate e ancora da usare», col rimando a `dipendenze.md`. Usarle resta il lavoro vero, che
+non è di documento.
 **Nota, non è un errore**: due commenti di testa parlano di un mondo prima di
 PostgreSQL. `backend/server.js:12-13` dice «Sotto c'è SQLite (`database/`), senza niente da
 installare» (mentre `server.js:32-33` elenca `ADF_PG`), e `backend/database/archivio.js:3-7`

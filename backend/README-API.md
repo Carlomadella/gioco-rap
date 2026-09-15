@@ -562,6 +562,7 @@ ospite e restituisce anche un token.
   "genere": "trap",
   "storia": "Comincia da zero.",
   "seed": 12345,
+  "difficolta": "anni-di-fame",
   "dispositivo": { "piattaforma": "windows", "nome": "Questo PC" }
 }
 ```
@@ -574,6 +575,10 @@ Regole:
   viene scelto casualmente;
 - `storia`: fino a 120 caratteri; se assente viene generata;
 - `seed`: intero tra 0 e 2.000.000.000;
+- `difficolta`: `strada-aperta`, `anni-di-fame` o `niente-sconti`; qualunque altro
+  valore, o nessuno, vale `anni-di-fame`. Si sceglie una volta, alla nascita
+  dell'artista, e da lì resta scritta accanto a lui (la legge `GET /api/artista/:id` e la
+  ripete `POST /api/punteggio`);
 - massimo tre artisti attivi per account.
 
 Risposta `201`: modello pubblico dell'artista più `chiave` e, se è stato creato un
@@ -666,9 +671,11 @@ Errori: `403 non-e-tuo`, `403 account-sospeso`, `429 troppo-in-fretta`,
 | `io` | UUID | — | marca la propria riga e restituisce `io` |
 | `citta` | testo fino a 40 caratteri | — | confronto senza distinzione maiuscole/minuscole |
 | `genere` | genere ammesso | — | un valore sconosciuto disattiva il filtro |
+| `difficolta` | `strada-aperta`, `anni-di-fame`, `niente-sconti` | — | chi corre con le stesse regole tue; un valore sconosciuto disattiva il filtro |
 
 Risposta: `{ settimana, totale, filtro, prossimoGiro, righe, io }`. Con un filtro la
-posizione viene ricalcolata dentro la città o il genere selezionato.
+posizione viene ricalcolata dentro la città, il genere o la difficoltà selezionata. La
+graduatoria resta **una sola per tutti**: il filtro è una vista, non tre classifiche.
 
 Esempi:
 
@@ -745,7 +752,9 @@ Se il cloud contiene una partita più avanti:
 ```
 
 La risposta è `409`. Soltanto dopo una conferma dell'utente va ripetuta con
-`"forza": true`. Altri errori: `400 stato-mancante`, `413 carriera-troppo-grande`.
+`"forza": true`. Altri errori: `400 stato-mancante`, `413 carriera-troppo-grande`,
+`403 non-e-tuo` se nel corpo c'è un `artistaId` che non è un artista di questo account
+(la carriera in cloud non si può legare all'artista di un altro).
 
 ### 23. `GET /api/traguardi`
 
@@ -963,7 +972,9 @@ ancora da realizzare.
 
 ### Catalogo eventi
 
-Esiste una seconda `fetch()` che non usa l'API del backend:
+Esiste una seconda `fetch()` che non usa l'API del backend (`ADF_CATALOG_URL` è una
+costante del gioco, in `frontend/js/game/eventi-v2.js` — non una variabile d'ambiente del
+server, nonostante il prefisso):
 
 ```js
 fetch(ADF_CATALOG_URL, { cache: "no-store" })
@@ -1078,24 +1089,17 @@ settimana e chiude la stagione.
 
 ## Variabili d'ambiente
 
-| Variabile | Default | Scopo |
-| --- | --- | --- |
-| `ADF_PORTA` | `8787` | porta HTTP |
-| `ADF_DATI` | `backend/database/dati/classifica.db` | file SQLite |
-| `ADF_PG` | assente | URL PostgreSQL; se presente sostituisce SQLite |
-| `ADF_BOT` | `140` | bot attivi |
-| `ADF_SETTIMANA_H` | `24` | ore reali per settimana di gioco |
-| `ADF_ORIGINI` | `*` | origini CORS ammesse |
-| `ADF_ADMIN` | vuota | chiave delle route di servizio |
-| `ADF_SALE` | `anni-di-fame` | sale per gli hash degli IP |
-| `ADF_INVIO_MS` | `10000` | intervallo minimo tra due punteggi dello stesso artista |
-| `ADF_PROXY` | assente | `1` soltanto dietro un reverse proxy controllato |
-| `ADF_STEAM_CHIAVE` | vuota | publisher key Steamworks |
-| `ADF_STEAM_APPID` | vuota | app id Steam |
-| `ADF_APPLE_AUD` | vuota | bundle id / audience Apple |
-| `ADF_GOOGLE_CLIENT` | vuota | client id Google |
+Stanno **in un posto solo**: la tabella «Le manopole» di [`README.md`](README.md#le-manopole),
+tutte e ventiquattro. È l'unica difesa da un controllo — `scripts/controlla-backend.js`
+confronta le `ADF_` che il codice legge con quelle che quella tabella elenca, e si ferma se
+ne manca una. Qui c'era una seconda copia, ed era rimasta a quattordici righe su
+ventiquattro senza che nessuno se ne accorgesse: due tabelle della stessa cosa divergono
+sempre, per questo ne è rimasta una.
 
-Le variabili possono stare in `backend/.env.local`, che non deve essere committato.
+Le due che contano per capire le rotte: `ADF_PG` (un URL PostgreSQL: se c'è, il server
+gira su PostgreSQL con `database/migrazioni-pg/`; se no su SQLite, file `ADF_DATI`) e
+`ADF_ADMIN` (la chiave delle route di servizio). Possono stare in `backend/.env.local`,
+che non si committa.
 
 ## Note e limiti attuali
 

@@ -8,7 +8,7 @@ tools: Read, Grep, Glob, Bash, Edit
 
 Il server ha tre posti che raccontano la stessa cosa e si aggiornano a mano, uno alla
 volta: il **codice** (`backend/server.js`), il **documento delle rotte**
-(`backend/README-API.md`) e lo **schema** (`backend/database/schema.md`, fuori da git),
+(`backend/README-API.md`) e lo **schema** (`backend/database/schema.md`, in git dal 13/09/2026),
 piu' le **due serie di migrazioni** — `database/migrazioni/` per SQLite e
 `database/migrazioni-pg/` per PostgreSQL. Quando divergono nessuno se ne accorge: te ne
 accorgi tutto insieme il giorno del passaggio a PostgreSQL, che e' il giorno dell'uscita.
