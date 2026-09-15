@@ -1733,3 +1733,46 @@ blocco nuovo dell'audit, «Lo Studio a cinque linguette (14/09/2026)», sette co
 tengono ferma la riorganizzazione. Provato nel gioco vero con Playwright a 1440 e a 390px:
 anteprima dal telefono, feat dalla classifica che dice sì, uscita → Cabina → «fallo sapere»
 → LaFamegram; niente errori in console, niente che sborda in larghezza.
+
+
+---
+
+## Sputa: la seconda app del telefono per postare
+
+~~«crea un'altra app del telefono per postare»~~ **FATTO (15/09/2026)**
+
+Accanto a LaFamegram — il finto Instagram, con foto, promo dei pezzi e storie — adesso c'è
+**Sputa**, il finto X: solo testo, **140 caratteri**, niente foto, e si chiama come si
+chiama la cosa che ci fai — sputare barre. Sta nella griglia del telefono dopo le otto app
+della foto, con la piastrella nera e il glifo dorato come Notifiche (la foto non la
+prevedeva), e si apre come le altre.
+
+Cosa c'è dentro:
+
+- **il foglio in cima**, col contatore dei caratteri e il tasto «Sputa». La barra esce
+  subito in testa al feed, con il suo fuoco (cresce con hype e fan). Le tue restano sul
+  dispositivo (`G.sputaMiei`, le ultime quaranta), come i post di LaFamegram scritti a
+  mano: un `POST` sul server non c'è ancora, ed è lo stesso buco del punto *«LaFamegram con
+  post veri, caricati dai giocatori»*;
+- **le barre dei rivali** (`G.rivals`): ognuno ne sputa una o due a settimana, tirate a
+  sorte ma **col dado fermo** — il seme è il rivale più la settimana — così riaprendo l'app
+  trovi le stesse, e quelle di un giorno che deve ancora venire non ci sono ancora. Parlano
+  del pezzo appena uscito se ce l'hanno (`hot`), dell'etichetta se l'hanno firmata
+  (`deal`), della loro città, e **di te** quando il tuo nome gira abbastanza (hype 40+,
+  top 20, o cinquemila fan): quelle hanno un filo arancione a sinistra. Si vedono questa
+  settimana e la scorsa, in ordine di tempo, con «oggi», «ieri», «3 giorni fa»;
+- **il fuoco** sotto alle barre degli altri è un tuo gesto e resta segnato
+  (`G.sputaFuoco`), ma non muove numeri; **Rispondi** ti mette «@Nome» nel foglio e la
+  risposta è una barra tua come le altre.
+
+Cosa dà: **la prima barra del giorno fa girare il nome, +1 hype** (fino al tetto della
+fase, e mai sotto a dove stavi). Le altre del giorno non danno niente — «la gente scorre
+oltre», lo dice il riquadro — quindi non c'è un giro da sfruttare: è la stessa idea della
+promo di LaFamegram, tenuta più semplice. Non costa energia: è il telefono, non lo studio.
+
+Sta tutta in un file suo, `frontend/js/game/sputa.js` (caricato dopo `telefono.js`, si
+registra da sola in `HUB_APP`), con lo stile in coda a `css/telefono.css` — come chiede il
+punto sui file già presenti. `telefono.js` ha solo la riga che la apre in `schermataApp`.
+Provato nel gioco vero con Playwright a 1440: feed con diciannove barre, risposta a un
+rivale, prima barra +1 hype e la seconda no, fuoco che si accende e resta, stesse barre
+riaprendo l'app, LaFamegram che funziona come prima, niente errori in console.

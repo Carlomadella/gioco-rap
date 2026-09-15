@@ -234,12 +234,25 @@ function studioBeatCompra(){
    un tiro di dado che non vedevi.
 
    Adesso lo vedi, e resta lo stesso dado. `registra` tirava `rnd(-5,6)` e se
-   lo teneva: la **prima take è quel tiro lì**, identico, gratis. Le altre le
-   chiedi tu e le paghi in energia — che è quello che dice il riferimento,
+   lo teneva: la **prima take è quel tiro lì**, identico. Le altre le chiedi
+   tu e le paghi in energia — che è quello che dice il riferimento,
    «UN'ALTRA TAKE · 12 energia». Chi non ci pensa registra come ha sempre
-   registrato; chi ha energia da spendere può insistere. */
+   registrato; chi ha energia da spendere può insistere.
+
+   **L'energia si spende per fare la take, mai per tenerla** (15/09/2026).
+   Prima la prima take usciva da sola appena entravi in cabina e i 45 di
+   energia li chiedeva «Tieni questa e chiudi», cioe' `registra`: pagavi
+   dodici a take per insistere, e poi scoprivi che per *tenere* quella buona
+   non ti restava abbastanza. Adesso la cabina si apre vuota, la prima take
+   la chiedi tu e costa quello che costava registrare — 45 — le altre 12, e
+   chiudere e' gratis: il conto lo fai prima di ogni take, non alla fine. */
+const STUDIO_TAKE_PRIMA = 45;
 const STUDIO_TAKE_ENERGIA = 12;
 const STUDIO_TAKE_MAX = 6;
+/* quanto costa la prossima take: la prima il prezzo della sessione, poi 12 */
+function studioTakeCosto(t){
+  return t && t.l.length ? STUDIO_TAKE_ENERGIA : STUDIO_TAKE_PRIMA;
+}
 
 /* ---- CHE COSA INCIDI ----
    Nel riferimento la colonna di destra non è un promemoria: le due strofe e
@@ -302,8 +315,20 @@ function studioTake(){
   const k = studioTakeChiave();
   if(!k) return null;
   const d = studioDati();
-  if(!d.take || d.take.k !== k)
-    d.take = {k, l:[Math.round(rnd(-5, 6))], s:0};
+  if(!d.take || d.take.k !== k){
+    /* Cambi strofa o beat: la take che avevi non e' di questo pezzo, ma
+       l'hai pagata — si mette da parte con la sua targhetta, e se torni su
+       quella coppia la ritrovi. Prima si buttava e basta, e da quando la
+       prima take costa la sessione (45) buttarla voleva dire ripagarla
+       (15/09/2026, problemi-riscontrati). Le take da parte finiscono
+       quando chiudi un pezzo: la sessione e' quella. */
+    if(!d.takeAltre) d.takeAltre = {};
+    if(d.take && d.take.l && d.take.l.length) d.takeAltre[d.take.k] = d.take;
+    d.take = d.takeAltre[k] || null;
+    delete d.takeAltre[k];
+    /* si apre vuota: la prima take la chiedi tu, con `studioTakeAncora` */
+    if(!d.take) d.take = {k, l:[], s:0};
+  }
   return d.take;
 }
 
@@ -328,6 +353,11 @@ function studioTakeMigliore(t){
 function studioTakeElenco(){
   const t = studioTake();
   if(!t) return "";
+  if(!t.l.length)
+    return '<div class="sttake"><p class="stnota">Nessuna take ancora: la prima costa ' +
+      STUDIO_TAKE_PRIMA + ' di energia, è la sessione. Poi le altre ' +
+      STUDIO_TAKE_ENERGIA + ' l\'una, e tenere quella buona non costa niente. ' +
+      'Le take sono di questa strofa su questo beat: se cambi, le ritrovi tornando qui.</p></div>';
   const buona = studioTakeMigliore(t);
   return '<div class="sttake">' + t.l.map((d, i) => {
     const q = studioTakeQ(d);
@@ -360,18 +390,28 @@ function studioTakeAncora(){
       "bad", "!", ["#3A3F49", "#22262E"]);
     return;
   }
-  if(G.energy < STUDIO_TAKE_ENERGIA){
-    toast("Ti serve energia: " + STUDIO_TAKE_ENERGIA + ", ne hai " + Math.round(G.energy),
+  const costo = studioTakeCosto(t);
+  if(G.energy < costo){
+    toast("Ti serve energia: " + costo + ", ne hai " + Math.round(G.energy),
       "bad", "!", ["#3A3F49", "#22262E"]);
     return;
   }
-  G.energy -= STUDIO_TAKE_ENERGIA;
+  G.energy -= costo;
+  /* la prima take e' lo stesso tiro di dado che `registra` faceva da sola */
   t.l.push(Math.round(rnd(-5, 6)));
   /* la take nuova si sceglie da sola solo se è meglio di quella che avevi:
      se no ti cancellava sotto al dito la take buona per una peggiore */
   if(t.l[t.l.length - 1] > t.l[t.s]) t.s = t.l.length - 1;
   SFX.rec ? SFX.rec() : SFX.tap();
   save(); renderStudio(); renderGioco();
+}
+
+/* C'e' almeno una take da tenere? Lo chiede `registra` (`need`): senza take
+   non c'e' niente da chiudere, e siccome la sessione si paga sulla take, un
+   `registra` senza take sarebbe un pezzo gratis. */
+function studioTakeManca(){
+  const t = studioTake();
+  return !t || !t.l.length;
 }
 
 /* Quella che si tiene, e le altre si buttano. La chiama `registra` al posto
@@ -389,6 +429,9 @@ function studioTakePresa(){
   if(!d || !d.l || !d.l.length) return rnd(-5, 6);
   const mia = d.k === studioTakeChiave();
   delete G.studio.take;
+  /* il pezzo e' chiuso, la sessione anche: le take messe da parte sugli
+     altri accoppiamenti non valgono piu' */
+  delete G.studio.takeAltre;
   if(!mia) return rnd(-5, 6);
   return d.l[d.s] != null ? d.l[d.s] : d.l[0];
 }

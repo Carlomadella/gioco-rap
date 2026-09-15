@@ -169,8 +169,11 @@ function avviaAzioneDiretta(id){
   showEvent({
     k:"Confermi?",
     t:a.n,
-    d:"Ti costa <b>" + en2 + (en2 === 1 ? " energia" : " energie") + "</b>" +
-      (c ? " e <b>" + fmt(c) + " €</b>" : "") + ". " + a.d,
+    /* una mossa che di energia non ne chiede (registra: si paga in cabina,
+       take per take) non deve dire «ti costa 0 energie» */
+    d:"Ti costa " +
+      (en2 ? "<b>" + en2 + (en2 === 1 ? " energia" : " energie") + "</b>" + (c ? " e " : "") : "") +
+      (c ? "<b>" + fmt(c) + " €</b>" : "") + ". " + a.d,
     annulla(){},
     opts:[
       {n:"Vai", d:"Fai la mossa adesso", run(){ esegui(); return null; }},
@@ -276,6 +279,9 @@ function renderGioco(){
     const soloEnergia = !ok && !miss && !noMoney;
     const sc = SC[a.id] || ["#3A3F49","#22262E",""];
     const g = ART[a.id] || ["#3A3F49","#22262E","·"];
+    /* quello che si scrive sulla tile: di solito il costo vero, ma una mossa
+       puo' farsi pagare altrove (registra: la take in Cabina) */
+    const scritto = a.costoScritto ? a.costoScritto() : en2;
     const b = document.createElement("button");
     b.className = "tile" + (soloEnergia ? " spenta" : "");
     b.disabled = !ok && !soloEnergia;
@@ -289,7 +295,7 @@ function renderGioco(){
         '<svg viewBox="0 0 200 128" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">' + sc[2] + '</svg>' +
         /* Punto 28: una mossa può non costare energia. «0 energia» è un
            numero che non vuol dire niente: si scrive gratis. */
-        '<span class="cost">' + (en2 ? '<i>' + en2 + '</i>energia' : 'gratis') + '</span>' +
+        '<span class="cost">' + (scritto ? '<i>' + scritto + '</i>energia' : 'gratis') + '</span>' +
         (c ? '<span class="price">' + c + ' \u20AC</span>' : '') +
         (ok ? '' : '<span class="lock">\uD83D\uDD12</span>') +
       '</span>' +

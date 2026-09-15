@@ -324,10 +324,21 @@ const ACTIONS = [
        ". Si comprano allo Shop.";
    }},
 
-  {id:"registra", n:"Registra il pezzo", e:45, luc:3,
+  /* Non costa energia (era 45): l'energia si paga in cabina, take per take —
+     la prima vale la sessione intera, `STUDIO_TAKE_PRIMA` in
+     studio-elementi.js — e **tenere** la take buona e' gratis. Prima chi
+     insisteva con le take arrivava a «Tieni questa e chiudi» senza i 45 per
+     premerlo (15/09/2026). Il tempo in sala e la sala stessa restano qui. */
+  {id:"registra", n:"Registra il pezzo", e:0, luc:3,
+   /* la mossa in se' costa zero perche' i 45 li chiede la prima take in
+      Cabina: la plancia e l'Agenda pero' devono dirli, non scrivere
+      «gratis» (15/09/2026). Solo da mostrare — non si scala da qui. */
+   costoScritto:() => (typeof studioTakeManca === "function" && studioTakeManca())
+     ? (typeof STUDIO_TAKE_PRIMA !== "undefined" ? STUDIO_TAKE_PRIMA : 45) : 0,
    money:() => G.gear.mic ? 0 : 50,
    d:"Strofa più beat, in sala. Esce una traccia grezza.",
-   need:() => !G.bars.length ? "1 strofa" : !G.beats.length ? "1 beat" : null,
+   need:() => !G.bars.length ? "1 strofa" : !G.beats.length ? "1 beat"
+     : (typeof studioTakeManca === "function" && studioTakeManca()) ? "una take, in cabina" : null,
    give:() => {
      const b = daIncidere(), bt = beatDaIncidere();
      return (b && bt ? "1 traccia · qualità ~" + Math.round(songQ(b,bt) + studioBonus() + featBonus()) : "1 traccia grezza") +
@@ -336,16 +347,20 @@ const ACTIONS = [
    run(){
      const b = daIncidere(), bt = beatDaIncidere();
      chiediTitolo(title(), (nome, seed, img) => {
+       /* punto 4: il tiro di dado della registrazione non e' piu' invisibile.
+          E' la take che hai scelto in cabina (`registrazione_pezzo`), e la
+          prima take e' esattamente questo `rnd(-5,6)` — chi non chiede altre
+          take registra con lo stesso dado di sempre.
+          Si legge **prima** di togliere strofa e beat dalla lista: la take
+          porta la targhetta di quella coppia, e con la strofa gia' sfilata la
+          targhetta non combaciava piu' — la take scelta non arrivava mai sul
+          pezzo, dall'08/09 (controllo mirato del 15/09). */
+       const presa = typeof studioTakePresa === "function" ? studioTakePresa() : rnd(-5,6);
        G.bars.splice(G.bars.indexOf(b),1);
        G.beats.splice(G.beats.indexOf(bt),1);
        if(!G.gear.mic) G.money -= 50;
        /* punto 12: chi sta dietro al vetro conta anche in registrazione — un
           fonico che ti conosce sa dove metterti la voce prima che glielo chiedi */
-       /* punto 4: il tiro di dado della registrazione non e' piu' invisibile.
-          E' la take che hai scelto in cabina (`registrazione_pezzo`), e la
-          prima take e' esattamente questo `rnd(-5,6)` — chi non chiede altre
-          take registra con lo stesso dado di sempre. */
-       const presa = typeof studioTakePresa === "function" ? studioTakePresa() : rnd(-5,6);
        /* il feat si legge **prima** di staccarlo (studioConsumaFeat qui
           sotto lo libera): letto dopo vale zero, e in Fuori la riga della
           qualita' non lo nominava mai — trovato da segnala-problemi il 15/09 */

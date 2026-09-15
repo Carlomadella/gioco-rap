@@ -22,8 +22,108 @@ un'altra cosa.
 
 | quando | quante |
 | --- | --- |
+| 15/09/2026 | 6 |
 | 07/09/2026 | 6 |
 | 06/09/2026 | 10 |
+
+---
+
+## 15/09/2026
+
+### Le card sulla mappa, tutte come lo Studio, e via il pallino giallo
+
+_Da `implementazioni.md`, ALE 8._
+
+8.  Le card sulla mappa come studio, fabbrica, pizzeria, la sala ecc hanno una card cliccabile troppo grande, LE VOGLIO TUTTE COME STUDIO. Inoltre noto che l'ultima cosa dove entri resta una sorte di pallino gialla come se t'indicasse l'ulitma cosa schiacciata. Non la voglio.
+
+    **FATTO (04/09/2026)** — era già chiuso quando il punto è stato riscritto qui: le dieci zone
+    cliccabili portate tutte alla misura dello Studio, e il pallino era il focus da tastiera,
+    tolto con un `blur()` dopo il click. Il racconto sta in
+    [`01-mappa-e-citta.md`](01-mappa-e-citta.md), «2 · Le card sulla mappa, tutte come lo Studio».
+
+### Via i tastini che muovono la mappa
+
+_Da `implementazioni.md`, ALE 9._
+
+9.  Ci sono dei tastini sul in centro sotto della mappa che fan muovere la mappa. Levali. La mappa non voglio si veda muoveree. dev'essere ferma
+
+    **FATTO (04/09/2026)** — erano le due frecce «scorri per esplorare» in fondo alla mappa: tolte
+    con tutto il codice del giro guidato. Sta in [`01-mappa-e-citta.md`](01-mappa-e-citta.md),
+    «3 · Via i tastini che muovono la mappa».
+
+### Lo Shop diventa uno shop, non un menù
+
+_Da `implementazioni.md`, ALE 10._
+
+10. Lo shop dev'essere un vero e proprio shop, come gli shop di fortnite o nba2k.. LEVA STI CAZZO DI INTERFACCIA MENU! RENDILO UNO SHOP DA VIDEOGIOCO NEL 2026
+
+    **FATTO** — il racconto sta in [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md),
+    «4 · Lo Shop diventa uno shop, non un menù». Resta una coda segnata in
+    `problemi-riscontrati.md` (10/09): le linguette promesse sono tre, ce ne sono due — i Vestiti
+    sono ancora la griglia vecchia.
+
+### Via il costo in energia per farsi fare un beat
+
+_Da `implementazioni.md`, ALE 14._
+
+14. Togli che nello studio, per comprare un beat, consumi 20 di energia. Non è realistico, toglilo.
+
+**FATTO (10/09/2026)** — tolto il costo di 20 energia per farsi fare un beat su misura da
+un beatmaker (`STUDIO_BEAT_ENERGIA` in `js/game/studio.js`, sezione «Fattelo fare»): resta
+il costo in soldi, il tempo (2 ore) e il limite di un beat a settimana per beatmaker. Il
+testo dell'interfaccia che mostrava «20 energia» è sparito insieme al conto. Non toccato
+«Cerca un beat» allo Shop, che non costava energia già prima.
+
+### Scrivere barre non dà nessun malus
+
+_Da `implementazioni.md`, ALE 15._
+
+15. Scrivere barre in studio non deve dare nessun malus, né di stanchezza né fisico,
+    NESSUNO. Lasciamo solo che costi 15 di energia, per ora. Non toccare nient'altro di quello
+    che c'era già.
+
+**FATTO (10/09/2026)** — tolto il calo di benessere (−1) che scattava chiudendo una strofa
+scritta al foglio (`chiudiStrofa` in `js/game/writer.js`): scrivere barre non stanca più.
+Il costo in energia dell'azione «Scrivi barre» (`js/game/actions.js`) è sceso da 28 a 15.
+Non toccato altro: il bonus di lucidità che l'azione già dava, il tempo che richiede, e come
+benessere e lucidità pesano sulla qualità del testo restano com'erano.
+
+### Il feat si sceglie in Cabina, e si registra anche da soli
+
+_Da `implementazioni.md`, CARLO · LUOGO: STUDIO 6._
+
+6. non posso scegliere i feat, e inoltre non posso fare canzoni senza feat
+
+   **RISPOSTA (14/09/2026) — serve una scelta, e non l'ho presa da solo.** Ho provato in
+   partita e nel codice, e come guasto non si riproduce: nella sezione Feat i rapper che
+   conosci sono bottoni (`data-feat`), il clic li mette «in sessione», «Lascia perdere» li
+   toglie, e senza nessuno in sessione si registra lo stesso — il centro dice «Va benissimo
+   così: il feat è una scelta, non un passaggio», e il pezzo esce senza feat. Quello che
+   probabilmente hai visto è la lista **vuota**: si può chiamare solo un rapper che hai già
+   conosciuto alla Sala (`studioGente("rapper")` legge `G.gente`), e a inizio partita non
+   c'è nessuno — la sezione lo dice, «Non conosci ancora nessun altro rapper. Si incontrano
+   alla Sala». La domanda è di design, non di codice: **da chi si deve poter scegliere il
+   feat?** Solo da chi conosci (com'è ora, e allora il punto è solo che la lista vuota va
+   spiegata meglio), oppure da tutti i rapper della città, anche mai visti, con un costo o
+   un rifiuto per chi non ti conosce (come alla Sala, dove «Proponi un pezzo insieme»
+   chiede «collaboratori»). Se «non posso fare canzoni senza feat» voleva dire un'altra
+   cosa, dimmi dov'eri: con un feat scelto non si può registrare senza tornare in Feat a
+   toglierlo, e forse è quello — in quel caso basta un «da solo» in Cabina come per il
+   fonico.
+
+   **Carletto (14/09/2026):** «Sto pensando di voler togliere le sezioni cover, feat,
+   marketing». Le idee su come farlo — via del tutto o fuse nelle stanze giuste, da chi si
+   sceglie il feat (solo chi conosci, tutti con costo e rifiuto, le due porte, dal
+   telefono), e la lettura «ad ogni pezzo» del punto 10 — stanno in
+   `documentazione/brainstorming-studio-cover-feat-marketing.md`.
+
+   **FATTO (15/09/2026)** — scelta **B + D3 + F2 + E**: il feat si sceglie in Cabina,
+   accanto al fonico, da due porte (chi conosci gratis, i rapper della classifica a
+   pagamento e con rifiuto, e chi accetta entra fra i contatti); «da solo» si clicca come
+   per il fonico. Cover nell'Uscita, Marketing sul telefono, un pezzo sul banco alla volta.
+   Tutto scritto in `implementazioni/02-interfaccia-e-telefono.md`, «Lo Studio a cinque
+   linguette».
+
 
 ---
 

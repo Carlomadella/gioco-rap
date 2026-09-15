@@ -431,3 +431,38 @@ copia di impostazioni dell'iframe aggiorna subito quella della landing e il
 parent rilegge comunque il salvataggio prima di riaprire il menu. I tasti di
 ascolto dei beat ora riallineano icona, `aria-pressed` e descrizione su stop,
 fine naturale, cambio fase e volume/master portati a zero.
+
+
+---
+
+## Studio · Non si spende energia per tenere una take
+
+> «non si può spendere energia per tenere una take»
+
+**FATTO (15/09/2026)** — prima la cabina si apriva con la prima take già fatta, gratis, e
+i 45 di energia li chiedeva **«Tieni questa e chiudi»**, che era la mossa `registra` con
+il suo prezzo di sempre. Chi insisteva — dodici di energia a take — arrivava alla fine con
+la take buona in mano e senza i 45 per tenerla. Adesso **l'energia si spende per fare la
+take, mai per tenerla**: la cabina si apre vuota, il tasto d'oro è «Registra la take · 45
+energia» (`STUDIO_TAKE_PRIMA`, cioè quello che costava registrare), le altre restano a 12
+(`STUDIO_TAKE_ENERGIA`), e «Tieni questa e chiudi» non chiede niente — con 3 di energia
+resta d'oro e cliccabile. Il conto lo fai prima di ogni take, non alla fine.
+
+La mossa `registra` in `actions.js` è a `e:0` e chiede una take (`need` → «Serve una take,
+in cabina»): senza take sarebbe un pezzo gratis. Il tempo in sala (180 minuti) e i 50 € di
+sala senza microfono restano dove stavano, su «Tieni questa e chiudi»: il punto parla di
+energia, e quelli non sono energia. La finestra di conferma dei soldi non dice più «ti costa
+0 energie». I salvataggi con una take vecchia in corso la trovano come l'avevano lasciata.
+Il dado è lo stesso di sempre, `rnd(-5,6)` a take, prima compresa.
+
+Sta in `frontend/js/game/studio-elementi.js` (`studioTakeCosto`, `studioTakeManca`),
+`studio.js` (la cabina) e `actions.js`; tre controlli dell'audit sono stati riscritti sulla
+regola nuova e uno aggiunto, «tenere una take non costa energia». Provato nel gioco vero con
+Playwright: 100 → 55 alla prima take, 43 alla seconda, e a 3 di energia si chiude lo stesso
+e si arriva alla finestra del titolo.
+
+**Coda (15/09/2026), dal giro di `segnala-problemi`.** Con la prima take a 45, cambiare
+strofa o beat in Cabina buttava la take pagata: adesso si mette da parte con la sua targhetta
+(`d.takeAltre`) e torna se torni su quella coppia; le take da parte finiscono quando chiudi
+un pezzo. La plancia e l'Agenda non scrivono più «gratis» per «Registra il pezzo»: dicono i
+45 della take finché una take non c'è (`costoScritto` in `actions.js`, solo da mostrare).

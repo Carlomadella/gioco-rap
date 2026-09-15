@@ -1,3 +1,40 @@
+## Cosa resta aperto al 15/09/2026
+
+Smistato leggendo ogni voce contro il codice: sotto a ciascuna c'è scritto se e quando è
+stata chiusa. Qui solo quelle **ancora aperte**, in ordine d'importanza — l'ordine è lo stesso
+di «Da fare adesso» in [`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md),
+che mette insieme i due fogli.
+
+1. **Sul telefono la promo non si sceglie e l'anteprima non si raggiunge più** (15/09) e
+   **Sputa sul telefono vero non c'è** (15/09): stesso buco, il telefono della plancia sotto
+   i 1180 px è nascosto. Una task sola.
+2. **L'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore** (13/09).
+3. **Lo Shop promette tre reparti a schede, ce ne sono due** (10/09).
+4. **Sul telefono i colori del «passaggio del mouse» restano accesi dopo il tocco** (08/09):
+   il giro unico su tutti i CSS.
+5. Le code dello Studio a cinque linguette (15/09): **un rapper della classifica con lo
+   stesso nome di uno della Sala non si può chiamare**, **chi accetta dalla classifica occupa
+   un posto della Sala**; e dal 14/09 **la copertina proposta e non confermata resta nel
+   salvataggio, foto compresa**.
+6. Le tre del Marketing (14/09): **«In spinta» esce come una seconda riga bianca**, **una
+   riga di pezzo senza seed è un bottone che non fa niente**, **il pezzo scelto può sparire
+   dall'elenco, ma resta quello che si spinge**; più **sul telefono il motivo per cui
+   l'anteprima è spenta viene tagliato**.
+7. **`jose` e `zod` stanno fra le `dependencies`** (13/09), aperta per decisione: `jose` va
+   usata in `backend/accessi.js`, non tolta.
+8. Solo documenti, dal giro `backend-allineato` del 15/09 in fondo: `README-API.md` non
+   conosce tre cose del 03/09 e ha la tabella delle variabili a metà; `backend/database/README.md`
+   dice ancora che `schema.md` è fuori da git; il README di radice dice «una dipendenza sola».
+9. **L'uscita di venerdì non costa niente, quella a mano sì** (08/09): risolto in parte per
+   scelta — il vantaggio di venerdì è quello di aspettare, non uno sconto. Sparisce del tutto
+   con «togli il parametro lucidità» (CARLO).
+10. Aperti di proposito (14/09, prova sul telefono): la copertina «grande» e quella «di
+    adesso» quasi uguali; nel Marketing la risposta compare in cima.
+
+Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
+
+---
+
 Una cosa che ho notato ma non ho toccato, perché è una scelta tua e non un bug:
 js/game/crime-caption.js contiene 118 citazioni testuali di brani rap con autore e titolo. Se il gioco esce su Steam e sugli store, quelle sono liriche protette da copyright e vanno valutate prima della pubblicazione.
 
@@ -376,6 +413,12 @@ decidere che nomi deve ascoltare `eventi-v2.js` per i tre tasti, ed è una cosa 
 tocca il motore degli eventi, non lo Studio. Segnato qui perché adesso i posti muti
 sono due su tre invece di uno su due.
 
+
+**RISOLTO (13/09/2026)** — l'hook è lo stesso per lo Shop e per la sezione Beat dello Studio,
+perché è la stessa transazione, e parte solo se l'acquisto è andato in porto; l'ascolto
+(`data-bplay`) idem, solo per un beat ancora sul banco. Il racconto sta in
+`implementazioni/06-mondo-e-personaggi.md`, «Il motore degli eventi e i beat comprati fuori
+dallo Shop».
 ### Sul telefono i colori del «passaggio del mouse» restano accesi dopo il tocco
 
 - **dove** — `frontend/css/studio-elementi.css:46, 65, 99, 173` (e in tutto il resto
@@ -600,6 +643,10 @@ la prova cade anche se qualcuno smette di ascoltare i due nomi voluti.
   spunta un evento sul mercato dei beat nei momenti dopo.
 - **quanto pesa** — si vede ma si gira intorno.
 
+
+**RISOLTO (13/09/2026)** — «una lavanderia non è un beat»: `eventi-v2.js` emette l'acquisto
+solo se `data-buy` è davvero un indice del banco e il beat esiste. Stesso posto della voce
+qui sopra, in `06-mondo-e-personaggi.md`.
 ### Due prove automatiche sono rosse, ma non per colpa di questo lavoro
 
 - **dove** — `frontend/js/avatar/makehuman/` (per esempio `adapter.js` e `contract.js`)
@@ -615,6 +662,10 @@ la prova cade anche se qualcuno smette di ascoltare i due nomi voluti.
 - **come si vede** — da `frontend/`, `npm run prova`.
 - **quanto pesa** — da sistemare con calma.
 
+
+**RISOLTO (08/09/2026)** — commit `4412dd1`: `js/avatar/makehuman/` è dichiarata libreria
+ES-module in `strumenti/prova.js` (`MODULI_JS_STANDALONE`), e le due prove non la leggono più
+come se fosse un gruppo di `<script>`. `npm run verifica` arriva in fondo.
 ## Giro del 10/09/2026
 
 Giro fatto sul branch `task/beat-energia-e-barre-senza-malus`, dopo le modifiche a
@@ -739,6 +790,9 @@ sotto, che però ha trovato lo stesso guaio ripresentarsi su un terzo commit.
   nomina una delle tre pagine per intero.
 - **quanto pesa** — da sistemare con calma.
 
+
+**RISOLTO (10/09/2026)** — commit `2f05b11` («riallinea Studio, Shop e navigazione pagine»):
+la riga di `rpg-v24-bridge.js` non nomina più `landing.html`.
 ---
 
 ## Giro del 10/09/2026 (controllo mirato sul commit in più, `346c955`)
@@ -1096,6 +1150,9 @@ passaggio a PostgreSQL.**
   bene: chi legge `schema.md` per capire come si fa la classifica non trova la colonna
   che la fa andare veloce.
 
+
+**RISOLTO (13/09/2026)** — commit `cdd86d9`, insieme a «`schema.md` entra in git»: il documento
+è stato riscritto sulle migrazioni vere, e le colonne ci sono.
 ### `schema.md` descrive un PostgreSQL che `migrazioni-pg/` non costruisce
 
 - **dove** — `backend/database/schema.md`, sezione 7 («Le differenze su SQLite») e
@@ -1117,6 +1174,11 @@ passaggio a PostgreSQL.**
   quattro**: e' il documento che si va a leggere il giorno del passaggio, ed e' quello
   che oggi racconta la cosa meno vera del backend.
 
+
+**RISOLTO (13/09/2026)** — stesso commit `cdd86d9`: i § 7-8 raccontano i due motori come stanno
+nelle migrazioni (`TEXT` per gli id, `BIGINT` per i tempi, `UNIQUE (lower(email))`), e
+`migrazioni-pg/` è nominata. Il giro di `backend-allineato` del 15/09, in fondo, conferma che
+le otto coppie di migrazioni combaciano colonna per colonna.
 ### Quattro variabili d'ambiente che il codice legge e nessun documento nomina
 
 - **dove** — `backend/accessi.js` (`ADF_APPLE_JWKS`, `ADF_GOOGLE_JWKS`, `ADF_STEAM_URL`)
@@ -2051,6 +2113,8 @@ presente (`README-API.md`, «Terzo esito, con `tipo: "email"`»).
   esito (`200 { account, token }` quando la sessione corrente è un ospite senza mail,
   con token invariato) e riscrivere la nota 3 al presente, o toglierla.
 
+
+**RISOLTO (15/09/2026)** — commit `43e7555`.
 ## Giro del 15/09/2026 (segnala-problemi, fine task `task/studio-cinque-linguette`)
 
 Controlli automatici tutti verdi: `npm run prova` 180 a posto e 0 no, `audit-regressioni.js`
@@ -2110,6 +2174,9 @@ Sei voci, nessuna blocca la partita. Le prime due sono quelle che contano.
   nell'Uscita: la riga «Qualità» non ha la voce del feat.
 - **quanto pesa** — da sistemare con calma.
 
+
+**RISOLTO (15/09/2026)** — commit `c4aa9e6`: `registra` legge le due costanti del feat **prima**
+che `studioConsumaFeat()` lo liberi, e l'audit controlla l'ordine.
 ### Sul telefono la promo non si sceglie e l'anteprima non si raggiunge più
 
 - **dove** — `frontend/js/game/studio.js:407-408` (`studioFalloSapere`: senza `telPC()`
@@ -2168,6 +2235,9 @@ Sei voci, nessuna blocca la partita. Le prime due sono quelle che contano.
   e prezzi da 200 € in su, e in classifica altri quattro nomi che non ci sono.
 - **quanto pesa** — da sistemare con calma.
 
+
+**RISOLTO (15/09/2026)** — commit `c4aa9e6`: «Dalla classifica» non si ferma più ai sei più
+grossi, tutta la classifica in «Con chi».
 ### Chi accetta dalla classifica occupa un posto della Sala, e alla Sala arriva meno gente
 
 - **dove** — `frontend/js/game/studio.js:303` (`G.gente.push(p)`) contro
@@ -2194,6 +2264,8 @@ Sei voci, nessuna blocca la partita. Le prime due sono quelle che contano.
 - **come si vede** — Cabina, «Dalla classifica», partita giovane.
 - **quanto pesa** — da sistemare con calma.
 
+**RISOLTO (15/09/2026)** — commit `c4aa9e6`: «all'8%».
+
 **Nota, non è un errore**: un rivale che dice no si può richiamare subito, all'infinito. Il no
 costa 5 di energia e un'ora (`studio.js:327-331`), la probabilità non scende mai sotto l'8%
 (`studio.js:274`), non c'è un «oggi no» né un ricordo del rifiuto: a forza di chiamare, prima
@@ -2216,3 +2288,363 @@ tocchi un pezzo in fondo e la risposta compare in cima» non riguarda più il Ma
 nello Studio non c'è) ma vale tale e quale per gli elenchi di Cabina, Mix e Uscita; «Il capo
 ANTEPRIMA … va a capo» non esiste più come schermata, ma lo `stCapo` che va a capo è lo
 stesso di «MIXI: «…» · q78» e resta aperto come scritto lì.
+
+## Giro del 15/09/2026 (backend-allineato, task `task/app-post-e-take-senza-energia`, «c'è un secondo database?»)
+
+La task (`e89eea7`) non ha toccato `backend/`. `node scripts/controlla-backend.js` verde,
+`npm run prova` 183 a posto, 0 no. Le otto coppie di migrazioni SQLite/PostgreSQL sono
+state confrontate colonna per colonna (tipo, `NOT NULL`, `DEFAULT`, `CHECK`, `REFERENCES`,
+indici e vincoli): dicono la stessa cosa, le sole differenze sono dialetto (`INTEGER`
+contro `BIGINT`/`DOUBLE PRECISION` come scritto in `schema.md` § 7, `AUTOINCREMENT` contro
+`GENERATED BY DEFAULT AS IDENTITY`, `strftime` contro `EXTRACT(EPOCH)` nell'`UPDATE` della
+004, l'`ALTER TABLE` doppio in una riga nella 008 PostgreSQL). **Niente che fermi il
+passaggio a PostgreSQL.**
+
+**Alla domanda «c'è un secondo database?»: no, non nel senso di un secondo strato dati.**
+Dal `b2ea221` (01/09, «sotto il server ci puo' stare PostgreSQL») ci sono **due motori**
+dietro a **uno strato dati solo**:
+
+- `backend/database/db.js:30-38` (`scegliMotore`) legge `cfg.pg` oppure `process.env.ADF_PG`:
+  se c'è un URL carica `postgres.js` e applica `migrazioni-pg/`, se no carica `sqlite.js`
+  e applica `migrazioni/`. È l'unico punto di scelta, e si sceglie **all'avvio**, non per
+  richiesta: **uno rimpiazza l'altro, non convivono** nello stesso processo.
+- `backend/database/sqlite.js` (`node:sqlite`, `DatabaseSync`, un file:
+  `ADF_DATI`, di suo `backend/database/dati/classifica.db`, `server.js:54`) e
+  `backend/database/postgres.js` (libreria `pg`, pool, `?`→`$n`, transazioni con
+  `AsyncLocalStorage`) espongono la stessa faccia: `esegui`, `uno`, `tutti`, `fai`,
+  `insieme`, `chiudi`, `nome`.
+- `backend/database/archivio.js` è l'unico file che parla col database e **non sa quale ha
+  sotto** (`archivio.js:25`, `let A = null`); `server.js` sa solo il nome per il log
+  (`server.js:601`). `copia.js:30-33` si tira indietro con `ADF_PG` (rimanda a `pg_dump`);
+  `prova.js:34-43` accende PostgreSQL **solo** con `--pg` esplicito (`npm run prova-pg`),
+  non basta la variabile nell'ambiente.
+- `ADF_PG` si può mettere in `backend/.env.local` (fuori da git, `.gitignore:13`), letto
+  da `backend/ambiente.js:27-46`; l'ambiente vero vince sul file. Oggi sul disco **non c'è**
+  né `.env.local` né un secondo file `.db`: in `dati/` c'è solo `classifica.db` (con
+  `-wal`/`-shm`) e la cartella `copie/`.
+- Nessuna traccia di un terzo motore o di un ORM: `package.json` ha `pg`, `jose`, `zod`,
+  e nel codice si `require` solo `pg` (`postgres.js:46`) e `node:sqlite`.
+
+La documentazione descrive entrambi i motori e come si scelgono: `backend/README.md:15-23`
+e `:131-133`, `backend/database/README.md:19` e `:514-632` («I due motori»),
+`backend/database/schema.md:23-34` e § 7-8, `backend/README-API.md:1084-1085`,
+`documentazione/dipendenze.md:73`. Sono a posto. Quello che è rimasto indietro è sotto.
+
+### `README-API.md` non conosce tre cose entrate con la difficoltà (03/09)
+
+- **dove** — `backend/README-API.md:553-583` (§11 `POST /api/artista`, corpo e regole),
+  `backend/README-API.md:662-669` (§15 `GET /api/classifica`, tabella delle query) e
+  `backend/README-API.md:748-749` (§22 `PUT /api/carriera/:slot`, gli errori). Il codice è
+  `backend/server.js:351` (`difficolta: b.difficolta` all'iscrizione),
+  `backend/server.js:409-413` (il filtro `?difficolta=` sulla classifica, fra i tre valori
+  di `archivio.DIFFICOLTA`) e `backend/server.js:465-468` (`403 non-e-tuo` se
+  `artistaId` nel corpo non è un artista dell'account).
+- **cosa succede** — il commit `42f10ae` (03/09, «la difficolta accanto all'artista, e
+  tre buchi tappati») ha toccato `server.js` ma non `README-API.md`, scritto il giorno
+  prima (`442a676`). Risultato: il corpo di `POST /api/artista` nel documento non ha
+  `difficolta` (mentre `POST /api/punteggio` a riga 621 ce l'ha); la tabella delle query di
+  `GET /api/classifica` elenca `da`, `quanti`, `io`, `citta`, `genere` e non `difficolta`;
+  `PUT /api/carriera/:slot` dice «Altri errori: `400 stato-mancante`, `413
+  carriera-troppo-grande`» e non il `403 non-e-tuo`, che è proprio uno dei «tre buchi
+  tappati».
+- **come si vede** — `backend/prova.js` prova tutte e tre le cose (cerca `difficolta` e
+  `non-e-tuo`); il documento a fianco non le racconta. `controlla-backend.js` confronta
+  solo i nomi delle rotte, quindi non lo becca.
+- **quanto pesa** — da sistemare con calma. Proposta: aggiungere `"difficolta"` al corpo
+  di §11 con la regola (uno dei tre valori, se no `anni-di-fame`), una riga `difficolta`
+  alla tabella di §15, e `403 non-e-tuo` agli errori di §22.
+
+### La tabella «Variabili d'ambiente» di `README-API.md` è a metà, e ne cita una che non esiste
+
+- **dove** — `backend/README-API.md:1079-1098`. Il confronto è con `backend/README.md:125-160`
+  (la tabella completa, difesa da `scripts/controlla-backend.js:99-113`) e col codice.
+- **cosa succede** — mancano sette manopole che il codice legge: `ADF_BOT_MINIMO`
+  (`server.js:55`), `ADF_PG_CONNESSIONI` (`postgres.js:88`), `ADF_APPLE_JWKS`,
+  `ADF_GOOGLE_JWKS`, `ADF_STEAM_URL` (`accessi.js:29-31`), `ADF_COPIE` (`copia.js:24`),
+  `ADF_TIENI` (`prova.js:961`). In più a riga 969 compare `ADF_CATALOG_URL` come se fosse
+  una variabile del server: è una costante del **frontend**
+  (`frontend/js/game/eventi-v2.js:16`), non una manopola d'ambiente. Il controllo
+  automatico difende solo `backend/README.md`, quindi le due tabelle possono divergere
+  senza che nessuno se ne accorga — ed è successo.
+- **come si vede** — `grep -o "ADF_[A-Z_]*" backend/README-API.md | sort -u` contro lo
+  stesso su `backend/README.md`.
+- **quanto pesa** — da sistemare con calma. Proposta: o si completa la tabella, o (meglio)
+  si toglie e si rimanda a quella di `backend/README.md`, che è l'unica difesa da un
+  controllo; e a riga 969 si dice che `ADF_CATALOG_URL` è del gioco.
+
+### `backend/database/README.md` dice ancora che `schema.md` «non sta in git»
+
+- **dove** — `backend/database/README.md:8-10` («**Non sta in git** (come `backend.md`): è
+  il foglio su cui si lavora, non il riferimento») e `backend/database/README.md:641`
+  («schema.md — il foglio di disegno, commentato (fuori da git)»). Lo stesso in
+  `.claude/agents/backend-allineato.md:11` («`backend/database/schema.md`, fuori da git»).
+- **cosa succede** — dal commit `cdd86d9` (13/09, «schema.md entra in git, allineato alle
+  migrazioni vere») il file è tracciato (`git ls-files backend/database/schema.md` lo
+  trova) e `controlla-backend.js` lo confronta con le migrazioni. Chi legge il README dei
+  dati pensa il contrario, e può non cercarlo in git o non committarne le modifiche.
+- **come si vede** — `git ls-files backend/database/schema.md`.
+- **quanto pesa** — da sistemare con calma: due righe di README e una del prompt
+  dell'agente.
+
+### Il README di radice dice «una dipendenza sola (`pg`)», il backend ne ha tre
+
+- **dove** — `README.md:9` («Node + SQLite, una dipendenza sola (`pg`)»). Il vero è in
+  `backend/package.json:22-26`: `jose`, `pg`, `zod`.
+- **cosa succede** — `eef9588` e `d879f75` (10/09) hanno aggiunto `jose` e `zod` al
+  `package.json` senza che nessun file le importi (`grep require jose|zod` nel backend non
+  trova niente; `accessi.js:72` verifica ancora le firme a mano con `crypto.verify`).
+  `documentazione/dipendenze.md:92-93` lo dice onestamente («`accessi.js` non la importa»,
+  «nessuna rotta la importa»), il README di radice no. Non è un problema di codice; è che
+  «una dipendenza sola» era l'argomento della regola vecchia, e non è più vero.
+- **come si vede** — `README.md:9` contro `backend/package.json`.
+- **quanto pesa** — da sistemare con calma: una riga. Resta aperta la scelta scritta in
+  `dipendenze.md:201` (usare `jose` in `accessi.js`, `zod` nelle rotte), che è un lavoro
+  vero e non di documento.
+
+**Nota, non è un errore**: due commenti di testa parlano di un mondo prima di
+PostgreSQL. `backend/server.js:12-13` dice «Sotto c'è SQLite (`database/`), senza niente da
+installare» (mentre `server.js:32-33` elenca `ADF_PG`), e `backend/database/archivio.js:3-7`
+dice «Il giorno che sotto ci sarà PostgreSQL, si riscrive questo file e basta — è il motivo
+per cui esiste»: è il contrario di quello che è successo, e che `db.js:13-15` spiega
+(l'asincrono su SQLite «è il prezzo, piccolo, perché `archivio.js` sia uno solo invece che
+due»). Il codice sotto è giusto; sono le premesse che sono invecchiate.
+
+
+## Giro del 15/09/2026 (segnala-problemi, fine task `task/app-post-e-take-senza-energia`, commit `e89eea7`)
+
+Controlli automatici tutti verdi: `npm run prova` 180 a posto e 0 no, `audit-regressioni.js`
+340 ok e 0 falliti, `verifica:build` 33 ok e 0 falliti. Letti per intero il diff del commit
+(quattordici file) e `sputa.js` riga per riga; poi, per quello che Sputa e la Cabina chiamano,
+`telefono.js` (`schermataApp`, `renderTelefono`, il click su `hb-tel`), `actions.js`
+(`registra`, `adfOggi`, `daIncidere`), `studio-elementi.js` (`studioTake`, `studioTakeAncora`,
+`studioTakePresa`, `studioStrofa`, `studioBeatSuCui`), `studio.js` (`studioSezCabina`,
+`studioAzione`), `ui.js` (`avviaAzioneDiretta`, la tile in `renderGioco`), `hub.js`
+(`hubPronta`, `renderHub`), `rivals.js` (`nuovoRivale`, `vitaRivali`), `phases.js`
+(`hypeCap`), `css/telefono.css` e `css/hub.css` (il telefono sotto i 1180). Tutte le
+funzioni che `sputa.js` usa esistono e stanno in file caricati prima; nessun errore in
+console.
+
+Provato nel gioco vero con Playwright a 1400 e a 390: Sputa si apre, la barra esce, il
+contatore conta, i 140 sono un tetto vero, il feed con i rivali è lo stesso riaprendo l'app,
+«Rispondi» mette «@Nome», il fuoco si accende e resta; in Cabina 100 → 55 alla prima take,
+43 alla seconda, «Tieni questa e chiudi» a 0 di energia arriva alla finestra del titolo e il
+pezzo esce con la take scelta; dalla plancia «Registra il pezzo» senza take dice «SERVE una
+take, in cabina».
+
+Sei voci, nessuna blocca la partita. La prima è quella che conta: è un buco che il commit
+ha aperto senza volerlo.
+
+### La take pagata 45 sparisce se in Cabina tocchi un'altra strofa o un altro beat
+
+- **dove** — `frontend/js/game/studio-elementi.js:314-322` (`studioTake`: se la chiave
+  strofa+beat non è quella della take in corso, la take si rifà **vuota**), i tocchi che
+  cambiano la chiave in `studio-elementi.js:806-808` (`data-strofa`, `data-incide`) e le
+  righe che li disegnano nella stessa Cabina, `frontend/js/game/studio.js:1088-1095`.
+- **cosa succede** — paghi 45 per la prima take, magari ti esce +5, poi tocchi un'altra
+  strofa o un altro beat nella colonna «Che cosa incidi» (che sta nella stessa schermata):
+  la take sparisce, il tasto torna «Registra la take · 45 energia», e se torni sul beat di
+  prima la take **non torna** (provato: energia 55, take `[5]`, cambio beat → take `[]`,
+  ricambio → ancora `[]`). Nessun avviso. Succede anche da solo: se compri un beat migliore
+  in Beat o scrivi una strofa migliore, la scelta di default cambia e la take pagata se ne
+  va. Prima di questo commit la prima take era gratis e il ripristino non costava niente:
+  ora costa la sessione intera.
+- **come si vede** — Studio, Cabina, con due beat o due strofe in mano: «Registra la take»,
+  poi tocca l'altro beat.
+- **quanto pesa** — si vede ma si gira intorno (basta non toccare niente dopo la take, ma
+  nessuno lo dice).
+
+
+**RISOLTO (15/09/2026)** — sullo stesso branch, prima del push. `studioTake()` non butta più la
+take quando la targhetta cambia: la mette da parte in `d.takeAltre` con la sua chiave, e se
+torni su quella coppia strofa+beat la ritrovi. Le take da parte finiscono quando chiudi un
+pezzo (`studioTakePresa`), che è la fine della sessione. La nota vuota della Cabina lo dice
+(«se cambi, le ritrovi tornando qui»). Un controllo nell'audit.
+### La plancia e l'Agenda dicono che «Registra il pezzo» è gratis
+
+- **dove** — `frontend/js/game/ui.js:295` (la tile: con `e:0` scrive «gratis») e
+  `frontend/js/game/telefono.js:630` (l'Agenda del telefono: «Registra il pezzo · 0⚡»).
+- **cosa succede** — la mossa costa zero sulla carta perché i 45 li chiede la take in
+  Cabina, ma la tile sulla mappa e la riga dell'Agenda leggono `a.e` e dicono al giocatore
+  che registrare è gratis / vale 0 energia. È falso: in tutto costa 45 come prima. Chi
+  pianifica la giornata dalla plancia fa i conti sbagliati.
+- **come si vede** — plancia, tile «Registra il pezzo» con strofa e beat in mano;
+  telefono → Agenda → «Le tue mosse».
+- **quanto pesa** — da sistemare con calma.
+
+
+**RISOLTO (15/09/2026)** — `registra` ha `costoScritto()`, solo da mostrare: 45 finché non c'è
+una take, poi «gratis» che a quel punto è vero. La tile (`ui.js`) e l'Agenda (`telefono.js`)
+leggono quello; il costo che si scala resta `e:0`. Un controllo nell'audit.
+### Dopo la prima barra del giorno l'hype in alto resta quello di prima
+
+- **dove** — `frontend/js/game/sputa.js:199-200` (`sputaScrivi` chiama `save()` e
+  `renderGioco()`, non `renderHub()`); la fascia con l'hype la ridisegna solo `renderHub`,
+  `frontend/js/game/hub.js:743-747`.
+- **cosa succede** — il fumetto dice «Il nome gira: +1 hype», `G.hype` sale di uno, ma il
+  numero «Hype» nella fascia in alto non si muove finché qualcos'altro non ridisegna la
+  plancia (provato: hype 5 → 6, la fascia dice ancora 5). Uno legge il fumetto, guarda in
+  alto e pensa che non sia successo niente.
+- **come si vede** — Sputa, prima barra del giorno, guarda «Hype» in alto.
+- **quanto pesa** — da sistemare con calma.
+
+
+**RISOLTO (15/09/2026)** — `sputaScrivi` chiama `renderHub()` (che ridisegna anche il telefono)
+oltre a `renderGioco()`.
+### Al tetto dell'hype Sputa promette «+1 hype» che non arriva
+
+- **dove** — `frontend/js/game/sputa.js:193-197` (il fumetto esce sempre alla prima barra,
+  l'`if(G.hype < tetto)` copre solo il numero) e `sputa.js:241-242` (il riquadro «La prima
+  barra del giorno fa girare il nome: +1 hype»).
+- **cosa succede** — in fase «Sconosciuto» il tetto dell'hype è 20 (`phases.js:15`): a 20 la
+  prima barra del giorno non dà niente, giustamente, ma il fumetto dice lo stesso «+1 hype»
+  e il riquadro sopra al foglio lo promette prima di scrivere (provato: hype 20, barra,
+  fumetto «+1 hype», hype 20). Letto nel codice il perché, visto in partita l'effetto.
+- **come si vede** — hype al tetto della fase, Sputa, scrivi una barra.
+- **quanto pesa** — da sistemare con calma.
+
+
+**RISOLTO (15/09/2026)** — al tetto il fumetto dice «il nome gira, ma qui sei già al tetto:
+serve il passo dopo», e il riquadro sopra al foglio lo dice prima di scrivere.
+### Il «dado fermo» dei rivali si sblocca quando un rivale esce con un pezzo
+
+- **dove** — `frontend/js/game/sputa.js:134` (il seme è `r.seed + settimana`) e `:158`
+  (l'id della barra, a cui è attaccato il fuoco), contro `frontend/js/game/rivals.js:78`,
+  che a ogni pezzo nuovo del rivale gli **cambia il seed**.
+- **cosa succede** — il documento e il commento in cima al file promettono che riaprendo
+  l'app trovi le stesse barre: vale finché nessun rivale pubblica. Quando uno esce con un
+  pezzo (succede ogni settimana a qualcuno) tutte le sue barre si rifanno da capo, comprese
+  quelle della settimana scorsa, che adesso parlano del pezzo di questa settimana; e il fuoco
+  che avevi messo resta segnato su un id che non esiste più (provato: due barre su «Fumo Blu»
+  → tre barre diverse, una su «Pezzo nuovo», fuoco rimasto in `G.sputaFuoco` a vuoto). Non è
+  grave, ma è il contrario di quello che la voce promette, e un giocatore attento se ne accorge.
+- **come si vede** — Sputa, segna una barra di un rivale, aspetta che quel rivale esca con un
+  pezzo (log «X è uscito con …»), riapri Sputa.
+- **quanto pesa** — da sistemare con calma.
+
+
+**RISOLTO (15/09/2026)** — il dado e l'id delle barre partono da `sputaSemeRivale(r)`, un
+numero fisso tirato dal **nome** del rivale, non da `r.seed` (che è il seme della copertina e
+`rivals.js` rifà a ogni pezzo nuovo). Le barre e il fuoco restano dove stavano. Resta una cosa
+piccola, voluta: la barra della settimana scorsa che parlava del pezzo nuovo di allora adesso
+nomina quello di oggi (`{ult}` si legge al ridisegno) — non si salva il testo per una riga.
+### Sputa sul telefono vero non c'è
+
+- **dove** — `frontend/css/hub.css:1273-1287` (`body.in-hub .ptel{display:none}` sotto i
+  1180 px) e `frontend/js/game/sputa.js:255-260` (si registra solo nel telefono della
+  plancia, in `HUB_APP` e `HUB_APP_VECCHIO`).
+- **cosa succede** — è lo stesso buco della voce «Sul telefono la promo non si sceglie e
+  l'anteprima non si raggiunge più» del giro precedente: il telefono della plancia sotto i
+  1180 px è nascosto, e Sputa vive solo lì. A 390 px `hb-tel` è largo zero e l'app non si
+  apre da nessuna parte (provato). Il commit ha aggiunto una seconda app a un telefono che
+  sul telefono non si vede; la scrivo perché il gioco esce sugli store ed è la seconda volta
+  in due giorni che una cosa nuova finisce dietro a quella tenda.
+- **come si vede** — finestra più stretta di 1180 px: non c'è un tasto per Sputa.
+- **quanto pesa** — da sistemare con calma (l'hype che dà è uno al giorno, la partita va
+  avanti senza).
+
+
+**APERTO, di proposito** — non si sistema qui: è lo stesso buco della promo e dell'anteprima
+sotto i 1180 px, e va chiuso in una task sola che decida dove sta il telefono quando lo
+schermo è un telefono. È il primo punto di «Da fare adesso» in
+`implementazioni/implementazioni.md`.
+**Nota, non è un errore**: cose piccole che non valgono una voce. `sputa.js:259` scrive «1
+barre tue» nella griglia vecchia del telefono (manca il singolare). I due tasti sotto le barre
+dei rivali — il fuoco e «Rispondi» — sono alti 21 px (`css/telefono.css`, `.tspfuoco` e
+`.tsprisp`, misurati in partita): sotto i 44 di `tocco.css`, ma quel telefono si vede solo
+dai 1180 px in su, quindi quasi sempre col mouse; se un giorno il telefono torna sul
+telefono, ci vorrà la presa. Il documento in `04-musica-e-suoni.md` dice che «i salvataggi
+con una take vecchia in corso la trovano come l'avevano lasciata»: vero, e quella take era
+gratis, quindi chi carica una partita salvata in Cabina prima di questo commit registra un
+pezzo senza spendere i 45, una volta sola — è una scelta, non un bug. Infine `registra`
+chiama `studioTakeManca()` dal suo `need`, che viene letto a ogni ridisegno della plancia e
+dell'Agenda: `studioTake()` scrive in `G.studio` anche da lì, ma scrive sempre la stessa cosa
+che scriverebbe la Cabina, quindi non fa danni; lo segno perché un `need` che scrive nel
+salvataggio è una cosa da sapere.
+
+## Giro del 15/09/2026 (controllo mirato sul commit ac64bc4)
+
+Controlli automatici tutti verdi: `npm run prova` 180 a posto e 0 no, `audit-regressioni.js`
+343 ok e 0 falliti, `verifica:build` 33 ok e 0 falliti. Letto il diff del commit per intero e,
+attorno a quello che tocca, `studio-elementi.js` (`studioTake`, `studioTakeElenco`,
+`studioTakeAncora`, `studioTakeManca`, `studioTakePresa`, `studioStrofa`, `studioBeatSuCui`,
+`studioTakeChiave`), `actions.js` (`registra` tutta, `daIncidere`, `adfDailyCounts`),
+`ui.js` (la tile in `renderGioco`, `avviaAzioneDiretta`), `telefono.js` (`schermataAgenda`,
+`renderTelefono`, `telVaiApp`), `hub.js` (`renderHub`), `sputa.js` riga per riga,
+`rivals.js` (`nuovoRivale`, `vitaRivali`), `copertine.js` (`chiediTitolo`), `fx.js` (`toast`).
+
+Provato nel gioco vero con Playwright a 1400 px, col server di sviluppo. Le sei correzioni
+fanno quello che le note RISOLTO dicono:
+- la take pagata si mette da parte e torna (energia 200 → 155 alla prima take, cambio beat →
+  la take sta in `takeAltre` con la sua targhetta, ricambio → è di nuovo lì, identica);
+- la tile dice «45 energia» + «SERVE una take, in cabina» senza take e «gratis» con una take;
+  l'Agenda «45⚡» e poi «0⚡»; `costoScritto` è letto solo da quelle due righe,
+  `avviaAzioneDiretta` scala ancora `en2` (l'energia non si muove al «Registra»);
+- dopo la prima barra del giorno la fascia in alto passa da 5 a 6 con il numero, e l'app
+  resta aperta su Sputa (`renderHub` ridisegna il telefono tenendo `TEL_APP`); Sputa si
+  scrive solo dal telefono della plancia, quindi `renderHub` trova sempre i suoi pezzi;
+- al tetto (20 in «Sconosciuto») il riquadro e il fumetto dicono tutti e due «sei già al
+  tetto», l'hype resta 20;
+- cambiando `r.seed` e `r.ult` a un rivale, le barre della settimana scorsa restano con lo
+  stesso id e lo stesso testo.
+
+Due voci, nessuna blocca la partita. La prima è la più grossa che ho trovato in questi giri
+sulla Cabina, e **non l'ha aperta questo commit**: c'è da quando `studioTakePresa` guarda la
+targhetta (08/09/2026). La scrivo qui perché il commit tocca proprio quella funzione, e
+perché il giro precedente aveva scritto «il pezzo esce con la take scelta» — non era vero,
+avevo guardato che il pezzo uscisse, non con quale numero.
+
+### La take che scegli in Cabina non finisce mai sul pezzo: esce sempre col dado nuovo
+
+- **dove** — `frontend/js/game/actions.js:350-351` (`registra.run`: la strofa e il beat si
+  tolgono dalla lista **prima** di leggere la take, che sta alla riga `:359`) contro
+  `frontend/js/game/studio-elementi.js:427-435` (`studioTakePresa` confronta la targhetta
+  della take con `studioTakeChiave()`, che dopo quel `splice` è di un'altra coppia — o
+  vuota — e allora butta la take e tira `rnd(-5,6)`).
+- **cosa succede** — paghi 45 per la prima take e 12 per le altre, scegli la buona, la Cabina
+  scrive «esce con q76» e il pezzo esce con q69: il numero della take non conta niente, si
+  tira sempre un dado nuovo. Provato tre volte di fila con una strofa e un beat soli: take
+  scelte 4, 5 e 6 (q73, q75, q76 in Cabina), sul pezzo `parti.take` 4,99, 3,07 e −2,70 —
+  numeri con la virgola, cioè il dado, non una take (le take sono interi). Prima del commit
+  era uguale. In pratica tutta l'energia spesa in Cabina oltre alla prima take è buttata, e
+  la prima serve solo a sbloccare il tasto.
+- **come si vede** — Studio → Cabina, tre take, tieni la migliore e guarda il «q» che ti
+  promette; «Tieni questa e chiudi», titolo; in Uscita il pezzo ha un altro q.
+- **quanto pesa** — si vede ma si gira intorno (il pezzo esce lo stesso, ma la Cabina è una
+  presa in giro finché sta così: il giocatore paga per un numero che non arriva).
+
+
+**RISOLTO (15/09/2026)** — sullo stesso branch, prima del push. `registra` legge
+`studioTakePresa()` **prima** di sfilare strofa e beat dalla lista, così la targhetta combacia.
+Provato nel gioco vero tre volte con la take a +5 scelta in Cabina: il pezzo esce con
+`parti.take` 5 e la qualità uguale a quella promessa (74/75/75). Un controllo nell'audit
+guarda l'ordine delle due righe.
+### La barra della settimana scorsa di un rivale cambia frase quando lui esce con un pezzo
+
+- **dove** — `frontend/js/game/sputa.js:155` (`if(r.hot > 0 && i === 0) pool = "nuovo"`) e
+  `:168` (il fuoco ×1,6 se `hot`): le barre si rifanno da `sputaSemeRivale` a ogni apertura,
+  ma la scelta del **mazzo** legge `r.hot` di adesso, non di quella settimana.
+- **cosa succede** — è quello che resta della voce «Il dado fermo dei rivali si sblocca»: gli
+  id e il dado adesso tengono, ma quando un rivale passa da `hot` 0 a 3 (esce con un pezzo,
+  `rivals.js:78`) la sua prima barra della settimana scorsa cambia frase per intero, non solo
+  il nome del pezzo (provato su «Zeta»: «Da Roma con niente in tasca e tutto nella testa» →
+  «Pezzo nuovo. Tre giorni e già la cantano sotto casa mia»), e il fuoco che ci avevi messo
+  resta su una frase che non è più quella. La nota RISOLTO dice che «{ult}» può cambiare: qui
+  cambia tutta la barra. Vale anche al contrario, quando `hot` torna a zero tre settimane
+  dopo, e quando cominci a essere nominato (`sputaTiNominano` cambia i mazzi).
+- **come si vede** — Sputa, leggi una barra «flex» o «città» di un rivale, aspetta il log «X è
+  uscito con …», riapri Sputa.
+- **quanto pesa** — da sistemare con calma.
+
+
+**LASCIATO (15/09/2026)** — è la cosa piccola già scritta sotto alla voce del dado fermo:
+per tenerla ferma andrebbe salvato il testo della barra, e per una riga di un rivale non vale
+un campo nel salvataggio.
+**Nota, non è un errore**: cose viste che sono scelte o inezie. `studioTakePresa` cancella
+`takeAltre` quando un pezzo si chiude, come dice la nota RISOLTO: chi ha pagato take su due
+coppie e ne registra una perde l'altra, e la frase nella Cabina («se cambi, le ritrovi
+tornando qui») non dice che finiscono con il pezzo — è la scelta scritta nel commento, la
+segno perché il giocatore non la legge. Con una take in mano la plancia scrive «gratis» e
+l'Agenda «0⚡» per la stessa mossa: stessa cosa detta in due modi, come già per le altre
+mosse a zero. `studioTake()` adesso scrive anche `takeAltre` nel salvataggio quando lo chiama
+`costoScritto` a ogni ridisegno della plancia — sempre la stessa cosa, non fa danni, è la
+stessa nota del giro precedente su `need`.

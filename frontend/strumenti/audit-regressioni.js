@@ -627,16 +627,30 @@ test("gli elementi dello Studio stanno in un file loro, caricato dopo studio.js"
   index.includes('css/studio-elementi.css'));
 
 test("la prima take e' lo stesso tiro di dado che registra faceva da sola",
-  studioEl.includes("d.take = {k, l:[Math.round(rnd(-5, 6))], s:0}") &&
+  /* la cabina si apre vuota e ogni take, la prima compresa, e' quel dado */
+  studioEl.includes("d.take = {k, l:[], s:0}") &&
+  studioEl.includes("t.l.push(Math.round(rnd(-5, 6)))") &&
   actions.includes("typeof studioTakePresa === \"function\" ? studioTakePresa() : rnd(-5,6)") &&
   /* e chi non ha take in corso ricade sullo stesso dado */
   studioEl.includes("if(!d || !d.l || !d.l.length) return rnd(-5, 6);"));
 
 test("una take in piu' si paga in energia, e non e' gratis",
   studioEl.includes("const STUDIO_TAKE_ENERGIA = 12") &&
-  studioEl.includes("G.energy -= STUDIO_TAKE_ENERGIA") &&
-  studioEl.includes("if(G.energy < STUDIO_TAKE_ENERGIA)") &&
+  studioEl.includes("G.energy -= costo") &&
+  studioEl.includes("if(G.energy < costo)") &&
   studioEl.includes("const STUDIO_TAKE_MAX = 6"));
+
+/* L'energia si spende per fare la take, mai per tenerla (15/09/2026): prima
+   «Tieni questa e chiudi» era `registra` a 45 di energia, e chi aveva pagato
+   le take per insistere arrivava alla fine senza i 45 per tenere quella
+   buona. La sessione adesso la paga la prima take. */
+test("tenere una take non costa energia: la sessione la paga la prima take",
+  studioEl.includes("const STUDIO_TAKE_PRIMA = 45") &&
+  studioEl.includes("return t && t.l.length ? STUDIO_TAKE_ENERGIA : STUDIO_TAKE_PRIMA;") &&
+  /id:"registra", n:"Registra il pezzo", e:0,/.test(actions) &&
+  /* e senza take non si registra: sarebbe un pezzo gratis */
+  actions.includes("studioTakeManca()) ? \"una take, in cabina\"") &&
+  studio.includes(`stPrimo(' data-ancora="1"', "Registra la take · " + costo + " energia"`));
 
 test("i cursori del banco partono al centro e al centro valgono zero",
   studioEl.includes("d.banco = {voce:2, bassi:2, aria:2}") &&
@@ -664,6 +678,46 @@ test("un pezzo in cassaforte non esce per sbaglio dalla plancia",
    tre sparite non sono sparite: sono finite dentro alle stanze giuste, e se
    una di queste righe salta e' perche' qualcuno ha rimesso una linguetta o
    ha staccato un pezzo che adesso sta altrove. */
+/* Sputa, la seconda app del telefono per postare (15/09/2026): un file suo,
+   caricato dopo telefono.js perche' si registra da sola in HUB_APP; il
+   telefono la apre e basta. La prima barra del giorno da' +1 hype, le altre
+   niente: e' il freno contro il giro da sfruttare, e va tenuto. */
+console.log("\nSputa — la seconda app per postare (15/09/2026)");
+const sputa = fs.existsSync(path.join(ROOT, "js/game/sputa.js")) ? leggi("js/game/sputa.js") : "";
+test("Sputa sta in un file suo, caricato dopo telefono.js, e il telefono la apre",
+  sputa.includes('HUB_APP.push({id:"sputa"') &&
+  index.includes("js/game/sputa.js") &&
+  index.indexOf("js/game/sputa.js") > index.indexOf("js/game/telefono.js") &&
+  telefono.includes('if(id === "sputa") return typeof schermataSputa === "function" ? schermataSputa() : "";'));
+test("su Sputa i rivali sputano col dado fermo, e solo la prima barra del giorno da' hype",
+  sputa.includes("function sputaDado(seme)") &&
+  /* dal nome, non da r.seed: rivals.js lo rifa' a ogni pezzo nuovo */
+  sputa.includes("sputaDado(sputaSemeRivale(r) + sett * 7919)") &&
+  sputa.includes('id:"r" + sputaSemeRivale(r) + ":" + sett + ":" + i') &&
+  sputa.includes('adfOggi("sputa") === 0') &&
+  sputa.includes("const SPUTA_HYPE_PRIMA = 1") &&
+  sputa.includes("const SPUTA_MAX = 140"));
+test("Sputa aggiorna la fascia dell'hype e al tetto non promette +1",
+  sputa.includes('if(typeof renderHub === "function") renderHub();') &&
+  sputa.includes("const sale = G.hype < tetto;") &&
+  sputa.includes("alTetto"));
+/* la take pagata su una coppia strofa+beat non si butta cambiando coppia:
+   si mette da parte e torna (15/09/2026). Le altre finiscono col pezzo. */
+test("la take scelta si legge prima di sfilare strofa e beat, se no non arriva sul pezzo",
+  (() => {
+    const run = actions.slice(actions.indexOf('id:"registra"'));
+    const presa = run.indexOf("studioTakePresa() : rnd(-5,6)"), sfila = run.indexOf("G.bars.splice(G.bars.indexOf(b),1)");
+    return presa > 0 && sfila > 0 && presa < sfila;
+  })());
+test("la take pagata si mette da parte cambiando strofa o beat, e torna",
+  studioEl.includes("d.takeAltre[d.take.k] = d.take") &&
+  studioEl.includes("d.take = d.takeAltre[k] || null;") &&
+  studioEl.includes("delete G.studio.takeAltre;"));
+test("la plancia e l'Agenda dicono i 45 della take, non «gratis»",
+  actions.includes("costoScritto:() => (typeof studioTakeManca === \"function\" && studioTakeManca())") &&
+  ui.includes("const scritto = a.costoScritto ? a.costoScritto() : en2;") &&
+  telefono.includes("(a.costoScritto ? a.costoScritto() : a.e)"));
+
 console.log("\nLo Studio a cinque linguette (14/09/2026)");
 test("le linguette dello Studio sono cinque: Beat, Testo, Cabina, Mix, Uscita",
   (() => {
@@ -799,7 +853,9 @@ test("i tasti dello Studio restano nello schermo anche quando il pannello scorre
 test("in cabina l'oro ce l'ha «Tieni questa e chiudi», non «Un'altra take»",
   studio.includes(`stPrimo(' data-az="registra"', "Tieni questa e chiudi"`) &&
   studio.includes(`stSecondo(' data-ancora="1"'`) &&
-  !studio.includes(`stPrimo(' data-ancora="1"'`));
+  /* l'oro sulla take ce l'ha solo la prima, quando di take non ce n'e' */
+  !studio.includes(`stPrimo(' data-ancora="1"',\n              "Un'altra take`) &&
+  !studio.includes(`stPrimo(' data-ancora="1"', "Un'altra take`));
 
 /* Il banco dello Studio e' lo stesso dello Shop, ma il motore ascoltava i nomi
    degli attributi invece dei fatti: chi comprava dallo Studio, per gli eventi,
@@ -1940,7 +1996,8 @@ test("punto 28: girare a cercare beat non costa energia",
 test("punto 28: ma costa tempo, che è il freno vero",
   /beat:\s*120/.test(time) && hours.includes('beat:      {open:"13:00", close:"02:00"}'));
 test("punto 28: una mossa da zero energia si scrive «gratis», non «0 energia»",
-  ui.includes("(en2 ? '<i>' + en2 + '</i>energia' : 'gratis')"));
+  /* `scritto` e` en2, salvo le mosse che si pagano altrove (registra) */
+  ui.includes("(scritto ? '<i>' + scritto + '</i>energia' : 'gratis')"));
 
 console.log("\nPunti 8 e 9 — l'agenda: gli appuntamenti e le notifiche");
 test("punto 8: ogni evento della plancia ha il quadratino per segnarlo",

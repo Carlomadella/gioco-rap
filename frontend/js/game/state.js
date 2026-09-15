@@ -21,6 +21,9 @@ const START = () => ({
   offersSeen:{}, goals:{}, log:[], streak:0,
   phase:0, trialCd:0, trialsDone:{}, evCd:{}, seenLog:0,
   rivals:[], gente:[], chartPrev:99, streamsPrev:0, lafamegramMiei:[], lafamegramEventi:[],
+  /* Sputa, la seconda app per postare (sputa.js): le barre tue, e a quali
+     degli altri hai messo il fuoco */
+  sputaMiei:[], sputaFuoco:{},
   best:{fans:0, chart:99}, ended:false,
   /* Anti-spam Promo: memoria della quota percentuale gia' consumata nella settimana. */
   promoSaturation:{key:"", baseFans:0, pctUsed:0},
