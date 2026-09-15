@@ -639,14 +639,8 @@ function adfInstallNotificationApp(){
         badge:()=>adfNotifUnread()
       });
     }
-    if(typeof HUB_APP_VECCHIO!=="undefined" && Array.isArray(HUB_APP_VECCHIO) &&
-       !HUB_APP_VECCHIO.some(a=>a.id==="notifiche")){
-      HUB_APP_VECCHIO.splice(1,0,{
-        id:"notifiche",n:"Notifiche",ic:"campana",k:"#F59E0B",
-        sotto:()=>adfNotifUnread()?(adfNotifUnread()+" nuove"):(adfNotifStore().length+" archiviate"),
-        vai:()=>adfOpenNotifications()
-      });
-    }
+    /* la griglia compatta (HUB_APP_VECCHIO) non c'e' piu' dal 15/09/2026: il
+       telefono e' uno solo, e sotto i 1180 si alza (telefono-stretto.js) */
   }catch(err){
     console.warn("[ADF v1.2.13] impossibile registrare app Notifiche",err);
   }

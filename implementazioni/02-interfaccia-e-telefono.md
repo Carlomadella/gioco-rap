@@ -1720,11 +1720,11 @@ Uscita**, cinque linguette, nessuna vuota, e a 390px ci stanno in riga senza sco
    Fuori dallo Studio (l'Agenda del telefono) `actions.js` ripiega sul migliore come
    sempre.
 
-**Una cosa da sapere, non risolta qui**: sotto i 1180px il telefono della plancia non c'è
-(scelta scritta in `hub.css`), quindi «Che post fai?» non si raggiunge; il tasto «fallo
-sapere» dello Studio allora lancia la promo direttamente sull'ultimo pezzo uscito, senza
-la scelta del pezzo e senza l'anteprima. Quando il telefono avrà una pagina a schermo
-intero anche da stretto, il tasto va lì e la foto `studio_promo.png` può farle da fondale.
+**Una cosa da sapere, ~~non risolta qui~~ risolta il 15/09/2026**: sotto i 1180px il
+telefono della plancia non c'era, quindi «Che post fai?» non si raggiungeva e «fallo
+sapere» lanciava la promo alla cieca sull'ultimo uscito. Adesso il telefono si alza a
+schermo pieno anche da stretto e il tasto va lì: vedi «Il telefono quando lo schermo è un
+telefono», più sotto.
 
 Prove: 180 in `strumenti/prova.js` (i blocchi dello Studio e della classifica, riscritti
 sulle cinque linguette: la promo sul telefono, le due porte del feat con il dado fermo,
@@ -1776,3 +1776,60 @@ punto sui file già presenti. `telefono.js` ha solo la riga che la apre in `sche
 Provato nel gioco vero con Playwright a 1440: feed con diciannove barre, risposta a un
 rivale, prima barra +1 hype e la seconda no, fuoco che si accende e resta, stesse barre
 riaprendo l'app, LaFamegram che funziona come prima, niente errori in console.
+
+## Il telefono quando lo schermo è un telefono
+
+> «Sul telefono la promo non si sceglie e l'anteprima non si raggiunge più» e «Sputa sul
+> telefono vero non c'è» (problemi-riscontrati, 15/09/2026): stesso buco, il telefono della
+> plancia sotto i 1180 px è nascosto. Una task sola.
+
+**FATTO (15/09/2026)** — branch `task/telefono-sul-telefono`. Sotto i 1180 punti la
+colonna del telefono non c'è — `hub.css` la toglie, la città vuole tutta la larghezza — e
+con lei erano sparite tre cose del gioco: LaFamegram con «Che post fai?», l'anteprima del
+pezzo e Sputa. Proprio sugli schermi degli store del telefono. Il paradosso era che sotto
+i 1180 il codice disegnava ancora una «colonna compatta» (`renderTelefonoVecchio`,
+`HUB_APP_VECCHIO`, una griglia sua con undici app) dentro a un contenitore che il CSS
+teneva a `display:none`: lavoro fatto per nessuno, e le app nate dopo — LaFamegram, Sputa,
+Notifiche, Trasferte — ci si dovevano iscrivere una seconda volta, ognuna a modo suo.
+
+**La scelta: un telefono solo, che si alza.** Non una terza disposizione, non una pagina
+nuova: lo stesso iPhone della foto, lo stesso `#hb-tel`, la stessa home e le stesse app.
+Sotto i 1180 nella barra in alto, accanto al Menu, c'è un tasto col telefono e la pallina
+rossa (la somma delle palline delle app: chat, notizie, obiettivi, notifiche, trasferte).
+Lo tocchi e il telefono sale a schermo pieno sopra alla plancia, col guscio della foto
+proporzionato allo schermo — su un telefono da 390 viene 366 × 741, cioè **il telefono è
+il telefono**; su un portatile da 1000 è un iPhone in mezzo allo schermo. Si mette giù in
+tre modi: il tasto «Metti giù» sotto al guscio, un tocco fuori, ESC (che prima chiude
+l'app aperta e torna alla home, e solo dopo mette giù — e viene consumato, se no
+`menu-sistema.js` apriva il menu di sistema sopra). Aprire un'app da fuori — «fallo
+sapere» dallo Studio, una notifica — alza il telefono da solo: `telVaiApp` chiama
+`telStrettoApri` se c'è.
+
+**Dove sta.** Due file nuovi, come chiedono i punti «crea un file nuovo collegato ai già
+presenti» e «tieni tutto ciò che riguarda la parte smartphone separata dal resto del
+progetto»: `frontend/js/game/telefono-stretto.js` (il tasto, l'alzare e il mettere giù, la
+pallina, ESC) e `frontend/css/telefono-stretto.css` (la sovrapposizione, il guscio a
+misura, il tasto). Togliendo i due file si torna alla plancia di prima. `telefono.js` sa
+solo due cose: che aprire un'app può voler dire prima alzare il telefono, e che dopo ogni
+ridisegno c'è una pallina da aggiornare. La colonna compatta è **tolta** — da
+`telefono.js`, dal CSS, e dalle iscrizioni in `sputa.js`, `eventi-v2.js` e
+`trasferte.js` — e con lei i controlli dell'audit che la descrivevano, sostituiti da
+quattro sulla regola nuova. `studioFalloSapere` non ha più il ramo cieco: passa sempre dal
+telefono.
+
+**Tre cose trovate strada facendo.** Le misure del guscio sono in `cqw` del contenitore
+`.ptel`, che alzato è tutto lo schermo: il telefono veniva una pastiglia con gli angoli da
+124 punti — il rimedio è il margine interno laterale di `.ptel`, che riporta la sua
+larghezza di contenuto a quella del guscio. La pastiglia del tempo sta nella barra a
+z-index 142, sopra a tutto, modale compresa: col telefono alzato galleggiava sullo schermo,
+e siccome il telefono non deve salire sopra alla modale (un evento che esce mentre posti si
+deve vedere) è la pastiglia che si nasconde. E il secondo ESC apriva il menu di sistema:
+`dialogoFlottante()` in `menu-sistema.js` adesso conosce anche il telefono alzato.
+
+Provato nel gioco vero con Playwright a 390 × 844, 1000 × 700 e 1400 × 900: tasto nella
+barra solo sotto i 1180, apertura, Sputa dalla griglia, ESC in due tempi senza menu di
+sistema, «fallo sapere» dallo Studio che alza il telefono su LaFamegram con «Che post fai?»,
+tocco fuori che mette giù; nessuno scorrimento orizzontale, nessun errore in console. A
+1400 niente è cambiato. **Da sapere**: a 1000 la barra in alto trabocca già di suo (1100
+punti di contenuto in 1000, il widget del tempo sopra allo stat) e il Menu finisce fuori;
+non è di questa task, è scritto in problemi-riscontrati.

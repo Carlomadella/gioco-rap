@@ -1,11 +1,15 @@
 /* Il telefono della plancia.
 
-   Sotto i 1180px resta la colonna compatta, ma usa gli stessi dati del telefono
-   grande: Messaggi sono solo conversazioni reali; Diario/G.log vive in
-   Notifiche. Le schermate Messaggi e Chat vengono riusate anche qui, senza
-   creare un secondo sistema.
+   È uno solo, a qualunque misura. Dai 1180px in su è la terza colonna della
+   plancia; sotto, la colonna non c'è (hub.css la toglie, la città vuole tutta
+   la larghezza) e lo stesso telefono si alza a schermo pieno da un tasto nella
+   barra — quello sta in telefono-stretto.js, che è l'unico a saperne qualcosa:
+   qui si chiama solo `telStrettoApri` quando si apre un'app, se c'è. Prima
+   sotto i 1180 c'era una «colonna compatta» con una griglia sua,
+   `HUB_APP_VECCHIO`: nessuno la vedeva più, e le app nate dopo — LaFamegram,
+   Sputa — non ci stavano. Tolta il 15/09/2026.
 
-   Dai 1180px in su è il telefono della foto (`media/photo/pagina di gioco/
+   È il telefono della foto (`media/photo/pagina di gioco/
    schermata_telefono.png`): sfondo, griglia di icone su quattro colonne, dock
    in fondo, e ogni app che si apre a schermo pieno dentro alla cornice, con la
    sua interfaccia e un modo per tornare alla home (il pallino/barra in basso, o
@@ -18,7 +22,11 @@
 HIC.camera = '<path d="M4 7h3l1.6-2.2h6.8L17 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zm8 3a4.4 4.4 0 1 0 0 8.8 4.4 4.4 0 0 0 0-8.8zm0 2.2a2.2 2.2 0 1 1 0 4.4 2.2 2.2 0 0 1 0-4.4zM17 8.4a.9.9 0 1 0 0 1.8.9.9 0 0 0 0-1.8z"/>';
 
 const TEL_SOGLIA = 1180;
-const telPC = () => window.innerWidth >= TEL_SOGLIA;
+/* «da PC» vuol dire con la colonna a video: hub.css la toglie fino a 1180
+   compreso (max-width), quindi la colonna c'è da 1181 in su */
+const telPC = () => window.innerWidth > TEL_SOGLIA;
+/* il telefono si vede: o è la colonna, o è alzato sullo schermo stretto */
+const telAVideo = () => telPC() || (typeof telStrettoAperto === "function" && telStrettoAperto());
 const tronca = (s, n) => (s && s.length > n) ? s.slice(0, n - 1) + "…" : (s || "");
 
 /* Messaggi = persone che ti scrivono. Il diario generale G.log NON è una
@@ -45,47 +53,17 @@ function telMessaggiNonLetti(){
 let TEL_APP = null;        /* id dell'app aperta, null = sei alla home */
 /* Aprire un'app dal suo widget. Prima i «vai» portavano fuori dal telefono,
    nel quaderno: adesso il telefono ce l'ha in casa e non si esce più. */
-function telVaiApp(id){ TEL_APP = id; telSegnaVisto(id); if(typeof hubTap === "function") hubTap(); renderTelefono(); }
+function telVaiApp(id){
+  TEL_APP = id; telSegnaVisto(id);
+  if(typeof hubTap === "function") hubTap();
+  /* sullo schermo stretto il telefono va prima alzato (telefono-stretto.js) */
+  if(typeof telStrettoApri === "function") telStrettoApri();
+  renderTelefono();
+}
 window.telVaiApp = telVaiApp;
 let TEL_ORIGIN = null;     /* da dove parte l'animazione di apertura */
 let TEL_INVTAB = "bars";   /* linguetta aperta dentro Inventario */
 let TEL_MODO_PC = telPC();
-
-/* ================= LE APP — COMPATTE (sotto i 1180px) ================= */
-const HUB_APP_VECCHIO = [
-  {id:"contatti", n:"Contatti", ic:"gente", k:"#38BDF8",
-   sotto:g => (g.gente || []).filter(p => !p.via && p.rel >= 1).length + " conosciuti",
-   vai:() => apriPosto()},
-  {id:"notifiche", n:"Notifiche", ic:"rischio", k:"#FB923C",
-   sotto:g => Math.max(0, g.log.length - (g.seenLog || 0)) + " nuove",
-   vai:() => { renderGioco(); openDiary(); }},
-  {id:"obiettivi", n:"Obiettivi", ic:"mirino", k:"#EF4444",
-   sotto:g => GOALS.filter(x => !g.goals[x.id]).length + " aperti",
-   vai:() => telVaiApp("obiettivi")},
-  {id:"notizie", n:"Notizie", ic:"giornale", k:"#60A5FA",
-   sotto:() => HUB_NOTIZIE.length + " questa settimana", vai:() => hubNotizie()},
-  {id:"inventario", n:"Inventario", ic:"zaino", k:"#F59E0B",
-   sotto:g => (g.bars.length + g.beats.length + g.songs.length + Object.keys(g.gear).length) + " cose",
-   vai:() => telVaiApp("inventario")},
-  /* punto 7: i numeri stavano sotto «Dettagli», nella vecchia schermata di
-     gioco. Adesso stanno sulla plancia — quindi l'app li mostra dove sono,
-     invece di aprire un pannello che non c'è più. */
-  {id:"statistiche", n:"Statistiche", ic:"barre", k:"#4ADE80",
-   vai:() => { GO("hub"); HUB_VISTA = "condizione"; renderHub(); }},
-  {id:"discografia", n:"Discografia", ic:"nota", k:"#C084FC",
-   sotto:g => g.songs.filter(x => x.released).length + " pezzi fuori",
-   vai:() => telVaiApp("discografia")},
-  {id:"contratti", n:"Contratti", ic:"foglio", k:"#94A3B8",
-   sotto:g => (g.contract ? g.contract.label : "indipendente"),
-   vai:() => telVaiApp("contratti")},
-  {id:"classifiche", n:"Classifiche", ic:"coppa", k:"#FACC15",
-   vai:() => telVaiApp("classifiche")},
-  {id:"agenda", n:"Agenda", ic:"agenda", k:"#F87171",
-   sotto:() => telAgendaDisponibili() + " mosse ora",
-   vai:() => telVaiApp("agenda")},
-  {id:"impostazioni", n:"Impostazioni", ic:"ingranaggio", k:"#9AA1B2",
-   vai:() => { if(window.IMPOSTAZIONI) window.IMPOSTAZIONI(); }}
-];
 
 /* ================= QUELLO CHE HAI GIA' GUARDATO ================= */
 /* Una pallina rossa che non si spegne mai smette di essere una notizia e
@@ -181,7 +159,7 @@ function telAggiornaFeed(){
       n:p.n, t:spoglia(p.t), w:"Settimana " + p.s, like:Math.max(0, Math.round(p.like || 0)),
       mia:false
     }));
-    if(telPC() && (!TEL_APP || TEL_APP === "lafamegram")) renderTelefono();
+    if(telAVideo() && (!TEL_APP || TEL_APP === "lafamegram")) renderTelefono();
   });
 }
 
@@ -304,10 +282,6 @@ function telAgendaEvento(e){
   return telAgendaAzione(e.id);
 }
 
-function telAgendaDisponibili(){
-  return ACTIONS.reduce((n,a) => n + (telAgendaAzione(a.id).ok ? 1 : 0), 0);
-}
-
 /* ================= RENDER — INGRESSO UNICO ================= */
 /* Il telefono si ridisegna con `innerHTML`, che **cancella** quello che ha
    dentro: se un contenitore preso in prestito dal magazzino fosse ancora lì,
@@ -329,42 +303,10 @@ window.riempiSlotTelefono = riempiSlotTelefono;
 
 function renderTelefono(){
   svuotaSlotTelefono();
-  if(!telPC()) renderTelefonoVecchio();
-  else renderTelefonoHome();
+  renderTelefonoHome();
   riempiSlotTelefono();
-}
-
-function renderTelefonoVecchio(){
-  const msg = telMessaggiDiretti().slice(0, 2);
-  const nuovi = telMessaggiNonLetti();
-  $("hb-tel").className = "ptelscr";
-  /* La colonna sta dentro al suo riquadro: lo schermo non ha più il margine
-     interno di prima, che adesso è la home a darsi da sé. */
-  $("hb-tel").innerHTML =
-    '<div class="pvecchio">' +
-    '<span class="ptt">Il tuo telefono</span>' +
-    '<div class="pmsg">' +
-      '<div class="pmsghead">' + hsvg("chat") + '<b>Messaggi</b>' +
-        (nuovi ? '<span class="pnuovi">' + nuovi + ' nuovi</span>' : '') + '</div>' +
-      (msg.length ? msg.map(m =>
-        '<button class="pmr" data-chat="' + m.id + '">' +
-          '<span class="pmav">' + hsvg("persona") + '</span>' +
-          '<span class="pmtx"><b>' + m.n + '</b><i>' + spoglia(m.t) + '</i></span>' +
-          '<span class="pmrt">' + (m.nonLetti ? m.nonLetti + ' nuovi<u></u>' : '') + '</span>' +
-        '</button>').join("")
-        : '<div class="pmr"><span class="pmtx"><i>Nessun messaggio diretto. Gli eventi automatici sono in Notifiche.</i></span></div>') +
-    '</div>' +
-    '<button class="plargo" data-telapp="chat">Vedi tutte le chat</button>' +
-    '<div class="papp">' + HUB_APP_VECCHIO.map(a =>
-      '<button class="pap" data-app="' + a.id + '" style="--k:' + a.k + '">' + hsvg(a.ic) +
-      '<span><b>' + a.n + '</b>' + (a.sotto ? '<i>' + a.sotto(G) + '</i>' : '') + '</span></button>').join("") +
-    '</div>' +
-    '<div class="pnews"><h4>Notizie della settimana</h4>' +
-      HUB_NOTIZIE.map(n => '<p style="--k:' + n.k + '">' + hsvg(n.ic) + n.t + '</p>').join("") +
-    '</div>' +
-    '<button class="plargo" data-news="1">Vedi tutte le notizie</button>' +
-    '</div>' +
-    (TEL_APP ? schermataWrap(TEL_APP) : '');
+  /* la pallina sul tasto della barra, sullo schermo stretto */
+  if(typeof telStrettoAggiorna === "function") telStrettoAggiorna();
 }
 
 /* ================= RENDER — HOME NUOVA ================= */
@@ -787,10 +729,10 @@ $("hb-tel").addEventListener("click", ev => {
   }
   const app = ev.target.closest("[data-app]");
   if(app){
-    const a = (telPC() ? HUB_APP : HUB_APP_VECCHIO).find(x => x.id === app.dataset.app);
+    const a = HUB_APP.find(x => x.id === app.dataset.app);
     if(!a) return;
     telSegnaVisto(a.id);
-    if(telPC()) telApriApp(a, ev); else { hubTap(); a.vai(); }
+    telApriApp(a, ev);
     return;
   }
   if(ev.target.closest("[data-diario]")){ renderGioco(); openDiary(); return; }
@@ -862,5 +804,5 @@ window.addEventListener("resize", () => {
 });
 
 /* un feed vivo vuol dire che si muove anche se non lo riapri tu: un giro
-   ogni due minuti, solo mentre il telefono nuovo è quello a video */
-setInterval(() => { if(telPC()) telAggiornaFeed(); }, 120000);
+   ogni due minuti, solo mentre il telefono è a video */
+setInterval(() => { if(telAVideo()) telAggiornaFeed(); }, 120000);

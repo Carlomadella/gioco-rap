@@ -369,9 +369,9 @@ const HUB_EVENTI = [
    righe:[["soldi", "Soldi veloci"], ["rischio", "Rischio vero"]]}
 ];
 
-/* Le app del telefono (HUB_APP, HUB_APP_VECCHIO) e il loro disegno stanno in
-   js/game/telefono.js: qui restano solo i dati che servono a tutta la
-   plancia, non solo al telefono. */
+/* Le app del telefono (HUB_APP) e il loro disegno stanno in js/game/telefono.js,
+   e sotto i 1180 il telefono si alza da telefono-stretto.js: qui restano solo i
+   dati che servono a tutta la plancia, non solo al telefono. */
 
 /* ================= NOTIZIE E SUGGERIMENTI ================= */
 const HUB_NOTIZIE = [

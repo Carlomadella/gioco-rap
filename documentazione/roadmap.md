@@ -190,10 +190,9 @@ barra del giorno dà +1 hype (`frontend/js/game/sputa.js`). Tutte e due in
 `implementazioni/`: «Non si spende energia per tenere una take» in `04-musica-e-suoni.md`,
 «Sputa» in `02-interfaccia-e-telefono.md`.
 
-**Manca**: l'app della discografia che dice come invecchiano i pezzi; e sotto i 1180px,
-dove il telefono della plancia non c'è, «Che post fai?» non si raggiunge (il tasto «fallo
-sapere» dello Studio lancia la promo diretta sull'ultimo uscito) — quando il telefono avrà
-una pagina intera anche da stretto, la promo va lì.
+**Manca**: l'app della discografia che dice come invecchiano i pezzi. (Il buco dei 1180px —
+«Che post fai?» che sotto non si raggiungeva — è chiuso il 15/09/2026: il telefono si alza
+a schermo pieno anche da stretto, vedi la tappa G.)
 
 È il punto salito in cima al foglio dei punti nuovi il 07/09/2026 (commit *«il punto sulla
 TRACK sale fra le cose da fare»*). Tocca `sim.js`, `studio.js`, `posto.js` e la discografia:
@@ -245,6 +244,13 @@ controllo in `audit-regressioni.js` tiene ferma la convenzione. Nello stesso gir
 chiusi i tre punti dello Studio (l'orologio galleggiante che copriva i pannelli, la barra
 delle take che non si poteva confrontare, la fascia in alto tagliata a 360) e la Strada, che
 sotto ai 980 punti non si impilava — esisteva solo larga, e sul telefono non si giocava.
+
+**Il telefono quando lo schermo è un telefono (15/09/2026)**: sotto i 1180 la colonna del
+telefono non c'era e con lei sparivano LaFamegram, l'anteprima e Sputa. Adesso lo stesso
+iPhone si alza a schermo pieno da un tasto nella barra (`telefono-stretto.js/.css`, due
+file loro), e la colonna compatta che nessuno vedeva è tolta. Sta in
+`implementazioni/02-interfaccia-e-telefono.md`, «Il telefono quando lo schermo è un
+telefono».
 
 **Resta la prova su un telefono vero**, con l'agente `prova-sul-telefono`: le misure di
 questo giro sono state lette nel CSS, non rifatte a schermo. Finché non è passata quella,

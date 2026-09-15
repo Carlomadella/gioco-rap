@@ -1,0 +1,94 @@
+/* IL TELEFONO QUANDO LO SCHERMO E' UN TELEFONO.
+
+   Dai 1180 punti in su il telefono e' la terza colonna della plancia (telefono.css).
+   Sotto, la colonna non c'e' — hub.css la toglie, perche' la citta' ha bisogno di
+   tutta la larghezza — e con lei sparivano LaFamegram («Che post fai?»), l'anteprima
+   del pezzo e Sputa: tre cose del gioco finite dietro a una tenda, proprio sugli
+   schermi degli store del telefono (problemi-riscontrati, 15/09/2026).
+
+   Qui il telefono torna come **sovrapposizione**: un tasto nella barra in alto,
+   accanto al Menu, lo apre a schermo pieno — lo stesso guscio, la stessa home, le
+   stesse app — e si chiude col tasto sotto, con un tocco fuori o con ESC. Su un
+   telefono vero il guscio riempie lo schermo: il telefono e' il telefono.
+
+   Il file e' suo, come chiede il punto «tieni tutto cio' che riguarda la parte
+   smartphone separata dal resto del progetto»: telefono.css non sa niente di
+   questo, e togliendo questo file si torna alla plancia di prima. La logica sta in
+   js/game/telefono-stretto.js. */
+
+/* ---- il tasto nella barra: si vede solo quando la colonna non c'e' ---- */
+.ptelbtn{display:none}
+
+@media (max-width:1180px){
+  .ptelbtn{
+    order:2;                       /* come .pmenu: dopo il widget del tempo */
+    flex:none;
+    position:relative;
+    display:flex;align-items:center;justify-content:center;
+    min-width:44px;min-height:44px;padding:0 10px;
+    margin-left:auto;              /* si prende lui il fianco destro, il Menu gli sta accanto */
+    background:none;border:0;border-left:1px solid rgba(255,255,255,.08);
+    color:#B7BCC7;cursor:pointer;
+    transition:color .15s,background .15s}
+  .ptelbtn + .pmenu{margin-left:0}
+  @media (hover:hover){.ptelbtn:hover{color:#fff;background:rgba(255,255,255,.05)}}
+  .ptelbtn:active{color:#fff}
+  .ptelbtn .hicon{width:22px;height:22px;fill:currentColor}
+  /* la pallina rossa e' quella delle icone dentro (telefono.css .tbadge):
+     stessa forma, cosi' fuori e dentro dicono la stessa cosa */
+  .ptelbadge{position:absolute;top:5px;right:4px;min-width:16px;height:16px;padding:0 4px;
+    border-radius:99px;background:#EF4444;color:#fff;font-size:9.5px;font-weight:800;
+    line-height:16px;text-align:center;box-shadow:0 0 0 2px #0A0D14}
+
+  /* ---- la sovrapposizione ---- */
+  /* hub.css dice «body.in-hub .ptel{display:none}» sotto i 1180: resta vero
+     da chiuso. Aperto (.on, come tutte le finestre di uscita.js) il telefono
+     copre la plancia. Sta sotto alla modale (60) e sopra allo Studio (55):
+     un evento gli esce sopra, lo Studio gli sta sotto. */
+  /* Il guscio della foto e' 676 x 1369 (telefono.css): alto quanto lo schermo
+     meno i margini e il tasto sotto, e largo di conseguenza — ma mai piu'
+     largo dello schermo. Su un telefono da 390 viene 366 x 741.
+     Le misure del guscio (scocca, angoli, tasti) sono in `cqw` di `.ptel`, che
+     e' il contenitore: qui `.ptel` e' tutto lo schermo, e senza rimedio il
+     telefono veniva una pastiglia con gli angoli da 124 punti. Il rimedio e'
+     il margine interno laterale: la larghezza di contenuto di `.ptel` diventa
+     quella del guscio, e i `cqw` tornano a leggere la misura giusta. */
+  body.in-hub .ptel.on{
+    --telalto:calc(100dvh - 24px - 54px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+    --tellargo:min(100vw - 24px, var(--telalto) * .494);
+    display:flex;
+    position:fixed;inset:0;z-index:58;
+    flex-direction:column;align-items:center;justify-content:center;gap:10px;
+    padding:12px calc((100vw - var(--tellargo)) / 2);
+    padding-top:calc(12px + env(safe-area-inset-top,0px));
+    padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));
+    background:rgba(4,5,10,.84);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  body.in-hub .ptel.on .ptelframe{
+    width:100%;
+    height:auto;aspect-ratio:676/1369;
+    flex:none;max-height:100%}
+
+  /* il tasto per metterlo giu': largo un pollice, sotto al guscio */
+  .ptelgiu{display:flex;align-items:center;justify-content:center;gap:8px;
+    flex:none;min-height:44px;padding:0 22px;border-radius:999px;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+    color:#E9EBF1;font:inherit;font-size:12px;font-weight:800;letter-spacing:.08em;
+    text-transform:uppercase;cursor:pointer}
+  .ptelgiu:active{background:rgba(255,255,255,.16)}
+  .ptelgiu .hicon{width:16px;height:16px;fill:currentColor}
+  .ptel:not(.on) .ptelgiu{display:none}
+
+  /* sotto al telefono aperto la plancia non scorre */
+  body.in-hub.tel-aperto{overflow:hidden}
+  /* La pastiglia del tempo (tempo-controlli.js) sta nella barra a z-index 142,
+     sopra a tutto, modale compresa: col telefono alzato galleggiava sopra allo
+     schermo. Il telefono non sale sopra alla modale — un evento che esce
+     mentre posti deve vedersi — quindi e' la pastiglia che si fa da parte. */
+  body.in-hub.tel-aperto #adf-time-dock{visibility:hidden}
+}
+
+/* dai 1180 in su il tasto «metti giu'» non ha senso: la colonna e' sempre li' */
+@media (min-width:1181px){
+  .ptelgiu{display:none}
+}

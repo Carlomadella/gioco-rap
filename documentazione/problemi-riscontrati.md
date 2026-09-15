@@ -5,23 +5,22 @@ stata chiusa. Qui solo quelle **ancora aperte**, in ordine d'importanza — l'or
 di «Da fare adesso» in [`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md),
 che mette insieme i due fogli.
 
-1. **Sul telefono la promo non si sceglie e l'anteprima non si raggiunge più** (15/09) e
-   **Sputa sul telefono vero non c'è** (15/09): stesso buco, il telefono della plancia sotto
-   i 1180 px è nascosto. Una task sola.
-2. **L'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore** (13/09).
-3. **Lo Shop promette tre reparti a schede, ce ne sono due** (10/09).
-4. **Sul telefono i colori del «passaggio del mouse» restano accesi dopo il tocco** (08/09):
+1. **L'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore** (13/09).
+2. **Lo Shop promette tre reparti a schede, ce ne sono due** (10/09).
+3. **Sul telefono i colori del «passaggio del mouse» restano accesi dopo il tocco** (08/09):
    il giro unico su tutti i CSS.
-5. Le code dello Studio a cinque linguette (15/09): **un rapper della classifica con lo
+4. Le code dello Studio a cinque linguette (15/09): **un rapper della classifica con lo
    stesso nome di uno della Sala non si può chiamare**, **chi accetta dalla classifica occupa
    un posto della Sala**; e dal 14/09 **la copertina proposta e non confermata resta nel
    salvataggio, foto compresa**.
-6. Le tre del Marketing (14/09): **«In spinta» esce come una seconda riga bianca**, **una
+5. Le tre del Marketing (14/09): **«In spinta» esce come una seconda riga bianca**, **una
    riga di pezzo senza seed è un bottone che non fa niente**, **il pezzo scelto può sparire
    dall'elenco, ma resta quello che si spinge**; più **sul telefono il motivo per cui
    l'anteprima è spenta viene tagliato**.
-7. **`jose` e `zod` stanno fra le `dependencies`** (13/09), aperta per decisione: `jose` va
+6. **`jose` e `zod` stanno fra le `dependencies`** (13/09), aperta per decisione: `jose` va
    usata in `backend/accessi.js`, non tolta.
+7. **Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
+   telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra.
 8. **L'uscita di venerdì non costa niente, quella a mano sì** (08/09): risolto in parte per
    scelta — il vantaggio di venerdì è quello di aspettare, non uno sconto. Sparisce del tutto
    con «togli il parametro lucidità» (CARLO).
@@ -2196,6 +2195,10 @@ che `studioConsumaFeat()` lo liberi, e l'audit controlla l'ordine.
 - **quanto pesa** — si vede ma si gira intorno (la promo parte comunque); per l'anteprima
   non c'è un giro.
 
+
+**RISOLTO (15/09/2026)** — branch `task/telefono-sul-telefono`: sotto i 1180 il telefono si alza a
+schermo pieno da un tasto nella barra, e «fallo sapere» ci passa sempre. «Il telefono quando
+lo schermo è un telefono» in `implementazioni/02-interfaccia-e-telefono.md`.
 ### Un rapper della classifica con lo stesso nome di uno della Sala non si può chiamare
 
 - **dove** — `frontend/js/game/studio.js:279-280` (`studioRivaliChiamabili` scarta i rivali
@@ -2563,6 +2566,10 @@ nomina quello di oggi (`{ult}` si legge al ridisegno) — non si salva il testo 
 sotto i 1180 px, e va chiuso in una task sola che decida dove sta il telefono quando lo
 schermo è un telefono. È il primo punto di «Da fare adesso» in
 `implementazioni/implementazioni.md`.
+
+**RISOLTO (15/09/2026)** — stesso branch, stessa cosa: il telefono alzato ha tutte le app,
+Sputa compresa; la griglia compatta in cui le app si dovevano iscrivere una seconda volta
+non c'è più.
 **Nota, non è un errore**: cose piccole che non valgono una voce. `sputa.js:259` scrive «1
 barre tue» nella griglia vecchia del telefono (manca il singolare). I due tasti sotto le barre
 dei rivali — il fuoco e «Rispondi» — sono alti 21 px (`css/telefono.css`, `.tspfuoco` e
@@ -2746,3 +2753,21 @@ sono venti: contate nei `CREATE TABLE` delle otto migrazioni).
 **Nota, non è un errore**: `documentazione/dipendenze.md:400` dice «il backend una
 dipendenza ce l'ha, `pg`» nel racconto di com'era il 07/09, quando `jose` e `zod` non c'erano
 ancora; è storia, e lo stesso file le elenca poche righe sopra. Va bene così.
+
+## Giro del 15/09/2026 (mentre si faceva «il telefono quando lo schermo è un telefono»)
+
+### Fra i 980 e i 1180 punti la barra della plancia trabocca, e il Menu esce a destra
+
+- **dove** — `frontend/css/hub.css` (`.pbarra`, `.plogo` 132, `.pcitta` 170, `.pstat`
+  467, `.pmenu` 107) e il widget del tempo che `tempo-controlli.js` monta nella barra
+  (`#adf-time-dock`, 224 di larghezza, sopra allo stat). Sotto i 980 `stretto.css` fa
+  andare a capo la barra; fra 980 e 1180 nessuno se ne occupa.
+- **cosa succede** — a 1000 di larghezza il contenuto della barra è 1100 (misurato: il
+  Menu comincia a 956 e finisce a 1063, la barra ha `scrollWidth` 1144). Non è di questa
+  task: c'era già, e il tasto nuovo del telefono (44) lo peggiora di 44 — a 1000 il Menu
+  è tutto fuori.
+- **come si vede** — finestra a 1000 × 700, plancia: il Menu non c'è, a destra c'è il
+  telefono e basta.
+- **quanto pesa** — si vede ma si gira intorno (il menu di sistema si apre anche con ESC).
+  La soglia di `stretto.css` a 980 e quella del telefono a 1180 non si parlano: o la barra
+  va a capo già sotto i 1180, o il logo e la città si stringono lì.

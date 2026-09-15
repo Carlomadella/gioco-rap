@@ -1513,13 +1513,8 @@ function installaApp(){
       HUB_APP.splice(2, 0, {id:"trasferte", n:"Trasferte", ic:"valigia", k:"#F97316",
         badge:() => badgeTrasferte()});
     }
-    if(typeof HUB_APP_VECCHIO !== "undefined" && Array.isArray(HUB_APP_VECCHIO) &&
-       !HUB_APP_VECCHIO.some(a => a.id === "trasferte")){
-      HUB_APP_VECCHIO.splice(2, 0, {id:"trasferte", n:"Trasferte", ic:"valigia", k:"#F97316",
-        sotto:() => { const n = st().inviti.length;
-          return n ? n + (n === 1 ? " invito aperto" : " inviti aperti") : conosciuti().length + " contatti fuori"; },
-        vai:() => apriApp()});
-    }
+    /* la griglia compatta (HUB_APP_VECCHIO) non c'e' piu' dal 15/09/2026: il
+       telefono e' uno solo, e sotto i 1180 si alza (telefono-stretto.js) */
     /* il ruolo scritto per esteso anche nell'app Contatti, se no un
        «videomaker» conosciuto a Roma lì dentro si legge in minuscolo e sbagliato */
     if(typeof TEL_RUOLI !== "undefined"){
