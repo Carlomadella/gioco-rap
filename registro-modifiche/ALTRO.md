@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:c0c45c2 -->
+## 16/09/26, 17:20 â€” task/salvare-i-punti-da-main â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `c0c45c2`
+
+### Cosa Ã¨ entrato
+
+- `5926f75` â€” fix(git): il giro di chiusura del gate dei fogli — cinque cose del controllo, tutte chiuse â€” **Carlomadella**
+- `c922653` â€” feat(git): i fogli dei punti si salvano da main — «fai in modo che io possa salvare le implementazioni nuove» â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/come-si-lavora.md`
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:684a1af -->
 ## 16/09/26, 14:36 â€” task/prima-transizione-video â†’ main
 
