@@ -24,6 +24,16 @@
 
 const { createRemoteJWKSet, jwtVerify } = require("jose");
 
+/* Gli errori di `jose` che parlano del BIGLIETTO: firma che non torna, chiave
+   sconosciuta, scaduto, non per noi, algoritmo non ammesso, JWT malformato.
+   Tutto il resto — il server delle chiavi che va in timeout, che risponde 503
+   o con una pagina HTML invece del JSON, la rete che non c'è — è colpa nostra,
+   e si racconta come «verifica non riuscita», non come «biglietto rifiutato».
+   Prima si guardava il messaggio con una regex, e un 503 di Apple passava per
+   un biglietto falso. */
+const COLPA_DEL_BIGLIETTO = /^ERR_(JWT_|JWS_|JWKS_NO_MATCHING_KEY|JWKS_MULTIPLE_MATCHING_KEYS|JOSE_ALG_NOT_ALLOWED|JOSE_NOT_SUPPORTED)/;
+const colpaDelBiglietto = e => !!(e && COLPA_DEL_BIGLIETTO.test(String(e.code || "")));
+
 const CFG = {
   steamChiave: process.env.ADF_STEAM_CHIAVE || "",
   steamAppId: process.env.ADF_STEAM_APPID || "",
@@ -77,13 +87,11 @@ async function apriToken(token, emittente, destinatario, urlChiavi){
     if(!payload.sub) return null;
     return payload;
   }catch(e){
-    /* firma che non torna, chiave sconosciuta, scaduto, non per noi, JWT
-       malformato: per chi chiama è tutto «biglietto rifiutato». Se invece
-       sono le chiavi pubbliche a non rispondere è un guaio nostro, e si
-       rilancia: chi chiama lo racconta come verifica non riuscita. */
-    if(e && (e.code === "ERR_JWKS_TIMEOUT" || /fetch|network|ECONN|ENOTFOUND|EAI_AGAIN/i.test(String(e.message))))
-      throw new Error("le chiavi pubbliche non rispondono: " + e.message);
-    return null;
+    /* per chi chiama un biglietto sbagliato è «rifiutato»; se invece sono le
+       chiavi pubbliche a non rispondere è un guaio nostro e si rilancia: chi
+       chiama lo racconta come verifica non riuscita */
+    if(colpaDelBiglietto(e)) return null;
+    throw new Error("le chiavi pubbliche non rispondono: " + (e && e.message || e));
   }
 }
 

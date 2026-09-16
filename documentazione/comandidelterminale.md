@@ -72,7 +72,7 @@ nome. **Va lanciato prima di ogni commit** che tocca `frontend/`.
 
 ## Il server (backend)
 
-Serve **Node 22.5 o più nuovo** (per via di `node:sqlite`, che è dentro Node senza
+Serve **Node 22.12 o più nuovo** (per via di `node:sqlite`, che è dentro Node senza
 installare niente). Comandi da lanciare dentro `backend/`:
 
 ```bash
@@ -149,7 +149,7 @@ sta già girando bene, usa quello — non serve riaccenderlo.
 **Node troppo vecchio per il backend** (`node:sqlite` non c'è) — controlla la versione:
 
 ```bash
-node --version     # deve essere 22.5 o più
+node --version     # deve essere 22.12 o più
 ```
 
 **`npm run prova` del frontend segnala il build mancante** — è normale se non hai mai

@@ -43,7 +43,8 @@ Anni di Fame — il server su http://localhost:8787
 
 La prima volta il database non c'è: se lo crea, applica le migrazioni e mette in pista 140
 bot in scala logaritmica, dal ragazzino con 300 ascolti a quello con due milioni.
-Serve **Node 22.5 o più nuovo** (è quando è arrivato `node:sqlite`).
+Serve **Node 22.12 o più nuovo**: `node:sqlite` c'è dal 22.5, ma `jose` è un pacchetto
+solo ESM e il `require` di un modulo ESM funziona senza flag dal 22.12.
 
 ## La prova
 

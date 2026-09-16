@@ -353,11 +353,12 @@ finisce nel gioco e pesa; **[fuori]** che resta negli strumenti e non pesa nient
 
 - **pg** — _già installata._ Il client PostgreSQL: SCRAM-SHA-256, TLS, tipi, riconnessioni.
   Il perché sta in [`../backend/database/README.md`](../backend/database/README.md).
-- **jose** — JWT e JWE fatti bene: verifica la firma, scarica e tiene da conto le chiavi
-  pubbliche (JWKS), controlla emittente, destinatario e scadenza. **Sostituisce la parte più
-  delicata di `accessi.js`.** È la prima che installerei.
-- **zod** — controlla il corpo di ogni richiesta prima che tocchi il database, e risponde
-  dicendo quale campo è sbagliato. Oggi è a mano, rotta per rotta, e le rotte crescono.
+- **jose** — _già installata, in uso dal 16/09/2026._ JWT e JWE fatti bene: verifica la
+  firma, scarica e tiene da conto le chiavi pubbliche (JWKS), controlla emittente,
+  destinatario e scadenza. Ha sostituito la parte più delicata di `accessi.js`.
+- **zod** — _già installata, in uso dal 16/09/2026._ Controlla il corpo di ogni richiesta
+  prima che tocchi il database, e risponde dicendo quale campo è sbagliato
+  (`backend/forme.js`). Prima era a mano, rotta per rotta.
 - **pino** — log strutturati in JSON, velocissimi: si filtrano, si contano, si mandano da
   qualche parte. Con **pino-pretty** restano leggibili mentre sviluppi.
 - **rate-limiter-flexible** — limiti di richieste che funzionano anche con più processi

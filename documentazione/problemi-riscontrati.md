@@ -54,6 +54,16 @@ fine task su quel foglio.
    (16/09/2026)** — tutte e cinque, nello stesso branch prima del push: commit dei soli
    fogli, nomi con accenti, `--no-renames`, eccezione stretta ai `.md` di primo livello,
    messaggio del push. Il dettaglio sotto a ogni voce, nel giro in fondo.
+15. ~~**Se le chiavi di Apple o Google rispondono con un errore (503, HTML), la colpa va al
+   giocatore**; più `jose` 6 che vuole Node 22.12, e il README dell'API sul `tipo`
+   sconosciuto (16/09).~~ **RISOLTO (16/09/2026)** — la colpa la decide il codice dell'errore
+   di `jose` (due prove nuove, 192 a posto); `engines >=22.12` e i documenti con lui; §6
+   corretto. Il dettaglio sotto a ogni voce, nel giro in fondo.
+16. ~~**Sei righe di documento dietro alla task `jose` e `zod`** (16/09, giro
+   backend-allineato).~~ **RISOLTO (16/09/2026)** — `README-API.md` corretto in §6, §7 e
+   nelle sette liste errori per rotta; `artistaId-mancante` è diventato `artista-mancante`
+   ed esce in `errore`; `README.md`, `ROADMAP.md` e `dipendenze.md` non dicono più «da
+   usare». Il dettaglio sotto a ogni voce, nel giro in fondo.
 
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
 
@@ -3404,3 +3414,232 @@ Una nota sui documenti, non un errore: il commento della prova nuova
 restare d'accordo» e controlla i due hook, lo script e `CLAUDE.md`; il quarto posto,
 `documentazione/come-si-lavora.md` («Salvare i punti nuovi, da `main`»), non è nella prova,
 mentre `CLAUDE.md` dice che le due copie della regola vanno cambiate insieme. Oggi tornano.
+
+## Giro del 16/09/2026 (segnala-problemi, fine task `task/jose-e-zod-nel-backend`, commit `d268a3d`)
+
+Giro sul backend, come chiesto: letti `backend/accessi.js` (e la versione di prima con
+`git show HEAD~1:backend/accessi.js`), `backend/forme.js`, il diff di `backend/server.js` e
+di `backend/prova.js`, `frontend/js/net/online.js` per i corpi che il gioco manda davvero,
+la collezione Postman, il codice di `jose` in `node_modules` (come scarica le chiavi e che
+errori tira), e i documenti toccati. Fatti girare `cd backend && npm run prova` (**190 a
+posto, 0 no**) e `node scripts/controlla-backend.js` (verde). Niente `npm run verifica`.
+In più uno script mio, fuori dal repo, che chiama `accessi.verifica("apple", …)` con le
+chiavi pubbliche in cinque stati diversi: è da lì che viene la prima voce.
+
+Le cose che **tengono** e che ho controllato a mano: le opzioni di `jwtVerify` fanno
+quello che faceva il codice di prima — `iss` con e senza `https://` (provato), `aud` anche
+come lista (provato), `exp` obbligatoria e `sub` obbligatorio, un minuto di tolleranza,
+«firmato nel futuro» rimasto come riga nostra; un biglietto con `alg: none` o `alg: HS256`
+viene buttato (provato), e `jose` guarda l'`alg` **prima** di andare a prendere le chiavi;
+un `exp` scritto come stringa viene buttato; le chiavi pubbliche con la porta chiusa danno
+«verifica-non-riuscita» come prima. In `forme.js` nessuna forma è più stretta di quello
+che `online.js` manda (`dispositivo` è un oggetto, `seed` un intero, `stream`/`deal` liberi,
+`settimana`/`anno` numeri, `forza` un booleano vero, `ultima` una stringa o `null`); dove
+`server.js` legge `b.x` senza più `String(b.x || "")` il campo è obbligatorio nella forma
+(`artistaId`, `id`, `codice`, `accountId`, `tipo`), quindi non arriva `undefined`; i campi
+letti con `!= null` (`nome`, `citta`, `genere` in `PUT /api/artista`, `ultima` nel
+punteggio) sono `nullish` nella forma; il `trim().toLowerCase()` della mail fatto due volte
+(`forme.js:62` e `server.js:247`) dà lo stesso risultato tutte e due le volte, è solo un
+doppione innocuo; le 14 rotte contate a mano sono 14 e i documenti dicono 14; la collezione
+Postman aspetta gli stessi nomi di errore che il server dà ancora (`email-non-valida`,
+`stato-mancante`, `azione-sconosciuta`, `serve-la-conferma`, 403 per il biglietto finto).
+Tre cose da segnalare, nessuna blocca la partita.
+
+### Se il server delle chiavi di Apple o Google risponde con un errore, la colpa viene data al giocatore
+- **dove** — `backend/accessi.js:84-86`
+- **cosa succede** — quando le chiavi pubbliche non si riescono a scaricare, il codice
+  rilancia l'errore solo se il messaggio contiene «fetch», «network», «ECONN», «ENOTFOUND»
+  o è un timeout di `jose`. Ma se il server di Apple risponde (per dire) 503, 429 o un
+  redirect, oppure risponde con una pagina HTML invece del JSON, `jose` tira un errore che
+  dice «Expected 200 OK from the JSON Web Key Set HTTP response» oppure «Failed to parse the
+  JSON Web Key Set HTTP response as JSON»: nessuna di quelle parole c'è, quindi si finisce
+  nel `return null` e chi entra si prende un **403 «biglietto-rifiutato»** — come se il
+  biglietto fosse falso — invece del «verifica-non-riuscita» che diceva il codice di prima
+  (che alzava un errore su qualsiasi risposta che non fosse 200). Il commento nel file
+  (righe 80-83) e il foglio `implementazioni/07-multiplayer-e-backend.md` («se sono le
+  chiavi pubbliche a non rispondere, l'errore risale come verifica non riuscita») promettono
+  il contrario. Nessuna prova in `prova.js` copre il caso: il finto Apple risponde sempre
+  200. `jose` mette un `code` su tutti i suoi errori (`ERR_JOSE_GENERIC` per questi due,
+  `ERR_JWKS_TIMEOUT` per il timeout), che è più solido di cercare parole nel messaggio.
+- **come si vede** — con `ADF_APPLE_AUD` messo e `ADF_APPLE_JWKS` puntato a un server che
+  risponde 503, `POST /api/account` con `tipo: "apple"` e un biglietto firmato bene torna
+  403 `biglietto-rifiutato`. Con la porta chiusa torna invece `verifica-non-riuscita`.
+- **quanto pesa** — si vede ma si gira intorno (succede solo quando è Apple o Google ad
+  avere un problema; il giocatore riprova più tardi, ma il messaggio gli dà la colpa).
+- **RISOLTO (16/09/2026, stesso branch, prima del push)** — in `accessi.js` la colpa la decide il **codice** dell'errore di `jose`, non
+  una regex sul messaggio: `ERR_JWT_*`, `ERR_JWS_*`, chiave sconosciuta, algoritmo non
+  ammesso, JWT malformato sono colpa del biglietto (→ null → «rifiutato»); tutto il resto —
+  timeout, 503, HTML al posto del JSON, rete giù — risale come «le chiavi pubbliche non
+  rispondono» → «verifica-non-riuscita». Due prove nuove in `prova.js`: il banchetto del
+  finto Apple risponde 503 su `/giu` e `apriToken` alza l'errore; con `/chiavi` torna il
+  `sub`. 192 a posto.
+
+### `jose` 6 si carica solo da Node 22.12 in su, i documenti dicono ancora 22.5
+- **dove** — `backend/accessi.js:25`, `backend/package.json:18`, `backend/README.md:46`,
+  `documentazione/comandidelterminale.md:75` e `:152`
+- **cosa succede** — `jose` dalla versione 6 è pubblicata solo come modulo ES (`"type":
+  "module"` nel suo `package.json`, nessuna copia CommonJS); `accessi.js` la carica con
+  `require("jose")`, che con un modulo ES funziona solo da Node 22.12 in su (prima era
+  dietro un flag sperimentale). Il `package.json` del backend chiede `node >=22.5`, e il
+  README e la guida ai comandi dicono «Node 22.5 o più nuovo»: chi mette il server su una
+  di quelle versioni (22.5-22.11) lo vede morire all'avvio con `ERR_REQUIRE_ESM` alla prima
+  riga di `accessi.js`, e con lui tutto l'online. Qui gira 22.14 e la CI prende l'ultima 22,
+  quindi oggi non si vede. Non l'ho provato su un Node vecchio: viene dal `package.json` di
+  `jose` e dalle note di Node 22.12.
+- **come si vede** — `node --version` fra 22.5 e 22.11, `cd backend && npm start`.
+- **quanto pesa** — si vede ma si gira intorno (basta aggiornare Node; ma la soglia va
+  scritta giusta in `engines` e nei due documenti, se no la promessa è falsa).
+- **RISOLTO (16/09/2026, stesso branch, prima del push)** — `engines.node` è `>=22.12` in `backend/package.json`, e lo dicono
+  `backend/README.md` (col perché: `node:sqlite` dal 22.5, `require` di un modulo ESM dal
+  22.12) e `documentazione/comandidelterminale.md` nei due punti.
+
+### Il README dell'API dice che un `tipo` di account sconosciuto diventa «ospite», adesso è un 400
+- **dove** — `backend/README-API.md:440-441`
+- **cosa succede** — c'è scritto «Un tipo assente o non riconosciuto viene trattato come
+  `ospite`». Dal 16/09 il tipo assente diventa ancora `ospite`, ma quello **non
+  riconosciuto** è un 400 `dati-non-validi` con `campi: [{ campo: "tipo" }]` — è una scelta
+  della task, scritta apposta nel foglio (`07-multiplayer-e-backend.md`, «più stretto dove
+  costava niente») e coperta da una prova. Il README però racconta ancora il comportamento
+  vecchio.
+- **come si vede** — `POST /api/account` con `{ "tipo": "marziano" }`: 400, non 201.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (16/09/2026, stesso branch, prima del push)** — §6 di `README-API.md`: assente vale `ospite`, sconosciuto è `400
+  dati-non-validi`, e Steam/Apple/Google senza biglietto è `400 biglietto-mancante`.
+
+Due note, non errori. **La prima:** `forza` in `PUT /api/carriera/:n` adesso deve essere un
+booleano vero (`forme.js:130`): il gioco manda `!!forza`, quindi va bene, ma un client che
+mandasse `"forza": "true"` o `1` — prima passava perché contava solo che fosse «vero» — ora
+prende un 400. È una scelta coerente con il resto della task, va solo saputo. **La seconda:**
+in `forme.js:128` `z.union([z.string().max(80), z.literal("")])` è un doppione — la stringa
+vuota è già una stringa sotto gli 80 caratteri — che non fa danni.
+
+## Giro del 16/09/2026 (backend-allineato, task `task/jose-e-zod-nel-backend`, commit `d268a3d`)
+
+`node scripts/controlla-backend.js` verde, `cd backend && npm run prova` 190 a posto, 0 no.
+Il commit non tocca `database/migrazioni/`, `database/migrazioni-pg/` né `schema.md`
+(`git show --stat d268a3d`): le coppie SQLite/PostgreSQL restano quelle già confrontate
+colonna per colonna il 15/09 — **niente che fermi il passaggio a PostgreSQL**. Le manopole
+`ADF_*` che legge `accessi.js` (`ADF_STEAM_CHIAVE`, `ADF_STEAM_APPID`, `ADF_APPLE_AUD`,
+`ADF_GOOGLE_CLIENT`, `ADF_APPLE_JWKS`, `ADF_GOOGLE_JWKS`, `ADF_STEAM_URL`,
+`accessi.js:28-35`) stanno tutte in «Le manopole» (`backend/README.md:144-149`), e il
+paragrafo su `jose` (`backend/README.md:304-312`) dice il vero. Le quattordici rotte con
+corpo passano tutte da `corpoInForma()` (`server.js:150-160`, quattordici chiamate; l'unico
+`await corpo(req)` rimasto è dentro `corpoInForma` stessa). Le `nota` sparite da
+`serve-la-conferma` e `azione-sconosciuta` non erano documentate in `README-API.md` e il
+frontend non le legge (`grep` su `frontend/js`); la collezione Postman (`postman/genera.js:348,
+378, 428, 553, 632`) manda sempre un id vero, quindi le sue cinque prove `403 non-e-tuo` e
+`400 azione-sconosciuta` reggono. Sei voci, tutte di documento tranne una riga di codice;
+nessuna blocca la partita.
+
+### `README-API.md` §6 dice che un `tipo` sconosciuto vale `ospite`; adesso è un 400
+
+- **dove** — `backend/README-API.md:440-441` («Un tipo assente o non riconosciuto viene
+  trattato come `ospite`»). Il vero è in `backend/forme.js:55` (`z.enum(TIPI_ACCOUNT)`) e
+  `backend/server.js:243` (`b.tipo || "ospite"`).
+- **cosa succede** — un `tipo` **assente** vale ancora `ospite`; un `tipo` **non
+  riconosciuto** (`"boh"`) non arriva più alla rotta: la forma risponde
+  `400 dati-non-validi` con `campi: [{ campo: "tipo", problema: "Opzione non valida: atteso
+  uno tra …" }]`. Prima del 16/09 ricadeva davvero su `ospite`. È la cosa giusta — un client
+  che sbaglia il tipo deve sentirselo dire — ma il documento dice il contrario.
+- **come si vede** — `POST /api/account` con `{ "tipo": "boh" }`: 400, non 201 ospite.
+- **quanto pesa** — da sistemare con calma: mezza frase in §6 («assente vale `ospite`; non
+  riconosciuto è `400 dati-non-validi`»).
+- **RISOLTO (16/09/2026, stesso branch, prima del push)** — vedi la voce gemella del giro segnala-problemi qui sopra: §6 corretto.
+
+### `biglietto-mancante` non «esiste da prima», e §6/§7 non lo elencano
+
+- **dove** — `backend/README-API.md:119-121` (l'elenco dei nomi «che esistono da prima»
+  comprende `biglietto-mancante`), §6 (`:487-488`) e §7 (`:527-528`), che elencano gli
+  errori di `POST /api/account` e `POST /api/sessione` senza questo. Il nome nasce in
+  `backend/forme.js:69` e `:86`: `git grep biglietto-mancante d268a3d~1 -- backend frontend`
+  non trova niente.
+- **cosa succede** — prima, `tipo: "apple"` senza `biglietto` finiva in `conBiglietto()` e
+  tornava `403 biglietto-rifiutato` (lo dice anche la prova nuova, `prova.js:624`: «Apple
+  senza biglietto è un 400, non un 403»). Adesso è `400 biglietto-mancante`. È un nome
+  nuovo, dunque un cambiamento di contratto per un client che guardasse il 403: va scritto
+  come tale, non fra quelli «di sempre», e va nella lista errori delle due rotte.
+- **come si vede** — `POST /api/sessione` con `{ "tipo": "google" }` e niente biglietto.
+- **quanto pesa** — da sistemare con calma: spostare il nome fuori dall'elenco «da prima» e
+  aggiungerlo a §6 e §7.
+- **RISOLTO (16/09/2026, stesso branch, prima del push)** — nel paragrafo generale `biglietto-mancante` e `artista-mancante` sono
+  «i due nomi nuovi dal 16/09/2026», con quello che erano prima (`403 biglietto-rifiutato`,
+  `403 chiave-sbagliata`); §6 e §7 li elencano.
+
+### `artistaId-mancante` non compare né nel documento né in `errore`
+
+- **dove** — `backend/forme.js:84` (la forma di `POST /api/sessione`, `tipo: "legacy"`
+  senza `artistaId`) e `backend/forme.js:170`, la regola che sceglie il nome da mettere in
+  `errore`: `/^[a-z][a-z0-9-]*$/`. `README-API.md` §7 (`:512-528`) non lo nomina.
+- **cosa succede** — la forma vuole rispondere `artistaId-mancante`, ma la `I` maiuscola
+  non passa la regola, quindi la risposta è `{ errore: "dati-non-validi", campi: [{ campo:
+  "artistaId", problema: "artistaId-mancante" }] }`: il nome c'è solo dentro a `campi`.
+  Prima del 16/09 lo stesso corpo prendeva `403 chiave-sbagliata` (`server.js:290`, con
+  `artistaGrezzo("")`). Non rompe niente — il 400 arriva e dice il campo — ma il nome
+  scritto nel codice non è quello che esce, e chi legge `forme.js` crede il contrario.
+- **come si vede** — da `backend/`, in Node: `require("./forme.js").controlla("sessione", { tipo: "legacy" })`
+  torna `errore: "dati-non-validi"`, non `artistaId-mancante`.
+- **quanto pesa** — da sistemare con calma. È una riga di codice (o la regola accetta le
+  maiuscole, o il messaggio diventa `artista-mancante`), e poi una riga in §7. La segnalo e
+  non la tocco: il codice non lo riscrivo io.
+- **RISOLTO (16/09/2026, stesso branch, prima del push)** — il nome è diventato `artista-mancante`, minuscolo come tutti gli altri,
+  così la regola di `controlla()` lo prende ed esce in `errore`; §7 lo elenca. La regola
+  resta stretta (minuscole e trattini) apposta: i nomi degli errori sono tutti così.
+
+### Le liste errori per rotta non sanno del `400` che ha preso il posto di `403 non-e-tuo`
+
+- **dove** — `backend/README-API.md` §4 (`:417`, `POST /api/relazione`), §14 (`:680`,
+  `POST /api/punteggio`), §25 (`:805-806`, `POST /api/traguardo`): dicono `403 non-e-tuo`
+  e basta. Anche §26 (`:808-823`, `POST /api/segnalazione`, nessun 400 elencato), §30
+  (`:869`, `POST /api/sanzione`: solo `400 sanzione-non-valida`) e §34 (`:901-909`,
+  `POST /api/spinto`: nessun errore). Il vero è in `backend/forme.js:46, 116, 134, 138,
+  146-147, 155`: `artistaId`/`id`/`accountId`/`tipo`/`codice` sono obbligatori.
+- **cosa succede** — un corpo **senza** l'id (o con un id non stringa) adesso è
+  `400 dati-non-validi` prima ancora di chiedere «è tuo?»; il `403 non-e-tuo` resta per
+  l'id di un altro. Per `sanzione` e `spinto` un campo obbligatorio che manca è 400 invece
+  di `400 sanzione-non-valida` o di un 200 a vuoto; per `segnalazione` è 400 invece di
+  `404 artista-sconosciuto`. Il paragrafo generale «Formato degli errori» (`:108-122`) lo
+  racconta per famiglia, e va bene così; ma chi legge una rotta sola non ci arriva.
+- **come si vede** — `POST /api/punteggio` con `{ "stream": 1 }` e una sessione valida:
+  400, non 403.
+- **quanto pesa** — da sistemare con calma: una frase sola, ripetuta, nelle sei liste
+  («più `400 dati-non-validi` se manca un campo obbligatorio, vedi Formato degli errori»).
+- **RISOLTO (16/09/2026, stesso branch, prima del push)** — una frase in ciascuna delle sette liste — relazione, account, sessione,
+  punteggio, traguardo, segnalazione, sanzione, spinto — «più `400 dati-non-validi` (con
+  `campi`) se manca un campo obbligatorio o ha il tipo sbagliato», coi campi che contano; e
+  il paragrafo generale dice che un id che manca è un `400`, non più il `403 non-e-tuo`.
+
+### «`campi` c'è lo stesso» non vale per il `nome-non-valido` che decide il server
+
+- **dove** — `backend/README-API.md:121` («`errore` resta quello, e `campi` c'è lo
+  stesso»). Il vero è in `backend/server.js:343` e `:384`: `male(res, 400, "nome-non-valido")`
+  senza `campi`.
+- **cosa succede** — `nome-non-valido` esce da due posti: dalla forma, quando `nome` manca
+  o non è una stringa (`forme.js:96`, con `campi`), e dal server, quando è una stringa ma
+  `nomePulito` la butta (vuota, troppo corta, caratteri invisibili): lì `campi` non c'è.
+  Un client che contasse su `campi` per dire «quale campo» lo trova a volte sì a volte no.
+- **come si vede** — `POST /api/artista` con `{ "nome": "  " }`: `{ "errore":
+  "nome-non-valido" }` e niente `campi`; con `{}`: `campi: [{ campo: "nome", … }]`.
+- **quanto pesa** — da sistemare con calma: o la frase dice «dove lo dice la forma», o
+  `server.js:343/384` aggiungono `{ campi: [{ campo: "nome", problema: "nome-non-valido" }] }`.
+  Scelta di chi tiene il codice.
+- **RISOLTO (16/09/2026, stesso branch, prima del push)** — la frase adesso dice «`campi` c'è dove è la forma a dirlo», e
+  `nome-non-valido` è scritto a parte: lo decide il server dopo la pulizia, senza `campi`.
+
+### Tre documenti dicono ancora che `jose` e `zod` sono «da usare»
+
+- **dove** — `README.md:9` (la tabella delle cartelle: «`jose`, `zod` — le ultime due
+  installate e ancora da usare»), `ROADMAP.md:133` («`jose` e `zod` installate e ancora da
+  usare»), `documentazione/dipendenze.md:356-360` (la lista delle candidate: «È la prima che
+  installerei» per `jose`, «Oggi è a mano, rotta per rotta» per `zod`, mentre `pg` alla riga
+  354 porta «_già installata._»).
+- **cosa succede** — il commit `d268a3d` ha aggiornato `backend/README.md`,
+  `documentazione/roadmap.md:63-64`, la tabella di `dipendenze.md:74-75` e il foglio 07, ma
+  non questi tre punti: chi apre il `README.md` di radice o `ROADMAP.md` legge che il
+  backend ha due dipendenze morte, e non è più vero da oggi.
+- **come si vede** — `grep -n "ancora da usare" README.md ROADMAP.md`.
+- **quanto pesa** — da sistemare con calma, tre righe. (Nota a margine, non di questa task:
+  `backend/README-API.md:6-7` dice «Verificata … commit `024bf79` del 2 settembre 2026» e
+  da allora è stata aggiornata dieci volte; o la riga si aggiorna a ogni giro o si toglie.)
+- **RISOLTO (16/09/2026, stesso branch, prima del push)** — `README.md` di radice, `ROADMAP.md` e la lista delle candidate in
+  `dipendenze.md` («_già installata, in uso dal 16/09/2026_», come `pg`). La nota a margine
+  sul commit di verifica di `README-API.md` resta: non è di questa task.

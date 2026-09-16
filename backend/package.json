@@ -15,7 +15,7 @@
     "postman": "node postman/prova.js"
   },
   "engines": {
-    "node": ">=22.5"
+    "node": ">=22.12"
   },
   "dependencies": {
     "jose": "^6.2.12",

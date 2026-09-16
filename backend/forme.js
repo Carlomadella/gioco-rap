@@ -81,7 +81,7 @@ const FORME = {
     dispositivo
   }).superRefine((b, ctx) => {
     if(b.tipo === "legacy" && !b.artistaId)
-      ctx.addIssue({ code: "custom", path: ["artistaId"], message: "artistaId-mancante" });
+      ctx.addIssue({ code: "custom", path: ["artistaId"], message: "artista-mancante" });
     if(["steam", "apple", "google"].indexOf(b.tipo) >= 0 && !b.biglietto)
       ctx.addIssue({ code: "custom", path: ["biglietto"], message: "biglietto-mancante" });
   }),
@@ -125,7 +125,7 @@ const FORME = {
   /* PUT /api/carriera/:n: la partita in cloud. Il tetto (2 MiB) lo mette l'archivio */
   carriera: z.looseObject({
     stato: z.record(z.string(), z.unknown(), { error: "stato-mancante" }),
-    artistaId: z.union([z.string().max(80), z.literal("")]).nullish(),
+    artistaId: z.string().max(80).nullish(),                 // "" vuol dire «nessuno»
     settimana: numero, anno: numero,
     forza: z.boolean().optional()
   }),

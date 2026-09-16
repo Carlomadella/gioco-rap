@@ -99,6 +99,9 @@ function fintoApple(){
     { kid, alg: "RS256", use: "sig" });
 
   const banchetto = http.createServer((req, res) => {
+    /* su /giu il banchetto è rotto: serve a provare che un 503 di Apple non
+       passa per un biglietto falso */
+    if(req.url === "/giu"){ res.writeHead(503, { "content-type": "text/html" }); res.end("<h1>giu</h1>"); return; }
     res.writeHead(200, { "content-type": "application/json" });
     res.end(JSON.stringify({ keys: [jwk] }));
   }).listen(PORTA_CHIAVI);
@@ -714,6 +717,16 @@ async function aspettaCheRisponda(figlio){
     const eterno = await chiama("/api/account", { metodo: "POST",
       corpo: { tipo: "apple", biglietto: apple.senzaScadenza("000123.abcdef") } });
     controlla("un biglietto senza scadenza viene buttato", eterno.stato === 403, eterno.dati);
+    /* la verifica direttamente, senza il server in mezzo: se il server delle
+       chiavi è giù la colpa è nostra e si alza un errore, non un «rifiutato» */
+    const accessi = require("./accessi.js");
+    const chiaviGiu = await accessi.apriToken(apple.buono("000123.abcdef"), "appleid.apple.com", AUD,
+      "http://127.0.0.1:" + PORTA_CHIAVI + "/giu").then(() => "tornato", e => e.message);
+    controlla("se le chiavi pubbliche rispondono 503 è colpa nostra, non del biglietto",
+      /chiavi pubbliche non rispondono/.test(chiaviGiu), chiaviGiu);
+    const dentro = await accessi.apriToken(apple.buono("000123.abcdef"), "appleid.apple.com", AUD,
+      "http://127.0.0.1:" + PORTA_CHIAVI + "/chiavi");
+    controlla("e con le chiavi buone torna il sub", dentro && dentro.sub === "000123.abcdef", dentro);
     const quali = await chiama("/api/stato");
     controlla("lo stato dice quali accessi sono collegati",
       quali.dati.accessi && quali.dati.accessi.apple === true && quali.dati.accessi.steam === false, quali.dati.accessi);
