@@ -1,0 +1,165 @@
+name: Patch Marketing V2
+
+on:
+  push:
+    branches:
+      - task/marketing-ciclo-v1-20260916
+    paths:
+      - .github/workflows/marketing-v2-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: task/marketing-ciclo-v1-20260916
+          fetch-depth: 0
+
+      - name: Collega releaseHype senza cambiare il bilanciamento
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_one(path, old, new):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              n = text.count(old)
+              assert n == 1, f'{path}: attesa 1 occorrenza, trovate {n}'
+              p.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          replace_one(
+              'frontend/pagine/gioco.html',
+              '<script src="js/game/rivals.js?v=12"></script>\n<script src="js/game/actions.js?v=16"></script>',
+              '<script src="js/game/rivals.js?v=12"></script>\n<script src="js/game/marketing.js?v=1"></script>\n<script src="js/game/actions.js?v=17"></script>'
+          )
+          replace_one(
+              'frontend/pagine/gioco.html',
+              '<script src="js/game/telefono.js?v=17"></script>',
+              '<script src="js/game/telefono.js?v=18"></script>'
+          )
+
+          replace_one(
+              'frontend/js/game/actions.js',
+              'const ADF_ANTEPRIMA_SPINTA = 0.12;',
+              'const ADF_ANTEPRIMA_SPINTA =\n  typeof MARKETING_RELEASE_HYPE_ANTEPRIMA === "number"\n    ? MARKETING_RELEASE_HYPE_ANTEPRIMA / 100\n    : 0.12;'
+          )
+
+          old_release = "\n".join([
+              'function anteprimeAllUscita(s){',
+              '  if(!s || !s.anteprime) return;',
+              '  s.spinta = Math.max(s.spinta || 1, 1 + Math.min(ADF_ANTEPRIME_MAX, s.anteprime) * ADF_ANTEPRIMA_SPINTA);',
+              '  delete s.anteprime;',
+              '}'
+          ])
+          new_release = "\n".join([
+              'function anteprimeAllUscita(s){',
+              '  if(!s) return;',
+              '  const uscita = typeof marketingSpintaUscita === "function"',
+              '    ? marketingSpintaUscita(s)',
+              '    : 1 + Math.min(ADF_ANTEPRIME_MAX, s.anteprime || 0) * ADF_ANTEPRIMA_SPINTA;',
+              '  if(uscita > 1) s.spinta = Math.max(s.spinta || 1, uscita);',
+              '  delete s.anteprime;',
+              '}'
+          ])
+          replace_one('frontend/js/game/actions.js', old_release, new_release)
+
+          old_give = "\n".join([
+              '   give:() => {',
+              '     const s = typeof studioDaAnticipare === "function" ? studioDaAnticipare() : null;',
+              '     const n = s ? (s.anteprime || 0) + 1 : 1;',
+              '     return "+" + (s ? Math.round((3 + s.q * 0.05) * RITMO / n) : "?") + " hype · all\'uscita parte al " +',
+              '       Math.round(100 * (1 + Math.min(ADF_ANTEPRIME_MAX, n) * ADF_ANTEPRIMA_SPINTA)) + "%";',
+              '   },'
+          ])
+          new_give = "\n".join([
+              '   give:() => {',
+              '     const s = typeof studioDaAnticipare === "function" ? studioDaAnticipare() : null;',
+              '     const n = s ? (s.anteprime || 0) + 1 : 1;',
+              '     const attesa = s && typeof marketingReleaseHype === "function"',
+              '       ? marketingReleaseHype(s)',
+              '       : Math.min(ADF_ANTEPRIME_MAX, n - 1) * ADF_ANTEPRIMA_SPINTA * 100;',
+              '     const dopo = Math.min(100, attesa + ADF_ANTEPRIMA_SPINTA * 100);',
+              '     return "+" + (s ? Math.round((3 + s.q * 0.05) * RITMO / n) : "?") +',
+              '       " hype · attesa " + Math.round(dopo) + "/100 · all\'uscita parte al " +',
+              '       Math.round(100 + dopo) + "%";',
+              '   },'
+          ])
+          replace_one('frontend/js/game/actions.js', old_give, new_give)
+
+          old_run = "\n".join([
+              '   run(){',
+              '     const s = studioDaAnticipare();',
+              '     if(!s) return "";',
+              '     const n = (s.anteprime || 0) + 1;',
+              '     s.anteprime = n;',
+              '     /* la prima anteprima rende piena, la seconda la metà, la terza un terzo:',
+              '        è un pezzo che non c\'è, non si può farlo sentire all\'infinito */',
+              '     const h = Math.round((3 + s.q * 0.05) * RITMO / n);',
+              '     G.hype = clamp(G.hype + h, 0, (typeof hypeCap==="function"?hypeCap():100));',
+              '     G.fans += Math.round(rnd(2, 9) * RITMO);',
+              '     return "Anteprima di «" + s.t + "»: hype +" + h + ". Quando esce parte al " +',
+              '       Math.round(100 * (1 + n * ADF_ANTEPRIMA_SPINTA)) + "%." +',
+              '       (n >= ADF_ANTEPRIME_MAX ? " L\'hanno sentito abbastanza: adesso deve uscire." : "");',
+              '   }},'
+          ])
+          new_run = "\n".join([
+              '   run(){',
+              '     const s = studioDaAnticipare();',
+              '     if(!s) return "";',
+              '     /* Migra l\'eventuale salvataggio vecchio prima di aumentare `anteprime`:',
+              '        altrimenti la prima preview nuova verrebbe contata due volte. */',
+              '     const attesaPrima = typeof marketingReleaseHype === "function"',
+              '       ? marketingReleaseHype(s)',
+              '       : Math.min(ADF_ANTEPRIME_MAX, s.anteprime || 0) * ADF_ANTEPRIMA_SPINTA * 100;',
+              '     const n = (s.anteprime || 0) + 1;',
+              '     s.anteprime = n;',
+              '     const attesa = typeof marketingAggiungiReleaseHype === "function"',
+              '       ? marketingAggiungiReleaseHype(s, ADF_ANTEPRIMA_SPINTA * 100)',
+              '       : Math.min(100, attesaPrima + ADF_ANTEPRIMA_SPINTA * 100);',
+              '     /* la prima anteprima rende piena, la seconda la metà, la terza un terzo:',
+              '        è un pezzo che non c\'è, non si può farlo sentire all\'infinito */',
+              '     const h = Math.round((3 + s.q * 0.05) * RITMO / n);',
+              '     G.hype = clamp(G.hype + h, 0, (typeof hypeCap==="function"?hypeCap():100));',
+              '     G.fans += Math.round(rnd(2, 9) * RITMO);',
+              '     return "Anteprima di «" + s.t + "»: hype +" + h + ", attesa " +',
+              '       Math.round(attesa) + "/100. Quando esce parte al " + Math.round(100 + attesa) + "%." +',
+              '       (n >= ADF_ANTEPRIME_MAX ? " L\'hanno sentito abbastanza: adesso deve uscire." : "");',
+              '   }},'
+          ])
+          replace_one('frontend/js/game/actions.js', old_run, new_run)
+
+          replace_one(
+              'frontend/js/game/telefono.js',
+              '  const fatte = ant ? (ant.anteprime || 0) : 0;\n  const azione = ant ? "anteprima" : "promo";',
+              '  const fatte = ant ? (ant.anteprime || 0) : 0;\n  const attesa = ant && typeof marketingReleaseHype === "function"\n    ? marketingReleaseHype(ant)\n    : Math.min(ADF_ANTEPRIME_MAX, fatte) * ADF_ANTEPRIMA_SPINTA * 100;\n  const attesaDopo = Math.min(100, attesa + ADF_ANTEPRIMA_SPINTA * 100);\n  const azione = ant ? "anteprima" : "promo";'
+          )
+
+          old_phone = "\n".join([
+              "        ? 'anteprime fatte: <b>' + fatte + \"/\" + ADF_ANTEPRIME_MAX + '</b> · all\\'uscita parte al <b>' +",
+              "          Math.round(100 * (1 + Math.min(ADF_ANTEPRIME_MAX, fatte + 1) * ADF_ANTEPRIMA_SPINTA)) + '%</b>'"
+          ])
+          new_phone = "\n".join([
+              "        ? 'anteprime fatte: <b>' + fatte + \"/\" + ADF_ANTEPRIME_MAX + '</b> · attesa pezzo: <b>' +",
+              "          Math.round(attesa) + '/100</b> · dopo questa: <b>' + Math.round(attesaDopo) + '/100</b> · partenza <b>' +",
+              "          Math.round(100 + attesaDopo) + '%</b>'"
+          ])
+          replace_one('frontend/js/game/telefono.js', old_phone, new_phone)
+          PY
+
+      - name: Verifica diff e committa
+        run: |
+          git diff --check
+          git diff --stat
+          test "$(git diff --numstat -- frontend/js/game/actions.js | awk '{print $1+$2}')" -lt 70
+          test "$(git diff --numstat -- frontend/js/game/telefono.js | awk '{print $1+$2}')" -lt 30
+          test "$(git diff --numstat -- frontend/pagine/gioco.html | awk '{print $1+$2}')" -lt 10
+          rm .github/workflows/marketing-v2-patch.yml
+          git config user.name "Anni di Fame CI"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A frontend/js/game/actions.js frontend/js/game/telefono.js frontend/pagine/gioco.html .github/workflows/marketing-v2-patch.yml
+          git commit -m "feat(marketing): collega l'attesa del singolo a preview e uscita"
+          git push origin HEAD:task/marketing-ciclo-v1-20260916
