@@ -80,12 +80,18 @@ const ADF_PROMO_SPINTA_MAX = 1.5;
    tre per pezzo, e ognuna vale all'uscita +0,12 di spinta sulla prima
    settimana — la stessa `s.spinta` della promo, che poi scende da sola. */
 const ADF_ANTEPRIME_MAX = 3;
-const ADF_ANTEPRIMA_SPINTA = 0.12;
+const ADF_ANTEPRIMA_SPINTA =
+  typeof MARKETING_RELEASE_HYPE_ANTEPRIMA === "number"
+    ? MARKETING_RELEASE_HYPE_ANTEPRIMA / 100
+    : 0.12;
 /* Quando il pezzo esce (l'azione `pubblica` qui sotto, o `studioUscitePronte`
    il venerdì) le anteprime fatte diventano la spinta della prima settimana. */
 function anteprimeAllUscita(s){
-  if(!s || !s.anteprime) return;
-  s.spinta = Math.max(s.spinta || 1, 1 + Math.min(ADF_ANTEPRIME_MAX, s.anteprime) * ADF_ANTEPRIMA_SPINTA);
+  if(!s) return;
+  const uscita = typeof marketingSpintaUscita === "function"
+    ? marketingSpintaUscita(s)
+    : 1 + Math.min(ADF_ANTEPRIME_MAX, s.anteprime || 0) * ADF_ANTEPRIMA_SPINTA;
+  if(uscita > 1) s.spinta = Math.max(s.spinta || 1, uscita);
   delete s.anteprime;
 }
 
@@ -496,21 +502,34 @@ const ACTIONS = [
    give:() => {
      const s = typeof studioDaAnticipare === "function" ? studioDaAnticipare() : null;
      const n = s ? (s.anteprime || 0) + 1 : 1;
-     return "+" + (s ? Math.round((3 + s.q * 0.05) * RITMO / n) : "?") + " hype · all'uscita parte al " +
-       Math.round(100 * (1 + Math.min(ADF_ANTEPRIME_MAX, n) * ADF_ANTEPRIMA_SPINTA)) + "%";
+     const attesa = s && typeof marketingReleaseHype === "function"
+       ? marketingReleaseHype(s)
+       : Math.min(ADF_ANTEPRIME_MAX, n - 1) * ADF_ANTEPRIMA_SPINTA * 100;
+     const dopo = Math.min(100, attesa + ADF_ANTEPRIMA_SPINTA * 100);
+     return "+" + (s ? Math.round((3 + s.q * 0.05) * RITMO / n) : "?") +
+       " hype · attesa " + Math.round(dopo) + "/100 · all'uscita parte al " +
+       Math.round(100 + dopo) + "%";
    },
    run(){
      const s = studioDaAnticipare();
      if(!s) return "";
+     /* Migra l'eventuale salvataggio vecchio prima di aumentare `anteprime`:
+        altrimenti la prima preview nuova verrebbe contata due volte. */
+     const attesaPrima = typeof marketingReleaseHype === "function"
+       ? marketingReleaseHype(s)
+       : Math.min(ADF_ANTEPRIME_MAX, s.anteprime || 0) * ADF_ANTEPRIMA_SPINTA * 100;
      const n = (s.anteprime || 0) + 1;
      s.anteprime = n;
+     const attesa = typeof marketingAggiungiReleaseHype === "function"
+       ? marketingAggiungiReleaseHype(s, ADF_ANTEPRIMA_SPINTA * 100)
+       : Math.min(100, attesaPrima + ADF_ANTEPRIMA_SPINTA * 100);
      /* la prima anteprima rende piena, la seconda la metà, la terza un terzo:
         è un pezzo che non c'è, non si può farlo sentire all'infinito */
      const h = Math.round((3 + s.q * 0.05) * RITMO / n);
      G.hype = clamp(G.hype + h, 0, (typeof hypeCap==="function"?hypeCap():100));
      G.fans += Math.round(rnd(2, 9) * RITMO);
-     return "Anteprima di «" + s.t + "»: hype +" + h + ". Quando esce parte al " +
-       Math.round(100 * (1 + n * ADF_ANTEPRIMA_SPINTA)) + "%." +
+     return "Anteprima di «" + s.t + "»: hype +" + h + ", attesa " +
+       Math.round(attesa) + "/100. Quando esce parte al " + Math.round(100 + attesa) + "%." +
        (n >= ADF_ANTEPRIME_MAX ? " L'hanno sentito abbastanza: adesso deve uscire." : "");
    }},
 

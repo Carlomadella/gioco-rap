@@ -632,6 +632,10 @@ function telPromo(){
   const oggi = typeof adfOggi === "function" ? adfOggi("promo") : 0;
   const mult = typeof promoDailyMult === "function" ? promoDailyMult() : 1;
   const fatte = ant ? (ant.anteprime || 0) : 0;
+  const attesa = ant && typeof marketingReleaseHype === "function"
+    ? marketingReleaseHype(ant)
+    : Math.min(ADF_ANTEPRIME_MAX, fatte) * ADF_ANTEPRIMA_SPINTA * 100;
+  const attesaDopo = Math.min(100, attesa + ADF_ANTEPRIMA_SPINTA * 100);
   const azione = ant ? "anteprima" : "promo";
   const pronto = telAgendaAzione(azione);
   const soloEnergia = !pronto.ok && soloSenzaEnergia(azione);
@@ -660,8 +664,9 @@ function telPromo(){
       : "") +
     '<div class="tnote" style="margin-top:9px">' +
       (ant
-        ? 'anteprime fatte: <b>' + fatte + "/" + ADF_ANTEPRIME_MAX + '</b> · all\'uscita parte al <b>' +
-          Math.round(100 * (1 + Math.min(ADF_ANTEPRIME_MAX, fatte + 1) * ADF_ANTEPRIMA_SPINTA)) + '%</b>'
+        ? 'anteprime fatte: <b>' + fatte + "/" + ADF_ANTEPRIME_MAX + '</b> · attesa pezzo: <b>' +
+          Math.round(attesa) + '/100</b> · dopo questa: <b>' + Math.round(attesaDopo) + '/100</b> · partenza <b>' +
+          Math.round(100 + attesaDopo) + '%</b>'
         : ultimo
           ? 'spingi «<b>' + ultimo.t + '</b>» · ' + (a && a.give ? a.give() : "")
           : 'Prima esce un pezzo, poi lo si spinge — o gliene fai sentire un\'anteprima, qui sopra.') +
