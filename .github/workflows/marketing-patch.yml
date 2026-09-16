@@ -12,7 +12,6 @@ permissions:
 
 jobs:
   patch:
-    if: github.event.head_commit.message == 'chore(marketing): applica patch minima'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -49,17 +48,16 @@ jobs:
           old_subtitle = '''          "q" + x.q + " · " + fmt(x.streams || 0) + " stream" + (x.spinta > 1 ? " · in spinta" : ""))).join("") + '</div>' '''
           new_subtitle = '''          "q" + x.q + " · " + fmt(x.streams || 0) + " stream")).join("") + '</div>' '''
 
-          if text.count(old_rows) != 1:
-              raise SystemExit(f'blocco righe inatteso: {text.count(old_rows)} occorrenze')
-          if text.count(old_subtitle) != 1:
-              raise SystemExit(f'sottotitolo inatteso: {text.count(old_subtitle)} occorrenze')
+          assert text.count(old_rows) == 1, f'blocco righe inatteso: {text.count(old_rows)}'
+          assert text.count(old_subtitle) == 1, f'sottotitolo inatteso: {text.count(old_subtitle)}'
 
           text = text.replace(old_rows, new_rows, 1).replace(old_subtitle, new_subtitle, 1)
           path.write_text(text, encoding='utf-8')
           PY
-      - name: Verifica diff e chiudi il workflow temporaneo
+      - name: Verifica che il diff sia minimo e committa
         run: |
           git diff --check
+          test "$(git diff --numstat -- frontend/js/game/telefono.js | awk '{print $1+$2}')" -lt 40
           git diff --stat
           git diff -- frontend/js/game/telefono.js
           rm .github/workflows/marketing-patch.yml
