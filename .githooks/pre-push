@@ -28,12 +28,13 @@ if git remote get-url "$REMOTE_NAME" >/dev/null 2>&1; then
   }
 fi
 
-# Un commit di soli fogli dei punti (implementazioni/*.md) o del registro:
+# Un commit di soli fogli dei punti (i .md di primo livello di implementazioni/,
+# non implementazioni/auto/ che e' del bot) o del registro:
 # e' l'eccezione che il pre-commit ammette su main, e qui vale lo stesso.
 solo_documenti() {
-  FILES="$(git diff-tree --no-commit-id --name-only -r "$1" 2>/dev/null || true)"
+  FILES="$(git -c core.quotepath=false diff-tree --no-commit-id --name-only -r "$1" 2>/dev/null || true)"
   [ -n "$FILES" ] || return 1
-  [ -z "$(printf '%s\n' "$FILES" | grep -v -E '^(registro-modifiche/|implementazioni/.*\.md$)' || true)" ]
+  [ -z "$(printf '%s\n' "$FILES" | grep -v -E '^(registro-modifiche/|implementazioni/[^/]+\.md$)' || true)" ]
 }
 
 NEED_VERIFY=0

@@ -47,6 +47,11 @@ fine task su quel foglio.
    animazioni. Restano le **due scelte**: il taglio in verticale (si vede un quarto
    dell'inquadratura) e il filmato che a freddo sul telefono può non partire in tempo — da
    provare sullo store, dove i file stanno sul telefono.
+14. ~~**Lo script che salva i punti da `main` committa tutto quello che era già in coda**,
+   non solo i fogli (16/09), più quattro cose piccole dello stesso giro.~~ **RISOLTO
+   (16/09/2026)** — tutte e cinque, nello stesso branch prima del push: commit dei soli
+   fogli, nomi con accenti, `--no-renames`, eccezione stretta ai `.md` di primo livello,
+   messaggio del push. Il dettaglio sotto a ogni voce, nel giro in fondo.
 
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
 
@@ -3284,3 +3289,111 @@ Documenti: le quattro scritture (`implementazioni/implementazioni.md` in due pun
 `documentazione/roadmap.md`) dicono tutte la stessa cosa — FATTO in parte, uno su cinque,
 gli altri quattro allo stesso modo, sette video senza un punto — e tornano fra loro. L'unica
 frase smentita dal codice è quella sull'Esc, già nella prima voce.
+
+## Giro del 16/09/2026 (segnala-problemi, fine task `task/salvare-i-punti-da-main`, commit `c922653`)
+
+Giro su carta, come chiesto: letti `.githooks/pre-commit`, `.githooks/pre-push`,
+`scripts/salva-punti.js`, le righe nuove di `CLAUDE.md` e di
+`documentazione/come-si-lavora.md`, la prova nuova in
+`frontend/strumenti/audit-regressioni.js:2121`. Fatti girare solo `sh -n` sui due hook e
+`node --check` sullo script: tutti e tre puliti. Niente cloni, niente prove dal vivo,
+niente `npm run verifica`. Il backend non è toccato.
+
+Le cose che **tengono** e che ho controllato a mano sul codice: un commit su `main` che
+tocca un foglio **e** un file di codice è bloccato dal pre-commit (riga 22, il codice resta
+nella lista) e dal pre-push (`solo_documenti`, riga 36); cancellare un file di codice su
+`main` è bloccato (la `D` è nel filtro di riga 12); un `git push` con più branch fa la
+verifica intera appena uno solo dei commit non è di soli fogli (`SOLO_DOCS` va a 0 e non
+torna su); un remoto senza `main` ferma il push già alla riga 25 (com'era prima); un merge
+commit non ha file nel `diff-tree` (provato su `684a1af`: vuoto), quindi `solo_documenti`
+dice «no» e il push di `main` dopo un merge fa la verifica intera come sempre — è la
+direzione prudente. I quattro posti (due hook, script, `CLAUDE.md`, `come-si-lavora.md`)
+dicono la stessa regola. Cinque cose da segnalare, nessuna blocca la partita né il
+salvataggio dei punti nel caso normale.
+
+### Lo script salva anche quello che era già in coda, non solo i fogli
+- **dove** — `scripts/salva-punti.js:61-62`
+- **cosa succede** — lo script fa `git add` dei fogli e poi `git commit -m …`: il commit
+  prende **tutto** quello che sta in coda (nell'index), non solo i fogli. Se prima avevi
+  fatto `git add frontend/js/qualcosa.js` e poi lanci lo script, su `main` il pre-commit lo
+  blocca (bene, ma il messaggio parla di branch e non capisci cosa c'entra col foglio); su
+  un branch di task quel file di codice finisce nel commit «docs(implementazioni): …» senza
+  che nessuno lo dica. Il documento promette «prende i fogli cambiati e solo quelli».
+- **come si vede** — su un branch di task: `git add` di un file di codice, poi
+  `node scripts/salva-punti.js`; guarda `git show --stat HEAD`.
+- **quanto pesa** — si vede ma si gira intorno.
+- **RISOLTO (16/09/2026, stesso branch, prima del push)** — `git commit --only -m … -- <fogli>`:
+  con i percorsi il commit prende solo quelli e quello che era in coda ci resta; e lo
+  `stash pop` è `--index`, così ci torna anche dopo il push. Provato nel clone: `README.md`
+  in coda prima, in coda dopo, e nel commit solo il foglio.
+
+### Un foglio con accenti o spazi nel nome fa fallire lo script
+- **dove** — `scripts/salva-punti.js:40`
+- **cosa succede** — Git, quando un nome ha lettere non ASCII (`core.quotePath`, che qui è
+  al valore di fabbrica), lo scrive fra virgolette con le lettere in codice:
+  `"implementazioni/citt\303\240.md"`. Lo script toglie le virgolette e poi trasforma
+  ogni `\` in `/`, e ne esce `implementazioni/citt/303/240.md`: il `git add` non trova il
+  file e lo script si ferma. Stessa fine per un foglio rinominato e già in coda, che nel
+  `--porcelain` compare come `R  vecchio.md -> nuovo.md` su una riga sola. Oggi i tredici
+  fogli hanno tutti nomi ASCII senza spazi, quindi non morde; morde il giorno che se ne
+  aggiunge uno con l'accento.
+- **come si vede** — crea `implementazioni/città.md`, `node scripts/salva-punti.js --prova`
+  e guarda il nome che stampa.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (16/09/2026, stesso branch, prima del push)** — lo script legge `git status
+  --porcelain -z` (NUL fra le voci, niente virgolette né escape ottali, il nome vecchio del
+  rename saltato); i due hook chiamano `git -c core.quotepath=false`, perché anche loro
+  vedevano `"citt\303\240 di prova.md"` con le virgolette e la regex non lo prendeva.
+  Provato con `implementazioni/città di prova.md`: committato e pushato.
+
+### Il pre-commit non vede lo spostamento di un file di codice dentro `implementazioni/`
+- **dove** — `.githooks/pre-commit:12`
+- **cosa succede** — `git diff --cached --name-only` riconosce gli spostamenti e scrive
+  solo il nome **nuovo**: `git mv frontend/js/x.js implementazioni/x.md` su `main` mostra
+  solo `implementazioni/x.md`, che è nell'eccezione, e il commit passa; il file di codice è
+  sparito da `main`. Il pre-push lo ferma (`diff-tree` alla riga 34 non riconosce gli
+  spostamenti e vede la cancellazione), quindi il buco è solo locale, ma il commit sbagliato
+  resta da rifare a mano.
+- **come si vede** — su `main`, `git mv` di un file di codice in `implementazioni/` con
+  estensione `.md`, poi `git commit`.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (16/09/2026, stesso branch, prima del push)** — `git diff --cached
+  --no-renames`: lo spostamento si vede come un file tolto e uno aggiunto, e il tolto
+  (`frontend/js/x.js`) non è un foglio. L'audit controlla che il flag resti.
+
+### L'eccezione prende anche `implementazioni/auto/`, i messaggi dicono `implementazioni/*.md`
+- **dove** — `.githooks/pre-commit:22` e `:33`, `.githooks/pre-push:36`
+- **cosa succede** — la regola `implementazioni/.*\.md$` vale per tutte le sottocartelle,
+  quindi anche per `implementazioni/auto/README.md` e `implementazioni/auto/tasks/*.md`, che
+  sono i fogli che fa il bot (`scripts/roadmap-auto.js`) e non si scrivono a mano. Il
+  messaggio del pre-commit, `CLAUDE.md:28` e `come-si-lavora.md:50` dicono
+  `implementazioni/*.md` o «i `.md` di `implementazioni/`», che si legge come la cartella
+  sola. Non è rotto: è da decidere se l'audit del bot deve poter essere ritoccato da `main`
+  o no, e poi scrivere la stessa cosa nei tre posti.
+- **come si vede** — leggendo le tre righe.
+- **quanto pesa** — da sistemare con calma (è una scelta, non un bug).
+- **RISOLTO (16/09/2026, stesso branch, prima del push)** — deciso: solo i `.md` di primo
+  livello, `implementazioni/[^/]+\.md$`, in tutti e due gli hook, nello script e nell'audit.
+  `implementazioni/auto/` è del bot e non è un foglio. Provato: `auto/finto.md` resta fuori.
+
+### Quando il push non riesce, lo script rimanda a un messaggio che può non esserci
+- **dove** — `scripts/salva-punti.js:74` e `:82`
+- **cosa succede** — il remoto è fisso a `origin` (il pre-push invece lo prende da `$1`).
+  Se `origin` non c'è, o se `main` sul remoto è andata avanti (Carletto ha salvato da un
+  altro computer), l'audit gira e poi il push viene rifiutato da Git, non dal gate; lo
+  script dice «leggi sopra cosa dice il gate, poi `git push`», ma sopra c'è solo l'errore di
+  Git e il `git push` fallisce uguale: la strada è `git pull --rebase` e poi `git push`.
+  Nel frattempo i file messi da parte tornano al loro posto (riga 77): bene, ma se erano
+  già in coda tornano fuori dalla coda (`stash pop` senza `--index`).
+- **come si vede** — con `main` remota più avanti della tua, `node scripts/salva-punti.js`.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (16/09/2026, stesso branch, prima del push)** — il remoto lo script lo legge da
+  `branch.<nome>.remote` (`origin` se manca); se il remoto non esiste committa e lo dice senza
+  provare il push; se il push non riesce il messaggio dice le due cause possibili — il gate,
+  oppure Git stesso col remoto avanti — e il comando per rimettersi in pari.
+
+Una nota sui documenti, non un errore: il commento della prova nuova
+(`frontend/strumenti/audit-regressioni.js:2117-2120`) parla di «tre posti che devono
+restare d'accordo» e controlla i due hook, lo script e `CLAUDE.md`; il quarto posto,
+`documentazione/come-si-lavora.md` («Salvare i punti nuovi, da `main`»), non è nella prova,
+mentre `CLAUDE.md` dice che le due copie della regola vanno cambiate insieme. Oggi tornano.

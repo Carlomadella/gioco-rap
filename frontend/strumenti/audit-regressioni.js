@@ -2118,16 +2118,18 @@ test("CLAUDE.md dice le cose che non si possono dimenticare",
    i fogli dei punti si salvano da main, ed e' l'unica eccezione alla regola del
    branch. Sta in tre posti che devono restare d'accordo: i due hook, lo script
    che li usa, e CLAUDE.md che la dice. */
-test("i fogli dei punti si salvano da main: hook, script e CLAUDE.md sono d'accordo",
+test("i fogli dei punti si salvano da main: hook, script, CLAUDE.md e come-si-lavora sono d'accordo",
   (() => {
     const pc = fs.readFileSync(path.join(RADICE, ".githooks", "pre-commit"), "utf8");
     const pp = fs.readFileSync(path.join(RADICE, ".githooks", "pre-push"), "utf8");
     const claude = fs.readFileSync(path.join(RADICE, "CLAUDE.md"), "utf8");
-    const ECCEZIONE = "implementazioni/.*\\.md$";
+    const ECCEZIONE = "implementazioni/[^/]+\\.md$";
+    const comeSiLavora = fs.readFileSync(path.join(RADICE, "documentazione", "come-si-lavora.md"), "utf8");
     return pc.includes(ECCEZIONE) && pp.includes(ECCEZIONE) &&
       pp.includes("solo_documenti") && pp.includes("audit-regressioni.js") &&
       fs.existsSync(path.join(RADICE, "scripts", "salva-punti.js")) &&
-      claude.includes("scripts/salva-punti.js");
+      claude.includes("scripts/salva-punti.js") && comeSiLavora.includes("scripts/salva-punti.js") &&
+      /--no-renames/.test(pc);
   })());
 test("il giro di fine task e' ancora acceso dopo il commit",
   (() => {
