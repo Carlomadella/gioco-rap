@@ -613,12 +613,17 @@ function telPromo(){
   if(ultimo && elenco.indexOf(ultimo) < 0) elenco.push(ultimo);
   const art = window.ARTIST || {};
   const mini = s => '<span class="tlicov">' + cover(s.seed || 7, s.t, art.name || "", s.img) + '</span>';
-  const seme = s => Number.isFinite(s.seed) ? ' data-spingi="' + s.seed + '"' : "";
-  const riga = (s, on, sotto) =>
-    '<button class="tli' + (on ? " on" : "") + '"' + seme(s) + '>' + mini(s) +
+  const riga = (s, on, sotto) => {
+    const cliccabile = Number.isFinite(s.seed);
+    const apri = cliccabile
+      ? '<button class="tli' + (on ? " on" : "") + '" data-spingi="' + s.seed + '">'
+      : '<div class="tli static">';
+    return apri + mini(s) +
       '<span class="tlitx"><b>' + s.t + '</b><i>' + sotto + '</i></span>' +
+      (s.spinta > 1 ? '<span class="ttag" data-marketing-state="spinta">spinta</span>' : "") +
       (on ? '<span class="ttag on">scelto</span>' : "") +
-    '</button>';
+      (cliccabile ? '</button>' : '</div>');
+  };
 
   if(!fuori.length && !pronti.length)
     return '<div class="tnote"><b>Che post fai?</b> Niente da spingere: prima si registra un pezzo, ' +
@@ -641,7 +646,7 @@ function telPromo(){
     '</div>' +
     (fuori.length
       ? '<div class="tlist">' + elenco.map(x => riga(x, !ant && x === ultimo,
-          "q" + x.q + " · " + fmt(x.streams || 0) + " stream" + (x.spinta > 1 ? " · in spinta" : ""))).join("") + '</div>'
+          "q" + x.q + " · " + fmt(x.streams || 0) + " stream")).join("") + '</div>'
       : "") +
     (pronti.length
       ? '<div class="tnote" style="margin-top:9px"><b>Non ancora fuori</b> · solo anteprima</div>' +
