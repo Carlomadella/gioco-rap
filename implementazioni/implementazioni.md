@@ -89,11 +89,10 @@ da quale lista viene.
 6. **L'avvio rapido ci mette due minuti e non lo dice** — da problemi-riscontrati. È il
    primo minuto di chi prova il gioco: o una barra di caricamento, o l'avvio rapido torna
    a non aspettare MakeHuman.
-7. **`jose` va usata, e `zod` va deciso** — da problemi-riscontrati (13/09) e dal registro
-   delle dipendenze: la verifica dei token Apple e Google in `backend/accessi.js` è scritta
-   a mano, ed è il posto peggiore dove risparmiare; `zod` sta fra le `dependencies` del
-   backend senza che nessuno la usi. Serve prima di uscire sugli store, non prima di
-   domani.
+7. ~~**`jose` va usata, e `zod` va deciso**~~ **FATTO (16/09/2026)** — `accessi.js`
+   verifica i token con `jose`; `zod` è deciso: si usa, e la forma dei corpi delle 14 rotte
+   sta in `backend/forme.js`. «Le due dipendenze del backend, usate» in
+   `07-multiplayer-e-backend.md`.
 
 **Piccole e chiare**
 

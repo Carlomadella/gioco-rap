@@ -106,6 +106,21 @@ Ogni errore usa almeno questa forma:
 
 Alcuni errori aggiungono `nota`, `motivo`, `salvata` o altri dettagli utili.
 
+Un corpo che **non ha la forma giusta** (dal 16/09/2026, `backend/forme.js`: un campo che
+manca, del tipo sbagliato, un valore fuori dall'elenco) è un `400` con la lista dei campi:
+
+```json
+{
+  "errore": "dati-non-validi",
+  "campi": [{ "campo": "id", "problema": "Input non valido: atteso string, ricevuto undefined" }]
+}
+```
+
+Dove un nome esiste da prima — `email-non-valida`, `segreto-troppo-corto`,
+`biglietto-mancante`, `stato-mancante`, `serve-la-conferma`, `azione-sconosciuta`,
+`nome-non-valido` — `errore` resta quello, e `campi` c'è lo stesso. Un campo in più non è
+mai un errore.
+
 | Stato | Significato tipico |
 | --- | --- |
 | `400` | JSON, URL o dati non validi |

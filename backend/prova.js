@@ -606,6 +606,32 @@ async function aspettaCheRisponda(figlio){
     const nonTuo = await chiama("/api/stagione/chiudi", { metodo: "POST" });
     controlla("la stagione non la chiude chi passa di lì", nonTuo.stato === 403);
 
+    console.log("\nla forma dei corpi (forme.js, con zod)");
+    /* Un corpo che non ha la forma giusta si prende un 400 che dice quale campo
+       e perché — non un 403 «non è tuo» né un 500 dalla chiave esterna. E i
+       nomi di sempre restano: chi mandava una mail storta legge ancora
+       `email-non-valida`, non un generico «dati non validi». */
+    const senzaId = await chiama("/api/punteggio", { metodo: "POST", corpo: { stream: 10 } });
+    controlla("un punteggio senza id è un 400 che dice quale campo manca",
+      senzaId.stato === 400 && senzaId.dati.errore === "dati-non-validi" &&
+      Array.isArray(senzaId.dati.campi) && senzaId.dati.campi.some(c => c.campo === "id"), senzaId.dati);
+    const mailStorta = await chiama("/api/account", { metodo: "POST", corpo: { tipo: "email", email: "x", segreto: "12345678" } });
+    controlla("una mail storta ha ancora il nome di sempre", mailStorta.stato === 400 && mailStorta.dati.errore === "email-non-valida", mailStorta.dati);
+    const tipoStrano = await chiama("/api/account", { metodo: "POST", corpo: { tipo: "marziano" } });
+    controlla("un tipo di account inventato non diventa più «ospite» in silenzio",
+      tipoStrano.stato === 400 && tipoStrano.dati.campi[0].campo === "tipo", tipoStrano.dati);
+    const senzaBiglietto = await chiama("/api/account", { metodo: "POST", corpo: { tipo: "apple" } });
+    controlla("Apple senza biglietto è un 400, non un 403", senzaBiglietto.stato === 400 && senzaBiglietto.dati.errore === "biglietto-mancante", senzaBiglietto.dati);
+    const statoStorto = await chiama("/api/carriera/1", { metodo: "PUT", testate: conSessione(sess2), corpo: { stato: "non un oggetto" } });
+    controlla("una carriera con lo stato che non è un oggetto dice «stato-mancante»",
+      statoStorto.stato === 400 && statoStorto.dati.errore === "stato-mancante", statoStorto.dati);
+    const azioneStrana = await chiama("/api/moderazione", { metodo: "POST", testate: { "x-admin": ADMIN },
+      corpo: { artistaId: "x", azione: "boh" } });
+    controlla("un'azione di moderazione sconosciuta ha il nome di sempre",
+      azioneStrana.stato === 400 && azioneStrana.dati.errore === "azione-sconosciuta", azioneStrana.dati);
+    const campoInPiu = await chiama("/api/artista", { metodo: "POST", corpo: { nome: "Campo In Piu", unCampoNuovo: 1 } });
+    controlla("un campo in più non è un errore: i client vecchi e nuovi ne mandano", campoInPiu.stato === 201, campoInPiu.dati);
+
     console.log("\nla cancellazione dell'account (quella che Apple e Google pretendono)");
     const senzaConferma = await chiama("/api/account", { metodo: "DELETE", testate: conSessione(sess2), corpo: {} });
     controlla("non si cancella per sbaglio", senzaConferma.stato === 400);

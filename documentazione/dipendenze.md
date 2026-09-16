@@ -60,8 +60,8 @@ Sono **dodici**: nove nel frontend (tutte in `devDependencies`) e tre nel backen
 strumenti e al giocatore costa zero. Oggi sono **tutte fuori**: al giocatore costano zero
 KB, nessuna entra in `gioco-*.js`.
 
-Di queste dodici, **cinque hanno un file nostro davanti** e stanno qui sotto. Le altre
-sette sono installate ma non le usa nessuno: stanno nella tabella dopo, ed è un debito
+Di queste dodici, **sette hanno un file nostro davanti** e stanno qui sotto. Le altre
+cinque sono installate ma non le usa nessuno: stanno nella tabella dopo, ed è un debito
 aperto, non una scelta.
 
 | pacchetto | dove | dentro/fuori | a cosa serve | perché non è scritta a mano | come si toglie |
@@ -71,36 +71,37 @@ aperto, non una scelta.
 | [`jsdom`](https://github.com/jsdom/jsdom) `^29.1.1` (MIT) | `frontend/package.json`, `devDependencies` | **fuori** | il DOM finto dentro Node — `document`, eventi, `localStorage` — con cui le prove aprono le schermate senza aprire Chrome | è un pezzo di browser: rifarlo a mano vuol dire rifare le specifiche HTML, e un DOM finto sbagliato fa passare prove che sul browser vero non passano | sta dietro a [`../frontend/test/unit/gameplay-regressions.test.js`](../frontend/test/unit/gameplay-regressions.test.js), l'unico file che la importa |
 | [`@playwright/test`](https://playwright.dev/) `^1.63.0` (Apache-2.0) | `frontend/package.json`, `devDependencies` | **fuori** | Chrome vero senza finestra: apre il gioco, ci clicca dentro dalla landing all'hub, e prende gli screenshot. È `npm run test:e2e`, dentro a `npm run verifica` | guidare un browser vero (protocollo CDP, aspettare che la pagina sia davvero pronta, screenshot) è il mestiere di un driver: a mano è un progetto suo, e sbagliarlo vuol dire prove che lampeggiano | sta dietro a [`../frontend/playwright.config.js`](../frontend/playwright.config.js) e alla cartella `frontend/test/e2e/`: si toglie il pezzo `npm run test:e2e` dalla catena `verifica` e il resto del gate continua a girare. **Vuole un browser scaricato a parte** (`npm run setup:browser`, una volta per macchina): e' la sola dipendenza del progetto che non basta `npm ci` a mettere a posto |
 | [`pg`](https://node-postgres.com/) `^8.23.0` (MIT) | `backend/package.json`, `dependencies` | **fuori** (server) | il client PostgreSQL: SCRAM-SHA-256, TLS, decodifica dei tipi, riconnessioni. Serve solo con `ADF_PG` acceso; di suo il server va a SQLite dentro a Node | è il file che tiene le carriere della gente: quattro punti dove un errore sottile non si vede subito e si paga sui dati veri. Il perché per esteso in [`../backend/database/README.md`](../backend/database/README.md) | sta dietro a [`../backend/database/postgres.js`](../backend/database/postgres.js): senza `ADF_PG` non viene nemmeno caricato |
+| [`jose`](https://github.com/panva/jose) `^6.2.12` (MIT) | `backend/package.json`, `dependencies` | **fuori** (server) | verifica i token di Apple e Google: firma RS256, chiavi pubbliche (JWKS) scaricate e tenute da conto con la rotazione, `iss`/`aud`/`exp`. _Entrata il 16/09/2026_ | è il posto peggiore del progetto dove tenere codice proprio: un errore nella verifica di una firma non lo prende nessun test e si scopre quando qualcuno entra nell'account di un altro. La versione a mano c'era ed era scritta bene; `jose` fa la stessa cosa da anni e la leggono in tanti | sta dietro a `apriToken()` in [`../backend/accessi.js`](../backend/accessi.js), l'unico posto che la importa; la versione a mano sta nella history (`git log -p backend/accessi.js`, prima del 16/09/2026) |
+| [`zod`](https://zod.dev/) `^4.6.1` (MIT) | `backend/package.json`, `dependencies` | **fuori** (server) | la forma dei corpi delle 14 rotte che ne leggono uno: se non torna, un 400 che dice quale campo e perché. _Entrata il 16/09/2026_ | prima era a mano, rotta per rotta (`String(b.x || "")`), e chi sbagliava un campo si prendeva un 403 «non è tuo» o un 500 dalla chiave esterna. Una forma scritta in un posto solo si legge, si prova e dice la verità a chi chiama | sta dietro a [`../backend/forme.js`](../backend/forme.js), l'unico che la importa: `corpoInForma()` in `server.js` chiama `forme.controlla()`, e si torna a `corpo(req)` rotta per rotta |
 
 ## Quelle entrate senza un file dietro _(debito, 13/09/2026)_
 
-La quarta domanda dice che ogni dipendenza sta **dietro a un file nostro**. Queste sette
-sono installate — stanno nei due `package.json` e nei lockfile, `npm ci` le tira giù in CI
-— ma **non le importa nessuno**: non c'è il file davanti, e per `eslint` non c'è nemmeno
-la configurazione né uno script che lo lanci. Verificato il 13/09/2026 cercando gli import
-in tutto il repo fuori da `node_modules/`.
+La quarta domanda dice che ogni dipendenza sta **dietro a un file nostro**. Queste cinque
+sono installate — stanno nel `package.json` del frontend e nel lockfile, `npm ci` le tira
+giù in CI — ma **non le importa nessuno**: non c'è il file davanti, e per `eslint` non c'è
+nemmeno la configurazione né uno script che lo lanci. Verificato il 13/09/2026 cercando gli
+import in tutto il repo fuori da `node_modules/`; il 16/09/2026 `jose` e `zod` sono uscite
+da questa tabella ed entrate in quella sopra, col loro file davanti.
 
-Non sono state tolte qui perché toglierle è una decisione, non una pulizia: per tre di
-loro il file davanti **era il piano** (sotto, «Quello che entrerebbe per prime»), e vanno
-o costruite o disinstallate — una per commit, col perché.
+Non sono state tolte qui perché toglierle è una decisione, non una pulizia: per `eslint` il
+file davanti **era il piano** (sotto, «Quello che entrerebbe per prime»), e va o costruito
+o disinstallata — una per commit, col perché.
 
 | pacchetto | dove | doveva servire a | cosa manca | se si molla |
 | --- | --- | --- | --- | --- |
 | `eslint` `^10.10.0` (MIT) + `@eslint/js` `^10.0.1` (MIT) + `globals` `^17.12.0` (MIT) | `frontend`, `devDependencies` | trovare i nomi storti sui 72 file a scope condiviso | non c'è `eslint.config.js`, e nessuno script `lint` in `package.json`: oggi non gira mai | `npm rm eslint @eslint/js globals` nel frontend |
 | `sharp` `^0.35.4` (Apache-2.0) | `frontend`, `devDependencies` | comprimere e convertire le immagini nel build | nessun file la importa: il build non tocca le immagini | `npm rm sharp` nel frontend — ed è quella che pesa di più da scaricare |
 | `vite` `^6.4.3` (MIT) | `frontend`, `devDependencies` | niente di deciso: `vitest` se la tira già dietro da sola | non c'è nessun `vite.config.js` e nessuno la importa. Il dev server è `strumenti/dev.js`, scritto da noi | `npm rm vite` nel frontend: `vitest` continua a girare, la sua copia se la porta da sé |
-| `jose` `^6.2.12` (MIT) | `backend`, `dependencies` | verificare i token Apple e Google al posto della verifica scritta a mano | `backend/accessi.js` non la importa: la verifica a mano è ancora quella di prima, ed è **il punto peggiore dove risparmiare** | `npm rm jose` nel backend — ma qui la mossa giusta è l'opposto: usarla |
-| `zod` `^4.6.1` (MIT) | `backend`, `dependencies` | validare i corpi delle rotte, oggi fatta a mano rotta per rotta | nessuna rotta la importa | `npm rm zod` nel backend |
 
 ## Quello che entrerebbe per prime, e non è ancora entrato
 
 `vitest` + `jsdom` sono entrate e hanno il loro file davanti: sono la riga di sopra, e il
-gate `npm run verifica` le fa girare a ogni giro. Restano queste due, e per tutte e due il
-pacchetto è già scaricato senza che nessuno lo usi (la tabella qui sopra):
+gate `npm run verifica` le fa girare a ogni giro. `jose` e `zod` pure, dal 16/09/2026.
+Resta questa, e il pacchetto è già scaricato senza che nessuno lo usi (la tabella qui
+sopra):
 
 | pacchetto | a cosa servirebbe | perché prima delle altre |
 | --- | --- | --- |
-| `jose` | verifica dei token Apple e Google al posto di quella scritta a mano in `backend/accessi.js` | è il posto peggiore del progetto dove risparmiare: un errore lì non lo prende nessun test e si scopre quando qualcuno entra nell'account di un altro |
 | `eslint` (+ `globals`) | trova variabili mai dichiarate, roba assegnata e mai usata, `==` al posto di `===` | 72 file senza moduli che condividono lo stesso scope e non hanno **nessuna** rete: oggi un nome storto lo trova un giocatore |
 
 ## Se un giorno la tabella si svuota
@@ -199,7 +200,10 @@ che mancava, ed è quello che c'è qui sopra.
    [`../implementazioni/08-uscita-sugli-store.md`](../implementazioni/08-uscita-sugli-store.md),
    e senza dipendenze non parte proprio.
 2. **`accessi.js` passa a `jose`**, e la validazione dei corpi delle rotte passa a `zod`
-   (oggi è a mano, rotta per rotta). Meno codice nostro nel punto più delicato.
+   — _fatto il 16/09/2026._ `apriToken()` è `jwtVerify` con `createRemoteJWKSet`, e le
+   prove sui biglietti Apple (firmato bene, firma altrui, scaduto, per un altro gioco, senza
+   scadenza) passano uguali; le 14 rotte che leggono un corpo passano da `forme.js`, e un
+   corpo storto è un 400 che dice quale campo. Meno codice nostro nel punto più delicato.
 3. **Le prove diventano prove** — _fatto il 13/09/2026, ed è l'unico punto di questa lista
    che è uscito._ `vitest` + `jsdom` per la logica e `@playwright/test` per il giro nel
    browser girano dentro a `npm run verifica` e in CI. `audit-regressioni.js` non si è

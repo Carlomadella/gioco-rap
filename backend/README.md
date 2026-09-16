@@ -303,10 +303,12 @@ curl -X PUT localhost:8787/api/carriera/1 -H 'content-type: application/json' \
 
 **La verifica c'è** (`accessi.js`): Apple e Google mandano un token firmato (JWT RS256) e
 lo controlliamo contro le loro chiavi pubbliche — firma, emittente, destinatario, scadenza;
-Steam manda un biglietto e lo facciamo verificare a Steamworks. Oggi è tutto scritto a
-mano con Node; **è il primo posto che passerà a una libreria** (`jose`), perché la
+Steam manda un biglietto e lo facciamo verificare a Steamworks. Dal 16/09/2026 la verifica
+del JWT la fa **`jose`** (`jwtVerify` + `createRemoteJWKSet`, che scarica le chiavi e le
+tiene da conto per un'ora): prima era scritta a mano con Node, ed era scritta bene, ma la
 verifica di una firma è l'ultimo posto dove conviene tenere codice proprio. La regola per
-scegliere le dipendenze, e `jose` fra quelle già decise, stanno in
+scegliere le dipendenze, e il perché di `jose` e di `zod` (che controlla la forma dei corpi
+delle rotte, `forme.js`), stanno in
 [`documentazione/dipendenze.md`](../documentazione/dipendenze.md).
 
 Quello che manca sono **le chiavi**, che si prendono quando c'è l'app registrata sugli

@@ -159,6 +159,34 @@ test("override backend resta disponibile per sviluppo locale",
   online.includes("|| DEFAULT_BASE;"));
 test("account e login tollerano il cold start del backend pubblico",
   (online.match(/attesa: 60000/g) || []).length >= 2);
+/* «Sviluppa le due dipendenze del backend» (16/09/2026): jose e zod avevano il
+   pacchetto scaricato e nessun file davanti. Adesso jose verifica i token in
+   accessi.js — e la verifica a mano non c'e' piu': se tornasse, sarebbe di
+   nuovo il posto peggiore dove risparmiare — e ogni corpo passa da forme.js.
+   Il registro in documentazione/dipendenze.md deve dire la stessa cosa. */
+test("i token di Apple e Google li verifica jose, non una firma controllata a mano",
+  (() => {
+    const acc = fs.readFileSync(path.join(ROOT, "..", "backend", "accessi.js"), "utf8");
+    return acc.includes('require("jose")') && acc.includes("jwtVerify(") &&
+      acc.includes("createRemoteJWKSet(") && acc.includes('requiredClaims: ["exp", "sub"]') &&
+      !acc.includes("crypto.verify(");
+  })());
+test("ogni rotta del backend che legge un corpo passa dalla sua forma (forme.js, zod)",
+  (() => {
+    const srv = fs.readFileSync(path.join(ROOT, "..", "backend", "server.js"), "utf8");
+    const forme = fs.readFileSync(path.join(ROOT, "..", "backend", "forme.js"), "utf8");
+    /* l'unica lettura nuda del corpo e' dentro a corpoInForma(); le rotte no */
+    return forme.includes('require("zod")') && srv.includes('require("./forme.js")') &&
+      srv.split("await corpo(req)").length === 2 &&
+      (srv.match(/corpoInForma\(req, res, "/g) || []).length >= 14;
+  })());
+test("il registro delle dipendenze sa che jose e zod hanno un file davanti",
+  (() => {
+    const d = fs.readFileSync(path.join(ROOT, "..", "documentazione", "dipendenze.md"), "utf8");
+    const debito = d.slice(d.indexOf("## Quelle entrate senza un file dietro"), d.indexOf("## Quello che entrerebbe per prime"));
+    return d.includes("../backend/forme.js") && d.includes("../backend/accessi.js") &&
+      !/\|\s*`jose`/.test(debito) && !/\|\s*`zod`/.test(debito);
+  })());
 test("sessione account e identita artista sono controlli separati",
   online.includes("const sessione = () => leggi(K_SESSIONE)") &&
   online.includes("collega, scollega, sessione, identita") &&

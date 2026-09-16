@@ -19,8 +19,10 @@ fine task su quel foglio.
    il giro unico su tutti i CSS.~~ **RISOLTO (08/09/2026, riconosciuto il 15/09)** — era
    chiuso lo stesso giorno e la riga sotto alla voce mancava: vedi il giro del 15/09 in fondo.
 4. **L'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore** (13/09).
-5. **`jose` e `zod` stanno fra le `dependencies`** (13/09), aperta per decisione: `jose` va
-   usata in `backend/accessi.js`, non tolta.
+5. ~~**`jose` e `zod` stanno fra le `dependencies`** (13/09), aperta per decisione.~~
+   **RISOLTO (16/09/2026)** — usate tutte e due: `jose` in `accessi.js`, `zod` in
+   `forme.js` per i corpi delle rotte. Vedi «Le due dipendenze del backend, usate» in
+   `implementazioni/07-multiplayer-e-backend.md`.
 6. **Lo Shop promette tre reparti a schede, ce ne sono due** (10/09).
 7. **L'uscita di venerdì non costa niente, quella a mano sì** (08/09): risolto in parte per
    scelta — il vantaggio di venerdì è quello di aspettare, non uno sconto. Sparisce del tutto
@@ -1238,6 +1240,11 @@ le otto coppie di migrazioni combaciano colonna per colonna.
 - **quanto pesa** — da sistemare con calma. Il registro in `documentazione/dipendenze.md`
   lo dice gia' e dice anche cosa fare: `jose` va **usata** (e' la prima della lista), non
   tolta.
+- **RISOLTO (16/09/2026)** — branch `task/jose-e-zod-nel-backend`: `accessi.js` importa
+  `jose` (`jwtVerify` + `createRemoteJWKSet` al posto della verifica a mano), `forme.js`
+  importa `zod` e dà la forma ai corpi delle 14 rotte che ne leggono uno. Stanno fra le
+  `dependencies` perché servono in produzione, ed è giusto così. Le prove del backend sono
+  190 (sette nuove sulle forme), e quelle sui biglietti Apple passano uguali.
 
 ---
 

@@ -296,3 +296,56 @@ generato, committato così si importa senza far girare niente), `prova.js` (il g
 > Quello che resta è il vestito. La richiesta era anche «fatta molto meglio,
 > senza il server a vista»: la pagina di adesso è sobria e onesta, non è il
 > restyle. Nell'elenco quel punto non c'è più — se lo si vuole, va riscritto.
+
+## Le due dipendenze del backend, usate
+
+> «Sviluppa le due dipendenze del backend» (Carletto, 16/09/2026); veniva da
+> problemi-riscontrati del 13/09, «`jose` e `zod` stanno fra le `dependencies`», e dal
+> registro in `documentazione/dipendenze.md`, dove tutte e due stavano nella tabella del
+> debito: installate il 10/09 senza un file davanti.
+
+**FATTO (16/09/2026)** — branch `task/jose-e-zod-nel-backend`.
+
+**`jose`, in `backend/accessi.js`.** La verifica dei token di Apple e Google — un JWT
+firmato RS256 — era scritta a mano: base64url, firma con `crypto.verify`, chiavi pubbliche
+scaricate e tenute in un `Map` per un'ora con la rotazione sul `kid` nuovo, `iss`, `aud`,
+`exp` obbligatoria, `iat` nel futuro. Era scritta bene, ma è il posto peggiore del progetto
+dove tenere codice proprio: un errore lì non lo prende nessun test e si scopre quando
+qualcuno entra nell'account di un altro. Adesso `apriToken()` è `jwtVerify` con
+`createRemoteJWKSet` (cache di un'ora, timeout di sei secondi, rotazione delle chiavi da
+sé), `algorithms: ["RS256"]`, `issuer` con e senza `https://` (Google firma in tutti e
+due i modi), `audience`, `requiredClaims: ["exp", "sub"]` — la scadenza resta
+**obbligatoria**, come prima — e un minuto di tolleranza sull'orologio. Il controllo
+«firmato nel futuro» resta una riga nostra, perché `jose` da solo non lo fa. Se sono le
+chiavi pubbliche a non rispondere, l'errore risale come «verifica non riuscita» e non come
+«biglietto rifiutato»: colpa nostra, non di chi chiama. Le cinque prove di `prova.js` sul
+finto Apple — firmato bene, firma altrui, scaduto, per un altro gioco, senza scadenza —
+passano uguali, senza toccarle. `module.exports` non cambia.
+
+**`zod`, in `backend/forme.js` (nuovo).** Quattordici rotte leggono un corpo, e ognuna se lo
+leggeva a mano: `String(b.artistaId || "")`, `typeof b.stato !== "object"`, `b.tipo ===
+"legacy"`. Chi sbagliava un campo si prendeva un 403 «non è tuo» (l'id mancante diventava
+`""`) o un 500 dalla chiave esterna. Adesso la forma di ogni corpo sta in `FORME`, una
+per rotta, e `corpoInForma(req, res, nome)` in `server.js` legge il JSON, lo controlla e —
+se non torna — risponde da sola un `400` con `campi: [{ campo, problema }]`. Tre scelte:
+
+1. **I nomi di sempre restano.** Dove un errore aveva già un nome — `email-non-valida`,
+   `segreto-troppo-corto`, `stato-mancante`, `serve-la-conferma`, `azione-sconosciuta`,
+   `nome-non-valido` — la forma lo dice come messaggio, e `errore` è quello; altrimenti è
+   `dati-non-validi`. Il gioco e `README-API.md` non cambiano.
+2. **Le forme sono larghe** (`looseObject`): un campo in più non è un errore, perché i client
+   vecchi ne mandano e quelli nuovi ne manderanno; e dove il gioco è sempre stato libero sui
+   tipi (`stream`, `deal`, `dispositivo`, i numeri anche come stringa) restano liberi — il
+   freno vero è `plausibilita.js` e `archivio.js`. Si guarda la forma, non il merito: la
+   pulizia dei testi (`nomePulito`) e i controlli col database (nome libero, artista tuo,
+   moderazione) restano nelle rotte.
+3. **Più stretto dove costava niente:** un `tipo` di account inventato non diventa più
+   «ospite» in silenzio; Apple, Google o Steam senza `biglietto` è un 400 e non un 403.
+
+I messaggi di `zod` sono in italiano (`z.locales.it()`). Sette prove nuove in `prova.js`
+(«la forma dei corpi»): 190 a posto.
+
+**Nel registro.** `documentazione/dipendenze.md`: le due righe sono uscite dalla tabella del
+debito ed entrate in quella di chi ha un file davanti (sette su dodici, ora); il punto 2 di
+«Cosa cambia nel progetto» è fatto. Il `README.md` e il `README-API.md` del backend dicono
+la cosa nuova. `scripts/controlla-backend.js` resta verde: le rotte non sono cambiate.
