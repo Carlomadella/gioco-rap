@@ -95,3 +95,95 @@ test("Marketing: il motivo dell'anteprima spenta resta leggibile nella larghezza
   expect(r.misuraMotivo.whiteSpace).not.toBe("nowrap");
   expect(r.misuraMotivo.scrollWidth).toBeLessThanOrEqual(r.misuraMotivo.clientWidth + 1);
 });
+
+test("Marketing: ciclo anteprima, uscita, promo e decadimento della spinta", async ({ page }) => {
+  await apriGioco(page);
+  const r = await page.evaluate(() => {
+    const seed = 901;
+    const pezzo = {
+      t:"Ciclo Marketing", q:72, mixed:true, released:false,
+      week:0, streams:0, last:0, seed
+    };
+
+    G.songs = [pezzo];
+    G.studio = { spingi:seed, banco:null };
+    G.energy = 100;
+    G.hype = 10;
+    G.fans = 100;
+    G.skills.rete = 0;
+    G.adfDailyActions = null;
+    G.promoSaturation = null;
+    G.ended = false;
+    G.job = null;
+    G.obligation = null;
+    G.shifts = 0;
+    G.trialCd = 999;
+
+    const anteprima = ACTIONS.find(a => a.id === "anteprima");
+    const promo = ACTIONS.find(a => a.id === "promo");
+    const hypePrima = G.hype;
+    const bisognoAnteprima = anteprima.need();
+    const esitoAnteprima = anteprima.run();
+    const dopoAnteprima = {
+      n:pezzo.anteprime || 0,
+      hype:G.hype,
+      released:pezzo.released,
+      testo:esitoAnteprima
+    };
+
+    pezzo.released = true;
+    pezzo.week = totalWeeks();
+    anteprimeAllUscita(pezzo);
+    const dopoUscita = {
+      anteprime:pezzo.anteprime,
+      spinta:pezzo.spinta
+    };
+
+    const bisognoPromo = promo.need();
+    const primaPromo = pezzo.spinta;
+    const esitoPromo = promo.run();
+    const dopoPromo = {
+      spinta:pezzo.spinta,
+      contate:adfOggi("promo"),
+      testo:esitoPromo
+    };
+
+    const primaDecadimento = pezzo.spinta;
+    const randomPrima = Math.random;
+    Math.random = () => 1;
+    try{
+      advanceWeek();
+    } finally {
+      Math.random = randomPrima;
+    }
+
+    return {
+      hypePrima,
+      bisognoAnteprima,
+      dopoAnteprima,
+      dopoUscita,
+      bisognoPromo,
+      primaPromo,
+      dopoPromo,
+      primaDecadimento,
+      dopoDecadimento:pezzo.spinta || 1
+    };
+  });
+
+  expect(r.bisognoAnteprima).toBeNull();
+  expect(r.dopoAnteprima.n).toBe(1);
+  expect(r.dopoAnteprima.hype).toBeGreaterThan(r.hypePrima);
+  expect(r.dopoAnteprima.released).toBe(false);
+  expect(r.dopoAnteprima.testo).toContain("Anteprima di");
+
+  expect(r.dopoUscita.anteprime).toBeUndefined();
+  expect(r.dopoUscita.spinta).toBeCloseTo(1.12, 5);
+
+  expect(r.bisognoPromo).toBeNull();
+  expect(r.dopoPromo.spinta).toBeGreaterThan(r.primaPromo);
+  expect(r.dopoPromo.contate).toBe(1);
+  expect(r.dopoPromo.testo).toContain("Spingi «Ciclo Marketing»");
+
+  expect(r.dopoDecadimento).toBeGreaterThan(1);
+  expect(r.dopoDecadimento).toBeLessThan(r.primaDecadimento);
+});
