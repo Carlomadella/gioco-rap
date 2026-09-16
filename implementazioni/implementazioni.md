@@ -161,6 +161,11 @@ da quale lista viene.
     branch già uniti in `main` (`git branch --merged main` li elenca, da
     `test/vitest-playwright-gate` a `task/studio-cinque-linguette`), anche sul remoto.
 
+**Ancora da smistare (16/09/2026):** i sette punti nuovi di CARLO — sei sullo Studio (il
+Marketing da spostare, la preview sul social prima dell'uscita, le sezioni in automatico coi
+malus, la Sala senza costo in energia, i collettivi, il joint album) e la troupe in «Da
+discutere». Entrano nell'ordine al prossimo giro.
+
 Restano fuori dall'ordine, di proposito: **le nuove modalità** (Carriera Studio, città di
 partenza, le città finali), che sono per dopo, quando il gioco è masterizzato; le canzoni
 con l'IA, che è una **giornaliera** e non si smista; e i due «aperti di proposito» di
@@ -427,9 +432,28 @@ con lo stesso numero e resta così._
     nessuno». Prima di farlo va deciso chi posta e cosa (i beatmaker i loro beat? gli opps
     contro di te? chi scala la classifica?).
 
+#### Studio (16/09/2026)
+
+_Scritti da Carletto il 16/09 nella lista dello Studio; i numeri sono i suoi, i buchi
+sono i punti chiusi in [`fatte.md`](fatte.md)._
+
+7. marketing toglilo da qua e spostalo, dimmi dove lo metti
+
+8. non posso spingere una canzone che non è ancora uscita, al massimo faccio uscire una preview sul social
+
+10. l'utente deve poter fare solo le sezioni Beat, Testo, e Cabina, poi il resto in automatico, però questo porta dei malus
+
+11. non deve costare energia interagire con gli altri all'interno della sala
+
+12. fai in modo che si possano creare collettivi di rapper
+
+13. fai in modo che un produttore possa chiamarti per fare un joint album con altri rapper
+
 #### Da discutere
 
 2. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles? Per forza a los angeles, però può decidere di tornare nelle città prima
+
+3. Il player può decidere se avere una troupe. es: manager, social media manager, fonico personale, beatmaker personale, videomaker
 
 #### Pagina di landing
 
