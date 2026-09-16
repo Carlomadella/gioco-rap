@@ -318,7 +318,8 @@ troppo vicine e pulsanti troppo grandi (B).
 > metà, il pallino giallo sull'ultimo posto visitato.
 
 **Carletto** — la TRACK (D), le foto di sfondo dei posti e le schermate rifatte in HTML (B),
-le transizioni video sulle cinque schede (B), lo skip lento (C), via «lucidità» (C), la
+le transizioni video sulle cinque schede (B — la prima, lo Studio, c'è dal 16/09/2026; le
+altre quattro si agganciano allo stesso modo), lo skip lento (C), via «lucidità» (C), la
 legacy — quanto sei influente sulle generazioni dopo di te (E: nel codice non esiste). Più
 due regole di lavoro: le canzoni con l'IA come task giornaliera, e quando non è un fix
 creare un file nuovo collegato invece di gonfiare quelli che ci sono.

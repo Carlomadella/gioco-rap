@@ -43,7 +43,11 @@
       "#crimeModal.on",
       "#adf-result-overlay.on",
       "#adf-social-overlay.on",
-      "#adf-social-banner.show"
+      "#adf-social-banner.show",
+      /* il filmato di una transizione (js/game/transizioni-video.js): Esc lo
+         salta, non apre il menu — anche nell'attesa che parta */
+      "#tvid.on",
+      "#tvid.attesa"
     ];
     if(selectors.some(sel => document.querySelector(sel))) return true;
 

@@ -33,6 +33,8 @@ const TIPI = {
   ".gif": "image/gif", ".svg": "image/svg+xml", ".ico": "image/x-icon",
   ".woff": "font/woff", ".woff2": "font/woff2", ".ttf": "font/ttf",
   ".mp3": "audio/mpeg", ".ogg": "audio/ogg", ".wav": "audio/wav",
+  /* le transizioni video: senza il tipo giusto Safari non le suona */
+  ".mp4": "video/mp4", ".webm": "video/webm",
   ".bin": "application/octet-stream"
 };
 
