@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:684a1af -->
+## 16/09/26, 14:36 â€” task/prima-transizione-video â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `684a1af`
+
+### Cosa Ã¨ entrato
+
+- `f0f730f` â€” feat(transizioni): il primo video, lo Studio — «implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata» â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:b9bd794 -->
 ## 15/09/26, 14:28 â€” task/telefono-sul-telefono â†’ main
 
