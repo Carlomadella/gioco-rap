@@ -28,7 +28,19 @@ if git remote get-url "$REMOTE_NAME" >/dev/null 2>&1; then
   }
 fi
 
+# Un commit di soli fogli dei punti (i .md di primo livello di implementazioni/,
+# non implementazioni/auto/ che e' del bot) o del registro:
+# e' l'eccezione che il pre-commit ammette su main, e qui vale lo stesso.
+solo_documenti() {
+  FILES="$(git -c core.quotepath=false diff-tree --no-commit-id --name-only -r "$1" 2>/dev/null || true)"
+  [ -n "$FILES" ] || return 1
+  [ -z "$(printf '%s\n' "$FILES" | grep -v -E '^(registro-modifiche/|implementazioni/[^/]+\.md$)' || true)" ]
+}
+
 NEED_VERIFY=0
+# Resta a 1 solo se tutto quello che parte e' fatto di fogli e registro:
+# allora basta l'audit, la verifica intera (minuti) e' per il codice.
+SOLO_DOCS=1
 while read -r LOCAL_REF LOCAL_OID REMOTE_REF REMOTE_OID; do
   [ -n "${LOCAL_REF:-}" ] || continue
   [ "$LOCAL_OID" = "$ZERO" ] && continue
@@ -37,6 +49,14 @@ while read -r LOCAL_REF LOCAL_OID REMOTE_REF REMOTE_OID; do
     refs/heads/*) NEED_VERIFY=1 ;;
     *) continue ;;
   esac
+
+  if [ "$REMOTE_OID" = "$ZERO" ]; then
+    SOLO_DOCS=0
+  else
+    for C in $(git rev-list "$REMOTE_OID..$LOCAL_OID"); do
+      if ! solo_documenti "$C"; then SOLO_DOCS=0; break; fi
+    done
+  fi
 
   if [ "$REMOTE_REF" = "refs/heads/main" ]; then
     # Nuova main remota non e' un caso normale per questo progetto.
@@ -55,6 +75,9 @@ while read -r LOCAL_REF LOCAL_OID REMOTE_REF REMOTE_OID; do
         continue
       fi
       if [ "$SUBJECT" = "docs: aggiorna registro modifiche" ]; then
+        continue
+      fi
+      if solo_documenti "$C"; then
         continue
       fi
 
@@ -99,8 +122,15 @@ while read -r LOCAL_REF LOCAL_OID REMOTE_REF REMOTE_OID; do
 done < "$TMP"
 
 if [ "$NEED_VERIFY" -eq 1 ]; then
-  echo ""
-  echo "[ADF GIT GATE] Eseguo la verifica ufficiale prima del push..."
-  echo ""
-  (cd "$ROOT/frontend" && npm run verifica)
+  if [ "$SOLO_DOCS" -eq 1 ]; then
+    echo ""
+    echo "[ADF GIT GATE] Solo fogli dei punti: faccio girare l'audit, non la verifica intera..."
+    echo ""
+    (cd "$ROOT/frontend" && node strumenti/audit-regressioni.js)
+  else
+    echo ""
+    echo "[ADF GIT GATE] Eseguo la verifica ufficiale prima del push..."
+    echo ""
+    (cd "$ROOT/frontend" && npm run verifica)
+  fi
 fi

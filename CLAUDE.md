@@ -25,6 +25,9 @@ qui, cambiala anche lì.
   chiusi si spostano nel file del loro argomento, con sotto **cosa è stato fatto e
   quando**: `**FATTO (gg/mm/aaaa)** — in una frase`. A metà si scrive `FATTO in parte` e
   cosa manca; se se n'è solo discusso, `RISPOSTA` e il ragionamento.
+- **I fogli dei punti si salvano anche da `main`**, ed è l'unica eccezione alla regola del
+  branch: `node scripts/salva-punti.js` committa e pusha i `.md` di `implementazioni/`
+  e basta (per loro il gate fa girare solo l'audit). Il codice passa sempre da un branch.
 - **I numeri dei punti si spostano.** Cita sempre il **testo** del punto, non il numero da
   solo — né nei commit né nei rimandi fra documenti.
 - **`registro-modifiche/` non si scrive a mano**: lo rifà un bot dai merge

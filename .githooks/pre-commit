@@ -9,13 +9,21 @@ if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
   exit 0
 fi
 
-STAGED="$(git diff --cached --name-only --diff-filter=ACMR 2>/dev/null || true)"
+# --no-renames: uno spostamento si vede come un file tolto E uno aggiunto, cosi'
+# `git mv frontend/js/x.js implementazioni/x.md` non passa per un foglio.
+STAGED="$(git -c core.quotepath=false diff --cached --name-only --no-renames --diff-filter=ACMRD 2>/dev/null || true)"
 [ -n "$STAGED" ] || exit 0
 
-# Il post-merge genera automaticamente il registro su main: quella e' l'unica
-# eccezione ammessa ai commit diretti.
-NON_REGISTRY="$(printf '%s\n' "$STAGED" | grep -v '^registro-modifiche/' || true)"
-if [ -z "$NON_REGISTRY" ]; then
+# Due eccezioni ai commit diretti su main, tutte e due di soli documenti:
+# - il post-merge genera il registro delle modifiche;
+# - i fogli dei punti (implementazioni/*.md): un'idea appena venuta si scrive
+#   nel foglio e si salva subito, senza aprire un branch per una riga. Vale
+#   solo per i .md di primo livello di quella cartella — non per
+#   implementazioni/auto/, che e' del bot — e il codice passa sempre da un branch.
+#   La stessa regola sta nel pre-push, che per questi commit fa girare solo
+#   l'audit invece della verifica intera (scripts/salva-punti.js li fa insieme).
+NON_DOCS="$(printf '%s\n' "$STAGED" | grep -v -E '^(registro-modifiche/|implementazioni/[^/]+\.md$)' || true)"
+if [ -z "$NON_DOCS" ]; then
   exit 0
 fi
 
@@ -25,6 +33,7 @@ cat <<'MSG'
 
 Le regole del progetto vietano lavoro diretto su main.
 Crea/usa un branch di task e committa li'. Il merge su main resta consentito.
+(Fanno eccezione solo i fogli dei punti, implementazioni/*.md, e il registro.)
 
 Esempio:
   git switch -c task/nome-lavoro

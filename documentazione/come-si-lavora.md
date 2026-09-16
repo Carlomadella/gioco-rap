@@ -41,6 +41,29 @@ esteso da un'altra parte, va in [`implementazioni/fatte.md`](../implementazioni/
 basta: meglio lì che lasciato nel foglio dei punti nuovi a farlo diventare lungo un'altra
 volta.
 
+### Salvare i punti nuovi, da `main`
+
+La regola del branch («mai lavorare su `main`», e gli hook in `.githooks/` la fanno
+rispettare: il commit diretto è bloccato, il push fa girare la verifica intera) è fatta per
+il codice. Per **una riga in un foglio** era un muro: Carletto scriveva un'idea in
+`implementazioni.md`, provava a salvarla e il gate gli diceva di aprire un branch. Dal
+16/09/2026 i `.md` di `implementazioni/` sono l'**unica eccezione**, come già lo era il
+registro delle modifiche che il bot committa da solo:
+
+- `.githooks/pre-commit` lascia passare su `main` un commit che tocca **solo** quei file —
+  i `.md` di primo livello, non `implementazioni/auto/` che è del bot;
+- `.githooks/pre-push`, se tutto quello che parte è fatto di fogli (e registro), fa girare
+  l'**audit** (`node strumenti/audit-regressioni.js`, che i documenti li controlla) e non la
+  verifica intera, che ci mette minuti ed è per il codice. Un commit di codice su `main`
+  resta bloccato come prima;
+- `node scripts/salva-punti.js` fa tutto insieme: prende i fogli cambiati e solo quelli, li
+  committa (`docs(implementazioni): ...`, con la frase che gli passi se gliela passi) e
+  **solo** quelli — quello che avevi già messo in coda ci resta —, mette da parte per il
+  tempo del push gli altri file sporchi — il gate vuole la cartella pulita — e pusha sul
+  remoto del branch. `--prova` dice cosa farebbe e si ferma.
+
+Il codice, i CSS, le foto, il `.gitignore`: quelli passano ancora da un branch `task/…`.
+
 ## Come si segna un punto chiuso
 
 Sotto al punto, indentato, una riga che dice cosa è stato fatto:
