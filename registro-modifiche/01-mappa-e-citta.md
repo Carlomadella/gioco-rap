@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:6ba6de0 -->
+## 16/09/26, 17:47 â€” task/jose-e-zod-nel-backend â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `6ba6de0`
+
+### Cosa Ã¨ entrato
+
+- `18fae26` â€” fix(backend): il giro di chiusura di jose e zod — nove voci dei due controlli, tutte chiuse â€” **Carlomadella**
+- `d268a3d` â€” feat(backend): jose e zod usate — «jose va usata, e zod va deciso» â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:684a1af -->
 ## 16/09/26, 14:36 â€” task/prima-transizione-video â†’ main
 

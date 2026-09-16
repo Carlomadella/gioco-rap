@@ -6,6 +6,35 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:6ba6de0 -->
+## 16/09/26, 17:47 â€” task/jose-e-zod-nel-backend â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `6ba6de0`
+
+### Cosa Ã¨ entrato
+
+- `18fae26` â€” fix(backend): il giro di chiusura di jose e zod — nove voci dei due controlli, tutte chiuse â€” **Carlomadella**
+- `d268a3d` â€” feat(backend): jose e zod usate — «jose va usata, e zod va deciso» â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `backend/README-API.md`
+- **Modificato:** `backend/README.md`
+- **Modificato:** `backend/accessi.js`
+- **Aggiunto:** `backend/forme.js`
+- **Modificato:** `backend/package.json`
+- **Modificato:** `backend/prova.js`
+- **Modificato:** `backend/server.js`
+- **Modificato:** `documentazione/comandidelterminale.md`
+- **Modificato:** `documentazione/dipendenze.md`
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/roadmap.md`
+
+**File interessati in questa categoria:** 11
+
+---
+
 <!-- merge:b39a7d2 -->
 ## 15/09/26, 11:27 â€” task/documenti-backend-in-pari â†’ main
 
