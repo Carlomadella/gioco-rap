@@ -187,3 +187,26 @@ test("Marketing: ciclo anteprima, uscita, promo e decadimento della spinta", asy
   expect(r.dopoDecadimento).toBeGreaterThan(1);
   expect(r.dopoDecadimento).toBeLessThan(r.primaDecadimento);
 });
+
+test("Marketing V2: l'attesa appartiene al singolo e migra le anteprime vecchie", async ({ page }) => {
+  await apriGioco(page);
+  const r = await page.evaluate(() => {
+    const nuovo = { t:"Nuovo", q:70, released:false, seed:1001 };
+    const legacy = { t:"Legacy", q:70, released:false, seed:1002, anteprime:2 };
+    const artistaPrima = G.hype;
+
+    return {
+      helper:typeof window.marketingReleaseHype,
+      nuovo:typeof window.marketingReleaseHype === "function" ? marketingReleaseHype(nuovo) : null,
+      legacy:typeof window.marketingReleaseHype === "function" ? marketingReleaseHype(legacy) : null,
+      legacySalvato:legacy.releaseHype,
+      artistaInvariato:G.hype === artistaPrima
+    };
+  });
+
+  expect(r.helper).toBe("function");
+  expect(r.nuovo).toBe(0);
+  expect(r.legacy).toBe(24);
+  expect(r.legacySalvato).toBe(24);
+  expect(r.artistaInvariato).toBe(true);
+});
