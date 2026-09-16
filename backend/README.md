@@ -43,7 +43,8 @@ Anni di Fame — il server su http://localhost:8787
 
 La prima volta il database non c'è: se lo crea, applica le migrazioni e mette in pista 140
 bot in scala logaritmica, dal ragazzino con 300 ascolti a quello con due milioni.
-Serve **Node 22.5 o più nuovo** (è quando è arrivato `node:sqlite`).
+Serve **Node 22.12 o più nuovo**: `node:sqlite` c'è dal 22.5, ma `jose` è un pacchetto
+solo ESM e il `require` di un modulo ESM funziona senza flag dal 22.12.
 
 ## La prova
 
@@ -303,10 +304,12 @@ curl -X PUT localhost:8787/api/carriera/1 -H 'content-type: application/json' \
 
 **La verifica c'è** (`accessi.js`): Apple e Google mandano un token firmato (JWT RS256) e
 lo controlliamo contro le loro chiavi pubbliche — firma, emittente, destinatario, scadenza;
-Steam manda un biglietto e lo facciamo verificare a Steamworks. Oggi è tutto scritto a
-mano con Node; **è il primo posto che passerà a una libreria** (`jose`), perché la
+Steam manda un biglietto e lo facciamo verificare a Steamworks. Dal 16/09/2026 la verifica
+del JWT la fa **`jose`** (`jwtVerify` + `createRemoteJWKSet`, che scarica le chiavi e le
+tiene da conto per un'ora): prima era scritta a mano con Node, ed era scritta bene, ma la
 verifica di una firma è l'ultimo posto dove conviene tenere codice proprio. La regola per
-scegliere le dipendenze, e `jose` fra quelle già decise, stanno in
+scegliere le dipendenze, e il perché di `jose` e di `zod` (che controlla la forma dei corpi
+delle rotte, `forme.js`), stanno in
 [`documentazione/dipendenze.md`](../documentazione/dipendenze.md).
 
 Quello che manca sono **le chiavi**, che si prendono quando c'è l'app registrata sugli

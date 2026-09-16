@@ -5,9 +5,13 @@
    verifichi, chiunque può dire di essere chiunque — ed è il motivo per cui,
    finché non ci sono le chiavi, qui si risponde «non posso» invece di «va bene».
 
-   Niente dipendenze: la verifica dei token di Apple e Google è JWT firmato
-   RS256, e Node sa già leggere una chiave in formato JWK e verificare una
-   firma. Per Steam basta una chiamata alla loro API.
+   La verifica dei token di Apple e Google la fa `jose` (16/09/2026): prima era
+   scritta a mano — base64url, firma RS256, chiavi JWKS con la rotazione,
+   `iss`/`aud`/`exp` — ed era scritta bene, ma è il posto peggiore del progetto
+   dove tenere codice proprio: un errore lì non lo prende nessun test e si
+   scopre quando qualcuno entra nell'account di un altro. `jose` fa esattamente
+   quello, lo fa da anni e lo leggono in tanti. Il perché per esteso sta in
+   documentazione/dipendenze.md. Per Steam basta una chiamata alla loro API.
 
    Le chiavi stanno nell'ambiente, mai nel codice:
      ADF_STEAM_CHIAVE   la publisher key di Steamworks
@@ -18,7 +22,17 @@
    Se una manca, quel canale resta chiuso e lo dice: nessun accesso a metà. */
 "use strict";
 
-const crypto = require("crypto");
+const { createRemoteJWKSet, jwtVerify } = require("jose");
+
+/* Gli errori di `jose` che parlano del BIGLIETTO: firma che non torna, chiave
+   sconosciuta, scaduto, non per noi, algoritmo non ammesso, JWT malformato.
+   Tutto il resto — il server delle chiavi che va in timeout, che risponde 503
+   o con una pagina HTML invece del JSON, la rete che non c'è — è colpa nostra,
+   e si racconta come «verifica non riuscita», non come «biglietto rifiutato».
+   Prima si guardava il messaggio con una regex, e un 503 di Apple passava per
+   un biglietto falso. */
+const COLPA_DEL_BIGLIETTO = /^ERR_(JWT_|JWS_|JWKS_NO_MATCHING_KEY|JWKS_MULTIPLE_MATCHING_KEYS|JOSE_ALG_NOT_ALLOWED|JOSE_NOT_SUPPORTED)/;
+const colpaDelBiglietto = e => !!(e && COLPA_DEL_BIGLIETTO.test(String(e.code || "")));
 
 const CFG = {
   steamChiave: process.env.ADF_STEAM_CHIAVE || "",
@@ -31,62 +45,54 @@ const CFG = {
   steamUrl: process.env.ADF_STEAM_URL || "https://partner.steam-api.com/ISteamUserAuth/AuthenticateUserTicket/v1/"
 };
 
-/* Le chiavi pubbliche di Apple e Google cambiano ogni tanto: si tengono da
-   parte per un'ora, e si vanno a riprendere se salta fuori un `kid` nuovo. */
-const cassetto = new Map();                       // url -> { quando, chiavi }
-async function chiaviDi(url, forza){
-  const c = cassetto.get(url);
-  if(!forza && c && Date.now() - c.quando < 3600e3) return c.chiavi;
-  const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
-  if(!res.ok) throw new Error("le chiavi pubbliche non rispondono: http " + res.status);
-  const dati = await res.json();
-  const chiavi = (dati.keys || []).filter(k => k.kty === "RSA");
-  cassetto.set(url, { quando: Date.now(), chiavi });
-  return chiavi;
+/* Le chiavi pubbliche di Apple e Google cambiano ogni tanto: `jose` le tiene
+   da parte per un'ora e se le va a riprendere da solo quando salta fuori un
+   `kid` che non conosce. Un mazzo per indirizzo, aperto la prima volta che
+   serve. */
+const mazzi = new Map();                          // url -> JWKS remoto
+function mazzoDi(url){
+  let m = mazzi.get(url);
+  if(!m){
+    m = createRemoteJWKSet(new URL(url), { cacheMaxAge: 3600e3, timeoutDuration: 6000 });
+    mazzi.set(url, m);
+  }
+  return m;
 }
-
-const base64url = s => Buffer.from(String(s).replace(/-/g, "+").replace(/_/g, "/"), "base64");
 
 /* Verifica un JWT firmato RS256 e torna quello che c'è dentro, solo se:
    la firma torna, l'emittente è quello giusto, il destinatario siamo noi, e
-   non è scaduto. Se una sola di queste non torna, non è valido. */
+   non è scaduto. Se una sola di queste non torna, non è valido.
+
+   La scadenza è **obbligatoria**, non «controllata se c'è» (`requiredClaims`):
+   un biglietto senza `exp` varrebbe per sempre. Apple e Google la mettono
+   sempre, quindi non toglie niente a nessuno — ma un biglietto eterno, se mai
+   ne uscisse uno, è esattamente la cosa che non deve entrare. Il minuto di
+   tolleranza sull'orologio è lo stesso di prima. */
 async function apriToken(token, emittente, destinatario, urlChiavi){
-  const pezzi = String(token || "").split(".");
-  if(pezzi.length !== 3) return null;
-  let testa, corpo;
+  if(typeof token !== "string" || token.split(".").length !== 3) return null;
+  const iss = String(emittente || "").replace(/^https:\/\//, "");
   try{
-    testa = JSON.parse(base64url(pezzi[0]).toString("utf8"));
-    corpo = JSON.parse(base64url(pezzi[1]).toString("utf8"));
-  }catch(e){ return null; }
-  if(testa.alg !== "RS256") return null;
-
-  let chiavi = await chiaviDi(urlChiavi);
-  let jwk = chiavi.find(k => k.kid === testa.kid);
-  if(!jwk){                                        // magari le hanno appena cambiate
-    chiavi = await chiaviDi(urlChiavi, true);
-    jwk = chiavi.find(k => k.kid === testa.kid);
+    const { payload } = await jwtVerify(token, mazzoDi(urlChiavi), {
+      algorithms: ["RS256"],
+      /* Google firma con `accounts.google.com` o con `https://accounts.google.com`:
+         valgono tutti e due, e così anche per Apple */
+      issuer: iss ? [iss, "https://" + iss] : undefined,
+      audience: destinatario || undefined,
+      requiredClaims: ["exp", "sub"],
+      clockTolerance: 60
+    });
+    /* firmato nel futuro: non è un caso che `jose` guardi da solo */
+    const adesso = Math.floor(Date.now() / 1000);
+    if(typeof payload.iat === "number" && payload.iat > adesso + 300) return null;
+    if(!payload.sub) return null;
+    return payload;
+  }catch(e){
+    /* per chi chiama un biglietto sbagliato è «rifiutato»; se invece sono le
+       chiavi pubbliche a non rispondere è un guaio nostro e si rilancia: chi
+       chiama lo racconta come verifica non riuscita */
+    if(colpaDelBiglietto(e)) return null;
+    throw new Error("le chiavi pubbliche non rispondono: " + (e && e.message || e));
   }
-  if(!jwk) return null;
-
-  const pubblica = crypto.createPublicKey({ key: jwk, format: "jwk" });
-  const buona = crypto.verify("RSA-SHA256",
-    Buffer.from(pezzi[0] + "." + pezzi[1]), pubblica, base64url(pezzi[2]));
-  if(!buona) return null;
-
-  const adesso = Math.floor(Date.now() / 1000);
-  /* La scadenza è **obbligatoria**, non «controllata se c'è». Prima il
-     controllo era `if(corpo.exp && ...)`: un biglietto senza `exp` saltava la
-     riga e valeva per sempre. Apple e Google la mettono sempre, quindi non
-     toglie niente a nessuno — ma un biglietto eterno, se mai ne uscisse uno,
-     è esattamente la cosa che non deve entrare. */
-  if(typeof corpo.exp !== "number") return null;                   // senza scadenza non si entra
-  if(corpo.exp < adesso - 60) return null;                         // scaduto
-  if(corpo.iat && corpo.iat > adesso + 300) return null;           // firmato nel futuro
-  if(emittente && String(corpo.iss || "").replace(/^https:\/\//, "") !== emittente.replace(/^https:\/\//, "")) return null;
-  const aud = Array.isArray(corpo.aud) ? corpo.aud : [corpo.aud];
-  if(destinatario && aud.indexOf(destinatario) < 0) return null;   // non è per noi
-  if(!corpo.sub) return null;
-  return corpo;
 }
 
 /* ==================== I TRE ==================== */

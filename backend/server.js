@@ -46,6 +46,7 @@ const crypto = require("crypto");
 const archivio = require("./database/archivio.js");
 const { GENERI, CITTA, STORIE, scegli } = require("./nomi.js");
 const accessi = require("./accessi.js");
+const forme = require("./forme.js");
 const moderazione = require("./moderazione.js");
 const R = require("./risposte.js");
 
@@ -142,6 +143,20 @@ function corpo(req){
   });
 }
 
+/* Il corpo letto E controllato contro la sua forma (forme.js, con zod). Se non
+   torna, la risposta è già partita — un 400 che dice quale campo e perché — e
+   qui torna `null`: chi chiama fa `if(!b) return;` e basta. I nomi degli
+   errori di sempre (`email-non-valida`, `stato-mancante`…) li mette la forma. */
+async function corpoInForma(req, res, nome, tollera){
+  let dato;
+  try{ dato = await corpo(req); }
+  catch(e){ if(!tollera) throw e; dato = {}; }
+  const r = forme.controlla(nome, dato);
+  if(r.ok) return r.ok;
+  male(res, 400, r.errore, { campi: r.campi });
+  return null;
+}
+
 /* ==================== CHI SEI ==================== */
 const chi = async req => archivio.sessione(req.headers["x-sessione"] || "");
 
@@ -203,8 +218,8 @@ async function rotta(req, res, url){
   }
 
   if(M("POST", "/api/relazione")){
-    const b = await corpo(req);
-    const mio = String(b.artistaId || "");
+    const b = await corpoInForma(req, res, "relazione"); if(!b) return;
+    const mio = b.artistaId;
     if(!await artistaMio(req, mio)) return male(res, 403, "non-e-tuo");
     if(b.tipo === "rimuovi"){
       await archivio.scancella(mio, String(b.altroId || ""), String(b.era || "rivale"));
@@ -222,14 +237,14 @@ async function rotta(req, res, url){
 
   /* ---------- account e sessioni ---------- */
   if(M("POST", "/api/account")){
-    const b = await corpo(req);
-    const tipo = ["ospite", "email", "steam", "apple", "google"].indexOf(b.tipo) >= 0 ? b.tipo : "ospite";
+    /* la forma (forme.js) ha già detto di no a una mail storta, a una password
+       corta e a un accesso esterno senza biglietto */
+    const b = await corpoInForma(req, res, "account"); if(!b) return;
+    const tipo = b.tipo || "ospite";
     let idEsterno = null;
 
     if(tipo === "email"){
       const email = String(b.email || "").trim().toLowerCase();
-      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return male(res, 400, "email-non-valida");
-      if(String(b.segreto || "").length < 8) return male(res, 400, "segreto-troppo-corto");
       /* «esiste già?» e «la password è giusta?» sono due domande diverse.
          Prima si chiedeva la seconda: chi riprovava con la stessa mail e una
          password sbagliata passava il controllo, arrivava all'INSERT e si
@@ -266,7 +281,7 @@ async function rotta(req, res, url){
   }
 
   if(M("POST", "/api/sessione")){
-    const b = await corpo(req);
+    const b = await corpoInForma(req, res, "sessione"); if(!b) return;
     /* dal vecchio mondo: chi ha ancora solo id artista + chiave si prende una
        sessione vera senza perdere niente */
     if(b.tipo === "legacy"){
@@ -315,16 +330,15 @@ async function rotta(req, res, url){
   if(M("DELETE", "/api/account")){
     const s = await chi(req);
     if(!s) return male(res, 403, "sessione-scaduta");
-    const b = await corpo(req).catch(() => ({}));
-    if(b.conferma !== "cancella") return male(res, 400, "serve-la-conferma",
-      { nota: 'manda {"conferma":"cancella"}' });
+    /* la conferma scritta per esteso: se manca, la forma risponde `serve-la-conferma` */
+    const b = await corpoInForma(req, res, "cancellaAccount", true); if(!b) return;
     const r = await archivio.cancellaAccount(s.account.id);
     return invia(res, 200, { ok: true, artistiRitirati: r.artisti });
   }
 
   /* ---------- gli artisti ---------- */
   if(M("POST", "/api/artista")){
-    const b = await corpo(req);
+    const b = await corpoInForma(req, res, "artista"); if(!b) return;
     const nome = nomePulito(b.nome);
     if(!nome) return male(res, 400, "nome-non-valido");
     const brutto = moderazione.controllaNome(nome);
@@ -364,7 +378,7 @@ async function rotta(req, res, url){
   if(M("PUT", "/api/artista/" + UUID)){
     const id = pezzo(3);
     if(!await artistaMio(req, id)) return male(res, 403, "non-e-tuo");
-    const b = await corpo(req);
+    const b = await corpoInForma(req, res, "aggiornaArtista"); if(!b) return;
     if(b.nome != null){
       const nome = nomePulito(b.nome);
       if(!nome) return male(res, 400, "nome-non-valido");
@@ -379,8 +393,8 @@ async function rotta(req, res, url){
   }
 
   if(M("POST", "/api/punteggio")){
-    const b = await corpo(req);
-    const id = String(b.id || "");
+    const b = await corpoInForma(req, res, "punteggio"); if(!b) return;
+    const id = b.id;
     const a = await artistaMio(req, id);
     if(!a) return male(res, 403, "non-e-tuo");
     if(Date.now() - (a.punteggio || 0) < CFG.invioMs) return male(res, 429, "troppo-in-fretta");
@@ -455,8 +469,8 @@ async function rotta(req, res, url){
   if(M("PUT", "/api/carriera/[123]")){
     const s = await chi(req);
     if(!s) return male(res, 403, "sessione-scaduta");
-    const b = await corpo(req);
-    if(!b.stato || typeof b.stato !== "object") return male(res, 400, "stato-mancante");
+    /* `stato` deve esserci ed essere un oggetto: se no la forma dice `stato-mancante` */
+    const b = await corpoInForma(req, res, "carriera"); if(!b) return;
     /* L'artista attaccato allo slot deve essere tuo. Prima ci si fidava del
        corpo della richiesta: un id inventato arrivava fino alla chiave esterna
        e tornava un 500, e l'id di un altro giocatore veniva accettato — la sua
@@ -480,9 +494,9 @@ async function rotta(req, res, url){
     return invia(res, 200, { traguardi: await archivio.traguardiDi(pezzo(3)) });
 
   if(M("POST", "/api/traguardo")){
-    const b = await corpo(req);
-    if(!await artistaMio(req, String(b.artistaId || ""))) return male(res, 403, "non-e-tuo");
-    const codice = String(b.codice || "");
+    const b = await corpoInForma(req, res, "traguardo"); if(!b) return;
+    if(!await artistaMio(req, b.artistaId)) return male(res, 403, "non-e-tuo");
+    const codice = b.codice;
     /* i traguardi che il server sa controllare da sé non si chiedono: se li dà
        lui, quando i numeri ci sono. Se no basterebbe la console del browser */
     if(archivio.CODICI_DAL_SERVER.indexOf(codice) >= 0)
@@ -496,8 +510,8 @@ async function rotta(req, res, url){
   if(M("POST", "/api/segnalazione")){
     const s = await chi(req);
     if(!s) return male(res, 403, "sessione-scaduta");
-    const b = await corpo(req);
-    const r = await archivio.segnala(String(b.artistaId || ""), s.account.id,
+    const b = await corpoInForma(req, res, "segnalazione"); if(!b) return;
+    const r = await archivio.segnala(b.artistaId, s.account.id,
       String(b.motivo || "nome"), nomePulito(b.nota, 300));
     if(!r) return male(res, 404, "artista-sconosciuto");
     return invia(res, 200, r.gia ? { gia: true } : { ok: true });
@@ -514,7 +528,7 @@ async function rotta(req, res, url){
 
   if(M("POST", "/api/stagione/chiudi")){
     if(!admin()) return male(res, 403, "non-sei-tu");
-    const b = await corpo(req).catch(() => ({}));
+    const b = await corpoInForma(req, res, "chiudiStagione", true); if(!b) return;
     const r = await archivio.chiudiStagione(nInt(b.quanti, 1, 1000, 100));
     return r ? invia(res, 200, r) : male(res, 409, "nessuna-stagione-aperta");
   }
@@ -526,8 +540,8 @@ async function rotta(req, res, url){
 
   if(M("POST", "/api/sanzione")){
     if(!admin()) return male(res, 403, "non-sei-tu");
-    const b = await corpo(req);
-    const r = await archivio.sanziona(String(b.accountId || ""), String(b.tipo || ""),
+    const b = await corpoInForma(req, res, "sanzione"); if(!b) return;
+    const r = await archivio.sanziona(b.accountId, b.tipo,
       nomePulito(b.motivo, 200) || "nessun motivo scritto", nInt(b.giorni, 0, 3650, 0));
     return r ? invia(res, 200, r) : male(res, 400, "sanzione-non-valida");
   }
@@ -539,8 +553,9 @@ async function rotta(req, res, url){
 
   if(M("POST", "/api/moderazione")){
     if(!admin()) return male(res, 403, "non-sei-tu");
-    const b = await corpo(req);
-    const id = String(b.artistaId || "");
+    /* `azione` è `rinomina` o `respingi`: il resto lo ferma la forma (`azione-sconosciuta`) */
+    const b = await corpoInForma(req, res, "moderazione"); if(!b) return;
+    const id = b.artistaId;
     if(b.azione === "rinomina"){
       const r = await archivio.rinominaDufficio(id);
       return r ? invia(res, 200, r) : male(res, 404, "artista-sconosciuto");
@@ -549,7 +564,6 @@ async function rotta(req, res, url){
       await archivio.chiudiSegnalazioni(id, "respinta");
       return invia(res, 200, { ok: true });
     }
-    return male(res, 400, "azione-sconosciuta", { nota: "rinomina oppure respingi" });
   }
 
   if(M("GET", "/api/da-spingere")){
@@ -559,8 +573,8 @@ async function rotta(req, res, url){
 
   if(M("POST", "/api/spinto")){
     if(!admin()) return male(res, 403, "non-sei-tu");
-    const b = await corpo(req);
-    await archivio.segnaSpinto(String(b.artistaId || ""), String(b.codice || ""));
+    const b = await corpoInForma(req, res, "spinto"); if(!b) return;
+    await archivio.segnaSpinto(b.artistaId, b.codice);
     return invia(res, 200, { ok: true });
   }
 

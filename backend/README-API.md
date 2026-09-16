@@ -106,6 +106,25 @@ Ogni errore usa almeno questa forma:
 
 Alcuni errori aggiungono `nota`, `motivo`, `salvata` o altri dettagli utili.
 
+Un corpo che **non ha la forma giusta** (dal 16/09/2026, `backend/forme.js`: un campo che
+manca, del tipo sbagliato, un valore fuori dall'elenco) è un `400` con la lista dei campi:
+
+```json
+{
+  "errore": "dati-non-validi",
+  "campi": [{ "campo": "id", "problema": "Input non valido: atteso string, ricevuto undefined" }]
+}
+```
+
+Dove un nome esiste da prima — `email-non-valida`, `segreto-troppo-corto`,
+`stato-mancante`, `serve-la-conferma`, `azione-sconosciuta` — `errore` resta quello, e
+`campi` c'è dove è la forma a dirlo. Due nomi sono nuovi dal 16/09/2026:
+`biglietto-mancante` (Steam, Apple o Google senza `biglietto`, prima era `403
+biglietto-rifiutato`) e `artista-mancante` (sessione `legacy` senza `artistaId`, prima
+era `403 chiave-sbagliata`). Un id che manca è un `400`, non più il `403 non-e-tuo` di
+prima. `nome-non-valido` lo decide il server dopo la pulizia del nome, senza `campi`. Un
+campo in più non è mai un errore.
+
 | Stato | Significato tipico |
 | --- | --- |
 | `400` | JSON, URL o dati non validi |
@@ -399,7 +418,7 @@ Rimozione:
 }
 ```
 
-Errori: `403 non-e-tuo`, `400 relazione-non-valida`.
+Errori: `403 non-e-tuo`, `400 relazione-non-valida`; più `400 dati-non-validi` (con `campi`) se manca un campo obbligatorio o ha il tipo sbagliato (`artistaId`).
 
 ### 5. `GET /api/notizie`
 
@@ -422,8 +441,10 @@ Query `quante`: 1–60, default 10. Risposta: `{ settimana, notizie }`.
 
 ### 6. `POST /api/account`
 
-Tipi ammessi: `ospite`, `email`, `steam`, `apple`, `google`. Un tipo assente o non
-riconosciuto viene trattato come `ospite`.
+Tipi ammessi: `ospite`, `email`, `steam`, `apple`, `google`. Un tipo assente vale
+`ospite`; uno non riconosciuto è un `400 dati-non-validi` (dal 16/09/2026: prima passava
+per `ospite` in silenzio). `steam`, `apple` e `google` senza `biglietto` sono
+`400 biglietto-mancante`.
 
 Account email:
 
@@ -470,7 +491,8 @@ invece di crearne un secondo — gli collega l'identità email e risponde
 sotto la stessa identità (dal 12/09/2026, commit `cb502a7`).
 
 Errori principali: `400 email-non-valida`, `400 segreto-troppo-corto`,
-`409 email-gia-usata`, `403 biglietto-rifiutato`, `501 accesso-non-ancora-collegato`.
+`400 biglietto-mancante`, `409 email-gia-usata`, `403 biglietto-rifiutato`,
+`501 accesso-non-ancora-collegato`; più `400 dati-non-validi` (con `campi`) se manca un campo obbligatorio o ha il tipo sbagliato.
 
 ### 7. `POST /api/sessione`
 
@@ -509,8 +531,9 @@ Migrazione del vecchio accesso:
 Per `steam`, `apple` o `google` si inviano `tipo`, `biglietto` e `dispositivo`.
 Successo: `200 { account, token }`.
 
-Errori: `403 non-torna`, `403 chiave-sbagliata`, `409 artista-senza-account`,
-`404 account-sconosciuto`, errori `403/501` dei provider.
+Errori: `403 non-torna`, `403 chiave-sbagliata`, `400 artista-mancante` (legacy senza
+`artistaId`), `400 biglietto-mancante`, `409 artista-senza-account`,
+`404 account-sconosciuto`, errori `403/501` dei provider; più `400 dati-non-validi` (con `campi`) se manca un campo obbligatorio o ha il tipo sbagliato.
 
 ### 8. `DELETE /api/sessione`
 
@@ -662,7 +685,8 @@ Risposta:
 }
 ```
 
-Errori: `403 non-e-tuo`, `403 account-sospeso`, `429 troppo-in-fretta`,
+Errori: `400 dati-non-validi` se manca `id` o un campo ha il tipo sbagliato (con `campi`),
+`403 non-e-tuo`, `403 account-sospeso`, `429 troppo-in-fretta`,
 `404 artista-sconosciuto`.
 
 ### 15. `GET /api/classifica`
@@ -788,7 +812,8 @@ Codici assegnati automaticamente dal server e quindi non richiedibili dal client
 `disco_oro`, `disco_platino`, `primo_contratto`.
 
 Risposta: `{ nuovo: true, codice }` oppure `{ gia: true }`. Errori:
-`403 non-e-tuo`, `404 traguardo-sconosciuto`, `409 questo-lo-da-il-server`.
+`403 non-e-tuo`, `404 traguardo-sconosciuto`, `409 questo-lo-da-il-server`; più `400 dati-non-validi` (con `campi`) se manca un campo obbligatorio o ha il tipo sbagliato
+(`artistaId`, `codice`).
 
 ### 26. `POST /api/segnalazione`
 
@@ -805,7 +830,8 @@ Richiede `x-sessione`.
 `motivo`: `nome`, `storia`, `imbroglio` o `altro`. `nota`: massimo 300 caratteri.
 Una segnalazione identica dello stesso account non viene duplicata e restituisce
 `{ gia: true }`. I bot non possono essere segnalati e producono lo stesso
-`404 artista-sconosciuto` usato per un artista inesistente.
+`404 artista-sconosciuto` usato per un artista inesistente. Senza `artistaId` è un
+`400 dati-non-validi` (con `campi`), non più il `404`.
 
 ### 27. `POST /api/giro`
 
@@ -852,7 +878,8 @@ Admin.
 
 `tipo`: `avviso`, `fuori_classifica`, `sospensione`. `motivo`: massimo 200 caratteri.
 `giorni`: 0–3.650; `0` significa senza scadenza. Risposta:
-`{ ok, tipo, motivo, fino }`. Errore: `400 sanzione-non-valida`.
+`{ ok, tipo, motivo, fino }`. Errori: `400 sanzione-non-valida`; più `400 dati-non-validi` (con `campi`) se manca un campo obbligatorio o ha il tipo sbagliato (`accountId`,
+`tipo`).
 
 ### 31. `GET /api/da-guardare`
 
@@ -891,7 +918,8 @@ Admin.
 { "artistaId": "uuid", "codice": "milano" }
 ```
 
-Marca il traguardo come sincronizzato e restituisce `{ "ok": true }`.
+Marca il traguardo come sincronizzato e restituisce `{ "ok": true }`. Errori:
+`400 dati-non-validi` (con `campi`) se manca `artistaId` o `codice`.
 
 ## Bridge frontend `ONLINE`
 
