@@ -1,0 +1,70 @@
+name: Patch Marketing V1
+
+on:
+  push:
+    branches:
+      - task/marketing-ciclo-v1-20260916
+    paths:
+      - .github/workflows/marketing-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.event.head_commit.message == 'chore(marketing): applica patch minima'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: task/marketing-ciclo-v1-20260916
+          fetch-depth: 0
+      - name: Applica solo i due fix riprodotti
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('frontend/js/game/telefono.js')
+          text = path.read_text(encoding='utf-8')
+
+          old_rows = '''  const seme = s => Number.isFinite(s.seed) ? ' data-spingi="' + s.seed + '"' : "";
+          const riga = (s, on, sotto) =>
+            '<button class="tli' + (on ? " on" : "") + '"' + seme(s) + '>' + mini(s) +
+              '<span class="tlitx"><b>' + s.t + '</b><i>' + sotto + '</i></span>' +
+              (on ? '<span class="ttag on">scelto</span>' : "") +
+            '</button>';'''
+
+          new_rows = '''  const riga = (s, on, sotto) => {
+            const cliccabile = Number.isFinite(s.seed);
+            const apri = cliccabile
+              ? '<button class="tli' + (on ? " on" : "") + '" data-spingi="' + s.seed + '">'
+              : '<div class="tli static">';
+            return apri + mini(s) +
+              '<span class="tlitx"><b>' + s.t + '</b><i>' + sotto + '</i></span>' +
+              (s.spinta > 1 ? '<span class="ttag" data-marketing-state="spinta">spinta</span>' : "") +
+              (on ? '<span class="ttag on">scelto</span>' : "") +
+              (cliccabile ? '</button>' : '</div>');
+          };'''
+
+          old_subtitle = '''          "q" + x.q + " · " + fmt(x.streams || 0) + " stream" + (x.spinta > 1 ? " · in spinta" : ""))).join("") + '</div>' '''
+          new_subtitle = '''          "q" + x.q + " · " + fmt(x.streams || 0) + " stream")).join("") + '</div>' '''
+
+          if text.count(old_rows) != 1:
+              raise SystemExit(f'blocco righe inatteso: {text.count(old_rows)} occorrenze')
+          if text.count(old_subtitle) != 1:
+              raise SystemExit(f'sottotitolo inatteso: {text.count(old_subtitle)} occorrenze')
+
+          text = text.replace(old_rows, new_rows, 1).replace(old_subtitle, new_subtitle, 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Verifica diff e chiudi il workflow temporaneo
+        run: |
+          git diff --check
+          git diff --stat
+          git diff -- frontend/js/game/telefono.js
+          rm .github/workflows/marketing-patch.yml
+          git config user.name "Anni di Fame CI"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A frontend/js/game/telefono.js .github/workflows/marketing-patch.yml
+          git commit -m "fix(marketing): correggi righe promo senza toccare il resto"
+          git push origin HEAD:task/marketing-ciclo-v1-20260916
