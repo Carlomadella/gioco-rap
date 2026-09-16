@@ -128,6 +128,7 @@ nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../docume
 | **—** | La chat del telefono non va più in loop | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Sputa: la seconda app del telefono per postare | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Il telefono quando lo schermo è un telefono | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | Le transizioni video: il primo, lo Studio | in parte | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Studio · Non si spende energia per tenere una take | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
 | **—** | Scambiarsi il numero con fonici e beatmaker | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Una gerarchia per gli incontri mentre si salta il tempo | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |

@@ -50,7 +50,8 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 Smistato il 15/09/2026, dopo la chiusura di «Sputa» e della regola nuova sull'energia in
 Cabina; riguardato lo stesso giorno dopo «Il telefono quando lo schermo è un telefono», da
-cui sono uscite due voci nuove. È l'ordine in cui si prendono i punti aperti di questo
+cui sono uscite due voci nuove, e il 16/09 dopo il primo video delle transizioni (la voce
+resta, a metà). È l'ordine in cui si prendono i punti aperti di questo
 foglio **e** quelli ancora aperti in
 [`problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md): prima quello che
 tocca il gioco sul telefono (è lì che esce), poi quello che pesa nel pacchetto o blocca una
@@ -80,9 +81,11 @@ da quale lista viene.
 
 5. **Le transizioni video** — CARLO, «implementa le transizioni dentro al progetto, che
    partano cliccando sulla scheda collegata». I 12 video stanno già in
-   `frontend/media/video/Transizioni di scena/` (28 MB) e **nessuna riga di codice li
-   carica**: oggi partono col pacchetto per gli store da peso morto. O si collegano, come
-   dice il punto, o escono dal pacchetto.
+   `frontend/media/video/Transizioni di scena/` (28 MB). **FATTO in parte (16/09/2026)** —
+   il primo, lo Studio, è collegato (`js/game/transizioni-video.js`, «Le transizioni video:
+   il primo, lo Studio» in `02-interfaccia-e-telefono.md`); gli altri quattro del punto
+   (Sala, Casa, stacca la spina, registra) si agganciano allo stesso modo, e i sette video
+   che nessun punto chiede restano peso morto nel pacchetto: o si collegano o escono.
 6. **L'avvio rapido ci mette due minuti e non lo dice** — da problemi-riscontrati. È il
    primo minuto di chi prova il gioco: o una barra di caricamento, o l'avvio rapido torna
    a non aspettare MakeHuman.
@@ -372,13 +375,20 @@ con lo stesso numero e resta così._
 
 8. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo. Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su "stacca la spina", il quinto su "registra un pezzo".
 
-   **Stato (15/09/2026)** — non è fatto, e non è il punto delle dissolvenze CSS (quello sta
-   in `02-interfaccia-e-telefono.md`, «Transizioni quando una card apre una pagina», ed è
-   un'altra cosa). I video ci sono, dodici, in `frontend/media/video/Transizioni di scena/`
-   (`01_studio`, `02_ingresso_sala`, `03_ritorno_casa`, `04_stacca_la_spina`,
-   `05_registra_pezzo`, più palestra, Milano, club, shop, trasferta, live): **nessuna riga di
-   codice li carica**, e `media/` finisce intera nel pacchetto per gli store — 28 MB che
-   viaggiano per niente.
+   **FATTO in parte (16/09/2026)** — il primo dei cinque: toccando «Studio» sulla mappa
+   (dopo il «Vai» dello spostamento, se non sei già lì) partono i 5,6 secondi di
+   `01_studio_definitivo.mp4` e sotto si apre la stanza. Il meccanismo è generale —
+   `transizioneVideo(id, poi)` in `js/game/transizioni-video.js`, un file nuovo, come
+   chiede la regola dei punti che non sono fix — e sta scritto in
+   `02-interfaccia-e-telefono.md`, «Le transizioni video: il primo, lo Studio». **Cosa
+   manca:** gli altri quattro — `02_ingresso_sala` sul cartello «La Sala»,
+   `03_ritorno_casa` su «Casa», `04_stacca_la_spina` sull'azione «Stacca la spina»,
+   `05_registra_pezzo` sull'incisione in Cabina — si aggiungono ognuno con una riga in
+   `TRANSIZIONI_VIDEO` e la chiamata al posto giusto; e va deciso cosa fare dei sette video
+   che nessun punto chiede (palestra, Milano, club, shop, trasferta, live, più un doppione
+   dello studio: 22 MB), che nel pacchetto per gli store viaggiano ancora per niente. Non è
+   il punto delle dissolvenze CSS («Transizioni quando una card apre una pagina», stesso
+   file): quelle restano, il video ci va sopra.
 
 9. quando skippi tante ore ci mette troppo a simulare
 

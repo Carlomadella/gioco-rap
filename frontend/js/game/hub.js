@@ -75,7 +75,13 @@ const HUB_LUOGHI = [
      settimana — è una stanza sua, con dentro le quattro fasi di un pezzo e la
      gente che ci lavora (js/game/studio.js). Punto 10: è sempre aperto. */
   {id:"studio", n:"Studio",
-   vai:() => apriStudio(G.bars.length ? "beat" : "cabina")},
+   /* «implementa le transizioni dentro al progetto, che partano cliccando
+      sulla scheda collegata»: cinque secondi di filmato
+      (js/game/transizioni-video.js) e poi la stanza. È il primo dei cinque
+      video del punto; gli altri (Sala, Casa, stacca la spina, registra) si
+      collegano allo stesso modo, uno per volta. */
+   vai:() => transizioneVideo("studio",
+     () => apriStudio(G.bars.length ? "beat" : "cabina"))},
   /* punto 59/61: era un cartello chiuso («Club & discoteche», ancora dentro
      alla foto — cambia solo quando cambia la mappa, punto 45); qui sotto
      adesso c'è un lavoro vero, part time. */

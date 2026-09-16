@@ -1827,8 +1827,9 @@ test("in media/ non restano immagini che nessuna riga di codice carica",
     /* media/ la copia intera strumenti/build.js: un concept lasciato qui
        finisce nel pacchetto per gli store senza che nessuno lo chieda mai.
        Il posto dei concept e' frontend/concept/, che il build non guarda.
-       I video restano fuori dal conto: sono il materiale del punto 23,
-       ancora da collegare. */
+       I video restano fuori dal conto: sono il materiale del punto delle
+       transizioni, che si collegano uno per volta (il primo, lo Studio, dal
+       16/09/2026: la sua prova sta piu' sotto, «il video dello Studio esiste»). */
     /* le pagine del creator RPG stanno dentro a media/ e chiamano i loro
        disegni da lì: contano come codice anche quelle. */
     const codice = ["js","css","media","pagine"].flatMap(d => elencaFile(path.join(ROOT, d)))
@@ -2179,7 +2180,49 @@ test("nessun :hover fuori da @media (hover:hover): sul telefono non resta acceso
     return fuori.length === 0;
   })());
 
-for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js"]){
+/* «Implementa le transizioni dentro al progetto, che partano cliccando sulla
+   scheda collegata»: il primo video, lo Studio. I dodici filmati stavano in
+   media/ da dieci giorni senza che nessuna riga li caricasse — 28 MB nel
+   pacchetto per niente. Adesso il cartello dello Studio passa da
+   transizioneVideo() prima di apriStudio(); la prova è che il file c'è, che
+   la pagina lo carica prima di hub.js, e che la copertura sta sopra allo
+   Studio (che si apre SOTTO al video prima della dissolvenza) e sotto al
+   toast. Se un giorno si toglie apposta, via anche questo blocco. */
+const tvid = leggi("js/game/transizioni-video.js");
+const tvidCss = leggi("css/transizioni-video.css").replace(/\s+/g, "");
+test("il video dello Studio esiste dove transizioni-video.js lo cerca",
+  (() => {
+    const m = tvid.match(/studio:\s*"([^"]+\.mp4)"/);
+    return !!m && fs.existsSync(path.join(ROOT, m[1]));
+  })());
+test("gioco.html carica transizioni-video.js prima di hub.js, e il suo CSS",
+  (() => {
+    const a = index.indexOf('<script src="js/game/transizioni-video.js'),
+          b = index.indexOf('<script src="js/game/hub.js');
+    return a >= 0 && b > a && index.includes("css/transizioni-video.css");
+  })());
+test("il cartello dello Studio passa dal video prima di aprire la stanza",
+  /id:"studio"[\s\S]{0,600}?transizioneVideo\("studio",[\s\S]{0,80}?apriStudio\(/.test(hub));
+test("la copertura del video sta sopra all'orologio del telefono (142) e sotto alla Strada (180)",
+  (() => {
+    const m = tvidCss.match(/\.tvid\{[^}]*z-index:(\d+)/);
+    const z = m ? +m[1] : 0;
+    return z > 142 && z < 180;
+  })());
+test("il video parte solo con le animazioni accese, e senza «riduci movimento» del sistema",
+  tvid.includes("SET.look.anim") && tvid.includes("prefers-reduced-motion"));
+/* Il primo giro di controllo l'aveva visto: Esc apriva il menu di pausa sopra
+   al video, perché il menu di sistema ascolta il tasto in cattura e lo ferma
+   se non riconosce una finestra aperta. La copertura deve stare nella sua
+   lista, in tutte e due le fasi (l'attesa e il filmato). */
+test("un tocco o Esc saltano il video, e il menu di sistema lascia passare l'Esc",
+  tvid.includes('addEventListener("click", fine)') && tvid.includes('"Escape"') &&
+  leggi("js/menu-sistema.js").includes('"#tvid.on"') &&
+  leggi("js/menu-sistema.js").includes('"#tvid.attesa"'));
+test("nell'attesa che il video parta la mappa non risponde: la copertura trasparente c'è",
+  tvid.includes('classList.add("attesa")') && tvidCss.includes(".tvid.attesa{display:block"));
+
+for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/transizioni-video.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }

@@ -1,0 +1,18 @@
+/* Le transizioni video (js/game/transizioni-video.js): il filmato che copre lo
+   schermo fra il cartello della mappa e la pagina del posto.
+   Sta a 150: sopra allo Studio (55) e al foglio (90), che si aprono SOTTO al
+   video prima che sfumi; sopra al toast (130) e alla pastiglia dell'orologio
+   (142, tempo-controlli.js), che sul telefono galleggiava in mezzo al filmato
+   e si toccava; sotto alla Strada (180+) e al menu di sistema.
+   `cover` e non `contain`: cinque secondi di stanza devono riempire lo schermo
+   a qualunque proporzione, come le foto dello Studio; quello che avanza si
+   taglia, meglio di due bande nere. */
+.tvid{position:fixed;inset:0;z-index:150;display:none;cursor:pointer}
+.tvid video{width:100%;height:100%;object-fit:cover;display:block}
+/* l'attesa che il video parta: si vede la mappa, ma non risponde — la
+   copertura è trasparente e i tocchi li prende lei (e saltano il video) */
+.tvid.attesa{display:block;background:transparent}
+.tvid.attesa video{visibility:hidden}
+.tvid.on{display:block;background:#000;animation:screenIn .22s ease-out both}
+/* la pagina è già aperta sotto: il filmato sfuma e poi sparisce */
+.tvid.via{display:block;background:#000;opacity:0;transition:opacity .24s ease-out;pointer-events:none}

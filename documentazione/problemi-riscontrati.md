@@ -1,4 +1,4 @@
-## Cosa resta aperto al 15/09/2026
+## Cosa resta aperto al 16/09/2026
 
 Smistato leggendo ogni voce contro il codice: sotto a ciascuna c'è scritto se e quando è
 stata chiusa. Qui solo quelle **ancora aperte**, nello stesso ordine di «Da fare adesso» in
@@ -35,6 +35,18 @@ fine task su quel foglio.
 10. Aperti di proposito (14/09, prova sul telefono): la copertina «grande» e quella «di
    adesso» quasi uguali; nel Marketing la risposta compare in cima. Nell'altro foglio
    restano fuori dall'ordine.
+11. ~~**Esc durante il video dello Studio apre il menu di pausa invece di saltare il filmato**
+   (16/09, prima transizione video).~~ **RISOLTO (16/09/2026)** — la copertura sta nella
+   lista delle finestre che il menu di sistema rispetta; provato: Esc salta, niente menu.
+12. ~~**Nel secondo e mezzo prima che il video parta la mappa risponde ancora** (16/09).~~
+   **RISOLTO (16/09/2026)** — nell'attesa una copertura trasparente prende i tocchi, e il
+   tocco salta l'attesa.
+13. ~~**Sul telefono l'orologio della plancia resta sopra al video** (16/09), più il video che
+   ignora «riduci movimento» del sistema.~~ **RISOLTO (16/09/2026)** — la copertura è salita
+   a 150, sopra all'orologio (142); `prefers-reduced-motion` spegne il video come le
+   animazioni. Restano le **due scelte**: il taglio in verticale (si vede un quarto
+   dell'inquadratura) e il filmato che a freddo sul telefono può non partire in tempo — da
+   provare sullo store, dove i file stanno sul telefono.
 
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
 
@@ -3151,3 +3163,124 @@ aperti, come chiesto: sotto le due cose che non tornano.
   adesso» si mette a rifare un giro già fatto. Da togliere dai tre elenchi (o da barrare
   con la data, come fa quel foglio) e, se si vuole, da sostituire con la scelta sulla
   risposta al «mentre premo». Non ho toccato nessuno dei tre.
+
+## Giro del 16/09/2026 (segnala-problemi, fine task `task/prima-transizione-video`, prima del commit)
+
+Controllato sul branch con le modifiche ancora da committare. I tre comandi sono verdi:
+`npm run prova` 180 a posto e 0 no, `node strumenti/audit-regressioni.js` 349 ok e 0
+falliti, `npm run verifica:build` 33 ok e 0 falliti; il build copia i dodici video in
+`dist/media/video/Transizioni di scena/`. Nessun errore di JavaScript all'avvio della pagina
+del gioco (aperta con Playwright sul Chrome installato, come dice il foglio di memoria):
+`transizioni-video.js` sta prima di `hub.js`, il cartello `#hb-pins` a cui si aggancia
+esiste, e il cartello dello Studio lo chiama solo al clic. Provato dal vivo: il video parte
+e finisce a 5,6 s e sotto c'è lo Studio; il clic a metà lo salta; col file che non c'è lo
+Studio si apre dopo un secondo (l'evento `error` arriva prima del timer); con le animazioni
+spente lo Studio si apre subito senza filmato; l'audio segue l'interruttore generale e il
+volume degli effetti (il video una traccia audio ce l'ha). Le cose sotto sono quelle che non
+tornano.
+
+### Esc durante il video non lo salta: apre il menu di pausa, e lo Studio si apre sotto al menu
+- **dove** — `frontend/js/menu-sistema.js:491-513` (l'ascoltatore di Esc del menu di
+  sistema, registrato «in cattura», cioè prima di tutti gli altri, e che ferma il tasto con
+  `stopImmediatePropagation`) contro `frontend/js/game/transizioni-video.js:85` e `:108`
+  (l'ascoltatore del video, normale, che così non riceve mai il tasto). La lista delle
+  finestre che il menu rispetta prima di aprirsi sta in `menu-sistema.js:36-71`
+  (`dialogoFlottante` e `internoDaChiuderePrima`): la copertura `.tvid` non c'è.
+- **cosa succede** — premi Esc mentre il filmato dello Studio va: si apre il menu «LA FAME /
+  SISTEMA» sopra al video, il video **continua** sotto (visto: da 2,7 s arriva a 5,6 s col
+  menu aperto), e quando finisce lo Studio si apre sotto al menu di pausa. Chi preme
+  «Riprendi» si ritrova nello Studio senza aver capito perché. Il salto con Esc quindi non
+  esiste, mentre lo promettono sia il commento in testa a `transizioni-video.js:17` sia
+  `implementazioni/02-interfaccia-e-telefono.md:1888` («un tocco, un clic o Esc chiudono il
+  video») — e la riga «Provato» di quel foglio (`:1897`) elenca il clic ma non l'Esc, che
+  infatti non è stato provato. La prova dell'audit
+  `frontend/strumenti/audit-regressioni.js:2212` («si può saltare») guarda solo che nel file
+  ci sia scritto `"Escape"`, quindi resta verde anche così.
+- **come si vede** — dalla mappa tocca «Studio» (conferma «Vai» se non sei già lì), premi
+  Esc mentre il filmato va.
+- **quanto pesa** — si vede ma si gira intorno: il video finisce da solo e il menu ha
+  «Riprendi». Ma è il tasto che tutti provano per saltare un filmato, e il risultato è un
+  menu di pausa che non ferma niente.
+- **RISOLTO (16/09/2026, stesso branch, prima del commit)** — `#tvid.on` e `#tvid.attesa`
+  stanno in `dialogoFlottante()` di `menu-sistema.js`: il menu lascia passare l'Esc e lo
+  prende l'ascoltatore del video. Provato: Esc a 1,2 s salta il filmato, lo Studio si apre,
+  nessun menu. L'audit adesso controlla le due voci nella lista del menu, non la sola stringa
+  `"Escape"`.
+
+### Nel secondo e mezzo prima che il video parta la mappa risponde ancora, e si aprono due posti
+- **dove** — `frontend/js/game/transizioni-video.js:92` (la copertura compare solo
+  all'evento `playing`), `:110` (il secondo e mezzo di attesa) e `:56` (se un video è già
+  in corso, il secondo tocco apre la pagina diretta).
+- **cosa succede** — è una scelta giusta che la mappa non diventi nera prima che il video
+  vada, ma finché non va la mappa è anche **cliccabile**. Tocchi «Studio» e, prima che il
+  filmato parta, tocchi un altro cartello: quel posto si apre (provato con la Pizzeria: si
+  apre la scheda «Lavapiatti»), poi il filmato copre tutto, e alla fine lo Studio si apre
+  **sotto** alla scheda della Pizzeria, che resta lì sopra. Se invece tocchi due volte
+  «Studio», la seconda volta lo apre subito senza video (per la guardia di riga 56), poi
+  arriva il video e lo riapre. Sul monitor la finestra è di pochi decimi di secondo (il
+  video a caldo parte in 10 ms); sul telefono emulato a 390 × 844 il filmato è partito a 1,6 s
+  anche col precarico fatto, e due volte su tre a freddo non è partito affatto entro il
+  tempo (lo Studio si è aperto senza video, come previsto): lì la finestra è tutta.
+- **come si vede** — tocca «Studio» e subito un altro cartello, meglio da telefono o con la
+  rete rallentata dagli strumenti del browser.
+- **quanto pesa** — si vede ma si gira intorno: chiudi la scheda di sopra e sei nello
+  Studio. Da guardare insieme al ritardo di partenza sul telefono vero.
+- **RISOLTO (16/09/2026, stesso branch, prima del commit)** — dal clic al `playing` la
+  copertura c'è ma è trasparente (`.tvid.attesa`): la mappa si vede e non risponde, e il
+  tocco lì sopra salta l'attesa e apre la pagina subito. Provato con la rete rallentata e un
+  video non precaricato: sotto al dito sul cartello della Pizzeria c'è la copertura, il
+  tocco apre lo Studio e la Pizzeria no.
+
+### Sul telefono l'orologio della plancia resta sopra al video, e si tocca
+- **dove** — `frontend/js/game/tempo-controlli.js:286` (`#adf-time-dock` a z-index 142)
+  contro `frontend/css/transizioni-video.css:8` (`.tvid` a 95).
+- **cosa succede** — a 390 × 844 la pastiglia dell'orologio («ANNO 1 · SETT. 01 · 08:00 ·
+  GIORNO 1/7») galleggia in mezzo al filmato, a sinistra, per tutti i 5,6 secondi (vista
+  nello screenshot; sul monitor a 1280 no: lì il video la copre, perché la barra della
+  plancia sta in un altro «strato»). È anche il primo elemento sotto al dito: nel telefono
+  emulato un tocco lì ha chiuso il video e aperto lo Studio con sopra la scheda «Scrivi
+  barre», invece del pannello delle ore. Questo secondo pezzo è da confermare su un
+  telefono vero, il primo si vede e basta.
+- **come si vede** — apri il gioco a 390 di larghezza, tocca «Studio», guarda a sinistra a
+  metà schermo mentre il filmato va.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (16/09/2026, stesso branch, prima del commit)** — `.tvid` è salita da 95 a 150:
+  sopra all'orologio (142) e al toast (130), sotto alla Strada (180) e al menu di sistema.
+  Provato a 390 × 844: `elementFromPoint` al centro della pastiglia dà la copertura.
+
+### Il video ignora «riduci le animazioni» del telefono, che il resto del gioco rispetta
+- **dove** — `frontend/js/game/transizioni-video.js:55` (guarda solo l'interruttore
+  «Animazioni» delle impostazioni del gioco).
+- **cosa succede** — chi ha acceso «riduci movimento» nel sistema (iOS e Android ce l'hanno
+  fra le opzioni di accessibilità) si becca comunque i cinque secondi di filmato. Altre
+  quattro parti del gioco quella preferenza la leggono (`frontend/css/effects.css:118`,
+  `frontend/css/avvio.css:104`, `frontend/js/game/tempo-controlli.js:362`,
+  `frontend/js/game/strada-crimine-ui.js:63`), il video no. È una riga in più nel
+  controllo di riga 55, non un lavoro.
+- **come si vede** — sul telefono, con «riduci movimento» acceso e «Animazioni» del gioco
+  lasciato acceso, tocca «Studio».
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (16/09/2026, stesso branch, prima del commit)** — `transizioneVideo()` guarda
+  anche `matchMedia("(prefers-reduced-motion: reduce)")`. Provato con la preferenza
+  emulata: lo Studio si apre diretto, senza copertura.
+
+Due note che sono **scelte**, non errori, e stanno qui solo per essere decise:
+
+- **In verticale si vede una fetta del filmato.** Il video è 1280 × 720; a 390 × 844 con
+  `object-fit:cover` (`frontend/css/transizioni-video.css:9`) sullo schermo entra circa un
+  quarto della larghezza dell'inquadratura, la fascia centrale: nello screenshot a 2 secondi
+  si vedono il banco e la pianta, il ragazzo che entra è fuori dal taglio. Il CSS lo dice
+  apposta («quello che avanza si taglia, meglio di due bande nere») e va bene così se i
+  cinque video sono pensati per il centro; se no, ai prossimi quattro conviene chiederlo a
+  chi li fa, o prevedere una versione verticale.
+- **A freddo, sul telefono, il video spesso non parte in tempo e non si vede.** È il
+  comportamento voluto (meglio niente che uno schermo nero), ma vuol dire che il primo
+  «Studio» di una partita nuova su un telefono lento può non avere il filmato. Sugli store
+  i file stanno sul telefono, non in rete, quindi probabilmente basta: va provato lì, non
+  qui.
+
+Documenti: le quattro scritture (`implementazioni/implementazioni.md` in due punti,
+`implementazioni/02-interfaccia-e-telefono.md`, `implementazioni/README.md`,
+`documentazione/roadmap.md`) dicono tutte la stessa cosa — FATTO in parte, uno su cinque,
+gli altri quattro allo stesso modo, sette video senza un punto — e tornano fra loro. L'unica
+frase smentita dal codice è quella sull'Esc, già nella prima voce.

@@ -1844,3 +1844,78 @@ dello schermo (`effects.css`). **Fra i 981 e i 1180** — tablet di traverso —
 trabocca già di suo (1100 punti in 1000) e il tasto in coda finiva fuori: lì il tasto
 **galleggia** in basso a destra, finché quella barra non avrà un disegno suo. Resta da decidere
 se il gioco sugli store gira anche in orizzontale.
+
+## Le transizioni video: il primo, lo Studio
+
+> «Implementa le transizioni dentro al progetto, che partano cliccando sulla scheda
+> collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo» (CARLO, nel
+> foglio dei punti nuovi). Cinque video su dodici; qui il primo.
+
+**FATTO in parte (16/09/2026)** — branch `task/prima-transizione-video`. Toccando «Studio»
+sulla mappa — dopo il «Vai · 30 min» dello spostamento, o subito se sei già lì — partono i
+5,6 secondi di `01_studio_definitivo.mp4` (il ragazzo dietro al vetro, il banco, le luci
+calde) e alla fine sotto c'è la Cabina, che ha la stessa luce: il filmato sfuma e la stanza
+resta. I video stavano in `frontend/media/video/Transizioni di scena/` dal 05/09 e
+**nessuna riga di codice li caricava**: 28 MB che viaggiavano nel pacchetto per gli store
+da peso morto.
+
+**Com'è fatto.** Un file nuovo, `js/game/transizioni-video.js` (la regola: quando non è
+un fix si crea un file collegato, non si gonfiano quelli che ci sono), con dentro una
+tabella `TRANSIZIONI_VIDEO` — per ora una riga, `studio` — e una funzione sola,
+`transizioneVideo(id, poi)`: il filmato copre lo schermo, quando finisce chiama `poi()`
+(che apre la pagina) e poi sfuma sopra di lei. In `hub.js` il cartello dello Studio fa
+`transizioneVideo("studio", () => apriStudio(...))` invece di `apriStudio(...)` diretto:
+gli altri quattro si aggiungono con una riga nella tabella e la stessa chiamata al posto
+giusto. Il CSS è `css/transizioni-video.css`: `.tvid` a z-index 150, sopra allo Studio
+(55) e al foglio (90) che si aprono *sotto* al video prima della dissolvenza, sopra al toast
+(130) e alla pastiglia dell'orologio (142), sotto alla Strada e al menu di sistema;
+`object-fit:cover`, come le foto dello Studio. Il server di sviluppo adesso serve
+`.mp4` e `.webm` col tipo giusto (`strumenti/dev.js`): senza, Chrome lo indovina e
+Safari no.
+
+**Le tre regole, tutte per non far aspettare chi gioca.**
+
+1. **La mappa resta finché il video non va davvero.** La copertura nera compare all'evento
+   `playing`, non al clic: se dopo un secondo e mezzo il video non è partito — rete lenta,
+   file mancante, formato che il browser non legge, data saver che ignora il `preload` —
+   si apre la pagina e basta. Mai uno schermo nero davanti a un tasto appena premuto. Ma
+   nell'attesa la mappa **non risponde**: una copertura trasparente (`.tvid.attesa`) prende
+   i tocchi — il primo giro di controllo aveva visto che due tocchi svelti aprivano due
+   posti uno sopra l'altro — e il secondo tocco salta l'attesa e apre la pagina subito. La
+   stessa rete di sicurezza si arma una volta sola anche dopo la partenza (durata + 0,8 s),
+   per gli stream troncati o un telefono che non ce la fa: `playing` torna a ogni ripresa
+   dopo un buffering, e se il timer ripartisse ogni volta un video che inciampa non finirebbe
+   mai.
+2. **Con le animazioni spente non parte.** `SET.look.anim` è la stessa manopola di
+   `html.ridotto`: chi l'ha spenta non vuole cinque secondi di filmato. Vale anche per
+   «riduci movimento» del sistema (`prefers-reduced-motion`), che il resto del gioco già
+   rispettava. L'audio segue `SET.audio.on` e il volume degli effetti.
+3. **Si salta**: un tocco, un clic o Esc chiudono il video e aprono subito la pagina. Per
+   l'Esc la copertura sta nella lista delle finestre che il menu di sistema rispetta
+   (`dialogoFlottante` in `js/menu-sistema.js`, che ascolta il tasto in cattura e se no
+   lo ferma e apre il menu di pausa sopra al video — era così al primo giro).
+
+**Il download.** Caricare i dodici video all'avvio sarebbero 28 MB per chi magari in un posto
+non ci va mai. Il filmato di un posto si prepara (`preload`) quando il puntatore passa sul
+suo cartello o al `touchstart`; quello dello Studio, il posto dove si va di più, si prepara
+comunque quattro secondi dopo l'avvio a pagina ferma (`TRANSIZIONI_PRECARICA`), perché col
+dito non c'è nessun «passarci sopra» e un secondo e mezzo non basta a un download freddo — da
+Chrome vero, sulla rete locale, il primo `canplay` arrivava a 3 secondi.
+
+**Provato** con Playwright sul Chrome installato (non su quello di Playwright, che decodifica
+l'H.264 a software e balbetta): a caldo il video parte in 10 ms e finisce a 5,6 s, poi lo
+Studio; a freddo senza precarica salta e apre lo Studio a 1,5 s; il clic a metà lo salta, e
+l'Esc pure, senza menu di pausa; nell'attesa (rete lenta, video non precaricato) sotto al dito
+sul cartello della Pizzeria c'è la copertura, e il tocco apre lo Studio e non la Pizzeria; a
+390 × 844 sopra all'orologio c'è il video; con le animazioni spente o «riduci movimento» lo
+Studio si apre diretto. L'audit controlla che il file esista, che la pagina lo carichi prima
+di `hub.js`, che il cartello dello Studio passi di lì, che la copertura stia sopra
+all'orologio e sotto alla Strada, che il menu di sistema la riconosca e che la copertura
+d'attesa ci sia. I quattro problemi del giro di fine task del 16/09 (problemi-riscontrati)
+sono chiusi qui dentro, prima del commit.
+
+**Cosa manca:** gli altri quattro video del punto — `02_ingresso_sala` su «La Sala»,
+`03_ritorno_casa` su «Casa», `04_stacca_la_spina` sull'azione, `05_registra_pezzo`
+sull'incisione — e una decisione sui sette che nessun punto chiede (palestra, Milano, club,
+shop, trasferta, live, più `video_transizione_entrata_in_studio` che è un doppione dello
+studio): 22 MB che nel pacchetto viaggiano ancora per niente.
