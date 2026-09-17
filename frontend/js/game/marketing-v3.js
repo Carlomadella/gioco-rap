@@ -245,13 +245,20 @@
         intro:"Adesso fai sentire <b>quindici secondi</b>. Lo snippet muove anche l'hype dell'artista, oltre all'attesa del singolo.",
         stato:"Campagna 3/5 · Snippet · attesa pezzo <b>" + Math.round(attesa) + "/100</b>"
       };
-      if(fase === "drop") return {
-        azione:"anteprima",
-        bottone:fatte < maxPreview ? "Altro snippet" : "Pronto al drop",
-        intro:"<b>Pronto al drop.</b> Il prossimo passaggio vero è pubblicarlo dallo Studio. Se vuoi, prima puoi ancora far sentire un altro snippet.",
-        stato:"Campagna 4/5 · Drop · attesa <b>" + Math.round(attesa) + "/100</b> · partenza <b>" +
-          Math.round(100 + attesa) + "%</b>"
-      };
+      if(fase === "drop"){
+        const dopo = Math.min(100, attesa + (fatte < maxPreview ? MARKETING_RELEASE_HYPE_ANTEPRIMA : 0));
+        return {
+          azione:"anteprima",
+          /* V2 resta leggibile e testabile: anche quando il pezzo è pronto al
+             drop il bottone dice ancora cosa farebbe un altro tap. A tre
+             preview il gate esistente lo disabilita e spiega il perché. */
+          bottone:"Fai uscire una preview",
+          intro:"<b>Pronto al drop.</b> Il prossimo passaggio vero è pubblicarlo dallo Studio. Se vuoi, prima puoi ancora far sentire un altro snippet.",
+          stato:"Campagna 4/5 · Drop · attesa pezzo: <b>" + Math.round(attesa) +
+            "/100</b> · dopo questa: <b>" + Math.round(dopo) + "/100</b> · partenza <b>" +
+            Math.round(100 + dopo) + "%</b>"
+        };
+      }
     }
 
     if(ultimo){

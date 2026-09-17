@@ -118,6 +118,13 @@ test("Marketing: ciclo anteprima, uscita, promo e decadimento della spinta", asy
     G.obligation = null;
     G.shifts = 0;
     G.trialCd = 999;
+    /* Questo test isola il sottociclo V2 preview -> uscita -> promo. Nel V3
+       Teaser e Annuncio sono prerequisiti, quindi qui li consideriamo già
+       completati senza attribuire bonus extra al pezzo. */
+    pezzo.marketingCampagna = {
+      fase:"snippet", teaser:true, annuncio:true, snippet:false,
+      drop:false, postRelease:false
+    };
 
     const anteprima = ACTIONS.find(a => a.id === "anteprima");
     const promo = ACTIONS.find(a => a.id === "promo");
