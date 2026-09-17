@@ -636,24 +636,28 @@ function telPromo(){
     ? marketingReleaseHype(ant)
     : Math.min(ADF_ANTEPRIME_MAX, fatte) * ADF_ANTEPRIMA_SPINTA * 100;
   const attesaDopo = Math.min(100, attesa + ADF_ANTEPRIMA_SPINTA * 100);
-  const azione = ant ? "anteprima" : "promo";
+  const camp = typeof marketingTelefonoConfig === "function"
+    ? marketingTelefonoConfig(ant, ultimo)
+    : null;
+  const azione = camp && camp.azione ? camp.azione : (ant ? "anteprima" : "promo");
   const pronto = telAgendaAzione(azione);
   const soloEnergia = !pronto.ok && soloSenzaEnergia(azione);
   const a = ACTIONS.find(x => x.id === azione);
 
   return '<div class="tpromo">' +
     '<div class="tnote"><b>Che post fai?</b> ' +
-      (ant
-        ? 'Il pezzo <b>non è fuori</b>: gliene fai sentire quindici secondi. Ogni anteprima dà hype, ' +
-          'e all\'uscita parte più forte — ma alla terza l\'hanno già sentito.'
-        : 'La clip del pezzo che scegli. La prima del giorno rende piena, poi la gente scorre oltre.') +
+      (camp && camp.intro ? camp.intro :
+        (ant
+          ? 'Il pezzo <b>non è fuori</b>: gliene fai sentire quindici secondi. Ogni anteprima dà hype, ' +
+            'e all\'uscita parte più forte — ma alla terza l\'hanno già sentito.'
+          : 'La clip del pezzo che scegli. La prima del giorno rende piena, poi la gente scorre oltre.')) +
     '</div>' +
     (fuori.length
       ? '<div class="tlist">' + elenco.map(x => riga(x, !ant && x === ultimo,
           "q" + x.q + " · " + fmt(x.streams || 0) + " stream")).join("") + '</div>'
       : "") +
     (pronti.length
-      ? '<div class="tnote" style="margin-top:9px"><b>Non ancora fuori</b> · solo anteprima</div>' +
+      ? '<div class="tnote" style="margin-top:9px"><b>Non ancora fuori</b> · campagna pre-release</div>' +
         '<div class="tlist">' + pronti.map(x => riga(x, x === ant,
           "q" + x.q + (x.anteprime ? " · " + x.anteprime + (x.anteprime === 1 ? " anteprima" : " anteprime") : " · nessuna anteprima"))).join("") + '</div>'
       : "") +
@@ -663,17 +667,18 @@ function telPromo(){
           Math.round(mult * 100) + '%</b>.</div>'
       : "") +
     '<div class="tnote" style="margin-top:9px">' +
-      (ant
-        ? 'anteprime fatte: <b>' + fatte + "/" + ADF_ANTEPRIME_MAX + '</b> · attesa pezzo: <b>' +
-          Math.round(attesa) + '/100</b> · dopo questa: <b>' + Math.round(attesaDopo) + '/100</b> · partenza <b>' +
-          Math.round(100 + attesaDopo) + '%</b>'
-        : ultimo
-          ? 'spingi «<b>' + ultimo.t + '</b>» · ' + (a && a.give ? a.give() : "")
-          : 'Prima esce un pezzo, poi lo si spinge — o gliene fai sentire un\'anteprima, qui sopra.') +
+      (camp && camp.stato ? camp.stato :
+        (ant
+          ? 'anteprime fatte: <b>' + fatte + "/" + ADF_ANTEPRIME_MAX + '</b> · attesa pezzo: <b>' +
+            Math.round(attesa) + '/100</b> · dopo questa: <b>' + Math.round(attesaDopo) + '/100</b> · partenza <b>' +
+            Math.round(100 + attesaDopo) + '%</b>'
+          : ultimo
+            ? 'spingi «<b>' + ultimo.t + '</b>» · ' + (a && a.give ? a.give() : "")
+            : 'Prima esce un pezzo, poi lo si spinge — o gliene fai sentire un\'anteprima, qui sopra.')) +
     '</div>' +
     '<button class="tbtn tposta' + (soloEnergia ? ' spenta' : '') + '" data-azione="' + azione + '"' +
       (pronto.ok || soloEnergia ? '' : ' disabled') + '>' +
-      (ant ? "Fai uscire una preview" : "Posta") +
+      (camp && camp.bottone ? camp.bottone : (ant ? "Fai uscire una preview" : "Posta")) +
       (a ? ' · ' + a.e + '⚡' : '') + '</button>' +
     (!pronto.ok && !soloEnergia && (ultimo || ant)
       ? '<div class="tnote" style="margin-top:7px">' + pronto.perche + '</div>' : '') +
