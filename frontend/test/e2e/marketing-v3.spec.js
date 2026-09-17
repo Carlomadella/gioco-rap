@@ -35,16 +35,18 @@ test("Marketing V3: la campagna segue teaser, annuncio, snippet, drop e post-rel
       nuovo.released = true;
       fasi.push(marketingAvanza(nuovo, "drop") && marketingFase(nuovo));
       fasi.push(marketingAvanza(nuovo, "post-release") && marketingFase(nuovo));
+      const legacyPreviewFase = marketingFase(legacyPreview);
       return {
         api,
         fasi,
         fuoriOrdine,
-        legacyPreview:marketingFase(legacyPreview),
+        legacyPreview:legacyPreviewFase,
+        legacyAttesa:legacyPreview.releaseHype,
         legacyFuori:marketingFase(legacyFuori)
       };
     }
 
-    return {api, fasi, fuoriOrdine:null, legacyPreview:null, legacyFuori:null};
+    return {api, fasi, fuoriOrdine:null, legacyPreview:null, legacyAttesa:null, legacyFuori:null};
   });
 
   expect(r.api.campagna).toBe("function");
@@ -53,6 +55,7 @@ test("Marketing V3: la campagna segue teaser, annuncio, snippet, drop e post-rel
   expect(r.fasi).toEqual(["teaser", "annuncio", "snippet", "drop", "post-release", "completa"]);
   expect(r.fuoriOrdine).toBe(false);
   expect(r.legacyPreview).toBe("drop");
+  expect(r.legacyAttesa).toBe(24);
   expect(r.legacyFuori).toBe("post-release");
 });
 
