@@ -136,16 +136,19 @@ test("Marketing V3: il telefono guida tutta la campagna senza mescolare hype art
 
   expect(r.azioni).toEqual({teaser:true, annuncio:true});
   expect(r.html0).toContain("Pubblica teaser");
+  expect(r.teaserEsito).toContain("Teaser di «Campagna V3» pubblicato");
   expect(r.dopoTeaser.fase).toBe("annuncio");
   expect(r.dopoTeaser.attesa).toBe(4);
   expect(r.dopoTeaser.hype).toBe(r.hype0);
   expect(r.dopoTeaser.html).toContain("Annuncia il pezzo");
 
+  expect(r.annuncioEsito).toContain("Hai annunciato «Campagna V3»");
   expect(r.dopoAnnuncio.fase).toBe("snippet");
   expect(r.dopoAnnuncio.attesa).toBe(12);
   expect(r.dopoAnnuncio.hype).toBe(r.hype0);
   expect(r.dopoAnnuncio.html).toContain("Fai uscire una preview");
 
+  expect(r.snippetEsito).toContain("Anteprima di «Campagna V3»");
   expect(r.dopoSnippet.fase).toBe("drop");
   expect(r.dopoSnippet.attesa).toBe(24);
   expect(r.dopoSnippet.hype).toBeGreaterThan(r.hype0);
@@ -155,6 +158,7 @@ test("Marketing V3: il telefono guida tutta la campagna senza mescolare hype art
   expect(r.dopoDrop.spinta).toBeCloseTo(1.24, 5);
   expect(r.dopoDrop.html).toContain("Post-release");
 
+  expect(r.promoEsito).toContain("Spingi «Campagna V3»");
   expect(r.dopoPost.fase).toBe("completa");
   expect(r.dopoPost.html).toContain("Campagna completata");
 });
