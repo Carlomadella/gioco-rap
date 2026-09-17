@@ -1,0 +1,62 @@
+name: Marketing V3 Compat
+
+on:
+  push:
+    branches:
+      - task/marketing-ciclo-v1-20260916
+    paths:
+      - .github/workflows/marketing-v3-compat.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: task/marketing-ciclo-v1-20260916
+
+      - name: Mantieni i contratti V2 compatibili con il V3
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new, label):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: attesa 1 occorrenza, trovate {count}')
+              p.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          replace_once(
+              'frontend/js/game/marketing-v3.js',
+              '''      if(fase === "drop") return {\n        azione:"anteprima",\n        bottone:fatte < maxPreview ? "Altro snippet" : "Pronto al drop",\n        intro:"<b>Pronto al drop.</b> Il prossimo passaggio vero è pubblicarlo dallo Studio. Se vuoi, prima puoi ancora far sentire un altro snippet.",\n        stato:"Campagna 4/5 · Drop · attesa <b>" + Math.round(attesa) + "/100</b> · partenza <b>" +\n          Math.round(100 + attesa) + "%</b>"\n      };''',
+              '''      if(fase === "drop"){\n        const dopo = Math.min(100, attesa + (fatte < maxPreview ? MARKETING_RELEASE_HYPE_ANTEPRIMA : 0));\n        return {\n          azione:"anteprima",\n          /* V2 resta leggibile e testabile: anche quando il pezzo è pronto al\n             drop il bottone dice ancora cosa farebbe un altro tap. A tre\n             preview il gate esistente lo disabilita e spiega il perché. */\n          bottone:"Fai uscire una preview",\n          intro:"<b>Pronto al drop.</b> Il prossimo passaggio vero è pubblicarlo dallo Studio. Se vuoi, prima puoi ancora far sentire un altro snippet.",\n          stato:"Campagna 4/5 · Drop · attesa pezzo: <b>" + Math.round(attesa) +\n            "/100</b> · dopo questa: <b>" + Math.round(dopo) + "/100</b> · partenza <b>" +\n            Math.round(100 + dopo) + "%</b>"\n        };\n      }''',
+              'copy drop compatibile V2'
+          )
+
+          replace_once(
+              'frontend/test/e2e/marketing.spec.js',
+              '''    G.trialCd = 999;\n\n    const anteprima = ACTIONS.find(a => a.id === "anteprima");''',
+              '''    G.trialCd = 999;\n    /* Questo test isola il sottociclo V2 preview -> uscita -> promo. Nel V3\n       Teaser e Annuncio sono prerequisiti, quindi qui li consideriamo già\n       completati senza attribuire bonus extra al pezzo. */\n    pezzo.marketingCampagna = {\n      fase:"snippet", teaser:true, annuncio:true, snippet:false,\n      drop:false, postRelease:false\n    };\n\n    const anteprima = ACTIONS.find(a => a.id === "anteprima");''',
+              'setup test sottociclo V2'
+          )
+
+          Path('.github/workflows/marketing-v3-compat.yml').unlink()
+          PY
+
+      - name: Verifica e committa
+        shell: bash
+        run: |
+          node --check frontend/js/game/marketing-v3.js
+          git diff --check
+          git diff --stat
+          git config user.name "Anni di Fame CI"
+          git config user.email "actions@users.noreply.github.com"
+          git add frontend/js/game/marketing-v3.js frontend/test/e2e/marketing.spec.js .github/workflows/marketing-v3-compat.yml
+          git commit -m "fix(marketing): preserva i contratti V2 nel ciclo V3"
+          git push origin HEAD:task/marketing-ciclo-v1-20260916
