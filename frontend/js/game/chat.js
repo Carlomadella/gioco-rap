@@ -563,7 +563,7 @@ function chatMandaBeat(p){
   if(typeof creaBeat !== "function" || typeof mioGenere !== "function") return null;
   const presi = (G.market || []).map(b => b.n).concat((G.beats || []).map(b => b.n));
   const q = rnd(28, 48) + (p.fama || 10) * 0.3 + (p.rel || 0) * 7;
-  const b = creaBeat(p.gen || mioGenere(), q, presi);
+  const b = creaBeat(p.gen || mioGenere(), q, presi, p.fama);
   b.price = Math.max(20, Math.round(b.price * (1 - (p.rel || 0) * 0.12)));
   b.da = p.n;
   G.market.push(b);

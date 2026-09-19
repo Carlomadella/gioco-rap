@@ -1,4 +1,4 @@
-## Cosa resta aperto al 19/09/2026
+## Cosa resta aperto al 20/09/2026
 
 Smistato leggendo ogni voce contro il codice: sotto a ciascuna c'è scritto se e quando è
 stata chiusa. Qui solo quelle **ancora aperte**, nello stesso ordine di «Da fare adesso» in
@@ -8,6 +8,8 @@ piccole, poi i lavori lunghi, in fondo le decisioni. Riordinato il 15/09 dopo il
 fine task su quel foglio; il 19/09 il giro sulle pagine dei posti sulla loro foto ha
 trovato sette cose, sei chiuse nello stesso branch, una (la mano del rapper) resta; lo
 stesso giorno il giro sull'avvio rapido ne ha trovate sette, tutte chiuse nel branch.
+Il 20/09 il giro sulle «quattro piccole» ne ha trovate tre, più tre note: sono le
+voci 30–32, tutte e tre chiuse nello stesso branch prima del push.
 
 1. **Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
    telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra. Il tasto
@@ -103,6 +105,22 @@ stesso giorno il giro sull'avvio rapido ne ha trovate sette, tutte chiuse nel br
    riparte il conto.
 29. ~~**Il caso @lento non guarda la schermata «Preparo il tuo artista»** (19/09).~~
    **RISOLTO (19/09/2026)** — la prova la vuole accesa con una fase, e via alla fine.
+
+30. ~~**`npm run prova` è rosso: il test «parte da zero» vuole ancora le skill a 0**~~ (20/09,
+   `strumenti/prova.js:352` contro `state.js:21`): 179 a posto, 1 no, e `npm run verifica` si
+   ferma lì. L'audit nuovo chiede il contrario: uno dei due resta rosso finché il test non
+   si aggiorna. **RISOLTO (20/09/2026)** — il test chiede le quattro skill a 1, e la
+   verifica di prima l'avevo letta male: l'exit code era di `tail`, non di npm.
+31. ~~**Il bonus dell'evento della settimana si può prendere due volte nello stesso giorno**~~
+   (20/09, `agenda.js:179-191` e `:331-334`): tolta la voce, la card torna su «segna» e il
+   peso si riprende intero. C'era già togliendo e rimettendo il quadratino a mano.
+   **RISOLTO (20/09/2026)** — `G.agenda.onorati` ricorda cosa hai onorato oggi: il peso
+   torna 1 e la card lo dà per passato.
+32. ~~**L'evento «fatto» resta in agenda se il gioco non lo conta come fatto**~~ (20/09): alla
+   Sala si toglie solo con la «Sessione» a pagamento, il colpo solo se riesce; il «Piccolo
+   party» invece se ne va con uno «Stacca la spina» di mattina. **RISOLTO (20/09/2026)** —
+   il colpo si onora prima del dado, il beat sul tavolo chiude il «Producer session» di oggi;
+   il party non era un problema: `orari.js` apre «Stacca la spina» solo dalle 00:00 alle 04:00.
 
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
 
@@ -4019,5 +4037,120 @@ blocco è di pochi secondi, e il contatore riprende giusto; non è della scherma
 quello che vede chi non ha la scheda video; (3) «Fallo a mano» non aggancia il tasto
 «to-menu» come fa `creatorePoiCitta` (`gioco-ingresso.js:278-288`), ma il ponte al
 «cancel» pulisce lo slot da sé (`rpg-v24-bridge.js:222-232`), quindi va bene così.
+
+L'indice «Cosa resta aperto» in testa al foglio ha le voci nuove di questo giro.
+
+## Giro del 20/09/2026 (segnala-problemi, fine task `task/piccole-agenda-beat-parametri-licenziarsi`, commit `164e6be`)
+
+Giro sulle «quattro piccole»: l'evento fatto che esce dall'agenda, i prezzi dei beat per
+fama del beatmaker, la partenza con tutti i parametri a 1, il lavoro da cui non ci si
+licenzia. Il backend non è stato toccato. Fatti girare `npm run prova` (**179 a posto,
+1 no** — vedi la prima voce), `node strumenti/audit-regressioni.js` (**383 ok, 0 falliti**,
+compreso il blocco nuovo «Le quattro piccole del 20/09»), `npm run verifica:build` (**33
+ok**) e `npm run test:unit` (3 su 3). Letti per intero il diff del commit e `agenda.js`; poi
+intorno: chi chiama `consumaPeso` (`actions.js` promo/live/stacca/palestra, `piazza.js`,
+`posto.js`, `strada-crimine.js`), chi legge le voci dopo (`hub.js` il quadratino e la card
+della settimana, `telefono.js` l'app Agenda, `bloccoSalto`, `controllaOggi`,
+`controllaGiorno`), `beats.js` con `state.js` e `content.js` davanti (l'ordine degli script
+in `gioco.html`: `clamp` e `rnd` ci sono già), `studio.js` (`studioBeatPronto`,
+`studioBeatPrezzo`), le due card e il loro CSS (`.shs` a due righe con i puntini,
+`.stbgen` su una riga con i puntini: il testo lungo non esce), `offerJobs` e la mossa
+«Cerca lavoro», `sim.js` (il licenziamento a `missed >= 3`, cioè tre settimane: il testo
+nuovo dice il vero), EV0035 nel catalogo (JSON valido, stesso formato degli altri 183
+`requirements`, `no_job` accanto a `has_job` in `testReq`), la Famepedia e le pagine per
+testi vecchi su prezzi, «licenziarsi» e «da zero» (niente da correggere), le soglie sulle
+skill (la più bassa è 16: partire da 1 non ne sposta nessuna). Fuori dal browser ho fatto
+girare `agenda.js` e `beats.js` dentro a `vm` per vedere cosa fanno davvero: i prezzi stanno
+sempre nella loro fascia (emergente 105–250, affermato 320–1000, famosissimo 1000–2000 su
+500 giri per caso), un beat vecchio senza `fascia` non scrive niente, e la voce di sabato
+resta se l'evento lo giochi mercoledì.
+
+Le cose che **tengono**: `onora` toglie solo le voci di oggi con quel nome, di oggi o della
+settimana, e non tocca gli altri giorni; il `save()` parte solo se ha tolto qualcosa; il
+filtro rifà l'array invece di toglierci dentro, quindi nessun giro sulle voci si rompe a
+metà; la plancia e il telefono rileggono le voci a ogni disegno, quindi il quadratino e
+l'app si aggiornano da soli; `G.job` si assegna in tre posti (`actions.js:227`, `hub.js:454`,
+`eventi-v2.js:418`) e tutti e tre passano solo se non lavori già — la sola strada per
+perderlo è `sim.js:161`; il tasto «Va bene» dei colloqui torna `null` come fanno già i
+tasti del centro per l'impiego.
+
+### `npm run prova` è rosso: il test «parte da zero» vuole ancora le skill a 0
+- **dove** — `frontend/strumenti/prova.js:345-354` (il controllo a `:352`,
+  `Object.values(stato.skills).every(v => v === 0)`); la riga che è cambiata è
+  `frontend/js/game/state.js:21`.
+- **cosa succede** — il commit porta le quattro abilità a 1, ma il test «soldi, fan, hype,
+  skill e stream iniziano tutti da zero» chiede ancora che siano tutte a 0: `npm run prova`
+  chiude con **179 a posto, 1 no** e codice d'uscita 1. `npm run verifica` è una catena di
+  comandi legati con «e poi»: si ferma lì, e l'audit, le prove del browser e il build dopo
+  non partono nemmeno. L'audit nuovo, dall'altra parte, pretende le skill a 1
+  (`audit-regressioni.js:2186`): i due controlli si contraddicono, e uno dei due sarà
+  sempre rosso finché il test non si aggiorna (anche il titolo del blocco, «la nuova carriera
+  parte da zero», dice una cosa non più vera per le skill).
+- **come si vede** — `cd frontend && npm run prova`, guardare il blocco «la nuova carriera
+  parte da zero»: la riga `skills={"scrittura":1,"flow":1,"presenza":1,"rete":1}`.
+- **quanto pesa** — si vede ma si gira intorno: il gioco funziona, ma il gate del push è
+  rosso e finché resta così la task non si può chiudere.
+- **RISOLTO (20/09/2026)** — il test in `prova.js` chiede quattro skill tutte a 1, col titolo
+  giusto. La verifica che avevo dato per verde era `npm run verifica | tail`: l'exit code
+  letto era quello di `tail`. Rifatta senza il tubo: 180 a posto, 385 dell'audit, e2e e build ok.
+
+### Il bonus dell'evento della settimana si può prendere due volte nello stesso giorno
+- **dove** — `frontend/js/game/agenda.js:179-191` (`onora`, `consumaPeso`) con
+  `:331-334` (`passata`) e `:126-139` (`segna`); la card che si riaccende è
+  `frontend/js/game/hub.js:707-716`.
+- **cosa succede** — prima, giocato l'evento, la voce restava e portava scritto
+  `bonusUsato`: il peso (×1,2 alla Sala, ×1,25 alla giornata di lanci, ×1,6 al giro grosso)
+  non tornava più quella settimana. Adesso la voce sparisce, e per la card della settimana
+  l'evento di oggi non è «passato» (`passata` guarda solo se il giorno è già andato):
+  il tasto torna su «segna». Segni di nuovo, rigiochi, e il peso torna intero — l'ho
+  visto fuori dal browser: `consumaPeso("sala")` dà 1,2, poi `segna`, poi di nuovo 1,2.
+  Con la Sala rende: ogni sessione da 60 € è un beat migliore del 20 %, finché hai soldi
+  ed energia. Per onestà: il buco c'era anche prima, ma bisognava togliere e rimettere il
+  quadratino apposta; adesso è il gioco che lo rimette su «segna» da solo. Il commento in
+  cima al blocco (`agenda.js:156-161`, «consumaPeso() lo marca subito») racconta ancora
+  il modo vecchio, e `vociDaConsumare` filtra un `bonusUsato` che nessuno scrive più.
+- **come si vede** — mercoledì, con «Sessione lunga alla Sala» fra i due della settimana:
+  segnala, fai una sessione con un beatmaker, torna in plancia — il tasto dice «segna»;
+  segnala e rifai la sessione.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (20/09/2026)** — `G.agenda.onorati` tiene le chiavi `anno:sett:giorno:tipo:id` di
+  quello che hai onorato oggi (`onora` le scrive, `pulisci` butta quelle di ieri): `vociDaConsumare`
+  torna vuoto se la settimana è già onorata, quindi il peso è 1, e `passata()` dice «passato»,
+  quindi la card non torna su «segna». Provato fuori dal browser: 1,3 → segna → 1. Il commento
+  vecchio è riscritto; il filtro su `bonusUsato` resta per i salvataggi di prima.
+
+### L'evento «fatto» resta in agenda se il gioco non lo conta come fatto
+- **dove** — `frontend/js/game/posto.js:851-858` (solo la «sessione» chiama
+  `consumaPeso("sala")`), `frontend/js/game/strada-crimine.js:204-210` (solo se il colpo
+  riesce), `frontend/js/game/actions.js:614-617` (il «Piccolo party»).
+- **cosa succede** — il punto dice «dopo che ho partecipato l'evento si toglie», ma la
+  voce si toglie solo quando parte il pezzo di codice che dà il peso. «Producer session»
+  segnata: vai alla Sala alle 22:30, parli con la gente, ascolti il beat sul tavolo — la
+  voce resta, perché si toglie solo con la «Sessione» a pagamento (60 €, e serve un
+  rapporto di almeno 2). «Colpo rapido» segnato: se il colpo va male la voce resta, e
+  l'agenda ti dice ancora di andarci. All'inverso, il «Piccolo party» delle 00:00 si toglie
+  anche se «Stacca la spina» lo fai alle dieci di mattina, perché è la stessa mossa. Il
+  salto del tempo non si blocca comunque (dopo l'ora l'appuntamento non ferma niente), ma
+  il quaderno dice il falso fino a mezzanotte.
+- **come si vede** — segna «Producer session», vai alla Sala e non fare la sessione;
+  oppure segna «Colpo rapido» e fallisci il colpo. Apri l'app Agenda del telefono.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (20/09/2026)** — in `strada-crimine.js` il peso si legge prima del dado: al colpo ci
+  sei andato anche se va male. In `posto.js` farsi sentire un beat chiama `AGENDA.onora("sala",
+  "oggi")`: chiude il «Producer session» di stasera e non la «Sessione lunga» della settimana,
+  che vuole la sessione vera e il suo peso. Il «Piccolo party» non era un problema: `orari.js`
+  apre «Stacca la spina» solo dalle 00:00 alle 04:00, di mattina non si fa.
+
+Note a margine, scelte e non bug: (1) **si parte con 0 € e il beat più economico costa
+100**: il primo beat vuole almeno un turno (70–220 € a seconda del lavoro) o la sessione
+alla Sala, mentre prima costava 15 — è quello che il punto di ALE chiede, ma la prima
+mezz'ora di gioco cambia, e vale la pena provarla; (2) **la sessione alla Sala costa 60 €
+e il beat è tuo gratis** (`posto.js:852` e `:862`), meno del fondo del listino di un
+emergente, e il beat sul tavolo con rapporto 1 viene 88 € (`posto.js:841`): il foglio lo
+dice apposta — «l'amicizia è un'altra cosa» — ma il listino e la Sala adesso raccontano due
+prezzi diversi per lo stesso beatmaker; (3) sulla card dello Studio la riga del genere sta
+su una riga sola con i puntini (`studio-elementi.css:80`): con un beatmaker dal nome lungo
+a 180 punti di card si legge «boom bap · Nome Cog…», che va bene, ma la fascia non si vede
+mai quando c'è il nome — è così per scelta (`b.da` vince).
 
 L'indice «Cosa resta aperto» in testa al foglio ha le voci nuove di questo giro.

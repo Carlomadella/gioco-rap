@@ -6096,7 +6096,12 @@
     "trigger": {
       "kind": "ambient"
     },
-    "requirements": [],
+    "requirements": [
+      {
+        "test": "no_job",
+        "value": true
+      }
+    ],
     "family_cooldown_days": 28,
     "legacy_replaces": [],
     "integration_notes": [],

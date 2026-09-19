@@ -1,6 +1,6 @@
 # La roadmap del progetto — a che punto siamo davvero
 
-**Aggiornata al 19/09/2026.** Ogni riga di questo file è stata controllata sul repo il
+**Aggiornata al 20/09/2026.** Ogni riga di questo file è stata controllata sul repo il
 giorno in cui è stata scritta: se qui c'è scritto «fatto», il codice c'è ed è stato
 guardato. Se c'è scritto «da fare», nel repo non c'è niente che lo faccia.
 
@@ -130,7 +130,10 @@ il feed che si scorre.
 
 **C'è già**: l'hype con un tetto per fase della carriera (`PHASES[fase].hcap` in
 `phases.js`) e un tetto settimanale sulla promo — **FATTO (06/09/2026)**; energia a 100,
-giornate e skip di quanto vuoi; le classifiche settimanali con le frecce.
+giornate e skip di quanto vuoi; le classifiche settimanali con le frecce; **FATTO
+(20/09/2026)** i prezzi dei beat su tre fasce per fama del beatmaker (100–250 / 300–1000 /
+1000–2000, `BEAT_FASCE` in `beats.js`), la partenza con tutti i parametri a 1, e la regola
+che da un lavoro non ci si licenzia — il posto lo perdi solo se non ti presenti.
 
 **Manca**:
 
@@ -138,8 +141,6 @@ giornate e skip di quanto vuoi; le classifiche settimanali con le frecce.
   cresce col livello, e i livelli devono avere un senso»*;
 - il pub e la pubblicità sui social come primo modo di fare hype a inizio carriera: sono
   rimasti fuori apposta dal giro dell'hype, e oggi come luogo non esistono;
-- i prezzi dei beat rifatti su tre fasce (100–250 / 300–1000 / 1000–2000) e la partenza con
-  tutti i parametri a 1 (foglio dei punti nuovi, Alessio);
 - la giornata al posto della settimana, e il conto dei costi dell'energia: c'è la risposta
   ragionata, il codice no;
 - **lo skip è lento** quando si saltano tante ore (foglio dei punti nuovi, Carletto);
@@ -317,9 +318,9 @@ I punti aperti in
 sulle tappe qui sopra:
 
 **Alessio** — shop già dalla città iniziale con prodotti limitati (B), rapporti coi
-beatmaker che non vanno in negativo (E), prezzi dei beat realistici (C), partenza con tutti
-i parametri a 1 (C), Avaturn e creatore in gioco che convivono 50/50 (B), card della mappa
-troppo vicine e pulsanti troppo grandi (B).
+beatmaker che non vanno in negativo (E), Avaturn e creatore in gioco che convivono 50/50 (B),
+card della mappa troppo vicine e pulsanti troppo grandi (B). I prezzi dei beat realistici e
+la partenza con tutti i parametri a 1 (C) sono **fatti il 20/09/2026**.
 
 > Tre punti di quel foglio — le card tutte come lo Studio, via i tastini che muovono la
 > mappa, lo shop che diventa uno shop — **risultano già chiusi** nella tabella dei punti:

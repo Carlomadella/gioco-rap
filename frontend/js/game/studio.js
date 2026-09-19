@@ -503,10 +503,14 @@ function studioBeatPronto(p){
   return {ok:true, perche:""};
 }
 /* Il prezzo cala col rapporto e sparisce da «fidato» in su: a un certo punto
-   non ti fa più pagare, e quello è il senso di averci lavorato per mesi. */
+   non ti fa più pagare, e quello è il senso di averci lavorato per mesi.
+   Si parte dal fondo del listino della sua fascia (beats.js, BEAT_FASCE):
+   un emergente da 100, un affermato da 300 — «i prezzi dei beat per fama del
+   beatmaker», ALE. Prima partiva da 60 € chiunque fosse. */
 function studioBeatPrezzo(p){
   if(p.rel >= 4) return 0;
-  return Math.max(20, Math.round((60 + p.fama * 2.2) * (1 - p.rel * 0.22) / 5) * 5);
+  const base = typeof fasciaBeatmaker === "function" ? fasciaBeatmaker(p.fama).min : 100;
+  return Math.max(20, Math.round(base * (1 - p.rel * 0.22) / 5) * 5);
 }
 /* Quanto viene buono: la sua fama dice quanto è bravo, il vostro rapporto
    quanto ci mette del suo, e la tua rete quanto sai chiedere. */
@@ -526,7 +530,7 @@ function studioFattiUnBeat(id){
   p.beatSett = sett;
 
   const presi = G.market.map(b => b.n).concat(G.beats.map(b => b.n));
-  const b = creaBeat(p.gen || mioGenere(), studioBeatQualita(p), presi);
+  const b = creaBeat(p.gen || mioGenere(), studioBeatQualita(p), presi, p.fama);
   b.da = p.n;                    /* chi l'ha fatto resta scritto sul beat */
   G.beats.push(b);
 

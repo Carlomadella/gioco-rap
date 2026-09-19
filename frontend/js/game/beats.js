@@ -89,19 +89,46 @@ function nomeBeat(id, presi){
   return pick(g.a) + " " + pick(g.b);
 }
 
-/* prezzo: cresce più che in proporzione alla qualità, e dipende dal genere.
-   Un beat scarso lo prendi con la paga di un turno, uno buono te lo devi meritare. */
-function prezzoBeat(q, id){
-  const p = (q*q*0.16 + 14) * genBeat(id).pr * rnd(0.9, 1.12);
-  return Math.max(15, Math.round(p/5)*5);
+/* I PREZZI DEI BEAT PER FAMA DEL BEATMAKER (ALE: «da 100 a 250 euro beat da
+   beatmaker emergenti, da 300 a 1000 per beatmaker affermati e da 1000 a 2000
+   per beatmaker famosissimi»). Prima il prezzo guardava solo la qualità
+   (q²·0,16 + 14: da 15 a ~1800 €), e un beat q66 al livello quattro costava
+   700 € senza che nessuno sapesse chi l'avesse fatto. Adesso decide la fama di
+   chi lo fa — la stessa `p.fama` della Sala, 0–100 — in quale **fascia** sta
+   il prezzo, e la qualità dove sta dentro alla fascia. Il genere sposta poco
+   (`pr`), e mai fuori dalla fascia. Gli sconti per il rapporto (posto.js,
+   chat.js, trasferte.js) restano quelli di sempre e si applicano dopo: il
+   listino è questo, l'amicizia è un'altra cosa. */
+const BEAT_FASCE = [
+  {id:"emergente",   n:"emergente",   da:0,  min:100,  max:250},
+  {id:"affermato",   n:"affermato",   da:40, min:300,  max:1000},
+  {id:"famosissimo", n:"famosissimo", da:75, min:1000, max:2000}
+];
+const fasciaBeatmaker = fama =>
+  BEAT_FASCE.filter(f => (Number(fama) || 0) >= f.da).pop() || BEAT_FASCE[0];
+function prezzoBeat(q, id, fama){
+  const f = fasciaBeatmaker(fama);
+  const dove = clamp((q - 5) / 95, 0, 1);
+  const p = (f.min + (f.max - f.min) * dove) * genBeat(id).pr * rnd(0.95, 1.1);
+  return clamp(Math.round(p/5)*5, f.min, f.max);
 }
+/* Un beat del banco senza un beatmaker con un nome — il «giro dei produttori»
+   di offriBeat() — è di uno del quartiere: la fama la si legge dal beat, un
+   po' di caso compreso. Così i tre del banco sono quasi sempre di emergenti,
+   e ogni tanto quello buono è di un affermato. */
+const famaDalBeat = q => clamp(Math.round(q * 0.7 + rnd(-10, 12)), 2, 100);
 
-function creaBeat(id, q, presi){
+function creaBeat(id, q, presi, fama){
   q = clamp(Math.round(q), 5, 100);
   const n = nomeBeat(id, presi);
   presi.push(n);
-  return {n, q, gen:id, price:prezzoBeat(q, id), seed:Math.floor(Math.random()*1e9)};
+  const f = fama == null ? famaDalBeat(q) : fama;
+  return {n, q, gen:id, fascia:fasciaBeatmaker(f).id, price:prezzoBeat(q, id, f),
+    seed:Math.floor(Math.random()*1e9)};
 }
+/* la fascia scritta sulla card: i beat di prima non ce l'hanno, e un vecchio
+   salvataggio non si rilegge — per loro non si scrive niente */
+const fasciaBeat = b => { const f = BEAT_FASCE.find(x => x.id === b.fascia); return f ? f.n : ""; };
 
 /* Il giro dei produttori: tre beat, tre generi diversi, tre fasce di qualità.
    Uno è sempre del tuo genere: quelli del tuo giro li conosci. */

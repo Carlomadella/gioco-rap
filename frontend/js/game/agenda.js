@@ -89,6 +89,9 @@
   function ag(){
     if(!G.agenda || typeof G.agenda !== "object") G.agenda = {voci:[], ultimoGiorno:0};
     if(!Array.isArray(G.agenda.voci)) G.agenda.voci = [];
+    /* gli appuntamenti già onorati oggi (vedi onora): i salvataggi di prima
+       non li hanno, si parte da vuoto */
+    if(!Array.isArray(G.agenda.onorati)) G.agenda.onorati = [];
     return G.agenda;
   }
   const oraInMinuti = testo => {
@@ -103,6 +106,9 @@
     catch(e){ return G.timeMinutes || 8 * 60; }
   };
   const chiave = (e, tipo) => tipo + ":" + e.id;
+  /* la chiave di un appuntamento onorato: il giorno, poi tipo:id come sopra */
+  const chiaveOggi = () => (G.year || 1) + ":" + (G.week || 1) + ":" + (G.day || 1) + ":";
+  const chiaveOnorata = (id, tipo) => chiaveOggi() + tipo + ":" + id;
 
   /* Le voci vecchie non si accumulano: un appuntamento di due settimane fa non
      è storia, è sporcizia. Si tengono quelli di oggi e quelli ancora da venire. */
@@ -113,7 +119,11 @@
       v.anno > anno ||
       (v.anno === anno && v.settimana > sett) ||
       (v.anno === anno && v.settimana === sett && v.giorno >= giorno));
-    return prima !== a.voci.length;
+    /* gli onorati valgono solo per il loro giorno: quelli di ieri sono storia */
+    const oggi = chiaveOggi();
+    const n = a.onorati.length;
+    a.onorati = a.onorati.filter(k => k.startsWith(oggi));
+    return prima !== a.voci.length || n !== a.onorati.length;
   }
 
   function voci(){ pulisci(); return ag().voci; }
@@ -157,9 +167,11 @@
      Non tutti gli eventi della settimana valgono uguale, e ognuno vale il
      suo solo se: l'hai segnato in agenda come evento della settimana, ed è
      proprio oggi il suo giorno — non prima, non "un po' dopo perché non
-     hai fatto in tempo". Un bonus preso una volta non si ripete nella
-     stessa settimana: consumaPeso() lo marca subito. */
+     hai fatto in tempo". Un bonus preso una volta non si ripete: la voce
+     esce dall'agenda (onora, sotto) e resta scritto che oggi l'hai onorata,
+     così risegnarla non rende niente e la card la dà per passata. */
   function vociDaConsumare(id){
+    if(onorato(id, "settimana")) return [];
     return voci().filter(v => v.tipo === "settimana" && v.id === id && !v.bonusUsato &&
       v.anno === (G.year || 1) && v.settimana === (G.week || 1) && v.giorno === (G.day || 1));
   }
@@ -168,15 +180,39 @@
     const def = SETTIMANALI.find(s => s.id === id);
     return def && def.peso ? def.peso : 1;
   }
+  /* L'EVENTO FATTO ESCE DALL'AGENDA (CARLO, «se partecipo ad un evento
+     segnato, dopo che ho partecipato l'evento si toglie automaticamente
+     dall'agenda»). Prima consumaPeso() segnava solo `bonusUsato`, e la voce
+     restava lì: la sera la trovavi ancora segnata come se dovessi ancora
+     andarci, e il salto del tempo si fermava per un appuntamento già onorato.
+     Adesso l'appuntamento di oggi con quel nome — di oggi o della settimana —
+     si toglie da solo nel momento in cui l'evento lo giochi davvero. Quelli di
+     un altro giorno non si toccano: non li hai ancora onorati.
+
+     Di quello che hai onorato resta la chiave in `onorati` (giro del 20/09):
+     senza, la card tornava su «segna», la risegnavi e il bonus della settimana
+     si riprendeva nello stesso giorno. Con `tipo` si onora solo quel tipo —
+     un beat preso alla Sala chiude il «Producer session» di stasera, ma non
+     la «Sessione lunga» della settimana, che vuole la sessione vera. */
+  function onora(id, tipo){
+    const a = ag(), anno = G.year || 1, sett = G.week || 1, giorno = G.day || 1;
+    const n = a.voci.length;
+    a.voci = a.voci.filter(v => {
+      const mia = v.id === id && (!tipo || v.tipo === tipo) &&
+        v.anno === anno && v.settimana === sett && v.giorno === giorno;
+      if(mia){
+        const k = chiaveOnorata(id, v.tipo);
+        if(a.onorati.indexOf(k) < 0) a.onorati.push(k);
+      }
+      return !mia;
+    });
+    return a.voci.length !== n;
+  }
+  const onorato = (id, tipo) => ag().onorati.indexOf(chiaveOnorata(id, tipo)) >= 0;
   function consumaPeso(id){
-    const trovate = vociDaConsumare(id);
-    if(!trovate.length) return 1;
-    const def = SETTIMANALI.find(s => s.id === id);
-    const peso = def && def.peso ? def.peso : 1;
-    if(peso > 1){
-      trovate.forEach(v => { v.bonusUsato = true; });
-      if(typeof save === "function") save();
-    }
+    /* il peso si legge prima di togliere la voce: è lei a dire che oggi vale */
+    const peso = pesoDiOggi(id);
+    if(onora(id) && typeof save === "function") save();
     return peso;
   }
 
@@ -313,12 +349,15 @@
   /* ==================== QUELLO CHE SERVE FUORI ==================== */
   window.AGENDA = {
     settimanali, voci, segnato, segna, togli, tocca,
-    pesoDiOggi, consumaPeso,
+    pesoDiOggi, consumaPeso, onora, onorato,
     minutiDi:oraInMinuti,
     /* quanti giorni si possono saltare, e per colpa di chi ci si ferma */
     bloccoSalto,
-    /* è già passata? serve alla card, per non far segnare l'impossibile */
+    /* è già passata? serve alla card, per non far segnare l'impossibile.
+       Un appuntamento onorato oggi è passato anche se l'ora non è arrivata:
+       ci sei già andato. */
     passata(e, tipo){
+      if(onorato(e.id, tipo)) return true;
       if(tipo === "settimana") return (e.giorno || 7) < (G.day || 1);
       return oraInMinuti(e.ora) <= adesso();
     },

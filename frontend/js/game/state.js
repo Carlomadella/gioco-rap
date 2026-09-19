@@ -15,7 +15,10 @@ const START = () => ({
   difficolta:"anni-di-fame",
   energy:100, maxEnergy:100, rest:0,
   money:0, fans:0, hype:0, wellbeing:80, lucidita:80,
-  skills:{scrittura:0, flow:0, presenza:0, rete:0},
+  /* «Il giocatore parte con tutti i parametri a 1» (ALE): non a zero. Sono
+     quattro punti in tutto, 88 di esperienza in livello(): si resta al
+     livello 1, ma la scheda non parte più con quattro barre vuote. */
+  skills:{scrittura:1, flow:1, presenza:1, rete:1},
   songs:[], bars:[], beats:[], market:[], job:null, shifts:0,
   life:{casa:0, auto:0, look:0, uscite:0, crew:0}, gear:{}, contract:null, obligation:null,
   offersSeen:{}, goals:{}, log:[], streak:0,

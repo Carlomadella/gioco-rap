@@ -2083,3 +2083,61 @@ modello, ricostruisco, scatto la foto) si leggono sotto alla quinta tacca.
 vestiti è un blocco unico del thread da 45–70 s (il profilo lo mette tutto in
 `WebGLRenderer.render` e nel `readPixels` della foto); lì il contatore della schermata si
 ferma con lui. È il camerino, non l'avvio rapido, e conta solo dove il 3D va a software.
+
+---
+
+## L'evento fatto esce dall'agenda
+
+> **FATTO (20/09/2026)** — branch `task/piccole-agenda-beat-parametri-licenziarsi`, una
+> delle quattro piccole chiuse insieme. File: `frontend/js/game/agenda.js`
+> (`onora`, `consumaPeso`) e `frontend/js/game/actions.js` (il «Piccolo party»).
+
+Il punto di CARLO: *«se partecipo ad un evento segnato, dopo che ho partecipato l'evento si
+toglie automaticamente dall'agenda e non deve essere più segnato»*.
+
+**Com'era.** Quando giocavi un evento segnato, `consumaPeso()` in `agenda.js` segnava solo
+`bonusUsato` sulla voce della settimana, per non dare due volte il bonus. La voce restava
+lì: la sera la trovavi ancora segnata sulla card come se dovessi ancora andarci, l'app
+Agenda del telefono la elencava, e — la cosa peggiore — **il salto del tempo si fermava**
+per un appuntamento che avevi già onorato, perché `bloccoSalto()` guarda le voci e non sa
+niente di `bonusUsato`.
+
+**Com'è.** `consumaPeso(id)` adesso legge il peso e poi chiama `onora(id)`, che toglie
+dall'agenda **tutte le voci di oggi con quel nome**, di oggi o della settimana. Quelle di un
+altro giorno non si toccano: non le hai ancora onorate. Il peso si legge *prima* di togliere
+la voce, perché è lei a dire che oggi l'evento vale di più. `bonusUsato` non si scrive più
+(la voce non c'è più), ma il filtro che lo legge resta per i salvataggi vecchi.
+
+I sei eventi che passano di lì sono gli stessi di prima — `promo`, `live`,
+`palestra_pesi` in `actions.js`, `free` in `piazza.js`, `sala` in `posto.js`, `colpo` in
+`strada-crimine.js` — più uno nuovo: il **«Piccolo party»** della plancia è la mossa
+`stacca`, e non passava dall'agenda perché non ha un peso settimanale. Adesso la chiama
+anche lui, e la voce se ne va.
+
+`onora` sta anche in `window.AGENDA`, per chi dovesse chiudere un appuntamento senza
+passare dal peso. L'audit («Le quattro piccole del 20/09») controlla che `consumaPeso`
+passi da `onora`, che `bonusUsato` non si scriva più e che tutte e sette le mosse
+chiamino l'agenda.
+
+**Il giro di fine task (20/09)** ha trovato tre cose, chiuse nello stesso branch:
+
+- **il bonus si riprendeva nello stesso giorno** — tolta la voce, la card tornava su
+  «segna», la risegnavi e il peso tornava intero. Adesso `G.agenda.onorati` tiene le
+  chiavi `anno:settimana:giorno:tipo:id` di quello che hai onorato oggi (`onora` le
+  scrive, `pulisci` butta quelle di ieri): `vociDaConsumare` torna vuoto se la settimana è
+  già onorata, quindi il peso è 1, e `passata()` dice «passato», quindi la card non si
+  riaccende. I salvataggi di prima non hanno `onorati` e partono da vuoto;
+- **la voce restava se l'evento non passava dal codice del peso** — il colpo si onorava
+  solo se riusciva (adesso il peso si legge prima del dado: ci sei andato anche se va
+  male), e alla Sala solo con la sessione a pagamento (adesso farsi sentire un beat chiama
+  `onora("sala", "oggi")`: chiude il «Producer session» di stasera ma non la «Sessione
+  lunga» della settimana, che vuole la sessione vera). Il «Piccolo party» di mattina non
+  era un problema: `orari.js` apre «Stacca la spina» solo dalle 00:00 alle 04:00;
+- **`npm run prova` era rosso** — il test «parte da zero» chiedeva le skill a 0. E la
+  verifica che avevo dato per verde era `npm run verifica | tail`: l'exit code letto era
+  quello di `tail`. Rifatta senza il tubo, tutta verde.
+
+Provato fuori dal browser (`vm`): segna → gioca → 1,3 e la voce via → risegna → 1; il
+beat alla Sala chiude l'evento di oggi e lascia quello della settimana col suo 1,2; il
+giorno dopo gli onorati spariscono; l'open mic giocato di lunedì non tocca quello
+segnato per sabato.
