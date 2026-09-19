@@ -1,0 +1,175 @@
+/* I LUOGHI CON LA FOTO — Casa, Palestra, Live Club, stacca la spina, e la
+   foto sotto alla Piazza. Il contenuto lo scrive js/game/luoghi-foto.js.
+
+   Il telaio è quello dello Studio (`studio.css`, che si carica prima): i
+   pannelli `.stpan`, le righe `.stscelta`, i tasti `.stprimo`, la fascia con
+   `.stnome` e `.strisorse` sono gli stessi, perché le foto di riferimento
+   sono le stesse fatte dalla stessa mano. Qui ci sono solo il guscio della
+   pagina — che non ha le linguette in basso dello Studio — e le cose che lo
+   Studio non ha: le porte sopra alla foto della Casa, il titolone dello
+   «stacca la spina», i numeri grossi. I blocchi per il telefono stanno in
+   `stretto.css`, come per tutto il resto. */
+
+/* Stesso z-index dello Studio (55): sotto a modal(60), report/scena(80),
+   writer(90), piazza(92), pannello(94) — tutto quello che una mossa apre
+   resta sopra alla pagina, che aspetta già disegnata dietro. */
+.luogo{position:fixed;inset:0;z-index:55;display:none;overflow:hidden;background:#05070B}
+.luogo.on{display:block}
+
+/* la foto e il velo: gli stessi dello Studio */
+.lfsfondo{position:absolute;inset:0;background-size:cover;background-repeat:no-repeat;
+  background-position:center;transform:scale(1.02)}
+.lfvelo{position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(3,6,11,.72) 0%,rgba(3,6,11,.06) 14%,rgba(3,6,11,.10) 42%,rgba(3,6,11,.72) 100%),
+    linear-gradient(90deg,rgba(3,6,11,.42) 0%,rgba(3,6,11,0) 24%,rgba(3,6,11,0) 76%,rgba(3,6,11,.42) 100%)}
+/* la Casa è una stanza da guardare: il velo si alza, restano solo i bordi */
+.luogo[data-luogo="casa"] .lfvelo{
+  background:
+    linear-gradient(180deg,rgba(3,6,11,.66) 0%,rgba(3,6,11,0) 16%,rgba(3,6,11,0) 70%,rgba(3,6,11,.5) 100%)}
+
+/* ---- LA FASCIA IN ALTO ----
+   `.lfhead` è il nome che js/menu-sistema.js si aspetta per questa pagina:
+   ci monta dentro la nav globale (256px a sinistra) e la tiene
+   `position:relative`, per questo la fascia fissa è il guscio `.lfbarra`. */
+.lfbarra{position:absolute;top:0;left:0;right:0;z-index:6;
+  background:linear-gradient(180deg,rgba(4,8,14,.94),rgba(4,8,14,.72));
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 rgba(125,175,215,.16),0 10px 30px rgba(0,0,0,.4)}
+.lfhead{display:flex;align-items:center;gap:12px;min-height:var(--stAlta);padding-right:18px}
+.lfhead .lfk{flex:none;font-family:"Archivo Black","Figtree",sans-serif;
+  font-size:21px;line-height:1;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--stOro);text-shadow:0 2px 12px rgba(242,193,78,.28)}
+/* la nav globale dentro alla fascia: stesse misure di Sala, Studio e Shop
+   (css/menu-sistema.css), scritte qui perché quel foglio resta com'è */
+#luogo.on .lfhead.adf-system-host-v7{min-height:58px!important;align-items:center!important}
+#luogo.on .lfhead.adf-system-host-v7 > .adf-global-nav{left:0!important;top:0!important;height:58px!important}
+#luogo.on .lfhead.adf-system-host-v7 > .lfk{margin-left:256px!important}
+
+/* ---- LE TRE COLONNE ----
+   Come nello Studio, appoggiate in basso: il terzo alto è solo stanza. Senza
+   le linguette sotto, il fondo è la riga in basso. */
+.lfwrap{position:absolute;left:0;right:0;top:var(--stAlta);bottom:calc(var(--stBanda) + 14px);
+  display:grid;grid-template-columns:330px minmax(0,1fr) 330px;gap:16px;
+  padding:16px 18px;align-items:end;
+  animation:rIn .38s cubic-bezier(.2,.9,.3,1)}
+.lfcol{max-height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;
+  display:flex;flex-direction:column;gap:12px}
+.lfcol::-webkit-scrollbar{width:6px}
+.lfcol::-webkit-scrollbar-thumb{background:rgba(125,175,215,.25);border-radius:3px}
+.lfcol:empty{display:none}
+.lfwrap:has(.lfsx:empty){grid-template-columns:minmax(0,1fr) 330px}
+.lfwrap:has(.lfdx:empty){grid-template-columns:330px minmax(0,1fr)}
+.lfwrap:has(.lfsx:empty):has(.lfdx:empty){grid-template-columns:minmax(0,1fr);
+  max-width:760px;margin:0 auto;align-items:center}
+/* i tasti in fondo al pannello si appoggiano al fondo della colonna mentre
+   il contenuto scorre sotto — stessa regola dello Studio, stesso motivo */
+.lfcol .stpan .stazioni{position:sticky;bottom:0;z-index:2;margin-top:16px;padding-block:11px;
+  background:#060D16;box-shadow:0 -14px 20px -8px #060D16}
+@media (min-height:1000px){.lfcol .stpan .stazioni{position:static;box-shadow:none;padding-block:0}}
+
+/* la riga in basso, senza le linguette sotto. `.stbanda` è display:flex,
+   che vince sull'attributo hidden: quando il diario è vuoto va detto qui. */
+.lfbanda{bottom:14px}
+.lfbanda[hidden]{display:none}
+
+/* una riga «etichetta … valore» nei pannelli laterali */
+.lfriga{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding:8px 2px;font-size:14px;color:var(--stSoft);
+  box-shadow:inset 0 -1px 0 rgba(125,175,215,.12)}
+.lfriga:last-child{box-shadow:none}
+.lfriga b{font-size:15.5px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;text-align:right}
+.lfriga.oro b{color:var(--stOro)}
+.lfnotasotto{margin:10px 0 0}
+.lflista{margin:0 0 6px;padding:0 0 0 18px;font-size:14.5px;line-height:1.6;color:var(--stTesto)}
+.lflista i{color:var(--stSoft);font-style:normal;font-size:13px}
+
+/* ---- L'ESITO DI UNA MOSSA ---- */
+.lfdetto{margin:0;font-size:16px;line-height:1.5;color:var(--stTesto)}
+.lfdetto b{color:var(--stOro)}
+.lfextra{margin:8px 0 0;font-size:15px;color:var(--stAzz);font-weight:700}
+.lfextra b{color:var(--stAzz)}
+
+/* ---- STACCA LA SPINA: il centro della pagina ----
+   Il titolone su due righe, bianco e oro, a pennellata come nel riferimento
+   (Archivo Black inclinato è quello che ci si avvicina di più con i caratteri
+   che il gioco ha già). Sotto, i due numeri con il loro tondo. */
+.lfcentro{display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:22px 18px 8px}
+.lftitolone{margin:0 0 8px;font-family:"Archivo Black","Figtree",sans-serif;
+  font-size:clamp(40px,7vw,86px);line-height:.92;letter-spacing:-.01em;
+  text-transform:uppercase;font-style:italic;
+  text-shadow:0 6px 30px rgba(0,0,0,.7)}
+.lftitolone span{display:block;color:#fff}
+.lftitolone b{display:block;color:var(--stOro);font-weight:400}
+.lfsotto{margin:0 0 22px;font-size:20px;font-weight:700;color:#fff;
+  text-shadow:0 2px 14px rgba(0,0,0,.8)}
+.lfnumeri{display:flex;align-items:center;gap:26px;margin:0 0 14px}
+.lfnum{display:flex;align-items:center;gap:12px;text-align:left}
+.lfnum + .lfnum{padding-left:26px;box-shadow:inset 1px 0 0 rgba(255,255,255,.22)}
+.lfnum i{flex:none;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(6,13,22,.72);box-shadow:inset 0 0 0 1.5px currentColor}
+.lfnum i svg{width:24px;height:24px;fill:currentColor}
+.lfnum i.verde{color:#2EE59D}
+.lfnum i.azz{color:var(--stAzz)}
+.lfnum span{display:block;font-size:14px;font-weight:600;color:var(--stTesto)}
+.lfnum b{display:block;font-size:26px;line-height:1.1;font-weight:900;color:#fff;font-variant-numeric:tabular-nums}
+.lfnum i.verde + div b{color:#2EE59D}
+.lfnum i.azz + div b{color:var(--stAzz)}
+.lfnota{margin:0 0 6px;max-width:520px;font-size:15px;line-height:1.5;color:var(--stTesto);
+  text-shadow:0 2px 12px rgba(0,0,0,.85)}
+.lfnota b{color:var(--stOro)}
+.lfcentro .stazioni{justify-content:center;max-width:none;margin-top:14px}
+.lfcentro .stperche{text-shadow:0 2px 10px rgba(0,0,0,.8)}
+
+/* ---- LA CASA: le porte sopra alla foto ----
+   Capsule scure col bordo d'oro che brilla, come le targhette del
+   riferimento: icona, nome in stampatello, sottotitolo. Stanno dove sta la
+   cosa nella stanza — il tavolo in mezzo, il letto di là a sinistra, il
+   divano a destra — in percentuale dello schermo. Sono bottoni che si
+   vedono, non zone trasparenti: costano energia (§3 delle pagine-azioni). */
+.lfwrap.lfporte{display:block;padding:0}
+.lfporta{position:absolute;display:flex;align-items:center;gap:13px;
+  min-height:56px;padding:10px 22px 10px 16px;border-radius:999px;
+  font:inherit;color:#fff;text-align:left;cursor:pointer;
+  background:rgba(8,10,14,.82);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 0 0 2px rgba(242,193,78,.85),0 0 24px rgba(242,193,78,.35),0 14px 36px rgba(0,0,0,.6);
+  transition:transform .15s,box-shadow .15s,background .15s}
+@media (hover:hover){.lfporta:hover{background:rgba(14,16,22,.9);
+  box-shadow:0 0 0 2px var(--stOroChiaro),0 0 34px rgba(242,193,78,.55),0 14px 36px rgba(0,0,0,.6)}}
+.lfporta:active{transform:translateY(1px)}
+.lfpico{flex:none;width:34px;height:34px;display:flex;align-items:center;justify-content:center}
+.lfpico svg{width:30px;height:30px;fill:var(--stOro)}
+.lfptesto b{display:block;font-size:17px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  white-space:nowrap}
+.lfptesto i{display:block;margin-top:2px;font-size:13px;font-style:normal;font-weight:500;color:var(--stTesto);
+  white-space:nowrap}
+.lfp-tavolo{left:50%;top:30%;transform:translateX(-50%)}
+.lfp-tavolo:active{transform:translate(-50%,1px)}
+.lfp-camera{left:11%;top:70%}
+.lfp-divano{right:11%;top:70%}
+.lfp-conti{left:50%;bottom:6%;transform:translateX(-50%);min-height:48px;padding:7px 18px 7px 12px;
+  box-shadow:0 0 0 1.5px rgba(125,175,215,.5),0 10px 26px rgba(0,0,0,.55)}
+.lfp-conti:active{transform:translate(-50%,1px)}
+.lfp-conti .lfpico svg{fill:var(--stAzz)}
+.lfp-conti .lfptesto b{font-size:14px}
+@media (hover:hover){.lfp-conti:hover{box-shadow:0 0 0 1.5px var(--stAzz),0 0 24px rgba(61,199,255,.35),0 10px 26px rgba(0,0,0,.55)}}
+
+/* ---- LA PIAZZA: la foto sotto alla pagina che c'è già ----
+   piazza.js resta com'è; js/game/luoghi-foto.js le mette la classe, e il
+   velo e la foto nello stile dell'elemento (lì è spiegato perché non in una
+   variabile). Qui solo come si stende. I pannelli, che erano `var(--card)`
+   pieno, diventano vetro scuro come quelli dello Studio. */
+.piazza.lffoto{background-color:#05070B;background-size:cover,cover;background-repeat:no-repeat}
+.piazza.lffoto .phead .pk{font-family:"Archivo Black","Figtree",sans-serif;font-size:19px;
+  letter-spacing:.06em;color:var(--stOro);text-shadow:0 2px 12px rgba(242,193,78,.28)}
+.piazza.lffoto .scena{box-shadow:0 20px 60px rgba(0,0,0,.6),inset 0 0 0 1px rgba(125,175,215,.22)}
+.piazza.lffoto .pcount{color:var(--stTesto);text-shadow:0 2px 10px rgba(0,0,0,.8)}
+.piazza.lffoto .psit,.piazza.lffoto .pline,.piazza.lffoto .pres{
+  background:rgba(6,13,22,.88);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  box-shadow:inset 0 0 0 1px rgba(125,175,215,.26),0 18px 46px rgba(0,0,0,.5)}
+@media (hover:hover){.piazza.lffoto .pline:hover{background:rgba(14,26,40,.92)}}
+.piazza.lffoto .ptap{background:linear-gradient(180deg,#FFDD84,#E0A92E);color:#12100A;
+  box-shadow:0 10px 26px rgba(224,169,46,.32),inset 0 1px 0 rgba(255,255,255,.5)}

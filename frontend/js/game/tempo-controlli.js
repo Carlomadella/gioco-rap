@@ -40,6 +40,10 @@
        in mezzo ai pannelli, coprendo «Il quartiere», «POSTA» e la stima degli
        stream. Un posto muto non monta il widget da nessuna parte. */
     {id:"studio", root:"#studio.on",          mute:true},
+    /* Casa, Palestra, Live Club e stacca la spina (js/game/luoghi-foto.js):
+       muti per la stessa ragione dello Studio — l'ora ce l'hanno nella
+       loro fascia — e prima dell'hub per lo stesso motivo. */
+    {id:"luogo",  root:"#luogo.on",           mute:true},
     {id:"hub",    root:"#s-hub.screen.on",   head:".pbarra",       mount:".pbarra", accent:"#c084fc", panel:"linear-gradient(180deg,rgba(16,18,27,.985),rgba(7,9,14,.985))", border:"rgba(192,132,252,.28)"}
   ];
 
@@ -536,6 +540,7 @@
     try{if(typeof renderArmadio==="function")renderArmadio();}catch(_){}
     try{if(typeof renderAbbigliamento==="function")renderAbbigliamento();}catch(_){}
     try{if(typeof renderStudio==="function")renderStudio();}catch(_){}
+    try{if(typeof renderLuogo==="function")renderLuogo();}catch(_){}
     try{if(typeof renderTelefono==="function")renderTelefono();}catch(_){}
     try{window.dispatchEvent(new CustomEvent("adf-time-controls:changed",{detail:{time:GAME_TIME.now(),day:Number(G.day)||1,week:Number(G.week)||1,year:Number(G.year)||1}}));}catch(_){}
     queueSync(true);

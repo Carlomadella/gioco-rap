@@ -1919,3 +1919,86 @@ sono chiusi qui dentro, prima del commit.
 sull'incisione — e una decisione sui sette che nessun punto chiede (palestra, Milano, club,
 shop, trasferta, live, più `video_transizione_entrata_in_studio` che è un doppione dello
 studio): 22 MB che nel pacchetto viaggiano ancora per niente.
+
+## Le pagine dei posti sulla loro foto: Casa, Palestra, Live Club, stacca la spina
+
+> «Aggiungi le foto di background dei posti senza HTML, poi ricrea la schermata identica
+> alle foto con elementi HTML» (CARLO, nel foglio dei punti nuovi). Lo Studio l'08/09; qui
+> gli altri.
+
+**FATTO (19/09/2026)** — branch `task/pagine-luoghi-foto`. Le sei foto di riferimento che
+restavano (`media/photo/schermate_luoghi/`) erano di posti che non avevano una pagina che
+le caricasse: Casa, Palestra e Live Club erano una finestra con due risposte, lo «stacca la
+spina» e la palestra finivano nella scenetta disegnata di `scene-art.js`, la Piazza aveva
+un cielo disegnato. Adesso ognuno è una pagina come lo Studio: la foto riempie lo schermo,
+la fascia in alto dice dove sei e cosa hai, e sopra alla foto ci sta quello che nel
+riferimento ci sta davvero.
+
+**Com'è fatto.** Un elemento solo in `gioco.html` (`#luogo`), riusato da quattro pagine;
+un file nuovo, `js/game/luoghi-foto.js` (la regola dei punti che non sono fix), con la
+tabella `LUOGHI_FOTO` — foto, ritaglio, le tre voci della fascia — e una funzione per
+pagina che restituisce le tre colonne (o le porte, per la Casa); `css/luoghi-foto.css` per
+il guscio e per quello che lo Studio non ha, i blocchi per il telefono in `stretto.css`. Il
+telaio è quello di `studio.css`: gli stessi pannelli (`stPan`), le stesse righe di scelta
+(`stScelta`), lo stesso tasto d'oro, perché le foto sono fatte dalla stessa mano. `hub.js`
+cambia solo i tre `vai` dei cartelli (`apriLuogo("casa" | "palestra" | "live")`);
+`menu-sistema.js` e `tempo-controlli.js` imparano che la pagina esiste (dove sei, «Torna
+alla mappa», l'orologio muto come nello Studio).
+
+- **Casa** (`casa_di provincia_definitiva`): la cucina, con quattro porte sopra alla foto
+  messe dove sta la cosa nella stanza — il tavolo, la camera, il divano — in percentuale
+  dello schermo: bottoni che si vedono, col bordo d'oro, non zone trasparenti. «Vai in
+  camera» è la notte di `saltaGiorni(1)` con la stessa conferma di «Salta avanti»; «i
+  conti di casa» era la seconda risposta della vecchia finestra e non si butta. Sul
+  telefono le porte vanno in colonna in fondo, dove sta il pollice: a 390 punti la stanza è
+  ritagliata a metà e quattro targhette sparse coprirebbero tutto.
+- **Stacca la spina** (`stacca_la_spina`): una scena senza scelte, come la voleva il
+  README delle pagine-azioni — il titolone, «Dormi, mangi, vedi gente normale», i due numeri
+  (prima quelli che la mossa promette, dopo quelli veri, letti dalla differenza), un tasto.
+  Continua riporta in cucina. La foto è il divano di giorno o di sera secondo
+  `GAME_TIME.band()`: è l'unica ragione per cui esistono tutte e due.
+- **Palestra** (`palestra`): la foto di riferimento è pulita, quindi in mezzo ci sta la
+  scelta Pesi/Cardio che stava nel cartello, a sinistra la serie — `palestraMoltiplicatore()`
+  esisteva e non si vedeva da nessuna parte — e a destra la giornata («ci sei già stato
+  oggi»).
+- **Live Club** (`concerto_live`): la scaletta dei pezzi fuori a sinistra, «stasera» a
+  destra — chi c'è, cioè la gente della Sala che conosci, tre a serata col criterio di
+  `presentiOggi()`, e l'incasso stimato con la stessa formula di `live` — in mezzo palco o
+  piazza, con il perché se non si può.
+- **La Piazza** (`freestyle_in_piazza`): la pagina c'era già (`piazza.js`) e resta com'è;
+  sotto ha la foto del sottopasso, e i pannelli diventano vetro scuro come quelli dello
+  Studio. La foto va scritta nello stile dell'elemento, non in una variabile CSS: un
+  `url()` dentro a una variabile Chrome lo risolve rispetto al foglio (`css/media/…`), e
+  la prima prova l'ha caricata da lì, 404.
+
+**Le mosse non cambiano.** Sono quelle di `actions.js`, partono da `avviaAzioneDiretta()`
+come dai cartelli, e passano dalle stesse guardie (posto, orario, energia). Quando una di
+quelle quattro (`stacca`, `palestra_pesi`, `palestra_cardio`, `live`) finiva nella scena a
+pagina piena (`mostraScena`, ui.js) adesso finisce sulla sua foto — anche se parte da una
+card di «Eventi e attività di oggi» o dall'agenda: la pagina si apre da sola e «Continua»
+la richiude. `mostraScena` e `renderGioco` sono incartate una volta sola in
+`luoghi-foto.js`, come fa già `interruzioni.js`: lo Studio ottiene lo stesso con un
+`renderStudio()` scritto a mano dopo ogni `renderGioco()`, otto posti in cinque file, e il
+README delle pagine-azioni spiega perché non si rifà. Il tasto d'oro legge anche l'orario
+del posto (`GAME_HOURS.actionStatus`): «Apre alle 20:00» sotto al tasto spento, invece
+della finestra dopo averlo premuto.
+
+**Provato** con Playwright a 1440 × 900 e 390 × 844: le quattro pagine aperte dai cartelli;
+i pesi fatti dalla pagina, l'esito sulla foto («Serie pesante: benessere +14, presenza
++0,6»), Continua che resta in palestra; il club chiuso alle 08:00 col tasto spento e
+«Apre alle 20:00», aperto alle 22:15, la serata fatta e l'esito; il freestyle veloce che
+aggiorna la fascia (l'ora, l'energia) senza ridisegnare a mano; la Piazza giocata con la
+foto sotto; lo stacca la spina dalla cucina, l'esito coi numeri veri e Continua che torna
+in cucina; la stessa mossa da una card che apre la pagina e la richiude; «Torna alla
+mappa» dalla fascia; «Vai in camera» che chiede conferma e passa alla mattina dopo; sul
+telefono nessuna pagina trabocca in orizzontale. L'audit («Le pagine dei posti sulla loro
+foto») controlla l'ordine dei file, che ogni foto della tabella esista, i tre cartelli, le
+quattro mosse in `SCENA_PIENA`, i due elenchi scritti a mano, il piano (55), la foto della
+piazza nello stile, l'orario sul tasto, il ridisegno in un posto solo e i blocchi stretti.
+Le quattro foto senza interfaccia sono uscite dalla lista delle «in attesa» dell'audit con
+un nome vero (`casa_divano_giorno`, `casa_divano_sera`, `live_club`, `piazza_freestyle`).
+
+**Cosa manca:** la serata del club giocata a momenti, come nel riferimento («al terzo pezzo
+uno in fondo comincia a parlare sopra», tre risposte, la gente che sale o scende, «cambia
+ordine» nella scaletta): è il minigioco della Piazza rifatto per il palco, e ha la sua voce
+nel foglio dei punti nuovi.

@@ -1,6 +1,6 @@
 # La roadmap del progetto — a che punto siamo davvero
 
-**Aggiornata al 15/09/2026.** Ogni riga di questo file è stata controllata sul repo il
+**Aggiornata al 19/09/2026.** Ogni riga di questo file è stata controllata sul repo il
 giorno in cui è stata scritta: se qui c'è scritto «fatto», il codice c'è ed è stato
 guardato. Se c'è scritto «da fare», nel repo non c'è niente che lo faccia.
 
@@ -115,7 +115,11 @@ il feed che si scorre.
   roba che si apre»*, a metà;
 - ogni parte del gioco con la sua ambientazione, e le schermate rifatte identiche alle foto
   — *«Ogni parte del gioco deve avere la sua ambientazione»* e *«La grafica uguale alla
-  foto, e l'avatar segnaposto»*.
+  foto, e l'avatar segnaposto»*. **FATTO (19/09/2026)** per i posti che una foto ce
+  l'hanno: Casa, Palestra, Live Club e stacca la spina sono pagine sulla loro foto, la
+  Piazza ha la sua sotto (`frontend/js/game/luoghi-foto.js`; «Le pagine dei posti sulla
+  loro foto» in `implementazioni/02-interfaccia-e-telefono.md`). Resta la serata del club
+  giocata a momenti, come nel riferimento, e i posti senza foto (Sala, Shop, la Strada).
 
 ### C · L'economia della carriera _(cominciata)_
 
@@ -317,8 +321,9 @@ troppo vicine e pulsanti troppo grandi (B).
 > vanno spostati nel file del loro argomento. Del primo resta da verificare la seconda
 > metà, il pallino giallo sull'ultimo posto visitato.
 
-**Carletto** — la TRACK (D), le foto di sfondo dei posti e le schermate rifatte in HTML (B),
-le transizioni video sulle cinque schede (B — la prima, lo Studio, c'è dal 16/09/2026; le
+**Carletto** — la TRACK (D), le foto di sfondo dei posti e le schermate rifatte in HTML (B —
+fatte per lo Studio l'08/09 e per Casa, Palestra, Live Club, stacca la spina e Piazza il
+19/09/2026; resta la serata del club a momenti), le transizioni video sulle cinque schede (B — la prima, lo Studio, c'è dal 16/09/2026; le
 altre quattro si agganciano allo stesso modo), lo skip lento (C), via «lucidità» (C), la
 legacy — quanto sei influente sulle generazioni dopo di te (E: nel codice non esiste). Più
 due regole di lavoro: le canzoni con l'IA come task giornaliera, e quando non è un fix

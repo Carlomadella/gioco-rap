@@ -21,6 +21,8 @@
     if(document.querySelector("#piazza.on")) return "piazza";
     if(document.querySelector("#writer.on")) return "writer";
     if(document.querySelector("#studio.on")) return "studio";
+    /* Casa, Palestra, Live Club, stacca la spina: js/game/luoghi-foto.js */
+    if(document.querySelector("#luogo.on")) return "luogo";
     if(document.querySelector("#pannello.on")) return "pannello";
     if(document.querySelector("#s-hub.screen.on")) return "hub";
     return "";
@@ -379,6 +381,7 @@
     try{ if($id("piazza") && $id("piazza").classList.contains("on") && typeof uscitaPiazza === "function") uscitaPiazza(); }catch(_){}
     try{ if($id("writer") && $id("writer").classList.contains("on") && typeof uscitaFoglio === "function") uscitaFoglio(); }catch(_){}
     try{ if($id("studio") && $id("studio").classList.contains("on") && typeof chiudiStudio === "function") chiudiStudio(); }catch(_){}
+    try{ if($id("luogo") && $id("luogo").classList.contains("on") && typeof chiudiLuogo === "function") chiudiLuogo(); }catch(_){}
     try{ if($id("pannello") && $id("pannello").classList.contains("on") && typeof chiudiPannello === "function") chiudiPannello(); }catch(_){}
     try{ if($id("strada") && $id("strada").classList.contains("on") && typeof chiudiStrada === "function") chiudiStrada(); }catch(_){}
 
@@ -553,6 +556,8 @@
     /* nello Studio usiamo tutta la card testata, non la flex-line:
        così non spostiamo più avatar/nome come faceva la V6 */
     {id:"studio",  root:"#studio.on",        head:".sthead"},
+    /* le pagine degli altri posti sulla loro foto: stessa fascia dello Studio */
+    {id:"luogo",   root:"#luogo.on",         head:".lfhead"},
     {id:"pannello",root:"#pannello.on",      head:".pnhead"},
     {id:"hub",     root:"#s-hub.screen.on",  head:".pbarra"}
   ];

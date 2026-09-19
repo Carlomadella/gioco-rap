@@ -1885,19 +1885,18 @@ test("in media/ non restano immagini che nessuna riga di codice carica",
          (js/game/studio.js, STUDIO_FOTO) e sono uscite da questa lista: si
          chiamano studio_beat / studio_testo / studio_cabina / studio_mix /
          studio_uscita, e
-         se sparissero dal disco il gioco se ne accorgerebbe da solo. Queste
-         restano materiale in attesa — le due di casa, il freestyle sotto
-         il cavalcavia e il live club: i loro posti non hanno ancora una
-         pagina che le carichi. E la scrivania di notte (`studio_promo.png`):
+         se sparissero dal disco il gioco se ne accorgerebbe da solo. Le
+         altre quattro — le due del divano di casa, il freestyle sotto il
+         cavalcavia e il live club — dal 19/09/2026 sono il fondale delle
+         pagine di Casa, Palestra, Live Club e stacca la spina
+         (js/game/luoghi-foto.js, LUOGHI_FOTO) e sono uscite anche loro:
+         si chiamano casa_divano_giorno / casa_divano_sera / live_club /
+         piazza_freestyle. Resta la scrivania di notte (`studio_promo.png`):
          era il fondale del Marketing dello Studio, e dal 14/09/2026 la promo
          sta sul telefono, in LaFamegram, che un fondale non ce l'ha. Resta
          qui finche' il telefono non avra' una pagina a schermo intero che
          possa caricarla. */
-      "studio_promo.png",
-      "ChatGPT Image 6 set 2026, 19_43_32 (2).png",
-      "ChatGPT Image 6 set 2026, 19_43_34 (6).png",
-      "ChatGPT Image 6 set 2026, 19_43_34 (8).png",
-      "ChatGPT Image 6 set 2026, 19_43_35 (10).png"
+      "studio_promo.png"
     ];
     /* Il dataset degli avatar (`media/makehuman-editor-v1`) sta fuori dal conto,
        e per due motivi diversi. Il primo: i suoi disegni non li nomina il
@@ -2267,7 +2266,63 @@ test("un tocco o Esc saltano il video, e il menu di sistema lascia passare l'Esc
 test("nell'attesa che il video parta la mappa non risponde: la copertura trasparente c'è",
   tvid.includes('classList.add("attesa")') && tvidCss.includes(".tvid.attesa{display:block"));
 
-for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/transizioni-video.js"]){
+/* Le pagine dei posti sulla loro foto (19/09/2026): Casa, Palestra, Live Club
+   e «stacca la spina» — il resto del punto «aggiungi le foto di background
+   dei posti», chiuso per lo Studio l'08/09. Una pagina sola (`#luogo`), il
+   telaio dello Studio, il contenuto in js/game/luoghi-foto.js. Queste prove
+   dicono che le foto ci sono, che i tre cartelli passano di lì, che i due
+   file che devono sapere della pagina lo sanno, e le due cose imparate
+   guardandola: la foto della piazza nello stile dell'elemento (dentro a una
+   variabile CSS Chrome la cercava in css/media/), il tasto d'oro che legge
+   l'orario. Se una pagina si toglie apposta, via anche la sua riga. */
+console.log("\nLe pagine dei posti sulla loro foto — Casa, Palestra, Live Club, stacca la spina");
+const luoghiFoto = leggi("js/game/luoghi-foto.js");
+const luoghiFotoCss = leggi("css/luoghi-foto.css");
+test("luoghi-foto.js e il suo CSS si caricano dopo lo Studio, di cui riusano i pannelli",
+  index.indexOf('<script src="js/game/luoghi-foto.js') > index.indexOf('<script src="js/game/studio-elementi.js') &&
+  index.indexOf('css/luoghi-foto.css') > index.indexOf('css/studio.css') &&
+  index.includes('<div class="luogo" id="luogo">'));
+test("ogni foto di LUOGHI_FOTO esiste sul disco, quella di giorno del divano compresa",
+  (() => {
+    const dir = (luoghiFoto.match(/LUOGHI_FOTO_DIR = "([^"]+)"/) || [])[1];
+    const foto = Array.from(luoghiFoto.matchAll(/(?:f|giorno):"([^"]+\.png)"/g)).map(m => m[1]);
+    return !!dir && foto.length >= 6 && foto.every(f => fs.existsSync(path.join(ROOT, dir + f)));
+  })());
+test("Casa, Palestra e Live Club sulla mappa aprono la pagina, non piu' la finestra con due risposte",
+  /id:"vita",[\s\S]{0,80}?apriLuogo\("casa"\)/.test(hub) &&
+  /id:"palestra",[\s\S]{0,80}?apriLuogo\("palestra"\)/.test(hub) &&
+  /id:"concerti",[\s\S]{0,80}?apriLuogo\("live"\)/.test(hub));
+test("le quattro mosse con la pagina finiscono sulla loro foto, e sono tutte scene a pagina piena",
+  (() => {
+    const m = luoghiFoto.match(/const LUOGO_MOSSE = \{([^}]+)\}/);
+    if(!m) return false;
+    const ids = Array.from(m[1].matchAll(/(\w+):"/g)).map(x => x[1]);
+    const piena = (ui.match(/const SCENA_PIENA = new Set\(\[([\s\S]*?)\]\)/) || ["",""])[1];
+    return ids.length === 4 && ids.every(id => piena.includes('"' + id + '"')) &&
+      luoghiFoto.includes("window.mostraScena = function(a, sc, msg, extra)");
+  })());
+test("il menu di sistema e l'orologio sanno che la pagina esiste (le liste scritte a mano)",
+  menuSystem.includes('document.querySelector("#luogo.on")) return "luogo"') &&
+  menuSystem.includes('typeof chiudiLuogo === "function") chiudiLuogo()') &&
+  menuSystem.includes('root:"#luogo.on",         head:".lfhead"') &&
+  timeControls.includes('{id:"luogo",  root:"#luogo.on",           mute:true}') &&
+  timeControls.includes('renderLuogo()'));
+test("la pagina sta allo stesso piano dello Studio (55), sotto alla finestra delle scelte (60)",
+  /\.luogo\{[^}]*z-index:55/.test(luoghiFotoCss));
+test("la foto sotto alla Piazza sta nello stile dell'elemento, non in una variabile CSS",
+  luoghiFoto.includes("p.style.backgroundImage = LF_PIAZZA_VELO + ', url(\"' + LUOGHI_FOTO_DIR + L.f + '\")'") &&
+  !luoghiFotoCss.includes("var(--lfFoto") && luoghiFotoCss.includes(".piazza.lffoto{"));
+test("il tasto d'oro legge l'orario del posto, e sul divano la foto segue l'ora",
+  luoghiFoto.includes("GAME_HOURS.actionStatus(id)") &&
+  luoghiFoto.includes('giorno:"schermate luoghi_senza_HTML/casa_divano_giorno.png"') &&
+  luoghiFoto.includes("GAME_TIME.band()"));
+test("quando il gioco si ridisegna si ridisegna anche la pagina aperta, in un posto solo",
+  luoghiFoto.includes("window.renderGioco = function()") && luoghiFoto.includes("renderLuogo();"));
+test("sul telefono le tre colonne diventano una pila e le porte della Casa vanno in colonna",
+  /@media \(max-width:900px\)\{[\s\S]*?\.lfwrap\{grid-template-columns:minmax\(0,1fr\)/.test(leggi("css/stretto.css")) &&
+  leggi("css/stretto.css").includes(".lfporta,.lfp-tavolo,.lfp-camera,.lfp-divano,.lfp-conti{position:static"));
+
+for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/transizioni-video.js","js/game/luoghi-foto.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }
