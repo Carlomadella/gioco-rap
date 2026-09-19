@@ -50,8 +50,10 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 Smistato il 15/09/2026, dopo la chiusura di «Sputa» e della regola nuova sull'energia in
 Cabina; riguardato lo stesso giorno dopo «Il telefono quando lo schermo è un telefono», da
-cui sono uscite due voci nuove, e il 16/09 dopo il primo video delle transizioni (la voce
-resta, a metà). È l'ordine in cui si prendono i punti aperti di questo
+cui sono uscite due voci nuove, il 16/09 dopo il primo video delle transizioni (la voce
+resta, a metà), e il 19/09 dopo le pagine di Casa, Palestra, Live Club e stacca la spina
+sulla loro foto (chiusa la voce delle foto; la serata del club giocata a momenti è una voce
+nuova, fra i lavori lunghi). È l'ordine in cui si prendono i punti aperti di questo
 foglio **e** quelli ancora aperti in
 [`problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md): prima quello che
 tocca il gioco sul telefono (è lì che esce), poi quello che pesa nel pacchetto o blocca una
@@ -128,33 +130,41 @@ da quale lista viene.
 16. **Quello che manca alla catena del pezzo** — CARLO, la coda del punto «Non è più:
     "Faccio un pezzo → +10 fama"» (FATTO in parte): la cover caricata da file e quella
     «stile emblema», la discografia come app del telefono, le remastered e le parti 2.
-17. **Le foto dei posti che non hanno ancora una pagina** — CARLO, la coda di «aggiungi
-    le foto di background dei posti» (FATTO in parte): Casa, la Palestra, il freestyle in
-    piazza, il concerto live e lo «stacca la spina»; dentro allo Studio, Cover e Feat
-    senza una foto loro.
-18. **Le card sulla mappa troppo vicine, i pulsanti sopra la mappa troppo grandi** — ALE.
+17. ~~**Le foto dei posti che non hanno ancora una pagina**~~ **FATTO (19/09/2026)** —
+    Casa, Palestra, Live Club e stacca la spina sono pagine sulla loro foto, la Piazza ha
+    la sua sotto; Cover e Feat come sezioni non esistono più dal 15/09 (Studio a cinque
+    linguette), quindi non hanno più bisogno di una foto. «Le pagine dei posti sulla loro
+    foto» in `02-interfaccia-e-telefono.md`. **Resta** la coda qui sotto, la serata a
+    momenti.
+18. **La serata del Live Club giocata a momenti** — CARLO, la coda di «aggiungi le foto di
+    background dei posti»: nel riferimento `concerto_live` in mezzo alla pagina c'è «al
+    terzo pezzo uno in fondo comincia a parlare sopra», tre risposte e la gente che sale o
+    scende, più «cambia ordine» nella scaletta. Oggi la serata è la mossa `live` di sempre
+    (un numero) scelta sulla foto: i momenti sono il minigioco della Piazza rifatto per il
+    palco, e la scaletta con l'ordine vorrebbe un peso in `sim.js`.
+19. **Le card sulla mappa troppo vicine, i pulsanti sopra la mappa troppo grandi** — ALE.
     Si giudicano a occhio: vanno guardate con uno screenshot, non dal CSS. Stessa cosa per
     **la schermata opzioni da migliorare graficamente** — CARLO, pagina di landing.
-19. **Quando skippi tante ore ci mette troppo** — CARLO. Prima si misura (quanti giorni,
+20. **Quando skippi tante ore ci mette troppo** — CARLO. Prima si misura (quanti giorni,
     quanti secondi), poi si cerca dove.
-20. **Su LaFamegram non posta nessuno** — CARLO. Oggi gli altri compaiono nel feed solo
+21. **Su LaFamegram non posta nessuno** — CARLO. Oggi gli altri compaiono nel feed solo
     quando l'evento riguarda te (il fan, il giornalista, la Strada: `lafamegramEventi`);
     nessun contatto della Sala o rivale posta per conto suo. Prima si decide chi posta e
     cosa, poi si fa.
-21. **Il pub e la pubblicità come primo modo di fare hype** — ALE, la coda del punto
+22. **Il pub e la pubblicità come primo modo di fare hype** — ALE, la coda del punto
     sull'hype (FATTO il 06/09 per il resto): oggi non esistono né come luogo né come
     azione.
 
 **Decisioni prima che lavori**
 
-22. **I rapporti coi beatmaker che vanno in negativo** — ALE. In `posto.js` il rapporto
+23. **I rapporti coi beatmaker che vanno in negativo** — ALE. In `posto.js` il rapporto
     scende (`p.rel--`) ma è tenuto fra 0 e 5: sotto zero non va. Prima di farlo va deciso
     cosa succede a −1 (non ti vende più? ti fa pagare di più?).
-23. **Non sempre far scorrere una giornata ridà l'energia** e **la legacy** — CARLO. Sono
+24. **Non sempre far scorrere una giornata ridà l'energia** e **la legacy** — CARLO. Sono
     regole di gioco nuove: prima si scrive come funzionano, poi si fa.
-24. **Lo Shop in provincia, con limitazioni** — ALE. Lo Shop c'è già dal primo giorno;
+25. **Lo Shop in provincia, con limitazioni** — ALE. Lo Shop c'è già dal primo giorno;
     va deciso cosa **non** si vende in provincia (vedi la RISPOSTA sotto al punto).
-25. **Le decisioni tue**, senza le quali il resto non si muove: se dopo Milano e Los
+26. **Le decisioni tue**, senza le quali il resto non si muove: se dopo Milano e Los
     Angeles si può tornare indietro (DA DISCUTERE); la pagina di Mycol e il «tuo artista»
     nella landing; se il gioco sugli store gira anche **di traverso** (nel repo non c'è un
     manifest né un `orientation`, da problemi-riscontrati); e se cancellare gli undici
@@ -371,11 +381,30 @@ con lo stesso numero e resta così._
    Sta in `frontend/js/game/studio-elementi.js` e `frontend/css/studio-elementi.css`, file
    nuovi accanto a quelli che c'erano, come chiede il punto sui file già presenti.
 
-   **Cosa manca ancora, per chiudere il punto:** le altre sei foto di riferimento sono di
-   posti che non hanno ancora una pagina che le carichi — Casa (`casa_di provincia_definitiva`,
-   `scrittura_barre`), la Palestra, il freestyle in piazza, il concerto live e lo «stacca la
-   spina». E dentro allo Studio, Cover e Feat una foto loro non ce l'hanno né con né senza
-   interfaccia: si tengono in prestito quella della stanza più vicina.
+   **FATTO (19/09/2026) — gli altri posti.** Casa, la Palestra, il Live Club e lo «stacca
+   la spina» sono pagine sulla loro foto a schermo intero, con lo stesso telaio dello
+   Studio (la fascia in alto con energia, cassa e ora; i pannelli di vetro scuro; il tasto
+   d'oro; la riga di diario in fondo). `casa_di provincia_definitiva`: la cucina con le
+   quattro porte sopra alla foto — scrivi una barra, vai in camera (la notte di «Salta
+   avanti», con conferma), stacca la spina, i conti di casa. `stacca_la_spina`: il
+   titolone su due righe, «Dormi, mangi, vedi gente normale», i due numeri (prima quelli
+   promessi, dopo quelli veri), Continua che riporta in cucina; la foto è quella del divano
+   di giorno o di sera secondo l'ora. `palestra`: Pesi o Cardio in mezzo, a sinistra la
+   serie dei giorni di fila che esisteva (`palestraMoltiplicatore`) e non si vedeva da
+   nessuna parte, a destra la giornata. `concerto_live`: la scaletta dei pezzi fuori a
+   sinistra, «stasera» a destra con chi c'è (la gente della Sala che conosci) e l'incasso
+   stimato, in mezzo palco o piazza. `freestyle_in_piazza`: la Piazza che c'era già ha la
+   foto del sottopasso sotto. Le mosse sono quelle di `actions.js` (nessun numero cambia);
+   quando finivano nella scenetta disegnata di `scene-art.js` adesso finiscono sulla foto,
+   anche se partono da una card della plancia. I tre cartelli della mappa aprono la pagina
+   invece della finestra con due risposte, che è sparita. Il tasto d'oro legge anche
+   l'orario del posto («Apre alle 20:00» sotto al tasto, invece della finestra dopo).
+   Sta in `frontend/js/game/luoghi-foto.js` e `frontend/css/luoghi-foto.css`, file nuovi;
+   il resto è in «Le pagine dei posti sulla loro foto» in `02-interfaccia-e-telefono.md`.
+
+   **Cosa manca ancora:** la serata del club giocata a momenti, come nel riferimento (la
+   voce sua nell'indice in testa). Cover e Feat non hanno più una sezione loro dal 15/09,
+   quindi non hanno più bisogno di una foto.
 
 8. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo. Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su "stacca la spina", il quinto su "registra un pezzo".
 

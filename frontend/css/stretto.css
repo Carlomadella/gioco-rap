@@ -651,3 +651,68 @@
   .acc-scheda{padding:24px 20px 22px; border-radius:18px}
   .acc-scheda h1{font-size:26px}
 }
+
+/* ==========================================================
+   LUOGHI-FOTO
+   ========================================================== */
+/* ============================================================
+   SCHERMI STRETTI — Casa, Palestra, Live Club e stacca la spina sul
+   telefono. Le tre colonne diventano una pila come nello Studio (prima
+   quello che si fa, poi il contorno); la fascia perde il nome del posto
+   sotto i 620 e va su due righe sotto i 480, per le stesse ragioni scritte
+   sopra per lo Studio. Le porte della Casa smettono di stare «dove sta la
+   cosa nella foto»: a 390 punti la stanza è ritagliata a metà, e quattro
+   targhette sparse coprirebbero tutto — si mettono in colonna in fondo,
+   dove sta il pollice.
+   ============================================================ */
+@media (max-width:900px){
+  .lfwrap{grid-template-columns:minmax(0,1fr);gap:12px;padding:12px 12px;
+    overflow-y:auto;align-content:start}
+  .lfwrap:has(.lfsx:empty),.lfwrap:has(.lfdx:empty),
+  .lfwrap:has(.lfsx:empty):has(.lfdx:empty){grid-template-columns:minmax(0,1fr);
+    max-width:none;margin:0;align-items:start}
+  .lfmid{order:1}
+  .lfsx{order:2}
+  .lfdx{order:3}
+  .lfcol{max-height:none;overflow:visible}
+  .lfhead{gap:9px;padding-right:12px}
+  .lfhead .lfk{font-size:17px}
+  .lfcentro{padding:12px 6px 8px}
+  .lfsotto{font-size:17px;margin-bottom:16px}
+  .lfnumeri{gap:16px}
+  .lfnum + .lfnum{padding-left:16px}
+  .lfnum i{width:42px;height:42px}
+  .lfnum b{font-size:22px}
+  /* le porte della Casa: in colonna, in fondo */
+  .lfwrap.lfporte{display:flex;flex-direction:column;justify-content:flex-end;gap:10px;
+    padding:12px 14px calc(14px + env(safe-area-inset-bottom,0px))}
+  .lfporta,.lfp-tavolo,.lfp-camera,.lfp-divano,.lfp-conti{position:static;transform:none;
+    width:100%;min-height:52px;border-radius:14px}
+  .lfporta:active,.lfp-tavolo:active,.lfp-conti:active{transform:translateY(1px)}
+  .lfptesto b,.lfptesto i{white-space:normal}
+}
+
+@media (max-width:620px){
+  #luogo .lfhead .lfk,#luogo .stsep{display:none}
+  #luogo .stnome{margin-left:210px;font-size:14px;letter-spacing:.03em}
+  #luogo .strisorse{gap:7px}
+  #luogo .strisorse span{font-size:12.5px;gap:4px}
+  #luogo .strisorse .stpunto{display:none}
+  #luogo .strisorse svg{width:14px;height:14px}
+  #luogo.on .lfhead.adf-system-host-v7 > .lfk{margin-left:210px!important}
+}
+
+@media (max-width:520px){
+  .lfbanda{left:10px;right:10px}
+  .lfcentro .stazioni .stprimo,.lfcentro .stazioni .stsecondo{flex:1 1 100%}
+  .lftitolone{font-size:clamp(36px,11vw,48px)}
+}
+
+@media (max-width:480px){
+  #luogo .lfhead{flex-wrap:wrap;align-items:flex-start;padding-right:12px}
+  #luogo .stnome{flex:1 1 100%;min-height:52px;align-items:center;
+    margin-left:210px;font-size:13.5px}
+  #luogo .strisorse{flex:1 1 100%;margin:0 0 4px;justify-content:flex-end;gap:10px}
+  #luogo .strisorse span{font-size:13px}
+}
+

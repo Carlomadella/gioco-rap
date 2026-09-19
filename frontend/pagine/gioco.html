@@ -36,6 +36,9 @@
 <link rel="stylesheet" href="css/studio.css?v=12">
 <!-- dopo studio.css: e' quello che riempie i suoi pannelli, e ne usa le variabili -->
 <link rel="stylesheet" href="css/studio-elementi.css?v=1">
+<!-- dopo studio.css anche questo: Casa, Palestra, Live Club e stacca la spina
+     sono disegnati con lo stesso telaio, sopra alla loro foto -->
+<link rel="stylesheet" href="css/luoghi-foto.css?v=1">
 <link rel="stylesheet" href="css/abilita.css?v=1">
 <link rel="stylesheet" href="css/negozio.css?v=12">
 <link rel="stylesheet" href="css/strada-crimine.css?v=13">
@@ -385,6 +388,28 @@
   <div class="stoltre" id="st-oltre" hidden aria-hidden="true"></div>
 </div>
 
+<!-- I LUOGHI CON LA FOTO — Casa, Palestra, Live Club e «stacca la spina»
+     (il punto 5 di CARLO, «aggiungi le foto di background dei posti»): una
+     pagina sola, riusata, con sotto la foto del posto a schermo intero e
+     sopra quello che nel riferimento ci sta sopra. Stesso telaio dello
+     Studio: la fascia in alto con la nav globale dentro a `.lfhead`, tre
+     colonne appoggiate in basso, la riga di diario in fondo. Il contenuto lo
+     scrive js/game/luoghi-foto.js. -->
+<div class="luogo" id="luogo">
+  <div class="lfsfondo" id="lf-scena"></div>
+  <div class="lfvelo" aria-hidden="true"></div>
+  <div class="lfbarra">
+    <div class="lfhead">
+      <div class="lfk" id="lf-k">—</div>
+      <span class="stsep" aria-hidden="true"></span>
+      <div class="stnome" id="lf-nome"></div>
+      <div class="strisorse" id="lf-risorse"></div>
+    </div>
+  </div>
+  <div class="lfwrap" id="lf-wrap"></div>
+  <div class="stbanda lfbanda" id="lf-banda" hidden></div>
+</div>
+
 <div class="posto" id="posto"><div class="powrap">
   <div class="pohead"><div class="pok">La Sala</div><button class="pox" id="po-x">&#10005;</button></div>
   <div class="poscena" id="po-scena"></div>
@@ -650,6 +675,9 @@
 <script src="js/game/studio.js?v=15"></script>
 <!-- subito dopo: le schede dei beat, le take, i cursori del banco e il quando -->
 <script src="js/game/studio-elementi.js?v=3"></script>
+<!-- e dopo lo Studio le pagine degli altri posti, che ne riusano i pannelli:
+     Casa, Palestra, Live Club, stacca la spina, e la foto sotto alla Piazza -->
+<script src="js/game/luoghi-foto.js?v=1"></script>
 <script src="js/game/abilita.js?v=1"></script>
 <script src="js/game/strada.js?v=12"></script>
 <script src="js/game/strada-crimine.js?v=14"></script>

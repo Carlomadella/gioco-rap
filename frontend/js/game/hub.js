@@ -97,22 +97,12 @@ const HUB_LUOGHI = [
      («Freestyle al bar centrale»): se passavi di lì a un'altra ora non
      esisteva. Il palco è il posto dove si sta davanti alla gente: ci stanno
      tutte e due. */
+  /* Il punto 5 di CARLO («aggiungi le foto di background dei posti»): la
+     finestra con le due risposte è diventata una pagina sulla foto del
+     locale (js/game/luoghi-foto.js), con la scaletta e chi c'è stasera. La
+     scelta palco/piazza è la stessa, si fa lì dentro. */
   {id:"concerti", n:"Live Club",
-   vai:() => {
-     const palco = hubPronta("live");
-     showEvent({k:"Live Club", t:"Che serata fai?",
-       d:"Il palco vero vuole un pezzo pubblicato. La piazza no: lì c’è solo il beat e la gente che passa.",
-       annulla(){},
-       opts:[
-         {n:"Serata open mic", d:palco.ok ? "Il palco, con i tuoi pezzi" : "Non ancora: " + palco.perche,
-          run(){ if(palco.ok) hubAzione("live");
-                 else hubChiuso({n:"Live Club", chiuso:"Non ancora: " + palco.perche +
-                   ". Il palco vero aspetta un pezzo pubblicato."});
-                 return null; }},
-         {n:"Freestyle in piazza", d:"Solo il beat e la gente che passa",
-          run(){ hubAzione("free"); return null; }}
-       ]});
-   }},
+   vai:() => apriLuogo("live")},
   /* il beat maker non è un listino: è la sala dove si conosce la gente */
   {id:"beat", n:"La Sala",
    vai:() => apriPosto()},
@@ -120,17 +110,12 @@ const HUB_LUOGHI = [
      alla Sala e si lavora con loro nello Studio. */
   /* punto 60: si chiamava «Vita quotidiana» — la palestra è uscita da qui
      ed è diventata un posto suo (punto 61), resta stacca la spina e i conti */
+  /* Punto 5 di CARLO: Casa è la foto della cucina con le porte sopra —
+     scrivi una barra, vai in camera, stacca la spina, i conti — come nel
+     riferimento `casa_di provincia_definitiva` (js/game/luoghi-foto.js). Le
+     due risposte della finestra di prima ci stanno tutte e due. */
   {id:"vita", n:"Casa",
-   vai:() => showEvent({k:"Casa", t:"Stacca la spina o guarda i conti",
-     d:"La settimana non è solo musica. Ogni tanto la testa va spenta, e i conti vanno guardati.",
-     annulla(){},
-     opts:[
-       {n:"Stacca la spina", d:"Una sera senza pensare a niente",
-        run(){ hubAzione("stacca"); return null; }},
-       {n:"Guarda cosa ti costa vivere", d:"Casa, look, uscite: le spese fisse",
-        run(){ apriPannello("Le spese fisse", "lifestyle",
-          "Quanto ti costa vivere come vivi, e cosa ti dà in cambio."); return null; }}
-     ]})},
+   vai:() => apriLuogo("casa")},
   /* punto 21/57: la Strada, ricostruita da claude/carriera-criminale.md
      (js/game/strada-crimine.js) — non era mai stata scritta, solo pensata */
   {id:"crimin", n:"Attività criminali",
@@ -143,16 +128,11 @@ const HUB_LUOGHI = [
   /* punto 61: la palestra esce dal sottomenu di Casa e diventa un posto
      suo — era «Business», un altro cartello chiuso senza niente dietro.
      Punto 9: non è più un pulsante solo — si sceglie cosa fare, come a Casa. */
+  /* Punto 5 di CARLO: la scelta fra Pesi e Cardio si fa sulla foto della
+     sala pesi, con accanto la serie dei giorni di fila che prima non si
+     vedeva da nessuna parte (js/game/luoghi-foto.js). */
   {id:"palestra", n:"Palestra",
-   vai:() => showEvent({k:"Palestra", t:"Che allenamento fai?",
-     d:"Il fisico che si vede sotto le luci, o la testa che si svuota prima di scrivere: scegli tu.",
-     annulla(){},
-     opts:[
-       {n:"Pesi", d:"Più energia, 18 € — benessere e presenza su.",
-        run(){ avviaAzioneDiretta("palestra_pesi"); return null; }},
-       {n:"Cardio leggero", d:"Poca energia, gratis — lucidità e benessere su.",
-        run(){ avviaAzioneDiretta("palestra_cardio"); return null; }}
-     ]})},
+   vai:() => apriLuogo("palestra")},
   /* punto 48: idem — l'attrezzatura da studio è già nel catalogo, la vetrina
      non deve stare spenta se quello che promette esiste già */
   /* punto 48 + «via il quaderno»: qui dentro è finito tutto quello che si

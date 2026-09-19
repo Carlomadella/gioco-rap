@@ -1,11 +1,12 @@
-## Cosa resta aperto al 16/09/2026
+## Cosa resta aperto al 19/09/2026
 
 Smistato leggendo ogni voce contro il codice: sotto a ciascuna c'è scritto se e quando è
 stata chiusa. Qui solo quelle **ancora aperte**, nello stesso ordine di «Da fare adesso» in
 [`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md), che mette
 insieme i due fogli: prima il telefono, poi quello che pesa nel pacchetto, poi le cose
 piccole, poi i lavori lunghi, in fondo le decisioni. Riordinato il 15/09 dopo il giro di
-fine task su quel foglio.
+fine task su quel foglio; il 19/09 il giro sulle pagine dei posti sulla loro foto ha
+trovato sette cose, sei chiuse nello stesso branch, una (la mano del rapper) resta.
 
 1. **Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
    telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra. Il tasto
@@ -64,6 +65,23 @@ fine task su quel foglio.
    nelle sette liste errori per rotta; `artistaId-mancante` è diventato `artista-mancante`
    ed esce in `errore`; `README.md`, `ROADMAP.md` e `dipendenze.md` non dicono più «da
    usare». Il dettaglio sotto a ogni voce, nel giro in fondo.
+17. **La mano del braccio alzato del rapper è un tracciato SVG rotto** (19/09,
+   `creator/nav.js:71`): a ogni Piazza la console segna «attribute d: Expected number» e la
+   mano col microfono non si disegna. Non è della task delle pagine dei posti: va guardato
+   il disegno, non indovinato un numero.
+18. ~~**«I conti di casa» aperti dalla Casa coprono il Menu e «Torna alla mappa»** (19/09).~~
+   **RISOLTO (19/09/2026)** — in `menu-sistema.js` il pannello viene prima della pagina.
+19. ~~**Sul telefono una mossa lanciata dal telefono alzato apre la pagina sotto al
+   telefono** (19/09).~~ **RISOLTO (19/09/2026)** — la pagina mette giù il telefono quando
+   si apre.
+20. ~~**Sul telefono il costo delle mosse nelle righe è tagliato** (19/09).~~ **RISOLTO
+   (19/09/2026)** — il costo sta nel tasto d'oro, per intero.
+21. ~~**«Vai in camera» salta il giorno senza i controlli del «+1»** (19/09).~~ **RISOLTO
+   (19/09/2026)** — passa da `ADF_TIME_SKIP`.
+22. ~~**Da «Stacca la spina» non si torna in cucina senza fare la mossa** (19/09).~~
+   **RISOLTO (19/09/2026)** — «Torna in cucina» accanto al tasto d'oro.
+23. ~~**Il documento delle pagine-azioni dice ancora che Casa, Palestra e Live Club sono
+   finestre** (19/09).~~ **RISOLTO (19/09/2026)** — nota di stato in testa al foglio.
 
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
 
@@ -3643,3 +3661,165 @@ nessuna blocca la partita.
 - **RISOLTO (16/09/2026, stesso branch, prima del push)** — `README.md` di radice, `ROADMAP.md` e la lista delle candidate in
   `dipendenze.md` («_già installata, in uso dal 16/09/2026_», come `pg`). La nota a margine
   sul commit di verifica di `README-API.md` resta: non è di questa task.
+
+## Giro del 19/09/2026 (segnala-problemi, fine task `task/pagine-luoghi-foto`, commit `18141cf`)
+
+Giro sulla task «Casa, Palestra, Live Club e stacca la spina sulla loro foto». Fatti girare
+`npm run prova` (**180 a posto, 0 no**), `node strumenti/audit-regressioni.js` (**366 ok,
+0 falliti**) e `npm run verifica:build` (**33 ok**). Letti per intero `js/game/luoghi-foto.js`
+e `css/luoghi-foto.css`, il blocco nuovo di `stretto.css`, il diff di `hub.js`,
+`menu-sistema.js` e `tempo-controlli.js`, l'elemento `#luogo` in `gioco.html`; e intorno,
+per le interazioni: `ui.js` (`avviaAzioneDiretta`, `mostraScena`, `SCENA_PIENA`),
+`actions.js` (le sei mosse che passano da qui), `interruzioni.js` e `orari.js` che incartano
+le stesse funzioni, `spostamenti.js` (la guardia sul posto), `uscita.js` (USCITE),
+`eventi-v2.js` (`overlayBusy`, il salto del tempo), `trasferte.js` (`schermoLibero`),
+`skip.js`/`agenda.js` (la notte di «Vai in camera»), `modal.js`, `piazza.js`,
+`telefono.js` e `telefono-stretto.js`, `strada-crimine-ui.js` (il carcere a 112 sta sopra).
+Poi il gioco vero con Playwright su `localhost:8000`, a 1366×768 e a 390×844: aperte le
+quattro pagine, fatte «stacca la spina», «cardio» e «open mic» alle 21 con un pezzo fuori,
+la Piazza con la foto sotto, «I conti di casa», «Vai in camera» (giorno 2, ore 08:00,
+energia piena, si resta in cucina), «Torna alla mappa» dal menu, la pagina con la mossa
+già fatta due volte. **Nessun errore in console dalle pagine nuove**, nessuna richiesta
+fallita: le cinque foto si caricano (anche quelle nella cartella col lo spazio nel nome),
+il divano è quello di giorno alle 08:00 e quello di sera alle 21:00.
+
+Le cose che **tengono** e che ho controllato a mano: `#luogo` non sta in USCITE, in
+`overlayBusy` né in `schermoLibero`, e per questa pagina va bene così — è il modello dello
+Studio (`#studio` non c'è nemmeno lui): ESC apre il menu di sistema come nello Studio,
+`overlayAperto()` deve restare falso perché `esegui()` in `ui.js:134` chiude il conto
+dell'azione solo se nessuna finestra è aperta, e gli eventi e gli inviti delle trasferte
+escono sopra alla pagina (modale a 60, gli overlay di Eventi V2 a 999999, il carcere a 112,
+`tras-overlay` a 120). I tre incarti (`renderGioco`, `mostraScena`, `apriPiazza`/
+`chiudiPiazza`) si caricano dopo `ui.js` e `piazza.js` e prima di `interruzioni.js` e
+`orari.js`, quindi la catena è quella giusta: un'interruzione rimanda l'esito e lo
+riconsegna alla pagina; il build non rinomina i nomi (`minifyIdentifiers:false`), quindi
+`window.mostraScena = …` vale anche nel file unico. `tempo.js` incarta
+`avviaAzioneDiretta` prima che la pagina la chiami, quindi la durata della mossa è quella
+giusta (stacca: 3 ore, provato). Il cartello del Live Club prima delle 20 lo ferma già
+`orari.js:382-399` sulla mappa, come prima. Le porte della Casa, il pannello dei conti,
+la Piazza dal Live Club e l'orologio della fascia si aggiornano da soli. Sette cose da
+segnalare, nessuna blocca la partita; le prime tre si vedono, le altre si sistemano con calma.
+
+### «I conti di casa» aperti dalla Casa coprono il Menu e «Torna alla mappa»
+- **dove** — `frontend/js/menu-sistema.js:560-561` (l'elenco HOSTS: `luogo` viene prima di
+  `pannello`), contro `frontend/js/game/tempo-controlli.js:34-46` dove `pannello` viene
+  prima di `luogo`; la porta che apre il pannello è `frontend/js/game/luoghi-foto.js:427-429`.
+- **cosa succede** — la porta «I conti di casa» apre il pannello delle spese fisse (`#pannello`,
+  che sta a 94) sopra alla Casa (che sta a 55). Il menu di sistema cerca in quale pagina montare
+  la barra col Menu e «Torna alla mappa», trova prima la Casa e la monta nella sua fascia — che
+  sta **sotto** al pannello. Risultato: sul pannello delle spese non c'è né il Menu né «Torna
+  alla mappa», resta solo la ✕ in alto a destra (che chiude il pannello e ti rimette in cucina,
+  non sulla mappa, anche se la sua etichetta dice «Torna alla mappa»). L'orologio invece c'è,
+  perché `tempo-controlli.js` guarda le pagine nell'altro ordine. Aprendo lo stesso pannello
+  dallo Shop sulla mappa la barra c'è: il buco è solo da qui.
+- **come si vede** — mappa → Casa → «I conti di casa»: in alto a sinistra niente Menu (provato
+  con Playwright: nel punto dove sta la barra risponde il pannello, non lei).
+- **quanto pesa** — si vede ma si gira intorno: la ✕ chiude e da Casa si torna alla mappa.
+- **RISOLTO (19/09/2026, stesso branch, prima del push)** — in `menu-sistema.js` l'elenco HOSTS mette `pannello` prima di
+  `luogo`, come già fa `tempo-controlli.js`: la barra col Menu e «Torna alla mappa» adesso si
+  monta nella fascia del pannello (provato con Playwright: sotto al dito risponde la nav).
+
+### Sul telefono, una mossa lanciata dal telefono alzato apre la pagina sotto al telefono
+- **dove** — `frontend/css/luoghi-foto.css:16` (la pagina sta a 55) contro
+  `frontend/css/telefono-stretto.css:61` (il telefono alzato sta a 58); chi apre la pagina è
+  l'incarto di `mostraScena` in `frontend/js/game/luoghi-foto.js:394-405`, chiamato dalle
+  righe dell'agenda del telefono (`frontend/js/game/telefono.js:787-794`), che elencano
+  tutte le mosse — «Pesi», «Cardio leggero», «Stacca la spina», «Serata open mic» comprese.
+- **cosa succede** — sotto i 1180 punti il telefono si alza a schermo pieno (58) sopra alla
+  mappa. Se da lì tocchi «Cardio leggero», la mossa parte (energia spesa, ora avanzata) e il
+  suo esito si scrive sulla pagina della Palestra, che si apre a 55: **dietro** al telefono. Tu
+  vedi ancora il telefono e niente che dica cos'è successo, finché non lo metti giù. Prima di
+  questa task l'esito usciva nella scenetta `#scena`, che sta a 80 e passava sopra al
+  telefono. Sul computer non succede: lì il telefono è una colonna della plancia e la pagina
+  la copre. Lo Studio ha lo stesso 55, ma le sue mosse dal telefono non ci sono.
+- **come si vede** — finestra a 390×844, tasto del telefono nella barra, app dell'agenda,
+  «Cardio leggero» (con energia): il telefono resta davanti (provato con Playwright:
+  `#luogo.on` acceso, `.ptel.on` acceso, nel centro dello schermo risponde il telefono).
+- **quanto pesa** — si vede ma si gira intorno: «Metti giù» e la pagina è lì con l'esito.
+- **RISOLTO (19/09/2026, stesso branch, prima del push)** — `apriLuogo()` chiama `telStrettoChiudi()` prima di accendere la
+  pagina: il telefono si mette giù e la pagina è davanti, com'è quando arrivi dalla mappa
+  (provato a 390×844: «Cardio leggero» dal telefono, l'esito in mezzo allo schermo).
+
+### Sul telefono il costo delle mosse nelle righe è tagliato: i 18 € dei Pesi non si leggono
+- **dove** — `frontend/js/game/luoghi-foto.js:281` (Pesi/Cardio) e `:328`, `:331` (palco/
+  piazza): il costo (`lfCosto`) è accodato alla descrizione della riga, dentro allo `<span>`
+  che `css/studio.css:182-183` (`.stchi span`) tiene su una riga sola con i
+  puntini.
+- **cosa succede** — a 390 punti la riga dice «Ferro pesante, poc…» e «Il palco, con i tuoi
+  pezzi.…»: energia e soldi sono dopo i puntini. Il tasto d'oro dice «Fai i pesi» senza costo,
+  la colonna «Oggi» dice quanto hai in cassa ma non quanto se ne va. Quindi sul telefono
+  nessun punto della pagina dice che i Pesi costano **18 €** (e 16 energie): lo scopri dopo,
+  o dalla finestra di conferma se «conferme» è acceso nelle impostazioni. Lo stacca la spina
+  non ha il problema: il suo costo sta nel tasto.
+- **come si vede** — finestra a 390×844, Palestra: le due righe in mezzo.
+- **quanto pesa** — si vede ma si gira intorno (con le conferme accese lo dice la finestra;
+  spente, paghi senza che nessuno te l'abbia scritto).
+- **RISOLTO (19/09/2026, stesso branch, prima del push)** — `lfTasto()` accoda il costo al tasto d'oro («Fai i pesi · 16
+  energie · 18 €», «Sali sul palco · 42 energie»), che non si tronca; nelle righe resta per
+  chi ha lo schermo largo.
+
+### «Vai in camera» salta il giorno senza i controlli del tasto «+1» dell'orologio
+- **dove** — `frontend/js/game/luoghi-foto.js:438` chiama `saltaGiorni(1)` direttamente; il
+  «+1» dell'orologio passa da `ADF_TIME_SKIP` (`frontend/js/game/eventi-v2.js:3062-3070`) e da
+  `blocked()` (`frontend/js/game/tempo-controlli.js:198`).
+- **cosa succede** — il tasto dell'orologio si rifiuta di far passare la notte se il catalogo
+  degli eventi non è ancora pronto (`ADF.ready`), se un salto è già in corso, se c'è un evento
+  alto che aspetta una risposta (`globalHigh`) o se c'è una finestra che blocca. La porta della
+  Casa controlla solo `G.ended` e va: la notte passa lo stesso. Il commento dice «la stessa del
+  tasto Salta avanti, e chiede conferma come lui» — la conferma c'è, i controlli no. L'agenda
+  invece c'è, perché `agenda.js:277-283` incarta `saltaGiorni` per tutti.
+- **come si vede** — solo leggendo il codice: nel giro normale (provato) la notte funziona.
+  Il caso da provare è Casa aperta nei primi secondi di gioco, prima che gli eventi siano
+  caricati.
+- **quanto pesa** — da sistemare con calma: una riga di guardia, la stessa del «+1».
+- **RISOLTO (19/09/2026, stesso branch, prima del push)** — «Dormi» passa da `ADF_TIME_SKIP(1)` (con `saltaGiorni` di ripiego
+  se il ponte non c'è) e se dice di no lo scrive in un toast.
+
+### Da «Stacca la spina» non si torna in cucina se non fai la mossa
+- **dove** — `frontend/js/game/luoghi-foto.js:407-418` (`luogoContinua`) e `:224-254`
+  (`lfStacca`): «Continua» compare solo dopo la mossa.
+- **cosa succede** — dalla Casa entri nello stacca la spina; se cambi idea, o se la mossa è
+  spenta perché l'hai già fatta due volte («Serve TORNARE DOMANI.», provato), la pagina non ha
+  un tasto per tornare in cucina: l'unica uscita è «Torna alla mappa» e poi di nuovo Casa.
+  Lo Studio ha le linguette in basso per spostarsi, questa pagina no.
+- **come si vede** — Casa → «Stacca la spina» → cerca il modo di tornare alle porte.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (19/09/2026, stesso branch, prima del push)** — accanto al tasto d'oro c'è «Torna in cucina» (`stsecondo`,
+  `data-continua`) quando la pagina arriva dalla Casa, anche a mossa spenta; e il motivo
+  «Serve TORNARE DOMANI.» è diventato «Per oggi basta: torna domani.» (la nota a margine 2).
+
+### Il documento delle pagine-azioni dice ancora che Casa, Palestra e Live Club sono finestre
+- **dove** — `documentazione/pagine-azioni/README.md:55-56` (la tabella dei pesi: «finestra:
+  Casa, Palestra, Live Club», «scena: … live, stacca, pesi, cardio»), `:66-73` (dove sta ogni
+  mossa oggi) e `:774-776` («resta scena» per stacca, pesi e cardio).
+- **cosa succede** — il commit ha aggiornato `02-interfaccia-e-telefono.md`,
+  `implementazioni.md` e la roadmap, ma il documento che spiega come si costruiscono queste
+  pagine racconta ancora lo stato di prima: tre finestre e quattro scene che non esistono più.
+  Chi lo legge per fare la prossima pagina parte da una mappa vecchia. La riga 805 («Il turno
+  di lavoro, staccare la spina, la palestra, il cardio» come cose che restano scena) idem.
+- **come si vede** — `grep -n "resta scena\|finestra" documentazione/pagine-azioni/README.md`.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (19/09/2026, stesso branch, prima del push)** — una nota «Stato al 19/09/2026» in testa al foglio dice cosa è
+  cambiato dopo la fotografia del 07/09 e come leggere le tabelle; il foglio resta il
+  progetto com'era scritto, non si riscrive a ogni pagina.
+
+### (non di questa task) La mano del braccio alzato del rapper è un tracciato SVG rotto
+- **dove** — `frontend/js/creator/nav.js:71`: l'ultimo pezzo `C` del tracciato ha due
+  coppie di numeri invece di tre (`C55.6,-364.2 49.7,-365.2 Z`).
+- **cosa succede** — ogni volta che si apre la Piazza (`piazza.js:55`, `ARTIST_BODY()`) la
+  console segna `<path> attribute d: Expected number` e il browser salta quel pezzo di disegno:
+  la mano che tiene il microfono non si disegna. Era così anche prima di questa task; l'ho
+  visto perché la Piazza è nel giro.
+- **come si vede** — Live Club → «Vai in piazza» → la battle, con la console aperta.
+- **quanto pesa** — da sistemare con calma.
+
+Note a margine, scelte e non bug: (1) nello stacca la spina, prima di premere, la riga sotto
+ai numeri dice «hai rivisto gente che non c'entra niente con la musica» al passato, come se
+fosse già successo (`luoghi-foto.js:237`) — sistemata, adesso è al presente; (2) il motivo «Serve TORNARE DOMANI.» sotto al
+tasto spento è il testo di `actions.js:599` letto da `hubPronta`, che sulla mappa stava in
+una card e qui sta in mezzo alla pagina, in maiuscolo; (3) a 1366 il sottotitolo della
+Palestra nella fascia esce tagliato («il fisico che si vede sotto le luc») anche se a destra
+c'è spazio — va guardato, non ho capito da cosa dipende.
+
+L'indice «Cosa resta aperto» in testa al foglio è aggiornato: sei voci chiuse nello stesso
+branch, resta la mano del rapper.
