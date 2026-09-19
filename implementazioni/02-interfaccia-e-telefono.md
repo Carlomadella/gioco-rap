@@ -2118,3 +2118,26 @@ anche lui, e la voce se ne va.
 passare dal peso. L'audit («Le quattro piccole del 20/09») controlla che `consumaPeso`
 passi da `onora`, che `bonusUsato` non si scriva più e che tutte e sette le mosse
 chiamino l'agenda.
+
+**Il giro di fine task (20/09)** ha trovato tre cose, chiuse nello stesso branch:
+
+- **il bonus si riprendeva nello stesso giorno** — tolta la voce, la card tornava su
+  «segna», la risegnavi e il peso tornava intero. Adesso `G.agenda.onorati` tiene le
+  chiavi `anno:settimana:giorno:tipo:id` di quello che hai onorato oggi (`onora` le
+  scrive, `pulisci` butta quelle di ieri): `vociDaConsumare` torna vuoto se la settimana è
+  già onorata, quindi il peso è 1, e `passata()` dice «passato», quindi la card non si
+  riaccende. I salvataggi di prima non hanno `onorati` e partono da vuoto;
+- **la voce restava se l'evento non passava dal codice del peso** — il colpo si onorava
+  solo se riusciva (adesso il peso si legge prima del dado: ci sei andato anche se va
+  male), e alla Sala solo con la sessione a pagamento (adesso farsi sentire un beat chiama
+  `onora("sala", "oggi")`: chiude il «Producer session» di stasera ma non la «Sessione
+  lunga» della settimana, che vuole la sessione vera). Il «Piccolo party» di mattina non
+  era un problema: `orari.js` apre «Stacca la spina» solo dalle 00:00 alle 04:00;
+- **`npm run prova` era rosso** — il test «parte da zero» chiedeva le skill a 0. E la
+  verifica che avevo dato per verde era `npm run verifica | tail`: l'exit code letto era
+  quello di `tail`. Rifatta senza il tubo, tutta verde.
+
+Provato fuori dal browser (`vm`): segna → gioca → 1,3 e la voce via → risegna → 1; il
+beat alla Sala chiude l'evento di oggi e lascia quello della settimana col suo 1,2; il
+giorno dopo gli onorati spariscono; l'open mic giocato di lunedì non tocca quello
+segnato per sabato.

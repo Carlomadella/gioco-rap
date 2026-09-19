@@ -342,14 +342,15 @@ console.log("\nla nuova carriera parte da zero");
   }catch(e){ errore = e; }
 
   controlla(
-    "soldi, fan, hype, skill e stream iniziano tutti da zero",
+    "soldi, fan, hype e stream iniziano da zero, le quattro skill da 1 (ALE, «tutti i parametri a 1»)",
     !errore &&
       stato.money === 0 &&
       stato.fans === 0 &&
       stato.hype === 0 &&
       stato.streamsPrev === 0 &&
       Array.isArray(stato.songs) && stato.songs.length === 0 &&
-      Object.values(stato.skills).every(v => v === 0),
+      Object.keys(stato.skills).length === 4 &&
+      Object.values(stato.skills).every(v => v === 1),
     errore ? [errore.message] : [
       "money=" + stato.money,
       "fans=" + stato.fans,

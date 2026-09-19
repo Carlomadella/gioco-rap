@@ -2156,15 +2156,24 @@ test("l'app Agenda del telefono mostra quello che ti sei segnato",
 console.log("\nLe quattro piccole del 20/09 — agenda, prezzi dei beat, parametri a 1, licenziarsi");
 const beatsJs = leggi("js/game/beats.js");
 test("l'evento fatto esce dall'agenda: consumaPeso() toglie la voce di oggi invece di segnarla",
-  agenda.includes("function onora(id)") &&
+  agenda.includes("function onora(id, tipo)") &&
   /function consumaPeso\(id\)\{[\s\S]{0,300}onora\(id\)/.test(agenda) &&
   !agenda.includes("v.bonusUsato = true") &&
-  agenda.includes("pesoDiOggi, consumaPeso, onora,"));
+  agenda.includes("pesoDiOggi, consumaPeso, onora, onorato,"));
+test("un appuntamento onorato resta scritto: risegnarlo non rende, e la card lo dà per passato",
+  agenda.includes("G.agenda.onorati = []") &&
+  agenda.includes("const chiaveOnorata = (id, tipo) =>") &&
+  /function vociDaConsumare\(id\)\{\s*if\(onorato\(id, "settimana"\)\) return \[\];/.test(agenda) &&
+  /passata\(e, tipo\)\{\s*if\(onorato\(e\.id, tipo\)\) return true;/.test(agenda) &&
+  agenda.includes('a.onorati = a.onorati.filter(k => k.startsWith(oggi))'));
 test("anche il «Piccolo party» passa dall'agenda, come gli altri tre eventi di oggi",
   /id:"stacca"[\s\S]{0,700}AGENDA\.consumaPeso\("stacca"\)/.test(actions) &&
   actions.includes('AGENDA.consumaPeso("promo")') && actions.includes('AGENDA.consumaPeso("live")') &&
   piazza.includes('AGENDA.consumaPeso("free")') && posto.includes('AGENDA.consumaPeso("sala")') &&
   crime.includes('AGENDA.consumaPeso("colpo")'));
+test("al colpo ci sei andato anche se va male, e un beat alla Sala onora il «Producer session» di oggi",
+  /const peso = \(window\.AGENDA[\s\S]{0,120}consumaPeso\("colpo"\) : 1;\s*if\(successo\)\{/.test(crime) &&
+  /tipo === "beat"\)\{[\s\S]{0,400}AGENDA\.onora\("sala", "oggi"\)/.test(posto));
 test("i prezzi dei beat vanno per fama del beatmaker: tre fasce, 100–250, 300–1000, 1000–2000",
   beatsJs.includes("const BEAT_FASCE = [") &&
   beatsJs.includes('da:0,  min:100,  max:250') &&

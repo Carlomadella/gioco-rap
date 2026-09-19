@@ -201,13 +201,15 @@ function stradaTenta(colpoId, approccioId){
   G.energy -= colpo.energia;
   const successo = Math.random() < stradaChance(colpo, approccio);
   const rumore = clamp((6 + colpo.difficolta * 10) * approccio.rumore, 2, 30);
+  /* Da smistare, punto 6: "Il giro grosso" segnato in agenda per oggi vale
+     il suo peso — è il più rischioso dei sei eventi della settimana, e
+     deve rendere in proporzione quando capita davvero quel giorno lì.
+     Si legge prima del dado: al colpo ci sei andato anche se va male, e
+     l'appuntamento esce dall'agenda lo stesso (giro del 20/09). */
+  const peso = (window.AGENDA && typeof AGENDA.consumaPeso === "function")
+    ? AGENDA.consumaPeso("colpo") : 1;
 
   if(successo){
-    /* Da smistare, punto 6: "Il giro grosso" segnato in agenda per oggi vale
-       il suo peso — è il più rischioso dei sei eventi della settimana, e
-       deve rendere in proporzione quando capita davvero quel giorno lì. */
-    const peso = (window.AGENDA && typeof AGENDA.consumaPeso === "function")
-      ? AGENDA.consumaPeso("colpo") : 1;
     const grezzo = rnd(colpo.min, colpo.max) * approccio.guadagno * peso;
     const pulito = Math.round(grezzo * .4), sporco = Math.round(grezzo * .6);
     G.money += pulito; s.sporchi += sporco;

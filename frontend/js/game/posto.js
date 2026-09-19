@@ -835,6 +835,11 @@ function azionePosto(tipo, id){
 
   if(tipo === "beat"){
     if(p.rel < 1 || beatSulTavolo(p)) return;
+    /* «Producer session: passa dalla Sala, stasera c'è chi fa beat» — se te
+       l'eri segnato, farti sentire un beat lo onora (solo quello di oggi: la
+       «Sessione lunga» della settimana vuole la sessione vera, sotto) */
+    if(window.AGENDA && typeof AGENDA.onora === "function" && AGENDA.onora("sala", "oggi") &&
+      typeof save === "function") save();
     const presi = G.market.map(b => b.n).concat(G.beats.map(b => b.n));
     const q = rnd(30, 50) + p.fama * 0.3 + p.rel * 7 + G.skills.rete * 0.3;
     const b = creaBeat(p.gen || mioGenere(), q, presi, p.fama);
