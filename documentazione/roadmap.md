@@ -120,6 +120,11 @@ il feed che si scorre.
   Piazza ha la sua sotto (`frontend/js/game/luoghi-foto.js`; «Le pagine dei posti sulla
   loro foto» in `implementazioni/02-interfaccia-e-telefono.md`). Resta la serata del club
   giocata a momenti, come nel riferimento, e i posti senza foto (Sala, Shop, la Strada).
+- **FATTO (19/09/2026)** — il primo minuto di chi prova il gioco: l'avvio rapido non è più
+  nove secondi di nero ma la schermata «Preparo il tuo artista», con le fasi vere del
+  camerino MakeHuman e tre tasti se si rompe (`frontend/js/preparo.js`). I «due minuti»
+  segnalati il 13/09 erano il browser senza GPU delle prove: su Chrome vero il personaggio
+  è pronto in 9 secondi.
 
 ### C · L'economia della carriera _(cominciata)_
 

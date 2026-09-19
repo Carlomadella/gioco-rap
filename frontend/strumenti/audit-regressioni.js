@@ -1971,6 +1971,57 @@ test("la pagina del 404 non sta piu' qui: la fa il middleware del backend",
       R.PAGINE[404]({ dove: "/api/x" }).indexOf("/api/x") > 0;
   })());
 
+/* «L'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore»
+   (19/09/2026): la schermata «Preparo il tuo artista» sta sopra al creator
+   nascosto e mostra le fasi del camerino MakeHuman — che arrivano per una
+   catena di quattro anelli: il motore dei modifier scrive al camerino, il
+   camerino al creator, il creator al gioco, il gioco alla schermata. Se un
+   anello si stacca la schermata resta ferma su «Apro il camerino» e nessuno
+   se ne accorge: queste prove tengono insieme gli anelli. E la rete di
+   sicurezza: se il camerino non parla entro venti secondi la schermata lo
+   dice, con i tre tasti, invece di aspettare i due minuti del limite. */
+console.log("\nL'avvio rapido — la schermata «Preparo il tuo artista»");
+const preparo = leggi("js/preparo.js");
+const preparoCss = leggi("css/preparo.css");
+const creatorHtml = leggi("media/creator-rpg-v24/creator.html");
+const camerino = leggi("media/makehuman-camerino-v1/runtime.js");
+const motore = leggi("media/makehuman-camerino-v1/modifier-engine.html");
+test("la schermata sta nell'HTML del gioco, con il suo file e il suo CSS, prima di gioco-ingresso.js",
+  index.includes('id="preparo"') && index.includes('id="preparo-fase"') && index.includes('id="preparo-tasti"') &&
+  index.includes("css/preparo.css") &&
+  index.indexOf('<script src="js/preparo.js') > 0 &&
+  index.indexOf('<script src="js/preparo.js') < index.indexOf('<script src="js/gioco-ingresso.js'));
+test("sta sopra al creator nascosto (999999), che è proprio quello che copre",
+  (() => {
+    const m = preparoCss.replace(/\s+/g, "").match(/#preparo\{[^}]*z-index:(\d+)/);
+    const b = leggi("js/creator/rpg-v24-bridge.js").match(/z-index:(\d+)/);
+    return !!m && !!b && Number(m[1]) > Number(b[1]);
+  })());
+test("la catena delle fasi: motore → camerino → creator → gioco → schermata",
+  motore.includes("type:'adf-mh-engine-log'") &&
+  camerino.includes("msg.type==='adf-mh-engine-log'") &&
+  camerino.includes("emitToRoom('adf-makehuman-progress',{message:statusEl.textContent})") &&
+  creatorHtml.includes("msg.type==='adf-makehuman-progress'") &&
+  creatorHtml.includes("type:'adf-rpg-v24-quick-makehuman-progress'") &&
+  ingresso.includes('msg.type === "adf-rpg-v24-quick-makehuman-progress"') &&
+  ingresso.includes("ADF_PREPARO.fase(msg.message)"));
+test("l'avvio rapido apre la schermata, e la chiude quando parte la cinematic",
+  /function avvioRapido\(\)[\s\S]*?ADF_PREPARO\.apri\(\)[\s\S]*?ADF_RPG_V24\.open\(\)/.test(ingresso) &&
+  ingresso.includes('ADF_PREPARO.fase("pronto per entrare"); ADF_PREPARO.chiudi();'));
+test("quando la catena si rompe non resta il nero: tre strade, e il camerino muto scade a venti secondi",
+  ingresso.includes("function preparoFallito(perche)") &&
+  /riprova\(\)\{[^}]*\?nuova=rapido/.test(ingresso) && ingresso.includes("aMano(){") && ingresso.includes("menu(){") &&
+  /const silenzio = setTimeout\(\s*\(\) => fallisci\([^)]*\),\s*20000\s*\)/.test(ingresso) &&
+  ingresso.includes("clearTimeout(silenzio);") &&
+  ingresso.includes("fallito(\"Il creator non ha risposto.\")") &&
+  preparo.includes('data-t="riprova"') && preparo.includes('data-t="aMano"') && preparo.includes('data-t="menu"'));
+test("la barra è a tacche, una per fase, e le fasi non tornano indietro",
+  /const FASI = \[[\s\S]*?\];/.test(preparo) && preparo.includes("if(i < tacca) return;") &&
+  preparoCss.includes("#preparo .barra i.in-corso"));
+test("la nota «la prima volta ci mette un po'» è CSS puro, e non esce nello stato d'errore",
+  preparoCss.includes("animation:preparoPazienza") && preparoCss.includes("#preparo.rotto .pazienza{display:none}") &&
+  index.includes('class="pazienza"'));
+
 console.log("\nPunto 27 — la landing, l'accesso e il gioco sono tre pagine");
 test("le tre pagine stanno tutte in pagine/",
   ["landing","accesso","gioco"].every(n => fs.existsSync(path.join(ROOT, "pagine", n + ".html"))));
@@ -2322,7 +2373,7 @@ test("sul telefono le tre colonne diventano una pila e le porte della Casa vanno
   /@media \(max-width:900px\)\{[\s\S]*?\.lfwrap\{grid-template-columns:minmax\(0,1fr\)/.test(leggi("css/stretto.css")) &&
   leggi("css/stretto.css").includes(".lfporta,.lfp-tavolo,.lfp-camera,.lfp-divano,.lfp-conti{position:static"));
 
-for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/transizioni-video.js","js/game/luoghi-foto.js"]){
+for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/transizioni-video.js","js/game/luoghi-foto.js","js/preparo.js","js/gioco-ingresso.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }

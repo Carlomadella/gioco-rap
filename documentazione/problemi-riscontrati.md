@@ -19,7 +19,10 @@ trovato sette cose, sei chiuse nello stesso branch, una (la mano del rapper) res
 3. ~~**Sul telefono i colori del «passaggio del mouse» restano accesi dopo il tocco** (08/09):
    il giro unico su tutti i CSS.~~ **RISOLTO (08/09/2026, riconosciuto il 15/09)** — era
    chiuso lo stesso giorno e la riga sotto alla voce mancava: vedi il giro del 15/09 in fondo.
-4. **L'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore** (13/09).
+4. ~~**L'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore** (13/09).~~
+   **RISOLTO (19/09/2026)** — la schermata «Preparo il tuo artista» con le fasi vere del
+   camerino; e i due minuti erano il browser senza GPU delle prove: su Chrome vero sono
+   9 secondi. Il dettaglio sotto alla voce, nel giro del 13/09.
 5. ~~**`jose` e `zod` stanno fra le `dependencies`** (13/09), aperta per decisione.~~
    **RISOLTO (16/09/2026)** — usate tutte e due: `jose` in `accessi.js`, `zod` in
    `forme.js` per i corpi delle rotte. Vedi «Le due dipendenze del backend, usate» in
@@ -1466,6 +1469,16 @@ resta com'era: e' di prima di questa task e non e' stato toccato qui.
 - **quanto pesa** — non blocca, ma e' il primo minuto di gioco di chi prova il gioco per la
   prima volta. Da guardare: o si mostra che sta caricando, o l'avvio rapido torna a non
   aspettare MakeHuman.
+- **RISOLTO (19/09/2026, branch `task/avvio-rapido`)** — la prima strada: la schermata
+  «Preparo il tuo artista» (`js/preparo.js`, `css/preparo.css`, `#preparo` in
+  `gioco.html`) sta sopra al creator nascosto e mostra le fasi vere del camerino
+  (rilanciate lungo la catena motore → camerino → creator → gioco), il tempo che passa, e
+  se si rompe tre tasti. Ma prima l'ho rimisurato fase per fase: **i 115 secondi erano il
+  Chromium senza GPU di Playwright**, che disegna il 3D a software (45–70 s in un blocco
+  solo dentro a `WebGLRenderer.render` e alla foto); **su Chrome vero, con la scheda video,
+  il personaggio è pronto in 8,6 secondi**, poi 17 s di cinematic. Il giocatore aspetta
+  nove secondi, non due minuti — ed erano nove secondi di nero. «L'avvio rapido: la
+  schermata «Preparo il tuo artista»» in `implementazioni/02-interfaccia-e-telefono.md`.
 
 ### La prova dell'avvio rapido non e' fragile, e' pesante: non sta in un gate a ogni push
 

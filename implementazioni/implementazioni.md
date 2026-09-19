@@ -53,7 +53,8 @@ Cabina; riguardato lo stesso giorno dopo «Il telefono quando lo schermo è un t
 cui sono uscite due voci nuove, il 16/09 dopo il primo video delle transizioni (la voce
 resta, a metà), e il 19/09 dopo le pagine di Casa, Palestra, Live Club e stacca la spina
 sulla loro foto (chiusa la voce delle foto; la serata del club giocata a momenti è una voce
-nuova, fra i lavori lunghi). È l'ordine in cui si prendono i punti aperti di questo
+nuova, fra i lavori lunghi) e dopo la schermata dell'avvio rapido. È l'ordine in cui si
+prendono i punti aperti di questo
 foglio **e** quelli ancora aperti in
 [`problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md): prima quello che
 tocca il gioco sul telefono (è lì che esce), poi quello che pesa nel pacchetto o blocca una
@@ -88,9 +89,11 @@ da quale lista viene.
    il primo, lo Studio» in `02-interfaccia-e-telefono.md`); gli altri quattro del punto
    (Sala, Casa, stacca la spina, registra) si agganciano allo stesso modo, e i sette video
    che nessun punto chiede restano peso morto nel pacchetto: o si collegano o escono.
-6. **L'avvio rapido ci mette due minuti e non lo dice** — da problemi-riscontrati. È il
-   primo minuto di chi prova il gioco: o una barra di caricamento, o l'avvio rapido torna
-   a non aspettare MakeHuman.
+6. ~~**L'avvio rapido ci mette due minuti e non lo dice**~~ **FATTO (19/09/2026)** — la
+   schermata «Preparo il tuo artista» sta sopra al creator nascosto con le fasi vere del
+   camerino, il tempo che passa e tre tasti se si rompe; e i due minuti erano il browser
+   senza GPU delle prove — su Chrome vero sono 9 secondi più la cinematic. «L'avvio
+   rapido: la schermata «Preparo il tuo artista»» in `02-interfaccia-e-telefono.md`.
 7. ~~**`jose` va usata, e `zod` va deciso**~~ **FATTO (16/09/2026)** — `accessi.js`
    verifica i token con `jose`; `zod` è deciso: si usa, e la forma dei corpi delle 14 rotte
    sta in `backend/forme.js`. «Le due dipendenze del backend, usate» in

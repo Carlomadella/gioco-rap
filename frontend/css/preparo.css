@@ -1,0 +1,65 @@
+/* PREPARO IL TUO ARTISTA — la schermata dell'avvio rapido (js/preparo.js).
+
+   Stessa famiglia di #avvio in servizio.css — il marchio, il titolo, una
+   barra — perché per chi ha appena premuto «Avvio rapido» è la stessa attesa
+   che continua. Due differenze volute: sta SOPRA al creator (999999, il
+   rettangolo nero che nascondeva tutto), e la barra è a tacche, una per
+   fase della catena, perché quelle fasi sono vere e si contano; una barra che
+   scorre a vuoto per due minuti direbbe solo «aspetta» e non «a che punto». */
+#preparo{position:fixed;inset:0;z-index:1000000;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:18px;padding:24px;
+  background:radial-gradient(120% 80% at 50% 0%,#161226,#08080B 68%);
+  color:var(--text);text-align:center;
+  transition:opacity .45s ease,visibility .45s ease}
+#preparo[hidden]{display:none}
+#preparo.via{opacity:0;visibility:hidden;pointer-events:none}
+
+#preparo .marchio{width:64px;height:64px;border-radius:20px;
+  background:linear-gradient(135deg,var(--c1,#FF5A36),var(--violet));
+  display:grid;place-items:center;box-shadow:0 18px 50px rgba(0,0,0,.55)}
+#preparo .marchio svg{width:38px;height:38px;display:block}
+#preparo h1{margin:0;font-family:var(--disp);font-size:clamp(24px,4.2vw,40px);
+  letter-spacing:-.02em}
+#preparo h1 em{font-style:normal;color:var(--acid)}
+
+/* la fase: la riga grossa dice cosa sta facendo, quella sotto il perché ci
+   mette tanto, il tempo a destra conta da solo */
+#preparo .fase{margin:0;font-size:17px;font-weight:700;color:var(--text);min-height:1.4em}
+#preparo .sotto{margin:0;max-width:40ch;min-height:1.5em;color:var(--soft);font-size:14px;line-height:1.5}
+#preparo .tempo{font-family:var(--cond);font-size:13px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--faint);font-variant-numeric:tabular-nums}
+
+/* le tacche: una per fase, quella in corso pulsa */
+#preparo .barra{display:flex;gap:6px;width:min(300px,72vw)}
+#preparo .barra i{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.1)}
+#preparo .barra i.fatta{background:var(--acid)}
+#preparo .barra i.in-corso{background:linear-gradient(90deg,rgba(255,197,61,.35),var(--acid),rgba(255,197,61,.35));
+  background-size:200% 100%;animation:preparoPulsa 1.3s ease-in-out infinite}
+@keyframes preparoPulsa{0%{background-position:100% 0}100%{background-position:-100% 0}}
+
+/* la nota che esce da sola dopo un po', senza JS: il primo avvio è lungo e
+   va detto prima che uno pensi che si è piantato */
+#preparo .pazienza{max-width:44ch;margin:0;font-size:13.5px;line-height:1.5;color:var(--soft);
+  opacity:0;animation:preparoPazienza .6s ease 25s forwards}
+#preparo .pazienza b{color:var(--text)}
+@keyframes preparoPazienza{to{opacity:1}}
+#preparo.rotto .pazienza{display:none}
+
+/* lo stato d'errore: il titolo cambia colore, e compaiono i tasti */
+#preparo.rotto .fase{color:var(--hot)}
+#preparo.rotto .barra i.in-corso{animation:none;background:var(--hot)}
+#preparo .tasti{display:flex;flex-wrap:wrap;justify-content:center;gap:9px}
+#preparo .tasti:empty{display:none}
+#preparo .tasti button{padding:12px 18px;border-radius:12px;font-family:var(--cond);
+  font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);
+  cursor:pointer;transition:background .15s,transform .12s}
+@media (hover:hover){#preparo .tasti button:hover{background:rgba(255,255,255,.1)}}
+#preparo .tasti button:active{transform:translateY(1px)}
+#preparo .tasti button.primo{border-color:transparent;color:#1a1206;
+  background:linear-gradient(180deg,#FFD980,#E0A32E)}
+
+@media (prefers-reduced-motion:reduce){
+  #preparo .barra i.in-corso{animation:none;background:var(--acid);opacity:.6}
+  #preparo .pazienza{animation-duration:.01s}
+}

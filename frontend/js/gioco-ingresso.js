@@ -87,7 +87,7 @@
     return true;
   }
 
-  function quandoCreatorPronto(frameAtteso, callback, tentativo){
+  function quandoCreatorPronto(frameAtteso, callback, tentativo, fallito){
     tentativo = tentativo || 0;
 
     /* Il bridge distrugge l'iframe a ogni chiusura. Un retry nato per una
@@ -107,11 +107,12 @@
 
     if(tentativo >= 120){
       console.error("[ADF] Creator RPG: caricamento non completato.");
+      if(typeof fallito === "function") fallito("Il creator non ha risposto.");
       return;
     }
 
     setTimeout(
-      () => quandoCreatorPronto(frameAtteso, callback, tentativo + 1),
+      () => quandoCreatorPronto(frameAtteso, callback, tentativo + 1, fallito),
       50
     );
   }
@@ -180,6 +181,7 @@
     const cleanup = () => {
       window.removeEventListener("message", onMessage);
       clearTimeout(timeout);
+      clearTimeout(silenzio);
     };
 
     const fallisci = message => {
@@ -195,6 +197,7 @@
         "[ADF] Avvio rapido MakeHuman:",
         message || "generazione personaggio fallita."
       );
+      preparoFallito(message || "Il personaggio non è arrivato.");
     };
 
     const onMessage = e => {
@@ -203,6 +206,14 @@
 
       if(msg.type === "adf-rpg-v24-quick-makehuman-error"){
         fallisci(msg.message || "errore MakeHuman.");
+        return;
+      }
+
+      /* le fasi del camerino, rilanciate dal creator: la schermata
+         «Preparo il tuo artista» le mette in fila */
+      if(msg.type === "adf-rpg-v24-quick-makehuman-progress"){
+        clearTimeout(silenzio);
+        if(window.ADF_PREPARO) ADF_PREPARO.fase(msg.message);
         return;
       }
 
@@ -220,18 +231,30 @@
         console.error(
           "[ADF] Avvio rapido: impossibile completare identità/RPG nel creator."
         );
+        preparoFallito("Il creator non ha completato il profilo.");
         return;
       }
 
       /* La cinematic è già partita prima che il frame torni visibile. */
+      if(window.ADF_PREPARO){ ADF_PREPARO.fase("pronto per entrare"); ADF_PREPARO.chiudi(); }
       frame.style.visibility = "";
     };
 
     window.addEventListener("message", onMessage);
 
     const timeout = setTimeout(
-      () => fallisci("timeout generazione preset MakeHuman."),
+      () => fallisci("Il camerino non ha finito in due minuti."),
       120000
+    );
+    /* Il camerino parla entro un secondo dall'apertura («1/6 — Carico body»):
+       se in venti secondi non ha detto niente non si è caricato (runtime.js
+       che non arriva, un errore prima della prima riga), e aspettare i due
+       minuti del limite di sopra è tenere fermo qualcuno per niente. Dopo la
+       prima voce il limite torna quello: su una macchina senza GPU la
+       ricostruzione del personaggio è un blocco solo, muto, da un minuto. */
+    const silenzio = setTimeout(
+      () => fallisci("Il camerino non ha risposto."),
+      20000
     );
 
     try{
@@ -582,6 +605,27 @@
     return "";
   };
 
+  /* La schermata «Preparo il tuo artista» (js/preparo.js) sta sopra al
+     creator nascosto per tutta l'attesa. Quando la catena si rompe non si
+     resta davanti al nero: riprova (la stessa pagina, da capo), fallo a mano
+     (il creator normale, che sotto c'è già), o il menu. */
+  function preparoFallito(perche){
+    if(!window.ADF_PREPARO) return;
+    ADF_PREPARO.errore(perche, {
+      riprova(){ location.replace(location.pathname + "?nuova=rapido"); },
+      aMano(){
+        ADF_PREPARO.chiudi();
+        const f = frameCreator();
+        if(f) f.style.visibility = "";
+      },
+      menu(){
+        annullaNuovoSlot();
+        if(typeof window.vaiA === "function") vaiA("landing");
+        else location.replace("landing.html");
+      }
+    });
+  }
+
   function avvioRapido(){
     audioPregame();
 
@@ -594,10 +638,13 @@
       console.error(
         "[ADF] Avvio rapido: creator RPG non disponibile."
       );
+      preparoFallito("Il creator non è disponibile.");
       return;
     }
 
     const rapido = datiRapidi();
+
+    if(window.ADF_PREPARO) ADF_PREPARO.apri();
 
     window.ADF_RPG_V24.open();
 
@@ -611,7 +658,7 @@
          Nome/città/RPG/cinematic vengono completati solo dopo che il
          preset e la propic sono pronti. */
       richiediMakeHumanRapido(f, rapido);
-    });
+    }, 0, preparoFallito);
   }
 
   /* ------------------------------------------------------- */

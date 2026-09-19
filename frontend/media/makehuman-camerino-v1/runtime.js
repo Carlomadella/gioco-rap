@@ -810,6 +810,9 @@ THREE.Cache.enabled = true;
 function setStatus(lines, cls='') {
   statusEl.className = 'status ' + cls;
   statusEl.textContent = Array.isArray(lines) ? lines.join('\n') : String(lines);
+  /* la stessa riga esce anche dal camerino: durante l'avvio rapido il gioco
+     la mostra al posto del rettangolo nero (creator.html la rilancia) */
+  emitToRoom('adf-makehuman-progress',{message:statusEl.textContent});
 }
 
 async function fetchJson(url, label='JSON', timeoutMs=60000) {
@@ -2120,6 +2123,13 @@ async function waitForNativeRebuildSettled() {
 function handleNativeEngineMessage(e) {
   if(!nativeModifierFrame || e.source!==nativeModifierFrame.contentWindow) return;
   const msg=e.data||{};
+
+  /* il log del motore («Carico targets.bin (~145 MB)…», «PRONTO: …»): è la
+     parte lunga dell'avvio, e chi aspetta deve poterla vedere */
+  if(msg.type==='adf-mh-engine-log') {
+    emitToRoom('adf-makehuman-progress',{message:String(msg.message||'')});
+    return;
+  }
 
   if(msg.type==='adf-mh-engine-error') {
     const err=new Error(msg.message||'Modifier engine MakeHuman non avviato');
@@ -4897,6 +4907,7 @@ function bindEditorShell() {
           /* adfMhApplyPreset() ora termina soltanto dopo il rebuild Three.js
              effettivamente completato: makePreviewImage() fotografa quindi
              lo stesso preset che si vede nel camerino. */
+          emitToRoom('adf-makehuman-progress',{message:'Scatto la foto'});
           emitToRoom('adf-makehuman-quick-preset-result',{
             presetId:preset.id,
             state:{
@@ -5643,6 +5654,7 @@ async function adfMhApplyPreset(presetId){
       Il guardaroba usa la sua API esistente: stessa logica degli
       slider/select manuali, senza ripristinare l'intero personaggio.
     */
+    emitToRoom('adf-makehuman-progress',{message:'Vesto il personaggio'});
     applyWardrobeSelections(state.slots||{},{notify:false});
 
     if(
@@ -5658,11 +5670,13 @@ async function adfMhApplyPreset(presetId){
       Un solo set-many al motore MakeHuman.
       È l'unica operazione morfologica del preset.
     */
+    emitToRoom('adf-makehuman-progress',{message:'Modello il corpo'});
     await requestNativeModifiers(state.modifiers);
 
     /* requestNativeModifiers() risolve quando arrivano i nuovi vertici, ma
        il renderer li applica tramite un rebuild schedulato al frame seguente.
        Aspettiamo quel rebuild prima di considerare il preset applicato. */
+    emitToRoom('adf-makehuman-progress',{message:'Ricostruisco la scena'});
     await waitForNativeRebuildSettled();
 
     if(typeof syncGenderQuick==='function') syncGenderQuick();
