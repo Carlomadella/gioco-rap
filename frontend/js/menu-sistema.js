@@ -556,9 +556,12 @@
     /* nello Studio usiamo tutta la card testata, non la flex-line:
        così non spostiamo più avatar/nome come faceva la V6 */
     {id:"studio",  root:"#studio.on",        head:".sthead"},
+    /* il pannello (94) può stare sopra alla pagina di un posto (55): «I conti
+       di casa» si aprono dalla cucina. Prima il pannello, se no la barra
+       finisce nella fascia coperta. */
+    {id:"pannello",root:"#pannello.on",      head:".pnhead"},
     /* le pagine degli altri posti sulla loro foto: stessa fascia dello Studio */
     {id:"luogo",   root:"#luogo.on",         head:".lfhead"},
-    {id:"pannello",root:"#pannello.on",      head:".pnhead"},
     {id:"hub",     root:"#s-hub.screen.on",  head:".pbarra"}
   ];
 

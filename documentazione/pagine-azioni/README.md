@@ -21,6 +21,20 @@ Questo è quel README. Tre parti:
 In fondo c'è la **[tabella di tutto](#la-tabella-di-tutto)** e
 **[l'ordine in cui le farei](#lordine-in-cui-le-farei)**.
 
+> **Stato al 19/09/2026.** Questo foglio fotografa il gioco com'era il 07/09, e le tabelle
+> qui sotto («dove si usa oggi», «dove sta ogni mossa oggi», la tabella di tutto) vanno
+> lette con due cose fatte dopo: l'08/09 lo Studio ha avuto dentro gli elementi delle
+> foto (`studio-elementi.js`), e il **19/09** Casa, Palestra e Live Club non sono più
+> finestre e stacca la spina, pesi, cardio e la serata open mic non sono più scene: sono
+> **pagine** sulla loro foto (`frontend/js/game/luoghi-foto.js`, «Le pagine dei posti sulla
+> loro foto» in `implementazioni/02-interfaccia-e-telefono.md`), e la Piazza ha la foto
+> sotto. La scelta di «lasciare scena» stacca, pesi e cardio è stata superata dal punto
+> di Carletto sulle foto: dentro non c'è comunque niente da decidere in più — la pagina
+> dello stacca la spina è una scena col titolone, e la palestra mostra la serie che prima
+> non si vedeva. Il registro unico (§1) e le sette liste restano come descritti: la
+> pagina nuova si è iscritta a mano in due (`menu-sistema.js`, `tempo-controlli.js`) come
+> lo Studio.
+
 ---
 
 # PARTE 1 — L'analisi

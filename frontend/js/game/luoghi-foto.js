@@ -93,6 +93,10 @@ function apriLuogo(id, opz){
   /* al Live Club la riga accesa è il palco se hai un pezzo fuori; se no la
      piazza, che è l'unica cosa che puoi fare davvero */
   if(id === "live") LUOGO.scelta = hubPronta("live").ok ? "live" : "free";
+  /* sotto i 1180 il telefono alzato sta a 58, la pagina a 55: una mossa
+     partita dall'agenda del telefono aprirebbe la pagina dietro. Il telefono
+     si mette giù (telefono-stretto.js), com'è quando arrivi dalla mappa. */
+  if(typeof telStrettoChiudi === "function") telStrettoChiudi();
   $("luogo").classList.add("on");
   renderLuogo();
 }
@@ -168,16 +172,23 @@ function lfCosto(id){
    anche l'orario del posto (`GAME_HOURS`, orari.js): il club apre alle otto
    di sera, e «Apre alle 20:00» scritto sotto al tasto vale più della finestra
    che altrimenti esce dopo averlo premuto. */
-function lfTasto(id, testo, icona){
+function lfTasto(id, testo, icona, secondo){
   let st = hubPronta(id);
   if(st.ok && typeof GAME_HOURS !== "undefined" && GAME_HOURS.actionStatus){
     const ore = GAME_HOURS.actionStatus(id);
     if(ore && !ore.open) st = {ok:false, perche:ore.label || "Adesso è chiuso"};
   }
+  /* «Serve TORNARE DOMANI» è il testo di actions.js pensato per una card
+     della mappa: in mezzo a una pagina si dice in italiano */
+  const perche = /TORNARE DOMANI/.test(st.perche) ? "Per oggi basta: torna domani" : st.perche;
+  /* il costo sta nel tasto, per intero: nelle righe di scelta la descrizione
+     sul telefono si taglia coi puntini, e i 18 € dei pesi non si leggevano */
+  const costo = lfCosto(id);
   return '<div class="stazioni">' +
     '<button type="button" class="stprimo" data-vai="' + id + '"' + (st.ok ? "" : " disabled") + '>' +
-      (icona ? lfIco(icona) : "") + lfEsc(testo) + '</button></div>' +
-    (st.ok ? "" : '<p class="stperche">' + lfEsc(st.perche) + '.</p>');
+      (icona ? lfIco(icona) : "") + lfEsc(testo + (costo ? " · " + costo : "")) + '</button>' +
+    (secondo || "") + '</div>' +
+    (st.ok ? "" : '<p class="stperche">' + lfEsc(perche) + '.</p>');
 }
 /* L'esito di una mossa: quello che ha detto, i numeri, e «Continua». */
 function lfEsito(){
@@ -234,7 +245,7 @@ function lfStacca(){
   } else {
     ben = n === 0 ? "+10–14" : n === 1 ? "+3–5" : "—";
     rete = n === 0 ? "+0,4" : "—";
-    nota = n === 0 ? "Una sera senza pensare a niente: hai rivisto gente che non c’entra niente con la musica."
+    nota = n === 0 ? "Una sera senza pensare a niente: rivedi gente che non c’entra niente con la musica."
       : n === 1 ? "La seconda volta oggi recupera meno: il corpo ha già avuto la sua parte."
       : "Per oggi hai recuperato abbastanza. Torna domani.";
   }
@@ -248,7 +259,10 @@ function lfStacca(){
       '</div>' +
       '<p class="lfnota">' + nota + '</p>' +
       (e ? '<div class="stazioni"><button type="button" class="stprimo" data-continua="1">Continua</button></div>'
-         : lfTasto("stacca", "Stacca la spina · " + lfCosto("stacca"), "divano")) +
+         /* accanto al tasto d'oro c'è sempre la via per tornare in cucina: chi
+            cambia idea, o chi trova la mossa spenta, non deve passare dalla mappa */
+         : lfTasto("stacca", "Stacca la spina", "divano",
+             LUOGO.da === "casa" ? '<button type="button" class="stsecondo" data-continua="1">Torna in cucina</button>' : "")) +
     '</div>';
   return {mid:mid};
 }
@@ -417,9 +431,11 @@ function luogoContinua(){
   renderLuogo();
 }
 
-/* Le porte della Casa. «Vai in camera» è la notte di `saltaGiorni(1)` — la
-   stessa del tasto «Salta avanti» — e chiede conferma come lui, perché
-   chiude la giornata; l'agenda, se ha un appuntamento, lo dice lei. */
+/* Le porte della Casa. «Vai in camera» è la notte del tasto «+1»
+   dell'orologio — passa dallo stesso ponte, `ADF_TIME_SKIP` (eventi-v2.js),
+   che si rifiuta se gli eventi non sono pronti, se un salto è in corso o se
+   c'è una decisione che aspetta — e chiede conferma come «Salta avanti»,
+   perché chiude la giornata; l'agenda, se ha un appuntamento, lo dice lei. */
 function luogoPorta(id){
   if(typeof SFX === "object" && SFX.tap) SFX.tap();
   if(id === "scrivi"){ avviaAzioneDiretta("scrivi"); return; }
@@ -435,7 +451,11 @@ function luogoPorta(id){
         (typeof avvisoAgenda === "function" ? avvisoAgenda() : ""),
       annulla(){},
       opts:[
-        {n:"Dormi", d:"Chiudi la giornata", run(){ saltaGiorni(1); renderLuogo(); return null; }},
+        {n:"Dormi", d:"Chiudi la giornata", run(){
+          const ok = typeof ADF_TIME_SKIP === "function" ? ADF_TIME_SKIP(1) : (saltaGiorni(1), true);
+          if(!ok && typeof toast === "function")
+            toast("<b>Non adesso.</b> C’è una decisione che aspetta, o il gioco sta ancora caricando.", "bad", "!", ["#B91C1C","#7F1D1D"]);
+          renderLuogo(); return null; }},
         {n:"Non ancora", d:"Resti in cucina", run(){ return null; }}
       ]});
   }
