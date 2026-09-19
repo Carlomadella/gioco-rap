@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:67e3719 -->
+## 20/09/26, 01:09 â€” task/piccole-agenda-beat-parametri-licenziarsi â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `67e3719`
+
+### Cosa Ã¨ entrato
+
+- `adbe45d` â€” fix(agenda): il giro di chiusura delle quattro piccole — tre voci del 20/09, tutte chiuse â€” **Carlomadella**
+- `164e6be` â€” feat(gioco): le quattro piccole — agenda, prezzi dei beat, parametri a 1, licenziarsi â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/ui.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:668d98c -->
 ## 19/09/26, 14:00 â€” task/pagine-luoghi-foto â†’ main
 

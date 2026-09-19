@@ -6,6 +6,40 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:67e3719 -->
+## 20/09/26, 01:09 â€” task/piccole-agenda-beat-parametri-licenziarsi â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `67e3719`
+
+### Cosa Ã¨ entrato
+
+- `adbe45d` â€” fix(agenda): il giro di chiusura delle quattro piccole — tre voci del 20/09, tutte chiuse â€” **Carlomadella**
+- `164e6be` â€” feat(gioco): le quattro piccole — agenda, prezzi dei beat, parametri a 1, licenziarsi â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/agenda.js`
+- **Modificato:** `frontend/js/game/beats.js`
+- **Modificato:** `frontend/js/game/chat.js`
+- **Modificato:** `frontend/js/game/eventi-master-1000-v1.2.13.json`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/posto.js`
+- **Modificato:** `frontend/js/game/state.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/js/game/studio-elementi.js`
+- **Modificato:** `frontend/js/game/studio.js`
+- **Modificato:** `frontend/js/game/trasferte.js`
+- **Modificato:** `frontend/js/game/ui.js`
+
+**File interessati in questa categoria:** 16
+
+---
+
 <!-- merge:975839c -->
 ## 15/09/26, 00:32 â€” task/studio-cinque-linguette â†’ main
 
