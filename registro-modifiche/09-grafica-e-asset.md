@@ -6,6 +6,30 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:668d98c -->
+## 19/09/26, 14:00 â€” task/pagine-luoghi-foto â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `668d98c`
+
+### Cosa Ã¨ entrato
+
+- `2cf77fc` â€” fix(luoghi): il giro di chiusura delle pagine sulla foto — sei voci del 19/09, tutte chiuse â€” **Carlomadella**
+- `18141cf` â€” feat(luoghi): Casa, Palestra, Live Club e stacca la spina sulla loro foto — «aggiungi le foto di background dei posti» â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/css/luoghi-foto.css`
+- **Modificato:** `frontend/css/stretto.css`
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_35 (10).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/casa_divano_giorno.png`
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_32 (2).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/casa_divano_sera.png`
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_34 (8).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/live_club.png`
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_34 (6).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/piazza_freestyle.png`
+
+**File interessati in questa categoria:** 6
+
+---
+
 <!-- merge:684a1af -->
 ## 16/09/26, 14:36 â€” task/prima-transizione-video â†’ main
 

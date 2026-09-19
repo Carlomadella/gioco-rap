@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:668d98c -->
+## 19/09/26, 14:00 â€” task/pagine-luoghi-foto â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `668d98c`
+
+### Cosa Ã¨ entrato
+
+- `2cf77fc` â€” fix(luoghi): il giro di chiusura delle pagine sulla foto — sei voci del 19/09, tutte chiuse â€” **Carlomadella**
+- `18141cf` â€” feat(luoghi): Casa, Palestra, Live Club e stacca la spina sulla loro foto — «aggiungi le foto di background dei posti» â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/hub.js`
+- **Aggiunto:** `frontend/js/game/luoghi-foto.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:684a1af -->
 ## 16/09/26, 14:36 â€” task/prima-transizione-video â†’ main
 
