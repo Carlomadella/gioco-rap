@@ -3216,6 +3216,14 @@ function requestQuickMakeHumanPreset(){
 
   quickMakeHumanRequested = true;
 
+  /* la fase che il camerino non annuncia: il preset e la foto */
+  if(window.parent!==window){
+    window.parent.postMessage({
+      type:'adf-rpg-v24-quick-makehuman-progress',
+      message:'Scelgo il look e scatto la foto'
+    },'*');
+  }
+
   try{
     localEditorFrame.contentWindow.postMessage({
       type:'adf-makehuman-quick-preset',
@@ -3303,9 +3311,33 @@ window.addEventListener('message', e=>{
       startQuickMakeHuman();
       return;
     }
+    /* «Fallo a mano» dalla schermata d'attesa del gioco: l'avvio rapido si
+       spegne — il camerino si chiude col suo cartello, e un risultato che
+       arrivasse dopo non applica più un preset a caso sotto le mani di chi
+       sta facendo il personaggio da sé */
+    if(msg.type==='adf-rpg-v24-quick-makehuman-cancel'){
+      quickMakeHumanPending = false;
+      quickMakeHumanRequested = false;
+      state.avatarPendingSource = null;
+      closeLocalEditor();
+      return;
+    }
   }
 
   if(localEditorFrame && e.source===localEditorFrame.contentWindow){
+    /* Le fasi del camerino (setStatus di runtime.js, il log del motore dei
+       modifier): durante l'avvio rapido il gioco le mostra nella schermata
+       «Preparo il tuo artista». Fuori dall'avvio rapido non servono a nessuno. */
+    if(msg.type==='adf-makehuman-progress'){
+      if(quickMakeHumanPending && window.parent!==window){
+        window.parent.postMessage({
+          type:'adf-rpg-v24-quick-makehuman-progress',
+          message:String(msg.message||'')
+        },'*');
+      }
+      return;
+    }
+
     if(msg.type==='adf-makehuman-ready'){
       sendMakeHumanInit();
 

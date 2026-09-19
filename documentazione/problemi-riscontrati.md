@@ -6,7 +6,8 @@ stata chiusa. Qui solo quelle **ancora aperte**, nello stesso ordine di «Da far
 insieme i due fogli: prima il telefono, poi quello che pesa nel pacchetto, poi le cose
 piccole, poi i lavori lunghi, in fondo le decisioni. Riordinato il 15/09 dopo il giro di
 fine task su quel foglio; il 19/09 il giro sulle pagine dei posti sulla loro foto ha
-trovato sette cose, sei chiuse nello stesso branch, una (la mano del rapper) resta.
+trovato sette cose, sei chiuse nello stesso branch, una (la mano del rapper) resta; lo
+stesso giorno il giro sull'avvio rapido ne ha trovate sette, tutte chiuse nel branch.
 
 1. **Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
    telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra. Il tasto
@@ -19,7 +20,10 @@ trovato sette cose, sei chiuse nello stesso branch, una (la mano del rapper) res
 3. ~~**Sul telefono i colori del «passaggio del mouse» restano accesi dopo il tocco** (08/09):
    il giro unico su tutti i CSS.~~ **RISOLTO (08/09/2026, riconosciuto il 15/09)** — era
    chiuso lo stesso giorno e la riga sotto alla voce mancava: vedi il giro del 15/09 in fondo.
-4. **L'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore** (13/09).
+4. ~~**L'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore** (13/09).~~
+   **RISOLTO (19/09/2026)** — la schermata «Preparo il tuo artista» con le fasi vere del
+   camerino; e i due minuti erano il browser senza GPU delle prove: su Chrome vero sono
+   9 secondi. Il dettaglio sotto alla voce, nel giro del 13/09.
 5. ~~**`jose` e `zod` stanno fra le `dependencies`** (13/09), aperta per decisione.~~
    **RISOLTO (16/09/2026)** — usate tutte e due: `jose` in `accessi.js`, `zod` in
    `forme.js` per i corpi delle rotte. Vedi «Le due dipendenze del backend, usate» in
@@ -82,6 +86,23 @@ trovato sette cose, sei chiuse nello stesso branch, una (la mano del rapper) res
    **RISOLTO (19/09/2026)** — «Torna in cucina» accanto al tasto d'oro.
 23. ~~**Il documento delle pagine-azioni dice ancora che Casa, Palestra e Live Club sono
    finestre** (19/09).~~ **RISOLTO (19/09/2026)** — nota di stato in testa al foglio.
+
+24. ~~**La sesta tacca «Pronto: si entra» della schermata dell'avvio rapido non si accende
+   mai** (19/09).~~ **RISOLTO (19/09/2026)** — «PRONTO:» maiuscolo e col due punti.
+25. ~~**«Fallo a mano» apre il camerino rotto, non il creator, e l'avvio rapido nel creator
+   resta acceso** (19/09).~~ **RISOLTO (19/09/2026)** — il gioco manda
+   `quick-makehuman-cancel`, il creator spegne il rapido e chiude il camerino.
+26. ~~Accessibilità della schermata dell'avvio rapido (19/09): **il lettore di schermo legge
+   il contatore ogni secondo** e **i tre tasti dell'errore compaiono senza focus**.~~
+   **RISOLTO (19/09/2026)** — parla solo la fase; il fuoco va su «Riprova».
+27. ~~**Se il creator non c'è proprio, l'errore dice «Sono passati 29 milioni di minuti»**
+   (19/09).~~ **RISOLTO (19/09/2026)** — la schermata si apre prima di ogni controllo, e
+   senza creator «Fallo a mano» non c'è.
+28. ~~**Il limite dei due minuti dell'avvio rapido è fisso anche mentre il camerino sta
+   parlando** (19/09).~~ **RISOLTO (19/09/2026)** — due minuti senza notizie: ogni fase
+   riparte il conto.
+29. ~~**Il caso @lento non guarda la schermata «Preparo il tuo artista»** (19/09).~~
+   **RISOLTO (19/09/2026)** — la prova la vuole accesa con una fase, e via alla fine.
 
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
 
@@ -1466,6 +1487,16 @@ resta com'era: e' di prima di questa task e non e' stato toccato qui.
 - **quanto pesa** — non blocca, ma e' il primo minuto di gioco di chi prova il gioco per la
   prima volta. Da guardare: o si mostra che sta caricando, o l'avvio rapido torna a non
   aspettare MakeHuman.
+- **RISOLTO (19/09/2026, branch `task/avvio-rapido`)** — la prima strada: la schermata
+  «Preparo il tuo artista» (`js/preparo.js`, `css/preparo.css`, `#preparo` in
+  `gioco.html`) sta sopra al creator nascosto e mostra le fasi vere del camerino
+  (rilanciate lungo la catena motore → camerino → creator → gioco), il tempo che passa, e
+  se si rompe tre tasti. Ma prima l'ho rimisurato fase per fase: **i 115 secondi erano il
+  Chromium senza GPU di Playwright**, che disegna il 3D a software (45–70 s in un blocco
+  solo dentro a `WebGLRenderer.render` e alla foto); **su Chrome vero, con la scheda video,
+  il personaggio è pronto in 8,6 secondi**, poi 17 s di cinematic. Il giocatore aspetta
+  nove secondi, non due minuti — ed erano nove secondi di nero. «L'avvio rapido: la
+  schermata «Preparo il tuo artista»» in `implementazioni/02-interfaccia-e-telefono.md`.
 
 ### La prova dell'avvio rapido non e' fragile, e' pesante: non sta in un gate a ogni push
 
@@ -3823,3 +3854,170 @@ c'è spazio — va guardato, non ho capito da cosa dipende.
 
 L'indice «Cosa resta aperto» in testa al foglio è aggiornato: sei voci chiuse nello stesso
 branch, resta la mano del rapper.
+
+## Giro del 19/09/2026 (segnala-problemi, fine task `task/avvio-rapido`, commit `f29ad6b`)
+
+Giro sulla task «Preparo il tuo artista», la schermata dell'avvio rapido. Fatti girare
+`npm run prova` (**180 a posto, 0 no**), `node strumenti/audit-regressioni.js` (**375 ok,
+0 falliti**) e `npm run verifica:build` (**33 ok**). Letti per intero `js/preparo.js` e
+`css/preparo.css`, il blocco `#preparo` di `gioco.html`, il diff di `js/gioco-ingresso.js`
+(`quandoCreatorPronto`, `richiediMakeHumanRapido`, `preparoFallito`, `avvioRapido`), quello di
+`media/creator-rpg-v24/creator.html` (il rilancio delle fasi, `startQuickMakeHuman`,
+`requestQuickMakeHumanPreset`, il risultato del preset), di `runtime.js` (`setStatus`,
+`emitToRoom`, `init`, il gestore del preset rapido, `adfMhApplyPreset`) e di
+`modifier-engine.html` (`log`); intorno, `js/creator/rpg-v24-bridge.js` (l'overlay a 999999 e
+cosa fa al «cancel»), `js/pagine.js` (`vaiA` e la shell della landing), `js/avvio.js` (come
+si arriva a `?nuova=rapido&slot=n`), `strumenti/build.js` (la copia di `media/`) e il caso
+@lento di `test/e2e/gameplay.spec.js`. Poi il gioco vero con Playwright su `localhost:8000`
+(Chromium senza GPU, quindi i tempi sono quelli lunghi): l'avvio rapido dalla landing con la
+schermata letta ogni mezzo secondo; lo stesso con `runtime.js` bloccato per vedere il limite
+dei venti secondi e i tre tasti, con «Torna al menu», «Fallo a mano» e «Riprova» premuti uno
+per volta; a 390×844 l'attesa e l'errore; il camerino aperto da solo
+(`media/makehuman-camerino-v1/index.html`, 45 secondi, nessun errore in console).
+
+Le cose che **tengono**: la catena delle fasi arriva alla schermata (a 0,8 s «Scarico il
+modello del corpo», a 1,6 s «Costruisco il personaggio», a 2,1 s «Scelgo il look e scatto la
+foto», poi il personaggio pronto a 37 s e la città a 100 s, cinematic compresa — zero errori
+in console); la schermata sta sopra al creator (1000000 contro 999999) e sotto non c'è
+niente che debba passarle davanti durante l'avvio rapido (gli overlay a 1000000 e 1200000
+di `eventi-v2.js` sono cose del gioco, non dell'avvio); il creator normale e «Il tuo artista»
+non la vedono (la apre solo `avvioRapido`, `gioco-ingresso.js:647`) e non rilanciano le fasi
+(`creator.html:3321` le passa solo con `quickMakeHumanPending`); il camerino da solo le manda
+a se stesso e le ignora (il suo ascoltatore a `runtime.js:4866` guarda solo il preset rapido e
+l'init, quello del motore controlla da chi arriva); i `'*'` nei `postMessage` portano solo
+righe di stato, niente di riservato; il limite dei venti secondi scatta a 20 s tondi con la
+frase giusta e i tre tasti; «Torna al menu» nella shell chiude la cornice del gioco e la
+landing è lì sotto; «Riprova» ricarica con `?nuova=rapido` e la schermata riparte (lo slot
+non serve nell'indirizzo: è già nelle impostazioni); il contatore va con l'orologio vero,
+non con i giri del timer, quindi dopo un blocco del thread mostra il tempo giusto; nel
+pacchetto (`dist/media/`) ci sono le righe nuove del creator, del camerino e del motore, e
+il bundle del gioco ha `ADF_PREPARO`; sul telefono i tre tasti sono alti 44 punti, niente
+esce dallo schermo; `:hover` sta sotto `@media (hover:hover)`.
+
+### La sesta tacca, «Pronto: si entra», non si accende mai
+- **dove** — `frontend/js/preparo.js:41` e `:43`.
+- **cosa succede** — quando il personaggio è pronto il gioco manda «pronto per entrare»
+  per accendere l'ultima tacca. Ma la fase di prima, «Costruisco il personaggio», si
+  riconosce con `/PRONTO|Costruisco personaggio/i` — e quella `i` fa prendere anche
+  «pronto per entrare», che è la quarta fase, non la sesta. La barra va solo avanti, quindi
+  il messaggio viene buttato: la schermata sparisce con la barra a quattro tacche e la
+  scritta ancora su «Scelgo il look e scatto la foto». L'ho visto con la sonda: alla
+  chiusura le tacche erano `fatta,fatta,fatta,fatta,in-corso,-`. Si vede poco perché la
+  dissolvenza dura mezzo secondo, ma la barra non arriva mai in fondo.
+- **come si vede** — avvio rapido, guardare la barra nell'istante in cui la schermata
+  sfuma; oppure in console `ADF_PREPARO.fase("pronto per entrare")` dopo la quarta fase.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (19/09/2026, stesso branch, prima del push)** — la fase del motore si riconosce da «PRONTO:» maiuscolo e col
+  due punti (niente `/i`), e «pronto per entrare» ha la sua riga: sesta tacca accesa
+  (provato: «Pronto: si entra» prima della cinematic). Le quattro righe del preset — vesto,
+  modello, ricostruisco, scatto la foto — sono diventate sottofasi della quinta tacca, scritte
+  sotto (la nota a margine 1).
+
+### «Fallo a mano» apre il camerino rotto, non il creator, e l'avvio rapido nel creator resta acceso
+- **dove** — `frontend/js/gioco-ingresso.js:616-620` (il tasto); `creator.html:3245`
+  (`quickMakeHumanPending` che nessuno spegne) e `:3336-3338` (il preset che parte da solo).
+- **cosa succede** — dopo «Il camerino non ha risposto» ho premuto «Fallo a mano»: si vede
+  il creator, ma con sopra il camerino ancora aperto (è la stessa finestra che non era
+  partita), e dentro il suo cartello tecnico «MakeHuman non è riuscito ad avviarsi —
+  runtime.js non caricato: http://127.0.0.1:8000/media/…». Il giocatore deve capire da solo
+  che c'è «Indietro» in basso a sinistra per tornare alla scelta dell'avatar. In più il
+  creator si ricorda ancora di essere in avvio rapido: se il camerino poi si sveglia (il
+  caso vero è il limite dei due minuti su una macchina lenta, non quello del file
+  bloccato), applica un preset a caso e chiude il camerino sotto le mani di chi sta
+  facendo il personaggio, saltando alla schermata dell'identità.
+- **come si vede** — bloccare `media/makehuman-camerino-v1/runtime.js` (in devtools,
+  Network → block request), avvio rapido, aspettare venti secondi, «Fallo a mano».
+- **quanto pesa** — si vede ma si gira intorno.
+- **RISOLTO (19/09/2026, stesso branch, prima del push)** — «Fallo a mano» manda al creator
+  `adf-rpg-v24-quick-makehuman-cancel`: `quickMakeHumanPending` si spegne, il camerino si
+  chiude col suo cartello, e un risultato in ritardo non applica più niente (provato con
+  `runtime.js` bloccato: sotto c'è «Come vuoi creare il tuo artista?», pulito).
+
+### Il lettore di schermo legge il contatore ogni secondo
+- **dove** — `frontend/pagine/gioco.html:103` (`aria-live="polite"` su tutto `#preparo`) e
+  `:116` (`#preparo-tempo`), `frontend/js/preparo.js:78-81`.
+- **cosa succede** — tutta la schermata è una zona «parlante», e dentro c'è il contatore
+  che cambia testo ogni secondo: per chi usa un lettore di schermo sono «1 s», «2 s»,
+  «3 s»… per tutta l'attesa, sopra alle fasi che invece andrebbero sentite. E la nota «La
+  prima volta ci mette un po'» sta nella pagina da subito (è invisibile solo per
+  l'opacità), quindi viene letta al secondo zero, non dopo i 25 secondi.
+- **come si vede** — Windows: Narratore o NVDA acceso, avvio rapido.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (19/09/2026, stesso branch, prima del push)** — `aria-live` sta solo sulla fase (e sulla riga sotto); il contatore e
+  la nota «la prima volta ci mette un po'» sono `aria-hidden`.
+
+### Quando compaiono i tre tasti nessuno ci va sopra con il focus
+- **dove** — `frontend/js/preparo.js:122-126` (`errore`).
+- **cosa succede** — i tasti vengono scritti nella pagina e basta: il focus resta sul
+  corpo del documento (la sonda lo ha letto: `BODY`). Chi va con la tastiera o con un
+  lettore di schermo sente «Non ce l'ha fatta» ma non sa che c'è qualcosa da premere, e
+  con Tab può finire dentro al creator che sta sotto, invisibile.
+- **come si vede** — come sopra, poi Tab.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (19/09/2026, stesso branch, prima del push)** — `errore()` mette il fuoco sul primo tasto (provato: «Riprova»).
+
+### Se il creator non c'è proprio, l'errore dice «Sono passati 29 milioni di minuti» e «Fallo a mano» porta al nero
+- **dove** — `frontend/js/gioco-ingresso.js:641` (chiamato prima di `apri()` a `:647`),
+  `frontend/js/preparo.js:47`, `:53` e `:116-118`.
+- **cosa succede** — se il ponte del creator (`ADF_RPG_V24`) non è caricato, la schermata
+  d'errore viene aperta senza che sia mai stata aperta quella d'attesa: il momento di
+  partenza vale zero, e «Sono passati …» conta dal 1970 (circa 29 milioni di minuti); la
+  barra delle tacche è vuota perché non è mai stata disegnata. E «Fallo a mano» chiude la
+  schermata per mostrare un creator che non esiste: si resta davanti al nero. Succede
+  solo se `rpg-v24-bridge.js` è rotto — ma è proprio il caso in cui la schermata dovrebbe
+  aiutare.
+- **come si vede** — in console, prima dell'avvio rapido, `delete window.ADF_RPG_V24`;
+  oppure leggere `secondi()` con `partita = 0`.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (19/09/2026, stesso branch, prima del push)** — `ADF_PREPARO.apri()` è la prima riga di `avvioRapido()`; `secondi()`
+  parte da adesso se nessuno l'ha mai aperta; e con `{senzaCreator:true}` «Fallo a mano»
+  non si offre.
+
+### Il limite dei due minuti è fisso anche mentre il camerino sta parlando
+- **dove** — `frontend/js/gioco-ingresso.js:245-248` (120 s) e `:255-258` (20 s);
+  `frontend/js/gioco-ingresso.js:108` (i 6 s del creator).
+- **cosa succede** — tre limiti diversi, e solo quello dei venti secondi si spegne quando
+  arriva un segno di vita. I due minuti contano dall'inizio, qualunque cosa il camerino
+  dica: e il file stesso scrive che senza scheda video ci si arriva a 115 s. Sul PC di
+  prova (Chromium a software) il personaggio arriva a 37 s e il caso @lento passa in 1,4
+  min; una macchina appena più lenta senza GPU — un portatile vecchio, una macchina
+  virtuale, un Chromebook — passa i 120 s mentre sta finendo, si vede «Il camerino non ha
+  finito in due minuti», e «Riprova» ricomincia da capo (il modello resta in cache, la
+  ricostruzione no). Ora che le fasi arrivano una per una, il limite potrebbe contare il
+  silenzio dall'ultima fase invece del totale; ma è una scelta, la segno e basta. Due
+  note sugli altri due: prima della prima fase il camerino deve scaricare `index.html`,
+  `runtime.js` (225 KB) e `three.module.js` (620 KB) — dal pacchetto sono in locale, ma
+  in una versione via web su una connessione lenta 20 s possono non bastare; e il creator
+  ha 6 s (120 tentativi × 50 ms, `:108`), un terzo del camerino, senza un motivo scritto.
+- **come si vede** — Chromium headless con `--disable-gpu` su una macchina lenta;
+  oppure abbassare `120000` a `30000` e fare l'avvio rapido senza scheda video.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (19/09/2026, stesso branch, prima del push)** — non più una scelta: i due minuti sono «senza notizie», `riarma()` a
+  ogni fase. Sulle macchine senza GPU il blocco muto più lungo visto è 70 s, sotto al limite.
+
+### Il caso @lento non guarda la schermata
+- **dove** — `frontend/test/e2e/gameplay.spec.js:60-147`.
+- **cosa succede** — la prova dell'avvio rapido controlla che si arrivi in città, ma non
+  che `#preparo` si apra, che le fasi avanzino e che si chiuda: l'unico controllo
+  automatico sulla schermata è l'audit (`strumenti/audit-regressioni.js:1985-2023`), che
+  guarda le stringhe nei file, non cosa succede — infatti la tacca che non si accende
+  (la prima voce di questo giro) non l'ha vista. Basterebbe leggere `#preparo-fase` e le
+  tacche mentre si aspetta, la prova sta già lì per 100 secondi.
+- **come si vede** — `grep -c preparo frontend/test/e2e/gameplay.spec.js` dà 0.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (19/09/2026, stesso branch, prima del push)** — la prova aspetta la schermata accesa con una fase vera (fino a 30 s)
+  e alla fine vuole `#preparo` nascosto (`preparoVia`).
+
+Note a margine, scelte e non bug: (1) le quattro righe nuove che il camerino manda durante
+il preset — «Vesto il personaggio» (`runtime.js:5657`), «Modello il corpo» (`:5673`),
+«Ricostruisco la scena» (`:5679`), «Scatto la foto» (`:4910`) — arrivano alla schermata ma
+non le riconosce nessuna fase (`preparo.js:37-44`), quindi non cambiano niente: o si danno
+loro una tacca o si tolgono, adesso sono fili che non vanno da nessuna parte; (2) nel
+Chromium senza GPU il contatore resta su «5 s» per trenta secondi e poi salta a «37 s»,
+perché il camerino blocca il thread anche del gioco (stesso processo) — su Chrome vero il
+blocco è di pochi secondi, e il contatore riprende giusto; non è della schermata, ma è
+quello che vede chi non ha la scheda video; (3) «Fallo a mano» non aggancia il tasto
+«to-menu» come fa `creatorePoiCitta` (`gioco-ingresso.js:278-288`), ma il ponte al
+«cancel» pulisce lo slot da sé (`rpg-v24-bridge.js:222-232`), quindi va bene così.
+
+L'indice «Cosa resta aperto» in testa al foglio ha le voci nuove di questo giro.

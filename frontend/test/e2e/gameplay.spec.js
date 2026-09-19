@@ -81,6 +81,26 @@ test("avvio rapido conclude la cinematic ed entra nell'hub @lento", async ({ pag
     /pagine\/gioco\.html\?nuova=rapido&slot=1$/
   );
 
+  /* Mentre il camerino lavora si deve vedere «Preparo il tuo artista», non il
+     nero: la schermata è accesa e ha già una fase (js/preparo.js). */
+  await expect.poll(
+    async () => {
+      const gioco = page.frames().find(frame => frame.url().includes("/pagine/gioco.html"));
+      if(!gioco) return null;
+      try{
+        return await gioco.evaluate(() => {
+          const el = document.getElementById("preparo");
+          return el && !el.hidden && !el.classList.contains("via") && !el.classList.contains("rotto")
+            ? document.getElementById("preparo-fase").textContent : null;
+        });
+      }catch(e){
+        if(/execution context was destroyed|frame was detached|target closed|navigation/i.test(e.message)) return null;
+        throw e;
+      }
+    },
+    { timeout: 30000 }
+  ).toMatch(/camerino|modello|personaggio|look/i);
+
   await expect.poll(
     async () => {
       const gioco = page.frames().find(frame =>
@@ -112,6 +132,9 @@ test("avvio rapido conclude la cinematic ed entra nell'hub @lento", async ({ pag
             !!document.querySelector("#s-hub.screen.on"),
           creatorChiuso:
             !document.getElementById("adf-rpg-v24-host"),
+          /* e alla fine la schermata d'attesa se n'è andata */
+          preparoVia:
+            document.getElementById("preparo").hidden,
           artistaSalvato:
             !!(
               window.ARTIST &&
@@ -137,6 +160,7 @@ test("avvio rapido conclude la cinematic ed entra nell'hub @lento", async ({ pag
     beatDisponibile: true,
     hubVisibile: true,
     creatorChiuso: true,
+    preparoVia: true,
     artistaSalvato: true
   });
 

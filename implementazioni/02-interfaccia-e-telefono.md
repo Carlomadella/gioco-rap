@@ -2002,3 +2002,84 @@ un nome vero (`casa_divano_giorno`, `casa_divano_sera`, `live_club`, `piazza_fre
 uno in fondo comincia a parlare sopra», tre risposte, la gente che sale o scende, «cambia
 ordine» nella scaletta): è il minigioco della Piazza rifatto per il palco, e ha la sua voce
 nel foglio dei punti nuovi.
+
+## L'avvio rapido: la schermata «Preparo il tuo artista»
+
+> «L'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore»
+> (problemi-riscontrati, 13/09/2026): «o si mostra che sta caricando, o l'avvio rapido
+> torna a non aspettare MakeHuman».
+
+**FATTO (19/09/2026)** — branch `task/avvio-rapido`. Dal 12/09 (`fb2b8d8`) l'avvio rapido
+non mette più un avatar finto: apre il creator nascosto, il creator apre il camerino
+MakeHuman, il camerino scarica il modello del corpo (`targets.bin`, 145 MB), lo
+costruisce, applica un preset maschile, veste il personaggio e scatta la foto; solo allora
+partono nome, città, storia e la cinematic. In tutto quel tempo, dalla scomparsa del
+caricamento della pagina alla cinematic, si vedeva un rettangolo nero: il creator era
+nascosto apposta (`visibility:hidden`, niente flash dell'avatar vuoto) e nessuno aveva
+messo qualcosa al suo posto.
+
+**Quanto ci mette davvero.** Prima di scegliere fra le due strade l'ho misurato, con i
+tempi di ogni fase (uno script Playwright che ascolta i messaggi della catena):
+
+- su **Chrome vero, con la scheda video**: il camerino parla a 0,8 s, `targets.bin` è
+  dentro a 1,9 s (dal server locale), il personaggio vestito e fotografato a **8,6 s**;
+  poi 17 s di cinematic (è la sua durata, `playCareerIntro`) e la città a 26 s;
+- nel **Chromium senza GPU delle prove automatiche**, che disegna il 3D a software: la
+  stessa catena arriva alla foto in 38–73 s (un blocco solo del thread, da 45 s: la
+  ricostruzione della scena con i vestiti e la foto, `WebGLRenderer.render` e
+  `makePreviewImage` nel profilo), poi la cinematic in ritardo e 7 s per buttare via
+  l'iframe del camerino: 100–150 s dal clic alla città.
+
+I «quasi due minuti» del 13/09 erano stati misurati con quel browser: **il giocatore, su
+un computer normale, aspetta nove secondi**. Non nove secondi di nero, però: la seconda
+strada («torna a non aspettare MakeHuman») avrebbe rimesso l'avatar finto per un'attesa
+che sulla macchina di un giocatore è corta, e si è presa la prima.
+
+**Com'è fatta.** `#preparo` in `gioco.html`, `js/preparo.js` e `css/preparo.css` (file
+nuovi, la regola dei punti che non sono fix): sta sopra al creator (1 000 000 contro
+999 999) e ha la stessa faccia di `#avvio` — il marchio, «Preparo il tuo artista», una
+riga con la fase, una barra e il tempo che passa. **Le fasi sono quelle vere**, non
+inventate: il motore dei modifier (`modifier-engine.html`, `log`) e il camerino
+(`runtime.js`, `setStatus`, più tre righe nuove dentro ad `adfMhApplyPreset` — vesto,
+modello, ricostruisco — e «Scatto la foto») le mandano al creator con
+`adf-makehuman-progress`; il creator, solo durante l'avvio rapido, le rilancia al gioco
+come `adf-rpg-v24-quick-makehuman-progress`; `gioco-ingresso.js` le passa a
+`ADF_PREPARO.fase()`, che le mette in fila su sei tacche (apro il camerino · lo carico ·
+scarico il modello del corpo · costruisco il personaggio · scelgo il look e scatto la
+foto · si entra) e non torna mai indietro. La barra è a tacche e non a percentuale per
+la stessa ragione scritta sopra a `#avvio`: la percentuale del download il motore non la
+sa. Dopo 25 secondi esce da sola, in CSS, la nota «la prima volta ci mette un po'» (il
+modello del corpo si scarica una volta). Quando arriva `quick-makehuman-ready` la
+schermata sfuma e sotto c'è già la cinematic.
+
+**Se si rompe, non resta il nero.** Tutte le uscite di errore della catena
+(`fallisci`, il creator che non risponde all'appello, il profilo che non si completa)
+passano da `preparoFallito()`: la schermata dice cos'è successo, da quanto, e dà tre
+tasti — **Riprova** (la stessa pagina da capo), **Fallo a mano** (il creator normale, che
+sotto c'è già), **Torna al menu** (con lo slot provvisorio ripulito). In più una rete di
+sicurezza nuova: il camerino parla entro un secondo, quindi **se in venti secondi non ha
+detto niente** (runtime.js che non arriva, un errore prima della prima riga) si dichiara
+subito, invece di aspettare i due minuti del limite di sempre — che resta, perché sulle
+macchine senza GPU la ricostruzione è un blocco muto da un minuto.
+
+**Provato** su Chrome vero (headed) e sul Chromium delle prove: le fasi in fila, la
+schermata via alla cinematic, la città dopo; con `runtime.js` bloccato la schermata
+d'errore a 20 s con i tre tasti, e «Fallo a mano» che scopre il creator. L'audit
+(«L'avvio rapido — la schermata «Preparo il tuo artista»») tiene insieme i quattro
+anelli della catena, l'ordine dei file, il piano sopra al creator, le tre strade e il
+limite dei venti secondi.
+
+**Il giro di fine task (19/09)** ha trovato sette cose, chiuse nello stesso branch: la
+sesta tacca che non si accendeva («PRONTO:» prendeva anche «pronto per entrare»); «Fallo a
+mano» che lasciava il camerino rotto sopra al creator e l'avvio rapido acceso (adesso il
+gioco manda `quick-makehuman-cancel` e il creator lo spegne); il lettore di schermo che
+leggeva il contatore ogni secondo (parla solo la fase); i tre tasti senza fuoco («Riprova»
+lo prende); l'errore senza creator che contava dal 1970; il limite dei due minuti, che
+adesso è «senza notizie» e riparte a ogni fase; e la prova `@lento`, che ora vuole la
+schermata accesa con una fase e nascosta alla fine. Le quattro righe del preset (vesto,
+modello, ricostruisco, scatto la foto) si leggono sotto alla quinta tacca.
+
+**Cosa resta, e non è di questo punto:** sulle macchine senza GPU la ricostruzione con i
+vestiti è un blocco unico del thread da 45–70 s (il profilo lo mette tutto in
+`WebGLRenderer.render` e nel `readPixels` della foto); lì il contatore della schermata si
+ferma con lui. È il camerino, non l'avvio rapido, e conta solo dove il 3D va a software.

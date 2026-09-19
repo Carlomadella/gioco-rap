@@ -13,7 +13,11 @@
   'use strict';
 
   const logEl=document.getElementById('log');
-  const log=(s)=>{ logEl.textContent += '\n'+s; console.log('[ADF MH ENGINE]',s); };
+  const log=(s)=>{
+    logEl.textContent += '\n'+s; console.log('[ADF MH ENGINE]',s);
+    /* anche al camerino, che durante l'avvio rapido lo passa al gioco */
+    try{ parent.postMessage({type:'adf-mh-engine-log',message:String(s)},'*'); }catch(e){}
+  };
   const fail=(err)=>{
     const message=String(err?.stack||err?.message||err);
     log('ERRORE: '+message);

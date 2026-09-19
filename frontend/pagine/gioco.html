@@ -23,6 +23,8 @@
 <!-- Fogli di stile: l'ordine conta, la cascata è quella originale. -->
 <link rel="stylesheet" href="css/base.css?v=12">
 <link rel="stylesheet" href="css/servizio.css?v=1">
+<!-- la schermata dell'avvio rapido mentre MakeHuman lavora (js/preparo.js) -->
+<link rel="stylesheet" href="css/preparo.css?v=1">
 <link rel="stylesheet" href="css/preview.css?v=12">
 <link rel="stylesheet" href="css/shell.css?v=14">
 <link rel="stylesheet" href="css/game.css?v=16">
@@ -94,6 +96,31 @@
 </div>
 
 <div class="servizio" id="servizio" role="alert"></div>
+
+<!-- PREPARO IL TUO ARTISTA — l'attesa dell'avvio rapido, sopra al creator
+     nascosto (js/preparo.js, css/preparo.css). Nascosta finché
+     js/gioco-ingresso.js non la apre; le fasi arrivano dal camerino MakeHuman. -->
+<div class="preparo" id="preparo" hidden>
+  <span class="marchio" aria-hidden="true">
+    <svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+      <rect x="14" y="6.5" width="6" height="12.6" rx="3" fill="#0B0B0D"/>
+      <g fill="none" stroke="#0B0B0D" stroke-width="2.4" stroke-linecap="round">
+        <path d="M10 16.4a7 7 0 0 0 14 0"/><path d="M17 23.4V27"/><path d="M12.8 27h8.4"/>
+      </g>
+    </svg>
+  </span>
+  <h1>Preparo il tuo <em>artista</em></h1>
+  <!-- solo la fase è annunciata: il contatore cambia ogni secondo e un lettore
+       di schermo lo leggerebbe tutto, e la nota in fondo esce da sola dopo 25 s
+       (CSS) — letta subito direbbe una cosa non ancora vera -->
+  <p class="fase" id="preparo-fase" role="status" aria-live="polite">Apro il camerino</p>
+  <p class="sotto" id="preparo-sotto" aria-live="polite"></p>
+  <span class="barra" id="preparo-barra" aria-hidden="true"></span>
+  <span class="tempo" id="preparo-tempo" aria-hidden="true">0 s</span>
+  <div class="tasti" id="preparo-tasti"></div>
+  <p class="pazienza" aria-hidden="true"><b>La prima volta ci mette un po'.</b> Il modello del corpo sono 145 MB
+    e si scaricano una volta sola: dalla prossima partita è molto più veloce.</p>
+</div>
 
 <div class="staccato" id="staccato" role="status">
   <span class="segno" aria-hidden="true">!</span>
@@ -630,6 +657,8 @@
 <!-- Dove stanno le tre pagine e come si passa dall'una all'altra. -->
 <script src="js/pagine.js?v=4"></script>
 <script src="js/servizio.js?v=1"></script>
+<!-- la schermata dell'avvio rapido: prima di gioco-ingresso.js, che la usa -->
+<script src="js/preparo.js?v=1"></script>
 
 <!-- Impostazioni: audio, aspetto, difficoltà, slot e lingua. Devono esistere
      prima di tutto il resto, perché stato e simulazione leggono da qui. -->
@@ -725,6 +754,6 @@
 <!-- L'ingresso in partita, per ultimo di tutti: legge dall'indirizzo come si è
      arrivati qui dalla landing (riprendi, nuova, creatore, profilo) e apre la
      schermata giusta. Prima di lui nessuna schermata è accesa. -->
-<script src="js/gioco-ingresso.js?v=2"></script>
+<script src="js/gioco-ingresso.js?v=3"></script>
 </body>
 </html>
