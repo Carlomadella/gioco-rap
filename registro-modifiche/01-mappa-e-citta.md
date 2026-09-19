@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:bf00c1d -->
+## 19/09/26, 15:59 â€” task/avvio-rapido â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `bf00c1d`
+
+### Cosa Ã¨ entrato
+
+- `db3e0e8` â€” fix(avvio): il giro di chiusura di «Preparo il tuo artista» — sette voci del 19/09, tutte chiuse â€” **Carlomadella**
+- `f29ad6b` â€” feat(avvio): «Preparo il tuo artista» — «l'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore» â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:668d98c -->
 ## 19/09/26, 14:00 â€” task/pagine-luoghi-foto â†’ main
 

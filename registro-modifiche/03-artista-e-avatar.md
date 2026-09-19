@@ -6,6 +6,34 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:bf00c1d -->
+## 19/09/26, 15:59 â€” task/avvio-rapido â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `bf00c1d`
+
+### Cosa Ã¨ entrato
+
+- `db3e0e8` â€” fix(avvio): il giro di chiusura di «Preparo il tuo artista» — sette voci del 19/09, tutte chiuse â€” **Carlomadella**
+- `f29ad6b` â€” feat(avvio): «Preparo il tuo artista» — «l'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore» â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/roadmap.md`
+- **Aggiunto:** `frontend/css/preparo.css`
+- **Modificato:** `frontend/js/gioco-ingresso.js`
+- **Aggiunto:** `frontend/js/preparo.js`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+- **Modificato:** `frontend/media/makehuman-camerino-v1/modifier-engine.html`
+- **Modificato:** `frontend/media/makehuman-camerino-v1/runtime.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/e2e/gameplay.spec.js`
+
+**File interessati in questa categoria:** 10
+
+---
+
 <!-- merge:f356840 -->
 ## 12/09/26, 19:59 â€” task/creator-blocco-capoluoghi-v3 â†’ main
 
