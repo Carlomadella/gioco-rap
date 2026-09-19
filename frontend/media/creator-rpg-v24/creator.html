@@ -3311,6 +3311,17 @@ window.addEventListener('message', e=>{
       startQuickMakeHuman();
       return;
     }
+    /* «Fallo a mano» dalla schermata d'attesa del gioco: l'avvio rapido si
+       spegne — il camerino si chiude col suo cartello, e un risultato che
+       arrivasse dopo non applica più un preset a caso sotto le mani di chi
+       sta facendo il personaggio da sé */
+    if(msg.type==='adf-rpg-v24-quick-makehuman-cancel'){
+      quickMakeHumanPending = false;
+      quickMakeHumanRequested = false;
+      state.avatarPendingSource = null;
+      closeLocalEditor();
+      return;
+    }
   }
 
   if(localEditorFrame && e.source===localEditorFrame.contentWindow){

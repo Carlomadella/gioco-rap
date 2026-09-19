@@ -178,10 +178,22 @@
   function richiediMakeHumanRapido(frame, rapido){
     let concluso = false;
 
+    let timeout = null;
     const cleanup = () => {
       window.removeEventListener("message", onMessage);
       clearTimeout(timeout);
       clearTimeout(silenzio);
+    };
+    /* Due minuti SENZA NOTIZIE, non due minuti in tutto: ogni fase che
+       arriva riparte il conto. Sulle macchine senza GPU la catena finisce
+       oltre i due minuti mandando fasi fino all'ultima, e un limite fisso
+       scattava mentre stava finendo. */
+    const riarma = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(
+        () => fallisci("Il camerino non dà notizie da due minuti."),
+        120000
+      );
     };
 
     const fallisci = message => {
@@ -213,6 +225,7 @@
          «Preparo il tuo artista» le mette in fila */
       if(msg.type === "adf-rpg-v24-quick-makehuman-progress"){
         clearTimeout(silenzio);
+        riarma();
         if(window.ADF_PREPARO) ADF_PREPARO.fase(msg.message);
         return;
       }
@@ -242,10 +255,7 @@
 
     window.addEventListener("message", onMessage);
 
-    const timeout = setTimeout(
-      () => fallisci("Il camerino non ha finito in due minuti."),
-      120000
-    );
+    riarma();
     /* Il camerino parla entro un secondo dall'apertura («1/6 — Carico body»):
        se in venti secondi non ha detto niente non si è caricato (runtime.js
        che non arriva, un errore prima della prima riga), e aspettare i due
@@ -609,14 +619,21 @@
      creator nascosto per tutta l'attesa. Quando la catena si rompe non si
      resta davanti al nero: riprova (la stessa pagina, da capo), fallo a mano
      (il creator normale, che sotto c'è già), o il menu. */
-  function preparoFallito(perche){
+  function preparoFallito(perche, opz){
     if(!window.ADF_PREPARO) return;
+    const senzaCreator = !!(opz && opz.senzaCreator);
     ADF_PREPARO.errore(perche, {
       riprova(){ location.replace(location.pathname + "?nuova=rapido"); },
-      aMano(){
+      /* senza un creator sotto «Fallo a mano» aprirebbe sul nero: non si offre */
+      aMano: senzaCreator ? null : function(){
         ADF_PREPARO.chiudi();
         const f = frameCreator();
-        if(f) f.style.visibility = "";
+        if(!f) return;
+        /* il creator spegne l'avvio rapido: chiude il camerino (col suo
+           cartello tecnico) e non applica più un preset a caso se il
+           camerino si sveglia dopo */
+        try{ f.contentWindow.postMessage({type:"adf-rpg-v24-quick-makehuman-cancel"}, "*"); }catch(e){}
+        f.style.visibility = "";
       },
       menu(){
         annullaNuovoSlot();
@@ -631,6 +648,10 @@
 
     window.__ADF_DOPO_CREAZIONE = entraInCitta;
 
+    /* la schermata si apre per prima: anche un errore un rigo sotto la trova
+       accesa, col suo orologio partito */
+    if(window.ADF_PREPARO) ADF_PREPARO.apri();
+
     if(
       !window.ADF_RPG_V24 ||
       typeof window.ADF_RPG_V24.open !== "function"
@@ -638,13 +659,11 @@
       console.error(
         "[ADF] Avvio rapido: creator RPG non disponibile."
       );
-      preparoFallito("Il creator non è disponibile.");
+      preparoFallito("Il creator non è disponibile.", {senzaCreator:true});
       return;
     }
 
     const rapido = datiRapidi();
-
-    if(window.ADF_PREPARO) ADF_PREPARO.apri();
 
     window.ADF_RPG_V24.open();
 

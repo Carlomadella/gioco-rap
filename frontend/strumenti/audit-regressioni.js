@@ -2009,12 +2009,31 @@ test("l'avvio rapido apre la schermata, e la chiude quando parte la cinematic",
   /function avvioRapido\(\)[\s\S]*?ADF_PREPARO\.apri\(\)[\s\S]*?ADF_RPG_V24\.open\(\)/.test(ingresso) &&
   ingresso.includes('ADF_PREPARO.fase("pronto per entrare"); ADF_PREPARO.chiudi();'));
 test("quando la catena si rompe non resta il nero: tre strade, e il camerino muto scade a venti secondi",
-  ingresso.includes("function preparoFallito(perche)") &&
-  /riprova\(\)\{[^}]*\?nuova=rapido/.test(ingresso) && ingresso.includes("aMano(){") && ingresso.includes("menu(){") &&
+  ingresso.includes("function preparoFallito(perche, opz)") &&
+  /riprova\(\)\{[^}]*\?nuova=rapido/.test(ingresso) && ingresso.includes("aMano: senzaCreator ? null : function(){") && ingresso.includes("menu(){") &&
   /const silenzio = setTimeout\(\s*\(\) => fallisci\([^)]*\),\s*20000\s*\)/.test(ingresso) &&
   ingresso.includes("clearTimeout(silenzio);") &&
   ingresso.includes("fallito(\"Il creator non ha risposto.\")") &&
   preparo.includes('data-t="riprova"') && preparo.includes('data-t="aMano"') && preparo.includes('data-t="menu"'));
+/* Il giro di fine task del 19/09 (problemi-riscontrati): il limite dei due
+   minuti era fisso e sulle macchine senza GPU scattava mentre la catena stava
+   finendo; «Fallo a mano» lasciava il camerino rotto sopra al creator e
+   l'avvio rapido acceso, pronto ad applicare un preset a caso se il camerino
+   si svegliava dopo. */
+test("i due minuti sono senza notizie (ripartono a ogni fase), e «Fallo a mano» spegne l'avvio rapido nel creator",
+  ingresso.includes("const riarma = () => {") && /progress"\)\{[\s\S]{0,120}?riarma\(\);/.test(ingresso) &&
+  ingresso.includes('postMessage({type:"adf-rpg-v24-quick-makehuman-cancel"}') &&
+  creatorHtml.includes("msg.type==='adf-rpg-v24-quick-makehuman-cancel'") &&
+  /quick-makehuman-cancel'\)\{[\s\S]{0,200}?quickMakeHumanPending = false;[\s\S]{0,200}?closeLocalEditor\(\);/.test(creatorHtml) &&
+  /* la schermata si apre prima di ogni controllo, e senza creator non offre «Fallo a mano» */
+  /function avvioRapido\(\)[\s\S]{0,300}?ADF_PREPARO\.apri\(\)[\s\S]*?senzaCreator:true/.test(ingresso) &&
+  /* la sesta tacca: «PRONTO:» del motore non deve prendere «pronto per entrare» */
+  preparo.includes("{m:/PRONTO:|Costruisco personaggio/,") && preparo.includes("{m:/pronto per entrare/i,") &&
+  /* solo la fase parla al lettore di schermo; contatore e nota no */
+  index.includes('id="preparo-fase" role="status" aria-live="polite"') &&
+  index.includes('id="preparo-tempo" aria-hidden="true"') && !index.includes('id="preparo" role="status"') &&
+  /* la prova lenta guarda la schermata: accesa mentre lavora, via alla fine */
+  leggi("test/e2e/gameplay.spec.js").includes("preparoVia:"));
 test("la barra è a tacche, una per fase, e le fasi non tornano indietro",
   /const FASI = \[[\s\S]*?\];/.test(preparo) && preparo.includes("if(i < tacca) return;") &&
   preparoCss.includes("#preparo .barra i.in-corso"));

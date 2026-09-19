@@ -2069,6 +2069,16 @@ d'errore a 20 s con i tre tasti, e «Fallo a mano» che scopre il creator. L'aud
 anelli della catena, l'ordine dei file, il piano sopra al creator, le tre strade e il
 limite dei venti secondi.
 
+**Il giro di fine task (19/09)** ha trovato sette cose, chiuse nello stesso branch: la
+sesta tacca che non si accendeva («PRONTO:» prendeva anche «pronto per entrare»); «Fallo a
+mano» che lasciava il camerino rotto sopra al creator e l'avvio rapido acceso (adesso il
+gioco manda `quick-makehuman-cancel` e il creator lo spegne); il lettore di schermo che
+leggeva il contatore ogni secondo (parla solo la fase); i tre tasti senza fuoco («Riprova»
+lo prende); l'errore senza creator che contava dal 1970; il limite dei due minuti, che
+adesso è «senza notizie» e riparte a ogni fase; e la prova `@lento`, che ora vuole la
+schermata accesa con una fase e nascosta alla fine. Le quattro righe del preset (vesto,
+modello, ricostruisco, scatto la foto) si leggono sotto alla quinta tacca.
+
 **Cosa resta, e non è di questo punto:** sulle macchine senza GPU la ricostruzione con i
 vestiti è un blocco unico del thread da 45–70 s (il profilo lo mette tutto in
 `WebGLRenderer.render` e nel `readPixels` della foto); lì il contatore della schermata si

@@ -38,9 +38,19 @@
     {m:/apro il camerino/i,                 t:"Apro il camerino"},
     {m:/^[1-5]\/6/,                          t:"Carico il camerino"},
     {m:/6\/6|targets\.bin/i,                 t:"Scarico il modello del corpo", s:"145 MB: la prima volta è la parte lunga, poi resta in cache"},
-    {m:/PRONTO|Costruisco personaggio/i,     t:"Costruisco il personaggio"},
+    /* «PRONTO:» maiuscolo e col due punti: è la riga del motore, e con la /i
+       prendeva anche «pronto per entrare» e la sesta tacca non si accendeva */
+    {m:/PRONTO:|Costruisco personaggio/,     t:"Costruisco il personaggio"},
     {m:/scelgo il look/i,                    t:"Scelgo il look e scatto la foto"},
-    {m:/cinematic|pronto per entrare/i,      t:"Pronto: si entra"}
+    {m:/pronto per entrare/i,                t:"Pronto: si entra"}
+  ];
+  /* dentro alla quinta fase il camerino dice anche cosa sta facendo: si
+     scrive sotto, senza spostare la tacca */
+  const SOTTOFASI = [
+    {m:/^Vesto il personaggio/,     s:"Vesto il personaggio"},
+    {m:/^Modello il corpo/,         s:"Modello il corpo"},
+    {m:/^Ricostruisco la scena/,    s:"Ricostruisco la scena"},
+    {m:/^Scatto la foto/,           s:"Scatto la foto"}
   ];
   const q = id => document.getElementById(id);
 
@@ -50,6 +60,9 @@
   let azioni = null;      /* i tasti dello stato d'errore */
 
   function secondi(){
+    /* se nessuno ha mai aperto la schermata (errore prima di `apri`) il
+       conto parte da adesso, non dal 1970 */
+    if(!partita) partita = Date.now();
     const s = Math.max(0, Math.round((Date.now() - partita) / 1000));
     return s < 60 ? s + " s" : Math.floor(s / 60) + " min " + (s % 60) + " s";
   }
@@ -88,6 +101,8 @@
     const el = q("preparo");
     if(!el || el.hidden || el.classList.contains("rotto")) return;
     const m = String(messaggio || "");
+    const sotto = SOTTOFASI.find(f => f.m.test(m));
+    if(sotto && tacca === 4){ q("preparo-sotto").textContent = sotto.s; return; }
     let i = FASI.findIndex(f => f.m.test(m));
     if(i < 0) return;
     if(i < tacca) return;
@@ -124,6 +139,10 @@
       (azioni.riprova ? '<button type="button" class="primo" data-t="riprova">Riprova</button>' : "") +
       (azioni.aMano ? '<button type="button" data-t="aMano">Fallo a mano</button>' : "") +
       (azioni.menu ? '<button type="button" data-t="menu">Torna al menu</button>' : "");
+    /* il fuoco va sul primo tasto: da tastiera e da lettore di schermo i tre
+       tasti devono essere la prossima cosa, non il body */
+    const primo = t.querySelector("button");
+    if(primo) try{ primo.focus({preventScroll:true}); }catch(e){}
   }
 
   if(q("preparo-tasti")){
