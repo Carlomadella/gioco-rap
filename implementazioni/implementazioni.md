@@ -53,9 +53,9 @@ Cabina; riguardato lo stesso giorno dopo «Il telefono quando lo schermo è un t
 cui sono uscite due voci nuove, il 16/09 dopo il primo video delle transizioni (la voce
 resta, a metà), e il 19/09 dopo le pagine di Casa, Palestra, Live Club e stacca la spina
 sulla loro foto (chiusa la voce delle foto; la serata del club giocata a momenti è una voce
-nuova, fra i lavori lunghi) e dopo la schermata dell'avvio rapido. È l'ordine in cui si
-prendono i punti aperti di questo
-foglio **e** quelli ancora aperti in
+nuova, fra i lavori lunghi) e dopo la schermata dell'avvio rapido; il 20/09 dopo le quattro
+piccole (agenda, prezzi dei beat, parametri a 1, licenziarsi), chiuse in un branch solo. È
+l'ordine in cui si prendono i punti aperti di questo foglio **e** quelli ancora aperti in
 [`problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md): prima quello che
 tocca il gioco sul telefono (è lì che esce), poi quello che pesa nel pacchetto o blocca una
 partita, poi le cose piccole e chiare, poi i lavori lunghi, in fondo quello che è una
@@ -101,18 +101,19 @@ da quale lista viene.
 
 **Piccole e chiare**
 
-8. **L'evento fatto esce dall'agenda** — CARLO, «se partecipo ad un evento segnato, dopo
-   che ho partecipato l'evento si toglie automaticamente dall'agenda». In `agenda.js`
-   `consumaPeso()` segna solo il bonus come usato: la voce resta segnata. Piccolo.
-9. **I prezzi dei beat per fama del beatmaker** — ALE, «da 100 a 250 euro beat da
-   beatmaker emergenti, da 300 a 1000 per beatmaker affermati e da 1000 a 2000 per
-   beatmaker famosissimi». Oggi `prezzoBeat()` in `beats.js` guarda solo la qualità
-   (da 15 a ~1800). I numeri sono già scritti, si tratta di metterli.
-10. **Si parte con tutti i parametri a 1** — ALE. In `state.js` le quattro abilità partono
-    a 0. Una riga, ma va guardato `livello()` che le somma.
-11. **Non ci si può licenziare** — CARLO, «non ci si può licenziare dal lavoro corrente,
-    implementalo per tutti i lavori». In `hub.js` c'è «lascialo o aspetta di essere
-    licenziato»: va tolto il «lascialo».
+8. ~~**L'evento fatto esce dall'agenda**~~ **FATTO (20/09/2026)** — `consumaPeso()` legge il
+   peso e poi `onora()` toglie la voce di oggi; anche il «Piccolo party» passa di lì.
+   «L'evento fatto esce dall'agenda» in `02-interfaccia-e-telefono.md`.
+9. ~~**I prezzi dei beat per fama del beatmaker**~~ **FATTO (20/09/2026)** — tre fasce sulla
+   fama di chi lo fa (100–250, 300–1000, 1000–2000), la qualità dice dove dentro alla fascia;
+   la fascia si legge sulla card. «I prezzi dei beat per fama del beatmaker» in
+   `04-musica-e-suoni.md`.
+10. ~~**Si parte con tutti i parametri a 1**~~ **FATTO (20/09/2026)** — una riga in
+    `state.js`; `livello()` guardato, si resta al livello 1. «Si parte con tutti i parametri
+    a 1» in `05-carriera-e-tempo.md`.
+11. ~~**Non ci si può licenziare**~~ **FATTO (20/09/2026)** — via il «lascialo» dai due testi,
+    i colloqui non si fanno con un posto in tasca, e l'evento «Ti offrono un lavoro vero»
+    chiede `no_job`. «Non ci si può licenziare» in `05-carriera-e-tempo.md`.
 12. **Avaturn e il creator in game, tutti e due** — ALE, «FAI COESISTERE LE COSE». Nel
     codice convivono già (vedi la RISPOSTA sotto al punto): resta da confermarlo in
     partita e scriverlo in `03-artista-e-avatar.md`, che oggi non ne parla.
@@ -224,10 +225,6 @@ _I numeri sono quelli di sempre: i buchi sono i punti chiusi, spostati in
    in provincia (i beat sopra a una certa qualità? l'attrezzatura da studio grande?).
 
 3. i rapporti con i beatmaker non vanno mai in negativo, puoi offenderli quanto vuoi e il rapporto resta uguale
-
-4. Ci sono i prezzi dei beat spropositati. Non ha senso che alcuni beat costino 700 euro al livello quattro. Facciamo prezzi realistici : da 100 a 250 euro beat da beatmaker emergenti , da 300 euro a 1000 per beatmaker affermati e da 1000 a 2000 per beatmaker famosissimi
-
-5. Il giocatore parte con tutti i parametri a 1
 
 6. Verissima la cosa dell'hype, fattore che dev'essere davvero primario nel gioco e i player dovran costantemente provare a inseguire ma con tanta fatica, Partiamo proprio dallo sviluppo dell'hype :
 
@@ -442,8 +439,6 @@ con lo stesso numero e resta così._
 
     _Regola di lavoro, non task: vedi in testa a «Da fare adesso»._
 
-15. non ci si può licenziare dal lavoro corrente, implementalo per tutti i lavori.
-
 16. quando si segna un evento in agenda poi non si riesce a far passare il giorno
 
     **RISPOSTA (15/09/2026)** — è l'effetto voluto di un tuo punto precedente, «gli eventi
@@ -451,9 +446,7 @@ con lo stesso numero e resta così._
     appuntamento di oggi ancora da fare il salto non parte, e se è più avanti il salto si
     ferma alla sua mattina. Un'ora già passata non blocca niente, e «Fine giornata» resta
     libero apposta. Se il giorno non passa **dopo che l'evento l'hai fatto**, allora è il
-    punto qui sotto: la voce resta segnata anche dopo.
-
-17. se partecipo ad un evento segnato, dopo che ho partecipato l'evento si toglie automaticamente dall'agenda e non deve essere più segnato
+    punto «se partecipo ad un evento segnato… si toglie automaticamente dall'agenda», FATTO il 20/09/2026 (in [`fatte.md`](fatte.md)).
 
 18. sull'app lafamegram non posta nessuno
 

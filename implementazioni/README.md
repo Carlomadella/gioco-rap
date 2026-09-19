@@ -33,8 +33,8 @@ per i punti, e sono in [`../documentazione/come-si-lavora.md`](../documentazione
 
 ## Tutti i punti
 
-113 voci in tutto: **77 chiuse**, 13 a metà, 18 da fare e 5 con la sola risposta scritta
-(ricontate dalla tabella qui sotto il 07/09/2026, +1 chiusa l'08/09/2026). A che punto siamo
+122 voci in tutto: **86 chiuse**, 14 a metà, 17 da fare e 5 con la sola risposta scritta
+(ricontate dalla tabella qui sotto il 20/09/2026, dopo le quattro piccole). A che punto siamo
 nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../documentazione/roadmap.md).
 
 | | punto | stato | dove |
@@ -158,6 +158,10 @@ nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../docume
 | **—** | Le due dipendenze del backend, usate | fatto | [multiplayer-e-backend](07-multiplayer-e-backend.md) |
 | **—** | La pulizia dei media, e i sessanta sfondi che sono dieci foto | fatto | [grafica-e-asset](09-grafica-e-asset.md) |
 | **68** | Il telefono nuovo, quello della foto | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | L'evento fatto esce dall'agenda | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | I prezzi dei beat per fama del beatmaker | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
+| **—** | Si parte con tutti i parametri a 1 | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
+| **—** | Non ci si può licenziare | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
 
 > Lo stato è letto dal testo dei punti: «fatto» vuol dire che c'è scritto cosa è
 > stato fatto e quando, «risposto» che c'è una risposta ragionata ma il codice

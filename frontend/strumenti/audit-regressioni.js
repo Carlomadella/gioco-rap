@@ -2153,6 +2153,49 @@ test("l'app Agenda del telefono mostra quello che ti sei segnato",
   tel.includes("segnatiInAgenda() +") &&
   tel.includes("data-agendavia"));
 
+console.log("\nLe quattro piccole del 20/09 — agenda, prezzi dei beat, parametri a 1, licenziarsi");
+const beatsJs = leggi("js/game/beats.js");
+test("l'evento fatto esce dall'agenda: consumaPeso() toglie la voce di oggi invece di segnarla",
+  agenda.includes("function onora(id)") &&
+  /function consumaPeso\(id\)\{[\s\S]{0,300}onora\(id\)/.test(agenda) &&
+  !agenda.includes("v.bonusUsato = true") &&
+  agenda.includes("pesoDiOggi, consumaPeso, onora,"));
+test("anche il «Piccolo party» passa dall'agenda, come gli altri tre eventi di oggi",
+  /id:"stacca"[\s\S]{0,700}AGENDA\.consumaPeso\("stacca"\)/.test(actions) &&
+  actions.includes('AGENDA.consumaPeso("promo")') && actions.includes('AGENDA.consumaPeso("live")') &&
+  piazza.includes('AGENDA.consumaPeso("free")') && posto.includes('AGENDA.consumaPeso("sala")') &&
+  crime.includes('AGENDA.consumaPeso("colpo")'));
+test("i prezzi dei beat vanno per fama del beatmaker: tre fasce, 100–250, 300–1000, 1000–2000",
+  beatsJs.includes("const BEAT_FASCE = [") &&
+  beatsJs.includes('da:0,  min:100,  max:250') &&
+  beatsJs.includes('da:40, min:300,  max:1000') &&
+  beatsJs.includes('da:75, min:1000, max:2000') &&
+  beatsJs.includes("function prezzoBeat(q, id, fama)") &&
+  beatsJs.includes("function creaBeat(id, q, presi, fama)") &&
+  !beatsJs.includes("q*q*0.16"));
+test("chi ha un nome passa la sua fama a creaBeat: Sala, Studio, chat, chi si rifà vivo",
+  (posto.match(/creaBeat\(p\.gen \|\| mioGenere\(\), q, presi, p\.fama\)/g) || []).length === 2 &&
+  studio.includes("creaBeat(p.gen || mioGenere(), studioBeatQualita(p), presi, p.fama)") &&
+  chatjs.includes("creaBeat(p.gen || mioGenere(), q, presi, p.fama)") &&
+  transfers.includes("Math.random() * 16, presi, p.fama)") &&
+  studio.includes("fasciaBeatmaker(p.fama).min"));
+test("la fascia si legge sulla card del beat, nello Studio e sul banco",
+  studioEl.includes("fasciaBeat(b)") && ui.includes("fasciaBeat(b)") &&
+  beatsJs.includes("const fasciaBeat = b =>"));
+test("si parte con tutti i parametri a 1",
+  state.includes("skills:{scrittura:1, flow:1, presenza:1, rete:1}"));
+test("non ci si può licenziare: nessun testo promette «lascialo», e l'offerta di lavoro non arriva a chi lavora già",
+  !hub.includes("lascialo o aspetta di essere licenziato") &&
+  (hub.match(/da un lavoro non ci si licenzia/g) || []).length === 2 &&
+  /function offerJobs\(\)\{[\s\S]{0,500}if\(G\.job\)\{/.test(actions) &&
+  ev.includes('if(t==="no_job") return !G.job;') &&
+  ev.includes("if(j && !G.job) G.job=") &&
+  (() => {
+    const lista = Array.isArray(cat) ? cat : (cat.events || cat.eventi || Object.values(cat).find(Array.isArray));
+    const e = lista.find(x => x.id === "EV0035");
+    return !!e && (e.requirements || []).some(r => r.test === "no_job");
+  })());
+
 console.log("\nPunto 7 — i file .md in cartelle con nomi coerenti");
 test("in radice restano solo README, ROADMAP e CLAUDE",
   (() => {

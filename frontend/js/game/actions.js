@@ -203,6 +203,17 @@ const mixGain = () => Math.round(6 + (G.gear.monitor?5:0) + (G.gear.cuffie?3:0) 
   + studioBonus() + bancoBonus();
 
 function offerJobs(){
+  /* «Non ci si può licenziare dal lavoro corrente» (CARLO): con un posto in
+     tasca i colloqui non si fanno — accettarne uno voleva dire mollare
+     quello di prima. La mossa «Cerca lavoro» lo sa già (avail), questo è
+     per chiunque altro arrivi qui. */
+  if(G.job){
+    showEvent({k:"Colloqui", t:"Hai già un posto",
+      d:"Lavori già come " + G.job.n.toLowerCase() +
+        ". Da un lavoro non ci si licenzia: lo perdi solo se non ti presenti per tre settimane.",
+      opts:[{n:"Va bene", d:"Torni a quello che facevi", run(){ return null; }}]});
+    return;
+  }
   const pool = JOBS.filter(j => (!j.req || j.req(G)) && (!G.job || G.job.id !== j.id));
   const picks = [];
   while(picks.length < 2 && picks.length < pool.length){
@@ -601,6 +612,9 @@ const ACTIONS = [
      ? "+10–14 benessere · un po' di rete"
      : "+3–5 benessere · recupero ridotto",
    run(){
+     /* il «Piccolo party» della plancia è questa mossa: se era segnato in
+        agenda, giocarlo lo toglie (agenda.js, onora) */
+     if(window.AGENDA && typeof AGENDA.consumaPeso === "function") AGENDA.consumaPeso("stacca");
      const n = adfOggi("stacca");
      const prima = G.wellbeing;
      const w = n === 0 ? Math.round(rnd(10,15)) : Math.round(rnd(3,6));

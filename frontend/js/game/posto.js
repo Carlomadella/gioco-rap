@@ -837,7 +837,7 @@ function azionePosto(tipo, id){
     if(p.rel < 1 || beatSulTavolo(p)) return;
     const presi = G.market.map(b => b.n).concat(G.beats.map(b => b.n));
     const q = rnd(30, 50) + p.fama * 0.3 + p.rel * 7 + G.skills.rete * 0.3;
-    const b = creaBeat(p.gen || mioGenere(), q, presi);
+    const b = creaBeat(p.gen || mioGenere(), q, presi, p.fama);
     b.price = Math.max(20, Math.round(b.price * (1 - p.rel * 0.12)));
     b.da = p.n;
     G.market.push(b);
@@ -858,7 +858,7 @@ function azionePosto(tipo, id){
       ? AGENDA.consumaPeso("sala") : 1;
     const presi = G.market.map(b => b.n).concat(G.beats.map(b => b.n));
     const q = (rnd(46, 62) + p.fama * 0.35 + p.rel * 8 + G.skills.rete * 0.3) * peso;
-    const b = creaBeat(p.gen || mioGenere(), q, presi);
+    const b = creaBeat(p.gen || mioGenere(), q, presi, p.fama);
     b.da = p.n; b.price = 0;
     G.beats.push(b);
     gain("rete", 0.8 * peso); addLuc(4);

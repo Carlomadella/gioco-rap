@@ -1261,7 +1261,7 @@ const OCCASIONI = {
       if(typeof creaBeat !== "function" || typeof mioGenere !== "function")
         return {t:"Ti ha mandato roba da ascoltare.", c:""};
       const presi = (G.market || []).map(b => b.n).concat((G.beats || []).map(b => b.n));
-      const b = creaBeat(p.gen || mioGenere(), 40 + (p.fama || 10) * .5 + Math.random() * 16, presi);
+      const b = creaBeat(p.gen || mioGenere(), 40 + (p.fama || 10) * .5 + Math.random() * 16, presi, p.fama);
       b.price = Math.max(20, Math.round(b.price * (1 - (p.rel || 0) * .15)));
       b.da = p.n;
       G.market.push(b);

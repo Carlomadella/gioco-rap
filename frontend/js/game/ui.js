@@ -394,7 +394,8 @@ function renderGioco(){
       '<button class="shdrop" data-drop="' + i + '" title="Rifiuta: sparisce dal catalogo">✕</button>' +
     '</span>' +
     '<span class="sht">' + b.n + '</span>' +
-    '<span class="shs">qualità ' + b.q + ' · ' + beatInfo(b).bpm + ' bpm</span>' +
+    '<span class="shs">qualità ' + b.q + ' · ' + beatInfo(b).bpm + ' bpm' +
+      (b.da ? ' · ' + b.da : (typeof fasciaBeat === "function" && fasciaBeat(b) ? ' · ' + fasciaBeat(b) : '')) + '</span>' +
     '<button class="shbuy" data-buy="' + i + '"' + (G.money < b.price ? " disabled" : "") + '>' + b.price + ' €</button></div>';
   /* il banco diviso per genere: il tuo per primo, gli altri in ordine */
   const perGen = {};

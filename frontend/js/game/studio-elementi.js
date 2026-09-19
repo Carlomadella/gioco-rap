@@ -183,7 +183,10 @@ function studioBeatScheda(b, on){
       '" data-bcard="' + beatSeed(b) + '">' +
     '<span class="stbcov">' + cover(beatSeed(b), "", "", "") + '</span>' +
     '<span class="stbnome">' + studioEsc(b.n) + '</span>' +
-    '<span class="stbgen">' + studioEsc(genBeat(beatGen(b)).n.toLowerCase()) + '</span>' +
+    '<span class="stbgen">' + studioEsc(genBeat(beatGen(b)).n.toLowerCase()) +
+      /* chi l'ha fatto, o almeno di che giro è: è quello che spiega il prezzo */
+      (b.da ? " · " + studioEsc(b.da) : (typeof fasciaBeat === "function" && fasciaBeat(b)
+        ? " · " + fasciaBeat(b) : "")) + '</span>' +
     '<span class="stbdati">' + info.bpm + ' bpm<em>|</em>q' + b.q + '</span>' +
     '<span class="stbriga">' +
       stPlay(' data-bplay="' + beatSeed(b) + '"', "Ascolta «" + b.n + "»") +

@@ -466,3 +466,73 @@ strofa o beat in Cabina buttava la take pagata: adesso si mette da parte con la 
 (`d.takeAltre`) e torna se torni su quella coppia; le take da parte finiscono quando chiudi
 un pezzo. La plancia e l'Agenda non scrivono più «gratis» per «Registra il pezzo»: dicono i
 45 della take finché una take non c'è (`costoScritto` in `actions.js`, solo da mostrare).
+
+---
+
+## I prezzi dei beat per fama del beatmaker
+
+> **FATTO (20/09/2026)** — branch `task/piccole-agenda-beat-parametri-licenziarsi`, una
+> delle quattro piccole chiuse insieme. File: `frontend/js/game/beats.js` (`BEAT_FASCE`,
+> `fasciaBeatmaker`, `prezzoBeat`, `creaBeat`, `fasciaBeat`), più i cinque posti che
+> creano un beat con un nome sopra (`posto.js` ×2, `studio.js`, `chat.js`,
+> `trasferte.js`), `studioBeatPrezzo` in `studio.js` e le due card
+> (`studio-elementi.js`, `ui.js`).
+
+Il punto di ALE: *«Ci sono i prezzi dei beat spropositati. Non ha senso che alcuni beat
+costino 700 euro al livello quattro. Facciamo prezzi realistici: da 100 a 250 euro beat da
+beatmaker emergenti, da 300 euro a 1000 per beatmaker affermati e da 1000 a 2000 per
+beatmaker famosissimi»*.
+
+**Com'era.** `prezzoBeat(q, id)` guardava solo la qualità: `q²·0,16 + 14`, per il
+moltiplicatore del genere e un po' di caso, da 15 a ~1800 €. Un beat q66 costava 700 €
+senza che nessuno sapesse chi l'avesse fatto: il prezzo non aveva un beatmaker dietro.
+
+**Com'è.** Decide **la fama di chi lo fa** — la stessa `p.fama` (0–100) delle persone della
+Sala — in quale fascia sta il prezzo; la qualità dice dove sta *dentro* alla fascia:
+
+| fascia | fama | prezzo |
+| --- | --- | --- |
+| emergente | 0–39 | 100–250 € |
+| affermato | 40–74 | 300–1000 € |
+| famosissimo | 75–100 | 1000–2000 € |
+
+Il genere sposta poco (`pr`) e mai fuori dalla fascia: il prezzo è **sempre** dentro ai
+suoi due estremi. Misurato fuori dal browser su 400 giri per caso: un emergente va da 100
+(q10) a 231 in media (q100), un affermato da 311 a 923, un famosissimo da 1006 a 1848.
+
+**Chi ha un nome passa la sua fama.** `creaBeat(id, q, presi, fama)` ha un quarto
+parametro: lo passano la Sala (il beat sul tavolo e la sessione lunga), lo Studio («Fatti
+un beat» da un contatto), la chat (il beat che ti manda) e chi si rifà vivo dalle
+trasferte. Il beat promesso dal producer di un'altra città (`trasferte.js`, quello con
+`beat.da = c.n`, il nome della città) non ha una fama e si legge dal beat come i beat
+anonimi.
+
+**Il banco anonimo.** I tre beat di `offriBeat()` — «il giro dei produttori» — non hanno
+un beatmaker con un nome: la fama la si legge dal beat (`famaDalBeat`, `q·0,7` più un po'
+di caso). Su 300 giri escono per il 92% emergenti e per l'8% affermati, prezzo medio 174
+€: è il quartiere. Un famosissimo sul banco non esce, e non deve — la gente della Sala
+nasce con `fama` 4–46, quindi anche lì al massimo un affermato. La terza fascia si
+vedrà quando le facce famose ci saranno (Milano).
+
+**Il beat su commissione allo Studio** (`studioBeatPrezzo`) partiva da 60 € chiunque
+fosse: adesso parte dal **fondo del listino della sua fascia** (100 un emergente, 300 un
+affermato) e cala col rapporto come prima, gratis da «fidato» in su.
+
+**Gli sconti restano.** Il rapporto con un beatmaker della Sala (−12 % a gradino, floor
+20 €), quello in chat, il −55 % del beat promesso in trasferta: sono un'altra cosa dal
+listino, e si applicano dopo. Un amico può fartelo pagare meno di 100 — il listino è
+questo, l'amicizia è un'altra cosa.
+
+**Si legge sulla card.** Ogni beat nuovo porta `fascia` («emergente», «affermato»,
+«famosissimo») e la card lo scrive dopo il genere — «rap · emergente» — dove non c'è già
+il nome di chi l'ha fatto; sia nello Studio (`stbgen`) sia sul banco vecchio di `ui.js`.
+I beat dei salvataggi di prima non hanno la fascia e non scrivono niente: non si rileggono.
+
+**Cosa cambia per chi comincia.** Si parte con 0 € e il beat più economico costa 100: un
+turno da barista (130 €) o da operaio (220 €). Prima costava 15. È quello che il punto
+chiede — «prezzi realistici» — e la prima mossa in Studio è comunque cercare un beat, che
+non costa energia.
+
+L'audit («Le quattro piccole del 20/09») tiene le tre fasce coi loro numeri, la firma di
+`prezzoBeat` e `creaBeat`, i cinque chiamanti con `p.fama`, il listino dello Studio e la
+fascia sulle due card; e controlla che la formula vecchia (`q*q*0.16`) non torni.

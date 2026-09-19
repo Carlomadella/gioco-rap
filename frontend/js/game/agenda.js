@@ -168,15 +168,25 @@
     const def = SETTIMANALI.find(s => s.id === id);
     return def && def.peso ? def.peso : 1;
   }
+  /* L'EVENTO FATTO ESCE DALL'AGENDA (CARLO, «se partecipo ad un evento
+     segnato, dopo che ho partecipato l'evento si toglie automaticamente
+     dall'agenda»). Prima consumaPeso() segnava solo `bonusUsato`, e la voce
+     restava lì: la sera la trovavi ancora segnata come se dovessi ancora
+     andarci, e il salto del tempo si fermava per un appuntamento già onorato.
+     Adesso l'appuntamento di oggi con quel nome — di oggi o della settimana —
+     si toglie da solo nel momento in cui l'evento lo giochi davvero. Quelli di
+     un altro giorno non si toccano: non li hai ancora onorati. */
+  function onora(id){
+    const a = ag(), anno = G.year || 1, sett = G.week || 1, giorno = G.day || 1;
+    const n = a.voci.length;
+    a.voci = a.voci.filter(v => !(v.id === id && v.anno === anno &&
+      v.settimana === sett && v.giorno === giorno));
+    return a.voci.length !== n;
+  }
   function consumaPeso(id){
-    const trovate = vociDaConsumare(id);
-    if(!trovate.length) return 1;
-    const def = SETTIMANALI.find(s => s.id === id);
-    const peso = def && def.peso ? def.peso : 1;
-    if(peso > 1){
-      trovate.forEach(v => { v.bonusUsato = true; });
-      if(typeof save === "function") save();
-    }
+    /* il peso si legge prima di togliere la voce: è lei a dire che oggi vale */
+    const peso = pesoDiOggi(id);
+    if(onora(id) && typeof save === "function") save();
     return peso;
   }
 
@@ -313,7 +323,7 @@
   /* ==================== QUELLO CHE SERVE FUORI ==================== */
   window.AGENDA = {
     settimanali, voci, segnato, segna, togli, tocca,
-    pesoDiOggi, consumaPeso,
+    pesoDiOggi, consumaPeso, onora,
     minutiDi:oraInMinuti,
     /* quanti giorni si possono saltare, e per colpa di chi ci si ferma */
     bloccoSalto,

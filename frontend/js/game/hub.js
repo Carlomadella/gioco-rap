@@ -424,7 +424,12 @@ function hubChiuso(l){
 
 /* punto 59: due posti di lavoro veri sulla mappa, non un cartello con su
    scritto «arriva a Milano». Si assume da solo chi ci va, se non lavora
-   già altrove — un posto alla volta, come è sempre stato G.job. */
+   già altrove — un posto alla volta, come è sempre stato G.job.
+   «Non ci si può licenziare dal lavoro corrente» (CARLO): il posto lo
+   lasci solo se ti mandano via — tre settimane senza presentarti, in
+   sim.js. Vale per tutti i lavori: qui, al centro per l'impiego, ai
+   colloqui (actions.js, offerJobs) e all'offerta degli eventi (eventi-v2,
+   `set_job`). Il testo di rifiuto qui sotto non promette più «lascialo». */
 function assumitiCome(jobId){
   const def = JOBS.find(j => j.id === jobId);
   if(!def) return;
@@ -443,7 +448,7 @@ function assumitiCome(jobId){
   if(!G.job || G.job.id !== jobId){
     if(G.job){
       hubChiuso({n:def.n, chiuso:"Lavori già come " + G.job.n.toLowerCase() +
-        ". Un posto alla volta — lascialo o aspetta di essere licenziato."});
+        ". Un posto alla volta, e da un lavoro non ci si licenzia: lo perdi solo se non ti presenti per tre settimane."});
       return;
     }
     G.job = {id:def.id, n:def.n, pay:def.pay, e:def.e, missed:0};
@@ -488,7 +493,7 @@ function schedaImpiego(){
   righe.push({n:"Lascia stare", d:"Torni alla mappa", run(){ return null; }});
   showEvent({k:"Centro per l'impiego", t:"Tutti i lavori in città",
     d:G.job ? "Lavori già come " + G.job.n.toLowerCase() +
-      ". Un posto alla volta — lascialo o aspetta di essere licenziato."
+      ". Un posto alla volta, e da un lavoro non ci si licenzia: lo perdi solo se non ti presenti per tre settimane."
       : "Guarda cosa c'è, e fatti assumere.",
     annulla(){}, opts:righe});
 }

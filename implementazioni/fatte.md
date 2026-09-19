@@ -22,9 +22,48 @@ un'altra cosa.
 
 | quando | quante |
 | --- | --- |
+| 20/09/2026 | 4 |
 | 15/09/2026 | 6 |
 | 07/09/2026 | 6 |
 | 06/09/2026 | 10 |
+
+---
+
+## 20/09/2026
+
+_Le quattro piccole, chiuse insieme nel branch `task/piccole-agenda-beat-parametri-licenziarsi`._
+
+### L'evento fatto esce dall'agenda
+
+_Da `implementazioni.md`, CARLO 17._
+
+17. se partecipo ad un evento segnato, dopo che ho partecipato l'evento si toglie automaticamente dall'agenda e non deve essere più segnato
+
+    **FATTO (20/09/2026)** — `consumaPeso()` in `agenda.js` legge il peso e poi `onora()` toglie dall'agenda la voce di oggi con quel nome, di oggi o della settimana; il «Piccolo party» (`stacca`) passa di lì anche lui, era l'unico che non lo faceva. Il racconto: «L'evento fatto esce dall'agenda» in `02-interfaccia-e-telefono.md`.
+
+### I prezzi dei beat per fama del beatmaker
+
+_Da `implementazioni.md`, ALE 4._
+
+4. Ci sono i prezzi dei beat spropositati. Non ha senso che alcuni beat costino 700 euro al livello quattro. Facciamo prezzi realistici : da 100 a 250 euro beat da beatmaker emergenti , da 300 euro a 1000 per beatmaker affermati e da 1000 a 2000 per beatmaker famosissimi
+
+    **FATTO (20/09/2026)** — tre fasce sulla fama di chi lo fa (`BEAT_FASCE` in `beats.js`): emergente 100–250, affermato 300–1000, famosissimo 1000–2000; la qualità dice dove dentro alla fascia, il genere non esce mai dalla fascia. Chi ha un nome passa la sua fama a `creaBeat`, il banco anonimo la legge dal beat (92 % emergenti), e la fascia si legge sulla card. Il racconto: «I prezzi dei beat per fama del beatmaker» in `04-musica-e-suoni.md`.
+
+### Si parte con tutti i parametri a 1
+
+_Da `implementazioni.md`, ALE 5._
+
+5. Il giocatore parte con tutti i parametri a 1
+
+    **FATTO (20/09/2026)** — una riga in `state.js`; `livello()` guardato, 88 di esperienza su 300: si resta al livello 1. Il racconto: «Si parte con tutti i parametri a 1» in `05-carriera-e-tempo.md`.
+
+### Non ci si può licenziare
+
+_Da `implementazioni.md`, CARLO 15._
+
+15. non ci si può licenziare dal lavoro corrente, implementalo per tutti i lavori.
+
+    **FATTO (20/09/2026)** — via il «lascialo» dai due testi di `hub.js`; `offerJobs()` non fa i colloqui con un posto in tasca; l'evento EV0035 «Ti offrono un lavoro vero» chiede `no_job` (test nuovo in `eventi-v2.js`) e `set_job` non sovrascrive un lavoro che c'è. Il posto lo lasci solo se ti mandano via, come è sempre stato in `sim.js`. Il racconto: «Non ci si può licenziare» in `05-carriera-e-tempo.md`.
 
 ---
 
