@@ -944,3 +944,13 @@ Il receipt append-only `source-separation-development-inference-v1-001` è stato
 La preparazione del receipt non ha aperto audio, non ha eseguito Source Separation e non ha acceduto al final holdout. Di conseguenza il primo output del separatore non esiste ancora e la rubric QA rimane realmente congelata prima dell'osservazione dei risultati.
 
 Prima dell'esecuzione deve passare il check read-only del receipt contro gli artefatti correnti congelati e contro le identità/sha delle 8 sorgenti development. Solo dopo quel check è autorizzato il batch append-only sulle 8 family. Final holdout, batch 131, training e task/data readiness restano esclusi.
+
+## NDR-065 — Source Separation: receipt check PASS, batch development autorizzato
+
+**Stato: ACCEPTED — 20 settembre 2026.**
+
+Il check read-only del receipt `source-separation-development-inference-v1-001` è passato sul workspace reale con stato `AUTHORIZED_NO_INFERENCE`, 8 record, `sourceFamiliesLocked=true`, `finalHoldoutExcluded=true`, `batch131Authorized=false` e `trainingAuthorized=false`.
+
+Il check ha quindi confermato che il receipt continua a corrispondere agli artefatti congelati di repository, al pilot manifest e alle identità/SHA delle 8 sorgenti development. Nessun output stem è ancora stato prodotto.
+
+Da questo checkpoint è autorizzata l'esecuzione append-only del batch HTDemucs **esclusivamente sulle 8 family development già congelate nel receipt**. Restano vietati accesso al final holdout, espansione alle 131 sorgenti, training e dichiarazioni di task/data readiness. Il risultato del batch dovrà essere sottoposto alla rubric QA congelata prima di qualsiasi promozione downstream.
