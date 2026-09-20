@@ -33,6 +33,7 @@ jobs:
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-source-separation-development-inference-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-source-separation-development-qa-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-source-separation-human-review-test.js
+      - run: node frontend/strumenti/fame-neural-composer/owned-beats-audio-to-midi-development-qa-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-source-separation-environment-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-audio-analysis-v2-protocol-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats/human-reference-holdout-pack-test.js
