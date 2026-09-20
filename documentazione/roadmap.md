@@ -101,9 +101,10 @@ staccata dall'accesso e dal gioco, l'albero delle abilità, la discografia, i di
 
 **C'è già**: la plancia che riempie lo schermo con la mappa del concept, i luoghi come
 punti da toccare, le card tutte nella forma dello Studio, i tastini che muovevano la mappa
-tolti, lo Shop diventato uno shop vero, Casa, la palestra, la Pizzeria e la Fabbrica al
-posto di due cartelli chiusi, le trasferte fuori città, il telefono nuovo con LaFamegram e
-il feed che si scorre.
+tolti, lo Shop diventato uno shop vero (e dal 20/09/2026 col reparto Vestiti sui capi del
+camerino MakeHuman: lo Shop sblocca, il camerino veste), Casa, la palestra, la Pizzeria e la
+Fabbrica al posto di due cartelli chiusi, le trasferte fuori città, il telefono nuovo con
+LaFamegram e il feed che si scorre.
 
 **Manca**:
 

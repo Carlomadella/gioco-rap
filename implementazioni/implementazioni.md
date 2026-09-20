@@ -124,8 +124,12 @@ da quale lista viene.
 12. **Avaturn e il creator in game, tutti e due** — ALE, «FAI COESISTERE LE COSE». Nel
     codice convivono già (vedi la RISPOSTA sotto al punto): resta da confermarlo in
     partita e scriverlo in `03-artista-e-avatar.md`, che oggi non ne parla.
-13. **Lo Shop promette tre reparti, ce ne sono due** — da problemi-riscontrati: i Vestiti
-    sono ancora la griglia vecchia, non dietro a una linguetta.
+13. ~~**Lo Shop promette tre reparti, ce ne sono due**~~ **FATTO (20/09/2026)** — la
+    terza linguetta è tornata, ma non sul ritratto 2D congelato il 09/09: il reparto
+    Vestiti vende 39 capi veri del camerino MakeHuman, lo Shop sblocca e il camerino veste
+    (le tendine mostrano solo quello che possiedi, più quello che hai già addosso). «Lo
+    Shop: il reparto Vestiti» in `02-interfaccia-e-telefono.md`. Gli avatar Avaturn non si
+    vestono con roba MakeHuman, e il reparto lo dice.
 
 **Lavori lunghi**
 

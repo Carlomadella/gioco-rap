@@ -1756,21 +1756,50 @@ test("ogni pezzo di attrezzatura ha un'icona propria (cuffie, mic, manopole, alt
   hub.includes("cuffie:'<path") && hub.includes("altoparlante:'<path"));
 test("la cassa dello shop si vede sempre, non solo scorrendo fino in fondo",
   ui.includes('$("sh-cash")') && ui.includes("fmt(G.money)"));
-test("Attrezzatura e Beat sono due reparti dietro due linguette, non due liste impilate",
-  index.includes('data-sh="gear"') && index.includes('data-sh="beat"') &&
-  index.includes('data-shsec="gear"') && index.includes('data-shsec="beat"') &&
-  (index.match(/\bdata-sh="/g) || []).length === 2 &&
-  (index.match(/\bdata-shsec="/g) || []).length === 2 &&
-  !index.includes('data-sh="fit"') && !index.includes('data-shsec="fit"') &&
+test("Attrezzatura, Beat e Vestiti sono tre reparti dietro tre linguette, non liste impilate",
+  index.includes('data-sh="gear"') && index.includes('data-sh="beat"') && index.includes('data-sh="fit"') &&
+  index.includes('data-shsec="gear"') && index.includes('data-shsec="beat"') && index.includes('data-shsec="fit"') &&
+  (index.match(/\bdata-sh="/g) || []).length === 3 &&
+  (index.match(/\bdata-shsec="/g) || []).length === 3 &&
   negozio.includes('const shTabs = $("sh-tabs")') &&
   negozio.includes('shTabs.addEventListener("click"') &&
   negozio.includes("s.dataset.shsec === b.dataset.sh"));
-test("il reparto Vestiti legacy resta nascosto e inerte finché manca il nuovo catalogo cosmetico",
-  negozio.includes("ADF_ABBIGLIAMENTO_HIBERNATE_V2") &&
-  negozio.includes("window.ADF_ABBIGLIAMENTO_LEGACY_ACTIVE = false") &&
-  negozio.includes("function renderAbbigliamento(){ return; }") &&
-  negozio.includes("function ngCompra(){ return false; }") &&
-  !index.includes('id="g-fit"') && !negozio.includes("data-compra"));
+/* Il reparto Vestiti (20/09/2026): lo Shop sblocca, il camerino veste. Il
+   vecchio abbigliamento 2D (congelato il 09/09) vestiva un ritratto che non
+   c'e' piu'; questo vende capi veri del camerino MakeHuman
+   (js/creator/guardaroba.js) e la lista arriva al camerino passando dal ponte del
+   creator, cosi' le tendine non offrono gratis quello che si compra. */
+const guardaroba = leggi("js/creator/guardaroba.js");
+test("il reparto Vestiti vende capi del camerino MakeHuman: ogni raw della vetrina sta nel suo catalogo, nella tendina giusta",
+  (() => {
+    const cat = JSON.parse(fs.readFileSync(path.join(ROOT, "media/makehuman-editor-v1/makehuman-ui-catalog-v29.json"), "utf8"));
+    const perRaw = new Map(cat.assets.map(a => [a.raw, a.group]));
+    const capi = [...guardaroba.matchAll(/\{id:"[a-z0-9]+", raw:"([^"]+)", n:"[^"]+", slot:"([a-zA-Z]+)", p:(\d+)/g)];
+    return capi.length >= 30 && capi.every(m => perRaw.get(m[1]) === m[2] && +m[3] > 0);
+  })());
+test("comprare un vestito e' la stessa economia dell'attrezzatura: G.money scende, G.vestiti[raw] diventa true, si salva",
+  negozio.includes("G.money -= v.p; guardarobaPosseduti()[v.raw] = true;") &&
+  negozio.includes("save(); renderGioco();") &&
+  ui.includes('if(typeof renderAbbigliamento === "function") renderAbbigliamento();'));
+test("la vetrina e i capi tuoi arrivano al camerino: ponte → creator → init del camerino",
+  leggi("js/creator/rpg-v24-bridge.js").includes("ADF_GUARDAROBA.perCamerino()") &&
+  leggi("media/creator-rpg-v24/creator.html").includes("state.guardaroba=(a.guardaroba") &&
+  leggi("media/creator-rpg-v24/creator.html").includes("guardaroba:state.guardaroba||null") &&
+  leggi("media/makehuman-camerino-v1/runtime.js").includes("adfGuardarobaImposta(msg.guardaroba||null,msg.state||null);"));
+test("nel camerino un capo in vetrina che non e' tuo non sta nelle tendine, ma quello che hai addosso resta",
+  (() => {
+    const rt = leggi("media/makehuman-camerino-v1/runtime.js");
+    return rt.includes("ADF_SHOP_GUARDAROBA_V1") &&
+      rt.includes("return WARDROBE_SLOT_SET.has(uiGroup) ? entries.filter(adfGuardarobaVisibile) : entries;") &&
+      rt.includes("const addosso=new Set(Object.values((state&&state.slots)||{}).map(String));") &&
+      rt.includes("if(resourceEntries.length) adfRipopolaGuardaroba();");
+  })());
+test("landing e gioco caricano il guardaroba, e il ponte del creator carica il creator nuovo",
+  index.includes('<script src="js/creator/guardaroba.js') &&
+  leggi("pagine/landing.html").includes('<script src="js/creator/guardaroba.js') &&
+  !leggi("js/creator/rpg-v24-bridge.js").includes("creator.html?v=25"));
+test("con un avatar Avaturn lo Shop lo dice, invece di vendere vestiti che non si vedranno",
+  negozio.includes("guardarobaVestibile()") && negozio.includes('art.avatarSource === "avaturn"'));
 test("comprare attrezzatura e beat resta la stessa economia di prima: stesso costo, stesso G.money, stesso G.gear/G.beats",
   ui.includes("G.money -= g2.p; G.gear[g2.id] = true;") &&
   ui.includes("G.money -= b.price; G.market.splice(i,1); G.beats.push("));

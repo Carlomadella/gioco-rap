@@ -143,7 +143,7 @@ const HUB_LUOGHI = [
      che come linguetta a sé non aveva senso: un negozio è un posto. */
   {id:"shop", n:"Shop",
    vai:() => apriPannello("Shop", "shop",
-     "Attrezzatura e beat da comprare.")},
+     "Attrezzatura, beat e vestiti da comprare.")},
   /* punto 6: il centro per l'impiego, arrivato con la mappa definitiva.
      Apre tutti i lavori (JOBS), non solo i due che hanno già un edificio —
      rispetta i requisiti, non finge che siano tutti presi al volo.

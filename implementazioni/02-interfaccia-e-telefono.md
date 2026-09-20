@@ -947,6 +947,89 @@ Non voglio questo, dallo studio si esce solo col pulsantino torna alla mappa che
 > Sette controlli nuovi in `strumenti/audit-regressioni.js`. `npm run verifica`
 > pulito: prova 67/67, audit 199/199, build 15/15.
 
+> **Nota (20/09/2026)**: la terza linguetta, Vestiti, è stata congelata da Mycol il 09/09
+> (`ADF_ABBIGLIAMENTO_HIBERNATE_V2`) perché vestiva il ritratto 2D del creator che non c'è
+> più; è tornata il 20/09 su un catalogo nuovo, quello del camerino MakeHuman — la sezione
+> qui sotto.
+
+## Lo Shop: il reparto Vestiti — lo Shop sblocca, il camerino veste
+
+> «Lo Shop promette tre reparti a schede, ce ne sono due» (problemi-riscontrati, 10/09), e
+> la richiesta del 20/09: «nello shop si trovano accessori o vestiti per l'avatar».
+
+**FATTO (20/09/2026)** — branch `task/shop-tre-reparti`. File nuovi:
+`frontend/js/creator/guardaroba.js` (il catalogo e il possesso), `frontend/media/photo/shop/`
+(39 miniature da 128 punti e `CREDITI.md`). Toccati: `js/game/negozio.js` (riscritto: le
+linguette e il reparto), `pagine/gioco.html` (la terza linguetta), `pagine/landing.html`
+(carica il guardaroba), `js/game/ui.js` (una riga), `css/game.css` (la card con la
+miniatura, la nota e il tasto), `js/game/hub.js` (il sottotitolo dello Shop),
+`js/creator/rpg-v24-bridge.js`, `media/creator-rpg-v24/creator.html` e
+`media/makehuman-camerino-v1/runtime.js` (il passaggio della lista e il filtro delle
+tendine), `strumenti/prova.js` e `strumenti/audit-regressioni.js`.
+
+**Il problema di partenza.** In partita l'avatar è una **foto** (`avatarPreviewImage`)
+scattata dal camerino MakeHuman (o da Avaturn): non è un disegno che il gioco possa rivestire
+da solo, ed è per questo che il vecchio reparto Vestiti — che vestiva il ritratto 2D del
+creator — è stato congelato il 09/09 «finché non esisterà un catalogo cosmetico coerente
+con i provider avatar reali». Ma il camerino ha già un **guardaroba completo** (14 tendine,
+468 capi del catalogo MakeHuman, con le miniature), e da «Il tuo artista» si riapre sopra la
+partita e la foto si aggiorna. Solo che è tutto gratis: uno Shop che vende vestiti ha senso
+solo se il camerino mostra quello che possiedi.
+
+**La regola: lo Shop sblocca, il camerino veste.**
+
+- **Il catalogo** (`VETRINA_VESTITI`, `js/creator/guardaroba.js`): 39 capi scelti uno per
+  uno dal catalogo MakeHuman, con lo stesso `raw` del camerino e la tendina in cui stanno —
+  6 cappelli, 6 occhiali, 4 gioielli, 10 per la parte alta, 5 per la parte bassa, 7 paia di
+  scarpe, le cuffie al collo. Solo capi **CC0 o CC-BY** (gli AGPL e quelli senza licenza
+  dichiarata restano fuori: la catena, il fedora, il septum, la camicia a righe); i crediti
+  in `media/photo/shop/CREDITI.md`. Il catalogo MakeHuman è roba di comunità generica
+  (cappello da mago, Babbo Natale, bikini): i nomi sono stati dati guardando la miniatura,
+  non il nome del file — gli «hero boots» sono stivali rossi al ginocchio, il «Coat» un
+  trench bianco, la giacca «rescue team» è una giacca da soccorso e la card lo dice. Prezzi
+  da 35 (canotta) a 900 € (anello di diamanti), sulla scala dell'attrezzatura.
+- **Lo Shop** (`negozio.js`): terza linguetta «Vestiti», sette reparti con il divisorio dei
+  beat (`gsep`), card come quelle dell'attrezzatura (`.shcard.shfit`) con la miniatura al
+  posto dell'icona, il prezzo o «Tuo», spente se i soldi non bastano. Comprare è la stessa
+  economia dell'attrezzatura: `G.money` scende, `G.vestiti[raw] = true` (la chiave esisteva
+  già: `eventi-v2.js` la conta), `save()`. In testa al reparto una nota dice quanti capi hai
+  e che «è nel camerino che ci si veste», col tasto **«Vai a provarlo nel camerino»**
+  (`ADF_RPG_V24.openAppearance()`); tornando dal camerino la foto nuova va anche sulla
+  plancia (`renderHub()` nel ponte).
+- **Il camerino**: la lista — cosa sta in vetrina, cosa è tuo — arriva con il messaggio di
+  init passando dal ponte (`payloadIniziale()` → `adf-rpg-v24-init`/`edit-appearance` →
+  `creator.html` → `adf-makehuman-init`, campo `guardaroba`). In `runtime.js`
+  (`ADF_SHOP_GUARDAROBA_V1`) `entriesForUiGroup` toglie dalle tendine del guardaroba i capi
+  in vetrina che non sono tuoi — e siccome preset e casuale passano di lì, non li pescano
+  nemmeno loro. **Quello che il personaggio ha già addosso resta**: un salvataggio di prima
+  del 20/09 non si spoglia. Senza il campo (camerino standalone, un creator vecchio) non
+  cambia niente. Il file sta in `js/creator/` e non in `js/game/` perché lo carica anche la
+  landing (alla prima creazione i capi in vetrina devono restare fuori dalle tendine), e la
+  landing carica del gioco solo lo stato e le fasi.
+- **Avaturn**: gli avatar Avaturn non si vestono con roba MakeHuman. Il reparto lo dice
+  (`guardarobaVestibile()`), invece di vendere cose che non si vedranno mai addosso; chi non
+  ha ancora un artista legge che «prima serve un artista fatto nel camerino».
+
+**Provato** con Playwright sul Chrome installato, a 1440 × 900 e 390 × 844: tre linguette;
+39 card in sette reparti, nessuna immagine rotta; comprato il beanie (1000 → 910 €, la card
+diventa «Tuo», `G.vestiti` ha il suo raw) e gli occhiali da sole (→ 750 €); dopo il reload il
+possesso c'è ancora. Poi il camerino aperto dalla partita con un artista MakeHuman che
+indossa il trilby (non comprato) e possiede il beanie: la tendina dei cappelli ha 24 voci
+invece di 28 (via i sei in vetrina, dentro il beanie perché tuo e il trilby perché addosso,
+che resta selezionato), quella degli occhiali 8 invece di 14. `npm run prova` 180, audit 418
+(sette controlli in più: il catalogo contro quello MakeHuman raw per raw e tendina per
+tendina, l'economia, il passaggio ponte → creator → camerino, il filtro, le pagine, la nota
+Avaturn) e `prova.js` con due controlli nuovi (il ritratto 2D non torna; ogni capo ha la sua
+miniatura e viceversa).
+
+**Cosa resta fuori, di proposito.** I capi si mettono addosso **nel camerino**, non dallo
+Shop: far rivestire la foto dall'esterno vorrebbe dire far girare MakeHuman (145 MB di
+target, 9 secondi su Chrome vero) a ogni acquisto. Il dataset MakeHuman (`media/
+makehuman-editor-v1`, 2,8 GB) resta fuori dal pacchetto per gli store come prima: il reparto
+funziona lo stesso (le miniature sono copie da 439 KB in `media/photo/shop/`), è il camerino
+che senza dataset non parte — e questo era vero anche prima dello Shop. Nessun effetto di
+gioco dai vestiti (hype, presenza): è un'idea per dopo, non era chiesta.
+
 
 ---
 
