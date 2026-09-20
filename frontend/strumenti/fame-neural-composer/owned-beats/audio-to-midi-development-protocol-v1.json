@@ -173,8 +173,10 @@
   },
   "implementation": {
     "baselinePath": "audio-to-midi-development-baseline.py",
-    "baselineGitBlobSha1": "0e48d49e6c7784b9e26628dcf52becd3d5456b9c",
-    "implementationCommit": "7950de6ab2e1ff65cbe596d25b855b84f9c0d17f"
+    "baselineGitBlobSha1": "5a7b14f9347ac3764dfdfc6377ba989a32106977",
+    "implementationCommit": "48136ed31f7b59a9e93a487d50cf59d1a538a9e5",
+    "freezeRevision": "pre-output-fix-001-python-major-minor",
+    "freezeRevisionReason": "Corrects preflight comparison of protocol Python 3.14 against patch-level runtime 3.14.x; no transcription output existed before this revision."
   },
   "frozenAt": "2026-09-20"
 }
