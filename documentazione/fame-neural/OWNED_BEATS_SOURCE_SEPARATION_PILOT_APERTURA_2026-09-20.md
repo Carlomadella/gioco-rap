@@ -83,3 +83,16 @@ Non vengono autorizzati:
 ## Prossimo intervento
 
 Implementare e verificare il **batch separator adapter** per il candidate fissato, poi congelare QA e soglie prima dell'ascolto degli output del pilot.
+
+
+## Addendum — adapter environment doctor
+
+Dopo il preflight reale sul workspace, il run `source-separation-pilot-v1-001` è stato preparato su 8/8 family development con SHA delle sorgenti verificati e senza inferenza.
+
+Per evitare di dipendere da assunzioni sulla GUI Audacity è stato aggiunto `source-separation-audacity-openvino-doctor.ps1`. Il comando non apre audio e non modifica configurazioni: rileva l'installazione Audacity, verifica `mod-openvino.dll`, verifica i due file HTDemucs contro gli SHA256 congelati e controlla se `mod-script-pipe` è disponibile/attivo.
+
+La pipeline Intel documenta Music Separation come effetto Audacity interattivo; il doctor serve quindi a stabilire se possiamo costruire il batch adapter riusando l'installazione esistente oppure se serve un backend standalone prima di produrre qualunque stem.
+
+Fonti:
+- https://github.com/intel/openvino-plugins-ai-audacity/blob/main/mod-openvino/OVMusicSeparation.cpp
+- https://manual.audacityteam.org/man/scripting.html

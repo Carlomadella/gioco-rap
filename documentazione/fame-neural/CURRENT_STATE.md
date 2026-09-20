@@ -20,7 +20,7 @@ La singola evaluation finale one-shot sul cohort sostitutivo `evaluation-holdout
 
 Il nuovo holdout R1 v2 è quindi **osservato, consumato e chiuso per tuning**. Non può essere riutilizzato per scegliere o modificare una configurazione successiva. `config-001` è la versione Audio Analysis promossa per il downstream del pilot.
 
-Source Separation pilot **aperto**: ricerca di apertura e tooling di preflight/prepare sono implementati; inferenza non ancora avviata. Baseline primaria del pilot: `intel-openvino-htdemucs-v4-97fc578`. Il final holdout Audio Analysis resta escluso. Prossimo intervento: batch separator adapter → QA stems → Audio→MIDI drums/low-end. Training serio resta chiuso.
+Source Separation pilot **preparato**: preflight reale passato su 8/8 family development e run append-only `source-separation-pilot-v1-001` creato con SHA delle sorgenti verificati; inferenza non ancora avviata. Baseline primaria: `intel-openvino-htdemucs-v4-97fc578`. Aggiunto doctor dell'adapter Audacity/OpenVINO per verificare installazione, model hash e disponibilità `mod-script-pipe` senza aprire audio. Prossimo intervento: discovery del comando effect via pipe → batch adapter → QA stems. Training serio resta chiuso.
 
 ## Checkpoint precedente — integrazione audit 13/09/2026
 
@@ -52,7 +52,7 @@ R6 finale resta aperto: reference cieca disponibile, scoring V1/config-001 e pai
 | Human Reference holdout R1 v2 | **COMPLETATA / FINALIZZATA** | 10/10 family complete e beat-metric usable; reviewId `audio-analysis-v2-holdout-r1-v2-reference-001`; submission digest `83a28e300daa8b64653354db46afabbcb4737c300e02636bf9b8bcde9c4efe90` |
 | Ambiente tecnico Audio Analysis | **COMPLETATO** | FFmpeg/ffprobe 9.0.1 + Python 3.14 + stack audio verificata |
 | Audio Analysis pilot | **R6 CHIUSO — V2_PROMOTE** | `audio-analysis-v2-config-001` confermata sul final holdout one-shot: beat paired median delta `0.0`, section F1 @0,5 s paired median delta `+0.545805`, technical integrity PASS; comparison SHA256 `c38046919388b839dce070f6a9503efad6c6fc43045bd6196305ea0056c12d7d`; nessun retuning consentito sullo stesso holdout |
-| Source Separation pilot | **APERTURA IMPLEMENTATA / INFERENZA NON AVVIATA** | protocollo e tooling preflight/prepare sul solo split `development` (8 family); baseline primaria `intel-openvino-htdemucs-v4-97fc578`; final holdout escluso; prossimo passo = adapter batch + QA prima dell'ascolto |
+| Source Separation pilot | **RUN PREPARATO / INFERENZA NON AVVIATA** | preflight 8/8 development PASS; `source-separation-pilot-v1-001` materializzato con source SHA verificati; baseline `intel-openvino-htdemucs-v4-97fc578`; doctor Audacity/OpenVINO aggiunto; final holdout escluso |
 | Trascrizione Audio→MIDI pilot | **DA FARE** | drums/low-end prima; tonal successivamente |
 | QA pilot | **DA FARE** | metriche automatiche e giudizio umano separati |
 | Espansione batch corpus | **BLOCCATA** | subordinata ai risultati/gate del pilot |
