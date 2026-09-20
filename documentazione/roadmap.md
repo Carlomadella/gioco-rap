@@ -341,9 +341,10 @@ I punti aperti in
 sulle tappe qui sopra:
 
 **Alessio** — shop già dalla città iniziale con prodotti limitati (B), rapporti coi
-beatmaker che non vanno in negativo (E), Avaturn e creatore in gioco che convivono 50/50 (B),
-card della mappa troppo vicine e pulsanti troppo grandi (B). I prezzi dei beat realistici e
-la partenza con tutti i parametri a 1 (C) sono **fatti il 20/09/2026**.
+beatmaker che non vanno in negativo (E), card della mappa troppo vicine e pulsanti troppo
+grandi (B). I prezzi dei beat realistici e la partenza con tutti i parametri a 1 (C) sono
+**fatti il 20/09/2026**, e lo stesso giorno **Avaturn e il camerino MakeHuman che convivono
+50/50** (B) è confermato in partita e scritto in `implementazioni/03-artista-e-avatar.md`.
 
 > Tre punti di quel foglio — le card tutte come lo Studio, via i tastini che muovono la
 > mappa, lo shop che diventa uno shop — **risultano già chiusi** nella tabella dei punti:

@@ -117,3 +117,62 @@ responsività, e la galleria e la barra delle categorie si disegnano; ma le cent
 una per una le ho controllate col metodo qui sopra, non a occhio.
 
 ---
+
+## Avaturn e il camerino MakeHuman, tutti e due
+
+> «Avaturn voglio lo rendiamo UN 50/50, cioè chi non vuole andare a farsi tutta la trafila
+> per fare Avaturn (anche se ovviamente dobbiamo fare di tutto per consigliarli a farlo)
+> può benissimamente creare il suo avatar in game. FAI COESISTERE LE COSE.» (ALE)
+
+**FATTO (20/09/2026)** — branch `task/avaturn-e-camerino-insieme`. Nel codice convivevano
+già (la RISPOSTA del 15/09 lo diceva); qui è **confermato in partita** e scritto, com'era
+chiesto, più una riga sulla card di Avaturn: «consigliato».
+
+**Come funziona, visto in Chrome.** Nuova partita apre il creator
+(`media/creator-rpg-v24/creator.html`) e la prima schermata è **«Come vuoi creare il tuo
+artista?»** con due card: **01 · Avaturn** (editor esterno, «selfie opzionale, più
+personalizzazione», da oggi con scritto *consigliato*) e **02 · MakeHuman** (editor del
+gioco, «nessun selfie, editor completo, nel gioco»). Il tasto sotto è spento finché non
+scegli («Seleziona un metodo»), poi dice «Continua con Avaturn →» o «Continua con MakeHuman
+→».
+
+- **MakeHuman** apre il camerino (`media/makehuman-camerino-v1/`, dentro al creator):
+  carica il runtime in sei passi («6/6 — Carico modifier stack nativo MakeHuman…»), poi
+  volto, corpo, capelli, pelle, guardaroba e la foto; alla conferma si passa all'identità.
+  È anche la strada dell'**avvio rapido** («Preparo il tuo artista»: un preset maschile e
+  la foto, senza toccare niente).
+- **Avaturn** apre il camerino di prima (`camerino.html`) con il tasto «Modifica con
+  Avaturn»: carica l'SDK da jsDelivr (`@avaturn/sdk`) e apre l'editor Avaturn in un iframe
+  (`https://demo.avaturn.dev/?sdk=true`); all'export l'avatar (URL del modello, anteprima)
+  torna nel camerino e da lì all'identità.
+- **Si cambia idea senza perdere niente**: con un avatar già confermato le card dicono
+  «Passa ad Avaturn →» / «Passa a MakeHuman →», e il personaggio di prima resta salvato
+  finché non confermi il nuovo (`state.avatarPendingSource`, `completeAvatarCreation`).
+- **In partita** i due sono la stessa cosa: una foto (`avatarPreviewImage`) sulla plancia,
+  con una classe diversa per l'inquadratura (`pport-img-avaturn`,
+  `pport-img-makehuman-deterministic` in `hub.js`); «Il tuo artista» dalla landing o dal
+  menu riapre l'editor giusto (`avatarSource`: `avaturn` o `local`).
+
+**Dove non sono 50/50, e va saputo.**
+
+- Lo **Shop veste solo MakeHuman**: il reparto Vestiti («Lo Shop: il reparto Vestiti» in
+  `02-interfaccia-e-telefono.md`) vende capi del catalogo MakeHuman, e con un avatar
+  Avaturn lo dice. Vestire un avatar Avaturn vorrebbe dire comprare nel loro editor, che
+  non è nostro.
+- **Avaturn gira sul demo pubblico** (`demo.avaturn.dev`), che chiede un accesso Google o
+  Discord dentro all'iframe: per il gioco sugli store serve un progetto Avaturn nostro
+  (sottodominio e chiave), con la loro licenza. È una cosa da fare prima dell'uscita, non
+  del codice.
+- **MakeHuman ha bisogno del suo dataset** (`media/makehuman-editor-v1`, 2,8 GB, fuori dal
+  pacchetto per gli store, `FUORI_DAL_PACCHETTO` in `strumenti/build.js`): finché non si
+  decide come distribuirlo, la strada «nel gioco» funziona in sviluppo e non in un
+  pacchetto pulito. Anche questa è una decisione da uscita: nessun foglio la porta ancora
+  come voce sua, e andrebbe fra le decisioni di `implementazioni.md`.
+
+**Provato** con Playwright sul Chrome installato a 1440 × 900: la schermata con le due card
+e il tasto spento; MakeHuman → il camerino arriva al passo 6/6; Avaturn → «Modifica con
+Avaturn» → l'SDK e l'iframe del demo si aprono (login Google/Discord dentro). Un controllo
+in più nell'audit: le due card ci sono, Avaturn è quella consigliata, e il ponte del creator
+distingue i due (`avatarSource`).
+
+---

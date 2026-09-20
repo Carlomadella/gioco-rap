@@ -989,6 +989,14 @@ body::before{
   font-size:34px;
   margin-top:10px;
 }
+/* «dobbiamo fare di tutto per consigliarli a farlo» (ALE, Avaturn 50/50): la
+   card di Avaturn lo dice, senza nascondere l'altra strada */
+#pageAppearance .avatar-consigliato{
+  color:#d3aa5e;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
 #pageAppearance .avatar-method .d{
   max-width:430px;
   font-size:11px;
@@ -2281,7 +2289,7 @@ body::before{
 
           <div class="avatar-method-grid">
             <button class="card avatar-method" type="button" data-avatar-source="avaturn">
-              <div class="id">01 · editor esterno</div>
+              <div class="id">01 · editor esterno · <b class="avatar-consigliato">consigliato</b></div>
               <span class="n">Avaturn</span>
               <div class="d">Per chi vuole costruire un avatar più personale, usando selfie oppure l’editor completo di Avaturn.</div>
               <div class="avatar-features">
