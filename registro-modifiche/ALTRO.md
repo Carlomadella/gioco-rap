@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:a2eb870 -->
+## 20/09/26, 23:23 â€” task/ordine-nel-foglio-dei-punti â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `a2eb870`
+
+### Cosa Ã¨ entrato
+
+- `f11c682` â€” docs(implementazioni): ordine nel foglio dei punti — le chiuse fuori dall'ordine, i punti dello Studio del 16/09 dentro, le regole di Carlo in come-si-lavora â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/come-si-lavora.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:668d98c -->
 ## 19/09/26, 14:00 â€” task/pagine-luoghi-foto â†’ main
 
