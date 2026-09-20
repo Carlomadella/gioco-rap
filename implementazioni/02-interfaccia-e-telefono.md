@@ -2218,3 +2218,57 @@ lunghe scorrono in verticale, che è quello che devono fare.
 
 **Resta quello che restava:** la prova su un telefono vero, e di traverso (844 × 390) il
 gioco si usa ma va deciso se sugli store gira anche in orizzontale.
+
+---
+
+## Le tre del Marketing: chiuse dal 14/09, e la riga delle mosse a capo
+
+> **FATTO (14/09/2026, riconosciuto il 20/09)** — branch `task/le-tre-del-marketing`. File:
+> `frontend/css/telefono.css` (la riga piccola delle mosse nell'Agenda) e
+> `frontend/strumenti/audit-regressioni.js` (cinque controlli, «Le tre del Marketing»).
+
+La voce di problemi-riscontrati del 14/09, terza nell'ordine di «Da fare adesso»: *«In
+spinta» esce come una seconda riga bianca*, *una riga di pezzo senza seed è un bottone che
+non fa niente*, *il pezzo scelto può sparire dall'elenco ma resta quello che si spinge*, più
+*sul telefono il motivo per cui l'anteprima è spenta viene tagliato*.
+
+**Erano già chiuse.** Tutte e quattro il 14/09 stesso, nel branch
+`task/studio-marketing-scegli-il-pezzo` (commit `98cc918`, `28c6561`, `e288634`), e questo
+foglio lo diceva da allora sotto «Quando tieni la take si chiede solo il nome». Il giorno
+dopo il Marketing è uscito dallo Studio ed è diventato «Che post fai?» su LaFamegram
+(`telPromo()` in `telefono.js`), e le tre regole ci sono passate pari pari: «in spinta» è
+testo nella riga piccola (`" · in spinta"`), la riga senza seed esce senza `data-spingi`
+(`Number.isFinite(s.seed)`), il pezzo scelto più vecchio dei sei viene aggiunto all'elenco
+(`elenco.push(ultimo)`); il motivo dell'anteprima spenta è «un pezzo scelto su LaFamegram»
+(`actions.js`). Il riordino del 15/09 non l'aveva riconosciuto — come per l'hover — e la
+voce è rimasta in cima all'ordine per sei giorni. Riprovato in partita con Playwright, a
+1440 e a 390, con otto pezzi fuori e il più vecchio scelto: le righe di «Che post fai?» sono
+alte uguali (56), «Pezzo 1» sta in elenco con «scelto», «Serve un pezzo scelto su
+LaFamegram» sta in una riga (255 punti in 255).
+
+**La cosa nuova, trovata guardando.** Nell'Agenda del telefono, «Le tue mosse», la riga
+piccola sotto al nome è una riga sola coi puntini (`.tlitx i`), e tiene circa 46 caratteri:
+il motivo della mossa spenta è corto dal 14/09, ma la **descrizione** della mossa accesa,
+che compare al suo posto, per quattro mosse no — promo (62 caratteri), anteprima (74), pesi
+(70), cardio (66). «Clip e provocazioni. Spinge il pezzo che scegl…»: e la parte che se ne
+andava era «su LaFamegram». Non si accorciano i testi, che sono gli stessi della scena a
+schermo pieno dopo la mossa: nell'Agenda la riga piccola delle mosse e degli eventi
+(`.tli[data-azione]`, `.tli[data-evento]`) va a capo fino a tre righe, poi i puntini. Le
+altre liste del telefono con la stessa riga non cambiano. Misurato su tutte e tredici le
+mosse a 1440, 390 e 360 (promo e anteprima accese; pesi e cardio mostravano il motivo corto,
+i loro caratteri sono contati sul testo): nessuna tagliata; le due righe alzano la card da 51
+a 64 (1440), da 53 a 68 (390). Il giro di fine task ha trovato che a **360 × 640** — il
+telefono basso, che si disegna più stretto per stare nell'altezza — la riga è 170 punti e
+due righe non bastavano ancora: «su LaFamegram» se ne andava lo stesso. Da lì il limite è
+tre righe, che a 360 × 640 servono a promo e anteprima (47 punti), a 375 × 667 alla sola
+anteprima, e dai 390 in su non cambiano niente.
+
+**Prove.** Cinque controlli nuovi in `audit-regressioni.js` («Le tre del Marketing
+(20/09/2026)»): le quattro cose del 14/09 e la riga a capo fino a tre righe; il controllo
+sulla riga senza seed guarda anche la guardia di `telSpingi` in `telefono.js`, non solo
+quella dello Studio. 403 controlli, tutti verdi. Il giro di fine task ha trovato tre cose
+(voci 44–46 di problemi-riscontrati), chiuse nel branch: le tre righe, quel controllo, e la
+prima tabella del README che contava 34 voci per questo foglio quando erano 43.
+
+**Da imparare**: prima di prendere una voce dell'ordine si cerca la sua RISOLTO sotto ai giri
+di problemi-riscontrati — due volte (l'hover, il Marketing) la voce era chiusa e l'indice no.

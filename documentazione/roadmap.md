@@ -276,6 +276,14 @@ sedici misure, dal 360 al 1920 × 1080: nessuna scorre di lato. Sta in
 `implementazioni/02-interfaccia-e-telefono.md`, «La fascia della plancia fra 980 e 1240, e
 la plancia a 1280 × 800».
 
+**Le tre del Marketing (20/09/2026)**: la voce del 14/09 in cima all'ordine — «in spinta»
+come seconda riga, la riga senza seed muta, il pezzo scelto che sparisce dall'elenco, il
+motivo dell'anteprima tagliato — era chiusa dal 14/09 stesso e passata pari pari in «Che post
+fai?» su LaFamegram; riprovata in partita e messa sotto audit. Trovata e chiusa una cosa nuova:
+nell'Agenda del telefono le descrizioni lunghe delle mosse (promo, anteprima, pesi, cardio)
+finivano coi puntini, adesso vanno a capo fino a tre righe. Sta in
+`implementazioni/02-interfaccia-e-telefono.md`, «Le tre del Marketing».
+
 **Resta la prova su un telefono vero**, con l'agente `prova-sul-telefono`: le misure di
 questi giri sono state prese nel browser, non in mano. Finché non è passata quella,
 questa tappa non è chiusa.

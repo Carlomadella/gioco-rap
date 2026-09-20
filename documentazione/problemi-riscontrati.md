@@ -14,7 +14,11 @@ giro sulla mano del rapper ne ha trovate due (33–34), chiuse nello stesso bran
 giorno il giro di fine task sulla fascia della plancia (`task/barra-plancia-980-1180`) ne ha
 trovate sei, più quattro note (voci 35–40), e la prova sul telefono altre sette, di cui tre le
 stesse, una la mano del rapper e una l'orizzontale già aperto (voce 9): le due nuove sono le
-voci 41–42. Tutte chiuse nello stesso branch prima del push.
+voci 41–42. Tutte chiuse nello stesso branch prima del push. Sempre il 20/09 la task «Le tre
+del Marketing» (`task/le-tre-del-marketing`) ha trovato che la voce 2 era **chiusa dal 14/09**
+in tutte e quattro le sue parti — l'indice non l'aveva riconosciuto, come per l'hover — e
+guardando in partita ha trovato una cosa nuova, la voce 43, chiusa nel branch; il giro di
+fine task ne ha trovate tre (44–46), chiuse nello stesso branch prima del push.
 
 1. ~~**Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
    telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra. Il tasto
@@ -24,10 +28,18 @@ voci 41–42. Tutte chiuse nello stesso branch prima del push.
    gradi sotto i 1240 e i 1120, va a capo a 980, sul telefono è tre righe da 165. Nello
    stesso giro la plancia a 1280 × 800 e 1366 × 768 (card degli eventi da 91 punti, quattro
    righe del profilo che sparivano). Il dettaglio sotto alla voce, nel giro del 15/09.
-2. Le tre del Marketing (14/09): **«In spinta» esce come una seconda riga bianca**, **una
+2. ~~Le tre del Marketing (14/09): **«In spinta» esce come una seconda riga bianca**, **una
    riga di pezzo senza seed è un bottone che non fa niente**, **il pezzo scelto può sparire
    dall'elenco, ma resta quello che si spinge**; più **sul telefono il motivo per cui
-   l'anteprima è spenta viene tagliato**.
+   l'anteprima è spenta viene tagliato**.~~ **RISOLTO (14/09/2026, riconosciuto il 20/09)** —
+   tutte e quattro erano chiuse lo stesso giorno, nel branch `task/studio-marketing-scegli-il-pezzo`
+   (le RISOLTE stanno sotto ai giri del 14/09, primo e secondo), e dal 15/09 il Marketing è
+   «Che post fai?» su LaFamegram, dove le tre regole sono passate pari pari. Riprovato in
+   partita il 20/09 a 1440 e a 390: «in spinta» è testo nella riga piccola, la riga senza
+   seed esce senza `data-spingi`, il pezzo scelto più vecchio dei sei sta in elenco con
+   «scelto», «Serve un pezzo scelto su LaFamegram» sta in una riga. Cinque controlli
+   nell'audit lo tengono fermo. Vedi «Le tre del Marketing» in
+   `implementazioni/02-interfaccia-e-telefono.md`.
 3. ~~**Sul telefono i colori del «passaggio del mouse» restano accesi dopo il tocco** (08/09):
    il giro unico su tutti i CSS.~~ **RISOLTO (08/09/2026, riconosciuto il 15/09)** — era
    chiuso lo stesso giorno e la riga sotto alla voce mancava: vedi il giro del 15/09 in fondo.
@@ -187,6 +199,25 @@ voci 41–42. Tutte chiuse nello stesso branch prima del push.
    tagliato, senza un segno** (20/09, prova sul telefono, `hub.css:1436-1450`).~~ **RISOLTO
    (20/09/2026)** — sotto i 780 di altezza il ritratto è 84 × 100 e le linguette 76: a 1366 × 768
    e 1024 × 768 la colonna è 555 in 555.
+43. ~~**Nell'Agenda del telefono la descrizione di quattro mosse finisce coi puntini**
+   (20/09, «Le tre del Marketing»): promo, anteprima, pesi e cardio, quando la mossa è
+   accesa.~~ **RISOLTO (20/09/2026)** — nell'Agenda la riga piccola delle mosse e degli
+   eventi va a capo su due righe. Il dettaglio nel giro in fondo.
+44. ~~**Sul telefono basso (360 × 640) la promo nell'Agenda finisce ancora coi puntini**
+   (20/09, giro di fine task su «Le tre del Marketing»): con lo schermo basso il telefono
+   si disegna più stretto e la riga piccola tiene 170 punti, la descrizione su due righe
+   ne vuole tre e «su LaFamegram» se ne va lo stesso. A 360 × 780 e a 375 × 667 sta.~~
+   **RISOLTO (20/09/2026)** — la riga piccola va fino a tre righe (`-webkit-line-clamp:3`):
+   a 360 × 640 promo e anteprima stanno in tre (47 punti), a 375 × 667 l'anteprima pure,
+   dai 390 in su restano due. Screenshot `agenda-mosse-accese-360x640-tre-righe.jpg`.
+45. ~~**Un controllo dell'audit guarda il file sbagliato** (20/09): «una riga di pezzo senza
+   seed esce senza data-spingi» controlla la guardia di `studio.js`, ma il tocco di «Che
+   post fai?» passa da `telSpingi` in `telefono.js`, che non è sotto controllo.~~
+   **RISOLTO (20/09/2026)** — il controllo guarda anche la guardia di `telSpingi`.
+46. ~~**La tabella dei fogli nel README dice 34 voci per l'interfaccia, la tabella grande ne
+   ha 43** (20/09): il conto in cima era già indietro prima del branch (39), il branch ne ha
+   aggiunte quattro senza toccarlo.~~ **RISOLTO (20/09/2026)** — ricontate tutte le righe
+   per foglio: 43, 16, 13, 16 e 8 (erano 34, 14, 11, 14 e 7).
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
 
 ---
@@ -2025,6 +2056,9 @@ Marketing». `SND.anteprima = "promo"` in `fx.js`.
   gia'. Dedotto da misure del CSS, non visto su un telefono vero: va guardato.
 - **come si vede** — telefono, Agenda, «Le tue mosse», senza aver scelto niente al Marketing.
 - **quanto pesa** — da sistemare con calma.
+- **RISOLTO (14/09/2026, riconosciuto il 20/09)** — il motivo è «un pezzo scelto su
+  LaFamegram» (`actions.js`, commit `e288634`): misurato il 20/09 in partita, 204 punti in
+  204 nella colonna a 1440 e 255 in 255 sul telefono a 390, senza puntini.
 
 ### L'anteprima fa il rumore di un tocco qualsiasi, non quello della promo
 
@@ -4634,3 +4668,178 @@ finiscono nel comando prima e il test diventa rosso per sbaglio. Rosso, non verd
 vede, quindi va bene.
 
 L'indice «Cosa resta aperto» in testa al foglio ha le voci 33 e 34 di questo giro.
+
+## Giro del 20/09/2026 (task `task/le-tre-del-marketing`, «Le tre del Marketing»)
+
+La voce 2 dell'indice — le tre cose del Marketing trovate il 14/09, più il motivo tagliato
+sul telefono — è **chiusa dal 14/09**: le quattro RISOLTE stanno sotto ai giri di quel giorno
+(primo e secondo), nei commit `98cc918`, `28c6561` e `e288634` dello stesso branch, e il
+foglio dei punti lo dice da allora («Sistemate insieme le quattro cose che segnala-problemi
+aveva trovato sul Marketing», sotto «Quando tieni la take si chiede solo il nome»). Il
+riordino del 15/09 non l'ha riconosciuto e la voce è rimasta aperta per sei giorni — lo
+stesso caso dell'hover (voce 3). Riprovato in partita con Playwright (server di sviluppo,
+otto pezzi fuori e uno no, il più vecchio scelto), a 1440 e a 390: «in spinta» è testo nella
+riga piccola e la riga è alta come le altre (56); la riga senza seed esce senza
+`data-spingi`; «Pezzo 1», scelto e più vecchio dei sei, sta in elenco con «scelto»;
+«Serve un pezzo scelto su LaFamegram» sta in una riga (255 in 255). Cinque controlli nuovi
+nell'audit («Le tre del Marketing (20/09/2026)») tengono ferme le quattro cose e la quinta
+qui sotto.
+
+### Nell'Agenda del telefono la descrizione di quattro mosse finisce coi puntini
+
+- **dove** — `frontend/css/telefono.css` (`.tlitx i`, una riga sola con
+  `text-overflow:ellipsis`) contro `frontend/js/game/actions.js` (le `d:` di `promo`, 62
+  caratteri; `anteprima`, 74; `palestra_pesi`, 70; `palestra_cardio`, 66) e
+  `telefono.js` (`schermataAgenda`, «Le tue mosse»).
+- **cosa succede** — la riga piccola tiene circa 46 caratteri nella colonna a 1440 (200
+  punti) e sul telefono a 390 (251): «Il foglio, la penna e quello che hai in testa.» ci sta
+  esatto, le altre nove pure. Le quattro lunghe no: «Clip e provocazioni. Spinge il pezzo
+  che scegl…» (294 punti in 200) — e la parte che se ne va è proprio «su LaFamegram», dove
+  andare a scegliere. Il motivo della mossa spenta è corto dal 14/09; la descrizione della
+  mossa accesa, che compare al suo posto quando puoi farla, no. Misurato in partita con
+  `scrollWidth > clientWidth` su tutte e tredici le righe, a 1440 e a 390: tagliate la promo
+  e, col pezzo scelto, l'anteprima; pesi e cardio mostravano «Devi andare a Palestra» e i
+  loro 70 e 66 caratteri sono contati sul testo, non misurati.
+- **come si vede** — telefono, Agenda, «Le tue mosse», con un pezzo fuori (la promo accesa).
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (20/09/2026)** — non accorciando i testi (sono gli stessi della scena a schermo
+  pieno dopo la mossa, e lì stanno bene) ma nella riga: in `telefono.css` la riga piccola
+  delle mosse e degli eventi dell'Agenda (`.tli[data-azione]`, `.tli[data-evento]`) va a
+  capo su due righe (`-webkit-line-clamp:2`), poi i puntini. Le altre liste del telefono con
+  la stessa riga (contatti, agenda segnata, «Che post fai?») non cambiano. Riprovato: a 1440
+  le due righe lunghe (promo e anteprima) sono alte 64 invece di 51, a 390 68 invece di
+  53, a 360 48 invece di 37; nessuna delle tredici è tagliata. Il controllo sta nell'audit.
+
+L'indice «Cosa resta aperto» in testa al foglio ha la voce 2 barrata e la voce 43 di questo
+giro.
+
+## Giro del 20/09/2026 (segnala-problemi, fine task `task/le-tre-del-marketing`, commit `a52377a`)
+
+Controlli automatici tutti verdi: `npm run prova` 180 a posto e 0 no, `audit-regressioni.js`
+403 ok e 0 falliti (i cinque di «Le tre del Marketing (20/09/2026)» compresi),
+`verifica:build` 33 ok e 0 falliti, e la regola nuova arriva intera nel file unico
+(`dist/anni-di-fame-gioco.html`), col `-webkit-box-orient:vertical` che certi minificatori
+tolgono. Letto il diff intero contro `main` (sette file, nessun JavaScript del gioco
+toccato), `telefono.css` intorno a `.tli`, `telefono-stretto.css` (la riga a 12 punti col
+telefono alzato), `schermataAgenda`, `telAgendaEvento`, `telAgendaAzione`,
+`telAgendaGateText` e `telSpingi` in `telefono.js`, `hubPronta` e `HUB_EVENTI` in
+`hub.js`, le `d:` e i `need:` di `actions.js`. Poi in partita con Playwright (server di
+sviluppo, un pezzo fuori così la promo è accesa) a 1440 × 900, 390 × 844, 375 × 667,
+360 × 780 e 360 × 640.
+
+Le cose chieste, in ordine, quelle a posto:
+
+- **Le altre liste del telefono non cambiano.** La regola è agganciata a `[data-azione]` e
+  `[data-evento]`, che nel gioco esistono solo nelle due liste dell'Agenda
+  (`telefono.js:558` e `:569`); l'unico altro `data-azione` è il bottone «Posta» di «Che
+  post fai?» (`:664`), che è un `.tbtn` e non un `.tli`. Contatti, agenda segnata, «Che
+  post fai?» (`data-spingi`), impostazioni: la riga piccola resta a una riga coi puntini,
+  misurato (`nowrap / block`) a 1440 e a 390.
+- **Il telefono stretto va d'accordo.** `telefono-stretto.css:96` cambia solo il corpo
+  del carattere (12 invece di 10,5): con la riga a 1,3 le due righe fanno 31 punti invece di
+  27, la card 68 invece di 64. Niente si sovrappone.
+- **`display:-webkit-box` sopra al `display:block`** della regola base va bene: è la
+  stessa coppia che `game.css:110` e `stretto.css:218` usano da tempo; `overflow:hidden`
+  resta dalla regola base (serve al taglio), `text-overflow:ellipsis` e `margin-top:1px` non
+  danno fastidio. Il browser di Playwright riporta la riga come `flow-root` — è come
+  Chromium chiama oggi la scatola col taglio a righe — e taglia dove deve.
+- **«Stasera» non ha un caso che va a capo.** I quattro eventi di `HUB_EVENTI` hanno
+  descrizioni da 22 a 42 caratteri, e i motivi per cui una riga è spenta («Dalle 21:00»,
+  «Troppo tardi per partecipare», «Sei in carcere») stanno tutti in una riga; il selettore
+  su `[data-evento]` oggi non cambia niente, ed è giusto che ci sia per quando cambierà.
+  Nessun motivo delle mosse spente (`hubPronta`, `telAgendaGateText`, i `need`) supera i
+  35 caratteri, e nessuna descrizione di mossa i 74: due righe bastano — dove la riga è
+  larga abbastanza, vedi la prima voce.
+- **I fogli tornano.** La tabella grande del README ricontata riga per riga: 126 voci, 90
+  «fatto», 14 «in parte», 17 «da fare», 5 «risposto» (1 + 4 «risposto, da fare»), nessun
+  duplicato. L'indice di problemi-riscontrati va da 1 a 43 senza salti; la voce 2 barrata
+  rimanda a RISOLTE che ci sono (il blocco in testa al giro del 14/09 per le prime tre, la
+  riga nuova sotto «Sul telefono il motivo…» per la quarta); «Quando tieni la take si chiede
+  solo il nome» e la frase «Sistemate insieme le quattro cose» stanno davvero nel foglio
+  dell'interfaccia (`02-interfaccia-e-telefono.md:1552` e `:1584`); i tre commit citati
+  (`98cc918`, `28c6561`, `e288634`) esistono. I quattro controlli sulle cose del 14/09
+  sono agganciati a stringhe che nel codice ci sono (`telefono.js:616`, `:613`, `:644`,
+  `actions.js:504`), letterali come tutto il resto dell'audit: si rompono se qualcuno
+  riscrive la riga, non se cambia il comportamento, ma è lo stile del file.
+
+Le tre cose trovate:
+
+### Sul telefono basso (360 × 640) la promo nell'Agenda finisce ancora coi puntini
+
+- **dove** — `frontend/css/telefono.css:234` (la regola nuova, due righe poi i puntini)
+  contro la larghezza che il telefono alzato ha con lo schermo basso.
+- **cosa succede** — con lo schermo alto 640 il telefono si disegna più stretto (la cornice
+  si adatta all'altezza) e la riga piccola delle mosse resta 170 punti larga: la descrizione
+  della promo, a 12 punti, vuole tre righe (47 punti in 31) e la fine se ne va ancora —
+  «Clip e provocazioni. Spinge il pezzo che scegli su…», con «LaFamegram» perso, che è
+  proprio la parte per cui la voce 43 era stata aperta. L'anteprima (74 caratteri) non l'ho
+  vista accesa in questa prova, ma con dodici caratteri in più della promo si taglia di
+  sicuro. A 360 × 780 la riga è 223 punti e sta (31 in 31), a 375 × 667 è 182 e sta per un
+  soffio, a 390 × 844 è 251. Il foglio dei punti dice «a 360 … nessuna delle tredici è
+  tagliata»: vale per il 360 alto, non per quello basso.
+- **come si vede** — finestra 360 × 640 (o un telefono Android piccolo), alza il telefono,
+  Agenda, «Le tue mosse», con un pezzo fuori così la promo è accesa. Screenshot fatto.
+- **quanto pesa** — da sistemare con calma. È un telefono piccolo e il senso della riga si
+  capisce lo stesso; ma la voce 43 era nata per non perdere «su LaFamegram».
+
+### Un controllo dell'audit guarda il file sbagliato
+
+- **dove** — `frontend/strumenti/audit-regressioni.js:2508-2510` («una riga di pezzo senza
+  seed esce senza data-spingi, non come bottone che non fa niente»).
+- **cosa succede** — la prima metà del controllo è giusta (`seme` in `telefono.js:616`);
+  la seconda cerca `if(!Number.isFinite(seed)) return;` in `studio.js`, che è la guardia
+  di `studioMettiSulBanco` e `studioSegna` (`studio.js:134` e `:360`) — lo Studio. Ma
+  dal 15/09 il tocco su un pezzo di «Che post fai?» passa da `telSpingi` in
+  `telefono.js:675`, che ha una guardia sua, scritta diversa
+  (`if(!Number.isFinite(seed) || typeof studioDati !== "function") return;`) e che l'audit
+  non guarda: se qualcuno la toglie, il controllo resta verde. Non è rotto niente oggi.
+- **come si vede** — leggendo i due file; l'audit passa comunque.
+- **quanto pesa** — da sistemare con calma.
+
+### La tabella dei fogli nel README dice 34 voci per l'interfaccia, la tabella grande ne ha 43
+
+- **dove** — `implementazioni/README.md:18` («**L'interfaccia e il telefono** — 34 voci»)
+  contro le righe della tabella grande che rimandano a `02-interfaccia-e-telefono.md` (43
+  dopo il branch, 39 su `main`).
+- **cosa succede** — il conto in cima era già indietro prima di questo branch (su `main`
+  la tabella grande ne ha 39 per quel foglio e in cima c'è scritto 34); il branch ne ha
+  aggiunte quattro nella tabella grande e ha ricontato solo il totale (126, giusto), non la
+  riga per foglio. Chi apre il README legge due numeri che non tornano fra loro. È un
+  foglio, non il gioco.
+- **come si vede** — `implementazioni/README.md`, la prima tabella contro la seconda.
+- **quanto pesa** — da sistemare con calma.
+
+Una nota, non un problema: a 360 × 640 anche il nome «Freestyle al bar centrale» nella
+lista «Stasera» va su due righe (la card è 67 invece di 53). Non è del branch — il nome è
+in grassetto e non ha regole di taglio — e si legge bene: lo segno perché l'ho visto.
+
+L'indice «Cosa resta aperto» in testa al foglio ha le voci 44–46 di questo giro.
+
+**Chiuse nello stesso branch, prima del push (20/09/2026).** La riga piccola delle mosse va
+fino a tre righe invece di due (`telefono.css`, `-webkit-line-clamp:3`): riprovato con
+Playwright a 360 × 640 (promo e anteprima 47 punti in tre righe, niente tagliato), 375 × 667
+(anteprima in tre, promo in due), 360 × 780, 390 × 844 e 1440 × 900 (due righe come prima),
+screenshot `agenda-mosse-accese-360x640-tre-righe.jpg`. Il controllo dell'audit cerca anche
+la guardia di `telSpingi`, e il suo compagno sulla riga a capo dice tre. La prima tabella del
+README ricontata foglio per foglio (43, 16, 13, 16, 8). Le tre voci in testa sono barrate.
+
+**Controllato il commit di chiusura `4aa172d` (segnala-problemi, 20/09/2026): non ha aperto
+niente.** Letto il diff intero (CSS, audit, README, i quattro fogli, tredici screenshot) contro
+il codice. Le tre chiusure sono vere: `telefono.css:236` dice `-webkit-line-clamp:3` e la
+regola arriva intera nel file unico (`dist/anni-di-fame-gioco.html`); il controllo dell'audit
+aggancia davvero la guardia di `telSpingi` (`telefono.js:675`, provato il regex sul file con i
+fine riga di Windows) e il suo compagno cerca il tre; la prima tabella del README ricontata
+riga per riga contro la tabella grande: 16, 43, 1, 16, 13, 16, 8, 3, 7 tornano tutte, e i
+totali (126 = 90 + 14 + 17 + 5) pure; i link puntano a file che esistono. Le voci 44–46 in
+testa sono barrate e le loro RISOLTO rimandano a cose che ci sono (lo screenshot
+`prove-telefono/2026-09-20/agenda-mosse-accese-360x640-tre-righe.jpg`, la riga dell'audit, i
+cinque numeri). Poi in partita con Playwright (un pezzo fuori e uno scelto, così promo e
+anteprima sono accese) a 1440 × 900, 390 × 844, 375 × 667, 360 × 780, 360 × 640 e 320 × 568:
+nessuna delle diciassette righe dell'Agenda è tagliata (`scrollHeight` uguale all'altezza);
+promo e anteprima vanno in tre righe a 360 × 640 e a 320 × 568 (47 punti, card 82), a 375 × 667
+solo l'anteprima, dai 390 in su restano in due; «su LaFamegram» arriva intero. Le altre
+liste del telefono (contatti, agenda segnata, «Che post fai?») restano a una riga: la regola
+tocca solo `[data-azione]` e `[data-evento]`, e `telefono-stretto.css:96` cambia solo il corpo
+del carattere. Una nota, non un problema: la RISOLTO della voce 43 in testa dice ancora «va a
+capo su due righe» — è la storia di quel giorno, e la voce 44 subito sotto spiega il passaggio
+a tre; si legge di seguito e non inganna, ma chi legge solo la 43 la trova indietro di un passo.

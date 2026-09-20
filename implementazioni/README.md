@@ -15,12 +15,12 @@ Quelli che erano rimasti indietro nel foglio — chiusi ma mai smistati — stan
 | file | cosa c'è dentro |
 | --- | --- |
 | [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 16 voci |
-| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 34 voci |
+| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 43 voci |
 | [`03-artista-e-avatar.md`](03-artista-e-avatar.md) | **L'artista e il suo avatar** — 1 voce |
-| [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 14 voci |
-| [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 11 voci |
-| [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md) | **Il mondo e la gente** — 14 voci |
-| [`07-multiplayer-e-backend.md`](07-multiplayer-e-backend.md) | **Il multiplayer e il server** — 7 voci |
+| [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 16 voci |
+| [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 13 voci |
+| [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md) | **Il mondo e la gente** — 16 voci |
+| [`07-multiplayer-e-backend.md`](07-multiplayer-e-backend.md) | **Il multiplayer e il server** — 8 voci |
 | [`08-uscita-sugli-store.md`](08-uscita-sugli-store.md) | **L'uscita su Steam e sugli store** — 3 voci |
 | [`09-grafica-e-asset.md`](09-grafica-e-asset.md) | **La grafica, le ambientazioni e gli asset** — 7 voci |
 
@@ -33,8 +33,10 @@ per i punti, e sono in [`../documentazione/come-si-lavora.md`](../documentazione
 
 ## Tutti i punti
 
-122 voci in tutto: **86 chiuse**, 14 a metà, 17 da fare e 5 con la sola risposta scritta
-(ricontate dalla tabella qui sotto il 20/09/2026, dopo le quattro piccole). A che punto siamo
+126 voci in tutto: **90 chiuse**, 14 a metà, 17 da fare e 5 con la sola risposta scritta
+(ricontate dalla tabella qui sotto il 20/09/2026, dopo «Le tre del Marketing»; nello stesso
+conto sono entrate tre sezioni del foglio dell'interfaccia che alla tabella mancavano — l'avvio
+rapido, le pagine dei posti sulla loro foto, la fascia della plancia). A che punto siamo
 nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../documentazione/roadmap.md).
 
 | | punto | stato | dove |
@@ -162,6 +164,10 @@ nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../docume
 | **—** | I prezzi dei beat per fama del beatmaker | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
 | **—** | Si parte con tutti i parametri a 1 | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
 | **—** | Non ci si può licenziare | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
+| **—** | Le pagine dei posti sulla loro foto: Casa, Palestra, Live Club, stacca la spina | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | L'avvio rapido: la schermata «Preparo il tuo artista» | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | La fascia della plancia fra 980 e 1240, e la plancia a 1280 × 800 | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | Le tre del Marketing: chiuse dal 14/09, e la riga delle mosse su due righe | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 
 > Lo stato è letto dal testo dei punti: «fatto» vuol dire che c'è scritto cosa è
 > stato fatto e quando, «risposto» che c'è una risposta ragionata ma il codice
