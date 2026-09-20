@@ -117,5 +117,10 @@
     "trainingAuthorized": false,
     "taskDataReadyMayBeDeclared": false
   },
-  "nextAction": "PREPARE_APPEND_ONLY_DEVELOPMENT_INFERENCE_RECEIPT"
+  "nextAction": "PREPARE_APPEND_ONLY_DEVELOPMENT_INFERENCE_RECEIPT",
+  "batchRunner": {
+    "path": "source-separation-development-inference.js",
+    "gitBlobSha": "64d13c9bc7c5956e53c5f07fbb3bc202d24d326a",
+    "implementationCommit": "7110770dc295f7b8f51fd7d0b91a0a2801ce6284"
+  }
 }
