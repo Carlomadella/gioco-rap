@@ -852,3 +852,15 @@ Artefatti finali:
 Decisione: `audio-analysis-v2-config-001` è promossa come versione Audio Analysis per il downstream del pilot. Il holdout R1 v2 è da questo momento osservato e consumato; non viene riutilizzato per tuning o scelta di nuove configurazioni. Qualunque tuning successivo richiede un nuovo untouched holdout.
 
 Questa decisione chiude R6 ma non promuove automaticamente Source Separation, Audio→MIDI, dataset, training o composer completo. Il prossimo blocco resta Source Separation pilot, seguito da Audio→MIDI drums/low-end e QA.
+
+## NDR-058 — Source Separation pilot: baseline HTDemucs OpenVINO riproducibile, holdout escluso
+
+Data: 20 settembre 2026. Stato: adottata per il pilot.
+
+Dopo la chiusura Audio Analysis R6 con `V2_PROMOTE`, Source Separation viene aperta sul solo split `development` di 8 composition family. Il final holdout `evaluation-holdout-r1-v2` è escluso dal pilot e non viene riutilizzato per tuning.
+
+Il baseline primario del pilot è `intel-openvino-htdemucs-v4-97fc578`, 4-stem `drums/bass/other/vocals`, legato alla revision Intel `97fc578fb57650045d40b00bc84c7d156be77547` e agli SHA256 dei due file OpenVINO registrati nel protocollo. La repository modello Intel dichiara licenza MIT.
+
+Questa decisione fissa un baseline riproducibile, non dichiara HTDemucs separatore definitivo. Un secondo modello può entrare nel confronto solo con checkpoint esatto, provenance/licenza verificabili e regola di confronto congelata prima dell'ascolto comparativo.
+
+Il primo blocco implementa preflight metadata-only e prepare append-only con verifica SHA delle sorgenti development. Non esegue inferenza, non autorizza batch sui 131 asset, non promuove `TASK_DATA_READY` e non apre training. Prima di ascoltare gli output del pilot vanno congelati adapter batch, receipt di esecuzione e rubric/criteri QA per stem e utilità downstream.

@@ -1,0 +1,59 @@
+{
+  "schema": "fame-owned-beats-source-separation-pilot-protocol-v1",
+  "version": 1,
+  "status": "OPENING_PROTOCOL",
+  "sourceCollectionId": "fame-owned-beats-v1",
+  "selection": {
+    "split": "development",
+    "expectedFamilies": 8,
+    "blockedSplits": [
+      "evaluation-holdout",
+      "evaluation-holdout-r1-v2"
+    ],
+    "requireUniqueCompositionFamilies": true,
+    "requireActiveRecords": true
+  },
+  "separatorCandidate": {
+    "id": "intel-openvino-htdemucs-v4-97fc578",
+    "role": "PRIMARY_PILOT_BASELINE",
+    "architecture": "HTDemucs v4",
+    "mode": "4_STEM",
+    "expectedStems": [
+      "drums",
+      "bass",
+      "other",
+      "vocals"
+    ],
+    "executionAdapterStatus": "NEXT_BLOCK",
+    "modelArtifact": {
+      "repository": "Intel/demucs-openvino",
+      "revision": "97fc578fb57650045d40b00bc84c7d156be77547",
+      "licenseDeclaredByRepository": "MIT",
+      "files": {
+        "htdemucs_v4.bin": "7aa84fa1f2b534bd6865a5609b8b5b028802fe761d6a09b1d30a1564f8fac6f8",
+        "htdemucs_v4.xml": "304e24325756089d6bb6583171dd1bea2327505e87c6cb6e010afea7463d9f0a"
+      }
+    }
+  },
+  "qa": {
+    "openingBlockMeasures": [
+      "source identity integrity",
+      "development/holdout separation",
+      "source byte integrity",
+      "append-only run identity"
+    ],
+    "mustBeFrozenBeforeListeningToPilotOutputs": [
+      "stem technical validation",
+      "role fidelity review rubric",
+      "downstream transcription usefulness rubric",
+      "separator comparison rule if a second model is introduced"
+    ]
+  },
+  "safety": {
+    "holdoutAccessAllowed": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false,
+    "batch131Authorized": false,
+    "manualQaStillRequired": true
+  }
+}
