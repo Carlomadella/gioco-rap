@@ -954,3 +954,13 @@ Il check read-only del receipt `source-separation-development-inference-v1-001` 
 Il check ha quindi confermato che il receipt continua a corrispondere agli artefatti congelati di repository, al pilot manifest e alle identità/SHA delle 8 sorgenti development. Nessun output stem è ancora stato prodotto.
 
 Da questo checkpoint è autorizzata l'esecuzione append-only del batch HTDemucs **esclusivamente sulle 8 family development già congelate nel receipt**. Restano vietati accesso al final holdout, espansione alle 131 sorgenti, training e dichiarazioni di task/data readiness. Il risultato del batch dovrà essere sottoposto alla rubric QA congelata prima di qualsiasi promozione downstream.
+
+## NDR-066 — Source Separation: prima inferenza development completata 8/8
+
+**Stato: ACCEPTED — 20 settembre 2026.**
+
+La prima inferenza reale HTDemucs/OpenVINO del pilot Source Separation è stata completata in modalità append-only sulle 8 family development congelate: `FAME000011`, `FAME000012`, `FAME000023`, `FAME000040`, `FAME000046`, `FAME000058`, `FAME000080`, `FAME000126`.
+
+Il run `source-separation-development-inference-v1-001` ha terminato con stato `INFERENCE_COMPLETE_AWAITING_TECHNICAL_AND_HUMAN_QA`, 8/8 record e `technicalValidationPassed=true`. Il comando ha dichiarato final holdout non acceduto, batch 131 non eseguito e training non autorizzato.
+
+Questo risultato certifica che il percorso reale source audio → HTDemucs/OpenVINO → quattro stem → result receipt append-only funziona tecnicamente sul cohort development. **Non certifica ancora qualità musicale o utilità Audio→MIDI**: la promozione resta subordinata alla rubric `source-separation-pilot-review-v1.json`, congelata prima del primo output.
