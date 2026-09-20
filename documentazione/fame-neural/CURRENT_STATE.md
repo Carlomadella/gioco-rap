@@ -20,7 +20,7 @@ La singola evaluation finale one-shot sul cohort sostitutivo `evaluation-holdout
 
 Il nuovo holdout R1 v2 è quindi **osservato, consumato e chiuso per tuning**. Non può essere riutilizzato per scegliere o modificare una configurazione successiva. `config-001` è la versione Audio Analysis promossa per il downstream del pilot.
 
-Source Separation pilot **preparato**: preflight reale passato su 8/8 family development e run append-only `source-separation-pilot-v1-001` creato con SHA delle sorgenti verificati; inferenza non ancora avviata. Baseline primaria: `intel-openvino-htdemucs-v4-97fc578`. Aggiunto doctor dell'adapter Audacity/OpenVINO per verificare installazione, model hash e disponibilità `mod-script-pipe` senza aprire audio. Prossimo intervento: discovery del comando effect via pipe → batch adapter → QA stems. Training serio resta chiuso.
+Source Separation pilot **preparato**: preflight reale passato su 8/8 family development e run append-only `source-separation-pilot-v1-001` creato con SHA delle sorgenti verificati; inferenza non ancora avviata. Baseline primaria: `intel-openvino-htdemucs-v4-97fc578`. Doctor reale PASS: Audacity 3.7.1, `mod-openvino.dll`, `mod-script-pipe.dll` e i due hash HTDemucs congelati sono presenti; manca solo l'attivazione/runtime della pipe. Aggiunto helper metadata-only per scoprire via `GetInfo` il comando scripting esatto dell'effetto prima di costruire il batch adapter. Prossimo intervento: abilitare `mod-script-pipe`, riavviare Audacity, eseguire discovery → batch adapter → QA stems. Training serio resta chiuso.
 
 ## Checkpoint precedente — integrazione audit 13/09/2026
 
