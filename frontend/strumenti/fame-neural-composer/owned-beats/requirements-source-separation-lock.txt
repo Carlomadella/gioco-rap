@@ -1,0 +1,19 @@
+# Generated from D:\FAME_NEURAL\venv-source-separation
+# Exact Python package snapshot used by owned-beats Source Separation standalone backend.
+# Source pip-freeze-all receipt SHA256 (Windows PowerShell capture): e7fd1df0076b79101923900aa280b3c53a46c5b0a166bad75cbf972b7794411a
+filelock==4.0.1
+fsspec==2026.9.0
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+mpmath==1.3.0
+networkx==3.4.2
+numpy==2.1.3
+openvino==2024.6.0
+openvino-telemetry==2025.2.0
+packaging==26.3
+pip==25.2
+setuptools==80.9.0
+sympy==1.14.0
+torch==2.4.1+cpu
+typing_extensions==4.16.0
+wheel==0.45.1
