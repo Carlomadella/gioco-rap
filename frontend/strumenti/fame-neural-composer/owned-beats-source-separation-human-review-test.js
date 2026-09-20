@@ -7,6 +7,7 @@ const path = require("node:path");
 const root = __dirname;
 const owned = path.join(root, "owned-beats");
 const source = fs.readFileSync(path.join(owned, "source-separation-human-review.js"), "utf8");
+const launcher = fs.readFileSync(path.join(owned, "start-source-separation-human-review.ps1"), "utf8");
 const mod = require(path.join(owned, "source-separation-human-review.js"));
 
 assert.equal(mod.median([0, 0, 2, 2, 2, 2, 2, 2]), 2);
@@ -83,5 +84,10 @@ assert(source.includes('trainingAuthorized: false'));
 assert(source.includes('audio controls'));
 assert(source.includes('Downstream onset/MIDI usefulness'));
 assert(source.includes('Downstream pitch/MIDI usefulness'));
+assert(launcher.includes("source-separation-human-review.js"));
+assert(launcher.includes(" prepare $Workspace $ReviewId"));
+assert(launcher.includes(" serve $Workspace $ReviewId $Port"));
+assert(!launcher.includes("source-separation-development-inference.js"));
+assert(!launcher.includes(" execute "));
 
 console.log("owned-beats-source-separation-human-review-test: PASS");
