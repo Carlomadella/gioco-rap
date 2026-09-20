@@ -341,8 +341,7 @@ function prepare(workspaceRoot, runId = DEFAULT_RUN_ID, modelXml = MODEL_DEFAULT
     model,
     ffmpeg,
     execution: {
-      ...frozen.contract.execution,
-      cacheRelativePath: "cache/source-separation-openvino"
+      ...frozen.contract.execution
     },
     sources,
     safety: {
