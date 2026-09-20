@@ -1,0 +1,99 @@
+{
+  "schema": "fame-owned-beats-source-separation-execution-contract-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_FIRST_PILOT_OUTPUT",
+  "sourceRunId": "source-separation-pilot-v1-001",
+  "openingProtocol": {
+    "path": "source-separation-pilot-protocol-v1.json",
+    "sha256": "f0afd48e6fd402c9adb1bb09d8a3310e61aa5c36b2662acc169ccc640d8aa696",
+    "gitBlobSha": "a8667e89360605336d51bb121a4780cff7d6bc05"
+  },
+  "environment": {
+    "spec": "source-separation-environment-v1.json",
+    "lock": "requirements-source-separation-lock.txt",
+    "sourceEnvironmentRunId": "source-separation-env-v1-001",
+    "sourcePipFreezeAllSha256": "e7fd1df0076b79101923900aa280b3c53a46c5b0a166bad75cbf972b7794411a"
+  },
+  "adapter": {
+    "path": "source-separation-standalone-adapter.py",
+    "gitBlobSha": "9574f616bcaa33e57c4c0e48c69a57054e3570dc",
+    "implementationCommit": "730700666b6c784c32e9a1a5e24a1fee9bcbb6fd",
+    "modelRevision": "97fc578fb57650045d40b00bc84c7d156be77547"
+  },
+  "execution": {
+    "sampleRate": 44100,
+    "device": "CPU",
+    "shifts": 1,
+    "shiftSeed": 0,
+    "overlap": 0.25,
+    "transitionPower": 1,
+    "segmentSamples": 343980,
+    "expectedStems": [
+      "drums",
+      "bass",
+      "other",
+      "vocals"
+    ],
+    "expectedModelInputs": [
+      {
+        "name": "input.25",
+        "shape": [
+          1,
+          4,
+          2048,
+          336
+        ]
+      },
+      {
+        "name": "input.1",
+        "shape": [
+          1,
+          2,
+          343980
+        ]
+      }
+    ],
+    "expectedModelOutputs": [
+      {
+        "name": "4172",
+        "shape": [
+          1,
+          16,
+          2048,
+          336
+        ]
+      },
+      {
+        "name": "4262",
+        "shape": [
+          1,
+          8,
+          343980
+        ]
+      }
+    ]
+  },
+  "review": {
+    "path": "source-separation-pilot-review-v1.json",
+    "sha256": "82a94dbe434c218cd9467f929ac19b0c7d5afada9d379a6fac12e7e2aa8f0096",
+    "status": "FROZEN_BEFORE_FIRST_PILOT_OUTPUT"
+  },
+  "preInferenceGate": {
+    "required": [
+      "SOURCE_SEPARATION_ENVIRONMENT_LOCK_VERIFY_PASS",
+      "SOURCE_SEPARATION_STANDALONE_ADAPTER_SELF_TEST_PASS",
+      "SOURCE_SEPARATION_STANDALONE_ADAPTER_MODEL_CHECK_PASS"
+    ],
+    "sourceAudioAccessAllowed": false,
+    "inferenceAllowed": false
+  },
+  "safety": {
+    "split": "development",
+    "expectedFamilies": 8,
+    "finalHoldoutAccessAllowed": false,
+    "batch131Authorized": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "nextAction": "RUN_NO_AUDIO_ADAPTER_VALIDATION"
+}
