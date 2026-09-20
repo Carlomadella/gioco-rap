@@ -5,8 +5,9 @@
   "sourceRunId": "source-separation-pilot-v1-001",
   "openingProtocol": {
     "path": "source-separation-pilot-protocol-v1.json",
-    "sha256": "f0afd48e6fd402c9adb1bb09d8a3310e61aa5c36b2662acc169ccc640d8aa696",
-    "gitBlobSha": "a8667e89360605336d51bb121a4780cff7d6bc05"
+    "gitBlobSha": "a8667e89360605336d51bb121a4780cff7d6bc05",
+    "repositoryCanonicalSha256": "f0afd48e6fd402c9adb1bb09d8a3310e61aa5c36b2662acc169ccc640d8aa696",
+    "runDigestMustBeVerifiedFromPreparedManifest": true
   },
   "environment": {
     "spec": "source-separation-environment-v1.json",
