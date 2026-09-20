@@ -1981,11 +1981,20 @@ pacchetto per gli store viaggiano ancora per niente. O si collegano (la palestra
 lo shop hanno un cartello; il live è una mossa; Milano e la trasferta sono i viaggi) o
 escono da `media/`.
 
-**Una nota, non del branch:** arrivando allo «stacca la spina» dall'agenda o da una card, i
-due numeri grandi della pagina (Benessere, Rete) mostrano «—» invece di «+13»: la
-fotografia dei numeri di prima (`LUOGO.prima`) la fa solo il tasto sulla pagina
-(`luogoVai`), non l'incarto di `mostraScena`. La riga sotto, «Benessere +14, rete +0,4», è
-giusta. Era così dal 19/09.
+**Il giro di fine task** (problemi-riscontrati, voci 47–51, tutte chiuse nel branch) ha
+trovato quattro cose nel gioco e una nel foglio. La copertura del filmato prendeva i tocchi
+ma **non il fuoco**: un Invio subito dopo il clic premeva di nuovo il tasto sotto (una
+seconda take pagata come seconda sessione, la mossa fatta due volte) — adesso la copertura
+prende il fuoco, Invio e spazio saltano il filmato come un tocco, Tab non gira per la pagina
+sotto. Il tasto **«Anni di Fame»** apriva il menu di sistema sopra al filmato (dallo Studio
+del 16/09): i tre tasti della barra sono inerti col filmato in corso, come «MAPPA» già era.
+Nell'**attesa** che il filmato dello «stacca la spina» partisse, la pagina sotto si
+ridisegnava già fatta («la seconda volta oggi recupera meno», il tasto d'oro ancora lì): fra
+il tasto e il filmato la pagina resta com'era (`LUOGO.attesa`). E arrivando allo «stacca la
+spina» **dall'agenda o da una card** i due numeri grandi erano «—» — non del branch, dal
+19/09: la fotografia dei numeri la faceva solo il tasto sulla pagina; adesso
+`luoghi-foto.js` incarta anche `avviaAzioneDiretta` e la fa da ogni strada. Quattro
+controlli in più nell'audit, 413 verdi.
 
 ## Le pagine dei posti sulla loro foto: Casa, Palestra, Live Club, stacca la spina
 

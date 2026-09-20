@@ -55,6 +55,11 @@ function transizioneVideoElemento(){
   if(box) return box;
   box = document.createElement("div");
   box.id = "tvid"; box.className = "tvid";
+  /* prende il fuoco quando copre lo schermo: se no resta sul tasto appena
+     premuto, e un Invio subito dopo il clic lo preme di nuovo sotto al
+     filmato (seconda take pagata come seconda sessione, mossa fatta due
+     volte) */
+  box.tabIndex = -1;
   const v = document.createElement("video");
   v.playsInline = true; v.setAttribute("playsinline", "");
   v.preload = "auto";
@@ -100,7 +105,8 @@ function transizioneVideo(id, poi){
     v.removeEventListener("error", fine);
     v.removeEventListener("playing", partito);
     box.removeEventListener("click", fine);
-    document.removeEventListener("keydown", tasto);
+    document.removeEventListener("keydown", tasto, true);
+    document.removeEventListener("keyup", tasto, true);
     try{ poi(); }catch(e){ console.error(e); }
     /* la pagina è già aperta sotto: il filmato, se c’era, sfuma sopra di lei */
     box.classList.remove("on", "attesa");
@@ -114,7 +120,13 @@ function transizioneVideo(id, poi){
       if(TRANSIZIONI_DOPO[id]) transizioneVideoPrepara(TRANSIZIONI_DOPO[id]);
     }, 260);
   };
-  const tasto = e => { if(e.key === "Escape"){ e.preventDefault(); fine(); } };
+  /* Esc, Invio e spazio saltano il filmato; Tab non gira per la pagina sotto.
+     Tutto in cattura e con il default fermato: Invio preme il tasto a fuoco
+     già al keydown, lo spazio al keyup. */
+  const tasto = e => {
+    if(e.key === "Escape" || e.key === "Enter" || e.key === " "){ e.preventDefault(); if(e.type === "keydown") fine(); }
+    else if(e.key === "Tab") e.preventDefault();
+  };
   const partito = () => {
     /* `playing` torna a ogni ripresa dopo un buffering: la rete di sicurezza
        si arma una volta sola, se no ogni inciampo la fa ripartire da capo */
@@ -140,7 +152,9 @@ function transizioneVideo(id, poi){
   v.addEventListener("error", fine);
   v.addEventListener("playing", partito);
   box.addEventListener("click", fine);
-  document.addEventListener("keydown", tasto);
+  document.addEventListener("keydown", tasto, true);
+  document.addEventListener("keyup", tasto, true);
+  try{ box.focus({preventScroll:true}); }catch(e){}
   /* se non parte in tempo si apre la pagina e basta */
   timer = setTimeout(() => { if(!avviato) fine(); }, TRANSIZIONE_ATTESA);
   const p = v.play();

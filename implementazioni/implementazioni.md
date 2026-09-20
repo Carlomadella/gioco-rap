@@ -50,8 +50,9 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 Smistato il 15/09/2026, dopo la chiusura di «Sputa» e della regola nuova sull'energia in
 Cabina; riguardato lo stesso giorno dopo «Il telefono quando lo schermo è un telefono», da
-cui sono uscite due voci nuove, il 16/09 dopo il primo video delle transizioni (la voce
-resta, a metà), e il 19/09 dopo le pagine di Casa, Palestra, Live Club e stacca la spina
+cui sono uscite due voci nuove, il 16/09 dopo il primo video delle transizioni (chiusa
+il 20/09 con gli altri quattro; resta la decisione sui sette video in più), e il 19/09
+dopo le pagine di Casa, Palestra, Live Club e stacca la spina
 sulla loro foto (chiusa la voce delle foto; la serata del club giocata a momenti è una voce
 nuova, fra i lavori lunghi) e dopo la schermata dell'avvio rapido; il 20/09 dopo le quattro
 piccole (agenda, prezzi dei beat, parametri a 1, licenziarsi), chiuse in un branch solo, e

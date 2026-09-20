@@ -2383,7 +2383,7 @@ test("i cartelli della Sala e di Casa passano dal loro video",
   /id:"beat"[\s\S]{0,300}?transizioneVideo\("sala",[\s\S]{0,40}?apriPosto\(/.test(hub) &&
   /id:"vita"[\s\S]{0,300}?transizioneVideo\("casa",[\s\S]{0,40}?apriLuogo\("casa"\)/.test(hub));
 test("«stacca la spina» ha il filmato fra il tasto e l'esito, da dovunque parta",
-  /window\.mostraScena = function[\s\S]{0,900}?transizioneVideo\(a\.id, mostra\)/.test(leggi("js/game/luoghi-foto.js")));
+  /window\.mostraScena = function[\s\S]{0,1400}?transizioneVideo\(a\.id, mostra\)/.test(leggi("js/game/luoghi-foto.js")));
 test("«registra» ha il filmato sulla prima take del pezzo, e solo su quella",
   /function studioTakeAncora\(\)[\s\S]{0,2200}?if\(!t\.l\.length && typeof transizioneVideo === "function"\) transizioneVideo\("registra", incidi\)/.test(leggi("js/game/studio-elementi.js")));
 test("il puntatore sul cartello prepara il video giusto: i cartelli hanno un id loro",
@@ -2398,6 +2398,33 @@ test("mentre un filmato va nessuna precarica gli cambia il file sotto",
 test("finito un filmato si prepara quello che può venire dopo nella pagina aperta",
   /TRANSIZIONI_DOPO = \{studio:"registra", casa:"stacca"\}/.test(tvid) &&
   tvid.includes("if(TRANSIZIONI_DOPO[id]) transizioneVideoPrepara(TRANSIZIONI_DOPO[id]);"));
+/* Il giro di fine task del 20/09 (problemi-riscontrati, voci 47–50): la
+   copertura prendeva i tocchi ma non il fuoco — un Invio dopo il clic premeva
+   di nuovo il tasto sotto al filmato (seconda take pagata come seconda
+   sessione); il tasto «Anni di Fame» apriva il menu sopra al filmato; nell'attesa
+   la pagina dello «stacca la spina» si ridisegnava già fatta; dall'agenda i due
+   numeri grandi erano «—». */
+test("la copertura del video prende il fuoco, e Invio, spazio e Tab non arrivano al tasto sotto",
+  tvid.includes("box.tabIndex = -1;") && tvid.includes("box.focus({preventScroll:true})") &&
+  /e\.key === "Escape" \|\| e\.key === "Enter" \|\| e\.key === " "/.test(tvid) &&
+  tvid.includes('else if(e.key === "Tab") e.preventDefault();') &&
+  tvid.includes('document.addEventListener("keydown", tasto, true)') &&
+  tvid.includes('document.addEventListener("keyup", tasto, true)'));
+test("la barra in alto è inerte col filmato in corso: il menu non si apre sopra al video",
+  /closest\("\[data-adf-global\]"\);\s*if\(global\)\{[\s\S]{0,500}?if\(document\.querySelector\("#tvid\.on, #tvid\.attesa"\)\) return;/.test(leggi("js/menu-sistema.js")));
+test("fra il tasto e il filmato la pagina della mossa resta com'era",
+  (() => {
+    const lf = leggi("js/game/luoghi-foto.js");
+    return lf.includes("if(LUOGO.attesa) return;") &&
+      lf.includes("if(LUOGO && LUOGO.id === id) LUOGO.attesa = true;") &&
+      lf.includes("LUOGO.attesa = false;");
+  })());
+test("la fotografia dei numeri si fa da ogni strada, non solo dal tasto sulla pagina",
+  (() => {
+    const lf = leggi("js/game/luoghi-foto.js");
+    return /window\.avviaAzioneDiretta = function\(id\)\{\s*if\(LUOGO_MOSSE\[id\][^\n]*LF_PRIMA = lfFotografia\(\);/.test(lf) &&
+      lf.includes("if(!LUOGO.prima) LUOGO.prima = LF_PRIMA;");
+  })());
 test("la copertura del video sta sopra all'orologio del telefono (142) e sotto alla Strada (180)",
   (() => {
     const m = tvidCss.match(/\.tvid\{[^}]*z-index:(\d+)/);
