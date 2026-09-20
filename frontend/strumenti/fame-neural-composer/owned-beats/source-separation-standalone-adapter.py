@@ -106,6 +106,11 @@ def _signature(compiled_model) -> dict:
     return {"inputs": inputs, "outputs": outputs}
 
 
+def _is_float32_element_type(value: str) -> bool:
+    normalized = str(value).strip().lower()
+    return normalized == "f32" or "float32" in normalized
+
+
 def _validate_signature(compiled_model) -> dict:
     signature = _signature(compiled_model)
 
@@ -118,7 +123,7 @@ def _validate_signature(compiled_model) -> dict:
         raise RuntimeError(f"Unexpected HTDemucs output signature: {actual_outputs!r}")
 
     for item in signature["inputs"] + signature["outputs"]:
-        if "f32" not in item["elementType"].lower():
+        if not _is_float32_element_type(item["elementType"]):
             raise RuntimeError(f"Unexpected HTDemucs tensor type: {item}")
 
     return signature
@@ -518,6 +523,13 @@ def technical_stats(stereo: np.ndarray) -> dict:
 
 
 def self_test() -> dict:
+    if not _is_float32_element_type("f32"):
+        raise RuntimeError("f32 element-type self-test failed")
+    if not _is_float32_element_type("<Type: 'float32'>"):
+        raise RuntimeError("OpenVINO float32 element-type self-test failed")
+    if _is_float32_element_type("float16") or _is_float32_element_type("bf16"):
+        raise RuntimeError("Non-float32 element-type rejection self-test failed")
+
     base = torch.arange(12, dtype=torch.float32).view(1, 2, 6)
     chunk = TensorChunk(base, 2, 3)
     padded = chunk.padded(7)
