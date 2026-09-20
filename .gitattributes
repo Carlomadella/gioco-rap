@@ -2,3 +2,5 @@
 frontend/strumenti/fame-neural-composer/owned-beats/audio-analysis-v2-protocol.json text eol=lf
 frontend/strumenti/fame-neural-composer/owned-beats/audio-analysis-holdout-cohort-r1-v2.json text eol=lf
 frontend/strumenti/fame-neural-composer/owned-beats/requirements-source-separation-lock.txt text eol=lf
+frontend/strumenti/fame-neural-composer/owned-beats/source-separation-pilot-review-v1.json text eol=lf
+frontend/strumenti/fame-neural-composer/owned-beats/source-separation-execution-contract-v1.json text eol=lf
