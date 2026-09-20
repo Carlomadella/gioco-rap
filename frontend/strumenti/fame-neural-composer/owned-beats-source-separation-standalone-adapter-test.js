@@ -12,6 +12,7 @@ const adapterPath = path.join(owned, "source-separation-standalone-adapter.py");
 const protocolPath = path.join(owned, "source-separation-pilot-protocol-v1.json");
 const contractPath = path.join(owned, "source-separation-execution-contract-v1.json");
 const reviewPath = path.join(owned, "source-separation-pilot-review-v1.json");
+const preInferencePath = path.join(owned, "verify-source-separation-pre-inference.ps1");
 
 function sha256(file) {
   return crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex");
@@ -21,6 +22,7 @@ const adapter = fs.readFileSync(adapterPath, "utf8");
 const protocol = JSON.parse(fs.readFileSync(protocolPath, "utf8"));
 const contract = JSON.parse(fs.readFileSync(contractPath, "utf8"));
 const review = JSON.parse(fs.readFileSync(reviewPath, "utf8"));
+const preInference = fs.readFileSync(preInferencePath, "utf8");
 
 assert.equal(protocol.schema, "fame-owned-beats-source-separation-pilot-protocol-v1");
 assert.equal(protocol.separatorCandidate.executionAdapterStatus, "NEXT_BLOCK");
@@ -68,6 +70,18 @@ assert(adapter.includes('("input.25", (1, 4, 2048, 336))'));
 assert(adapter.includes('("input.1", (1, 2, 343980))'));
 assert(adapter.includes('("4172", (1, 16, 2048, 336))'));
 assert(adapter.includes('("4262", (1, 8, 343980))'));
+
+
+assert(preInference.includes("verify-source-separation-environment-lock.ps1"));
+assert(preInference.includes("source-separation-pilot.js"));
+assert(preInference.includes(" self-test"));
+assert(preInference.includes(" inspect-model "));
+assert(preInference.includes("SOURCE_SEPARATION_PRE_INFERENCE_GATE_PASS"));
+assert(preInference.includes("sourceAudioOpenedByThisCommand = $false"));
+assert(preInference.includes("sourceSeparationExecutedByThisCommand = $false"));
+assert(preInference.includes("packagesInstalledByThisCommand = $false"));
+assert(!preInference.includes("separate-file"));
+assert(!preInference.includes("pip install"));
 
 const py = process.platform === "win32" ? "python" : "python3";
 const syntax = cp.spawnSync(
