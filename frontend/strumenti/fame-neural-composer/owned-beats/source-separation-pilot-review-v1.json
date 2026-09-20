@@ -1,0 +1,85 @@
+{
+  "schema": "fame-owned-beats-source-separation-pilot-review-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_FIRST_PILOT_OUTPUT",
+  "scope": {
+    "split": "development",
+    "expectedFamilies": 8,
+    "holdoutAllowed": false,
+    "batch131Allowed": false
+  },
+  "technicalValidation": {
+    "requiredStems": [
+      "drums",
+      "bass",
+      "other",
+      "vocals"
+    ],
+    "requiredSampleRate": 44100,
+    "requiredChannels": 2,
+    "requireSameSamplesPerChannelAsDecodedSource": true,
+    "requireFiniteSamples": true,
+    "requireOutputSha256": true,
+    "overwriteExistingOutputsAllowed": false,
+    "measureWithoutHardThreshold": [
+      "peakAbs",
+      "rms",
+      "stemSumResidualRmsRatio"
+    ]
+  },
+  "humanReview": {
+    "scale": {
+      "0": "unusable: role is missing or artifacts/leakage dominate",
+      "1": "weak: major correction or isolation work required",
+      "2": "usable: role is clear enough for downstream pilot with moderate correction",
+      "3": "strong: role is clean and directly useful for downstream transcription"
+    },
+    "drums": [
+      "percussive retention",
+      "kick/snare/hat transient clarity",
+      "tonal/vocal leakage",
+      "downstream onset/MIDI usefulness"
+    ],
+    "bass": [
+      "low-end retention",
+      "fundamental/pitch traceability",
+      "kick/drum leakage",
+      "downstream pitch/MIDI usefulness"
+    ],
+    "auxiliary": {
+      "other": [
+        "gross artifacts",
+        "unexpected role swap"
+      ],
+      "vocals": [
+        "gross artifacts",
+        "unexpected role swap"
+      ]
+    }
+  },
+  "pilotGate": {
+    "technical": "ALL_8_FAMILIES_PASS",
+    "drums": {
+      "medianDownstreamUsefulnessAtLeast": 2,
+      "familiesAtOrAbove2AtLeast": 6
+    },
+    "bass": {
+      "medianDownstreamUsefulnessAtLeast": 2,
+      "familiesAtOrAbove2AtLeast": 6
+    },
+    "outcomeIfPass": "OPEN_AUDIO_TO_MIDI_DRUMS_LOW_END_PILOT",
+    "outcomeIfFail": "KEEP_AUDIO_TO_MIDI_CLOSED_AND_REVIEW_SEPARATOR"
+  },
+  "secondSeparatorRule": {
+    "allowedOnlyIfNeeded": true,
+    "freezeCheckpointAndLicenseBeforeRunning": true,
+    "sameDevelopmentFamilies": true,
+    "blindComparativeReviewRequired": true,
+    "finalHoldoutAllowed": false
+  },
+  "safety": {
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false,
+    "finalHoldoutAccessAllowed": false
+  }
+}
