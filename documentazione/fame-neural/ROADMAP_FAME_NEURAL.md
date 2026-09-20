@@ -1861,3 +1861,31 @@ Questo checkpoint congela baseline V1 e split prima del tuning successivo. Non c
 Prossimo passo owned-beats:
 
 BASELINE V1 reference-scored sui soli development → candidate AUDIO ANALYSIS V2 sui soli development → confronto paired V2−V1 → solo con `V2_WINS`, freeze immutabile della candidata → singola valutazione separata sugli evaluation-holdout → SOURCE SEPARATION → AUDIO→MIDI drums/low-end → QA.
+
+
+### Checkpoint operativo owned-beats — aggiornato 20 settembre 2026
+
+Il percorso proprietario audio→MIDI ha superato il blocco Source Separation sul cohort development congelato.
+
+Stato verificato:
+
+- Audio Analysis R6 final holdout chiuso con `V2_PROMOTE`;
+- Source Separation inference completata su 8/8 family development;
+- technical QA: `ALL_8_FAMILIES_PASS`, 32/32 stem verificati;
+- Human Review Source Separation completata con gate congelato prima dell'ascolto;
+- drums: mediana downstream usefulness 2.5, 8/8 family >=2;
+- bass/low-end: mediana downstream usefulness 2.5, 7/8 family >=2;
+- outcome ufficiale: `OPEN_AUDIO_TO_MIDI_DRUMS_LOW_END_PILOT`;
+- final holdout non riaperto;
+- batch 131 non autorizzato;
+- training serio ancora chiuso.
+
+Le osservazioni qualitative sullo stem `other` indicano che la separazione tonale non è ancora stabile lungo l'intero arrangiamento in più family. Il PASS non viene quindi esteso al ramo tonale.
+
+Prossimo blocco owned-beats autorizzato:
+
+**AUDIO→MIDI drums/low-end sui soli 8 development → QA dedicato.**
+
+Prima dell'implementazione del nuovo blocco resta obbligatoria la ricerca di apertura prevista dal protocollo della roadmap; protocollo, strumenti candidati e criteri del pilot vanno congelati prima di osservare i risultati.
+
+Checkpoint dettagliato: [Source Separation development PASS — 20/09/2026](OWNED_BEATS_SOURCE_SEPARATION_DEVELOPMENT_PASS_2026-09-20.md).
