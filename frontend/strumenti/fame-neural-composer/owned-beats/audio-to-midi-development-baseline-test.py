@@ -25,6 +25,7 @@ def main():
     protocol = mod.require_protocol()
 
     assert protocol["status"] == "FROZEN_BEFORE_FIRST_TRANSCRIPTION_OUTPUT"
+    assert mod.python_major_minor() == protocol["baselineEnvironment"]["python"]
     assert protocol["scope"]["expectedFamilies"] == 8
     assert protocol["scope"]["finalHoldoutAccessAllowed"] is False
     assert protocol["scope"]["batch131Authorized"] is False
