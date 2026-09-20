@@ -2451,10 +2451,14 @@ test("sul telefono le tre colonne diventano una pila e le porte della Casa vanno
 (function(){
   const vm = require("vm");
   const ctx = {window:{__POSE:""}, document:{getElementById:()=>null,querySelectorAll:()=>[],addEventListener(){}},
-    $:()=>({}), A:{w:60,h:175,skin:"#c08060",fit:"tuta",color:"#f00"}, portrait:()=>"", fit:()=>({}), shade:c=>c, console};
+    $:()=>({}), A:{name:"Prova",w:60,h:175,skin:"#c08060",fit:"tuta",color:"#f00"}, portrait:()=>"", fit:()=>({}), shade:c=>c, console};
   vm.createContext(ctx);
-  try{ vm.runInContext(leggi("js/creator/nav.js"), ctx); }catch(e){}
-  const svg = typeof ctx.window.ARTIST_BODY === "function" ? ctx.window.ARTIST_BODY() : "";
+  let svg = "";
+  try{
+    vm.runInContext(leggi("js/creator/nav.js"), ctx, {filename:"nav.js"});
+    svg = ctx.window.ARTIST_BODY();
+    test("nav.js si carica nel test runtime e disegna il corpo intero", svg.length > 0);
+  }catch(e){ test("nav.js si carica nel test runtime e disegna il corpo intero", false, e.message); }
   const rotti = [];
   for(const [,d] of svg.matchAll(/ d="([^"]+)"/g)){
     for(const [,c,args] of d.matchAll(/([MLCZ])([^MLCZ]*)/g)){
@@ -2464,7 +2468,7 @@ test("sul telefono le tre colonne diventano una pila e le porte della Casa vanno
     }
   }
   test("il corpo intero del rapper: ogni tracciato SVG ha le coordinate che deve (la mano alzata compresa)",
-    svg.length > 0 && rotti.length === 0, rotti.join(" | ") || "ARTIST_BODY non generato");
+    svg.length > 0 && rotti.length === 0, rotti.join(" | ") || "corpo non generato");
 })();
 
 for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/transizioni-video.js","js/game/luoghi-foto.js","js/preparo.js","js/gioco-ingresso.js"]){

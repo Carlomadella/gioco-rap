@@ -6,10 +6,11 @@ stata chiusa. Qui solo quelle **ancora aperte**, nello stesso ordine di «Da far
 insieme i due fogli: prima il telefono, poi quello che pesa nel pacchetto, poi le cose
 piccole, poi i lavori lunghi, in fondo le decisioni. Riordinato il 15/09 dopo il giro di
 fine task su quel foglio; il 19/09 il giro sulle pagine dei posti sulla loro foto ha
-trovato sette cose, sei chiuse nello stesso branch, una (la mano del rapper) resta; lo
-stesso giorno il giro sull'avvio rapido ne ha trovate sette, tutte chiuse nel branch.
-Il 20/09 il giro sulle «quattro piccole» ne ha trovate tre, più tre note: sono le
-voci 30–32, tutte e tre chiuse nello stesso branch prima del push.
+trovato sette cose, sei chiuse nello stesso branch, una (la mano del rapper) è stata
+chiusa il 20/09 in un branch suo; lo stesso giorno il giro sull'avvio rapido ne ha trovate
+sette, tutte chiuse nel branch. Il 20/09 il giro sulle «quattro piccole» ne ha trovate tre,
+più tre note: sono le voci 30–32, tutte e tre chiuse nello stesso branch prima del push; il
+giro sulla mano del rapper ne ha trovate due (33–34), chiuse nello stesso branch.
 
 1. **Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
    telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra. Il tasto
@@ -124,6 +125,17 @@ voci 30–32, tutte e tre chiuse nello stesso branch prima del push.
    party» invece se ne va con uno «Stacca la spina» di mattina. **RISOLTO (20/09/2026)** —
    il colpo si onora prima del dado, il beat sul tavolo chiude il «Producer session» di oggi;
    il party non era un problema: `orari.js` apre «Stacca la spina» solo dalle 00:00 alle 04:00.
+
+33. ~~**L'audit della mano ingoia in silenzio l'errore con cui `nav.js` si carica** (20/09,
+   `audit-regressioni.js:2456`): l'artista finto non ha `name`, `refreshArtistChrome()`
+   esplode e il `catch` vuoto non lo dice. Oggi innocuo, perché `ARTIST_BODY` è già
+   definita; domani il test direbbe solo «ARTIST_BODY non generato» senza il perché.~~
+   **RISOLTO (20/09/2026)** — l'artista finto ha un `name`, `nav.js` si carica senza errori,
+   e caricamento e `ARTIST_BODY()` stanno in un test loro che riporta il messaggio, come
+   il blocco gemello di `spostamenti.js`.
+34. ~~**L'indice in testa dice ancora che la mano del rapper «resta»** (20/09, riga 9 di
+   questo foglio), mentre la voce 17 qui sotto è chiusa.~~ **RISOLTO (20/09/2026)** — il
+   paragrafo dice che è stata chiusa il 20/09 in un branch suo.
 
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
 
@@ -4163,3 +4175,88 @@ a 180 punti di card si legge «boom bap · Nome Cog…», che va bene, ma la fas
 mai quando c'è il nome — è così per scelta (`b.da` vince).
 
 L'indice «Cosa resta aperto» in testa al foglio ha le voci nuove di questo giro.
+
+## Giro del 20/09/2026 (segnala-problemi, fine task `task/mano-rapper-svg`, commit `309de1c`)
+
+Giro piccolo, sul solo commit `309de1c` nel worktree `gioco-rap-mano`: la mano del braccio
+alzato del rapper in `frontend/js/creator/nav.js:71`, il controllo nuovo in
+`frontend/strumenti/audit-regressioni.js:2447-2468`, la voce 17 dell'indice, la scheda del
+19/09 e la riga della roadmap. `npm run verifica` era già verde (386, 3, 33) e non l'ho
+rifatto. Letti `git show 309de1c` e `nav.js` per intero; il controllo dell'audit l'ho
+fatto girare da solo con `vm`, sul `nav.js` di adesso e su quello di prima
+(`bcec0df`): sul vecchio segna `C 52.8,-361.6 47.2,-362.6`, sul nuovo niente — come dice
+il commit. Poi ho disegnato le due mani con Playwright (Chromium), ingrandite: quella
+vecchia Chrome la disegnava lo stesso, fino al pezzo rotto, con uno spigolo tagliato dritto
+in basso a sinistra e l'errore in console; quella nuova è un pugno tondo che copre il
+polsino, col microfono dentro.
+
+**Il punto scelto per chiudere è sensato.** La mano parte dal polso `48,-372`; il braccio
+alzato finisce in cima fra `66,-372` e `50,-370`, quindi il polso sta esattamente lì. Il
+fondo della mano nuova (l'ultima curva, con i controlli a `-366` e `-367`) scende di
+tre-cinque unità sotto l'orlo della manica e lo copre, come nel braccio abbassato dove la
+mano finisce a `50,-210`, due unità oltre l'orlo (`48,-212`), e la `Z` chiude dritto
+sul polso. Le due mani sono fatte allo stesso modo: prima il dorso, poi il lato, poi il
+ritorno al polso. L'unica alternativa sarebbe stata chiudere su `50,-370` (l'angolo interno
+della manica) e lasciare alla `Z` gli ultimi due punti: stesso disegno a occhio, niente da
+cambiare. Il commento in cima al controllo, la voce 17 e la scheda del 19/09 dicono il
+vero sui numeri (`C56,-366 50,-367 48,-372 Z`); `nav.js:71` è la riga giusta.
+
+### L'audit della mano ingoia in silenzio l'errore con cui `nav.js` si carica
+- **dove** — `frontend/strumenti/audit-regressioni.js:2456` (`try{ ... }catch(e){}`) e
+  `:2457` (la chiamata `ARTIST_BODY()` fuori dal `try`); l'errore nasce in
+  `frontend/js/creator/nav.js:174` (`A.name.trim()` dentro `refreshArtistChrome()`,
+  chiamata a `:178`).
+- **cosa succede** — l'artista finto ha `w`, `h`, `skin`, `fit`, `color` ma non `name`:
+  quando `nav.js` arriva in fondo e ridisegna l'avatar della barra, esplode con «Cannot
+  read properties of undefined (reading 'trim')» e il `catch` vuoto lo butta via. Oggi non
+  fa danno, perché `ARTIST_BODY` viene definita prima (riga 42) e il test la trova. Ma il
+  controllo è cieco: se domani qualcuno mette prima della riga 42 una riga che chiede un
+  pezzo che i finti non hanno (`A.name`, un `$()` che deve rispondere qualcosa,
+  `portrait()` che deve tornare un oggetto), il test si accende con «ARTIST_BODY non
+  generato» e basta, senza il messaggio vero — e chi lo legge deve rifare tutto il
+  ragionamento da zero. L'altro blocco `vm` dell'audit (`:1491-1492`, spostamenti) fa
+  la cosa giusta: se il file non si carica, lo scrive come test fallito col messaggio. In
+  più `ARTIST_BODY()` a `:2457` sta fuori dal `try`: se un giorno lancia (un campo di
+  `A` che non c'è, `portrait(true)` che non torna `defs`/`testa` — già oggi i finti
+  producono «undefinedundefined» nella testa, senza rompere), muore l'audit intero con uno
+  stack, non una riga rossa. Gli altri finti bastano: `$` torna `{}` e i tre `onclick`
+  ci si appoggiano, `shade` e `fit` producono solo colori (anche «undefined»), e i
+  colori non stanno nei tracciati.
+- **come si vede** — nel `catch` mettere `console.log(e.message)` e far girare
+  `node strumenti/audit-regressioni.js`: stampa l'errore del `trim`. Oppure spostare
+  `refreshArtistChrome()` prima di `window.ARTIST_BODY` e vedere il test dire solo
+  «ARTIST_BODY non generato».
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (20/09/2026)** — l'artista finto ha `name:"Prova"`, e `nav.js` si carica senza
+  errori; il caricamento e `ARTIST_BODY()` stanno in un test loro («nav.js si carica nel test
+  runtime e disegna il corpo intero») che riporta il messaggio dell'eccezione, come il blocco
+  gemello di `spostamenti.js`. 387 controlli, tutti verdi.
+
+### L'indice in testa dice ancora che la mano del rapper «resta»
+- **dove** — `documentazione/problemi-riscontrati.md:9` («sei chiuse nello stesso branch,
+  una (la mano del rapper) resta»).
+- **cosa succede** — il commit barra la voce 17 e la segna RISOLTO, ma il paragrafo sopra
+  all'indice — quello che uno legge per primo, con la data del 20/09 — dice ancora che la
+  mano è l'unica rimasta aperta del giro del 19/09. La stessa frase in fondo al giro del
+  19/09 (`:3883`) va bene così: racconta com'era quel giorno.
+- **come si vede** — aprire il foglio, leggere le prime dieci righe.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (20/09/2026)** — il paragrafo dice che la mano è stata chiusa il 20/09 in un
+  branch suo, e cita le voci 33–34 di questo giro.
+
+Note a margine, non bug: (1) **il vecchio tracciato non faceva sparire la mano**: Chrome
+disegna un tracciato fino al pezzo sbagliato e si ferma lì, quindi la mano c'era, con un
+angolo tagliato dritto e un piccolo spigolo in basso a sinistra, e l'errore in console. Il
+messaggio del commit e la scheda del 19/09 dicono «non si disegnava»: è storia, non serve
+correggerla, ma è il motivo per cui nessuno l'aveva vista a occhio prima del giro con la
+console aperta. (2) **«corpo intero» nella roadmap vuol dire quello che disegna `nav.js`**:
+la testa arriva da `portrait(true)` (`js/creator/portrait.js`), che nell'audit è un finto
+che torna vuoto, quindi i tracciati della testa il controllo non li conta. Va bene così —
+è un altro file — ma se un giorno si rompe un tracciato della testa, questo controllo non
+se ne accorge. (3) **il conteggio conosce solo `M`, `L`, `C` e `Z`**
+(`audit-regressioni.js:2460`): oggi il corpo usa solo quelli, ho controllato ogni
+tracciato; se un giorno uno usa `Q`, `S`, `A`, `H`, `V` o le lettere minuscole, i numeri
+finiscono nel comando prima e il test diventa rosso per sbaglio. Rosso, non verde: si
+vede, quindi va bene.
+
+L'indice «Cosa resta aperto» in testa al foglio ha le voci 33 e 34 di questo giro.
