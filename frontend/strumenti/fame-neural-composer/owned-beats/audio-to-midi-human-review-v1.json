@@ -1,0 +1,79 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-human-review-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_FIRST_AUDIO_TO_MIDI_LISTENING",
+  "reviewId": "audio-to-midi-human-review-v1-001",
+  "runId": "audio-to-midi-development-baseline-v1-001",
+  "split": "development",
+  "expectedFamilies": 8,
+  "blindness": {
+    "drums": true,
+    "labels": [
+      "A",
+      "B"
+    ],
+    "balancedAssignment": true,
+    "armIdentityExposedDuringReview": false
+  },
+  "renderer": {
+    "id": "fame-neutral-midi-audition-renderer-v1",
+    "sampleRate": 22050,
+    "channels": 1,
+    "pcm": "s16le",
+    "sameRendererForBothDrumArms": true,
+    "drums": {
+      "kick": "decaying sine sweep",
+      "snare": "deterministic noise plus low tone",
+      "hihat": "deterministic high-passed noise"
+    },
+    "lowEnd": {
+      "midiNotes": "sine plus second harmonic, note envelope",
+      "contourDiagnostic": "continuous sine following stored pYIN pitchContour; diagnostic only"
+    },
+    "interpretation": "Renderer sound quality is not part of the score; judge timing, roles, pitch, duration and downstream usefulness."
+  },
+  "scale": {
+    "0": "unusable",
+    "1": "weak; major correction required",
+    "2": "usable for downstream pilot with moderate correction",
+    "3": "strong; directly useful"
+  },
+  "drumsCriteria": [
+    "kick retention and false kicks",
+    "snare/hihat retention and class confusion",
+    "timing",
+    "downstream Drum View usefulness"
+  ],
+  "lowEndCriteria": [
+    "onset",
+    "pitch/octave correctness",
+    "duration/release",
+    "glide/contour preservation using contour diagnostic",
+    "downstream MIDI usefulness"
+  ],
+  "drumsSelectionRule": {
+    "qualification": {
+      "medianUsefulnessAtLeast": 2,
+      "familiesAtOrAbove2AtLeast": 6
+    },
+    "order": [
+      "higher median usefulness",
+      "higher families at or above 2",
+      "higher total usefulness score",
+      "if still tied, select drums-only-spectral-onset-v1 as lower-complexity baseline"
+    ],
+    "noAutomaticUseOfTechnicalEventCounts": true
+  },
+  "lowEndGate": {
+    "armId": "librosa-pyin-lowend-v1",
+    "medianUsefulnessAtLeast": 2,
+    "familiesAtOrAbove2AtLeast": 6
+  },
+  "safety": {
+    "finalHoldoutAllowed": false,
+    "batch131Allowed": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "nextAfterReview": "PREPARE_BASIC_PITCH_ARM_AND_COMPARE_BEFORE_FINAL_LOW_END_PROMOTION"
+}
