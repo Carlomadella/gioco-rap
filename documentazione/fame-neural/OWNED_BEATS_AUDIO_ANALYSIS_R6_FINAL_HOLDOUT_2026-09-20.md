@@ -7,7 +7,7 @@ Stato: **R6 CHIUSO / V2_PROMOTE / HOLDOUT CONSUMATO**
 
 Chiudere il percorso R6 rimasto aperto dopo l'audit del 13 settembre: Human Reference holdout cieca finalizzata, scoring V1 e `audio-analysis-v2-config-001` sulla stessa reservation, confronto paired finale e decisione secondo il protocollo congelato.
 
-Questo checkpoint registra gli output prodotti nel workspace esterno `D:\\FAME_NEURAL`. I report restano fuori da Git; qui vengono conservati identità, digest ed esito.
+Questo checkpoint registra gli output prodotti nel workspace esterno `D:\FAME_NEURAL`. I report restano fuori da Git; qui vengono conservati identità, digest ed esito.
 
 ## Binding finale
 
@@ -37,7 +37,7 @@ Il finalizer ufficiale ha chiuso la reference con:
 
 Snapshot:
 
-`D:\\FAME_NEURAL\\references\\audio-analysis-v2\\evaluation-holdout-r1-v2\\audio-analysis-v2-holdout-r1-v2-reference-001.json`
+`D:\FAME_NEURAL\references\audio-analysis-v2\evaluation-holdout-r1-v2\audio-analysis-v2-holdout-r1-v2-reference-001.json`
 
 La reference è stata raccolta in modalità cieca rispetto agli output V1/V2 e finalizzata prima dello scoring.
 
@@ -62,7 +62,7 @@ Su Windows il freeze storico del dependency lock corrisponde alla rappresentazio
 
 Run:
 
-`D:\\FAME_NEURAL\\runs\\audio-analysis-final-holdout-r1-v2\\r6-final-holdout-001`
+`D:\FAME_NEURAL\runs\audio-analysis-final-holdout-r1-v2\r6-final-holdout-001`
 
 Paired median deltas V2 − V1:
 

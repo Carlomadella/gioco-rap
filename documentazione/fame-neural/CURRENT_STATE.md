@@ -32,7 +32,8 @@ R6 finale resta aperto: reference cieca disponibile, scoring V1/config-001 e pai
 
 ## Owned Beats — stato operativo
 
-> Checkpoint corrente Audio Analysis: [V2 config-001 — development V2_WINS + candidate freeze — 12/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_V2_DEVELOPMENT_WIN_CANDIDATE_FREEZE_2026-09-12.md).
+> Checkpoint corrente Audio Analysis: [R6 final holdout — V2_PROMOTE — 20/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_R6_FINAL_HOLDOUT_2026-09-20.md).
+> Checkpoint development precedente: [V2 config-001 — development V2_WINS + candidate freeze — 12/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_V2_DEVELOPMENT_WIN_CANDIDATE_FREEZE_2026-09-12.md).
 > Checkpoint precedente Block E: [V2 config-001 — metric gate — 11/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_V2_CONFIG001_METRIC_GATE_2026-09-11.md).
 > Diagnostica complementare: [Easy sanity set e localization audit — 11/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_EASY_SANITY_CHECKPOINT_2026-09-11.md).
 > Metodo review congelato: [Freeze correction-cost review config-001 — 11/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_CORRECTION_COST_REVIEW_FREEZE_2026-09-11.md).
