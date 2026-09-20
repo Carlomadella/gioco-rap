@@ -991,3 +991,28 @@ Risultato rispetto alle soglie fissate prima dell'ascolto:
 È quindi autorizzato il prossimo blocco Audio→MIDI **sulle sole 8 family development e limitatamente a drums + low-end**. Final holdout, batch 131, training e task/data readiness restano esclusi.
 
 Le osservazioni qualitative post-review sullo stem `other` mostrano in più family un pattern di buona separazione iniziale seguito da degrado, perdita o riapparizione in sezioni successive. Queste osservazioni non modificano il gate drums/bass, ma impediscono di estendere implicitamente il PASS al ramo tonale. Il tonal Audio→MIDI resta chiuso fino a un gate dedicato.
+
+## NDR-069 — Audio→MIDI development: baseline permissiva, kick fusion e low-end a due stadi
+
+**Stato: ACCEPTED — 20 settembre 2026.**
+
+Dopo il PASS Source Separation, il primo blocco Audio→MIDI resta limitato alle 8 family `development`, senza final holdout, batch 131 o training.
+
+La ricerca di apertura ha escluso dal primo percorso commerciale i pretrained drum model con restrizioni NonCommercial o licenza dei checkpoint non chiarita. Il baseline iniziale usa quindi soltanto il venv Audio Analysis già congelato (`Python 3.14`, `librosa==1.0.0`, FFmpeg) e non introduce checkpoint esterni.
+
+Per i drums vengono confrontati due arm:
+
+- `drums-only-spectral-onset-v1`;
+- `drums-bass-kick-fusion-v1`.
+
+La seconda variante esiste per testare direttamente il failure mode osservato nella Human Review Source Separation, dove in più family il kick è risultato assente dal drums ma presente nel bass. Snare/hat restano derivati dal drums; soltanto il kick usa evidenza addizionale low-end.
+
+Per il low-end:
+
+- baseline eseguibile: `librosa-pyin-lowend-v1`;
+- candidata ufficiale successiva: `basic-pitch-0.4.0-lowend-v1`, bloccata finché non viene creato un environment separato con lock esatto e freeze del modello;
+- TorchCrepe resta backup diagnostico, non autorizzato nella prima esecuzione.
+
+Il protocollo `audio-to-midi-development-protocol-v1.json` è congelato prima del primo output e lega il baseline al Git blob `0e48d49e6c7784b9e26628dcf52becd3d5456b9c`. Il BPM usato per renderizzare il MIDI deve provenire dall'output stimato della Audio Analysis V2 promossa; la Human Reference non può essere usata come input di trascrizione.
+
+Il prossimo passo è un **preflight locale no-transcription**. Solo dopo PASS può essere eseguito il run append-only sulle 8 family development.
