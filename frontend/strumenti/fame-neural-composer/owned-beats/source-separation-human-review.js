@@ -285,30 +285,30 @@ label{display:block;margin:7px 0}.progress{height:7px;background:#202733;border-
 <script>
 let PKG,idx=0,answers={};
 const app=document.getElementById("app");
-function scoreButtons(role,value){return [0,1,2,3].map(n=>`<button data-role="${role}" data-score="${n}" class="${value===n?"sel":""}">${n}</button>`).join("")}
+function scoreButtons(role,value){return [0,1,2,3].map(n=>\`<button data-role="\${role}" data-score="\${n}" class="\${value===n?"sel":""}">\${n}</button>\`).join("")}
 function current(){return PKG.families[idx]}
 function state(id){return answers[id]||(answers[id]={drums:{downstreamUsefulness:null,note:""},bass:{downstreamUsefulness:null,note:""},reviewerAttested:false})}
 function render(){
  if(idx>=PKG.families.length){app.innerHTML="";document.getElementById("done").classList.remove("hidden");document.getElementById("bar").style.width="100%";return}
  const f=current(),s=state(f.sourceRecordId);document.getElementById("bar").style.width=(idx/PKG.families.length*100)+"%";
- app.innerHTML=`<div class="panel"><div class="row"><h2>${f.sourceRecordId}</h2><b>${idx+1}/${PKG.families.length}</b></div>
- <h3>Originale</h3><audio controls src="/media/${encodeURIComponent(f.sourceRecordId)}/source"></audio>
- <h3>Drums</h3><audio controls src="/media/${encodeURIComponent(f.sourceRecordId)}/drums"></audio>
+ app.innerHTML=\`<div class="panel"><div class="row"><h2>\${f.sourceRecordId}</h2><b>\${idx+1}/\${PKG.families.length}</b></div>
+ <h3>Originale</h3><audio controls src="/media/\${encodeURIComponent(f.sourceRecordId)}/source"></audio>
+ <h3>Drums</h3><audio controls src="/media/\${encodeURIComponent(f.sourceRecordId)}/drums"></audio>
  <p><b>Downstream onset/MIDI usefulness</b> — 0 inutilizzabile, 1 debole, 2 utilizzabile, 3 forte.</p>
- <div class="score">${scoreButtons("drums",s.drums.downstreamUsefulness)}</div>
+ <div class="score">\${scoreButtons("drums",s.drums.downstreamUsefulness)}</div>
  <p class="muted">Controlla: ritenzione percussiva; chiarezza kick/snare/hat; leakage tonale/vocale.</p>
- <textarea id="drumsNote" placeholder="Nota drums opzionale">${s.drums.note}</textarea>
- <h3>Bass</h3><audio controls src="/media/${encodeURIComponent(f.sourceRecordId)}/bass"></audio>
+ <textarea id="drumsNote" placeholder="Nota drums opzionale">\${s.drums.note}</textarea>
+ <h3>Bass</h3><audio controls src="/media/\${encodeURIComponent(f.sourceRecordId)}/bass"></audio>
  <p><b>Downstream pitch/MIDI usefulness</b> — 0 inutilizzabile, 1 debole, 2 utilizzabile, 3 forte.</p>
- <div class="score">${scoreButtons("bass",s.bass.downstreamUsefulness)}</div>
+ <div class="score">\${scoreButtons("bass",s.bass.downstreamUsefulness)}</div>
  <p class="muted">Controlla: ritenzione low-end; fondamentale/pitch tracciabile; leakage kick/drums.</p>
- <textarea id="bassNote" placeholder="Nota bass opzionale">${s.bass.note}</textarea>
+ <textarea id="bassNote" placeholder="Nota bass opzionale">\${s.bass.note}</textarea>
  <details><summary>Ascolto ausiliario other/vocals</summary>
- <h4>Other</h4><audio controls src="/media/${encodeURIComponent(f.sourceRecordId)}/other"></audio>
- <h4>Vocals</h4><audio controls src="/media/${encodeURIComponent(f.sourceRecordId)}/vocals"></audio></details>
- <label><input id="attest" type="checkbox" ${s.reviewerAttested?"checked":""}> Ho ascoltato originale, drums e bass e confermo i punteggi.</label>
- <div class="row"><button id="prev" ${idx===0?"disabled":""}>Indietro</button><button id="next">Salva e avanti</button></div>
- <p id="err" class="warn"></p></div>`;
+ <h4>Other</h4><audio controls src="/media/\${encodeURIComponent(f.sourceRecordId)}/other"></audio>
+ <h4>Vocals</h4><audio controls src="/media/\${encodeURIComponent(f.sourceRecordId)}/vocals"></audio></details>
+ <label><input id="attest" type="checkbox" \${s.reviewerAttested?"checked":""}> Ho ascoltato originale, drums e bass e confermo i punteggi.</label>
+ <div class="row"><button id="prev" \${idx===0?"disabled":""}>Indietro</button><button id="next">Salva e avanti</button></div>
+ <p id="err" class="warn"></p></div>\`;
  app.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>{
    s.drums.note=document.getElementById("drumsNote").value;
    s.bass.note=document.getElementById("bassNote").value;
