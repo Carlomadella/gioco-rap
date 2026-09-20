@@ -351,8 +351,10 @@ la partenza con tutti i parametri a 1 (C) sono **fatti il 20/09/2026**.
 
 **Carletto** — la TRACK (D), le foto di sfondo dei posti e le schermate rifatte in HTML (B —
 fatte per lo Studio l'08/09 e per Casa, Palestra, Live Club, stacca la spina e Piazza il
-19/09/2026; resta la serata del club a momenti), le transizioni video sulle cinque schede (B — la prima, lo Studio, c'è dal 16/09/2026; le
-altre quattro si agganciano allo stesso modo), lo skip lento (C), via «lucidità» (C), la
+19/09/2026; resta la serata del club a momenti), le transizioni video sulle cinque schede
+(B — fatte: lo Studio dal 16/09/2026, la Sala, Casa, stacca la spina e registra dal
+20/09/2026; da decidere i sette video che nessun punto chiede), lo skip lento (C), via
+«lucidità» (C), la
 legacy — quanto sei influente sulle generazioni dopo di te (E: nel codice non esiste). Più
 due regole di lavoro: le canzoni con l'IA come task giornaliera, e quando non è un fix
 creare un file nuovo collegato invece di gonfiare quelli che ci sono.

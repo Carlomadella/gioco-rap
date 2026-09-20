@@ -1,10 +1,12 @@
 /* Le transizioni video: il filmato di cinque secondi che parte quando tocchi
-   un posto sulla mappa, prima che la sua pagina si apra.
+   un posto sulla mappa, prima che la sua pagina si apra — o quando fai una
+   delle due mosse che ne hanno uno, prima che si veda com'è andata.
 
    I video stanno in media/video/Transizioni di scena/ — dodici, pronti dal
-   05/09 — e fino a oggi nessuna riga di codice li caricava: viaggiavano nel
-   pacchetto per gli store da peso morto. Qui si collegano uno alla volta, a
-   partire dallo Studio, che è il posto dove si clicca di più.
+   05/09 — e fino al 16/09 nessuna riga di codice li caricava: viaggiavano nel
+   pacchetto per gli store da peso morto. Il punto ne chiede cinque, e sono
+   questi: lo Studio (il primo, 16/09), poi la Sala, Casa, stacca la spina e
+   registra (20/09). Gli altri sette aspettano una decisione.
 
    Come funziona: `transizioneVideo("studio", () => apriStudio(...))`. Il
    filmato copre lo schermo, alla fine si apre la pagina sotto e il filmato
@@ -25,8 +27,24 @@
 "use strict";
 
 const TRANSIZIONI_VIDEO = {
-  studio: "media/video/Transizioni di scena/01_studio_definitivo.mp4"
+  studio:   "media/video/Transizioni di scena/01_studio_definitivo.mp4",
+  /* la strada, il portone, la stanza coi computer: il cartello «La Sala» */
+  sala:     "media/video/Transizioni di scena/02_ingresso_sala_definitivo.mp4",
+  /* la via di notte, le scale, il salotto: il cartello «Casa» */
+  casa:     "media/video/Transizioni di scena/03_ritorno_casa_definitivo.mp4",
+  /* il divano e la tele: la mossa «Stacca la spina», da dovunque parta
+     (la porta di Casa, l'agenda del telefono, la card della sera) */
+  stacca:   "media/video/Transizioni di scena/04_stacca_la_spina_definitivo.mp4",
+  /* il microfono, il foglio, il banco: la prima take in Cabina */
+  registra: "media/video/Transizioni di scena/05_registra_pezzo_definitivo.mp4"
 };
+/* I cartelli della mappa hanno un id loro (`data-l`): qui si dice quale
+   filmato preparare quando il puntatore ci passa sopra. */
+const TRANSIZIONI_CARTELLI = {studio:"studio", beat:"sala", vita:"casa"};
+/* Finito un filmato, si prepara quello che può venire subito dopo dentro
+   alla pagina appena aperta: in Cabina si registra, a Casa si stacca la
+   spina. Un download che parte a pagina ferma, non sotto al dito. */
+const TRANSIZIONI_DOPO = {studio:"registra", casa:"stacca"};
 /* quanto si aspetta il video prima di lasciar perdere, in millisecondi */
 const TRANSIZIONE_ATTESA = 1500;
 
@@ -45,9 +63,12 @@ function transizioneVideoElemento(){
   return box;
 }
 
-/* Mette in coda il download del filmato, senza farlo partire. */
+/* Mette in coda il download del filmato, senza farlo partire. Non mentre un
+   altro sta andando: l'elemento video è uno solo, e cambiargli `src` a metà
+   filmato lo taglia lì — succedeva con la precarica dello Studio (quattro
+   secondi dopo l'avvio) se in quei quattro secondi toccavi la Sala. */
 function transizioneVideoPrepara(id){
-  const src = TRANSIZIONI_VIDEO[id]; if(!src) return;
+  const src = TRANSIZIONI_VIDEO[id]; if(!src || TVID_CORRENTE) return;
   const v = transizioneVideoElemento().querySelector("video");
   const url = encodeURI(src);
   if(v.dataset.src === url) return;
@@ -88,6 +109,9 @@ function transizioneVideo(id, poi){
       box.classList.remove("via");
       try{ v.pause(); }catch(e){}
       TVID_CORRENTE = null;
+      /* solo a dissolvenza finita: cambiare `src` mentre il filmato sfuma
+         lo farebbe sparire di colpo */
+      if(TRANSIZIONI_DOPO[id]) transizioneVideoPrepara(TRANSIZIONI_DOPO[id]);
     }, 260);
   };
   const tasto = e => { if(e.key === "Escape"){ e.preventDefault(); fine(); } };
@@ -106,8 +130,8 @@ function transizioneVideo(id, poi){
     timer = setTimeout(fine, dur * 1000 + 800);
   };
 
-  TVID_CORRENTE = id;
   transizioneVideoPrepara(id);
+  TVID_CORRENTE = id;
   try{ v.currentTime = 0; }catch(e){}
   box.classList.remove("via");
   /* trasparente, ma prende i tocchi: la mappa sotto non risponde più */
@@ -135,7 +159,7 @@ const TRANSIZIONI_PRECARICA = ["studio"];
   const pins = document.getElementById("hb-pins"); if(!pins) return;
   const prepara = ev => {
     const b = ev.target.closest && ev.target.closest(".pspot");
-    if(b && b.dataset.l) transizioneVideoPrepara(b.dataset.l);
+    if(b && TRANSIZIONI_CARTELLI[b.dataset.l]) transizioneVideoPrepara(TRANSIZIONI_CARTELLI[b.dataset.l]);
   };
   pins.addEventListener("pointerover", prepara);
   pins.addEventListener("touchstart", prepara, {passive:true});

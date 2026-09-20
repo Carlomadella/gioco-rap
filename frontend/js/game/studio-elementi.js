@@ -400,13 +400,22 @@ function studioTakeAncora(){
     return;
   }
   G.energy -= costo;
-  /* la prima take e' lo stesso tiro di dado che `registra` faceva da sola */
-  t.l.push(Math.round(rnd(-5, 6)));
-  /* la take nuova si sceglie da sola solo se è meglio di quella che avevi:
-     se no ti cancellava sotto al dito la take buona per una peggiore */
-  if(t.l[t.l.length - 1] > t.l[t.s]) t.s = t.l.length - 1;
-  SFX.rec ? SFX.rec() : SFX.tap();
-  save(); renderStudio(); renderGioco();
+  const incidi = () => {
+    /* la prima take e' lo stesso tiro di dado che `registra` faceva da sola */
+    t.l.push(Math.round(rnd(-5, 6)));
+    /* la take nuova si sceglie da sola solo se è meglio di quella che avevi:
+       se no ti cancellava sotto al dito la take buona per una peggiore */
+    if(t.l[t.l.length - 1] > t.l[t.s]) t.s = t.l.length - 1;
+    SFX.rec ? SFX.rec() : SFX.tap();
+    save(); renderStudio(); renderGioco();
+  };
+  /* «registra un pezzo» e' il quinto video del punto sulle transizioni
+     (js/game/transizioni-video.js): il microfono, il foglio, il banco. Parte
+     con la PRIMA take del pezzo — e' quella in cui si entra in cabina; le
+     altre ripetono, e sei filmati per un pezzo non li vuole nessuno. L'energia
+     e' gia' scalata: il filmato sta fra il tasto e la take. */
+  if(!t.l.length && typeof transizioneVideo === "function") transizioneVideo("registra", incidi);
+  else incidi();
 }
 
 /* C'e' almeno una take da tenere? Lo chiede `registra` (`need`): senza take

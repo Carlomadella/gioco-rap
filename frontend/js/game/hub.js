@@ -77,9 +77,9 @@ const HUB_LUOGHI = [
   {id:"studio", n:"Studio",
    /* «implementa le transizioni dentro al progetto, che partano cliccando
       sulla scheda collegata»: cinque secondi di filmato
-      (js/game/transizioni-video.js) e poi la stanza. È il primo dei cinque
-      video del punto; gli altri (Sala, Casa, stacca la spina, registra) si
-      collegano allo stesso modo, uno per volta. */
+      (js/game/transizioni-video.js) e poi la stanza. Il primo dei cinque
+      video del punto (16/09); la Sala e Casa qui sotto, stacca la spina in
+      luoghi-foto.js e registra in studio-elementi.js (20/09). */
    vai:() => transizioneVideo("studio",
      () => apriStudio(G.bars.length ? "beat" : "cabina"))},
   /* punto 59/61: era un cartello chiuso («Club & discoteche», ancora dentro
@@ -105,7 +105,9 @@ const HUB_LUOGHI = [
    vai:() => apriLuogo("live")},
   /* il beat maker non è un listino: è la sala dove si conosce la gente */
   {id:"beat", n:"La Sala",
-   vai:() => apriPosto()},
+   /* il secondo video del punto: la strada, il portone, la stanza coi
+      computer, e poi la Sala */
+   vai:() => transizioneVideo("sala", () => apriPosto())},
   /* Beat Maker non è più un luogo sulla mappa: i beatmaker si conoscono
      alla Sala e si lavora con loro nello Studio. */
   /* punto 60: si chiamava «Vita quotidiana» — la palestra è uscita da qui
@@ -115,7 +117,8 @@ const HUB_LUOGHI = [
      riferimento `casa_di provincia_definitiva` (js/game/luoghi-foto.js). Le
      due risposte della finestra di prima ci stanno tutte e due. */
   {id:"vita", n:"Casa",
-   vai:() => apriLuogo("casa")},
+   /* il terzo video del punto: la via di notte, le scale, e poi la cucina */
+   vai:() => transizioneVideo("casa", () => apriLuogo("casa"))},
   /* punto 21/57: la Strada, ricostruita da claude/carriera-criminale.md
      (js/game/strada-crimine.js) — non era mai stata scritta, solo pensata */
   {id:"crimin", n:"Attività criminali",

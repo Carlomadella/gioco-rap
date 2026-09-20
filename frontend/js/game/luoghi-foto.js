@@ -410,11 +410,20 @@ if(typeof mostraScena === "function"){
   window.mostraScena = function(a, sc, msg, extra){
     const id = a && LUOGO_MOSSE[a.id];
     if(!id) return lfScenaOriginale.apply(this, arguments);
-    /* arrivata da fuori (una card degli eventi, l'agenda): la pagina si apre
-       adesso, e «Continua» la richiude */
-    if(!LUOGO || LUOGO.id !== id) apriLuogo(id, {da:"mossa"});
-    LUOGO.esito = {a:a.id, msg:String(msg == null ? "" : msg), extra:String(extra == null ? "" : extra)};
-    renderLuogo();
+    const esito = {a:a.id, msg:String(msg == null ? "" : msg), extra:String(extra == null ? "" : extra)};
+    const mostra = () => {
+      /* arrivata da fuori (una card degli eventi, l'agenda): la pagina si apre
+         adesso, e «Continua» la richiude */
+      if(!LUOGO || LUOGO.id !== id) apriLuogo(id, {da:"mossa"});
+      LUOGO.esito = esito;
+      renderLuogo();
+    };
+    /* «stacca la spina» è una delle cinque mosse con un filmato
+       (js/game/transizioni-video.js): il divano e la tele, e poi si legge
+       com'è andata la serata. La mossa è già fatta — i numeri sono cambiati
+       — e il filmato sta fra il tasto e l'esito, da dovunque sia partita. */
+    if(typeof transizioneVideo === "function" && TRANSIZIONI_VIDEO[a.id]) transizioneVideo(a.id, mostra);
+    else mostra();
   };
 }
 
