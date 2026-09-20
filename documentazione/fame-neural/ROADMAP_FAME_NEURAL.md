@@ -1889,3 +1889,23 @@ Prossimo blocco owned-beats autorizzato:
 Prima dell'implementazione del nuovo blocco resta obbligatoria la ricerca di apertura prevista dal protocollo della roadmap; protocollo, strumenti candidati e criteri del pilot vanno congelati prima di osservare i risultati.
 
 Checkpoint dettagliato: [Source Separation development PASS — 20/09/2026](OWNED_BEATS_SOURCE_SEPARATION_DEVELOPMENT_PASS_2026-09-20.md).
+
+
+### Apertura Audio→MIDI drums/low-end — 20 settembre 2026
+
+La ricerca di apertura obbligatoria del blocco è completata e il protocollo development-only è congelato prima del primo output.
+
+Baseline implementata:
+
+- drums `DRUMS_ONLY`: onset/classificazione coarse dal solo stem drums;
+- drums `DRUMS_BASS_KICK_FUSION`: snare/hat dal drums, kick con evidenza aggiuntiva dal bass;
+- low-end `librosa-pyin-lowend-v1`: contour F0 + note segmentation + MIDI;
+- BPM autonomo: output stimato della `audio-analysis-v2-config-001`, mai Human Reference.
+
+Basic Pitch 0.4.0 è la candidata low-end note-level/pitch-bend successiva, ma resta bloccata fino a venv dedicato, lock transitivo e model freeze. Modelli drum con licenza NonCommercial o checkpoint non chiarito non entrano nel primo pilot commerciale.
+
+Sequenza operativa:
+
+`PRE-FLIGHT NO AUDIO→MIDI OUTPUT → BASELINE APPEND-ONLY 8 DEVELOPMENT → TECHNICAL/HUMAN QA → BASIC PITCH ARM → CONFRONTO`
+
+Final holdout, batch 131, tonal Audio→MIDI e training restano chiusi.
