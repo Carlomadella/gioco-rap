@@ -29,6 +29,7 @@ jobs:
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-source-separation-audacity-doctor-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-source-separation-audacity-pipe-discover-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-source-separation-standalone-doctor-test.js
+      - run: node frontend/strumenti/fame-neural-composer/owned-beats-source-separation-standalone-adapter-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-source-separation-environment-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-audio-analysis-v2-protocol-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats/human-reference-holdout-pack-test.js
