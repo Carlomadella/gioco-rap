@@ -1,0 +1,56 @@
+{
+  "schema": "fame-owned-beats-basic-pitch-environment-v1",
+  "version": 1,
+  "status": "BOOTSTRAP_PENDING_EXACT_TRANSITIVE_LOCK",
+  "python": {
+    "requiredMajorMinor": "3.10"
+  },
+  "package": {
+    "name": "basic-pitch",
+    "version": "0.4.0",
+    "license": "Apache-2.0",
+    "repository": "spotify/basic-pitch",
+    "repositoryCommit": "fa5997af0a8210982619003269994a1be25eddf3"
+  },
+  "runtime": {
+    "platform": "Windows",
+    "expectedBackend": "ONNX",
+    "requireOnnxRuntime": true,
+    "forbidTensorFlowRequirement": false,
+    "modelFamily": "icassp_2022",
+    "modelPathMustEndWith": "nmp.onnx"
+  },
+  "workspace": {
+    "venvRelativePath": "venv-basic-pitch",
+    "environmentRunsRelativePath": "runs/basic-pitch-environment"
+  },
+  "safety": {
+    "reuseAudioAnalysisVenv": false,
+    "reuseSourceSeparationVenv": false,
+    "sourceAudioAccessAllowedDuringSetup": false,
+    "transcriptionAllowedDuringSetup": false,
+    "finalHoldoutAccessAllowedDuringSetup": false,
+    "batch131AccessAllowedDuringSetup": false,
+    "trainingAllowedDuringSetup": false
+  },
+  "freezePolicy": {
+    "bootstrapPinsAreNotTheFinalLock": true,
+    "capturePipFreezeAll": true,
+    "captureEnvironmentReceipt": true,
+    "capturePackagedModelSha256": true,
+    "exactModelShaMustBeCommittedBeforeFirstStemInference": true,
+    "nextActionAfterSuccessfulBootstrap": "REVIEW_AND_COMMIT_EXACT_PIP_FREEZE_AND_MODEL_SHA"
+  },
+  "bootstrapTools": {
+    "indexUrl": "https://pypi.org/simple",
+    "pip": "25.2",
+    "setuptools": "80.9.0",
+    "wheel": "0.45.1"
+  },
+  "lock": {
+    "path": "requirements-basic-pitch-lock.txt",
+    "sourceRunId": "basic-pitch-env-v1-001",
+    "committed": false,
+    "reviewed": false
+  }
+}
