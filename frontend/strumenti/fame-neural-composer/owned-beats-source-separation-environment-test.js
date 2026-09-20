@@ -76,7 +76,8 @@ assert.equal(
   spec.lock.repositoryCanonicalSha256
 );
 
-assert(script.includes("venv-source-separation"));
+assert.equal(spec.workspace.venvRelativePath, "venv-source-separation");
+assert(script.includes("$venv = Join-Path $Workspace $spec.workspace.venvRelativePath"));
 assert(script.includes("pip freeze --all"));
 assert(script.includes("source-separation-env-v1-001"));
 assert(script.includes("REVIEW_AND_COMMIT_EXACT_PIP_FREEZE"));
