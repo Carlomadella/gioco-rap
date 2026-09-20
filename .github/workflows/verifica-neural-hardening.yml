@@ -80,6 +80,8 @@ jobs:
         run: python frontend/strumenti/fame-neural-composer/owned-beats/audio-analysis-correction-cost-review-test.py
       - name: Owned beats Audio Analysis V2 pre-tuning hardening
         run: python frontend/strumenti/fame-neural-composer/owned-beats-audio-analysis-v2-test.py
+      - name: Audio to MIDI development baseline regression
+        run: python frontend/strumenti/fame-neural-composer/owned-beats/audio-to-midi-development-baseline-test.py
 
   human-reference-browser:
     runs-on: ubuntu-latest
