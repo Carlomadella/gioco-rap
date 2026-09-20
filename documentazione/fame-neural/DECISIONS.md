@@ -1016,3 +1016,24 @@ Per il low-end:
 Il protocollo `audio-to-midi-development-protocol-v1.json` è congelato prima del primo output e lega il baseline al Git blob `0e48d49e6c7784b9e26628dcf52becd3d5456b9c`. Il BPM usato per renderizzare il MIDI deve provenire dall'output stimato della Audio Analysis V2 promossa; la Human Reference non può essere usata come input di trascrizione.
 
 Il prossimo passo è un **preflight locale no-transcription**. Solo dopo PASS può essere eseguito il run append-only sulle 8 family development.
+
+## NDR-070 — Audio→MIDI development: preflight locale PASS
+
+**Stato: ACCEPTED — 20 settembre 2026.**
+
+Il preflight locale della baseline Audio→MIDI development è passato con mode `AUDIO_TO_MIDI_DEVELOPMENT_BASELINE_PREFLIGHT_PASS`.
+
+Evidenza osservata:
+
+- 8/8 sourceRecordId development riconosciuti;
+- autonomous BPM coverage 8/8 dal report `audio-analysis-v2-config-001`;
+- Python `3.14.3`;
+- `librosa 1.0.0`;
+- FFmpeg `9.0.1`;
+- `sourceAudioOpenedByThisCommand=false`;
+- `transcriptionExecutedByThisCommand=false`;
+- final holdout non acceduto;
+- batch 131 non acceduto;
+- training non autorizzato.
+
+Il preflight non ha prodotto output Audio→MIDI. È quindi autorizzata la prima esecuzione append-only del baseline congelato sulle sole 8 family development.
