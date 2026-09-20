@@ -348,7 +348,7 @@ function openBrowser(url) {
   } catch {}
 }
 
-function serve(workspaceRoot, reviewId = DEFAULT_REVIEW_ID, port = 8766) {
+function serve(workspaceRoot, reviewId = DEFAULT_REVIEW_ID, port = 0) {
   reviewId = safeId(reviewId, "review-id");
   const workspace = path.resolve(workspaceRoot);
   qa.technical(workspace, INFERENCE_RUN_ID);
@@ -433,19 +433,38 @@ function serve(workspaceRoot, reviewId = DEFAULT_REVIEW_ID, port = 8766) {
     }
   });
 
-  server.listen(Number(port), "127.0.0.1", () => {
-    const url = `http://127.0.0.1:${Number(port)}/`;
+  let fallbackUsed = false;
+  server.on("error", error => {
+    if (error?.code === "EADDRINUSE" && Number(port) !== 0 && !fallbackUsed) {
+      fallbackUsed = true;
+      process.stderr.write(`Requested review port ${Number(port)} is busy; retrying on an OS-assigned free port.\n`);
+      return server.listen(0, "127.0.0.1");
+    }
+    process.stderr.write(
+      `SOURCE SEPARATION HUMAN REVIEW SERVER FAILED: ${error?.code || "ERROR"}: ${error?.message || error}\n`
+    );
+    process.exitCode = 1;
+  });
+
+  server.on("listening", () => {
+    const address = server.address();
+    const boundPort = address && typeof address === "object" ? address.port : Number(port);
+    const url = `http://127.0.0.1:${boundPort}/`;
     process.stdout.write(stableJson({
       mode: "SOURCE_SEPARATION_HUMAN_REVIEW_SERVER_READY",
       reviewId,
       url,
       records: pkg.families.length,
+      requestedPort: Number(port),
+      boundPort,
       metricsExposedToReviewer: false,
       finalHoldoutAccessedByThisCommand: false,
       trainingAuthorized: false
     }));
     openBrowser(url);
   });
+
+  server.listen(Number(port), "127.0.0.1");
 }
 
 function report(workspaceRoot, reviewId = DEFAULT_REVIEW_ID) {
@@ -461,7 +480,7 @@ function main(args = process.argv.slice(2)) {
     throw new Error("Usage: node source-separation-human-review.js <prepare|serve|report> <workspace> [review-id] [port]");
   }
   if (command === "prepare") process.stdout.write(stableJson(prepare(workspace, reviewId || DEFAULT_REVIEW_ID)));
-  else if (command === "serve") serve(workspace, reviewId || DEFAULT_REVIEW_ID, port || 8766);
+  else if (command === "serve") serve(workspace, reviewId || DEFAULT_REVIEW_ID, port === undefined ? 0 : Number(port));
   else if (command === "report") process.stdout.write(stableJson(report(workspace, reviewId || DEFAULT_REVIEW_ID)));
   else throw new Error(`Unknown command: ${command}`);
 }
@@ -475,4 +494,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { prepare, median, validateSubmission, computeGate };
+module.exports = { prepare, serve, median, validateSubmission, computeGate };
