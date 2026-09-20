@@ -153,6 +153,13 @@ def main():
     assert '"batch131Accessed": False' in text
     assert '"trainingAuthorized": False' in text
 
+    prepare_wrapper = (HERE / "prepare-audio-to-midi-development-baseline.ps1").read_text(encoding="utf-8")
+    run_wrapper = (HERE / "run-audio-to-midi-development-baseline.ps1").read_text(encoding="utf-8")
+    assert " preflight $Workspace" in prepare_wrapper
+    assert " execute $Workspace --run-id $RunId" not in prepare_wrapper
+    assert " preflight $Workspace" in run_wrapper
+    assert " execute $Workspace --run-id $RunId" in run_wrapper
+
     frozen = json.loads(PROTOCOL_FILE.read_text(encoding="utf-8"))
     assert frozen["drums"]["arms"][0]["id"] == "drums-only-spectral-onset-v1"
     assert frozen["drums"]["arms"][1]["id"] == "drums-bass-kick-fusion-v1"
