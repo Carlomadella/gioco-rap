@@ -746,3 +746,6 @@ Digest candidate manifest reale: `8bf3e1e107c3d634ff2637d15950f617b3d8541420ced0
 
 
 Technical QA Audio→MIDI completato sul run `audio-to-midi-development-baseline-v1-001`: `AUDIO_TO_MIDI_DEVELOPMENT_TECHNICAL_QA_PASS`, 8/8 family, 24/24 MIDI verificati, PPQ 480, conteggi note/eventi coerenti con i result JSON, final holdout/batch131/training tutti esclusi. Le diagnostiche non sono interpretate come qualità musicale e non selezionano automaticamente l'arm.
+
+
+Human QA Audio→MIDI congelata prima dell'ascolto con reviewId `audio-to-midi-human-review-v1-001`. I due arm drums vengono presentati come A/B ciechi con assegnazione bilanciata e stesso renderer neutro; la selezione usa nell'ordine mediana usefulness, numero di family >=2, somma voti e solo in parità completa preferisce il baseline drums-only più semplice. Il low-end pYIN viene valutato contro lo stem bass originale con render MIDI note-level e render diagnostico del pitch contour. Le diagnostiche tecniche (conteggi eventi, kick candidate, note count) non sono mostrate al reviewer.
