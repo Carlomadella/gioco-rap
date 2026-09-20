@@ -922,3 +922,15 @@ Il run append-only `source-separation-pilot-v1-001` è stato preparato contro il
 I dettagli che appartengono al blocco successivo — adapter standalone, device, seed degli shift, overlap, signature tensoriale e rubric QA congelata prima dell'ascolto — vivono nel separato `source-separation-execution-contract-v1.json` e in `source-separation-pilot-review-v1.json`. Il protocollo opening resta lo stesso artefatto storico; il contratto execution lo referenzia senza sostituirlo.
 
 L'adapter `source-separation-standalone-adapter.py` è implementato ma, a questo checkpoint, nessuna Source Separation è stata eseguita. Prima della prima inferenza sul solo development devono passare quattro controlli no-audio: verifica del lock ambiente, check del run preparato, self-test dell'adapter e verifica della signature del modello OpenVINO. Final holdout, batch 131, training e dichiarazioni di task/data readiness restano esclusi.
+
+## NDR-063 — Source Separation: pre-inference PASS e receipt append-only obbligatorio
+
+**Stato: ACCEPTED — 20 settembre 2026.**
+
+Il gate no-audio reale del backend standalone Source Separation è passato integralmente prima della prima inferenza: lock ambiente esatto e package set verificati, run `source-separation-pilot-v1-001` ancora `PREPARED_NO_INFERENCE` su 8/8 family development, self-test dell'adapter PASS e modello HTDemucs/OpenVINO congelato compilato su CPU con SHA XML/BIN attesi e signature tensoriale esatta float32. Il gate non ha aperto audio, non ha eseguito separazione, non ha installato package e non ha acceduto al final holdout.
+
+Il pass del gate **non autorizza un batch non tracciato**. Prima della prima inferenza deve esistere un receipt append-only `source-separation-development-inference-v1-001` che congela: manifest pilot e sue 8 identità sorgente, execution contract, review rubric, environment spec/lock/receipt, adapter, batch runner, modello XML/BIN, FFmpeg osservato e parametri di esecuzione. Il batch può leggere soltanto le sorgenti elencate nel receipt e scrive un result receipt append-only per ogni source record.
+
+La configurazione congelata per questo pilot è 4-stem `drums/bass/other/vocals`, 44.1 kHz stereo float32, WAV PCM-f32le, CPU, 1 shift con seed 0, overlap 0.25 e segment length 343980. Le metriche tecniche `peakAbs`, `rms` e `stemSumResidualRmsRatio` vengono registrate senza soglia post-hoc; la promozione resta subordinata alla rubric QA già congelata.
+
+Final holdout, batch sulle 131 sorgenti, training e dichiarazioni di task/data readiness restano esclusi. Un run parziale senza result receipt è fail-closed: non viene sovrascritto né reinterpretato come completato.
