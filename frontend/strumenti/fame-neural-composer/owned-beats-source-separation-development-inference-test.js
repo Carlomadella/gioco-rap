@@ -21,6 +21,13 @@ const contract = JSON.parse(fs.readFileSync(contractPath, "utf8"));
 
 mod.validateContract(contract);
 assert.equal(mod.canonicalGitBlobSha(adapterPath), contract.adapter.gitBlobSha);
+assert.equal(contract.execution.cacheRelativePath, "cache/source-separation-openvino");
+assert.equal(contract.execution.audioIO.decodeSampleRate, 44100);
+assert.equal(contract.execution.audioIO.channels, 2);
+assert.equal(contract.execution.audioIO.internalSampleFormat, "float32");
+assert.equal(contract.execution.audioIO.stemContainer, "wav");
+assert.equal(contract.execution.audioIO.stemCodec, "pcm_f32le");
+assert.equal(contract.nextAction, "PREPARE_APPEND_ONLY_DEVELOPMENT_INFERENCE_RECEIPT");
 
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), "fame-source-sep-receipt-"));
 try {
