@@ -1071,3 +1071,39 @@ Diagnostica osservata, non usata come quality score:
 - low-end pYIN: 1162 note complessive.
 
 Questi conteggi corroborano il failure mode già osservato nella Source Separation, ma non promuovono automaticamente la fusion: la scelta drums deve essere fatta mediante Human QA blind con stesso renderer. Il low-end pYIN richiede confronto umano con lo stem bass originale e diagnostica del contour. Final holdout, batch 131, training e task-data readiness restano chiusi.
+
+## NDR-073 — Audio→MIDI development: kick-fusion selezionato, pYIN qualificato
+
+**Stato: ACCEPTED — 20 settembre 2026.**
+
+La Human QA blind `audio-to-midi-human-review-v1-001` è completata con submission digest `52e7803b56fee6a6a7dea7546b7a6c6c38fdb86b01b6861f07a5a96882518f0d`.
+
+Risultato drums:
+
+- `drums-only-spectral-onset-v1`: mediana 0.5, 3/8 family >=2, totale 10, FAIL;
+- `drums-bass-kick-fusion-v1`: mediana 2, 6/8 family >=2, totale 13, PASS;
+- arm selezionato: `drums-bass-kick-fusion-v1`.
+
+Risultato low-end:
+
+- `librosa-pyin-lowend-v1`: mediana 2, 6/8 family >=2, totale 13, PASS.
+
+Il PASS pYIN non costituisce ancora promozione definitiva del low-end: il protocollo congelato richiede il confronto con Basic Pitch prima della selezione finale. Outcome della review: `OPEN_AUDIO_TO_MIDI_QA_INTEGRATION`. Final holdout, batch 131, training e task-data readiness restano chiusi.
+
+## NDR-074 — Basic Pitch 0.4.0: provenance corretta e freeze ambiente prima dell'inferenza
+
+**Stato: ACCEPTED — 20 settembre 2026.**
+
+Durante la preparazione del candidato Basic Pitch è stata verificata la provenance del package `basic-pitch==0.4.0`.
+
+Il vecchio protocollo baseline riportava il commit `fa5997af0a8210982619003269994a1be25eddf3` accanto alla versione 0.4.0. Quel commit appartiene a uno stato successivo del repository e non è il commit del tag `v0.4.0`. Il tag ufficiale `v0.4.0` punta a `9991303bba609a3b93089d13ec80d1d495083596`.
+
+Il protocollo baseline già consumato non viene modificato, perché cambiarne l'hash post-run invaliderebbe la tracciabilità storica. La provenance corretta viene invece congelata nel nuovo `basic-pitch-lowend-candidate-protocol-v1.json` e nella spec environment dedicata.
+
+Basic Pitch viene preparato in `venv-basic-pitch` separato, Python 3.10. Prima della prima inferenza sugli stem bass sono obbligatori:
+
+- `pip freeze --all` completo e revisionato;
+- lock transitivo esatto commesso in repo;
+- backend ONNX verificato;
+- SHA256 del modello `icassp_2022/nmp.onnx` incluso nel package congelato e commesso;
+- nessun accesso al final holdout, batch 131 o training.
