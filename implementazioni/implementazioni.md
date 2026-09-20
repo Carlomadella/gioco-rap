@@ -80,8 +80,8 @@ da quale lista viene.
    tagliato sul telefono. Erano chiuse tutte e quattro il 14/09 stesso, nel branch del
    Marketing, e passate pari pari in «Che post fai?» su LaFamegram; riprovate in partita il
    20/09 e messe sotto audit. Nello stesso giro è venuta fuori e chiusa una cosa nuova: nell'Agenda
-   del telefono le descrizioni lunghe delle mosse finivano coi puntini, adesso vanno su
-   due righe. «Le tre del Marketing» in `02-interfaccia-e-telefono.md`.
+   del telefono le descrizioni lunghe delle mosse finivano coi puntini, adesso vanno a
+   capo fino a tre righe. «Le tre del Marketing» in `02-interfaccia-e-telefono.md`.
 4. ~~**Il giro unico sull'hover al tocco**~~ **FATTO (08/09/2026, riconosciuto il 15/09)** —
    era chiuso da una settimana e tre elenchi lo davano ancora da fare: tutte le regole
    `:hover` stanno in `@media (hover:hover)`, e l'audit lo controlla («La responsività: lo

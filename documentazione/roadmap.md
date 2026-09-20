@@ -281,7 +281,7 @@ come seconda riga, la riga senza seed muta, il pezzo scelto che sparisce dall'el
 motivo dell'anteprima tagliato — era chiusa dal 14/09 stesso e passata pari pari in «Che post
 fai?» su LaFamegram; riprovata in partita e messa sotto audit. Trovata e chiusa una cosa nuova:
 nell'Agenda del telefono le descrizioni lunghe delle mosse (promo, anteprima, pesi, cardio)
-finivano coi puntini, adesso vanno su due righe. Sta in
+finivano coi puntini, adesso vanno a capo fino a tre righe. Sta in
 `implementazioni/02-interfaccia-e-telefono.md`, «Le tre del Marketing».
 
 **Resta la prova su un telefono vero**, con l'agente `prova-sul-telefono`: le misure di

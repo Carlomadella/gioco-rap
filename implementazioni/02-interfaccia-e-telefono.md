@@ -2221,7 +2221,7 @@ gioco si usa ma va deciso se sugli store gira anche in orizzontale.
 
 ---
 
-## Le tre del Marketing: chiuse dal 14/09, e la riga delle mosse su due righe
+## Le tre del Marketing: chiuse dal 14/09, e la riga delle mosse a capo
 
 > **FATTO (14/09/2026, riconosciuto il 20/09)** — branch `task/le-tre-del-marketing`. File:
 > `frontend/css/telefono.css` (la riga piccola delle mosse nell'Agenda) e
@@ -2253,14 +2253,22 @@ che compare al suo posto, per quattro mosse no — promo (62 caratteri), antepri
 (70), cardio (66). «Clip e provocazioni. Spinge il pezzo che scegl…»: e la parte che se ne
 andava era «su LaFamegram». Non si accorciano i testi, che sono gli stessi della scena a
 schermo pieno dopo la mossa: nell'Agenda la riga piccola delle mosse e degli eventi
-(`.tli[data-azione]`, `.tli[data-evento]`) va a capo su due righe, poi i puntini. Le altre
-liste del telefono con la stessa riga non cambiano. Misurato su tutte e tredici le mosse a
-1440, 390 e 360 (promo e anteprima accese; pesi e cardio mostravano il motivo corto, i loro
-caratteri sono contati sul testo): nessuna tagliata; le due righe alzano la card da 51 a 64
-(1440), da 53 a 68 (390).
+(`.tli[data-azione]`, `.tli[data-evento]`) va a capo fino a tre righe, poi i puntini. Le
+altre liste del telefono con la stessa riga non cambiano. Misurato su tutte e tredici le
+mosse a 1440, 390 e 360 (promo e anteprima accese; pesi e cardio mostravano il motivo corto,
+i loro caratteri sono contati sul testo): nessuna tagliata; le due righe alzano la card da 51
+a 64 (1440), da 53 a 68 (390). Il giro di fine task ha trovato che a **360 × 640** — il
+telefono basso, che si disegna più stretto per stare nell'altezza — la riga è 170 punti e
+due righe non bastavano ancora: «su LaFamegram» se ne andava lo stesso. Da lì il limite è
+tre righe, che a 360 × 640 servono a promo e anteprima (47 punti), a 375 × 667 alla sola
+anteprima, e dai 390 in su non cambiano niente.
 
 **Prove.** Cinque controlli nuovi in `audit-regressioni.js` («Le tre del Marketing
-(20/09/2026)»): le quattro cose del 14/09 e la riga su due righe. 403 controlli, tutti verdi.
+(20/09/2026)»): le quattro cose del 14/09 e la riga a capo fino a tre righe; il controllo
+sulla riga senza seed guarda anche la guardia di `telSpingi` in `telefono.js`, non solo
+quella dello Studio. 403 controlli, tutti verdi. Il giro di fine task ha trovato tre cose
+(voci 44–46 di problemi-riscontrati), chiuse nel branch: le tre righe, quel controllo, e la
+prima tabella del README che contava 34 voci per questo foglio quando erano 43.
 
 **Da imparare**: prima di prendere una voce dell'ordine si cerca la sua RISOLTO sotto ai giri
 di problemi-riscontrati — due volte (l'hover, il Marketing) la voce era chiusa e l'indice no.
