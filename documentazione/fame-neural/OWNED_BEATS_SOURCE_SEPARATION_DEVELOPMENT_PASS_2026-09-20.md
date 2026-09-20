@@ -50,6 +50,33 @@ Il gate tecnico richiedeva `ALL_8_FAMILIES_PASS`.
 
 Il PASS autorizza il pilot Audio→MIDI soltanto per **drums + low-end**. Non autorizza automaticamente il ramo tonale, il batch completo sulle 131 sorgenti, il training o una dichiarazione di task/data readiness.
 
+
+## Note complete della Human Review su drums e bass
+
+Le note seguenti provengono dal `submission.json` della review `source-separation-human-review-v1-001` e accompagnano i punteggi usati dal gate.
+
+| Source record | Drums | Nota drums | Bass | Nota bass |
+|---|---:|---|---:|---|
+| `FAME000011` | 2 | Residuo di bass udibile. | 1 | Sembra avere l'attack spostato troppo avanti; sorgente difficile per forte distorsione volontaria. |
+| `FAME000012` | 2 | Snare poco chiaro. | 3 | Bass molto chiaro e pieno. |
+| `FAME000023` | 2 | Zero kick; solo snare e hat. | 3 | Bass + kick, ma molto chiaro. |
+| `FAME000040` | 3 | Buono, molto chiaro e preciso. | 2 | Buono. |
+| `FAME000046` | 2 | Manca il kick; solo rim e hats. | 3 | Bass + kick, pieno. |
+| `FAME000058` | 3 | Chiaro e buono, senza kick. | 3 | Bass + kick molto buono; sulle note lunghe il bass sembra perdere un po' d'intensità. |
+| `FAME000080` | 3 | Chiaro, bello e completo. | 2 | Chiaro; un po' spento ma buono. |
+| `FAME000126` | 3 | Bello, chiaro, forte e preciso. | 2 | Il reviewer percepisce qualcosa di anomalo non identificato, ma lo stem resta musicalmente efficace. |
+
+### Failure mode da portare nel blocco Audio→MIDI
+
+Le note mostrano un pattern concreto che il solo PASS aggregato non evidenzia:
+
+- in `FAME000023`, `FAME000046` e `FAME000058` il reviewer segnala **kick assente dal drums**;
+- negli stessi casi il reviewer segnala **kick presente insieme al bass**;
+- `FAME000011` mostra leakage di bass nei drums e un low-end temporalmente difficile;
+- snare/hat/rim possono restare utili anche quando il kick non è correttamente isolato.
+
+Questo non invalida il gate Source Separation, perché il criterio congelato era l'utilità downstream complessiva e il gate è stato superato. Però crea una domanda tecnica obbligatoria per il blocco successivo: **la trascrizione kick non deve assumere senza verifica che tutta l'informazione utile sia contenuta esclusivamente nello stem `drums`**. La ricerca di apertura Audio→MIDI dovrà confrontare almeno l'ipotesi drums-only con una strategia che usa anche evidenza low-end/bass per il kick, prima di congelare il protocollo.
+
 ## Osservazioni qualitative post-review sullo stem `other`
 
 Queste note sono state fornite dal reviewer dopo la review e sono conservate come evidenza qualitativa ausiliaria. **Non fanno parte del gate PASS drums/bass e non ne modificano retroattivamente le soglie.**
