@@ -37,8 +37,8 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 1. **Da fare adesso, in ordine** — l'ordine in cui si prendono i punti aperti, di questo
    foglio e di [`problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md)
-   insieme. Si aggiorna a ogni giro: un punto chiuso resta nella lista, barrato, con la
-   data.
+   insieme. Si aggiorna a ogni giro: un punto chiuso esce dalla lista e va in fondo, una
+   riga con la data e dove sta il racconto; i numeri delle voci si spostano.
 2. **Inbox automatica** — le richieste nuove come checkbox, una frase basta: le legge
    `scripts/roadmap-auto.js`, che prima cerca duplicati e cose già fatte.
 3. **Le liste per persona** (ALE, CARLO) — i punti scritti a mano, con sotto le note di
@@ -48,150 +48,118 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 ## Da fare adesso, in ordine
 
-Smistato il 15/09/2026, dopo la chiusura di «Sputa» e della regola nuova sull'energia in
-Cabina; riguardato lo stesso giorno dopo «Il telefono quando lo schermo è un telefono», da
-cui sono uscite due voci nuove, il 16/09 dopo il primo video delle transizioni (chiusa
-il 20/09 con gli altri quattro; resta la decisione sui sette video in più), e il 19/09
-dopo le pagine di Casa, Palestra, Live Club e stacca la spina
-sulla loro foto (chiusa la voce delle foto; la serata del club giocata a momenti è una voce
-nuova, fra i lavori lunghi) e dopo la schermata dell'avvio rapido; il 20/09 dopo le quattro
-piccole (agenda, prezzi dei beat, parametri a 1, licenziarsi), chiuse in un branch solo, e
-dopo «Le tre del Marketing», che erano chiuse dal 14/09 senza che l'ordine lo dicesse. È
-l'ordine in cui si prendono i punti aperti di questo foglio **e** quelli ancora aperti in
-[`problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md): prima quello che
-tocca il gioco sul telefono (è lì che esce), poi quello che pesa nel pacchetto o blocca una
-partita, poi le cose piccole e chiare, poi i lavori lunghi, in fondo quello che è una
-decisione prima che un lavoro. Ogni voce cita il **testo** del punto, non il numero, e dice
-da quale lista viene.
+Riordinato il 20/09/2026, dopo il reparto Vestiti dello Shop. Le voci chiuse sono uscite
+dalla lista e stanno in fondo, una riga l'una con la data e dove sta il racconto — prima
+restavano barrate in mezzo alle aperte e la lista era lunga il doppio di quello che
+serviva. I sette punti di CARLO del 16/09 (lo Studio, la troupe) sono entrati: due erano
+già chiusi senza che nessuno lo dicesse, il Marketing spostato e la preview di un pezzo
+non uscito. È l'ordine in cui si prendono i punti aperti di questo foglio **e** quelli
+ancora aperti in [`problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md):
+prima quello che tocca il gioco sul telefono (è lì che esce), poi quello che pesa nel
+pacchetto o blocca una partita, poi le cose piccole e chiare, poi i lavori lunghi, in
+fondo quello che è una decisione prima che un lavoro. Ogni voce cita il **testo** del
+punto, non il numero — qui i numeri si spostano a ogni riordino — e dice da quale lista
+viene.
 
 **Sul telefono**
 
-1. ~~**Il Marketing sul telefono vero**~~ **FATTO (15/09/2026)** — il telefono si alza a
-   schermo pieno anche sotto i 1180: «Il telefono quando lo schermo è un telefono» in
-   `02-interfaccia-e-telefono.md`.
-2. ~~**Fra i 980 e i 1180 punti la barra della plancia trabocca**~~ **FATTO (20/09/2026)** —
-   la fascia si stringe per gradi (1240, 1120), va a capo a 980, sul telefono è tre righe
-   (165 punti, era 307); e chiudendola si è sistemata anche la plancia a 1280 × 800 e
-   1366 × 768, dove le card degli eventi erano larghe 91 punti e quattro righe del profilo
-   sparivano. «La fascia della plancia fra 980 e 1240, e la plancia a 1280 × 800» in
-   `02-interfaccia-e-telefono.md`.
-3. ~~**Le tre del Marketing**~~ **FATTO (14/09/2026, riconosciuto il 20/09)** — da
-   problemi-riscontrati (14/09): «In spinta» come seconda riga bianca, la riga senza seed
-   che è un bottone muto, il pezzo scelto che sparisce dall'elenco, il motivo dell'anteprima
-   tagliato sul telefono. Erano chiuse tutte e quattro il 14/09 stesso, nel branch del
-   Marketing, e passate pari pari in «Che post fai?» su LaFamegram; riprovate in partita il
-   20/09 e messe sotto audit. Nello stesso giro è venuta fuori e chiusa una cosa nuova: nell'Agenda
-   del telefono le descrizioni lunghe delle mosse finivano coi puntini, adesso vanno a
-   capo fino a tre righe. «Le tre del Marketing» in `02-interfaccia-e-telefono.md`.
-4. ~~**Il giro unico sull'hover al tocco**~~ **FATTO (08/09/2026, riconosciuto il 15/09)** —
-   era chiuso da una settimana e tre elenchi lo davano ancora da fare: tutte le regole
-   `:hover` stanno in `@media (hover:hover)`, e l'audit lo controlla («La responsività: lo
-   Studio, la Strada e l'hover al tocco» in `02-interfaccia-e-telefono.md`).
+1. **Il giro su un telefono vero** — la coda della responsività (CARLO, «Responsività»,
+   chiusa l'08/09). Le misure sono state prese nel browser a sedici misure, dal 360 al
+   1920: in mano, mai. Si fa con `prova-sul-telefono` sull'estensione, o con un telefono
+   collegato; finché non passa, la tappa della responsività non è chiusa (lo dice anche la
+   roadmap).
 
 **Pesa nel pacchetto o blocca una partita**
 
-5. ~~**Le transizioni video**~~ **FATTO (20/09/2026)** — CARLO, «implementa le transizioni
-   dentro al progetto, che partano cliccando sulla scheda collegata». Lo Studio dal 16/09;
-   il 20/09 gli altri quattro del punto: la Sala e Casa sul cartello, «stacca la spina»
-   sulla mossa da dovunque parta, «registra» sulla prima take in Cabina. «Le transizioni
-   video: gli altri quattro» in `02-interfaccia-e-telefono.md`. **Resta una decisione**, la
-   voce sua in fondo: i sette video che nessun punto chiede.
-6. ~~**L'avvio rapido ci mette due minuti e non lo dice**~~ **FATTO (19/09/2026)** — la
-   schermata «Preparo il tuo artista» sta sopra al creator nascosto con le fasi vere del
-   camerino, il tempo che passa e tre tasti se si rompe; e i due minuti erano il browser
-   senza GPU delle prove — su Chrome vero sono 9 secondi più la cinematic. «L'avvio
-   rapido: la schermata «Preparo il tuo artista»» in `02-interfaccia-e-telefono.md`.
-7. ~~**`jose` va usata, e `zod` va deciso**~~ **FATTO (16/09/2026)** — `accessi.js`
-   verifica i token con `jose`; `zod` è deciso: si usa, e la forma dei corpi delle 14 rotte
-   sta in `backend/forme.js`. «Le due dipendenze del backend, usate» in
-   `07-multiplayer-e-backend.md`.
+_Niente di aperto: `jose` e `zod` sono usate, l'avvio rapido dice quanto ci mette, i
+cinque video del punto sono collegati. I sette video in più sono una decisione, in fondo._
 
 **Piccole e chiare**
 
-8. ~~**L'evento fatto esce dall'agenda**~~ **FATTO (20/09/2026)** — `consumaPeso()` legge il
-   peso e poi `onora()` toglie la voce di oggi; anche il «Piccolo party» passa di lì.
-   «L'evento fatto esce dall'agenda» in `02-interfaccia-e-telefono.md`.
-9. ~~**I prezzi dei beat per fama del beatmaker**~~ **FATTO (20/09/2026)** — tre fasce sulla
-   fama di chi lo fa (100–250, 300–1000, 1000–2000), la qualità dice dove dentro alla fascia;
-   la fascia si legge sulla card. «I prezzi dei beat per fama del beatmaker» in
-   `04-musica-e-suoni.md`.
-10. ~~**Si parte con tutti i parametri a 1**~~ **FATTO (20/09/2026)** — una riga in
-    `state.js`; `livello()` guardato, si resta al livello 1. «Si parte con tutti i parametri
-    a 1» in `05-carriera-e-tempo.md`.
-11. ~~**Non ci si può licenziare**~~ **FATTO (20/09/2026)** — via il «lascialo» dai due testi,
-    i colloqui non si fanno con un posto in tasca, e l'evento «Ti offrono un lavoro vero»
-    chiede `no_job`. «Non ci si può licenziare» in `05-carriera-e-tempo.md`.
-12. **Avaturn e il creator in game, tutti e due** — ALE, «FAI COESISTERE LE COSE». Nel
-    codice convivono già (vedi la RISPOSTA sotto al punto): resta da confermarlo in
-    partita e scriverlo in `03-artista-e-avatar.md`, che oggi non ne parla.
-13. ~~**Lo Shop promette tre reparti, ce ne sono due**~~ **FATTO (20/09/2026)** — la
-    terza linguetta è tornata, ma non sul ritratto 2D congelato il 09/09: il reparto
-    Vestiti vende 39 capi veri del camerino MakeHuman, lo Shop sblocca e il camerino veste
-    (le tendine mostrano solo quello che possiedi, più quello che hai già addosso). «Lo
-    Shop: il reparto Vestiti» in `02-interfaccia-e-telefono.md`. Gli avatar Avaturn non si
-    vestono con roba MakeHuman, e il reparto lo dice.
-14. **Lo Shop dopo i Vestiti: lo stile che conta, i capi che si sbloccano, le offerte della
-    settimana** — CARLO, i tre punti «Shop (20/09/2026)» scelti fra le idee proposte
-    chiudendo il reparto. Vanno in quest'ordine: prima l'effetto dei capi (presenza/hype
-    da `makehumanState.slots`, il bonus del look a tema), poi lo sblocco per carriera
-    (contratto, fan, trasferta), poi l'offerta del lunedì e l'usato. Il primo tocca
-    `sim.js`/`actions.js`, gli altri due solo `guardaroba.js` e `negozio.js`.
+2. **Avaturn e il creator in game, tutti e due** — ALE, «FAI COESISTERE LE COSE». Nel
+   codice convivono già (vedi la RISPOSTA sotto al punto): resta da confermarlo in
+   partita e scriverlo in `03-artista-e-avatar.md`, che oggi non ne parla.
+3. **Non deve costare energia interagire con gli altri nella Sala** — CARLO, «Studio
+   (16/09/2026)». Oggi in `posto.js` ogni mossa della Sala costa (`PO_COSTO`: due parole
+   12, il numero 4, la sessione 45, il feat 45, il video 35). Da decidere una riga prima
+   di farlo: «interagire» è parlare e scambiarsi il numero — a zero — mentre la sessione
+   e il feat restano lavoro e si pagano; o tutto a zero.
+4. **Lo Shop dopo i Vestiti: lo stile che conta, i capi che si sbloccano, le offerte della
+   settimana** — CARLO, i tre punti «Shop (20/09/2026)» scelti fra le idee proposte
+   chiudendo il reparto. Vanno in quest'ordine: prima l'effetto dei capi (presenza/hype
+   da `makehumanState.slots`, il bonus del look a tema), poi lo sblocco per carriera
+   (contratto, fan, trasferta), poi l'offerta del lunedì e l'usato. Il primo tocca
+   `sim.js`/`actions.js`, gli altri due solo `guardaroba.js` e `negozio.js`.
 
 **Lavori lunghi**
 
-15. **Via la lucidità** — CARLO, «togli il parametro «lucidità» e tutto ciò che ne
-    consegue». Tocca 17 file del gioco e le formule della qualità del testo: non è una
-    riga, va fatto in una task sua con l'audit aggiornato nello stesso commit. Chiude da
-    sola anche «l'uscita di venerdì non costa niente, quella a mano sì» di
-    problemi-riscontrati.
-16. **Le tre code dello Studio a cinque linguette** — da problemi-riscontrati (15/09):
-    l'omonimo della classifica che non si può chiamare, chi accetta dalla classifica che
-    ruba un posto alla Sala, la copertina proposta e non confermata che resta nel
-    salvataggio con la foto.
-17. **Quello che manca alla catena del pezzo** — CARLO, la coda del punto «Non è più:
-    "Faccio un pezzo → +10 fama"» (FATTO in parte): la cover caricata da file e quella
-    «stile emblema», la discografia come app del telefono, le remastered e le parti 2.
-18. ~~**Le foto dei posti che non hanno ancora una pagina**~~ **FATTO (19/09/2026)** —
-    Casa, Palestra, Live Club e stacca la spina sono pagine sulla loro foto, la Piazza ha
-    la sua sotto; Cover e Feat come sezioni non esistono più dal 15/09 (Studio a cinque
-    linguette), quindi non hanno più bisogno di una foto. «Le pagine dei posti sulla loro
-    foto» in `02-interfaccia-e-telefono.md`. **Resta** la coda qui sotto, la serata a
-    momenti.
-19. **La serata del Live Club giocata a momenti** — CARLO, la coda di «aggiungi le foto di
-    background dei posti»: nel riferimento `concerto_live` in mezzo alla pagina c'è «al
-    terzo pezzo uno in fondo comincia a parlare sopra», tre risposte e la gente che sale o
-    scende, più «cambia ordine» nella scaletta. Oggi la serata è la mossa `live` di sempre
-    (un numero) scelta sulla foto: i momenti sono il minigioco della Piazza rifatto per il
-    palco, e la scaletta con l'ordine vorrebbe un peso in `sim.js`.
-20. **Le card sulla mappa troppo vicine, i pulsanti sopra la mappa troppo grandi** — ALE.
+5. **Via la lucidità** — CARLO, «togli il parametro «lucidità» e tutto ciò che ne
+   consegue». Tocca 17 file del gioco e le formule della qualità del testo: non è una
+   riga, va fatto in una task sua con l'audit aggiornato nello stesso commit. Chiude da
+   sola anche «l'uscita di venerdì non costa niente, quella a mano sì» di
+   problemi-riscontrati.
+6. **Le tre code dello Studio a cinque linguette** — da problemi-riscontrati (15/09):
+   l'omonimo della classifica che non si può chiamare, chi accetta dalla classifica che
+   ruba un posto alla Sala, la copertina proposta e non confermata che resta nel
+   salvataggio con la foto.
+7. **Quello che manca alla catena del pezzo** — CARLO, la coda del punto «Non è più:
+   "Faccio un pezzo → +10 fama"» (FATTO in parte): la cover caricata da file e quella
+   «stile emblema», la discografia come app del telefono, le remastered e le parti 2.
+8. **Beat, Testo e Cabina a mano, il resto in automatico coi malus** — CARLO, «Studio
+   (16/09/2026)»: «l'utente deve poter fare solo le sezioni Beat, Testo e Cabina, poi il
+   resto in automatico, però questo porta dei malus». Oggi Mix e Uscita si aprono col
+   primo pezzo sul banco e si fanno a mano. L'automatico è una scelta in Cabina («chiudi
+   tu il resto»): un mix medio, l'uscita al venerdì, e un malus sulla qualità che si legge
+   nel riquadro dei numeri.
+9. **La serata del Live Club giocata a momenti** — CARLO, la coda di «aggiungi le foto di
+   background dei posti»: nel riferimento `concerto_live` in mezzo alla pagina c'è «al
+   terzo pezzo uno in fondo comincia a parlare sopra», tre risposte e la gente che sale o
+   scende, più «cambia ordine» nella scaletta. Oggi la serata è la mossa `live` di sempre
+   (un numero) scelta sulla foto: i momenti sono il minigioco della Piazza rifatto per il
+   palco, e la scaletta con l'ordine vorrebbe un peso in `sim.js`.
+10. **Le card sulla mappa troppo vicine, i pulsanti sopra la mappa troppo grandi** — ALE.
     Si giudicano a occhio: vanno guardate con uno screenshot, non dal CSS. Stessa cosa per
     **la schermata opzioni da migliorare graficamente** — CARLO, pagina di landing.
-21. **Quando skippi tante ore ci mette troppo** — CARLO. Prima si misura (quanti giorni,
+11. **Quando skippi tante ore ci mette troppo** — CARLO. Prima si misura (quanti giorni,
     quanti secondi), poi si cerca dove.
-22. **Su LaFamegram non posta nessuno** — CARLO. Oggi gli altri compaiono nel feed solo
+12. **Su LaFamegram non posta nessuno** — CARLO. Oggi gli altri compaiono nel feed solo
     quando l'evento riguarda te (il fan, il giornalista, la Strada: `lafamegramEventi`);
     nessun contatto della Sala o rivale posta per conto suo. Prima si decide chi posta e
     cosa, poi si fa.
-23. **Il pub e la pubblicità come primo modo di fare hype** — ALE, la coda del punto
-    sull'hype (FATTO il 06/09 per il resto): oggi non esistono né come luogo né come
-    azione.
+13. **Il pub e la pubblicità come primo modo di fare hype** — ALE, la coda del punto
+    sull'hype (FATTO il 06/09 per il resto, in `fatte.md`): oggi non esistono né come
+    luogo né come azione.
+14. **I collettivi di rapper** — CARLO, «Studio (16/09/2026)»: «fai in modo che si possano
+    creare collettivi di rapper». Nel gioco non esiste un gruppo: ci sono i rivali della
+    classifica e la gente della Sala, uno per uno. Prima si scrive cos'è un collettivo
+    (chi ci entra, cosa dà — pezzi in comune, hype condiviso, un nome in classifica), poi
+    si fa.
+15. **Il joint album con altri rapper, su chiamata di un produttore** — CARLO, «Studio
+    (16/09/2026)»: «fai in modo che un produttore possa chiamarti per fare un joint album
+    con altri rapper». La chiamata è un evento del telefono; l'album, più pezzi in fila
+    con più feat, oggi non esiste come oggetto. Viene dopo i collettivi.
 
 **Decisioni prima che lavori**
 
-24. **I rapporti coi beatmaker che vanno in negativo** — ALE. In `posto.js` il rapporto
+16. **I rapporti coi beatmaker che vanno in negativo** — ALE. In `posto.js` il rapporto
     scende (`p.rel--`) ma è tenuto fra 0 e 5: sotto zero non va. Prima di farlo va deciso
     cosa succede a −1 (non ti vende più? ti fa pagare di più?).
-25. **Non sempre far scorrere una giornata ridà l'energia** e **la legacy** — CARLO. Sono
+17. **Non sempre far scorrere una giornata ridà l'energia** e **la legacy** — CARLO. Sono
     regole di gioco nuove: prima si scrive come funzionano, poi si fa.
-26. **Lo Shop in provincia, con limitazioni** — ALE. Lo Shop c'è già dal primo giorno;
+18. **Lo Shop in provincia, con limitazioni** — ALE. Lo Shop c'è già dal primo giorno;
     va deciso cosa **non** si vende in provincia (vedi la RISPOSTA sotto al punto).
-27. **Le decisioni tue**, senza le quali il resto non si muove: se dopo Milano e Los
+19. **La troupe** — CARLO, «Da discutere»: «il player può decidere se avere una troupe:
+    manager, social media manager, fonico personale, beatmaker personale, videomaker». Il
+    fonico e il beatmaker «personali» sono già gente della Sala con un rapporto che sale;
+    il manager, il social media manager e il videomaker non esistono. Prima si decide cosa
+    fa ognuno e quanto costa a settimana.
+20. **Le decisioni tue**, senza le quali il resto non si muove: se dopo Milano e Los
     Angeles si può tornare indietro (DA DISCUTERE); la pagina di Mycol e il «tuo artista»
     nella landing; se il gioco sugli store gira anche **di traverso** (nel repo non c'è un
     manifest né un `orientation`, da problemi-riscontrati); e se cancellare gli undici
     branch già uniti in `main` (`git branch --merged main` li elenca, da
     `test/vitest-playwright-gate` a `task/studio-cinque-linguette`), anche sul remoto.
-28. **I sette video che nessun punto chiede** — la coda delle transizioni video (FATTO il
+21. **I sette video che nessun punto chiede** — la coda delle transizioni video (FATTO il
     20/09 per i cinque del punto): palestra, Milano, club, shop, trasferta, live, più
     `video_transizione_entrata_in_studio` che è un doppione dello studio. Sono 22 MB in
     `frontend/media/video/Transizioni di scena/` che viaggiano nel pacchetto per gli
@@ -200,22 +168,49 @@ da quale lista viene.
     il meccanismo è pronto (`TRANSIZIONI_VIDEO` in `js/game/transizioni-video.js`, una
     riga e una chiamata l'uno) — o escono da `media/`. Il doppione esce comunque.
 
-**Ancora da smistare (16/09/2026):** i sette punti nuovi di CARLO — sei sullo Studio (il
-Marketing da spostare, la preview sul social prima dell'uscita, le sezioni in automatico coi
-malus, la Sala senza costo in energia, i collettivi, il joint album) e la troupe in «Da
-discutere». Entrano nell'ordine al prossimo giro.
-
 Restano fuori dall'ordine, di proposito: **le nuove modalità** (Carriera Studio, città di
 partenza, le città finali), che sono per dopo, quando il gioco è masterizzato; le canzoni
 con l'IA, che è una **giornaliera** e non si smista; e i due «aperti di proposito» di
 problemi-riscontrati (la copertina «grande» e quella «di adesso» quasi uguali, la risposta
 del Marketing in cima).
 
+**Chiuse, dal riordino del 15/09 a oggi** — una riga l'una; il racconto sta nel foglio
+detto, la richiesta com'era scritta in [`fatte.md`](fatte.md):
+
+- **Il giro unico sull'hover al tocco** — FATTO 08/09 (riconosciuto il 15/09): «La
+  responsività: lo Studio, la Strada e l'hover al tocco», `02-interfaccia-e-telefono.md`.
+- **Un pezzo non uscito non si spinge: se ne fa uscire un'anteprima** — FATTO 14/09
+  (riconosciuto il 20/09): stessa sezione, `02-interfaccia-e-telefono.md`.
+- **Le tre del Marketing** — FATTO 14/09 (riconosciuto il 20/09), più la riga delle mosse
+  nell'Agenda a capo: «Le tre del Marketing», `02-interfaccia-e-telefono.md`.
+- **Il Marketing sul telefono vero** — FATTO 15/09: «Il telefono quando lo schermo è un
+  telefono», `02-interfaccia-e-telefono.md`.
+- **Il Marketing spostato fuori dallo Studio** («marketing toglilo da qua e spostalo,
+  dimmi dove lo metti») — FATTO 15/09 (riconosciuto il 20/09): sul telefono, in
+  LaFamegram, «Che post fai?» — «Lo Studio a cinque linguette», `02-interfaccia-e-telefono.md`.
+- **`jose` va usata, e `zod` va deciso** — FATTO 16/09: «Le due dipendenze del backend,
+  usate», `07-multiplayer-e-backend.md`.
+- **L'avvio rapido ci mette due minuti e non lo dice** — FATTO 19/09: «L'avvio rapido: la
+  schermata «Preparo il tuo artista»», `02-interfaccia-e-telefono.md`.
+- **Le foto dei posti che non hanno ancora una pagina** — FATTO 19/09: «Le pagine dei
+  posti sulla loro foto», `02-interfaccia-e-telefono.md`. La serata a momenti è la voce 9.
+- **Fra i 980 e i 1180 punti la barra della plancia trabocca** — FATTO 20/09, con la
+  plancia a 1280 × 800 e 1366 × 768: «La fascia della plancia fra 980 e 1240, e la plancia
+  a 1280 × 800», `02-interfaccia-e-telefono.md`.
+- **Le transizioni video** — FATTO 20/09 (lo Studio dal 16/09): «Le transizioni video: gli
+  altri quattro», `02-interfaccia-e-telefono.md`. I sette video in più sono la voce 21.
+- **L'evento fatto esce dall'agenda** — FATTO 20/09: `02-interfaccia-e-telefono.md`.
+- **I prezzi dei beat per fama del beatmaker** — FATTO 20/09: `04-musica-e-suoni.md`.
+- **Si parte con tutti i parametri a 1** — FATTO 20/09: `05-carriera-e-tempo.md`.
+- **Non ci si può licenziare** — FATTO 20/09: `05-carriera-e-tempo.md`.
+- **Lo Shop promette tre reparti, ce ne sono due** — FATTO 20/09: «Lo Shop: il reparto
+  Vestiti — lo Shop sblocca, il camerino veste», `02-interfaccia-e-telefono.md`.
+
 Due punti di CARLO — «quando non sono fix… crea un file nuovo collegato ai già presenti»
 e «tieni tutto ciò che riguarda la parte smartphone separata dal resto del progetto» —
-**non sono task ma regole di lavoro**: il loro posto è
-[`come-si-lavora.md`](../documentazione/come-si-lavora.md) e la versione corta in
-`CLAUDE.md`. Finché non ci arrivano restano qui sotto, dove stavano.
+**non sono task ma regole di lavoro**: dal 20/09/2026 stanno in
+[`come-si-lavora.md`](../documentazione/come-si-lavora.md) («Le regole di Carlo sui
+file») e nella versione corta in `CLAUDE.md`, e sono uscite dalla lista qui sotto.
 
 ---
 
@@ -240,7 +235,9 @@ cancellate.
 ### ALE
 
 _I numeri sono quelli di sempre: i buchi sono i punti chiusi, spostati in
-[`fatte.md`](fatte.md)._
+[`fatte.md`](fatte.md). Il 6, l'hype, ci stava «apposta, per la coda che manca»: dal 20/09
+la coda — il pub e la pubblicità — è una voce dell'ordine in testa, e il punto è andato in
+`fatte.md` con gli altri._
 
 2. Rendi accessibile lo shop già dalla città iniziale, con limitazioni sui prodotti in vendita
 
@@ -250,44 +247,6 @@ _I numeri sono quelli di sempre: i buchi sono i punti chiusi, spostati in
    in provincia (i beat sopra a una certa qualità? l'attrezzatura da studio grande?).
 
 3. i rapporti con i beatmaker non vanno mai in negativo, puoi offenderli quanto vuoi e il rapporto resta uguale
-
-6. Verissima la cosa dell'hype, fattore che dev'essere davvero primario nel gioco e i player dovran costantemente provare a inseguire ma con tanta fatica, Partiamo proprio dallo sviluppo dell'hype :
-
-   L'hype è in scala internazionale, vuol dire che se sei al livello 100 è impossibile che tu sia ancora nel paesino di provincia.
-   Probabilmente all'inizio l'unico modo per fare hype è andare al pub e pubblicare sui social pubblicità per la tua musica (DA SVILUPPARE QUESTO) , ma più di tanto HYPE all'inizio non si può fare, quindi è impossibile che al primo anno rimanendo nella prima città tu diventi 100 di hype
-
-   Tutt'altro se non sei goat manco puoi averli 100 di hype
-
-   L'hype vero si inizierà a fare quando i tuoi numeri social andranno forte e nelle classifiche il tuo nome inizierà a farsi valere sempre di più, quando farai feat con nomi più grandi dei tuoi e i pezzi andranno bene, quando prendiamo una macchina importante e molto costosa e la flexiamo sui social
-
-   Insomma, come le cose che vanno davvero in hype IRL, non se fai un feat con pinko pallino a caso che nessuno conosce
-
-   **FATTO (06/09/2026)** — l'hype adesso ha un **tetto che dipende dalla fase della
-   carriera** (`PHASES[fase].hcap` in `phases.js`, letto da `hypeCap()`): 20 da
-   Sconosciuto, 42 da esordiente, 55, 65, 80, 92, e solo da GOAT il tetto è 100. Non
-   conta _come_ l'hype sale — farmando o con un colpo di fortuna — il tetto tiene
-   comunque, perché è applicato ovunque l'hype cresce (oltre 30 punti diversi nel
-   codice, da `promo` alla Strada). I tetti restano sempre sopra alle soglie
-   `G.hype >= 40/60/55` già richieste dalle prove di passaggio della carriera stessa
-   (`phases.js`, `TRIALS`), quindi nessuna prova diventa impossibile da superare.
-   Sulla fatica vera: la promo sui social aveva già un freno sui follower, ma
-   **l'hype che dà continuava a salire ogni giorno senza limite** — adesso ha anche
-   lui un tetto settimanale (22 punti, `actions.js`), verificato con 7 giorni di
-   promo di fila. Sul lato "quando conta davvero": scalare in classifica adesso dà un
-   bonus d'hype vero e proporzionato al salto (`sim.js`, vicino a `G.best.chart`), e
-   un feat capitato per caso (`events.js`) non vale più sempre uguale: **la maggior
-   parte delle volte è un nome piccolo** (hype modesto), **una volta ogni tanto è uno
-   grosso davvero**, e lì l'hype si muove sul serio — non lo sai finché non firmi,
-   come chiesto. Il "feat con nomi più grandi" esiste già anche come relazione vera
-   con un beatmaker della Sala (`posto.js`, tipo `feat`, scala già con `p.fama`): non
-   toccato, andava già bene. Restano fuori da questo giro — **da sviluppare a
-   parte**, come segnalato nel punto stesso — il pub e la pubblicità come primo modo
-   di fare hype a inizio carriera, che oggi non esistono ancora come luogo/azione.
-   `npm run prova` (70/70) più una verifica dedicata fuori dal browser sui tetti per
-   fase e sul tetto settimanale della promo.
-
-   _(Il punto resta qui apposta, per la coda che manca — il pub e la pubblicità; la nota
-   breve sta in [`fatte.md`](fatte.md).)_
 
 11. Avaturn voglio lo rendiamo UN 50/50 , Cioè chi non vuole andare a farsi tutta la trafila per fare avaturn (anche se ovviamente dobbiamo fare di tutto per consigliarli a farlo) può benissimamente creare il suo avatar in game. FAI COESISTERE LE COSE.
 
@@ -305,7 +264,9 @@ _I numeri sono quelli di sempre: i buchi sono i punti chiusi, spostati in
 
 _Stessa regola: i numeri non si rifanno. Ci sono due punti «4» — quello lungo sulla
 catena del pezzo è il «punto 4 di CARLO» che `studio.js` cita, l'altro è arrivato dopo
-con lo stesso numero e resta così._
+con lo stesso numero e resta così. Il 12 e il 14 non erano task ma regole di lavoro, e dal
+20/09 stanno in `come-si-lavora.md`; l'8 (le transizioni video) e il 16 (l'agenda che
+blocca il giorno, risposto e chiuso) sono in `fatte.md`._
 
 #### Giornaliere
 
@@ -431,46 +392,13 @@ con lo stesso numero e resta così._
    voce sua nell'indice in testa). Cover e Feat non hanno più una sezione loro dal 15/09,
    quindi non hanno più bisogno di una foto.
 
-8. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo. Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su "stacca la spina", il quinto su "registra un pezzo".
-
-   **FATTO (20/09/2026)** — il primo il 16/09: toccando «Studio» sulla mappa (dopo il
-   «Vai» dello spostamento, se non sei già lì) partono i 5,6 secondi di
-   `01_studio_definitivo.mp4` e sotto si apre la stanza. Il meccanismo è generale —
-   `transizioneVideo(id, poi)` in `js/game/transizioni-video.js`, un file nuovo, come
-   chiede la regola dei punti che non sono fix — e sta scritto in
-   `02-interfaccia-e-telefono.md`, «Le transizioni video: il primo, lo Studio». Gli altri
-   quattro il 20/09: `02_ingresso_sala` sul cartello «La Sala», `03_ritorno_casa` su
-   «Casa», `04_stacca_la_spina` sulla mossa «Stacca la spina» da dovunque parta (la porta
-   di Casa, l'agenda, la card della sera), `05_registra_pezzo` sulla prima take in Cabina;
-   «Le transizioni video: gli altri quattro», stesso foglio. Non è il punto delle
-   dissolvenze CSS («Transizioni quando una card apre una pagina», stesso file): quelle
-   restano, il video ci va sopra. **Resta da decidere** cosa fare dei sette video che
-   nessun punto chiede (la voce sua fra le decisioni di «Da fare adesso»).
-
 9. quando skippi tante ore ci mette troppo a simulare
 
 10. togli il parametro «lucidità» e tutto ciò che ne consegue
 
 11. aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
 
-12. quando non sono fix, risoluzioni di bug o errori non modificare troppo i file già presenti ma crea un file nuovo collegato ai già presenti
-
-    _Regola di lavoro, non task: vedi in testa a «Da fare adesso»._
-
 13. non sempre far scorrere una giornata ti ridà l'energia
-
-14. tieni tutto ciò che riguarda la parte smartphone separata dal resto del progetto
-
-    _Regola di lavoro, non task: vedi in testa a «Da fare adesso»._
-
-16. quando si segna un evento in agenda poi non si riesce a far passare il giorno
-
-    **RISPOSTA (15/09/2026)** — è l'effetto voluto di un tuo punto precedente, «gli eventi
-    segnati in agenda bloccano lo skip» (FATTO 06/09, in [`fatte.md`](fatte.md)): con un
-    appuntamento di oggi ancora da fare il salto non parte, e se è più avanti il salto si
-    ferma alla sua mattina. Un'ora già passata non blocca niente, e «Fine giornata» resta
-    libero apposta. Se il giorno non passa **dopo che l'evento l'hai fatto**, allora è il
-    punto «se partecipo ad un evento segnato… si toglie automaticamente dall'agenda», FATTO il 20/09/2026 (in [`fatte.md`](fatte.md)).
 
 18. sull'app lafamegram non posta nessuno
 
@@ -484,11 +412,9 @@ con lo stesso numero e resta così._
 #### Studio (16/09/2026)
 
 _Scritti da Carletto il 16/09 nella lista dello Studio; i numeri sono i suoi, i buchi
-sono i punti chiusi in [`fatte.md`](fatte.md)._
-
-7. marketing toglilo da qua e spostalo, dimmi dove lo metti
-
-8. non posso spingere una canzone che non è ancora uscita, al massimo faccio uscire una preview sul social
+sono i punti chiusi in [`fatte.md`](fatte.md). Il 7 (il Marketing spostato) e l'8 (la
+preview di un pezzo non uscito) risultavano fatti dal 14 e dal 15/09 senza che il foglio
+lo dicesse: riconosciuti il 20/09. Gli altri quattro sono nell'ordine in testa._
 
 10. l'utente deve poter fare solo le sezioni Beat, Testo, e Cabina, poi il resto in automatico, però questo porta dei malus
 

@@ -34,6 +34,9 @@ qui, cambiala anche lì.
   (`scripts/genera-registro-modifiche.js`). Quello che ci metti a mano sparisce.
 - Le dipendenze si possono usare: ognuna si sceglie, si motiva in una riga e si può
   togliere. Le regole e il registro stanno in `documentazione/dipendenze.md`.
+- **Quando non è un fix, un file nuovo collegato** a quelli che ci sono, non un file già
+  grosso che si gonfia. E **la parte smartphone sta separata** dal resto (`telefono*.js`,
+  `telefono*.css`).
 
 ## Prima di chiudere
 

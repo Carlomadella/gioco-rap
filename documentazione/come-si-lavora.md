@@ -196,6 +196,22 @@ node scripts/promemoria-telefono.js
 node scripts/dopo-la-task.js
 ```
 
+## Le regole di Carlo sui file
+
+Due punti che stavano nel foglio dei punti (CARLO 12 e 14) e non erano task ma regole:
+
+- **Quando non è un fix, si fa un file nuovo collegato a quelli che ci sono**, invece di
+  gonfiarli. «Quando non sono fix, risoluzioni di bug o errori, non modificare troppo i
+  file già presenti ma crea un file nuovo collegato ai già presenti.» È così che sono
+  nati `studio-elementi.js`, `luoghi-foto.js`, `transizioni-video.js`, `guardaroba.js`:
+  ognuno accanto al file che lo chiama, con in testa il perché. Un fix invece si fa dove
+  sta il baco.
+- **La parte smartphone sta separata dal resto.** «Tieni tutto ciò che riguarda la parte
+  smartphone separata dal resto del progetto.» Il telefono è `telefono.js` e
+  `telefono.css`; il telefono quando lo schermo è un telefono è `telefono-stretto.js` e
+  `telefono-stretto.css`, che gli altri file conoscono solo per due funzioni. Quello che
+  riguarda il telefono non si sparge negli altri file.
+
 ## Le dipendenze
 
 **Si possono usare.** Il principio «zero dipendenze» è caduto il 07/09/2026. La regola che
