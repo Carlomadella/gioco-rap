@@ -6,6 +6,41 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:0fcc254 -->
+## 20/09/26, 20:48 â€” task/le-tre-del-marketing â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `0fcc254`
+
+### Cosa Ã¨ entrato
+
+- `d64c3c5` â€” docs: giro di fine task sul commit di chiusura de «Le tre del Marketing» — niente aperto â€” **Carlomadella**
+- `4aa172d` â€” fix(telefono): il giro di chiusura de «Le tre del Marketing» — tre voci del 20/09 (44–46), tutte chiuse â€” **Carlomadella**
+- `a52377a` â€” fix(telefono): «Le tre del Marketing» — chiuse dal 14/09, riconosciute; e la riga delle mosse su due righe â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/agenda-mosse-accese-1440x900.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/agenda-mosse-accese-360x640-tre-righe.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/agenda-mosse-accese-360x640.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/agenda-mosse-accese-360x800.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/agenda-mosse-accese-390x844.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/agenda-mosse-spente-360x800.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/agenda-mosse-spente-390x844.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/agenda-palestra-360x640.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/agenda-palestra-360x800.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/agenda-palestra-390x844.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/agenda-stasera-360x800.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/agenda-tocco-promo-360x800.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/agenda-tocco-promo-390x844.jpg`
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/css/telefono.css`
+
+**File interessati in questa categoria:** 16
+
+---
+
 <!-- merge:d17bd8f -->
 ## 20/09/26, 11:49 â€” task/barra-plancia-980-1180 â†’ main
 
