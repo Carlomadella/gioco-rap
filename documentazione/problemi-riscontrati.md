@@ -6,12 +6,13 @@ stata chiusa. Qui solo quelle **ancora aperte**, nello stesso ordine di «Da far
 insieme i due fogli: prima il telefono, poi quello che pesa nel pacchetto, poi le cose
 piccole, poi i lavori lunghi, in fondo le decisioni. Riordinato il 15/09 dopo il giro di
 fine task su quel foglio; il 19/09 il giro sulle pagine dei posti sulla loro foto ha
-trovato sette cose, sei chiuse nello stesso branch, una (la mano del rapper) resta; lo
-stesso giorno il giro sull'avvio rapido ne ha trovate sette, tutte chiuse nel branch.
-Il 20/09 il giro sulle «quattro piccole» ne ha trovate tre, più tre note: sono le
-voci 30–32, tutte e tre chiuse nello stesso branch prima del push. Lo stesso giorno il giro di
-fine task sulla fascia della plancia (`task/barra-plancia-980-1180`) ne ha trovate sei, più
-quattro note: sono le voci 33–38, tutte aperte, nessuna blocca la partita.
+trovato sette cose, sei chiuse nello stesso branch, una (la mano del rapper) è stata
+chiusa il 20/09 in un branch suo; lo stesso giorno il giro sull'avvio rapido ne ha trovate
+sette, tutte chiuse nel branch. Il 20/09 il giro sulle «quattro piccole» ne ha trovate tre,
+più tre note: sono le voci 30–32, tutte e tre chiuse nello stesso branch prima del push; il
+giro sulla mano del rapper ne ha trovate due (33–34), chiuse nello stesso branch. Lo stesso
+giorno il giro di fine task sulla fascia della plancia (`task/barra-plancia-980-1180`) ne ha
+trovate sei, più quattro note: sono le voci 35–40, tutte aperte, nessuna blocca la partita.
 
 1. ~~**Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
    telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra. Il tasto
@@ -77,10 +78,13 @@ quattro note: sono le voci 33–38, tutte aperte, nessuna blocca la partita.
    nelle sette liste errori per rotta; `artistaId-mancante` è diventato `artista-mancante`
    ed esce in `errore`; `README.md`, `ROADMAP.md` e `dipendenze.md` non dicono più «da
    usare». Il dettaglio sotto a ogni voce, nel giro in fondo.
-17. **La mano del braccio alzato del rapper è un tracciato SVG rotto** (19/09,
+17. ~~**La mano del braccio alzato del rapper è un tracciato SVG rotto** (19/09,
    `creator/nav.js:71`): a ogni Piazza la console segna «attribute d: Expected number» e la
    mano col microfono non si disegna. Non è della task delle pagine dei posti: va guardato
-   il disegno, non indovinato un numero.
+   il disegno, non indovinato un numero.~~ **RISOLTO (20/09/2026)** — branch
+   `task/mano-rapper-svg`: all'ultima curva della mano mancava il punto d'arrivo, che è
+   quello da cui parte (`48,-372`, il polso); adesso la mano si chiude lì. L'audit genera
+   il corpo intero e conta le coordinate di ogni tracciato, così non torna indietro.
 18. ~~**«I conti di casa» aperti dalla Casa coprono il Menu e «Torna alla mappa»** (19/09).~~
    **RISOLTO (19/09/2026)** — in `menu-sistema.js` il pannello viene prima della pagina.
 19. ~~**Sul telefono una mossa lanciata dal telefono alzato apre la pagina sotto al
@@ -128,26 +132,37 @@ quattro note: sono le voci 33–38, tutte aperte, nessuna blocca la partita.
    il colpo si onora prima del dado, il beat sul tavolo chiude il «Producer session» di oggi;
    il party non era un problema: `orari.js` apre «Stacca la spina» solo dalle 00:00 alle 04:00.
 
-33. **Il foglio della strofa sul telefono scorre di lato, e la X sta fuori dallo schermo** (20/09,
+33. ~~**L'audit della mano ingoia in silenzio l'errore con cui `nav.js` si carica** (20/09,
+   `audit-regressioni.js:2456`): l'artista finto non ha `name`, `refreshArtistChrome()`
+   esplode e il `catch` vuoto non lo dice. Oggi innocuo, perché `ARTIST_BODY` è già
+   definita; domani il test direbbe solo «ARTIST_BODY non generato» senza il perché.~~
+   **RISOLTO (20/09/2026)** — l'artista finto ha un `name`, `nav.js` si carica senza errori,
+   e caricamento e `ARTIST_BODY()` stanno in un test loro che riporta il messaggio, come
+   il blocco gemello di `spostamenti.js`.
+34. ~~**L'indice in testa dice ancora che la mano del rapper «resta»** (20/09, riga 9 di
+   questo foglio), mentre la voce 17 qui sotto è chiusa.~~ **RISOLTO (20/09/2026)** — il
+   paragrafo dice che è stata chiusa il 20/09 in un branch suo.
+
+35. **Il foglio della strofa sul telefono scorre di lato, e la X sta fuori dallo schermo** (20/09,
    `overlays.css:47-54` con `menu-sistema.css:541-553`): a 390 e 360 la testata è larga 415 in
    354, la X del foglio parte a 389 e il titolo va su tre righe. Il documento della task dice
    che nessuna schermata scorre di lato, il foglio sì.
-34. **La pastiglia del tempo sotto i 620 è rimpicciolita due volte: 105 × 38, scritte da
+36. **La pastiglia del tempo sotto i 620 è rimpicciolita due volte: 105 × 38, scritte da
    4,7 punti** (20/09, `stretto.css:636-647` e `:768-776` contro `tempo-controlli.js:367-372`):
    il foglio la rimpicciolisce a 168 × 54 da solo, la scatola da 150 la stringe ancora, e i
    sette decimi si applicano sopra. Nella plancia, nella Sala e nello Shop.
-35. **Le due regole che appoggiano il marchio dove sta `#hb-logo` (980 e 620) non lavorano**
+37. **Le due regole che appoggiano il marchio dove sta `#hb-logo` (980 e 620) non lavorano**
    (20/09, `stretto.css:470-476` e `:615-618` contro `menu-sistema.css:429-434`): stessa forza,
    tutte e due con `!important`, e menu-sistema si carica dopo. Il marchio sta a 0,0 invece
    che a 6,8: fra 901 e 980 è 19 punti più in alto della città.
-36. **Fra 981 e 1120 «Città di provincia» va su due righe e riempie la fascia fino ai bordi**
+38. **Fra 981 e 1120 «Città di provincia» va su due righe e riempie la fascia fino ai bordi**
    (20/09, `hub.css:1315-1317`): la casella è 150, il nome a 17 punti non ci sta, e
    «CITTÀ ATTUALE» tocca il bordo sopra e la fase quello sotto.
-37. **Fra 981 e 1180 il tasto tondo del telefono copre il fondo della seconda riga della
+39. **Fra 981 e 1180 il tasto tondo del telefono copre il fondo della seconda riga della
    settimana** (20/09, `telefono-stretto.css:109-118` con `hub.css:1343-1357`): a 1024 × 768
    la «Serata open mic» finisce a 715 e il tasto parte a 696. E il commento di
    telefono-stretto dice ancora che la barra trabocca «di suo».
-38. **Il «Negozio» delle regole nuove non esiste** (20/09, `stretto.css:751-820`,
+40. **Il «Negozio» delle regole nuove non esiste** (20/09, `stretto.css:751-820`,
    `implementazioni/02-interfaccia-e-telefono.md`): `#negozio`, `.nghead`, `.ngk` e `.ngx` non
    sono in `gioco.html` e `negozio.js` è dormiente; il documento lo conta fra le quattro
    testate sistemate.
@@ -3903,6 +3918,12 @@ segnalare, nessuna blocca la partita; le prime tre si vedono, le altre si sistem
   visto perché la Piazza è nel giro.
 - **come si vede** — Live Club → «Vai in piazza» → la battle, con la console aperta.
 - **quanto pesa** — da sistemare con calma.
+- **RISOLTO (20/09/2026)** — branch `task/mano-rapper-svg`: la curva è `C56,-366 50,-367
+  48,-372 Z`, con il terzo punto che è il polso da cui il tracciato parte — la mano si
+  chiude su sé stessa invece di restare un pezzo che il browser butta via. Nell'audit un
+  controllo genera `ARTIST_BODY()` con un artista finto e conta le coordinate di ogni
+  comando (`M`/`L` due, `C` multipli di sei, `Z` nessuna): sul codice vecchio fallisce,
+  sul nuovo passa.
 
 Note a margine, scelte e non bug: (1) nello stacca la spina, prima di premere, la riga sotto
 ai numeri dice «hai rivisto gente che non c'entra niente con la musica» al passato, come se
@@ -4325,7 +4346,7 @@ si vede in ogni schermata presa: **a ogni ingresso in plancia esce il toast «Ev
 v1.2.13: 1000 caricati.»** (`eventi-v2.js:3058-3059`), un messaggio da sviluppatore che il
 giocatore non sa cosa farsene — non è nei documenti, e se è voluto va scritto.
 
-L'indice «Cosa resta aperto» in testa al foglio ha le voci nuove di questo giro (33–38).
+L'indice «Cosa resta aperto» in testa al foglio ha le voci nuove di questo giro (35–40, erano 33–38 prima di unire main con la mano del rapper).
 
 ## Giro del 20/09/2026 (prova-sul-telefono, fine task `task/barra-plancia-980-1180`, commit `c4d9f77`)
 
@@ -4475,3 +4496,88 @@ colonne con la settimana a destra. Console pulita sulla plancia, in Sala, Shop e
 - La foto della città non riempie la sua card e lascia due bande sopra e sotto (61 a
   1280 × 800, 73 a 1240, 23 a 1366): è `aspect-ratio` per scelta (`hub.css:623-634`, il
   fondo sfocato dietro), non è della task.
+
+## Giro del 20/09/2026 (segnala-problemi, fine task `task/mano-rapper-svg`, commit `309de1c`)
+
+Giro piccolo, sul solo commit `309de1c` nel worktree `gioco-rap-mano`: la mano del braccio
+alzato del rapper in `frontend/js/creator/nav.js:71`, il controllo nuovo in
+`frontend/strumenti/audit-regressioni.js:2447-2468`, la voce 17 dell'indice, la scheda del
+19/09 e la riga della roadmap. `npm run verifica` era già verde (386, 3, 33) e non l'ho
+rifatto. Letti `git show 309de1c` e `nav.js` per intero; il controllo dell'audit l'ho
+fatto girare da solo con `vm`, sul `nav.js` di adesso e su quello di prima
+(`bcec0df`): sul vecchio segna `C 52.8,-361.6 47.2,-362.6`, sul nuovo niente — come dice
+il commit. Poi ho disegnato le due mani con Playwright (Chromium), ingrandite: quella
+vecchia Chrome la disegnava lo stesso, fino al pezzo rotto, con uno spigolo tagliato dritto
+in basso a sinistra e l'errore in console; quella nuova è un pugno tondo che copre il
+polsino, col microfono dentro.
+
+**Il punto scelto per chiudere è sensato.** La mano parte dal polso `48,-372`; il braccio
+alzato finisce in cima fra `66,-372` e `50,-370`, quindi il polso sta esattamente lì. Il
+fondo della mano nuova (l'ultima curva, con i controlli a `-366` e `-367`) scende di
+tre-cinque unità sotto l'orlo della manica e lo copre, come nel braccio abbassato dove la
+mano finisce a `50,-210`, due unità oltre l'orlo (`48,-212`), e la `Z` chiude dritto
+sul polso. Le due mani sono fatte allo stesso modo: prima il dorso, poi il lato, poi il
+ritorno al polso. L'unica alternativa sarebbe stata chiudere su `50,-370` (l'angolo interno
+della manica) e lasciare alla `Z` gli ultimi due punti: stesso disegno a occhio, niente da
+cambiare. Il commento in cima al controllo, la voce 17 e la scheda del 19/09 dicono il
+vero sui numeri (`C56,-366 50,-367 48,-372 Z`); `nav.js:71` è la riga giusta.
+
+### L'audit della mano ingoia in silenzio l'errore con cui `nav.js` si carica
+- **dove** — `frontend/strumenti/audit-regressioni.js:2456` (`try{ ... }catch(e){}`) e
+  `:2457` (la chiamata `ARTIST_BODY()` fuori dal `try`); l'errore nasce in
+  `frontend/js/creator/nav.js:174` (`A.name.trim()` dentro `refreshArtistChrome()`,
+  chiamata a `:178`).
+- **cosa succede** — l'artista finto ha `w`, `h`, `skin`, `fit`, `color` ma non `name`:
+  quando `nav.js` arriva in fondo e ridisegna l'avatar della barra, esplode con «Cannot
+  read properties of undefined (reading 'trim')» e il `catch` vuoto lo butta via. Oggi non
+  fa danno, perché `ARTIST_BODY` viene definita prima (riga 42) e il test la trova. Ma il
+  controllo è cieco: se domani qualcuno mette prima della riga 42 una riga che chiede un
+  pezzo che i finti non hanno (`A.name`, un `$()` che deve rispondere qualcosa,
+  `portrait()` che deve tornare un oggetto), il test si accende con «ARTIST_BODY non
+  generato» e basta, senza il messaggio vero — e chi lo legge deve rifare tutto il
+  ragionamento da zero. L'altro blocco `vm` dell'audit (`:1491-1492`, spostamenti) fa
+  la cosa giusta: se il file non si carica, lo scrive come test fallito col messaggio. In
+  più `ARTIST_BODY()` a `:2457` sta fuori dal `try`: se un giorno lancia (un campo di
+  `A` che non c'è, `portrait(true)` che non torna `defs`/`testa` — già oggi i finti
+  producono «undefinedundefined» nella testa, senza rompere), muore l'audit intero con uno
+  stack, non una riga rossa. Gli altri finti bastano: `$` torna `{}` e i tre `onclick`
+  ci si appoggiano, `shade` e `fit` producono solo colori (anche «undefined»), e i
+  colori non stanno nei tracciati.
+- **come si vede** — nel `catch` mettere `console.log(e.message)` e far girare
+  `node strumenti/audit-regressioni.js`: stampa l'errore del `trim`. Oppure spostare
+  `refreshArtistChrome()` prima di `window.ARTIST_BODY` e vedere il test dire solo
+  «ARTIST_BODY non generato».
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (20/09/2026)** — l'artista finto ha `name:"Prova"`, e `nav.js` si carica senza
+  errori; il caricamento e `ARTIST_BODY()` stanno in un test loro («nav.js si carica nel test
+  runtime e disegna il corpo intero») che riporta il messaggio dell'eccezione, come il blocco
+  gemello di `spostamenti.js`. 387 controlli, tutti verdi.
+
+### L'indice in testa dice ancora che la mano del rapper «resta»
+- **dove** — `documentazione/problemi-riscontrati.md:9` («sei chiuse nello stesso branch,
+  una (la mano del rapper) resta»).
+- **cosa succede** — il commit barra la voce 17 e la segna RISOLTO, ma il paragrafo sopra
+  all'indice — quello che uno legge per primo, con la data del 20/09 — dice ancora che la
+  mano è l'unica rimasta aperta del giro del 19/09. La stessa frase in fondo al giro del
+  19/09 (`:3883`) va bene così: racconta com'era quel giorno.
+- **come si vede** — aprire il foglio, leggere le prime dieci righe.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (20/09/2026)** — il paragrafo dice che la mano è stata chiusa il 20/09 in un
+  branch suo, e cita le voci 33–34 di questo giro.
+
+Note a margine, non bug: (1) **il vecchio tracciato non faceva sparire la mano**: Chrome
+disegna un tracciato fino al pezzo sbagliato e si ferma lì, quindi la mano c'era, con un
+angolo tagliato dritto e un piccolo spigolo in basso a sinistra, e l'errore in console. Il
+messaggio del commit e la scheda del 19/09 dicono «non si disegnava»: è storia, non serve
+correggerla, ma è il motivo per cui nessuno l'aveva vista a occhio prima del giro con la
+console aperta. (2) **«corpo intero» nella roadmap vuol dire quello che disegna `nav.js`**:
+la testa arriva da `portrait(true)` (`js/creator/portrait.js`), che nell'audit è un finto
+che torna vuoto, quindi i tracciati della testa il controllo non li conta. Va bene così —
+è un altro file — ma se un giorno si rompe un tracciato della testa, questo controllo non
+se ne accorge. (3) **il conteggio conosce solo `M`, `L`, `C` e `Z`**
+(`audit-regressioni.js:2460`): oggi il corpo usa solo quelli, ho controllato ogni
+tracciato; se un giorno uno usa `Q`, `S`, `A`, `H`, `V` o le lettere minuscole, i numeri
+finiscono nel comando prima e il test diventa rosso per sbaglio. Rosso, non verde: si
+vede, quindi va bene.
+
+L'indice «Cosa resta aperto» in testa al foglio ha le voci 33 e 34 di questo giro.
