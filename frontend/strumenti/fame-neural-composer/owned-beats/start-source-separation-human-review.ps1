@@ -1,7 +1,7 @@
 param(
   [string]$Workspace = "D:\FAME_NEURAL",
   [string]$ReviewId = "source-separation-human-review-v1-001",
-  [int]$Port = 8766
+  [int]$Port = 0
 )
 
 $ErrorActionPreference = "Stop"
