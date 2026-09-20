@@ -146,6 +146,7 @@ function prepare(workspaceRoot, reviewId = DEFAULT_REVIEW_ID) {
     families
   };
 
+  fs.mkdirSync(path.dirname(root), { recursive: true });
   fs.mkdirSync(root, { recursive: false });
   try {
     fs.writeFileSync(path.join(root, "review-package.json"), stableJson(payload), { flag: "wx" });
@@ -308,7 +309,13 @@ function render(){
  <label><input id="attest" type="checkbox" ${s.reviewerAttested?"checked":""}> Ho ascoltato originale, drums e bass e confermo i punteggi.</label>
  <div class="row"><button id="prev" ${idx===0?"disabled":""}>Indietro</button><button id="next">Salva e avanti</button></div>
  <p id="err" class="warn"></p></div>`;
- app.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>{s[b.dataset.role].downstreamUsefulness=Number(b.dataset.score);render()});
+ app.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>{
+   s.drums.note=document.getElementById("drumsNote").value;
+   s.bass.note=document.getElementById("bassNote").value;
+   s.reviewerAttested=document.getElementById("attest").checked;
+   s[b.dataset.role].downstreamUsefulness=Number(b.dataset.score);
+   render();
+ });
  document.getElementById("next").onclick=()=>save(true);
  document.getElementById("prev").onclick=()=>{save(false);idx--;render()};
 }
