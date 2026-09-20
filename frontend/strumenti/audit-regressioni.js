@@ -2444,6 +2444,33 @@ test("sul telefono le tre colonne diventano una pila e le porte della Casa vanno
   /@media \(max-width:900px\)\{[\s\S]*?\.lfwrap\{grid-template-columns:minmax\(0,1fr\)/.test(leggi("css/stretto.css")) &&
   leggi("css/stretto.css").includes(".lfporta,.lfp-tavolo,.lfp-camera,.lfp-divano,.lfp-conti{position:static"));
 
+/* «La mano del braccio alzato del rapper è un tracciato SVG rotto» (20/09/2026):
+   la curva che chiudeva la mano aveva due coppie invece di tre, il browser la saltava
+   e la mano col microfono non si disegnava. Qui il corpo intero viene generato davvero
+   (con un artista finto) e ogni tracciato si conta pezzo per pezzo. */
+(function(){
+  const vm = require("vm");
+  const ctx = {window:{__POSE:""}, document:{getElementById:()=>null,querySelectorAll:()=>[],addEventListener(){}},
+    $:()=>({}), A:{name:"Prova",w:60,h:175,skin:"#c08060",fit:"tuta",color:"#f00"}, portrait:()=>"", fit:()=>({}), shade:c=>c, console};
+  vm.createContext(ctx);
+  let svg = "";
+  try{
+    vm.runInContext(leggi("js/creator/nav.js"), ctx, {filename:"nav.js"});
+    svg = ctx.window.ARTIST_BODY();
+    test("nav.js si carica nel test runtime e disegna il corpo intero", svg.length > 0);
+  }catch(e){ test("nav.js si carica nel test runtime e disegna il corpo intero", false, e.message); }
+  const rotti = [];
+  for(const [,d] of svg.matchAll(/ d="([^"]+)"/g)){
+    for(const [,c,args] of d.matchAll(/([MLCZ])([^MLCZ]*)/g)){
+      const n = (args.trim().match(/-?\d+(\.\d+)?/g)||[]).length;
+      const ok = c==="Z" ? n===0 : c==="C" ? (n>0 && n%6===0) : n===2;
+      if(!ok) rotti.push(c + " " + args.trim());
+    }
+  }
+  test("il corpo intero del rapper: ogni tracciato SVG ha le coordinate che deve (la mano alzata compresa)",
+    svg.length > 0 && rotti.length === 0, rotti.join(" | ") || "corpo non generato");
+})();
+
 for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/transizioni-video.js","js/game/luoghi-foto.js","js/preparo.js","js/gioco-ingresso.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
