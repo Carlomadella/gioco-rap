@@ -37,5 +37,11 @@
     "capturePipFreezeAll": true,
     "captureEnvironmentReceipt": true,
     "nextActionAfterSuccessfulBootstrap": "REVIEW_AND_COMMIT_EXACT_PIP_FREEZE"
+  },
+  "bootstrapTools": {
+    "indexUrl": "https://pypi.org/simple",
+    "pip": "25.2",
+    "setuptools": "80.9.0",
+    "wheel": "0.45.1"
   }
 }

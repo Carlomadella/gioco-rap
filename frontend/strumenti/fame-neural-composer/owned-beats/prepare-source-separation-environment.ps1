@@ -49,13 +49,22 @@ if (-not (Test-Path -LiteralPath $venvPython -PathType Leaf)) {
 $torchVersion = [string]$spec.packages.torch.version
 $torchIndex = [string]$spec.packages.torch.indexUrl
 $openvinoVersion = [string]$spec.packages.openvino.version
+$openvinoIndex = [string]$spec.packages.openvino.indexUrl
+$bootstrapIndex = [string]$spec.bootstrapTools.indexUrl
+$pipBootstrapVersion = [string]$spec.bootstrapTools.pip
+$setuptoolsBootstrapVersion = [string]$spec.bootstrapTools.setuptools
+$wheelBootstrapVersion = [string]$spec.bootstrapTools.wheel
+
+Write-Host "Aggiornamento tooling pip del venv dedicato..." -ForegroundColor Cyan
+& $venvPython -m pip install --disable-pip-version-check --index-url $bootstrapIndex "pip==$pipBootstrapVersion" "setuptools==$setuptoolsBootstrapVersion" "wheel==$wheelBootstrapVersion"
+if ($LASTEXITCODE -ne 0) { throw "Bootstrap pip/setuptools/wheel fallito" }
 
 Write-Host "Installazione Torch CPU $torchVersion nel venv dedicato..." -ForegroundColor Cyan
-& $venvPython -m pip install --disable-pip-version-check --index-url $torchIndex "torch==$torchVersion"
+& $venvPython -m pip install --disable-pip-version-check --index-url $bootstrapIndex --extra-index-url $torchIndex "torch==$torchVersion"
 if ($LASTEXITCODE -ne 0) { throw "Installazione Torch fallita" }
 
 Write-Host "Installazione OpenVINO $openvinoVersion nel venv dedicato..." -ForegroundColor Cyan
-& $venvPython -m pip install --disable-pip-version-check "openvino==$openvinoVersion"
+& $venvPython -m pip install --disable-pip-version-check --index-url $openvinoIndex "openvino==$openvinoVersion"
 if ($LASTEXITCODE -ne 0) { throw "Installazione OpenVINO fallita" }
 
 $torchActual = (& $venvPython -c "import torch; print(torch.__version__)").Trim()
