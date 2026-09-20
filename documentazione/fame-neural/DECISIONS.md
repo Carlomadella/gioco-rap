@@ -902,3 +902,13 @@ Le versioni Torch/OpenVINO derivano dalla documentazione/build prerequisites Int
 Il file `source-separation-environment-v1.json` contiene i pin di bootstrap, ma **non è ancora il lock transitive definitivo**. Lo script `prepare-source-separation-environment.ps1` crea il venv, verifica il modello e il runtime, quindi cattura `pip freeze --all` e un receipt append-only. Solo dopo la revisione di quel freeze verrà committato il lock esatto e potrà iniziare l'implementazione/esecuzione dell'adapter.
 
 Il setup non apre audio, non esegue Source Separation e non accede al final holdout.
+
+## NDR-061 — Source Separation: freeze transitivo revisionato e lock esatto versionato
+
+**Stato: ACCEPTED — 20 settembre 2026.**
+
+Il bootstrap dedicato `D:\FAME_NEURAL\venv-source-separation` è stato completato con Python 3.10.11, Torch `2.4.1+cpu`, OpenVINO `2024.6.0`, modello HTDemucs congelato leggibile su device CPU e FFmpeg disponibile. Il comando di bootstrap non ha aperto audio, non ha eseguito inferenza e non ha acceduto al final holdout.
+
+Il `pip freeze --all` reale contiene 16 package ed è registrato dal receipt `source-separation-env-v1-001` con SHA256 `e7fd1df0076b79101923900aa280b3c53a46c5b0a166bad75cbf972b7794411a`. Lo snapshot package è congelato in `requirements-source-separation-lock.txt`; il lock repository usa LF canonico ed è verificato separatamente dal digest del file catturato su Windows, così la normalizzazione EOL non viene confusa con una differenza di dipendenze.
+
+Da questo checkpoint è autorizzata **l'implementazione e la verifica tecnica** del clean standalone HTDemucs/OpenVINO adapter sul solo split `development`. Non sono ancora autorizzati accesso al final holdout, batch sulle 131 sorgenti, training o dichiarazioni di task/data readiness. L'esecuzione di Source Separation resta un gate successivo e deve rispettare il protocollo pilot già congelato.
