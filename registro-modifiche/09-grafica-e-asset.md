@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:ae5ca5b -->
+## 20/09/26, 23:48 â€” task/avaturn-e-camerino-insieme â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `ae5ca5b`
+
+### Cosa Ã¨ entrato
+
+- `4f395a6` â€” docs(avatar): «Avaturn voglio lo rendiamo UN 50/50 … FAI COESISTERE LE COSE» — confermato in partita e scritto; Avaturn «consigliato» sulla card â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:219c73c -->
 ## 20/09/26, 23:10 â€” task/shop-tre-reparti â†’ main
 
