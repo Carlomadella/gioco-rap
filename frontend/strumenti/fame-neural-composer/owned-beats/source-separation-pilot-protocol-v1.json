@@ -24,7 +24,7 @@
       "other",
       "vocals"
     ],
-    "executionAdapterStatus": "IMPLEMENTED_AWAITING_NO_AUDIO_VALIDATION",
+    "executionAdapterStatus": "NEXT_BLOCK",
     "modelArtifact": {
       "repository": "Intel/demucs-openvino",
       "revision": "97fc578fb57650045d40b00bc84c7d156be77547",
@@ -43,16 +43,11 @@
       "append-only run identity"
     ],
     "mustBeFrozenBeforeListeningToPilotOutputs": [
-      "stem technical validation: frozen in source-separation-pilot-review-v1.json",
-      "role fidelity review rubric: frozen in source-separation-pilot-review-v1.json",
-      "downstream transcription usefulness rubric: frozen in source-separation-pilot-review-v1.json",
-      "separator comparison rule if a second model is introduced: frozen in source-separation-pilot-review-v1.json"
-    ],
-    "reviewSpec": {
-      "path": "source-separation-pilot-review-v1.json",
-      "sha256": "82a94dbe434c218cd9467f929ac19b0c7d5afada9d379a6fac12e7e2aa8f0096",
-      "status": "FROZEN_BEFORE_FIRST_PILOT_OUTPUT"
-    }
+      "stem technical validation",
+      "role fidelity review rubric",
+      "downstream transcription usefulness rubric",
+      "separator comparison rule if a second model is introduced"
+    ]
   },
   "safety": {
     "holdoutAccessAllowed": false,
@@ -60,54 +55,5 @@
     "taskDataReadyMayBeDeclared": false,
     "batch131Authorized": false,
     "manualQaStillRequired": true
-  },
-  "execution": {
-    "adapter": "source-separation-standalone-adapter.py",
-    "sampleRate": 44100,
-    "device": "CPU",
-    "shifts": 1,
-    "shiftSeed": 0,
-    "overlap": 0.25,
-    "transitionPower": 1,
-    "segmentSamples": 343980,
-    "expectedModelInputs": [
-      {
-        "name": "input.25",
-        "shape": [
-          1,
-          4,
-          2048,
-          336
-        ]
-      },
-      {
-        "name": "input.1",
-        "shape": [
-          1,
-          2,
-          343980
-        ]
-      }
-    ],
-    "expectedModelOutputs": [
-      {
-        "name": "4172",
-        "shape": [
-          1,
-          16,
-          2048,
-          336
-        ]
-      },
-      {
-        "name": "4262",
-        "shape": [
-          1,
-          8,
-          343980
-        ]
-      }
-    ],
-    "preInferenceGate": "SELF_TEST_AND_MODEL_SIGNATURE_CHECK_PASS"
   }
 }
