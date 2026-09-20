@@ -19,7 +19,8 @@ function sha256(file) {
 }
 
 function gitBlobSha(file) {
-  const bytes = fs.readFileSync(file);
+  const canonicalText = fs.readFileSync(file, "utf8").replace(/\r\n/g, "\n");
+  const bytes = Buffer.from(canonicalText, "utf8");
   const header = Buffer.from(`blob ${bytes.length}\0`, "utf8");
   return crypto.createHash("sha1").update(header).update(bytes).digest("hex");
 }
