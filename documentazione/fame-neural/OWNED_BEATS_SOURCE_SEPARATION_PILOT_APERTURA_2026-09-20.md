@@ -96,3 +96,19 @@ La pipeline Intel documenta Music Separation come effetto Audacity interattivo; 
 Fonti:
 - https://github.com/intel/openvino-plugins-ai-audacity/blob/main/mod-openvino/OVMusicSeparation.cpp
 - https://manual.audacityteam.org/man/scripting.html
+
+
+## Addendum — esito discovery scripting e pivot backend
+
+La named pipe Audacity è stata aperta correttamente sul PC reale. Il discovery mirato ha restituito:
+
+- `targetCommandMatches: []`;
+- `targetMenuMatches: []`;
+- `targetCommandUnique: false`;
+- `targetHasAutomatableParams: false`.
+
+Il risultato è coerente con la struttura dell'effetto Intel: i controlli Separation Mode, OpenVINO device e Shifts sono membri GUI dell'effetto e non sono esposti come settings automatizzabili. Il default della modalità è 2-stem, mentre il pilot richiede 4-stem.
+
+Per questo motivo il batch via `mod-script-pipe` non viene proseguito. La baseline modello resta invariata; cambia soltanto il modo di esecuzione.
+
+Aggiunto `source-separation-standalone-doctor.py`: controllo read-only del modello congelato, Torch, OpenVINO e FFmpeg, senza apertura audio o inferenza.

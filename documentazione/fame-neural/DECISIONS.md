@@ -864,3 +864,22 @@ Il baseline primario del pilot è `intel-openvino-htdemucs-v4-97fc578`, 4-stem `
 Questa decisione fissa un baseline riproducibile, non dichiara HTDemucs separatore definitivo. Un secondo modello può entrare nel confronto solo con checkpoint esatto, provenance/licenza verificabili e regola di confronto congelata prima dell'ascolto comparativo.
 
 Il primo blocco implementa preflight metadata-only e prepare append-only con verifica SHA delle sorgenti development. Non esegue inferenza, non autorizza batch sui 131 asset, non promuove `TASK_DATA_READY` e non apre training. Prima di ascoltare gli output del pilot vanno congelati adapter batch, receipt di esecuzione e rubric/criteri QA per stem e utilità downstream.
+
+## NDR-059 — Source Separation: escluso batch via Audacity, backend standalone sul modello congelato
+
+Data: 20 settembre 2026. Stato: adottata.
+
+Il test reale di `mod-script-pipe` su Audacity 3.7.1 ha confermato che la pipe Windows funziona, ma `GetInfo` non espone `OpenVINO Music Separation` come comando utilizzabile dal batch adapter.
+
+La verifica della sorgente Intel dell'effetto mostra inoltre che:
+
+- `m_separationModeSelectionChoice` parte da `0`, cioè modalità 2-stem;
+- `m_deviceSelectionChoice` e `mNumberOfShifts` sono stato dell'interfaccia;
+- l'effetto non implementa un `VisitSettings` che renda questi controlli parametri di scripting;
+- la modalità richiesta dal pilot è invece 4-stem `Drums/Bass/Other/Vocals`.
+
+Non viene quindi introdotta automazione GUI né un comando Audacity fragile. Il batch via Audacity è chiuso come strada non idonea.
+
+Resta congelato lo stesso artefatto modello `intel-openvino-htdemucs-v4-97fc578` già verificato per SHA256. Il prossimo adapter sarà standalone e riproducibile, con ambiente Python separato dal venv Audio Analysis congelato. Prima di installare dipendenze o eseguire inferenza viene usato un doctor read-only per verificare Torch/OpenVINO/FFmpeg e leggere la signature del modello.
+
+Non viene copiato nel repository il wrapper C++ GPL del plugin Intel. L'implementazione standalone deve usare componenti con licenza compatibile e mantenere separata la provenance del modello dalla provenance del codice adapter.
