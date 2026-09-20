@@ -974,3 +974,20 @@ Il technical QA read-only del run `source-separation-development-inference-v1-00
 Le metriche `peakAbs`, `rms` e `stemSumResidualRmsRatio` sono state misurate come diagnostica senza hard threshold, coerentemente con la rubric congelata prima del primo output. In particolare `FAME000126` ha il residual ratio osservato più alto (circa 0.1012), ma non viene introdotta retroattivamente una soglia automatica.
 
 Il PASS tecnico non certifica utilità musicale. Il gate Source Separation resta aperto fino alla review umana congelata di drums e bass: mediana del downstream-usefulness almeno 2 e almeno 6/8 family con voto almeno 2 per ciascuno dei due stem. Solo un eventuale PASS di entrambi apre il pilot Audio→MIDI drums/low-end.
+
+## NDR-068 — Source Separation development PASS: Audio→MIDI drums/low-end aperto
+
+**Stato: ACCEPTED — 20 settembre 2026.**
+
+La Human Review congelata del run `source-separation-development-inference-v1-001` è completata con reviewId `source-separation-human-review-v1-001`, package digest `e860ecd2ae8ccc8ebdafa6069097e03f9443fef15fd1b3f62ed6b620bb35d276` e submission digest `ae63ed188816efb9d272a43549338c3441627505eaaa9e0f78b0b548544343cf`.
+
+Risultato rispetto alle soglie fissate prima dell'ascolto:
+
+- drums: mediana downstream usefulness 2.5; 8/8 family >=2; PASS;
+- bass: mediana downstream usefulness 2.5; 7/8 family >=2; PASS;
+- technical: `ALL_8_FAMILIES_PASS`;
+- outcome: `OPEN_AUDIO_TO_MIDI_DRUMS_LOW_END_PILOT`.
+
+È quindi autorizzato il prossimo blocco Audio→MIDI **sulle sole 8 family development e limitatamente a drums + low-end**. Final holdout, batch 131, training e task/data readiness restano esclusi.
+
+Le osservazioni qualitative post-review sullo stem `other` mostrano in più family un pattern di buona separazione iniziale seguito da degrado, perdita o riapparizione in sezioni successive. Queste osservazioni non modificano il gate drums/bass, ma impediscono di estendere implicitamente il PASS al ramo tonale. Il tonal Audio→MIDI resta chiuso fino a un gate dedicato.
