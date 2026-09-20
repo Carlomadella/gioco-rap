@@ -11,6 +11,7 @@ const modulePath = path.join(owned, "source-separation-development-inference.js"
 const prepareWrapperPath = path.join(owned, "prepare-source-separation-development-inference.ps1");
 const runWrapperPath = path.join(owned, "run-source-separation-development-inference.ps1");
 const adapterPath = path.join(owned, "source-separation-standalone-adapter.py");
+const runnerPath = path.join(owned, "source-separation-development-inference.js");
 const contractPath = path.join(owned, "source-separation-execution-contract-v1.json");
 
 const mod = require(modulePath);
@@ -21,6 +22,9 @@ const contract = JSON.parse(fs.readFileSync(contractPath, "utf8"));
 
 mod.validateContract(contract);
 assert.equal(mod.canonicalGitBlobSha(adapterPath), contract.adapter.gitBlobSha);
+assert.equal(mod.canonicalGitBlobSha(runnerPath), contract.batchRunner.gitBlobSha);
+assert.equal(contract.batchRunner.path, "source-separation-development-inference.js");
+assert.equal(contract.batchRunner.implementationCommit, "7110770dc295f7b8f51fd7d0b91a0a2801ce6284");
 assert.equal(contract.execution.cacheRelativePath, "cache/source-separation-openvino");
 assert.equal(contract.execution.audioIO.decodeSampleRate, 44100);
 assert.equal(contract.execution.audioIO.channels, 2);
@@ -62,6 +66,9 @@ assert(source.includes('Partial output without append-only result receipt'));
 assert(source.includes('INFERENCE_COMPLETE_AWAITING_TECHNICAL_AND_HUMAN_QA'));
 assert(source.includes('stemSumResidualRmsRatio'));
 assert(source.includes('sourcePilotManifestSha256'));
+assert(source.includes('batchRunner'));
+assert(source.includes('runnerGitBlobSha'));
+assert(source.includes('safeArtifactId(source.sourceRecordId'));
 assert(source.includes('executionContractSha256'));
 assert(source.includes('environmentLockSha256'));
 
