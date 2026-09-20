@@ -3,15 +3,13 @@
 
 Metadata/UI discovery only:
 - requires Audacity already running with mod-script-pipe enabled;
-- sends GetInfo/Help scripting commands;
+- sends GetInfo scripting commands;
 - does not import audio;
 - does not invoke OpenVINO Music Separation;
 - does not change Audacity preferences.
 
-Windows note:
-Python's normal open() can return EINVAL on Audacity named-pipe endpoints.
-This helper opens the pipes with CreateFileW and then wraps the Win32
-handles as binary Python file objects.
+Windows named pipes are opened with CreateFileW because Python's normal
+open() can return EINVAL on Audacity pipe endpoints.
 """
 from __future__ import annotations
 
@@ -19,12 +17,15 @@ import argparse
 import ctypes
 from ctypes import wintypes
 import json
-import msvcrt
 import os
 import sys
 
-KEYWORDS = ("openvino", "music separation", "separation")
+if sys.platform == "win32":
+    import msvcrt
+else:
+    msvcrt = None
 
+TARGET_TEXT = "openvino music separation"
 GENERIC_READ = 0x80000000
 GENERIC_WRITE = 0x40000000
 OPEN_EXISTING = 3
@@ -51,39 +52,40 @@ if kernel32 is not None:
     kernel32.CloseHandle.restype = wintypes.BOOL
 
 
-def matching_lines(text: str):
-    lines = []
-    for line in text.splitlines():
-        low = line.lower()
-        if any(k in low for k in KEYWORDS):
-            lines.append(line)
-    return lines
+def decode_first_json(text: str):
+    decoder = json.JSONDecoder()
+    for i, ch in enumerate(text):
+        if ch not in "[{":
+            continue
+        try:
+            value, _ = decoder.raw_decode(text[i:])
+            return value
+        except json.JSONDecodeError:
+            continue
+    raise RuntimeError("Audacity GetInfo response does not contain decodable JSON")
+
+
+def contains_target(value):
+    if isinstance(value, dict):
+        haystack = " ".join(str(value.get(k, "")) for k in ("id", "name", "label", "tip", "url"))
+        return TARGET_TEXT in haystack.lower()
+    return TARGET_TEXT in str(value).lower()
+
+
+def exact_matches(value):
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if contains_target(item)]
 
 
 def _create_file_handle(name: str, access: int):
-    handle = kernel32.CreateFileW(
-        name,
-        access,
-        0,
-        None,
-        OPEN_EXISTING,
-        0,
-        None,
-    )
+    handle = kernel32.CreateFileW(name, access, 0, None, OPEN_EXISTING, 0, None)
     if handle == INVALID_HANDLE_VALUE:
         error = ctypes.get_last_error()
         if error == ERROR_PIPE_BUSY:
             if not kernel32.WaitNamedPipeW(name, PIPE_WAIT_MS):
                 raise ctypes.WinError(ctypes.get_last_error())
-            handle = kernel32.CreateFileW(
-                name,
-                access,
-                0,
-                None,
-                OPEN_EXISTING,
-                0,
-                None,
-            )
+            handle = kernel32.CreateFileW(name, access, 0, None, OPEN_EXISTING, 0, None)
         if handle == INVALID_HANDLE_VALUE:
             raise ctypes.WinError(ctypes.get_last_error())
     return handle
@@ -137,8 +139,7 @@ def open_pipe():
 
 
 def send(to_file, from_file, command: str):
-    payload = (command + "\r\n\0").encode("utf-8")
-    to_file.write(payload)
+    to_file.write((command + "\r\n\0").encode("utf-8"))
     to_file.flush()
 
     chunks = []
@@ -153,39 +154,69 @@ def send(to_file, from_file, command: str):
     return b"".join(chunks).decode("utf-8", errors="replace")
 
 
+def self_test():
+    commands = """
+noise before
+[
+  {"id":"Normalize","name":"Normalize","params":[]},
+  {"id":"OpenVINOMusicSeparation","name":"OpenVINO Music Separation","params":[],"tip":"Split stems"}
+]
+BatchCommand finished: OK
+"""
+    menus = """
+[
+ {"label":"OpenVINO Music Separation...","id":"Effect_Audacity_OpenVINO AI Effects_OpenVINO Music Separation_Built-in Effect: OpenVINO Music Separation"},
+ {"label":"OpenVINO Whisper Transcription...","id":"other"}
+]
+"""
+    c = exact_matches(decode_first_json(commands))
+    m = exact_matches(decode_first_json(menus))
+    assert len(c) == 1 and c[0]["id"] == "OpenVINOMusicSeparation"
+    assert len(m) == 1 and "Music Separation" in m[0]["label"]
+    print("source-separation-audacity-pipe-discover self-test: PASS")
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.parse_args()
+    ap.add_argument("--self-test", action="store_true")
+    args = ap.parse_args()
+    if args.self_test:
+        self_test()
+        return
 
     to_file, from_file = open_pipe()
     try:
-        responses = {}
-        for name, command in (
-            ("getInfoHelp", 'Help: Command="GetInfo"'),
-            ("commands", "GetInfo: Type=Commands"),
-            ("menus", "GetInfo: Type=Menus"),
-        ):
-            responses[name] = send(to_file, from_file, command)
+        commands_raw = send(to_file, from_file, "GetInfo: Type=Commands")
+        menus_raw = send(to_file, from_file, "GetInfo: Type=Menus")
 
-        matches = {
-            key: matching_lines(value)
-            for key, value in responses.items()
-        }
+        commands = exact_matches(decode_first_json(commands_raw))
+        menus = exact_matches(decode_first_json(menus_raw))
+
+        command = commands[0] if len(commands) == 1 else None
+        params = command.get("params", []) if isinstance(command, dict) else []
+        has_params = bool(params)
+
+        if len(commands) == 1 and has_params:
+            next_action = "FREEZE_BATCH_COMMAND_PARAMETERS"
+        elif len(commands) == 1:
+            next_action = "SCRIPTING_COMMAND_HAS_NO_AUTOMATABLE_PARAMS_REVIEW_BACKEND"
+        else:
+            next_action = "TARGET_COMMAND_NOT_UNIQUELY_EXPOSED_REVIEW_BACKEND"
 
         print(json.dumps({
-            "mode": "SOURCE_SEPARATION_AUDACITY_PIPE_DISCOVERY",
+            "mode": "SOURCE_SEPARATION_AUDACITY_PIPE_TARGET_DISCOVERY",
             "pipeReady": True,
             "pipeTransport": "WIN32_CREATEFILEW_BINARY",
+            "target": "OpenVINO Music Separation",
+            "targetCommandMatches": commands,
+            "targetMenuMatches": menus,
+            "targetCommandUnique": len(commands) == 1,
+            "targetHasAutomatableParams": has_params,
+            "targetAutomatableParams": params,
             "audioOpenedByThisCommand": False,
             "sourceSeparationExecutedByThisCommand": False,
             "preferencesModifiedByThisCommand": False,
-            "matches": matches,
-            "rawResponseLengths": {k: len(v) for k, v in responses.items()},
-            "nextAction": (
-                "BUILD_BATCH_ADAPTER_FROM_DISCOVERED_COMMAND"
-                if any(matches.values())
-                else "INSPECT_RAW_AUDACITY_COMMAND_SURFACE"
-            ),
+            "nextAction": next_action,
         }, indent=2))
     finally:
         to_file.close()
