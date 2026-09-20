@@ -2482,6 +2482,20 @@ test("nell'attesa che il video parta la mappa non risponde: la copertura traspar
    guardandola: la foto della piazza nello stile dell'elemento (dentro a una
    variabile CSS Chrome la cercava in css/media/), il tasto d'oro che legge
    l'orario. Se una pagina si toglie apposta, via anche la sua riga. */
+/* «Avaturn voglio lo rendiamo UN 50/50 … FAI COESISTERE LE COSE» (ALE), confermato in
+   partita il 20/09/2026: la prima schermata del creator ha le due card, Avaturn è
+   quella consigliata, e il ponte distingue i due per `avatarSource`. */
+test("il creator offre Avaturn e MakeHuman, con Avaturn consigliato, e il ponte li distingue",
+  (() => {
+    const creator = leggi("media/creator-rpg-v24/creator.html");
+    return creator.includes('data-avatar-source="avaturn"') && creator.includes('data-avatar-source="local"') &&
+      /data-avatar-source="avaturn">\s*<div class="id">[^<]*<b class="avatar-consigliato">consigliato<\/b>/.test(creator) &&
+      creator.includes("Come vuoi creare il tuo artista?") &&
+      hub.includes('art?.avatarSource === "avaturn"') &&
+      leggi("js/creator/rpg-v24-bridge.js").includes('if(source==="avaturn"){') &&
+      leggi("js/creator/rpg-v24-bridge.js").includes('}else if(source==="local"){');
+  })());
+
 console.log("\nLe pagine dei posti sulla loro foto — Casa, Palestra, Live Club, stacca la spina");
 const luoghiFoto = leggi("js/game/luoghi-foto.js");
 const luoghiFotoCss = leggi("css/luoghi-foto.css");

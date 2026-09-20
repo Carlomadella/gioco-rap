@@ -16,7 +16,7 @@ Quelli che erano rimasti indietro nel foglio — chiusi ma mai smistati — stan
 | --- | --- |
 | [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 16 voci |
 | [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 47 voci |
-| [`03-artista-e-avatar.md`](03-artista-e-avatar.md) | **L'artista e il suo avatar** — 1 voce |
+| [`03-artista-e-avatar.md`](03-artista-e-avatar.md) | **L'artista e il suo avatar** — 2 voci |
 | [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 16 voci |
 | [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 13 voci |
 | [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md) | **Il mondo e la gente** — 16 voci |
@@ -33,7 +33,7 @@ per i punti, e sono in [`../documentazione/come-si-lavora.md`](../documentazione
 
 ## Tutti i punti
 
-130 voci in tutto: **95 chiuse**, 13 a metà, 17 da fare e 5 con la sola risposta scritta
+131 voci in tutto: **96 chiuse**, 13 a metà, 17 da fare e 5 con la sola risposta scritta
 (ricontate dalla tabella qui sotto il 20/09/2026, dopo il riordino del foglio dei punti; nello
 stesso giro sono entrate due sezioni del foglio dell'interfaccia che alla tabella mancavano — lo
 Studio a cinque linguette, l'anteprima di un pezzo non uscito — e il giorno prima altre tre,
@@ -148,6 +148,7 @@ nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../docume
 | **—** | Controllo del codice: due nomi di classe che si pestavano i piedi | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **4** | Lo Shop diventa uno shop, non un menù | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Lo Shop: il reparto Vestiti — lo Shop sblocca, il camerino veste | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | Avaturn e il camerino MakeHuman, tutti e due | fatto | [artista-e-avatar](03-artista-e-avatar.md) |
 | **24** | Un tasto per uscire al menu, scritto a lettere | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **25** | «Disciplina» diventa «Condizione» | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **27** | La landing è una pagina sua, staccata dall'accesso e dal gioco | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
