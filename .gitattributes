@@ -1,0 +1,3 @@
+# Digest-sensitive frozen Neural artifacts must keep repository LF bytes on Windows.
+frontend/strumenti/fame-neural-composer/owned-beats/audio-analysis-v2-protocol.json text eol=lf
+frontend/strumenti/fame-neural-composer/owned-beats/audio-analysis-holdout-cohort-r1-v2.json text eol=lf
