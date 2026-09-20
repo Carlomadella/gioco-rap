@@ -1,7 +1,7 @@
 {
   "schema": "fame-owned-beats-audio-to-midi-development-protocol-v1",
   "version": 1,
-  "status": "DRAFT_BEFORE_IMPLEMENTATION_FREEZE",
+  "status": "FROZEN_BEFORE_FIRST_TRANSCRIPTION_OUTPUT",
   "scope": {
     "split": "development",
     "expectedFamilies": 8,
@@ -173,7 +173,8 @@
   },
   "implementation": {
     "baselinePath": "audio-to-midi-development-baseline.py",
-    "baselineGitBlobSha1": null,
-    "implementationCommit": null
-  }
+    "baselineGitBlobSha1": "0e48d49e6c7784b9e26628dcf52becd3d5456b9c",
+    "implementationCommit": "7950de6ab2e1ff65cbe596d25b855b84f9c0d17f"
+  },
+  "frozenAt": "2026-09-20"
 }
