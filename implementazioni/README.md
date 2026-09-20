@@ -15,7 +15,7 @@ Quelli che erano rimasti indietro nel foglio — chiusi ma mai smistati — stan
 | file | cosa c'è dentro |
 | --- | --- |
 | [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 16 voci |
-| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 45 voci |
+| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 47 voci |
 | [`03-artista-e-avatar.md`](03-artista-e-avatar.md) | **L'artista e il suo avatar** — 1 voce |
 | [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 16 voci |
 | [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 13 voci |
@@ -33,10 +33,11 @@ per i punti, e sono in [`../documentazione/come-si-lavora.md`](../documentazione
 
 ## Tutti i punti
 
-128 voci in tutto: **93 chiuse**, 13 a metà, 17 da fare e 5 con la sola risposta scritta
-(ricontate dalla tabella qui sotto il 20/09/2026, dopo il reparto Vestiti dello Shop; nello stesso
-conto sono entrate tre sezioni del foglio dell'interfaccia che alla tabella mancavano — l'avvio
-rapido, le pagine dei posti sulla loro foto, la fascia della plancia). A che punto siamo
+130 voci in tutto: **95 chiuse**, 13 a metà, 17 da fare e 5 con la sola risposta scritta
+(ricontate dalla tabella qui sotto il 20/09/2026, dopo il riordino del foglio dei punti; nello
+stesso giro sono entrate due sezioni del foglio dell'interfaccia che alla tabella mancavano — lo
+Studio a cinque linguette, l'anteprima di un pezzo non uscito — e il giorno prima altre tre,
+l'avvio rapido, le pagine dei posti sulla loro foto, la fascia della plancia). A che punto siamo
 nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../documentazione/roadmap.md).
 
 | | punto | stato | dove |
@@ -169,7 +170,9 @@ nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../docume
 | **—** | Le pagine dei posti sulla loro foto: Casa, Palestra, Live Club, stacca la spina | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | L'avvio rapido: la schermata «Preparo il tuo artista» | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | La fascia della plancia fra 980 e 1240, e la plancia a 1280 × 800 | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
-| **—** | Le tre del Marketing: chiuse dal 14/09, e la riga delle mosse su due righe | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | Le tre del Marketing: chiuse dal 14/09, e la riga delle mosse a capo | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | Lo Studio a cinque linguette: B + D3 + F2 + E (col Marketing spostato sul telefono) | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | Un pezzo non uscito non si spinge: se ne fa uscire un'anteprima | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 
 > Lo stato è letto dal testo dei punti: «fatto» vuol dire che c'è scritto cosa è
 > stato fatto e quando, «risposto» che c'è una risposta ragionata ma il codice

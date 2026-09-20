@@ -22,7 +22,7 @@ un'altra cosa.
 
 | quando | quante |
 | --- | --- |
-| 20/09/2026 | 4 |
+| 20/09/2026 | 9 |
 | 15/09/2026 | 6 |
 | 07/09/2026 | 6 |
 | 06/09/2026 | 10 |
@@ -31,7 +31,112 @@ un'altra cosa.
 
 ## 20/09/2026
 
-_Le quattro piccole, chiuse insieme nel branch `task/piccole-agenda-beat-parametri-licenziarsi`._
+_Le quattro piccole, chiuse insieme nel branch `task/piccole-agenda-beat-parametri-licenziarsi`;
+poi, col riordino del foglio, le altre cinque: le transizioni video, l'hype (che stava in
+`implementazioni.md` «apposta, per la coda», e la coda adesso è una voce dell'ordine), la
+domanda sull'agenda che blocca il giorno, e i due punti dello Studio del 16/09 che erano
+già fatti — il Marketing spostato, la preview di un pezzo non uscito._
+
+### Le transizioni video: tutte e cinque
+
+_Da `implementazioni.md`, CARLO 8._
+
+8. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo. Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su "stacca la spina", il quinto su "registra un pezzo".
+
+   **FATTO (20/09/2026)** — il primo il 16/09: toccando «Studio» sulla mappa (dopo il
+   «Vai» dello spostamento, se non sei già lì) partono i 5,6 secondi di
+   `01_studio_definitivo.mp4` e sotto si apre la stanza. Il meccanismo è generale —
+   `transizioneVideo(id, poi)` in `js/game/transizioni-video.js`, un file nuovo, come
+   chiede la regola dei punti che non sono fix — e sta scritto in
+   `02-interfaccia-e-telefono.md`, «Le transizioni video: il primo, lo Studio». Gli altri
+   quattro il 20/09: `02_ingresso_sala` sul cartello «La Sala», `03_ritorno_casa` su
+   «Casa», `04_stacca_la_spina` sulla mossa «Stacca la spina» da dovunque parta (la porta
+   di Casa, l'agenda, la card della sera), `05_registra_pezzo` sulla prima take in Cabina;
+   «Le transizioni video: gli altri quattro», stesso foglio. Non è il punto delle
+   dissolvenze CSS («Transizioni quando una card apre una pagina», stesso file): quelle
+   restano, il video ci va sopra. **Resta da decidere** cosa fare dei sette video che
+   nessun punto chiede (la voce sua fra le decisioni di «Da fare adesso»).
+
+### L'hype come fattore primario, col tetto legato alla fase — il punto, per intero
+
+_Da `implementazioni.md`, ALE 6 (la nota breve, del 06/09, sta più sotto in questo stesso
+file). La coda che mancava — il pub e la pubblicità come primo modo di fare hype — è una
+voce dell'ordine in `implementazioni.md`, fra i lavori lunghi._
+
+6. Verissima la cosa dell'hype, fattore che dev'essere davvero primario nel gioco e i player dovran costantemente provare a inseguire ma con tanta fatica, Partiamo proprio dallo sviluppo dell'hype :
+
+   L'hype è in scala internazionale, vuol dire che se sei al livello 100 è impossibile che tu sia ancora nel paesino di provincia.
+   Probabilmente all'inizio l'unico modo per fare hype è andare al pub e pubblicare sui social pubblicità per la tua musica (DA SVILUPPARE QUESTO) , ma più di tanto HYPE all'inizio non si può fare, quindi è impossibile che al primo anno rimanendo nella prima città tu diventi 100 di hype
+
+   Tutt'altro se non sei goat manco puoi averli 100 di hype
+
+   L'hype vero si inizierà a fare quando i tuoi numeri social andranno forte e nelle classifiche il tuo nome inizierà a farsi valere sempre di più, quando farai feat con nomi più grandi dei tuoi e i pezzi andranno bene, quando prendiamo una macchina importante e molto costosa e la flexiamo sui social
+
+   Insomma, come le cose che vanno davvero in hype IRL, non se fai un feat con pinko pallino a caso che nessuno conosce
+
+   **FATTO (06/09/2026)** — l'hype adesso ha un **tetto che dipende dalla fase della
+   carriera** (`PHASES[fase].hcap` in `phases.js`, letto da `hypeCap()`): 20 da
+   Sconosciuto, 42 da esordiente, 55, 65, 80, 92, e solo da GOAT il tetto è 100. Non
+   conta _come_ l'hype sale — farmando o con un colpo di fortuna — il tetto tiene
+   comunque, perché è applicato ovunque l'hype cresce (oltre 30 punti diversi nel
+   codice, da `promo` alla Strada). I tetti restano sempre sopra alle soglie
+   `G.hype >= 40/60/55` già richieste dalle prove di passaggio della carriera stessa
+   (`phases.js`, `TRIALS`), quindi nessuna prova diventa impossibile da superare.
+   Sulla fatica vera: la promo sui social aveva già un freno sui follower, ma
+   **l'hype che dà continuava a salire ogni giorno senza limite** — adesso ha anche
+   lui un tetto settimanale (22 punti, `actions.js`), verificato con 7 giorni di
+   promo di fila. Sul lato "quando conta davvero": scalare in classifica adesso dà un
+   bonus d'hype vero e proporzionato al salto (`sim.js`, vicino a `G.best.chart`), e
+   un feat capitato per caso (`events.js`) non vale più sempre uguale: **la maggior
+   parte delle volte è un nome piccolo** (hype modesto), **una volta ogni tanto è uno
+   grosso davvero**, e lì l'hype si muove sul serio — non lo sai finché non firmi,
+   come chiesto. Il "feat con nomi più grandi" esiste già anche come relazione vera
+   con un beatmaker della Sala (`posto.js`, tipo `feat`, scala già con `p.fama`): non
+   toccato, andava già bene. Restano fuori da questo giro — **da sviluppare a
+   parte**, come segnalato nel punto stesso — il pub e la pubblicità come primo modo
+   di fare hype a inizio carriera, che oggi non esistono ancora come luogo/azione.
+   `npm run prova` (70/70) più una verifica dedicata fuori dal browser sui tetti per
+   fase e sul tetto settimanale della promo.
+
+   _(Il punto resta qui apposta, per la coda che manca — il pub e la pubblicità; la nota
+   breve sta in [`fatte.md`](fatte.md).)_
+
+### L'agenda segnata che non fa passare il giorno — risposto, e la cosa sotto è chiusa
+
+_Da `implementazioni.md`, CARLO 16._
+
+16. quando si segna un evento in agenda poi non si riesce a far passare il giorno
+
+    **RISPOSTA (15/09/2026)** — è l'effetto voluto di un tuo punto precedente, «gli eventi
+    segnati in agenda bloccano lo skip» (FATTO 06/09, in [`fatte.md`](fatte.md)): con un
+    appuntamento di oggi ancora da fare il salto non parte, e se è più avanti il salto si
+    ferma alla sua mattina. Un'ora già passata non blocca niente, e «Fine giornata» resta
+    libero apposta. Se il giorno non passa **dopo che l'evento l'hai fatto**, allora è il
+    punto «se partecipo ad un evento segnato… si toglie automaticamente dall'agenda», FATTO il 20/09/2026 (in [`fatte.md`](fatte.md)).
+
+### Il Marketing fuori dallo Studio
+
+_Da `implementazioni.md`, CARLO «Studio (16/09/2026)» 7._
+
+7. marketing toglilo da qua e spostalo, dimmi dove lo metti
+
+   **FATTO (15/09/2026, riconosciuto il 20/09)** — sul telefono: in LaFamegram, in cima al
+   feed, c'è «Che post fai?» (`telPromo()` in `telefono.js`), con i pezzi usciti da spingere
+   e «Non ancora fuori» per l'anteprima; lo Studio dopo l'uscita dice «fallo sapere» e apre
+   il telefono lì. La linguetta Marketing dello Studio non c'è più. Il racconto: «Lo Studio a
+   cinque linguette: B + D3 + F2 + E» in `02-interfaccia-e-telefono.md`.
+
+### La preview di un pezzo non ancora uscito
+
+_Da `implementazioni.md`, CARLO «Studio (16/09/2026)» 8._
+
+8. non posso spingere una canzone che non è ancora uscita, al massimo faccio uscire una preview sul social
+
+   **FATTO (14/09/2026, riconosciuto il 20/09)** — la promo vede solo i pezzi usciti; di un
+   pezzo registrato e non uscito si fa uscire un'anteprima (`anteprima` in `actions.js`: 8
+   energia, hype pieno la prima volta poi a scalare, e alla terza «l'hanno già sentito»), che
+   quando il pezzo esce diventa la spinta della prima settimana. Il racconto: «Un pezzo non
+   uscito non si spinge: se ne fa uscire un'anteprima» in `02-interfaccia-e-telefono.md`.
 
 ### L'evento fatto esce dall'agenda
 
