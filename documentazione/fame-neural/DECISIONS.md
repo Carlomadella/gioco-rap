@@ -964,3 +964,13 @@ La prima inferenza reale HTDemucs/OpenVINO del pilot Source Separation è stata 
 Il run `source-separation-development-inference-v1-001` ha terminato con stato `INFERENCE_COMPLETE_AWAITING_TECHNICAL_AND_HUMAN_QA`, 8/8 record e `technicalValidationPassed=true`. Il comando ha dichiarato final holdout non acceduto, batch 131 non eseguito e training non autorizzato.
 
 Questo risultato certifica che il percorso reale source audio → HTDemucs/OpenVINO → quattro stem → result receipt append-only funziona tecnicamente sul cohort development. **Non certifica ancora qualità musicale o utilità Audio→MIDI**: la promozione resta subordinata alla rubric `source-separation-pilot-review-v1.json`, congelata prima del primo output.
+
+## NDR-067 — Source Separation: technical QA 8/8 PASS, qualità musicale ancora aperta
+
+**Stato: ACCEPTED — 20 settembre 2026.**
+
+Il technical QA read-only del run `source-separation-development-inference-v1-001` è passato con gate `ALL_8_FAMILIES_PASS`: 8/8 result receipt e 32/32 stem sono stati verificati contro SHA, sample rate 44.1 kHz, stereo, lunghezza della sorgente decodificata e finitezza dei sample.
+
+Le metriche `peakAbs`, `rms` e `stemSumResidualRmsRatio` sono state misurate come diagnostica senza hard threshold, coerentemente con la rubric congelata prima del primo output. In particolare `FAME000126` ha il residual ratio osservato più alto (circa 0.1012), ma non viene introdotta retroattivamente una soglia automatica.
+
+Il PASS tecnico non certifica utilità musicale. Il gate Source Separation resta aperto fino alla review umana congelata di drums e bass: mediana del downstream-usefulness almeno 2 e almeno 6/8 family con voto almeno 2 per ciascuno dei due stem. Solo un eventuale PASS di entrambi apre il pilot Audio→MIDI drums/low-end.
