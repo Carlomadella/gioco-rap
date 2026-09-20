@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:20153a1 -->
+## 20/09/26, 11:23 â€” task/mano-rapper-svg â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `20153a1`
+
+### Cosa Ã¨ entrato
+
+- `108ec42` â€” fix(piazza): il giro di chiusura della mano del rapper — l'audit dice perché, l'indice dice che è chiusa â€” **Carlomadella**
+- `309de1c` â€” fix(piazza): «La mano del braccio alzato del rapper è un tracciato SVG rotto» — la curva si chiude sul polso â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/js/creator/nav.js`
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:67e3719 -->
 ## 20/09/26, 01:09 â€” task/piccole-agenda-beat-parametri-licenziarsi â†’ main
 
