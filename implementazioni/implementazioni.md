@@ -54,7 +54,8 @@ cui sono uscite due voci nuove, il 16/09 dopo il primo video delle transizioni (
 resta, a metà), e il 19/09 dopo le pagine di Casa, Palestra, Live Club e stacca la spina
 sulla loro foto (chiusa la voce delle foto; la serata del club giocata a momenti è una voce
 nuova, fra i lavori lunghi) e dopo la schermata dell'avvio rapido; il 20/09 dopo le quattro
-piccole (agenda, prezzi dei beat, parametri a 1, licenziarsi), chiuse in un branch solo. È
+piccole (agenda, prezzi dei beat, parametri a 1, licenziarsi), chiuse in un branch solo, e
+dopo «Le tre del Marketing», che erano chiuse dal 14/09 senza che l'ordine lo dicesse. È
 l'ordine in cui si prendono i punti aperti di questo foglio **e** quelli ancora aperti in
 [`problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md): prima quello che
 tocca il gioco sul telefono (è lì che esce), poi quello che pesa nel pacchetto o blocca una
@@ -73,10 +74,14 @@ da quale lista viene.
    1366 × 768, dove le card degli eventi erano larghe 91 punti e quattro righe del profilo
    sparivano. «La fascia della plancia fra 980 e 1240, e la plancia a 1280 × 800» in
    `02-interfaccia-e-telefono.md`.
-3. **Le tre del Marketing** — da problemi-riscontrati (14/09): «In spinta» che esce come
-   una seconda riga bianca, la riga di pezzo senza seed che è un bottone che non fa
-   niente, il pezzo scelto che può sparire dall'elenco ma resta quello che si spinge; più,
-   sul telefono, il motivo per cui l'anteprima è spenta che viene tagliato.
+3. ~~**Le tre del Marketing**~~ **FATTO (14/09/2026, riconosciuto il 20/09)** — da
+   problemi-riscontrati (14/09): «In spinta» come seconda riga bianca, la riga senza seed
+   che è un bottone muto, il pezzo scelto che sparisce dall'elenco, il motivo dell'anteprima
+   tagliato sul telefono. Erano chiuse tutte e quattro il 14/09 stesso, nel branch del
+   Marketing, e passate pari pari in «Che post fai?» su LaFamegram; riprovate in partita il
+   20/09 e messe sotto audit. Nello stesso giro è venuta fuori e chiusa una cosa nuova: nell'Agenda
+   del telefono le descrizioni lunghe delle mosse finivano coi puntini, adesso vanno su
+   due righe. «Le tre del Marketing» in `02-interfaccia-e-telefono.md`.
 4. ~~**Il giro unico sull'hover al tocco**~~ **FATTO (08/09/2026, riconosciuto il 15/09)** —
    era chiuso da una settimana e tre elenchi lo davano ancora da fare: tutte le regole
    `:hover` stanno in `@media (hover:hover)`, e l'audit lo controlla («La responsività: lo

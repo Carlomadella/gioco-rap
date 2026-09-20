@@ -2497,6 +2497,25 @@ test("sul telefono le tre colonne diventano una pila e le porte della Casa vanno
     /@media \(max-width:620px\)\{[\s\S]*?\.stchi span\{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;/.test(strettoCss));
 }
 
+/* «Le tre del Marketing» (20/09/2026, `implementazioni/02-interfaccia-e-telefono.md`):
+   le tre voci del 14/09 erano chiuse lo stesso giorno, e questo le tiene chiuse; la cosa
+   nuova è la riga delle mosse nell'Agenda del telefono, che va a capo su due righe. */
+console.log("\nLe tre del Marketing (20/09/2026)");
+(function(){
+  const telCss = leggi("css/telefono.css");
+  test("«in spinta» sta nella riga piccola di «Che post fai?» come testo, non come <b> che va a capo",
+    tel.includes('(x.spinta > 1 ? " · in spinta" : "")') && !tel.includes("<b>in spinta</b>"));
+  test("una riga di pezzo senza seed esce senza data-spingi, non come bottone che non fa niente",
+    tel.includes("const seme = s => Number.isFinite(s.seed) ? ' data-spingi=\"' + s.seed + '\"' : \"\";") &&
+    studio.includes("if(!Number.isFinite(seed)) return;"));
+  test("il pezzo scelto piu' vecchio dei sei resta nell'elenco di «Che post fai?»",
+    tel.includes("if(ultimo && elenco.indexOf(ultimo) < 0) elenco.push(ultimo);"));
+  test("il motivo dell'anteprima spenta e' corto e dice dove andare: «un pezzo scelto su LaFamegram»",
+    actions.includes('return !s ? "un pezzo scelto su LaFamegram"'));
+  test("nell'Agenda la riga piccola delle mosse e degli eventi va a capo su due righe, non i puntini",
+    /\.tli\[data-azione\] \.tlitx i,\.tli\[data-evento\] \.tlitx i\{white-space:normal;display:-webkit-box;\s*-webkit-box-orient:vertical;-webkit-line-clamp:2/.test(telCss));
+})();
+
 /* «La mano del braccio alzato del rapper è un tracciato SVG rotto» (20/09/2026):
    la curva che chiudeva la mano aveva due coppie invece di tre, il browser la saltava
    e la mano col microfono non si disegnava. Qui il corpo intero viene generato davvero

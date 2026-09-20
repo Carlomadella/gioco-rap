@@ -226,6 +226,13 @@
 .tlitx b{display:block;font-size:12px;font-weight:700;color:#E8EAF0}
 .tlitx i{display:block;font-style:normal;font-size:10.5px;color:#8A90A0;margin-top:1px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* «Le tue mosse» e «Stasera» nell'Agenda: la riga piccola è la descrizione della mossa o
+   il motivo per cui è spenta («Serve un pezzo scelto su LaFamegram»), e con i puntini
+   se ne perdeva la fine — la riga tiene 46 caratteri (200 punti nella colonna a 1440,
+   251 sul telefono a 390) e promo, anteprima, pesi e cardio ne hanno da 62 a 74. Due
+   righe, poi i puntini. */
+.tli[data-azione] .tlitx i,.tli[data-evento] .tlitx i{white-space:normal;display:-webkit-box;
+  -webkit-box-orient:vertical;-webkit-line-clamp:2;line-height:1.3}
 .tliv{flex:none;font-size:11px;font-weight:700;color:#9AA1B2;display:flex;align-items:center;gap:3px}
 .tliv .hicon{width:12px;height:12px;fill:#FBBF24}
 .tlipos{flex:none;width:20px;text-align:center;font-size:12px;font-weight:800;color:#8A90A0}

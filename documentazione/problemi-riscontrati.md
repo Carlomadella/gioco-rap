@@ -14,7 +14,10 @@ giro sulla mano del rapper ne ha trovate due (33–34), chiuse nello stesso bran
 giorno il giro di fine task sulla fascia della plancia (`task/barra-plancia-980-1180`) ne ha
 trovate sei, più quattro note (voci 35–40), e la prova sul telefono altre sette, di cui tre le
 stesse, una la mano del rapper e una l'orizzontale già aperto (voce 9): le due nuove sono le
-voci 41–42. Tutte chiuse nello stesso branch prima del push.
+voci 41–42. Tutte chiuse nello stesso branch prima del push. Sempre il 20/09 la task «Le tre
+del Marketing» (`task/le-tre-del-marketing`) ha trovato che la voce 2 era **chiusa dal 14/09**
+in tutte e quattro le sue parti — l'indice non l'aveva riconosciuto, come per l'hover — e
+guardando in partita ha trovato una cosa nuova, la voce 43, chiusa nel branch.
 
 1. ~~**Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
    telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra. Il tasto
@@ -24,10 +27,18 @@ voci 41–42. Tutte chiuse nello stesso branch prima del push.
    gradi sotto i 1240 e i 1120, va a capo a 980, sul telefono è tre righe da 165. Nello
    stesso giro la plancia a 1280 × 800 e 1366 × 768 (card degli eventi da 91 punti, quattro
    righe del profilo che sparivano). Il dettaglio sotto alla voce, nel giro del 15/09.
-2. Le tre del Marketing (14/09): **«In spinta» esce come una seconda riga bianca**, **una
+2. ~~Le tre del Marketing (14/09): **«In spinta» esce come una seconda riga bianca**, **una
    riga di pezzo senza seed è un bottone che non fa niente**, **il pezzo scelto può sparire
    dall'elenco, ma resta quello che si spinge**; più **sul telefono il motivo per cui
-   l'anteprima è spenta viene tagliato**.
+   l'anteprima è spenta viene tagliato**.~~ **RISOLTO (14/09/2026, riconosciuto il 20/09)** —
+   tutte e quattro erano chiuse lo stesso giorno, nel branch `task/studio-marketing-scegli-il-pezzo`
+   (le RISOLTE stanno sotto ai giri del 14/09, primo e secondo), e dal 15/09 il Marketing è
+   «Che post fai?» su LaFamegram, dove le tre regole sono passate pari pari. Riprovato in
+   partita il 20/09 a 1440 e a 390: «in spinta» è testo nella riga piccola, la riga senza
+   seed esce senza `data-spingi`, il pezzo scelto più vecchio dei sei sta in elenco con
+   «scelto», «Serve un pezzo scelto su LaFamegram» sta in una riga. Cinque controlli
+   nell'audit lo tengono fermo. Vedi «Le tre del Marketing» in
+   `implementazioni/02-interfaccia-e-telefono.md`.
 3. ~~**Sul telefono i colori del «passaggio del mouse» restano accesi dopo il tocco** (08/09):
    il giro unico su tutti i CSS.~~ **RISOLTO (08/09/2026, riconosciuto il 15/09)** — era
    chiuso lo stesso giorno e la riga sotto alla voce mancava: vedi il giro del 15/09 in fondo.
@@ -187,6 +198,10 @@ voci 41–42. Tutte chiuse nello stesso branch prima del push.
    tagliato, senza un segno** (20/09, prova sul telefono, `hub.css:1436-1450`).~~ **RISOLTO
    (20/09/2026)** — sotto i 780 di altezza il ritratto è 84 × 100 e le linguette 76: a 1366 × 768
    e 1024 × 768 la colonna è 555 in 555.
+43. ~~**Nell'Agenda del telefono la descrizione di quattro mosse finisce coi puntini**
+   (20/09, «Le tre del Marketing»): promo, anteprima, pesi e cardio, quando la mossa è
+   accesa.~~ **RISOLTO (20/09/2026)** — nell'Agenda la riga piccola delle mosse e degli
+   eventi va a capo su due righe. Il dettaglio nel giro in fondo.
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
 
 ---
@@ -2025,6 +2040,9 @@ Marketing». `SND.anteprima = "promo"` in `fx.js`.
   gia'. Dedotto da misure del CSS, non visto su un telefono vero: va guardato.
 - **come si vede** — telefono, Agenda, «Le tue mosse», senza aver scelto niente al Marketing.
 - **quanto pesa** — da sistemare con calma.
+- **RISOLTO (14/09/2026, riconosciuto il 20/09)** — il motivo è «un pezzo scelto su
+  LaFamegram» (`actions.js`, commit `e288634`): misurato il 20/09 in partita, 204 punti in
+  204 nella colonna a 1440 e 255 in 255 sul telefono a 390, senza puntini.
 
 ### L'anteprima fa il rumore di un tocco qualsiasi, non quello della promo
 
@@ -4634,3 +4652,47 @@ finiscono nel comando prima e il test diventa rosso per sbaglio. Rosso, non verd
 vede, quindi va bene.
 
 L'indice «Cosa resta aperto» in testa al foglio ha le voci 33 e 34 di questo giro.
+
+## Giro del 20/09/2026 (task `task/le-tre-del-marketing`, «Le tre del Marketing»)
+
+La voce 2 dell'indice — le tre cose del Marketing trovate il 14/09, più il motivo tagliato
+sul telefono — è **chiusa dal 14/09**: le quattro RISOLTE stanno sotto ai giri di quel giorno
+(primo e secondo), nei commit `98cc918`, `28c6561` e `e288634` dello stesso branch, e il
+foglio dei punti lo dice da allora («Sistemate insieme le quattro cose che segnala-problemi
+aveva trovato sul Marketing», sotto «Quando tieni la take si chiede solo il nome»). Il
+riordino del 15/09 non l'ha riconosciuto e la voce è rimasta aperta per sei giorni — lo
+stesso caso dell'hover (voce 3). Riprovato in partita con Playwright (server di sviluppo,
+otto pezzi fuori e uno no, il più vecchio scelto), a 1440 e a 390: «in spinta» è testo nella
+riga piccola e la riga è alta come le altre (56); la riga senza seed esce senza
+`data-spingi`; «Pezzo 1», scelto e più vecchio dei sei, sta in elenco con «scelto»;
+«Serve un pezzo scelto su LaFamegram» sta in una riga (255 in 255). Cinque controlli nuovi
+nell'audit («Le tre del Marketing (20/09/2026)») tengono ferme le quattro cose e la quinta
+qui sotto.
+
+### Nell'Agenda del telefono la descrizione di quattro mosse finisce coi puntini
+
+- **dove** — `frontend/css/telefono.css` (`.tlitx i`, una riga sola con
+  `text-overflow:ellipsis`) contro `frontend/js/game/actions.js` (le `d:` di `promo`, 62
+  caratteri; `anteprima`, 74; `palestra_pesi`, 70; `palestra_cardio`, 66) e
+  `telefono.js` (`schermataAgenda`, «Le tue mosse»).
+- **cosa succede** — la riga piccola tiene circa 46 caratteri nella colonna a 1440 (200
+  punti) e sul telefono a 390 (251): «Il foglio, la penna e quello che hai in testa.» ci sta
+  esatto, le altre nove pure. Le quattro lunghe no: «Clip e provocazioni. Spinge il pezzo
+  che scegl…» (294 punti in 200) — e la parte che se ne va è proprio «su LaFamegram», dove
+  andare a scegliere. Il motivo della mossa spenta è corto dal 14/09; la descrizione della
+  mossa accesa, che compare al suo posto quando puoi farla, no. Misurato in partita con
+  `scrollWidth > clientWidth` su tutte e tredici le righe, a 1440 e a 390: tagliate la promo
+  e, col pezzo scelto, l'anteprima; pesi e cardio mostravano «Devi andare a Palestra» e i
+  loro 70 e 66 caratteri sono contati sul testo, non misurati.
+- **come si vede** — telefono, Agenda, «Le tue mosse», con un pezzo fuori (la promo accesa).
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (20/09/2026)** — non accorciando i testi (sono gli stessi della scena a schermo
+  pieno dopo la mossa, e lì stanno bene) ma nella riga: in `telefono.css` la riga piccola
+  delle mosse e degli eventi dell'Agenda (`.tli[data-azione]`, `.tli[data-evento]`) va a
+  capo su due righe (`-webkit-line-clamp:2`), poi i puntini. Le altre liste del telefono con
+  la stessa riga (contatti, agenda segnata, «Che post fai?») non cambiano. Riprovato: a 1440
+  le due righe lunghe (promo e anteprima) sono alte 64 invece di 51, a 390 68 invece di
+  53, a 360 48 invece di 37; nessuna delle tredici è tagliata. Il controllo sta nell'audit.
+
+L'indice «Cosa resta aperto» in testa al foglio ha la voce 2 barrata e la voce 43 di questo
+giro.
