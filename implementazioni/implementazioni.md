@@ -50,8 +50,9 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 Smistato il 15/09/2026, dopo la chiusura di «Sputa» e della regola nuova sull'energia in
 Cabina; riguardato lo stesso giorno dopo «Il telefono quando lo schermo è un telefono», da
-cui sono uscite due voci nuove, il 16/09 dopo il primo video delle transizioni (la voce
-resta, a metà), e il 19/09 dopo le pagine di Casa, Palestra, Live Club e stacca la spina
+cui sono uscite due voci nuove, il 16/09 dopo il primo video delle transizioni (chiusa
+il 20/09 con gli altri quattro; resta la decisione sui sette video in più), e il 19/09
+dopo le pagine di Casa, Palestra, Live Club e stacca la spina
 sulla loro foto (chiusa la voce delle foto; la serata del club giocata a momenti è una voce
 nuova, fra i lavori lunghi) e dopo la schermata dell'avvio rapido; il 20/09 dopo le quattro
 piccole (agenda, prezzi dei beat, parametri a 1, licenziarsi), chiuse in un branch solo, e
@@ -89,13 +90,12 @@ da quale lista viene.
 
 **Pesa nel pacchetto o blocca una partita**
 
-5. **Le transizioni video** — CARLO, «implementa le transizioni dentro al progetto, che
-   partano cliccando sulla scheda collegata». I 12 video stanno già in
-   `frontend/media/video/Transizioni di scena/` (28 MB). **FATTO in parte (16/09/2026)** —
-   il primo, lo Studio, è collegato (`js/game/transizioni-video.js`, «Le transizioni video:
-   il primo, lo Studio» in `02-interfaccia-e-telefono.md`); gli altri quattro del punto
-   (Sala, Casa, stacca la spina, registra) si agganciano allo stesso modo, e i sette video
-   che nessun punto chiede restano peso morto nel pacchetto: o si collegano o escono.
+5. ~~**Le transizioni video**~~ **FATTO (20/09/2026)** — CARLO, «implementa le transizioni
+   dentro al progetto, che partano cliccando sulla scheda collegata». Lo Studio dal 16/09;
+   il 20/09 gli altri quattro del punto: la Sala e Casa sul cartello, «stacca la spina»
+   sulla mossa da dovunque parta, «registra» sulla prima take in Cabina. «Le transizioni
+   video: gli altri quattro» in `02-interfaccia-e-telefono.md`. **Resta una decisione**, la
+   voce sua in fondo: i sette video che nessun punto chiede.
 6. ~~**L'avvio rapido ci mette due minuti e non lo dice**~~ **FATTO (19/09/2026)** — la
    schermata «Preparo il tuo artista» sta sopra al creator nascosto con le fasi vere del
    camerino, il tempo che passa e tre tasti se si rompe; e i due minuti erano il browser
@@ -181,6 +181,14 @@ da quale lista viene.
     manifest né un `orientation`, da problemi-riscontrati); e se cancellare gli undici
     branch già uniti in `main` (`git branch --merged main` li elenca, da
     `test/vitest-playwright-gate` a `task/studio-cinque-linguette`), anche sul remoto.
+27. **I sette video che nessun punto chiede** — la coda delle transizioni video (FATTO il
+    20/09 per i cinque del punto): palestra, Milano, club, shop, trasferta, live, più
+    `video_transizione_entrata_in_studio` che è un doppione dello studio. Sono 22 MB in
+    `frontend/media/video/Transizioni di scena/` che viaggiano nel pacchetto per gli
+    store senza che nessuna riga li carichi. O si collegano — la palestra, il club e lo
+    shop hanno un cartello, il live è una mossa, Milano e la trasferta sono i viaggi, e
+    il meccanismo è pronto (`TRANSIZIONI_VIDEO` in `js/game/transizioni-video.js`, una
+    riga e una chiamata l'uno) — o escono da `media/`. Il doppione esce comunque.
 
 **Ancora da smistare (16/09/2026):** i sette punti nuovi di CARLO — sei sullo Studio (il
 Marketing da spostare, la preview sul social prima dell'uscita, le sezioni in automatico coi
@@ -415,20 +423,19 @@ con lo stesso numero e resta così._
 
 8. implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata — studio, sala, ritorno a casa, stacca la spina, registra un pezzo. Nel dettaglio: il primo video parte quando il player clicca sul luogo chiamato "studio", il secondo quando clicca su "sala", il terzo quando decide di tornare a "casa", il quarto su "stacca la spina", il quinto su "registra un pezzo".
 
-   **FATTO in parte (16/09/2026)** — il primo dei cinque: toccando «Studio» sulla mappa
-   (dopo il «Vai» dello spostamento, se non sei già lì) partono i 5,6 secondi di
+   **FATTO (20/09/2026)** — il primo il 16/09: toccando «Studio» sulla mappa (dopo il
+   «Vai» dello spostamento, se non sei già lì) partono i 5,6 secondi di
    `01_studio_definitivo.mp4` e sotto si apre la stanza. Il meccanismo è generale —
    `transizioneVideo(id, poi)` in `js/game/transizioni-video.js`, un file nuovo, come
    chiede la regola dei punti che non sono fix — e sta scritto in
-   `02-interfaccia-e-telefono.md`, «Le transizioni video: il primo, lo Studio». **Cosa
-   manca:** gli altri quattro — `02_ingresso_sala` sul cartello «La Sala»,
-   `03_ritorno_casa` su «Casa», `04_stacca_la_spina` sull'azione «Stacca la spina»,
-   `05_registra_pezzo` sull'incisione in Cabina — si aggiungono ognuno con una riga in
-   `TRANSIZIONI_VIDEO` e la chiamata al posto giusto; e va deciso cosa fare dei sette video
-   che nessun punto chiede (palestra, Milano, club, shop, trasferta, live, più un doppione
-   dello studio: 22 MB), che nel pacchetto per gli store viaggiano ancora per niente. Non è
-   il punto delle dissolvenze CSS («Transizioni quando una card apre una pagina», stesso
-   file): quelle restano, il video ci va sopra.
+   `02-interfaccia-e-telefono.md`, «Le transizioni video: il primo, lo Studio». Gli altri
+   quattro il 20/09: `02_ingresso_sala` sul cartello «La Sala», `03_ritorno_casa` su
+   «Casa», `04_stacca_la_spina` sulla mossa «Stacca la spina» da dovunque parta (la porta
+   di Casa, l'agenda, la card della sera), `05_registra_pezzo` sulla prima take in Cabina;
+   «Le transizioni video: gli altri quattro», stesso foglio. Non è il punto delle
+   dissolvenze CSS («Transizioni quando una card apre una pagina», stesso file): quelle
+   restano, il video ci va sopra. **Resta da decidere** cosa fare dei sette video che
+   nessun punto chiede (la voce sua fra le decisioni di «Da fare adesso»).
 
 9. quando skippi tante ore ci mette troppo a simulare
 

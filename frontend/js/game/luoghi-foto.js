@@ -111,6 +111,10 @@ function chiudiLuogo(){
 function renderLuogo(){
   const root = $("luogo");
   if(!root || !root.classList.contains("on") || !LUOGO) return;
+  /* fra il tasto e il filmato della mossa (l'incarto di mostraScena, sotto)
+     la pagina resta com'era: la mossa è già fatta, e ridisegnarla adesso
+     direbbe «la seconda volta oggi recupera meno» col tasto d'oro ancora lì */
+  if(LUOGO.attesa) return;
   const L = LUOGHI_FOTO[LUOGO.id];
   root.dataset.luogo = LUOGO.id;
 
@@ -375,10 +379,11 @@ function lfLive(){
 /* ==================== LE MOSSE ====================
    Da qui parte una mossa di actions.js, come dai cartelli. Prima si fotografa
    com'eri, per scrivere i numeri veri nell'esito. */
+const lfFotografia = () => ({well:G.wellbeing, rete:(G.skills && G.skills.rete) || 0,
+  pres:(G.skills && G.skills.presenza) || 0, money:G.money, fans:G.fans});
 function luogoVai(id){
   if(!LUOGO) return;
-  LUOGO.prima = {well:G.wellbeing, rete:(G.skills && G.skills.rete) || 0,
-    pres:(G.skills && G.skills.presenza) || 0, money:G.money, fans:G.fans};
+  LUOGO.prima = lfFotografia();
   LUOGO.esito = null;
   if(typeof SFX === "object" && SFX.tap) SFX.tap();
   avviaAzioneDiretta(id);
@@ -405,16 +410,43 @@ if(typeof renderGioco === "function"){
    e qui la si incarta, come fa già interruzioni.js: se la mossa è una di
    quelle di LUOGO_MOSSE si apre (o si aggiorna) la sua pagina e l'esito si
    legge lì; tutte le altre continuano come prima. */
+/* La fotografia dei numeri la faceva solo il tasto sulla pagina (`luogoVai`):
+   dall'agenda del telefono o da una card della sera i due numeri grandi
+   dell'esito uscivano «—». Si incarta anche `avviaAzioneDiretta` (ui.js):
+   una mossa con la pagina si fotografa prima di partire, da ogni strada. */
+let LF_PRIMA = null;
+if(typeof avviaAzioneDiretta === "function"){
+  const lfAvviaOriginale = avviaAzioneDiretta;
+  window.avviaAzioneDiretta = function(id){
+    if(LUOGO_MOSSE[id] && typeof G !== "undefined" && G) LF_PRIMA = lfFotografia();
+    return lfAvviaOriginale.apply(this, arguments);
+  };
+}
 if(typeof mostraScena === "function"){
   const lfScenaOriginale = mostraScena;
   window.mostraScena = function(a, sc, msg, extra){
     const id = a && LUOGO_MOSSE[a.id];
     if(!id) return lfScenaOriginale.apply(this, arguments);
-    /* arrivata da fuori (una card degli eventi, l'agenda): la pagina si apre
-       adesso, e «Continua» la richiude */
-    if(!LUOGO || LUOGO.id !== id) apriLuogo(id, {da:"mossa"});
-    LUOGO.esito = {a:a.id, msg:String(msg == null ? "" : msg), extra:String(extra == null ? "" : extra)};
-    renderLuogo();
+    const esito = {a:a.id, msg:String(msg == null ? "" : msg), extra:String(extra == null ? "" : extra)};
+    const mostra = () => {
+      /* arrivata da fuori (una card degli eventi, l'agenda): la pagina si apre
+         adesso, e «Continua» la richiude */
+      if(!LUOGO || LUOGO.id !== id) apriLuogo(id, {da:"mossa"});
+      LUOGO.attesa = false;
+      if(!LUOGO.prima) LUOGO.prima = LF_PRIMA;
+      LF_PRIMA = null;
+      LUOGO.esito = esito;
+      renderLuogo();
+    };
+    /* la pagina è già aperta (il tasto d'oro): resta com'è finché il filmato
+       non ha finito, vedi renderLuogo */
+    if(LUOGO && LUOGO.id === id) LUOGO.attesa = true;
+    /* «stacca la spina» è una delle cinque mosse con un filmato
+       (js/game/transizioni-video.js): il divano e la tele, e poi si legge
+       com'è andata la serata. La mossa è già fatta — i numeri sono cambiati
+       — e il filmato sta fra il tasto e l'esito, da dovunque sia partita. */
+    if(typeof transizioneVideo === "function" && TRANSIZIONI_VIDEO[a.id]) transizioneVideo(a.id, mostra);
+    else mostra();
   };
 }
 

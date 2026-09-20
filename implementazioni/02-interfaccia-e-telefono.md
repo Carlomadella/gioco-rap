@@ -1914,11 +1914,87 @@ all'orologio e sotto alla Strada, che il menu di sistema la riconosca e che la c
 d'attesa ci sia. I quattro problemi del giro di fine task del 16/09 (problemi-riscontrati)
 sono chiusi qui dentro, prima del commit.
 
-**Cosa manca:** gli altri quattro video del punto — `02_ingresso_sala` su «La Sala»,
-`03_ritorno_casa` su «Casa», `04_stacca_la_spina` sull'azione, `05_registra_pezzo`
-sull'incisione — e una decisione sui sette che nessun punto chiede (palestra, Milano, club,
-shop, trasferta, live, più `video_transizione_entrata_in_studio` che è un doppione dello
-studio): 22 MB che nel pacchetto viaggiano ancora per niente.
+**Cosa mancava:** gli altri quattro video del punto, agganciati il 20/09 — la sezione qui
+sotto — e una decisione sui sette che nessun punto chiede, che resta fra le decisioni di
+`implementazioni.md`.
+
+## Le transizioni video: gli altri quattro — la Sala, Casa, stacca la spina, registra
+
+> Lo stesso punto di CARLO: «il secondo quando clicca su "sala", il terzo quando decide di
+> tornare a "casa", il quarto su "stacca la spina", il quinto su "registra un pezzo"».
+
+**FATTO (20/09/2026)** — branch `task/transizioni-video-le-altre`. Il punto è chiuso: i
+cinque video che chiede sono tutti collegati. File: `js/game/transizioni-video.js` (la
+tabella, con quattro righe in più e due tabelle piccole), `js/game/hub.js` (i due cartelli),
+`js/game/luoghi-foto.js` (la mossa), `js/game/studio-elementi.js` (la take),
+`strumenti/audit-regressioni.js` (sei controlli in più nel blocco delle transizioni).
+
+**Dove partono.** Guardati fotogramma per fotogramma prima di agganciarli, perché il nome
+del file non basta a dire cosa c'è dentro:
+
+- **La Sala** (`02_ingresso_sala`: la strada, il portone, la stanza coi computer) sul
+  cartello «La Sala», prima di `apriPosto()` — come lo Studio.
+- **Casa** (`03_ritorno_casa`: la via di notte, le scale, il salotto) sul cartello «Casa»,
+  prima di `apriLuogo("casa")`.
+- **Stacca la spina** (`04_stacca_la_spina`: entra in salotto, si siede, la tele) non su un
+  cartello ma **sulla mossa**, da dovunque parta — la porta di Casa, l'agenda del telefono,
+  la card «Piccolo party» della sera. Il posto giusto era già lì: l'incarto di `mostraScena`
+  in `luoghi-foto.js`, che dal 19/09 manda l'esito di quella mossa sulla foto del divano. La
+  mossa è già fatta quando il filmato parte (i numeri sono cambiati, il salvataggio pure): il
+  video sta fra il tasto e l'esito, e a filmato finito la pagina si apre con «Ti sei
+  fermato. Benessere +13…». Sotto i 1180, dall'agenda, il telefono resta alzato sotto alla
+  copertura trasparente dell'attesa e si mette giù quando la pagina si apre.
+- **Registra** (`05_registra_pezzo`: il microfono, il foglio sul leggio, il banco) **sulla
+  prima take del pezzo** in Cabina, non su «Tieni questa e chiudi» e non su ogni take: la
+  prima è quella in cui si entra in cabina, le altre cinque ripetono, e sei filmati per un
+  pezzo non li vuole nessuno. L'energia è già scalata quando parte; il tiro di dado della
+  take arriva a filmato finito (o al tocco che lo salta).
+
+**Il download, con cinque video.** Il puntatore sul cartello prepara il filmato di quel
+posto, ma i cartelli hanno un id loro (`beat` per la Sala, `vita` per Casa): la tabella
+`TRANSIZIONI_CARTELLI` traduce. E le due mosse non hanno un cartello su cui passare: quando
+un filmato finisce si prepara quello che può venire subito dopo nella pagina appena aperta
+(`TRANSIZIONI_DOPO`: dopo lo Studio si prepara «registra», dopo Casa «stacca la spina»), a
+dissolvenza finita — cambiare `src` mentre il filmato sfuma lo farebbe sparire di colpo.
+Chi arriva allo «stacca la spina» dall'agenda senza passare da Casa ha la regola di sempre:
+un secondo e mezzo, poi la pagina e basta.
+
+**Una cosa trovata agganciando la Sala.** L'elemento video è uno solo, e la precarica dello
+Studio quattro secondi dopo l'avvio gli cambiava `src` anche se in quei quattro secondi
+avevi toccato la Sala: il filmato della Sala si tagliava lì, e lo schermo restava nero fino
+alla rete di sicurezza. Era così anche prima (con lo Studio solo, il caso era «tocchi lo
+Studio prima dei quattro secondi» e la precarica trovava lo stesso file: non si vedeva).
+Adesso `transizioneVideoPrepara` non tocca niente mentre un filmato va (`TVID_CORRENTE`).
+
+**Provato** con Playwright sul Chrome installato, a 1440 × 900 e a 390 × 844: la Sala e
+Casa partono al cartello e a 5,6 s si apre la pagina sotto; dopo Casa il video pronto è
+`04_stacca`, dopo lo Studio è `05_registra`; lo «stacca la spina» dalla porta di Casa e
+dall'agenda del telefono passa dal filmato e finisce sull'esito (benessere 80 → 93); la
+prima take in Cabina passa dal filmato, la seconda no (take 1 → 2 senza copertura); con le
+animazioni spente la Sala si apre diretta; l'Esc a metà del filmato della Sala apre la Sala
+senza menu di pausa. 409 controlli dell'audit, tutti verdi.
+
+**Da decidere** (in `implementazioni.md`, fra le decisioni): i sette video che nessun punto
+chiede — palestra, Milano, club, shop, trasferta, live, più
+`video_transizione_entrata_in_studio` che è un doppione dello studio — 22 MB che nel
+pacchetto per gli store viaggiano ancora per niente. O si collegano (la palestra, il club e
+lo shop hanno un cartello; il live è una mossa; Milano e la trasferta sono i viaggi) o
+escono da `media/`.
+
+**Il giro di fine task** (problemi-riscontrati, voci 47–51, tutte chiuse nel branch) ha
+trovato quattro cose nel gioco e una nel foglio. La copertura del filmato prendeva i tocchi
+ma **non il fuoco**: un Invio subito dopo il clic premeva di nuovo il tasto sotto (una
+seconda take pagata come seconda sessione, la mossa fatta due volte) — adesso la copertura
+prende il fuoco, Invio e spazio saltano il filmato come un tocco, Tab non gira per la pagina
+sotto. Il tasto **«Anni di Fame»** apriva il menu di sistema sopra al filmato (dallo Studio
+del 16/09): i tre tasti della barra sono inerti col filmato in corso, come «MAPPA» già era.
+Nell'**attesa** che il filmato dello «stacca la spina» partisse, la pagina sotto si
+ridisegnava già fatta («la seconda volta oggi recupera meno», il tasto d'oro ancora lì): fra
+il tasto e il filmato la pagina resta com'era (`LUOGO.attesa`). E arrivando allo «stacca la
+spina» **dall'agenda o da una card** i due numeri grandi erano «—» — non del branch, dal
+19/09: la fotografia dei numeri la faceva solo il tasto sulla pagina; adesso
+`luoghi-foto.js` incarta anche `avviaAzioneDiretta` e la fa da ogni strada. Quattro
+controlli in più nell'audit, 413 verdi.
 
 ## Le pagine dei posti sulla loro foto: Casa, Palestra, Live Club, stacca la spina
 

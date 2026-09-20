@@ -2347,19 +2347,23 @@ test("nessun :hover fuori da @media (hover:hover): sul telefono non resta acceso
   })());
 
 /* «Implementa le transizioni dentro al progetto, che partano cliccando sulla
-   scheda collegata»: il primo video, lo Studio. I dodici filmati stavano in
-   media/ da dieci giorni senza che nessuna riga li caricasse — 28 MB nel
-   pacchetto per niente. Adesso il cartello dello Studio passa da
-   transizioneVideo() prima di apriStudio(); la prova è che il file c'è, che
-   la pagina lo carica prima di hub.js, e che la copertura sta sopra allo
-   Studio (che si apre SOTTO al video prima della dissolvenza) e sotto al
+   scheda collegata»: il primo video, lo Studio (16/09), poi gli altri quattro
+   del punto (20/09): la Sala, Casa, stacca la spina, registra. I dodici
+   filmati stavano in media/ da dieci giorni senza che nessuna riga li
+   caricasse — 28 MB nel pacchetto per niente. Adesso il cartello dello Studio
+   passa da transizioneVideo() prima di apriStudio(); la prova è che il file
+   c'è, che la pagina lo carica prima di hub.js, e che la copertura sta sopra
+   allo Studio (che si apre SOTTO al video prima della dissolvenza) e sotto al
    toast. Se un giorno si toglie apposta, via anche questo blocco. */
 const tvid = leggi("js/game/transizioni-video.js");
 const tvidCss = leggi("css/transizioni-video.css").replace(/\s+/g, "");
-test("il video dello Studio esiste dove transizioni-video.js lo cerca",
+test("i cinque video della tabella esistono dove transizioni-video.js li cerca",
   (() => {
-    const m = tvid.match(/studio:\s*"([^"]+\.mp4)"/);
-    return !!m && fs.existsSync(path.join(ROOT, m[1]));
+    const tab = tvid.match(/const TRANSIZIONI_VIDEO = \{([\s\S]*?)\n\};/);
+    const file = tab ? [...tab[1].matchAll(/^\s*(\w+):\s*"([^"]+\.mp4)"/gm)] : [];
+    return file.length === 5 &&
+      ["studio", "sala", "casa", "stacca", "registra"].every(id => file.some(f => f[1] === id)) &&
+      file.every(f => fs.existsSync(path.join(ROOT, f[2])));
   })());
 test("gioco.html carica transizioni-video.js prima di hub.js, e il suo CSS",
   (() => {
@@ -2369,6 +2373,58 @@ test("gioco.html carica transizioni-video.js prima di hub.js, e il suo CSS",
   })());
 test("il cartello dello Studio passa dal video prima di aprire la stanza",
   /id:"studio"[\s\S]{0,600}?transizioneVideo\("studio",[\s\S]{0,80}?apriStudio\(/.test(hub));
+/* Gli altri quattro (20/09/2026): due cartelli, una mossa, una take. La
+   Sala e Casa come lo Studio; «stacca la spina» nel punto dove l'esito di
+   quella mossa va sulla sua foto (l'incarto di mostraScena in luoghi-foto.js),
+   così il filmato c'è da qualunque parte parta — la porta di Casa, l'agenda
+   del telefono, la card della sera; «registra» sulla PRIMA take del pezzo,
+   non su tutte e sei. */
+test("i cartelli della Sala e di Casa passano dal loro video",
+  /id:"beat"[\s\S]{0,300}?transizioneVideo\("sala",[\s\S]{0,40}?apriPosto\(/.test(hub) &&
+  /id:"vita"[\s\S]{0,300}?transizioneVideo\("casa",[\s\S]{0,40}?apriLuogo\("casa"\)/.test(hub));
+test("«stacca la spina» ha il filmato fra il tasto e l'esito, da dovunque parta",
+  /window\.mostraScena = function[\s\S]{0,1400}?transizioneVideo\(a\.id, mostra\)/.test(leggi("js/game/luoghi-foto.js")));
+test("«registra» ha il filmato sulla prima take del pezzo, e solo su quella",
+  /function studioTakeAncora\(\)[\s\S]{0,2200}?if\(!t\.l\.length && typeof transizioneVideo === "function"\) transizioneVideo\("registra", incidi\)/.test(leggi("js/game/studio-elementi.js")));
+test("il puntatore sul cartello prepara il video giusto: i cartelli hanno un id loro",
+  /TRANSIZIONI_CARTELLI = \{studio:"studio", beat:"sala", vita:"casa"\}/.test(tvid) &&
+  tvid.includes("transizioneVideoPrepara(TRANSIZIONI_CARTELLI[b.dataset.l])"));
+/* L'elemento video è uno solo: la precarica dello Studio (quattro secondi
+   dopo l'avvio) cambiava `src` a un filmato che stava andando e lo tagliava
+   lì. Visto agganciando la Sala: se la tocchi nei primi quattro secondi. */
+test("mentre un filmato va nessuna precarica gli cambia il file sotto",
+  /function transizioneVideoPrepara\(id\)\{\r?\n\s*const src = TRANSIZIONI_VIDEO\[id\]; if\(!src \|\| TVID_CORRENTE\) return;/.test(tvid) &&
+  /transizioneVideoPrepara\(id\);\r?\n\s*TVID_CORRENTE = id;/.test(tvid));
+test("finito un filmato si prepara quello che può venire dopo nella pagina aperta",
+  /TRANSIZIONI_DOPO = \{studio:"registra", casa:"stacca"\}/.test(tvid) &&
+  tvid.includes("if(TRANSIZIONI_DOPO[id]) transizioneVideoPrepara(TRANSIZIONI_DOPO[id]);"));
+/* Il giro di fine task del 20/09 (problemi-riscontrati, voci 47–50): la
+   copertura prendeva i tocchi ma non il fuoco — un Invio dopo il clic premeva
+   di nuovo il tasto sotto al filmato (seconda take pagata come seconda
+   sessione); il tasto «Anni di Fame» apriva il menu sopra al filmato; nell'attesa
+   la pagina dello «stacca la spina» si ridisegnava già fatta; dall'agenda i due
+   numeri grandi erano «—». */
+test("la copertura del video prende il fuoco, e Invio, spazio e Tab non arrivano al tasto sotto",
+  tvid.includes("box.tabIndex = -1;") && tvid.includes("box.focus({preventScroll:true})") &&
+  /e\.key === "Escape" \|\| e\.key === "Enter" \|\| e\.key === " "/.test(tvid) &&
+  tvid.includes('else if(e.key === "Tab") e.preventDefault();') &&
+  tvid.includes('document.addEventListener("keydown", tasto, true)') &&
+  tvid.includes('document.addEventListener("keyup", tasto, true)'));
+test("la barra in alto è inerte col filmato in corso: il menu non si apre sopra al video",
+  /closest\("\[data-adf-global\]"\);\s*if\(global\)\{[\s\S]{0,500}?if\(document\.querySelector\("#tvid\.on, #tvid\.attesa"\)\) return;/.test(leggi("js/menu-sistema.js")));
+test("fra il tasto e il filmato la pagina della mossa resta com'era",
+  (() => {
+    const lf = leggi("js/game/luoghi-foto.js");
+    return lf.includes("if(LUOGO.attesa) return;") &&
+      lf.includes("if(LUOGO && LUOGO.id === id) LUOGO.attesa = true;") &&
+      lf.includes("LUOGO.attesa = false;");
+  })());
+test("la fotografia dei numeri si fa da ogni strada, non solo dal tasto sulla pagina",
+  (() => {
+    const lf = leggi("js/game/luoghi-foto.js");
+    return /window\.avviaAzioneDiretta = function\(id\)\{\s*if\(LUOGO_MOSSE\[id\][^\n]*LF_PRIMA = lfFotografia\(\);/.test(lf) &&
+      lf.includes("if(!LUOGO.prima) LUOGO.prima = LF_PRIMA;");
+  })());
 test("la copertura del video sta sopra all'orologio del telefono (142) e sotto alla Strada (180)",
   (() => {
     const m = tvidCss.match(/\.tvid\{[^}]*z-index:(\d+)/);
@@ -2411,7 +2467,8 @@ test("ogni foto di LUOGHI_FOTO esiste sul disco, quella di giorno del divano com
     return !!dir && foto.length >= 6 && foto.every(f => fs.existsSync(path.join(ROOT, dir + f)));
   })());
 test("Casa, Palestra e Live Club sulla mappa aprono la pagina, non piu' la finestra con due risposte",
-  /id:"vita",[\s\S]{0,80}?apriLuogo\("casa"\)/.test(hub) &&
+  /* dal 20/09 Casa passa prima dal suo video: il commento in mezzo allunga la strada */
+  /id:"vita",[\s\S]{0,240}?apriLuogo\("casa"\)/.test(hub) &&
   /id:"palestra",[\s\S]{0,80}?apriLuogo\("palestra"\)/.test(hub) &&
   /id:"concerti",[\s\S]{0,80}?apriLuogo\("live"\)/.test(hub));
 test("le quattro mosse con la pagina finiscono sulla loro foto, e sono tutte scene a pagina piena",

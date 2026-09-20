@@ -481,6 +481,11 @@
     if(global){
       e.preventDefault();
       e.stopImmediatePropagation();
+      /* col filmato di una transizione in corso la barra è inerte, come
+         «MAPPA» già faceva: il menu si apriva sopra al filmato e a fine
+         filmato la pagina si apriva sotto al menu. Un tocco sul filmato lo
+         salta, e poi la barra torna. */
+      if(document.querySelector("#tvid.on, #tvid.attesa")) return;
       if(global.dataset.adfGlobal === "mappa") tornaMappa();
       else if(global.dataset.adfGlobal === "menu") uscitaRapida();
       else apri();

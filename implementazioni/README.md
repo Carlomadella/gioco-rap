@@ -15,7 +15,7 @@ Quelli che erano rimasti indietro nel foglio — chiusi ma mai smistati — stan
 | file | cosa c'è dentro |
 | --- | --- |
 | [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 16 voci |
-| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 43 voci |
+| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 44 voci |
 | [`03-artista-e-avatar.md`](03-artista-e-avatar.md) | **L'artista e il suo avatar** — 1 voce |
 | [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 16 voci |
 | [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 13 voci |
@@ -33,8 +33,8 @@ per i punti, e sono in [`../documentazione/come-si-lavora.md`](../documentazione
 
 ## Tutti i punti
 
-126 voci in tutto: **90 chiuse**, 14 a metà, 17 da fare e 5 con la sola risposta scritta
-(ricontate dalla tabella qui sotto il 20/09/2026, dopo «Le tre del Marketing»; nello stesso
+127 voci in tutto: **92 chiuse**, 13 a metà, 17 da fare e 5 con la sola risposta scritta
+(ricontate dalla tabella qui sotto il 20/09/2026, dopo le transizioni video; nello stesso
 conto sono entrate tre sezioni del foglio dell'interfaccia che alla tabella mancavano — l'avvio
 rapido, le pagine dei posti sulla loro foto, la fascia della plancia). A che punto siamo
 nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../documentazione/roadmap.md).
@@ -130,7 +130,8 @@ nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../docume
 | **—** | La chat del telefono non va più in loop | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Sputa: la seconda app del telefono per postare | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Il telefono quando lo schermo è un telefono | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
-| **—** | Le transizioni video: il primo, lo Studio | in parte | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | Le transizioni video: il primo, lo Studio | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | Le transizioni video: gli altri quattro — la Sala, Casa, stacca la spina, registra | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Studio · Non si spende energia per tenere una take | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
 | **—** | Scambiarsi il numero con fonici e beatmaker | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Una gerarchia per gli incontri mentre si salta il tempo | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |

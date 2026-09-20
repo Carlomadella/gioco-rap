@@ -18,7 +18,12 @@ voci 41–42. Tutte chiuse nello stesso branch prima del push. Sempre il 20/09 l
 del Marketing» (`task/le-tre-del-marketing`) ha trovato che la voce 2 era **chiusa dal 14/09**
 in tutte e quattro le sue parti — l'indice non l'aveva riconosciuto, come per l'hover — e
 guardando in partita ha trovato una cosa nuova, la voce 43, chiusa nel branch; il giro di
-fine task ne ha trovate tre (44–46), chiuse nello stesso branch prima del push.
+fine task ne ha trovate tre (44–46), chiuse nello stesso branch prima del push. Sempre il
+20/09 il giro di fine task sulle transizioni video («gli altri quattro»,
+`task/transizioni-video-le-altre`) ne ha trovate cinque (47–51), tutte chiuse nello stesso branch prima del push, più tre note: due della
+copertura del filmato (che il tasto del menu e la tastiera passano), una sulla pagina
+sotto durante l'attesa, la nota già scritta nel foglio dell'interfaccia sui due «—»
+dall'agenda (confermata), e una riga di foglio rimasta indietro.
 
 1. ~~**Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
    telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra. Il tasto
@@ -218,6 +223,34 @@ fine task ne ha trovate tre (44–46), chiuse nello stesso branch prima del push
    ha 43** (20/09): il conto in cima era già indietro prima del branch (39), il branch ne ha
    aggiunte quattro senza toccarlo.~~ **RISOLTO (20/09/2026)** — ricontate tutte le righe
    per foglio: 43, 16, 13, 16 e 8 (erano 34, 14, 11, 14 e 7).
+47. ~~**Sotto al filmato i tasti rispondono ancora alla tastiera** (20/09, transizioni video):
+   la copertura prende clic, tocchi ed Esc ma non il fuoco. Invio subito dopo il clic su
+   «Registra la take» fa una seconda take pagando due volte la sessione (45 + 45 invece di
+   45 + 12); Tab e Invio sul tasto d'oro dello «stacca la spina» fanno la mossa due volte.~~
+   **RISOLTO (20/09/2026)** — la copertura prende il fuoco (`tabIndex -1`, `focus()`);
+   Invio e spazio saltano il filmato come un tocco, Tab non gira per la pagina sotto, tutto
+   in cattura e col default fermato. Riprovato: Tab + Invio dopo il clic sulla take → una
+   take sola, energia 100 → 55.
+48. ~~**Mentre si aspetta che il filmato dello «stacca la spina» parta, la pagina sotto dice
+   una cosa sbagliata** (20/09): «+3–5», «la seconda volta oggi recupera meno», il tasto d'oro
+   ancora lì, e la banda in basso che già dice «Ti sei fermato. Benessere +13». Fino a un
+   secondo e mezzo, solo se il video non è già in cache.~~ **RISOLTO (20/09/2026)** — fra il
+   tasto e il filmato la pagina resta com'era (`LUOGO.attesa`, `renderLuogo` non ridisegna);
+   la banda del diario in basso è di tutto il gioco e continua a scrivere subito.
+49. ~~**Il tasto «Anni di Fame» apre il menu di sistema sopra al filmato, che continua sotto**
+   (20/09): a fine filmato la pagina si apre sotto al menu. Era così dallo Studio del 16/09,
+   adesso vale per cinque; «MAPPA» invece è bloccato come deve.~~ **RISOLTO (20/09/2026)** —
+   i tre tasti della barra (`data-adf-global`) sono inerti col filmato in corso, come già
+   «MAPPA»: un tocco sul filmato lo salta, poi la barra torna.
+50. ~~**Arrivando allo «stacca la spina» dall'agenda o dalla card, i due numeri grandi sono
+   «—»** (20/09, confermata la nota del foglio dell'interfaccia): la fotografia dei numeri di
+   prima la fa solo il tasto sulla pagina. Non è del branch, è così dal 19/09.~~ **RISOLTO
+   (20/09/2026)** — `luoghi-foto.js` incarta anche `avviaAzioneDiretta`: una mossa con la
+   pagina si fotografa prima di partire, da ogni strada. Dall'agenda: «Benessere +4».
+51. ~~**Il paragrafo in testa a «Da fare adesso» dice ancora che la voce delle transizioni
+   «resta, a metà»** (20/09, `implementazioni/implementazioni.md:53`), mentre la voce 5 due
+   righe sotto è barrata e FATTO.~~ **RISOLTO (20/09/2026)** — il paragrafo dice che è chiusa
+   il 20/09 e che resta la decisione sui sette video.
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
 
 ---
@@ -4843,3 +4876,154 @@ tocca solo `[data-azione]` e `[data-evento]`, e `telefono-stretto.css:96` cambia
 del carattere. Una nota, non un problema: la RISOLTO della voce 43 in testa dice ancora «va a
 capo su due righe» — è la storia di quel giorno, e la voce 44 subito sotto spiega il passaggio
 a tre; si legge di seguito e non inganna, ma chi legge solo la 43 la trova indietro di un passo.
+
+## Giro del 20/09/2026 (segnala-problemi, fine task `task/transizioni-video-le-altre`, commit `32cb6f5`)
+
+Un commit sopra a `main`: i quattro video che mancavano al punto di CARLO «implementa le
+transizioni dentro al progetto, che partano cliccando sulla scheda collegata» — la Sala,
+Casa, stacca la spina, registra. I tre comandi non li ho rifatti: chi ha lanciato il giro li
+ha appena visti verdi (180 a posto, 409 ok, 33 ok di build). Ho letto il diff intero
+(`transizioni-video.js`, `hub.js`, `luoghi-foto.js`, `studio-elementi.js`, l'audit, i
+quattro fogli) contro il codice, e poi ho giocato con Playwright sul Chrome installato a
+1280 × 800 e a 390 × 844 col tocco.
+
+**Quello che torna.** Il JavaScript all'avvio: `transizioni-video.js` sta dopo
+`luoghi-foto.js` e `studio-elementi.js` in `gioco.html` (righe 706, 709, 716), ma i due lo
+chiamano solo al clic e dietro `typeof transizioneVideo === "function"`
+(`luoghi-foto.js:425`, `studio-elementi.js:417`); `TRANSIZIONI_VIDEO` sta dopo la `&&`, quindi
+senza il file non si tocca. Nessun'altra pagina carica quei due file (`index.html` e
+`pagine/*.html` no), e la prova di `prova.js:1111` che carica `studio-elementi.js` senza il
+file dei video passa proprio per quella guardia. Nessun errore in console in nessuna delle
+prove. La Sala e Casa partono dal cartello e a fine filmato c'è la Sala sotto e la cucina
+sotto; dopo Casa il video pronto è quello dello stacca, dopo lo Studio quello della take; il
+puntatore sui cartelli `beat`, `vita` e `studio` prepara il file giusto. Lo «stacca la spina»
+da tutte e tre le strade: dalla porta di Casa (esito «+13 / +0,4» giusto), dall'agenda a 1280
+e col telefono alzato a 390 (il telefono resta su sotto la copertura e si mette giù quando
+la pagina si apre, `LUOGO` è `null` fino a lì e `mostra()` la apre), dalla card del
+«Piccolo party» (stessa riga di codice dell'agenda, `hub.js:893`; la card di sera è spenta
+«Dalle 00:00», è l'orario, non un guasto). Esc a metà, un tocco a metà e un secondo tocco
+svelto sullo stesso tasto d'oro saltano il filmato e aprono l'esito senza rifare la mossa.
+La take: l'energia scende al clic (100 → 55), il tiro di dado arriva a fine filmato e il
+salvataggio con lui (in mezzo `localStorage` ha ancora l'energia di prima: se la partita si
+chiude durante il filmato non si perde né energia né take); col file che non c'è la take
+arriva subito (l'evento `error` arriva prima del secondo e mezzo); la seconda take non ha
+filmato; il tocco a metà la fa arrivare. I fogli: la prima tabella del README contro la
+grande riga per riga (16, 44, 1, 16, 13 tornano; i totali 127 = 92 + 13 + 17 + 5 pure); la
+voce 5 dell'ordine, la voce 27 nuova e il punto 8 di CARLO dicono la stessa cosa; la roadmap
+pure. Le cose sotto sono quelle che non tornano.
+
+### Sotto al filmato i tasti rispondono ancora alla tastiera: due take pagate come due sessioni, due «stacca la spina»
+- **dove** — `frontend/js/game/transizioni-video.js:138-143` (la copertura prende i clic e
+  l'Esc, ma non sposta né blocca il fuoco della tastiera) contro
+  `frontend/js/game/studio-elementi.js:402` e `:417` (l'energia scende subito, la take arriva
+  dopo, e fino ad allora `t.l` è vuota: la «prima take» da 45 lo è ancora) e
+  `frontend/js/game/luoghi-foto.js:385` (`luogoVai` ridisegna la pagina col tasto d'oro
+  ancora acceso).
+- **cosa succede** — il filmato copre lo schermo, ma il tasto che hai appena premuto resta
+  «a fuoco» sotto di lui, e Invio lo preme di nuovo. In Cabina: clic su «Registra la take ·
+  45 energia», poi Invio mentre il filmato va — l'energia passa da 55 a 10 (una seconda
+  sessione da 45, non un'altra take da 12), e a fine filmato le take sono due. Sulla pagina
+  dello «stacca la spina»: con Tab si arriva al tasto d'oro sotto al filmato e Invio fa la
+  mossa una seconda volta (energia 41 → 27, «oggi» da 1 a 2); l'esito che si legge alla fine
+  è quello della prima, la seconda è successa e basta. Col mouse e col dito non si può (la
+  copertura li prende): è solo tastiera, cioè il PC e Steam.
+- **come si vede** — Studio, Cabina, clic su «Registra la take», Invio subito; oppure Casa,
+  porta «Stacca la spina», tasto d'oro, poi Tab finché il fuoco torna sul tasto e Invio.
+- **quanto pesa** — si vede ma si gira intorno: non si rompe niente, ma una take costa il
+  doppio senza che si capisca perché.
+
+### Mentre si aspetta che il filmato dello «stacca la spina» parta, la pagina sotto dice una cosa sbagliata
+- **dove** — `frontend/js/game/ui.js:158` (`renderGioco()` subito dopo `mostraScena`, che
+  adesso ha in mezzo il filmato) con `frontend/js/game/luoghi-foto.js:398` (l'incarto di
+  `renderGioco` ridisegna la pagina) e `:385` (`luogoVai` la ridisegna ancora), mentre
+  `LUOGO.esito` arriva solo a filmato finito (`:418`).
+- **cosa succede** — dalla porta di Casa, nel secondo e mezzo in cui la copertura è
+  trasparente e il video non è ancora partito, la pagina sotto si vede ed è quella di **dopo**
+  la mossa ma **senza** l'esito: i numeri grandi dicono «+3–5» e «—», la riga dice «La seconda
+  volta oggi recupera meno: il corpo ha già avuto la sua parte», il tasto d'oro «Stacca la
+  spina · 14 energie» è ancora lì, la fascia in alto ha già l'energia scalata (86), e la banda
+  in basso — l'ultima riga del diario — dice già «Ti sei fermato. Benessere +13, rete +0,4»,
+  cioè l'esito prima del filmato che dovrebbe portarci. Se il video è in cache (dopo il
+  filmato di Casa lo è: `TRANSIZIONI_DOPO`) il filmato copre tutto in pochi millisecondi e
+  non si vede; se non lo è (Casa aperta da «Continua», o rete lenta) si vede fino a un
+  secondo e mezzo, e poi o parte il filmato o arriva l'esito. Screenshot fatto con il video
+  rallentato a 600 ms dal clic. Dall'agenda non succede: lì la pagina non c'è ancora.
+- **come si vede** — Casa, «Stacca la spina», tasto d'oro con la rete rallentata dagli
+  strumenti del browser (o alla prima volta senza essere passati dal filmato di Casa).
+- **quanto pesa** — da sistemare con calma: dura al massimo un secondo e mezzo e poi si
+  sistema da sola, ma per quel tempo la pagina promette la mossa che hai appena fatto.
+
+### Il tasto «Anni di Fame» apre il menu di sistema sopra al filmato, che continua sotto
+- **dove** — `frontend/js/menu-sistema.js:486` (il clic sul tasto del marchio chiama
+  `apri()`) e `:194-195` (`apri()` chiede solo che il gioco sia acceso), con
+  `frontend/css/menu-sistema.css:55` (la barra sta a 9600, sopra alla copertura del video a
+  150: si vede e si tocca durante il filmato). «MAPPA» invece passa da `tornaMappa()`, che
+  guarda `dialogoFlottante()` con dentro `#tvid.on` e `#tvid.attesa`, e non fa niente.
+- **cosa succede** — durante il filmato della Sala tocchi «Anni di Fame» in alto a sinistra:
+  si apre il menu «LA FAME / SISTEMA», il filmato va avanti sotto (visto: da 0,6 s arriva a
+  5,6 s col menu aperto), e quando finisce la Sala si apre sotto al menu.
+  Chi preme «Riprendi» si ritrova nella Sala senza aver capito perché. È la sorella dell'Esc
+  chiusa il 16/09 (voce 11): lì il tasto, qui il bottone; con lo Studio solo era già così,
+  adesso vale per cinque filmati.
+- **come si vede** — dalla mappa tocca «La Sala» (o Casa, o Studio), e mentre il filmato va
+  tocca il marchio in alto a sinistra.
+- **quanto pesa** — si vede ma si gira intorno: il filmato finisce da solo e il menu ha
+  «Riprendi».
+
+### Arrivando allo «stacca la spina» dall'agenda o dalla card, i due numeri grandi sono «—»
+- **dove** — `frontend/js/game/luoghi-foto.js:91` (`apriLuogo` parte con `prima:null`) e
+  `:240-243` (senza `prima` i due numeri diventano «—»), contro `:380` (`luogoVai`, l'unico
+  posto che fotografa i numeri di prima). L'incarto di `mostraScena` (`:417`) apre la pagina
+  con `da:"mossa"` e non fotografa niente.
+- **cosa succede** — è la nota che il foglio dell'interfaccia ha già scritto, e la confermo:
+  dall'agenda del telefono (a 1280 e a 390) e dalla card della sera, a filmato finito la
+  pagina dice «Benessere —», «Rete —» sotto alle due icone, mentre la riga sotto dice
+  «Ti sei fermato. Benessere +11, rete +0,4». Dalla porta di Casa i numeri ci sono
+  («+13», «+0,4»). Screenshot fatto. Non è del branch: è così dal 19/09, da quando le pagine
+  dei posti stanno sulla loro foto.
+- **come si vede** — telefono, Agenda, «Le tue mosse», «Stacca la spina»; guarda i due
+  numeri grandi a filmato finito.
+- **quanto pesa** — da sistemare con calma.
+
+### Il paragrafo in testa a «Da fare adesso» dice ancora che la voce delle transizioni «resta, a metà»
+- **dove** — `implementazioni/implementazioni.md:53` («il 16/09 dopo il primo video delle
+  transizioni (la voce resta, a metà)») contro la voce 5 dello stesso elenco (`:92`), barrata
+  e **FATTO (20/09/2026)** in questo branch, e la voce 27 nuova (`:183`).
+- **cosa succede** — il paragrafo che racconta i giri dell'ordine è stato aggiornato per le
+  quattro piccole e per il Marketing del 20/09, non per questo giro: chi lo legge trova la
+  voce «a metà» e due righe sotto la trova chiusa. È un foglio, non il gioco.
+- **come si vede** — `implementazioni/implementazioni.md`, il paragrafo sotto «Da fare
+  adesso, in ordine».
+- **quanto pesa** — da sistemare con calma.
+
+Tre note che non sono errori:
+
+- **La Sala ha il filmato solo dal cartello.** La card «Producer session» — sulla plancia
+  (`hub.js:890`) e nell'agenda del telefono (`telefono.js:784`) — apre la Sala diretta, senza
+  filmato; lo «stacca la spina» invece ce l'ha da tutte le strade, perché sta sulla mossa. I
+  fogli lo dicono così («la Sala e Casa sul cartello»), quindi è una scelta: la segno perché
+  chi arriva alla Sala dalla card la sera vede una cosa diversa da chi ci arriva dalla mappa.
+- **Vista una volta e non riprodotta:** a 390, al terzo «stacca la spina» del giorno dalla
+  porta di Casa, il numero grande diceva «+8» e la riga sotto «Benessere +6» (screenshot
+  `m-stacca-esito` nello scratchpad della prova). Il benessere era passato da 91 a 99,3: la
+  mossa ne ha dati 6, gli altri 2,3 sono arrivati da qualcos'altro fra la fotografia di
+  `luogoVai` e l'esito, e non ho trovato da dove (con un tracciamento su `G.wellbeing` in
+  una prova a 1280 la mossa era l'unica a toccarlo, e i numeri tornavano: +12 e +12). Il
+  branch non tocca quel conto; il filmato però allunga di cinque secondi la finestra in cui
+  qualcos'altro può muovere il numero. Da guardare, non da dare per rotto.
+- **Dopo ogni filmato di Casa e dello Studio parte un download da 4–5 MB** (`TRANSIZIONI_DOPO`,
+  `transizioni-video.js:47` e `:114`): lo stacca e la take, «a pagina ferma». Sugli store i
+  file stanno sul telefono e non costa niente; nel browser con la rete del telefono sono
+  megabyte spesi anche se poi non si stacca la spina né si registra. È la scelta che il file
+  spiega, la segno e basta.
+
+L'indice «Cosa resta aperto» in testa al foglio ha le voci 47–51 di questo giro.
+
+**Chiuse nello stesso branch, prima del push (20/09/2026).** Tutte e cinque: la copertura del
+filmato prende il fuoco e ferma Invio, spazio e Tab; i tre tasti della barra sono inerti col
+filmato in corso; fra il tasto e il filmato la pagina dello «stacca la spina» resta com'era;
+la fotografia dei numeri si fa da ogni strada (anche dall'agenda: «Benessere +4»); il
+paragrafo in testa all'ordine è aggiornato. Riprovato con Playwright sul Chrome installato a
+1440 × 900: Tab + Invio dopo il clic sulla take → una take sola (energia 100 → 55); spazio a
+metà filmato apre Casa; il clic sul brand col filmato in corso non apre il menu e a fine
+filmato si apre la Sala. Quattro controlli in più nell'audit. Le cinque voci in testa sono barrate.
