@@ -56,7 +56,11 @@ dall'agenda (confermata), e una riga di foglio rimasta indietro.
    **RISOLTO (16/09/2026)** — usate tutte e due: `jose` in `accessi.js`, `zod` in
    `forme.js` per i corpi delle rotte. Vedi «Le due dipendenze del backend, usate» in
    `implementazioni/07-multiplayer-e-backend.md`.
-6. **Lo Shop promette tre reparti a schede, ce ne sono due** (10/09).
+6. ~~**Lo Shop promette tre reparti a schede, ce ne sono due** (10/09).~~ **RISOLTO
+   (20/09/2026)** — branch `task/shop-tre-reparti`: la terza linguetta, Vestiti, vende capi
+   veri del camerino MakeHuman («lo Shop sblocca, il camerino veste»); il ritratto 2D che
+   Mycol aveva congelato il 09/09 non è tornato. «Lo Shop: il reparto Vestiti» in
+   `implementazioni/02-interfaccia-e-telefono.md`.
 7. **L'uscita di venerdì non costa niente, quella a mano sì** (08/09): risolto in parte per
    scelta — il vantaggio di venerdì è quello di aspettare, non uno sconto. Sparisce del tutto
    con «togli il parametro lucidità» (CARLO), che nell'altro foglio è fra i lavori lunghi.
@@ -1007,6 +1011,10 @@ sotto, che però ha trovato lo stesso guaio ripresentarsi su un terzo commit.
   nessuna linguetta.
 - **come si vede** — apri lo Shop dalla mappa: le linguette in alto sono solo due.
 - **quanto pesa** — da sistemare con calma.
+
+**RISOLTO (20/09/2026)** — non con la griglia vecchia (era il ritratto 2D del creator,
+congelato apposta il 09/09) ma con un reparto nuovo sui capi del camerino MakeHuman: «Lo
+Shop: il reparto Vestiti» in `implementazioni/02-interfaccia-e-telefono.md`.
 
 ### Un file fuori da `js/pagine.js` si tiene scritto a mano il nome di una pagina
 

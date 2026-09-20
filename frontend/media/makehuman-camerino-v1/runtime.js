@@ -3187,8 +3187,47 @@ function buildResourceCatalog() {
     }));
 }
 
+/* ADF_SHOP_GUARDAROBA_V1 — lo Shop del gioco sblocca, il camerino veste.
+   Con l'init arriva `guardaroba: {vetrina:[raw…], tuoi:[raw…]}`: i capi in
+   vetrina che non sono tuoi spariscono dalle tendine (e dai preset e dal
+   casuale, che passano di qui). Quello che il personaggio ha gia' addosso
+   nello stato ricevuto resta sempre: un salvataggio di prima dello Shop non si
+   spoglia. Senza `guardaroba` (standalone, o un creator vecchio) non cambia
+   niente. */
+let adfGuardarobaNascosti=null;
+function adfGuardarobaImposta(guardaroba,state){
+  if(!guardaroba || !Array.isArray(guardaroba.vetrina)){ adfGuardarobaNascosti=null; return; }
+  const tuoi=new Set((Array.isArray(guardaroba.tuoi)?guardaroba.tuoi:[]).map(String));
+  const addosso=new Set(Object.values((state&&state.slots)||{}).map(String));
+  adfGuardarobaNascosti=new Set(
+    guardaroba.vetrina.map(String).filter(raw=>!tuoi.has(raw) && !addosso.has(raw))
+  );
+  if(resourceEntries.length) adfRipopolaGuardaroba();
+}
+function adfGuardarobaVisibile(entry){
+  return !adfGuardarobaNascosti || !adfGuardarobaNascosti.has(entry.raw);
+}
+/* le tendine sono gia' state riempite (l'init e' arrivato a runtime pronto):
+   si rifanno le sole opzioni del guardaroba, tenendo il valore scelto —
+   i listener stanno sul <select>, non sulle <option> */
+function adfRipopolaGuardaroba(){
+  for(const def of SLOT_DEFS){
+    if(!WARDROBE_SLOT_SET.has(def.id)) continue;
+    const select=E(`slot-${def.id}`);
+    if(!select) continue;
+    const prima=select.value;
+    const entries=entriesForUiGroup(def.uiGroup);
+    select.innerHTML=
+      `<option value="">— nessuno —</option>`+
+      entries.map(e=>
+        `<option value="${escapeHtmlAttr(e.raw)}" title="${escapeHtmlAttr(e.uiDescription||e.originalName||'')}">${escapeHtml(e.uiLabel)}</option>`
+      ).join('');
+    select.value=[...select.options].some(o=>o.value===prima)?prima:'';
+  }
+}
 function entriesForUiGroup(uiGroup) {
-  return resourceEntries.filter(e=>e.uiGroup===uiGroup);
+  const entries=resourceEntries.filter(e=>e.uiGroup===uiGroup);
+  return WARDROBE_SLOT_SET.has(uiGroup) ? entries.filter(adfGuardarobaVisibile) : entries;
 }
 
 function wardrobeSlotDef(slotId) {
@@ -4938,6 +4977,9 @@ function bindEditorShell() {
        secondo restore tardivo non deve sovrascrivere il primo preset cliccato. */
     if(window.__ADF_MAKEHUMAN_INIT_ACCEPTED__) return;
     window.__ADF_MAKEHUMAN_INIT_ACCEPTED__=true;
+
+    /* prima del restore: le tendine devono gia' sapere cosa non offrire */
+    adfGuardarobaImposta(msg.guardaroba||null,msg.state||null);
 
     if(msg.state) {
       if(runtimeReady) {

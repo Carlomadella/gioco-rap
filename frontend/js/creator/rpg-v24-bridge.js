@@ -1,7 +1,7 @@
 /* Creator RPG V24 — ponte isolato fra il creator approvato e la partita vera. */
 "use strict";
 (function(){
-  const SRC_NORMALE = "media/creator-rpg-v24/creator.html?v=25";
+  const SRC_NORMALE = "media/creator-rpg-v24/creator.html?v=26";
   let overlay=null, frame=null;
   let modalita="normal";
   let aperta=false, overflowPrima="", faseAudioPrima=null;
@@ -52,7 +52,13 @@
       avatarSource:A?.avatarSource||null,
       avatarData:A?.avatarData||null,
       profile:A?.artistProfile||null,
-      answers:A?.rpgAnswers||[]
+      answers:A?.rpgAnswers||[],
+      /* lo Shop sblocca, il camerino veste (js/creator/guardaroba.js): cosa sta
+         in vetrina e cosa e' tuo, cosi' le tendine del camerino non offrono
+         gratis quello che si compra. Senza il file (una pagina che non lo
+         carica) il camerino resta com'era: tutto libero. */
+      guardaroba:(window.ADF_GUARDAROBA && typeof ADF_GUARDAROBA.perCamerino==="function")
+        ? ADF_GUARDAROBA.perCamerino() : null
     };
   }
 
@@ -243,6 +249,8 @@
       if(modalita!=="appearance") return;
       if(!salvaAspetto(m.detail||{})) return;
       terminaSessione(true);
+      /* in partita la foto nuova va anche sulla plancia, subito */
+      try{ if(typeof renderHub==="function") renderHub(); }catch(e){}
       return;
     }
 

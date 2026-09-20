@@ -484,6 +484,10 @@ function renderGioco(){
     };
   });
 
+  /* il terzo reparto, i Vestiti (negozio.js, js/creator/guardaroba.js): tornati il 20/09 sui capi
+     veri del camerino MakeHuman */
+  if(typeof renderAbbigliamento === "function") renderAbbigliamento();
+
   /* punto 4: la cassa dello shop, sempre in vista sopra le linguette —
      in un negozio vero non si scorre a caso per sapere quanto si ha. */
   const shCash = $("sh-cash");

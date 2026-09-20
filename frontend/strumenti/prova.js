@@ -58,34 +58,41 @@ controlla("ogni pagina cita dei fogli di stile e del codice", mute.length === 0,
 const mancanti = [...css, ...js].filter(f => !fs.existsSync(path.join(RADICE, f)));
 controlla("ogni file citato dalle pagine esiste davvero", mancanti.length === 0, mancanti);
 
-/* ADF_ABBIGLIAMENTO_HIBERNATE_V2
-   Il vecchio abbigliamento 2D deve restare non raggiungibile e inerte finché
-   non verrà sostituito da un sistema cosmetico compatibile con i provider. */
+/* Il reparto Vestiti dello Shop (20/09/2026). Il vecchio abbigliamento 2D
+   (ADF_ABBIGLIAMENTO_HIBERNATE_V2, 09/09) vestiva il ritratto del creator che
+   non c'e' piu', ed era congelato «finche' non verra' sostituito da un sistema
+   cosmetico compatibile con i provider»: il sistema e' js/creator/guardaroba.js,
+   capi veri del camerino MakeHuman. Quel ritratto non deve tornare: il
+   negozio non tocca `A.fit` ne' `portrait()`, e il guardaroba `#negozio`
+   (`ng-grid`) resta fuori. */
 {
   const giocoHtml = fs.readFileSync(path.join(RADICE, "pagine/gioco.html"), "utf8");
   const hubJs = fs.readFileSync(path.join(RADICE, "js/game/hub.js"), "utf8");
-  const uiJs = fs.readFileSync(path.join(RADICE, "js/game/ui.js"), "utf8");
   const negozioJs = fs.readFileSync(path.join(RADICE, "js/game/negozio.js"), "utf8");
 
   controlla(
-    "guardaroba e reparto vestiti legacy non sono raggiungibili dalla UI",
-    !giocoHtml.includes('data-sh="fit"') &&
-    !giocoHtml.includes('id="g-fit"') &&
+    "il guardaroba 2D di una volta non torna: niente ritratto, niente #negozio",
     !giocoHtml.includes('id="ng-grid"') &&
     !hubJs.includes('["vestiti", "Vestiti"') &&
-    !hubJs.includes('b.dataset.v === "vestiti"')
+    !hubJs.includes('b.dataset.v === "vestiti"') &&
+    !/\bA\.fit\b/.test(negozioJs) &&
+    !/\bportrait\s*\(/.test(negozioJs)
   );
 
-  controlla(
-    "il runtime vestiti legacy resta inerte",
-    negozioJs.includes("ADF_ABBIGLIAMENTO_HIBERNATE_V2") &&
-    negozioJs.includes("window.ADF_ABBIGLIAMENTO_LEGACY_ACTIVE = false") &&
-    !uiJs.includes('renderAbbigliamento === "function"') &&
-    !/\bG\.vestiti\b/.test(negozioJs) &&
-    !/\bA\.fit\b/.test(negozioJs) &&
-    !/\bportrait\s*\(/.test(negozioJs) &&
-    !negozioJs.includes("data-compra")
-  );
+  /* ogni capo in vetrina ha la sua miniatura, e ogni miniatura un capo:
+     una card senza immagine e' una card rotta, un'immagine senza card e'
+     peso nel pacchetto */
+  const guardaroba = fs.readFileSync(path.join(RADICE, "js/creator/guardaroba.js"), "utf8");
+  const capi = [...guardaroba.matchAll(/\{id:"([a-z0-9]+)", raw:"([^"]+)"/g)].map(m => m[1]);
+  const cartella = path.join(RADICE, "media/photo/shop");
+  const miniature = fs.existsSync(cartella)
+    ? fs.readdirSync(cartella).filter(f => f.endsWith(".png")).map(f => f.replace(/^capo-/, "").replace(/\.png$/, ""))
+    : [];
+  const senzaFoto = capi.filter(id => !miniature.includes(id));
+  const senzaCapo = miniature.filter(id => !capi.includes(id));
+  controlla("ogni capo in vetrina allo Shop ha la sua miniatura in media/photo/shop, e viceversa",
+    capi.length > 0 && senzaFoto.length === 0 && senzaCapo.length === 0,
+    [...senzaFoto.map(x => "senza foto: " + x), ...senzaCapo.map(x => "senza capo: " + x)]);
 }
 
 const cssSulDisco = tuttiIFile(path.join(RADICE, "css"), ".css");

@@ -2798,6 +2798,10 @@ function applyParentArtist(artist){
   state.avatarSource=a.avatarSource||null;
   state.avatarPendingSource=state.avatarSource;
   state.avatarData=a.avatarData||null;
+  /* lo Shop del gioco (js/creator/guardaroba.js): cosa sta in vetrina e cosa
+     e' gia' tuo. Va al camerino con l'init, che nasconde dalle tendine i
+     capi in vendita non comprati. Se manca, il camerino resta tutto libero. */
+  state.guardaroba=(a.guardaroba && typeof a.guardaroba==='object') ? a.guardaroba : null;
   state.name=a.name||"";
   state.city=a.city||"";
   state.genre=a.genre||null;
@@ -3202,7 +3206,8 @@ function sendMakeHumanInit(){
   try{
     localEditorFrame.contentWindow.postMessage({
       type:'adf-makehuman-init',
-      state:currentMakeHumanState()
+      state:currentMakeHumanState(),
+      guardaroba:state.guardaroba||null
     },'*');
   }catch(e){}
 }

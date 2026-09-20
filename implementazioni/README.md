@@ -15,7 +15,7 @@ Quelli che erano rimasti indietro nel foglio — chiusi ma mai smistati — stan
 | file | cosa c'è dentro |
 | --- | --- |
 | [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 16 voci |
-| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 44 voci |
+| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 45 voci |
 | [`03-artista-e-avatar.md`](03-artista-e-avatar.md) | **L'artista e il suo avatar** — 1 voce |
 | [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 16 voci |
 | [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 13 voci |
@@ -33,8 +33,8 @@ per i punti, e sono in [`../documentazione/come-si-lavora.md`](../documentazione
 
 ## Tutti i punti
 
-127 voci in tutto: **92 chiuse**, 13 a metà, 17 da fare e 5 con la sola risposta scritta
-(ricontate dalla tabella qui sotto il 20/09/2026, dopo le transizioni video; nello stesso
+128 voci in tutto: **93 chiuse**, 13 a metà, 17 da fare e 5 con la sola risposta scritta
+(ricontate dalla tabella qui sotto il 20/09/2026, dopo il reparto Vestiti dello Shop; nello stesso
 conto sono entrate tre sezioni del foglio dell'interfaccia che alla tabella mancavano — l'avvio
 rapido, le pagine dei posti sulla loro foto, la fascia della plancia). A che punto siamo
 nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../documentazione/roadmap.md).
@@ -146,6 +146,7 @@ nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../docume
 | **—** | Responsività di tutto il gioco | in parte | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Controllo del codice: due nomi di classe che si pestavano i piedi | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **4** | Lo Shop diventa uno shop, non un menù | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | Lo Shop: il reparto Vestiti — lo Shop sblocca, il camerino veste | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **24** | Un tasto per uscire al menu, scritto a lettere | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **25** | «Disciplina» diventa «Condizione» | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **27** | La landing è una pagina sua, staccata dall'accesso e dal gioco | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
