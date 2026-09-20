@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:33dd294 -->
+## 20/09/26, 21:57 â€” task/transizioni-video-le-altre â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `33dd294`
+
+### Cosa Ã¨ entrato
+
+- `cddd392` â€” fix(video): il giro di chiusura delle transizioni — cinque voci del 20/09 (47–51), tutte chiuse â€” **Carlomadella**
+- `32cb6f5` â€” feat(video): «implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata» — gli altri quattro: la Sala, Casa, stacca la spina, registra â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:0fcc254 -->
 ## 20/09/26, 20:48 â€” task/le-tre-del-marketing â†’ main
 

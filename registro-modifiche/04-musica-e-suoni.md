@@ -6,6 +6,33 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:33dd294 -->
+## 20/09/26, 21:57 â€” task/transizioni-video-le-altre â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `33dd294`
+
+### Cosa Ã¨ entrato
+
+- `cddd392` â€” fix(video): il giro di chiusura delle transizioni — cinque voci del 20/09 (47–51), tutte chiuse â€” **Carlomadella**
+- `32cb6f5` â€” feat(video): «implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata» — gli altri quattro: la Sala, Casa, stacca la spina, registra â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/transizione-stacca-agenda-390x844.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/transizione-stacca-agenda-esito-390x844.jpg`
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/luoghi-foto.js`
+- **Modificato:** `frontend/js/game/studio-elementi.js`
+- **Modificato:** `frontend/js/game/transizioni-video.js`
+- **Modificato:** `frontend/js/menu-sistema.js`
+
+**File interessati in questa categoria:** 9
+
+---
+
 <!-- merge:d17bd8f -->
 ## 20/09/26, 11:49 â€” task/barra-plancia-980-1180 â†’ main
 
