@@ -117,11 +117,11 @@ cinque video del punto sono collegati. I sette video in più sono una decisione,
    tu il resto»): un mix medio, l'uscita al venerdì, e un malus sulla qualità che si legge
    nel riquadro dei numeri.
 10. **La serata del Live Club giocata a momenti** — CARLO, la coda di «aggiungi le foto di
-   background dei posti»: nel riferimento `concerto_live` in mezzo alla pagina c'è «al
-   terzo pezzo uno in fondo comincia a parlare sopra», tre risposte e la gente che sale o
-   scende, più «cambia ordine» nella scaletta. Oggi la serata è la mossa `live` di sempre
-   (un numero) scelta sulla foto: i momenti sono il minigioco della Piazza rifatto per il
-   palco, e la scaletta con l'ordine vorrebbe un peso in `sim.js`.
+    background dei posti»: nel riferimento `concerto_live` in mezzo alla pagina c'è «al
+    terzo pezzo uno in fondo comincia a parlare sopra», tre risposte e la gente che sale o
+    scende, più «cambia ordine» nella scaletta. Oggi la serata è la mossa `live` di sempre
+    (un numero) scelta sulla foto: i momenti sono il minigioco della Piazza rifatto per il
+    palco, e la scaletta con l'ordine vorrebbe un peso in `sim.js`.
 11. **Le card sulla mappa troppo vicine, i pulsanti sopra la mappa troppo grandi** — ALE.
     Si giudicano a occhio: vanno guardate con uno screenshot, non dal CSS. Stessa cosa per
     **la schermata opzioni da migliorare graficamente** — CARLO, pagina di landing.
@@ -253,17 +253,17 @@ la coda — il pub e la pubblicità — è una voce dell'ordine in testa, e il p
 
 3. i rapporti con i beatmaker non vanno mai in negativo, puoi offenderli quanto vuoi e il rapporto resta uguale
 
-11. Avaturn voglio lo rendiamo UN 50/50 , Cioè chi non vuole andare a farsi tutta la trafila per fare avaturn (anche se ovviamente dobbiamo fare di tutto per consigliarli a farlo) può benissimamente creare il suo avatar in game. FAI COESISTERE LE COSE.
+4. Avaturn voglio lo rendiamo UN 50/50 , Cioè chi non vuole andare a farsi tutta la trafila per fare avaturn (anche se ovviamente dobbiamo fare di tutto per consigliarli a farlo) può benissimamente creare il suo avatar in game. FAI COESISTERE LE COSE.
 
-    **RISPOSTA (15/09/2026)** — nel codice convivono già: `avvio.js` apre
-    «Avaturn/MakeHuman», `hub.js` distingue `avatarSource === "avaturn"` dall'altro, e
-    l'avvio rapido carica MakeHuman vero. Da confermare in partita che dal creator si
-    scelga davvero fra le due strade, e poi scriverlo in
-    [`03-artista-e-avatar.md`](03-artista-e-avatar.md), che oggi non ne parla.
+   **RISPOSTA (15/09/2026)** — nel codice convivono già: `avvio.js` apre
+   «Avaturn/MakeHuman», `hub.js` distingue `avatarSource === "avaturn"` dall'altro, e
+   l'avvio rapido carica MakeHuman vero. Da confermare in partita che dal creator si
+   scelga davvero fra le due strade, e poi scriverlo in
+   [`03-artista-e-avatar.md`](03-artista-e-avatar.md), che oggi non ne parla.
 
-12. Studio, casa e attività criminiali sulla mappa sono TROPPO VICINE LE CARD tra di loro. Anche se gli edifici sono abbastanza vicini falle in un modo MOOOOLTO più clean. Così sono troppo ammassate.
+5. Studio, casa e attività criminiali sulla mappa sono TROPPO VICINE LE CARD tra di loro. Anche se gli edifici sono abbastanza vicini falle in un modo MOOOOLTO più clean. Così sono troppo ammassate.
 
-13. Ti ricordo che i pulsanti sopra la mappa sono ANCORA TROPPO GRANDI rispetto ai quadratini stessi. Rivedilo.
+6. Ti ricordo che i pulsanti sopra la mappa sono ANCORA TROPPO GRANDI rispetto ai quadratini stessi. Rivedilo.
 
 ### CARLO
 
@@ -332,7 +332,7 @@ blocca il giorno, risposto e chiuso) sono in `fatte.md`._
    per pezzo). **Manca** la cover caricata da file e quella «stile emblema» (oggi solo
    proposte generate), la discografia come app del telefono, e le remastered e le parti 2.
 
-4. Non funziona più la pagina attività criminali, questo è ciò che segna in console:
+5. Non funziona più la pagina attività criminali, questo è ciò che segna in console:
 
    ```
    Feature policy: ignorato nome caratteristica non supportato “autoplay”. pagine.js:68:11
@@ -353,7 +353,7 @@ blocca il giorno, risposto e chiuso) sono in `fatte.md`._
    giro sulla Strada la trovava giocabile. **Se succede ancora, serve cosa fai e cosa vedi**
    (la pagina non si apre? si apre e non risponde?), perché la console non lo dice.
 
-5. aggiungi le foto di background dei posti senza HTML, poi ricrea la schermata identica alle foto con elementi HTML
+6. aggiungi le foto di background dei posti senza HTML, poi ricrea la schermata identica alle foto con elementi HTML
 
    **FATTO in parte (08/09/2026) — lo Studio.** Le foto sotto ci sono già da prima; adesso ci
    sono anche gli elementi che nelle foto di riferimento ci stanno **sopra**, e che il codice
@@ -397,15 +397,15 @@ blocca il giorno, risposto e chiuso) sono in `fatte.md`._
    voce sua nell'indice in testa). Cover e Feat non hanno più una sezione loro dal 15/09,
    quindi non hanno più bisogno di una foto.
 
-9. quando skippi tante ore ci mette troppo a simulare
+7. quando skippi tante ore ci mette troppo a simulare
 
-10. togli il parametro «lucidità» e tutto ciò che ne consegue
+8. togli il parametro «lucidità» e tutto ciò che ne consegue
 
-11. aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
+9. aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
 
-13. non sempre far scorrere una giornata ti ridà l'energia
+10. non sempre far scorrere una giornata ti ridà l'energia
 
-18. sull'app lafamegram non posta nessuno
+11. sull'app lafamegram non posta nessuno
 
     **Stato (15/09/2026)** — nel feed (`telPost()` in `telefono.js`) ci sono i tuoi post,
     quelli che nascono dagli incontri — il fan, il giornalista, la Strada, tutti in
@@ -414,7 +414,7 @@ blocca il giorno, risposto e chiuso) sono in `fatte.md`._
     nessuno». Prima di farlo va deciso chi posta e cosa (i beatmaker i loro beat? gli opps
     contro di te? chi scala la classifica?).
 
-19. Costa troppo una take in studio
+12. Costa troppo una take in studio
 
 #### Studio (16/09/2026)
 
@@ -493,13 +493,11 @@ Nelle cose da mettere dopo aver masterizzato il gioco, creiamo delle nuove modal
 ESEMPI NUOVE MODALITA' DI GIOCO:
 
 1. MODALITA' CARRIERA STUDIO:
-
    - Il personaggio creato dall'utente è un rapper di uno studio e devi portare lo studio al top (es. La fame studio) e avere lo studio migliore contro altri studi gestiti da altri player attivi
 
 2. MODALITA' A SCELTA DI CITTA' DI PARTENZA E LIBERA: puoi decidere in che città nascere e in base a quello hai pro o contro. Il player sceglie tra un numero di città predefinito e poi si può spostare in tutto il mondo (forse meno)
 
 3. MODALITA' CON PIU' CITTA' FINALI: dopo esserti stabilizzato a Los Angeles e, dopo aver creato contatti con personaggi di altre città o che lavoro in altre città o inviti per telefono che ti ha fatto ricevere il manager sblocchi la possibilità di andare o trasferirti in altre città come:
-
    - Chicago i crimini sono più facili ma c'è più criminalità/concorrenza ed è più difficile affermarsi
    - Las vegas: per avere i casinò migliori e i locali top per massimizzare il lifestyle così puoi averlo al massimo e sbloccare un'altra cosa es. un titolo da esporre nella descrizione del profilo tipo: JOHN GOTTI
    - Atlanta/New York: più focalizzata sul conoscere artisti famosi come 21 Savage, Future, Young Thug
