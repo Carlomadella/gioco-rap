@@ -1,0 +1,85 @@
+{
+  "schema": "fame-owned-beats-basic-pitch-lowend-candidate-protocol-v1",
+  "version": 1,
+  "status": "ENVIRONMENT_BOOTSTRAP_PENDING_BEFORE_FIRST_INFERENCE",
+  "candidateId": "basic-pitch-0.4.0-lowend-v1",
+  "scope": {
+    "split": "development",
+    "expectedFamilies": 8,
+    "sourceRecordIds": [
+      "FAME000011",
+      "FAME000012",
+      "FAME000023",
+      "FAME000040",
+      "FAME000046",
+      "FAME000058",
+      "FAME000080",
+      "FAME000126"
+    ],
+    "inputStem": "bass",
+    "finalHoldoutAllowed": false,
+    "batch131Allowed": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "prerequisite": {
+    "baselineRunId": "audio-to-midi-development-baseline-v1-001",
+    "humanReviewId": "audio-to-midi-human-review-v1-001",
+    "humanReviewSubmissionDigestSha256": "52e7803b56fee6a6a7dea7546b7a6c6c38fdb86b01b6861f07a5a96882518f0d",
+    "baselineTechnicalGate": "ALL_8_FAMILIES_PASS",
+    "selectedDrumsArm": "drums-bass-kick-fusion-v1",
+    "pyinGatePass": true,
+    "nextActionFromReview": "PREPARE_BASIC_PITCH_ARM_AND_COMPARE_BEFORE_FINAL_LOW_END_PROMOTION"
+  },
+  "package": {
+    "name": "basic-pitch",
+    "version": "0.4.0",
+    "repository": "spotify/basic-pitch",
+    "repositoryTag": "v0.4.0",
+    "repositoryTagCommit": "9991303bba609a3b93089d13ec80d1d495083596",
+    "license": "Apache-2.0",
+    "packagedModelFamily": "icassp_2022",
+    "expectedWindowsBackend": "ONNX"
+  },
+  "environment": {
+    "specPath": "basic-pitch-environment-v1.json",
+    "requiredPythonMajorMinor": "3.10",
+    "lockPath": "requirements-basic-pitch-lock.txt",
+    "exactTransitiveLockRequiredBeforeInference": true,
+    "exactPackagedModelSha256RequiredBeforeInference": true
+  },
+  "input": {
+    "sourceSeparationRunId": "source-separation-development-inference-v1-001",
+    "stem": "bass",
+    "sourceAudioOriginalAllowed": false,
+    "humanReferenceAsInputAllowed": false
+  },
+  "comparison": {
+    "baselineArm": "librosa-pyin-lowend-v1",
+    "candidateArm": "basic-pitch-0.4.0-lowend-v1",
+    "sameEightDevelopmentFamilies": true,
+    "blindHumanComparisonRequired": true,
+    "primaryCriteria": [
+      "onset",
+      "pitch/octave correctness",
+      "duration/release",
+      "glide/pitch-bend preservation",
+      "downstream MIDI usefulness"
+    ],
+    "gate": {
+      "medianUsefulnessAtLeast": 2,
+      "familiesAtOrAbove2AtLeast": 6
+    },
+    "selectionRule": [
+      "higher median usefulness",
+      "higher families at or above 2",
+      "higher total usefulness score",
+      "if still tied, prefer pYIN baseline as lower-complexity method"
+    ]
+  },
+  "safety": {
+    "environmentSetupMayOpenAudio": false,
+    "environmentSetupMayRunInference": false,
+    "noBasicPitchInferenceUntilLockAndModelFreeze": true
+  }
+}
