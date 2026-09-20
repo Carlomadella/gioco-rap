@@ -934,3 +934,13 @@ Il pass del gate **non autorizza un batch non tracciato**. Prima della prima inf
 La configurazione congelata per questo pilot è 4-stem `drums/bass/other/vocals`, 44.1 kHz stereo float32, WAV PCM-f32le, CPU, 1 shift con seed 0, overlap 0.25 e segment length 343980. Le metriche tecniche `peakAbs`, `rms` e `stemSumResidualRmsRatio` vengono registrate senza soglia post-hoc; la promozione resta subordinata alla rubric QA già congelata.
 
 Final holdout, batch sulle 131 sorgenti, training e dichiarazioni di task/data readiness restano esclusi. Un run parziale senza result receipt è fail-closed: non viene sovrascritto né reinterpretato come completato.
+
+## NDR-064 — Source Separation: receipt development congelato prima dell'inferenza
+
+**Stato: ACCEPTED — 20 settembre 2026.**
+
+Il receipt append-only `source-separation-development-inference-v1-001` è stato creato sul workspace reale dopo una nuova esecuzione completa del gate pre-inference. Il receipt contiene 8 record, stato `AUTHORIZED_NO_INFERENCE` e `sourceFamiliesLocked=true`.
+
+La preparazione del receipt non ha aperto audio, non ha eseguito Source Separation e non ha acceduto al final holdout. Di conseguenza il primo output del separatore non esiste ancora e la rubric QA rimane realmente congelata prima dell'osservazione dei risultati.
+
+Prima dell'esecuzione deve passare il check read-only del receipt contro gli artefatti correnti congelati e contro le identità/sha delle 8 sorgenti development. Solo dopo quel check è autorizzato il batch append-only sulle 8 family. Final holdout, batch 131, training e task/data readiness restano esclusi.
