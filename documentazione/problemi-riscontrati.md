@@ -71,10 +71,13 @@ voci 30–32, tutte e tre chiuse nello stesso branch prima del push.
    nelle sette liste errori per rotta; `artistaId-mancante` è diventato `artista-mancante`
    ed esce in `errore`; `README.md`, `ROADMAP.md` e `dipendenze.md` non dicono più «da
    usare». Il dettaglio sotto a ogni voce, nel giro in fondo.
-17. **La mano del braccio alzato del rapper è un tracciato SVG rotto** (19/09,
+17. ~~**La mano del braccio alzato del rapper è un tracciato SVG rotto** (19/09,
    `creator/nav.js:71`): a ogni Piazza la console segna «attribute d: Expected number» e la
    mano col microfono non si disegna. Non è della task delle pagine dei posti: va guardato
-   il disegno, non indovinato un numero.
+   il disegno, non indovinato un numero.~~ **RISOLTO (20/09/2026)** — branch
+   `task/mano-rapper-svg`: all'ultima curva della mano mancava il punto d'arrivo, che è
+   quello da cui parte (`48,-372`, il polso); adesso la mano si chiude lì. L'audit genera
+   il corpo intero e conta le coordinate di ogni tracciato, così non torna indietro.
 18. ~~**«I conti di casa» aperti dalla Casa coprono il Menu e «Torna alla mappa»** (19/09).~~
    **RISOLTO (19/09/2026)** — in `menu-sistema.js` il pannello viene prima della pagina.
 19. ~~**Sul telefono una mossa lanciata dal telefono alzato apre la pagina sotto al
@@ -3861,6 +3864,12 @@ segnalare, nessuna blocca la partita; le prime tre si vedono, le altre si sistem
   visto perché la Piazza è nel giro.
 - **come si vede** — Live Club → «Vai in piazza» → la battle, con la console aperta.
 - **quanto pesa** — da sistemare con calma.
+- **RISOLTO (20/09/2026)** — branch `task/mano-rapper-svg`: la curva è `C56,-366 50,-367
+  48,-372 Z`, con il terzo punto che è il polso da cui il tracciato parte — la mano si
+  chiude su sé stessa invece di restare un pezzo che il browser butta via. Nell'audit un
+  controllo genera `ARTIST_BODY()` con un artista finto e conta le coordinate di ogni
+  comando (`M`/`L` due, `C` multipli di sei, `Z` nessuna): sul codice vecchio fallisce,
+  sul nuovo passa.
 
 Note a margine, scelte e non bug: (1) nello stacca la spina, prima di premere, la riga sotto
 ai numeri dice «hai rivisto gente che non c'entra niente con la musica» al passato, come se

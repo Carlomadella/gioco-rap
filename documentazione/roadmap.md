@@ -125,6 +125,11 @@ il feed che si scorre.
   camerino MakeHuman e tre tasti se si rompe (`frontend/js/preparo.js`). I «due minuti»
   segnalati il 13/09 erano il browser senza GPU delle prove: su Chrome vero il personaggio
   è pronto in 9 secondi.
+- **FATTO (20/09/2026)** — la mano del braccio alzato del rapper in Piazza si disegna: il
+  tracciato SVG in `frontend/js/creator/nav.js` aveva una curva a due punti invece di
+  tre e il browser la buttava via («La mano del braccio alzato del rapper è un tracciato
+  SVG rotto», da problemi-riscontrati del 19/09). L'audit adesso conta le coordinate di
+  ogni tracciato del corpo intero.
 
 ### C · L'economia della carriera _(cominciata)_
 
