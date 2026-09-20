@@ -53,7 +53,7 @@ R6 finale resta aperto: reference cieca disponibile, scoring V1/config-001 e pai
 | Ambiente tecnico Audio Analysis | **COMPLETATO** | FFmpeg/ffprobe 9.0.1 + Python 3.14 + stack audio verificata |
 | Audio Analysis pilot | **R6 CHIUSO — V2_PROMOTE** | `audio-analysis-v2-config-001` confermata sul final holdout one-shot: beat paired median delta `0.0`, section F1 @0,5 s paired median delta `+0.545805`, technical integrity PASS; comparison SHA256 `c38046919388b839dce070f6a9503efad6c6fc43045bd6196305ea0056c12d7d`; nessun retuning consentito sullo stesso holdout |
 | Source Separation pilot | **PASS — AUDIO→MIDI DRUMS/LOW-END APERTO** | technical QA 8/8 + 32/32 stem PASS; human gate: drums median 2.5, 8/8 >=2; bass median 2.5, 7/8 >=2; outcome `OPEN_AUDIO_TO_MIDI_DRUMS_LOW_END_PILOT`; `other` mostra degrado temporale qualitativo in più family, quindi tonal resta chiuso |
-| Trascrizione Audio→MIDI pilot | **BASELINE 8/8 COMPLETA / TECHNICAL+HUMAN QA PENDENTI** | run append-only `audio-to-midi-development-baseline-v1-001` completato su 8/8 development; prodotti 24 MIDI (`drums-only`, `drums+bass kick-fusion`, `bass-pYIN`) + result JSON; final holdout/batch131/training esclusi; prossimo gate = technical QA read-only + human QA congelata |
+| Trascrizione Audio→MIDI pilot | **TECHNICAL QA PASS / HUMAN QA PENDENTE** | baseline 8/8 completata; technical QA `ALL_8_FAMILIES_PASS`, 8/8 result e 24/24 MIDI verificati; diagnostica: kick drums-only 102 totali vs kick-fusion 696, con 4 family a zero kick nel drums-only; low-end pYIN 1162 note complessive; nessuna di queste diagnostiche è un quality score; prossimo gate = Human QA blind drums + low-end |
 | QA pilot | **DA FARE** | metriche automatiche e giudizio umano separati |
 | Espansione batch corpus | **BLOCCATA** | subordinata ai risultati/gate del pilot |
 | Training serio | **CHIUSO** | nessun training autorizzato da questo avanzamento |
@@ -743,3 +743,6 @@ Il Block2 non seleziona automaticamente lo split FAME finale: session-grouped e'
 Digest candidate manifest reale: `8bf3e1e107c3d634ff2637d15950f617b3d8541420ced02fb692c0b80d4c78a2`.
 
 `DRUM DATA READY V2` resta aperto e il training serio resta chiuso.
+
+
+Technical QA Audio→MIDI completato sul run `audio-to-midi-development-baseline-v1-001`: `AUDIO_TO_MIDI_DEVELOPMENT_TECHNICAL_QA_PASS`, 8/8 family, 24/24 MIDI verificati, PPQ 480, conteggi note/eventi coerenti con i result JSON, final holdout/batch131/training tutti esclusi. Le diagnostiche non sono interpretate come qualità musicale e non selezionano automaticamente l'arm.
