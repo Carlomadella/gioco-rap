@@ -71,6 +71,55 @@ function midiHz(note){return 440*Math.pow(2,(note-69)/12)}
 function renderBassNotes(notes,sr=22050){const end=Math.max(1,...notes.map(n=>n.endSeconds+.1)),samples=new Float32Array(Math.ceil(end*sr));notes.forEach(n=>{const start=Math.max(0,Math.floor(n.startSeconds*sr)),stop=Math.min(samples.length,Math.ceil(n.endSeconds*sr)),f=midiHz(n.midiNote);let phase=0;for(let i=start;i<stop;i++){const t=(i-start)/sr,remain=(stop-i)/sr,env=Math.min(1,t/.01,remain/.04);phase+=2*Math.PI*f/sr;samples[i]+=.36*env*(Math.sin(phase)+.22*Math.sin(2*phase))}});return toWav(samples,sr)}
 function renderContour(points,sr=22050){const end=Math.max(1,...points.map(p=>p.timeSeconds+.05)),samples=new Float32Array(Math.ceil(end*sr));if(points.length<2)return toWav(samples,sr);let phase=0;for(let j=0;j<points.length-1;j++){const a=points[j],b=points[j+1],gap=b.timeSeconds-a.timeSeconds;if(gap<=0||gap>.05)continue;const start=Math.max(0,Math.floor(a.timeSeconds*sr)),stop=Math.min(samples.length,Math.ceil(b.timeSeconds*sr));for(let i=start;i<stop;i++){const u=(i/sr-a.timeSeconds)/gap,f=a.frequencyHz+(b.frequencyHz-a.frequencyHz)*Math.max(0,Math.min(1,u));phase+=2*Math.PI*f/sr;samples[i]+=.32*Math.sin(phase)}}return toWav(samples,sr)}
 
+function parseByteRange(rangeHeader,size){
+ if(!rangeHeader)return null;
+ const match=/^bytes=(\d*)-(\d*)$/.exec(String(rangeHeader).trim());
+ if(!match)return{invalid:true};
+ let start=match[1]===""?null:Number(match[1]),end=match[2]===""?null:Number(match[2]);
+ if(start===null&&end===null)return{invalid:true};
+ if(start===null){
+   const suffix=end;
+   if(!Number.isInteger(suffix)||suffix<=0)return{invalid:true};
+   start=Math.max(0,size-suffix);end=size-1;
+ }else{
+   if(!Number.isInteger(start)||start<0||start>=size)return{invalid:true};
+   if(end===null)end=size-1;
+   if(!Number.isInteger(end)||end<start)return{invalid:true};
+   end=Math.min(end,size-1);
+ }
+ return{start,end};
+}
+
+function sendAudioBuffer(req,res,buffer){
+ const size=buffer.length,range=parseByteRange(req.headers.range,size);
+ const base={"Content-Type":"audio/wav","Accept-Ranges":"bytes","Cache-Control":"no-store"};
+ if(range?.invalid){res.writeHead(416,{...base,"Content-Range":"bytes */"+size,"Content-Length":"0"});return res.end()}
+ if(range){
+   const length=range.end-range.start+1;
+   res.writeHead(206,{...base,"Content-Range":"bytes "+range.start+"-"+range.end+"/"+size,"Content-Length":String(length)});
+   if(req.method==="HEAD")return res.end();
+   return res.end(buffer.subarray(range.start,range.end+1));
+ }
+ res.writeHead(200,{...base,"Content-Length":String(size)});
+ if(req.method==="HEAD")return res.end();
+ return res.end(buffer);
+}
+
+function sendAudioFile(req,res,file){
+ const stat=fs.statSync(file),size=stat.size,range=parseByteRange(req.headers.range,size);
+ const base={"Content-Type":"audio/wav","Accept-Ranges":"bytes","Cache-Control":"no-store"};
+ if(range?.invalid){res.writeHead(416,{...base,"Content-Range":"bytes */"+size,"Content-Length":"0"});return res.end()}
+ if(range){
+   const length=range.end-range.start+1;
+   res.writeHead(206,{...base,"Content-Range":"bytes "+range.start+"-"+range.end+"/"+size,"Content-Length":String(length)});
+   if(req.method==="HEAD")return res.end();
+   return fs.createReadStream(file,{start:range.start,end:range.end}).pipe(res);
+ }
+ res.writeHead(200,{...base,"Content-Length":String(size)});
+ if(req.method==="HEAD")return res.end();
+ return fs.createReadStream(file).pipe(res);
+}
+
 function sourceStemPath(workspace,rid,stem){const receipt=readJson(path.join(sourceSepRoot(workspace),"execution-receipt.json")),source=receipt.sources.find(x=>x.sourceRecordId===rid);if(!source)throw new Error("Unknown source record");return path.join(sourceSepRoot(workspace),source.outputRelativePath,stem+".wav")}
 function resultFor(workspace,rid){return readJson(path.join(runRoot(workspace),rid,"result.json"))}
 function computeArmStats(values,qual){const scores=values.map(x=>x.score),med=median(scores),atLeast=scores.filter(x=>x>=2).length;return{medianUsefulness:med,familiesAtOrAbove2:atLeast,totalUsefulness:scores.reduce((a,b)=>a+b,0),pass:med>=qual.medianUsefulnessAtLeast&&atLeast>=qual.familiesAtOrAbove2AtLeast}}
@@ -103,10 +152,10 @@ function openBrowser(url){try{let child;if(process.platform==="win32")child=spaw
 function serve(workspaceRoot,reviewId=DEFAULT_REVIEW_ID,port=0){
  const workspace=path.resolve(workspaceRoot);qa.technical(workspace,RUN_ID);const p=protocol(),root=reviewRoot(workspace,reviewId),packageFile=path.join(root,"review-package.json"),keyFile=path.join(root,"blind-key.json");if(!fs.existsSync(packageFile)||!fs.existsSync(keyFile))throw new Error("Human Review package missing; run prepare first");
  const pkg=readJson(packageFile),key=readJson(keyFile),publicPkg={...pkg,packageDigestSha256:sha256File(packageFile)},submissionFile=path.join(root,"submission.json"),reportFile=path.join(root,"report.json");if(fs.existsSync(submissionFile)||fs.existsSync(reportFile))throw new Error("Human Review already finalized");const cache=new Map();
- const server=http.createServer((req,res)=>{try{const url=new URL(req.url,"http://127.0.0.1");if(req.method==="GET"&&url.pathname==="/"){res.writeHead(200,{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store"});return res.end(html())}if(req.method==="GET"&&url.pathname==="/package"){res.writeHead(200,{"Content-Type":"application/json","Cache-Control":"no-store"});return res.end(stableJson(publicPkg))}const parts=url.pathname.split("/").filter(Boolean).map(decodeURIComponent);if(req.method==="GET"&&parts[0]==="media"&&parts.length===3){const file=sourceStemPath(workspace,parts[1],parts[2]);if(!fs.existsSync(file))throw new Error("Stem missing");res.writeHead(200,{"Content-Type":"audio/wav","Cache-Control":"no-store"});return fs.createReadStream(file).pipe(res)}if(req.method==="GET"&&parts[0]==="render"&&parts.length===3){const rid=parts[1],what=parts[2],cacheKey=rid+"|"+what;let wav=cache.get(cacheKey);if(!wav){const result=resultFor(workspace,rid);if(what==="A"||what==="B"){const mapped=key.mapping[rid]?.[what];if(!mapped)throw new Error("Blind mapping missing");wav=renderDrums(result[mapped].events)}else if(what==="bass-midi")wav=renderBassNotes(result.lowEndPyin.notes);else if(what==="bass-contour")wav=renderContour(result.lowEndPyin.pitchContour);else throw new Error("Unknown render target");cache.set(cacheKey,wav)}res.writeHead(200,{"Content-Type":"audio/wav","Cache-Control":"no-store"});return res.end(wav)}if(req.method==="POST"&&url.pathname==="/submit"){let body="";req.setEncoding("utf8");req.on("data",chunk=>{body+=chunk;if(body.length>1024*1024)req.destroy()});return req.on("end",()=>{try{const doc=validateSubmission(JSON.parse(body),publicPkg),finalized=finalizeSubmission(doc,publicPkg,key,p),submission={...doc,unblinded:finalized.families,gate:finalized.gate};fs.writeFileSync(submissionFile,stableJson(submission),{flag:"wx"});const report={schema:REPORT_SCHEMA,version:1,reviewId,runId:RUN_ID,completedAt:new Date().toISOString(),packageDigestSha256:publicPkg.packageDigestSha256,submissionDigestSha256:sha256File(submissionFile),records:8,gate:finalized.gate,safety:{finalHoldoutAccessed:false,batch131Accessed:false,trainingAuthorized:false,taskDataReadyMayBeDeclared:false},nextAction:"PREPARE_BASIC_PITCH_ARM_AND_COMPARE_BEFORE_FINAL_LOW_END_PROMOTION"};fs.writeFileSync(reportFile,stableJson(report),{flag:"wx"});res.writeHead(200,{"Content-Type":"application/json"});res.end(stableJson(report));setTimeout(()=>server.close(),750)}catch(error){res.writeHead(400,{"Content-Type":"text/plain"});res.end(error.message)}})}res.writeHead(404);res.end("Not found")}catch(error){res.writeHead(500,{"Content-Type":"text/plain"});res.end(error.message)}});
+ const server=http.createServer((req,res)=>{try{const url=new URL(req.url,"http://127.0.0.1");if(req.method==="GET"&&url.pathname==="/"){res.writeHead(200,{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store"});return res.end(html())}if(req.method==="GET"&&url.pathname==="/package"){res.writeHead(200,{"Content-Type":"application/json","Cache-Control":"no-store"});return res.end(stableJson(publicPkg))}const parts=url.pathname.split("/").filter(Boolean).map(decodeURIComponent);if((req.method==="GET"||req.method==="HEAD")&&parts[0]==="media"&&parts.length===3){const file=sourceStemPath(workspace,parts[1],parts[2]);if(!fs.existsSync(file))throw new Error("Stem missing");return sendAudioFile(req,res,file)}if((req.method==="GET"||req.method==="HEAD")&&parts[0]==="render"&&parts.length===3){const rid=parts[1],what=parts[2],cacheKey=rid+"|"+what;let wav=cache.get(cacheKey);if(!wav){const result=resultFor(workspace,rid);if(what==="A"||what==="B"){const mapped=key.mapping[rid]?.[what];if(!mapped)throw new Error("Blind mapping missing");wav=renderDrums(result[mapped].events)}else if(what==="bass-midi")wav=renderBassNotes(result.lowEndPyin.notes);else if(what==="bass-contour")wav=renderContour(result.lowEndPyin.pitchContour);else throw new Error("Unknown render target");cache.set(cacheKey,wav)}return sendAudioBuffer(req,res,wav)}if(req.method==="POST"&&url.pathname==="/submit"){let body="";req.setEncoding("utf8");req.on("data",chunk=>{body+=chunk;if(body.length>1024*1024)req.destroy()});return req.on("end",()=>{try{const doc=validateSubmission(JSON.parse(body),publicPkg),finalized=finalizeSubmission(doc,publicPkg,key,p),submission={...doc,unblinded:finalized.families,gate:finalized.gate};fs.writeFileSync(submissionFile,stableJson(submission),{flag:"wx"});const report={schema:REPORT_SCHEMA,version:1,reviewId,runId:RUN_ID,completedAt:new Date().toISOString(),packageDigestSha256:publicPkg.packageDigestSha256,submissionDigestSha256:sha256File(submissionFile),records:8,gate:finalized.gate,safety:{finalHoldoutAccessed:false,batch131Accessed:false,trainingAuthorized:false,taskDataReadyMayBeDeclared:false},nextAction:"PREPARE_BASIC_PITCH_ARM_AND_COMPARE_BEFORE_FINAL_LOW_END_PROMOTION"};fs.writeFileSync(reportFile,stableJson(report),{flag:"wx"});res.writeHead(200,{"Content-Type":"application/json"});res.end(stableJson(report));setTimeout(()=>server.close(),750)}catch(error){res.writeHead(400,{"Content-Type":"text/plain"});res.end(error.message)}})}res.writeHead(404);res.end("Not found")}catch(error){res.writeHead(500,{"Content-Type":"text/plain"});res.end(error.message)}});
  server.on("error",error=>{process.stderr.write("AUDIO TO MIDI HUMAN REVIEW SERVER FAILED: "+(error.code||"ERROR")+": "+error.message+"\n");process.exitCode=1});server.on("listening",()=>{const address=server.address(),boundPort=address&&typeof address==="object"?address.port:Number(port),url="http://127.0.0.1:"+boundPort+"/";process.stdout.write(stableJson({mode:"AUDIO_TO_MIDI_HUMAN_REVIEW_SERVER_READY",reviewId,url,records:8,drumsArmIdentityExposedToReviewer:false,finalHoldoutAccessedByThisCommand:false,trainingAuthorized:false}));openBrowser(url)});server.listen(Number(port),"127.0.0.1");
 }
 function report(workspaceRoot,reviewId=DEFAULT_REVIEW_ID){const file=path.join(reviewRoot(path.resolve(workspaceRoot),reviewId),"report.json");if(!fs.existsSync(file))throw new Error("Human Review report missing");return readJson(file)}
 function main(args=process.argv.slice(2)){const[command,workspace,reviewId,port]=args;if(!command||!workspace)throw new Error("Usage: node audio-to-midi-human-review.js <prepare|serve|report> <workspace> [review-id] [port]");if(command==="prepare")process.stdout.write(stableJson(prepare(workspace,reviewId||DEFAULT_REVIEW_ID)));else if(command==="serve")serve(workspace,reviewId||DEFAULT_REVIEW_ID,port===undefined?0:Number(port));else if(command==="report")process.stdout.write(stableJson(report(workspace,reviewId||DEFAULT_REVIEW_ID)));else throw new Error("Unknown command")}
 if(require.main===module){try{main()}catch(error){console.error(error.message);process.exitCode=1}}
-module.exports={prepare,median,computeArmStats,chooseDrums,validateSubmission,finalizeSubmission,renderDrums,renderBassNotes,renderContour};
+module.exports={prepare,median,computeArmStats,chooseDrums,validateSubmission,finalizeSubmission,renderDrums,renderBassNotes,renderContour,parseByteRange,sendAudioBuffer,sendAudioFile};
