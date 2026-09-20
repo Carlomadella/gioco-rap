@@ -744,6 +744,10 @@ def validate_audio_analysis(workspace, protocol):
     return report_path, bpm
 
 
+def python_major_minor():
+    return f"{sys.version_info.major}.{sys.version_info.minor}"
+
+
 def preflight(workspace_root):
     workspace = Path(workspace_root).resolve()
     if not workspace.is_dir():
@@ -751,9 +755,12 @@ def preflight(workspace_root):
     protocol = require_protocol()
 
     required = protocol["baselineEnvironment"]
-    if sys.version.split()[0] != str(required["python"]):
+    required_python = str(required["python"])
+    actual_python = python_major_minor()
+    if actual_python != required_python:
         raise RuntimeError(
-            f"Audio→MIDI baseline requires Python {required['python']}, found {sys.version.split()[0]}"
+            f"Audio→MIDI baseline requires Python {required_python}.x, "
+            f"found {sys.version.split()[0]}"
         )
     if librosa.__version__ != required["requiredLibrosa"]:
         raise RuntimeError(
