@@ -12,6 +12,11 @@ const script = fs.readFileSync(
 assert(script.includes('GetInfo: Type=Commands'));
 assert(script.includes('GetInfo: Type=Menus'));
 assert(script.includes('Help: Command="GetInfo"'));
+assert(script.includes('CreateFileW'));
+assert(script.includes('msvcrt.open_osfhandle'));
+assert(script.includes('WIN32_CREATEFILEW_BINARY'));
+assert(!script.includes('open(to_name,'));
+assert(!script.includes('open(from_name,'));
 assert(script.includes('"audioOpenedByThisCommand": False'));
 assert(script.includes('"sourceSeparationExecutedByThisCommand": False'));
 assert(script.includes('"preferencesModifiedByThisCommand": False'));
