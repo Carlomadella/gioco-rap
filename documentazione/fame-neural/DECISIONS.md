@@ -883,3 +883,22 @@ Non viene quindi introdotta automazione GUI né un comando Audacity fragile. Il 
 Resta congelato lo stesso artefatto modello `intel-openvino-htdemucs-v4-97fc578` già verificato per SHA256. Il prossimo adapter sarà standalone e riproducibile, con ambiente Python separato dal venv Audio Analysis congelato. Prima di installare dipendenze o eseguire inferenza viene usato un doctor read-only per verificare Torch/OpenVINO/FFmpeg e leggere la signature del modello.
 
 Non viene copiato nel repository il wrapper C++ GPL del plugin Intel. L'implementazione standalone deve usare componenti con licenza compatibile e mantenere separata la provenance del modello dalla provenance del codice adapter.
+
+## NDR-060 — Source Separation: ambiente standalone separato e bootstrap coerente con Intel
+
+Data: 20 settembre 2026. Stato: adottata per il bootstrap.
+
+Il doctor reale sul PC ha rilevato Python 3.10.11 e FFmpeg 9.0.1, ma nessuna installazione globale di Torch/OpenVINO. Non viene riutilizzato né modificato il venv congelato di Audio Analysis.
+
+Per ridurre lo scarto rispetto alla toolchain con cui Intel costruisce il plugin HTDemucs/OpenVINO, il bootstrap Source Separation usa:
+
+- Python 3.10.x;
+- PyTorch CPU `2.4.1+cpu`;
+- OpenVINO `2024.6.0`;
+- gli stessi `htdemucs_v4.xml/bin` già congelati per SHA256.
+
+Le versioni Torch/OpenVINO derivano dalla documentazione/build prerequisites Intel del plugin compatibile con Audacity 3.7.1. Il bootstrap è separato in `D:\FAME_NEURAL\venv-source-separation`.
+
+Il file `source-separation-environment-v1.json` contiene i pin di bootstrap, ma **non è ancora il lock transitive definitivo**. Lo script `prepare-source-separation-environment.ps1` crea il venv, verifica il modello e il runtime, quindi cattura `pip freeze --all` e un receipt append-only. Solo dopo la revisione di quel freeze verrà committato il lock esatto e potrà iniziare l'implementazione/esecuzione dell'adapter.
+
+Il setup non apre audio, non esegue Source Separation e non accede al final holdout.

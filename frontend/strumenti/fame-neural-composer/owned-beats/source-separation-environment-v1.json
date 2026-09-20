@@ -1,0 +1,41 @@
+{
+  "schema": "fame-owned-beats-source-separation-environment-v1",
+  "version": 1,
+  "status": "BOOTSTRAP_PINNED_AWAITING_FREEZE",
+  "python": {
+    "requiredMajorMinor": "3.10"
+  },
+  "packages": {
+    "torch": {
+      "version": "2.4.1+cpu",
+      "indexUrl": "https://download.pytorch.org/whl/cpu",
+      "provenance": "Intel OpenVINO Audacity build docs use libtorch 2.4.1+cpu for HTDemucs"
+    },
+    "openvino": {
+      "version": "2024.6.0",
+      "indexUrl": "https://pypi.org/simple",
+      "provenance": "Intel OpenVINO Audacity build docs use OpenVINO 2024.6"
+    }
+  },
+  "model": {
+    "candidateId": "intel-openvino-htdemucs-v4-97fc578",
+    "binSha256": "7aa84fa1f2b534bd6865a5609b8b5b028802fe761d6a09b1d30a1564f8fac6f8",
+    "xmlSha256": "304e24325756089d6bb6583171dd1bea2327505e87c6cb6e010afea7463d9f0a"
+  },
+  "workspace": {
+    "venvRelativePath": "venv-source-separation",
+    "environmentRunsRelativePath": "runs/source-separation-environment"
+  },
+  "safety": {
+    "reuseAudioAnalysisVenv": false,
+    "sourceAudioAccessAllowedDuringSetup": false,
+    "inferenceAllowedDuringSetup": false,
+    "finalHoldoutAccessAllowedDuringSetup": false
+  },
+  "freezePolicy": {
+    "bootstrapPinsAreNotTheFinalLock": true,
+    "capturePipFreezeAll": true,
+    "captureEnvironmentReceipt": true,
+    "nextActionAfterSuccessfulBootstrap": "REVIEW_AND_COMMIT_EXACT_PIP_FREEZE"
+  }
+}
