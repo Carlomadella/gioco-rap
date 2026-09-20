@@ -18,6 +18,12 @@ function sha256(file) {
   return crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex");
 }
 
+function gitBlobSha(file) {
+  const bytes = fs.readFileSync(file);
+  const header = Buffer.from(`blob ${bytes.length}\0`, "utf8");
+  return crypto.createHash("sha1").update(header).update(bytes).digest("hex");
+}
+
 const adapter = fs.readFileSync(adapterPath, "utf8");
 const protocol = JSON.parse(fs.readFileSync(protocolPath, "utf8"));
 const contract = JSON.parse(fs.readFileSync(contractPath, "utf8"));
@@ -46,6 +52,14 @@ assert.deepEqual(contract.execution.expectedStems, ["drums", "bass", "other", "v
 assert.equal(contract.preInferenceGate.sourceAudioAccessAllowed, false);
 assert.equal(contract.preInferenceGate.inferenceAllowed, false);
 assert.equal(contract.safety.finalHoldoutAccessAllowed, false);
+assert.equal(contract.adapter.gitBlobSha, gitBlobSha(adapterPath));
+assert.equal(contract.adapter.implementationCommit, "15269866226f6685c2cf9adbf75f07d8a43ef51c");
+assert.equal(contract.adapter.modelTypeValidation.expectedSemanticType, "float32");
+assert.deepEqual(
+  contract.adapter.modelTypeValidation.acceptedOpenVinoStringForms,
+  ["f32", "<Type: 'float32'>"]
+);
+assert.equal(contract.adapter.modelTypeValidation.rejectNonFloat32, true);
 
 assert.equal(review.schema, "fame-owned-beats-source-separation-pilot-review-v1");
 assert.equal(review.status, "FROZEN_BEFORE_FIRST_PILOT_OUTPUT");
@@ -70,6 +84,10 @@ assert(adapter.includes('("input.25", (1, 4, 2048, 336))'));
 assert(adapter.includes('("input.1", (1, 2, 343980))'));
 assert(adapter.includes('("4172", (1, 16, 2048, 336))'));
 assert(adapter.includes('("4262", (1, 8, 343980))'));
+assert(adapter.includes('normalized == "f32" or "float32" in normalized'));
+assert(adapter.includes('_is_float32_element_type("<Type: \'float32\'>")'));
+assert(adapter.includes('_is_float32_element_type("float16")'));
+assert(adapter.includes('_is_float32_element_type("bf16")'));
 
 
 assert(preInference.includes("verify-source-separation-environment-lock.ps1"));
