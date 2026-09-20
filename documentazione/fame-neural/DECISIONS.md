@@ -1037,3 +1037,21 @@ Evidenza osservata:
 - training non autorizzato.
 
 Il preflight non ha prodotto output Audio→MIDI. È quindi autorizzata la prima esecuzione append-only del baseline congelato sulle sole 8 family development.
+
+## NDR-071 — Audio→MIDI development: prima baseline reale completata 8/8
+
+**Stato: ACCEPTED — 20 settembre 2026.**
+
+Il run append-only `audio-to-midi-development-baseline-v1-001` è stato eseguito sulle sole 8 family development congelate e ha completato 8/8 record con stato `BASELINE_COMPLETE_AWAITING_TECHNICAL_AND_HUMAN_QA`.
+
+Per ciascuna family sono stati prodotti tre output MIDI:
+
+- `drums-only.mid`;
+- `drums-bass-kick-fusion.mid`;
+- `bass-pyin.mid`;
+
+oltre al `result.json` con eventi drums, low-end notes e pitch contour.
+
+Il comando ha dichiarato `finalHoldoutAccessedByThisCommand=false`, `batch131AccessedByThisCommand=false` e `trainingAuthorized=false`.
+
+Il completamento del run non promuove ancora alcun arm: prima servono technical QA read-only e Human QA congelata. Basic Pitch resta candidato low-end successivo, non ancora eseguito.
