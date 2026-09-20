@@ -17,9 +17,17 @@
   },
   "adapter": {
     "path": "source-separation-standalone-adapter.py",
-    "gitBlobSha": "9574f616bcaa33e57c4c0e48c69a57054e3570dc",
-    "implementationCommit": "730700666b6c784c32e9a1a5e24a1fee9bcbb6fd",
-    "modelRevision": "97fc578fb57650045d40b00bc84c7d156be77547"
+    "gitBlobSha": "7810e832629fd1f088de23d657cafae456dce211",
+    "implementationCommit": "15269866226f6685c2cf9adbf75f07d8a43ef51c",
+    "modelRevision": "97fc578fb57650045d40b00bc84c7d156be77547",
+    "modelTypeValidation": {
+      "expectedSemanticType": "float32",
+      "acceptedOpenVinoStringForms": [
+        "f32",
+        "<Type: 'float32'>"
+      ],
+      "rejectNonFloat32": true
+    }
   },
   "execution": {
     "sampleRate": 44100,
