@@ -84,9 +84,15 @@ assert(source.includes('trainingAuthorized: false'));
 assert(source.includes('audio controls'));
 assert(source.includes('Downstream onset/MIDI usefulness'));
 assert(source.includes('Downstream pitch/MIDI usefulness'));
+assert(source.includes('server.on("error"'));
+assert(source.includes('error?.code === "EADDRINUSE"'));
+assert(source.includes('server.listen(0, "127.0.0.1")'));
+assert(source.includes('const boundPort = address && typeof address === "object" ? address.port : Number(port)'));
+assert(source.includes('port === undefined ? 0 : Number(port)'));
 assert(launcher.includes("source-separation-human-review.js"));
 assert(launcher.includes(" prepare $Workspace $ReviewId"));
 assert(launcher.includes(" serve $Workspace $ReviewId $Port"));
+assert(launcher.includes("[int]$Port = 0"));
 assert(!launcher.includes("source-separation-development-inference.js"));
 assert(!launcher.includes(" execute "));
 
