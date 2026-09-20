@@ -6,6 +6,46 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:d17bd8f -->
+## 20/09/26, 11:49 â€” task/barra-plancia-980-1180 â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `d17bd8f`
+
+### Cosa Ã¨ entrato
+
+- `8781762` â€” fix(plancia): il giro di chiusura della fascia — otto voci del 20/09 (35–42), tutte chiuse â€” **Carlomadella**
+- `a8f6cc3` â€” merge: main nel branch della fascia — la mano del rapper; le voci del giro rinumerate 35–40 â€” **Carlomadella**
+- `7b8c978` â€” docs(plancia): i due giri di fine task sulla fascia — segnala-problemi e prova-sul-telefono, sei e sette voci â€” **Carlomadella**
+- `c4d9f77` â€” feat(plancia): «Fra i 980 e i 1180 punti la barra della plancia trabocca» — la fascia per gradi, e la plancia a 1280 × 800 â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/piazza-390x844-mano-mancante-zoom.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/piazza-390x844-mano-mancante.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/plancia-1024x768-citta-al-bordo-zoom.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/plancia-1024x768-citta-al-bordo.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/plancia-1280x800-titolo-evento-tagliato.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/plancia-1366x768-profilo-tagliato.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/plancia-360x640.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/plancia-390x844.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/plancia-844x390-fascia-144-marchio-34.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/sala-390x844.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/sala-844x390.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/shop-390x844.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/studio-1024x768.jpg`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-20/studio-390x844.jpg`
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/css/hub.css`
+- **Modificato:** `frontend/css/stretto.css`
+- **Modificato:** `frontend/css/telefono-stretto.css`
+- **Modificato:** `frontend/js/game/tempo-controlli.js`
+
+**File interessati in questa categoria:** 20
+
+---
+
 <!-- merge:67e3719 -->
 ## 20/09/26, 01:09 â€” task/piccole-agenda-beat-parametri-licenziarsi â†’ main
 
