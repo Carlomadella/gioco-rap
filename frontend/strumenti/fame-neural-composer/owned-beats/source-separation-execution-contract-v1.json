@@ -17,8 +17,8 @@
   },
   "adapter": {
     "path": "source-separation-standalone-adapter.py",
-    "gitBlobSha": "7810e832629fd1f088de23d657cafae456dce211",
-    "implementationCommit": "15269866226f6685c2cf9adbf75f07d8a43ef51c",
+    "gitBlobSha": "2659f069a5564cc525dbcfca3c84c054dedeb4f7",
+    "implementationCommit": "b0988b1916de968586de259dc0f05f8a18c5cf1f",
     "modelRevision": "97fc578fb57650045d40b00bc84c7d156be77547",
     "modelTypeValidation": {
       "expectedSemanticType": "float32",
@@ -80,6 +80,11 @@
           343980
         ]
       }
+    ],
+    "technicalMeasures": [
+      "peakAbs",
+      "rms",
+      "stemSumResidualRmsRatio"
     ]
   },
   "review": {
