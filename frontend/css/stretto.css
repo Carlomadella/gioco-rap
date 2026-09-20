@@ -465,13 +465,17 @@
   /* Il marchio che si vede non è #hb-logo ma la nav di menu-sistema.js,
      appoggiata sopra con `top:0;bottom:0` (menu-sistema.css): con la fascia
      su due righe si stirava per tutta l'altezza e il marchio finiva sopra a
-     ENERGIA. Alta quanto il suo contenuto e appoggiata dove sta #hb-logo,
-     che è invisibile ma tiene il posto: stessi margini della fascia. */
-  #s-hub.screen.on .pbarra.adf-system-host-v7 > .adf-global-nav {
+     ENERGIA. Alta 44 — un tasto che si tocca, non i 34 del suo contenuto —
+     e appoggiata dove sta #hb-logo, che è invisibile ma tiene il posto:
+     stessi margini della fascia. Le regole di menu-sistema.css sono
+     `!important` e quel foglio si carica **dopo** questo: a parità
+     vincerebbero loro, quindi `html` davanti, che pesa un gradino in più
+     (giro del 20/09: senza, il marchio stava a 0,0 e alto tutta la fascia). */
+  html #s-hub.screen.on .pbarra.adf-system-host-v7 > .adf-global-nav {
     top: 8px !important;
     left: 6px !important;
     bottom: auto !important;
-    height: auto !important;
+    height: 44px !important;
     align-self: flex-start !important;
   }
 }
@@ -583,15 +587,18 @@
    città, poi sei risorse su tre righe, poi la pastiglia del tempo con il
    telefono e il Menu. Qui:
    1. prima riga (44): il logo, la pastiglia del tempo rimpicciolita ai
-      sette decimi, il telefono e il Menu — i tre tasti restano da 44;
+      nove decimi, il telefono e il Menu — i tre tasti restano da 44;
    2. seconda riga: la città e la fase su una riga sola;
    3. terza: le sei risorse su tre colonne e due righe, icona più numero,
       con l'etichetta piccola sopra; le barrette restano ma sottili.
-   La pastiglia è un bottone da 210 x 62 disegnato da tempo-controlli.js
-   con misure fisse dentro a uno stile suo: si rimpicciolisce con
-   `transform`, che non cambia l'impaginazione — il suo posto nella riga è
-   la scatola `#adf-time-dock`, che qui è 150 x 44. Il pannello che apre si
-   posiziona da `getBoundingClientRect()`, che la trasformazione la vede. */
+   La pastiglia è un bottone disegnato da tempo-controlli.js con misure
+   fisse dentro a uno stile suo, che sotto i 620 la fa già 168 x 54 con le
+   scritte da 7 punti: qui si rimpicciolisce ancora ai nove decimi con
+   `transform` (151 x 49), che non cambia l'impaginazione — il suo posto
+   nella riga è la scatola `#adf-time-dock`, 160 x 44. Ai sette decimi
+   (giro del 20/09) era 105 x 38 con le scritte da 4,7 punti: illeggibile.
+   Il pannello che apre si posiziona da `getBoundingClientRect()`, che la
+   trasformazione la vede. */
 @media (max-width: 620px) {
   .pbarra {
     padding: 4px 6px 6px;
@@ -612,7 +619,7 @@
   }
   /* il marchio vero (la nav di menu-sistema.js) alto quanto la riga e
      largo quanto #hb-logo qui sotto, così non finisce sotto alla pastiglia */
-  #s-hub.screen.on .pbarra.adf-system-host-v7 > .adf-global-nav {
+  html #s-hub.screen.on .pbarra.adf-system-host-v7 > .adf-global-nav {
     top: 4px !important;
     height: 44px !important;
   }
@@ -634,7 +641,7 @@
     font-size: 19px;
   }
   body.in-hub #adf-time-dock[data-host="hub"] {
-    flex: 0 0 150px;
+    flex: 0 0 160px;
     height: 44px;
     margin-left: auto;
     padding: 0;
@@ -643,7 +650,7 @@
     overflow: visible;
   }
   body.in-hub #adf-time-dock[data-host="hub"] #adf-time-widget {
-    transform: scale(0.7);
+    transform: scale(0.9);
     transform-origin: center;
   }
   .ptelbtn {
@@ -748,72 +755,76 @@
 
 
 /* ==========================================================
-   LE TESTATE DEI POSTI SUL TELEFONO — la Sala, il Negozio, il pannello
-   (lo Shop) e la Piazza
+   LE TESTATE DEI POSTI SUL TELEFONO — la Sala, il pannello (lo Shop), la
+   Piazza e il foglio della strofa
    ========================================================== */
 /* Sono le fasce in cui menu-sistema.js appoggia il marchio e MAPPA
    (menu-sistema.css, «NAV HUD HOST V7») e tempo-controlli.js la pastiglia
    del tempo. A 390 la somma non ci stava: marchio 112, MAPPA 90, il titolo
    da 210 in poi, la pastiglia 218 — la Sala scorreva di lato di cento
-   punti e lo Shop di centoquattordici (giro del 20/09). Qui, sotto i 620:
-   - la pastiglia si rimpicciolisce ai sette decimi, come nella plancia;
+   punti e lo Shop di centoquattordici (giro del 20/09); il foglio della
+   strofa, col titolo da 256 in poi, di sessanta. Qui, sotto i 620:
+   - la pastiglia si rimpicciolisce ai nove decimi, come nella plancia;
    - MAPPA se ne va: in queste fasce c'è già la X, che fa la stessa cosa,
      e due tasti per tornare alla mappa uno accanto all'altro erano il
      modo per non avere posto per il resto;
    - il marchio si stringe a 96 e il titolo gli si mette subito dopo.
+   Il Negozio (`#negozio`, `.nghead`) qui non c'è: non sta in gioco.html
+   e negozio.js è dormiente — quando tornerà avrà la sua riga.
    Le regole di menu-sistema.css sono `!important` e quel foglio si carica
    **dopo** questo: a parità vincerebbero loro, quindi qui c'è `html`
    davanti, che pesa un gradino in più. */
 @media (max-width:620px){
   body #adf-time-dock[data-host="posto"],
-  body #adf-time-dock[data-host="negozio"],
   body #adf-time-dock[data-host="pannello"]{
-    flex:0 0 150px;height:44px;margin-left:auto;padding:0;
+    flex:0 0 160px;height:44px;margin-left:auto;padding:0;
     border-left:0;background:transparent;overflow:visible}
   body #adf-time-dock[data-host="posto"] #adf-time-widget,
-  body #adf-time-dock[data-host="negozio"] #adf-time-widget,
   body #adf-time-dock[data-host="pannello"] #adf-time-widget{
-    transform:scale(.7);transform-origin:center}
-  /* la X sta dopo la pastiglia nella Sala e nel Negozio (`before:".pox"`):
-     un po' d'aria fra le due */
-  #adf-time-dock[data-host="posto"] + .pox,
-  #adf-time-dock[data-host="negozio"] + .ngx{margin-left:8px}
+    transform:scale(.9);transform-origin:center}
+  /* la X sta dopo la pastiglia nella Sala (`before:".pox"`): un po' d'aria
+     fra le due */
+  #adf-time-dock[data-host="posto"] + .pox{margin-left:8px}
 
   html #posto.on .pohead.adf-system-host-v7 > .adf-global-nav > .adf-global-map,
-  html #negozio.on .nghead.adf-system-host-v7 > .adf-global-nav > .adf-global-map,
   html #pannello.on .pnhead.adf-system-host-v7 > .adf-global-nav > .adf-global-map,
-  html #piazza.on .phead.adf-system-host-v7 > .adf-global-nav > .adf-global-map{
+  html #piazza.on .phead.adf-system-host-v7 > .adf-global-nav > .adf-global-map,
+  html #writer.on .whead.adf-system-host-v7 > .adf-global-nav > .adf-global-map{
     display:none!important}
   html #posto.on .pohead.adf-system-host-v7 > .adf-global-nav > .adf-global-system,
-  html #negozio.on .nghead.adf-system-host-v7 > .adf-global-nav > .adf-global-system,
   html #pannello.on .pnhead.adf-system-host-v7 > .adf-global-nav > .adf-global-system,
-  html #piazza.on .phead.adf-system-host-v7 > .adf-global-nav > .adf-global-system{
+  html #piazza.on .phead.adf-system-host-v7 > .adf-global-nav > .adf-global-system,
+  html #writer.on .whead.adf-system-host-v7 > .adf-global-nav > .adf-global-system{
     width:96px!important;min-width:96px!important;padding:0 6px!important;gap:5px!important}
   html #posto.on .pohead.adf-system-host-v7 > .pok,
-  html #negozio.on .nghead.adf-system-host-v7 > .ngk,
   html #pannello.on .pnhead.adf-system-host-v7 > .pnk,
-  html #piazza.on .phead.adf-system-host-v7 > :not(.adf-global-nav):first-child{
+  html #piazza.on .phead.adf-system-host-v7 > :not(.adf-global-nav):first-child,
+  html #writer.on .whead.adf-system-host-v7 > :not(.adf-global-nav):first-child{
     margin-left:104px!important}
   /* il titolo del freestyle era 19 punti su due righe: usciva dallo schermo */
   html #piazza.on .phead .pk{font-size:14px}
+  /* il titolo del foglio era 34 punti su tre righe, e la X finiva fuori
+     dallo schermo (giro del 20/09) */
+  html #writer.on .whead h2{font-size:22px;line-height:1.05}
+  html #writer.on .whead > :not(.adf-global-nav):first-child{min-width:0}
 }
 /* Sotto i 400 (un telefono da 360) nello Shop non ci stava ancora: 96 di
    marchio, il titolo, la X e la pastiglia fanno 350 in 316. Qui il marchio
    è la sola corona, da 44: il menu di sistema si apre lo stesso. */
 @media (max-width:400px){
   html #posto.on .pohead.adf-system-host-v7 > .adf-global-nav > .adf-global-system,
-  html #negozio.on .nghead.adf-system-host-v7 > .adf-global-nav > .adf-global-system,
   html #pannello.on .pnhead.adf-system-host-v7 > .adf-global-nav > .adf-global-system,
-  html #piazza.on .phead.adf-system-host-v7 > .adf-global-nav > .adf-global-system{
+  html #piazza.on .phead.adf-system-host-v7 > .adf-global-nav > .adf-global-system,
+  html #writer.on .whead.adf-system-host-v7 > .adf-global-nav > .adf-global-system{
     width:44px!important;min-width:44px!important;padding:0!important;justify-content:center!important}
   html #posto.on .pohead.adf-system-host-v7 .adf-wordmark-text,
-  html #negozio.on .nghead.adf-system-host-v7 .adf-wordmark-text,
   html #pannello.on .pnhead.adf-system-host-v7 .adf-wordmark-text,
-  html #piazza.on .phead.adf-system-host-v7 .adf-wordmark-text{display:none}
+  html #piazza.on .phead.adf-system-host-v7 .adf-wordmark-text,
+  html #writer.on .whead.adf-system-host-v7 .adf-wordmark-text{display:none}
   html #posto.on .pohead.adf-system-host-v7 > .pok,
-  html #negozio.on .nghead.adf-system-host-v7 > .ngk,
   html #pannello.on .pnhead.adf-system-host-v7 > .pnk,
-  html #piazza.on .phead.adf-system-host-v7 > :not(.adf-global-nav):first-child{
+  html #piazza.on .phead.adf-system-host-v7 > :not(.adf-global-nav):first-child,
+  html #writer.on .whead.adf-system-host-v7 > :not(.adf-global-nav):first-child{
     margin-left:52px!important}
 }
 

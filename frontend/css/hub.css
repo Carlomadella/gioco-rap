@@ -1312,8 +1312,14 @@ body.in-hub .topnav {
   }
 }
 @media (max-width: 1120px) {
+  /* «Città di provincia» a 17 punti sono 150: in una casella da 150 con
+     14 di padding andava su due righe e toccava i bordi della fascia (giro
+     del 20/09). Il nome a 15 e la casella a 164: ci sta su una riga. */
   .pcitta {
-    width: 150px;
+    width: 164px;
+  }
+  .pcn {
+    font-size: 15px;
   }
   .ps .pk,
   .ps .pbar {
@@ -1376,6 +1382,28 @@ body.in-hub .topnav {
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 16px;
+  }
+  /* sotto i 1300 la card è 202 e «FREESTYLE AL BAR CENTRALE» ne vuole 208:
+     due righe strette (24) invece dei puntini. La card è 56 (a 800 di
+     altezza): due righe 24, il piede 21 e 5 di padding sopra e sotto fanno
+     55 — il piede e il tasto perdono un po' d'aria (giro del 20/09, a 1240
+     e 1280). `.pevrow .pev` perché il blocco degli 820 di altezza, più
+     sotto, rimette il padding a 7. */
+  @media (max-width: 1300px) {
+    .pevt {
+      white-space: normal;
+      line-height: 12px;
+      max-height: 24px;
+    }
+    .pevrow .pev {
+      padding: 5px 8px;
+    }
+    .pevrow .pevfoot {
+      padding-top: 2px;
+    }
+    .pevrow .pevgo {
+      padding: 3px 10px;
+    }
   }
   .pevt .hicon {
     display: inline-block;
@@ -1474,6 +1502,18 @@ body.in-hub .topnav {
   .pevl {
     margin-top: 5px;
     gap: 3px;
+  }
+}
+/* A 768 di altezza (1366 × 768, 1024 × 768) la colonna del profilo scorreva
+   ancora di 27 senza un segno che sotto ci fosse altro: «Prossimo livello» a
+   metà (giro del 20/09). Il ritratto e le linguette perdono altri 32. */
+@media (max-height: 780px) and (min-width: 901px) {
+  .psxtab {
+    height: 76px;
+  }
+  .pport {
+    width: 84px;
+    height: 100px;
   }
 }
 

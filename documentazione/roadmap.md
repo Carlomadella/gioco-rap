@@ -269,7 +269,7 @@ telefono».
 
 **La fascia della plancia e la plancia sul computer (20/09/2026)**: la fascia in alto, che
 fra 980 e 1240 traboccava e sul telefono era alta un terzo dello schermo, si stringe per
-gradi e sul telefono è tre righe da 165 punti. E la plancia è a posto anche alle misure da
+gradi e sul telefono è tre righe da 159 punti. E la plancia è a posto anche alle misure da
 portatile — 1280 × 800, 1366 × 768 — dove le card degli eventi erano larghe 91 punti e
 quattro righe del profilo sparivano. Un banco Playwright ha passato venti schermate a
 sedici misure, dal 360 al 1920 × 1080: nessuna scorre di lato. Sta in

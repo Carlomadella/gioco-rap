@@ -2163,14 +2163,19 @@ quella che si guarda, il benessere si legge nel profilo. Fra 901 e 980 va a capo
 logo, città, pastiglia, telefono e Menu, seconda riga le sei risorse in fila — e la riga
 della griglia cresce con lei, se no la seconda riga finiva sopra alla città. Sotto i 620 tre
 righe in tutto, un quinto dello schermo e non un terzo: logo, pastiglia rimpicciolita ai
-sette decimi con `transform` (è un bottone da 210 × 62 disegnato con misure fisse dentro a
-uno stile suo), telefono e Menu; poi la città con la fase; poi le sei risorse su tre colonne.
-A 390 × 844 la fascia è alta 165, era 307.
+nove decimi con `transform` (è un bottone disegnato con misure fisse dentro a uno stile suo,
+che sotto i 620 la fa già 168 × 54 — ai sette decimi del primo giro era 105 × 38 con le
+scritte da 4,7 punti, illeggibile), telefono e Menu; poi la città con la fase; poi le sei
+risorse su tre colonne. A 390 × 844 la fascia è alta 159, era 307. Fra 981 e 1180 il tasto
+del telefono, che galleggiava in un tondo in basso a destra perché la fascia traboccava,
+torna nella barra: la fascia ci sta, e il tondo copriva la settimana.
 
-**Le testate dei posti** (la Sala, il Negozio, lo Shop, la Piazza) sotto i 620: la pastiglia
-ai sette decimi come nella plancia, MAPPA se ne va (in quelle fasce c'è già la X, che fa la
-stessa cosa), il marchio a 96 e sotto i 400 la sola corona da 44. La Sala scorreva di lato di
-cento punti a 390, lo Shop di centoquattordici. E la piazza e il foglio sono muti in
+**Le testate dei posti** (la Sala, lo Shop, la Piazza e il foglio della strofa) sotto i 620:
+la pastiglia ai nove decimi come nella plancia, MAPPA se ne va (in quelle fasce c'è già la X,
+che fa la stessa cosa), il marchio a 96 e sotto i 400 la sola corona da 44. La Sala scorreva
+di lato di cento punti a 390, lo Shop di centoquattordici, il foglio di sessanta con la X
+fuori dallo schermo. Il Negozio non c'è: `#negozio` non sta in `gioco.html` e `negozio.js` è
+dormiente — quando tornerà avrà la sua riga. E la piazza e il foglio sono muti in
 `tempo-controlli.js`: non montano la pastiglia da nessuna parte, e sotto i 900 — dove il
 palco smette di essere un contesto suo — quella dell'hub, con il suo z-index 142,
 galleggiava sopra al titolo del freestyle.
