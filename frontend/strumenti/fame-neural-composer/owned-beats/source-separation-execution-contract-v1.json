@@ -85,7 +85,15 @@
       "peakAbs",
       "rms",
       "stemSumResidualRmsRatio"
-    ]
+    ],
+    "cacheRelativePath": "cache/source-separation-openvino",
+    "audioIO": {
+      "decodeSampleRate": 44100,
+      "channels": 2,
+      "internalSampleFormat": "float32",
+      "stemContainer": "wav",
+      "stemCodec": "pcm_f32le"
+    }
   },
   "review": {
     "path": "source-separation-pilot-review-v1.json",
@@ -109,5 +117,5 @@
     "trainingAuthorized": false,
     "taskDataReadyMayBeDeclared": false
   },
-  "nextAction": "RUN_NO_AUDIO_ADAPTER_VALIDATION"
+  "nextAction": "PREPARE_APPEND_ONLY_DEVELOPMENT_INFERENCE_RECEIPT"
 }
