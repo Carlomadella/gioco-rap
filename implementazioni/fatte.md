@@ -14,11 +14,13 @@ Qualche punto era stato segnato due volte — una volta nella lista dove era nat
 nelle FATTE. Dove è successo trovi tutte e due le note, una sotto l'altra: nessuna delle
 due si butta, perché dicono cose diverse (una i dettagli, l'altra il commit).
 
-**I numeri delle liste in `implementazioni.md` non sono stati rifatti.** Le liste hanno
-dei buchi dove stavano questi punti, ed è voluto: `frontend/js/game/studio.js` e
+**I numeri citati qui («CARLO 17», «ALE 4») sono quelli che i punti avevano quando sono
+stati chiusi.** Fino al 20/09/2026 le liste in `implementazioni.md` tenevano i buchi al
+posto dei punti chiusi; quel giorno Carletto le ha rinumerate senza buchi, quindi lo stesso
+numero oggi può indicare un altro punto. Il «punto 4 di CARLO» che `frontend/js/game/studio.js`
+cita (la catena del pezzo) e il «punto 4 di ALE» di
 [`../documentazione/pagine-azioni/README.md`](../documentazione/pagine-azioni/README.md)
-citano «il punto 4 di CARLO» e «il punto 4 di ALE», e rinumerare li farebbe puntare a
-un'altra cosa.
+(i prezzi dei beat, chiuso, qui sotto) restano leggibili da qui.
 
 | quando | quante |
 | --- | --- |

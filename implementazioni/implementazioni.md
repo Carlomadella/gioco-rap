@@ -239,10 +239,10 @@ cancellate.
 
 ### ALE
 
-_I numeri sono quelli di sempre: i buchi sono i punti chiusi, spostati in
-[`fatte.md`](fatte.md). Il 6, l'hype, ci stava «apposta, per la coda che manca»: dal 20/09
-la coda — il pub e la pubblicità — è una voce dell'ordine in testa, e il punto è andato in
-`fatte.md` con gli altri._
+_Il 20/09/2026 Carletto ha rinumerato la lista senza buchi: i numeri che `fatte.md` cita
+per i punti chiusi sono quelli di prima. L'hype (era il 6) ci stava «apposta, per la coda
+che manca»: la coda — il pub e la pubblicità — è una voce dell'ordine in testa, e il punto
+è andato in `fatte.md` con gli altri._
 
 2. Rendi accessibile lo shop già dalla città iniziale, con limitazioni sui prodotti in vendita
 
@@ -267,11 +267,12 @@ la coda — il pub e la pubblicità — è una voce dell'ordine in testa, e il p
 
 ### CARLO
 
-_Stessa regola: i numeri non si rifanno. Ci sono due punti «4» — quello lungo sulla
-catena del pezzo è il «punto 4 di CARLO» che `studio.js` cita, l'altro è arrivato dopo
-con lo stesso numero e resta così. Il 12 e il 14 non erano task ma regole di lavoro, e dal
-20/09 stanno in `come-si-lavora.md`; l'8 (le transizioni video) e il 16 (l'agenda che
-blocca il giorno, risposto e chiuso) sono in `fatte.md`._
+_Rinumerata senza buchi il 20/09/2026, come quella di ALE: il «punto 4 di CARLO» che
+`studio.js` cita è ancora il 4, quello lungo sulla catena del pezzo; i numeri che
+`fatte.md` cita per i punti chiusi sono quelli di prima. Due punti non erano task ma
+regole di lavoro («crea un file nuovo collegato», «la parte smartphone separata») e dal
+20/09 stanno in `come-si-lavora.md`; le transizioni video e la domanda sull'agenda che
+blocca il giorno (risposta e chiusa) sono in `fatte.md`._
 
 #### Giornaliere
 
