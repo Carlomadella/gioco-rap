@@ -262,8 +262,17 @@ file loro), e la colonna compatta che nessuno vedeva è tolta. Sta in
 `implementazioni/02-interfaccia-e-telefono.md`, «Il telefono quando lo schermo è un
 telefono».
 
+**La fascia della plancia e la plancia sul computer (20/09/2026)**: la fascia in alto, che
+fra 980 e 1240 traboccava e sul telefono era alta un terzo dello schermo, si stringe per
+gradi e sul telefono è tre righe da 165 punti. E la plancia è a posto anche alle misure da
+portatile — 1280 × 800, 1366 × 768 — dove le card degli eventi erano larghe 91 punti e
+quattro righe del profilo sparivano. Un banco Playwright ha passato venti schermate a
+sedici misure, dal 360 al 1920 × 1080: nessuna scorre di lato. Sta in
+`implementazioni/02-interfaccia-e-telefono.md`, «La fascia della plancia fra 980 e 1240, e
+la plancia a 1280 × 800».
+
 **Resta la prova su un telefono vero**, con l'agente `prova-sul-telefono`: le misure di
-questo giro sono state lette nel CSS, non rifatte a schermo. Finché non è passata quella,
+questi giri sono state prese nel browser, non in mano. Finché non è passata quella,
 questa tappa non è chiusa.
 
 ### H · Los Angeles _(da fare)_

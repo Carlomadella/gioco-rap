@@ -67,10 +67,12 @@ da quale lista viene.
 1. ~~**Il Marketing sul telefono vero**~~ **FATTO (15/09/2026)** — il telefono si alza a
    schermo pieno anche sotto i 1180: «Il telefono quando lo schermo è un telefono» in
    `02-interfaccia-e-telefono.md`.
-2. **Fra i 980 e i 1180 punti la barra della plancia trabocca** — da problemi-riscontrati
-   (15/09, trovato chiudendo il punto sopra): 1100 punti di contenuto in 1000, il Menu
-   esce a destra; sotto i 980 la barra è alta un terzo dello schermo. Il tasto del
-   telefono galleggia e si raggiunge, la barra resta da disegnare.
+2. ~~**Fra i 980 e i 1180 punti la barra della plancia trabocca**~~ **FATTO (20/09/2026)** —
+   la fascia si stringe per gradi (1240, 1120), va a capo a 980, sul telefono è tre righe
+   (165 punti, era 307); e chiudendola si è sistemata anche la plancia a 1280 × 800 e
+   1366 × 768, dove le card degli eventi erano larghe 91 punti e quattro righe del profilo
+   sparivano. «La fascia della plancia fra 980 e 1240, e la plancia a 1280 × 800» in
+   `02-interfaccia-e-telefono.md`.
 3. **Le tre del Marketing** — da problemi-riscontrati (14/09): «In spinta» che esce come
    una seconda riga bianca, la riga di pezzo senza seed che è un bottone che non fa
    niente, il pezzo scelto che può sparire dall'elenco ma resta quello che si spinge; più,
@@ -506,7 +508,10 @@ lo Studio, la Strada e l'hover al tocco».
 Resta da fare: il giro su un telefono vero con `prova-sul-telefono` — le misure sono
 state lette nel CSS, le schermate non sono state rifatte. Il 15/09 il giro a misura di
 telefono (390 × 844) è stato fatto nel browser, chiudendo «Il telefono quando lo schermo
-è un telefono»; il telefono vero, in mano, ancora no.
+è un telefono»; il telefono vero, in mano, ancora no. Il 20/09 il giro su tutte le
+schermate a sedici misure, dal 360 al 1920 × 1080: nessuna scorre di lato, e la plancia
+è a posto anche a 1280 × 800 e 1366 × 768 («La fascia della plancia fra 980 e 1240, e la
+plancia a 1280 × 800» in `02-interfaccia-e-telefono.md`).
 
 #### Nuove modalità
 

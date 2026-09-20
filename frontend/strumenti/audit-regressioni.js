@@ -2444,6 +2444,40 @@ test("sul telefono le tre colonne diventano una pila e le porte della Casa vanno
   /@media \(max-width:900px\)\{[\s\S]*?\.lfwrap\{grid-template-columns:minmax\(0,1fr\)/.test(leggi("css/stretto.css")) &&
   leggi("css/stretto.css").includes(".lfporta,.lfp-tavolo,.lfp-camera,.lfp-divano,.lfp-conti{position:static"));
 
+/* ---- «La fascia della plancia fra 980 e 1240, e la plancia a 1280 × 800»
+   (20/09/2026, `implementazioni/02-interfaccia-e-telefono.md`). La fascia si
+   stringe per gradi in hub.css (1240, 1120), va a capo a 980 in stretto.css e
+   sul telefono e' tre righe; sotto i 1520 le card degli eventi stanno su due
+   righe e due colonne; le due scatole del profilo non si schiacciano piu';
+   la piazza e il foglio sono muti in tempo-controlli.js. */
+{
+  const hubCss = leggi("css/hub.css");
+  const strettoCss = leggi("css/stretto.css");
+  const tempoCtl = leggi("js/game/tempo-controlli.js");
+  test("la fascia della plancia si stringe per gradi: sotto i 1240 il Menu e' la casetta, sotto i 1120 le risorse sono icona e numero",
+    /@media \(max-width: 1240px\) \{[\s\S]*?\.pmenu \.pk \{\s*display: none;/.test(hubCss) &&
+    /@media \(max-width: 1120px\) \{[\s\S]*?\.ps \.pk,\s*\.ps \.pbar \{\s*display: none;/.test(hubCss) &&
+    /@media \(max-width: 1120px\) \{[\s\S]*?\.ps:first-child \.pbar \{\s*display: block;/.test(hubCss));
+  test("sotto i 980 la fascia va a capo e la riga della griglia cresce con lei; sotto i 620 la pastiglia e' ai sette decimi",
+    /@media \(max-width: 980px\) \{[\s\S]*?\.plancia \{\s*grid-template-rows: auto minmax\(0, 1fr\)/.test(strettoCss) &&
+    /@media \(max-width: 980px\) \{[\s\S]*?\.pstat \{\s*order: 5;/.test(strettoCss) &&
+    /@media \(max-width: 620px\) \{[\s\S]*?#adf-time-dock\[data-host="hub"\] #adf-time-widget \{\s*transform: scale\(0\.7\);/.test(strettoCss));
+  test("sotto i 620 nelle testate dei posti MAPPA se ne va e la pastiglia e' ai sette decimi",
+    strettoCss.includes('html #posto.on .pohead.adf-system-host-v7 > .adf-global-nav > .adf-global-map') &&
+    strettoCss.includes('body #adf-time-dock[data-host="posto"] #adf-time-widget'));
+  test("sotto i 1520 le card degli eventi stanno su due righe e due colonne, con la settimana a destra",
+    /@media \(min-width: 901px\) and \(max-width: 1520px\) \{[\s\S]*?\.pevrow \{\s*display: grid;/.test(hubCss) &&
+    /@media \(min-width: 901px\) and \(max-width: 1520px\) \{[\s\S]*?\.pevsett,\s*\.pevpiu \{\s*grid-column: 3;\s*grid-row: 1 \/ 3;/.test(hubCss));
+  test("le due scatole del profilo non si schiacciano: la colonna scorre",
+    /\.pdue \{[^}]*flex: none;/.test(hubCss) &&
+    hubCss.includes("@media (max-height: 820px) and (min-width: 901px)"));
+  test("la piazza e il foglio sono muti in tempo-controlli.js: la pastiglia dell'hub non galleggia sopra al freestyle",
+    tempoCtl.includes('{id:"piazza", root:"#piazza.on",          mute:true}') &&
+    tempoCtl.includes('{id:"writer", root:"#writer.on",          mute:true}'));
+  test("sul telefono la riga piccola di una scelta dello Studio va a capo, al massimo due righe",
+    /@media \(max-width:620px\)\{[\s\S]*?\.stchi span\{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;/.test(strettoCss));
+}
+
 for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/transizioni-video.js","js/game/luoghi-foto.js","js/preparo.js","js/gioco-ingresso.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }

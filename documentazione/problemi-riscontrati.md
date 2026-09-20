@@ -11,10 +11,14 @@ stesso giorno il giro sull'avvio rapido ne ha trovate sette, tutte chiuse nel br
 Il 20/09 il giro sulle «quattro piccole» ne ha trovate tre, più tre note: sono le
 voci 30–32, tutte e tre chiuse nello stesso branch prima del push.
 
-1. **Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
+1. ~~**Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
    telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra. Il tasto
    del telefono lì galleggia in basso a destra, quindi si raggiunge; la barra resta da
-   disegnare. E sotto i 980 la barra è alta 307 su 844: un terzo dello schermo.
+   disegnare. E sotto i 980 la barra è alta 307 su 844: un terzo dello schermo.~~
+   **RISOLTO (20/09/2026)** — branch `task/barra-plancia-980-1180`: la fascia si stringe per
+   gradi sotto i 1240 e i 1120, va a capo a 980, sul telefono è tre righe da 165. Nello
+   stesso giro la plancia a 1280 × 800 e 1366 × 768 (card degli eventi da 91 punti, quattro
+   righe del profilo che sparivano). Il dettaglio sotto alla voce, nel giro del 15/09.
 2. Le tre del Marketing (14/09): **«In spinta» esce come una seconda riga bianca**, **una
    riga di pezzo senza seed è un bottone che non fa niente**, **il pezzo scelto può sparire
    dall'elenco, ma resta quello che si spinge**; più **sul telefono il motivo per cui
@@ -2891,6 +2895,19 @@ ancora; è storia, e lo stesso file le elenca poche righe sopra. Va bene così.
 - **quanto pesa** — si vede ma si gira intorno (il menu di sistema si apre anche con ESC).
   La soglia di `stretto.css` a 980 e quella del telefono a 1180 non si parlano: o la barra
   va a capo già sotto i 1180, o il logo e la città si stringono lì.
+
+**RISOLTO (20/09/2026)** — branch `task/barra-plancia-980-1180`. Tutte e due le strade: sotto
+i 1240 logo e città si stringono e il Menu è la sola casetta, sotto i 1120 le risorse
+restano icona e numero (l'energia tiene la barretta), sotto i 980 la fascia va a capo su
+due righe, sotto i 620 su tre — a 390 × 844 è alta 165, era 307. Nello stesso giro le
+testate della Sala, del Negozio, dello Shop e della Piazza sotto i 620 (la pastiglia ai
+sette decimi, MAPPA via perché c'è la X, il marchio a 96 e sotto i 400 la sola corona), la
+piazza e il foglio muti in `tempo-controlli.js`, e la plancia sul computer a 1280 × 800 e
+1366 × 768: le card degli eventi, larghe 91 punti, stanno su due righe e due colonne sotto
+i 1520; e le quattro righe del profilo (stile, fan base, pezzi fuori, contratto) che sotto
+gli 820 di altezza si schiacciavano a due punti. Provato con un banco Playwright su venti
+schermate a sedici misure: nessuna scorre di lato. Il racconto in «La fascia della plancia
+fra 980 e 1240, e la plancia a 1280 × 800», `implementazioni/02-interfaccia-e-telefono.md`.
 
 ## Prova sul telefono del 15/09/2026 (il telefono che si alza)
 

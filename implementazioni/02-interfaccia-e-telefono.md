@@ -2141,3 +2141,75 @@ Provato fuori dal browser (`vm`): segna → gioca → 1,3 e la voce via → rise
 beat alla Sala chiude l'evento di oggi e lascia quello della settimana col suo 1,2; il
 giorno dopo gli onorati spariscono; l'open mic giocato di lunedì non tocca quello
 segnato per sabato.
+
+## La fascia della plancia fra 980 e 1240, e la plancia a 1280 × 800
+
+> **FATTO (20/09/2026)** — branch `task/barra-plancia-980-1180`. File: `frontend/css/hub.css`
+> (i blocchi dei 1240, 1120, 1520 e il blocco degli schermi bassi), `frontend/css/stretto.css`
+> (i blocchi dei 980, 620 e 400, le testate dei posti) e `frontend/js/game/tempo-controlli.js`
+> (la piazza e il foglio fra i contesti muti).
+
+La voce di problemi-riscontrati del 15/09: *«Fra i 980 e i 1180 punti la barra della plancia
+trabocca»* — 1237 punti di contenuto (logo 132, città 190, sei risorse 584, la pastiglia del
+tempo 224, Menu 107) in una fascia che sotto i 1240 non ce li ha, e nessuno se ne occupava
+fino ai 900 di `stretto.css`; e sotto i 980 la fascia alta 307 su 844, un terzo dello
+schermo. Chiudendola è venuto fuori che **la plancia non era a posto neanche sul computer**
+alle misure più comuni, e si è chiuso anche quello.
+
+**La fascia in alto, per gradi.** Sopra i 980 si stringe senza andare a capo: sotto i 1240 il
+Menu è la sola casetta (la parola la dice il `title`), logo e città perdono un po' di fianco;
+sotto i 1120 le risorse restano icona e numero, l'energia tiene la sua barretta perché è
+quella che si guarda, il benessere si legge nel profilo. Fra 901 e 980 va a capo: prima riga
+logo, città, pastiglia, telefono e Menu, seconda riga le sei risorse in fila — e la riga
+della griglia cresce con lei, se no la seconda riga finiva sopra alla città. Sotto i 620 tre
+righe in tutto, un quinto dello schermo e non un terzo: logo, pastiglia rimpicciolita ai
+sette decimi con `transform` (è un bottone da 210 × 62 disegnato con misure fisse dentro a
+uno stile suo), telefono e Menu; poi la città con la fase; poi le sei risorse su tre colonne.
+A 390 × 844 la fascia è alta 165, era 307.
+
+**Le testate dei posti** (la Sala, il Negozio, lo Shop, la Piazza) sotto i 620: la pastiglia
+ai sette decimi come nella plancia, MAPPA se ne va (in quelle fasce c'è già la X, che fa la
+stessa cosa), il marchio a 96 e sotto i 400 la sola corona da 44. La Sala scorreva di lato di
+cento punti a 390, lo Shop di centoquattordici. E la piazza e il foglio sono muti in
+`tempo-controlli.js`: non montano la pastiglia da nessuna parte, e sotto i 900 — dove il
+palco smette di essere un contesto suo — quella dell'hub, con il suo z-index 142,
+galleggiava sopra al titolo del freestyle.
+
+**La plancia sul computer, a 1280 × 800, 1366 × 768, 1440 × 900.** Due cose che a 1920 × 1080
+non si vedono e a queste misure sì:
+
+- **le quattro card degli eventi erano larghe 91 punti** a 1280 (466 a 1366, 500 a 1440
+  divisi in quattro): la colonna centrale, tolte le due ai lati (320 + 310 di minimo) e la
+  colonna della settimana (184), non aveva i 200 punti a card per cui erano disegnate —
+  titoli su tre righe tagliate, «ALLE 21:00» a metà. Sotto i 1520, dove scendono sotto i
+  150, stanno **su due righe e due colonne** (`display:grid` sulla riga, la settimana a
+  destra alta due righe), e ogni card tiene il titolo su una riga con i puntini e il piede
+  con l'ora e il tasto, che sono le due cose per cui esiste; descrizione ed elenco, che qui
+  erano già tagliati, se ne vanno. L'altezza della fascia non cambia. A 1280 le card sono
+  202 × 56, a 1366 245 × 56, a 1440 263 × 66;
+- **stile, fan base, pezzi fuori e contratto sparivano** sotto gli 820 di altezza: `.psx` è
+  una colonna flex che scorre (ha la sua barra sottile), e a cedere erano le due scatole
+  `.pdue`, le sole con `overflow:hidden`, schiacciate a due punti d'altezza — nel profilo
+  restavano due righe vuote. `flex:none`, e la colonna scorre come era pensata; il blocco
+  degli schermi bassi, che era «sotto i 760», è «sotto gli 820» e stringe anche il
+  ritratto (126 × 150 → 104 × 124) e l'aria fra i blocchi: a 800 ci sta tutto senza
+  scorrere, a 768 scorre di 27, a 720 di 68.
+
+E con la colonna a 280 (sotto i 1180) «0 su 5 curati» andava a capo: la barretta cede, il
+valore no. Sul telefono, sotto i 620, la riga piccola sotto al nome di una scelta dello
+Studio (e della Sala, della Casa, della Palestra, che usano le stesse righe) va a capo su
+due righe invece dei puntini — a 360 nella Palestra faceva «16 ene…» — e il valore a destra
+(«+lucidità · +benessere») può andare a capo invece di comprimere il nome a «Cardio legge…».
+
+**Come è stato provato.** Un banco Playwright nello scratchpad (non nel repo) che apre le
+venti schermate del gioco — plancia, telefono alzato, agenda, le cinque dello Studio, Sala,
+Shop, piazza, foglio, Strada, Casa, Live Club, Palestra, le due schede, le impostazioni, le
+trasferte — a sedici misure (360, 390, 430, 620, 768, 900, 940, 980, 1024, 1100, 1180, 1240,
+1280, 1366 × 768, 1440 × 900, 1920 × 1080, più 1280 × 720 e 844 × 390) e per ognuna misura il
+documento e la schermata accesa (`scrollWidth > clientWidth`) e chi esce dai bordi senza un
+antenato che lo tagli. Dopo il giro: **nessuna schermata scorre di lato a nessuna misura**.
+La landing e l'accesso sono stati provati a parte, a sei misure: puliti. Le pagine più
+lunghe scorrono in verticale, che è quello che devono fare.
+
+**Resta quello che restava:** la prova su un telefono vero, e di traverso (844 × 390) il
+gioco si usa ma va deciso se sugli store gira anche in orizzontale.
