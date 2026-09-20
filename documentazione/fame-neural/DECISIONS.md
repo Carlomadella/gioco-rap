@@ -1055,3 +1055,19 @@ oltre al `result.json` con eventi drums, low-end notes e pitch contour.
 Il comando ha dichiarato `finalHoldoutAccessedByThisCommand=false`, `batch131AccessedByThisCommand=false` e `trainingAuthorized=false`.
 
 Il completamento del run non promuove ancora alcun arm: prima servono technical QA read-only e Human QA congelata. Basic Pitch resta candidato low-end successivo, non ancora eseguito.
+
+## NDR-072 — Audio→MIDI development: technical QA 8/8 PASS
+
+**Stato: ACCEPTED — 20 settembre 2026.**
+
+Il technical QA read-only del run `audio-to-midi-development-baseline-v1-001` è passato con `ALL_8_FAMILIES_PASS`: 8/8 result receipt e 24/24 file MIDI sono stati verificati per struttura MIDI, PPQ 480, tempo, bilanciamento note-on/note-off, coerenza tra MIDI e result JSON, eventi drums e note/contour pYIN.
+
+Diagnostica osservata, non usata come quality score:
+
+- kick `drums-only`: 102 eventi complessivi;
+- kick `drums+bass kick-fusion`: 696 eventi complessivi;
+- `FAME000012`, `FAME000023`, `FAME000046`, `FAME000126`: zero kick nel drums-only;
+- `FAME000058`: un solo kick nel drums-only;
+- low-end pYIN: 1162 note complessive.
+
+Questi conteggi corroborano il failure mode già osservato nella Source Separation, ma non promuovono automaticamente la fusion: la scelta drums deve essere fatta mediante Human QA blind con stesso renderer. Il low-end pYIN richiede confronto umano con lo stem bass originale e diagnostica del contour. Final holdout, batch 131, training e task-data readiness restano chiusi.
