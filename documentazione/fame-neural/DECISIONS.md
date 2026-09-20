@@ -912,3 +912,13 @@ Il bootstrap dedicato `D:\FAME_NEURAL\venv-source-separation` è stato completat
 Il `pip freeze --all` reale contiene 16 package ed è registrato dal receipt `source-separation-env-v1-001` con SHA256 `e7fd1df0076b79101923900aa280b3c53a46c5b0a166bad75cbf972b7794411a`. Lo snapshot package è congelato in `requirements-source-separation-lock.txt`; il lock repository usa LF canonico ed è verificato separatamente dal digest del file catturato su Windows, così la normalizzazione EOL non viene confusa con una differenza di dipendenze.
 
 Da questo checkpoint è autorizzata **l'implementazione e la verifica tecnica** del clean standalone HTDemucs/OpenVINO adapter sul solo split `development`. Non sono ancora autorizzati accesso al final holdout, batch sulle 131 sorgenti, training o dichiarazioni di task/data readiness. L'esecuzione di Source Separation resta un gate successivo e deve rispettare il protocollo pilot già congelato.
+
+## NDR-062 — Source Separation: opening protocol immutabile, execution contract separato
+
+**Stato: ACCEPTED — 20 settembre 2026.**
+
+Il run append-only `source-separation-pilot-v1-001` è stato preparato contro il digest di `source-separation-pilot-protocol-v1.json`. Quel protocollo di apertura non viene quindi esteso o riscritto dopo la preparazione: modificarne i byte invaliderebbe il controllo di identità già implementato in `source-separation-pilot.js`.
+
+I dettagli che appartengono al blocco successivo — adapter standalone, device, seed degli shift, overlap, signature tensoriale e rubric QA congelata prima dell'ascolto — vivono nel separato `source-separation-execution-contract-v1.json` e in `source-separation-pilot-review-v1.json`. Il protocollo opening resta lo stesso artefatto storico; il contratto execution lo referenzia senza sostituirlo.
+
+L'adapter `source-separation-standalone-adapter.py` è implementato ma, a questo checkpoint, nessuna Source Separation è stata eseguita. Prima della prima inferenza sul solo development devono passare quattro controlli no-audio: verifica del lock ambiente, check del run preparato, self-test dell'adapter e verifica della signature del modello OpenVINO. Final holdout, batch 131, training e dichiarazioni di task/data readiness restano esclusi.
