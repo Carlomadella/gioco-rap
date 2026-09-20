@@ -584,6 +584,7 @@ def separate_file(
     output_dir.mkdir(parents=True, exist_ok=True)
 
     stereo = decode_stereo_f32(source)
+    source_stats = technical_stats(stereo)
     separator = OpenVinoHTDemucs(
         model_xml,
         device=device,
@@ -593,6 +594,16 @@ def separate_file(
         shift_seed=shift_seed,
     )
     separated = separator.separate(stereo)
+
+    stem_sum = separated.sum(axis=0, dtype=np.float64)
+    residual = stereo.astype(np.float64, copy=False) - stem_sum
+    residual_rms = float(np.sqrt(np.mean(np.square(residual, dtype=np.float64))))
+    source_rms = float(source_stats["rms"])
+    residual_ratio = (
+        residual_rms / source_rms
+        if source_rms > 1e-12
+        else None
+    )
 
     stems = {}
     for index, name in enumerate(SOURCES):
@@ -614,6 +625,18 @@ def separate_file(
         "overlap": DEFAULT_OVERLAP,
         "shifts": shifts,
         "shiftSeed": shift_seed,
+        "sourceTechnical": source_stats,
+        "technicalValidation": {
+            "allStemsFinite": all(item["finite"] for item in stems.values()),
+            "allStemsStereo": all(item["channels"] == 2 for item in stems.values()),
+            "allStemsSampleRate44100": all(item["sampleRate"] == SAMPLE_RATE for item in stems.values()),
+            "allStemsSameSamplesAsSource": all(
+                item["samplesPerChannel"] == source_stats["samplesPerChannel"]
+                for item in stems.values()
+            ),
+            "stemSumResidualRms": residual_rms,
+            "stemSumResidualRmsRatio": residual_ratio,
+        },
         "stems": stems,
         "sourceAudioOpenedByThisCommand": True,
         "sourceSeparationExecutedByThisCommand": True,
