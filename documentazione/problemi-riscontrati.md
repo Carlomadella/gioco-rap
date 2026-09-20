@@ -4822,3 +4822,24 @@ Playwright a 360 × 640 (promo e anteprima 47 punti in tre righe, niente tagliat
 screenshot `agenda-mosse-accese-360x640-tre-righe.jpg`. Il controllo dell'audit cerca anche
 la guardia di `telSpingi`, e il suo compagno sulla riga a capo dice tre. La prima tabella del
 README ricontata foglio per foglio (43, 16, 13, 16, 8). Le tre voci in testa sono barrate.
+
+**Controllato il commit di chiusura `4aa172d` (segnala-problemi, 20/09/2026): non ha aperto
+niente.** Letto il diff intero (CSS, audit, README, i quattro fogli, tredici screenshot) contro
+il codice. Le tre chiusure sono vere: `telefono.css:236` dice `-webkit-line-clamp:3` e la
+regola arriva intera nel file unico (`dist/anni-di-fame-gioco.html`); il controllo dell'audit
+aggancia davvero la guardia di `telSpingi` (`telefono.js:675`, provato il regex sul file con i
+fine riga di Windows) e il suo compagno cerca il tre; la prima tabella del README ricontata
+riga per riga contro la tabella grande: 16, 43, 1, 16, 13, 16, 8, 3, 7 tornano tutte, e i
+totali (126 = 90 + 14 + 17 + 5) pure; i link puntano a file che esistono. Le voci 44–46 in
+testa sono barrate e le loro RISOLTO rimandano a cose che ci sono (lo screenshot
+`prove-telefono/2026-09-20/agenda-mosse-accese-360x640-tre-righe.jpg`, la riga dell'audit, i
+cinque numeri). Poi in partita con Playwright (un pezzo fuori e uno scelto, così promo e
+anteprima sono accese) a 1440 × 900, 390 × 844, 375 × 667, 360 × 780, 360 × 640 e 320 × 568:
+nessuna delle diciassette righe dell'Agenda è tagliata (`scrollHeight` uguale all'altezza);
+promo e anteprima vanno in tre righe a 360 × 640 e a 320 × 568 (47 punti, card 82), a 375 × 667
+solo l'anteprima, dai 390 in su restano in due; «su LaFamegram» arriva intero. Le altre
+liste del telefono (contatti, agenda segnata, «Che post fai?») restano a una riga: la regola
+tocca solo `[data-azione]` e `[data-evento]`, e `telefono-stretto.css:96` cambia solo il corpo
+del carattere. Una nota, non un problema: la RISOLTO della voce 43 in testa dice ancora «va a
+capo su due righe» — è la storia di quel giorno, e la voce 44 subito sotto spiega il passaggio
+a tre; si legge di seguito e non inganna, ma chi legge solo la 43 la trova indietro di un passo.
