@@ -53,7 +53,7 @@ R6 finale resta aperto: reference cieca disponibile, scoring V1/config-001 e pai
 | Ambiente tecnico Audio Analysis | **COMPLETATO** | FFmpeg/ffprobe 9.0.1 + Python 3.14 + stack audio verificata |
 | Audio Analysis pilot | **R6 CHIUSO — V2_PROMOTE** | `audio-analysis-v2-config-001` confermata sul final holdout one-shot: beat paired median delta `0.0`, section F1 @0,5 s paired median delta `+0.545805`, technical integrity PASS; comparison SHA256 `c38046919388b839dce070f6a9503efad6c6fc43045bd6196305ea0056c12d7d`; nessun retuning consentito sullo stesso holdout |
 | Source Separation pilot | **PASS — AUDIO→MIDI DRUMS/LOW-END APERTO** | technical QA 8/8 + 32/32 stem PASS; human gate: drums median 2.5, 8/8 >=2; bass median 2.5, 7/8 >=2; outcome `OPEN_AUDIO_TO_MIDI_DRUMS_LOW_END_PILOT`; `other` mostra degrado temporale qualitativo in più family, quindi tonal resta chiuso |
-| Trascrizione Audio→MIDI pilot | **TECHNICAL QA PASS / HUMAN QA PENDENTE** | baseline 8/8 completata; technical QA `ALL_8_FAMILIES_PASS`, 8/8 result e 24/24 MIDI verificati; diagnostica: kick drums-only 102 totali vs kick-fusion 696, con 4 family a zero kick nel drums-only; low-end pYIN 1162 note complessive; nessuna di queste diagnostiche è un quality score; prossimo gate = Human QA blind drums + low-end |
+| Trascrizione Audio→MIDI pilot | **HUMAN QA PASS / DRUMS ARM SELEZIONATO / BASIC PITCH PENDENTE** | Human QA `audio-to-midi-human-review-v1-001`: drums-only FAIL (median 0.5, 3/8 >=2, total 10); `drums-bass-kick-fusion-v1` PASS e selezionato (median 2, 6/8 >=2, total 13); pYIN PASS come baseline low-end (median 2, 6/8 >=2, total 13) ma non ancora promosso definitivamente; prossimo passo = bootstrap+freeze Basic Pitch 0.4.0, poi confronto blind low-end |
 | QA pilot | **DA FARE** | metriche automatiche e giudizio umano separati |
 | Espansione batch corpus | **BLOCCATA** | subordinata ai risultati/gate del pilot |
 | Training serio | **CHIUSO** | nessun training autorizzato da questo avanzamento |
@@ -749,3 +749,8 @@ Technical QA Audio→MIDI completato sul run `audio-to-midi-development-baseline
 
 
 Human QA Audio→MIDI congelata prima dell'ascolto con reviewId `audio-to-midi-human-review-v1-001`. I due arm drums vengono presentati come A/B ciechi con assegnazione bilanciata e stesso renderer neutro; la selezione usa nell'ordine mediana usefulness, numero di family >=2, somma voti e solo in parità completa preferisce il baseline drums-only più semplice. Il low-end pYIN viene valutato contro lo stem bass originale con render MIDI note-level e render diagnostico del pitch contour. Le diagnostiche tecniche (conteggi eventi, kick candidate, note count) non sono mostrate al reviewer.
+
+
+Human QA Audio→MIDI completata con submission digest `52e7803b56fee6a6a7dea7546b7a6c6c38fdb86b01b6861f07a5a96882518f0d` e outcome `OPEN_AUDIO_TO_MIDI_QA_INTEGRATION`. Il ramo drums selezionato è `drums-bass-kick-fusion-v1`; `drums-only-spectral-onset-v1` resta baseline negativa utile. `librosa-pyin-lowend-v1` supera il proprio gate ma resta baseline qualificata, non vincitore finale, perché il protocollo richiede ancora il confronto Basic Pitch.
+
+Preparazione Basic Pitch aperta in ambiente separato `venv-basic-pitch`, Python 3.10, package `basic-pitch==0.4.0`, backend atteso ONNX su Windows. Prima inferenza vietata finché non vengono congelati exact transitive lock e SHA256 del modello ONNX incluso nel pacchetto.
