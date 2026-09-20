@@ -10,7 +10,9 @@
     "version": "0.4.0",
     "license": "Apache-2.0",
     "repository": "spotify/basic-pitch",
-    "repositoryCommit": "fa5997af0a8210982619003269994a1be25eddf3"
+    "repositoryCommit": "9991303bba609a3b93089d13ec80d1d495083596",
+    "repositoryTag": "v0.4.0",
+    "provenanceCorrection": "The earlier Audio→MIDI baseline protocol recorded fa5997af... beside package 0.4.0; that SHA is a later repository commit, not the v0.4.0 tag. This environment spec uses the actual v0.4.0 tag commit before any Basic Pitch inference."
   },
   "runtime": {
     "platform": "Windows",
