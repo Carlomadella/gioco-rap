@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:219c73c -->
+## 20/09/26, 23:10 â€” task/shop-tre-reparti â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `219c73c`
+
+### Cosa Ã¨ entrato
+
+- `0537ae2` â€” feat(shop): «Lo Shop promette tre reparti, ce ne sono due» — il reparto Vestiti: lo Shop sblocca, il camerino veste â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/negozio.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:d17bd8f -->
 ## 20/09/26, 11:49 â€” task/barra-plancia-980-1180 â†’ main
 

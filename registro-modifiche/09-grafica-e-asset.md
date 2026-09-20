@@ -6,6 +6,66 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:219c73c -->
+## 20/09/26, 23:10 â€” task/shop-tre-reparti â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `219c73c`
+
+### Cosa Ã¨ entrato
+
+- `0537ae2` â€” feat(shop): «Lo Shop promette tre reparti, ce ne sono due» — il reparto Vestiti: lo Shop sblocca, il camerino veste â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/game.css`
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+- **Modificato:** `frontend/media/makehuman-camerino-v1/runtime.js`
+- **Aggiunto:** `frontend/media/photo/shop/CREDITI.md`
+- **Aggiunto:** `frontend/media/photo/shop/capo-anello.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-anfibi.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-bandana.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-beanie.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-boots.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-camicia.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-canotta.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-canotta2.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-cappotto.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-chino.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-coppola.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-cornici.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-cuffia.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-cuffie.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-diamante.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-elegante.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-fulmini.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-jeans.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-lucide.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-maglione.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-montatura.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-montatura2.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-oxford.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-pantaloni.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-patrol.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-pelle.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-perle.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-pescatore.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-polo.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-shorts.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-slim.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-sneaker.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-sole.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-sport.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-stivaletti.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-tecnica.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-trilby.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-vissuto.png`
+- **Aggiunto:** `frontend/media/photo/shop/capo-vista.png`
+
+**File interessati in questa categoria:** 43
+
+---
+
 <!-- merge:0fcc254 -->
 ## 20/09/26, 20:48 â€” task/le-tre-del-marketing â†’ main
 
