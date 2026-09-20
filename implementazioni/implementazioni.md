@@ -130,62 +130,68 @@ da quale lista viene.
     (le tendine mostrano solo quello che possiedi, più quello che hai già addosso). «Lo
     Shop: il reparto Vestiti» in `02-interfaccia-e-telefono.md`. Gli avatar Avaturn non si
     vestono con roba MakeHuman, e il reparto lo dice.
+14. **Lo Shop dopo i Vestiti: lo stile che conta, i capi che si sbloccano, le offerte della
+    settimana** — CARLO, i tre punti «Shop (20/09/2026)» scelti fra le idee proposte
+    chiudendo il reparto. Vanno in quest'ordine: prima l'effetto dei capi (presenza/hype
+    da `makehumanState.slots`, il bonus del look a tema), poi lo sblocco per carriera
+    (contratto, fan, trasferta), poi l'offerta del lunedì e l'usato. Il primo tocca
+    `sim.js`/`actions.js`, gli altri due solo `guardaroba.js` e `negozio.js`.
 
 **Lavori lunghi**
 
-14. **Via la lucidità** — CARLO, «togli il parametro «lucidità» e tutto ciò che ne
+15. **Via la lucidità** — CARLO, «togli il parametro «lucidità» e tutto ciò che ne
     consegue». Tocca 17 file del gioco e le formule della qualità del testo: non è una
     riga, va fatto in una task sua con l'audit aggiornato nello stesso commit. Chiude da
     sola anche «l'uscita di venerdì non costa niente, quella a mano sì» di
     problemi-riscontrati.
-15. **Le tre code dello Studio a cinque linguette** — da problemi-riscontrati (15/09):
+16. **Le tre code dello Studio a cinque linguette** — da problemi-riscontrati (15/09):
     l'omonimo della classifica che non si può chiamare, chi accetta dalla classifica che
     ruba un posto alla Sala, la copertina proposta e non confermata che resta nel
     salvataggio con la foto.
-16. **Quello che manca alla catena del pezzo** — CARLO, la coda del punto «Non è più:
+17. **Quello che manca alla catena del pezzo** — CARLO, la coda del punto «Non è più:
     "Faccio un pezzo → +10 fama"» (FATTO in parte): la cover caricata da file e quella
     «stile emblema», la discografia come app del telefono, le remastered e le parti 2.
-17. ~~**Le foto dei posti che non hanno ancora una pagina**~~ **FATTO (19/09/2026)** —
+18. ~~**Le foto dei posti che non hanno ancora una pagina**~~ **FATTO (19/09/2026)** —
     Casa, Palestra, Live Club e stacca la spina sono pagine sulla loro foto, la Piazza ha
     la sua sotto; Cover e Feat come sezioni non esistono più dal 15/09 (Studio a cinque
     linguette), quindi non hanno più bisogno di una foto. «Le pagine dei posti sulla loro
     foto» in `02-interfaccia-e-telefono.md`. **Resta** la coda qui sotto, la serata a
     momenti.
-18. **La serata del Live Club giocata a momenti** — CARLO, la coda di «aggiungi le foto di
+19. **La serata del Live Club giocata a momenti** — CARLO, la coda di «aggiungi le foto di
     background dei posti»: nel riferimento `concerto_live` in mezzo alla pagina c'è «al
     terzo pezzo uno in fondo comincia a parlare sopra», tre risposte e la gente che sale o
     scende, più «cambia ordine» nella scaletta. Oggi la serata è la mossa `live` di sempre
     (un numero) scelta sulla foto: i momenti sono il minigioco della Piazza rifatto per il
     palco, e la scaletta con l'ordine vorrebbe un peso in `sim.js`.
-19. **Le card sulla mappa troppo vicine, i pulsanti sopra la mappa troppo grandi** — ALE.
+20. **Le card sulla mappa troppo vicine, i pulsanti sopra la mappa troppo grandi** — ALE.
     Si giudicano a occhio: vanno guardate con uno screenshot, non dal CSS. Stessa cosa per
     **la schermata opzioni da migliorare graficamente** — CARLO, pagina di landing.
-20. **Quando skippi tante ore ci mette troppo** — CARLO. Prima si misura (quanti giorni,
+21. **Quando skippi tante ore ci mette troppo** — CARLO. Prima si misura (quanti giorni,
     quanti secondi), poi si cerca dove.
-21. **Su LaFamegram non posta nessuno** — CARLO. Oggi gli altri compaiono nel feed solo
+22. **Su LaFamegram non posta nessuno** — CARLO. Oggi gli altri compaiono nel feed solo
     quando l'evento riguarda te (il fan, il giornalista, la Strada: `lafamegramEventi`);
     nessun contatto della Sala o rivale posta per conto suo. Prima si decide chi posta e
     cosa, poi si fa.
-22. **Il pub e la pubblicità come primo modo di fare hype** — ALE, la coda del punto
+23. **Il pub e la pubblicità come primo modo di fare hype** — ALE, la coda del punto
     sull'hype (FATTO il 06/09 per il resto): oggi non esistono né come luogo né come
     azione.
 
 **Decisioni prima che lavori**
 
-23. **I rapporti coi beatmaker che vanno in negativo** — ALE. In `posto.js` il rapporto
+24. **I rapporti coi beatmaker che vanno in negativo** — ALE. In `posto.js` il rapporto
     scende (`p.rel--`) ma è tenuto fra 0 e 5: sotto zero non va. Prima di farlo va deciso
     cosa succede a −1 (non ti vende più? ti fa pagare di più?).
-24. **Non sempre far scorrere una giornata ridà l'energia** e **la legacy** — CARLO. Sono
+25. **Non sempre far scorrere una giornata ridà l'energia** e **la legacy** — CARLO. Sono
     regole di gioco nuove: prima si scrive come funzionano, poi si fa.
-25. **Lo Shop in provincia, con limitazioni** — ALE. Lo Shop c'è già dal primo giorno;
+26. **Lo Shop in provincia, con limitazioni** — ALE. Lo Shop c'è già dal primo giorno;
     va deciso cosa **non** si vende in provincia (vedi la RISPOSTA sotto al punto).
-26. **Le decisioni tue**, senza le quali il resto non si muove: se dopo Milano e Los
+27. **Le decisioni tue**, senza le quali il resto non si muove: se dopo Milano e Los
     Angeles si può tornare indietro (DA DISCUTERE); la pagina di Mycol e il «tuo artista»
     nella landing; se il gioco sugli store gira anche **di traverso** (nel repo non c'è un
     manifest né un `orientation`, da problemi-riscontrati); e se cancellare gli undici
     branch già uniti in `main` (`git branch --merged main` li elenca, da
     `test/vitest-playwright-gate` a `task/studio-cinque-linguette`), anche sul remoto.
-27. **I sette video che nessun punto chiede** — la coda delle transizioni video (FATTO il
+28. **I sette video che nessun punto chiede** — la coda delle transizioni video (FATTO il
     20/09 per i cinque del punto): palestra, Milano, club, shop, trasferta, live, più
     `video_transizione_entrata_in_studio` che è un doppione dello studio. Sono 22 MB in
     `frontend/media/video/Transizioni di scena/` che viaggiano nel pacchetto per gli
@@ -491,6 +497,24 @@ sono i punti chiusi in [`fatte.md`](fatte.md)._
 12. fai in modo che si possano creare collettivi di rapper
 
 13. fai in modo che un produttore possa chiamarti per fare un joint album con altri rapper
+
+#### Shop (20/09/2026)
+
+_Le idee proposte chiudendo il reparto Vestiti («Lo Shop: il reparto Vestiti» in
+`02-interfaccia-e-telefono.md`); Carlo ha scelto queste tre. Numerate da 1, come le liste
+di quel giorno._
+
+1. **Lo stile che conta** — ogni capo del reparto Vestiti che hai addosso dà un punto di
+   presenza o di hype (si legge da `makehumanState.slots`, quello che il camerino ha messo
+   sull'artista); un look completo a tema — tutto elegante, tutto street — dà un bonus alla
+   promo. Così comprare serve a qualcosa oltre alla foto.
+
+2. **Capi che si sbloccano** — non tutto in vendita dal primo giorno: la giacca elegante
+   dopo il primo contratto, l'anello di diamanti a 10.000 fan, i capi «di Milano» solo dopo
+   la trasferta. Lo Shop cresce con la carriera; una card bloccata dice cosa serve.
+
+3. **Le offerte della settimana** — un capo a metà prezzo che gira ogni lunedì, come i beat
+   del banco, più un banco dell'usato con capi scontati che vanno e vengono.
 
 #### Da discutere
 
