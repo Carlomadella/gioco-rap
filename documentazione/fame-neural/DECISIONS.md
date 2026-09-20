@@ -824,3 +824,31 @@ Il test di regressione usa path audio volutamente inesistenti e verifica che sel
 Questa modifica non osserva l'holdout, non genera Human Reference holdout, non esegue V1/V2 sulle 10 tracce e non cambia candidate, config, protocollo o freeze.
 
 Il prossimo passaggio consentito, solo dopo `HOLDOUT_PREFLIGHT_PASS`, è preparare il percorso di Human Reference holdout cieca e poi eseguire una singola evaluation finale secondo il protocollo congelato.
+
+## NDR-057 — Audio Analysis R6: config-001 promossa sul final holdout one-shot
+
+Data: 20 settembre 2026. Stato: adottata.
+
+Il percorso R6 è stato completato sul nuovo cohort sostitutivo `evaluation-holdout-r1-v2`, legato alla reservation `b3b3af11aaefb894353a3a80b27b077488d7430a52371bafd91f1a8316fc1ac5` e alla Human Reference finalizzata `audio-analysis-v2-holdout-r1-v2-reference-001` con submission digest `83a28e300daa8b64653354db46afabbcb4737c300e02636bf9b8bcde9c4efe90`.
+
+La singola evaluation finale `r6-final-holdout-001` su 10/10 family produce:
+
+- paired median delta Beat F1 @70 ms: `0.0`;
+- paired median delta Section F1 @0,5 s: `+0.545805`;
+- technical integrity: PASS;
+- beat tracker outputs exactly invariant: `true`;
+- same family set / Human Reference / reservation: `true`;
+- metric gate: `V2_WINS`;
+- protocol outcome: **`V2_PROMOTE`**.
+
+Artefatti finali:
+
+- V1 report SHA256 `7b15a668a602c4357fa3416068b5c809259f282f6c09cdf75a3d9558edc1a264`;
+- V2 report SHA256 `423d00e0048535080b8aa85b7ff8993576b03a32d2b5ff63df8dab70a2afe965`;
+- comparison report SHA256 `c38046919388b839dce070f6a9503efad6c6fc43045bd6196305ea0056c12d7d`;
+- run manifest SHA256 `b108ff2ba8c00591c36fe2dfbd017e95a29bdeb88f27058003fb060ae8afc652`;
+- completion receipt SHA256 `268b8736fe8ff3546f67cfdf9d2c553512197c0dfc883411f1670b1e091002d5`.
+
+Decisione: `audio-analysis-v2-config-001` è promossa come versione Audio Analysis per il downstream del pilot. Il holdout R1 v2 è da questo momento osservato e consumato; non viene riutilizzato per tuning o scelta di nuove configurazioni. Qualunque tuning successivo richiede un nuovo untouched holdout.
+
+Questa decisione chiude R6 ma non promuove automaticamente Source Separation, Audio→MIDI, dataset, training o composer completo. Il prossimo blocco resta Source Separation pilot, seguito da Audio→MIDI drums/low-end e QA.

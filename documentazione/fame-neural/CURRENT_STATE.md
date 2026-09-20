@@ -1,10 +1,30 @@
 # FAME Neural — Current State
 
-Data: 2026-09-13
+Data: 2026-09-20
 
-## Checkpoint corrente — integrazione audit 13/09/2026
+## Checkpoint corrente — R6 Audio Analysis finale chiuso / V2_PROMOTE — 20/09/2026
 
-**Per le prossime azioni prevale [Integrazione audit 13 settembre](INTEGRAZIONE_AUDIT_2026-09-13.md).**
+Checkpoint completo: [Owned Beats — Audio Analysis R6 final holdout](OWNED_BEATS_AUDIO_ANALYSIS_R6_FINAL_HOLDOUT_2026-09-20.md).
+
+La singola evaluation finale one-shot sul cohort sostitutivo `evaluation-holdout-r1-v2` è stata completata su 10/10 family con la Human Reference cieca finalizzata e la stessa reservation congelata.
+
+- candidate: `audio-analysis-v2-config-001`;
+- run: `r6-final-holdout-001`;
+- technical integrity: **PASS**;
+- beat tracker outputs exactly invariant: **true**;
+- paired median delta Beat F1 @70 ms: `0.0`;
+- paired median delta Section F1 @0,5 s: `+0.545805`;
+- metric gate: **`V2_WINS`**;
+- protocol outcome: **`V2_PROMOTE`**;
+- retuning sullo stesso holdout: **vietato**.
+
+Il nuovo holdout R1 v2 è quindi **osservato, consumato e chiuso per tuning**. Non può essere riutilizzato per scegliere o modificare una configurazione successiva. `config-001` è la versione Audio Analysis promossa per il downstream del pilot.
+
+Prossimo blocco ufficiale: **Source Separation pilot → Audio→MIDI drums/low-end → QA pilot**. Training serio resta chiuso.
+
+## Checkpoint precedente — integrazione audit 13/09/2026
+
+**Checkpoint storico precedente:** [Integrazione audit 13 settembre](INTEGRAZIONE_AUDIT_2026-09-13.md).
 Le sezioni sottostanti restano storico della progressione e non autorizzano l'accesso al vecchio holdout.
 R1 usa il nuovo cohort sostitutivo `evaluation-holdout-r1-v2` con identità complete e digest; il vecchio holdout è escluso per provenienza insufficiente.
 Integrate le correzioni CI, Drum View, readiness, codec train-only, storico reservation e copertura UI cieca. Test locali e limiti nel checkpoint; CI remota da verificare dopo push.
@@ -17,7 +37,7 @@ R6 finale resta aperto: reference cieca disponibile, scoring V1/config-001 e pai
 > Diagnostica complementare: [Easy sanity set e localization audit — 11/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_EASY_SANITY_CHECKPOINT_2026-09-11.md).
 > Metodo review congelato: [Freeze correction-cost review config-001 — 11/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_CORRECTION_COST_REVIEW_FREEZE_2026-09-11.md).
 
-**Stato aggiornato: 12/09/2026. Conversione audio→MIDI non ancora avviata (`converted: 0`).**
+**Stato aggiornato: 20/09/2026. Audio Analysis R6 chiuso con `V2_PROMOTE`; conversione audio→MIDI non ancora avviata (`converted: 0`).**
 
 | Attività | Stato | Evidenza / prossimo vincolo |
 |---|---|---|
@@ -26,11 +46,12 @@ R6 finale resta aperto: reference cieca disponibile, scoring V1/config-001 e pai
 | Selezione cohort pilot | **COMPLETATO** | 8 beat registrati in `owned-beats-pilot-v1` |
 | Composition family corpus proprietario | **COMPLETATO** | 131/131 record confermati umanamente come composizioni distinte; 131 `compositionFamilyId` unici, 0 record senza family |
 | Diversità musicale pilot | **DA COMPLETARE** | audit formale del pilot ancora da fare; sanity set separato di 3 boom bap volutamente semplici supporta l'ipotesi che il development congelato sia comparativamente più difficile, ma non sostituisce una verifica sistematica di difficoltà/diversità |
-| Evaluation holdout | **SET CONGELATO / NON OSSERVATO** | 10 composition family congelate in `evaluation-holdout` prima del tuning V2; 8 development, overlap 0, 113 record ancora senza split; candidate freeze verificato, prossimo accesso consentito solo come singola valutazione finale |
-| Human Reference development | **COMPLETATA / VERSIONATA** | `precision-v3` finalizzata: 8/8 family, 24/24 finestre `COMPLETE` + reviewed, digest `6e80e998cf2e5725f346989f707cb59a0b44f218d8909012171d0b9ebbec91af`; `precision-v2`/`precision-v1` preservate come storico; holdout non osservato |
+| Evaluation holdout R1 v2 | **CONSUMATO / CHIUSO ONE-SHOT** | 10/10 family valutate una sola volta in `evaluation-holdout-r1-v2`; cohort digest `887ac3aee76ac65b710381bc428bd8bb7cd5708e94a4dbd9449dbea9386866e6`; reservation digest `b3b3af11aaefb894353a3a80b27b077488d7430a52371bafd91f1a8316fc1ac5`; vietato retuning sullo stesso holdout |
+| Human Reference development | **COMPLETATA / VERSIONATA** | `precision-v3` finalizzata: 8/8 family, 24/24 finestre `COMPLETE` + reviewed, digest `6e80e998cf2e5725f346989f707cb59a0b44f218d8909012171d0b9ebbec91af`; `precision-v2`/`precision-v1` preservate come storico |
+| Human Reference holdout R1 v2 | **COMPLETATA / FINALIZZATA** | 10/10 family complete e beat-metric usable; reviewId `audio-analysis-v2-holdout-r1-v2-reference-001`; submission digest `83a28e300daa8b64653354db46afabbcb4737c300e02636bf9b8bcde9c4efe90` |
 | Ambiente tecnico Audio Analysis | **COMPLETATO** | FFmpeg/ffprobe 9.0.1 + Python 3.14 + stack audio verificata |
-| Audio Analysis pilot | **SVILUPPO CHIUSO — V2_WINS / CANDIDATE FROZEN** | `audio-analysis-v2-config-001` (1/8) ha chiuso development con `V2_WINS`: correction-cost review 8/8 family comparabili, median relative increase `-0.010704` (~-1,07%), nessun veto; report `51a9a08a…`, development summary `cd4abdf…`; candidate freeze verificato SHA256 `5ab2e4d9…`; source/config/protocol invariati; holdout non osservato; prossimo vincolo = singola evaluation holdout finale, senza tuning post-osservazione |
-| Source Separation pilot | **DA FARE** | successiva all'Audio Analysis |
+| Audio Analysis pilot | **R6 CHIUSO — V2_PROMOTE** | `audio-analysis-v2-config-001` confermata sul final holdout one-shot: beat paired median delta `0.0`, section F1 @0,5 s paired median delta `+0.545805`, technical integrity PASS; comparison SHA256 `c38046919388b839dce070f6a9503efad6c6fc43045bd6196305ea0056c12d7d`; nessun retuning consentito sullo stesso holdout |
+| Source Separation pilot | **PROSSIMO BLOCCO** | Audio Analysis chiusa con `V2_PROMOTE`; aprire il pilot Source Separation senza riutilizzare l'holdout Audio Analysis per tuning |
 | Trascrizione Audio→MIDI pilot | **DA FARE** | drums/low-end prima; tonal successivamente |
 | QA pilot | **DA FARE** | metriche automatiche e giudizio umano separati |
 | Espansione batch corpus | **BLOCCATA** | subordinata ai risultati/gate del pilot |
