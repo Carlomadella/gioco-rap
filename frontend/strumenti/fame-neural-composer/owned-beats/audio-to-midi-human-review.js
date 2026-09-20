@@ -20,7 +20,7 @@ function readJson(file){return JSON.parse(fs.readFileSync(file,"utf8").replace(/
 function stableJson(v){return JSON.stringify(v,null,2)+"\n"}
 function sha256File(file){return crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex")}
 function median(values){const s=values.slice().sort((a,b)=>a-b),m=s.length/2;return s.length%2?s[Math.floor(m)]:(s[m-1]+s[m])/2}
-function safeId(v,label){if(typeof v!=="string"||!/^[A-Za-z0-9][A-Za-z0-9._-]{2,79}$/.test(v))throw new Error(${label}+" invalid");return v}
+function safeId(v,label){if(typeof v!=="string"||!/^[A-Za-z0-9][A-Za-z0-9._-]{2,79}$/.test(v))throw new Error(label+" invalid");return v}
 function reviewRoot(workspace,reviewId){return path.join(workspace,"reviews","audio-to-midi-development",safeId(reviewId,"review-id"))}
 function runRoot(workspace){return path.join(workspace,"runs","audio-to-midi-development-baseline",RUN_ID)}
 function sourceSepRoot(workspace){return path.join(workspace,"runs","source-separation-development-inference",SOURCE_SEP_RUN_ID)}
