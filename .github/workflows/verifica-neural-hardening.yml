@@ -3,10 +3,12 @@ on:
   push:
     paths:
       - 'frontend/strumenti/fame-neural-composer/**'
+      - '.gitattributes'
       - '.github/workflows/verifica-neural-hardening.yml'
   pull_request:
     paths:
       - 'frontend/strumenti/fame-neural-composer/**'
+      - '.gitattributes'
       - '.github/workflows/verifica-neural-hardening.yml'
 permissions:
   contents: read
