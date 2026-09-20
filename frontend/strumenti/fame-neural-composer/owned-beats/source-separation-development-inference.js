@@ -11,6 +11,7 @@ const CONTRACT_FILE = path.join(HERE, "source-separation-execution-contract-v1.j
 const REVIEW_FILE = path.join(HERE, "source-separation-pilot-review-v1.json");
 const ENV_SPEC_FILE = path.join(HERE, "source-separation-environment-v1.json");
 const ADAPTER_FILE = path.join(HERE, "source-separation-standalone-adapter.py");
+const RUNNER_FILE = __filename;
 const DEFAULT_RUN_ID = "source-separation-development-inference-v1-001";
 const SCHEMA = "fame-owned-beats-source-separation-development-inference-v1";
 const MODEL_DEFAULT = "C:\\Program Files\\Audacity\\openvino-models\\htdemucs_v4.xml";
@@ -53,6 +54,13 @@ function safeRunId(value) {
   return value;
 }
 
+function safeArtifactId(value, label) {
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{1,79}$/.test(value || "")) {
+    throw new Error(`Unsafe ${label}: ${value}`);
+  }
+  return value;
+}
+
 function isWithin(root, target) {
   const rel = path.relative(root, target);
   return rel === "" || (!rel.startsWith("..") && !path.isAbsolute(rel));
@@ -81,7 +89,16 @@ function validateContract(contract) {
     contract.execution?.shiftSeed !== 0 ||
     contract.execution?.overlap !== 0.25 ||
     contract.execution?.segmentSamples !== 343980 ||
+    contract.execution?.cacheRelativePath !== "cache/source-separation-openvino" ||
+    contract.execution?.audioIO?.decodeSampleRate !== 44100 ||
+    contract.execution?.audioIO?.channels !== 2 ||
+    contract.execution?.audioIO?.internalSampleFormat !== "float32" ||
+    contract.execution?.audioIO?.stemContainer !== "wav" ||
+    contract.execution?.audioIO?.stemCodec !== "pcm_f32le" ||
     JSON.stringify(contract.execution?.expectedStems) !== JSON.stringify(["drums", "bass", "other", "vocals"]) ||
+    JSON.stringify(contract.execution?.technicalMeasures) !== JSON.stringify(["peakAbs", "rms", "stemSumResidualRmsRatio"]) ||
+    contract.adapter?.path !== "source-separation-standalone-adapter.py" ||
+    contract.batchRunner?.path !== "source-separation-development-inference.js" ||
     contract.safety?.split !== "development" ||
     contract.safety?.expectedFamilies !== 8 ||
     contract.safety?.finalHoldoutAccessAllowed !== false ||
@@ -120,6 +137,11 @@ function validateFrozenRepositoryArtifacts() {
     throw new Error(`Adapter Git blob mismatch: ${adapterGitBlobSha}`);
   }
 
+  const runnerGitBlobSha = canonicalGitBlobSha(RUNNER_FILE);
+  if (runnerGitBlobSha !== contract.batchRunner.gitBlobSha) {
+    throw new Error(`Batch runner Git blob mismatch: ${runnerGitBlobSha}`);
+  }
+
   const lockFile = path.join(HERE, envSpec.lock.path);
   const lockSha256 = sha256Bytes(lockFile);
   if (
@@ -140,12 +162,14 @@ function validateFrozenRepositoryArtifacts() {
     reviewSha256,
     environmentSpecSha256: sha256Bytes(ENV_SPEC_FILE),
     lockSha256,
-    adapterGitBlobSha
+    adapterGitBlobSha,
+    runnerGitBlobSha
   };
 }
 
 function modelIdentity(xmlPath, pilotRun) {
   const xml = path.resolve(xmlPath);
+  if (!/\.xml$/i.test(xml)) throw new Error(`Model path must end in .xml: ${xml}`);
   const bin = xml.replace(/\.xml$/i, ".bin");
   if (!fs.existsSync(xml) || !fs.statSync(xml).isFile()) throw new Error(`Model XML missing: ${xml}`);
   if (!fs.existsSync(bin) || !fs.statSync(bin).isFile()) throw new Error(`Model BIN missing: ${bin}`);
@@ -243,6 +267,7 @@ function validateReceiptAgainstCurrent(workspace, runId) {
     receipt.environmentSpecSha256 !== frozen.environmentSpecSha256 ||
     receipt.environmentLockSha256 !== frozen.lockSha256 ||
     receipt.adapter?.gitBlobSha !== frozen.adapterGitBlobSha ||
+    receipt.batchRunner?.gitBlobSha !== frozen.runnerGitBlobSha ||
     !Array.isArray(receipt.sources) ||
     receipt.sources.length !== frozen.contract.safety.expectedFamilies
   ) {
@@ -298,6 +323,7 @@ function prepare(workspaceRoot, runId = DEFAULT_RUN_ID, modelXml = MODEL_DEFAULT
   const ffmpeg = probeFfmpeg();
 
   const sources = preparedPilot.sources.map(source => {
+    safeArtifactId(source.sourceRecordId, "sourceRecordId");
     validateSource(source, workspace);
     return {
       ...identity(source),
@@ -337,6 +363,11 @@ function prepare(workspaceRoot, runId = DEFAULT_RUN_ID, modelXml = MODEL_DEFAULT
       path: frozen.contract.adapter.path,
       gitBlobSha: frozen.adapterGitBlobSha,
       implementationCommit: frozen.contract.adapter.implementationCommit
+    },
+    batchRunner: {
+      path: frozen.contract.batchRunner.path,
+      gitBlobSha: frozen.runnerGitBlobSha,
+      implementationCommit: frozen.contract.batchRunner.implementationCommit
     },
     model,
     ffmpeg,
