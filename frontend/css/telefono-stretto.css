@@ -106,21 +106,12 @@
   body.in-hub.tel-aperto #adf-time-dock{visibility:hidden}
 }
 
-/* Fra i 980 e i 1180 — il tablet di traverso, la finestra a meta' schermo — la
-   barra della plancia trabocca gia' di suo (1100 punti in 1000: e' scritto in
-   problemi-riscontrati) e il tasto in coda finiva fuori dallo schermo: su un iPad
-   da 1024 il telefono non si alzava da nessuna parte. Finche' quella barra non ha
-   un disegno suo, qui il tasto galleggia in basso a destra, dove c'e' sempre. */
-@media (min-width:981px) and (max-width:1180px){
-  .ptelbtn{
-    position:fixed;right:16px;bottom:16px;z-index:57;
-    width:56px;height:56px;padding:0;margin:0;border-radius:50%;
-    border:1px solid rgba(255,255,255,.14);
-    background:linear-gradient(180deg,#1A1E27,#0E1117);
-    box-shadow:0 10px 30px rgba(0,0,0,.55)}
-  .ptelbtn .hicon{width:26px;height:26px}
-  .ptelbadge{top:2px;right:2px}
-}
+/* Fra i 980 e i 1180 — il tablet di traverso, la finestra a meta' schermo — il
+   tasto galleggiava in basso a destra in un tondo da 56, perche' la barra della
+   plancia traboccava di suo e lui finiva fuori dallo schermo. Dal 20/09 la fascia
+   si stringe per gradi (hub.css, «La fascia della plancia fra 980 e 1240») e il
+   tasto ci sta: il tondo se n'e' andato, copriva il fondo della seconda riga
+   della settimana (giro del 20/09, a 1024 x 768). */
 
 /* Di traverso (un telefono girato: 844 x 390) il guscio con le proporzioni
    dell'iPhone viene un francobollo da 154 di larghezza, e dentro non si tocca

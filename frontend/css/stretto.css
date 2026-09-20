@@ -209,6 +209,18 @@
   #studio .strisorse span{font-size:12.5px;gap:4px}
   #studio .strisorse .stpunto{display:none}
   #studio .strisorse svg{width:14px;height:14px}
+  /* la riga piccola sotto al nome di una scelta («Ferro pesante, poche
+     ripetizioni. 16 energie · 18 €») sul computer sta su una riga con i
+     puntini; qui, dove la riga è larga la metà, i puntini mangiavano la
+     parte che dice qualcosa (a 360 nella Palestra: «16 ene…»). Va a capo,
+     al massimo due righe. Vale per tutte le pagine che usano le righe
+     dello Studio: la Sala, la Casa, il Live Club, la Palestra. */
+  .stchi span{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;
+    -webkit-box-orient:vertical;line-height:1.25}
+  .stchi span span{display:inline}
+  /* e il valore a destra («+lucidità · +benessere») può andare a capo
+     invece di comprimere il nome a «Cardio legge…» */
+  .stval{white-space:normal;text-align:right;max-width:42%}
 }
 
 @media (max-width:520px){
@@ -377,6 +389,97 @@
   }
 }
 
+/* ---- la fascia in alto va a capo ----
+   Sopra i 980 la fascia si stringe senza andare a capo (hub.css, i blocchi
+   dei 1240 e dei 1120). Da qui in giù va a capo: prima riga logo, città, la
+   pastiglia del tempo, il telefono e il Menu; seconda riga le sei risorse in
+   fila, con l'etichetta e la barretta che tornano perché lo spazio c'è.
+   Prima queste regole stavano nel blocco dei 900, e fra 901 e 980 la fascia
+   traboccava (problemi-riscontrati, 15/09). */
+@media (max-width: 980px) {
+  /* fra 901 e 980 la plancia è ancora una griglia a righe fisse: la riga
+     della fascia deve crescere con lei, se no la seconda riga finisce sopra
+     alla città e al profilo */
+  .plancia {
+    grid-template-rows: auto minmax(0, 1fr) clamp(32px, 5vh, 44px);
+  }
+  .pbarra {
+    height: auto;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 8px 6px;
+    gap: 6px 0;
+  }
+  /* accanto al tasto del telefono (44 x 44) il Menu era alto 22: due icone
+     uguali, una si prende col pollice e l'altra no (prova sul telefono del
+     15/09/2026) */
+  .pmenu {
+    min-height: 44px;
+    padding: 0 12px;
+    margin-left: auto;
+  }
+  .plogo {
+    width: auto;
+    padding: 0 10px 0 4px;
+  }
+  .pcitta {
+    width: auto;
+    flex: 1;
+    border-left: 0;
+    padding-left: 12px;
+  }
+  .psett {
+    width: auto;
+    padding-left: 12px;
+  }
+  /* le risorse per ultime: la pastiglia del tempo, il telefono e il Menu
+     salgono in prima riga accanto alla città, invece di una terza riga loro */
+  .pstat {
+    order: 5;
+    flex: 1 0 100%;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 4px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  .pstat .ps {
+    border-left: 0;
+    padding: 2px 4px;
+    gap: 8px;
+  }
+  .pstat .ps:last-child {
+    display: flex;
+  }
+  .ps .pk,
+  .ps .pbar {
+    display: block;
+  }
+  .ps .pv {
+    margin-top: 2px;
+  }
+  .ps .pbar {
+    width: 100%;
+    max-width: 88px;
+  }
+  /* Il marchio che si vede non è #hb-logo ma la nav di menu-sistema.js,
+     appoggiata sopra con `top:0;bottom:0` (menu-sistema.css): con la fascia
+     su due righe si stirava per tutta l'altezza e il marchio finiva sopra a
+     ENERGIA. Alta 44 — un tasto che si tocca, non i 34 del suo contenuto —
+     e appoggiata dove sta #hb-logo, che è invisibile ma tiene il posto:
+     stessi margini della fascia. Le regole di menu-sistema.css sono
+     `!important` e quel foglio si carica **dopo** questo: a parità
+     vincerebbero loro, quindi `html` davanti, che pesa un gradino in più
+     (giro del 20/09: senza, il marchio stava a 0,0 e alto tutta la fascia). */
+  html #s-hub.screen.on .pbarra.adf-system-host-v7 > .adf-global-nav {
+    top: 8px !important;
+    left: 6px !important;
+    bottom: auto !important;
+    height: 44px !important;
+    align-self: flex-start !important;
+  }
+}
+
 /* ---- il telefono in mano: si impila ---- */
 @media (max-width: 900px) {
   /* Il palco smette di essere inchiodato allo schermo e torna a essere un
@@ -400,62 +503,7 @@
     grid-template-rows: auto auto auto auto;
     grid-template-areas: "barra" "centro" "sx" "sugg";
   }
-
-  .pbarra {
-    height: auto;
-    flex-wrap: wrap;
-    align-items: center;
-    padding: 8px 6px;
-    gap: 6px 0;
-  }
-  /* accanto al tasto del telefono (44 x 44) il Menu era alto 22: due icone
-     uguali, una si prende col pollice e l'altra no (prova sul telefono del
-     15/09/2026) */
-  .pmenu {
-    min-height: 44px;
-  }
-  .plogo {
-    width: auto;
-    padding: 0 10px 0 4px;
-  }
-  /* sullo schermo stretto resta la casetta: la parola la mangia la riga */
-  .pmenu {
-    padding: 0 12px;
-    margin-left: auto;
-  }
-  .pmenu .pk {
-    display: none;
-  }
-  .pcitta {
-    width: auto;
-    flex: 1;
-    border-left: 0;
-    padding-left: 12px;
-  }
-  .psett {
-    width: auto;
-    padding-left: 12px;
-  }
-  .pstat {
-    flex: 1 0 100%;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 4px;
-    padding-top: 6px;
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
-  }
-  .pstat .ps {
-    border-left: 0;
-    padding: 2px 4px;
-    gap: 8px;
-  }
-  .pstat .ps:last-child {
-    display: flex;
-  }
-  .ps .pbar {
-    width: 100%;
-    max-width: 88px;
-  }
+  /* la fascia in alto: le sue regole stanno nel blocco dei 980, più su */
 
   .pcolsx,
   .pcolcentro {
@@ -506,8 +554,14 @@
     flex-wrap: wrap;
     gap: 8px;
   }
-  .pev {
+  /* la card sta dentro a `.pevbox` (il quadratino dell'agenda, punto 8):
+     è la scatola che va a capo, non la card — con la regola sulla sola
+     `.pev` le quattro restavano in fila da 90 punti l'una, coi titoli
+     tagliati (trovato a 390 il 20/09) */
+  .pevbox {
     flex: 1 1 46%;
+  }
+  .pev {
     min-height: 128px;
   }
   .pevsett {
@@ -527,16 +581,134 @@
   }
 }
 
-@media (max-width: 560px) {
-  .pev {
-    flex: 1 1 100%;
+/* ---- la fascia sul telefono: tre righe, un quinto dello schermo e non un
+   terzo ----
+   A 390 x 844 la fascia era alta 307 (problemi-riscontrati, 15/09): logo e
+   città, poi sei risorse su tre righe, poi la pastiglia del tempo con il
+   telefono e il Menu. Qui:
+   1. prima riga (44): il logo, la pastiglia del tempo rimpicciolita ai
+      nove decimi, il telefono e il Menu — i tre tasti restano da 44;
+   2. seconda riga: la città e la fase su una riga sola;
+   3. terza: le sei risorse su tre colonne e due righe, icona più numero,
+      con l'etichetta piccola sopra; le barrette restano ma sottili.
+   La pastiglia è un bottone disegnato da tempo-controlli.js con misure
+   fisse dentro a uno stile suo, che sotto i 620 la fa già 168 x 54 con le
+   scritte da 7 punti: qui si rimpicciolisce ancora ai nove decimi con
+   `transform` (151 x 49), che non cambia l'impaginazione — il suo posto
+   nella riga è la scatola `#adf-time-dock`, 160 x 44. Ai sette decimi
+   (giro del 20/09) era 105 x 38 con le scritte da 4,7 punti: illeggibile.
+   Il pannello che apre si posiziona da `getBoundingClientRect()`, che la
+   trasformazione la vede. */
+@media (max-width: 620px) {
+  .pbarra {
+    padding: 4px 6px 6px;
+    gap: 4px 0;
+  }
+  .plogo {
+    padding: 0 6px 0 2px;
+  }
+  .plogo b {
+    font-size: 12px;
+  }
+  .plogo i {
+    font-size: 20px;
+  }
+  .plogo .hcrown {
+    width: 16px;
+    height: 16px;
+  }
+  /* il marchio vero (la nav di menu-sistema.js) alto quanto la riga e
+     largo quanto #hb-logo qui sotto, così non finisce sotto alla pastiglia */
+  html #s-hub.screen.on .pbarra.adf-system-host-v7 > .adf-global-nav {
+    top: 4px !important;
+    height: 44px !important;
+  }
+  #s-hub.screen.on .pbarra.adf-system-host-v7 > .adf-global-nav > .adf-global-system {
+    width: 96px !important;
+    min-width: 96px !important;
+    height: 44px !important;
+    padding: 0 6px !important;
+    gap: 5px !important;
+  }
+  #s-hub.screen.on .pbarra.adf-system-host-v7 .adf-wordmark-crown {
+    width: 15px;
+    height: 15px;
+  }
+  #s-hub.screen.on .pbarra.adf-system-host-v7 .adf-wordmark-text b {
+    font-size: 11px;
+  }
+  #s-hub.screen.on .pbarra.adf-system-host-v7 .adf-wordmark-text i {
+    font-size: 19px;
+  }
+  body.in-hub #adf-time-dock[data-host="hub"] {
+    flex: 0 0 160px;
+    height: 44px;
+    margin-left: auto;
+    padding: 0;
+    border-left: 0;
+    background: transparent;
+    overflow: visible;
+  }
+  body.in-hub #adf-time-dock[data-host="hub"] #adf-time-widget {
+    transform: scale(0.9);
+    transform-origin: center;
+  }
+  .ptelbtn {
+    margin-left: 0;
+  }
+  .pmenu {
+    padding: 0 10px;
+  }
+  .pcitta {
+    order: 3;
+    flex: 1 0 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0 8px;
+    padding: 0 4px;
+  }
+  .pcitta .pk {
+    display: none;
   }
   .pcitta .pcn {
-    font-size: 15px;
+    font-size: 14px;
+  }
+  .pcitta .pcf {
+    font-size: 10.5px;
   }
   .pstat {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2px 6px;
+    padding-top: 4px;
   }
+  .pstat .ps {
+    padding: 2px;
+    gap: 6px;
+  }
+  .ps .hicon {
+    width: 17px;
+    height: 17px;
+  }
+  .ps .pk {
+    font-size: 8.5px;
+    letter-spacing: 0.1em;
+  }
+  .ps .pv {
+    font-size: 13.5px;
+    margin-top: 0;
+  }
+  .ps .pbar {
+    height: 3px;
+    margin-top: 3px;
+    max-width: 64px;
+  }
+}
+
+@media (max-width: 560px) {
+  /* le card degli eventi restano due per riga anche qui: a 390 vengono
+     larghe 180, e il titolo ci sta su due righe */
   .psxtab {
     height: 78px;
   }
@@ -579,6 +751,81 @@
   .sld{width:100%}
   .sw2row{max-width:none;justify-content:flex-start}
   .sslot{flex-wrap:wrap}
+}
+
+
+/* ==========================================================
+   LE TESTATE DEI POSTI SUL TELEFONO — la Sala, il pannello (lo Shop), la
+   Piazza e il foglio della strofa
+   ========================================================== */
+/* Sono le fasce in cui menu-sistema.js appoggia il marchio e MAPPA
+   (menu-sistema.css, «NAV HUD HOST V7») e tempo-controlli.js la pastiglia
+   del tempo. A 390 la somma non ci stava: marchio 112, MAPPA 90, il titolo
+   da 210 in poi, la pastiglia 218 — la Sala scorreva di lato di cento
+   punti e lo Shop di centoquattordici (giro del 20/09); il foglio della
+   strofa, col titolo da 256 in poi, di sessanta. Qui, sotto i 620:
+   - la pastiglia si rimpicciolisce ai nove decimi, come nella plancia;
+   - MAPPA se ne va: in queste fasce c'è già la X, che fa la stessa cosa,
+     e due tasti per tornare alla mappa uno accanto all'altro erano il
+     modo per non avere posto per il resto;
+   - il marchio si stringe a 96 e il titolo gli si mette subito dopo.
+   Il Negozio (`#negozio`, `.nghead`) qui non c'è: non sta in gioco.html
+   e negozio.js è dormiente — quando tornerà avrà la sua riga.
+   Le regole di menu-sistema.css sono `!important` e quel foglio si carica
+   **dopo** questo: a parità vincerebbero loro, quindi qui c'è `html`
+   davanti, che pesa un gradino in più. */
+@media (max-width:620px){
+  body #adf-time-dock[data-host="posto"],
+  body #adf-time-dock[data-host="pannello"]{
+    flex:0 0 160px;height:44px;margin-left:auto;padding:0;
+    border-left:0;background:transparent;overflow:visible}
+  body #adf-time-dock[data-host="posto"] #adf-time-widget,
+  body #adf-time-dock[data-host="pannello"] #adf-time-widget{
+    transform:scale(.9);transform-origin:center}
+  /* la X sta dopo la pastiglia nella Sala (`before:".pox"`): un po' d'aria
+     fra le due */
+  #adf-time-dock[data-host="posto"] + .pox{margin-left:8px}
+
+  html #posto.on .pohead.adf-system-host-v7 > .adf-global-nav > .adf-global-map,
+  html #pannello.on .pnhead.adf-system-host-v7 > .adf-global-nav > .adf-global-map,
+  html #piazza.on .phead.adf-system-host-v7 > .adf-global-nav > .adf-global-map,
+  html #writer.on .whead.adf-system-host-v7 > .adf-global-nav > .adf-global-map{
+    display:none!important}
+  html #posto.on .pohead.adf-system-host-v7 > .adf-global-nav > .adf-global-system,
+  html #pannello.on .pnhead.adf-system-host-v7 > .adf-global-nav > .adf-global-system,
+  html #piazza.on .phead.adf-system-host-v7 > .adf-global-nav > .adf-global-system,
+  html #writer.on .whead.adf-system-host-v7 > .adf-global-nav > .adf-global-system{
+    width:96px!important;min-width:96px!important;padding:0 6px!important;gap:5px!important}
+  html #posto.on .pohead.adf-system-host-v7 > .pok,
+  html #pannello.on .pnhead.adf-system-host-v7 > .pnk,
+  html #piazza.on .phead.adf-system-host-v7 > :not(.adf-global-nav):first-child,
+  html #writer.on .whead.adf-system-host-v7 > :not(.adf-global-nav):first-child{
+    margin-left:104px!important}
+  /* il titolo del freestyle era 19 punti su due righe: usciva dallo schermo */
+  html #piazza.on .phead .pk{font-size:14px}
+  /* il titolo del foglio era 34 punti su tre righe, e la X finiva fuori
+     dallo schermo (giro del 20/09) */
+  html #writer.on .whead h2{font-size:22px;line-height:1.05}
+  html #writer.on .whead > :not(.adf-global-nav):first-child{min-width:0}
+}
+/* Sotto i 400 (un telefono da 360) nello Shop non ci stava ancora: 96 di
+   marchio, il titolo, la X e la pastiglia fanno 350 in 316. Qui il marchio
+   è la sola corona, da 44: il menu di sistema si apre lo stesso. */
+@media (max-width:400px){
+  html #posto.on .pohead.adf-system-host-v7 > .adf-global-nav > .adf-global-system,
+  html #pannello.on .pnhead.adf-system-host-v7 > .adf-global-nav > .adf-global-system,
+  html #piazza.on .phead.adf-system-host-v7 > .adf-global-nav > .adf-global-system,
+  html #writer.on .whead.adf-system-host-v7 > .adf-global-nav > .adf-global-system{
+    width:44px!important;min-width:44px!important;padding:0!important;justify-content:center!important}
+  html #posto.on .pohead.adf-system-host-v7 .adf-wordmark-text,
+  html #pannello.on .pnhead.adf-system-host-v7 .adf-wordmark-text,
+  html #piazza.on .phead.adf-system-host-v7 .adf-wordmark-text,
+  html #writer.on .whead.adf-system-host-v7 .adf-wordmark-text{display:none}
+  html #posto.on .pohead.adf-system-host-v7 > .pok,
+  html #pannello.on .pnhead.adf-system-host-v7 > .pnk,
+  html #piazza.on .phead.adf-system-host-v7 > :not(.adf-global-nav):first-child,
+  html #writer.on .whead.adf-system-host-v7 > :not(.adf-global-nav):first-child{
+    margin-left:52px!important}
 }
 
 

@@ -2444,6 +2444,59 @@ test("sul telefono le tre colonne diventano una pila e le porte della Casa vanno
   /@media \(max-width:900px\)\{[\s\S]*?\.lfwrap\{grid-template-columns:minmax\(0,1fr\)/.test(leggi("css/stretto.css")) &&
   leggi("css/stretto.css").includes(".lfporta,.lfp-tavolo,.lfp-camera,.lfp-divano,.lfp-conti{position:static"));
 
+/* ---- «La fascia della plancia fra 980 e 1240, e la plancia a 1280 × 800»
+   (20/09/2026, `implementazioni/02-interfaccia-e-telefono.md`). La fascia si
+   stringe per gradi in hub.css (1240, 1120), va a capo a 980 in stretto.css e
+   sul telefono e' tre righe; sotto i 1520 le card degli eventi stanno su due
+   righe e due colonne; le due scatole del profilo non si schiacciano piu';
+   la piazza e il foglio sono muti in tempo-controlli.js. */
+{
+  const hubCss = leggi("css/hub.css");
+  const strettoCss = leggi("css/stretto.css");
+  const tempoCtl = leggi("js/game/tempo-controlli.js");
+  test("la fascia della plancia si stringe per gradi: sotto i 1240 il Menu e' la casetta, sotto i 1120 le risorse sono icona e numero",
+    /@media \(max-width: 1240px\) \{[\s\S]*?\.pmenu \.pk \{\s*display: none;/.test(hubCss) &&
+    /@media \(max-width: 1120px\) \{[\s\S]*?\.ps \.pk,\s*\.ps \.pbar \{\s*display: none;/.test(hubCss) &&
+    /@media \(max-width: 1120px\) \{[\s\S]*?\.ps:first-child \.pbar \{\s*display: block;/.test(hubCss));
+  test("sotto i 980 la fascia va a capo e la riga della griglia cresce con lei; sotto i 620 la pastiglia e' ai nove decimi in una scatola da 160",
+    /@media \(max-width: 980px\) \{[\s\S]*?\.plancia \{\s*grid-template-rows: auto minmax\(0, 1fr\)/.test(strettoCss) &&
+    /@media \(max-width: 980px\) \{[\s\S]*?\.pstat \{\s*order: 5;/.test(strettoCss) &&
+    /@media \(max-width: 620px\) \{[\s\S]*?#adf-time-dock\[data-host="hub"\] \{\s*flex: 0 0 160px;/.test(strettoCss) &&
+    /@media \(max-width: 620px\) \{[\s\S]*?#adf-time-dock\[data-host="hub"\] #adf-time-widget \{\s*transform: scale\(0\.9\);/.test(strettoCss));
+  /* giro del 20/09: le due regole del marchio (980 e 620) perdevano contro menu-sistema.css,
+     stessa forza e caricato dopo — `html` davanti, e alto 44 come un tasto */
+  test("il marchio nella fascia stretta vince su menu-sistema.css (html davanti) ed e' alto 44",
+    /html #s-hub\.screen\.on \.pbarra\.adf-system-host-v7 > \.adf-global-nav \{\s*top: 8px !important;\s*left: 6px !important;\s*bottom: auto !important;\s*height: 44px !important;/.test(strettoCss) &&
+    /html #s-hub\.screen\.on \.pbarra\.adf-system-host-v7 > \.adf-global-nav \{\s*top: 4px !important;\s*height: 44px !important;/.test(strettoCss));
+  test("sotto i 620 nelle testate dei posti e nel foglio della strofa MAPPA se ne va e la pastiglia e' ai nove decimi",
+    strettoCss.includes('html #posto.on .pohead.adf-system-host-v7 > .adf-global-nav > .adf-global-map') &&
+    strettoCss.includes('html #writer.on .whead.adf-system-host-v7 > .adf-global-nav > .adf-global-map') &&
+    strettoCss.includes('html #writer.on .whead h2{font-size:22px') &&
+    /body #adf-time-dock\[data-host="posto"\] #adf-time-widget,[\s\S]{0,120}?\{\s*transform:scale\(\.9\)/.test(strettoCss) &&
+    /* il Negozio non esiste (#negozio non e' in gioco.html): le sue regole non ci sono */
+    !strettoCss.includes("#negozio.on .nghead"));
+  /* giro del 20/09: fra 981 e 1180 il tasto del telefono galleggiava in un tondo che copriva la
+     settimana; la fascia adesso ci sta e lui torna in barra */
+  test("fra 981 e 1180 il tasto del telefono sta nella barra, non galleggia piu' in basso a destra",
+    !/@media \(min-width:981px\) and \(max-width:1180px\)\{\s*\.ptelbtn\{\s*position:fixed/.test(leggi("css/telefono-stretto.css")));
+  test("fra 981 e 1120 la citta' sta su una riga (15 punti in una casella da 164), e a 768 di altezza il profilo non scorre",
+    /@media \(max-width: 1120px\) \{[\s\S]*?\.pcitta \{\s*width: 164px;\s*\}\s*\.pcn \{\s*font-size: 15px;/.test(hubCss) &&
+    /@media \(max-height: 780px\) and \(min-width: 901px\) \{[\s\S]*?\.pport \{\s*width: 84px;\s*height: 100px;/.test(hubCss));
+  test("sotto i 1300 il titolo della card degli eventi sta su due righe, non con i puntini",
+    /@media \(max-width: 1300px\) \{\s*\.pevt \{\s*white-space: normal;\s*line-height: 12px;\s*max-height: 24px;/.test(hubCss));
+  test("sotto i 1520 le card degli eventi stanno su due righe e due colonne, con la settimana a destra",
+    /@media \(min-width: 901px\) and \(max-width: 1520px\) \{[\s\S]*?\.pevrow \{\s*display: grid;/.test(hubCss) &&
+    /@media \(min-width: 901px\) and \(max-width: 1520px\) \{[\s\S]*?\.pevsett,\s*\.pevpiu \{\s*grid-column: 3;\s*grid-row: 1 \/ 3;/.test(hubCss));
+  test("le due scatole del profilo non si schiacciano: la colonna scorre",
+    /\.pdue \{[^}]*flex: none;/.test(hubCss) &&
+    hubCss.includes("@media (max-height: 820px) and (min-width: 901px)"));
+  test("la piazza e il foglio sono muti in tempo-controlli.js: la pastiglia dell'hub non galleggia sopra al freestyle",
+    tempoCtl.includes('{id:"piazza", root:"#piazza.on",          mute:true}') &&
+    tempoCtl.includes('{id:"writer", root:"#writer.on",          mute:true}'));
+  test("sul telefono la riga piccola di una scelta dello Studio va a capo, al massimo due righe",
+    /@media \(max-width:620px\)\{[\s\S]*?\.stchi span\{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;/.test(strettoCss));
+}
+
 /* «La mano del braccio alzato del rapper è un tracciato SVG rotto» (20/09/2026):
    la curva che chiudeva la mano aveva due coppie invece di tre, il browser la saltava
    e la mano col microfono non si disegnava. Qui il corpo intero viene generato davvero

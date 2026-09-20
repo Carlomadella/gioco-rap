@@ -508,6 +508,13 @@ body.in-hub .topnav {
 
 .pdue {
   display: flex;
+  /* `.psx` è una colonna flex che scorre (ha la sua barra sottile, più su):
+     quando lo schermo è basso — 1366 × 768, 1280 × 720 — a cedere erano
+     queste due scatole, le sole con `overflow:hidden`, che si schiacciavano
+     a due punti d'altezza: stile, fan base, pezzi fuori e contratto
+     sparivano e restavano due righe vuote (giro del 20/09). `flex:none` e
+     la colonna scorre, come era pensata. */
+  flex: none;
   margin-top: 12px;
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 9px;
@@ -1270,6 +1277,150 @@ body.in-hub .topnav {
       );
   }
 }
+/* «Fra i 980 e i 1180 punti la barra della plancia trabocca» (problemi-riscontrati,
+   15/09): il contenuto della fascia — logo 132, città 190, sei risorse 584, la
+   pastiglia del tempo 224, Menu 107 — fa 1237 punti, e sotto quella larghezza
+   il Menu usciva a destra senza che nessuno se ne occupasse fino ai 900 di
+   stretto.css. Qui la fascia si stringe per gradi, senza andare a capo:
+   1. sotto i 1240 il Menu è la sola casetta (la parola la dice il `title`),
+      logo e città perdono un po' di fianco, le risorse un po' di respiro;
+   2. sotto i 1120 le risorse restano icona e numero: l'etichetta e la
+      barretta se ne vanno (l'energia tiene la sua, è quella che si guarda),
+      e il benessere si legge nel profilo, come già sotto i 1000.
+   Così a 981 ci stanno ancora tutti e a 1240 non cambia niente. Sotto i 980
+   va a capo: sta in stretto.css, con il resto del telefono. */
+@media (max-width: 1240px) {
+  .plogo {
+    width: 112px;
+  }
+  .pcitta {
+    width: 160px;
+    padding-left: 14px;
+  }
+  .pmenu {
+    padding: 0 14px;
+  }
+  .pmenu .pk {
+    display: none;
+  }
+  .ps {
+    padding: 0 4px 0 10px;
+    gap: 7px;
+  }
+  .ps .pbar {
+    width: 56px;
+  }
+}
+@media (max-width: 1120px) {
+  /* «Città di provincia» a 17 punti sono 150: in una casella da 150 con
+     14 di padding andava su due righe e toccava i bordi della fascia (giro
+     del 20/09). Il nome a 15 e la casella a 164: ci sta su una riga. */
+  .pcitta {
+    width: 164px;
+  }
+  .pcn {
+    font-size: 15px;
+  }
+  .ps .pk,
+  .ps .pbar {
+    display: none;
+  }
+  .ps:first-child .pbar {
+    display: block;
+  }
+  .ps .pv {
+    margin-top: 0;
+  }
+  .pstat .ps:last-child {
+    display: none;
+  }
+}
+/* «Le card degli eventi a 1280 sono larghe 91 punti» (giro del 20/09):
+   la colonna centrale, tolte le due colonne ai lati (320 + 310 di minimo)
+   e la colonna della settimana (184), lascia alle quattro card 366 punti a
+   1280, 466 a 1366, 500 a 1440: titoli su tre righe tagliate, «ALLE 21:00»
+   a metà. Erano disegnate per i 200 punti che hanno a 1920. Sotto i 1520
+   — dove scendono sotto i 150 — stanno su due righe e due colonne, e ogni
+   card tiene il titolo su una riga e il piede con l'ora e il tasto, che
+   sono le due cose per cui esiste: descrizione ed elenco, che qui erano
+   già tagliati, se ne vanno. La settimana resta a destra, alta due righe.
+   L'altezza della fascia non cambia: 139 diviso due fa 65 a card. Sotto i
+   900 la fascia si impila con le sue regole, in stretto.css. */
+@media (min-width: 901px) and (max-width: 1520px) {
+  .pevrow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .pevsett,
+  .pevpiu {
+    grid-column: 3;
+    grid-row: 1 / 3;
+  }
+  /* la settimana si allarga fino a quanto le serve per i nomi degli eventi
+     (con `flex: 0 0 184px` lo faceva già da sola: il minimo automatico di un
+     flex batte la base), le card si dividono il resto */
+  .pevsett {
+    width: auto;
+    min-width: 184px;
+    max-width: 230px;
+  }
+  .pevpiu {
+    width: 96px;
+  }
+  .pevbox {
+    min-height: 0;
+  }
+  .pev {
+    padding: 7px 8px 7px;
+    justify-content: space-between;
+  }
+  .pevt {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 16px;
+  }
+  /* sotto i 1300 la card è 202 e «FREESTYLE AL BAR CENTRALE» ne vuole 208:
+     due righe strette (24) invece dei puntini. La card è 56 (a 800 di
+     altezza): due righe 24, il piede 21 e 5 di padding sopra e sotto fanno
+     55 — il piede e il tasto perdono un po' d'aria (giro del 20/09, a 1240
+     e 1280). `.pevrow .pev` perché il blocco degli 820 di altezza, più
+     sotto, rimette il padding a 7. */
+  @media (max-width: 1300px) {
+    .pevt {
+      white-space: normal;
+      line-height: 12px;
+      max-height: 24px;
+    }
+    .pevrow .pev {
+      padding: 5px 8px;
+    }
+    .pevrow .pevfoot {
+      padding-top: 2px;
+    }
+    .pevrow .pevgo {
+      padding: 3px 10px;
+    }
+  }
+  .pevt .hicon {
+    display: inline-block;
+    vertical-align: -3px;
+    margin: 0 4px 0 0;
+  }
+  .pevd,
+  .pevl {
+    display: none;
+  }
+  .pevfoot {
+    padding-top: 4px;
+  }
+  .pevgo {
+    padding: 5px 10px;
+  }
+}
 @media (max-width: 1180px) {
   .plancia {
     grid-template-columns: minmax(280px, 0.8fr) minmax(0, 2.4fr);
@@ -1290,14 +1441,51 @@ body.in-hub .topnav {
   .pora {
     display: none;
   }
-  .pcitta {
-    width: 170px;
+  /* la larghezza della città qui sotto la decide il blocco dei 1240/1120,
+     più sopra: una regola qui, venendo dopo, la batterebbe */
+  /* con la colonna a 280 «0 su 5 curati» andava a capo su due righe: la
+     barretta cede un po', il valore no */
+  .prow .mini {
+    width: 64px;
+  }
+  .prow .v {
+    white-space: nowrap;
   }
 }
 
-@media (max-height: 760px) and (min-width: 901px) {
+@media (max-height: 820px) and (min-width: 901px) {
   .psxtab {
     height: 84px;
+  }
+  /* la colonna del profilo perde un po' d'aria fra i blocchi e il ritratto
+     si fa più piccolo: a 800 di altezza (1280 × 800, lo Steam Deck) così
+     ci sta tutto senza scorrere, a 768 scorre di poco. Il blocco era «sotto
+     i 760»: 800 è la misura più comune e ci mancava di poco. */
+  .pport {
+    width: 104px;
+    height: 124px;
+  }
+  .psx {
+    padding: 10px 12px 8px;
+  }
+  .pface {
+    margin-top: 8px;
+  }
+  .psk {
+    margin-top: 8px;
+  }
+  .pskrow {
+    height: 22px;
+  }
+  .pdue {
+    margin-top: 8px;
+  }
+  .pdue > div {
+    padding: 6px 12px;
+  }
+  .pnext {
+    margin-top: 8px;
+    padding: 7px 12px 9px;
   }
   .peventi {
     height: 168px;
@@ -1314,6 +1502,18 @@ body.in-hub .topnav {
   .pevl {
     margin-top: 5px;
     gap: 3px;
+  }
+}
+/* A 768 di altezza (1366 × 768, 1024 × 768) la colonna del profilo scorreva
+   ancora di 27 senza un segno che sotto ci fosse altro: «Prossimo livello» a
+   metà (giro del 20/09). Il ritratto e le linguette perdono altri 32. */
+@media (max-height: 780px) and (min-width: 901px) {
+  .psxtab {
+    height: 76px;
+  }
+  .pport {
+    width: 84px;
+    height: 100px;
   }
 }
 

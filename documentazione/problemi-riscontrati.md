@@ -10,12 +10,20 @@ trovato sette cose, sei chiuse nello stesso branch, una (la mano del rapper) è 
 chiusa il 20/09 in un branch suo; lo stesso giorno il giro sull'avvio rapido ne ha trovate
 sette, tutte chiuse nel branch. Il 20/09 il giro sulle «quattro piccole» ne ha trovate tre,
 più tre note: sono le voci 30–32, tutte e tre chiuse nello stesso branch prima del push; il
-giro sulla mano del rapper ne ha trovate due (33–34), chiuse nello stesso branch.
+giro sulla mano del rapper ne ha trovate due (33–34), chiuse nello stesso branch. Lo stesso
+giorno il giro di fine task sulla fascia della plancia (`task/barra-plancia-980-1180`) ne ha
+trovate sei, più quattro note (voci 35–40), e la prova sul telefono altre sette, di cui tre le
+stesse, una la mano del rapper e una l'orizzontale già aperto (voce 9): le due nuove sono le
+voci 41–42. Tutte chiuse nello stesso branch prima del push.
 
-1. **Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
+1. ~~**Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
    telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra. Il tasto
    del telefono lì galleggia in basso a destra, quindi si raggiunge; la barra resta da
-   disegnare. E sotto i 980 la barra è alta 307 su 844: un terzo dello schermo.
+   disegnare. E sotto i 980 la barra è alta 307 su 844: un terzo dello schermo.~~
+   **RISOLTO (20/09/2026)** — branch `task/barra-plancia-980-1180`: la fascia si stringe per
+   gradi sotto i 1240 e i 1120, va a capo a 980, sul telefono è tre righe da 165. Nello
+   stesso giro la plancia a 1280 × 800 e 1366 × 768 (card degli eventi da 91 punti, quattro
+   righe del profilo che sparivano). Il dettaglio sotto alla voce, nel giro del 15/09.
 2. Le tre del Marketing (14/09): **«In spinta» esce come una seconda riga bianca**, **una
    riga di pezzo senza seed è un bottone che non fa niente**, **il pezzo scelto può sparire
    dall'elenco, ma resta quello che si spinge**; più **sul telefono il motivo per cui
@@ -137,6 +145,48 @@ giro sulla mano del rapper ne ha trovate due (33–34), chiuse nello stesso bran
    questo foglio), mentre la voce 17 qui sotto è chiusa.~~ **RISOLTO (20/09/2026)** — il
    paragrafo dice che è stata chiusa il 20/09 in un branch suo.
 
+35. ~~**Il foglio della strofa sul telefono scorre di lato, e la X sta fuori dallo schermo** (20/09,
+   `overlays.css:47-54` con `menu-sistema.css:541-553`): a 390 e 360 la testata è larga 415 in
+   354, la X del foglio parte a 389 e il titolo va su tre righe. Il documento della task dice
+   che nessuna schermata scorre di lato, il foglio sì.~~ **RISOLTO (20/09/2026)** — il foglio
+   sta nelle regole delle testate sotto i 620 (MAPPA via, marchio 96, titolo da 104) col
+   titolo a 22 punti su una riga; a 390 la X sta a 328, a 360 a 298.
+36. ~~**La pastiglia del tempo sotto i 620 è rimpicciolita due volte: 105 × 38, scritte da
+   4,7 punti** (20/09, `stretto.css:636-647` e `:768-776` contro `tempo-controlli.js:367-372`):
+   il foglio la rimpicciolisce a 168 × 54 da solo, la scatola da 150 la stringe ancora, e i
+   sette decimi si applicano sopra. Nella plancia, nella Sala e nello Shop.~~ **RISOLTO
+   (20/09/2026)** — nove decimi in una scatola da 160: 144 × 49, le scritte a 6 punti (quelle
+   del foglio suo, che sotto i 620 le fa da 6,7 e 7). La fascia a 390 resta 159.
+37. ~~**Le due regole che appoggiano il marchio dove sta `#hb-logo` (980 e 620) non lavorano**
+   (20/09, `stretto.css:470-476` e `:615-618` contro `menu-sistema.css:429-434`): stessa forza,
+   tutte e due con `!important`, e menu-sistema si carica dopo. Il marchio sta a 0,0 invece
+   che a 6,8: fra 901 e 980 è 19 punti più in alto della città.~~ **RISOLTO (20/09/2026)** —
+   `html` davanti come nelle testate, e alto 44 (era 34 col contenuto che sporgeva, prova sul
+   telefono): a 844 × 390 e a 900 il marchio sta a 6,8 e fa 132 × 44, sotto i 620 a 6,4 e 96 × 44.
+38. ~~**Fra 981 e 1120 «Città di provincia» va su due righe e riempie la fascia fino ai bordi**
+   (20/09, `hub.css:1315-1317`): la casella è 150, il nome a 17 punti non ci sta, e
+   «CITTÀ ATTUALE» tocca il bordo sopra e la fase quello sotto.~~ **RISOLTO (20/09/2026)** —
+   la casella a 164 e il nome a 15: una riga, a 981 come a 1120.
+39. ~~**Fra 981 e 1180 il tasto tondo del telefono copre il fondo della seconda riga della
+   settimana** (20/09, `telefono-stretto.css:109-118` con `hub.css:1343-1357`): a 1024 × 768
+   la «Serata open mic» finisce a 715 e il tasto parte a 696. E il commento di
+   telefono-stretto dice ancora che la barra trabocca «di suo».~~ **RISOLTO (20/09/2026)** —
+   il tondo se n'è andato: la fascia adesso ci sta e il tasto torna nella barra (44 × 72 a
+   1024, fra il tempo e il Menu), da 981 a 1180 senza che la barra scorra.
+40. ~~**Il «Negozio» delle regole nuove non esiste** (20/09, `stretto.css:751-820`,
+   `implementazioni/02-interfaccia-e-telefono.md`): `#negozio`, `.nghead`, `.ngk` e `.ngx` non
+   sono in `gioco.html` e `negozio.js` è dormiente; il documento lo conta fra le quattro
+   testate sistemate.~~ **RISOLTO (20/09/2026)** — via le righe del Negozio da `stretto.css`
+   (l'audit controlla che non tornino); le testate sono tre più il foglio, e il documento lo
+   dice.
+41. ~~**A 1240–1280 il titolo della card dell'evento si tronca coi puntini: «FREESTYLE AL BAR
+   CEN…»** (20/09, prova sul telefono, `hub.css:1373-1378`): titolo 184 contro 208 richiesti.~~
+   **RISOLTO (20/09/2026)** — sotto i 1300 il titolo va su due righe da 12 (24) e il piede
+   perde un po' d'aria (padding 5, tasto 3 e 10): 55 in 56, «CENTRALE» sulla seconda riga.
+42. ~~**A 768 di altezza la scatola del profilo scorre di 27 punti e «Prossimo livello» resta
+   tagliato, senza un segno** (20/09, prova sul telefono, `hub.css:1436-1450`).~~ **RISOLTO
+   (20/09/2026)** — sotto i 780 di altezza il ritratto è 84 × 100 e le linguette 76: a 1366 × 768
+   e 1024 × 768 la colonna è 555 in 555.
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
 
 ---
@@ -2907,6 +2957,19 @@ ancora; è storia, e lo stesso file le elenca poche righe sopra. Va bene così.
   La soglia di `stretto.css` a 980 e quella del telefono a 1180 non si parlano: o la barra
   va a capo già sotto i 1180, o il logo e la città si stringono lì.
 
+**RISOLTO (20/09/2026)** — branch `task/barra-plancia-980-1180`. Tutte e due le strade: sotto
+i 1240 logo e città si stringono e il Menu è la sola casetta, sotto i 1120 le risorse
+restano icona e numero (l'energia tiene la barretta), sotto i 980 la fascia va a capo su
+due righe, sotto i 620 su tre — a 390 × 844 è alta 165, era 307. Nello stesso giro le
+testate della Sala, del Negozio, dello Shop e della Piazza sotto i 620 (la pastiglia ai
+sette decimi, MAPPA via perché c'è la X, il marchio a 96 e sotto i 400 la sola corona), la
+piazza e il foglio muti in `tempo-controlli.js`, e la plancia sul computer a 1280 × 800 e
+1366 × 768: le card degli eventi, larghe 91 punti, stanno su due righe e due colonne sotto
+i 1520; e le quattro righe del profilo (stile, fan base, pezzi fuori, contratto) che sotto
+gli 820 di altezza si schiacciavano a due punti. Provato con un banco Playwright su venti
+schermate a sedici misure: nessuna scorre di lato. Il racconto in «La fascia della plancia
+fra 980 e 1240, e la plancia a 1280 × 800», `implementazioni/02-interfaccia-e-telefono.md`.
+
 ## Prova sul telefono del 15/09/2026 (il telefono che si alza)
 
 Misure: **390 × 844**, **360 × 800** e **844 × 390** (orizzontale). Branch
@@ -4175,6 +4238,317 @@ a 180 punti di card si legge «boom bap · Nome Cog…», che va bene, ma la fas
 mai quando c'è il nome — è così per scelta (`b.da` vince).
 
 L'indice «Cosa resta aperto» in testa al foglio ha le voci nuove di questo giro.
+
+## Giro del 20/09/2026 (segnala-problemi, fine task `task/barra-plancia-980-1180`, commit `c4d9f77`)
+
+Giro sul commit che stringe la fascia della plancia per gradi (1240, 1120), la manda a capo a
+980, la fa in tre righe sotto i 620, sistema le testate dei posti sotto i 620 e i 400, le card
+degli eventi sotto i 1520 e il profilo sotto gli 820 di altezza. `npm run verifica` era già
+verde (lo dice il messaggio della task) e non l'ho rifatto. Letti per intero il diff del commit,
+i blocchi `@media` di `hub.css` e `stretto.css` con le regole base della fascia, `tempo-controlli.js`
+(la lista dei posti e lo stile che inietta), `menu-sistema.css` e `menu-sistema.js` (dove si appoggia
+il marchio), `telefono-stretto.css`, `hub.js` (le sei risorse, le card e la settimana), i sette
+controlli nuovi dell'audit e i quattro documenti. Poi il gioco vero, con Playwright sul server
+di sviluppo, a dodici larghezze fra 360 e 1520 per la plancia e a 390, 360 e 1280 per la Sala, lo
+Shop, la piazza e il foglio: misure prese dal browser e schermate guardate, non solo il CSS.
+
+Le cose che **tengono**: a nessuna delle dodici misure la plancia scorre di lato, e la fascia
+a 390 × 844 è alta 159 (era 307); fra 901 e 980 la riga della griglia cresce e la seconda riga
+delle risorse non finisce sopra al profilo; a 1280 × 800 le card sono 202 × 56 su due righe, le
+due scatole del profilo 51 di altezza (non più 2) e la colonna scorre di 27 a 768; la piazza e il
+foglio non montano più la pastiglia (`activeHost()` torna `null` e nasconde scatola e pannello)
+e il pannello della pastiglia rimpicciolita si apre al posto giusto (`getBoundingClientRect()`
+vede la trasformazione, come dice il commento); MAPPA se ne va davvero nella Sala, nello Shop e
+nella piazza sotto i 620 e le tre testate non scorrono più di lato a 390 né a 360; le sei
+risorse sono costruite da `hub.js:734-741` con l'energia prima e il benessere ultimo, quindi
+`.ps:first-child .pbar` e `.pstat .ps:last-child` prendono le celle giuste; i sette controlli
+dell'audit cercano cose che nel codice ci sono e passerebbero al rosso se sparissero.
+
+### Il foglio della strofa sul telefono scorre di lato, e la X sta fuori dallo schermo
+- **dove** — `frontend/css/overlays.css:47-54` (`.writer{overflow-y:auto}`, `.whead`, la X
+  `.wx`) e `frontend/css/menu-sistema.css:541-553` (la nav del marchio con MAPPA nella testata
+  del foglio); in `stretto.css` per `.whead` non c'è niente.
+- **cosa succede** — a 390 e a 360 la testata del foglio è larga 415 dentro a 354: il marchio
+  con MAPPA prende 202 punti, il titolo «Scrivi la tua strofa» va su tre righe e la X parte a
+  389, cioè fuori dallo schermo. Siccome `.writer` scorre in verticale, scorre anche di lato
+  (433 in 390): si trascina il foglio a sinistra per trovare la X, oppure si usa «Lascia
+  perdere» in fondo. La piazza, che è la sorella del foglio in `menu-sistema.css`, in questa task
+  è stata sistemata sotto i 620; il foglio no. Il documento della task dice «nessuna schermata
+  scorre di lato a nessuna misura» e conta il foglio fra le venti provate.
+- **come si vede** — a 390 di larghezza, dallo Studio (Testo) apri il foglio: il titolo su tre
+  righe, la X che non c'è, la pagina che si trascina di lato.
+- **quanto pesa** — si vede ma si gira intorno.
+- **RISOLTO (20/09/2026)** — branch `task/barra-plancia-980-1180`: `#writer.on .whead` sta nelle tre regole delle
+  testate sotto i 620 (MAPPA via, marchio 96, titolo da 104) e sotto i 400 (la sola corona,
+  titolo da 52), col titolo a 22 punti; a 390 e a 360 la testata non scorre e la X sta a
+  328 e a 298. Misurato col banco Playwright, screenshot nello scratchpad.
+
+### La pastiglia del tempo sotto i 620 è rimpicciolita due volte: 105 × 38, scritte da 4,7 punti
+- **dove** — `frontend/css/stretto.css:636-647` (plancia) e `:768-776` (Sala e Shop):
+  `transform: scale(0.7)` dentro a una scatola da 150 × 44; contro `frontend/js/game/tempo-controlli.js:367-372`,
+  il blocco dei 620 dello stile che inietta la pastiglia stessa.
+- **cosa succede** — il commento in `stretto.css:583-593` ragiona su un bottone da 210 × 62 che
+  ai sette decimi fa 147 × 43. Ma la pastiglia sotto i 620 si rimpicciolisce già da sola a
+  168 × 54 (e le sue scritte piccole a 6,7 e 7 punti); poi la scatola da 150 la stringe a 150
+  perché è un figlio flessibile; poi i sette decimi. Misurata nel browser: 105 × 38, l'ora a
+  14,7 punti, «ANNO 1 · SETT. 01» e «GIORNO 1/7» a 4,7 e 4,9. L'ora si legge e la pastiglia
+  si tocca, ma il bersaglio è sotto ai 44 della regola del tocco (`tocco.css`) e le due righe
+  piccole su un monitor normale sono un'ombra; su un telefono a tre pixel per punto sono
+  quattordici pixel fisici, si leggono a fatica. Vale nella plancia, nella Sala e nello Shop.
+- **come si vede** — a 390 di larghezza, la pastiglia in alto nella plancia: la riga sopra e
+  sotto l'ora.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (20/09/2026)** — branch `task/barra-plancia-980-1180`: `scale(.9)` in una scatola da 160 (plancia, Sala,
+  Shop): 144 × 49 con ANNO/GIORNO a 6 punti, l'ora a 19. La fascia a 390 resta 159 e a 360
+  la prima riga fa 96 + 160 + 44 + 43 in 348. Il commento in stretto.css dice le misure vere.
+
+### Le due regole che appoggiano il marchio dove sta `#hb-logo` (980 e 620) non lavorano
+- **dove** — `frontend/css/stretto.css:470-476` (`top:8px; left:6px; bottom:auto; height:auto`)
+  e `:615-618` (`top:4px; height:44px`), contro `frontend/css/menu-sistema.css:429-434`
+  (`left:0; top:0; bottom:0; height:auto`, tutte `!important`).
+- **cosa succede** — i due selettori sono identici lettera per lettera, tutte e due le regole
+  hanno `!important`, e `menu-sistema.css` si carica **dopo** `stretto.css` (è scritto in cima a
+  `stretto.css` e in `gioco.html:58-60`): a parità vince l'ultimo, quindi `top`, `left` e
+  `bottom` di stretto non si applicano mai. Il commento sopra dice che il marchio si appoggia
+  «dove sta #hb-logo, stessi margini della fascia»; misurato: il marchio sta a 0,0 mentre
+  `#hb-logo` sta a 6,19 a 900 e 940, a 6,4 a 390 — fra 901 e 980 il marchio è incollato
+  all'angolo, 19 punti più in alto della città che gli sta accanto. Non si stira per tutta
+  l'altezza solo perché `align-self:flex-start`, che non ha una rivale, lo tiene alto quanto
+  il contenuto. Il blocco delle testate dei posti, tre schermate più sotto, il problema lo
+  conosce e ci mette `html` davanti; questi due blocchi no.
+- **come si vede** — a 940 di larghezza, la plancia: il marchio nell'angolo in alto a
+  sinistra, «CITTÀ ATTUALE» che parte più in basso.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (20/09/2026)** — branch `task/barra-plancia-980-1180`: `html` davanti a tutte e due, e `height:44px`
+  invece di `auto` (la prova sul telefono l'aveva misurato 34 con 41 di contenuto). A 900 e
+  a 844 × 390: 6,8 e 132 × 44; a 620 e sotto: 6,4 e 96 × 44. Un controllo nell'audit.
+
+### Fra 981 e 1120 «Città di provincia» va su due righe e riempie la fascia fino ai bordi
+- **dove** — `frontend/css/hub.css:1315-1317` (`.pcitta{width:150px}` sotto i 1120) con `.pcn` a
+  17 punti (`hub.css:202-207`).
+- **cosa succede** — in 135 punti di testo «Città di provincia» a 17 punti non ci sta: va su
+  due righe (40 di altezza), e con l'etichetta sopra e la fase sotto la casella fa 72 in una
+  fascia da 72: «CITTÀ ATTUALE» tocca il bordo di sopra e «Fase 1: Sconosciuto» quello di
+  sotto, senza aria. Niente è tagliato (misurato 72 su 72), ma è la casella più stretta di
+  tutta la fascia e la città di partenza è quella che si vede per più tempo. A 1121 torna
+  su una riga.
+- **come si vede** — a 1024 × 768, la plancia, la seconda casella della fascia.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (20/09/2026)** — branch `task/barra-plancia-980-1180`: `.pcitta` a 164 e `.pcn` a 15 punti sotto i 1120:
+  una riga da 981 a 1120, la fascia resta 72-75.
+
+### Fra 981 e 1180 il tasto tondo del telefono copre il fondo della seconda riga della settimana
+- **dove** — `frontend/css/telefono-stretto.css:109-118` (il tasto fisso in basso a destra,
+  56 × 56 a 16 dal bordo) con `frontend/css/hub.css:1343-1357` (la settimana alta due righe,
+  fino al fondo della fascia degli eventi).
+- **cosa succede** — a 1024 × 768 la riga «Serata open mic · SEGNA» va da 671 a 715 e il tasto
+  parte a 696: i 19 punti in fondo alla riga sono sotto al tasto, e la scritta SEGNA lo
+  sfiora. Uguale a 1100 × 800, 1180 × 800 e 1180 × 720. Toccando il fondo della riga si apre
+  il telefono invece di segnare l'evento; la parte alta della riga risponde. A 900 di altezza
+  non si toccano. E il commento sopra a quel blocco (`telefono-stretto.css:109-113`) dice che
+  «la barra della plancia trabocca già di suo» e che il tasto galleggia «finché quella barra
+  non ha un disegno suo»: adesso il disegno c'è, e il tasto galleggia ancora — che va bene,
+  perché nella fascia a 1024 posto non ce n'è (le risorse finiscono a 749, la pastiglia a
+  973, il Menu a 1024), ma il commento racconta una cosa non più vera.
+- **come si vede** — a 1024 × 768, la plancia, in basso a destra.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (20/09/2026)** — branch `task/barra-plancia-980-1180`: via il blocco 981–1180 di telefono-stretto.css: la
+  fascia ci sta (è il lavoro di questa task) e il tasto torna in barra, 44 × 72 fra il tempo e
+  il Menu; misurato a 981, 1024, 1100, 1120 e 1180, la barra non scorre e la settimana è
+  libera. Il commento dice com'era e perché non c'è più; l'audit controlla che il tondo non
+  torni.
+
+### Il «Negozio» delle regole nuove non esiste
+- **dove** — `frontend/css/stretto.css:751-820` (`#negozio.on .nghead`, `.ngk`, `.ngx`,
+  `#adf-time-dock[data-host="negozio"]`), `implementazioni/02-interfaccia-e-telefono.md`
+  («Le testate dei posti (la Sala, il Negozio, lo Shop, la Piazza)») e il messaggio del commit.
+- **cosa succede** — in `pagine/gioco.html` non c'è nessun `id="negozio"`, né `.nghead`, né
+  `.ngk`, né `.ngx`; `negozio.js` è un file dormiente («ADF_ABBIGLIAMENTO_HIBERNATE_V2», tutte
+  le funzioni tornano subito). Le regole per il Negozio in `menu-sistema.css` e in
+  `tempo-controlli.js` c'erano già da prima e non sono di questa task; ma le tredici righe
+  nuove in `stretto.css` non prendono niente, e il documento e il commit contano il Negozio
+  fra le quattro testate sistemate: sono tre (Sala, Shop, piazza).
+- **come si vede** — `grep -rn negozio frontend/pagine/gioco.html`: solo i due `<link>`.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (20/09/2026)** — branch `task/barra-plancia-980-1180`: le righe del Negozio sono uscite dalle regole delle
+  testate (`#negozio`, `.nghead`, `.ngk`, `.ngx`, `data-host="negozio"`), il commento dice che
+  non c'è e che quando tornerà avrà la sua riga; il documento della task conta tre testate
+  più il foglio. L'audit controlla che `#negozio.on .nghead` non sia in stretto.css.
+
+Note a margine, scelte e non bug: (1) **a 390 la Sala, lo Shop e la piazza hanno la sola
+corona** — il blocco dei 400 (`stretto.css:803`) dice «un telefono da 360», ma 390 è sotto i
+400 e la corona vale anche per l'iPhone base, il più comune: se è voluto, va bene; (2) il
+terzo controllo nuovo dell'audit (`audit-regressioni.js:2465-2467`) verifica solo che i due
+selettori esistano, non che MAPPA sia `display:none` né che la pastiglia sia a `scale(.7)`;
+e i controlli con `[\s\S]*?` dopo `@media (...) {` passerebbero anche se la regola stesse in
+un blocco successivo: dicono meno di quello che promettono, ma non danno falsi verdi oggi;
+(3) `.pstat .ps:last-child{display:none}` sta due volte, a 1000 in `stretto.css:383-386` e a
+1120 in `hub.css:1328-1330`: quella di stretto adesso non serve; (4) fuori dalla task, ma lo
+si vede in ogni schermata presa: **a ogni ingresso in plancia esce il toast «Eventi
+v1.2.13: 1000 caricati.»** (`eventi-v2.js:3058-3059`), un messaggio da sviluppatore che il
+giocatore non sa cosa farsene — non è nei documenti, e se è voluto va scritto.
+
+L'indice «Cosa resta aperto» in testa al foglio ha le voci nuove di questo giro (35–40, erano 33–38 prima di unire main con la mano del rapper).
+
+## Giro del 20/09/2026 (prova-sul-telefono, fine task `task/barra-plancia-980-1180`, commit `c4d9f77`)
+
+Misure: **390 × 844** (telefono verticale), **844 × 390** (di traverso), **1024 × 768**,
+**1100 × 800**, **1280 × 800**, **1366 × 768**; in più **360 × 640** (il piccolo vero) e
+i quattro confini della fascia, **979/981** e **1240/1241**. Branch
+`task/barra-plancia-980-1180`, commit `c4d9f77`. Partita di prova di `gioco.html` (giorno 1,
+nessun pezzo). Gli screenshot stanno in `documentazione/prove-telefono/2026-09-20/`.
+
+**Come l'ho provato, per riprovarlo.** L'estensione Chrome non era collegata: ho usato
+Playwright da `frontend/node_modules` con una finestra di quella misura (`viewport`,
+`hasTouch` sotto i 900), su ognuna la plancia e poi Sala (`apriPosto()`), Shop
+(`HUB_LUOGHI` → `shop`), Piazza (`apriPiazza()`) e Studio (`apriStudio("cabina")`), con
+la console registrata. Per ogni schermata ho misurato `scrollWidth` contro `clientWidth`
+della pagina, la fascia e i suoi figli (chi esce dallo schermo, chi si sovrappone, chi ha
+il testo più largo della casella), e la misura di Menu, tasto del telefono e marchio. Il
+**Negozio non si può aprire**: `#negozio` non esiste in `gioco.html` (`negozio.js` è
+dormiente, «ADF_ABBIGLIAMENTO_HIBERNATE_V2»), quindi le regole nuove per `.nghead`
+(`stretto.css:783-806`) non toccano niente e la testata del Negozio non l'ho potuta
+guardare. Il server l'ho acceso io su `localhost:8000` e l'ho spento alla fine.
+
+**Quello che funziona.** **Nessuna delle 31 schermate scorre di lato** (`scrollWidth` =
+`clientWidth` a tutte le misure, plancia e quattro luoghi compresi). A 390 e a 360 la
+fascia è tre righe da 159: marchio 96 × 44, pastiglia ai sette decimi, telefono 44 × 44,
+Menu 43 × 44, la città e la fase su una riga, le sei risorse su tre colonne e due righe,
+niente che si accavalla. A 981 la fascia sta su una riga (72) con tutto dentro, a 979 va a
+capo (148) con le risorse sotto; a 1240 il Menu è la sola casetta (51), a 1241 torna la
+parola (107). Sala, Shop e Piazza sotto i 620 hanno la sola corona (44 × 58) con il titolo
+subito dopo, MAPPA se n'è andato e la X resta; a 844 × 390 e sopra il marchio pieno e TORNA
+ALLA MAPPA ci stanno. Lo Studio a 390 tiene marchio, TORNA ALLA MAPPA e «LA CABINA» su una
+riga, con le risorse sotto. Le card degli eventi a 1024–1366 stanno su due righe e due
+colonne con la settimana a destra. Console pulita sulla plancia, in Sala, Shop e Studio.
+
+![Plancia a 390 × 844: la fascia su tre righe](prove-telefono/2026-09-20/plancia-390x844.jpg)
+![Plancia a 360 × 640](prove-telefono/2026-09-20/plancia-360x640.jpg)
+![La Sala a 390: la sola corona, il titolo, la pastiglia e la X](prove-telefono/2026-09-20/sala-390x844.jpg)
+![Lo Shop a 390](prove-telefono/2026-09-20/shop-390x844.jpg)
+![Lo Studio a 390](prove-telefono/2026-09-20/studio-390x844.jpg)
+
+### Ogni volta che si apre la Piazza un errore rosso in console: la mano del braccio alzato ha un path SVG rotto
+
+- **dove** — `frontend/js/creator/nav.js:69-71`, la mano di `braccioAlto` dentro a
+  `ARTIST_BODY`: l'ultima curva è `C W(56),-H(366) W(50),-H(367) Z`, cioè una `C` con
+  **due** coppie di coordinate invece di tre. La costruisce `costruisciScena()`
+  (`piazza.js:56`, `<g id="mebody">`).
+- **cosa succede** — il browser rifiuta tutto il path (`Error: <path> attribute d:
+  Expected number, "…4.2 49.7,-365.2 Z"`, in console a **tutte** le sei misure, sempre
+  all'`apriPiazza()`) e la mano che regge il microfono non viene disegnata: il braccio
+  finisce nel vuoto e il microfono galleggia sopra.
+- **come si vede** — apri la Piazza da qualunque misura, guarda la console e la figura al
+  centro. Non c'entra la task (è lo stesso corpo del creator, e `posto.js` non lo usa: in
+  Sala la console è pulita).
+- **quanto pesa** — medio: è un errore rosso a ogni apertura, e la figura è la cosa che
+  sta al centro della schermata. Non blocca niente.
+- **RISOLTO (20/09/2026)** — branch `task/mano-rapper-svg`, già in `main`: la voce 17 in
+  testa al foglio.
+
+![Piazza a 390: il braccio alzato senza la mano](prove-telefono/2026-09-20/piazza-390x844-mano-mancante.jpg)
+![La figura ingrandita: il microfono sopra al braccio, senza la mano](prove-telefono/2026-09-20/piazza-390x844-mano-mancante-zoom.jpg)
+
+### Fra i 981 e i 1120 il blocco della città riempie la fascia da bordo a bordo: «CITTÀ ATTUALE» attaccato in cima, «Fase 1» in fondo
+
+- **dove** — `frontend/css/hub.css:1314-1317` (`@media (max-width:1120px) .pcitta{width:150px}`):
+  con 150 di scatola e 14 di rientro restano 135 al nome, e «Città di provincia» va su
+  **due righe** (a 1240, con 145, sta su una).
+- **cosa succede** — etichetta 13 + nome 40 + fase 13 con i loro margini fanno **72**, che
+  a 768 di altezza è esattamente l'altezza della fascia (`.pbarra` 72): `.pk` parte a
+  y=0 e `.pcf` finisce a 72, senza un punto d'aria sopra e sotto, mentre tutte le altre
+  colonne della fascia respirano. A 800 di altezza (fascia 75) l'aria è 2 punti. Con una
+  città dal nome più lungo («Città metropolitana») resta su due righe, non peggiora.
+- **come si vede** — plancia a 1024 × 768 o 1100 × 800, guarda a sinistra fra il
+  marchio e ENERGIA: le lettere di «CITTÀ ATTUALE» toccano il bordo superiore.
+- **quanto pesa** — basso: è la fascia che la task ha appena ridisegnato, si nota
+  perché è l'unica colonna schiacciata.
+- **RISOLTO (20/09/2026)** — è la voce 38: casella 164, nome a 15, una riga.
+
+![Plancia a 1024 × 768](prove-telefono/2026-09-20/plancia-1024x768-citta-al-bordo.jpg)
+![Il blocco della città ingrandito: attaccato sopra e sotto](prove-telefono/2026-09-20/plancia-1024x768-citta-al-bordo-zoom.jpg)
+
+### Di traverso (844 × 390) e fra i 621 e i 980 il marchio che apre il menu di sistema è alto 34, e il suo contenuto 41
+
+- **dove** — `frontend/css/stretto.css:470-476`: con la fascia su due righe la nav di
+  `menu-sistema.js` è `height:auto` e il bottone `.adf-global-system` viene **132 × 34**;
+  sotto i 620 (`stretto.css:615-624`) è forzato a 44 e va bene.
+- **cosa succede** — su un telefono di traverso, che è touch, il bersaglio del menu di
+  sistema è 34 di altezza (sotto i 44); e la parola del marchio è alta 41 dentro a una
+  scatola da 34 (`scrollHeight` 41 > `clientHeight` 34): non si taglia perché
+  l'overflow è visibile, ma sporge di 7 sotto al bottone. Il Menu casetta e il telefono
+  accanto sono 44.
+- **come si vede** — plancia a 844 × 390 (o 979 × 768), in alto a sinistra.
+- **quanto pesa** — basso: il menu di sistema si apre anche dal Menu casetta.
+- **RISOLTO (20/09/2026)** — è la voce 37: `height:44px` e `html` davanti, 132 × 44 a 6,8.
+
+### Di traverso la fascia si prende 144 punti su 390: la città resta in 246
+
+- **dove** — `frontend/css/stretto.css:399-478` (`@media (max-width:980px)`, la fascia su
+  due righe): 844 × 390 ricade nella fascia del tablet stretto, non in quella del
+  telefono, e le righe sono da 72 e 55.
+- **cosa succede** — la fascia è il 37% dello schermo; della mappa si vede la prima
+  fila di cartelli (Shop, Live Club, Centro per l'impiego, La Sala, Casa) e lo Studio è
+  tagliato a metà sul bordo. Si scorre, ma la prima schermata è quasi tutta fascia.
+- **come si vede** — plancia a 844 × 390.
+- **quanto pesa** — basso: l'orizzontale è un punto ancora aperto (memoria
+  «Responsività da finire»), lo segno perché la task ha rifatto proprio la fascia.
+- **Aperta di proposito** — è la voce 9: prima si decide se il gioco sugli store gira di
+  traverso, poi la fascia orizzontale avrà il suo disegno.
+
+![Plancia a 844 × 390: la fascia da 144 e il marchio da 34](prove-telefono/2026-09-20/plancia-844x390-fascia-144-marchio-34.jpg)
+
+### A 1240–1280 il titolo della card dell'evento si tronca coi puntini: «FREESTYLE AL BAR CEN…»
+
+- **dove** — `frontend/css/hub.css:1373-1378` (`.pevt{white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis}` nel blocco 901–1520): a 1280 la card è 202 e il titolo ha 184
+  ma ne vuole 208; a 1240, 164 contro 208.
+- **cosa succede** — «Freestyle al bar centrale» diventa «FREESTYLE AL BAR CEN…»; gli
+  altri tre titoli di oggi ci stanno. A 1366 (227) e a 1024–1100 (254–264, senza il
+  telefono a lato) sta intero.
+- **come si vede** — plancia a 1280 × 800, «Eventi e attività di oggi», prima card.
+- **quanto pesa** — basso: è la scelta della task (titolo su una riga), ma alla misura
+  che la task cita come riferimento il primo titolo non si legge tutto.
+- **RISOLTO (20/09/2026)** — voce 41: sotto i 1300 due righe da 12 e il piede più stretto,
+  55 in 56; a 1280 «FREESTYLE AL BAR / CENTRALE», screenshot nello scratchpad.
+
+![Plancia a 1280 × 800: la prima card tronca](prove-telefono/2026-09-20/plancia-1280x800-titolo-evento-tagliato.jpg)
+
+### A 768 di altezza la scatola del profilo scorre di 27 punti e «Prossimo livello» resta tagliato, senza un segno
+
+- **dove** — `frontend/css/hub.css:1436-1450` (le scatole del profilo sotto gli 820 di
+  altezza, `.psx` che scorre): a 1024 × 768 e 1366 × 768 `#hb-profilo` è 547 di
+  finestra su 574 di contenuto.
+- **cosa succede** — la scatola «Prossimo livello» si vede a metà (il testo sì, la
+  barretta no) e il bordo basso della card sembra il bordo della scatola: che sotto ci
+  sia altro non lo dice niente, la barra sottile di scorrimento compare solo col mouse
+  sopra. A 800 di altezza sta tutto.
+- **come si vede** — plancia a 1366 × 768, colonna di sinistra, sopra alle tre linguette.
+- **quanto pesa** — basso.
+- **RISOLTO (20/09/2026)** — voce 42: sotto i 780 di altezza ritratto 84 × 100 e linguette
+  76, la colonna è 555 in 555 a 1366 × 768 e a 1024 × 768.
+
+![Plancia a 1366 × 768: «Prossimo livello» a metà](prove-telefono/2026-09-20/plancia-1366x768-profilo-tagliato.jpg)
+
+### Sul telefono la terza riga della pastiglia («GIORNO 1/7») è a 5 punti: non si legge
+
+- **dove** — `frontend/js/game/tempo-controlli.js:372` (`.adf-tw-day{font-size:7px}` nella
+  versione stretta del widget, bianco al 76% sul cielo chiaro) per `stretto.css:646`
+  (`transform:scale(0.7)`, la pastiglia ai sette decimi): 7 × 0,7 = **4,9 punti**.
+- **cosa succede** — a 390 e a 360 la riga sotto all'ora è una macchia chiara sul
+  cielo di giorno; a 844 × 390 e sul computer (7,8 senza scala) si legge appena.
+- **come si vede** — plancia a 390 × 844, la pastiglia in prima riga.
+- **quanto pesa** — basso: l'ora e la settimana sopra si leggono; il giorno lo dice
+  anche il pannello che la pastiglia apre.
+- **RISOLTO (20/09/2026)** — è la voce 36: nove decimi, GIORNO a 6,3 punti (7 × 0,9), ANNO a 6.
+
+### Cose viste e lasciate lì
+
+- Sul computer (1024 e oltre) la X di Sala e Piazza è **34 × 34** (`#po-x`, `#p-x`);
+  sotto i 900 diventa più grande. Col mouse va bene.
+- La foto della città non riempie la sua card e lascia due bande sopra e sotto (61 a
+  1280 × 800, 73 a 1240, 23 a 1366): è `aspect-ratio` per scelta (`hub.css:623-634`, il
+  fondo sfocato dietro), non è della task.
 
 ## Giro del 20/09/2026 (segnala-problemi, fine task `task/mano-rapper-svg`, commit `309de1c`)
 

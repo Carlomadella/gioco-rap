@@ -44,6 +44,13 @@
        muti per la stessa ragione dello Studio — l'ora ce l'hanno nella
        loro fascia — e prima dell'hub per lo stesso motivo. */
     {id:"luogo",  root:"#luogo.on",           mute:true},
+    /* La piazza (il freestyle) e il foglio (writer.js) non montano la
+       pastiglia da nessuna parte, e sotto i 900 — dove il palco smette di
+       essere un contesto suo (`.palco{position:static}`, stretto.css) — la
+       pastiglia dell'hub, con il suo z-index 142, galleggiava sopra al
+       titolo del freestyle (giro del 20/09). Muti, come lo Studio. */
+    {id:"piazza", root:"#piazza.on",          mute:true},
+    {id:"writer", root:"#writer.on",          mute:true},
     {id:"hub",    root:"#s-hub.screen.on",   head:".pbarra",       mount:".pbarra", accent:"#c084fc", panel:"linear-gradient(180deg,rgba(16,18,27,.985),rgba(7,9,14,.985))", border:"rgba(192,132,252,.28)"}
   ];
 
