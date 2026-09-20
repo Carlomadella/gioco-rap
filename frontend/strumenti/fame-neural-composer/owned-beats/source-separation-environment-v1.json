@@ -1,7 +1,7 @@
 {
   "schema": "fame-owned-beats-source-separation-environment-v1",
   "version": 1,
-  "status": "BOOTSTRAP_PINNED_AWAITING_FREEZE",
+  "status": "EXACT_TRANSITIVE_LOCK_COMMITTED",
   "python": {
     "requiredMajorMinor": "3.10"
   },
@@ -36,12 +36,21 @@
     "bootstrapPinsAreNotTheFinalLock": true,
     "capturePipFreezeAll": true,
     "captureEnvironmentReceipt": true,
-    "nextActionAfterSuccessfulBootstrap": "REVIEW_AND_COMMIT_EXACT_PIP_FREEZE"
+    "nextActionAfterSuccessfulBootstrap": "VERIFY_COMMITTED_LOCK_THEN_IMPLEMENT_CLEAN_STANDALONE_HTDEMUCS_ADAPTER"
   },
   "bootstrapTools": {
     "indexUrl": "https://pypi.org/simple",
     "pip": "25.2",
     "setuptools": "80.9.0",
     "wheel": "0.45.1"
+  },
+  "lock": {
+    "path": "requirements-source-separation-lock.txt",
+    "sourceRunId": "source-separation-env-v1-001",
+    "sourcePipFreezeAllSha256": "e7fd1df0076b79101923900aa280b3c53a46c5b0a166bad75cbf972b7794411a",
+    "repositoryCanonicalSha256": "125c146cd2a007f11301e183fa976d3babe1d8e0959c7df56ee795b6828dc09a",
+    "packageCount": 16,
+    "reviewed": true,
+    "committed": true
   }
 }
