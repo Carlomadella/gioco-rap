@@ -24,7 +24,8 @@ assert.equal(protocol.environment.observedOnnxRuntimeVersion,"1.23.2");
 assert.equal(protocol.environment.packagedModel.sha256,"2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec");
 assert.equal(protocol.environment.packagedModel.committed,true);
 assert.equal(protocol.environment.sourcePipFreezeAllSha256,"9374ac7a60f9ba6cc97ae14f9b8627c527bb3ef70833d27e95340d45ff69aa7f");
-assert.equal(protocol.safety.noBasicPitchInferenceUntilLockAndModelFreeze,false);\nassert.equal(protocol.safety.noBasicPitchInferenceUntilPreinferenceVerify,true);
+assert.equal(protocol.safety.noBasicPitchInferenceUntilLockAndModelFreeze,false);
+assert.equal(protocol.safety.noBasicPitchInferenceUntilPreinferenceVerify,true);
 
 for(const needle of [
   "BASIC_PITCH_ENVIRONMENT_BOOTSTRAP_VERIFY_PASS",
