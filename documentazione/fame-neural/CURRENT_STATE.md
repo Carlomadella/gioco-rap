@@ -807,3 +807,33 @@ La blind low-end comparison v2 è chiusa con `KEEP_PYIN_LOW_END`: `librosa-pyin-
 
 
 Il run locale `audio-to-midi-selected-integration-v1-001` ha completato 8/8 family con `AUDIO_TO_MIDI_SELECTED_INTEGRATION_COMPLETE` e stato `SELECTED_DEVELOPMENT_INTEGRATION_COMPLETE`. Selezioni: `drums-bass-kick-fusion-v1` + `librosa-pyin-lowend-v1`. Il known issue è stato risolto automaticamente dal submission v2 come `FAME000040`, classificazione `UPSTREAM_SOURCE_SEPARATION_CONTAMINATION`. Il comando non ha eseguito ritrascrizione né ricodifica MIDI e non ha acceduto final holdout/batch131 né autorizzato training/task-data readiness. È ora disponibile il verifier read-only post-output; la chiusura formale del blocco resta subordinata al suo PASS sul workspace locale e alla ricerca di chiusura prevista da NDR-026.
+
+## Chiusura Audio→MIDI drums/low-end development — 21 settembre 2026
+
+Il verifier post-output del run `audio-to-midi-selected-integration-v1-001` è passato sul workspace reale con:
+
+- `AUDIO_TO_MIDI_SELECTED_INTEGRATION_VERIFY_PASS`;
+- stato `SELECTED_DEVELOPMENT_INTEGRATION_VERIFIED`;
+- 8/8 family verificate;
+- 16/16 MIDI finali byte-identici ai corrispondenti MIDI selezionati della baseline;
+- drums selezionato: `drums-bass-kick-fusion-v1`;
+- low-end selezionato: `librosa-pyin-lowend-v1`;
+- `FAME000040` unico known issue low-end;
+- classificazione `UPSTREAM_SOURCE_SEPARATION_CONTAMINATION`;
+- root-cause layer `source-separation`;
+- `transcriptionRootCause=false`;
+- nessuna ritrascrizione;
+- nessuna ricodifica MIDI;
+- final holdout/batch131 non acceduti;
+- training non autorizzato;
+- task-data readiness falsa.
+
+La ricerca di chiusura obbligatoria NDR-026 è completata in [OWNED_BEATS_AUDIO_TO_MIDI_CLOSING_RESEARCH_2026-09-21.md](OWNED_BEATS_AUDIO_TO_MIDI_CLOSING_RESEARCH_2026-09-21.md).
+
+Stato del blocco:
+
+`AUDIO_TO_MIDI_DRUMS_LOW_END_DEVELOPMENT_CLOSED`
+
+Il PASS resta development-only. Drums mantiene due family sotto soglia (`FAME000023=0`, `FAME000080=1`); low-end mantiene `FAME000040=1`, attribuito a contaminazione upstream dello stem e non a root cause pYIN. Basic Pitch resta negative result storico con 0/8 family >=2 nel confronto congelato.
+
+Le 10 family già usate nel final holdout Audio Analysis non vengono riutilizzate automaticamente come nuovo final test indipendente Audio→MIDI. Il prossimo step è preparare un cohort evaluation fresco da family ancora non assegnate, con protocollo e numerosità congelati prima di qualsiasi nuovo ascolto/output. Training e batch131 restano chiusi.
