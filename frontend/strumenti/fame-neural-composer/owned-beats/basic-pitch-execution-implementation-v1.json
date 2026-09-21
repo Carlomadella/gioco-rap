@@ -7,8 +7,8 @@
   "executionContractGitBlobSha": "e81a18cc5785b00de48803f2ca88a1f8a17ad4bc",
   "executor": {
     "path": "basic-pitch-development-execute.py",
-    "gitBlobSha": "f677c82f1761fe7441fe0e09364bd7635c9931a3",
-    "implementationCommit": "443cb7e2c2846b0df2f2c0e808fd687fbbd79fc1"
+    "gitBlobSha": "0027011aa74a001c52918e885864c8bf82891260",
+    "implementationCommit": "2fbd4e4af7cfdb0ed6e0d75eda67730635e6219e"
   },
   "runtime": {
     "modelLoadedOncePerProcess": true,
@@ -34,5 +34,6 @@
     "batch131Allowed": false,
     "trainingAuthorized": false,
     "taskDataReadyMayBeDeclared": false
-  }
+  },
+  "freezeRevision": "pre-output-guard-001-bind-receipt-inference"
 }
