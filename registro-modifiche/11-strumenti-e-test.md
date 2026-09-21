@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:d471010 -->
+## 21/09/26, 19:36 â€” task/discografia-app-telefono â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `d471010`
+
+### Cosa Ã¨ entrato
+
+- `6f27b7e` â€” Remastered e parti 2, dopo il giro di fine task: il pezzo senza seed non è di nessuno, il fonico conta una volta sola, la sostituzione della parte 2 si dice a schermo, «lascia» alto come gli altri, la frase del Mix separa guadagno e costo, e la Cabina ha «lascia la parte 2» â€” **Carlomadella**
+- `4b12a12` â€” Remastered e parti 2, la coda di «Non è più: "Faccio un pezzo → +10 fama"»: dalla Discografia sul telefono si prenotano, in Studio si fanno — la parte 2 in Cabina col titolo suo (e quando esce rimette in piedi il primo), la remastered al banco del Mix; la riga della Discografia nel telefono, che era rotta, va su due righe â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+- **Aggiunto:** `frontend/test/unit/seguiti.test.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:5b1b476 -->
 ## 21/09/26, 18:31 â€” task/studio-le-tre-code â†’ main
 
