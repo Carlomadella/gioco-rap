@@ -28,7 +28,7 @@ assert.equal(contract.scope.trainingAuthorized,false);
 
 const frozen=mod.validateRepo();
 assert.equal(frozen.contract.candidateId,"basic-pitch-0.4.0-lowend-v1");
-assert.equal(frozen.lockSha,"3613fc36f85e54629e14e98cd05648eb2b3d1ddd2b2f3ee87360299f464a60ad");
+assert.equal(frozen.lockSha256,"3613fc36f85e54629e14e98cd05648eb2b3d1ddd2b2f3ee87360299f464a60ad");
 
 const tmp=fs.mkdtempSync(path.join(os.tmpdir(),"fame-basic-pitch-bpm-"));
 try{
