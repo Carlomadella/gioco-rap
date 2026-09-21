@@ -27,7 +27,7 @@ assert.equal(implementation.status,"FROZEN_BEFORE_FIRST_BASIC_PITCH_INFERENCE");
 assert.equal(implementation.runId,"basic-pitch-development-inference-v1-001");
 assert.equal(implementation.executionContractGitBlobSha,gitBlobSha(executionContractPath));
 assert.equal(implementation.executor.gitBlobSha,gitBlobSha(executorPath));
-assert.equal(implementation.executor.gitBlobSha,"f677c82f1761fe7441fe0e09364bd7635c9931a3");
+assert.equal(implementation.executor.gitBlobSha,"0027011aa74a001c52918e885864c8bf82891260");
 assert.equal(implementation.runtime.modelLoadedOncePerProcess,true);
 assert.equal(implementation.output.atomicPerFamily,true);
 assert.equal(implementation.output.resumeByValidatedReceipt,true);
@@ -56,6 +56,8 @@ for(const needle of [
 ]) assert(executor.includes(needle),needle);
 
 assert.equal((executor.match(/model = Model\(model_path\)/g)||[]).length,1);
+assert(executor.includes('receipt.get("inference") != frozen["execution"]["inference"]'));
+assert(executor.includes('receipt.get("receiptRunner", {}).get("gitBlobSha")'));
 assert(executor.includes('del model_output'));
 assert(!executor.includes("np.savez"));
 assert(!executor.includes("final-holdout"));
