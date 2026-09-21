@@ -58,5 +58,24 @@
     "trainingAuthorized": false,
     "taskDataReadyMayBeDeclared": false
   },
-  "nextAfterIntegration": "VERIFY_SELECTED_INTEGRATION_AND_CLOSE_AUDIO_TO_MIDI_DEVELOPMENT_BLOCK"
+  "nextAfterIntegration": "VERIFY_SELECTED_INTEGRATION_AND_CLOSE_AUDIO_TO_MIDI_DEVELOPMENT_BLOCK",
+  "expectedSourceRecordIds": [
+    "FAME000011",
+    "FAME000012",
+    "FAME000023",
+    "FAME000040",
+    "FAME000046",
+    "FAME000058",
+    "FAME000080",
+    "FAME000126"
+  ],
+  "output": {
+    "rootRelativeToWorkspace": "runs/audio-to-midi-selected-integration/audio-to-midi-selected-integration-v1-001",
+    "perFamily": [
+      "drums.mid",
+      "low-end.mid",
+      "selection.json"
+    ],
+    "summary": "summary.json"
+  }
 }
