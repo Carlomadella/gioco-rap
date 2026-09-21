@@ -557,3 +557,36 @@ dentro un id testuale; `+"lavanderia"` fa `NaN`, il beat non si trovava e l'even
 lo stesso, con `beat: undefined` — e in catalogo c'è un evento che filtra proprio su
 `action: "buy"`. Adesso si emette solo se l'indice è davvero un indice e il beat sul banco
 esiste.
+
+## Nella Sala non si spende energia
+
+> «non deve costare energia interagire con gli altri all'interno della sala» — CARLO,
+> «Studio (16/09/2026)»
+
+**FATTO (21/09/2026)** — branch `task/sala-gratis-e-take-a-25`. Il foglio dei punti chiedeva
+di decidere una riga prima di farlo — solo parlare e il numero a zero, o tutto — e Carlo ha
+detto **tutto a zero**: la Sala è rete, non lavoro.
+
+`PO_COSTO` in `frontend/js/game/posto.js` è a 0 su tutte e sette le mosse — due parole (era
+12), il numero (4), la sessione in studio (45), il mix del fonico (20), il feat (45), il
+video (35), l'intervista (12). La tabella resta, a zero, perché i controlli sull'energia e
+le etichette passano di lì: se un giorno si torna indietro si cambiano i numeri e basta.
+
+**I tasti dicono «gratis».** Prima l'etichetta era `PO_COSTO.parla + " energia"`, che a
+zero avrebbe scritto «0 energia»: adesso c'è `poEtichetta(tipo, soldi)`, che mette
+l'energia solo se c'è, i soldi se ci sono — «60 €» sulla sessione, il prezzo del video
+(`costoVideo`) sul video — e se non c'è niente scrive «gratis», la stessa parola che «Fatti
+sentire un beat» usava già.
+
+**Non si farma lo stesso.** Ogni mossa ha il suo tempo (`PO_TEMPO`: mezz'ora per due
+parole, la sessione un pomeriggio) e passa dal gate del tempo reale; «due parole» con la
+stessa persona nello stesso giorno vale meno (`p.ult`); i gradini del rapporto si salgono
+uno alla volta; il feat ha le sue sei settimane fra uno e l'altro; e i soldi della sessione
+e del video restano soldi. Quello che è sparito è solo il conto dell'energia — che teneva
+lontano dalla Sala chi aveva speso la giornata in Studio, e la Sala è proprio il posto dove
+si dovrebbe andare quando in Studio non c'è più niente da fare.
+
+Un controllo nuovo nell'audit («nella Sala nessuna mossa costa energia, e i tasti dicono
+«gratis»») tiene la tabella a zero e l'etichetta, e si accorge se torna un
+`PO_COSTO.x + " energi…"`. Lo Studio, dove la take costa ancora, è cambiato lo stesso
+giorno: «La take costa 25, le altre 8» in `04-musica-e-suoni.md`.

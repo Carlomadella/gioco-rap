@@ -536,3 +536,33 @@ non costa energia.
 L'audit («Le quattro piccole del 20/09») tiene le tre fasce coi loro numeri, la firma di
 `prezzoBeat` e `creaBeat`, i cinque chiamanti con `p.fama`, il listino dello Studio e la
 fascia sulle due card; e controlla che la formula vecchia (`q*q*0.16`) non torni.
+
+---
+
+## Studio · La take costa 25, le altre 8
+
+> «Costa troppo una take in studio» — CARLO, 20/09/2026
+
+**FATTO (21/09/2026)** — branch `task/sala-gratis-e-take-a-25`. Con la prima take a 45 e le
+altre a 12, su 100 di energia al giorno, una sessione da tre take era 69: più di mezza
+giornata per un pezzo, e la Sala col fonico costava gli stessi 45. I numeri li ha decisi
+Carlo: **la prima take costa 25, le altre 8**. Tre take fanno 41, sei — il massimo,
+`STUDIO_TAKE_MAX` — fanno 65, dove prima non ci si arrivava (105).
+
+Cambiano solo le due costanti in `frontend/js/game/studio-elementi.js`,
+`STUDIO_TAKE_PRIMA` e `STUDIO_TAKE_ENERGIA`: il tasto d'oro della Cabina («Registra la take
+· 25 energia», poi «Un'altra take · 8 energia»), il conto di `studioTakeCosto` e quello che
+la plancia e l'Agenda scrivono per «Registra il pezzo» (`costoScritto` in `actions.js`, che
+aveva un 45 di riserva, portato a 25) leggono da lì. La regola del 15/09 non si tocca:
+l'energia si spende per fare la take, mai per tenerla, e «Tieni questa e chiudi» resta
+gratis. Il dado è lo stesso.
+
+La Sala resta l'altra strada: la sessione col fonico dal 21/09 non costa energia (60 € e il
+tempo: «Nella Sala non si spende energia» in `06-mondo-e-personaggi.md`), e dà la qualità
+in più del fonico. Lo Studio costa energia e non soldi se hai il microfono; la Sala soldi e
+un rapporto da costruire.
+
+I due controlli dell'audit sulle take («una take in più si paga in energia», «tenere una
+take non costa energia») sono riscritti sui numeri nuovi. Il riferimento in
+`documentazione/pagine-azioni/README.md` («UN'ALTRA TAKE · 12 energia») è la foto di come
+doveva essere e non si riscrive.

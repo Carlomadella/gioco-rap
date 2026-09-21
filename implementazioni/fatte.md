@@ -24,12 +24,42 @@ cita (la catena del pezzo) e il «punto 4 di ALE» di
 
 | quando | quante |
 | --- | --- |
+| 21/09/2026 | 2 |
 | 20/09/2026 | 9 |
 | 15/09/2026 | 6 |
 | 07/09/2026 | 6 |
 | 06/09/2026 | 10 |
 
 ---
+
+## 21/09/2026
+
+_Le due piccole dell'energia, chiuse insieme nel branch `task/sala-gratis-e-take-a-25`:
+la Sala che non costa più niente e la take che costava troppo._
+
+### Nella Sala non si spende energia
+
+_Da `implementazioni.md`, CARLO «Studio (16/09/2026)» 11._
+
+11. non deve costare energia interagire con gli altri all'interno della sala
+
+    **FATTO (21/09/2026)** — tutto a zero, come deciso: `PO_COSTO` in `posto.js` è a 0 su
+    tutte e sette le mosse (due parole, il numero, la sessione, il mix, il feat, il video,
+    l'intervista) e i tasti dicono «gratis» — o solo i soldi, «60 €» per la sessione, il
+    prezzo del video — al posto di «0 energie» (`poEtichetta`). Il tempo di ogni mossa e
+    il «due parole» che vale meno con la stessa persona nello stesso giorno restano: non
+    si farma. Il racconto: «Nella Sala non si spende energia» in `06-mondo-e-personaggi.md`.
+
+### La take costa 25, le altre 8
+
+_Da `implementazioni.md`, CARLO 12._
+
+12. Costa troppo una take in studio
+
+    **FATTO (21/09/2026)** — `STUDIO_TAKE_PRIMA` 45 → 25 e `STUDIO_TAKE_ENERGIA` 12 → 8
+    in `studio-elementi.js`: una sessione da tre take fa 41 di energia invece di 69. I
+    tasti della Cabina, la plancia e l'Agenda leggono le costanti e cambiano da soli. Il
+    racconto: «La take costa 25, le altre 8» in `04-musica-e-suoni.md`.
 
 ## 20/09/2026
 

@@ -17,9 +17,9 @@ Quelli che erano rimasti indietro nel foglio — chiusi ma mai smistati — stan
 | [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 16 voci |
 | [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 47 voci |
 | [`03-artista-e-avatar.md`](03-artista-e-avatar.md) | **L'artista e il suo avatar** — 2 voci |
-| [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 16 voci |
+| [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 17 voci |
 | [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 13 voci |
-| [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md) | **Il mondo e la gente** — 16 voci |
+| [`06-mondo-e-personaggi.md`](06-mondo-e-personaggi.md) | **Il mondo e la gente** — 17 voci |
 | [`07-multiplayer-e-backend.md`](07-multiplayer-e-backend.md) | **Il multiplayer e il server** — 8 voci |
 | [`08-uscita-sugli-store.md`](08-uscita-sugli-store.md) | **L'uscita su Steam e sugli store** — 3 voci |
 | [`09-grafica-e-asset.md`](09-grafica-e-asset.md) | **La grafica, le ambientazioni e gli asset** — 7 voci |
@@ -33,8 +33,9 @@ per i punti, e sono in [`../documentazione/come-si-lavora.md`](../documentazione
 
 ## Tutti i punti
 
-131 voci in tutto: **96 chiuse**, 13 a metà, 17 da fare e 5 con la sola risposta scritta
-(ricontate dalla tabella qui sotto il 20/09/2026, dopo il riordino del foglio dei punti; nello
+133 voci in tutto: **98 chiuse**, 13 a metà, 17 da fare e 5 con la sola risposta scritta
+(ricontate dalla tabella qui sotto il 21/09/2026, con le due piccole dell'energia — la Sala a
+zero, la take a 25 — entrate quel giorno; il conto di prima era del 20/09, dopo il riordino del foglio dei punti; nello
 stesso giro sono entrate due sezioni del foglio dell'interfaccia che alla tabella mancavano — lo
 Studio a cinque linguette, l'anteprima di un pezzo non uscito — e il giorno prima altre tre,
 l'avvio rapido, le pagine dei posti sulla loro foto, la fascia della plancia). A che punto siamo
@@ -174,6 +175,8 @@ nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../docume
 | **—** | Le tre del Marketing: chiuse dal 14/09, e la riga delle mosse a capo | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Lo Studio a cinque linguette: B + D3 + F2 + E (col Marketing spostato sul telefono) | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Un pezzo non uscito non si spinge: se ne fa uscire un'anteprima | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | Nella Sala non si spende energia | fatto | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
+| **—** | Studio · La take costa 25, le altre 8 | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
 
 > Lo stato è letto dal testo dei punti: «fatto» vuol dire che c'è scritto cosa è
 > stato fatto e quando, «risposto» che c'è una risposta ragionata ma il codice
