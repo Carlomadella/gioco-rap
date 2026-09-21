@@ -39,6 +39,7 @@ jobs:
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-basic-pitch-environment-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-basic-pitch-bootstrap-verify-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-basic-pitch-lock-test.js
+      - run: node frontend/strumenti/fame-neural-composer/owned-beats-basic-pitch-preinference-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-source-separation-environment-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-audio-analysis-v2-protocol-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats/human-reference-holdout-pack-test.js
