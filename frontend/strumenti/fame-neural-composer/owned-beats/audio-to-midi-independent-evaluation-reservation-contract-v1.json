@@ -1,0 +1,36 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-evaluation-reservation-contract-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_EVALUATION_RESERVATION",
+  "cohortId": "audio-to-midi-independent-evaluation-v1",
+  "plannedSplit": "audio-to-midi-evaluation-v1",
+  "expectedFamilies": 12,
+  "files": {
+    "gatePath": "audio-to-midi-independent-evaluation-gate.js",
+    "gateGitBlobSha": "fbdf8835bcd60d0d94004f6a8e2e196f2ba8df27",
+    "protocolPath": "audio-to-midi-independent-evaluation-v1.json",
+    "protocolGitBlobSha": "7ad299fddc9fc1430f15d6ae65327e9d53205c65",
+    "referencePath": "audio-to-midi-independent-evaluation-cohort-v1.json",
+    "referenceGitBlobSha": "f7b93c8647c70b5f0f4caa66a741f98fc0da0e48",
+    "splitDecisionPath": "audio-to-midi-independent-evaluation-split-v1.json",
+    "splitDecisionGitBlobSha": "da7fd393472bbb25d52f7a2eac885eb1ff5503cd",
+    "selectorPath": "prepare-audio-to-midi-independent-evaluation.js",
+    "selectorGitBlobSha": "305fe132ba54d4b777d8d2a76e66262fd39ea554"
+  },
+  "reservation": {
+    "reviewId": "audio-to-midi-independent-evaluation-v1-split-freeze",
+    "receiptStatus": "RESERVED_BEFORE_AUDIO_ACCESS",
+    "appendOnly": true,
+    "recoveryFromCommittedSplitWithoutReceipt": true
+  },
+  "safety": {
+    "preflightMayOpenAudio": false,
+    "reserveMayOpenAudio": false,
+    "reserveMayRunSourceSeparation": false,
+    "reserveMayRunTranscription": false,
+    "batch131Authorized": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "nextAction": "RUN_METADATA_ONLY_PREFLIGHT_AND_RESERVE_BEFORE_ANY_AUDIO_ACCESS"
+}
