@@ -41,7 +41,8 @@ assert.equal(protocol.prerequisite.selectedDrumsArm,"drums-bass-kick-fusion-v1")
 assert.equal(protocol.prerequisite.pyinGatePass,true);
 assert.equal(protocol.environment.exactTransitiveLockRequiredBeforeInference,true);
 assert.equal(protocol.environment.exactPackagedModelSha256RequiredBeforeInference,true);
-assert.equal(protocol.safety.noBasicPitchInferenceUntilLockAndModelFreeze,false);\nassert.equal(protocol.safety.noBasicPitchInferenceUntilPreinferenceVerify,true);
+assert.equal(protocol.safety.noBasicPitchInferenceUntilLockAndModelFreeze,false);
+assert.equal(protocol.safety.noBasicPitchInferenceUntilPreinferenceVerify,true);
 
 assert(prepare.includes('"basic-pitch==$basicPitchVersion"'));
 assert(prepare.includes("pip freeze --all"));
