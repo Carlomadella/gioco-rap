@@ -828,8 +828,11 @@ function diventaOpp(p){
      in un salvataggio di prima del 21/09, un omonimo che la Sala aveva pescato
      senza guardare la classifica — non ne nasce un secondo con lo stesso
      nome: quello che c'e' cambia storia. Se no ne nasce uno. In tutti e due i
-     casi la persona resta legata al suo rivale (`rivale`, `rivaleId`): un opp
-     non torna in «Dalla classifica» come uno sconosciuto da pagare. */
+     casi la persona resta legata al suo rivale (`rivaleId`): un opp non torna
+     in «Dalla classifica» come uno sconosciuto da pagare. Solo l'id, non
+     `rivale`: quello vuol dire «venuto dalla classifica» e tiene la persona
+     fuori dal conto della Sala (genteDellaSala) — chi ha rotto con te alla
+     Sala il suo posto lo occupa ancora, com'e' sempre stato. */
   if(!G.rivals) G.rivals = [];
   let r = G.rivals.find(x => p.rivaleId != null ? x.id === p.rivaleId : x.n === p.n) || null;
   if(r){
@@ -841,7 +844,7 @@ function diventaOpp(p){
     r.storia = "Vi siete conosciuti alla Sala. È finita male.";
     G.rivals.push(r);
   }
-  if(r){ p.rivale = true; p.rivaleId = r.id; }
+  if(r) p.rivaleId = r.id;
   pushLog("<b>" + p.n + "</b> non ti saluta più. Adesso è uno contro cui corri.", "bad");
 }
 

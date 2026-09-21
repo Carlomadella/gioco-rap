@@ -815,7 +815,7 @@ test("la Sala e la classifica pescano dallo stesso mazzo senza omonimi, e l'opp 
   posto.includes("const usati = (G.gente || []).map(p => p.n).concat((G.rivals || []).map(r => r.n));") &&
   leggi("js/game/rivals.js").includes("const usati = (G.rivals||[]).map(x => x.n).concat((G.gente||[]).map(p => p.n));") &&
   posto.includes("let r = G.rivals.find(x => p.rivaleId != null ? x.id === p.rivaleId : x.n === p.n) || null;") &&
-  posto.includes("if(r){ p.rivale = true; p.rivaleId = r.id; }") &&
+  posto.includes("  if(r) p.rivaleId = r.id;") && !posto.includes("p.rivale = true") &&
   leggi("js/game/trasferte.js").includes("const usati = (G.gente || []).map(p => p.n).concat((G.rivals || []).map(r => r.n));") &&
   fs.existsSync(path.join(ROOT, "test/unit/studio-rivali-e-sala.test.js")));
 test("la proposta di copertina non resta orfana: renderStudio la butta se il pezzo non e' piu' in Fuori, e la memoria piena la sacrifica per prima",

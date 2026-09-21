@@ -96,8 +96,9 @@ describe("un rivale della classifica e il suo omonimo alla Sala", () => {
     expect(p.G.rivals.length).toBe(quanti + 1);
     const opp = p.G.gente.find(x => x.id === "p3");
     const r = p.G.rivals.find(x => x.n === "Nessuno Così");
-    expect(opp.rivale).toBe(true);
     expect(opp.rivaleId).toBe(r.id);
+    expect(opp.rivale).toBeUndefined();            // non e' «venuto dalla classifica»...
+    expect(p.run("genteDellaSala().some(x => x.id === 'p3')")).toBe(true);   // ...e il suo posto alla Sala lo tiene, come sempre
     expect(p.run("studioRivaliChiamabili().map(r => r.n)")).not.toContain("Nessuno Così");
   });
 

@@ -5369,7 +5369,9 @@ il ripiego «Nome 3» non controlla i doppioni ma oggi non si arriva a usarlo.
   Cabina → Con chi: è sotto «Dalla classifica».
 - **quanto pesa** — si vede ma si gira intorno.
 - **RISOLTO (21/09/2026)** — stesso branch, commit dopo: `diventaOpp` lega sempre la persona al suo
-  rivale (`rivale:true`, `rivaleId` = l'id di quello trovato o di quello appena creato), quindi
+  rivale (`rivaleId` = l'id di quello trovato o di quello appena creato; non `rivale:true`, che vuol dire
+  «venuto dalla classifica» e lo toglierebbe dal conto della Sala — chi ha rotto con te il posto lo
+  occupa ancora, com'è sempre stato), quindi
   `studioRivaleContatto` lo vede e «Dalla classifica» non lo rimette in vendita. Vale anche per il
   rivale-contatto uscito dalla classifica e poi diventato opp: ne nasce uno nuovo e la persona passa a
   puntare a quello. Provato in `studio-rivali-e-sala.test.js`.
