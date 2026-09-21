@@ -405,7 +405,10 @@ function relNome(p){ return REL_NOMI[clamp(p.rel, 0, 5)]; }
 function relSoglia(p){ return 3 + p.rel; }         /* più sali, più costa salire */
 
 function nuovaPersona(ruolo){
-  const usati = (G.gente || []).map(p => p.n);
+  /* i rapper pescano dagli stessi nomi dei rivali: un nome che sta gia' in
+     classifica non si riusa, se no alla Sala gira un omonimo di uno che poi
+     non si puo' chiamare in Cabina (problemi-riscontrati, 15/09) */
+  const usati = (G.gente || []).map(p => p.n).concat((G.rivals || []).map(r => r.n));
   let pool = POSTO_NOMI[ruolo];
   if(!pool) pool = RIV_NOMI;                        /* i rapper: nomi da rivali */
   const liberi = pool.filter(n => usati.indexOf(n) < 0);
@@ -431,19 +434,26 @@ function nuovaPersona(ruolo){
 
 /* Quanta gente gira: all'inizio tre facce, poi ne arriva una ogni due settimane.
    Il giornalista compare solo quando qualcuno comincia a sapere chi sei. */
+/* La gente DELLA SALA: chi e' arrivato dalla classifica (`rivale`, studio.js)
+   sta in `G.gente` come tutti, ma non prende un posto di quelli che la Sala
+   fa arrivare — se no due feat comprati in Cabina volevano dire due persone
+   in meno alla Sala, magari il videomaker o il giornalista
+   (problemi-riscontrati, 15/09; chiuso il 21/09). */
+function genteDellaSala(){ return (G.gente || []).filter(p => p && !p.rivale); }
 function sistemaGente(){
   if(!G.gente) G.gente = [];
   const sett = typeof totalWeeks === "function" ? totalWeeks() : G.week;
   const quante = clamp(3 + Math.floor(sett / 2), 3, POSTO_MAX);
   const ruoli = ["beatmaker", "rapper", "fonico", "beatmaker", "rapper", "beatmaker", "fonico", "rapper"];
-  while(G.gente.length < quante){
-    let r = ruoli[G.gente.length % ruoli.length];
+  while(genteDellaSala().length < quante){
+    const n = genteDellaSala().length;
+    let r = ruoli[n % ruoli.length];
     /* punto 10: uno slot lo prende il videomaker, appena hai qualcosa da
        girare — prima del giornalista, che arriva molto più avanti */
-    if(G.gente.length >= 3 && POSTO_RUOLI.videomaker.da(G) &&
+    if(n >= 3 && POSTO_RUOLI.videomaker.da(G) &&
        !G.gente.some(p => p.ruolo === "videomaker")) r = "videomaker";
     /* uno slot ogni tanto lo prende il giornalista, se è ora */
-    else if(G.gente.length >= 4 && POSTO_RUOLI.giornalista.da(G) &&
+    else if(n >= 4 && POSTO_RUOLI.giornalista.da(G) &&
        !G.gente.some(p => p.ruolo === "giornalista")) r = "giornalista";
     G.gente.push(nuovaPersona(r));
   }
@@ -814,12 +824,31 @@ function poRispondi(i){
    è un menù, è una persona che ti si mette contro. */
 function diventaOpp(p){
   p.via = true;
-  if(typeof nuovoRivale === "function"){
-    const r = nuovoRivale(rnd(400, 1800));
+  /* Se in classifica c'e' gia' lui — venuto da li' (studio.js, `rivaleId`) o,
+     in un salvataggio di prima del 21/09, un omonimo che la Sala aveva pescato
+     senza guardare la classifica — non ne nasce un secondo con lo stesso
+     nome: quello che c'e' cambia storia. Se no ne nasce uno. In tutti e due i
+     casi la persona resta legata al suo rivale (`rivaleId`): un opp non torna
+     in «Dalla classifica» come uno sconosciuto da pagare. Solo l'id, non
+     `rivale`: quello vuol dire «venuto dalla classifica» e tiene la persona
+     fuori dal conto della Sala (genteDellaSala) — chi ha rotto con te alla
+     Sala il suo posto lo occupa ancora, com'e' sempre stato. */
+  if(!G.rivals) G.rivals = [];
+  let r = G.rivals.find(x => p.rivaleId != null ? x.id === p.rivaleId : x.n === p.n) || null;
+  /* La storia vale anche per il rivale ricreato: chi era venuto dalla
+     classifica con un feat ed e' poi uscito dalla classifica non «si e'
+     conosciuto alla Sala». */
+  const storia = p.rivale ? "Ha fatto un feat con te, poi alla Sala è finita male."
+    : "Vi siete conosciuti alla Sala. È finita male.";
+  if(r){
+    r.storia = storia;
+  } else if(typeof nuovoRivale === "function"){
+    r = nuovoRivale(rnd(400, 1800));
     r.n = p.n; r.gen = p.gen || r.gen; r.skin = p.skin; r.col = p.col; r.hair = p.hair;
-    r.storia = "Vi siete conosciuti alla Sala. È finita male.";
+    r.storia = storia;
     G.rivals.push(r);
   }
+  if(r) p.rivaleId = r.id;
   pushLog("<b>" + p.n + "</b> non ti saluta più. Adesso è uno contro cui corri.", "bad");
 }
 

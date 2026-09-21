@@ -43,9 +43,16 @@ function faccia(r2, size){
     '</svg>';
 }
 function nuovoRivale(forza){
-  const usati = (G.rivals||[]).map(x => x.n);
+  /* nemmeno il nome di uno che gira alla Sala: stesso mazzo (RIV_NOMI), e
+     un omonimo in classifica non si potrebbe chiamare (v. posto.js) */
+  const usati = (G.rivals||[]).map(x => x.n).concat((G.gente||[]).map(p => p.n));
   const pool = RIV_NOMI.filter(n => usati.indexOf(n) < 0);
   return {
+    /* chi e': il `seed` qui sotto e' la copertina dell'ultimo pezzo e cambia
+       a ogni uscita (vitaRivali), il nome lo puo' avere anche uno della Sala;
+       l'id resta lo stesso per tutta la partita — e' quello che lega il
+       rivale al suo contatto in studio.js (`rivaleId`) */
+    id: "r" + Math.floor(Math.random()*1e9),
     n: pool.length ? pick(pool) : pick(RIV_NOMI) + " " + Math.floor(rnd(2,9)),
     eta: Math.floor(rnd(18, 33)), /* punto 65: stessa fascia del giocatore, sono la sua generazione */
     city: pick(RIV_CITTA), gen: pick(RIV_GEN), col: pick(RIV_COL),
@@ -57,6 +64,8 @@ function nuovoRivale(forza){
 function sistemaRivali(){
   if(!G.rivals) G.rivals = [];
   G.rivals = G.rivals.map(r2 => {
+    /* i rivali di prima del 21/09 non hanno l'id: se lo prendono qui */
+    if(r2 && r2.city && !r2.id) r2.id = "r" + Math.floor(Math.random()*1e9);
     if(r2.city) return r2;
     const nuovo = nuovoRivale(r2.p || 500);
     nuovo.n = r2.n || nuovo.n; nuovo.p = r2.p || nuovo.p; nuovo.prev = nuovo.p;

@@ -953,7 +953,9 @@ function ruoloDaIncontrare(){
 function nuovoContatto(ruolo, cittaId, daId){
   const c = CITTA_BY_ID[cittaId] || {n:"", scena:5};
   const info = RUOLI[ruolo] || {};
-  const usati = (G.gente || []).map(p => p.n);
+  /* nemmeno i nomi della classifica: i rapper (e i DJ) pescano dallo stesso
+     mazzo, e un omonimo di un rivale poi non si chiama in Cabina (v. posto.js) */
+  const usati = (G.gente || []).map(p => p.n).concat((G.rivals || []).map(r => r.n));
   let pool = info.nomi;
   if(!pool || !pool.length) pool = (typeof RIV_NOMI !== "undefined") ? RIV_NOMI : ["Senza nome"];
   const liberi = pool.filter(n => usati.indexOf(n) < 0);

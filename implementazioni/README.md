@@ -33,10 +33,10 @@ per i punti, e sono in [`../documentazione/come-si-lavora.md`](../documentazione
 
 ## Tutti i punti
 
-136 voci in tutto: **101 chiuse**, 13 a metà, 17 da fare e 5 con la sola risposta scritta
+137 voci in tutto: **102 chiuse**, 13 a metà, 17 da fare e 5 con la sola risposta scritta
 (ricontate dalla tabella qui sotto il 21/09/2026, con le due piccole dell'energia — la Sala a
 zero, la take a 25 — «Lo stile che conta», lo Shop solo vestiti coi filtri e i capi che si
-sbloccano con le offerte della settimana entrate quel giorno; il conto di prima era del 20/09, dopo il riordino del foglio dei punti; nello
+sbloccano con le offerte della settimana, e le tre code dello Studio entrate quel giorno; il conto di prima era del 20/09, dopo il riordino del foglio dei punti; nello
 stesso giro sono entrate due sezioni del foglio dell'interfaccia che alla tabella mancavano — lo
 Studio a cinque linguette, l'anteprima di un pezzo non uscito — e il giorno prima altre tre,
 l'avvio rapido, le pagine dei posti sulla loro foto, la fascia della plancia). A che punto siamo
@@ -181,6 +181,7 @@ nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../docume
 | **—** | Lo stile che conta: i capi addosso pesano su hype, presenza e promo | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Lo Shop vende solo vestiti, coi filtri per tipologia | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Lo Shop cresce con la carriera: i capi che si sbloccano e le offerte della settimana | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
+| **—** | Le tre code dello Studio a cinque linguette: l'omonimo, il posto rubato alla Sala, la copertina orfana | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 
 > Lo stato è letto dal testo dei punti: «fatto» vuol dire che c'è scritto cosa è
 > stato fatto e quando, «risposto» che c'è una risposta ragionata ma il codice

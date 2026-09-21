@@ -70,10 +70,12 @@ diventata una regola (lo sconto scritto è quello vero).
 7. **L'uscita di venerdì non costa niente, quella a mano sì** (08/09): risolto in parte per
    scelta — il vantaggio di venerdì è quello di aspettare, non uno sconto. Sparisce del tutto
    con «togli il parametro lucidità» (CARLO), che nell'altro foglio è fra i lavori lunghi.
-8. Le code dello Studio a cinque linguette (15/09): **un rapper della classifica con lo
+8. ~~Le code dello Studio a cinque linguette (15/09): **un rapper della classifica con lo
    stesso nome di uno della Sala non si può chiamare**, **chi accetta dalla classifica occupa
    un posto della Sala**; e dal 14/09 **la copertina proposta e non confermata resta nel
-   salvataggio, foto compresa**.
+   salvataggio, foto compresa**.~~ **RISOLTO (21/09/2026)** — le prime due nel branch
+   `task/studio-le-tre-code` (il legame rivale ↔ contatto è l'id del rivale, la Sala conta
+   solo la sua gente); la copertina era già chiusa il 14/09 (`e288634`) e l'indice non l'aveva visto.
 9. **Di traverso** (844 × 390) il telefono alzato si usa, ma resta da **decidere se il gioco
    sugli store gira anche in orizzontale**: nel repo non c'è un manifest né un
    `orientation`. Nell'altro foglio sta fra «le decisioni tue».
@@ -2089,6 +2091,11 @@ Marketing». `SND.anteprima = "promo"` in `fx.js`.
   pezzo: torna in Cover, la proposta non c'e' piu' da nessuna parte ma nel salvataggio
   (`localStorage`, chiave della partita) `studio.coverProva.img` e' ancora pieno.
 - **quanto pesa** — da sistemare con calma.
+- **RISOLTO (14/09/2026, riconosciuto il 21/09)** — commit `e288634`, «la proposta di
+  copertina non resta orfana»: `studioCoverPulisci()` (chiamata da `renderStudio`) butta la
+  proposta se il suo pezzo non sta più in Fuori, e `salvaConCopertine` a memoria piena
+  sacrifica **prima** la proposta non confermata, poi le copertine dei pezzi. L'indice in
+  testa a questo foglio la dava ancora aperta: l'audit adesso lo controlla.
 
 ### Sul telefono il motivo per cui l'anteprima e' spenta viene tagliato
 
@@ -2484,6 +2491,15 @@ lo schermo è un telefono» in `implementazioni/02-interfaccia-e-telefono.md`.
 - **come si vede** — partita dove alla Sala c'è un rapper con un nome che sta anche in
   classifica: in Cabina, sotto «Dalla classifica», quel nome manca.
 - **quanto pesa** — da sistemare con calma.
+- **RISOLTO (21/09/2026)** — branch `task/studio-le-tre-code`: il legame è l'**id** del rivale
+  (`id` nuovo in `nuovoRivale`, dato anche ai rivali dei salvataggi vecchi da
+  `sistemaRivali`; `rivaleId` sulla persona, `studioRivaleContatto` in `studio.js`) — non
+  il `seed`, che è la copertina del suo ultimo pezzo e cambia a ogni uscita; i contatti
+  venuti dalla classifica prima di oggi (`rivale:true` senza id) valgono ancora per
+  nome. In più la Sala non pesca più un nome che sta in classifica e la classifica non ne
+  pesca uno della Sala (stesso mazzo, `nuovaPersona`/`nuovoRivale`), e `diventaOpp` su
+  uno che era già in classifica non ne crea un secondo: cambia la sua storia. Dieci prove
+  in `test/unit/studio-rivali-e-sala.test.js` (sei fallivano sul codice di prima).
 
 ### «Dalla classifica» mostra solo i sei più grossi, cioè quelli che dicono di no
 
@@ -2518,6 +2534,11 @@ grossi, tutta la classifica in «Con chi».
 - **come si vede** — fai accettare due rivali nelle prime settimane, poi conta chi arriva
   alla Sala nelle settimane dopo: un posto in meno per ognuno.
 - **quanto pesa** — da sistemare con calma.
+- **RISOLTO (21/09/2026)** — stesso branch: `sistemaGente` conta solo la gente della Sala (`genteDellaSala()`,
+  chi non ha `rivale`) per il tetto, per il turno dei ruoli e per il momento in cui
+  arrivano il videomaker e il giornalista; i rivali fra i contatti restano in `G.gente`
+  come prima, in più. Provato: con due rivali accettati la Sala ha la stessa gente di
+  una partita senza (6 e 6), e col tetto pieno arrivano lo stesso videomaker e giornalista.
 
 ### «Sì al 8%» e «Dice sì al 8%»: davanti alla vocale ci va «all'»
 
@@ -5300,3 +5321,88 @@ cassa si legge il testo della card che passa sotto («Usato · −40% · ancora 
 L'altezza c'era anche prima del commit; la trasparenza sull'ultima riga è dello sfondo nuovo.
 — **Sistemata (21/09/2026)**, stesso branch: lo sfondo è pieno fino a 10 punti dal bordo
 (`calc(100% - 10px)`, il padding della barra) e sfuma solo lì, con una o tre righe.
+
+## Giro del 21/09/2026 (segnala-problemi, giro stretto sui commit `389beea` e `c8fc276`, branch `task/studio-le-tre-code`)
+
+Controllati `npm run prova` (180 ok), `audit-regressioni.js` (439 ok), `verifica:build`
+(33 ok) e le nove prove di `test/unit/studio-rivali-e-sala.test.js` (tutte verdi) sul
+lavoro com'è adesso. Guardati `posto.js`, `rivals.js`, `studio.js`, `sim.js`, `ui.js`,
+`trasferte.js` e `chat.js` intorno a `G.gente` e `G.rivals`. A posto: nessuno usa
+`G.gente.length` come tetto della Sala fuori da `sistemaGente`; `sistemaRivali` e
+`sistemaGente` si escludono i nomi a vicenda qualunque dei due giri per primo (`G.rivals`
+e `G.gente` nascono in `state.js:26`); i rivali rigenerati o nuovi hanno sempre l'id
+(`nuovoRivale`), quelli dei salvataggi vecchi lo prendono in `sistemaRivali`; il contatto
+vecchio con `rivale:true` senza id vale per nome e l'omonimo della Sala non lo confonde
+(`p.rivale` è richiesto); il mazzo dei nomi (30) regge 8 alla Sala più 11 in classifica,
+il ripiego «Nome 3» non controlla i doppioni ma oggi non si arriva a usarlo.
+
+### Il commit `389beea` legava il contatto al rivale col seme della copertina, che cambia a ogni pezzo nuovo
+
+- **dove** — `frontend/js/game/rivals.js:80` (`r2.seed = ...` in `vitaRivali`) contro
+  `studio.js` di quel commit (`rivaleSeed:r.seed`).
+- **cosa succede** — alla prima uscita del rivale il suo contatto non lo riconosceva più:
+  tornava in «Dalla classifica» a pagamento, e se diceva sì entrava una seconda volta
+  fra i contatti; `diventaOpp` ne faceva un secondo in classifica. `sputa.js:132` lo
+  diceva già dal 15/09: «il seed rivals.js lo rifa' a ogni pezzo nuovo».
+- **come si vede** — sul commit `389beea`: chiama un rivale, fai passare settimane
+  finché esce con un pezzo, riapri la Cabina.
+- **quanto pesa** — si vede ma si gira intorno.
+- **RISOLTO (21/09/2026)** — commit `c8fc276`, stesso branch: il legame è un `id` fisso
+  del rivale (`rivaleId`), dato anche ai rivali dei salvataggi vecchi; una prova in più.
+
+### L'opp che nasce alla Sala torna in «Dalla classifica» come uno sconosciuto da pagare
+
+- **dove** — `frontend/js/game/posto.js:832-836` (`diventaOpp`, il ramo `nuovoRivale`) e
+  `frontend/js/game/studio.js:287` (`studioRivaleContatto`).
+- **cosa succede** — quando uno della Sala ti si mette contro, il rivale che nasce in
+  classifica non viene legato al suo contatto: la persona non ha `rivale` né `rivaleId`,
+  e `studioRivaleContatto` cerca solo per id o per nome-con-`rivale`. Così in Cabina
+  quello che «è finita male» sta sotto «Dalla classifica» con un prezzo e una
+  percentuale, come se non lo conoscessi; se dice sì, `studioRivaleInGente` mette fra i
+  contatti un **secondo** con lo stesso nome e la stessa faccia (pelle, colore e capelli
+  li copia `diventaOpp`), uno «via» e uno nuovo. Prima di questo commit lo nascondeva il
+  nome. Stesso buco quando un contatto venuto dalla classifica esce dalla classifica
+  (`vitaRivali` lo toglie) e poi diventa opp: il rivale rinasce con un id nuovo e il
+  contatto tiene quello vecchio. La prova «uno della Sala che diventa opp entra in
+  classifica come prima» conta solo i rivali, non guarda la Cabina.
+- **come si vede** — alla Sala fai litigare un rapper (risposta che lo manda via), poi
+  Cabina → Con chi: è sotto «Dalla classifica».
+- **quanto pesa** — si vede ma si gira intorno.
+- **RISOLTO (21/09/2026)** — stesso branch, commit dopo: `diventaOpp` lega sempre la persona al suo
+  rivale (`rivaleId` = l'id di quello trovato o di quello appena creato; non `rivale:true`, che vuol dire
+  «venuto dalla classifica» e lo toglierebbe dal conto della Sala — chi ha rotto con te il posto lo
+  occupa ancora, com'è sempre stato), quindi
+  `studioRivaleContatto` lo vede e «Dalla classifica» non lo rimette in vendita. Vale anche per il
+  rivale-contatto uscito dalla classifica e poi diventato opp: ne nasce uno nuovo e la persona passa a
+  puntare a quello. Provato in `studio-rivali-e-sala.test.js`.
+
+### Le trasferte pescano i rapper dallo stesso mazzo della classifica senza guardarla
+
+- **dove** — `frontend/js/game/trasferte.js:955-958` (`nuovoContatto`, `usati` è solo
+  `G.gente`; per i rapper `pool` è `RIV_NOMI`).
+- **cosa succede** — il commit ha chiuso la porta fra Sala e classifica, ma un rapper
+  conosciuto in trasferta può ancora avere il nome di uno in classifica. In Cabina lo trovi
+  due volte: gratis in «Chi conosci» e a pagamento in «Dalla classifica», con due facce
+  diverse. In più il mazzo dei DJ (`trasferte.js:132`) ha «Selva» e «Turbo», che stanno
+  anche in `RIV_NOMI`.
+- **come si vede** — partita con qualche trasferta fatta: confronta i rapper fra i
+  contatti con la classifica.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (21/09/2026)** — stesso branch, commit dopo: `nuovoContatto` in `trasferte.js` esclude
+  anche i nomi di `G.rivals`, come `nuovaPersona` della Sala.
+
+### Salvataggio vecchio con l'omonimo già alla Sala: se quello diventa opp, in classifica ci sono due «Lupo»
+
+- **dove** — `frontend/js/game/posto.js:829` (`const gia = p.rivale && ...`).
+- **cosa succede** — nelle partite di prima del 21/09 alla Sala può già girare un rapper
+  col nome di uno in classifica (le due pesche non si escludevano). Se quello diventa opp,
+  `gia` non lo cerca perché non è `rivale`, e nasce un secondo rivale con lo stesso nome.
+  Da lì il tocco sulla riga della classifica (`ui.js:706`, `click: x.n`) e
+  `studioChiamaRivale(nome)` (`studio.js:320`) vanno per nome e prendono sempre il primo.
+  Nelle partite nuove non succede.
+- **come si vede** — solo con un salvataggio vecchio che abbia già l'omonimo.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (21/09/2026)** — stesso branch, commit dopo: `diventaOpp` cerca il rivale per id e, se la
+  persona non ne ha uno, per nome — l'omonimo di un salvataggio vecchio si fonde col rivale che c'è
+  («Vi siete conosciuti alla Sala. È finita male.») invece di sdoppiarlo, e da lì è legato a lui.
+  Provato in `studio-rivali-e-sala.test.js`.

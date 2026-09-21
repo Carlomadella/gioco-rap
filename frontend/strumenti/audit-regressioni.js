@@ -792,6 +792,36 @@ test("il feat si sceglie in Cabina, da due porte: chi conosci gratis, la classif
   studio.includes("function studioFeatProbabilita(r)") &&
   studio.includes("G.gente.push(p);") &&
   !studio.includes("function studioSezFeat()"));
+/* Le tre code dello Studio (problemi-riscontrati 15/09, chiuse il 21/09/2026):
+   il rivale e il suo contatto si legano con l'id del rivale, non col nome; i rivali fra
+   i contatti non contano nel tetto della Sala; la Sala e la classifica non si
+   rubano i nomi; l'opp che era gia' in classifica non si sdoppia. La cover
+   orfana era gia' chiusa il 14/09 (studioCoverPulisci). */
+test("un rivale con lo stesso nome di uno della Sala si puo' chiamare: il legame col contatto e' l'id del rivale (non il seed, che cambia a ogni uscita)",
+  studio.includes("function studioRivaleContatto(r){") &&
+  studio.includes("p.rivaleId != null ? p.rivaleId === r.id : (p.rivale && p.n === r.n)") &&
+  !studio.includes("rivaleSeed") &&
+  leggi("js/game/rivals.js").includes('id: "r" + Math.floor(Math.random()*1e9),') &&
+  leggi("js/game/rivals.js").includes('if(r2 && r2.city && !r2.id) r2.id = "r" + Math.floor(Math.random()*1e9);') &&
+  studio.includes("return (G.rivals || []).filter(r => r && r.n && !studioRivaleContatto(r))") &&
+  studio.includes("rivaleId:r.id") &&
+  !studio.includes("const noti = new Set((G.gente || []).map(p => p.n));"));
+test("chi accetta dalla classifica non ruba un posto alla Sala: il tetto conta solo la gente della Sala",
+  posto.includes("function genteDellaSala(){ return (G.gente || []).filter(p => p && !p.rivale); }") &&
+  posto.includes("while(genteDellaSala().length < quante){") &&
+  !posto.includes("while(G.gente.length < quante){") &&
+  posto.includes("const n = genteDellaSala().length;"));
+test("la Sala e la classifica pescano dallo stesso mazzo senza omonimi, e l'opp gia' in classifica non si sdoppia",
+  posto.includes("const usati = (G.gente || []).map(p => p.n).concat((G.rivals || []).map(r => r.n));") &&
+  leggi("js/game/rivals.js").includes("const usati = (G.rivals||[]).map(x => x.n).concat((G.gente||[]).map(p => p.n));") &&
+  posto.includes("let r = G.rivals.find(x => p.rivaleId != null ? x.id === p.rivaleId : x.n === p.n) || null;") &&
+  posto.includes("  if(r) p.rivaleId = r.id;") && !posto.includes("p.rivale = true") &&
+  leggi("js/game/trasferte.js").includes("const usati = (G.gente || []).map(p => p.n).concat((G.rivals || []).map(r => r.n));") &&
+  fs.existsSync(path.join(ROOT, "test/unit/studio-rivali-e-sala.test.js")));
+test("la proposta di copertina non resta orfana: renderStudio la butta se il pezzo non e' piu' in Fuori, e la memoria piena la sacrifica per prima",
+  studio.includes("function studioCoverPulisci(){") &&
+  studio.includes("  studioCoverPulisci();") &&
+  leggi("js/game/copertine.js").includes("if(G.studio && G.studio.coverProva && G.studio.coverProva.img){"));
 test("il feat conta sul pezzo: la sua gente ascolta (sim.js) e all'uscita muove l'hype",
   actions.includes("featFama:conMe ? conMe.fama : 0") &&
   actions.includes("function featHypeUscita(s)") &&
