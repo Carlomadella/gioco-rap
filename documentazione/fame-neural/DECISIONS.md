@@ -1348,3 +1348,23 @@ Decisione:
 - algoritmo pYIN/Basic Pitch, output MIDI e gate di selezione non cambiano.
 
 È aggiunta una regressione che simula un candidate con ultimo evento a 0,3 s su reference da 5,25 s e richiede un render candidate di 5,25 s.
+
+## NDR-086 — Blind low-end review: review v1 finalizzata ma invalida può essere superseduta
+
+**Stato: ACCEPTED — 21 settembre 2026.**
+
+Una review `basic-pitch-lowend-blind-comparison-v1-001` già finalizzata non viene considerata valida se è stata prodotta con il renderer che troncava A/B all'ultimo evento rilevato.
+
+Il superseding v2 deve:
+
+- preservare integralmente gli artefatti v1;
+- verificare schema/identità di package, blind key, submission e report;
+- verificare i digest package/submission del report v1;
+- scrivere un marker append-only `superseded-invalid-review.json`;
+- registrare `status=SUPERSEDED_INVALID_RENDER_DURATION`;
+- registrare SHA256 degli artefatti v1 preservati;
+- ignorare il gate della review invalida;
+- non copiare punteggi o note nella nuova review;
+- creare `basic-pitch-lowend-blind-comparison-v1-002` da zero con renderer full-duration.
+
+È aggiunta una regressione che costruisce una v1 già finalizzata con submission+report e richiede che il superseding avvenga senza cancellazioni.
