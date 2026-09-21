@@ -85,5 +85,10 @@
     "trainingAuthorized": false,
     "taskDataReadyMayBeDeclared": false
   },
-  "nextAction": "SELECT_FRESH_COHORT_METADATA_ONLY_AND_FREEZE_IDENTITIES"
+  "nextAction": "SELECT_FRESH_COHORT_METADATA_ONLY_AND_FREEZE_IDENTITIES",
+  "implementation": {
+    "selectorPath": "prepare-audio-to-midi-independent-evaluation.js",
+    "selectorGitBlobSha": "305fe132ba54d4b777d8d2a76e66262fd39ea554",
+    "implementationCommit": "31f7ed88c27ec25d7489ce9b5aa5798960803192"
+  }
 }
