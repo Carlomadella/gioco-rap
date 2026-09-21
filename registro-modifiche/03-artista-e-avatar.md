@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:c43384b -->
+## 21/09/26, 13:15 â€” task/shop-capi-sbloccati-e-offerte â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `c43384b`
+
+### Cosa Ã¨ entrato
+
+- `305f912` â€” docs: la lista «Da fare adesso» rinumerata dopo i due punti dello Shop usciti, e la voce dello Shop in provincia rimanda ai capi che si sbloccano â€” **Carlomadella**
+- `df4ee09` â€” Shop: «Capi che si sbloccano» e «Le offerte della settimana» — lo Shop cresce con la carriera â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/creator/guardaroba.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:1ff4f30 -->
 ## 21/09/26, 08:27 â€” task/shop-solo-vestiti-con-filtri â†’ main
 
