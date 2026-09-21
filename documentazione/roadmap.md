@@ -221,6 +221,17 @@ barra del giorno dà +1 hype (`frontend/js/game/sputa.js`). Tutte e due in
 altre **8** (erano 45 e 12; tre take fanno 41 invece di 69). «La take costa 25, le altre 8»
 in `04-musica-e-suoni.md`.
 
+**FATTO (21/09/2026)** — **«Le tre code dello Studio a cinque linguette»** (branch
+`task/studio-le-tre-code`): l'*omonimo* — «Dalla classifica» nascondeva il rivale il cui nome
+girava già alla Sala, perché Sala e classifica pescavano dallo stesso mazzo senza parlarsi;
+adesso il legame rivale ↔ contatto è l'**id** del rivale (`rivaleId`, non il nome né il seed) e
+i due mazzi si escludono a vicenda, trasferte comprese. Il *posto rubato* — chi accettava il
+feat entrava in `G.gente` e toglieva un posto alla Sala; adesso il tetto conta solo
+`genteDellaSala()`, e chi rompe con te alla Sala il suo posto lo tiene. La *copertina orfana*
+era già chiusa dal 14/09, l'indice non l'aveva visto. Dieci prove vitest in
+`test/unit/studio-rivali-e-sala.test.js`. «Le tre code, chiuse il 21/09/2026» in
+`02-interfaccia-e-telefono.md`.
+
 **Manca**: l'app della discografia che dice come invecchiano i pezzi. (Il buco dei 1180px —
 «Che post fai?» che sotto non si raggiungeva — è chiuso il 15/09/2026: il telefono si alza
 a schermo pieno anche da stretto, vedi la tappa G.)

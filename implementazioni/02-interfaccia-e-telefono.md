@@ -2117,7 +2117,8 @@ problemi-riscontrati del 15/09):
 
 Il giro di fine task (`segnala-problemi`) ne ha trovate tre in più, chiuse nel branch: l'opp nato
 alla Sala tornava in «Dalla classifica» come uno sconosciuto da pagare (adesso `diventaOpp` lega
-sempre la persona al suo rivale con `rivaleId`), le trasferte pescavano i rapper senza guardare la
+sempre la persona al suo rivale con `rivaleId` — solo l'id, non `rivale:true`, che vuol dire «venuto
+dalla classifica» e le avrebbe tolto il posto alla Sala), le trasferte pescavano i rapper senza guardare la
 classifica (`nuovoContatto` esclude anche `G.rivals`), e in un salvataggio vecchio l'omonimo già
 alla Sala che diventava opp sdoppiava il rivale (si fonde con quello che c'è).
 
