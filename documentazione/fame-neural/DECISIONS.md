@@ -1327,3 +1327,24 @@ Prima della promozione low-end sono obbligatori:
 4. selezione: mediana, poi count >=2, poi score totale; parità completa -> pYIN.
 
 Per il rendering blind si usa lo stesso oscillatore neutrale per entrambi gli arm. pYIN usa i note boundaries congelati più il pitch contour; Basic Pitch usa i note boundaries congelati più i pitch bend, che in Basic Pitch 0.4.0 sono espressi in unità da 1/3 di semitono. Nessun final holdout viene aperto da questa review.
+
+## NDR-085 — Blind low-end review: durata candidate vincolata alla reference
+
+**Stato: ACCEPTED — 21 settembre 2026.**
+
+Durante la review `basic-pitch-lowend-blind-comparison-v1-001` è stato osservato un Candidate B di circa un secondo, non valutabile rispetto al bass stem completo.
+
+La causa è nel renderer della review, non nell'inference artifact: `renderBasicPitch()` e `renderPyin()` allocavano il WAV fino all'ultimo evento candidato. Un metodo con pochi eventi iniziali produceva quindi un file corto invece di un file full-length contenente silenzio nelle regioni non rilevate.
+
+Decisione:
+
+- la review v1-001 non viene completata né riutilizzata;
+- nuovo review ID append-only: `basic-pitch-lowend-blind-comparison-v1-002`;
+- la durata di Reference, A e B è vincolata alla durata del `bass.wav` di riferimento;
+- la durata reference viene congelata nel review package;
+- il server ricontrolla la durata del bass stem prima di renderizzare;
+- regioni senza note restano silenziose fino alla fine e sono parte della valutazione;
+- il mapping blind viene rigenerato sul nuovo review ID;
+- algoritmo pYIN/Basic Pitch, output MIDI e gate di selezione non cambiano.
+
+È aggiunta una regressione che simula un candidate con ultimo evento a 0,3 s su reference da 5,25 s e richiede un render candidate di 5,25 s.
