@@ -25,6 +25,7 @@ import math
 import os
 import shutil
 import sys
+import traceback
 import uuid
 from pathlib import Path
 
@@ -391,7 +392,7 @@ def validate_existing_family_output(root: Path, source, frozen):
     result = read_json(result_file)
     if (
         result.get("schema") != RESULT_SCHEMA
-        or result.get("version") != 1
+        or result.get("version") != 2
         or result.get("runId") != DEFAULT_RUN_ID
         or result.get("candidateId") != frozen["execution"]["candidateId"]
         or result.get("sourceRecordId") != source["sourceRecordId"]
@@ -417,6 +418,29 @@ def validate_existing_family_output(root: Path, source, frozen):
     return result, midi
 
 
+def write_failure_report(root: Path, run_id: str, stage: str, source_record_id, error: Exception):
+    report_file = root / "failure-report.json"
+    payload = {
+        "schema": "fame-owned-beats-basic-pitch-inference-failure-v2",
+        "version": 2,
+        "runId": run_id,
+        "status": "FAILED_BEFORE_COMPLETE_SUMMARY",
+        "recordedAt": __import__("datetime").datetime.now(
+            __import__("datetime").timezone.utc
+        ).isoformat(),
+        "stage": stage,
+        "sourceRecordId": source_record_id,
+        "errorType": type(error).__name__,
+        "errorMessage": str(error),
+        "traceback": traceback.format_exc(),
+        "finalHoldoutAccessed": False,
+        "batch131Accessed": False,
+        "trainingAuthorized": False,
+    }
+    if not report_file.exists():
+        report_file.write_text(stable_json(payload), encoding="utf-8", newline="\n")
+
+
 def execute(workspace_root: str, run_id: str = DEFAULT_RUN_ID):
     workspace = Path(workspace_root).resolve()
     if not workspace.is_dir():
@@ -431,7 +455,7 @@ def execute(workspace_root: str, run_id: str = DEFAULT_RUN_ID):
         summary = read_json(summary_file)
         if (
             summary.get("schema") != SUMMARY_SCHEMA
-            or summary.get("version") != 1
+            or summary.get("version") != 2
             or summary.get("status") != "INFERENCE_COMPLETE_AWAITING_TECHNICAL_AND_HUMAN_QA"
             or summary.get("runId") != run_id
             or summary.get("records") != 8
@@ -456,7 +480,11 @@ def execute(workspace_root: str, run_id: str = DEFAULT_RUN_ID):
     from basic_pitch.inference import Model, predict
 
     print("Load frozen Basic Pitch ONNX model once for development run...", file=sys.stderr, flush=True)
-    model = Model(model_path)
+    try:
+        model = Model(model_path)
+    except Exception as error:
+        write_failure_report(root, run_id, "MODEL_LOAD", None, error)
+        raise
 
     results = []
     for index, source in enumerate(receipt["sources"], start=1):
@@ -518,7 +546,7 @@ def execute(workspace_root: str, run_id: str = DEFAULT_RUN_ID):
             )
             result = {
                 "schema": RESULT_SCHEMA,
-                "version": 1,
+                "version": 2,
                 "runId": run_id,
                 "candidateId": receipt["candidateId"],
                 "sourceRecordId": rid,
@@ -573,7 +601,8 @@ def execute(workspace_root: str, run_id: str = DEFAULT_RUN_ID):
                     "pitchBendPointCount": midi["pitchBendPointCount"],
                 }
             )
-        except Exception:
+        except Exception as error:
+            write_failure_report(root, run_id, "FAMILY_INFERENCE_OR_PERSIST", rid, error)
             shutil.rmtree(temp_dir, ignore_errors=True)
             raise
 
@@ -582,7 +611,7 @@ def execute(workspace_root: str, run_id: str = DEFAULT_RUN_ID):
 
     summary = {
         "schema": SUMMARY_SCHEMA,
-        "version": 1,
+        "version": 2,
         "status": "INFERENCE_COMPLETE_AWAITING_TECHNICAL_AND_HUMAN_QA",
         "runId": run_id,
         "candidateId": receipt["candidateId"],
