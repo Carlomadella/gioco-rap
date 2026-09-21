@@ -799,3 +799,8 @@ La prima blind low-end review `basic-pitch-lowend-blind-comparison-v1-001` è st
 
 
 La review blind low-end v1 può risultare già finalizzata localmente. Poiché il renderer v1 è stato verificato come metodologicamente invalido per durata candidate troncata, una finalizzazione v1 non viene più trattata come blocker. Il superseding v2 preserva package/blind key/submission/report, ne verifica schema e digest, scrive `superseded-invalid-review.json` con stato `SUPERSEDED_INVALID_RENDER_DURATION`, forza `gateFromInvalidReviewIgnored=true` e `scoresCopiedToSupersedingReview=false`, quindi prepara una review v2 nuova da zero.
+
+
+La blind low-end comparison v2 è chiusa con `KEEP_PYIN_LOW_END`: `librosa-pyin-lowend-v1` ha mediana 2, 7/8 family >=2 e score totale 17; `basic-pitch-0.4.0-lowend-v1` ha mediana 0, 0/8 family >=2 e score totale 0. Il singolo caso pYIN con score 1 è stato chiarito durante la review come **failure upstream di source separation**, non come root cause di trascrizione: nello stem `bass` sono già presenti residui del lead che occupano la stessa regione spettrale dell'808, e pYIN li trascrive coerentemente nel MIDI. La classificazione adottata è `UPSTREAM_SOURCE_SEPARATION_CONTAMINATION`; la family specifica viene ricavata automaticamente dal `submission.json` v2 e mantenuta come regression case development.
+
+È stato congelato il run append-only `audio-to-midi-selected-integration-v1-001` per integrare `drums-bass-kick-fusion-v1` + `librosa-pyin-lowend-v1`. L'integrazione non ritrascrive e non ricodifica MIDI: copia byte-identici i due output selezionati, registra SHA/provenance/punteggi e known issue per family. Final holdout, batch131, training e task-data readiness restano chiusi. **Run locale non ancora eseguito.**
