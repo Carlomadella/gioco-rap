@@ -143,7 +143,7 @@ const HUB_LUOGHI = [
      che come linguetta a sé non aveva senso: un negozio è un posto. */
   {id:"shop", n:"Shop",
    vai:() => apriPannello("Shop", "shop",
-     "Attrezzatura, beat e vestiti da comprare.")},
+     "Vestiti e accessori per il tuo artista.")},
   /* punto 6: il centro per l'impiego, arrivato con la mappa definitiva.
      Apre tutti i lavori (JOBS), non solo i due che hanno già un edificio —
      rispetta i requisiti, non finge che siano tutti presi al volo.
@@ -381,8 +381,8 @@ const HUB_SUGG = [
 /* Il luogo non rifà quello che sa già fare la partita: la apre sulla sezione
    giusta. Così la plancia resta la porta, e il gioco resta dov'è. */
 /* IL PANNELLO DI UN LUOGO.
-   Uno solo, riusato: Casa ci mette le spese fisse, lo Shop il banco e la
-   vetrina. Il contenuto non lo disegna lui — se lo prende in prestito dal
+   Uno solo, riusato: Casa ci mette le spese fisse, lo Shop i vestiti coi
+   filtri. Il contenuto non lo disegna lui — se lo prende in prestito dal
    magazzino (`#g-magazzino`), dove `renderGioco()` continua a scrivere come ha
    sempre fatto, e alla chiusura glielo restituisce. Così non è stata riscritta
    una riga di quello che disegna le spese, il banco dei beat o la vetrina. */
@@ -559,7 +559,7 @@ function rigaSkill(ic, n, v, titolo){
 /* le quattro abilità del rapper: quello che fa lui, non il mestiere di
    qualcun altro. Produzione e mixing non sono più abilità tue — le fa il
    beatmaker e il fonico alla Sala (punto 46); l'attrezzatura e il mestiere
-   al mixer restano nel gioco (gearBonus, mixGain) come qualità del pezzo,
+   al mixer resta nel gioco (mixGain) come qualità del pezzo,
    non come una barra che ti appartiene. */
 function skillRighe(){
   return rigaSkill("mic", "Rap", G.skills.flow) +

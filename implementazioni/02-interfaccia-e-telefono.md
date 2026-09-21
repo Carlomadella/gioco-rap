@@ -1116,6 +1116,75 @@ nell'ordine in `implementazioni.md`.
 
 ---
 
+## Lo Shop vende solo vestiti, coi filtri per tipologia
+
+> «i beat non devono stare nello shop, inoltre nei vestiti suddividimi tutto e creami dei
+> pulsanti tipo filtri che se schiacciati fanno vedere solo quella tipologia di
+> abbigliamento, l'attrezzatura non serve se andiamo in studio a registrare» — CARLO,
+> 21/09/2026.
+
+**FATTO (21/09/2026)** — branch `task/shop-solo-vestiti-con-filtri`. Toccati:
+`pagine/gioco.html` (lo Shop senza le tre linguette), `js/game/negozio.js` (i filtri),
+`js/game/ui.js` (via il banco dei beat e la vetrina dell'attrezzatura), `js/game/actions.js`
+(via l'attrezzatura dalle formule), `js/game/content.js` (via `GEAR`), `js/game/telefono.js`
+(l'inventario a tre linguette), `js/game/events.js` (il furto), `js/game/hub.js` (il
+sottotitolo), `js/game/posto.js` e `js/game/studio.js` (i testi che mandavano allo Shop),
+`css/game.css` e `css/negozio.css` (le regole morte), `strumenti/audit-regressioni.js`.
+
+**Tre cose in una.**
+
+**1 · I beat escono dallo Shop.** Il banco dei beat (`G.market`) era in due posti dal 15/09:
+la linguetta Beat dello Shop, disegnata da `ui.js` in `#g-market`, e la stanza «Il beat»
+dello Studio, che pesca dallo stesso banco e fa la stessa transazione. Adesso c'è solo lo
+Studio. Il banco non cambia — chi te lo fa sentire alla Sala, in chat o in trasferta lo mette
+sempre lì — cambiano i testi: «Cerca un beat» dice «Sono sul banco dello Studio, nella
+stanza «Il beat»», il beatmaker della Sala «sul banco dello Studio», lo Studio senza contatti
+«resta il banco: tre beat qui sotto». Il motore degli eventi ascolta già l'acquisto dallo
+Studio (`data-stcompra`, dal 13/09), quindi non perde niente.
+
+**2 · L'attrezzatura non esiste più.** «Non serve se andiamo in studio a registrare»: si
+registra in Studio, e le cuffie, il microfono, la scheda, i monitor e il trattamento
+acustico da casa non hanno più senso. Non è solo la vetrina che sparisce: **escono anche gli
+effetti**, perché un bonus che nessuno può più comprare è un numero morto. `GEAR` non c'è
+più in `content.js`; in `actions.js` la qualità del pezzo (`songQ`) e il fattore
+«attrezzatura» di `qFactors` non sommano più `gearBonus()` (che non esiste), il mix
+(`mixGain`) non guarda più monitor e cuffie, e **la sala costa 50 € a tutti** — prima era
+gratis con un microfono tuo, e «senza microfono» era la scusa dei 50. L'inventario del
+telefono ha tre linguette (Bars, Beat, Pezzi) invece di quattro; l'evento «Ti hanno svuotato
+la sala» non può più toglierti un pezzo di attrezzatura, e la seconda risposta costa 10 di
+benessere. `G.gear` resta nei salvataggi vecchi e nessuno lo legge più (il motore degli
+eventi ha due condizioni generiche sull'attrezzatura, `gear_owned_count_at_least` e
+`remove_random_gear`, che restano nel catalogo e non scattano mai).
+
+Per chi gioca: un pezzo nuovo perde al massimo i 34 punti grezzi che l'attrezzatura completa
+dava a `songQ` (prima di `wellFactor`) e il +10% del fattore — ma li aveva solo chi aveva
+speso 2.520 €; chi comincia non cambia di un punto. Chi aveva il microfono paga di nuovo i
+50 € di sala.
+
+**3 · I filtri dei Vestiti.** Al posto delle tre linguette dei reparti, nella stessa barra con
+la cassa, ci sono le pastiglie dei filtri (`#sh-filtri`, `shFitFiltri()`): **Tutti**, poi
+una per tendina del camerino nell'ordine di `VETRINA_REPARTI` — Cappelli, Occhiali, Gioielli,
+Parte alta, Parte bassa, Scarpe, Altro — ognuna col numero dei capi in piccolo e, se ne hai,
+quanti sono tuoi («Scarpe 1/7»). Quella schiacciata (`SH_FIT_FILTRO`) mostra solo quel
+reparto, con la sua intestazione; «Tutti» li mostra in fila come prima. Comprare un capo col
+filtro attivo lo lascia dov'è (il conto sulla pastiglia sale). Non si salva: lo Shop si
+riapre su «Tutti». Sono le stesse pastiglie di prima (`.shtab`), quindi sul telefono vanno
+a capo da sole.
+
+**Cosa è uscito.** `SH_GEAR_ICONE`, `rigaBeat` e i due blocchi di `renderGioco` che
+disegnavano `#g-shop` e `#g-market`; `.shsec`, `.shicon`, `.shbeat`, `.shplay`,
+`.shdrop`, `.shbuy` da `game.css` e `.shsec .ngcard` da `negozio.css`; il pulsante
+«Tuo»/prezzo e le card dei vestiti restano come sono. L'audit: i quattro controlli del
+«Punto 4» sui tre reparti sono riscritti (un reparto solo, i filtri, l'attrezzatura fuori
+dalle formule, nessun testo che mandi allo Shop per un beat) e «la fascia si legge sulla card
+del beat» guarda solo lo Studio.
+
+**Provato** con Playwright a 1366 × 768 e 390 × 844: 39 capi su «Tutti», 7 su «Scarpe» con
+la sola intestazione «Scarpe», l'acquisto col filtro attivo che resta sulle scarpe («Scarpe
+2/7», 900 → 660 €), nessun errore in console. Verifica completa verde.
+
+---
+
 ## 27 · La landing è una pagina sua, staccata dall'accesso e dal gioco
 
 > **FATTO (06/09/2026)** — branch `task/26-landing-login-gioco-pagine-separate`.

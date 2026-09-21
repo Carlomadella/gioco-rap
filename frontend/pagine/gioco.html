@@ -304,25 +304,22 @@
   <div class="list" data-mag="lifestyle"><h3>Le tue spese fisse</h3><div id="g-lifesum"></div></div>
   <div data-mag="lifestyle" id="g-life"></div>
 
-  <!-- il banco e la vetrina → lo Shop della mappa. Punto 4: i reparti
-       dietro le linguette (Attrezzatura/Beat/Vestiti), non liste impilate — e
-       la cassa sempre in vista, non serve più uscire per sapere quanto hai.
+  <!-- lo Shop della mappa: dal 21/09/2026 vende solo i Vestiti («i beat non
+       devono stare nello shop», «l'attrezzatura non serve se andiamo in studio
+       a registrare», CARLO). I beat si cercano allo Studio, nella stanza «Il
+       beat», dallo stesso banco (G.market); l'attrezzatura non esiste più.
+       Al posto delle tre linguette dei reparti ci sono i filtri per tipologia
+       (#sh-filtri, li disegna negozio.js), e la cassa sempre in vista.
        Un solo `data-mag="shop"` sul contenitore: prendiDalMagazzino() lo sposta
-       intero nel pannello, coi reparti dentro. I Vestiti sono tornati il 20/09
-       (js/game/negozio.js, js/creator/guardaroba.js): capi veri del camerino
-       MakeHuman, lo Shop sblocca e il camerino veste. -->
+       intero nel pannello. I Vestiti sono del 20/09 (js/game/negozio.js,
+       js/creator/guardaroba.js): capi veri del camerino MakeHuman, lo Shop
+       sblocca e il camerino veste. -->
   <div class="shshop" data-mag="shop">
     <div class="shbar">
-      <div class="shtabs" id="sh-tabs">
-        <button class="shtab on" data-sh="gear">Attrezzatura</button>
-        <button class="shtab" data-sh="beat">Beat</button>
-        <button class="shtab" data-sh="fit">Vestiti</button>
-      </div>
+      <div class="shtabs" id="sh-filtri"></div>
       <span class="shcash" id="sh-cash"></span>
     </div>
-    <div class="shsec on" data-shsec="gear"><div id="g-shop" class="shgrid"></div></div>
-    <div class="shsec" data-shsec="beat"><div id="g-market"></div></div>
-    <div class="shsec" data-shsec="fit"><div id="g-fit"></div></div>
+    <div id="g-fit"></div>
   </div>
 
   <!-- nessuno li apre più: li dice l'Inventario del telefono -->

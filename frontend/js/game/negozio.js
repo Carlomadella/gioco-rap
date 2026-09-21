@@ -1,34 +1,59 @@
-/* Lo Shop: le linguette dei reparti, e il reparto Vestiti.
+/* Lo Shop: i Vestiti, coi filtri per tipologia.
 
-   Attrezzatura e Beat li disegna ui.js (renderGioco) dentro a `#g-shop` e
-   `#g-market`, dal 04/09. Qui ci sono le linguette che cambiano reparto e il
-   terzo reparto, i Vestiti, che dal 09/09 al 20/09 non c'era: il vecchio
-   abbigliamento 2D (ADF_ABBIGLIAMENTO_HIBERNATE_V2, Mycol) vestiva un ritratto
-   che non esiste piu', ed era stato congelato in attesa di «un catalogo
-   cosmetico coerente con i provider avatar reali». Il catalogo e' arrivato:
-   js/creator/guardaroba.js, capi veri del camerino MakeHuman.
+   Dal 21/09/2026 lo Shop vende solo vestiti (CARLO: «i beat non devono stare
+   nello shop», «l'attrezzatura non serve se andiamo in studio a registrare»).
+   Fino a quel giorno c'erano tre reparti dietro tre linguette — Attrezzatura
+   e Beat li disegnava ui.js dentro a `#g-shop` e `#g-market` — e i Vestiti
+   erano il terzo. I beat si cercano allo Studio, nella stanza «Il beat», che
+   pesca dallo stesso banco (`G.market`); l'attrezzatura da casa non esiste
+   piu': si registra in Studio, e quello che aveva addosso (il bonus sulla
+   qualita', i 50 € di sala «senza microfono») e' uscito da actions.js.
+
+   Il reparto Vestiti e' del 20/09: il vecchio abbigliamento 2D
+   (ADF_ABBIGLIAMENTO_HIBERNATE_V2, Mycol) vestiva un ritratto che non esiste
+   piu', ed era stato congelato in attesa di «un catalogo cosmetico coerente
+   con i provider avatar reali». Il catalogo e' js/creator/guardaroba.js, capi
+   veri del camerino MakeHuman.
 
    Lo Shop SBLOCCA, il camerino VESTE (il perche' sta in guardaroba.js): qui
    si compra e basta, e un tasto porta nel camerino a provarsi quello che si
-   e' comprato. L'economia e' la stessa dell'attrezzatura: `G.money` scende,
-   `G.vestiti[raw]` diventa true, si salva. */
-"use strict";
+   e' comprato. L'economia: `G.money` scende, `G.vestiti[raw]` diventa true,
+   si salva.
 
-const shTabs = $("sh-tabs");
-if(shTabs){
-  shTabs.addEventListener("click", ev => {
-    const b = ev.target.closest(".shtab");
-    if(!b) return;
-    hubTap();
-    document.querySelectorAll("#sh-tabs .shtab").forEach(t =>
-      t.classList.toggle("on", t === b));
-    document.querySelectorAll(".shsec").forEach(s =>
-      s.classList.toggle("on", s.dataset.shsec === b.dataset.sh));
-  });
-}
+   I filtri («creami dei pulsanti tipo filtri che se schiacciati fanno vedere
+   solo quella tipologia», CARLO 21/09): le pastiglie in `#sh-filtri`, una
+   per tendina del camerino (VETRINA_REPARTI) piu' «Tutti»; quella schiacciata
+   mostra solo i capi di quel tipo. Non si salva: si riapre lo Shop su
+   «Tutti». */
+"use strict";
 
 /* ---- il reparto Vestiti ---- */
 const SH_FIT_TINTA = ["#3B2A4A", "#1B1426"];
+let SH_FIT_FILTRO = "tutti";   /* la pastiglia schiacciata: "tutti" o uno slot */
+
+/* le pastiglie dei filtri: Tutti, poi le tendine del camerino nell'ordine di
+   VETRINA_REPARTI, ognuna col numero di capi (e quanti tuoi) */
+function shFitFiltri(){
+  const el = $("sh-filtri"); if(!el) return;
+  const voci = [["tutti", "Tutti", VETRINA_VESTITI]].concat(
+    VETRINA_REPARTI.map(([slot, nome]) => [slot, nome, VETRINA_VESTITI.filter(v => v.slot === slot)])
+  ).filter(([, , capi]) => capi.length);
+  if(!voci.some(([id]) => id === SH_FIT_FILTRO)) SH_FIT_FILTRO = "tutti";
+  el.innerHTML = voci.map(([id, nome, capi]) => {
+    const tuoi = capi.filter(v => guardarobaPosseduto(v.raw)).length;
+    return '<button type="button" class="shtab' + (SH_FIT_FILTRO === id ? " on" : "") +
+      '" data-filtro="' + id + '" aria-pressed="' + (SH_FIT_FILTRO === id) + '">' + nome +
+      '<small>' + (tuoi ? tuoi + "/" : "") + capi.length + '</small></button>';
+  }).join("");
+  el.querySelectorAll("[data-filtro]").forEach(btn => {
+    btn.onclick = () => {
+      if(SH_FIT_FILTRO === btn.dataset.filtro) return;
+      SH_FIT_FILTRO = btn.dataset.filtro;
+      hubTap();
+      renderAbbigliamento();
+    };
+  });
+}
 
 function shFitCard(v){
   const tuo = guardarobaPosseduto(v.raw);
@@ -78,7 +103,9 @@ function shFitTesta(){
 
 function renderAbbigliamento(){
   const el = $("g-fit"); if(!el || typeof VETRINA_VESTITI === "undefined") return;
-  el.innerHTML = shFitTesta() + VETRINA_REPARTI.map(([slot, nome]) => {
+  shFitFiltri();
+  const reparti = SH_FIT_FILTRO === "tutti" ? VETRINA_REPARTI : VETRINA_REPARTI.filter(([slot]) => slot === SH_FIT_FILTRO);
+  el.innerHTML = shFitTesta() + reparti.map(([slot, nome]) => {
     const capi = VETRINA_VESTITI.filter(v => v.slot === slot);
     if(!capi.length) return "";
     const tuoi = capi.filter(v => guardarobaPosseduto(v.raw)).length;

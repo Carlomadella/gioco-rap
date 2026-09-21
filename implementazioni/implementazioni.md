@@ -214,6 +214,9 @@ detto, la richiesta com'era scritta in [`fatte.md`](fatte.md):
   take costa 25, le altre 8», `04-musica-e-suoni.md`.
 - **Lo stile che conta** — FATTO 21/09: «Lo stile che conta: i capi addosso pesano su hype,
   presenza e promo», `02-interfaccia-e-telefono.md`.
+- **I beat non devono stare nello shop, i filtri dei vestiti, l'attrezzatura non serve** —
+  FATTO 21/09, lo stesso giorno in cui è stato chiesto: «Lo Shop vende solo vestiti, coi
+  filtri per tipologia», `02-interfaccia-e-telefono.md`.
 
 Due punti di CARLO — «quando non sono fix… crea un file nuovo collegato ai già presenti»
 e «tieni tutto ciò che riguarda la parte smartphone separata dal resto del progetto» —
@@ -445,7 +448,8 @@ lo dicesse: riconosciuti il 20/09. L'11 (la Sala senza energia) è chiuso il 21/
 
 _Le idee proposte chiudendo il reparto Vestiti («Lo Shop: il reparto Vestiti» in
 `02-interfaccia-e-telefono.md`); Carlo ha scelto queste tre. Numerate da 1, come le liste
-di quel giorno. Il 1, «Lo stile che conta», è chiuso il 21/09 e sta in `fatte.md`._
+di quel giorno. Il 1, «Lo stile che conta», è chiuso il 21/09 e sta in `fatte.md`, con la
+richiesta del 21/09 sullo Shop solo vestiti coi filtri (chiusa lo stesso giorno)._
 
 2. **Capi che si sbloccano** — non tutto in vendita dal primo giorno: la giacca elegante
    dopo il primo contratto, l'anello di diamanti a 10.000 fan, i capi «di Milano» solo dopo

@@ -155,20 +155,18 @@ function qFactors(){
   if((G.shifts||0) > 0) f.push(["turni fatti", stanco]);
   const lu = 0.65 + luc()*0.005;                                    f.push(["lucidità", lu]);
   const esp = 1 + Math.min(0.14, G.songs.length*0.012);             f.push(["esperienza", esp]);
-  const attr = 1 + Math.min(0.10, gearBonus()*0.004);
-  if(gearBonus() > 0) f.push(["attrezzatura", attr]);
-  return {mult: ben*casa*stanco*esp*attr*lu, list:f};
+  /* l'attrezzatura da casa non c'e' piu' (21/09/2026): si registra in Studio */
+  return {mult: ben*casa*stanco*esp*lu, list:f};
 }
 const qDetail = () => qFactors().list
   .map(([n,v]) => n + " " + (v>=1?"+":"") + Math.round((v-1)*100) + "%").join(" · ");
 const wellFactor = () => qFactors().mult;
 const qVeloce = () => clamp((22 + G.skills.scrittura*0.65) * wellFactor(), 5, 100);
-const gearBonus = () => GEAR.reduce((a,g) => a + (G.gear[g.id] ? g.q : 0), 0);
 const bestBar  = () => G.bars.slice().sort((a,b) => b.q-a.q)[0];
 const bestBeat = () => G.beats.slice().sort((a,b) => b.q-a.q)[0];
 const unmixed  = () => G.songs.filter(s => !s.released && !s.mixed);
 const ready    = () => G.songs.filter(s => !s.released);
-const songQ = (bar, beat) => clamp((bar.q*0.45 + beat.q*0.33 + G.skills.flow*0.35 + gearBonus()) * wellFactor(), 5, 100);
+const songQ = (bar, beat) => clamp((bar.q*0.45 + beat.q*0.33 + G.skills.flow*0.35) * wellFactor(), 5, 100);
 /* punto 12: quanto migliora il mix. Ai monitor e alle cuffie si aggiunge **chi
    c'è dietro al banco**: un fonico conosciuto alla Sala e chiamato dallo
    Studio vale quanto il rapporto che avete costruito. `typeof` perché
@@ -207,7 +205,7 @@ const daPubblicare = () => (typeof studioDaPubblicare === "function" && studioDa
    prima che esistessero — e da lì si guadagnano o si perdono fino a tre
    punti a seconda di quanto sta in piedi quello che hai fatto. */
 const bancoBonus = () => (typeof studioBancoGuadagno === "function" ? studioBancoGuadagno() : 0);
-const mixGain = () => Math.round(6 + (G.gear.monitor?5:0) + (G.gear.cuffie?3:0) + G.skills.flow*0.06)
+const mixGain = () => Math.round(6 + G.skills.flow*0.06)
   + studioBonus() + bancoBonus();
 
 function offerJobs(){
@@ -340,7 +338,7 @@ const ACTIONS = [
      gain("rete", 0.9);
      return "Tre beat sul tavolo: " +
        out.map(b => b.n + " (" + genBeat(b.gen).n.toLowerCase() + ", q" + b.q + ")").join(" · ") +
-       ". Si comprano allo Shop.";
+       ". Sono sul banco dello Studio, nella stanza «Il beat».";
    }},
 
   /* Non costa energia (era 45): l'energia si paga in cabina, take per take —
@@ -355,7 +353,9 @@ const ACTIONS = [
       scala da qui. */
    costoScritto:() => (typeof studioTakeManca === "function" && studioTakeManca())
      ? (typeof STUDIO_TAKE_PRIMA !== "undefined" ? STUDIO_TAKE_PRIMA : 25) : 0,
-   money:() => G.gear.mic ? 0 : 50,
+   /* la sala: 50 € a pezzo. Erano gratis con un microfono tuo, ma
+      l'attrezzatura da casa non c'e' piu' (21/09/2026) */
+   money:() => 50,
    d:"Strofa più beat, in sala. Esce una traccia grezza.",
    need:() => !G.bars.length ? "1 strofa" : !G.beats.length ? "1 beat"
      : (typeof studioTakeManca === "function" && studioTakeManca()) ? "una take, in cabina" : null,
@@ -378,7 +378,7 @@ const ACTIONS = [
        const presa = typeof studioTakePresa === "function" ? studioTakePresa() : rnd(-5,6);
        G.bars.splice(G.bars.indexOf(b),1);
        G.beats.splice(G.beats.indexOf(bt),1);
-       if(!G.gear.mic) G.money -= 50;
+       G.money -= 50;
        /* punto 12: chi sta dietro al vetro conta anche in registrazione — un
           fonico che ti conosce sa dove metterti la voce prima che glielo chiedi */
        /* il feat si legge **prima** di staccarlo (studioConsumaFeat qui

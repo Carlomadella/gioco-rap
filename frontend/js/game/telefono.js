@@ -416,10 +416,12 @@ function schermataObiettivi(){
   }).join("") + '</div>';
 }
 
-/* ---- Inventario: quattro linguette, come nel catalogo vero ---- */
+/* ---- Inventario: tre linguette (erano quattro, come nel catalogo vero: la
+   quarta, l'attrezzatura, non esiste piu' dal 21/09/2026) ---- */
 function schermataInventario(){
   const tabs = [["bars", "Bars", G.bars.length], ["beats", "Beat", G.beats.length],
-    ["songs", "Pezzi", G.songs.length], ["gear", "Attrezz.", GEAR.filter(x => G.gear[x.id]).length]];
+    ["songs", "Pezzi", G.songs.length]];
+  if(TEL_INVTAB === "gear") TEL_INVTAB = "bars";
   const nav = '<div class="tsub">' + tabs.map(([id, n, c]) =>
     '<button class="tsubb' + (TEL_INVTAB === id ? " on" : "") + '" data-inv="' + id + '">' +
     n + ' (' + c + ')</button>').join("") + '</div>';
@@ -436,12 +438,6 @@ function schermataInventario(){
     '<div class="tli static"><span class="tliav">' + hsvg("mic") + '</span>' +
     '<span class="tlitx"><b>' + s.t + '</b><i>' + (s.released ? short(s.streams || 0) + " stream" : "In lavorazione") +
     '</i></span><span class="tliv">' + Math.round(s.q) + '</span></div>').join("") + '</div>';
-  else if(TEL_INVTAB === "gear"){
-    const posseduta = GEAR.filter(g2 => G.gear[g2.id]);
-    if(posseduta.length) corpo = '<div class="tlist">' + posseduta.map(g2 =>
-      '<div class="tli static"><span class="tliav">' + hsvg("manopole") + '</span>' +
-      '<span class="tlitx"><b>' + g2.n + '</b><i>' + g2.d + '</i></span></div>').join("") + '</div>';
-  }
   return nav + corpo;
 }
 

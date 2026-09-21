@@ -28,14 +28,6 @@ const ART = {
   stacca:TINTA_VITA.concat("Z"), palestra_pesi:TINTA_VITA.concat("P"),
   palestra_cardio:TINTA_VITA.concat("P")
 };
-/* punto 4: un'icona per pezzo di attrezzatura — hsvg() e le icone (HIC) sono
-   di hub.js, ma essendo tutti <script> classici sullo stesso scope globale
-   sono già pronte quando renderGioco() gira davvero (hub.js carica dopo,
-   ma questa mappa la legge solo a runtime, non al caricamento del file). */
-const SH_GEAR_ICONE = {
-  cuffie:"cuffie", mic:"mic", scheda:"manopole", monitor:"altoparlante", tratt:"barre"
-};
-
 /* Punto 50: queste mosse finivano dritte in un toast — nessuna scena,
    nessuna pagina, un numero e via. Scrivi/beat/free hanno già la loro
    (foglio, piazza, e beat aspetta la scena del producer al punto 8);
@@ -380,60 +372,10 @@ function renderGioco(){
           '<span class="nm"><b>' + b.n + '</b><span>qualità ' + b.q + ' · ' + beatEtichetta(b) + '</span></span>' +
           '<button class="play" data-mine="' + i + '" title="Ascolta" aria-label="Ascolta il beat" aria-pressed="false">▶</button>' +
           '<span class="tag">tuo</span></div>').join("")
-      : '<div class="li"><span class="nm"><b>Beat comprati</b><span>nessuno: i beat si comprano qui sotto</span></span><span class="v">0</span></div>');
+      : '<div class="li"><span class="nm"><b>Beat comprati</b><span>nessuno: i beat si cercano allo Studio</span></span><span class="v">0</span></div>');
 
   $("g-mat").querySelectorAll("[data-mine]").forEach(btn => {
     btn.onclick = () => beatSuona(G.beats[+btn.dataset.mine], btn);
-  });
-
-  /* punto 4: card da vetrina, non righe da lista — la cover fa da fondale,
-     ascolta e rifiuta stanno sopra di lei, comprare è un tasto pieno sotto. */
-  const rigaBeat = (b, i) => '<div class="shbeat' + (G.money < b.price ? " no" : "") + '">' +
-    '<span class="shart" style="background:' + beatCov(b) + '">' +
-      '<button class="shplay" data-hear="' + i + '" title="Ascolta il beat" aria-label="Ascolta il beat" aria-pressed="false">▶</button>' +
-      '<button class="shdrop" data-drop="' + i + '" title="Rifiuta: sparisce dal catalogo">✕</button>' +
-    '</span>' +
-    '<span class="sht">' + b.n + '</span>' +
-    '<span class="shs">qualità ' + b.q + ' · ' + beatInfo(b).bpm + ' bpm' +
-      (b.da ? ' · ' + b.da : (typeof fasciaBeat === "function" && fasciaBeat(b) ? ' · ' + fasciaBeat(b) : '')) + '</span>' +
-    '<button class="shbuy" data-buy="' + i + '"' + (G.money < b.price ? " disabled" : "") + '>' + b.price + ' €</button></div>';
-  /* il banco diviso per genere: il tuo per primo, gli altri in ordine */
-  const perGen = {};
-  G.market.forEach((b,i) => { const g = beatGen(b); (perGen[g] = perGen[g] || []).push([b,i]); });
-  const mioG = mioGenere();
-  const ordine = Object.keys(perGen).sort((x,y) =>
-    x === mioG ? -1 : y === mioG ? 1 : genBeat(x).n.localeCompare(genBeat(y).n));
-  $("g-market").innerHTML = G.market.length
-    ? ordine.map(g => {
-        const gg = genBeat(g);
-        return '<div class="gsep' + (g === mioG ? " mine" : "") + '">' +
-          '<i style="background:linear-gradient(140deg,' + gg.c[0] + ',' + gg.c[1] + ')"></i>' +
-          '<b>' + gg.n + '</b><span>' + (g === mioG ? "il tuo genere" : gg.bpm[0] + "–" + gg.bpm[1] + " bpm") +
-          ' · ' + perGen[g].length + (perGen[g].length === 1 ? " beat" : " beat") + '</span></div>' +
-          '<div class="shgrid">' + perGen[g].map(([b,i]) => rigaBeat(b,i)).join("") + '</div>';
-      }).join("")
-    : '<div class="empty2">Il banco è vuoto. I beat si vanno a cercare allo Studio, nella stanza «Il beat».</div>';
-  $("g-market").querySelectorAll("[data-hear]").forEach(btn => {
-    btn.onclick = () => beatSuona(G.market[+btn.dataset.hear], btn);
-  });
-  /* i beat che non ti dicono niente li lasci lì: spariscono dal catalogo */
-  $("g-market").querySelectorAll("[data-drop]").forEach(btn => {
-    btn.onclick = () => {
-      const b = G.market[+btn.dataset.drop];
-      if(!b) return;
-      G.market.splice(+btn.dataset.drop, 1);
-      toast("Hai lasciato lì «<b>" + b.n + "</b>». Non era il tuo.", "", "✕", ["#5A6472","#2B2B34"]);
-      save(); renderGioco();
-    };
-  });
-  $("g-market").querySelectorAll("[data-buy]").forEach(btn => {
-    btn.onclick = () => {
-      const i = +btn.dataset.buy, b = G.market[i];
-      if(!b || G.money < b.price) return;
-      G.money -= b.price; G.market.splice(i,1); G.beats.push({n:b.n, q:b.q, gen:beatGen(b), seed:beatSeed(b)});
-      pushLog("Comprato il beat «" + b.n + "» (q" + b.q + ") per " + b.price + " €.", "");
-      save(); renderGioco();
-    };
   });
 
   $("g-songs").innerHTML = G.songs.length
@@ -457,35 +399,10 @@ function renderGioco(){
     };
   });
 
-  /* punto 4: la vetrina dell'attrezzatura — card come le altre, non righe di
-     menù. Tutta l'attrezzatura è "roba da studio", quindi un solo fondale
-     (TINTA_STUDIO, lo stesso delle azioni di scrittura/registrazione/mix):
-     a differenziare le card è l'icona e il nome, non cinque colori a caso. */
-  $("g-shop").innerHTML = GEAR.map(g2 => {
-    const owned = !!G.gear[g2.id];
-    const noMoney = !owned && G.money < g2.p;
-    return '<button class="shcard' + (owned ? " owned" : "") +
-      '" style="--a:' + TINTA_STUDIO[0] + ';--b:' + TINTA_STUDIO[1] + '" data-gear="' + g2.id + '"' +
-      (owned || noMoney ? " disabled" : "") + '>' +
-      '<span class="shart">' + hsvg(SH_GEAR_ICONE[g2.id] || "ingranaggio", "shicon") +
-        (owned ? '<span class="shtag">Tuo</span>' : '<span class="shprice">' + g2.p + ' €</span>') +
-      '</span>' +
-      '<span class="sht">' + g2.n + '</span>' +
-      '<span class="shs">' + g2.d + '</span>' +
-    '</button>';
-  }).join("");
-  $("g-shop").querySelectorAll("[data-gear]").forEach(btn => {
-    btn.onclick = () => {
-      const g2 = GEAR.find(x => x.id === btn.dataset.gear);
-      if(G.money < g2.p) return;
-      G.money -= g2.p; G.gear[g2.id] = true;
-      pushLog("Hai comprato: " + g2.n + ".", "good");
-      save(); renderGioco();
-    };
-  });
-
-  /* il terzo reparto, i Vestiti (negozio.js, js/creator/guardaroba.js): tornati il 20/09 sui capi
-     veri del camerino MakeHuman */
+  /* lo Shop: dal 21/09/2026 solo i Vestiti (negozio.js, js/creator/guardaroba.js),
+     capi veri del camerino MakeHuman. Il banco dei beat e la vetrina
+     dell'attrezzatura che stavano qui non ci sono piu': i beat si cercano
+     allo Studio, l'attrezzatura non esiste. */
   if(typeof renderAbbigliamento === "function") renderAbbigliamento();
 
   /* punto 4: la cassa dello shop, sempre in vista sopra le linguette —

@@ -73,8 +73,10 @@ const EVENTS = [
    opts:[
      {n:"Ricompra il necessario", d:"−700 €",
       run(){ G.money -= 700; return {t:"Hai rimesso in piedi la sala. Settecento euro andati.", c:"bad"}; }},
-     {n:"Arrangiati con quello che resta", d:"Le prossime registrazioni ne risentono",
-      run(){ for(const k of Object.keys(G.gear)){ delete G.gear[k]; break; }
+     /* toglieva un pezzo di attrezzatura: non esiste piu' (21/09/2026), il
+        colpo lo prende il morale */
+     {n:"Arrangiati con quello che resta", d:"−10 benessere",
+      run(){ G.wellbeing = clamp(G.wellbeing - 10, 0, 100);
         return {t:"Vai avanti con quello che è rimasto.", c:"bad"}; }}
    ]},
   {id:"sfratto", when:g => g.money < -150 && (g.life.casa||0) > 0, k:"Casa", t:"L'affitto è indietro",

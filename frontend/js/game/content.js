@@ -6,13 +6,10 @@ const W1 = ["Notte","Fame","Ferro","Vetro","Asfalto","Sangue","Fumo","Cemento","
 const W2 = ["in tasca","addosso","di lato","alla gola","che brucia","senza nome","in periferia","sotto casa","d'inverno","a vuoto","per sempre","e basta"];
 const title = () => Math.random() < .45 ? pick(W1) : pick(W1) + " " + pick(W2);
 
-const GEAR = [
-  {id:"cuffie", n:"Cuffie da studio", p:220, q:4, d:"Senti quello che stai facendo davvero."},
-  {id:"mic", n:"Microfono a condensatore", p:520, q:9, d:"La voce smette di suonare piccola."},
-  {id:"scheda", n:"Scheda audio", p:380, q:6, d:"Niente più latenza, niente più take buttate."},
-  {id:"monitor", n:"Monitor da studio", p:760, q:8, d:"I bassi finalmente si sentono per quello che sono."},
-  {id:"tratt", n:"Trattamento acustico", p:640, q:7, d:"La stanza smette di rovinarti le registrazioni."}
-];
+/* L'attrezzatura da casa (GEAR: cuffie, microfono, scheda, monitor,
+   trattamento) non c'e' piu' dal 21/09/2026: «l'attrezzatura non serve se
+   andiamo in studio a registrare» (CARLO). `G.gear` resta nei salvataggi
+   vecchi e non lo legge piu' nessuno. */
 
 const OFFERS = [
   {id:"distro", label:"Rete Distribuzione", tag:"Solo distribuzione", need:1500,

@@ -107,7 +107,10 @@ Fabbrica al posto di due cartelli chiusi, le trasferte fuori città, il telefono
 LaFamegram e il feed che si scorre. **FATTO (21/09/2026)** — «Lo stile che conta»: ogni
 capo della vetrina addosso all'artista vale +1 hype a settimana o +1 presenza sul palco, e
 tre capi dello stesso tema danno +25% alla promo (`js/game/stile.js`; il racconto in
-`implementazioni/02-interfaccia-e-telefono.md`). Restano dello Shop i capi che si
+`implementazioni/02-interfaccia-e-telefono.md`). **FATTO (21/09/2026)** — lo Shop vende
+**solo vestiti**, coi filtri per tipologia: i beat si cercano allo Studio, l'attrezzatura
+da casa non esiste più (né la vetrina né i suoi effetti sulla qualità: «Lo Shop vende solo
+vestiti, coi filtri per tipologia», stesso foglio). Restano dello Shop i capi che si
 sbloccano con la carriera e le offerte della settimana.
 
 **Manca**:
