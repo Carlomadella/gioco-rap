@@ -5406,3 +5406,105 @@ il ripiego «Nome 3» non controlla i doppioni ma oggi non si arriva a usarlo.
   persona non ne ha uno, per nome — l'omonimo di un salvataggio vecchio si fonde col rivale che c'è
   («Vi siete conosciuti alla Sala. È finita male.») invece di sdoppiarlo, e da lì è legato a lui.
   Provato in `studio-rivali-e-sala.test.js`.
+
+
+## Remastered e parti 2 (21/09/2026)
+
+Giro stretto sul commit `4b12a12` del branch `task/discografia-app-telefono`. I quattro
+controlli automatici sono verdi: `npm run prova` 180 a posto e 0 no, `audit-regressioni.js`
+444 ok e 0 falliti, `npm run verifica:build` 33 ok, `npx vitest run test/unit` 35 test in 4 file.
+Controllato a mano: la mossa `remaster` in mezzo a chi scorre `ACTIONS` (plancia, Agenda del
+telefono, `avviaAzioneDiretta`, `interruzioni.js`, `luoghi-foto.js`, l'avvolgimento di
+`eventi-v2.js`): dappertutto c'è un ripiego per scena, icona e colore che mancano, la durata
+e il posto ci sono (`tempo.js`, `orari.js`, `fx.js`), e con `avail()` falso la mossa non compare
+da nessuna parte. Il seed di un pezzo uscito non cambia: «Cambia titolo» (✎) si tiene quello che
+c'è, e la copertina si conferma solo su un pezzo non ancora fuori — le prenotazioni restano
+legate. Il nodo `#g-disco` con l'ascoltatore sopra si sposta intero fra magazzino e telefono, e
+`renderDiscografia()` ne riscrive solo l'interno: i tasti restano vivi. Nel Mix i due
+ascoltatori su `#studio` non si pestano («Lascia stare» non ha `data-az`, e ha `type="button"`).
+`seguitoUscita` è chiamata in tutte e due le uscite (`pubblica` e il venerdì di
+`studioUscitePronte`), e sono le sole due righe che mettono `released = true`. Un titolo vuoto
+non si può fare dal gioco (`chiediTitolo` ripiega sempre sul suggerito), quindi
+`seguitoTitolo` con «» non si raggiunge. Quello che resta è qui sotto: niente che blocchi.
+
+### Con un salvataggio vecchio, un pezzo senza numero di serie dice «ha la sua parte 2» e i suoi tasti non fanno niente
+
+- **dove** — `frontend/js/game/seguiti.js:46` (`seguitoParte2`: `x.seguitoDi === orig.seed`),
+  e i tasti a `seguiti.js:207` e `:213` (`data-disco-p2="' + s.seed`, `data-disco-rm="' + s.seed`).
+- **cosa succede** — i pezzi dei salvataggi più vecchi possono non avere il `seed` (lo dice
+  `studioPezzoSeme` in `studio-elementi.js:287`, e `renderDiscografia` ci ripiega con
+  `x.seed || (i + 11)`). Per uno di quelli `orig.seed` è vuoto, e «vuoto uguale vuoto» fa sì
+  che `seguitoParte2` trovi il primo pezzo qualsiasi che non è una parte 2 — cioè quasi
+  sempre un pezzo a caso: nella Discografia la riga si prende l'etichetta «ha la sua parte 2»
+  (o «la parte 2 è sul banco») senza che sia vero, e il tasto «Parte 2» non compare. Il tasto
+  «Remastered» invece compare, ma dentro ha scritto `undefined`: al tocco `Number("undefined")`
+  non trova nessun pezzo e non succede niente, senza nemmeno un avviso. Nelle partite nuove
+  non capita: ogni pezzo nasce col suo numero.
+- **come si vede** — solo con un salvataggio in cui un pezzo uscito non ha `seed`: apri la
+  Discografia dal telefono e guarda quella riga.
+- **quanto pesa** — si vede ma si gira intorno.
+- **RISOLTO (21/09/2026)** — stesso branch, commit dopo: `seguitoParte2` torna vuoto se il primo non
+  ha il seed, e `discoPuoParte2`/`discoPuoRemaster` vogliono il seed: un pezzo senza numero non
+  ha etichette né tasti. Provato in `seguiti.test.js`.
+
+### La remastered conta il fonico una volta e mezza, e il «di cui» sul pannello non torna
+
+- **dove** — `frontend/js/game/seguiti.js:142-146` (`remasterGuadagno`) e `:248-249` (il
+  riquadro «→ qNN · +g, di cui +X di <fonico>»).
+- **cosa succede** — `mixGain()` (`actions.js:208`) ha già dentro l'aiuto del fonico
+  (`studioBonus`) e il bonus dei tre cursori del banco. `remasterGuadagno` ne prende la
+  metà e poi ci **riaggiunge** il fonico per intero: con un fonico da +6 il suo peso vero è
+  +9, ma il pannello dice «di cui +6». In più i cursori dell'ultimo mix, che nel pannello
+  della remastered non si vedono, spostano il numero senza che si capisca da cosa. Non è
+  rotto, è un conto che non si legge: lo scrivo perché il commento in testa alla funzione
+  dice «metà del mix, più il fonico» e non sembra pensato così.
+- **come si vede** — Mix con una remastered prenotata e un fonico scelto: confronta il «+g»
+  con quello che esce togliendo il fonico («da solo»).
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (21/09/2026)** — `remasterBase()` è metà del mix nudo (`6 + flow·0,06`, mai meno di
+  tre), senza passare da `mixGain()`; il fonico si aggiunge una volta, e il «di cui» torna.
+
+### Sul telefono la sostituzione di una parte 2 già prenotata avviene in silenzio
+
+- **dove** — `frontend/js/game/seguiti.js:208` (`title="C'è già una parte 2 prenotata: questa
+  la sostituisce"`), e `discoPrenotaParte2` a `:82-93`.
+- **cosa succede** — se hai già prenotato la parte 2 di un pezzo e tocchi «Parte 2» su un
+  altro, la prima prenotazione viene buttata. L'avviso c'è solo come `title`, cioè la
+  nuvoletta che esce col mouse fermo sopra: col dito non esiste. Il toast che segue parla
+  solo del pezzo nuovo, del vecchio niente. Il gioco esce sul telefono, dove è il caso
+  normale.
+- **come si vede** — Discografia dal telefono con due pezzi da almeno 8 settimane: prenota
+  la parte 2 del primo, poi tocca «Parte 2» sul secondo.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (21/09/2026)** — via il `title`: accanto a «Parte 2» c'è scritto «al posto di «X»»
+  quando ce n'è già una prenotata, e il toast dice «quella di «X» è lasciata».
+
+### Il tasto «lascia» accanto a «prenotata» è alto 24 pixel
+
+- **dove** — `frontend/css/seguiti.css:27-28` (`.dpren + .dbtn{padding:3px 9px;min-height:24px…}`).
+- **cosa succede** — il tasto che toglie una prenotazione è più piccolo degli altri `.dbtn`
+  (28) e molto sotto la misura comoda per un dito; sta anche accanto a un testo, quindi è
+  facile mancarlo o prendere la riga. Nel telefono la riga è già stretta.
+- **come si vede** — Discografia dal telefono con una parte 2 o remastered prenotata.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (21/09/2026)** — «lascia» ha il padding e i 28 px degli altri `.dbtn`.
+
+### La frase del pannello Remastered si legge male
+
+- **dove** — `frontend/js/game/seguiti.js:245-247`.
+- **cosa succede** — «La remastered lo rimette in giro come nuovo, quasi, e gli lascia i
+  punti del banco: 24 energie e 80 € di sala.» — i due punti fanno sembrare che «i punti del
+  banco» siano le 24 energie e gli 80 €, che invece sono il costo. Vanno separati: una frase
+  per cosa guadagna il pezzo, una per cosa costa a te.
+- **come si vede** — Mix con una remastered prenotata.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (21/09/2026)** — due frasi: «…gli lascia addosso i punti del banco. A te costa 24
+  energie e 80 € di sala.»
+
+**Nota, una scelta e non un bug** — la nota in Cabina promette che il pezzo «si chiamerà
+«X pt. 2»», ma il riquadro del titolo lo lascia cambiare (il suggerito è solo il segnaposto),
+e dallo Studio non c'è un tasto per lasciare la prenotazione: si torna al telefono. Funziona
+così com'è; è da decidere se la Cabina debba dire come si annulla.
+- **RISOLTO (21/09/2026)** — la nota in Cabina dice «il titolo proposto è «X pt. 2» (lo puoi
+  cambiare, resta legato alla prima)» e ha il tasto «lascia la parte 2», lo stesso
+  `data-disco-lascia` della Discografia.

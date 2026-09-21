@@ -240,7 +240,14 @@ la gente del primo), `actions.js` (il titolo e il legame in `registra`, il rilan
 `pubblica`, la mossa `remaster`), `studio-elementi.js` (il rilancio all'uscita del venerdì),
 `studio.js` (il Mix aperto per la remastered, la nota in Cabina), `ui.js` (la riga e la
 nota della Discografia), `tempo.js`, `orari.js`, `fx.js`, `telefono.css`, `gioco.html`.
-Prove: `test/unit/seguiti.test.js`, otto con vitest sui file veri; cinque controlli nell'audit.
+Prove: `test/unit/seguiti.test.js`, undici con vitest sui file veri; cinque controlli nell'audit.
+
+Il giro di fine task (`segnala-problemi`) ne ha trovate cinque, chiuse nel branch: un pezzo di un
+salvataggio vecchio senza seed si prendeva una parte 2 a caso (adesso senza seed non ha né tasti né
+etichette), il fonico contava una volta e mezza (`remasterBase()` è metà del mix nudo, il fonico si
+aggiunge una volta), la sostituzione di una parte 2 già prenotata si diceva solo in un `title`
+(adesso «al posto di «X»» a schermo), «lascia» era alto 24 px, e la frase del pannello confondeva
+guadagno e costo. E la Cabina ha il suo «lascia la parte 2».
 
 **Resta** del punto: la cover «stile emblema Black Ops 2», l'editor a livelli — è una pagina a
 parte e non è cominciata.

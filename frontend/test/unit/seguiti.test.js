@@ -154,6 +154,40 @@ describe("la discografia decide, lo Studio fa", () => {
     expect(p.run("curvaPezzo(G.songs[2], 0)")).toBe(1);
   });
 
+  it("un pezzo di un salvataggio vecchio senza seed non e' di nessuno: niente tasti, niente «ha la sua parte 2» a caso", () => {
+    p.run('G.songs.push({t:"Senza numero", q:60, released:true, week:G.week - 20, streams:5000, storia:[]})');
+    p.run('G.songs.push({t:"Sul banco", q:60, released:false, seed:555})');   // seguitoDi mancante: undefined === undefined
+    const vecchio = p.G.songs[3];
+    expect(p.run("seguitoParte2(G.songs[3])")).toBe(null);
+    expect(p.run("discoPuoParte2(G.songs[3])")).toBe(false);
+    expect(p.run("discoPuoRemaster(G.songs[3])")).toBe(false);
+    expect(p.run("discoSeguitiRiga(G.songs[3])")).toBe("");
+    expect(vecchio.seed).toBeUndefined();
+  });
+
+  it("il fonico conta una volta sola: meta' del mix nudo piu' il suo aiuto, e il «di cui» torna", () => {
+    p.run('G.gente.push({id:"f1", ruolo:"fonico", n:"Nico", rel:3}); G.studio.fonico = "f1";');
+    const aiuto = p.run("studioAiutoFonico()");
+    expect(aiuto).toBe(6);
+    const base = p.run("remasterBase()");
+    expect(base).toBe(Math.max(3, Math.round((6 + 30 * 0.06) * 0.5)));
+    expect(p.run("remasterGuadagno()")).toBe(base + aiuto);
+    p.run("discoPrenotaRemaster(111)");
+    expect(p.run("remasterPannello()")).toContain("+" + aiuto + "</span> di Nico");
+    p.G.studio.fonico = null;
+    expect(p.run("remasterGuadagno()")).toBe(base);
+  });
+
+  it("prenotare la parte 2 di un altro pezzo lascia la prima, e lo dice a schermo, non in un title", () => {
+    p.run("discoPrenotaParte2(111)");
+    const riga = p.run("discoSeguitiRiga(G.songs[1])");
+    expect(riga).toContain("al posto di «Tutto o niente»");
+    expect(riga).not.toContain("title=");
+    p.run("discoPrenotaParte2(222)");
+    expect(p.G.studio.seguito).toBe(222);
+    expect(p.run("seguitoCabinaNota()")).toContain('data-disco-lascia="p2"');
+  });
+
   it("una prenotazione rimasta in un salvataggio su un pezzo che non c'e' piu' cade da sola", () => {
     p.G.studio.seguito = 999; p.G.studio.remaster = 999;
     expect(p.run("seguitoPrenotato()")).toBe(null);

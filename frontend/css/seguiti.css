@@ -24,8 +24,10 @@
 .dbtn:active{transform:translateY(1px)}
 /* «prenotata: in Cabina» — una riga detta, con il tasto «lascia» accanto */
 .dpren{font-size:11.5px;font-weight:700;color:var(--acc,#C084FC)}
-.dpren + .dbtn{padding:3px 9px;min-height:24px;font-weight:700;
+.dpren + .dbtn{padding:5px 11px;font-weight:700;
   background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);color:var(--soft)}
+/* «al posto di …»: la prenotazione che verrebbe lasciata */
+.dpren.spenta{color:var(--faint);font-weight:600}
 
 /* nel telefono la riga e' stretta: la coda rientra sotto la copertina */
 .telslot .dazioni{padding-left:0}
@@ -33,6 +35,8 @@
 /* la nota in Cabina sopra alle take: e' la parte 2 di qualcosa */
 .stseguito{padding:8px 10px;border-radius:8px;background:rgba(139,92,246,.12);
   box-shadow:inset 0 0 0 1px rgba(139,92,246,.35)}
+/* «lascia la parte 2» sotto alla frase, non in mezzo */
+.stseguito .stlink{display:flex;width:max-content;margin-top:6px}
 
 @media (max-width:700px){
   .dazioni{padding-left:0}

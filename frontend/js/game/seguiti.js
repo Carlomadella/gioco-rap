@@ -40,9 +40,11 @@ function seguitoOriginale(s){
   if(!s || s.seguitoDi == null) return null;
   return (G.songs || []).find(x => x.seed === s.seguitoDi) || null;
 }
-/* la parte 2 di `orig`, uscita o ancora sul banco */
+/* la parte 2 di `orig`, uscita o ancora sul banco. Un pezzo di un
+   salvataggio vecchio puo' non avere il seed: senza, non e' di nessuno — se no
+   «vuoto uguale vuoto» gli trovava una parte 2 a caso. */
 function seguitoParte2(orig){
-  if(!orig) return null;
+  if(!orig || orig.seed == null) return null;
   return (G.songs || []).find(x => x.seguitoDi === orig.seed) || null;
 }
 function seguitoPrenotato(){
@@ -65,11 +67,11 @@ function remasterPrenotato(){
 /* Niente parte 3: la parte 2 di una parte 2 e' un altro pezzo, e il tasto
    non c'e'. */
 function discoPuoParte2(s){
-  return !!(s && s.released && s.seguitoDi == null && !seguitoParte2(s) &&
+  return !!(s && s.released && s.seed != null && s.seguitoDi == null && !seguitoParte2(s) &&
     seguitoEta(s) >= SEGUITO_ETA_MIN);
 }
 function discoPuoRemaster(s){
-  return !!(s && s.released && !s.remaster && seguitoEta(s) >= REMASTER_ETA_MIN);
+  return !!(s && s.released && s.seed != null && !s.remaster && seguitoEta(s) >= REMASTER_ETA_MIN);
 }
 
 /* ==================== LA PARTE 2 ==================== */
@@ -83,9 +85,11 @@ function discoPrenotaParte2(seed){
   const s = (G.songs || []).find(x => x.seed === seed);
   if(!discoPuoParte2(s)) return false;
   if(!G.studio) G.studio = {};
+  const prima = seguitoPrenotato();
   G.studio.seguito = seed;
   if(typeof toast === "function")
-    toast("La <b>parte 2</b> di «" + s.t + "»: la scrivi e la incidi <b>in Cabina</b>, il titolo è già suo",
+    toast("La <b>parte 2</b> di «" + s.t + "»: la scrivi e la incidi <b>in Cabina</b>, il titolo è già suo" +
+      (prima && prima !== s ? " — quella di «" + prima.t + "» è lasciata" : ""),
       "good", "2", typeof TINTA_STUDIO !== "undefined" ? TINTA_STUDIO : ["#8B5CF6", "#1D1030"]);
   if(typeof SFX === "object" && SFX.tap) SFX.tap();
   save();
@@ -136,13 +140,19 @@ function discoLasciaRemaster(){
   if(typeof SFX === "object" && SFX.tap) SFX.tap();
   save();
 }
-/* Quanto guadagna: meta' del mix di adesso (il pezzo un mix l'aveva gia'),
-   mai meno di tre, piu' il fonico dietro al vetro — e' per lui che vale
-   tornare in Studio a farla. */
+/* Quanto guadagna: meta' del mix **nudo** (quello che sai fare tu: il pezzo
+   un mix l'aveva gia'), mai meno di tre, piu' il fonico dietro al vetro per
+   intero — e' per lui che vale tornare in Studio a farla. Non si passa da
+   `mixGain()`, che ha gia' dentro il fonico e i cursori dell'ultimo mix: il
+   fonico contava una volta e mezza e il «di cui» del pannello non tornava
+   (giro di fine task, 21/09). */
+function remasterBase(){
+  const flow = (G.skills && G.skills.flow) || 0;
+  return Math.max(3, Math.round((6 + flow * 0.06) * 0.5));
+}
 function remasterGuadagno(){
-  const base = typeof mixGain === "function" ? mixGain() : 6;
   const fon = typeof studioAiutoFonico === "function" ? studioAiutoFonico() : 0;
-  return Math.max(3, Math.round(base * 0.5)) + fon;
+  return remasterBase() + fon;
 }
 /* Il lavoro vero, chiamato dalla mossa `remaster` di actions.js. */
 function remasterChiudi(){
@@ -204,8 +214,10 @@ function discoSeguitiRiga(s){
     tasti.push('<span class="dpren">parte 2 prenotata: in Cabina</span>' +
       '<button type="button" class="dbtn" data-disco-lascia="p2">lascia</button>');
   else if(discoPuoParte2(s))
-    tasti.push('<button type="button" class="dbtn" data-disco-p2="' + s.seed + '"' +
-      (pren ? ' title="C’è già una parte 2 prenotata: questa la sostituisce"' : '') + '>Parte 2</button>');
+    tasti.push('<button type="button" class="dbtn" data-disco-p2="' + s.seed + '">Parte 2</button>' +
+      /* la prenotazione e' una sola: se ce n'e' una su un altro pezzo, lo si
+         dice a schermo — un `title` col dito non esiste */
+      (pren ? '<span class="dpren spenta">al posto di «' + discoEsc(pren.t) + '»</span>' : ''));
   if(rem === s)
     tasti.push('<span class="dpren">remastered prenotata: al Mix</span>' +
       '<button type="button" class="dbtn" data-disco-lascia="rm">lascia</button>');
@@ -230,8 +242,10 @@ function seguitoCabinaNota(){
   const s = seguitoPrenotato();
   if(!s) return "";
   return '<p class="stnota stseguito">Quello che incidi adesso è la <b>parte 2</b> di «<b>' +
-    discoEsc(s.t) + '</b>»: si chiamerà «' + discoEsc(seguitoTitolo()) + '», e quando esce ' +
-    'rimette in piedi anche la prima.</p>';
+    discoEsc(s.t) + '</b>»: il titolo proposto è «' + discoEsc(seguitoTitolo()) + '» (lo puoi ' +
+    'cambiare, resta legato alla prima), e quando esce rimette in piedi anche lei. ' +
+    '<button type="button" class="stlink" data-disco-lascia="p2">' +
+    (typeof stIco === "function" ? stIco("rinnova") : "") + 'lascia la parte 2</button></p>';
 }
 /* Il pannello al banco del Mix quando c'e' una remastered prenotata. */
 function remasterPannello(){
@@ -243,8 +257,9 @@ function remasterPannello(){
   return stPan("",
     stCapo("Rimasterizzi", s.t, "q" + s.q) +
     '<p class="stnota">Uscito ' + seguitoEta(s) + ' settimane fa, ' + short(s.streams || 0) +
-      ' ascolti. La remastered lo <b>rimette in giro</b> come nuovo, quasi, e gli lascia i punti ' +
-      'del banco: ' + REMASTER_ENERGIA + ' energie e ' + fmt(REMASTER_COSTO) + ' € di sala.</p>' +
+      ' ascolti. La remastered lo <b>rimette in giro</b> come nuovo, quasi, e gli lascia addosso ' +
+      'i punti del banco. A te costa <b>' + REMASTER_ENERGIA + ' energie</b> e <b>' +
+      fmt(REMASTER_COSTO) + ' €</b> di sala.</p>' +
     stEsito(stFreccia() + ' ' + stOro("q" + clamp(s.q + g, 5, 100)) + ' · ' + stNum("+" + g) +
       (fon ? ', di cui ' + stNum("+" + aiuto) + ' di ' + discoEsc(fon.n) : ', da solo') +
       ' · <b>torna a girare</b>') +

@@ -1991,6 +1991,8 @@ test("la remastered si prenota dalla Discografia e si chiude al banco del Mix: l
   studio.includes('return x.id === "banco" && typeof remasterPrenotato === "function" && !!remasterPrenotato();') &&
   studio.includes('const remaster = typeof remasterPannello === "function" ? remasterPannello() : "";') &&
   seguiti.includes("if(!s || s.remaster){ d.remaster = null; return null; }") &&
+  seguiti.includes("function remasterBase(){") && !seguiti.includes("? mixGain()") &&
+  seguiti.includes("if(!orig || orig.seed == null) return null;") &&
   seguiti.includes("s.rilancioForza = RILANCIO_REMASTER;") &&
   leggi("js/game/tempo.js").includes("remaster:120,") && hours.includes('remaster:"studio",') &&
   leggi("js/game/fx.js").includes('remaster:"mix",'));
