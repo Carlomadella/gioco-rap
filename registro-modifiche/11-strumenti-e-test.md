@@ -6,6 +6,37 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:1ff4f30 -->
+## 21/09/26, 08:27 â€” task/shop-solo-vestiti-con-filtri â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `1ff4f30`
+
+### Cosa Ã¨ entrato
+
+- `022e7ad` â€” Shop: «i beat non devono stare nello shop … pulsanti tipo filtri … l'attrezzatura non serve se andiamo in studio a registrare» — solo vestiti, coi filtri per tipologia â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/css/game.css`
+- **Modificato:** `frontend/css/negozio.css`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/content.js`
+- **Modificato:** `frontend/js/game/events.js`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/negozio.js`
+- **Modificato:** `frontend/js/game/posto.js`
+- **Modificato:** `frontend/js/game/studio.js`
+- **Modificato:** `frontend/js/game/telefono.js`
+- **Modificato:** `frontend/js/game/ui.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 14
+
+---
+
 <!-- merge:f83c4ad -->
 ## 21/09/26, 08:07 â€” task/shop-lo-stile-che-conta â†’ main
 
