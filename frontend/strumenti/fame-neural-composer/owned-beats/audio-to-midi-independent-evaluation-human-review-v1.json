@@ -1,0 +1,68 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-independent-evaluation-human-review-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_FIRST_EVALUATION_LISTENING",
+  "reviewId": "audio-to-midi-independent-evaluation-human-review-v1-001",
+  "runId": "audio-to-midi-independent-evaluation-v1-001",
+  "cohortId": "audio-to-midi-independent-evaluation-v1",
+  "split": "audio-to-midi-evaluation-v1",
+  "expectedFamilies": 12,
+  "bindings": {
+    "evaluationProtocolGitBlobSha": "7ad299fddc9fc1430f15d6ae65327e9d53205c65",
+    "technicalQaGitBlobSha": "5d89ee5c33f24068f0232ef9090ee7baeb84471a",
+    "rendererModuleGitBlobSha": "9e51ac1518acc11d67c742c09dae7906a4383342",
+    "implementationGitBlobSha": "e1fd38c181ec33803fa3f23404070060d50659f4"
+  },
+  "blindness": {
+    "familyIdentityExposedDuringReview": false,
+    "selectedArmIdentityExposedDuringReview": false,
+    "opaqueFamilyLabels": true,
+    "deterministicOpaqueOrder": true
+  },
+  "renderer": {
+    "id": "fame-neutral-midi-audition-renderer-v1",
+    "sampleRate": 22050,
+    "channels": 1,
+    "pcm": "s16le",
+    "sourceModule": "audio-to-midi-human-review.js",
+    "interpretation": "Renderer sound quality is not part of the score; judge timing, roles, pitch, duration and downstream usefulness."
+  },
+  "scale": {
+    "0": "unusable",
+    "1": "weak; major correction required",
+    "2": "usable for downstream pilot with moderate correction",
+    "3": "strong; directly useful"
+  },
+  "drumsCriteria": [
+    "kick retention and false kicks",
+    "snare/hihat retention and class confusion",
+    "timing",
+    "downstream Drum View usefulness"
+  ],
+  "lowEndCriteria": [
+    "onset",
+    "pitch/octave correctness",
+    "duration/release",
+    "glide/contour preservation using contour diagnostic",
+    "downstream MIDI usefulness"
+  ],
+  "gate": {
+    "technical": "ALL_12_FAMILIES_PASS",
+    "drums": {
+      "medianUsefulnessAtLeast": 2,
+      "familiesAtOrAbove2AtLeast": 9
+    },
+    "lowEnd": {
+      "medianUsefulnessAtLeast": 2,
+      "familiesAtOrAbove2AtLeast": 9
+    },
+    "outcomeIfPass": "OPEN_OWNED_BEATS_AUDIO_TO_MIDI_BATCH_PREPARATION",
+    "outcomeIfFail": "KEEP_BATCH_CLOSED_REVIEW_FAILURES"
+  },
+  "safety": {
+    "retuningAllowed": false,
+    "batch131Authorized": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false
+  }
+}
