@@ -1,0 +1,38 @@
+{
+  "schema": "fame-owned-beats-basic-pitch-execution-implementation-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_FIRST_BASIC_PITCH_INFERENCE",
+  "runId": "basic-pitch-development-inference-v1-001",
+  "executionContractPath": "basic-pitch-execution-contract-v1.json",
+  "executionContractGitBlobSha": "e81a18cc5785b00de48803f2ca88a1f8a17ad4bc",
+  "executor": {
+    "path": "basic-pitch-development-execute.py",
+    "gitBlobSha": "f677c82f1761fe7441fe0e09364bd7635c9931a3",
+    "implementationCommit": "443cb7e2c2846b0df2f2c0e808fd687fbbd79fc1"
+  },
+  "runtime": {
+    "modelLoadedOncePerProcess": true,
+    "basicPitchApi": "basic_pitch.inference.predict",
+    "rawModelOutputPersisted": false
+  },
+  "output": {
+    "atomicPerFamily": true,
+    "resumeByValidatedReceipt": true,
+    "perFamily": [
+      "basic-pitch.mid",
+      "result.json"
+    ],
+    "summary": "inference-summary.json",
+    "rawModelOutputPersisted": false
+  },
+  "safety": {
+    "split": "development",
+    "expectedFamilies": 8,
+    "inputStem": "bass",
+    "originalSourceAudioAllowed": false,
+    "finalHoldoutAllowed": false,
+    "batch131Allowed": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false
+  }
+}
