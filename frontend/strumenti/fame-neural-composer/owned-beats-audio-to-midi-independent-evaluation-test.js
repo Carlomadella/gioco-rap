@@ -26,6 +26,7 @@ assert.equal(protocol.sourceCorpus.expectedCompositionFamilies,131);
 assert.equal(protocol.cohort.expectedFamilies,12);
 assert.equal(protocol.cohort.selection.algorithm,"opaque-identity-sha256-rank-v1");
 assert.equal(protocol.cohort.selection.usesAudioContentOrDerivedMetrics,false);
+assert.equal(protocol.cohort.independence.excludeConsumedAudioAnalysisHoldout,true);
 assert.equal(protocol.gate.drums.familiesAtOrAbove2AtLeast,9);
 assert.equal(protocol.gate.lowEnd.familiesAtOrAbove2AtLeast,9);
 assert.equal(protocol.frozenPipeline.drums.armId,"drums-bass-kick-fusion-v1");
@@ -42,7 +43,8 @@ assert.equal(protocol.implementation.selectorGitBlobSha,"305fe132ba54d4b777d8d2a
 
 for(const needle of [
   "untouchedForEvaluation(record)",
-  "excludeConsumedAudioAnalysisHoldout",
+  "CONSUMED_HOLDOUT_REFERENCE_FILE",
+  "priorExcludedIdentities()",
   "rankFor(record,seed)",
   "eligibleUniverseDigestSha256",
   "cohortDigestSha256",
