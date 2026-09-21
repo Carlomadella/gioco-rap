@@ -102,6 +102,8 @@ jobs:
         run: python frontend/strumenti/fame-neural-composer/owned-beats-audio-analysis-v2-test.py
       - name: Audio to MIDI development baseline regression
         run: python frontend/strumenti/fame-neural-composer/owned-beats/audio-to-midi-development-baseline-test.py
+      - name: Audio to MIDI independent evaluation executor self-test
+        run: python frontend/strumenti/fame-neural-composer/owned-beats/audio-to-midi-independent-evaluation-execution.py self-test
       - name: Basic Pitch executor self-test
         run: python frontend/strumenti/fame-neural-composer/owned-beats/basic-pitch-development-execute.py self-test
       - name: Basic Pitch superseding executor self-test
