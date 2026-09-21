@@ -778,3 +778,8 @@ Per preservare l'evidenza consumata, v1-001 non viene modificato né riutilizzat
 
 
 Superseding receipt Basic Pitch creato con `BASIC_PITCH_SUPERSEDING_INFERENCE_RECEIPT_PREPARED`: run `basic-pitch-development-inference-v1-002`, supersedes `v1-001`, 8/8 record, stato `AUTHORIZED_NO_INFERENCE`, `algorithmChanged=false`, zero inferenza/MIDI/holdout/batch131/training durante la preparazione. Il prossimo passo autorizzato è l'esecuzione append-only del v1-002 con executor congelato e failure report persistente in caso di nuovo errore.
+
+
+Il run superseding `basic-pitch-development-inference-v1-002` è fallito **prima del model load e prima di qualsiasi inferenza** durante `validate_receipt()`. Causa radice verificata nel codice: il producer v2 non emetteva `preInferenceGatePassedImmediatelyBeforeReceipt`, mentre l'executor v2 lo richiedeva ancora come residuo della validazione v1 (`RECEIPT_EVIDENCE_PRODUCER_CONSUMER_MISMATCH`). Nessun output family è stato prodotto dal v1-002.
+
+È stato preparato il nuovo superseding `basic-pitch-development-inference-v1-003`, ancora `algorithmChanged=false`. Il contract v3 congela l'intero oggetto `receiptEvidence`; il producer usa direttamente tale oggetto e l'executor confronta l'intero oggetto, eliminando la duplicazione di schema. La preparazione v1-003 riesegue inoltre un fresh pre-inference gate prima di creare il receipt. Il failure report v3 copre anche `PRE_EXECUTION_VALIDATION`.
