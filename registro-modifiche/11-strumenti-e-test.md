@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:170da15 -->
+## 21/09/26, 07:51 â€” task/sala-gratis-e-take-a-25 â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `170da15`
+
+### Cosa Ã¨ entrato
+
+- `d08209e` â€” Sala: «non deve costare energia interagire con gli altri all'interno della sala» — tutto a zero; Studio: «Costa troppo una take in studio» — la prima a 25, le altre a 8 â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/posto.js`
+- **Modificato:** `frontend/js/game/studio-elementi.js`
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:ae5ca5b -->
 ## 20/09/26, 23:48 â€” task/avaturn-e-camerino-insieme â†’ main
 
