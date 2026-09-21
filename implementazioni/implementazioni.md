@@ -49,7 +49,7 @@ L'indice con **tutti i punti e il loro stato** sta in
 ## Da fare adesso, in ordine
 
 Riordinato il 20/09/2026, dopo il reparto Vestiti dello Shop; il 21/09 sono uscite le due
-piccole della Sala e della take. Le voci chiuse sono uscite
+piccole della Sala e della take, e i tre punti dello Shop. Le voci chiuse sono uscite
 dalla lista e stanno in fondo, una riga l'una con la data e dove sta il racconto — prima
 restavano barrate in mezzo alle aperte e la lista era lunga il doppio di quello che
 serviva. I sette punti di CARLO del 16/09 (lo Studio, la troupe) sono entrati: due erano
@@ -77,21 +77,17 @@ cinque video del punto sono collegati. I sette video in più sono una decisione,
 
 **Piccole e chiare**
 
-2. **Lo Shop dopo i Vestiti: i capi che si sbloccano, le offerte della settimana** —
-   CARLO, i punti 2 e 3 di «Shop (20/09/2026)» scelti fra le idee proposte chiudendo il
-   reparto (il primo, «Lo stile che conta», è FATTO il 21/09, in fondo fra le chiuse).
-   Nell'ordine: lo sblocco per carriera (contratto, fan, trasferta), poi l'offerta del
-   lunedì e l'usato. Toccano solo `guardaroba.js` e `negozio.js`; una card bloccata dice
-   cosa serve.
+_Niente di aperto: i tre punti dello Shop scelti il 20/09 sono chiusi tutti il 21/09, in
+fondo fra le chiuse._
 
 **Lavori lunghi**
 
-3. **Via la lucidità** — CARLO, «togli il parametro «lucidità» e tutto ciò che ne
+2. **Via la lucidità** — CARLO, «togli il parametro «lucidità» e tutto ciò che ne
    consegue». Tocca 17 file del gioco e le formule della qualità del testo: non è una
    riga, va fatto in una task sua con l'audit aggiornato nello stesso commit. Chiude da
    sola anche «l'uscita di venerdì non costa niente, quella a mano sì» di
    problemi-riscontrati.
-4. **Le tre code dello Studio a cinque linguette** — da problemi-riscontrati (15/09):
+3. **Le tre code dello Studio a cinque linguette** — da problemi-riscontrati (15/09):
    l'omonimo della classifica che non si può chiamare, chi accetta dalla classifica che
    ruba un posto alla Sala, la copertina proposta e non confermata che resta nel
    salvataggio con la foto.
@@ -217,6 +213,9 @@ detto, la richiesta com'era scritta in [`fatte.md`](fatte.md):
 - **I beat non devono stare nello shop, i filtri dei vestiti, l'attrezzatura non serve** —
   FATTO 21/09, lo stesso giorno in cui è stato chiesto: «Lo Shop vende solo vestiti, coi
   filtri per tipologia», `02-interfaccia-e-telefono.md`.
+- **Capi che si sbloccano** e **Le offerte della settimana** — FATTO 21/09, insieme: «Lo
+  Shop cresce con la carriera: i capi che si sbloccano e le offerte della settimana»,
+  `02-interfaccia-e-telefono.md`.
 
 Due punti di CARLO — «quando non sono fix… crea un file nuovo collegato ai già presenti»
 e «tieni tutto ciò che riguarda la parte smartphone separata dal resto del progetto» —
@@ -447,16 +446,10 @@ lo dicesse: riconosciuti il 20/09. L'11 (la Sala senza energia) è chiuso il 21/
 #### Shop (20/09/2026)
 
 _Le idee proposte chiudendo il reparto Vestiti («Lo Shop: il reparto Vestiti» in
-`02-interfaccia-e-telefono.md`); Carlo ha scelto queste tre. Numerate da 1, come le liste
-di quel giorno. Il 1, «Lo stile che conta», è chiuso il 21/09 e sta in `fatte.md`, con la
-richiesta del 21/09 sullo Shop solo vestiti coi filtri (chiusa lo stesso giorno)._
-
-2. **Capi che si sbloccano** — non tutto in vendita dal primo giorno: la giacca elegante
-   dopo il primo contratto, l'anello di diamanti a 10.000 fan, i capi «di Milano» solo dopo
-   la trasferta. Lo Shop cresce con la carriera; una card bloccata dice cosa serve.
-
-3. **Le offerte della settimana** — un capo a metà prezzo che gira ogni lunedì, come i beat
-   del banco, più un banco dell'usato con capi scontati che vanno e vengono.
+`02-interfaccia-e-telefono.md`); Carlo ha scelto queste tre. Tutte e tre chiuse il
+21/09/2026 e stanno in `fatte.md` — «Lo stile che conta», poi «Capi che si sbloccano» e
+«Le offerte della settimana» insieme — con la richiesta del 21/09 sullo Shop solo vestiti
+coi filtri (chiusa lo stesso giorno)._
 
 #### Da discutere
 

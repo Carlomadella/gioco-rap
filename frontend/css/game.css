@@ -323,6 +323,19 @@
 .shstile.on{color:var(--acid)}
 .shfitnota .shlook{color:var(--acid)}
 .shfitnota span{flex:1 1 240px}
+/* «Capi che si sbloccano» (21/09): la card bloccata resta in vetrina, spenta,
+   e dice cosa serve; «Le offerte della settimana»: il listino barrato col
+   prezzo nuovo, la riga dell'offerta, e la sezione in testa al reparto */
+.shcard.locked{filter:grayscale(.8) brightness(.5)}
+.shreq,.shoff{display:block;margin:-6px 12px 11px;font-family:var(--cond);font-size:11px;font-weight:800;
+  letter-spacing:.06em;text-transform:uppercase}
+.shreq{color:#FCA5A5}
+.shoff{color:#FBBF24}
+.shprice.off{color:#FBBF24;box-shadow:inset 0 0 0 1px rgba(251,191,36,.4)}
+.shprice.off s{opacity:.55;font-weight:600;margin-right:2px}
+.shofferte{margin-bottom:6px}
+.shoffnota{margin:0 0 14px;padding:10px 14px;border-radius:12px;font-size:12.5px;color:var(--faint);
+  background:rgba(255,255,255,.03);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
 .shbtn{flex:none;padding:9px 16px;border-radius:999px;font-family:var(--cond);font-size:12.5px;font-weight:800;
   letter-spacing:.06em;text-transform:uppercase;color:#0B0B0D;background:var(--acid);
   box-shadow:0 3px 0 #7A5A00;transition:transform .12s}

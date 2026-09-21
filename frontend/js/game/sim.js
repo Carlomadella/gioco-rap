@@ -238,6 +238,10 @@ function advanceWeek(){
 
   G.week++;
   if(G.week > 52){ G.week = 1; G.year++; G.age++; pushLog("<b>Un anno in più.</b> Hai " + G.age + " anni.", "big"); }
+  /* «Le offerte della settimana» (21/09/2026): al lunedi' lo Shop tira a
+     sorte il capo a meta' prezzo e rinnova il banco dell'usato
+     (negozio-offerte.js), e lo scrive nel diario */
+  if(typeof offerteSettimana === "function") offerteSettimana(true);
 
   checkGoals();
   if(G.trialCd > 0) G.trialCd--;
