@@ -1417,3 +1417,36 @@ Il run `audio-to-midi-selected-integration-v1-001` ha completato 8/8 family con:
 - task-data readiness non dichiarabile.
 
 La chiusura tecnica richiede un verifier post-output read-only che controlli 8/8 `selection.json`, 16/16 MIDI byte-identici alla baseline selezionata, provenance e punteggi, e l'unicità del known issue `FAME000040`. Il blocco non viene dichiarato chiuso prima di tale PASS e della ricerca di chiusura prevista da NDR-026.
+
+## NDR-089 — Audio→MIDI drums/low-end development chiuso; nuova evaluation deve usare family fresche
+
+**Stato: ACCEPTED — 21 settembre 2026.**
+
+Il verifier post-output `AUDIO_TO_MIDI_SELECTED_INTEGRATION_VERIFY_PASS` chiude il blocco development-only Audio→MIDI drums/low-end.
+
+Evidenze finali:
+
+- 8/8 family verificate;
+- 16/16 MIDI integrati byte-identici agli output selezionati;
+- drums: `drums-bass-kick-fusion-v1`, mediana 2, 6/8 family >=2, totale 13;
+- low-end: `librosa-pyin-lowend-v1`, mediana 2, 7/8 family >=2, totale 17;
+- Basic Pitch: mediana 0, 0/8 family >=2, totale 0;
+- `FAME000040` è l'unico low-end case sotto soglia ed è classificato `UPSTREAM_SOURCE_SEPARATION_CONTAMINATION`, `transcriptionRootCause=false`;
+- drums mantiene due weak/failure development cases: `FAME000023=0` e `FAME000080=1`; non viene attribuita una causa non verificata;
+- nessuna ritrascrizione o ricodifica nel selected integration;
+- holdout/batch131/training/task-data readiness restano chiusi.
+
+La ricerca di chiusura non giustifica ulteriore tuning sugli stessi 8 development. Basic Pitch viene conservato come negative result storico e non resta arm attivo per questo blocco.
+
+In applicazione di NDR-032, le 10 family già consumate nel final holdout di Audio Analysis non vengono considerate da sole un nuovo final test indipendente per Audio→MIDI. La prossima evaluation deve usare un cohort fresco scelto fra le family ancora non assegnate e congelato prima di osservare nuovi output.
+
+Il prossimo protocollo deve fissare prima dell'esecuzione:
+
+- numerosità motivata;
+- identità delle family;
+- pipeline immutabile Source Separation → kick fusion + pYIN;
+- criteri/gate;
+- gestione dei failure;
+- divieto di retuning sul nuovo evaluation cohort.
+
+Il blocco Audio→MIDI drums/low-end è quindi `CLOSED_DEVELOPMENT_ONLY`, non `TASK_DATA_READY`.
