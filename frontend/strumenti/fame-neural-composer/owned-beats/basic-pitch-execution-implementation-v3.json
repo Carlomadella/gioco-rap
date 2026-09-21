@@ -1,0 +1,66 @@
+{
+  "schema": "fame-owned-beats-basic-pitch-execution-implementation-v3",
+  "version": 3,
+  "status": "FROZEN_BEFORE_FIRST_V3_BASIC_PITCH_INFERENCE",
+  "runId": "basic-pitch-development-inference-v1-003",
+  "executionContractPath": "basic-pitch-execution-contract-v3.json",
+  "executionContractGitBlobSha": "acc28a5b8c9a175b4465f42c68f5b6aa09daf804",
+  "executor": {
+    "path": "basic-pitch-development-execute-v3.py",
+    "gitBlobSha": "bae2ac410658e71d0e7e4986203bee6f3bc59683",
+    "implementationCommit": "c372eff820ad998d4edf5db4382b59d076954001"
+  },
+  "runtime": {
+    "modelLoadedOncePerProcess": true,
+    "basicPitchApi": "basic_pitch.inference.predict",
+    "rawModelOutputPersisted": false
+  },
+  "receiptValidation": {
+    "evidenceObjectComparedAsWhole": true,
+    "expectedEvidenceSource": "executionContract.receiptEvidence"
+  },
+  "output": {
+    "outputRootCreatedBeforeInference": true,
+    "atomicPerFamily": true,
+    "resumeByValidatedReceipt": true,
+    "perFamily": [
+      "basic-pitch.mid",
+      "result.json"
+    ],
+    "summary": "inference-summary.json",
+    "rawModelOutputPersisted": false
+  },
+  "failureCapture": {
+    "file": "failure-report.json",
+    "appendOnlyFirstFailure": true,
+    "stages": [
+      "PRE_EXECUTION_VALIDATION",
+      "MODEL_LOAD",
+      "FAMILY_INFERENCE_OR_PERSIST"
+    ],
+    "captures": [
+      "stage",
+      "sourceRecordId",
+      "errorType",
+      "errorMessage",
+      "traceback"
+    ]
+  },
+  "supersedes": {
+    "runId": "basic-pitch-development-inference-v1-002",
+    "executorGitBlobSha": "677b7d658261efbe713375c0190f1107b82cbd00",
+    "algorithmChanged": false,
+    "implementationOnlyFix": true,
+    "defectCode": "RECEIPT_EVIDENCE_PRODUCER_CONSUMER_MISMATCH"
+  },
+  "safety": {
+    "split": "development",
+    "expectedFamilies": 8,
+    "inputStem": "bass",
+    "originalSourceAudioAllowed": false,
+    "finalHoldoutAllowed": false,
+    "batch131Allowed": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false
+  }
+}
