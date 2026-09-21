@@ -837,3 +837,22 @@ Stato del blocco:
 Il PASS resta development-only. Drums mantiene due family sotto soglia (`FAME000023=0`, `FAME000080=1`); low-end mantiene `FAME000040=1`, attribuito a contaminazione upstream dello stem e non a root cause pYIN. Basic Pitch resta negative result storico con 0/8 family >=2 nel confronto congelato.
 
 Le 10 family già usate nel final holdout Audio Analysis non vengono riutilizzate automaticamente come nuovo final test indipendente Audio→MIDI. Il prossimo step è preparare un cohort evaluation fresco da family ancora non assegnate, con protocollo e numerosità congelati prima di qualsiasi nuovo ascolto/output. Training e batch131 restano chiusi.
+
+## Preparazione evaluation Audio→MIDI indipendente — 21 settembre 2026
+
+Dopo la chiusura del blocco development è stato congelato il protocollo `audio-to-midi-independent-evaluation-v1.json` prima della selezione del nuovo cohort.
+
+Regole congelate:
+
+- corpus atteso: 131 record / 131 composition family;
+- cohort fresco: 12 family;
+- selezione metadata-only con `opaque-identity-sha256-rank-v1`;
+- nessun audio aperto, hashato o analizzato durante la selezione;
+- esclusione di qualunque record già splittato, usato in pilot, QA o processing;
+- esclusione esplicita degli 8 development e del final holdout Audio Analysis già consumato;
+- pipeline da valutare immutabile: HTDemucs selezionato → `drums-bass-kick-fusion-v1` + `librosa-pyin-lowend-v1`;
+- Basic Pitch non rientra nell'evaluation;
+- gate umano predefinito: mediana >=2 e almeno 9/12 family >=2 sia drums sia low-end;
+- batch131, training e task-data readiness ancora non autorizzati.
+
+Il selector `prepare-audio-to-midi-independent-evaluation.js` è congelato al Git blob `305fe132ba54d4b777d8d2a76e66262fd39ea554`. Il prossimo comando locale deve soltanto selezionare e materializzare la reference metadata-only dei 12 record; prima di qualunque accesso audio la reference risultante verrà congelata in repository.
