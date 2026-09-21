@@ -77,12 +77,12 @@ cinque video del punto sono collegati. I sette video in più sono una decisione,
 
 **Piccole e chiare**
 
-2. **Lo Shop dopo i Vestiti: lo stile che conta, i capi che si sbloccano, le offerte della
-   settimana** — CARLO, i tre punti «Shop (20/09/2026)» scelti fra le idee proposte
-   chiudendo il reparto. Vanno in quest'ordine: prima l'effetto dei capi (presenza/hype
-   da `makehumanState.slots`, il bonus del look a tema), poi lo sblocco per carriera
-   (contratto, fan, trasferta), poi l'offerta del lunedì e l'usato. Il primo tocca
-   `sim.js`/`actions.js`, gli altri due solo `guardaroba.js` e `negozio.js`.
+2. **Lo Shop dopo i Vestiti: i capi che si sbloccano, le offerte della settimana** —
+   CARLO, i punti 2 e 3 di «Shop (20/09/2026)» scelti fra le idee proposte chiudendo il
+   reparto (il primo, «Lo stile che conta», è FATTO il 21/09, in fondo fra le chiuse).
+   Nell'ordine: lo sblocco per carriera (contratto, fan, trasferta), poi l'offerta del
+   lunedì e l'usato. Toccano solo `guardaroba.js` e `negozio.js`; una card bloccata dice
+   cosa serve.
 
 **Lavori lunghi**
 
@@ -212,6 +212,8 @@ detto, la richiesta com'era scritta in [`fatte.md`](fatte.md):
   zero: «Nella Sala non si spende energia», `06-mondo-e-personaggi.md`.
 - **Costa troppo una take in studio** — FATTO 21/09, la prima a 25 e le altre a 8: «La
   take costa 25, le altre 8», `04-musica-e-suoni.md`.
+- **Lo stile che conta** — FATTO 21/09: «Lo stile che conta: i capi addosso pesano su hype,
+  presenza e promo», `02-interfaccia-e-telefono.md`.
 
 Due punti di CARLO — «quando non sono fix… crea un file nuovo collegato ai già presenti»
 e «tieni tutto ciò che riguarda la parte smartphone separata dal resto del progetto» —
@@ -443,12 +445,7 @@ lo dicesse: riconosciuti il 20/09. L'11 (la Sala senza energia) è chiuso il 21/
 
 _Le idee proposte chiudendo il reparto Vestiti («Lo Shop: il reparto Vestiti» in
 `02-interfaccia-e-telefono.md`); Carlo ha scelto queste tre. Numerate da 1, come le liste
-di quel giorno._
-
-1. **Lo stile che conta** — ogni capo del reparto Vestiti che hai addosso dà un punto di
-   presenza o di hype (si legge da `makehumanState.slots`, quello che il camerino ha messo
-   sull'artista); un look completo a tema — tutto elegante, tutto street — dà un bonus alla
-   promo. Così comprare serve a qualcosa oltre alla foto.
+di quel giorno. Il 1, «Lo stile che conta», è chiuso il 21/09 e sta in `fatte.md`._
 
 2. **Capi che si sbloccano** — non tutto in vendita dal primo giorno: la giacca elegante
    dopo il primo contratto, l'anello di diamanti a 10.000 fan, i capi «di Milano» solo dopo

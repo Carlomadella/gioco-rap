@@ -32,6 +32,7 @@ const SH_FIT_TINTA = ["#3B2A4A", "#1B1426"];
 
 function shFitCard(v){
   const tuo = guardarobaPosseduto(v.raw);
+  const addosso = typeof stileAddosso === "function" && stileAddosso().some(x => x.raw === v.raw);
   const senzaSoldi = !tuo && G.money < v.p;
   return '<button class="shcard shfit' + (tuo ? " owned" : "") +
     '" style="--a:' + SH_FIT_TINTA[0] + ';--b:' + SH_FIT_TINTA[1] + '" data-vestito="' + v.id + '"' +
@@ -41,6 +42,10 @@ function shFitCard(v){
     '</span>' +
     '<span class="sht">' + v.n + '</span>' +
     '<span class="shs">' + v.d + '</span>' +
+    /* «Lo stile che conta» (21/09): cosa da' addosso, e di che tema e' */
+    '<span class="shstile' + (addosso ? " on" : "") + '">' +
+      (addosso ? "Addosso \u00b7 " : "") + "+1 " + v.b + (v.t ? " \u00b7 " + v.t : "") +
+    '</span>' +
   '</button>';
 }
 
@@ -57,9 +62,16 @@ function shFitTesta(){
         : "I vestiti si mettono addosso nel <b>camerino</b> (Il tuo artista, dal menu). Prima serve un artista fatto lì.") +
       '</div>';
   }
+  /* «Lo stile che conta» (21/09): quello che i capi addosso stanno dando, e
+     cosa manca al look (stile.js) */
+  const riga = typeof stileRiga === "function" ? stileRiga() : "";
+  const manca = typeof stileLookManca === "function" ? stileLookManca() : null;
   return '<div class="shfitnota">' +
     '<span>' + (tuoi ? "Hai <b>" + tuoi + (tuoi === 1 ? " capo</b>" : " capi</b>") + " di questo reparto. " : "") +
-      'Quello che compri qui lo trovi nelle tendine del <b>camerino</b>: è lì che ci si veste.</span>' +
+      'Quello che compri qui lo trovi nelle tendine del <b>camerino</b>: è lì che ci si veste. ' +
+      'Ogni capo addosso vale <b>un punto di hype</b> a settimana o <b>di presenza</b> sul palco.' +
+      (riga ? '<br><b class="shlook">' + riga + '</b>' : "") +
+      (manca ? '<br>' + manca : "") + '</span>' +
     '<button type="button" class="shbtn" data-camerino="1">Vai a provarlo nel camerino</button>' +
     '</div>';
 }

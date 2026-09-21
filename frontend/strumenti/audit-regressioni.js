@@ -1814,7 +1814,46 @@ test("con un avatar Avaturn lo Shop lo dice, invece di vendere vestiti che non s
   negozio.includes("guardarobaVestibile()") && negozio.includes('art.avatarSource === "avaturn"'));
 test("comprare attrezzatura e beat resta la stessa economia di prima: stesso costo, stesso G.money, stesso G.gear/G.beats",
   ui.includes("G.money -= g2.p; G.gear[g2.id] = true;") &&
-  ui.includes("G.money -= b.price; G.market.splice(i,1); G.beats.push("));
+  ui.includes("G.money -= b.price; G.market.splice(i,1); G.beats.push("));
+
+/* «Lo stile che conta» (21/09/2026, CARLO «Shop (20/09/2026)» 1): ogni capo
+   addosso — letto da makehumanState.slots — vale un punto di hype a settimana
+   o di presenza sul palco, e un look completo a tema da' +25% alla promo.
+   Il conto sta in js/game/stile.js, file nuovo; il catalogo dice cosa da'
+   ognuno (b) e di che tema e' (t). */
+const stile = leggi("js/game/stile.js");
+test("ogni capo della vetrina dice cosa da' addosso (b: hype o presenza) e il suo tema (t: street, elegante o null)",
+  (() => {
+    const capi = [...guardaroba.matchAll(/\{id:"[a-z0-9]+", raw:"[^"]+", n:"[^"]+", slot:"[a-zA-Z]+", p:\d+, d:"[^"]+", t:(null|"street"|"elegante"), b:"(hype|presenza)"\}/g)];
+    const tutti = (guardaroba.match(/\{id:"[a-z0-9]+", raw:/g) || []).length;
+    return capi.length >= 30 && capi.length === tutti &&
+      capi.some(m => m[1] === '"street"') && capi.some(m => m[1] === '"elegante"') &&
+      capi.some(m => m[2] === "hype") && capi.some(m => m[2] === "presenza");
+  })());
+test("i capi addosso si leggono dagli slot del camerino MakeHuman, e solo per chi si veste li' (Avaturn no)",
+  stile.includes("if(typeof guardarobaVestibile === \"function\" && !guardarobaVestibile()) return {};") &&
+  stile.includes("const addosso = new Set(Object.values(stileSlots()).map(String));") &&
+  stile.includes("return VETRINA_VESTITI.filter(v => addosso.has(v.raw));") &&
+  index.includes('<script src="js/game/stile.js'));
+test("un capo da hype vale un punto di hype a settimana, accanto al lifestyle",
+  sim.includes("const stHype = typeof stileBonus === \"function\" ? stileBonus().hype : 0;") &&
+  sim.includes("G.hype = clamp(G.hype * 0.87 + lb.hype * vissuto + stHype, 0,"));
+test("un capo da presenza conta sul palco — la serata e la piazza — senza toccare l'abilita'",
+  actions.includes("function presenzaSulPalco(){") &&
+  actions.includes("presenzaSulPalco()*1.4 + G.hype*0.7") &&
+  (actions.match(/presenzaSulPalco\(\)\*0\.5/g) || []).length === 2 &&
+  !actions.includes("G.skills.presenza*1.4") &&
+  stile.includes("return base + stileBonus().presenza;"));
+test("con tre capi dello stesso tema, e nessuno dell'altro, la promo rende +25%",
+  stile.includes("const STILE_LOOK_MIN = 3;") &&
+  stile.includes("const STILE_PROMO_BONUS = 0.25;") &&
+  stile.includes("if(temi.length >= STILE_LOOK_MIN && temi.every(t => t === temi[0])){") &&
+  actions.includes("const hWanted = (6 + G.skills.rete*0.12) * RITMO * mult * peso * look.promo;"));
+test("lo Shop dice cosa da' ogni capo, cosa sta dando il look e cosa gli manca; e si rifa' quando esci dal camerino",
+  negozio.includes('<span class="shstile') &&
+  negozio.includes("stileRiga()") && negozio.includes("stileLookManca()") &&
+  ui.includes('bonusTxt.push("il look: " + stileRiga());') &&
+  leggi("js/creator/rpg-v24-bridge.js").includes('try{ if(typeof renderAbbigliamento==="function") renderAbbigliamento(); }catch(e){}'));
 
 console.log("\nProblemi riscontrati \u2014 carcere senza notifiche, didascalie scritte in casa");
 const caption = leggi("js/game/crime-caption.js");
