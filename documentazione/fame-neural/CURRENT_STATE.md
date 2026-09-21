@@ -791,3 +791,8 @@ Il receipt append-only del run `basic-pitch-development-inference-v1-003` è sta
 Basic Pitch development inference v1-003 completata con `BASIC_PITCH_V1_003_DEVELOPMENT_INFERENCE_COMPLETE`: 8/8 record, stato `INFERENCE_COMPLETE_AWAITING_TECHNICAL_AND_HUMAN_QA`, modello caricato una volta per processo, raw model output non persistito, nessun accesso final holdout/batch131 e training/task-data readiness ancora chiusi.
 
 È stato implementato il technical QA read-only del v1-003 e congelato il protocollo di blind comparison low-end `basic-pitch-lowend-blind-comparison-v1-001`. Il confronto rivaluta alla cieca `librosa-pyin-lowend-v1` vs `basic-pitch-0.4.0-lowend-v1` sugli stessi 8 bass stem, con qualification gate mediana >=2 e almeno 6/8 family >=2. Parità completa -> pYIN per minore complessità. La review non è ancora stata eseguita.
+
+
+La prima blind low-end review `basic-pitch-lowend-blind-comparison-v1-001` è stata interrotta prima della submission finale dopo aver osservato un candidate render di ~1 s. Causa verificata nel renderer: la durata del WAV sintetico era derivata dall'ultimo evento rilevato dal candidate, non dalla durata del `bass.wav` di riferimento (`CANDIDATE_RENDER_DURATION_TRUNCATED_TO_LAST_DETECTED_EVENT`). Questo rendeva impossibile valutare correttamente coverage e silenzi mancanti.
+
+È stato congelato il superseding protocol `basic-pitch-lowend-comparison-v2.json` con review ID `basic-pitch-lowend-blind-comparison-v1-002`. Reference, Candidate A e Candidate B devono ora condividere la durata del bass stem di riferimento; se un metodo non rileva eventi per parte del brano, il renderer conserva silenzio fino alla fine. Il vecchio pacchetto viene marcato append-only come abortito solo se non esistono submission/report finali.
