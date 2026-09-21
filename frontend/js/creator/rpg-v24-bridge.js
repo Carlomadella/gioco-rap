@@ -249,8 +249,11 @@
       if(modalita!=="appearance") return;
       if(!salvaAspetto(m.detail||{})) return;
       terminaSessione(true);
-      /* in partita la foto nuova va anche sulla plancia, subito */
+      /* in partita la foto nuova va anche sulla plancia, subito; e lo Shop,
+         che dal 21/09 dice cosa dai capi addosso («Lo stile che conta»),
+         si rifa' con quello che hai appena messo */
       try{ if(typeof renderHub==="function") renderHub(); }catch(e){}
+      try{ if(typeof renderAbbigliamento==="function") renderAbbigliamento(); }catch(e){}
       return;
     }
 

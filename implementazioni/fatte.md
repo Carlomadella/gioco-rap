@@ -24,7 +24,7 @@ cita (la catena del pezzo) e il «punto 4 di ALE» di
 
 | quando | quante |
 | --- | --- |
-| 21/09/2026 | 2 |
+| 21/09/2026 | 3 |
 | 20/09/2026 | 9 |
 | 15/09/2026 | 6 |
 | 07/09/2026 | 6 |
@@ -35,7 +35,25 @@ cita (la catena del pezzo) e il «punto 4 di ALE» di
 ## 21/09/2026
 
 _Le due piccole dell'energia, chiuse insieme nel branch `task/sala-gratis-e-take-a-25`:
-la Sala che non costa più niente e la take che costava troppo._
+la Sala che non costa più niente e la take che costava troppo. Poi la prima delle tre dello
+Shop, «Lo stile che conta», nel branch `task/shop-lo-stile-che-conta`._
+
+### Lo stile che conta
+
+_Da `implementazioni.md`, CARLO «Shop (20/09/2026)» 1._
+
+1. **Lo stile che conta** — ogni capo del reparto Vestiti che hai addosso dà un punto di
+   presenza o di hype (si legge da `makehumanState.slots`, quello che il camerino ha messo
+   sull'artista); un look completo a tema — tutto elegante, tutto street — dà un bonus alla
+   promo. Così comprare serve a qualcosa oltre alla foto.
+
+   **FATTO (21/09/2026)** — `js/game/stile.js`, file nuovo, legge i capi della vetrina che
+   stanno negli slot del camerino: ognuno vale +1 hype a settimana (`sim.js`, accanto al
+   lifestyle) o +1 presenza sul palco (serata e piazza in `actions.js`, l'abilità non
+   cambia); con tre capi dello stesso tema e nessuno dell'altro la promo rende +25%. Il
+   catalogo ha `b` e `t` per capo; lo Shop lo dice su ogni card e in testata. Il racconto:
+   «Lo stile che conta: i capi addosso pesano su hype, presenza e promo» in
+   `02-interfaccia-e-telefono.md`.
 
 ### Nella Sala non si spende energia
 

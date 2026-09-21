@@ -538,6 +538,8 @@ function renderGioco(){
   if(lb2.fan > 1) bonusTxt.push("+" + Math.round((lb2.fan-1)*100) + "% fan");
   if(lb2.live > 1) bonusTxt.push("+" + Math.round((lb2.live-1)*100) + "% sui live");
   if(lb2.well) bonusTxt.push((lb2.well > 0 ? "+" : "") + lb2.well + " benessere");
+  /* «Lo stile che conta» (21/09): i capi addosso, dallo Shop (stile.js) */
+  if(typeof stileRiga === "function" && stileRiga()) bonusTxt.push("il look: " + stileRiga());
   $("g-lifesum").innerHTML = '<div class="lsum">' +
     '<div><div class="v bad">' + fmt(lc) + ' €</div><div class="l">di lifestyle a settimana</div></div>' +
     '<div><div class="v">' + fmt(weeklyCosts()) + ' €</div><div class="l">spese totali</div></div>' +

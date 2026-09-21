@@ -1028,8 +1028,91 @@ target, 9 secondi su Chrome vero) a ogni acquisto. Il dataset MakeHuman (`media/
 makehuman-editor-v1`, 2,8 GB) resta fuori dal pacchetto per gli store come prima: il reparto
 funziona lo stesso (le miniature sono copie da 439 KB in `media/photo/shop/`), è il camerino
 che senza dataset non parte — e questo era vero anche prima dello Shop. Nessun effetto di
-gioco dai vestiti (hype, presenza): è un'idea per dopo, non era chiesta.
+gioco dai vestiti (hype, presenza): è un'idea per dopo, non era chiesta — ed è arrivata il
+21/09, la sezione qui sotto.
 
+---
+
+## Lo stile che conta: i capi addosso pesano su hype, presenza e promo
+
+> «Lo stile che conta — ogni capo del reparto Vestiti che hai addosso dà un punto di
+> presenza o di hype (si legge da `makehumanState.slots`, quello che il camerino ha messo
+> sull'artista); un look completo a tema — tutto elegante, tutto street — dà un bonus alla
+> promo. Così comprare serve a qualcosa oltre alla foto.» — CARLO, «Shop (20/09/2026)» 1,
+> la prima delle tre scelte chiudendo il reparto Vestiti.
+
+**FATTO (21/09/2026)** — branch `task/shop-lo-stile-che-conta`. File nuovo:
+`frontend/js/game/stile.js` (il conto). Toccati: `js/creator/guardaroba.js` (due campi per
+capo), `js/game/sim.js` (una riga nel conto della settimana), `js/game/actions.js` (la
+promo, la serata, il freestyle), `js/game/negozio.js` (la card e la testata del reparto),
+`js/game/ui.js` (una riga nel riepilogo del lifestyle), `js/creator/rpg-v24-bridge.js`
+(lo Shop si rifà quando esci dal camerino), `css/game.css`, `pagine/gioco.html`,
+`strumenti/audit-regressioni.js` (sei controlli).
+
+**Cosa vuol dire «addosso».** Non comprato: **messo**. Lo Shop sblocca e il camerino veste
+(la regola del 20/09), e il camerino salva le sue tendine in
+`ARTIST.avatarData.makehumanState.slots` — `{hats: "clothes/…/elvs_beanie_slouch.json", …}`,
+gli stessi `raw` della vetrina. `stileAddosso()` incrocia le due liste: quello che sta in
+vetrina **e** negli slot conta, il resto no. Un capo comprato e lasciato nell'armadio non dà
+niente; uno che il personaggio aveva già addosso da prima del 20/09 (i salvataggi vecchi non
+si spogliano) conta come gli altri. Vale solo per chi si veste nel camerino MakeHuman
+(`guardarobaVestibile`): un avatar Avaturn non ha slot, e il reparto glielo dice già.
+
+**Cosa dà ogni capo.** Il catalogo in `guardaroba.js` ha due campi in più per capo:
+`b`, «hype» o «presenza», e `t`, il tema — «street», «elegante», o `null`. Un punto
+l'uno, come dice il punto. La spartizione è a occhio ma con una regola: **hype è quello che
+si vede da lontano** (i gioielli tutti e quattro, gli occhiali da sole e quelli sportivi, le
+sneaker, gli stivali rossi, i mocassini lucidi, la giacca elegante, il trench, la giacca da
+soccorso, il maglione vissuto, gli shorts, la bandana, il beanie, le cuffie al collo);
+**presenza è come ti porti** (cappelli e montature da vista, polo e camicia, i due maglioni
+di lana, canotte, jeans, chino e pantaloni scuri, stivaletti, boots, oxford). Diciotto da
+hype, ventuno da presenza. Il tema: diciotto street, diciannove eleganti, e i due maglioni
+di lana senza tema — vanno con tutto e non fanno look, né lo rompono.
+
+**Dove si sente.**
+
+- **L'hype**: ogni capo da hype addosso vale **+1 hype a settimana**, sommato nel conto di
+  `advanceWeek()` (`sim.js`) accanto a quello del lifestyle — è esattamente quello che fa
+  «Come ti vesti» del lifestyle (Streetwear +2, Roba firmata +5, Gioielli veri +10), ma coi
+  capi veri del camerino invece di un gradino astratto. Non lo scala il lavoro (`vissuto`):
+  ce li hai addosso anche al turno. Il gradino del lifestyle resta com'è: sono due cose
+  diverse, il tenore e i pezzi.
+- **La presenza**: ogni capo da presenza vale **+1 sul palco**, cioè dove
+  `G.skills.presenza` conta — la serata open mic (`live`: fan `presenza·1,4`) e il giro
+  veloce in piazza (`free`: fan `presenza·0,5`) leggono `presenzaSulPalco()`, che è
+  l'abilità più i capi (`stilePresenza()`). **L'abilità non cambia**: togli la camicia e
+  il punto se ne va; le barre del profilo, il requisito del buttafuori (presenza 16) e il
+  livello restano sull'abilità nuda. Il freestyle giocato (`piazza.js`) ha i suoi conti e
+  non passa di qui.
+- **La promo**: con un **look completo** — almeno tre capi a tema addosso, tutti dello
+  stesso tema, nessuno dell'altro (`STILE_LOOK_MIN`, `STILE_PROMO_BONUS`) — «Promo sui
+  social» rende **+25% di hype** (`hWanted · look.promo`); il tetto settimanale della
+  promo resta quello, il bonus ci sta dentro. La riga della mossa lo dice («+3 hype ·
+  follower · look street»).
+
+**Dove si legge.** Nel reparto Vestiti ogni card ha una riga in fondo — «+1 hype · street»,
+«+1 presenza · elegante», «+1 presenza» per i maglioni — che si accende in giallo con
+«Addosso ·» davanti se ce l'hai su. La testata del reparto dice la regola in una frase, poi
+quello che il look sta dando («3 capi addosso · +2 hype a settimana · +1 presenza sul
+palco · look street completo: promo +25%», `stileRiga()`) e cosa gli manca
+(`stileLookManca()`: «Look street: manca un capo street per la promo a +25%», o «Look
+street a metà: camicia fuori è dell'altro tema»). La stessa riga del look sta nel riepilogo
+del lifestyle, fra i vantaggi attivi. Quando esci dal camerino con «Salva», lo Shop si
+ridisegna con quello che hai appena messo (il ponte chiama `renderAbbigliamento` insieme a
+`renderHub`).
+
+**Niente da salvare.** Tutto si legge dallo stato del personaggio ogni volta: nessun campo
+nuovo in `G`, nessuna migrazione, un salvataggio vecchio funziona uguale.
+
+**Provato** fuori dal browser (beanie + occhiali da sole + sneaker + maglione: 3 hype, 1
+presenza, look street, promo 1,25; con la camicia al posto del maglione il look salta e la
+testata dice perché; Avaturn: zero capi) e nel gioco con Playwright a 1366 × 768 e 390 × 844:
+la testata, le card con la riga accesa, il riepilogo del lifestyle, nessun errore in
+console.
+
+**Cosa resta dei tre punti dello Shop.** Il secondo (i capi che si sbloccano con la
+carriera) e il terzo (le offerte della settimana e l'usato) sono le due voci che restano
+nell'ordine in `implementazioni.md`.
 
 ---
 

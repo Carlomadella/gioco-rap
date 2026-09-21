@@ -104,7 +104,11 @@ punti da toccare, le card tutte nella forma dello Studio, i tastini che muovevan
 tolti, lo Shop diventato uno shop vero (e dal 20/09/2026 col reparto Vestiti sui capi del
 camerino MakeHuman: lo Shop sblocca, il camerino veste), Casa, la palestra, la Pizzeria e la
 Fabbrica al posto di due cartelli chiusi, le trasferte fuori città, il telefono nuovo con
-LaFamegram e il feed che si scorre.
+LaFamegram e il feed che si scorre. **FATTO (21/09/2026)** — «Lo stile che conta»: ogni
+capo della vetrina addosso all'artista vale +1 hype a settimana o +1 presenza sul palco, e
+tre capi dello stesso tema danno +25% alla promo (`js/game/stile.js`; il racconto in
+`implementazioni/02-interfaccia-e-telefono.md`). Restano dello Shop i capi che si
+sbloccano con la carriera e le offerte della settimana.
 
 **Manca**:
 

@@ -139,7 +139,12 @@ function advanceWeek(){
   const lb = lifeBonus();
   const vissuto = clamp(1 - (G.shifts||0) * 0.20, 0.25, 1);
   G.fans += Math.round(newFans * (lb.fan - 1) * vissuto);
-  G.hype = clamp(G.hype * 0.87 + lb.hype * vissuto, 0, (typeof hypeCap==="function"?hypeCap():100));
+  /* «Lo stile che conta» (21/09/2026): i capi da hype che hai addosso, un
+     punto l'uno a settimana, come «Come ti vesti» del lifestyle ma coi capi
+     veri del camerino (stile.js). Non lo scala il lavoro: ce li hai addosso
+     anche al turno. */
+  const stHype = typeof stileBonus === "function" ? stileBonus().hype : 0;
+  G.hype = clamp(G.hype * 0.87 + lb.hype * vissuto + stHype, 0, (typeof hypeCap==="function"?hypeCap():100));
 
   // il benessere tende al livello naturale del tuo tenore di vita, non sale all'infinito
   const naturale = clamp(34 + lb.well * 4.6 * vissuto - (G.money < 0 ? 12 : 0), 12, 100);

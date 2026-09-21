@@ -314,6 +314,11 @@
   border-radius:14px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);
   font-size:13px;line-height:1.4;color:var(--soft)}
 .shfitnota b{color:#fff}
+/* «Lo stile che conta» (21/09): cosa da' un capo, e il look in testata */
+.shstile{display:block;margin:-6px 12px 11px;font-family:var(--cond);font-size:11px;font-weight:800;
+  letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.shstile.on{color:var(--acid)}
+.shfitnota .shlook{color:var(--acid)}
 .shfitnota span{flex:1 1 240px}
 .shbtn{flex:none;padding:9px 16px;border-radius:999px;font-family:var(--cond);font-size:12.5px;font-weight:800;
   letter-spacing:.06em;text-transform:uppercase;color:#0B0B0D;background:var(--acid);

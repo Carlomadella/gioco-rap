@@ -15,7 +15,7 @@ Quelli che erano rimasti indietro nel foglio — chiusi ma mai smistati — stan
 | file | cosa c'è dentro |
 | --- | --- |
 | [`01-mappa-e-citta.md`](01-mappa-e-citta.md) | **La mappa e le tre città** — 16 voci |
-| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 47 voci |
+| [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md) | **L'interfaccia e il telefono** — 48 voci |
 | [`03-artista-e-avatar.md`](03-artista-e-avatar.md) | **L'artista e il suo avatar** — 2 voci |
 | [`04-musica-e-suoni.md`](04-musica-e-suoni.md) | **La musica, la scrittura e i suoni** — 17 voci |
 | [`05-carriera-e-tempo.md`](05-carriera-e-tempo.md) | **La carriera e il tempo** — 13 voci |
@@ -33,9 +33,9 @@ per i punti, e sono in [`../documentazione/come-si-lavora.md`](../documentazione
 
 ## Tutti i punti
 
-133 voci in tutto: **98 chiuse**, 13 a metà, 17 da fare e 5 con la sola risposta scritta
+134 voci in tutto: **99 chiuse**, 13 a metà, 17 da fare e 5 con la sola risposta scritta
 (ricontate dalla tabella qui sotto il 21/09/2026, con le due piccole dell'energia — la Sala a
-zero, la take a 25 — entrate quel giorno; il conto di prima era del 20/09, dopo il riordino del foglio dei punti; nello
+zero, la take a 25 — e «Lo stile che conta» dello Shop entrate quel giorno; il conto di prima era del 20/09, dopo il riordino del foglio dei punti; nello
 stesso giro sono entrate due sezioni del foglio dell'interfaccia che alla tabella mancavano — lo
 Studio a cinque linguette, l'anteprima di un pezzo non uscito — e il giorno prima altre tre,
 l'avvio rapido, le pagine dei posti sulla loro foto, la fascia della plancia). A che punto siamo
@@ -177,6 +177,7 @@ nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../docume
 | **—** | Un pezzo non uscito non si spinge: se ne fa uscire un'anteprima | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | Nella Sala non si spende energia | fatto | [mondo-e-personaggi](06-mondo-e-personaggi.md) |
 | **—** | Studio · La take costa 25, le altre 8 | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
+| **—** | Lo stile che conta: i capi addosso pesano su hype, presenza e promo | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 
 > Lo stato è letto dal testo dei punti: «fatto» vuol dire che c'è scritto cosa è
 > stato fatto e quando, «risposto» che c'è una risposta ragionata ma il codice

@@ -114,6 +114,14 @@ function promoSettimana(){
   return G.promoSaturation;
 }
 
+/* «Lo stile che conta» (21/09/2026): sul palco — la serata e la piazza —
+   la presenza e' l'abilita' piu' i capi da presenza che hai addosso
+   (stilePresenza in stile.js). Il freestyle giocato in piazza.js ha i suoi
+   conti e non passa di qui. */
+function presenzaSulPalco(){
+  return typeof stilePresenza === "function" ? stilePresenza() : G.skills.presenza;
+}
+
 function promoDailyMult(){
   const n = adfOggi("promo");
   return n < ADF_PROMO_DAILY_MULT.length
@@ -442,8 +450,10 @@ const ACTIONS = [
    need:() => G.songs.some(s => s.released) ? null : "1 pezzo fuori",
    give:() => {
      const mult = promoDailyMult();
-     return "+" + Math.round((6 + G.skills.rete*0.12) * RITMO * mult) +
-       " hype \u00b7 follower" + (mult < 1 ? " \u00b7 resa ridotta" : "");
+     const look = typeof stileBonus === "function" ? stileBonus() : {promo:1, tema:null};
+     return "+" + Math.round((6 + G.skills.rete*0.12) * RITMO * mult * look.promo) +
+       " hype \u00b7 follower" + (mult < 1 ? " \u00b7 resa ridotta" : "") +
+       (look.tema ? " \u00b7 look " + look.tema : "");
    },
    run(){
      const mult = promoDailyMult();
@@ -451,7 +461,10 @@ const ACTIONS = [
        ? AGENDA.consumaPeso("promo") : 1;
 
      const p = promoSettimana();
-     const hWanted = (6 + G.skills.rete*0.12) * RITMO * mult * peso;
+     /* «Lo stile che conta» (21/09/2026): col look completo — tre capi dello
+        stesso tema addosso — la promo rende +25% (stile.js) */
+     const look = typeof stileBonus === "function" ? stileBonus() : {promo:1, tema:null};
+     const hWanted = (6 + G.skills.rete*0.12) * RITMO * mult * peso * look.promo;
      const hBudget = Math.max(0, ADF_PROMO_WEEKLY_HYPE_CAP - p.hypeUsed);
      const h = Math.min(hWanted, hBudget);
      p.hypeUsed += h;
@@ -543,7 +556,7 @@ const ACTIONS = [
          : "La battle vera è un evento esclusivo: " + battaglia.motivo,
        veloce(){
          gain("presenza", 1.4);
-         const f = Math.round((rnd(2,12) + G.skills.presenza*0.5) * RITMO);
+         const f = Math.round((rnd(2,12) + presenzaSulPalco()*0.5) * RITMO);
          G.fans += f; G.wellbeing = clamp(G.wellbeing-2,0,100);
          return {t:"Giro veloce in piazza: " + f + " persone si sono fermate.", c:""};
        },
@@ -552,7 +565,7 @@ const ACTIONS = [
            if(typeof toast === "function")
              toast("<b>Non è ancora il momento.</b> " + battaglia.motivo, "bad", "!", ["#B91C1C","#7F1D1D"]);
            gain("presenza", 1.4);
-           const f = Math.round((rnd(2,12) + G.skills.presenza*0.5) * RITMO);
+           const f = Math.round((rnd(2,12) + presenzaSulPalco()*0.5) * RITMO);
            G.fans += f; G.wellbeing = clamp(G.wellbeing-2,0,100);
            azioneFatta();
            pushLog("Il palco vero non c'è ancora: giro veloce lo stesso, " + f + " persone si sono fermate.", "");
@@ -575,7 +588,7 @@ const ACTIONS = [
        ? AGENDA.consumaPeso("live") : 1;
      const giaOggi = adfOggi("live") > 0;
      const molt = (giaOggi ? 0.45 : 1) * peso;
-     const f = Math.round((rnd(8,30) + G.skills.presenza*1.4 + G.hype*0.7) * RITMO * molt);
+     const f = Math.round((rnd(8,30) + presenzaSulPalco()*1.4 + G.hype*0.7) * RITMO * molt);
      const m = Math.round((rnd(20,60) + G.hype*1.4) * RITMO * molt);
      const lbb = lifeBonus();
      G.fans += Math.round(f*lbb.live); G.money += Math.round(m*lbb.live);
