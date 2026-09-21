@@ -65,5 +65,10 @@
       "higher total usefulness score",
       "if still tied, prefer pYIN baseline as lower-complexity method"
     ]
+  },
+  "receiptRunner": {
+    "path": "basic-pitch-development-inference.js",
+    "gitBlobSha": "0feffda5174f5a4a3a29a986c437384cc8cbc5f7",
+    "implementationCommit": "1870274e43f3934e42eb5779ef6b69b5d4473dc7"
   }
 }
