@@ -1162,3 +1162,27 @@ Sono stati verificati insieme:
 - modello `nmp.onnx`, 230444 byte, SHA256 `2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec`.
 
 Il verifier non ha aperto audio e non ha eseguito trascrizioni. È quindi aperto il gate pre-inference development-only. Tale gate può leggere i byte degli 8 `bass.wav` esclusivamente per verificarne gli SHA contro i receipt Source Separation; non può decodificare audio, chiamare Basic Pitch o scrivere MIDI.
+
+## NDR-078 — Basic Pitch: pre-inference gate 8/8 PASS e execution contract congelato
+
+**Stato: ACCEPTED — 21 settembre 2026.**
+
+Il gate development-only ha restituito `BASIC_PITCH_PREINFERENCE_GATE_PASS`.
+
+Sono state verificate 8/8 family e l'integrità degli 8 `bass.wav` tramite SHA contro i receipt Source Separation. Il comando ha letto i byte degli stem esclusivamente per hashing; non ha decodificato audio, non ha invocato Basic Pitch e non ha prodotto MIDI. Source audio originale, final holdout, batch 131 e training restano esclusi.
+
+Prima della prima inferenza viene congelato `basic-pitch-execution-contract-v1.json` con:
+
+- `basic-pitch==0.4.0`, tag `v0.4.0`, commit `9991303bba609a3b93089d13ec80d1d495083596`;
+- backend ONNX e modello `nmp.onnx` già congelato;
+- API `basic_pitch.inference.predict`;
+- onset threshold 0.5;
+- frame threshold 0.3;
+- minimum note length 127.70 ms;
+- frequency range 25–300 Hz;
+- pitch bends abilitati;
+- melodia trick abilitato;
+- BPM per family derivato dall'output autonomo `audio-analysis-v2-config-001`;
+- output append-only.
+
+Il runner che prepara/verifica il receipt è congelato al Git blob `0feffda5174f5a4a3a29a986c437384cc8cbc5f7` (commit `1870274e43f3934e42eb5779ef6b69b5d4473dc7`). Il prossimo passo è creare il receipt append-only `AUTHORIZED_NO_INFERENCE`; l'inferenza resta separata.
