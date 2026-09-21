@@ -22,5 +22,6 @@ for(const needle of [
 assert(!diag.includes(" execute $Workspace"));
 assert(!diag.includes("predict("));
 assert(!diag.includes("predict_and_save"));
-assert(!diag.includes("Set-Content -LiteralPath $midi"));\nassert(!diag.includes("Move-Item -LiteralPath"));
+assert(!diag.includes("Set-Content -LiteralPath $midi"));
+assert(!diag.includes("Move-Item -LiteralPath"));
 console.log("owned-beats-basic-pitch-failure-diagnostic-test: PASS");
