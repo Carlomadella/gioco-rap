@@ -2088,6 +2088,34 @@ tengono ferma la riorganizzazione. Provato nel gioco vero con Playwright a 1440 
 anteprima dal telefono, feat dalla classifica che dice sì, uscita → Cabina → «fallo sapere»
 → LaFamegram; niente errori in console, niente che sborda in larghezza.
 
+**Le tre code, chiuse il 21/09/2026** (branch `task/studio-le-tre-code`; erano la voce
+«Le tre code dello Studio a cinque linguette» in `implementazioni.md`, da
+problemi-riscontrati del 15/09):
+
+- **L'omonimo.** «Dalla classifica» scartava i rivali il cui *nome* stava già in `G.gente`,
+  ma la Sala e la classifica pescano dallo stesso mazzo di trenta nomi senza parlarsi: un
+  «Lupo» da fama 20 alla Sala nascondeva il «Lupo» da tre milioni di ascolti in classifica.
+  Adesso il legame fra un rivale e il suo contatto è il **seed** del rivale
+  (`rivaleSeed` sulla persona, `studioRivaleContatto()` in `studio.js`); i contatti venuti
+  dalla classifica prima di oggi hanno `rivale:true` e nessun seed, e per loro vale ancora
+  il nome. Alla radice: `nuovaPersona` (`posto.js`) non pesca più un nome che sta in
+  classifica, e `nuovoRivale` (`rivals.js`) non ne pesca uno che gira alla Sala. E
+  `diventaOpp` su uno che era già in classifica non ne crea un secondo con lo stesso nome:
+  cambia la sua storia («Ha fatto un feat con te, poi alla Sala è finita male»).
+- **Il posto rubato.** Ogni rivale che diceva sì entrava in `G.gente` e contava nel tetto
+  della Sala (`sistemaGente`: gente finché `G.gente.length < quante`, tetto 8): due feat
+  comprati, due persone in meno alla Sala — magari il videomaker o il giornalista. Adesso il
+  tetto, il turno dei ruoli e il momento in cui arrivano videomaker e giornalista contano
+  solo la **gente della Sala** (`genteDellaSala()`, chi non ha `rivale`); i rivali fra i
+  contatti restano in `G.gente` come prima, in più.
+- **La copertina orfana** era già chiusa il 14/09 (`e288634`: `studioCoverPulisci` e
+  `salvaConCopertine` che sacrifica prima la proposta); l'indice di problemi-riscontrati
+  non l'aveva visto. Adesso l'audit lo controlla.
+
+Prove: `test/unit/studio-rivali-e-sala.test.js`, otto con vitest sui file veri
+(`studio.js`, `posto.js`, `rivals.js`) e un dado seminato — sei fallivano sul codice di
+prima; quattro controlli nuovi nell'audit.
+
 
 ---
 

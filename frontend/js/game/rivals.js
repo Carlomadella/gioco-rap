@@ -43,7 +43,9 @@ function faccia(r2, size){
     '</svg>';
 }
 function nuovoRivale(forza){
-  const usati = (G.rivals||[]).map(x => x.n);
+  /* nemmeno il nome di uno che gira alla Sala: stesso mazzo (RIV_NOMI), e
+     un omonimo in classifica non si potrebbe chiamare (v. posto.js) */
+  const usati = (G.rivals||[]).map(x => x.n).concat((G.gente||[]).map(p => p.n));
   const pool = RIV_NOMI.filter(n => usati.indexOf(n) < 0);
   return {
     n: pool.length ? pick(pool) : pick(RIV_NOMI) + " " + Math.floor(rnd(2,9)),

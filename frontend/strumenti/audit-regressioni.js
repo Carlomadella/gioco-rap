@@ -792,6 +792,31 @@ test("il feat si sceglie in Cabina, da due porte: chi conosci gratis, la classif
   studio.includes("function studioFeatProbabilita(r)") &&
   studio.includes("G.gente.push(p);") &&
   !studio.includes("function studioSezFeat()"));
+/* Le tre code dello Studio (problemi-riscontrati 15/09, chiuse il 21/09/2026):
+   il rivale e il suo contatto si legano col seed, non col nome; i rivali fra
+   i contatti non contano nel tetto della Sala; la Sala e la classifica non si
+   rubano i nomi; l'opp che era gia' in classifica non si sdoppia. La cover
+   orfana era gia' chiusa il 14/09 (studioCoverPulisci). */
+test("un rivale con lo stesso nome di uno della Sala si puo' chiamare: il legame col contatto e' il seed",
+  studio.includes("function studioRivaleContatto(r){") &&
+  studio.includes("p.rivaleSeed != null ? p.rivaleSeed === r.seed : (p.rivale && p.n === r.n)") &&
+  studio.includes("return (G.rivals || []).filter(r => r && r.n && !studioRivaleContatto(r))") &&
+  studio.includes("rivaleSeed:r.seed") &&
+  !studio.includes("const noti = new Set((G.gente || []).map(p => p.n));"));
+test("chi accetta dalla classifica non ruba un posto alla Sala: il tetto conta solo la gente della Sala",
+  posto.includes("function genteDellaSala(){ return (G.gente || []).filter(p => p && !p.rivale); }") &&
+  posto.includes("while(genteDellaSala().length < quante){") &&
+  !posto.includes("while(G.gente.length < quante){") &&
+  posto.includes("const n = genteDellaSala().length;"));
+test("la Sala e la classifica pescano dallo stesso mazzo senza omonimi, e l'opp gia' in classifica non si sdoppia",
+  posto.includes("const usati = (G.gente || []).map(p => p.n).concat((G.rivals || []).map(r => r.n));") &&
+  leggi("js/game/rivals.js").includes("const usati = (G.rivals||[]).map(x => x.n).concat((G.gente||[]).map(p => p.n));") &&
+  posto.includes("const gia = p.rivale && (G.rivals || []).find(r => p.rivaleSeed != null ? r.seed === p.rivaleSeed : r.n === p.n);") &&
+  fs.existsSync(path.join(ROOT, "test/unit/studio-rivali-e-sala.test.js")));
+test("la proposta di copertina non resta orfana: renderStudio la butta se il pezzo non e' piu' in Fuori, e la memoria piena la sacrifica per prima",
+  studio.includes("function studioCoverPulisci(){") &&
+  studio.includes("  studioCoverPulisci();") &&
+  leggi("js/game/copertine.js").includes("if(G.studio && G.studio.coverProva && G.studio.coverProva.img){"));
 test("il feat conta sul pezzo: la sua gente ascolta (sim.js) e all'uscita muove l'hype",
   actions.includes("featFama:conMe ? conMe.fama : 0") &&
   actions.includes("function featHypeUscita(s)") &&

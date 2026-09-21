@@ -70,10 +70,12 @@ diventata una regola (lo sconto scritto è quello vero).
 7. **L'uscita di venerdì non costa niente, quella a mano sì** (08/09): risolto in parte per
    scelta — il vantaggio di venerdì è quello di aspettare, non uno sconto. Sparisce del tutto
    con «togli il parametro lucidità» (CARLO), che nell'altro foglio è fra i lavori lunghi.
-8. Le code dello Studio a cinque linguette (15/09): **un rapper della classifica con lo
+8. ~~Le code dello Studio a cinque linguette (15/09): **un rapper della classifica con lo
    stesso nome di uno della Sala non si può chiamare**, **chi accetta dalla classifica occupa
    un posto della Sala**; e dal 14/09 **la copertina proposta e non confermata resta nel
-   salvataggio, foto compresa**.
+   salvataggio, foto compresa**.~~ **RISOLTO (21/09/2026)** — le prime due nel branch
+   `task/studio-le-tre-code` (il legame rivale ↔ contatto è il seed, la Sala conta solo la
+   sua gente); la copertina era già chiusa il 14/09 (`e288634`) e l'indice non l'aveva visto.
 9. **Di traverso** (844 × 390) il telefono alzato si usa, ma resta da **decidere se il gioco
    sugli store gira anche in orizzontale**: nel repo non c'è un manifest né un
    `orientation`. Nell'altro foglio sta fra «le decisioni tue».
@@ -2089,6 +2091,11 @@ Marketing». `SND.anteprima = "promo"` in `fx.js`.
   pezzo: torna in Cover, la proposta non c'e' piu' da nessuna parte ma nel salvataggio
   (`localStorage`, chiave della partita) `studio.coverProva.img` e' ancora pieno.
 - **quanto pesa** — da sistemare con calma.
+- **RISOLTO (14/09/2026, riconosciuto il 21/09)** — commit `e288634`, «la proposta di
+  copertina non resta orfana»: `studioCoverPulisci()` (chiamata da `renderStudio`) butta la
+  proposta se il suo pezzo non sta più in Fuori, e `salvaConCopertine` a memoria piena
+  sacrifica **prima** la proposta non confermata, poi le copertine dei pezzi. L'indice in
+  testa a questo foglio la dava ancora aperta: l'audit adesso lo controlla.
 
 ### Sul telefono il motivo per cui l'anteprima e' spenta viene tagliato
 
@@ -2484,6 +2491,13 @@ lo schermo è un telefono» in `implementazioni/02-interfaccia-e-telefono.md`.
 - **come si vede** — partita dove alla Sala c'è un rapper con un nome che sta anche in
   classifica: in Cabina, sotto «Dalla classifica», quel nome manca.
 - **quanto pesa** — da sistemare con calma.
+- **RISOLTO (21/09/2026)** — branch `task/studio-le-tre-code`: il legame è il **seed** del rivale
+  (`rivaleSeed` sulla persona, `studioRivaleContatto` in `studio.js`); i contatti
+  venuti dalla classifica prima di oggi (`rivale:true` senza seed) valgono ancora per
+  nome. In più la Sala non pesca più un nome che sta in classifica e la classifica non ne
+  pesca uno della Sala (stesso mazzo, `nuovaPersona`/`nuovoRivale`), e `diventaOpp` su
+  uno che era già in classifica non ne crea un secondo: cambia la sua storia. Otto prove
+  in `test/unit/studio-rivali-e-sala.test.js` (sei fallivano sul codice di prima).
 
 ### «Dalla classifica» mostra solo i sei più grossi, cioè quelli che dicono di no
 
@@ -2518,6 +2532,11 @@ grossi, tutta la classifica in «Con chi».
 - **come si vede** — fai accettare due rivali nelle prime settimane, poi conta chi arriva
   alla Sala nelle settimane dopo: un posto in meno per ognuno.
 - **quanto pesa** — da sistemare con calma.
+- **RISOLTO (21/09/2026)** — stesso branch: `sistemaGente` conta solo la gente della Sala (`genteDellaSala()`,
+  chi non ha `rivale`) per il tetto, per il turno dei ruoli e per il momento in cui
+  arrivano il videomaker e il giornalista; i rivali fra i contatti restano in `G.gente`
+  come prima, in più. Provato: con due rivali accettati la Sala ha la stessa gente di
+  una partita senza (6 e 6), e col tetto pieno arrivano lo stesso videomaker e giornalista.
 
 ### «Sì al 8%» e «Dice sì al 8%»: davanti alla vocale ci va «all'»
 
