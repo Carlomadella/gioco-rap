@@ -1894,7 +1894,7 @@ test("la card bloccata resta in vetrina, spenta, dice cosa serve e non si compra
   negozio.includes("(tuo || manca || senzaSoldi ? \" disabled\" : \"\")") &&
   negozio.includes('<span class="shreq">Bloccato \\u00b7 \' + manca + \'</span>') &&
   negozio.includes("if(!v || guardarobaPosseduto(v.raw) || shFitRequisito(v)) return;") &&
-  leggi("css/game.css").includes(".shcard.locked{") &&
+  leggi("css/game.css").includes(".shcard.locked:disabled{") &&
   negozio.includes("si sbloccano\") + ' con la carriera: la card dice cosa serve.'"));
 
 /* «Le offerte della settimana» (21/09/2026, CARLO «Shop (20/09/2026)» 3): un
@@ -1910,7 +1910,7 @@ test("al lunedi' (advanceWeek, dopo G.week++) si tira a sorte il capo a meta' pr
   sim.indexOf('offerteSettimana(true);') > sim.indexOf("  G.week++;") &&
   offerte.includes("if(s.sett === w) return false;") &&
   offerte.includes("s.capo = scelta.length ? scelta[Math.floor(Math.random() * scelta.length)].id : null;") &&
-  offerte.includes('if(typeof totalWeeks === "function" && s.sett !== totalWeeks()) offerteSettimana(false);'));
+  offerte.includes("if(offerteStato().sett !== totalWeeks() && offerteSettimana(false) && typeof save === \"function\") save();"));
 test("l'usato va e viene: via gli scaduti e i comprati, dentro i nuovi fino a un numero tirato a sorte, ognuno con la sua scadenza e il suo sconto",
   offerte.includes("s.usato = s.usato.filter(u => u.fino > w && u.id !== s.capo && liberi.some(v => v.id === u.id));") &&
   offerte.includes("const quanti = 1 + Math.floor(Math.random() * OFF_USATO_MAX);") &&

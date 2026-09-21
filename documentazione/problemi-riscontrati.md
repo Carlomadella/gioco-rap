@@ -23,7 +23,13 @@ fine task ne ha trovate tre (44–46), chiuse nello stesso branch prima del push
 `task/transizioni-video-le-altre`) ne ha trovate cinque (47–51), tutte chiuse nello stesso branch prima del push, più tre note: due della
 copertura del filmato (che il tasto del menu e la tastiera passano), una sulla pagina
 sotto durante l'attesa, la nota già scritta nel foglio dell'interfaccia sui due «—»
-dall'agenda (confermata), e una riga di foglio rimasta indietro.
+dall'agenda (confermata), e una riga di foglio rimasta indietro. Il 21/09 il giro di fine
+task sullo Shop coi capi che si sbloccano e le offerte (`task/shop-capi-sbloccati-e-offerte`,
+il primo coi tre agenti insieme dopo il «non lanciare agenti» del 20/09) ha trovato cinque
+cose (`segnala-problemi`), una riga di documento nel backend (`backend-allineato`) e una
+nella prova sul telefono, fatta con Playwright perché l'estensione non c'era: tutte e sette
+chiuse in `task/shop-rifiniture-dopo-il-giro`, più la nota sullo sconto dell'usato che è
+diventata una regola (lo sconto scritto è quello vero).
 
 1. ~~**Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
    telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra. Il tasto
@@ -5035,3 +5041,177 @@ paragrafo in testa all'ordine è aggiornato. Riprovato con Playwright sul Chrome
 1440 × 900: Tab + Invio dopo il clic sulla take → una take sola (energia 100 → 55); spazio a
 metà filmato apre Casa; il clic sul brand col filmato in corso non apre il menu e a fine
 filmato si apre la Sala. Quattro controlli in più nell'audit. Le cinque voci in testa sono barrate.
+
+## Giro del 21/09/2026 (backend-allineato, fine task «Capi che si sbloccano» e «Le offerte della settimana», merge `c43384b`)
+
+La task ha toccato solo `frontend/` e i fogli: l'ultimo commit su `backend/` resta `18fae26`
+del 16/09. Fatti girare `node scripts/controlla-backend.js` (allineato, esce 0) e
+`cd backend && npm run prova` (**192 a posto, 0 no**). Poi il confronto a mano: le otto
+coppie di migrazioni SQLite/PostgreSQL differiscono solo nei tipi (`INTEGER`/`BIGINT`,
+`AUTOINCREMENT`/`IDENTITY`, `REAL`/`DOUBLE PRECISION`), nell'espressione «adesso» della 004 e
+nell'`UPDATE ... = rowid` della 006 che di là non serve — tutte volute e spiegate nei file
+stessi; nessuna colonna o vincolo manca da una parte sola, niente fermerebbe il passaggio a
+PostgreSQL. Le risposte di `README-API.md` (artista pubblico, `/api/stato`, `/api/io`,
+`/api/punteggio`, `/api/classifica`, `/api/carriera`, `/api/account`) combaciano campo per
+campo con `server.js` e `archivio.js`; `schema.md` conosce `fuori`, `difficolta`, `live`,
+`feat` e `traguardo.ordine`. Una voce sola, di documento.
+
+### `README-API.md` dice ancora «Node.js 22.5», il server ne vuole 22.12
+
+- **dove** — `backend/README-API.md:30` («Richiede **Node.js 22.5 o successivo**»).
+- **cosa succede** — la voce del 16/09 («`jose` 6 si carica solo da Node 22.12 in su») ha
+  corretto `engines` in `package.json`, `backend/README.md:46` e `comandidelterminale.md`, ma
+  non questa riga: chi parte dal README dell'API — che è il primo che si apre per provare
+  una rotta — legge 22.5, mette su un 22.5-22.11 e il server muore all'avvio con
+  `ERR_REQUIRE_ESM`. Lo stesso file, in testa (`:6-7`), dice ancora «Verificata … commit
+  `024bf79` del 2 settembre 2026»: è la nota a margine già lasciata il 16/09, resta aperta.
+- **come si vede** — `grep -n "22.5" backend/README-API.md`; `node --version` fra 22.5 e
+  22.11 e `cd backend && npm start`.
+- **quanto pesa** — da sistemare con calma: una riga (e, volendo, togliere o aggiornare la
+  riga «Verificata sul commit»). Non è di questa task, che il backend non l'ha toccato.
+- **RISOLTO (21/09/2026)** — nel branch `task/shop-rifiniture-dopo-il-giro`: la riga 30 dice 22.12, e l'intestazione
+  dice «Verificata … commit `6f3f668` del 21 settembre 2026», col rimando alla prima
+  stesura del 2 settembre.
+
+
+## Giro del 21/09/2026 (segnala-problemi, fine task «Capi che si sbloccano» e «Le offerte della settimana», merge `c43384b`)
+
+Controllato: `npm run prova` (180 a posto, 0 no), `node strumenti/audit-regressioni.js`
+(435 ok, 0 falliti), `npm run verifica:build` (33 ok, 0 falliti). Poi il codice nuovo fatto
+girare davvero, fuori dal browser con una partita finta e dentro al browser (Playwright, a
+390×844 e a 1280×800) con un salvataggio **senza** `G.offerte`: nessun errore JavaScript,
+nessuna larghezza che sfora sul telefono (`scrollWidth` 390 su 390), l'ordine degli script in
+`pagine/gioco.html` è giusto (`negozio.js` prima di `negozio-offerte.js`, e ogni richiamo fra
+i due passa da un `typeof`), il lunedì chiamato due volte di fila non ricambia l'offerta
+(`sett` uguale → esce subito), un capo bloccato non finisce mai in offerta (0 su 7), la card
+in offerta senza soldi resta spenta, i filtri per tipologia nascondono la sezione «Questa
+settimana» e mostrano il prezzo scontato anche dentro al reparto, e nel camerino i capi
+bloccati restano fuori come quelli non comprati (`perCamerino()` non è cambiata). **Niente
+che blocchi la partita.** Quello che c'è da sistemare è piccolo:
+
+### «1 capo scontati» sul banco dell'usato
+
+- **dove** — `frontend/js/game/negozio-offerte.js:140`
+- **cosa succede** — la riga accanto al titolo «Il banco dell'usato» mette il singolare sul
+  nome e il plurale sull'aggettivo: con un capo solo dice «1 capo scontati, finché ci
+  sono». Il pezzo di frase che cambia fra 1 e 2+ è solo « capo»/« capi», mentre
+  «scontati, finché ci sono» è fisso.
+- **come si vede** — apri lo Shop una settimana in cui sul banco c'è un capo solo (capita
+  spesso: il numero è tirato a sorte fra 1 e 3). Visto in entrambi gli screenshot del giro.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (21/09/2026)** — nel branch `task/shop-rifiniture-dopo-il-giro`: «un capo scontato, finché c'è» con uno,
+  «N capi scontati, finché ci sono» con di più.
+
+### La card bloccata ha un suo stile in `game.css`, ma non si vede mai
+
+- **dove** — `frontend/css/game.css:329` (`.shcard.locked`) contro `:299`
+  (`.shcard:disabled:not(.owned)`)
+- **cosa succede** — la card bloccata è sempre anche `disabled` (`negozio.js:102`), e la
+  regola per i bottoni spenti «pesa» di più di quella per i bloccati, quindi vince
+  sempre: misurato nel browser, una card bloccata e una che non ti puoi permettere hanno
+  lo stesso identico filtro (`grayscale(0.55) brightness(0.62)`). La riga «Bloccato · …»
+  le distingue lo stesso, ma la regola in `:329` è lettera morta, e la stessa attenuazione
+  spegne anche il rosso di quella riga (che sul telefono si legge, ma appena).
+- **come si vede** — Shop, «Gioielli»: «Anello di diamanti» (bloccato) e «Collana di
+  perle» (bloccata) accanto a un capo che costa più dei tuoi soldi: sono uguali.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (21/09/2026)** — nel branch `task/shop-rifiniture-dopo-il-giro`: la regola è `.shcard.locked:disabled`
+  (stessa specificità di `.shcard:disabled:not(.owned)`, e viene dopo), più scura —
+  `grayscale(.9) brightness(.42)` contro `.55/.62` — misurato con Playwright: una card
+  bloccata e una «senza soldi» accanto adesso hanno due filtri diversi.
+
+### Su un salvataggio vecchio la prima estrazione si fa aprendo lo Shop, ma non si salva
+
+- **dove** — `frontend/js/game/negozio-offerte.js:107` e `:132`
+- **cosa succede** — se le offerte non sono di questa settimana (salvataggio di prima del
+  merge, o `G.offerte` mancante), lo Shop tira a sorte da solo mentre disegna le card, ma
+  non chiama `save()`. Se uno apre lo Shop, guarda, e chiude il gioco senza fare
+  nient'altro che salvi, al prossimo avvio l'offerta è un'altra. Succede una volta sola
+  per partita (dal lunedì dopo ci pensa `advanceWeek`), e quasi ogni azione salva, quindi
+  è un caso di bordo.
+- **come si vede** — con un salvataggio senza `G.offerte`: apri lo Shop, annota l'offerta,
+  ricarica la pagina, riapri lo Shop.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (21/09/2026)** — nel branch `task/shop-rifiniture-dopo-il-giro`: `offerteAggiorna()` in
+  `negozio-offerte.js` fa l'estrazione pigra e, se ha tirato a sorte, chiama `save()`;
+  la prova unitaria conta un salvataggio alla prima apertura.
+
+### Il diario tace se il lunedì c'è l'usato ma non il capo a metà prezzo
+
+- **dove** — `frontend/js/game/negozio-offerte.js:93-96`
+- **cosa succede** — la riga «Allo Shop: … a metà prezzo … e N capi usati sul banco» parte
+  solo se c'è il capo del lunedì; se `capo` è `null` (i pochi capi rimasti sono già tutti
+  sul banco dell'usato) e il banco è pieno lo stesso, nel diario non c'è niente. Raro:
+  serve aver comprato quasi tutto.
+- **come si vede** — compra tutti i capi meno due o tre, aspetta un lunedì in cui quelli
+  restanti stanno sul banco dell'usato, guarda il diario.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (21/09/2026)** — nel branch `task/shop-rifiniture-dopo-il-giro`: senza capo del lunedì ma con l'usato il
+  diario dice «Allo Shop: N capi usati sul banco, niente a metà prezzo questa settimana».
+
+### Il codice nuovo ha i controlli dell'audit ma nessuna prova in `test/`
+
+- **dove** — `frontend/test/` (nessun file cita `offerteSettimana`, `offertaDi` o
+  `shFitRequisito`); `frontend/strumenti/audit-regressioni.js:1887-1921` guarda solo che
+  certe righe di testo ci siano.
+- **cosa succede** — l'estrazione del lunedì, i requisiti dei capi e il prezzo scontato
+  girano senza una prova che li faccia funzionare davvero (quella di questo giro l'ho
+  fatta a mano, nello scratchpad). Se domani cambia `totalWeeks` o la forma di
+  `G.trasferte`, se ne accorge il giocatore, non `npm run prova`.
+- **come si vede** — `grep -rn offerteSettimana frontend/test` non trova niente.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (21/09/2026)** — nel branch `task/shop-rifiniture-dopo-il-giro`:
+  `frontend/test/unit/shop-sblocchi-e-offerte.test.js`, tredici prove con vitest — i tre
+  requisiti (contratto anche dopo la rescissione, i fan, Milano), i sette bloccati, la card
+  bloccata; l'estrazione con il salvataggio, la stessa settimana che non ricambia, l'usato
+  (numero, sconto, scadenza, mai il capo del lunedì), il comprato e il bloccato senza
+  offerta, il lunedì nuovo e il diario, il diario col solo usato, il prezzo pagato,
+  `G.offerte` rotto. Girano in `npm run test:unit`, quindi in `npm run verifica`.
+
+## Giro del 21/09/2026 (prova sul telefono, stessa task, fatto con Playwright)
+
+L'estensione Chrome non era collegata: l'agente `prova-sul-telefono` si è fermato come deve,
+e il giro l'ho fatto con Playwright a 390 × 844 e 844 × 390 (`isMobile`, tocco vero). Otto
+controlli per verso, tutti passati: niente esce di lato, «L'offerta del lunedì» e «Il banco
+dell'usato» in testa su «Tutti», la card in offerta col listino barrato e la riga gialla
+(larga 166 punti in verticale), comprarla scala il prezzo scontato (90 € per un capo da 180)
+e la card diventa «Tuo» e sparisce dalla sezione, le sette bloccate fra Gioielli, Parte alta
+e Scarpe spente con la riga giusta e niente sezione offerte coi filtri, un tocco su una
+bloccata non fa niente, con contratto + 12.000 fan + Milano le bloccate spariscono, console
+pulita. Una cosa storta, non di questa task:
+
+### La barra dei filtri dello Shop è appiccicata in cima ma non ha uno sfondo
+
+- **dove** — `frontend/css/game.css`, `.shbar` (`position:sticky; top:0`, nessun
+  `background`).
+- **cosa succede** — scorrendo il reparto le pastiglie dei filtri e la cassa restano in
+  cima, ma sotto ci passano le card e le intestazioni: «Tutti 39» sopra «Gioielli · 4
+  capi», le pastiglie sopra le foto. C'è da quando la barra è diventata sticky (la cassa
+  sempre in vista, «lo Shop diventa uno shop»), non dai filtri di oggi.
+- **come si vede** — a 1366 × 768 e sul telefono in orizzontale, scorri lo Shop fino a
+  «Parte alta».
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (21/09/2026)** — nel branch `task/shop-rifiniture-dopo-il-giro`: la barra ha
+  uno sfondo, il nero del pannello che sfuma in basso (`linear-gradient(180deg,#0B0B0F
+  78%,rgba(11,11,15,0))`), così le card che scorrono sotto spariscono dietro le pastiglie.
+
+**Note che sono scelte, non errori** (le scrivo perché uno che gioca se le può chiedere):
+
+- Su «Tutti» il capo in offerta compare **due volte**: nella sezione «Questa settimana» in
+  testa e al suo posto nel reparto, tutte e due con il prezzo barrato (`negozio.js:155-163`).
+  È voluto («con le stesse card del listino»); sul telefono vuol dire una card in più da
+  scorrere, e a desktop la sezione in testa lascia una riga larga con una card sola a
+  sinistra.
+- Lo **sconto scritto sulla card dell'usato è quello tirato a sorte, non quello che esce
+  dal prezzo arrotondato**: «Bandana 40 → 30 €, −30%» è in realtà un −25%. Il codice lo
+  spiega (`negozio-offerte.js:116-118`, il 40% su 140 farebbe 85 cioè 39%). Chi fa il
+  conto se ne accorge; è una scelta. — **Cambiata (21/09/2026)**, stesso branch delle
+  voci sopra: lo sconto scritto è quello vero, dal prezzo arrotondato, ai 5 punti (140 →
+  85 dice −40%, 40 → 30 dice −25%): chi fa il conto lo trova giusto. Il campo `sc` non si
+  salva più.
+- Ogni lunedì mette **una riga nel diario** anche durante un salto lungo (12 settimane
+  saltate = 12 righe, misurato): come le altre righe settimanali, con il diario che tiene
+  le ultime 80.
+- Con un avatar Avaturn o senza avatar la testata dice che i vestiti non si vedranno
+  addosso, ma le offerte e i capi bloccati compaiono lo stesso e si comprano lo stesso:
+  coerente con «Puoi comprarli, ma non li vedrai su di lui» (`negozio.js:125-131`).
