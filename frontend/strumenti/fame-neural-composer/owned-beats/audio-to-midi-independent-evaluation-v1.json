@@ -1,0 +1,89 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-independent-evaluation-protocol-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_FRESH_COHORT_SELECTION",
+  "purpose": "INDEPENDENT_EVALUATION_OF_FROZEN_DRUMS_LOW_END_PIPELINE",
+  "createdAt": "2026-09-21",
+  "sourceCorpus": {
+    "sourceCollectionId": "fame-owned-beats-v1",
+    "expectedRecords": 131,
+    "expectedCompositionFamilies": 131
+  },
+  "cohort": {
+    "cohortId": "audio-to-midi-independent-evaluation-v1",
+    "plannedSplit": "audio-to-midi-evaluation-v1",
+    "expectedFamilies": 12,
+    "independence": {
+      "excludeAnyAssignedSplit": true,
+      "excludeDevelopment": true,
+      "excludeConsumedAudioAnalysisHoldout": true,
+      "excludeAnyPilotCohort": true,
+      "excludeAnyRoleProcessingOrReview": true,
+      "excludeAnyQaEvidence": true
+    },
+    "selection": {
+      "algorithm": "opaque-identity-sha256-rank-v1",
+      "seed": "fame-audio-to-midi-independent-evaluation-v1|2026-09-21|pre-audio",
+      "identityFields": [
+        "compositionFamilyId",
+        "sourceRecordId",
+        "sourceAssetId",
+        "sha256"
+      ],
+      "usesAudioContentOrDerivedMetrics": false,
+      "rankAscendingBySha256": true
+    },
+    "rationale": {
+      "developmentFamilies": 8,
+      "evaluationFamilies": 12,
+      "statement": "12 independent families increase the human-evaluation cohort by 50% over development while keeping review cost bounded before any corpus-wide run. The gate remains a predeclared product-evaluation rule, not a universal statistical claim."
+    }
+  },
+  "frozenPipeline": {
+    "sourceSeparation": {
+      "selectedArm": "intel-openvino-htdemucs-v4-97fc578",
+      "modelRevision": "97fc578fb57650045d40b00bc84c7d156be77547",
+      "noRetuningOnEvaluation": true
+    },
+    "drums": {
+      "armId": "drums-bass-kick-fusion-v1",
+      "noRetuningOnEvaluation": true
+    },
+    "lowEnd": {
+      "armId": "librosa-pyin-lowend-v1",
+      "noRetuningOnEvaluation": true
+    },
+    "basicPitch": {
+      "status": "NOT_SELECTED_NEGATIVE_DEVELOPMENT_RESULT",
+      "mayReenterThisEvaluation": false
+    }
+  },
+  "gate": {
+    "technical": "ALL_12_FAMILIES_PASS",
+    "scale": {
+      "0": "unusable",
+      "1": "weak; major correction required",
+      "2": "usable for downstream pilot with moderate correction",
+      "3": "strong; directly useful"
+    },
+    "drums": {
+      "medianUsefulnessAtLeast": 2,
+      "familiesAtOrAbove2AtLeast": 9
+    },
+    "lowEnd": {
+      "medianUsefulnessAtLeast": 2,
+      "familiesAtOrAbove2AtLeast": 9
+    },
+    "outcomeIfPass": "OPEN_OWNED_BEATS_AUDIO_TO_MIDI_BATCH_PREPARATION",
+    "outcomeIfFail": "KEEP_BATCH_CLOSED_REVIEW_FAILURES"
+  },
+  "safety": {
+    "cohortSelectionMayOpenAudio": false,
+    "cohortSelectionMayHashAudio": false,
+    "evaluationMayRetunePipeline": false,
+    "batch131Authorized": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "nextAction": "SELECT_FRESH_COHORT_METADATA_ONLY_AND_FREEZE_IDENTITIES"
+}
