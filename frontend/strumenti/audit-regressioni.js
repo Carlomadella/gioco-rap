@@ -793,15 +793,18 @@ test("il feat si sceglie in Cabina, da due porte: chi conosci gratis, la classif
   studio.includes("G.gente.push(p);") &&
   !studio.includes("function studioSezFeat()"));
 /* Le tre code dello Studio (problemi-riscontrati 15/09, chiuse il 21/09/2026):
-   il rivale e il suo contatto si legano col seed, non col nome; i rivali fra
+   il rivale e il suo contatto si legano con l'id del rivale, non col nome; i rivali fra
    i contatti non contano nel tetto della Sala; la Sala e la classifica non si
    rubano i nomi; l'opp che era gia' in classifica non si sdoppia. La cover
    orfana era gia' chiusa il 14/09 (studioCoverPulisci). */
-test("un rivale con lo stesso nome di uno della Sala si puo' chiamare: il legame col contatto e' il seed",
+test("un rivale con lo stesso nome di uno della Sala si puo' chiamare: il legame col contatto e' l'id del rivale (non il seed, che cambia a ogni uscita)",
   studio.includes("function studioRivaleContatto(r){") &&
-  studio.includes("p.rivaleSeed != null ? p.rivaleSeed === r.seed : (p.rivale && p.n === r.n)") &&
+  studio.includes("p.rivaleId != null ? p.rivaleId === r.id : (p.rivale && p.n === r.n)") &&
+  !studio.includes("rivaleSeed") &&
+  leggi("js/game/rivals.js").includes('id: "r" + Math.floor(Math.random()*1e9),') &&
+  leggi("js/game/rivals.js").includes('if(r2 && r2.city && !r2.id) r2.id = "r" + Math.floor(Math.random()*1e9);') &&
   studio.includes("return (G.rivals || []).filter(r => r && r.n && !studioRivaleContatto(r))") &&
-  studio.includes("rivaleSeed:r.seed") &&
+  studio.includes("rivaleId:r.id") &&
   !studio.includes("const noti = new Set((G.gente || []).map(p => p.n));"));
 test("chi accetta dalla classifica non ruba un posto alla Sala: il tetto conta solo la gente della Sala",
   posto.includes("function genteDellaSala(){ return (G.gente || []).filter(p => p && !p.rivale); }") &&
@@ -811,7 +814,7 @@ test("chi accetta dalla classifica non ruba un posto alla Sala: il tetto conta s
 test("la Sala e la classifica pescano dallo stesso mazzo senza omonimi, e l'opp gia' in classifica non si sdoppia",
   posto.includes("const usati = (G.gente || []).map(p => p.n).concat((G.rivals || []).map(r => r.n));") &&
   leggi("js/game/rivals.js").includes("const usati = (G.rivals||[]).map(x => x.n).concat((G.gente||[]).map(p => p.n));") &&
-  posto.includes("const gia = p.rivale && (G.rivals || []).find(r => p.rivaleSeed != null ? r.seed === p.rivaleSeed : r.n === p.n);") &&
+  posto.includes("const gia = p.rivale && (G.rivals || []).find(r => p.rivaleId != null ? r.id === p.rivaleId : r.n === p.n);") &&
   fs.existsSync(path.join(ROOT, "test/unit/studio-rivali-e-sala.test.js")));
 test("la proposta di copertina non resta orfana: renderStudio la butta se il pezzo non e' piu' in Fuori, e la memoria piena la sacrifica per prima",
   studio.includes("function studioCoverPulisci(){") &&

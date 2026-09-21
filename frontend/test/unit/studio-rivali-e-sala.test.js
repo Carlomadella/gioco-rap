@@ -1,6 +1,6 @@
 /* Le code dello Studio a cinque linguette (problemi-riscontrati 15/09, chiuse
    il 21/09/2026): un rivale della classifica con lo stesso nome di uno della
-   Sala si deve poter chiamare (il legame e' il seed, non il nome), e chi
+   Sala si deve poter chiamare (il legame e' l'id del rivale, non il nome), e chi
    accetta dalla classifica non prende un posto di quelli che la Sala fa
    arrivare. Girano studio.js, posto.js e rivals.js veri, con un `G` finto. */
 import fs from "node:fs";
@@ -57,16 +57,25 @@ describe("un rivale della classifica e il suo omonimo alla Sala", () => {
     expect(nomi.length).toBe(p.G.rivals.length);
   });
 
-  it("chi accetta entra fra i contatti col seed del rivale, e da li' non si richiama", () => {
+  it("chi accetta entra fra i contatti con l'id del rivale, e da li' non si richiama — nemmeno dopo che e' uscito con un pezzo nuovo", () => {
     const r = p.G.rivals[0];
     p.run("studioRivaleInGente(G.rivals[0])");
     const c = p.G.gente.find(x => x.rivale);
-    expect(c.rivaleSeed).toBe(r.seed);
+    expect(c.rivaleId).toBe(r.id);
     expect(p.run("studioRivaliChiamabili().map(r => r.n)")).not.toContain(r.n);
     expect(p.run("studioRivaliChiamabili().length")).toBe(p.G.rivals.length - 1);
+    r.seed = 12345;                                  // e' uscito: la copertina cambia (vitaRivali), lui no
+    expect(p.run("studioRivaliChiamabili().map(r => r.n)")).not.toContain(r.n);
   });
 
-  it("un contatto venuto dalla classifica prima del 21/09 (senza seed) vale ancora per nome", () => {
+  it("i rivali di un salvataggio vecchio prendono un id a sistemaRivali, e ognuno ha il suo", () => {
+    p.G.rivals.forEach(r => { delete r.id; });
+    p.run("sistemaRivali()");
+    expect(p.G.rivals.every(r => typeof r.id === "string" && r.id.startsWith("r"))).toBe(true);
+    expect(new Set(p.G.rivals.map(r => r.id)).size).toBe(p.G.rivals.length);
+  });
+
+  it("un contatto venuto dalla classifica prima del 21/09 (senza id) vale ancora per nome", () => {
     p.run('G.gente.push({id:"p2", ruolo:"rapper", n:G.rivals[1].n, rivale:true, rel:1})');
     expect(p.run("studioRivaliChiamabili().map(r => r.n)")).not.toContain(p.G.rivals[1].n);
   });

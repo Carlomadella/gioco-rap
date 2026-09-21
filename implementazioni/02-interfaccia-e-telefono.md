@@ -2095,10 +2095,13 @@ problemi-riscontrati del 15/09):
 - **L'omonimo.** «Dalla classifica» scartava i rivali il cui *nome* stava già in `G.gente`,
   ma la Sala e la classifica pescano dallo stesso mazzo di trenta nomi senza parlarsi: un
   «Lupo» da fama 20 alla Sala nascondeva il «Lupo» da tre milioni di ascolti in classifica.
-  Adesso il legame fra un rivale e il suo contatto è il **seed** del rivale
-  (`rivaleSeed` sulla persona, `studioRivaleContatto()` in `studio.js`); i contatti venuti
-  dalla classifica prima di oggi hanno `rivale:true` e nessun seed, e per loro vale ancora
-  il nome. Alla radice: `nuovaPersona` (`posto.js`) non pesca più un nome che sta in
+  Adesso il legame fra un rivale e il suo contatto è l'**id** del rivale — un campo nuovo
+  in `nuovoRivale`, che `sistemaRivali` dà anche ai rivali dei salvataggi vecchi; **non** il
+  `seed`, che è la copertina del suo ultimo pezzo e cambia a ogni uscita (`vitaRivali`):
+  la prima stesura di oggi legava quello, e il contatto sarebbe tornato «chiamabile» a
+  pagamento alla prima uscita del rivale — (`rivaleId` sulla persona,
+  `studioRivaleContatto()` in `studio.js`); i contatti venuti dalla classifica prima di oggi
+  hanno `rivale:true` e nessun id, e per loro vale ancora il nome. Alla radice: `nuovaPersona` (`posto.js`) non pesca più un nome che sta in
   classifica, e `nuovoRivale` (`rivals.js`) non ne pesca uno che gira alla Sala. E
   `diventaOpp` su uno che era già in classifica non ne crea un secondo con lo stesso nome:
   cambia la sua storia («Ha fatto un feat con te, poi alla Sala è finita male»).
@@ -2112,7 +2115,7 @@ problemi-riscontrati del 15/09):
   `salvaConCopertine` che sacrifica prima la proposta); l'indice di problemi-riscontrati
   non l'aveva visto. Adesso l'audit lo controlla.
 
-Prove: `test/unit/studio-rivali-e-sala.test.js`, otto con vitest sui file veri
+Prove: `test/unit/studio-rivali-e-sala.test.js`, nove con vitest sui file veri
 (`studio.js`, `posto.js`, `rivals.js`) e un dado seminato — sei fallivano sul codice di
 prima; quattro controlli nuovi nell'audit.
 

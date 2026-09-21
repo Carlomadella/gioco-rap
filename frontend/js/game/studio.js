@@ -275,15 +275,16 @@ function studioFeatProbabilita(r){
 }
 /* I rivali che si possono chiamare: quelli che non sono già fra i contatti
    (chi ha accettato una volta sta in `G.gente`, e da lì costa zero).
-   Il legame fra il rivale e il suo contatto e' il **seed** del rivale
-   (`rivaleSeed` sulla persona), non il nome: la Sala e la classifica pescano
+   Il legame fra il rivale e il suo contatto e' l'**id** del rivale
+   (`rivaleId` sulla persona; non il `seed`, che e' la copertina del suo
+   ultimo pezzo e cambia a ogni uscita), non il nome: la Sala e la classifica pescano
    dallo stesso mazzo di nomi, e un «Lupo» da fama 20 alla Sala non e' il
    «Lupo» da tre milioni di ascolti in classifica — col nome da solo quello in
    classifica spariva da «Dalla classifica» senza dirlo (problemi-riscontrati,
    15/09; chiuso il 21/09). I contatti venuti dalla classifica prima del 21/09
-   hanno `rivale:true` e nessun seed: per loro vale ancora il nome. */
+   hanno `rivale:true` e nessun id: per loro vale ancora il nome. */
 function studioRivaleContatto(r){
-  return (G.gente || []).find(p => p && (p.rivaleSeed != null ? p.rivaleSeed === r.seed : (p.rivale && p.n === r.n))) || null;
+  return (G.gente || []).find(p => p && (p.rivaleId != null ? p.rivaleId === r.id : (p.rivale && p.n === r.n))) || null;
 }
 function studioRivaliChiamabili(){
   return (G.rivals || []).filter(r => r && r.n && !studioRivaleContatto(r))
@@ -307,7 +308,7 @@ function studioRivaleInGente(r){
     scoperto:false, rel:1, pt:0, ult:-1, feat:-99,
     skin:r.skin, hair:r.hair, col:r.col,
     rivale:true,                      /* viene dalla classifica, non dalla Sala */
-    rivaleSeed:r.seed                 /* QUALE rivale: il nome da solo non basta */
+    rivaleId:r.id                     /* QUALE rivale: il nome da solo non basta */
   };
   if(!G.gente) G.gente = [];
   G.gente.push(p);

@@ -826,7 +826,7 @@ function diventaOpp(p){
   p.via = true;
   /* se era gia' in classifica (venuto da li', studio.js) non ne nasce un
      secondo con lo stesso nome: quello che c'e' cambia storia */
-  const gia = p.rivale && (G.rivals || []).find(r => p.rivaleSeed != null ? r.seed === p.rivaleSeed : r.n === p.n);
+  const gia = p.rivale && (G.rivals || []).find(r => p.rivaleId != null ? r.id === p.rivaleId : r.n === p.n);
   if(gia){
     gia.storia = "Ha fatto un feat con te, poi alla Sala è finita male.";
   } else if(typeof nuovoRivale === "function"){

@@ -74,8 +74,8 @@ diventata una regola (lo sconto scritto è quello vero).
    stesso nome di uno della Sala non si può chiamare**, **chi accetta dalla classifica occupa
    un posto della Sala**; e dal 14/09 **la copertina proposta e non confermata resta nel
    salvataggio, foto compresa**.~~ **RISOLTO (21/09/2026)** — le prime due nel branch
-   `task/studio-le-tre-code` (il legame rivale ↔ contatto è il seed, la Sala conta solo la
-   sua gente); la copertina era già chiusa il 14/09 (`e288634`) e l'indice non l'aveva visto.
+   `task/studio-le-tre-code` (il legame rivale ↔ contatto è l'id del rivale, la Sala conta
+   solo la sua gente); la copertina era già chiusa il 14/09 (`e288634`) e l'indice non l'aveva visto.
 9. **Di traverso** (844 × 390) il telefono alzato si usa, ma resta da **decidere se il gioco
    sugli store gira anche in orizzontale**: nel repo non c'è un manifest né un
    `orientation`. Nell'altro foglio sta fra «le decisioni tue».
@@ -2491,12 +2491,14 @@ lo schermo è un telefono» in `implementazioni/02-interfaccia-e-telefono.md`.
 - **come si vede** — partita dove alla Sala c'è un rapper con un nome che sta anche in
   classifica: in Cabina, sotto «Dalla classifica», quel nome manca.
 - **quanto pesa** — da sistemare con calma.
-- **RISOLTO (21/09/2026)** — branch `task/studio-le-tre-code`: il legame è il **seed** del rivale
-  (`rivaleSeed` sulla persona, `studioRivaleContatto` in `studio.js`); i contatti
-  venuti dalla classifica prima di oggi (`rivale:true` senza seed) valgono ancora per
+- **RISOLTO (21/09/2026)** — branch `task/studio-le-tre-code`: il legame è l'**id** del rivale
+  (`id` nuovo in `nuovoRivale`, dato anche ai rivali dei salvataggi vecchi da
+  `sistemaRivali`; `rivaleId` sulla persona, `studioRivaleContatto` in `studio.js`) — non
+  il `seed`, che è la copertina del suo ultimo pezzo e cambia a ogni uscita; i contatti
+  venuti dalla classifica prima di oggi (`rivale:true` senza id) valgono ancora per
   nome. In più la Sala non pesca più un nome che sta in classifica e la classifica non ne
   pesca uno della Sala (stesso mazzo, `nuovaPersona`/`nuovoRivale`), e `diventaOpp` su
-  uno che era già in classifica non ne crea un secondo: cambia la sua storia. Otto prove
+  uno che era già in classifica non ne crea un secondo: cambia la sua storia. Nove prove
   in `test/unit/studio-rivali-e-sala.test.js` (sei fallivano sul codice di prima).
 
 ### «Dalla classifica» mostra solo i sei più grossi, cioè quelli che dicono di no
