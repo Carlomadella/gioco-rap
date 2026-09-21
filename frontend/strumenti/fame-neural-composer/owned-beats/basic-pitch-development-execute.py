@@ -214,6 +214,11 @@ def validate_receipt(workspace: Path, run_id: str, frozen):
         or receipt.get("environmentLockSha256") != frozen["lockSha256"]
         or receipt.get("model", {}).get("sha256")
         != frozen["execution"]["package"]["modelSha256"]
+        or receipt.get("model", {}).get("filename")
+        != frozen["execution"]["package"]["modelFilename"]
+        or receipt.get("receiptRunner", {}).get("gitBlobSha")
+        != frozen["execution"]["receiptRunner"]["gitBlobSha"]
+        or receipt.get("inference") != frozen["execution"]["inference"]
         or receipt.get("humanReview", {}).get("submissionDigestSha256")
         != frozen["protocol"]["prerequisite"]["humanReviewSubmissionDigestSha256"]
         or receipt.get("safety", {}).get("split") != "development"
