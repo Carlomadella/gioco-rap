@@ -1398,3 +1398,22 @@ Classificazione ufficiale del caso:
 - nessun retuning post-hoc di pYIN viene introdotto sulla base di questa review.
 
 L'integrazione selezionata usa `drums-bass-kick-fusion-v1` + `librosa-pyin-lowend-v1`. Il run `audio-to-midi-selected-integration-v1-001` deve copiare byte-identici i MIDI selezionati, conservare SHA/provenance e ricavare automaticamente dal submission v2 l'ID della family con score 1. Final holdout, batch 131, training e task-data readiness restano chiusi.
+
+## NDR-088 — Audio→MIDI selected integration: 8/8 creata, FAME000040 known issue upstream
+
+**Stato: ACCEPTED — 21 settembre 2026.**
+
+Il run `audio-to-midi-selected-integration-v1-001` ha completato 8/8 family con:
+
+- drums: `drums-bass-kick-fusion-v1`;
+- low-end: `librosa-pyin-lowend-v1`;
+- `knownIssueSourceRecordId=FAME000040`;
+- `knownIssueClassification=UPSTREAM_SOURCE_SEPARATION_CONTAMINATION`;
+- nessuna ritrascrizione;
+- nessuna ricodifica MIDI;
+- final holdout non acceduto;
+- batch131 non acceduto;
+- training non autorizzato;
+- task-data readiness non dichiarabile.
+
+La chiusura tecnica richiede un verifier post-output read-only che controlli 8/8 `selection.json`, 16/16 MIDI byte-identici alla baseline selezionata, provenance e punteggi, e l'unicità del known issue `FAME000040`. Il blocco non viene dichiarato chiuso prima di tale PASS e della ricerca di chiusura prevista da NDR-026.
