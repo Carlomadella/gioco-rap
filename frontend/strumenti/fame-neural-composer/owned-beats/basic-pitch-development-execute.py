@@ -169,7 +169,7 @@ def validate_repository_freeze():
         != execution["environment"]["repositoryLockSha256"]
         or protocol.get("environment", {}).get("packagedModel", {}).get("sha256")
         != execution["package"]["modelSha256"]
-        or implementation.get("executionContractSha256") != sha256_file(EXECUTION_CONTRACT_FILE)
+        or implementation.get("executionContractGitBlobSha") != git_blob_sha1(EXECUTION_CONTRACT_FILE)
     ):
         raise RuntimeError("Basic Pitch repository freeze no longer matches execution implementation")
 
