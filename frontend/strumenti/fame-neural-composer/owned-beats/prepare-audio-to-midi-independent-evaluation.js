@@ -15,6 +15,11 @@ const IDENTITY_FIELDS=["compositionFamilyId","sourceRecordId","sourceAssetId","s
 function readJson(file){return JSON.parse(fs.readFileSync(file,"utf8").replace(/^\uFEFF/,""))}
 function stableJson(value){return JSON.stringify(value,null,2)+"\n"}
 function sha256Text(value){return crypto.createHash("sha256").update(value).digest("hex")}
+function gitBlobSha(file){
+  const text=fs.readFileSync(file,"utf8").replace(/\r\n/g,"\n");
+  const bytes=Buffer.from(text,"utf8");
+  return crypto.createHash("sha1").update(Buffer.from("blob "+bytes.length+"\0","utf8")).update(bytes).digest("hex");
+}
 function identity(record){
   const out={};
   for(const field of IDENTITY_FIELDS){
@@ -63,7 +68,9 @@ function validateProtocol(){
     p.safety?.evaluationMayRetunePipeline!==false||
     p.safety?.batch131Authorized!==false||
     p.safety?.trainingAuthorized!==false||
-    p.safety?.taskDataReadyMayBeDeclared!==false
+    p.safety?.taskDataReadyMayBeDeclared!==false||
+    p.implementation?.selectorPath!==path.basename(__filename)||
+    p.implementation?.selectorGitBlobSha!==gitBlobSha(__filename)
   ) throw new Error("Independent Audio→MIDI evaluation protocol mismatch");
   return p;
 }
