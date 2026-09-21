@@ -1,0 +1,62 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-selected-integration-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_FIRST_SELECTED_INTEGRATION_OUTPUT",
+  "runId": "audio-to-midi-selected-integration-v1-001",
+  "split": "development",
+  "expectedFamilies": 8,
+  "sourceRun": {
+    "runId": "audio-to-midi-development-baseline-v1-001",
+    "summary": "runs/audio-to-midi-development-baseline/audio-to-midi-development-baseline-v1-001/summary.json"
+  },
+  "selection": {
+    "drums": {
+      "armId": "drums-bass-kick-fusion-v1",
+      "sourceField": "drumsBassKickFusion",
+      "sourceMidiFile": "drums-bass-kick-fusion.mid",
+      "destinationMidiFile": "drums.mid",
+      "requiredReviewId": "audio-to-midi-human-review-v1-001",
+      "requiredSubmissionDigestSha256": "52e7803b56fee6a6a7dea7546b7a6c6c38fdb86b01b6861f07a5a96882518f0d"
+    },
+    "lowEnd": {
+      "armId": "librosa-pyin-lowend-v1",
+      "sourceField": "lowEndPyin",
+      "sourceMidiFile": "bass-pyin.mid",
+      "destinationMidiFile": "low-end.mid",
+      "requiredReviewId": "basic-pitch-lowend-blind-comparison-v1-002",
+      "requiredPackageDigestSha256": "1468bf17fedbacd27bceffaccc48540db6c3664d2c5e747511763b61206113a1",
+      "requiredSubmissionDigestSha256": "0c964c9591a3eb8060e3b8dfd3385cc8d572e21718add4059138f045f291b7a8",
+      "requiredOutcome": "KEEP_PYIN_LOW_END",
+      "requiredStats": {
+        "medianUsefulness": 2,
+        "familiesAtOrAbove2": 7,
+        "totalUsefulness": 17,
+        "pass": true
+      }
+    }
+  },
+  "knownIssuePolicy": {
+    "expectedBelowThresholdLowEndFamilies": 1,
+    "expectedScore": 1,
+    "classification": "UPSTREAM_SOURCE_SEPARATION_CONTAMINATION",
+    "rootCauseLayer": "source-separation",
+    "reviewerConfirmedCause": "tonal lead residuals overlap the 808 frequency region in the separated bass stem and are consequently transcribed into the low-end MIDI",
+    "transcriptionRootCause": false,
+    "retainAsDevelopmentRegressionCase": true,
+    "noPostHocRetuningFromThisDevelopmentReview": true
+  },
+  "integration": {
+    "noRetranscription": true,
+    "noMidiReencoding": true,
+    "copySelectedMidiByteIdentical": true,
+    "perFamilySelectionJson": true,
+    "appendOnly": true
+  },
+  "safety": {
+    "finalHoldoutAllowed": false,
+    "batch131Allowed": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "nextAfterIntegration": "VERIFY_SELECTED_INTEGRATION_AND_CLOSE_AUDIO_TO_MIDI_DEVELOPMENT_BLOCK"
+}
