@@ -886,7 +886,7 @@ function studioSezBeat(){
   } else {
     mid = stPan("",
       stCapo("Il beat", banco ? "tre sul banco" : "non te lo fa nessuno", "") +
-      '<p class="stnota">Senza qualcuno che te lo faccia resta lo Shop: tre beat sul banco, ' +
+      '<p class="stnota">Senza qualcuno che te lo faccia resta il banco: tre beat qui sotto, ' +
       'da comprare. Non serve conoscere nessuno, e non costa energia — ci vogliono due ore.</p>' +
       banco +
       stAzioni(
@@ -1074,7 +1074,7 @@ function studioSezCabina(){
     mid = stPan("",
       stCapo("Incidi", "manca il beat", "") +
       '<p class="stnota">Hai la strofa, non su cosa metterla. Te lo fai fare al <b>Beat</b>, ' +
-        'da uno che conosci, oppure lo compri allo Shop.</p>');
+        'da uno che conosci, oppure lo compri dal banco.</p>');
   }
   if(ultimo) mid = stCoda(mid, studioFalloSapereRiga(ultimo, da));
 

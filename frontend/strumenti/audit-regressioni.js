@@ -1759,23 +1759,44 @@ test("nessun foglio di stile parla ancora di pfrec o di .pspot.qui",
   })());
 
 console.log("\nPunto 4 — lo Shop è uno shop, non un menù impostazioni");
-test("Attrezzatura e Beat sono card (.shcard/.shbeat), non righe di lista (.li)",
-  ui.includes('"shcard') && ui.includes('"shbeat') &&
-  !/\$\("g-shop"\)\.innerHTML\s*=\s*GEAR\.map\(g2 => \{[^}]*<div class="li"/.test(ui));
-test("ogni pezzo di attrezzatura ha un'icona propria (cuffie, mic, manopole, altoparlante, barre)",
-  ui.includes("SH_GEAR_ICONE") &&
-  ui.includes('cuffie:"cuffie"') && ui.includes('monitor:"altoparlante"') &&
-  hub.includes("cuffie:'<path") && hub.includes("altoparlante:'<path"));
+/* Dal 21/09/2026 lo Shop vende solo vestiti (CARLO: «i beat non devono stare
+   nello shop», «l'attrezzatura non serve se andiamo in studio a registrare»):
+   il banco dei beat e la vetrina dell'attrezzatura, che erano due reparti
+   dietro tre linguette, sono usciti; al posto delle linguette ci sono i
+   filtri per tipologia dei Vestiti. I capi restano card (.shcard). */
+test("i vestiti sono card (.shcard), non righe di lista (.li)",
+  negozio.includes('<button class="shcard shfit') && !negozio.includes('<div class="li"'));
 test("la cassa dello shop si vede sempre, non solo scorrendo fino in fondo",
   ui.includes('$("sh-cash")') && ui.includes("fmt(G.money)"));
-test("Attrezzatura, Beat e Vestiti sono tre reparti dietro tre linguette, non liste impilate",
-  index.includes('data-sh="gear"') && index.includes('data-sh="beat"') && index.includes('data-sh="fit"') &&
-  index.includes('data-shsec="gear"') && index.includes('data-shsec="beat"') && index.includes('data-shsec="fit"') &&
-  (index.match(/\bdata-sh="/g) || []).length === 3 &&
-  (index.match(/\bdata-shsec="/g) || []).length === 3 &&
-  negozio.includes('const shTabs = $("sh-tabs")') &&
-  negozio.includes('shTabs.addEventListener("click"') &&
-  negozio.includes("s.dataset.shsec === b.dataset.sh"));
+test("lo Shop ha un reparto solo, i Vestiti: niente linguette dei reparti, niente banco dei beat, niente attrezzatura",
+  !index.includes('data-sh="') && !index.includes('data-shsec="') &&
+  !index.includes('id="g-shop"') && !index.includes('id="g-market"') &&
+  index.includes('<div class="shtabs" id="sh-filtri"></div>') && index.includes('<div id="g-fit"></div>') &&
+  !ui.includes('$("g-market")') && !ui.includes('$("g-shop")') && !ui.includes("SH_GEAR_ICONE") &&
+  !negozio.includes("sh-tabs") &&
+  !leggi("css/game.css").includes(".shsec{") && !leggi("css/game.css").includes(".shbeat{"));
+test("i filtri dei Vestiti: una pastiglia per tipologia piu' «Tutti», e quella schiacciata mostra solo quel tipo",
+  negozio.includes('let SH_FIT_FILTRO = "tutti";') &&
+  negozio.includes("function shFitFiltri(){") &&
+  negozio.includes('const voci = [["tutti", "Tutti", VETRINA_VESTITI]].concat(') &&
+  negozio.includes("VETRINA_REPARTI.map(([slot, nome]) => [slot, nome, VETRINA_VESTITI.filter(v => v.slot === slot)])") &&
+  negozio.includes('const reparti = SH_FIT_FILTRO === "tutti" ? VETRINA_REPARTI : VETRINA_REPARTI.filter(([slot]) => slot === SH_FIT_FILTRO);') &&
+  negozio.includes("SH_FIT_FILTRO = btn.dataset.filtro;") &&
+  negozio.includes('aria-pressed="'));
+test("l'attrezzatura non esiste piu': niente GEAR, niente bonus sulla qualita', la sala costa 50 a tutti, l'inventario del telefono ha tre linguette",
+  !leggi("js/game/content.js").includes("const GEAR = [") &&
+  !actions.includes("gearBonus") && !actions.includes("G.gear") &&
+  actions.includes("const songQ = (bar, beat) => clamp((bar.q*0.45 + beat.q*0.33 + G.skills.flow*0.35) * wellFactor(), 5, 100);") &&
+  actions.includes("const mixGain = () => Math.round(6 + G.skills.flow*0.06)") &&
+  actions.includes("   money:() => 50,") && actions.includes("       G.money -= 50;") &&
+  !leggi("js/game/telefono.js").includes('"Attrezz."') &&
+  !leggi("js/game/events.js").includes("delete G.gear[k]"));
+test("i beat si cercano allo Studio: nessun testo del gioco manda piu' allo Shop per un beat",
+  actions.includes("Sono sul banco dello Studio, nella stanza «Il beat».") &&
+  !leggi("js/game/posto.js").includes("banco dello Shop") &&
+  !studio.includes("lo compri allo Shop") &&
+  ui.includes("nessuno: i beat si cercano allo Studio") &&
+  hub.includes('"Vestiti e accessori per il tuo artista."'));
 /* Il reparto Vestiti (20/09/2026): lo Shop sblocca, il camerino veste. Il
    vecchio abbigliamento 2D (congelato il 09/09) vestiva un ritratto che non
    c'e' piu'; questo vende capi veri del camerino MakeHuman
@@ -1812,9 +1833,6 @@ test("landing e gioco caricano il guardaroba, e il ponte del creator carica il c
   !leggi("js/creator/rpg-v24-bridge.js").includes("creator.html?v=25"));
 test("con un avatar Avaturn lo Shop lo dice, invece di vendere vestiti che non si vedranno",
   negozio.includes("guardarobaVestibile()") && negozio.includes('art.avatarSource === "avaturn"'));
-test("comprare attrezzatura e beat resta la stessa economia di prima: stesso costo, stesso G.money, stesso G.gear/G.beats",
-  ui.includes("G.money -= g2.p; G.gear[g2.id] = true;") &&
-  ui.includes("G.money -= b.price; G.market.splice(i,1); G.beats.push("));
 
 /* «Lo stile che conta» (21/09/2026, CARLO «Shop (20/09/2026)» 1): ogni capo
    addosso — letto da makehumanState.slots — vale un punto di hype a settimana
@@ -2268,8 +2286,10 @@ test("chi ha un nome passa la sua fama a creaBeat: Sala, Studio, chat, chi si ri
   chatjs.includes("creaBeat(p.gen || mioGenere(), q, presi, p.fama)") &&
   transfers.includes("Math.random() * 16, presi, p.fama)") &&
   studio.includes("fasciaBeatmaker(p.fama).min"));
-test("la fascia si legge sulla card del beat, nello Studio e sul banco",
-  studioEl.includes("fasciaBeat(b)") && ui.includes("fasciaBeat(b)") &&
+/* il banco vecchio dello Shop (ui.js) non c'e' piu' dal 21/09/2026: la card
+   e' solo quella dello Studio */
+test("la fascia si legge sulla card del beat, nello Studio",
+  studioEl.includes("fasciaBeat(b)") &&
   beatsJs.includes("const fasciaBeat = b =>"));
 test("si parte con tutti i parametri a 1",
   state.includes("skills:{scrittura:1, flow:1, presenza:1, rete:1}"));

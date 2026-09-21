@@ -24,7 +24,7 @@ cita (la catena del pezzo) e il «punto 4 di ALE» di
 
 | quando | quante |
 | --- | --- |
-| 21/09/2026 | 3 |
+| 21/09/2026 | 4 |
 | 20/09/2026 | 9 |
 | 15/09/2026 | 6 |
 | 07/09/2026 | 6 |
@@ -36,7 +36,21 @@ cita (la catena del pezzo) e il «punto 4 di ALE» di
 
 _Le due piccole dell'energia, chiuse insieme nel branch `task/sala-gratis-e-take-a-25`:
 la Sala che non costa più niente e la take che costava troppo. Poi la prima delle tre dello
-Shop, «Lo stile che conta», nel branch `task/shop-lo-stile-che-conta`._
+Shop, «Lo stile che conta», nel branch `task/shop-lo-stile-che-conta`; e la richiesta
+arrivata subito dopo — solo vestiti, coi filtri — chiusa in giornata._
+
+### Lo Shop vende solo vestiti, coi filtri
+
+_Da Carlo, a voce, il 21/09/2026: non è mai passata dal foglio._
+
+- i beat non devono stare nello shop, inoltre nei vestiti suddividimi tutto e creami dei pulsanti tipo filtri che se schiacciati fanno vedere solo quella tipologia di abbigliamento, l'attrezzatura non serve se andiamo in studio a registrare
+
+  **FATTO (21/09/2026)** — lo Shop ha un reparto solo, i Vestiti, e al posto delle
+  linguette le pastiglie dei filtri (Tutti, Cappelli, Occhiali, Gioielli, Parte alta, Parte
+  bassa, Scarpe, Altro, col numero dei capi). I beat si cercano allo Studio, dallo stesso
+  banco. L'attrezzatura non esiste più, e con lei i suoi effetti: la qualità del pezzo e il
+  mix non la sommano, la sala costa 50 € a tutti. Il racconto: «Lo Shop vende solo vestiti,
+  coi filtri per tipologia» in `02-interfaccia-e-telefono.md`.
 
 ### Lo stile che conta
 
