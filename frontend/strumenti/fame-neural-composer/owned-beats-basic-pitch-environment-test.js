@@ -12,8 +12,12 @@ const prepare=fs.readFileSync(path.join(owned,"prepare-basic-pitch-environment.p
 const doctor=fs.readFileSync(path.join(owned,"basic-pitch-environment-doctor.py"),"utf8");
 
 assert.equal(spec.schema,"fame-owned-beats-basic-pitch-environment-v1");
-assert.equal(spec.status,"BOOTSTRAP_PENDING_EXACT_TRANSITIVE_LOCK");
+assert.equal(spec.status,"BOOTSTRAP_COMPLETE_AWAITING_EXACT_TRANSITIVE_LOCK_COMMIT");
 assert.equal(spec.python.requiredMajorMinor,"3.10");
+assert.equal(spec.python.observedVersion,"3.10.11");
+assert.equal(spec.runtime.observedOnnxRuntimeVersion,"1.23.2");
+assert.equal(spec.runtime.packagedModel.sha256,"2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec");
+assert.equal(spec.lock.sourcePipFreezeAllSha256,"9374ac7a60f9ba6cc97ae14f9b8627c527bb3ef70833d27e95340d45ff69aa7f");
 assert.equal(spec.package.version,"0.4.0");
 assert.equal(spec.package.repositoryTag,"v0.4.0");
 assert.equal(spec.package.repositoryCommit,"9991303bba609a3b93089d13ec80d1d495083596");
@@ -30,7 +34,7 @@ assert.equal(spec.freezePolicy.capturePipFreezeAll,true);
 assert.equal(spec.freezePolicy.capturePackagedModelSha256,true);
 
 assert.equal(protocol.schema,"fame-owned-beats-basic-pitch-lowend-candidate-protocol-v1");
-assert.equal(protocol.status,"ENVIRONMENT_BOOTSTRAP_PENDING_BEFORE_FIRST_INFERENCE");
+assert.equal(protocol.status,"ENVIRONMENT_BOOTSTRAP_COMPLETE_AWAITING_LOCK_COMMIT");
 assert.equal(protocol.candidateId,"basic-pitch-0.4.0-lowend-v1");
 assert.equal(protocol.package.repositoryTagCommit,"9991303bba609a3b93089d13ec80d1d495083596");
 assert.equal(protocol.prerequisite.selectedDrumsArm,"drums-bass-kick-fusion-v1");
