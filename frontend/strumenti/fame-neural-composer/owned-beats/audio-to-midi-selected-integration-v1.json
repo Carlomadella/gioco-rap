@@ -77,5 +77,10 @@
       "selection.json"
     ],
     "summary": "summary.json"
+  },
+  "implementation": {
+    "runnerPath": "audio-to-midi-selected-integration.js",
+    "runnerGitBlobSha": "aff86ecca58a8d4cf16b87e79578fa7bf4a6d149",
+    "implementationCommit": "53232427b1465cbbdc4fe6ed10608974b0aac36e"
   }
 }
