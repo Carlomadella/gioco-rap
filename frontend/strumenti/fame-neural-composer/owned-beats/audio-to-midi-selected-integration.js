@@ -124,9 +124,9 @@ function validateDrumsReview(workspace,p){
 }
 function validateLowEndReview(workspace,p){
   const root=path.join(workspace,"reviews","basic-pitch-lowend-comparison",LOWEND_REVIEW_ID);
-  const reportFile=path.join(root,"report.json"),submissionFile=path.join(root,"submission.json");
-  if(!fs.existsSync(reportFile)||!fs.existsSync(submissionFile))throw new Error("Selected low-end comparison artifacts missing");
-  const report=readJson(reportFile),submission=readJson(submissionFile),sel=p.selection.lowEnd;
+  const reportFile=path.join(root,"report.json"),submissionFile=path.join(root,"submission.json"),packageFile=path.join(root,"review-package.json");
+  if(!fs.existsSync(reportFile)||!fs.existsSync(submissionFile)||!fs.existsSync(packageFile))throw new Error("Selected low-end comparison artifacts missing");
+  const report=readJson(reportFile),submission=readJson(submissionFile),pkg=readJson(packageFile),sel=p.selection.lowEnd;
   if(
     report.schema!=="fame-owned-beats-basic-pitch-lowend-comparison-report-v2"||
     report.version!==2||
@@ -134,7 +134,14 @@ function validateLowEndReview(workspace,p){
     report.records!==8||
     report.packageDigestSha256!==sel.requiredPackageDigestSha256||
     report.submissionDigestSha256!==sel.requiredSubmissionDigestSha256||
+    sha256File(packageFile)!==sel.requiredPackageDigestSha256||
     sha256File(submissionFile)!==sel.requiredSubmissionDigestSha256||
+    pkg.schema!=="fame-owned-beats-basic-pitch-lowend-comparison-package-v2"||
+    pkg.version!==2||
+    pkg.reviewId!==LOWEND_REVIEW_ID||
+    pkg.renderer?.outputDurationSource!=="reference-bass-stem"||
+    pkg.renderer?.outputDurationMustMatchReference!==true||
+    pkg.renderer?.silenceAfterLastDetectedEventPreserved!==true||
     report.gate?.technical!=="ALL_8_FAMILIES_PASS"||
     report.gate?.lowEndComparison?.selectedArm!==sel.armId||
     report.gate?.lowEndComparison?.pass!==true||
@@ -168,7 +175,7 @@ function validateLowEndReview(workspace,p){
     below.length!==p.knownIssuePolicy.expectedBelowThresholdLowEndFamilies||
     below[0]?.[1]!==p.knownIssuePolicy.expectedScore
   ) throw new Error("Known low-end development issue count/score mismatch");
-  return{reportFile,submissionFile,report,submission,scores,knownIssueSourceRecordId:below[0][0]};
+  return{reportFile,submissionFile,packageFile,report,submission,pkg,scores,knownIssueSourceRecordId:below[0][0]};
 }
 function validateBaseline(workspace,p){
   const root=baselineRoot(workspace),summaryFile=path.join(root,"summary.json");
@@ -335,6 +342,7 @@ function execute(workspaceRoot,runId=DEFAULT_RUN_ID){
         baselineSummarySha256:sha256File(baseline.summaryFile),
         drumsReviewReportSha256:sha256File(drums.reportFile),
         drumsReviewSubmissionSha256:sha256File(drums.submissionFile),
+        lowEndReviewPackageSha256:sha256File(low.packageFile),
         lowEndReviewReportSha256:sha256File(low.reportFile),
         lowEndReviewSubmissionSha256:sha256File(low.submissionFile)
       },
