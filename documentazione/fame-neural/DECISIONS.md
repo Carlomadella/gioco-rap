@@ -1302,3 +1302,28 @@ Il receipt conferma:
 - final holdout, batch 131 e training esclusi.
 
 Da questo checkpoint contract v3, receipt runner v3 ed executor v3 sono considerati congelati per il primo output. Il prossimo passo autorizzato è l'esecuzione append-only del run v1-003.
+
+## NDR-084 — Basic Pitch: v1-003 inference 8/8 completa; QA e blind comparison aperti
+
+**Stato: ACCEPTED — 21 settembre 2026.**
+
+Il run `basic-pitch-development-inference-v1-003` ha completato 8/8 family con stato `INFERENCE_COMPLETE_AWAITING_TECHNICAL_AND_HUMAN_QA`.
+
+Evidenze del run:
+
+- modello ONNX caricato una sola volta;
+- raw model output non persistito;
+- 8 result family e relativi MIDI prodotti append-only;
+- final holdout non acceduto;
+- batch 131 non acceduto;
+- training non autorizzato;
+- task-data readiness non dichiarabile.
+
+Prima della promozione low-end sono obbligatori:
+
+1. technical QA read-only sul summary, 8 result, input stem SHA e 8 MIDI;
+2. blind Human QA `librosa-pyin-lowend-v1` vs `basic-pitch-0.4.0-lowend-v1` sugli stessi 8 bass stem;
+3. qualification di ciascun arm: mediana usefulness >=2 e almeno 6/8 family con score >=2;
+4. selezione: mediana, poi count >=2, poi score totale; parità completa -> pYIN.
+
+Per il rendering blind si usa lo stesso oscillatore neutrale per entrambi gli arm. pYIN usa i note boundaries congelati più il pitch contour; Basic Pitch usa i note boundaries congelati più i pitch bend, che in Basic Pitch 0.4.0 sono espressi in unità da 1/3 di semitono. Nessun final holdout viene aperto da questa review.
