@@ -18,6 +18,7 @@ const AUDIO_ANALYSIS_RUN_ID="v2-config-001-development-001";
 
 function readJson(file){return JSON.parse(fs.readFileSync(file,"utf8").replace(/^\uFEFF/,""))}
 function sha256File(file){const h=crypto.createHash("sha256");const fd=fs.openSync(file,"r");try{const b=Buffer.allocUnsafe(1024*1024);while(true){const n=fs.readSync(fd,b,0,b.length,null);if(!n)break;h.update(b.subarray(0,n))}}finally{fs.closeSync(fd)}return h.digest("hex")}
+function canonicalGitBlobSha(file){const text=fs.readFileSync(file,"utf8").replace(/\r\n/g,"\n"),bytes=Buffer.from(text,"utf8"),header=Buffer.from("blob "+bytes.length+"\0","utf8");return crypto.createHash("sha1").update(header).update(bytes).digest("hex")}
 function safeId(v,label){if(typeof v!=="string"||!/^[A-Za-z0-9][A-Za-z0-9._-]{2,79}$/.test(v))throw new Error(label+" invalid");return v}
 function isWithin(root,target){const rel=path.relative(root,target);return rel===""||(!rel.startsWith("..")&&!path.isAbsolute(rel))}
 function resolveWithin(root,relative,label){if(typeof relative!=="string"||!relative.trim()||path.isAbsolute(relative))throw new Error("Unsafe "+label+" relative path");const target=path.resolve(root,relative);if(!isWithin(root,target))throw new Error(label+" path escapes workspace");return target}
@@ -52,13 +53,17 @@ function validateContract(contract){
    contract.scope?.batch131Authorized!==false||
    contract.scope?.trainingAuthorized!==false||
    contract.scope?.taskDataReadyMayBeDeclared!==false||
-   contract.output?.runId!==DEFAULT_RUN_ID
+   contract.output?.runId!==DEFAULT_RUN_ID||
+   contract.receiptRunner?.path!==path.basename(__filename)||
+   typeof contract.receiptRunner?.gitBlobSha!=="string"||
+   !/^[0-9a-f]{40}$/.test(contract.receiptRunner.gitBlobSha)
  ) throw new Error("Unsupported or unsafe Basic Pitch execution contract");
  return contract;
 }
 
 function validateRepo(){
  const protocol=readJson(PROTOCOL_FILE),env=readJson(ENV_SPEC_FILE),contract=validateContract(readJson(CONTRACT_FILE));
+ const runnerGitBlobSha=canonicalGitBlobSha(__filename);
  if(
    protocol.status!=="ENVIRONMENT_AND_MODEL_FROZEN_AWAITING_PREINFERENCE_VERIFY"||
    env.status!=="EXACT_TRANSITIVE_LOCK_COMMITTED"||
@@ -66,14 +71,16 @@ function validateRepo(){
    env.lock?.reviewed!==true||
    sha256File(LOCK_FILE)!==contract.environment.repositoryLockSha256||
    protocol.environment?.repositoryLockSha256!==contract.environment.repositoryLockSha256||
-   protocol.environment?.packagedModel?.sha256!==contract.package.modelSha256
+   protocol.environment?.packagedModel?.sha256!==contract.package.modelSha256||
+   runnerGitBlobSha!==contract.receiptRunner.gitBlobSha
  ) throw new Error("Basic Pitch repository freeze no longer matches execution contract");
  return{
    protocol,env,contract,
    protocolSha256:sha256File(PROTOCOL_FILE),
    environmentSpecSha256:sha256File(ENV_SPEC_FILE),
    contractSha256:sha256File(CONTRACT_FILE),
-   lockSha256:sha256File(LOCK_FILE)
+   lockSha256:sha256File(LOCK_FILE),
+   runnerGitBlobSha
  };
 }
 
@@ -173,6 +180,7 @@ function prepare(workspaceRoot,runId=DEFAULT_RUN_ID){
    executionContractSha256:frozen.contractSha256,
    environmentSpecSha256:frozen.environmentSpecSha256,
    environmentLockSha256:frozen.lockSha256,
+   receiptRunner:{path:path.basename(__filename),gitBlobSha:frozen.runnerGitBlobSha},
    environmentReceipt:{
      runId:ENV_RUN_ID,
      receiptSha256:sha256File(environment.file),
@@ -261,6 +269,7 @@ function check(workspaceRoot,runId=DEFAULT_RUN_ID){
    receipt.executionContractSha256!==frozen.contractSha256||
    receipt.environmentSpecSha256!==frozen.environmentSpecSha256||
    receipt.environmentLockSha256!==frozen.lockSha256||
+   receipt.receiptRunner?.gitBlobSha!==frozen.runnerGitBlobSha||
    receipt.model?.sha256!==frozen.contract.package.modelSha256||
    receipt.humanReview?.submissionDigestSha256!==frozen.protocol.prerequisite.humanReviewSubmissionDigestSha256||
    !Array.isArray(receipt.sources)||receipt.sources.length!==8||
@@ -294,4 +303,4 @@ function main(args=process.argv.slice(2)){
  process.stdout.write(JSON.stringify(result,null,2)+"\n");
 }
 if(require.main===module){try{main()}catch(error){console.error(error.message);process.exitCode=1}}
-module.exports={prepare,check,validateContract,validateRepo,bpmBySource};
+module.exports={prepare,check,validateContract,validateRepo,bpmBySource,canonicalGitBlobSha};
