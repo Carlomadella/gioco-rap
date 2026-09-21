@@ -1950,3 +1950,22 @@ Prossimo passaggio:
 `PREFLIGHT METADATA-ONLY → RESERVE 12 FAMILY / ASSIGN SPLIT → FREEZE EXECUTION → SOURCE SEPARATION + AUDIO→MIDI ONCE → TECHNICAL/HUMAN GATE`
 
 Il batch completo e il training restano chiusi fino all'esito della nuova evaluation indipendente.
+
+### Evaluation Audio→MIDI indipendente — reservation ed execution freeze — 21 settembre 2026
+
+Reservation completata:
+
+- 12/12 family assegnate a `audio-to-midi-evaluation-v1`;
+- 0 foreign record nello split;
+- audio access: 0;
+- remaining unassigned fresh family dopo reservation: 91.
+
+Execution congelata prima dell'audio:
+
+`audio-analysis-v2-config-001 BPM → HTDemucs frozen → drums-bass-kick-fusion-v1 + librosa-pyin-lowend-v1`.
+
+Sequenza restante:
+
+`EXECUTION RECEIPT NO-AUDIO → RUN ONCE 12 FAMILY → TECHNICAL QA → BLIND HUMAN QA → GATE 9/12 + MEDIAN>=2 PER ENTRAMBI I RAMI`.
+
+Solo un PASS del gate indipendente può aprire la preparazione del batch esteso. Training e task-data readiness restano separati e chiusi.
