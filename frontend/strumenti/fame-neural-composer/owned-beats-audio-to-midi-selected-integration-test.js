@@ -70,9 +70,12 @@ assert(runner.includes('fs.copyFileSync(srcDrums,dstDrums,fs.constants.COPYFILE_
 assert(runner.includes('fs.copyFileSync(srcLow,dstLow,fs.constants.COPYFILE_EXCL)'));
 assert(runner.includes('sha256File(dstDrums)!==drumsSha'));
 assert(runner.includes('sha256File(dstLow)!==lowSha'));
+assert(!runner.includes("child_process"));
+assert(!runner.includes("spawn("));
+assert(!runner.includes("execFile("));
 assert(!runner.includes("ffmpeg"));
-assert(!runner.includes("librosa"));
 assert(!runner.includes("predict("));
+assert(!runner.includes("python.exe"));
 
 assert.deepEqual(tool.armStats([1,2,2,2,2,2,3,3]),{
   medianUsefulness:2,
