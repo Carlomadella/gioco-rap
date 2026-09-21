@@ -73,7 +73,7 @@
   },
   "receiptRunner": {
     "path": "basic-pitch-development-inference-v2.js",
-    "gitBlobSha": "456ebfc22b6be73fb180e4ddbf45d68b6f6c2567",
-    "implementationCommit": "3517c8d2608c7d56febf970d4cfe8780738229d6"
+    "gitBlobSha": "22413f184b309c875ff4aa49e37d5d08c1dd9558",
+    "implementationCommit": "37b83933b77d200fde793294b2946ee9a76c6637"
   }
 }
