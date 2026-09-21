@@ -2120,9 +2120,11 @@ alla Sala tornava in «Dalla classifica» come uno sconosciuto da pagare (adesso
 sempre la persona al suo rivale con `rivaleId` — solo l'id, non `rivale:true`, che vuol dire «venuto
 dalla classifica» e le avrebbe tolto il posto alla Sala), le trasferte pescavano i rapper senza guardare la
 classifica (`nuovoContatto` esclude anche `G.rivals`), e in un salvataggio vecchio l'omonimo già
-alla Sala che diventava opp sdoppiava il rivale (si fonde con quello che c'è).
+alla Sala che diventava opp sdoppiava il rivale (si fonde con quello che c'è). Il secondo giro ne ha
+vista una di testo: il rivale-contatto uscito dalla classifica che poi diventa opp rinasceva con «Vi
+siete conosciuti alla Sala» — adesso tiene la storia del feat.
 
-Prove: `test/unit/studio-rivali-e-sala.test.js`, dieci con vitest sui file veri
+Prove: `test/unit/studio-rivali-e-sala.test.js`, undici con vitest sui file veri
 (`studio.js`, `posto.js`, `rivals.js`) e un dado seminato — sei fallivano sul codice di
 prima; quattro controlli nuovi nell'audit.
 

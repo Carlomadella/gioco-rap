@@ -228,7 +228,7 @@ adesso il legame rivale ↔ contatto è l'**id** del rivale (`rivaleId`, non il 
 i due mazzi si escludono a vicenda, trasferte comprese. Il *posto rubato* — chi accettava il
 feat entrava in `G.gente` e toglieva un posto alla Sala; adesso il tetto conta solo
 `genteDellaSala()`, e chi rompe con te alla Sala il suo posto lo tiene. La *copertina orfana*
-era già chiusa dal 14/09, l'indice non l'aveva visto. Dieci prove vitest in
+era già chiusa dal 14/09, l'indice non l'aveva visto. Undici prove vitest in
 `test/unit/studio-rivali-e-sala.test.js`. «Le tre code, chiuse il 21/09/2026» in
 `02-interfaccia-e-telefono.md`.
 

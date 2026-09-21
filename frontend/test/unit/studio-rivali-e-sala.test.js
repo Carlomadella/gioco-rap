@@ -89,6 +89,19 @@ describe("un rivale della classifica e il suo omonimo alla Sala", () => {
     expect(p.G.rivals[0].storia).toContain("feat");
   });
 
+  it("il rivale-contatto uscito dalla classifica che diventa opp rinasce con la storia del feat, non «conosciuti alla Sala»", () => {
+    p.run("studioRivaleInGente(G.rivals[0])");
+    const quanti = p.G.rivals.length;
+    p.run("G.rivals.splice(0, 1)");                   // e' uscito dalla classifica (come fa vitaRivali)
+    p.run("diventaOpp(G.gente.find(x => x.rivale))");
+    expect(p.G.rivals.length).toBe(quanti);           // uno via, uno rinato
+    const opp = p.G.gente.find(x => x.rivale);
+    const r = p.G.rivals.find(x => x.id === opp.rivaleId);
+    expect(r.n).toBe(opp.n);
+    expect(r.storia).toContain("feat");
+    expect(r.storia).not.toContain("conosciuti");
+  });
+
   it("uno della Sala che diventa opp entra in classifica, resta legato al suo rivale e non si richiama in Cabina", () => {
     p.run('G.gente.push({id:"p3", ruolo:"rapper", n:"Nessuno Così", rel:0})');
     const quanti = p.G.rivals.length;

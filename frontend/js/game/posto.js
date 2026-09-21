@@ -835,13 +835,17 @@ function diventaOpp(p){
      Sala il suo posto lo occupa ancora, com'e' sempre stato. */
   if(!G.rivals) G.rivals = [];
   let r = G.rivals.find(x => p.rivaleId != null ? x.id === p.rivaleId : x.n === p.n) || null;
+  /* La storia vale anche per il rivale ricreato: chi era venuto dalla
+     classifica con un feat ed e' poi uscito dalla classifica non «si e'
+     conosciuto alla Sala». */
+  const storia = p.rivale ? "Ha fatto un feat con te, poi alla Sala è finita male."
+    : "Vi siete conosciuti alla Sala. È finita male.";
   if(r){
-    r.storia = p.rivale ? "Ha fatto un feat con te, poi alla Sala è finita male."
-      : "Vi siete conosciuti alla Sala. È finita male.";
+    r.storia = storia;
   } else if(typeof nuovoRivale === "function"){
     r = nuovoRivale(rnd(400, 1800));
     r.n = p.n; r.gen = p.gen || r.gen; r.skin = p.skin; r.col = p.col; r.hair = p.hair;
-    r.storia = "Vi siete conosciuti alla Sala. È finita male.";
+    r.storia = storia;
     G.rivals.push(r);
   }
   if(r) p.rivaleId = r.id;
