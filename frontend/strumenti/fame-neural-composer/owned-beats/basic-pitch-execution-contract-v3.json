@@ -1,0 +1,87 @@
+{
+  "schema": "fame-owned-beats-basic-pitch-execution-contract-v3",
+  "version": 3,
+  "status": "FROZEN_BEFORE_FIRST_V3_BASIC_PITCH_OUTPUT",
+  "candidateId": "basic-pitch-0.4.0-lowend-v1",
+  "package": {
+    "name": "basic-pitch",
+    "version": "0.4.0",
+    "repository": "spotify/basic-pitch",
+    "repositoryTag": "v0.4.0",
+    "repositoryTagCommit": "9991303bba609a3b93089d13ec80d1d495083596",
+    "modelFilename": "nmp.onnx",
+    "modelSha256": "2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec",
+    "backend": "ONNX",
+    "onnxRuntimeVersion": "1.23.2"
+  },
+  "environment": {
+    "pythonVersion": "3.10.11",
+    "repositoryLockSha256": "3613fc36f85e54629e14e98cd05648eb2b3d1ddd2b2f3ee87360299f464a60ad",
+    "packageCount": 44
+  },
+  "inference": {
+    "api": "basic_pitch.inference.predict",
+    "modelLoad": "basic_pitch.inference.Model(ICASSP_2022_MODEL_PATH) once per run",
+    "onsetThreshold": 0.5,
+    "frameThreshold": 0.3,
+    "minimumNoteLengthMs": 127.7,
+    "minimumFrequencyHz": 25,
+    "maximumFrequencyHz": 300,
+    "multiplePitchBends": true,
+    "melodiaTrick": true,
+    "midiTempoSource": "audio-analysis-v2-config-001 development estimated BPM per family",
+    "saveRawModelOutput": false,
+    "saveMidi": true,
+    "saveNoteEventsJson": true,
+    "savePitchBends": true,
+    "appendOnly": true
+  },
+  "receiptEvidence": {
+    "preInferenceGatePassedImmediatelyBeforeReceipt": true,
+    "priorRunValidatedAndMarkedAborted": true,
+    "bassStemIntegrityBytesReadByPrepareCommand": true,
+    "audioDecodedByPrepareCommand": false,
+    "basicPitchInferenceExecutedByPrepareCommand": false,
+    "midiWrittenByPrepareCommand": false
+  },
+  "scope": {
+    "split": "development",
+    "expectedFamilies": 8,
+    "inputStem": "bass",
+    "finalHoldoutAccessAllowed": false,
+    "batch131Authorized": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "output": {
+    "runId": "basic-pitch-development-inference-v1-003",
+    "directoryRelativeToWorkspace": "runs/basic-pitch-development-inference/basic-pitch-development-inference-v1-003",
+    "perFamily": [
+      "basic-pitch.mid",
+      "result.json"
+    ],
+    "summary": "inference-summary.json"
+  },
+  "supersedes": {
+    "runId": "basic-pitch-development-inference-v1-002",
+    "algorithmChanged": false,
+    "implementationOnlyFix": true,
+    "defectCode": "RECEIPT_EVIDENCE_PRODUCER_CONSUMER_MISMATCH"
+  },
+  "comparison": {
+    "baselineArm": "librosa-pyin-lowend-v1",
+    "candidateArm": "basic-pitch-0.4.0-lowend-v1",
+    "blindHumanComparisonRequired": true,
+    "selectionRule": [
+      "higher median usefulness",
+      "higher families at or above 2",
+      "higher total usefulness score",
+      "if still tied, prefer pYIN baseline as lower-complexity method"
+    ]
+  },
+  "receiptRunner": {
+    "path": "basic-pitch-development-inference-v3.js",
+    "gitBlobSha": "1c95445d9e1082eb22212356f2a7ade086670a8b",
+    "implementationCommit": "95c246beed316fe1a6ddaaf71492f79a92068f7d"
+  }
+}
