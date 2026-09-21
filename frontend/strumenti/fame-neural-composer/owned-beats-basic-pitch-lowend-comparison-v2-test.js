@@ -86,7 +86,9 @@ try{
 }
 
 const src=fs.readFileSync(path.join(__dirname,"owned-beats","basic-pitch-lowend-comparison-v2.js"),"utf8");
-assert(src.includes("SUPERSEDED_INVALID_RENDER_DURATION"));\nassert(src.includes("gateFromInvalidReviewIgnored:true"));\nassert(src.includes("scoresCopiedToSupersedingReview:false"));
+assert(src.includes("SUPERSEDED_INVALID_RENDER_DURATION"));
+assert(src.includes("gateFromInvalidReviewIgnored:true"));
+assert(src.includes("scoresCopiedToSupersedingReview:false"));
 assert(src.includes("referenceDurationSeconds:wavDurationSeconds(referenceFile)"));
 assert(src.includes("renderBasicPitch(bpResult(workspace,rid),p,family.referenceDurationSeconds)"));
 assert(src.includes("renderPyin(pyinResult(workspace,rid),p,family.referenceDurationSeconds)"));
