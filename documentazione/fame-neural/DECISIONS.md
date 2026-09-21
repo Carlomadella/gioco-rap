@@ -1450,3 +1450,37 @@ Il prossimo protocollo deve fissare prima dell'esecuzione:
 - divieto di retuning sul nuovo evaluation cohort.
 
 Il blocco Audio→MIDI drums/low-end è quindi `CLOSED_DEVELOPMENT_ONLY`, non `TASK_DATA_READY`.
+
+## NDR-090 — Audio→MIDI: evaluation indipendente su 12 family fresche selezionate metadata-only
+
+**Stato: ACCEPTED — 21 settembre 2026.**
+
+Dopo la chiusura development, il nuovo gate Audio→MIDI usa un cohort indipendente diverso sia dagli 8 development sia dal final holdout già consumato da Audio Analysis.
+
+La selezione è stata eseguita prima di qualunque nuovo accesso audio con algoritmo `opaque-identity-sha256-rank-v1`, seed congelato e sole identità `compositionFamilyId/sourceRecordId/sourceAssetId/sha256`.
+
+Sul manifest reale:
+
+- record: 131;
+- family: 131;
+- fresh eligible universe: 103;
+- cohort selezionato: 12;
+- cohort digest: `287839b1967f659988927539fcefabd44a286541698a8700349712c84525d788`.
+
+Il valore storico 113 descriveva l'universo ancora unsplit prima dell'assegnazione del successivo cohort R1 v2 da 10 family. Dopo quell'assegnazione il fresh universe corrente è 103.
+
+Il cohort Audio→MIDI congelato contiene:
+
+`FAME000001, FAME000102, FAME000006, FAME000129, FAME000020, FAME000073, FAME000092, FAME000121, FAME000010, FAME000071, FAME000116, FAME000101`.
+
+Gate già congelato:
+
+- technical: 12/12;
+- drums: mediana >=2 e almeno 9/12 family >=2;
+- low-end: mediana >=2 e almeno 9/12 family >=2;
+- pipeline immutabile: HTDemucs selezionato → `drums-bass-kick-fusion-v1` + `librosa-pyin-lowend-v1`;
+- nessun retuning sul cohort evaluation;
+- Basic Pitch non rientra nell'evaluation;
+- batch131/training/task-data readiness restano chiusi.
+
+La sola selezione non cambia il manifest. Prima dell'audio il cohort deve essere riservato append-only e assegnato allo split `audio-to-midi-evaluation-v1`.
