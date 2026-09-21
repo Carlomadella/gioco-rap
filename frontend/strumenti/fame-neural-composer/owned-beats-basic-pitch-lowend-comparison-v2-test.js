@@ -1,6 +1,7 @@
 "use strict";
 
 const assert=require("node:assert");
+const crypto=require("node:crypto");
 const fs=require("node:fs");
 const os=require("node:os");
 const path=require("node:path");
@@ -85,11 +86,66 @@ try{
 }
 
 const src=fs.readFileSync(path.join(__dirname,"owned-beats","basic-pitch-lowend-comparison-v2.js"),"utf8");
-assert(src.includes("ABORTED_BEFORE_FINAL_SUBMISSION_RENDER_DURATION_BUG"));
+assert(src.includes("SUPERSEDED_INVALID_RENDER_DURATION"));\nassert(src.includes("gateFromInvalidReviewIgnored:true"));\nassert(src.includes("scoresCopiedToSupersedingReview:false"));
 assert(src.includes("referenceDurationSeconds:wavDurationSeconds(referenceFile)"));
 assert(src.includes("renderBasicPitch(bpResult(workspace,rid),p,family.referenceDurationSeconds)"));
 assert(src.includes("renderPyin(pyinResult(workspace,rid),p,family.referenceDurationSeconds)"));
 assert(src.includes("Reference duration changed after package freeze"));
 assert(!src.includes("Math.max(1,...events.map(n=>n.endSeconds+.1))"));
+
+
+const finalizedTmp=fs.mkdtempSync(path.join(os.tmpdir(),"fame-lowend-finalized-v1-"));
+try{
+  const priorRoot=path.join(finalizedTmp,"reviews","basic-pitch-lowend-comparison","basic-pitch-lowend-blind-comparison-v1-001");
+  fs.mkdirSync(priorRoot,{recursive:true});
+  const write=(name,value)=>fs.writeFileSync(path.join(priorRoot,name),JSON.stringify(value,null,2)+"\n");
+  const sha=file=>crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex");
+
+  const packageFile=path.join(priorRoot,"review-package.json");
+  const blindKeyFile=path.join(priorRoot,"blind-key.json");
+  const submissionFile=path.join(priorRoot,"submission.json");
+  const reportFile=path.join(priorRoot,"report.json");
+
+  write("review-package.json",{
+    schema:"fame-owned-beats-basic-pitch-lowend-comparison-package-v1",
+    version:1,
+    reviewId:"basic-pitch-lowend-blind-comparison-v1-001"
+  });
+  write("blind-key.json",{
+    schema:"fame-owned-beats-basic-pitch-lowend-comparison-blind-key-v1",
+    version:1,
+    reviewId:"basic-pitch-lowend-blind-comparison-v1-001",
+    mapping:{}
+  });
+  write("submission.json",{
+    schema:"fame-owned-beats-basic-pitch-lowend-comparison-submission-v1",
+    version:1,
+    reviewId:"basic-pitch-lowend-blind-comparison-v1-001"
+  });
+  write("report.json",{
+    schema:"fame-owned-beats-basic-pitch-lowend-comparison-report-v1",
+    version:1,
+    reviewId:"basic-pitch-lowend-blind-comparison-v1-001",
+    packageDigestSha256:sha(packageFile),
+    submissionDigestSha256:sha(submissionFile)
+  });
+
+  const marked=tool.markPriorComparisonSuperseded(finalizedTmp);
+  assert.equal(marked.payload.status,"SUPERSEDED_INVALID_RENDER_DURATION");
+  assert.equal(marked.payload.priorState,"FINALIZED");
+  assert.equal(marked.payload.gateFromInvalidReviewIgnored,true);
+  assert.equal(marked.payload.scoresCopiedToSupersedingReview,false);
+  assert.equal(marked.payload.preservedArtifacts.reviewPackageSha256,sha(packageFile));
+  assert.equal(marked.payload.preservedArtifacts.blindKeySha256,sha(blindKeyFile));
+  assert.equal(marked.payload.preservedArtifacts.submissionSha256,sha(submissionFile));
+  assert.equal(marked.payload.preservedArtifacts.reportSha256,sha(reportFile));
+  assert(fs.existsSync(path.join(priorRoot,"superseded-invalid-review.json")));
+
+  const rerun=tool.markPriorComparisonSuperseded(finalizedTmp);
+  assert.equal(rerun.payload.priorState,"FINALIZED");
+  assert.equal(rerun.payload.preservedArtifacts.reportSha256,sha(reportFile));
+}finally{
+  fs.rmSync(finalizedTmp,{recursive:true,force:true});
+}
 
 console.log("owned-beats-basic-pitch-lowend-comparison-v2-test: PASS");
