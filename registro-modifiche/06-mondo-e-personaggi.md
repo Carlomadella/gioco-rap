@@ -6,6 +6,35 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:5b1b476 -->
+## 21/09/26, 18:31 â€” task/studio-le-tre-code â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `5b1b476`
+
+### Cosa Ã¨ entrato
+
+- `21afb8d` â€” Studio, «Le tre code dello Studio a cinque linguette», dopo il secondo giro: il rivale-contatto uscito dalla classifica che diventa opp rinasce con la storia del feat, non «conosciuti alla Sala» â€” **Carlomadella**
+- `e8d8f32` â€” docs: la roadmap segna FATTO «Le tre code dello Studio a cinque linguette», e la nota di chiusura dice che il legame è solo rivaleId â€” **Carlomadella**
+- `b588eb3` â€” Studio, «Le tre code dello Studio a cinque linguette»: chi rompe con te alla Sala il posto lo occupa ancora — diventaOpp lega la persona al rivale solo con rivaleId, non con rivale:true che vuol dire «venuto dalla classifica» e la toglieva dal conto della Sala â€” **Carlomadella**
+- `6b84125` â€” Studio, dopo il giro di fine task: l'opp nato alla Sala resta legato al suo rivale (non torna in «Dalla classifica» a pagamento), le trasferte non pescano nomi della classifica, l'omonimo di un salvataggio vecchio che diventa opp si fonde col rivale â€” **Carlomadella**
+- `c8fc276` â€” Studio: il legame rivale ↔ contatto è un id stabile del rivale, non il seed (che è la copertina dell'ultimo pezzo e cambia a ogni uscita) â€” **Carlomadella**
+- `389beea` â€” Studio, «Le tre code dello Studio a cinque linguette»: l'omonimo della classifica si può chiamare (il legame è il seed), chi accetta non ruba un posto alla Sala; la copertina orfana era già chiusa dal 14/09 â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/js/game/posto.js`
+- **Modificato:** `frontend/js/game/rivals.js`
+- **Modificato:** `frontend/js/game/studio.js`
+- **Modificato:** `frontend/js/game/trasferte.js`
+- **Aggiunto:** `frontend/test/unit/studio-rivali-e-sala.test.js`
+
+**File interessati in questa categoria:** 7
+
+---
+
 <!-- merge:9995781 -->
 ## 21/09/26, 13:53 â€” task/shop-rifiniture-dopo-il-giro â†’ main
 
