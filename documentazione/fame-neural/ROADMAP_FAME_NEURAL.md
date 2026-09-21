@@ -1933,3 +1933,20 @@ Ricerca di chiusura: [Owned Beats — Audio→MIDI drums/low-end — ricerca di 
 Stato:
 
 `AUDIO_TO_MIDI_DRUMS_LOW_END_DEVELOPMENT_CLOSED / TRAINING_CLOSED / TASK_DATA_READY=false`.
+
+### Evaluation Audio→MIDI indipendente — cohort selezionato — 21 settembre 2026
+
+Il nuovo evaluation cohort è stato selezionato metadata-only e congelato prima di qualsiasi audio access:
+
+- fresh universe al freeze: 103 family;
+- selected: 12 family;
+- cohort digest: `287839b1967f659988927539fcefabd44a286541698a8700349712c84525d788`;
+- overlap con 8 development: 0;
+- overlap con final holdout Audio Analysis R1 v2: 0;
+- audio/derived metrics usati per la selezione: no.
+
+Prossimo passaggio:
+
+`PREFLIGHT METADATA-ONLY → RESERVE 12 FAMILY / ASSIGN SPLIT → FREEZE EXECUTION → SOURCE SEPARATION + AUDIO→MIDI ONCE → TECHNICAL/HUMAN GATE`
+
+Il batch completo e il training restano chiusi fino all'esito della nuova evaluation indipendente.
