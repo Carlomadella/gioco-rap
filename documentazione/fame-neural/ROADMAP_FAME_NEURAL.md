@@ -1909,3 +1909,27 @@ Sequenza operativa:
 `PRE-FLIGHT NO AUDIO→MIDI OUTPUT → BASELINE APPEND-ONLY 8 DEVELOPMENT → TECHNICAL/HUMAN QA → BASIC PITCH ARM → CONFRONTO`
 
 Final holdout, batch 131, tonal Audio→MIDI e training restano chiusi.
+
+### Chiusura Audio→MIDI drums/low-end development — 21 settembre 2026
+
+Il blocco development-only aperto il 20 settembre è chiuso.
+
+Risultato finale verificato:
+
+- selected integration `audio-to-midi-selected-integration-v1-001`: 8/8;
+- post-output verifier: PASS;
+- 16/16 MIDI selezionati byte-identici alla baseline;
+- drums: `drums-bass-kick-fusion-v1`, PASS 6/8 >=2;
+- low-end: `librosa-pyin-lowend-v1`, PASS 7/8 >=2;
+- Basic Pitch 0.4.0: FAIL 0/8 >=2 nel confronto congelato;
+- known issue low-end: `FAME000040`, upstream source-separation contamination;
+- tonal Audio→MIDI non aperto;
+- batch 131 e training non autorizzati.
+
+Ricerca di chiusura: [Owned Beats — Audio→MIDI drums/low-end — ricerca di chiusura — 21/09/2026](OWNED_BEATS_AUDIO_TO_MIDI_CLOSING_RESEARCH_2026-09-21.md).
+
+**Prossimo gate:** preparare una evaluation Audio→MIDI indipendente su family fresche ancora non assegnate. Le 10 family già consumate nel final holdout Audio Analysis non vengono riutilizzate automaticamente come nuovo final test indipendente. Prima di qualsiasi accesso al nuovo cohort vanno congelati numerosità, identità, pipeline, rubric e decision rule.
+
+Stato:
+
+`AUDIO_TO_MIDI_DRUMS_LOW_END_DEVELOPMENT_CLOSED / TRAINING_CLOSED / TASK_DATA_READY=false`.
