@@ -1,0 +1,113 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-independent-evaluation-execution-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_FIRST_EVALUATION_AUDIO_ACCESS",
+  "runId": "audio-to-midi-independent-evaluation-v1-001",
+  "cohortId": "audio-to-midi-independent-evaluation-v1",
+  "split": "audio-to-midi-evaluation-v1",
+  "expectedFamilies": 12,
+  "cohortDigestSha256": "287839b1967f659988927539fcefabd44a286541698a8700349712c84525d788",
+  "retuningAllowed": false,
+  "pipeline": {
+    "audioAnalysis": {
+      "candidateId": "audio-analysis-v2-config-001",
+      "configHash": "04e00482802c46dda876733b7210992cab9eadbafa33153266a483b4a90b81b3",
+      "bpmSource": "FROZEN_V1_UNCHANGED",
+      "beatTracker": "FROZEN_V1_UNCHANGED",
+      "humanReferenceAsInput": false
+    },
+    "sourceSeparation": {
+      "armId": "intel-openvino-htdemucs-v4-97fc578",
+      "modelRevision": "97fc578fb57650045d40b00bc84c7d156be77547",
+      "modelXmlSha256": "304e24325756089d6bb6583171dd1bea2327505e87c6cb6e010afea7463d9f0a",
+      "modelBinSha256": "7aa84fa1f2b534bd6865a5609b8b5b028802fe761d6a09b1d30a1564f8fac6f8",
+      "device": "CPU",
+      "sampleRate": 44100,
+      "shifts": 1,
+      "shiftSeed": 0,
+      "overlap": 0.25,
+      "segmentSamples": 343980,
+      "expectedStems": [
+        "drums",
+        "bass",
+        "other",
+        "vocals"
+      ]
+    },
+    "drums": {
+      "armId": "drums-bass-kick-fusion-v1",
+      "decodeSampleRate": 22050,
+      "hopLength": 256,
+      "nFft": 2048,
+      "onsetDelta": 0.15,
+      "waitFrames": 1,
+      "kickFusionDeduplicateWithinSeconds": 0.05
+    },
+    "lowEnd": {
+      "armId": "librosa-pyin-lowend-v1",
+      "sampleRate": 22050,
+      "hopLength": 256,
+      "frameLength": 4096,
+      "fminHz": 25,
+      "fmaxHz": 300,
+      "voicedProbabilityAtLeast": 0.6,
+      "minimumNoteDurationSeconds": 0.06,
+      "maximumGapFrames": 2
+    },
+    "basicPitch": {
+      "enabled": false,
+      "reason": "NOT_SELECTED_NEGATIVE_DEVELOPMENT_RESULT"
+    },
+    "midi": {
+      "ppq": 480,
+      "drumChannelZeroBased": 9,
+      "bassChannelZeroBased": 0
+    }
+  },
+  "bindings": {
+    "evaluationProtocolGitBlobSha": "7ad299fddc9fc1430f15d6ae65327e9d53205c65",
+    "cohortReferenceGitBlobSha": "f7b93c8647c70b5f0f4caa66a741f98fc0da0e48",
+    "reservationContractGitBlobSha": "e5743c33b944c3180db01ea49df52b062fdc03a1",
+    "audioAnalysisConfigGitBlobSha": "8fc33525f5ba3462b95d303b620fe4b3f82209e7",
+    "audioAnalysisSourceGitBlobSha": "2940f7ef71b5b165903e3371c1b7d14e116538bf",
+    "audioAnalysisBaselineGitBlobSha": "fcabcf8b069fe2a65edc6ce171d86226e1bcaecb",
+    "audioMidiDevelopmentProtocolGitBlobSha": "58cc4da3afc88fa5ec4522452d761359b445f8c9",
+    "audioMidiDevelopmentSourceGitBlobSha": "5a7b14f9347ac3764dfdfc6377ba989a32106977",
+    "sourceSeparationContractGitBlobSha": "fb11a62a1b13204a58188bbe610d6e1b70678472",
+    "sourceSeparationProtocolGitBlobSha": "a8667e89360605336d51bb121a4780cff7d6bc05",
+    "sourceSeparationAdapterGitBlobSha": "2659f069a5564cc525dbcfca3c84c054dedeb4f7",
+    "sourceSeparationEnvironmentGitBlobSha": "ed6829a1308938bbfa9df4918398eacd80ccb85b",
+    "sourceSeparationLockGitBlobSha": "f19e0f5014257fc0962ebd49531b503167fc98ec",
+    "audioAnalysisLockGitBlobSha": "bb92c90d0abc2ce04be549e76be7d997ff0d5b75"
+  },
+  "implementation": {
+    "executorPath": "audio-to-midi-independent-evaluation-execution.py",
+    "executorGitBlobSha": "126aa8ed9dcdc58bcbe83e27db3bb64190e28429",
+    "implementationCommit": "42bfdffb82f67ffb58cbedeb2c33145177cf6901"
+  },
+  "output": {
+    "rootRelativeToWorkspace": "runs/audio-to-midi-independent-evaluation-execution/audio-to-midi-independent-evaluation-v1-001",
+    "perFamily": [
+      "stems/drums.wav",
+      "stems/bass.wav",
+      "stems/other.wav",
+      "stems/vocals.wav",
+      "drums.mid",
+      "low-end.mid",
+      "result.json"
+    ],
+    "summary": "summary.json",
+    "appendOnly": true
+  },
+  "qa": {
+    "technicalBeforeHuman": true,
+    "humanGateFromProtocol": true,
+    "humanReviewMustNotRetunePipeline": true
+  },
+  "safety": {
+    "batch131Authorized": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "nextAction": "PREPARE_APPEND_ONLY_EVALUATION_EXECUTION_RECEIPT_NO_AUDIO"
+}
