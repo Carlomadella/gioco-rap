@@ -24,6 +24,7 @@
     beat:120,
     registra:180,
     mixa:120,
+    remaster:120,      /* remastered e parti 2: una sessione al banco, come il mix */
     pubblica:15,
     promo:45,
     anteprima:30,      /* punto 8 dello Studio: quindici secondi da girare e postare */

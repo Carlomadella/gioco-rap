@@ -87,9 +87,12 @@ fondo fra le chiuse._
    riga, va fatto in una task sua con l'audit aggiornato nello stesso commit. Chiude da
    sola anche «l'uscita di venerdì non costa niente, quella a mano sì» di
    problemi-riscontrati.
-3. **Quello che manca alla catena del pezzo** — CARLO, la coda del punto «Non è più:
-   "Faccio un pezzo → +10 fama"» (FATTO in parte): la cover caricata da file e quella
-   «stile emblema», la discografia come app del telefono, le remastered e le parti 2.
+3. **La cover «stile emblema»** — CARLO, l'ultima coda del punto «Non è più: "Faccio un
+   pezzo → +10 fama"» (FATTO in parte): l'editor di copertine a livelli, come l'emblema di
+   Black Ops 2. È una pagina a parte. Il resto della coda è chiuso: la cover da file c'era
+   dal 07/09, la discografia era già un'app del telefono dal 04/09 (il foglio diceva il
+   contrario), e **le remastered e le parti 2** sono FATTE il 21/09 — «Remastered e parti 2»
+   sotto «19 · La discografia», `04-musica-e-suoni.md`.
 4. **Beat, Testo e Cabina a mano, il resto in automatico coi malus** — CARLO, «Studio
    (16/09/2026)»: «l'utente deve poter fare solo le sezioni Beat, Testo e Cabina, poi il
    resto in automatico, però questo porta dei malus». Oggi Mix e Uscita si aprono col
@@ -345,8 +348,11 @@ che costava troppo._
    la Cover e il QUANDO); il Marketing è passato sul telefono, in LaFamegram; la stima degli
    stream esce dalla formula vera di `sim.js`. La discografia c'è (`04-musica-e-suoni.md`,
    «19 · La discografia»: una linguetta della partita con la curva delle ultime 26 settimane
-   per pezzo). **Manca** la cover caricata da file e quella «stile emblema» (oggi solo
-   proposte generate), la discografia come app del telefono, e le remastered e le parti 2.
+   per pezzo). **FATTO anche (21/09/2026)**: le **remastered e le parti 2**, dalla
+   Discografia sul telefono allo Studio («Remastered e parti 2», `04-musica-e-suoni.md`);
+   la cover caricata da file c'era dal 07/09 e la discografia è un'app del telefono dal
+   04/09 — questo foglio diceva che mancavano, e non era vero. **Manca** solo la cover
+   «stile emblema», l'editor a livelli.
 
 5. Non funziona più la pagina attività criminali, questo è ciò che segna in console:
 

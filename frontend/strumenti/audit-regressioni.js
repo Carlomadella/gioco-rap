@@ -1961,6 +1961,45 @@ test("la sezione «Questa settimana» sta in testa al reparto, solo su «Tutti»
   offerte.includes("L'offerta del lunedì") && offerte.includes("Il banco dell'usato") &&
   offerte.includes('pushLog("Allo Shop: <b>" + capo.n + "</b> a metà prezzo fino a domenica"'));
 
+/* Remastered e parti 2 (21/09/2026, la coda di CARLO «Non e' piu': "Faccio un
+   pezzo → +10 fama"»): dalla Discografia sul telefono si prenotano, in Studio
+   si fanno. File nuovo, js/game/seguiti.js, e css/seguiti.css. */
+const seguiti = leggi("js/game/seguiti.js");
+test("remastered e parti 2 stanno in un file loro, caricato dal gioco con il suo foglio, e la Discografia li disegna riga per riga",
+  index.includes('<script src="js/game/seguiti.js') && index.includes('href="css/seguiti.css') &&
+  seguiti.includes("const SEGUITO_ETA_MIN = 8;") && seguiti.includes("const REMASTER_ETA_MIN = 12;") &&
+  ui.includes('(typeof discoSeguitiRiga === "function" ? discoSeguitiRiga(x) : "") +') &&
+  ui.includes('(typeof discoSeguitiNota === "function" ? discoSeguitiNota(fuori) : "") +') &&
+  fs.existsSync(path.join(ROOT, "test/unit/seguiti.test.js")));
+test("la parte 2 si prenota dalla Discografia, porta il titolo in Cabina e il pezzo inciso resta legato al primo (seguitoDi)",
+  seguiti.includes("function discoPrenotaParte2(seed){") &&
+  seguiti.includes("s2.seguitoDi = orig.seed;") &&
+  actions.includes("chiediTitolo(titoloSeguito || title(), (nome, seed, img) => {") &&
+  actions.includes('const primo = typeof seguitoIncidi === "function" ? seguitoIncidi(s2) : null;') &&
+  studio.includes('(typeof seguitoCabinaNota === "function" ? seguitoCabinaNota() : "") +'));
+test("quando la parte 2 esce (a mano o di venerdi') il primo torna a girare, e la gente del primo ascolta il secondo in sim.js",
+  actions.includes('if(typeof seguitoUscita === "function") seguitoUscita(s);') &&
+  studioEl.includes('if(typeof seguitoUscita === "function") seguitoUscita(s);') &&
+  seguiti.includes("orig.rilancio = totalWeeks();") &&
+  seguiti.includes("function curvaPezzo(s, age){") &&
+  sim.includes('const curve = typeof curvaPezzo === "function" ? curvaPezzo(s, age)') &&
+  sim.includes('const seguitoPull = typeof seguitoAscolti === "function" ? seguitoAscolti(s) : 0;') &&
+  sim.includes("let out = (fanPull + scoperta + featPull + seguitoPull) * curve * rnd(0.8, 1.25);"));
+test("la remastered si prenota dalla Discografia e si chiude al banco del Mix: la mossa c'e' solo finche' e' prenotata, apre il Mix a banco vuoto, costa come un mix piu' la sala, una volta sola per pezzo",
+  actions.includes('{id:"remaster", n:"Remastered", e:24, luc:2,') &&
+  actions.includes('avail:() => typeof remasterPrenotato === "function" && !!remasterPrenotato(),') &&
+  studio.includes('return x.id === "banco" && typeof remasterPrenotato === "function" && !!remasterPrenotato();') &&
+  studio.includes('const remaster = typeof remasterPannello === "function" ? remasterPannello() : "";') &&
+  seguiti.includes("if(!s || s.remaster){ d.remaster = null; return null; }") &&
+  seguiti.includes("function remasterBase(){") && !seguiti.includes("? mixGain()") &&
+  seguiti.includes("if(!orig || orig.seed == null) return null;") &&
+  seguiti.includes("s.rilancioForza = RILANCIO_REMASTER;") &&
+  leggi("js/game/tempo.js").includes("remaster:120,") && hours.includes('remaster:"studio",') &&
+  leggi("js/game/fx.js").includes('remaster:"mix",'));
+test("nel telefono la riga della Discografia va su due righe: prima il titolo non si leggeva e i numeri uscivano dal bordo",
+  tel.length > 0 && leggi("css/telefono.css").includes(".telslot .drow{flex-wrap:wrap;") &&
+  leggi("css/telefono.css").includes(".telslot .dnm{flex:1 1 60%;min-width:0}"));
+
 console.log("\nProblemi riscontrati \u2014 carcere senza notifiche, didascalie scritte in casa");
 const caption = leggi("js/game/crime-caption.js");
 test("in carcere la fascia di LaFamegram non compare",
