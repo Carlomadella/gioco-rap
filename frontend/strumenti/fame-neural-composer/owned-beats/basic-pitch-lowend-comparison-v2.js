@@ -11,7 +11,8 @@ const HERE=__dirname;
 const PROTOCOL_FILE=path.join(HERE,"basic-pitch-lowend-comparison-v2.json");
 const QA_FILE=path.join(HERE,"basic-pitch-development-qa.py");
 
-const REVIEW_ID="basic-pitch-lowend-blind-comparison-v1-002";\nconst PRIOR_REVIEW_ID="basic-pitch-lowend-blind-comparison-v1-001";
+const REVIEW_ID="basic-pitch-lowend-blind-comparison-v1-002";
+const PRIOR_REVIEW_ID="basic-pitch-lowend-blind-comparison-v1-001";
 const BASELINE_RUN_ID="audio-to-midi-development-baseline-v1-001";
 const BASIC_PITCH_RUN_ID="basic-pitch-development-inference-v1-003";
 const SOURCE_SEP_RUN_ID="source-separation-development-inference-v1-001";
