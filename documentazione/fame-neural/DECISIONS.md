@@ -1143,3 +1143,22 @@ Freeze:
 - packaged model `nmp.onnx` SHA256 `2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec`.
 
 Il lock è marcato reviewed/committed e il file è forzato LF via `.gitattributes`. Questo non autorizza ancora l'inferenza: prima serve il verifier locale finale che confronta lock repository, freeze locale, receipt, venv corrente e modello corrente.
+
+## NDR-077 — Basic Pitch: exact lock locale verificato, pre-inference gate aperto
+
+**Stato: ACCEPTED — 21 settembre 2026.**
+
+Il verifier locale dell'ambiente Basic Pitch ha restituito `BASIC_PITCH_ENVIRONMENT_LOCK_VERIFY_PASS`.
+
+Sono stati verificati insieme:
+
+- source `pip freeze --all` SHA256 `9374ac7a60f9ba6cc97ae14f9b8627c527bb3ef70833d27e95340d45ff69aa7f`;
+- repository lock SHA256 `3613fc36f85e54629e14e98cd05648eb2b3d1ddd2b2f3ee87360299f464a60ad`;
+- package set 44/44 identico;
+- Python `3.10.11`;
+- `basic-pitch==0.4.0`;
+- backend `ONNX`;
+- `onnxruntime==1.23.2`;
+- modello `nmp.onnx`, 230444 byte, SHA256 `2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec`.
+
+Il verifier non ha aperto audio e non ha eseguito trascrizioni. È quindi aperto il gate pre-inference development-only. Tale gate può leggere i byte degli 8 `bass.wav` esclusivamente per verificarne gli SHA contro i receipt Source Separation; non può decodificare audio, chiamare Basic Pitch o scrivere MIDI.
