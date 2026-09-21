@@ -1208,3 +1208,32 @@ L'executor:
 - lascia final holdout, batch 131, training e task-data readiness chiusi.
 
 Il prossimo passo è la prima inferenza reale Basic Pitch sugli 8 bass stem development.
+
+## NDR-080 — Basic Pitch: v1-001 abortito, superseding v1-002 implementation-only
+
+**Stato: ACCEPTED — 21 settembre 2026.**
+
+Il primo tentativo reale sul run `basic-pitch-development-inference-v1-001` non ha prodotto family output persistenti.
+
+La diagnostica successiva ha verificato:
+
+- exact environment/model lock ancora valido;
+- receipt v1-001 ancora valido;
+- executor self-test PASS;
+- caricamento reale `Model(nmp.onnx)` PASS con backend ONNX;
+- 0 family directory complete;
+- nessun `inference-summary.json`;
+- nessuna temp directory residua.
+
+Nel codice v1 è stato individuato un difetto di implementazione certo: il rename atomico puntava a `root/outputs/<sourceRecordId>` senza creare prima `root/outputs`. Il wrapper v1 non ha conservato l'eccezione Python originale, quindi questo difetto viene registrato come causa certa che rendeva il run non completabile, non come prova che fosse l'unico eventuale failure point precedente.
+
+Per non riscrivere un'implementazione già consumata:
+
+- `v1-001` viene marcato append-only come aborted implementation attempt solo se il workspace conferma ancora zero output/zero summary/zero temp;
+- il nuovo run è `basic-pitch-development-inference-v1-002`;
+- algoritmo, modello, 8 input stem, BPM e parametri `predict()` restano identici;
+- `algorithmChanged=false`;
+- il fix è implementation-only: creare/validare `outputs/` prima del model load/inference;
+- il nuovo executor scrive `failure-report.json` append-only con stage, family, tipo, messaggio e traceback se dovesse fallire di nuovo.
+
+Questo superseding non autorizza final holdout, batch 131, training o task-data readiness.
