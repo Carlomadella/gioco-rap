@@ -856,3 +856,28 @@ Regole congelate:
 - batch131, training e task-data readiness ancora non autorizzati.
 
 Il selector `prepare-audio-to-midi-independent-evaluation.js` è congelato al Git blob `305fe132ba54d4b777d8d2a76e66262fd39ea554`. Il prossimo comando locale deve soltanto selezionare e materializzare la reference metadata-only dei 12 record; prima di qualunque accesso audio la reference risultante verrà congelata in repository.
+
+## Evaluation Audio→MIDI indipendente: cohort fresco congelato — 21 settembre 2026
+
+La selezione metadata-only del nuovo cohort indipendente è completata e congelata in `audio-to-midi-independent-evaluation-cohort-v1.json`.
+
+Evidenza del manifest reale:
+
+- 131 record / 131 composition family;
+- universo fresco eleggibile al momento della selezione: **103 family**;
+- eligible-universe digest: `60c77d0fb6f12fc3e9df4f66a329ccb1b7bef60954264e70924851dddf98904f`;
+- source-manifest identity digest: `a459b2df4c9e3a0fe0b268e58833e15c9b45097231b115a1d85311e993557f38`;
+- cohort selezionato: 12 family;
+- cohort digest: `287839b1967f659988927539fcefabd44a286541698a8700349712c84525d788`;
+- audio aperto/hashato/decodificato durante la selezione: no;
+- metriche audio usate per selezionare: no;
+- manifest modificato dalla selezione: no;
+- split modificati dalla selezione: no.
+
+Il precedente valore **113 unassigned** era una fotografia precedente alla selezione/assegnazione delle 10 nuove family del cohort `evaluation-holdout-r1-v2`. Quel cohort R1 v2 era stato scelto da un universo di 113 e, una volta assegnato al proprio split, ha lasciato **103 family ancora intatte**. Non risultano asset persi o rimossi.
+
+I 12 record congelati sono:
+
+`FAME000001, FAME000102, FAME000006, FAME000129, FAME000020, FAME000073, FAME000092, FAME000121, FAME000010, FAME000071, FAME000116, FAME000101`.
+
+La reference è legata al selector Git blob `305fe132ba54d4b777d8d2a76e66262fd39ea554`, al protocollo e alla decisione di split. Il prossimo passo è metadata-only: preflight + reservation delle 12 family nello split `audio-to-midi-evaluation-v1`, ancora senza Source Separation o Audio→MIDI.
