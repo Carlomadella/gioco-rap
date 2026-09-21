@@ -168,29 +168,84 @@ function wavDurationSeconds(file){
  }finally{fs.closeSync(fd)}
 }
 
-function markPriorComparisonAborted(workspace){
+function markPriorComparisonSuperseded(workspace){
  const root=reviewRoot(workspace,PRIOR_REVIEW_ID);
  if(!fs.existsSync(root))throw new Error("Prior low-end comparison package missing: "+root);
- const submission=path.join(root,"submission.json"),report=path.join(root,"report.json");
- if(fs.existsSync(submission)||fs.existsSync(report))throw new Error("Prior low-end comparison was already finalized; cannot supersede renderer");
- const marker=path.join(root,"aborted-review.json");
+
+ const packageFile=path.join(root,"review-package.json");
+ const blindKeyFile=path.join(root,"blind-key.json");
+ const submissionFile=path.join(root,"submission.json");
+ const reportFile=path.join(root,"report.json");
+ if(!fs.existsSync(packageFile)||!fs.existsSync(blindKeyFile))throw new Error("Prior low-end comparison core artifacts missing");
+
+ const pkg=readJson(packageFile),key=readJson(blindKeyFile);
+ if(
+   pkg.schema!=="fame-owned-beats-basic-pitch-lowend-comparison-package-v1"||
+   pkg.version!==1||
+   pkg.reviewId!==PRIOR_REVIEW_ID||
+   key.schema!=="fame-owned-beats-basic-pitch-lowend-comparison-blind-key-v1"||
+   key.version!==1||
+   key.reviewId!==PRIOR_REVIEW_ID
+ ) throw new Error("Prior low-end comparison core artifacts are not the frozen v1 review");
+
+ const submissionExists=fs.existsSync(submissionFile);
+ const reportExists=fs.existsSync(reportFile);
+ let submission=null,report=null;
+ if(submissionExists){
+   submission=readJson(submissionFile);
+   if(
+     submission.schema!=="fame-owned-beats-basic-pitch-lowend-comparison-submission-v1"||
+     submission.version!==1||
+     submission.reviewId!==PRIOR_REVIEW_ID
+   ) throw new Error("Prior low-end comparison submission is invalid");
+ }
+ if(reportExists){
+   report=readJson(reportFile);
+   if(
+     report.schema!=="fame-owned-beats-basic-pitch-lowend-comparison-report-v1"||
+     report.version!==1||
+     report.reviewId!==PRIOR_REVIEW_ID||
+     report.packageDigestSha256!==sha256File(packageFile)||
+     !submissionExists||
+     report.submissionDigestSha256!==sha256File(submissionFile)
+   ) throw new Error("Prior low-end comparison report is invalid");
+ }
+
+ const marker=path.join(root,"superseded-invalid-review.json");
  const payload={
-   schema:"fame-owned-beats-basic-pitch-lowend-comparison-abort-v1",
+   schema:"fame-owned-beats-basic-pitch-lowend-comparison-superseded-invalid-v1",
    version:1,
    reviewId:PRIOR_REVIEW_ID,
-   status:"ABORTED_BEFORE_FINAL_SUBMISSION_RENDER_DURATION_BUG",
+   status:"SUPERSEDED_INVALID_RENDER_DURATION",
    recordedAt:new Date().toISOString(),
    defectCode:"CANDIDATE_RENDER_DURATION_TRUNCATED_TO_LAST_DETECTED_EVENT",
    observedIssue:"Candidate duration was derived from the last detected event instead of the reference bass stem duration.",
+   priorState:reportExists?"FINALIZED":submissionExists?"SUBMISSION_ONLY":"UNFINALIZED",
+   preservedArtifacts:{
+     reviewPackageSha256:sha256File(packageFile),
+     blindKeySha256:sha256File(blindKeyFile),
+     submissionSha256:submissionExists?sha256File(submissionFile):null,
+     reportSha256:reportExists?sha256File(reportFile):null
+   },
+   gateFromInvalidReviewIgnored:true,
+   scoresCopiedToSupersedingReview:false,
    supersededByReviewId:REVIEW_ID
  };
  if(fs.existsSync(marker)){
    const existing=readJson(marker);
-   if(existing.reviewId!==PRIOR_REVIEW_ID||existing.supersededByReviewId!==REVIEW_ID)throw new Error("Prior abort marker incompatible");
-   return existing;
+   if(
+     existing.schema!==payload.schema||
+     existing.reviewId!==PRIOR_REVIEW_ID||
+     existing.supersededByReviewId!==REVIEW_ID||
+     existing.defectCode!==payload.defectCode||
+     existing.preservedArtifacts?.reviewPackageSha256!==payload.preservedArtifacts.reviewPackageSha256||
+     existing.preservedArtifacts?.submissionSha256!==payload.preservedArtifacts.submissionSha256||
+     existing.preservedArtifacts?.reportSha256!==payload.preservedArtifacts.reportSha256
+   ) throw new Error("Prior invalid-review marker incompatible with preserved artifacts");
+   return{file:marker,payload:existing};
  }
  fs.writeFileSync(marker,stableJson(payload),{flag:"wx"});
- return payload;
+ return{file:marker,payload};
 }
 function pyinResult(workspace,rid){return readJson(path.join(baselineRoot(workspace),rid,"result.json"))}
 function bpResult(workspace,rid){return readJson(path.join(basicPitchRoot(workspace),"outputs",rid,"result.json"))}
@@ -350,7 +405,7 @@ function openBrowser(url){
 function prepare(workspaceRoot,reviewId=REVIEW_ID){
  reviewId=safeId(reviewId,"review-id");if(reviewId!==REVIEW_ID)throw new Error("Only frozen low-end comparison reviewId is allowed");
  const workspace=path.resolve(workspaceRoot),p=protocol(),qa=runTechnicalQa(workspace),prior=validatePriorHumanReview(workspace,p),bp=basicPitchSummary(workspace);
- markPriorComparisonAborted(workspace);
+ const superseded=markPriorComparisonSuperseded(workspace);
  const ids=bp.summary.results.map(x=>x.sourceRecordId);
  if(ids.length!==8||new Set(ids).size!==8)throw new Error("Unexpected Basic Pitch comparison cohort");
  const root=reviewRoot(workspace,reviewId);
@@ -363,6 +418,13 @@ function prepare(workspaceRoot,reviewId=REVIEW_ID){
    basicPitchSummarySha256:sha256File(bp.file),
    basicPitchTechnicalGate:qa.technicalGate,
    priorAudioToMidiHumanReviewSubmissionDigestSha256:prior.submissionDigestSha256,
+   supersededInvalidReview:{
+     reviewId:PRIOR_REVIEW_ID,
+     markerSha256:sha256File(superseded.file),
+     priorState:superseded.payload.priorState,
+     gateIgnored:true,
+     scoresCopied:false
+   },
    criteria:p.criteria,scale:p.scale,renderer:p.renderer,
    families:ids.map(sourceRecordId=>{const referenceFile=sourceStemPath(workspace,sourceRecordId);return{sourceRecordId,candidates:["A","B"],referenceStem:"bass",referenceDurationSeconds:wavDurationSeconds(referenceFile)}}),
    safety:p.safety
@@ -372,7 +434,7 @@ function prepare(workspaceRoot,reviewId=REVIEW_ID){
    fs.writeFileSync(path.join(root,"review-package.json"),stableJson(pkg),{flag:"wx"});
    fs.writeFileSync(path.join(root,"blind-key.json"),stableJson({schema:BLIND_KEY_SCHEMA,version:2,reviewId,mapping:blind}),{flag:"wx"});
  }catch(error){fs.rmSync(root,{recursive:true,force:true});throw error}
- return{mode:"BASIC_PITCH_LOW_END_BLIND_COMPARISON_PREPARED",reviewId,records:8,technicalGate:"ALL_8_FAMILIES_PASS",armIdentityExposedToReviewer:false,finalHoldoutAccessedByThisCommand:false,batch131AccessedByThisCommand:false,trainingAuthorized:false,nextAction:"SERVE_AND_COMPLETE_BLIND_LOW_END_COMPARISON"};
+ return{mode:"BASIC_PITCH_LOW_END_BLIND_COMPARISON_V2_PREPARED",reviewId,supersedesReviewId:PRIOR_REVIEW_ID,priorReviewState:superseded.payload.priorState,priorInvalidGateIgnored:true,priorScoresCopied:false,records:8,technicalGate:"ALL_8_FAMILIES_PASS",armIdentityExposedToReviewer:false,finalHoldoutAccessedByThisCommand:false,batch131AccessedByThisCommand:false,trainingAuthorized:false,nextAction:"SERVE_AND_COMPLETE_BLIND_LOW_END_COMPARISON_V2"};
 }
 
 function serve(workspaceRoot,reviewId=REVIEW_ID,port=0){
@@ -425,4 +487,4 @@ function serve(workspaceRoot,reviewId=REVIEW_ID,port=0){
 function report(workspaceRoot,reviewId=REVIEW_ID){const file=path.join(reviewRoot(path.resolve(workspaceRoot),reviewId),"report.json");if(!fs.existsSync(file))throw new Error("Low-end comparison report missing");return readJson(file)}
 function main(args=process.argv.slice(2)){const[command,workspace,reviewId,port]=args;if(!command||!workspace)throw new Error("Usage: node basic-pitch-lowend-comparison.js <prepare|serve|report> <workspace> [review-id] [port]");if(command==="prepare")process.stdout.write(stableJson(prepare(workspace,reviewId||REVIEW_ID)));else if(command==="serve")serve(workspace,reviewId||REVIEW_ID,port===undefined?0:Number(port));else if(command==="report")process.stdout.write(stableJson(report(workspace,reviewId||REVIEW_ID)));else throw new Error("Unknown command")}
 if(require.main===module){try{main()}catch(error){console.error(error.message);process.exitCode=1}}
-module.exports={prepare,median,computeArmStats,chooseLowEnd,validateSubmission,finalizeSubmission,renderPyin,renderBasicPitch,wavDurationSeconds,markPriorComparisonAborted};
+module.exports={prepare,median,computeArmStats,chooseLowEnd,validateSubmission,finalizeSubmission,renderPyin,renderBasicPitch,wavDurationSeconds,markPriorComparisonSuperseded};
