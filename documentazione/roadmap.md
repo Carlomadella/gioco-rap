@@ -232,9 +232,18 @@ era già chiusa dal 14/09, l'indice non l'aveva visto. Undici prove vitest in
 `test/unit/studio-rivali-e-sala.test.js`. «Le tre code, chiuse il 21/09/2026» in
 `02-interfaccia-e-telefono.md`.
 
-**Manca**: l'app della discografia che dice come invecchiano i pezzi. (Il buco dei 1180px —
-«Che post fai?» che sotto non si raggiungeva — è chiuso il 15/09/2026: il telefono si alza
-a schermo pieno anche da stretto, vedi la tappa G.)
+**FATTO (21/09/2026)** — **remastered e parti 2**, dalla Discografia sul telefono: su un
+pezzo vecchio (8 settimane per la parte 2, 12 per la remastered) la riga ha i suoi tasti; si
+decide lì e si fa in Studio — la parte 2 si incide in Cabina col titolo già suo e quando esce
+rimette in piedi anche il primo, la remastered si chiude al banco del Mix (24 energie, 80 €,
+metà del mix più il fonico) e il pezzo riparte quasi come nuovo. La riga della Discografia nel
+telefono, che era rotta, va su due righe. «Remastered e parti 2» in `04-musica-e-suoni.md`.
+
+**Manca**: la cover «stile emblema», l'editor a livelli (una pagina a parte). L'app della
+discografia che dice come invecchiano i pezzi **c'era già** dal 04/09/2026: questa riga
+diceva che mancava, e non era vero. (Il buco dei 1180px — «Che post fai?» che sotto non si
+raggiungeva — è chiuso il 15/09/2026: il telefono si alza a schermo pieno anche da stretto,
+vedi la tappa G.)
 
 È il punto salito in cima al foglio dei punti nuovi il 07/09/2026 (commit *«il punto sulla
 TRACK sale fra le cose da fare»*). Tocca `sim.js`, `studio.js`, `posto.js` e la discografia:

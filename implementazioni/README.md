@@ -155,6 +155,7 @@ nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../docume
 | **25** | «Disciplina» diventa «Condizione» | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **27** | La landing è una pagina sua, staccata dall'accesso e dal gioco | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **19** | La discografia | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
+| **—** | Remastered e parti 2: la Discografia decide, lo Studio fa | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
 | **20**, **22** | «Fatti sentire un beat» non faceva niente, e i beat non si vedevano | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
 | **28** | Girare a cercare beat non costa più energia | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
 | **13** | L'albero delle abilità | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |

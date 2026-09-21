@@ -354,6 +354,16 @@
 .telslot .dtesta{grid-template-columns:1fr 1fr;gap:6px}
 .telslot .dtesta .dbox{padding:8px 9px}
 .telslot .dtesta .v{font-size:15px}
+.telslot .drow{flex-wrap:wrap;gap:6px 10px;padding:10px 12px}
+/* la riga del pezzo in due righe: copertina e titolo sopra; curva, verso e
+   numeri sotto. Con la larghezza del telefono la riga unica di game.css
+   schiacciava il titolo a zero e i numeri uscivano dal bordo (21/09/2026). */
+.telslot .dnm{flex:1 1 60%;min-width:0}   /* con la copertina riempie la prima riga: il resto va sotto */
+.telslot .dcurva{order:3;flex:0 0 52px;width:auto}
+.telslot .dand{order:4;width:auto;flex:1 1 0;min-width:0;text-align:left}
+.telslot .dnum{order:5;width:auto;flex:0 0 auto}
+.telslot .dnum b{font-size:14px}
+.telslot .dnota{padding:10px 12px 12px;font-size:11.5px}
 .telslot .empty2{padding:12px;font-size:12px}
 
 /* ---- Sputa: il finto X (sputa.js) ----

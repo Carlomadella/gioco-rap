@@ -195,6 +195,56 @@ cliccando sopra si ferma, come dice il codice.
 
     File toccati: `js/game/ui.js`, `js/game/sim.js`, `css/game.css`, `index.html`.
 
+### Remastered e parti 2 — la discografia decide, lo Studio fa
+
+**FATTO (21/09/2026)** — branch `task/discografia-app-telefono`. È la coda del punto di CARLO
+«Non è più: "Faccio un pezzo → +10 fama"»: *«è possibile controllare come stanno andando le
+canzoni nel tempo da un'app del telefono per sapere se stanno invecchiando bene o male e magari
+farci delle remastered o parti 2»*. La prima metà c'era già — la Discografia è un'app del
+telefono dal 04/09 (`e8b1dda`) e la curva dice se un pezzo invecchia — mancava cosa farci.
+
+Adesso su ogni pezzo abbastanza vecchio la riga della Discografia ha i suoi tasti. Si
+**decide lì**, sul telefono, ma il lavoro si fa **in Studio**, come tutto il resto:
+
+- **Parte 2** (da **8 settimane** fuori) — si prenota, e il prossimo pezzo che incidi in Cabina
+  nasce «*Titolo* pt. 2»: la Cabina lo dice sopra alle take, il titolo è già nel campo (si può
+  cambiare, ma resta legato al primo). Quando esce — a mano o di venerdì — succedono due cose:
+  la gente che aveva ascoltato il primo va a sentire il secondo (`seguitoAscolti`, in
+  `sim.js` accanto al feat: una parte degli ascolti totali del primo, ogni settimana, con la
+  curva del secondo), e **il primo torna a girare**: la sua curva ricomincia da capo a metà
+  forza (`rilancio`, `rilancioForza` 0,45). Niente parte 3, e una parte 2 sola per pezzo.
+- **Remastered** (da **12 settimane**, quando la curva è a un quinto) — si prenota, e il Mix
+  dello Studio si apre anche a banco vuoto con il suo pannello: «Rimasterizzi: “Tutto o
+  niente” · q74 → q77, di cui +2 del fonico · torna a girare». Costa **24 energie** come il mix
+  e **80 €** di sala, e la mossa `remaster` esiste solo finché ce n'è una prenotata (nella
+  plancia e nell'Agenda non compare a vuoto). Il pezzo guadagna metà del mix di adesso, mai
+  meno di tre, più il fonico dietro al vetro — è per lui che vale tornare in Studio — e riparte
+  quasi come nuovo (`rilancioForza` 0,8). Una volta sola per pezzo; nella Discografia resta
+  l'etichetta **remastered**.
+
+La curva rilanciata è il massimo fra quella vecchia e una nuova che parte dalla settimana del
+rilancio alla forza scritta sul pezzo (`curvaPezzo` in `seguiti.js`, letta da `songWeekly`):
+un pezzo appena uscito non ne ha bisogno e vince la sua. «Lascia» toglie la prenotazione da
+dove l'hai messa; una prenotazione rimasta in un salvataggio su un pezzo che non c'è più cade
+da sola.
+
+**Incidentale, ma vero**: nel telefono la riga della Discografia era **rotta** da quando è
+diventata un'app — la riga unica di `game.css` (copertina · titolo · curva · verso · numeri)
+nei 250 px del telefono schiacciava il titolo a zero e mandava i numeri fuori dal bordo.
+Adesso va su due righe (`.telslot .drow` in `telefono.css`): copertina e titolo sopra,
+curva, verso e numeri sotto. Provato con Playwright a 1440 (telefono grande) e a 390.
+
+File nuovi: `js/game/seguiti.js` (la logica, i tasti nella Discografia, la nota in Cabina, il
+pannello del Mix) e `css/seguiti.css`. Toccati con un aggancio l'uno: `sim.js` (la curva e
+la gente del primo), `actions.js` (il titolo e il legame in `registra`, il rilancio in
+`pubblica`, la mossa `remaster`), `studio-elementi.js` (il rilancio all'uscita del venerdì),
+`studio.js` (il Mix aperto per la remastered, la nota in Cabina), `ui.js` (la riga e la
+nota della Discografia), `tempo.js`, `orari.js`, `fx.js`, `telefono.css`, `gioco.html`.
+Prove: `test/unit/seguiti.test.js`, otto con vitest sui file veri; cinque controlli nell'audit.
+
+**Resta** del punto: la cover «stile emblema Black Ops 2», l'editor a livelli — è una pagina a
+parte e non è cominciata.
+
 ---
 
 ## 10, 11, 12 · Lo Studio: una stanza sua, e tantissimo gameplay dentro

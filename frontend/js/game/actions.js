@@ -366,7 +366,9 @@ const ACTIONS = [
    },
    run(){
      const b = daIncidere(), bt = beatDaIncidere();
-     chiediTitolo(title(), (nome, seed, img) => {
+     /* la parte 2 prenotata dalla Discografia (seguiti.js) porta il suo titolo */
+     const titoloSeguito = typeof seguitoTitolo === "function" ? seguitoTitolo() : null;
+     chiediTitolo(titoloSeguito || title(), (nome, seed, img) => {
        /* punto 4: il tiro di dado della registrazione non e' piu' invisibile.
           E' la take che hai scelto in cabina (`registrazione_pezzo`), e la
           prima take e' esattamente questo `rnd(-5,6)` — chi non chiede altre
@@ -397,12 +399,15 @@ const ACTIONS = [
             da cosa e' fatta la qualita', letti poi in Fuori. Il mix li
             completa quando arriva. */
          parti:{beat:bt.q, testo:b.q, fonico:conFonico, feat:conFeat, take:presa}};
+       /* se era prenotata una parte 2, e' lui: resta legato al primo (seguiti.js) */
+       const primo = typeof seguitoIncidi === "function" ? seguitoIncidi(s2) : null;
        G.songs.push(s2); G.wellbeing = clamp(G.wellbeing-3,0,100);
        /* appena inciso e' lui sul banco dello Studio (punto 10 «ad ogni
           pezzo»): Mix e Uscita si aprono su di lui */
        if(typeof studioMettiSulBanco === "function") studioMettiSulBanco(seed);
        pushLog("Registrato <b>«" + nome + "»</b> su «" + bt.n + "»" +
-         (conMe ? " con <b>" + conMe.n + "</b>" : "") + " — qualità " + q + ".", "");
+         (conMe ? " con <b>" + conMe.n + "</b>" : "") +
+         (primo ? ", la parte 2 di «" + primo.t + "»" : "") + " — qualità " + q + ".", "");
        SFX.rec(); save(); renderGioco();
        if(typeof renderStudio === "function") renderStudio();
      });
@@ -437,12 +442,36 @@ const ACTIONS = [
      if(!s.mixed) s.q = clamp(s.q - 8, 5, 100);
      s.released = true; s.week = totalWeeks();
      anteprimeAllUscita(s);
+     /* una parte 2 che esce rimette in piedi la prima (seguiti.js) */
+     if(typeof seguitoUscita === "function") seguitoUscita(s);
      /* uscito: il banco dello Studio si svuota, Mix e Uscita si richiudono */
      if(typeof studioSvuotaBanco === "function") studioSvuotaBanco(s);
      /* un nome grosso sul pezzo muove l'hype quando esce: la sua gente lo
         vede (foglio dell'hype, «feat con nomi piu' grandi») */
      G.hype = clamp(G.hype + 6 + s.q*0.12 + featHypeUscita(s), 0, (typeof hypeCap==="function"?hypeCap():100));
      return "«" + s.t + "» è fuori" + (s.mixed ? "." : ", ma non era mixato: qualità " + s.q + ".");
+   }},
+
+  /* Remastered (seguiti.js): si prenota dalla Discografia su un pezzo uscito
+     da almeno REMASTER_ETA_MIN settimane e si chiude qui, al banco del Mix.
+     La mossa esiste solo finche' ce n'e' una prenotata: nella plancia e
+     nell'Agenda non compare a vuoto. */
+  {id:"remaster", n:"Remastered", e:24, luc:2,
+   d:"Il pezzo vecchio torna al banco: qualche punto in più, e riparte.",
+   avail:() => typeof remasterPrenotato === "function" && !!remasterPrenotato(),
+   money:() => (typeof REMASTER_COSTO !== "undefined" ? REMASTER_COSTO : 80),
+   need:() => (typeof remasterPrenotato === "function" && remasterPrenotato()) ? null : "un pezzo scelto dalla Discografia",
+   give:() => {
+     const s = remasterPrenotato();
+     return s ? "«" + s.t + "» q" + s.q + " → q" + clamp(s.q + remasterGuadagno(), 5, 100) + " · torna a girare" : "";
+   },
+   run(){
+     const r = remasterChiudi();
+     if(!r) return "";
+     G.money -= (typeof REMASTER_COSTO !== "undefined" ? REMASTER_COSTO : 80);
+     G.hype = clamp(G.hype + 4, 0, (typeof hypeCap==="function"?hypeCap():100));
+     gain("flow", 0.6);
+     return "«" + r.s.t + "» rimasterizzato: qualità " + r.prima + " → " + r.s.q + ". Torna a girare.";
    }},
 
   {id:"promo", n:"Promo sui social", e:12,

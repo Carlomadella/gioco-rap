@@ -48,6 +48,7 @@
     beat:"studio",
     registra:"studio",
     mixa:"studio",
+    remaster:"studio",
     live:"concerti",
     /* punto 9: due mosse, stesso posto */
     palestra_pesi:"palestra",

@@ -264,7 +264,7 @@ SUONO_NOMI.forEach(k => {
   };
 });
 
-const SND = {scrivi:"write", beat:"apri", registra:"rec", mixa:"mix", pubblica:"publish",
+const SND = {scrivi:"write", beat:"apri", registra:"rec", mixa:"mix", remaster:"mix", pubblica:"publish",
   promo:"promo", anteprima:"promo", free:"crowd", live:"crowd", turno:"cash", cercalavoro:"apri", stacca:"tap",
   palestra_pesi:"palestra", palestra_cardio:"palestra"};
 

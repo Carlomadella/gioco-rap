@@ -778,6 +778,8 @@ function studioUscitePronte(){
     s.released = true;
     s.week = typeof totalWeeks === "function" ? totalWeeks() : (G.week || 1);
     if(typeof anteprimeAllUscita === "function") anteprimeAllUscita(s);
+    /* una parte 2 che esce rimette in piedi la prima (seguiti.js) */
+    if(typeof seguitoUscita === "function") seguitoUscita(s);
     const cap = typeof hypeCap === "function" ? hypeCap() : 100;
     const feat = typeof featHypeUscita === "function" ? featHypeUscita(s) : 0;
     G.hype = clamp(G.hype + 6 + s.q * 0.12 + STUDIO_VENERDI_HYPE + feat, 0, cap);

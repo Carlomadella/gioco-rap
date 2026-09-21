@@ -108,7 +108,10 @@ function studioSbloccato(){
   return !!studioSulBanco();
 }
 function studioSezAperta(x){
-  return !x.dopo || studioSbloccato();
+  if(!x.dopo || studioSbloccato()) return true;
+  /* il Mix si apre anche a banco vuoto se c'e' una remastered prenotata
+     dalla Discografia (seguiti.js): e' li' che si chiude */
+  return x.id === "banco" && typeof remasterPrenotato === "function" && !!remasterPrenotato();
 }
 
 /* ==================== IL PEZZO SUL BANCO (F2) ====================
@@ -1040,6 +1043,8 @@ function studioSezCabina(){
     const scelta = prese ? studioTakeQ(t.l[t.s]) : q;
     mid = stPan("",
       stCapo("Incidi", (b.tema || "la strofa") + "» su «" + bt.n, "q~" + q) +
+      /* la parte 2 prenotata dalla Discografia (seguiti.js) */
+      (typeof seguitoCabinaNota === "function" ? seguitoCabinaNota() : "") +
       '<p class="stnota">Un fonico che ti conosce sa dove metterti la voce prima che glielo ' +
         'chiedi: <b>vale qualità</b>, in cabina e al banco.</p>' +
       studioTakeElenco() +
@@ -1145,7 +1150,15 @@ function studioSezBanco(){
       : studioVuoto("Non conosci ancora nessun fonico. <b>Alla Sala</b> ce ne gira più di uno.")));
 
   let mid;
-  if(scelto){
+  const remaster = typeof remasterPannello === "function" ? remasterPannello() : "";
+  if(remaster){
+    /* la remastered prenotata dalla Discografia (seguiti.js) passa avanti:
+       il banco torna al provino appena la chiudi, o la lasci */
+    mid = remaster + (scelto
+      ? stPan("", '<p class="stnota">Sul banco c\'è anche «<b>' + studioEsc(scelto.t) +
+          '</b>» da mixare: viene dopo la remastered, o dopo che l\'hai lasciata.</p>')
+      : "");
+  } else if(scelto){
     /* Il centro e' quello di `studio_mixaggio`: **i tre cursori**, con le
        tacche, i due capi scritti sotto e una frase per ognuno. Sotto, il
        riquadro del risultato con il carattere che ne esce — «→ q78 ·

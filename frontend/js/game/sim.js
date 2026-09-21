@@ -24,7 +24,10 @@ function featAscolti(s){
 }
 function songWeekly(s){
   const age = totalWeeks() - s.week;
-  const curve = age <= 1 ? 1 : Math.exp(-age/7.5);
+  /* remastered e parti 2 (seguiti.js): un pezzo rilanciato ricomincia la
+     sua curva dalla settimana del rilancio, alla forza scritta sul pezzo */
+  const curve = typeof curvaPezzo === "function" ? curvaPezzo(s, age)
+    : (age <= 1 ? 1 : Math.exp(-age/7.5));
   const push = G.contract ? G.contract.push : 1;
   // chi ti segue già lo ascolta; gli altri ti scoprono solo se il pezzo è forte e c'è hype
   const fanPull = G.fans * rnd(0.26, 0.5) * (0.5 + s.q/170);
@@ -33,7 +36,9 @@ function songWeekly(s){
      Vale la fama di chi c'e' sopra, scritta alla registrazione, e segue la
      stessa curva del resto — non e' un colpo secco, e' pubblico in piu' */
   const featPull = featAscolti(s);
-  let out = (fanPull + scoperta + featPull) * curve * rnd(0.8, 1.25);
+  /* la parte 2 (seguiti.js): chi aveva ascoltato il primo va a sentire il secondo */
+  const seguitoPull = typeof seguitoAscolti === "function" ? seguitoAscolti(s) : 0;
+  let out = (fanPull + scoperta + featPull + seguitoPull) * curve * rnd(0.8, 1.25);
   /* punto 10: il video girato dal videomaker de La Sala. Non è un colpo di
      hype che passa: resta attaccato al pezzo e lo tiene a galla settimana
      dopo settimana, che è quello che fa un video per davvero. */

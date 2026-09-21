@@ -21,6 +21,7 @@ const LAPERTE = new Set();
 const ART = {
   scrivi:TINTA_STUDIO.concat("S"), beat:TINTA_SUONO.concat("B"),
   registra:TINTA_STUDIO.concat("R"), mixa:TINTA_STUDIO.concat("M"),
+  remaster:TINTA_STUDIO.concat("\u21bb"),
   pubblica:TINTA_STUDIO.concat("P"), promo:TINTA_HUSTLE.concat("O"),
   anteprima:TINTA_HUSTLE.concat("A"),
   free:TINTA_SUONO.concat("F"), live:TINTA_SUONO.concat("L"),
@@ -812,6 +813,8 @@ function renderDiscografia(){
       discoCurva(x.storia, a.c) +
       '<span class="dand"><u>' + a.t + '</u>' + (a.f ? '<em>' + a.f + '</em>' : '') + '</span>' +
       '<span class="dnum"><b>' + short(x.streams || 0) + '</b><span>' + short(x.last || 0) + ' questa sett.</span></span>' +
+      /* remastered e parti 2 (seguiti.js): l'etichetta e i tasti, quando il pezzo e' abbastanza vecchio */
+      (typeof discoSeguitiRiga === "function" ? discoSeguitiRiga(x) : "") +
       '</div>';
   }).join("");
 
@@ -819,7 +822,8 @@ function renderDiscografia(){
     '<div class="dlista">' + righe + '</div>' +
     '<p class="dnota">La curva sono le ultime settimane di ascolti. Un pezzo che scende non \u00e8 ' +
     'un pezzo brutto: \u00e8 un pezzo vecchio. Quello che lo rimette in piedi \u00e8 quello che gli ' +
-    'succede intorno \u2014 un video, un feat, un palco, un altro pezzo che tira su tutto il resto.</p>' +
+    'succede intorno \u2014 un video, un feat, un palco, un altro pezzo che tira su tutto il resto.' +
+    (typeof discoSeguitiNota === "function" ? discoSeguitiNota(fuori) : "") + '</p>' +
     '</div>';
   box.querySelector(".dlista").style.setProperty("--acc", cc);
 }
