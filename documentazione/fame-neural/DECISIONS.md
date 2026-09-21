@@ -1237,3 +1237,21 @@ Per non riscrivere un'implementazione già consumata:
 - il nuovo executor scrive `failure-report.json` append-only con stage, family, tipo, messaggio e traceback se dovesse fallire di nuovo.
 
 Questo superseding non autorizza final holdout, batch 131, training o task-data readiness.
+
+## NDR-081 — Basic Pitch: superseding receipt v1-002 AUTHORIZED_NO_INFERENCE
+
+**Stato: ACCEPTED — 21 settembre 2026.**
+
+Il receipt append-only del superseding run `basic-pitch-development-inference-v1-002` è stato creato con successo dopo aver verificato e marcato in sicurezza `v1-001` come tentativo abortito senza output family persistenti.
+
+Il receipt v1-002 conferma:
+
+- 8/8 record development;
+- `status=AUTHORIZED_NO_INFERENCE`;
+- `supersedesRunId=basic-pitch-development-inference-v1-001`;
+- `algorithmChanged=false`;
+- nessuna inferenza Basic Pitch durante la preparazione;
+- nessun MIDI scritto;
+- final holdout, batch 131 e training esclusi.
+
+È quindi autorizzato il primo tentativo reale del superseding executor v1-002. In caso di ulteriore failure, il nuovo runner deve persistere `failure-report.json` con stage, family, tipo, messaggio e traceback prima che il wrapper sollevi l'errore.
