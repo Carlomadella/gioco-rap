@@ -757,3 +757,6 @@ Preparazione Basic Pitch aperta in ambiente separato `venv-basic-pitch`, Python 
 
 
 Bootstrap ambiente Basic Pitch completato con `BASIC_PITCH_ENVIRONMENT_BOOTSTRAP_PASS`: Python `3.10.11`, `basic-pitch==0.4.0`, backend `ONNX`, `onnxruntime==1.23.2`, modello packaged `nmp.onnx` da 230444 byte con SHA256 `2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec`. Il `pip freeze --all` locale ha SHA256 `9374ac7a60f9ba6cc97ae14f9b8627c527bb3ef70833d27e95340d45ff69aa7f`. Setup senza accesso audio/inferenza/holdout/batch131/training. Il modello è ora congelato in repo; manca solo il commit del lock transitivo esatto prima di qualsiasi inferenza Basic Pitch.
+
+
+Exact transitive lock Basic Pitch committato in `requirements-basic-pitch-lock.txt`: 44 package, package set derivato dal `pip freeze --all` locale con source SHA256 `9374ac7a60f9ba6cc97ae14f9b8627c527bb3ef70833d27e95340d45ff69aa7f`, SHA256 canonico repository `3613fc36f85e54629e14e98cd05648eb2b3d1ddd2b2f3ee87360299f464a60ad`. `.gitattributes` forza LF sul lock digest-sensitive. Stato candidato: environment+model frozen, **verifica locale finale pre-inference pendente**. Nessuna inferenza Basic Pitch autorizzata prima di `BASIC_PITCH_ENVIRONMENT_LOCK_VERIFY_PASS`.
