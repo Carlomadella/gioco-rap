@@ -760,3 +760,8 @@ Bootstrap ambiente Basic Pitch completato con `BASIC_PITCH_ENVIRONMENT_BOOTSTRAP
 
 
 Exact transitive lock Basic Pitch committato in `requirements-basic-pitch-lock.txt`: 44 package, package set derivato dal `pip freeze --all` locale con source SHA256 `9374ac7a60f9ba6cc97ae14f9b8627c527bb3ef70833d27e95340d45ff69aa7f`, SHA256 canonico repository `3613fc36f85e54629e14e98cd05648eb2b3d1ddd2b2f3ee87360299f464a60ad`. `.gitattributes` forza LF sul lock digest-sensitive. Stato candidato: environment+model frozen, **verifica locale finale pre-inference pendente**. Nessuna inferenza Basic Pitch autorizzata prima di `BASIC_PITCH_ENVIRONMENT_LOCK_VERIFY_PASS`.
+
+
+Pre-inference gate Basic Pitch completato con `BASIC_PITCH_PREINFERENCE_GATE_PASS`: exact environment/model lock verificato, 8/8 family development verificate, byte degli 8 `bass.wav` letti solo per controllo SHA, nessun decode audio, nessuna inferenza Basic Pitch, nessun MIDI scritto, nessun accesso a source audio originale/final holdout/batch131 e training ancora non autorizzato. Prossimo passo: creare il receipt append-only `basic-pitch-development-inference-v1-001` in stato `AUTHORIZED_NO_INFERENCE`.
+
+Execution contract Basic Pitch congelato prima del primo output: API `basic_pitch.inference.predict`, default v0.4.0 onset `0.5`, frame `0.3`, minimum note length `127.70 ms`, banda low-end `25–300 Hz`, `multiplePitchBends=true`, `melodiaTrick=true`, BPM autonomo per family dalla Audio Analysis V2. Il receipt runner è congelato al Git blob `0feffda5174f5a4a3a29a986c437384cc8cbc5f7`.
