@@ -1126,3 +1126,20 @@ Ambiente osservato:
 - SHA256 del `pip freeze --all` locale `9374ac7a60f9ba6cc97ae14f9b8627c527bb3ef70833d27e95340d45ff69aa7f`.
 
 Il modello è congelato in spec/protocollo candidato. Il lock transitivo non viene ricostruito dal log di installazione: deve derivare esattamente dal `pip-freeze-all.txt` catturato dal receipt. Fino al commit e alla verifica del lock, l'inferenza Basic Pitch sugli 8 bass stem resta vietata.
+
+## NDR-076 — Basic Pitch: exact transitive lock committato
+
+**Stato: ACCEPTED — 21 settembre 2026.**
+
+Il `pip freeze --all` catturato dal bootstrap locale Basic Pitch è stato committato come `requirements-basic-pitch-lock.txt` senza ricostruire il package set dal log di installazione.
+
+Freeze:
+
+- package count: 44;
+- source freeze SHA256: `9374ac7a60f9ba6cc97ae14f9b8627c527bb3ef70833d27e95340d45ff69aa7f`;
+- repository canonical SHA256: `3613fc36f85e54629e14e98cd05648eb2b3d1ddd2b2f3ee87360299f464a60ad`;
+- `basic-pitch==0.4.0`;
+- `onnxruntime==1.23.2`;
+- packaged model `nmp.onnx` SHA256 `2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec`.
+
+Il lock è marcato reviewed/committed e il file è forzato LF via `.gitattributes`. Questo non autorizza ancora l'inferenza: prima serve il verifier locale finale che confronta lock repository, freeze locale, receipt, venv corrente e modello corrente.
