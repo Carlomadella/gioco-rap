@@ -13,7 +13,21 @@ def sha256_file(path):
             h.update(chunk)
     return h.hexdigest()
 
+def model_load_smoke(model_path):
+    from basic_pitch.inference import Model
+    model = Model(model_path)
+    model_type = getattr(getattr(model, "model_type", None), "name", None)
+    if model_type != "ONNX":
+        raise RuntimeError(f"Basic Pitch model smoke expected ONNX, found {model_type}")
+    return model_type
+
+
 def main():
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--load-model-smoke", action="store_true")
+    args = parser.parse_args()
+
     import basic_pitch
     from basic_pitch import ICASSP_2022_MODEL_PATH, ONNX_PRESENT, TF_PRESENT, TFLITE_PRESENT, CT_PRESENT
 
@@ -49,12 +63,21 @@ def main():
             "bytes": model.stat().st_size,
             "sha256": sha256_file(model),
         },
+        "modelLoadSmoke": {
+            "requested": bool(args.load_model_smoke),
+            "passed": False,
+            "modelType": None,
+        },
         "sourceAudioOpenedByThisCommand": False,
         "transcriptionExecutedByThisCommand": False,
         "finalHoldoutAccessedByThisCommand": False,
         "batch131AccessedByThisCommand": False,
         "trainingAuthorized": False,
     }
+    if args.load_model_smoke:
+        payload["modelLoadSmoke"]["modelType"] = model_load_smoke(model)
+        payload["modelLoadSmoke"]["passed"] = True
+
     print(json.dumps(payload, indent=2))
 
 if __name__ == "__main__":
