@@ -1,0 +1,46 @@
+{
+  "schema": "fame-owned-beats-basic-pitch-execution-implementation-v2",
+  "version": 2,
+  "status": "FROZEN_BEFORE_FIRST_V2_BASIC_PITCH_INFERENCE",
+  "runId": "basic-pitch-development-inference-v1-002",
+  "executionContractPath": "basic-pitch-execution-contract-v2.json",
+  "executionContractGitBlobSha": "1b719ee780f826185e6f77179dd6333539675aa1",
+  "executor": {
+    "path": "basic-pitch-development-execute-v2.py",
+    "gitBlobSha": "5ae04e481ca752699520a2349e5d0ae15ce86885",
+    "implementationCommit": "1a29bb45fd63855df096eb45b8baea3e90f06c27"
+  },
+  "runtime": {
+    "modelLoadedOncePerProcess": true,
+    "basicPitchApi": "basic_pitch.inference.predict",
+    "rawModelOutputPersisted": false
+  },
+  "output": {
+    "outputRootCreatedBeforeInference": true,
+    "atomicPerFamily": true,
+    "resumeByValidatedReceipt": true,
+    "perFamily": [
+      "basic-pitch.mid",
+      "result.json"
+    ],
+    "summary": "inference-summary.json",
+    "rawModelOutputPersisted": false
+  },
+  "supersedes": {
+    "runId": "basic-pitch-development-inference-v1-001",
+    "executorGitBlobSha": "0027011aa74a001c52918e885864c8bf82891260",
+    "algorithmChanged": false,
+    "implementationOnlyFix": true,
+    "defectCode": "OUTPUT_PARENT_NOT_CREATED_BEFORE_ATOMIC_RENAME"
+  },
+  "safety": {
+    "split": "development",
+    "expectedFamilies": 8,
+    "inputStem": "bass",
+    "originalSourceAudioAllowed": false,
+    "finalHoldoutAllowed": false,
+    "batch131Allowed": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false
+  }
+}
