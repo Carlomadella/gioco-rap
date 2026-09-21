@@ -1186,3 +1186,25 @@ Prima della prima inferenza viene congelato `basic-pitch-execution-contract-v1.j
 - output append-only.
 
 Il runner che prepara/verifica il receipt è congelato al Git blob `0feffda5174f5a4a3a29a986c437384cc8cbc5f7` (commit `1870274e43f3934e42eb5779ef6b69b5d4473dc7`). Il prossimo passo è creare il receipt append-only `AUTHORIZED_NO_INFERENCE`; l'inferenza resta separata.
+
+## NDR-079 — Basic Pitch: receipt 8/8 AUTHORIZED_NO_INFERENCE e executor congelato
+
+**Stato: ACCEPTED — 21 settembre 2026.**
+
+Il run `basic-pitch-development-inference-v1-001` dispone ora del receipt append-only in stato `AUTHORIZED_NO_INFERENCE`, creato dopo il PASS del pre-inference gate.
+
+Il receipt blocca 8/8 family development, gli SHA degli input `bass.wav`, il modello ONNX, l'exact environment lock, la Human QA precedente e i BPM autonomi della Audio Analysis V2. La sua creazione non ha decodificato audio, eseguito Basic Pitch o scritto MIDI.
+
+Per non modificare un artefatto già consumato, l'esecuzione viene affidata a `basic-pitch-development-execute.py`, separato dal receipt runner. Prima del primo output è stato congelato l'executor al Git blob `0027011aa74a001c52918e885864c8bf82891260`.
+
+L'executor:
+
+- carica il modello ONNX una sola volta per l'intero run;
+- usa soltanto gli 8 `bass.wav` del receipt;
+- verifica che i parametri `receipt.inference` coincidano esattamente con l'execution contract;
+- produce per family `basic-pitch.mid` + `result.json` in directory temporanea, poi rename atomico;
+- non persiste i raw model tensor;
+- può riprendere un run solo se output esistenti e SHA sono già validi;
+- lascia final holdout, batch 131, training e task-data readiness chiusi.
+
+Il prossimo passo è la prima inferenza reale Basic Pitch sugli 8 bass stem development.
