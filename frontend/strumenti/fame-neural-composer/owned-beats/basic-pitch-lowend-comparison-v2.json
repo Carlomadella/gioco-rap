@@ -1,0 +1,77 @@
+{
+  "schema": "fame-owned-beats-basic-pitch-lowend-comparison-v2",
+  "version": 2,
+  "status": "FROZEN_BEFORE_FIRST_SUPERSEDING_LOW_END_COMPARISON_LISTENING",
+  "reviewId": "basic-pitch-lowend-blind-comparison-v1-002",
+  "split": "development",
+  "expectedFamilies": 8,
+  "baseline": {
+    "armId": "librosa-pyin-lowend-v1",
+    "runId": "audio-to-midi-development-baseline-v1-001",
+    "priorHumanReviewId": "audio-to-midi-human-review-v1-001",
+    "priorHumanReviewSubmissionDigestSha256": "52e7803b56fee6a6a7dea7546b7a6c6c38fdb86b01b6861f07a5a96882518f0d",
+    "priorGatePass": true
+  },
+  "candidate": {
+    "armId": "basic-pitch-0.4.0-lowend-v1",
+    "runId": "basic-pitch-development-inference-v1-003",
+    "technicalGateRequired": "ALL_8_FAMILIES_PASS"
+  },
+  "blindness": {
+    "balancedAB": true,
+    "armIdentityExposedDuringReview": false,
+    "mappingPrivateLocalOnly": true
+  },
+  "renderer": {
+    "sampleRate": 22050,
+    "sameNeutralOscillatorForBothArms": true,
+    "fundamentalGain": 0.3,
+    "secondHarmonicGain": 0.066,
+    "attackSeconds": 0.01,
+    "releaseSeconds": 0.04,
+    "pyinUsesFrozenNoteBoundariesAndPitchContour": true,
+    "basicPitchUsesFrozenNoteBoundariesAndPitchBends": true,
+    "basicPitchPitchBendUnitsPerSemitone": 3,
+    "sourceBassStemProvidedAsReference": true,
+    "httpByteRangeRequired": true,
+    "outputDurationSource": "reference-bass-stem",
+    "outputDurationMustMatchReference": true,
+    "silenceAfterLastDetectedEventPreserved": true,
+    "durationToleranceSeconds": 0.01
+  },
+  "criteria": [
+    "onset/timing",
+    "pitch/octave correctness",
+    "duration/release",
+    "glide/pitch-bend preservation",
+    "downstream MIDI usefulness"
+  ],
+  "scale": {
+    "min": 0,
+    "max": 3,
+    "labels": {
+      "0": "unusable",
+      "1": "weak / major corrections",
+      "2": "usable / limited corrections",
+      "3": "strong / minimal corrections"
+    }
+  },
+  "qualification": {
+    "medianUsefulnessAtLeast": 2,
+    "familiesAtOrAbove2AtLeast": 6
+  },
+  "selectionRule": [
+    "higher median usefulness",
+    "higher families at or above 2",
+    "higher total usefulness score",
+    "if still tied, prefer librosa-pyin-lowend-v1 as lower-complexity method"
+  ],
+  "safety": {
+    "finalHoldoutAllowed": false,
+    "batch131Allowed": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "supersedesReviewId": "basic-pitch-lowend-blind-comparison-v1-001",
+  "supersedesReason": "CANDIDATE_RENDER_DURATION_TRUNCATED_TO_LAST_DETECTED_EVENT"
+}
