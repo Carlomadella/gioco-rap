@@ -881,3 +881,23 @@ I 12 record congelati sono:
 `FAME000001, FAME000102, FAME000006, FAME000129, FAME000020, FAME000073, FAME000092, FAME000121, FAME000010, FAME000071, FAME000116, FAME000101`.
 
 La reference è legata al selector Git blob `305fe132ba54d4b777d8d2a76e66262fd39ea554`, al protocollo e alla decisione di split. Il prossimo passo è metadata-only: preflight + reservation delle 12 family nello split `audio-to-midi-evaluation-v1`, ancora senza Source Separation o Audio→MIDI.
+
+## Evaluation Audio→MIDI: reservation completata ed execution congelata — 21 settembre 2026
+
+La reservation del cohort `audio-to-midi-independent-evaluation-v1` è completata e verificata con `AUDIO_TO_MIDI_INDEPENDENT_EVALUATION_RESERVATION_CHECK_PASS`.
+
+Stato verificato:
+
+- 12/12 family usano lo split `audio-to-midi-evaluation-v1`;
+- 0 record estranei usano quello split;
+- cohort digest `287839b1967f659988927539fcefabd44a286541698a8700349712c84525d788`;
+- audio non aperto/decodificato dalla reservation;
+- Source Separation non eseguita;
+- trascrizione non eseguita;
+- batch131/training/task-data readiness ancora chiusi.
+
+Dopo la reservation, il corpus proprietario ha **91 family ancora non assegnate** (103 fresche prima della reservation meno le 12 ora riservate).
+
+È stato inoltre congelato, prima del primo audio access evaluation, `audio-to-midi-independent-evaluation-execution-v1.json`. La pipeline resta immutata rispetto alla selezione development: BPM autonomo `audio-analysis-v2-config-001` con beat/BPM V1 invariati → HTDemucs OpenVINO congelato → `drums-bass-kick-fusion-v1` + `librosa-pyin-lowend-v1`. Basic Pitch resta escluso. Il nuovo executor ha self-test CI PASS nell'ambiente Audio Analysis.
+
+Prossimo passaggio: creare e verificare il receipt append-only di esecuzione senza aprire audio. Solo dopo quel receipt è consentita la singola esecuzione sui 12 record.
