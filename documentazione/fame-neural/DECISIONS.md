@@ -1107,3 +1107,22 @@ Basic Pitch viene preparato in `venv-basic-pitch` separato, Python 3.10. Prima d
 - backend ONNX verificato;
 - SHA256 del modello `icassp_2022/nmp.onnx` incluso nel package congelato e commesso;
 - nessun accesso al final holdout, batch 131 o training.
+
+## NDR-075 — Basic Pitch: bootstrap environment PASS, modello ONNX congelato
+
+**Stato: ACCEPTED — 21 settembre 2026.**
+
+Il bootstrap locale `basic-pitch-env-v1-001` è completato senza aprire audio e senza eseguire trascrizioni.
+
+Ambiente osservato:
+
+- Python `3.10.11`;
+- `basic-pitch==0.4.0`;
+- backend selezionato `ONNX`;
+- `onnxruntime==1.23.2`;
+- modello packaged `nmp.onnx`;
+- dimensione modello 230444 byte;
+- SHA256 modello `2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec`;
+- SHA256 del `pip freeze --all` locale `9374ac7a60f9ba6cc97ae14f9b8627c527bb3ef70833d27e95340d45ff69aa7f`.
+
+Il modello è congelato in spec/protocollo candidato. Il lock transitivo non viene ricostruito dal log di installazione: deve derivare esattamente dal `pip-freeze-all.txt` catturato dal receipt. Fino al commit e alla verifica del lock, l'inferenza Basic Pitch sugli 8 bass stem resta vietata.
