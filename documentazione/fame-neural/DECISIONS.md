@@ -1255,3 +1255,31 @@ Il receipt v1-002 conferma:
 - final holdout, batch 131 e training esclusi.
 
 È quindi autorizzato il primo tentativo reale del superseding executor v1-002. In caso di ulteriore failure, il nuovo runner deve persistere `failure-report.json` con stage, family, tipo, messaggio e traceback prima che il wrapper sollevi l'errore.
+
+## NDR-082 — Basic Pitch: v1-002 abortito per receipt schema mismatch; v1-003 con parity contract
+
+**Stato: ACCEPTED — 21 settembre 2026.**
+
+Il tentativo `basic-pitch-development-inference-v1-002` si è fermato in `validate_receipt()`, prima del model load e quindi prima di qualunque inferenza audio.
+
+Causa verificata:
+
+- il receipt producer v2 emetteva `priorRunValidatedAndMarkedAborted`, `bassStemIntegrityBytesReadByPrepareCommand`, `audioDecodedByPrepareCommand=false`, `basicPitchInferenceExecutedByPrepareCommand=false` e `midiWrittenByPrepareCommand=false`;
+- l'executor v2 ereditava ancora dal v1 anche il requisito `preInferenceGatePassedImmediatelyBeforeReceipt=true`;
+- tale campo non era presente nel receipt v2;
+- l'executor rifiutava quindi inevitabilmente il receipt con `Basic Pitch receipt no longer matches frozen repository artifacts`.
+
+Questo è un errore di implementazione producer/consumer, non un risultato del modello Basic Pitch.
+
+Strategia v1-003:
+
+- nuovo run append-only `basic-pitch-development-inference-v1-003`;
+- `algorithmChanged=false`;
+- stessi 8 bass stem, stesso modello, stessi BPM e stessi parametri `predict()`;
+- fresh pre-inference gate rieseguito prima della creazione del receipt;
+- `receiptEvidence` congelato come unico oggetto nel contract v3;
+- producer e consumer devono usare/confrontare esattamente quell'oggetto;
+- test CI dedicato producer ↔ contract ↔ consumer;
+- failure report esteso allo stage `PRE_EXECUTION_VALIDATION`.
+
+Final holdout, batch 131, training e task-data readiness restano chiusi.
