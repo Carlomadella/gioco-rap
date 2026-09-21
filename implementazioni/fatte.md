@@ -36,8 +36,35 @@ cita (la catena del pezzo) e il «punto 4 di ALE» di
 
 _Le due piccole dell'energia, chiuse insieme nel branch `task/sala-gratis-e-take-a-25`:
 la Sala che non costa più niente e la take che costava troppo. Poi la prima delle tre dello
-Shop, «Lo stile che conta», nel branch `task/shop-lo-stile-che-conta`; e la richiesta
-arrivata subito dopo — solo vestiti, coi filtri — chiusa in giornata._
+Shop, «Lo stile che conta», nel branch `task/shop-lo-stile-che-conta`; la richiesta
+arrivata subito dopo — solo vestiti, coi filtri — chiusa in giornata; e le altre due dello
+Shop, i capi che si sbloccano e le offerte, insieme nel branch
+`task/shop-capi-sbloccati-e-offerte`._
+
+### Capi che si sbloccano, e le offerte della settimana
+
+_Da `implementazioni.md`, CARLO «Shop (20/09/2026)» 2 e 3._
+
+2. **Capi che si sbloccano** — non tutto in vendita dal primo giorno: la giacca elegante
+   dopo il primo contratto, l'anello di diamanti a 10.000 fan, i capi «di Milano» solo dopo
+   la trasferta. Lo Shop cresce con la carriera; una card bloccata dice cosa serve.
+
+   **FATTO (21/09/2026)** — sette capi del catalogo portano `req`: la giacca elegante e le
+   Oxford dopo il primo contratto (vale anche se poi l'etichetta ha rescisso), l'anello di
+   diamanti a 10.000 fan e la collana di perle a 2.500, il trench bianco, i mocassini e gli
+   stivali di pelle dopo una trasferta a Milano. La card bloccata resta in vetrina, spenta,
+   con scritto cosa serve; la testata conta quanti si sbloccano ancora.
+
+3. **Le offerte della settimana** — un capo a metà prezzo che gira ogni lunedì, come i beat
+   del banco, più un banco dell'usato con capi scontati che vanno e vengono.
+
+   **FATTO (21/09/2026)** — `js/game/negozio-offerte.js`, file nuovo: al lunedì
+   (`advanceWeek`) un capo comprabile va a metà prezzo fino a domenica e il banco
+   dell'usato si rinnova — da uno a tre capi al −25/−30/−40%, ognuno con una scadenza da una
+   a tre settimane; via gli scaduti e i comprati, dentro i nuovi. Si salva in `G.offerte`,
+   il diario lo dice al lunedì, la sezione «Questa settimana» sta in testa al reparto. Il
+   racconto di tutti e due: «Lo Shop cresce con la carriera: i capi che si sbloccano e le
+   offerte della settimana» in `02-interfaccia-e-telefono.md`.
 
 ### Lo Shop vende solo vestiti, coi filtri
 

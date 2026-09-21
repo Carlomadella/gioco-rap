@@ -1110,9 +1110,9 @@ testata dice perché; Avaturn: zero capi) e nel gioco con Playwright a 1366 × 7
 la testata, le card con la riga accesa, il riepilogo del lifestyle, nessun errore in
 console.
 
-**Cosa resta dei tre punti dello Shop.** Il secondo (i capi che si sbloccano con la
-carriera) e il terzo (le offerte della settimana e l'usato) sono le due voci che restano
-nell'ordine in `implementazioni.md`.
+**Cosa resta dei tre punti dello Shop.** Niente, dal 21/09 sera: il secondo (i capi che si
+sbloccano con la carriera) e il terzo (le offerte della settimana e l'usato) sono chiusi
+insieme, «Lo Shop cresce con la carriera», più sotto.
 
 ---
 
@@ -1182,6 +1182,106 @@ del beat» guarda solo lo Studio.
 **Provato** con Playwright a 1366 × 768 e 390 × 844: 39 capi su «Tutti», 7 su «Scarpe» con
 la sola intestazione «Scarpe», l'acquisto col filtro attivo che resta sulle scarpe («Scarpe
 2/7», 900 → 660 €), nessun errore in console. Verifica completa verde.
+
+---
+
+## Lo Shop cresce con la carriera: i capi che si sbloccano e le offerte della settimana
+
+> «Capi che si sbloccano — non tutto in vendita dal primo giorno: la giacca elegante dopo il
+> primo contratto, l'anello di diamanti a 10.000 fan, i capi «di Milano» solo dopo la
+> trasferta. Lo Shop cresce con la carriera; una card bloccata dice cosa serve.»
+> «Le offerte della settimana — un capo a metà prezzo che gira ogni lunedì, come i beat del
+> banco, più un banco dell'usato con capi scontati che vanno e vengono.» — CARLO, «Shop
+> (20/09/2026)» 2 e 3, gli ultimi due dei tre scelti chiudendo il reparto Vestiti.
+
+**FATTO (21/09/2026)** — branch `task/shop-capi-sbloccati-e-offerte`. File nuovo:
+`frontend/js/game/negozio-offerte.js` (le offerte). Toccati: `js/creator/guardaroba.js`
+(il campo `req` su sette capi), `js/game/negozio.js` (lo sblocco, la card bloccata, il
+prezzo in offerta, la sezione in testa), `js/game/sim.js` (una riga al lunedì),
+`css/game.css`, `pagine/gioco.html` e `pagine/landing.html` (le versioni),
+`strumenti/audit-regressioni.js` (otto controlli nuovi, uno aggiornato e la regex dei capi
+che accetta `req`).
+
+**I capi che si sbloccano.** Il catalogo dice, su alcuni capi, cosa deve essere successo
+prima di poterli comprare — `req`, un oggetto con una condizione sola: `{contratto:true}`,
+`{fan:N}` o `{citta:"milano"}`. Sette capi su trentanove, tutti eleganti e tutti fra i
+più cari, così la vetrina del primo giorno resta street e da poco:
+
+- **dopo il primo contratto** — la giacca elegante (520 €) e le Oxford (340 €, «da giacca
+  elegante»);
+- **coi fan** — l'anello di diamanti a 10.000 (900 €) e la collana di perle a 2.500 (700 €);
+- **dopo una trasferta a Milano** — il trench bianco (380 €), i mocassini e calzini (300 €)
+  e gli stivali di pelle (320 €): i capi «di Milano».
+
+Il dato sta nel catalogo, la decisione nello Shop: `guardaroba.js` lo carica anche la landing,
+dove `G` non c'è, quindi `shFitRequisito(v)` vive in `negozio.js` e guarda la partita.
+Torna `null` se il capo è sbloccato, se no la frase da scrivere sulla card. Il contratto è
+`G.contract || G.goals.g6`: è «dopo il **primo** contratto», e `g6` (l'obiettivo «Firma un
+contratto») ricorda che l'hai firmato anche quando l'etichetta ha rescisso dal carcere. I fan
+sono `G.fans` di adesso, quindi un capo può ribloccarsi se scendi sotto — è raro (i fan
+calano solo dentro), e comunque quello che hai già comprato resta tuo. Milano è
+`G.trasferte.citta.milano.visite > 0`, il contatore che `trasferte.js` alza quando torni.
+
+**La card bloccata** non sparisce: resta al suo posto nel reparto, spenta (`.shcard.locked`,
+disabilitata, in bianco e nero), col prezzo di listino nell'angolo come le altre, e una riga
+rossa in fondo — «Bloccato · dopo il primo contratto», «Bloccato · a 10.000 fan», «Bloccato ·
+dopo una trasferta a Milano». Così uno sa che esiste e cosa deve fare per averla, che è il
+senso del punto («lo Shop cresce con la carriera»). La testata del reparto conta quanti ne
+mancano («7 capi si sbloccano con la carriera: la card dice cosa serve»). Nel camerino non
+cambia niente: un capo bloccato non è tuo, e la regola del 20/09 lo tiene già fuori dalle
+tendine. Comprare passa da `shFitRequisito` anche nel gestore del clic, non solo dal
+`disabled` della card.
+
+**Le offerte della settimana.** File suo, `negozio-offerte.js`: `negozio.js` disegna e
+incassa, lì sta solo cosa è in offerta e perché. Due cose:
+
+- **L'offerta del lunedì**: un capo a metà prezzo (`OFF_SCONTO_LUNEDI`, arrotondato ai 5 €
+  come il listino), tirato a sorte fra quelli che puoi comprare — non tuoi, non bloccati — e
+  che non stanno già sull'usato. Vale fino a domenica; il lunedì dopo ne arriva un altro.
+- **Il banco dell'usato**: da uno a tre capi (`OFF_USATO_MAX`), ognuno con uno sconto
+  tirato a sorte fra 25, 30 e 40% (`OFF_USATO_SCONTI`, lo sconto scritto sulla card è
+  quello sorteggiato, non quello ricalcolato dal prezzo arrotondato) e una scadenza sua, da
+  una a tre settimane. Al lunedì escono gli scaduti, i comprati e quelli che si sono
+  ribloccati, ed entrano i nuovi fino a un numero che cambia ogni settimana: è il «vanno e
+  vengono» del punto. Usato o no, il capo è lo stesso — nel camerino non si vede la
+  differenza, e non c'era motivo di inventarne una.
+
+Il giro è `offerteSettimana()`, come `offriBeat()` per i beat: si tira a sorte **e si
+salva**, così non gira ogni volta che apri lo Shop e non si può comprare a metà prezzo un
+capo dopo l'altro. La chiama `advanceWeek()` subito dopo `G.week++` — cioè al lunedì — e
+scrive nel diario cosa c'è («Allo Shop: **Trench bianco** a metà prezzo fino a domenica, e 2
+capi usati sul banco»), così uno sa quando vale la pena passare. Lo Shop la chiama anche da
+solo se trova salvata una settimana diversa da quella di adesso: un salvataggio di prima
+del 21/09 si trova le offerte alla prima apertura, e una partita nuova le ha dal primo
+giorno. Il salvato è `G.offerte = {sett, capo, usato:[{id, p, sc, fino}]}`, con `sett` la
+settimana assoluta (`totalWeeks`).
+
+**Quanto costa un capo, oggi.** `offertaDi(v)` risponde `null` (listino) o
+`{p, tipo, sconto, riga}`, e risponde solo se il capo è ancora comprabile: se nel frattempo
+è diventato tuo o si è ribloccato, niente offerta. `shFitPrezzo(v)` in `negozio.js` è quello
+che la card mostra e che il clic fa pagare — un posto solo, così non capita di mostrare un
+prezzo e incassarne un altro. La card in offerta ha il listino barrato e il prezzo nuovo in
+giallo nell'angolo («~~520~~ 260 €»), e in fondo la riga «Offerta del lunedì · metà prezzo
+fino a domenica» o «Usato · −30% · ancora 2 settimane». Il diario dell'acquisto dice quanto
+hai pagato e quanto costava.
+
+**Dove si vede.** In testa al reparto, sotto la nota, la sezione della settimana: «L'offerta
+del lunedì» con la sua card, «Il banco dell'usato» con le sue, con lo stesso divisorio dei
+reparti ma arancione. Solo col filtro «Tutti»: i filtri per tipologia restano il listino
+pulito, e comunque la card di un capo in offerta ha il prezzo scontato anche lì. Se non c'è
+niente — hai comprato tutto quello che si poteva scontare — lo dice in una riga.
+
+**Provato** fuori dal browser (ventiquattro controlli: la giacca bloccata e sbloccata con
+`g6` senza `G.contract`, i diamanti a 10.000, il trench dopo Milano; la prima settimana
+con capo e usato, il richiamo nella stessa settimana che non cambia niente, la metà prezzo
+ai 5 €, l'usato fra il 25 e il 40 con scadenza 1–3, il capo comprato che perde l'offerta e
+la sezione che lo salta, il lunedì dopo col capo nuovo e la riga nel diario, l'usato tutto
+uscito dopo tante settimane, le card) e nel gioco con Playwright a 1366 × 768 e 390 × 844:
+sette card bloccate al primo giorno con le tre frasi giuste, zero con contratto, 12.000 fan e
+Milano; la sezione della settimana con l'offerta e l'usato, i prezzi barrati, nessun errore in
+console. Verifica completa verde (435 controlli dell'audit).
+
+**Cosa resta dei tre punti dello Shop.** Niente.
 
 ---
 

@@ -38,7 +38,14 @@
    camicie, pantaloni, scarpe da giorno), un punto l'uno; `t` e' il tema,
    "street" o "elegante", e con tre capi dello stesso tema e nessuno dell'altro
    il look e' completo e la promo rende di piu'. I maglioni non hanno tema:
-   vanno con tutto e non fanno look. Il conto lo fa js/game/stile.js. */
+   vanno con tutto e non fanno look. Il conto lo fa js/game/stile.js.
+   Dal 21/09/2026 («Capi che si sbloccano», CARLO) alcuni capi portano anche
+   `req`, cosa deve essere successo nella carriera prima di poterli comprare:
+   `{contratto:true}` il primo contratto firmato, `{fan:N}` almeno N fan,
+   `{citta:"milano"}` una trasferta in quella citta'. Qui sta solo il dato: chi
+   decide se e' sbloccato e' lo Shop (shFitRequisito in js/game/negozio.js),
+   perche' guarda la partita e questo file lo carica anche la landing. Un capo
+   bloccato non e' tuo, quindi nel camerino non c'e' comunque. */
 const VETRINA_VESTITI = [
   {id:"beanie", raw:"clothes/elvs_beanie_slouch/elvs_beanie_slouch.json", n:"Beanie", slot:"hats", p:90, d:"Calato sugli occhi. Sta bene con tutto.", t:"street", b:"hype"},
   {id:"coppola", raw:"clothes/elvs_male_flat_cap1/elvs_male_flat_cap1.json", n:"Coppola", slot:"hats", p:110, d:"Vecchia scuola, tirata avanti.", t:"elegante", b:"presenza"},
@@ -53,8 +60,8 @@ const VETRINA_VESTITI = [
   {id:"montatura2", raw:"clothes/Sagerfrog_s_Glasses_02/Sagerfrog_s_Glasses_02.json", n:"Montatura squadrata", slot:"glasses", p:150, d:"Spessa, nera, decisa.", t:"elegante", b:"presenza"},
   {id:"cornici", raw:"clothes/TBM_Glasses_Frames_01/TBM_Glasses_Frames_01.json", n:"Montatura tonda", slot:"glasses", p:140, d:"Tonda come una volta.", t:"elegante", b:"presenza"},
   {id:"anello", raw:"clothes/Ring_1/Ring_1.json", n:"Anello", slot:"jewelry", p:180, d:"Uno solo, quello giusto.", t:"elegante", b:"hype"},
-  {id:"diamante", raw:"clothes/diamond_ring_01/diamond_ring_01.json", n:"Anello di diamanti", slot:"jewelry", p:900, d:"Si vede da lontano. È fatto per quello.", t:"elegante", b:"hype"},
-  {id:"perle", raw:"clothes/Pearl_Necklace/Pearl_Necklace.json", n:"Collana di perle", slot:"jewelry", p:700, d:"Fuori posto di proposito.", t:"elegante", b:"hype"},
+  {id:"diamante", raw:"clothes/diamond_ring_01/diamond_ring_01.json", n:"Anello di diamanti", slot:"jewelry", p:900, d:"Si vede da lontano. È fatto per quello.", t:"elegante", b:"hype", req:{fan:10000}},
+  {id:"perle", raw:"clothes/Pearl_Necklace/Pearl_Necklace.json", n:"Collana di perle", slot:"jewelry", p:700, d:"Fuori posto di proposito.", t:"elegante", b:"hype", req:{fan:2500}},
   {id:"fulmini", raw:"clothes/heroine_lightning_earrings/heroine_lightning_earrings.json", n:"Orecchini a fulmine", slot:"jewelry", p:220, d:"Due lampi, uno per lato.", t:"street", b:"hype"},
   {id:"canotta", raw:"clothes/mens_tanks_elv1f/mens_tanks_elv1f.json", n:"Canotta", slot:"tops", p:35, d:"Braccia fuori, niente da nascondere.", t:"street", b:"presenza"},
   {id:"canotta2", raw:"clothes/mens_tanks_elvmuscle1f/mens_tanks_elvmuscle1f.json", n:"Canotta muscle", slot:"tops", p:45, d:"Per chi in palestra ci va davvero.", t:"street", b:"presenza"},
@@ -63,9 +70,9 @@ const VETRINA_VESTITI = [
   {id:"maglione", raw:"clothes/Knitted_Sweater_01/Knitted_Sweater_01.json", n:"Maglione di lana", slot:"tops", p:140, d:"Grosso, caldo, da nonno. Va di moda.", t:null, b:"presenza"},
   {id:"pescatore", raw:"clothes/Sweater_Fisherman/Sweater_Fisherman.json", n:"Maglione da pescatore", slot:"tops", p:160, d:"A trecce. Il porto non l'hai mai visto.", t:null, b:"presenza"},
   {id:"vissuto", raw:"clothes/Worn_out_sweater/Worn_out_sweater.json", n:"Maglione vissuto", slot:"tops", p:50, d:"Sdrucito nei punti giusti.", t:"street", b:"hype"},
-  {id:"cappotto", raw:"clothes/Coat/Coat.json", n:"Trench bianco", slot:"tops", p:380, d:"Fino al ginocchio, con la cintura. Cammini diverso.", t:"elegante", b:"hype"},
+  {id:"cappotto", raw:"clothes/Coat/Coat.json", n:"Trench bianco", slot:"tops", p:380, d:"Fino al ginocchio, con la cintura. Cammini diverso.", t:"elegante", b:"hype", req:{citta:"milano"}},
   {id:"tecnica", raw:"clothes/rescueteam-jacket-male/rescueteam-jacket-male.json", n:"Giacca da soccorso", slot:"tops", p:260, d:"Rossa, coi catarifrangenti. Del soccorso non sei.", t:"street", b:"hype"},
-  {id:"elegante", raw:"clothes/Suit_Dinner_Jacket/Suit_Dinner_Jacket.json", n:"Giacca elegante", slot:"tops", p:520, d:"Per le sere in cui conta chi ti guarda.", t:"elegante", b:"hype"},
+  {id:"elegante", raw:"clothes/Suit_Dinner_Jacket/Suit_Dinner_Jacket.json", n:"Giacca elegante", slot:"tops", p:520, d:"Per le sere in cui conta chi ti guarda.", t:"elegante", b:"hype", req:{contratto:true}},
   {id:"jeans", raw:"clothes/mens_elv_jeans1f/mens_elv_jeans1f.json", n:"Jeans larghi", slot:"bottoms", p:110, d:"Cadono giusti sulle scarpe.", t:"street", b:"presenza"},
   {id:"slim", raw:"clothes/mens_elv_jeans2slf/mens_elv_jeans2slf.json", n:"Jeans slim", slot:"bottoms", p:130, d:"Stretti dove serve.", t:"street", b:"presenza"},
   {id:"shorts", raw:"clothes/elvs_male_shorts1/elvs_male_shorts1.json", n:"Shorts stampati", slot:"bottoms", p:60, d:"Galassia sulle gambe, da giugno a settembre.", t:"street", b:"hype"},
@@ -75,9 +82,9 @@ const VETRINA_VESTITI = [
   {id:"stivaletti", raw:"clothes/Boots_Ankle_Male/Boots_Ankle_Male.json", n:"Stivaletti", slot:"shoes", p:210, d:"Alla caviglia, suola grossa.", t:"elegante", b:"presenza"},
   {id:"boots", raw:"clothes/male_boots/male_boots.json", n:"Boots", slot:"shoes", p:240, d:"Pesanti. Si sentono sulle scale.", t:"street", b:"presenza"},
   {id:"anfibi", raw:"clothes/hero_boots_1/hero_boots_1.json", n:"Stivali rossi", slot:"shoes", p:260, d:"Al ginocchio, rossi. Non passi inosservato.", t:"street", b:"hype"},
-  {id:"lucide", raw:"clothes/MJ-Shoes/MJ-Shoes.json", n:"Mocassini e calzini", slot:"shoes", p:300, d:"Neri lucidi, calzini bianchi. Da palco.", t:"elegante", b:"hype"},
-  {id:"oxford", raw:"clothes/Shoes_Oxford_male/Shoes_Oxford_male.json", n:"Oxford", slot:"shoes", p:340, d:"Da giacca elegante, o da contrasto.", t:"elegante", b:"presenza"},
-  {id:"pelle", raw:"clothes/exy_leather_boots/exy_leather_boots.json", n:"Stivali di pelle", slot:"shoes", p:320, d:"Di pelle vera, o quasi.", t:"elegante", b:"hype"},
+  {id:"lucide", raw:"clothes/MJ-Shoes/MJ-Shoes.json", n:"Mocassini e calzini", slot:"shoes", p:300, d:"Neri lucidi, calzini bianchi. Da palco.", t:"elegante", b:"hype", req:{citta:"milano"}},
+  {id:"oxford", raw:"clothes/Shoes_Oxford_male/Shoes_Oxford_male.json", n:"Oxford", slot:"shoes", p:340, d:"Da giacca elegante, o da contrasto.", t:"elegante", b:"presenza", req:{contratto:true}},
+  {id:"pelle", raw:"clothes/exy_leather_boots/exy_leather_boots.json", n:"Stivali di pelle", slot:"shoes", p:320, d:"Di pelle vera, o quasi.", t:"elegante", b:"hype", req:{citta:"milano"}},
   {id:"cuffie", raw:"clothes/Headset/Headset.json", n:"Cuffie al collo", slot:"clothesOther", p:150, d:"Al collo anche quando non ascolti niente.", t:"street", b:"hype"}
 ];
 

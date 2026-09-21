@@ -1811,7 +1811,7 @@ test("il reparto Vestiti vende capi del camerino MakeHuman: ogni raw della vetri
     return capi.length >= 30 && capi.every(m => perRaw.get(m[1]) === m[2] && +m[3] > 0);
   })());
 test("comprare un vestito e' la stessa economia dell'attrezzatura: G.money scende, G.vestiti[raw] diventa true, si salva",
-  negozio.includes("G.money -= v.p; guardarobaPosseduti()[v.raw] = true;") &&
+  negozio.includes("G.money -= prezzo; guardarobaPosseduti()[v.raw] = true;") &&
   negozio.includes("save(); renderGioco();") &&
   ui.includes('if(typeof renderAbbigliamento === "function") renderAbbigliamento();'));
 test("la vetrina e i capi tuoi arrivano al camerino: ponte → creator → init del camerino",
@@ -1842,7 +1842,7 @@ test("con un avatar Avaturn lo Shop lo dice, invece di vendere vestiti che non s
 const stile = leggi("js/game/stile.js");
 test("ogni capo della vetrina dice cosa da' addosso (b: hype o presenza) e il suo tema (t: street, elegante o null)",
   (() => {
-    const capi = [...guardaroba.matchAll(/\{id:"[a-z0-9]+", raw:"[^"]+", n:"[^"]+", slot:"[a-zA-Z]+", p:\d+, d:"[^"]+", t:(null|"street"|"elegante"), b:"(hype|presenza)"\}/g)];
+    const capi = [...guardaroba.matchAll(/\{id:"[a-z0-9]+", raw:"[^"]+", n:"[^"]+", slot:"[a-zA-Z]+", p:\d+, d:"[^"]+", t:(null|"street"|"elegante"), b:"(hype|presenza)"(?:, req:\{[^}]*\})?\}/g)];
     const tutti = (guardaroba.match(/\{id:"[a-z0-9]+", raw:/g) || []).length;
     return capi.length >= 30 && capi.length === tutti &&
       capi.some(m => m[1] === '"street"') && capi.some(m => m[1] === '"elegante"') &&
@@ -1872,6 +1872,61 @@ test("lo Shop dice cosa da' ogni capo, cosa sta dando il look e cosa gli manca; 
   negozio.includes("stileRiga()") && negozio.includes("stileLookManca()") &&
   ui.includes('bonusTxt.push("il look: " + stileRiga());') &&
   leggi("js/creator/rpg-v24-bridge.js").includes('try{ if(typeof renderAbbigliamento==="function") renderAbbigliamento(); }catch(e){}'));
+
+/* «Capi che si sbloccano» (21/09/2026, CARLO «Shop (20/09/2026)» 2): non tutto
+   in vendita dal primo giorno — la giacca elegante dopo il primo contratto,
+   l'anello di diamanti a 10.000 fan, i capi «di Milano» dopo la trasferta.
+   Il catalogo porta `req`, lo Shop guarda la partita, la card bloccata dice
+   cosa serve. */
+test("il catalogo ha capi con un requisito di carriera: contratto, fan, trasferta a Milano — e i tre dell'esempio sono quelli",
+  guardaroba.includes('{id:"elegante", raw:') && /\{id:"elegante", [^\n]*req:\{contratto:true\}\}/.test(guardaroba) &&
+  /\{id:"diamante", [^\n]*req:\{fan:10000\}\}/.test(guardaroba) &&
+  (guardaroba.match(/req:\{citta:"milano"\}/g) || []).length >= 2 &&
+  (guardaroba.match(/req:\{/g) || []).length >= 5);
+test("lo Shop decide se un capo e' sbloccato guardando la partita: il primo contratto resta valido anche dopo una rescissione, i fan, le visite a Milano",
+  negozio.includes("function shFitRequisito(v){") &&
+  negozio.includes('if(r.contratto && !(G.contract || (G.goals && G.goals.g6))) return "dopo il primo contratto";') &&
+  negozio.includes('if(r.fan && (Number(G.fans) || 0) < r.fan) return "a " + fmt(r.fan) + " fan";') &&
+  negozio.includes("if(!(c && c.visite > 0)) return \"dopo una trasferta a \" + (SH_CITTA[r.citta] || r.citta);") &&
+  !guardaroba.includes("G.contract") && !guardaroba.includes("G.fans"));
+test("la card bloccata resta in vetrina, spenta, dice cosa serve e non si compra",
+  negozio.includes('(manca ? " locked" : "")') &&
+  negozio.includes("(tuo || manca || senzaSoldi ? \" disabled\" : \"\")") &&
+  negozio.includes('<span class="shreq">Bloccato \\u00b7 \' + manca + \'</span>') &&
+  negozio.includes("if(!v || guardarobaPosseduto(v.raw) || shFitRequisito(v)) return;") &&
+  leggi("css/game.css").includes(".shcard.locked{") &&
+  negozio.includes("si sbloccano\") + ' con la carriera: la card dice cosa serve.'"));
+
+/* «Le offerte della settimana» (21/09/2026, CARLO «Shop (20/09/2026)» 3): un
+   capo a meta' prezzo che gira ogni lunedi', piu' il banco dell'usato con capi
+   scontati che vanno e vengono. File nuovo, js/game/negozio-offerte.js. */
+const offerte = leggi("js/game/negozio-offerte.js");
+test("le offerte stanno in un file loro, caricato dal gioco, e si salvano in G.offerte come i beat in G.market",
+  index.includes('<script src="js/game/negozio-offerte.js') &&
+  offerte.includes("const OFF_SCONTO_LUNEDI = 0.5;") &&
+  offerte.includes("function offerteStato(){") && offerte.includes("if(!G.offerte || typeof G.offerte !== \"object\") G.offerte = {};"));
+test("al lunedi' (advanceWeek, dopo G.week++) si tira a sorte il capo a meta' prezzo e si rinnova l'usato; lo Shop lo fa da solo se la settimana salvata e' un'altra",
+  sim.includes('if(typeof offerteSettimana === "function") offerteSettimana(true);') &&
+  sim.indexOf('offerteSettimana(true);') > sim.indexOf("  G.week++;") &&
+  offerte.includes("if(s.sett === w) return false;") &&
+  offerte.includes("s.capo = scelta.length ? scelta[Math.floor(Math.random() * scelta.length)].id : null;") &&
+  offerte.includes('if(typeof totalWeeks === "function" && s.sett !== totalWeeks()) offerteSettimana(false);'));
+test("l'usato va e viene: via gli scaduti e i comprati, dentro i nuovi fino a un numero tirato a sorte, ognuno con la sua scadenza e il suo sconto",
+  offerte.includes("s.usato = s.usato.filter(u => u.fino > w && u.id !== s.capo && liberi.some(v => v.id === u.id));") &&
+  offerte.includes("const quanti = 1 + Math.floor(Math.random() * OFF_USATO_MAX);") &&
+  offerte.includes("fino:w + 1 + Math.floor(Math.random() * OFF_USATO_SETTIMANE)") &&
+  offerte.includes("const OFF_USATO_SCONTI = [0.25, 0.3, 0.4];"));
+test("l'offerta vale solo su un capo ancora comprabile (non tuo, non bloccato), e lo Shop fa pagare quel prezzo",
+  offerte.includes("if(guardarobaPosseduto(v.raw) || (typeof shFitRequisito === \"function\" && shFitRequisito(v))) return null;") &&
+  negozio.includes("function shFitPrezzo(v){") &&
+  negozio.includes("const prezzo = shFitPrezzo(v);") &&
+  negozio.includes("G.money -= prezzo; guardarobaPosseduti()[v.raw] = true;") &&
+  negozio.includes('<span class="shprice off"><s>'));
+test("la sezione «Questa settimana» sta in testa al reparto, solo su «Tutti», e il diario dice cosa c'e' in offerta",
+  negozio.includes('const offerte = SH_FIT_FILTRO === "tutti" && typeof offerteSezione === "function" ? offerteSezione() : "";') &&
+  negozio.includes("el.innerHTML = shFitTesta() + offerte + reparti.map(") &&
+  offerte.includes("L'offerta del lunedì") && offerte.includes("Il banco dell'usato") &&
+  offerte.includes('pushLog("Allo Shop: <b>" + capo.n + "</b> a metà prezzo fino a domenica"'));
 
 console.log("\nProblemi riscontrati \u2014 carcere senza notifiche, didascalie scritte in casa");
 const caption = leggi("js/game/crime-caption.js");
