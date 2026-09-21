@@ -272,7 +272,7 @@ function render(){if(idx>=PKG.families.length){app.innerHTML='';document.getElem
  '<h3>Candidate B</h3><audio controls preload="metadata" src="/render/'+encodeURIComponent(f.sourceRecordId)+'/B"></audio><div class="score">'+buttons('B',s.candidates.B.score)+'</div><textarea id="noteB" placeholder="Nota opzionale">'+s.candidates.B.note+'</textarea>'+
  '<label><input id="attest" type="checkbox" '+(s.reviewerAttested?'checked':'')+'> Ho ascoltato reference, A e B per questa family.</label>'+
  '<div class="row" style="margin-top:16px"><button id="prev" '+(idx===0?'disabled':'')+'>Indietro</button><button id="next">Avanti</button></div></div>';
- app.querySelectorAll('[data-label]').forEach(b=>b.onclick=()=>{const x=state(f.sourceRecordId);x.candidates[b.dataset.label].score=Number(b.dataset.score);render()});
+ app.querySelectorAll('[data-label]').forEach(b=>b.onclick=()=>{persist();const x=state(f.sourceRecordId);x.candidates[b.dataset.label].score=Number(b.dataset.score);render()});
  document.getElementById('prev').onclick=()=>{persist();idx--;render()};
  document.getElementById('next').onclick=()=>{persist();const x=state(f.sourceRecordId);if(x.candidates.A.score===null||x.candidates.B.score===null||!x.reviewerAttested){alert('Assegna entrambi i punteggi e conferma l ascolto.');return}idx++;render()};
 }
