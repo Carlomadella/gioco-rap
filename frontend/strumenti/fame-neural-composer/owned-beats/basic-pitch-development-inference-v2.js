@@ -130,6 +130,9 @@ function prepare(workspaceRoot,runId=DEFAULT_RUN_ID){
      reason:"IMPLEMENTATION_ONLY_FIX_OUTPUT_PARENT_FOR_ATOMIC_RENAME",
      algorithmChanged:false
    },
+   protocolSha256:old.protocolSha256,
+   environmentSpecSha256:old.environmentSpecSha256,
+   environmentLockSha256:old.environmentLockSha256,
    executionContractSha256:sha256File(CONTRACT_FILE),
    receiptRunner:{path:path.basename(__filename),gitBlobSha:gitBlobSha(__filename)},
    environmentReceipt:old.environmentReceipt,
@@ -172,7 +175,7 @@ function check(workspaceRoot,runId=DEFAULT_RUN_ID){
  const workspace=path.resolve(workspaceRoot),contract=validateContract(),root=newRoot(workspace),file=path.join(root,"execution-receipt.json");
  if(runId!==DEFAULT_RUN_ID||!fs.existsSync(file))throw new Error("Superseding Basic Pitch receipt missing");
  const r=readJson(file);
- if(r.schema!==SCHEMA||r.version!==2||r.status!=="AUTHORIZED_NO_INFERENCE"||r.runId!==DEFAULT_RUN_ID||r.executionContractSha256!==sha256File(CONTRACT_FILE)||r.receiptRunner?.gitBlobSha!==gitBlobSha(__filename)||r.supersedes?.runId!==PRIOR_RUN_ID||r.supersedes?.algorithmChanged!==false||JSON.stringify(r.inference)!==JSON.stringify(contract.inference)||!Array.isArray(r.sources)||r.sources.length!==8)throw new Error("Superseding Basic Pitch receipt invalid");
+ if(r.schema!==SCHEMA||r.version!==2||r.status!=="AUTHORIZED_NO_INFERENCE"||r.runId!==DEFAULT_RUN_ID||typeof r.protocolSha256!=="string"||typeof r.environmentSpecSha256!=="string"||typeof r.environmentLockSha256!=="string"||r.executionContractSha256!==sha256File(CONTRACT_FILE)||r.receiptRunner?.gitBlobSha!==gitBlobSha(__filename)||r.supersedes?.runId!==PRIOR_RUN_ID||r.supersedes?.algorithmChanged!==false||JSON.stringify(r.inference)!==JSON.stringify(contract.inference)||!Array.isArray(r.sources)||r.sources.length!==8)throw new Error("Superseding Basic Pitch receipt invalid");
  for(const source of r.sources){const stem=resolveWithin(workspace,source.relativePath,"bass stem");if(!fs.existsSync(stem)||fs.statSync(stem).size!==source.bytes||sha256File(stem)!==source.sha256)throw new Error("Superseding receipt stem changed: "+source.sourceRecordId)}
  return{mode:"BASIC_PITCH_SUPERSEDING_INFERENCE_RECEIPT_CHECK",runId,status:r.status,records:8,algorithmChanged:false,nextAction:r.nextAction};
 }
