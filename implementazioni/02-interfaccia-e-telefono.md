@@ -1252,8 +1252,9 @@ salva**, così non gira ogni volta che apri lo Shop e non si può comprare a met
 capo dopo l'altro. La chiama `advanceWeek()` subito dopo `G.week++` — cioè al lunedì — e
 scrive nel diario cosa c'è («Allo Shop: **Trench bianco** a metà prezzo fino a domenica, e 2
 capi usati sul banco»), così uno sa quando vale la pena passare. Lo Shop la chiama anche da
-solo se trova salvata una settimana diversa da quella di adesso (`offerteAggiorna`, che
-poi salva): un salvataggio di prima del 21/09 si trova le offerte alla prima apertura, e
+solo se trova salvata una settimana diversa da quella di adesso (`offerteAggiorna`; il
+render non salva, segna `daSalvare` e salva l'apertura dello Shop dalla mappa, che è
+un'azione): un salvataggio di prima del 21/09 si trova le offerte alla prima apertura, e
 una partita nuova le ha dal primo giorno. Il salvato è
 `G.offerte = {sett, capo, usato:[{id, p, fino}]}`, con `sett` la settimana assoluta
 (`totalWeeks`).
@@ -1292,7 +1293,12 @@ prove unitarie che mancavano (`test/unit/shop-sblocchi-e-offerte.test.js`, tredi
 barra dei filtri sticky senza sfondo (vecchia, vista con Playwright sul telefono in
 orizzontale) e la riga «Node.js 22.5» del `README-API.md` del backend. E una nota diventata
 regola: lo sconto scritto sull'usato è quello vero. Il racconto per esteso in
-`documentazione/problemi-riscontrati.md`, «Giro del 21/09/2026».
+`documentazione/problemi-riscontrati.md`, «Giro del 21/09/2026». Il giro stretto sulle
+rifiniture ne ha trovate altre tre, chiuse nello stesso branch: il salvataggio dopo
+l'estrazione pigra che copriva un salvataggio illeggibile prima del «Riprova» (adesso il
+render non salva mai: segna `daSalvare` e salva l'apertura dello Shop dalla mappa), la prova
+che falliva una volta ogni trenta (dado seminato) e quella che non passava dal ramo «solo
+usato» (costruito davvero).
 
 **Cosa resta dei tre punti dello Shop.** Niente.
 

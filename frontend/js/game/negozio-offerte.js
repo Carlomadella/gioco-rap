@@ -27,7 +27,8 @@
    salva subito. Dal lunedi' il diario dice cosa c'e' in offerta, cosi' uno
    sa quando vale la pena passare.
 
-   Quello che si salva: `G.offerte = {sett, capo, usato:[{id, p, fino}]}`.
+   Quello che si salva: `G.offerte = {sett, capo, usato:[{id, p, fino}]}` (piu'
+   `daSalvare`, solo fra un'estrazione del render e l'apertura dello Shop).
    `sett` e' la settimana assoluta (totalWeeks), `capo` l'id del capo a meta'
    prezzo (o null se non c'e' piu' niente da scontare), `usato` i capi del
    banco con il loro prezzo gia' arrotondato ai 5 € e la settimana in cui
@@ -101,11 +102,24 @@ function offerteSettimana(avvisa){
 }
 
 /* Se le offerte salvate sono di un'altra settimana (un salvataggio di prima
-   del 21/09, o `G.offerte` che manca) si tira a sorte adesso — e si salva,
-   se no ricaricando la pagina senza fare altro l'offerta sarebbe un'altra. */
-function offerteAggiorna(){
-  if(typeof totalWeeks !== "function") return;
-  if(offerteStato().sett !== totalWeeks() && offerteSettimana(false) && typeof save === "function") save();
+   del 21/09, o `G.offerte` che manca) si tira a sorte adesso. Con `salva`
+   si salva anche: lo fa l'apertura dello Shop dalla mappa (hub.js), che e'
+   un'azione di chi gioca — se no ricaricando la pagina senza fare altro
+   l'offerta sarebbe un'altra. Il render invece NON salva mai: il primo
+   `renderGioco()` di una partita nuova gira anche quando il salvataggio di
+   prima era illeggibile e il cartello «Riprova a caricarla» non e' ancora
+   comparso, e un `save()` li' scriverebbe la partita nuova sopra a quella
+   rotta (trovato dal giro di fine task del 21/09). */
+function offerteAggiorna(salva){
+  if(typeof totalWeeks !== "function") return false;
+  const s = offerteStato();
+  const nuova = s.sett !== totalWeeks();
+  if(nuova) offerteSettimana(false);
+  /* un'estrazione fatta dal render resta segnata (`daSalvare`) finche'
+     un'apertura dello Shop non la salva */
+  if(salva && (nuova || s.daSalvare)){ delete s.daSalvare; if(typeof save === "function") save(); }
+  else if(nuova) s.daSalvare = true;
+  return nuova;
 }
 
 /* L'offerta su un capo, oggi: null se e' a listino. Se c'e':

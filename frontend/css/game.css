@@ -271,7 +271,7 @@
   /* e' appiccicata in cima mentre si scorre: senza uno sfondo le pastiglie
      galleggiavano sopra le card (visto il 21/09 a 1366 e sul telefono in
      orizzontale) */
-  background:linear-gradient(180deg,#0B0B0F 78%,rgba(11,11,15,0))}
+  background:linear-gradient(180deg,#0B0B0F calc(100% - 10px),rgba(11,11,15,0))}
 .shtabs{display:flex;gap:8px;flex-wrap:wrap}
 .shtab{padding:9px 18px;border-radius:999px;font-family:var(--cond);font-size:13px;font-weight:800;
   letter-spacing:.06em;text-transform:uppercase;color:var(--soft);background:rgba(255,255,255,.05);

@@ -12,9 +12,18 @@ const QUI = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(QUI, "../..");
 const leggi = file => fs.readFileSync(path.join(ROOT, file), "utf8");
 
-function partita(){
+/* un dado seminato al posto di Math.random: le prove non dipendono dal caso
+   (il capo del lunedi' puo' uscire uguale due settimane di fila, 1 su 29) */
+function dado(seme){
+  let x = seme >>> 0;
+  return () => { x = (Math.imul(x, 1664525) + 1013904223) >>> 0; return x / 4294967296; };
+}
+
+function partita(seme = 7){
+  const MathSeminato = Object.create(Math);
+  MathSeminato.random = dado(seme);
   const ctx = {
-    console, Math, Number, Array, Object, Set, String, JSON,
+    console, Math: MathSeminato, Number, Array, Object, Set, String, JSON,
     window: {},
     G: { money: 5000, fans: 0, goals: {}, contract: null, year: 1, week: 1, vestiti: {}, log: [] },
     fmt: n => Math.round(n).toLocaleString("it-IT"),
@@ -75,14 +84,23 @@ describe("le offerte della settimana", () => {
   let p;
   beforeEach(() => { p = partita(); });
 
-  it("alla prima apertura tira a sorte un capo comprabile a meta' prezzo, ai 5 euro, e salva", () => {
-    const off = p.run("offertaDi(VETRINA_VESTITI.find(v => v.id === G.offerte?.capo) || VETRINA_VESTITI[0]); G.offerte");
+  it("alla prima apertura tira a sorte un capo comprabile a meta' prezzo, ai 5 euro; il render non salva, l'apertura dello Shop si'", () => {
+    const off = p.run("offertaDi(VETRINA_VESTITI[0]); G.offerte");
     expect(off.sett).toBe(1);
     expect(off.capo).toBeTruthy();
-    expect(p.ctx.salvataggi).toBe(1);
+    expect(p.ctx.salvataggi).toBe(0);           // il render non salva mai
     const capo = p.capo(off.capo);
     expect(p.run('shFitRequisito(VETRINA_VESTITI.find(v => v.id === G.offerte.capo))')).toBeNull();
     expect(p.run("shFitPrezzo(VETRINA_VESTITI.find(v => v.id === G.offerte.capo))")).toBe(Math.max(5, Math.round(capo.p / 2 / 5) * 5));
+    expect(p.G.offerte.daSalvare).toBe(true);   // ma segna che l'estrazione non e' salvata
+    expect(p.run("offerteAggiorna(true)")).toBe(false);   // apri lo Shop: niente di nuovo, ma salva quella
+    expect(p.ctx.salvataggi).toBe(1);
+    expect(p.G.offerte.daSalvare).toBeUndefined();
+    expect(p.run("offerteAggiorna(true)")).toBe(false);   // riapri: niente da salvare
+    expect(p.ctx.salvataggi).toBe(1);
+    p.G.week = 2;
+    expect(p.run("offerteAggiorna(true)")).toBe(true);    // settimana nuova dalla mappa: tira e salva
+    expect(p.ctx.salvataggi).toBe(2);
   });
 
   it("nella stessa settimana non ricambia, e la card in offerta ha il listino barrato", () => {
@@ -122,13 +140,13 @@ describe("le offerte della settimana", () => {
     expect(html).not.toContain("L'offerta del lunedì");
   });
 
-  it("al lunedi' (settimana nuova) cambia il capo, l'usato scaduto esce e il diario lo dice", () => {
+  it("al lunedi' (settimana nuova) si ritira a sorte, l'usato scaduto esce e il diario lo dice", () => {
     p.run("offerteSettimana(false)");
-    const prima = p.G.offerte.capo;
     p.G.week = 2;
     expect(p.run("offerteSettimana(true)")).toBe(true);
     expect(p.G.offerte.sett).toBe(2);
-    expect(p.G.offerte.capo).not.toBe(prima);
+    expect(p.run("shFitRequisito(VETRINA_VESTITI.find(v => v.id === G.offerte.capo))")).toBeNull();
+    expect(p.run("!!G.vestiti[VETRINA_VESTITI.find(v => v.id === G.offerte.capo).raw]")).toBe(false);
     expect(p.G.log.some(t => t.startsWith("Allo Shop: "))).toBe(true);
     p.G.week = 40;
     p.run("offerteSettimana(false)");
@@ -136,11 +154,18 @@ describe("le offerte della settimana", () => {
   });
 
   it("il diario parla anche quando resta solo l'usato e niente a meta' prezzo", () => {
-    p.run("VETRINA_VESTITI.forEach(v => { G.vestiti[v.raw] = true; }); offerteSettimana(false)");
+    p.run("offerteSettimana(false)");
+    // restano liberi solo i capi gia' sul banco dell'usato, che non scadono: il
+    // lunedi' dopo non c'e' niente da mettere a meta' prezzo
+    p.run("const sulBanco = new Set(G.offerte.usato.map(u => u.id)); G.offerte.usato.forEach(u => { u.fino = 9; });" +
+      "VETRINA_VESTITI.forEach(v => { if(!sulBanco.has(v.id)) G.vestiti[v.raw] = true; });");
     p.G.week = 2;
-    // un capo solo libero: finisce sull'usato o a meta' prezzo, ma in tutti e due i casi il diario scrive
-    p.run("delete G.vestiti[VETRINA_VESTITI.find(v => v.id === 'beanie').raw]; offerteSettimana(true)");
-    expect(p.G.log.filter(t => t.startsWith("Allo Shop: ")).length).toBe(1);
+    p.run("offerteSettimana(true)");
+    expect(p.G.offerte.capo).toBeNull();
+    expect(p.G.offerte.usato.length).toBeGreaterThan(0);
+    const righe = p.G.log.filter(t => t.startsWith("Allo Shop: "));
+    expect(righe.length).toBe(1);
+    expect(righe[0]).toContain("niente a metà prezzo questa settimana");
   });
 
   it("comprare in offerta fa pagare il prezzo scontato", () => {

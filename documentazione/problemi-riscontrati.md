@@ -5215,3 +5215,88 @@ pulita. Una cosa storta, non di questa task:
 - Con un avatar Avaturn o senza avatar la testata dice che i vestiti non si vedranno
   addosso, ma le offerte e i capi bloccati compaiono lo stesso e si comprano lo stesso:
   coerente con «Puoi comprarli, ma non li vedrai su di lui» (`negozio.js:125-131`).
+
+## Giro del 21/09/2026 (segnala-problemi, giro stretto sul commit `f4f7569`, branch `task/shop-rifiniture-dopo-il-giro`)
+
+Controllato solo quello che il commit ha toccato. `npm run verifica` passa (unitarie, audit,
+build 33 ok, exit 0). Il `save()` chiamato mentre lo Shop si disegna **non** fa ricorsione:
+`save()` scrive su localStorage e basta (`state.js:108`, `copertine.js:29`), non ridisegna
+niente; e l'estrazione pigra scatta una volta sola per partita, perché `G.week` cambia solo
+in `advanceWeek` (`sim.js:239`), che rifà le offerte subito dopo, cambio d'anno compreso.
+Un salvataggio con il vecchio campo `sc` nell'usato si carica senza errori: il campo resta
+lì fino alla scadenza del capo (al massimo tre settimane) e nessuno lo legge, lo sconto
+scritto viene dal prezzo. Sotto i 640 punti la barra dei filtri non è appiccicata per scelta
+(`stretto.css:85`), quindi lo sfondo nuovo lì non conta; a 1366 e sul telefono da fermo la
+banda scura si intuisce appena. Tre cose da sistemare, una delle quali è una regressione
+portata dal fix:
+
+### Il salvataggio automatico dello Shop copre un salvataggio illeggibile prima che uno possa dire «Riprova»
+
+- **dove** — `frontend/js/game/negozio-offerte.js:106-108` (`offerteAggiorna`, chiamata dalle
+  righe 117 e 143), che scatta da `ui.js:406` (`renderGioco` disegna lo Shop sempre, anche a
+  pannello chiuso) al primo ingresso in città (`gioco-ingresso.js:728`); il cartello con
+  «Riprova a caricarla» sta in `servizio.js:161`.
+- **cosa succede** — quando la partita salvata non si riesce a leggere, il gioco ne mette da
+  parte una copia, parte con una partita nuova e mostra il cartello «Riprova a caricarla /
+  Ricomincia da questo slot». Adesso però, prima ancora del cartello, il primo disegno della
+  città fa tirare a sorte le offerte e chiama `save()`: la partita nuova (0 €, settimana 1)
+  viene scritta **sopra** quella rotta. «Riprova a caricarla» ricarica la pagina, trova la
+  partita nuova, non dice più niente: uno si ritrova da capo senza aver scelto. Provato con
+  Playwright mettendo una stringa rotta nella chiave: dopo il primo disegno la chiave contiene
+  la partita nuova; con la versione di `negozio-offerte.js` di prima di questo commit la
+  stringa rotta restava intatta. La copia messa da parte
+  (`…-illeggibile-<data>`) sopravvive, ma il gioco non ha un tasto per riprenderla.
+- **come si vede** — con il gioco aperto, nella console: `localStorage.setItem(CHIAVE_PARTITA(),
+  '{"rotto')`, poi ricarica la pagina e premi «Riprova a caricarla».
+- **quanto pesa** — si vede ma si gira intorno (la copia c'è, ma la recupera solo chi sa dove
+  guardare).
+- **RISOLTO (21/09/2026)** — stesso branch, commit dopo: il render **non salva mai**. `offerteAggiorna(salva)`
+  tira a sorte e, se l'ha fatto dal render, lo segna (`G.offerte.daSalvare`); è l'apertura
+  dello Shop dalla mappa (`hub.js`, `vai` dello Shop — un'azione di chi gioca, come
+  comprare) a chiamarla con `salva` e a scrivere. Riprovato con Playwright: con
+  `'{rotto'` in `localStorage`, dopo il caricamento la stringa rotta è ancora lì e il
+  cartello c'è; aprendo lo Shop il salvato diventa leggibile con lo stesso capo di `G`.
+
+### La prova «al lunedì cambia il capo» fallisce a caso, una volta ogni trenta
+
+- **dove** — `frontend/test/unit/shop-sblocchi-e-offerte.test.js:131`
+  (`expect(p.G.offerte.capo).not.toBe(prima)`).
+- **cosa succede** — il capo del lunedì è tirato a sorte fra i 29-32 comprabili, e niente vieta
+  che esca lo stesso della settimana prima: succede il 3,6% delle volte (misurato su 20.000
+  estrazioni: 1 su 29), e la prova pretende che sia diverso. Fatto girare il file 40 volte:
+  fallito 2 (`expected 'vista' not to be 'vista'`, `expected 'bandana' not to be 'bandana'`).
+  Quindi `npm run verifica` — e il gate del commit — diventa rosso ogni tanto senza che
+  nessuno abbia rotto niente.
+- **come si vede** — `npx vitest run test/unit/shop-sblocchi-e-offerte.test.js` una decina
+  di volte di fila.
+- **quanto pesa** — si vede ma si gira intorno (si rilancia), ma è un falso allarme che
+  costa tempo a chi lo prende.
+- **RISOLTO (21/09/2026)** — stesso branch: la prova ha un dado seminato (`Object.create(Math)` con un `random`
+  a congruenza lineare, seme 7) al posto di `Math.random`, e non chiede più che il capo
+  cambi: chiede che al lunedì nuovo sia comprabile e non tuo. Tre giri di fila verdi.
+
+### La prova «il diario parla anche quando resta solo l'usato» non passa mai da quel caso
+
+- **dove** — `frontend/test/unit/shop-sblocchi-e-offerte.test.js:138-144`
+- **cosa succede** — la prova lascia libero un capo solo (il beanie) e conta una riga di
+  diario; ma con un capo solo libero quello finisce **sempre** a metà prezzo (il capo del
+  lunedì si sceglie per primo, e l'usato pesca fra gli altri), quindi la riga che esce è
+  «…a metà prezzo fino a domenica», mai «niente a metà prezzo questa settimana». Misurato:
+  0 su 500 giri. Il ramo nuovo del diario (`negozio-offerte.js:99`) resta senza prova, anche
+  se la prova ha il suo nome. Il caso vero si costruisce: due capi liberi, uno va a metà
+  prezzo e l'altro sull'usato con scadenza oltre la settimana dopo; si compra quello a metà
+  prezzo; al lunedì dopo resta solo l'usato.
+- **come si vede** — nella prova, stampa `p.G.log[0]` dopo `offerteSettimana(true)`.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (21/09/2026)** — stesso branch: la prova costruisce il caso — dopo la prima estrazione allunga la
+  scadenza dei capi sul banco dell'usato e compra tutti gli altri, così al lunedì dopo
+  `capo` è `null` e l'usato c'è — e controlla che la riga dica «niente a metà prezzo
+  questa settimana».
+
+**Nota, non un errore:** sul telefono di traverso (844 × 390) la barra appiccicata va su tre
+righe (i filtri su due, la cassa sulla terza) ed è alta 146 punti su 390; la terza riga sta
+nella parte dove lo sfondo nuovo sfuma (`game.css:274`, dal 78% in giù), così accanto alla
+cassa si legge il testo della card che passa sotto («Usato · −40% · ancora 3 settimane»).
+L'altezza c'era anche prima del commit; la trasparenza sull'ultima riga è dello sfondo nuovo.
+— **Sistemata (21/09/2026)**, stesso branch: lo sfondo è pieno fino a 10 punti dal bordo
+(`calc(100% - 10px)`, il padding della barra) e sfuma solo lì, con una o tre righe.

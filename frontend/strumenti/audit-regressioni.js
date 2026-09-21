@@ -1910,7 +1910,10 @@ test("al lunedi' (advanceWeek, dopo G.week++) si tira a sorte il capo a meta' pr
   sim.indexOf('offerteSettimana(true);') > sim.indexOf("  G.week++;") &&
   offerte.includes("if(s.sett === w) return false;") &&
   offerte.includes("s.capo = scelta.length ? scelta[Math.floor(Math.random() * scelta.length)].id : null;") &&
-  offerte.includes("if(offerteStato().sett !== totalWeeks() && offerteSettimana(false) && typeof save === \"function\") save();"));
+  offerte.includes("function offerteAggiorna(salva){") &&
+  offerte.includes("  if(salva && (nuova || s.daSalvare)){ delete s.daSalvare; if(typeof save === \"function\") save(); }") &&
+  offerte.includes("  offerteAggiorna();") && !offerte.includes("offerteAggiorna(true)") && !negozio.includes("offerteAggiorna") &&
+  hub.includes('if(typeof offerteAggiorna === "function") offerteAggiorna(true);'));
 test("l'usato va e viene: via gli scaduti e i comprati, dentro i nuovi fino a un numero tirato a sorte, ognuno con la sua scadenza e il suo sconto",
   offerte.includes("s.usato = s.usato.filter(u => u.fino > w && u.id !== s.capo && liberi.some(v => v.id === u.id));") &&
   offerte.includes("const quanti = 1 + Math.floor(Math.random() * OFF_USATO_MAX);") &&
