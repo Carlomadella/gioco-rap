@@ -824,17 +824,24 @@ function poRispondi(i){
    è un menù, è una persona che ti si mette contro. */
 function diventaOpp(p){
   p.via = true;
-  /* se era gia' in classifica (venuto da li', studio.js) non ne nasce un
-     secondo con lo stesso nome: quello che c'e' cambia storia */
-  const gia = p.rivale && (G.rivals || []).find(r => p.rivaleId != null ? r.id === p.rivaleId : r.n === p.n);
-  if(gia){
-    gia.storia = "Ha fatto un feat con te, poi alla Sala è finita male.";
+  /* Se in classifica c'e' gia' lui — venuto da li' (studio.js, `rivaleId`) o,
+     in un salvataggio di prima del 21/09, un omonimo che la Sala aveva pescato
+     senza guardare la classifica — non ne nasce un secondo con lo stesso
+     nome: quello che c'e' cambia storia. Se no ne nasce uno. In tutti e due i
+     casi la persona resta legata al suo rivale (`rivale`, `rivaleId`): un opp
+     non torna in «Dalla classifica» come uno sconosciuto da pagare. */
+  if(!G.rivals) G.rivals = [];
+  let r = G.rivals.find(x => p.rivaleId != null ? x.id === p.rivaleId : x.n === p.n) || null;
+  if(r){
+    r.storia = p.rivale ? "Ha fatto un feat con te, poi alla Sala è finita male."
+      : "Vi siete conosciuti alla Sala. È finita male.";
   } else if(typeof nuovoRivale === "function"){
-    const r = nuovoRivale(rnd(400, 1800));
+    r = nuovoRivale(rnd(400, 1800));
     r.n = p.n; r.gen = p.gen || r.gen; r.skin = p.skin; r.col = p.col; r.hair = p.hair;
     r.storia = "Vi siete conosciuti alla Sala. È finita male.";
     G.rivals.push(r);
   }
+  if(r){ p.rivale = true; p.rivaleId = r.id; }
   pushLog("<b>" + p.n + "</b> non ti saluta più. Adesso è uno contro cui corri.", "bad");
 }
 

@@ -2115,7 +2115,13 @@ problemi-riscontrati del 15/09):
   `salvaConCopertine` che sacrifica prima la proposta); l'indice di problemi-riscontrati
   non l'aveva visto. Adesso l'audit lo controlla.
 
-Prove: `test/unit/studio-rivali-e-sala.test.js`, nove con vitest sui file veri
+Il giro di fine task (`segnala-problemi`) ne ha trovate tre in più, chiuse nel branch: l'opp nato
+alla Sala tornava in «Dalla classifica» come uno sconosciuto da pagare (adesso `diventaOpp` lega
+sempre la persona al suo rivale con `rivaleId`), le trasferte pescavano i rapper senza guardare la
+classifica (`nuovoContatto` esclude anche `G.rivals`), e in un salvataggio vecchio l'omonimo già
+alla Sala che diventava opp sdoppiava il rivale (si fonde con quello che c'è).
+
+Prove: `test/unit/studio-rivali-e-sala.test.js`, dieci con vitest sui file veri
 (`studio.js`, `posto.js`, `rivals.js`) e un dado seminato — sei fallivano sul codice di
 prima; quattro controlli nuovi nell'audit.
 

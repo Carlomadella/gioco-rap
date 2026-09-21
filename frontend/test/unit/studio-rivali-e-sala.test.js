@@ -89,10 +89,27 @@ describe("un rivale della classifica e il suo omonimo alla Sala", () => {
     expect(p.G.rivals[0].storia).toContain("feat");
   });
 
-  it("uno della Sala che diventa opp entra in classifica come prima", () => {
+  it("uno della Sala che diventa opp entra in classifica, resta legato al suo rivale e non si richiama in Cabina", () => {
+    p.run('G.gente.push({id:"p3", ruolo:"rapper", n:"Nessuno Così", rel:0})');
     const quanti = p.G.rivals.length;
-    p.run("diventaOpp(G.gente[0])");
+    p.run('diventaOpp(G.gente.find(x => x.id === "p3"))');
     expect(p.G.rivals.length).toBe(quanti + 1);
+    const opp = p.G.gente.find(x => x.id === "p3");
+    const r = p.G.rivals.find(x => x.n === "Nessuno Così");
+    expect(opp.rivale).toBe(true);
+    expect(opp.rivaleId).toBe(r.id);
+    expect(p.run("studioRivaliChiamabili().map(r => r.n)")).not.toContain("Nessuno Così");
+  });
+
+  it("salvataggio vecchio: l'omonimo della Sala che diventa opp si fonde col rivale che c'e', niente due «Lupo»", () => {
+    // G.gente[0] e' l'omonimo (non rivale) del primo rivale, come lo pescava la Sala prima del 21/09
+    const quanti = p.G.rivals.length;
+    const nome = p.G.rivals[0].n;
+    p.run("diventaOpp(G.gente[0])");
+    expect(p.G.rivals.length).toBe(quanti);
+    expect(p.G.rivals.filter(r => r.n === nome).length).toBe(1);
+    expect(p.G.gente[0].rivaleId).toBe(p.G.rivals[0].id);
+    expect(p.G.rivals[0].storia).toContain("Sala");
   });
 
   it("la Sala non pesca piu' un nome che sta in classifica, e la classifica non pesca uno della Sala", () => {
