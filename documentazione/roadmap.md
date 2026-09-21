@@ -1,6 +1,6 @@
 # La roadmap del progetto — a che punto siamo davvero
 
-**Aggiornata al 20/09/2026.** Ogni riga di questo file è stata controllata sul repo il
+**Aggiornata al 21/09/2026.** Ogni riga di questo file è stata controllata sul repo il
 giorno in cui è stata scritta: se qui c'è scritto «fatto», il codice c'è ed è stato
 guardato. Se c'è scritto «da fare», nel repo non c'è niente che lo faccia.
 
@@ -206,6 +206,10 @@ barra del giorno dà +1 hype (`frontend/js/game/sputa.js`). Tutte e due in
 `implementazioni/`: «Non si spende energia per tenere una take» in `04-musica-e-suoni.md`,
 «Sputa» in `02-interfaccia-e-telefono.md`.
 
+**FATTO (21/09/2026)** — «Costa troppo una take in studio»: la prima take costa **25** e le
+altre **8** (erano 45 e 12; tre take fanno 41 invece di 69). «La take costa 25, le altre 8»
+in `04-musica-e-suoni.md`.
+
 **Manca**: l'app della discografia che dice come invecchiano i pezzi. (Il buco dei 1180px —
 «Che post fai?» che sotto non si raggiungeva — è chiuso il 15/09/2026: il telefono si alza
 a schermo pieno anche da stretto, vedi la tappa G.)
@@ -223,7 +227,10 @@ Ci si appoggiano due punti già aperti: *«"Completa la canzone" deve costare qu
 **C'è già**: La Sala, il posto dove si conosce la gente — ruolo, carattere, fama e i sei
 gradini del rapporto, e con un rapper si può anche rompere; il videomaker; gli opp e i
 giornalisti per strada; un'età per i personaggi; una conversazione lunga al giorno; le chat
-con mamma e il migliore amico.
+con mamma e il migliore amico. **FATTO (21/09/2026)** — «non deve costare energia
+interagire con gli altri all'interno della sala»: `PO_COSTO` tutto a zero, i tasti dicono
+«gratis» o solo i soldi; restano il tempo di ogni mossa e i gradini («Nella Sala non si
+spende energia» in `implementazioni/06-mondo-e-personaggi.md`).
 
 **Manca**:
 

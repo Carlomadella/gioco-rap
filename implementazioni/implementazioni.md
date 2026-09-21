@@ -48,7 +48,8 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 ## Da fare adesso, in ordine
 
-Riordinato il 20/09/2026, dopo il reparto Vestiti dello Shop. Le voci chiuse sono uscite
+Riordinato il 20/09/2026, dopo il reparto Vestiti dello Shop; il 21/09 sono uscite le due
+piccole della Sala e della take. Le voci chiuse sono uscite
 dalla lista e stanno in fondo, una riga l'una con la data e dove sta il racconto — prima
 restavano barrate in mezzo alle aperte e la lista era lunga il doppio di quello che
 serviva. I sette punti di CARLO del 16/09 (lo Studio, la troupe) sono entrati: due erano
@@ -76,17 +77,7 @@ cinque video del punto sono collegati. I sette video in più sono una decisione,
 
 **Piccole e chiare**
 
-2. **Non deve costare energia interagire con gli altri nella Sala** — CARLO, «Studio
-   (16/09/2026)». Oggi in `posto.js` ogni mossa della Sala costa (`PO_COSTO`: due parole
-   12, il numero 4, la sessione 45, il feat 45, il video 35). Da decidere una riga prima
-   di farlo: «interagire» è parlare e scambiarsi il numero — a zero — mentre la sessione
-   e il feat restano lavoro e si pagano; o tutto a zero.
-3. **Costa troppo una take in studio** — CARLO (20/09). Oggi la prima take del pezzo
-   costa 45 di energia (`STUDIO_TAKE_PRIMA`, il prezzo della sessione di una volta) e le
-   altre 12 (`STUDIO_TAKE_ENERGIA`), su 100 al giorno: una sessione con tre take è più
-   di metà giornata. Da decidere il numero — la prima a 25 e le altre a 8? — e tenere
-   d'occhio la Sala, dove la sessione col fonico costa gli stessi 45 (`PO_COSTO`).
-4. **Lo Shop dopo i Vestiti: lo stile che conta, i capi che si sbloccano, le offerte della
+2. **Lo Shop dopo i Vestiti: lo stile che conta, i capi che si sbloccano, le offerte della
    settimana** — CARLO, i tre punti «Shop (20/09/2026)» scelti fra le idee proposte
    chiudendo il reparto. Vanno in quest'ordine: prima l'effetto dei capi (presenza/hype
    da `makehumanState.slots`, il bonus del look a tema), poi lo sblocco per carriera
@@ -95,73 +86,73 @@ cinque video del punto sono collegati. I sette video in più sono una decisione,
 
 **Lavori lunghi**
 
-5. **Via la lucidità** — CARLO, «togli il parametro «lucidità» e tutto ciò che ne
+3. **Via la lucidità** — CARLO, «togli il parametro «lucidità» e tutto ciò che ne
    consegue». Tocca 17 file del gioco e le formule della qualità del testo: non è una
    riga, va fatto in una task sua con l'audit aggiornato nello stesso commit. Chiude da
    sola anche «l'uscita di venerdì non costa niente, quella a mano sì» di
    problemi-riscontrati.
-6. **Le tre code dello Studio a cinque linguette** — da problemi-riscontrati (15/09):
+4. **Le tre code dello Studio a cinque linguette** — da problemi-riscontrati (15/09):
    l'omonimo della classifica che non si può chiamare, chi accetta dalla classifica che
    ruba un posto alla Sala, la copertina proposta e non confermata che resta nel
    salvataggio con la foto.
-7. **Quello che manca alla catena del pezzo** — CARLO, la coda del punto «Non è più:
+5. **Quello che manca alla catena del pezzo** — CARLO, la coda del punto «Non è più:
    "Faccio un pezzo → +10 fama"» (FATTO in parte): la cover caricata da file e quella
    «stile emblema», la discografia come app del telefono, le remastered e le parti 2.
-8. **Beat, Testo e Cabina a mano, il resto in automatico coi malus** — CARLO, «Studio
+6. **Beat, Testo e Cabina a mano, il resto in automatico coi malus** — CARLO, «Studio
    (16/09/2026)»: «l'utente deve poter fare solo le sezioni Beat, Testo e Cabina, poi il
    resto in automatico, però questo porta dei malus». Oggi Mix e Uscita si aprono col
    primo pezzo sul banco e si fanno a mano. L'automatico è una scelta in Cabina («chiudi
    tu il resto»): un mix medio, l'uscita al venerdì, e un malus sulla qualità che si legge
    nel riquadro dei numeri.
-9. **La serata del Live Club giocata a momenti** — CARLO, la coda di «aggiungi le foto di
+7. **La serata del Live Club giocata a momenti** — CARLO, la coda di «aggiungi le foto di
     background dei posti»: nel riferimento `concerto_live` in mezzo alla pagina c'è «al
     terzo pezzo uno in fondo comincia a parlare sopra», tre risposte e la gente che sale o
     scende, più «cambia ordine» nella scaletta. Oggi la serata è la mossa `live` di sempre
     (un numero) scelta sulla foto: i momenti sono il minigioco della Piazza rifatto per il
     palco, e la scaletta con l'ordine vorrebbe un peso in `sim.js`.
-10. **Le card sulla mappa troppo vicine, i pulsanti sopra la mappa troppo grandi** — ALE.
+8. **Le card sulla mappa troppo vicine, i pulsanti sopra la mappa troppo grandi** — ALE.
     Si giudicano a occhio: vanno guardate con uno screenshot, non dal CSS. Stessa cosa per
     **la schermata opzioni da migliorare graficamente** — CARLO, pagina di landing.
-11. **Quando skippi tante ore ci mette troppo** — CARLO. Prima si misura (quanti giorni,
+9. **Quando skippi tante ore ci mette troppo** — CARLO. Prima si misura (quanti giorni,
     quanti secondi), poi si cerca dove.
-12. **Su LaFamegram non posta nessuno** — CARLO. Oggi gli altri compaiono nel feed solo
+10. **Su LaFamegram non posta nessuno** — CARLO. Oggi gli altri compaiono nel feed solo
     quando l'evento riguarda te (il fan, il giornalista, la Strada: `lafamegramEventi`);
     nessun contatto della Sala o rivale posta per conto suo. Prima si decide chi posta e
     cosa, poi si fa.
-13. **Il pub e la pubblicità come primo modo di fare hype** — ALE, la coda del punto
+11. **Il pub e la pubblicità come primo modo di fare hype** — ALE, la coda del punto
     sull'hype (FATTO il 06/09 per il resto, in `fatte.md`): oggi non esistono né come
     luogo né come azione.
-14. **I collettivi di rapper** — CARLO, «Studio (16/09/2026)»: «fai in modo che si possano
+12. **I collettivi di rapper** — CARLO, «Studio (16/09/2026)»: «fai in modo che si possano
     creare collettivi di rapper». Nel gioco non esiste un gruppo: ci sono i rivali della
     classifica e la gente della Sala, uno per uno. Prima si scrive cos'è un collettivo
     (chi ci entra, cosa dà — pezzi in comune, hype condiviso, un nome in classifica), poi
     si fa.
-15. **Il joint album con altri rapper, su chiamata di un produttore** — CARLO, «Studio
+13. **Il joint album con altri rapper, su chiamata di un produttore** — CARLO, «Studio
     (16/09/2026)»: «fai in modo che un produttore possa chiamarti per fare un joint album
     con altri rapper». La chiamata è un evento del telefono; l'album, più pezzi in fila
     con più feat, oggi non esiste come oggetto. Viene dopo i collettivi.
 
 **Decisioni prima che lavori**
 
-16. **I rapporti coi beatmaker che vanno in negativo** — ALE. In `posto.js` il rapporto
+14. **I rapporti coi beatmaker che vanno in negativo** — ALE. In `posto.js` il rapporto
     scende (`p.rel--`) ma è tenuto fra 0 e 5: sotto zero non va. Prima di farlo va deciso
     cosa succede a −1 (non ti vende più? ti fa pagare di più?).
-17. **Non sempre far scorrere una giornata ridà l'energia** e **la legacy** — CARLO. Sono
+15. **Non sempre far scorrere una giornata ridà l'energia** e **la legacy** — CARLO. Sono
     regole di gioco nuove: prima si scrive come funzionano, poi si fa.
-18. **Lo Shop in provincia, con limitazioni** — ALE. Lo Shop c'è già dal primo giorno;
+16. **Lo Shop in provincia, con limitazioni** — ALE. Lo Shop c'è già dal primo giorno;
     va deciso cosa **non** si vende in provincia (vedi la RISPOSTA sotto al punto).
-19. **La troupe** — CARLO, «Da discutere»: «il player può decidere se avere una troupe:
+17. **La troupe** — CARLO, «Da discutere»: «il player può decidere se avere una troupe:
     manager, social media manager, fonico personale, beatmaker personale, videomaker». Il
     fonico e il beatmaker «personali» sono già gente della Sala con un rapporto che sale;
     il manager, il social media manager e il videomaker non esistono. Prima si decide cosa
     fa ognuno e quanto costa a settimana.
-20. **Le decisioni tue**, senza le quali il resto non si muove: se dopo Milano e Los
+18. **Le decisioni tue**, senza le quali il resto non si muove: se dopo Milano e Los
     Angeles si può tornare indietro (DA DISCUTERE); la pagina di Mycol e il «tuo artista»
     nella landing; se il gioco sugli store gira anche **di traverso** (nel repo non c'è un
     manifest né un `orientation`, da problemi-riscontrati); e se cancellare gli undici
     branch già uniti in `main` (`git branch --merged main` li elenca, da
     `test/vitest-playwright-gate` a `task/studio-cinque-linguette`), anche sul remoto.
-21. **Come arriva MakeHuman a chi installa il gioco** — dal punto su Avaturn e il camerino
+19. **Come arriva MakeHuman a chi installa il gioco** — dal punto su Avaturn e il camerino
     (FATTO il 20/09): il camerino MakeHuman legge il dataset di `media/makehuman-editor-v1`
     (2,8 GB), che sta fuori da git e fuori dal pacchetto per gli store
     (`FUORI_DAL_PACCHETTO` in `strumenti/build.js`). In un pacchetto pulito la strada «crea
@@ -169,7 +160,7 @@ cinque video del punto sono collegati. I sette video in più sono una decisione,
     (solo i proxy e i target che il camerino usa davvero — il catalogo UI ne conta 468 su
     1.717), un download al primo avvio, o il dataset intero. Va deciso prima dell'uscita,
     insieme al progetto Avaturn nostro (oggi gira sul demo pubblico).
-22. **I sette video che nessun punto chiede** — la coda delle transizioni video (FATTO il
+20. **I sette video che nessun punto chiede** — la coda delle transizioni video (FATTO il
     20/09 per i cinque del punto): palestra, Milano, club, shop, trasferta, live, più
     `video_transizione_entrata_in_studio` che è un doppione dello studio. Sono 22 MB in
     `frontend/media/video/Transizioni di scena/` che viaggiano nel pacchetto per gli
@@ -203,12 +194,12 @@ detto, la richiesta com'era scritta in [`fatte.md`](fatte.md):
 - **L'avvio rapido ci mette due minuti e non lo dice** — FATTO 19/09: «L'avvio rapido: la
   schermata «Preparo il tuo artista»», `02-interfaccia-e-telefono.md`.
 - **Le foto dei posti che non hanno ancora una pagina** — FATTO 19/09: «Le pagine dei
-  posti sulla loro foto», `02-interfaccia-e-telefono.md`. La serata a momenti è la voce 9.
+  posti sulla loro foto», `02-interfaccia-e-telefono.md`. La serata a momenti è la voce 7.
 - **Fra i 980 e i 1180 punti la barra della plancia trabocca** — FATTO 20/09, con la
   plancia a 1280 × 800 e 1366 × 768: «La fascia della plancia fra 980 e 1240, e la plancia
   a 1280 × 800», `02-interfaccia-e-telefono.md`.
 - **Le transizioni video** — FATTO 20/09 (lo Studio dal 16/09): «Le transizioni video: gli
-  altri quattro», `02-interfaccia-e-telefono.md`. I sette video in più sono la voce 22.
+  altri quattro», `02-interfaccia-e-telefono.md`. I sette video in più sono la voce 20.
 - **L'evento fatto esce dall'agenda** — FATTO 20/09: `02-interfaccia-e-telefono.md`.
 - **I prezzi dei beat per fama del beatmaker** — FATTO 20/09: `04-musica-e-suoni.md`.
 - **Si parte con tutti i parametri a 1** — FATTO 20/09: `05-carriera-e-tempo.md`.
@@ -217,6 +208,10 @@ detto, la richiesta com'era scritta in [`fatte.md`](fatte.md):
   Vestiti — lo Shop sblocca, il camerino veste», `02-interfaccia-e-telefono.md`.
 - **Avaturn e il creator in game, tutti e due** — FATTO 20/09, confermato in partita e
   scritto: «Avaturn e il camerino MakeHuman, tutti e due», `03-artista-e-avatar.md`.
+- **Non deve costare energia interagire con gli altri nella Sala** — FATTO 21/09, tutto a
+  zero: «Nella Sala non si spende energia», `06-mondo-e-personaggi.md`.
+- **Costa troppo una take in studio** — FATTO 21/09, la prima a 25 e le altre a 8: «La
+  take costa 25, le altre 8», `04-musica-e-suoni.md`.
 
 Due punti di CARLO — «quando non sono fix… crea un file nuovo collegato ai già presenti»
 e «tieni tutto ciò che riguarda la parte smartphone separata dal resto del progetto» —
@@ -286,7 +281,8 @@ _Rinumerata senza buchi il 20/09/2026, come quella di ALE: il «punto 4 di CARLO
 `fatte.md` cita per i punti chiusi sono quelli di prima. Due punti non erano task ma
 regole di lavoro («crea un file nuovo collegato», «la parte smartphone separata») e dal
 20/09 stanno in `come-si-lavora.md`; le transizioni video e la domanda sull'agenda che
-blocca il giorno (risposta e chiusa) sono in `fatte.md`._
+blocca il giorno (risposta e chiusa) sono in `fatte.md`; dal 21/09 anche il 12, la take
+che costava troppo._
 
 #### Giornaliere
 
@@ -429,18 +425,15 @@ blocca il giorno (risposta e chiusa) sono in `fatte.md`._
     nessuno». Prima di farlo va deciso chi posta e cosa (i beatmaker i loro beat? gli opps
     contro di te? chi scala la classifica?).
 
-12. Costa troppo una take in studio
-
 #### Studio (16/09/2026)
 
 _Scritti da Carletto il 16/09 nella lista dello Studio; i numeri sono i suoi, i buchi
 sono i punti chiusi in [`fatte.md`](fatte.md). Il 7 (il Marketing spostato) e l'8 (la
 preview di un pezzo non uscito) risultavano fatti dal 14 e dal 15/09 senza che il foglio
-lo dicesse: riconosciuti il 20/09. Gli altri quattro sono nell'ordine in testa._
+lo dicesse: riconosciuti il 20/09. L'11 (la Sala senza energia) è chiuso il 21/09, in
+`fatte.md`. Gli altri tre sono nell'ordine in testa._
 
 10. l'utente deve poter fare solo le sezioni Beat, Testo, e Cabina, poi il resto in automatico, però questo porta dei malus
-
-11. non deve costare energia interagire con gli altri all'interno della sala
 
 12. fai in modo che si possano creare collettivi di rapper
 

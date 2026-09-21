@@ -239,8 +239,9 @@ function studioBeatCompra(){
    Adesso lo vedi, e resta lo stesso dado. `registra` tirava `rnd(-5,6)` e se
    lo teneva: la **prima take è quel tiro lì**, identico. Le altre le chiedi
    tu e le paghi in energia — che è quello che dice il riferimento,
-   «UN'ALTRA TAKE · 12 energia». Chi non ci pensa registra come ha sempre
-   registrato; chi ha energia da spendere può insistere.
+   «UN'ALTRA TAKE · 12 energia» (dal 21/09 sono 8, vedi sotto). Chi non ci
+   pensa registra come ha sempre registrato; chi ha energia da spendere può
+   insistere.
 
    **L'energia si spende per fare la take, mai per tenerla** (15/09/2026).
    Prima la prima take usciva da sola appena entravi in cabina e i 45 di
@@ -248,9 +249,14 @@ function studioBeatCompra(){
    dodici a take per insistere, e poi scoprivi che per *tenere* quella buona
    non ti restava abbastanza. Adesso la cabina si apre vuota, la prima take
    la chiedi tu e costa quello che costava registrare — 45 — le altre 12, e
-   chiudere e' gratis: il conto lo fai prima di ogni take, non alla fine. */
-const STUDIO_TAKE_PRIMA = 45;
-const STUDIO_TAKE_ENERGIA = 12;
+   chiudere e' gratis: il conto lo fai prima di ogni take, non alla fine.
+
+   **«Costa troppo una take in studio»** (CARLO, 20/09/2026): con 45 + 12 + 12
+   una sessione da tre take era 69 su 100 di energia, piu' di mezza giornata.
+   Dal 21/09 la prima costa 25 e le altre 8: tre take fanno 41. La Sala col
+   fonico resta la strada con la qualita' in piu'. */
+const STUDIO_TAKE_PRIMA = 25;
+const STUDIO_TAKE_ENERGIA = 8;
 const STUDIO_TAKE_MAX = 6;
 /* quanto costa la prossima take: la prima il prezzo della sessione, poi 12 */
 function studioTakeCosto(t){

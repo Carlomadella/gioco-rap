@@ -6,8 +6,12 @@
 
    La regola: ogni persona ha un carattere, e con ognuna si sale un gradino alla
    volta — conoscenza, contatto, amico, collaboratore, fidato, partner. Quello che
-   puoi chiedere dipende da dove sei arrivato. Parlare costa energia come tutto il
-   resto: qui non si farma gratis.
+   puoi chiedere dipende da dove sei arrivato. Dal 21/09/2026 qui **non si spende
+   energia** («non deve costare energia interagire con gli altri all'interno
+   della sala», CARLO): parlare, il numero, la sessione, il mix, il feat, il
+   video, l'intervista sono a zero. Non si farma lo stesso: ogni mossa ha il
+   suo tempo (`PO_TEMPO`, il gate del tempo reale) e «due parole» con la stessa
+   persona nello stesso giorno vale meno (`p.ult`).
 
    In provincia c'è poca gente e pochi ruoli, di proposito: il giornalista si
    affaccia solo quando qualcuno comincia a sapere chi sei, e manager, promoter e
@@ -17,9 +21,19 @@
 const POSTO_MAX = 8;                  /* quanta gente può girare in provincia */
 const REL_NOMI = ["conoscenza", "contatto", "amico", "collaboratore", "fidato", "partner"];
 
-/* Punto 39: energia a 100 al giorno. «Due parole» resta una mossa piccola,
-   la sessione in studio e il feat restano le più grosse della Sala. */
-const PO_COSTO = {parla:12, sessione:45, mix:20, feat:45, intervista:12, numero:4, video:35};
+/* Tutto a zero dal 21/09/2026 (erano parla 12, sessione 45, mix 20, feat 45,
+   intervista 12, numero 4, video 35): la Sala e' rete, non lavoro. La tabella
+   resta perche' i controlli e le etichette passano di qui, e se un giorno si
+   torna indietro basta cambiare i numeri. */
+const PO_COSTO = {parla:0, sessione:0, mix:0, feat:0, intervista:0, numero:0, video:0};
+/* l'etichetta del costo: l'energia solo se c'e', i soldi se ci sono, se no «gratis» */
+function poEtichetta(tipo, soldi){
+  const e = PO_COSTO[tipo] || 0;
+  const parti = [];
+  if(e) parti.push(e + (e === 1 ? " energia" : " energie"));
+  if(soldi) parti.push(soldi);
+  return parti.length ? parti.join(" \u00b7 ") : "gratis";
+}
 
 const PO_TEMPO = Object.freeze({
   parla:30,
@@ -612,7 +626,7 @@ function costoVideo(p){
 function azioniDi(p){
   const r = POSTO_RUOLI[p.ruolo];
   let out = poTasto(p, "parla", "Fatti due parole",
-    p.rel >= 5 ? "Ci conosciamo ormai" : "Sali di un gradino con " + p.n, PO_COSTO.parla + " energia",
+    p.rel >= 5 ? "Ci conosciamo ormai" : "Sali di un gradino con " + p.n, poEtichetta("parla"),
     G.energy >= PO_COSTO.parla);
 
   /* Il numero: si scambia con chi lavora sui pezzi — chi fa i beat e chi sta
@@ -625,7 +639,7 @@ function azioniDi(p){
       ? poTasto(p, "numero", "Avete il numero", "Ti scrive in chat", "", false)
       : poTasto(p, "numero", "Scambiatevi il numero",
           p.rel >= 1 ? "Da qui in poi ti scrive in chat" : "Serve almeno un contatto",
-          PO_COSTO.numero + " energia",
+          poEtichetta("numero"),
           p.rel >= 1 && G.energy >= PO_COSTO.numero);
   }
 
@@ -640,19 +654,19 @@ function azioniDi(p){
       "gratis", p.rel >= 1 && !sul);
     out += poTasto(p, "sessione", "Sessione in studio",
       p.rel >= 2 ? "Un pomeriggio in sala: esce un beat vostro" : "Serve che siate amici",
-      PO_COSTO.sessione + " energie · 60 €", p.rel >= 2 && G.energy >= PO_COSTO.sessione && G.money >= 60);
+      poEtichetta("sessione", "60 €"), p.rel >= 2 && G.energy >= PO_COSTO.sessione && G.money >= 60);
   }
   if(p.ruolo === "fonico"){
     out += poTasto(p, "mix", "Portagli un pezzo",
       p.rel >= 2 ? "Te lo mixa lui, meglio di come lo faresti tu" : "Serve che siate amici",
-      PO_COSTO.mix + " energie", p.rel >= 2 && G.energy >= PO_COSTO.mix && G.songs.some(s => !s.mixed));
+      poEtichetta("mix"), p.rel >= 2 && G.energy >= PO_COSTO.mix && G.songs.some(s => !s.mixed));
   }
   if(p.ruolo === "rapper"){
     const cd = (typeof totalWeeks === "function" ? totalWeeks() : G.week) - p.feat;
     out += poTasto(p, "feat", "Proponi un pezzo insieme",
       p.rel >= 3 ? (cd < 6 ? "Ne avete fatto uno da poco" : "Un feat vero, con la sua gente dietro")
         : "Serve che siate collaboratori",
-      PO_COSTO.feat + " energie", p.rel >= 3 && cd >= 6 && G.energy >= PO_COSTO.feat);
+      poEtichetta("feat"), p.rel >= 3 && cd >= 6 && G.energy >= PO_COSTO.feat);
   }
   /* punto 10: il videomaker gira il video di un pezzo che è già fuori. Un
      pezzo, un video: non è una leva da tirare due volte sullo stesso. */
@@ -661,13 +675,13 @@ function azioniDi(p){
     out += poTasto(p, "video", "Fategli un video",
       p.rel < 2 ? "Serve che siate amici"
         : (senza ? "«" + senza.t + "»: il pezzo continua a girare" : "Ogni pezzo fuori ha già il suo video"),
-      PO_COSTO.video + " energie · " + costoVideo(p) + " €",
+      poEtichetta("video", costoVideo(p) + " €"),
       p.rel >= 2 && !!senza && G.energy >= PO_COSTO.video && G.money >= costoVideo(p));
   }
   if(p.ruolo === "giornalista"){
     out += poTasto(p, "intervista", "Fatti intervistare",
       p.rel >= 1 ? "Un pezzo sul giro locale: la gente legge" : "Serve almeno un contatto",
-      PO_COSTO.intervista + " energia", p.rel >= 1 && G.energy >= PO_COSTO.intervista);
+      poEtichetta("intervista"), p.rel >= 1 && G.energy >= PO_COSTO.intervista);
   }
   const sulTavolo = p.ruolo === "beatmaker" ? beatSulTavolo(p) : null;
   return '<div class="poaz">' + out + '</div>' +

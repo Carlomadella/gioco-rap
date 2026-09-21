@@ -543,6 +543,18 @@ test("la vecchia formula percentuale illimitata e rimossa",
 }
 
 
+/* «non deve costare energia interagire con gli altri all'interno della sala»
+   (CARLO, Studio 16/09; deciso «tutto a zero» il 21/09/2026): la tabella dei
+   costi resta, a zero, e le etichette dicono «gratis» invece di «0 energie». */
+test("nella Sala nessuna mossa costa energia, e i tasti dicono «gratis» (o solo i soldi)",
+  (() => {
+    const posto = leggi("js/game/posto.js");
+    return posto.includes("const PO_COSTO = {parla:0, sessione:0, mix:0, feat:0, intervista:0, numero:0, video:0};") &&
+      posto.includes('return parti.length ? parti.join(" \\u00b7 ") : "gratis";') &&
+      !/PO_COSTO\.\w+ \+ " energi/.test(posto) &&
+      posto.includes('poEtichetta("sessione", "60 €")');
+  })());
+
 console.log("\nPunto 3 - tempo reale Sala / Studio");
 
 test("GAME_TIME espone gate e consumo per azioni custom",
@@ -676,8 +688,8 @@ test("la prima take e' lo stesso tiro di dado che registra faceva da sola",
   /* e chi non ha take in corso ricade sullo stesso dado */
   studioEl.includes("if(!d || !d.l || !d.l.length) return rnd(-5, 6);"));
 
-test("una take in piu' si paga in energia, e non e' gratis",
-  studioEl.includes("const STUDIO_TAKE_ENERGIA = 12") &&
+test("una take in piu' si paga in energia, e non e' gratis: 8 dal 21/09/2026 («Costa troppo una take in studio»)",
+  studioEl.includes("const STUDIO_TAKE_ENERGIA = 8") &&
   studioEl.includes("G.energy -= costo") &&
   studioEl.includes("if(G.energy < costo)") &&
   studioEl.includes("const STUDIO_TAKE_MAX = 6"));
@@ -686,8 +698,8 @@ test("una take in piu' si paga in energia, e non e' gratis",
    «Tieni questa e chiudi» era `registra` a 45 di energia, e chi aveva pagato
    le take per insistere arrivava alla fine senza i 45 per tenere quella
    buona. La sessione adesso la paga la prima take. */
-test("tenere una take non costa energia: la sessione la paga la prima take",
-  studioEl.includes("const STUDIO_TAKE_PRIMA = 45") &&
+test("tenere una take non costa energia: la sessione la paga la prima take (25 dal 21/09/2026)",
+  studioEl.includes("const STUDIO_TAKE_PRIMA = 25") &&
   studioEl.includes("return t && t.l.length ? STUDIO_TAKE_ENERGIA : STUDIO_TAKE_PRIMA;") &&
   /id:"registra", n:"Registra il pezzo", e:0,/.test(actions) &&
   /* e senza take non si registra: sarebbe un pezzo gratis */
