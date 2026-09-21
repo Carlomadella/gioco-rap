@@ -1,7 +1,7 @@
 {
   "schema": "fame-owned-beats-basic-pitch-environment-v1",
   "version": 1,
-  "status": "BOOTSTRAP_COMPLETE_AWAITING_EXACT_TRANSITIVE_LOCK_COMMIT",
+  "status": "EXACT_TRANSITIVE_LOCK_COMMITTED",
   "python": {
     "requiredMajorMinor": "3.10",
     "observedVersion": "3.10.11"
@@ -48,7 +48,7 @@
     "captureEnvironmentReceipt": true,
     "capturePackagedModelSha256": true,
     "exactModelShaMustBeCommittedBeforeFirstStemInference": true,
-    "nextActionAfterSuccessfulBootstrap": "REVIEW_AND_COMMIT_EXACT_PIP_FREEZE_AND_MODEL_SHA"
+    "nextActionAfterSuccessfulBootstrap": "VERIFY_COMMITTED_LOCK_AND_MODEL_THEN_PREPARE_BASIC_PITCH_INFERENCE"
   },
   "bootstrapTools": {
     "indexUrl": "https://pypi.org/simple",
@@ -59,8 +59,10 @@
   "lock": {
     "path": "requirements-basic-pitch-lock.txt",
     "sourceRunId": "basic-pitch-env-v1-001",
-    "committed": false,
-    "reviewed": false,
-    "sourcePipFreezeAllSha256": "9374ac7a60f9ba6cc97ae14f9b8627c527bb3ef70833d27e95340d45ff69aa7f"
+    "committed": true,
+    "reviewed": true,
+    "sourcePipFreezeAllSha256": "9374ac7a60f9ba6cc97ae14f9b8627c527bb3ef70833d27e95340d45ff69aa7f",
+    "repositoryCanonicalSha256": "3613fc36f85e54629e14e98cd05648eb2b3d1ddd2b2f3ee87360299f464a60ad",
+    "packageCount": 44
   }
 }
