@@ -1283,3 +1283,22 @@ Strategia v1-003:
 - failure report esteso allo stage `PRE_EXECUTION_VALIDATION`.
 
 Final holdout, batch 131, training e task-data readiness restano chiusi.
+
+## NDR-083 — Basic Pitch: v1-003 receipt AUTHORIZED_NO_INFERENCE
+
+**Stato: ACCEPTED — 21 settembre 2026.**
+
+Il nuovo superseding run `basic-pitch-development-inference-v1-003` ha creato correttamente il proprio receipt append-only dopo un fresh pre-inference gate.
+
+Il receipt conferma:
+
+- 8/8 record development;
+- `status=AUTHORIZED_NO_INFERENCE`;
+- `supersedesRunId=basic-pitch-development-inference-v1-002`;
+- `freshPreInferenceGatePassed=true`;
+- `algorithmChanged=false`;
+- nessuna inferenza Basic Pitch eseguita durante la preparazione;
+- nessun MIDI scritto;
+- final holdout, batch 131 e training esclusi.
+
+Da questo checkpoint contract v3, receipt runner v3 ed executor v3 sono considerati congelati per il primo output. Il prossimo passo autorizzato è l'esecuzione append-only del run v1-003.
