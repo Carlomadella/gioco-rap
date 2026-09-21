@@ -1484,3 +1484,23 @@ Gate già congelato:
 - batch131/training/task-data readiness restano chiusi.
 
 La sola selezione non cambia il manifest. Prima dell'audio il cohort deve essere riservato append-only e assegnato allo split `audio-to-midi-evaluation-v1`.
+
+## NDR-091 — Evaluation Audio→MIDI riservata; execution immutabile prima dell'audio
+
+**Stato: ACCEPTED — 21 settembre 2026.**
+
+Il cohort indipendente da 12 family è stato assegnato allo split `audio-to-midi-evaluation-v1` e la reservation append-only è stata verificata prima di qualunque accesso audio.
+
+La pipeline di evaluation viene congelata prima del primo output:
+
+1. BPM autonomo da `audio-analysis-v2-config-001`, riusando il beat/BPM V1 dichiarato invariato;
+2. Source Separation `intel-openvino-htdemucs-v4-97fc578`, stesso modello/revision/hash e stessi parametri del development;
+3. drums `drums-bass-kick-fusion-v1`, stessi parametri congelati;
+4. low-end `librosa-pyin-lowend-v1`, stessi parametri congelati;
+5. Basic Pitch escluso dall'evaluation;
+6. nessun Human Reference come input;
+7. nessun retuning sul cohort evaluation.
+
+L'executor `audio-to-midi-independent-evaluation-execution.py` e il contratto `audio-to-midi-independent-evaluation-execution-v1.json` sono congelati prima del primo audio access e legano tramite Git blob tutti i componenti già selezionati.
+
+La preparazione del receipt resta metadata/environment/model-only. L'esecuzione audio è un comando successivo separato. Un failure dell'evaluation non autorizza tuning sugli stessi 12 record: il batch resta chiuso e i failure vengono analizzati separatamente.
