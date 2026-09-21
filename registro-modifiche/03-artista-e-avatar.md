@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:f83c4ad -->
+## 21/09/26, 08:07 â€” task/shop-lo-stile-che-conta â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `f83c4ad`
+
+### Cosa Ã¨ entrato
+
+- `08c5a0e` â€” Shop: «Lo stile che conta» — i capi addosso pesano su hype, presenza e promo â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/creator/guardaroba.js`
+- **Modificato:** `frontend/js/creator/rpg-v24-bridge.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:ae5ca5b -->
 ## 20/09/26, 23:48 â€” task/avaturn-e-camerino-insieme â†’ main
 

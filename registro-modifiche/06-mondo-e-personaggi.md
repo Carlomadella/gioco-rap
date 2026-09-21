@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:f83c4ad -->
+## 21/09/26, 08:07 â€” task/shop-lo-stile-che-conta â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `f83c4ad`
+
+### Cosa Ã¨ entrato
+
+- `08c5a0e` â€” Shop: «Lo stile che conta» — i capi addosso pesano su hype, presenza e promo â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/negozio.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:170da15 -->
 ## 21/09/26, 07:51 â€” task/sala-gratis-e-take-a-25 â†’ main
 
