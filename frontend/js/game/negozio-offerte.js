@@ -23,14 +23,16 @@
    Il giro lo fa `offerteSettimana()`, chiamata da `advanceWeek()` (sim.js)
    subito dopo `G.week++`, cioe' al lunedi'; in piu' lo Shop la chiama da solo
    se trova una settimana diversa da quella salvata (un salvataggio vecchio,
-   o la prima partita: le offerte ci sono dal primo giorno). Dal lunedi' il
-   diario dice cosa c'e' in offerta, cosi' uno sa quando vale la pena passare.
+   o la prima partita: le offerte ci sono dal primo giorno), e in quel caso
+   salva subito. Dal lunedi' il diario dice cosa c'e' in offerta, cosi' uno
+   sa quando vale la pena passare.
 
-   Quello che si salva: `G.offerte = {sett, capo, usato:[{id, p, sc, fino}]}`.
+   Quello che si salva: `G.offerte = {sett, capo, usato:[{id, p, fino}]}` (piu'
+   `daSalvare`, solo fra un'estrazione del render e l'apertura dello Shop).
    `sett` e' la settimana assoluta (totalWeeks), `capo` l'id del capo a meta'
    prezzo (o null se non c'e' piu' niente da scontare), `usato` i capi del
-   banco con il loro prezzo gia' arrotondato ai 5 €, lo sconto in percento
-   (`sc`, quello scritto sulla card) e la settimana in cui escono. Il prezzo
+   banco con il loro prezzo gia' arrotondato ai 5 € e la settimana in cui
+   escono; lo sconto scritto sulla card si ricava dal prezzo. Il prezzo
    che lo Shop mostra e fa pagare lo chiede a `offertaDi(v)` (via shFitPrezzo
    di negozio.js): il capo ha un'offerta solo se e' ancora comprabile — se
    nel frattempo e' diventato tuo, o si e' ribloccato (i fan possono anche
@@ -86,16 +88,38 @@ function offerteSettimana(avvisa){
   while(s.usato.length < quanti && pool.length){
     const v = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
     const sconto = OFF_USATO_SCONTI[Math.floor(Math.random() * OFF_USATO_SCONTI.length)];
-    s.usato.push({id:v.id, p:offArrotonda(v.p * (1 - sconto)), sc:Math.round(sconto * 100),
+    s.usato.push({id:v.id, p:offArrotonda(v.p * (1 - sconto)),
       fino:w + 1 + Math.floor(Math.random() * OFF_USATO_SETTIMANE)});
   }
 
   if(avvisa && typeof pushLog === "function"){
     const capo = s.capo && VETRINA_VESTITI.find(v => v.id === s.capo);
-    if(capo) pushLog("Allo Shop: <b>" + capo.n + "</b> a metà prezzo fino a domenica" +
-      (s.usato.length ? ", e " + s.usato.length + (s.usato.length === 1 ? " capo usato" : " capi usati") + " sul banco" : "") + ".", "");
+    const usati = s.usato.length ? s.usato.length + (s.usato.length === 1 ? " capo usato" : " capi usati") + " sul banco" : "";
+    if(capo) pushLog("Allo Shop: <b>" + capo.n + "</b> a metà prezzo fino a domenica" + (usati ? ", e " + usati : "") + ".", "");
+    else if(usati) pushLog("Allo Shop: " + usati + ", niente a metà prezzo questa settimana.", "");
   }
   return true;
+}
+
+/* Se le offerte salvate sono di un'altra settimana (un salvataggio di prima
+   del 21/09, o `G.offerte` che manca) si tira a sorte adesso. Con `salva`
+   si salva anche: lo fa l'apertura dello Shop dalla mappa (hub.js), che e'
+   un'azione di chi gioca — se no ricaricando la pagina senza fare altro
+   l'offerta sarebbe un'altra. Il render invece NON salva mai: il primo
+   `renderGioco()` di una partita nuova gira anche quando il salvataggio di
+   prima era illeggibile e il cartello «Riprova a caricarla» non e' ancora
+   comparso, e un `save()` li' scriverebbe la partita nuova sopra a quella
+   rotta (trovato dal giro di fine task del 21/09). */
+function offerteAggiorna(salva){
+  if(typeof totalWeeks !== "function") return false;
+  const s = offerteStato();
+  const nuova = s.sett !== totalWeeks();
+  if(nuova) offerteSettimana(false);
+  /* un'estrazione fatta dal render resta segnata (`daSalvare`) finche'
+     un'apertura dello Shop non la salva */
+  if(salva && (nuova || s.daSalvare)){ delete s.daSalvare; if(typeof save === "function") save(); }
+  else if(nuova) s.daSalvare = true;
+  return nuova;
 }
 
 /* L'offerta su un capo, oggi: null se e' a listino. Se c'e':
@@ -104,7 +128,7 @@ function offerteSettimana(avvisa){
 function offertaDi(v){
   if(typeof G === "undefined" || !G || !v) return null;
   const s = offerteStato();
-  if(typeof totalWeeks === "function" && s.sett !== totalWeeks()) offerteSettimana(false);
+  offerteAggiorna();
   if(guardarobaPosseduto(v.raw) || (typeof shFitRequisito === "function" && shFitRequisito(v))) return null;
   if(s.capo === v.id){
     return {p:offArrotonda(v.p * OFF_SCONTO_LUNEDI), tipo:"lunedi", sconto:Math.round(OFF_SCONTO_LUNEDI * 100),
@@ -113,9 +137,10 @@ function offertaDi(v){
   const u = s.usato.find(x => x.id === v.id);
   if(u){
     const sett = u.fino - (typeof totalWeeks === "function" ? totalWeeks() : 0);
-    /* lo sconto scritto sulla card e' quello tirato a sorte, non quello
-       ricalcolato dal prezzo arrotondato (140 al 40% fa 85, che e' il 39%) */
-    const sconto = u.sc || Math.round((1 - u.p / v.p) * 100);
+    /* lo sconto scritto sulla card e' quello VERO, dal prezzo arrotondato,
+       ai 5 punti: 140 al 40% fa 85 e si scrive −40%, ma 40 al 30% fa 30 ed
+       e' un −25%, e va scritto −25% — chi fa il conto deve trovarlo giusto */
+    const sconto = Math.round((1 - u.p / v.p) * 100 / 5) * 5;
     return {p:u.p, tipo:"usato", sconto,
       riga:"Usato · −" + sconto + "% · " +
         (sett <= 1 ? "solo questa settimana" : "ancora " + sett + " settimane")};
@@ -129,7 +154,7 @@ function offertaDi(v){
 function offerteSezione(){
   if(typeof shFitCard !== "function" || typeof VETRINA_VESTITI === "undefined") return "";
   const s = offerteStato();
-  if(typeof totalWeeks === "function" && s.sett !== totalWeeks()) offerteSettimana(false);
+  offerteAggiorna();
   const capo = s.capo && VETRINA_VESTITI.find(v => v.id === s.capo && offertaDi(v));
   const usato = s.usato.map(u => VETRINA_VESTITI.find(v => v.id === u.id)).filter(v => v && offertaDi(v));
   const sep = (nome, nota) => '<div class="gsep"><i style="background:linear-gradient(140deg,#B45309,#F59E0B)"></i>' +
@@ -137,7 +162,7 @@ function offerteSezione(){
   let out = "";
   if(capo) out += sep("L'offerta del lunedì", "un capo a metà prezzo, fino a domenica") +
     '<div class="shgrid">' + shFitCard(capo) + '</div>';
-  if(usato.length) out += sep("Il banco dell'usato", usato.length + (usato.length === 1 ? " capo" : " capi") + " scontati, finché ci sono") +
+  if(usato.length) out += sep("Il banco dell'usato", usato.length === 1 ? "un capo scontato, finché c'è" : usato.length + " capi scontati, finché ci sono") +
     '<div class="shgrid">' + usato.map(shFitCard).join("") + '</div>';
   if(!out) out = '<div class="shoffnota">Questa settimana niente in offerta: hai già tutto quello che si poteva scontare. Il lunedì cambia.</div>';
   return '<div class="shofferte">' + out + '</div>';

@@ -1239,8 +1239,9 @@ incassa, lì sta solo cosa è in offerta e perché. Due cose:
   come il listino), tirato a sorte fra quelli che puoi comprare — non tuoi, non bloccati — e
   che non stanno già sull'usato. Vale fino a domenica; il lunedì dopo ne arriva un altro.
 - **Il banco dell'usato**: da uno a tre capi (`OFF_USATO_MAX`), ognuno con uno sconto
-  tirato a sorte fra 25, 30 e 40% (`OFF_USATO_SCONTI`, lo sconto scritto sulla card è
-  quello sorteggiato, non quello ricalcolato dal prezzo arrotondato) e una scadenza sua, da
+  tirato a sorte fra 25, 30 e 40% (`OFF_USATO_SCONTI`; lo sconto scritto sulla card è
+  quello vero, dal prezzo arrotondato ai 5 €, ai 5 punti — 40 → 30 € dice −25%) e una
+  scadenza sua, da
   una a tre settimane. Al lunedì escono gli scaduti, i comprati e quelli che si sono
   ribloccati, ed entrano i nuovi fino a un numero che cambia ogni settimana: è il «vanno e
   vengono» del punto. Usato o no, il capo è lo stesso — nel camerino non si vede la
@@ -1251,10 +1252,12 @@ salva**, così non gira ogni volta che apri lo Shop e non si può comprare a met
 capo dopo l'altro. La chiama `advanceWeek()` subito dopo `G.week++` — cioè al lunedì — e
 scrive nel diario cosa c'è («Allo Shop: **Trench bianco** a metà prezzo fino a domenica, e 2
 capi usati sul banco»), così uno sa quando vale la pena passare. Lo Shop la chiama anche da
-solo se trova salvata una settimana diversa da quella di adesso: un salvataggio di prima
-del 21/09 si trova le offerte alla prima apertura, e una partita nuova le ha dal primo
-giorno. Il salvato è `G.offerte = {sett, capo, usato:[{id, p, sc, fino}]}`, con `sett` la
-settimana assoluta (`totalWeeks`).
+solo se trova salvata una settimana diversa da quella di adesso (`offerteAggiorna`; il
+render non salva, segna `daSalvare` e salva l'apertura dello Shop dalla mappa, che è
+un'azione): un salvataggio di prima del 21/09 si trova le offerte alla prima apertura, e
+una partita nuova le ha dal primo giorno. Il salvato è
+`G.offerte = {sett, capo, usato:[{id, p, fino}]}`, con `sett` la settimana assoluta
+(`totalWeeks`).
 
 **Quanto costa un capo, oggi.** `offertaDi(v)` risponde `null` (listino) o
 `{p, tipo, sconto, riga}`, e risponde solo se il capo è ancora comprabile: se nel frattempo
@@ -1280,6 +1283,22 @@ uscito dopo tante settimane, le card) e nel gioco con Playwright a 1366 × 768 e
 sette card bloccate al primo giorno con le tre frasi giuste, zero con contratto, 12.000 fan e
 Milano; la sezione della settimana con l'offerta e l'usato, i prezzi barrati, nessun errore in
 console. Verifica completa verde (435 controlli dell'audit).
+
+**Il giro di fine task** (la sera del 21/09, coi tre agenti: il primo giro con gli agenti
+dopo il «non lanciare agenti» del 20/09) ha trovato sette cose, tutte chiuse nel branch
+`task/shop-rifiniture-dopo-il-giro`: «1 capo scontati», la regola `.shcard.locked` che
+perdeva contro il `disabled` generico (adesso `.shcard.locked:disabled`, più scura di una
+card «senza soldi»), l'estrazione pigra che non salvava, il diario muto col solo usato, le
+prove unitarie che mancavano (`test/unit/shop-sblocchi-e-offerte.test.js`, tredici), la
+barra dei filtri sticky senza sfondo (vecchia, vista con Playwright sul telefono in
+orizzontale) e la riga «Node.js 22.5» del `README-API.md` del backend. E una nota diventata
+regola: lo sconto scritto sull'usato è quello vero. Il racconto per esteso in
+`documentazione/problemi-riscontrati.md`, «Giro del 21/09/2026». Il giro stretto sulle
+rifiniture ne ha trovate altre tre, chiuse nello stesso branch: il salvataggio dopo
+l'estrazione pigra che copriva un salvataggio illeggibile prima del «Riprova» (adesso il
+render non salva mai: segna `daSalvare` e salva l'apertura dello Shop dalla mappa), la prova
+che falliva una volta ogni trenta (dado seminato) e quella che non passava dal ramo «solo
+usato» (costruito davvero).
 
 **Cosa resta dei tre punti dello Shop.** Niente.
 

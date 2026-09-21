@@ -142,8 +142,12 @@ const HUB_LUOGHI = [
      compra — l'attrezzatura, il banco dei beat e i vestiti. Era il Catalogo,
      che come linguetta a sé non aveva senso: un negozio è un posto. */
   {id:"shop", n:"Shop",
-   vai:() => apriPannello("Shop", "shop",
-     "Vestiti e accessori per il tuo artista.")},
+   vai:() => {
+     /* le offerte della settimana, se sono ancora da tirare a sorte, si
+        tirano qui e si salvano: e' un'azione, il render non salva */
+     if(typeof offerteAggiorna === "function") offerteAggiorna(true);
+     apriPannello("Shop", "shop", "Vestiti e accessori per il tuo artista.");
+   }},
   /* punto 6: il centro per l'impiego, arrivato con la mappa definitiva.
      Apre tutti i lavori (JOBS), non solo i due che hanno già un edificio —
      rispetta i requisiti, non finge che siano tutti presi al volo.

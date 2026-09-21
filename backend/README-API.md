@@ -4,7 +4,8 @@ Documentazione operativa dell'API HTTP di **Anni di Fame** e del bridge frontend
 `ONLINE`.
 
 > Verificata sulla repo `Carlomadella/gioco-rap`, branch `main`, commit
-> `024bf7984338eabc44c1df63ff380ecc94013668` del 2 settembre 2026.
+> `6f3f668` del 21 settembre 2026 (l'agente `backend-allineato`: rotte, risposte e
+> migrazioni combaciano; la prima stesura era sul commit `024bf79` del 2 settembre).
 >
 > Fonti principali: `backend/server.js`, `backend/database/archivio.js`,
 > `frontend/js/net/online.js` e `backend/postman/genera.js`.
@@ -27,7 +28,7 @@ Documentazione operativa dell'API HTTP di **Anni di Fame** e del bridge frontend
 
 ## Avvio rapido
 
-Richiede **Node.js 22.5 o successivo**.
+Richiede **Node.js 22.12 o successivo**.
 
 ```bash
 cd backend

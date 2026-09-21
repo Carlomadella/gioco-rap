@@ -267,7 +267,11 @@
    reparti. */
 .shshop{margin-bottom:14px}
 .shbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;
-  position:sticky;top:0;z-index:3;padding:10px 0}
+  position:sticky;top:0;z-index:3;padding:10px 0;
+  /* e' appiccicata in cima mentre si scorre: senza uno sfondo le pastiglie
+     galleggiavano sopra le card (visto il 21/09 a 1366 e sul telefono in
+     orizzontale) */
+  background:linear-gradient(180deg,#0B0B0F calc(100% - 10px),rgba(11,11,15,0))}
 .shtabs{display:flex;gap:8px;flex-wrap:wrap}
 .shtab{padding:9px 18px;border-radius:999px;font-family:var(--cond);font-size:13px;font-weight:800;
   letter-spacing:.06em;text-transform:uppercase;color:var(--soft);background:rgba(255,255,255,.05);
@@ -326,7 +330,7 @@
 /* «Capi che si sbloccano» (21/09): la card bloccata resta in vetrina, spenta,
    e dice cosa serve; «Le offerte della settimana»: il listino barrato col
    prezzo nuovo, la riga dell'offerta, e la sezione in testa al reparto */
-.shcard.locked{filter:grayscale(.8) brightness(.5)}
+.shcard.locked:disabled{filter:grayscale(.9) brightness(.42)}
 .shreq,.shoff{display:block;margin:-6px 12px 11px;font-family:var(--cond);font-size:11px;font-weight:800;
   letter-spacing:.06em;text-transform:uppercase}
 .shreq{color:#FCA5A5}
