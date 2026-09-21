@@ -7,8 +7,8 @@
   "executionContractGitBlobSha": "1b719ee780f826185e6f77179dd6333539675aa1",
   "executor": {
     "path": "basic-pitch-development-execute-v2.py",
-    "gitBlobSha": "5ae04e481ca752699520a2349e5d0ae15ce86885",
-    "implementationCommit": "1a29bb45fd63855df096eb45b8baea3e90f06c27"
+    "gitBlobSha": "677b7d658261efbe713375c0190f1107b82cbd00",
+    "implementationCommit": "1ebc1a9c1319a2c535d5c06cbe656528dc7b8022"
   },
   "runtime": {
     "modelLoadedOncePerProcess": true,
@@ -42,5 +42,16 @@
     "batch131Allowed": false,
     "trainingAuthorized": false,
     "taskDataReadyMayBeDeclared": false
+  },
+  "failureCapture": {
+    "file": "failure-report.json",
+    "appendOnlyFirstFailure": true,
+    "captures": [
+      "stage",
+      "sourceRecordId",
+      "errorType",
+      "errorMessage",
+      "traceback"
+    ]
   }
 }
