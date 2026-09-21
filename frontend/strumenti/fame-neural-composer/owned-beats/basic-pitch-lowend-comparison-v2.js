@@ -277,7 +277,7 @@ function chooseLowEnd(stats){
 }
 
 function validateSubmission(doc,pkg){
- if(doc?.schema!==SUBMISSION_SCHEMA||doc.version!==1||doc.reviewId!==pkg.reviewId||doc.packageDigestSha256!==pkg.packageDigestSha256||!Array.isArray(doc.families)||doc.families.length!==8)throw new Error("Invalid low-end comparison submission envelope");
+ if(doc?.schema!==SUBMISSION_SCHEMA||doc.version!==2||doc.reviewId!==pkg.reviewId||doc.packageDigestSha256!==pkg.packageDigestSha256||!Array.isArray(doc.families)||doc.families.length!==8)throw new Error("Invalid low-end comparison submission envelope");
  const ids=new Set(pkg.families.map(x=>x.sourceRecordId)),seen=new Set();
  for(const item of doc.families){
    if(!ids.has(item.sourceRecordId)||seen.has(item.sourceRecordId))throw new Error("Invalid/duplicate family");
@@ -335,7 +335,7 @@ function render(){if(idx>=PKG.families.length){app.innerHTML='';document.getElem
  document.getElementById('next').onclick=()=>{persist();const x=state(f.sourceRecordId);if(x.candidates.A.score===null||x.candidates.B.score===null||!x.reviewerAttested){alert('Assegna entrambi i punteggi e conferma l ascolto.');return}idx++;render()};
 }
 fetch('/package').then(r=>r.json()).then(x=>{PKG=x;render()});
-document.getElementById('submit').onclick=async()=>{const families=PKG.families.map(f=>({sourceRecordId:f.sourceRecordId,...state(f.sourceRecordId)}));const body={schema:'fame-owned-beats-basic-pitch-lowend-comparison-submission-v2',version:1,reviewId:PKG.reviewId,packageDigestSha256:PKG.packageDigestSha256,families};const r=await fetch('/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const t=await r.text();document.getElementById('result').textContent=t;if(!r.ok)alert(t)};
+document.getElementById('submit').onclick=async()=>{const families=PKG.families.map(f=>({sourceRecordId:f.sourceRecordId,...state(f.sourceRecordId)}));const body={schema:'fame-owned-beats-basic-pitch-lowend-comparison-submission-v2',version:2,reviewId:PKG.reviewId,packageDigestSha256:PKG.packageDigestSha256,families};const r=await fetch('/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const t=await r.text();document.getElementById('result').textContent=t;if(!r.ok)alert(t)};
 </script></main></body></html>`}
 
 function openBrowser(url){
@@ -356,7 +356,7 @@ function prepare(workspaceRoot,reviewId=REVIEW_ID){
  if(fs.existsSync(root))throw new Error("Append-only low-end comparison already exists: "+root);
  const blind=balancedBlindMap(ids);
  const pkg={
-   schema:PACKAGE_SCHEMA,version:1,status:"PREPARED_AWAITING_BLIND_LOW_END_REVIEW",reviewId,
+   schema:PACKAGE_SCHEMA,version:2,status:"PREPARED_AWAITING_BLIND_LOW_END_REVIEW",reviewId,
    preparedAt:new Date().toISOString(),split:"development",records:8,
    protocolDigestSha256:sha256File(PROTOCOL_FILE),
    basicPitchSummarySha256:sha256File(bp.file),
@@ -369,7 +369,7 @@ function prepare(workspaceRoot,reviewId=REVIEW_ID){
  fs.mkdirSync(path.dirname(root),{recursive:true});fs.mkdirSync(root,{recursive:false});
  try{
    fs.writeFileSync(path.join(root,"review-package.json"),stableJson(pkg),{flag:"wx"});
-   fs.writeFileSync(path.join(root,"blind-key.json"),stableJson({schema:BLIND_KEY_SCHEMA,version:1,reviewId,mapping:blind}),{flag:"wx"});
+   fs.writeFileSync(path.join(root,"blind-key.json"),stableJson({schema:BLIND_KEY_SCHEMA,version:2,reviewId,mapping:blind}),{flag:"wx"});
  }catch(error){fs.rmSync(root,{recursive:true,force:true});throw error}
  return{mode:"BASIC_PITCH_LOW_END_BLIND_COMPARISON_PREPARED",reviewId,records:8,technicalGate:"ALL_8_FAMILIES_PASS",armIdentityExposedToReviewer:false,finalHoldoutAccessedByThisCommand:false,batch131AccessedByThisCommand:false,trainingAuthorized:false,nextAction:"SERVE_AND_COMPLETE_BLIND_LOW_END_COMPARISON"};
 }
@@ -408,7 +408,7 @@ function serve(workspaceRoot,reviewId=REVIEW_ID,port=0){
        fs.writeFileSync(submissionFile,stableJson(submission),{flag:"wx"});
        const selected=finalized.gate.lowEndComparison.selectedArm;
        const nextAction=selected?"INTEGRATE_SELECTED_LOW_END_WITH_DRUMS_KICK_FUSION_AND_KEEP_FINAL_HOLDOUT_CLOSED":"KEEP_LOW_END_UNPROMOTED_AND_REVIEW_METHOD";
-       const report={schema:REPORT_SCHEMA,version:1,reviewId,completedAt:new Date().toISOString(),packageDigestSha256:publicPkg.packageDigestSha256,submissionDigestSha256:sha256File(submissionFile),records:8,gate:finalized.gate,context:{selectedDrumsArm:"drums-bass-kick-fusion-v1",baselineArm:"librosa-pyin-lowend-v1",candidateArm:"basic-pitch-0.4.0-lowend-v1"},safety:{finalHoldoutAccessed:false,batch131Accessed:false,trainingAuthorized:false,taskDataReadyMayBeDeclared:false},nextAction};
+       const report={schema:REPORT_SCHEMA,version:2,reviewId,completedAt:new Date().toISOString(),packageDigestSha256:publicPkg.packageDigestSha256,submissionDigestSha256:sha256File(submissionFile),records:8,gate:finalized.gate,context:{selectedDrumsArm:"drums-bass-kick-fusion-v1",baselineArm:"librosa-pyin-lowend-v1",candidateArm:"basic-pitch-0.4.0-lowend-v1"},safety:{finalHoldoutAccessed:false,batch131Accessed:false,trainingAuthorized:false,taskDataReadyMayBeDeclared:false},nextAction};
        fs.writeFileSync(reportFile,stableJson(report),{flag:"wx"});
        res.writeHead(200,{"Content-Type":"application/json","Cache-Control":"no-store"});res.end(stableJson(report));setTimeout(()=>server.close(),750);
      }catch(error){res.writeHead(400,{"Content-Type":"text/plain"});res.end(error.message)}})
