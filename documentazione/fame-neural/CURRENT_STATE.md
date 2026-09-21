@@ -786,3 +786,8 @@ Il run superseding `basic-pitch-development-inference-v1-002` è fallito **prima
 
 
 Il receipt append-only del run `basic-pitch-development-inference-v1-003` è stato creato con `BASIC_PITCH_V1_003_INFERENCE_RECEIPT_PREPARED`: supersedes `v1-002`, 8/8 record, `status=AUTHORIZED_NO_INFERENCE`, fresh pre-inference gate PASS, `algorithmChanged=false`, nessuna inferenza/MIDI/holdout/batch131/training durante la preparazione. Contract v3, receipt runner v3 ed executor v3 restano congelati e non vengono più modificati prima del primo output.
+
+
+Basic Pitch development inference v1-003 completata con `BASIC_PITCH_V1_003_DEVELOPMENT_INFERENCE_COMPLETE`: 8/8 record, stato `INFERENCE_COMPLETE_AWAITING_TECHNICAL_AND_HUMAN_QA`, modello caricato una volta per processo, raw model output non persistito, nessun accesso final holdout/batch131 e training/task-data readiness ancora chiusi.
+
+È stato implementato il technical QA read-only del v1-003 e congelato il protocollo di blind comparison low-end `basic-pitch-lowend-blind-comparison-v1-001`. Il confronto rivaluta alla cieca `librosa-pyin-lowend-v1` vs `basic-pitch-0.4.0-lowend-v1` sugli stessi 8 bass stem, con qualification gate mediana >=2 e almeno 6/8 family >=2. Parità completa -> pYIN per minore complessità. La review non è ancora stata eseguita.
