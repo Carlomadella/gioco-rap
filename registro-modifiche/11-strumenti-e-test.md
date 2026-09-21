@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:9995781 -->
+## 21/09/26, 13:53 â€” task/shop-rifiniture-dopo-il-giro â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `9995781`
+
+### Cosa Ã¨ entrato
+
+- `1e5426c` â€” Shop, il giro stretto sulle rifiniture: il render non salva mai (l'estrazione si segna e la salva l'apertura dello Shop), le prove col dado seminato e il ramo «solo usato» costruito, la barra piena fino al bordo â€” **Carlomadella**
+- `f4f7569` â€” Shop, le rifiniture dopo il giro di fine task: «1 capo scontati», la card bloccata più scura, l'estrazione pigra che salva, il diario col solo usato, tredici prove unitarie, la barra dei filtri con lo sfondo, README-API a Node 22.12 â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+- **Aggiunto:** `frontend/test/unit/shop-sblocchi-e-offerte.test.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:c43384b -->
 ## 21/09/26, 13:15 â€” task/shop-capi-sbloccati-e-offerte â†’ main
 
