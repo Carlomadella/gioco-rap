@@ -1368,3 +1368,33 @@ Il superseding v2 deve:
 - creare `basic-pitch-lowend-blind-comparison-v1-002` da zero con renderer full-duration.
 
 È aggiunta una regressione che costruisce una v1 già finalizzata con submission+report e richiede che il superseding avvenga senza cancellazioni.
+
+## NDR-087 — Audio→MIDI: pYIN selezionato; singolo score 1 attribuito allo stem contaminato
+
+**Stato: ACCEPTED — 21 settembre 2026.**
+
+La blind comparison low-end v2 seleziona `librosa-pyin-lowend-v1`:
+
+- mediana usefulness: 2;
+- family >=2: 7/8;
+- totale: 17;
+- gate: PASS.
+
+`basic-pitch-0.4.0-lowend-v1` non supera il gate:
+
+- mediana usefulness: 0;
+- family >=2: 0/8;
+- totale: 0;
+- gate: FAIL.
+
+Il singolo score pYIN pari a 1 non viene classificato come root cause del trascrittore. La review ha identificato contaminazione già presente nello stem `bass`: residui tonali del lead occupano la stessa regione dell'808 e vengono quindi correttamente interpretati da pYIN come pitch presenti nell'input.
+
+Classificazione ufficiale del caso:
+
+- `UPSTREAM_SOURCE_SEPARATION_CONTAMINATION`;
+- root-cause layer: `source-separation`;
+- `transcriptionRootCause=false`;
+- la family resta un development regression case;
+- nessun retuning post-hoc di pYIN viene introdotto sulla base di questa review.
+
+L'integrazione selezionata usa `drums-bass-kick-fusion-v1` + `librosa-pyin-lowend-v1`. Il run `audio-to-midi-selected-integration-v1-001` deve copiare byte-identici i MIDI selezionati, conservare SHA/provenance e ricavare automaticamente dal submission v2 l'ID della family con score 1. Final holdout, batch 131, training e task-data readiness restano chiusi.
