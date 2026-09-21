@@ -1,7 +1,7 @@
 {
   "schema": "fame-owned-beats-basic-pitch-lowend-candidate-protocol-v1",
   "version": 1,
-  "status": "ENVIRONMENT_BOOTSTRAP_COMPLETE_AWAITING_LOCK_COMMIT",
+  "status": "ENVIRONMENT_AND_MODEL_FROZEN_AWAITING_PREINFERENCE_VERIFY",
   "candidateId": "basic-pitch-0.4.0-lowend-v1",
   "scope": {
     "split": "development",
@@ -57,7 +57,11 @@
       "bytes": 230444,
       "sha256": "2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec",
       "committed": true
-    }
+    },
+    "repositoryLockSha256": "3613fc36f85e54629e14e98cd05648eb2b3d1ddd2b2f3ee87360299f464a60ad",
+    "packageCount": 44,
+    "lockCommitted": true,
+    "lockReviewed": true
   },
   "input": {
     "sourceSeparationRunId": "source-separation-development-inference-v1-001",
@@ -91,6 +95,7 @@
   "safety": {
     "environmentSetupMayOpenAudio": false,
     "environmentSetupMayRunInference": false,
-    "noBasicPitchInferenceUntilLockAndModelFreeze": true
+    "noBasicPitchInferenceUntilLockAndModelFreeze": false,
+    "noBasicPitchInferenceUntilPreinferenceVerify": true
   }
 }
