@@ -74,3 +74,19 @@ Il generatore P3 usa seed deterministici diversi per fixture/evento. Quindi D01 
 5. Beat reali e P6 restano chiusi fino alla decisione successiva.
 
 Next action: `RUN_TSUMUGI_CONTROLLED_FAILURE_REPORT_READ_ONLY`.
+
+
+## Correzione di localizzazione dopo audit sorgente Tsumugi
+
+Il primo reporter etichettava D03/D06/D07 come `PAIRS_SELECTED_BUT_NO_INTERVALS_DECODED`. L'audit del commit Tsumugi congelato mostra però che `_select_pair_candidates` unisce alla soglia un top-k globale. Con `instrumentFilter=drums` rimane una sola classe strumento e il modello espone 88 pitch (MIDI 21–108), mentre il protocollo congelato usa `instrumentPairInferTopk=256`.
+
+Conseguenza: il top-k include di fatto tutti gli 88 pitch ammessi della classe drums anche quando il relativo `pair_gate_logit` è sotto la soglia `-3.0`. Pertanto `selected_pair_count > 0` **non prova** che il pair gate abbia assegnato confidenza positiva o sopra soglia ai pitch target.
+
+La conclusione verificata viene quindi ristretta a:
+
+- il silence gate non elimina D03/D06/D07;
+- il decoder Semi-CRF produce zero intervalli finali;
+- dai result JSON persistiti non è possibile distinguere se i pitch target avessero pair-gate score forte/debole, perché il top-k forza l'enumerazione degli 88 pitch ammessi;
+- serve una nuova diagnostica controllata sui soli fixture sintetici che registri `pair_gate_logits` e interval-score margins a `note_bias=0`, senza modificare nessun parametro e senza accedere a beat reali.
+
+Il reporter read-only è stato corretto per segnalare `TOPK_ENUMERATES_ALL_ALLOWED_PITCHES_NO_INTERVALS_DECODED` quando questa condizione è presente.
