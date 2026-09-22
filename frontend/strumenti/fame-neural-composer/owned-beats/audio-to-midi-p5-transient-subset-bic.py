@@ -81,7 +81,7 @@ def build_templates(fixtures_root,fixture_protocol,baseline,dev,candidate):
     sr=int(dev["drums"]["decodeSampleRate"])
     hop=int(dev["drums"]["hopLength"])
     n_fft=int(dev["drums"]["nFft"])
-    window_seconds=0.08
+    window_seconds=float(freeze["eventWindowSeconds"])
     half_frames=max(1,int(round((window_seconds/2.0)*sr/hop)))
     protocol_by_id={x["id"]:x for x in fixture_protocol["fixtures"]}
     columns=[]
