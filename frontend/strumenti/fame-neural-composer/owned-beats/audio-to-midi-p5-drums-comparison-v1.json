@@ -23,10 +23,22 @@
       "L04 gap/release F1 1.0"
     ],
     "d02SpectralRange": {
-      "lowRatioApprox": [0.022133, 0.025929],
-      "midRatioApprox": [0.148461, 0.150543],
-      "highRatioApprox": [0.824637, 0.827787],
-      "centroidHzApprox": [6597.070234, 6654.856535],
+      "lowRatioApprox": [
+        0.022133,
+        0.025929
+      ],
+      "midRatioApprox": [
+        0.148461,
+        0.150543
+      ],
+      "highRatioApprox": [
+        0.824637,
+        0.827787
+      ],
+      "centroidHzApprox": [
+        6597.070234,
+        6654.856535
+      ],
       "currentOutcome": "HIHAT"
     }
   },
@@ -47,7 +59,25 @@
         "no post-hoc use of the 12 consumed evaluation families",
         "thresholds/scores must be frozen before real-easy or development comparison",
         "unsupported clap/rim must not be relabeled solely to increase supported-class score"
-      ]
+      ],
+      "implementationFreeze": {
+        "sampleRateSource": "development protocol drums.decodeSampleRate",
+        "hopLengthSource": "development protocol drums.hopLength",
+        "nFftSource": "development protocol drums.nFft",
+        "frequencyBandsSource": "development protocol drums.spectralBandsHz",
+        "classBandMapping": {
+          "kick": "low",
+          "snare": "mid",
+          "hihat": "high"
+        },
+        "onsetEnvelope": "per-class spectral-flux envelope computed from the class band of the same STFT",
+        "peakPicker": "librosa.onset.onset_detect with the same pre_max=1, post_max=1, pre_avg=3, post_avg=3, delta and waitFrames as the frozen baseline",
+        "eventPolicy": "each class is detected independently; multiple roles may be emitted at the same or neighboring transient",
+        "deduplication": "same-role detections only; no cross-role suppression",
+        "velocity": "same velocity_map contract as baseline, applied within each class envelope",
+        "newLearnedParameters": 0,
+        "newTunedThresholds": 0
+      }
     },
     {
       "id": "drums-pfnmf-template-activation-v1",
@@ -71,25 +101,37 @@
     {
       "level": 1,
       "name": "isolated_supported_hits",
-      "fixtures": ["D01_KICK_ISOLATED", "D02_SNARE_ISOLATED", "D03_HIHAT_ISOLATED"],
+      "fixtures": [
+        "D01_KICK_ISOLATED",
+        "D02_SNARE_ISOLATED",
+        "D03_HIHAT_ISOLATED"
+      ],
       "advanceWhen": "all supported isolated fixtures have transient recall 1.0 and class F1 1.0 at 30 ms; no regression versus baseline pass fixtures"
     },
     {
       "level": 2,
       "name": "simultaneous_supported_hits",
-      "fixtures": ["D04_KICK_SNARE_SIMULTANEOUS", "D05_KICK_HIHAT_SIMULTANEOUS"],
+      "fixtures": [
+        "D04_KICK_SNARE_SIMULTANEOUS",
+        "D05_KICK_HIHAT_SIMULTANEOUS"
+      ],
       "advanceWhen": "unique-transient recall remains 1.0 and every supported reference role at each simultaneous transient is recovered at 30 ms without extra supported-class false positives"
     },
     {
       "level": 3,
       "name": "simple_rhythmic_patterns",
-      "fixtures": ["D06_HIHAT_TRIPLETS", "D07_KICK_SYNCOPATED"],
+      "fixtures": [
+        "D06_HIHAT_TRIPLETS",
+        "D07_KICK_SYNCOPATED"
+      ],
       "advanceWhen": "both retain class F1 1.0 at 30 ms"
     },
     {
       "level": 4,
       "name": "unsupported_role_diagnostic",
-      "fixtures": ["D08_UNSUPPORTED_CLAP_RIM"],
+      "fixtures": [
+        "D08_UNSUPPORTED_CLAP_RIM"
+      ],
       "advanceWhen": "diagnostic only; never used as a supported-class PASS requirement"
     },
     {
@@ -127,7 +169,10 @@
       "kickRecall",
       "kickF1"
     ],
-    "reportBy": ["family", "curriculumLevel"]
+    "reportBy": [
+      "family",
+      "curriculumLevel"
+    ]
   },
   "budget": {
     "controlledFixtures": 8,
