@@ -1543,3 +1543,17 @@ Decisioni vincolanti:
 
 Checkpoint dettagliato: `OWNED_BEATS_AUDIO_TO_MIDI_INDEPENDENT_EVALUATION_FAILURE_2026-09-22.md`.
 
+
+## Addendum a NDR-092 — limiti della misura e precisione causale — 22 settembre 2026
+
+Rettifica documentale basata sull'audit del codice `99df90e`; non cambia voti, digest, gate o protocolli congelati.
+
+- Gli eventi mancanti riportati dal reviewer sono osservazioni sull'output; l'attribuzione a onset detection richiede confronto con gli onset intermedi. Una classe errata o uno stem degradato possono produrre lo stesso sintomo.
+- Il limite single-label è verificato per il classificatore drums; la fusion può aggiungere un kick separato. Il beneficio netto della fusion resta da isolare con confronto attiva/disattiva su development.
+- La review indipendente usa rendering dai JSON con durata legata all'ultimo evento, non alla reference, e inviluppo sintetico del basso. Il loro impatto sui voti non è misurato. Prima di nuovi confronti verificare e versionare il renderer e la corrispondenza eventi–MIDI; gli artefatti della review storica restano immutati.
+- Il PASS low-end resta quello del confronto con gli stem; non dimostra da solo la fedeltà della separazione al mix originale.
+- `maximumGapFrames` non estende automaticamente la coda oltre l'ultimo frame valido. `fmax` limita la fondamentale; le armoniche alte non provano una violazione del range. Il contour persistito omette i frame scartati e non basta per ricostruirne F0/probabilità.
+- NMF con template e attivazioni indipendenti per strumento è una candidata documentata da valutare, non un metodo selezionato né un'autorizzazione a training. Eventuali vincoli ritmici non devono imporre pattern regolari a sincopi reali.
+- Cohort consumato, batch 131/training/task-data readiness chiusi e obbligo di nuova evaluation fresca restano invariati.
+
+Dettagli, limiti e fonti: [failure analysis revisionata](OWNED_BEATS_AUDIO_TO_MIDI_INDEPENDENT_EVALUATION_FAILURE_2026-09-22.md).
