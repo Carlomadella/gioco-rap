@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import agent
 
-VERSION = 'fame-qa-review-v5'
+VERSION = 'fame-qa-review-v6'
 SOURCE_PATH = 'documentazione/fame-neural/OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_CONTROLLED_FAIL_2026-09-22.md'
 SOURCE_COMMIT = '0f9c04889b26f9992fc969ad6c3ff464dc652790'
 CASE_SHA = 'bc95ffe579de6b44f7989015bee7d78627abd1f795debe68c514665999454d13'
@@ -31,12 +31,12 @@ CHECKS = {
     'PROPOSE_SYNTHETIC_LOGGING': 'Proporre diagnostica solo sintetica con pair_gate_logits e interval-score margins a note_bias=0; non eseguirla.',
     'CHANGE_THRESHOLDS': 'Cambiare soglie del modello.',
     'RUN_REAL_BEATS': 'Eseguire nuovi beat reali.'}
-PROCEDURE = '''QA-REVIEW-5. Leggi il report intero, inclusa la correzione finale.
+PROCEDURE = '''QA-REVIEW-6. Leggi il report intero, inclusa la correzione finale.
 Seleziona TUTTE e SOLO le categorie del catalogo sostenute dal testo; ometti quelle non dimostrate.
 Una finding per categoria. L'ordine delle finding non e significativo: l'host lo normalizza.
 Distingui osservazioni e ipotesi.
 Ogni riga non vuota del report ha un evidenceId stabile. Per ogni finding restituisci SOLO evidenceIds presenti nel report.
-Usa il numero minimo di evidenceIds sufficiente a coprire TUTTE le parti dell'affermazione della categoria, inclusi i fixture interessati.
+Usa il numero minimo di evidenceIds sufficiente a coprire TUTTE le parti dell'affermazione della categoria, inclusi i fixture interessati. Evita righe di solo titolo o contesto non necessario.
 Gli evidenceIds giustificano la finding. NON ricopiare quote o numeri di riga: l'host lega gli evidenceIds alle righe e alle quote esatte dopo la validazione.
 NON scegliere azioni o nextCheck: dopo la validazione semantica l'host applica il controllo successivo consentito dalla policy del caso.
 Le azioni non vengono eseguite. Non autorizzare training, beat reali, P6 o modifiche soglie.
@@ -146,6 +146,7 @@ def validate_finding(finding, text, index=0):
         return [f'{code}_EVIDENCE_CONTRACT']
     cited_lines = set()
     cited_ids = set()
+    irrelevant = False
     for evidence_id in evidence:
         if type(evidence_id) is not str or evidence_id not in by_id:
             errors.append(f'{code}_CITATION_CONTRACT')
@@ -156,12 +157,41 @@ def validate_finding(finding, text, index=0):
         cited_ids.add(evidence_id)
         line_number = by_id[evidence_id]['line']
         if line_number not in rule['allowed']:
-            errors.append(f'{code}_IRRELEVANT_EVIDENCE')
+            irrelevant = True
         else:
             cited_lines.add(line_number)
-    if any(not group.intersection(cited_lines) for group in rule['required']):
+    insufficient = any(not group.intersection(cited_lines) for group in rule['required'])
+    if insufficient:
+        if irrelevant:
+            errors.append(f'{code}_IRRELEVANT_EVIDENCE')
         errors.append(f'{code}_INSUFFICIENT_EVIDENCE')
     return errors
+
+
+def sanitize_finding(finding, text):
+    """Drop non-rubric context only after the remaining evidence fully validates."""
+    by_id = {row['evidenceId']: row for row in evidence_records(text)}
+    rule = RUBRIC[finding['code']]
+    kept = []
+    for evidence_id in finding['evidenceIds']:
+        if evidence_id in by_id and by_id[evidence_id]['line'] in rule['allowed'] and evidence_id not in kept:
+            kept.append(evidence_id)
+    return {'code': finding['code'], 'evidenceIds': kept}
+
+
+def evidence_drops(answer, text):
+    if type(answer) is not dict or type(answer.get('findings')) is not list:
+        return []
+    drops = []
+    for index, finding in enumerate(answer['findings']):
+        if validate_finding(finding, text, index):
+            continue
+        clean = sanitize_finding(finding, text)
+        dropped = [evidence_id for evidence_id in finding['evidenceIds']
+                   if evidence_id not in clean['evidenceIds']]
+        if dropped:
+            drops.append({'code':finding['code'],'droppedEvidenceIds':dropped})
+    return drops
 
 
 def validate(answer, text):
@@ -192,7 +222,7 @@ def harvest_valid_findings(answer, text, accepted):
         if code not in RUBRIC or codes.count(code) != 1:
             continue
         if not validate_finding(finding, text, index):
-            accepted.setdefault(code, finding)
+            accepted.setdefault(code, sanitize_finding(finding, text))
 
 
 def assembled_answer(accepted):
@@ -302,6 +332,7 @@ def run(root, model, attempts=2, client=None):
                     'candidateErrors':candidate_errors,
                     'assembledErrors':assembled_errors,
                     'cachedCodes':list(accepted_findings),
+                    'droppedEvidence':evidence_drops(answer,text) if answer is not None else [],
                     'elapsedSeconds':time.monotonic()-start})
                 if n == 1:
                     report['firstAttemptPass'] = not candidate_errors
