@@ -32,7 +32,7 @@ Il contour pYIN salvato omette i frame scartati; aumentare `maximumGapFrames` no
 
 Seguire il [piano operativo Audio→MIDI P1–P6](ROADMAP_FAME_NEURAL.md#piano-operativo-attivo--audiomidi-dopo-ndr-092), che prevale sui “prossimi passi” dei checkpoint storici sotto.
 
-**Stato:** **P1 PASS, P2 PASS, P3 ATTIVO**. P1 ha congelato inventario/protocollo diagnostico e verificato 91 family fresche non assegnate. P2 ha versionato il renderer v2 a durata reference e verificato 12/12 equivalenze JSON↔MIDI, con zero overflow. Il prossimo blocco è la diagnostica easy Audio→MIDI (P3); le evidenze decidono le correzioni su development (P4–P5), mentre la promozione richiede un nuovo cohort indipendente (P6).
+**Stato:** **P1 PASS, P2 PASS, P3 CONTROLLED COMPLETE, P4 PASS, P5 ATTIVO**. P3 controlled ha localizzato il failure drums nel layer di attribuzione ruoli/rappresentazione simultanea: snare isolato rilevato temporalmente ma classificato hihat; kick+snare e kick+hat simultanei hanno unique-transient recall 1.0 ma la pipeline single-label non può emettere entrambi i ruoli. Il low-end controllato resta stabile e congelato. NDR-095 congela il confronto P5; la prima variante è `drums-independent-multilabel-spectral-v1`. P6 su cohort fresco resta obbligatorio prima di qualsiasi promozione.
 
 La prova easy storica è conservata nel [checkpoint dell'11 settembre](OWNED_BEATS_AUDIO_ANALYSIS_EASY_SANITY_CHECKPOINT_2026-09-11.md) e in NDR-050: riguardava Audio Analysis/sezioni, non Audio→MIDI. Il nuovo passaggio easy serve a isolare i difetti e non sostituisce i test rappresentativi. Disponibilità locale e diritti dei file devono essere verificati.
 
@@ -40,7 +40,9 @@ La prova easy storica è conservata nel [checkpoint dell'11 settembre](OWNED_BEA
 
 **Esito P1/P2 — NDR-094:** P1 è PASS. L'audit metadata-only ha verificato 131 record/131 family e 91 family fresche non assegnate secondo i criteri congelati. P2 è PASS: `FAME_NEURAL_P2_DIAGNOSTIC_AUDIT_PASS`, 12/12 family JSON↔MIDI equivalenti, zero overflow e nessuna modifica a voti/artefatti storici. Il renderer v1 storico era event-duration-dependent: il differenziale `reference - v1` osservato varia da -0.153832 s a +9.344331 s per drums, da -0.043152 s a +9.280862 s per bass notes e da +0.018458 s a +9.342472 s per contour. L'effetto sui voti storici non è misurato e non viene reinterpretato. Per i confronti futuri il sistema di misura usa il renderer v2 a durata reference. Checkpoint: [P2 measurement/export audit — PASS](OWNED_BEATS_AUDIO_TO_MIDI_P2_MEASUREMENT_PASS_2026-09-22.md).
 
-Il prossimo passo attivo è P3 easy Audio→MIDI. Gate, risultati e cohort consumati restano invariati; batch131, training e task-data readiness restano chiusi.
+**Esito P3/P4 — NDR-095:** controlled fixtures completate senza consumare family fresche. D01/D03/D06/D07 PASS; D02 classifica 4/4 snare come hihat pur con transient recall 1.0; D04/D05 mostrano il limite multi-role della classificazione single-label con unique-transient recall 1.0. Low-end: L01/L02/L04 F1 1.0 e L03 glide median absolute pitch error 2.879475 cent. Non si ritoccano low-end o onset timing e non si ricavano nuove soglie dal solo sintetico. Protocollo P5 congelato in `audio-to-midi-p5-drums-comparison-v1.json`. Checkpoint: [P3 controlled diagnostic / P4 decision](OWNED_BEATS_AUDIO_TO_MIDI_P3_P4_DECISION_2026-09-22.md).
+
+Il prossimo passo attivo è P5: implementare e confrontare `drums-independent-multilabel-spectral-v1` sui fixture controllati prima del real-easy. Gate, risultati e cohort consumati restano invariati; batch131, training e task-data readiness restano chiusi.
 
 ## Checkpoint precedente — R6 Audio Analysis finale chiuso / V2_PROMOTE — 20/09/2026
 
