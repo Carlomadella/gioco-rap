@@ -46,7 +46,9 @@ La prova easy storica è conservata nel [checkpoint dell'11 settembre](OWNED_BEA
 
 **Esito P5 candidata 2 — NDR-097:** `drums-pfnmf-template-activation-v1` è un negative/partial result controllato. Il factorization converge ma restano cross-activation spurie: D05 F1 0.8 con 4 FP, D06 F1 0.642857 con 10 FP, D07 F1 0.5 con 10 FP; D04 recupera kick+snare ma aggiunge hihat falsi. Non vengono ritoccate soglie post-hoc. La terza candidata `drums-transient-subset-bic-v1` è congelata prima del primo risultato: onset detector baseline invariato, tutti i 7 sottoinsiemi kick/snare/hihat, ampiezze NNLS e scelta del sottoinsieme via BIC senza soglie di classe.
 
-Il prossimo passo attivo è eseguire il controlled transient-subset+BIC comparison append-only. Gate, risultati e cohort consumati restano invariati; batch131, training e task-data readiness restano chiusi.
+**Esito P5 candidata 3 — NDR-098:** `drums-transient-subset-bic-v1` migliora nettamente le co-attivazioni ma non supera il gate controllato. D05 F1 0.888889 con 2 FP snare; D06 F1 0.666667 con 9 FP snare; D07 resta F1 1.0. Il run ordina `STOP_CONTROLLED_NONLEARNED_VARIANT_LOOP_AND_REASSESS_REAL_TEMPLATE_OR_LEARNED_MULTI_LABEL_PATH`. Il loop euristico/template sul sintetico è quindi chiuso senza threshold tuning post-hoc. La prima candidata pretrained per il nuovo ramo è `Tsumugi drums_v1_5`, solo inference: source MIT commit `f7411471...`, checkpoint model repo MIT revision `89aefa28...`, SHA256 `65138ad1...9319`. Prima di qualsiasi audio access è obbligatorio il preflight environment/checkpoint no-audio.
+
+Il prossimo passo attivo è preparare e verificare l'ambiente Tsumugi congelato senza aprire audio. Batch131, training e task-data readiness restano chiusi.
 
 ## Checkpoint precedente — R6 Audio Analysis finale chiuso / V2_PROMOTE — 20/09/2026
 
