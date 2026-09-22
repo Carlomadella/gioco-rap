@@ -1658,3 +1658,39 @@ Decisioni:
 10. qualsiasi promozione futura richiede ancora P6 su cohort fresco.
 
 Checkpoint: [P3 controlled diagnostic / P4 decision](OWNED_BEATS_AUDIO_TO_MIDI_P3_P4_DECISION_2026-09-22.md).
+
+
+## NDR-096 — Multi-label spectral negativo; PF-NMF controllata come seconda candidata P5
+
+**Stato: ACCEPTED — 22 settembre 2026.**
+
+La prima candidata P5 `drums-independent-multilabel-spectral-v1` ha completato il confronto controllato append-only e non supera il gate.
+
+Evidenze chiave:
+
+- D04/D05 recuperano i ruoli simultanei mancanti della baseline, ma introducono attivazioni spurie;
+- D05: 8 TP / 4 FP / 0 FN, F1 0.8, con snare falsi;
+- D06: 9 TP / 18 FP / 0 FN, F1 0.5, con kick+snare falsi su hi-hat;
+- D07: 5 TP / 10 FP / 0 FN, F1 0.5, con snare+hi-hat falsi su kick;
+- D08 diagnostico produce 12 eventi contro 4 baseline.
+
+La candidata dimostra che una rappresentazione multi-label può recuperare simultaneità, ma il semplice peak-picking indipendente per banda non discrimina l'identità strumentale dei transienti broadband. Non vengono introdotte soglie post-hoc per far passare i fixture; la candidata viene conservata come negative result.
+
+Si apre la seconda candidata già prevista da NDR-095: `drums-pfnmf-template-activation-v1`.
+
+Per il solo controlled mechanics stage:
+
+- template fissi kick/snare/hi-hat da D01/D02/D03;
+- magnitude STFT;
+- dizionario drums fisso;
+- KL-divergence con update moltiplicativi della matrice di attivazione;
+- `rH=0` perché gli input sono drum-only clean stems;
+- nessun template adaptation;
+- novelty = differenza positiva delle attivazioni;
+- threshold adattivo congelato: mediana dei precedenti 0.1 s + 0.12 × massimo globale della novelty;
+- nessun nuovo parametro learned;
+- nessun uso dei 12 evaluation consumati.
+
+Questo test può dimostrare solo la meccanica di attivazioni indipendenti sul sintetico. Anche in caso di PASS non autorizza real-easy senza una strategia separata per template/provenance e non promuove batch131/training/task-data readiness.
+
+Checkpoint negative result: [P5 multilabel spectral candidate](OWNED_BEATS_AUDIO_TO_MIDI_P5_MULTILABEL_NEGATIVE_2026-09-22.md).
