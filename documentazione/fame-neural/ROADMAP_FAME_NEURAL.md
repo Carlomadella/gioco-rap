@@ -30,6 +30,101 @@ Checkpoint: [Owned Beats — Audio→MIDI independent evaluation — gate failur
 
 ---
 
+## Piano operativo attivo — Audio→MIDI dopo NDR-092
+
+**Aggiornato il 22 settembre 2026. Decisione: NDR-093.** Questa sezione stabilisce i prossimi passi di questo filone e prevale sulle indicazioni temporali dei checkpoint precedenti riportati più avanti. Non sostituisce le altre fasi della roadmap e non chiude la Fase 7.
+
+**Stato di esecuzione:** piano documentale adottato; tutti i passi P1–P6 sotto sono **DA ESEGUIRE**. Nessun nuovo test audio, renderer corretto o algoritmo migliorato è dichiarato completato da questo aggiornamento.
+
+### Istruzioni iniziali per GPT-5
+
+Leggere nell'ordine:
+
+1. [CURRENT_STATE](CURRENT_STATE.md), questa sezione e NDR-026, NDR-032, NDR-050, NDR-092 con addendum e NDR-093 in [DECISIONS](DECISIONS.md).
+2. [Failure analysis Audio→MIDI](OWNED_BEATS_AUDIO_TO_MIDI_INDEPENDENT_EVALUATION_FAILURE_2026-09-22.md).
+3. [Checkpoint easy sanity](OWNED_BEATS_AUDIO_ANALYSIS_EASY_SANITY_CHECKPOINT_2026-09-11.md) e [playbook Owned Beats](FAME_OWNED_BEATS_AUDIO_TO_MIDI_PLAYBOOK.md).
+
+Prima di modificare codice, verificare branch, commit, worktree, stato dei file e istruzioni locali. I percorsi Windows e i commit citati nei checkpoint sono evidenze storiche, non prova dello stato locale attuale. Non fare reset, checkout o sovrascritture su modifiche dell'utente. Separare sempre evidenza verificata nella repo, risultati locali documentati ed elementi ancora da acquisire.
+
+### P1 — Inventario e protocollo diagnostico
+
+**Obiettivo:** rendere eseguibili e tracciabili i controlli senza consumare altri dati di evaluation.
+
+- Applicare la ricerca di apertura NDR-026: riusare l'audit esistente dove pertinente, esplicitando lacune, alternative e verifiche necessarie prima di scegliere nuovi metodi.
+- Inventariare manifest, split, esposizioni pregresse, audio originali, stem, result JSON, MIDI e review. Verificare disponibilità e hash; non dedurre la presenza dei file locali dai soli checkpoint.
+- Recuperare, se disponibili e utilizzabili, Oldschool / 90s Boom Bap, Locked Up e Street Candy tramite gli hash del checkpoint easy. La dicitura commerciale “FREE” non dimostra diritti di riutilizzo.
+- Il test storico easy misurava **Audio Analysis / sezioni**: per config-001 mediana Section F1 @0,5 s = 0,222222 e @3 s = 0,777778. Non era un PASS di source separation o Audio→MIDI.
+- Definire un gruppo **easy Audio→MIDI diagnostico** distinto: numero, identità, provenienza, diritti, esposizione, riferimenti e criteri prima dei test. Se i tre file non sono disponibili/adatti, documentare la sostituzione con materiale proprio o autorizzato e fixture controllate.
+- Registrare separatamente development, easy diagnostico, 12 evaluation consumate e materiale ancora non esposto. Il numero storico di family non assegnate non prova la loro freschezza attuale.
+- Fissare prima dei confronti metriche, tolleranze temporali, protocollo di ascolto, criteri di avanzamento e budget. Non inventare soglie o etichette mancanti; senza riferimento affidabile riportare solo evidenza qualitativa.
+
+**Output:** inventario e protocollo versionati, con dati mancanti espliciti. Se manca un file indispensabile, chiedere quel file o l'esito di un comando read-only preciso; proseguire intanto con le verifiche indipendenti da esso.
+
+### P2 — Verificare e versionare misura, export e renderer
+
+**Obiettivo:** poter distinguere difetti di trascrizione, esportazione e ascolto.
+
+- Verificare il percorso effettivo della review indipendente: attualmente sintetizza dai JSON e limita la durata in base all'ultimo evento. Il fix della review Basic Pitch non va assunto presente qui.
+- Implementare una nuova versione del renderer con durata esplicita pari alla reference, includendo silenzi iniziali/finali e casi senza eventi. Definire il trattamento degli eventi oltre la durata reference, senza nasconderli mediante taglio silenzioso.
+- Dichiarare per ogni audio se deriva dal JSON o dal MIDI riletto. Verificare la corrispondenza JSON–MIDI su note, pitch, tempi, durate, velocity, canali e conversione tempo/PPQ; controllare pitch bend se presenti.
+- Usare fixture note per eventi simultanei, primo/ultimo evento, nessun evento, note sostenute e gap. Documentare inviluppo sintetico e differenza tra durata della nota e coda udibile.
+- Conservare renderer, artefatti, voti e digest storici. Eventuali nuovi render delle 12 family sono diagnosi/regressione, non una nuova evaluation indipendente né una riscrittura dei voti.
+
+**Output:** nuova versione identificata, test mirati e report di equivalenza/durata. Prima di nuovi confronti musicali il sistema di misura deve risultare verificato.
+
+### P3 — Eseguire il controllo easy Audio→MIDI
+
+**Obiettivo:** stabilire se i difetti compaiono già in casi semplici e localizzarli.
+
+- Eseguire per prima la baseline congelata; versionare separatamente il nuovo sistema di misura.
+- Usare sia fixture controllate con eventi noti sia beat reali semplici ammessi dal protocollo. Le fixture isolano i componenti; i beat reali verificano il comportamento sul materiale musicale.
+- Coprire colpi isolati, kick/snare/hat simultanei, clap/rim, triplet hat, kick sincopati, basso sostenuto, cambi di nota/glide e gap. Registrare i casi fuori dalla tassonomia della baseline senza rinominarli per farli passare.
+- Confrontare mix originale → stem → onset intermedi → classificazione/fusion → eventi → MIDI → render. Separare la fedeltà della separazione al mix dalla trascrizione dello stem.
+- Misurare, dove esiste un riferimento, precision/recall degli onset, errori di classe e simultaneità, kick aggiunti/mancanti, pitch e durata del basso secondo P1.
+- Per pYIN raccogliere diagnostica dei frame inclusi quelli scartati: F0, voiced flag/probabilità e motivo di esclusione. Il solo contour filtrato non basta a spiegare le interruzioni.
+
+**Output:** report easy con risultati per caso e stadio, esempi riproducibili e cause confermate distinte dalle ipotesi. Un buon risultato easy non sostituisce il gate su campioni rappresentativi dei 131.
+
+### P4 — Decidere il percorso in base alle evidenze
+
+| Esito verificato | Passo operativo |
+| --- | --- |
+| Errore di renderer/export | Correggere la nuova versione e ripetere le verifiche controllate prima di attribuire il difetto all'algoritmo. |
+| Difetti già sui casi semplici | Isolare e correggere il componente responsabile su development; ripetere easy e regressioni prima di ampliare la complessità. |
+| Easy adeguato, campioni complessi problematici | Costruire/integrare development rappresentativo con autorizzazione e assegnazione documentate; studiare separazione, sovrapposizioni e timbri problematici. |
+| Evidenza insufficiente o cause miste | Acquisire riferimenti/diagnostica mirati; non selezionare una riscrittura sulla sola impressione d'ascolto. |
+
+I 12 campioni consumati aiutano a descrivere e verificare i failure, ma non vanno usati per scegliere parametri. Non prelevare nuove family riservate o non esposte senza registrare prima il loro ruolo e l'esposizione.
+
+**Output:** decisione motivata che indica componente, evidenze e confronto development successivo.
+
+### P5 — Sviluppare e confrontare le varianti necessarie
+
+- Prima della selezione del metodo, completare la ricerca comparativa NDR-026 su capacità, limiti, licenze, dati e risorse. NMF con template/attivazioni per strumento è una candidata, non una soluzione già adottata.
+- Trattare detection, classificazione e kick fusion come problemi misurabili separatamente. Per le simultaneità verificare la possibilità di più attivazioni; aggiungere il nome di una classe non crea un rilevatore.
+- Confrontare fusion attiva/disattiva sullo stesso development. Non imporre regolarità ritmica che elimini sincopi reali.
+- Conservare pYIN v1 come baseline. Eventuali modifiche a segmentazione, range o confidence richiedono diagnostica e una nuova variante: aumentare il gap non estende automaticamente la release e fmax limita la fondamentale.
+- Congelare budget e criteri di scelta prima dei risultati, eseguire confronti abbinati e regressioni. Non selezionare sui 12 consumati né riaprire automaticamente Basic Pitch.
+- Svolgere la ricerca di chiusura NDR-026: risultati rispetto alle ipotesi, limiti residui, alternative e decisione documentata.
+
+**Output:** confronto riproducibile, variante selezionata oppure esito esplicito di nessun miglioramento; nessuna promozione basata soltanto su easy.
+
+### P6 — Nuova evaluation indipendente prima di considerare il batch
+
+- Solo dopo gli esiti richiesti da P1–P5, congelare pipeline, dipendenze, parametri, renderer e protocollo di valutazione.
+- Identificare e riservare append-only un nuovo cohort realmente fresco, controllando esposizioni, family e duplicati. Escludere easy, development e campioni già osservati.
+- Definire numerosità, soglie e regola decisionale prima di accesso audio/output, motivandoli rispetto al precedente protocollo; non modificarli dopo i risultati.
+- Eseguire technical QA e human review cieca. Se fallisce, mantenere il batch chiuso e registrare i nuovi campioni come consumati.
+- Se passa, documentare una decisione separata sui requisiti per preparare il batch. Il PASS non apre automaticamente training, task-data readiness o gli altri gate della roadmap.
+
+**Output:** report indipendente e aggiornamento coerente di CURRENT_STATE, ROADMAP e DECISIONS.
+
+### Formato obbligatorio del resoconto a ogni passaggio
+
+Registrare stato (DA ESEGUIRE / IN CORSO / PASS / FAIL / BLOCCATO), commit e versioni, input con hash/split/esposizione, comandi realmente eseguiti, risultati e limiti, percorso degli artefatti, prossimo passo e condizione di avanzamento. Distinguere controlli sul codice da esecuzioni audio sul PC. Il passo attivo iniziale è **P1**, seguito da **P2**; nessuna esecuzione batch131 o training è autorizzata da questo piano.
+
+---
+
 # 0. Come si legge questa roadmap
 
 Revisione documentale successiva al commit `02bc708`: [confronto handoff e roadmap](REVISIONE_HANDOFF_SONIC_PI_2026-09-09.md). Le conseguenze sono adottate in NDR-035…040. Il rapporto conserva evidenze e proposte al commit analizzato; questa roadmap e CURRENT_STATE indicano decisioni e stato correnti. La revisione non modifica il codice né chiude i gate musicali.
