@@ -1,12 +1,32 @@
 # FAME Neural — Roadmap ufficiale V2
 
 Data: 11 settembre 2026<br>
+Ultimo aggiornamento operativo: 22 settembre 2026<br>
 Stato: ROADMAP OPERATIVA V2 — PRECISATA DOPO AUDIT HANDOFF E SONIC PI<br>
 Progetto: FAME Neural Composer
 
 > Questa V2 sostituisce la sequenza operativa della V1 dalla FASE 7 in avanti.
 > Le FASI 0–6 restano storico tecnico valido, ma alcune conclusioni vengono ristrette o reinterpretate alla luce degli audit musicali e della ricerca del 9 settembre 2026.
 > Gli errori e le ipotesi falsificate NON vengono cancellati: sono parte della documentazione ufficiale per evitare regressioni concettuali.
+
+---
+
+## Aggiornamento operativo — 22 settembre 2026 — Audio→MIDI independent evaluation
+
+La pipeline Audio→MIDI congelata ha completato la prima evaluation indipendente su 12 family fresche.
+
+- technical QA: **12/12 PASS**, 48 stem e 24 MIDI verificati;
+- drums `drums-bass-kick-fusion-v1`: mediana 2, 8/12 family >=2 → **FAIL** rispetto al gate 9/12;
+- low-end `librosa-pyin-lowend-v1`: mediana 3, 10/12 family >=2 → **PASS**;
+- outcome: `KEEP_BATCH_CLOSED_REVIEW_FAILURES`.
+
+La failure analysis mostra che il prossimo sviluppo drums deve distinguere almeno tre problemi: **onset detection/recall**, **role classification** e **kick-fusion decision**. Il baseline corrente è single-label e rappresenta soltanto kick/snare/hihat, mentre la review indipendente segnala ripetutamente clap/rim e simultaneità mal rappresentati. La bass-kick fusion resta una direzione supportata, non una soluzione da eliminare.
+
+Il low-end resta valido nel perimetro del gate superato; i casi `FAME000001` e `FAME000071` richiedono diagnostica mirata, non una riscrittura generalizzata.
+
+Le 12 family evaluation sono consumate. Nessuna variante modificata può essere rivalutata su di esse come nuova prova indipendente. Batch 131, training e task-data readiness restano chiusi.
+
+Checkpoint: [Owned Beats — Audio→MIDI independent evaluation — gate failure e failure analysis](OWNED_BEATS_AUDIO_TO_MIDI_INDEPENDENT_EVALUATION_FAILURE_2026-09-22.md). Decisione: NDR-092.
 
 ---
 

@@ -1,8 +1,26 @@
 # FAME Neural — Current State
 
-Data: 2026-09-20
+Data: 2026-09-22
 
-## Checkpoint corrente — R6 Audio Analysis finale chiuso / V2_PROMOTE — 20/09/2026
+## Checkpoint corrente — Audio→MIDI independent evaluation: drums FAIL / low-end PASS — 22/09/2026
+
+Checkpoint completo: [Owned Beats — Audio→MIDI independent evaluation — gate failure e failure analysis](OWNED_BEATS_AUDIO_TO_MIDI_INDEPENDENT_EVALUATION_FAILURE_2026-09-22.md).
+
+La pipeline congelata `intel-openvino-htdemucs-v4-97fc578 → drums-bass-kick-fusion-v1 + librosa-pyin-lowend-v1` è stata eseguita sul cohort fresco `audio-to-midi-independent-evaluation-v1` da 12 family. Il technical QA read-only ha passato `ALL_12_FAMILIES_PASS`, verificando 12 result, 48 stem e 24 MIDI.
+
+La blind Human QA è stata finalizzata su 12/12 family:
+
+- drums: mediana **2**, **8/12** family >=2, totale **18** → **FAIL** contro requisito 9/12;
+- low-end: mediana **3**, **10/12** family >=2, totale **28** → **PASS**;
+- outcome complessivo: `KEEP_BATCH_CLOSED_REVIEW_FAILURES`.
+
+I failure drums non vengono interpretati come semplice miss di una sola family rispetto alla soglia: le note mostrano pattern ricorrenti di **eventi mancanti** e **confusione dei ruoli**, inclusi snare/clap sostituiti da hat, kick↔snare, rim/kick e triplet hat non rilevate. Il codice congelato conferma un limite strutturale rilevante: classificazione single-label con sole tre classi `kick/snare/hihat`; clap e rim non sono classi esplicite. La bass-kick fusion resta supportata come idea perché recupera kick utili in più family, ma mostra anche falsi/mancati kick e il suo decision layer va rivalutato.
+
+Il low-end resta promosso **nel solo perimetro di questo gate**. I due casi sotto soglia richiedono diagnostica mirata su release/segmentazione (`FAME000001`) e range/confidence sulle note alte (`FAME000071`), senza trasformare ipotesi in root cause non verificate.
+
+Le 12 family evaluation sono ora **consumate**: possono essere failure/regression evidence, ma non una nuova independent evaluation dopo tuning. Batch 131, training e task-data readiness restano chiusi.
+
+## Checkpoint precedente — R6 Audio Analysis finale chiuso / V2_PROMOTE — 20/09/2026
 
 Checkpoint completo: [Owned Beats — Audio Analysis R6 final holdout](OWNED_BEATS_AUDIO_ANALYSIS_R6_FINAL_HOLDOUT_2026-09-20.md).
 
@@ -53,9 +71,9 @@ R6 finale resta aperto: reference cieca disponibile, scoring V1/config-001 e pai
 | Ambiente tecnico Audio Analysis | **COMPLETATO** | FFmpeg/ffprobe 9.0.1 + Python 3.14 + stack audio verificata |
 | Audio Analysis pilot | **R6 CHIUSO — V2_PROMOTE** | `audio-analysis-v2-config-001` confermata sul final holdout one-shot: beat paired median delta `0.0`, section F1 @0,5 s paired median delta `+0.545805`, technical integrity PASS; comparison SHA256 `c38046919388b839dce070f6a9503efad6c6fc43045bd6196305ea0056c12d7d`; nessun retuning consentito sullo stesso holdout |
 | Source Separation pilot | **PASS — AUDIO→MIDI DRUMS/LOW-END APERTO** | technical QA 8/8 + 32/32 stem PASS; human gate: drums median 2.5, 8/8 >=2; bass median 2.5, 7/8 >=2; outcome `OPEN_AUDIO_TO_MIDI_DRUMS_LOW_END_PILOT`; `other` mostra degrado temporale qualitativo in più family, quindi tonal resta chiuso |
-| Trascrizione Audio→MIDI pilot | **HUMAN QA PASS / DRUMS ARM SELEZIONATO / BASIC PITCH PENDENTE** | Human QA `audio-to-midi-human-review-v1-001`: drums-only FAIL (median 0.5, 3/8 >=2, total 10); `drums-bass-kick-fusion-v1` PASS e selezionato (median 2, 6/8 >=2, total 13); pYIN PASS come baseline low-end (median 2, 6/8 >=2, total 13) ma non ancora promosso definitivamente; prossimo passo = bootstrap+freeze Basic Pitch 0.4.0, poi confronto blind low-end |
-| QA pilot | **DA FARE** | metriche automatiche e giudizio umano separati |
-| Espansione batch corpus | **BLOCCATA** | subordinata ai risultati/gate del pilot |
+| Trascrizione Audio→MIDI | **INDEPENDENT EVALUATION: DRUMS FAIL / LOW-END PASS** | Technical QA 12/12, 48/48 stem e 24/24 MIDI PASS. Blind Human QA: `drums-bass-kick-fusion-v1` median 2, 8/12 >=2, total 18 → FAIL; `librosa-pyin-lowend-v1` median 3, 10/12 >=2, total 28 → PASS. Outcome `KEEP_BATCH_CLOSED_REVIEW_FAILURES`; cohort 12 consumato, nessun retuning consentito. |
+| QA Audio→MIDI | **COMPLETATO — GATE COMPLESSIVO FAIL** | Technical QA PASS; blind Human QA completata. Failure analysis formalizzata nel checkpoint 22/09/2026: drums detection/recall + role classification + kick-fusion decision da separare nel prossimo development; low-end passa il gate. |
+| Espansione batch corpus | **BLOCCATA** | Independent evaluation complessiva FAIL sul ramo drums; nessun batch 131 finché una nuova variante non supera un nuovo gate indipendente su cohort fresco. |
 | Training serio | **CHIUSO** | nessun training autorizzato da questo avanzamento |
 
 Le 131 composition family del corpus proprietario sono state confermate umanamente e registrate. Il cohort di sviluppo contiene 8 family e l'evaluation holdout 10 family distinte, senza overlap. I 113 record rimanenti non hanno ancora uno split assegnato. `familyStatus`, QA e task admissibility restano separati e non vengono auto-promossi.

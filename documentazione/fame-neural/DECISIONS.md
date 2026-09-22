@@ -1504,3 +1504,42 @@ La pipeline di evaluation viene congelata prima del primo output:
 L'executor `audio-to-midi-independent-evaluation-execution.py` e il contratto `audio-to-midi-independent-evaluation-execution-v1.json` sono congelati prima del primo audio access e legano tramite Git blob tutti i componenti già selezionati.
 
 La preparazione del receipt resta metadata/environment/model-only. L'esecuzione audio è un comando successivo separato. Un failure dell'evaluation non autorizza tuning sugli stessi 12 record: il batch resta chiuso e i failure vengono analizzati separatamente.
+
+## NDR-092 — Audio→MIDI independent evaluation: drums FAIL, low-end PASS; cohort consumato
+
+**Stato: ACCEPTED — 22 settembre 2026.**
+
+La prima independent evaluation della pipeline congelata `intel-openvino-htdemucs-v4-97fc578 → drums-bass-kick-fusion-v1 + librosa-pyin-lowend-v1` è completata sulle 12 family fresche di `audio-to-midi-independent-evaluation-v1`.
+
+Il technical QA ha passato `ALL_12_FAMILIES_PASS` con 12/12 result, 48/48 stem e 24/24 MIDI verificati.
+
+La blind Human QA `audio-to-midi-independent-evaluation-human-review-v1-001` ha prodotto:
+
+- drums `drums-bass-kick-fusion-v1`: mediana 2, 8/12 family >=2, totale 18 → **FAIL** rispetto al requisito 9/12;
+- low-end `librosa-pyin-lowend-v1`: mediana 3, 10/12 family >=2, totale 28 → **PASS**;
+- outcome complessivo: `KEEP_BATCH_CLOSED_REVIEW_FAILURES`.
+
+Le family drums sotto soglia sono `FAME000001=1`, `FAME000101=1`, `FAME000073=0`, `FAME000102=0`. Le family low-end sotto soglia sono `FAME000001=1` e `FAME000071=0`.
+
+La failure analysis usa le note umane come evidenza musicale e il codice congelato come evidenza implementativa. Sono registrati tre sottoproblemi drums distinti da non collassare in un singolo tuning di soglia:
+
+1. **detection/recall** — eventi mancanti, inclusa una triplet hat non rilevata e sezioni con perdita del ritmo;
+2. **role classification** — il baseline è single-label e contiene soltanto `kick/snare/hihat`; clap e rim non sono classi esplicite, mentre la review riporta ripetute confusioni snare/clap/hat/kick;
+3. **kick-fusion decision** — l'evidenza bass è utile e recupera kick reali in più family, quindi il concetto di fusion viene preservato; falsi kick e kick mancanti mostrano però che il decision layer corrente non è abbastanza robusto.
+
+Queste corrispondenze sono una diagnosi tecnica motivata, non vengono elevate a ground-truth causale per ogni singolo errore senza misure dedicate.
+
+Il low-end non viene riaperto come failure globale. `FAME000001` motiva una diagnostica su release/segmentazione; `FAME000071` motiva una verifica di `fmax=300 Hz` e voiced-confidence. Nessuna delle due ipotesi viene dichiarata root cause prima del relativo controllo numerico.
+
+Decisioni vincolanti:
+
+- la pipeline corrente **non** autorizza batch 131;
+- `librosa-pyin-lowend-v1` conserva il PASS di questo gate;
+- `drums-bass-kick-fusion-v1` resta baseline/regression reference, non arm promosso;
+- i 12 record evaluation sono consumati e possono essere usati per failure analysis/regressioni, ma non come nuova independent evaluation dopo modifiche;
+- il prossimo drums development deve trattare separatamente detection/recall, role classification e kick-fusion decision;
+- ogni futura promozione richiede pipeline nuovamente congelata e un nuovo cohort fresco;
+- training e task-data readiness restano chiusi.
+
+Checkpoint dettagliato: `OWNED_BEATS_AUDIO_TO_MIDI_INDEPENDENT_EVALUATION_FAILURE_2026-09-22.md`.
+
