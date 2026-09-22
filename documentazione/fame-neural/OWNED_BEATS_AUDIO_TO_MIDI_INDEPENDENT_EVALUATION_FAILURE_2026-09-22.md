@@ -127,7 +127,7 @@ Le note sotto sono normalizzate solo nell'ortografia per leggibilità; il signif
 
 ## Failure analysis drums
 
-### 1. Pattern verificato dalla Human QA: detection/recall
+### 1. Osservazione Human QA: eventi mancanti; origine da localizzare
 
 Più note riportano eventi mancanti:
 
@@ -144,7 +144,7 @@ Nel codice congelato gli onset vengono rilevati prima della classificazione tram
 - `delta=0.15`;
 - `waitFrames=1`.
 
-**Interpretazione tecnica:** almeno una parte dei failure non è risolvibile cambiando soltanto la classificazione kick/snare/hat, perché un evento non rilevato dall'onset detector non arriva mai allo stadio di classificazione. Questa è una diagnosi coerente con codice + note, non una misura ground-truth di precision/recall.
+**Interpretazione tecnica:** se un onset manca davvero dall'uscita del detector, il classificatore non può recuperarlo. Le note d'ascolto, però, non dimostrano da sole che il detector lo abbia perso: un colpo apparentemente assente può essere presente all'istante corretto con una classe errata, oppure essere degradato già nello stem. Occorre confrontare riferimento annotato, onset prima della classificazione ed eventi finali. Un hop vale circa 11,6 ms; questo valore e `waitFrames=1` non provano la causa delle terzine perse. Precision/recall per evento e per classe non sono state misurate in questo audit.
 
 ### 2. Pattern verificato dalla Human QA: confusione dei ruoli
 
@@ -165,11 +165,13 @@ Nel codice congelato la tassonomia drums contiene soltanto:
 
 Per ogni onset del drums stem `classify_drum_ratios()` restituisce **una sola classe**. `clap` e `rim` non esistono come classi esplicite; eventi simultanei non sono rappresentati come classificazione multi-label nello stesso onset.
 
+La bass-kick fusion può aggiungere un kick separato a un evento del drums stem: il limite single-label riguarda il classificatore del singolo onset, non un divieto assoluto di simultaneità nell'output finale. Aggiungere nomi di classi non basta: occorrono rilevatori appropriati e un mapping esplicito di clap/rim, eventualmente raggruppati per un obiettivo dichiarato.
+
 **Diagnosi:** la tassonomia a tre classi e la decisione single-label sono un limite strutturale verificato del baseline corrente. La corrispondenza con le confusioni udite è forte, ma non viene registrata come unica causa provata di ogni errore.
 
 ### 3. Kick fusion: ipotesi utile ma decisione ancora troppo grezza
 
-La review conferma un vantaggio reale dell'evidenza cross-stem:
+La review riporta un beneficio percepito compatibile con l'evidenza cross-stem:
 
 - `FAME000020`, `FAME000010`, `FAME000116`: il reviewer apprezza kick recuperati anche quando nello stem drums sono poco chiari o assenti.
 
@@ -189,7 +191,7 @@ Nel codice congelato il candidato kick dal bass usa una soglia spettrale locale:
 
 Non esiste in questo arm una conferma ritmica o multi-evidenza più ricca prima di promuovere il candidato a kick.
 
-**Decisione:** non eliminare il concetto di drums+bass kick fusion; conservarlo come ipotesi supportata, ma il decision layer deve essere rivalutato nel prossimo development.
+**Decisione:** conservare la fusion come ipotesi supportata. Il suo beneficio netto richiede un confronto controllato fusion attiva/disattiva su development, misurando kick recuperati e falsi positivi. Eventuali indizi ritmici non devono imporre pattern regolari o generare colpi senza evidenza audio: sincopi e variazioni possono essere corrette. Nessuna modifica della fusion congelata è introdotta qui.
 
 ---
 
@@ -210,7 +212,7 @@ Il pYIN congelato usa:
 - `maximumGapFrames = 2`;
 - hop 256 a 22050 Hz.
 
-Due hop corrispondono a circa **23,2 ms**. Una perdita breve di voiced-confidence può quindi chiudere una nota o separare regioni che percettivamente appartengono alla stessa sustain/release.
+Due hop corrispondono a circa **23,2 ms**. Il codice chiude il segmento quando il numero di frame consecutivi non validi supera `maximumGapFrames`; il note-off è collocato al frame successivo all'ultimo frame valido. Aumentare la tolleranza può ricongiungere brevi interruzioni quando torna un pitch compatibile, ma **non prolunga automaticamente una coda senza nuovi frame validi**. Anche il cambio della nota quantizzata e il filtro di durata minima (60 ms) possono influire sui segmenti.
 
 **Diagnosi:** il meccanismo di segmentazione/confidence è un candidato concreto da investigare. Non viene dichiarato root cause definitivo senza una misura dedicata sul contour.
 
@@ -227,10 +229,27 @@ Il pYIN congelato usa:
 
 Due ipotesi tecniche sono quindi compatibili con il failure:
 
-1. parte del contenuto utile raggiunge/supera il limite superiore di 300 Hz;
+1. la **fondamentale** utile supera il limite superiore di 300 Hz: la sola presenza di armoniche sopra 300 Hz non basta a dimostrarlo;
 2. la voiced probability scende sotto 0.6 in quelle regioni.
 
-**Stato:** causa non ancora verificata. Non viene scelta una delle due spiegazioni senza ispezione numerica dedicata del contour/result.
+**Stato:** causa non ancora verificata; le due ipotesi non sono esaustive. La voiced probability misura la presenza di una componente intonata, non certifica la correttezza del pitch o la sua appartenenza al basso. Il `pitchContour` persistito contiene soltanto i frame accettati (`voiced_flag`, F0 finita e probabilità >=0,6): dai punti mancanti non si ricostruiscono le stime/probabilità scartate. Per distinguere le cause serve diagnostica separata, con F0, flag e probabilità di tutti i frame e confronto con lo stem; eventuali nuove esecuzioni sui casi consumati sono solo analisi, senza tuning o nuova qualifica indipendente. Nessun aumento automatico di `fmax` o abbassamento indiscriminato della soglia è autorizzato.
+
+---
+
+## Limiti verificati della misura e del renderer — revisione 22/09/2026
+
+Audit del codice al commit `99df90e55b744d1378de6c6e0a532f7cfe4056d2`. Questo controllo documentale non ha aperto gli audio né ricalcolato i digest degli artefatti sul workspace locale; voti, digest ed esiti sopra sono evidenze registrate, preservate senza modifiche.
+
+`audio-to-midi-independent-evaluation-human-review.js` richiama `audio-to-midi-human-review.js`:
+
+- `renderDrums(result.drums.events)`, `renderBassNotes(result.lowEnd.notes)` e `renderContour(result.lowEnd.pitchContour)` sintetizzano dai JSON; non rileggono i MIDI esportati;
+- la durata deriva dall'ultimo evento/punto (+0,35 s drums, +0,1 s note basso, +0,05 s contour; minimo 1 s), non dalla durata dello stem reference;
+- il basso usa attacco 10 ms e sfumatura finale 40 ms entro i confini della nota; il renderer contour non interpola gap superiori a 50 ms;
+- la correzione full-duration di `basic-pitch-lowend-comparison-v2.js` non è automaticamente applicata a questa review indipendente.
+
+Sono limiti implementativi accertati, **non una misura del loro effetto sui singoli voti**. Prima di attribuire release corta o assenze al trascrittore occorre separare confini delle note, frame scartati, renderer e MIDI esportato. Verificare il rendering con fixture note, garantire reference/candidato di uguale durata e controllare la corrispondenza eventi–MIDI; ogni correzione futura deve usare una nuova versione senza alterare gli artefatti congelati.
+
+La reference d'ascolto è lo stem separato: il PASS low-end documenta l'esito di quel confronto, non dimostra il recupero completo del basso presente nel mix originale. Le carenze upstream richiedono una verifica distinta. Il gate storico e i punteggi restano invariati; nessuna promozione aggiuntiva è derivata da questo audit.
 
 ---
 
@@ -244,7 +263,7 @@ Due ipotesi tecniche sono quindi compatibili con il failure:
 4. Low-end passa 10/12 con mediana 3.
 5. Nei drums ricorrono sia eventi mancanti sia confusioni di ruolo.
 6. Il classificatore corrente è single-label e supporta solo kick/snare/hihat.
-7. La bass-kick fusion recupera informazione utile in più family ma mostra anche falsi/mancati kick.
+7. Il reviewer segnala recuperi utili e falsi/mancati kick; il contributo causale e il beneficio netto della fusion non sono stati isolati con un confronto controllato.
 8. I 12 record evaluation sono consumati e non possono essere riutilizzati come nuova prova indipendente dopo tuning.
 
 ### Supportato ma non ancora dimostrato come root cause completa
@@ -257,7 +276,7 @@ Due ipotesi tecniche sono quindi compatibili con il failure:
 3. Rivedere la segmentazione pYIN per release/gap sul caso `FAME000001`.
 4. Verificare range/confidence pYIN sul caso `FAME000071`.
 
-### Falsificato
+### Interpretazione non giustificata dai dati
 
 L'interpretazione:
 
@@ -287,3 +306,21 @@ Per il prossimo ciclo:
 6. prima della prossima evaluation congelare una nuova pipeline e selezionare un nuovo cohort fresco;
 7. batch 131, training e task-data readiness restano chiusi fino a un nuovo gate indipendente.
 
+## Proposta per il prossimo development — da valutare, non implementata
+
+1. Verificare e versionare il renderer prima di nuovi confronti. Preservare integralmente la review consumata; un riascolto correttivo degli stessi casi non costituisce nuova evaluation indipendente.
+2. Su development separato, annotare brevi passaggi con colpi simultanei, terzine, falsi kick e cambi timbrici. Misurare separatamente onset mancanti, errori di classe e contributo della separazione.
+3. Confrontare la baseline con una candidata che ammetta attivazioni indipendenti/simultanee per strumento. Una possibilità documentata è NMF con template di colpi isolati e rilevamento degli attacchi per componente; template, mapping e parametri devono essere congelati prima del confronto. La robustezza su rap/trap/drill e timbri nuovi resta da dimostrare.
+4. Valutare la fusion attiva/disattiva sugli stessi development, senza imporre regolarità ritmica come prova dell'esistenza di un kick.
+5. Mantenere pYIN v1 come riferimento congelato. Studiare eventuali varianti di segmentazione/range solo dopo aver distinto renderer, F0, voicing e contaminazione dello stem; ogni variante deve essere rivalutata.
+6. Congelare metodo, criteri e nuova pipeline prima di selezionare/usare un nuovo cohort indipendente. Le proposte non aprono training, batch 131 o task-data readiness.
+
+La NMF è una candidata metodologica, non una soluzione già validata sul corpus. I modelli neurali dedicati sono un'altra famiglia da valutare. Il repository ADTOF consultato dichiara CC BY-NC-SA 4.0: non viene proposto come dipendenza già approvata per il prodotto; codice, pesi e dati richiedono verifica dei termini applicabili.
+
+## Fonti della revisione
+
+- Codice del progetto, commit [99df90e](https://github.com/Carlomadella/gioco-rap/tree/99df90e55b744d1378de6c6e0a532f7cfe4056d2/frontend/strumenti/fame-neural-composer/owned-beats): baseline, protocollo, executor e renderer della review.
+- [librosa pYIN: F0, fmax, voiced flag e voiced probability](https://librosa.org/doc/0.10.2/generated/librosa.pyin.html). Riferimento semantico dell'API; la versione congelata del progetto è 1.0.0 e il comportamento qui descritto del wrapper è stato verificato nel codice del progetto.
+- [Weyers et al., ISMIR 2025: Understanding Performance Limitations in Automatic Drum Transcription](https://ismir2025program.ismir.net/poster_130.html): sovrapposizione dei colpi e interferenze; non prova causale sui nostri record.
+- [Wu et al., A Review of Automatic Drum Transcription, 2018 — materiali degli autori](https://www.audiolabs-erlangen.de/resources/MIR/2017-DrumTranscription-Survey): metodi NMF e reti ricorrenti.
+- [ADTOF — repository degli autori](https://github.com/MZehren/ADTOF): modelli e dichiarazione di licenza, consultati il 22/09/2026.
