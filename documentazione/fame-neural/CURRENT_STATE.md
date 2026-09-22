@@ -48,7 +48,9 @@ La prova easy storica è conservata nel [checkpoint dell'11 settembre](OWNED_BEA
 
 **Esito P5 candidata 3 — NDR-098:** `drums-transient-subset-bic-v1` migliora nettamente le co-attivazioni ma non supera il gate controllato. D05 F1 0.888889 con 2 FP snare; D06 F1 0.666667 con 9 FP snare; D07 resta F1 1.0. Il run ordina `STOP_CONTROLLED_NONLEARNED_VARIANT_LOOP_AND_REASSESS_REAL_TEMPLATE_OR_LEARNED_MULTI_LABEL_PATH`. Il loop euristico/template sul sintetico è quindi chiuso senza threshold tuning post-hoc. La prima candidata pretrained per il nuovo ramo è `Tsumugi drums_v1_5`, solo inference: source MIT commit `f7411471...`, checkpoint model repo MIT revision `89aefa28...`, SHA256 `65138ad1...9319`. Prima di qualsiasi audio access è obbligatorio il preflight environment/checkpoint no-audio.
 
-Il prossimo passo attivo è preparare e verificare l'ambiente Tsumugi congelato senza aprire audio. Batch131, training e task-data readiness restano chiusi.
+**Tsumugi preflight PASS — 22/09/2026:** `audio-to-midi-p5-tsumugi-env-v1-001` ha verificato source commit `f7411471...`, checkpoint SHA256 `65138ad1...9319` / 57,150,497 byte, Python 3.12.14, torch/torchaudio CUDA 13 e RTX 5070 Ti. Snapshot package SHA256 `b14b2b16...22704`. Il comando non ha aperto source audio o fixture, non ha eseguito transcription/source separation e non autorizza training/batch131. Checkpoint: [Tsumugi preflight PASS](OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_PREFLIGHT_PASS_2026-09-22.md). Il protocollo controlled `audio-to-midi-p5-tsumugi-controlled-protocol-v1.json` è congelato prima del primo accesso fixture.
+
+Il prossimo passo attivo è eseguire la controlled inference Tsumugi sulle sole 8 fixture drums P3 congelate. Beat reali, cohort indipendenti, batch131, training e task-data readiness restano chiusi.
 
 ## Checkpoint precedente — R6 Audio Analysis finale chiuso / V2_PROMOTE — 20/09/2026
 
