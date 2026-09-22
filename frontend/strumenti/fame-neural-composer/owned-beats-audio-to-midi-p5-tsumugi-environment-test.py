@@ -8,7 +8,7 @@ OWNED=ROOT/"owned-beats"
 def main():
     spec=json.loads((OWNED/"audio-to-midi-p5-tsumugi-environment-v1.json").read_text(encoding="utf-8"))
     assert spec["schema"]=="fame-owned-beats-audio-to-midi-p5-tsumugi-environment-v1"
-    assert spec["status"]=="FROZEN_PREFLIGHT_BEFORE_FIRST_TSUMUGI_AUDIO_ACCESS"
+    assert spec["status"]=="PREFLIGHT_PASS_LOCKED_BEFORE_FIRST_TSUMUGI_AUDIO_ACCESS"
     assert spec["candidateId"]=="tsumugi-drums-v1_5"
     assert spec["source"]["commit"]=="f7411471a4de0ad3d430191de11b8623d67e5b38"
     assert spec["source"]["license"]=="MIT"
@@ -26,6 +26,9 @@ def main():
     assert spec["safety"]["fixtureAudioAccessAllowedDuringSetup"] is False
     assert spec["safety"]["transcriptionAllowedDuringSetup"] is False
     assert spec["safety"]["trainingAuthorized"] is False
+    assert spec["observedPreflight"]["installedPackagesSha256"]=="b14b2b16bd95bc164e7ab5c57a2dd0c035ea6353acae99cdb5a13913b7b22704"
+    assert spec["observedPreflight"]["cudaAvailable"] is True
+    assert spec["observedPreflight"]["deviceName"]=="NVIDIA GeForce RTX 5070 Ti"
     doctor=(OWNED/"audio-to-midi-p5-tsumugi-environment-doctor.py").read_text(encoding="utf-8")
     runner=(OWNED/"prepare-audio-to-midi-p5-tsumugi-environment.ps1").read_text(encoding="utf-8")
     for needle in [
