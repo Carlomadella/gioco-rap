@@ -7,6 +7,8 @@ import json
 from pathlib import Path
 
 RUN_ID="audio-to-midi-p5-tsumugi-controlled-v1-001"
+PROTOCOL_FILE=Path(__file__).resolve().parent/"audio-to-midi-p5-tsumugi-controlled-protocol-v1.json"
+TSUMUGI_NUM_PITCHES=88
 
 def read_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8-sig"))
@@ -17,7 +19,7 @@ def pick(stats, *names):
             return stats.get(name)
     return None
 
-def localization_hint(result):
+def localization_hint(result, protocol):
     stats=result.get("decoderStats") or {}
     raw_count=int(result.get("rawPredictedNoteCount") or 0)
     window_count=pick(stats,"window_count","windowCount")
@@ -28,6 +30,13 @@ def localization_hint(result):
     boundary_no_onset=pick(stats,"boundary_no_onset_count","boundaryNoOnsetCount")
     boundary_no_offset=pick(stats,"boundary_no_offset_count","boundaryNoOffsetCount")
 
+    resolved=result.get("resolvedInferenceSettings") or {}
+    allowed_ids=resolved.get("allowedInstrumentIds") or []
+    topk=int(protocol.get("inference",{}).get("instrumentPairInferTopk",0))
+    topk_covers_all_allowed=(
+        len(allowed_ids)==1 and topk>=TSUMUGI_NUM_PITCHES
+    )
+
     if raw_count>0:
         hint="PREDICTED_NOTES_PRESENT"
     elif window_count is not None and skipped is not None and int(window_count)>0 and int(skipped)==int(window_count):
@@ -35,7 +44,11 @@ def localization_hint(result):
     elif selected_pairs is not None and int(selected_pairs)==0:
         hint="NO_INSTRUMENT_PITCH_PAIRS_SELECTED"
     elif selected_pairs is not None and int(selected_pairs)>0 and decoded_intervals is not None and int(decoded_intervals)==0:
-        hint="PAIRS_SELECTED_BUT_NO_INTERVALS_DECODED"
+        hint=(
+            "TOPK_ENUMERATES_ALL_ALLOWED_PITCHES_NO_INTERVALS_DECODED"
+            if topk_covers_all_allowed
+            else "PAIRS_SELECTED_BUT_NO_INTERVALS_DECODED"
+        )
     elif decoded_intervals is not None and int(decoded_intervals)>0:
         hint="INTERVALS_DECODED_BUT_NO_FINAL_NOTES"
     else:
@@ -50,9 +63,13 @@ def localization_hint(result):
         "decodedIntervalCount":decoded_intervals,
         "boundaryNoOnsetCount":boundary_no_onset,
         "boundaryNoOffsetCount":boundary_no_offset,
+        "instrumentPairInferTopk":topk,
+        "allowedInstrumentIds":allowed_ids,
+        "topkCoversAllAllowedPitches":topk_covers_all_allowed,
+        "selectedPairCountIsGateConfidenceEvidence":False if topk_covers_all_allowed else None,
     }
 
-def summarize_result(result):
+def summarize_result(result, protocol):
     events=result.get("events") or []
     raw_pitch_counts=Counter(int(e["rawPitch"]) for e in events)
     canonical_pitch_counts=Counter(int(e["canonicalPitch"]) for e in events)
@@ -70,7 +87,7 @@ def summarize_result(result):
             "recall":metric.get("recall"),
             "f1":metric.get("f1"),
         },
-        "decoder":localization_hint(result),
+        "decoder":localization_hint(result,protocol),
         "rawPitchCounts":{str(k):v for k,v in sorted(raw_pitch_counts.items())},
         "canonicalPitchCounts":{str(k):v for k,v in sorted(canonical_pitch_counts.items())},
         "roleCounts":dict(sorted(role_counts.items())),
@@ -96,13 +113,14 @@ def report(workspace):
     summary=read_json(summary_file)
     if summary.get("status")!="CONTROLLED_TSUMUGI_INFERENCE_COMPLETE_DIAGNOSTIC_ONLY":
         raise RuntimeError(f"Unexpected Tsumugi summary status: {summary.get('status')}")
+    protocol=read_json(PROTOCOL_FILE)
     fixtures=[]
     for row in summary.get("results",[]):
         fid=row["fixtureId"]
         result_file=root/fid/"result.json"
         if not result_file.is_file():
             raise RuntimeError(f"Tsumugi result missing: {result_file}")
-        fixtures.append(summarize_result(read_json(result_file)))
+        fixtures.append(summarize_result(read_json(result_file),protocol))
     return {
         "mode":"FAME_NEURAL_P5_TSUMUGI_CONTROLLED_FAILURE_REPORT",
         "runId":RUN_ID,
@@ -126,17 +144,21 @@ def self_test():
         "rawPredictedNoteCount":0,
         "decoderStats":{"window_count":1,"skipped_silent_window_count":0,"selected_pair_count":0,"decoded_interval_count":0}
     }
-    assert localization_hint(a)["hint"]=="NO_INSTRUMENT_PITCH_PAIRS_SELECTED"
+    protocol={"inference":{"instrumentPairInferTopk":0}}
+    assert localization_hint(a,protocol)["hint"]=="NO_INSTRUMENT_PITCH_PAIRS_SELECTED"
     b={
         "rawPredictedNoteCount":0,
         "decoderStats":{"window_count":1,"skipped_silent_window_count":1,"selected_pair_count":0,"decoded_interval_count":0}
     }
-    assert localization_hint(b)["hint"]=="ALL_WINDOWS_SKIPPED_BY_SILENCE_GATE"
+    assert localization_hint(b,protocol)["hint"]=="ALL_WINDOWS_SKIPPED_BY_SILENCE_GATE"
     c={
         "rawPredictedNoteCount":0,
         "decoderStats":{"window_count":1,"skipped_silent_window_count":0,"selected_pair_count":3,"decoded_interval_count":0}
     }
-    assert localization_hint(c)["hint"]=="PAIRS_SELECTED_BUT_NO_INTERVALS_DECODED"
+    assert localization_hint(c,protocol)["hint"]=="PAIRS_SELECTED_BUT_NO_INTERVALS_DECODED"
+    c["resolvedInferenceSettings"]={"allowedInstrumentIds":[7]}
+    protocol={"inference":{"instrumentPairInferTopk":256}}
+    assert localization_hint(c,protocol)["hint"]=="TOPK_ENUMERATES_ALL_ALLOWED_PITCHES_NO_INTERVALS_DECODED"
     return {"mode":"FAME_NEURAL_P5_TSUMUGI_FAILURE_REPORT_SELF_TEST_PASS"}
 
 def main():
