@@ -1,0 +1,154 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-p5-drums-comparison-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_FIRST_P5_VARIANT_RESULT",
+  "createdAt": "2026-09-22",
+  "decision": "NDR-095",
+  "scope": "DRUMS_ONLY_LOWEND_FROZEN",
+  "evidence": {
+    "p3RunId": "audio-to-midi-p3-controlled-baseline-v1-001",
+    "fixtureManifestSha256": "f68eddc1fab7919f90a8bd391e24e444401a168d36fa06f22af0ec6d70d33d0b",
+    "verifiedFindings": [
+      "D01 kick isolated PASS",
+      "D02 snare isolated transient recall 1.0 but role classification FAIL: 4/4 predicted hihat",
+      "D03 hihat isolated PASS",
+      "D04 kick+snare simultaneous unique-transient recall 1.0 but simultaneous multi-role representation FAIL",
+      "D05 kick+hihat simultaneous unique-transient recall 1.0 but simultaneous multi-role representation FAIL",
+      "D06 hihat triplets PASS",
+      "D07 syncopated kick PASS",
+      "D08 clap/rim intentionally unsupported and excluded from supported-class scoring",
+      "L01 sustained note F1 1.0",
+      "L02 note changes F1 1.0",
+      "L03 glide median absolute pitch error 2.879475 cents",
+      "L04 gap/release F1 1.0"
+    ],
+    "d02SpectralRange": {
+      "lowRatioApprox": [0.022133, 0.025929],
+      "midRatioApprox": [0.148461, 0.150543],
+      "highRatioApprox": [0.824637, 0.827787],
+      "centroidHzApprox": [6597.070234, 6654.856535],
+      "currentOutcome": "HIHAT"
+    }
+  },
+  "frozenComponents": {
+    "onsetDetector": "audio-to-midi-development-baseline-v1 detect_onsets unchanged for first P5 comparison",
+    "lowEnd": "librosa-pyin-lowend-v1 unchanged",
+    "midiExport": "existing verified JSON-to-MIDI path",
+    "renderer": "fame-neutral-midi-audition-renderer-v2-reference-duration"
+  },
+  "candidates": [
+    {
+      "id": "drums-independent-multilabel-spectral-v1",
+      "priority": 1,
+      "purpose": "Allow independent kick/snare/hihat activations at one detected transient using interpretable class evidence instead of exclusive if/else classification.",
+      "constraints": [
+        "one transient may emit zero, one, or multiple supported roles",
+        "no rhythm regularization",
+        "no post-hoc use of the 12 consumed evaluation families",
+        "thresholds/scores must be frozen before real-easy or development comparison",
+        "unsupported clap/rim must not be relabeled solely to increase supported-class score"
+      ]
+    },
+    {
+      "id": "drums-pfnmf-template-activation-v1",
+      "priority": 2,
+      "purpose": "Independent instrument activation comparison using partially fixed NMF/templates.",
+      "constraints": [
+        "controlled-fixture templates may prove mechanics but cannot alone justify real-beat promotion",
+        "template provenance and rights must be explicit before real material is used",
+        "same event-level metrics and budget as candidate 1"
+      ]
+    }
+  ],
+  "externalReferenceOnly": [
+    {
+      "id": "oaf-drums",
+      "status": "RESEARCH_REFERENCE_NOT_SELECTED",
+      "reason": "Demonstrates learned drum transcription with E-GMD, but historical Magenta implementation is archived and uses a legacy TensorFlow stack; integration/checkpoint licensing/runtime burden must be audited separately before any use."
+    }
+  ],
+  "curriculum": [
+    {
+      "level": 1,
+      "name": "isolated_supported_hits",
+      "fixtures": ["D01_KICK_ISOLATED", "D02_SNARE_ISOLATED", "D03_HIHAT_ISOLATED"],
+      "advanceWhen": "all supported isolated fixtures have transient recall 1.0 and class F1 1.0 at 30 ms; no regression versus baseline pass fixtures"
+    },
+    {
+      "level": 2,
+      "name": "simultaneous_supported_hits",
+      "fixtures": ["D04_KICK_SNARE_SIMULTANEOUS", "D05_KICK_HIHAT_SIMULTANEOUS"],
+      "advanceWhen": "unique-transient recall remains 1.0 and every supported reference role at each simultaneous transient is recovered at 30 ms without extra supported-class false positives"
+    },
+    {
+      "level": 3,
+      "name": "simple_rhythmic_patterns",
+      "fixtures": ["D06_HIHAT_TRIPLETS", "D07_KICK_SYNCOPATED"],
+      "advanceWhen": "both retain class F1 1.0 at 30 ms"
+    },
+    {
+      "level": 4,
+      "name": "unsupported_role_diagnostic",
+      "fixtures": ["D08_UNSUPPORTED_CLAP_RIM"],
+      "advanceWhen": "diagnostic only; never used as a supported-class PASS requirement"
+    },
+    {
+      "level": 5,
+      "name": "real_easy_authorized_beats",
+      "fixtures": [],
+      "advanceWhen": "three real-easy identities/references are frozen before first candidate run; paired baseline/candidate metrics reported without using consumed evaluation families"
+    },
+    {
+      "level": 6,
+      "name": "existing_development_regression",
+      "fixtures": [],
+      "advanceWhen": "paired comparison on the existing 8 development families with event-level references available for the question being tested; human usefulness remains separate from event metrics"
+    },
+    {
+      "level": 7,
+      "name": "representative_complexity",
+      "fixtures": [],
+      "advanceWhen": "only after earlier levels pass; no fresh P6 cohort is consumed"
+    }
+  ],
+  "fusionComparison": {
+    "required": true,
+    "sameOtherComponents": true,
+    "onsetToleranceSeconds": 0.03,
+    "matching": "one-to-one same-role",
+    "report": [
+      "correctKickRecovered",
+      "falseKickIntroduced",
+      "kickStillMissing",
+      "kickTP",
+      "kickFP",
+      "kickFN",
+      "kickPrecision",
+      "kickRecall",
+      "kickF1"
+    ],
+    "reportBy": ["family", "curriculumLevel"]
+  },
+  "budget": {
+    "controlledFixtures": 8,
+    "realEasyBeats": 3,
+    "existingDevelopmentFamiliesMaximum": 8,
+    "consumedIndependentEvaluationFamilies": 0,
+    "freshP6FamiliesConsumed": 0,
+    "trainingRunsAuthorized": 0
+  },
+  "selectionRule": {
+    "controlledStage": "candidate must satisfy levels 1-3 before real-easy comparison",
+    "realEasyAndDevelopment": "select only if improvement addresses measured P3 failure without regression on baseline PASS cases and without unacceptable false activations",
+    "noAutomaticPromotionFromSynthetic": true,
+    "independentEvaluationRequiredAfterSelection": true
+  },
+  "safety": {
+    "lowEndMayBeRetuned": false,
+    "consumedEvaluationMayBeUsedForTuning": false,
+    "trainingAuthorized": false,
+    "batch131Authorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "nextAction": "IMPLEMENT_DRUMS_INDEPENDENT_MULTILABEL_SPECTRAL_V1_ON_CONTROLLED_FIXTURES_ONLY"
+}
