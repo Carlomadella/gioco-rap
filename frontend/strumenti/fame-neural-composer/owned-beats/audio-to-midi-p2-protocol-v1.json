@@ -1,0 +1,56 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-p2-measurement-protocol-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_P2_DIAGNOSTIC_AUDIT",
+  "createdAt": "2026-09-22",
+  "decision": "NDR-093",
+  "renderer": {
+    "historicalRendererId": "fame-neutral-midi-audition-renderer-v1",
+    "historicalRendererImmutable": true,
+    "candidateRendererId": "fame-neutral-midi-audition-renderer-v2-reference-duration",
+    "sampleRate": 22050,
+    "durationSource": "result.stems.<role>.samplesPerChannel / result.stems.<role>.sampleRate",
+    "durationPolicy": "candidate WAV duration equals reference stem duration rounded to nearest output sample",
+    "overflowPolicy": "ERROR_BEFORE_RENDER; diagnostic audit reports overflow explicitly; never silently truncate symbolic events beyond the reference duration",
+    "zeroEventPolicy": "render full-duration silence",
+    "bassEnvelope": {"attackSeconds": 0.01, "releaseSeconds": 0.04},
+    "contourMaximumInterpolationGapSeconds": 0.05
+  },
+  "jsonMidiEquivalence": {
+    "midiPpq": 480,
+    "drumChannelZeroBased": 9,
+    "lowEndChannelZeroBased": 0,
+    "drumAllowedNotes": [36, 38, 42],
+    "compare": ["note", "channel", "velocity", "onset", "offset"],
+    "timingTolerance": "half one MIDI tick at result BPM plus numeric epsilon",
+    "drumOffsetSemantics": "technical MIDI gate duration = max(0.03 seconds, one sixteenth of one beat); not a musical drum-duration claim",
+    "lowEndOffsetSemantics": "result.lowEnd.notes[].endSeconds",
+    "pitchBendPolicy": "must be absent for current v1 JSON contract; any pitch-bend event is reported as non-equivalent",
+    "tempoPolicy": "single tempo event; tempo microseconds must equal rounded 60000000/result.bpm within one microsecond"
+  },
+  "diagnosticCohort": {
+    "runId": "audio-to-midi-independent-evaluation-v1-001",
+    "split": "audio-to-midi-evaluation-v1",
+    "expectedFamilies": 12,
+    "use": "FAILURE_AND_REGRESSION_DIAGNOSTIC_ONLY",
+    "historicalVotesMutable": false,
+    "retuningAllowed": false
+  },
+  "gate": {
+    "rendererFixtures": "PASS_ALL",
+    "jsonMidiFixtures": "PASS_ALL",
+    "consumedEvaluationAudit": "REPORT_ALL_12_WITHOUT_RETUNING",
+    "conditionBeforeP3": "P2 deterministic measurement/export checks PASS"
+  },
+  "safety": {
+    "sourceAudioMayBeOpened": false,
+    "sourceSeparationMayRun": false,
+    "transcriptionMayRun": false,
+    "historicalArtifactsMayBeOverwritten": false,
+    "historicalVotesMayBeRewritten": false,
+    "consumedEvaluationMayBeUsedForTuning": false,
+    "trainingAuthorized": false,
+    "batch131Authorized": false,
+    "taskDataReadyMayBeDeclared": false
+  }
+}
