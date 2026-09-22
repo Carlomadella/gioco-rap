@@ -1557,3 +1557,24 @@ Rettifica documentale basata sull'audit del codice `99df90e`; non cambia voti, d
 - Cohort consumato, batch 131/training/task-data readiness chiusi e obbligo di nuova evaluation fresca restano invariati.
 
 Dettagli, limiti e fonti: [failure analysis revisionata](OWNED_BEATS_AUDIO_TO_MIDI_INDEPENDENT_EVALUATION_FAILURE_2026-09-22.md).
+
+## NDR-093 — Percorso operativo Audio→MIDI con diagnostica easy prima delle varianti
+
+**Stato: ACCEPTED — 22 settembre 2026 — piano operativo; esecuzione P1–P6 ancora da svolgere.**
+
+A seguito della richiesta dell'utente, si adotta il [piano P1–P6 della roadmap](ROADMAP_FAME_NEURAL.md#piano-operativo-attivo--audiomidi-dopo-ndr-092) come sequenza attiva di questo filone:
+
+1. inventario verificato di dati/esposizioni/diritti e protocollo diagnostico;
+2. verifica/versionamento del renderer e corrispondenza JSON–MIDI;
+3. controllo easy Audio→MIDI con baseline congelata, fixture note e beat semplici ammessi;
+4. localizzazione del problema e scelta del percorso in base agli esiti;
+5. ricerca, sviluppo e confronto di sole varianti motivate su development;
+6. nuova evaluation indipendente su cohort fresco prima di considerare il batch.
+
+Il test easy di NDR-050 resta evidenza storica di **Audio Analysis/sezioni**. Non viene reinterpretato come successo Audio→MIDI. Il nuovo gruppo easy è diagnostico, identificato e registrato separatamente; eventuali sostituzioni dei tre beat originari devono essere esplicite e motivate.
+
+Il controllo easy è previsto prima della scelta delle correzioni, non come sostituzione retroattiva dei campioni difficili o riduzione del gate. Se fallisce, si isola il componente responsabile; se è adeguato ma i casi complessi falliscono, si lavora su development rappresentativo. In entrambi i casi serve una nuova evaluation fresca per promuovere una variante.
+
+Restano vincolanti NDR-026 e NDR-092 con addendum: ricerca di apertura/chiusura, preservazione dei risultati storici, niente tuning sui 12 consumati, nessuna scelta algoritmica automatica, batch131/training/task-data readiness chiusi. Questo piano non modifica protocolli congelati, non autorizza training e non dichiara completata alcuna nuova verifica audio.
+
+A ogni passaggio GPT-5 deve riportare versioni, input, verifiche effettivamente eseguite, risultati/limiti e prossimo passo, aggiornando coerentemente stato, roadmap e decisioni. In assenza di dati locali deve indicare precisamente cosa manca, senza inventare esecuzioni o risultati.
