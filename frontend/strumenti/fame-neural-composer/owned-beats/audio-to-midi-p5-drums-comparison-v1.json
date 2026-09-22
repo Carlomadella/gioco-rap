@@ -98,7 +98,7 @@
         "template provenance and rights must be explicit before real material is used",
         "same event-level metrics and budget as candidate 1"
       ],
-      "status": "IMPLEMENTATION_FROZEN_BEFORE_FIRST_RESULT",
+      "status": "NEGATIVE_OR_PARTIAL_RESULT_CONTROLLED_GATE_FAIL",
       "implementationFreeze": {
         "scope": "CONTROLLED_MECHANICS_ONLY",
         "templateSources": {
@@ -132,6 +132,50 @@
         "sourceBasis": "Wu & Lerch 2015 PF-NMF mechanics adapted to controlled drum-only stems; no claim of full polyphonic/template-adaptation implementation",
         "newLearnedParameters": 0,
         "tunedOnConsumedEvaluation": false
+      },
+      "resultSummary": {
+        "failureMode": "TEMPLATE_CROSS_ACTIVATION_FALSE_POSITIVES",
+        "evidence": [
+          "D04: kick+snare recovered but 4 extra hihat activations; 12 candidate events for 8 references",
+          "D05: 8 TP / 4 FP / 0 FN, F1 0.8; extra snare activations",
+          "D06: 9 TP / 10 FP / 0 FN, F1 0.642857; 9 extra snare + 1 extra kick",
+          "D07: 5 TP / 10 FP / 0 FN, F1 0.5; 5 extra snare + 5 extra hihat",
+          "D08 diagnostic: 9 candidate events for 4 unsupported references"
+        ],
+        "convergence": "NMF iterations converged on reported fixtures; failure is not non-convergence",
+        "decision": "DO_NOT_RETUNE_ACTIVATION_THRESHOLDS_ON_CONTROLLED_FIXTURES; KEEP_AS_NEGATIVE_OR_PARTIAL_RESULT"
+      }
+    },
+    {
+      "id": "drums-transient-subset-bic-v1",
+      "priority": 3,
+      "status": "IMPLEMENTATION_FROZEN_BEFORE_FIRST_RESULT",
+      "purpose": "At each already-detected transient, explicitly select the subset of kick/snare/hihat templates that best explains the local spectrum instead of thresholding each role independently.",
+      "constraints": [
+        "reuse frozen baseline transient detector",
+        "evaluate all 7 non-empty subsets of the 3 supported roles",
+        "fit non-negative amplitudes with scipy.optimize.nnls",
+        "choose subset by minimum BIC; no class-specific threshold",
+        "templates come only from controlled isolated fixtures D01/D02/D03 in this mechanics stage",
+        "no use of consumed independent-evaluation families",
+        "synthetic mechanics PASS cannot promote to real-easy"
+      ],
+      "implementationFreeze": {
+        "scope": "CONTROLLED_MECHANICS_ONLY",
+        "templateSources": {
+          "kick": "D01_KICK_ISOLATED",
+          "snare": "D02_SNARE_ISOLATED",
+          "hihat": "D03_HIHAT_ISOLATED"
+        },
+        "representation": "median magnitude spectrum over 80 ms centered on annotated/detected transient",
+        "normalization": "L2 per template and observed transient vector",
+        "subsetSearch": "all 7 non-empty subsets of kick/snare/hihat",
+        "amplitudeFit": "scipy.optimize.nnls",
+        "modelSelection": "BIC = nBins * ln(RSS/nBins + eps) + k * ln(nBins)",
+        "eventTime": "frozen baseline transient time shared by all selected roles",
+        "onsetToleranceSeconds": 0.03,
+        "newLearnedParameters": 0,
+        "newTunedThresholds": 0
       }
     }
   ],
@@ -240,5 +284,5 @@
     "batch131Authorized": false,
     "taskDataReadyMayBeDeclared": false
   },
-  "nextAction": "IMPLEMENT_DRUMS_PFNMF_TEMPLATE_ACTIVATION_V1_ON_CONTROLLED_FIXTURES_ONLY"
+  "nextAction": "IMPLEMENT_DRUMS_TRANSIENT_SUBSET_BIC_V1_ON_CONTROLLED_FIXTURES_ONLY"
 }
