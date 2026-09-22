@@ -1,0 +1,90 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-p5-tsumugi-environment-v1",
+  "version": 1,
+  "status": "FROZEN_PREFLIGHT_BEFORE_FIRST_TSUMUGI_AUDIO_ACCESS",
+  "createdAt": "2026-09-22",
+  "decision": "NDR-098",
+  "candidateId": "tsumugi-drums-v1_5",
+  "source": {
+    "repository": "anime-song/tsumugi",
+    "repositoryUrl": "https://github.com/anime-song/tsumugi.git",
+    "commit": "f7411471a4de0ad3d430191de11b8623d67e5b38",
+    "license": "MIT",
+    "licenseGitBlobSha1": "6a337ec710b2c937c59448e4adc5f60fe67456d9",
+    "pyprojectGitBlobSha1": "084e715ccf82af9614ae8fb332859ea6be9ac8a7",
+    "uvLockGitBlobSha1": "0430dd7bedece5d98524024f9aa0ef7d18475c23"
+  },
+  "checkpoint": {
+    "repository": "anime-song/instrument_agnostic_amt",
+    "repositoryUrl": "https://huggingface.co/anime-song/instrument_agnostic_amt",
+    "license": "MIT",
+    "revision": "89aefa28abf0a54f859505f41f211d273662c7c7",
+    "filename": "best_model_drums_v1_5.pth",
+    "bytes": 57150497,
+    "sha256": "65138ad1dd919f33fb0ce56e54c0c23c87deaad6511132d69137cf4901ee9319",
+    "downloadUrl": "https://huggingface.co/anime-song/instrument_agnostic_amt/resolve/89aefa28abf0a54f859505f41f211d273662c7c7/best_model_drums_v1_5.pth?download=true"
+  },
+  "runtime": {
+    "platform": "Windows",
+    "pythonSupported": ">=3.10,<3.15",
+    "developmentPython": "3.12",
+    "torch": "2.13.0",
+    "torchaudio": "2.11.0",
+    "windowsTorchIndex": "https://download.pytorch.org/whl/cu130",
+    "preferredDevice": "cuda",
+    "minimumRecommendedGpuVramGiB": 12,
+    "trainingAllowed": false
+  },
+  "workspace": {
+    "externalRelativePath": "external/tsumugi-drums-v1_5",
+    "sourceRelativePath": "external/tsumugi-drums-v1_5/source",
+    "checkpointRelativePath": "external/tsumugi-drums-v1_5/checkpoints/best_model_drums_v1_5.pth",
+    "environmentRunsRelativePath": "runs/audio-to-midi-p5-tsumugi-environment",
+    "environmentRunId": "audio-to-midi-p5-tsumugi-env-v1-001"
+  },
+  "preflight": {
+    "requireUv": true,
+    "cloneExactCommit": true,
+    "useUvLockedEnvironment": true,
+    "verifyGitHead": true,
+    "verifyGitClean": true,
+    "verifySourceLicenseBlob": true,
+    "verifyPyprojectBlob": true,
+    "verifyUvLockBlob": true,
+    "verifyCheckpointBytes": true,
+    "verifyCheckpointSha256": true,
+    "loadCheckpointMetadataWithoutInference": true,
+    "verifyCudaAvailability": true,
+    "captureInstalledPackageFreeze": true,
+    "captureReceipt": true
+  },
+  "controlledEvaluation": {
+    "audioAccessAllowedBeforePreflightPass": false,
+    "fixtureRunId": "audio-to-midi-p3-fixtures-v1",
+    "fixtures": [
+      "D01_KICK_ISOLATED",
+      "D02_SNARE_ISOLATED",
+      "D03_HIHAT_ISOLATED",
+      "D04_KICK_SNARE_SIMULTANEOUS",
+      "D05_KICK_HIHAT_SIMULTANEOUS",
+      "D06_HIHAT_TRIPLETS",
+      "D07_KICK_SYNCOPATED",
+      "D08_UNSUPPORTED_CLAP_RIM"
+    ],
+    "sourceSeparation": false,
+    "freshOwnedBeatFamiliesConsumed": 0,
+    "consumedIndependentEvaluationFamiliesUsed": 0,
+    "trainingRunsAuthorized": 0,
+    "promotionFromSyntheticOnly": false
+  },
+  "safety": {
+    "sourceAudioAccessAllowedDuringSetup": false,
+    "fixtureAudioAccessAllowedDuringSetup": false,
+    "transcriptionAllowedDuringSetup": false,
+    "sourceSeparationAllowedDuringSetup": false,
+    "trainingAuthorized": false,
+    "batch131Authorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "nextAction": "PREPARE_AND_VERIFY_TSUMUGI_ENVIRONMENT_WITHOUT_AUDIO"
+}
