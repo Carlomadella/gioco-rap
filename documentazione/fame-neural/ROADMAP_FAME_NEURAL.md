@@ -34,7 +34,7 @@ Checkpoint: [Owned Beats — Audio→MIDI independent evaluation — gate failur
 
 **Aggiornato il 22 settembre 2026. Decisione: NDR-093.** Questa sezione stabilisce i prossimi passi di questo filone e prevale sulle indicazioni temporali dei checkpoint precedenti riportati più avanti. Non sostituisce le altre fasi della roadmap e non chiude la Fase 7.
 
-**Stato di esecuzione:** **P1 PASS, P2 PASS, P3 ATTIVO**. P1 ha congelato inventario e protocollo diagnostico con 91 family fresche non assegnate verificate. P2 ha chiuso misura/export con renderer v2 a durata reference, 12/12 equivalenze JSON↔MIDI e zero overflow. P3 easy Audio→MIDI è il prossimo blocco operativo. Nessun algoritmo drums/low-end è stato ancora modificato o promosso.
+**Stato di esecuzione:** **P1 PASS, P2 PASS, P3 CONTROLLED COMPLETE, P4 PASS, P5 ATTIVO**. P3 ha localizzato il primo failure drums già sui casi semplici: snare isolato classificato hihat con transient recall 1.0 e simultaneità kick+snare/kick+hat non rappresentabile dal layer single-label. Il low-end controllato resta stabile. P4 ha deciso di non ritoccare onset/low-end e ha congelato il protocollo P5 per una prima variante multi-label interpretabile. Nessun algoritmo è ancora promosso.
 
 ### Istruzioni iniziali per GPT-5
 
@@ -76,7 +76,7 @@ Checkpoint: [Owned Beats — Audio→MIDI P2 measurement/export audit — PASS](
 
 **Output:** nuova versione identificata, test mirati e report di equivalenza/durata. Prima di nuovi confronti musicali il sistema di misura deve risultare verificato.
 
-### P3 — Eseguire il controllo easy Audio→MIDI — **ATTIVO**
+### P3 — Eseguire il controllo easy Audio→MIDI — **CONTROLLED COMPLETE / REAL-EASY PENDING**
 
 **Obiettivo:** stabilire se i difetti compaiono già in casi semplici e localizzarli.
 
@@ -89,7 +89,10 @@ Checkpoint: [Owned Beats — Audio→MIDI P2 measurement/export audit — PASS](
 
 **Output:** report easy con risultati per caso e stadio, esempi riproducibili e cause confermate distinte dalle ipotesi. Un buon risultato easy non sostituisce il gate su campioni rappresentativi dei 131.
 
-### P4 — Decidere il percorso in base alle evidenze
+### P4 — Decidere il percorso in base alle evidenze — **PASS 22/09/2026**
+
+Checkpoint: [P3 controlled diagnostic / P4 decision](OWNED_BEATS_AUDIO_TO_MIDI_P3_P4_DECISION_2026-09-22.md). Decisione NDR-095: low-end e onset detector restano congelati nel primo confronto; niente threshold tuning ricavato dai soli fixture. P5 apre con `drums-independent-multilabel-spectral-v1`, seguito da PF-NMF/template activation come confronto se necessario. I criteri sono congelati in `audio-to-midi-p5-drums-comparison-v1.json` prima del primo risultato variante.
+
 
 | Esito verificato | Passo operativo |
 | --- | --- |
