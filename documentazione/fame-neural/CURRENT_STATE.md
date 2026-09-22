@@ -20,6 +20,14 @@ Il low-end resta promosso **nel solo perimetro di questo gate**. I due casi sott
 
 Le 12 family evaluation sono ora **consumate**: possono essere failure/regression evidence, ma non una nuova independent evaluation dopo tuning. Batch 131, training e task-data readiness restano chiusi.
 
+### Precisazione dell'audit — 22/09/2026
+
+Voti e outcome restano quelli registrati sopra. Eventi mancanti percepiti non provano da soli failure dell'onset detector; il beneficio netto della kick fusion richiede un confronto controllato. Il PASS low-end è relativo agli stem reference, non una verifica completa della separazione rispetto al mix originale.
+
+Il renderer della review indipendente sintetizza dai JSON, non dai MIDI riletti, e deriva la durata dall'ultimo evento anziché dalla reference. Attacco/release sintetici possono influenzare l'ascolto: l'effetto sui voti non è stato misurato. Prima di nuove prove occorre verificare/versionare il renderer e separare detection, classificazione, segmentazione e difetti upstream. L'audit non ha aperto audio locali, modificato algoritmi o rivalutato i punteggi.
+
+Il contour pYIN salvato omette i frame scartati; aumentare `maximumGapFrames` non allunga automaticamente le code e `fmax=300` riguarda la fondamentale, non le armoniche. NMF con template e attivazioni per strumento è una proposta da confrontare su development, non una soluzione adottata. Dettagli e fonti nel checkpoint; nessuna nuova autorizzazione a training/batch131.
+
 ## Checkpoint precedente — R6 Audio Analysis finale chiuso / V2_PROMOTE — 20/09/2026
 
 Checkpoint completo: [Owned Beats — Audio Analysis R6 final holdout](OWNED_BEATS_AUDIO_ANALYSIS_R6_FINAL_HOLDOUT_2026-09-20.md).
@@ -48,7 +56,7 @@ R1 usa il nuovo cohort sostitutivo `evaluation-holdout-r1-v2` con identità comp
 Integrate le correzioni CI, Drum View, readiness, codec train-only, storico reservation e copertura UI cieca. Test locali e limiti nel checkpoint; CI remota da verificare dopo push.
 R6 finale resta aperto: reference cieca disponibile, scoring V1/config-001 e paired comparison finale ancora da collegare alla reservation. Training serio chiuso.
 
-## Owned Beats — stato operativo
+## Owned Beats — storico dello stato operativo
 
 > Checkpoint corrente Audio Analysis: [R6 final holdout — V2_PROMOTE — 20/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_R6_FINAL_HOLDOUT_2026-09-20.md).
 > Checkpoint development precedente: [V2 config-001 — development V2_WINS + candidate freeze — 12/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_V2_DEVELOPMENT_WIN_CANDIDATE_FREEZE_2026-09-12.md).
@@ -56,7 +64,7 @@ R6 finale resta aperto: reference cieca disponibile, scoring V1/config-001 e pai
 > Diagnostica complementare: [Easy sanity set e localization audit — 11/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_EASY_SANITY_CHECKPOINT_2026-09-11.md).
 > Metodo review congelato: [Freeze correction-cost review config-001 — 11/09/2026](OWNED_BEATS_AUDIO_ANALYSIS_CORRECTION_COST_REVIEW_FREEZE_2026-09-11.md).
 
-**Stato aggiornato: 20/09/2026. Audio Analysis R6 chiuso con `V2_PROMOTE`; conversione audio→MIDI non ancora avviata (`converted: 0`).**
+**Fotografia storica del 20/09/2026, superata dai checkpoint successivi. Per lo stato corrente fa fede il checkpoint del 22/09/2026 in apertura; questa sezione non definisce il prossimo passo.**
 
 | Attività | Stato | Evidenza / prossimo vincolo |
 |---|---|---|
