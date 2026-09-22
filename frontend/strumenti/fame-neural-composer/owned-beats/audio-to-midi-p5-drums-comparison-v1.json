@@ -77,6 +77,16 @@
         "velocity": "same velocity_map contract as baseline, applied within each class envelope",
         "newLearnedParameters": 0,
         "newTunedThresholds": 0
+      },
+      "status": "NEGATIVE_RESULT_CONTROLLED_GATE_FAIL",
+      "resultSummary": {
+        "failureMode": "BROADBAND_COACTIVATION_FALSE_POSITIVES",
+        "evidence": [
+          "D05: 8 TP / 4 FP / 0 FN, F1 0.8; extra snare activations",
+          "D06: 9 TP / 18 FP / 0 FN, F1 0.5; extra kick+snare on each hihat",
+          "D07: 5 TP / 10 FP / 0 FN, F1 0.5; extra snare+hihat on each kick"
+        ],
+        "decision": "DO_NOT_TUNE_THRESHOLDS_ON_CONTROLLED_FIXTURES; KEEP_AS_NEGATIVE_RESULT"
       }
     },
     {
@@ -87,7 +97,42 @@
         "controlled-fixture templates may prove mechanics but cannot alone justify real-beat promotion",
         "template provenance and rights must be explicit before real material is used",
         "same event-level metrics and budget as candidate 1"
-      ]
+      ],
+      "status": "IMPLEMENTATION_FROZEN_BEFORE_FIRST_RESULT",
+      "implementationFreeze": {
+        "scope": "CONTROLLED_MECHANICS_ONLY",
+        "templateSources": {
+          "kick": "D01_KICK_ISOLATED",
+          "snare": "D02_SNARE_ISOLATED",
+          "hihat": "D03_HIHAT_ISOLATED"
+        },
+        "templateConstruction": {
+          "representation": "magnitude STFT",
+          "nFftSource": "development protocol drums.nFft",
+          "hopLengthSource": "development protocol drums.hopLength",
+          "eventWindowSeconds": 0.08,
+          "statistic": "median magnitude spectrum across annotated isolated hits",
+          "normalization": "L1 per template"
+        },
+        "factorization": {
+          "method": "fixed drum dictionary NMF with KL-divergence multiplicative H update",
+          "harmonicRank": 0,
+          "dictionaryAdaptation": false,
+          "initialization": "deterministic positive projection from W^T V with epsilon floor",
+          "maxIterations": 200,
+          "relativeCostTolerance": 0.000001
+        },
+        "onsetExtraction": {
+          "novelty": "positive first difference of each drum activation row",
+          "adaptiveThreshold": "median of previous 0.1 seconds + 0.12 * global novelty maximum",
+          "localMaximumRequired": true,
+          "crossRoleSuppression": false,
+          "onsetToleranceSeconds": 0.03
+        },
+        "sourceBasis": "Wu & Lerch 2015 PF-NMF mechanics adapted to controlled drum-only stems; no claim of full polyphonic/template-adaptation implementation",
+        "newLearnedParameters": 0,
+        "tunedOnConsumedEvaluation": false
+      }
     }
   ],
   "externalReferenceOnly": [
@@ -195,5 +240,5 @@
     "batch131Authorized": false,
     "taskDataReadyMayBeDeclared": false
   },
-  "nextAction": "IMPLEMENT_DRUMS_INDEPENDENT_MULTILABEL_SPECTRAL_V1_ON_CONTROLLED_FIXTURES_ONLY"
+  "nextAction": "IMPLEMENT_DRUMS_PFNMF_TEMPLATE_ACTIVATION_V1_ON_CONTROLLED_FIXTURES_ONLY"
 }
