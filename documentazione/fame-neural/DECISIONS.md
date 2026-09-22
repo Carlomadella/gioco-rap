@@ -1578,3 +1578,15 @@ Il controllo easy è previsto prima della scelta delle correzioni, non come sost
 Restano vincolanti NDR-026 e NDR-092 con addendum: ricerca di apertura/chiusura, preservazione dei risultati storici, niente tuning sui 12 consumati, nessuna scelta algoritmica automatica, batch131/training/task-data readiness chiusi. Questo piano non modifica protocolli congelati, non autorizza training e non dichiara completata alcuna nuova verifica audio.
 
 A ogni passaggio GPT-5 deve riportare versioni, input, verifiche effettivamente eseguite, risultati/limiti e prossimo passo, aggiornando coerentemente stato, roadmap e decisioni. In assenza di dati locali deve indicare precisamente cosa manca, senza inventare esecuzioni o risultati.
+
+### Addendum a NDR-093 — curriculum easy→hard e misura della kick fusion — 22 settembre 2026
+
+**Stato: ACCEPTED come integrazione del piano; efficacia del curriculum non ancora verificata.**
+
+- P3 mantiene il ruolo di easy sanity diagnostico. P4/P5 formalizzano anche un curriculum di sviluppo a complessità crescente: colpi isolati → simultaneità → pattern/loop semplici → sincopi/terzine → beat rap/trap densi → beat completi rappresentativi. L'ordine viene motivato dalle difficoltà misurate; stem puliti e separati sono condizioni da distinguere.
+- Per ogni livello definire riferimenti, metriche e criteri di avanzamento prima dei risultati, conservando i livelli precedenti come regressioni. Un PASS easy non sostituisce la valutazione rappresentativa o indipendente.
+- Se le evidenze motivano un metodo apprendibile, l'eventuale training progressivo va confrontato con gli stessi dati a complessità mescolata, a split, modello e budget comparabili. Il curriculum di training resta un'ipotesi: questa decisione non apre il training e non impone una scelta algoritmica.
+- Il confronto fusion ON/OFF conserva l'evidenza storica di usefulness ma deve isolare, sullo stesso development e a componenti invariati, kick corretti recuperati, falsi positivi introdotti e kick mancanti per evento. Riferimenti, matching uno-a-uno e tolleranza vanno definiti prima; riportare conteggi/denominatori e precision/recall per family e livello, senza inventare ground truth.
+- Restano invariati P1 come prossimo passo, divieto di tuning sui 12 consumati, nuova evaluation fresca P6 e chiusura di batch131/training/task-data readiness. Nessun algoritmo o risultato storico è modificato da questo addendum.
+
+Dettagli operativi nel piano P4/P5 della roadmap; CURRENT_STATE riporta la stessa precisazione.
