@@ -175,7 +175,8 @@
         "eventTime": "frozen baseline transient time shared by all selected roles",
         "onsetToleranceSeconds": 0.03,
         "newLearnedParameters": 0,
-        "newTunedThresholds": 0
+        "newTunedThresholds": 0,
+        "eventWindowSeconds": 0.08
       }
     }
   ],
