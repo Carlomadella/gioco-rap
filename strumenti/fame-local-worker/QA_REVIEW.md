@@ -1,4 +1,4 @@
-# QA-REVIEW-1 — primo compito su un documento reale di FAME Neural
+# QA-REVIEW — primo compito su un documento reale di FAME Neural
 
 ## Scopo e fonte
 
@@ -10,24 +10,24 @@ Una copia congelata e inclusa in `cases/tsumugi-controlled-report.md`. Il checks
 
 ## Dati e confini
 
-Il modello riceve il report con righe numerate, una procedura e due cataloghi: categorie e controlli possibili, inclusi distrattori non giustificati dal report. Deve selezionare le categorie supportate e le citazioni pertinenti. Non riceve la tabella delle risposte attese del validatore.
+Il modello riceve il report come elenco di righe non vuote con `evidenceId` stabile, numero di riga fisico e testo, piu una procedura e due cataloghi: categorie e controlli possibili, inclusi distrattori non giustificati dal report. Deve selezionare le categorie supportate e gli `evidenceId` pertinenti. Non riceve la tabella delle risposte attese del validatore.
 
 L'host fornisce memoria e documento; il modello non cerca nella repo, non legge D:\FAME_NEURAL, non apre audio, non dispone di shell e non esegue i controlli proposti. La memoria e fornita dall'operatore: non e una prova di apprendimento o di ricerca autonoma dei file.
 
 ## Output e validazione
 
-`answer.json` contiene una finding per categoria sostenuta, con codice, citazioni integrali di righe e nextCheck. `review.md` presenta le stesse informazioni in italiano leggibile. Nessun testo libero aggiuntivo viene accettato, per evitare affermazioni non verificabili dal controllo di questo primo caso.
+Il modello non ricopia quote o numeri di riga: restituisce `evidenceIds`. Dopo la validazione, l'host materializza `answer.json` legando ogni ID alla riga fisica e alla quote esatta dello snapshot; `review.md` presenta le stesse informazioni in italiano leggibile. Questo elimina errori meccanici di copia e riferimenti a righe vuote senza ridurre il controllo semantico.
 
 Il validatore usa una rubrica curata specifica per il documento congelato:
 
-- categorie supportate, completezza, ordine e assenza di duplicati;
-- citazioni esatte e pertinenti, copertura delle evidenze necessarie;
+- categorie supportate, completezza e assenza di duplicati; l'ordine e normalizzato dall'host;
+- `evidenceId` pertinenti e copertura delle evidenze necessarie; le quote esatte sono legate dall'host;
 - distinzione tra ipotesi timbrica e causa dimostrata;
 - correzione del significato dei pitch selezionati dal top-k;
 - controllo successivo ammesso per ogni categoria;
 - nessuna autorizzazione a training, beat reali/P6 o cambi soglie.
 
-Una citazione esatta da sola NON dimostra che una conclusione sia giusta: qui anche il legame categoria-evidenza e verificato da una rubrica preparata e testata dall'operatore. La rubrica non e un valutatore semantico universale. Per un altro report serve un nuovo caso e una revisione della rubrica; non basta cambiare report.md.
+Un `evidenceId` valido da solo NON dimostra che una conclusione sia giusta: qui anche il legame categoria-evidenza e verificato da una rubrica preparata e testata dall'operatore. La rubrica non e un valutatore semantico universale. Per un altro report serve un nuovo caso e una revisione della rubrica; non basta cambiare report.md.
 
 Esito positivo: `VALIDATED_FOR_REVIEW`, con `humanReviewRequired: true` e `executionAuthorized: false`. Non significa validazione delle cause scientifiche o autorizzazione a eseguire una nuova inference. Le proposte rimangono da confrontare con la roadmap corrente prima di qualsiasi attuazione.
 
@@ -36,9 +36,9 @@ Esito positivo: `VALIDATED_FOR_REVIEW`, con `humanReviewRequired: true` e `execu
 Da PowerShell nella repo aggiornata, con Ollama avviato e il modello gia installato:
 
 ```powershell
-python -m unittest discover -s strumenti/fame-local-worker -p "test_*.py" -v
-python strumenti/fame-local-worker/qa_worker.py init --root "$HOME\FAME_QA_REVIEW_001"
-python strumenti/fame-local-worker/qa_worker.py run --root "$HOME\FAME_QA_REVIEW_001" --model "qwen3-coder:30b"
+python strumenti/fame-local-worker/test_qa_worker.py -v
+python strumenti/fame-local-worker/qa_worker.py init --root "$HOME\FAME_QA_REVIEW_003"
+python strumenti/fame-local-worker/qa_worker.py run --root "$HOME\FAME_QA_REVIEW_003" --model "qwen3-coder:30b"
 ```
 
 Cline non viene usato. Il modello indicato e quello gia provato dall'operatore, non un vincitore di benchmark. E possibile specificare un altro modello locale installato usando una scrivania separata. Init rifiuta root esistenti.
@@ -56,7 +56,7 @@ La memoria assente in questa scrivania e un errore di preparazione, non una prov
 
 ## Cosa e stato verificato e cosa manca
 
-23 test automatici: 13 del manifest worker e 10 del QA worker. Usano risposte simulate; verificano anche omissioni, false cause, citazioni non pertinenti, proposte vietate, alterazioni della fonte, retry e lock. Non costituiscono un risultato reale di Qwen su questo compito. Windows puo saltare il test symlink se la creazione dei link non e disponibile.
+Le suite automatiche del manifest worker e del QA worker sono separate. Su Windows vanno eseguite direttamente con `test_agent.py` e `test_qa_worker.py`; verificano anche omissioni, false cause, evidenze non pertinenti, proposte vietate, alterazioni della fonte, retry e lock. Non costituiscono un risultato reale di Qwen su questo compito. Windows puo saltare il test symlink se la creazione dei link non e disponibile.
 
 Prossima verifica: eseguire un run reale e leggere insieme report.json, answer.json e review.md. Misurare correttezza al primo tentativo, eventuale correzione e utilita della bozza per l'operatore. Non aggiungere nuove ripetizioni senza una domanda concreta da risolvere. Non dichiarare la rete pronta o il modello migliore sulla base di questo solo report noto.
 
