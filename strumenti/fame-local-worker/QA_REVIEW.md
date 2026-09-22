@@ -37,8 +37,8 @@ Da PowerShell nella repo aggiornata, con Ollama avviato e il modello gia install
 
 ```powershell
 python strumenti/fame-local-worker/test_qa_worker.py -v
-python strumenti/fame-local-worker/qa_worker.py init --root "$HOME\FAME_QA_REVIEW_005"
-python strumenti/fame-local-worker/qa_worker.py run --root "$HOME\FAME_QA_REVIEW_005" --model "qwen3-coder:30b"
+python strumenti/fame-local-worker/qa_worker.py init --root "$HOME\FAME_QA_REVIEW_006"
+python strumenti/fame-local-worker/qa_worker.py run --root "$HOME\FAME_QA_REVIEW_006" --model "qwen3-coder:30b"
 ```
 
 Cline non viene usato. Il modello indicato e quello gia provato dall'operatore, non un vincitore di benchmark. E possibile specificare un altro modello locale installato usando una scrivania separata. Init rifiuta root esistenti.
@@ -76,3 +76,13 @@ La v5 sposta `nextCheck` fuori dall'output del modello. Il modello deve riconosc
 I retry sono cumulativi: una finding gia validata viene conservata dall'host e non puo essere persa da un tentativo successivo. L'output finale puo essere assemblato da finding validate in tentativi diversi; `assembledAcrossAttempts` lo rende esplicito nel report. Nessuna finding non validata viene conservata.
 
 `ZERO_INTERVALS` descrive ora il fatto indicato dal codice: il decoder Semi-CRF produce zero intervalli finali. La constatazione separata sul silence gate resta nel report ma non viene usata come requisito artificiale della stessa categoria.
+
+## Nota v6 — salvage di evidenza sufficiente
+
+Il run reale v5 ha mostrato che Qwen puo includere, oltre alle evidenze corrette, una riga di titolo o contesto non necessaria. Tre finding semanticamente complete (GATE_FAIL, MISSING_EVENTS, PAIR_CONFIDENCE_UNKNOWN) venivano quindi scartate interamente per un solo evidenceId extra.
+
+La v6 distingue ora tra evidenza insufficiente e contesto superfluo. Se gli evidenceIds pertinenti coprono gia tutti i gruppi richiesti della finding, gli ID esterni alla rubrica vengono rimossi deterministicamente dall'host invece di invalidare tutta la finding. Se invece la copertura richiesta manca, l'evidenza irrilevante resta un errore insieme a INSUFFICIENT_EVIDENCE.
+
+Ogni rimozione viene registrata in attempt-N-validation.json come droppedEvidence; l'output finale materializza solo evidenze ammesse. Questo mantiene l'audit del modello originale senza permettere che una riga estranea diventi parte della bozza validata.
+
+E stato aggiunto un test di regressione che riproduce il pattern osservato nel retry reale v5: finding corrette con righe extra, TIMBRE_HYPOTHESIS gia conservata dal tentativo precedente e completamento cumulativo al retry.
