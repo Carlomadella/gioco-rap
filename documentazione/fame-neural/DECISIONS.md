@@ -1715,3 +1715,18 @@ Si congela prima del primo risultato una terza candidata non-learned, `drums-tra
 Questo esperimento resta mechanics-only con template da D01/D02/D03; anche un eventuale PASS non autorizza real-easy, training, batch131 o task-data readiness.
 
 Checkpoint: [P5 PF-NMF controlled negative/partial](OWNED_BEATS_AUDIO_TO_MIDI_P5_PFNMF_NEGATIVE_2026-09-22.md).
+
+
+## NDR-098 — Stop al loop non-learned; preflight Tsumugi drums_v1_5
+
+**Stato: ACCEPTED — 22 settembre 2026.**
+
+La candidata `drums-transient-subset-bic-v1` migliora la precisione rispetto alle due varianti precedenti ma non supera il gate controllato. D05 raggiunge F1 0.888889 con due snare falsi; D06 F1 0.666667 con uno snare falso su ciascun hi-hat; D07 resta perfetto; il run termina con `STOP_CONTROLLED_NONLEARNED_VARIANT_LOOP_AND_REASSESS_REAL_TEMPLATE_OR_LEARNED_MULTI_LABEL_PATH`.
+
+Decisione: fermare nuove euristiche/template sullo stesso sintetico. Non si ritoccano soglie, low-end, onset detector o cohort consumati e training resta chiuso.
+
+Il prossimo ramo cambia fonte di informazione: prima candidata pretrained da preflight `Tsumugi drums_v1_5`, solo inference. Source MIT commit `f7411471a4de0ad3d430191de11b8623d67e5b38`; model repo Hugging Face marcato MIT; checkpoint `best_model_drums_v1_5.pth`, upload revision `89aefa28abf0a54f859505f41f211d273662c7c7`, bytes `57150497`, SHA256 `65138ad1dd919f33fb0ce56e54c0c23c87deaad6511132d69137cf4901ee9319`.
+
+Prima di ogni audio access vanno verificati source commit, source lock, ambiente dedicato, checkpoint SHA/bytes e licenza. Il controlled stage userà solo le fixture P3 già congelate e non autorizza training.
+
+Checkpoint: [P5 subset+BIC negative/partial](OWNED_BEATS_AUDIO_TO_MIDI_P5_SUBSET_BIC_NEGATIVE_2026-09-22.md).
