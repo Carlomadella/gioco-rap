@@ -34,7 +34,7 @@ Checkpoint: [Owned Beats — Audio→MIDI independent evaluation — gate failur
 
 **Aggiornato il 22 settembre 2026. Decisione: NDR-093.** Questa sezione stabilisce i prossimi passi di questo filone e prevale sulle indicazioni temporali dei checkpoint precedenti riportati più avanti. Non sostituisce le altre fasi della roadmap e non chiude la Fase 7.
 
-**Stato di esecuzione:** piano documentale adottato; tutti i passi P1–P6 sotto sono **DA ESEGUIRE**. Nessun nuovo test audio, renderer corretto o algoritmo migliorato è dichiarato completato da questo aggiornamento.
+**Stato di esecuzione:** **P1 PASS, P2 PASS, P3 ATTIVO**. P1 ha congelato inventario e protocollo diagnostico con 91 family fresche non assegnate verificate. P2 ha chiuso misura/export con renderer v2 a durata reference, 12/12 equivalenze JSON↔MIDI e zero overflow. P3 easy Audio→MIDI è il prossimo blocco operativo. Nessun algoritmo drums/low-end è stato ancora modificato o promosso.
 
 ### Istruzioni iniziali per GPT-5
 
@@ -46,7 +46,9 @@ Leggere nell'ordine:
 
 Prima di modificare codice, verificare branch, commit, worktree, stato dei file e istruzioni locali. I percorsi Windows e i commit citati nei checkpoint sono evidenze storiche, non prova dello stato locale attuale. Non fare reset, checkout o sovrascritture su modifiche dell'utente. Separare sempre evidenza verificata nella repo, risultati locali documentati ed elementi ancora da acquisire.
 
-### P1 — Inventario e protocollo diagnostico
+### P1 — Inventario e protocollo diagnostico — **PASS 22/09/2026**
+
+Checkpoint tecnico: protocollo `audio-to-midi-diagnostic-protocol-v1.json`, audit `audio-to-midi-p1-audit.js` e test dedicato. Verificati 131 record/131 family, 8 development, 12 evaluation Audio→MIDI consumate, 20 holdout Audio Analysis e **91 family fresche non assegnate**. I tre easy storici non risultano presenti in `D:\FAME_NEURAL`; i diritti sono confermati dall'utente e la loro assenza non blocca P2. Identità real-easy da congelare prima di P3.
 
 **Obiettivo:** rendere eseguibili e tracciabili i controlli senza consumare altri dati di evaluation.
 
@@ -60,7 +62,9 @@ Prima di modificare codice, verificare branch, commit, worktree, stato dei file 
 
 **Output:** inventario e protocollo versionati, con dati mancanti espliciti. Se manca un file indispensabile, chiedere quel file o l'esito di un comando read-only preciso; proseguire intanto con le verifiche indipendenti da esso.
 
-### P2 — Verificare e versionare misura, export e renderer
+### P2 — Verificare e versionare misura, export e renderer — **PASS 22/09/2026**
+
+Checkpoint: [Owned Beats — Audio→MIDI P2 measurement/export audit — PASS](OWNED_BEATS_AUDIO_TO_MIDI_P2_MEASUREMENT_PASS_2026-09-22.md). Implementato renderer v2 a durata reference senza modificare il v1 storico. Audit reale sul cohort consumato: **12/12 JSON↔MIDI equivalenti**, **0 overflow**; nessun source audio aperto, nessuna separation/transcription/retuning, nessun voto o artefatto storico modificato. Il differenziale `reference - renderer v1` arriva fino a circa **+9.34 s**, quindi il v1 era dipendente dall'ultimo evento e non dalla durata reference. L'impatto sui voti storici resta non misurato.
 
 **Obiettivo:** poter distinguere difetti di trascrizione, esportazione e ascolto.
 
@@ -72,7 +76,7 @@ Prima di modificare codice, verificare branch, commit, worktree, stato dei file 
 
 **Output:** nuova versione identificata, test mirati e report di equivalenza/durata. Prima di nuovi confronti musicali il sistema di misura deve risultare verificato.
 
-### P3 — Eseguire il controllo easy Audio→MIDI
+### P3 — Eseguire il controllo easy Audio→MIDI — **ATTIVO**
 
 **Obiettivo:** stabilire se i difetti compaiono già in casi semplici e localizzarli.
 
@@ -127,7 +131,7 @@ Per ogni livello registrare input e riferimenti, fattore di complessità introdo
 
 ### Formato obbligatorio del resoconto a ogni passaggio
 
-Registrare stato (DA ESEGUIRE / IN CORSO / PASS / FAIL / BLOCCATO), commit e versioni, input con hash/split/esposizione, comandi realmente eseguiti, risultati e limiti, percorso degli artefatti, prossimo passo e condizione di avanzamento. Distinguere controlli sul codice da esecuzioni audio sul PC. Il passo attivo iniziale è **P1**, seguito da **P2**; nessuna esecuzione batch131 o training è autorizzata da questo piano.
+Registrare stato (DA ESEGUIRE / IN CORSO / PASS / FAIL / BLOCCATO), commit e versioni, input con hash/split/esposizione, comandi realmente eseguiti, risultati e limiti, percorso degli artefatti, prossimo passo e condizione di avanzamento. Distinguere controlli sul codice da esecuzioni audio sul PC. Il passo attivo corrente è **P3**; P1 e P2 sono PASS. Nessuna esecuzione batch131 o training è autorizzata da questo piano.
 
 ---
 
