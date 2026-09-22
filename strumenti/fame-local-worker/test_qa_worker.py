@@ -10,7 +10,6 @@ from test_agent import FakeOllama, response
 
 
 def golden():
-    lines=qa.case_text().splitlines()
     entries=[
         ('GATE_FAIL',[65,74],'HOLD_REAL_EVALUATION'),
         ('SNARE_HAT_CONFUSION',[41,43],'INSPECT_ROLE_OUTPUTS'),
@@ -19,8 +18,8 @@ def golden():
         ('TIMBRE_HYPOTHESIS',[61],'PLAN_TIMBRE_COMPARISON'),
         ('PAIR_CONFIDENCE_UNKNOWN',[83,90],'PROPOSE_SYNTHETIC_LOGGING'),
         ('ZERO_INTERVALS',[87,88],'INSPECT_DECODER_OUTPUTS')]
-    return {'findings':[{'code':code,'evidence':[{'line':n,'quote':lines[n-1]} for n in nums],
-                         'nextCheck':check} for code,nums,check in entries]}
+    return {'findings':[{'code':code,'evidenceLines':nums,'nextCheck':check}
+                        for code,nums,check in entries]}
 
 
 class QAWorkerTests(unittest.TestCase):
@@ -37,18 +36,24 @@ class QAWorkerTests(unittest.TestCase):
     def test_real_frozen_case_and_alternative_citation(self):
         answer=golden()
         self.assertEqual(qa.validate(answer,qa.case_text()),[])
-        answer['findings'][5]['evidence'][0]={'line':89,'quote':qa.case_text().splitlines()[88]}
+        answer['findings'][5]['evidenceLines'][0]=89
         self.assertEqual(qa.validate(answer,qa.case_text()),[])
+        answer['findings'].reverse()
+        self.assertEqual(qa.validate(answer,qa.case_text()),[])
+        materialized=qa.materialize(answer,qa.case_text())
+        self.assertEqual([row['code'] for row in materialized['findings']],list(qa.RUBRIC))
+        self.assertEqual(materialized['findings'][0]['evidence'][0]['quote'],
+                         qa.case_text().splitlines()[materialized['findings'][0]['evidence'][0]['line']-1])
         self.assertEqual(qa.digest(qa.case_text().replace('\n','\r\n')),qa.CASE_SHA)
 
-    def test_fabricated_quote_and_irrelevant_real_quote_rejected(self):
+    def test_irrelevant_and_invalid_lines_rejected(self):
         answer=golden()
-        answer['findings'][0]['evidence'][0]['quote']='Il gate passa'
-        self.assertTrue(qa.validate(answer,qa.case_text()))
-        answer=golden()
-        answer['findings'][0]['evidence'][0]={'line':40,'quote':qa.case_text().splitlines()[39]}
+        answer['findings'][0]['evidenceLines'][0]=40
         errors=qa.validate(answer,qa.case_text())
         self.assertIn('GATE_FAIL_IRRELEVANT_EVIDENCE',errors)
+        answer=golden()
+        answer['findings'][0]['evidenceLines'][0]=True
+        self.assertIn('GATE_FAIL_CITATION_CONTRACT',qa.validate(answer,qa.case_text()))
 
     def test_unsupported_cause_and_unsafe_next_step(self):
         answer=golden()
@@ -68,7 +73,7 @@ class QAWorkerTests(unittest.TestCase):
         answer['findings'].append(answer['findings'][0])
         self.assertTrue(qa.validate(answer,qa.case_text()))
         answer=golden()
-        answer['findings'][0]['evidence'][0]['line']=True
+        answer['findings'][0]['evidenceLines'][0]=True
         self.assertTrue(qa.validate(answer,qa.case_text()))
 
     def test_accept_review_only_no_oracle_in_request(self):
@@ -82,6 +87,10 @@ class QAWorkerTests(unittest.TestCase):
         self.assertNotIn('RUBRIC',json.dumps(request))
         self.assertNotIn('tools',request)
         self.assertIn('ONSET_TOLERANCE_CAUSE',json.dumps(request))
+        self.assertIn('evidenceLines',json.dumps(request))
+        answer=agent.read(out/'answer.json')
+        self.assertIn('evidence',answer['findings'][0])
+        self.assertNotIn('evidenceLines',answer['findings'][0])
 
     def test_retry_and_rejection_keep_attempts(self):
         wrong=golden()
@@ -101,15 +110,14 @@ class QAWorkerTests(unittest.TestCase):
     def test_retry_feedback_is_actionable_without_oracle(self):
         feedback=qa.retry_feedback([
             'GATE_FAIL_INSUFFICIENT_EVIDENCE',
-            'MISSING_EVENTS_QUOTE_MISMATCH',
+            'MISSING_EVENTS_INSUFFICIENT_EVIDENCE',
             'SNARE_HAT_CONFUSION_NEXT_CHECK',
             'SNARE_HAT_CONFUSION_IRRELEVANT_EVIDENCE',
-            'INCOMPLETE_OR_UNORDERED_FINDINGS'])
-        self.assertIn('QUOTE_MISMATCH',feedback)
+            'INCOMPLETE_FINDINGS'])
         self.assertIn('IRRELEVANT_EVIDENCE',feedback)
         self.assertIn('INSUFFICIENT_EVIDENCE',feedback)
         self.assertIn('NEXT_CHECK',feedback)
-        self.assertIn('INCOMPLETE_OR_UNORDERED_FINDINGS',feedback)
+        self.assertIn('INCOMPLETE_FINDINGS',feedback)
         self.assertNotIn('RUBRIC',feedback)
         self.assertNotIn('HOLD_REAL_EVALUATION',feedback)
         self.assertNotIn('riga 74',feedback.lower())
