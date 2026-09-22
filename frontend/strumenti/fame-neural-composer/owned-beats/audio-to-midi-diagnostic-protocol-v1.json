@@ -1,0 +1,208 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-diagnostic-protocol-v1",
+  "version": 1,
+  "status": "FROZEN_P1_INVENTORY_AND_DIAGNOSTIC_RULES",
+  "createdAt": "2026-09-22",
+  "decision": "NDR-093",
+  "purpose": "DIAGNOSTIC_EASY_TO_HARD_LOCALIZATION_BEFORE_AUDIO_TO_MIDI_VARIANTS",
+  "inventory": {
+    "sourceCollectionId": "fame-owned-beats-v1",
+    "expectedRecords": 131,
+    "expectedCompositionFamilies": 131,
+    "expectedSplitCounts": {
+      "<unset>": 91,
+      "development": 8,
+      "audio-to-midi-evaluation-v1": 12,
+      "evaluation-holdout": 10,
+      "evaluation-holdout-r1-v2": 10
+    },
+    "expectedFreshUnassignedFamilies": 91,
+    "freshDefinition": "unassigned split; no pilot cohort; no QA evidence; all roles PENDING/NOT_PROCESSED with null artifactId; presentInScan is not false",
+    "freshPoolPolicy": "Do not open or repurpose fresh records implicitly. Assign any future development/evaluation role explicitly before audio access."
+  },
+  "knownExposures": {
+    "development": {
+      "split": "development",
+      "expectedFamilies": 8,
+      "sourceRecordIds": [
+        "FAME000011", "FAME000012", "FAME000023", "FAME000040",
+        "FAME000046", "FAME000058", "FAME000080", "FAME000126"
+      ],
+      "use": "DEVELOPMENT_AND_REGRESSION_ALLOWED"
+    },
+    "consumedAudioToMidiEvaluation": {
+      "split": "audio-to-midi-evaluation-v1",
+      "expectedFamilies": 12,
+      "sourceRecordIds": [
+        "FAME000001", "FAME000102", "FAME000006", "FAME000129",
+        "FAME000020", "FAME000073", "FAME000092", "FAME000121",
+        "FAME000010", "FAME000071", "FAME000116", "FAME000101"
+      ],
+      "use": "FAILURE_AND_REGRESSION_EVIDENCE_ONLY_NO_TUNING_NO_FRESH_REEVALUATION"
+    },
+    "audioAnalysisHoldouts": {
+      "splits": ["evaluation-holdout", "evaluation-holdout-r1-v2"],
+      "expectedFamiliesEach": 10,
+      "use": "KEEP_OUT_OF_AUDIO_TO_MIDI_DEVELOPMENT"
+    }
+  },
+  "easyDiagnostic": {
+    "historicalExternalSet": {
+      "status": "NOT_FOUND_IN_D_FAME_NEURAL_2026_09_22_READ_ONLY_AUDIT",
+      "rightsStatus": "USER_CONFIRMED_USABLE",
+      "tracks": [
+        {
+          "id": "easy-oldschool-90s-boom-bap",
+          "displayName": "Oldschool / 90s Boom Bap",
+          "sha256": "f408c79254d36b534fdfbe7cffe7dcf707130116f5a121293123d501d9a8fef4"
+        },
+        {
+          "id": "easy-locked-up",
+          "displayName": "Locked Up",
+          "sha256": "0ce33ec22bef47ea40d45fe56dd465545d0c98b31fb605869cfe9e3f78eb9aa8"
+        },
+        {
+          "id": "easy-street-candy",
+          "displayName": "Street Candy",
+          "sha256": "e80c31488306f8dd729b5f03664f00cdc59d4f78d30701e72f2dc60b4aab86f4"
+        }
+      ],
+      "policy": "Prefer exact historical SHA matches if recovered. Absence does not block P2."
+    },
+    "controlledFixturePlan": {
+      "status": "SPEC_IDENTITIES_FROZEN_AUDIO_TO_BE_GENERATED_AND_HASHED_BEFORE_P3",
+      "generatorRequirement": "deterministic; repository version and generated WAV/annotation SHA256 frozen before first P3 baseline run",
+      "fixtures": [
+        {"id": "D01_KICK_ISOLATED", "domain": "drums", "factor": "isolated kick"},
+        {"id": "D02_SNARE_ISOLATED", "domain": "drums", "factor": "isolated snare"},
+        {"id": "D03_HIHAT_ISOLATED", "domain": "drums", "factor": "isolated hi-hat"},
+        {"id": "D04_KICK_SNARE_SIMULTANEOUS", "domain": "drums", "factor": "kick+snare simultaneous"},
+        {"id": "D05_KICK_HIHAT_SIMULTANEOUS", "domain": "drums", "factor": "kick+hi-hat simultaneous"},
+        {"id": "D06_HIHAT_TRIPLETS", "domain": "drums", "factor": "hi-hat triplets"},
+        {"id": "D07_KICK_SYNCOPATED", "domain": "drums", "factor": "syncopated kick"},
+        {"id": "D08_UNSUPPORTED_CLAP_RIM", "domain": "drums", "factor": "clap/rim outside baseline taxonomy"},
+        {"id": "L01_SUSTAINED_NOTE", "domain": "lowend", "factor": "sustained note"},
+        {"id": "L02_NOTE_CHANGE", "domain": "lowend", "factor": "discrete pitch change"},
+        {"id": "L03_GLIDE", "domain": "lowend", "factor": "glide"},
+        {"id": "L04_GAP_RELEASE", "domain": "lowend", "factor": "gap and release"}
+      ]
+    },
+    "realBeatSet": {
+      "expectedTracks": 3,
+      "status": "IDENTITIES_PENDING_BEFORE_P3",
+      "selectionPriority": [
+        "exact recovered historical easy-set SHA256",
+        "new user-provided authorized simple beats registered outside independent evaluation",
+        "explicitly allocated development material"
+      ],
+      "forbiddenSources": [
+        "audio-to-midi-evaluation-v1 consumed cohort",
+        "audio-analysis holdouts",
+        "future P6 independent cohort"
+      ],
+      "freezeBeforeFirstP3Run": true
+    }
+  },
+  "metrics": {
+    "drums": {
+      "primaryEventMatching": {
+        "sameClassRequired": true,
+        "onsetToleranceSeconds": 0.03,
+        "matching": "one-to-one maximum matching",
+        "simultaneousDifferentClassesAreIndependentEvents": true,
+        "metrics": ["TP", "FP", "FN", "precision", "recall", "f1"],
+        "reportPerClass": true,
+        "reportAggregate": true,
+        "basis": "MIREX Drum Transcription 30 ms onset-deviation criterion"
+      },
+      "secondaryTimingDiagnostic": {
+        "onsetToleranceSeconds": 0.05,
+        "purpose": "separate near-miss timing from larger detection/classification failures; not the primary drum score"
+      },
+      "unsupportedReferenceRoles": {
+        "policy": "preserve original label and mark unsupportedByBaseline=true; do not relabel clap/rim as snare solely to improve score"
+      },
+      "fusion": {
+        "comparison": "ON_vs_OFF_same_development_other_components_fixed",
+        "eventMatchingUsesPrimaryDrumRule": true,
+        "requiredCounts": ["correctKickRecovered", "falseKickIntroduced", "kickStillMissing"],
+        "requiredMetrics": ["kickPrecision", "kickRecall", "kickF1"],
+        "reportByFamilyAndCurriculumLevel": true
+      }
+    },
+    "lowEnd": {
+      "noteMatching": {
+        "onsetToleranceSeconds": 0.05,
+        "pitchToleranceCents": 50.0,
+        "offsetTolerance": {
+          "ratioOfReferenceDuration": 0.2,
+          "minimumSeconds": 0.05,
+          "rule": "max(ratio*referenceDuration, minimumSeconds)"
+        },
+        "matching": "one-to-one maximum matching",
+        "metrics": ["precision", "recall", "f1", "averageOverlapRatio"],
+        "basis": "mir_eval transcription defaults"
+      },
+      "diagnostics": [
+        "onsetErrorMs", "offsetErrorMs", "durationErrorMs", "pitchErrorCents",
+        "allFrameF0", "voicedFlag", "voicedProbability", "exclusionReason"
+      ]
+    },
+    "stageTrace": [
+      "mix_original",
+      "separated_stem",
+      "preclassification_onsets_or_pitch_frames",
+      "classification_or_fusion_or_segmentation",
+      "symbolic_events",
+      "exported_midi",
+      "audition_render"
+    ]
+  },
+  "curriculum": {
+    "levels": [
+      "isolated_hits_or_notes",
+      "simultaneous_events",
+      "simple_patterns",
+      "simple_loops",
+      "syncopation_and_triplets",
+      "dense_rap_trap_beats",
+      "representative_full_beats"
+    ],
+    "rules": [
+      "define references, metrics and advancement condition before observing results at each level",
+      "keep previous levels as regression tests",
+      "report per-level results; aggregate scores must not hide simple-level failures",
+      "distinguish clean/controlled sources from source-separated stems"
+    ],
+    "training": "CLOSED. If a learnable method is later justified, compare easy-to-hard curriculum against the same data mixed across complexity with comparable split/model/budget."
+  },
+  "advancement": {
+    "p1": {
+      "inventory": "PASS when manifest has 131 unique records/families, frozen known exposures match, and fresh metadata-only count is 91",
+      "protocol": "PASS when this file and audit test pass",
+      "realEasyIdentity": "MAY_REMAIN_PENDING_FOR_P2_BUT_MUST_BE_FROZEN_BEFORE_P3"
+    },
+    "p2": {
+      "mayProceedWithRealEasyIdentityPending": true,
+      "deterministicGate": "renderer/export/JSON-MIDI fixture checks must pass before new musical comparisons"
+    },
+    "p3": {
+      "promotionUse": "DIAGNOSTIC_ONLY",
+      "maySelectAlgorithmForIndependentPromotion": false,
+      "requiresBeforeRun": [
+        "controlled fixture audio+annotation hashes frozen",
+        "real easy beat identities frozen or explicitly waived in favor of fixture-only substage"
+      ]
+    }
+  },
+  "safety": {
+    "p1MayOpenAudio": false,
+    "p1MayHashSourceAudio": false,
+    "p1MayModifyManifest": false,
+    "consumedEvaluationMayBeUsedForTuning": false,
+    "batch131Authorized": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "nextAction": "P2_VERIFY_AND_VERSION_RENDERER_EXPORT_AND_JSON_MIDI_EQUIVALENCE"
+}
