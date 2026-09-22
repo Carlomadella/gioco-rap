@@ -50,7 +50,9 @@ La prova easy storica è conservata nel [checkpoint dell'11 settembre](OWNED_BEA
 
 **Tsumugi preflight PASS — 22/09/2026:** `audio-to-midi-p5-tsumugi-env-v1-001` ha verificato source commit `f7411471...`, checkpoint SHA256 `65138ad1...9319` / 57,150,497 byte, Python 3.12.14, torch/torchaudio CUDA 13 e RTX 5070 Ti. Snapshot package SHA256 `b14b2b16...22704`. Il comando non ha aperto source audio o fixture, non ha eseguito transcription/source separation e non autorizza training/batch131. Checkpoint: [Tsumugi preflight PASS](OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_PREFLIGHT_PASS_2026-09-22.md). Il protocollo controlled `audio-to-midi-p5-tsumugi-controlled-protocol-v1.json` è congelato prima del primo accesso fixture.
 
-Il prossimo passo attivo è eseguire la controlled inference Tsumugi sulle sole 8 fixture drums P3 congelate. Beat reali, cohort indipendenti, batch131, training e task-data readiness restano chiusi.
+**Tsumugi controlled — NDR-099:** il run `audio-to-midi-p5-tsumugi-controlled-v1-001` non supera il gate. D01 kick isolato e D05 kick+hi-hat simultanei sono perfetti; D02 recupera 4/4 snare ma aggiunge 4 hi-hat falsi; D03/D06 hi-hat e D07 kick sincopato producono zero eventi; D04 recupera 4/4 kick ma perde 4/4 snare e aggiunge 4 hi-hat falsi. Il pattern è invariato a 50 ms. Il risultato mostra capacità multi-hit reale ma forte sensibilità a timbro/contesto sintetico; nessun retuning è autorizzato. Checkpoint: [Tsumugi controlled gate FAIL](OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_CONTROLLED_FAIL_2026-09-22.md).
+
+Il prossimo passo attivo è eseguire il reporter read-only `audio-to-midi-p5-tsumugi-failure-report.py` sui result JSON già persistiti per localizzare silence gate / pair selection / interval decode senza nuova inference. Beat reali, P6, batch131, training e task-data readiness restano chiusi.
 
 ## Checkpoint precedente — R6 Audio Analysis finale chiuso / V2_PROMOTE — 20/09/2026
 
