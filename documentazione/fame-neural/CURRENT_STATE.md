@@ -52,7 +52,9 @@ La prova easy storica è conservata nel [checkpoint dell'11 settembre](OWNED_BEA
 
 **Tsumugi controlled — NDR-099:** il run `audio-to-midi-p5-tsumugi-controlled-v1-001` non supera il gate. D01 kick isolato e D05 kick+hi-hat simultanei sono perfetti; D02 recupera 4/4 snare ma aggiunge 4 hi-hat falsi; D03/D06 hi-hat e D07 kick sincopato producono zero eventi; D04 recupera 4/4 kick ma perde 4/4 snare e aggiunge 4 hi-hat falsi. Il pattern è invariato a 50 ms. Il risultato mostra capacità multi-hit reale ma forte sensibilità a timbro/contesto sintetico; nessun retuning è autorizzato. Checkpoint: [Tsumugi controlled gate FAIL](OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_CONTROLLED_FAIL_2026-09-22.md).
 
-Il prossimo passo attivo è eseguire il reporter read-only `audio-to-midi-p5-tsumugi-failure-report.py` sui result JSON già persistiti per localizzare silence gate / pair selection / interval decode senza nuova inference. Beat reali, P6, batch131, training e task-data readiness restano chiusi.
+**Correzione dopo audit sorgente Tsumugi:** `selected_pair_count > 0` non è prova di confidenza del pair gate nel controlled run, perché con `instrumentFilter=drums`, 88 pitch ammessi e `instrumentPairInferTopk=256`, il top-k enumera di fatto tutti i pitch drums. D03/D06/D07 passano il silence gate ma producono zero intervalli Semi-CRF; resta da distinguere pair-gate debole da interval-score non positivo. Il reporter è stato corretto e il protocollo `audio-to-midi-p5-tsumugi-score-diagnostic-v1.json` è congelato senza retuning.
+
+Il prossimo passo attivo è eseguire il score diagnostic append-only sulle stesse fixture sintetiche, registrando pair-gate logits e Semi-CRF interval-score margins a `note_bias=0`. Beat reali, P6, batch131, training e task-data readiness restano chiusi.
 
 ## Checkpoint precedente — R6 Audio Analysis finale chiuso / V2_PROMOTE — 20/09/2026
 
