@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import agent
 
-VERSION = 'fame-qa-review-v3'
+VERSION = 'fame-qa-review-v4'
 SOURCE_PATH = 'documentazione/fame-neural/OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_CONTROLLED_FAIL_2026-09-22.md'
 SOURCE_COMMIT = '0f9c04889b26f9992fc969ad6c3ff464dc652790'
 CASE_SHA = 'bc95ffe579de6b44f7989015bee7d78627abd1f795debe68c514665999454d13'
@@ -31,12 +31,13 @@ CHECKS = {
     'PROPOSE_SYNTHETIC_LOGGING': 'Proporre diagnostica solo sintetica con pair_gate_logits e interval-score margins a note_bias=0; non eseguirla.',
     'CHANGE_THRESHOLDS': 'Cambiare soglie del modello.',
     'RUN_REAL_BEATS': 'Eseguire nuovi beat reali.'}
-PROCEDURE = '''QA-REVIEW-3. Leggi il report intero, inclusa la correzione finale.
+PROCEDURE = '''QA-REVIEW-4. Leggi il report intero, inclusa la correzione finale.
 Seleziona TUTTE e SOLO le categorie del catalogo sostenute dal testo; ometti quelle non dimostrate.
 Una finding per categoria. L'ordine delle finding non e significativo: l'host lo normalizza.
 Distingui osservazioni e ipotesi.
 Ogni riga non vuota del report ha un evidenceId stabile. Per ogni finding restituisci SOLO evidenceIds presenti nel report.
-Usa il numero minimo di evidenceIds sufficiente a coprire l'affermazione e il nextCheck, inclusi i fixture interessati.
+Usa il numero minimo di evidenceIds sufficiente a coprire TUTTE le parti dell'affermazione della categoria, inclusi i fixture interessati.
+Gli evidenceIds giustificano la finding; NON serve citare una riga soltanto per giustificare il nextCheck. Il nextCheck viene valutato separatamente.
 NON ricopiare quote o numeri di riga: l'host lega gli evidenceIds alle righe e alle quote esatte dopo la validazione.
 Scegli un nextCheck dal catalogo coerente con la finding e con la correzione finale.
 Le azioni sono proposte, mai eseguite. Non autorizzare training, beat reali, P6 o modifiche soglie.
@@ -61,7 +62,7 @@ def schema_for(records):
 RUBRIC = {
     'GATE_FAIL': {
         'check':'HOLD_REAL_EVALUATION',
-        'required':[{38,65},{74}],
+        'required':[{38,65}],
         'allowed':{38,65,74}},
     'SNARE_HAT_CONFUSION': {
         'check':'INSPECT_ROLE_OUTPUTS',
@@ -81,7 +82,7 @@ RUBRIC = {
         'allowed':{61}},
     'PAIR_CONFIDENCE_UNKNOWN': {
         'check':'PROPOSE_SYNTHETIC_LOGGING',
-        'required':[{83,89},{90}],
+        'required':[{83,89}],
         'allowed':{81,83,89,90}},
     'ZERO_INTERVALS': {
         'check':'INSPECT_DECODER_OUTPUTS',
@@ -200,9 +201,9 @@ def retry_feedback(errors):
     if any(error.endswith('_IRRELEVANT_EVIDENCE') for error in errors):
         hints.append('IRRELEVANT_EVIDENCE: rimuovi evidenceIds che non sostengono direttamente quella categoria e rileggi il report per trovare evidenceIds pertinenti.')
     if any(error.endswith('_INSUFFICIENT_EVIDENCE') for error in errors):
-        hints.append('INSUFFICIENT_EVIDENCE: la finding non copre tutti gli elementi necessari della propria affermazione o del nextCheck; rileggi l intero report e aggiungi solo evidenceIds distinti e pertinenti.')
+        hints.append('INSUFFICIENT_EVIDENCE: confronta ogni parte semantica della descrizione della categoria con gli evidenceIds scelti. Gli evidenceIds devono coprire la finding, non il nextCheck. Rileggi il report e aggiungi solo evidenceIds distinti e pertinenti per le parti mancanti.')
     if any(error.endswith('_NEXT_CHECK') for error in errors):
-        hints.append('NEXT_CHECK: riesamina il controllo proposto usando esclusivamente il significato della finding, il report e il catalogo nextChecks; non mantenere automaticamente la scelta precedente.')
+        hints.append('NEXT_CHECK: riesamina il controllo proposto usando la finding e soprattutto le sezioni Decisione/Correzione piu recenti del report. Preferisci il controllo diagnostico direttamente legato alla finding; non saltare a una ipotesi piu ampia se quella ipotesi e gia rappresentata da una categoria separata.')
     if 'INCOMPLETE_FINDINGS' in errors:
         hints.append('INCOMPLETE_FINDINGS: ricostruisci tutte e sole le categorie supportate, una volta ciascuna. L ordine non conta.')
     if 'DUPLICATE_CODE' in errors or any(error.endswith('_DUPLICATE_CITATION') for error in errors):

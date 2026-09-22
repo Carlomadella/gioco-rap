@@ -16,7 +16,7 @@ L'host fornisce memoria e documento; il modello non cerca nella repo, non legge 
 
 ## Output e validazione
 
-Il modello non ricopia quote o numeri di riga: restituisce `evidenceIds`. Dopo la validazione, l'host materializza `answer.json` legando ogni ID alla riga fisica e alla quote esatta dello snapshot; `review.md` presenta le stesse informazioni in italiano leggibile. Questo elimina errori meccanici di copia e riferimenti a righe vuote senza ridurre il controllo semantico.
+Il modello non ricopia quote o numeri di riga: restituisce `evidenceIds`. Dopo la validazione, l'host materializza `answer.json` legando ogni ID alla riga fisica e alla quote esatta dello snapshot; `review.md` presenta le stesse informazioni in italiano leggibile. Gli `evidenceIds` devono sostenere la finding, non una riga separata che descrive il nextCheck: il controllo successivo e validato indipendentemente. Questo elimina errori meccanici e non confonde prova dell'osservazione con giustificazione dell'azione.
 
 Il validatore usa una rubrica curata specifica per il documento congelato:
 
@@ -37,8 +37,8 @@ Da PowerShell nella repo aggiornata, con Ollama avviato e il modello gia install
 
 ```powershell
 python strumenti/fame-local-worker/test_qa_worker.py -v
-python strumenti/fame-local-worker/qa_worker.py init --root "$HOME\FAME_QA_REVIEW_003"
-python strumenti/fame-local-worker/qa_worker.py run --root "$HOME\FAME_QA_REVIEW_003" --model "qwen3-coder:30b"
+python strumenti/fame-local-worker/qa_worker.py init --root "$HOME\FAME_QA_REVIEW_004"
+python strumenti/fame-local-worker/qa_worker.py run --root "$HOME\FAME_QA_REVIEW_004" --model "qwen3-coder:30b"
 ```
 
 Cline non viene usato. Il modello indicato e quello gia provato dall'operatore, non un vincitore di benchmark. E possibile specificare un altro modello locale installato usando una scrivania separata. Init rifiuta root esistenti.
@@ -61,3 +61,10 @@ Le suite automatiche del manifest worker e del QA worker sono separate. Su Windo
 Prossima verifica: eseguire un run reale e leggere insieme report.json, answer.json e review.md. Misurare correttezza al primo tentativo, eventuale correzione e utilita della bozza per l'operatore. Non aggiungere nuove ripetizioni senza una domanda concreta da risolvere. Non dichiarare la rete pronta o il modello migliore sulla base di questo solo report noto.
 
 I tre successi della precedente demo manifest non isolano Cline come causa dei fallimenti LUME-7: compito, prompt, contesto e responsabilita erano diversi. Questo task continua lo sviluppo del runtime diretto, non costituisce un confronto controllato fra runtime.
+
+
+## Nota v4 — separazione tra evidenza e azione
+
+La v4 corregge due falsi negativi osservati nei run reali v3: GATE_FAIL non richiede anche la riga che ribadisce la chiusura di beat reali/P6, e PAIR_CONFIDENCE_UNKNOWN non richiede anche la riga che propone la nuova diagnostica. In entrambi i casi la finding era gia sostenuta; il nextCheck viene controllato separatamente.
+
+Restano volutamente errori reali se il modello sceglie un nextCheck non coerente con la Decisione/Correzione corrente o se una categoria composta non ha evidenza per tutte le sue parti (esempio: ZERO_INTERVALS richiede sia zero intervalli sia lo stato del silence gate).
