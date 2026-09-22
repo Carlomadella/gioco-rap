@@ -47,19 +47,20 @@ def maximum_match(ref_times, est_times, tolerance):
 
 def onset_metrics(reference_events,onset_times,tolerance):
     refs=[x for x in reference_events if x.get("role") in DRUM_ROLES]
-    pairs=maximum_match([x["timeSeconds"] for x in refs],onset_times,tolerance)
-    out=prf(len(pairs),len(onset_times)-len(pairs),len(refs)-len(pairs))
+    unique_times=sorted({round(float(x["timeSeconds"]),6) for x in refs})
+    pairs=maximum_match(unique_times,onset_times,tolerance)
+    out=prf(len(pairs),len(onset_times)-len(pairs),len(unique_times)-len(pairs))
     out.update({
         "referenceSupportedEvents":len(refs),
+        "referenceTransientTimes":len(unique_times),
         "detectedOnsets":len(onset_times),
         "matches":[
             {
-                "referenceIndex":i,
+                "referenceTransientIndex":i,
                 "onsetIndex":j,
-                "role":refs[i]["role"],
-                "referenceTimeSeconds":refs[i]["timeSeconds"],
+                "referenceTimeSeconds":unique_times[i],
                 "detectedTimeSeconds":onset_times[j],
-                "absoluteErrorSeconds":round(abs(float(onset_times[j])-float(refs[i]["timeSeconds"])),6)
+                "absoluteErrorSeconds":round(abs(float(onset_times[j])-float(unique_times[i])),6)
             }
             for i,j in pairs
         ]
@@ -107,6 +108,25 @@ def simultaneous_groups(reference_events):
         if len(set(roles))>1
     ]
 
+def spectral_evidence(events):
+    rows=[]
+    for event in events:
+        spectral=event.get("spectral") or {}
+        rows.append({
+            "timeSeconds":event.get("timeSeconds"),
+            "predictedRole":event.get("role"),
+            "sourceStem":event.get("sourceStem"),
+            "lowRatio":spectral.get("lowRatio"),
+            "midRatio":spectral.get("midRatio"),
+            "highRatio":spectral.get("highRatio"),
+            "centroidHz":spectral.get("centroidHz"),
+            "kickLowGate":spectral.get("lowRatio") is not None and spectral.get("lowRatio")>=0.45,
+            "kickCentroidGate":spectral.get("centroidHz") is not None and spectral.get("centroidHz")<1800,
+            "hihatHighGate":spectral.get("highRatio") is not None and spectral.get("highRatio")>=0.28,
+            "hihatCentroidGate":spectral.get("centroidHz") is not None and spectral.get("centroidHz")>=3500
+        })
+    return rows
+
 def localize_drum(result,reference=None,tolerance=DEFAULT_TOLERANCE):
     if reference is None:
         reference=result.get("reference")
@@ -122,16 +142,17 @@ def localize_drum(result,reference=None,tolerance=DEFAULT_TOLERANCE):
     for row in statuses:
         counts[row["status"]]=counts.get(row["status"],0)+1
 
+    simultaneous=simultaneous_groups(ref)
     if not [x for x in ref if x.get("role") in DRUM_ROLES]:
         localization="NO_SUPPORTED_DRUM_REFERENCE"
     elif onset["recall"]<1.0:
-        localization="DETECTION_FAILURE_PRESENT"
+        localization="TRANSIENT_DETECTION_FAILURE_PRESENT"
+    elif simultaneous and classification.get("recall",0.0)<1.0:
+        localization="TRANSIENT_DETECTION_OK_SIMULTANEOUS_MULTIROLE_LIMIT"
     elif classification.get("recall",0.0)<1.0:
-        localization="ONSET_DETECTION_OK_CLASSIFICATION_OR_SINGLE_LABEL_FAILURE"
+        localization="TRANSIENT_DETECTION_OK_ROLE_CLASSIFICATION_FAILURE"
     else:
         localization="SUPPORTED_DRUM_REFERENCE_PASS"
-
-    simultaneous=simultaneous_groups(ref)
     return {
         "fixtureId":result["fixtureId"],
         "factor":result["factor"],
@@ -143,7 +164,9 @@ def localize_drum(result,reference=None,tolerance=DEFAULT_TOLERANCE):
         "simultaneousReferenceGroups":simultaneous,
         "singleLabelPressurePresent":bool(simultaneous),
         "bassKickCandidates":len(result["drums"].get("bassKickCandidates",[])),
-        "unsupportedReferenceDiagnostic":result["drums"].get("unsupportedReferenceDiagnostic")
+        "unsupportedReferenceDiagnostic":result["drums"].get("unsupportedReferenceDiagnostic"),
+        "drumsOnlySpectralEvidence":spectral_evidence(result["drums"].get("drumsOnlyEvents",[])),
+        "fusionSpectralEvidence":spectral_evidence(fusion)
     }
 
 def summarize_lowend(result):
@@ -230,14 +253,27 @@ def self_test():
         }
     }
     out=localize_drum(result)
-    assert out["onsetDetection30ms"]["recall"]==0.5
-    assert out["localization"]=="DETECTION_FAILURE_PRESENT"
+    assert out["onsetDetection30ms"]["recall"]==1.0
+    assert out["localization"]=="TRANSIENT_DETECTION_OK_SIMULTANEOUS_MULTIROLE_LIMIT"
     assert out["singleLabelPressurePresent"] is True
 
-    result["intermediate"]["drumsOnsetTimesSeconds"]=[0.49,0.51]
-    out=localize_drum(result)
+    isolated={
+        "fixtureId":"I",
+        "factor":"isolated",
+        "reference":{"drumEvents":[{"timeSeconds":0.5,"role":"snare"}]},
+        "intermediate":{"drumsOnsetTimesSeconds":[0.51]},
+        "drums":{
+            "fusionEvents":[{"timeSeconds":0.51,"role":"hihat","spectral":{"lowRatio":0.1,"midRatio":0.5,"highRatio":0.4,"centroidHz":4200}}],
+            "drumsOnlyEvents":[{"timeSeconds":0.51,"role":"hihat","spectral":{"lowRatio":0.1,"midRatio":0.5,"highRatio":0.4,"centroidHz":4200}}],
+            "primary30ms":{"tp":0,"fp":1,"fn":1,"precision":0.0,"recall":0.0,"f1":0.0},
+            "bassKickCandidates":[],
+            "unsupportedReferenceDiagnostic":{"unsupportedReferenceEvents":0}
+        }
+    }
+    out=localize_drum(isolated)
     assert out["onsetDetection30ms"]["recall"]==1.0
-    assert out["localization"]=="ONSET_DETECTION_OK_CLASSIFICATION_OR_SINGLE_LABEL_FAILURE"
+    assert out["localization"]=="TRANSIENT_DETECTION_OK_ROLE_CLASSIFICATION_FAILURE"
+    assert out["drumsOnlySpectralEvidence"][0]["hihatHighGate"] is True
     return {"mode":"FAME_NEURAL_P3_LOCALIZATION_SELF_TEST_PASS"}
 
 def main():
