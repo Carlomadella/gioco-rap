@@ -105,7 +105,10 @@ I 12 campioni consumati aiutano a descrivere e verificare i failure, ma non vann
 
 **Output:** decisione motivata che indica componente, evidenze e confronto development successivo.
 
-### P5 — Sviluppare e confrontare le varianti necessarie
+### P5 — Sviluppare e confrontare le varianti necessarie — **ATTIVO**
+
+**Aggiornamento 22/09/2026 — NDR-096…098:** tre varianti non-learned controllate sono state chiuse senza promozione: multi-label band-flux, PF-NMF fixed-template e transient-subset+BIC. Tutte recuperano in parte le simultaneità ma almeno una mantiene co-attivazioni spurie; il loop euristico/template sul sintetico è fermato senza threshold tuning post-hoc. Il nuovo ramo P5 parte da un pretrained inference candidate, `Tsumugi drums_v1_5`, con source/checkpoint/licenza/ambiente da congelare e verificare prima di qualsiasi audio access. Training resta chiuso.
+
 
 **Curriculum diagnostico/development easy→hard:** formalizzare in P4, usando gli esiti di P3, una progressione controllata: colpi isolati → combinazioni simultanee → pattern semplici → loop semplici → sincopi/terzine → beat rap/trap densi → beat completi rappresentativi. Questa è una progressione iniziale da adattare alle difficoltà misurate, non una graduatoria universale. Distinguere inoltre stem puliti e stem ottenuti dalla separazione: sono condizioni diverse da confrontare, non livelli intercambiabili.
 
@@ -134,7 +137,7 @@ Per ogni livello registrare input e riferimenti, fattore di complessità introdo
 
 ### Formato obbligatorio del resoconto a ogni passaggio
 
-Registrare stato (DA ESEGUIRE / IN CORSO / PASS / FAIL / BLOCCATO), commit e versioni, input con hash/split/esposizione, comandi realmente eseguiti, risultati e limiti, percorso degli artefatti, prossimo passo e condizione di avanzamento. Distinguere controlli sul codice da esecuzioni audio sul PC. Il passo attivo corrente è **P3**; P1 e P2 sono PASS. Nessuna esecuzione batch131 o training è autorizzata da questo piano.
+Registrare stato (DA ESEGUIRE / IN CORSO / PASS / FAIL / BLOCCATO), commit e versioni, input con hash/split/esposizione, comandi realmente eseguiti, risultati e limiti, percorso degli artefatti, prossimo passo e condizione di avanzamento. Distinguere controlli sul codice da esecuzioni audio sul PC. Il passo attivo corrente è **P5**; P1 e P2 sono PASS, P3 controlled è completo e P4 è PASS. Nessuna esecuzione batch131 o training è autorizzata da questo piano.
 
 ---
 
