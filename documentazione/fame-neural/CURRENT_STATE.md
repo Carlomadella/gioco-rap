@@ -36,6 +36,8 @@ Seguire il [piano operativo Audio→MIDI P1–P6](ROADMAP_FAME_NEURAL.md#piano-o
 
 La prova easy storica è conservata nel [checkpoint dell'11 settembre](OWNED_BEATS_AUDIO_ANALYSIS_EASY_SANITY_CHECKPOINT_2026-09-11.md) e in NDR-050: riguardava Audio Analysis/sezioni, non Audio→MIDI. Il nuovo passaggio easy serve a isolare i difetti e non sostituisce i test rappresentativi. Disponibilità locale e diritti dei file devono essere verificati.
 
+**Precisazione NDR-093 — curriculum easy→hard:** P4/P5 organizzano lo sviluppo dai colpi isolati ai beat completi rappresentativi, con criteri di avanzamento prestabiliti e regressioni sui livelli precedenti. L'eventuale curriculum di training è un'ipotesi da confrontare con gli stessi dati a complessità mescolata, a condizioni comparabili, soltanto dopo l'apertura del relativo gate. Training resta chiuso. Il confronto fusion ON/OFF deve misurare per evento kick recuperati, falsi positivi introdotti e kick mancanti, distinguendoli dal miglioramento storico di usefulness. P1 rimane il prossimo passo; nessuna di queste verifiche è già eseguita.
+
 Questo aggiornamento è documentale: nessuna nuova esecuzione audio, correzione del renderer o selezione algoritmica viene dichiarata completata. Gate, risultati e cohort consumati restano invariati.
 
 ## Checkpoint precedente — R6 Audio Analysis finale chiuso / V2_PROMOTE — 20/09/2026
