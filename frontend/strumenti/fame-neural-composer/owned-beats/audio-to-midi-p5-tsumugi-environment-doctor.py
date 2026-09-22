@@ -57,9 +57,9 @@ def main():
         ("pyproject","pyproject.toml",spec["source"]["pyprojectGitBlobSha1"]),
         ("uvLock","uv.lock",spec["source"]["uvLockGitBlobSha1"]),
     ]:
-        actual=git_blob_sha1(source/relative)
+        actual=run_text(["git","rev-parse",f"HEAD:{relative}"],cwd=source)
         if actual!=expected:
-            raise RuntimeError(f"Tsumugi {relative} blob mismatch: {actual} != {expected}")
+            raise RuntimeError(f"Tsumugi {relative} Git blob mismatch: {actual} != {expected}")
         blob_checks[key]=actual
 
     checkpoint_bytes=checkpoint.stat().st_size
@@ -85,6 +85,13 @@ def main():
     raw=load_checkpoint(checkpoint)
     model_config=extract_model_config(raw)
     training_args=extract_training_args(raw)
+
+    if not str(torch.__version__).startswith(str(spec["runtime"]["torch"])):
+        raise RuntimeError(f"Torch version mismatch: {torch.__version__} != {spec['runtime']['torch']}")
+    if not str(torchaudio.__version__).startswith(str(spec["runtime"]["torchaudio"])):
+        raise RuntimeError(f"Torchaudio version mismatch: {torchaudio.__version__} != {spec['runtime']['torchaudio']}")
+    if not (sys.version_info >= (3,10) and sys.version_info < (3,15)):
+        raise RuntimeError(f"Unsupported Python for Tsumugi: {sys.version.split()[0]}")
 
     cuda_available=bool(torch.cuda.is_available())
     if not cuda_available:
