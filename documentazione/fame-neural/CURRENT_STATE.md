@@ -28,6 +28,16 @@ Il renderer della review indipendente sintetizza dai JSON, non dai MIDI riletti,
 
 Il contour pYIN salvato omette i frame scartati; aumentare `maximumGapFrames` non allunga automaticamente le code e `fmax=300` riguarda la fondamentale, non le armoniche. NMF con template e attivazioni per strumento è una proposta da confrontare su development, non una soluzione adottata. Dettagli e fonti nel checkpoint; nessuna nuova autorizzazione a training/batch131.
 
+## Prossimi passi attivi — NDR-093
+
+Seguire il [piano operativo Audio→MIDI P1–P6](ROADMAP_FAME_NEURAL.md#piano-operativo-attivo--audiomidi-dopo-ndr-092), che prevale sui “prossimi passi” dei checkpoint storici sotto.
+
+**Stato:** piano adottato, P1–P6 DA ESEGUIRE. Primo passo: inventario/protocollo (P1), poi verifica/versionamento renderer ed equivalenza JSON–MIDI (P2), quindi nuova diagnostica easy Audio→MIDI (P3). Le evidenze decidono le correzioni su development (P4–P5); la promozione richiede un nuovo cohort indipendente (P6).
+
+La prova easy storica è conservata nel [checkpoint dell'11 settembre](OWNED_BEATS_AUDIO_ANALYSIS_EASY_SANITY_CHECKPOINT_2026-09-11.md) e in NDR-050: riguardava Audio Analysis/sezioni, non Audio→MIDI. Il nuovo passaggio easy serve a isolare i difetti e non sostituisce i test rappresentativi. Disponibilità locale e diritti dei file devono essere verificati.
+
+Questo aggiornamento è documentale: nessuna nuova esecuzione audio, correzione del renderer o selezione algoritmica viene dichiarata completata. Gate, risultati e cohort consumati restano invariati.
+
 ## Checkpoint precedente — R6 Audio Analysis finale chiuso / V2_PROMOTE — 20/09/2026
 
 Checkpoint completo: [Owned Beats — Audio Analysis R6 final holdout](OWNED_BEATS_AUDIO_ANALYSIS_R6_FINAL_HOLDOUT_2026-09-20.md).
