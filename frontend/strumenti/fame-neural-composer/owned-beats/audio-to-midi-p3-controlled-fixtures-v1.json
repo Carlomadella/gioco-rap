@@ -1,0 +1,59 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-p3-controlled-fixtures-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_FIRST_P3_FIXTURE_BASELINE_RUN",
+  "createdAt": "2026-09-22",
+  "purpose": "CONTROLLED_CLEAN_STEM_DIAGNOSTIC_BEFORE_REAL_EASY_BEATS",
+  "audio": {
+    "sampleRate": 22050,
+    "channels": 1,
+    "durationSeconds": 4.0,
+    "pcm": "s16le-wav",
+    "bpm": 120.0
+  },
+  "metrics": {
+    "drums": {
+      "supportedRoles": ["kick", "snare", "hihat"],
+      "onsetToleranceSeconds": 0.03,
+      "matching": "one-to-one same-role maximum matching",
+      "secondaryToleranceSeconds": 0.05
+    },
+    "lowEnd": {
+      "onsetToleranceSeconds": 0.05,
+      "pitchToleranceCents": 50.0,
+      "offsetRatio": 0.2,
+      "offsetMinimumSeconds": 0.05
+    }
+  },
+  "fixtures": [
+    {"id":"D01_KICK_ISOLATED","domain":"drums","factor":"isolated kick","drumEvents":[{"timeSeconds":0.5,"role":"kick"},{"timeSeconds":1.5,"role":"kick"},{"timeSeconds":2.5,"role":"kick"},{"timeSeconds":3.5,"role":"kick"}]},
+    {"id":"D02_SNARE_ISOLATED","domain":"drums","factor":"isolated snare","drumEvents":[{"timeSeconds":0.5,"role":"snare"},{"timeSeconds":1.5,"role":"snare"},{"timeSeconds":2.5,"role":"snare"},{"timeSeconds":3.5,"role":"snare"}]},
+    {"id":"D03_HIHAT_ISOLATED","domain":"drums","factor":"isolated hi-hat","drumEvents":[{"timeSeconds":0.5,"role":"hihat"},{"timeSeconds":1.0,"role":"hihat"},{"timeSeconds":1.5,"role":"hihat"},{"timeSeconds":2.0,"role":"hihat"},{"timeSeconds":2.5,"role":"hihat"},{"timeSeconds":3.0,"role":"hihat"},{"timeSeconds":3.5,"role":"hihat"}]},
+    {"id":"D04_KICK_SNARE_SIMULTANEOUS","domain":"drums","factor":"kick+snare simultaneous","drumEvents":[{"timeSeconds":0.5,"role":"kick"},{"timeSeconds":0.5,"role":"snare"},{"timeSeconds":1.5,"role":"kick"},{"timeSeconds":1.5,"role":"snare"},{"timeSeconds":2.5,"role":"kick"},{"timeSeconds":2.5,"role":"snare"},{"timeSeconds":3.5,"role":"kick"},{"timeSeconds":3.5,"role":"snare"}]},
+    {"id":"D05_KICK_HIHAT_SIMULTANEOUS","domain":"drums","factor":"kick+hi-hat simultaneous","drumEvents":[{"timeSeconds":0.5,"role":"kick"},{"timeSeconds":0.5,"role":"hihat"},{"timeSeconds":1.5,"role":"kick"},{"timeSeconds":1.5,"role":"hihat"},{"timeSeconds":2.5,"role":"kick"},{"timeSeconds":2.5,"role":"hihat"},{"timeSeconds":3.5,"role":"kick"},{"timeSeconds":3.5,"role":"hihat"}]},
+    {"id":"D06_HIHAT_TRIPLETS","domain":"drums","factor":"hi-hat triplets","drumEvents":[{"timeSeconds":0.5,"role":"hihat"},{"timeSeconds":0.666667,"role":"hihat"},{"timeSeconds":0.833333,"role":"hihat"},{"timeSeconds":1.5,"role":"hihat"},{"timeSeconds":1.666667,"role":"hihat"},{"timeSeconds":1.833333,"role":"hihat"},{"timeSeconds":2.5,"role":"hihat"},{"timeSeconds":2.666667,"role":"hihat"},{"timeSeconds":2.833333,"role":"hihat"}]},
+    {"id":"D07_KICK_SYNCOPATED","domain":"drums","factor":"syncopated kick","drumEvents":[{"timeSeconds":0.5,"role":"kick"},{"timeSeconds":1.25,"role":"kick"},{"timeSeconds":1.75,"role":"kick"},{"timeSeconds":2.625,"role":"kick"},{"timeSeconds":3.25,"role":"kick"}]},
+    {"id":"D08_UNSUPPORTED_CLAP_RIM","domain":"drums","factor":"clap/rim outside baseline taxonomy","drumEvents":[{"timeSeconds":0.5,"role":"clap","unsupportedByBaseline":true},{"timeSeconds":1.5,"role":"rim","unsupportedByBaseline":true},{"timeSeconds":2.5,"role":"clap","unsupportedByBaseline":true},{"timeSeconds":3.5,"role":"rim","unsupportedByBaseline":true}]},
+    {"id":"L01_SUSTAINED_NOTE","domain":"lowend","factor":"sustained note","lowEndNotes":[{"startSeconds":0.5,"endSeconds":3.5,"midiNote":45}]},
+    {"id":"L02_NOTE_CHANGE","domain":"lowend","factor":"discrete pitch change","lowEndNotes":[{"startSeconds":0.4,"endSeconds":0.9,"midiNote":45},{"startSeconds":1.1,"endSeconds":1.6,"midiNote":48},{"startSeconds":1.8,"endSeconds":2.3,"midiNote":41},{"startSeconds":2.5,"endSeconds":3.0,"midiNote":43}]},
+    {"id":"L03_GLIDE","domain":"lowend","factor":"continuous glide","lowEndGlide":{"startSeconds":0.5,"endSeconds":3.5,"startMidi":40.0,"endMidi":45.0,"referencePointStepSeconds":0.05}},
+    {"id":"L04_GAP_RELEASE","domain":"lowend","factor":"gap and release","lowEndNotes":[{"startSeconds":0.5,"endSeconds":1.2,"midiNote":45},{"startSeconds":1.5,"endSeconds":2.2,"midiNote":45},{"startSeconds":2.8,"endSeconds":3.3,"midiNote":45}]}
+  ],
+  "safety": {
+    "freshOwnedBeatFamiliesConsumed": 0,
+    "sourceSeparationRequiredForControlledStage": false,
+    "trainingAuthorized": false,
+    "batch131Authorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "nextAction": "PREPARE_APPEND_ONLY_CONTROLLED_FIXTURES_THEN_RUN_FROZEN_BASELINE",
+  "advancement": {
+    "controlledStageCompleteWhen": [
+      "all 12 fixtures execute",
+      "reference annotations and generated audio hashes verify",
+      "event/note metrics and intermediate diagnostics are persisted"
+    ],
+    "scorePolicy": "DIAGNOSTIC_ONLY_NO_POST_HOC_PROMOTION_THRESHOLD",
+    "nextDecision": "P4 uses per-case evidence; P3 scores do not select a new algorithm"
+  }
+}
