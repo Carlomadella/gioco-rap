@@ -1730,3 +1730,29 @@ Il prossimo ramo cambia fonte di informazione: prima candidata pretrained da pre
 Prima di ogni audio access vanno verificati source commit, source lock, ambiente dedicato, checkpoint SHA/bytes e licenza. Il controlled stage userà solo le fixture P3 già congelate e non autorizza training.
 
 Checkpoint: [P5 subset+BIC negative/partial](OWNED_BEATS_AUDIO_TO_MIDI_P5_SUBSET_BIC_NEGATIVE_2026-09-22.md).
+
+
+## NDR-099 — Tsumugi controlled gate FAIL; localizzazione read-only prima del real-easy
+
+**Stato: ACCEPTED — 22 settembre 2026.**
+
+`tsumugi-drums-v1_5` ha completato `audio-to-midi-p5-tsumugi-controlled-v1-001` sulle otto fixture drums congelate.
+
+Esiti principali:
+
+- D01 kick isolato: F1 1.0;
+- D02 snare isolato: F1 0.666667, 4/4 snare corretti + 4 hi-hat falsi;
+- D03 hi-hat isolato: F1 0.0, zero eventi;
+- D04 kick+snare simultanei: F1 0.5, kick 4/4, snare 0/4, 4 hi-hat falsi;
+- D05 kick+hi-hat simultanei: F1 1.0, 8/8 eventi corretti;
+- D06 hi-hat triplets: F1 0.0, zero eventi;
+- D07 kick sincopato: F1 0.0, zero eventi;
+- D08 clap/rim diagnostico: 2 hi-hat predetti.
+
+Il pattern è identico anche a 50 ms, quindi non è spiegato dal primary onset tolerance a 30 ms.
+
+Il risultato dimostra capacità multi-hit reale (D05) e corretta rilevazione di almeno alcuni kick/snare sintetici (D01/D02), ma mostra forte sensibilità a timbro e contesto. Il generatore P3 usa seed diversi per fixture/evento, quindi fixture della stessa classe non hanno waveform identiche.
+
+Decisione: Tsumugi non è promosso dal controlled gate. Nessun retuning di note bias, instrument-pair gate, merge o altri parametri dopo aver visto i risultati. Prima di qualsiasi accesso real-easy si esegue una localizzazione read-only sui result JSON persistiti, verificando decoder stats e pitch raw/canonici. Beat reali, P6, training e batch131 restano chiusi.
+
+Checkpoint: [Tsumugi controlled gate FAIL](OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_CONTROLLED_FAIL_2026-09-22.md).
