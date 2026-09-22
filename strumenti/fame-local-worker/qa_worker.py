@@ -139,6 +139,29 @@ def validate(answer, text):
     return errors
 
 
+def retry_feedback(errors):
+    """Turn validator codes into actionable, non-oracle retry guidance."""
+    hints = []
+    if any(error.endswith('_QUOTE_MISMATCH') for error in errors):
+        hints.append('QUOTE_MISMATCH: copia il testo esattamente dal campo text della stessa riga numerata; non parafrasare e verifica che line e quote appartengano alla stessa riga.')
+    if any(error.endswith('_IRRELEVANT_EVIDENCE') for error in errors):
+        hints.append('IRRELEVANT_EVIDENCE: rimuovi citazioni che non sostengono direttamente quella categoria e rileggi il report per trovare evidenza pertinente.')
+    if any(error.endswith('_INSUFFICIENT_EVIDENCE') for error in errors):
+        hints.append('INSUFFICIENT_EVIDENCE: la finding non copre tutti gli elementi necessari della propria affermazione; rileggi l intero report e aggiungi solo evidenze distinte e pertinenti.')
+    if any(error.endswith('_NEXT_CHECK') for error in errors):
+        hints.append('NEXT_CHECK: riesamina il controllo proposto usando esclusivamente il significato della finding, il report e il catalogo nextChecks; non mantenere automaticamente la scelta precedente.')
+    if 'INCOMPLETE_OR_UNORDERED_FINDINGS' in errors:
+        hints.append('INCOMPLETE_OR_UNORDERED_FINDINGS: ricostruisci tutte e sole le categorie supportate, una volta ciascuna, nell ordine esatto in cui compaiono nel catalogo categories.')
+    if 'DUPLICATE_CODE' in errors or any(error.endswith('_DUPLICATE_CITATION') for error in errors):
+        hints.append('DUPLICATE: elimina categorie o citazioni duplicate.')
+    if any(error.startswith('INVALID_RESPONSE:') for error in errors):
+        hints.append('INVALID_RESPONSE: ricostruisci da zero un JSON conforme allo schema senza tool call, testo libero o campi extra.')
+    return ('Controlli falliti: ' + ', '.join(errors) + '. '
+            'Non riutilizzare la risposta precedente senza verificarla: ricostruisci l intera risposta dal report numerato. '
+            + ' '.join(hints)
+            + ' Non inventare righe, quote, categorie o controlli; non viene fornita la soluzione attesa dal validatore.')
+
+
 def render(answer):
     parts = ['# Revisione QA — bozza validata per il caso congelato',
              '\nNon autorizza esecuzioni, training o apertura di nuovi dati.\n']
@@ -209,7 +232,7 @@ def run(root, model, attempts=2, client=None):
                     report.update(status='VALIDATED_FOR_REVIEW',acceptedAfterRetry=n>1)
                     break
                 messages.append({'role':'assistant','content':msg.get('content','') if type(msg) is dict else ''})
-                messages.append({'role':'user','content':'Controlli falliti: '+', '.join(errors)+'. Rileggi il report intero e correggi. Le citazioni devono essere esatte.'})
+                messages.append({'role':'user','content':retry_feedback(errors)})
             else:
                 report['status'] = 'REJECTED'
         except Exception as exc:
