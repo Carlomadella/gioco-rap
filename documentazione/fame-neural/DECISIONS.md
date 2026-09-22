@@ -1590,3 +1590,31 @@ A ogni passaggio GPT-5 deve riportare versioni, input, verifiche effettivamente 
 - Restano invariati P1 come prossimo passo, divieto di tuning sui 12 consumati, nuova evaluation fresca P6 e chiusura di batch131/training/task-data readiness. Nessun algoritmo o risultato storico è modificato da questo addendum.
 
 Dettagli operativi nel piano P4/P5 della roadmap; CURRENT_STATE riporta la stessa precisazione.
+
+## NDR-094 — P1/P2 chiusi; renderer v2 obbligatorio per i confronti futuri
+
+**Stato: ACCEPTED — 22 settembre 2026.**
+
+P1 è chiuso con PASS: inventario/protocollo diagnostico versionati, 131 record/131 family verificati e **91 family fresche non assegnate** secondo i criteri congelati. I tre easy storici non risultano presenti nel workspace `D:\FAME_NEURAL`; i diritti di utilizzo sono confermati dall'utente. La loro identità o quella di sostituti autorizzati deve essere congelata prima del primo run P3.
+
+P2 è chiuso con PASS:
+
+- `FAME_NEURAL_P2_DIAGNOSTIC_AUDIT_PASS`;
+- 12/12 family del cohort consumato risultano JSON↔MIDI equivalenti secondo il contratto P2;
+- zero overflow rispetto alla durata reference;
+- nessun source audio aperto, nessuna source separation/transcription/retuning eseguita;
+- nessun artefatto o voto storico modificato.
+
+Il renderer storico v1 resta immutato ma **non va usato per nuovi confronti decisionali** perché deriva la durata dall'ultimo evento. Il differenziale `reference - renderer v1` osservato sulle 12 family varia:
+
+- drums: da -0.153832 s a +9.344331 s;
+- bass notes: da -0.043152 s a +9.280862 s;
+- bass contour: da +0.018458 s a +9.342472 s.
+
+Questo risultato dimostra un limite del sistema di misura storico, non l'entità del suo effetto sui voti. L'impatto sui punteggi Human QA storici non è misurato e i voti/outcome NDR-092 restano invariati.
+
+Per ogni confronto futuro di questo filone si usa il renderer v2 a **durata reference esplicita**, con overflow esplicito e casi senza eventi a silenzio piena-durata. L'equivalenza JSON↔MIDI è un gate tecnico separato dalla qualità musicale.
+
+P3 easy Audio→MIDI diventa il passo attivo. Training, batch131 e task-data readiness restano chiusi.
+
+Checkpoint: [Owned Beats — Audio→MIDI P2 measurement/export audit — PASS](OWNED_BEATS_AUDIO_TO_MIDI_P2_MEASUREMENT_PASS_2026-09-22.md).
