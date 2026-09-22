@@ -42,7 +42,9 @@ La prova easy storica è conservata nel [checkpoint dell'11 settembre](OWNED_BEA
 
 **Esito P3/P4 — NDR-095:** controlled fixtures completate senza consumare family fresche. D01/D03/D06/D07 PASS; D02 classifica 4/4 snare come hihat pur con transient recall 1.0; D04/D05 mostrano il limite multi-role della classificazione single-label con unique-transient recall 1.0. Low-end: L01/L02/L04 F1 1.0 e L03 glide median absolute pitch error 2.879475 cent. Non si ritoccano low-end o onset timing e non si ricavano nuove soglie dal solo sintetico. Protocollo P5 congelato in `audio-to-midi-p5-drums-comparison-v1.json`. Checkpoint: [P3 controlled diagnostic / P4 decision](OWNED_BEATS_AUDIO_TO_MIDI_P3_P4_DECISION_2026-09-22.md).
 
-Il prossimo passo attivo è P5: implementare e confrontare `drums-independent-multilabel-spectral-v1` sui fixture controllati prima del real-easy. Gate, risultati e cohort consumati restano invariati; batch131, training e task-data readiness restano chiusi.
+**Esito P5 candidata 1 — NDR-096:** `drums-independent-multilabel-spectral-v1` è un negative result controllato. Recupera le simultaneità ma genera co-attivazioni broadband: D05 F1 0.8 con 4 FP, D06 F1 0.5 con 18 FP, D07 F1 0.5 con 10 FP. Non vengono ritoccate soglie sul sintetico. La seconda candidata P5 `drums-pfnmf-template-activation-v1` è ora implementata per un controlled mechanics test con template fissi D01/D02/D03, KL-NMF, `rH=0`, nessun template adaptation e threshold adattivo precongelato. Anche un eventuale PASS resta meccanico e non autorizza real-easy senza nuova strategia template/provenance.
+
+Il prossimo passo attivo è eseguire il controlled PF-NMF comparison append-only. Gate, risultati e cohort consumati restano invariati; batch131, training e task-data readiness restano chiusi.
 
 ## Checkpoint precedente — R6 Audio Analysis finale chiuso / V2_PROMOTE — 20/09/2026
 
