@@ -30,7 +30,7 @@ class V2Tests(unittest.TestCase):
 
     def teach(self):
         d = self.prepare('teach')
-        (d / 'memory/procedure.md').write_text(lab.TEACH)
+        (d / 'memory/procedure.md').write_text(lab.TEACH, encoding='utf-8')
         lab.dump(d / 'answer.json', lab.expected(lab.records('teach')))
         self.call(lab.freeze, self.root)
         return d
