@@ -44,7 +44,9 @@ La prova easy storica è conservata nel [checkpoint dell'11 settembre](OWNED_BEA
 
 **Esito P5 candidata 1 — NDR-096:** `drums-independent-multilabel-spectral-v1` è un negative result controllato. Recupera le simultaneità ma genera co-attivazioni broadband: D05 F1 0.8 con 4 FP, D06 F1 0.5 con 18 FP, D07 F1 0.5 con 10 FP. Non vengono ritoccate soglie sul sintetico. La seconda candidata P5 `drums-pfnmf-template-activation-v1` è ora implementata per un controlled mechanics test con template fissi D01/D02/D03, KL-NMF, `rH=0`, nessun template adaptation e threshold adattivo precongelato. Anche un eventuale PASS resta meccanico e non autorizza real-easy senza nuova strategia template/provenance.
 
-Il prossimo passo attivo è eseguire il controlled PF-NMF comparison append-only. Gate, risultati e cohort consumati restano invariati; batch131, training e task-data readiness restano chiusi.
+**Esito P5 candidata 2 — NDR-097:** `drums-pfnmf-template-activation-v1` è un negative/partial result controllato. Il factorization converge ma restano cross-activation spurie: D05 F1 0.8 con 4 FP, D06 F1 0.642857 con 10 FP, D07 F1 0.5 con 10 FP; D04 recupera kick+snare ma aggiunge hihat falsi. Non vengono ritoccate soglie post-hoc. La terza candidata `drums-transient-subset-bic-v1` è congelata prima del primo risultato: onset detector baseline invariato, tutti i 7 sottoinsiemi kick/snare/hihat, ampiezze NNLS e scelta del sottoinsieme via BIC senza soglie di classe.
+
+Il prossimo passo attivo è eseguire il controlled transient-subset+BIC comparison append-only. Gate, risultati e cohort consumati restano invariati; batch131, training e task-data readiness restano chiusi.
 
 ## Checkpoint precedente — R6 Audio Analysis finale chiuso / V2_PROMOTE — 20/09/2026
 
