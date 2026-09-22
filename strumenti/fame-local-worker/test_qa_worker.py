@@ -40,6 +40,25 @@ def observed_qwen_v4():
                         for code,nums in entries]}
 
 
+def observed_qwen_v5_retry():
+    ids=by_line()
+    entries=[
+        ('GATE_FAIL',[36,38,65]),
+        ('SNARE_HAT_CONFUSION',[41,43,59]),
+        ('MISSING_EVENTS',[42,45,46,47]),
+        ('D08_OUTSIDE_GATE',[47]),
+        ('PAIR_CONFIDENCE_UNKNOWN',[81,83,85,89]),
+        ('ZERO_INTERVALS',[88])]
+    return {'findings':[{'code':code,'evidenceIds':[ids[n] for n in nums]}
+                        for code,nums in entries]}
+
+
+def observed_qwen_v5_first_cached():
+    full=golden()
+    keep={'SNARE_HAT_CONFUSION','TIMBRE_HYPOTHESIS','D08_OUTSIDE_GATE','ZERO_INTERVALS'}
+    return {'findings':[row for row in full['findings'] if row['code'] in keep]}
+
+
 class QAWorkerTests(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory()
@@ -73,6 +92,42 @@ class QAWorkerTests(unittest.TestCase):
 
     def test_qwen_v4_output_only_missing_timbre(self):
         self.assertEqual(qa.validate(observed_qwen_v4(),qa.case_text()),['INCOMPLETE_FINDINGS'])
+
+
+    def test_qwen_v5_extra_context_is_nonfatal_and_sanitized(self):
+        answer=observed_qwen_v5_retry()
+        self.assertEqual(qa.validate(answer,qa.case_text()),['INCOMPLETE_FINDINGS'])
+        drops=qa.evidence_drops(answer,qa.case_text())
+        dropped={item['code']:item['droppedEvidenceIds'] for item in drops}
+        ids=by_line()
+        self.assertEqual(dropped['GATE_FAIL'],[ids[36]])
+        self.assertEqual(dropped['MISSING_EVENTS'],[ids[47]])
+        self.assertEqual(dropped['PAIR_CONFIDENCE_UNKNOWN'],[ids[85]])
+        gate=next(row for row in answer['findings'] if row['code']=='GATE_FAIL')
+        clean=qa.sanitize_finding(gate,qa.case_text())
+        self.assertEqual(clean['evidenceIds'],[ids[38],ids[65]])
+
+    def test_real_qwen_v5_pattern_closes_on_retry(self):
+        result=self.run_qa(FakeOllama([
+            response(observed_qwen_v5_first_cached()),
+            response(observed_qwen_v5_retry())]))
+        self.assertEqual(result['status'],'VALIDATED_FOR_REVIEW')
+        self.assertFalse(result['firstAttemptPass'])
+        self.assertTrue(result['acceptedAfterRetry'])
+        self.assertTrue(result['assembledAcrossAttempts'])
+        out=next((self.root/'runs').iterdir())
+        validation=agent.read(out/'attempt-2-validation.json')
+        self.assertEqual(validation['assembledErrors'],[])
+        self.assertEqual(
+            {item['code'] for item in validation['droppedEvidence']},
+            {'GATE_FAIL','MISSING_EVENTS','PAIR_CONFIDENCE_UNKNOWN'})
+        accepted=agent.read(out/'answer.json')
+        for finding in accepted['findings']:
+            self.assertNotIn(36,[item['line'] for item in finding['evidence']])
+            if finding['code']=='MISSING_EVENTS':
+                self.assertNotIn(47,[item['line'] for item in finding['evidence']])
+            if finding['code']=='PAIR_CONFIDENCE_UNKNOWN':
+                self.assertNotIn(85,[item['line'] for item in finding['evidence']])
 
     def test_irrelevant_invalid_and_insufficient_evidence(self):
         ids=by_line()
