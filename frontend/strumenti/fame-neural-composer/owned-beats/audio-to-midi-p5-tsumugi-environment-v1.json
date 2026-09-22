@@ -1,7 +1,7 @@
 {
   "schema": "fame-owned-beats-audio-to-midi-p5-tsumugi-environment-v1",
   "version": 1,
-  "status": "FROZEN_PREFLIGHT_BEFORE_FIRST_TSUMUGI_AUDIO_ACCESS",
+  "status": "PREFLIGHT_PASS_LOCKED_BEFORE_FIRST_TSUMUGI_AUDIO_ACCESS",
   "createdAt": "2026-09-22",
   "decision": "NDR-098",
   "candidateId": "tsumugi-drums-v1_5",
@@ -86,5 +86,19 @@
     "batch131Authorized": false,
     "taskDataReadyMayBeDeclared": false
   },
-  "nextAction": "PREPARE_AND_VERIFY_TSUMUGI_ENVIRONMENT_WITHOUT_AUDIO"
+  "nextAction": "RUN_FROZEN_TSUMUGI_CONTROLLED_FIXTURE_INFERENCE",
+  "observedPreflight": {
+    "runId": "audio-to-midi-p5-tsumugi-env-v1-001",
+    "pythonVersion": "3.12.14",
+    "torchVersion": "2.13.0+cu130",
+    "torchaudioVersion": "2.11.0+cu130",
+    "cudaAvailable": true,
+    "cudaVersion": "13.0",
+    "deviceName": "NVIDIA GeForce RTX 5070 Ti",
+    "installedPackagesSha256": "b14b2b16bd95bc164e7ab5c57a2dd0c035ea6353acae99cdb5a13913b7b22704",
+    "sourceAudioOpenedByPreflight": false,
+    "fixtureAudioOpenedByPreflight": false,
+    "transcriptionExecutedByPreflight": false,
+    "sourceSeparationExecutedByPreflight": false
+  }
 }
