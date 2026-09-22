@@ -1618,3 +1618,43 @@ Per ogni confronto futuro di questo filone si usa il renderer v2 a **durata refe
 P3 easy Audio→MIDI diventa il passo attivo. Training, batch131 e task-data readiness restano chiusi.
 
 Checkpoint: [Owned Beats — Audio→MIDI P2 measurement/export audit — PASS](OWNED_BEATS_AUDIO_TO_MIDI_P2_MEASUREMENT_PASS_2026-09-22.md).
+
+
+## NDR-095 — P3 localizza il failure drums; P4 seleziona sviluppo multi-label senza retuning low-end
+
+**Stato: ACCEPTED — 22 settembre 2026.**
+
+Il controlled diagnostic P3 `audio-to-midi-p3-controlled-baseline-v1-001` è completato su 12 fixture hash-congelate, senza consumare family proprietarie fresche e senza Source Separation.
+
+Evidenze drums:
+
+- D01 kick isolato: PASS;
+- D02 snare isolato: transient detection PASS 4/4, classificazione FAIL 4/4 come hihat;
+- D03 hi-hat isolato: PASS;
+- D04 kick+snare simultanei: unique-transient detection PASS, multi-role FAIL;
+- D05 kick+hi-hat simultanei: unique-transient detection PASS, multi-role FAIL;
+- D06 hi-hat triplet: PASS;
+- D07 kick sincopato: PASS;
+- D08 clap/rim resta diagnostico fuori tassonomia e non viene riclassificato per gonfiare il punteggio.
+
+Evidenze low-end:
+
+- sustained note, note change e gap/release: F1 1.0;
+- glide: median absolute pitch error 2.879475 cent.
+
+La failure drums è quindi localizzata nel layer di attribuzione ruoli/rappresentazione simultanea prima che nella detection temporale generale. Il classificatore corrente è esclusivo; un singolo transient non può emettere più classi.
+
+Decisioni:
+
+1. low-end resta congelato;
+2. onset detector resta baseline invariata nel primo confronto P5;
+3. nessun threshold tuning viene ricavato dai soli fixture sintetici;
+4. la prima variante P5 è `drums-independent-multilabel-spectral-v1`, con attivazioni indipendenti kick/snare/hihat sullo stesso transient;
+5. PF-NMF/template activation resta seconda candidata di confronto;
+6. OaF Drums resta riferimento esterno, non integrazione selezionata automaticamente;
+7. criteri e budget sono congelati in `audio-to-midi-p5-drums-comparison-v1.json`;
+8. prima del real-easy vanno congelate 3 identità/reference autorizzate;
+9. i 12 record independent evaluation consumati restano esclusi dal tuning;
+10. qualsiasi promozione futura richiede ancora P6 su cohort fresco.
+
+Checkpoint: [P3 controlled diagnostic / P4 decision](OWNED_BEATS_AUDIO_TO_MIDI_P3_P4_DECISION_2026-09-22.md).
