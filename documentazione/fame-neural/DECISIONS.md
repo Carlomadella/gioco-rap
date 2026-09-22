@@ -1694,3 +1694,24 @@ Per il solo controlled mechanics stage:
 Questo test può dimostrare solo la meccanica di attivazioni indipendenti sul sintetico. Anche in caso di PASS non autorizza real-easy senza una strategia separata per template/provenance e non promuove batch131/training/task-data readiness.
 
 Checkpoint negative result: [P5 multilabel spectral candidate](OWNED_BEATS_AUDIO_TO_MIDI_P5_MULTILABEL_NEGATIVE_2026-09-22.md).
+
+
+## NDR-097 — PF-NMF controlled negativo/parziale; terza candidata transient-subset+BIC
+
+**Stato: ACCEPTED — 22 settembre 2026.**
+
+La candidata P5 `drums-pfnmf-template-activation-v1` non supera il gate controllato. Il factorization loop converge sui casi riportati, ma restano co-attivazioni spurie tra template:
+
+- D04: kick+snare recuperati con 4 hihat falsi;
+- D05: 8 TP / 4 FP / 0 FN, F1 0.8, con snare falsi;
+- D06: 9 TP / 10 FP / 0 FN, F1 0.642857, con 9 snare + 1 kick falsi;
+- D07: 5 TP / 10 FP / 0 FN, F1 0.5, con 5 snare + 5 hihat falsi;
+- D08 diagnostico: 9 eventi candidati per 4 riferimenti fuori tassonomia.
+
+Non si ritoccano le soglie delle attivazioni sui fixture. PF-NMF resta negative/partial evidence.
+
+Si congela prima del primo risultato una terza candidata non-learned, `drums-transient-subset-bic-v1`: riusa il detector temporale congelato e, per ogni transient, valuta tutti i sette sottoinsiemi non vuoti di kick/snare/hihat. Ogni sottoinsieme viene fitatto con ampiezze non-negative tramite `scipy.optimize.nnls`; il modello viene scelto con BIC sul residuo spettrale. Nessuna soglia specifica di classe viene tarata.
+
+Questo esperimento resta mechanics-only con template da D01/D02/D03; anche un eventuale PASS non autorizza real-easy, training, batch131 o task-data readiness.
+
+Checkpoint: [P5 PF-NMF controlled negative/partial](OWNED_BEATS_AUDIO_TO_MIDI_P5_PFNMF_NEGATIVE_2026-09-22.md).
