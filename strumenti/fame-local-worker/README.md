@@ -91,3 +91,8 @@ Il controllo semantico usa uno snapshot, poi ricontrolla i file prima dell'accet
 Documentazione API consultata:
 - https://docs.ollama.com/api/chat (schema JSON, opzioni, risposta)
 - https://docs.ollama.com/faq (contesto, GPU, configurazione locale)
+
+
+## Compito QA su un report reale
+
+Disponibile [QA-REVIEW-1](QA_REVIEW.md): lettura del report Tsumugi congelato, citazioni verificate e controlli successivi proposti. Avvio con `qa_worker.py`; la demo manifest e `agent.py` restano invariati. Esito positivo limitato a `VALIDATED_FOR_REVIEW`, senza esecuzioni autorizzate.
