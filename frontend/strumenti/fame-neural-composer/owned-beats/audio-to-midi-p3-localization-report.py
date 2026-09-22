@@ -1,15 +1,24 @@
 #!/usr/bin/env python3
 """Read-only localization report for the completed P3 controlled baseline."""
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
 RUN_ID="audio-to-midi-p3-controlled-baseline-v1-001"
+FIXTURE_RUN_ID="audio-to-midi-p3-fixtures-v1"
 DEFAULT_TOLERANCE=0.03
 DRUM_ROLES={"kick","snare","hihat"}
 
 def read_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8-sig"))
+
+def sha256_file(path):
+    h=hashlib.sha256()
+    with Path(path).open("rb") as f:
+        for chunk in iter(lambda:f.read(1024*1024),b""):
+            h.update(chunk)
+    return h.hexdigest()
 
 def prf(tp,fp,fn):
     precision=tp/(tp+fp) if tp+fp else 0.0
@@ -98,8 +107,12 @@ def simultaneous_groups(reference_events):
         if len(set(roles))>1
     ]
 
-def localize_drum(result,tolerance=DEFAULT_TOLERANCE):
-    ref=result["reference"].get("drumEvents",[])
+def localize_drum(result,reference=None,tolerance=DEFAULT_TOLERANCE):
+    if reference is None:
+        reference=result.get("reference")
+    if not isinstance(reference,dict):
+        raise RuntimeError(f"Reference missing for fixture: {result.get('fixtureId')}")
+    ref=reference.get("drumEvents",[])
     onsets=result["intermediate"].get("drumsOnsetTimesSeconds",[])
     fusion=result["drums"].get("fusionEvents",[])
     onset=onset_metrics(ref,onsets,tolerance)
@@ -145,21 +158,39 @@ def summarize_lowend(result):
     }
 
 def report(workspace):
-    root=Path(workspace).resolve()/"runs"/"audio-to-midi-p3-controlled-baseline"/RUN_ID
+    workspace=Path(workspace).resolve()
+    root=workspace/"runs"/"audio-to-midi-p3-controlled-baseline"/RUN_ID
+    fixtures_root=workspace/"runs"/"audio-to-midi-p3-controlled-fixtures"/FIXTURE_RUN_ID
     summary_file=root/"summary.json"
     if not summary_file.is_file():
         raise RuntimeError(f"P3 summary missing: {summary_file}")
     summary=read_json(summary_file)
     if summary.get("status")!="CONTROLLED_BASELINE_COMPLETE_DIAGNOSTIC_ONLY" or summary.get("records")!=12:
         raise RuntimeError("Unexpected P3 controlled baseline summary")
+    fixture_manifest_file=fixtures_root/"fixture-manifest.json"
+    if not fixture_manifest_file.is_file():
+        raise RuntimeError(f"P3 fixture manifest missing: {fixture_manifest_file}")
+    if sha256_file(fixture_manifest_file)!=summary.get("fixtureManifestSha256"):
+        raise RuntimeError("P3 fixture manifest SHA does not match frozen baseline summary")
 
     drums=[]
     lowend=[]
     for row in summary["results"]:
         result_file=root/row["fixtureId"]/"result.json"
         result=read_json(result_file)
+        annotation_info=result.get("fixtureHashes",{}).get("annotation")
+        if not isinstance(annotation_info,dict):
+            raise RuntimeError(f"Frozen annotation provenance missing: {row['fixtureId']}")
+        reference_file=fixtures_root/annotation_info.get("relativePath","")
+        if not reference_file.is_file():
+            raise RuntimeError(f"Frozen reference missing: {reference_file}")
+        if sha256_file(reference_file)!=annotation_info.get("sha256"):
+            raise RuntimeError(f"Frozen reference SHA mismatch: {row['fixtureId']}")
+        reference=read_json(reference_file)
+        if reference.get("fixtureId")!=row["fixtureId"]:
+            raise RuntimeError(f"Frozen reference identity mismatch: {row['fixtureId']}")
         if result["domain"]=="drums":
-            drums.append(localize_drum(result))
+            drums.append(localize_drum(result,reference))
         elif result["domain"]=="lowend":
             lowend.append(summarize_lowend(result))
 
