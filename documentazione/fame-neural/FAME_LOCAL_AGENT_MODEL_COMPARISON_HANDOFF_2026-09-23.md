@@ -1,5 +1,10 @@
 # Handoff GPT-5.6 — confronto modello locale, 23 settembre 2026
 
+## Prova separata autorizzata: GPT-OSS 20B in Cline
+
+Disponibile [CLINE_GPTOSS_PROBE.md](../../strumenti/fame-local-worker/CLINE_GPTOSS_PROBE.md) con preparatore `cline_gptoss_probe.py`, scrivania sintetica e correttore esterno. Root dedicata `FAME_CLINE_GPTOSS_001`; aprire in Cline solo `desk`. Non interferisce con l'audit QA qui sotto. 8 test del preparatore/correttore passati; nessuna prova reale Cline eseguita dall'assistente. Risultato dell'artefatto e attestazione operatore sono distinti. Non confrontare direttamente questa prova semplice con i punteggi del report QA.
+
+
 ## Checkpoint prioritario: audit rubriche, senza nuove inferenze
 
 Recovery reale riportato: 1/2, rete ancora 13/14 secondo il protocollo congelato. Completato audit delle 14 rubriche; il supporto contestuale E152+E153+E154 viene distinto dalla prova diretta E155. Leggere [RUBRIC_AUDIT.md](../../strumenti/fame-local-worker/RUBRIC_AUDIT.md) ed eseguire `qa_rubric_audit.py` sugli artefatti esistenti. Nessun retry Ollama; esiti storici immutati. Il sidecar distingue conclusione, copertura e citazioni superflue. 26 test con client simulati passati. Questo checkpoint prevale sulle istruzioni operative storiche sotto.
