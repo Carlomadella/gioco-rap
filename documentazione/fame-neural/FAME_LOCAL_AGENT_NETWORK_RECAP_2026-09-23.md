@@ -1,5 +1,10 @@
 # FAME Neural — Recap rete agenti locali
 
+## Checkpoint attuale: recovery del risultato 13/14
+
+La rete 001 ha riportato 13/14 decisioni accettate (9/10 finding e 4/4 controlli negativi). Il solo LOWEND_CAUSES_UNPROVEN ha evidenze incomplete. Procedere con [RECOVERY.md](../../strumenti/fame-local-worker/RECOVERY.md) e `qa_recovery.py`: due sottoincarichi, massimo due nuove chiamate, risultato originale conservato. Non ripetere il confronto monolitico né ricreare la rete 001. Questo aggiornamento prevale sulle istruzioni operative storiche riportate sotto. Recovery reale ancora da eseguire; 19 test del codice passati con client simulato.
+
+
 Data: 23/09/2026
 
 ## Obiettivo

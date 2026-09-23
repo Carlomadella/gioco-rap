@@ -1,0 +1,30 @@
+{
+  "schema": "fame-network-operator-observation-v1",
+  "provenance": "Trascrizione dell'output e del dettaglio forniti dall'operatore in chat; nessun accesso indipendente al disco Windows o esecuzione locale del modello da parte dell'assistente.",
+  "sourceRoot": "FAME_AGENT_NETWORK_001",
+  "summaryStamp": "20260923T130810775824Z",
+  "status": "NEEDS_REVIEW",
+  "acceptedDecisions": 13,
+  "totalDecisions": 14,
+  "acceptedFindings": 9,
+  "expectedFindings": 10,
+  "negativeControlsAccepted": 4,
+  "failedCode": "LOWEND_CAUSES_UNPROVEN",
+  "failureStatus": "SEMANTIC_FAIL",
+  "elapsedModelSecondsReported": 37.40600000030827,
+  "failedAnswerReported": {
+    "supported": true,
+    "evidenceIds": [
+      "E147",
+      "E148",
+      "E149",
+      "E152",
+      "E153",
+      "E154",
+      "E155"
+    ]
+  },
+  "assessment": "Evidenze sull'incertezza dei silenzi delle note alte; manca la copertura dell'incertezza della release corta. Recupero separato, senza cambiare esito first-pass o rubrica originale.",
+  "recoveryExecuted": false,
+  "independentEvaluation": false
+}

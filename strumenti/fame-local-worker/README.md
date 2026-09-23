@@ -1,5 +1,10 @@
 # FAME Direct Worker v1 — Ollama senza Cline
 
+## Checkpoint attuale: recovery del risultato 13/14
+
+La rete 001 ha riportato 13/14 decisioni accettate (9/10 finding e 4/4 controlli negativi). Il solo LOWEND_CAUSES_UNPROVEN ha evidenze incomplete. Procedere con [RECOVERY.md](RECOVERY.md) e `qa_recovery.py`: due sottoincarichi, massimo due nuove chiamate, risultato originale conservato. Non ripetere il confronto monolitico né ricreare la rete 001. Questo aggiornamento prevale sulle istruzioni operative storiche riportate sotto. Recovery reale ancora da eseguire; 19 test del codice passati con client simulato.
+
+
 ## Flusso coordinato attuale
 
 Il primo coordinatore con scrivanie specializzate e pronto: leggere [COORDINATOR.md](COORDINATOR.md). Una categoria per agente, 14 incarichi in sequenza sullo stesso GPT-OSS, stato persistente e controlli congelati. Si usa `qa_coordinator.py` in una nuova rete `FAME_AGENT_NETWORK_001`; i test e i risultati precedenti restano separati. Nessun risultato reale della rete ancora disponibile.

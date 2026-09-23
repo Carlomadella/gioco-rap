@@ -1,5 +1,10 @@
 # Handoff GPT-5.6 — confronto modello locale, 23 settembre 2026
 
+## Checkpoint attuale: recovery del risultato 13/14
+
+La rete 001 ha riportato 13/14 decisioni accettate (9/10 finding e 4/4 controlli negativi). Il solo LOWEND_CAUSES_UNPROVEN ha evidenze incomplete. Procedere con [RECOVERY.md](../../strumenti/fame-local-worker/RECOVERY.md) e `qa_recovery.py`: due sottoincarichi, massimo due nuove chiamate, risultato originale conservato. Non ripetere il confronto monolitico né ricreare la rete 001. Questo aggiornamento prevale sulle istruzioni operative storiche riportate sotto. Recovery reale ancora da eseguire; 19 test del codice passati con client simulato.
+
+
 ## Prossimo lavoro: rete coordinata autorizzata
 
 L'operatore ha chiesto di costruire il flusso coordinato. Implementazione disponibile in `strumenti/fame-local-worker/qa_coordinator.py`; protocollo, comandi e limiti in `strumenti/fame-local-worker/COORDINATOR.md`. Da qui proseguire con la nuova rete `FAME_AGENT_NETWORK_001`, una categoria per scrivania. Non ripetere la diagnostica precedente. Quattordici incarichi sequenziali, dieci affermazioni vere e quattro false valutate lato host, con rubric invariata. Nuovo prompt e formato: esperimento distinto, non prova causale pura del sovraccarico. Nessun run reale della rete ancora eseguito durante la preparazione.
