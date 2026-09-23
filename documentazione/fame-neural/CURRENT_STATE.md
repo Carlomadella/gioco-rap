@@ -1,5 +1,11 @@
 # FAME Neural — Current State
 
+## Secondo incarico Direct QA congelato — subset+BIC
+
+Preparato `subset-bic-review-v1` sul checkpoint storico NDR-098 `OWNED_BEATS_AUDIO_TO_MIDI_P5_SUBSET_BIC_NEGATIVE_2026-09-22.md`. Il pacchetto verifica cinque affermazioni: gate+D06, localizzazione del bottleneck e stop del loop euristico, scope del passaggio a Tsumugi, training non autorizzato e MT3 non ancora chiarito come prima scelta. Fonte integrale ricomposta da 15 unita semantiche e rubrica host-only congelata prima del run.
+
+Il task e distinto da `pfnmf-review-v1` e deve essere eseguito in una nuova root `FAME_DIRECT_QA_NETWORK_002`, una sola volta. Il run reale non e ancora eseguito. Dettagli in [DIRECT_QA_WORKER.md](../../strumenti/fame-local-worker/DIRECT_QA_WORKER.md).
+
 ## Primo run reale Direct QA — PF-NMF VALIDATED_FOR_REVIEW
 
 Il primo incarico della coda generica, `pfnmf-review-v1`, e stato eseguito una sola volta su `FAME_DIRECT_QA_NETWORK_001` con esito operator-reported `VALIDATED_FOR_REVIEW`, `modelCalls=1`, `executionAuthorized=false`. La review prodotta e coerente con la rubrica congelata: gate/cross-activation supportati da U02+U03, D06 9 snare + 1 kick da U03, scope BIC da U06, apertura training non supportata.

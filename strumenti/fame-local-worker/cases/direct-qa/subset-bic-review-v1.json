@@ -1,0 +1,144 @@
+{
+  "taskId": "subset-bic-review-v1",
+  "sourceCommit": "1283c9678ece6b64ea6b030b75236bed24cddad6",
+  "sourcePath": "documentazione/fame-neural/OWNED_BEATS_AUDIO_TO_MIDI_P5_SUBSET_BIC_NEGATIVE_2026-09-22.md",
+  "sourceSnapshot": "cases/direct-qa/subset-bic-source.md",
+  "sourceSha256": "d715ca71c1faa75e44922b428333f1d2d908814b195b96f3de0afc8500e0c3aa",
+  "scope": "Revisione del checkpoint storico NDR-098. Verificare esito, pattern residuo, decisione di fermare il loop euristico e vincoli del passaggio al ramo pretrained. Non eseguire decisioni né trattare il documento come stato corrente.",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "# Owned Beats — P5 transient subset+BIC — controlled negative/partial result"
+    },
+    {
+      "unitId": "U02",
+      "text": "Data: 22 settembre 2026  \nDecisione: NDR-098  \nBranch: `feature/fame-neural-roadmap`"
+    },
+    {
+      "unitId": "U03",
+      "text": "## Esito"
+    },
+    {
+      "unitId": "U04",
+      "text": "La candidata `drums-transient-subset-bic-v1` non supera il gate controllato. Il run termina con:"
+    },
+    {
+      "unitId": "U05",
+      "text": "`STOP_CONTROLLED_NONLEARNED_VARIANT_LOOP_AND_REASSESS_REAL_TEMPLATE_OR_LEARNED_MULTI_LABEL_PATH`."
+    },
+    {
+      "unitId": "U06",
+      "text": "Evidenze verificate dall'output del run:"
+    },
+    {
+      "unitId": "U07",
+      "text": "- D05 kick+hi-hat: 8 TP / 2 FP / 0 FN, precision 0.8, recall 1.0, F1 0.888889; due transient selezionano ancora `kick+snare+hihat` e introducono snare falsi;\n- D06 hi-hat triplets: 9 TP / 9 FP / 0 FN, precision 0.5, recall 1.0, F1 0.666667; tutti i nove transient selezionano `snare+hihat`, quindi lo snare resta una falsa co-attivazione sistematica;\n- D07 kick sincopato: 5 TP / 0 FP / 0 FN, precision/recall/F1 1.0; il candidato seleziona `kick` per tutti i cinque transient;\n- D08 clap/rim diagnostico: 7 eventi candidati per riferimenti fuori tassonomia; i subset scelti includono combinazioni e snare singoli."
+    },
+    {
+      "unitId": "U08",
+      "text": "## Interpretazione"
+    },
+    {
+      "unitId": "U09",
+      "text": "La selezione esplicita del subset migliora nettamente la precisione rispetto ai detector multi-label indipendenti e PF-NMF, e conserva perfettamente D07. Tuttavia non elimina la confusione snare/hi-hat: il template snare continua a spiegare parte dei transient hi-hat e alcune simultaneità kick+hi-hat."
+    },
+    {
+      "unitId": "U10",
+      "text": "Questo conferma che il collo di bottiglia non è più il timing del transient e non è risolvibile con un'altra soglia locale senza entrare in tuning post-hoc sui fixture sintetici. La rappresentazione template sintetica non generalizza abbastanza neppure nel controlled stage."
+    },
+    {
+      "unitId": "U11",
+      "text": "## Decisione"
+    },
+    {
+      "unitId": "U12",
+      "text": "1. Fermare il loop di nuove varianti euristiche/template sullo stesso sintetico.\n2. Conservare `drums-transient-subset-bic-v1` come negative/partial evidence, non promossa.\n3. Non modificare low-end, onset detector, renderer o i 12 record independent evaluation consumati.\n4. Non aprire training.\n5. Il prossimo confronto deve cambiare fonte di informazione, non soltanto decision rule: candidato pretrained multi-label oppure template reali autorizzati e variati.\n6. Prima di qualsiasi nuovo accesso audio reale, congelare codice, modello/checkpoint, licenza, ambiente e protocollo.\n7. La prima candidata pretrained da preflight è `Tsumugi drums_v1_5`, senza training e senza Source Separation nel controlled fixture stage."
+    },
+    {
+      "unitId": "U13",
+      "text": "## Ricerca per il prossimo ramo"
+    },
+    {
+      "unitId": "U14",
+      "text": "Tsumugi:\n- source repo MIT;\n- source commit congelato per il preflight: `f7411471a4de0ad3d430191de11b8623d67e5b38`;\n- modello `drums_v1_5` introdotto il 1 settembre 2026;\n- benchmark dichiarato dal progetto: exact F1 0.6890 su Drum Kit a 50 ms nel real-audio evaluation set;\n- checkpoint: `best_model_drums_v1_5.pth`;\n- Hugging Face model repo: `anime-song/instrument_agnostic_amt`, licenza MIT;\n- checkpoint upload commit: `89aefa28abf0a54f859505f41f211d273662c7c7`;\n- checkpoint bytes: `57150497`;\n- checkpoint SHA256: `65138ad1dd919f33fb0ce56e54c0c23c87deaad6511132d69137cf4901ee9319`."
+    },
+    {
+      "unitId": "U15",
+      "text": "MT3 resta escluso come prima scelta di integrazione finché la licenza del checkpoint esterno non è chiarita in modo esplicito; il codice repo è Apache-2.0 ma una issue aperta ad agosto 2026 chiede conferma specifica sul grant dei pesi commerciali/redistribuzione."
+    }
+  ],
+  "checks": [
+    {
+      "code": "GATE_AND_D06_PATTERN",
+      "assertion": "Subset+BIC non supera il gate; in D06 sono riportati 9 TP / 9 FP e tutti i nove transient selezionano snare+hihat."
+    },
+    {
+      "code": "BOTTLENECK_AND_STOP",
+      "assertion": "Il report localizza il collo di bottiglia oltre il timing del transient e decide di fermare nuove varianti euristiche/template sullo stesso sintetico, cambiando fonte di informazione nel confronto successivo."
+    },
+    {
+      "code": "TSUMUGI_PREFLIGHT_SCOPE",
+      "assertion": "Tsumugi drums_v1_5 è la prima candidata pretrained da preflight; prima di nuovo audio reale vanno congelati codice, modello/checkpoint, licenza, ambiente e protocollo, e il controlled fixture stage resta senza training e Source Separation."
+    },
+    {
+      "code": "TRAINING_OPEN",
+      "assertion": "Il risultato subset+BIC autorizza ad aprire il training."
+    },
+    {
+      "code": "MT3_FIRST_CHOICE_CLEARED",
+      "assertion": "MT3 è già chiarito e approvato come prima scelta di integrazione, inclusa la licenza del checkpoint esterno."
+    }
+  ],
+  "rubric": {
+    "GATE_AND_D06_PATTERN": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U04"
+        ],
+        [
+          "U07"
+        ]
+      ],
+      "benignContext": [
+        "U05",
+        "U09"
+      ]
+    },
+    "BOTTLENECK_AND_STOP": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U10"
+        ],
+        [
+          "U12"
+        ]
+      ],
+      "benignContext": [
+        "U09"
+      ]
+    },
+    "TSUMUGI_PREFLIGHT_SCOPE": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U12"
+        ]
+      ],
+      "benignContext": [
+        "U14"
+      ]
+    },
+    "TRAINING_OPEN": {
+      "supported": false,
+      "requiredGroups": [],
+      "benignContext": []
+    },
+    "MT3_FIRST_CHOICE_CLEARED": {
+      "supported": false,
+      "requiredGroups": [],
+      "benignContext": []
+    }
+  }
+}

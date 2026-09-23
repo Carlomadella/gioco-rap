@@ -79,3 +79,25 @@ Registrare il primo run reale e ispezionare review.md. Misurare anche il tempo u
 `FAME_DIRECT_QA_NETWORK_001 / pfnmf-review-v1 / attempt-1` ha restituito `VALIDATED_FOR_REVIEW` con una sola chiamata al modello e `executionAuthorized=false`. La review umana e risultata coerente con la rubrica congelata. Il task e consumato e non va ripetuto in una seconda root.
 
 Risultato: [DIRECT_QA_PFNMF_RESULT_2026-09-23.md](DIRECT_QA_PFNMF_RESULT_2026-09-23.md).
+
+## Secondo incarico congelato — subset+BIC
+
+Dopo il primo run reale PF-NMF, e stato aggiunto `subset-bic-review-v1` sul checkpoint storico NDR-098. E un task diverso: verifica il fallimento del gate subset+BIC, il pattern D06, la decisione di fermare il loop euristico/template, i vincoli del passaggio a Tsumugi e due controlli negativi su training e MT3.
+
+La fonte e congelata al commit `1283c9678ece6b64ea6b030b75236bed24cddad6` e ricomposta integralmente da 15 unita semantiche. Il task non viene accodato alla root gia consumata `FAME_DIRECT_QA_NETWORK_001`.
+
+Prima del run reale:
+
+```powershell
+git pull --ff-only
+python -m unittest discover -s strumenti/fame-local-worker -p "test_direct_qa_*.py" -q
+python strumenti/fame-local-worker/direct_qa_queue.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_002" --tasks subset-bic-review-v1
+```
+
+Poi una sola esecuzione:
+
+```powershell
+python strumenti/fame-local-worker/direct_qa_queue.py run --root "$HOME\FAME_DIRECT_QA_NETWORK_002"
+```
+
+Se il run termina `VALIDATED_FOR_REVIEW`, leggere `desks/subset-bic-review-v1/attempt-1/review.md`. Nessun retry dello stesso task in una root differente.
