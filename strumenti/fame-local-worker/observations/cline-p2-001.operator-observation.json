@@ -1,0 +1,96 @@
+{
+  "schema": "fame-cline-p2-operator-observation-v1",
+  "provenance": "Trascrizione strutturata dell'output del grader e della risposta Cline forniti dall'operatore in chat; nessun accesso indipendente ai log completi o alla root locale.",
+  "sourceRoot": "FAME_CLINE_GPTOSS_P2_001",
+  "graderSchema": "fame-cline-gptoss-p2-qa-v1",
+  "sourceCommit": "5fc9330ef003be43cfbb2af8a63c13e7814ea870",
+  "sourcePath": "documentazione/fame-neural/OWNED_BEATS_AUDIO_TO_MIDI_P2_MEASUREMENT_PASS_2026-09-22.md",
+  "caseSha256": "566912bff9c497361f00ccb7f8a513461b4543bbd854ae9988ba508c8c7b49e9",
+  "status": "FAIL",
+  "artifactCorrect": false,
+  "diagnosticOnly": false,
+  "integrityErrors": [],
+  "answerErrors": [
+    "RECORD_1_INSUFFICIENT_EVIDENCE"
+  ],
+  "conclusionsCorrect": 4,
+  "conclusionsTotal": 4,
+  "sufficientCoverage": 3,
+  "coverageTotal": 4,
+  "assessments": [
+    {
+      "code": "EXPORT_EQUIVALENT",
+      "conclusionCorrect": true,
+      "coverage": "SUFFICIENT",
+      "evidenceIds": [
+        "E026",
+        "E027"
+      ],
+      "precisionWarnings": [],
+      "unreviewedEvidenceIds": []
+    },
+    {
+      "code": "REFERENCE_DURATION",
+      "conclusionCorrect": true,
+      "coverage": "INSUFFICIENT",
+      "evidenceIds": [
+        "E020",
+        "E021"
+      ],
+      "missingFrozenEvidenceGroup": [
+        "E019"
+      ],
+      "precisionWarnings": [],
+      "unreviewedEvidenceIds": []
+    },
+    {
+      "code": "HISTORICAL_EFFECT_UNKNOWN",
+      "conclusionCorrect": true,
+      "coverage": "SUFFICIENT",
+      "evidenceIds": [
+        "E032",
+        "E033",
+        "E059",
+        "E060"
+      ],
+      "precisionWarnings": [
+        "E032",
+        "E033"
+      ],
+      "unreviewedEvidenceIds": []
+    },
+    {
+      "code": "TRAINING_AUTHORIZED",
+      "conclusionCorrect": true,
+      "coverage": "NOT_REQUIRED",
+      "evidenceIds": [],
+      "precisionWarnings": [],
+      "unreviewedEvidenceIds": []
+    }
+  ],
+  "sessionReported": {
+    "model": "gpt-oss:20b",
+    "modelDigest": "17052f91a42e97930aa6e28a6c6c06a983e6a58dbb00434885a0cf5313e376f7",
+    "clineVersion": "4.1.20",
+    "ollamaVersion": "0.34.2",
+    "provider": "Ollama",
+    "baseUrl": "http://localhost:11434",
+    "compactPrompt": null,
+    "contextSize": 32768,
+    "thinkingSetting": null,
+    "cleanSession": true,
+    "toolReadWriteObserved": true,
+    "onlyLocalModelObserved": true,
+    "scopeRespected": true,
+    "interventions": 0,
+    "elapsedSeconds": null,
+    "notes": "Nuovo report P2 rispetto ai probe Cline registrati. Una sola sessione, nessun Retry o suggerimento correttivo. answer.json creato tramite Cline. Nessuna precedente esposizione al report P2 nota all'operatore."
+  },
+  "sessionIndependentlyVerified": false,
+  "modelCallsByGrader": 0,
+  "independentEvaluation": false,
+  "humanReviewRequired": true,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "retryExecuted": false
+}

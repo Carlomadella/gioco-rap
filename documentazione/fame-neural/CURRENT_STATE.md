@@ -1,8 +1,12 @@
 # FAME Neural — Current State
 
-## Prossima prova Cline preparata: QA del report P2
+## Probe Cline P2 eseguito — QA del report P2
 
-Disponibile [CLINE_GPTOSS_P2_PROBE.md](../../strumenti/fame-local-worker/CLINE_GPTOSS_P2_PROBE.md) e `cline_gptoss_p2_probe.py`. Nuova root `FAME_CLINE_GPTOSS_P2_001`, singolo report pre-numerato, quattro affermazioni, criteri congelati prima del run. Conclusione, copertura e precisione separate: contesto superfluo già verificato innocuo produce warning, non FAIL; citazioni non valutate richiedono revisione. 9 test con fixture simulate passati, prova reale ancora da eseguire. Preservare i precedenti esiti, nessun retry dei casi consumati, nessuna apertura di training/batch131/produzione.
+Il run `FAME_CLINE_GPTOSS_P2_001` è stato eseguito sul report P2 congelato con una sola desk e report pre-numerato. Il tool flow ha completato `answer.json`.
+
+Grader: `FAIL` per `RECORD_1_INSUFFICIENT_EVIDENCE`, con integrità PASS e **4/4 conclusioni corrette**. Coverage: 3/4 sufficiente. `REFERENCE_DURATION` ha citato E020+E021 ma ha omesso E019, richiesto dalla rubrica congelata. `HISTORICAL_EFFECT_UNKNOWN` è sufficiente; E032+E033 sono warning benigni, non errori. Nessun Retry sul caso consumato.
+
+Dettaglio consolidato in [CLINE_GPTOSS_RESULTS_2026-09-23.md](../../strumenti/fame-local-worker/CLINE_GPTOSS_RESULTS_2026-09-23.md). Nessuna apertura di training/batch131/produzione.
 
 
 Data: 2026-09-23

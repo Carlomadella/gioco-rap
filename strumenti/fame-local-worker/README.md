@@ -1,8 +1,10 @@
 # FAME Direct Worker v1 — Ollama senza Cline
 
-## Prossima prova Cline preparata: QA del report P2
+## Probe Cline P2 — eseguito
 
-Disponibile [CLINE_GPTOSS_P2_PROBE.md](CLINE_GPTOSS_P2_PROBE.md) e `cline_gptoss_p2_probe.py`. Nuova root `FAME_CLINE_GPTOSS_P2_001`, singolo report pre-numerato, quattro affermazioni, criteri congelati prima del run. Conclusione, copertura e precisione separate: contesto superfluo già verificato innocuo produce warning, non FAIL; citazioni non valutate richiedono revisione. 9 test con fixture simulate passati, prova reale ancora da eseguire. Preservare i precedenti esiti, nessun retry dei casi consumati, nessuna apertura di training/batch131/produzione.
+Disponibile [CLINE_GPTOSS_P2_PROBE.md](CLINE_GPTOSS_P2_PROBE.md) con preparatore/correttore `cline_gptoss_p2_probe.py`. Il run reale `FAME_CLINE_GPTOSS_P2_001` ha completato il tool flow e prodotto `answer.json`.
+
+Esito: `FAIL` per una sola copertura insufficiente, con **4/4 conclusioni corrette** e integrità PASS. `REFERENCE_DURATION` ha omesso E019 pur citando E020+E021; `HISTORICAL_EFFECT_UNKNOWN` ha aggiunto due citazioni benignamente superflue, registrate come warning non bloccanti. Nessun Retry sul caso consumato. Dettagli e provenance in [CLINE_GPTOSS_RESULTS_2026-09-23.md](CLINE_GPTOSS_RESULTS_2026-09-23.md) e nell'observation JSON dedicata.
 
 
 ## Checkpoint Cline + GPT-OSS 20B — prove locali completate

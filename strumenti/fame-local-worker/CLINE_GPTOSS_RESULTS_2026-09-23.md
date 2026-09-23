@@ -123,12 +123,47 @@ Dettaglio:
 
 Il PASS del tool layer nel formato compatto non trasforma questo repeat in una nuova independent evaluation. Serve soltanto a isolare l'effetto del packaging dei file.
 
+
+## 5. Probe QA P2 — nuovo report pre-numerato
+
+Root operatore: `FAME_CLINE_GPTOSS_P2_001`.
+
+Preparatore/correttore: `cline_gptoss_p2_probe.py`.
+
+Source congelata:
+
+- commit: `5fc9330ef003be43cfbb2af8a63c13e7814ea870`;
+- path: `documentazione/fame-neural/OWNED_BEATS_AUDIO_TO_MIDI_P2_MEASUREMENT_PASS_2026-09-22.md`;
+- case SHA256: `566912bff9c497361f00ccb7f8a513461b4543bbd854ae9988ba508c8c7b49e9`.
+
+Il tool flow ha completato la lettura della desk e la scrittura di `answer.json` senza Retry o suggerimenti correttivi riportati.
+
+Esito del grader:
+
+- stato: `FAIL`;
+- integrità: PASS, `integrityErrors=[]`;
+- conclusioni: **4/4 corrette**;
+- coverage sufficiente: **3/4**;
+- unico errore bloccante: `RECORD_1_INSUFFICIENT_EVIDENCE`;
+- nessuna citazione non revisionata.
+
+Dettaglio:
+
+- `EXPORT_EQUIVALENT`: conclusione corretta, coverage `SUFFICIENT`, E026 + E027;
+- `REFERENCE_DURATION`: conclusione corretta, coverage `INSUFFICIENT`, E020 + E021;
+- `HISTORICAL_EFFECT_UNKNOWN`: conclusione corretta, coverage `SUFFICIENT`, E059 + E060; E032 + E033 sono warning di precisione benigni già congelati;
+- `TRAINING_AUTHORIZED`: correttamente `false`, coverage `NOT_REQUIRED`.
+
+Per `REFERENCE_DURATION` la rubrica congelata richiede tre gruppi distinti: E019, E020 ed E021. Il modello ha citato E020 + E021 ma ha omesso E019, che introduce esplicitamente che il renderer v2 usa una durata esplicita derivata dalla reference. Non si modifica la rubrica e non si ritenta il caso dopo aver visto il risultato.
+
+Questo è il primo nuovo report P2 registrato con il formato singolo pre-numerato. Il tool layer ha completato il task; il limite osservato resta la copertura precisa di affermazioni composte.
+
 ## Evidenza cumulativa e interpretazione
 
-Sui due probe QA che hanno prodotto una risposta completa, GPT-OSS + Cline ha ottenuto **8/8 conclusioni corrette** sui casi selezionati. Gli errori osservati sono stati entrambi nella selezione delle prove:
+Sui tre probe QA che hanno prodotto una risposta completa, GPT-OSS + Cline ha ottenuto **12/12 conclusioni corrette** sui casi selezionati. Gli errori osservati restano concentrati nella selezione/copertura delle prove:
 
-- una finding con evidenza insufficiente per una conclusione composta;
-- una finding con una citazione pertinente ma superflua.
+- due finding con evidenza insufficiente per una conclusione composta (independent-evaluation e P2);
+- una finding con una citazione pertinente ma superflua nel diagnostico Tsumugi.
 
 Non è ancora dimostrata una precisione affidabile delle citazioni su casi nuovi. Il risultato non autorizza tuning della rubrica sui casi consumati.
 
