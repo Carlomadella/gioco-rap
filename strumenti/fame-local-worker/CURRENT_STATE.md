@@ -212,18 +212,99 @@ Interpretazione verificabile dal protocollo v2:
 - `VALIDATED_FOR_REVIEW` richiede ancora revisione umana;
 - nessuna azione operativa e stata autorizzata.
 
-## Prossimo intervento
+## Revisione umana V2_001 chiusa
 
-Leggere gli artefatti dell' `attempt-1` senza nuove chiamate al modello:
+La review, la validation e il report incollati dall'operatore sono coerenti tra
+loro e con il package congelato.
 
-```powershell
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_001\desks\local-worker-runtime-transition-v2\attempt-1\review.md"
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_001\desks\local-worker-runtime-transition-v2\attempt-1\validation.json"
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_001\desks\local-worker-runtime-transition-v2\attempt-1\report.json"
+Esito umano:
+
+```text
+5/5 conclusioni corrette
+3/3 check positivi con coverage SUFFICIENT
+0 precisionWarnings
+0 unreviewedEvidenceIds
+2/2 check negativi correttamente non supportati
+modelCalls = 1
+acceptedAfterRepair = false
 ```
 
-Questa lettura e la revisione umana del first-pass. Non rilanciare `run` sulla
-root `FAME_DIRECT_QA_NETWORK_V2_001`.
+Risultato storico aggiunto:
+
+```text
+strumenti/fame-local-worker/DIRECT_QA_RUNTIME_TRANSITION_V2_RESULT_2026-09-24.md
+a84b7a5e332dc7b7b869e4fe1c26beff728d6816
+```
+
+La root `FAME_DIRECT_QA_NETWORK_V2_001` e definitivamente consumata.
+
+## Checkpoint multi-desk v2 preparato
+
+Per passare dal singolo worker a una prova reale della queue con piu scrivanie,
+sono stati congelati due task nuovi e indipendenti sul sistema FAME Local Worker
+stesso.
+
+Task 1:
+
+```text
+coordinator-architecture-v2
+source: strumenti/fame-local-worker/COORDINATOR.md
+```
+
+Verifica confini della rete, natura logica/sequenziale delle scrivanie,
+assenza di PASS per maggioranza, gate globale e controlli negativi contro
+parallelizzazione fittizia/autonomia di modifica.
+
+Task 2:
+
+```text
+package-authoring-v2
+source: strumenti/fame-local-worker/DIRECT_QA_PACKAGE_AUTHORING.md
+```
+
+Verifica semantic-unit rule, frozen-run rule, freeze pre-call, regola evidence
+per check negativi e requisiti dei test package-specific.
+
+File/commit preparati:
+
+```text
+ed1e27fa6468fdb0debe81ef8e79541b39293808
+test(fame-local-worker): freeze coordinator architecture source
+
+acde01596eedc53da68cde1b966be2cba07ee242
+test(fame-local-worker): freeze package authoring source
+
+53ae1e5131d2f965ea1717df073658ddd0bee66e
+feat(fame-local-worker): add coordinator architecture v2 task
+
+102ea3d3c8993a9c03e3272994f9e4920b652699
+feat(fame-local-worker): add package authoring v2 task
+
+65188065d464371269ee62d33a03e81a12418bf0
+test(fame-local-worker): validate two-desk v2 checkpoint
+```
+
+Il nuovo test verifica anche che una queue con entrambi i task si inizializzi
+come due desk `NOT_RUN`, zero model calls e stato globale `PENDING`.
+
+## Prossimo intervento
+
+Prima di qualsiasi nuova inferenza, eseguire localmente l'intera suite v2:
+
+```powershell
+git pull --ff-only origin recovery/fame-local-worker-v2-cdea2227
+python -m unittest discover -s . -p "test_direct_qa_*v2.py" -q
+```
+
+Solo dopo PASS, inizializzare la nuova queue multi-desk senza chiamare il modello:
+
+```powershell
+python direct_qa_queue_v2.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_002" --tasks coordinator-architecture-v2 package-authoring-v2
+python direct_qa_queue_v2.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_002"
+```
+
+Lo stato atteso e due desk `NOT_RUN`, `modelCalls=0`, queue `PENDING`.
+Non eseguire `run` prima di avere verificato questo stato.
 
 ## Vincolo di continuita
 
