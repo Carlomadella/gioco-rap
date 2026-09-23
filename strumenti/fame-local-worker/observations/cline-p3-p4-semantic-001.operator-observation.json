@@ -1,0 +1,79 @@
+{
+  "schema": "fame-cline-p3-p4-semantic-operator-observation-v1",
+  "provenance": "Trascrizione strutturata dell'output del grader fornito dall'operatore in chat; nessun accesso indipendente ai log completi o alla root locale.",
+  "sourceRoot": "FAME_CLINE_GPTOSS_P3P4_SEMANTIC_001",
+  "graderSchema": "fame-cline-gptoss-p3-p4-semantic-qa-v1",
+  "evidenceUnitMode": "SEMANTIC_BLOCK_V1",
+  "sourceCommit": "94e2b448760a1613062c1d2de18458cf7688385a",
+  "sourcePath": "documentazione/fame-neural/OWNED_BEATS_AUDIO_TO_MIDI_P3_P4_DECISION_2026-09-22.md",
+  "caseSha256": "f28a18435b95a4c21265dc5ee4ce57a50b38e572cb256fa424e11005595b775c",
+  "status": "FAIL",
+  "artifactCorrect": false,
+  "integrityErrors": [],
+  "answerErrors": [
+    "RECORD_3_INSUFFICIENT_EVIDENCE"
+  ],
+  "conclusionsCorrect": 4,
+  "conclusionsTotal": 4,
+  "sufficientCoverage": 3,
+  "coverageTotal": 4,
+  "assessments": [
+    {
+      "code": "D02_FAILURE_LAYER",
+      "conclusionCorrect": true,
+      "coverage": "SUFFICIENT",
+      "evidenceIds": [
+        "U003"
+      ]
+    },
+    {
+      "code": "SIMULTANEOUS_ROLE_LIMIT",
+      "conclusionCorrect": true,
+      "coverage": "SUFFICIENT",
+      "evidenceIds": [
+        "U003"
+      ]
+    },
+    {
+      "code": "SYNTHETIC_THRESHOLD_TUNING_AUTHORIZED",
+      "conclusionCorrect": true,
+      "coverage": "NOT_REQUIRED",
+      "evidenceIds": []
+    },
+    {
+      "code": "P5_FIRST_VARIANT_SCOPE",
+      "conclusionCorrect": true,
+      "coverage": "INSUFFICIENT",
+      "evidenceIds": [
+        "U010"
+      ],
+      "missingFrozenEvidenceGroup": [
+        "U012"
+      ]
+    }
+  ],
+  "interpretation": {
+    "lineFragmentArtifact": false,
+    "missingEvidenceMeaning": "U010 copre la scelta di attivazioni indipendenti; U012 copre i vincoli onset detector/export/renderer v2/low-end invariati.",
+    "retryExecuted": false
+  },
+  "sessionReported": {
+    "model": "gpt-oss:20b",
+    "modelDigest": "17052f91a42e97930aa6e28a6c6c06a983e6a58dbb00434885a0cf5313e376f7",
+    "clineVersion": "4.1.20",
+    "ollamaVersion": "0.34.2",
+    "provider": "Ollama",
+    "baseUrl": "http://localhost:11434",
+    "contextSize": 32768,
+    "cleanSession": true,
+    "toolReadWriteObserved": true,
+    "onlyLocalModelObserved": true,
+    "scopeRespected": true,
+    "interventions": 0
+  },
+  "sessionIndependentlyVerified": false,
+  "modelCallsByGrader": 0,
+  "independentEvaluation": false,
+  "humanReviewRequired": true,
+  "retryExecuted": false
+}
