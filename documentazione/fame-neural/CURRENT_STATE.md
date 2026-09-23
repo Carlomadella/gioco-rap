@@ -1,5 +1,11 @@
 # FAME Neural — Current State
 
+## Tsumugi real-easy development run completato — Human Review congelata
+
+L'operatore ha completato il run append-only `audio-to-midi-p5-tsumugi-real-easy-development-v1-001` su `FAME000040`, `FAME000080`, `FAME000126`. Output dichiarato: 3/3 record, solo stem drums development già consumati, nessun original source audio, nessuna independent evaluation/final holdout, nessuna nuova Source Separation, nessun retuning, training/P6/batch131/task-data chiusi.
+
+Prima del primo ascolto del Candidate è stata congelata la review `audio-to-midi-p5-tsumugi-real-easy-human-review-v1-001`. La UI confronta per ciascuna family lo stem drums di riferimento con un render neutro a durata-reference dell'output Tsumugi e raccoglie score 0–3 + nota. L'identità del Candidate non è mostrata nella UI; il risultato è descrittivo e **non promuove automaticamente** Tsumugi.
+
 ## Tsumugi V1 score localization corretta — real-easy development diagnostic congelato
 
 Il reporter read-only corretto ha chiuso la localizzazione per ruolo: 9 role-row supportate, 5 con raw pitch target presenti e 4 con target assente + score non positivo. I quattro miss sono D03 hi-hat, D04 snare, D06 hi-hat e D07 kick. Non esiste alcun caso con score target positivo ma pitch target assente. Il failure e quindi gia visibile nello score head V1 per questi ruoli; non viene aperto decoder tuning sul sintetico.

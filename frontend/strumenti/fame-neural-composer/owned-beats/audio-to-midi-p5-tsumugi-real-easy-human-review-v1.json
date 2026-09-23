@@ -1,0 +1,51 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-p5-tsumugi-real-easy-human-review-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_FIRST_REAL_EASY_HUMAN_LISTENING",
+  "createdAt": "2026-09-23",
+  "reviewId": "audio-to-midi-p5-tsumugi-real-easy-human-review-v1-001",
+  "runId": "audio-to-midi-p5-tsumugi-real-easy-development-v1-001",
+  "expectedRecords": [
+    "FAME000040",
+    "FAME000080",
+    "FAME000126"
+  ],
+  "renderer": {
+    "id": "fame-neutral-midi-audition-renderer-v2-reference-duration",
+    "candidateIdentityExposedInUi": false,
+    "rendererSoundQualityIsNotScored": true
+  },
+  "scale": {
+    "0": "unusable",
+    "1": "weak; major correction required",
+    "2": "usable for downstream pilot with moderate correction",
+    "3": "strong; directly useful"
+  },
+  "criteria": [
+    "kick retention and false kicks",
+    "snare/hihat retention and class confusion",
+    "timing",
+    "coverage across the reference stem",
+    "downstream Drum View usefulness"
+  ],
+  "interpretation": {
+    "automaticPromotion": false,
+    "descriptiveStatsOnly": true,
+    "medianAndFamiliesAtOrAbove2Reported": true,
+    "noThresholdFrozenAsPromotionGate": true
+  },
+  "safety": {
+    "split": "development",
+    "originalSourceAudioAllowed": false,
+    "developmentDrumsStemAllowed": true,
+    "independentEvaluationAllowed": false,
+    "finalHoldoutAllowed": false,
+    "sourceSeparationExecutionAllowed": false,
+    "retuningAllowed": false,
+    "trainingAuthorized": false,
+    "p6Authorized": false,
+    "batch131Authorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "nextAction": "COMPLETE_3_FAMILY_HUMAN_REVIEW_THEN_DECIDE_TSUMUGI_BRANCH"
+}
