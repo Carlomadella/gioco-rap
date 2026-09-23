@@ -1,0 +1,36 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-p6-evaluation-reservation-contract-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_P6_RESERVATION",
+  "cohortId": "audio-to-midi-p6-independent-evaluation-v1",
+  "plannedSplit": "audio-to-midi-p6-evaluation-v1",
+  "expectedFamilies": 12,
+  "files": {
+    "gatePath": "audio-to-midi-p6-independent-evaluation-gate.js",
+    "gateGitBlobSha": "baf88c6a84f6570db7b83a6d4cb64b04289f4935",
+    "protocolPath": "audio-to-midi-p6-independent-evaluation-v1.json",
+    "protocolGitBlobSha": "185b8aeca968ea53ff4b6e33ecc774e12637ab6c",
+    "referencePath": "audio-to-midi-p6-independent-evaluation-cohort-v1.json",
+    "referenceGitBlobSha": "34c66971f92044a99b8781e16fffbadfba2a3c58",
+    "splitDecisionPath": "audio-to-midi-p6-independent-evaluation-split-v1.json",
+    "splitDecisionGitBlobSha": "0c2b5958e31f7e1edc87818924c2d3461fb25fe5",
+    "selectorPath": "prepare-audio-to-midi-p6-independent-evaluation.js",
+    "selectorGitBlobSha": "c68b40f5bca98aa6e25e312fe5cc6955cd21a626"
+  },
+  "reservation": {
+    "reviewId": "audio-to-midi-p6-independent-evaluation-v1-split-freeze",
+    "receiptStatus": "RESERVED_BEFORE_P6_AUDIO_ACCESS",
+    "appendOnly": true,
+    "recoveryFromAssignedSplitWithoutReceipt": true
+  },
+  "safety": {
+    "preflightMayOpenAudio": false,
+    "reserveMayOpenAudio": false,
+    "reserveMayRunSourceSeparation": false,
+    "reserveMayRunTranscription": false,
+    "batch131Authorized": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "nextAction": "RUN_P6_METADATA_ONLY_PREFLIGHT_RESERVE_AND_CHECK_BEFORE_ANY_AUDIO_ACCESS"
+}

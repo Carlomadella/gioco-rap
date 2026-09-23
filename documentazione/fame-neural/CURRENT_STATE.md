@@ -1,5 +1,9 @@
 # FAME Neural — Current State
 
+## P6 reservation tool congelato
+
+Dopo NDR-102 è stato aggiunto il gate di reservation P6 autosufficiente. Valida protocollo, reference, rank/digest, manifest identity snapshot e stato dei 12 record; assegna esclusivamente lo split `audio-to-midi-p6-evaluation-v1`, aggiorna manifest JSON/CSV sotto lock e scrive una receipt append-only recuperabile se lo split fosse già assegnato. Nessuna fase di reservation può aprire/hashare/decodificare audio o eseguire Source Separation/trascrizione.
+
 ## P6 cohort congelato — 12 family fresche, zero audio access
 
 Il preview P6 metadata-only ha passato self-test e selezione: **91 family eleggibili**, 12 selezionate e congelate in repo. Cohort digest `3a4595b7bb7e1edc61fdf5ba45557d13949f7cb7c1233daa58ae2b273bfa0188`; manifest identity digest `a459b2df4c9e3a0fe0b268e58833e15c9b45097231b115a1d85311e993557f38`.
