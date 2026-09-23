@@ -2,6 +2,10 @@
 
 ## Prossima prova Cline — P3/P4 con unita semantiche
 
+## Prossimo diagnostico Cline — Tsumugi contract audit compatto
+
+Il run multi-file del contract audit si e interrotto nel tool layer prima di `audit.json`. E disponibile [CLINE_GPTOSS_TSUMUGI_CONTRACT_COMPACT_DIAGNOSTIC.md](CLINE_GPTOSS_TSUMUGI_CONTRACT_COMPACT_DIAGNOSTIC.md): stessi quattro check e stessa rubrica, ma i quattro snapshot sono concatenati integralmente in un solo `source-audit.md`. E un diagnostico di packaging, non una nuova independent evaluation.
+
 Preparata [CLINE_GPTOSS_P3_P4_SEMANTIC_PROBE.md](CLINE_GPTOSS_P3_P4_SEMANTIC_PROBE.md) con `cline_gptoss_p3_p4_semantic_probe.py`. Usa il nuovo report P3/P4 e assegna gli ID di evidenza a paragrafi/blocchi lista completi, non a singole righe. Il grader resta host-only e separa conclusione, coverage, warning benigni e citazioni non revisionate. Il run reale non e ancora eseguito.
 
 Il P2 storico resta FAIL secondo la rubrica congelata; la nuova prova corregge il **metodo futuro**, non il risultato passato.
