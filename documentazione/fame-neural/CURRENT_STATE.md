@@ -1,5 +1,11 @@
 # FAME Neural — Current State
 
+## Tsumugi V1 score localization corretta — real-easy development diagnostic congelato
+
+Il reporter read-only corretto ha chiuso la localizzazione per ruolo: 9 role-row supportate, 5 con raw pitch target presenti e 4 con target assente + score non positivo. I quattro miss sono D03 hi-hat, D04 snare, D06 hi-hat e D07 kick. Non esiste alcun caso con score target positivo ma pitch target assente. Il failure e quindi gia visibile nello score head V1 per questi ruoli; non viene aperto decoder tuning sul sintetico.
+
+Congelato prima della prima inferenza reale il run `audio-to-midi-p5-tsumugi-real-easy-development-v1-001` su tre family development gia consumate e scelte soltanto dalla Human Review Source Separation preesistente: `FAME000040`, `FAME000080`, `FAME000126`, tutte drums usefulness 3. Il run apre esclusivamente i loro stem `drums.wav` gia prodotti; original source, independent evaluation e final holdout restano chiusi. Riusa esattamente le impostazioni del controlled Tsumugi, non consente retuning e richiede review umana prima di qualsiasi decisione.
+
 ## V1 score reporter — per-role reclassification from persisted controlled events
 
 Il run V1 score append-only è già consumato e non viene rieseguito. Il successivo hardening del codice ha evidenziato che la localizzazione deve essere per ruolo/pitch target, non in base al conteggio totale di intervalli della fixture.

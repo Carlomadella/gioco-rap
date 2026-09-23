@@ -1,0 +1,69 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-p5-tsumugi-real-easy-development-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_FIRST_TSUMUGI_REAL_EASY_STEM_ACCESS",
+  "createdAt": "2026-09-23",
+  "decision": "NDR-100",
+  "purpose": "DISTINGUISH_SYNTHETIC_SCORE_HEAD_SENSITIVITY_FROM_REAL_DEVELOPMENT_STEM_WEAKNESS",
+  "candidateId": "tsumugi-drums-v1_5",
+  "runId": "audio-to-midi-p5-tsumugi-real-easy-development-v1-001",
+  "controlledProtocol": "audio-to-midi-p5-tsumugi-controlled-protocol-v1.json",
+  "sourceControlledRunId": "audio-to-midi-p5-tsumugi-controlled-v1-001",
+  "sourceV1ScoreDiagnosticRunId": "audio-to-midi-p5-tsumugi-v1-score-diagnostic-v1-001",
+  "sourceSeparation": {
+    "runId": "source-separation-development-inference-v1-001",
+    "reviewId": "source-separation-human-review-v1-001",
+    "packageDigestSha256": "e860ecd2ae8ccc8ebdafa6069097e03f9443fef15fd1b3f62ed6b620bb35d276",
+    "submissionDigestSha256": "ae63ed188816efb9d272a43549338c3441627505eaaa9e0f78b0b548544343cf",
+    "requiredOutcome": "OPEN_AUDIO_TO_MIDI_DRUMS_LOW_END_PILOT"
+  },
+  "selectedDevelopmentRecords": [
+    {
+      "sourceRecordId": "FAME000040",
+      "priorHumanDrumsUsefulness": 3,
+      "priorHumanNote": "Buono, molto chiaro e preciso."
+    },
+    {
+      "sourceRecordId": "FAME000080",
+      "priorHumanDrumsUsefulness": 3,
+      "priorHumanNote": "Chiaro, bello e completo."
+    },
+    {
+      "sourceRecordId": "FAME000126",
+      "priorHumanDrumsUsefulness": 3,
+      "priorHumanNote": "Bello, chiaro, forte e preciso."
+    }
+  ],
+  "selectionPolicy": {
+    "frozenBeforeTsumugiRealEasyInference": true,
+    "basedOnlyOnPreexistingSourceSeparationHumanReview": true,
+    "noTsumugiOutputUsedForSelection": true,
+    "split": "development",
+    "freshIndependentEvaluationFamiliesConsumed": 0,
+    "finalHoldoutAllowed": false
+  },
+  "inference": {
+    "reuseControlledInferenceSettings": true,
+    "expectedSemiCrfVersion": "v1",
+    "expectedNumPitchSlots": 1
+  },
+  "output": {
+    "writeMidi": true,
+    "writeEventJson": true,
+    "automaticPromotion": false,
+    "humanReviewRequired": true
+  },
+  "safety": {
+    "originalSourceAudioAccessAllowed": false,
+    "sourceSeparationStemAccessAllowed": true,
+    "independentEvaluationAccessAllowed": false,
+    "finalHoldoutAccessAllowed": false,
+    "sourceSeparationExecutionAllowed": false,
+    "retuningAllowed": false,
+    "trainingAuthorized": false,
+    "p6Authorized": false,
+    "batch131Authorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "nextAction": "RUN_APPEND_ONLY_TSUMUGI_REAL_EASY_DEVELOPMENT_DIAGNOSTIC_THEN_PREPARE_HUMAN_REVIEW"
+}
