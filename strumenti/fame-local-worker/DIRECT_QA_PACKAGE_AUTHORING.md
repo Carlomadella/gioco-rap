@@ -27,6 +27,27 @@ Reason: the model may reasonably cite the heading together with the content. If 
 
 Never repair a consumed task by changing its rubric/package and rerunning it. Preserve the historical result, classify the authoring defect separately, and apply the improved unitization only to new task IDs.
 
+## Benign-context rule
+
+For every positive check, classify before the first model call not only the
+minimum evidence required for coverage, but also any other unit that a careful
+reviewer could reasonably cite as contextual support without changing the
+conclusion.
+
+Use `benignContext` only for evidence that is relevant but unnecessary.
+Do not use it as a wildcard for arbitrary extra citations.
+
+A useful pre-freeze test is:
+
+- if the required evidence were already present, would citing this additional
+  unit still be defensible as context for the exact assertion?
+- if yes, consider freezing it as `benignContext`;
+- if no, leave it unreviewed so the validator can still reject evidence drift.
+
+Do not change `benignContext` after observing a consumed run in order to turn a
+historical reject into a PASS. Apply improved context classification only to new
+task IDs.
+
 ## Pre-run checklist
 
 Before freezing a new direct-QA package:
@@ -36,6 +57,7 @@ Before freezing a new direct-QA package:
 3. headings without autonomous semantics must be joined to the following block;
 4. each positive check must have explicit required coverage groups;
 5. known harmless contextual units that may reasonably accompany evidence must be listed as benign context;
-6. negative checks must not need evidence IDs;
-7. package-specific tests must include incomplete coverage and false-positive authorization cases;
-8. freeze package and rubric before the first model call.
+6. benign context must be relevant to the exact assertion, not a wildcard for extra evidence;
+7. negative checks must not need evidence IDs;
+8. package-specific tests must include incomplete coverage, false-positive authorization and unreviewed-evidence cases;
+9. freeze package, rubric and benign-context classification before the first model call.
