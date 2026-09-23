@@ -30,8 +30,10 @@ def state(root):
         rows.append(dict(taskId=task,status=r['status'],modelCalls=r.get('modelCalls',0),
                          firstAttemptPass=r.get('firstAttemptPass'),acceptedAfterRepair=r.get('acceptedAfterRepair',False)))
     statuses=[r['status'] for r in rows]
+    terminal_problems=[s for s in statuses if s not in ACCEPTED and s!='NOT_RUN']
     if all(s=='VALIDATED_FOR_REVIEW' for s in statuses):overall='VALIDATED_FOR_REVIEW'
     elif all(s in ACCEPTED for s in statuses):overall='VALIDATED_FOR_REVIEW_AFTER_REPAIR'
+    elif terminal_problems:overall='NEEDS_REVIEW'
     elif any(s=='NOT_RUN' for s in statuses):overall='PENDING'
     else:overall='NEEDS_REVIEW'
     return dict(schema=SCHEMA,results=rows,status=overall,executionAuthorized=False)
