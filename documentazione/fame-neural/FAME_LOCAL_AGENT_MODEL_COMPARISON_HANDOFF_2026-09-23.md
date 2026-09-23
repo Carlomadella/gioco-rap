@@ -1,6 +1,10 @@
 # Handoff GPT-5.6 — confronto modello locale, 23 settembre 2026
 
-## Obiettivo immediato
+## Aggiornamento: diagnostica successiva autorizzata
+
+Il confronto congelato resta concluso con entrambi i FAIL. L'operatore ha autorizzato una nuova verifica della configurazione GPT-OSS: leggere `strumenti/fame-local-worker/GPTOSS_DIAGNOSTIC.md`. Nuovo runner e scrivania separati, think=low esplicito e budget ancora 4096; nessun risultato reale ancora disponibile per questo nuovo esperimento. Non ripetere i vecchi comandi TRANSFER per questa diagnostica.
+
+## Obiettivo immediato (storico del confronto)
 
 Guidare Mycol nel confronto di UN secondo modello locale Ollama sul caso QA transfer gia congelato. GPT-5.6 e l'assistente che accompagna l'operatore; non viene configurato come modello Ollama e non sostituisce il requisito locale/gratuito del worker.
 
