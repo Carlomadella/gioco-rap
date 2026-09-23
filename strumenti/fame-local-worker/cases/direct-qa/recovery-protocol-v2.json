@@ -1,0 +1,107 @@
+{
+  "taskId": "recovery-protocol-v2",
+  "sourceCommit": "cdea2227a4a71906c48b97d888e707a787cecc3e",
+  "sourcePath": "strumenti/fame-local-worker/RECOVERY.md",
+  "sourceSnapshot": "cases/direct-qa/recovery-protocol-v2-source.md",
+  "sourceSha256": "b5e5e394a9055dfe03179db8fa43bd842f69213faec6d26a148a5b2a75c790ca",
+  "scope": "Revisione delle invarianti del recovery storico della rete: preservazione del first pass, assenza di oracle/retry automatici, separazione recovery/transfer e limiti di autorizzazione. Non rivalutare il contenuto audio del caso storico.",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "# Recupero controllato della rete 001\n\n## Checkpoint prioritario: audit rubriche, senza nuove inferenze\n\nRecovery reale riportato: 1/2, rete ancora 13/14 secondo il protocollo congelato. Completato audit delle 14 rubriche; il supporto contestuale E152+E153+E154 viene distinto dalla prova diretta E155. Leggere [RUBRIC_AUDIT.md](RUBRIC_AUDIT.md) ed eseguire `qa_rubric_audit.py` sugli artefatti esistenti. Nessun retry Ollama; esiti storici immutati. Il sidecar distingue conclusione, copertura e citazioni superflue. 26 test con client simulati passati. Questo checkpoint prevale sulle istruzioni operative storiche sotto.\n"
+    },
+    {
+      "unitId": "U02",
+      "text": "## Stato e obiettivo\n\nL'output fornito dall'operatore registra 13/14 decisioni accettate: 9/10 affermazioni supportate e quattro affermazioni non supportate correttamente respinte. Il solo fallimento è LOWEND_CAUSES_UNPROVEN. Le evidenze selezionate coprono i silenzi sulle note alte ma non l'incertezza sulla release corta. Il fallimento originale resta registrato; non si allenta il criterio.\n\n`qa_recovery.py` prepara due incarichi separati sullo stesso report completo:\n\n- RELEASE_CAUSE_UNPROVEN: verificare l'incertezza sulla causa della release corta.\n- HIGH_NOTE_CAUSE_UNPROVEN: verificare l'incertezza sulla causa dei silenzi sulle note alte.\n\nStesso GPT-OSS 20B e digest, think=low, contesto 16384, budget 4096. Nessuna risposta attesa, ID corretto o rubrica viene passato al modello. La rubrica è lato operatore. I due risultati sono ricombinati e rivalidati contro il criterio originale completo. Il riuso del coordinatore avviene in un modulo isolato: i file del protocollo precedente non vengono modificati."
+    },
+    {
+      "unitId": "U03",
+      "text": "## Esecuzione PowerShell\n\nDalla worktree `C:\\Users\\mycol\\gioco-rap-fame-neural`, sul branch `feature/fame-neural-roadmap`, aggiornare senza forzare:\n\n```powershell\ngit pull --ff-only\n```\n\nSe Git segnala conflitti o modifiche incompatibili, fermarsi senza reset/stash automatici. Non ricreare o cancellare `FAME_AGENT_NETWORK_001`.\n\nPreparare il recovery (nessuna chiamata al modello):\n\n```powershell\npython strumenti/fame-local-worker/qa_recovery.py init --source \"$HOME\\FAME_AGENT_NETWORK_001\" --root \"$HOME\\FAME_AGENT_RECOVERY_001\"\n```\n\nEseguire al massimo due chiamate, una per incarico:\n\n```powershell\npython strumenti/fame-local-worker/qa_recovery.py run --root \"$HOME\\FAME_AGENT_RECOVERY_001\"\n```\n\nIl runner accetta solo una rete originale completa 13/14, con il solo LOWEND_CAUSES_UNPROVEN in SEMANTIC_FAIL. Controlla richieste, risposte e ricevute originali e congela gli hash degli artefatti. Fonte e recovery devono essere cartelle separate. Gli hash rilevano cambiamenti rispetto allo snapshot locale: non costituiscono una firma indipendente dell'operatore.\n\nUn secondo `run` visita soltanto incarichi mai tentati: nessun retry automatico di errori, fallimenti o tentativi interrotti. Non cancellare una cartella per ottenere un nuovo primo tentativo. Dopo un crash, rimuovere un eventuale lock soltanto dopo aver confermato che il processo è terminato.\n\nPer rileggere e rivalidare senza chiamare Ollama:\n\n```powershell\npython strumenti/fame-local-worker/qa_recovery.py status --root \"$HOME\\FAME_AGENT_RECOVERY_001\"\n```"
+    },
+    {
+      "unitId": "U04",
+      "text": "## Interpretazione\n\nIl risultato finale è in `recovery-results/<timestamp>/evaluation.json`. Le cartelle `summaries` descrivono solo i due sottoincarichi, non l'esito della rete completa.\n\n- `VALIDATED_AFTER_RECOVERY`: entrambe le verifiche accettate, evidenze unite sufficienti per la rubrica originale e tutti i dieci finding validi. Vengono scritti anche answer.json e review.md.\n- `NEEDS_REVIEW`: recupero non completo; nessun report finale promosso. Conservare raw response, result ed evaluation per diagnosi.\n- `firstPassAccepted=13`, `firstPassTotal=14`, `firstPassPassed=false` restano invariati anche se dopo il recupero si arriva a 14/14.\n\nI tempi del primo passaggio e del recupero restano distinti e viene riportato il totale. Nessun training, batch audio, modifica algoritmo o task-data readiness viene autorizzato. Il livello low è richiesto, non certificato tramite una misura indipendente."
+    },
+    {
+      "unitId": "U05",
+      "text": "## Checkpoint successivo per GPT-5.6 / GPT-6\n\n1. Registrare l'esito reale del recovery, inclusi eventuali fallimenti, con modello, digest, richieste, risposte, tempi e interventi umani. I test simulati del codice non sono risultati del modello.\n2. Se fallisce, ispezionare le risposte delle sole due scrivanie; non aumentare retry o indebolire rubriche per ottenere un PASS.\n3. Se passa, congelare il protocollo prima di scegliere un nuovo report non usato per svilupparlo. Definire prima della chiamata affermazioni vere, false e composte e rubrica indipendente lato operatore. Non inserire nel prompt ID attesi o risposte.\n4. Misurare separatamente primo passaggio, recuperi, falsi positivi, evidenze mancanti, chiamate, tempo modello e revisione umana. Un nuovo report potrà valutare trasferimento; questo recovery sul caso noto no.\n5. Solo dopo quel controllo assegnare un primo lavoro QA reale ristretto. La generalizzazione della scomposizione è ancora da progettare: questa versione implementa esplicitamente il caso low-end, non un pianificatore autonomo universale."
+    },
+    {
+      "unitId": "U06",
+      "text": "## Verifica del codice\n\nDalla cartella strumenti/fame-local-worker:\n\n```powershell\npython -m unittest test_qa_coordinator test_qa_recovery -q\n```\n\n19 test con client simulato: isolamento incarichi, copertura semantica, merge sotto rubrica originale, conservazione byte per byte della fonte, assenza di riesecuzione, interruzioni, errori di trasporto, modifiche alla fonte prima/durante il run e manomissione della risposta. Nessuna chiamata reale a Ollama eseguita per questi test.\n"
+    }
+  ],
+  "checks": [
+    {
+      "code": "FIRST_PASS_IMMUTABLE",
+      "assertion": "Anche se il recovery completa la copertura, i conteggi e lo stato del first pass restano invariati e non diventano retroattivamente un 14/14 al primo tentativo."
+    },
+    {
+      "code": "NO_ORACLE_OR_AUTO_RETRY",
+      "assertion": "Il recovery non invia al modello risposte attese, ID corretti o rubrica e un secondo run visita solo incarichi mai tentati, senza retry automatico di fallimenti o interruzioni."
+    },
+    {
+      "code": "RECOVERY_NOT_TRANSFER_PROOF",
+      "assertion": "Il recovery sul caso noto non valuta il trasferimento o la generalizzazione; per quello serve un nuovo report congelato prima della chiamata."
+    },
+    {
+      "code": "RECOVERY_AUTHORIZES_TRAINING",
+      "assertion": "Un recovery validato autorizza training, batch audio o modifiche algoritmiche."
+    },
+    {
+      "code": "LOCAL_HASH_IS_INDEPENDENT_SIGNATURE",
+      "assertion": "Gli hash locali del recovery costituiscono una firma indipendente dell'operatore."
+    }
+  ],
+  "rubric": {
+    "FIRST_PASS_IMMUTABLE": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U04"
+        ]
+      ],
+      "benignContext": [
+        "U01",
+        "U02"
+      ]
+    },
+    "NO_ORACLE_OR_AUTO_RETRY": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U02"
+        ],
+        [
+          "U03"
+        ]
+      ],
+      "benignContext": [
+        "U01",
+        "U05"
+      ]
+    },
+    "RECOVERY_NOT_TRANSFER_PROOF": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U05"
+        ]
+      ],
+      "benignContext": [
+        "U01",
+        "U04"
+      ]
+    },
+    "RECOVERY_AUTHORIZES_TRAINING": {
+      "supported": false,
+      "requiredGroups": [],
+      "benignContext": []
+    },
+    "LOCAL_HASH_IS_INDEPENDENT_SIGNATURE": {
+      "supported": false,
+      "requiredGroups": [],
+      "benignContext": []
+    }
+  }
+}
