@@ -711,19 +711,117 @@ Il test conserva entrambe le proprieta:
 - U01 viene verificata esplicitamente come blocco che contiene gia tutti gli
   elementi DIRECT/CONTEXTUAL della finding.
 
+## Verifica locale dopo V2_003
+
+Esecuzione operatore:
+
+```text
+Ran 39 tests
+OK
+```
+
+Quindi le regressioni introdotte dopo la diagnosi V2_003 risultano PASS sul PC
+locale.
+
+## Checkpoint V2_004 preparato
+
+Sono stati scelti due nuovi task ID su documenti byte-identici al commit
+`cdea2227`.
+
+Task 1:
+
+```text
+transfer-protocol-v2
+source: strumenti/fame-local-worker/QA_TRANSFER.md
+```
+
+Verifica:
+
+- componenti congelate vs componenti nuove del transfer;
+- metrica primaria piu stretta del solo VALIDATED_FOR_REVIEW;
+- revisione umana ancora necessaria;
+- controlli negativi contro blind-test non certificato, retro-PASS dopo difetto
+  rubric e certificazione prematura di rete multiagente.
+
+Task 2:
+
+```text
+review-boundary-v2
+source: strumenti/fame-local-worker/QA_REVIEW.md
+```
+
+Verifica:
+
+- policy operativa host-owned;
+- VALIDATED_FOR_REVIEW distinto da autorizzazione all'esecuzione;
+- retry assistito distinto da successo spontaneo;
+- regola v6 di salvage solo con coverage gia completa;
+- controlli negativi contro shell/repo access autonomo, salvage con coverage
+  mancante e dichiarazione di network readiness da un singolo report.
+
+Le rubriche V2_004 applicano gia la regola anti-duplicazione dei required group:
+ogni finding positiva ha una sola unit necessaria quando quella unit copre
+integralmente l'asserzione; i rinforzi ragionevoli sono solo benign context.
+
+Commit preparati:
+
+```text
+2f1c92e7fc103dbb18b7a9ffd4ca933385e43f33
+test(fame-local-worker): freeze transfer protocol source
+
+7ebdc023e068455a7cc29eb75c707b55449aea52
+test(fame-local-worker): freeze review boundary source
+
+09fb7a3a369001f03af6fb9baa49464ead27e91b
+feat(fame-local-worker): add transfer protocol v2 task
+
+3a226fc2ab38e4d9c96056734693df66c724fa20
+feat(fame-local-worker): add review boundary v2 task
+
+69e870ec49b4a66f94be57f11b67b3cf851be0f5
+test(fame-local-worker): validate transfer review v2 checkpoint
+```
+
+I nuovi test specifici sono 13 e coprono:
+
+- ricostruzione package/fonti;
+- expected answers;
+- coverage necessaria;
+- falsi positivi di blind test/autorizzazione/generalizzazione;
+- confine salvage v6;
+- benign context;
+- unreviewed evidence;
+- payload senza rubrica;
+- init queue a due desk senza model call.
+
 ## Prossimo intervento
 
-Verificare localmente le nuove regressioni:
+Verificare localmente V2_004:
 
 ```powershell
 git pull --ff-only origin recovery/fame-local-worker-v2-cdea2227
 python -m unittest discover -s . -p "test_direct_qa_*v2.py" -q
 ```
 
-Il totale atteso passa da 38 a **39 test**.
+Con i 13 nuovi test il totale atteso passa da 39 a **52 test**.
 
-Dopo PASS, non riusare V2_003. Il checkpoint successivo deve usare task ID nuovi
-e applicare gia in authoring la regola contro required group ridondanti.
+Solo dopo PASS inizializzare, senza inferenza:
+
+```powershell
+python direct_qa_queue_v2.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_004" --tasks transfer-protocol-v2 review-boundary-v2
+python direct_qa_queue_v2.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_004"
+```
+
+Stato atteso:
+
+```text
+transfer-protocol-v2 = NOT_RUN, modelCalls=0
+review-boundary-v2   = NOT_RUN, modelCalls=0
+queue status         = PENDING
+executionAuthorized  = false
+```
+
+Non eseguire `run` prima del PASS locale e della verifica dello status.
 
 ## Vincolo di continuita
 
