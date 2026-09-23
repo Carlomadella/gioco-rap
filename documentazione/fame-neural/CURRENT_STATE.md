@@ -1,5 +1,11 @@
 # FAME Neural — Current State
 
+## Primo run reale Direct QA — PF-NMF VALIDATED_FOR_REVIEW
+
+Il primo incarico della coda generica, `pfnmf-review-v1`, e stato eseguito una sola volta su `FAME_DIRECT_QA_NETWORK_001` con esito operator-reported `VALIDATED_FOR_REVIEW`, `modelCalls=1`, `executionAuthorized=false`. La review prodotta e coerente con la rubrica congelata: gate/cross-activation supportati da U02+U03, D06 9 snare + 1 kick da U03, scope BIC da U06, apertura training non supportata.
+
+Il task non viene ripetuto. Il worker diretto generico ha quindi completato il primo checkpoint reale del percorso `snapshot host -> Ollama diretto -> schema -> validatore -> review umana`. Prossimo passo: aggiungere un secondo incarico utile e distinto, con fonte e rubrica congelate prima del run. Dettagli in [DIRECT_QA_PFNMF_RESULT_2026-09-23.md](../../strumenti/fame-local-worker/DIRECT_QA_PFNMF_RESULT_2026-09-23.md).
+
 ## Checkpoint operativo — worker QA diretto riutilizzabile pronto
 
 Implementati `direct_qa_worker.py` e `direct_qa_queue.py`: pacchetti task congelati, una chiamata per scrivania, controlli host-side e nessuna azione autorizzata dal modello. Prima coda `FAME_DIRECT_QA_NETWORK_001`, incarico `pfnmf-review-v1` sul report storico PF-NMF, con unità testuali complete. I precedenti probe restano invariati; la preparazione Cline sotto è archivio, non prossimo passo. 18 test con client simulato passati; run Ollama reale ancora da eseguire. Comandi, criteri e limiti in [DIRECT_QA_WORKER.md](../../strumenti/fame-local-worker/DIRECT_QA_WORKER.md).

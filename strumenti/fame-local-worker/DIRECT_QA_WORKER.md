@@ -73,3 +73,9 @@ python -m unittest discover -s strumenti/fame-local-worker -p "test_direct_qa_*.
 ```
 
 Registrare il primo run reale e ispezionare review.md. Misurare anche il tempo umano: elapsedSeconds del runner non dimostra risparmio netto. Solo dopo questo checkpoint aggiungere un secondo incarico utile e indipendente. Non riaprire Cline né ripetere casi consumati per ottenere PASS. Se cambia la rubrica dopo osservazione, la rivalutazione va riportata separatamente.
+
+## Primo run reale registrato
+
+`FAME_DIRECT_QA_NETWORK_001 / pfnmf-review-v1 / attempt-1` ha restituito `VALIDATED_FOR_REVIEW` con una sola chiamata al modello e `executionAuthorized=false`. La review umana e risultata coerente con la rubrica congelata. Il task e consumato e non va ripetuto in una seconda root.
+
+Risultato: [DIRECT_QA_PFNMF_RESULT_2026-09-23.md](DIRECT_QA_PFNMF_RESULT_2026-09-23.md).
