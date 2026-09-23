@@ -86,6 +86,47 @@ Stati principali:
 A questo checkpoint non e documentato alcun nuovo run reale v2. La v2 non va
 usata per riprocessare i tre task v1 consumati.
 
+## Hardening eseguito sulla branch di recovery
+
+Durante la rilettura della v2 e stato trovato un difetto nell'aggregazione della
+coda: con una desk in `ERROR` e task successivi ancora `NOT_RUN`,
+`direct_qa_queue_v2.state()` classificava l'intera coda come `PENDING`.
+Questo poteva mascherare un errore operativo gia avvenuto.
+
+Correzione applicata:
+
+```text
+a1c44f26e450dd1e7eb5f0a4344ca112faac2690
+fix(fame-local-worker): preserve terminal queue failures
+```
+
+La precedenza ora e:
+
+1. tutte first-pass accettate -> `VALIDATED_FOR_REVIEW`;
+2. tutte accettate, con almeno un repair -> `VALIDATED_FOR_REVIEW_AFTER_REPAIR`;
+3. qualsiasi stato terminale/non accettato gia presente -> `NEEDS_REVIEW`;
+4. solo accepted + `NOT_RUN` -> `PENDING`.
+
+Regressione aggiunta:
+
+```text
+82f4a3357b7d53d8a86c2c24416548746f43b7a9
+test(fame-local-worker): cover terminal error aggregation
+```
+
+Il test costruisce una coda con due task, forza un timeout sulla prima desk e
+verifica:
+
+```text
+results = [ERROR, NOT_RUN]
+queue status = NEEDS_REVIEW
+model calls = 1
+```
+
+La branch remota contiene la patch e il test. La suite non e stata rieseguita in
+questo ambiente perche il container non riesce a risolvere `github.com`; la
+verifica locale resta obbligatoria prima del nuovo run reale v2.
+
 ## Regole di authoring gia acquisite
 
 Le evidence unit devono essere blocchi semanticamente completi. Un heading
@@ -105,21 +146,24 @@ Prima di congelare un nuovo pacchetto:
 
 ## Verifica locale prevista
 
-Dalla root della repository, sul branch di recovery:
+Dalla root della repository:
 
 ```powershell
+git fetch origin
 git switch recovery/fame-local-worker-v2-cdea2227
+git pull --ff-only origin recovery/fame-local-worker-v2-cdea2227
 python -m unittest discover -s strumenti/fame-local-worker -p "test_direct_qa_*v2.py" -q
 ```
 
-I documenti presenti a `cdea2227` riportano i test v2 come passati con client
-simulato; questo file non sostituisce una nuova esecuzione locale dei test.
+I documenti presenti a `cdea2227` riportano i test v2 originali come passati
+con client simulato; il nuovo test di regressione deve ancora essere eseguito
+sul PC locale dopo il pull della branch di recovery.
 
 ## Prossimo intervento
 
-Il passo successivo corretto e preparare un NUOVO task Direct QA specifico per
-la v2, con fonte e rubrica congelate prima dell'inferenza, e aggiungere i test
-del pacchetto.
+Dopo il PASS locale della suite v2, il passo successivo corretto e preparare un
+NUOVO task Direct QA specifico per la v2, con fonte e rubrica congelate prima
+dell'inferenza, e aggiungere i test del pacchetto.
 
 Non scegliere o rieseguire automaticamente PF-NMF, subset+BIC o Tsumugi
 controlled. Non aprire un filone audio/MIDI come sostituto del nuovo task.
