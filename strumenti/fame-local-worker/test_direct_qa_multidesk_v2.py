@@ -70,6 +70,26 @@ class MultiDeskV2PackageTests(unittest.TestCase):
         self.assertFalse(result['accepted'])
         self.assertIn('RERUN_CONSUMED_TASK:INCORRECT_CONCLUSION',result['errors'])
 
+    def test_declared_benign_context_warns_but_does_not_reject(self):
+        answer=json.loads(json.dumps(authoring_good()))
+        answer['results'][0]['evidenceIds']=['U01','U03']
+        result=w.assess(answer,w.package(AUTHORING))
+        self.assertTrue(result['accepted'])
+        row=result['assessments'][0]
+        self.assertEqual(row['coverage'],'SUFFICIENT')
+        self.assertEqual(row['precisionWarnings'],['U03'])
+        self.assertEqual(row['unreviewedEvidenceIds'],[])
+
+    def test_undeclared_extra_context_is_rejected(self):
+        answer=json.loads(json.dumps(coordinator_good()))
+        answer['results'][2]['evidenceIds']=['U05','U01']
+        result=w.assess(answer,w.package(COORD))
+        self.assertFalse(result['accepted'])
+        self.assertIn('GLOBAL_VALIDATION_GATE:UNREVIEWED_EVIDENCE',result['errors'])
+        row=result['assessments'][2]
+        self.assertEqual(row['coverage'],'SUFFICIENT')
+        self.assertEqual(row['unreviewedEvidenceIds'],['U01'])
+
     def test_payloads_do_not_expose_host_rubrics(self):
         for task in (COORD,AUTHORING):
             request=json.dumps(w.payload(w.package(task)),ensure_ascii=False)
