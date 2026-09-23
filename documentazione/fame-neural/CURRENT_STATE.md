@@ -1,5 +1,13 @@
 # FAME Neural — Current State
 
+## Tsumugi checkpoint V1 confermato — nuovo score diagnostic congelato
+
+Environment doctor operator-reported sul checkpoint SHA congelato ha confermato `semi_crf_version=v1`, `num_pitch_slots=1`, 88 pitch MIDI 21–108. Questo chiude definitivamente il presupposto pair-gate: il V1 head non emette `pair_gate_logits` e il suo `selected_pair_count` storico indica 88 pitch/slot tracks, non pair selezionati.
+
+Preparato il nuovo run append-only `audio-to-midi-p5-tsumugi-v1-score-diagnostic-v1-001`. Usa esclusivamente le reali uscite V1 `interval_query/key/diag`, calcola score pitch-wise sui target kick/snare/hihat a `note_bias=0` e confronta tali score con i decoder stats gia persistiti del controlled run. Non esegue una nuova Semi-CRF decode, non produce trascrizione, non ritocca parametri e non apre beat reali.
+
+Prima del run reale devono passare static test e self-test locali. Il precedente pair-gate runId resta consumato/chiuso e non viene ritentato.
+
 ## Tsumugi score diagnostic — controlled failure per head contract errato
 
 Il primo tentativo del pair-gate score diagnostic ha passato static/self-test ma si e fermato durante il model forward con `KeyError: pair_gate_logits`. Audit del source Tsumugi congelato mostra che `pair_gate_logits` esiste solo nel V2 head; il V1 head usa `interval_query/key/diag`. Inoltre nel decoder V1 `selected_pair_count` e semplicemente il numero di track pitch/slot e non costituisce evidence di pair-gate selection.

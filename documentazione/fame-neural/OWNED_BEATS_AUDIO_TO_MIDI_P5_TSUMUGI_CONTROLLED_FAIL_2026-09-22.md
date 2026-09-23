@@ -90,3 +90,14 @@ La conclusione verificata viene quindi ristretta a:
 - serve una nuova diagnostica controllata sui soli fixture sintetici che registri `pair_gate_logits` e interval-score margins a `note_bias=0`, senza modificare nessun parametro e senza accedere a beat reali.
 
 Il reporter read-only è stato corretto per segnalare `TOPK_ENUMERATES_ALL_ALLOWED_PITCHES_NO_INTERVALS_DECODED` quando questa condizione è presente.
+
+
+## Seconda correzione — checkpoint V1 confermato
+
+L'environment doctor eseguito il 23 settembre sul checkpoint congelato ha confermato `semi_crf_version=v1` e `num_pitch_slots=1`.
+
+Questo invalida la precedente interpretazione basata sul pair gate: `pair_gate_logits` e `_select_pair_candidates` appartengono al percorso V2, mentre il checkpoint `drums_v1_5` in uso istanzia il V1 head. Nel decoder V1, `selected_pair_count` e il numero di track pitch/slot (`88 * 1 = 88`) e **non** una misura di confidenza o selezione pair-gate.
+
+La conclusione corretta sui fixture D03/D06/D07 resta soltanto che il silence gate non li elimina e il source controlled run riporta zero intervalli decodificati/final notes; il livello a cui si indebolisce il segnale va localizzato sulle reali uscite V1 `interval_query/key/diag`.
+
+Il pair-gate diagnostic `audio-to-midi-p5-tsumugi-score-diagnostic-v1-001` e stato chiuso come design failure. Il sostituto congelato e `audio-to-midi-p5-tsumugi-v1-score-diagnostic-v1-001`.

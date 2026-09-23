@@ -1,0 +1,95 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-p5-tsumugi-v1-score-diagnostic-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_FIRST_V1_SCORE_DIAGNOSTIC_RUN",
+  "createdAt": "2026-09-23",
+  "decision": "NDR-099_V1_HEAD_CORRECTION",
+  "candidateId": "tsumugi-drums-v1_5",
+  "sourceRunId": "audio-to-midi-p5-tsumugi-controlled-v1-001",
+  "priorFailedRunId": "audio-to-midi-p5-tsumugi-score-diagnostic-v1-001",
+  "runId": "audio-to-midi-p5-tsumugi-v1-score-diagnostic-v1-001",
+  "purpose": "LOCALIZE_V1_PITCH_SEMI_CRF_SCORE_WITHOUT_RETUNING",
+  "fixtures": [
+    "D01_KICK_ISOLATED",
+    "D02_SNARE_ISOLATED",
+    "D03_HIHAT_ISOLATED",
+    "D04_KICK_SNARE_SIMULTANEOUS",
+    "D05_KICK_HIHAT_SIMULTANEOUS",
+    "D06_HIHAT_TRIPLETS",
+    "D07_KICK_SYNCOPATED",
+    "D08_UNSUPPORTED_CLAP_RIM"
+  ],
+  "checkpointContract": {
+    "semiCrfVersion": "v1",
+    "numPitchSlots": 1,
+    "numPitches": 88,
+    "midiRange": [
+      21,
+      108
+    ],
+    "checkpointSha256": "65138ad1dd919f33fb0ce56e54c0c23c87deaad6511132d69137cf4901ee9319"
+  },
+  "inferenceContract": {
+    "reuseControlledCheckpointAndEnvironment": true,
+    "device": "cuda",
+    "amp": false,
+    "compile": false,
+    "instrumentFilter": "drums",
+    "noteBias": 0,
+    "semiCrfBackend": "torch",
+    "noParameterMutation": true,
+    "semiCrfDecodeInThisDiagnostic": false,
+    "finalTranscriptionInThisDiagnostic": false
+  },
+  "pitchDiagnostics": {
+    "targetPitches": [
+      35,
+      36,
+      38,
+      40,
+      42,
+      44,
+      46
+    ],
+    "roleGroups": {
+      "kick": [
+        35,
+        36
+      ],
+      "snare": [
+        38,
+        40
+      ],
+      "hihat": [
+        42,
+        44,
+        46
+      ]
+    },
+    "reportPerTargetPitch": [
+      "maxSingletonScore",
+      "positiveSingletonCount",
+      "maxNonSingletonScore",
+      "positiveNonSingletonCount",
+      "maxEventScore",
+      "positiveIntervalScorePresent"
+    ]
+  },
+  "interpretationRules": {
+    "scoreHeadWeak": "source controlled decodedIntervalCount is 0 and every expected-role target maxEventScore is <= 0",
+    "positiveScoreButNoDecodedIntervals": "source controlled decodedIntervalCount is 0 and at least one expected-role target maxEventScore is > 0",
+    "sourceControlledIntervalsPresent": "source controlled decodedIntervalCount is > 0",
+    "noRetuningFromDiagnostic": true
+  },
+  "safety": {
+    "sourceAudioAccessAllowed": false,
+    "fixtureAudioAccessAllowed": true,
+    "ownedBeatAudioAccessAllowed": false,
+    "sourceSeparationAllowed": false,
+    "semiCrfDecodeAllowed": false,
+    "trainingAuthorized": false,
+    "batch131Authorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "nextAction": "RUN_APPEND_ONLY_TSUMUGI_V1_SCORE_DIAGNOSTIC_ON_FROZEN_SYNTHETIC_FIXTURES"
+}

@@ -9,6 +9,8 @@ from pathlib import Path
 RUN_ID="audio-to-midi-p5-tsumugi-controlled-v1-001"
 PROTOCOL_FILE=Path(__file__).resolve().parent/"audio-to-midi-p5-tsumugi-controlled-protocol-v1.json"
 TSUMUGI_NUM_PITCHES=88
+FROZEN_CHECKPOINT_SEMI_CRF_VERSION="v1"
+FROZEN_CHECKPOINT_NUM_PITCH_SLOTS=1
 
 def read_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8-sig"))
@@ -33,22 +35,14 @@ def localization_hint(result, protocol):
     resolved=result.get("resolvedInferenceSettings") or {}
     allowed_ids=resolved.get("allowedInstrumentIds") or []
     topk=int(protocol.get("inference",{}).get("instrumentPairInferTopk",0))
-    topk_covers_all_allowed=(
-        len(allowed_ids)==1 and topk>=TSUMUGI_NUM_PITCHES
-    )
+    expected_v1_track_count=TSUMUGI_NUM_PITCHES*FROZEN_CHECKPOINT_NUM_PITCH_SLOTS
 
     if raw_count>0:
         hint="PREDICTED_NOTES_PRESENT"
     elif window_count is not None and skipped is not None and int(window_count)>0 and int(skipped)==int(window_count):
         hint="ALL_WINDOWS_SKIPPED_BY_SILENCE_GATE"
-    elif selected_pairs is not None and int(selected_pairs)==0:
-        hint="NO_INSTRUMENT_PITCH_PAIRS_SELECTED"
-    elif selected_pairs is not None and int(selected_pairs)>0 and decoded_intervals is not None and int(decoded_intervals)==0:
-        hint=(
-            "TOPK_ENUMERATES_ALL_ALLOWED_PITCHES_NO_INTERVALS_DECODED"
-            if topk_covers_all_allowed
-            else "PAIRS_SELECTED_BUT_NO_INTERVALS_DECODED"
-        )
+    elif decoded_intervals is not None and int(decoded_intervals)==0:
+        hint="V1_PITCH_TRACKS_PRESENT_NO_INTERVALS_DECODED"
     elif decoded_intervals is not None and int(decoded_intervals)>0:
         hint="INTERVALS_DECODED_BUT_NO_FINAL_NOTES"
     else:
@@ -63,10 +57,12 @@ def localization_hint(result, protocol):
         "decodedIntervalCount":decoded_intervals,
         "boundaryNoOnsetCount":boundary_no_onset,
         "boundaryNoOffsetCount":boundary_no_offset,
+        "checkpointSemiCrfVersion":FROZEN_CHECKPOINT_SEMI_CRF_VERSION,
+        "expectedV1PitchTrackCount":expected_v1_track_count,
         "instrumentPairInferTopk":topk,
         "allowedInstrumentIds":allowed_ids,
-        "topkCoversAllAllowedPitches":topk_covers_all_allowed,
-        "selectedPairCountIsGateConfidenceEvidence":False if topk_covers_all_allowed else None,
+        "selectedPairCountMeaning":"PITCH_SLOT_TRACK_COUNT",
+        "selectedPairCountIsGateConfidenceEvidence":False,
     }
 
 def summarize_result(result, protocol):
@@ -145,7 +141,7 @@ def self_test():
         "decoderStats":{"window_count":1,"skipped_silent_window_count":0,"selected_pair_count":0,"decoded_interval_count":0}
     }
     protocol={"inference":{"instrumentPairInferTopk":0}}
-    assert localization_hint(a,protocol)["hint"]=="NO_INSTRUMENT_PITCH_PAIRS_SELECTED"
+    assert localization_hint(a,protocol)["hint"]=="V1_PITCH_TRACKS_PRESENT_NO_INTERVALS_DECODED"
     b={
         "rawPredictedNoteCount":0,
         "decoderStats":{"window_count":1,"skipped_silent_window_count":1,"selected_pair_count":0,"decoded_interval_count":0}
@@ -155,10 +151,9 @@ def self_test():
         "rawPredictedNoteCount":0,
         "decoderStats":{"window_count":1,"skipped_silent_window_count":0,"selected_pair_count":3,"decoded_interval_count":0}
     }
-    assert localization_hint(c,protocol)["hint"]=="PAIRS_SELECTED_BUT_NO_INTERVALS_DECODED"
-    c["resolvedInferenceSettings"]={"allowedInstrumentIds":[7]}
-    protocol={"inference":{"instrumentPairInferTopk":256}}
-    assert localization_hint(c,protocol)["hint"]=="TOPK_ENUMERATES_ALL_ALLOWED_PITCHES_NO_INTERVALS_DECODED"
+    assert localization_hint(c,protocol)["hint"]=="V1_PITCH_TRACKS_PRESENT_NO_INTERVALS_DECODED"
+    assert localization_hint(c,protocol)["selectedPairCountMeaning"]=="PITCH_SLOT_TRACK_COUNT"
+    assert localization_hint(c,protocol)["selectedPairCountIsGateConfidenceEvidence"] is False
     return {"mode":"FAME_NEURAL_P5_TSUMUGI_FAILURE_REPORT_SELF_TEST_PASS"}
 
 def main():
