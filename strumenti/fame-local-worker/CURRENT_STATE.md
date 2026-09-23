@@ -154,19 +154,6 @@ File aggiunti:
 - `cases/direct-qa/local-worker-runtime-transition-v2.json`
 - `test_direct_qa_runtime_transition_v2.py`
 
-Commit di preparazione:
-
-```text
-d09cd137aecffba92b4d2a5ab0fff921023d5f60
-test(fame-local-worker): freeze runtime transition source
-
-8659056a06731a9edc1e725203954198107a7878
-feat(fame-local-worker): add first v2 runtime transition task
-
-680b3c631efcd87954ae47976c3dfd963745f435
-test(fame-local-worker): validate runtime transition v2 package
-```
-
 Il task misura cinque affermazioni:
 
 1. due failure classi distinte osservate nel percorso Cline e limite del
@@ -180,10 +167,7 @@ Il task misura cinque affermazioni:
 5. controllo negativo: la decisione non autorizza autonomia di produzione senza
    validazione host.
 
-La fonte e nuova rispetto ai tre task Direct QA consumati. Non viene
-riprocessato PF-NMF, subset+BIC o Tsumugi controlled.
-
-## Root reale v2 inizializzata
+## Prima root reale v2
 
 Root operatore:
 
@@ -199,45 +183,47 @@ local-worker-runtime-transition-v2
 
 Status verificato dopo `init`:
 
-```json
-{
-  "schema": "fame-direct-qa-queue-v2",
-  "results": [
-    {
-      "taskId": "local-worker-runtime-transition-v2",
-      "status": "NOT_RUN",
-      "modelCalls": 0,
-      "firstAttemptPass": null,
-      "acceptedAfterRepair": false
-    }
-  ],
-  "status": "PENDING",
-  "executionAuthorized": false
-}
+```text
+desk status = NOT_RUN
+modelCalls = 0
+queue status = PENDING
+executionAuthorized = false
 ```
 
-Quindi l'inizializzazione e avvenuta senza chiamate al modello e senza
-autorizzazioni operative.
+## Esito prima inferenza reale v2
+
+Status operator-reported dopo il run e rilettura con `status`:
+
+```text
+taskId = local-worker-runtime-transition-v2
+status = VALIDATED_FOR_REVIEW
+modelCalls = 1
+firstAttemptPass = true
+acceptedAfterRepair = false
+queue status = VALIDATED_FOR_REVIEW
+executionAuthorized = false
+```
+
+Interpretazione verificabile dal protocollo v2:
+
+- il task ha superato il validatore al primo tentativo;
+- non e stata usata la seconda chiamata di repair;
+- la root e consumata e non deve essere rilanciata;
+- `VALIDATED_FOR_REVIEW` richiede ancora revisione umana;
+- nessuna azione operativa e stata autorizzata.
 
 ## Prossimo intervento
 
-Prima inferenza reale v2 sulla root gia inizializzata:
+Leggere gli artefatti dell' `attempt-1` senza nuove chiamate al modello:
 
 ```powershell
-python direct_qa_queue_v2.py run --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_001"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_001\desks\local-worker-runtime-transition-v2\attempt-1\review.md"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_001\desks\local-worker-runtime-transition-v2\attempt-1\validation.json"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_001\desks\local-worker-runtime-transition-v2\attempt-1\report.json"
 ```
 
-Il worker conserva `attempt-1`. Se il validatore semantico/citazionale rifiuta,
-puo effettuare al massimo una seconda chiamata controllata nello stesso run con
-feedback generico; errori di preflight o trasporto non attivano repair.
-
-Dopo il run, leggere anche lo stato riproducibile senza nuove chiamate:
-
-```powershell
-python direct_qa_queue_v2.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_001"
-```
-
-Non rilanciare `run` su questa root una volta consumata.
+Questa lettura e la revisione umana del first-pass. Non rilanciare `run` sulla
+root `FAME_DIRECT_QA_NETWORK_V2_001`.
 
 ## Vincolo di continuita
 
