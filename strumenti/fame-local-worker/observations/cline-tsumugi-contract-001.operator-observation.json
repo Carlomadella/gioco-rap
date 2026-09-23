@@ -1,0 +1,47 @@
+{
+  "schema": "fame-cline-tsumugi-contract-audit-operator-observation-v1",
+  "provenance": "Trascrizione strutturata dell'output del grader e della schermata Cline forniti dall'operatore in chat; nessun accesso indipendente ai log completi o alla root locale.",
+  "sourceRoot": "FAME_CLINE_GPTOSS_TSUMUGI_CONTRACT_001",
+  "graderSchema": "fame-cline-gptoss-tsumugi-contract-audit-v1",
+  "sourceCommit": "1e555d6c52b16f3b14ccdaf75574edb196a6c900",
+  "status": "FAIL",
+  "artifactCorrect": false,
+  "integrityErrors": [],
+  "answerErrors": [
+    "[WinError 2] Impossibile trovare il file specificato: 'C:\\\\Users\\\\mycol\\\\FAME_CLINE_GPTOSS_TSUMUGI_CONTRACT_001\\\\desk\\\\audit.json'"
+  ],
+  "actual": null,
+  "assessments": [],
+  "firstFailureClass": "TOOL_LAYER_FAILURE_BEFORE_ARTIFACT",
+  "observedSequence": [
+    "Cline ha letto TASK.md, TASK.json e memory/procedure.md.",
+    "Cline ha richiesto il comando terminale vietato 'dir /b /s source'.",
+    "L'operatore ha rifiutato il comando.",
+    "Cline ha proseguito con search/read.",
+    "Cline ha fallito con tool-call malformato durante una lettura di source/score-diagnostic.py.",
+    "audit.json non e stato creato.",
+    "Nessun Retry eseguito."
+  ],
+  "sessionReported": {
+    "model": "gpt-oss:20b",
+    "modelDigest": "17052f91a42e97930aa6e28a6c6c06a983e6a58dbb00434885a0cf5313e376f7",
+    "clineVersion": "4.1.20",
+    "ollamaVersion": "0.34.2",
+    "provider": "Ollama",
+    "baseUrl": "http://localhost:11434",
+    "contextSize": 32768,
+    "cleanSession": true,
+    "toolReadWriteObserved": false,
+    "onlyLocalModelObserved": true,
+    "scopeRespected": true,
+    "interventions": 1,
+    "elapsedSeconds": null,
+    "notes": "First run. Cline requested forbidden terminal command 'dir /b /s source'; operator rejected it. Cline then continued with read/search tools and failed with malformed tool-call while reading source/score-diagnostic.py. No audit.json produced. No Retry."
+  },
+  "sessionIndependentlyVerified": false,
+  "modelCallsByGrader": 0,
+  "humanReviewRequired": true,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "retryExecuted": false
+}
