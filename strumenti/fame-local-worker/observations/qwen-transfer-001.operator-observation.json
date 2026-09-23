@@ -1,0 +1,170 @@
+{
+  "schema": "fame-qa-transfer-operator-observation-v1",
+  "provenance": "Trascrizione strutturata degli output incollati dall'operatore in chat; non importazione o verifica dei file originali sul PC.",
+  "codeCommit": "5f29502092c9b641117e595a70a4489e651e66be",
+  "runId": "20260923T071733244082Z",
+  "root": "C:\\Users\\mycol\\FAME_QA_TRANSFER_001",
+  "model": "qwen3-coder:30b",
+  "modelDigest": null,
+  "modelDigestNote": "Da acquisire dal preflight.json originale; non presente nell'output incollato.",
+  "status": "REJECTED",
+  "transferStatus": "FAIL",
+  "firstAttemptPass": false,
+  "validation": {
+    "errors": [
+      "DRUMS_FAIL_IRRELEVANT_EVIDENCE",
+      "DRUMS_FAIL_INSUFFICIENT_EVIDENCE",
+      "LOWEND_PASS_IRRELEVANT_EVIDENCE",
+      "LOWEND_PASS_INSUFFICIENT_EVIDENCE",
+      "INCOMPLETE_FINDINGS"
+    ],
+    "candidateErrors": [
+      "DRUMS_FAIL_IRRELEVANT_EVIDENCE",
+      "DRUMS_FAIL_INSUFFICIENT_EVIDENCE",
+      "LOWEND_PASS_IRRELEVANT_EVIDENCE",
+      "LOWEND_PASS_INSUFFICIENT_EVIDENCE",
+      "INCOMPLETE_FINDINGS"
+    ],
+    "assembledErrors": [
+      "INCOMPLETE_FINDINGS"
+    ],
+    "cachedCodes": [
+      "TECHNICAL_ONLY",
+      "COHORT_CONSUMED",
+      "AUTHORIZATION_CLOSED",
+      "SINGLE_LABEL_LIMIT",
+      "FUSION_BENEFIT_UNISOLATED",
+      "RENDERER_LIMITS"
+    ],
+    "droppedEvidence": [
+      {
+        "code": "AUTHORIZATION_CLOSED",
+        "droppedEvidenceIds": [
+          "E071"
+        ]
+      },
+      {
+        "code": "SINGLE_LABEL_LIMIT",
+        "droppedEvidenceIds": [
+          "E112",
+          "E113",
+          "E114",
+          "E115"
+        ]
+      },
+      {
+        "code": "FUSION_BENEFIT_UNISOLATED",
+        "droppedEvidenceIds": [
+          "E123",
+          "E126"
+        ]
+      }
+    ],
+    "elapsedSeconds": 24.313000000081956
+  },
+  "parsedModelAnswer": {
+    "findings": [
+      {
+        "code": "TECHNICAL_ONLY",
+        "evidenceIds": [
+          "E031"
+        ]
+      },
+      {
+        "code": "DRUMS_FAIL",
+        "evidenceIds": [
+          "E042",
+          "E049",
+          "E050"
+        ]
+      },
+      {
+        "code": "LOWEND_PASS",
+        "evidenceIds": [
+          "E058",
+          "E060",
+          "E061"
+        ]
+      },
+      {
+        "code": "COHORT_CONSUMED",
+        "evidenceIds": [
+          "E016",
+          "E176"
+        ]
+      },
+      {
+        "code": "AUTHORIZATION_CLOSED",
+        "evidenceIds": [
+          "E068",
+          "E069",
+          "E070",
+          "E071"
+        ]
+      },
+      {
+        "code": "SINGLE_LABEL_LIMIT",
+        "evidenceIds": [
+          "E112",
+          "E113",
+          "E114",
+          "E115",
+          "E116",
+          "E117"
+        ]
+      },
+      {
+        "code": "FUSION_BENEFIT_UNISOLATED",
+        "evidenceIds": [
+          "E120",
+          "E121",
+          "E122",
+          "E123",
+          "E124",
+          "E125",
+          "E126",
+          "E132"
+        ]
+      },
+      {
+        "code": "RENDERER_LIMITS",
+        "evidenceIds": [
+          "E160",
+          "E161",
+          "E162",
+          "E163",
+          "E164",
+          "E165"
+        ]
+      }
+    ]
+  },
+  "ollamaMetrics": {
+    "created_at": "2026-09-23T07:17:57.6303434Z",
+    "done": true,
+    "done_reason": "stop",
+    "total_duration": 24302638600,
+    "load_duration": 13514263600,
+    "prompt_eval_count": 11762,
+    "prompt_eval_cached_count": 0,
+    "prompt_eval_duration": 5379388000,
+    "eval_count": 377,
+    "eval_duration": 5379396000
+  },
+  "assessment": {
+    "validatedCategories": 6,
+    "expectedCategories": 10,
+    "omittedCategories": [
+      "ONSET_CAUSE_UNKNOWN",
+      "LOWEND_CAUSES_UNPROVEN"
+    ],
+    "unsupportedCategoriesEmitted": [],
+    "missingSupport": {
+      "DRUMS_FAIL": "Manca il risultato 8/12: E049 e il totale 18, non il conteggio family.",
+      "LOWEND_PASS": "Manca il risultato 10/12: E060 e il totale 28, non il conteggio family."
+    },
+    "humanReviewSeconds": null,
+    "manualBaselineSeconds": null,
+    "netTimeSavingEstablished": false
+  }
+}
