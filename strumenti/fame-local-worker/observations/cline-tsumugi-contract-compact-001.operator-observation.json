@@ -40,8 +40,10 @@
   "toolFlowCompleted": true,
   "auditJsonCreated": true,
   "operatorReportedUiErrors": 5,
-  "operatorReportedUiErrorTextsAvailable": false,
+  "operatorReportedUiErrorTextsAvailable": true,
   "interventions": 0,
   "retryExecuted": false,
-  "sessionIndependentlyVerified": false
+  "sessionIndependentlyVerified": false,
+  "uiErrorClass": "REPEATED_TOOL_CALL_PARSE_ERRORS",
+  "uiEvidence": "Screenshot operatore: cinque errori rossi 'error parsing tool call' durante la sessione; Cline ha proseguito autonomamente e ha infine creato audit.json."
 }
