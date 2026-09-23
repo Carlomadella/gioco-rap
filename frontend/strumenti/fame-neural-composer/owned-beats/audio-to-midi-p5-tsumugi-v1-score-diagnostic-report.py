@@ -28,9 +28,9 @@ def summarize(summary):
 
     localization_counts=Counter()
     supported_role_rows=0
-    zero_interval_supported_role_rows=0
-    zero_interval_positive_role_rows=0
-    zero_interval_nonpositive_role_rows=0
+    absent_target_supported_role_rows=0
+    absent_target_positive_role_rows=0
+    absent_target_nonpositive_role_rows=0
     fixtures=[]
 
     for row in results:
@@ -40,18 +40,21 @@ def summarize(summary):
             localization_counts[localization]+=1
             supported_role_rows+=1
             source_count=int(role.get("sourceControlledDecodedIntervalCount") or 0)
-            if source_count==0:
-                zero_interval_supported_role_rows+=1
+            target_event_count=int(role.get("sourceControlledTargetPitchEventCount") or 0)
+            if target_event_count==0:
+                absent_target_supported_role_rows+=1
                 if bool(role.get("anyPositiveIntervalScore")):
-                    zero_interval_positive_role_rows+=1
+                    absent_target_positive_role_rows+=1
                 else:
-                    zero_interval_nonpositive_role_rows+=1
+                    absent_target_nonpositive_role_rows+=1
             roles.append({
                 "role":role.get("role"),
                 "targetPitches":role.get("targetPitches") or [],
                 "bestMaxEventScore":role.get("bestMaxEventScore"),
                 "anyPositiveIntervalScore":bool(role.get("anyPositiveIntervalScore")),
                 "sourceControlledDecodedIntervalCount":source_count,
+                "sourceControlledTargetPitchEventCount":target_event_count,
+                "sourceControlledTargetRawPitchCounts":role.get("sourceControlledTargetRawPitchCounts") or {},
                 "localization":localization,
             })
         fixtures.append({
@@ -69,9 +72,9 @@ def summarize(summary):
         "runtime":summary.get("runtime") or {},
         "localizationCounts":dict(sorted(localization_counts.items())),
         "supportedRoleRows":supported_role_rows,
-        "zeroIntervalSupportedRoleRows":zero_interval_supported_role_rows,
-        "zeroIntervalPositiveTargetScoreRoleRows":zero_interval_positive_role_rows,
-        "zeroIntervalNonpositiveTargetScoreRoleRows":zero_interval_nonpositive_role_rows,
+        "absentTargetPitchSupportedRoleRows":absent_target_supported_role_rows,
+        "absentTargetPitchPositiveScoreRoleRows":absent_target_positive_role_rows,
+        "absentTargetPitchNonpositiveScoreRoleRows":absent_target_nonpositive_role_rows,
         "fixtures":fixtures,
         "sourceAudioOpenedByThisCommand":False,
         "ownedBeatAudioOpenedByThisCommand":False,
@@ -115,8 +118,10 @@ def self_test():
                 "bestMaxEventScore":1.0 if index==0 else -0.5,
                 "anyPositiveIntervalScore":index==0,
                 "sourceControlledDecodedIntervalCount":0,
+                "sourceControlledTargetPitchEventCount":0,
+                "sourceControlledTargetRawPitchCounts":{"35":0,"36":0},
                 "localization":(
-                    "POSITIVE_TARGET_SCORE_BUT_SOURCE_DECODED_ZERO_INTERVALS"
+                    "POSITIVE_TARGET_SCORE_BUT_SOURCE_TARGET_PITCH_ABSENT"
                     if index==0 else
                     "EXPECTED_ROLE_TARGET_SCORES_NONPOSITIVE"
                 )
@@ -131,8 +136,8 @@ def self_test():
     out=summarize(fake)
     assert out["records"]==8
     assert out["supportedRoleRows"]==3
-    assert out["zeroIntervalPositiveTargetScoreRoleRows"]==1
-    assert out["zeroIntervalNonpositiveTargetScoreRoleRows"]==2
+    assert out["absentTargetPitchPositiveScoreRoleRows"]==1
+    assert out["absentTargetPitchNonpositiveScoreRoleRows"]==2
     return {"mode":"FAME_NEURAL_P5_TSUMUGI_V1_SCORE_DIAGNOSTIC_REPORT_SELF_TEST_PASS"}
 
 
