@@ -1,0 +1,87 @@
+{
+  "taskId": "package-authoring-v2",
+  "sourceCommit": "cdea2227a4a71906c48b97d888e707a787cecc3e",
+  "sourcePath": "strumenti/fame-local-worker/DIRECT_QA_PACKAGE_AUTHORING.md",
+  "sourceSnapshot": "cases/direct-qa/package-authoring-v2-source.md",
+  "sourceSha256": "3fefe0b9c54b985beeffa59861cfc04275b9c8c12aa5642e543629c0a01339a6",
+  "scope": "Revisione delle regole di authoring dei package Direct QA. Verificare unitizzazione semantica, immutabilita dei run consumati e requisiti pre-run senza introdurre eccezioni non presenti nel documento.",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "# Direct QA package authoring rules\n\n## Semantic unit rule\n\nEvidence units must represent complete semantic blocks.\n\nDo not split a structural Markdown heading into its own evidence unit when it only labels the paragraph/list that follows. In that case, combine the heading and its following content into one unit.\n\nBad:\n\n```text\nU13: ## Ricerca per il prossimo ramo\nU14: Tsumugi: ...\n```\n\nPreferred:\n\n```text\nU13: ## Ricerca per il prossimo ramo\n\nTsumugi: ...\n```\n\nReason: the model may reasonably cite the heading together with the content. If the heading is a standalone unit but is neither required nor declared benign context, the host validator can produce a precision false negative even when the conclusion and required coverage are correct."
+    },
+    {
+      "unitId": "U02",
+      "text": "## Frozen-run rule\n\nNever repair a consumed task by changing its rubric/package and rerunning it. Preserve the historical result, classify the authoring defect separately, and apply the improved unitization only to new task IDs."
+    },
+    {
+      "unitId": "U03",
+      "text": "## Pre-run checklist\n\nBefore freezing a new direct-QA package:\n\n1. source snapshot must match the intended repository source exactly;\n2. units must reconstruct the complete source;\n3. headings without autonomous semantics must be joined to the following block;\n4. each positive check must have explicit required coverage groups;\n5. known harmless contextual units that may reasonably accompany evidence must be listed as benign context;\n6. negative checks must not need evidence IDs;\n7. package-specific tests must include incomplete coverage and false-positive authorization cases;\n8. freeze package and rubric before the first model call."
+    }
+  ],
+  "checks": [
+    {
+      "code": "SEMANTIC_UNIT_RULE",
+      "assertion": "Un heading Markdown strutturale privo di semantica autonoma deve essere unito al blocco successivo invece di diventare una evidence unit isolata."
+    },
+    {
+      "code": "RERUN_CONSUMED_TASK",
+      "assertion": "Un task gia consumato puo essere corretto modificando rubric/package e rilanciato con lo stesso task ID."
+    },
+    {
+      "code": "FREEZE_BEFORE_MODEL_CALL",
+      "assertion": "Package e rubric devono essere congelati prima della prima chiamata al modello."
+    },
+    {
+      "code": "NEGATIVE_CHECK_EVIDENCE_REQUIRED",
+      "assertion": "I check negativi devono obbligatoriamente avere evidence IDs."
+    },
+    {
+      "code": "PACKAGE_TEST_REQUIREMENTS",
+      "assertion": "I test specifici del package devono includere almeno casi di coverage incompleta e false-positive authorization."
+    }
+  ],
+  "rubric": {
+    "SEMANTIC_UNIT_RULE": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U01"
+        ]
+      ],
+      "benignContext": [
+        "U03"
+      ]
+    },
+    "RERUN_CONSUMED_TASK": {
+      "supported": false,
+      "requiredGroups": [],
+      "benignContext": []
+    },
+    "FREEZE_BEFORE_MODEL_CALL": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U03"
+        ]
+      ],
+      "benignContext": [
+        "U02"
+      ]
+    },
+    "NEGATIVE_CHECK_EVIDENCE_REQUIRED": {
+      "supported": false,
+      "requiredGroups": [],
+      "benignContext": []
+    },
+    "PACKAGE_TEST_REQUIREMENTS": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U03"
+        ]
+      ],
+      "benignContext": []
+    }
+  }
+}
