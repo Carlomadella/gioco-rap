@@ -1,12 +1,17 @@
 # FAME Direct Worker v1 — Ollama senza Cline
 
+## Checkpoint operativo — worker QA diretto riutilizzabile pronto
+
+Implementati `direct_qa_worker.py` e `direct_qa_queue.py`: pacchetti task congelati, una chiamata per scrivania, controlli host-side e nessuna azione autorizzata dal modello. Prima coda `FAME_DIRECT_QA_NETWORK_001`, incarico `pfnmf-review-v1` sul report storico PF-NMF, con unità testuali complete. I precedenti probe restano invariati; la preparazione Cline sotto è archivio, non prossimo passo. 18 test con client simulato passati; run Ollama reale ancora da eseguire. Comandi, criteri e limiti in [DIRECT_QA_WORKER.md](DIRECT_QA_WORKER.md).
+
+
 ## Decisione corrente — runtime diretto Ollama
 
 Il percorso operativo FAME Local Worker non usa piu Cline. L'isolamento `FAME_DIRECT_TSUMUGI_CONTRACT_001` ha dato `PASS` con `artifactCorrect=true` in una sola chiamata a `gpt-oss:20b`, senza tool e senza retry, sullo stesso audit Tsumugi congelato che via Cline aveva prodotto 2/4 classificazioni corrette e ripetuti errori di parsing tool-call.
 
 Il risultato e diagnostico, non una nuova independent evaluation e non prova causalita esclusiva. La decisione ingegneristica e pero fissata: nuovi task QA strutturati devono usare snapshot host-side, chiamata Ollama diretta, JSON Schema e validatore esterno. Dettagli in [FAME_LOCAL_WORKER_CLINE_EXIT_2026-09-23.md](FAME_LOCAL_WORKER_CLINE_EXIT_2026-09-23.md).
 
-## Prossima prova Cline — P3/P4 con unita semantiche
+## Archivio — preparazione Cline P3/P4 superata dalla decisione sul runtime diretto
 
 ## Prossimo diagnostico Cline — Tsumugi contract audit compatto
 

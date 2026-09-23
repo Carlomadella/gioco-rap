@@ -1,5 +1,10 @@
 # FAME Neural — Current State
 
+## Checkpoint operativo — worker QA diretto riutilizzabile pronto
+
+Implementati `direct_qa_worker.py` e `direct_qa_queue.py`: pacchetti task congelati, una chiamata per scrivania, controlli host-side e nessuna azione autorizzata dal modello. Prima coda `FAME_DIRECT_QA_NETWORK_001`, incarico `pfnmf-review-v1` sul report storico PF-NMF, con unità testuali complete. I precedenti probe restano invariati; la preparazione Cline sotto è archivio, non prossimo passo. 18 test con client simulato passati; run Ollama reale ancora da eseguire. Comandi, criteri e limiti in [DIRECT_QA_WORKER.md](../../strumenti/fame-local-worker/DIRECT_QA_WORKER.md).
+
+
 ## Decisione corrente — FAME Local Worker diretto, Cline fuori dal runtime operativo
 
 Il diagnostico di isolamento `FAME_DIRECT_TSUMUGI_CONTRACT_001` ha completato lo stesso audit Tsumugi con `gpt-oss:20b` tramite una sola chiamata diretta a Ollama: `status=PASS`, `artifactCorrect=true`, `modelCalls=1`. Il percorso non espone tool al modello e usa snapshot host-side + JSON Schema + validatore esterno.
@@ -8,9 +13,9 @@ Il precedente Cline compatto aveva completato l'artefatto ma con 2/4 binding cor
 
 **Prossimo passo architetturale:** generalizzare il worker diretto per i nuovi task QA FAME Neural, mantenendo rubriche congelate, una chiamata iniziale misurabile, validazione host-side e nessuna azione automatica autorizzata da un output del modello.
 
-## Prossimo probe Cline — P3/P4 semantic evidence units
+## Archivio — preparazione Cline P3/P4 superata dalla decisione sul runtime diretto
 
-Preparato un nuovo QA sul report P3/P4 con unita di evidenza complete (paragrafi/blocchi lista) invece della numerazione line-based. Obiettivo: misurare comprensione e copertura senza introdurre il difetto P2 di una singola frase spezzata in piu ID. Quattro decisioni: layer del failure D02, limite sui colpi simultanei, divieto di threshold tuning dal solo sintetico, scope della prima variante P5. Grader/rubrica congelati prima del run; nessun run Cline ancora eseguito.
+Preparato un nuovo QA sul report P3/P4 con unita di evidenza complete (paragrafi/blocchi lista) invece della numerazione line-based. Preparazione conservata per tracciabilità, non da eseguire come prossimo passo. Obiettivo storico: misurare comprensione e copertura senza introdurre il difetto P2 di una singola frase spezzata in piu ID. Quattro decisioni: layer del failure D02, limite sui colpi simultanei, divieto di threshold tuning dal solo sintetico, scope della prima variante P5. Grader/rubrica congelati prima del run; nessun run Cline ancora eseguito.
 
 Il FAIL P2 resta storico e non viene ricalcolato. La sua omissione E019 viene trattata come limite metodologico del vecchio evidence packaging, non come prova autonoma di mancata comprensione del renderer.
 

@@ -1,0 +1,101 @@
+{
+  "taskId": "pfnmf-review-v1",
+  "sourceCommit": "e86b7b162e87ade32a367506cee3cdf9c3fda7a8",
+  "sourcePath": "documentazione/fame-neural/OWNED_BEATS_AUDIO_TO_MIDI_P5_PFNMF_NEGATIVE_2026-09-22.md",
+  "sourceSnapshot": "cases/direct-qa/pfnmf-source.md",
+  "sourceSha256": "e26eded77b1ecdc9689012e3f51de7b8b95f091393764c2667f31d5467fc28fb",
+  "scope": "Revisione del checkpoint storico NDR-097. Classificare le affermazioni secondo il report, non eseguire le decisioni storiche e non presumere che siano il prossimo passo corrente.",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "# Owned Beats — P5 PF-NMF controlled result — negative/partial\n\nData: 22 settembre 2026  \nDecisione: NDR-097  \nBranch: `feature/fame-neural-roadmap`"
+    },
+    {
+      "unitId": "U02",
+      "text": "## Esito\n\nLa candidata `drums-pfnmf-template-activation-v1` non supera il gate controllato."
+    },
+    {
+      "unitId": "U03",
+      "text": "Il factorization loop converge sui casi riportati, quindi il failure non è un problema di mancata convergenza numerica. Il pattern residuo è invece **cross-activation tra template**:\n\n- D04 kick+snare: kick e snare vengono recuperati ma compaiono 4 hihat falsi;\n- D05 kick+hi-hat: 8 TP / 4 FP / 0 FN, F1 0.8; i 4 FP sono snare;\n- D06 hi-hat triplets: 9 TP / 10 FP / 0 FN, F1 0.642857; 9 snare falsi + 1 kick falso;\n- D07 kick sincopato: 5 TP / 10 FP / 0 FN, F1 0.5; 5 snare falsi + 5 hihat falsi;\n- D08 clap/rim diagnostico: 9 eventi candidati per 4 riferimenti fuori tassonomia."
+    },
+    {
+      "unitId": "U04",
+      "text": "Il run termina con `KEEP_PFNMF_AS_CONTROLLED_NEGATIVE_OR_PARTIAL_RESULT_AND_REASSESS_REPRESENTATION_BEFORE_REAL_EASY`."
+    },
+    {
+      "unitId": "U05",
+      "text": "## Interpretazione\n\nPF-NMF migliora la capacità di rappresentare ruoli simultanei rispetto alla baseline single-label, ma thresholdare separatamente le attivazioni dei template produce ancora troppe classi spurie. Aumentare soglie sui fixture controllati sarebbe tuning post-hoc e non viene fatto."
+    },
+    {
+      "unitId": "U06",
+      "text": "## Decisione\n\n1. Conservare PF-NMF come negative/partial evidence.\n2. Non modificare low-end, onset detector, renderer o cohort consumati.\n3. Non aprire training.\n4. Prima del real-easy provare una terza candidata non-learned focalizzata sulla **selezione del sottoinsieme di classi per transient**.\n5. La candidata `drums-transient-subset-bic-v1` riusa il detector temporale congelato; per ogni transient valuta tutti i 7 sottoinsiemi non vuoti di kick/snare/hihat, stima ampiezze non-negative con NNLS e sceglie il modello con BIC minimo.\n6. Nessuna soglia di classe viene ricavata dai fixture.\n7. Anche un eventuale PASS resta mechanics-only finché template/provenance e real-easy non sono congelati."
+    },
+    {
+      "unitId": "U07",
+      "text": "## Ricerca comparativa\n\nLa letteratura recente continua a indicare le sovrapposizioni e il contenuto spettrale condiviso come limiti centrali dell'ADT; i sistemi più forti tendono verso classificazione multi-label appresa o separate-and-detect per classe. Questo supporta l'uso della candidata BIC come ultimo controllo deterministico di rappresentazione, non come presunta soluzione stato-dell'arte."
+    }
+  ],
+  "checks": [
+    {
+      "code": "GATE_AND_CAUSE",
+      "assertion": "PF-NMF non supera il gate, pur convergendo numericamente: restano cross-activation tra template."
+    },
+    {
+      "code": "D06_ERRORS",
+      "assertion": "In D06 sono riportati 10 falsi positivi: 9 snare e 1 kick."
+    },
+    {
+      "code": "BIC_SCOPE",
+      "assertion": "La candidata BIC proposta valuta sette sottoinsiemi non vuoti, stima ampiezze con NNLS e mantiene il detector temporale congelato."
+    },
+    {
+      "code": "TRAINING_OPEN",
+      "assertion": "Il risultato PF-NMF autorizza ad aprire il training."
+    }
+  ],
+  "rubric": {
+    "GATE_AND_CAUSE": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U02"
+        ],
+        [
+          "U03"
+        ]
+      ],
+      "benignContext": [
+        "U04",
+        "U05"
+      ]
+    },
+    "D06_ERRORS": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U03"
+        ]
+      ],
+      "benignContext": [
+        "U02",
+        "U05"
+      ]
+    },
+    "BIC_SCOPE": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U06"
+        ]
+      ],
+      "benignContext": [
+        "U07"
+      ]
+    },
+    "TRAINING_OPEN": {
+      "supported": false,
+      "requiredGroups": [],
+      "benignContext": []
+    }
+  }
+}
