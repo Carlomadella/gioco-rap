@@ -1,0 +1,66 @@
+{
+  "schema": "fame-qa-transfer-operator-observation-v1",
+  "provenance": "Trascrizione strutturata degli output incollati dall'operatore in chat; non importazione o verifica diretta dei file originali sul PC.",
+  "codeCommit": "5f29502092c9b641117e595a70a4489e651e66be",
+  "runId": "20260923T073208792637Z",
+  "root": "C:\\Users\\mycol\\FAME_QA_TRANSFER_002",
+  "model": "gpt-oss:20b",
+  "modelDigest": "17052f91a42e97930aa6e28a6c6c06a983e6a58dbb00434885a0cf5313e376f7",
+  "modelDetails": {
+    "parameterSize": "20.9B",
+    "quantization": "MXFP4",
+    "contextLength": 131072,
+    "capabilities": [
+      "completion",
+      "tools",
+      "thinking"
+    ],
+    "license": "Apache-2.0"
+  },
+  "status": "REJECTED",
+  "transferStatus": "FAIL",
+  "firstAttemptPass": false,
+  "failureClass": "GENERATION_BUDGET_EXHAUSTED_NO_STRUCTURED_RESPONSE",
+  "validation": {
+    "errors": [
+      "INVALID_RESPONSE:Risposta incompleta o tool inattesi",
+      "INCOMPLETE_FINDINGS"
+    ],
+    "candidateErrors": [
+      "INVALID_RESPONSE:Risposta incompleta o tool inattesi"
+    ],
+    "assembledErrors": [
+      "INCOMPLETE_FINDINGS"
+    ],
+    "cachedCodes": [],
+    "droppedEvidence": [],
+    "elapsedSeconds": 49.84399999992456
+  },
+  "parsedModelAnswer": null,
+  "response": {
+    "contentEmpty": true,
+    "reasoningPresent": true,
+    "done": true,
+    "doneReason": "length"
+  },
+  "ollamaMetrics": {
+    "totalDurationNs": 49824148000,
+    "loadDurationNs": 7091257500,
+    "promptEvalCount": 10186,
+    "promptEvalCachedCount": 0,
+    "promptEvalDurationNs": 14762228000,
+    "evalCount": 4096,
+    "evalDurationNs": 27904577000
+  },
+  "assessment": {
+    "validatedCategories": 0,
+    "expectedCategories": 10,
+    "unsupportedCategoriesEmitted": [],
+    "structuredAnswerProduced": false,
+    "outputBudgetExhausted": true,
+    "comparisonNote": "Peggiore del run Qwen su questo protocollo congelato: Qwen produsse JSON valido e 6/10 categorie validate; GPT-OSS non produsse alcun content finale prima del limite di 4096 token.",
+    "humanReviewSeconds": null,
+    "manualBaselineSeconds": null,
+    "netTimeSavingEstablished": false
+  }
+}
