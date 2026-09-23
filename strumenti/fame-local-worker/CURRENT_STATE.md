@@ -83,39 +83,29 @@ Stati principali:
 - `ERROR`
 - `ERROR_AFTER_REPAIR`
 
-A questo checkpoint non e documentato alcun nuovo run reale v2. La v2 non va
-usata per riprocessare i tre task v1 consumati.
+La v2 non va usata per riprocessare i tre task v1 consumati.
 
-## Hardening eseguito sulla branch di recovery
+## Hardening della queue v2
 
 Durante la rilettura della v2 e stato trovato un difetto nell'aggregazione della
 coda: con una desk in `ERROR` e task successivi ancora `NOT_RUN`,
 `direct_qa_queue_v2.state()` classificava l'intera coda come `PENDING`.
-Questo poteva mascherare un errore operativo gia avvenuto.
 
-Correzione applicata:
+Correzione:
 
 ```text
 a1c44f26e450dd1e7eb5f0a4344ca112faac2690
 fix(fame-local-worker): preserve terminal queue failures
 ```
 
-La precedenza ora e:
-
-1. tutte first-pass accettate -> `VALIDATED_FOR_REVIEW`;
-2. tutte accettate, con almeno un repair -> `VALIDATED_FOR_REVIEW_AFTER_REPAIR`;
-3. qualsiasi stato terminale/non accettato gia presente -> `NEEDS_REVIEW`;
-4. solo accepted + `NOT_RUN` -> `PENDING`.
-
-Regressione aggiunta:
+Regressione:
 
 ```text
 82f4a3357b7d53d8a86c2c24416548746f43b7a9
 test(fame-local-worker): cover terminal error aggregation
 ```
 
-Il test costruisce una coda con due task, forza un timeout sulla prima desk e
-verifica:
+Comportamento verificato dal test:
 
 ```text
 results = [ERROR, NOT_RUN]
@@ -123,9 +113,68 @@ queue status = NEEDS_REVIEW
 model calls = 1
 ```
 
-La branch remota contiene la patch e il test. La suite non e stata rieseguita in
-questo ambiente perche il container non riesce a risolvere `github.com`; la
-verifica locale resta obbligatoria prima del nuovo run reale v2.
+## Verifica locale v2
+
+Esecuzione operatore del 23/09/2026, dalla directory
+`strumenti/fame-local-worker`:
+
+```text
+Ran 12 tests in 0.727s
+OK
+```
+
+Quindi worker v2 + queue v2 + regressione sull'aggregazione terminale risultano
+PASS sul PC locale prima della preparazione del primo nuovo task v2.
+
+## Primo nuovo task v2 congelato
+
+Task:
+
+```text
+local-worker-runtime-transition-v2
+```
+
+Fonte:
+
+```text
+strumenti/fame-local-worker/FAME_LOCAL_WORKER_CLINE_EXIT_2026-09-23.md
+source commit: cdea2227a4a71906c48b97d888e707a787cecc3e
+```
+
+File aggiunti:
+
+- `cases/direct-qa/local-worker-runtime-transition-source.md`
+- `cases/direct-qa/local-worker-runtime-transition-v2.json`
+- `test_direct_qa_runtime_transition_v2.py`
+
+Commit di preparazione:
+
+```text
+d09cd137aecffba92b4d2a5ab0fff921023d5f60
+test(fame-local-worker): freeze runtime transition source
+
+8659056a06731a9edc1e725203954198107a7878
+feat(fame-local-worker): add first v2 runtime transition task
+
+680b3c631efcd87954ae47976c3dfd963745f435
+test(fame-local-worker): validate runtime transition v2 package
+```
+
+Il task misura cinque affermazioni:
+
+1. due failure classi distinte osservate nel percorso Cline e limite del
+   packaging a file unico;
+2. contratto del runtime diretto senza tool, con snapshot host-side, schema JSON
+   e validatore host;
+3. esito operator-reported del run diretto
+   `FAME_DIRECT_TSUMUGI_CONTRACT_001`;
+4. controllo negativo: il PASS diretto non dimostra causalita esclusiva di
+   Cline;
+5. controllo negativo: la decisione non autorizza autonomia di produzione senza
+   validazione host.
+
+La fonte e nuova rispetto ai tre task Direct QA consumati. Non viene
+riprocessato PF-NMF, subset+BIC o Tsumugi controlled.
 
 ## Regole di authoring gia acquisite
 
@@ -144,38 +193,25 @@ Prima di congelare un nuovo pacchetto:
 7. test positivi e negativi specifici del pacchetto;
 8. package e rubric congelati prima della prima chiamata reale.
 
-## Verifica locale prevista
-
-Dalla root della repository:
-
-```powershell
-git fetch origin
-git switch recovery/fame-local-worker-v2-cdea2227
-git pull --ff-only origin recovery/fame-local-worker-v2-cdea2227
-python -m unittest discover -s strumenti/fame-local-worker -p "test_direct_qa_*v2.py" -q
-```
-
-I documenti presenti a `cdea2227` riportano i test v2 originali come passati
-con client simulato; il nuovo test di regressione deve ancora essere eseguito
-sul PC locale dopo il pull della branch di recovery.
-
 ## Prossimo intervento
 
-Dopo il PASS locale della suite v2, il passo successivo corretto e preparare un
-NUOVO task Direct QA specifico per la v2, con fonte e rubrica congelate prima
-dell'inferenza, e aggiungere i test del pacchetto.
+Prima inferenza reale v2 solo dopo PASS locale del nuovo test package-specific.
 
-Non scegliere o rieseguire automaticamente PF-NMF, subset+BIC o Tsumugi
-controlled. Non aprire un filone audio/MIDI come sostituto del nuovo task.
+Dalla directory `strumenti/fame-local-worker`:
 
-Prima del primo run reale v2 devono essere disponibili:
+```powershell
+git pull --ff-only origin recovery/fame-local-worker-v2-cdea2227
+python -m unittest discover -s . -p "test_direct_qa_*v2.py" -q
+```
 
-- nuovo `taskId`;
-- snapshot della fonte;
-- evidence unit complete;
-- check/rubric host-only;
-- test package-specific;
-- root nuova e non riutilizzata.
+Se la suite passa, inizializzare una root nuova:
+
+```powershell
+python direct_qa_queue_v2.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_001" --tasks local-worker-runtime-transition-v2
+```
+
+L'init non chiama il modello. Il run reale viene eseguito solo dopo aver
+verificato che init/status siano corretti.
 
 ## Vincolo di continuita
 
