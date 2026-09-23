@@ -1,5 +1,11 @@
 # FAME Neural — Current State
 
+## Prossimo probe Cline — P3/P4 semantic evidence units
+
+Preparato un nuovo QA sul report P3/P4 con unita di evidenza complete (paragrafi/blocchi lista) invece della numerazione line-based. Obiettivo: misurare comprensione e copertura senza introdurre il difetto P2 di una singola frase spezzata in piu ID. Quattro decisioni: layer del failure D02, limite sui colpi simultanei, divieto di threshold tuning dal solo sintetico, scope della prima variante P5. Grader/rubrica congelati prima del run; nessun run Cline ancora eseguito.
+
+Il FAIL P2 resta storico e non viene ricalcolato. La sua omissione E019 viene trattata come limite metodologico del vecchio evidence packaging, non come prova autonoma di mancata comprensione del renderer.
+
 ## Probe Cline P2 eseguito — QA del report P2
 
 Il run `FAME_CLINE_GPTOSS_P2_001` è stato eseguito sul report P2 congelato con una sola desk e report pre-numerato. Il tool flow ha completato `answer.json`.

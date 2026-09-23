@@ -156,6 +156,8 @@ Dettaglio:
 
 Per `REFERENCE_DURATION` la rubrica congelata richiede tre gruppi distinti: E019, E020 ed E021. Il modello ha citato E020 + E021 ma ha omesso E019, che introduce esplicitamente che il renderer v2 usa una durata esplicita derivata dalla reference. Non si modifica la rubrica e non si ritenta il caso dopo aver visto il risultato.
 
+Nota metodologica successiva: E019/E020/E021 derivano in realta dalla stessa frase/paragrafo del source report. Il FAIL resta corretto **rispetto alla rubrica congelata**, ma non viene interpretato come prova che il modello non abbia compreso il renderer. Ha anche misurato la capacita di ricomporre una frase frammentata dalla numerazione line-based. Il probe successivo passa quindi a unita semantiche complete senza rivalutare retroattivamente P2.
+
 Questo è il primo nuovo report P2 registrato con il formato singolo pre-numerato. Il tool layer ha completato il task; il limite osservato resta la copertura precisa di affermazioni composte.
 
 ## Evidenza cumulativa e interpretazione
