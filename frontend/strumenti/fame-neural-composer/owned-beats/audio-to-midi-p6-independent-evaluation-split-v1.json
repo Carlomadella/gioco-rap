@@ -1,0 +1,27 @@
+{
+  "schema": "fame-owned-beats-review-v1",
+  "version": 1,
+  "reviewId": "audio-to-midi-p6-independent-evaluation-v1-split-freeze",
+  "decisions": [
+    {
+      "sourceRecordIds": [
+        "FAME000085",
+        "FAME000096",
+        "FAME000057",
+        "FAME000053",
+        "FAME000043",
+        "FAME000044",
+        "FAME000065",
+        "FAME000031",
+        "FAME000017",
+        "FAME000074",
+        "FAME000075",
+        "FAME000021"
+      ],
+      "set": {
+        "split": "audio-to-midi-p6-evaluation-v1"
+      },
+      "note": "Reserved metadata-only for the frozen P6 independent Audio-to-MIDI evaluation cohort before any P6 audio access."
+    }
+  ]
+}

@@ -1,5 +1,13 @@
 # FAME Neural — Current State
 
+## P6 cohort congelato — 12 family fresche, zero audio access
+
+Il preview P6 metadata-only ha passato self-test e selezione: **91 family eleggibili**, 12 selezionate e congelate in repo. Cohort digest `3a4595b7bb7e1edc61fdf5ba45557d13949f7cb7c1233daa58ae2b273bfa0188`; manifest identity digest `a459b2df4c9e3a0fe0b268e58833e15c9b45097231b115a1d85311e993557f38`.
+
+Cohort P6: `FAME000085, FAME000096, FAME000057, FAME000053, FAME000043, FAME000044, FAME000065, FAME000031, FAME000017, FAME000074, FAME000075, FAME000021`.
+
+La selezione non ha aperto/hashato/decodificato audio e non ha modificato manifest o split. La reference e il futuro split decision sono ora congelati in repo. Prossimo gate: reservation metadata-only verificata prima di qualsiasi P6 audio access.
+
 ## P6 selector self-test — esclusioni storiche rese autosufficienti
 
 Il secondo self-test P6 si è fermato prima del preview con `ENOENT` sul file repo `audio-analysis-holdout-cohort-r1-v2.json` nel worktree locale. Anche questo failure è avvenuto prima della selezione e prima di qualsiasi audio access.

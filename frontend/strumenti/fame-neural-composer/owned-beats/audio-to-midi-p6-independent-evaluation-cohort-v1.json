@@ -1,0 +1,139 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-p6-evaluation-cohort-reference-v1",
+  "version": 1,
+  "cohortId": "audio-to-midi-p6-independent-evaluation-v1",
+  "status": "FROZEN_FRESH_COHORT_BEFORE_AUDIO_ACCESS",
+  "purpose": "INDEPENDENT_EVALUATION_OF_FROZEN_TSUMUGI_DRUMS_AND_PYIN_LOW_END_PIPELINE",
+  "frozenAt": "2026-09-23",
+  "expectedFamilies": 12,
+  "plannedSplit": "audio-to-midi-p6-evaluation-v1",
+  "identityFields": [
+    "compositionFamilyId",
+    "sourceRecordId",
+    "sourceAssetId",
+    "sha256"
+  ],
+  "selection": {
+    "algorithm": "opaque-identity-sha256-rank-v1",
+    "seed": "fame-audio-to-midi-p6-independent-evaluation-v1|2026-09-23|pre-audio",
+    "usesAudioContentOrDerivedMetrics": false,
+    "eligibleFamilyCount": 91,
+    "eligibleUniverseDigestSha256": "21f4ae2a335027ae4593eb4fcddc6a7831e2d2264daea343ec26e39dc799b3bd"
+  },
+  "sourceManifest": {
+    "schema": "fame-owned-beats-workspace-v1",
+    "version": 1,
+    "recordCount": 131,
+    "identityDigestSha256": "a459b2df4c9e3a0fe0b268e58833e15c9b45097231b115a1d85311e993557f38"
+  },
+  "cohortDigestSha256": "3a4595b7bb7e1edc61fdf5ba45557d13949f7cb7c1233daa58ae2b273bfa0188",
+  "records": [
+    {
+      "compositionFamilyId": "FAM-FAME000085",
+      "sourceRecordId": "FAME000085",
+      "sourceAssetId": "sha256:1ebc112acae115fa0c39b804a22f01b6a040a8bd3715ffa913728798a931d5a2",
+      "sha256": "1ebc112acae115fa0c39b804a22f01b6a040a8bd3715ffa913728798a931d5a2",
+      "selectionRank": 1,
+      "rankSha256": "0782d63d496ab8ea761ab34357a988e890267fc10919e8e96e1d1be95e9cb59e"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000096",
+      "sourceRecordId": "FAME000096",
+      "sourceAssetId": "sha256:92e8df4f53561205d889b6c758604ba5494d57b59652c9ebfeae8735e8d8e106",
+      "sha256": "92e8df4f53561205d889b6c758604ba5494d57b59652c9ebfeae8735e8d8e106",
+      "selectionRank": 2,
+      "rankSha256": "0879ae95dd20cd0653f14751ea63d9289967ea41e18395630afb640c130acff7"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000057",
+      "sourceRecordId": "FAME000057",
+      "sourceAssetId": "sha256:224dae186e2d52566b17650211b1cfd02e9ca76575943a64b46d2c12ddebddf9",
+      "sha256": "224dae186e2d52566b17650211b1cfd02e9ca76575943a64b46d2c12ddebddf9",
+      "selectionRank": 3,
+      "rankSha256": "08d42b93ee2a5bae01dbbe63daa882418b29429f993afddd158fece7912d6d4c"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000053",
+      "sourceRecordId": "FAME000053",
+      "sourceAssetId": "sha256:7763b1beaceac70da5229502462c2f94032ea326657e897653c5691ac342c4f1",
+      "sha256": "7763b1beaceac70da5229502462c2f94032ea326657e897653c5691ac342c4f1",
+      "selectionRank": 4,
+      "rankSha256": "0b49d57b351613f106b80c3e5def91608398985c0db8d33b5c8ae7c11688d214"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000043",
+      "sourceRecordId": "FAME000043",
+      "sourceAssetId": "sha256:0fe198cdc72e44d3051a97cf236154c0add4765fb59707cdcc67db8635f66c2a",
+      "sha256": "0fe198cdc72e44d3051a97cf236154c0add4765fb59707cdcc67db8635f66c2a",
+      "selectionRank": 5,
+      "rankSha256": "0d29c62f3ed2b12d84992060e91918c6e523a0365f9fcf89e448fc65c4f68cdf"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000044",
+      "sourceRecordId": "FAME000044",
+      "sourceAssetId": "sha256:4656140f1639572a1627c0ed99473cad7081ac8ee5f53d2add574ed33f2195de",
+      "sha256": "4656140f1639572a1627c0ed99473cad7081ac8ee5f53d2add574ed33f2195de",
+      "selectionRank": 6,
+      "rankSha256": "0dbad466553f28f2d69979e537be6817ef128e49e6f44ae31f5adb01aea67788"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000065",
+      "sourceRecordId": "FAME000065",
+      "sourceAssetId": "sha256:f11c366601ea44ac8cf0cde0c9a925fd360f3bc28bb8fcdc16e328121174bb1b",
+      "sha256": "f11c366601ea44ac8cf0cde0c9a925fd360f3bc28bb8fcdc16e328121174bb1b",
+      "selectionRank": 7,
+      "rankSha256": "0eebe1110a67aa3590dba31a66e9e47da4dcbc34dcf53565bc8830bcee6738f5"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000031",
+      "sourceRecordId": "FAME000031",
+      "sourceAssetId": "sha256:310ddc0ac71785b7543a03b16dbefd0bb65f116ebf1ddc7fe2b9c0e557826601",
+      "sha256": "310ddc0ac71785b7543a03b16dbefd0bb65f116ebf1ddc7fe2b9c0e557826601",
+      "selectionRank": 8,
+      "rankSha256": "0fd1c620d42fa842af24b720fe5d59235d46adf3b2fc2d84d0b76c00c128004b"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000017",
+      "sourceRecordId": "FAME000017",
+      "sourceAssetId": "sha256:1de7d184339709b74327c522c5cd19818f98399153b0b62ae4c1df68cef5003b",
+      "sha256": "1de7d184339709b74327c522c5cd19818f98399153b0b62ae4c1df68cef5003b",
+      "selectionRank": 9,
+      "rankSha256": "1436f9a99f3380bc92f4974eb58806e2f28f29b059a0a99d4ce54734ff244cb8"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000074",
+      "sourceRecordId": "FAME000074",
+      "sourceAssetId": "sha256:48034502c72748e9e14e49d74454df29b05316843a5862d75b288b1f5944c81e",
+      "sha256": "48034502c72748e9e14e49d74454df29b05316843a5862d75b288b1f5944c81e",
+      "selectionRank": 10,
+      "rankSha256": "1549148fb1446628a84ea5cabed31f09d2ac427494c988a21290a25d6a42a19c"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000075",
+      "sourceRecordId": "FAME000075",
+      "sourceAssetId": "sha256:589e6f92ce842b73c2e7801cfd5f27dcee35fd4a60572054d4fb74f9399c8f71",
+      "sha256": "589e6f92ce842b73c2e7801cfd5f27dcee35fd4a60572054d4fb74f9399c8f71",
+      "selectionRank": 11,
+      "rankSha256": "15757fd834bc8ed233cb37a6ce00d54120d49bf9102979be580d1f511adf493e"
+    },
+    {
+      "compositionFamilyId": "FAM-FAME000021",
+      "sourceRecordId": "FAME000021",
+      "sourceAssetId": "sha256:e6a5e896743d04b139830a80e7f1bf74e4cf06b28df705f6c05433c6b8754b9c",
+      "sha256": "e6a5e896743d04b139830a80e7f1bf74e4cf06b28df705f6c05433c6b8754b9c",
+      "selectionRank": 12,
+      "rankSha256": "17722c2bd40a2b9ba559c69d96634659baa6daaf01ce33f8973456a1f3348dc4"
+    }
+  ],
+  "safety": {
+    "audioFileOpenedBeforeFreeze": false,
+    "audioFileHashedBeforeFreeze": false,
+    "audioDecodedBeforeFreeze": false,
+    "derivedAudioMetricsUsedForSelection": false,
+    "sourceManifestMutatedBeforeFreeze": false,
+    "splitAssignmentsChangedBeforeFreeze": false,
+    "batch131Authorized": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false
+  }
+}

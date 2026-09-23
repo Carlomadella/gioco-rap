@@ -1813,3 +1813,24 @@ La selezione usa esclusivamente identità metadata con SHA256 rank deterministic
 
 Il primo comando P6 autorizzato è soltanto il preview metadata-only. Le identità risultanti devono essere congelate in repository prima di reservation o audio access. P6 execution, batch131, training e task-data readiness restano chiusi.
 
+## NDR-102 — P6 cohort fresco selezionato metadata-only e congelato prima dell'audio
+
+**Stato: ACCEPTED — 23 settembre 2026.**
+
+Il selector P6 ha completato self-test e preview metadata-only senza aprire, hashare o decodificare audio e senza modificare manifest/split.
+
+Snapshot verificato dall'output operatore:
+
+- corpus manifest: 131 record;
+- family eleggibili dopo esclusioni: **91**;
+- eligible universe digest SHA256: `21f4ae2a335027ae4593eb4fcddc6a7831e2d2264daea343ec26e39dc799b3bd`;
+- source manifest identity digest SHA256: `a459b2df4c9e3a0fe0b268e58833e15c9b45097231b115a1d85311e993557f38`;
+- cohort digest SHA256: `3a4595b7bb7e1edc61fdf5ba45557d13949f7cb7c1233daa58ae2b273bfa0188`.
+
+Le 12 identità congelate, in ordine di rank, sono:
+`FAME000085`, `FAME000096`, `FAME000057`, `FAME000053`, `FAME000043`, `FAME000044`, `FAME000065`, `FAME000031`, `FAME000017`, `FAME000074`, `FAME000075`, `FAME000021`.
+
+La reference completa con asset SHA256 e rank SHA256 è versionata in `audio-to-midi-p6-independent-evaluation-cohort-v1.json`. È stato inoltre congelato il futuro split decision `audio-to-midi-p6-evaluation-v1`, ma **non è ancora stato applicato al manifest locale**.
+
+Decisione: il prossimo passo consentito è la reservation metadata-only del cohort congelato. Nessun P6 audio access, source separation o transcription prima della reservation verificata. Batch131, training e task-data readiness restano chiusi.
+

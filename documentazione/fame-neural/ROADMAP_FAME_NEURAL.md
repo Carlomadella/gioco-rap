@@ -129,6 +129,8 @@ Per ogni livello registrare input e riferimenti, fattore di complessità introdo
 
 ### P6 — Nuova evaluation indipendente prima di considerare il batch — **PREPARAZIONE ATTIVA 23/09/2026**
 
+**Freeze cohort 23/09/2026 — NDR-102:** preview metadata-only PASS, 91 family eleggibili, 12 identity congelate prima dell'audio. Cohort digest `3a4595b7bb7e1edc61fdf5ba45557d13949f7cb7c1233daa58ae2b273bfa0188`. Nessun audio access e nessuna modifica split durante la selezione. Il passo successivo è reservation metadata-only del cohort congelato.
+
 NDR-101 congela prima della selezione: 12 family, selector metadata-only deterministico, pipeline Tsumugi+pYIN, renderer v2 e gate invariato rispetto alla precedente independent evaluation (mediana >=2, almeno 9/12 family >=2 per entrambi i rami). Il primo passo è il preview metadata-only; nessun audio access o reservation è ancora autorizzato fino al freeze delle identità risultanti.
 
 <!-- historical P6 specification follows -->
