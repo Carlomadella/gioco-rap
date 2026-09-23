@@ -325,26 +325,67 @@ executionAuthorized       = false
 
 L'inizializzazione non ha effettuato chiamate al modello.
 
+## Esito prima queue multi-desk reale v2
+
+Root:
+
+```text
+$HOME\FAME_DIRECT_QA_NETWORK_V2_002
+```
+
+Esito operator-reported:
+
+```text
+coordinator-architecture-v2
+  status = REJECTED
+  modelCalls = 2
+  firstAttemptPass = false
+  acceptedAfterRepair = false
+
+package-authoring-v2
+  status = VALIDATED_FOR_REVIEW
+  modelCalls = 1
+  firstAttemptPass = true
+  acceptedAfterRepair = false
+
+queue status = NEEDS_REVIEW
+executionAuthorized = false
+```
+
+La prima desk ha usato entrambe le chiamate consentite dal protocollo v2 ed e
+rimasta REJECTED. La seconda desk e passata al primo tentativo.
+
+Questo e il primo run reale che esercita il repair v2. Il risultato del
+coordinatore non deve essere ritentato o corretto retroattivamente cambiando
+rubric/package. Prima di qualsiasi decisione architetturale vanno ispezionati
+gli artefatti di attempt-1 e attempt-2 per distinguere:
+
+- conclusione errata;
+- coverage insufficiente;
+- evidence superflua/non revisionata;
+- errore di contratto/risposta;
+- eventuale variazione prodotta dal feedback generico.
+
 ## Prossimo intervento
 
-Eseguire una sola volta la queue multi-desk reale:
+Leggere, senza nuove chiamate al modello, gli artefatti della desk fallita:
 
 ```powershell
-python direct_qa_queue_v2.py run --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_002"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_002\desks\coordinator-architecture-v2\attempt-1\candidate.json"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_002\desks\coordinator-architecture-v2\attempt-1\validation.json"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_002\desks\coordinator-architecture-v2\attempt-2\candidate.json"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_002\desks\coordinator-architecture-v2\attempt-2\repair-feedback.json"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_002\desks\coordinator-architecture-v2\attempt-2\validation.json"
 ```
 
-Poi rileggere lo stato senza nuove chiamate:
+Per chiudere anche la desk passata:
 
 ```powershell
-python direct_qa_queue_v2.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_002"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_002\desks\package-authoring-v2\attempt-1\review.md"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_002\desks\package-authoring-v2\attempt-1\validation.json"
 ```
 
-La queue esegue le desk in sequenza. Ogni desk conserva il proprio attempt-1 e,
-solo se necessario per un reject semantico/citazionale, puo usare una sola
-correzione controllata. Un errore operativo arresta la queue e lascia le desk
-successive non eseguite.
-
-Non rilanciare `run` sulla root una volta consumate entrambe le desk.
+Non rilanciare `run` sulla root `FAME_DIRECT_QA_NETWORK_V2_002`.
 
 ## Vincolo di continuita
 
