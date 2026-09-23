@@ -6,9 +6,6 @@ const path=require("node:path");
 
 const HERE=__dirname;
 const PROTOCOL_FILE=path.join(HERE,"audio-to-midi-p6-independent-evaluation-v1.json");
-const DEVELOPMENT_PROTOCOL_FILE=path.join(HERE,"audio-to-midi-development-protocol-v1.json");
-const AUDIO_ANALYSIS_HOLDOUT_FILE=path.join(HERE,"audio-analysis-holdout-cohort-r1-v2.json");
-const PRIOR_AUDIO_TO_MIDI_EVAL_FILE=path.join(HERE,"audio-to-midi-independent-evaluation-cohort-v1.json");
 const COHORT_ID="audio-to-midi-p6-independent-evaluation-v1";
 const IDENTITY_FIELDS=["compositionFamilyId","sourceRecordId","sourceAssetId","sha256"];
 
@@ -95,6 +92,12 @@ function validateProtocol(){
     p.safety?.evaluationMayRetunePipeline!==false||
     p.safety?.batch131Authorized!==false||
     p.safety?.trainingAuthorized!==false||
+    p.historicalExclusions?.expectedSourceRecordIds!==30||
+    !Array.isArray(p.historicalExclusions?.sourceRecordIds)||
+    p.historicalExclusions.sourceRecordIds.length!==30||
+    p.historicalExclusions?.expectedCompositionFamilyIds!==22||
+    !Array.isArray(p.historicalExclusions?.compositionFamilyIds)||
+    p.historicalExclusions.compositionFamilyIds.length!==22||
     p.implementation?.selectorPath!==path.basename(__filename)||
     p.implementation?.selectorGitBlobSha!==gitBlobSha(__filename)
   ) throw new Error("P6 independent evaluation protocol mismatch");
@@ -124,17 +127,14 @@ function untouchedForP6(record){
   }
   return true;
 }
-function priorExcludedIdentities(){
-  const dev=readJson(DEVELOPMENT_PROTOCOL_FILE);
-  const hold=readJson(AUDIO_ANALYSIS_HOLDOUT_FILE);
-  const priorEval=readJson(PRIOR_AUDIO_TO_MIDI_EVAL_FILE);
-  const sourceIds=new Set(dev.sourceSeparation?.expectedSourceRecordIds||[]);
-  const familyIds=new Set();
-  for(const group of [hold.records||[],priorEval.records||[]]){
-    for(const row of group){
-      sourceIds.add(row.sourceRecordId);
-      if(row.compositionFamilyId)familyIds.add(row.compositionFamilyId);
-    }
+function priorExcludedIdentities(p){
+  const sourceIds=new Set(p.historicalExclusions?.sourceRecordIds||[]);
+  const familyIds=new Set(p.historicalExclusions?.compositionFamilyIds||[]);
+  if(sourceIds.size!==Number(p.historicalExclusions?.expectedSourceRecordIds)){
+    throw new Error("P6 historical source exclusion count mismatch");
+  }
+  if(familyIds.size!==Number(p.historicalExclusions?.expectedCompositionFamilyIds)){
+    throw new Error("P6 historical family exclusion count mismatch");
   }
   return{sourceIds,familyIds};
 }
@@ -145,7 +145,7 @@ function rankFor(record,seed){
 function select(manifest,p){
   validateWorkspaceManifest(manifest);
   validateGlobalIdentityIntegrity(manifest,p);
-  const excluded=priorExcludedIdentities();
+  const excluded=priorExcludedIdentities(p);
   const eligible=manifest.records.filter(record=>{
     const id=identity(record);
     return untouchedForP6(record)&&!excluded.sourceIds.has(id.sourceRecordId)&&!excluded.familyIds.has(id.compositionFamilyId);
@@ -209,7 +209,7 @@ function preview(workspace){
   };
 }
 function selfTest(){
-  const p=validateProtocol(),excluded=priorExcludedIdentities();
+  const p=validateProtocol(),excluded=priorExcludedIdentities(p);
   const fixture=[];
   for(let i=1;i<=131;i++){
     const rid="FAME"+String(i).padStart(6,"0"),sha=crypto.createHash("sha256").update("p6-fixture-"+rid).digest("hex");

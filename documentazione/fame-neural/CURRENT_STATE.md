@@ -1,5 +1,11 @@
 # FAME Neural — Current State
 
+## P6 selector self-test — esclusioni storiche rese autosufficienti
+
+Il secondo self-test P6 si è fermato prima del preview con `ENOENT` sul file repo `audio-analysis-holdout-cohort-r1-v2.json` nel worktree locale. Anche questo failure è avvenuto prima della selezione e prima di qualsiasi audio access.
+
+Causa radice: il selector metadata-only dipendeva ancora da tre file storici separati per ricostruire le esclusioni. Le esclusioni sono ora congelate direttamente nel protocollo P6: 8 development + 10 Audio Analysis holdout consumati + 12 precedente Audio→MIDI independent evaluation = **30 sourceRecordId** esclusi. Le 22 composition family note dei due cohort storici sono congelate anch'esse. Il selector non dipende più da quei tre file e il test impedisce di reintrodurre tali dipendenze.
+
 ## P6 selector self-test — dipendenza bootstrap rimossa
 
 Il primo self-test P6 si è fermato prima del preview con `MODULE_NOT_FOUND: './bootstrap'` nel worktree locale. Nessun cohort è stato selezionato e nessun audio è stato aperto.

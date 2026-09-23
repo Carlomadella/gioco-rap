@@ -107,6 +107,118 @@
   "nextAction": "RUN_METADATA_ONLY_P6_SELECTOR_PREVIEW_AND_FREEZE_IDENTITIES",
   "implementation": {
     "selectorPath": "prepare-audio-to-midi-p6-independent-evaluation.js",
-    "selectorGitBlobSha": "d776c2f9b3c24edb1d76bdec5a9a3988d2adde73"
+    "selectorGitBlobSha": "c68b40f5bca98aa6e25e312fe5cc6955cd21a626"
+  },
+  "historicalExclusions": {
+    "frozenBeforeP6Selection": true,
+    "sources": [
+      {
+        "reason": "development",
+        "count": 8,
+        "sourceRecordIds": [
+          "FAME000011",
+          "FAME000012",
+          "FAME000023",
+          "FAME000040",
+          "FAME000046",
+          "FAME000058",
+          "FAME000080",
+          "FAME000126"
+        ]
+      },
+      {
+        "reason": "consumed-audio-analysis-holdout",
+        "count": 10,
+        "sourceRecordIds": [
+          "FAME000013",
+          "FAME000015",
+          "FAME000025",
+          "FAME000027",
+          "FAME000037",
+          "FAME000039",
+          "FAME000059",
+          "FAME000103",
+          "FAME000110",
+          "FAME000131"
+        ]
+      },
+      {
+        "reason": "prior-audio-to-midi-independent-evaluation",
+        "count": 12,
+        "sourceRecordIds": [
+          "FAME000001",
+          "FAME000102",
+          "FAME000006",
+          "FAME000129",
+          "FAME000020",
+          "FAME000073",
+          "FAME000092",
+          "FAME000121",
+          "FAME000010",
+          "FAME000071",
+          "FAME000116",
+          "FAME000101"
+        ]
+      }
+    ],
+    "expectedSourceRecordIds": 30,
+    "sourceRecordIds": [
+      "FAME000011",
+      "FAME000012",
+      "FAME000023",
+      "FAME000040",
+      "FAME000046",
+      "FAME000058",
+      "FAME000080",
+      "FAME000126",
+      "FAME000013",
+      "FAME000015",
+      "FAME000025",
+      "FAME000027",
+      "FAME000037",
+      "FAME000039",
+      "FAME000059",
+      "FAME000103",
+      "FAME000110",
+      "FAME000131",
+      "FAME000001",
+      "FAME000102",
+      "FAME000006",
+      "FAME000129",
+      "FAME000020",
+      "FAME000073",
+      "FAME000092",
+      "FAME000121",
+      "FAME000010",
+      "FAME000071",
+      "FAME000116",
+      "FAME000101"
+    ],
+    "expectedCompositionFamilyIds": 22,
+    "compositionFamilyIds": [
+      "FAM-FAME000013",
+      "FAM-FAME000015",
+      "FAM-FAME000025",
+      "FAM-FAME000027",
+      "FAM-FAME000037",
+      "FAM-FAME000039",
+      "FAM-FAME000059",
+      "FAM-FAME000103",
+      "FAM-FAME000110",
+      "FAM-FAME000131",
+      "FAM-FAME000001",
+      "FAM-FAME000102",
+      "FAM-FAME000006",
+      "FAM-FAME000129",
+      "FAM-FAME000020",
+      "FAM-FAME000073",
+      "FAM-FAME000092",
+      "FAM-FAME000121",
+      "FAM-FAME000010",
+      "FAM-FAME000071",
+      "FAM-FAME000116",
+      "FAM-FAME000101"
+    ],
+    "note": "Development composition families are also excluded by sourceRecordId; global P6 selector integrity requires one unique compositionFamilyId per manifest record."
   }
 }
