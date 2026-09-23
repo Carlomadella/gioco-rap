@@ -532,34 +532,59 @@ coprono:
 - assenza della rubrica nel payload;
 - init queue a due desk senza model call.
 
+## Root V2_003 inizializzata
+
+Root operatore:
+
+```text
+$HOME\FAME_DIRECT_QA_NETWORK_V2_003
+```
+
+Desk:
+
+```text
+recovery-protocol-v2
+rubric-audit-protocol-v2
+```
+
+Status verificato dopo `init`:
+
+```text
+recovery-protocol-v2     = NOT_RUN, modelCalls=0
+rubric-audit-protocol-v2 = NOT_RUN, modelCalls=0
+queue status             = PENDING
+executionAuthorized      = false
+```
+
+L'inizializzazione non ha effettuato chiamate al modello.
+
+Nota di verifica: nel messaggio operatore che documenta questo init non e
+presente l'output della suite attesa da 38 test. Quindi questo file registra
+l'init come verificato ma non aggiunge un nuovo PASS locale della suite senza
+evidenza esplicita.
+
 ## Prossimo intervento
 
-Verificare localmente il checkpoint V2_003:
+Se la suite da 38 test non e stata ancora eseguita o il relativo output non e
+stato conservato, eseguirla ora prima della prima inferenza V2_003:
 
 ```powershell
-git pull --ff-only origin recovery/fame-local-worker-v2-cdea2227
 python -m unittest discover -s . -p "test_direct_qa_*v2.py" -q
 ```
 
-Con gli 11 nuovi test il totale atteso passa da 27 a **38 test**.
-
-Solo dopo PASS inizializzare, senza inferenza:
+Dopo un PASS locale, eseguire una sola volta:
 
 ```powershell
-python direct_qa_queue_v2.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_003" --tasks recovery-protocol-v2 rubric-audit-protocol-v2
+python direct_qa_queue_v2.py run --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_003"
+```
+
+Poi rileggere lo stato senza nuove chiamate:
+
+```powershell
 python direct_qa_queue_v2.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_003"
 ```
 
-Stato atteso:
-
-```text
-recovery-protocol-v2      = NOT_RUN, modelCalls=0
-rubric-audit-protocol-v2  = NOT_RUN, modelCalls=0
-queue status              = PENDING
-executionAuthorized       = false
-```
-
-Non eseguire `run` prima del PASS locale e della verifica dello status.
+Non rilanciare `run` dopo che entrambe le desk sono state consumate.
 
 ## Vincolo di continuita
 
