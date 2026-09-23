@@ -366,26 +366,101 @@ gli artefatti di attempt-1 e attempt-2 per distinguere:
 - errore di contratto/risposta;
 - eventuale variazione prodotta dal feedback generico.
 
+## Diagnosi V2_002 completata
+
+`coordinator-architecture-v2` resta storicamente `REJECTED`, ma il failure non
+e semantico.
+
+Attempt-1:
+
+```text
+5/5 conclusioni corrette
+coverage positiva = tutta SUFFICIENT
+errori = 2 x UNREVIEWED_EVIDENCE su U01
+```
+
+Attempt-2 dopo feedback generico:
+
+```text
+5/5 conclusioni corrette
+coverage positiva = tutta SUFFICIENT
+errori = 1 x UNREVIEWED_EVIDENCE su U01
+```
+
+Il repair ha quindi corretto uno dei due errori di precisione senza ricevere
+check ID, target o expected evidence.
+
+Classificazione:
+
+```text
+PRECISION_REJECT_WITH_PARTIAL_REPAIR
+```
+
+Non si modifica retroattivamente il package consumato.
+
+`package-authoring-v2` e invece confermato dalla review umana come
+`VALIDATED_FOR_REVIEW` al primo tentativo:
+
+```text
+5/5 conclusioni corrette
+coverage positiva = tutta SUFFICIENT
+unreviewedEvidenceIds = []
+precisionWarnings = [U03] solo su SEMANTIC_UNIT_RULE
+```
+
+U03 era gia dichiarata `benignContext`, quindi il warning non blocca il PASS.
+
+Risultato storico aggiunto:
+
+```text
+strumenti/fame-local-worker/DIRECT_QA_MULTIDESK_V2_RESULT_2026-09-24.md
+d96cb7134ac47e644f810712dd7bbbcc089302f6
+```
+
+## Hardening authoring per task futuri
+
+Aggiornato `DIRECT_QA_PACKAGE_AUTHORING.md` con una regola esplicita:
+
+- required evidence = copertura minima necessaria;
+- benign context = evidence pertinente ma non necessaria;
+- evidence estranea = resta bloccante come `UNREVIEWED_EVIDENCE`.
+
+La classificazione va congelata prima della prima model call del nuovo task e
+non puo essere usata per convertire retroattivamente un reject storico in PASS.
+
+Commit:
+
+```text
+cf271ec65cf9c3b695cd66e8bd128635c9f71948
+docs(fame-local-worker): harden benign-context authoring
+```
+
+Aggiunte anche regressioni che fissano il confine tra:
+
+- benign context dichiarato -> `precisionWarning`, non reject;
+- extra evidence non dichiarata -> `UNREVIEWED_EVIDENCE`, reject.
+
+Commit:
+
+```text
+b6cc5929c36e395187ed06ffacc96260af47f0c6
+test(fame-local-worker): cover benign versus unreviewed evidence
+```
+
 ## Prossimo intervento
 
-Leggere, senza nuove chiamate al modello, gli artefatti della desk fallita:
+Verificare localmente le nuove regressioni:
 
 ```powershell
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_002\desks\coordinator-architecture-v2\attempt-1\candidate.json"
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_002\desks\coordinator-architecture-v2\attempt-1\validation.json"
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_002\desks\coordinator-architecture-v2\attempt-2\candidate.json"
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_002\desks\coordinator-architecture-v2\attempt-2\repair-feedback.json"
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_002\desks\coordinator-architecture-v2\attempt-2\validation.json"
+git pull --ff-only origin recovery/fame-local-worker-v2-cdea2227
+python -m unittest discover -s . -p "test_direct_qa_*v2.py" -q
 ```
 
-Per chiudere anche la desk passata:
+Il totale atteso passa da 25 a **27 test**.
 
-```powershell
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_002\desks\package-authoring-v2\attempt-1\review.md"
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_002\desks\package-authoring-v2\attempt-1\validation.json"
-```
-
-Non rilanciare `run` sulla root `FAME_DIRECT_QA_NETWORK_V2_002`.
+Solo dopo il PASS si apre il checkpoint successivo con nuovi task ID; non si
+riusa `coordinator-architecture-v2` e non si rilancia la root
+`FAME_DIRECT_QA_NETWORK_V2_002`.
 
 ## Vincolo di continuita
 
