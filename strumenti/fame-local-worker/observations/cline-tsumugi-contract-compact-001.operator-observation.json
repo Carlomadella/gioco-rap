@@ -1,0 +1,47 @@
+{
+  "schema": "fame-cline-tsumugi-contract-compact-operator-observation-v1",
+  "sourceRoot": "FAME_CLINE_GPTOSS_TSUMUGI_CONTRACT_COMPACT_001",
+  "status": "FAIL",
+  "diagnosticOnly": true,
+  "artifactCorrect": false,
+  "integrityErrors": [],
+  "answerErrors": [
+    "RECORD_1_INCORRECT",
+    "RECORD_2_INCORRECT"
+  ],
+  "semanticCorrect": 2,
+  "semanticTotal": 4,
+  "results": [
+    [
+      "NOTE_BIAS_RUNTIME_BINDING",
+      "ENFORCED",
+      "ENFORCED",
+      true
+    ],
+    [
+      "PAIR_GATE_THRESHOLD_RUNTIME_BINDING",
+      "ENFORCED",
+      "NOT_ENFORCED",
+      false
+    ],
+    [
+      "PAIR_TOPK_RUNTIME_BINDING",
+      "ENFORCED",
+      "NOT_ENFORCED",
+      false
+    ],
+    [
+      "FIXTURE_SET_RUNTIME_BINDING",
+      "NOT_ENFORCED",
+      "NOT_ENFORCED",
+      true
+    ]
+  ],
+  "toolFlowCompleted": true,
+  "auditJsonCreated": true,
+  "operatorReportedUiErrors": 5,
+  "operatorReportedUiErrorTextsAvailable": false,
+  "interventions": 0,
+  "retryExecuted": false,
+  "sessionIndependentlyVerified": false
+}
