@@ -453,7 +453,17 @@ Comportamento v6:
 - l'output finale materializza solo evidenze ammesse;
 - aggiunto un test che riproduce il pattern reale osservato nel retry v5.
 
-**Stato importante al momento della pausa:** la v6 è presente sul branch remoto, ma non è stata ancora pullata/testata localmente dall'operatore e non è stato ancora eseguito un run reale v6. Non va quindi dichiarata PASS.
+Verifica completata dopo la pausa:
+
+- test automatici v6: **16/16 PASS**;
+- run reale v6 con `qwen3-coder:30b`: **VALIDATED_FOR_REVIEW al primo tentativo**;
+- `errors: []`;
+- `candidateErrors: []`;
+- `assembledErrors: []`;
+- tutte e sette le categorie in `cachedCodes`;
+- evidenceId superflui registrati in `droppedEvidence` e rimossi dall'output finale.
+
+Questo chiude con PASS il primo task QA reale end-to-end del Direct Worker.
 
 ## Cosa abbiamo imparato
 
@@ -507,7 +517,8 @@ Prima di confrontare altri modelli conviene chiudere una versione del worker il 
 - QA worker v1–v5 real run: **REJECTED**
 - QA worker v5 automatic tests: **14/14 PASS**
 - Retry cumulativo v5: **funzionante**
-- QA worker v6: **implementato sul branch remoto, non ancora verificato localmente**
+- QA worker v6 automatic tests: **16/16 PASS**
+- QA worker v6 real run Qwen: **VALIDATED_FOR_REVIEW al primo tentativo**
 - Modello corrente: `qwen3-coder:30b`
 - Runtime corrente: FAME Direct Worker diretto su Ollama
 - Cline: non usato nel runtime corrente
@@ -523,21 +534,36 @@ Head al momento della pausa prima di questo aggiornamento recap:
 
 `7e125be05667af9fdb5745774c5f09d88e8b1ea5`
 
-Primo passo alla ripresa:
+Verifica v6 completata localmente:
 
-```powershell
-git pull origin feature/fame-neural-roadmap
-python strumenti/fame-local-worker/test_qa_worker.py -v
-```
+- suite QA: **16/16 PASS**, 0 FAIL;
+- desk: `C:\Users\mycol\FAME_QA_REVIEW_006`;
+- run: `runs\20260923T065440213888Z\report.json`;
+- stato: **VALIDATED_FOR_REVIEW**;
+- `firstAttemptPass: true`;
+- una sola chiamata a Qwen, nessun retry.
 
-Se la suite v6 passa, creare una nuova desk pulita (es. `FAME_QA_REVIEW_006`) e fare un singolo run reale con `qwen3-coder:30b`.
+Il primo tentativo ha prodotto tutte e sette le finding attese. L'host ha inoltre registrato e rimosso evidenceId superflui tramite `droppedEvidence`, senza perdere le evidenze sufficienti. `candidateErrors` e `assembledErrors` sono entrambi vuoti.
 
-Il criterio da verificare è semplice: la v6 deve accettare finding con evidenza sufficiente anche se Qwen aggiunge contesto superfluo, mantenendo traccia di ciò che viene scartato e senza accettare finding semanticamente incomplete.
+L'output finale contiene le sette finding validate con nextCheck host-owned:
 
-Solo dopo questo punto conviene decidere se:
+- GATE_FAIL;
+- SNARE_HAT_CONFUSION;
+- MISSING_EVENTS;
+- D08_OUTSIDE_GATE;
+- TIMBRE_HYPOTHESIS;
+- PAIR_CONFIDENCE_UNKNOWN;
+- ZERO_INTERVALS.
 
-1. stabilizzare definitivamente questo QA task;
-2. provare un secondo task reale diverso per verificare generalizzazione;
-3. confrontare Qwen con Devstral/GPT-OSS o altro modello;
-4. iniziare la vera orchestrazione multi-agent (coda, più desk, memoria condivisa versionata, coordinatore).
+Le stringhe mojibake osservate con PowerShell (`â€“`, `Ã¨`, ecc.) sono una resa del terminale: lo snapshot UTF-8 nella repository contiene correttamente i caratteri originali.
+
+## Prossimo passo consigliato
+
+Non continuare a ottimizzare questo stesso caso Tsumugi: il rischio ora è overfitting del worker alla rubrica conosciuta.
+
+Il prossimo esperimento utile è un **secondo task reale, differente e congelato**, con nuova rubrica preparata prima del run. Solo dopo questo secondo caso conviene decidere se:
+
+1. considerare stabile il pattern Direct Worker + validatore;
+2. confrontare Qwen con Devstral/GPT-OSS sullo stesso protocollo;
+3. iniziare la vera orchestrazione multi-agent (coda, più desk, memoria condivisa versionata, coordinatore).
 
