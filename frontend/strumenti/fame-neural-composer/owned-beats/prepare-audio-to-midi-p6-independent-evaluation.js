@@ -3,7 +3,6 @@
 const crypto=require("node:crypto");
 const fs=require("node:fs");
 const path=require("node:path");
-const {validate:validateWorkspaceManifest}=require("./bootstrap");
 
 const HERE=__dirname;
 const PROTOCOL_FILE=path.join(HERE,"audio-to-midi-p6-independent-evaluation-v1.json");
@@ -12,6 +11,34 @@ const AUDIO_ANALYSIS_HOLDOUT_FILE=path.join(HERE,"audio-analysis-holdout-cohort-
 const PRIOR_AUDIO_TO_MIDI_EVAL_FILE=path.join(HERE,"audio-to-midi-independent-evaluation-cohort-v1.json");
 const COHORT_ID="audio-to-midi-p6-independent-evaluation-v1";
 const IDENTITY_FIELDS=["compositionFamilyId","sourceRecordId","sourceAssetId","sha256"];
+
+function validateWorkspaceManifest(manifest){
+  if(manifest?.schema!=="fame-owned-beats-workspace-v1"||manifest?.version!==1||!Array.isArray(manifest.records)){
+    throw new Error("Unsupported manifest schema");
+  }
+  const sourceIds=new Set(),hashes=new Set(),familySplits=new Map();
+  for(const record of manifest.records){
+    if(!/^FAME\d{6,}$/.test(record?.sourceRecordId||"")||
+       !/^[a-f0-9]{64}$/.test(record?.sha256||"")||
+       sourceIds.has(record.sourceRecordId)||
+       hashes.has(record.sha256)||
+       record.sourceAssetId!=="sha256:"+record.sha256||
+       !Array.isArray(record.sourcePaths)||
+       !record.roles){
+      throw new Error("Invalid or duplicate manifest record");
+    }
+    sourceIds.add(record.sourceRecordId);
+    hashes.add(record.sha256);
+    if(record.compositionFamilyId&&record.split){
+      const prior=familySplits.get(record.compositionFamilyId);
+      if(prior&&prior!==record.split){
+        throw new Error("Composition family crosses splits: "+record.compositionFamilyId+" ("+prior+" vs "+record.split+")");
+      }
+      familySplits.set(record.compositionFamilyId,record.split);
+    }
+  }
+  return manifest;
+}
 
 function readJson(file){return JSON.parse(fs.readFileSync(file,"utf8").replace(/^\uFEFF/,""))}
 function stableJson(value){return JSON.stringify(value,null,2)+"\n"}

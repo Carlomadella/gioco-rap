@@ -107,6 +107,6 @@
   "nextAction": "RUN_METADATA_ONLY_P6_SELECTOR_PREVIEW_AND_FREEZE_IDENTITIES",
   "implementation": {
     "selectorPath": "prepare-audio-to-midi-p6-independent-evaluation.js",
-    "selectorGitBlobSha": "ef268935be77f8e228ce0f64d90336e25726d8eb"
+    "selectorGitBlobSha": "d776c2f9b3c24edb1d76bdec5a9a3988d2adde73"
   }
 }

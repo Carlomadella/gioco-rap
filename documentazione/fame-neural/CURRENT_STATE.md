@@ -1,5 +1,11 @@
 # FAME Neural — Current State
 
+## P6 selector self-test — dipendenza bootstrap rimossa
+
+Il primo self-test P6 si è fermato prima del preview con `MODULE_NOT_FOUND: './bootstrap'` nel worktree locale. Nessun cohort è stato selezionato e nessun audio è stato aperto.
+
+Il selector P6 ora contiene internamente la validazione read-only minima del manifest necessaria alla selezione, invece di dipendere da `bootstrap.js`. Lo static test vieta esplicitamente il ritorno di quella dipendenza. Il protocollo è stato riallineato al nuovo Git blob SHA del selector.
+
 ## P6 preparazione — protocollo e selector metadata-only congelati
 
 Congelato NDR-101 prima di qualunque nuovo audio access: 12 family, stesso gate della precedente independent evaluation (mediana >=2 e almeno 9/12 >=2 per drums e low-end), pipeline `audio-analysis-v2-config-001 → HTDemucs/OpenVINO → Tsumugi drums_v1_5 + pYIN low-end`, renderer v2 reference-duration. La selezione è metadata-only, deterministica e deve escludere ogni family già assegnata/consumata.
