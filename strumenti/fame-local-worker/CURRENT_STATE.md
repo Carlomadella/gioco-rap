@@ -600,27 +600,130 @@ seconda chiamata controllata ed e rimasta rejected.
 
 La root e consumata e non va rilanciata.
 
+## Diagnosi V2_003 completata
+
+### recovery-protocol-v2
+
+Review umana confermata:
+
+```text
+5/5 conclusioni corrette
+coverage positiva = tutta SUFFICIENT
+unreviewedEvidenceIds = []
+precisionWarnings = [U01] solo su FIRST_PASS_IMMUTABLE
+modelCalls = 1
+firstAttemptPass = true
+```
+
+La desk resta quindi un first-pass reale valido.
+
+### rubric-audit-protocol-v2
+
+Attempt-1:
+
+```text
+4/5 conclusioni corrette
+DIRECT_CONTEXTUAL_STRENGTH = conclusione corretta, coverage rifiutata
+AUDIT_PROMOTES_OPERATIONAL_NETWORK = conclusione errata
+```
+
+Feedback repair:
+
+```text
+SOME_CONCLUSION_INCORRECT
+SOME_EVIDENCE_COVERAGE_INSUFFICIENT
+oracleTargetsSent = false
+checkIdsSentInFeedback = false
+```
+
+Attempt-2:
+
+```text
+5/5 conclusioni corrette
+unico errore host = DIRECT_CONTEXTUAL_STRENGTH:INSUFFICIENT_EVIDENCE
+```
+
+Il repair ha quindi corretto il vero errore semantico.
+
+### Difetto della rubrica congelata
+
+La finding `DIRECT_CONTEXTUAL_STRENGTH` richiedeva:
+
+```text
+U01 + U03
+```
+
+ma U01 contiene gia integralmente:
+
+- E152 + E153 + E154 come supporto contestuale;
+- E155 come prova diretta;
+- la distinzione esplicita della forza della prova.
+
+U03 ripete la distinzione nel sidecar ma non copre una clausola necessaria che
+manca da U01.
+
+Quindi il requisito U03 era ridondante e ha prodotto un false reject di
+coverage.
+
+Lo stato storico resta `REJECTED`: il package consumato non viene modificato o
+rilanciato.
+
+Classificazione diagnostica:
+
+```text
+ATTEMPT_1:
+  genuine semantic error + package coverage false negative
+
+ATTEMPT_2:
+  semantic recovery successful
+  5/5 conclusions correct
+  final reject caused only by rubric authoring defect
+```
+
+Risultato storico aggiunto:
+
+```text
+strumenti/fame-local-worker/DIRECT_QA_RECOVERY_AUDIT_V2_RESULT_2026-09-24.md
+b648e0e78e8914c22a8584f88be82d5c33f5c76d
+```
+
+Regola di authoring aggiunta:
+
+```text
+a19dc2bacec9e9ac8db253d5eb343b56a563f114
+docs(fame-local-worker): forbid redundant required coverage groups
+```
+
+Ogni required group futuro deve coprire una clausola semanticamente necessaria e
+distinta della finding. Restatement o rinforzi ridondanti non devono diventare
+gruppi obbligatori separati.
+
+Regressione aggiunta:
+
+```text
+a6b176f42d7c42754085a7e7332a47d4c6dc7675
+test(fame-local-worker): preserve v2 003 rubric defect regression
+```
+
+Il test conserva entrambe le proprieta:
+
+- il package storico congelato continua a rifiutare U01-only;
+- U01 viene verificata esplicitamente come blocco che contiene gia tutti gli
+  elementi DIRECT/CONTEXTUAL della finding.
+
 ## Prossimo intervento
 
-Ispezionare senza nuove chiamate gli artefatti della desk fallita:
+Verificare localmente le nuove regressioni:
 
 ```powershell
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_003\desks\rubric-audit-protocol-v2\attempt-1\candidate.json"
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_003\desks\rubric-audit-protocol-v2\attempt-1\validation.json"
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_003\desks\rubric-audit-protocol-v2\attempt-2\candidate.json"
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_003\desks\rubric-audit-protocol-v2\attempt-2\repair-feedback.json"
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_003\desks\rubric-audit-protocol-v2\attempt-2\validation.json"
+git pull --ff-only origin recovery/fame-local-worker-v2-cdea2227
+python -m unittest discover -s . -p "test_direct_qa_*v2.py" -q
 ```
 
-Per chiudere anche la desk passata:
+Il totale atteso passa da 38 a **39 test**.
 
-```powershell
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_003\desks\recovery-protocol-v2\attempt-1\review.md"
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_003\desks\recovery-protocol-v2\attempt-1\validation.json"
-```
-
-Non modificare package/rubriche e non rilanciare `run` su V2_003 prima della
-classificazione del reject.
+Dopo PASS, non riusare V2_003. Il checkpoint successivo deve usare task ID nuovi
+e applicare gia in authoring la regola contro required group ridondanti.
 
 ## Vincolo di continuita
 
