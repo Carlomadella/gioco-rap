@@ -1,0 +1,99 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-p5-tsumugi-controlled-protocol-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_FIRST_TSUMUGI_FIXTURE_AUDIO_ACCESS",
+  "createdAt": "2026-09-22",
+  "decision": "NDR-098",
+  "candidateId": "tsumugi-drums-v1_5",
+  "environmentSpec": "audio-to-midi-p5-tsumugi-environment-v1.json",
+  "environmentRunId": "audio-to-midi-p5-tsumugi-env-v1-001",
+  "fixtureRunId": "audio-to-midi-p3-fixtures-v1",
+  "fixtureManifestSha256": "f68eddc1fab7919f90a8bd391e24e444401a168d36fa06f22af0ec6d70d33d0b",
+  "runId": "audio-to-midi-p5-tsumugi-controlled-v1-001",
+  "input": {
+    "condition": "CONTROLLED_CLEAN_DRUM_STEM_NO_SOURCE_SEPARATION",
+    "fixtures": [
+      "D01_KICK_ISOLATED",
+      "D02_SNARE_ISOLATED",
+      "D03_HIHAT_ISOLATED",
+      "D04_KICK_SNARE_SIMULTANEOUS",
+      "D05_KICK_HIHAT_SIMULTANEOUS",
+      "D06_HIHAT_TRIPLETS",
+      "D07_KICK_SYNCOPATED",
+      "D08_UNSUPPORTED_CLAP_RIM"
+    ]
+  },
+  "inference": {
+    "checkpointMode": "EXPLICIT_FROZEN_LOCAL_PATH_NO_AUTO_DOWNLOAD",
+    "modelType": "drums_v1_5",
+    "device": "cuda",
+    "allowCpuFallback": false,
+    "amp": false,
+    "compile": false,
+    "instrumentFilter": "drums",
+    "windowMsPolicy": "checkpoint training_args.window_ms if present else 8000",
+    "strideMsPolicy": "half resolved window_ms",
+    "trackBatchSizePolicy": "checkpoint training_args.semi_crf_track_batch_size if present else 128",
+    "windowBatchSize": 1,
+    "mergeGapMs": null,
+    "mergeOnsetMs": 50.0,
+    "silenceGateRmsDbfs": -72.0,
+    "noteBias": 0.0,
+    "useBoundaryHead": true,
+    "semiCrfBackend": "torch",
+    "semiCrfSparseDecode": false,
+    "instrumentPairInferTopk": 256,
+    "instrumentPairGateThreshold": -3.0,
+    "instrumentPairMaxPairs": 512,
+    "velocity": 100,
+    "minMidiNoteMs": 5.0
+  },
+  "drumPitchPolicy": {
+    "aliasesBeforeScoring": {
+      "40": 38,
+      "57": 49
+    },
+    "supportedRoleMapping": {
+      "kick": [35, 36],
+      "snare": [38],
+      "hihat": [42, 44, 46]
+    },
+    "allOtherPredictedDrumPitches": "COUNT_AS_OVERALL_FALSE_POSITIVES_AND_REPORT_SEPARATELY",
+    "unsupportedReferenceRoles": ["clap", "rim"],
+    "unsupportedReferencePolicy": "DIAGNOSTIC_ONLY_NOT_REQUIRED_FOR_CONTROLLED_PASS"
+  },
+  "metrics": {
+    "primaryOnsetToleranceSeconds": 0.03,
+    "secondaryOnsetToleranceSeconds": 0.05,
+    "matching": "one-to-one same-role onset matching",
+    "reportOverall": ["tp", "fp", "fn", "precision", "recall", "f1"],
+    "reportByClass": ["kick", "snare", "hihat"],
+    "reportUnsupportedOutputPitches": true
+  },
+  "controlledGate": {
+    "requiredPerfectPrimary30ms": [
+      "D01_KICK_ISOLATED",
+      "D02_SNARE_ISOLATED",
+      "D03_HIHAT_ISOLATED",
+      "D04_KICK_SNARE_SIMULTANEOUS",
+      "D05_KICK_HIHAT_SIMULTANEOUS",
+      "D06_HIHAT_TRIPLETS",
+      "D07_KICK_SYNCOPATED"
+    ],
+    "requiredPrecision": 1.0,
+    "requiredRecall": 1.0,
+    "requiredF1": 1.0,
+    "D08": "DIAGNOSTIC_ONLY",
+    "syntheticPassPromotesCandidate": false
+  },
+  "safety": {
+    "freshOwnedBeatFamiliesConsumed": 0,
+    "consumedIndependentEvaluationFamiliesUsed": 0,
+    "sourceSeparationAllowed": false,
+    "trainingAuthorized": false,
+    "batch131Authorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "nextIfPass": "REVIEW_TSUMUGI_CONTROLLED_RESULT_THEN_FREEZE_REAL_EASY_IDENTITIES_AND_REAL_TEMPLATE_PRETRAINED_COMPARISON",
+  "nextIfFail": "REVIEW_TSUMUGI_FAILURE_PATTERN_BEFORE_ANY_REAL_EASY_ACCESS"
+}

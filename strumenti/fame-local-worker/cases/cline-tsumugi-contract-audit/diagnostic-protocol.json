@@ -1,0 +1,79 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-p5-tsumugi-score-diagnostic-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_FIRST_SCORE_DIAGNOSTIC_RUN",
+  "createdAt": "2026-09-22",
+  "decision": "NDR-099_ADDENDUM",
+  "candidateId": "tsumugi-drums-v1_5",
+  "sourceRunId": "audio-to-midi-p5-tsumugi-controlled-v1-001",
+  "runId": "audio-to-midi-p5-tsumugi-score-diagnostic-v1-001",
+  "purpose": "LOCALIZE_PAIR_GATE_VS_SEMI_CRF_INTERVAL_HEAD_WITHOUT_RETUNING",
+  "fixtures": [
+    "D01_KICK_ISOLATED",
+    "D02_SNARE_ISOLATED",
+    "D03_HIHAT_ISOLATED",
+    "D04_KICK_SNARE_SIMULTANEOUS",
+    "D05_KICK_HIHAT_SIMULTANEOUS",
+    "D06_HIHAT_TRIPLETS",
+    "D07_KICK_SYNCOPATED",
+    "D08_UNSUPPORTED_CLAP_RIM"
+  ],
+  "inferenceContract": {
+    "reuseControlledCheckpointAndEnvironment": true,
+    "device": "cuda",
+    "amp": false,
+    "compile": false,
+    "instrumentFilter": "drums",
+    "instrumentPairGateThreshold": -3.0,
+    "instrumentPairInferTopk": 256,
+    "noteBias": 0.0,
+    "semiCrfBackend": "torch",
+    "noParameterMutation": true
+  },
+  "pitchDiagnostics": {
+    "midiRange": [21,108],
+    "numPitches": 88,
+    "targetPitches": [35,36,38,40,42,44,46],
+    "roleGroups": {
+      "kick": [35,36],
+      "snare": [38,40],
+      "hihat": [42,44,46]
+    },
+    "topPairGatePitchesToReport": 12
+  },
+  "intervalDiagnostics": {
+    "blankNoiseScore": 0.0,
+    "reportPerTargetPitch": [
+      "pairGateLogit",
+      "pairGateMarginToThreshold",
+      "pairGateRankAmong88",
+      "pairGateAboveThreshold",
+      "maxSingletonScore",
+      "positiveSingletonCount",
+      "maxNonSingletonScore",
+      "positiveNonSingletonCount",
+      "maxEventScore"
+    ],
+    "reportExpectedRoleAggregate": true,
+    "lengthScaling": "READ_FROM_FROZEN_CHECKPOINT_CONFIG_AND_RECORD",
+    "lengthPenalty": "READ_FROM_FROZEN_CHECKPOINT_CONFIG_AND_RECORD"
+  },
+  "interpretationRules": {
+    "pairGateWeak": "all expected-role target pairGateLogits are below frozen threshold -3.0",
+    "intervalHeadWeak": "at least one expected-role target pairGateLogit is at/above threshold but all expected-role maxEventScores are <= 0",
+    "decoderEvidencePresent": "at least one expected-role maxEventScore is > 0",
+    "noRetuningFromDiagnostic": true
+  },
+  "safety": {
+    "sourceAudioAccessAllowed": false,
+    "fixtureAudioAccessAllowed": true,
+    "ownedBeatAudioAccessAllowed": false,
+    "freshOwnedBeatFamiliesConsumed": 0,
+    "consumedIndependentEvaluationFamiliesUsed": 0,
+    "sourceSeparationAllowed": false,
+    "trainingAuthorized": false,
+    "batch131Authorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "nextAction": "RUN_APPEND_ONLY_TSUMUGI_SCORE_DIAGNOSTIC_ON_FROZEN_SYNTHETIC_FIXTURES"
+}
