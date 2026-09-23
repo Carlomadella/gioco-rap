@@ -1,5 +1,11 @@
 # FAME Neural — Current State
 
+## Tsumugi score diagnostic — controlled failure per head contract errato
+
+Il primo tentativo del pair-gate score diagnostic ha passato static/self-test ma si e fermato durante il model forward con `KeyError: pair_gate_logits`. Audit del source Tsumugi congelato mostra che `pair_gate_logits` esiste solo nel V2 head; il V1 head usa `interval_query/key/diag`. Inoltre nel decoder V1 `selected_pair_count` e semplicemente il numero di track pitch/slot e non costituisce evidence di pair-gate selection.
+
+Il runId `audio-to-midi-p5-tsumugi-score-diagnostic-v1-001` non viene ritentato. Il vecchio runner ora contiene un guard esplicito che rifiuta checkpoint non-V2 prima dell'apertura delle fixture. Prossimo passo: environment doctor read-only per registrare `semi_crf_version` e `num_pitch_slots` reali; se V1, congelare un nuovo diagnostic pitch-wise compatibile con il V1 Semi-CRF. Dettaglio in [OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_SCORE_DIAGNOSTIC_CONTROLLED_FAIL_2026-09-23.md](OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_SCORE_DIAGNOSTIC_CONTROLLED_FAIL_2026-09-23.md).
+
 ## Hardening score diagnostic Tsumugi — contract binding preparato
 
 Dopo l'isolamento del worker QA, il runner reale `audio-to-midi-p5-tsumugi-score-diagnostic.py` e stato riesaminato prima dell'esecuzione. Il contract congelato conteneva campi non tutti cross-bindati a runtime: in particolare pair-gate threshold, top-k e lista fixture potevano divergere dal diagnostic protocol senza un rifiuto esplicito.

@@ -40,6 +40,8 @@ def main():
         "validate_resolved_contract",
         "runtimeContractBindingVerified",
         "fixtureSetBindingVerified",
+        "PAIR_GATE_DIAGNOSTIC_REQUIRES_V2_HEAD",
+        "V1 outputs do not expose pair_gate_logits",
     ]:
         assert needle in runner
 

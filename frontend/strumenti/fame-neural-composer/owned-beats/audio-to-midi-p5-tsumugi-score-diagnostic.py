@@ -220,6 +220,14 @@ def execute(workspace: Path):
     device = torch.device("cuda")
 
     model, model_config, training_args = load_model(checkpoint, device=device)
+    semi_crf_version = str(model_config.semi_crf_version)
+    if semi_crf_version != "v2":
+        raise RuntimeError(
+            "PAIR_GATE_DIAGNOSTIC_REQUIRES_V2_HEAD: "
+            f"checkpoint semi_crf_version={semi_crf_version}; "
+            "V1 outputs do not expose pair_gate_logits. "
+            "Do not reinterpret V1 selected_pair_count as pair-gate evidence."
+        )
     drum_instrument_id = int(resolve_instrument_id(contract["instrumentFilter"]))
 
     frozen = controlled["inference"]
