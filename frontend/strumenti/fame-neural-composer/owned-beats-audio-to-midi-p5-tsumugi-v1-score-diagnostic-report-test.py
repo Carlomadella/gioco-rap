@@ -11,8 +11,9 @@ def main():
     source=SCRIPT.read_text(encoding="utf-8")
     ast.parse(source)
     for needle in [
-        "zeroIntervalPositiveTargetScoreRoleRows",
-        "zeroIntervalNonpositiveTargetScoreRoleRows",
+        "absentTargetPitchPositiveScoreRoleRows",
+        "absentTargetPitchNonpositiveScoreRoleRows",
+        "sourceControlledTargetPitchEventCount",
         "HUMAN_REVIEW_V1_SCORE_MARGINS_AND_LOCALIZATION_COUNTS",
         "fixtureAudioOpenedByThisCommand",
         "semiCrfDecodeExecutedByThisCommand",
