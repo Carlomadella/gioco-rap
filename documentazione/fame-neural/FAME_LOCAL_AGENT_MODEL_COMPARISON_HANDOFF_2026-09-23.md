@@ -1,5 +1,10 @@
 # Handoff GPT-5.6 — confronto modello locale, 23 settembre 2026
 
+## Prossimo lavoro: rete coordinata autorizzata
+
+L'operatore ha chiesto di costruire il flusso coordinato. Implementazione disponibile in `strumenti/fame-local-worker/qa_coordinator.py`; protocollo, comandi e limiti in `strumenti/fame-local-worker/COORDINATOR.md`. Da qui proseguire con la nuova rete `FAME_AGENT_NETWORK_001`, una categoria per scrivania. Non ripetere la diagnostica precedente. Quattordici incarichi sequenziali, dieci affermazioni vere e quattro false valutate lato host, con rubric invariata. Nuovo prompt e formato: esperimento distinto, non prova causale pura del sovraccarico. Nessun run reale della rete ancora eseguito durante la preparazione.
+
+
 ## Aggiornamento: diagnostica successiva autorizzata
 
 Il confronto congelato resta concluso con entrambi i FAIL. L'operatore ha autorizzato una nuova verifica della configurazione GPT-OSS: leggere `strumenti/fame-local-worker/GPTOSS_DIAGNOSTIC.md`. Nuovo runner e scrivania separati, think=low esplicito e budget ancora 4096; nessun risultato reale ancora disponibile per questo nuovo esperimento. Non ripetere i vecchi comandi TRANSFER per questa diagnostica.

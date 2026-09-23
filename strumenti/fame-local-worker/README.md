@@ -1,5 +1,10 @@
 # FAME Direct Worker v1 — Ollama senza Cline
 
+## Flusso coordinato attuale
+
+Il primo coordinatore con scrivanie specializzate e pronto: leggere [COORDINATOR.md](COORDINATOR.md). Una categoria per agente, 14 incarichi in sequenza sullo stesso GPT-OSS, stato persistente e controlli congelati. Si usa `qa_coordinator.py` in una nuova rete `FAME_AGENT_NETWORK_001`; i test e i risultati precedenti restano separati. Nessun risultato reale della rete ancora disponibile.
+
+
 Primo worker locale con scrivania dedicata. Python 3.10+ e sola libreria standard, nessun pacchetto pip, SDK a pagamento o Cline richiesto. Il modello deve essere gia installato in Ollama; questo programma non scarica modelli e non seleziona servizi cloud.
 
 ## Cosa e pronto
