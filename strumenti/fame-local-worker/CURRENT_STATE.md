@@ -447,20 +447,119 @@ b6cc5929c36e395187ed06ffacc96260af47f0c6
 test(fame-local-worker): cover benign versus unreviewed evidence
 ```
 
+## Verifica locale dopo hardening precisione
+
+Esecuzione operatore:
+
+```text
+Ran 27 tests
+OK
+```
+
+Quindi le regressioni introdotte dopo `FAME_DIRECT_QA_NETWORK_V2_002` risultano
+PASS sul PC locale:
+
+- benign context dichiarato -> warning non bloccante;
+- extra evidence non dichiarata -> `UNREVIEWED_EVIDENCE` bloccante.
+
+## Checkpoint V2_003 preparato
+
+Sono stati scelti due nuovi task ID su documenti della rete gia presenti e
+byte-identici al commit di ripartenza `cdea2227`.
+
+Task 1:
+
+```text
+recovery-protocol-v2
+source: strumenti/fame-local-worker/RECOVERY.md
+source commit: cdea2227a4a71906c48b97d888e707a787cecc3e
+```
+
+Verifica:
+
+- immutabilita del first pass dopo recovery;
+- assenza di oracle e retry automatici;
+- separazione tra recovery sul caso noto e prova di transfer/generalizzazione;
+- controlli negativi su training e significato degli hash locali.
+
+Task 2:
+
+```text
+rubric-audit-protocol-v2
+source: strumenti/fame-local-worker/RUBRIC_AUDIT.md
+source commit: cdea2227a4a71906c48b97d888e707a787cecc3e
+```
+
+Verifica:
+
+- `SEMANTIC_FAIL` non equivale automaticamente a mancata comprensione;
+- distinzione DIRECT / CONTEXTUAL;
+- sidecar separato che preserva esiti e validator storici;
+- controlli negativi contro universalizzazione del supporto contestuale e
+  promozione operativa della rete.
+
+Le fonti sono state verificate identiche tra branch di recovery e `cdea2227`
+prima del freeze.
+
+Commit preparati:
+
+```text
+d9bac2935279f7a1ebbd3196d6966832974dd518
+test(fame-local-worker): freeze recovery protocol source
+
+00ebe3583578ff03eb54e9f7666e9de6c37107c0
+test(fame-local-worker): freeze rubric audit source
+
+b796874f019a22b78e45c5ff08065f2e0ec99643
+feat(fame-local-worker): add recovery protocol v2 task
+
+d9cd87fc48a3bd276bc832ce86e5fead5b90747c
+feat(fame-local-worker): add rubric audit protocol v2 task
+
+5c217d7109543308f380c358fa35d2fe7120ee94
+test(fame-local-worker): validate recovery audit v2 checkpoint
+```
+
+I package usano sei blocchi semantici completi ciascuno. I test specifici
+coprono:
+
+- ricostruzione integrale fonte;
+- expected answer;
+- coverage composto incompleto;
+- falsi positivi di autorizzazione/generalizzazione;
+- benign context;
+- unreviewed evidence;
+- assenza della rubrica nel payload;
+- init queue a due desk senza model call.
+
 ## Prossimo intervento
 
-Verificare localmente le nuove regressioni:
+Verificare localmente il checkpoint V2_003:
 
 ```powershell
 git pull --ff-only origin recovery/fame-local-worker-v2-cdea2227
 python -m unittest discover -s . -p "test_direct_qa_*v2.py" -q
 ```
 
-Il totale atteso passa da 25 a **27 test**.
+Con gli 11 nuovi test il totale atteso passa da 27 a **38 test**.
 
-Solo dopo il PASS si apre il checkpoint successivo con nuovi task ID; non si
-riusa `coordinator-architecture-v2` e non si rilancia la root
-`FAME_DIRECT_QA_NETWORK_V2_002`.
+Solo dopo PASS inizializzare, senza inferenza:
+
+```powershell
+python direct_qa_queue_v2.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_003" --tasks recovery-protocol-v2 rubric-audit-protocol-v2
+python direct_qa_queue_v2.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_003"
+```
+
+Stato atteso:
+
+```text
+recovery-protocol-v2      = NOT_RUN, modelCalls=0
+rubric-audit-protocol-v2  = NOT_RUN, modelCalls=0
+queue status              = PENDING
+executionAuthorized       = false
+```
+
+Non eseguire `run` prima del PASS locale e della verifica dello status.
 
 ## Vincolo di continuita
 
