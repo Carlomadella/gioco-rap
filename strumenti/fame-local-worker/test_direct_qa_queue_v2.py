@@ -10,13 +10,14 @@ import direct_qa_worker_v2 as w
 
 
 class Fake:
-    def __init__(self,replies):
-        self.replies=list(replies);self.calls=[]
+    def __init__(self,replies=None,mode=None):
+        self.replies=list(replies or []);self.mode=mode;self.calls=[]
     def request(self,endpoint,payload=None):
         if endpoint=='/api/version':return {'version':'test'}
         if endpoint=='/api/tags':return {'models':[{'name':w.MODEL,'digest':w.DIGEST}]}
         if endpoint=='/api/show':return {}
         self.calls.append(payload)
+        if self.mode=='timeout':raise TimeoutError('test')
         return dict(done=True,message=dict(content=json.dumps(self.replies.pop(0))),done_reason='stop')
 
 
@@ -53,6 +54,15 @@ class QueueV2Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d,contextlib.redirect_stdout(io.StringIO()):
             root=Path(d)/'q';q.init(root,['pfnmf-review-v1'])
             f=Fake([good()]);q.run(root,f);q.run(root,f)
+            self.assertEqual(len(f.calls),1)
+
+    def test_error_is_not_hidden_by_remaining_pending_tasks(self):
+        with tempfile.TemporaryDirectory() as d,contextlib.redirect_stdout(io.StringIO()):
+            root=Path(d)/'q'
+            q.init(root,['pfnmf-review-v1','subset-bic-review-v1'])
+            f=Fake(mode='timeout');r=q.run(root,f)
+            self.assertEqual(r['status'],'NEEDS_REVIEW')
+            self.assertEqual([row['status'] for row in r['results']],['ERROR','NOT_RUN'])
             self.assertEqual(len(f.calls),1)
 
 
