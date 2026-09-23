@@ -1,8 +1,10 @@
 # FAME Direct Worker v1 — Ollama senza Cline
 
-## Decisione corrente — uscita da Cline
+## Decisione corrente — runtime diretto Ollama
 
-I probe Cline non vengono piu usati come percorso operativo per FAME Local Worker. Il diagnostico Tsumugi compatto ha comunque mostrato errori ripetuti del tool layer e 2/4 classificazioni runtime corrette. Il passo di isolamento e ora [direct_tsumugi_contract_audit.py](direct_tsumugi_contract_audit.py): stessa rubrica congelata, una chiamata diretta a Ollama, nessun tool e nessun retry. Dettagli in [FAME_LOCAL_WORKER_CLINE_EXIT_2026-09-23.md](FAME_LOCAL_WORKER_CLINE_EXIT_2026-09-23.md).
+Il percorso operativo FAME Local Worker non usa piu Cline. L'isolamento `FAME_DIRECT_TSUMUGI_CONTRACT_001` ha dato `PASS` con `artifactCorrect=true` in una sola chiamata a `gpt-oss:20b`, senza tool e senza retry, sullo stesso audit Tsumugi congelato che via Cline aveva prodotto 2/4 classificazioni corrette e ripetuti errori di parsing tool-call.
+
+Il risultato e diagnostico, non una nuova independent evaluation e non prova causalita esclusiva. La decisione ingegneristica e pero fissata: nuovi task QA strutturati devono usare snapshot host-side, chiamata Ollama diretta, JSON Schema e validatore esterno. Dettagli in [FAME_LOCAL_WORKER_CLINE_EXIT_2026-09-23.md](FAME_LOCAL_WORKER_CLINE_EXIT_2026-09-23.md).
 
 ## Prossima prova Cline — P3/P4 con unita semantiche
 

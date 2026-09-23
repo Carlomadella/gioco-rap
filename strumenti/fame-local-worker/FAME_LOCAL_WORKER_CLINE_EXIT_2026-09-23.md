@@ -33,3 +33,18 @@ Interpretazione:
 - ERROR operativo: problema del direct runtime/preflight, da correggere prima di valutare il modello.
 
 Dopo questo isolamento non si continua a ripetere lo stesso caso. Le decisioni successive riguardano architettura del worker e selezione/scomposizione dei task, non il recupero retroattivo dei probe consumati.
+
+## Esito isolamento diretto
+
+Run operator-reported: `FAME_DIRECT_TSUMUGI_CONTRACT_001`.
+
+Comando diretto con `gpt-oss:20b`, una sola chiamata Ollama, nessun tool e nessun retry:
+
+- `status=PASS`;
+- `artifactCorrect=true`;
+- `modelCalls=1`;
+- stessa rubrica congelata dei quattro binding runtime Tsumugi.
+
+Questo diagnostico non e una nuova independent evaluation e non dimostra causalita esclusiva di Cline, perche il runtime e il framing diretto differiscono. Dimostra pero che lo stesso modello, sullo stesso contenuto/rubrica, puo completare correttamente il task quando Cline e rimosso dal percorso.
+
+Decisione operativa: per FAME Local Worker i task QA strutturati passano al runtime diretto Ollama con snapshot host-side, schema JSON e validatore esterno. Cline resta evidenza storica/strumento separato, non il runtime di produzione del worker.

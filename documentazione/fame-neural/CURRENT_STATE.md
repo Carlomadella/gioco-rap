@@ -1,5 +1,13 @@
 # FAME Neural — Current State
 
+## Decisione corrente — FAME Local Worker diretto, Cline fuori dal runtime operativo
+
+Il diagnostico di isolamento `FAME_DIRECT_TSUMUGI_CONTRACT_001` ha completato lo stesso audit Tsumugi con `gpt-oss:20b` tramite una sola chiamata diretta a Ollama: `status=PASS`, `artifactCorrect=true`, `modelCalls=1`. Il percorso non espone tool al modello e usa snapshot host-side + JSON Schema + validatore esterno.
+
+Il precedente Cline compatto aveva completato l'artefatto ma con 2/4 binding corretti e cinque errori di parsing tool-call osservati durante la sessione. Il confronto diagnostico non prova causalita esclusiva di Cline, ma rende il runtime diretto la scelta operativa piu controllabile. Non verranno eseguiti altri retry dei casi Cline consumati per ottenere PASS.
+
+**Prossimo passo architetturale:** generalizzare il worker diretto per i nuovi task QA FAME Neural, mantenendo rubriche congelate, una chiamata iniziale misurabile, validazione host-side e nessuna azione automatica autorizzata da un output del modello.
+
 ## Prossimo probe Cline — P3/P4 semantic evidence units
 
 Preparato un nuovo QA sul report P3/P4 con unita di evidenza complete (paragrafi/blocchi lista) invece della numerazione line-based. Obiettivo: misurare comprensione e copertura senza introdurre il difetto P2 di una singola frase spezzata in piu ID. Quattro decisioni: layer del failure D02, limite sui colpi simultanei, divieto di threshold tuning dal solo sintetico, scope della prima variante P5. Grader/rubrica congelati prima del run; nessun run Cline ancora eseguito.
