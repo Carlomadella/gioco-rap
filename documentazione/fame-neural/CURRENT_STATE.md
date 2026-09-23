@@ -1,5 +1,10 @@
 # FAME Neural — Current State
 
+## Prossima prova Cline preparata: QA del report P2
+
+Disponibile [CLINE_GPTOSS_P2_PROBE.md](../../strumenti/fame-local-worker/CLINE_GPTOSS_P2_PROBE.md) e `cline_gptoss_p2_probe.py`. Nuova root `FAME_CLINE_GPTOSS_P2_001`, singolo report pre-numerato, quattro affermazioni, criteri congelati prima del run. Conclusione, copertura e precisione separate: contesto superfluo già verificato innocuo produce warning, non FAIL; citazioni non valutate richiedono revisione. 9 test con fixture simulate passati, prova reale ancora da eseguire. Preservare i precedenti esiti, nessun retry dei casi consumati, nessuna apertura di training/batch131/produzione.
+
+
 Data: 2026-09-23
 
 
