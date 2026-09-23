@@ -183,17 +183,61 @@ Il task misura cinque affermazioni:
 La fonte e nuova rispetto ai tre task Direct QA consumati. Non viene
 riprocessato PF-NMF, subset+BIC o Tsumugi controlled.
 
+## Root reale v2 inizializzata
+
+Root operatore:
+
+```text
+$HOME\FAME_DIRECT_QA_NETWORK_V2_001
+```
+
+Task:
+
+```text
+local-worker-runtime-transition-v2
+```
+
+Status verificato dopo `init`:
+
+```json
+{
+  "schema": "fame-direct-qa-queue-v2",
+  "results": [
+    {
+      "taskId": "local-worker-runtime-transition-v2",
+      "status": "NOT_RUN",
+      "modelCalls": 0,
+      "firstAttemptPass": null,
+      "acceptedAfterRepair": false
+    }
+  ],
+  "status": "PENDING",
+  "executionAuthorized": false
+}
+```
+
+Quindi l'inizializzazione e avvenuta senza chiamate al modello e senza
+autorizzazioni operative.
+
 ## Prossimo intervento
 
-Inizializzare una root nuova v2, senza inferenza:
+Prima inferenza reale v2 sulla root gia inizializzata:
 
 ```powershell
-python direct_qa_queue_v2.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_001" --tasks local-worker-runtime-transition-v2
+python direct_qa_queue_v2.py run --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_001"
+```
+
+Il worker conserva `attempt-1`. Se il validatore semantico/citazionale rifiuta,
+puo effettuare al massimo una seconda chiamata controllata nello stesso run con
+feedback generico; errori di preflight o trasporto non attivano repair.
+
+Dopo il run, leggere anche lo stato riproducibile senza nuove chiamate:
+
+```powershell
 python direct_qa_queue_v2.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_001"
 ```
 
-L'init non chiama il modello. Dopo verifica di `status= PENDING` e desk
-`NOT_RUN`, il passo successivo sara la prima inferenza reale v2 con `run`.
+Non rilanciare `run` su questa root una volta consumata.
 
 ## Vincolo di continuita
 
