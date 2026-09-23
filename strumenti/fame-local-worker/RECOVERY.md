@@ -1,5 +1,10 @@
 # Recupero controllato della rete 001
 
+## Checkpoint prioritario: audit rubriche, senza nuove inferenze
+
+Recovery reale riportato: 1/2, rete ancora 13/14 secondo il protocollo congelato. Completato audit delle 14 rubriche; il supporto contestuale E152+E153+E154 viene distinto dalla prova diretta E155. Leggere [RUBRIC_AUDIT.md](RUBRIC_AUDIT.md) ed eseguire `qa_rubric_audit.py` sugli artefatti esistenti. Nessun retry Ollama; esiti storici immutati. Il sidecar distingue conclusione, copertura e citazioni superflue. 26 test con client simulati passati. Questo checkpoint prevale sulle istruzioni operative storiche sotto.
+
+
 ## Stato e obiettivo
 
 L'output fornito dall'operatore registra 13/14 decisioni accettate: 9/10 affermazioni supportate e quattro affermazioni non supportate correttamente respinte. Il solo fallimento è LOWEND_CAUSES_UNPROVEN. Le evidenze selezionate coprono i silenzi sulle note alte ma non l'incertezza sulla release corta. Il fallimento originale resta registrato; non si allenta il criterio.

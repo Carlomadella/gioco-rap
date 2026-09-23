@@ -1,0 +1,45 @@
+{
+  "schema": "fame-recovery-operator-observation-v1",
+  "provenance": "Output evaluation.json, response.json e result.json incollati dall'operatore in chat; nessun accesso indipendente al disco Windows.",
+  "originalStatus": "NEEDS_REVIEW",
+  "firstPassAccepted": 13,
+  "afterRecoveryAccepted": 13,
+  "recoveryAccepted": 1,
+  "recoveryTotal": 2,
+  "elapsedModelSecondsReported": 16.85999999998603,
+  "acceptedChild": "RELEASE_CAUSE_UNPROVEN",
+  "acceptedEvidence": [
+    "E145"
+  ],
+  "failedChild": "HIGH_NOTE_CAUSE_UNPROVEN",
+  "failedAnswer": {
+    "supported": true,
+    "evidenceIds": [
+      "E147",
+      "E148",
+      "E149",
+      "E150",
+      "E151",
+      "E152",
+      "E153",
+      "E154"
+    ]
+  },
+  "failedErrors": [
+    "HIGH_NOTE_CAUSE_UNPROVEN_IRRELEVANT_EVIDENCE",
+    "HIGH_NOTE_CAUSE_UNPROVEN_INSUFFICIENT_EVIDENCE"
+  ],
+  "documentaryReassessment": {
+    "postHoc": true,
+    "release": "SUPPORTED_DIRECT",
+    "highNotes": "SUPPORTED_CONTEXTUAL",
+    "contextualEvidence": [
+      "E152",
+      "E153",
+      "E154"
+    ],
+    "localArtifactsReassessed": false,
+    "historicalResultChanged": false,
+    "independentEvaluation": false
+  }
+}
