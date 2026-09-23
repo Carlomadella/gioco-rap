@@ -76,9 +76,9 @@
     ]
   },
   "interpretationRules": {
-    "scoreHeadWeak": "source controlled decodedIntervalCount is 0 and every expected-role target maxEventScore is <= 0",
-    "positiveScoreButNoDecodedIntervals": "source controlled decodedIntervalCount is 0 and at least one expected-role target maxEventScore is > 0",
-    "sourceControlledIntervalsPresent": "source controlled decodedIntervalCount is > 0",
+    "sourceControlledTargetPitchEventsPresent": "for the expected role, at least one frozen controlled event has rawPitch in that role's target MIDI pitches",
+    "positiveScoreButTargetPitchAbsent": "no frozen controlled target-pitch event exists for the expected role, but at least one expected-role target maxEventScore is > 0",
+    "scoreHeadWeak": "no frozen controlled target-pitch event exists for the expected role and every expected-role target maxEventScore is <= 0",
     "noRetuningFromDiagnostic": true
   },
   "safety": {
