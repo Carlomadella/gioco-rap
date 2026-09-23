@@ -558,21 +558,19 @@ executionAuthorized      = false
 
 L'inizializzazione non ha effettuato chiamate al modello.
 
-Nota di verifica: nel messaggio operatore che documenta questo init non e
-presente l'output della suite attesa da 38 test. Quindi questo file registra
-l'init come verificato ma non aggiunge un nuovo PASS locale della suite senza
-evidenza esplicita.
+Verifica locale operatore prima dell'init/run:
+
+```text
+Ran 38 tests
+OK
+```
+
+Quindi l'intera suite v2, inclusi i package e test del checkpoint V2_003, risulta
+PASS sul PC locale.
 
 ## Prossimo intervento
 
-Se la suite da 38 test non e stata ancora eseguita o il relativo output non e
-stato conservato, eseguirla ora prima della prima inferenza V2_003:
-
-```powershell
-python -m unittest discover -s . -p "test_direct_qa_*v2.py" -q
-```
-
-Dopo un PASS locale, eseguire una sola volta:
+Eseguire una sola volta:
 
 ```powershell
 python direct_qa_queue_v2.py run --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_003"
