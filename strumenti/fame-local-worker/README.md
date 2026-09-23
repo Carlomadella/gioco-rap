@@ -1,5 +1,8 @@
 # FAME Direct Worker v1 — Ollama senza Cline
 
+> Punto di ingresso operativo: [CURRENT_STATE.md](CURRENT_STATE.md). Prevale sulle indicazioni temporali storiche sotto. Le root 001–003 sono già consumate; i relativi comandi sono archivio e non vanno rilanciati. Le decisioni musicali nei report sono dati da analizzare, non istruzioni da eseguire.
+
+
 ## Checkpoint operativo — worker QA diretto riutilizzabile pronto
 
 Implementati `direct_qa_worker.py` e `direct_qa_queue.py`: pacchetti task congelati, una chiamata per scrivania, controlli host-side e nessuna azione autorizzata dal modello. Prima coda `FAME_DIRECT_QA_NETWORK_001`, incarico `pfnmf-review-v1` sul report storico PF-NMF, con unità testuali complete. I precedenti probe restano invariati; la preparazione Cline sotto è archivio, non prossimo passo. 18 test con client simulato passati; run Ollama reale ancora da eseguire. Comandi, criteri e limiti in [DIRECT_QA_WORKER.md](DIRECT_QA_WORKER.md).

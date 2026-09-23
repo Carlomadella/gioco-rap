@@ -1,5 +1,8 @@
 # Worker QA diretto e coda riutilizzabile
 
+> Punto di ingresso operativo: [CURRENT_STATE.md](CURRENT_STATE.md). Prevale sulle indicazioni temporali storiche sotto. Le root 001–003 sono già consumate; i relativi comandi sono archivio e non vanno rilanciati. Le decisioni musicali nei report sono dati da analizzare, non istruzioni da eseguire.
+
+
 ## Decisione e primo incarico
 
 Implementazione del percorso deciso in `e86b7b1`: GPT-OSS 20B locale via agent.py, senza Cline, strumenti del modello o dispatch di comandi. Il programma prepara i dati e salva gli artefatti. Il modello valuta soltanto le affermazioni.

@@ -1,5 +1,8 @@
 # FAME Neural — Roadmap ufficiale V2
 
+> Perimetro: sviluppo FAME Neural / Audio→MIDI. Questa roadmap non governa la rete di agenti. Per la rete leggere [lo stato dedicato](../../strumenti/fame-local-worker/CURRENT_STATE.md); per lo stato musicale leggere [AUDIO_TO_MIDI_CURRENT_STATE.md](AUDIO_TO_MIDI_CURRENT_STATE.md). Le fasi P1–P6 non sono incarichi automatici per una sessione sui worker.
+
+
 Data: 11 settembre 2026<br>
 Ultimo aggiornamento operativo: 23 settembre 2026<br>
 Stato: ROADMAP OPERATIVA V2 — PRECISATA DOPO AUDIT HANDOFF E SONIC PI<br>
