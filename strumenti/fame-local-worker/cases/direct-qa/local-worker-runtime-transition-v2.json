@@ -1,0 +1,106 @@
+{
+  "taskId": "local-worker-runtime-transition-v2",
+  "sourceCommit": "cdea2227a4a71906c48b97d888e707a787cecc3e",
+  "sourcePath": "strumenti/fame-local-worker/FAME_LOCAL_WORKER_CLINE_EXIT_2026-09-23.md",
+  "sourceSnapshot": "cases/direct-qa/local-worker-runtime-transition-source.md",
+  "sourceSha256": "da717a3792d4f385e0cfd5eff2c488a7e7f157d93a049c6c9ae632daa738e3ab",
+  "scope": "Revisione della decisione architetturale FAME Local Worker dopo i probe Cline. Classificare solo cio che il documento supporta: non trasformare un PASS diretto in prova di causalita esclusiva e non autorizzare autonomia operativa.",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "# FAME Local Worker — chiusura del percorso Cline e isolamento runtime\n\nData: 2026-09-23.\n\n## Decisione\n\nNon eseguire altri retry o probe Cline sullo stesso problema per cercare un PASS."
+    },
+    {
+      "unitId": "U02",
+      "text": "Le prove hanno mostrato due failure classi indipendenti:\n\n1. **tool layer Cline**: tool-call JSON malformate e richieste di shell nonostante il task read-only;\n2. **ragionamento semantico**: nel diagnostico compatto Tsumugi il modello ha completato l'artefatto ma ha classificato correttamente solo 2/4 binding runtime."
+    },
+    {
+      "unitId": "U03",
+      "text": "Il packaging a file unico ha permesso di arrivare ad `audit.json`, ma non ha eliminato gli errori di tool-call e non ha corretto i due errori semantici."
+    },
+    {
+      "unitId": "U04",
+      "text": "## Strategia\n\nIl percorso operativo FAME Local Worker passa al client diretto Ollama gia presente in `agent.py`."
+    },
+    {
+      "unitId": "U05",
+      "text": "Il modello:\n- non riceve tool;\n- non sceglie file o comandi;\n- riceve uno snapshot preparato dall'host;\n- restituisce JSON sotto schema;\n- viene validato dall'host;\n- non puo trasformare un output errato in un'azione autorizzata."
+    },
+    {
+      "unitId": "U06",
+      "text": "Per isolare Cline dal modello, `direct_tsumugi_contract_audit.py` ripete **una sola volta** lo stesso audit Tsumugi tramite `/api/chat` locale, senza Cline e senza retry. Non e una nuova independent evaluation."
+    },
+    {
+      "unitId": "U07",
+      "text": "Interpretazione:\n- PASS 4/4 diretto: il precedente 2/4 e compatibile con un effetto del runtime/prompting Cline;\n- REJECTED con gli stessi errori o altri errori semantici: il limite appartiene al modello/task anche senza Cline;\n- ERROR operativo: problema del direct runtime/preflight, da correggere prima di valutare il modello.\n\nDopo questo isolamento non si continua a ripetere lo stesso caso. Le decisioni successive riguardano architettura del worker e selezione/scomposizione dei task, non il recupero retroattivo dei probe consumati."
+    },
+    {
+      "unitId": "U08",
+      "text": "## Esito isolamento diretto\n\nRun operator-reported: `FAME_DIRECT_TSUMUGI_CONTRACT_001`.\n\nComando diretto con `gpt-oss:20b`, una sola chiamata Ollama, nessun tool e nessun retry:\n\n- `status=PASS`;\n- `artifactCorrect=true`;\n- `modelCalls=1`;\n- stessa rubrica congelata dei quattro binding runtime Tsumugi."
+    },
+    {
+      "unitId": "U09",
+      "text": "Questo diagnostico non e una nuova independent evaluation e non dimostra causalita esclusiva di Cline, perche il runtime e il framing diretto differiscono. Dimostra pero che lo stesso modello, sullo stesso contenuto/rubrica, puo completare correttamente il task quando Cline e rimosso dal percorso."
+    },
+    {
+      "unitId": "U10",
+      "text": "Decisione operativa: per FAME Local Worker i task QA strutturati passano al runtime diretto Ollama con snapshot host-side, schema JSON e validatore esterno. Cline resta evidenza storica/strumento separato, non il runtime di produzione del worker."
+    }
+  ],
+  "checks": [
+    {
+      "code": "CLINE_FAILURE_CLASSES",
+      "assertion": "Le prove distinguono due classi di failure indipendenti, tool layer Cline e ragionamento semantico, e il packaging a file unico non elimina entrambe."
+    },
+    {
+      "code": "DIRECT_RUNTIME_CONTRACT",
+      "assertion": "Nel percorso diretto il modello non riceve tool o scelta autonoma di file/comandi, usa snapshot host-side e JSON sotto schema, ed e soggetto a validazione host che impedisce di autorizzare azioni da output errati."
+    },
+    {
+      "code": "DIRECT_ISOLATION_RESULT",
+      "assertion": "FAME_DIRECT_TSUMUGI_CONTRACT_001 e riportato PASS con artifactCorrect=true, una sola model call, nessun tool, nessun retry e rubrica congelata."
+    },
+    {
+      "code": "CLINE_EXCLUSIVE_CAUSE",
+      "assertion": "Il PASS del run diretto dimostra che Cline era la causa esclusiva dei precedenti errori."
+    },
+    {
+      "code": "AUTONOMOUS_PRODUCTION_AUTHORIZED",
+      "assertion": "La decisione autorizza il worker o la rete a operare autonomamente in produzione senza validazione host."
+    }
+  ],
+  "rubric": {
+    "CLINE_FAILURE_CLASSES": {
+      "supported": true,
+      "requiredGroups": [
+        ["U02"],
+        ["U03"]
+      ],
+      "benignContext": ["U01"]
+    },
+    "DIRECT_RUNTIME_CONTRACT": {
+      "supported": true,
+      "requiredGroups": [
+        ["U05"]
+      ],
+      "benignContext": ["U04", "U10"]
+    },
+    "DIRECT_ISOLATION_RESULT": {
+      "supported": true,
+      "requiredGroups": [
+        ["U08"]
+      ],
+      "benignContext": ["U06"]
+    },
+    "CLINE_EXCLUSIVE_CAUSE": {
+      "supported": false,
+      "requiredGroups": [],
+      "benignContext": []
+    },
+    "AUTONOMOUS_PRODUCTION_AUTHORIZED": {
+      "supported": false,
+      "requiredGroups": [],
+      "benignContext": []
+    }
+  }
+}
