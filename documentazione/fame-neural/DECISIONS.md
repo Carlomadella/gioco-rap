@@ -1756,3 +1756,38 @@ Il risultato dimostra capacità multi-hit reale (D05) e corretta rilevazione di 
 Decisione: Tsumugi non è promosso dal controlled gate. Nessun retuning di note bias, instrument-pair gate, merge o altri parametri dopo aver visto i risultati. Prima di qualsiasi accesso real-easy si esegue una localizzazione read-only sui result JSON persistiti, verificando decoder stats e pitch raw/canonici. Beat reali, P6, training e batch131 restano chiusi.
 
 Checkpoint: [Tsumugi controlled gate FAIL](OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_CONTROLLED_FAIL_2026-09-22.md).
+
+## NDR-100 — Tsumugi real-easy development utile; candidato drums selezionato per P6
+
+**Stato: ACCEPTED — 23 settembre 2026.**
+
+Il run `audio-to-midi-p5-tsumugi-real-easy-development-v1-001` ha usato tre family development già consumate e scelte prima dell'inferenza dalla precedente Human Review Source Separation: `FAME000040`, `FAME000080`, `FAME000126`. Nessuna family della independent evaluation, nessun final holdout e nessun original source audio sono stati usati.
+
+La Human Review congelata prima del primo ascolto, `audio-to-midi-p5-tsumugi-real-easy-human-review-v1-001`, è stata completata dall'operatore con:
+
+- mediana usefulness: **2**;
+- family >=2: **3/3**;
+- totale usefulness: **6**;
+- score individuali: **2 / 2 / 2**;
+- `automaticPromotion=false`.
+
+Osservazioni qualitative:
+
+- `FAME000040`: base complessivamente molto buona; qualche kick percepito fuori posto; triplet hi-hat leggermente lente; rim mappato come hi-hat;
+- `FAME000080`: kick/snare/hi-hat riconosciuti bene anche in sovrapposizione; triplet hi-hat ancora lente;
+- `FAME000126`: clap non riconosciuto come tale e sostituito con hi-hat.
+
+Questa evidenza mostra che il failure sintetico di Tsumugi non equivale a incapacità generale sui drums reali. Restano però limiti concreti: timing delle terzine, falsi kick occasionali e tassonomia/mapping di clap/rim. Le tre family development non costituiscono una nuova evaluation indipendente e non provano generalizzazione al corpus.
+
+**Decisione:**
+
+1. chiudere P5 con `tsumugi-drums-v1_5` come **candidato drums selezionato per P6**, non come algoritmo promosso al batch;
+2. congelare source commit, checkpoint SHA, ambiente e inference settings usati nel controlled/real-easy; nessun retuning dopo la review;
+3. mantenere `librosa-pyin-lowend-v1` come arm low-end congelato;
+4. P6 deve usare un nuovo cohort realmente fresco, esclusi development, easy e le 12 family della precedente independent evaluation;
+5. protocollo, numerosità, soglie, renderer e pipeline completa devono essere congelati prima di qualsiasi nuovo audio access/output;
+6. clap/rim, triplet timing e falsi kick diventano failure mode espliciti da cercare nella Human Review P6, non parametri da correggere post-hoc prima del gate;
+7. training, P6 execution, batch131 e task-data readiness restano chiusi finché il protocollo P6 e il nuovo cohort non sono congelati.
+
+Checkpoint: [P5 Tsumugi real-easy Human Review](OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_REAL_EASY_REVIEW_2026-09-23.md).
+

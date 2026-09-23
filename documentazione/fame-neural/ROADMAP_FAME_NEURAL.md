@@ -1,7 +1,7 @@
 # FAME Neural — Roadmap ufficiale V2
 
 Data: 11 settembre 2026<br>
-Ultimo aggiornamento operativo: 22 settembre 2026<br>
+Ultimo aggiornamento operativo: 23 settembre 2026<br>
 Stato: ROADMAP OPERATIVA V2 — PRECISATA DOPO AUDIT HANDOFF E SONIC PI<br>
 Progetto: FAME Neural Composer
 
@@ -34,7 +34,7 @@ Checkpoint: [Owned Beats — Audio→MIDI independent evaluation — gate failur
 
 **Aggiornato il 22 settembre 2026. Decisione: NDR-093.** Questa sezione stabilisce i prossimi passi di questo filone e prevale sulle indicazioni temporali dei checkpoint precedenti riportati più avanti. Non sostituisce le altre fasi della roadmap e non chiude la Fase 7.
 
-**Stato di esecuzione:** **P1 PASS, P2 PASS, P3 CONTROLLED COMPLETE, P4 PASS, P5 ATTIVO**. P3 ha localizzato il primo failure drums già sui casi semplici: snare isolato classificato hihat con transient recall 1.0 e simultaneità kick+snare/kick+hat non rappresentabile dal layer single-label. Il low-end controllato resta stabile. P4 ha deciso di non ritoccare onset/low-end e ha congelato il protocollo P5 per una prima variante multi-label interpretabile. Nessun algoritmo è ancora promosso.
+**Stato di esecuzione:** **P1 PASS, P2 PASS, P3 CONTROLLED + REAL-EASY COMPLETE, P4 PASS, P5 CHIUSO / CANDIDATO Tsumugi SELEZIONATO, P6 PREPARAZIONE**. P3 ha localizzato il primo failure drums già sui casi semplici: snare isolato classificato hihat con transient recall 1.0 e simultaneità kick+snare/kick+hat non rappresentabile dal layer single-label. Il low-end controllato resta stabile. P4 ha deciso di non ritoccare onset/low-end e ha congelato il protocollo P5 per una prima variante multi-label interpretabile. Nessun algoritmo è ancora promosso.
 
 ### Istruzioni iniziali per GPT-5
 
@@ -76,7 +76,7 @@ Checkpoint: [Owned Beats — Audio→MIDI P2 measurement/export audit — PASS](
 
 **Output:** nuova versione identificata, test mirati e report di equivalenza/durata. Prima di nuovi confronti musicali il sistema di misura deve risultare verificato.
 
-### P3 — Eseguire il controllo easy Audio→MIDI — **CONTROLLED COMPLETE / REAL-EASY PENDING**
+### P3 — Eseguire il controllo easy Audio→MIDI — **CONTROLLED + REAL-EASY COMPLETE 23/09/2026**
 
 **Obiettivo:** stabilire se i difetti compaiono già in casi semplici e localizzarli.
 
@@ -105,7 +105,9 @@ I 12 campioni consumati aiutano a descrivere e verificare i failure, ma non vann
 
 **Output:** decisione motivata che indica componente, evidenze e confronto development successivo.
 
-### P5 — Sviluppare e confrontare le varianti necessarie — **ATTIVO**
+### P5 — Sviluppare e confrontare le varianti necessarie — **CHIUSO / TSUMUGI SELEZIONATO PER P6 — 23/09/2026**
+
+**Chiusura 23/09/2026 — NDR-100:** dopo il controlled Tsumugi, la localizzazione V1 per ruolo e la Human Review real-easy su tre development stem chiari, `tsumugi-drums-v1_5` viene selezionato come candidato drums da sottoporre a P6. La review real-easy ha score 2/2/2 (mediana 2, 3/3 >=2) con limiti residui su triplet hi-hat, falsi kick occasionali e clap/rim→hi-hat. Nessun retuning viene eseguito prima del nuovo gate indipendente. Low-end resta `librosa-pyin-lowend-v1`. La selezione P5 non autorizza batch131/training/task-data readiness.
 
 **Aggiornamento 22/09/2026 — NDR-096…098:** tre varianti non-learned controllate sono state chiuse senza promozione: multi-label band-flux, PF-NMF fixed-template e transient-subset+BIC. Tutte recuperano in parte le simultaneità ma almeno una mantiene co-attivazioni spurie; il loop euristico/template sul sintetico è fermato senza threshold tuning post-hoc. Il nuovo ramo P5 parte da un pretrained inference candidate, `Tsumugi drums_v1_5`, con source/checkpoint/licenza/ambiente da congelare e verificare prima di qualsiasi audio access. Training resta chiuso.
 
@@ -137,7 +139,7 @@ Per ogni livello registrare input e riferimenti, fattore di complessità introdo
 
 ### Formato obbligatorio del resoconto a ogni passaggio
 
-Registrare stato (DA ESEGUIRE / IN CORSO / PASS / FAIL / BLOCCATO), commit e versioni, input con hash/split/esposizione, comandi realmente eseguiti, risultati e limiti, percorso degli artefatti, prossimo passo e condizione di avanzamento. Distinguere controlli sul codice da esecuzioni audio sul PC. Il passo attivo corrente è **P5**; P1 e P2 sono PASS, P3 controlled è completo e P4 è PASS. Nessuna esecuzione batch131 o training è autorizzata da questo piano.
+Registrare stato (DA ESEGUIRE / IN CORSO / PASS / FAIL / BLOCCATO), commit e versioni, input con hash/split/esposizione, comandi realmente eseguiti, risultati e limiti, percorso degli artefatti, prossimo passo e condizione di avanzamento. Distinguere controlli sul codice da esecuzioni audio sul PC. Il passo attivo corrente è **P6 PREPARAZIONE**; P1 e P2 sono PASS, P3 controlled + real-easy è completo, P4 è PASS e P5 è chiuso con Tsumugi selezionato come candidato drums. Nessuna esecuzione batch131 o training è autorizzata da questo piano.
 
 ---
 

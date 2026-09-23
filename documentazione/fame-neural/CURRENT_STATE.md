@@ -1,5 +1,11 @@
 # FAME Neural — Current State
 
+## P5 chiuso — Tsumugi selezionato come candidato drums per P6
+
+Human Review real-easy Tsumugi completata operator-reported su `FAME000040`, `FAME000080`, `FAME000126`: score **2/2/2**, mediana **2**, **3/3 >=2**, totale **6**, automatic promotion false. Note: base utile e riconoscimento di kick/snare/hat anche sovrapposti, ma triplet hi-hat lente, qualche falso kick e clap/rim ricondotti a hi-hat.
+
+Decisione NDR-100: chiudere P5 selezionando `tsumugi-drums-v1_5` come candidato drums per **P6 nuova evaluation indipendente**, senza retuning. Low-end resta `librosa-pyin-lowend-v1`. Questo non apre batch131 o training e non equivale a promozione: il prossimo passo è congelare protocollo, numerosità, soglie, pipeline e nuovo cohort P6 prima di qualsiasi nuovo audio access.
+
 ## Tsumugi real-easy development run completato — Human Review congelata
 
 L'operatore ha completato il run append-only `audio-to-midi-p5-tsumugi-real-easy-development-v1-001` su `FAME000040`, `FAME000080`, `FAME000126`. Output dichiarato: 3/3 record, solo stem drums development già consumati, nessun original source audio, nessuna independent evaluation/final holdout, nessuna nuova Source Separation, nessun retuning, training/P6/batch131/task-data chiusi.
