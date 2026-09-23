@@ -568,21 +568,59 @@ OK
 Quindi l'intera suite v2, inclusi i package e test del checkpoint V2_003, risulta
 PASS sul PC locale.
 
+## Esito V2_003
+
+Root:
+
+```text
+$HOME\FAME_DIRECT_QA_NETWORK_V2_003
+```
+
+Esito operator-reported:
+
+```text
+recovery-protocol-v2
+  status = VALIDATED_FOR_REVIEW
+  modelCalls = 1
+  firstAttemptPass = true
+  acceptedAfterRepair = false
+
+rubric-audit-protocol-v2
+  status = REJECTED
+  modelCalls = 2
+  firstAttemptPass = false
+  acceptedAfterRepair = false
+
+queue status = NEEDS_REVIEW
+executionAuthorized = false
+```
+
+La desk recovery e passata al primo tentativo. La desk rubric-audit ha usato la
+seconda chiamata controllata ed e rimasta rejected.
+
+La root e consumata e non va rilanciata.
+
 ## Prossimo intervento
 
-Eseguire una sola volta:
+Ispezionare senza nuove chiamate gli artefatti della desk fallita:
 
 ```powershell
-python direct_qa_queue_v2.py run --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_003"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_003\desks\rubric-audit-protocol-v2\attempt-1\candidate.json"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_003\desks\rubric-audit-protocol-v2\attempt-1\validation.json"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_003\desks\rubric-audit-protocol-v2\attempt-2\candidate.json"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_003\desks\rubric-audit-protocol-v2\attempt-2\repair-feedback.json"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_003\desks\rubric-audit-protocol-v2\attempt-2\validation.json"
 ```
 
-Poi rileggere lo stato senza nuove chiamate:
+Per chiudere anche la desk passata:
 
 ```powershell
-python direct_qa_queue_v2.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_003"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_003\desks\recovery-protocol-v2\attempt-1\review.md"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_003\desks\recovery-protocol-v2\attempt-1\validation.json"
 ```
 
-Non rilanciare `run` dopo che entrambe le desk sono state consumate.
+Non modificare package/rubriche e non rilanciare `run` su V2_003 prima della
+classificazione del reject.
 
 ## Vincolo di continuita
 
