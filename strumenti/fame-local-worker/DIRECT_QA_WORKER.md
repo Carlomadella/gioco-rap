@@ -101,3 +101,9 @@ python strumenti/fame-local-worker/direct_qa_queue.py run --root "$HOME\FAME_DIR
 ```
 
 Se il run termina `VALIDATED_FOR_REVIEW`, leggere `desks/subset-bic-review-v1/attempt-1/review.md`. Nessun retry dello stesso task in una root differente.
+
+## Esito secondo incarico — reject di precisione del packaging
+
+`subset-bic-review-v1` e stato consumato con `REJECTED`, una sola chiamata. Le 5/5 conclusioni erano corrette e tutte le finding positive avevano coverage sufficiente. L'unico errore era `TSUMUGI_PREFLIGHT_SCOPE:UNREVIEWED_EVIDENCE` per `U13`, un heading Markdown privo di contenuto autonomo.
+
+Il risultato non viene ricalcolato ne ritentato. Il difetto e stato classificato come authoring/packaging: i task futuri devono unire heading strutturali e blocco successivo nella stessa unita semantica. Vedi [DIRECT_QA_PACKAGE_AUTHORING.md](DIRECT_QA_PACKAGE_AUTHORING.md) e [DIRECT_QA_SUBSET_BIC_RESULT_2026-09-23.md](DIRECT_QA_SUBSET_BIC_RESULT_2026-09-23.md).

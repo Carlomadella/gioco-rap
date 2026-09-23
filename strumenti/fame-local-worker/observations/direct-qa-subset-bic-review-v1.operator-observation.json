@@ -1,0 +1,23 @@
+{
+  "schema": "fame-direct-qa-operator-observation-v1",
+  "taskId": "subset-bic-review-v1",
+  "root": "FAME_DIRECT_QA_NETWORK_002",
+  "attempt": 1,
+  "provenance": "Output CLI e validation.json incollati dall'operatore in chat; root locale non letta indipendentemente.",
+  "status": "REJECTED",
+  "modelCalls": 1,
+  "executionAuthorized": false,
+  "retryExecuted": false,
+  "conclusionCorrect": 5,
+  "conclusionTotal": 5,
+  "supportedCoverageAllSufficient": true,
+  "errors": [
+    "TSUMUGI_PREFLIGHT_SCOPE:UNREVIEWED_EVIDENCE"
+  ],
+  "unreviewedEvidenceIds": [
+    "U13"
+  ],
+  "u13Text": "## Ricerca per il prossimo ramo",
+  "humanInterpretation": "PACKAGING_PRECISION_FALSE_NEGATIVE",
+  "independentSessionVerification": false
+}

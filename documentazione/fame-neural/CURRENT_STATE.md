@@ -1,5 +1,11 @@
 # FAME Neural — Current State
 
+## Secondo run reale Direct QA — subset+BIC REJECTED per packaging di evidenza
+
+`subset-bic-review-v1` e stato eseguito una sola volta su `FAME_DIRECT_QA_NETWORK_002`: 5/5 conclusioni corrette e coverage sufficiente per tutte le finding positive. Il solo errore host e `TSUMUGI_PREFLIGHT_SCOPE:UNREVIEWED_EVIDENCE` per `U13`, che e soltanto il heading `## Ricerca per il prossimo ramo`.
+
+Il risultato storico resta `REJECTED` e il task non viene ritentato. La causa viene classificata come difetto di authoring del pacchetto: i heading strutturali non devono diventare evidence unit autonome nei task futuri. La regola e ora documentata in [DIRECT_QA_PACKAGE_AUTHORING.md](../../strumenti/fame-local-worker/DIRECT_QA_PACKAGE_AUTHORING.md).
+
 ## Secondo incarico Direct QA congelato — subset+BIC
 
 Preparato `subset-bic-review-v1` sul checkpoint storico NDR-098 `OWNED_BEATS_AUDIO_TO_MIDI_P5_SUBSET_BIC_NEGATIVE_2026-09-22.md`. Il pacchetto verifica cinque affermazioni: gate+D06, localizzazione del bottleneck e stop del loop euristico, scope del passaggio a Tsumugi, training non autorizzato e MT3 non ancora chiarito come prima scelta. Fonte integrale ricomposta da 15 unita semantiche e rubrica host-only congelata prima del run.
