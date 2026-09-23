@@ -51,6 +51,17 @@ def main():
     module=load_module()
     module.validate_protocol_contract(protocol,controlled,env_spec)
 
+    wrapper=(OWNED/"run-audio-to-midi-p5-tsumugi-v1-score-diagnostic.ps1").read_text(encoding="utf-8")
+    for needle in [
+        "TSUMUGI_V1_SCORE_DIAGNOSTIC_COMPLETE_NO_RETUNING",
+        "already complete; reusing persisted append-only run",
+        "INCOMPLETE_APPEND_ONLY_V1_SCORE_DIAGNOSTIC",
+        "Do not delete or overwrite it; freeze a new runId",
+        "audio-to-midi-p5-tsumugi-v1-score-diagnostic-report.py",
+    ]:
+        assert needle in wrapper
+
+
     mutations=[
         ("semiCrfVersion","v2"),
         ("numPitchSlots",2),
