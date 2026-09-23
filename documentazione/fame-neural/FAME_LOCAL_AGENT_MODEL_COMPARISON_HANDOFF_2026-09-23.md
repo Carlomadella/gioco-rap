@@ -29,6 +29,12 @@ Il motore v6 e il trasporto sono controllati tramite hash. Il nuovo caso conserv
 - ONSET_CAUSE_UNKNOWN e LOWEND_CAUSES_UNPROVEN completamente omesse.
 - Nessuna categoria falsa emessa; formato JSON valido.
 - Sette riferimenti superflui scartati nelle categorie gia valide.
+- Secondo modello confrontato: `gpt-oss:20b`, run `20260923T073208792637Z`, REJECTED / transfer FAIL, circa 49,844 s.
+- Digest GPT-OSS: `17052f91a42e97930aa6e28a6c6c06a983e6a58dbb00434885a0cf5313e376f7`; 20.9B, MXFP4, context dichiarato 131072.
+- GPT-OSS non ha prodotto `message.content`: ha consumato tutti i 4096 token di output nel reasoning ed e terminato con `done_reason=length`.
+- Nessuna categoria e arrivata al validatore: `cachedCodes=[]`, `droppedEvidence=[]`.
+- Il FAIL GPT-OSS e quindi di generazione/output budget sul protocollo congelato, distinto dal FAIL semantico Qwen.
+- Su questo protocollo congelato Qwen resta il risultato meno debole: JSON valido e 6/10 categorie validate, contro nessuna risposta strutturata di GPT-OSS. Questo non e un giudizio generale sui modelli.
 
 Mappatura verificata nel report congelato:
 E042 = riga 60, requisito drums almeno 9/12.
@@ -87,7 +93,7 @@ Get-Content -Raw -Encoding UTF8 "$p\attempt-1-response.json"
 ## Decisione predefinita
 
 - Secondo modello PASS con revisione umana corretta: candidato preferibile su QUESTO caso. Prima di affidargli lavoro, verificare anche la regressione sul primo caso e misurare un piccolo incarico utile; non proclamare affidabilita generale.
-- Secondo modello FAIL: confrontare tipo e gravita degli errori; fermare il giro di aggiustamenti sul caso. Valutare un compito piu stretto, eventualmente separando estrazione fatti e verifica, con un nuovo protocollo dichiarato.
+- Secondo modello FAIL: confronto completato. Qwen ha fallito semanticamente ma ha prodotto output strutturato parziale; GPT-OSS ha esaurito il budget di generazione senza produrre output strutturato. Fermare il giro di aggiustamenti sul caso congelato. Valutare un compito piu stretto, eventualmente separando estrazione fatti e verifica, con un nuovo protocollo dichiarato.
 - Errore di runtime/contesto: registrarlo come infrastrutturale, distinto dal FAIL semantico; preservare il primo run.
 - Eventuale difetto dimostrato del valutatore: invalidare la prova con motivazione; mai promuoverla retroattivamente.
 
@@ -95,4 +101,4 @@ Nessun coordinatore multiagente ora. Nessun training, nuova inferenza audio, mod
 
 ## Prompt di ripresa per GPT-5.6
 
-> Leggi documentazione/fame-neural/FAME_LOCAL_AGENT_MODEL_COMPARISON_HANDOFF_2026-09-23.md sul branch feature/fame-neural-roadmap e i file indicati. Il secondo test Qwen e gia FAIL documentato: non ripeterlo e non cambiare i criteri. Aiutami a confrontare un solo altro modello locale gratuito tramite il runner esistente, un comando alla volta. Parti da ollama list per scegliere un tag realmente disponibile. Conserva risultati e limiti senza dichiarare prove non eseguite.
+> Leggi documentazione/fame-neural/FAME_LOCAL_AGENT_MODEL_COMPARISON_HANDOFF_2026-09-23.md sul branch feature/fame-neural-roadmap e le observation Qwen/GPT-OSS. Il confronto congelato e concluso: Qwen FAIL semantico, GPT-OSS FAIL per esaurimento output senza risposta strutturata. Non ripetere i run e non cambiare retroattivamente i criteri. Il prossimo lavoro deve usare un nuovo protocollo dichiarato, piu stretto, se si decide di proseguire.
