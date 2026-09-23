@@ -1,6 +1,20 @@
 # FAME Neural — Current State
 
-Data: 2026-09-22
+Data: 2026-09-23
+
+
+## Checkpoint Cline + GPT-OSS locale — 23/09/2026
+
+Completato il ciclo di probe Cline su `gpt-oss:20b` locale. Report consolidato: [Cline + GPT-OSS 20B — risultati dei probe locali](../../strumenti/fame-local-worker/CLINE_GPTOSS_RESULTS_2026-09-23.md).
+
+Evidenza operator-reported:
+
+- probe filesystem sintetico: PASS;
+- QA reale ristretto: 4/4 conclusioni corrette, una finding con evidenza insufficiente;
+- Tsumugi multi-file: tool-call JSON malformata prima della risposta;
+- diagnostico Tsumugi compatto: tool flow completato, 4/4 conclusioni corrette, una citazione superflua.
+
+Decisione per il prossimo esperimento: **nuovo caso congelato prima dell'esecuzione, una desk, report unico pre-numerato, grader esterno invariato, nessun retry sui casi consumati**. La precisione delle citazioni resta il limite semantico osservato; la robustezza del tool layer non è ancora dimostrata in generale. Training, batch131 e produzione restano chiusi.
 
 ## Checkpoint corrente — Audio→MIDI independent evaluation: drums FAIL / low-end PASS — 22/09/2026
 

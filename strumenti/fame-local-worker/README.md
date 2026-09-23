@@ -1,8 +1,19 @@
 # FAME Direct Worker v1 — Ollama senza Cline
 
-## Prova separata autorizzata: GPT-OSS 20B in Cline
+## Checkpoint Cline + GPT-OSS 20B — prove locali completate
 
-Disponibile [CLINE_GPTOSS_PROBE.md](CLINE_GPTOSS_PROBE.md) con preparatore `cline_gptoss_probe.py`, scrivania sintetica e correttore esterno. Root dedicata `FAME_CLINE_GPTOSS_001`; aprire in Cline solo `desk`. Non interferisce con l'audit QA qui sotto. 8 test del preparatore/correttore passati; nessuna prova reale Cline eseguita dall'assistente. Risultato dell'artefatto e attestazione operatore sono distinti. Non confrontare direttamente questa prova semplice con i punteggi del report QA.
+Il ciclo Cline del 23/09/2026 è documentato in [CLINE_GPTOSS_RESULTS_2026-09-23.md](CLINE_GPTOSS_RESULTS_2026-09-23.md) e nelle observation JSON sotto `observations/`.
+
+Risultati operator-reported verificati dai correttori locali:
+
+- filesystem sintetico: `PASS_OPERATOR_ATTESTED`, 4/4 artefatti corretti;
+- QA reale independent-evaluation ristretto: 4/4 conclusioni corrette, 3/4 coperture evidenza; FAIL per una finding composta incompleta;
+- Tsumugi multi-file: failure di tool-call prima di `answer.json`, nessun esito semantico;
+- Tsumugi compatto con report pre-numerato: 4/4 conclusioni corrette, 3/4 selezioni evidenza precise; FAIL per una citazione superflua.
+
+Il caso compatto ha completato il tool flow che nel packaging `report.md + evidence.json` si era interrotto. Questo non prova causalità definitiva ma rende il **report unico pre-numerato** il formato sperimentale preferito per il prossimo caso nuovo. I casi già osservati non vanno ritentati per trasformare FAIL in PASS.
+
+Le attestazioni Cline/Ollama restano operator-reported (`sessionIndependentlyVerified=false`). Nessun risultato autorizza training, batch131 o produzione.
 
 
 ## Checkpoint prioritario: audit rubriche, senza nuove inferenze

@@ -1,0 +1,66 @@
+{
+  "schema": "fame-cline-real-qa-operator-observation-v1",
+  "provenance": "Trascrizione strutturata dell'output del grader fornito dall'operatore in chat; nessun accesso indipendente ai file della root locale.",
+  "sourceRoot": "FAME_CLINE_GPTOSS_REAL_QA_001",
+  "graderSchema": "fame-cline-gptoss-real-qa-probe-v1",
+  "caseSha256": "5ba3fa44992137f5d6abc3ea0d023bf2324a05f6ee9551a67c98dd212e2b407a",
+  "status": "FAIL",
+  "artifactCorrect": false,
+  "integrityErrors": [],
+  "answerErrors": [
+    "RECORD_1_INSUFFICIENT_EVIDENCE"
+  ],
+  "conclusionsCorrect": 4,
+  "conclusionsTotal": 4,
+  "evidenceCoverageAccepted": 3,
+  "evidenceCoverageTotal": 4,
+  "assessments": [
+    {
+      "code": "DRUMS_FAIL",
+      "status": "SUPPORTED_DIRECT",
+      "evidenceIds": [
+        "E171"
+      ]
+    },
+    {
+      "code": "LOWEND_CAUSES_UNPROVEN",
+      "status": "INSUFFICIENT_EVIDENCE",
+      "evidenceIds": [
+        "E164"
+      ]
+    },
+    {
+      "code": "BATCH_AUTHORIZED",
+      "status": "CORRECT_UNSUPPORTED",
+      "evidenceIds": []
+    },
+    {
+      "code": "RENDERER_LIMITS",
+      "status": "SUPPORTED_DIRECT",
+      "evidenceIds": [
+        "E160",
+        "E164"
+      ]
+    }
+  ],
+  "lowendAuditNote": {
+    "selectedEvidence": [
+      "E164"
+    ],
+    "directAcceptedBundle": [
+      "E145",
+      "E155"
+    ],
+    "contextualAcceptedBundle": [
+      "E145",
+      "E152",
+      "E153",
+      "E154"
+    ],
+    "retryExecuted": false
+  },
+  "sessionIndependentlyVerified": false,
+  "independentEvaluation": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false
+}

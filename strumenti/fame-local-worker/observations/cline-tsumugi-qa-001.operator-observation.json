@@ -1,0 +1,26 @@
+{
+  "schema": "fame-cline-tsumugi-tool-failure-operator-observation-v1",
+  "provenance": "Trascrizione strutturata dello screenshot Cline e dell'output del grader forniti dall'operatore; nessun accesso indipendente ai log interni di Cline.",
+  "sourceRoot": "FAME_CLINE_GPTOSS_TSUMUGI_QA_001",
+  "graderSchema": "fame-cline-gptoss-tsumugi-qa-probe-v1",
+  "caseSha256": "bc95ffe579de6b44f7989015bee7d78627abd1f795debe68c514665999454d13",
+  "status": "FAIL",
+  "artifactCorrect": false,
+  "integrityErrors": [],
+  "answerProduced": false,
+  "failureClass": "TOOL_CALL_PARSE_BEFORE_ANSWER",
+  "uiErrorsReported": [
+    "error parsing tool call",
+    "unexpected end of JSON input"
+  ],
+  "toolCallFragmentReported": {
+    "file": "evidence.json",
+    "start_line": 50,
+    "end_line": 200
+  },
+  "retryExecuted": false,
+  "interventions": 0,
+  "sessionIndependentlyVerified": false,
+  "semanticAssessmentAvailable": false,
+  "independentEvaluation": false
+}

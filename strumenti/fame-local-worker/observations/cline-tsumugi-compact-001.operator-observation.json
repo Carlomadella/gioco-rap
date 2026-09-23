@@ -1,0 +1,60 @@
+{
+  "schema": "fame-cline-tsumugi-compact-operator-observation-v1",
+  "provenance": "Trascrizione strutturata dell'output del grader fornito dall'operatore; diagnostico sullo stesso caso congelato dopo failure tool-call, non nuova independent evaluation.",
+  "sourceRoot": "FAME_CLINE_GPTOSS_TSUMUGI_COMPACT_001",
+  "graderSchema": "fame-cline-gptoss-tsumugi-compact-diagnostic-v1",
+  "caseSha256": "bc95ffe579de6b44f7989015bee7d78627abd1f795debe68c514665999454d13",
+  "status": "FAIL",
+  "artifactCorrect": false,
+  "diagnosticOnly": true,
+  "priorFailureClass": "TOOL_CALL_PARSE_BEFORE_ANSWER",
+  "integrityErrors": [],
+  "answerErrors": [
+    "RECORD_1_SURPLUS_EVIDENCE"
+  ],
+  "conclusionsCorrect": 4,
+  "conclusionsTotal": 4,
+  "preciseEvidenceAccepted": 3,
+  "preciseEvidenceTotal": 4,
+  "assessments": [
+    {
+      "code": "MISSING_EVENTS",
+      "status": "SUPPORTED_DIRECT",
+      "evidenceIds": [
+        "E031",
+        "E034",
+        "E035"
+      ]
+    },
+    {
+      "code": "TIMBRE_HYPOTHESIS",
+      "status": "SURPLUS_EVIDENCE",
+      "evidenceIds": [
+        "E042",
+        "E045"
+      ],
+      "surplusEvidenceIds": [
+        "E042"
+      ]
+    },
+    {
+      "code": "ONSET_TOLERANCE_CAUSE",
+      "status": "CORRECT_UNSUPPORTED",
+      "evidenceIds": []
+    },
+    {
+      "code": "PAIR_CONFIDENCE_UNKNOWN",
+      "status": "SUPPORTED_DIRECT",
+      "evidenceIds": [
+        "E060"
+      ]
+    }
+  ],
+  "toolReadWriteObservedReported": true,
+  "retryExecuted": false,
+  "interventions": 0,
+  "sessionIndependentlyVerified": false,
+  "independentEvaluation": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false
+}
