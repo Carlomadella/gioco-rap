@@ -1,5 +1,13 @@
 # FAME Neural — Current State
 
+## Hardening score diagnostic Tsumugi — contract binding preparato
+
+Dopo l'isolamento del worker QA, il runner reale `audio-to-midi-p5-tsumugi-score-diagnostic.py` e stato riesaminato prima dell'esecuzione. Il contract congelato conteneva campi non tutti cross-bindati a runtime: in particolare pair-gate threshold, top-k e lista fixture potevano divergere dal diagnostic protocol senza un rifiuto esplicito.
+
+Il runner ora valida **prima dell'accesso audio fixture** l'intero `inferenceContract` contro il controlled protocol, candidate/sourceRun/environment identity e uguaglianza esatta della lista fixture. Dopo `resolve_inference_settings` verifica nuovamente threshold, top-k, noteBias e backend Semi-CRF contro il contract. Il filtro strumento viene risolto dal contract invece di essere hardcoded separatamente.
+
+Lo static test e stato esteso con mutation tests per threshold, top-k, noteBias, backend, AMP, compile, instrument filter, fixture order e sourceRunId. **Patch preparata ma non ancora verificata sul PC locale ne eseguito il diagnostic reale.** Il run append-only `audio-to-midi-p5-tsumugi-score-diagnostic-v1-001` resta non consumato finche self/static test e wrapper non passano localmente.
+
 ## Terzo incarico Direct QA congelato — Tsumugi controlled
 
 Preparato `tsumugi-controlled-review-v1` sul checkpoint storico NDR-099 e sulla correzione di localizzazione contenuta nello stesso documento. Il nuovo package applica la regola emersa dal reject subset+BIC: 9 unita semantiche complete, nessun heading strutturale isolato.

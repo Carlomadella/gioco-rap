@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import ast
+import copy
+import importlib.util
 import json
 from pathlib import Path
 
@@ -34,8 +36,60 @@ def main():
         "diagnosticModelForwardExecutedByThisCommand",
         "transcriptionExecutedByThisCommand",
         "retuningPerformedByThisCommand",
+        "validate_protocol_contract",
+        "validate_resolved_contract",
+        "runtimeContractBindingVerified",
+        "fixtureSetBindingVerified",
     ]:
         assert needle in runner
+
+    spec=importlib.util.spec_from_file_location(
+        "tsumugi_score_diagnostic_contract_test",
+        OWNED/"audio-to-midi-p5-tsumugi-score-diagnostic.py",
+    )
+    module=importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    controlled=json.loads((OWNED/"audio-to-midi-p5-tsumugi-controlled-protocol-v1.json").read_text(encoding="utf-8"))
+    env_spec=json.loads((OWNED/"audio-to-midi-p5-tsumugi-environment-v1.json").read_text(encoding="utf-8"))
+    module.validate_protocol_contract(protocol,controlled,env_spec)
+
+    mutations=[
+        ("instrumentPairGateThreshold",-2.5),
+        ("instrumentPairInferTopk",128),
+        ("noteBias",0.25),
+        ("semiCrfBackend","other"),
+        ("amp",True),
+        ("compile",True),
+        ("instrumentFilter","other"),
+    ]
+    for key,value in mutations:
+        bad=copy.deepcopy(protocol)
+        bad["inferenceContract"][key]=value
+        try:
+            module.validate_protocol_contract(bad,controlled,env_spec)
+        except RuntimeError:
+            pass
+        else:
+            raise AssertionError(f"contract divergence not rejected: {key}")
+
+    bad=copy.deepcopy(protocol)
+    bad["fixtures"]=list(reversed(bad["fixtures"]))
+    try:
+        module.validate_protocol_contract(bad,controlled,env_spec)
+    except RuntimeError:
+        pass
+    else:
+        raise AssertionError("fixture-set divergence not rejected")
+
+    bad=copy.deepcopy(protocol)
+    bad["sourceRunId"]="wrong-run"
+    try:
+        module.validate_protocol_contract(bad,controlled,env_spec)
+    except RuntimeError:
+        pass
+    else:
+        raise AssertionError("sourceRunId divergence not rejected")
+
     print("owned-beats-audio-to-midi-p5-tsumugi-score-diagnostic-test: PASS")
 
 if __name__=="__main__":

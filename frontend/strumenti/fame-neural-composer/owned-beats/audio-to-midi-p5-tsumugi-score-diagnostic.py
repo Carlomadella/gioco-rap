@@ -57,6 +57,80 @@ def finite_or_none(value):
     value = float(value)
     return value if math.isfinite(value) else None
 
+def validate_protocol_contract(diag_protocol, controlled, env_spec):
+    """Bind the frozen score-diagnostic contract to the controlled protocol.
+
+    This runs before fixture audio access. A matching value in two JSON files is
+    not enough unless the runner refuses divergence explicitly.
+    """
+    contract = diag_protocol.get("inferenceContract")
+    if not isinstance(contract, dict):
+        raise RuntimeError("Score diagnostic inferenceContract missing")
+
+    controlled_inference = controlled.get("inference") or {}
+    expected_contract = {
+        "reuseControlledCheckpointAndEnvironment": True,
+        "device": controlled_inference.get("device"),
+        "amp": controlled_inference.get("amp"),
+        "compile": controlled_inference.get("compile"),
+        "instrumentFilter": controlled_inference.get("instrumentFilter"),
+        "instrumentPairGateThreshold": controlled_inference.get("instrumentPairGateThreshold"),
+        "instrumentPairInferTopk": controlled_inference.get("instrumentPairInferTopk"),
+        "noteBias": controlled_inference.get("noteBias"),
+        "semiCrfBackend": controlled_inference.get("semiCrfBackend"),
+        "noParameterMutation": True,
+    }
+    if contract != expected_contract:
+        raise RuntimeError(
+            "Score diagnostic inferenceContract differs from frozen controlled inference"
+        )
+
+    if contract["device"] != "cuda":
+        raise RuntimeError("Score diagnostic supports only frozen CUDA execution")
+    if contract["amp"] is not False:
+        raise RuntimeError("Score diagnostic AMP contract must remain disabled")
+    if contract["compile"] is not False:
+        raise RuntimeError("Score diagnostic torch.compile contract must remain disabled")
+    if contract["instrumentFilter"] != "drums":
+        raise RuntimeError("Score diagnostic instrument filter must remain drums")
+    if contract["noParameterMutation"] is not True:
+        raise RuntimeError("Score diagnostic requires noParameterMutation=true")
+
+    if diag_protocol.get("candidateId") != controlled.get("candidateId"):
+        raise RuntimeError("Diagnostic and controlled candidateId differ")
+    if diag_protocol.get("candidateId") != env_spec.get("candidateId"):
+        raise RuntimeError("Diagnostic and environment candidateId differ")
+    if diag_protocol.get("sourceRunId") != controlled.get("runId"):
+        raise RuntimeError("Diagnostic sourceRunId differs from controlled runId")
+    if controlled.get("environmentSpec") != ENV_SPEC_FILE.name:
+        raise RuntimeError("Controlled environmentSpec differs from frozen environment file")
+    if list(diag_protocol.get("fixtures") or []) != list(
+        (controlled.get("input") or {}).get("fixtures") or []
+    ):
+        raise RuntimeError("Diagnostic fixture set differs from controlled fixture set")
+
+    return contract
+
+def validate_resolved_contract(contract, settings):
+    """Verify resolved settings still match the frozen diagnostic contract."""
+    checks = {
+        "instrumentPairGateThreshold": float(settings.instrument_pair_gate_threshold),
+        "instrumentPairInferTopk": int(settings.instrument_pair_infer_topk),
+        "noteBias": float(settings.note_bias),
+        "semiCrfBackend": str(settings.semi_crf_backend),
+    }
+    expected = {
+        "instrumentPairGateThreshold": float(contract["instrumentPairGateThreshold"]),
+        "instrumentPairInferTopk": int(contract["instrumentPairInferTopk"]),
+        "noteBias": float(contract["noteBias"]),
+        "semiCrfBackend": str(contract["semiCrfBackend"]),
+    }
+    if checks != expected:
+        raise RuntimeError(
+            f"Resolved inference settings differ from frozen diagnostic contract: "
+            f"resolved={checks} expected={expected}"
+        )
+
 def execute(workspace: Path):
     workspace = workspace.resolve()
     diag_protocol = read_json(DIAG_PROTOCOL_FILE)
@@ -69,6 +143,8 @@ def execute(workspace: Path):
         raise RuntimeError("Frozen Tsumugi controlled protocol is unavailable")
     if env_spec.get("status") != "PREFLIGHT_PASS_LOCKED_BEFORE_FIRST_TSUMUGI_AUDIO_ACCESS":
         raise RuntimeError("Frozen Tsumugi environment preflight is unavailable")
+
+    contract = validate_protocol_contract(diag_protocol, controlled, env_spec)
 
     source_root = workspace / env_spec["workspace"]["sourceRelativePath"]
     checkpoint = workspace / env_spec["workspace"]["checkpointRelativePath"]
@@ -144,7 +220,7 @@ def execute(workspace: Path):
     device = torch.device("cuda")
 
     model, model_config, training_args = load_model(checkpoint, device=device)
-    drum_instrument_id = int(resolve_instrument_id("drums"))
+    drum_instrument_id = int(resolve_instrument_id(contract["instrumentFilter"]))
 
     frozen = controlled["inference"]
     args = SimpleNamespace(
@@ -171,6 +247,7 @@ def execute(workspace: Path):
     settings = __import__("dataclasses").replace(
         settings, allowed_instrument_ids=(drum_instrument_id,)
     )
+    validate_resolved_contract(contract, settings)
 
     source_resolved = source_summary.get("resolvedInferenceSettings") or {}
     expected_resolved = {
@@ -182,7 +259,10 @@ def execute(workspace: Path):
         "noteBias": float(settings.note_bias),
         "semiCrfBackend": str(settings.semi_crf_backend),
         "drumInstrumentId": drum_instrument_id,
-        "device": "cuda",
+        "allowedInstrumentIds": [drum_instrument_id],
+        "ampEnabled": False,
+        "compileEnabled": False,
+        "device": contract["device"],
     }
     for key, value in expected_resolved.items():
         if source_resolved.get(key) != value:
@@ -194,8 +274,6 @@ def execute(workspace: Path):
     length_scaling = str(model_config.semi_crf_length_scaling)
     length_penalty = float(model_config.semi_crf_length_penalty)
     note_bias = float(settings.note_bias)
-    if note_bias != float(diag_protocol["inferenceContract"]["noteBias"]):
-        raise RuntimeError("note_bias differs from frozen score diagnostic contract")
 
     target_midis = [int(x) for x in diag_protocol["pitchDiagnostics"]["targetPitches"]]
     role_groups = {
@@ -537,6 +615,8 @@ def execute(workspace: Path):
 def self_test():
     diag = read_json(DIAG_PROTOCOL_FILE)
     controlled = read_json(CONTROLLED_PROTOCOL_FILE)
+    env_spec = read_json(ENV_SPEC_FILE)
+    contract = validate_protocol_contract(diag, controlled, env_spec)
     if diag["status"] != "FROZEN_BEFORE_FIRST_SCORE_DIAGNOSTIC_RUN":
         raise RuntimeError("Score diagnostic freeze self-test failed")
     if diag["inferenceContract"]["noteBias"] != 0.0:
@@ -550,7 +630,10 @@ def self_test():
         "numPitches": 88,
         "instrumentPairInferTopk": controlled["inference"]["instrumentPairInferTopk"],
         "topkCoversAllAllowedDrumPitches": True,
-        "noteBias": diag["inferenceContract"]["noteBias"],
+        "noteBias": contract["noteBias"],
+        "instrumentPairGateThreshold": contract["instrumentPairGateThreshold"],
+        "runtimeContractBindingVerified": True,
+        "fixtureSetBindingVerified": True,
     }
 
 def main():
