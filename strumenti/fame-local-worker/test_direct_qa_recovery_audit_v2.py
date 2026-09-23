@@ -70,12 +70,23 @@ class RecoveryAuditV2PackageTests(unittest.TestCase):
         self.assertFalse(result['accepted'])
         self.assertIn('RECOVERY_AUTHORIZES_TRAINING:INCORRECT_CONCLUSION',result['errors'])
 
-    def test_audit_direct_contextual_claim_needs_both_blocks(self):
+    def test_consumed_audit_package_preserves_frozen_two_group_rule(self):
         answer=json.loads(json.dumps(audit_good()))
         answer['results'][1]['evidenceIds']=['U01']
         result=w.assess(answer,w.package(AUDIT))
         self.assertFalse(result['accepted'])
         self.assertIn('DIRECT_CONTEXTUAL_STRENGTH:INSUFFICIENT_EVIDENCE',result['errors'])
+
+    def test_audit_u01_already_contains_complete_direct_contextual_claim(self):
+        p=w.package(AUDIT)
+        u01=next(u['text'] for u in p['units'] if u['unitId']=='U01')
+        self.assertIn('E152',u01)
+        self.assertIn('E153',u01)
+        self.assertIn('E154',u01)
+        self.assertIn('E155',u01)
+        self.assertIn('supporto contestuale',u01)
+        self.assertIn('direttamente',u01)
+        self.assertIn('mantenendo distinta la forza della prova',u01)
 
     def test_audit_contextual_rule_cannot_be_universalized(self):
         answer=json.loads(json.dumps(audit_good()))
