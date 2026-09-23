@@ -1,0 +1,110 @@
+{
+  "taskId": "transfer-protocol-v2",
+  "sourceCommit": "cdea2227a4a71906c48b97d888e707a787cecc3e",
+  "sourcePath": "strumenti/fame-local-worker/QA_TRANSFER.md",
+  "sourceSnapshot": "cases/direct-qa/transfer-protocol-v2-source.md",
+  "sourceSha256": "76d1f13dd716fd7e492397763ea0548217f9a344d3efe8caac64ae37d1b39788",
+  "scope": "Revisione del protocollo di transfer QA storico: distinguere componenti congelate, metrica primaria, ruolo della revisione umana e limiti delle conclusioni senza riaprire il caso audio.",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "# Seconda prova QA locale — protocollo congelato v1\n\n## Scopo e stato\n\nVerificare il worker su un secondo documento reale, senza ritoccare il motore v6 in base alla risposta di Qwen. Nessuna esecuzione Ollama effettuata durante la preparazione; esito reale ancora NON MISURATO.\n\nIl caso e il report storico di independent evaluation Audio→MIDI, copiato integralmente dal commit `7d90ac20b45136104717f155d1e26d4f40a818eb`. Fonte, hash e criteri sono in `cases/independent-evaluation-rubric.json`. Il report registra esiti storici: questa prova non riesegue audio, non verifica i file D:\\FAME_NEURAL e non modifica lo stato attuale della roadmap.\n\nIl precedente caso Tsumugi resta invariato. Il risultato v6 comunicato dall'operatore: run `20260923T065440213888Z`, prima risposta validata, 21,688 secondi, 7 categorie, 8 evidenze scartate. Questo riepilogo deriva dall'output incollato in chat, non da un audit dei file originali sul PC."
+    },
+    {
+      "unitId": "U02",
+      "text": "## Cosa rimane congelato\n\n- `qa_worker.py` v6 e `agent.py`: nessuna modifica; hash canonici controllati dal nuovo adattatore.\n- Procedura, schema, trasporto locale, parametri (16384 context, 4096 output, temperatura 0, seed 42), filtraggio e materializzazione del motore.\n- Nuovi solo documento, catalogo, rubric e policy specifici del secondo caso.\n- Una chiamata al modello, senza retry; una esecuzione per scrivania.\n- Il modello riceve documento, catalogo e policy, mai la rubric con le risposte/citazioni attese. Non ha tool o accesso autonomo alla repo.\n\nNon e un test cieco rispetto ai preparatori: abbiamo letto il documento e scritto la rubric. E un nuovo caso per questo esperimento del worker; non possiamo certificare che il modello non abbia mai visto il testo in altre circostanze. Non misura apprendimento dei pesi o autonomia generale."
+    },
+    {
+      "unitId": "U03",
+      "text": "## Criteri registrati prima del run\n\nDieci categorie obbligatorie: separazione PASS tecnico/qualita, FAIL drums, PASS low-end, cohort consumato, autorizzazioni chiuse, causa onset incerta, limite single-label con eccezione fusion, beneficio fusion non isolato, cause low-end incerte, limiti renderer.\n\nLe alternative di evidenza sono esplicite nella rubric. Citazioni superflue vengono scartate e registrate secondo la v6 solo se quelle rimanenti bastano. Affermazioni errate, parti mancanti, ID inventati o duplicati non vengono corrette per far passare la risposta.\n\nEsito primario: `transfer-evaluation.json` deve essere PASS, con prima risposta completa e `candidateErrors=[]`. Il solo `VALIDATED_FOR_REVIEW` non basta: il motore puo assemblare finding valide anche da un candidato contenente errori. La metrica della nuova prova lo distingue senza modificare v6.\n\nLa revisione umana deve ancora confermare citazioni, significato e utilita. Registrare separatamente tempo di revisione e tempo di una revisione manuale comparabile; il software lascia questi valori null e non dichiara un risparmio non misurato."
+    },
+    {
+      "unitId": "U04",
+      "text": "## Esecuzione PowerShell\n\nDalla radice della worktree sul branch feature/fame-neural-roadmap:\n\n```powershell\ngit pull --ff-only origin feature/fame-neural-roadmap\npython strumenti/fame-local-worker/qa_transfer.py init --root \"$HOME\\FAME_QA_TRANSFER_001\"\npython strumenti/fame-local-worker/qa_transfer.py run --root \"$HOME\\FAME_QA_TRANSFER_001\" --model \"qwen3-coder:30b\"\n```\n\nSe il pull o init fallisce, fermarsi e leggere l'errore; non cambiare branch e non cancellare scrivanie esistenti. Il secondo comando crea la scrivania, il terzo esegue la prova. Nessuna installazione aggiuntiva oltre all'ambiente gia usato.\n\nIl comando stampa il percorso di `transfer-evaluation.json`. Conservare tutta la cartella run: richiesta e risposta grezza, validazione, configurazione congelata, preflight con digest modello, report, answer/review se disponibili. Per leggere JSON con PowerShell usare `Get-Content -Raw -Encoding UTF8`."
+    },
+    {
+      "unitId": "U05",
+      "text": "## Decisione dopo il risultato\n\n- PASS e revisione umana soddisfacente: conservare il risultato e valutare un piccolo incarico utile con costo umano misurato. Non certifica ancora una rete multiagente.\n- FAIL semantico: conservare il fallimento; confrontare eventualmente un altro modello su identico caso/configurazione e nuova scrivania, senza ritoccare criteri.\n- Errore infrastrutturale: registrarlo separatamente dal ragionamento; una ripetizione correttiva resta distinta dalla prima prova.\n- Eventuale difetto reale della rubric: registrarlo e invalidare la prova, non trasformarla retroattivamente in PASS.\n\nNon aprire batch 131, training, P6, nuovi audio o coordinatore multiagente in conseguenza di questo test."
+    },
+    {
+      "unitId": "U06",
+      "text": "## Verifica del codice\n\n`python -m unittest discover -s strumenti/fame-local-worker -p \"test_*.py\"`\n\nPreparazione: 33 test stdlib superati nel container, con risposte Ollama simulate. Non costituiscono un PASS del modello. Quattro nuovi test coprono esito completo, nessuna rubric nella richiesta, isolamento dalla v6, blocco della ripetizione, errori semantici/citazioni incomplete, scarto tracciato e input alterato.\n\n"
+    }
+  ],
+  "checks": [
+    {
+      "code": "FROZEN_ENGINE_NEW_CASE_ONLY",
+      "assertion": "Nel transfer restano congelati worker, agent, procedura, schema, trasporto e parametri; cambiano solo documento, catalogo, rubrica e policy specifici del nuovo caso."
+    },
+    {
+      "code": "PRIMARY_TRANSFER_PASS_STRICT",
+      "assertion": "L'esito primario richiede transfer-evaluation PASS con prima risposta completa e candidateErrors vuoto; VALIDATED_FOR_REVIEW da solo non basta."
+    },
+    {
+      "code": "HUMAN_REVIEW_STILL_REQUIRED",
+      "assertion": "Anche dopo l'esito automatico la revisione umana deve confermare citazioni, significato e utilita, senza dichiarare risparmio di tempo non misurato."
+    },
+    {
+      "code": "TRANSFER_IS_BLIND",
+      "assertion": "Il transfer descritto e un test cieco rispetto ai preparatori e certifica che il modello non abbia mai visto il testo."
+    },
+    {
+      "code": "RUBRIC_DEFECT_RETRO_PASS",
+      "assertion": "Se emerge un difetto reale della rubrica, il risultato storico puo essere trasformato retroattivamente in PASS."
+    },
+    {
+      "code": "PASS_CERTIFIES_MULTIAGENT",
+      "assertion": "PASS piu revisione umana certificano gia una rete multiagente."
+    }
+  ],
+  "rubric": {
+    "FROZEN_ENGINE_NEW_CASE_ONLY": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U02"
+        ]
+      ],
+      "benignContext": [
+        "U01"
+      ]
+    },
+    "PRIMARY_TRANSFER_PASS_STRICT": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U03"
+        ]
+      ],
+      "benignContext": [
+        "U05"
+      ]
+    },
+    "HUMAN_REVIEW_STILL_REQUIRED": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U03"
+        ]
+      ],
+      "benignContext": [
+        "U05"
+      ]
+    },
+    "TRANSFER_IS_BLIND": {
+      "supported": false,
+      "requiredGroups": [],
+      "benignContext": []
+    },
+    "RUBRIC_DEFECT_RETRO_PASS": {
+      "supported": false,
+      "requiredGroups": [],
+      "benignContext": []
+    },
+    "PASS_CERTIFIES_MULTIAGENT": {
+      "supported": false,
+      "requiredGroups": [],
+      "benignContext": []
+    }
+  }
+}
