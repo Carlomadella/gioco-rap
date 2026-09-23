@@ -49,7 +49,8 @@ class TsumugiCompactProbeTests(unittest.TestCase):
     def test_numbered_report_contains_stable_ids(self):
         content = (self.root / 'desk/report-numbered.md').read_text(encoding='utf-8')
         self.assertIn('E001 |', content)
-        self.assertIn('E089 |', content)
+        pair_confidence_id = self.ids(89)[0]
+        self.assertIn(f'{pair_confidence_id} |', content)
 
     def test_valid_artifact_passes_without_attestation(self):
         self.write_answer()
