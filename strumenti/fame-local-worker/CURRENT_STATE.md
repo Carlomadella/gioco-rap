@@ -287,24 +287,64 @@ test(fame-local-worker): validate two-desk v2 checkpoint
 Il nuovo test verifica anche che una queue con entrambi i task si inizializzi
 come due desk `NOT_RUN`, zero model calls e stato globale `PENDING`.
 
-## Prossimo intervento
+## Verifica locale checkpoint multi-desk
 
-Prima di qualsiasi nuova inferenza, eseguire localmente l'intera suite v2:
+Esecuzione operatore:
 
-```powershell
-git pull --ff-only origin recovery/fame-local-worker-v2-cdea2227
-python -m unittest discover -s . -p "test_direct_qa_*v2.py" -q
+```text
+Ran 25 tests in 0.968s
+OK
 ```
 
-Solo dopo PASS, inizializzare la nuova queue multi-desk senza chiamare il modello:
+Quindi la suite v2 completa, inclusi i test dei due nuovi package e della queue
+multi-desk, risulta PASS sul PC locale.
+
+## Root multi-desk v2 inizializzata
+
+Root:
+
+```text
+$HOME\FAME_DIRECT_QA_NETWORK_V2_002
+```
+
+Desk:
+
+```text
+coordinator-architecture-v2
+package-authoring-v2
+```
+
+Status verificato dopo `init`:
+
+```text
+coordinator-architecture-v2 = NOT_RUN, modelCalls=0
+package-authoring-v2      = NOT_RUN, modelCalls=0
+queue status              = PENDING
+executionAuthorized       = false
+```
+
+L'inizializzazione non ha effettuato chiamate al modello.
+
+## Prossimo intervento
+
+Eseguire una sola volta la queue multi-desk reale:
 
 ```powershell
-python direct_qa_queue_v2.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_002" --tasks coordinator-architecture-v2 package-authoring-v2
+python direct_qa_queue_v2.py run --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_002"
+```
+
+Poi rileggere lo stato senza nuove chiamate:
+
+```powershell
 python direct_qa_queue_v2.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_002"
 ```
 
-Lo stato atteso e due desk `NOT_RUN`, `modelCalls=0`, queue `PENDING`.
-Non eseguire `run` prima di avere verificato questo stato.
+La queue esegue le desk in sequenza. Ogni desk conserva il proprio attempt-1 e,
+solo se necessario per un reject semantico/citazionale, puo usare una sola
+correzione controllata. Un errore operativo arresta la queue e lascia le desk
+successive non eseguite.
+
+Non rilanciare `run` sulla root una volta consumate entrambe le desk.
 
 ## Vincolo di continuita
 
