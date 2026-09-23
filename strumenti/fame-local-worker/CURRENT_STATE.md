@@ -115,16 +115,23 @@ model calls = 1
 
 ## Verifica locale v2
 
-Esecuzione operatore del 23/09/2026, dalla directory
-`strumenti/fame-local-worker`:
+Prima verifica operatore:
 
 ```text
 Ran 12 tests in 0.727s
 OK
 ```
 
-Quindi worker v2 + queue v2 + regressione sull'aggregazione terminale risultano
-PASS sul PC locale prima della preparazione del primo nuovo task v2.
+Dopo aggiunta del primo nuovo package v2 e dei relativi test:
+
+```text
+Ran 17 tests
+OK
+```
+
+Quindi worker v2, queue v2, regressione sull'aggregazione terminale e package
+`local-worker-runtime-transition-v2` risultano PASS sul PC locale prima della
+prima inizializzazione reale della rete v2.
 
 ## Primo nuovo task v2 congelato
 
@@ -176,42 +183,17 @@ Il task misura cinque affermazioni:
 La fonte e nuova rispetto ai tre task Direct QA consumati. Non viene
 riprocessato PF-NMF, subset+BIC o Tsumugi controlled.
 
-## Regole di authoring gia acquisite
-
-Le evidence unit devono essere blocchi semanticamente completi. Un heading
-Markdown che serve solo a introdurre il blocco successivo deve essere unito a
-quel contenuto.
-
-Prima di congelare un nuovo pacchetto:
-
-1. lo snapshot deve corrispondere esattamente alla fonte scelta;
-2. le unit devono ricostruire integralmente la fonte;
-3. heading non autonomi devono essere uniti al blocco seguente;
-4. i check positivi devono avere coverage group espliciti;
-5. eventuale benign context deve essere dichiarato prima del run;
-6. check negativi senza evidence ID;
-7. test positivi e negativi specifici del pacchetto;
-8. package e rubric congelati prima della prima chiamata reale.
-
 ## Prossimo intervento
 
-Prima inferenza reale v2 solo dopo PASS locale del nuovo test package-specific.
-
-Dalla directory `strumenti/fame-local-worker`:
-
-```powershell
-git pull --ff-only origin recovery/fame-local-worker-v2-cdea2227
-python -m unittest discover -s . -p "test_direct_qa_*v2.py" -q
-```
-
-Se la suite passa, inizializzare una root nuova:
+Inizializzare una root nuova v2, senza inferenza:
 
 ```powershell
 python direct_qa_queue_v2.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_001" --tasks local-worker-runtime-transition-v2
+python direct_qa_queue_v2.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_001"
 ```
 
-L'init non chiama il modello. Il run reale viene eseguito solo dopo aver
-verificato che init/status siano corretti.
+L'init non chiama il modello. Dopo verifica di `status= PENDING` e desk
+`NOT_RUN`, il passo successivo sara la prima inferenza reale v2 con `run`.
 
 ## Vincolo di continuita
 
