@@ -1,5 +1,13 @@
 # FAME Neural — Current State
 
+## V1 score reporter — per-role reclassification from persisted controlled events
+
+Il run V1 score append-only è già consumato e non viene rieseguito. Il successivo hardening del codice ha evidenziato che la localizzazione deve essere per ruolo/pitch target, non in base al conteggio totale di intervalli della fixture.
+
+Per evitare di reinterpretare un artefatto storico con campi che non conteneva ancora, il reporter read-only ora ricostruisce `sourceControlledTargetPitchEventCount` direttamente dagli `events[].rawPitch` dei result JSON persistiti del controlled run `audio-to-midi-p5-tsumugi-controlled-v1-001`. La classificazione è quindi riproducibile senza nuova inferenza, senza accesso audio e senza modificare il run consumato.
+
+Il report precedente basato sul conteggio totale di intervalli non va usato per la decisione real-easy. Va rigenerato una volta con il reporter aggiornato.
+
 ## Tsumugi checkpoint V1 confermato — nuovo score diagnostic congelato
 
 Environment doctor operator-reported sul checkpoint SHA congelato ha confermato `semi_crf_version=v1`, `num_pitch_slots=1`, 88 pitch MIDI 21–108. Questo chiude definitivamente il presupposto pair-gate: il V1 head non emette `pair_gate_logits` e il suo `selected_pair_count` storico indica 88 pitch/slot tracks, non pair selezionati.

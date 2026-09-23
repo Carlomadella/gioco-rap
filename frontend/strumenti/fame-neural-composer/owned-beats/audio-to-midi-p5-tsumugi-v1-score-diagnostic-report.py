@@ -9,6 +9,8 @@ from pathlib import Path
 
 RUN_ID="audio-to-midi-p5-tsumugi-v1-score-diagnostic-v1-001"
 RUN_DIR="audio-to-midi-p5-tsumugi-v1-score-diagnostic"
+SOURCE_CONTROLLED_RUN_ID="audio-to-midi-p5-tsumugi-controlled-v1-001"
+SOURCE_CONTROLLED_DIR="audio-to-midi-p5-tsumugi-controlled"
 EXPECTED_STATUS="TSUMUGI_V1_SCORE_DIAGNOSTIC_COMPLETE_NO_RETUNING"
 
 
@@ -16,7 +18,7 @@ def read_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8-sig"))
 
 
-def summarize(summary):
+def summarize(summary, controlled_events_by_fixture):
     if summary.get("status") != EXPECTED_STATUS:
         raise RuntimeError(f"Unexpected V1 score diagnostic status: {summary.get('status')}")
     if summary.get("runId") != RUN_ID:
@@ -35,26 +37,43 @@ def summarize(summary):
 
     for row in results:
         roles=[]
+        fixture_id=row.get("fixtureId")
+        controlled_events=controlled_events_by_fixture.get(fixture_id)
+        if controlled_events is None:
+            raise RuntimeError(f"Persisted controlled events missing for {fixture_id}")
+        raw_pitch_counts=Counter(int(event["rawPitch"]) for event in controlled_events)
         for role in row.get("expectedRoleDiagnostics") or []:
-            localization=str(role.get("localization"))
-            localization_counts[localization]+=1
             supported_role_rows+=1
             source_count=int(role.get("sourceControlledDecodedIntervalCount") or 0)
-            target_event_count=int(role.get("sourceControlledTargetPitchEventCount") or 0)
+            target_pitches=[int(value) for value in (role.get("targetPitches") or [])]
+            target_raw_pitch_counts={
+                str(pitch):int(raw_pitch_counts.get(pitch,0))
+                for pitch in target_pitches
+            }
+            target_event_count=sum(target_raw_pitch_counts.values())
+            any_positive=bool(role.get("anyPositiveIntervalScore"))
+            if target_event_count>0:
+                localization="SOURCE_CONTROLLED_TARGET_PITCH_EVENTS_PRESENT"
+            elif any_positive:
+                localization="POSITIVE_TARGET_SCORE_BUT_SOURCE_TARGET_PITCH_ABSENT"
+            else:
+                localization="EXPECTED_ROLE_TARGET_SCORES_NONPOSITIVE"
+            localization_counts[localization]+=1
             if target_event_count==0:
                 absent_target_supported_role_rows+=1
-                if bool(role.get("anyPositiveIntervalScore")):
+                if any_positive:
                     absent_target_positive_role_rows+=1
                 else:
                     absent_target_nonpositive_role_rows+=1
             roles.append({
                 "role":role.get("role"),
-                "targetPitches":role.get("targetPitches") or [],
+                "targetPitches":target_pitches,
                 "bestMaxEventScore":role.get("bestMaxEventScore"),
-                "anyPositiveIntervalScore":bool(role.get("anyPositiveIntervalScore")),
+                "anyPositiveIntervalScore":any_positive,
                 "sourceControlledDecodedIntervalCount":source_count,
                 "sourceControlledTargetPitchEventCount":target_event_count,
-                "sourceControlledTargetRawPitchCounts":role.get("sourceControlledTargetRawPitchCounts") or {},
+                "sourceControlledTargetRawPitchCounts":target_raw_pitch_counts,
+                "storedLocalization":role.get("localization"),
                 "localization":localization,
             })
         fixtures.append({
@@ -76,6 +95,7 @@ def summarize(summary):
         "absentTargetPitchPositiveScoreRoleRows":absent_target_positive_role_rows,
         "absentTargetPitchNonpositiveScoreRoleRows":absent_target_nonpositive_role_rows,
         "fixtures":fixtures,
+        "localizationRecomputedFromPersistedControlledEvents":True,
         "sourceAudioOpenedByThisCommand":False,
         "ownedBeatAudioOpenedByThisCommand":False,
         "fixtureAudioOpenedByThisCommand":False,
@@ -91,14 +111,25 @@ def summarize(summary):
 
 
 def report(workspace):
-    summary_file=(
-        Path(workspace).resolve()
-        /"runs"/RUN_DIR/RUN_ID/"summary.json"
-    )
+    workspace=Path(workspace).resolve()
+    summary_file=workspace/"runs"/RUN_DIR/RUN_ID/"summary.json"
     if not summary_file.is_file():
         raise RuntimeError(f"V1 score diagnostic summary missing: {summary_file}")
-    out=summarize(read_json(summary_file))
+    summary=read_json(summary_file)
+    controlled_events_by_fixture={}
+    for row in summary.get("results") or []:
+        fixture_id=str(row.get("fixtureId"))
+        result_file=(
+            workspace/"runs"/SOURCE_CONTROLLED_DIR/SOURCE_CONTROLLED_RUN_ID
+            /fixture_id/"result.json"
+        )
+        if not result_file.is_file():
+            raise RuntimeError(f"Controlled result missing for V1 score review: {result_file}")
+        controlled_result=read_json(result_file)
+        controlled_events_by_fixture[fixture_id]=controlled_result.get("events") or []
+    out=summarize(summary,controlled_events_by_fixture)
     out["summaryFile"]=str(summary_file)
+    out["sourceControlledRunId"]=SOURCE_CONTROLLED_RUN_ID
     return out
 
 
@@ -133,11 +164,22 @@ def self_test():
             "sourceControlledDecodedIntervalCount":0,
             "expectedRoleDiagnostics":roles,
         })
-    out=summarize(fake)
+    controlled_events_by_fixture={
+        "D01":[{"rawPitch":35}],
+        "D02":[],
+        "D03":[],
+        "D04":[],
+        "D05":[],
+        "D06":[],
+        "D07":[],
+        "D08":[],
+    }
+    out=summarize(fake,controlled_events_by_fixture)
     assert out["records"]==8
     assert out["supportedRoleRows"]==3
-    assert out["absentTargetPitchPositiveScoreRoleRows"]==1
+    assert out["absentTargetPitchPositiveScoreRoleRows"]==0
     assert out["absentTargetPitchNonpositiveScoreRoleRows"]==2
+    assert out["localizationCounts"]["SOURCE_CONTROLLED_TARGET_PITCH_EVENTS_PRESENT"]==1
     return {"mode":"FAME_NEURAL_P5_TSUMUGI_V1_SCORE_DIAGNOSTIC_REPORT_SELF_TEST_PASS"}
 
 
