@@ -252,11 +252,292 @@ Il README del worker indica come step successivo:
    - strumenti più potenti;
    - eventuale coordinatore multiagente.
 
-## Stato sintetico
+## QA worker su report FAME Neural reale
+
+Dopo i 3/3 PASS del task demo, il Direct Worker è stato portato su un primo task reale e ristretto:
+
+`strumenti/fame-local-worker/qa_worker.py`
+
+Caso congelato:
+
+`strumenti/fame-local-worker/cases/tsumugi-controlled-report.md`
+
+Fonte originale:
+
+`documentazione/fame-neural/OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_CONTROLLED_FAIL_2026-09-22.md`
+
+Obiettivo del task:
+
+- leggere un report reale già congelato;
+- riconoscere finding supportate dal testo;
+- collegarle a evidenze verificabili;
+- non aprire audio o dataset;
+- non eseguire inference, training o modifiche soglie;
+- non autorizzare beat reali/P6;
+- lasciare l'esecuzione successiva fuori dal modello.
+
+Il QA worker resta quindi un task read-only di interpretazione/triage, non un esecutore della pipeline Audio→MIDI.
+
+## Evoluzione QA worker v1 → v6
+
+### v1 — righe + quote esatte
+
+Prima versione reale del QA worker.
+
+Il modello doveva:
+
+- selezionare categorie;
+- copiare quote esatte;
+- citare numeri di riga;
+- scegliere il nextCheck.
+
+Primo run reale Qwen: **REJECTED**.
+
+Problemi principali:
+
+- quote quasi corrette ma non identiche;
+- numeri di riga errati;
+- ordine finding;
+- evidenze aggiuntive considerate irrilevanti;
+- nextCheck talvolta semanticamente plausibile ma diverso dalla rubrica.
+
+Conclusione: troppo lavoro deterministico lasciato al modello.
+
+### v2 — quote e ordine spostati sull'host
+
+Commit rilevante:
+
+`a87e2e2b0d2d5ac67aa865a2f31a222fbd506e68`
+
+Modifiche:
+
+- il modello restituisce solo numeri di riga;
+- l'host lega le quote esatte;
+- l'ordine viene normalizzato dall'host;
+- eliminati i fallimenti puramente meccanici su quote e ordine.
+
+Run reale: **REJECTED**, ma quote/order failures spariscono.
+
+### v3 — evidenceId stabili
+
+Commit:
+
+`93d32ce6428e5abfb6438167b2eee4a40dbf47ac`
+
+Modifiche:
+
+- ogni riga non vuota riceve un `evidenceId` stabile;
+- il modello non deve più ricopiare numeri di riga;
+- lo schema Ollama ammette solo ID realmente esistenti;
+- l'host riconverte gli ID in riga fisica + quote esatta;
+- rubrica ampliata per accettare alcune evidenze alternative semanticamente valide.
+
+Test locali eseguiti: **12/12 PASS**.
+
+Run reale v3: **REJECTED**.
+
+Miglioramento osservato:
+
+- tentativo 1: 9 errori;
+- tentativo 2: 4 errori;
+- un terzo tentativo non ha ulteriormente migliorato i 4 errori residui.
+
+Gli errori residui erano:
+
+- `GATE_FAIL_INSUFFICIENT_EVIDENCE`
+- `SNARE_HAT_CONFUSION_NEXT_CHECK`
+- `PAIR_CONFIDENCE_UNKNOWN_INSUFFICIENT_EVIDENCE`
+- `ZERO_INTERVALS_INSUFFICIENT_EVIDENCE`
+
+### v4 — separazione evidenza finding / nextCheck
+
+Commit:
+
+`91db0c8184a2f6a0524e8931af14d8a0f8a39742`
+
+Problema identificato:
+
+il validatore richiedeva talvolta evidenza della finding **e** una riga che giustificasse il nextCheck, mescolando prova dell'osservazione e scelta dell'azione successiva.
+
+Correzione:
+
+- l'evidenza deve sostenere la finding;
+- il nextCheck resta validato separatamente;
+- retry feedback più specifico.
+
+Test locali: **13/13 PASS**.
+
+Run reale v4: **REJECTED**.
+
+Nel tentativo 2 Qwen:
+
+- riconosce correttamente gran parte delle finding;
+- usa evidenze corrette per quasi tutte;
+- sceglie `INSPECT_DECODER_OUTPUTS` per `SNARE_HAT_CONFUSION`;
+- perde completamente `TIMBRE_HYPOTHESIS`;
+- mantiene `ZERO_INTERVALS` con la riga corretta sugli zero intervalli.
+
+Questo ha mostrato due problemi architetturali residui:
+
+1. il modello non dovrebbe possedere una decisione operativa che l'host può applicare deterministicamente;
+2. un retry non dovrebbe poter perdere una finding già validata in un tentativo precedente.
+
+### v5 — nextCheck host-owned + retry cumulativo
+
+Commit di implementazione/test/documentazione finale v5:
+
+`f25e69f956eb3ee7b8ab3dccc8d896475690d62f`
+
+Modifiche:
+
+- `nextCheck` rimosso dall'output del modello;
+- l'host applica il nextCheck consentito dalla rubrica solo dopo validazione semantica;
+- i retry diventano cumulativi;
+- una finding già validata viene conservata;
+- l'output finale può essere assemblato da finding validate in tentativi diversi;
+- aggiunto `assembledAcrossAttempts`;
+- `ZERO_INTERVALS` ristretto al fatto effettivo: il decoder Semi-CRF produce zero intervalli finali.
+
+Test locali eseguiti: **14/14 PASS**.
+
+Run reale v5:
+
+`C:\Users\mycol\FAME_QA_REVIEW_005\runs\20260922T234029342755Z\report.json`
+
+Esito: **REJECTED**.
+
+Tentativo 2:
+
+- `cachedCodes`:
+  - `SNARE_HAT_CONFUSION`
+  - `TIMBRE_HYPOTHESIS`
+  - `D08_OUTSIDE_GATE`
+  - `ZERO_INTERVALS`
+- `assembledErrors`: solo `INCOMPLETE_FINDINGS`
+
+Quindi il meccanismo cumulativo funziona: le finding valide sopravvivono ai retry.
+
+Le tre finding ancora non accettate erano:
+
+- `GATE_FAIL`
+- `MISSING_EVENTS`
+- `PAIR_CONFIDENCE_UNKNOWN`
+
+In tutti e tre i casi Qwen aveva già incluso evidenza sufficiente, ma aggiungeva anche un ID extra:
+
+- GATE_FAIL: `E027` = titolo `## Risultati controllati`;
+- MISSING_EVENTS: `E036` = D08, fuori dal gruppo D03/D06/D07;
+- PAIR_CONFIDENCE_UNKNOWN: `E061` = frase introduttiva “La conclusione verificata viene quindi ristretta a:”.
+
+Il validatore v5 invalidava l'intera finding per la presenza di un solo elemento extra, pur avendo già copertura sufficiente.
+
+### v6 — salvage di evidenza sufficiente
+
+Commit corrente remoto:
+
+`7e125be05667af9fdb5745774c5f09d88e8b1ea5`
+
+Implementazione principale:
+
+`bdcff3f2dbaddd42ef7f91742db0757713170e58`
+
+Test di regressione aggiunti:
+
+`1788cf8ec5be36787efe0e2d3398d9cf79fa284c`
+
+Comportamento v6:
+
+- se la finding ha già evidenza sufficiente, gli `evidenceId` extra vengono scartati deterministicamente dall'host;
+- se manca evidenza necessaria, resta `INSUFFICIENT_EVIDENCE`;
+- gli ID rimossi sono tracciati in `droppedEvidence`;
+- l'output finale materializza solo evidenze ammesse;
+- aggiunto un test che riproduce il pattern reale osservato nel retry v5.
+
+**Stato importante al momento della pausa:** la v6 è presente sul branch remoto, ma non è stata ancora pullata/testata localmente dall'operatore e non è stato ancora eseguito un run reale v6. Non va quindi dichiarata PASS.
+
+## Cosa abbiamo imparato
+
+Il lavoro ha separato progressivamente le responsabilità:
+
+### Modello
+
+Responsabile di:
+
+- riconoscimento semantico delle finding;
+- scelta delle evidenze pertinenti fra quelle fornite;
+- distinzione tra osservazione e ipotesi.
+
+### Host
+
+Responsabile di:
+
+- accesso ai file;
+- integrity/checksum;
+- schema JSON;
+- mapping evidenceId → riga/quote;
+- ordine canonico;
+- policy del nextCheck;
+- lock e retry;
+- conservazione delle finding già validate;
+- rimozione deterministica di contesto superfluo quando la finding è già sufficientemente provata;
+- audit completo degli input/output.
+
+Questo è il pattern che sta emergendo come più solido: **il modello fa il lavoro semantico, l'host fa tutto ciò che può essere deterministico e verificabile.**
+
+## Valutazione corrente di Qwen3-Coder 30B
+
+Fatti verificati:
+
+- task demo Direct Worker: **3/3 PASS first-attempt**;
+- QA reale: non ancora PASS end-to-end fino alla v5;
+- i retry reali mostrano però che Qwen identifica gran parte delle finding e delle evidenze corrette;
+- una parte rilevante dei FAIL osservati è stata causata da contratti/validatori troppo meccanici o da responsabilità che non era utile lasciare al modello.
+
+Non è ancora dimostrato che Qwen3-Coder 30B sia il modello migliore per la rete.
+
+Non è nemmeno dimostrato che vada sostituito adesso.
+
+Prima di confrontare altri modelli conviene chiudere una versione del worker il cui contratto sia equo e stabile, poi fare un confronto controllato sullo stesso task.
+
+## Stato sintetico al 23/09/2026
 
 - Cline proof-zero v2: **FAIL**
-- Direct Worker test automatici: **PASS**
-- Direct Worker Qwen 30B real run: **3/3 PASS first-attempt**
-- Modello da mantenere per ora: **qwen3-coder:30b**
-- Runtime da sviluppare: **FAME Direct Worker**
-- Prossimo obiettivo: **primo task reale ristretto di FAME Neural**
+- Direct Worker base automatic tests: **PASS**
+- Direct Worker base + Qwen reale: **3/3 PASS first-attempt**
+- QA worker v1–v5 real run: **REJECTED**
+- QA worker v5 automatic tests: **14/14 PASS**
+- Retry cumulativo v5: **funzionante**
+- QA worker v6: **implementato sul branch remoto, non ancora verificato localmente**
+- Modello corrente: `qwen3-coder:30b`
+- Runtime corrente: FAME Direct Worker diretto su Ollama
+- Cline: non usato nel runtime corrente
+- Audio→MIDI: non eseguito o modificato da questo lavoro
+
+## Punto esatto da cui riprendere
+
+Branch:
+
+`feature/fame-neural-roadmap`
+
+Head al momento della pausa prima di questo aggiornamento recap:
+
+`7e125be05667af9fdb5745774c5f09d88e8b1ea5`
+
+Primo passo alla ripresa:
+
+```powershell
+git pull origin feature/fame-neural-roadmap
+python strumenti/fame-local-worker/test_qa_worker.py -v
+```
+
+Se la suite v6 passa, creare una nuova desk pulita (es. `FAME_QA_REVIEW_006`) e fare un singolo run reale con `qwen3-coder:30b`.
+
+Il criterio da verificare è semplice: la v6 deve accettare finding con evidenza sufficiente anche se Qwen aggiunge contesto superfluo, mantenendo traccia di ciò che viene scartato e senza accettare finding semanticamente incomplete.
+
+Solo dopo questo punto conviene decidere se:
+
+1. stabilizzare definitivamente questo QA task;
+2. provare un secondo task reale diverso per verificare generalizzazione;
+3. confrontare Qwen con Devstral/GPT-OSS o altro modello;
+4. iniziare la vera orchestrazione multi-agent (coda, più desk, memoria condivisa versionata, coordinatore).
+
