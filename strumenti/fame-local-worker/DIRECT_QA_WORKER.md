@@ -107,3 +107,20 @@ Se il run termina `VALIDATED_FOR_REVIEW`, leggere `desks/subset-bic-review-v1/at
 `subset-bic-review-v1` e stato consumato con `REJECTED`, una sola chiamata. Le 5/5 conclusioni erano corrette e tutte le finding positive avevano coverage sufficiente. L'unico errore era `TSUMUGI_PREFLIGHT_SCOPE:UNREVIEWED_EVIDENCE` per `U13`, un heading Markdown privo di contenuto autonomo.
 
 Il risultato non viene ricalcolato ne ritentato. Il difetto e stato classificato come authoring/packaging: i task futuri devono unire heading strutturali e blocco successivo nella stessa unita semantica. Vedi [DIRECT_QA_PACKAGE_AUTHORING.md](DIRECT_QA_PACKAGE_AUTHORING.md) e [DIRECT_QA_SUBSET_BIC_RESULT_2026-09-23.md](DIRECT_QA_SUBSET_BIC_RESULT_2026-09-23.md).
+
+## Terzo incarico congelato — Tsumugi controlled
+
+Preparato `tsumugi-controlled-review-v1` sul checkpoint NDR-099 con la regola di authoring corretta: nessun heading strutturale e una evidence unit autonoma. Le nove unita ricompongono integralmente la fonte e mantengono insieme heading + contenuto correlato.
+
+Il task verifica cinque punti: gate FAIL senza generalizzare l'incapacita del modello, limite dell'ipotesi timbrica/OOD, limite inferenziale del top-k sulla pair confidence, scope della diagnostica sintetica successiva e controllo negativo sull'apertura real-easy/P6.
+
+Run dedicato:
+
+```powershell
+git pull --ff-only
+python -m unittest discover -s . -p "test_direct_qa_*.py" -q
+python direct_qa_queue.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_003" --tasks tsumugi-controlled-review-v1
+python direct_qa_queue.py run --root "$HOME\FAME_DIRECT_QA_NETWORK_003"
+```
+
+Una sola inferenza. Non riusare le root 001/002 e non ritentare questo task in una root differente.

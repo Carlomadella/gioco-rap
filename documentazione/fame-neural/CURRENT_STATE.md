@@ -1,5 +1,11 @@
 # FAME Neural — Current State
 
+## Terzo incarico Direct QA congelato — Tsumugi controlled
+
+Preparato `tsumugi-controlled-review-v1` sul checkpoint storico NDR-099 e sulla correzione di localizzazione contenuta nello stesso documento. Il nuovo package applica la regola emersa dal reject subset+BIC: 9 unita semantiche complete, nessun heading strutturale isolato.
+
+Cinque check congelati: gate FAIL ma capacita parziali reali, ipotesi timbrica non dimostrata come OOD-only, limite top-k sulla pair confidence, scope della sola diagnostica sintetica successiva, real-easy/P6 ancora non autorizzati. Run reale non ancora eseguito; root prevista `FAME_DIRECT_QA_NETWORK_003`.
+
 ## Secondo run reale Direct QA — subset+BIC REJECTED per packaging di evidenza
 
 `subset-bic-review-v1` e stato eseguito una sola volta su `FAME_DIRECT_QA_NETWORK_002`: 5/5 conclusioni corrette e coverage sufficiente per tutte le finding positive. Il solo errore host e `TSUMUGI_PREFLIGHT_SCOPE:UNREVIEWED_EVIDENCE` per `U13`, che e soltanto il heading `## Ricerca per il prossimo ramo`.
