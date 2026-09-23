@@ -6,6 +6,8 @@ Environment doctor operator-reported sul checkpoint SHA congelato ha confermato 
 
 Preparato il nuovo run append-only `audio-to-midi-p5-tsumugi-v1-score-diagnostic-v1-001`. Usa esclusivamente le reali uscite V1 `interval_query/key/diag`, calcola score pitch-wise sui target kick/snare/hihat a `note_bias=0` e confronta tali score con i decoder stats gia persistiti del controlled run. Non esegue una nuova Semi-CRF decode, non produce trascrizione, non ritocca parametri e non apre beat reali.
 
+Hardening finale prima del run: la localizzazione è ora **per ruolo/pitch target**, non basata sul conteggio totale di intervalli del controlled run. Per ogni ruolo atteso confronta gli score V1 dei pitch GM congelati con gli eventi rawPitch già persistiti (`kick 35/36`, `snare 38/40`, `hihat 42/44/46`). Questo evita che, per esempio, gli intervalli kick/hat di D04 vengano scambiati per evidenza di successo dello snare.
+
 Prima del run reale devono passare static test e self-test locali. Il precedente pair-gate runId resta consumato/chiuso e non viene ritentato.
 
 ## Tsumugi score diagnostic — controlled failure per head contract errato
