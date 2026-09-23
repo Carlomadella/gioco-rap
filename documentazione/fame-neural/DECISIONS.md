@@ -1791,3 +1791,25 @@ Questa evidenza mostra che il failure sintetico di Tsumugi non equivale a incapa
 
 Checkpoint: [P5 Tsumugi real-easy Human Review](OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_REAL_EASY_REVIEW_2026-09-23.md).
 
+## NDR-101 — P6 protocollo e selezione metadata-only congelati prima del nuovo cohort
+
+**Stato: ACCEPTED — 23 settembre 2026.**
+
+Dopo NDR-100, P6 mantiene invariata la numerosità del precedente gate indipendente: **12 family**. La scelta preserva comparabilità con la precedente evaluation e non deriva dai risultati Tsumugi real-easy.
+
+Pipeline congelata prima della selezione:
+
+`audio-analysis-v2-config-001 → intel-openvino-htdemucs-v4-97fc578 → tsumugi-drums-v1_5 + librosa-pyin-lowend-v1`
+
+Tsumugi resta legato a source commit `f7411471a4de0ad3d430191de11b8623d67e5b38`, checkpoint SHA256 `65138ad1dd919f33fb0ce56e54c0c23c87deaad6511132d69137cf4901ee9319`, head V1, `num_pitch_slots=1`, `noteBias=0`. Renderer Human Review: `fame-neutral-midi-audition-renderer-v2-reference-duration`.
+
+Gate P6 congelato e **non allentato** rispetto alla precedente independent evaluation:
+
+- technical: 12/12;
+- drums: mediana >=2 e almeno 9/12 family >=2;
+- low-end: mediana >=2 e almeno 9/12 family >=2.
+
+La selezione usa esclusivamente identità metadata con SHA256 rank deterministico. Esclude development, Audio Analysis holdout consumato, precedente Audio→MIDI independent evaluation, qualsiasi split/processing/review/QA già assegnato. Nessun audio può essere aperto o hashato durante selezione/preview.
+
+Il primo comando P6 autorizzato è soltanto il preview metadata-only. Le identità risultanti devono essere congelate in repository prima di reservation o audio access. P6 execution, batch131, training e task-data readiness restano chiusi.
+

@@ -1,0 +1,112 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-p6-independent-evaluation-protocol-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_P6_FRESH_COHORT_SELECTION",
+  "createdAt": "2026-09-23",
+  "decision": "NDR-101",
+  "purpose": "INDEPENDENT_EVALUATION_OF_FROZEN_TSUMUGI_DRUMS_AND_PYIN_LOW_END_PIPELINE",
+  "sourceCorpus": {
+    "sourceCollectionId": "fame-owned-beats-v1",
+    "expectedRecords": 131,
+    "expectedCompositionFamilies": 131
+  },
+  "cohort": {
+    "cohortId": "audio-to-midi-p6-independent-evaluation-v1",
+    "plannedSplit": "audio-to-midi-p6-evaluation-v1",
+    "expectedFamilies": 12,
+    "independence": {
+      "excludeAnyAssignedSplit": true,
+      "excludeDevelopment": true,
+      "excludeConsumedAudioAnalysisHoldout": true,
+      "excludePriorAudioToMidiIndependentEvaluation": true,
+      "excludeAnyPilotCohort": true,
+      "excludeAnyRoleProcessingOrReview": true,
+      "excludeAnyQaEvidence": true
+    },
+    "selection": {
+      "algorithm": "opaque-identity-sha256-rank-v1",
+      "seed": "fame-audio-to-midi-p6-independent-evaluation-v1|2026-09-23|pre-audio",
+      "identityFields": [
+        "compositionFamilyId",
+        "sourceRecordId",
+        "sourceAssetId",
+        "sha256"
+      ],
+      "usesAudioContentOrDerivedMetrics": false,
+      "rankAscendingBySha256": true
+    },
+    "rationale": {
+      "priorIndependentEvaluationFamilies": 12,
+      "expectedFamilies": 12,
+      "statement": "Keep the same 12-family cohort size as the prior independent evaluation so the product gate remains directly comparable. Selection is metadata-only and occurs before any P6 audio access."
+    }
+  },
+  "frozenPipeline": {
+    "audioAnalysis": {
+      "configId": "audio-analysis-v2-config-001",
+      "noRetuningOnEvaluation": true
+    },
+    "sourceSeparation": {
+      "selectedArm": "intel-openvino-htdemucs-v4-97fc578",
+      "modelRevision": "97fc578fb57650045d40b00bc84c7d156be77547",
+      "noRetuningOnEvaluation": true
+    },
+    "drums": {
+      "armId": "tsumugi-drums-v1_5",
+      "sourceCommit": "f7411471a4de0ad3d430191de11b8623d67e5b38",
+      "checkpointSha256": "65138ad1dd919f33fb0ce56e54c0c23c87deaad6511132d69137cf4901ee9319",
+      "semiCrfVersion": "v1",
+      "numPitchSlots": 1,
+      "noteBias": 0,
+      "noRetuningOnEvaluation": true
+    },
+    "lowEnd": {
+      "armId": "librosa-pyin-lowend-v1",
+      "noRetuningOnEvaluation": true
+    },
+    "renderer": {
+      "id": "fame-neutral-midi-audition-renderer-v2-reference-duration"
+    },
+    "knownFailureModesToSurfaceInHumanReview": [
+      "triplet-hihat timing",
+      "false kick",
+      "clap/rim mapped or confused as hihat",
+      "overlapping kick/snare/hihat"
+    ]
+  },
+  "gate": {
+    "technical": "ALL_12_FAMILIES_PASS",
+    "scale": {
+      "0": "unusable",
+      "1": "weak; major correction required",
+      "2": "usable for downstream pilot with moderate correction",
+      "3": "strong; directly useful"
+    },
+    "drums": {
+      "medianUsefulnessAtLeast": 2,
+      "familiesAtOrAbove2AtLeast": 9
+    },
+    "lowEnd": {
+      "medianUsefulnessAtLeast": 2,
+      "familiesAtOrAbove2AtLeast": 9
+    },
+    "rationale": "Reuse the predeclared prior independent-evaluation gate unchanged for comparability; do not relax it after Tsumugi real-easy development results.",
+    "outcomeIfPass": "OPEN_P6_POST_GATE_BATCH_PREPARATION_DECISION",
+    "outcomeIfFail": "KEEP_BATCH_CLOSED_RECORD_P6_FAILURES"
+  },
+  "safety": {
+    "cohortSelectionMayOpenAudio": false,
+    "cohortSelectionMayHashAudio": false,
+    "cohortSelectionMayReadDerivedAudioMetrics": false,
+    "evaluationMayRetunePipeline": false,
+    "priorEvaluationMayBeUsedForTuning": false,
+    "batch131Authorized": false,
+    "trainingAuthorized": false,
+    "taskDataReadyMayBeDeclared": false
+  },
+  "nextAction": "RUN_METADATA_ONLY_P6_SELECTOR_PREVIEW_AND_FREEZE_IDENTITIES",
+  "implementation": {
+    "selectorPath": "prepare-audio-to-midi-p6-independent-evaluation.js",
+    "selectorGitBlobSha": "ef268935be77f8e228ce0f64d90336e25726d8eb"
+  }
+}

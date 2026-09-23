@@ -127,6 +127,11 @@ Per ogni livello registrare input e riferimenti, fattore di complessità introdo
 
 **Output:** confronto riproducibile, variante selezionata oppure esito esplicito di nessun miglioramento; nessuna promozione basata soltanto su easy.
 
+### P6 — Nuova evaluation indipendente prima di considerare il batch — **PREPARAZIONE ATTIVA 23/09/2026**
+
+NDR-101 congela prima della selezione: 12 family, selector metadata-only deterministico, pipeline Tsumugi+pYIN, renderer v2 e gate invariato rispetto alla precedente independent evaluation (mediana >=2, almeno 9/12 family >=2 per entrambi i rami). Il primo passo è il preview metadata-only; nessun audio access o reservation è ancora autorizzato fino al freeze delle identità risultanti.
+
+<!-- historical P6 specification follows -->
 ### P6 — Nuova evaluation indipendente prima di considerare il batch
 
 - Solo dopo gli esiti richiesti da P1–P5, congelare pipeline, dipendenze, parametri, renderer e protocollo di valutazione.

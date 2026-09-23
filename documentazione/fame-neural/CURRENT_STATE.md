@@ -1,5 +1,11 @@
 # FAME Neural — Current State
 
+## P6 preparazione — protocollo e selector metadata-only congelati
+
+Congelato NDR-101 prima di qualunque nuovo audio access: 12 family, stesso gate della precedente independent evaluation (mediana >=2 e almeno 9/12 >=2 per drums e low-end), pipeline `audio-analysis-v2-config-001 → HTDemucs/OpenVINO → Tsumugi drums_v1_5 + pYIN low-end`, renderer v2 reference-duration. La selezione è metadata-only, deterministica e deve escludere ogni family già assegnata/consumata.
+
+Il prossimo passo autorizzato è **solo** il preview locale del nuovo cohort P6. Il preview non apre/hash/decodifica audio e non modifica manifest o split. Le 12 identità devono poi essere congelate in repo prima della reservation.
+
 ## P5 chiuso — Tsumugi selezionato come candidato drums per P6
 
 Human Review real-easy Tsumugi completata operator-reported su `FAME000040`, `FAME000080`, `FAME000126`: score **2/2/2**, mediana **2**, **3/3 >=2**, totale **6**, automatic promotion false. Note: base utile e riconoscimento di kick/snare/hat anche sovrapposti, ma triplet hi-hat lente, qualche falso kick e clap/rim ricondotti a hi-hat.
