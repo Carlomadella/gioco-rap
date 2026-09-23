@@ -1,5 +1,9 @@
 # FAME Direct Worker v1 — Ollama senza Cline
 
+## Decisione corrente — uscita da Cline
+
+I probe Cline non vengono piu usati come percorso operativo per FAME Local Worker. Il diagnostico Tsumugi compatto ha comunque mostrato errori ripetuti del tool layer e 2/4 classificazioni runtime corrette. Il passo di isolamento e ora [direct_tsumugi_contract_audit.py](direct_tsumugi_contract_audit.py): stessa rubrica congelata, una chiamata diretta a Ollama, nessun tool e nessun retry. Dettagli in [FAME_LOCAL_WORKER_CLINE_EXIT_2026-09-23.md](FAME_LOCAL_WORKER_CLINE_EXIT_2026-09-23.md).
+
 ## Prossima prova Cline — P3/P4 con unita semantiche
 
 ## Prossimo diagnostico Cline — Tsumugi contract audit compatto
