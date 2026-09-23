@@ -1,0 +1,226 @@
+{
+  "sourceCommit": "7d90ac20b45136104717f155d1e26d4f40a818eb",
+  "sourcePath": "documentazione/fame-neural/OWNED_BEATS_AUDIO_TO_MIDI_INDEPENDENT_EVALUATION_FAILURE_2026-09-22.md",
+  "catalog": {
+    "TECHNICAL_ONLY": "Il PASS tecnico verifica integrita e coerenza, non qualita musicale.",
+    "DRUMS_FAIL": "Drums fallisce: 8/12 contro il requisito 9/12.",
+    "LOWEND_PASS": "Low-end passa: 10/12 e mediana 3.",
+    "COHORT_CONSUMED": "I 12 casi sono consumati e non qualificano una nuova evaluation dopo modifiche.",
+    "AUTHORIZATION_CLOSED": "Batch 131, training e task-data readiness restano chiusi.",
+    "ONSET_CAUSE_UNKNOWN": "Gli eventi mancanti all'ascolto non dimostrano che la causa sia il detector onset.",
+    "SINGLE_LABEL_LIMIT": "Il classificatore per onset e single-label, ma la fusion puo aggiungere kick simultanei nell'output.",
+    "FUSION_BENEFIT_UNISOLATED": "Recuperi percepiti non dimostrano il beneficio netto causale della fusion.",
+    "LOWEND_CAUSES_UNPROVEN": "Release corta e silenzi sulle note alte hanno cause ancora da verificare.",
+    "RENDERER_LIMITS": "La review sintetizza dai JSON senza rileggere i MIDI; l'effetto dei limiti sui voti non e misurato.",
+    "TECHNICAL_PROVES_MUSICAL_QUALITY": "Il PASS tecnico dimostra buona qualita musicale.",
+    "ONSET_ROOT_CAUSE_PROVEN": "Il detector onset e la causa dimostrata delle terzine perse.",
+    "FUSION_NET_BENEFIT_PROVEN": "Il beneficio netto della fusion e gia isolato sperimentalmente.",
+    "BATCH_AUTHORIZED": "Il batch 131 e autorizzato."
+  },
+  "checks": {
+    "KEEP_TECHNICAL_SEPARATE": "Mantenere separati integrita tecnica e qualita musicale.",
+    "KEEP_GATE_CLOSED": "Preservare i vincoli del report.",
+    "PRESERVE_LOWEND": "Preservare pYIN come riferimento; nessuna modifica automatica.",
+    "REQUIRE_FRESH_COHORT": "Richiedere nuovo cohort dopo freeze della nuova pipeline.",
+    "SEPARATE_ERROR_SOURCES": "Proporre confronto riferimento/onset/eventi, senza eseguirlo.",
+    "REVIEW_ROLE_REPRESENTATION": "Documentare il limite per onset senza negare la fusion.",
+    "PLAN_FUSION_ABLATION": "Proporre confronto fusion ON/OFF su development, senza eseguirlo.",
+    "PLAN_CONTOUR_DIAGNOSTICS": "Proporre diagnostica F0/voicing/renderer; nessun tuning.",
+    "REVIEW_RENDERER": "Proporre verifica JSON/MIDI e durata reference/candidato."
+  },
+  "rubric": {
+    "TECHNICAL_ONLY": {
+      "required": [
+        [
+          43
+        ]
+      ],
+      "allowed": [
+        29,
+        31,
+        32,
+        43,
+        260
+      ],
+      "check": "KEEP_TECHNICAL_SEPARATE"
+    },
+    "DRUMS_FAIL": {
+      "required": [
+        [
+          69,
+          262
+        ],
+        [
+          60,
+          262
+        ],
+        [
+          71,
+          261,
+          262
+        ]
+      ],
+      "allowed": [
+        60,
+        69,
+        71,
+        261,
+        262
+      ],
+      "check": "KEEP_GATE_CLOSED"
+    },
+    "LOWEND_PASS": {
+      "required": [
+        [
+          84,
+          263
+        ],
+        [
+          85,
+          263
+        ],
+        [
+          87,
+          200,
+          263
+        ]
+      ],
+      "allowed": [
+        84,
+        85,
+        87,
+        200,
+        263
+      ],
+      "check": "PRESERVE_LOWEND"
+    },
+    "COHORT_CONSUMED": {
+      "required": [
+        [
+          23,
+          267,
+          305
+        ]
+      ],
+      "allowed": [
+        23,
+        267,
+        305,
+        306
+      ],
+      "check": "REQUIRE_FRESH_COHORT"
+    },
+    "AUTHORIZATION_CLOSED": {
+      "required": [
+        [
+          100,
+          307
+        ],
+        [
+          101,
+          307
+        ],
+        [
+          102,
+          307
+        ]
+      ],
+      "allowed": [
+        100,
+        101,
+        102,
+        307,
+        316
+      ],
+      "check": "KEEP_GATE_CLOSED"
+    },
+    "ONSET_CAUSE_UNKNOWN": {
+      "required": [
+        [
+          147
+        ]
+      ],
+      "allowed": [
+        147
+      ],
+      "check": "SEPARATE_ERROR_SOURCES"
+    },
+    "SINGLE_LABEL_LIMIT": {
+      "required": [
+        [
+          166,
+          265
+        ],
+        [
+          168
+        ]
+      ],
+      "allowed": [
+        166,
+        168,
+        170,
+        265
+      ],
+      "check": "REVIEW_ROLE_REPRESENTATION"
+    },
+    "FUSION_BENEFIT_UNISOLATED": {
+      "required": [
+        [
+          194,
+          266
+        ]
+      ],
+      "allowed": [
+        174,
+        176,
+        178,
+        182,
+        183,
+        194,
+        266
+      ],
+      "check": "PLAN_FUSION_ABLATION"
+    },
+    "LOWEND_CAUSES_UNPROVEN": {
+      "required": [
+        [
+          217
+        ],
+        [
+          235
+        ]
+      ],
+      "allowed": [
+        215,
+        217,
+        232,
+        233,
+        235,
+        250
+      ],
+      "check": "PLAN_CONTOUR_DIAGNOSTICS"
+    },
+    "RENDERER_LIMITS": {
+      "required": [
+        [
+          245
+        ],
+        [
+          250
+        ]
+      ],
+      "allowed": [
+        245,
+        246,
+        247,
+        248,
+        250,
+        252
+      ],
+      "check": "REVIEW_RENDERER"
+    }
+  },
+  "caseSha256": "5ba3fa44992137f5d6abc3ea0d023bf2324a05f6ee9551a67c98dd212e2b407a",
+  "engineSha256": "7df6aa946d6ccbaec4b32335cc54fa9d861b26e3eb2d658a096ff7321c633ae6",
+  "transportSha256": "f0e517cc488fdbfd263ab73468398442b81b1bbff7afcec488a97c200f1073fa"
+}
