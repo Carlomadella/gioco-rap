@@ -124,3 +124,31 @@ python direct_qa_queue.py run --root "$HOME\FAME_DIRECT_QA_NETWORK_003"
 ```
 
 Una sola inferenza. Non riusare le root 001/002 e non ritentare questo task in una root differente.
+
+## Esito terzo incarico — errore semantico reale
+
+`tsumugi-controlled-review-v1` e stato consumato con `REJECTED`: 4/5 conclusioni corrette. `TOPK_PAIR_CONFIDENCE_LIMIT` aveva conclusione corretta ma evidence insufficiente; `SYNTHETIC_DIAGNOSTIC_SCOPE` aveva conclusione errata. Questo non e un falso reject di packaging.
+
+Risultato: [DIRECT_QA_TSUMUGI_CONTROLLED_RESULT_2026-09-23.md](DIRECT_QA_TSUMUGI_CONTROLLED_RESULT_2026-09-23.md).
+
+## Worker v2 — primo tentativo misurato + una correzione controllata
+
+Il worker v1 e congelato per mantenere leggibili e riproducibili le root 001–003. Non modificarlo per aggiungere retry.
+
+Il nuovo `direct_qa_worker_v2.py` conserva attempt-1 come misura autonoma. Se la risposta e semanticamente/citazionalmente rifiutata, effettua **al massimo una** seconda chiamata nello stesso run. Il feedback non contiene check ID, target booleani, rubriche o expected evidence; comunica solo categorie generiche come `SOME_CONCLUSION_INCORRECT` o `SOME_EVIDENCE_COVERAGE_INSUFFICIENT`.
+
+Stati:
+- `VALIDATED_FOR_REVIEW`: corretto al primo tentativo;
+- `VALIDATED_FOR_REVIEW_AFTER_REPAIR`: corretto solo dopo seconda chiamata; non conta come first-attempt pass;
+- `REJECTED`: entrambe le risposte non superano il validatore;
+- `ERROR` / `ERROR_AFTER_REPAIR`: problema operativo, non corretto con retry semantico.
+
+La coda v2 e `direct_qa_queue_v2.py`. Ogni desk resta non rieseguibile dopo il run. Errori di preflight o trasporto non attivano la correzione.
+
+Test:
+
+```powershell
+python -m unittest discover -s . -p "test_direct_qa_*v2.py" -q
+```
+
+Il prossimo run reale v2 deve usare un **nuovo task**: non si usa v2 per riprocessare PF-NMF, subset+BIC o Tsumugi controlled gia consumati.

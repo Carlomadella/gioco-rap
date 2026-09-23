@@ -1,0 +1,46 @@
+{
+  "schema": "fame-direct-qa-operator-observation-v1",
+  "taskId": "tsumugi-controlled-review-v1",
+  "root": "FAME_DIRECT_QA_NETWORK_003",
+  "attempt": 1,
+  "provenance": "Output CLI e validation.json incollati dall'operatore in chat; root locale non letta indipendentemente.",
+  "status": "REJECTED",
+  "modelCalls": 1,
+  "executionAuthorized": false,
+  "retryExecuted": false,
+  "conclusionCorrect": 4,
+  "conclusionTotal": 5,
+  "errors": [
+    "TOPK_PAIR_CONFIDENCE_LIMIT:INSUFFICIENT_EVIDENCE",
+    "SYNTHETIC_DIAGNOSTIC_SCOPE:INCORRECT_CONCLUSION"
+  ],
+  "assessments": [
+    [
+      "GATE_WITH_PARTIAL_CAPABILITY",
+      true,
+      "SUFFICIENT"
+    ],
+    [
+      "TIMBRE_HYPOTHESIS_LIMIT",
+      true,
+      "SUFFICIENT"
+    ],
+    [
+      "TOPK_PAIR_CONFIDENCE_LIMIT",
+      true,
+      "INSUFFICIENT"
+    ],
+    [
+      "SYNTHETIC_DIAGNOSTIC_SCOPE",
+      false,
+      "NOT_ASSESSED"
+    ],
+    [
+      "REAL_EASY_ALREADY_OPEN",
+      true,
+      "NOT_REQUIRED"
+    ]
+  ],
+  "interpretation": "GENUINE_SEMANTIC_MISS_PLUS_EVIDENCE_COVERAGE_MISS",
+  "independentSessionVerification": false
+}
