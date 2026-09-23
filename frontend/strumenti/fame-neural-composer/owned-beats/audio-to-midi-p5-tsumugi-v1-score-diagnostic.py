@@ -355,8 +355,10 @@ def execute(workspace: Path):
                 if "decoded_interval_count" in source_decoder
                 else source_decoder.get("decodedIntervalCount") or 0
             )
+            source_events = source_result.get("events") or []
             role_rows = []
             for role in expected_roles:
+                role_pitch_set = set(role_groups[role])
                 role_targets = [
                     target_by_pitch[pitch]
                     for pitch in role_groups[role]
@@ -366,10 +368,22 @@ def execute(workspace: Path):
                 any_positive = any(
                     row["positiveIntervalScorePresent"] for row in role_targets
                 )
-                if source_decoded_intervals > 0:
-                    localization = "SOURCE_CONTROLLED_INTERVALS_PRESENT"
+                source_target_events = [
+                    event for event in source_events
+                    if int(event.get("rawPitch", -1)) in role_pitch_set
+                ]
+                source_target_event_count = len(source_target_events)
+                source_target_raw_pitch_counts = {
+                    str(pitch): sum(
+                        1 for event in source_target_events
+                        if int(event.get("rawPitch", -1)) == pitch
+                    )
+                    for pitch in role_groups[role]
+                }
+                if source_target_event_count > 0:
+                    localization = "SOURCE_CONTROLLED_TARGET_PITCH_EVENTS_PRESENT"
                 elif any_positive:
-                    localization = "POSITIVE_TARGET_SCORE_BUT_SOURCE_DECODED_ZERO_INTERVALS"
+                    localization = "POSITIVE_TARGET_SCORE_BUT_SOURCE_TARGET_PITCH_ABSENT"
                 else:
                     localization = "EXPECTED_ROLE_TARGET_SCORES_NONPOSITIVE"
                 role_rows.append({
@@ -378,6 +392,8 @@ def execute(workspace: Path):
                     "bestMaxEventScore": best,
                     "anyPositiveIntervalScore": any_positive,
                     "sourceControlledDecodedIntervalCount": source_decoded_intervals,
+                    "sourceControlledTargetPitchEventCount": source_target_event_count,
+                    "sourceControlledTargetRawPitchCounts": source_target_raw_pitch_counts,
                     "localization": localization,
                 })
 
