@@ -1,3 +1,5 @@
+# FAME Direct Worker v1 — Ollama senza Cline
+
 ## Prossima prova Cline — P3/P4 con unita semantiche
 
 Preparata [CLINE_GPTOSS_P3_P4_SEMANTIC_PROBE.md](CLINE_GPTOSS_P3_P4_SEMANTIC_PROBE.md) con `cline_gptoss_p3_p4_semantic_probe.py`. Usa il nuovo report P3/P4 e assegna gli ID di evidenza a paragrafi/blocchi lista completi, non a singole righe. Il grader resta host-only e separa conclusione, coverage, warning benigni e citazioni non revisionate. Il run reale non e ancora eseguito.
