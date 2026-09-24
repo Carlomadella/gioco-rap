@@ -993,34 +993,70 @@ Documentazione v3:
 docs(fame-local-worker): document fresh reconstruction worker v3
 ```
 
-## Prossimo intervento
+## Verifica locale e init V3_001
 
-Verificare localmente v2 + v3 insieme:
-
-```powershell
-git pull --ff-only origin recovery/fame-local-worker-v2-cdea2227
-python -m unittest discover -s . -p "test_direct_qa_*v*.py" -q
-```
-
-I test v2 verificati erano 52. I nuovi test v3 sono 18, quindi il totale atteso
-e **70 test**.
-
-Solo dopo PASS inizializzare la diagnostica, senza inferenza:
-
-```powershell
-python direct_qa_queue_v3.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_V3_001" --tasks review-boundary-repair-v3
-python direct_qa_queue_v3.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_V3_001"
-```
-
-Stato atteso:
+Esecuzione operatore:
 
 ```text
-review-boundary-repair-v3 = NOT_RUN, modelCalls=0
+Ran 70 tests in 1.821s
+OK
+```
+
+Quindi suite v2 + v3 interamente PASS sul PC locale.
+
+Root diagnostica:
+
+```text
+$HOME\FAME_DIRECT_QA_NETWORK_V3_001
+```
+
+Desk:
+
+```text
+review-boundary-repair-v3
+```
+
+Status verificato dopo `init`:
+
+```text
+review-boundary-repair-v3 = NOT_RUN
+modelCalls                = 0
+firstAttemptPass          = null
+acceptedAfterRepair       = false
 queue status              = PENDING
 executionAuthorized       = false
 ```
 
-Non eseguire `run` prima del PASS locale e della verifica dello status.
+L'inizializzazione non ha effettuato chiamate al modello.
+
+Questa root e una diagnostica controllata sul caso noto V2_004. Non e una nuova
+evaluation indipendente e non misura generalizzazione.
+
+## Prossimo intervento
+
+Eseguire una sola volta il run reale v3:
+
+```powershell
+python direct_qa_queue_v3.py run --root "$HOME\FAME_DIRECT_QA_NETWORK_V3_001"
+```
+
+Poi rileggere lo stato senza nuove chiamate:
+
+```powershell
+python direct_qa_queue_v3.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_V3_001"
+```
+
+Non rilanciare `run` dopo che la desk e stata consumata.
+
+Se attempt-1 fallisce e attempt-2 viene eseguito, la verifica successiva dovra
+controllare almeno:
+
+- candidate e validation dei due tentativi;
+- `repair-feedback.json`;
+- `previousCandidateReplayed=false`;
+- `freshReconstruction=true`;
+- eventuale correzione o persistenza del check
+  `V6_DROPS_EXTRA_WHEN_COVERAGE_MISSING`.
 
 ## Vincolo di continuita
 
