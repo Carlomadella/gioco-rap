@@ -1,0 +1,192 @@
+{
+  "schema": "fame-real-claim-comparison-v1",
+  "scope": "Development comparison on a real repository document frozen before model calls; same ternary semantics and same rubric for batch and selector+judge. Not independent evaluation or production qualification.",
+  "sourcePath": "strumenti/fame-local-worker/CLINE_GPTOSS_P2_PROBE.md",
+  "sourceCommit": "cdea2227a4a71906c48b97d888e707a787cecc3e",
+  "sourceSnapshot": "real-claim-comparison-source.md",
+  "sourceSha256": "258cc46e482b65c3e7fececaa1d050d1d502b853ac051ed4e5920913417c287e",
+  "units": [
+    {
+      "id": "U01",
+      "text": "# Prossima prova: QA P2 in Cline, report unico numerato"
+    },
+    {
+      "id": "U02",
+      "text": "Il report scelto è `OWNED_BEATS_AUDIO_TO_MIDI_P2_MEASUREMENT_PASS_2026-09-22.md`, congelato dal commit `5fc9330ef003be43cfbb2af8a63c13e7814ea870`. Snapshot in `cases/cline-p2-report.md`; SHA256 `566912bff9c497361f00ccb7f8a513461b4543bbd854ae9988ba508c8c7b49e9`."
+    },
+    {
+      "id": "U03",
+      "text": "È nuovo rispetto ai report dei probe Cline registrati (independent evaluation e Tsumugi), non una certificazione che il modello non lo abbia mai incontrato. Dichiarare eventuali precedenti esposizioni. Si valuta il contenuto del report P2 storico, non lo stato operativo corrente del progetto. Le precedenti prove e rubriche restano invariate."
+    },
+    {
+      "id": "U04",
+      "text": "## Procedura operatore"
+    },
+    {
+      "id": "U05",
+      "text": "Dalla worktree sul branch feature/fame-neural-roadmap, aggiornare con `git pull --ff-only`, poi:"
+    },
+    {
+      "id": "U06",
+      "text": "```powershell\npython strumenti/fame-local-worker/cline_gptoss_p2_probe.py init --root \"$HOME\\FAME_CLINE_GPTOSS_P2_001\"\n```"
+    },
+    {
+      "id": "U07",
+      "text": "Il comando prepara i file, senza chiamare il modello. Aprire in una nuova finestra VS Code **solo** la cartella:"
+    },
+    {
+      "id": "U08",
+      "text": "```text\nC:\\Users\\mycol\\FAME_CLINE_GPTOSS_P2_001\\desk\n```"
+    },
+    {
+      "id": "U09",
+      "text": "Nuova conversazione Cline, stessa configurazione osservata: Cline 4.1.20, Ollama 0.34.2, gpt-oss:20b, contesto UI 32768, Act, Web Search disattivato. Non confondere Auto Compact con Use Compact Prompt, assente nella UI osservata. Annotare eventuali differenze senza cambiarle silenziosamente. Auto-approve solo letture; approvare manualmente la scrittura di answer.json. Nessun terminale, browser o MCP per il compito."
+    },
+    {
+      "id": "U10",
+      "text": "Inviare una sola volta:"
+    },
+    {
+      "id": "U11",
+      "text": "```text\nEsegui il compito in TASK.md usando i file della scrivania. Salva il risultato richiesto in answer.json.\n```"
+    },
+    {
+      "id": "U12",
+      "text": "Non passare questa guida, codice del grader, rubriche o risultati attesi al modello. Nella desk ci sono soltanto incarichi, procedura, regola e report unico con ID incorporati. Conservare i log fuori dalla desk. Nessun suggerimento correttivo né Retry nel run misurato. Se il tool layer fallisce, registrare il primo esito; dopo 5 minuti senza completamento interrompere e annotare il motivo."
+    },
+    {
+      "id": "U13",
+      "text": "Compilare `operator/session.json` con ciò che si è realmente osservato, prima del grade. Non copiare automaticamente true dalla sessione precedente. Registrare durata se misurata; lasciare null se ignota. La normale approvazione Save non conta come suggerimento correttivo."
+    },
+    {
+      "id": "U14",
+      "text": "Controllo esterno, dal terminale della repo:"
+    },
+    {
+      "id": "U15",
+      "text": "```powershell\npython strumenti/fame-local-worker/cline_gptoss_p2_probe.py grade --root \"$HOME\\FAME_CLINE_GPTOSS_P2_001\"\n```"
+    },
+    {
+      "id": "U16",
+      "text": "Salva `operator/evaluation.json` una sola volta. Se esiste già, leggerlo senza rilanciare grade:"
+    },
+    {
+      "id": "U17",
+      "text": "```powershell\nGet-Content -Raw -Encoding UTF8 \"$HOME\\FAME_CLINE_GPTOSS_P2_001\\operator\\evaluation.json\"\n```"
+    },
+    {
+      "id": "U18",
+      "text": "## Criteri fissati prima della risposta"
+    },
+    {
+      "id": "U19",
+      "text": "Quattro affermazioni: export su 12 family e overflow, durata reference del renderer, effetto storico non misurato e voti preservati, presunta autorizzazione training/batch. Ogni parte delle affermazioni composte richiede copertura. Rubrica host-only nel preparatore; hash del grader e file congelati registrati all'init e verificati al grade."
+    },
+    {
+      "id": "U20",
+      "text": "Il risultato separa:"
+    },
+    {
+      "id": "U21",
+      "text": "- conclusione: `conclusionCorrect`;\n- copertura: `coverage`;\n- contesto aggiuntivo già verificato innocuo: `precisionWarnings`, non bloccante;\n- citazioni fuori dagli insiemi verificati: `unreviewedEvidenceIds`, da ispezionare, senza dichiararle automaticamente false o innocue;\n- contratto JSON, integrità file e attestazione della sessione."
+    },
+    {
+      "id": "U22",
+      "text": "Il PASS dell'artefatto richiede conclusioni corrette e copertura sufficiente, senza difetti di contratto o citazioni ancora da valutare. Le citazioni innocue superflue non provocano FAIL. Il limite di otto ID resta quello noto; ogni insieme necessario entra ampiamente nel limite."
+    },
+    {
+      "id": "U23",
+      "text": "`PASS_OPERATOR_ATTESTED` richiede anche la scheda sessione completa; `ARTIFACT_PASS_SESSION_UNVERIFIED` significa che il contenuto è corretto ma la sessione non è attestata completamente. Le attestazioni non sono verifiche indipendenti dei log. `FAIL` va letto insieme agli errori: una risposta assente non è un giudizio sulla semantica."
+    },
+    {
+      "id": "U24",
+      "text": "Nessuna nuova autorizzazione audio/training/batch131/produzione. Non confrontare direttamente la percentuale di quattro affermazioni con quella della rete di 14 agenti su un report diverso. Non modificare i criteri per ottenere un PASS dopo il primo run; eventuali audit sono separati."
+    },
+    {
+      "id": "U25",
+      "text": "## Verifica del preparatore/correttore"
+    },
+    {
+      "id": "U26",
+      "text": "9 test con fixture simulate passati: copertura di tutte le parti, prove alternative della sintesi, aggiunta innocua non bloccante, falsa autorizzazione respinta, citazioni non valutate segnalate, ID invalidi, risultato salvato senza sovrascrittura, report alterato rifiutato. Nessuna inferenza Cline/Ollama eseguita dall'assistente."
+    },
+    {
+      "id": "U27",
+      "text": "```powershell\npython -m unittest discover -s strumenti/fame-local-worker -p test_cline_gptoss_p2_probe.py -q\n```"
+    },
+    {
+      "id": "U28",
+      "text": "## Dopo il run"
+    },
+    {
+      "id": "U29",
+      "text": "Leggere evaluation e log, registrare separatamente completamento, conclusioni, copertura, precisione, interventi e tempi. Un esito buono giustifica altri compiti ristretti; non dimostra ancora affidabilità generale o vantaggio di tempo. In caso di failure, diagnosticare la classe senza ripetere il caso per promuoverlo retroattivamente."
+    }
+  ],
+  "cases": [
+    {
+      "id": "R01",
+      "assertion": "Nel run misurato non sono ammessi suggerimenti correttivi o retry; se il tool layer fallisce va registrato il primo esito.",
+      "expected": {
+        "verdict": "SUPPORTED",
+        "requiredGroups": [
+          [
+            "U12"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "R02",
+      "assertion": "Il PASS dell'artefatto richiede conclusioni corrette e copertura sufficiente, mentre citazioni innocue superflue non provocano FAIL.",
+      "expected": {
+        "verdict": "SUPPORTED",
+        "requiredGroups": [
+          [
+            "U22"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "R03",
+      "assertion": "PASS_OPERATOR_ATTESTED costituisce una verifica indipendente dei log della sessione.",
+      "expected": {
+        "verdict": "CONTRADICTED",
+        "requiredGroups": [
+          [
+            "U23"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "R04",
+      "assertion": "Un esito buono di questa prova dimostra già affidabilità generale e vantaggio di tempo.",
+      "expected": {
+        "verdict": "CONTRADICTED",
+        "requiredGroups": [
+          [
+            "U29"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "R05",
+      "assertion": "Il comando di grade deve terminare entro sessanta secondi.",
+      "expected": {
+        "verdict": "UNKNOWN",
+        "requiredGroups": []
+      }
+    },
+    {
+      "id": "R06",
+      "assertion": "operator/session.json deve essere firmato digitalmente prima del grade.",
+      "expected": {
+        "verdict": "UNKNOWN",
+        "requiredGroups": []
+      }
+    }
+  ]
+}
