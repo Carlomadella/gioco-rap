@@ -1,3 +1,60 @@
+# Checkpoint corrente — stop espansione multi-agent staged
+
+24 settembre 2026.
+
+## Decisione architetturale
+
+La linea `selector + judge` non va ulteriormente scalata o raffinata come
+percorso principale del QA.
+
+Evidenza reale piu recente:
+
+```text
+FAME_REAL_CLAIM_COMPARISON_001
+baseline ternaria batch = 6/6
+staged selector+judge   = 3/6
+baselineModelSeconds    = 10.281
+stagedModelSeconds      = 37.437
+comparison              = STAGED_WORSE
+```
+
+Il confronto usa stessa semantica ternaria, stessa rubrica host, stesso scoring
+e stesso documento reale. Quindi il peggioramento non e spiegabile dal vecchio
+mismatch boolean-vs-ternary del test sintetico.
+
+Failure staged osservati:
+
+```text
+R01 = Incomplete response
+R04 = Incomplete response
+R05 = semantic error: CONTRADICTED invece di UNKNOWN
+```
+
+La baseline batch ha invece completato 6/6.
+
+## Conseguenza
+
+Non aprire altre varianti `selector+judge` o nuove versioni di repair solo per
+ottenere un PASS.
+
+Il multi-agent resta un obiettivo del progetto, ma la decomposizione obbligatoria
+di ogni claim in piu worker non e supportata dai dati correnti.
+
+Il prossimo lavoro architetturale deve partire da un principio diverso:
+
+1. un singolo worker diretto deve essere il percorso primario;
+2. eventuali agenti aggiuntivi devono intervenire come revisori indipendenti,
+   adjudicator o escalation su casi dubbi/falliti;
+3. nessun agente aggiuntivo deve peggiorare un risultato gia corretto del worker
+   primario;
+4. la rete completa va considerata non pronta finche non chiude almeno un giro
+   reale end-to-end senza correzioni manuali intermedie.
+
+Non e autorizzato alcun ritorno automatico ad Audio->MIDI, training, batch o
+produzione da questo checkpoint.
+
+---
+
 # Checkpoint corrente — confronto reale simmetrico batch vs staged
 
 24 settembre 2026.
