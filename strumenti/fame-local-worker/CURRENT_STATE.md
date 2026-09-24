@@ -1,16 +1,138 @@
-# Checkpoint corrente — confronto worker per singola affermazione
+# Checkpoint corrente — confronto reale simmetrico batch vs staged
 
-24 settembre 2026. Programma pronto: [CLAIM_NETWORK.md](CLAIM_NETWORK.md). Nuovo confronto diagnostico sintetico: baseline batch boolean vs selector + judge ternario, una claim per chiamata, 6 casi, massimo 13 chiamate, nessun retry. 9 test simulati PASS; inferenza reale NON eseguita qui. Nessuna promozione della rete.
+24 settembre 2026.
 
-Il run V3_001 mostrato dall'operatore resta REJECTED: entrambe le risposte citano la frase contraria a V6_DROPS_EXTRA_WHEN_COVERAGE_MISSING ma la dichiarano supportata. Il secondo tentativo subisce anche il falso rifiuto di U07: il testo sostiene già la policy host-owned, benché la rubrica richieda U03. Fonte: output completo fornito dall'operatore; non verifica indipendente del suo disco. Artefatti e rubriche storici preservati.
+## Risultato Claim Network 001
 
-Prossimo comando, da questa cartella con Ollama avviato:
+Run reale operator-reported:
 
-```powershell
-python claim_network.py --root "$HOME\FAME_CLAIM_NETWORK_001"
+```text
+$HOME\FAME_CLAIM_NETWORK_001
+status = COMPLETE_FOR_REVIEW
+calls = 13
+baselineAccepted = 6/6
+stagedAccepted = 6/6
+stagedAllPass = true
+comparison = NO_GAIN
+executionAuthorized = false
+independentEvaluation = false
 ```
 
-Il checkpoint corrente prevale sui vecchi “prossimo intervento” sotto. Non rieseguire V3_001. Il confronto nuovo cambia insieme decomposizione e formato; non isola una causa né dimostra generalizzazione. Nessun lavoro Audio→MIDI è autorizzato da questo checkpoint.
+La suite sintetica conferma che GPT-OSS 20B gestisce correttamente, su questi
+sei casi development, SUPPORTED/CONTRADICTED/UNKNOWN, condizioni e negazioni.
+
+La scomposizione selector + judge non migliora il risultato: 6/6 in entrambe le
+modalita con molte piu chiamate staged.
+
+Risultato salvato:
+
+```text
+strumenti/fame-local-worker/CLAIM_NETWORK_RESULT_2026-09-24.md
+b2961f81ef376008823d5163d865293e1abc8388
+```
+
+Il confronto sintetico precedente non era semanticamente simmetrico: baseline
+booleana, judge ternario. Non usarlo per attribuire causalmente `NO_GAIN` alla
+sola decomposizione.
+
+## Nuovo confronto reale simmetrico preparato
+
+Fonte reale della repository:
+
+```text
+strumenti/fame-local-worker/CLINE_GPTOSS_P2_PROBE.md
+source commit = cdea2227a4a71906c48b97d888e707a787cecc3e
+source SHA256 = 258cc46e482b65c3e7fececaa1d050d1d502b853ac051ed4e5920913417c287e
+```
+
+La fonte e stata verificata byte-identica fra il commit di recovery e il branch
+corrente prima del freeze.
+
+Snapshot:
+
+```text
+strumenti/fame-local-worker/real-claim-comparison-source.md
+b39b90296d97e12ac471903664bb9d119a3b6080
+```
+
+Suite:
+
+```text
+strumenti/fame-local-worker/real_claim_comparison_cases.json
+6024c09a2e15cfd19d768c9088c7d9ba17dff197
+```
+
+La fonte viene ricostruita integralmente da 29 unita. Sei claim congelate:
+
+```text
+2 SUPPORTED
+2 CONTRADICTED
+2 UNKNOWN
+```
+
+Runner:
+
+```text
+strumenti/fame-local-worker/real_claim_comparison.py
+b6e0120e97038e6556c346e2bd7449fe42078ce1
+```
+
+Baseline e staged condividono realmente:
+
+- stessa semantica ternaria;
+- stesso system prompt di giudizio;
+- stessa rubrica host;
+- stesso scoring;
+- stessa fonte completa;
+- stessa evidence policy.
+
+Differenza intenzionale:
+
+```text
+baseline = 1 chiamata batch per 6 claim
+staged   = 6 selector + 6 judge
+```
+
+Il judge staged riceve sempre tutte le 29 unita del documento; il suggerimento
+del selector e esplicitamente non autoritativo.
+
+Test:
+
+```text
+strumenti/fame-local-worker/test_real_claim_comparison.py
+a12b795585543a931729d6000c9662e5515eff3a
+```
+
+Documentazione:
+
+```text
+strumenti/fame-local-worker/REAL_CLAIM_COMPARISON.md
+59eec21f5eb6d0ff5dbaea00aabbd06821af041c
+```
+
+## Prossimo intervento
+
+Prima del run reale:
+
+```powershell
+git pull --ff-only origin recovery/fame-local-worker-v2-cdea2227
+python -m unittest test_real_claim_comparison -q
+```
+
+Sono attesi **12 test**.
+
+Solo dopo PASS:
+
+```powershell
+python real_claim_comparison.py --root "$HOME\FAME_REAL_CLAIM_COMPARISON_001"
+```
+
+Il run usa al massimo 13 chiamate, nessun retry. La root deve essere nuova e non
+va rilanciata.
+
+Il risultato serve a confrontare batch vs decomposizione sullo stesso compito
+reale con semantica/rubrica simmetriche. Non e una independent evaluation e non
+autorizza training, audio, produzione o autonomia operativa.
 
 ---
 
