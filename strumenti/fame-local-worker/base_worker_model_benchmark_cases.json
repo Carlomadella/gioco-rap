@@ -271,7 +271,7 @@
             "verdict": "SUPPORTED",
             "requiredGroups": [
               [
-                "U20"
+                "U19"
               ]
             ]
           }
@@ -283,7 +283,7 @@
             "verdict": "SUPPORTED",
             "requiredGroups": [
               [
-                "U16"
+                "U15"
               ]
             ]
           }
@@ -295,7 +295,7 @@
             "verdict": "CONTRADICTED",
             "requiredGroups": [
               [
-                "U15"
+                "U14"
               ]
             ]
           }
@@ -307,7 +307,7 @@
             "verdict": "CONTRADICTED",
             "requiredGroups": [
               [
-                "U21"
+                "U20"
               ]
             ]
           }
