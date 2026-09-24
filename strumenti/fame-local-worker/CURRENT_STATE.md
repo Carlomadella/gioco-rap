@@ -830,21 +830,59 @@ executionAuthorized  = false
 
 L'inizializzazione non ha effettuato chiamate al modello.
 
+## Esito V2_004
+
+Root:
+
+```text
+$HOME\FAME_DIRECT_QA_NETWORK_V2_004
+```
+
+Esito operator-reported:
+
+```text
+transfer-protocol-v2
+  status = VALIDATED_FOR_REVIEW
+  modelCalls = 1
+  firstAttemptPass = true
+  acceptedAfterRepair = false
+
+review-boundary-v2
+  status = REJECTED
+  modelCalls = 2
+  firstAttemptPass = false
+  acceptedAfterRepair = false
+
+queue status = NEEDS_REVIEW
+executionAuthorized = false
+```
+
+La desk transfer e passata al primo tentativo. La desk review-boundary ha usato
+la seconda chiamata controllata ed e rimasta rejected.
+
+La root e consumata e non va rilanciata.
+
 ## Prossimo intervento
 
-Eseguire una sola volta la queue reale:
+Ispezionare senza nuove chiamate gli artefatti della desk fallita:
 
 ```powershell
-python direct_qa_queue_v2.py run --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_004"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_004\desks\review-boundary-v2\attempt-1\candidate.json"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_004\desks\review-boundary-v2\attempt-1\validation.json"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_004\desks\review-boundary-v2\attempt-2\candidate.json"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_004\desks\review-boundary-v2\attempt-2\repair-feedback.json"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_004\desks\review-boundary-v2\attempt-2\validation.json"
 ```
 
-Poi rileggere lo stato senza nuove chiamate:
+Per chiudere anche la desk passata:
 
 ```powershell
-python direct_qa_queue_v2.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_004"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_004\desks\transfer-protocol-v2\attempt-1\review.md"
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_004\desks\transfer-protocol-v2\attempt-1\validation.json"
 ```
 
-Non rilanciare `run` dopo che entrambe le desk sono state consumate.
+Non modificare package/rubriche e non rilanciare `run` su V2_004 prima della
+classificazione del reject.
 
 ## Vincolo di continuita
 
