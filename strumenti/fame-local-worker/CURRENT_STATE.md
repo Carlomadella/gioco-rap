@@ -1032,31 +1032,107 @@ L'inizializzazione non ha effettuato chiamate al modello.
 Questa root e una diagnostica controllata sul caso noto V2_004. Non e una nuova
 evaluation indipendente e non misura generalizzazione.
 
+## Esito e diagnosi V3_001
+
+Root:
+
+```text
+$HOME\FAME_DIRECT_QA_NETWORK_V3_001
+```
+
+Esito operator-reported:
+
+```text
+review-boundary-repair-v3
+status = REJECTED
+modelCalls = 2
+firstAttemptPass = false
+acceptedAfterRepair = false
+queue status = NEEDS_REVIEW
+executionAuthorized = false
+```
+
+### Attempt 1
+
+Unico errore:
+
+```text
+V6_DROPS_EXTRA_WHEN_COVERAGE_MISSING:INCORRECT_CONCLUSION
+```
+
+Gli altri sei check erano corretti.
+
+Attempt-1 riproduce quindi esattamente il genuine semantic error osservato in
+V2_004.
+
+### Attempt 2 fresh reconstruction
+
+Il candidate mantiene:
+
+```text
+V6_DROPS_EXTRA_WHEN_COVERAGE_MISSING = true
+```
+
+e modifica `HOST_OWNS_ACTION_POLICY` usando solo U07.
+
+Validation:
+
+```text
+HOST_OWNS_ACTION_POLICY:INSUFFICIENT_EVIDENCE
+V6_DROPS_EXTRA_WHEN_COVERAGE_MISSING:INCORRECT_CONCLUSION
+```
+
+Quindi il repair v3:
+
+- non corregge il genuine semantic error;
+- introduce inoltre una regressione di coverage.
+
+U03 era required evidence per `HOST_OWNS_ACTION_POLICY`; U07 era solo benign
+context, quindi U07 da sola non e sufficiente.
+
+Classificazione:
+
+```text
+FRESH_RECONSTRUCTION_REPAIR_FAILED_AND_REGRESSED
+```
+
+Confronto sullo stesso caso noto:
+
+```text
+V2_004 attempt-2:
+  1 semantic error
+  other positive coverage sufficient
+
+V3_001 attempt-2:
+  same semantic error
+  + 1 new coverage error
+```
+
+Conclusione limitata al caso testato: eliminare il replay del candidate
+precedente non migliora il repair e produce un risultato peggiore. Questo non
+prova una causa generale del comportamento del modello.
+
+Risultato storico:
+
+```text
+strumenti/fame-local-worker/DIRECT_QA_V3_001_RESULT_2026-09-24.md
+09181128fa40c7ff737443df4d909f57524e3ad9
+```
+
 ## Prossimo intervento
 
-Eseguire una sola volta il run reale v3:
+Non aprire automaticamente v4 con un altro prompt di repair.
 
-```powershell
-python direct_qa_queue_v3.py run --root "$HOME\FAME_DIRECT_QA_NETWORK_V3_001"
-```
+Isolare invece il failure del singolo worker su un task diagnostico minimo che
+separi quattro passaggi:
 
-Poi rileggere lo stato senza nuove chiamate:
+1. comprensione letterale della regola sorgente;
+2. gestione della condizione/negazione;
+3. mapping della finding a `supported=true/false`;
+4. selezione dell'evidence.
 
-```powershell
-python direct_qa_queue_v3.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_V3_001"
-```
-
-Non rilanciare `run` dopo che la desk e stata consumata.
-
-Se attempt-1 fallisce e attempt-2 viene eseguito, la verifica successiva dovra
-controllare almeno:
-
-- candidate e validation dei due tentativi;
-- `repair-feedback.json`;
-- `previousCandidateReplayed=false`;
-- `freshReconstruction=true`;
-- eventuale correzione o persistenza del check
-  `V6_DROPS_EXTRA_WHEN_COVERAGE_MISSING`.
+Il prossimo test deve dirci **quale trasformazione fallisce**, non semplicemente
+se un altro retry riesce a ottenere PASS.
 
 ## Vincolo di continuita
 
