@@ -1,0 +1,616 @@
+{
+  "schema": "fame-base-worker-model-benchmark-v1",
+  "scope": "Development benchmark to select a base local worker model before further multi-agent work. Three real repository documents, 15 frozen ternary claims, identical prompts/rubrics/options per model. Not independent evaluation or production qualification.",
+  "models": [
+    "gpt-oss:20b",
+    "mistral-small3.2:24b"
+  ],
+  "documents": [
+    {
+      "key": "package-authoring",
+      "sourcePath": "strumenti/fame-local-worker/DIRECT_QA_PACKAGE_AUTHORING.md",
+      "sourceSnapshot": "model-benchmark-package-authoring-source.md",
+      "sourceBlob": "f9531cba721c73c9e2e385e28e89f90861f78fe3",
+      "units": [
+        {
+          "id": "U01",
+          "text": "# Direct QA package authoring rules"
+        },
+        {
+          "id": "U02",
+          "text": "## Semantic unit rule\n\nEvidence units must represent complete semantic blocks."
+        },
+        {
+          "id": "U03",
+          "text": "Do not split a structural Markdown heading into its own evidence unit when it only labels the paragraph/list that follows. In that case, combine the heading and its following content into one unit."
+        },
+        {
+          "id": "U04",
+          "text": "Bad:"
+        },
+        {
+          "id": "U05",
+          "text": "```text\nU13: ## Ricerca per il prossimo ramo\nU14: Tsumugi: ...\n```"
+        },
+        {
+          "id": "U06",
+          "text": "Preferred:"
+        },
+        {
+          "id": "U07",
+          "text": "```text\nU13: ## Ricerca per il prossimo ramo"
+        },
+        {
+          "id": "U08",
+          "text": "Tsumugi: ...\n```"
+        },
+        {
+          "id": "U09",
+          "text": "Reason: the model may reasonably cite the heading together with the content. If the heading is a standalone unit but is neither required nor declared benign context, the host validator can produce a precision false negative even when the conclusion and required coverage are correct."
+        },
+        {
+          "id": "U10",
+          "text": "## Frozen-run rule\n\nNever repair a consumed task by changing its rubric/package and rerunning it. Preserve the historical result, classify the authoring defect separately, and apply the improved unitization only to new task IDs."
+        },
+        {
+          "id": "U11",
+          "text": "## Benign-context rule\n\nFor every positive check, classify before the first model call not only the\nminimum evidence required for coverage, but also any other unit that a careful\nreviewer could reasonably cite as contextual support without changing the\nconclusion."
+        },
+        {
+          "id": "U12",
+          "text": "Use `benignContext` only for evidence that is relevant but unnecessary.\nDo not use it as a wildcard for arbitrary extra citations."
+        },
+        {
+          "id": "U13",
+          "text": "A useful pre-freeze test is:"
+        },
+        {
+          "id": "U14",
+          "text": "- if the required evidence were already present, would citing this additional\n  unit still be defensible as context for the exact assertion?\n- if yes, consider freezing it as `benignContext`;\n- if no, leave it unreviewed so the validator can still reject evidence drift."
+        },
+        {
+          "id": "U15",
+          "text": "Do not change `benignContext` after observing a consumed run in order to turn a\nhistorical reject into a PASS. Apply improved context classification only to new\ntask IDs."
+        },
+        {
+          "id": "U16",
+          "text": "## Required-group non-duplication rule\n\nEach required coverage group must correspond to a genuinely distinct semantic\nobligation in the assertion."
+        },
+        {
+          "id": "U17",
+          "text": "Do not require two separate units merely because both restate or reinforce the\nsame fact. If one complete semantic unit already supports every part of the\nassertion, a second unit containing the same substance must not become another\nmandatory group."
+        },
+        {
+          "id": "U18",
+          "text": "Before freezing a positive check, perform this test for every required group:"
+        },
+        {
+          "id": "U19",
+          "text": "1. identify the exact clause of the assertion that the group is necessary for;\n2. remove that group while keeping the other required groups;\n3. ask whether any part of the assertion is now unsupported;\n4. if no part becomes unsupported, the group is redundant and should be an\n   alternative, benign context, or omitted."
+        },
+        {
+          "id": "U20",
+          "text": "This classification must be made before the first model call. Do not remove a\nredundant group retroactively from a consumed package to convert a historical\nreject into a PASS."
+        },
+        {
+          "id": "U21",
+          "text": "## Pre-run checklist\n\nBefore freezing a new direct-QA package:"
+        },
+        {
+          "id": "U22",
+          "text": "1. source snapshot must match the intended repository source exactly;\n2. units must reconstruct the complete source;\n3. headings without autonomous semantics must be joined to the following block;\n4. each positive check must have explicit required coverage groups;\n5. known harmless contextual units that may reasonably accompany evidence must be listed as benign context;\n6. benign context must be relevant to the exact assertion, not a wildcard for extra evidence;\n7. negative checks must not need evidence IDs;\n8. every required coverage group must map to a distinct necessary clause of the assertion;\n9. package-specific tests must include incomplete coverage, false-positive authorization and unreviewed-evidence cases;\n10. freeze package, rubric and benign-context classification before the first model call."
+        }
+      ],
+      "cases": [
+        {
+          "id": "P01",
+          "assertion": "Un heading Markdown puramente strutturale deve essere unito al blocco di contenuto che introduce.",
+          "expected": {
+            "verdict": "SUPPORTED",
+            "requiredGroups": [
+              [
+                "U03"
+              ]
+            ]
+          }
+        },
+        {
+          "id": "P02",
+          "assertion": "benignContext va usato solo per evidence pertinente ma non necessaria e non come wildcard per citazioni arbitrarie.",
+          "expected": {
+            "verdict": "SUPPORTED",
+            "requiredGroups": [
+              [
+                "U12"
+              ]
+            ]
+          }
+        },
+        {
+          "id": "P03",
+          "assertion": "Un task già consumato può essere corretto cambiando la rubrica e rilanciandolo per trasformare il reject storico in PASS.",
+          "expected": {
+            "verdict": "CONTRADICTED",
+            "requiredGroups": [
+              [
+                "U10"
+              ]
+            ]
+          }
+        },
+        {
+          "id": "P04",
+          "assertion": "Due unità che ripetono lo stesso fatto devono diventare due required group obbligatori separati.",
+          "expected": {
+            "verdict": "CONTRADICTED",
+            "requiredGroups": [
+              [
+                "U17"
+              ]
+            ]
+          }
+        },
+        {
+          "id": "P05",
+          "assertion": "Ogni nuovo package Direct QA deve contenere esattamente otto check.",
+          "expected": {
+            "verdict": "UNKNOWN",
+            "requiredGroups": []
+          }
+        }
+      ]
+    },
+    {
+      "key": "recovery",
+      "sourcePath": "strumenti/fame-local-worker/RECOVERY.md",
+      "sourceSnapshot": "model-benchmark-recovery-source.md",
+      "sourceBlob": "10e8795690e9e0fd98fcc956950d4d7116b83d2f",
+      "units": [
+        {
+          "id": "U01",
+          "text": "# Recupero controllato della rete 001"
+        },
+        {
+          "id": "U02",
+          "text": "## Checkpoint prioritario: audit rubriche, senza nuove inferenze\n\nRecovery reale riportato: 1/2, rete ancora 13/14 secondo il protocollo congelato. Completato audit delle 14 rubriche; il supporto contestuale E152+E153+E154 viene distinto dalla prova diretta E155. Leggere [RUBRIC_AUDIT.md](RUBRIC_AUDIT.md) ed eseguire `qa_rubric_audit.py` sugli artefatti esistenti. Nessun retry Ollama; esiti storici immutati. Il sidecar distingue conclusione, copertura e citazioni superflue. 26 test con client simulati passati. Questo checkpoint prevale sulle istruzioni operative storiche sotto."
+        },
+        {
+          "id": "U03",
+          "text": "\n## Stato e obiettivo\n\nL'output fornito dall'operatore registra 13/14 decisioni accettate: 9/10 affermazioni supportate e quattro affermazioni non supportate correttamente respinte. Il solo fallimento è LOWEND_CAUSES_UNPROVEN. Le evidenze selezionate coprono i silenzi sulle note alte ma non l'incertezza sulla release corta. Il fallimento originale resta registrato; non si allenta il criterio."
+        },
+        {
+          "id": "U04",
+          "text": "`qa_recovery.py` prepara due incarichi separati sullo stesso report completo:"
+        },
+        {
+          "id": "U05",
+          "text": "- RELEASE_CAUSE_UNPROVEN: verificare l'incertezza sulla causa della release corta.\n- HIGH_NOTE_CAUSE_UNPROVEN: verificare l'incertezza sulla causa dei silenzi sulle note alte."
+        },
+        {
+          "id": "U06",
+          "text": "Stesso GPT-OSS 20B e digest, think=low, contesto 16384, budget 4096. Nessuna risposta attesa, ID corretto o rubrica viene passato al modello. La rubrica è lato operatore. I due risultati sono ricombinati e rivalidati contro il criterio originale completo. Il riuso del coordinatore avviene in un modulo isolato: i file del protocollo precedente non vengono modificati."
+        },
+        {
+          "id": "U07",
+          "text": "## Esecuzione PowerShell\n\nDalla worktree `C:\\Users\\mycol\\gioco-rap-fame-neural`, sul branch `feature/fame-neural-roadmap`, aggiornare senza forzare:"
+        },
+        {
+          "id": "U08",
+          "text": "```powershell\ngit pull --ff-only\n```"
+        },
+        {
+          "id": "U09",
+          "text": "Se Git segnala conflitti o modifiche incompatibili, fermarsi senza reset/stash automatici. Non ricreare o cancellare `FAME_AGENT_NETWORK_001`."
+        },
+        {
+          "id": "U10",
+          "text": "Preparare il recovery (nessuna chiamata al modello):"
+        },
+        {
+          "id": "U11",
+          "text": "```powershell\npython strumenti/fame-local-worker/qa_recovery.py init --source \"$HOME\\FAME_AGENT_NETWORK_001\" --root \"$HOME\\FAME_AGENT_RECOVERY_001\"\n```"
+        },
+        {
+          "id": "U12",
+          "text": "Eseguire al massimo due chiamate, una per incarico:"
+        },
+        {
+          "id": "U13",
+          "text": "```powershell\npython strumenti/fame-local-worker/qa_recovery.py run --root \"$HOME\\FAME_AGENT_RECOVERY_001\"\n```"
+        },
+        {
+          "id": "U14",
+          "text": "Il runner accetta solo una rete originale completa 13/14, con il solo LOWEND_CAUSES_UNPROVEN in SEMANTIC_FAIL. Controlla richieste, risposte e ricevute originali e congela gli hash degli artefatti. Fonte e recovery devono essere cartelle separate. Gli hash rilevano cambiamenti rispetto allo snapshot locale: non costituiscono una firma indipendente dell'operatore."
+        },
+        {
+          "id": "U15",
+          "text": "Un secondo `run` visita soltanto incarichi mai tentati: nessun retry automatico di errori, fallimenti o tentativi interrotti. Non cancellare una cartella per ottenere un nuovo primo tentativo. Dopo un crash, rimuovere un eventuale lock soltanto dopo aver confermato che il processo è terminato."
+        },
+        {
+          "id": "U16",
+          "text": "Per rileggere e rivalidare senza chiamare Ollama:"
+        },
+        {
+          "id": "U17",
+          "text": "```powershell\npython strumenti/fame-local-worker/qa_recovery.py status --root \"$HOME\\FAME_AGENT_RECOVERY_001\"\n```"
+        },
+        {
+          "id": "U18",
+          "text": "## Interpretazione\n\nIl risultato finale è in `recovery-results/<timestamp>/evaluation.json`. Le cartelle `summaries` descrivono solo i due sottoincarichi, non l'esito della rete completa."
+        },
+        {
+          "id": "U19",
+          "text": "- `VALIDATED_AFTER_RECOVERY`: entrambe le verifiche accettate, evidenze unite sufficienti per la rubrica originale e tutti i dieci finding validi. Vengono scritti anche answer.json e review.md.\n- `NEEDS_REVIEW`: recupero non completo; nessun report finale promosso. Conservare raw response, result ed evaluation per diagnosi.\n- `firstPassAccepted=13`, `firstPassTotal=14`, `firstPassPassed=false` restano invariati anche se dopo il recupero si arriva a 14/14."
+        },
+        {
+          "id": "U20",
+          "text": "I tempi del primo passaggio e del recupero restano distinti e viene riportato il totale. Nessun training, batch audio, modifica algoritmo o task-data readiness viene autorizzato. Il livello low è richiesto, non certificato tramite una misura indipendente."
+        },
+        {
+          "id": "U21",
+          "text": "## Checkpoint successivo per GPT-5.6 / GPT-6\n\n1. Registrare l'esito reale del recovery, inclusi eventuali fallimenti, con modello, digest, richieste, risposte, tempi e interventi umani. I test simulati del codice non sono risultati del modello.\n2. Se fallisce, ispezionare le risposte delle sole due scrivanie; non aumentare retry o indebolire rubriche per ottenere un PASS.\n3. Se passa, congelare il protocollo prima di scegliere un nuovo report non usato per svilupparlo. Definire prima della chiamata affermazioni vere, false e composte e rubrica indipendente lato operatore. Non inserire nel prompt ID attesi o risposte.\n4. Misurare separatamente primo passaggio, recuperi, falsi positivi, evidenze mancanti, chiamate, tempo modello e revisione umana. Un nuovo report potrà valutare trasferimento; questo recovery sul caso noto no.\n5. Solo dopo quel controllo assegnare un primo lavoro QA reale ristretto. La generalizzazione della scomposizione è ancora da progettare: questa versione implementa esplicitamente il caso low-end, non un pianificatore autonomo universale."
+        },
+        {
+          "id": "U22",
+          "text": "## Verifica del codice\n\nDalla cartella strumenti/fame-local-worker:"
+        },
+        {
+          "id": "U23",
+          "text": "```powershell\npython -m unittest test_qa_coordinator test_qa_recovery -q\n```"
+        },
+        {
+          "id": "U24",
+          "text": "19 test con client simulato: isolamento incarichi, copertura semantica, merge sotto rubrica originale, conservazione byte per byte della fonte, assenza di riesecuzione, interruzioni, errori di trasporto, modifiche alla fonte prima/durante il run e manomissione della risposta. Nessuna chiamata reale a Ollama eseguita per questi test."
+        }
+      ],
+      "cases": [
+        {
+          "id": "R01",
+          "assertion": "Anche se il recovery arriva a copertura completa, firstPassAccepted, firstPassTotal e firstPassPassed restano invariati.",
+          "expected": {
+            "verdict": "SUPPORTED",
+            "requiredGroups": [
+              [
+                "U20"
+              ]
+            ]
+          }
+        },
+        {
+          "id": "R02",
+          "assertion": "Un secondo run visita solo incarichi mai tentati e non ritenta automaticamente errori, fallimenti o tentativi interrotti.",
+          "expected": {
+            "verdict": "SUPPORTED",
+            "requiredGroups": [
+              [
+                "U16"
+              ]
+            ]
+          }
+        },
+        {
+          "id": "R03",
+          "assertion": "Gli hash locali congelati dal recovery costituiscono una firma indipendente dell'operatore.",
+          "expected": {
+            "verdict": "CONTRADICTED",
+            "requiredGroups": [
+              [
+                "U15"
+              ]
+            ]
+          }
+        },
+        {
+          "id": "R04",
+          "assertion": "Un recovery validato autorizza training, batch audio e modifiche algoritmiche.",
+          "expected": {
+            "verdict": "CONTRADICTED",
+            "requiredGroups": [
+              [
+                "U21"
+              ]
+            ]
+          }
+        },
+        {
+          "id": "R05",
+          "assertion": "Il recovery completo deve terminare entro sessanta secondi.",
+          "expected": {
+            "verdict": "UNKNOWN",
+            "requiredGroups": []
+          }
+        }
+      ]
+    },
+    {
+      "key": "worker",
+      "sourcePath": "strumenti/fame-local-worker/DIRECT_QA_WORKER.md",
+      "sourceSnapshot": "model-benchmark-worker-source.md",
+      "sourceBlob": "f116b2db438826951af6634d16c8e40853bce871",
+      "units": [
+        {
+          "id": "U01",
+          "text": "# Worker QA diretto e coda riutilizzabile"
+        },
+        {
+          "id": "U02",
+          "text": "## Decisione e primo incarico\n\nImplementazione del percorso deciso in `e86b7b1`: GPT-OSS 20B locale via agent.py, senza Cline, strumenti del modello o dispatch di comandi. Il programma prepara i dati e salva gli artefatti. Il modello valuta soltanto le affermazioni."
+        },
+        {
+          "id": "U03",
+          "text": "Primo pacchetto: `pfnmf-review-v1`, audit documentale del checkpoint storico PF-NMF NDR-097. Fonte congelata al commit e86b7b162e87ade32a367506cee3cdf9c3fda7a8; snapshot completo incluso in cases/direct-qa. Le sette unità conservano testo, paragrafi e liste completi; il runner verifica che ricompongano la fonte integrale. Le quattro affermazioni riguardano esito/causa, errori D06, ambito BIC e presunta apertura training."
+        },
+        {
+          "id": "U04",
+          "text": "Questo report non compare nei probe registrati esaminati. Non è possibile certificare precedenti esposizioni del modello o assenza di contaminazione; dichiarare quelle note. È una proposta di QA di un report storico, non esecuzione delle sue decisioni e non nuova valutazione audio indipendente."
+        },
+        {
+          "id": "U05",
+          "text": "## Comandi operativi PowerShell\n\nDalla worktree aggiornata del branch feature/fame-neural-roadmap:"
+        },
+        {
+          "id": "U06",
+          "text": "```powershell\ngit pull --ff-only\n```"
+        },
+        {
+          "id": "U07",
+          "text": "Preparare una coda dedicata, senza inferenza:"
+        },
+        {
+          "id": "U08",
+          "text": "```powershell\npython strumenti/fame-local-worker/direct_qa_queue.py init --root \"$HOME\\FAME_DIRECT_QA_NETWORK_001\" --tasks pfnmf-review-v1\n```"
+        },
+        {
+          "id": "U09",
+          "text": "Con Ollama avviato, eseguire:"
+        },
+        {
+          "id": "U10",
+          "text": "```powershell\npython strumenti/fame-local-worker/direct_qa_queue.py run --root \"$HOME\\FAME_DIRECT_QA_NETWORK_001\"\n```"
+        },
+        {
+          "id": "U11",
+          "text": "Una sola chiamata iniziale per scrivania; attualmente la coda contiene un solo incarico. Non eseguire lo stesso pacchetto anche in una seconda root per ottenere un nuovo primo tentativo. Non aprire queste cartelle in Cline."
+        },
+        {
+          "id": "U12",
+          "text": "Rilettura senza chiamate al modello:"
+        },
+        {
+          "id": "U13",
+          "text": "```powershell\npython strumenti/fame-local-worker/direct_qa_queue.py status --root \"$HOME\\FAME_DIRECT_QA_NETWORK_001\"\n```"
+        },
+        {
+          "id": "U14",
+          "text": "Dettaglio del primo incarico:"
+        },
+        {
+          "id": "U15",
+          "text": "```powershell\nGet-Content -Raw -Encoding UTF8 \"$HOME\\FAME_DIRECT_QA_NETWORK_001\\desks\\pfnmf-review-v1\\attempt-1\\report.json\"\n```"
+        },
+        {
+          "id": "U16",
+          "text": "I file comprendono preflight, request, response, candidate, validation, report e ricevuta hash. Se accettato vengono prodotti answer.json e review.md con le evidenze testuali per la revisione umana. Per errori di trasporto o preflight alcuni artefatti possono mancare: report.json ne registra la causa. La rubrica host-only non viene inviata al modello."
+        },
+        {
+          "id": "U17",
+          "text": "## Contratto operativo\n\n- Modello gpt-oss:20b, digest `17052f91a42e97930aa6e28a6c6c06a983e6a58dbb00434885a0cf5313e376f7` verificato prima della chiamata.\n- Parametri come il diagnostico diretto: num_ctx=32768, num_predict=2048, temperature=0, seed=42. Nessun override think: resta il default server, non dichiarato low. Preflight e richiesta conservati.\n- JSON Schema nel payload; il validator host verifica anche ordine, tipi, ID e copertura. Conformità JSON da sola non dimostra correttezza semantica.\n- Una sola attempt-1. Anche errore e interruzione restano registrati e non sono rieseguiti. Il rilancio della coda visita solo scrivanie mai tentate; si ferma al primo ERROR operativo per evitare time-out ripetuti. Lock impediscono esecuzioni concorrenti; rimuoverli dopo crash solo dopo arresto confermato.\n- Fonte, pacchetto, codice worker/trasporto e snapshot congelati. Modifiche durante il run impediscono accettazione. Status verifica hash degli artefatti e riproduce la validazione. Hash locali non sono firme indipendenti.\n- Il client usa loopback e blocca redirect/proxy; non certifica isolamento di rete dell'intero server Ollama.\n- `VALIDATED_FOR_REVIEW`: conclusioni e prove conformi ai criteri del pacchetto, con revisione umana ancora richiesta. `REJECTED`: output invalido/conclusione errata/prove insufficienti o non ancora revisionate. `ERROR`: problema operativo/integrità. `INTERRUPTED`: tentativo privo di ricevuta, non ripetibile automaticamente.\n- Citazioni di contesto già verificate innocue generano precisionWarnings. Le altre aggiunte sono unreviewedEvidenceIds e richiedono revisione; non vengono chiamate automaticamente false.\n- Nessun output autorizza training, batch131, produzione, modifica sorgenti o altre azioni. La coda coordina QA indipendenti, non pianifica cambi al progetto."
+        },
+        {
+          "id": "U18",
+          "text": "## Aggiungere scrivanie senza riscrivere il runner\n\nIl protocollo comune sta in direct_qa_worker.py; la coda deterministica in direct_qa_queue.py. Un nuovo incarico è un JSON in cases/direct-qa con taskId, commit/path/hash della fonte, snapshot completo in repo, scope, unità testuali, checks e rubriche. Il registro è limitato a task ID locali: nessun caricamento di plugin, percorso o codice scelto dal modello."
+        },
+        {
+          "id": "U19",
+          "text": "Prima dell'inferenza: revisionare la fonte, creare unità complete, definire verità attese, gruppi alternativi sufficienti e contesto benigno. Aggiungere test negativi e positivi specifici. Non usare il runner generico come validatore universale: ogni pacchetto richiede una rubrica giustificata."
+        },
+        {
+          "id": "U20",
+          "text": "La coda può contenere fino a 20 task distinti, eseguiti sequenzialmente sulla GPU. Non creare 20 copie dello stesso report per presentarle come prove indipendenti. Il vecchio qa_coordinator.py resta congelato con i suoi risultati; questo coordinatore riutilizza lo stesso principio di scrivanie e controlli, con un formato pacchetto generalizzato."
+        },
+        {
+          "id": "U21",
+          "text": "## Validazione e passaggio successivo\n\n18 test con client simulato passati: copertura/conclusioni, warning innocui, ID invalidi, assenza di oracle/tool nel prompt, digest errato, trasporto/troncamento, integrità prima/durante/dopo, ricevute, lock e mancata riesecuzione di tentativi completati/interrotti. Nessuna inferenza reale eseguita qui."
+        },
+        {
+          "id": "U22",
+          "text": "```powershell\npython -m unittest discover -s strumenti/fame-local-worker -p \"test_direct_qa_*.py\" -q\n```"
+        },
+        {
+          "id": "U23",
+          "text": "Registrare il primo run reale e ispezionare review.md. Misurare anche il tempo umano: elapsedSeconds del runner non dimostra risparmio netto. Solo dopo questo checkpoint aggiungere un secondo incarico utile e indipendente. Non riaprire Cline né ripetere casi consumati per ottenere PASS. Se cambia la rubrica dopo osservazione, la rivalutazione va riportata separatamente."
+        },
+        {
+          "id": "U24",
+          "text": "## Primo run reale registrato\n\n`FAME_DIRECT_QA_NETWORK_001 / pfnmf-review-v1 / attempt-1` ha restituito `VALIDATED_FOR_REVIEW` con una sola chiamata al modello e `executionAuthorized=false`. La review umana e risultata coerente con la rubrica congelata. Il task e consumato e non va ripetuto in una seconda root."
+        },
+        {
+          "id": "U25",
+          "text": "Risultato: [DIRECT_QA_PFNMF_RESULT_2026-09-23.md](DIRECT_QA_PFNMF_RESULT_2026-09-23.md)."
+        },
+        {
+          "id": "U26",
+          "text": "## Secondo incarico congelato — subset+BIC\n\nDopo il primo run reale PF-NMF, e stato aggiunto `subset-bic-review-v1` sul checkpoint storico NDR-098. E un task diverso: verifica il fallimento del gate subset+BIC, il pattern D06, la decisione di fermare il loop euristico/template, i vincoli del passaggio a Tsumugi e due controlli negativi su training e MT3."
+        },
+        {
+          "id": "U27",
+          "text": "La fonte e congelata al commit `1283c9678ece6b64ea6b030b75236bed24cddad6` e ricomposta integralmente da 15 unita semantiche. Il task non viene accodato alla root gia consumata `FAME_DIRECT_QA_NETWORK_001`."
+        },
+        {
+          "id": "U28",
+          "text": "Prima del run reale:"
+        },
+        {
+          "id": "U29",
+          "text": "```powershell\ngit pull --ff-only\npython -m unittest discover -s strumenti/fame-local-worker -p \"test_direct_qa_*.py\" -q\npython strumenti/fame-local-worker/direct_qa_queue.py init --root \"$HOME\\FAME_DIRECT_QA_NETWORK_002\" --tasks subset-bic-review-v1\n```"
+        },
+        {
+          "id": "U30",
+          "text": "Poi una sola esecuzione:"
+        },
+        {
+          "id": "U31",
+          "text": "```powershell\npython strumenti/fame-local-worker/direct_qa_queue.py run --root \"$HOME\\FAME_DIRECT_QA_NETWORK_002\"\n```"
+        },
+        {
+          "id": "U32",
+          "text": "Se il run termina `VALIDATED_FOR_REVIEW`, leggere `desks/subset-bic-review-v1/attempt-1/review.md`. Nessun retry dello stesso task in una root differente."
+        },
+        {
+          "id": "U33",
+          "text": "## Esito secondo incarico — reject di precisione del packaging\n\n`subset-bic-review-v1` e stato consumato con `REJECTED`, una sola chiamata. Le 5/5 conclusioni erano corrette e tutte le finding positive avevano coverage sufficiente. L'unico errore era `TSUMUGI_PREFLIGHT_SCOPE:UNREVIEWED_EVIDENCE` per `U13`, un heading Markdown privo di contenuto autonomo."
+        },
+        {
+          "id": "U34",
+          "text": "Il risultato non viene ricalcolato ne ritentato. Il difetto e stato classificato come authoring/packaging: i task futuri devono unire heading strutturali e blocco successivo nella stessa unita semantica. Vedi [DIRECT_QA_PACKAGE_AUTHORING.md](DIRECT_QA_PACKAGE_AUTHORING.md) e [DIRECT_QA_SUBSET_BIC_RESULT_2026-09-23.md](DIRECT_QA_SUBSET_BIC_RESULT_2026-09-23.md)."
+        },
+        {
+          "id": "U35",
+          "text": "## Terzo incarico congelato — Tsumugi controlled\n\nPreparato `tsumugi-controlled-review-v1` sul checkpoint NDR-099 con la regola di authoring corretta: nessun heading strutturale e una evidence unit autonoma. Le nove unita ricompongono integralmente la fonte e mantengono insieme heading + contenuto correlato."
+        },
+        {
+          "id": "U36",
+          "text": "Il task verifica cinque punti: gate FAIL senza generalizzare l'incapacita del modello, limite dell'ipotesi timbrica/OOD, limite inferenziale del top-k sulla pair confidence, scope della diagnostica sintetica successiva e controllo negativo sull'apertura real-easy/P6."
+        },
+        {
+          "id": "U37",
+          "text": "Run dedicato:"
+        },
+        {
+          "id": "U38",
+          "text": "```powershell\ngit pull --ff-only\npython -m unittest discover -s . -p \"test_direct_qa_*.py\" -q\npython direct_qa_queue.py init --root \"$HOME\\FAME_DIRECT_QA_NETWORK_003\" --tasks tsumugi-controlled-review-v1\npython direct_qa_queue.py run --root \"$HOME\\FAME_DIRECT_QA_NETWORK_003\"\n```"
+        },
+        {
+          "id": "U39",
+          "text": "Una sola inferenza. Non riusare le root 001/002 e non ritentare questo task in una root differente."
+        },
+        {
+          "id": "U40",
+          "text": "## Esito terzo incarico — errore semantico reale\n\n`tsumugi-controlled-review-v1` e stato consumato con `REJECTED`: 4/5 conclusioni corrette. `TOPK_PAIR_CONFIDENCE_LIMIT` aveva conclusione corretta ma evidence insufficiente; `SYNTHETIC_DIAGNOSTIC_SCOPE` aveva conclusione errata. Questo non e un falso reject di packaging."
+        },
+        {
+          "id": "U41",
+          "text": "Risultato: [DIRECT_QA_TSUMUGI_CONTROLLED_RESULT_2026-09-23.md](DIRECT_QA_TSUMUGI_CONTROLLED_RESULT_2026-09-23.md)."
+        },
+        {
+          "id": "U42",
+          "text": "## Worker v2 — primo tentativo misurato + una correzione controllata\n\nIl worker v1 e congelato per mantenere leggibili e riproducibili le root 001–003. Non modificarlo per aggiungere retry."
+        },
+        {
+          "id": "U43",
+          "text": "Il nuovo `direct_qa_worker_v2.py` conserva attempt-1 come misura autonoma. Se la risposta e semanticamente/citazionalmente rifiutata, effettua **al massimo una** seconda chiamata nello stesso run. Il feedback non contiene check ID, target booleani, rubriche o expected evidence; comunica solo categorie generiche come `SOME_CONCLUSION_INCORRECT` o `SOME_EVIDENCE_COVERAGE_INSUFFICIENT`."
+        },
+        {
+          "id": "U44",
+          "text": "Stati:\n- `VALIDATED_FOR_REVIEW`: corretto al primo tentativo;\n- `VALIDATED_FOR_REVIEW_AFTER_REPAIR`: corretto solo dopo seconda chiamata; non conta come first-attempt pass;\n- `REJECTED`: entrambe le risposte non superano il validatore;\n- `ERROR` / `ERROR_AFTER_REPAIR`: problema operativo, non corretto con retry semantico."
+        },
+        {
+          "id": "U45",
+          "text": "La coda v2 e `direct_qa_queue_v2.py`. Ogni desk resta non rieseguibile dopo il run. Errori di preflight o trasporto non attivano la correzione."
+        },
+        {
+          "id": "U46",
+          "text": "Test:"
+        },
+        {
+          "id": "U47",
+          "text": "```powershell\npython -m unittest discover -s . -p \"test_direct_qa_*v2.py\" -q\n```"
+        },
+        {
+          "id": "U48",
+          "text": "Il prossimo run reale v2 deve usare un **nuovo task**: non si usa v2 per riprocessare PF-NMF, subset+BIC o Tsumugi controlled gia consumati."
+        },
+        {
+          "id": "U49",
+          "text": "## Worker v3 — repair con fresh reconstruction\n\nV2 resta congelato per mantenere verificabili le root storiche V2_001–V2_004.\nIl caso reale `review-boundary-v2` ha mostrato un errore semantico identico in\nattempt-1 e attempt-2 nonostante il feedback generico\n`SOME_CONCLUSION_INCORRECT`."
+        },
+        {
+          "id": "U50",
+          "text": "V3 cambia una sola parte sostanziale del repair:"
+        },
+        {
+          "id": "U51",
+          "text": "- attempt-1 resta identico come misura autonoma;\n- massimo due chiamate;\n- stesso snapshot, stesso modello/digest e stessi parametri;\n- il feedback continua a contenere solo classi generiche del validator;\n- nessun check ID, target booleano, expected evidence o rubrica host;\n- attempt-2 **non riceve il candidate precedente** come messaggio assistant;\n- attempt-2 deve ricostruire l'intera risposta da zero e ricontrollare\n  negazioni, condizioni, quantificatori e inferenze non esplicite."
+        },
+        {
+          "id": "U52",
+          "text": "File:"
+        },
+        {
+          "id": "U53",
+          "text": "```text\ndirect_qa_worker_v3.py\ndirect_qa_queue_v3.py\n```"
+        },
+        {
+          "id": "U54",
+          "text": "Il nuovo comportamento non viene retroapplicato alle root v2."
+        },
+        {
+          "id": "U55",
+          "text": "### Diagnostica controllata\n\n`review-boundary-repair-v3` riusa lo stesso documento e la stessa semantica\ndella desk V2_004 con un nuovo task ID. Serve esclusivamente a osservare il\nrepair fresh-reconstruction su un caso noto. Non e una nuova evaluation\nindipendente e non misura generalizzazione."
+        },
+        {
+          "id": "U56",
+          "text": "Un eventuale PASS dopo repair dimostrerebbe soltanto che il nuovo protocollo ha\nrecuperato questo caso noto; un FAIL resterebbe un dato utile sul limite del\nrepair generico."
+        }
+      ],
+      "cases": [
+        {
+          "id": "W01",
+          "assertion": "Il validator host controlla anche ordine, tipi, ID e coverage; la sola conformità JSON non dimostra correttezza semantica.",
+          "expected": {
+            "verdict": "SUPPORTED",
+            "requiredGroups": [
+              [
+                "U17"
+              ]
+            ]
+          }
+        },
+        {
+          "id": "W02",
+          "assertion": "La coda può contenere fino a 20 task distinti ed eseguirli sequenzialmente sulla GPU; duplicare lo stesso report non crea prove indipendenti.",
+          "expected": {
+            "verdict": "SUPPORTED",
+            "requiredGroups": [
+              [
+                "U20"
+              ]
+            ]
+          }
+        },
+        {
+          "id": "W03",
+          "assertion": "Un output VALIDATED_FOR_REVIEW autorizza training o produzione senza ulteriore revisione.",
+          "expected": {
+            "verdict": "CONTRADICTED",
+            "requiredGroups": [
+              [
+                "U17"
+              ]
+            ]
+          }
+        },
+        {
+          "id": "W04",
+          "assertion": "Nel worker v3 il secondo tentativo riceve il candidate precedente come messaggio assistant.",
+          "expected": {
+            "verdict": "CONTRADICTED",
+            "requiredGroups": [
+              [
+                "U51"
+              ]
+            ]
+          }
+        },
+        {
+          "id": "W05",
+          "assertion": "Il worker richiede specificamente CUDA 12.8 per essere eseguito.",
+          "expected": {
+            "verdict": "UNKNOWN",
+            "requiredGroups": []
+          }
+        }
+      ]
+    }
+  ]
+}
