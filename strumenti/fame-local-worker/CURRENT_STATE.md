@@ -1,3 +1,201 @@
+# Checkpoint corrente — selezione del modello base
+
+24 settembre 2026.
+
+## Stop multi-agent confermato
+
+Il confronto reale simmetrico `FAME_REAL_CLAIM_COMPARISON_001` ha prodotto:
+
+```text
+baseline batch = 6/6
+selector+judge = 3/6
+baselineModelSeconds = 10.281
+stagedModelSeconds = 37.437
+comparison = STAGED_WORSE
+```
+
+Failure staged:
+
+```text
+R01 = selector Incomplete response
+R04 = selector Incomplete response
+R05 = semantic error: CONTRADICTED invece di UNKNOWN
+```
+
+Risultato storico:
+
+```text
+strumenti/fame-local-worker/REAL_CLAIM_COMPARISON_RESULT_2026-09-24.md
+1337e462d941d5bea81e0b61d9bfe9ebb704586f
+```
+
+La linea selector+judge resta congelata. Non aggiungere agenti o repair prima di
+aver scelto un worker di base migliore o confermato che il modello attuale resta
+la scelta migliore.
+
+## Decisione modello challenger
+
+Non ripetere Qwen.
+
+Challenger scelto:
+
+```text
+mistral-small3.2:24b
+```
+
+Baseline:
+
+```text
+gpt-oss:20b
+```
+
+Il confronto non usa la rete multi-agent: misura direttamente il worker base.
+
+## Benchmark congelato
+
+Tre documenti reali:
+
+```text
+DIRECT_QA_PACKAGE_AUTHORING.md
+RECOVERY.md
+DIRECT_QA_WORKER.md
+```
+
+Snapshot commit:
+
+```text
+449b619fbec2390f82f2d2397ebabec4d6c0e244
+2b6b341af7f05d62b7a0bd67f61fcc7ec9bcef50
+567d8e5952eb73ad5cae31c81f9c8180834f793f
+```
+
+Suite:
+
+```text
+base_worker_model_benchmark_cases.json
+15 claim totali
+5 claim per documento
+2 SUPPORTED + 2 CONTRADICTED + 1 UNKNOWN per documento
+```
+
+Commit suite iniziale e correzione evidence RECOVERY:
+
+```text
+00ee6ef7039f08fe19390a4630c5594157ccb212
+498a40495c41054062cbe6b7fc39b732f7a8d8dd
+```
+
+Required evidence RECOVERY verificata prima del run:
+
+```text
+R01 -> U19
+R02 -> U15
+R03 -> U14
+R04 -> U20
+R05 -> UNKNOWN / []
+```
+
+Runner:
+
+```text
+base_worker_model_benchmark.py
+96ad2b0c51172146ab641ca9b14fb985fdded2ce
+```
+
+Test:
+
+```text
+test_base_worker_model_benchmark.py
+5ab6a64dacd1b5a0c44196229f34b7fec81b8362
+```
+
+Documentazione:
+
+```text
+BASE_WORKER_MODEL_BENCHMARK.md
+fd54aef2bd9a7bb3030861be2f7365b953e29893
+```
+
+## Contratto del benchmark
+
+Configurazione identica:
+
+```text
+num_ctx = 8192
+num_predict = 1024
+temperature = 0
+seed = 42
+```
+
+Per ogni modello:
+
+```text
+3 documenti
+1 chiamata batch per documento
+15 claim
+3 model calls
+```
+
+Totale massimo:
+
+```text
+6 model calls
+0 retry
+```
+
+`init` congela i digest reali installati senza fare inference.
+`run` rifiuta modello/codice/suite/snapshot modificati dopo init.
+
+Metrica primaria:
+
+```text
+accepted claims / 15
+```
+
+Il tempo non spezza i pareggi.
+
+## Prossimo intervento
+
+Aggiornare il branch e verificare il benchmark:
+
+```powershell
+git pull --ff-only origin recovery/fame-local-worker-v2-cdea2227
+python -m unittest test_base_worker_model_benchmark -q
+```
+
+Sono attesi **13 test**.
+
+Installare il challenger:
+
+```powershell
+ollama pull mistral-small3.2:24b
+```
+
+Poi inizializzare senza inference:
+
+```powershell
+python base_worker_model_benchmark.py init --root "$HOME\FAME_BASE_WORKER_MODEL_001"
+python base_worker_model_benchmark.py status --root "$HOME\FAME_BASE_WORKER_MODEL_001"
+```
+
+Dopo verifica di entrambi i digest, eseguire una sola volta:
+
+```powershell
+python base_worker_model_benchmark.py run --root "$HOME\FAME_BASE_WORKER_MODEL_001"
+```
+
+Possibili risultati:
+
+```text
+MISTRAL_BETTER
+GPT_OSS_BETTER
+TIE_ON_ACCEPTED
+```
+
+Nessun ritorno al multi-agent prima di questa decisione.
+
+---
+
 # Checkpoint corrente — stop espansione multi-agent staged
 
 24 settembre 2026.
