@@ -794,25 +794,32 @@ I nuovi test specifici sono 13 e coprono:
 - payload senza rubrica;
 - init queue a due desk senza model call.
 
-## Prossimo intervento
+## Verifica locale e init V2_004
 
-Verificare localmente V2_004:
+Esecuzione operatore:
 
-```powershell
-git pull --ff-only origin recovery/fame-local-worker-v2-cdea2227
-python -m unittest discover -s . -p "test_direct_qa_*v2.py" -q
+```text
+Ran 52 tests in 0.927s
+OK
 ```
 
-Con i 13 nuovi test il totale atteso passa da 39 a **52 test**.
+Quindi l'intera suite v2, inclusi i package e i test del checkpoint V2_004,
+risulta PASS sul PC locale.
 
-Solo dopo PASS inizializzare, senza inferenza:
+Root:
 
-```powershell
-python direct_qa_queue_v2.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_004" --tasks transfer-protocol-v2 review-boundary-v2
-python direct_qa_queue_v2.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_004"
+```text
+$HOME\FAME_DIRECT_QA_NETWORK_V2_004
 ```
 
-Stato atteso:
+Desk:
+
+```text
+transfer-protocol-v2
+review-boundary-v2
+```
+
+Status verificato dopo `init`:
 
 ```text
 transfer-protocol-v2 = NOT_RUN, modelCalls=0
@@ -821,7 +828,23 @@ queue status         = PENDING
 executionAuthorized  = false
 ```
 
-Non eseguire `run` prima del PASS locale e della verifica dello status.
+L'inizializzazione non ha effettuato chiamate al modello.
+
+## Prossimo intervento
+
+Eseguire una sola volta la queue reale:
+
+```powershell
+python direct_qa_queue_v2.py run --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_004"
+```
+
+Poi rileggere lo stato senza nuove chiamate:
+
+```powershell
+python direct_qa_queue_v2.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_004"
+```
+
+Non rilanciare `run` dopo che entrambe le desk sono state consumate.
 
 ## Vincolo di continuita
 
