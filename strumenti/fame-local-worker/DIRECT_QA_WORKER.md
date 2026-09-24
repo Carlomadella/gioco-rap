@@ -152,3 +152,41 @@ python -m unittest discover -s . -p "test_direct_qa_*v2.py" -q
 ```
 
 Il prossimo run reale v2 deve usare un **nuovo task**: non si usa v2 per riprocessare PF-NMF, subset+BIC o Tsumugi controlled gia consumati.
+
+## Worker v3 — repair con fresh reconstruction
+
+V2 resta congelato per mantenere verificabili le root storiche V2_001–V2_004.
+Il caso reale `review-boundary-v2` ha mostrato un errore semantico identico in
+attempt-1 e attempt-2 nonostante il feedback generico
+`SOME_CONCLUSION_INCORRECT`.
+
+V3 cambia una sola parte sostanziale del repair:
+
+- attempt-1 resta identico come misura autonoma;
+- massimo due chiamate;
+- stesso snapshot, stesso modello/digest e stessi parametri;
+- il feedback continua a contenere solo classi generiche del validator;
+- nessun check ID, target booleano, expected evidence o rubrica host;
+- attempt-2 **non riceve il candidate precedente** come messaggio assistant;
+- attempt-2 deve ricostruire l'intera risposta da zero e ricontrollare
+  negazioni, condizioni, quantificatori e inferenze non esplicite.
+
+File:
+
+```text
+direct_qa_worker_v3.py
+direct_qa_queue_v3.py
+```
+
+Il nuovo comportamento non viene retroapplicato alle root v2.
+
+### Diagnostica controllata
+
+`review-boundary-repair-v3` riusa lo stesso documento e la stessa semantica
+della desk V2_004 con un nuovo task ID. Serve esclusivamente a osservare il
+repair fresh-reconstruction su un caso noto. Non e una nuova evaluation
+indipendente e non misura generalizzazione.
+
+Un eventuale PASS dopo repair dimostrerebbe soltanto che il nuovo protocollo ha
+recuperato questo caso noto; un FAIL resterebbe un dato utile sul limite del
+repair generico.
