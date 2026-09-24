@@ -1,0 +1,25 @@
+{
+  "scope": "Synthetic development comparison authored before first local call; not independent evaluation or production qualification",
+  "documents": {
+    "export": [
+      {"id":"EX1","text":"Il pacchetto viene esportato solo se checksum e firma sono entrambi validi. Se uno dei due controlli fallisce, il pacchetto resta in quarantena."},
+      {"id":"EX2","text":"L'esito della verifica viene conservato nel registro locale."}
+    ],
+    "sensor": [
+      {"id":"SE1","text":"Una misura è pubblicabile se la calibrazione è valida e non ci sono allarmi. Un allarme blocca la pubblicazione anche con calibrazione valida."},
+      {"id":"SE2","text":"Il registro conserva valore misurato, data e identificativo del sensore."}
+    ],
+    "backup": [
+      {"id":"BA1","text":"Una copia è dichiarata recuperabile soltanto dopo un ripristino di prova riuscito. Il solo completamento della copia non basta."},
+      {"id":"BA2","text":"Una copia con ripristino di prova riuscito viene marcata recuperabile nel catalogo."}
+    ]
+  },
+  "cases": [
+    {"id":"C01","document":"export","assertion":"Se la firma fallisce, un checksum valido basta comunque per esportare il pacchetto.","expected":{"verdict":"CONTRADICTED","requiredGroups":[["EX1"]]}},
+    {"id":"C02","document":"sensor","assertion":"La pubblicazione viene bloccata da un allarme anche se la calibrazione è valida.","expected":{"verdict":"SUPPORTED","requiredGroups":[["SE1"]]}},
+    {"id":"C03","document":"backup","assertion":"Il ripristino di prova deve terminare entro dieci minuti.","expected":{"verdict":"UNKNOWN","requiredGroups":[]}},
+    {"id":"C04","document":"export","assertion":"Il registro locale viene cancellato automaticamente dopo trenta giorni.","expected":{"verdict":"UNKNOWN","requiredGroups":[]}},
+    {"id":"C05","document":"backup","assertion":"Una copia con ripristino di prova riuscito viene marcata recuperabile.","expected":{"verdict":"SUPPORTED","requiredGroups":[["BA2"]]}},
+    {"id":"C06","document":"sensor","assertion":"Un allarme non impedisce la pubblicazione quando la calibrazione è valida.","expected":{"verdict":"CONTRADICTED","requiredGroups":[["SE1"]]}}
+  ]
+}

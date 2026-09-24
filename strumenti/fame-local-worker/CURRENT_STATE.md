@@ -1,3 +1,21 @@
+# Checkpoint corrente — confronto worker per singola affermazione
+
+24 settembre 2026. Programma pronto: [CLAIM_NETWORK.md](CLAIM_NETWORK.md). Nuovo confronto diagnostico sintetico: baseline batch boolean vs selector + judge ternario, una claim per chiamata, 6 casi, massimo 13 chiamate, nessun retry. 9 test simulati PASS; inferenza reale NON eseguita qui. Nessuna promozione della rete.
+
+Il run V3_001 mostrato dall'operatore resta REJECTED: entrambe le risposte citano la frase contraria a V6_DROPS_EXTRA_WHEN_COVERAGE_MISSING ma la dichiarano supportata. Il secondo tentativo subisce anche il falso rifiuto di U07: il testo sostiene già la policy host-owned, benché la rubrica richieda U03. Fonte: output completo fornito dall'operatore; non verifica indipendente del suo disco. Artefatti e rubriche storici preservati.
+
+Prossimo comando, da questa cartella con Ollama avviato:
+
+```powershell
+python claim_network.py --root "$HOME\FAME_CLAIM_NETWORK_001"
+```
+
+Il checkpoint corrente prevale sui vecchi “prossimo intervento” sotto. Non rieseguire V3_001. Il confronto nuovo cambia insieme decomposizione e formato; non isola una causa né dimostra generalizzazione. Nessun lavoro Audio→MIDI è autorizzato da questo checkpoint.
+
+---
+
+## Storico precedente conservato
+
 # FAME Local Worker — CURRENT STATE
 
 Data di ripartenza: 2026-09-23.
