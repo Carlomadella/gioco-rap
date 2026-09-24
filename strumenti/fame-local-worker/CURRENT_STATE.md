@@ -862,30 +862,168 @@ la seconda chiamata controllata ed e rimasta rejected.
 
 La root e consumata e non va rilanciata.
 
+## Diagnosi V2_004 completata
+
+`transfer-protocol-v2` resta `VALIDATED_FOR_REVIEW` al primo tentativo.
+
+`review-boundary-v2` resta storicamente `REJECTED` dopo due chiamate.
+
+Attempt-1 e attempt-2 hanno mantenuto lo stesso unico errore semantico:
+
+```text
+V6_DROPS_EXTRA_WHEN_COVERAGE_MISSING = true
+```
+
+La fonte congelata dice invece che il salvage v6 dell'evidence extra avviene
+solo quando la coverage richiesta e gia completa. Se manca coverage, l'evidence
+irrilevante resta un errore insieme a `INSUFFICIENT_EVIDENCE`.
+
+Gli altri sei check erano corretti; le finding positive avevano coverage
+sufficiente; non risultano unreviewed evidence. U07 su
+`HOST_OWNS_ACTION_POLICY` e un benign precision warning.
+
+Feedback attempt-2:
+
+```text
+SOME_CONCLUSION_INCORRECT
+oracleTargetsSent = false
+checkIdsSentInFeedback = false
+```
+
+Il repair v2 non ha modificato il booleano errato.
+
+Classificazione:
+
+```text
+GENUINE_SEMANTIC_REJECT_REPAIR_UNCHANGED
+```
+
+Non e un difetto di package/rubrica e V2_004 non va rilanciata.
+
+Risultato storico:
+
+```text
+strumenti/fame-local-worker/DIRECT_QA_TRANSFER_REVIEW_V2_RESULT_2026-09-24.md
+adefde7e6863e443c033482eeea4af0ac09b8447
+```
+
+## Worker v3 preparato
+
+V2 resta congelato. E stato creato un nuovo protocollo v3 che modifica solo il
+repair semantico:
+
+```text
+fae52ac9647a201264755cd9ebccb773f35b94de
+feat(fame-local-worker): add fresh reconstruction QA worker v3
+
+6d4375e6292853760f73fbf19b0e3932b35b3560
+feat(fame-local-worker): add direct QA queue v3
+```
+
+Differenza centrale:
+
+- attempt-1 resta la misura autonoma;
+- massimo due model call;
+- nessun tool/rubrica/check ID/target/expected evidence;
+- attempt-2 riceve snapshot originale + sole classi generiche del validator;
+- il candidate precedente **non viene replayato**;
+- il modello deve ricostruire da zero tutte le conclusioni e ricontrollare
+  negazioni, condizioni, quantificatori e inferenze.
+
+Artefatto `repair-feedback.json` registra:
+
+```text
+previousCandidateReplayed = false
+freshReconstruction = true
+```
+
+## Diagnostica v3 preparata
+
+Nuovo task ID:
+
+```text
+review-boundary-repair-v3
+```
+
+Usa lo stesso documento noto e la stessa semantica/rubrica del caso V2_004 con
+un nuovo task ID, esclusivamente per osservare il nuovo repair. Non e una nuova
+evaluation indipendente e non prova generalizzazione.
+
+Commit:
+
+```text
+f6cb45db6300b02e2e325248440e5c2fdd332a90
+test(fame-local-worker): freeze v3 repair diagnostic source
+
+b66e99b81615c11427a14191927d3985aea778b4
+feat(fame-local-worker): add v3 repair diagnostic task
+```
+
+Test v3 aggiunti:
+
+```text
+34c4326e0ecacd4872d448e6928d277226eee54b
+test(fame-local-worker): cover fresh reconstruction worker v3
+
+6abad093687e787e26b48aeeec28f233fb1caa34
+test(fame-local-worker): cover direct QA queue v3
+
+7c0184f5b4990c68aa38cf027bbcfca0ee26eb0d
+test(fame-local-worker): validate v3 repair diagnostic package
+```
+
+Coprono:
+
+- first-pass immutato;
+- repair accepted/rejected;
+- nessun replay del candidate precedente;
+- assenza di messaggi assistant in attempt-2;
+- feedback generico senza oracle/check ID/rubrica;
+- fresh reasoning su negazioni/condizioni/quantificatori;
+- preflight/transport senza repair;
+- non-rerunnability;
+- status riproducibile;
+- queue error precedence;
+- package diagnostico e known semantic error.
+
+Documentazione v3:
+
+```text
+3c7f7fb75386cbd899c8adcec607a4151a48a505
+docs(fame-local-worker): document fresh reconstruction worker v3
+```
+
 ## Prossimo intervento
 
-Ispezionare senza nuove chiamate gli artefatti della desk fallita:
+Verificare localmente v2 + v3 insieme:
 
 ```powershell
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_004\desks\review-boundary-v2\attempt-1\candidate.json"
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_004\desks\review-boundary-v2\attempt-1\validation.json"
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_004\desks\review-boundary-v2\attempt-2\candidate.json"
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_004\desks\review-boundary-v2\attempt-2\repair-feedback.json"
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_004\desks\review-boundary-v2\attempt-2\validation.json"
+git pull --ff-only origin recovery/fame-local-worker-v2-cdea2227
+python -m unittest discover -s . -p "test_direct_qa_*v*.py" -q
 ```
 
-Per chiudere anche la desk passata:
+I test v2 verificati erano 52. I nuovi test v3 sono 18, quindi il totale atteso
+e **70 test**.
+
+Solo dopo PASS inizializzare la diagnostica, senza inferenza:
 
 ```powershell
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_004\desks\transfer-protocol-v2\attempt-1\review.md"
-Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_V2_004\desks\transfer-protocol-v2\attempt-1\validation.json"
+python direct_qa_queue_v3.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_V3_001" --tasks review-boundary-repair-v3
+python direct_qa_queue_v3.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_V3_001"
 ```
 
-Non modificare package/rubriche e non rilanciare `run` su V2_004 prima della
-classificazione del reject.
+Stato atteso:
+
+```text
+review-boundary-repair-v3 = NOT_RUN, modelCalls=0
+queue status              = PENDING
+executionAuthorized       = false
+```
+
+Non eseguire `run` prima del PASS locale e della verifica dello status.
 
 ## Vincolo di continuita
 
 Se una futura sessione deve riprendere questa rete, leggere prima questo file e
 il commit/branch indicati sopra. In caso di conflitto con descrizioni di altri
-filoni, questa branch e la fonte di verita per il lavoro FAME Local Worker v2.
+filoni, questa branch e la fonte di verita per il lavoro FAME Local Worker.
