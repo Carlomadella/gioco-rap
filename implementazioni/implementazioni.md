@@ -493,7 +493,10 @@ telefono (390 × 844) è stato fatto nel browser, chiudendo «Il telefono quando
 è un telefono»; il telefono vero, in mano, ancora no. Il 20/09 il giro su tutte le
 schermate a sedici misure, dal 360 al 1920 × 1080: nessuna scorre di lato, e la plancia
 è a posto anche a 1280 × 800 e 1366 × 768 («La fascia della plancia fra 980 e 1240, e la
-plancia a 1280 × 800» in `02-interfaccia-e-telefono.md`).
+plancia a 1280 × 800» in `02-interfaccia-e-telefono.md`). Il 26/09 un nuovo giro emulato
+a 390 × 844 e 360 × 640 ha trovato e chiuso la collisione `.stx` delle Impostazioni e
+quattro bersagli sotto i 44 punti; le regressioni sono in
+`frontend/test/e2e/mobile-touch.spec.js`. Resta comunque la prova sul dispositivo fisico.
 
 #### Nuove modalità
 

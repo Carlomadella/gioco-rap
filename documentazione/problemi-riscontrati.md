@@ -5508,3 +5508,79 @@ così com'è; è da decidere se la Cabina debba dire come si annulla.
 - **RISOLTO (21/09/2026)** — la nota in Cabina dice «il titolo proposto è «X pt. 2» (lo puoi
   cambiare, resta legato alla prima)» e ha il tasto «lascia la parte 2», lo stesso
   `data-disco-lascia` della Discografia.
+
+## Giro sul telefono del 26/09/2026 (Playwright, coda di «Responsività»)
+
+Giro in browser mobile a **390 × 844** e **360 × 640**, con puntatore touch e
+`prefers-reduced-motion`. Guardate 11 schermate per misura: landing, scelta dell'avvio,
+plancia (anche dopo lo scorrimento orizzontale della mappa), Shop, Sala, Cabina dello
+Studio, home del telefono, Discografia, Agenda, Attività criminali e Impostazioni. Il
+documento non scorre di lato in nessuna delle due misure; la mappa larga 900 punti si
+scorre dentro al proprio riquadro e porta regolarmente ai luoghi sulla destra. Nessun
+errore JavaScript durante il giro: l'unico rosso di console è la richiesta al backend
+pubblico negata dalla rete della sandbox, e il gioco continua offline come previsto.
+
+Questo è un giro **emulato**, non quello conclusivo su un dispositivo fisico: in questa
+sessione l'estensione non esponeva alcun browser e non c'era un telefono collegato. Per
+questo non chiude ancora «Il giro su un telefono vero» e non è stato eseguito
+`promemoria-telefono.js --fatto`.
+
+### Nelle Impostazioni il testo di ogni riga viene chiuso in una scatola 44 × 44 e si sovrappone
+
+- **dove** — `frontend/css/tocco.css:83` assegna globalmente `width:44px;height:44px` a
+  `.stx`, pensando al tasto della Strada. Ma `.stx` è anche il contenitore di titolo e
+  descrizione delle righe delle Impostazioni (`frontend/css/impostazioni.css:62-64`). Sotto
+  i 620 punti la riga diventa una colonna (`frontend/css/stretto.css:746-750`), ma la
+  scatola del testo resta larga e alta 44.
+- **cosa succede** — «Audio del gioco», «Volume generale», «Musica», «Effetti» e «Beat»
+  vanno a capo quasi lettera per lettera, escono dai loro 44 punti e si scrivono sopra
+  alle righe successive e agli slider. Il pannello non si riesce a leggere né a usare
+  con sicurezza.
+- **come si vede** — dalla plancia apri **Impostazioni → Audio** a 390 × 844 o 360 × 640.
+- **quanto pesa** — blocca una schermata.
+- **RISOLTO (26/09/2026)** — la regola quadrata di `tocco.css` ora è limitata a
+  `#strada .stx`: le `.stx` delle Impostazioni tornano a occupare la larghezza della riga
+  e titolo, descrizione, interruttori e slider non si sovrappongono più. La regressione è
+  coperta a 360 × 640 da `frontend/test/e2e/mobile-touch.spec.js`.
+
+![Impostazioni a 390 × 844: testi sovrapposti](prove-telefono/2026-09-26/11-impostazioni-390x844.png)
+
+![Impostazioni a 360 × 640: testi sovrapposti](prove-telefono/2026-09-26/11-impostazioni-360x640.png)
+
+![Impostazioni corrette a 390 × 844](prove-telefono/2026-09-26/11-impostazioni-risolto-390x844.png)
+
+![Impostazioni corrette a 360 × 640](prove-telefono/2026-09-26/11-impostazioni-risolto-360x640.png)
+
+### Quattro comandi da toccare restano sotto i 44 punti dichiarati dal foglio del tocco
+
+- **dove** — il bottone Account della landing misura **32 px** in altezza
+  (`frontend/css/shell.css:122-126`, ristretto ancora in `stretto.css:67`); «Importa
+  partita» misura **33 px** (`frontend/css/avvio.css:53-55`); i filtri dello Shop misurano
+  **35 px** (`frontend/css/game.css:275-280`); il quadratino per segnare un evento in
+  Agenda misura **26 × 26 px** (`frontend/css/hub.css:1050-1065`). Nessuno dei quattro è
+  allargato da `frontend/css/tocco.css`.
+- **cosa succede** — sono tutti comandi reali, non decorazioni, ma chiedono un tocco più
+  preciso degli altri controlli. Il quadratino dell'Agenda è il peggiore: sta nell'angolo
+  di una card che fa un'altra azione, quindi mancarlo può aprire l'evento invece di
+  segnarlo.
+- **come si vede** — a 390 × 844 o 360 × 640: Account è in alto nella landing, «Importa
+  partita» in fondo alla scelta dell'avvio, i filtri subito sotto la testata dello Shop,
+  il quadratino nell'angolo delle card «Eventi e attività di oggi».
+- **quanto pesa** — si vede ma si gira intorno; l'Agenda è la parte più facile da sbagliare.
+- **RISOLTO (26/09/2026)** — Account, «Importa partita» e i filtri dello Shop hanno
+  `min-height:44px`; il quadratino dell'Agenda resta visivamente 26 × 26 ma riceve una
+  presa trasparente centrata di 44 × 44, senza spostare il contenuto della card. La prova
+  Playwright `frontend/test/e2e/mobile-touch.spec.js` misura tutti e quattro i bersagli a
+  360 × 640.
+
+![Scelta dell'avvio a 360 × 640: Importa partita](prove-telefono/2026-09-26/02-menu-avvio-360x640.png)
+
+![Shop a 390 × 844: filtri alti 35 punti](prove-telefono/2026-09-26/04-shop-390x844.png)
+
+![Plancia a 390 × 844: quadratini Agenda da 26 punti](prove-telefono/2026-09-26/03-plancia-390x844.png)
+
+![Landing corretta a 360 × 640: Account da 44 punti](prove-telefono/2026-09-26/01-landing-risolto-360x640.png)
+
+![Scelta dell'avvio corretta a 360 × 640: Importa partita da 44 punti](prove-telefono/2026-09-26/02-menu-avvio-risolto-360x640.png)
+
+![Shop corretto a 390 × 844: filtri da almeno 44 punti](prove-telefono/2026-09-26/04-shop-risolto-390x844.png)
