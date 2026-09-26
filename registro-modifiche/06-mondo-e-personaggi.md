@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:241bcda -->
+## 26/09/26, 16:50 â€” task/giro-telefono-25-09-2026 â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `241bcda`
+
+### Cosa Ã¨ entrato
+
+- `74ebb70` â€” Responsività: sistema Impostazioni e bersagli touch sotto i 44 punti â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/10-strada-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/10-strada-390x844.png`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:5b1b476 -->
 ## 21/09/26, 18:31 â€” task/studio-le-tre-code â†’ main
 

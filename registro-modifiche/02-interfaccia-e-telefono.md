@@ -6,6 +6,62 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:241bcda -->
+## 26/09/26, 16:50 â€” task/giro-telefono-25-09-2026 â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `241bcda`
+
+### Cosa Ã¨ entrato
+
+- `74ebb70` â€” Responsività: sistema Impostazioni e bersagli touch sotto i 44 punti â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/01-landing-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/01-landing-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/01-landing-risolto-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/01-landing-risolto-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/02-menu-avvio-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/02-menu-avvio-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/02-menu-avvio-risolto-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/02-menu-avvio-risolto-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/03-plancia-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/03-plancia-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/03-plancia-risolto-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/03-plancia-risolto-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/03b-plancia-destra-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/03b-plancia-destra-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/04-shop-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/04-shop-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/04-shop-risolto-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/04-shop-risolto-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/05-sala-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/05-sala-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/06-studio-cabina-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/06-studio-cabina-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/07-telefono-home-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/07-telefono-home-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/08-telefono-discografia-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/08-telefono-discografia-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/09-telefono-agenda-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/09-telefono-agenda-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/10-strada-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/10-strada-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/11-impostazioni-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/11-impostazioni-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/11-impostazioni-risolto-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-26/11-impostazioni-risolto-390x844.png`
+- **Modificato:** `frontend/css/tocco.css`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+- **Aggiunto:** `frontend/test/e2e/mobile-touch.spec.js`
+
+**File interessati in questa categoria:** 39
+
+---
+
 <!-- merge:d471010 -->
 ## 21/09/26, 19:36 â€” task/discografia-app-telefono â†’ main
 

@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:241bcda -->
+## 26/09/26, 16:50 â€” task/giro-telefono-25-09-2026 â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `241bcda`
+
+### Cosa Ã¨ entrato
+
+- `74ebb70` â€” Responsività: sistema Impostazioni e bersagli touch sotto i 44 punti â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/test/e2e/mobile-touch.spec.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:d471010 -->
 ## 21/09/26, 19:36 â€” task/discografia-app-telefono â†’ main
 
