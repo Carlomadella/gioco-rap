@@ -41,6 +41,10 @@
   .brand{padding-left:4px;padding-right:9px}   /* 43 -> 45 */
   .avatarbtn{width:44px;height:44px}
   .brand-mute{width:44px;height:44px}   /* 36 -> 44, punto 15 */
+  .navacc{min-height:44px}
+
+  /* ---- la scelta dell'avvio ---- */
+  .avv-importa{min-height:44px}
 
   /* ---- la plancia: il logo e le linguette ---- */
   .plogo{min-height:44px}
@@ -53,7 +57,12 @@
      foto sono comunque tutti più larghi e più alti di 44 px. */
 
   /* ---- il negozio dei vestiti ---- */
-  .ngbtn{min-height:44px}
+  .ngbtn,.shtab{min-height:44px}
+
+  /* Il quadratino resta piccolo dentro alla card, ma la sua presa arriva alla
+     misura del dito senza spostare titolo, ora o contenuto dell'evento. */
+  .pevseg::after{content:"";position:absolute;left:50%;top:50%;
+    transform:translate(-50%,-50%);width:44px;height:44px}
 
   /* ---- le impostazioni ---- */
   .stab,.sbtn,.seg button{min-height:44px}
@@ -80,7 +89,9 @@
   .wline .rm{position:relative}
 
   /* ---- la Strada (il colpo, punto 21) ---- */
-  .stx{width:44px;height:44px}
+  /* `.stx` esiste anche nelle Impostazioni: senza il padrone qui sotto i
+     testi del pannello venivano chiusi in 44×44 e si sovrapponevano. */
+  #strada .stx{width:44px;height:44px}
   .stbtn,.stmini,.stmolla{min-height:44px}
 
   /* ---- il creatore e i moduli ---- */
