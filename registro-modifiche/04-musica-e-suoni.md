@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:04fda6c -->
+## 27/09/26, 16:19 â€” task/foglio-a-capo-sul-telefono â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `04fda6c`
+
+### Cosa Ã¨ entrato
+
+- `fa298cc` â€” Sul telefono le barre del Foglio vanno a capo â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/writer.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:13c9519 -->
 ## 27/09/26, 16:18 â€” task/due-piccole-testo-traguardo â†’ main
 

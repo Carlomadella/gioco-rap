@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:04fda6c -->
+## 27/09/26, 16:19 â€” task/foglio-a-capo-sul-telefono â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `04fda6c`
+
+### Cosa Ã¨ entrato
+
+- `fa298cc` â€” Sul telefono le barre del Foglio vanno a capo â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/overlays.css`
+- **Modificato:** `frontend/css/tocco.css`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:1effdfc -->
 ## 27/09/26, 13:57 â€” feat/responsive-travel-modal â†’ main
 

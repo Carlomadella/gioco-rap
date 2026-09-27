@@ -6,6 +6,27 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:04fda6c -->
+## 27/09/26, 16:19 â€” task/foglio-a-capo-sul-telefono â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `04fda6c`
+
+### Cosa Ã¨ entrato
+
+- `fa298cc` â€” Sul telefono le barre del Foglio vanno a capo â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/overlays.css`
+- **Modificato:** `frontend/css/tocco.css`
+- **Modificato:** `frontend/js/game/writer.js`
+- **Aggiunto:** `frontend/test/e2e/foglio-a-capo.spec.js`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:26f1182 -->
 ## 27/09/26, 16:18 â€” task/titolo-dopo-il-viaggio â†’ main
 
