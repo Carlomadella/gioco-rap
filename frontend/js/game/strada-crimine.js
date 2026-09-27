@@ -721,7 +721,12 @@ function stradaSettimana(){
     const persi = Math.round(G.fans * rnd(.06, .13));
     if(persi > 0){ G.fans = Math.max(0, G.fans - persi); pushLog(fmt(persi) + " fan spariti mentre eri dentro.", "bad"); }
     G.hype = clamp(G.hype * .72, 0, (typeof hypeCap==="function"?hypeCap():100));
-    G.money -= Math.round(weeklyCosts() * .6);
+    /* dentro si paga di più: l'avvocato, i pacchi, le telefonate, sopra alle
+       spese di fuori che advanceWeek() ha già tolto. Prima non lo diceva
+       nessuno e il resoconto ne mostrava una sola (giro del 27/09, voce 61) */
+    const dentro = Math.round(weeklyCosts() * .6);
+    G.money -= dentro;
+    pushLog("Da dentro costa: <b>−" + fmt(dentro) + " €</b> fra avvocato, pacchi e telefonate, oltre alle spese di fuori.", "bad");
     if(G.contract && Math.random() < .20){
       pushLog("<b>L'etichetta ha rescisso.</b> I giornali ci sono andati pesante.", "bad");
       G.contract = null;
