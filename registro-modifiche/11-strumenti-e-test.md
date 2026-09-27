@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:13c9519 -->
+## 27/09/26, 16:18 â€” task/due-piccole-testo-traguardo â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `13c9519`
+
+### Cosa Ã¨ entrato
+
+- `9cf22cf` â€” «Ancora 1 settimana così», e «Vivi di musica» vuole che non lavori â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/content.js`
+- **Modificato:** `frontend/js/game/sim.js`
+- **Aggiunto:** `frontend/test/e2e/due-piccole.spec.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:3b85be1 -->
 ## 27/09/26, 16:18 â€” task/diario-senza-giorno-saltato â†’ main
 
