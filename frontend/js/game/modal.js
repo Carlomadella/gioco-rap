@@ -39,12 +39,23 @@ function showEvent(e){
   $("m-k").textContent = e.k;
   $("m-t").textContent = e.t;
   $("m-d").innerHTML = e.d;
+  const travel = e.travel || null;
+  $("modal").classList.toggle("travel-confirm", !!travel);
+  $("m-travel").hidden = !travel;
+  $("m-d").hidden = !!travel;
+  $("modal").setAttribute("aria-describedby", travel ? "m-travel" : "m-d");
+  if(travel){
+    $("travel-departure").textContent = travel.departure;
+    $("travel-arrival").textContent = travel.arrival;
+    $("travel-duration").textContent = travel.duration;
+  }
   MODALE_ANNULLA = typeof e.annulla === "function" ? e.annulla : null;
   $("m-x").hidden = !MODALE_ANNULLA;
   const w = $("m-opts"); w.innerHTML = "";
-  e.opts.forEach(o => {
+  e.opts.forEach((o, index) => {
     const b = document.createElement("button");
-    b.className = "opt2";
+    b.className = "opt2" + (travel ? (index === 0 ? " travel-cancel" : " travel-go") : "");
+    b.type = "button";
     b.innerHTML = '<span class="n">' + o.n + '</span><span class="d">' + o.d + '</span>';
     b.onclick = () => {
       MODALE_ANNULLA = null;
@@ -68,6 +79,7 @@ function showEvent(e){
   });
   MODALE_OBBLIGATA = obbligata ? w.firstChild : null;
   $("modal").classList.add("on");
+  if(travel) w.querySelector(".travel-cancel").focus();
 }
 
 /* Torna true se la finestra si è davvero chiusa: chi chiama (ESC, clic fuori)
