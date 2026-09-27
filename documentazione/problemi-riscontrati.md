@@ -33,8 +33,8 @@ diventata una regola (lo sconto scritto è quello vero). Il 27/09 il giro su tut
 gioco simulato, ha aggiunto le voci 52–61: otto problemi, una voce con due piccole (60) e una
 di scelte da fare (61). Lo stesso giorno le cinque che bloccavano la partita o la verifica
 (52–56) sono state chiuse, una per branch, e i giri di fine task su quelle correzioni hanno
-aggiunto le voci 62–64. In «Da fare adesso» non ci sono ancora: stanno in fondo a questo
-indice finché qualcuno non le smista.
+aggiunto le voci 62–64, chiuse anche loro lo stesso giorno insieme alla 57–60 e a parte della
+61: resta aperta solo la parte della 61 che è una decisione di bilanciamento.
 
 1. ~~**Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
    telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra. Il tasto
@@ -291,32 +291,38 @@ indice finché qualcuno non le smista.
 56. ~~**`main` è rosso dal commit `a9e3233`** (27/09).~~ **RISOLTO (27/09/2026)** — branch
    `task/audit-skip-overlay`: il controllo cerca `!skipOverlayBusy()` e guarda che le
    decisioni vere blocchino ancora lo skip.
-57. **All'inizio la classifica ha dieci posti, quindi «sei in top 10» è vero da subito**
-   (27/09): con uno stream la riga del diario è verde con «#N in classifica», e al primo
-   ingresso il diario scrive «hype +40» anche se il tetto della fase ne fa entrare 20.
-58. **Durante un salto un incontro ALTO per strada si chiude con la X senza scegliere, e i
-   giorni che restavano del salto si perdono** (27/09): `SALTO_STOP` gli mette un
-   `annulla(){}`, fuori dal salto non ce l'ha.
-59. Il diario si riempie di «1 giorno saltato. Benessere +0, lucidità +0.» a ogni fine
-   giornata, e il lunedì la deriva del benessere di tutta la settimana finisce addosso a un
-   giorno solo (27/09).
-60. Piccole (27/09): «Ancora 1 settimane così», e il traguardo «Vivi di musica — senza aver
-   lavorato altrove» che guarda solo i mille euro.
-61. Da decidere (27/09): in carcere le spese si pagano 1,6 volte e il resoconto ne mostra una;
-   i numeri del bilanciamento dopo un anno (lucidità sempre a 96–99, scrittura al tetto,
-   niente game over coi debiti) stanno nel giro del 27/09.
-62. **Sul telefono il Foglio mostra una barra per volta dentro un campo da 200 punti**
-   (27/09, prova sul telefono): a 360 × 640 di una barra da 90 caratteri se ne leggono 27, il
-   resto scorre dentro al campo (`writer.js:259-260`, un `<input>` per riga). Serve un campo
-   che vada a capo: non è una riga di CSS, perché il foglio vive di Invio e frecce fra le righe.
-63. Note della coda della modale (27/09, giro di fine task): è «obbligatoria» ogni finestra
-   senza annulla, quindi anche i menu dei luoghi e i colloqui fanno aspettare un ALTO; e la
-   coda non si salva, per cui una prova rimasta in coda e già segnata in `G.trialsDone` si
-   perde se si ricarica proprio in quel momento. Nessuna delle due si è vista rompere niente.
-64. Sul telefono l'etichetta «LIVE CLUB» è tagliata dal bordo destro della mappa: la mappa
-   scorre di lato apposta, ma niente dice che si può scorrere (27/09, prova sul telefono).
-   In orizzontale il telefono alzato mostra due file di app: conta solo con la decisione
-   della voce 9.
+57. ~~**All'inizio la classifica ha dieci posti, quindi «sei in top 10» è vero da subito**
+   (27/09).~~ **RISOLTO (27/09/2026)** — branch `task/classifica-dieci-posti`: riga verde e salto
+   solo davanti ad almeno un rivale, il salto parte dall'ultima riga, il diario scrive l'hype
+   entrato davvero.
+58. ~~**Durante un salto un incontro ALTO per strada si chiude con la X senza scegliere**
+   (27/09).~~ **RISOLTO (27/09/2026)** — branch `task/incontro-alto-senza-x`: tolto l'annulla.
+   Nel gioco di oggi il caso non capitava (Eventi V2 non interroga gli incontri durante un
+   salto), restava sulla strada vecchia. Che un salto si fermi a una decisione senza
+   riprendere è voluto da Eventi V2 («lo skip resta interrotto»), e il widget lo dice.
+59. ~~Il diario si riempie di «1 giorno saltato» a ogni fine giornata (27/09).~~ **RISOLTO
+   (27/09/2026)** — branch `task/diario-senza-giorno-saltato`: un giorno solo scrive una riga
+   solo se ci sono notifiche o l'avanzamento si è interrotto.
+60. ~~Piccole (27/09): «Ancora 1 settimane così», e «Vivi di musica».~~ **RISOLTO
+   (27/09/2026)** — branch `task/due-piccole-testo-traguardo`.
+61. Da decidere (27/09): **RISOLTO in parte (27/09/2026)** — branch `task/carcere-spese-e-lavoro`:
+   il costo in più del carcere resta ma il diario lo dice, e il lavoro perso in carcere lo
+   diceva già l'avviso «Non ti sei presentato». **Restano da decidere** i numeri del
+   bilanciamento dopo un anno: lucidità sempre fra 96 e 99 (la lucidità resta, decisione di
+   Carlo del 21/09: è da far mordere, non da togliere), scrittura al tetto entro l'anno,
+   niente game over coi debiti, 2 € di spese a settimana per ogni pezzo mai registrato.
+62. ~~**Sul telefono il Foglio mostra una barra per volta dentro un campo da 200 punti**
+   (27/09).~~ **RISOLTO (27/09/2026)** — branch `task/foglio-a-capo-sul-telefono`: ogni riga è
+   un textarea che va a capo e cresce, si rimisura girando il telefono, e l'a capo delle
+   tastiere del telefono vale come Invio.
+63. ~~Note della coda della modale (27/09).~~ **RISOLTO (27/09/2026)** — branch
+   `task/coda-menu-e-prova-ricaricata`: una prova rimasta aperta torna all'ingresso e, se si era
+   in carcere, alla prima settimana da libero. L'altra nota era sbagliata: i menu dei luoghi
+   hanno `annulla` e per la coda sono finestre normali.
+64. ~~Sul telefono «LIVE CLUB» è tagliato dal bordo destro della mappa (27/09).~~ **RISOLTO
+   (27/09/2026)** — branch `task/mappa-si-scorre`: una freccia da 44 sul bordo destro dice che
+   la città continua. Il telefono alzato in orizzontale resta legato alla decisione della
+   voce 9.
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
 
 ---
@@ -6032,3 +6038,60 @@ La simulazione del 27/09 rifatta sulla coda della modale: 60 giorni, 0 errori, 0
   leggere i salvataggi vecchi (nessuno la scrive né la legge); `backend/README-API.md` diceva
   che `salvaCarriera` manda «l'intero `G`» (manda una copia, più `__adfCloud` se c'è un artista).
 - **RISOLTO (27/09/2026)** — branch `task/backend-documento-salvataggi`.
+
+## Giro del 27/09/2026 (voci 57–64, e il controllo della PR #2)
+
+Dopo il push delle voci 52–56 su `main` è entrata la PR #2 («Modale spostamento azzurra e
+responsive», `1effdfc`). La verifica su quel `main` era verde (i quattro rossi del primo giro
+erano il server sulla 8000 che ricaricava le pagine durante il cambio di branch: rifatte,
+22 su 22), ma l'unione con le finestre scritte a mano aveva una regressione, qui sotto.
+Poi le voci 57–64, un branch per voce, e il giro di fine task con `segnala-problemi` e
+`prova-sul-telefono`: tutto quello che hanno trovato è chiuso negli stessi branch, tranne
+quello scritto in fondo.
+
+### Dopo una conferma di viaggio il titolo del pezzo non si poteva scrivere
+
+- **dove** — la PR #2 nasconde `#m-d` e mette `travel-confirm` sulla modale, e lo rimette a
+  posto solo il prossimo `showEvent()`. Il titolo del pezzo, la scheda del rivale e la scelta
+  del salto scrivono la modale a mano (`copertine.js`, `sim.js`, `skip.js`).
+- **cosa succede** — Studio → «Vai» → Registra: «Come lo chiami» si apriva senza testo e senza
+  il campo, coi colori del viaggio.
+- **quanto pesa** — si vede ma si gira intorno (il titolo suggerito passava lo stesso).
+- **RISOLTO (27/09/2026)** — branch `task/titolo-dopo-il-viaggio`: `modaleViaggio()` /
+  `modaleSenzaViaggio()` in `modal.js`, chiamata dalle tre finestre scritte a mano. Nello stesso
+  branch il dado 🎲 del titolo, che a 360 e 390 usciva dallo schermo (`min-width:0`).
+
+### La conferma del viaggio in orizzontale si apriva già scorsa
+
+- **dove** — la PR #2 dà il fuoco a «Resta qui», che sta in fondo alla finestra: il browser
+  scorreva la finestra per mostrarlo, e a 844 × 390 «Spostamento» usciva di 46 px.
+- **RISOLTO (27/09/2026)** — branch `task/ritocchi-telefono-27-09`: `focus({preventScroll:true})`.
+
+### Le prove e2e rosse a caso
+
+- **dove** — ventidue prove, quasi tutte caricano la pagina del gioco due volte: con quattro in
+  parallelo un ricaricamento passava a volte i 30 secondi del tetto.
+- **RISOLTO (27/09/2026)** — branch `task/e2e-tetto-60-secondi`: il tetto è 60, col motivo
+  scritto in `playwright.config.js`.
+
+### Dal giro di fine task
+
+- La freccia della mappa scorreva via con la città: la colonna della griglia era larga quanto
+  lo schermo e non quanto la foto. **RISOLTO** — colonna `max(100%, 900px)`; la prova la misura
+  dopo il tocco e a metà di una trascinata.
+- Il Foglio: girando il telefono le barre non si rimisuravano; l'a capo mandato da certe
+  tastiere diventava uno spazio; «Chiudi la strofa» e «+ Aggiungi una riga» andavano su tre
+  righe; in «Strofa chiusa» le barre a capo si confondevano. **RISOLTO** — tutto nel branch del
+  Foglio, più `enterkeyhint="next"`.
+- Una prova ricaricata in carcere non tornava più anche da libero. **RISOLTO** — torna alla
+  prima settimana chiusa da libero.
+- Notifiche «1 eventi · 1 nuovi»; «Segna lette» (20 px), i giorni del pannello del tempo (40) e
+  le frecce dello Studio (36) sotto i 44. **RISOLTO** — `task/ritocchi-telefono-27-09`.
+
+### Restano
+
+- I numeri del bilanciamento della voce 61: decisioni, non bug.
+- Il telefono alzato in orizzontale (due file di app, il dock fuori): con la voce 9.
+- Sul telefono l'orologio resta sopra l'intestazione del Diario a 360: forse voluto, da
+  guardare con la voce 9 e il giro sul telefono; e dal telefono, sulla plancia, non c'è un
+  modo col dito di aprire il Diario (la prova l'ha aperto con `openDiary()`).
