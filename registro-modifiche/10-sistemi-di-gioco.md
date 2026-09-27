@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:3b85be1 -->
+## 27/09/26, 16:18 â€” task/diario-senza-giorno-saltato â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `3b85be1`
+
+### Cosa Ã¨ entrato
+
+- `29c22f1` â€” La fine giornata non scrive più «1 giorno saltato» nel diario â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/skip.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:ae1413f -->
 ## 27/09/26, 16:18 â€” task/classifica-dieci-posti â†’ main
 
