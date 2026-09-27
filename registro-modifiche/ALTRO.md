@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:70a2bd0 -->
+## 27/09/26, 16:23 â€” task/e2e-tetto-60-secondi â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `70a2bd0`
+
+### Cosa Ã¨ entrato
+
+- `e807452` â€” Prove e2e: il tetto passa da 30 a 60 secondi â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/playwright.config.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:74011d1 -->
 ## 27/09/26, 15:13 â€” task/giro-controllo-un-anno â†’ main
 
