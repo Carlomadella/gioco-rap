@@ -87,13 +87,21 @@ const CHIAVE_PARTITA = () => (typeof slotKey === "function" ? slotKey(SAVE_KEY) 
    quel campo — una `strada` senza `attivita` faceva scoppiare la chiusura della
    settimana (giro del 27/09). Gli oggetti di START() si completano un livello
    più giù; array e valori semplici restano quelli salvati. */
+/* I campi la cui assenza vuol dire qualcosa, e che quindi non si completano:
+   `strada.giroAvviato` mancante è un salvataggio di prima del flag, e
+   stradaGiroAvviato() lo ricava dalle prove (precedenti, ferro, attività).
+   Messo a false da qui, una carriera criminale vecchia tornava «pulita». */
+const NON_COMPLETARE = {strada:["giroAvviato"]};
 function partitaDaSalvataggio(dati){
   const base = START(), g = Object.assign(base, dati || {});
   const iniziali = START();
   for(const k of Object.keys(iniziali)){
     const d = iniziali[k], v = g[k];
     const oggetto = x => x && typeof x === "object" && !Array.isArray(x);
-    if(oggetto(d) && oggetto(v)) g[k] = Object.assign(d, v);
+    if(oggetto(d) && oggetto(v)){
+      for(const via of NON_COMPLETARE[k] || []) if(!(via in v)) delete d[via];
+      g[k] = Object.assign(d, v);
+    }
     else if(oggetto(d) && v == null) g[k] = d;
   }
   return g;
