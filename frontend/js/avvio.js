@@ -334,7 +334,7 @@
 
         selezionaSlot(s.n);
     A = Object.assign(DEF(), s.a || {});
-    G = Object.assign(START(), s.g || {});
+    G = partitaDaSalvataggio(s.g);
     if(!G.difficolta || !DIFFICOLTA[G.difficolta]) G.difficolta = diffCorrente(s);
     if(SET && SET.gioco) SET.gioco.difficolta = G.difficolta;
     if(typeof setSalva === "function") setSalva();
@@ -445,7 +445,7 @@
     /* Il bridge vive già nella landing e legge A: allineiamo la memoria allo
        slot scelto da CONTINUA prima di aprire Avaturn/MakeHuman. */
     A = Object.assign(DEF(), s.a || {});
-    G = Object.assign(START(), s.g || {});
+    G = partitaDaSalvataggio(s.g);
     window.ARTIST = A;
 
     return s;
