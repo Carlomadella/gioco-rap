@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:e1277e7 -->
+## 27/09/26, 16:18 â€” task/incontro-alto-senza-x â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `e1277e7`
+
+### Cosa Ã¨ entrato
+
+- `5bf23ba` â€” L'incontro ALTO per strada fermo in un salto non ha più la X â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:ae1413f -->
 ## 27/09/26, 16:18 â€” task/classifica-dieci-posti â†’ main
 
