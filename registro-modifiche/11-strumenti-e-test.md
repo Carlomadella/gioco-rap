@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:3a1b2e8 -->
+## 27/09/26, 15:13 â€” task/contratto-rescisso-in-carcere â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `3a1b2e8`
+
+### Cosa Ã¨ entrato
+
+- `378537e` â€” Il contratto rescisso in carcere si porta via anche la consegna â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/test/e2e/contratto-rescisso.spec.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:5838892 -->
 ## 27/09/26, 15:13 â€” task/audit-skip-overlay â†’ main
 

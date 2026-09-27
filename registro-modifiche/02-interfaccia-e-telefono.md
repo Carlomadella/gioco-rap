@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:3a1b2e8 -->
+## 27/09/26, 15:13 â€” task/contratto-rescisso-in-carcere â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `3a1b2e8`
+
+### Cosa Ã¨ entrato
+
+- `378537e` â€” Il contratto rescisso in carcere si porta via anche la consegna â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/sim.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Aggiunto:** `frontend/test/e2e/contratto-rescisso.spec.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:241bcda -->
 ## 26/09/26, 16:50 â€” task/giro-telefono-25-09-2026 â†’ main
 
