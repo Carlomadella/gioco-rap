@@ -271,9 +271,18 @@ function advanceWeek(){
      mai da solo. Durante un salto fermano lo scorrimento sul serio invece
      di sparire fino all'ultimo giorno (prima capitava solo lì, per caso). */
   const prova = (!detenutoAInizioSettimana && G.trialCd <= 0) ? pendingTrial() : null;
+  /* una prova segnata ma mai decisa (ricaricata mentre eri dentro, per
+     esempio): all'ingresso non torna perché in carcere non si apre, quindi
+     torna qui, alla prima settimana chiusa da libero (giro del 27/09) */
+  const aperta = (!prova && !detenutoAInizioSettimana && G.trialCd <= 0 &&
+    typeof provaRimastaAperta === "function") ? provaRimastaAperta() : null;
   if(prova){
     G.trialsDone[prova.ph] = true;
     if(SALTO) SALTO_STOP = prova; else showEvent(prova);
+  }
+  else if(aperta){
+    if(SALTO) SALTO_STOP = aperta;
+    else if(typeof riapriProvaRimasta === "function") riapriProvaRimasta();
   }
   else if(!detenutoAInizioSettimana && Math.random() < .38) maybeEvent();
   save(); renderGioco();

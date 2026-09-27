@@ -28,3 +28,26 @@ test("una prova rimasta aperta torna dopo un ricaricamento, una volta sola", asy
   expect(dopo).toEqual({aperta:false, segnata:false});
   expect(errori).toEqual([]);
 });
+
+test("ricaricata in carcere, la prova torna alla prima settimana da libero", async ({ page }) => {
+  const errori = [];
+  page.on("pageerror", e => errori.push(e.message));
+  await page.goto("/pagine/gioco.html");
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  await page.waitForFunction(() => window.GAME && window.ADF_TIME_SKIP);
+  await page.evaluate(() => { G.phase = 0; G.trialsDone = {0:true}; G.trialCd = 0;
+    G.strada.arresto = {settimane:1, colpo:"prova"}; save(); });
+  await page.reload();
+  await page.waitForFunction(() => window.GAME && window.ADF_TIME_SKIP);
+
+  const dentro = await page.evaluate(() => { GAME.enter();
+    return document.getElementById("modal").classList.contains("on") &&
+      document.getElementById("m-t").textContent === "Il contest del quartiere"; });
+  expect(dentro).toBe(false);
+
+  /* esce, e la prima settimana chiusa da libero la ripresenta */
+  await page.evaluate(() => { G.strada.arresto = null; G.day = 7; avanzaGiorno(); });
+  await expect(page.locator("#m-t")).toHaveText("Il contest del quartiere");
+  expect(errori).toEqual([]);
+});
