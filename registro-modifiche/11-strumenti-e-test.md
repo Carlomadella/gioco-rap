@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:8053990 -->
+## 27/09/26, 15:13 â€” task/salvataggio-annidato-a-meta â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `8053990`
+
+### Cosa Ã¨ entrato
+
+- `0776f9f` â€” Il completamento del salvataggio non rimette «pulita» una carriera criminale vecchia â€” **Carlomadella**
+- `24316c0` â€” Il salvataggio si completa anche dentro gli oggetti annidati â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/test/e2e/salvataggio-vecchio.spec.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:f2ec9b9 -->
 ## 27/09/26, 15:13 â€” task/alto-coperto-da-altra-finestra â†’ main
 
