@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:74011d1 -->
+## 27/09/26, 15:13 â€” task/giro-controllo-un-anno â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `74011d1`
+
+### Cosa Ã¨ entrato
+
+- `6c95d32` â€” Rapporto del giro di un anno: le voci 52–56 chiuse, e i giri di fine task â€” **Carlomadella**
+- `72f31b0` â€” Giro di controllo di un anno: le sei correzioni del giro stretto â€” **Carlomadella**
+- `6bd1c06` â€” Giro di controllo su tutto il repository, con un anno di gioco simulato â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:a2eb870 -->
 ## 20/09/26, 23:23 â€” task/ordine-nel-foglio-dei-punti â†’ main
 
