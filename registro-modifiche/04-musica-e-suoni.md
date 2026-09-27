@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:f2ec9b9 -->
+## 27/09/26, 15:13 â€” task/alto-coperto-da-altra-finestra â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `f2ec9b9`
+
+### Cosa Ã¨ entrato
+
+- `d0f5485` â€” La coda della modale: si conta una volta, riparte anche dopo un errore â€” **Carlomadella**
+- `8e00cf1` â€” Un evento ALTO a schermo non si copre più con un'altra finestra â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/copertine.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:241bcda -->
 ## 26/09/26, 16:50 â€” task/giro-telefono-25-09-2026 â†’ main
 
