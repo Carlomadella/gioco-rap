@@ -8,7 +8,29 @@
    se no bastava premere ESC per far sparire tutto quello che non conviene. */
 let MODALE_ANNULLA = null;
 
+/* Una finestra senza via d'uscita (un evento ALTO, una prova) non si copre.
+   Prima la finestra dopo la riscriveva: l'ALTO spariva dallo schermo ma
+   restava pendente col suo lucchetto, e il «+1» restava bloccato fino a
+   ricaricare (giro del 27/09, 21 giorni di fila nell'anno simulato). Adesso
+   quella dopo aspetta in coda e si apre appena si è scelto. */
+/* il primo bottone della finestra obbligata: se chi scrive la modale a mano
+   (il titolo del pezzo, la scheda di un rivale) ci è passato sopra, il bottone
+   non è più nella pagina e la finestra non è più quella da proteggere */
+let MODALE_OBBLIGATA = null;
+const MODALE_CODA = [];
+const modaleObbligata = () => !!(MODALE_OBBLIGATA && MODALE_OBBLIGATA.isConnected &&
+  $("modal").classList.contains("on"));
+function modaleProssima(){
+  if(!MODALE_CODA.length || $("modal").classList.contains("on")) return;
+  showEvent(MODALE_CODA.shift());
+}
+
 function showEvent(e){
+  if(modaleObbligata()){
+    MODALE_CODA.push(e);
+    return;
+  }
+  const obbligata = typeof e.annulla !== "function";
   $("m-k").textContent = e.k;
   $("m-t").textContent = e.t;
   $("m-d").innerHTML = e.d;
@@ -21,6 +43,7 @@ function showEvent(e){
     b.innerHTML = '<span class="n">' + o.n + '</span><span class="d">' + o.d + '</span>';
     b.onclick = () => {
       MODALE_ANNULLA = null;
+      MODALE_OBBLIGATA = null;
       /* la finestra si chiude prima di eseguire: certe scelte ne riaprono
          un'altra qui dentro (il titolo del pezzo, «Come la fai»), e chiudere
          dopo se la sarebbe portata via appena nata */
@@ -29,9 +52,11 @@ function showEvent(e){
       if(r.t) pushLog(r.t, r.c);
       save(); renderGioco();
       if(typeof renderStudio === "function") renderStudio();
+      modaleProssima();
     };
     w.appendChild(b);
   });
+  MODALE_OBBLIGATA = obbligata ? w.firstChild : null;
   $("modal").classList.add("on");
 }
 
@@ -41,10 +66,12 @@ function chiudiModale(){
   if(!MODALE_ANNULLA) return false;
   const annulla = MODALE_ANNULLA;
   MODALE_ANNULLA = null;
+  MODALE_OBBLIGATA = null;
   $("modal").classList.remove("on");
   annulla();
   renderGioco();
   if(typeof renderStudio === "function") renderStudio();
+  modaleProssima();
   return true;
 }
 $("m-x").onclick = () => chiudiModale();

@@ -73,6 +73,8 @@ function chiediTitolo(suggerito, onOk, pezzo){
     MODALE_ANNULLA = null;
     $("modal").classList.remove("on");
     onOk(v.slice(0,26), st.seed, st.img);
+    /* se nel frattempo è arrivata una decisione, aspettava in coda (modal.js) */
+    if(typeof modaleProssima === "function") modaleProssima();
   };
   b.onclick = chiudi;
   w.appendChild(b);
