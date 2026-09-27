@@ -2341,7 +2341,16 @@ function finishSkipLog(done,lucPrima,wellPrima,newNotifications,interrupted){
   const extra=newNotifications>0
     ?" · <b>"+newNotifications+" "+(newNotifications===1?"evento":"eventi")+" in Notifiche</b>"
     :"";
-  pushLog("<b>"+done+(done===1?" giorno saltato.":" giorni saltati.")+"</b> Benessere "+
+  /* Un giorno solo è la «Fine giornata» di tutti i giorni, non un salto: una
+     riga sua a ogni sera riempiva il diario (che ne tiene 80) e spingeva fuori
+     i conti delle settimane, e il lunedì si prendeva addosso la deriva del
+     benessere di tutta la settimana. Si scrive solo se c'è qualcosa da dire
+     (giro del 27/09, voce 59). */
+  if(done===0){ /* il giorno si è disfatto (tornaAllaFoto): non è passato niente */ }
+  else if(done===1){
+    if(newNotifications>0 || interrupted)
+      pushLog("<b>Nuovo giorno.</b>"+extra+(interrupted?" · <b>Avanzamento interrotto.</b>":""),"");
+  }else pushLog("<b>"+done+" giorni saltati.</b> Benessere "+
     (dWell>=0?"+"+dWell:dWell)+", lucidità "+(dLuc>=0?"+"+dLuc:dLuc)+"."+extra+
     (interrupted?" · <b>Avanzamento interrotto.</b>":""),
     dLuc<=-10?"bad":"");

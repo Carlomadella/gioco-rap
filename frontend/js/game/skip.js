@@ -91,9 +91,11 @@ function saltaGiorni(n){
   }
   if(errore) rilanciaDopo(errore);
   const dLuc = Math.round(luc() - lucPrima), dWell = Math.round(G.wellbeing - wellPrima);
-  pushLog("<b>" + vissuti + (vissuti === 1 ? " giorno saltato." : " giorni saltati.") + "</b> Benessere " +
-    (dWell >= 0 ? "+" + dWell : dWell) + ", lucidità " + (dLuc >= 0 ? "+" + dLuc : dLuc) + ".",
-    dLuc <= -10 ? "bad" : "");
+  /* un giorno solo è la fine giornata, non un salto: niente riga (voce 59) */
+  if(vissuti > 1)
+    pushLog("<b>" + vissuti + " giorni saltati.</b> Benessere " +
+      (dWell >= 0 ? "+" + dWell : dWell) + ", lucidità " + (dLuc >= 0 ? "+" + dLuc : dLuc) + ".",
+      dLuc <= -10 ? "bad" : "");
   SFX[settimaneChiuse > 0 ? "week" : "giorno"]();
   save();
   if(settimaneChiuse > 0){
