@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:1effdfc -->
+## 27/09/26, 13:57 â€” feat/responsive-travel-modal â†’ main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `1effdfc`
+
+### Cosa Ã¨ entrato
+
+- `f444af9` â€” feat(game): conferma spostamento azzurra e responsive â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/test/unit/travel-modal.test.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:8f632e1 -->
 ## 27/09/26, 15:13 â€” task/orologio-sotto-le-finestre â†’ main
 
