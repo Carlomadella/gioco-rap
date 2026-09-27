@@ -89,7 +89,9 @@ function showEvent(e){
   });
   MODALE_OBBLIGATA = obbligata ? w.firstChild : null;
   $("modal").classList.add("on");
-  if(travel) w.querySelector(".travel-cancel").focus();
+  /* senza preventScroll il browser scorreva la finestra fino al tasto, che sta in
+     fondo: col telefono in orizzontale il titolo usciva di 46 px (27/09) */
+  if(travel) w.querySelector(".travel-cancel").focus({preventScroll:true});
 }
 
 /* Torna true se la finestra si è davvero chiusa: chi chiama (ESC, clic fuori)
