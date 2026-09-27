@@ -604,6 +604,10 @@ body.in-hub .topnav {
   background: #05070b;
   border: 0;
 }
+/* la freccia «la città continua» (js/game/mappa-scorre.js): esiste solo dove
+   la mappa scorre, cioè sotto i 900 (css/stretto.css) */
+.pmappa-freccia { display: none; }
+
 .pmappa::before {
   content: "";
   position: absolute;
