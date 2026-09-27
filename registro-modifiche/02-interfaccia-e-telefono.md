@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:68e09a1 -->
+## 27/09/26, 16:19 â€” task/coda-menu-e-prova-ricaricata â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `68e09a1`
+
+### Cosa Ã¨ entrato
+
+- `8b433f9` â€” Una prova di passaggio rimasta aperta torna dopo un ricaricamento â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/entry.js`
+- **Modificato:** `frontend/js/game/phases.js`
+- **Aggiunto:** `frontend/test/e2e/prova-ricaricata.spec.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:04fda6c -->
 ## 27/09/26, 16:19 â€” task/foglio-a-capo-sul-telefono â†’ main
 
