@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:a202dde -->
+## 27/09/26, 16:52 â€” task/coda-menu-e-prova-ricaricata â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `a202dde`
+
+### Cosa Ã¨ entrato
+
+- `665d85f` â€” La prova rimasta aperta torna anche dopo il carcere â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/sim.js`
+- **Modificato:** `frontend/test/e2e/prova-ricaricata.spec.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:a0a4f23 -->
 ## 27/09/26, 16:19 â€” task/carcere-spese-e-lavoro â†’ main
 

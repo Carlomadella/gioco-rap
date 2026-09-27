@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:a202dde -->
+## 27/09/26, 16:52 â€” task/coda-menu-e-prova-ricaricata â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `a202dde`
+
+### Cosa Ã¨ entrato
+
+- `665d85f` â€” La prova rimasta aperta torna anche dopo il carcere â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/test/e2e/prova-ricaricata.spec.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:3e09a47 -->
 ## 27/09/26, 16:52 â€” task/foglio-a-capo-sul-telefono â†’ main
 
