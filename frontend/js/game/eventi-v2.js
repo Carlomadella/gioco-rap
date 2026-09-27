@@ -630,8 +630,8 @@ function adfOpenNotifications(){
         '<b>Notifiche</b>'+
       '</div>'+
       '<div class="adf-ntool">'+
-        '<div><strong>'+list.length+'</strong> eventi dagli skip'+
-          (unread?' · <span>'+unread+' nuovi</span>':'')+
+        '<div><strong>'+list.length+'</strong> '+(list.length===1?'evento':'eventi')+' dagli skip'+
+          (unread?' · <span>'+unread+(unread===1?' nuovo':' nuovi')+'</span>':'')+
         '</div>'+
         (unread?'<button type="button" data-adf-notif-read="1">Segna lette</button>':'')+
       '</div>'+

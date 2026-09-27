@@ -68,6 +68,13 @@
      presa più grande: sopra c'è l'ultima riga della lista e una presa da 44
      le rubava i tocchi (giro del 27/09). Per uscire c'è il tasto indietro. */
 
+  /* piccoli dal giro sul telefono del 27/09: «Segna lette» delle Notifiche,
+     i due giorni del pannello del tempo, le frecce dello Studio (il play ha già
+     la sua presa da 44 in studio-elementi.css) */
+  .adf-ntool button{min-height:44px;padding-left:12px;padding-right:12px}
+  .adf-tc-day-actions .adf-tc-btn{min-height:44px}
+  .stavanti{height:44px}
+
   /* ---- le impostazioni ---- */
   .stab,.sbtn,.seg button{min-height:44px}
   .sbtn,.sprove .sbtn{padding-left:18px;padding-right:18px}   /* 42 -> 48 */
