@@ -21,8 +21,13 @@ const MODALE_CODA = [];
 const modaleObbligata = () => !!(MODALE_OBBLIGATA && MODALE_OBBLIGATA.isConnected &&
   $("modal").classList.contains("on"));
 function modaleProssima(){
-  if(!MODALE_CODA.length || $("modal").classList.contains("on")) return;
-  showEvent(MODALE_CODA.shift());
+  if($("modal").classList.contains("on")) return;
+  if(MODALE_CODA.length){ showEvent(MODALE_CODA.shift()); return; }
+  /* niente in coda: se c'è un ALTO dell'orologio rimasto sotto (qualcuno ci
+     aveva scritto sopra a mano), torna adesso e non al prossimo render */
+  try{
+    if(window.GAME_EVENTS && GAME_EVENTS.pending()) GAME_EVENTS.showPending();
+  }catch(e){}
 }
 
 function showEvent(e){
@@ -48,11 +53,16 @@ function showEvent(e){
          un'altra qui dentro (il titolo del pezzo, «Come la fai»), e chiudere
          dopo se la sarebbe portata via appena nata */
       $("modal").classList.remove("on");
-      const r = o.run() || {t:"", c:""};
-      if(r.t) pushLog(r.t, r.c);
-      save(); renderGioco();
-      if(typeof renderStudio === "function") renderStudio();
-      modaleProssima();
+      /* se la scelta scoppia, quella in coda deve uscire lo stesso: se no
+         resta lì e salta fuori al primo clic su un'altra finestra */
+      try{
+        const r = o.run() || {t:"", c:""};
+        if(r.t) pushLog(r.t, r.c);
+        save(); renderGioco();
+        if(typeof renderStudio === "function") renderStudio();
+      }finally{
+        modaleProssima();
+      }
     };
     w.appendChild(b);
   });

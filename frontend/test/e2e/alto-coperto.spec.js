@@ -47,10 +47,27 @@ test("un ALTO coperto da una finestra scritta a mano torna su", async ({ page })
   /* la scelta del salto scrive la modale a mano, senza passare da showEvent */
   await page.evaluate(() => scegliSalto([{n:"Resto qui", d:"", run(){}}]));
   await expect(page.locator("#m-t")).toHaveText("Salta avanti");
+  /* nessun render a mano: deve tornare da solo appena la finestra si chiude */
   await page.locator("#m-opts button").first().click();
-  await page.evaluate(() => renderGioco());
 
   await expect(page.locator("#m-t")).toHaveText("A casa ti fermano");
   await expect(page.locator("#modal")).toHaveClass(/\bon\b/);
+  expect(errori).toEqual([]);
+});
+
+test("una finestra in coda si conta una volta sola, quando si apre", async ({ page }) => {
+  const errori = [];
+  await altoASchermo(page, errori);
+
+  const conta = () => page.evaluate(() => (G.eventiV2.stats && G.eventiV2.stats.legacyStreet) || 0);
+  const prima = await conta();
+  await page.evaluate(() => showEvent({k:"Per strada", t:"Uno che ti riconosce", d:"",
+    opts:[{n:"Saluti", d:"", run(){ return null; }}]}));
+  /* in coda: non si è ancora aperta, non si conta */
+  expect(await conta()).toBe(prima);
+
+  await page.locator("#m-opts button").first().click();
+  await expect(page.locator("#m-t")).toHaveText("Uno che ti riconosce");
+  expect(await conta()).toBe(prima + 1);
   expect(errori).toEqual([]);
 });
