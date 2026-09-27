@@ -239,7 +239,15 @@ function apriFoglio(opz){
   $("w-cancel").style.display = "";
   disegnaFoglio();
   $("writer").classList.add("on");
-  setTimeout(() => { const f = document.querySelector(".wline input"); if(f) f.focus(); }, 80);
+  /* misurate adesso che il foglio si vede: nascoste erano alte zero */
+  $("w-body").querySelectorAll(".wline textarea").forEach(altezzaRiga);
+  setTimeout(() => { const f = document.querySelector(".wline textarea"); if(f) f.focus(); }, 80);
+}
+/* il campo di una barra è alto quanto il suo testo: una riga, o due se va a
+   capo. Da nascosto scrollHeight è zero: lì si lascia l'altezza di una riga. */
+function altezzaRiga(el){
+  el.style.height = "auto";
+  if(el.scrollHeight > 0) el.style.height = el.scrollHeight + "px";
 }
 function chiudiFoglio(){ $("writer").classList.remove("on"); WR = null; }
 
@@ -256,8 +264,11 @@ function disegnaFoglio(){
     const g = viva ? a.gruppi[idx] : 0;
     const auto = viva && WR.gen[i] === r.trim();
     h += '<div class="wline' + (auto ? " auto" : "") + '"><span class="no">' + (i+1) + '</span>' +
-      '<input data-i="' + i + '" maxlength="90" placeholder="' +
-        (i === 0 ? "Scrivi la prima barra…" : "…") + '" value="' + r.replace(/"/g,"&quot;") + '">' +
+      /* una barra arriva a 90 caratteri: su un telefono stretto un <input> ne
+         mostrava 27 e il resto scorreva dentro al campo. Il textarea va a capo e
+         cresce; Invio passa lo stesso alla barra dopo (giro del 27/09, voce 62) */
+      '<textarea rows="1" data-i="' + i + '" maxlength="90" placeholder="' +
+        (i === 0 ? "Scrivi la prima barra…" : "…") + '">' + r.replace(/&/g,"&amp;").replace(/</g,"&lt;") + '</textarea>' +
       '<span class="sil">' + (viva ? sillabe(r) : "") + '</span>' +
       '<span class="rm' + (g ? " on" : "") + '" style="' + (g ? "background:" + RCOL[g] : "") + '">' +
         (g ? a.lett[g-1] : "·") + '</span></div>';
@@ -296,12 +307,15 @@ function disegnaFoglio(){
   $("w-done").disabled = a.vive.length < 2;
   $("w-done").textContent = (b <= 1.01 && a.vive.length >= 2) ? "Tienila così" : "Chiudi la strofa";
 
-  $("w-body").querySelectorAll("input").forEach(inp => {
+  $("w-body").querySelectorAll("textarea").forEach(inp => {
+    altezzaRiga(inp);
     inp.oninput = () => {
+      /* una barra è una riga: un a capo incollato diventa uno spazio */
+      if(/\n/.test(inp.value)) inp.value = inp.value.replace(/\s*\n\s*/g, " ");
       WR.righe[+inp.dataset.i] = inp.value;
       const pos = inp.selectionStart, i = inp.dataset.i;
       disegnaFoglio();
-      const n2 = document.querySelector('.wline input[data-i="' + i + '"]');
+      const n2 = document.querySelector('.wline textarea[data-i="' + i + '"]');
       if(n2){ n2.focus(); try{ n2.setSelectionRange(pos, pos); }catch(e){} }
     };
     inp.onkeydown = e => {
@@ -310,7 +324,7 @@ function disegnaFoglio(){
         const i = +inp.dataset.i;
         if(i === WR.righe.length-1 && WR.righe.length < 10) WR.righe.push("");
         disegnaFoglio();
-        const n2 = document.querySelector('.wline input[data-i="' + Math.min(i+1, WR.righe.length-1) + '"]');
+        const n2 = document.querySelector('.wline textarea[data-i="' + Math.min(i+1, WR.righe.length-1) + '"]');
         if(n2) n2.focus();
       }
     };
