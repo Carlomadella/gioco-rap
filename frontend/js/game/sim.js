@@ -194,13 +194,24 @@ function advanceWeek(){
      (non un pareggio con la posizione migliore già raggiunta) vale hype,
      tanto più quanto sei salito in alto — entrare in top 10, o essere primi,
      vale un morso in più. */
+  /* La classifica ha tante righe quanti rivali più te: all'inizio dieci, quindi
+     «top 10» voleva dire esserci e basta, e il primo ingresso valeva un salto da
+     99. Conta chi sta davanti ad almeno uno, e il salto parte dall'ultima riga
+     (giro del 27/09, voce 57). */
+  const ultimaRiga = G.rivals.length + 1;
+  const inClassifica = streams > 0 && pos < ultimaRiga;
   if(streams > 0 && pos <= G.best.chart){
-    if(pos < G.best.chart){
-      const salto = Math.min(G.best.chart, 99) - pos;
+    if(pos < G.best.chart && inClassifica){
+      const salto = Math.min(G.best.chart, ultimaRiga) - pos;
       const bonus = Math.round(clamp(salto * 0.4 + (pos <= 10 ? 6 : 0) + (pos === 1 ? 10 : 0), 0, 40));
       if(bonus > 0){
+        const prima = G.hype;
         G.hype = clamp(G.hype + bonus, 0, (typeof hypeCap==="function"?hypeCap():100));
-        pushLog("<b>Sali in classifica.</b> Sei #" + pos + ", hype +" + bonus + ".", "good");
+        /* si scrive quello che è entrato davvero, non il bonus: il tetto
+           della fase può tenerne fuori una parte */
+        const preso = Math.round(G.hype - prima);
+        pushLog("<b>Sali in classifica.</b> Sei #" + pos +
+          (preso > 0 ? ", hype +" + preso + "." : ": l'hype è già al tetto di " + PHASES[G.phase].n.toLowerCase() + "."), "good");
       }
     }
     G.best.chart = pos;
@@ -210,7 +221,7 @@ function advanceWeek(){
   if(streams > 0)
     pushLog("<b>" + fmt(streams) + " stream</b>, " + fmt(newFans) + " nuovi fan, " +
       (gross-costs >= 0 ? "+" : "") + fmt(gross-costs) + " €" +
-      (pos <= 10 ? " · <b>#" + pos + " in classifica</b>" : ""), pos <= 10 ? "good" : "");
+      (inClassifica && pos <= 10 ? " · <b>#" + pos + " in classifica</b>" : ""), inClassifica && pos <= 10 ? "good" : "");
   else
     pushLog("Nessun pezzo fuori. Spese della settimana: −" + fmt(costs) + " €", "");
 
