@@ -2356,7 +2356,10 @@ saltaGiorni=function(n){
   const detenutoPrimaDelSalto=!!(G.strada&&G.strada.arresto);
   const before=weekOpen, costiSettimana=weeklyCosts();
   const lucPrima=luc(), wellPrima=G.wellbeing;
-  const s=st(), chainBefore=s.skip1Chain;
+  /* let: se un giorno si disfa (tornaAllaFoto) G.eventiV2 è un oggetto nuovo
+     e va riletto, se no notifiche e skip1Chain finiscono in quello vecchio */
+  let s=st();
+  const chainBefore=s.skip1Chain;
   const notifPrima=s.notifications.length;
 
   const guaranteed=new Set();
@@ -2372,9 +2375,17 @@ saltaGiorni=function(n){
   SALTO_STOP=null;
   let weeks=0, done=0, adfStop=null, adfAny=false, adfSocialStop=null;
 
+  /* Qualunque errore dentro la chiusura del giorno o della settimana lasciava
+     accesi ADF.skipRunning e SALTO: da lì «+1» e «+7» rispondevano «bloccato
+     da una decisione» fino a ricaricare, e dopo il ricaricamento l'errore
+     tornava uguale (giro del 27/09). Il giorno rotto si disfa (fotoPartita,
+     sim.js), il salto si ferma e l'errore va alla schermata di servizio. */
+  let errore=null, foto=null, fotoDone=0, fotoWeeks=0;
+  try{
   for(let i=0;i<n && !G.ended;i++){
     SALTO=true;
     const wasJailed=adfInJail();
+    foto=fotoPartita(); fotoDone=done; fotoWeeks=weeks;
     if(avanzaGiorno()) weeks++;
     done++;
 
@@ -2418,9 +2429,17 @@ saltaGiorni=function(n){
       }
     }
   }
-
-  ADF.skipRunning=false;
-  SALTO=false;
+  }catch(err){
+    errore=err;
+    if(foto) tornaAllaFoto(foto);
+    /* il giorno disfatto non si conta, e lo stato degli eventi si rilegge */
+    done=fotoDone; weeks=fotoWeeks; s=st();
+    SALTO_STOP=null; adfStop=null;
+  }finally{
+    ADF.skipRunning=false;
+    SALTO=false;
+  }
+  if(errore) rilanciaDopo(errore);
 
   if(n===1 && !adfAny && !SALTO_STOP) s.skip1Chain=Math.min(12,chainBefore+1);
   else if(adfAny || n!==1) s.skip1Chain=0;
