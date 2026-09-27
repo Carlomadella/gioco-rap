@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:8f632e1 -->
+## 27/09/26, 15:13 â€” task/orologio-sotto-le-finestre â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `8f632e1`
+
+### Cosa Ã¨ entrato
+
+- `bdb4aa7` â€” Orologio: «GIORNO» più grande anche sul telefono; via la presa della barretta â€” **Carlomadella**
+- `9ccf9d7` â€” Sul telefono l'orologio sta sotto le finestre, e quattro ritocchi dal giro â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:8053990 -->
 ## 27/09/26, 15:13 â€” task/salvataggio-annidato-a-meta â†’ main
 
