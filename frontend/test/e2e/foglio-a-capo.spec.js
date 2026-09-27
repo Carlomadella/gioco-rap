@@ -82,3 +82,25 @@ test("girando il telefono la barra si rimisura, e l'a capo della tastiera è un 
   expect(r).toEqual({riga:"Seconda barra", fuoco:"2"});
   expect(errori).toEqual([]);
 });
+
+test("i tasti del foglio stanno su una riga e la strofa chiusa separa le barre", async ({ page }) => {
+  const errori = [];
+  page.on("pageerror", e => errori.push(e.message));
+  await page.goto("/pagine/gioco.html");
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  await page.waitForFunction(() => window.GAME && window.ADF_TIME_SKIP);
+  await page.evaluate(() => {
+    GAME.enter(); apriFoglio({righe:4});
+    WR.righe = ["Ho contato le monete sotto la luce del lampione", "e sapevo già che non bastava mai a niente",
+      "ma le ho messe in tasca come fossero un milione", "", ""];
+    disegnaFoglio();
+  });
+  const alt = sel => page.locator(sel).evaluateAll(els => els.map(e => e.getBoundingClientRect().height));
+  expect(Math.max(...await alt("#w-done"))).toBeLessThanOrEqual(56);
+  expect(Math.max(...await alt(".wadd"))).toBeLessThanOrEqual(56);
+
+  await page.locator("#w-done").click();
+  await expect(page.locator(".wtxt .wbarra")).toHaveCount(3);
+  expect(errori).toEqual([]);
+});

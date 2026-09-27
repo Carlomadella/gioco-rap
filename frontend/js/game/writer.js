@@ -273,7 +273,7 @@ function disegnaFoglio(){
       /* una barra arriva a 90 caratteri: su un telefono stretto un <input> ne
          mostrava 27 e il resto scorreva dentro al campo. Il textarea va a capo e
          cresce; Invio passa lo stesso alla barra dopo (giro del 27/09, voce 62) */
-      '<textarea rows="1" data-i="' + i + '" maxlength="90" placeholder="' +
+      '<textarea rows="1" enterkeyhint="next" data-i="' + i + '" maxlength="90" placeholder="' +
         (i === 0 ? "Scrivi la prima barra…" : "…") + '">' + r.replace(/&/g,"&amp;").replace(/</g,"&lt;") + '</textarea>' +
       '<span class="sil">' + (viva ? sillabe(r) : "") + '</span>' +
       '<span class="rm' + (g ? " on" : "") + '" style="' + (g ? "background:" + RCOL[g] : "") + '">' +
@@ -388,7 +388,7 @@ function chiudiStrofa(){
     riga("Metrica", a.metrica, Math.round(a.media) + " sillabe di media") +
     riga("Parole", a.parole, new Set((a.vive.join(" ").toLowerCase().match(/[a-z]+/g)||[]).map(pulisci)).size + " parole diverse") +
     riga("Tema", a.tema, a.usate + " parole sul tema") +
-    '</div><div class="wtxt">' + testo.replace(/</g,"&lt;") + '</div>';
+    '</div><div class="wtxt">' + a.vive.map(r => '<div class="wbarra">' + r.replace(/&/g,"&amp;").replace(/</g,"&lt;") + '</div>').join("") + '</div>';
   $("w-st").innerHTML = "In cartella hai <b>" + G.bars.length + "</b> strofe";
   $("w-done").textContent = "Metti via il foglio";
   $("w-done").onclick = () => { chiudiFoglio(); save(); renderGioco(); if(typeof renderStudio === "function") renderStudio(); };
