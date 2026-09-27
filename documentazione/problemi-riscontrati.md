@@ -29,7 +29,9 @@ il primo coi tre agenti insieme dopo il «non lanciare agenti» del 20/09) ha tr
 cose (`segnala-problemi`), una riga di documento nel backend (`backend-allineato`) e una
 nella prova sul telefono, fatta con Playwright perché l'estensione non c'era: tutte e sette
 chiuse in `task/shop-rifiniture-dopo-il-giro`, più la nota sullo sconto dell'usato che è
-diventata una regola (lo sconto scritto è quello vero).
+diventata una regola (lo sconto scritto è quello vero). Il 27/09 il giro su tutto il repository, con un anno di
+gioco simulato, ne ha trovate dieci (voci 52–61): sono tutte aperte, niente è stato
+toccato nel codice.
 
 1. ~~**Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
    telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra. Il tasto
@@ -263,6 +265,33 @@ diventata una regola (lo sconto scritto è quello vero).
    «resta, a metà»** (20/09, `implementazioni/implementazioni.md:53`), mentre la voce 5 due
    righe sotto è barrata e FATTO.~~ **RISOLTO (20/09/2026)** — il paragrafo dice che è chiusa
    il 20/09 e che resta la decisione sui sette video.
+52. **Se l'etichetta rescinde mentre sei in carcere e c'è una consegna aperta, il calendario
+   si ferma per sempre** (27/09, un anno simulato): alla scadenza `advanceWeek()` legge
+   `G.contract.advance` su `null`. Il dettaglio nel giro del 27/09 in fondo.
+53. **Un errore dentro la chiusura della settimana blocca «+1» e «+7» fino a ricaricare, e
+   dopo il ricaricamento si ripete** (27/09): il `saltaGiorni` di Eventi V2 accende
+   `ADF.skipRunning` e `SALTO` senza `try/finally`. È quello che rende permanenti la 52 e la 55.
+54. **Un evento ALTO dell'orologio coperto da un'altra finestra sparisce ma tiene il
+   lucchetto: il tempo non va più avanti** (27/09): capitato due volte nell'anno simulato,
+   una per 21 giorni di fila. Il meccanismo è riprodotto; la strada del giocatore vero no.
+55. **Un salvataggio con `strada` a metà (senza `attivita`) rompe la chiusura della
+   settimana** (27/09): il caricamento in `state.js` fonde solo il primo livello.
+56. **`main` è rosso dal commit `a9e3233`** (27/09): il controllo «gli skip del widget sono
+   bloccati da qualunque HIGH globale» cerca ancora `!overlayBusy()`, il codice ora usa
+   `!skipOverlayBusy()`. La catena si ferma lì: unit, e2e e build non girano.
+57. **La classifica ha dieci posti, quindi «sei in top 10» è sempre vero** (27/09): ogni
+   settimana con uno stream la riga verde «#N in classifica», il +6 d'hype, e al primo
+   ingresso il diario scrive «hype +40» anche se il tetto della fase ne fa entrare 20.
+58. **Durante un salto un incontro ALTO per strada si chiude con la X senza scegliere**
+   (27/09): `SALTO_STOP` gli mette un `annulla(){}`, fuori dal salto non ce l'ha.
+59. Il diario si riempie di «1 giorno saltato. Benessere +0, lucidità +0.» a ogni fine
+   giornata, e la deriva di tutta la settimana finisce addosso a un giorno solo (27/09).
+60. Piccole (27/09): «Ancora 1 settimane così», e il traguardo «Vivi di musica — senza aver
+   lavorato altrove» che guarda solo i mille euro.
+61. Da decidere (27/09): in carcere le spese si pagano 1,6 volte e il resoconto ne mostra una;
+   i numeri del bilanciamento dopo un anno (lucidità sempre a 96–99, scrittura al tetto,
+   niente game over coi debiti) stanno nel giro del 27/09.
+
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
 
 ---
@@ -5584,3 +5613,209 @@ questo non chiude ancora «Il giro su un telefono vero» e non è stato eseguito
 ![Scelta dell'avvio corretta a 360 × 640: Importa partita da 44 punti](prove-telefono/2026-09-26/02-menu-avvio-risolto-360x640.png)
 
 ![Shop corretto a 390 × 844: filtri da almeno 44 punti](prove-telefono/2026-09-26/04-shop-risolto-390x844.png)
+
+## Giro del 27/09/2026 (tutto il repository, più un anno di gioco simulato)
+
+Branch `task/giro-controllo-un-anno`, base `origin/main` a `a9e3233`. Prima tutte le prove
+che ci sono, poi un bot che gioca un anno intero nel browser come farebbe un giocatore: si
+cerca un lavoro e ci va, scrive due strofe al giorno, cerca e compra i beat, fa la take in
+cabina, registra, mixa, pubblica, fa promo, serate, freestyle, palestra e «stacca la
+spina» quando il benessere scende; agli eventi risponde a caso, e chiude la giornata con
+`ADF_TIME_SKIP(1)`, cioè la stessa strada del «+1». A ogni giorno controlla che i numeri
+della partita siano numeri e stiano nei loro limiti, e segna ogni errore JavaScript, ogni
+messaggio d'errore in console e ogni volta che il calendario non si muove.
+
+**Le prove che ci sono**
+
+| cosa | esito |
+|---|---|
+| `npm run verifica` sulla base | **rosso**: `npm run prova` passa, `audit-regressioni.js` fa 443 ok e 1 fallito (voce 56 qui sotto). La catena si ferma lì |
+| `npm run test:unit` (lanciato a parte) | 39 su 39 |
+| `npm run test:e2e` (lanciato a parte) | 3 su 3 |
+| `npm run verifica:build` | a posto; resta l'avviso già noto dei caratteri da Google Fonts |
+| `npm run verifica:dipendenze` | 0 vulnerabilità, frontend e backend |
+| `backend`: `npm run prova` | 192 a posto, 0 no |
+| `npx eslint js` | non gira: manca `eslint.config.js`, già scritto in `documentazione/dipendenze.md` |
+
+**L'anno simulato**
+
+Due partite complete da 364 giorni (semi 1 e 7), più tre da 150 giorni per cercare di far
+tornare il blocco della voce 54, più le prove mirate su quello che la lettura del codice
+faceva sospettare (carcere, contratto, salto di sette giorni, fine anno, debiti,
+salvataggio vecchio). In tutto circa 1.200 giorni di gioco.
+
+| a fine anno | seme 1 | seme 7 |
+|---|---|---|
+| fan | 25.729 | 70.791 |
+| fase | 2, Rapper emergente | 3, Rapper |
+| pezzi usciti | 61 | 102 |
+| stream nell'ultima settimana | 47.932 | 294.604 |
+| migliore posizione | #2 | #1 |
+| soldi | 112 € | 1.581 € |
+| hype / benessere / lucidità | 45 / 61 / 99 | 61 / 49 / 96 |
+| scrittura / flow / presenza / rete | 75 / 48 / 70 / 50 | 88 / 59 / 67 / 59 |
+| salvataggio | 217 KB | 244 KB |
+| errori JavaScript | 0 | 0 |
+| numeri rotti (NaN, fuori limite) | 0 | 0 |
+| giorni in cui il «+1» non andava | 1 | 21 |
+
+Il salvataggio si rilegge dopo un ricaricamento, e il passaggio all'anno 2 (settimana 52 →
+anno 2, età 20) è giusto. Nessun errore in console nelle partite normali: gli errori veri
+sono usciti tutti dai casi che la partita normale tocca di rado.
+
+Il bot non tiene conto degli orari quanto un giocatore (prova il turno da lavapiatti di
+mattina, il live club prima che apra): i rifiuti per «arrival-closed» e «energia» nei suoi
+conti sono suoi, non del gioco, e qui non sono segnati.
+
+### Se l'etichetta rescinde mentre sei in carcere e c'è una consegna aperta, il calendario si ferma per sempre
+
+- **dove** — `frontend/js/game/strada-crimine.js:725-728`: in carcere, una settimana su
+  cinque, `G.contract = null` («L'etichetta ha rescisso»), ma `G.obligation` resta com'è.
+  Alla scadenza della consegna `frontend/js/game/sim.js:230` fa
+  `Math.round(G.contract.advance * 0.4)`.
+- **cosa succede** — `TypeError: Cannot read properties of null (reading 'advance')`
+  dentro `advanceWeek()`, prima di `G.week++`. La settimana non si chiude e l'obbligo non
+  si cancella (`left` scende a −1, −2…): alla chiusura dopo succede di nuovo, e con la
+  voce 53 il «+1» si blocca del tutto. Ricaricare non serve, lo stato salvato è lo stesso.
+- **come si vede** — provato nel browser: contratto con consegna (`OFFERS` con `deliver`),
+  `left:1`, contratto tolto come fa la rescissione, due fine settimana di fila: tutte e
+  due danno l'errore, la settimana resta la 1.
+- **quanto pesa** — blocca la partita. Serve una carriera con contratto a consegne e un
+  arresto, quindi non è la prima ora di gioco: è proprio la partita di chi ci ha messo di
+  più. Una seconda cosa dallo stesso punto: rescisso il contratto, l'etichetta torna fra
+  le offerte e si può rifirmare prendendo di nuovo l'anticipo.
+
+### Un errore dentro la chiusura della settimana blocca «+1» e «+7» fino a ricaricare
+
+- **dove** — `frontend/js/game/eventi-v2.js:2370-2422`, il `saltaGiorni` che Eventi V2
+  mette al posto di quello di `skip.js`: `ADF.skipRunning=true` e `SALTO=true` prima del
+  giro, `false` dopo, senza `try/finally` intorno a `avanzaGiorno()`.
+- **cosa succede** — se una qualunque cosa chiamata dalla chiusura del giorno o della
+  settimana lancia un errore (voce 52, voce 55, o la prossima che arriva),
+  `ADF.skipRunning` resta acceso: `ADF_CAN_SKIP_TIME()` torna `false` per sempre e il
+  widget dice «Il calendario è bloccato da una decisione o da un'azione in corso», che
+  non è vero. Resta acceso anche `SALTO`, che tiene zitti eventi e chat.
+- **come si vede** — con il salvataggio della voce 55: il primo «+1» dà l'errore, i nove
+  dopo rispondono tutti «bloccato».
+- **quanto pesa** — da solo non rompe niente, ma trasforma ogni errore della chiusura in
+  una partita ferma, e nasconde l'errore vero dietro un messaggio sbagliato.
+
+### Un evento ALTO dell'orologio coperto da un'altra finestra sparisce ma tiene il lucchetto
+
+- **dove** — `frontend/js/game/eventi-tempo.js:313-330`: `showPending()` accende
+  `MOSTRANDO_ALTO` quando mostra l'evento, e lo spegne solo `clearPending()` (riga 284),
+  cioè solo quando si sceglie un'opzione. La finestra è `#modal`, la stessa di tutti gli
+  altri `showEvent()` (`frontend/js/game/modal.js:11`), che la riscrivono senza guardare
+  cosa c'era.
+- **cosa succede** — se mentre l'ALTO è a schermo qualcos'altro chiama `showEvent()`,
+  l'ALTO viene sostituito; chiusa quella finestra, l'evento non c'è più ma resta
+  «pendente», il lucchetto globale resta preso (`ADF_EVENTI.globalHigh()` = clock) e
+  `showPending()` non lo rimette su, perché `MOSTRANDO_ALTO` è ancora vero. Il «+1» e il
+  «+7» restano bloccati finché non si ricarica la pagina (al ricaricamento
+  `MOSTRANDO_ALTO` riparte da `false` e l'evento torna).
+- **come si vede** — riprodotto nel browser: «A casa ti fermano» forzato con
+  `GAME_EVENTS.force`, sopra i colloqui di lavoro, «Nessuno dei due»: la finestra è
+  chiusa, `GAME_EVENTS.pending()` = famiglia_muro, `ADF_CAN_SKIP_TIME()` = false,
+  `ADF_TIME_SKIP(1)` = false. Nell'anno simulato è successo due volte, con il lucchetto
+  preso e nessuna finestra aperta: un giorno col seme 1 (giorno 130), **21 giorni di
+  fila** col seme 7 (dal 337 al 357). Nelle altre tre partite da 150 giorni non è tornato.
+- **quanto pesa** — ferma il tempo senza dire perché. Nel bot la seconda finestra la apre
+  il bot stesso, che lancia la mossa dopo senza guardare; che strada usi un giocatore vero
+  non l'ho trovata. Da guardare: la modale sta a `z-index:60` (`css/overlays.css:151`),
+  mentre la barra globale (9600), le trasferte (120) e la Famepedia (120) stanno sopra e
+  restano cliccabili. Il rimedio vale comunque: o `showEvent()` non sovrascrive un ALTO,
+  o `showPending()` controlla che la modale mostri davvero l'ALTO prima di fidarsi di
+  `MOSTRANDO_ALTO`.
+
+### Un salvataggio con `strada` a metà rompe la chiusura della settimana
+
+- **dove** — `frontend/js/game/state.js:95`: `G = Object.assign(START(), JSON.parse(r))`
+  fonde solo il primo livello. Una `strada` salvata senza `attivita` resta senza: la legge
+  `stradaSettimana()` (`frontend/js/game/strada-crimine.js:752`, `s.attivita[a.id]`).
+- **cosa succede** — `Cannot read properties of undefined (reading 'lavanderia')` alla
+  prima chiusura della settimana, poi la voce 53 blocca tutto.
+- **come si vede** — un salvataggio a mano con `strada:{rep:0, heat:0}`, ricaricato: al
+  primo lunedì l'errore, i nove «+1» dopo bloccati. `G.strada` ha solo `rep` e `heat`.
+- **quanto pesa** — il salvataggio l'ho scritto io: un salvataggio vero del periodo in cui
+  `strada` aveva meno campi non l'ho trovato. Ma lo schema difensivo che il resto del
+  gioco usa (`diarioBordo()`, `studioDati()`) qui manca, e gli altri oggetti annidati di
+  `START()` (`life`, `agenda`, `telVisto`, `promoSaturation`) hanno lo stesso rischio.
+
+### `main` è rosso dal commit `a9e3233`
+
+- **dove** — `frontend/strumenti/audit-regressioni.js:1308-1311` cerca
+  `!globalHigh() && !overlayBusy()` in `eventi-v2.js`; il commit `a9e3233` («fix(game):
+  allow day skip from time-control locations», 27/09, dritto su `main`) ha messo
+  `!skipOverlayBusy()` (`frontend/js/game/eventi-v2.js:3087`).
+- **cosa succede** — il controllo fallisce, l'audit è rosso, e dato che la verifica
+  è una catena con `&&`, test unitari, e2e e build **non girano più** a nessuno finché non
+  si sistema: li ho lanciati a parte e passano.
+- **come si vede** — `npm run verifica` su `origin/main`: l'audit dice 443 ok, 1 fallito.
+- **quanto pesa** — il cambio nel codice ha senso (Sala, Strada e Negozio sono pagine, non
+  decisioni), va aggiornato il controllo. Il commit però è entrato senza branch, senza la
+  verifica e senza il testo del punto, in inglese.
+
+### La classifica ha dieci posti, quindi «sei in top 10» è sempre vero
+
+- **dove** — `frontend/js/game/rivals.js:74` tiene i rivali a 9; con te sono 10.
+  `frontend/js/game/sim.js:193-203` e `:211-213` danno il +6 e la riga verde a `pos <= 10`.
+- **cosa succede** — dalla prima settimana con un pezzo fuori sei al massimo #10: la riga
+  del diario è sempre verde con «#N in classifica», e al primo ingresso `G.best.chart`
+  passa da 99 a 10, salto 89, «Sali in classifica. Sei #10, hype +40». Col seme 1 alla
+  settimana 2 bastavano **38 stream**. E il +40 è scritto, non preso: il tetto di
+  «Sconosciuto» è 20 (`hypeCap()`), il diario dice il bonus e non quello che è entrato.
+- **come si vede** — il diario dell'anno simulato: «38 stream, 15 nuovi fan, −29 € · #10
+  in classifica», e sopra «Sali in classifica. Sei #10, hype +40.».
+- **quanto pesa** — la classifica non racconta più niente all'inizio, e il primo numero
+  d'hype che uno vede è falso.
+
+### Durante un salto un incontro ALTO per strada si chiude con la X
+
+- **dove** — `frontend/js/game/strada.js:351`: durante il salto l'incontro alto diventa
+  `SALTO_STOP = {…, annulla(){}, …}`; `mostraEventoConRipresa()` (`skip.js:111`) lo passa
+  a `showEvent()`, che con un `annulla` mostra la X e accetta ESC. Fuori dal salto la
+  stessa scena passa da `mostraIncontro(scena, true, …)` che l'annulla non lo mette
+  («Gli HIGH non hanno annulla: niente X, ESC o click fuori», riga 303).
+- **cosa succede** — con un «+7» un opp o un nemico per strada si possono chiudere senza
+  scegliere, e il salto riprende. In più quella strada non prende il lucchetto globale.
+- **come si vede** — provato nel browser con l'incontro «opp»: X visibile,
+  `chiudiModale()` = true, finestra chiusa senza scelta.
+- **quanto pesa** — si scappa da una decisione che dovrebbe essere obbligatoria.
+
+### Il diario si riempie di «1 giorno saltato»
+
+- **dove** — `frontend/js/game/eventi-v2.js:2344` (e `skip.js:80` sulla strada vecchia) scrive una riga a ogni «+1», anche quando la giornata l'hai giocata.
+- **cosa succede** — sette righe «1 giorno saltato. Benessere +0, lucidità +0.» a
+  settimana. Il diario tiene 80 righe (`sim.js:18`): con le mosse del giorno il resoconto
+  della settimana esce dal diario in un paio di settimane. E il lunedì la deriva del
+  benessere di tutta la settimana (`advanceWeek`, fino a −20) finisce su «1 giorno
+  saltato. Benessere −21», come se l'avesse fatta quel giorno.
+- **quanto pesa** — il diario diventa rumore, e «saltato» dice una cosa sbagliata.
+
+### Piccole
+
+- `frontend/js/game/sim.js:173`: «Ancora 1 settimane così e ti licenziano».
+- `frontend/js/game/content.js:81`: «Vivi di musica — Mille euro in banca senza aver
+  lavorato altrove» guarda solo `g.money >= 1000`. Nelle due partite è arrivato mentre il
+  bot faceva il magazziniere e l'operaio da tutto l'anno.
+
+### Da decidere (non sono bug)
+
+- **In carcere le spese si pagano 1,6 volte**: `advanceWeek()` toglie le spese intere, poi
+  `stradaSettimana()` (`strada-crimine.js:724`) toglie un altro 60%; il resoconto mostra
+  solo le prime. Se è voluto va scritto nel resoconto, se no è un doppio conto.
+- **Tre settimane dentro e perdi il lavoro**: in carcere il turno non si può fare e
+  `advanceWeek()` conta le settimane saltate come assenze. Col barista e tre settimane di
+  pena si esce disoccupati. Può essere giusto; oggi non lo dice nessuno.
+- **I numeri dopo un anno**, da tenere presenti quando si bilancia:
+  - la lucidità resta fra 96 e 99 tutto l'anno con una routine normale (scrivere, la
+    palestra): non morde mai. Non è una proposta di toglierla (vedi la decisione di
+    Carlo del 21/09), è un dato;
+  - la scrittura arriva a 87,8 su 88 entro l'anno col seme 7: il tetto delle abilità si
+    tocca nel primo anno;
+  - i soldi restano fra 100 e 600 € per tutto l'anno anche con 294.000 stream a
+    settimana: il lavoro non diventa mai facoltativo senza contratto;
+  - non c'è una fine: 5.000 € di debito per due mesi abbassano solo il benessere, e
+    `G.ended` non viene mai messo a `true` in tutto il codice;
+  - le spese crescono di 2 € a settimana per ogni pezzo mai registrato
+    (`weeklyCosts()`): con 102 pezzi sono 204 € fissi.
