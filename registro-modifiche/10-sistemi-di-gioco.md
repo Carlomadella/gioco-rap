@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:ae1413f -->
+## 27/09/26, 16:18 â€” task/classifica-dieci-posti â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `ae1413f`
+
+### Cosa Ã¨ entrato
+
+- `5d1fe4c` â€” La classifica conta chi sta davanti a qualcuno, e il diario scrive l'hype vero â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/sim.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:f83c4ad -->
 ## 21/09/26, 08:07 â€” task/shop-lo-stile-che-conta â†’ main
 
