@@ -295,7 +295,14 @@ function tornaAllaFoto(foto){
 /* L'errore non si ingoia: dopo aver rimesso a posto partita e salto lo si
    rilancia fuori dal giro, e lo prende la schermata «Il gioco si è fermato»
    (js/servizio.js) col dettaglio da mandare. */
-function rilanciaDopo(err){ setTimeout(() => { throw err; }, 0); }
+function rilanciaDopo(err){
+  /* la schermata di servizio si apre una volta per sessione: dal secondo
+     errore in poi senza questa riga il giorno tornava indietro in silenzio */
+  if(typeof toast === "function")
+    toast("<b>Il giorno non si è chiuso.</b> Qualcosa si è rotto: la giornata è tornata com'era.",
+      "bad", "!", ["#B91C1C", "#7F1D1D"]);
+  setTimeout(() => { throw err; }, 0);
+}
 
 function avanzaGiorno(){
   if(G.ended) return false;

@@ -2356,7 +2356,10 @@ saltaGiorni=function(n){
   const detenutoPrimaDelSalto=!!(G.strada&&G.strada.arresto);
   const before=weekOpen, costiSettimana=weeklyCosts();
   const lucPrima=luc(), wellPrima=G.wellbeing;
-  const s=st(), chainBefore=s.skip1Chain;
+  /* let: se un giorno si disfa (tornaAllaFoto) G.eventiV2 è un oggetto nuovo
+     e va riletto, se no notifiche e skip1Chain finiscono in quello vecchio */
+  let s=st();
+  const chainBefore=s.skip1Chain;
   const notifPrima=s.notifications.length;
 
   const guaranteed=new Set();
@@ -2377,12 +2380,12 @@ saltaGiorni=function(n){
      da una decisione» fino a ricaricare, e dopo il ricaricamento l'errore
      tornava uguale (giro del 27/09). Il giorno rotto si disfa (fotoPartita,
      sim.js), il salto si ferma e l'errore va alla schermata di servizio. */
-  let errore=null, foto=null;
+  let errore=null, foto=null, fotoDone=0, fotoWeeks=0;
   try{
   for(let i=0;i<n && !G.ended;i++){
     SALTO=true;
     const wasJailed=adfInJail();
-    foto=fotoPartita();
+    foto=fotoPartita(); fotoDone=done; fotoWeeks=weeks;
     if(avanzaGiorno()) weeks++;
     done++;
 
@@ -2429,6 +2432,8 @@ saltaGiorni=function(n){
   }catch(err){
     errore=err;
     if(foto) tornaAllaFoto(foto);
+    /* il giorno disfatto non si conta, e lo stato degli eventi si rilegge */
+    done=fotoDone; weeks=fotoWeeks; s=st();
     SALTO_STOP=null; adfStop=null;
   }finally{
     ADF.skipRunning=false;
