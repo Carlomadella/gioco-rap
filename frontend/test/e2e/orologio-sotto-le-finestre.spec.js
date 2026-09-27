@@ -16,6 +16,9 @@ test("l'orologio non sta sopra la modale né sopra le Impostazioni", async ({ pa
 
   const visibile = () => page.evaluate(() => getComputedStyle(document.getElementById("adf-time-dock")).visibility);
   expect(await visibile()).toBe("visible");
+  /* «GIORNO 1/7»: sul telefono era a 7-7,8 px, le regole strette lo rimpicciolivano */
+  const giorno = await page.evaluate(() => parseFloat(getComputedStyle(document.querySelector(".adf-tw-day")).fontSize));
+  expect(giorno).toBeGreaterThanOrEqual(8.5);
 
   /* una modale alta, con la X: quella che in orizzontale finiva sotto l'orologio */
   await page.evaluate(() => showEvent({k:"Prova", t:"Un titolo lungo abbastanza da andare su tre righe in orizzontale",

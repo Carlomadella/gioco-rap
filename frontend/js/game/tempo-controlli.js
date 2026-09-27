@@ -369,13 +369,13 @@
          precise e vincevano anche sul telefono, cosi' l'orologio si
          rimpiccioliva ma la casella che se lo tiene restava larga come su un
          monitor. Stessa precisione, e viene dopo: adesso vince questa. */
-      #adf-time-dock[data-host]{flex-basis:202px;padding-inline:5px}#${WIDGET_ID}{width:192px;height:58px;padding:7px 9px 7px 70px;border-radius:15px}.adf-tw-sun{width:43px;height:43px;left:14px;top:7px}.adf-tw-moon{width:37px;height:37px;left:17px;top:10px}.adf-tw-time{font-size:23px}.adf-tw-meta{font-size:7.5px}.adf-tw-day{font-size:7.8px}}
+      #adf-time-dock[data-host]{flex-basis:202px;padding-inline:5px}#${WIDGET_ID}{width:192px;height:58px;padding:7px 9px 7px 70px;border-radius:15px}.adf-tw-sun{width:43px;height:43px;left:14px;top:7px}.adf-tw-moon{width:37px;height:37px;left:17px;top:10px}.adf-tw-time{font-size:23px}.adf-tw-meta{font-size:7.5px}.adf-tw-day{font-size:8.8px}}
       @media(max-width:620px){/* [data-host] e non #adf-time-dock e basta: le righe
          per singolo posto (strada, jail, hub, posto...) sono scritte piu'
          precise e vincevano anche sul telefono, cosi' l'orologio si
          rimpiccioliva ma la casella che se lo tiene restava larga come su un
          monitor. Stessa precisione, e viene dopo: adesso vince questa. */
-      #adf-time-dock[data-host]{flex-basis:176px;padding-inline:4px}#${WIDGET_ID}{width:168px;height:54px;padding:6px 8px 6px 61px;border-radius:14px}.adf-tw-sun{width:38px;height:38px;left:12px;top:8px}.adf-tw-moon{width:33px;height:33px;left:14px;top:10px}.adf-tw-time{font-size:21px}.adf-tw-meta{font-size:6.7px}.adf-tw-day{font-size:7px;margin-top:3px}.adf-tc-panel{width:min(340px,calc(100vw - 16px));max-height:calc(100vh - 16px)}}
+      #adf-time-dock[data-host]{flex-basis:176px;padding-inline:4px}#${WIDGET_ID}{width:168px;height:54px;padding:6px 8px 6px 61px;border-radius:14px}.adf-tw-sun{width:38px;height:38px;left:12px;top:8px}.adf-tw-moon{width:33px;height:33px;left:14px;top:10px}.adf-tw-time{font-size:21px}.adf-tw-meta{font-size:6.7px}.adf-tw-day{font-size:8.2px;margin-top:3px}.adf-tc-panel{width:min(340px,calc(100vw - 16px));max-height:calc(100vh - 16px)}}
       @media(prefers-reduced-motion:reduce){#${WIDGET_ID},#${WIDGET_ID} *,#${ROOT_ID} *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
     `;
     document.head.appendChild(s);
