@@ -3071,9 +3071,9 @@ ADF_CATALOG_LOAD
     if(buildBadge){ buildBadge.textContent="1000 OK · v1.2.13"; buildBadge.classList.add("ok"); }
     installCalendar();
     refreshHub();
+    /* solo in console: a schermo era un avviso da sviluppatori, e al primo
+       avvio finiva sopra la prima decisione (prova sul telefono del 27/09) */
     console.info("[Anni di Fame] Eventi v1.2.13 pronti:",db.length,"eventi");
-    if(typeof toast==="function")
-      setTimeout(()=>toast("<b>Eventi v1.2.13:</b> 1000 caricati.","good","◆",["#7C3AED","#4C1D95"]),300);
   })
   .catch(err=>{
     const buildBadge=document.getElementById("adf-build-badge");

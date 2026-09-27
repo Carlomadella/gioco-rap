@@ -64,6 +64,12 @@
   .pevseg::after{content:"";position:absolute;left:50%;top:50%;
     transform:translate(-50%,-50%);width:44px;height:44px}
 
+  /* la barretta «torna alla home» del telefono è alta 5 px: resta così,
+     cresce solo la presa (prova sul telefono del 27/09) */
+  .tgest{position:relative}
+  .tgest::after{content:"";position:absolute;left:0;right:0;top:50%;
+    transform:translateY(-50%);height:44px}
+
   /* ---- le impostazioni ---- */
   .stab,.sbtn,.seg button{min-height:44px}
   .sbtn,.sprove .sbtn{padding-left:18px;padding-right:18px}   /* 42 -> 48 */

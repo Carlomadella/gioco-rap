@@ -296,6 +296,12 @@
       .adf-tc-legacy-hidden{display:none!important}
       #adf-time-dock{position:relative;z-index:142;flex:0 0 224px;align-self:stretch;display:flex;align-items:center;justify-content:center;min-width:0;padding:4px 7px;border-left:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(255,255,255,.018),rgba(255,255,255,.006))}
       #adf-time-dock[hidden]{display:none!important}
+      /* sotto una decisione o nelle Impostazioni l'orologio non serve e non deve
+         esserci: col suo 142 stava sopra la modale (60) e le Impostazioni (120),
+         in orizzontale copriva la X e dalle Impostazioni faceva passare il tempo
+         (prova sul telefono del 27/09) */
+      body:has(#modal.on) #adf-time-dock,body:has(.setts.on) #adf-time-dock,
+      body:has(#modal.on) #adf-tc-panel,body:has(.setts.on) #adf-tc-panel{visibility:hidden!important;pointer-events:none!important}
       #adf-time-dock[data-host="game"]{margin-left:auto;align-self:center;height:66px;flex-basis:222px;padding:0 6px;border-left:1px solid rgba(255,255,255,.07);background:transparent}
       #adf-time-dock[data-host="posto"],#adf-time-dock[data-host="negozio"]{margin-left:auto;align-self:center;height:64px;flex-basis:218px;padding:0 5px;border-left:0;background:transparent}
       #adf-time-dock[data-host="strada"]{height:100%;flex-basis:222px;padding:3px 6px}
@@ -317,7 +323,7 @@
       .adf-tw-meta,.adf-tw-day,.adf-tw-time{position:relative;z-index:30;display:block;text-shadow:0 1px 8px rgba(0,0,0,.50),0 0 1px rgba(0,0,0,.7);white-space:nowrap}
       .adf-tw-meta{color:rgba(255,255,255,.88);font:800 8.2px/1 Figtree,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase}
       .adf-tw-time{margin-top:2px;color:#fff;font:500 25px/.95 Figtree,system-ui,sans-serif;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
-      .adf-tw-day{margin-top:4px;color:rgba(255,255,255,.76);font:750 8.5px/1 Figtree,system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase}
+      .adf-tw-day{margin-top:4px;color:rgba(255,255,255,.9);font:750 9.5px/1 Figtree,system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase}
       .adf-tw-glass{position:absolute;inset:0;z-index:25;border-radius:inherit;background:linear-gradient(145deg,rgba(255,255,255,.09),transparent 34%,transparent 72%,rgba(255,255,255,.025));pointer-events:none}
 
       .adf-tw-sky{position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:inherit;pointer-events:none;background:linear-gradient(180deg,var(--sky-top,#5f8fbe) 0%,var(--sky-mid,#79a9ce) 45%,var(--sky-low,#a7c8de) 77%,var(--sky-horizon,#c7dce8) 100%);transition:background 1.05s linear,filter .7s ease}

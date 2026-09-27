@@ -74,5 +74,7 @@ test("i quattro comandi segnalati hanno una presa di almeno 44 punti", async ({ 
   );
   await page.waitForTimeout(450);
   const filtro = await page.locator(".shtab").first().boundingBox();
-  expect.soft(filtro.height, "Filtro Shop").toBeGreaterThanOrEqual(44);
+  /* 44 in CSS; la misura esce a volte 43,9994 per il posizionamento sotto il
+     pixel, e faceva rossa la verifica a caso (giro del 27/09) */
+  expect.soft(filtro.height, "Filtro Shop").toBeGreaterThanOrEqual(43.99);
 });
