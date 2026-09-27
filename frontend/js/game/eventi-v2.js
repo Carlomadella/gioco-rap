@@ -202,6 +202,23 @@ function overlayBusy(){
   if(socialBanner && socialBanner.classList.contains("show")) return true;
   return false;
 }
+
+/* Il widget globale del tempo vive anche dentro Sala/Posto, Strada e Negozio.
+   Queste schermate sono contesti di navigazione, non decisioni pendenti:
+   trattarle come overlay bloccanti rendeva +1/+7 inutilizzabile proprio da lì.
+   Alle 04:00 diventava un deadlock perché nessuna altra ACTION può partire.
+   Conserviamo invece il blocco per vere scene/decisioni/modal. */
+function skipOverlayBusy(){
+  const detenuto=!!(G.strada&&G.strada.arresto);
+  const ids=["modal","report","writer","piazza","scena","crimeModal","adf-result-overlay","adf-social-overlay"];
+  for(const id of ids){
+    if(id==="report" && detenuto) continue;
+    const el=document.getElementById(id);
+    if(el && el.classList.contains("on")) return true;
+  }
+  const socialBanner=document.getElementById("adf-social-banner");
+  return !!(socialBanner && socialBanner.classList.contains("show"));
+}
 function afterClear(fn, tries){
   tries=tries==null?80:tries;
   if(!overlayBusy()){ fn(); return; }
@@ -3067,7 +3084,7 @@ ADF_CATALOG_LOAD
   });
 
 window.ADF_CAN_SKIP_TIME=function(){
-  return ADF.ready && !ADF.skipRunning && !globalHigh() && !overlayBusy() && !G.ended;
+  return ADF.ready && !ADF.skipRunning && !globalHigh() && !skipOverlayBusy() && !G.ended;
 };
 
 /* Bridge unico per i controlli +1/+7 e per gli eventi a minuti.

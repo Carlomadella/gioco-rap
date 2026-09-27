@@ -135,3 +135,28 @@ describe("ingresso gameplay", () => {
     dom.window.close();
   });
 });
+
+describe("salto calendario dai luoghi", () => {
+  it("non considera Sala/Posto, Strada e Negozio overlay bloccanti per +1/+7", () => {
+    const source = leggi("js/game/eventi-v2.js");
+    const start = source.indexOf("function skipOverlayBusy()");
+    const end = source.indexOf("function afterClear", start);
+    const helper = source.slice(start, end);
+    const canSkipStart = source.indexOf("window.ADF_CAN_SKIP_TIME=function()");
+    const canSkipEnd = source.indexOf("};", canSkipStart) + 2;
+    const canSkip = source.slice(canSkipStart, canSkipEnd);
+
+    expect(start).toBeGreaterThan(-1);
+    expect(helper).not.toContain('"posto"');
+    expect(helper).not.toContain('"strada"');
+    expect(helper).not.toContain('"negozio"');
+    expect(helper).toContain('"modal"');
+    expect(helper).toContain('"report"');
+    expect(helper).toContain('"writer"');
+    expect(helper).toContain('"piazza"');
+    expect(helper).toContain('"scena"');
+    expect(canSkip).toContain("!skipOverlayBusy()");
+    expect(canSkip).not.toContain("!overlayBusy()");
+  });
+});
+
