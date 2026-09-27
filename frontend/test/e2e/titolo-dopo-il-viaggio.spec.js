@@ -42,3 +42,20 @@ test("dopo la conferma di un viaggio il titolo del pezzo si scrive", async ({ pa
   await expect(page.locator("#modal")).not.toHaveClass(/travel-confirm/);
   expect(errori).toEqual([]);
 });
+
+test.describe("sul telefono", () => {
+  test.use({ viewport: { width: 360, height: 640 }, hasTouch: true, isMobile: true });
+  /* il campo del titolo senza min-width:0 si allargava e spingeva il dado 🎲 fuori
+     dallo schermo (prova sul telefono del 27/09) */
+  test("il dado del titolo sta dentro alla finestra", async ({ page }) => {
+    await page.goto("/pagine/gioco.html");
+    await page.waitForFunction(() => window.GAME && window.ADF_TIME_SKIP);
+    await page.evaluate(() => { GAME.enter(); chiediTitolo("Prova", () => {}); });
+    const dado = page.locator("#tt-dado");
+    await expect(dado).toBeVisible();
+    const box = await dado.boundingBox();
+    expect(box.x + box.width).toBeLessThanOrEqual(360);
+    await dado.tap();
+    await expect(page.locator("#tt-in")).not.toHaveValue("");
+  });
+});
