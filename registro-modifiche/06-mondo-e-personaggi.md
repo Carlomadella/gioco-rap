@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:a0a4f23 -->
+## 27/09/26, 16:19 â€” task/carcere-spese-e-lavoro â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `a0a4f23`
+
+### Cosa Ã¨ entrato
+
+- `f28ccec` â€” In carcere il diario dice quanto costa stare dentro â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Aggiunto:** `frontend/test/e2e/carcere-spese.spec.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:3b85be1 -->
 ## 27/09/26, 16:18 â€” task/diario-senza-giorno-saltato â†’ main
 

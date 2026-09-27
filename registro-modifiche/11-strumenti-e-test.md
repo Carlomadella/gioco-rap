@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:a0a4f23 -->
+## 27/09/26, 16:19 â€” task/carcere-spese-e-lavoro â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `a0a4f23`
+
+### Cosa Ã¨ entrato
+
+- `f28ccec` â€” In carcere il diario dice quanto costa stare dentro â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/test/e2e/carcere-spese.spec.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:13c9519 -->
 ## 27/09/26, 16:18 â€” task/due-piccole-testo-traguardo â†’ main
 
