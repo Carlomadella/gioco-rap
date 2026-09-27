@@ -85,7 +85,7 @@
   .slider input[type=range]::-webkit-slider-thumb{margin-top:-9px}
 
   /* ---- il foglio di scrittura: e' qui che si scrive col pollice ---- */
-  .wline input,.wadd,.wbar button{min-height:44px}
+  .wline textarea,.wadd,.wbar button{min-height:44px}
   /* la crocetta che toglie la riga e' una pastiglia di 23: si allarga la presa,
      e va a prendersi lo spazio del contasillabe, che non e' da toccare */
   .wline .rm::after{content:"";position:absolute;left:50%;top:50%;
