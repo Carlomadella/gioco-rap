@@ -53,6 +53,7 @@ function salvaConCopertine(){
    Il pezzo nasce con la copertina generata dal suo seed, come prima; chi
    passa `pezzo` (la rinomina dalla plancia) si riprende seed e foto intatti. */
 function chiediTitolo(suggerito, onOk, pezzo){
+  if(typeof modaleSenzaViaggio === "function") modaleSenzaViaggio();
   $("m-k").textContent = "Come lo chiami";
   $("m-t").textContent = "Il titolo del pezzo";
   const st = {seed:(pezzo && pezzo.seed) || Math.floor(Math.random()*1e9), img:(pezzo && pezzo.img) || ""};

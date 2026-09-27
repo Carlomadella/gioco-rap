@@ -30,6 +30,24 @@ function modaleProssima(){
   }catch(e){}
 }
 
+/* La conferma dello spostamento ha la sua faccia (partenza, arrivo, durata)
+   e nasconde il testo normale. Chi scrive la modale a mano (il titolo del
+   pezzo, la scheda del rivale, la scelta del salto) deve rimetterla normale:
+   se no, dopo un viaggio, il titolo del pezzo si apriva senza testo e senza
+   il campo per scriverlo (27/09). */
+function modaleViaggio(travel){
+  $("modal").classList.toggle("travel-confirm", !!travel);
+  $("m-travel").hidden = !travel;
+  $("m-d").hidden = !!travel;
+  $("modal").setAttribute("aria-describedby", travel ? "m-travel" : "m-d");
+  if(travel){
+    $("travel-departure").textContent = travel.departure;
+    $("travel-arrival").textContent = travel.arrival;
+    $("travel-duration").textContent = travel.duration;
+  }
+}
+function modaleSenzaViaggio(){ modaleViaggio(null); }
+
 function showEvent(e){
   if(modaleObbligata()){
     MODALE_CODA.push(e);
@@ -40,15 +58,7 @@ function showEvent(e){
   $("m-t").textContent = e.t;
   $("m-d").innerHTML = e.d;
   const travel = e.travel || null;
-  $("modal").classList.toggle("travel-confirm", !!travel);
-  $("m-travel").hidden = !travel;
-  $("m-d").hidden = !!travel;
-  $("modal").setAttribute("aria-describedby", travel ? "m-travel" : "m-d");
-  if(travel){
-    $("travel-departure").textContent = travel.departure;
-    $("travel-arrival").textContent = travel.arrival;
-    $("travel-duration").textContent = travel.duration;
-  }
+  modaleViaggio(travel);
   MODALE_ANNULLA = typeof e.annulla === "function" ? e.annulla : null;
   $("m-x").hidden = !MODALE_ANNULLA;
   const w = $("m-opts"); w.innerHTML = "";

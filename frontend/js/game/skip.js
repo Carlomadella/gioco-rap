@@ -9,6 +9,7 @@
 "use strict";
 
 function scegliSalto(opts){
+  if(typeof modaleSenzaViaggio === "function") modaleSenzaViaggio();
   $("m-k").textContent = "Il tempo";
   $("m-t").textContent = "Salta avanti";
   $("m-d").innerHTML = "Ti fermi e lasci correre il calendario. Non scrivi, non registri, " +

@@ -355,6 +355,7 @@ function schedaRivale(nome){
   const dist = mio > 0 ? (r2.p > mio ? "ti sta davanti di " + short(r2.p - mio) + " stream"
     : "sei avanti tu di " + short(mio - r2.p) + " stream") : "tu non sei ancora in classifica";
   const trend = r2.prev ? (r2.p > r2.prev*1.05 ? "in salita" : r2.p < r2.prev*0.95 ? "in calo" : "fermo") : "—";
+  if(typeof modaleSenzaViaggio === "function") modaleSenzaViaggio();
   $("m-k").textContent = "Chi è";
   $("m-t").textContent = r2.n;
   $("m-d").innerHTML = '<div class="rcard2">' +
