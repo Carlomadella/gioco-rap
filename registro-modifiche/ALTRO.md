@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:f06f0ea -->
+## 27/09/26, 16:53 â€” task/rapporto-voci-57-64 â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `f06f0ea`
+
+### Cosa Ã¨ entrato
+
+- `e995438` â€” Rapporto: le voci 57–64 chiuse, la regressione della PR #2 e il giro di fine task â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:70a2bd0 -->
 ## 27/09/26, 16:23 â€” task/e2e-tetto-60-secondi â†’ main
 
