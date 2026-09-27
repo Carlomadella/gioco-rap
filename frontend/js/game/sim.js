@@ -373,7 +373,7 @@ function schedaRivale(nome){
   const b = document.createElement("button");
   b.className = "opt2";
   b.innerHTML = '<span class="n">Chiudi</span><span class="d">Torna alla classifica</span>';
-  b.onclick = () => $("modal").classList.remove("on");
+  b.onclick = () => { $("modal").classList.remove("on"); if(typeof modaleProssima === "function") modaleProssima(); };
   w.appendChild(b);
   $("modal").classList.add("on");
 }

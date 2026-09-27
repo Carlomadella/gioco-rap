@@ -40,6 +40,8 @@
   const EVENT_ICON = {basso:"·", medio:"!", alto:"◆"};
   const EVENT_TINT = {basso:["#3B4756","#1E242D"], medio:["#8A6C35","#332919"], alto:["#8E2C2C","#351515"]};
 
+  /* false, oppure il primo bottone dell'ALTO a schermo: serve a capire se
+     qualcuno ci ha scritto sopra (giro del 27/09) */
   let MOSTRANDO_ALTO = false;
   let RESTORE_TIMER = null;
   let AUTO_GUARD = false;
@@ -313,7 +315,16 @@
   function showPending(){
     const p = pending();
     if(inJail()) return;
-    if(!p || MOSTRANDO_ALTO || typeof showEvent !== "function" || !screenGameplay()) return;
+    /* L'ALTO era a schermo ma la modale non lo mostra più: un'altra finestra
+       ci ha scritto sopra. Prima MOSTRANDO_ALTO restava vero, l'ALTO non
+       tornava e il suo lucchetto teneva fermo il «+1» fino a ricaricare. */
+    if(MOSTRANDO_ALTO){
+      const m = document.getElementById("modal");
+      const ancoraSu = MOSTRANDO_ALTO.isConnected && m && m.classList.contains("on");
+      if(ancoraSu) return;
+      MOSTRANDO_ALTO = false;
+    }
+    if(!p || typeof showEvent !== "function" || !screenGameplay()) return;
     const modal = document.getElementById("modal");
     if(modal && modal.classList.contains("on")){
       setTimeout(queuePending, 180);
@@ -350,6 +361,8 @@
         }
       }))
     });
+    /* il bottone vero, non un «true»: se sparisce dalla pagina l'ALTO è stato coperto */
+    MOSTRANDO_ALTO = document.querySelector("#m-opts button") || false;
   }
 
   function triggerHigh(e,ctx){

@@ -18,7 +18,7 @@ function scegliSalto(opts){
     const b = document.createElement("button");
     b.className = "opt2";
     b.innerHTML = '<span class="n">' + o.n + '</span><span class="d">' + o.d + '</span>';
-    b.onclick = () => { $("modal").classList.remove("on"); o.run(); };
+    b.onclick = () => { $("modal").classList.remove("on"); o.run(); if(typeof modaleProssima === "function") modaleProssima(); };
     w.appendChild(b);
   });
   $("modal").classList.add("on");

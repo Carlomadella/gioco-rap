@@ -3030,6 +3030,9 @@ obs.observe(document.body,{childList:true,subtree:true});
    deve comunque riaprire la finestra 10–15 giorni. */
 const _showEvent=showEvent;
 showEvent=function(e){
+  /* se c'è una decisione a schermo la finestra va solo in coda (modal.js):
+     si conta quando si apre davvero, cioè quando la coda la ripassa di qui */
+  if(typeof modaleObbligata==="function" && modaleObbligata()) return _showEvent.apply(this,arguments);
   if(e && !e.__adfCatalog && e.ph!=null) armHigh();
   const k=String((e&&e.k)||"").toLowerCase();
   if(k.includes("strada")){
