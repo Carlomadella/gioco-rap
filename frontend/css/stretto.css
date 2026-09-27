@@ -524,6 +524,10 @@
   /* la foto e la freccia nella stessa cella: la freccia sta in fondo a destra
      della città e, appiccicosa, resta sul bordo finché c'è altra città da
      vedere (voce 64 del giro del 27/09, js/game/mappa-scorre.js) */
+  /* la colonna larga quanto la foto e non quanto lo schermo: se no la freccia
+     finiva in fondo ai 374 px visibili, scorreva via con la città e lo
+     sticky non la teneva mai sul bordo (prova sul telefono del 27/09) */
+  .pmappa { grid-template-columns: max(100%, 900px); }   /* = la larghezza di .pfoto qui sotto */
   .pmappa > .pfoto { grid-area: 1 / 1; }
   .pmappa.si-scorre .pmappa-freccia {
     display: grid;

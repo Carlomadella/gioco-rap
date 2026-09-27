@@ -25,6 +25,16 @@ test.describe("sul telefono", () => {
 
     await freccia.tap();
     await expect.poll(() => page.evaluate(() => document.querySelector(".pmappa").scrollLeft)).toBeGreaterThan(0);
+    /* e dopo lo scorrimento la freccia è ancora sul bordo destro, non a metà città */
+    await page.waitForTimeout(600);
+    const dopo = await freccia.boundingBox();
+    expect(dopo.x + dopo.width).toBeLessThanOrEqual(390);
+    expect(dopo.x).toBeGreaterThan(390 - 70);
+    /* anche a metà di una trascinata */
+    await page.evaluate(() => { const m = document.querySelector(".pmappa"); m.scrollLeft = Math.round((m.scrollWidth - m.clientWidth) / 2); });
+    await page.waitForTimeout(200);
+    const meta = await freccia.boundingBox();
+    expect(meta.x).toBeGreaterThan(390 - 70);
 
     await page.evaluate(() => { const m = document.querySelector(".pmappa"); m.scrollLeft = m.scrollWidth; });
     await expect(freccia).toBeHidden();
