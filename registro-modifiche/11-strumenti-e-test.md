@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:5838892 -->
+## 27/09/26, 15:13 â€” task/audit-skip-overlay â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `5838892`
+
+### Cosa Ã¨ entrato
+
+- `a6e3bd3` â€” Audit: il controllo degli skip guarda skipOverlayBusy() â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:241bcda -->
 ## 26/09/26, 16:50 â€” task/giro-telefono-25-09-2026 â†’ main
 
