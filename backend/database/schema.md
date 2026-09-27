@@ -334,7 +334,7 @@ CREATE TABLE carriera (
   artista_id      TEXT    REFERENCES artista(id) ON DELETE SET NULL,
   slot            INTEGER NOT NULL CHECK (slot BETWEEN 1 AND 3),
   stato           TEXT    NOT NULL,          -- l'oggetto G intero, in JSON
-  versione_stato  INTEGER NOT NULL DEFAULT 2,-- la versione del formato del salvataggio
+  versione_stato  INTEGER NOT NULL DEFAULT 2,-- la versione del formato; oggi resta a 2, il vecchio lo completa il client
   versione_gioco  TEXT    NOT NULL DEFAULT '',  -- quale build l'ha scritto
   settimana_gioco INTEGER NOT NULL DEFAULT 1,
   anno_gioco      INTEGER NOT NULL DEFAULT 1,

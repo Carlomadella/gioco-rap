@@ -955,7 +955,7 @@ salva la base URL in `localStorage`.
 | `ONLINE.piattaforma()` | rileva localmente `android`, `ios`, `mac`, `windows`, `linux` o `web` |
 | `ONLINE.punteggioDaPartita()` | costruisce localmente il payload leggendo l'oggetto globale `G` (diario di bordo compreso: `live` e `feat` da `diarioBordo()`, `colpi` mai) |
 | `ONLINE.invia(dati?)` | `POST /api/punteggio`; senza argomenti usa `punteggioDaPartita()` |
-| `ONLINE.salvaCarriera(slot?, forza?)` | `PUT /api/carriera/:slot` con l'intero oggetto `G` |
+| `ONLINE.salvaCarriera(slot?, forza?)` | `PUT /api/carriera/:slot` con una copia di `G` più `__adfCloud: { v:1, artista }`, l'istantanea dell'artista che serve al ripristino (`frontend/js/net/online.js:291-296`) |
 | `ONLINE.carriera(slot?)` | `GET /api/carriera/:slot` |
 | `ONLINE.carriere()` | `GET /api/carriere` |
 | `ONLINE.traguardi()` | `GET /api/traguardi` |
