@@ -24,6 +24,18 @@ function assicuraArtistaOnline(){
   }catch(e){}
 }
 
+/* una prova di passaggio rimasta aperta prima di un ricaricamento torna su
+   (phases.js, provaRimastaAperta). Non due volte: se è già a schermo o in
+   coda dietro un'altra decisione, resta dov'è. */
+function riapriProvaRimasta(){
+  if(typeof provaRimastaAperta !== "function") return;
+  const p = provaRimastaAperta();
+  if(!p || (G.strada && G.strada.arresto)) return;
+  const aSchermo = $("modal").classList.contains("on") && $("m-t").textContent === p.t;
+  const inCoda = typeof MODALE_CODA !== "undefined" && MODALE_CODA.indexOf(p) >= 0;
+  if(!aSchermo && !inCoda) showEvent(p);
+}
+
 window.GAME = {
   enter(){
     entraAudioGameplay();
@@ -35,5 +47,6 @@ window.GAME = {
     renderGioco();
     /* la mappa è la prima cosa che si vede: va riempita anche lei */
     if(typeof renderHub === "function") renderHub();
+    riapriProvaRimasta();
   }
 };

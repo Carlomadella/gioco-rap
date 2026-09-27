@@ -156,4 +156,13 @@ const TRIALS = [
 function pendingTrial(){
   return TRIALS.find(t => t.ph === G.phase && !G.trialsDone[t.ph] && t.req(G));
 }
+/* Una prova si segna come fatta quando si apre (sim.js), e la chiudono
+   passTrial() (la fase sale) o failTrial() (il segno si toglie). Segnata e
+   senza attesa vuol dire che è rimasta aperta: se si ricarica in quel momento
+   pendingTrial() la salta, e la carriera restava ferma in quella fase per
+   sempre. All'ingresso la si ripresenta (giro del 27/09, voce 63). */
+function provaRimastaAperta(){
+  if(!G.trialsDone || !G.trialsDone[G.phase] || G.trialCd > 0) return null;
+  return TRIALS.find(t => t.ph === G.phase) || null;
+}
 function nextTrial(){ return TRIALS.find(t => t.ph === G.phase); }
