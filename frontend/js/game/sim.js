@@ -170,8 +170,9 @@ function advanceWeek(){
         pushLog("<b>Ti hanno licenziato</b> da " + G.job.n + ". Niente più stipendio.", "bad");
         G.job = null;
       }else{
-        pushLog("Non ti sei presentato al lavoro. Ancora " + (3 - G.job.missed) +
-          " settimane così e ti licenziano.", "bad");
+        const restano = 3 - G.job.missed;
+        pushLog("Non ti sei presentato al lavoro. Ancora " + restano +
+          (restano === 1 ? " settimana così" : " settimane così") + " e ti licenziano.", "bad");
       }
     }
   }

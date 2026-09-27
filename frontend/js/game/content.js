@@ -78,7 +78,8 @@ const GOALS = [
   {id:"g1", n:"Primo pezzo pubblicato", d:"Metti fuori qualcosa. Qualsiasi cosa.", ok:g => g.songs.some(s=>s.released), rw:{hype:5}},
   {id:"g2", n:"Mille ascoltatori", d:"Mille persone che non conosci.", ok:g => g.fans >= 1000, rw:{hype:8}},
   {id:"g3", n:"Entra nei primi cinque", d:"Un piazzamento vero, non l'ultima riga.", ok:g => g.best.chart <= 5, rw:{hype:12, money:200}},
-  {id:"g4", n:"Vivi di musica", d:"Mille euro in banca senza aver lavorato altrove.", ok:g => g.money >= 1000, rw:{wellbeing:10}},
+  /* «senza aver lavorato altrove»: senza un posto di lavoro (giro del 27/09, voce 60) */
+  {id:"g4", n:"Vivi di musica", d:"Mille euro in banca senza aver lavorato altrove.", ok:g => g.money >= 1000 && !g.job, rw:{wellbeing:10}},
   {id:"g5", n:"Un pezzo che gira", d:"Un singolo oltre i centomila stream.", ok:g => g.songs.some(s=>s.streams >= 100000), rw:{hype:15}},
   {id:"g6", n:"Firma un contratto", d:"O rifiutali tutti sapendo cosa rifiuti.", ok:g => !!g.contract || g.goals.g6, rw:{}},
   {id:"g7", n:"Diecimila fan", d:"Non sei più un caso isolato.", ok:g => g.fans >= 10000, rw:{hype:10}},
