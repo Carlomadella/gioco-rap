@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:9e9d494 -->
+## 27/09/26, 16:52 â€” task/titolo-dopo-il-viaggio â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `9e9d494`
+
+### Cosa Ã¨ entrato
+
+- `cdc50b6` â€” Sul telefono il dado del titolo sta dentro alla finestra â€” **Carlomadella**
+- `694f06b` â€” La prova del titolo dopo il viaggio controlla anche la scheda del rivale â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/overlays.css`
+- **Modificato:** `frontend/test/e2e/titolo-dopo-il-viaggio.spec.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:071bdcf -->
 ## 27/09/26, 16:19 â€” task/mappa-si-scorre â†’ main
 
