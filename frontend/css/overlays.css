@@ -111,7 +111,7 @@
 .wtxt{background:#0F0F13;border-radius:14px;padding:16px 18px;font-size:15.5px;line-height:1.85;
   font-weight:600;white-space:pre-wrap}
 .titolo{display:flex;gap:9px;margin-top:12px}
-.titolo input{flex:1;background:#0E0E13;border:0;outline:0;color:#fff;font-family:var(--disp);
+.titolo input{flex:1;min-width:0;background:#0E0E13;border:0;outline:0;color:#fff;font-family:var(--disp);
   font-size:19px;padding:13px 15px;border-radius:12px;letter-spacing:-.02em;
   box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.1)}
 .titolo input:focus{box-shadow:inset 0 0 0 1.5px var(--acid)}
