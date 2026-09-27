@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:969eb78 -->
+## 27/09/26, 16:52 â€” task/mappa-si-scorre â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `969eb78`
+
+### Cosa Ã¨ entrato
+
+- `8f88f99` â€” La freccia della mappa resta davvero sul bordo destro â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/stretto.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:3e09a47 -->
 ## 27/09/26, 16:52 â€” task/foglio-a-capo-sul-telefono â†’ main
 

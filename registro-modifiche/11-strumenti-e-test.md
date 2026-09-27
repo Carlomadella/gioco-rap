@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:969eb78 -->
+## 27/09/26, 16:52 â€” task/mappa-si-scorre â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `969eb78`
+
+### Cosa Ã¨ entrato
+
+- `8f88f99` â€” La freccia della mappa resta davvero sul bordo destro â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/test/e2e/mappa-si-scorre.spec.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:a202dde -->
 ## 27/09/26, 16:52 â€” task/coda-menu-e-prova-ricaricata â†’ main
 
