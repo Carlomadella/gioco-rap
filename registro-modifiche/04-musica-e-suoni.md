@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:26f1182 -->
+## 27/09/26, 16:18 â€” task/titolo-dopo-il-viaggio â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `26f1182`
+
+### Cosa Ã¨ entrato
+
+- `cf57c4c` â€” Dopo la conferma di un viaggio il titolo del pezzo torna scrivibile â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/copertine.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:f2ec9b9 -->
 ## 27/09/26, 15:13 â€” task/alto-coperto-da-altra-finestra â†’ main
 
