@@ -64,6 +64,10 @@
   .pevseg::after{content:"";position:absolute;left:50%;top:50%;
     transform:translate(-50%,-50%);width:44px;height:44px}
 
+  /* la barretta «torna alla home» del telefono resta alta 5 px e senza
+     presa più grande: sopra c'è l'ultima riga della lista e una presa da 44
+     le rubava i tocchi (giro del 27/09). Per uscire c'è il tasto indietro. */
+
   /* ---- le impostazioni ---- */
   .stab,.sbtn,.seg button{min-height:44px}
   .sbtn,.sprove .sbtn{padding-left:18px;padding-right:18px}   /* 42 -> 48 */

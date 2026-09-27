@@ -296,6 +296,12 @@
       .adf-tc-legacy-hidden{display:none!important}
       #adf-time-dock{position:relative;z-index:142;flex:0 0 224px;align-self:stretch;display:flex;align-items:center;justify-content:center;min-width:0;padding:4px 7px;border-left:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(255,255,255,.018),rgba(255,255,255,.006))}
       #adf-time-dock[hidden]{display:none!important}
+      /* sotto una decisione o nelle Impostazioni l'orologio non serve e non deve
+         esserci: col suo 142 stava sopra la modale (60) e le Impostazioni (120),
+         in orizzontale copriva la X e dalle Impostazioni faceva passare il tempo
+         (prova sul telefono del 27/09) */
+      body:has(#modal.on) #adf-time-dock,body:has(.setts.on) #adf-time-dock,
+      body:has(#modal.on) #adf-tc-panel,body:has(.setts.on) #adf-tc-panel{visibility:hidden!important;pointer-events:none!important}
       #adf-time-dock[data-host="game"]{margin-left:auto;align-self:center;height:66px;flex-basis:222px;padding:0 6px;border-left:1px solid rgba(255,255,255,.07);background:transparent}
       #adf-time-dock[data-host="posto"],#adf-time-dock[data-host="negozio"]{margin-left:auto;align-self:center;height:64px;flex-basis:218px;padding:0 5px;border-left:0;background:transparent}
       #adf-time-dock[data-host="strada"]{height:100%;flex-basis:222px;padding:3px 6px}
@@ -317,7 +323,7 @@
       .adf-tw-meta,.adf-tw-day,.adf-tw-time{position:relative;z-index:30;display:block;text-shadow:0 1px 8px rgba(0,0,0,.50),0 0 1px rgba(0,0,0,.7);white-space:nowrap}
       .adf-tw-meta{color:rgba(255,255,255,.88);font:800 8.2px/1 Figtree,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase}
       .adf-tw-time{margin-top:2px;color:#fff;font:500 25px/.95 Figtree,system-ui,sans-serif;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
-      .adf-tw-day{margin-top:4px;color:rgba(255,255,255,.76);font:750 8.5px/1 Figtree,system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase}
+      .adf-tw-day{margin-top:4px;color:rgba(255,255,255,.9);font:750 9.5px/1 Figtree,system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase}
       .adf-tw-glass{position:absolute;inset:0;z-index:25;border-radius:inherit;background:linear-gradient(145deg,rgba(255,255,255,.09),transparent 34%,transparent 72%,rgba(255,255,255,.025));pointer-events:none}
 
       .adf-tw-sky{position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:inherit;pointer-events:none;background:linear-gradient(180deg,var(--sky-top,#5f8fbe) 0%,var(--sky-mid,#79a9ce) 45%,var(--sky-low,#a7c8de) 77%,var(--sky-horizon,#c7dce8) 100%);transition:background 1.05s linear,filter .7s ease}
@@ -363,13 +369,13 @@
          precise e vincevano anche sul telefono, cosi' l'orologio si
          rimpiccioliva ma la casella che se lo tiene restava larga come su un
          monitor. Stessa precisione, e viene dopo: adesso vince questa. */
-      #adf-time-dock[data-host]{flex-basis:202px;padding-inline:5px}#${WIDGET_ID}{width:192px;height:58px;padding:7px 9px 7px 70px;border-radius:15px}.adf-tw-sun{width:43px;height:43px;left:14px;top:7px}.adf-tw-moon{width:37px;height:37px;left:17px;top:10px}.adf-tw-time{font-size:23px}.adf-tw-meta{font-size:7.5px}.adf-tw-day{font-size:7.8px}}
+      #adf-time-dock[data-host]{flex-basis:202px;padding-inline:5px}#${WIDGET_ID}{width:192px;height:58px;padding:7px 9px 7px 70px;border-radius:15px}.adf-tw-sun{width:43px;height:43px;left:14px;top:7px}.adf-tw-moon{width:37px;height:37px;left:17px;top:10px}.adf-tw-time{font-size:23px}.adf-tw-meta{font-size:7.5px}.adf-tw-day{font-size:8.8px}}
       @media(max-width:620px){/* [data-host] e non #adf-time-dock e basta: le righe
          per singolo posto (strada, jail, hub, posto...) sono scritte piu'
          precise e vincevano anche sul telefono, cosi' l'orologio si
          rimpiccioliva ma la casella che se lo tiene restava larga come su un
          monitor. Stessa precisione, e viene dopo: adesso vince questa. */
-      #adf-time-dock[data-host]{flex-basis:176px;padding-inline:4px}#${WIDGET_ID}{width:168px;height:54px;padding:6px 8px 6px 61px;border-radius:14px}.adf-tw-sun{width:38px;height:38px;left:12px;top:8px}.adf-tw-moon{width:33px;height:33px;left:14px;top:10px}.adf-tw-time{font-size:21px}.adf-tw-meta{font-size:6.7px}.adf-tw-day{font-size:7px;margin-top:3px}.adf-tc-panel{width:min(340px,calc(100vw - 16px));max-height:calc(100vh - 16px)}}
+      #adf-time-dock[data-host]{flex-basis:176px;padding-inline:4px}#${WIDGET_ID}{width:168px;height:54px;padding:6px 8px 6px 61px;border-radius:14px}.adf-tw-sun{width:38px;height:38px;left:12px;top:8px}.adf-tw-moon{width:33px;height:33px;left:14px;top:10px}.adf-tw-time{font-size:21px}.adf-tw-meta{font-size:6.7px}.adf-tw-day{font-size:8.2px;margin-top:3px}.adf-tc-panel{width:min(340px,calc(100vw - 16px));max-height:calc(100vh - 16px)}}
       @media(prefers-reduced-motion:reduce){#${WIDGET_ID},#${WIDGET_ID} *,#${ROOT_ID} *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
     `;
     document.head.appendChild(s);
