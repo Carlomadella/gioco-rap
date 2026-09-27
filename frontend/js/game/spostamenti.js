@@ -339,16 +339,16 @@
     showEvent({
       k:"Spostamento",
       t:"Vai lì?",
-      d:"Partenza <b>" + GAME_TIME.format(p.now) + "</b> · arrivo previsto <b>" +
-        GAME_TIME.format(p.arrival) + "</b>.<br>Il tragitto richiede <b>" + dur + "</b>.",
+      d:"",
+      travel:{departure:GAME_TIME.format(p.now), arrival:GAME_TIME.format(p.arrival), duration:dur},
       annulla(){},
       opts:[
+        {n:"Resta qui", d:"Continua a esplorare la mappa senza perdere tempo", run(){ return null; }},
         {n:"Vai · " + dur, d:"Il tempo passa solo dopo questa conferma", run(){
           const out = esegui(p.toId);
           if(out.ok && typeof onArrive === "function") onArrive();
           return null;
-        }},
-        {n:"Resta qui", d:"Continua a esplorare la mappa senza perdere tempo", run(){ return null; }}
+        }}
       ]
     });
   }
