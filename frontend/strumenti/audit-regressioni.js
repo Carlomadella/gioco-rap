@@ -1305,8 +1305,13 @@ const scBody=sc0>=0&&sc1>sc0?ev.slice(sc0,sc1):"";
 test("HIGH catalogo prende il lock prima di chat o LaFamegram",
   scBody.includes('beginGlobalHigh("catalog",e.id') &&
   scBody.indexOf('beginGlobalHigh("catalog",e.id') < scBody.indexOf("mirrorDelivery(e)"));
+/* Dal 27/09 (a9e3233) lo skip guarda skipOverlayBusy(): Sala, Strada e Negozio
+   sono pagine e non fermano più il «+1», le decisioni vere sì. */
+const sob0=ev.indexOf("function skipOverlayBusy(");
+const sobBody=sob0>=0?ev.slice(sob0,ev.indexOf("function afterClear(",sob0)):"";
 test("gli skip del widget sono bloccati da qualunque HIGH globale",
-  ev.includes("!globalHigh() && !overlayBusy()") &&
+  ev.includes("!globalHigh() && !skipOverlayBusy()") &&
+  ["modal","report","writer","piazza","scena"].every(id => sobBody.includes('"' + id + '"')) &&
   timeControls.includes("ADF_EVENTI.globalHigh") &&
   timeControls.includes("window.ADF_TIME_SKIP(count)"));
 test("refresh di un HIGH catalogo non duplica Chat o LaFamegram",
