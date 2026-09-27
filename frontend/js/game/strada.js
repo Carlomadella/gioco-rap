@@ -348,7 +348,9 @@ function provaIncontro(){
      salto sul serio (SALTO_STOP, sim.js legge questa variabile) */
   if(SALTO){
     if(liv !== "alto"){ risolviIncontroAuto(scena); return; }
-    SALTO_STOP = {k:"Per strada", t:scena.t, d:scena.d, annulla(){}, opts:scena.opts};
+    /* niente annulla: è un ALTO come fuori dal salto (mostraIncontro(…, true)),
+       e con la X si scappava dalla decisione (giro del 27/09, voce 58) */
+    SALTO_STOP = {k:"Per strada", t:scena.t, d:scena.d, opts:scena.opts};
     return;
   }
 

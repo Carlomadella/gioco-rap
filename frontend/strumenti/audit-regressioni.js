@@ -1294,6 +1294,11 @@ test("un HIGH per strada non ha annulla e usa il lock globale",
   street.includes('if(!obbligatorio) ev.annulla=function(){}') &&
   street.includes('ADF_EVENTI.beginHigh("street",scelto.id)') &&
   street.includes("mostraIncontro(scena,true"));
+/* voce 58 del giro del 27/09: anche fermo in un salto (strada vecchia, senza
+   Eventi V2) l'incontro ALTO non ha annulla */
+test("un HIGH per strada fermo in un salto non ha annulla",
+  street.includes('SALTO_STOP = {k:"Per strada", t:scena.t, d:scena.d, opts:scena.opts};') &&
+  !/SALTO_STOP = {[^}]*annulla/.test(street));
 test("HIGH catalogo e strada sopravvivono al refresh",
   ev.includes("pendingGlobalHigh") &&
   ev.includes('ph.source==="catalog"') &&
