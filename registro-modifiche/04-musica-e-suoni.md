@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:3e09a47 -->
+## 27/09/26, 16:52 â€” task/foglio-a-capo-sul-telefono â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `3e09a47`
+
+### Cosa Ã¨ entrato
+
+- `32afc59` â€” Foglio sul telefono: tasti su una riga, barre separate, Invio che dice «avanti» â€” **Carlomadella**
+- `44db19d` â€” Il Foglio si rimisura girando il telefono, e l'a capo della tastiera è un Invio â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/writer.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:04fda6c -->
 ## 27/09/26, 16:19 â€” task/foglio-a-capo-sul-telefono â†’ main
 
