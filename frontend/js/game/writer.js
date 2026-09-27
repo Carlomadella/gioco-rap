@@ -249,6 +249,12 @@ function altezzaRiga(el){
   el.style.height = "auto";
   if(el.scrollHeight > 0) el.style.height = el.scrollHeight + "px";
 }
+/* girando il telefono col foglio aperto le righe cambiano larghezza: una barra
+   lunga che prima stava in due righe ne vuole quattro */
+window.addEventListener("resize", () => {
+  if(!WR || !$("writer").classList.contains("on")) return;
+  $("w-body").querySelectorAll(".wline textarea").forEach(altezzaRiga);
+});
 function chiudiFoglio(){ $("writer").classList.remove("on"); WR = null; }
 
 /* Come w-x/w-cancel, ma richiamabile da fuori (bottone globale «Torna alla
@@ -267,7 +273,7 @@ function disegnaFoglio(){
       /* una barra arriva a 90 caratteri: su un telefono stretto un <input> ne
          mostrava 27 e il resto scorreva dentro al campo. Il textarea va a capo e
          cresce; Invio passa lo stesso alla barra dopo (giro del 27/09, voce 62) */
-      '<textarea rows="1" data-i="' + i + '" maxlength="90" placeholder="' +
+      '<textarea rows="1" enterkeyhint="next" data-i="' + i + '" maxlength="90" placeholder="' +
         (i === 0 ? "Scrivi la prima barra…" : "…") + '">' + r.replace(/&/g,"&amp;").replace(/</g,"&lt;") + '</textarea>' +
       '<span class="sil">' + (viva ? sillabe(r) : "") + '</span>' +
       '<span class="rm' + (g ? " on" : "") + '" style="' + (g ? "background:" + RCOL[g] : "") + '">' +
@@ -307,12 +313,23 @@ function disegnaFoglio(){
   $("w-done").disabled = a.vive.length < 2;
   $("w-done").textContent = (b <= 1.01 && a.vive.length >= 2) ? "Tienila così" : "Chiudi la strofa";
 
+  /* Invio passa alla barra dopo (e se è l'ultima ne aggiunge una) */
+  const vaiAllaDopo = i => {
+    if(i === WR.righe.length-1 && WR.righe.length < 10) WR.righe.push("");
+    disegnaFoglio();
+    const n2 = document.querySelector('.wline textarea[data-i="' + Math.min(i+1, WR.righe.length-1) + '"]');
+    if(n2) n2.focus();
+  };
   $("w-body").querySelectorAll("textarea").forEach(inp => {
     altezzaRiga(inp);
-    inp.oninput = () => {
+    inp.oninput = ev => {
+      /* certe tastiere del telefono non mandano il tasto Invio ma solo un a
+         capo nel testo: è lo stesso Invio, e passa alla barra dopo */
+      const invio = ev && (ev.inputType === "insertLineBreak" || ev.inputType === "insertParagraph");
       /* una barra è una riga: un a capo incollato diventa uno spazio */
-      if(/\n/.test(inp.value)) inp.value = inp.value.replace(/\s*\n\s*/g, " ");
+      if(/\n/.test(inp.value)) inp.value = inp.value.replace(/\s*\n\s*/g, invio ? "" : " ");
       WR.righe[+inp.dataset.i] = inp.value;
+      if(invio){ vaiAllaDopo(+inp.dataset.i); return; }
       const pos = inp.selectionStart, i = inp.dataset.i;
       disegnaFoglio();
       const n2 = document.querySelector('.wline textarea[data-i="' + i + '"]');
@@ -321,11 +338,7 @@ function disegnaFoglio(){
     inp.onkeydown = e => {
       if(e.key === "Enter"){
         e.preventDefault();
-        const i = +inp.dataset.i;
-        if(i === WR.righe.length-1 && WR.righe.length < 10) WR.righe.push("");
-        disegnaFoglio();
-        const n2 = document.querySelector('.wline textarea[data-i="' + Math.min(i+1, WR.righe.length-1) + '"]');
-        if(n2) n2.focus();
+        vaiAllaDopo(+inp.dataset.i);
       }
     };
   });
@@ -375,7 +388,7 @@ function chiudiStrofa(){
     riga("Metrica", a.metrica, Math.round(a.media) + " sillabe di media") +
     riga("Parole", a.parole, new Set((a.vive.join(" ").toLowerCase().match(/[a-z]+/g)||[]).map(pulisci)).size + " parole diverse") +
     riga("Tema", a.tema, a.usate + " parole sul tema") +
-    '</div><div class="wtxt">' + testo.replace(/</g,"&lt;") + '</div>';
+    '</div><div class="wtxt">' + a.vive.map(r => '<div class="wbarra">' + r.replace(/&/g,"&amp;").replace(/</g,"&lt;") + '</div>').join("") + '</div>';
   $("w-st").innerHTML = "In cartella hai <b>" + G.bars.length + "</b> strofe";
   $("w-done").textContent = "Metti via il foglio";
   $("w-done").onclick = () => { chiudiFoglio(); save(); renderGioco(); if(typeof renderStudio === "function") renderStudio(); };

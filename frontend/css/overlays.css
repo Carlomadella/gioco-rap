@@ -77,7 +77,8 @@
 .waddrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
 .wadd.auto{flex:2 1 190px;background:rgba(255,197,61,.14);color:var(--acid);font-weight:800}
 @media (hover:hover){.wadd.auto:hover{background:rgba(255,197,61,.24)}}
-.wadd{flex:1;background:rgba(255,255,255,.06);border:0;color:var(--soft);border-radius:12px;padding:11px;
+/* i tasti non vanno a capo: se non ci stanno, va a capo la fila (27/09) */
+.wadd{flex:1 1 auto;white-space:nowrap;background:rgba(255,255,255,.06);border:0;color:var(--soft);border-radius:12px;padding:11px;
   font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
 @media (hover:hover){.wadd:hover{background:rgba(255,255,255,.11);color:#fff}}
 .wmeters{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
@@ -93,8 +94,8 @@
 .wbar{position:fixed;left:0;right:0;bottom:0;background:rgba(9,9,12,.96);
   border-top:1px solid rgba(255,255,255,.08);padding:13px 18px;z-index:2}
 .wbar .in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:10px}
-.wbar .st{font-size:13px;color:var(--soft);font-weight:600}
-.wbar button{border:0;border-radius:13px;padding:13px 20px;font-family:inherit;font-size:14.5px;
+.wbar .st{flex:1;min-width:0;font-size:13px;color:var(--soft);font-weight:600}
+.wbar button{flex:none;white-space:nowrap;border:0;border-radius:13px;padding:13px 20px;font-family:inherit;font-size:14.5px;
   font-weight:800;cursor:pointer}
 .wbar .gh{background:rgba(255,255,255,.08);color:var(--soft);margin-left:auto}
 .wbar .sl{background:#fff;color:#0B0B0D}
@@ -108,8 +109,12 @@
 .wrow .bar{flex:1;height:5px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden}
 .wrow .bar i{display:block;height:100%;background:var(--acid)}
 .wrow span{font-size:12.5px;color:var(--soft);min-width:150px;text-align:right}
-.wtxt{background:#0F0F13;border-radius:14px;padding:16px 18px;font-size:15.5px;line-height:1.85;
-  font-weight:600;white-space:pre-wrap}
+/* una barra per blocco: quando una barra va a capo sul telefono si vede
+   ancora dove finisce e dove comincia la dopo (27/09) */
+.wtxt{background:#0F0F13;border-radius:14px;padding:16px 18px;font-size:15.5px;line-height:1.4;
+  font-weight:600}
+.wtxt .wbarra{margin-bottom:.6em}
+.wtxt .wbarra:last-child{margin-bottom:0}
 .titolo{display:flex;gap:9px;margin-top:12px}
 .titolo input{flex:1;min-width:0;background:#0E0E13;border:0;outline:0;color:#fff;font-family:var(--disp);
   font-size:19px;padding:13px 15px;border-radius:12px;letter-spacing:-.02em;
