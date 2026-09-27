@@ -281,6 +281,22 @@ function advanceWeek(){
    avanzaGiorno() è il motore puro: nessun save/render, nessuna finestra.
    Lo richiama sia «Fine giornata» (una volta) sia saltaGiorni() (N volte di
    fila) — così i due modi di far passare il tempo restano una sola verità. */
+/* Un giorno che va in errore a metà non deve restare nella partita: la
+   chiusura della settimana aggiunge stream, fan e soldi prima di far salire
+   G.week, e salvato così la stessa settimana si chiudeva due volte (giro di
+   fine task del 27/09). Il salto fa una foto prima di ogni giorno e, se il
+   giorno scoppia, ci torna — nello stesso oggetto G, che altri tengono in mano. */
+function fotoPartita(){ return JSON.stringify(G); }
+function tornaAllaFoto(foto){
+  const prima = JSON.parse(foto);
+  for(const k of Object.keys(G)) if(!(k in prima)) delete G[k];
+  Object.assign(G, prima);
+}
+/* L'errore non si ingoia: dopo aver rimesso a posto partita e salto lo si
+   rilancia fuori dal giro, e lo prende la schermata «Il gioco si è fermato»
+   (js/servizio.js) col dettaglio da mandare. */
+function rilanciaDopo(err){ setTimeout(() => { throw err; }, 0); }
+
 function avanzaGiorno(){
   if(G.ended) return false;
   syncEnergy();

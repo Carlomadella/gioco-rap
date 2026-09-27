@@ -2375,13 +2375,14 @@ saltaGiorni=function(n){
   /* Qualunque errore dentro la chiusura del giorno o della settimana lasciava
      accesi ADF.skipRunning e SALTO: da lì «+1» e «+7» rispondevano «bloccato
      da una decisione» fino a ricaricare, e dopo il ricaricamento l'errore
-     tornava uguale (giro del 27/09). L'errore si dice in console e si ferma
-     il salto, ma il calendario resta usabile. */
-  let errore=null;
+     tornava uguale (giro del 27/09). Il giorno rotto si disfa (fotoPartita,
+     sim.js), il salto si ferma e l'errore va alla schermata di servizio. */
+  let errore=null, foto=null;
   try{
   for(let i=0;i<n && !G.ended;i++){
     SALTO=true;
     const wasJailed=adfInJail();
+    foto=fotoPartita();
     if(avanzaGiorno()) weeks++;
     done++;
 
@@ -2427,14 +2428,13 @@ saltaGiorni=function(n){
   }
   }catch(err){
     errore=err;
-    console.error("[Anni di Fame] il salto del tempo si è fermato su un errore", err);
+    if(foto) tornaAllaFoto(foto);
+    SALTO_STOP=null; adfStop=null;
   }finally{
     ADF.skipRunning=false;
     SALTO=false;
   }
-  if(errore && typeof toast==="function")
-    toast("<b>Il giorno non si è chiuso bene.</b> Il salto si è fermato: riprova, e se torna diccelo.",
-      "bad","!",["#B91C1C","#7F1D1D"]);
+  if(errore) rilanciaDopo(errore);
 
   if(n===1 && !adfAny && !SALTO_STOP) s.skip1Chain=Math.min(12,chainBefore+1);
   else if(adfAny || n!==1) s.skip1Chain=0;
