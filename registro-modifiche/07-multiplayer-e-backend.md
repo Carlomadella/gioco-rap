@@ -6,6 +6,27 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:33a69bd -->
+## 27/09/26, 15:13 â€” task/backend-documento-salvataggi â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `33a69bd`
+
+### Cosa Ã¨ entrato
+
+- `8eb0941` â€” Backend: salvaCarriera aggiunge __adfCloud solo se c'è un artista â€” **Carlomadella**
+- `778b053` â€” Backend: due frasi della documentazione allineate a quello che fa il codice â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `backend/README-API.md`
+- **Modificato:** `backend/database/README.md`
+- **Modificato:** `backend/database/schema.md`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:9995781 -->
 ## 21/09/26, 13:53 â€” task/shop-rifiniture-dopo-il-giro â†’ main
 
