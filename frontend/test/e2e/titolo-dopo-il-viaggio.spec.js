@@ -30,5 +30,15 @@ test("dopo la conferma di un viaggio il titolo del pezzo si scrive", async ({ pa
   /* e la stessa cosa per la scelta del salto e la scheda di un rivale */
   await page.evaluate(() => scegliSalto([{n:"Resta", d:"", run(){}}]));
   await expect(page.locator("#m-d")).toBeVisible();
+  await page.locator("#m-opts button").first().click();
+  /* la scheda di un rivale, dopo un altro viaggio */
+  await page.evaluate(() => {
+    showEvent({k:"Spostamento", t:"Vai lì?", d:"", travel:{departure:"11:00", arrival:"11:20", duration:"20 min"},
+      annulla(){}, opts:[{n:"Resta qui", d:"", run(){ return null; }}, {n:"Vai", d:"", run(){ return null; }}]});
+  });
+  await page.locator("#m-opts .travel-cancel").click();
+  await page.evaluate(() => { sistemaRivali(); schedaRivale(G.rivals[0].n); });
+  await expect(page.locator("#m-d .rcard2")).toBeVisible();
+  await expect(page.locator("#modal")).not.toHaveClass(/travel-confirm/);
   expect(errori).toEqual([]);
 });
