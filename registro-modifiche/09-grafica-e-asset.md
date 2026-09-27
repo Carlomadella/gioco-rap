@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:071bdcf -->
+## 27/09/26, 16:19 â€” task/mappa-si-scorre â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `071bdcf`
+
+### Cosa Ã¨ entrato
+
+- `4698cb8` â€” Sul telefono una freccia dice che la città continua a destra â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/hub.css`
+- **Modificato:** `frontend/css/stretto.css`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:04fda6c -->
 ## 27/09/26, 16:19 â€” task/foglio-a-capo-sul-telefono â†’ main
 

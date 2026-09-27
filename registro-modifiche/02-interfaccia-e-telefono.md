@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:071bdcf -->
+## 27/09/26, 16:19 â€” task/mappa-si-scorre â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `071bdcf`
+
+### Cosa Ã¨ entrato
+
+- `4698cb8` â€” Sul telefono una freccia dice che la città continua a destra â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/hub.css`
+- **Modificato:** `frontend/css/stretto.css`
+- **Aggiunto:** `frontend/js/game/mappa-scorre.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `frontend/test/e2e/mappa-si-scorre.spec.js`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:68e09a1 -->
 ## 27/09/26, 16:19 â€” task/coda-menu-e-prova-ricaricata â†’ main
 
