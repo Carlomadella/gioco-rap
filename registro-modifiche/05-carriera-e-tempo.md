@@ -6,6 +6,29 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:e7f618f -->
+## 27/09/26, 15:13 â€” task/salto-senza-finally â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `e7f618f`
+
+### Cosa Ã¨ entrato
+
+- `bc515d0` â€” Il salto rilegge lo stato degli eventi dopo un giorno disfatto, e avvisa sempre â€” **Carlomadella**
+- `1030fee` â€” Il salto disfa il giorno rotto e manda l'errore alla schermata di servizio â€” **Carlomadella**
+- `f6b9262` â€” Il salto del tempo si spegne anche quando la chiusura va in errore â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/sim.js`
+- **Modificato:** `frontend/js/game/skip.js`
+- **Aggiunto:** `frontend/test/e2e/salto-dopo-un-errore.spec.js`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:d471010 -->
 ## 21/09/26, 19:36 â€” task/discografia-app-telefono â†’ main
 
