@@ -31,8 +31,10 @@ nella prova sul telefono, fatta con Playwright perché l'estensione non c'era: t
 chiuse in `task/shop-rifiniture-dopo-il-giro`, più la nota sullo sconto dell'usato che è
 diventata una regola (lo sconto scritto è quello vero). Il 27/09 il giro su tutto il repository, con un anno di
 gioco simulato, ha aggiunto le voci 52–61: otto problemi, una voce con due piccole (60) e una
-di scelte da fare (61). Sono tutte aperte, niente è stato toccato nel codice, e in «Da fare
-adesso» non ci sono ancora: stanno in fondo a questo indice finché qualcuno non le smista.
+di scelte da fare (61). Lo stesso giorno le cinque che bloccavano la partita o la verifica
+(52–56) sono state chiuse, una per branch, e i giri di fine task su quelle correzioni hanno
+aggiunto le voci 62–64. In «Da fare adesso» non ci sono ancora: stanno in fondo a questo
+indice finché qualcuno non le smista.
 
 1. ~~**Fra i 980 e i 1180 punti la barra della plancia trabocca** (15/09, trovato facendo il
    telefono che si alza): 1100 punti di contenuto in 1000, il Menu esce a destra. Il tasto
@@ -266,23 +268,29 @@ adesso» non ci sono ancora: stanno in fondo a questo indice finché qualcuno no
    «resta, a metà»** (20/09, `implementazioni/implementazioni.md:53`), mentre la voce 5 due
    righe sotto è barrata e FATTO.~~ **RISOLTO (20/09/2026)** — il paragrafo dice che è chiusa
    il 20/09 e che resta la decisione sui sette video.
-52. **Se l'etichetta rescinde mentre sei in carcere e c'è una consegna aperta, il calendario
-   si ferma** (27/09, un anno simulato): alla scadenza `advanceWeek()` legge
-   `G.contract.advance` su `null`. Si sblocca solo firmando un altro contratto, che nessuno
-   indovina. Blocca la partita. Il dettaglio nel giro del 27/09 in fondo.
-53. **Un errore dentro la chiusura della settimana blocca «+1» e «+7» fino a ricaricare, e
-   dopo il ricaricamento si ripete** (27/09): il `saltaGiorni` di Eventi V2 accende
-   `ADF.skipRunning` e `SALTO` senza `try/finally`. È quello che rende permanenti la 52 e la 55.
-54. **Un evento ALTO dell'orologio coperto da un'altra finestra sparisce ma tiene il
-   lucchetto: il tempo non va più avanti** (27/09): capitato due volte nell'anno simulato,
-   una per 21 giorni di fila. Il meccanismo è riprodotto; la strada del giocatore vero no.
-   Blocca la partita.
-55. **Un salvataggio con `strada` a metà (senza `attivita`) rompe la chiusura della
-   settimana** (27/09): il caricamento in `state.js` fonde solo il primo livello.
-56. **`main` è rosso dal commit `a9e3233`** (27/09): il controllo «gli skip del widget sono
-   bloccati da qualunque HIGH globale» cerca ancora `!overlayBusy()`, il codice ora usa
-   `!skipOverlayBusy()`. La catena si ferma lì: unit, e2e, build e dipendenze non girano
-   più a nessuno.
+52. ~~**Se l'etichetta rescinde mentre sei in carcere e c'è una consegna aperta, il calendario
+   si ferma** (27/09, un anno simulato).~~ **RISOLTO (27/09/2026)** — branch
+   `task/contratto-rescisso-in-carcere`: la rescissione cancella anche la consegna, e
+   `advanceWeek()` butta una consegna rimasta senza contratto (i salvataggi già rotti
+   ripartono). Prova in `frontend/test/e2e/contratto-rescisso.spec.js`.
+53. ~~**Un errore dentro la chiusura della settimana blocca «+1» e «+7» fino a ricaricare, e
+   dopo il ricaricamento si ripete** (27/09).~~ **RISOLTO (27/09/2026)** — branch
+   `task/salto-senza-finally`: il salto spegne sempre `ADF.skipRunning` e `SALTO`, disfa il
+   giorno rotto tornando alla foto presa prima (`fotoPartita()` in `sim.js`), e manda
+   l'errore alla schermata di servizio più un avviso. Prova in
+   `frontend/test/e2e/salto-dopo-un-errore.spec.js`.
+54. ~~**Un evento ALTO dell'orologio coperto da un'altra finestra sparisce ma tiene il
+   lucchetto: il tempo non va più avanti** (27/09).~~ **RISOLTO (27/09/2026)** — branch
+   `task/alto-coperto-da-altra-finestra`: una finestra senza via d'uscita non si copre più,
+   quella nuova aspetta in coda (`modal.js`); l'ALTO dell'orologio controlla di essere
+   davvero a schermo e si rimette su. Prove in `frontend/test/e2e/alto-coperto.spec.js`.
+55. ~~**Un salvataggio con `strada` a metà (senza `attivita`) rompe la chiusura della
+   settimana** (27/09).~~ **RISOLTO (27/09/2026)** — branch `task/salvataggio-annidato-a-meta`:
+   `partitaDaSalvataggio()` in `state.js` completa un livello più giù gli oggetti di
+   `START()`, tranne `strada.giroAvviato`. Prova in `frontend/test/e2e/salvataggio-vecchio.spec.js`.
+56. ~~**`main` è rosso dal commit `a9e3233`** (27/09).~~ **RISOLTO (27/09/2026)** — branch
+   `task/audit-skip-overlay`: il controllo cerca `!skipOverlayBusy()` e guarda che le
+   decisioni vere blocchino ancora lo skip.
 57. **All'inizio la classifica ha dieci posti, quindi «sei in top 10» è vero da subito**
    (27/09): con uno stream la riga del diario è verde con «#N in classifica», e al primo
    ingresso il diario scrive «hype +40» anche se il tetto della fase ne fa entrare 20.
@@ -297,7 +305,18 @@ adesso» non ci sono ancora: stanno in fondo a questo indice finché qualcuno no
 61. Da decidere (27/09): in carcere le spese si pagano 1,6 volte e il resoconto ne mostra una;
    i numeri del bilanciamento dopo un anno (lucidità sempre a 96–99, scrittura al tetto,
    niente game over coi debiti) stanno nel giro del 27/09.
-
+62. **Sul telefono il Foglio mostra una barra per volta dentro un campo da 200 punti**
+   (27/09, prova sul telefono): a 360 × 640 di una barra da 90 caratteri se ne leggono 27, il
+   resto scorre dentro al campo (`writer.js:259-260`, un `<input>` per riga). Serve un campo
+   che vada a capo: non è una riga di CSS, perché il foglio vive di Invio e frecce fra le righe.
+63. Note della coda della modale (27/09, giro di fine task): è «obbligatoria» ogni finestra
+   senza annulla, quindi anche i menu dei luoghi e i colloqui fanno aspettare un ALTO; e la
+   coda non si salva, per cui una prova rimasta in coda e già segnata in `G.trialsDone` si
+   perde se si ricarica proprio in quel momento. Nessuna delle due si è vista rompere niente.
+64. Sul telefono l'etichetta «LIVE CLUB» è tagliata dal bordo destro della mappa: la mappa
+   scorre di lato apposta, ma niente dice che si può scorrere (27/09, prova sul telefono).
+   In orizzontale il telefono alzato mostra due file di app: conta solo con la decisione
+   della voce 9.
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
 
 ---
@@ -5695,6 +5714,7 @@ conti sono suoi, non del gioco, e qui non sono segnati.
   arresto, quindi non è la prima ora di gioco: è proprio la partita di chi ci ha messo di
   più. Una seconda cosa dallo stesso punto: rescisso il contratto, l'etichetta torna fra
   le offerte e si può rifirmare prendendo di nuovo l'anticipo.
+- **RISOLTO (27/09/2026)** — branch `task/contratto-rescisso-in-carcere`: la rescissione cancella anche la consegna, e `advanceWeek()` butta una consegna senza contratto.
 
 ### Un errore dentro la chiusura della settimana blocca «+1» e «+7» fino a ricaricare
 
@@ -5711,6 +5731,7 @@ conti sono suoi, non del gioco, e qui non sono segnati.
 - **quanto pesa** — blocca la partita ogni volta che c'è un errore nella chiusura: da solo
   non rompe niente, ma trasforma ogni errore in una partita ferma e lo nasconde dietro un
   messaggio sbagliato.
+- **RISOLTO (27/09/2026)** — branch `task/salto-senza-finally`: il salto spegne sempre `ADF.skipRunning` e `SALTO`, disfa il giorno rotto e manda l'errore alla schermata di servizio.
 
 ### Un evento ALTO dell'orologio coperto da un'altra finestra sparisce ma tiene il lucchetto
 
@@ -5738,6 +5759,7 @@ conti sono suoi, non del gioco, e qui non sono segnati.
   restano cliccabili. Il rimedio vale comunque: o `showEvent()` non sovrascrive un ALTO,
   o `showPending()` controlla che la modale mostri davvero l'ALTO prima di fidarsi di
   `MOSTRANDO_ALTO`.
+- **RISOLTO (27/09/2026)** — branch `task/alto-coperto-da-altra-finestra`: la finestra nuova aspetta in coda dietro una decisione, e l'ALTO dell'orologio si rimette su se qualcuno ci scrive sopra a mano.
 
 ### Un salvataggio con `strada` a metà rompe la chiusura della settimana
 
@@ -5752,6 +5774,7 @@ conti sono suoi, non del gioco, e qui non sono segnati.
   `strada` aveva meno campi non l'ho trovato. Ma lo schema difensivo che il resto del
   gioco usa (`diarioBordo()`, `studioDati()`) qui manca, e gli altri oggetti annidati di
   `START()` (`life`, `agenda`, `telVisto`, `promoSaturation`) hanno lo stesso rischio.
+- **RISOLTO (27/09/2026)** — branch `task/salvataggio-annidato-a-meta`: `partitaDaSalvataggio()` completa un livello più giù gli oggetti di `START()`.
 
 ### `main` è rosso dal commit `a9e3233`
 
@@ -5766,6 +5789,7 @@ conti sono suoi, non del gioco, e qui non sono segnati.
 - **quanto pesa** — blocca la verifica di tutti (non la partita). Il cambio nel codice ha senso (Sala, Strada e Negozio sono pagine, non
   decisioni), va aggiornato il controllo. Il commit però è entrato senza branch, senza la
   verifica e senza il testo del punto, in inglese.
+- **RISOLTO (27/09/2026)** — branch `task/audit-skip-overlay`: il controllo cerca `!skipOverlayBusy()` e guarda che le decisioni vere blocchino ancora lo skip.
 
 ### All'inizio la classifica ha dieci posti, quindi «sei in top 10» è vero da subito
 
@@ -5938,3 +5962,73 @@ che non torna è qui sotto: sono correzioni al foglio, non errori nuovi del gioc
 - **come si vede** — leggere le righe «quanto pesa» della sezione.
 - **quanto pesa** — da sistemare con calma.
 - **RISOLTO (27/09/2026)** — ogni «quanto pesa» delle voci 52–59 usa le parole del foglio; 52, 53, 54 e 55 «blocca la partita», 56 blocca la verifica.
+
+## Giri di fine task del 27/09/2026 sulle correzioni dei blocchi (segnala-problemi, backend-allineato, prova-sul-telefono)
+
+Le voci 52–56 sono state chiuse in sei branch, uno per problema più uno per il telefono e
+uno per due frasi del backend: `task/audit-skip-overlay`, `task/contratto-rescisso-in-carcere`,
+`task/salto-senza-finally`, `task/alto-coperto-da-altra-finestra`,
+`task/salvataggio-annidato-a-meta`, `task/orologio-sotto-le-finestre`,
+`task/backend-documento-salvataggi`. Ogni blocco ha la sua prova e2e, che senza la correzione
+fallisce. Poi due giri dei tre agenti: quello che hanno trovato sta qui sotto, chiuso negli
+stessi branch prima del merge, tranne le tre voci dell'indice (62–64).
+
+La simulazione del 27/09 rifatta sulla coda della modale: 60 giorni, 0 errori, 0 blocchi.
+
+### Il salto salvava una settimana chiusa a metà
+
+- **dove** — il primo `try/catch` del salto (`task/salto-senza-finally`) arrivava a `save()`
+  dopo l'errore, con stream, fan e soldi già contati e `G.week` non ancora salito.
+- **quanto pesa** — la stessa settimana si chiudeva due volte.
+- **RISOLTO (27/09/2026)** — foto della partita prima di ogni giorno (`fotoPartita()` /
+  `tornaAllaFoto()` in `sim.js`), e al giorno rotto si torna lì; `st()` si rilegge dopo, e il
+  giorno disfatto non entra nel conto dei giorni e delle settimane. La prova controlla memoria
+  e salvataggio.
+
+### L'errore del salto non arrivava a nessuno
+
+- **dove** — il toast «riprova, e se torna diccelo» ingoiava l'errore: la schermata di
+  servizio non lo vedeva e non c'era niente da mandare. Dal secondo errore della sessione
+  (la schermata si apre una volta) il giorno tornava indietro in silenzio.
+- **RISOLTO (27/09/2026)** — `rilanciaDopo()` rilancia l'errore fuori dal giro, dove lo
+  prende `servizio.js`, e mette un avviso ogni volta.
+
+### La coda della modale contava due volte, e si fermava su un errore
+
+- **dove** — il passaggio di Eventi V2 davanti a `showEvent()` contava anche le finestre che
+  andavano solo in coda; una scelta che scoppiava lasciava ferma la coda.
+- **RISOLTO (27/09/2026)** — si contano quando si aprono (prova per il contatore della
+  Strada), `modaleProssima()` sta in un `finally`, e a coda vuota richiama l'ALTO
+  dell'orologio rimasto sotto invece di aspettare un render.
+
+### Il completamento del salvataggio rimetteva «pulita» una carriera criminale vecchia
+
+- **dove** — `strada.giroAvviato:false` messo da `START()` nei salvataggi di prima del flag:
+  `stradaGiroAvviato()` non faceva più la migrazione dalle prove.
+- **RISOLTO (27/09/2026)** — `NON_COMPLETARE` in `state.js`; la prova carica una strada vecchia
+  con dei precedenti e la trova ancora nel giro.
+
+### Sul telefono l'orologio stava sopra la modale e le Impostazioni
+
+- **dove** — `#adf-time-dock` a `z-index:142` (`tempo-controlli.js`), la modale a 60, le
+  Impostazioni a 120. A 844 × 390 copriva la X di una modale alta; nelle Impostazioni un
+  tocco apriva il pannello del «+1».
+- **RISOLTO (27/09/2026)** — con la modale o le Impostazioni aperte orologio e pannello si
+  nascondono (`body:has(…)`); prova in `frontend/test/e2e/orologio-sotto-le-finestre.spec.js`.
+  Nello stesso branch: «GIORNO 1/7» da 7 a 8,2 px sul telefono, via l'avviso «Eventi
+  v1.2.13: 1000 caricati» che al primo avvio stava sopra la prima decisione, la X dello Shop
+  da 38 a 44. La presa da 44 della barretta «torna alla home» è stata provata e tolta: rubava
+  i tocchi all'ultima riga della lista.
+
+### La prova del filtro dello Shop falliva a caso
+
+- **dove** — `frontend/test/e2e/mobile-touch.spec.js`: la misura esce a volte 43,9994 contro
+  44, anche su `main` (5 fallimenti su 16 ripetizioni).
+- **RISOLTO (27/09/2026)** — accetta 43,99.
+
+### Due frasi della documentazione del backend
+
+- **dove** — `backend/database/README.md` e `schema.md` dicevano che `versione_stato` serve a
+  leggere i salvataggi vecchi (nessuno la scrive né la legge); `backend/README-API.md` diceva
+  che `salvaCarriera` manda «l'intero `G`» (manda una copia, più `__adfCloud` se c'è un artista).
+- **RISOLTO (27/09/2026)** — branch `task/backend-documento-salvataggi`.
