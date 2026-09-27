@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:c415886 -->
+## 27/09/26, 16:53 â€” task/ritocchi-telefono-27-09 â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `c415886`
+
+### Cosa Ã¨ entrato
+
+- `0d0ce55` â€” Telefono: la conferma del viaggio non si apre già scorsa, e tre ritocchi â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:a202dde -->
 ## 27/09/26, 16:52 â€” task/coda-menu-e-prova-ricaricata â†’ main
 
