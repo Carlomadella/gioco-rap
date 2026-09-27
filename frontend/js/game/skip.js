@@ -70,12 +70,18 @@ function saltaGiorni(n){
   SALTO = true;
   SALTO_STOP = null;
   let settimaneChiuse = 0, vissuti = 0;
-  for(; vissuti < n && !G.ended; vissuti++){
-    if(vissuti === n - 1) SALTO = false;   /* l'ultimo giorno rimette in moto eventi e prove */
-    if(avanzaGiorno()) settimaneChiuse++;
-    if(SALTO_STOP){ vissuti++; break; }    /* oggi si è fermato qui: contato, non si rivive */
+  /* un errore nella chiusura non deve lasciare SALTO acceso (giro del 27/09) */
+  try{
+    for(; vissuti < n && !G.ended; vissuti++){
+      if(vissuti === n - 1) SALTO = false;   /* l'ultimo giorno rimette in moto eventi e prove */
+      if(avanzaGiorno()) settimaneChiuse++;
+      if(SALTO_STOP){ vissuti++; break; }    /* oggi si è fermato qui: contato, non si rivive */
+    }
+  }catch(err){
+    console.error("[Anni di Fame] il salto del tempo si è fermato su un errore", err);
+  }finally{
+    SALTO = false;
   }
-  SALTO = false;
   const dLuc = Math.round(luc() - lucPrima), dWell = Math.round(G.wellbeing - wellPrima);
   pushLog("<b>" + vissuti + (vissuti === 1 ? " giorno saltato." : " giorni saltati.") + "</b> Benessere " +
     (dWell >= 0 ? "+" + dWell : dWell) + ", lucidità " + (dLuc >= 0 ? "+" + dLuc : dLuc) + ".",
