@@ -725,6 +725,10 @@ function stradaSettimana(){
     if(G.contract && Math.random() < .20){
       pushLog("<b>L'etichetta ha rescisso.</b> I giornali ci sono andati pesante.", "bad");
       G.contract = null;
+      /* senza contratto la consegna non esiste più: lasciata lì, alla
+         scadenza advanceWeek() cercava la penale su un contratto che non c'è
+         e la settimana non si chiudeva più (giro del 27/09) */
+      G.obligation = null;
     }
     if(s.arresto.settimane <= 0){
       const colpoFatto = s.arresto.colpo;

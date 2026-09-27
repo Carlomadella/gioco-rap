@@ -220,6 +220,10 @@ function advanceWeek(){
   }
 
   // contratto: obblighi
+  /* una consegna senza contratto è quella rimasta da una rescissione in
+     carcere prima del 27/09: si butta, se no la penale qui sotto legge
+     `G.contract.advance` su null e blocca la settimana per sempre */
+  if(G.obligation && !G.contract) G.obligation = null;
   if(G.obligation){
     G.obligation.left--;
     const done = G.songs.filter(s => s.released && s.week > G.obligation.from).length;
