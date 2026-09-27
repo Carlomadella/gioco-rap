@@ -191,7 +191,7 @@ Sta fuori da `artista` perché un giocatore vero queste cose non le ha.
 | `artista_id` | TEXT → `artista` | |
 | `slot` | INTEGER | 1, 2 o 3 — `UNIQUE (account_id, slot)` |
 | `stato` | TEXT | **il salvataggio intero, JSON in una colonna** |
-| `versione_stato` | INTEGER | la forma del JSON, per leggere anche i salvataggi vecchi |
+| `versione_stato` | INTEGER | la forma del JSON; oggi resta sempre a 2, nessuno la scrive né la legge. I salvataggi vecchi li completa il gioco quando li carica (`partitaDaSalvataggio()` in `frontend/js/game/state.js`) |
 | `versione_gioco` | TEXT | |
 | `settimana_gioco` `anno_gioco` | INTEGER | per mostrare la carriera senza aprire il JSON |
 | `byte` | INTEGER | quanto pesa: serve a metterci un tetto |
