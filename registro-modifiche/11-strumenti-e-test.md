@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:14eff26 -->
+## 28/09/26, 12:18 â€” task/modale-piu-piccola â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `14eff26`
+
+### Cosa Ã¨ entrato
+
+- `aed5dfd` â€” Giro di fine task sulla conferma dello spostamento: pulito â€” **Carlomadella**
+- `c3aeede` â€” La conferma dello spostamento, più piccola â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/test/e2e/ritocchi-telefono.spec.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:7f02c3e -->
 ## 28/09/26, 11:46 â€” task/diario-dal-telefono â†’ main
 
