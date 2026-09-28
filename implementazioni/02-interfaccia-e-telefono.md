@@ -2742,3 +2742,15 @@ prima tabella del README che contava 34 voci per questo foglio quando erano 43.
 
 **Da imparare**: prima di prendere una voce dell'ordine si cerca la sua RISOLTO sotto ai giri
 di problemi-riscontrati — due volte (l'hover, il Marketing) la voce era chiusa e l'indice no.
+
+## La conferma dello spostamento, più piccola
+
+CARLO, 28/09/2026: «rimpicciolisci la modale».
+
+**FATTO (28/09/2026)** — branch `task/modale-piu-piccola`: la conferma «Vai lì?» (la modale
+azzurra della PR #2) era larga 720 contro i 470 delle altre modali, col titolo a 54, gli orari
+a 40 e i tasti alti 100; a 844 × 390 non ci stava e scorreva. Adesso è larga 500 (alta 326
+invece di 454 a 1440 × 900), titolo 32, orari 28, tasti 64; sul telefono in verticale 362
+invece di 443; di traverso (`max-height:480px`) la riga piccola sotto ai due tasti va via e
+la modale sta tutta, alta 250. La X resta 44 × 44. La prova in orizzontale di
+`ritocchi-telefono.spec.js` controlla anche che non scorra.
