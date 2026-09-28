@@ -336,6 +336,16 @@ test("Escape chiude una app del telefono",
 test("G.log del telefono è esplicitamente Notifiche, l'app di eventi-v2",
   ev.includes('id:"notifiche",n:"Notifiche"') &&
   ev.includes("badge:()=>adfNotifUnread()"));
+/* il Diario ha una porta sola, il tasto nelle Notifiche: senza, non si apre
+   da nessuna parte (giro del 27/09) */
+test("il Diario si apre dalle Notifiche del telefono",
+  ev.includes('data-diario="1"') &&
+  tel.includes('if(ev.target.closest("[data-diario]")){ renderGioco(); openDiary(); return; }'));
+test("Esc sul Diario aperto dalle Notifiche chiude solo il Diario",
+  leggi("js/game/ui.js").includes('if(e.key === "Escape" && $("drawer").classList.contains("on")){ closeDiary(); e.stopImmediatePropagation(); }'));
+test("l'orologio si nasconde sopra al Diario, come sopra alla modale",
+  timeControls.includes("body:has(#drawer.on) #adf-time-dock") &&
+  timeControls.includes("body:has(#drawer.on) #adf-tc-panel"));
 
 console.log("\nAgenda — disponibilità reale");
 test("Agenda combina requisiti base e guardia runtime",

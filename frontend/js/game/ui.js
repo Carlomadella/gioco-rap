@@ -559,7 +559,11 @@ function openDiary(){
 function closeDiary(){ $("drawer").classList.remove("on"); }
 $("d-close").onclick = () => closeDiary();
 $("drawer").addEventListener("click", e => { if(e.target.id === "drawer") closeDiary(); });
-document.addEventListener("keydown", e => { if(e.key === "Escape") closeDiary(); });
+/* un Esc chiude una cosa sola: aperto dalle Notifiche, il Diario si chiude e
+   il telefono resta lì, invece di tornare anche lui alla home (giro del 28/09) */
+document.addEventListener("keydown", e => {
+  if(e.key === "Escape" && $("drawer").classList.contains("on")){ closeDiary(); e.stopImmediatePropagation(); }
+});
 
 document.querySelectorAll(".nb").forEach(t => {
   t.onclick = () => {

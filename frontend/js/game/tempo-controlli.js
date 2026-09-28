@@ -299,9 +299,10 @@
       /* sotto una decisione o nelle Impostazioni l'orologio non serve e non deve
          esserci: col suo 142 stava sopra la modale (60) e le Impostazioni (120),
          in orizzontale copriva la X e dalle Impostazioni faceva passare il tempo
-         (prova sul telefono del 27/09) */
-      body:has(#modal.on) #adf-time-dock,body:has(.setts.on) #adf-time-dock,
-      body:has(#modal.on) #adf-tc-panel,body:has(.setts.on) #adf-tc-panel{visibility:hidden!important;pointer-events:none!important}
+         (prova sul telefono del 27/09); lo stesso sopra al Diario, dove a 360
+         copriva l'intestazione */
+      body:has(#modal.on) #adf-time-dock,body:has(.setts.on) #adf-time-dock,body:has(#drawer.on) #adf-time-dock,
+      body:has(#modal.on) #adf-tc-panel,body:has(.setts.on) #adf-tc-panel,body:has(#drawer.on) #adf-tc-panel{visibility:hidden!important;pointer-events:none!important}
       #adf-time-dock[data-host="game"]{margin-left:auto;align-self:center;height:66px;flex-basis:222px;padding:0 6px;border-left:1px solid rgba(255,255,255,.07);background:transparent}
       #adf-time-dock[data-host="posto"],#adf-time-dock[data-host="negozio"]{margin-left:auto;align-self:center;height:64px;flex-basis:218px;padding:0 5px;border-left:0;background:transparent}
       #adf-time-dock[data-host="strada"]{height:100%;flex-basis:222px;padding:3px 6px}

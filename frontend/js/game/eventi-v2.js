@@ -633,7 +633,12 @@ function adfOpenNotifications(){
         '<div><strong>'+list.length+'</strong> '+(list.length===1?'evento':'eventi')+' dagli skip'+
           (unread?' · <span>'+unread+(unread===1?' nuovo':' nuovi')+'</span>':'')+
         '</div>'+
-        (unread?'<button type="button" data-adf-notif-read="1">Segna lette</button>':'')+
+        /* il Diario (G.log) si apriva da qui prima di Eventi V2 (276e8d1), ed era
+           la sua unica porta: senza questo tasto non si apriva più da nessuna parte */
+        '<div class="adf-ntasti">'+
+          '<button type="button" data-diario="1" aria-label="Apri il diario: tutto quello che è successo">Diario</button>'+
+          (unread?'<button type="button" data-adf-notif-read="1">Segna lette</button>':'')+
+        '</div>'+
       '</div>'+
       '<div class="tscreenbody adf-nbody">'+
         (list.length
@@ -2725,6 +2730,7 @@ notifCss.textContent=`
   font:600 9.5px Figtree,system-ui,sans-serif;color:#727A8C}
 .adf-ntool strong{color:#E8EAF0;font-weight:900}
 .adf-ntool span{color:#F59E0B;font-weight:800}
+.adf-ntasti{flex:none;display:flex;gap:6px}
 .adf-ntool button{border:0;background:rgba(245,158,11,.1);color:#FBBF24;
   padding:5px 8px;border-radius:999px;font:800 8.5px Figtree,system-ui,sans-serif;
   text-transform:uppercase;letter-spacing:.04em;cursor:pointer}
