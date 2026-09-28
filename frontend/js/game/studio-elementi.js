@@ -743,9 +743,12 @@ function studioMandaFuori(){
   }
 
   const g = studioGiorniAVenerdi();
+  /* venerdì scelto da te: l'hype torna. Ma solo se non era già in coda: un
+     pezzo chiuso dal gioco resta sul banco con l'Uscita su venerdì, e
+     ripremere «Mandalo fuori» non deve ridargli l'hype che il malus toglie */
+  if(s.esce == null) delete s.esceAuto;
   s.esce = studioOggiAssoluto() + g;
   delete s.tenuto;
-  delete s.esceAuto;                        /* venerdì scelto da te: l'hype torna */
   pushLog("«" + s.t + "» è in coda per venerdì" +
     (g ? " — " + studioVenerdiTesto() + "." : ", cioè stanotte."), "");
   toast("«" + s.t + "» esce venerdì", "good", "▶", TINTA_SUONO);

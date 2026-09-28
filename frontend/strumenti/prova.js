@@ -1246,14 +1246,22 @@ console.log("\nlo Studio: la gente della Sala conta");
     controlla("il gioco lo mixa della casa (+3) e lo mette in coda per venerdì, senza energia",
       auto.q === 53 && auto.mixed && auto.car === "della casa" && auto.parti.mix === 3 &&
       auto.esce != null && auto.esceAuto === true && dentro("G.energy") === energiaAuto &&
-      dentro("G.studio.banco") == null,
+      dentro("G.studio.banco") === 777 && dentro("STUDIO_SEZ") === "beat",
       JSON.stringify(auto));
+    /* tornandoci, Mix e Uscita restano aperte (Carlo, 28/09), e ripremere
+       «Mandalo fuori» sull'Uscita non ridà l'hype del venerdì */
+    const aperte = dentro("STUDIO_SEZIONI.filter(x => x.dopo).every(x => studioSezAperta(x))");
+    dentro("STUDIO_SEZ = 'fuori'; renderStudio(); studioMandaFuori()");
+    controlla("dopo il resto in automatico Mix e Uscita restano aperte, e l'Uscita non ridà l'hype",
+      aperte && dentro("studioQuando()") === "venerdi" &&
+      dentro("G.songs.find(s => s.seed === 777).esceAuto") === true,
+      JSON.stringify({aperte, quando:dentro("studioQuando()")}));
     const hypeAutoPrima = dentro("G.hype = 0; G.hype");
     dentro("G.day = 5; G.songs.find(s => s.seed === 777).esce = studioOggiAssoluto(); studioUscitePronte()");
     const uscito = dentro("G.songs.find(s => s.seed === 777)");
     const hypeAuto = dentro("G.hype") - hypeAutoPrima;
     controlla("esce venerdì, ma senza l'hype dell'attesa",
-      uscito.released && !uscito.esceAuto &&
+      uscito.released && !uscito.esceAuto && dentro("G.studio.banco") == null &&
       Math.abs(hypeAuto - (6 + uscito.q * 0.12)) < 0.01,
       "hype +" + hypeAuto.toFixed(2));
 

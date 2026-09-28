@@ -15,7 +15,8 @@
 
    Un pezzo già mixato a mano perde solo il secondo: il gioco fa l'Uscita.
    La copertina resta quella che il pezzo ha già; una proposta non confermata
-   si lascia cadere, come «Lascia com'era». */
+   si lascia cadere, come «Lascia com'era». Il pezzo resta sul banco, e Mix e
+   Uscita restano aperte su di lui. */
 
 const STUDIO_AUTO_MIX = 3;
 
@@ -63,10 +64,11 @@ function studioRestoAutomatico(){
   const g = typeof studioGiorniAVenerdi === "function" ? studioGiorniAVenerdi() : 0;
   s.esce = studioOggiAssoluto() + g;
   delete s.tenuto;
-  /* il banco si libera: si torna al Beat per il pezzo dopo. Il pezzo resta in
-     lista, con «in coda per venerdì», e da lì si rimette sul banco */
-  studioSvuotaBanco(s);
-  studioDati().quando = "subito";
+  /* Il pezzo resta sul banco, così Mix e Uscita restano aperte: tornandoci si
+     vede «già mixato» e l'Uscita su «venerdì» (Carlo, 28/09: «non devono essere
+     lockate quando ci ritorno dentro»). Si torna al Beat per il pezzo dopo; il
+     banco passa a quello nuovo quando lo incidi, e si svuota quando esce. */
+  studioDati().quando = "venerdi";
   STUDIO_SEZ = "beat";
   pushLog("«" + s.t + "» lo chiude il gioco: mix della casa, qualità " + s.q +
     ", in coda per venerdì" + (g ? " — " + studioVenerdiTesto() : ", cioè stanotte") + ".", "");

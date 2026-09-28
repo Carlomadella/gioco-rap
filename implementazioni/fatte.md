@@ -208,7 +208,8 @@ _Da `implementazioni.md`, CARLO «Studio (16/09/2026)» 10._
     **FATTO (28/09/2026)** — col pezzo appena inciso sul banco, in Cabina e nel Mix c'è
     «chiudi tu il resto: mix e uscita». Il gioco lo mixa «della casa» (+3 invece del mix
     vero, di solito +7…+15) e lo mette in coda per venerdì senza l'hype dell'attesa (+4);
-    non costa energia né una mossa. «Il resto in automatico» in
+    non costa energia né una mossa. Il pezzo resta sul banco, e tornandoci Mix e Uscita
+    sono aperte (Carlo, 28/09). «Il resto in automatico» in
     `02-interfaccia-e-telefono.md`.
 
 ### Capi che si sbloccano, e le offerte della settimana

@@ -1294,7 +1294,7 @@ function studioNumeri(s, qFinale, quando, proposta){
   const resa = proposta ? {seed:proposta.seed, img:proposta.img} : s;
   const ascolti =
     voce("Copertina", "×" + studioResaTesto(resa)) +
-    (quando === "venerdi" ? voce("Venerdì", "+" + STUDIO_VENERDI_HYPE + " hype") : "") +
+    (quando === "venerdi" && !s.esceAuto ? voce("Venerdì", "+" + STUDIO_VENERDI_HYPE + " hype") : "") +
     (fatte ? voce("Anteprime", "×" + (1 + Math.min(ADF_ANTEPRIME_MAX, fatte) * ADF_ANTEPRIMA_SPINTA).toFixed(2).replace(".", ",")) : "") +
     (s.featFama ? voce("La gente di " + s.feat, "+" + (typeof featHypeUscita === "function" ? featHypeUscita(s) : 0) + " hype") : "") +
     voce("Hype", Math.round(G.hype)) + voce("Fan", fmt(G.fans));
@@ -1327,7 +1327,8 @@ function studioSezFuori(){
       attr:' data-quando="' + o.id + '"', on:quando === o.id,
       n:o.n,
       d:o.id === "venerdi" ? studioVenerdiTesto() : o.d,
-      v:o.id === "venerdi" ? "+hype" : ""
+      /* chiuso dal gioco (studio-automatico.js): il venerdì non porta hype */
+      v:o.id === "venerdi" ? (s && s.esceAuto ? "" : "+hype") : ""
     })).join(""));
 
   let mid;

@@ -2817,7 +2817,14 @@ mossa.» — e il tasto «chiudi tu il resto: mix e uscita». Il tocco:
 - lo mette in coda per **venerdì** con la stessa strada del «venerdì» di Fuori, ma segnato
   (`esceAuto`): quando esce, `studioUscitePronte()` non dà i +4 di hype dell'attesa;
 - non costa energia né la mossa del giorno (il mix a mano ne costa 24), lascia la
-  copertina che il pezzo ha già, libera il banco e riporta al **Beat** per il pezzo dopo.
+  copertina che il pezzo ha già e riporta al **Beat** per il pezzo dopo.
+
+Il pezzo **resta sul banco**, quindi Mix e Uscita non si richiudono: tornandoci il Mix dice
+«già mixato» e l'Uscita è su «venerdì», senza «+hype» accanto e senza la voce «Venerdì» nel
+riquadro dei numeri (Carlo, 28/09: «non devono essere lockate quando ci ritorno dentro»).
+Ripremere «Mandalo fuori» lì non ridà l'hype: il segno si toglie solo se il venerdì lo
+scegli tu per un pezzo che non era già in coda. Il banco passa al pezzo nuovo quando lo
+incidi, e si svuota quando esce.
 
 Un pezzo già mixato a mano perde solo il venerdì secco (il tasto dice «fai uscire tu
 venerdì»). Rimettere il pezzo sul banco, o sceglierne il venerdì a mano, toglie il segno e
