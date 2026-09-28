@@ -6103,3 +6103,45 @@ quello scritto in fondo.
   (`body:has(#drawer.on)` in `tempo-controlli.js`), come con la modale. Provato a 390 × 844,
   360 × 640 e 1440 × 900: si apre, Esc lo chiude, niente scorre di lato, console pulita. Due
   controlli nell'audit.
+
+## Giro del 28/09/2026 (segnala-problemi, giro stretto sul commit b85ba42, branch `task/diario-dal-telefono`)
+
+Guardato il codice nuovo e provato nel browser (Playwright, porta 8160) a 360 × 640,
+320 × 640, 640 × 360 e 1440 × 900: si apre il telefono, si entra in Notifiche, si tocca
+«Diario», poi lo si chiude con la X, con Esc e con un tocco fuori. Nessun errore in console
+in nessuna prova.
+
+- **Gli altri che ascoltano `data-diario`: a posto.** Quello dello Studio (`studio.js:1609`)
+  ascolta solo dentro lo Studio, che è un'altra parte della pagina: dal telefono non lo
+  raggiunge. Il gestore di Eventi V2 che intercetta i tocchi prima di tutti
+  (`eventi-v2.js:682`) prende solo l'app Notifiche, la freccia indietro e «Segna lette», e
+  lascia passare il nuovo tasto. `menu-sistema.js` e `uscita.js` conoscono già il Diario
+  aperto (`#drawer.on`) e non aprono il menu sopra di lui.
+- **Chiudere con la X o col tocco fuori: a posto.** Si torna alle Notifiche com'erano, piene,
+  col telefono ancora alzato.
+- **L'orologio: a posto.** Col Diario aperto sparisce, chiuso il Diario ritorna (a 1440 si
+  vede di nuovo, a 360 resta nascosto come già era col telefono alzato). Il tempo non si
+  ferma: il Diario non è nella lista delle finestre che bloccano il tempo, e non c'è bisogno
+  che lo sia, perché il tempo va avanti solo quando lo chiedi tu.
+- **La testata a 360: ci sta.** «Diario» 48 × 44 e «Segna lette» 76 × 44 nella stessa riga,
+  il testo «12 eventi dagli skip · 12 nuovi» va su due righe senza uscire; niente esce di
+  lato nemmeno a 320 e in orizzontale (640 × 360). (Misurare subito dopo il tocco sull'app
+  dà numeri più piccoli, 41 × 38: è l'animazione d'apertura che ingrandisce lo schermo, non
+  un difetto.)
+
+### Esc chiude il Diario e insieme ti butta fuori dalle Notifiche
+- **dove** — `frontend/js/game/telefono.js:794-796` (il tasto Esc del telefono), insieme a
+  `frontend/js/game/ui.js:562` e `frontend/js/game/uscita.js:66`
+- **cosa succede** — con il Diario aperto dalle Notifiche, un solo Esc fa due cose: chiude il
+  Diario e riporta il telefono alla schermata con le icone. Il telefono ascolta Esc senza
+  guardare se sopra c'è il Diario. Con la X o col tocco fuori invece si torna alle
+  Notifiche, com'è giusto. Succede sia a 360 sia a 1440.
+- **come si vede** — apri il telefono, Notifiche, «Diario», premi Esc: il Diario si chiude ma
+  sotto non ci sono più le Notifiche, c'è la home del telefono.
+- **quanto pesa** — da sistemare con calma (basta un tocco per rientrare nelle Notifiche; sul
+  telefono vero Esc c'è solo con una tastiera, il tasto indietro di Android andrà guardato
+  quando ci sarà).
+- **RISOLTO (28/09/2026)** — nello stesso branch: l'Esc che chiude il Diario si ferma lì
+  (`stopImmediatePropagation` in `ui.js`, che si carica prima di `telefono.js`). Riprovato a
+  390 × 844, 360 × 640 e 1440 × 900: dopo Esc si è ancora nelle Notifiche. Un controllo
+  nell'audit.

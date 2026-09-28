@@ -341,6 +341,8 @@ test("G.log del telefono è esplicitamente Notifiche, l'app di eventi-v2",
 test("il Diario si apre dalle Notifiche del telefono",
   ev.includes('data-diario="1"') &&
   tel.includes('if(ev.target.closest("[data-diario]")){ renderGioco(); openDiary(); return; }'));
+test("Esc sul Diario aperto dalle Notifiche chiude solo il Diario",
+  leggi("js/game/ui.js").includes('if(e.key === "Escape" && $("drawer").classList.contains("on")){ closeDiary(); e.stopImmediatePropagation(); }'));
 test("l'orologio si nasconde sopra al Diario, come sopra alla modale",
   timeControls.includes("body:has(#drawer.on) #adf-time-dock") &&
   timeControls.includes("body:has(#drawer.on) #adf-tc-panel"));
