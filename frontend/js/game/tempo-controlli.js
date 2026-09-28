@@ -25,6 +25,17 @@
   const WIDGET_ID = "adf-time-widget";
   const STEP = Number(GAME_TIME.SLOT) || 15;
   const WAIT_STEP_MS = 350;
+  /* «Quando skippi tante ore ci mette troppo» (CARLO): 350 ms per ogni passo da
+     15 minuti volevano dire 11,8 secondi per 8 ore, e 11,2 erano pausa — il
+     passo vero costa 14 ms. I passi restano da 15 minuti (eventi, orari e
+     agenda li contano uno a uno), ma le pause di un'attesa intera stanno in
+     WAIT_TOTAL_MS: un'ora resta lenta come prima, otto ore non più. */
+  const WAIT_TOTAL_MS = 1600;
+  const WAIT_MIN_MS = 25;
+  function pausaPasso(minuti){
+    const passi = Math.max(1, Math.ceil(minuti / STEP));
+    return clampN(Math.round(WAIT_TOTAL_MS / passi), WAIT_MIN_MS, WAIT_STEP_MS);
+  }
 
   const HOSTS = [
     {id:"jail",    root:"#adf-jail.on",      head:".adf-jail-top", mount:".adf-jail-meta", accent:"#ff315b", panel:"linear-gradient(180deg,rgba(25,8,14,.985),rgba(8,8,11,.985))", border:"rgba(255,49,91,.38)"},
@@ -570,16 +581,17 @@
     if(target<=start) return;
 
     waiting=true;status("Il tempo sta passando…","");syncTarget();
+    const pausa=pausaPasso(target-start);
     let stopped=false;
     try{
       while(GAME_TIME.now()<target){
         if(actionBlocked()||eventBlocked()){stopped=true;break;}
         const now=GAME_TIME.now(),step=Math.min(STEP,target-now);
-        const out=GAME_TIME.advance(step,"wait-global",{detail:{manualWait:true,target,visualStepMs:WAIT_STEP_MS}});
+        const out=GAME_TIME.advance(step,"wait-global",{detail:{manualWait:true,target,visualStepMs:pausa}});
         if(out&&out.blocked){stopped=true;break;}
         try{if(typeof GAME_WEATHER!=="undefined"&&GAME_WEATHER.sync)GAME_WEATHER.sync();}catch(_){}
         queueSync(false);
-        await sleep(WAIT_STEP_MS);
+        await sleep(pausa);
         if(eventBlocked()){stopped=true;break;}
       }
     }finally{

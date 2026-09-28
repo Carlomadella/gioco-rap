@@ -346,6 +346,13 @@ test("Esc sul Diario aperto dalle Notifiche chiude solo il Diario",
 test("l'orologio si nasconde sopra al Diario, come sopra alla modale",
   timeControls.includes("body:has(#drawer.on) #adf-time-dock") &&
   timeControls.includes("body:has(#drawer.on) #adf-tc-panel"));
+/* «Quando skippi tante ore ci mette troppo»: la pausa fra i passi di un'attesa
+   dipende da quanto è lunga, non è più 350 ms fissi (8 ore erano 11,8 secondi) */
+test("un'attesa lunga non dorme 350 ms a ogni quarto d'ora",
+  timeControls.includes("function pausaPasso(minuti)") &&
+  timeControls.includes("const pausa=pausaPasso(target-start);") &&
+  timeControls.includes("await sleep(pausa);") &&
+  !timeControls.includes("await sleep(WAIT_STEP_MS);"));
 
 console.log("\nAgenda — disponibilità reale");
 test("Agenda combina requisiti base e guardia runtime",

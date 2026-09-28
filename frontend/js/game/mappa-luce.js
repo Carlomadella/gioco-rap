@@ -66,8 +66,9 @@
 
   function transitionMs(detail){
     if(detail && Number.isFinite(Number(detail.visualStepMs))){
-      /* Attendi: il nuovo step arriva ogni 350 ms.
-         La transizione dura poco più dello step: i cambi si fondono tra loro. */
+      /* Attendi: il nuovo step arriva ogni 350 ms, meno nelle attese lunghe
+         (tempo-controlli.js, pausaPasso). La transizione dura almeno 380 ms:
+         i cambi si fondono tra loro. */
       return Math.max(380, Math.min(650, Math.round(Number(detail.visualStepMs) * 1.25)));
     }
     /* Azioni/spostamenti possono saltare anche ore: il cambio resta morbido
