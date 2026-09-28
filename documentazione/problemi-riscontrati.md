@@ -6092,6 +6092,14 @@ quello scritto in fondo.
 
 - I numeri del bilanciamento della voce 61: decisioni, non bug.
 - Il telefono alzato in orizzontale (due file di app, il dock fuori): con la voce 9.
-- Sul telefono l'orologio resta sopra l'intestazione del Diario a 360: forse voluto, da
+- ~~Sul telefono l'orologio resta sopra l'intestazione del Diario a 360: forse voluto, da
   guardare con la voce 9 e il giro sul telefono; e dal telefono, sulla plancia, non c'è un
-  modo col dito di aprire il Diario (la prova l'ha aperto con `openDiary()`).
+  modo col dito di aprire il Diario (la prova l'ha aperto con `openDiary()`).~~
+  **RISOLTO (28/09/2026)** — branch `task/diario-dal-telefono`. Il Diario non si apriva col
+  dito da nessuna parte, nemmeno da PC: la sua porta era l'app Notifiche (`276e8d1`), ed
+  Eventi V2 l'ha ridisegnata senza. Adesso nella testata delle Notifiche c'è il tasto
+  «Diario» (48 × 44 sul telefono), che passa dal gestore `[data-diario]` di `telefono.js`
+  rimasto orfano dal 03/09. L'orologio si nasconde col Diario aperto
+  (`body:has(#drawer.on)` in `tempo-controlli.js`), come con la modale. Provato a 390 × 844,
+  360 × 640 e 1440 × 900: si apre, Esc lo chiude, niente scorre di lato, console pulita. Due
+  controlli nell'audit.
