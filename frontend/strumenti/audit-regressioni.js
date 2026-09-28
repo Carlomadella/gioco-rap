@@ -698,6 +698,13 @@ test("gli elementi dello Studio stanno in un file loro, caricato dopo studio.js"
   index.indexOf('js/game/studio-elementi.js') > index.indexOf('js/game/studio.js') &&
   index.includes('css/studio-elementi.css'));
 
+/* «Beat, Testo e Cabina a mano, il resto in automatico coi malus» */
+test("il resto in automatico sta in un file suo, dopo studio-elementi.js, e porta i due malus",
+  index.indexOf("js/game/studio-automatico.js") > index.indexOf("js/game/studio-elementi.js") &&
+  leggi("js/game/studio-automatico.js").includes("const STUDIO_AUTO_MIX = 3;") &&
+  studioEl.includes("(auto ? 0 : STUDIO_VENERDI_HYPE)") &&
+  studioEl.includes("delete s.esceAuto;"));
+
 test("la prima take e' lo stesso tiro di dado che registra faceva da sola",
   /* la cabina si apre vuota e ogni take, la prima compresa, e' quel dado */
   studioEl.includes("d.take = {k, l:[], s:0}") &&
@@ -1027,7 +1034,7 @@ test("la stima degli stream tiene conto del tetto della fase, come fa sim.js il 
 test("l'uscita di venerdi' costa la lucidita' come quella mandata fuori a mano",
   (() => {
     const a = studioEl.indexOf("function studioUscitePronte()");
-    const corpo = a >= 0 ? studioEl.slice(a, a + 1400) : "";
+    const corpo = a >= 0 ? studioEl.slice(a, a + 1900) : "";
     return corpo.includes('if(typeof addLuc === "function") addLuc(-1);');
   })());
 
@@ -3032,7 +3039,7 @@ console.log("\nLe tre del Marketing (20/09/2026)");
   test("il bot del simulatore di bilanciamento trova ancora finestre, colpi e azioni per nome", altro.length === 0, altro.join(", "));
 })();
 
-for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/transizioni-video.js","js/game/luoghi-foto.js","js/preparo.js","js/gioco-ingresso.js"]){
+for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/studio-automatico.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/transizioni-video.js","js/game/luoghi-foto.js","js/preparo.js","js/gioco-ingresso.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }

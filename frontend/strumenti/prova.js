@@ -1115,7 +1115,8 @@ console.log("\nlo Studio: la gente della Sala conta");
                        i suoi pannelli (schede dei beat, take, cursori del banco,
                        il quando di Fuori) e senza di lui le sezioni non
                        disegnano */
-                    "js/game/studio-elementi.js", "js/game/writer.js",
+                    "js/game/studio-elementi.js", "js/game/studio-automatico.js",
+                    "js/game/writer.js",
                     "js/game/beatplay.js",
                     /* la promo sta sul telefono (LaFamegram) dal 14/09/2026:
                        qui si carica per provare che «Che post fai?» legga le
@@ -1225,6 +1226,36 @@ console.log("\nlo Studio: la gente della Sala conta");
       }catch(e){ rotte.push(s + " — " + e.message); }
     }
     controlla("tutte le sezioni si disegnano", rotte.length === 0, rotte);
+
+    /* «Beat, Testo e Cabina a mano, il resto in automatico coi malus»
+       (studio-automatico.js): un pezzo appena inciso, sul banco. La riga c'è in
+       Cabina; il tocco lo mixa della casa (+3), lo mette in coda per venerdì
+       senza l'hype dell'attesa, non costa energia e libera il banco. */
+    dentro(`
+      G.songs.push({t:"Prova auto", q:50, mixed:false, released:false, week:0, streams:0, last:0,
+        seed:777, parti:{beat:50, testo:50, fonico:0, feat:0, take:0}});
+      studioMettiSulBanco(777); STUDIO_SEZ = "cabina"; renderStudio();
+    `);
+    controlla("in Cabina, col pezzo inciso sul banco, c'è «chiudi tu il resto»",
+      dipinto().indexOf('data-auto="1"') >= 0, dipinto().slice(0, 200));
+    const energiaAuto = dentro("G.energy");
+    nodi.studio.scatena("click", {
+      target: { closest: selettore => selettore === "[data-auto]" ? { dataset:{ auto:"1" } } : null }
+    });
+    const auto = dentro("G.songs.find(s => s.seed === 777)");
+    controlla("il gioco lo mixa della casa (+3) e lo mette in coda per venerdì, senza energia",
+      auto.q === 53 && auto.mixed && auto.car === "della casa" && auto.parti.mix === 3 &&
+      auto.esce != null && auto.esceAuto === true && dentro("G.energy") === energiaAuto &&
+      dentro("G.studio.banco") == null,
+      JSON.stringify(auto));
+    const hypeAutoPrima = dentro("G.hype = 0; G.hype");
+    dentro("G.day = 5; G.songs.find(s => s.seed === 777).esce = studioOggiAssoluto(); studioUscitePronte()");
+    const uscito = dentro("G.songs.find(s => s.seed === 777)");
+    const hypeAuto = dentro("G.hype") - hypeAutoPrima;
+    controlla("esce venerdì, ma senza l'hype dell'attesa",
+      uscito.released && !uscito.esceAuto &&
+      Math.abs(hypeAuto - (6 + uscito.q * 0.12)) < 0.01,
+      "hype +" + hypeAuto.toFixed(2));
 
     /* le quattro foto senza interfaccia sono attaccate alle stanze giuste, e
        stanno davvero sul disco: un fondale che non c'è non dà errore, lascia

@@ -2797,3 +2797,31 @@ si sceglie fra i meno usati e resta suo (`p.volto`). Anche «Chi c'è stasera» 
 di chi non conosci (prima era una sagoma): il nome resta «???». Due controlli nuovi in
 `audit-regressioni.js`. Il resto del gioco (Studio, classifica) disegna ancora le facce di
 `rivals.js`.
+
+## Il resto in automatico
+
+CARLO, «Studio (16/09/2026)»: «l'utente deve poter fare solo le sezioni Beat, Testo, e
+Cabina, poi il resto in automatico, però questo porta dei malus».
+
+**FATTO (28/09/2026)** — branch `task/studio-resto-automatico`, file nuovo
+`frontend/js/game/studio-automatico.js`, caricato dopo `studio-elementi.js`.
+
+Col pezzo appena inciso sul banco, sotto al pannello della **Cabina** (e sotto ai cursori
+del **Mix**) c'è una riga che dice il prezzo prima del tocco — «il mix della casa dà +3 (il
+tuo +6), «Sottopasso» esce venerdì ma senza l'hype dell'attesa. Niente energia, niente
+mossa.» — e il tasto «chiudi tu il resto: mix e uscita». Il tocco:
+
+- mixa il pezzo **della casa**: +3 fisso (`STUDIO_AUTO_MIX`) invece del mix vero, che è
+  6 + flow più il fonico e i cursori (di solito +7…+15), e niente flow guadagnato; nel
+  riquadro dei numeri di Fuori la voce si legge «Mix della casa»;
+- lo mette in coda per **venerdì** con la stessa strada del «venerdì» di Fuori, ma segnato
+  (`esceAuto`): quando esce, `studioUscitePronte()` non dà i +4 di hype dell'attesa;
+- non costa energia né la mossa del giorno (il mix a mano ne costa 24), lascia la
+  copertina che il pezzo ha già, libera il banco e riporta al **Beat** per il pezzo dopo.
+
+Un pezzo già mixato a mano perde solo il venerdì secco (il tasto dice «fai uscire tu
+venerdì»). Rimettere il pezzo sul banco, o sceglierne il venerdì a mano, toglie il segno e
+l'hype torna. Provato nel browser a 1440 × 900 e 390 × 844: la riga c'è, il tasto è alto
+44, «Sottopasso» q48 → 51, in coda per venerdì, energia invariata, console pulita. Tre
+prove nuove in `strumenti/prova.js` (la riga, il mix della casa senza energia, l'uscita
+senza hype) e un controllo nell'audit.

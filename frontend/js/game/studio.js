@@ -1092,6 +1092,9 @@ function studioSezCabina(){
       '<p class="stnota">Hai la strofa, non su cosa metterla. Te lo fai fare al <b>Beat</b>, ' +
         'da uno che conosci, oppure lo compri dal banco.</p>');
   }
+  /* il resto in automatico (studio-automatico.js): col pezzo appena inciso
+     sul banco, Mix e Uscita li può chiudere il gioco, coi suoi malus */
+  if(typeof studioAutoRiga === "function") mid = stCoda(mid, studioAutoRiga());
   if(ultimo) mid = stCoda(mid, studioFalloSapereRiga(ultimo, da));
 
   /* «CHE COSA INCIDI»: le strofe sotto al loro sottotitolo, i beat sotto al
@@ -1173,7 +1176,8 @@ function studioSezBanco(){
         stNum("+" + g) + (fon ? ', di cui ' + stNum(studioAiuto(fon)) + ' suoi' : '')) +
       stAzioni(
         stPrimo(' data-ascolta="1"', "Ascolta", "play"),
-        stSecondo(' data-az="mixa"', "Chiudi il mix", "spunta")));
+        stSecondo(' data-az="mixa"', "Chiudi il mix", "spunta")) +
+      (typeof studioAutoRiga === "function" ? studioAutoRiga() : ""));
   } else if(banco){
     /* il pezzo sul banco e' gia' mixato: qui non c'e' piu' niente da fare,
        si passa all'Uscita — o si rimette sul banco un altro provino */
@@ -1284,7 +1288,7 @@ function studioNumeri(s, qFinale, quando, proposta){
     ? voce("Beat", pt.beat) + voce("Testo", pt.testo) +
       (pt.fonico ? voce("Fonico", "+" + pt.fonico) : "") +
       (pt.feat ? voce(s.feat ? "con " + s.feat : "Feat", "+" + pt.feat) : "") +
-      (pt.mix != null ? voce("Mix", "+" + pt.mix) : (s.mixed ? "" : voce("Mix", "−8 se esce così")))
+      (pt.mix != null ? voce(s.car === "della casa" ? "Mix della casa" : "Mix", "+" + pt.mix) : (s.mixed ? "" : voce("Mix", "−8 se esce così")))
     : voce("Qualità", "q" + s.q);
   const fatte = s.anteprime || 0;
   const resa = proposta ? {seed:proposta.seed, img:proposta.img} : s;

@@ -745,6 +745,7 @@ function studioMandaFuori(){
   const g = studioGiorniAVenerdi();
   s.esce = studioOggiAssoluto() + g;
   delete s.tenuto;
+  delete s.esceAuto;                        /* venerdì scelto da te: l'hype torna */
   pushLog("«" + s.t + "» è in coda per venerdì" +
     (g ? " — " + studioVenerdiTesto() + "." : ", cioè stanotte."), "");
   toast("«" + s.t + "» esce venerdì", "good", "▶", TINTA_SUONO);
@@ -758,6 +759,7 @@ function studioRiprendi(seed){
   if(!s) return;
   delete s.tenuto;
   delete s.esce;
+  delete s.esceAuto;
   studioMettiSulBanco(seed);               /* ritirato = di nuovo sul banco */
   studioDati().quando = "subito";
   SFX.tap(); save(); renderStudio(); renderGioco();
@@ -782,7 +784,11 @@ function studioUscitePronte(){
     if(typeof seguitoUscita === "function") seguitoUscita(s);
     const cap = typeof hypeCap === "function" ? hypeCap() : 100;
     const feat = typeof featHypeUscita === "function" ? featHypeUscita(s) : 0;
-    G.hype = clamp(G.hype + 6 + s.q * 0.12 + STUDIO_VENERDI_HYPE + feat, 0, cap);
+    /* chiuso dal gioco (studio-automatico.js): esce venerdì, ma l'attesa non
+       l'hai scelta tu e l'hype dell'attesa non c'è — è uno dei due malus */
+    const auto = !!s.esceAuto;
+    delete s.esceAuto;
+    G.hype = clamp(G.hype + 6 + s.q * 0.12 + (auto ? 0 : STUDIO_VENERDI_HYPE) + feat, 0, cap);
     /* Mandarlo fuori a mano costa un punto di lucidita' (la mossa «Pubblica
        il pezzo», in actions.js): se metterlo in coda non costasse niente,
        aspettare non sarebbe una scelta ma sempre la scelta giusta — l'hype in
@@ -790,7 +796,7 @@ function studioUscitePronte(){
        non gliela si puo' far pagare: il pezzo esce di notte, mentre dormi. */
     if(typeof addLuc === "function") addLuc(-1);
     if(typeof studioSvuotaBanco === "function") studioSvuotaBanco(s);
-    pushLog("<b>«" + s.t + "» è uscito</b>, di venerdì come avevi deciso" +
+    pushLog("<b>«" + s.t + "» è uscito</b>, di venerdì " + (auto ? "come l'ha messo in coda il gioco" : "come avevi deciso") +
       (s.mixed ? "." : ", ma non era mixato: qualità " + s.q + "."), "good");
   }
 }

@@ -17,8 +17,10 @@ lucidità», la 9 fra «Le decisioni tue», la 10 fra quelle fuori dall'ordine);
 sono decisioni di bilanciamento e per ora stanno solo qui.
 
 **7.** **L'uscita di venerdì non costa niente, quella a mano sì** (08/09): risolto in parte per
-scelta — il vantaggio di venerdì è quello di aspettare, non uno sconto. Sparisce del tutto
-con «togli il parametro lucidità» (CARLO), che nell'altro foglio è fra i lavori lunghi.
+scelta — il vantaggio di venerdì è quello di aspettare, non uno sconto, e dall'08/09
+anche l'uscita di venerdì costa un punto di lucidità. «Togli il parametro lucidità» non
+si fa più (Carlo, 21/09: la lucidità resta), quindi non sparisce da sola: è una scelta
+di bilanciamento, con la voce 61.
 
 **9.** **Di traverso** (844 × 390) il telefono alzato si usa, ma resta da **decidere se il gioco
 sugli store gira anche in orizzontale**: nel repo non c'è un manifest né un

@@ -25,6 +25,7 @@ cita (la catena del pezzo) e il «punto 4 di ALE» di
 | quando | quante |
 | --- | --- |
 | 29/09/2026 | 5, più le chiuse dell'ordine |
+| 28/09/2026 | 1 |
 | 21/09/2026 | 4 |
 | 20/09/2026 | 9 |
 | 15/09/2026 | 6 |
@@ -96,6 +97,9 @@ detto, la richiesta com'era scritta in [`fatte.md`](fatte.md):
   01/10): «Il Circolo tutto nello schermo, coi volti veri», `02-interfaccia-e-telefono.md`.
 - **Su LaFamegram non posta nessuno** — FATTO 28/09 (su main il 01/10): postano i rivali e la
   gente della Sala che conosci, «Su LaFamegram posta anche la gente», `02-interfaccia-e-telefono.md`.
+- **Beat, Testo e Cabina a mano, il resto in automatico coi malus** — FATTO 28/09 (su main il
+  01/10): «chiudi tu il resto: mix e uscita», mix della casa e uscita al venerdì senza l'hype
+  dell'attesa; «Il resto in automatico», `02-interfaccia-e-telefono.md`.
 
 Due punti di CARLO — «quando non sono fix… crea un file nuovo collegato ai già presenti»
 e «tieni tutto ciò che riguarda la parte smartphone separata dal resto del progetto» —
@@ -194,6 +198,18 @@ Shop, «Lo stile che conta», nel branch `task/shop-lo-stile-che-conta`; la rich
 arrivata subito dopo — solo vestiti, coi filtri — chiusa in giornata; e le altre due dello
 Shop, i capi che si sbloccano e le offerte, insieme nel branch
 `task/shop-capi-sbloccati-e-offerte`._
+
+### Beat, Testo e Cabina a mano, il resto in automatico
+
+_Da `implementazioni.md`, CARLO «Studio (16/09/2026)» 10._
+
+10. l'utente deve poter fare solo le sezioni Beat, Testo, e Cabina, poi il resto in automatico, però questo porta dei malus
+
+    **FATTO (28/09/2026)** — col pezzo appena inciso sul banco, in Cabina e nel Mix c'è
+    «chiudi tu il resto: mix e uscita». Il gioco lo mixa «della casa» (+3 invece del mix
+    vero, di solito +7…+15) e lo mette in coda per venerdì senza l'hype dell'attesa (+4);
+    non costa energia né una mossa. «Il resto in automatico» in
+    `02-interfaccia-e-telefono.md`.
 
 ### Capi che si sbloccano, e le offerte della settimana
 
