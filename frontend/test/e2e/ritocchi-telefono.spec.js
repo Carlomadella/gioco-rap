@@ -14,6 +14,12 @@ test("in orizzontale la conferma del viaggio si apre dal titolo", async ({ page 
   await page.waitForTimeout(300);
   const scorsa = await page.evaluate(() => document.querySelector("#modal .sheet2").scrollTop);
   expect(scorsa).toBe(0);
+  /* dal 28/09 è più piccola e di traverso ci sta tutta, senza scorrere */
+  const scorre = await page.evaluate(() => {
+    const s = document.querySelector("#modal .sheet2");
+    return s.scrollHeight - s.clientHeight;
+  });
+  expect(scorre).toBeLessThanOrEqual(1);
   /* e il tasto «Resta qui» ha comunque il fuoco */
   expect(await page.evaluate(() => document.activeElement.classList.contains("travel-cancel"))).toBe(true);
 });

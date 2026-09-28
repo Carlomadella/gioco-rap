@@ -186,40 +186,42 @@
 /* La conferma della mappa: gli eventi continuano a usare la modale normale. */
 .travel-pin{display:none}
 #modal.travel-confirm{background:rgba(2,9,18,.78);backdrop-filter:blur(9px)}
+/* Rimpicciolita il 28/09: era larga 720 contro i 470 delle altre modali, col
+   titolo a 54 e i tasti alti 100, e di traverso (844 × 390) scorreva. */
 .travel-confirm .sheet2{
-  width:min(100%,720px);max-width:720px;max-height:calc(100dvh - 32px);
-  padding:32px;border:1px solid #168fc3;border-radius:18px;
+  width:min(100%,500px);max-width:500px;max-height:calc(100dvh - 32px);
+  padding:22px;border:1px solid #168fc3;border-radius:16px;
   background:radial-gradient(ellipse at 100% 100%,rgba(11,90,145,.25),transparent 44%),
     linear-gradient(145deg,#071727,#04101e 75%);
   box-shadow:0 24px 70px rgba(0,0,0,.65),inset 0 0 0 1px rgba(82,207,255,.12),0 0 20px rgba(0,183,255,.13);
   color:#eff9ff;
 }
 .travel-confirm .travel-pin{
-  position:absolute;top:32px;left:32px;display:grid;place-items:center;
-  width:64px;height:64px;border:1px solid rgba(37,206,247,.64);border-radius:14px;
+  position:absolute;top:22px;left:22px;display:grid;place-items:center;
+  width:44px;height:44px;border:1px solid rgba(37,206,247,.64);border-radius:11px;
   background:linear-gradient(150deg,#06314a,#082031);color:#47edff;
 }
-.travel-confirm .travel-pin svg{width:35px;height:35px;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.travel-confirm .mx{top:30px;right:30px;width:44px;height:44px;border:1px solid #2878a6;background:#0b2840;color:#eafaff;font-size:22px}
-.travel-confirm .k{display:block;margin:3px 56px 0 86px;padding:0;color:#4acdf8;font:800 12px/1.4 Figtree,system-ui,sans-serif;letter-spacing:.23em}
-.travel-confirm h2{margin:6px 56px 26px 86px;font:900 clamp(36px,5vw,54px)/1 Archivo Black,Figtree,system-ui,sans-serif;letter-spacing:-.045em;color:#f3fbff}
-.travel-confirm .travel-route{overflow:hidden;margin-bottom:16px;border:1px solid rgba(44,167,228,.55);border-radius:14px;background:rgba(1,15,30,.75)}
-.travel-confirm .travel-times{display:grid;grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr);align-items:center;gap:8px;padding:21px 22px}
-.travel-confirm .travel-time{display:flex;align-items:center;gap:14px;min-width:0}
+.travel-confirm .travel-pin svg{width:24px;height:24px;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.travel-confirm .mx{top:22px;right:22px;width:44px;height:44px;border:1px solid #2878a6;background:#0b2840;color:#eafaff;font-size:19px}
+.travel-confirm .k{display:block;margin:2px 52px 0 58px;padding:0;color:#4acdf8;font:800 10.5px/1.4 Figtree,system-ui,sans-serif;letter-spacing:.2em}
+.travel-confirm h2{margin:4px 52px 18px 58px;font:900 clamp(26px,3vw,32px)/1 Archivo Black,Figtree,system-ui,sans-serif;letter-spacing:-.04em;color:#f3fbff}
+.travel-confirm .travel-route{overflow:hidden;margin-bottom:12px;border:1px solid rgba(44,167,228,.55);border-radius:12px;background:rgba(1,15,30,.75)}
+.travel-confirm .travel-times{display:grid;grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr);align-items:center;gap:6px;padding:14px 16px}
+.travel-confirm .travel-time{display:flex;align-items:center;gap:10px;min-width:0}
 .travel-confirm .travel-time > div{min-width:0}
-.travel-confirm .travel-time span:not(.travel-clock){display:block;margin-bottom:4px;color:#a7bfda;font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
-.travel-confirm .travel-time strong{display:block;font:900 clamp(29px,4vw,40px)/1 Figtree,system-ui,sans-serif;letter-spacing:-.035em;font-variant-numeric:tabular-nums;color:#f3faff}
-.travel-confirm .travel-clock{flex:none;display:grid;place-items:center;width:46px;height:46px;border:1px solid rgba(36,156,222,.38);border-radius:11px;background:#06253b;color:#77e5ff}
-.travel-confirm .travel-clock svg{width:27px;height:27px;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
-.travel-confirm .travel-arrow{text-align:center;color:#26d6ef;font-size:26px;line-height:1}
-.travel-confirm .travel-length{display:flex;align-items:center;gap:12px;padding:16px 22px;border-top:1px solid rgba(44,167,228,.28);color:#bcd2e9;font-size:16px;line-height:1.35}
+.travel-confirm .travel-time span:not(.travel-clock){display:block;margin-bottom:3px;color:#a7bfda;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.travel-confirm .travel-time strong{display:block;font:900 clamp(22px,2.4vw,28px)/1 Figtree,system-ui,sans-serif;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:#f3faff}
+.travel-confirm .travel-clock{flex:none;display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(36,156,222,.38);border-radius:9px;background:#06253b;color:#77e5ff}
+.travel-confirm .travel-clock svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.travel-confirm .travel-arrow{text-align:center;color:#26d6ef;font-size:20px;line-height:1}
+.travel-confirm .travel-length{display:flex;align-items:center;gap:10px;padding:10px 16px;border-top:1px solid rgba(44,167,228,.28);color:#bcd2e9;font-size:14px;line-height:1.35}
 .travel-confirm .travel-length strong{color:#45e6f7;font-weight:900}
-.travel-confirm .travel-hourglass{flex:none;display:grid;place-items:center;width:32px;height:32px;border-radius:8px;background:#0c3048;color:#8be7ff;font-size:21px}
-.travel-confirm .travel-hourglass svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.travel-confirm #m-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.travel-confirm .opt2{display:flex;flex-direction:column;justify-content:center;min-height:100px;margin:0;padding:15px 18px;border:1px solid #3887b7;border-radius:12px;background:linear-gradient(155deg,#0a2b43,#071b30);box-shadow:none;text-align:center;color:#f1f9ff}
-.travel-confirm .opt2 .n{font:900 clamp(20px,3vw,25px)/1.15 Figtree,system-ui,sans-serif;letter-spacing:-.025em}
-.travel-confirm .opt2 .d{margin-top:7px;color:#bfd1e7;font-size:12px;line-height:1.35}
+.travel-confirm .travel-hourglass{flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:7px;background:#0c3048;color:#8be7ff;font-size:16px}
+.travel-confirm .travel-hourglass svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.travel-confirm #m-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.travel-confirm .opt2{display:flex;flex-direction:column;justify-content:center;min-height:64px;margin:0;padding:10px 14px;border:1px solid #3887b7;border-radius:11px;background:linear-gradient(155deg,#0a2b43,#071b30);box-shadow:none;text-align:center;color:#f1f9ff}
+.travel-confirm .opt2 .n{font:900 18px/1.15 Figtree,system-ui,sans-serif;letter-spacing:-.02em}
+.travel-confirm .opt2 .d{margin-top:4px;color:#bfd1e7;font-size:11.5px;line-height:1.3}
 .travel-confirm .travel-go{border-color:#3edcfb;background:linear-gradient(150deg,#0874ac,#075077);box-shadow:inset 0 1px 0 rgba(179,249,255,.3),0 0 16px rgba(0,179,234,.19)}
 .travel-confirm .opt2:focus-visible,.travel-confirm .mx:focus-visible{outline:2px solid #74eaff;outline-offset:3px}
 @media (hover:hover){
@@ -228,25 +230,38 @@
 }
 @media (max-width:560px){
   #modal.travel-confirm{padding:12px}
-  .travel-confirm .sheet2{max-height:calc(100dvh - 24px);padding:21px;border-radius:16px}
-  .travel-confirm .travel-pin{top:21px;left:21px;width:46px;height:46px;border-radius:11px}
-  .travel-confirm .travel-pin svg{width:26px;height:26px}
-  .travel-confirm .mx{top:21px;right:21px}
-  .travel-confirm .k{margin:2px 48px 0 60px;font-size:10px;letter-spacing:.16em}
-  .travel-confirm h2{margin:4px 42px 24px 60px;font-size:clamp(29px,8vw,39px)}
-  .travel-confirm .travel-times{gap:4px;grid-template-columns:minmax(0,1fr) 19px minmax(0,1fr);padding:17px 13px}
+  .travel-confirm .sheet2{max-height:calc(100dvh - 24px);padding:18px;border-radius:14px}
+  .travel-confirm .travel-pin{top:18px;left:18px;width:40px;height:40px;border-radius:10px}
+  .travel-confirm .travel-pin svg{width:22px;height:22px}
+  .travel-confirm .mx{top:16px;right:16px}
+  .travel-confirm .k{margin:1px 48px 0 52px;font-size:10px;letter-spacing:.16em}
+  .travel-confirm h2{margin:4px 48px 16px 52px;font-size:clamp(24px,7vw,30px)}
+  .travel-confirm .travel-times{gap:4px;grid-template-columns:minmax(0,1fr) 19px minmax(0,1fr);padding:13px 12px}
   .travel-confirm .travel-time{gap:7px}
-  .travel-confirm .travel-clock{width:32px;height:32px;border-radius:8px}
-  .travel-confirm .travel-clock svg{width:20px;height:20px}
+  .travel-confirm .travel-clock{width:30px;height:30px;border-radius:8px}
+  .travel-confirm .travel-clock svg{width:18px;height:18px}
   .travel-confirm .travel-time span:not(.travel-clock){display:flex;align-items:flex-end;min-height:2.2em;font-size:9px;letter-spacing:.08em}
-  .travel-confirm .travel-time strong{font-size:clamp(24px,7vw,34px)}
-  .travel-confirm .travel-arrow{font-size:19px}
-  .travel-confirm .travel-length{padding:13px;font-size:14px}
-  .travel-confirm #m-opts{grid-template-columns:1fr;gap:10px}
-  .travel-confirm .opt2{min-height:76px;padding:12px}
+  .travel-confirm .travel-time strong{font-size:clamp(22px,6.4vw,28px)}
+  .travel-confirm .travel-arrow{font-size:17px}
+  .travel-confirm .travel-length{padding:10px 12px;font-size:13.5px}
+  .travel-confirm #m-opts{grid-template-columns:1fr;gap:8px}
+  .travel-confirm .opt2{min-height:56px;padding:9px 12px}
 }
 @media (max-width:370px){
   .travel-confirm .travel-clock{display:none}
-  .travel-confirm .travel-times{padding-inline:16px}
+  .travel-confirm .travel-times{padding-inline:14px}
+}
+/* di traverso: la riga piccola dei tasti va via, e la modale sta tutta */
+@media (max-height:480px){
+  #modal.travel-confirm{padding:10px}
+  .travel-confirm .sheet2{max-height:calc(100dvh - 20px);padding:14px 18px}
+  .travel-confirm .travel-pin{top:14px;left:18px}
+  .travel-confirm .mx{top:12px;right:14px}
+  .travel-confirm h2{margin-bottom:12px}
+  .travel-confirm .travel-times{padding:10px 14px}
+  .travel-confirm .travel-length{padding:8px 14px}
+  .travel-confirm .travel-route{margin-bottom:10px}
+  .travel-confirm .opt2{min-height:48px}
+  .travel-confirm .opt2 .d{display:none}
 }
 @media (prefers-reduced-motion:reduce){.travel-confirm .sheet2{animation:none}}
