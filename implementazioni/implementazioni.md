@@ -108,8 +108,8 @@ fondo fra le chiuse._
 6. **Le card sulla mappa troppo vicine, i pulsanti sopra la mappa troppo grandi** — ALE.
     Si giudicano a occhio: vanno guardate con uno screenshot, non dal CSS. Stessa cosa per
     **la schermata opzioni da migliorare graficamente** — CARLO, pagina di landing.
-7. **Quando skippi tante ore ci mette troppo** — CARLO. Prima si misura (quanti giorni,
-    quanti secondi), poi si cerca dove.
+7. ~~**Quando skippi tante ore ci mette troppo** — CARLO.~~ **FATTO (28/09/2026)** — otto
+    ore di attesa da 11,8 a 2,2 secondi: «L'attesa lunga non si trascina», `05-carriera-e-tempo.md`.
 8. **Su LaFamegram non posta nessuno** — CARLO. Oggi gli altri compaiono nel feed solo
     quando l'evento riguarda te (il fan, il giornalista, la Strada: `lafamegramEventi`);
     nessun contatto della Sala o rivale posta per conto suo. Prima si decide chi posta e
@@ -420,6 +420,11 @@ che costava troppo._
    quindi non hanno più bisogno di una foto.
 
 7. quando skippi tante ore ci mette troppo a simulare
+
+   **FATTO (28/09/2026)** — misurato: 8 ore d'attesa erano 11,8 secondi, 11,2 di pausa fissa
+   fra un quarto d'ora e l'altro; il calcolo è 14 ms a passo e +7 giorni ci mette 0,2 s.
+   Adesso le pause di un'attesa stanno in 1,6 secondi: 8 ore in 2,2. «L'attesa lunga non si
+   trascina» in `05-carriera-e-tempo.md`.
 
 8. togli il parametro «lucidità» e tutto ciò che ne consegue
 

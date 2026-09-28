@@ -386,3 +386,24 @@ condizione.
 
 L'audit («Le quattro piccole del 20/09») controlla che «lascialo» non torni nei testi, che
 `offerJobs` si fermi con un lavoro, e che EV0035 chieda `no_job` nel catalogo.
+
+## L'attesa lunga non si trascina
+
+CARLO, «quando skippi tante ore ci mette troppo a simulare».
+
+**FATTO (28/09/2026)** — branch `task/skip-lento`. Prima misurato, nel browser a 1440 × 900:
+
+| cosa | prima | dopo |
+|---|---|---|
+| «Attendi» 8 ore | 11,8 s | 2,2 s |
+| «Attendi» 1 ora | 1,5 s | 1,5 s |
+| un passo da 15 minuti, senza pause | 14 ms | 12 ms |
+| +7 giorni | 0,2 s | 0,2 s |
+
+Il tempo non se ne andava nel calcolo ma nell'attesa voluta: `waitTo()` in
+`tempo-controlli.js` fa un passo da 15 minuti e poi dorme 350 ms, per far vedere il cielo e
+la luce della mappa che cambiano. Otto ore sono 32 passi, cioè 11,2 secondi di sonno. I
+passi restano da 15 minuti — eventi dell'orologio, orari e agenda li contano uno a uno —
+ma le pause di un'attesa intera stanno in 1,6 secondi (`pausaPasso()`: fra 25 e 350 ms a
+passo). Fino a un'ora e un quarto non cambia niente; la luce della mappa dura almeno 380 ms e
+i cambi si fondono. L'audit controlla che la pausa non torni fissa.
