@@ -6490,3 +6490,28 @@ lanciato.
 - **quanto pesa** — da sistemare con calma.
 
 **RISOLTO (30/09/2026)** — stesso branch: niente più tre righe nella scheda (la scheda scorre, con la barretta sottile), le mosse chiuse del Palco vanno a capo invece dei puntini e la loro colonna ha la barretta, le facce di «Chi c'è stasera» scendono fino a 46 punti.
+
+## Giro del 29/09/2026 (segnala-problemi, giro stretto sul commit 2b1f650, branch `task/lafamegram-posta-la-gente`) — la chiusa
+
+### I post della strada e della Voce del Giro prendono la data di quando li guardi, non di quando nascono
+- **dove** — `frontend/js/game/telefono.js:215` (la riga che dà la settimana ai post degli
+  incontri), con i post che nascono in `frontend/js/game/strada.js:124` e
+  `frontend/js/game/eventi-v2.js:2012`
+- **cosa succede** — i post degli incontri non hanno una settimana e la prendono la prima
+  volta che apri LaFamegram. Il commento dice che «il popup che li annuncia apre LaFamegram»,
+  ma questo vale solo per i post con la foto (quelli del popup social): quelli degli incontri
+  per strada (il fan, «La Voce del Giro» sul litigio, ecc.) e le notizie della Voce del Giro
+  nascono senza nessun popup che apra l'app. Se non apri LaFamegram per qualche settimana,
+  quando lo apri quei post vecchi finiscono in cima, sopra i post della gente di questa
+  settimana, e sotto la scritta «in giro» / «adesso». Lo stesso succede alla prima apertura
+  con un salvataggio di prima di oggi: tutti i post vecchi degli incontri diventano «di
+  questa settimana».
+- **come si vede** — fai un incontro per strada che finisce su LaFamegram, non aprire il
+  telefono, fai passare tre o quattro settimane, poi apri LaFamegram: il post della strada
+  sta sopra i post dei rivali usciti nel frattempo.
+- **quanto pesa** — da sistemare con calma (l'ordine del feed è un po' sbagliato, non si
+  perde niente).
+- **RISOLTO (29/09/2026)** — branch `task/lafamegram-posta-la-gente`: i post si timbrano
+  `tw:totalWeeks()` quando nascono (`strada.js` e i due posti di `eventi-v2.js`), `telPost`
+  non timbra più niente e quelli dei salvataggi vecchi senza settimana vanno in fondo.
+  Controllo in `audit-regressioni.js`.

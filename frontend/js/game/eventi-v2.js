@@ -1790,7 +1790,7 @@ function adfSocialMakePost(scene, opts){
   const post={
     adfSocial:true,
     sid:"SOC"+(++st().runtime.socialPostSeq),
-    n:author,t:caption,w:"adesso",like:likes,comments:comments,mia:false,
+    n:author,t:caption,w:"adesso",tw:totalWeeks(),like:likes,comments:comments,mia:false,
     media:{scene:scene}
   };
   adfSocialEnsureActions(post);
@@ -2051,7 +2051,7 @@ function mirrorDelivery(e, meta){
   if(e.delivery==="lafamegram"){
     G.lafamegramEventi=G.lafamegramEventi||[];
     G.lafamegramEventi.unshift({
-      n:"La Voce del Giro",t:e.title+" — "+e.description,w:"adesso",
+      n:"La Voce del Giro",t:e.title+" — "+e.description,w:"adesso",tw:totalWeeks(),
       like:Math.max(5,Math.round(12+G.hype*.8)),mia:false
     });
     if(G.lafamegramEventi.length>20) G.lafamegramEventi.length=20;

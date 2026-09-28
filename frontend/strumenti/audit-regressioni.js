@@ -811,7 +811,11 @@ test("su LaFamegram posta anche la gente: rivali e Sala, mescolati nel feed",
   index.indexOf("js/game/telefono-feed-gente.js") > index.indexOf("js/game/telefono.js") &&
   leggi("js/game/telefono-feed-gente.js").includes("vitaRivali = function") &&
   leggi("js/game/telefono-feed-gente.js").includes("function feedGenteSala()") &&
-  tel.includes("G.lafamegramGente || []"));
+  tel.includes("G.lafamegramGente || []") &&
+  /* i post degli incontri si datano quando nascono, non quando apri l'app */
+  leggi("js/game/strada.js").includes('w:"in giro", tw:totalWeeks()') &&
+  ev.split('w:"adesso",tw:totalWeeks()').length >= 3 &&
+  !tel.includes("p.tw = ora"));
 test("il feat si sceglie in Cabina, da due porte: chi conosci gratis, la classifica a pagamento e con rifiuto",
   studio.includes("function studioCabinaConChi(ft)") &&
   studio.includes("function studioChiamaRivale(nome)") &&

@@ -11,7 +11,7 @@ roadmap, nei commenti del codice) quel giro lo trova in `problemi-risolti.md`, c
 ## Cosa resta aperto al 29/09/2026
 
 I numeri sono quelli di sempre, e restano: altri documenti citano «la voce 65». La prossima
-voce nuova è la 78. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
+voce nuova è la 79. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
 [`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md) (la 7 con «Via la
 lucidità», la 9 fra «Le decisioni tue», la 10 fra quelle fuori dall'ordine); la 61 e la 65
 sono decisioni di bilanciamento e per ora stanno solo qui.
@@ -64,6 +64,12 @@ Dal giro del 30/09 su `task/circolo-viewport-avatar` (dettaglio in fondo):
 
 **77.** Nota: la stessa persona ha una foto al Circolo e una faccia disegnata nello Studio; e
 chi è una ragazza lo decide una lista di nomi scritta a mano.
+
+Dal giro del 29/09 su `task/lafamegram-posta-la-gente` (dettaglio in fondo; arrivato su
+`main` il 01/10):
+
+**78.** Da decidere: **il feed vero del server finisce sotto ai post della gente** — fino a
+settanta card prima dei post dei giocatori veri.
 
 ---
 
@@ -596,3 +602,27 @@ sue regole partono tutte da 1180 in giù.
   anche nello Studio, e se il genere diventa una cosa della persona invece che del nome.
 - **come si vede** — conosci un fonico al Circolo, poi aprilo nella Cabina.
 - **quanto pesa** — da sistemare con calma.
+
+## Giro del 29/09/2026 (segnala-problemi, giro stretto sul commit 2b1f650, branch `task/lafamegram-posta-la-gente`)
+
+I controlli automatici passano tutti e tre (`npm run prova`, `audit-regressioni.js`,
+`npm run verifica:build`). Guardato: i salvataggi vecchi (senza `lafamegramGente` prendono la
+lista vuota quando si carica la partita, e `telPost` ha comunque il suo `|| []`); le card di
+`eventi-v2.js` con i post della gente, che non hanno `sid`: escono come card semplici, senza
+i tasti Like/Repost/Rispondi, e nessun tasto resta con un indirizzo vuoto; l'ordine degli
+script in `frontend/pagine/gioco.html` (`rivals.js` e `sim.js` prima del file nuovo, che
+avvolge `vitaRivali` in un solo posto: altri file che la avvolgono non ce ne sono); `telPost`
+la usano solo le due schermate LaFamegram. Due cose da segnalare: la prima è chiusa nel branch e sta in `problemi-risolti.md`.
+
+### 78. Il feed vero del server finisce sotto a settanta post finti
+- **dove** — `frontend/js/game/telefono.js:220` (`miei.concat(altri, base)`), con il tetto di
+  40 post in `frontend/js/game/telefono-feed-gente.js:14`
+- **cosa succede** — `base` è il feed che arriva dal server (i post del mondo e chi ti ha
+  appena passato in classifica). Prima gli stavano sopra solo i tuoi post e quelli degli
+  incontri (al massimo 30); adesso ci si aggiungono fino a 40 post della gente, e dopo
+  qualche mese di partita i post dei giocatori veri stanno in fondo, dopo una settantina di
+  card. Funziona, ma è una scelta da fare apposta: se il feed online deve contare, così non
+  lo vede quasi nessuno.
+- **come si vede** — partita collegata al server, qualche mese di gioco, apri LaFamegram e
+  scorri: i post con «Settimana N» del server arrivano solo in fondo.
+- **quanto pesa** — da sistemare con calma (è più una scelta che un errore).
