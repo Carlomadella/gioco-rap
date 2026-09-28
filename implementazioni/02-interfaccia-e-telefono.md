@@ -349,6 +349,27 @@ il telefono deve sembrare un vero e proprio telefono : Quindi come un iphone esa
 
 ---
 
+## Su LaFamegram posta anche la gente
+
+sull'app lafamegram non posta nessuno
+
+   **FATTO (28/09/2026)** — adesso postano gli altri, una volta a settimana
+   (`js/game/telefono-feed-gente.js`, attaccato a `vitaRivali`):
+   - **i rivali della classifica**, con le stesse cose che finiscono nel diario: il
+     pezzo nuovo («Fuori «Ore Piccole». Link in bio»), la firma con l'etichetta, il primo
+     post quando spuntano dal niente, e la frecciata quando ti nominano in un pezzo. Nelle
+     settimane senza niente di grosso uno di loro posta comunque qualcosa del giro. I like
+     seguono i loro ascolti.
+   - **la gente della Sala che conosci** (rel ≥ 1), uno o due a settimana, col suo
+     mestiere: il beatmaker il beat, il fonico il mix, il giornalista il pezzo, il
+     videomaker il set. Chi ti vuole bene (rel ≥ 3) ogni tanto rilancia un tuo pezzo
+     uscito. La stessa persona non ripete la frase dei suoi ultimi post.
+
+   Stanno in `G.lafamegramGente` (le ultime quaranta), e `telPost()` le mescola con i
+   post degli incontri dal più nuovo; i tuoi restano in cima. Chi posta e cosa l'ho
+   deciso io (la voce diceva «prima si decide»): se Carlo vuole altro — gli opps più
+   cattivi, i beat da ascoltare nel post — si cambia nei testi in cima al file.
+
 ---
 
 ## Responsività di tutto il gioco — **cominciata, da finire domani**

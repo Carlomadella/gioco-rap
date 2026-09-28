@@ -804,6 +804,14 @@ test("il Marketing sta sul telefono: «Che post fai?» in LaFamegram, e Fuori ci
   studio.includes("function studioFalloSapere()") &&
   studio.includes('data-lafamegram="1"') &&
   !studio.includes("function studioSezMarketing()"));
+/* «sull'app lafamegram non posta nessuno» (28/09/2026): rivali e gente della
+   Sala postano per conto loro, una volta a settimana, attaccati a vitaRivali. */
+test("su LaFamegram posta anche la gente: rivali e Sala, mescolati nel feed",
+  fs.existsSync(path.join(ROOT, "js/game/telefono-feed-gente.js")) &&
+  index.indexOf("js/game/telefono-feed-gente.js") > index.indexOf("js/game/telefono.js") &&
+  leggi("js/game/telefono-feed-gente.js").includes("vitaRivali = function") &&
+  leggi("js/game/telefono-feed-gente.js").includes("function feedGenteSala()") &&
+  tel.includes("G.lafamegramGente || []"));
 test("il feat si sceglie in Cabina, da due porte: chi conosci gratis, la classifica a pagamento e con rifiuto",
   studio.includes("function studioCabinaConChi(ft)") &&
   studio.includes("function studioChiamaRivale(nome)") &&

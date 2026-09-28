@@ -82,7 +82,7 @@ viene.
    in quattro passi (il dettaglio sotto al punto). Si porta dietro la metà che manca di
    «I salvataggi non possono più stare nel localStorage» e le chiavi di «Gli account
    veri», in `08-uscita-sugli-store.md`, e aspetta la decisione sul telefono **di
-   traverso** (voce 15).
+   traverso** (voce 14).
 
 _Il resto è chiuso: `jose` e `zod` sono usate, l'avvio rapido dice quanto ci mette, i
 cinque video del punto sono collegati. I sette video in più sono una decisione, fra le decisioni._
@@ -114,45 +114,41 @@ _Niente di aperto: i tre punti dello Shop scelti il 20/09 sono chiusi tutti il 2
 6. **Le card sulla mappa troppo vicine, i pulsanti sopra la mappa troppo grandi** — ALE.
    Si giudicano a occhio: vanno guardate con uno screenshot, non dal CSS. Stessa cosa per
    **la schermata opzioni da migliorare graficamente** — CARLO, pagina di landing.
-7. **Su LaFamegram non posta nessuno** — CARLO. Oggi gli altri compaiono nel feed solo
-   quando l'evento riguarda te (il fan, il giornalista, la Strada: `lafamegramEventi`);
-   nessun contatto della Sala o rivale posta per conto suo. Prima si decide chi posta e
-   cosa, poi si fa.
-8. **Il pub e la pubblicità come primo modo di fare hype** — ALE, la coda del punto
+7. **Il pub e la pubblicità come primo modo di fare hype** — ALE, la coda del punto
    sull'hype (FATTO il 06/09 per il resto, in `fatte.md`): oggi non esistono né come
    luogo né come azione.
-9. **I collettivi di rapper** — CARLO, «Studio (16/09/2026)»: «fai in modo che si possano
+8. **I collettivi di rapper** — CARLO, «Studio (16/09/2026)»: «fai in modo che si possano
    creare collettivi di rapper». Nel gioco non esiste un gruppo: ci sono i rivali della
    classifica e la gente della Sala, uno per uno. Prima si scrive cos'è un collettivo
    (chi ci entra, cosa dà — pezzi in comune, hype condiviso, un nome in classifica), poi
    si fa.
-10. **Il joint album con altri rapper, su chiamata di un produttore** — CARLO, «Studio
-    (16/09/2026)»: «fai in modo che un produttore possa chiamarti per fare un joint album
-    con altri rapper». La chiamata è un evento del telefono; l'album, più pezzi in fila
-    con più feat, oggi non esiste come oggetto. Viene dopo i collettivi.
+9. **Il joint album con altri rapper, su chiamata di un produttore** — CARLO, «Studio
+   (16/09/2026)»: «fai in modo che un produttore possa chiamarti per fare un joint album
+   con altri rapper». La chiamata è un evento del telefono; l'album, più pezzi in fila
+   con più feat, oggi non esiste come oggetto. Viene dopo i collettivi.
 
 **Decisioni prima che lavori**
 
-11. **I rapporti coi beatmaker che vanno in negativo** — ALE. In `posto.js` il rapporto
+10. **I rapporti coi beatmaker che vanno in negativo** — ALE. In `posto.js` il rapporto
     scende (`p.rel--`) ma è tenuto fra 0 e 5: sotto zero non va. Prima di farlo va deciso
     cosa succede a −1 (non ti vende più? ti fa pagare di più?).
-12. **Non sempre far scorrere una giornata ridà l'energia** e **la legacy** — CARLO. Sono
+11. **Non sempre far scorrere una giornata ridà l'energia** e **la legacy** — CARLO. Sono
     regole di gioco nuove: prima si scrive come funzionano, poi si fa.
-13. **Lo Shop in provincia, con limitazioni** — ALE. Lo Shop c'è già dal primo giorno, e
+12. **Lo Shop in provincia, con limitazioni** — ALE. Lo Shop c'è già dal primo giorno, e
     dal 21/09 sette capi si sbloccano con la carriera («Capi che si sbloccano», in
     `fatte.md`): è una limitazione, ma per carriera, non per città. Va ancora deciso cosa **non**
     si vende in provincia (vedi la RISPOSTA sotto al punto).
-14. **La troupe** — CARLO, «Da discutere»: «il player può decidere se avere una troupe:
+13. **La troupe** — CARLO, «Da discutere»: «il player può decidere se avere una troupe:
     manager, social media manager, fonico personale, beatmaker personale, videomaker». Il
     fonico e il beatmaker «personali» sono già gente della Sala con un rapporto che sale;
     il manager, il social media manager e il videomaker non esistono. Prima si decide cosa
     fa ognuno e quanto costa a settimana.
-15. **Le decisioni tue**, senza le quali il resto non si muove: la pagina di Mycol e il «tuo artista»
+14. **Le decisioni tue**, senza le quali il resto non si muove: la pagina di Mycol e il «tuo artista»
     nella landing; se il gioco sugli store gira anche **di traverso** (nel repo non c'è un
     manifest né un `orientation`, da problemi-riscontrati); e se cancellare gli undici
     branch già uniti in `main` (`git branch --merged main` li elenca, da
     `test/vitest-playwright-gate` a `task/studio-cinque-linguette`), anche sul remoto.
-16. **Come arriva MakeHuman a chi installa il gioco** — dal punto su Avaturn e il camerino
+15. **Come arriva MakeHuman a chi installa il gioco** — dal punto su Avaturn e il camerino
     (FATTO il 20/09): il camerino MakeHuman legge il dataset di `media/makehuman-editor-v1`
     (2,8 GB), che sta fuori da git e fuori dal pacchetto per gli store
     (`FUORI_DAL_PACCHETTO` in `strumenti/build.js`). In un pacchetto pulito la strada «crea
@@ -160,7 +156,7 @@ _Niente di aperto: i tre punti dello Shop scelti il 20/09 sono chiusi tutti il 2
     (solo i proxy e i target che il camerino usa davvero — il catalogo UI ne conta 468 su
     1.717), un download al primo avvio, o il dataset intero. Va deciso prima dell'uscita,
     insieme al progetto Avaturn nostro (oggi gira sul demo pubblico).
-17. **I sette video che nessun punto chiede** — la coda delle transizioni video (FATTO il
+16. **I sette video che nessun punto chiede** — la coda delle transizioni video (FATTO il
     20/09 per i cinque del punto): palestra, Milano, club, shop, trasferta, live, più
     `video_transizione_entrata_in_studio` che è un doppione dello studio. Sono 22 MB in
     `frontend/media/video/Transizioni di scena/` che viaggiano nel pacchetto per gli
@@ -339,15 +335,6 @@ che costava troppo._
 7. aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
 
 8. non sempre far scorrere una giornata ti ridà l'energia
-
-9. sull'app lafamegram non posta nessuno
-
-   **Stato (15/09/2026)** — nel feed (`telPost()` in `telefono.js`) ci sono i tuoi post,
-   quelli che nascono dagli incontri — il fan, il giornalista, la Strada, tutti in
-   `lafamegramEventi` e tutti **su di te** — e due notizie de «La Voce del Giro». Nessun
-   contatto della Sala, nessun rivale, posta per conto suo: è vero che «non posta
-   nessuno». Prima di farlo va deciso chi posta e cosa (i beatmaker i loro beat? gli opps
-   contro di te? chi scala la classifica?).
 
 10. mettere un recap giornaliero con in aggiunta gli highlights.
 
