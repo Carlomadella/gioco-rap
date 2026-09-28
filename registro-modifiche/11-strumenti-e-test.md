@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:7f02c3e -->
+## 28/09/26, 11:46 â€” task/diario-dal-telefono â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `7f02c3e`
+
+### Cosa Ã¨ entrato
+
+- `7da4f4f` â€” Esc sul Diario aperto dalle Notifiche chiude solo il Diario â€” **Carlomadella**
+- `b85ba42` â€” Il Diario si riapre col dito, e l'orologio non ci sta sopra â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:c415886 -->
 ## 27/09/26, 16:53 â€” task/ritocchi-telefono-27-09 â†’ main
 
