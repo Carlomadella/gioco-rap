@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:6a4f0a9 -->
+## 28/09/26, 12:49 â€” task/skip-lento â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `6a4f0a9`
+
+### Cosa Ã¨ entrato
+
+- `85e934e` â€” Quando skippi tante ore non ci mette più troppo â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/tempo-controlli.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:7f02c3e -->
 ## 28/09/26, 11:46 â€” task/diario-dal-telefono â†’ main
 
