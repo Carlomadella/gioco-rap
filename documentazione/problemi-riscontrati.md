@@ -6145,3 +6145,19 @@ in nessuna prova.
   (`stopImmediatePropagation` in `ui.js`, che si carica prima di `telefono.js`). Riprovato a
   390 × 844, 360 × 640 e 1440 × 900: dopo Esc si è ancora nelle Notifiche. Un controllo
   nell'audit.
+
+## Giro del 28/09/2026 (segnala-problemi, giro stretto sul commit c3aeede, branch `task/modale-piu-piccola`)
+
+Niente da segnalare. Cosa ho controllato, con il browser (Playwright, server mio sulla 8160):
+la conferma «Vai lì?» aperta a 19 misure, da 320 × 480 a 1920 × 1080, più quelle di
+traverso (844 × 390, 740 × 360, 667 × 375, 568 × 320, 932 × 430), una volta con i numeri
+corti (08:00 → 08:30, «30 min») e una con quelli lunghi (23:59 → 00:40, «1 h 45 min», e il
+tasto «Vai · 1 h 45 min»). A nessuna misura la finestra esce dallo schermo o scorre, nessun
+testo esce dalla sua casella, la X non si sovrappone al titolo. La X è sempre 44 × 44 e i
+due tasti sono alti almeno 48 (di traverso) e 56-77 altrove, quindi si prendono bene col
+dito. Di traverso la riga piccola sotto i tasti sparisce come previsto e la finestra resta
+alta 250. Le regole nuove, compresa quella per gli schermi bassi (`max-height:480px`, in
+`frontend/css/overlays.css`), cominciano tutte con `.travel-confirm`, e quella classe la
+mette solo la conferma dello spostamento (`frontend/js/game/modal.js:39`). Una finestra
+normale aperta subito dopo il viaggio torna senza la classe, larga 470 come prima e con il
+suo testo visibile. Nessun errore JavaScript nella pagina.
