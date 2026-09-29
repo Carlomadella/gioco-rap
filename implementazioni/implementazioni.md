@@ -152,8 +152,7 @@ fondo fra le chiuse._
     fonico e il beatmaker «personali» sono già gente della Sala con un rapporto che sale;
     il manager, il social media manager e il videomaker non esistono. Prima si decide cosa
     fa ognuno e quanto costa a settimana.
-17. **Le decisioni tue**, senza le quali il resto non si muove: se dopo Milano e Los
-    Angeles si può tornare indietro (DA DISCUTERE); la pagina di Mycol e il «tuo artista»
+17. **Le decisioni tue**, senza le quali il resto non si muove: la pagina di Mycol e il «tuo artista»
     nella landing; se il gioco sugli store gira anche **di traverso** (nel repo non c'è un
     manifest né un `orientation`, da problemi-riscontrati); e se cancellare gli undici
     branch già uniti in `main` (`git branch --merged main` li elenca, da
@@ -450,6 +449,10 @@ che costava troppo._
     nessuno». Prima di farlo va deciso chi posta e cosa (i beatmaker i loro beat? gli opps
     contro di te? chi scala la classifica?).
 
+12. mettere un recap giornaliero con in aggiunta gli highlights.
+
+13. le trasferte di lavoro in altre città ci stanno già dalla prima città, i concerti in giro per l'italia da Milano
+
 #### Studio (16/09/2026)
 
 _Scritti da Carletto il 16/09 nella lista dello Studio; i numeri sono i suoi, i buchi
@@ -517,6 +520,12 @@ coi filtri (chiusa lo stesso giorno)._
 #### Da discutere
 
 2. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles? Per forza a los angeles, però può decidere di tornare nelle città prima
+
+   **DECISO (29/09/2026)** — CARLO: dopo Los Angeles **non ci si trasferisce in un'altra
+   città italiana**, si resta a Los Angeles. **Alle città precedenti invece si torna**:
+   da Los Angeles si può rientrare a Milano e in provincia. Esce da «Le decisioni tue»
+   nell'ordine in testa; si fa insieme a Milano e Los Angeles, che come città oggi non
+   esistono ancora.
 
 3. Il player può decidere se avere una troupe. es: manager, social media manager, fonico personale, beatmaker personale, videomaker
 
