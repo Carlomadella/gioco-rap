@@ -10,7 +10,8 @@ in radice fino al punto 7.
 | [`come-si-lavora.md`](come-si-lavora.md) | **le regole di lavoro**: i punti, i numeri che si spostano, `npm run verifica`, il giro di fine task, quello che gira da solo. In versione corta in [`../CLAUDE.md`](../CLAUDE.md) |
 | [`comandidelterminale.md`](comandidelterminale.md) | tutti i comandi: git, il frontend, il backend, e i guai comuni |
 | [`stili-interfaccia.md`](stili-interfaccia.md) | i riferimenti visivi di fuori (i link ai mock e ai concept) |
-| [`problemi-riscontrati.md`](problemi-riscontrati.md) | i problemi trovati leggendo il codice, e come sono stati chiusi |
+| [`problemi-riscontrati.md`](problemi-riscontrati.md) | i problemi trovati dai giri di controllo e ancora aperti |
+| [`problemi-risolti.md`](problemi-risolti.md) | i problemi chiusi, ognuno col suo RISOLTO: spostati qui da `problemi-riscontrati.md` |
 | [`dipendenze.md`](dipendenze.md) | la regola per scegliere una dipendenza, il prezzo che si paga, e il registro di quelle installate |
 | [`pagine-azioni/`](pagine-azioni/README.md) | una pagina per ogni azione: l'analisi, i pro e i contro, il telaio comune e il progetto di **ogni** schermata, mossa per mossa |
 | [`brainstorming-studio-cover-feat-marketing.md`](brainstorming-studio-cover-feat-marketing.md) | **da decidere**: lo Studio senza le linguette Cover, Feat e Marketing — le idee, il prezzo di ognuna, la domanda sui feat e il punto 10 letto «ad ogni pezzo» |

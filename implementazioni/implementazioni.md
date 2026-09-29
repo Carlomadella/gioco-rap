@@ -37,12 +37,15 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 1. **Da fare adesso, in ordine** — l'ordine in cui si prendono i punti aperti, di questo
    foglio e di [`problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md)
-   insieme. Si aggiorna a ogni giro: un punto chiuso esce dalla lista e va in fondo, una
-   riga con la data e dove sta il racconto; i numeri delle voci si spostano.
+   insieme. Si aggiorna a ogni giro: un punto chiuso esce dalla lista e va in
+   [`fatte.md`](fatte.md), una riga con la data e dove sta il racconto; i numeri delle voci
+   si spostano.
 2. **Inbox automatica** — le richieste nuove come checkbox, una frase basta: le legge
    `scripts/roadmap-auto.js`, che prima cerca duplicati e cose già fatte.
 3. **Le liste per persona** (ALE, CARLO) — i punti scritti a mano, con sotto le note di
-   stato: `FATTO`, `FATTO in parte` e cosa manca, `RISPOSTA` se se n'è solo discusso.
+   stato. Qui restano solo quelli **da fare** o **FATTO in parte** (con cosa manca): un
+   punto FATTO, o chiuso da una `RISPOSTA` o da una decisione, va in [`fatte.md`](fatte.md)
+   (ripulito così il 29/09/2026).
 
 ---
 
@@ -50,7 +53,7 @@ L'indice con **tutti i punti e il loro stato** sta in
 
 Riordinato il 20/09/2026, dopo il reparto Vestiti dello Shop; il 21/09 sono uscite le due
 piccole della Sala e della take, e i tre punti dello Shop. Le voci chiuse sono uscite
-dalla lista e stanno in fondo, una riga l'una con la data e dove sta il racconto — prima
+dalla lista e stanno in [`fatte.md`](fatte.md), una riga l'una con la data e dove sta il racconto — prima
 restavano barrate in mezzo alle aperte e la lista era lunga il doppio di quello che
 serviva. I sette punti di CARLO del 16/09 (lo Studio, la troupe) sono entrati: due erano
 già chiusi senza che nessuno lo dicesse, il Marketing spostato e la preview di un pezzo
@@ -79,15 +82,15 @@ viene.
    in quattro passi (il dettaglio sotto al punto). Si porta dietro la metà che manca di
    «I salvataggi non possono più stare nel localStorage» e le chiavi di «Gli account
    veri», in `08-uscita-sugli-store.md`, e aspetta la decisione sul telefono **di
-   traverso** (voce 17).
+   traverso** (voce 16).
 
 _Il resto è chiuso: `jose` e `zod` sono usate, l'avvio rapido dice quanto ci mette, i
-cinque video del punto sono collegati. I sette video in più sono una decisione, in fondo._
+cinque video del punto sono collegati. I sette video in più sono una decisione, fra le decisioni._
 
 **Piccole e chiare**
 
 _Niente di aperto: i tre punti dello Shop scelti il 20/09 sono chiusi tutti il 21/09, in
-fondo fra le chiuse._
+[`fatte.md`](fatte.md)._
 
 **Lavori lunghi**
 
@@ -117,47 +120,45 @@ fondo fra le chiuse._
 7. **Le card sulla mappa troppo vicine, i pulsanti sopra la mappa troppo grandi** — ALE.
     Si giudicano a occhio: vanno guardate con uno screenshot, non dal CSS. Stessa cosa per
     **la schermata opzioni da migliorare graficamente** — CARLO, pagina di landing.
-8. ~~**Quando skippi tante ore ci mette troppo** — CARLO.~~ **FATTO (28/09/2026)** — otto
-    ore di attesa da 11,8 a 2,2 secondi: «L'attesa lunga non si trascina», `05-carriera-e-tempo.md`.
-9. **Su LaFamegram non posta nessuno** — CARLO. Oggi gli altri compaiono nel feed solo
+8. **Su LaFamegram non posta nessuno** — CARLO. Oggi gli altri compaiono nel feed solo
     quando l'evento riguarda te (il fan, il giornalista, la Strada: `lafamegramEventi`);
     nessun contatto della Sala o rivale posta per conto suo. Prima si decide chi posta e
     cosa, poi si fa.
-10. **Il pub e la pubblicità come primo modo di fare hype** — ALE, la coda del punto
+9. **Il pub e la pubblicità come primo modo di fare hype** — ALE, la coda del punto
     sull'hype (FATTO il 06/09 per il resto, in `fatte.md`): oggi non esistono né come
     luogo né come azione.
-11. **I collettivi di rapper** — CARLO, «Studio (16/09/2026)»: «fai in modo che si possano
+10. **I collettivi di rapper** — CARLO, «Studio (16/09/2026)»: «fai in modo che si possano
     creare collettivi di rapper». Nel gioco non esiste un gruppo: ci sono i rivali della
     classifica e la gente della Sala, uno per uno. Prima si scrive cos'è un collettivo
     (chi ci entra, cosa dà — pezzi in comune, hype condiviso, un nome in classifica), poi
     si fa.
-12. **Il joint album con altri rapper, su chiamata di un produttore** — CARLO, «Studio
+11. **Il joint album con altri rapper, su chiamata di un produttore** — CARLO, «Studio
     (16/09/2026)»: «fai in modo che un produttore possa chiamarti per fare un joint album
     con altri rapper». La chiamata è un evento del telefono; l'album, più pezzi in fila
     con più feat, oggi non esiste come oggetto. Viene dopo i collettivi.
 
 **Decisioni prima che lavori**
 
-13. **I rapporti coi beatmaker che vanno in negativo** — ALE. In `posto.js` il rapporto
+12. **I rapporti coi beatmaker che vanno in negativo** — ALE. In `posto.js` il rapporto
     scende (`p.rel--`) ma è tenuto fra 0 e 5: sotto zero non va. Prima di farlo va deciso
     cosa succede a −1 (non ti vende più? ti fa pagare di più?).
-14. **Non sempre far scorrere una giornata ridà l'energia** e **la legacy** — CARLO. Sono
+13. **Non sempre far scorrere una giornata ridà l'energia** e **la legacy** — CARLO. Sono
     regole di gioco nuove: prima si scrive come funzionano, poi si fa.
-15. **Lo Shop in provincia, con limitazioni** — ALE. Lo Shop c'è già dal primo giorno, e
-    dal 21/09 sette capi si sbloccano con la carriera («Capi che si sbloccano», fra le
-    chiuse): è una limitazione, ma per carriera, non per città. Va ancora deciso cosa **non**
+14. **Lo Shop in provincia, con limitazioni** — ALE. Lo Shop c'è già dal primo giorno, e
+    dal 21/09 sette capi si sbloccano con la carriera («Capi che si sbloccano», in
+    `fatte.md`): è una limitazione, ma per carriera, non per città. Va ancora deciso cosa **non**
     si vende in provincia (vedi la RISPOSTA sotto al punto).
-16. **La troupe** — CARLO, «Da discutere»: «il player può decidere se avere una troupe:
+15. **La troupe** — CARLO, «Da discutere»: «il player può decidere se avere una troupe:
     manager, social media manager, fonico personale, beatmaker personale, videomaker». Il
     fonico e il beatmaker «personali» sono già gente della Sala con un rapporto che sale;
     il manager, il social media manager e il videomaker non esistono. Prima si decide cosa
     fa ognuno e quanto costa a settimana.
-17. **Le decisioni tue**, senza le quali il resto non si muove: la pagina di Mycol e il «tuo artista»
+16. **Le decisioni tue**, senza le quali il resto non si muove: la pagina di Mycol e il «tuo artista»
     nella landing; se il gioco sugli store gira anche **di traverso** (nel repo non c'è un
     manifest né un `orientation`, da problemi-riscontrati); e se cancellare gli undici
     branch già uniti in `main` (`git branch --merged main` li elenca, da
     `test/vitest-playwright-gate` a `task/studio-cinque-linguette`), anche sul remoto.
-18. **Come arriva MakeHuman a chi installa il gioco** — dal punto su Avaturn e il camerino
+17. **Come arriva MakeHuman a chi installa il gioco** — dal punto su Avaturn e il camerino
     (FATTO il 20/09): il camerino MakeHuman legge il dataset di `media/makehuman-editor-v1`
     (2,8 GB), che sta fuori da git e fuori dal pacchetto per gli store
     (`FUORI_DAL_PACCHETTO` in `strumenti/build.js`). In un pacchetto pulito la strada «crea
@@ -165,7 +166,7 @@ fondo fra le chiuse._
     (solo i proxy e i target che il camerino usa davvero — il catalogo UI ne conta 468 su
     1.717), un download al primo avvio, o il dataset intero. Va deciso prima dell'uscita,
     insieme al progetto Avaturn nostro (oggi gira sul demo pubblico).
-19. **I sette video che nessun punto chiede** — la coda delle transizioni video (FATTO il
+18. **I sette video che nessun punto chiede** — la coda delle transizioni video (FATTO il
     20/09 per i cinque del punto): palestra, Milano, club, shop, trasferta, live, più
     `video_transizione_entrata_in_studio` che è un doppione dello studio. Sono 22 MB in
     `frontend/media/video/Transizioni di scena/` che viaggiano nel pacchetto per gli
@@ -180,60 +181,8 @@ con l'IA, che è una **giornaliera** e non si smista; e i due «aperti di propos
 problemi-riscontrati (la copertina «grande» e quella «di adesso» quasi uguali, la risposta
 del Marketing in cima).
 
-**Chiuse, dal riordino del 15/09 a oggi** — una riga l'una; il racconto sta nel foglio
-detto, la richiesta com'era scritta in [`fatte.md`](fatte.md):
-
-- **Il giro unico sull'hover al tocco** — FATTO 08/09 (riconosciuto il 15/09): «La
-  responsività: lo Studio, la Strada e l'hover al tocco», `02-interfaccia-e-telefono.md`.
-- **Un pezzo non uscito non si spinge: se ne fa uscire un'anteprima** — FATTO 14/09
-  (riconosciuto il 20/09): stessa sezione, `02-interfaccia-e-telefono.md`.
-- **Le tre del Marketing** — FATTO 14/09 (riconosciuto il 20/09), più la riga delle mosse
-  nell'Agenda a capo: «Le tre del Marketing», `02-interfaccia-e-telefono.md`.
-- **Il Marketing sul telefono vero** — FATTO 15/09: «Il telefono quando lo schermo è un
-  telefono», `02-interfaccia-e-telefono.md`.
-- **Il Marketing spostato fuori dallo Studio** («marketing toglilo da qua e spostalo,
-  dimmi dove lo metti») — FATTO 15/09 (riconosciuto il 20/09): sul telefono, in
-  LaFamegram, «Che post fai?» — «Lo Studio a cinque linguette», `02-interfaccia-e-telefono.md`.
-- **`jose` va usata, e `zod` va deciso** — FATTO 16/09: «Le due dipendenze del backend,
-  usate», `07-multiplayer-e-backend.md`.
-- **L'avvio rapido ci mette due minuti e non lo dice** — FATTO 19/09: «L'avvio rapido: la
-  schermata «Preparo il tuo artista»», `02-interfaccia-e-telefono.md`.
-- **Le foto dei posti che non hanno ancora una pagina** — FATTO 19/09: «Le pagine dei
-  posti sulla loro foto», `02-interfaccia-e-telefono.md`. La serata a momenti è la voce 6.
-- **Fra i 980 e i 1180 punti la barra della plancia trabocca** — FATTO 20/09, con la
-  plancia a 1280 × 800 e 1366 × 768: «La fascia della plancia fra 980 e 1240, e la plancia
-  a 1280 × 800», `02-interfaccia-e-telefono.md`.
-- **Le transizioni video** — FATTO 20/09 (lo Studio dal 16/09): «Le transizioni video: gli
-  altri quattro», `02-interfaccia-e-telefono.md`. I sette video in più sono la voce 19.
-- **L'evento fatto esce dall'agenda** — FATTO 20/09: `02-interfaccia-e-telefono.md`.
-- **I prezzi dei beat per fama del beatmaker** — FATTO 20/09: `04-musica-e-suoni.md`.
-- **Si parte con tutti i parametri a 1** — FATTO 20/09: `05-carriera-e-tempo.md`.
-- **Non ci si può licenziare** — FATTO 20/09: `05-carriera-e-tempo.md`.
-- **Lo Shop promette tre reparti, ce ne sono due** — FATTO 20/09: «Lo Shop: il reparto
-  Vestiti — lo Shop sblocca, il camerino veste», `02-interfaccia-e-telefono.md`.
-- **Avaturn e il creator in game, tutti e due** — FATTO 20/09, confermato in partita e
-  scritto: «Avaturn e il camerino MakeHuman, tutti e due», `03-artista-e-avatar.md`.
-- **Non deve costare energia interagire con gli altri nella Sala** — FATTO 21/09, tutto a
-  zero: «Nella Sala non si spende energia», `06-mondo-e-personaggi.md`.
-- **Costa troppo una take in studio** — FATTO 21/09, la prima a 25 e le altre a 8: «La
-  take costa 25, le altre 8», `04-musica-e-suoni.md`.
-- **Lo stile che conta** — FATTO 21/09: «Lo stile che conta: i capi addosso pesano su hype,
-  presenza e promo», `02-interfaccia-e-telefono.md`.
-- **I beat non devono stare nello shop, i filtri dei vestiti, l'attrezzatura non serve** —
-  FATTO 21/09, lo stesso giorno in cui è stato chiesto: «Lo Shop vende solo vestiti, coi
-  filtri per tipologia», `02-interfaccia-e-telefono.md`.
-- **Capi che si sbloccano** e **Le offerte della settimana** — FATTO 21/09, insieme: «Lo
-  Shop cresce con la carriera: i capi che si sbloccano e le offerte della settimana»,
-  `02-interfaccia-e-telefono.md`.
-- **Le tre code dello Studio a cinque linguette** — FATTO 21/09: l'omonimo e il posto
-  rubato alla Sala nel branch, la copertina orfana era già chiusa dal 14/09; «Le tre code,
-  chiuse il 21/09/2026» sotto «Lo Studio a cinque linguette», `02-interfaccia-e-telefono.md`.
-
-Due punti di CARLO — «quando non sono fix… crea un file nuovo collegato ai già presenti»
-e «tieni tutto ciò che riguarda la parte smartphone separata dal resto del progetto» —
-**non sono task ma regole di lavoro**: dal 20/09/2026 stanno in
-[`come-si-lavora.md`](../documentazione/come-si-lavora.md) («Le regole di Carlo sui
-file») e nella versione corta in `CLAUDE.md`, e sono uscite dalla lista qui sotto.
+Le voci chiuse dell'ordine, una riga l'una, stanno in [`fatte.md`](fatte.md), in testa
+(«Chiuse, dal riordino del 15/09 al 29/09»).
 
 ---
 
@@ -270,21 +219,6 @@ che manca»: la coda — il pub e la pubblicità — è una voce dell'ordine in 
    in provincia (i beat sopra a una certa qualità? l'attrezzatura da studio grande?).
 
 3. i rapporti con i beatmaker non vanno mai in negativo, puoi offenderli quanto vuoi e il rapporto resta uguale
-
-4. Avaturn voglio lo rendiamo UN 50/50 , Cioè chi non vuole andare a farsi tutta la trafila per fare avaturn (anche se ovviamente dobbiamo fare di tutto per consigliarli a farlo) può benissimamente creare il suo avatar in game. FAI COESISTERE LE COSE.
-
-   **RISPOSTA (15/09/2026)** — nel codice convivono già: `avvio.js` apre
-   «Avaturn/MakeHuman», `hub.js` distingue `avatarSource === "avaturn"` dall'altro, e
-   l'avvio rapido carica MakeHuman vero. Da confermare in partita che dal creator si
-   scelga davvero fra le due strade, e poi scriverlo in
-   [`03-artista-e-avatar.md`](03-artista-e-avatar.md), che oggi non ne parla.
-
-   **FATTO (20/09/2026)** — confermato in partita: la prima schermata del creator chiede
-   «Come vuoi creare il tuo artista?» con le due card, MakeHuman apre il camerino e Avaturn
-   il suo editor, e si cambia strada senza perdere l'avatar confermato. Sulla card di
-   Avaturn c'è scritto «consigliato». «Avaturn e il camerino MakeHuman, tutti e due» in
-   `03-artista-e-avatar.md`, con le tre cose che 50/50 non sono (lo Shop veste solo
-   MakeHuman, Avaturn gira sul demo pubblico, MakeHuman vuole il suo dataset).
 
 5. Studio, casa e attività criminiali sulla mappa sono TROPPO VICINE LE CARD tra di loro. Anche se gli edifici sono abbastanza vicini falle in un modo MOOOOLTO più clean. Così sono troppo ammassate.
 
@@ -362,27 +296,6 @@ che costava troppo._
    04/09 — questo foglio diceva che mancavano, e non era vero. **Manca** solo la cover
    «stile emblema», l'editor a livelli.
 
-5. Non funziona più la pagina attività criminali, questo è ciò che segna in console:
-
-   ```
-   Feature policy: ignorato nome caratteristica non supportato “autoplay”. pagine.js:68:11
-   Feature policy: ignorato nome caratteristica non supportato “autoplay”. pagine.js:90:19
-   Feature policy: ignorato nome caratteristica non supportato “autoplay”. pagine.js:106:5
-   [Anni di Fame] Eventi v1.2.13 pronti: 1000 eventi eventi-v2.js:3010:13
-   Problema di sicurezza: i contenuti in http://localhost:8000/pagine/landing.html non possono caricare o avere link che rimandino a file:///.
-   Problema di sicurezza: i contenuti in http://localhost:8000/pagine/gioco.html non possono caricare o avere link che rimandino a file:///.
-   ```
-
-   **RISPOSTA (15/09/2026)** — quelle righe di console non sono il guasto: sono avvisi di
-   Firefox e basta. «Feature policy … autoplay» è l'`allow="autoplay"` dell'iframe in
-   `js/pagine.js` (Firefox non conosce quel nome, Chrome sì, e in tutti e due l'audio va);
-   il «problema di sicurezza» su `file:///` è un link che punta al disco, e nel frontend non
-   ce n'è nessuno — probabilmente la pagina era stata aperta prima da file. Nel codice non
-   trovo cosa fosse rotto: il 07/09 due guardie saltavano la Strada perché cercavano un id
-   che non esiste (`strada-crimine`, sistemato, sta in problemi-riscontrati), e l'08/09 il
-   giro sulla Strada la trovava giocabile. **Se succede ancora, serve cosa fai e cosa vedi**
-   (la pagina non si apre? si apre e non risponde?), perché la console non lo dice.
-
 6. aggiungi le foto di background dei posti senza HTML, poi ricrea la schermata identica alle foto con elementi HTML
 
    **FATTO in parte (08/09/2026) — lo Studio.** Le foto sotto ci sono già da prima; adesso ci
@@ -427,13 +340,6 @@ che costava troppo._
    voce sua nell'indice in testa). Cover e Feat non hanno più una sezione loro dal 15/09,
    quindi non hanno più bisogno di una foto.
 
-7. quando skippi tante ore ci mette troppo a simulare
-
-   **FATTO (28/09/2026)** — misurato: 8 ore d'attesa erano 11,8 secondi, 11,2 di pausa fissa
-   fra un quarto d'ora e l'altro; il calcolo è 14 ms a passo e +7 giorni ci mette 0,2 s.
-   Adesso le pause di un'attesa stanno in 1,6 secondi: 8 ore in 2,2. «L'attesa lunga non si
-   trascina» in `05-carriera-e-tempo.md`.
-
 8. togli il parametro «lucidità» e tutto ciò che ne consegue
 
 9. aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
@@ -466,14 +372,6 @@ lo dicesse: riconosciuti il 20/09. L'11 (la Sala senza energia) è chiuso il 21/
 12. fai in modo che si possano creare collettivi di rapper
 
 13. fai in modo che un produttore possa chiamarti per fare un joint album con altri rapper
-
-#### Shop (20/09/2026)
-
-_Le idee proposte chiudendo il reparto Vestiti («Lo Shop: il reparto Vestiti» in
-`02-interfaccia-e-telefono.md`); Carlo ha scelto queste tre. Tutte e tre chiuse il
-21/09/2026 e stanno in `fatte.md` — «Lo stile che conta», poi «Capi che si sbloccano» e
-«Le offerte della settimana» insieme — con la richiesta del 21/09 sullo Shop solo vestiti
-coi filtri (chiusa lo stesso giorno)._
 
 #### Uscita sugli store (29/09/2026)
 
@@ -519,27 +417,11 @@ coi filtri (chiusa lo stesso giorno)._
 
 #### Da discutere
 
-2. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles? Per forza a los angeles, però può decidere di tornare nelle città prima
-
-   **DECISO (29/09/2026)** — CARLO: dopo Los Angeles **non ci si trasferisce in un'altra
-   città italiana**, si resta a Los Angeles. **Alle città precedenti invece si torna**:
-   da Los Angeles si può rientrare a Milano e in provincia. Esce da «Le decisioni tue»
-   nell'ordine in testa; si fa insieme a Milano e Los Angeles, che come città oggi non
-   esistono ancora.
-
 3. Il player può decidere se avere una troupe. es: manager, social media manager, fonico personale, beatmaker personale, videomaker
 
 #### Pagina di landing
 
 1. migliorare graficamente la schermata opzioni
-
-2. creare una schermata per le classifiche che si apre anche dall'app del telefono
-
-   **Stato (15/09/2026)** — sembra già fatto da prima: la landing ha la voce «Classifiche»
-   (`pagine/landing.html`, «Chi comanda questa settimana») e il telefono ha l'app
-   «Classifiche» (`telefono.js`, `schermataClassifiche()`, che risente il server quando
-   la apri). Se intendevi un'altra cosa — una schermata sola, uguale nei due posti? — va
-   riscritto il punto.
 
 3. DA DISCUTERE collegare la pagina di mycol togliere la sezione il tuo artista dalla pagina di landing o , oltre che da nuova partita. e collegarla allo shop, se shoppi qualcosa ti va nell'inventario
 

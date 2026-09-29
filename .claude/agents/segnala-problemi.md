@@ -78,7 +78,9 @@ Le regole del mestiere:
 
 ## Dove si scrive
 
-In fondo a `documentazione/problemi-riscontrati.md`, sotto un titolo con la data del giro:
+In fondo a `documentazione/problemi-riscontrati.md`, sotto un titolo con la data del giro. Le voci
+già chiuse stanno in `documentazione/problemi-risolti.md`: guardaci prima, per non riaprire una cosa
+già sistemata (se è tornata, dillo e cita la voce chiusa):
 
 ```
 ## Giro del 04/09/2026
