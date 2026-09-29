@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:d13db73 -->
+## 29/09/26, 19:38 â€” task/simulatore-bilanciamento â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `d13db73`
+
+### Cosa Ã¨ entrato
+
+- `69f5c63` â€” Il diario del progetto: il primo mese, dal 29/08 al 29/09 â€” **Carlomadella**
+- `1996e56` â€” Il simulatore di bilanciamento: le voci del giro di fine task â€” **Carlomadella**
+- `47eae1d` â€” Il simulatore di bilanciamento: mille carriere con strategie diverse, una alla volta â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:52ee5e1 -->
 ## 29/09/26, 03:17 â€” task/roadmap-los-angeles-decisa â†’ main
 
