@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:52ee5e1 -->
+## 29/09/26, 03:17 â€” task/roadmap-los-angeles-decisa â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `52ee5e1`
+
+### Cosa Ã¨ entrato
+
+- `bce4d01` â€” Dopo Los Angeles si resta a LA, alle città precedenti si torna: le due voci del giro di fine task â€” **Carlomadella**
+- `86698c3` â€” La roadmap segna deciso: dopo Los Angeles si resta a LA, alle città precedenti si torna â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/roadmap.md`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:6a4f0a9 -->
 ## 28/09/26, 12:49 â€” task/skip-lento â†’ main
 
