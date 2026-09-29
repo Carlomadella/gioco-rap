@@ -24,11 +24,160 @@ cita (la catena del pezzo) e il «punto 4 di ALE» di
 
 | quando | quante |
 | --- | --- |
+| 29/09/2026 | 5, più le chiuse dell'ordine |
 | 21/09/2026 | 4 |
 | 20/09/2026 | 9 |
 | 15/09/2026 | 6 |
 | 07/09/2026 | 6 |
 | 06/09/2026 | 10 |
+
+---
+
+## 29/09/2026
+
+_Il foglio dei punti nuovi è stato ripulito: lì restano solo i punti da fare e quelli fatti
+in parte. Qui sotto quello che era chiuso — FATTO, una RISPOSTA che chiudeva la domanda, una
+decisione presa — con la richiesta com'era scritta e le note, verbatim._
+
+### Chiuse, dal riordino del 15/09 al 29/09
+
+_Stavano in fondo a «Da fare adesso»._ — una riga l'una; il racconto sta nel foglio
+detto, la richiesta com'era scritta in [`fatte.md`](fatte.md):
+
+- **Il giro unico sull'hover al tocco** — FATTO 08/09 (riconosciuto il 15/09): «La
+  responsività: lo Studio, la Strada e l'hover al tocco», `02-interfaccia-e-telefono.md`.
+- **Un pezzo non uscito non si spinge: se ne fa uscire un'anteprima** — FATTO 14/09
+  (riconosciuto il 20/09): stessa sezione, `02-interfaccia-e-telefono.md`.
+- **Le tre del Marketing** — FATTO 14/09 (riconosciuto il 20/09), più la riga delle mosse
+  nell'Agenda a capo: «Le tre del Marketing», `02-interfaccia-e-telefono.md`.
+- **Il Marketing sul telefono vero** — FATTO 15/09: «Il telefono quando lo schermo è un
+  telefono», `02-interfaccia-e-telefono.md`.
+- **Il Marketing spostato fuori dallo Studio** («marketing toglilo da qua e spostalo,
+  dimmi dove lo metti») — FATTO 15/09 (riconosciuto il 20/09): sul telefono, in
+  LaFamegram, «Che post fai?» — «Lo Studio a cinque linguette», `02-interfaccia-e-telefono.md`.
+- **`jose` va usata, e `zod` va deciso** — FATTO 16/09: «Le due dipendenze del backend,
+  usate», `07-multiplayer-e-backend.md`.
+- **L'avvio rapido ci mette due minuti e non lo dice** — FATTO 19/09: «L'avvio rapido: la
+  schermata «Preparo il tuo artista»», `02-interfaccia-e-telefono.md`.
+- **Le foto dei posti che non hanno ancora una pagina** — FATTO 19/09: «Le pagine dei
+  posti sulla loro foto», `02-interfaccia-e-telefono.md`. La serata a momenti è la voce 6.
+- **Fra i 980 e i 1180 punti la barra della plancia trabocca** — FATTO 20/09, con la
+  plancia a 1280 × 800 e 1366 × 768: «La fascia della plancia fra 980 e 1240, e la plancia
+  a 1280 × 800», `02-interfaccia-e-telefono.md`.
+- **Le transizioni video** — FATTO 20/09 (lo Studio dal 16/09): «Le transizioni video: gli
+  altri quattro», `02-interfaccia-e-telefono.md`. I sette video in più sono la voce 18.
+- **L'evento fatto esce dall'agenda** — FATTO 20/09: `02-interfaccia-e-telefono.md`.
+- **I prezzi dei beat per fama del beatmaker** — FATTO 20/09: `04-musica-e-suoni.md`.
+- **Si parte con tutti i parametri a 1** — FATTO 20/09: `05-carriera-e-tempo.md`.
+- **Non ci si può licenziare** — FATTO 20/09: `05-carriera-e-tempo.md`.
+- **Lo Shop promette tre reparti, ce ne sono due** — FATTO 20/09: «Lo Shop: il reparto
+  Vestiti — lo Shop sblocca, il camerino veste», `02-interfaccia-e-telefono.md`.
+- **Avaturn e il creator in game, tutti e due** — FATTO 20/09, confermato in partita e
+  scritto: «Avaturn e il camerino MakeHuman, tutti e due», `03-artista-e-avatar.md`.
+- **Non deve costare energia interagire con gli altri nella Sala** — FATTO 21/09, tutto a
+  zero: «Nella Sala non si spende energia», `06-mondo-e-personaggi.md`.
+- **Costa troppo una take in studio** — FATTO 21/09, la prima a 25 e le altre a 8: «La
+  take costa 25, le altre 8», `04-musica-e-suoni.md`.
+- **Lo stile che conta** — FATTO 21/09: «Lo stile che conta: i capi addosso pesano su hype,
+  presenza e promo», `02-interfaccia-e-telefono.md`.
+- **I beat non devono stare nello shop, i filtri dei vestiti, l'attrezzatura non serve** —
+  FATTO 21/09, lo stesso giorno in cui è stato chiesto: «Lo Shop vende solo vestiti, coi
+  filtri per tipologia», `02-interfaccia-e-telefono.md`.
+- **Capi che si sbloccano** e **Le offerte della settimana** — FATTO 21/09, insieme: «Lo
+  Shop cresce con la carriera: i capi che si sbloccano e le offerte della settimana»,
+  `02-interfaccia-e-telefono.md`.
+- **Le tre code dello Studio a cinque linguette** — FATTO 21/09: l'omonimo e il posto
+  rubato alla Sala nel branch, la copertina orfana era già chiusa dal 14/09; «Le tre code,
+  chiuse il 21/09/2026» sotto «Lo Studio a cinque linguette», `02-interfaccia-e-telefono.md`.
+- **Quando skippi tante ore ci mette troppo** — FATTO 28/09: otto ore di attesa da 11,8 a
+  2,2 secondi, «L'attesa lunga non si trascina», `05-carriera-e-tempo.md`.
+
+Due punti di CARLO — «quando non sono fix… crea un file nuovo collegato ai già presenti»
+e «tieni tutto ciò che riguarda la parte smartphone separata dal resto del progetto» —
+**non sono task ma regole di lavoro**: dal 20/09/2026 stanno in
+[`come-si-lavora.md`](../documentazione/come-si-lavora.md) («Le regole di Carlo sui
+file») e nella versione corta in `CLAUDE.md`, e sono uscite dalla lista qui sotto.
+
+### Avaturn e il camerino, tutti e due
+
+_Da `implementazioni.md`, ALE 4._
+
+4. Avaturn voglio lo rendiamo UN 50/50 , Cioè chi non vuole andare a farsi tutta la trafila per fare avaturn (anche se ovviamente dobbiamo fare di tutto per consigliarli a farlo) può benissimamente creare il suo avatar in game. FAI COESISTERE LE COSE.
+
+   **RISPOSTA (15/09/2026)** — nel codice convivono già: `avvio.js` apre
+   «Avaturn/MakeHuman», `hub.js` distingue `avatarSource === "avaturn"` dall'altro, e
+   l'avvio rapido carica MakeHuman vero. Da confermare in partita che dal creator si
+   scelga davvero fra le due strade, e poi scriverlo in
+   [`03-artista-e-avatar.md`](03-artista-e-avatar.md), che oggi non ne parla.
+
+   **FATTO (20/09/2026)** — confermato in partita: la prima schermata del creator chiede
+   «Come vuoi creare il tuo artista?» con le due card, MakeHuman apre il camerino e Avaturn
+   il suo editor, e si cambia strada senza perdere l'avatar confermato. Sulla card di
+   Avaturn c'è scritto «consigliato». «Avaturn e il camerino MakeHuman, tutti e due» in
+   `03-artista-e-avatar.md`, con le tre cose che 50/50 non sono (lo Shop veste solo
+   MakeHuman, Avaturn gira sul demo pubblico, MakeHuman vuole il suo dataset).
+
+### La pagina delle attività criminali «non funziona più»
+
+_Da `implementazioni.md`, CARLO «Da fare» 5: una RISPOSTA, nessun guasto trovato._
+
+5. Non funziona più la pagina attività criminali, questo è ciò che segna in console:
+
+   ```
+   Feature policy: ignorato nome caratteristica non supportato “autoplay”. pagine.js:68:11
+   Feature policy: ignorato nome caratteristica non supportato “autoplay”. pagine.js:90:19
+   Feature policy: ignorato nome caratteristica non supportato “autoplay”. pagine.js:106:5
+   [Anni di Fame] Eventi v1.2.13 pronti: 1000 eventi eventi-v2.js:3010:13
+   Problema di sicurezza: i contenuti in http://localhost:8000/pagine/landing.html non possono caricare o avere link che rimandino a file:///.
+   Problema di sicurezza: i contenuti in http://localhost:8000/pagine/gioco.html non possono caricare o avere link che rimandino a file:///.
+   ```
+
+   **RISPOSTA (15/09/2026)** — quelle righe di console non sono il guasto: sono avvisi di
+   Firefox e basta. «Feature policy … autoplay» è l'`allow="autoplay"` dell'iframe in
+   `js/pagine.js` (Firefox non conosce quel nome, Chrome sì, e in tutti e due l'audio va);
+   il «problema di sicurezza» su `file:///` è un link che punta al disco, e nel frontend non
+   ce n'è nessuno — probabilmente la pagina era stata aperta prima da file. Nel codice non
+   trovo cosa fosse rotto: il 07/09 due guardie saltavano la Strada perché cercavano un id
+   che non esiste (`strada-crimine`, sistemato, sta in problemi-riscontrati), e l'08/09 il
+   giro sulla Strada la trovava giocabile. **Se succede ancora, serve cosa fai e cosa vedi**
+   (la pagina non si apre? si apre e non risponde?), perché la console non lo dice.
+
+### Quando skippi tante ore ci mette troppo
+
+_Da `implementazioni.md`, CARLO «Da fare» 7._
+
+7. quando skippi tante ore ci mette troppo a simulare
+
+   **FATTO (28/09/2026)** — misurato: 8 ore d'attesa erano 11,8 secondi, 11,2 di pausa fissa
+   fra un quarto d'ora e l'altro; il calcolo è 14 ms a passo e +7 giorni ci mette 0,2 s.
+   Adesso le pause di un'attesa stanno in 1,6 secondi: 8 ore in 2,2. «L'attesa lunga non si
+   trascina» in `05-carriera-e-tempo.md`.
+
+### Dopo Los Angeles si resta a LA, alle città precedenti si torna
+
+_Da `implementazioni.md`, CARLO «Da discutere» 2: deciso; si fa insieme a Milano e Los
+Angeles, che come città ancora non esistono._
+
+2. DA DISCUTERE Dopo aver completato milano ed essere diventato goat ed essere andato a los angeles il player può decidere se trasferirsi in un'altra città italiana o per forza a Los Angeles? Per forza a los angeles, però può decidere di tornare nelle città prima
+
+   **DECISO (29/09/2026)** — CARLO: dopo Los Angeles **non ci si trasferisce in un'altra
+   città italiana**, si resta a Los Angeles. **Alle città precedenti invece si torna**:
+   da Los Angeles si può rientrare a Milano e in provincia. Esce da «Le decisioni tue»
+   nell'ordine in testa; si fa insieme a Milano e Los Angeles, che come città oggi non
+   esistono ancora.
+
+### Una schermata per le classifiche, anche dal telefono
+
+_Da `implementazioni.md`, CARLO «Pagina di landing» 2: già fatta da prima, a detta della
+nota; se il punto voleva altro, va riscritto nel foglio._
+
+2. creare una schermata per le classifiche che si apre anche dall'app del telefono
+
+   **Stato (15/09/2026)** — sembra già fatto da prima: la landing ha la voce «Classifiche»
+   (`pagine/landing.html`, «Chi comanda questa settimana») e il telefono ha l'app
+   «Classifiche» (`telefono.js`, `schermataClassifiche()`, che risente il server quando
+   la apri). Se intendevi un'altra cosa — una schermata sola, uguale nei due posti? — va
+   riscritto il punto.
 
 ---
 
@@ -358,7 +507,6 @@ _Da `implementazioni.md`, CARLO · LUOGO: STUDIO 6._
    per il fonico. Cover nell'Uscita, Marketing sul telefono, un pezzo sul banco alla volta.
    Tutto scritto in `implementazioni/02-interfaccia-e-telefono.md`, «Lo Studio a cinque
    linguette».
-
 
 ---
 
@@ -696,7 +844,7 @@ _Da `implementazioni.md`, FATTE._
    **è già successo tre volte** — la ✕ dello Studio (punto 15), `renderNegozio` che
    non esisteva, e una terza trovata scrivendo il README (`strada-crimine` non era
    l'id di niente), sistemata il 07/09/2026 e raccontata in
-   [`documentazione/problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md).
+   [`documentazione/problemi-risolti.md`](../documentazione/problemi-risolti.md).
    Tutte e tre chiuse cambiando una riga; nessuna delle tre ha tolto il motivo.
    Un registro unico costa un paio di giorni, non cambia niente di quello che si
    vede e dimezza il costo di ogni pagina fatta da lì in poi.

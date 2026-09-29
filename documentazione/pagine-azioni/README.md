@@ -194,7 +194,7 @@ motivo — la stessa lista scritta a mano in posti diversi:
    *non esiste* — l'id vero è `strada`. Quelle due guardie saltavano la pagina delle
    Attività criminali da sempre: con le Attività criminali aperte un evento poteva
    uscirti sopra e una trasferta poteva partire. Sistemato il 07/09/2026, dettagli in
-   [`problemi-riscontrati.md`](../problemi-riscontrati.md).
+   [`problemi-risolti.md`](../problemi-risolti.md).
 
 Tre volte su tre la pezza è stata cambiare una riga. Tre volte su tre ha funzionato, e
 tre volte su tre non ha tolto il motivo: gli elenchi scritti a mano sono ancora lì, e
