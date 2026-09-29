@@ -96,6 +96,21 @@ describe("Il Circolo", () => {
     expect(feat()).not.toContain("disabled");
   });
 
+  it("sul palco si sale solo stando al Circolo, e una serata a metà muore se te ne vai o si spegne il palco", () => {
+    c.run('G.currentPlace = "vita"');
+    expect(c.run("ccPalcoStato('openmic').ok")).toBe(false);
+    expect(c.run("ccPalcoStato('openmic').perche")).toContain("lontano");
+    c.run('G.currentPlace = "beat"');
+    expect(c.run("ccPalcoStato('openmic').ok")).toBe(true);
+    c.run("G.circolo = {serata:{key:'1:1:1', tipo:'openmic', passo:1, pubblico:50, ids:['freddi','sopra','base']}}");
+    expect(c.run("!!circoloStato().serata")).toBe(true);
+    c.run('G.currentPlace = "vita"');
+    expect(c.run("circoloStato().serata")).toBe(null);
+    c.run('G.currentPlace = "beat"; G.circolo.serata = {key:"1:1:1", tipo:"openmic", passo:1, pubblico:50, ids:["freddi"]}');
+    c.ctx.ora = ORA("01:00");
+    expect(c.run("circoloStato().serata")).toBe(null);
+  });
+
   it("la resa della serata si legge una volta sola e torna a 1: un live partito da fuori vale come sempre", () => {
     expect(c.run("circoloResaSerata()")).toBe(1);
     c.run("CIRCOLO_RESA = 1.3");

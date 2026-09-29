@@ -2827,9 +2827,13 @@ console.log("\nIl Circolo — la Sala e il Live Club, un posto solo");
     circolo.includes("chi.forEach(p => { p.pt = Math.max(0, p.pt - 1); });") &&
     circolo.includes('if(v.tipo === "feat" && v.puo && !circoloPalcoAcceso())') &&
     circolo.includes('if(d.ccAz === "feat" && !circoloPalcoAcceso()) return;'));
-  test("una serata a metà sta nel salvataggio: uscire non la ricomincia",
+  test("una serata a metà sta nel salvataggio: uscire non la ricomincia, ma muore se il palco si spegne o te ne vai",
     circolo.includes("circoloStato().serata = {key:circoloGiorno()") &&
-    circolo.includes("if(c.serata && c.serata.key !== circoloGiorno()) c.serata = null;"));
+    circolo.includes("if(c.serata && (c.serata.key !== circoloGiorno() || !circoloPalcoAcceso() || !circoloQui())) c.serata = null;"));
+  /* il giro del 30/09: il palco solo stando lì, gli eventi che aspettano */
+  test("sul palco si sale solo stando al Circolo, e col Circolo aperto gli eventi aspettano",
+    circolo.includes('if(!circoloQui()) return {ok:false, perche:"Sei lontano: raggiungi il Circolo dalla mappa"};') &&
+    leggi("js/game/eventi-v2.js").includes('if(typeof circoloOccupato==="function" && circoloOccupato()) return true;'));
   test("sugli schermi stretti il Circolo si impila, e i :hover stanno dietro a (hover:hover)",
     leggi("css/stretto.css").includes(".cc-giu{grid-template-columns:minmax(0,1fr);") &&
     leggi("css/stretto.css").includes(".cc-su{grid-template-columns:minmax(0,1fr)}") &&

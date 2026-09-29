@@ -11,7 +11,7 @@ roadmap, nei commenti del codice) quel giro lo trova in `problemi-risolti.md`, c
 ## Cosa resta aperto al 29/09/2026
 
 I numeri sono quelli di sempre, e restano: altri documenti citano «la voce 65». La prossima
-voce nuova è la 68. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
+voce nuova è la 75. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
 [`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md) (la 7 con «Via la
 lucidità», la 9 fra «Le decisioni tue», la 10 fra quelle fuori dall'ordine); la 61 e la 65
 sono decisioni di bilanciamento e per ora stanno solo qui.
@@ -50,6 +50,15 @@ del 29/09 in fondo.
 
 **67.** Da decidere (29/09): **CARLO 12 (il recap giornaliero) e CARLO 13 (le trasferte dalla
 prima città)** sono aperti ma non stanno in «Da fare adesso» né fra quelli fuori dall'ordine.
+
+Dal giro del 30/09 sul Circolo (dettaglio in fondo): le voci 68–73 sono chiuse lo stesso giorno
+nel branch `task/il-circolo` e stanno in `problemi-risolti.md`; della 71 resta una scelta.
+
+**71.** Da decidere: il live partito da una card vale sempre come una serata media, quello sul
+palco del Circolo da 0,55 a 1,45.
+
+**74.** Nota: cinque foto di riferimento nuove, quasi 10 MB, finiscono nel pacchetto senza che il
+gioco le usi.
 
 ---
 
@@ -526,3 +535,28 @@ documenti.
   adesso».
 - **quanto pesa** — da sistemare con calma.
 - **RISOLTO in parte (29/09/2026)** — stesso branch: le due voci del 15/09 in `problemi-risolti.md` hanno la loro riga RISOLTO. Resta dove mettere CARLO 12 e 13 nell'ordine di «Da fare adesso»: è una scelta di priorità (voce 67).
+
+---
+
+## Giro del 30/09/2026 — Il Circolo, quello che resta aperto
+
+Le altre voci del giro (segnala-problemi e prova-sul-telefono, commit `07d14b9`) sono chiuse
+nello stesso branch e stanno in [`problemi-risolti.md`](problemi-risolti.md).
+
+### Il live partito da una card vale sempre come una serata media (da decidere)
+- **dove** — `frontend/js/game/actions.js` (la resa), `frontend/js/game/circolo.js` (`circoloResaSerata`)
+- **cosa succede** — il live partito da una card o dall'agenda vale sempre 1, quello giocato
+  sul palco del Circolo da 0,55 a 1,45. Chi è già al Circolo può scegliere la strada sicura e
+  saltare i momenti. È una scelta: se i momenti devono contare sempre, la card deve aprirli.
+- **quanto pesa** — da decidere.
+
+### Nota: cinque foto di riferimento finiscono nel pacchetto senza che il gioco le usi
+- **dove** — `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/`:
+  `backstage.png`, `bancone.png`, `il_circolo.png`, `open_mic.png`, `sala.png`
+- **cosa succede** — sono i disegni di riferimento della pagina, quasi 10 MB in tutto; nel
+  codice nessuna le carica (le cita solo un commento). `media/` va intera nei pacchetti
+  degli store, quindi il gioco pesa 10 MB in più. **È una scelta, non un errore**: quella
+  cartella teneva già altri riferimenti prima di questo lavoro, e va deciso se i
+  riferimenti stanno lì o fuori dal pacchetto.
+- **come si vede** — cerca i cinque nomi nel codice: non esce niente.
+- **quanto pesa** — da sistemare con calma.

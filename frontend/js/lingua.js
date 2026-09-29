@@ -78,7 +78,7 @@ const LANG = {
   "Cerca un beat":"Find a beat", "Registra il pezzo":"Record the track",
   "Mixa il pezzo":"Mix the track", "Pubblica il pezzo":"Release the track",
   "Promo sui social":"Push it on social", "Freestyle in piazza":"Freestyle in the square",
-  "Serata open mic":"Open mic night", "Vai al turno":"Go to your shift",
+  "Serata live":"Live night", "Vai al turno":"Go to your shift",
   "Cerca lavoro":"Look for work", "Stacca la spina":"Pull the plug",
   "Il foglio":"The page", "Scrivi la tua strofa":"Write your verse",
   "Lascia perdere":"Forget it", "Chiudi la strofa":"Close the verse",

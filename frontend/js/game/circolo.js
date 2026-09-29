@@ -77,9 +77,26 @@ function circoloPalcoAcceso(){ const f = circoloFascia(); return !!(f && f.palco
 function circoloStato(){
   if(!G.circolo || typeof G.circolo !== "object") G.circolo = {};
   const c = G.circolo;
-  /* una serata lasciata a metà ieri non si riprende oggi */
-  if(c.serata && c.serata.key !== circoloGiorno()) c.serata = null;
+  /* una serata lasciata a metà si riprende solo se è ancora la stessa sera,
+     il palco è ancora acceso e sei ancora qui: se no è finita lì, e non
+     pesa su niente (problemi-riscontrati, «La serata lasciata a metà») */
+  if(c.serata && (c.serata.key !== circoloGiorno() || !circoloPalcoAcceso() || !circoloQui())) c.serata = null;
   return c;
+}
+/* Sei al Circolo? La pagina si apre anche da lontano — il telefono, una
+   card, l'agenda: la gente si guarda anche da lì — ma sul palco si sale
+   solo stando qui (problemi-riscontrati, «Il palco funziona anche da
+   lontano»). */
+function circoloQui(){
+  if(typeof G === "undefined" || !G || !G.currentPlace) return true;
+  return typeof GAME_HOURS !== "undefined" && GAME_HOURS.samePlace
+    ? GAME_HOURS.samePlace(G.currentPlace, "beat") : G.currentPlace === "beat";
+}
+/* Mentre la pagina è aperta gli eventi della giornata aspettano, come
+   aspettavano con la Sala (eventi-v2.js lo chiede qui). */
+function circoloOccupato(){
+  return typeof LUOGO !== "undefined" && !!LUOGO && LUOGO.id === "circolo" &&
+    !!$("luogo") && $("luogo").classList.contains("on");
 }
 function circoloGiorno(){ return typeof adfGiornoKey === "function" ? adfGiornoKey() : String(G.week || 1); }
 let CIRCOLO = {scelto:null, nessuno:false, lampo:null};
@@ -325,6 +342,7 @@ function ccPalcoStato(id){
   if(!f || !f.palco){
     return {ok:false, perche:!f ? "Il Circolo è chiuso" : f.id === "aftershow" ? "Il palco è spento: domani dalle 21:00" : "Il palco si accende alle 21:00"};
   }
+  if(!circoloQui()) return {ok:false, perche:"Sei lontano: raggiungi il Circolo dalla mappa"};
   if(id === "openmic"){
     if(typeof adfOggi === "function" && adfOggi("openmic") > 0) return {ok:false, perche:"Il tuo giro stasera l’hai fatto"};
     if(G.energy < CIRCOLO_OPENMIC.e) return {ok:false, perche:"Serve energia"};
@@ -550,6 +568,10 @@ function circoloFineSerata(){
     if(typeof LUOGO !== "undefined" && LUOGO && LUOGO.esito)
       LUOGO.esito.extra = (LUOGO.esito.extra || "") + " " + sala + (guarda ? " " + guarda : "");
   } else {
+    if(G.energy < CIRCOLO_OPENMIC.e){
+      if(typeof toast === "function") toast("<b>Non ce la fai più.</b> L’energia è finita prima della fine del giro.", "bad", "!", ["#B91C1C","#7F1D1D"]);
+      save(); renderLuogo(); return;
+    }
     const msg = circoloOpenMic(resa);
     if(typeof LUOGO !== "undefined" && LUOGO) LUOGO.esito = {a:"openmic", msg:msg, extra:sala + (guarda ? " " + guarda : "")};
   }
@@ -645,8 +667,13 @@ if($("luogo")){
     if(d.ccAz){
       /* il feat, sul palco: la pagina lo dice, qui si controlla di nuovo */
       if(d.ccAz === "feat" && !circoloPalcoAcceso()) return;
+      const prima = d.ccAz === "feat" ? (G.gente.find(x => x.id === d.p) || {}).feat : null;
       azionePosto(d.ccAz, d.p);
-      if(d.ccAz === "feat") circoloStato().suonato = {key:circoloGiorno(), min:circoloOra()};
+      /* il dopo-serata, solo se sul palco con lui ci sei salito davvero */
+      if(d.ccAz === "feat" && (G.gente.find(x => x.id === d.p) || {}).feat !== prima){
+        circoloStato().suonato = {key:circoloGiorno(), min:circoloOra()};
+        save();
+      }
       return;
     }
     if(d.ccPalco){ circoloPalco(d.ccPalco); return; }

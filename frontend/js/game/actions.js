@@ -607,7 +607,7 @@ const ACTIONS = [
      return "";
    }},
 
-  {id:"live", n:"Serata open mic", e:42, luc:2,
+  {id:"live", n:"Serata live", e:42, luc:2,
    d:"Palco piccolo, ma la gente ti vede in faccia.",
    need:() => G.songs.some(s => s.released) ? null : "1 pezzo fuori",
    give:() => "~" + Math.round((20 + G.hype*1.4 + 40) * RITMO) + " € · fan · presenza" +

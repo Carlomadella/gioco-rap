@@ -6247,3 +6247,205 @@ documenti.
 - **quanto pesa** — da sistemare con calma.
 - **RISOLTO (29/09/2026)** — stesso branch: `segnala-problemi`, `prova-sul-telefono`, `backend-allineato` e `come-si-lavora.md` dicono di spostare la voce chiusa in `problemi-risolti.md`.
 
+
+## Giro del 30/09/2026 (segnala-problemi, fine task `task/il-circolo`, commit `07d14b9`)
+
+Giro stretto sull'unione della Sala e del Live Club nel Circolo. `npm run verifica` era verde
+al commit e non l'ho rilanciata; il gioco non l'ho aperto nel browser, quello che segue viene
+dalla lettura del codice. **Niente che fermi il gioco all'avvio**: in tutto `frontend/` (js,
+css, pagine, strumenti, test) non c'è più nessun richiamo a `#posto`, `po-lista`, `po-x`,
+`scenaSala`, `azioniDi`, `renderDialogo`, `lfLive` o `apriLuogo("live")`; `schedaPersona`
+esiste ancora, ma è un'altra funzione, quella delle trasferte (`trasferte.js:1543`), non
+quella tolta. `renderPosto` e `apriPosto` ci sono ancora apposta e portano al Circolo. Le
+funzioni che il Circolo chiama da altri file esistono tutte (`lfCosto`, `presenzaSulPalco`,
+`adfOggi`, `prendiBeatDalBanco`, `lasciaBeatSala`, `beatSuona`, `faccia`). I salvataggi
+vecchi reggono: chi era fermo a «concerti» riparte al Circolo (`spostamenti.js:74`), un
+evento che dice ancora «concerti» finisce lì (`orari.js:18`), e un salvataggio senza
+`G.circolo` se lo crea da solo (`circolo.js:78`, e `circoloDopoSerata` lo controlla prima
+di leggerlo). Nessuna scritta «Live Club» o «La Sala» rimasta davanti al giocatore: quelle
+che restano sono nei commenti, più il cartello «Sala» sulla foto, che è voluto (è nel
+riferimento). Le cose che non tornano sono sei, più una nota.
+
+
+### Il palco del Circolo si usa anche quando non sei al Circolo, e alla fine il live viene rifiutato
+- **dove** — `frontend/js/game/posto.js:491-495` (`apriPosto` apre la pagina senza
+  portarti lì), chiamato da `telefono.js:382,389,736` («Vai al Circolo» nei contatti),
+  `hub.js:340,879` e `telefono.js:780` (la card «Producer session»), `agenda.js:57`; il palco
+  in `circolo.js:321-344`, che non guarda dove sei; il rifiuto in `circolo.js:547-549`
+- **cosa succede** — tre strade aprono la pagina del Circolo senza spostarti sulla mappa:
+  il tasto «Vai al Circolo» del telefono, la card «Producer session» e la «Sessione lunga al
+  Circolo» dell'agenda. Per la gente è come prima (la vecchia Sala si apriva allo stesso
+  modo). Ma adesso nella stessa pagina c'è il palco, e il palco non controlla dove sei: dopo
+  le 21 da casa il tasto «Live» è acceso, parte il filmato, giochi i tre momenti, e solo alla
+  fine il gioco controlla il posto e ti dice «Per fare questa mossa devi prima raggiungere
+  Il Circolo». La serata giocata è persa (non costa niente, ma non vale niente). L'«Open
+  Mic», invece, non lo controlla mai: si fa da casa e dà fan veri, senza andarci.
+- **come si vede** — dopo le 21, da Casa, apri il telefono → Contatti → «Vai al Circolo» →
+  «Live» → scegli tre risposte.
+- **quanto pesa** — si vede ma si gira intorno.
+- **RISOLTO (30/09/2026)** — branch `task/il-circolo`: sul palco si sale solo stando al Circolo (`circoloQui`, «Sei lontano: raggiungi il Circolo dalla mappa»), l'open mic compreso; la pagina da lontano mostra ancora la gente.
+
+### Una serata lasciata a metà si riprende anche quando il live non si può più fare
+- **dove** — `frontend/js/game/circolo.js:77-83` (la serata a metà resta salvata per tutto
+  il giorno), `:324` e `:460` (si riprende da dove eri), `:538-549` (il live alla fine),
+  `:564-566` (l'open mic alla fine)
+- **cosa succede** — la serata a metà resta in memoria apposta, così uscire dalla pagina non
+  la fa ricominciare. Però quando la riprendi il gioco non ricontrolla niente di quello che
+  aveva controllato all'inizio. Se nel frattempo è passata mezzanotte, hai speso energia
+  altrove o sei andato da un'altra parte, finisci i tre momenti e il live viene rifiutato
+  («è troppo tardi», «non hai abbastanza energia», «devi raggiungere Il Circolo»): la serata
+  sparisce e non resta niente. Con l'open mic è il contrario: alla fine toglie 22 di energia
+  senza guardare se ce l'hai ancora (l'energia può andare sotto zero) e mette il tempo anche
+  se la giornata è già finita. In più il palco mostra «Sei sul palco: la serata è ancora in
+  corso» anche la mattina dopo le 03:00, finché il giorno non cambia alle 04:00.
+- **come si vede** — alle 23:50 premi «Live», fai un momento, torna alla mappa, fai passare
+  l'ora oltre mezzanotte, rientra e finisci i momenti.
+- **quanto pesa** — si vede ma si gira intorno.
+- **RISOLTO (30/09/2026)** — branch `task/il-circolo`: una serata a metà si butta se il palco si è spento o non sei più al Circolo (`circoloStato`), e l'open mic ricontrolla l'energia alla fine invece di mandarla sotto zero.
+
+### Sul telefono i motivi dei tasti spenti sono tagliati, e alcuni tasti sono troppo piccoli
+- **dove** — `frontend/css/circolo.css:148-149` (la riga sotto alle mosse con la gente),
+  `:172` (le righe del palco), `:159` (i tre tasti del beat sul tavolo, 26 pixel),
+  `:143` (le mosse con la gente, 30 pixel); `frontend/css/stretto.css:1013-1030` (i 44 pixel
+  valgono solo sotto i 620 di larghezza)
+- **cosa succede** — quando una mossa è spenta, il motivo sta in una riga sola che si taglia
+  coi puntini («Il feat nasce sul palco: torna dopo le…», «Sei sul palco: la serata è
+  anc…»); la frase intera c'è solo nel suggerimento che compare passandoci sopra col mouse,
+  cioè sul telefono mai. Poi i tasti ▶ / prezzo / ✕ del beat sul tavolo sono alti 26 pixel a
+  qualsiasi larghezza, e le mosse con la gente e le righe del palco diventano da 44 solo
+  sotto i 620: un telefono tenuto di traverso (844 o 932 di larghezza) ha tasti da 30. Non
+  l'ho provato su uno schermo: va guardato col banco degli screenshot.
+- **come si vede** — sul telefono, al Circolo, di pomeriggio, apri un rapper che è già
+  collaboratore e leggi sotto «Proponi un feat».
+- **quanto pesa** — si vede ma si gira intorno.
+- **RISOLTO (30/09/2026)** — branch `task/il-circolo`: i motivi vanno a capo invece di tagliarsi; col dito (`pointer:coarse`, anche di traverso) i tasti sono almeno 44, i tasti del beat 32 col mouse.
+
+### Due cose diverse si chiamano «open mic», e la card del live vale sempre come una serata media
+- **dove** — `frontend/js/game/actions.js:610` (la mossa del live si chiama ancora «Serata
+  open mic»), `frontend/js/game/agenda.js:53` (l'appuntamento «Serata open mic» del sabato),
+  contro `frontend/js/game/circolo.js:359-361` (sul palco «Open Mic» e «Live» sono due righe
+  diverse); `actions.js:622` (la resa)
+- **cosa succede** — sul palco «Open Mic» è la mossa nuova senza requisiti e «Live» è quella
+  che chiede un pezzo fuori; ma la mossa del Live, dappertutto fuori dal palco, si chiama
+  ancora «Serata open mic»: nell'agenda e nelle card. Chi segna in agenda la
+  «Serata open mic» e poi preme «Open Mic» al Circolo non la onora: la onora solo «Live».
+  **Seconda cosa, ed è una scelta, non un errore**: il live partito da una card o
+  dall'agenda vale sempre 1, quello giocato sul palco da 0,55 a 1,45. Chi è già al Circolo
+  può scegliere la strada sicura e saltare i momenti; se i momenti devono contare, va
+  deciso se la card li apre anche lei.
+- **come si vede** — segna «Serata open mic» in agenda, poi al Circolo premi «Open Mic».
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO in parte (30/09/2026)** — branch `task/il-circolo`: la mossa `live` si chiama «Serata live» (azioni, agenda, inglese), quindi «open mic» è solo quello del Circolo. Resta aperta la scelta sulla resa della card, nel foglio dei problemi aperti.
+
+### Il dopo-serata parte anche quando il feat non è partito
+- **dove** — `frontend/js/game/circolo.js:648-649`
+- **cosa succede** — dopo aver premuto «Proponi un feat», il gioco segna che sei appena
+  sceso dal palco (le due ore in cui le risposte buone valgono un punto in più) senza
+  guardare se il feat è partito davvero: `azionePosto` può rifiutarlo (per esempio se non
+  c'è più tempo nella giornata) e il premio arriva lo stesso. Il tasto di solito è già
+  spento in quei casi, quindi capita di rado.
+- **come si vede** — solo leggendo il codice; a mano serve un feat rifiutato col tasto
+  ancora acceso.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (30/09/2026)** — branch `task/il-circolo`: il dopo-serata del feat parte solo se `p.feat` è cambiato, cioè se il feat c'è stato.
+
+### Gli eventi adesso possono saltare fuori mentre sei al Circolo (va guardato)
+- **dove** — `frontend/js/game/eventi-v2.js:195` (l'elenco delle finestre che fanno aspettare
+  gli eventi: «posto» è uscito e non è entrato niente al suo posto), `frontend/js/game/uscita.js:55`
+- **cosa succede** — la vecchia pagina della Sala teneva fermi gli eventi della giornata
+  finché eri dentro, e contava come una «scena aperta». La pagina del Circolo sta dentro
+  alla pagina dei luoghi, che non lo fa: un evento può aprirsi sopra a un dialogo o a metà
+  dei momenti del live. Casa e Palestra si comportano già così, quindi può essere voluto;
+  la serata a metà resta salvata e non si perde. Non l'ho visto succedere: va guardato
+  giocando.
+- **come si vede** — resta al Circolo con una serata o un dialogo aperti mentre il tempo passa.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (30/09/2026)** — branch `task/il-circolo`: col Circolo aperto gli eventi aspettano, come con la Sala (`circoloOccupato`, letto da eventi-v2.js).
+
+## Giro sul telefono del 30/09/2026 (Playwright, la pagina «Il Circolo»)
+
+Misure: **390 × 844**, **360 × 740** (verticale) e **844 × 390** (orizzontale), con
+puntatore touch (`hasTouch`, `isMobile`). Branch `task/il-circolo`, commit `07d14b9`,
+partita di prova aperta con `apriLuogo("circolo")` alle 21:30 e alle 15:00. Guardata tutta
+la pagina scorrendo `#lf-wrap`, e giocata col tocco: cartello Bancone, scelta di una
+persona, «Parla» e una risposta, poi «Open Mic», i tre momenti fino all'esito e
+«Continua». Il flusso arriva in fondo a tutte e tre le misure; dopo il cartello e dopo
+l'Open Mic la pagina scorre da sola sul riquadro giusto. **Nessuno sbordamento
+orizzontale** (`scrollWidth` = `clientWidth` in `#lf-wrap` e nel documento, a ogni
+passo) e **nessun errore JavaScript**: l'unico rosso di console è il 404 di
+`/favicon.ico`. In verticale (390 e 360) la pagina si legge e i tasti dei riquadri
+sono da 44; i problemi stanno nei cartelli sulla foto e in orizzontale, dove vale la
+fascia 620–900 e non le regole del telefono.
+
+Giro **emulato**, non su un telefono vero: `promemoria-telefono.js --fatto` non è stato
+lanciato.
+
+
+### Sotto i 900 punti, dietro ai cartelli piccoli spuntano i cartelli disegnati nella foto
+
+- **dove** — `frontend/css/stretto.css:1006-1011` (`.cc-cart` rimpicciolito, `em`
+  nascosti, `min-width/min-height:0`, e il Backstage spostato con `right:3%`), contro la
+  foto `media/photo/schermate_luoghi/schermate luoghi_senza_HTML/il_circolo.png`, che
+  nonostante il nome ha **i quattro cartelli già disegnati dentro** (icona, nome e le due
+  righe di testo). Sopra i 900 i cartelli HTML hanno la stessa misura di quelli della foto
+  e li coprono; sotto, sono solo la pillola con icona e nome.
+- **cosa succede** — a 844 × 390 attorno a ogni pillola si vede il riquadro della foto con
+  le sue righe mezze coperte («Parla con le persone» tagliato a metà dalla pillola
+  Bancone, «Open Mic, Freestyle» sotto la pillola Palco, «Rapper, producer» sotto Sala):
+  sembrano due cartelli sovrapposti fuori registro. A 390 e 360 è meno grave, ma il
+  Backstage, spostato a destra, lascia scoperto sul bordo il pezzo del cartello disegnato
+  («…a», «…iali»).
+- **come si vede** — apri il Circolo e guarda la foto in orizzontale (844 × 390), poi a
+  390 × 844 il bordo destro vicino a Backstage.
+- **quanto pesa** — si vede subito: è la prima cosa della pagina.
+
+![Cartelli a 844 × 390](prove-telefono/2026-09-30/circolo-cartelli-844x390.png)
+![Cartelli a 390 × 844](prove-telefono/2026-09-30/circolo-cartelli-390x844.png)
+- **RISOLTO (30/09/2026)** — branch `task/il-circolo`: sotto i 900 i cartelli perdono le righe ma tengono la misura del riferimento, e coprono quelli stampati nel fondale provvisorio.
+
+### In orizzontale i tasti della gente sono alti 30 e quelli del palco 40, e le scritte si troncano
+
+- **dove** — `frontend/css/circolo.css:143` (`.cc-az` `min-height:30px`) e `:169-172`
+  (`.cc-mossa`, 40 di altezza, `i` con `nowrap` ed ellissi); il `min-height:44px` per
+  `.cc-az`, `.cc-mossa` e `.cc-mopz` sta solo nel blocco `max-width:620px` di
+  `frontend/css/stretto.css:1022-1027`. Un telefono girato (844 × 390) cade nella fascia
+  620–900, dove i due riquadri stanno affiancati e valgono le misure da desktop.
+- **cosa succede** — a 844 × 390 «Parla», «Scambia il numero», «Chiedi un beat»,
+  «Sessione in studio», «Torna indietro» e le tre risposte del dialogo sono tasti da
+  253 × 30; Open Mic, Freestyle, Live sono 187 × 40. In più le etichette si tagliano coi
+  puntini: «Scambia il nu…», «Serve almeno un cont…», «Serve che siate collaborat…», e
+  durante la serata «Sei sul palco: la serata è anc…» sulle tre mosse del palco.
+- **come si vede** — 844 × 390, tocca Bancone e guarda la scheda della persona e il
+  riquadro «2. Il palco» accanto.
+- **quanto pesa** — da sistemare: si prendono, ma sono sotto i 44 e le spiegazioni del
+  perché un tasto è spento non si leggono.
+
+![Tasti in orizzontale](prove-telefono/2026-09-30/circolo-tasti-844x390.png)
+- **RISOLTO (30/09/2026)** — branch `task/il-circolo`: i 44 valgono col dito a ogni larghezza (`@media (pointer:coarse)`), e i motivi vanno a capo.
+
+### I quattro cartelli sulla foto sono alti 32 punti a tutte le misure del telefono
+
+- **dove** — `frontend/css/stretto.css:1006-1008` (padding 6/9, icona 18, nome 12,5 px);
+  il commento del blocco (`:994-995`) dice che restano «grandi abbastanza per il dito».
+- **cosa succede** — a 390, 360 e 844 i cartelli misurano 96 × 32 (Bancone), 79 × 32
+  (Palco), 73 × 32 (Sala), 108 × 32 (Backstage): larghi abbastanza, bassi di 12 punti.
+  Non si coprono fra loro e restano dentro alla foto; al tocco funzionano (il Bancone
+  porta al riquadro «1. La gente»).
+- **come si vede** — a 390 × 844 la foto in cima alla pagina (stessa figura della prima
+  voce).
+- **quanto pesa** — da sistemare con calma: sono anche doppioni delle voci dei riquadri
+  sotto.
+- **RISOLTO (30/09/2026)** — branch `task/il-circolo`: tengono l'altezza del riferimento e col dito non scendono sotto i 44.
+
+### In orizzontale la foto occupa tutto il primo schermo
+
+- **dove** — `frontend/css/stretto.css:1003` (`.cc-scena{max-height:none;min-height:0}`
+  sotto i 900): la foto tiene il suo rapporto 1250/526 su tutta la larghezza.
+- **cosa succede** — a 844 × 390 la scena è alta 355 punti in un `#lf-wrap` alto 336:
+  entrando si vede solo la foto (più alta dello schermo) e nessun indizio che sotto c'è
+  la pagina; il titolo «Il Circolo» e i riquadri arrivano solo scorrendo.
+- **come si vede** — 844 × 390, apri il Circolo.
+- **quanto pesa** — da sistemare con calma.
+
+![Primo schermo in orizzontale](prove-telefono/2026-09-30/circolo-foto-844x390.png)
+- **RISOLTO (30/09/2026)** — branch `task/il-circolo`: di traverso la foto è al massimo il 68% dell'altezza, sotto si vede la pagina.

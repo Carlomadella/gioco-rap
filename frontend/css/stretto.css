@@ -1003,12 +1003,17 @@
   .cc-scena{max-height:none;min-height:0;box-shadow:none}
   .cc-info{padding:16px 16px 18px;contain:none;overflow:visible}
   .cc-titolo{font-size:34px}
-  .cc-cart{gap:6px;padding:6px 9px;border-radius:6px}
+  /* i cartelli perdono le righe sotto ma tengono la loro misura: coprono
+     la zona del riferimento, e il dito ha un bersaglio vero */
+  .cc-cart{align-items:center;gap:6px;padding:6px 9px;border-radius:6px}
   .cc-cart i{width:18px;height:18px;margin:0}
   .cc-cart b{font-size:12.5px;margin:0}
   .cc-cart em{display:none}
-  .cc-c-bancone,.cc-c-palco,.cc-c-sala,.cc-c-backstage{min-width:0;min-height:0}
-  .cc-c-backstage{left:auto;right:3%}
+  .cc-c-backstage{left:auto;right:.5%}
+}
+/* il telefono girato: la foto lascia vedere che sotto c'è la pagina */
+@media (max-width:900px) and (orientation:landscape){
+  .cc-scena{max-height:68vh}
 }
 @media (max-width:620px){
   .cc-giu{grid-template-columns:minmax(0,1fr);padding:4px 0 calc(14px + env(safe-area-inset-bottom,0px))}
@@ -1019,13 +1024,17 @@
     border-bottom:1px solid rgba(255,255,255,.12)}
   .cc-chi{flex:none}
   .cc-chi.on::after{left:6px;right:6px;top:auto;bottom:0;width:auto;height:3px}
-  .cc-az{min-height:44px}
   .cc-palco{grid-template-columns:34% minmax(0,1fr)}
-  .cc-mossa{min-height:44px;justify-content:center}
+  .cc-mossa{justify-content:center}
   .cc-prog{grid-template-columns:minmax(0,1fr)}
   .cc-prog .cc-foto{display:none}
   .cc-momenti{min-height:300px;padding:12px}
   .cc-momento{width:100%}
-  .cc-mopz{min-height:44px}
+}
+/* col dito, a qualsiasi larghezza (anche un telefono di traverso, fra 620
+   e 900): i tasti del Circolo non scendono sotto i 44 */
+@media (pointer:coarse){
+  .cc-az,.cc-mossa,.cc-mopz,.cc-chi,.cc-cart{min-height:44px}
+  .cc-beat button{min-width:44px;height:44px}
 }
 
