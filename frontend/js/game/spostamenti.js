@@ -39,7 +39,6 @@
   const TRAVEL_POS = Object.freeze({
     studio:    {x:14.160, y:13.335},
     pizzeria:  {x:90.040, y:60.420},
-    concerti:  {x:64.455, y:25.835},
     beat:      {x:49.640, y:19.505},
     vita:      {x:17.745, y:59.330},
     crimin:    {x:15.460, y:84.585},
@@ -70,6 +69,9 @@
     /* Compatibilità con i salvataggi precedenti alla rimozione dell'hotspot:
        chi aveva chiuso la partita al Beat Maker riparte nello Studio. */
     if(G.currentPlace === "beatmaker") G.currentPlace = "studio";
+    /* Il Live Club dal 29/09/2026 è un pezzo del Circolo, che sta dov'era
+       la Sala: chi aveva chiuso la partita là riparte lì. */
+    if(G.currentPlace === "concerti") G.currentPlace = "beat";
 
     /* Un arresto è anche uno stato fisico: finché la pena è attiva il
        giocatore si trova al punto Carcere/Attività criminali, non a Casa. */

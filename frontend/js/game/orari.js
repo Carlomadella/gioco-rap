@@ -10,10 +10,12 @@
 (function(){
   if(typeof GAME_TIME === "undefined") return;
 
-  /* Nessun alias fisico attivo: Beat Maker non è più un luogo della città.
-     I vecchi salvataggi che si trovavano lì vengono migrati allo Studio
-     da spostamenti.js. */
-  const PLACE_ALIAS = Object.freeze({});
+  /* Beat Maker non è più un luogo della città: i vecchi salvataggi che si
+     trovavano lì vengono migrati allo Studio da spostamenti.js.
+     Il Live Club (`concerti`) dal 29/09/2026 è un pezzo del Circolo, che
+     sulla mappa sta dov'era la Sala (`beat`): chi lo nomina ancora — un
+     vecchio salvataggio, un evento scritto prima — finisce lì. */
+  const PLACE_ALIAS = Object.freeze({concerti:"beat"});
   function normalizePlace(id){
     const key=String(id||"");
     return PLACE_ALIAS[key] || key;
@@ -27,8 +29,9 @@
        li tengono — è la differenza fra il tuo mestiere e il resto della città. */
     studio:    {allDay:true},
     pizzeria:  {open:"16:00", close:"02:00"},
-    concerti:  {open:"20:00", close:"03:00"},
-    beat:      {open:"13:00", close:"02:00"},
+    /* Il Circolo (js/game/circolo.js): di pomeriggio il retro, la sera il
+       palco, fino alle tre. Le fasce dentro stanno in CIRCOLO_FASCE. */
+    beat:      {open:"13:00", close:"03:00"},
     vita:      {allDay:true},
     crimin:    {open:"18:00", close:"04:00"},
     fabbrica:  {open:"08:00", close:"19:00"},
@@ -49,10 +52,19 @@
     registra:"studio",
     mixa:"studio",
     remaster:"studio",
-    live:"concerti",
+    live:"beat",
     /* punto 9: due mosse, stesso posto */
     palestra_pesi:"palestra",
     palestra_cardio:"palestra"
+  });
+
+  /* Una mossa che sta in un posto ma non per tutto il suo orario: il palco
+     del Circolo si accende alle 21:00 (la fascia «Open Mic e Live» di
+     CIRCOLO_FASCE), mentre il locale è aperto dalle 13:00. Si chiude con il
+     locale, alle 03:00: la serata dura tre ore (tempo.js), quindi l'ultima
+     che parte è quella di mezzanotte — la fine della fascia. */
+  const ACTION_HOURS = Object.freeze({
+    live:{open:"21:00", close:"03:00"}
   });
 
   /* I lavori non usano tutti un punto della mappa, ma hanno comunque un turno
@@ -81,7 +93,7 @@
      per il controllo "fai in tempo a finire prima che chiuda": la più
      corta (cardio) è la scelta prudente, l'altra la controlla la sua tile
      una volta dentro (decorateActions). */
-  const DIRECT_PLACE_ACTION = Object.freeze({concerti:"live", palestra:"palestra_cardio"});
+  const DIRECT_PLACE_ACTION = Object.freeze({palestra:"palestra_cardio"});
 
   /* I due edifici che sono un posto di lavoro: entrarci vuol dire fare il
      turno, quindi il cartello sulla mappa deve rispettare la finestra del
@@ -138,6 +150,7 @@
       const jid = G.job && G.job.id;
       return jid ? JOB_HOURS[jid] : null;
     }
+    if(ACTION_HOURS[id]) return ACTION_HOURS[id];
     const place = ACTION_PLACE[id];
     return place ? PLACE_HOURS[place] : null;
   }

@@ -378,15 +378,15 @@ function schermataApp(id){
    tasto non deve mandarti in sala prove a cercarlo — li' non lo trovi. */
 function schermataContatti(){
   const vivi = (G.gente || []).filter(p => !p.via);
-  if(!vivi.length) return '<div class="tempty">Nessun contatto ancora. Passa dalla Sala, dietro al bar centrale.</div>' +
-    '<button class="tbtn" data-posto="1">Vai alla Sala</button>';
+  if(!vivi.length) return '<div class="tempty">Nessun contatto ancora. Passa dal Circolo: di pomeriggio ci trovi la gente del giro.</div>' +
+    '<button class="tbtn" data-posto="1">Vai al Circolo</button>';
   return '<div class="tlist">' + vivi.map(p =>
     '<button class="tli" ' + (p.fuori ? 'data-app="trasferte"' : 'data-posto="1"') + '>' +
       '<span class="tliav" style="--k:' + p.col + '">' + hsvg("persona") + '</span>' +
       '<span class="tlitx"><b>' + p.n + '</b><i>' + (TEL_RUOLI[p.ruolo] || p.ruolo) + ' · ' + REL_NOMI[p.rel] +
         (p.fuori && p.citta ? ' · ' + telCittaNome(p.citta) : '') + '</i></span>' +
       '<span class="tliv">' + hsvg("fama") + Math.round(p.fama) + '</span></button>').join("") +
-    '</div><button class="tbtn" data-posto="1">Vai alla Sala</button>';
+    '</div><button class="tbtn" data-posto="1">Vai al Circolo</button>';
 }
 /* Il nome per esteso della citta' lo sa trasferte.js; se non e' caricato si
    ripiega sull'id, che e' gia' leggibile («bologna»). */

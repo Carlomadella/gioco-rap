@@ -53,7 +53,7 @@
     {id:"live", ic:"corona", k:"#F97316", n:"Serata open mic", peso:1.15,
      d:"Il locale apre il palco a chi ha qualcosa da far sentire.", giorno:6, ora:"21:30",
      righe:[["fama", "Fama vera"], ["soldi", "Qualche soldo"]]},
-    {id:"sala", ic:"nota", k:"#38BDF8", n:"Sessione lunga alla Sala", peso:1.2,
+    {id:"sala", ic:"nota", k:"#38BDF8", n:"Sessione lunga al Circolo", peso:1.2,
      d:"Tutta la sera, e gira gente che conta.", giorno:3, ora:"20:00", posto:true,
      righe:[["gente", "Gente da conoscere"], ["cursori", "Beat sul tavolo"]]},
     {id:"promo", ic:"hype", k:"#FB923C", n:"Giornata di lanci", peso:1.25,

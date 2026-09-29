@@ -42,7 +42,7 @@ function installaBot(){
       }
       if(on("writer")){ document.getElementById("w-done").click(); continue; }
       let chiuso = false;
-      for(const id of ["piazza","posto","strada","drawer","report","scena"]){
+      for(const id of ["piazza","strada","drawer","report","scena"]){
         if(on(id)){
           try{ chiudiInCima(); }catch(e){ sc.blocchi.push("chiudi " + id + ": " + e.message); }
           if(on(id)) document.getElementById(id).classList.remove("on");

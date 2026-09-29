@@ -1,4 +1,4 @@
-/* I LUOGHI CON LA FOTO — Casa, la Palestra, il Live Club, lo «stacca la
+/* I LUOGHI CON LA FOTO — Casa, la Palestra, il Circolo, lo «stacca la
    spina», e la foto sotto alla Piazza.
 
    Il punto 5 di CARLO («aggiungi le foto di background dei posti senza HTML,
@@ -47,8 +47,13 @@ const LUOGHI_FOTO = {
              k:"Casa", bar:"Stacca la spina", d:"prenditi una pausa"},
   palestra: {f:"schermate_luoghi_con_elementi_HTML/palestra.png", pos:"center 55%",
              k:"Palestra", bar:"La sala pesi", d:"il fisico che si vede sotto le luci"},
-  live:     {f:"schermate luoghi_senza_HTML/live_club.png", pos:"center 42%",
-             k:"Live Club", bar:"Stasera", d:"palco piccolo, la gente ti vede in faccia"},
+  /* il Circolo (js/game/circolo.js) la foto non la stende sotto a tutto:
+     la mette nel suo riquadro, come nel riferimento `il_circolo`. La
+     stanza nella fascia è la fascia dell'ora (`circoloFascia`). */
+  circolo:  {f:"schermate luoghi_senza_HTML/il_circolo.png", pos:"center",
+             k:"Il Circolo", bar:() => typeof circoloFascia === "function" && circoloFascia()
+               ? circoloFascia().n : "Chiuso",
+             d:"il posto della scena locale"},
   /* la Piazza ha già la sua pagina (piazza.js): qui c'è solo la foto da
      metterle sotto, vedi in fondo */
   piazza:   {f:"schermate luoghi_senza_HTML/piazza_freestyle.png", pos:"center 40%"}
@@ -57,7 +62,7 @@ const LUOGHI_FOTO = {
 /* Le mosse che hanno una pagina con la foto: quando partono — da qui, dai
    cartelli, dalle card di «Eventi e attività di oggi», dall'agenda — l'esito
    si legge sulla foto del loro posto, non più nella scenetta disegnata. */
-const LUOGO_MOSSE = {stacca:"stacca", palestra_pesi:"palestra", palestra_cardio:"palestra", live:"live"};
+const LUOGO_MOSSE = {stacca:"stacca", palestra_pesi:"palestra", palestra_cardio:"palestra", live:"circolo"};
 
 /* Lo stato della pagina aperta. `scelta` è la riga accesa (Pesi o Cardio, il
    palco o la piazza); `esito` è la mossa appena fatta, con quello che ha
@@ -90,9 +95,9 @@ function apriLuogo(id, opz){
   if(typeof G === "undefined" || !G || !LUOGHI_FOTO[id] || id === "piazza") return;
   LUOGO = {id:id, da:(opz && opz.da) || "mappa", scelta:null, esito:null, prima:null};
   if(id === "palestra") LUOGO.scelta = "palestra_pesi";
-  /* al Live Club la riga accesa è il palco se hai un pezzo fuori; se no la
-     piazza, che è l'unica cosa che puoi fare davvero */
-  if(id === "live") LUOGO.scelta = hubPronta("live").ok ? "live" : "free";
+  /* il Circolo si può aprire su un riquadro (la gente, il palco…): lo dice
+     chi lo apre — l'agenda che dice «passa dalla Sala», per esempio */
+  if(id === "circolo" && typeof circoloApri === "function") circoloApri(opz || {});
   /* sotto i 1180 il telefono alzato sta a 58, la pagina a 55: una mossa
      partita dall'agenda del telefono aprirebbe la pagina dietro. Il telefono
      si mette giù (telefono-stretto.js), com'è quando arrivi dalla mappa. */
@@ -125,7 +130,7 @@ function renderLuogo(){
   scena.style.backgroundPosition = L.pos;
 
   $("lf-k").textContent = L.k;
-  $("lf-nome").innerHTML = lfEsc(L.bar) +
+  $("lf-nome").innerHTML = lfEsc(typeof L.bar === "function" ? L.bar() : L.bar) +
     '<i><span class="stpunto"></span>' + lfEsc(L.d) + '</i>';
   $("lf-risorse").innerHTML = typeof studioRisorse === "function" ? studioRisorse() : "";
 
@@ -133,10 +138,19 @@ function renderLuogo(){
     LUOGO.id === "casa"     ? lfCasa() :
     LUOGO.id === "stacca"   ? lfStacca() :
     LUOGO.id === "palestra" ? lfPalestra() :
-    lfLive();
+    circoloParti();
   const wrap = $("lf-wrap");
-  /* la Casa non ha colonne: ha le porte sopra alla foto, e basta */
-  wrap.className = "lfwrap" + (parti.porte ? " lfporte" : "");
+  /* la Casa non ha colonne: ha le porte sopra alla foto, e basta. Il
+     Circolo ha una pagina sua, che scorre (circolo.js) */
+  wrap.className = "lfwrap" + (parti.porte ? " lfporte" : "") + (parti.pagina ? " lfcircolo" : "");
+  if(parti.pagina){
+    const su = wrap.scrollTop;
+    wrap.innerHTML = parti.pagina;
+    wrap.scrollTop = su;
+    $("lf-banda").hidden = true;
+    if(typeof circoloDopoDisegno === "function") circoloDopoDisegno(wrap);
+    return;
+  }
   wrap.innerHTML = parti.porte ||
     '<div class="lfcol lfsx">' + (parti.sx || "") + '</div>' +
     '<div class="lfcol lfmid">' + (parti.mid || "") + '</div>' +
@@ -319,62 +333,10 @@ function lfPalestra(){
   return {sx:sx, mid:mid, dx:dx};
 }
 
-/* ---------- IL LIVE CLUB ----------
-   Il riferimento ha la scaletta a sinistra, «stasera» a destra e in mezzo la
-   serata. La scaletta sono i tuoi pezzi fuori, quelli che porti sul palco;
-   «stasera» è chi c'è (la gente della Sala che conosci) e quanto rende. In
-   mezzo si sceglie: il palco, che vuole un pezzo pubblicato, o la piazza.
-   I momenti da giocare durante la serata (quello che parla sopra, la traccia
-   che parte storta) nel riferimento ci sono e qui non ancora: sono il
-   minigioco della Piazza rifatto per il palco, e vanno in una task loro. */
-function lfLive(){
-  const fuori = (G.songs || []).filter(s => s.released).slice().sort((a, b) => (b.q || 0) - (a.q || 0));
-  const sx = lfPan("La scaletta",
-    fuori.length
-      ? fuori.slice(0, 4).map((s, i) => stScelta({senzaPallino:true, n:(i + 1) + ". " + s.t,
-          d:s.feat ? "con " + lfEsc(s.feat) : (s.tema ? lfEsc(s.tema) : "il tuo pezzo"),
-          mini:typeof cover === "function" ? cover(s.seed || 7, s.t, (window.ARTIST || {}).name || "", s.img) : "",
-          v:"q" + Math.round(s.q || 0)})).join("")
-      : '<div class="stvuoto"><b>Nessun pezzo fuori.</b> Il palco vero aspetta un pezzo pubblicato. La piazza no: lì c’è solo il beat e la gente che passa.</div>',
-    "barre", fuori.length ? fuori.length + (fuori.length === 1 ? " pezzo fuori" : " pezzi fuori") : "");
-
-  const palco = hubPronta("live"), piazza = hubPronta("free");
-  const giaOggi = typeof adfOggi === "function" && adfOggi("live") > 0;
-  const stima = Math.round((20 + G.hype * 1.4 + 40) * (typeof RITMO === "number" ? RITMO : 0.4) * (giaOggi ? 0.45 : 1));
-  const righe =
-    stScelta({attr:' data-scelta="live"', on:LUOGO.scelta === "live", n:"Serata open mic",
-      d:'Il palco, con i tuoi pezzi. <span class="oro">' + lfCosto("live") + '</span>',
-      v:palco.ok ? "~" + fmt(stima) + " € · fan" : palco.perche, vCls:palco.ok ? "" : "calmo"}) +
-    stScelta({attr:' data-scelta="free"', on:LUOGO.scelta === "free", n:"Freestyle in piazza",
-      d:'Solo il beat e la gente che passa. <span class="oro">' + lfCosto("free") + '</span>',
-      v:piazza.ok ? "presenza · fan" : piazza.perche, vCls:piazza.ok ? "" : "calmo"});
-  const scelta = LUOGO.scelta || (palco.ok ? "live" : "free");
-  const mid = LUOGO.esito
-    ? lfPan("Com’è andata", lfEsito(), "spunta")
-    : lfPan("Che serata fai?",
-        '<p class="stnota">Il palco vero vuole un pezzo pubblicato. La piazza no.</p>' +
-        righe +
-        lfTasto(scelta, scelta === "live" ? "Sali sul palco" : "Vai in piazza", scelta === "live" ? "palco" : "mic"),
-        "palco");
-
-  /* chi c'è: la gente della Sala che conosci davvero (almeno un contatto),
-     tre a serata, sempre gli stessi dentro la settimana — lo stesso criterio
-     di `presentiOggi()` in posto.js */
-  const sett = typeof totalWeeks === "function" ? totalWeeks() : (G.week || 1);
-  const chi = (G.gente || []).filter(p => !p.via && p.rel >= 1)
-    .sort((a, b) => ((b.id.charCodeAt(1) * 31 + sett * 17) % 97) - ((a.id.charCodeAt(1) * 31 + sett * 17) % 97))
-    .slice(0, 3);
-  const dx = lfPan("Stasera",
-    '<div class="stsottotit">Chi c’è</div>' +
-    (chi.length
-      ? '<ul class="lflista">' + chi.map(p => '<li>' + lfEsc(p.n) + ' <i>(' + lfEsc(p.ruolo) + ')</i></li>').join("") + '</ul>'
-      : '<p class="stnota">Nessuno che conosci. La Sala è dove si conosce la gente.</p>') +
-    '<div class="stsottotit">Incasso</div>' +
-    lfRiga("Stimato", palco.ok ? "~" + fmt(stima) + " €" : "—", "oro") +
-    (giaOggi ? '<p class="stnota lfnotasotto">Il palco lo conoscevano già: stasera rende meno.</p>' : ""),
-    "cartella");
-  return {sx:sx, mid:mid, dx:dx};
-}
+/* ---------- IL CIRCOLO ----------
+   Il Live Club e la Sala sono diventati un posto solo (29/09/2026): la
+   pagina è sua, in js/game/circolo.js — qui passa solo per la fascia in
+   alto, l'orologio e l'esito delle mosse, come gli altri posti. */
 
 /* ==================== LE MOSSE ====================
    Da qui parte una mossa di actions.js, come dai cartelli. Prima si fotografa
@@ -451,7 +413,7 @@ if(typeof mostraScena === "function"){
 }
 
 /* «Continua» dopo una mossa: si torna da dove si era venuti. Lo «stacca la
-   spina» aperto dalla Casa torna in cucina; la palestra e il club restano
+   spina» aperto dalla Casa torna in cucina; la palestra e il Circolo restano
    sulla loro pagina, pronti per la prossima volta; quello che era arrivato
    da una card chiude e basta. */
 function luogoContinua(){
@@ -515,7 +477,7 @@ if($("luogo")){
    risolve rispetto al foglio di stile (`css/media/…`, che non esiste), non
    rispetto alla pagina. Il velo sta nello stesso `background`, così scorre
    insieme alla pagina e non serve un elemento in più. Quando la piazza si
-   chiude, la pagina del Live Club che sta sotto si ridisegna: i numeri sono
+   chiude, la pagina del Circolo che sta sotto si ridisegna: i numeri sono
    cambiati. */
 const LF_PIAZZA_VELO = "linear-gradient(180deg,rgba(3,6,11,.78) 0%,rgba(3,6,11,.30) 22%,rgba(3,6,11,.42) 60%,rgba(3,6,11,.86) 100%)";
 if(typeof apriPiazza === "function"){

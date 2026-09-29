@@ -17,7 +17,10 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=Archivo+Black&family=Barlow+Condensed:wght@600;700;800&display=swap">
 <!-- I tre caratteri della Strada (schermata «Attività criminali»): stencil per i
      titoli, condensato per le etichette, Plex per il testo. -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=Roboto+Condensed:wght@500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=Roboto+Condensed:wght@400;500;600;700;800;900&display=swap">
+<!-- Il pennarello dei titoli del Circolo («IL CIRCOLO», «1. LA GENTE»),
+     css/circolo.css -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap">
 
 <meta name="robots" content="noindex">
 <!-- Fogli di stile: l'ordine conta, la cascata è quella originale. -->
@@ -36,13 +39,15 @@
 <link rel="stylesheet" href="css/hud.css?v=12">
 <link rel="stylesheet" href="css/forms.css?v=12">
 <link rel="stylesheet" href="css/actionbar.css?v=12">
-<link rel="stylesheet" href="css/posto.css?v=13">
 <link rel="stylesheet" href="css/studio.css?v=12">
 <!-- dopo studio.css: e' quello che riempie i suoi pannelli, e ne usa le variabili -->
 <link rel="stylesheet" href="css/studio-elementi.css?v=1">
-<!-- dopo studio.css anche questo: Casa, Palestra, Live Club e stacca la spina
+<!-- dopo studio.css anche questo: Casa, Palestra, il Circolo e stacca la spina
      sono disegnati con lo stesso telaio, sopra alla loro foto -->
-<link rel="stylesheet" href="css/luoghi-foto.css?v=1">
+<link rel="stylesheet" href="css/luoghi-foto.css?v=2">
+<!-- dopo luoghi-foto.css: il Circolo (la Sala e il Live Club insieme) ha una
+     pagina sua dentro a #luogo, js/game/circolo.js -->
+<link rel="stylesheet" href="css/circolo.css?v=1">
 <link rel="stylesheet" href="css/abilita.css?v=1">
 <link rel="stylesheet" href="css/negozio.css?v=12">
 <link rel="stylesheet" href="css/strada-crimine.css?v=13">
@@ -365,8 +370,6 @@
   </radialGradient>
 </defs></svg>
 
-<!-- La Sala: il posto dove si conosce la gente. Il contenuto lo mette
-     js/game/posto.js. -->
 <!-- Lo Studio (punti 10, 11, 12 e il punto 4 di CARLO): le cinque sezioni di un
      pezzo — beat, testo, cabina, mix, uscita (dal 15/09/2026: il feat sta in
      cabina, la cover nell'uscita, il marketing sul telefono). Le
@@ -440,13 +443,6 @@
   <div class="stbanda lfbanda" id="lf-banda" hidden></div>
 </div>
 
-<div class="posto" id="posto"><div class="powrap">
-  <div class="pohead"><div class="pok">La Sala</div><button class="pox" id="po-x">&#10005;</button></div>
-  <div class="poscena" id="po-scena"></div>
-  <p class="podove" id="po-dove"></p>
-  <div class="polista" id="po-lista"></div>
-  <div class="porete" id="po-rete"></div>
-</div></div>
 
 
 <!-- L'ALBERO DELLE ABILITÀ (punto 13) — arriva da `abilita(11).html`.
@@ -715,14 +711,16 @@
 <script src="js/game/fx.js?v=14"></script>
 <script src="js/game/entry.js?v=3"></script><!-- ADF_AUDIO_ENTRY_PAGE_V1 -->
 <script src="js/game/skip.js?v=15"></script>
-<script src="js/game/posto.js?v=15"></script>
+<script src="js/game/posto.js?v=16"></script>
 <script src="js/game/studio.js?v=15"></script>
 <!-- subito dopo: le schede dei beat, le take, i cursori del banco e il quando -->
 <script src="js/game/studio-elementi.js?v=3"></script>
 <script src="js/game/seguiti.js?v=1"></script><!-- remastered e parti 2: si decidono dalla Discografia, si fanno in Studio -->
 <!-- e dopo lo Studio le pagine degli altri posti, che ne riusano i pannelli:
-     Casa, Palestra, Live Club, stacca la spina, e la foto sotto alla Piazza -->
-<script src="js/game/luoghi-foto.js?v=1"></script>
+     Casa, Palestra, il Circolo, stacca la spina, e la foto sotto alla Piazza -->
+<script src="js/game/luoghi-foto.js?v=2"></script>
+<!-- il Circolo: la Sala e il Live Club insieme, dentro alla pagina dei posti -->
+<script src="js/game/circolo.js?v=1"></script>
 <script src="js/game/abilita.js?v=1"></script>
 <script src="js/game/strada.js?v=12"></script>
 <script src="js/game/strada-crimine.js?v=14"></script>

@@ -87,27 +87,15 @@ const HUB_LUOGHI = [
      adesso c'è un lavoro vero, part time. */
   {id:"pizzeria", n:"Pizzeria",
    vai:() => schedaLavoro("lavapiatti", "Pizzeria")},
-  /* punto 48: non più un cartello chiuso — è dove si va a fare l'open mic,
-     che esisteva già come azione ma non aveva un posto sulla mappa. Se non
-     hai ancora un pezzo fuori il palco non c'è, ma lo dice, non fa finta di
-     niente. Nella mappa definitiva il cartello dice «Live Club», il posto
-     resta lo stesso di sempre (id "concerti"). */
-  /* «Via il quaderno»: qui adesso si sceglie, come a Casa e in Palestra. Il
-     freestyle sulla mappa c'era già, ma solo come evento della sera alle 21:00
-     («Freestyle al bar centrale»): se passavi di lì a un'altra ora non
-     esisteva. Il palco è il posto dove si sta davanti alla gente: ci stanno
-     tutte e due. */
-  /* Il punto 5 di CARLO («aggiungi le foto di background dei posti»): la
-     finestra con le due risposte è diventata una pagina sulla foto del
-     locale (js/game/luoghi-foto.js), con la scaletta e chi c'è stasera. La
-     scelta palco/piazza è la stessa, si fa lì dentro. */
-  {id:"concerti", n:"Live Club",
-   vai:() => apriLuogo("live")},
-  /* il beat maker non è un listino: è la sala dove si conosce la gente */
-  {id:"beat", n:"La Sala",
-   /* il secondo video del punto: la strada, il portone, la stanza coi
-      computer, e poi la Sala */
-   vai:() => transizioneVideo("sala", () => apriPosto())},
+  /* Il Circolo (29/09/2026): la Sala e il Live Club sono diventati un posto
+     solo, «un posto, due vite» — di pomeriggio il retro dove si conosce la
+     gente, la sera il palco. Sta dov'era la Sala (id "beat", che resta
+     perché orari, spostamenti ed eventi lo conoscono già); il cartello del
+     Live Club non c'è più, e chi dice ancora «concerti» finisce qui
+     (`PLACE_ALIAS`, orari.js). Si entra col video dell'ora: la stanza coi
+     computer di giorno, il club la sera (circoloEntra, js/game/circolo.js). */
+  {id:"beat", n:"Il Circolo",
+   vai:() => circoloEntra()},
   /* Beat Maker non è più un luogo sulla mappa: i beatmaker si conoscono
      alla Sala e si lavora con loro nello Studio. */
   /* punto 60: si chiamava «Vita quotidiana» — la palestra è uscita da qui
@@ -169,7 +157,6 @@ const HUB_SAGOME = Object.freeze({
   studio:  [[19.26,55.26],[27.03,50.80],[29.67,54.41],[29.55,61.64],[27.87,64.61],[19.74,63.97]],
   pizzeria:[[49.64,69.29],[56.94,63.55],[62.44,66.95],[62.20,74.39],[58.31,80.23],
             [52.15,87.14],[47.73,83.74],[46.53,75.88]],
-  concerti:[[33.25,22.32],[42.17,19.98],[45.57,21.89],[45.33,28.69],[35.17,32.09],[33.25,30.61]],
   beat:    [[44.86,31.88],[51.32,28.27],[58.31,31.03],[58.13,36.66],[52.93,39.53],[44.98,37.41]],
   vita:    [[19.50,34.22],[23.92,31.03],[30.08,33.16],[29.90,41.23],[25.72,43.57],[19.74,41.23]],
   crimin:  [[1.79,65.36],[12.26,63.55],[14.95,72.26],[11.06,80.98],[3.29,78.64]],
@@ -217,7 +204,6 @@ function hubSagoma(id){
 const HUB_PIN_COLOR = Object.freeze({
   studio:"#A855F7",
   pizzeria:"#FF5A36",
-  concerti:"#EC4899",
   beat:"#A855F7",
   vita:"#FB923C",
   crimin:"#EF4444",
@@ -232,7 +218,6 @@ const HUB_DISTRICT = Object.freeze({
   studio:"periferia",
   vita:"periferia",
   crimin:"periferia",
-  concerti:"centro",
   beat:"centro",
   shop:"periferia",
   impiego:"centro",
@@ -352,7 +337,7 @@ const HUB_EVENTI = [
    d:"Freestyle contest aperto a tutti.", ora:"21:00",
    righe:[["hype", "Hype in piazza"], ["gente", "Gente nuova"]]},
   {id:"sala", ic:"nota", k:"#38BDF8", n:"Producer session",
-   d:"Passa dalla Sala: stasera c'è chi fa beat.", ora:"22:30", posto:true,
+   d:"Passa dal Circolo: stasera c'è chi fa beat.", ora:"22:30", posto:true,
    righe:[["gente", "Gente da conoscere"], ["cursori", "Beat da farsi sentire"]]},
   {id:"stacca", ic:"corona", k:"#FACC15", n:"Piccolo party",
    d:"Party in appartamento.", ora:"00:00",

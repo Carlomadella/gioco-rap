@@ -36,7 +36,12 @@ const TRANSIZIONI_VIDEO = {
      (la porta di Casa, l'agenda del telefono, la card della sera) */
   stacca:   "media/video/Transizioni di scena/04_stacca_la_spina_definitivo.mp4",
   /* il microfono, il foglio, il banco: la prima take in Cabina */
-  registra: "media/video/Transizioni di scena/05_registra_pezzo_definitivo.mp4"
+  registra: "media/video/Transizioni di scena/05_registra_pezzo_definitivo.mp4",
+  /* il Circolo la sera (js/game/circolo.js, circoloEntra): di giorno si
+     entra dal retro col video della Sala, dalle 21:00 dalla porta del club */
+  club:     "media/video/Transizioni di scena/08_ingresso_club_definitivo.mp4",
+  /* sali sul palco del Circolo: fra il tasto e il primo dei tre momenti */
+  palco:    "media/video/Transizioni di scena/11_live_definitivo.mp4"
 };
 /* I cartelli della mappa hanno un id loro (`data-l`): qui si dice quale
    filmato preparare quando il puntatore ci passa sopra. */

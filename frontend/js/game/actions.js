@@ -616,7 +616,11 @@ const ACTIONS = [
      const peso = (window.AGENDA && typeof AGENDA.consumaPeso === "function")
        ? AGENDA.consumaPeso("live") : 1;
      const giaOggi = adfOggi("live") > 0;
-     const molt = (giaOggi ? 0.45 : 1) * peso;
+     /* sul palco del Circolo la serata si gioca a momenti (circolo.js): come
+        è andata la gente, da 0,55 a 1,45, pesa sulla resa. Da fuori (l'agenda,
+        una card) vale 1, com'è sempre stato. */
+     const resa = typeof circoloResaSerata === "function" ? circoloResaSerata() : 1;
+     const molt = (giaOggi ? 0.45 : 1) * peso * resa;
      const f = Math.round((rnd(8,30) + presenzaSulPalco()*1.4 + G.hype*0.7) * RITMO * molt);
      const m = Math.round((rnd(20,60) + G.hype*1.4) * RITMO * molt);
      const lbb = lifeBonus();

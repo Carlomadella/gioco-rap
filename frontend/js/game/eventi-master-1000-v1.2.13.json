@@ -75477,7 +75477,7 @@
       "repo024",
       "stage1"
     ],
-    "description": "Con almeno duemila fan, la Sala può introdurre una persona che trasforma le chiacchiere in racconto pubblico.",
+    "description": "Con almeno duemila fan, il Circolo può introdurre una persona che trasforma le chiacchiere in racconto pubblico.",
     "choices": [
       {
         "label": "Ascoltalo davvero",
@@ -93824,7 +93824,7 @@
       "repo028",
       "stage2"
     ],
-    "description": "Una persona persistente può collegare Sala e classifica senza creare un NPC nuovo.",
+    "description": "Una persona persistente può collegare il Circolo e la classifica senza creare un NPC nuovo.",
     "choices": [
       {
         "label": "Chiarisci subito",
@@ -142081,7 +142081,7 @@
     "arc_linked": false,
     "family": "telefono_social",
     "coverage_category": "phone",
-    "title": "Una persona della Sala ti scrive direttamente",
+    "title": "Una persona del Circolo ti scrive direttamente",
     "tier": "medium",
     "rarity": "insolito",
     "tone": "mixed",
@@ -161365,7 +161365,7 @@
     "arc_linked": true,
     "family": "sala_persone",
     "coverage_category": "sala",
-    "title": "Il messaggio arriva fuori dalla Sala",
+    "title": "Il messaggio arriva fuori dal Circolo",
     "tier": "low",
     "rarity": "comune",
     "tone": "mixed",
@@ -182805,7 +182805,7 @@
       "repo022",
       "stage1"
     ],
-    "description": "Parlarci nella Sala può costruire un rapporto diverso da quello della classifica.",
+    "description": "Parlarci al Circolo può costruire un rapporto diverso da quello della classifica.",
     "choices": [
       {
         "label": "Ascoltalo davvero",

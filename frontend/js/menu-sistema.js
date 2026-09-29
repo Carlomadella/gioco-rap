@@ -16,12 +16,11 @@
   function hostAttivo(){
     if(document.querySelector("#adf-jail.on")) return "jail";
     if(document.querySelector("#strada.on")) return "strada";
-    if(document.querySelector("#posto.on")) return "posto";
     if(document.querySelector("#negozio.on")) return "negozio";
     if(document.querySelector("#piazza.on")) return "piazza";
     if(document.querySelector("#writer.on")) return "writer";
     if(document.querySelector("#studio.on")) return "studio";
-    /* Casa, Palestra, Live Club, stacca la spina: js/game/luoghi-foto.js */
+    /* Casa, Palestra, il Circolo, stacca la spina: js/game/luoghi-foto.js */
     if(document.querySelector("#luogo.on")) return "luogo";
     if(document.querySelector("#pannello.on")) return "pannello";
     if(document.querySelector("#s-hub.screen.on")) return "hub";
@@ -373,7 +372,6 @@
 
     /* Prima chiudiamo gli overlay di navigazione; poi rendiamo esplicita la
        destinazione hub, così il tasto significa sempre davvero "Mappa". */
-    try{ if($id("posto") && $id("posto").classList.contains("on") && typeof chiudiPosto === "function") chiudiPosto(); }catch(_){}
     try{ if($id("negozio") && $id("negozio").classList.contains("on") && typeof chiudiNegozio === "function") chiudiNegozio(); }catch(_){}
     /* Piazza e Writer non si chiudono col semplice "on" tolto: un'azione può
        restare a metà (freestyle interrotto, strofa non chiusa) e va annullata
@@ -554,7 +552,6 @@
   const HOSTS=[
     {id:"jail",    root:"#adf-jail.on",     head:".adf-jail-top"},
     {id:"strada",  root:"#strada.on",       head:".topbar"},
-    {id:"posto",   root:"#posto.on",         head:".pohead"},
     {id:"negozio", root:"#negozio.on",       head:".nghead"},
     {id:"piazza",  root:"#piazza.on",        head:".phead"},
     {id:"writer",  root:"#writer.on",        head:".whead"},

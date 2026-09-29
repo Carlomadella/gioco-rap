@@ -267,7 +267,7 @@ nel codice, ovunque — e non c'è stato niente da riscrivere.
 | `forms.css` | pannelli e campi del creatore |
 | `creator.css` | sezione avatar: galleria degli otto, categorie, fondali |
 | `actionbar.css` | barra fissa in basso e bottoni |
-| `posto.css` | La Sala: la scena del posto e le schede della gente |
+| `circolo.css` | Il Circolo (la Sala e il Live Club insieme): la foto coi cartelli, gli orari, i quattro riquadri |
 | `hub.css` | la plancia: testata, profilo, mappa, eventi, telefono |
 | `impostazioni.css` | pannello impostazioni, temi, densità |
 
@@ -324,7 +324,8 @@ Vite viene a sistemare** (punto 1 qui sopra): fino ad allora, l'ordine è legge.
 | `fx.js` | suono, notifiche, rapporto, avvio (`window.GAME`) |
 | `skip.js` | salta un giorno, una settimana, un mese |
 | `uscita.js` | uscire da un'azione (✕, ESC, clic fuori) rimettendo a posto il conto |
-| `posto.js` | La Sala: la gente del giro, i rapporti che ci costruisci |
+| `posto.js` | la gente del giro e i rapporti che ci costruisci (si incontra al Circolo) |
+| `circolo.js` | Il Circolo: la pagina, il palco, la serata giocata a momenti, il dopo-serata |
 | `hub.js` | la plancia: testata, profilo, mappa, eventi di oggi, telefono |
 
 **Per ultimo**
