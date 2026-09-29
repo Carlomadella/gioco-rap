@@ -323,6 +323,13 @@ aggiunto le voci 62–64, chiuse anche loro lo stesso giorno insieme alla 57–6
    (27/09/2026)** — branch `task/mappa-si-scorre`: una freccia da 44 sul bordo destro dice che
    la città continua. Il telefono alzato in orizzontale resta legato alla decisione della
    voce 9.
+65. Da decidere (29/09), dal simulatore di bilanciamento su sei carriere da un anno: **il
+   crimine non paga** (−1.129 €, 300 giorni su 364 in carcere), **lavorare non rende** (chi fa
+   il turno ogni giorno chiude con 346 €, chi sta fermo con 897), **la giornata rallenta da
+   0,7 a 3,3 secondi** per chi lavora, **l'hype al tetto** per il musicista, **nessun
+   contratto** in nessuna strategia. Le abilità al tetto sono la stessa cosa della voce 61.
+   Una carriera per strategia: sono indizi, da riprovare su un centinaio. Il dettaglio nel
+   giro del 29/09 in fondo, «Il simulatore di bilanciamento».
 Tutto il resto, da qui in giù, è chiuso: le voci restano perché raccontano cosa è successo.
 
 ---
@@ -6207,3 +6214,72 @@ due scelte di scrittura, non errori.
   punto 26 in `01-mappa-e-citta.md` e nella riga di Los Angeles della lista dell'hub in
   `ROADMAP.md`. Il punto in `implementazioni.md` resta sotto «Da discutere» con la sua scritta
   originale: è la richiesta com'era, e la nota DECISO sotto dice che è chiuso.
+
+## Giro del 29/09/2026 (il simulatore di bilanciamento, sei carriere da un anno)
+
+Branch `task/simulatore-bilanciamento`. `npm run bilanciamento -- --carriere 6`: sei carriere
+da 364 giorni **una dopo l'altra**, una per strategia, col bot del giro del 27/09 dentro al
+browser vero. 35 minuti in tutto, **nessun errore JS, nessuna invariante saltata, nessun
+giorno che non si chiude**. Il rapporto intero è in
+`test-results/bilanciamento-sei/rapporto.md` (non va su git: si rifà col comando).
+
+| a fine anno | musicista | lavoratore | promo | criminale | fermo | caso |
+|---|---|---|---|---|---|---|
+| fan | 28.321 | 7.654 | 56.210 | 98 | 1.066 | 113 |
+| soldi | 537 € | 346 € | 564 € | −1.129 € | 897 € | 194 € |
+| fase | 2 | 1 | 2 | 0 | 0 | 0 |
+| pezzi usciti | 81 | 26 | 103 | 3 | 0 | 0 |
+| minuti per l'anno | 8 | 13 | 6 | 2,5 | 3 | 2,5 |
+
+È **una carriera per strategia**: le voci sotto sono indizi da riprovare su un centinaio
+(una notte di `npm run bilanciamento`), non verdetti. Nessuna blocca la partita.
+
+### Il giro in parallelo si pianta, uno alla volta no
+- **dove** — `frontend/strumenti/simulatore-bilanciamento.js`, `--lavoratori`
+- **cosa succede** — con otto carriere insieme, dopo una trentina le pagine si fermavano
+  («giorno fermo da un minuto») o si ricaricavano a metà («Execution context was destroyed»),
+  e l'avvio di quelle dopo andava in timeout. Una carriera alla volta arriva in fondo.
+- **quanto pesa** — per il gioco niente; per lo strumento vuol dire un centinaio di carriere a
+  notte, non mille: le mille si fanno in più notti con `--riprendi`.
+- **RISOLTO (29/09/2026)** — stesso branch: `--lavoratori` parte da 1, ed è scritto in testa
+  al simulatore.
+
+### Il crimine non paga mai
+- **cosa succede** — il criminale chiude a −1.129 € e passa **300 giorni su 364 in carcere**:
+  18 colpi, 9 arresti. Per 47 volte il colpo non parte perché «troppo caldo». Anche la
+  strategia a caso, che ogni tanto ruba, sta dentro 256 giorni. Un arresto ogni due colpi.
+- **quanto pesa** — da decidere: la Strada oggi è solo un modo di perdere soldi e tempo.
+
+### Lavorare non rende
+- **cosa succede** — chi fa il turno ogni giorno arriva a circa 3.800 € a metà anno e poi
+  scende a **346 €** a fine anno; chi sta fermo chiude con **897 €**. Il lavoratore finisce
+  anche con la lucidità a 1 (gli altri fra 74 e 99).
+- **quanto pesa** — da decidere: guardare dove vanno i soldi nella seconda metà (beat
+  comprati, spese dei pezzi della voce 61).
+
+### La giornata rallenta per chi lavora e chi spinge la promo
+- **cosa succede** — una giornata vera (il «+1») passa da 0,7 a **3,3 secondi** per il
+  lavoratore e da 0,7 a 2 per la promo; le altre strategie restano ferme sotto il secondo.
+  Qualcosa cresce con la carriera senza un tetto. Oggi non ferma niente.
+- **quanto pesa** — da guardare: è la pista più probabile per i giorni che in parallelo non
+  tornavano più.
+
+### L'hype sta al tetto
+- **cosa succede** — il musicista ha l'hype al tetto della sua fase nel **63% delle
+  settimane**: la curva non conta, conta il tetto.
+- **quanto pesa** — da decidere.
+
+### Nessun contratto in un anno
+- **cosa succede** — nessuna delle sei firma un contratto, neanche la promo con 56.210 fan
+  e un primo posto in classifica.
+- **quanto pesa** — da decidere se è voluto per il primo anno.
+
+### Le abilità al tetto in un anno
+- **cosa succede** — scrittura 86,7 (lavoratore) e 88 (promo), presenza 85 (promo): il tetto
+  è 88. È la stessa cosa della voce 61, qui misurata su più strategie.
+
+### Nota, non è un errore: la strategia a caso non pubblica mai
+- **cosa succede** — il rapporto dice «azioni che non partono mai» per live, anteprima,
+  pubblica, mixa e registra della strategia a caso. È il bot: prova a pubblicare senza
+  tracce, e il gioco giustamente dice di no («manca 1 traccia»). Da togliere dai sospetti del
+  rapporto quando il perché è un requisito che manca.
