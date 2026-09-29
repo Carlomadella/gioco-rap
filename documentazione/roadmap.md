@@ -332,9 +332,10 @@ questa tappa non è chiusa.
 Ci si arriva da GOAT (livello ≥ 30, fama ≥ 90, hype ≥ 85, reputazione ≥ 80): studi top tier,
 label e A&R, eventi VIP, casinò, criminalità ad altissimo rischio. Dopo Milano, non prima.
 
-**DECISO (29/09/2026)** — Los Angeles è l'ultima città: dopo non ci si trasferisce in
-un'altra città italiana. Da Los Angeles però **si torna** a Milano e in provincia, quando si
-vuole. La decisione sta sotto al punto «Dopo aver completato Milano… Los Angeles», in
+**DECISO (29/09/2026)** — da Los Angeles non ci si trasferisce in un'altra città
+italiana: si resta lì. Però **si torna** a Milano e in provincia, quando si vuole. Le città
+finali oltre Los Angeles (Chicago, Las Vegas, Atlanta/New York) restano le modalità per dopo
+il gioco, in fondo a questo foglio. La decisione sta sotto al punto «Dopo aver completato Milano… Los Angeles», in
 `../implementazioni/implementazioni.md` (CARLO, «Da discutere»).
 
 ### I · L'uscita sugli store _(tre lavori su cinque)_

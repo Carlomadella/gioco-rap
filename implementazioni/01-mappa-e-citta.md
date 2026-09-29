@@ -83,6 +83,11 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
     Hollywood, casinò (dove i soldi si possono anche perdere in una serata), auto e gioielli, shop esclusivi,
     studi top, eventi internazionali, artisti internazionali, business enormi, criminalità ad altissimo rischio.
 
+    **DECISO (29/09/2026)** — CARLO: da Los Angeles non ci si trasferisce in un'altra città italiana, si
+    resta lì; alle città precedenti invece **si torna**, a Milano e in provincia. La decisione sta sotto al
+    punto «Dopo aver completato milano…» in [`implementazioni.md`](implementazioni.md) (CARLO, «Da
+    discutere»). Le città finali oltre Los Angeles restano le modalità per dopo il gioco.
+
     **Gli studi non sono una skin.** Ogni studio ha una qualità che entra nel calcolo del pezzo: provinciale
     ~40/100, milanese ~75/100, leggendario ~95/100.
 

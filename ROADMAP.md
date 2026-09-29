@@ -116,7 +116,8 @@ Farmare contatti è gameplay, non un menu.
    e i ruoli di Milano (manager, promoter, A&R).
 3. Studi come luoghi con una qualità, dentro il calcolo del pezzo; via ogni residuo di studio proprio.
 4. Milano: soglie di sblocco, luoghi nuovi, prezzi e qualità più alti.
-5. Los Angeles: soglie, luoghi di lusso e di rischio, tetto della carriera.
+5. Los Angeles: soglie, luoghi di lusso e di rischio, tetto della carriera. Da lì non ci si trasferisce in
+   un'altra città italiana, ma a Milano e in provincia si torna (deciso il 29/09/2026).
 
 ---
 
