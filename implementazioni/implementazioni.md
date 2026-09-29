@@ -72,7 +72,16 @@ viene.
 
 **Pesa nel pacchetto o blocca una partita**
 
-_Niente di aperto: `jose` e `zod` sono usate, l'avvio rapido dice quanto ci mette, i
+2. **Il guscio nativo: Electron per Steam, Capacitor per il telefono** — CARLO, «Uscita
+   sugli store (29/09/2026)». Oggi il gioco gira solo nel browser: Steam e gli store
+   vogliono un'app da installare, e nel repo non c'è né Electron né Capacitor. `npm run
+   build` fa già la cartella `dist/` che i due gusci sanno aprire; manca tutto il resto,
+   in quattro passi (il dettaglio sotto al punto). Si porta dietro la metà che manca di
+   «I salvataggi non possono più stare nel localStorage» e le chiavi di «Gli account
+   veri», in `08-uscita-sugli-store.md`, e aspetta la decisione sul telefono **di
+   traverso** (voce 17).
+
+_Il resto è chiuso: `jose` e `zod` sono usate, l'avvio rapido dice quanto ci mette, i
 cinque video del punto sono collegati. I sette video in più sono una decisione, in fondo._
 
 **Piccole e chiare**
@@ -82,74 +91,74 @@ fondo fra le chiuse._
 
 **Lavori lunghi**
 
-2. **Via la lucidità** — CARLO, «togli il parametro «lucidità» e tutto ciò che ne
+3. **Via la lucidità** — CARLO, «togli il parametro «lucidità» e tutto ciò che ne
    consegue». Tocca 17 file del gioco e le formule della qualità del testo: non è una
    riga, va fatto in una task sua con l'audit aggiornato nello stesso commit. Chiude da
    sola anche «l'uscita di venerdì non costa niente, quella a mano sì» di
    problemi-riscontrati.
-3. **La cover «stile emblema»** — CARLO, l'ultima coda del punto «Non è più: "Faccio un
+4. **La cover «stile emblema»** — CARLO, l'ultima coda del punto «Non è più: "Faccio un
    pezzo → +10 fama"» (FATTO in parte): l'editor di copertine a livelli, come l'emblema di
    Black Ops 2. È una pagina a parte. Il resto della coda è chiuso: la cover da file c'era
    dal 07/09, la discografia era già un'app del telefono dal 04/09 (il foglio diceva il
    contrario), e **le remastered e le parti 2** sono FATTE il 21/09 — «Remastered e parti 2»
    sotto «19 · La discografia», `04-musica-e-suoni.md`.
-4. **Beat, Testo e Cabina a mano, il resto in automatico coi malus** — CARLO, «Studio
+5. **Beat, Testo e Cabina a mano, il resto in automatico coi malus** — CARLO, «Studio
    (16/09/2026)»: «l'utente deve poter fare solo le sezioni Beat, Testo e Cabina, poi il
    resto in automatico, però questo porta dei malus». Oggi Mix e Uscita si aprono col
    primo pezzo sul banco e si fanno a mano. L'automatico è una scelta in Cabina («chiudi
    tu il resto»): un mix medio, l'uscita al venerdì, e un malus sulla qualità che si legge
    nel riquadro dei numeri.
-5. **La serata del Live Club giocata a momenti** — CARLO, la coda di «aggiungi le foto di
+6. **La serata del Live Club giocata a momenti** — CARLO, la coda di «aggiungi le foto di
     background dei posti»: nel riferimento `concerto_live` in mezzo alla pagina c'è «al
     terzo pezzo uno in fondo comincia a parlare sopra», tre risposte e la gente che sale o
     scende, più «cambia ordine» nella scaletta. Oggi la serata è la mossa `live` di sempre
     (un numero) scelta sulla foto: i momenti sono il minigioco della Piazza rifatto per il
     palco, e la scaletta con l'ordine vorrebbe un peso in `sim.js`.
-6. **Le card sulla mappa troppo vicine, i pulsanti sopra la mappa troppo grandi** — ALE.
+7. **Le card sulla mappa troppo vicine, i pulsanti sopra la mappa troppo grandi** — ALE.
     Si giudicano a occhio: vanno guardate con uno screenshot, non dal CSS. Stessa cosa per
     **la schermata opzioni da migliorare graficamente** — CARLO, pagina di landing.
-7. ~~**Quando skippi tante ore ci mette troppo** — CARLO.~~ **FATTO (28/09/2026)** — otto
+8. ~~**Quando skippi tante ore ci mette troppo** — CARLO.~~ **FATTO (28/09/2026)** — otto
     ore di attesa da 11,8 a 2,2 secondi: «L'attesa lunga non si trascina», `05-carriera-e-tempo.md`.
-8. **Su LaFamegram non posta nessuno** — CARLO. Oggi gli altri compaiono nel feed solo
+9. **Su LaFamegram non posta nessuno** — CARLO. Oggi gli altri compaiono nel feed solo
     quando l'evento riguarda te (il fan, il giornalista, la Strada: `lafamegramEventi`);
     nessun contatto della Sala o rivale posta per conto suo. Prima si decide chi posta e
     cosa, poi si fa.
-9. **Il pub e la pubblicità come primo modo di fare hype** — ALE, la coda del punto
+10. **Il pub e la pubblicità come primo modo di fare hype** — ALE, la coda del punto
     sull'hype (FATTO il 06/09 per il resto, in `fatte.md`): oggi non esistono né come
     luogo né come azione.
-10. **I collettivi di rapper** — CARLO, «Studio (16/09/2026)»: «fai in modo che si possano
+11. **I collettivi di rapper** — CARLO, «Studio (16/09/2026)»: «fai in modo che si possano
     creare collettivi di rapper». Nel gioco non esiste un gruppo: ci sono i rivali della
     classifica e la gente della Sala, uno per uno. Prima si scrive cos'è un collettivo
     (chi ci entra, cosa dà — pezzi in comune, hype condiviso, un nome in classifica), poi
     si fa.
-11. **Il joint album con altri rapper, su chiamata di un produttore** — CARLO, «Studio
+12. **Il joint album con altri rapper, su chiamata di un produttore** — CARLO, «Studio
     (16/09/2026)»: «fai in modo che un produttore possa chiamarti per fare un joint album
     con altri rapper». La chiamata è un evento del telefono; l'album, più pezzi in fila
     con più feat, oggi non esiste come oggetto. Viene dopo i collettivi.
 
 **Decisioni prima che lavori**
 
-12. **I rapporti coi beatmaker che vanno in negativo** — ALE. In `posto.js` il rapporto
+13. **I rapporti coi beatmaker che vanno in negativo** — ALE. In `posto.js` il rapporto
     scende (`p.rel--`) ma è tenuto fra 0 e 5: sotto zero non va. Prima di farlo va deciso
     cosa succede a −1 (non ti vende più? ti fa pagare di più?).
-13. **Non sempre far scorrere una giornata ridà l'energia** e **la legacy** — CARLO. Sono
+14. **Non sempre far scorrere una giornata ridà l'energia** e **la legacy** — CARLO. Sono
     regole di gioco nuove: prima si scrive come funzionano, poi si fa.
-14. **Lo Shop in provincia, con limitazioni** — ALE. Lo Shop c'è già dal primo giorno, e
+15. **Lo Shop in provincia, con limitazioni** — ALE. Lo Shop c'è già dal primo giorno, e
     dal 21/09 sette capi si sbloccano con la carriera («Capi che si sbloccano», fra le
     chiuse): è una limitazione, ma per carriera, non per città. Va ancora deciso cosa **non**
     si vende in provincia (vedi la RISPOSTA sotto al punto).
-15. **La troupe** — CARLO, «Da discutere»: «il player può decidere se avere una troupe:
+16. **La troupe** — CARLO, «Da discutere»: «il player può decidere se avere una troupe:
     manager, social media manager, fonico personale, beatmaker personale, videomaker». Il
     fonico e il beatmaker «personali» sono già gente della Sala con un rapporto che sale;
     il manager, il social media manager e il videomaker non esistono. Prima si decide cosa
     fa ognuno e quanto costa a settimana.
-16. **Le decisioni tue**, senza le quali il resto non si muove: se dopo Milano e Los
+17. **Le decisioni tue**, senza le quali il resto non si muove: se dopo Milano e Los
     Angeles si può tornare indietro (DA DISCUTERE); la pagina di Mycol e il «tuo artista»
     nella landing; se il gioco sugli store gira anche **di traverso** (nel repo non c'è un
     manifest né un `orientation`, da problemi-riscontrati); e se cancellare gli undici
     branch già uniti in `main` (`git branch --merged main` li elenca, da
     `test/vitest-playwright-gate` a `task/studio-cinque-linguette`), anche sul remoto.
-17. **Come arriva MakeHuman a chi installa il gioco** — dal punto su Avaturn e il camerino
+18. **Come arriva MakeHuman a chi installa il gioco** — dal punto su Avaturn e il camerino
     (FATTO il 20/09): il camerino MakeHuman legge il dataset di `media/makehuman-editor-v1`
     (2,8 GB), che sta fuori da git e fuori dal pacchetto per gli store
     (`FUORI_DAL_PACCHETTO` in `strumenti/build.js`). In un pacchetto pulito la strada «crea
@@ -157,7 +166,7 @@ fondo fra le chiuse._
     (solo i proxy e i target che il camerino usa davvero — il catalogo UI ne conta 468 su
     1.717), un download al primo avvio, o il dataset intero. Va deciso prima dell'uscita,
     insieme al progetto Avaturn nostro (oggi gira sul demo pubblico).
-18. **I sette video che nessun punto chiede** — la coda delle transizioni video (FATTO il
+19. **I sette video che nessun punto chiede** — la coda delle transizioni video (FATTO il
     20/09 per i cinque del punto): palestra, Milano, club, shop, trasferta, live, più
     `video_transizione_entrata_in_studio` che è un doppione dello studio. Sono 22 MB in
     `frontend/media/video/Transizioni di scena/` che viaggiano nel pacchetto per gli
@@ -191,12 +200,12 @@ detto, la richiesta com'era scritta in [`fatte.md`](fatte.md):
 - **L'avvio rapido ci mette due minuti e non lo dice** — FATTO 19/09: «L'avvio rapido: la
   schermata «Preparo il tuo artista»», `02-interfaccia-e-telefono.md`.
 - **Le foto dei posti che non hanno ancora una pagina** — FATTO 19/09: «Le pagine dei
-  posti sulla loro foto», `02-interfaccia-e-telefono.md`. La serata a momenti è la voce 5.
+  posti sulla loro foto», `02-interfaccia-e-telefono.md`. La serata a momenti è la voce 6.
 - **Fra i 980 e i 1180 punti la barra della plancia trabocca** — FATTO 20/09, con la
   plancia a 1280 × 800 e 1366 × 768: «La fascia della plancia fra 980 e 1240, e la plancia
   a 1280 × 800», `02-interfaccia-e-telefono.md`.
 - **Le transizioni video** — FATTO 20/09 (lo Studio dal 16/09): «Le transizioni video: gli
-  altri quattro», `02-interfaccia-e-telefono.md`. I sette video in più sono la voce 18.
+  altri quattro», `02-interfaccia-e-telefono.md`. I sette video in più sono la voce 19.
 - **L'evento fatto esce dall'agenda** — FATTO 20/09: `02-interfaccia-e-telefono.md`.
 - **I prezzi dei beat per fama del beatmaker** — FATTO 20/09: `04-musica-e-suoni.md`.
 - **Si parte con tutti i parametri a 1** — FATTO 20/09: `05-carriera-e-tempo.md`.
@@ -462,6 +471,48 @@ _Le idee proposte chiudendo il reparto Vestiti («Lo Shop: il reparto Vestiti» 
 21/09/2026 e stanno in `fatte.md` — «Lo stile che conta», poi «Capi che si sbloccano» e
 «Le offerte della settimana» insieme — con la richiesta del 21/09 sullo Shop solo vestiti
 coi filtri (chiusa lo stesso giorno)._
+
+#### Uscita sugli store (29/09/2026)
+
+1. il guscio nativo: Electron e Capacitor non sono ancora nel repo. Oggi il gioco si
+   gioca solo nel browser (`npm run dev`, `localhost:8000`), ma Steam e gli store del
+   telefono non accettano un sito: vogliono un programma da installare (su Steam un `.exe`
+   per Windows, un'app per Mac e Linux) e un'app vera per il telefono (`.ipa` per iPhone,
+   `.aab` per Android). Il guscio prende il gioco così com'è e lo fa girare dentro un'app
+   nativa: una finestra di browser senza barra degli indirizzi, travestita da programma.
+   **Electron** è quello per il computer, quindi per Steam (lo usano Discord, VS Code,
+   Slack, e mezzo genere gestionale su Steam); **Capacitor** è quello per iPhone e
+   Android. Il codice del gioco non cambia: il guscio ci aggiunge l'icona,
+   l'installazione, lo schermo intero e l'accesso al dispositivo — i file dei salvataggi,
+   Steam Cloud, i login di Apple e Google.
+
+   **C'è già**: `npm run build` fa la cartella `dist/` coi percorsi relativi, cioè nella
+   forma che Electron e Capacitor sanno aprire («Il build vero», FATTO il 31/08/2026, in
+   `08-uscita-sugli-store.md`).
+
+   **Da fare, in ordine:**
+   1. **installarli** nel progetto: due dipendenze nuove, ognuna con la sua riga in
+      `documentazione/dipendenze.md`;
+   2. **configurarli**: nome, icona, finestra e schermo intero sul computer; orientamento
+      sul telefono, che aspetta la decisione su **di traverso** (in «Da fare adesso», fra
+      «Le decisioni tue»: oggi nel repo non c'è un manifest né un `orientation`);
+   3. **produrre i file installabili e provarli davvero**: su Windows e su Mac, e su un
+      telefono vero — che chiude anche la coda della responsività, «Il giro su un telefono
+      vero»;
+   4. **collegare le cose native**: `save()` che scrive un file nella cartella dell'app e il
+      cloud nostro al posto del solo `localStorage` (la metà che manca di «I salvataggi non
+      possono più stare nel localStorage»), Steam Cloud, e le chiavi di Steam, Apple e
+      Google (le uniche che mancano a «Gli account veri»: senza, quei canali rispondono
+      `501`).
+
+   **Collegati**: il dataset di MakeHuman (2,8 GB, fuori dal pacchetto: «Come arriva
+   MakeHuman a chi installa il gioco») e i sette video che nessuna riga carica — tutti e due
+   decidono quanto pesa quello che il guscio impacchetta.
+
+   **Da sapere prima di cominciare**: per iPhone il pacchetto si fa solo da un Mac con
+   Xcode e serve l'account Apple Developer (99 $ l'anno); Google Play chiede 25 $ una volta
+   sola; su Steam ogni gioco paga 100 $ di Steam Direct. Le chiavi del punto 4 si prendono
+   quando l'app è registrata sugli store.
 
 #### Da discutere
 
