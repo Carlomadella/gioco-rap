@@ -36,7 +36,7 @@
     provincia:{basso:.82, medio:.80, alto:.76}
   });
 
-  const PUBLIC_PLACES = new Set(["studio","pizzeria","concerti","beat","crimin","fabbrica","palestra","shop"]);
+  const PUBLIC_PLACES = new Set(["studio","pizzeria","beat","crimin","fabbrica","palestra","shop"]);
   const EVENT_ICON = {basso:"·", medio:"!", alto:"◆"};
   const EVENT_TINT = {basso:["#3B4756","#1E242D"], medio:["#8A6C35","#332919"], alto:["#8E2C2C","#351515"]};
 
@@ -499,7 +499,7 @@
         const f = randInt(1,5); G.fans += f; addStat("hype",1,0,100);
         return {t:"Qualcuno ti riconosce al volo e mette una storia. +"+f+" follower.",c:"good"};
       }},
-    {id:"caffe_al_volo", title:"Caffè al volo", level:"basso", weight:2.1, places:["studio","beat","pizzeria","concerti","fabbrica"],
+    {id:"caffe_al_volo", title:"Caffè al volo", level:"basso", weight:2.1, places:["studio","beat","pizzeria","fabbrica"],
       apply(){ G.money -= 4; addStat("wellbeing",1,0,100); return {t:"Quattro euro e cinque minuti di chiacchiere. Ti rimette un minimo in asse.",c:""}; }},
     {id:"cavo_rotto", title:"Cavo rotto", level:"basso", weight:1.6, places:["studio"],
       apply(){ G.money -= 9; return {t:"Un cavo decide di morire proprio oggi. −9 € e si riparte.",c:""}; }},
@@ -527,7 +527,7 @@
         addStat("wellbeing",-2,0,100);
         return {t:"Una pattuglia ti tiene lì qualche minuto e prende nota delle facce. Heat +2, benessere −2.",c:"bad"};
       }},
-    {id:"serata_fredda", title:"Serata fredda", level:"medio", weight:1.5, places:["concerti"], maxPhase:2,
+    {id:"serata_fredda", title:"Serata fredda", level:"medio", weight:1.5, places:["beat"], maxPhase:2,
       apply(){ addStat("hype",-2,0,100); addStat("wellbeing",-3,0,100);
         return {t:"La sala è più vuota del previsto e lo senti addosso. Hype −2, benessere −3.",c:"bad"}; }},
     {id:"spesa_imprevista", title:"Spesa imprevista", level:"medio", weight:1.15, minPhase:1, publicOnly:true,
@@ -556,7 +556,7 @@
           return {t:"Ti fermano cento metri dopo. Heat +9, benessere −6.",c:"bad"};
         }}
       ]},
-    {id:"lite_dietro_palco", title:"Lite dietro il palco", level:"alto", weight:1.9, places:["concerti"], minFans:500,
+    {id:"lite_dietro_palco", title:"Lite dietro il palco", level:"alto", weight:1.9, places:["beat"], minFans:500,
       description:() => "Dietro il palco due persone del giro stanno per venire alle mani. Una delle due ti chiama per nome e ti tira in mezzo. Se fai finta di niente lo vedono tutti.",
       options:() => [
         {n:"Ti metti in mezzo", d:"Presenza e sangue freddo decidono come finisce", run(){
@@ -593,7 +593,7 @@
           return {t:"Hai chiuso la porta e riaperto il quaderno. Benessere −8, lucidità +2.",c:"bad"};
         }}
       ]},
-    {id:"promoter_metropoli", title:"Proposta del promoter", level:"alto", weight:1.25, scenes:["metropoli"], places:["concerti"], minPhase:2, minFans:5000,
+    {id:"promoter_metropoli", title:"Proposta del promoter", level:"alto", weight:1.25, scenes:["metropoli"], places:["beat"], minPhase:2, minFans:5000,
       description:ctx => "Un promoter di <b>"+esc(ctx.city)+"</b> ti prende da parte. Ha una data grossa libera fra poco, ma vuole una risposta adesso: entri pagando una quota oppure lasci il posto a un altro.",
       options:() => [
         {n:"Comprati lo spazio", d:"−500 €, ma rete e hype salgono", run(){

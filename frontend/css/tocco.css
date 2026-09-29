@@ -31,7 +31,7 @@
 @media (pointer:coarse), (max-width:900px){
 
   /* ---- le croci per chiudere: erano tutte fra i 34 e i 38 ---- */
-  .dclose,.pox,.ngx,.phead .px,.whead .wx,.sx,.sheet2 .mx{width:44px;height:44px}
+  .dclose,.ngx,.phead .px,.whead .wx,.sx,.sheet2 .mx{width:44px;height:44px}
 
   /* ---- la barra in alto ---- */
   /* niente min-width qui dentro: su un elemento flessibile abbassa il minimo

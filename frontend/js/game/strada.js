@@ -270,8 +270,8 @@ const INCONTRI = [
       ]};
   }},
 
-  {id:"nemico", peso:1, liv:"alto", req:() => G.rivals.some(r => r.storia && r.storia.indexOf("Sala") >= 0), crea(){
-    const r = G.rivals.find(x => x.storia && x.storia.indexOf("Sala") >= 0);
+  {id:"nemico", peso:1, liv:"alto", req:() => G.rivals.some(r => r.storia && /Sala|Circolo/.test(r.storia)), crea(){
+    const r = G.rivals.find(x => x.storia && /Sala|Circolo/.test(x.storia));
     return {t:"È finita male, e te lo ritrovi davanti", d:r.n + " ti vede. Vi conoscevate da prima, poi non più.",
       opts:[
         {n:"Fai finta di niente", d:"La strada è larga", run(){

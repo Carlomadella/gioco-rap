@@ -506,7 +506,7 @@ function studioBeatFatto(p){
 /* Il perché sta in una frase, non in un numero secco: «35 €» su un bottone
    spento non dice se te ne mancano trenta o se costa e basta. */
 function studioBeatPronto(p){
-  if(p.rel < 1) return {ok:false, perche:"Prima diventate contatti, alla Sala"};
+  if(p.rel < 1) return {ok:false, perche:"Prima diventate contatti, al Circolo"};
   if(studioBeatFatto(p)) return {ok:false, perche:"Ci ha già lavorato questa settimana"};
   const c = studioBeatPrezzo(p);
   if(G.money < c) return {ok:false, perche:"Ti servono " + fmt(c) + " €, ne hai " + fmt(G.money)};
@@ -858,7 +858,7 @@ function studioSezBeat(){
             vCls: p.rel >= 1 ? "" : "calmo"
           });
         }).join("")
-      : studioVuoto("Non conosci ancora nessun beatmaker. Passa <b>dalla Sala</b>: è lì che si trovano."));
+      : studioVuoto("Non conosci ancora nessun beatmaker. Passa <b>dal Circolo</b>: è lì che si trovano."));
 
   /* Il centro è quello del riferimento `studio_creazione_beat`: **le schede
      dei tre beat sul banco**, non una riga di testo. Copertina, genere, bpm,
@@ -1018,7 +1018,7 @@ function studioSezCabina(){
     stScelta({attr:' data-fonico=""', on:!fon, mini:stSagoma(),
       n:"da solo", d:"quello che sai fare tu",
       v:"+0", vCls:"calmo"}) +
-    (gente.length ? "" : studioVuoto("Non conosci ancora nessun fonico. <b>Alla Sala</b> ce ne gira più di uno.")) +
+    (gente.length ? "" : studioVuoto("Non conosci ancora nessun fonico. <b>Al Circolo</b> ce ne gira più di uno.")) +
     /* «CON CHI»: il feat, sotto al fonico — stesse caselle, stesso «da solo».
        Due porte (idea D3): chi conosci accetta sempre e non costa niente;
        i rapper della classifica si pagano e possono dire di no. */
@@ -1147,7 +1147,7 @@ function studioSezBanco(){
       n:"da solo", d:"il mix lo fai tu",
       v:"+0", vCls:"calmo"}) +
     (studioGente("fonico").length ? ""
-      : studioVuoto("Non conosci ancora nessun fonico. <b>Alla Sala</b> ce ne gira più di uno.")));
+      : studioVuoto("Non conosci ancora nessun fonico. <b>Al Circolo</b> ce ne gira più di uno.")));
 
   let mid;
   const remaster = typeof remasterPannello === "function" ? remasterPannello() : "";

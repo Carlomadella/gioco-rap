@@ -123,7 +123,7 @@ describe("un rivale della classifica e il suo omonimo alla Sala", () => {
     expect(p.G.rivals.length).toBe(quanti);
     expect(p.G.rivals.filter(r => r.n === nome).length).toBe(1);
     expect(p.G.gente[0].rivaleId).toBe(p.G.rivals[0].id);
-    expect(p.G.rivals[0].storia).toContain("Sala");
+    expect(p.G.rivals[0].storia).toContain("Circolo");
   });
 
   it("la Sala non pesca piu' un nome che sta in classifica, e la classifica non pesca uno della Sala", () => {

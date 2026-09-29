@@ -15,7 +15,13 @@
 
    In provincia c'è poca gente e pochi ruoli, di proposito: il giornalista si
    affaccia solo quando qualcuno comincia a sapere chi sei, e manager, promoter e
-   uffici stampa non ci sono proprio. Quelli sono Milano. */
+   uffici stampa non ci sono proprio. Quelli sono Milano.
+
+   Dal 29/09/2026 la Sala non ha più una pagina sua: con il Live Club è
+   diventata **Il Circolo** (js/game/circolo.js), e la gente si incontra nel
+   riquadro «1. La gente» di quella pagina. Qui resta tutto quello che la
+   gente È — chi arriva, i caratteri, i dialoghi, quello che la rete ti dà —
+   e le mosse si descrivono come dati (`vociDi`), che il Circolo disegna. */
 "use strict";
 
 const POSTO_MAX = 8;                  /* quanta gente può girare in provincia */
@@ -300,7 +306,7 @@ const DIALOGHI = {
         ["Gli dici di farle tutte e due comunque", -1, "gasato"]]},
     {t:"«La gente in sala fa troppo rumore, non riesco a lavorare bene.»",
      o:[["Fai silenzio e provi a far calmare gli altri", 2, "pratico"],
-        ["Gli dici che è la Sala, è sempre stata così", 0, "diffidente"],
+        ["Gli dici che è il Circolo, è sempre stato così", 0, "diffidente"],
         ["Gli dici che è un problema suo", -1, null]]},
     {t:"Ti chiede se hai mai pensato di imparare a mixare da solo.",
      o:[["Gli dici che preferisci lasciarlo fare a chi lo sa fare", 2, "pratico"],
@@ -459,8 +465,10 @@ function sistemaGente(){
   }
 }
 
-/* Chi c'è oggi: tre facce, sempre le stesse dentro la settimana. */
-function presentiOggi(){
+/* Chi c'è oggi: tre facce, sempre le stesse dentro la settimana. Il Circolo
+   ne chiede di più la sera (`quanti`): l'ordine è lo stesso, quindi chi c'è
+   di pomeriggio c'è anche stasera, e se ne aggiungono altri. */
+function presentiOggi(quanti){
   sistemaGente();
   const sett = typeof totalWeeks === "function" ? totalWeeks() : G.week;
   const vivi = G.gente.filter(p => !p.via);
@@ -470,125 +478,39 @@ function presentiOggi(){
     /* chi conosci meglio è più facile trovarlo: il giro è quello */
     return (kb + b.rel * 12) - (ka + a.rel * 12);
   });
-  return ord.slice(0, 3);
+  return ord.slice(0, quanti || 3);
 }
 
-/* ==================== LA STANZA ==================== */
-/* Una sagoma in piedi: non è il ritratto, è la figura di chi sta nella stanza. */
-function poSagoma(p, x, terra, s){
-  const c = p.col, cd = shade2(c, -0.45), sk = p.skin;
-  return '<g transform="translate(' + x + ',' + terra + ') scale(' + s + ')">' +
-    '<ellipse cx="0" cy="2" rx="15" ry="4" fill="#000" opacity=".4"/>' +
-    '<path d="M-7,-36 L-9,-2 L-2.6,-2 L-1.4,-36 Z" fill="#15171E"/>' +
-    '<path d="M7,-36 L9,-2 L2.6,-2 L1.4,-36 Z" fill="#15171E"/>' +
-    '<path d="M-12,-34 C-13.6,-56 -12,-66 -7.6,-70 L7.6,-70 C12,-66 13.6,-56 12,-34 Z" fill="' + c + '"/>' +
-    '<path d="M-12,-34 C-13,-52 -12,-63 -8,-68 L-3,-68 L-4,-34 Z" fill="' + cd + '" opacity=".6"/>' +
-    '<circle cx="0" cy="-79" r="9.4" fill="' + sk + '"/>' +
-    '<path d="M-9.4,-81 C-9.4,-88.6 -5.2,-91.6 0,-91.6 C5.2,-91.6 9.4,-88.6 9.4,-81 Z" fill="#14110F"/>' +
-    '</g>';
-}
-
-function scenaSala(chi){
-  window.__POSE = "fermo";
-  const corpo = window.ARTIST_BODY ? window.ARTIST_BODY() : "";
-  const col = (window.ARTIST && window.ARTIST.color) || "#FF5A36";
-  let gente = "";
-  /* stanno in piedi come te: stessa altezza d'uomo, un po' più indietro */
-  const posti = [[420, 1.18], [516, 1.10], [318, 1.02]];
-  chi.forEach((p, i) => { const [x, s] = posti[i % posti.length]; gente += poSagoma(p, x, 238, s); });
-
-  return '<svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg">' +
-    '<defs>' +
-      '<linearGradient id="sa-muro" x1="0" y1="0" x2="0" y2="1">' +
-        '<stop offset="0" stop-color="#221A2E"/><stop offset="1" stop-color="#14101C"/></linearGradient>' +
-      '<linearGradient id="sa-terra" x1="0" y1="0" x2="0" y2="1">' +
-        '<stop offset="0" stop-color="#1A1622"/><stop offset="1" stop-color="#0E0C13"/></linearGradient>' +
-      '<radialGradient id="sa-lamp" cx=".5" cy=".5" r=".5">' +
-        '<stop offset="0" stop-color="#FFD98A" stop-opacity=".34"/>' +
-        '<stop offset="1" stop-color="#FFD98A" stop-opacity="0"/></radialGradient>' +
-      '<radialGradient id="sa-alone" cx=".5" cy=".5" r=".5">' +
-        '<stop offset="0" stop-color="' + col + '" stop-opacity=".45"/>' +
-        '<stop offset="1" stop-color="' + col + '" stop-opacity="0"/></radialGradient>' +
-    '</defs>' +
-    '<rect width="640" height="260" fill="url(#sa-muro)"/>' +
-    /* pannelli fonoassorbenti sul muro */
-    '<g fill="#2C2338" opacity=".85">' +
-      '<rect x="40" y="34" width="46" height="46" rx="4"/><rect x="96" y="34" width="46" height="46" rx="4"/>' +
-      '<rect x="40" y="90" width="46" height="46" rx="4"/><rect x="96" y="90" width="46" height="46" rx="4"/>' +
-      '<rect x="498" y="30" width="52" height="52" rx="4"/><rect x="560" y="30" width="52" height="52" rx="4"/>' +
-    '</g>' +
-    /* poster e luce al neon */
-    '<rect x="230" y="28" width="86" height="62" rx="3" fill="#31213F"/>' +
-    '<rect x="238" y="36" width="70" height="34" rx="2" fill="' + col + '" opacity=".55"/>' +
-    '<rect x="238" y="76" width="44" height="5" rx="2" fill="#E8E3F5" opacity=".5"/>' +
-    '<rect x="352" y="26" width="120" height="8" rx="4" fill="#FF7BD5" opacity=".8"/>' +
-    '<ellipse cx="412" cy="52" rx="120" ry="46" fill="url(#sa-lamp)"/>' +
-    /* pavimento e tappeto */
-    '<rect y="188" width="640" height="72" fill="url(#sa-terra)"/>' +
-    '<ellipse cx="300" cy="238" rx="240" ry="20" fill="#241C2E" opacity=".7"/>' +
-    /* banco col mixer */
-    '<g>' +
-      '<rect x="30" y="150" width="176" height="12" rx="3" fill="#2A2233"/>' +
-      '<rect x="42" y="162" width="10" height="74" fill="#1B1622"/>' +
-      '<rect x="184" y="162" width="10" height="74" fill="#1B1622"/>' +
-      '<rect x="52" y="132" width="132" height="20" rx="3" fill="#191420"/>' +
-      '<g fill="#4B4160">' +
-        '<rect x="60" y="138" width="4" height="9"/><rect x="70" y="138" width="4" height="9"/>' +
-        '<rect x="80" y="138" width="4" height="9"/><rect x="90" y="138" width="4" height="9"/>' +
-        '<rect x="100" y="138" width="4" height="9"/><rect x="110" y="138" width="4" height="9"/></g>' +
-      '<circle cx="140" cy="142" r="5" fill="#6B5C86"/><circle cx="156" cy="142" r="5" fill="#6B5C86"/>' +
-      '<rect x="118" y="104" width="52" height="30" rx="3" fill="#0E0B14"/>' +
-      '<rect x="122" y="108" width="44" height="22" fill="#3DC7FF" opacity=".35"/>' +
-    '</g>' +
-    /* casse */
-    '<g fill="#1D1826">' +
-      '<rect x="558" y="120" width="58" height="116" rx="5"/>' +
-      '<circle cx="587" cy="150" r="14" fill="#12101A"/><circle cx="587" cy="150" r="5" fill="#2E2840"/>' +
-      '<circle cx="587" cy="200" r="20" fill="#12101A"/><circle cx="587" cy="200" r="7" fill="#2E2840"/>' +
-    '</g>' +
-    /* divano */
-    '<g fill="#2B2036">' +
-      '<rect x="248" y="186" width="150" height="34" rx="8"/>' +
-      '<rect x="248" y="166" width="150" height="26" rx="8" fill="#332742"/>' +
-    '</g>' +
-    gente +
-    '<ellipse cx="150" cy="236" rx="70" ry="16" fill="url(#sa-alone)"/>' +
-    '<g transform="translate(150,236) scale(0.30)">' + corpo + '</g>' +
-    '</svg>';
-}
-
-/* ==================== LA SCHERMATA ==================== */
+/* ==================== DOVE SI INCONTRA ====================
+   La Sala è un pezzo del Circolo (js/game/circolo.js): chi chiama
+   `apriPosto()` — l'agenda del telefono, un evento che dice «passa dalla
+   Sala» — apre il Circolo sul riquadro della gente. */
 let POSTO_PARLA = null;      /* con chi stai parlando, e quale situazione */
-let POSTO_APERTA = null;     /* quale scheda è aperta nella lista */
+let POSTO_APERTA = null;     /* chi è selezionato nel riquadro della gente */
 
 function apriPosto(){
   sistemaGente();
   POSTO_PARLA = null;
-  $("posto").classList.add("on");
-  renderPosto();
+  if(typeof apriLuogo === "function") apriLuogo("circolo", {pannello:"gente"});
 }
 function chiudiPosto(){
   POSTO_PARLA = null;
-  $("posto").classList.remove("on");
+  if(typeof chiudiLuogo === "function") chiudiLuogo();
   save(); renderGioco();
   if(typeof renderHub === "function") renderHub();
 }
 
-/* Il nome è lungo di proposito: nel gioco tutti i file dividono lo stesso
-   scope, e un «bottone» qualsiasi qui dentro pesterebbe i piedi a quello delle
-   impostazioni. */
-function poTasto(p, tipo, testo, sotto, costo, pronto){
+/* Una mossa verso una persona, come dato: cosa c'è scritto, sotto, quanto
+   costa e se si può. Il gate del tempo reale si guarda qui, una volta sola,
+   perché il Circolo e chiunque altro la disegni dicano la stessa cosa. */
+function poVoce(p, tipo, testo, sotto, costo, pronto){
   const gate=poTempoGate(tipo);
   const puo=!!pronto && gate.ok;
   const sottoFinale=(!!pronto && !gate.ok)
     ? poTempoPerche(gate)
     : sotto;
   const costoFinale=poTempoCosto(tipo,costo);
-
-  return '<button class="poazione' + (puo ? '' : ' no') + '" data-az="' + tipo + '" data-p="' + p.id + '"' +
-    (puo ? '' : ' disabled') + '><span class="n">' + testo + '</span>' +
-    '<span class="d">' + sottoFinale + '</span>' +
-    (costoFinale ? '<span class="c">' + costoFinale + '</span>' : '') + '</button>';
+  return {tipo:tipo, p:p.id, n:testo, sotto:sottoFinale, costo:costoFinale, puo:puo};
 }
 
 /* ============ IL BEAT SUL TAVOLO (punto 20 e 22) ============
@@ -633,11 +555,11 @@ function costoVideo(p){
 }
 
 /* quello che puoi chiedere a una persona dipende da quanto la conosci */
-function azioniDi(p){
-  const r = POSTO_RUOLI[p.ruolo];
-  let out = poTasto(p, "parla", "Fatti due parole",
+function vociDi(p){
+  const out = [];
+  out.push(poVoce(p, "parla", "Parla",
     p.rel >= 5 ? "Ci conosciamo ormai" : "Sali di un gradino con " + p.n, poEtichetta("parla"),
-    G.energy >= PO_COSTO.parla);
+    G.energy >= PO_COSTO.parla));
 
   /* Il numero: si scambia con chi lavora sui pezzi — chi fa i beat e chi sta
      al mixer — perche' sono quelli che poi ti scrivono per lavoro. A un
@@ -645,12 +567,12 @@ function azioniDi(p){
      rilascia un'intervista: non e' la stessa cosa.
      Serve almeno un contatto: il numero non lo si da' a uno appena visto. */
   if(p.ruolo === "beatmaker" || p.ruolo === "fonico" || p.ruolo === "videomaker"){
-    out += p.numero
-      ? poTasto(p, "numero", "Avete il numero", "Ti scrive in chat", "", false)
-      : poTasto(p, "numero", "Scambiatevi il numero",
+    out.push(p.numero
+      ? poVoce(p, "numero", "Avete il numero", "Ti scrive in chat", "", false)
+      : poVoce(p, "numero", "Scambia il numero",
           p.rel >= 1 ? "Da qui in poi ti scrive in chat" : "Serve almeno un contatto",
           poEtichetta("numero"),
-          p.rel >= 1 && G.energy >= PO_COSTO.numero);
+          p.rel >= 1 && G.energy >= PO_COSTO.numero));
   }
 
   if(p.ruolo === "beatmaker"){
@@ -658,97 +580,51 @@ function azioniDi(p){
        catalogo di un'altra schermata. Finche' ce l'hai sul tavolo resta li':
        lo ascolti, lo compri o lo lasci, e solo dopo te ne fa sentire un altro. */
     const sul = beatSulTavolo(p);
-    out += poTasto(p, "beat", "Fatti sentire un beat",
+    out.push(poVoce(p, "beat", "Chiedi un beat",
       sul ? "Ce n'e' gia' uno sul tavolo: ascoltalo, prendilo o lascialo"
         : p.rel >= 1 ? "Te lo mette nel mercato, a prezzo da amico" : "Serve almeno un contatto",
-      "gratis", p.rel >= 1 && !sul);
-    out += poTasto(p, "sessione", "Sessione in studio",
+      "gratis", p.rel >= 1 && !sul));
+    out.push(poVoce(p, "sessione", "Sessione in studio",
       p.rel >= 2 ? "Un pomeriggio in sala: esce un beat vostro" : "Serve che siate amici",
-      poEtichetta("sessione", "60 €"), p.rel >= 2 && G.energy >= PO_COSTO.sessione && G.money >= 60);
+      poEtichetta("sessione", "60 €"), p.rel >= 2 && G.energy >= PO_COSTO.sessione && G.money >= 60));
   }
   if(p.ruolo === "fonico"){
-    out += poTasto(p, "mix", "Portagli un pezzo",
+    out.push(poVoce(p, "mix", "Portagli un pezzo",
       p.rel >= 2 ? "Te lo mixa lui, meglio di come lo faresti tu" : "Serve che siate amici",
-      poEtichetta("mix"), p.rel >= 2 && G.energy >= PO_COSTO.mix && G.songs.some(s => !s.mixed));
+      poEtichetta("mix"), p.rel >= 2 && G.energy >= PO_COSTO.mix && G.songs.some(s => !s.mixed)));
   }
   if(p.ruolo === "rapper"){
     const cd = (typeof totalWeeks === "function" ? totalWeeks() : G.week) - p.feat;
-    out += poTasto(p, "feat", "Proponi un pezzo insieme",
+    out.push(poVoce(p, "feat", "Proponi un feat",
       p.rel >= 3 ? (cd < 6 ? "Ne avete fatto uno da poco" : "Un feat vero, con la sua gente dietro")
         : "Serve che siate collaboratori",
-      poEtichetta("feat"), p.rel >= 3 && cd >= 6 && G.energy >= PO_COSTO.feat);
+      poEtichetta("feat"), p.rel >= 3 && cd >= 6 && G.energy >= PO_COSTO.feat));
   }
   /* punto 10: il videomaker gira il video di un pezzo che è già fuori. Un
      pezzo, un video: non è una leva da tirare due volte sullo stesso. */
   if(p.ruolo === "videomaker"){
     const senza = daGirare();
-    out += poTasto(p, "video", "Fategli un video",
+    out.push(poVoce(p, "video", "Fategli un video",
       p.rel < 2 ? "Serve che siate amici"
         : (senza ? "«" + senza.t + "»: il pezzo continua a girare" : "Ogni pezzo fuori ha già il suo video"),
       poEtichetta("video", costoVideo(p) + " €"),
-      p.rel >= 2 && !!senza && G.energy >= PO_COSTO.video && G.money >= costoVideo(p));
+      p.rel >= 2 && !!senza && G.energy >= PO_COSTO.video && G.money >= costoVideo(p)));
   }
   if(p.ruolo === "giornalista"){
-    out += poTasto(p, "intervista", "Fatti intervistare",
+    out.push(poVoce(p, "intervista", "Fatti intervistare",
       p.rel >= 1 ? "Un pezzo sul giro locale: la gente legge" : "Serve almeno un contatto",
-      poEtichetta("intervista"), p.rel >= 1 && G.energy >= PO_COSTO.intervista);
+      poEtichetta("intervista"), p.rel >= 1 && G.energy >= PO_COSTO.intervista));
   }
-  const sulTavolo = p.ruolo === "beatmaker" ? beatSulTavolo(p) : null;
-  return '<div class="poaz">' + out + '</div>' +
-    (sulTavolo ? rigaBeatSala(sulTavolo) : '') +
-    '<p class="poruolo">' + r.d + '</p>';
+  return out;
 }
 
-function schedaPersona(p, aperta){
-  const r = POSTO_RUOLI[p.ruolo];
-  const gen = p.gen && typeof genBeat === "function" ? genBeat(p.gen).n : "";
-  return '<div class="poperso' + (aperta ? " aperta" : "") + '" style="--k:' + r.k + '">' +
-    '<button class="potesta" data-apri="' + p.id + '">' +
-      '<span class="poav">' + faccia(p, 46) + '</span>' +
-      '<span class="potx"><b>' + p.n + '</b>' +
-        '<i>' + (p.eta ? p.eta + " anni · " : "") + r.n + (gen ? " · " + gen.toLowerCase() : "") + '</i></span>' +
-      '<span class="porel"><u>' + relNome(p) + '</u>' +
-        '<span class="pobar"><i style="width:' + Math.round(p.pt / relSoglia(p) * 100) + '%"></i></span>' +
-        '<em>' + (p.scoperto ? "tipo " + p.car : "non lo conosci ancora") + '</em></span>' +
-    '</button>' +
-    (aperta ? azioniDi(p) : '') + '</div>';
-}
-
+/* Il Circolo disegna la pagina: chi ridisegnava la Sala dopo una mossa
+   (qui sotto, eventi-v2, tempo-controlli) ridisegna il Circolo. */
 function renderPosto(){
-  const chi = presentiOggi();
-  $("po-scena").innerHTML = scenaSala(chi);
-
-  if(POSTO_PARLA){ renderDialogo(); return; }
-
-  const conosciuti = G.gente.filter(p => !p.via && p.rel >= 1).length;
-  $("po-dove").innerHTML =
-    "Sala prove dietro al bar centrale. Ci si passa la sera: chi porta un beat, chi " +
-    "cerca una voce, chi sta lì e basta. <b>" + chi.length + "</b> facce stasera, " +
-    "<b>" + conosciuti + "</b> di rete vera.";
-
-  $("po-lista").innerHTML = chi.map(p => schedaPersona(p, p.id === POSTO_APERTA)).join("");
-
-  const rete = G.gente.filter(p => !p.via);
-  $("po-rete").innerHTML = '<span class="pok2">La tua rete</span>' +
-    (rete.length ? rete.map(p =>
-      '<span class="porig" style="--k:' + POSTO_RUOLI[p.ruolo].k + '">' +
-      '<b>' + p.n + '</b><i>' + POSTO_RUOLI[p.ruolo].n.toLowerCase() + '</i>' +
-      '<u>' + relNome(p) + '</u></span>').join("")
-      : '<span class="porig"><i>Ancora nessuno.</i></span>');
+  if(typeof renderLuogo === "function") renderLuogo();
 }
 
 /* ==================== PARLARE ==================== */
-function renderDialogo(){
-  const {p, sit} = POSTO_PARLA;
-  $("po-dove").innerHTML = '<b>' + p.n + '</b> · ' + POSTO_RUOLI[p.ruolo].n.toLowerCase() +
-    ' · ' + relNome(p);
-  $("po-lista").innerHTML =
-    '<div class="podial"><p class="poq">' + sit.t + '</p>' +
-    sit.o.map((o, i) => '<button class="porisp" data-r="' + i + '">' + o[0] + '</button>').join("") +
-    '</div>';
-  $("po-rete").innerHTML = "";
-}
-
 function parlaCon(id){
   const p = G.gente.find(x => x.id === id);
   if(!p || G.energy < PO_COSTO.parla) return;
@@ -781,6 +657,10 @@ function poRispondi(i){
     p.scoperto = true;
     if(pt > 0) pt += 1;
   }
+  /* Il dopo-serata (js/game/circolo.js): se sei appena sceso dal palco, una
+     risposta buona vale un punto in più. Si somma PRIMA del «già visto
+     oggi», che resta il tetto: la serata non diventa un modo per farmare. */
+  if(pt > 0 && typeof circoloDopoSerata === "function" && circoloDopoSerata()) pt += 1;
   if(p.ult === sett) pt = Math.min(pt, 1);                       /* già visto oggi: vale meno */
   p.ult = sett;
 
@@ -838,8 +718,8 @@ function diventaOpp(p){
   /* La storia vale anche per il rivale ricreato: chi era venuto dalla
      classifica con un feat ed e' poi uscito dalla classifica non «si e'
      conosciuto alla Sala». */
-  const storia = p.rivale ? "Ha fatto un feat con te, poi alla Sala è finita male."
-    : "Vi siete conosciuti alla Sala. È finita male.";
+  const storia = p.rivale ? "Ha fatto un feat con te, poi al Circolo è finita male."
+    : "Vi siete conosciuti al Circolo. È finita male.";
   if(r){
     r.storia = storia;
   } else if(typeof nuovoRivale === "function"){
@@ -982,42 +862,14 @@ function azionePosto(tipo, id){
   if(typeof renderHub === "function") renderHub();
 }
 
-/* ==================== COMANDI ==================== */
-$("po-lista").addEventListener("click", ev => {
-  const r = ev.target.closest(".porisp");
-  if(r){ poRispondi(+r.dataset.r); return; }
-
-  /* punto 20 e 22: il beat sul tavolo si ascolta, si prende o si lascia da qui */
-  const asc = ev.target.closest("[data-sent]");
-  if(asc){ const b = G.market[+asc.dataset.sent]; if(b && typeof beatSuona === "function") beatSuona(b, asc); return; }
-  /* Comprare il beat e' la stessa cosa che si fa allo Studio, sulle schede
-     del banco: la mossa sta scritta una volta sola in
-     js/game/studio-elementi.js e le due pagine si ridisegnano per conto
-     loro, perche' La Sala e lo Studio non hanno la stessa schermata. */
-  const prendi = ev.target.closest("[data-prendi]");
-  if(prendi && !prendi.disabled){
-    const b = G.market[+prendi.dataset.prendi];
-    if(b && prendiBeatDalBanco(b)) renderPosto();
-    return;
-  }
-  const lascia = ev.target.closest("[data-lascia]");
-  if(lascia){
-    const i = +lascia.dataset.lascia, b = G.market[i];
-    if(!b) return;
-    G.market.splice(i, 1);
-    const chi = G.gente.find(x => x.beatOff === b.n);
-    if(chi) delete chi.beatOff;
-    pushLog("Hai lasciato l\u00ec \u00ab" + b.n + "\u00bb.", "");
-    SFX.tap(); save(); renderGioco(); renderPosto();
-    return;
-  }
-
-  const az = ev.target.closest("[data-az]");
-  if(az && !az.disabled){ azionePosto(az.dataset.az, az.dataset.p); return; }
-  const ap = ev.target.closest("[data-apri]");
-  if(ap){
-    POSTO_APERTA = POSTO_APERTA === ap.dataset.apri ? null : ap.dataset.apri;
-    SFX.tap(); renderPosto();
-  }
-});
-$("po-x").onclick = () => { SFX.tap(); chiudiPosto(); };
+/* ==================== IL BEAT LASCIATO LÌ ====================
+   Era dentro al listener della vecchia pagina: adesso lo chiama il Circolo. */
+function lasciaBeatSala(i){
+  const b = G.market[i];
+  if(!b) return;
+  G.market.splice(i, 1);
+  const chi = G.gente.find(x => x.beatOff === b.n);
+  if(chi) delete chi.beatOff;
+  pushLog("Hai lasciato l\u00ec \u00ab" + b.n + "\u00bb.", "");
+  SFX.tap(); save(); renderGioco(); renderPosto();
+}

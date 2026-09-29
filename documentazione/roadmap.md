@@ -130,8 +130,13 @@ non resta niente.
   foto, e l'avatar segnaposto»*. **FATTO (19/09/2026)** per i posti che una foto ce
   l'hanno: Casa, Palestra, Live Club e stacca la spina sono pagine sulla loro foto, la
   Piazza ha la sua sotto (`frontend/js/game/luoghi-foto.js`; «Le pagine dei posti sulla
-  loro foto» in `implementazioni/02-interfaccia-e-telefono.md`). Resta la serata del club
-  giocata a momenti, come nel riferimento, e i posti senza foto (Sala, Shop, la Strada).
+  loro foto» in `implementazioni/02-interfaccia-e-telefono.md`). **FATTO (29/09/2026)**
+  — **Il Circolo**: la Sala e il Live Club sono un posto solo, sulla mappa dov'era la Sala,
+  con la pagina identica al riferimento `il_circolo.png` senza la barra di sotto; dentro
+  c'è anche la serata giocata a momenti (tre pezzi, la gente da 0 a 100 che pesa sul live)
+  — `frontend/js/game/circolo.js`. Restano lo Shop e la Strada senza foto, il fondale
+  pulito del Circolo (oggi è ritagliato dal riferimento) e le quattro schermate dei
+  cartelli arrivate il 29/09 (bancone, sala, open mic, backstage).
 - **FATTO (19/09/2026)** — il primo minuto di chi prova il gioco: l'avvio rapido non è più
   nove secondi di nero ma la schermata «Preparo il tuo artista», con le fasi vere del
   camerino MakeHuman e tre tasti se si rompe (`frontend/js/preparo.js`). I «due minuti»
@@ -259,13 +264,16 @@ Ci si appoggiano due punti già aperti: *«"Completa la canzone" deve costare qu
 
 ### E · Il mondo vivo _(cominciata)_
 
-**C'è già**: La Sala, il posto dove si conosce la gente — ruolo, carattere, fama e i sei
+**C'è già**: La Sala — dal 29/09/2026 il retro del Circolo —, il posto dove si conosce la gente — ruolo, carattere, fama e i sei
 gradini del rapporto, e con un rapper si può anche rompere; il videomaker; gli opp e i
 giornalisti per strada; un'età per i personaggi; una conversazione lunga al giorno; le chat
 con mamma e il migliore amico. **FATTO (21/09/2026)** — «non deve costare energia
 interagire con gli altri all'interno della sala»: `PO_COSTO` tutto a zero, i tasti dicono
 «gratis» o solo i soldi; restano il tempo di ogni mossa e i gradini («Nella Sala non si
-spende energia» in `implementazioni/06-mondo-e-personaggi.md`).
+spende energia» in `implementazioni/06-mondo-e-personaggi.md`). **FATTO (29/09/2026)** —
+la Sala e il palco si parlano: sceso dal palco, per due ore una risposta buona vale un
+punto in più; chi è collaboratore e stasera è in sala guarda il tuo live (+1 o −1, mai un
+gradino in meno); il feat con un rapper si propone solo la sera, col palco acceso.
 
 **Manca**:
 
@@ -403,9 +411,10 @@ grandi (B). I prezzi dei beat realistici e la partenza con tutti i parametri a 1
 
 **Carletto** — la TRACK (D), le foto di sfondo dei posti e le schermate rifatte in HTML (B —
 fatte per lo Studio l'08/09 e per Casa, Palestra, Live Club, stacca la spina e Piazza il
-19/09/2026; resta la serata del club a momenti), le transizioni video sulle cinque schede
-(B — fatte: lo Studio dal 16/09/2026, la Sala, Casa, stacca la spina e registra dal
-20/09/2026; da decidere i sette video che nessun punto chiede), lo skip lento (C), via
+19/09/2026; il Circolo e la serata a momenti il 29/09/2026), le transizioni video sulle
+cinque schede (B — fatte: lo Studio dal 16/09/2026, la Sala, Casa, stacca la spina e
+registra dal 20/09/2026; dal 29/09 anche l'ingresso del club e il live, al Circolo; da
+decidere i cinque video che nessun punto chiede), lo skip lento (C), via
 «lucidità» (C), la
 legacy — quanto sei influente sulle generazioni dopo di te (E: nel codice non esiste). Più
 due regole di lavoro: le canzoni con l'IA come task giornaliera, e quando non è un fix

@@ -893,7 +893,9 @@ test("il tema del foglio lo sceglie lo Studio, e senza scelta resta il tiro a ca
 
 test("comprare un beat dal banco e' scritto una volta sola, non due",
   studioEl.includes("function prendiBeatDalBanco(b)") &&
-  posto.includes("prendiBeatDalBanco(b)") &&
+  /* dal 29/09/2026 il beat sul tavolo si compra dal Circolo, che ha preso
+     il posto della pagina della Sala */
+  leggi("js/game/circolo.js").includes("prendiBeatDalBanco(b)") &&
   /* la vecchia copia dentro a posto.js non c'e' piu'. Si guarda la riga che
      mette il beat in cartella, non lo `splice`: quello resta, perche' La
      Sala ha anche il tasto per **lasciarlo li'**, che toglie il beat dal
@@ -1237,7 +1239,6 @@ test("controller si monta nella testata della finestra attiva",
   /* punto 7: la vecchia schermata di gioco non c'è più, al suo posto il
      quaderno sopra alla mappa — la testata dove si monta è la sua. */
   timeControls.includes('head:".pnhead"') &&
-  timeControls.includes('head:".pohead"') &&
   timeControls.includes('head:".nghead"') &&
   timeControls.includes('head:".topbar"') &&
   timeControls.includes('head:".adf-jail-top"'));
@@ -1502,10 +1503,10 @@ test("Beat Maker non è più un hotspot fisico",
   !travel.includes("beatmaker: {") &&
   !hours.includes('beatmaker:"studio"') &&
   !hours.includes('beatmaker:"beat"'));
-test("la produzione beat richiede lo Studio mentre La Sala resta networking",
+test("la produzione beat richiede lo Studio mentre il Circolo (la Sala di prima) resta networking",
   hours.includes('beat:"studio"') &&
   hub.includes('{id:"studio", n:"Studio"') &&
-  hub.includes('{id:"beat", n:"La Sala"'));
+  hub.includes('{id:"beat", n:"Il Circolo"'));
 test("spostamenti migra i vecchi salvataggi Beat Maker allo Studio",
   travel.includes('G.currentPlace === "beatmaker"') &&
   travel.includes('G.currentPlace = "studio"'));
@@ -1775,14 +1776,15 @@ console.log("\nPunto 2 — la zona da toccare è la sagoma dell'edificio, non un
 /* Il rettangolo uguale per tutti (10.50×12.50) non c'è più: su una foto in
    prospettiva non combaciava con nessun palazzo. Adesso ogni posto ha il suo
    profilo in HUB_SAGOME, e il rettangolo del bottone è solo il contenitore. */
-test("i dieci luoghi hanno un profilo in HUB_SAGOME, di almeno tre punti",
+/* dal 29/09/2026 sono nove: il Live Club è dentro al Circolo */
+test("i nove luoghi hanno un profilo in HUB_SAGOME, di almeno tre punti",
   (() => {
     const b0 = hub.indexOf("const HUB_SAGOME");
     const b1 = hub.indexOf("});", b0);
     if(b0 < 0 || b1 < 0) return false;
     const blocco = hub.slice(b0, b1);
     const sagome = [...blocco.matchAll(/([a-z]+):\s*\[(\[[^\]]*\][,\s]*)+\]/g)];
-    return sagome.length === 10 &&
+    return sagome.length === 9 &&
       sagome.every(m => (m[0].match(/\[[\d.]+,[\d.]+\]/g) || []).length >= 3);
   })());
 test("nessun luogo porta più x/y/w/h a mano: misure e baricentro escono dal profilo",
@@ -2148,7 +2150,14 @@ test("in media/ non restano immagini che nessuna riga di codice carica",
          sta sul telefono, in LaFamegram, che un fondale non ce l'ha. Resta
          qui finche' il telefono non avra' una pagina a schermo intero che
          possa caricarla. */
-      "studio_promo.png"
+      "studio_promo.png",
+      /* Il Circolo (29/09/2026): il riferimento della pagina, con gli
+         elementi stampati sopra — il fondale provvisorio ritagliato da lui
+         sta in «senza_HTML» con lo stesso nome, finché non arriva quello
+         pulito — e le quattro schermate dei cartelli (bancone, sala, open
+         mic, backstage), arrivate mentre la pagina si faceva: materiale
+         in attesa, come le altre. */
+      "il_circolo.png", "bancone.png", "sala.png", "open_mic.png", "backstage.png"
     ];
     /* Il dataset degli avatar (`media/makehuman-editor-v1`) sta fuori dal conto,
        e per due motivi diversi. Il primo: i suoi disegni non li nomina il
@@ -2360,7 +2369,7 @@ test("punto 25: la scheda non si chiama più «Disciplina»",
 test("punto 28: girare a cercare beat non costa energia",
   /\{id:"beat", n:"Cerca un beat", e:0,/.test(actions));
 test("punto 28: ma costa tempo, che è il freno vero",
-  /beat:\s*120/.test(time) && hours.includes('beat:      {open:"13:00", close:"02:00"}'));
+  /beat:\s*120/.test(time) && hours.includes('beat:      {open:"13:00", close:"03:00"}'));
 test("punto 28: una mossa da zero energia si scrive «gratis», non «0 energia»",
   /* `scritto` e` en2, salvo le mosse che si pagano altrove (registra) */
   ui.includes("(scritto ? '<i>' + scritto + '</i>energia' : 'gratis')"));
@@ -2611,12 +2620,14 @@ test("nessun :hover fuori da @media (hover:hover): sul telefono non resta acceso
    toast. Se un giorno si toglie apposta, via anche questo blocco. */
 const tvid = leggi("js/game/transizioni-video.js");
 const tvidCss = leggi("css/transizioni-video.css").replace(/\s+/g, "");
-test("i cinque video della tabella esistono dove transizioni-video.js li cerca",
+/* dal 29/09/2026 sette: il Circolo si entra dal club la sera (08) e il
+   palco ha il suo filmato prima della serata (11) */
+test("i sette video della tabella esistono dove transizioni-video.js li cerca",
   (() => {
     const tab = tvid.match(/const TRANSIZIONI_VIDEO = \{([\s\S]*?)\n\};/);
     const file = tab ? [...tab[1].matchAll(/^\s*(\w+):\s*"([^"]+\.mp4)"/gm)] : [];
-    return file.length === 5 &&
-      ["studio", "sala", "casa", "stacca", "registra"].every(id => file.some(f => f[1] === id)) &&
+    return file.length === 7 &&
+      ["studio", "sala", "casa", "stacca", "registra", "club", "palco"].every(id => file.some(f => f[1] === id)) &&
       file.every(f => fs.existsSync(path.join(ROOT, f[2])));
   })());
 test("gioco.html carica transizioni-video.js prima di hub.js, e il suo CSS",
@@ -2633,8 +2644,9 @@ test("il cartello dello Studio passa dal video prima di aprire la stanza",
    così il filmato c'è da qualunque parte parta — la porta di Casa, l'agenda
    del telefono, la card della sera; «registra» sulla PRIMA take del pezzo,
    non su tutte e sei. */
-test("i cartelli della Sala e di Casa passano dal loro video",
-  /id:"beat"[\s\S]{0,300}?transizioneVideo\("sala",[\s\S]{0,40}?apriPosto\(/.test(hub) &&
+test("i cartelli del Circolo e di Casa passano dal loro video",
+  /id:"beat", n:"Il Circolo",\s*vai:\(\) => circoloEntra\(\)/.test(hub) &&
+  /function circoloEntra\(\)\{[\s\S]{0,300}?"club" : "sala";[\s\S]{0,200}?transizioneVideo\(video, \(\) => apriLuogo\("circolo"\)\)/.test(leggi("js/game/circolo.js")) &&
   /id:"vita"[\s\S]{0,300}?transizioneVideo\("casa",[\s\S]{0,40}?apriLuogo\("casa"\)/.test(hub));
 test("«stacca la spina» ha il filmato fra il tasto e l'esito, da dovunque parta",
   /window\.mostraScena = function[\s\S]{0,1400}?transizioneVideo\(a\.id, mostra\)/.test(leggi("js/game/luoghi-foto.js")));
@@ -2734,12 +2746,12 @@ test("ogni foto di LUOGHI_FOTO esiste sul disco, quella di giorno del divano com
     const foto = Array.from(luoghiFoto.matchAll(/(?:f|giorno):"([^"]+\.png)"/g)).map(m => m[1]);
     return !!dir && foto.length >= 6 && foto.every(f => fs.existsSync(path.join(ROOT, dir + f)));
   })());
-test("Casa, Palestra e Live Club sulla mappa aprono la pagina, non piu' la finestra con due risposte",
+test("Casa, Palestra e il Circolo sulla mappa aprono la pagina, non piu' la finestra con due risposte",
   /* dal 20/09 Casa passa prima dal suo video: il commento in mezzo allunga la strada */
   /id:"vita",[\s\S]{0,240}?apriLuogo\("casa"\)/.test(hub) &&
   /id:"palestra",[\s\S]{0,80}?apriLuogo\("palestra"\)/.test(hub) &&
-  /id:"concerti",[\s\S]{0,80}?apriLuogo\("live"\)/.test(hub));
-test("le quattro mosse con la pagina finiscono sulla loro foto, e sono tutte scene a pagina piena",
+  !hub.includes('{id:"concerti"') && hub.includes("circoloEntra()"));
+test("le quattro mosse con la pagina finiscono sulla loro foto, e sono tutte scene a pagina piena (il live nel Circolo)",
   (() => {
     const m = luoghiFoto.match(/const LUOGO_MOSSE = \{([^}]+)\}/);
     if(!m) return false;
@@ -2765,6 +2777,69 @@ test("il tasto d'oro legge l'orario del posto, e sul divano la foto segue l'ora"
   luoghiFoto.includes("GAME_TIME.band()"));
 test("quando il gioco si ridisegna si ridisegna anche la pagina aperta, in un posto solo",
   luoghiFoto.includes("window.renderGioco = function()") && luoghiFoto.includes("renderLuogo();"));
+/* Il Circolo (29/09/2026): la Sala e il Live Club diventati un posto solo,
+   sul riferimento `il_circolo.png` senza la barra di sotto. La pagina vive
+   dentro a #luogo; la vecchia pagina della Sala (#posto) non c'è più. Se una
+   di queste cose si toglie apposta, via anche la sua riga. */
+console.log("\nIl Circolo — la Sala e il Live Club, un posto solo");
+{
+  const circolo = leggi("js/game/circolo.js");
+  const circoloCss = leggi("css/circolo.css");
+  test("circolo.js e circolo.css si caricano dopo luoghi-foto, col pennarello dei titoli",
+    index.indexOf('<script src="js/game/circolo.js') > index.indexOf('<script src="js/game/luoghi-foto.js') &&
+    index.indexOf('href="css/circolo.css') > index.indexOf('href="css/luoghi-foto.css') &&
+    index.includes("family=Permanent+Marker") && circoloCss.includes('"Permanent Marker"'));
+  test("la pagina della Sala non c'è più: né l'HTML, né il foglio, né la testata nelle liste",
+    !index.includes('id="posto"') && !index.includes("css/posto.css") &&
+    !fs.existsSync(path.join(ROOT, "css/posto.css")) &&
+    !menuSystem.includes('"#posto.on"') && !timeControls.includes('"#posto.on"') &&
+    !leggi("js/game/posto.js").includes('$("po-lista")'));
+  test("sulla mappa un cartello solo, dov'era la Sala; chi dice ancora «concerti» finisce lì",
+    hub.includes('{id:"beat", n:"Il Circolo"') && !hub.includes('{id:"concerti"') &&
+    !/\bconcerti:\s*\[/.test(hub) && hours.includes('PLACE_ALIAS = Object.freeze({concerti:"beat"})') &&
+    hours.includes('live:"beat"') && travel.includes('if(G.currentPlace === "concerti") G.currentPlace = "beat";'));
+  test("il locale è aperto 13–03, il palco del live dalle 21 (l'ultima serata parte a mezzanotte)",
+    hours.includes('beat:      {open:"13:00", close:"03:00"}') &&
+    hours.includes('live:{open:"21:00", close:"03:00"}') &&
+    hours.includes("if(ACTION_HOURS[id]) return ACTION_HOURS[id];") &&
+    /\{id:"serata",\s*da:"21:00", a:"00:00"/.test(circolo));
+  test("le quattro targhette sulla foto e i quattro riquadri del riferimento",
+    ["bancone", "palco", "sala", "backstage"].every(id => circolo.includes('cart("' + id + '"')) &&
+    ["gente", "palco", "serata", "momenti"].every(id => circolo.includes('ccPannello("' + id + '"')) &&
+    !circolo.includes("Statistiche") && !circolo.includes("Inventario"));
+  test("le foto della pagina ci sono: il fondale, il palco e la serata",
+    ["media/photo/schermate_luoghi/schermate luoghi_senza_HTML/il_circolo.png",
+     "media/photo/circolo/palco.jpg", "media/photo/circolo/serata.jpg",
+     "media/photo/schermate_luoghi/schermate luoghi_senza_HTML/live_club.png"]
+      .every(f => fs.existsSync(path.join(ROOT, f))));
+  test("la serata giocata a momenti pesa sul live di actions.js, e fuori dal Circolo vale 1",
+    actions.includes('const resa = typeof circoloResaSerata === "function" ? circoloResaSerata() : 1;') &&
+    actions.includes("const molt = (giaOggi ? 0.45 : 1) * peso * resa;") &&
+    circolo.includes("function circoloResaSerata(){ const r = CIRCOLO_RESA; CIRCOLO_RESA = 1; return r; }"));
+  test("il dopo-serata si somma prima del tetto «già visto oggi»",
+    (() => {
+      const posto = leggi("js/game/posto.js");
+      const a = posto.indexOf('typeof circoloDopoSerata === "function" && circoloDopoSerata()) pt += 1;');
+      const b = posto.indexOf("if(p.ult === sett) pt = Math.min(pt, 1);");
+      return a > 0 && b > a;
+    })());
+  test("la gente guarda senza far scendere di gradino, e il feat si accende solo col palco acceso",
+    circolo.includes("chi.forEach(p => { p.pt = Math.max(0, p.pt - 1); });") &&
+    circolo.includes('if(v.tipo === "feat" && v.puo && !circoloPalcoAcceso())') &&
+    circolo.includes('if(d.ccAz === "feat" && !circoloPalcoAcceso()) return;'));
+  test("una serata a metà sta nel salvataggio: uscire non la ricomincia, ma muore se il palco si spegne o te ne vai",
+    circolo.includes("circoloStato().serata = {key:circoloGiorno()") &&
+    circolo.includes("if(c.serata && (c.serata.key !== circoloGiorno() || !circoloPalcoAcceso() || !circoloQui())) c.serata = null;"));
+  /* il giro del 30/09: il palco solo stando lì, gli eventi che aspettano */
+  test("sul palco si sale solo stando al Circolo, e col Circolo aperto gli eventi aspettano",
+    circolo.includes('if(!circoloQui()) return {ok:false, perche:"Sei lontano: raggiungi il Circolo dalla mappa"};') &&
+    leggi("js/game/eventi-v2.js").includes('if(typeof circoloOccupato==="function" && circoloOccupato()) return true;'));
+  test("sugli schermi stretti il Circolo si impila, e i :hover stanno dietro a (hover:hover)",
+    leggi("css/stretto.css").includes(".cc-giu{grid-template-columns:minmax(0,1fr);") &&
+    leggi("css/stretto.css").includes(".cc-su{grid-template-columns:minmax(0,1fr)}") &&
+    circoloCss.includes("@media (hover:hover){"));
+}
+
 test("sul telefono le tre colonne diventano una pila e le porte della Casa vanno in colonna",
   /@media \(max-width:900px\)\{[\s\S]*?\.lfwrap\{grid-template-columns:minmax\(0,1fr\)/.test(leggi("css/stretto.css")) &&
   leggi("css/stretto.css").includes(".lfporta,.lfp-tavolo,.lfp-camera,.lfp-divano,.lfp-conti{position:static"));
@@ -2794,10 +2869,10 @@ test("sul telefono le tre colonne diventano una pila e le porte della Casa vanno
     /html #s-hub\.screen\.on \.pbarra\.adf-system-host-v7 > \.adf-global-nav \{\s*top: 8px !important;\s*left: 6px !important;\s*bottom: auto !important;\s*height: 44px !important;/.test(strettoCss) &&
     /html #s-hub\.screen\.on \.pbarra\.adf-system-host-v7 > \.adf-global-nav \{\s*top: 4px !important;\s*height: 44px !important;/.test(strettoCss));
   test("sotto i 620 nelle testate dei posti e nel foglio della strofa MAPPA se ne va e la pastiglia e' ai nove decimi",
-    strettoCss.includes('html #posto.on .pohead.adf-system-host-v7 > .adf-global-nav > .adf-global-map') &&
+    strettoCss.includes('html #pannello.on .pnhead.adf-system-host-v7 > .adf-global-nav > .adf-global-map') &&
     strettoCss.includes('html #writer.on .whead.adf-system-host-v7 > .adf-global-nav > .adf-global-map') &&
     strettoCss.includes('html #writer.on .whead h2{font-size:22px') &&
-    /body #adf-time-dock\[data-host="posto"\] #adf-time-widget,[\s\S]{0,120}?\{\s*transform:scale\(\.9\)/.test(strettoCss) &&
+    /body #adf-time-dock\[data-host="pannello"\] #adf-time-widget\{\s*transform:scale\(\.9\)/.test(strettoCss) &&
     /* il Negozio non esiste (#negozio non e' in gioco.html): le sue regole non ci sono */
     !strettoCss.includes("#negozio.on .nghead"));
   /* giro del 20/09: fra 981 e 1180 il tasto del telefono galleggiava in un tondo che copriva la

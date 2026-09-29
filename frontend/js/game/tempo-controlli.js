@@ -40,7 +40,6 @@
   const HOSTS = [
     {id:"jail",    root:"#adf-jail.on",      head:".adf-jail-top", mount:".adf-jail-meta", accent:"#ff315b", panel:"linear-gradient(180deg,rgba(25,8,14,.985),rgba(8,8,11,.985))", border:"rgba(255,49,91,.38)"},
     {id:"strada", root:"#strada.on",         head:".topbar",       mount:".session", before:".exit", accent:"#c52e5f", panel:"linear-gradient(180deg,rgba(27,7,20,.985),rgba(8,5,9,.985))", border:"rgba(197,46,95,.42)"},
-    {id:"posto",  root:"#posto.on",          head:".pohead",       mount:".pohead", before:".pox", accentVar:"--acid", accent:"#a3e635", panel:"linear-gradient(180deg,rgba(25,20,34,.985),rgba(12,10,17,.985))", border:"rgba(255,255,255,.14)"},
     {id:"negozio",root:"#negozio.on",        head:".nghead",       mount:".nghead", before:".ngx", accentVar:"--acid", accent:"#a3e635", panel:"linear-gradient(180deg,rgba(25,20,34,.985),rgba(12,10,17,.985))", border:"rgba(255,255,255,.14)"},
     {id:"pannello",root:"#pannello.on",      head:".pnhead",       mount:".pnhead", accentVar:"--c1", accent:"#7c3aed", panel:"linear-gradient(180deg,rgba(20,18,25,.985),rgba(10,10,14,.985))", border:"rgba(255,255,255,.14)"},
     /* Lo Studio è **muto**: l'ora ce l'ha già sua, nella fascia in alto
@@ -51,7 +50,7 @@
        in mezzo ai pannelli, coprendo «Il quartiere», «POSTA» e la stima degli
        stream. Un posto muto non monta il widget da nessuna parte. */
     {id:"studio", root:"#studio.on",          mute:true},
-    /* Casa, Palestra, Live Club e stacca la spina (js/game/luoghi-foto.js):
+    /* Casa, Palestra, il Circolo e stacca la spina (js/game/luoghi-foto.js):
        muti per la stessa ragione dello Studio — l'ora ce l'hanno nella
        loro fascia — e prima dell'hub per lo stesso motivo. */
     {id:"luogo",  root:"#luogo.on",           mute:true},
@@ -315,11 +314,11 @@
       body:has(#modal.on) #adf-time-dock,body:has(.setts.on) #adf-time-dock,body:has(#drawer.on) #adf-time-dock,
       body:has(#modal.on) #adf-tc-panel,body:has(.setts.on) #adf-tc-panel,body:has(#drawer.on) #adf-tc-panel{visibility:hidden!important;pointer-events:none!important}
       #adf-time-dock[data-host="game"]{margin-left:auto;align-self:center;height:66px;flex-basis:222px;padding:0 6px;border-left:1px solid rgba(255,255,255,.07);background:transparent}
-      #adf-time-dock[data-host="posto"],#adf-time-dock[data-host="negozio"]{margin-left:auto;align-self:center;height:64px;flex-basis:218px;padding:0 5px;border-left:0;background:transparent}
+      #adf-time-dock[data-host="negozio"]{margin-left:auto;align-self:center;height:64px;flex-basis:218px;padding:0 5px;border-left:0;background:transparent}
       #adf-time-dock[data-host="strada"]{height:100%;flex-basis:222px;padding:3px 6px}
       #adf-time-dock[data-host="jail"]{height:100%;flex-basis:220px;padding:3px 6px}
       #adf-time-dock[data-host="hub"]{flex-basis:224px;padding:4px 7px}
-      #adf-time-dock + .exit,#adf-time-dock + .pox,#adf-time-dock + .ngx{margin-left:6px}
+      #adf-time-dock + .exit,#adf-time-dock + .ngx{margin-left:6px}
       #${WIDGET_ID}[hidden],#${ROOT_ID}[hidden]{display:none!important}
       #${WIDGET_ID},#${ROOT_ID},#${WIDGET_ID} *,#${ROOT_ID} *{box-sizing:border-box}
 

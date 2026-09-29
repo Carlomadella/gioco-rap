@@ -192,7 +192,9 @@ function overlayBusy(){
       if(!soloReport) return true;
     }
   }catch(_){}
-  const ids=["modal","report","writer","piazza","scena","posto","strada","negozio","adf-result-overlay","adf-social-overlay"];
+  /* il Circolo (la Sala di prima) tiene fermi gli eventi mentre è aperto */
+  if(typeof circoloOccupato==="function" && circoloOccupato()) return true;
+  const ids=["modal","report","writer","piazza","scena","strada","negozio","adf-result-overlay","adf-social-overlay"];
   for(const id of ids){
     if(id==="report" && detenuto) continue;
     const el=document.getElementById(id);
