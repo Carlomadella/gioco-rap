@@ -6,6 +6,37 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:4a578e8 -->
+## 30/09/26, 00:35 â€” task/il-circolo â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `4a578e8`
+
+### Cosa Ã¨ entrato
+
+- `cf8f789` â€” Il Circolo: le voci del giro di fine task — il palco solo stando lì, la serata a metà, il telefono â€” **Carlomadella**
+- `07d14b9` â€” Il Circolo: la Sala e il Live Club diventano un posto solo, con la serata giocata a momenti â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/css/circolo.css`
+- **Modificato:** `frontend/css/menu-sistema.css`
+- **Rimosso:** `frontend/css/posto.css`
+- **Modificato:** `frontend/css/stretto.css`
+- **Modificato:** `frontend/css/tocco.css`
+- **Aggiunto:** `frontend/media/photo/circolo/palco.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/serata.jpg`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/il_circolo.png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/backstage.png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/bancone.png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/il_circolo.png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/open_mic.png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/sala.png`
+
+**File interessati in questa categoria:** 13
+
+---
+
 <!-- merge:14eff26 -->
 ## 28/09/26, 12:18 â€” task/modale-piu-piccola â†’ main
 

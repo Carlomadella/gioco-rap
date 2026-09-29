@@ -6,6 +6,68 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:4a578e8 -->
+## 30/09/26, 00:35 â€” task/il-circolo â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `4a578e8`
+
+### Cosa Ã¨ entrato
+
+- `cf8f789` â€” Il Circolo: le voci del giro di fine task — il palco solo stando lì, la serata a metà, il telefono â€” **Carlomadella**
+- `07d14b9` â€” Il Circolo: la Sala e il Live Club diventano un posto solo, con la serata giocata a momenti â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/problemi-risolti.md`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-30/circolo-cartelli-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-30/circolo-cartelli-844x390.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-30/circolo-foto-844x390.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-09-30/circolo-tasti-844x390.png`
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/README.md`
+- **Aggiunto:** `frontend/css/circolo.css`
+- **Modificato:** `frontend/css/menu-sistema.css`
+- **Rimosso:** `frontend/css/posto.css`
+- **Modificato:** `frontend/css/stretto.css`
+- **Modificato:** `frontend/css/tocco.css`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/agenda.js`
+- **Aggiunto:** `frontend/js/game/circolo.js`
+- **Modificato:** `frontend/js/game/eventi-master-1000-v1.2.13.json`
+- **Modificato:** `frontend/js/game/eventi-tempo.js`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/luoghi-foto.js`
+- **Modificato:** `frontend/js/game/orari.js`
+- **Modificato:** `frontend/js/game/posto.js`
+- **Modificato:** `frontend/js/game/spostamenti.js`
+- **Modificato:** `frontend/js/game/strada.js`
+- **Modificato:** `frontend/js/game/studio.js`
+- **Modificato:** `frontend/js/game/telefono.js`
+- **Modificato:** `frontend/js/game/tempo-controlli.js`
+- **Modificato:** `frontend/js/game/transizioni-video.js`
+- **Modificato:** `frontend/js/game/trasferte.js`
+- **Modificato:** `frontend/js/game/uscita.js`
+- **Modificato:** `frontend/js/lingua.js`
+- **Modificato:** `frontend/js/menu-sistema.js`
+- **Aggiunto:** `frontend/media/photo/circolo/palco.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/serata.jpg`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/il_circolo.png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/backstage.png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/bancone.png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/il_circolo.png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/open_mic.png`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/sala.png`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `frontend/test/unit/circolo.test.js`
+- **Modificato:** `frontend/test/unit/studio-rivali-e-sala.test.js`
+
+**File interessati in questa categoria:** 44
+
+---
+
 <!-- merge:2c5c304 -->
 ## 29/09/26, 21:14 â€” task/problemi-risolti â†’ main
 
