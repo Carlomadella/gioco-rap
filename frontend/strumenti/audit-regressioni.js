@@ -2869,6 +2869,42 @@ console.log("\nLe tre del Marketing (20/09/2026)");
     svg.length > 0 && rotti.length === 0, rotti.join(" | ") || "corpo non generato");
 })();
 
+/* Il simulatore di bilanciamento (29/09/2026): non entra nella verifica perché dura ore,
+   ma il suo bot gioca con i nomi veri del gioco. Se uno di questi sparisce o cambia nome,
+   il bot non si rompe: smette di fare quella mossa, e il rapporto racconta una curva falsa. */
+(function(){
+  const fs2 = require("fs");
+  const c = ["strumenti/simulatore-bilanciamento.js","strumenti/bilanciamento/bot.js","strumenti/bilanciamento/rapporto.js"].filter(p => !fs2.existsSync(path.join(ROOT,p)));
+  test("il simulatore di bilanciamento c'è: runner, bot e rapporto", c.length === 0, c.join(", "));
+  test("il simulatore di bilanciamento si lancia con npm run bilanciamento",
+    /"bilanciamento":\s*"node strumenti\/simulatore-bilanciamento\.js"/.test(leggi("package.json")));
+  const giochi = fs2.readdirSync(path.join(ROOT,"js/game")).filter(x => x.endsWith(".js")).map(x => leggi("js/game/" + x)).join("\n");
+  const nomi = ["avviaAzioneDiretta","prendiBeatDalBanco","stradaTenta","stradaRipulisci","stToggleAvvocato","stAssumiUomo",
+    "studioTakeManca","studioTakeAncora","studioPronti","studioSegna","studioDaAnticipare","chiudiInCima","chiudiModale","avanzaGiorno","hypeCap"];
+  const via = nomi.filter(n => !new RegExp("function " + n + "\\s*\\(").test(giochi));
+  if(!/const STRADA_COLPI\s*=/.test(giochi)) via.push("STRADA_COLPI");
+  if(!/let STRADA_SCENA\s*=/.test(giochi)) via.push("STRADA_SCENA");
+  if(!/window\.ADF_TIME_SKIP\s*=/.test(giochi)) via.push("ADF_TIME_SKIP");
+  /* le chiavi dentro agli oggetti esportati, non una parola qualsiasi nel file */
+  const esportato = (f, nome) => { const t = leggi(f), i = t.indexOf("window." + nome); return i < 0 ? "" : t.slice(i, t.indexOf("});", i)); };
+  const viaggio = esportato("js/game/spostamenti.js", "GAME_TRAVEL"), tempo = esportato("js/game/tempo.js", "GAME_TIME");
+  for(const k of ["go:","requiredPlaceForAction,","actionAccess,"]) if(!viaggio.includes(k)) via.push("GAME_TRAVEL." + k.replace(/[:,]$/, ""));
+  for(const k of ["advance:","now:","remaining:","DAY_END"]) if(!tempo.includes(k)) via.push("GAME_TIME." + k.replace(/:$/, ""));
+  test("il bot del simulatore di bilanciamento trova ancora le funzioni del gioco che usa", via.length === 0, via.join(", "));
+  /* il resto su cui il bot si regge: i titoli delle finestre che non conta fra gli eventi,
+     i colpi e le azioni che chiama per id, l'interruttore delle conferme che spegne */
+  const altro = [];
+  for(const [t, f] of [["Come la fai","js/game/writer.js"],["Colloqui","js/game/actions.js"],["Come lo chiami","js/game/copertine.js"]])
+    if(!leggi(f).includes('"' + t + '"')) altro.push("finestra «" + t + "» in " + f);
+  const bot = leggi("strumenti/bilanciamento/bot.js");
+  for(const t of ["Come la fai","Colloqui","Come lo chiami"]) if(!bot.includes('"' + t + '"')) altro.push("il bot non salta «" + t + "»");
+  for(const c of ["consegne","scotta","cassa"]) if(!new RegExp('id:\\s*"' + c + '"').test(leggi("js/game/strada-crimine.js"))) altro.push("colpo " + c);
+  for(const a of ["scrivi","beat","registra","mixa","pubblica","promo","anteprima","free","live","turno","cercalavoro","stacca","palestra_cardio"])
+    if(!new RegExp('id:\\s*"' + a + '"').test(leggi("js/game/actions.js"))) altro.push("azione " + a);
+  if(!/conferme:\s*true/.test(leggi("js/impostazioni.js"))) altro.push("SET.gioco.conferme");
+  test("il bot del simulatore di bilanciamento trova ancora finestre, colpi e azioni per nome", altro.length === 0, altro.join(", "));
+})();
+
 for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/transizioni-video.js","js/game/luoghi-foto.js","js/preparo.js","js/gioco-ingresso.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }

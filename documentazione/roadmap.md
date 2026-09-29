@@ -151,6 +151,10 @@ giornate e skip di quanto vuoi; le classifiche settimanali con le frecce; **FATT
 (20/09/2026)** i prezzi dei beat su tre fasce per fama del beatmaker (100–250 / 300–1000 /
 1000–2000, `BEAT_FASCE` in `beats.js`), la partenza con tutti i parametri a 1, e la regola
 che da un lavoro non ci si licenzia — il posto lo perdi solo se non ti presenti.
+**FATTO (29/09/2026)** il simulatore di bilanciamento: `npm run bilanciamento` gioca mille
+carriere da un anno con sei strategie (chi lavora, chi spinge la promo, chi fa crimini, chi
+sta fermo, chi fa a caso, il musicista) e scrive un rapporto con le curve che sembrano
+rotte. È lo strumento per misurare i numeri di questa tappa prima di cambiarli.
 
 **Manca**:
 
@@ -271,7 +275,9 @@ spende energia» in `implementazioni/06-mondo-e-personaggi.md`).
   hanno abilità, fama e carattere»*;
 - i rapporti coi beatmaker che non vanno mai in negativo: li puoi offendere quanto vuoi e
   il rapporto resta uguale (foglio dei punti nuovi, Alessio);
-- la vita simulata, e la criminalità che oggi è troppo facile: risposta scritta, codice no;
+- la vita simulata, e la criminalità che oggi è troppo facile: risposta scritta, codice no.
+  Il simulatore di bilanciamento (29/09) aggiunge che non rende: con un colpo al giorno
+  l'anno finisce in carcere e in rosso (voce 65 di `problemi-riscontrati.md`);
 - i dialoghi tanti e diversi, e gli scenari uguali nella forma e diversi nelle circostanze:
   tutti e due a metà.
 
