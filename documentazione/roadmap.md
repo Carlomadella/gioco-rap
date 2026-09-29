@@ -1,6 +1,6 @@
 # La roadmap del progetto — a che punto siamo davvero
 
-**Aggiornata al 21/09/2026.** Ogni riga di questo file è stata controllata sul repo il
+**Aggiornata al 29/09/2026.** Ogni riga di questo file è stata controllata sul repo il
 giorno in cui è stata scritta: se qui c'è scritto «fatto», il codice c'è ed è stato
 guardato. Se c'è scritto «da fare», nel repo non c'è niente che lo faccia.
 
@@ -332,6 +332,11 @@ questa tappa non è chiusa.
 Ci si arriva da GOAT (livello ≥ 30, fama ≥ 90, hype ≥ 85, reputazione ≥ 80): studi top tier,
 label e A&R, eventi VIP, casinò, criminalità ad altissimo rischio. Dopo Milano, non prima.
 
+**DECISO (29/09/2026)** — Los Angeles è l'ultima città: dopo non ci si trasferisce in
+un'altra città italiana. Da Los Angeles però **si torna** a Milano e in provincia, quando si
+vuole. La decisione sta sotto al punto «Dopo aver completato Milano… Los Angeles», in
+`../implementazioni/implementazioni.md` (CARLO, «Da discutere»).
+
 ### I · L'uscita sugli store _(tre lavori su cinque)_
 
 La tabella qui sotto.
@@ -399,9 +404,11 @@ legacy — quanto sei influente sulle generazioni dopo di te (E: nel codice non 
 due regole di lavoro: le canzoni con l'IA come task giornaliera, e quando non è un fix
 creare un file nuovo collegato invece di gonfiare quelli che ci sono.
 
-**Da discutere**: se dopo Los Angeles si possa scegliere un'altra città italiana (la
-risposta scritta è: a Los Angeles per forza, ma indietro si può tornare); la schermata delle
-classifiche aperta anche dall'app del telefono; la pagina di Mycol collegata allo shop.
+**Deciso (29/09/2026)**: dopo Los Angeles non ci si trasferisce in un'altra città
+italiana, si resta a Los Angeles; alle città precedenti invece si torna (vedi la tappa H).
+
+**Da discutere**: la schermata delle classifiche aperta anche dall'app del telefono; la
+pagina di Mycol collegata allo shop.
 
 **Dopo il gioco**, non prima: le modalità nuove — carriera dello studio, città di partenza a
 scelta, le città finali (Chicago, Las Vegas, Atlanta/New York).
