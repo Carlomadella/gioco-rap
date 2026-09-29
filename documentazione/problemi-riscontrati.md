@@ -6161,3 +6161,49 @@ alta 250. Le regole nuove, compresa quella per gli schermi bassi (`max-height:48
 mette solo la conferma dello spostamento (`frontend/js/game/modal.js:39`). Una finestra
 normale aperta subito dopo il viaggio torna senza la classe, larga 470 come prima e con il
 suo testo visibile. Nessun errore JavaScript nella pagina.
+
+## Giro del 29/09/2026 (segnala-problemi, giro stretto sul commit 86698c3, branch `task/roadmap-los-angeles-decisa`)
+
+Cosa ho controllato: che la decisione su Los Angeles («si resta a LA, alle città di prima
+si torna») dica la stessa cosa in `documentazione/roadmap.md`, in
+`implementazioni/implementazioni.md`, in `ROADMAP.md` di radice, nel `README.md` e in
+`implementazioni/01-mappa-e-citta.md`; che il rimando dalla tappa H porti al file giusto
+(`../implementazioni/implementazioni.md` da `documentazione/` c'è, e il punto citato col suo
+testo si trova); che «Le decisioni tue» nell'ordine in testa non lo nomini più (non lo nomina).
+Il «Da discutere» in fondo alla roadmap non ne parla più. Nessuno dei documenti dice il
+contrario. Il codice non l'ho guardato: il commit non lo tocca. Due cose piccole, tutte e
+due scelte di scrittura, non errori.
+
+### «Los Angeles è l'ultima città» e le città finali dopo il gioco
+- **dove** — `documentazione/roadmap.md:335`, contro `documentazione/roadmap.md:413-414` e
+  `implementazioni/implementazioni.md:577` («Modalità con più città finali»)
+- **cosa succede** — la nota nuova sotto la tappa H dice «Los Angeles è l'ultima città»,
+  mentre venti righe sotto la stessa roadmap parla delle città finali dopo LA (Chicago,
+  Las Vegas, Atlanta/New York) come modalità per dopo. La decisione di Carlo, per come è
+  scritta in `implementazioni.md:524`, dice solo che non ci si trasferisce **in un'altra
+  città italiana**: «l'ultima città» dice di più. Chi legge solo la tappa H può pensare che
+  le città finali siano state scartate.
+- **come si vede** — leggi la tappa H e poi il paragrafo «Dopo il gioco» in fondo alla roadmap.
+- **quanto pesa** — da sistemare con calma (è una nota: basta dire «l'ultima città del gioco
+  base» o togliere «l'ultima città» e tenere «non in un'altra città italiana»).
+- **RISOLTO (29/09/2026)** — stesso branch: la nota della tappa H non dice più «l'ultima
+  città», dice «non in un'altra città italiana» e che le città finali restano le modalità per
+  dopo il gioco.
+
+### La decisione resta sotto «Da discutere» e non arriva al foglio della mappa
+- **dove** — `implementazioni/implementazioni.md:520-528`; `implementazioni/01-mappa-e-citta.md:67`
+  (punto «La carriera cresce con la mappa: Provincia → Milano → Los Angeles»); `ROADMAP.md:119`
+- **cosa succede** — il punto deciso sta ancora sotto il titolo «Da discutere» e comincia
+  ancora con la scritta «DA DISCUTERE»: la nota DECISO sotto lo chiarisce, ma a colpo
+  d'occhio sembra aperto. Nel foglio dell'argomento (la mappa e le città) e nella lista
+  dell'hub di `ROADMAP.md` («Los Angeles: soglie, luoghi di lusso e di rischio, tetto della
+  carriera») la regola del ritorno a Milano e in provincia non c'è: chi farà Los Angeles
+  partendo da lì non la trova. Non si contraddicono, manca solo il richiamo.
+- **come si vede** — apri `01-mappa-e-citta.md` al punto 26, o `ROADMAP.md` alla lista
+  dell'hub, e cerca «torna».
+- **quanto pesa** — da sistemare con calma (è una scelta di dove tenere la decisione, non un
+  errore; il commit dice che si fa insieme a Milano e LA, quindi può aspettare quel lavoro).
+- **RISOLTO (29/09/2026)** — stesso branch: la regola del ritorno c'è anche sotto la Fase 3 del
+  punto 26 in `01-mappa-e-citta.md` e nella riga di Los Angeles della lista dell'hub in
+  `ROADMAP.md`. Il punto in `implementazioni.md` resta sotto «Da discutere» con la sua scritta
+  originale: è la richiesta com'era, e la nota DECISO sotto dice che è chiuso.
