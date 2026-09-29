@@ -21,6 +21,11 @@ function installaBot(){
   const on = id => { const el = document.getElementById(id); return !!(el && el.classList.contains("on")); };
   const conta = (tab, k) => { tab[k] = (tab[k] || 0) + 1; };
 
+  /* le finestre che non sono eventi: la scelta della strofa (writer.js), i colloqui
+     (actions.js) e il titolo del pezzo (copertine.js). Il bot prende la prima opzione
+     e non le conta fra gli eventi. I titoli li tiene fermi l'audit. */
+  const NON_EVENTI = ["Come la fai", "Colloqui", "Come lo chiami"];
+
   /* quello che resta aperto dopo un'azione o un salto: eventi, colloqui, il foglio,
      le schermate dei posti, gli overlay dei moduli eventi e crimine */
   function risolvi(sc){
@@ -30,8 +35,9 @@ function installaBot(){
         const bt = [...document.querySelectorAll("#m-opts button")].filter(b => !b.disabled);
         if(!bt.length){ sc.blocchi.push("modale senza bottoni: " + k); try{ chiudiModale(); }catch(e){} if(on("modal")) break; continue; }
         let i = 0;
-        if(k !== "Come la fai" && k !== "Colloqui" && bt.length > 1) i = Math.floor(Math.random() * bt.length);
-        if(k !== "Come la fai" && k !== "Colloqui" && k !== "Il titolo") sc.eventi++;
+        const evento = !NON_EVENTI.includes(k);
+        if(evento && bt.length > 1) i = Math.floor(Math.random() * bt.length);
+        if(evento) sc.eventi++;
         bt[i].click(); continue;
       }
       if(on("writer")){ document.getElementById("w-done").click(); continue; }
@@ -199,8 +205,12 @@ function installaBot(){
       if(g % 2 === 0) prova(sc, "palestra_cardio");
       if(g % 5 === 0) prova(sc, "free");
     },
-    /* chi lavora: il turno tutti i giorni, la musica con quello che avanza */
+    /* chi lavora: il turno tutti i giorni, la musica con quello che avanza. Mix e
+       uscita prima del turno: dopo, la giornata è finita e il pezzo registrato resta
+       in cassetto a costare (il giro del 29/09 ne pubblicava 26 su 100) */
     lavoratore(sc, g){
+      if(pronta("mixa")) prova(sc, "mixa");
+      if(pronta("pubblica")) prova(sc, "pubblica");
       lavoro(sc, true); riposo(sc, 35);
       if(g % 2 === 0) musica(sc, { poco: true, margine: 150 });
       if(fuori() && g % 3 === 0) prova(sc, "promo");
@@ -257,7 +267,8 @@ function installaBot(){
       hypeCap: typeof hypeCap === "function" ? hypeCap() : 100,
       ben: Math.round(G.wellbeing), luc: Math.round(G.lucidita), fase: G.phase,
       pezzi: G.songs.filter(x => x.released).length, stream: Math.round(G.streamsPrev || 0),
-      classifica: G.best && G.best.chart || null,
+      /* 99 è il valore di partenza (state.js): vuol dire mai entrato in classifica */
+      classifica: G.best && G.best.chart < 99 ? G.best.chart : null,
       abilita: Object.fromEntries(Object.entries(G.skills).map(([k, v]) => [k, Math.round(v * 10) / 10])),
       lavoro: G.job ? G.job.id : null, carcere: !!s.arresto, rep: Math.round(s.rep || 0), calore: Math.round(s.heat || 0),
       sporchi: Math.round(s.sporchi || 0), contratto: !!G.contract, finita: !!G.ended
@@ -277,6 +288,9 @@ function installaBot(){
         if(!inCarcere()) STRATEGIE[strategia](sc, g);
       }catch(e){ sc.blocchi.push("strategia: " + e.message); }
       risolvi(sc);
+      /* il «+1» da solo: il tempo della giornata intera conta anche le mosse del bot,
+         e un rallentamento del gioco si vede qui */
+      const t1 = performance.now();
       const prima = GAME_TIME.now ? GAME_TIME.now() : 0, g0 = [G.year, G.week, G.day].join(".");
       let ok = window.ADF_TIME_SKIP(1);
       await attendi(0);
@@ -288,6 +302,7 @@ function installaBot(){
         if(!ok){ sc.salto = "bloccato"; avanzaGiorno(); save(); risolvi(sc); }
         else sc.salto = "al secondo colpo";
       }
+      sc.msSalto = Math.round(performance.now() - t1);
       if([G.year, G.week, G.day].join(".") === g0 && sc.salto === "ok") sc.salto = "fermo";
       sc.prima = prima;
       sc.invarianti = invarianti();

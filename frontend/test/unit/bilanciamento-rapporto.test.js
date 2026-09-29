@@ -49,6 +49,15 @@ describe("rapporto del simulatore di bilanciamento", () => {
     expect(esito).toContain("1 carriere,");
   });
 
+  it("il rallentamento lo dice il «+1» da solo, non la giornata col bot dentro", () => {
+    const lenta = (n, salto) => carriera(n, "lavoratore", { fan: 10 }, { settimane: Array.from({ length: 10 }, (_, i) => ({
+      g: (i + 1) * 7, fan: 10, soldi: 0, ms: 500 + i * 400, msSalto: salto ? 100 + i * 150 : 100, abilita: {} })) });
+    expect(giro([lenta(1, false)]).md).not.toContain("Il gioco rallenta");
+    const { md } = giro([lenta(1, true)]);
+    expect(md).toContain("Il gioco rallenta");
+    expect(md).toContain("per il «+1»");
+  });
+
   it("senza righe non scrive niente e lo dice", () => {
     expect(leggi(path.join(os.tmpdir(), "non-esiste-" + Date.now() + ".jsonl"))).toEqual([]);
     expect(scriviRapporto(path.join(os.tmpdir(), "non-esiste.jsonl"), os.tmpdir())).toMatch(/nessuna carriera/);

@@ -1,4 +1,4 @@
-## Cosa resta aperto al 27/09/2026
+## Cosa resta aperto al 29/09/2026
 
 Smistato leggendo ogni voce contro il codice: sotto a ciascuna c'è scritto se e quando è
 stata chiusa. Qui solo quelle **ancora aperte**, nello stesso ordine di «Da fare adesso» in
@@ -6221,7 +6221,8 @@ Branch `task/simulatore-bilanciamento`. `npm run bilanciamento -- --carriere 6`:
 da 364 giorni **una dopo l'altra**, una per strategia, col bot del giro del 27/09 dentro al
 browser vero. 35 minuti in tutto, **nessun errore JS, nessuna invariante saltata, nessun
 giorno che non si chiude**. Il rapporto intero è in
-`test-results/bilanciamento-sei/rapporto.md` (non va su git: si rifà col comando).
+`frontend/test-results/bilanciamento-sei/rapporto.md` (non va su git: si rifà col comando,
+con `--uscita test-results/bilanciamento-sei`).
 
 | a fine anno | musicista | lavoratore | promo | criminale | fermo | caso |
 |---|---|---|---|---|---|---|
@@ -6258,11 +6259,12 @@ giorno che non si chiude**. Il rapporto intero è in
   comprati, spese dei pezzi della voce 61).
 
 ### La giornata rallenta per chi lavora e chi spinge la promo
-- **cosa succede** — una giornata vera (il «+1») passa da 0,7 a **3,3 secondi** per il
-  lavoratore e da 0,7 a 2 per la promo; le altre strategie restano ferme sotto il secondo.
-  Qualcosa cresce con la carriera senza un tetto. Oggi non ferma niente.
-- **quanto pesa** — da guardare: è la pista più probabile per i giorni che in parallelo non
-  tornavano più.
+- **cosa succede** — una giornata del bot (le sue mosse, le attese e il «+1») passa da 0,7 a
+  **3,3 secondi** per il lavoratore e da 0,7 a 2 per la promo; le altre strategie restano
+  ferme sotto il secondo. Il lavoratore è anche quello che aspetta di più (726 attese), quindi
+  può essere il bot e non il gioco: il «+1» da solo ora si misura a parte (giro sotto).
+- **quanto pesa** — da guardare col «+1» da solo: se cresce lui, è la pista per i giorni che
+  in parallelo non tornavano più.
 
 ### L'hype sta al tetto
 - **cosa succede** — il musicista ha l'hype al tetto della sua fase nel **63% delle
@@ -6283,3 +6285,141 @@ giorno che non si chiude**. Il rapporto intero è in
   pubblica, mixa e registra della strategia a caso. È il bot: prova a pubblicare senza
   tracce, e il gioco giustamente dice di no («manca 1 traccia»). Da togliere dai sospetti del
   rapporto quando il perché è un requisito che manca.
+
+## Giro del 29/09/2026 (segnala-problemi, fine task `task/simulatore-bilanciamento`, commit `47eae1d`)
+
+Giro stretto sul simulatore: runner, bot, rapporto, test, i controlli nuovi dell'audit e
+quello che dicono di lui questo file e la roadmap. `npm run verifica` era già verde e non
+l'ho rilanciata; il simulatore non l'ho fatto girare (dura ore). Ho letto il bot riga per
+riga contro il gioco: **tutte le funzioni che chiama esistono, coi nomi e gli argomenti
+giusti** (azioni, spostamenti, orari, Strada, Studio, fine giornata), e anche le finestre
+che chiude esistono. I numeri scritti nel giro del 29/09 qui sopra combaciano con
+`test-results/bilanciamento-sei/rapporto.md`. Le opzioni in testa al runner combaciano col
+codice (`--lavoratori` 1, `--uscita` dentro `frontend/`, che git ignora). Nessuna delle voci
+sotto blocca la partita: sono tutte sullo strumento e su come si leggono i suoi numeri.
+
+### Il comando per rigiocare una carriera, scritto nel rapporto, butta via il rapporto della notte
+- **dove** — `frontend/strumenti/bilanciamento/rapporto.js:259`, insieme a
+  `frontend/strumenti/simulatore-bilanciamento.js:135`
+- **cosa succede** — il rapporto consiglia `npm run bilanciamento -- --carriere N
+  --lavoratori 1` per rigiocare una carriera. Ma senza `--riprendi` il simulatore mette da
+  parte le righe della notte (le rinomina con un numero lungo) e riscrive `rapporto.md` e
+  `rapporto.json` nella stessa cartella: dopo aver rigiocato la carriera 17, il rapporto
+  delle mille carriere non c'è più, e per rifarlo bisogna ritrovare e rinominare a mano il
+  file messo da parte. In più rigioca dalla 1 alla N, non la N da sola.
+- **come si vede** — finisci una notte, poi lancia il comando del rapporto con
+  `--carriere 17`.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (29/09/2026)** — stesso branch: c'è `--sola N`, che rigioca solo la carriera N
+  in una cartella sua (`test-results/bilanciamento-sola-N`), e il rapporto consiglia quello.
+  Provato con `--sola 2`.
+
+### Il rapporto del giro dei sei sta in una cartella che git non ignora
+- **dove** — `test-results/` nella radice del progetto (non in `frontend/`); `.gitignore:3`
+  ignora solo `frontend/test-results/`
+- **cosa succede** — il giro del 29/09 qui sopra dice che il rapporto «non va su git», ma
+  `test-results/bilanciamento-sei/` (e le sorelle `-anno`, `-prova`, `-uno`) stanno nella
+  radice, dove git le vede: `git status` le mostra fra i file nuovi, e un `git add .` le
+  porterebbe dentro. In più il comando scritto lì (`--carriere 6`) scrive in
+  `frontend/test-results/bilanciamento`, non nella cartella citata.
+- **come si vede** — `git status` nella radice: c'è `?? test-results/`.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (29/09/2026)** — stesso branch: le cartelle dei giri di prova sono passate in
+  `frontend/test-results/`, dove finisce anche il simulatore di suo e che git ignora; i
+  rimandi del giro dei sei sono corretti.
+
+### «Eventi risposti» conta anche la finestra del titolo del pezzo
+- **dove** — `frontend/strumenti/bilanciamento/bot.js:34`; la finestra è in
+  `frontend/js/game/copertine.js:57`
+- **cosa succede** — il bot non conta come evento le finestre «Come la fai», «Colloqui» e
+  «Il titolo». Ma la finestra del titolo si chiama «Come lo chiami», non «Il titolo»: così
+  ogni pezzo registrato conta come un evento. Nel giro dei sei il musicista ha 119 «eventi
+  risposti» e 81 registrazioni, la promo 137 e 103: la riga degli eventi è quasi tutta
+  titoli.
+- **come si vede** — `test-results/bilanciamento-sei/rapporto.md`, riga «eventi risposti»,
+  confrontata con «registra» nelle azioni.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (29/09/2026)** — stesso branch: il bot salta «Come lo chiami», e le tre finestre
+  stanno in un elenco solo (`NON_EVENTI`) che l'audit confronta coi titoli veri del gioco.
+
+### Il rapporto scrive valori di partenza come se fossero misure
+- **dove** — `frontend/strumenti/bilanciamento/rapporto.js:91` e `:243`
+- **cosa succede** — due cose della stessa famiglia. La «miglior classifica» di chi non è
+  mai entrato in classifica esce **99**, che nel gioco è il valore di partenza
+  (`frontend/js/game/state.js:30`), non un piazzamento: nel giro dei sei `fermo` e `caso`
+  hanno «99». E con `--solo-rapporto` il titolo dice «carriere da 364 giorni» anche se le
+  carriere erano più corte, perché prende il valore di default e non quello delle righe.
+- **come si vede** — la tabella «Le strategie a fine anno» del giro dei sei; oppure
+  `--solo-rapporto` su un giro fatto con `--giorni 120`.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (29/09/2026)** — stesso branch: chi non è mai entrato in classifica esce «—», e
+  il titolo prende i giorni dalle carriere, non dall'opzione.
+
+### Il tempo della «giornata» misura anche le mosse del bot, non solo il +1
+- **dove** — `frontend/strumenti/simulatore-bilanciamento.js:98` e `:113`; il giro del 29/09
+  qui sopra, «La giornata rallenta per chi lavora», e la voce 65 dell'indice
+- **cosa succede** — il tempo viene preso attorno all'intera giornata del bot: le mosse, le
+  attese a passi di mezz'ora (ognuno salva la partita) e poi il +1. Il giro del 29/09 scrive
+  invece che è «una giornata vera (il +1)» che passa da 0,7 a 3,3 secondi. Il lavoratore è
+  anche quello che aspetta di più (726 attese contro 99–124 delle altre strategie), quindi il
+  rallentamento potrebbe essere il bot che aspetta, e non il gioco. Va misurato il +1 da solo
+  prima di cercare «qualcosa che cresce senza tetto».
+- **come si vede** — nel rapporto dei sei: «aspetta 726» per il lavoratore, e la riga «ms a
+  giornata».
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (29/09/2026)** — stesso branch: il bot misura il «+1» da solo (`msSalto`), il
+  rapporto ha una riga sua e il sospetto «il gioco rallenta» guarda quello; la giornata
+  intera resta, scritta «bot compreso». Il giro dei sei non dice più «una giornata vera».
+
+### «Lavorare non rende» è in buona parte il modo in cui gioca il bot
+- **dove** — `frontend/strumenti/bilanciamento/bot.js:203`, confrontato da
+  `frontend/strumenti/bilanciamento/rapporto.js:119`
+- **cosa succede** — il lavoratore fa il turno ogni giorno e poi, quando arriva in studio, è
+  troppo tardi: registra 100 pezzi (50 € di sala l'uno, più 99 beat comprati) ma ne pubblica
+  26, e si vede rifiutare «pubblica» per 152 volte perché la giornata è finita. I pezzi mai
+  usciti restano e costano ogni settimana (è la voce 61). Il confronto è con `fermo`, che non
+  spende niente in musica: così il sospetto misura la strategia che spreca, non il lavoro che
+  rende poco. È lo stesso tipo di falso sospetto della «strategia a caso che non pubblica
+  mai», già segnata.
+- **come si vede** — nel rapporto dei sei, le azioni e i rifiuti del lavoratore.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO in parte (29/09/2026)** — stesso branch: il lavoratore del bot mixa e pubblica
+  prima del turno, non dopo. Il sospetto nel rapporto resta: se anche così chi lavora chiude
+  sotto chi sta fermo, allora è il gioco. Il numero rifatto è nel giro dei sei.
+
+### Il commento in testa al runner dà tempi che il giro stesso smentisce
+- **dove** — `frontend/strumenti/simulatore-bilanciamento.js:9`
+- **cosa succede** — dice che un anno dura «da uno (chi fa crimini) a otto minuti (chi
+  spinge la promo)». Nel giro dei sei il criminale ci ha messo 2,5 minuti, la promo 6 e il più
+  lento è stato il lavoratore, con 13. Il conto «un centinaio a notte» regge lo stesso.
+- **come si vede** — la tabella del giro del 29/09 qui sopra, riga «minuti per l'anno».
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (29/09/2026)** — stesso branch: «da due minuti e mezzo a tredici (chi lavora)».
+
+### L'audit controlla le funzioni del bot, ma non le scritte e i nomi su cui si orienta
+- **dove** — `frontend/strumenti/audit-regressioni.js:2872`
+- **cosa succede** — il controllo nuovo guarda che le funzioni chiamate dal bot esistano, ed
+  è a posto. Ma il bot si basa anche su cose che il controllo non guarda: il titolo delle
+  finestre («Come la fai», «Colloqui»), l'impostazione che toglie le conferme
+  (`SET.gioco.conferme`), `GAME_TRAVEL.go`, `STRADA_SCENA`, i nomi dei colpi della Strada e
+  delle mosse. Se una di queste cambia, il bot non si rompe e non se ne accorge nessuno: per
+  esempio senza «Come la fai» sceglierebbe a caso fra «Falla veloce» e il foglio bianco. La
+  scritta «Il titolo» della voce sopra è già un caso di questi. Anche i controlli su
+  `GAME_TIME` cercano solo la parola nel file, e passerebbero comunque.
+- **come si vede** — leggere il blocco dell'audit accanto a `bot.js`.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (29/09/2026)** — stesso branch: un controllo in più guarda i tre titoli delle
+  finestre (nel gioco e nel bot), i tre colpi, le tredici azioni che il bot chiama per id,
+  `conferme` nelle impostazioni e `STRADA_SCENA`; `GAME_TIME` e `GAME_TRAVEL` (con `go`) si
+  cercano dentro all'oggetto esportato, non in tutto il file.
+
+### Nota sui documenti: la roadmap e la voce 65 dicono due cose opposte sul crimine
+- **dove** — `documentazione/roadmap.md:278`; la voce 65 in cima a questo file
+- **cosa succede** — la roadmap tiene fra le cose che mancano «la criminalità che oggi è
+  troppo facile», e il simulatore dice il contrario: il crimine non paga mai. Non è un errore
+  del codice: una delle due va aggiornata quando si decide la voce 65. Anche il titolo
+  dell'indice in cima dice ancora «Cosa resta aperto al 27/09/2026», con dentro la voce del
+  29/09.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (29/09/2026)** — stesso branch: la riga della roadmap rimanda alla voce 65 (tutte
+  e due possono essere vere: il colpo si fa facile, ma non rende), e l'indice dice 29/09.

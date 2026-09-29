@@ -275,7 +275,9 @@ spende energia» in `implementazioni/06-mondo-e-personaggi.md`).
   hanno abilità, fama e carattere»*;
 - i rapporti coi beatmaker che non vanno mai in negativo: li puoi offendere quanto vuoi e
   il rapporto resta uguale (foglio dei punti nuovi, Alessio);
-- la vita simulata, e la criminalità che oggi è troppo facile: risposta scritta, codice no;
+- la vita simulata, e la criminalità che oggi è troppo facile: risposta scritta, codice no.
+  Il simulatore di bilanciamento (29/09) aggiunge che non rende: con un colpo al giorno
+  l'anno finisce in carcere e in rosso (voce 65 di `problemi-riscontrati.md`);
 - i dialoghi tanti e diversi, e gli scenari uguali nella forma e diversi nelle circostanze:
   tutti e due a metà.
 

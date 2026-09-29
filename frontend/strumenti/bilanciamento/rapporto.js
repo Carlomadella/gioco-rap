@@ -24,7 +24,7 @@ const somma = (tab, da) => { for(const [k, v] of Object.entries(da || {})) tab[k
 /* una carriera interrotta chiude con una settimana `parziale` che ha solo i tempi */
 const ultima = r => r.settimane.filter(s => !s.parziale).pop() || {};
 
-const CURVE = ["fan", "soldi", "hype", "pezzi", "stream", "ben", "luc", "rep", "calore", "ms"];
+const CURVE = ["fan", "soldi", "hype", "pezzi", "stream", "ben", "luc", "rep", "calore", "ms", "msSalto"];
 
 function leggi(file){
   if(!fs.existsSync(file)) return [];
@@ -196,15 +196,19 @@ const SOSPETTI = [
     }
     return s.length ? `**Azioni che non partono mai.** ${s.join("; ")}. Guarda i rifiuti qui sotto per il perché.` : null;
   },
-  /* non è bilanciamento, ma si vede solo così: una giornata che a fine anno costa
-     molto più che all'inizio vuol dire che qualcosa nel salvataggio cresce senza tetto */
+  /* non è bilanciamento, ma si vede solo così: un «+1» che a fine anno costa molto più
+     che all'inizio vuol dire che qualcosa nel salvataggio cresce senza tetto. Si guarda il
+     «+1» da solo (msSalto): la giornata intera conta anche le mosse del bot, che crescono
+     con la carriera per conto loro. Le righe vecchie, senza msSalto, usano la giornata. */
   function rallenta(R, C){
     const s = [];
     for(const [k, cc] of Object.entries(C)){
-      const t = cc.filter(r => r.ms.p50 != null);
+      const salto = cc.some(r => r.msSalto && r.msSalto.p50 != null);
+      const c = salto ? "msSalto" : "ms";
+      const t = cc.filter(r => r[c] && r[c].p50 != null);
       if(t.length < 8) continue;
-      const a = med(t.slice(0, 4).map(r => r.ms.p50)), b = med(t.slice(-4).map(r => r.ms.p50));
-      if(b > 1000 && b > a * 2) s.push(`\`${k}\` (${num(a)} → ${num(b)} ms a giornata)`);
+      const a = med(t.slice(0, 4).map(r => r[c].p50)), b = med(t.slice(-4).map(r => r[c].p50));
+      if(b > (salto ? 500 : 1000) && b > a * 2) s.push(`\`${k}\` (${num(a)} → ${num(b)} ms ${salto ? "per il «+1»" : "a giornata, bot compreso"})`);
     }
     return s.length ? `**Il gioco rallenta col passare della carriera.** ${s.join(", ")}: qualcosa cresce senza tetto, e prima o poi un giorno non torna più.` : null;
   },
@@ -240,7 +244,7 @@ function scriviRapporto(file, cartella, opz){
 
   const md = [];
   md.push("# Simulatore di bilanciamento — il rapporto", "");
-  md.push(`*${tutte.length} carriere da ${opz.giorni || med(tutte.map(r => r.giorni))} giorni, scritto il ${new Date().toLocaleString("it-IT")}. ` +
+  md.push(`*${tutte.length} carriere da ${med(tutte.map(r => r.giorni))} giorni, scritto il ${new Date().toLocaleString("it-IT")}. ` +
     `Le cifre sono mediane a fine carriera; fra parentesi il 10° e il 90° percentile.*`, "");
 
   md.push("## Le curve che sembrano rotte", "");
@@ -256,7 +260,7 @@ function scriviRapporto(file, cartella, opz){
   for(const [b, ns] of Object.entries(blocchi).sort((a, b) => b[1].size - a[1].size).slice(0, 10))
     rotte.push(`- blocco in ${ns.size} carriere (${[...ns].slice(0, 5).map(n => "#" + n).join(" ")}): ${b}`);
   md.push(rotte.length ? rotte.join("\n") : "Niente: nessun errore JS, nessuna invariante saltata, nessun giorno che non si chiude.", "");
-  md.push("Una carriera si rigioca uguale col suo numero: `npm run bilanciamento -- --carriere N --lavoratori 1` rifà dalla 1 alla N con gli stessi semi.", "");
+  md.push("Una carriera si rigioca uguale col suo numero: `npm run bilanciamento -- --sola N` rigioca la carriera N da sola, in una cartella sua: questo rapporto resta com'è.", "");
 
   md.push("## Le strategie a fine anno", "");
   const q3 = x => x.p50 == null ? "—" : `${num(x.p50)} (${num(x.p10)}–${num(x.p90)})`;
@@ -278,7 +282,8 @@ function scriviRapporto(file, cartella, opz){
     ["eventi risposti", ...riga(0, r => num(r.eventi))],
     ["giornate chiuse male", ...riga(0, r => Object.entries(r.salti).filter(([k]) => k !== "ok").map(([k, v]) => `${k}: ${v}`).join(", ") || "—")],
     ["secondi a carriera", ...riga(0, r => num(r.secondi))],
-    ["ms a giornata, inizio → fine", ...nomi.map(n => { const t = C[n].filter(r => r.ms.p50 != null); return t.length ? `${num(t[0].ms.p50)} → ${num(t[t.length - 1].ms.p50)}` : "—"; })]
+    ["ms a giornata, inizio → fine", ...nomi.map(n => { const t = C[n].filter(r => r.ms.p50 != null); return t.length ? `${num(t[0].ms.p50)} → ${num(t[t.length - 1].ms.p50)}` : "—"; })],
+    ["ms del «+1», inizio → fine", ...nomi.map(n => { const t = C[n].filter(r => r.msSalto && r.msSalto.p50 != null); return t.length ? `${num(t[0].msSalto.p50)} → ${num(t[t.length - 1].msSalto.p50)}` : "—"; })]
   ]), "");
 
   md.push("### Abilità a fine anno (mediana)", "");

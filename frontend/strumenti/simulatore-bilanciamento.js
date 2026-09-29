@@ -5,16 +5,18 @@
      npm run bilanciamento -- --carriere 60 --giorni 120    un giro corto, per provare
      npm run bilanciamento -- --riprendi                    riparte da dove si era fermato
      npm run bilanciamento -- --solo-rapporto               rifà il rapporto dai risultati
+     npm run bilanciamento -- --sola 17                     rigioca la carriera 17, uguale,
+                                                            in test-results/bilanciamento-sola-17
 
-   Una carriera alla volta: un anno dura da uno (chi fa crimini) a otto minuti (chi spinge
-   la promo), quindi una notte ne fa un centinaio e le mille si chiudono in più notti,
+   Una carriera alla volta: un anno dura da due minuti e mezzo (chi fa crimini, chi sta
+   fermo, chi fa a caso) a tredici (chi lavora), quindi una notte ne fa un centinaio e le mille si chiudono in più notti,
    ognuna con --riprendi. In parallelo (29/09/2026, otto alla volta) dopo una trentina di
    carriere le pagine si fermavano o si ricaricavano a metà: --lavoratori N c'è ancora,
    ma i risultati di quel giro non erano da fidarsi.
 
    Opzioni: --carriere N (1000) · --giorni N (364) · --lavoratori N (1)
    · --strategie musicista,promo,… (tutte) · --seme N (1) · --porta N (8124)
-   · --uscita cartella (test-results/bilanciamento).
+   · --uscita cartella (test-results/bilanciamento, dentro a frontend/: git la ignora).
 
    Il giocatore lo fa strumenti/bilanciamento/bot.js, dentro al browser vero: è il bot
    del giro di un anno del 27/09/2026, con una strategia per carriera (chi lavora, chi
@@ -47,7 +49,8 @@ const GIORNI = Number(arg("--giorni", 364));
 const LAVORATORI = Math.max(1, Number(arg("--lavoratori", 1)));
 const SEME = Number(arg("--seme", 1));
 const PORTA = Number(arg("--porta", 8124));
-const USCITA = path.resolve(RADICE, arg("--uscita", "test-results/bilanciamento"));
+const SOLA = Number(arg("--sola", 0));
+const USCITA = path.resolve(RADICE, arg("--uscita", SOLA ? "test-results/bilanciamento-sola-" + SOLA : "test-results/bilanciamento"));
 const RIGHE = path.join(USCITA, "carriere.jsonl");
 const TUTTE = ["musicista", "lavoratore", "promo", "criminale", "fermo", "caso"];
 const STRATEGIE = arg("--strategie", TUTTE.join(",")).split(",").map(s => s.trim()).filter(Boolean);
@@ -83,7 +86,7 @@ async function carriera(page, n, strategia){
   page.on("pageerror", suErrore);
   page.on("console", suConsole);
   const t0 = Date.now();
-  let msSett = [];
+  let msSett = [], msSalti = [];
   try{
     await page.goto(`http://127.0.0.1:${PORTA}/pagine/gioco.html`);
     await page.evaluate(() => localStorage.clear());
@@ -111,9 +114,11 @@ async function carriera(page, n, strategia){
       if(sc.invarianti.length && rec.invarianti.length < 30) rec.invarianti.push({ g, p: sc.invarianti.slice(0, 5) });
       /* quanto dura una giornata vera: se cresce con la carriera, il gioco rallenta */
       msSett.push(Date.now() - tg);
+      msSalti.push(sc.msSalto || 0);
       if(g % 7 === 0 || g === GIORNI){
-        rec.settimane.push({ g, ...sc.foto, ms: Math.round(msSett.reduce((a, b) => a + b, 0) / msSett.length), msMax: Math.max(...msSett) });
-        msSett = [];
+        rec.settimane.push({ g, ...sc.foto, ms: Math.round(msSett.reduce((a, b) => a + b, 0) / msSett.length), msMax: Math.max(...msSett),
+          msSalto: Math.round(msSalti.reduce((a, b) => a + b, 0) / msSalti.length) });
+        msSett = []; msSalti = [];
       }
       if(sc.foto.finita){ rec.note.push("partita finita al giorno " + g); break; }
     }
@@ -136,7 +141,8 @@ async function carriera(page, n, strategia){
 
   const fatte = giaFatte();
   const coda = [];
-  for(let n = 1; n <= CARRIERE; n++) if(!fatte.has(n)) coda.push(n);
+  if(SOLA) coda.push(SOLA);
+  else for(let n = 1; n <= CARRIERE; n++) if(!fatte.has(n)) coda.push(n);
   console.log(`Simulatore di bilanciamento: ${coda.length} carriere da ${GIORNI} giorni (${fatte.size} già fatte), ` +
     `${LAVORATORI} alla volta, strategie ${STRATEGIE.join(", ")}.`);
 
