@@ -6,6 +6,30 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:2c5c304 -->
+## 29/09/26, 21:14 â€” task/problemi-risolti â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `2c5c304`
+
+### Cosa Ã¨ entrato
+
+- `058144e` â€” I problemi chiusi in problemi-risolti.md: le voci del giro di fine task â€” **Carlomadella**
+- `81104f5` â€” I problemi chiusi in problemi-risolti.md, e il foglio dei punti nuovi solo con quelli aperti â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `.claude/agents/segnala-problemi.md`
+- **Modificato:** `documentazione/README.md`
+- **Modificato:** `documentazione/come-si-lavora.md`
+- **Modificato:** `documentazione/pagine-azioni/README.md`
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Aggiunto:** `documentazione/problemi-risolti.md`
+
+**File interessati in questa categoria:** 6
+
+---
+
 <!-- merge:f06f0ea -->
 ## 27/09/26, 16:53 â€” task/rapporto-voci-57-64 â†’ main
 

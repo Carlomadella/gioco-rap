@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:2c5c304 -->
+## 29/09/26, 21:14 â€” task/problemi-risolti â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `2c5c304`
+
+### Cosa Ã¨ entrato
+
+- `058144e` â€” I problemi chiusi in problemi-risolti.md: le voci del giro di fine task â€” **Carlomadella**
+- `81104f5` â€” I problemi chiusi in problemi-risolti.md, e il foglio dei punti nuovi solo con quelli aperti â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `.claude/agents/backend-allineato.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:33a69bd -->
 ## 27/09/26, 15:13 â€” task/backend-documento-salvataggi â†’ main
 
