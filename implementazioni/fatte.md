@@ -65,7 +65,7 @@ detto, la richiesta com'era scritta in [`fatte.md`](fatte.md):
   plancia a 1280 × 800 e 1366 × 768: «La fascia della plancia fra 980 e 1240, e la plancia
   a 1280 × 800», `02-interfaccia-e-telefono.md`.
 - **Le transizioni video** — FATTO 20/09 (lo Studio dal 16/09): «Le transizioni video: gli
-  altri quattro», `02-interfaccia-e-telefono.md`. I sette video in più sono la voce 19.
+  altri quattro», `02-interfaccia-e-telefono.md`. I sette video in più sono la voce 18.
 - **L'evento fatto esce dall'agenda** — FATTO 20/09: `02-interfaccia-e-telefono.md`.
 - **I prezzi dei beat per fama del beatmaker** — FATTO 20/09: `04-musica-e-suoni.md`.
 - **Si parte con tutti i parametri a 1** — FATTO 20/09: `05-carriera-e-tempo.md`.
@@ -844,7 +844,7 @@ _Da `implementazioni.md`, FATTE._
    **è già successo tre volte** — la ✕ dello Studio (punto 15), `renderNegozio` che
    non esisteva, e una terza trovata scrivendo il README (`strada-crimine` non era
    l'id di niente), sistemata il 07/09/2026 e raccontata in
-   [`documentazione/problemi-riscontrati.md`](../documentazione/problemi-riscontrati.md).
+   [`documentazione/problemi-risolti.md`](../documentazione/problemi-risolti.md).
    Tutte e tre chiuse cambiando una riga; nessuna delle tre ha tolto il motivo.
    Un registro unico costa un paio di giorni, non cambia niente di quello che si
    vede e dimezza il costo di ogni pagina fatta da lì in poi.

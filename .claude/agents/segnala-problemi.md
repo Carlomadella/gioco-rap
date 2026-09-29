@@ -87,8 +87,9 @@ già sistemata (se è tornata, dillo e cita la voce chiusa):
 ```
 
 **Non cancelli e non riscrivi quello che c'è già.** Aggiungi in fondo. Se un problema di
-un giro precedente adesso è sistemato, non lo togli: gli scrivi sotto una riga
-`**RISOLTO (04/09/2026)** — ...`, così resta la storia di cosa era successo.
+un giro precedente adesso è sistemato, non lo cancelli: gli scrivi sotto una riga
+`**RISOLTO (04/09/2026)** — ...` e sposti la voce, intera, in `documentazione/problemi-risolti.md`
+(nel suo giro, o in fondo col titolo del giro). Così la storia resta, e questo foglio tiene solo le aperte.
 
 Se non hai trovato niente, scrivilo: una riga sotto il titolo del giro che dice cosa hai
 controllato e che era tutto a posto. Un giro senza esito è un'informazione, un file muto

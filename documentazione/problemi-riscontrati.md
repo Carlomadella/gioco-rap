@@ -4,13 +4,17 @@ Qui stanno solo le cose **ancora aperte**, trovate dai giri di controllo (gli ag
 `segnala-problemi`, `backend-allineato`, `prova-sul-telefono`) o giocando. Quando una voce
 si chiude, sotto le si scrive `**RISOLTO (gg/mm/aaaa)** — in una frase` e la voce passa in
 [`problemi-risolti.md`](problemi-risolti.md), insieme al suo numero se ce l'ha nell'indice.
-Le voci chiuse fino al 29/09/2026 sono tutte lì, coi giri che le hanno trovate.
+Le voci chiuse fino al 29/09/2026 sono tutte lì, coi giri che le hanno trovate: un rimando
+scritto prima del 29/09 a «un giro di problemi-riscontrati» (nei fogli dei punti, nella
+roadmap, nei commenti del codice) quel giro lo trova in `problemi-risolti.md`, con la stessa data.
 
 ## Cosa resta aperto al 29/09/2026
 
 I numeri sono quelli di sempre, e restano: altri documenti citano «la voce 65». La prossima
-voce nuova è la 66. Le voci aperte stanno anche in «Da fare adesso» di
-[`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md).
+voce nuova è la 68. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
+[`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md) (la 7 con «Via la
+lucidità», la 9 fra «Le decisioni tue», la 10 fra quelle fuori dall'ordine); la 61 e la 65
+sono decisioni di bilanciamento e per ora stanno solo qui.
 
 **7.** **L'uscita di venerdì non costa niente, quella a mano sì** (08/09): risolto in parte per
 scelta — il vantaggio di venerdì è quello di aspettare, non uno sconto. Sparisce del tutto
@@ -38,6 +42,14 @@ il turno ogni giorno chiude con 346 €, chi sta fermo con 897), **la giornata r
 contratto** in nessuna strategia. Le abilità al tetto sono la stessa cosa della voce 61.
 Una carriera per strategia: sono indizi, da riprovare su un centinaio. Il dettaglio nel
 giro del 29/09 in fondo, «Il simulatore di bilanciamento».
+
+**66.** Da decidere (29/09): **«Via la lucidità» è ancora fra i lavori da fare** (voce 3 di «Da
+fare adesso», CARLO 8), ma Carlo il 21/09 ha detto che la lucidità resta (voce 61). O esce dalla
+lista, o si scrive che è sospesa; e la voce 7 non sparirà «con la lucidità». Il dettaglio nel giro
+del 29/09 in fondo.
+
+**67.** Da decidere (29/09): **CARLO 12 (il recap giornaliero) e CARLO 13 (le trasferte dalla
+prima città)** sono aperti ma non stanno in «Da fare adesso» né fra quelli fuori dall'ordine.
 
 ---
 
@@ -467,3 +479,50 @@ sotto blocca la partita: sono tutte sullo strumento e su come si leggono i suoi 
 - **RISOLTO in parte (29/09/2026)** — stesso branch: il lavoratore del bot mixa e pubblica
   prima del turno, non dopo. Il sospetto nel rapporto resta: se anche così chi lavora chiude
   sotto chi sta fermo, allora è il gioco. Il numero rifatto è nel giro dei sei.
+
+---
+
+## Giro del 29/09/2026 (segnala-problemi, giro stretto sul commit `81104f5`, i chiusi in `problemi-risolti.md`)
+
+Solo documentazione, nessun file del gioco toccato; la verifica era già verde e non l'ho
+rilanciata. **Il passaggio non ha perso testo**: ho messo a confronto, parola per parola, il
+foglio com'era prima (`git show HEAD~1:…`) con la somma dei due fogli nuovi. Mancano solo la
+riga «Tutto il resto, da qui in giù, è chiuso» e i numeri dell'indice scritti `1.` invece
+di `**1.**`, cioè cambi voluti. **Nessuna voce aperta è finita fra le risolte**: le cinque
+dell'indice (7, 9, 10, 61, 65) e i 14 dettagli dei loro giri stanno in questo foglio. Ogni
+voce `###` passata di là ha il suo RISOLTO, una RISPOSTA, è una nota oppure è chiusa
+dall'indice o da un blocco di chiusura del suo giro, con due eccezioni (la prima voce qui
+sotto). Anche in `implementazioni.md` ogni punto rimasto è ancora da fare o fatto in parte,
+e in `fatte.md` non c'è niente di aperto. Le cose che non tornano sono sei, tutte nei
+documenti.
+
+### «Via la lucidità» è ancora fra i lavori da fare, anche se Carlo ha deciso che la lucidità resta
+- **dove** — `implementazioni/implementazioni.md:97-101` (voce 3 di «Da fare adesso») e
+  `:343` (CARLO 8), `documentazione/problemi-riscontrati.md:15-17` (voce 7), contro
+  `documentazione/problemi-riscontrati.md:30` (voce 61: «la lucidità resta, decisione di
+  Carlo del 21/09»)
+- **cosa succede** — i due fogli ripuliti adesso sono corti e si leggono tutti d'un fiato,
+  e proprio per questo si nota che si contraddicono. La voce 61 dice che la lucidità resta
+  e va resa più incisiva, non tolta. La voce 3 dell'ordine dice «Via la lucidità», e la
+  voce 7 di questo foglio dice che l'uscita di venerdì «sparisce del tutto» con quel
+  lavoro. Chi prende la prossima voce dell'elenco si mette a togliere una cosa che Carlo
+  vuole tenere. **È una scelta, non un errore**: va deciso se il punto CARLO 8 si chiude
+  con una RISPOSTA, e allora la voce 3 esce dall'ordine e la 7 va riscritta.
+- **come si vede** — leggi le tre righe una dopo l'altra.
+- **quanto pesa** — da sistemare con calma.
+
+### Due voci passate fra le risolte senza un RISOLTO sotto, e due punti nuovi di CARLO fuori dall'ordine
+- **dove** — `documentazione/problemi-risolti.md:3336` e `:3360` (giro del 15/09 su
+  `task/sistema-il-foglio-dei-punti-nuovi`); `implementazioni/implementazioni.md:358` e `:360`
+  (CARLO 12, il recap giornaliero, e CARLO 13, le trasferte fin dalla prima città)
+- **cosa succede** — le due voci del 15/09 («"Cosa resta aperto" dice che il suo ordine è
+  lo stesso…» e «L'hover al tocco è chiuso dall'08/09, ma tre elenchi…») nei fatti sono
+  chiuse: la premessa dell'indice è stata riscritta, e l'hover è la voce 3 barrata. Però
+  sotto non hanno la loro riga RISOLTO, e sono le uniche del file. I due punti di CARLO
+  aggiunti il 29/09 (commit `36ab184`) sono giustamente fra gli aperti, ma non stanno né
+  nell'elenco di «Da fare adesso» né in «Restano fuori dall'ordine». Non è colpa di
+  questo commit.
+- **come si vede** — leggi le due voci fino al giro successivo; cerca «recap» in «Da fare
+  adesso».
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO in parte (29/09/2026)** — stesso branch: le due voci del 15/09 in `problemi-risolti.md` hanno la loro riga RISOLTO. Resta dove mettere CARLO 12 e 13 nell'ordine di «Da fare adesso»: è una scelta di priorità (voce 67).

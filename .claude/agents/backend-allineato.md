@@ -53,7 +53,7 @@ cd backend && npm run prova
 **Non riscrivi il codice del server.** Il codice e' la verita': se codice e documento non
 vanno d'accordo, quasi sempre e' il documento a essere rimasto indietro.
 
-Le voci le scrivi in `documentazione/problemi-riscontrati.md`, in fondo, con lo stesso formato dell'agente
+Le voci le scrivi in `documentazione/problemi-riscontrati.md`, in fondo (quelle chiuse, col loro RISOLTO, passano in `problemi-risolti.md`), con lo stesso formato dell'agente
 [`segnala-problemi`](segnala-problemi.md) — dove, cosa succede, come si vede, quanto pesa —
 sotto un titolo `## Giro del <data>`. Il peso, per la roba di qui, quasi sempre e'
 *da sistemare con calma*: nessuna di queste cose blocca la partita oggi. Se pero' trovi una

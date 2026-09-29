@@ -62,7 +62,7 @@ pesa. Aggiungi in cima al giro la misura usata (390 × 844, e 360 × 640 se l'ha
 senza quella, la segnalazione non si puo' riprovare.
 
 Non cancelli le voci vecchie. Se una di un giro precedente adesso e' a posto, ci scrivi
-sotto `**RISOLTO (data)**`.
+sotto `**RISOLTO (data)**` e la sposti, intera, in `documentazione/problemi-risolti.md`.
 
 Quando hai finito, segna il giro come fatto — serve a non farti richiamare domani per
 niente:

@@ -8,7 +8,8 @@ di là si chiude, passa qui, nel suo giro (in fondo, se il giro non c'è ancora)
 ## L'indice delle voci chiuse
 
 Smistato leggendo ogni voce contro il codice: sotto a ciascuna c'è scritto se e quando è
-stata chiusa. Qui solo quelle **ancora aperte**, nello stesso ordine di «Da fare adesso» in
+stata chiusa. *(Scritto quando le voci stavano tutte in un foglio solo: le aperte di allora
+sono rimaste in `problemi-riscontrati.md`, qui sotto ci sono le chiuse.)* Qui solo quelle **ancora aperte**, nello stesso ordine di «Da fare adesso» in
 [`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md), che mette
 insieme i due fogli: prima il telefono, poi quello che pesa nel pacchetto, poi le cose
 piccole, poi i lavori lunghi, in fondo le decisioni. Riordinato il 15/09 dopo il giro di
@@ -67,7 +68,7 @@ nell'audit lo tengono fermo. Vedi «Le tre del Marketing» in
 
 **3.** ~~**Sul telefono i colori del «passaggio del mouse» restano accesi dopo il tocco** (08/09):
 il giro unico su tutti i CSS.~~ **RISOLTO (08/09/2026, riconosciuto il 15/09)** — era
-chiuso lo stesso giorno e la riga sotto alla voce mancava: vedi il giro del 15/09 in fondo.
+chiuso lo stesso giorno e la riga sotto alla voce mancava: vedi il giro del 15/09 più sotto.
 
 **4.** ~~**L'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore** (13/09).~~
 **RISOLTO (19/09/2026)** — la schermata «Preparo il tuo artista» con le fasi vere del
@@ -753,7 +754,7 @@ torna: tutte le 161 regole `:hover` dei 27 fogli in `frontend/css/` stanno dentr
 gabbia `@media (hover:hover)`, e il controllo automatico «nessun :hover fuori da
 @media (hover:hover)» in `audit-regressioni.js` è verde anche sui pezzi di grafica scritti
 dentro al JavaScript. Questa riga mancava, ed è per questo che la voce è rimasta negli
-elenchi degli aperti: vedi il giro del 15/09 in fondo.
+elenchi degli aperti: vedi il giro del 15/09 più sotto.
 
 ### Nota, non è un errore: in cabina il tasto d'oro è quello che spende
 
@@ -3356,6 +3357,7 @@ aperti, come chiesto: sotto le due cose che non tornano.
   premessa qui smette di promettere lo stesso ordine (basta dire «tutte stanno in "Da fare
   adesso", che le mette in fila con le altre»), o le dieci voci qui si riordinano come di
   là. Non ho toccato né l'una né l'altra.
+- **RISOLTO (riconosciuto il 29/09/2026)** — la premessa dell'indice è stata riscritta, e dal 29/09 l'indice sta in testa a `problemi-riscontrati.md` con le sole aperte.
 
 ### L'hover al tocco è chiuso dall'08/09, ma tre elenchi lo danno ancora da fare
 
@@ -3386,6 +3388,7 @@ aperti, come chiesto: sotto le due cose che non tornano.
   risposta al «mentre premo». Non ho toccato nessuno dei tre.
 
 ---
+- **RISOLTO (riconosciuto il 29/09/2026)** — l'hover è barrato come chiuso (voce 3 dell'indice) ed è uscito dagli elenchi degli aperti.
 
 ## Giro del 16/09/2026 (segnala-problemi, fine task `task/prima-transizione-video`, prima del commit)
 
@@ -6163,3 +6166,84 @@ due scelte di scrittura, non errori.
 - **quanto pesa** — da sistemare con calma.
 - **RISOLTO (29/09/2026)** — stesso branch: la riga della roadmap rimanda alla voce 65 (tutte
   e due possono essere vere: il colpo si fa facile, ma non rende), e l'indice dice 29/09.
+
+---
+
+## Giro del 29/09/2026 (segnala-problemi, giro stretto sul commit `81104f5`, i chiusi in `problemi-risolti.md`)
+
+Solo documentazione, nessun file del gioco toccato; la verifica era già verde e non l'ho
+rilanciata. **Il passaggio non ha perso testo**: ho messo a confronto, parola per parola, il
+foglio com'era prima (`git show HEAD~1:…`) con la somma dei due fogli nuovi. Mancano solo la
+riga «Tutto il resto, da qui in giù, è chiuso» e i numeri dell'indice scritti `1.` invece
+di `**1.**`, cioè cambi voluti. **Nessuna voce aperta è finita fra le risolte**: le cinque
+dell'indice (7, 9, 10, 61, 65) e i 14 dettagli dei loro giri stanno in questo foglio. Ogni
+voce `###` passata di là ha il suo RISOLTO, una RISPOSTA, è una nota oppure è chiusa
+dall'indice o da un blocco di chiusura del suo giro, con due eccezioni (la prima voce qui
+sotto). Anche in `implementazioni.md` ogni punto rimasto è ancora da fare o fatto in parte,
+e in `fatte.md` non c'è niente di aperto. Le cose che non tornano sono sei, tutte nei
+documenti.
+
+*Le voci ancora aperte di questo giro stanno in [`problemi-riscontrati.md`](problemi-riscontrati.md).*
+
+### «I sette video in più sono la voce 19»: dopo la rinumerazione sono la 18
+- **dove** — `implementazioni/fatte.md:68`
+- **cosa succede** — la riga «Le transizioni video» è stata spostata così com'era, e il
+  numero che citava non è stato aggiornato. In «Da fare adesso» le voci sono scese di uno:
+  «I sette video che nessun punto chiede» adesso è la 18 e la 19 non esiste più. La «voce
+  6» due righe sopra, invece, è ancora giusta.
+- **come si vede** — leggi la riga, poi conta in «Da fare adesso» (`implementazioni.md:169`).
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (29/09/2026)** — stesso branch: in `fatte.md` è la voce 18.
+
+### Il foglio dice che le voci aperte stanno anche in «Da fare adesso», ma la 61 e la 65 non ci sono
+- **dove** — `documentazione/problemi-riscontrati.md:11-12`, da confrontare con
+  `implementazioni/implementazioni.md:52-187`
+- **cosa succede** — la frase nuova in testa dice «Le voci aperte stanno anche in "Da fare
+  adesso"». Per la 7, la 9 e la 10 è vero. Le due decisioni sul bilanciamento invece, la
+  61 (lucidità, scrittura al tetto, debiti) e la 65 (il crimine non paga, lavorare non
+  rende, nessun contratto), in quel foglio non compaiono da nessuna parte: né nell'elenco
+  né in «Restano fuori dall'ordine». Chi parte da «Da fare adesso» non le trova. Non
+  mancano per colpa di questo commit, ma adesso il foglio promette una cosa che non c'è.
+- **come si vede** — cerca «bilanciamento» o «crimine» in `implementazioni.md`: niente.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (29/09/2026)** — stesso branch: la testa del foglio dice quali voci stanno anche in «Da fare adesso» (7, 9, 10) e che la 61 e la 65 per ora stanno solo qui.
+
+### Tanti rimandi mandano a `problemi-riscontrati.md` per cose che adesso stanno in `problemi-risolti.md`
+- **dove** — collegamenti veri, che si cliccano: `documentazione/pagine-azioni/README.md:197`
+  e `implementazioni/fatte.md:847` («raccontata in problemi-riscontrati», la guardia
+  `strada-crimine` del 07/09). Rimandi scritti a mano: `implementazioni/02-interfaccia-e-telefono.md:1296`
+  («Giro del 21/09/2026», adesso tutto di là), `:1789`, `:1939`, `:2093`, `:2177`,
+  `:2308`, `:2479`, `:2622`, `:2700`, `:2740`; `implementazioni/07-multiplayer-e-backend.md:303`;
+  `implementazioni/fatte.md:141` e `:446`; `documentazione/roadmap.md:54` e `:143`;
+  `documentazione/dipendenze.md:212` («in problemi-riscontrati si vede quanto è lungo il
+  giro sul telefono»: adesso quel foglio è corto). Ci sono anche i commenti nel codice e
+  nell'audit, come `frontend/strumenti/audit-regressioni.js:812`, `:935`, `:2270`, `:2655`
+  e `frontend/js/game/posto.js:410`.
+- **cosa succede** — puntano tutti a giri che sono stati chiusi e spostati. Chi apre il
+  file indicato non trova il racconto. Per fortuna la testa del foglio dice che le voci
+  chiuse sono in `problemi-risolti.md`, quindi con un passaggio in più ci si arriva. I
+  numeri dell'indice non si sono spostati, quindi «la voce 65» e «le voci 47–51» restano
+  giusti. Dentro a `problemi-risolti.md` invece ci sono due rimandi di posizione sbagliati
+  (righe 70 e 756: «vedi il giro del 15/09 in fondo», ma quel giro sta a metà file) e un
+  paragrafo copiato così com'era (riga 11: «Qui solo quelle **ancora aperte**») che sotto
+  il titolo «L'indice delle voci chiuse» dice il contrario. In `fatte.md:44-45` la riga
+  nuova rimanda a `fatte.md` da dentro `fatte.md`.
+- **come si vede** — clicca il collegamento in `pagine-azioni/README.md:197` e cerca
+  `strada-crimine`: in `problemi-riscontrati.md` non c'è.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (29/09/2026)** — stesso branch: i due link cliccabili (`pagine-azioni/README.md`, `fatte.md`) puntano a `problemi-risolti.md`, i due «in fondo» e l'introduzione copiata di `problemi-risolti.md` sono corretti; per i rimandi scritti a mano (fogli, roadmap, commenti del codice) la testa di `problemi-riscontrati.md` dice che un giro di prima del 29/09 sta in `problemi-risolti.md`, con la stessa data.
+
+### Le regole degli agenti dicono ancora di scrivere il RISOLTO sotto la voce e lasciarla dov'è
+- **dove** — `.claude/agents/segnala-problemi.md:89-91`, `.claude/agents/prova-sul-telefono.md:65`,
+  `.claude/agents/backend-allineato.md:56`, `documentazione/come-si-lavora.md` (non toccato)
+- **cosa succede** — la testa di `problemi-riscontrati.md` dice che quando una voce si
+  chiude «passa in `problemi-risolti.md`». Le regole degli agenti dicono invece «non lo
+  togli: gli scrivi sotto una riga RISOLTO». Al primo giro che trova una voce chiusa,
+  l'agente la lascia qui e il foglio degli aperti torna a riempirsi di chiusi. Il commit
+  ha aggiunto una riga solo a `segnala-problemi.md`, e solo per dire di guardare nel file
+  dei risolti. `come-si-lavora.md` non nomina il file nuovo, anche se `CLAUDE.md` chiede
+  di cambiare lì le regole quando cambiano.
+- **come si vede** — leggi `segnala-problemi.md:89-91` e poi le righe 3-7 di questo foglio.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (29/09/2026)** — stesso branch: `segnala-problemi`, `prova-sul-telefono`, `backend-allineato` e `come-si-lavora.md` dicono di spostare la voce chiusa in `problemi-risolti.md`.
+

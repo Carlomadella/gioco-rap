@@ -143,7 +143,7 @@ sanno fare. Non sono un lusso di fine settimana: sono la rete sotto al filo.
 
 | agente | cosa fa |
 | --- | --- |
-| `segnala-problemi` | gira il gioco, trova le cose rotte o storte e le scrive in [`problemi-riscontrati.md`](problemi-riscontrati.md). Non sistema niente |
+| `segnala-problemi` | gira il gioco, trova le cose rotte o storte e le scrive in [`problemi-riscontrati.md`](problemi-riscontrati.md). Non sistema niente. Una voce chiusa, col suo RISOLTO, passa in [`problemi-risolti.md`](problemi-risolti.md) |
 | `backend-allineato` | controlla che le due metà del server non abbiano preso strade diverse: le rotte vere contro `README-API.md`, le migrazioni SQLite contro quelle PostgreSQL, `schema.md` contro le tabelle che esistono |
 
 Si lanciano **insieme**, non uno alla volta, e quello che trovano si sistema subito: un
