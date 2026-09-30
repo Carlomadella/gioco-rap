@@ -2756,6 +2756,9 @@ test("la Fabbrica usa la foto e i comandi HTML, senza riaprire la scheda lavoro"
   luoghiFoto.includes('data-lavoro="operaio"') &&
   /id:"fabbrica",[\s\S]{0,80}?apriLuogo\("fabbrica"\)/.test(hub) &&
   !/id:"fabbrica",[\s\S]{0,80}?schedaLavoro\("operaio"/.test(hub));
+test("il turno avviato dalla Fabbrica resta nella pagina, senza seconda scena sopra",
+  luoghiFoto.includes('a.id === "turno" && LUOGO && LUOGO.id === "fabbrica"') &&
+  luoghiFoto.includes('LUOGO_MOSSE[a.id] || (turnoFabbrica ? "fabbrica" : null)'));
 test("le quattro mosse con la pagina finiscono sulla loro foto, e sono tutte scene a pagina piena (il live nel Circolo)",
   (() => {
     const m = luoghiFoto.match(/const LUOGO_MOSSE = \{([^}]+)\}/);
