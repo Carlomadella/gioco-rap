@@ -48,9 +48,9 @@
     {id:"negozio",  root:"#negozio.on",        head:".nghead", mount:".nghead", before:".ngx", accentVar:"--acid", accent:"#a3e635", panel:"linear-gradient(180deg,rgba(25,20,34,.985),rgba(12,10,17,.985))", border:"rgba(255,255,255,.14)"},
     {id:"piazza",   root:"#piazza.on",         head:".phead", mount:".phead", before:".px", accent:"#c084fc", panel:"linear-gradient(180deg,rgba(20,14,27,.985),rgba(8,7,12,.985))", border:"rgba(192,132,252,.32)"},
     {id:"writer",   root:"#writer.on",         head:".whead", mount:".whead", before:".wx", accent:"#f0c75e", panel:"linear-gradient(180deg,rgba(24,20,13,.985),rgba(9,8,6,.985))", border:"rgba(240,199,94,.30)"},
-    {id:"studio",   root:"#studio.on",         head:".sthead", mount:".sthead", accent:"#f2c14e", panel:"linear-gradient(180deg,rgba(18,19,24,.985),rgba(7,9,13,.985))", border:"rgba(242,193,78,.28)"},
+    {id:"studio",   root:"#studio.on",         head:".sthead", mount:".sthead", before:".strisorse", accent:"#f2c14e", panel:"linear-gradient(180deg,rgba(18,19,24,.985),rgba(7,9,13,.985))", border:"rgba(242,193,78,.28)"},
     {id:"pannello", root:"#pannello.on",       head:".pnhead", mount:".pnhead", before:".pnx", accentVar:"--c1", accent:"#7c3aed", panel:"linear-gradient(180deg,rgba(20,18,25,.985),rgba(10,10,14,.985))", border:"rgba(255,255,255,.14)"},
-    {id:"luogo",    root:"#luogo.on",          head:".lfhead", mount:".lfhead", accent:"#f2c14e", panel:"linear-gradient(180deg,rgba(18,19,24,.985),rgba(7,9,13,.985))", border:"rgba(242,193,78,.28)"},
+    {id:"luogo",    root:"#luogo.on",          head:".lfhead", mount:".lfhead", before:".strisorse", accent:"#f2c14e", panel:"linear-gradient(180deg,rgba(18,19,24,.985),rgba(7,9,13,.985))", border:"rgba(242,193,78,.28)"},
     {id:"hub",      root:"#s-hub.screen.on",   head:".pbarra", mount:".pbarra", accent:"#c084fc", panel:"linear-gradient(180deg,rgba(16,18,27,.985),rgba(7,9,14,.985))", border:"rgba(192,132,252,.28)"}
   ];
 
