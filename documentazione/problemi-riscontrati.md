@@ -11,7 +11,7 @@ roadmap, nei commenti del codice) quel giro lo trova in `problemi-risolti.md`, c
 ## Cosa resta aperto al 29/09/2026
 
 I numeri sono quelli di sempre, e restano: altri documenti citano «la voce 65». La prossima
-voce nuova è la 75. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
+voce nuova è la 78. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
 [`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md) (la 7 con «Via la
 lucidità», la 9 fra «Le decisioni tue», la 10 fra quelle fuori dall'ordine); la 61 e la 65
 sono decisioni di bilanciamento e per ora stanno solo qui.
@@ -59,6 +59,11 @@ palco del Circolo da 0,55 a 1,45.
 
 **74.** Nota: cinque foto di riferimento nuove, quasi 10 MB, finiscono nel pacchetto senza che il
 gioco le usi.
+
+Dal giro del 30/09 su `task/circolo-viewport-avatar` (dettaglio in fondo):
+
+**77.** Nota: la stessa persona ha una foto al Circolo e una faccia disegnata nello Studio; e
+chi è una ragazza lo decide una lista di nomi scritta a mano.
 
 ---
 
@@ -559,4 +564,35 @@ nello stesso branch e stanno in [`problemi-risolti.md`](problemi-risolti.md).
   cartella teneva già altri riferimenti prima di questo lavoro, e va deciso se i
   riferimenti stanno lì o fuori dal pacchetto.
 - **come si vede** — cerca i cinque nomi nel codice: non esce niente.
+- **quanto pesa** — da sistemare con calma.
+
+---
+
+## Giro del 30/09/2026 (segnala-problemi, fine task `task/circolo-viewport-avatar`, commit `41ac344`)
+
+I controlli automatici sono tutti verdi: `npm run prova` 180 a posto, l'audit 467 ok e 0
+falliti, il build 33 ok. Il JavaScript nuovo non rompe l'avvio: in nessuna delle nove misure
+fatte col browser (Playwright, da 1181 × 650 a 1920 × 1080) è uscito un errore. Ho misurato la
+pagina del Circolo a nove misure dello schermo. **La pagina non scorre più davvero** a nessuna
+di queste: la Gente, il Palco e la scheda della persona scorrono dentro al loro riquadro e ci
+stanno. Il dialogo e il beat sul tavolo stanno nella scheda, che scorre e ha la sua barra.
+Il volto della persona (`p.volto`) è un numero e finisce nel salvataggio come il resto; vale
+anche per chi arriva dalla classifica (`rivale`) e per i nomi col numero in fondo
+(«Sara 3» resta una ragazza). Nella fascia fra 1180 e 1181 (lo zoom di Windows può dare
+larghezze a metà) non vale nessuna delle due regole, e la pagina torna quella di prima, che
+scorre: non si rompe niente. `stretto.css` non si aspetta lo scorrimento sopra i 1180: le
+sue regole partono tutte da 1180 in giù.
+
+### 77. Nota: la stessa persona ha due facce, e chi è una ragazza lo decide una lista a mano
+- **dove** — `frontend/js/game/circolo.js:166-175` (`CC_NOMI_LEI`, `circoloVolto`), contro
+  `frontend/js/game/studio.js:852`, `:1009`, `:1142`, `:1222` (`faccia(p, 40)`)
+- **cosa succede** — **è una scelta, non un errore.** Al Circolo le persone hanno uno degli
+  otto ritratti; nello Studio (fonico, feat, chiamare un rivale) la stessa persona ha
+  ancora la faccia disegnata, con la pelle e i capelli suoi. Quindi Sara del Circolo e Sara
+  della Cabina non si assomigliano. Poi: ragazza o ragazzo lo decide una lista di dodici nomi scritta
+  dentro `circolo.js`, separata dalle liste dei nomi (`posto.js:145`, `rivals.js:5`). Un nome
+  aggiunto domani a quelle liste prende la foto da ragazzo, e i nomi che possono essere l'una
+  o l'altro («Kalé», «Ombra», «Zeta») vanno sempre coi ragazzi. Va deciso se le foto vanno
+  anche nello Studio, e se il genere diventa una cosa della persona invece che del nome.
+- **come si vede** — conosci un fonico al Circolo, poi aprilo nella Cabina.
 - **quanto pesa** — da sistemare con calma.
