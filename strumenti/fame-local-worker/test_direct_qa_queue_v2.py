@@ -56,6 +56,11 @@ class QueueV2Tests(unittest.TestCase):
             with self.assertRaises(ValueError):q.init(root,['pfnmf-review-v1'])
             self.assertFalse(root.exists())
 
+    def test_cli_run_and_status_do_not_require_tasks(self):
+        parser=q.build_parser()
+        self.assertIsNone(parser.parse_args(['run','--root','x']).tasks)
+        self.assertIsNone(parser.parse_args(['status','--root','x']).tasks)
+
     def test_queue_does_not_rerun_consumed_desk(self):
         with tempfile.TemporaryDirectory() as d,contextlib.redirect_stdout(io.StringIO()):
             root=Path(d)/'q';q.init(root,['tsumugi-score-diagnostic-review-v1'])

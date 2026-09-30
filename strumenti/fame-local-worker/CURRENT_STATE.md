@@ -15,6 +15,7 @@ I documenti FAME Neural sono input di QA. Leggere un prossimo passo nel document
 | PF-NMF, root 001 | VALIDATED_FOR_REVIEW, una chiamata | Risultato operator-reported; non prova affidabilità generale |
 | subset+BIC, root 002 | REJECTED, 5/5 conclusioni corrette e coverage sufficiente | Heading U13 citato e non ammesso: difetto di packaging |
 | Tsumugi controlled, root 003 | REJECTED, 4/5 conclusioni corrette | Una conclusione errata e una copertura insufficiente |
+| Tsumugi score diagnostic, v2 real run | VALIDATED_FOR_REVIEW, first-attempt PASS, 1 chiamata | Singolo task documentale; non prova affidabilità generale |
 
 Vedi i tre DIRECT_QA_*_RESULT_2026-09-23.md. I casi sono consumati; non ripeterli per ottenere un nuovo primo tentativo.
 
@@ -28,7 +29,7 @@ Checkpoint pertinente alla rete: `cdea2227a4a71906c48b97d888e707a787cecc3e` (val
 - v2: direct_qa_worker_v2.py e direct_qa_queue_v2.py, introdotti nel commit cdea2227.
 - v2 permette al massimo una correzione con categorie generiche del validatore, conservando il primo tentativo.
 - Un PASS dopo correzione va distinto da un PASS iniziale.
-- Nei documenti esaminati non è registrato un run reale v2 riuscito. Non dichiararlo già validato.
+- Il primo run reale v2 è registrato il 30 settembre 2026 su `tsumugi-score-diagnostic-review-v1`: `VALIDATED_FOR_REVIEW` al primo tentativo, una chiamata, nessun repair. È una prova singola, non validazione generale.
 - La rubrica specifica è preparata dall'operatore/host: il sistema non è ancora un validatore semantico universale o una rete autonoma di sviluppo.
 
 ## Hardening v2 verificato — 30 settembre 2026
@@ -46,14 +47,16 @@ Commit CI `23171593992036224d9e02dad351011db302b5ab`:
 - comando `python -m unittest discover -s . -p "test_direct_qa_*.py" -q`;
 - run GitHub Actions `36676247028`: `success`.
 
-Non è ancora stato eseguito alcun run reale v2 con Ollama.
+Il primo run reale v2 con Ollama è stato eseguito nella root `FAME_DIRECT_QA_NETWORK_V2_20260930_081223`: first-attempt PASS, una chiamata, nessun repair. Risultato dettagliato in [DIRECT_QA_TSUMUGI_SCORE_DIAGNOSTIC_V2_RESULT_2026-09-30.md](DIRECT_QA_TSUMUGI_SCORE_DIAGNOSTIC_V2_RESULT_2026-09-30.md).
+
+Durante il run è emerso un bug CLI: `--task` / `--tasks` erano obbligatori anche per `run/status`. Il codice corrente li richiede solo per `init`; `run/status` leggono il task dalla root congelata.
 
 ## Prossimo passo della rete
 
-1. Aggiornare la worktree locale del branch `feature/fame-neural-roadmap`.
-2. Inizializzare una root nuova con `tsumugi-score-diagnostic-review-v1`.
-3. Eseguire localmente una sola desk v2 con Ollama e conservare attempt-1; l'eventuale attempt-2 resta una sola correzione validator-guided.
-4. Registrare esito, evidenze e tempo umano; valutare l'utilità prima di ampliare ruoli. Non avviare elaborazioni musicali per procurarsi altri task.
+1. Verificare con CI il fix CLI e la riproducibilità dei test Direct QA.
+2. Trattare `tsumugi-score-diagnostic-review-v1` come consumato: non rieseguirlo in una nuova root per ottenere un altro first attempt.
+3. Misurare almeno un secondo task documentale realmente nuovo prima di concludere che la v2 migliora affidabilità/utilità; preservare first-attempt e repair come metriche separate.
+4. Valutare il costo umano di review prima di ampliare ruoli. Non avviare elaborazioni musicali per procurarsi altri task.
 
 La separazione documentale non esegue questi passi e non certifica nuovi test o inferenze.
 

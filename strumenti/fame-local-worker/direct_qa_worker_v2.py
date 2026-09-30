@@ -278,15 +278,22 @@ def status(root):
     return r2
 
 
-def main():
+def build_parser():
     a=argparse.ArgumentParser(description=__doc__)
     a.add_argument('command',choices=('init','run','status'))
     a.add_argument('--root',required=True,type=Path)
-    a.add_argument('--task',required=True)
+    a.add_argument('--task')
+    return a
+
+
+def main():
+    a=build_parser()
     args=a.parse_args()
     try:
         root=args.root.resolve()
-        if args.command=='init':init(root,args.task)
+        if args.command=='init':
+            if not args.task:raise ValueError('--task richiesto per init')
+            init(root,args.task)
         elif args.command=='status':print(json.dumps(status(root),ensure_ascii=False,indent=2))
         else:
             result=run(root)

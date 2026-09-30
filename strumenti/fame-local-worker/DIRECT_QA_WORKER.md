@@ -169,8 +169,25 @@ Verifica locale prima del run reale:
 
 ```powershell
 git pull --ff-only
-python -m unittest discover -s strumenti/fame-local-worker -p "test_direct_qa_*.py" -q
-python strumenti/fame-local-worker/direct_qa_queue_v2.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_001" --tasks tsumugi-score-diagnostic-review-v1
+Push-Location strumenti/fame-local-worker
+python -m unittest discover -s . -p "test_direct_qa_*.py" -q
+python .\direct_qa_queue_v2.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_<UNIVOCO>" --tasks tsumugi-score-diagnostic-review-v1
+Pop-Location
 ```
 
 Solo dopo test PASS e init riuscito, il run reale previsto è una singola desk v2; attempt-1 resta la misura primaria e l'eventuale attempt-2 è solo repair controllato.
+
+
+## Esito quarto incarico — primo run reale v2
+
+Il 30 settembre 2026 `tsumugi-score-diagnostic-review-v1` è stato consumato nella root locale `FAME_DIRECT_QA_NETWORK_V2_20260930_081223`.
+
+Esito: `VALIDATED_FOR_REVIEW` al primo tentativo, una sola chiamata, nessun repair. Tutti i cinque check hanno conclusione corretta; i quattro positivi hanno coverage sufficiente, senza precision warning o evidenze non revisionate. `elapsedSeconds` è circa 16.953 s; il report locale registra 1319 prompt tokens valutati e 1050 output tokens valutati.
+
+Risultato: [DIRECT_QA_TSUMUGI_SCORE_DIAGNOSTIC_V2_RESULT_2026-09-30.md](DIRECT_QA_TSUMUGI_SCORE_DIAGNOSTIC_V2_RESULT_2026-09-30.md).
+
+Il task è ora consumato e non va ripetuto come nuovo first attempt. Il PASS non autorizza audio, P6, training o produzione e non certifica affidabilità generale della rete.
+
+### Correzione CLI emersa dal run
+
+`direct_qa_worker_v2.py` e `direct_qa_queue_v2.py` accettano ora `run` e `status` senza `--task` / `--tasks`, perché il task è già congelato in desk/queue. Questi argomenti restano richiesti operativamente soltanto per `init`. Test dedicati impediscono di reintrodurre il requisito globale.

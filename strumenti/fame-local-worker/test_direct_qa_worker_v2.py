@@ -100,6 +100,11 @@ class WorkerV2Tests(unittest.TestCase):
             w.init(other,'pfnmf-review-v1')
         self.assertFalse(other.exists())
 
+    def test_cli_run_and_status_do_not_require_task(self):
+        parser=w.build_parser()
+        self.assertIsNone(parser.parse_args(['run','--root',str(self.root)]).task)
+        self.assertIsNone(parser.parse_args(['status','--root',str(self.root)]).task)
+
     def test_no_reexecution_after_consumed_run(self):
         f=Fake([self.good()]);self.run_worker(f)
         with self.assertRaises(FileExistsError):self.run_worker(f)

@@ -52,15 +52,22 @@ def run(root,client=None):
     finally:lock.unlink()
 
 
-def main():
+def build_parser():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('command',choices=('init','run','status'))
     p.add_argument('--root',required=True,type=Path)
-    p.add_argument('--tasks',nargs='+',required=True)
+    p.add_argument('--tasks',nargs='+')
+    return p
+
+
+def main():
+    p=build_parser()
     a=p.parse_args()
     try:
         root=a.root.resolve()
-        if a.command=='init':init(root,a.tasks)
+        if a.command=='init':
+            if not a.tasks:raise ValueError('--tasks richiesto per init')
+            init(root,a.tasks)
         elif a.command=='status':print(json.dumps(state(root),ensure_ascii=False,indent=2))
         else:
             result=run(root)
