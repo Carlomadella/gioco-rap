@@ -147,3 +147,16 @@ Risultato: [DIRECT_QA_RUBRIC_AUDIT_SEMANTICS_V2_RESULT_2026-09-30.md](DIRECT_QA_
 ## Verifica sesto task v2
 
 Checkpoint `775bdb3fcd0edb012a3626e87e1be3ac15467a8e`: `package-authoring-rules-review-v1` congelato prima di qualsiasi chiamata reale. GitHub Actions `Verifica FAME local worker`, run `36683638626`: `success`, 65 test, `OK`.
+
+
+## Esito sesto run reale v2
+
+Root locale `FAME_DIRECT_QA_NETWORK_V2_20260930_092711`. `package-authoring-rules-review-v1` ha chiuso `VALIDATED_FOR_REVIEW` al primo tentativo con una sola chiamata. Tutti i 5 check sono corretti; i quattro positivi hanno coverage sufficiente; zero errori, zero precision warning, zero evidence ID non revisionati. Il salvage host-side non è stato necessario.
+
+Metriche: `elapsedSeconds` circa 11.218 s, `prompt_eval_count=1205`, `eval_count=668`, `done_reason=stop`. Il task è consumato e bloccato da nuove inizializzazioni.
+
+Risultato: [DIRECT_QA_PACKAGE_AUTHORING_RULES_V2_RESULT_2026-09-30.md](DIRECT_QA_PACKAGE_AUTHORING_RULES_V2_RESULT_2026-09-30.md).
+
+## Settimo task v2 congelato
+
+È preparato `recovery-protocol-review-v1` su `RECOVERY.md` al commit `5530c2649ddda83a07511f8e0549d4ccf45723fe`. Verifica preservazione del first pass, recovery bounded in due sottoincarichi, assenza di retry automatico, semantica degli stati recovery e controllo negativo su generalizzazione/training. La rubrica usa U04 come evidenza minima sufficiente per l'invarianza del first pass; U01/U02 sono solo benign context.
