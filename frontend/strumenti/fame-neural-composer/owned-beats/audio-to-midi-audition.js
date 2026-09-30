@@ -302,4 +302,4 @@ if(require.main===module){
   try{main()}catch(error){console.error("FAME AUDIO TO MIDI AUDITION FAILED: "+error.message);process.exit(1)}
 }
 
-module.exports={load,serve,selfTest,DEFAULT_FAMILY};
+module.exports={load,serve,selfTest,DEFAULT_FAMILY,buildClapRimEvents,buildAdtofTsumugiClapRimHybrid};
