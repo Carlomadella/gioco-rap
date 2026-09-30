@@ -2765,7 +2765,8 @@ test("la Pizzeria usa una pagina fotografica separata dalla Fabbrica, senza popu
   /id:"pizzeria",[\s\S]{0,80}?apriLuogo\("pizzeria"\)/.test(hub) &&
   !/id:"pizzeria",[\s\S]{0,80}?schedaLavoro\("lavapiatti"/.test(hub));
 test("il turno di Fabbrica e Pizzeria resta nella rispettiva pagina, senza seconda scena sopra",
-  luoghiFoto.includes('(LUOGO.id === "fabbrica" || LUOGO.id === "pizzeria") ? LUOGO.id : null') &&
+  luoghiFoto.includes('LUOGO.id === "fabbrica" && G.job.id === "operaio"') &&
+  luoghiFoto.includes('LUOGO.id === "pizzeria" && G.job.id === "lavapiatti"') &&
   luoghiFoto.includes("LUOGO_MOSSE[a.id] || turnoLuogo"));
 test("le quattro mosse con la pagina finiscono sulla loro foto, e sono tutte scene a pagina piena (il live nel Circolo)",
   (() => {
