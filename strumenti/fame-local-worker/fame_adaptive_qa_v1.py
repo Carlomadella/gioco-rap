@@ -62,8 +62,6 @@ def metadata(case_id):
 def init(root,case_id):
     root=root.resolve()
     root.mkdir(parents=True,exist_ok=False)
-    (root/'single-agent').mkdir()
-    (root/'four-role-network').mkdir()
     baseline.init(root/'single-agent',case_id)
     network.init(root/'four-role-network',case_id)
     agent.write(root/'adaptive.json',metadata(case_id))
