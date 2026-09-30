@@ -13,18 +13,33 @@
 
   const $id = id => document.getElementById(id);
 
-  function hostAttivo(){
-    if(document.querySelector("#adf-jail.on")) return "jail";
-    if(document.querySelector("#strada.on")) return "strada";
-    if(document.querySelector("#negozio.on")) return "negozio";
-    if(document.querySelector("#piazza.on")) return "piazza";
-    if(document.querySelector("#writer.on")) return "writer";
-    if(document.querySelector("#studio.on")) return "studio";
+  /* Un'unica fonte per capire DOVE siamo. Il tasto MAPPA non deve dipendere
+     dal markup specifico della singola schermata: se una pagina di gameplay
+     viene ridisegnata, basta che conservi il suo root `.on`. Le schermate che
+     stanno sopra all'hub (Abilità, pannelli, luoghi) vengono prima dell'hub,
+     altrimenti la barra globale finirebbe montata nella pagina sottostante. */
+  const GAMEPLAY_HOSTS = Object.freeze([
+    {id:"jail",     root:"#adf-jail.on",        mappa:false},
+    {id:"abilita",  root:"#abilita.on"},
+    {id:"strada",   root:"#strada.on"},
+    {id:"negozio",  root:"#negozio.on"},
+    {id:"piazza",   root:"#piazza.on"},
+    {id:"writer",   root:"#writer.on"},
+    {id:"studio",   root:"#studio.on"},
+    {id:"pannello", root:"#pannello.on"},
     /* Casa, Palestra, il Circolo, stacca la spina: js/game/luoghi-foto.js */
-    if(document.querySelector("#luogo.on")) return "luogo";
-    if(document.querySelector("#pannello.on")) return "pannello";
-    if(document.querySelector("#s-hub.screen.on")) return "hub";
-    return "";
+    {id:"luogo",    root:"#luogo.on"},
+    {id:"hub",      root:"#s-hub.screen.on",    mappa:false}
+  ]);
+
+  function hostSpecAttivo(){
+    for(const h of GAMEPLAY_HOSTS) if(document.querySelector(h.root)) return h;
+    return null;
+  }
+
+  function hostAttivo(){
+    const h = hostSpecAttivo();
+    return h ? h.id : "";
   }
 
   function giocoAttivo(){ return !!hostAttivo(); }
@@ -371,7 +386,15 @@
     chiudi();
 
     /* Prima chiudiamo gli overlay di navigazione; poi rendiamo esplicita la
-       destinazione hub, così il tasto significa sempre davvero "Mappa". */
+       destinazione hub, così il tasto significa sempre davvero "Mappa".
+       Abilità è una schermata a pagina intera sopra l'hub: dal 30/09 usa lo
+       stesso contratto globale e non il suo bottone privato. */
+    try{
+      if($id("abilita") && $id("abilita").classList.contains("on")){
+        if(window.ADF_ABILITA_API && typeof ADF_ABILITA_API.close === "function") ADF_ABILITA_API.close();
+        else if(typeof window.chiudiAbilita === "function") window.chiudiAbilita();
+      }
+    }catch(_){}
     try{ if($id("negozio") && $id("negozio").classList.contains("on") && typeof chiudiNegozio === "function") chiudiNegozio(); }catch(_){}
     /* Piazza e Writer non si chiudono col semplice "on" tolto: un'azione può
        restare a metà (freestyle interrotto, strofa non chiusa) e va annullata
@@ -425,7 +448,8 @@
     if(!viva) return;
 
     const map = bar.querySelector('[data-adf-global="mappa"]');
-    const senzaMappa = h === "hub" || h === "jail";
+    const host = hostSpecAttivo();
+    const senzaMappa = !host || host.mappa === false;
     map.hidden = senzaMappa;
     const bloccata = !senzaMappa && mappaBloccata();
     map.disabled = bloccata;
@@ -536,10 +560,19 @@
   crea();
   preparaControlliContesto();
 
+  /* Contratto stabile di navigazione. Le schermate possono cambiare markup e
+     stile senza reimplementare il ritorno alla città: i comandi visibili e gli
+     eventuali fallback legacy chiamano sempre questa stessa API. */
+  window.ADF_NAVIGATION = Object.freeze({
+    toMap:tornaMappa,
+    currentHost:hostAttivo
+  });
+
   window.ADF_SYSTEM_MENU = Object.freeze({
     open:apri,
     close:chiudi,
     map:tornaMappa,
+    currentHost:hostAttivo,
     saveAndExit:salvaEdEsci,
     exitToMenu:uscitaRapida
   });
@@ -558,6 +591,9 @@
     /* nello Studio usiamo tutta la card testata, non la flex-line:
        così non spostiamo più avatar/nome come faceva la V6 */
     {id:"studio",  root:"#studio.on",        head:".sthead"},
+    /* L'albero abilità è una pagina intera senza una testata compatibile con
+       le altre: la nav resta nel body, fissa. Va prima dell'hub sottostante. */
+    {id:"abilita", root:"#abilita.on",       head:null},
     /* il pannello (94) può stare sopra alla pagina di un posto (55): «I conti
        di casa» si aprono dalla cucina. Prima il pannello, se no la barra
        finisce nella fascia coperta. */
@@ -574,8 +610,8 @@
     for(const h of HOSTS){
       const root=document.querySelector(h.root);
       if(!root) continue;
-      const head=root.querySelector(h.head);
-      if(head) return {spec:h,head};
+      const head=h.head ? root.querySelector(h.head) : null;
+      if(head || h.head === null) return {spec:h,head};
     }
     return null;
   }
@@ -591,7 +627,22 @@
     if(!nav) return;
 
     const f=active();
-    if(!f){ clear(); return; }
+    if(!f){
+      clear();
+      nav.dataset.host="";
+      if(nav.parentElement!==document.body) document.body.appendChild(nav);
+      return;
+    }
+
+    /* Le schermate senza una testata compatibile (oggi: Abilità) non devono
+       ereditare il parent della schermata precedente. Restano agganciate al
+       body: è il fallback realmente globale, immune ai rerender locali. */
+    if(!f.head){
+      clear();
+      nav.dataset.host=f.spec.id;
+      if(nav.parentElement!==document.body) document.body.appendChild(nav);
+      return;
+    }
 
     if(current!==f.head){
       clear();
