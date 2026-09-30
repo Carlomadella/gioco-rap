@@ -322,3 +322,16 @@ Risultato: [DIRECT_QA_GPTOSS_DIAGNOSTIC_SEMANTICS_V2_RESULT_2026-09-30.md](DIREC
 ## Dodicesimo incarico v2 preparato — QA transfer protocol
 
 `qa-transfer-protocol-review-v1` usa `QA_TRANSFER.md` congelato al commit `5f29502092c9b641117e595a70a4489e651e66be`. Il task misura distinzione tra nuovo caso e blind test, metrica transfer e semplice validazione del motore, limiti del salvage, costo umano non misurato e gestione non retroattiva dei difetti di rubrica.
+
+
+## Esito dodicesimo incarico — QA transfer protocol raw-clean PASS
+
+`qa-transfer-protocol-review-v1` è stato consumato il 30 settembre 2026 nella root `FAME_DIRECT_QA_NETWORK_V2_20260930_103658`.
+
+Esito: `VALIDATED_FOR_REVIEW`, una chiamata, nessun repair, 5/5 conclusioni corrette, coverage sufficiente, zero warning e zero surplus evidence. Nessun salvage.
+
+Risultato: [DIRECT_QA_TRANSFER_PROTOCOL_V2_RESULT_2026-09-30.md](DIRECT_QA_TRANSFER_PROTOCOL_V2_RESULT_2026-09-30.md).
+
+## Aggregatore storico v2
+
+`direct_qa_v2_aggregate.py` riassume run v2 già eseguiti verificando le receipt storiche e il binding desk/report. Non usa `worker.status()` sui vecchi root perché gli hash del codice sono intenzionalmente quelli dell'epoca. Il report separa raw-clean, salvage, repair, reject/error, troncamenti, warning, chiamate e tempi; non interpreta retroattivamente un difetto storico come PASS.
