@@ -7,19 +7,19 @@
   "units": [
     {
       "unitId": "U01",
-      "text": "Esito formale: status REJECTED; modelCalls 2; firstAttemptPass false; acceptedAfterRepair false; queue status NEEDS_REVIEW; executionAuthorized false. Il task è consumato e non viene ritentato."
+      "text": "- status: `REJECTED`;\n- modelCalls: 2;\n- firstAttemptPass: false;\n- acceptedAfterRepair: false;\n- queue status: `NEEDS_REVIEW`;\n- executionAuthorized: false.\n\nIl task è consumato e non viene ritentato."
     },
     {
       "unitId": "U02",
-      "text": "Attempt 1: failure di output budget con done_reason length, eval_count 2048 e validation INVALID_RESPONSE:Risposta incompleta. Non esiste candidate.json per attempt-1."
+      "text": "Failure di output budget:\n\n- `done_reason: length`;\n- `eval_count: 2048`;\n- `prompt_eval_count: 2693`;\n- `total_duration: 23020301800 ns`;\n- `load_duration: 9539042200 ns`;\n- `elapsedSeconds: 23.031000000191852`;\n- validation: `INVALID_RESPONSE:Risposta incompleta`.\n\nNon esiste `candidate.json` per attempt-1."
     },
     {
       "unitId": "U03",
-      "text": "Attempt 2: tutte le cinque conclusioni sono corrette; tutti i quattro check positivi hanno coverage sufficiente; il controllo negativo è corretto. L'unico errore formale è COORDINATOR_SCOPE:UNREVIEWED_EVIDENCE. U06 è pertinente. Il reject è quindi classificato come precision false negative del validator, non errore semantico."
+      "text": "Tutte le cinque conclusioni sono corrette. Tutti i quattro check positivi hanno coverage sufficiente. Il controllo negativo è corretto.\n\nL'unico errore formale è:\n\n`COORDINATOR_SCOPE:UNREVIEWED_EVIDENCE`\n\nCandidate:\n- `COORDINATOR_SCOPE`: U01 + U06;\n- `DESK_ISOLATION_AND_HOST_CONTROL`: U02;\n- `DISTINCT_PROTOCOL_LIMIT`: U03;\n- `GLOBAL_STATE_SEMANTICS`: U05;\n- `COORDINATOR_AUTHORIZES_FAME_MODS_OR_TRAINING`: false, nessuna evidenza.\n\nU06 è pertinente: ribadisce che il coordinatore non modifica algoritmi FAME Neural e non apre training, audio, batch131 o P6. Il reject è quindi classificato come precision false negative del validator, non errore semantico."
     },
     {
       "unitId": "U04",
-      "text": "Hardening successivo: num_predict portato da 2048 a 4096; task aggiunto ai consumati; evidence ID extra vengono rimossi host-side solo se conclusione e required coverage sono già corrette; missing evidence continua a fallire normalmente."
+      "text": "Commit `ee64500421a93a80c10d50d0d737eb63a0daef51`:\n- `num_predict` v2 portato da 2048 a 4096;\n- `coordinator-architecture-review-v1` aggiunto ai task consumati;\n- evidence ID extra vengono rimossi deterministicamente dall'host solo se conclusione e required coverage sono già corrette;\n- gli ID rimossi sono tracciati;\n- missing evidence continua a fallire normalmente."
     }
   ],
   "answerOptions": [
