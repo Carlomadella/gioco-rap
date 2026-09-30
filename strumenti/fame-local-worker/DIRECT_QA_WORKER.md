@@ -155,3 +155,22 @@ python -m unittest discover -s . -p "test_direct_qa_*v2.py" -q
 ```
 
 Il prossimo run reale v2 deve usare un **nuovo task**: non si usa v2 per riprocessare PF-NMF, subset+BIC o Tsumugi controlled gia consumati.
+
+
+## Quarto incarico v2 preparato — score diagnostic read-only
+
+Per il primo run reale v2 viene congelato `tsumugi-score-diagnostic-review-v1`, basato esclusivamente sul report già registrato `OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_V1_SCORE_DIAGNOSTIC_RESULT_2026-09-23.md` al commit `022ef352e00cfa0aca7a3dae9a9478c8c3c49626`.
+
+Il task verifica ricostruzione `events[].rawPitch`, localizzazione del failure nello score head, mancata apertura di decoder tuning sui fixture sintetici, perimetro delle tre family real-easy già consumate e un controllo negativo su independent evaluation/final holdout/promozione automatica. È QA documentale: non esegue inference audio e non autorizza P6.
+
+La v2 rifiuta ora in `init` i tre task già consumati (`pfnmf-review-v1`, `subset-bic-review-v1`, `tsumugi-controlled-review-v1`) e CLI/coda richiedono un task esplicito, evitando che il default storico possa essere riprocessato per errore.
+
+Verifica locale prima del run reale:
+
+```powershell
+git pull --ff-only
+python -m unittest discover -s strumenti/fame-local-worker -p "test_direct_qa_*.py" -q
+python strumenti/fame-local-worker/direct_qa_queue_v2.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_001" --tasks tsumugi-score-diagnostic-review-v1
+```
+
+Solo dopo test PASS e init riuscito, il run reale previsto è una singola desk v2; attempt-1 resta la misura primaria e l'eventuale attempt-2 è solo repair controllato.

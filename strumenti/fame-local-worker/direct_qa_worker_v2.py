@@ -21,6 +21,13 @@ DIGEST=base.DIGEST
 OPTIONS=dict(base.OPTIONS)
 SYSTEM=base.SYSTEM
 MAXIMUM_MODEL_CALLS=2
+CONSUMED_TASKS=frozenset({'pfnmf-review-v1','subset-bic-review-v1','tsumugi-controlled-review-v1'})
+
+
+def ensure_fresh_task(task):
+    if task in CONSUMED_TASKS:
+        raise ValueError('Task gia consumato: v2 richiede un nuovo task ID')
+    return task
 
 
 def digest(value):
@@ -52,6 +59,7 @@ def metadata(p):
 
 
 def init(root,task):
+    ensure_fresh_task(task)
     p=package(task)
     root.mkdir(parents=True,exist_ok=False)
     agent.write(root/'desk.json',metadata(p))
@@ -274,7 +282,7 @@ def main():
     a=argparse.ArgumentParser(description=__doc__)
     a.add_argument('command',choices=('init','run','status'))
     a.add_argument('--root',required=True,type=Path)
-    a.add_argument('--task',default='pfnmf-review-v1')
+    a.add_argument('--task',required=True)
     args=a.parse_args()
     try:
         root=args.root.resolve()

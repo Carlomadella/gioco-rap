@@ -11,7 +11,9 @@ ACCEPTED={'VALIDATED_FOR_REVIEW','VALIDATED_FOR_REVIEW_AFTER_REPAIR'}
 
 def init(root,tasks):
     if not tasks or len(tasks)>20 or len(set(tasks))!=len(tasks):raise ValueError('Da 1 a 20 task distinti')
-    for task in tasks:worker.package(task)
+    for task in tasks:
+        worker.package(task)
+        worker.ensure_fresh_task(task)
     root.mkdir(parents=True,exist_ok=False);(root/'desks').mkdir()
     for task in tasks:worker.init(root/'desks'/task,task)
     agent.write(root/'queue.json',dict(schema=SCHEMA,tasks=tasks,
@@ -54,7 +56,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('command',choices=('init','run','status'))
     p.add_argument('--root',required=True,type=Path)
-    p.add_argument('--tasks',nargs='+',default=['pfnmf-review-v1'])
+    p.add_argument('--tasks',nargs='+',required=True)
     a=p.parse_args()
     try:
         root=a.root.resolve()

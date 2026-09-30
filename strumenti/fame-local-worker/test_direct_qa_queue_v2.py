@@ -22,36 +22,43 @@ class Fake:
 
 def good():
     return {'results':[
-        {'code':'GATE_AND_CAUSE','supported':True,'evidenceIds':['U02','U03']},
-        {'code':'D06_ERRORS','supported':True,'evidenceIds':['U03']},
-        {'code':'BIC_SCOPE','supported':True,'evidenceIds':['U06']},
-        {'code':'TRAINING_OPEN','supported':False,'evidenceIds':[]},
+        {'code':'RAW_PITCH_RECONSTRUCTION','supported':True,'evidenceIds':['U02','U03']},
+        {'code':'SCORE_HEAD_FAILURE_LOCALIZED','supported':True,'evidenceIds':['U04','U06']},
+        {'code':'NO_SYNTHETIC_DECODER_TUNING','supported':True,'evidenceIds':['U07']},
+        {'code':'REAL_EASY_COHORT_SCOPE','supported':True,'evidenceIds':['U08']},
+        {'code':'FRESH_EVALUATION_OR_PROMOTION_AUTHORIZED','supported':False,'evidenceIds':[]},
     ]}
 
 
 def bad():
     value=good();value=json.loads(json.dumps(value))
-    value['results'][0]={'code':'GATE_AND_CAUSE','supported':False,'evidenceIds':[]}
+    value['results'][0]={'code':'RAW_PITCH_RECONSTRUCTION','supported':False,'evidenceIds':[]}
     return value
 
 
 class QueueV2Tests(unittest.TestCase):
     def test_first_pass_queue(self):
         with tempfile.TemporaryDirectory() as d,contextlib.redirect_stdout(io.StringIO()):
-            root=Path(d)/'q';q.init(root,['pfnmf-review-v1'])
+            root=Path(d)/'q';q.init(root,['tsumugi-score-diagnostic-review-v1'])
             f=Fake([good()]);r=q.run(root,f)
             self.assertEqual(r['status'],'VALIDATED_FOR_REVIEW');self.assertEqual(len(f.calls),1)
 
     def test_repaired_queue(self):
         with tempfile.TemporaryDirectory() as d,contextlib.redirect_stdout(io.StringIO()):
-            root=Path(d)/'q';q.init(root,['pfnmf-review-v1'])
+            root=Path(d)/'q';q.init(root,['tsumugi-score-diagnostic-review-v1'])
             f=Fake([bad(),good()]);r=q.run(root,f)
             self.assertEqual(r['status'],'VALIDATED_FOR_REVIEW_AFTER_REPAIR');self.assertEqual(len(f.calls),2)
             self.assertTrue(r['results'][0]['acceptedAfterRepair'])
 
+    def test_queue_rejects_consumed_task_before_creating_root(self):
+        with tempfile.TemporaryDirectory() as d,contextlib.redirect_stdout(io.StringIO()):
+            root=Path(d)/'q'
+            with self.assertRaises(ValueError):q.init(root,['pfnmf-review-v1'])
+            self.assertFalse(root.exists())
+
     def test_queue_does_not_rerun_consumed_desk(self):
         with tempfile.TemporaryDirectory() as d,contextlib.redirect_stdout(io.StringIO()):
-            root=Path(d)/'q';q.init(root,['pfnmf-review-v1'])
+            root=Path(d)/'q';q.init(root,['tsumugi-score-diagnostic-review-v1'])
             f=Fake([good()]);q.run(root,f);q.run(root,f)
             self.assertEqual(len(f.calls),1)
 

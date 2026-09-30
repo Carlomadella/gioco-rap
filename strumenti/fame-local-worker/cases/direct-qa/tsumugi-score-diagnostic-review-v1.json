@@ -1,0 +1,119 @@
+{
+  "taskId": "tsumugi-score-diagnostic-review-v1",
+  "sourceCommit": "022ef352e00cfa0aca7a3dae9a9478c8c3c49626",
+  "sourcePath": "documentazione/fame-neural/OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_V1_SCORE_DIAGNOSTIC_RESULT_2026-09-23.md",
+  "sourceSnapshot": "cases/direct-qa/tsumugi-score-diagnostic-source.md",
+  "sourceSha256": "d58e1945e7bd4778f65d79b9433ffc3fd9efd5a5cfc89e4fdd2fe8ec9fe75db8",
+  "scope": "Revisione documentale del risultato score diagnostic V1 già registrato. Verificare ricostruzione rawPitch, localizzazione del failure, confine decoder tuning e perimetro del real-easy congelato. Non eseguire inference, aprire audio, P6, retuning o training.",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "# Owned Beats — P5 Tsumugi V1 score diagnostic — corrected per-role result\n\nData: 23 settembre 2026.\n\nRun: `audio-to-midi-p5-tsumugi-v1-score-diagnostic-v1-001`."
+    },
+    {
+      "unitId": "U02",
+      "text": "Il reporter read-only corretto ha ricostruito la presenza dei pitch target direttamente dagli `events[].rawPitch` persistiti del controlled run."
+    },
+    {
+      "unitId": "U03",
+      "text": "Risultato su 9 role-row supportate:\n\n- `SOURCE_CONTROLLED_TARGET_PITCH_EVENTS_PRESENT`: 5;\n- `EXPECTED_ROLE_TARGET_SCORES_NONPOSITIVE`: 4;\n- `POSITIVE_TARGET_SCORE_BUT_SOURCE_TARGET_PITCH_ABSENT`: 0."
+    },
+    {
+      "unitId": "U04",
+      "text": "I quattro miss per ruolo sono:\n\n- D03 hi-hat: best score `-1.207700610`, zero pitch target 42/44/46;\n- D04 snare: best score `-7.770591259`, zero pitch target 38/40;\n- D06 hi-hat: best score `-3.646468163`, zero pitch target 42/44/46;\n- D07 kick: best score `-1.721765161`, zero pitch target 35/36."
+    },
+    {
+      "unitId": "U05",
+      "text": "I casi positivi sono coerenti: D01 kick, D02 snare, D04 kick e D05 kick+hi-hat hanno score target positivi e corrispondenti raw pitch target nel controlled output."
+    },
+    {
+      "unitId": "U06",
+      "text": "## Interpretazione\n\nIl failure dei quattro ruoli mancanti è già visibile nello score head V1: non esiste, in questo diagnostic, un caso in cui il target abbia score positivo e venga poi perso dal decoding/path selection."
+    },
+    {
+      "unitId": "U07",
+      "text": "Quindi non viene aperto un ramo di decoder tuning sui fixture sintetici. La domanda successiva è se questa debolezza sia specifica dei transient sintetici oppure si presenti anche su stem drums reali già giudicati chiari."
+    },
+    {
+      "unitId": "U08",
+      "text": "## Passo successivo congelato\n\nIl diagnostic real-easy development usa tre family già consumate e selezionate esclusivamente dalla precedente Human Review Source Separation:\n\n- `FAME000040` — drums usefulness 3 — “Buono, molto chiaro e preciso.”\n- `FAME000080` — drums usefulness 3 — “Chiaro, bello e completo.”\n- `FAME000126` — drums usefulness 3 — “Bello, chiaro, forte e preciso.”"
+    },
+    {
+      "unitId": "U09",
+      "text": "Non consuma independent evaluation o final holdout, non apre original source audio, non modifica parametri e non promuove automaticamente Tsumugi."
+    }
+  ],
+  "checks": [
+    {
+      "code": "RAW_PITCH_RECONSTRUCTION",
+      "assertion": "Il reporter read-only corretto ricostruisce la presenza dei pitch target da events[].rawPitch persistiti del controlled run; sulle 9 role-row riporta 5 target presenti, 4 score target non positivi e 0 casi con score positivo ma target pitch assente."
+    },
+    {
+      "code": "SCORE_HEAD_FAILURE_LOCALIZED",
+      "assertion": "I quattro miss D03 hi-hat, D04 snare, D06 hi-hat e D07 kick hanno best score negativo e, nel diagnostic, non c'è un target con score positivo poi perso dal decoding/path selection."
+    },
+    {
+      "code": "NO_SYNTHETIC_DECODER_TUNING",
+      "assertion": "Il report non apre decoder tuning sui fixture sintetici; sposta la domanda su stem drums reali già giudicati chiari."
+    },
+    {
+      "code": "REAL_EASY_COHORT_SCOPE",
+      "assertion": "Il real-easy diagnostic congelato usa FAME000040, FAME000080 e FAME000126, già consumate e selezionate esclusivamente dalla precedente Human Review Source Separation, tutte con drums usefulness 3."
+    },
+    {
+      "code": "FRESH_EVALUATION_OR_PROMOTION_AUTHORIZED",
+      "assertion": "Il report autorizza l'uso di independent evaluation o final holdout, l'apertura dell'original source audio o la promozione automatica di Tsumugi."
+    }
+  ],
+  "rubric": {
+    "RAW_PITCH_RECONSTRUCTION": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U02"
+        ],
+        [
+          "U03"
+        ]
+      ],
+      "benignContext": []
+    },
+    "SCORE_HEAD_FAILURE_LOCALIZED": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U04"
+        ],
+        [
+          "U06"
+        ]
+      ],
+      "benignContext": [
+        "U05"
+      ]
+    },
+    "NO_SYNTHETIC_DECODER_TUNING": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U07"
+        ]
+      ],
+      "benignContext": []
+    },
+    "REAL_EASY_COHORT_SCOPE": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U08"
+        ]
+      ],
+      "benignContext": []
+    },
+    "FRESH_EVALUATION_OR_PROMOTION_AUTHORIZED": {
+      "supported": false,
+      "requiredGroups": [],
+      "benignContext": []
+    }
+  }
+}

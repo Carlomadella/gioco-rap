@@ -12,10 +12,16 @@ class DirectQaAuthoringTests(unittest.TestCase):
     def test_future_packages_should_not_use_heading_only_units(self):
         # Authoring guard for NEW packages. The historical consumed package above
         # is intentionally grandfathered and must not be rewritten.
-        for task in []:
+        checked = []
+        for path in sorted((w.BASE / "cases/direct-qa").glob("*.json")):
+            task = path.stem
+            if task == "subset-bic-review-v1":
+                continue
+            checked.append(task)
             p = w.package(task)
             for unit in p["units"]:
                 self.assertFalse(unit["text"].strip().startswith("#") and "\n" not in unit["text"].strip())
+        self.assertTrue(checked)
 
 
 if __name__ == "__main__":
