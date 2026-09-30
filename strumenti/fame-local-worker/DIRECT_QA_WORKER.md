@@ -223,3 +223,12 @@ Attempt-1 e attempt-2 hanno entrambi 5/5 conclusioni corrette. Il solo errore è
 Il task non viene modificato né ritentato. Risultato: [DIRECT_QA_TSUMUGI_V1_ARCHITECTURE_FAILURE_V2_RESULT_2026-09-30.md](DIRECT_QA_TSUMUGI_V1_ARCHITECTURE_FAILURE_V2_RESULT_2026-09-30.md).
 
 Regola di authoring aggiunta: non richiedere evidenza di background duplicata quando una singola unità copre già esplicitamente tutte le componenti della proposizione. I test automatici v2 usano una fixture test-only separata dai task reali consumabili.
+
+
+## Sesto incarico v2 preparato — P2 measurement/export audit
+
+È congelato `p2-measurement-export-review-v1` sul report storico `OWNED_BEATS_AUDIO_TO_MIDI_P2_MEASUREMENT_PASS_2026-09-22.md`, commit `1c71cefc2756a83002963ddf5f0bd25835755c96`.
+
+Il task è deliberatamente diverso dai due Tsumugi: controlla scope di un cohort già consumato, risultato JSON↔MIDI 12/12, comportamento event-duration-dependent del renderer v1, limiti causali del PASS P2 e controllo negativo sulle autorizzazioni. Le unità sono costruite secondo la regola di evidenza minima sufficiente: nessun check positivo richiede più unità se una singola unità contiene già l'intera proposizione.
+
+Nessun run audio viene aperto dal QA documentale.

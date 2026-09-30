@@ -39,3 +39,12 @@ Before freezing a new direct-QA package:
 6. negative checks must not need evidence IDs;
 7. package-specific tests must include incomplete coverage and false-positive authorization cases;
 8. freeze package and rubric before the first model call.
+
+
+## Minimal sufficient evidence rule
+
+For a new positive check, prefer the smallest semantic unit that already contains every material component of the assertion. Do not require a second background unit merely because it explains why the first unit is true.
+
+If one unit is explicitly self-sufficient, use one required group containing that unit. Multiple required groups are appropriate only when the assertion genuinely combines facts that are separated across the source and no single unit states the complete proposition.
+
+Before freezing the package, manually test the minimal citation a careful reviewer could reasonably choose. If that citation supports the full assertion, the rubric must accept it.

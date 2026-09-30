@@ -89,3 +89,8 @@ Commit `c803e05380d56f3c06a7253a4ca66c4c25bcebbc`: secondo task congelato, primo
 Root locale `FAME_DIRECT_QA_NETWORK_V2_20260930_082657`. Il task `tsumugi-v1-architecture-failure-review-v1` ha chiuso `REJECTED` dopo attempt-1 + repair. Entrambi i tentativi avevano 5/5 conclusioni corrette; l'unico errore era `UNVERIFIED_ARCH_ASSUMPTION:INSUFFICIENT_EVIDENCE`. Il modello ha scelto `U04` in entrambi i tentativi; verifica manuale della fonte e del package mostra che `U04` contiene già tutta la proposizione richiesta. Classificazione: false negative di packaging/rubric, non errore semantico del worker. Nessun rerun.
 
 Il task è aggiunto ai `CONSUMED_TASKS`. Le regressioni v2 usano ora una fixture test-only separata, così i task reali possono restare immutabili e consumati.
+
+
+## Terzo task v2 congelato
+
+È preparato `p2-measurement-export-review-v1` sul report P2 measurement/export audit al commit `1c71cefc2756a83002963ddf5f0bd25835755c96`. Il task verifica scope del cohort consumato, equivalenza JSON↔MIDI, comportamento temporale del renderer v1, limiti causali del PASS P2 e controllo negativo su training/batch131/task-data readiness. Ogni check positivo usa una sola unità semanticamente autosufficiente per evitare il false negative di coverage emerso nel secondo run.

@@ -1,0 +1,99 @@
+{
+  "taskId": "p2-measurement-export-review-v1",
+  "sourceCommit": "1c71cefc2756a83002963ddf5f0bd25835755c96",
+  "sourcePath": "documentazione/fame-neural/OWNED_BEATS_AUDIO_TO_MIDI_P2_MEASUREMENT_PASS_2026-09-22.md",
+  "sourceSnapshot": "cases/direct-qa/p2-measurement-export-source.md",
+  "sourceSha256": "1bd1e3ba81968ae3bc31a6d88f4b7c84f00245f9c9e614f5181f92ea36fbec01",
+  "scope": "Revisione documentale read-only del P2 measurement/export audit. Distinguere risultati tecnici, comportamento del renderer e limiti delle inferenze causali, senza autorizzare nuove esecuzioni Audio→MIDI.",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "# Owned Beats — Audio→MIDI P2 measurement/export audit — PASS\n\nData: 22 settembre 2026  \nDecisione: NDR-094  \nBranch: `feature/fame-neural-roadmap`\n\n## Obiettivo\n\nChiudere P2 del piano NDR-093 verificando separatamente:\n\n1. durata e comportamento del renderer di audition;\n2. corrispondenza JSON → MIDI;\n3. assenza di regressioni o modifiche agli artefatti/voti storici.\n\nIl cohort usato è quello **già consumato** dell'independent evaluation `audio-to-midi-independent-evaluation-v1-001`. È stato usato soltanto come failure/regression evidence, non per tuning o nuova qualification."
+    },
+    {
+      "unitId": "U02",
+      "text": "## Implementazione verificata\n\nNuovi artefatti versionati:\n\n- `audio-to-midi-p2-protocol-v1.json`;\n- `audio-to-midi-human-review-v2.js`;\n- `audio-to-midi-p2-audit.js`;\n- `owned-beats-audio-to-midi-p2-test.js`;\n- `run-audio-to-midi-p2-audit.ps1`.\n\nIl renderer storico v1 resta immutato.\n\nIl renderer v2 usa una durata esplicita derivata da:\n\n`samplesPerChannel / sampleRate`\n\ndei reference stem già registrati nei `result.json`. Gli eventi oltre la reference sono errori espliciti; i casi senza eventi producono silenzio a durata piena."
+    },
+    {
+      "unitId": "U03",
+      "text": "## Risultato P2 reale\n\nOutput locale:\n\n- mode: `FAME_NEURAL_P2_DIAGNOSTIC_AUDIT_PASS`;\n- records: **12**;\n- JSON↔MIDI equivalence: **12/12**;\n- overflow families: **0**;\n- source audio opened: **false**;\n- source separation executed: **false**;\n- transcription executed: **false**;\n- retuning performed: **false**;\n- historical artifacts modified: **false**;\n- historical votes modified: **false**;\n- training authorized: **false**;\n- batch131 authorized: **false**;\n- task-data ready: **false**.\n\nLa verifica JSON↔MIDI comprende note, canali, velocity, onset, offset, PPQ/tempo e assenza di pitch bend inattesi. Per i drums l'offset MIDI è una durata tecnica deterministica, non una durata musicale inferita dal JSON."
+    },
+    {
+      "unitId": "U04",
+      "text": "## Durata renderer storico v1\n\nConvenzione dei numeri sotto:\n\n`reference duration - renderer v1 duration`\n\nQuindi:\n\n- valore positivo = il v1 terminava prima della reference;\n- valore negativo = il v1 era leggermente più lungo della reference.\n\nRange osservati sulle 12 family:\n\n| Candidate | min | max |\n| --- | ---: | ---: |\n| drums render | -0.153832 s | +9.344331 s |\n| bass-note render | -0.043152 s | +9.280862 s |\n| bass-contour render | +0.018458 s | +9.342472 s |\n\nIl caso più evidente nel riepilogo è `FAME000092`, con differenza di circa **+9.34 s drums**, **+9.28 s bass** e **+9.34 s contour**.\n\nQuesto dimostra che il renderer v1 era **event-duration-dependent** e non reference-duration-dependent. Non era però sempre più corto: piccoli valori negativi compaiono quando il padding tecnico del v1 superava leggermente la durata reference."
+    },
+    {
+      "unitId": "U05",
+      "text": "## Interpretazione\n\n### Verificato\n\n- P2 measurement/export gate: **PASS**.\n- JSON e MIDI della independent evaluation sono equivalenti secondo il contratto P2 su tutte le 12 family.\n- Nessun overflow rispetto alla reference è stato rilevato.\n- Il renderer v1 poteva differire dalla durata reference di diversi secondi; il v2 elimina questa dipendenza dall'ultimo evento per i confronti futuri.\n\n### Non dimostrato\n\n- Non è misurato quanto la differenza di durata del renderer v1 abbia influenzato i voti Human QA storici.\n- I voti e l'outcome `KEEP_BATCH_CLOSED_REVIEW_FAILURES` non vengono reinterpretati o riscritti.\n- P2 non dimostra che i failure drums siano causati dal renderer; al contrario, elimina export JSON→MIDI come spiegazione generale dei failure e rende i prossimi test più controllati."
+    },
+    {
+      "unitId": "U06",
+      "text": "## Gate e prossimo passo\n\nP1: **PASS**.  \nP2: **PASS**.  \nP3: **ATTIVO**.\n\nIl prossimo blocco è il controllo easy Audio→MIDI con:\n\n- fixture controllate;\n- baseline congelata;\n- renderer v2;\n- beat reali semplici ammessi e congelati prima del primo run;\n- tracing mix/stem → onset/F0 intermedi → classification/fusion/segmentation → JSON → MIDI → render.\n\nTraining, batch131 e task-data readiness restano chiusi."
+    }
+  ],
+  "checks": [
+    {
+      "code": "CONSUMED_COHORT_SCOPE",
+      "assertion": "Il cohort independent evaluation era già consumato ed è stato usato in P2 solo come failure/regression evidence, non per tuning o nuova qualification."
+    },
+    {
+      "code": "P2_JSON_MIDI_AUDIT",
+      "assertion": "Il run P2 ha coperto 12 record, ottenuto equivalenza JSON↔MIDI 12/12 e zero overflow, senza aprire source audio, rieseguire separation/transcription, fare retuning o modificare artefatti/voti storici."
+    },
+    {
+      "code": "V1_RENDERER_DURATION_BEHAVIOR",
+      "assertion": "La differenza è definita come reference duration meno renderer v1 duration; il v1 era event-duration-dependent e poteva risultare sia più corto di diversi secondi sia leggermente più lungo per effetto del padding tecnico."
+    },
+    {
+      "code": "P2_CAUSAL_LIMITS",
+      "assertion": "P2 non misura quanto il renderer v1 abbia influenzato i voti storici, non riscrive l'outcome della Human QA e non dimostra che il renderer abbia causato i failure drums; elimina invece l'export JSON→MIDI come spiegazione generale."
+    },
+    {
+      "code": "P2_AUTHORIZES_TRAINING_OR_BATCH131",
+      "assertion": "Il PASS P2 autorizza training, batch131 o task-data readiness."
+    }
+  ],
+  "rubric": {
+    "CONSUMED_COHORT_SCOPE": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U01"
+        ]
+      ],
+      "benignContext": []
+    },
+    "P2_JSON_MIDI_AUDIT": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U03"
+        ]
+      ],
+      "benignContext": []
+    },
+    "V1_RENDERER_DURATION_BEHAVIOR": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U04"
+        ]
+      ],
+      "benignContext": []
+    },
+    "P2_CAUSAL_LIMITS": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U05"
+        ]
+      ],
+      "benignContext": []
+    },
+    "P2_AUTHORIZES_TRAINING_OR_BATCH131": {
+      "supported": false,
+      "requiredGroups": [],
+      "benignContext": []
+    }
+  }
+}
