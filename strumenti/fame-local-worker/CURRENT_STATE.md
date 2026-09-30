@@ -55,7 +55,7 @@ Durante il run è emerso un bug CLI: `--task` / `--tasks` erano obbligatori anch
 
 1. Trattare `tsumugi-score-diagnostic-review-v1` come consumato: non rieseguirlo in una nuova root per ottenere un altro first attempt.
 2. Il secondo task `tsumugi-v1-architecture-failure-review-v1` è congelato sul controlled score-diagnostic failure del 23 settembre, con source snapshot completo e rubrica fissata prima del run.
-3. Eseguire una sola desk v2 su `tsumugi-v1-architecture-failure-review-v1`, preservando first-attempt e repair come metriche separate.
+3. Il secondo run reale è consumato: `REJECTED` dopo 2 chiamate, ma con 5/5 conclusioni corrette in entrambi i tentativi; il reject è stato classificato come falso negativo di rubrica perché `U04` da sola copriva già l'intera affermazione.
 4. Valutare il costo umano di review prima di ampliare ruoli. Non avviare elaborazioni musicali per procurarsi altri task.
 
 La separazione documentale non esegue questi passi e non certifica nuovi test o inferenze.
@@ -82,3 +82,10 @@ Il commit `04a4e9bddd5ce41f686faf0521aedd5a451febe7` registra il primo run reale
 ## Verifica secondo task v2
 
 Commit `c803e05380d56f3c06a7253a4ca66c4c25bcebbc`: secondo task congelato, primo task v2 aggiunto ai consumati, test v2 riallineati sul nuovo task. GitHub Actions `Verifica FAME local worker`, run `36677890055`: `success`, 51 test, `OK`.
+
+
+## Esito secondo run reale v2
+
+Root locale `FAME_DIRECT_QA_NETWORK_V2_20260930_082657`. Il task `tsumugi-v1-architecture-failure-review-v1` ha chiuso `REJECTED` dopo attempt-1 + repair. Entrambi i tentativi avevano 5/5 conclusioni corrette; l'unico errore era `UNVERIFIED_ARCH_ASSUMPTION:INSUFFICIENT_EVIDENCE`. Il modello ha scelto `U04` in entrambi i tentativi; verifica manuale della fonte e del package mostra che `U04` contiene già tutta la proposizione richiesta. Classificazione: false negative di packaging/rubric, non errore semantico del worker. Nessun rerun.
+
+Il task è aggiunto ai `CONSUMED_TASKS`. Le regressioni v2 usano ora una fixture test-only separata, così i task reali possono restare immutabili e consumati.

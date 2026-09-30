@@ -39,13 +39,13 @@ def bad():
 class QueueV2Tests(unittest.TestCase):
     def test_first_pass_queue(self):
         with tempfile.TemporaryDirectory() as d,contextlib.redirect_stdout(io.StringIO()):
-            root=Path(d)/'q';q.init(root,['tsumugi-v1-architecture-failure-review-v1'])
+            root=Path(d)/'q';q.init(root,['direct-qa-v2-regression-fixture-v1'])
             f=Fake([good()]);r=q.run(root,f)
             self.assertEqual(r['status'],'VALIDATED_FOR_REVIEW');self.assertEqual(len(f.calls),1)
 
     def test_repaired_queue(self):
         with tempfile.TemporaryDirectory() as d,contextlib.redirect_stdout(io.StringIO()):
-            root=Path(d)/'q';q.init(root,['tsumugi-v1-architecture-failure-review-v1'])
+            root=Path(d)/'q';q.init(root,['direct-qa-v2-regression-fixture-v1'])
             f=Fake([bad(),good()]);r=q.run(root,f)
             self.assertEqual(r['status'],'VALIDATED_FOR_REVIEW_AFTER_REPAIR');self.assertEqual(len(f.calls),2)
             self.assertTrue(r['results'][0]['acceptedAfterRepair'])
@@ -53,7 +53,7 @@ class QueueV2Tests(unittest.TestCase):
     def test_queue_rejects_consumed_task_before_creating_root(self):
         with tempfile.TemporaryDirectory() as d,contextlib.redirect_stdout(io.StringIO()):
             root=Path(d)/'q'
-            with self.assertRaises(ValueError):q.init(root,['pfnmf-review-v1'])
+            with self.assertRaises(ValueError):q.init(root,['tsumugi-v1-architecture-failure-review-v1'])
             self.assertFalse(root.exists())
 
     def test_cli_run_and_status_do_not_require_tasks(self):
@@ -63,7 +63,7 @@ class QueueV2Tests(unittest.TestCase):
 
     def test_queue_does_not_rerun_consumed_desk(self):
         with tempfile.TemporaryDirectory() as d,contextlib.redirect_stdout(io.StringIO()):
-            root=Path(d)/'q';q.init(root,['tsumugi-v1-architecture-failure-review-v1'])
+            root=Path(d)/'q';q.init(root,['direct-qa-v2-regression-fixture-v1'])
             f=Fake([good()]);q.run(root,f);q.run(root,f)
             self.assertEqual(len(f.calls),1)
 

@@ -27,8 +27,8 @@ class WorkerV2Tests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
         self.root=Path(self.temp.name)/'desk'
-        self.p=w.package('tsumugi-v1-architecture-failure-review-v1')
-        with contextlib.redirect_stdout(io.StringIO()):w.init(self.root,'tsumugi-v1-architecture-failure-review-v1')
+        self.p=w.package('direct-qa-v2-regression-fixture-v1')
+        with contextlib.redirect_stdout(io.StringIO()):w.init(self.root,'direct-qa-v2-regression-fixture-v1')
 
     def good(self):
         return {'results':[
@@ -96,7 +96,7 @@ class WorkerV2Tests(unittest.TestCase):
 
     def test_consumed_tasks_cannot_be_initialized_in_v2(self):
         other=Path(self.temp.name)/'consumed'
-        for task in ('pfnmf-review-v1','tsumugi-score-diagnostic-review-v1'):
+        for task in ('pfnmf-review-v1','tsumugi-score-diagnostic-review-v1','tsumugi-v1-architecture-failure-review-v1'):
             with self.assertRaises(ValueError):
                 w.init(other,task)
             self.assertFalse(other.exists())

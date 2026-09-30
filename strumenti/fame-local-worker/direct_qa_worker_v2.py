@@ -21,7 +21,7 @@ DIGEST=base.DIGEST
 OPTIONS=dict(base.OPTIONS)
 SYSTEM=base.SYSTEM
 MAXIMUM_MODEL_CALLS=2
-CONSUMED_TASKS=frozenset({'pfnmf-review-v1','subset-bic-review-v1','tsumugi-controlled-review-v1','tsumugi-score-diagnostic-review-v1'})
+CONSUMED_TASKS=frozenset({'pfnmf-review-v1','subset-bic-review-v1','tsumugi-controlled-review-v1','tsumugi-score-diagnostic-review-v1','tsumugi-v1-architecture-failure-review-v1'})
 
 
 def ensure_fresh_task(task):

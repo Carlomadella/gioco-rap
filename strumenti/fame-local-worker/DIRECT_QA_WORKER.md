@@ -212,3 +212,14 @@ python .\direct_qa_queue_v2.py run --root "$ROOT"
 ```
 
 Nessuna elaborazione musicale viene eseguita dal task.
+
+
+## Esito quinto incarico — reject formale, false negative di rubrica
+
+`tsumugi-v1-architecture-failure-review-v1` è stato consumato il 30 settembre 2026 nella root `FAME_DIRECT_QA_NETWORK_V2_20260930_082657`.
+
+Attempt-1 e attempt-2 hanno entrambi 5/5 conclusioni corrette. Il solo errore è `UNVERIFIED_ARCH_ASSUMPTION:INSUFFICIENT_EVIDENCE`: il modello cita `U04`, mentre la rubrica congelata richiedeva `U03 + U04`. La verifica manuale mostra che `U04` contiene già l'intera affermazione; il reject è quindi classificato come false negative di authoring/rubric.
+
+Il task non viene modificato né ritentato. Risultato: [DIRECT_QA_TSUMUGI_V1_ARCHITECTURE_FAILURE_V2_RESULT_2026-09-30.md](DIRECT_QA_TSUMUGI_V1_ARCHITECTURE_FAILURE_V2_RESULT_2026-09-30.md).
+
+Regola di authoring aggiunta: non richiedere evidenza di background duplicata quando una singola unità copre già esplicitamente tutte le componenti della proposizione. I test automatici v2 usano una fixture test-only separata dai task reali consumabili.

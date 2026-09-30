@@ -1,0 +1,98 @@
+{
+  "taskId": "direct-qa-v2-regression-fixture-v1",
+  "sourceCommit": "TEST_ONLY",
+  "sourcePath": "test fixture only",
+  "sourceSnapshot": "cases/direct-qa/direct-qa-v2-regression-fixture-source.md",
+  "sourceSha256": "c1651d945c2fafdf85d7fe86abc21b96ba18e51c00491d4a32e560b09ea5eefa",
+  "scope": "Fixture esclusivamente per regressioni automatiche del worker v2; non è un task reale e non deve essere eseguito come misura.",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "# Direct QA v2 regression fixture\n\nU01 fixture context."
+    },
+    {
+      "unitId": "U02",
+      "text": "U02 first supported fact."
+    },
+    {
+      "unitId": "U03",
+      "text": "U03 architecture fact."
+    },
+    {
+      "unitId": "U04",
+      "text": "U04 interpretation fact."
+    },
+    {
+      "unitId": "U05",
+      "text": "U05 decision fact."
+    }
+  ],
+  "checks": [
+    {
+      "code": "CONTROLLED_FAILURE_BEFORE_PUBLISH",
+      "assertion": "Fixture check 1."
+    },
+    {
+      "code": "V1_V2_OUTPUT_MISMATCH",
+      "assertion": "Fixture check 2."
+    },
+    {
+      "code": "UNVERIFIED_ARCH_ASSUMPTION",
+      "assertion": "Fixture check 3."
+    },
+    {
+      "code": "V1_REPLACEMENT_SCOPE",
+      "assertion": "Fixture check 4."
+    },
+    {
+      "code": "FAILURE_AUTHORIZES_MUSICAL_EXECUTION",
+      "assertion": "Fixture negative check."
+    }
+  ],
+  "rubric": {
+    "CONTROLLED_FAILURE_BEFORE_PUBLISH": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U02"
+        ]
+      ],
+      "benignContext": []
+    },
+    "V1_V2_OUTPUT_MISMATCH": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U03"
+        ]
+      ],
+      "benignContext": []
+    },
+    "UNVERIFIED_ARCH_ASSUMPTION": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U03"
+        ],
+        [
+          "U04"
+        ]
+      ],
+      "benignContext": []
+    },
+    "V1_REPLACEMENT_SCOPE": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U05"
+        ]
+      ],
+      "benignContext": []
+    },
+    "FAILURE_AUTHORIZES_MUSICAL_EXECUTION": {
+      "supported": false,
+      "requiredGroups": [],
+      "benignContext": []
+    }
+  }
+}
