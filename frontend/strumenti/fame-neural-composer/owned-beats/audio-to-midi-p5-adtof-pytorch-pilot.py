@@ -96,8 +96,15 @@ def validate_environment(workspace: Path, protocol: dict) -> dict:
         raise RuntimeError(f"ADTOF source HEAD mismatch: {head}")
 
     status = git_output(source_root, "status", "--porcelain")
-    if status:
-        raise RuntimeError("ADTOF pinned source tree is dirty")
+    tracked_dirty = [
+        line for line in status.splitlines()
+        if line and not line.startswith("??")
+    ]
+    if tracked_dirty:
+        raise RuntimeError(
+            "ADTOF pinned source has tracked modifications: "
+            + " | ".join(tracked_dirty)
+        )
 
     weight = source_root / ext["weightRelativePath"]
     if not weight.is_file():
@@ -112,6 +119,10 @@ def validate_environment(workspace: Path, protocol: dict) -> dict:
         "sourceHead": head,
         "weightGitBlobSha1": blob,
         "weightSha256": sha256_file(weight),
+        "untrackedBuildArtifacts": [
+            line[3:] for line in status.splitlines()
+            if line.startswith("??")
+        ],
     }
 
 
@@ -192,6 +203,7 @@ def preflight(workspace_root: str) -> dict:
         "sourceHead": env["sourceHead"],
         "sourceWeightSha256": env["weightSha256"],
         "installedWeightSha256": sha256_file(installed_weight),
+        "untrackedBuildArtifacts": env["untrackedBuildArtifacts"],
         "labels": list(LABELS_5),
         "thresholds": [float(x) for x in FRAME_RNN_THRESHOLDS],
         "torchVersion": str(torch.__version__),
