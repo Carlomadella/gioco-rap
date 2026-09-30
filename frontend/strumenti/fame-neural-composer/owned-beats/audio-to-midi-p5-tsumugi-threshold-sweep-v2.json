@@ -1,0 +1,46 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-p5-tsumugi-threshold-sweep-v2",
+  "version": 2,
+  "status": "FROZEN_BEFORE_THRESHOLD_SWEEP_V2_INFERENCE",
+  "createdAt": "2026-09-30",
+  "purpose": "MAKE_PAIR_GATE_THRESHOLD_EFFECTIVE_BY_DISABLING_TOPK_UNION",
+  "baseCandidateId": "tsumugi-drums-v1_5",
+  "runId": "audio-to-midi-p5-tsumugi-threshold-sweep-v2-001",
+  "supersedesRunId": "audio-to-midi-p5-tsumugi-threshold-sweep-v1-001",
+  "supersessionReason": "V1 varied instrumentPairGateThreshold while instrumentPairInferTopk=256 forced all allowed drum pitches into the candidate set, making the threshold sweep ineffective.",
+  "sourceRecordIds": [
+    "FAME000040",
+    "FAME000080",
+    "FAME000126"
+  ],
+  "sweep": {
+    "parameter": "instrumentPairGateThreshold",
+    "frozenValues": [
+      -3,
+      0,
+      0.5,
+      1,
+      2
+    ],
+    "instrumentPairInferTopk": 0,
+    "instrumentPairMaxPairs": 512,
+    "allOtherInferenceSettingsFrozen": true
+  },
+  "evaluation": {
+    "automaticWinner": false,
+    "compareMidiHashesBeforeHumanReview": true,
+    "humanListeningOnlyIfVariantsDiffer": true
+  },
+  "safety": {
+    "split": "development",
+    "reuseConsumedDevelopmentFamilies": true,
+    "originalSourceAudioAllowed": false,
+    "developmentDrumsStemAccessAllowed": true,
+    "independentEvaluationAllowed": false,
+    "finalHoldoutAllowed": false,
+    "sourceSeparationExecutionAllowed": false,
+    "trainingAuthorized": false,
+    "batch131Authorized": false,
+    "taskDataReadyMayBeDeclared": false
+  }
+}
