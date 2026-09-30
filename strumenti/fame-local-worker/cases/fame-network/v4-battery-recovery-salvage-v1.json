@@ -1,0 +1,64 @@
+{
+  "caseId": "v4-battery-recovery-salvage-v1",
+  "sourceCommit": "f00b58e6fadf02e4d212530c6caf42b32fabf34a",
+  "sourcePath": "strumenti/fame-local-worker/DIRECT_QA_RECOVERY_PROTOCOL_V2_RESULT_2026-09-30.md",
+  "sourceSnapshot": "cases/fame-network/v4-battery-recovery-result-source.md",
+  "question": "Come va classificato il PASS del recovery protocol e quali sono i limiti del salvage osservato?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "- status: `VALIDATED_FOR_REVIEW`;\n- firstAttemptPass: `true`;\n- acceptedAfterRepair: `false`;\n- modelCalls: 1;\n- humanReviewRequired: `true`;\n- executionAuthorized: `false`;\n- trainingAuthorized: `false`;\n- networkProductionReady: `false`;\n- independentEvaluation: `false`."
+    },
+    {
+      "unitId": "U02",
+      "text": "Il run non è però equivalente ai due PASS precedenti: il salvage host-side è intervenuto per rimuovere evidence ID superflui da due finding già correttamente coperte:\n\n- `RECOVERY_BOUNDED_TWO_SUBTASKS`: rimosso U03;\n- `NO_AUTOMATIC_RETRY_OR_RECREATION`: rimosso U02."
+    },
+    {
+      "unitId": "U03",
+      "text": "Quindi il PASS è semanticamente valido, ma con selezione delle prove meno precisa rispetto ai run quinto e sesto."
+    },
+    {
+      "unitId": "U04",
+      "text": "Il nuovo salvage v2 ha funzionato nel caso reale previsto: ha eliminato solo citazioni superflue dopo aver verificato conclusione corretta e required coverage già sufficiente. Non ha inventato coverage mancante e non ha corretto conclusioni errate."
+    },
+    {
+      "unitId": "U05",
+      "text": "Il risultato non costituisce independent evaluation e non certifica affidabilità generale o production readiness della rete."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_VALID_WITH_SALVAGE",
+      "meaning": "È un first-attempt VALIDATED_FOR_REVIEW semanticamente valido, ma il salvage ha rimosso solo evidenze superflue da finding già coperte; non ha riparato missing coverage o conclusioni errate."
+    },
+    {
+      "optionId": "ANSWER_RAW_CLEAN",
+      "meaning": "È un PASS raw-clean senza alcun intervento host-side sulle evidenze."
+    },
+    {
+      "optionId": "ANSWER_SALVAGE_REPAIRED_SEMANTICS",
+      "meaning": "Il salvage ha corretto conclusioni errate o inventato coverage mancante, trasformando semanticamente il risultato."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_VALID_WITH_SALVAGE",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U01"
+    ],
+    [
+      "U02"
+    ],
+    [
+      "U04"
+    ]
+  ],
+  "optionalContext": [
+    "U03",
+    "U05"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
