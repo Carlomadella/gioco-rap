@@ -746,3 +746,34 @@ Nessun winner automatico; human review resta separata.
 Verifica automatica pre-run: 80 Direct-QA + 103 FAME, tutti OK.
 
 Dettagli: [FAME_SINGLE_VS_FOUR_V4_BATTERY_V1.md](FAME_SINGLE_VS_FOUR_V4_BATTERY_V1.md).
+
+
+## V4 comparison battery — risultato reale
+
+Quattro casi completati, budget massimo totale pareggiato 16384 vs 16384.
+
+Automatic summary:
+- answer option corretta: 4/4 in entrambi i bracci;
+- accepted: single-agent 3/4, network V4 2/4;
+- required coverage completa: single-agent 3/4, network 2/4;
+- troncamenti: 0;
+- calls: single 4, network 16;
+- prompt eval: 2846 vs 20218;
+- eval: 3283 vs 18109;
+- model duration excluding load: ~22.19 s vs ~119.92 s.
+
+Human review:
+- PF-NMF: pareggio qualitativo, overhead network;
+- subset+BIC: entrambi incompleti; nessun vantaggio architetturale;
+- recovery salvage: pareggio qualitativo, overhead network;
+- aggregate 9-run: single-agent completa U01/U02/U03; network perde U01/U02 e viene correttamente bloccata.
+
+Classificazione complessiva su questa batteria: 2 pareggi, 1 double-fail, 1 single-agent win, 0 network win.
+
+La V4 ha risolto il bug strutturale del Verifier, ma la rete always-on non è giustificata sui QA documentali osservati: costa molto di più e può perdere evidence lungo la pipeline.
+
+Decisione: non creare V5 always-on. Prossima architettura candidata: adaptive escalation, con single-agent primario e V4 solo su trigger di failure/uncertainty.
+
+Tutti i quattro case della batteria sono consumati in entrambi i bracci.
+
+Report: [FAME_SINGLE_VS_FOUR_V4_BATTERY_V1_RESULT_2026-09-30.md](FAME_SINGLE_VS_FOUR_V4_BATTERY_V1_RESULT_2026-09-30.md).
