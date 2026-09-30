@@ -821,3 +821,28 @@ Target host-only:
 Il pilot non è progettato per forzare l'escalation. Serve a verificare in reale il comportamento economico dell'adaptive: se la baseline V2 è sufficiente, V4 deve restare non eseguita e il run deve chiudere con 1 sola chiamata.
 
 Verifica automatica pre-run: 80 Direct-QA + 110 FAME, tutti OK.
+
+
+## Adaptive QA V1 — pilot 1 PASS, pilot 2 pronto
+
+Pilot 1 `adaptive-p2-measurement-pilot-v1`:
+- single-agent ACCEPTED;
+- answer `ANSWER_LIMITED_PASS`;
+- required coverage U01/U02/U03 completa;
+- trigger `BASELINE_ACCEPTED`;
+- decision `NO_ESCALATION`;
+- Four-Role Network V4 non eseguita, 0 call;
+- totale adaptive: 1 call.
+
+Review umana: PASS. Il primo pilot conferma il ramo economico dell'architettura adaptive: quando la baseline è sufficiente, V4 resta spenta.
+
+Il case è consumato in baseline V2 e network V4.
+
+Pilot 2 congelato: `adaptive-transfer-protocol-pilot-v1`.
+Fonte: `DIRECT_QA_TRANSFER_PROTOCOL_V2_RESULT_2026-09-30.md`.
+Target host-only: `ANSWER_DISCIPLINED_TRANSFER_PASS`.
+Required evidence: U01-U07, nessun optional context.
+
+Il secondo pilot è più denso e non forza artificialmente l'escalation: se il single-agent perde una delle sette unità richieste, il coordinator deve escalare a V4; se le copre tutte, deve fermarsi a 1 call.
+
+Verifica automatica pre-run: 80 Direct-QA + 111 FAME, tutti OK.
