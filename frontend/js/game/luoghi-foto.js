@@ -49,7 +49,7 @@ const LUOGHI_FOTO = {
              k:"Palestra", bar:"La sala pesi", d:"il fisico che si vede sotto le luci"},
   /* La Fabbrica usa lo stesso telaio della Palestra: scena pulita sotto,
      comandi veri HTML/CSS appoggiati in basso. Niente popup all'ingresso. */
-  fabbrica: {f:"schermate_luoghi_con_elementi_HTML/fabbrica.avif", pos:"center 52%",
+  fabbrica: {f:"schermate_luoghi_con_elementi_HTML/fabbrica.webp", pos:"center 52%",
              k:"Fabbrica", bar:"Linea di montaggio", d:"turno pieno, rumore e ferro"},
   /* il Circolo (js/game/circolo.js) la foto non la stende sotto a tutto:
      la mette nel suo riquadro, come nel riferimento `il_circolo`. La
