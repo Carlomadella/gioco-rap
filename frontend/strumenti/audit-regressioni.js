@@ -1132,7 +1132,7 @@ test("carcere è esclusivo: niente ritorno mappa e il listener locale non lo chi
   crimeui.includes('if(street().arresto)return;'));
 
 test("nuovo menu di sistema riconosce il carcere e blocca Mappa",
-  menuSystem.includes('if(document.querySelector("#adf-jail.on")) return "jail";') &&
+  /\{id:"jail",\s+root:"#adf-jail\.on",\s+mappa:false\}/.test(menuSystem) &&
   menuSystem.includes('if(hostAttivo() === "jail" || hostAttivo() === "hub"'));
 
 /* Punto 27: il controllo non sta più in js/avvio.js — la landing non fa più
@@ -1643,7 +1643,7 @@ test("lo Studio non chiude più su Escape: ricade sul menu di sistema globale, c
 test("chiudiStudio() resta esposta perché la chiama il bottone globale, non lo Studio stesso",
   studio.includes("function chiudiStudio()"));
 test("il menu di sistema riconosce lo Studio come host e ci mostra «Torna alla mappa»",
-  menuSystem.includes('if(document.querySelector("#studio.on")) return "studio";'));
+  menuSystem.includes('{id:"studio",   root:"#studio.on"}'));
 test("«Torna alla mappa» chiude davvero lo Studio prima di andare all'hub",
   menuSystem.includes('if($id("studio") && $id("studio").classList.contains("on") && typeof chiudiStudio === "function") chiudiStudio();'));
 test("la barra globale si monta nella testata dello Studio, non sotto in hub",
@@ -1717,8 +1717,8 @@ test("registrare il pezzo (actions.js) ridisegna lo Studio dopo il titolo",
 
 console.log("\nPunto 1 (bis) — «Torna alla mappa» funziona in ogni stanza dove si vede");
 test("Piazza e Writer si mostravano nella barra HOSTS ma il menu non li riconosceva: ora sì",
-  menuSystem.includes('if(document.querySelector("#piazza.on")) return "piazza";') &&
-  menuSystem.includes('if(document.querySelector("#writer.on")) return "writer";'));
+  menuSystem.includes('{id:"piazza",   root:"#piazza.on"}') &&
+  menuSystem.includes('{id:"writer",   root:"#writer.on"}'));
 test("«Torna alla mappa» annulla un freestyle o una strofa a metà invece di lasciarli pendenti",
   menuSystem.includes('typeof uscitaPiazza === "function") uscitaPiazza();') &&
   menuSystem.includes('typeof uscitaFoglio === "function") uscitaFoglio();'));
@@ -1726,7 +1726,7 @@ test("uscitaFoglio() esiste ed è la stessa sequenza di annulla+chiudi+renderGio
   writer.includes("function uscitaFoglio()") &&
   writer.includes("if(WR) annullaAzione(); chiudiFoglio(); renderGioco();"));
 test("il Pannello (ex Quaderno) è riconosciuto come host ma «Torna alla mappa» non lo chiudeva: ora sì",
-  menuSystem.includes('if(document.querySelector("#pannello.on")) return "pannello";') &&
+  menuSystem.includes('{id:"pannello", root:"#pannello.on"}') &&
   menuSystem.includes('typeof chiudiPannello === "function") chiudiPannello();'));
 test("il vero bug: in Piazza e Writer il bottone si vedeva ma restava disabled per sempre — mappaBloccata() riusava la lista dell'ESC, che li considera giustamente \"interni\" a prescindere",
   menuSystem.includes("function dialogoFlottante(){") &&
@@ -1746,28 +1746,26 @@ test("l'ESC continua a lasciar chiudere Piazza e Writer da soli prima di aprire 
     const body = menuSystem.slice(b0, b1);
     return body.includes('querySelector("#writer.on")') && body.includes('querySelector("#piazza.on")');
   })());
-test("hostAttivo() e la lista HOSTS che monta la barra riconoscono esattamente le stesse stanze",
+test("GAMEPLAY_HOSTS e la lista HOSTS che monta la barra riconoscono esattamente le stesse stanze",
   (() => {
-    const hostBody = menuSystem.slice(
-      menuSystem.indexOf("function hostAttivo(){"),
-      menuSystem.indexOf("}", menuSystem.indexOf("function hostAttivo(){"))
-    );
-    const daHostAttivo = [...hostBody.matchAll(/return "([a-z]+)";/g)].map(m => m[1]).sort();
+    const gameplay0 = menuSystem.indexOf("const GAMEPLAY_HOSTS");
+    const gameplay1 = menuSystem.indexOf("]);", gameplay0);
+    const gameplayBlock = gameplay0 >= 0 && gameplay1 > gameplay0 ? menuSystem.slice(gameplay0, gameplay1) : "";
+    const daGameplay = [...gameplayBlock.matchAll(/id:"([a-z]+)"/g)].map(m => m[1]).sort();
     const hostsBlock = menuSystem.slice(menuSystem.indexOf("const HOSTS=["), menuSystem.indexOf("];", menuSystem.indexOf("const HOSTS=[")));
     const daHosts = [...hostsBlock.matchAll(/id:"([a-z]+)"/g)].map(m => m[1]).sort();
-    return daHostAttivo.length > 0 && daHosts.length > 0 &&
-      JSON.stringify(daHostAttivo) === JSON.stringify(daHosts);
+    return daGameplay.length > 0 && daHosts.length > 0 &&
+      JSON.stringify(daGameplay) === JSON.stringify(daHosts);
   })());
-test("ogni stanza non-hub/jail riconosciuta da hostAttivo() ha davvero un modo di chiudersi in tornaMappa()",
+test("ogni stanza non-hub/jail riconosciuta da GAMEPLAY_HOSTS ha davvero un modo di chiudersi in tornaMappa()",
   (() => {
     const tm0 = menuSystem.indexOf("function tornaMappa(){");
     const tm1 = menuSystem.indexOf("\n  function creaBarraGlobale", tm0);
     const body = tm0 >= 0 && tm1 > tm0 ? menuSystem.slice(tm0, tm1) : "";
-    const hostBody = menuSystem.slice(
-      menuSystem.indexOf("function hostAttivo(){"),
-      menuSystem.indexOf("}", menuSystem.indexOf("function hostAttivo(){"))
-    );
-    const stanze = [...hostBody.matchAll(/return "([a-z]+)";/g)].map(m => m[1])
+    const gameplay0 = menuSystem.indexOf("const GAMEPLAY_HOSTS");
+    const gameplay1 = menuSystem.indexOf("]);", gameplay0);
+    const gameplayBlock = gameplay0 >= 0 && gameplay1 > gameplay0 ? menuSystem.slice(gameplay0, gameplay1) : "";
+    const stanze = [...gameplayBlock.matchAll(/id:"([a-z]+)"/g)].map(m => m[1])
       .filter(id => id !== "jail" && id !== "hub");
     return !!body && stanze.every(id => body.includes('$id("' + id + '")'));
   })());
@@ -2761,7 +2759,7 @@ test("le quattro mosse con la pagina finiscono sulla loro foto, e sono tutte sce
       luoghiFoto.includes("window.mostraScena = function(a, sc, msg, extra)");
   })());
 test("il menu di sistema e l'orologio sanno che la pagina esiste (le liste scritte a mano)",
-  menuSystem.includes('document.querySelector("#luogo.on")) return "luogo"') &&
+  menuSystem.includes('{id:"luogo",    root:"#luogo.on"}') &&
   menuSystem.includes('typeof chiudiLuogo === "function") chiudiLuogo()') &&
   menuSystem.includes('root:"#luogo.on",         head:".lfhead"') &&
   timeControls.includes('{id:"luogo",  root:"#luogo.on",           mute:true}') &&
