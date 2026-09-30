@@ -310,6 +310,10 @@
       #adf-time-dock[data-host="strada"]{height:100%;flex-basis:222px;padding:3px 6px}
       #adf-time-dock[data-host="jail"]{height:100%;flex-basis:220px;padding:3px 6px}
       #adf-time-dock[data-host="hub"]{flex-basis:224px;padding:4px 7px}
+      #adf-time-dock[data-host="studio"],#adf-time-dock[data-host="luogo"],#adf-time-dock[data-host="piazza"],#adf-time-dock[data-host="writer"],#adf-time-dock[data-host="pannello"]{margin-left:auto;align-self:center;height:64px;flex-basis:218px;padding:0 5px;border-left:0;background:transparent}
+      /* Abilità non ha una testata comune: il dock vive nel body, nello
+         stesso angolo in ogni viewport, e il pannello resta position:fixed. */
+      #adf-time-dock[data-host="abilita"]{position:fixed;top:8px;right:10px;z-index:142;width:224px;height:66px;min-width:224px;padding:2px 7px;border-left:0;border-radius:18px;background:rgba(4,6,8,.42);backdrop-filter:blur(10px)}
       #adf-time-dock + .exit,#adf-time-dock + .ngx{margin-left:6px}
       #${WIDGET_ID}[hidden],#${ROOT_ID}[hidden]{display:none!important}
       #${WIDGET_ID},#${ROOT_ID},#${WIDGET_ID} *,#${ROOT_ID} *{box-sizing:border-box}
@@ -378,7 +382,10 @@
          precise e vincevano anche sul telefono, cosi' l'orologio si
          rimpiccioliva ma la casella che se lo tiene restava larga come su un
          monitor. Stessa precisione, e viene dopo: adesso vince questa. */
-      #adf-time-dock[data-host]{flex-basis:176px;padding-inline:4px}#${WIDGET_ID}{width:168px;height:54px;padding:6px 8px 6px 61px;border-radius:14px}.adf-tw-sun{width:38px;height:38px;left:12px;top:8px}.adf-tw-moon{width:33px;height:33px;left:14px;top:10px}.adf-tw-time{font-size:21px}.adf-tw-meta{font-size:6.7px}.adf-tw-day{font-size:8.2px;margin-top:3px}.adf-tc-panel{width:min(340px,calc(100vw - 16px));max-height:calc(100vh - 16px)}}
+      #adf-time-dock[data-host]{flex-basis:176px;padding-inline:4px}
+      #adf-time-dock[data-host="studio"],#adf-time-dock[data-host="luogo"],#adf-time-dock[data-host="piazza"],#adf-time-dock[data-host="writer"],#adf-time-dock[data-host="pannello"]{flex-basis:160px;height:54px;padding:0;overflow:visible}
+      #adf-time-dock[data-host="abilita"]{top:58px;right:8px;width:176px;min-width:176px;height:58px;padding:2px 4px}
+      #${WIDGET_ID}{width:168px;height:54px;padding:6px 8px 6px 61px;border-radius:14px}.adf-tw-sun{width:38px;height:38px;left:12px;top:8px}.adf-tw-moon{width:33px;height:33px;left:14px;top:10px}.adf-tw-time{font-size:21px}.adf-tw-meta{font-size:6.7px}.adf-tw-day{font-size:8.2px;margin-top:3px}.adf-tc-panel{width:min(340px,calc(100vw - 16px));max-height:calc(100vh - 16px)}}
       @media(prefers-reduced-motion:reduce){#${WIDGET_ID},#${WIDGET_ID} *,#${ROOT_ID} *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
     `;
     document.head.appendChild(s);
