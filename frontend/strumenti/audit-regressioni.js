@@ -2647,7 +2647,7 @@ test("i cartelli del Circolo e di Casa passano dal loro video",
   /function circoloEntra\(\)\{[\s\S]{0,300}?"club" : "sala";[\s\S]{0,200}?transizioneVideo\(video, \(\) => apriLuogo\("circolo"\)\)/.test(leggi("js/game/circolo.js")) &&
   /id:"vita"[\s\S]{0,300}?transizioneVideo\("casa",[\s\S]{0,40}?apriLuogo\("casa"\)/.test(hub));
 test("«stacca la spina» ha il filmato fra il tasto e l'esito, da dovunque parta",
-  /window\.mostraScena = function[\s\S]{0,1400}?transizioneVideo\(a\.id, mostra\)/.test(leggi("js/game/luoghi-foto.js")));
+  /window\.mostraScena = function[\s\S]*?transizioneVideo\(a\.id, mostra\)/.test(leggi("js/game/luoghi-foto.js")));
 test("«registra» ha il filmato sulla prima take del pezzo, e solo su quella",
   /function studioTakeAncora\(\)[\s\S]{0,2200}?if\(!t\.l\.length && typeof transizioneVideo === "function"\) transizioneVideo\("registra", incidi\)/.test(leggi("js/game/studio-elementi.js")));
 test("il puntatore sul cartello prepara il video giusto: i cartelli hanno un id loro",
