@@ -1,0 +1,57 @@
+{
+  "caseId": "battery-anti-bias-v1",
+  "sourceCommit": "a5466c48f44f410052bd825bc40eb60af2dd0213",
+  "sourcePath": "strumenti/fame-local-worker/FAME_ANTI_BIAS.md",
+  "sourceSnapshot": "cases/fame-network/battery-anti-bias-source.md",
+  "question": "Se il challenger Anti-Bias chiude positivamente entro lo scope, possiamo descrivere il sistema come unbiased e lasciare passare un issue BLOCKING rimasto UNRESOLVED?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "Il challenger non può dichiarare `UNBIASED`, `BIAS_FREE` o `BIAS_ELIMINATED`."
+    },
+    {
+      "unitId": "U02",
+      "text": "Un issue `BLOCKING` deve produrre uno stato Anti-Bias bloccante. Nel flusso FAME finale:\n- `REJECTED` dal verifier = il verifier dimostra che l'issue non regge;\n- `UPHELD` = problema confermato, integrazione bloccata;\n- `UNRESOLVED` = problema non risolto, integrazione bloccata."
+    },
+    {
+      "unitId": "U03",
+      "text": "`ANTI_BIAS_EVIDENCE_INSUFFICIENT` e `ANTI_BIAS_RESULTS_CONTRADICTORY` sono hard stop per l'integrazione."
+    },
+    {
+      "unitId": "U04",
+      "text": "Ogni risultato mantiene incertezza residua esplicita e richiede revisione umana."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_YES",
+      "meaning": "Sì: un esito positivo Anti-Bias consente di dichiarare il sistema unbiased e un issue BLOCKING UNRESOLVED può comunque passare."
+    },
+    {
+      "optionId": "ANSWER_NO",
+      "meaning": "No: il protocollo vieta etichette unbiased/bias-free e un issue BLOCKING UNRESOLVED blocca l'integrazione; resta inoltre revisione umana."
+    },
+    {
+      "optionId": "ANSWER_INSUFFICIENT",
+      "meaning": "Le evidenze non specificano né le etichette vietate né la semantica degli issue BLOCKING."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_NO",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U01"
+    ],
+    [
+      "U02"
+    ]
+  ],
+  "optionalContext": [
+    "U03",
+    "U04"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
