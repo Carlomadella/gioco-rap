@@ -1,0 +1,64 @@
+{
+  "caseId": "model-comparison-generalization-network-v3",
+  "sourceCommit": "826d121a6e752202c9cfa40289ae4ce359735986",
+  "sourcePath": "documentazione/fame-neural/FAME_LOCAL_AGENT_MODEL_COMPARISON_HANDOFF_2026-09-23.md",
+  "sourceSnapshot": "cases/fame-network/model-comparison-generalization-source.md",
+  "question": "Il confronto congelato dimostra che Qwen3-Coder 30B è in generale un modello migliore di GPT-OSS 20B per la rete FAME Neural?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "- Secondo caso, report independent evaluation: Qwen3-Coder 30B, run `20260923T071733244082Z`, REJECTED / transfer FAIL, circa 24,313 s.\n- Sei categorie accettate su dieci.\n- DRUMS_FAIL e LOWEND_PASS corretti come direzione ma senza citazioni dei conteggi 8/12 e 10/12.\n- ONSET_CAUSE_UNKNOWN e LOWEND_CAUSES_UNPROVEN completamente omesse.\n- Nessuna categoria falsa emessa; formato JSON valido.\n- Sette riferimenti superflui scartati nelle categorie gia valide."
+    },
+    {
+      "unitId": "U02",
+      "text": "- Secondo modello confrontato: `gpt-oss:20b`, run `20260923T073208792637Z`, REJECTED / transfer FAIL, circa 49,844 s.\n- Digest GPT-OSS: `17052f91a42e97930aa6e28a6c6c06a983e6a58dbb00434885a0cf5313e376f7`; 20.9B, MXFP4, context dichiarato 131072.\n- GPT-OSS non ha prodotto `message.content`: ha consumato tutti i 4096 token di output nel reasoning ed e terminato con `done_reason=length`.\n- Nessuna categoria e arrivata al validatore: `cachedCodes=[]`, `droppedEvidence=[]`.\n- Il FAIL GPT-OSS e quindi di generazione/output budget sul protocollo congelato, distinto dal FAIL semantico Qwen."
+    },
+    {
+      "unitId": "U03",
+      "text": "- Su questo protocollo congelato Qwen resta il risultato meno debole: JSON valido e 6/10 categorie validate, contro nessuna risposta strutturata di GPT-OSS. Questo non e un giudizio generale sui modelli."
+    },
+    {
+      "unitId": "U04",
+      "text": "6. Confrontare categorie corrette, mancanti, non supportate, copertura delle evidenze, riferimenti scartati e costo della revisione umana. Riportare modello/tag/digest, contesto, token e tempi. I 24,3 s di Qwen includono circa 13,5 s di caricamento: non confrontare ingenuamente un run a freddo con uno a caldo. Non dichiarare risparmio di tempo umano non misurato."
+    },
+    {
+      "unitId": "U05",
+      "text": "- Secondo modello FAIL: confronto completato. Qwen ha fallito semanticamente ma ha prodotto output strutturato parziale; GPT-OSS ha esaurito il budget di generazione senza produrre output strutturato. Fermare il giro di aggiustamenti sul caso congelato. Valutare un compito piu stretto, eventualmente separando estrazione fatti e verifica, con un nuovo protocollo dichiarato."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_YES",
+      "meaning": "Sì: questo confronto congelato dimostra una superiorità generale di Qwen3-Coder 30B su GPT-OSS 20B per la rete FAME Neural."
+    },
+    {
+      "optionId": "ANSWER_NO",
+      "meaning": "No: il confronto mostra soltanto che Qwen ha prodotto il risultato meno debole su quello specifico protocollo congelato e non dimostra una superiorità generale del modello."
+    },
+    {
+      "optionId": "ANSWER_INSUFFICIENT",
+      "meaning": "Le evidenze fornite non consentono nemmeno di stabilire quale modello abbia ottenuto il risultato meno debole sul protocollo congelato."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_NO",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U01"
+    ],
+    [
+      "U02"
+    ],
+    [
+      "U03"
+    ]
+  ],
+  "optionalContext": [
+    "U04",
+    "U05"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
