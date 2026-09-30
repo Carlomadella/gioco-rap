@@ -411,3 +411,34 @@ Entrambi i bracci ricevono la stessa domanda, stesse unità, stesso modello/dige
 Verifica automatica prima del run reale: 80 test Direct-QA + 49 test FAME, tutti OK.
 
 Dettagli: [FAME_SINGLE_VS_FOUR_V1.md](FAME_SINGLE_VS_FOUR_V1.md).
+
+
+## Primo confronto reale single-agent vs Four-Role V3
+
+Root locale `FAME_SINGLE_VS_FOUR_V1_20260930_132135`.
+
+Entrambi i bracci hanno chiuso `PROPOSED_FOR_HUMAN_REVIEW` con `ANSWER_NO`, required evidence coverage completa e le stesse evidenze essenziali U02 + U03.
+
+Revisione umana: pareggio qualitativo sul caso. La rete non ha corretto un errore, recuperato evidenza mancante o aggiunto un limite materiale perso dalla baseline.
+
+Costo osservato:
+- single agent: 1 call, prompt 847, eval 1596, model time excluding load circa 11.008 s;
+- four-role: 4 call, prompt 4989, eval 3749, model time excluding load circa 26.895 s.
+
+Classificazione: **pareggio qualitativo con overhead netto della rete**. Nessuna conclusione generale sull'architettura da un singolo caso.
+
+Il case `single-vs-four-coordinator-causality-v1` è consumato nella rete V3.
+
+Report: [FAME_SINGLE_VS_FOUR_V1_RESULT_2026-09-30.md](FAME_SINGLE_VS_FOUR_V1_RESULT_2026-09-30.md).
+
+## Secondo confronto single-agent vs Four-Role preparato
+
+Nuovo case congelato: `single-vs-four-rubric-audit-generalization-v2` su `RUBRIC_AUDIT.md` al commit `5530c2649ddda83a07511f8e0549d4ccf45723fe`.
+
+Domanda: se il recovery viene rivalutato 2/2, è lecito promuovere la rete originale a 14/14 al primo tentativo e generalizzare il supporto contestuale come equivalente alla prova diretta?
+
+Il secondo confronto usa `fame_single_vs_four_v2.py` e inverte l'ordine dei bracci: prima Four-Role Network, poi single-agent.
+
+Verifica automatica pre-run: 80 test Direct-QA + 54 test FAME, tutti OK.
+
+Dettagli: [FAME_SINGLE_VS_FOUR_V2.md](FAME_SINGLE_VS_FOUR_V2.md).
