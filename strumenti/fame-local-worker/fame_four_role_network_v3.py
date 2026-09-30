@@ -132,6 +132,16 @@ def host_rubric(p):
     }
 
 
+def extractor_case(p):
+    return {
+        'caseId':p['caseId'],
+        'sourceCommit':p['sourceCommit'],
+        'sourcePath':p['sourcePath'],
+        'question':p['question'],
+        'units':p['units'],
+    }
+
+
 def metadata(p):
     return {
         'schema':VERSION,
@@ -211,7 +221,7 @@ def verifier_schema(p,extractor,challenge):
     claims=[c['claimId'] for c in extractor['claims']]
     evidence=[u['unitId'] for u in p['units']]
     issues=[i['issueId'] for i in challenge['issues']]
-    required=['verdict','decisions']
+    required=['answerOptionId','decisions']
     properties={
         'answerOptionId':{'type':'string','enum':[row['optionId'] for row in p['answerOptions']]},
         'decisions':{
@@ -366,6 +376,8 @@ def validate_integrator(answer,p,extractor,challenge,verifier):
         errors.append('INTEGRATOR_ANSWER_OPTION')
     if answer.get('answerOptionId')!=p['expectedAnswerOptionId']:
         errors.append('INTEGRATOR_INCORRECT_ANSWER_OPTION')
+    if answer.get('answerOptionId')!=verifier.get('answerOptionId'):
+        errors.append('INTEGRATOR_VERIFIER_ANSWER_MISMATCH')
 
     supported={row['claimId']:row for row in verifier['decisions'] if row['status']=='EVIDENCE_SUPPORTS_CLAIM'}
     used=answer.get('usedClaimIds')
@@ -408,7 +420,7 @@ def extractor_request(p):
         'model':MODEL,'stream':False,'options':dict(OPTIONS),'format':extractor_schema(p),
         'messages':[
             {'role':'system','content':EXTRACTOR_SYSTEM},
-            {'role':'user','content':json.dumps(public_case(p),ensure_ascii=False)},
+            {'role':'user','content':json.dumps(extractor_case(p),ensure_ascii=False)},
         ],
     }
 
