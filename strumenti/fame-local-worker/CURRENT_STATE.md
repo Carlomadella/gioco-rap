@@ -165,3 +165,22 @@ Risultato: [DIRECT_QA_PACKAGE_AUTHORING_RULES_V2_RESULT_2026-09-30.md](DIRECT_QA
 ## Verifica settimo task v2
 
 Checkpoint `cfb5ca113f551698e922e2709395a58a8ad3e74b`: `recovery-protocol-review-v1` congelato prima di qualsiasi chiamata reale. GitHub Actions `Verifica FAME local worker`, run `36684201024`: `success`, 69 test, `OK`.
+
+
+## Esito settimo run reale v2
+
+Root locale `FAME_DIRECT_QA_NETWORK_V2_20260930_093655`. `recovery-protocol-review-v1` ha chiuso `VALIDATED_FOR_REVIEW` al primo tentativo con una sola chiamata. Tutti i 5 check hanno conclusione corretta e coverage sufficiente sui positivi.
+
+Il run ha richiesto il salvage host-side su due finding già sufficientemente coperte:
+- `RECOVERY_BOUNDED_TWO_SUBTASKS`: rimosso U03;
+- `NO_AUTOMATIC_RETRY_OR_RECREATION`: rimosso U02.
+
+`RECOVERY_PRESERVES_FIRST_PASS` mantiene precision warning per U01 e U02, entrambi benign context dichiarati. Nessun evidence ID non revisionato. Quindi il PASS è semanticamente valido ma con selezione evidence meno precisa dei run quinto e sesto.
+
+Metriche: `elapsedSeconds=18.875`, `prompt_eval_count=2203`, `eval_count=1715`, `done_reason=stop`. Il task è consumato e bloccato da nuove inizializzazioni.
+
+Risultato: [DIRECT_QA_RECOVERY_PROTOCOL_V2_RESULT_2026-09-30.md](DIRECT_QA_RECOVERY_PROTOCOL_V2_RESULT_2026-09-30.md).
+
+## Ottavo task v2 congelato
+
+È preparato `gptoss-diagnostic-semantics-review-v1` su `GPTOSS_DIAGNOSTIC.md` al commit `6da4fd1666ea4d82a331e597b3004068d08a567f`. Verifica unica variazione think=low, distinzione OUTPUT_TRUNCATED vs SEMANTIC_FAIL, significato di ERROR operativo e controllo negativo che il troncamento provi un errore semantico.
