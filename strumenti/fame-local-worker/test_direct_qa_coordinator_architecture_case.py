@@ -8,10 +8,10 @@ class CoordinatorArchitectureDirectQaCaseTests(unittest.TestCase):
 
     def answer(self):
         return {"results": [
-            {"code": "COORDINATOR_SCOPE", "supported": True, "evidenceIds": ["U02"]},
-            {"code": "DESK_ISOLATION_AND_HOST_CONTROL", "supported": True, "evidenceIds": ["U03"]},
-            {"code": "DISTINCT_PROTOCOL_LIMIT", "supported": True, "evidenceIds": ["U04"]},
-            {"code": "GLOBAL_STATE_SEMANTICS", "supported": True, "evidenceIds": ["U06"]},
+            {"code": "COORDINATOR_SCOPE", "supported": True, "evidenceIds": ["U01"]},
+            {"code": "DESK_ISOLATION_AND_HOST_CONTROL", "supported": True, "evidenceIds": ["U02"]},
+            {"code": "DISTINCT_PROTOCOL_LIMIT", "supported": True, "evidenceIds": ["U03"]},
+            {"code": "GLOBAL_STATE_SEMANTICS", "supported": True, "evidenceIds": ["U05"]},
             {"code": "COORDINATOR_AUTHORIZES_FAME_MODS_OR_TRAINING", "supported": False, "evidenceIds": []},
         ]}
 
