@@ -212,3 +212,18 @@ Risultato: [DIRECT_QA_GPTOSS_DIAGNOSTIC_SEMANTICS_V2_RESULT_2026-09-30.md](DIREC
 ## Verifica nono task v2
 
 Checkpoint `5b7d7eaad0338ee1905c51cb9d593539fc1c2f94`: `qa-transfer-protocol-review-v1` congelato prima di qualsiasi chiamata reale. GitHub Actions `Verifica FAME local worker`, run `36690720093`: `success`, 75 test, `OK`.
+
+
+## Esito nono run reale v2
+
+Root locale `FAME_DIRECT_QA_NETWORK_V2_20260930_103658`. `qa-transfer-protocol-review-v1` ha chiuso `VALIDATED_FOR_REVIEW` al primo tentativo con una sola chiamata. Tutti i 5 check hanno conclusione corretta; i quattro positivi hanno coverage sufficiente; zero errori, zero precision warning, zero evidence ID non revisionati.
+
+Non sono presenti `droppedEvidence` né `hostSalvageApplied`: è un first-attempt raw-clean PASS.
+
+Metriche: `elapsedSeconds` circa 19.297 s, `prompt_eval_count=2006`, `eval_count=1252`, `done_reason=stop`. Il task è consumato e bloccato da nuove inizializzazioni.
+
+Risultato: [DIRECT_QA_TRANSFER_PROTOCOL_V2_RESULT_2026-09-30.md](DIRECT_QA_TRANSFER_PROTOCOL_V2_RESULT_2026-09-30.md).
+
+## Aggregazione run v2
+
+Aggiunto `direct_qa_v2_aggregate.py`: legge root storiche v2 e verifica le receipt degli artefatti senza rieseguire vecchi run con il codice attuale. Distingue first-pass raw-clean, first-pass con salvage, accepted-after-repair, reject/error, troncamenti, warning, evidence scartata, chiamate e tempi. Non converte classificazioni storiche manuali in PASS e non dichiara tempo umano non misurato.
