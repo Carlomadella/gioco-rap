@@ -928,3 +928,60 @@ CI al commit `e012e88f38ce6d0e520c4fdd209f7d6bcfb2a462`:
 
 Prossimo passo: eseguire V6 sullo stesso transfer case come ulteriore diagnostico di recovery. Anche questo non e un nuovo first attempt e non sostituisce i risultati V4/V5.
 
+## Four-Role Network V6 — diagnostico reale recuperato
+
+Eseguito `fame_four_role_network_v6.py` sul case gia consumato `adaptive-transfer-protocol-pilot-v1` esclusivamente come diagnostico del nuovo evidence-preserving repair.
+
+Esito:
+- Extractor: ACCEPTED;
+- Anti-Bias: ACCEPTED;
+- Verifier: ACCEPTED;
+- Integrator: ACCEPTED;
+- status rete: `PROPOSED_FOR_HUMAN_REVIEW`;
+- modelCalls: 4;
+- answer: `ANSWER_DISCIPLINED_TRANSFER_PASS`.
+
+Il Verifier ha mantenuto C1/U01 come supportedClaim e ha riparato C2 in:
+- R1 con U02-U05;
+- R2 con U06-U07.
+
+Le tre issue Anti-Bias BLOCKING sono state marcate `RESOLVED_BY_REPAIR`; il gate V6 ha verificato la presenza degli evidence ID indicati dalle issue e la coverage finale U01-U07. L'Integrator ha usato esclusivamente C1, R1 e R2 ed e stato accettato.
+
+Interpretazione limitata: V6 recupera il failure noto V4/V5 su questo diagnostico. Non e evidenza indipendente di generalizzazione e non sostituisce i risultati V4/V5.
+
+## Adaptive QA V2 — V6 escalation + fresh pilot
+
+Aggiunto `fame_adaptive_qa_v2.py` senza modificare Adaptive QA V1.
+
+Architettura:
+- single-agent baseline V2 resta il percorso primario;
+- stessa escalation policy congelata di V1;
+- Four-Role Network V6 viene eseguita solo se la baseline fallisce con risposta valida;
+- nessuna escalation su baseline ACCEPTED;
+- nessuna escalation su failure operativo senza response;
+- massimo 1 call se baseline sufficiente, massimo 5 call con escalation.
+
+Fresh pilot congelato:
+- case: `adaptive-v2-tsumugi-architecture-pilot-v1`;
+- fonte: `DIRECT_QA_TSUMUGI_V1_ARCHITECTURE_FAILURE_V2_RESULT_2026-09-30.md`;
+- sourceCommit: `64ee9ee07fe46d57b4e5b8b2ff72182dd89b64a4`;
+- target host-only: `ANSWER_RUBRIC_FALSE_NEGATIVE_DISCIPLINED`;
+- required evidence: U01-U07;
+- nessun optional context.
+
+Il pilot distingue:
+- REJECTED/NEEDS_REVIEW formale;
+- 5/5 conclusioni semanticamente corrette;
+- false negative dovuto a rubrica sovravincolata;
+- impossibilita del repair generico di correggere un validator sovravincolato;
+- task consumato e nessuna promozione/rerun retroattiva;
+- correzione valida soltanto per authoring futuro.
+
+Le units sono estratti letterali dello snapshot congelato; un primo packaging parafrasato e stato respinto dal loader con `Unit network non presente nello snapshot sorgente` ed e stato corretto prima di qualsiasi run reale.
+
+CI sul commit `ce4c4c25d6440e45d88ef7fcee8963269cfea246`:
+- 80 Direct-QA: OK;
+- 125 FAME: OK.
+
+Prossimo passo: eseguire una sola volta il fresh pilot Adaptive QA V2. Se la baseline passa, V6 deve restare spenta; se la baseline fallisce con response valida, V6 deve essere lanciata automaticamente. Il case diventa consumato dopo questo run.
+
