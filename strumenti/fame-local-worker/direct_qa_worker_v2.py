@@ -22,7 +22,7 @@ OPTIONS=dict(base.OPTIONS)
 OPTIONS['num_predict']=4096
 SYSTEM=base.SYSTEM
 MAXIMUM_MODEL_CALLS=2
-CONSUMED_TASKS=frozenset({'pfnmf-review-v1','subset-bic-review-v1','tsumugi-controlled-review-v1','tsumugi-score-diagnostic-review-v1','tsumugi-v1-architecture-failure-review-v1','p2-measurement-export-review-v1','coordinator-architecture-review-v1','rubric-audit-semantics-review-v1','package-authoring-rules-review-v1','recovery-protocol-review-v1','gptoss-diagnostic-semantics-review-v1'})
+CONSUMED_TASKS=frozenset({'pfnmf-review-v1','subset-bic-review-v1','tsumugi-controlled-review-v1','tsumugi-score-diagnostic-review-v1','tsumugi-v1-architecture-failure-review-v1','p2-measurement-export-review-v1','coordinator-architecture-review-v1','rubric-audit-semantics-review-v1','package-authoring-rules-review-v1','recovery-protocol-review-v1','gptoss-diagnostic-semantics-review-v1','qa-transfer-protocol-review-v1'})
 
 
 def ensure_fresh_task(task):
