@@ -1045,3 +1045,48 @@ CI al commit `1531f2d87241153b57ecab0af3f2670fb28de7aa`:
 
 Prossimo passo: eseguire V7 sul case consumato `adaptive-v2-tsumugi-architecture-pilot-v1` soltanto come diagnostico del nuovo omission-recovery. Non e un nuovo first attempt e non costituisce nuova evidenza indipendente.
 
+## Four-Role Network V7 — diagnostico reale: omissione visibile ma giudicata non materiale
+
+Eseguito `fame_four_role_network_v7.py` sul case consumato `adaptive-v2-tsumugi-architecture-pilot-v1` esclusivamente come diagnostico del bounded omission recovery.
+
+Esito:
+- Extractor: ACCEPTED;
+- U01 risulta effettivamente scoperta dopo l'Extractor;
+- Anti-Bias: ACCEPTED ma `omissionReview(U01)=NOT_MATERIAL`;
+- Verifier: answer option corretta ma `omissionResolution(U01)=NOT_REQUIRED`;
+- Verifier REJECTED dal gate host con `VERIFIER_INSUFFICIENT_FINAL_EVIDENCE_AFTER_RECOVERY`;
+- Integrator non eseguito;
+- modelCalls: 3;
+- network status: `NEEDS_REVIEW`.
+
+Il canale V7 funziona strutturalmente: U01 non e piu invisibile. Il failure e semantico/decisionale: Anti-Bias e Verifier vedono l'unita omessa ma la classificano come non necessaria.
+
+La causa architetturale residua e che V7 non obbliga il Verifier a dimostrare che tutte le proposizioni materiali del significato testuale dell'opzione da lui scelta siano sostenute. In questo case l'opzione scelta include esplicitamente il fatto che il run resta formalmente REJECTED/NEEDS_REVIEW, mentre U01 e l'unita che documenta quegli status.
+
+V7 resta congelata e questo run resta preservato come failure diagnostica reale.
+
+## Four-Role Network V8 — selected-option support audit
+
+Aggiunto `fame_four_role_network_v8.py`, senza modificare V4/V5/V6/V7.
+
+V8 mantiene quattro ruoli/chiamate massime e aggiunge soltanto nel Verifier un audit esplicito dell'opzione pubblica selezionata:
+- il Verifier deve scomporre il significato testuale dell'answer option scelta in componenti materiali e indipendentemente falsificabili;
+- ogni componente deve avere evidenceIds diretti nelle unita originali;
+- `selectedOptionAudit.optionId` deve coincidere con `answerOptionId`;
+- `selectedOptionAudit.fullySupported` deve essere true;
+- se il supporto dell'opzione scelta richiede una evidence unit omessa dall'Extractor, quella evidence deve essere recuperata tramite `recoveredClaims` e `omissionResolution=RECOVERED`;
+- il gate host privato sulle `requiredFinalEvidenceGroups` resta invariato e non viene inviato ai modelli.
+
+Nuovi errori host principali:
+- `VERIFIER_SELECTED_OPTION_AUDIT_MISMATCH`;
+- `VERIFIER_SELECTED_OPTION_NOT_FULLY_SUPPORTED`;
+- `VERIFIER_SELECTED_OPTION_OMISSION_NOT_RECOVERED`.
+
+Il test dedicato riproduce il failure V7 reale con Anti-Bias che continua a classificare U01 come `NOT_MATERIAL`, ma verifica che il Verifier V8 possa e debba recuperare U01 quando la usa per sostenere la clausola formale dell'opzione selezionata.
+
+CI al commit `bec7d2bc63c08a589f69fe50d189e49902653df6`:
+- 80 Direct-QA: OK;
+- 136 FAME: OK.
+
+Prossimo passo: eseguire V8 sullo stesso case consumato esclusivamente come diagnostico causale della nuova selected-option audit. Non e una nuova misura indipendente. Se recupera il failure, il test successivo deve essere un nuovo case fresco.
+
