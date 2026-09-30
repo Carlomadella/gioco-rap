@@ -1,0 +1,59 @@
+{
+  "caseId": "runtime-contract-result-network-v4",
+  "sourceCommit": "718a4a09d3f206f8f1d927b38d2dca81e5333c5c",
+  "sourcePath": "strumenti/fame-local-worker/CLINE_GPTOSS_TSUMUGI_CONTRACT_RESULT.md",
+  "sourceSnapshot": "cases/fame-network/v4-runtime-result-source.md",
+  "question": "Il FAIL del primo runtime contract audit dimostra un errore semantico nell'audit Tsumugi e giustifica ritentare la stessa sessione fino a ottenere PASS?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "Questo risultato non misura la correttezza dell'audit Tsumugi, perche non esiste un artefatto semantico da valutare."
+    },
+    {
+      "unitId": "U02",
+      "text": "E un failure del tool layer prima della consegna. Inoltre mostra un secondo limite operativo rilevante: Cline ha tentato di usare il terminale nonostante il task e le regole della desk lo vietassero."
+    },
+    {
+      "unitId": "U03",
+      "text": "Il caso resta consumato e non viene ritentato per trasformarlo in PASS. Un eventuale prossimo confronto deve cambiare il packaging o il runtime del task, non correggere questa stessa sessione."
+    },
+    {
+      "unitId": "U04",
+      "text": "Il grader ha restituito `FAIL` con:\n\n- `artifactCorrect=false`;\n- `integrityErrors=[]`;\n- nessun `audit.json`;\n- nessuna valutazione semantica disponibile."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_YES",
+      "meaning": "Sì: il FAIL dimostra che l'audit Tsumugi era semanticamente errato e la stessa sessione va ritentata fino al PASS."
+    },
+    {
+      "optionId": "ANSWER_NO",
+      "meaning": "No: non c'è un artefatto semantico da giudicare; il failure è nel tool layer e il caso consumato non va ritentato per trasformarlo in PASS."
+    },
+    {
+      "optionId": "ANSWER_INSUFFICIENT",
+      "meaning": "Le evidenze non permettono di distinguere errore semantico, failure del tool layer e stato consumato del caso."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_NO",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U01"
+    ],
+    [
+      "U02"
+    ],
+    [
+      "U03"
+    ]
+  ],
+  "optionalContext": [
+    "U04"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
