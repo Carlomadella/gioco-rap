@@ -1,6 +1,6 @@
 # Rete di agenti locali — stato operativo
 
-Aggiornamento: 30 settembre 2026. Stato della rete verificato fino al commit `c803e05380d56f3c06a7253a4ca66c4c25bcebbc`; Direct QA CI PASS (51 test).
+Aggiornamento: 30 settembre 2026. Stato della rete verificato fino al commit `4c60c18425fc56a40b476ddfffded55ecb968141`; Direct QA CI PASS (55 test).
 
 ## Obiettivo e perimetro
 
@@ -94,3 +94,8 @@ Il task è aggiunto ai `CONSUMED_TASKS`. Le regressioni v2 usano ora una fixture
 ## Terzo task v2 congelato
 
 È preparato `p2-measurement-export-review-v1` sul report P2 measurement/export audit al commit `1c71cefc2756a83002963ddf5f0bd25835755c96`. Il task verifica scope del cohort consumato, equivalenza JSON↔MIDI, comportamento temporale del renderer v1, limiti causali del PASS P2 e controllo negativo su training/batch131/task-data readiness. Ogni check positivo usa una sola unità semanticamente autosufficiente per evitare il false negative di coverage emerso nel secondo run.
+
+
+## Verifica terzo task v2
+
+Commit `4c60c18425fc56a40b476ddfffded55ecb968141`: terzo task `p2-measurement-export-review-v1` congelato con regola di evidenza minima sufficiente. GitHub Actions `Verifica FAME local worker`, run `36679412661`: `success`, 55 test, `OK`.
