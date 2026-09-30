@@ -24,3 +24,6 @@ jobs:
       - name: Direct QA regressions
         working-directory: strumenti/fame-local-worker
         run: python -m unittest discover -s . -p "test_direct_qa_*.py" -q
+      - name: FAME network regressions
+        working-directory: strumenti/fame-local-worker
+        run: python -m unittest discover -s . -p "test_fame_*.py" -q
