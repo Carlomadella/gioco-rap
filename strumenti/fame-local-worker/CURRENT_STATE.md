@@ -777,3 +777,33 @@ Decisione: non creare V5 always-on. Prossima architettura candidata: adaptive es
 Tutti i quattro case della batteria sono consumati in entrambi i bracci.
 
 Report: [FAME_SINGLE_VS_FOUR_V4_BATTERY_V1_RESULT_2026-09-30.md](FAME_SINGLE_VS_FOUR_V4_BATTERY_V1_RESULT_2026-09-30.md).
+
+
+## Adaptive QA V1 implementato
+
+Creato `fame_adaptive_qa_v1.py`.
+
+Architettura:
+- single-agent V2 primario;
+- Four-Role Network V4 solo su failure con response valida;
+- nessuna escalation su baseline ACCEPTED;
+- nessuna escalation su failure operativo senza response;
+- nessun retry automatico.
+
+Trigger:
+- BASELINE_ACCEPTED -> no escalation;
+- OUTPUT_TRUNCATED -> escalation;
+- INSUFFICIENT_FINAL_EVIDENCE -> escalation;
+- HOST_REJECTED_BASELINE -> escalation;
+- POST_RESPONSE_BASELINE_ERROR -> escalation;
+- NO_RESPONSE_OPERATIONAL_FAILURE -> stop.
+
+Massimo:
+- 1 call se il single passa;
+- 5 call se serve V4.
+
+Baseline V2 e Network V4 restano intatte e riproducibili.
+
+Verifica automatica: 80 Direct-QA + 109 FAME, tutti OK.
+
+Dettagli: [FAME_ADAPTIVE_QA_V1.md](FAME_ADAPTIVE_QA_V1.md).
