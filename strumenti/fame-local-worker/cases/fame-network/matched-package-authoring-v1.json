@@ -7,19 +7,19 @@
   "units": [
     {
       "unitId": "U01",
-      "text": "Evidence units must represent complete semantic blocks. Do not split a structural Markdown heading into its own evidence unit when it only labels the paragraph/list that follows. A standalone heading can cause a precision false negative even when conclusion and required coverage are correct."
+      "text": "Reason: the model may reasonably cite the heading together with the content. If the heading is a standalone unit but is neither required nor declared benign context, the host validator can produce a precision false negative even when the conclusion and required coverage are correct."
     },
     {
       "unitId": "U02",
-      "text": "Frozen-run rule: Never repair a consumed task by changing its rubric/package and rerunning it. Preserve the historical result, classify the authoring defect separately, and apply the improved unitization only to new task IDs."
+      "text": "Never repair a consumed task by changing its rubric/package and rerunning it. Preserve the historical result, classify the authoring defect separately, and apply the improved unitization only to new task IDs."
     },
     {
       "unitId": "U03",
-      "text": "Before freezing a new direct-QA package: source snapshot must match; units must reconstruct source; positive checks need explicit required coverage; harmless context may be benign context; negative checks need no evidence IDs; add package-specific tests; freeze package and rubric before the first model call."
+      "text": "Before freezing a new direct-QA package:\n\n1. source snapshot must match the intended repository source exactly;\n2. units must reconstruct the complete source;\n3. headings without autonomous semantics must be joined to the following block;\n4. each positive check must have explicit required coverage groups;\n5. known harmless contextual units that may reasonably accompany evidence must be listed as benign context;\n6. negative checks must not need evidence IDs;\n7. package-specific tests must include incomplete coverage and false-positive authorization cases;\n8. freeze package and rubric before the first model call."
     },
     {
       "unitId": "U04",
-      "text": "Minimal sufficient evidence rule: prefer the smallest semantic unit that already contains every material component of the assertion. Do not require a second background unit merely because it explains why the first unit is true. Multiple required groups are appropriate only when the assertion genuinely combines facts separated across the source."
+      "text": "For a new positive check, prefer the smallest semantic unit that already contains every material component of the assertion. Do not require a second background unit merely because it explains why the first unit is true.\n\nIf one unit is explicitly self-sufficient, use one required group containing that unit. Multiple required groups are appropriate only when the assertion genuinely combines facts that are separated across the source and no single unit states the complete proposition."
     }
   ],
   "answerOptions": [
