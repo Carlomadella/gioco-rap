@@ -391,10 +391,14 @@ function lfFabbrica(){
     (stato.ok ? "" : '<p class="stperche">' + lfEsc(stato.perche) + '.</p>'),
     "orologio");
 
+  const statoTitolo = mio ? "Sei assunto qui." : altro ? "Hai già un altro lavoro." : "Non sei ancora assunto.";
+  const statoTesto = mio
+    ? "Quando entri fai direttamente il turno."
+    : altro
+      ? "Lavori già come " + altro.n.toLowerCase() + ". Un posto alla volta: questo turno resta bloccato."
+      : "Il primo turno ti assume automaticamente.";
   const dx = lfPan("Oggi",
-    '<div class="stvuoto"><b>' + (mio ? "Sei assunto qui." : "Non sei ancora assunto.") + '</b> ' +
-      (mio ? "Quando entri fai direttamente il turno." : "Il primo turno ti assume automaticamente.") +
-    '</div>' +
+    '<div class="stvuoto"><b>' + lfEsc(statoTitolo) + '</b> ' + lfEsc(statoTesto) + '</div>' +
     lfRiga("Energia", Math.round(G.energy)) +
     lfRiga("In cassa", fmt(G.money) + " €", "oro"),
     "soldi");
@@ -456,7 +460,12 @@ if(typeof avviaAzioneDiretta === "function"){
 if(typeof mostraScena === "function"){
   const lfScenaOriginale = mostraScena;
   window.mostraScena = function(a, sc, msg, extra){
-    const id = a && LUOGO_MOSSE[a.id];
+    /* Il turno è condiviso da tutti i lavori: lo teniamo dentro alla pagina
+       solo quando è partito dalla Fabbrica. Pizzeria e gli altri flussi non
+       cambiano. In questo modo il bottone HTML sotto alla foto non apre una
+       seconda schermata sopra al luogo appena scelto. */
+    const turnoFabbrica = a && a.id === "turno" && LUOGO && LUOGO.id === "fabbrica";
+    const id = a && (LUOGO_MOSSE[a.id] || (turnoFabbrica ? "fabbrica" : null));
     if(!id) return lfScenaOriginale.apply(this, arguments);
     const esito = {a:a.id, msg:String(msg == null ? "" : msg), extra:String(extra == null ? "" : extra)};
     const mostra = () => {
