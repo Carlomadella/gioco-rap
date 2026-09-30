@@ -58,6 +58,14 @@ class FameAntiBiasTests(unittest.TestCase):
         value['overall']='ANTI_BIAS_CHALLENGE_PASS_WITH_LIMITATIONS'
         self.assertIn('ANTI_BIAS_BLOCKING_ISSUE_NOT_REFLECTED',a.validate(value,self.claims(),self.units()))
 
+    def test_rework_requires_blocking_issue(self):
+        value=self.good()
+        value['overall']='ANTI_BIAS_REWORK_REQUIRED'
+        self.assertIn(
+            'ANTI_BIAS_REWORK_WITHOUT_BLOCKING_ISSUE',
+            a.validate(value,self.claims(),self.units())
+        )
+
     def test_unknown_claim_or_evidence_is_rejected(self):
         value=self.good()
         value['issues'][0]['claimIds']=['C9']
