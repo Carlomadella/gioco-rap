@@ -296,3 +296,16 @@ Risultato: [DIRECT_QA_PACKAGE_AUTHORING_RULES_V2_RESULT_2026-09-30.md](DIRECT_QA
 ## Decimo incarico v2 preparato — recovery protocol
 
 `recovery-protocol-review-v1` usa `RECOVERY.md` congelato al commit `5530c2649ddda83a07511f8e0549d4ccf45723fe`. Il task verifica che un recovery migliori coverage senza riscrivere il first pass, senza retry automatici e senza trasformare un caso noto in prova di generalizzazione o autorizzazione operativa.
+
+
+## Esito decimo incarico — recovery protocol first-attempt PASS con salvage
+
+`recovery-protocol-review-v1` è stato consumato il 30 settembre 2026 nella root `FAME_DIRECT_QA_NETWORK_V2_20260930_093655`.
+
+Esito: `VALIDATED_FOR_REVIEW`, una chiamata, nessun repair. Tutte le conclusioni sono corrette. Il salvage host-side ha rimosso due evidence ID superflui da finding già sufficientemente coperte; restano benign precision warning sulla finding first-pass invariance. Nessun missing evidence è stato riparato dall'host.
+
+Risultato: [DIRECT_QA_RECOVERY_PROTOCOL_V2_RESULT_2026-09-30.md](DIRECT_QA_RECOVERY_PROTOCOL_V2_RESULT_2026-09-30.md).
+
+## Undicesimo incarico v2 preparato — GPT-OSS diagnostic semantics
+
+`gptoss-diagnostic-semantics-review-v1` usa `GPTOSS_DIAGNOSTIC.md` congelato al commit `6da4fd1666ea4d82a331e597b3004068d08a567f`. Il task misura la capacità di distinguere failure semantici, troncamento di output ed errori operativi senza promuovere retroattivamente il confronto storico.
