@@ -34,7 +34,7 @@ class FameFourRoleNetworkV3Tests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root=Path(self.temp.name)/'network'
         self.real_case_dir=n.CASE_DIR
-        base=n.package(self.fixture_case_id)
+        base=n.package('model-comparison-generalization-network-v3')
         self.fixture_case_id='four-role-v3-regression-fixture'
         fixture_dir=Path(self.temp.name)/'cases'
         fixture_dir.mkdir()
