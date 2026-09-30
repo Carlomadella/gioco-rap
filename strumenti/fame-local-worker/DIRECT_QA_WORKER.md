@@ -270,3 +270,16 @@ Hardening futuro in `ee64500421a93a80c10d50d0d737eb63a0daef51`: 4096 token di ou
 ## Ottavo incarico v2 preparato — rubric audit semantics
 
 `rubric-audit-semantics-review-v1` usa `RUBRIC_AUDIT.md` congelato al commit `5530c2649ddda83a07511f8e0549d4ccf45723fe`. È un task più epistemico: separa etichette del validator, forza della prova, rivalutazione sidecar e stato storico, con controllo negativo su promozione/independent evaluation.
+
+
+## Esito ottavo incarico — rubric audit semantics first-attempt PASS
+
+`rubric-audit-semantics-review-v1` è stato consumato il 30 settembre 2026 nella root `FAME_DIRECT_QA_NETWORK_V2_20260930_092045`.
+
+Esito: `VALIDATED_FOR_REVIEW`, una chiamata, nessun repair, 5/5 conclusioni corrette, coverage sufficiente, nessun warning e nessun surplus evidence. Il salvage v2 non è intervenuto.
+
+Risultato: [DIRECT_QA_RUBRIC_AUDIT_SEMANTICS_V2_RESULT_2026-09-30.md](DIRECT_QA_RUBRIC_AUDIT_SEMANTICS_V2_RESULT_2026-09-30.md).
+
+## Nono incarico v2 preparato — package authoring rules
+
+`package-authoring-rules-review-v1` usa `DIRECT_QA_PACKAGE_AUTHORING.md` congelato al commit `4c60c18425fc56a40b476ddfffded55ecb968141`. Il task testa le regole con cui vengono costruiti i package Direct QA stessi, inclusi freeze, benign context e prova minima sufficiente.
