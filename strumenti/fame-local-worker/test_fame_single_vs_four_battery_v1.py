@@ -7,6 +7,7 @@ from pathlib import Path
 
 import fame_anti_bias as anti
 import fame_four_role_network_v3 as network
+import fame_single_agent_baseline_v1 as baseline
 import fame_single_vs_four_battery_v1 as battery
 
 
@@ -39,6 +40,12 @@ class BatteryTests(unittest.TestCase):
         self.temp=tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root=Path(self.temp.name)/'battery'
+        self.real_network_consumed=network.CONSUMED_CASES
+        self.real_baseline_consumed=baseline.CONSUMED_CASES
+        network.CONSUMED_CASES=frozenset()
+        baseline.CONSUMED_CASES=frozenset()
+        self.addCleanup(setattr,network,'CONSUMED_CASES',self.real_network_consumed)
+        self.addCleanup(setattr,baseline,'CONSUMED_CASES',self.real_baseline_consumed)
         with contextlib.redirect_stdout(io.StringIO()):
             battery.init(self.root)
 
@@ -97,6 +104,10 @@ class BatteryTests(unittest.TestCase):
                 else:
                     result.append(value)
         return result
+
+    def test_real_battery_cases_are_consumed_outside_test_override(self):
+        self.assertIn('battery-anti-bias-v1',self.real_network_consumed)
+        self.assertIn('battery-anti-bias-v1',self.real_baseline_consumed)
 
     def test_manifest_preregisters_four_balanced_cases(self):
         meta=json.loads((self.root/'battery.json').read_text(encoding='utf-8'))
