@@ -207,3 +207,8 @@ Risultato: [DIRECT_QA_GPTOSS_DIAGNOSTIC_SEMANTICS_V2_RESULT_2026-09-30.md](DIREC
 ## Nono task v2 congelato
 
 È preparato `qa-transfer-protocol-review-v1` su `QA_TRANSFER.md` al commit `5f29502092c9b641117e595a70a4489e651e66be`. Verifica che il secondo caso non sia cieco rispetto ai preparatori, che PASS transfer sia più stretto di `VALIDATED_FOR_REVIEW`, che il salvage non corregga errori semantici o coverage mancante, che il costo umano non venga assunto e che un difetto della rubrica non promuova retroattivamente la prova.
+
+
+## Verifica nono task v2
+
+Checkpoint `5b7d7eaad0338ee1905c51cb9d593539fc1c2f94`: `qa-transfer-protocol-review-v1` congelato prima di qualsiasi chiamata reale. GitHub Actions `Verifica FAME local worker`, run `36690720093`: `success`, 75 test, `OK`.
