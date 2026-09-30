@@ -1,6 +1,6 @@
 # Rete di agenti locali — stato operativo
 
-Aggiornamento: 30 settembre 2026. Stato della rete verificato fino al commit `04a4e9bddd5ce41f686faf0521aedd5a451febe7`; Direct QA CI PASS (47 test).
+Aggiornamento: 30 settembre 2026. Stato della rete verificato fino al commit `c803e05380d56f3c06a7253a4ca66c4c25bcebbc`; Direct QA CI PASS (51 test).
 
 ## Obiettivo e perimetro
 
@@ -77,3 +77,8 @@ Il commit `04a4e9bddd5ce41f686faf0521aedd5a451febe7` registra il primo run reale
 ## Secondo task v2 congelato
 
 `tsumugi-v1-architecture-failure-review-v1` usa esclusivamente il report storico `OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_SCORE_DIAGNOSTIC_CONTROLLED_FAIL_2026-09-23.md` al commit `46ad39eca673e1d97376c776344d64b294b346b7`. Verifica failure prima del publish, confine architetturale V1/V2, significato di `selected_pair_count`, presupposto diagnostico non verificato, replacement scope e controllo negativo sulle autorizzazioni musicali. Il task precedente `tsumugi-score-diagnostic-review-v1` è ora bloccato in `CONSUMED_TASKS` e non può essere inizializzato di nuovo dalla v2.
+
+
+## Verifica secondo task v2
+
+Commit `c803e05380d56f3c06a7253a4ca66c4c25bcebbc`: secondo task congelato, primo task v2 aggiunto ai consumati, test v2 riallineati sul nuovo task. GitHub Actions `Verifica FAME local worker`, run `36677890055`: `success`, 51 test, `OK`.
