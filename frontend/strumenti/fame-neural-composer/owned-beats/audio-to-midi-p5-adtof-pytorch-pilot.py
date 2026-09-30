@@ -100,10 +100,19 @@ def validate_environment(workspace: Path, protocol: dict) -> dict:
         line for line in status.splitlines()
         if line and not line.startswith("??")
     ]
-    if tracked_dirty:
+    allowed_generated_prefixes = ("src/adtof_pytorch.egg-info/",)
+    unsafe_tracked_dirty = []
+    generated_tracked_dirty = []
+    for line in tracked_dirty:
+        changed_path = line[3:].replace("\\", "/").strip()
+        if changed_path.startswith(allowed_generated_prefixes):
+            generated_tracked_dirty.append(changed_path)
+        else:
+            unsafe_tracked_dirty.append(line)
+    if unsafe_tracked_dirty:
         raise RuntimeError(
-            "ADTOF pinned source has tracked modifications: "
-            + " | ".join(tracked_dirty)
+            "ADTOF pinned source has unsafe tracked modifications: "
+            + " | ".join(unsafe_tracked_dirty)
         )
 
     weight = source_root / ext["weightRelativePath"]
@@ -119,6 +128,7 @@ def validate_environment(workspace: Path, protocol: dict) -> dict:
         "sourceHead": head,
         "weightGitBlobSha1": blob,
         "weightSha256": sha256_file(weight),
+        "generatedTrackedArtifacts": generated_tracked_dirty,
         "untrackedBuildArtifacts": [
             line[3:] for line in status.splitlines()
             if line.startswith("??")
@@ -203,6 +213,7 @@ def preflight(workspace_root: str) -> dict:
         "sourceHead": env["sourceHead"],
         "sourceWeightSha256": env["weightSha256"],
         "installedWeightSha256": sha256_file(installed_weight),
+        "generatedTrackedArtifacts": env["generatedTrackedArtifacts"],
         "untrackedBuildArtifacts": env["untrackedBuildArtifacts"],
         "labels": list(LABELS_5),
         "thresholds": [float(x) for x in FRAME_RNN_THRESHOLDS],
