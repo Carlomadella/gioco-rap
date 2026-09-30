@@ -33,8 +33,20 @@ class FameFourRoleNetworkV3Tests(unittest.TestCase):
         self.temp=tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root=Path(self.temp.name)/'network'
+        self.real_case_dir=n.CASE_DIR
+        base=n.package(self.fixture_case_id)
+        self.fixture_case_id='four-role-v3-regression-fixture'
+        fixture_dir=Path(self.temp.name)/'cases'
+        fixture_dir.mkdir()
+        fixture=dict(base)
+        fixture['caseId']=self.fixture_case_id
+        (fixture_dir/(self.fixture_case_id+'.json')).write_text(
+            json.dumps(fixture,ensure_ascii=False,indent=2)+'\n',encoding='utf-8'
+        )
+        n.CASE_DIR=fixture_dir
+        self.addCleanup(setattr,n,'CASE_DIR',self.real_case_dir)
         with contextlib.redirect_stdout(io.StringIO()):
-            n.init(self.root,'model-comparison-generalization-network-v3')
+            n.init(self.root,self.fixture_case_id)
 
     def extractor(self):
         return {'claims':[
@@ -103,7 +115,7 @@ class FameFourRoleNetworkV3Tests(unittest.TestCase):
         self.assertNotIn('expectedAnswerOptionId',payload)
 
     def test_verifier_schema_has_unambiguous_claim_statuses(self):
-        p=n.package('model-comparison-generalization-network-v3')
+        p=n.package(self.fixture_case_id)
         schema=n.verifier_schema(p,self.extractor(),self.challenge())
         status_enum=schema['properties']['decisions']['items']['properties']['status']['enum']
         self.assertEqual(status_enum,[
@@ -131,7 +143,7 @@ class FameFourRoleNetworkV3Tests(unittest.TestCase):
         verifier=self.verifier()
         verifier['decisions'][0]['status']='EVIDENCE_DOES_NOT_SUPPORT_CLAIM'
         errors=n.validate_verifier(
-            verifier,n.package('model-comparison-generalization-network-v3'),self.extractor(),self.challenge()
+            verifier,n.package(self.fixture_case_id),self.extractor(),self.challenge()
         )
         self.assertIn('VERIFIER_NONSUPPORTED_WITH_EVIDENCE',errors)
 
