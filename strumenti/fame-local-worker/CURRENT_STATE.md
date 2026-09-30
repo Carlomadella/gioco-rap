@@ -561,3 +561,36 @@ Le unità dei package sono legate letteralmente agli snapshot congelati; nessuna
 Verifica automatica pre-run: 80 test Direct-QA + 75 test FAME, tutti OK.
 
 Dettagli: [FAME_SINGLE_VS_FOUR_MATCHED_BUDGET_V1.md](FAME_SINGLE_VS_FOUR_MATCHED_BUDGET_V1.md).
+
+
+## Matched-total-generation-budget V1 — esito reale
+
+Batteria completata sui quattro casi pre-registrati con budget massimo totale pareggiato:
+- single-agent: 1×16384;
+- Four-Role Network V3: 4×4096.
+
+Automatic summary:
+- entrambi corretti: 2/4;
+- solo single-agent corretto: 1/4;
+- solo network corretto: 1/4;
+- accepted: 3/4 per entrambi;
+- required coverage completa: 3/4 per entrambi;
+- single truncated cases: 1;
+- network truncated cases: 0;
+- model calls: single 4, network 15.
+
+Caso 1 `matched-package-authoring-v1`: entrambi ACCEPTED / ANSWER_NO / U02+U04.
+
+Caso 2 `matched-qa-review-v1`: network ACCEPTED; single-agent ERROR per `Risposta incompleta`, `done_reason=length`, `eval_count=16384`. La decomposizione completa il task anche a massimo budget totale uguale, ma non dimostra errore semantico del single-agent perché il JSON finale non si completa.
+
+Caso 3 `matched-cline-real-qa-v1`: entrambi ACCEPTED / ANSWER_NO / U01+U02+U03.
+
+Caso 4 `matched-coordinator-reject-v1`: single-agent ACCEPTED / ANSWER_NO / U01+U03; network NEEDS_REVIEW perché il Verifier è REJECTED con `VERIFIER_NONSUPPORTED_WITH_EVIDENCE`, response completa `done_reason=stop`, nessun troncamento; Integrator non eseguito.
+
+Quindi il matched-budget non assegna un vincitore generale: 2 pareggi, 1 vantaggio operativo network su troncamento, 1 failure network da classificare.
+
+Aggiunto `fame_network_attempt_diagnostic.py`, read-only, per classificare il Verifier storico del quarto caso senza nuove chiamate modello.
+
+Tutti i quattro case matched-budget sono consumati sia nella rete V3 sia nella baseline V2.
+
+Report: [FAME_SINGLE_VS_FOUR_MATCHED_BUDGET_V1_RESULT_2026-09-30.md](FAME_SINGLE_VS_FOUR_MATCHED_BUDGET_V1_RESULT_2026-09-30.md).
