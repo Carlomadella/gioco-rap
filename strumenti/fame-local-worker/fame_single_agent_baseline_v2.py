@@ -15,7 +15,7 @@ DIGEST=network.DIGEST
 OPTIONS=dict(network.OPTIONS)
 OPTIONS['num_predict']=16384
 FINAL_ACCEPTED='PROPOSED_FOR_HUMAN_REVIEW'
-CONSUMED_CASES=frozenset()
+CONSUMED_CASES=frozenset({'matched-package-authoring-v1','matched-qa-review-v1','matched-cline-real-qa-v1','matched-coordinator-reject-v1'})
 
 SYSTEM="""Sei la baseline single-agent di FAME Neural.
 Rispondi usando solo domanda, opzioni di risposta e unità di evidenza fornite.
