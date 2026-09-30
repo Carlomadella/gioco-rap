@@ -297,3 +297,18 @@ Secondo pilot congelato: `agent-network-readiness-network-v2`, su un documento d
 Dettagli: [FAME_FOUR_ROLE_NETWORK_V2.md](FAME_FOUR_ROLE_NETWORK_V2.md).
 
 Verifica automatica dopo V2: GitHub Actions `Verifica FAME local worker` PASS con 80 test Direct-QA + 25 test FAME network/Anti-Bias.
+
+
+## Primo pilot reale Four-Role Network V2
+
+Root locale `FAME_FOUR_ROLE_NETWORK_V2_20260930_120959`.
+
+Esito: Extractor `ACCEPTED`, Anti-Bias `ACCEPTED`, Verifier `ERROR` HTTP 400 prima della risposta, Integrator non eseguito. Chiamate semantiche completate: 2.
+
+L'Anti-Bias calibrato ha prodotto `issues=[]` e `ANTI_BIAS_CHALLENGE_PASS_WITHIN_SCOPE`, senza ripetere i falsi positivi della V1.
+
+Causa del 400: lo schema Verifier generava `issueId.enum=[]` quando non esistevano issue Anti-Bias. Corretto il builder: `antiBiasResolution` viene omesso interamente quando non ci sono issue.
+
+Aggiunto `fame_four_role_network_v2_recovery.py`: recovery bounded che riusa gli output ACCEPTED di Extractor + Anti-Bias dal run storico e consente al massimo due nuove chiamate, Verifier + Integrator. Non rilancia i primi due ruoli.
+
+Report: [FAME_FOUR_ROLE_NETWORK_V2_FIRST_PILOT_RESULT_2026-09-30.md](FAME_FOUR_ROLE_NETWORK_V2_FIRST_PILOT_RESULT_2026-09-30.md).
