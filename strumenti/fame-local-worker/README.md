@@ -158,3 +158,16 @@ Documentazione API consultata:
 ## Compito QA su un report reale
 
 Disponibile [QA-REVIEW-1](QA_REVIEW.md): lettura del report Tsumugi congelato, citazioni verificate e controlli successivi proposti. Avvio con `qa_worker.py`; la demo manifest e `agent.py` restano invariati. Esito positivo limitato a `VALIDATED_FOR_REVIEW`, senza esecuzioni autorizzate.
+
+
+## Rete a quattro ruoli — fase corrente
+
+Dopo l'aggregate dei primi nove run Direct QA v2, il prossimo esperimento non è un altro task singolo.
+
+È disponibile [FAME_FOUR_ROLE_NETWORK_V1.md](FAME_FOUR_ROLE_NETWORK_V1.md) con runner `fame_four_role_network_v1.py`:
+
+`Extractor -> Anti-Bias -> Verifier -> Integrator`.
+
+L'Anti-Bias FAME è un sottoinsieme operativo minimale adattato read-only da `scientific-method-ai`; non importa la cascade scientifica o altri sistemi non necessari. Vedere [FAME_ANTI_BIAS.md](FAME_ANTI_BIAS.md).
+
+Il primo pilot reale resta da eseguire. Nessun risultato autorizza training o produzione.
