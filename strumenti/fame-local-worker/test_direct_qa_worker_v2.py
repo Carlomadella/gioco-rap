@@ -27,22 +27,22 @@ class WorkerV2Tests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
         self.root=Path(self.temp.name)/'desk'
-        self.p=w.package('tsumugi-score-diagnostic-review-v1')
-        with contextlib.redirect_stdout(io.StringIO()):w.init(self.root,'tsumugi-score-diagnostic-review-v1')
+        self.p=w.package('tsumugi-v1-architecture-failure-review-v1')
+        with contextlib.redirect_stdout(io.StringIO()):w.init(self.root,'tsumugi-v1-architecture-failure-review-v1')
 
     def good(self):
         return {'results':[
-            {'code':'RAW_PITCH_RECONSTRUCTION','supported':True,'evidenceIds':['U02','U03']},
-            {'code':'SCORE_HEAD_FAILURE_LOCALIZED','supported':True,'evidenceIds':['U04','U06']},
-            {'code':'NO_SYNTHETIC_DECODER_TUNING','supported':True,'evidenceIds':['U07']},
-            {'code':'REAL_EASY_COHORT_SCOPE','supported':True,'evidenceIds':['U08']},
-            {'code':'FRESH_EVALUATION_OR_PROMOTION_AUTHORIZED','supported':False,'evidenceIds':[]},
+            {'code':'CONTROLLED_FAILURE_BEFORE_PUBLISH','supported':True,'evidenceIds':['U02']},
+            {'code':'V1_V2_OUTPUT_MISMATCH','supported':True,'evidenceIds':['U03']},
+            {'code':'UNVERIFIED_ARCH_ASSUMPTION','supported':True,'evidenceIds':['U03','U04']},
+            {'code':'V1_REPLACEMENT_SCOPE','supported':True,'evidenceIds':['U05']},
+            {'code':'FAILURE_AUTHORIZES_MUSICAL_EXECUTION','supported':False,'evidenceIds':[]},
         ]}
 
     def bad(self):
         value=json.loads(json.dumps(self.good()))
-        value['results'][0]={'code':'RAW_PITCH_RECONSTRUCTION','supported':False,'evidenceIds':[]}
-        value['results'][1]['evidenceIds']=['U04']
+        value['results'][0]={'code':'CONTROLLED_FAILURE_BEFORE_PUBLISH','supported':False,'evidenceIds':[]}
+        value['results'][2]['evidenceIds']=['U04']
         return value
 
     def run_worker(self,f):
@@ -67,8 +67,8 @@ class WorkerV2Tests(unittest.TestCase):
         feedback=f.calls[1]['messages'][-1]['content']
         self.assertIn('SOME_CONCLUSION_INCORRECT',feedback)
         self.assertIn('SOME_EVIDENCE_COVERAGE_INSUFFICIENT',feedback)
-        self.assertNotIn('RAW_PITCH_RECONSTRUCTION',feedback)
-        self.assertNotIn('SCORE_HEAD_FAILURE_LOCALIZED',feedback)
+        self.assertNotIn('CONTROLLED_FAILURE_BEFORE_PUBLISH',feedback)
+        self.assertNotIn('UNVERIFIED_ARCH_ASSUMPTION',feedback)
         request=json.dumps(f.calls[1],ensure_ascii=False)
         self.assertNotIn('requiredGroups',request)
         self.assertNotIn('benignContext',request)
@@ -96,9 +96,10 @@ class WorkerV2Tests(unittest.TestCase):
 
     def test_consumed_tasks_cannot_be_initialized_in_v2(self):
         other=Path(self.temp.name)/'consumed'
-        with self.assertRaises(ValueError):
-            w.init(other,'pfnmf-review-v1')
-        self.assertFalse(other.exists())
+        for task in ('pfnmf-review-v1','tsumugi-score-diagnostic-review-v1'):
+            with self.assertRaises(ValueError):
+                w.init(other,task)
+            self.assertFalse(other.exists())
 
     def test_cli_run_and_status_do_not_require_task(self):
         parser=w.build_parser()

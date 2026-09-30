@@ -191,3 +191,24 @@ Il task è ora consumato e non va ripetuto come nuovo first attempt. Il PASS non
 ### Correzione CLI emersa dal run
 
 `direct_qa_worker_v2.py` e `direct_qa_queue_v2.py` accettano ora `run` e `status` senza `--task` / `--tasks`, perché il task è già congelato in desk/queue. Questi argomenti restano richiesti operativamente soltanto per `init`. Test dedicati impediscono di reintrodurre il requisito globale.
+
+
+## Quinto incarico v2 preparato — V1 architecture diagnostic failure
+
+È congelato `tsumugi-v1-architecture-failure-review-v1` sul report storico del controlled score diagnostic failure al commit `46ad39eca673e1d97376c776344d64b294b346b7`.
+
+Il task controlla cinque punti: failure prima della pubblicazione, mismatch degli output V1/V2, invalidità del presupposto `pair_gate_logits`, scope corretto del replacement diagnostic e controllo negativo su retuning/beat reali/training/P6/batch131.
+
+Il precedente `tsumugi-score-diagnostic-review-v1` è stato aggiunto ai task consumati della v2: una nuova root non può più trasformarlo in un altro first attempt.
+
+Run previsto, dalla cartella `strumenti/fame-local-worker`:
+
+```powershell
+git pull --ff-only
+python -m unittest discover -s . -p "test_direct_qa_*.py" -q
+$ROOT = "$HOME\FAME_DIRECT_QA_NETWORK_V2_$(Get-Date -Format 'yyyyMMdd_HHmmss')"
+python .\direct_qa_queue_v2.py init --root "$ROOT" --tasks tsumugi-v1-architecture-failure-review-v1
+python .\direct_qa_queue_v2.py run --root "$ROOT"
+```
+
+Nessuna elaborazione musicale viene eseguita dal task.

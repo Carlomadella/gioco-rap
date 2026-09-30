@@ -54,8 +54,8 @@ Durante il run è emerso un bug CLI: `--task` / `--tasks` erano obbligatori anch
 ## Prossimo passo della rete
 
 1. Trattare `tsumugi-score-diagnostic-review-v1` come consumato: non rieseguirlo in una nuova root per ottenere un altro first attempt.
-2. Preparare e congelare un secondo task documentale realmente nuovo, con source snapshot completo e rubrica fissata prima del run.
-3. Eseguire una sola desk v2 sul nuovo task, preservando first-attempt e repair come metriche separate.
+2. Il secondo task `tsumugi-v1-architecture-failure-review-v1` è congelato sul controlled score-diagnostic failure del 23 settembre, con source snapshot completo e rubrica fissata prima del run.
+3. Eseguire una sola desk v2 su `tsumugi-v1-architecture-failure-review-v1`, preservando first-attempt e repair come metriche separate.
 4. Valutare il costo umano di review prima di ampliare ruoli. Non avviare elaborazioni musicali per procurarsi altri task.
 
 La separazione documentale non esegue questi passi e non certifica nuovi test o inferenze.
@@ -72,3 +72,8 @@ Guida tecnica e storico dei comandi: [DIRECT_QA_WORKER.md](DIRECT_QA_WORKER.md).
 ## Verifica post-run
 
 Il commit `04a4e9bddd5ce41f686faf0521aedd5a451febe7` registra il primo run reale v2 e corregge la CLI `run/status`. GitHub Actions `Verifica FAME local worker`, run `36677541885`, ha completato con `success`: 47 test, `OK`.
+
+
+## Secondo task v2 congelato
+
+`tsumugi-v1-architecture-failure-review-v1` usa esclusivamente il report storico `OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_SCORE_DIAGNOSTIC_CONTROLLED_FAIL_2026-09-23.md` al commit `46ad39eca673e1d97376c776344d64b294b346b7`. Verifica failure prima del publish, confine architetturale V1/V2, significato di `selected_pair_count`, presupposto diagnostico non verificato, replacement scope e controllo negativo sulle autorizzazioni musicali. Il task precedente `tsumugi-score-diagnostic-review-v1` è ora bloccato in `CONSUMED_TASKS` e non può essere inizializzato di nuovo dalla v2.

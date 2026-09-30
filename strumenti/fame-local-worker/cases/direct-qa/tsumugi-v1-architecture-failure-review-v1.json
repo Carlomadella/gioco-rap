@@ -1,0 +1,100 @@
+{
+  "taskId": "tsumugi-v1-architecture-failure-review-v1",
+  "sourceCommit": "46ad39eca673e1d97376c776344d64b294b346b7",
+  "sourcePath": "documentazione/fame-neural/OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_SCORE_DIAGNOSTIC_CONTROLLED_FAIL_2026-09-23.md",
+  "sourceSnapshot": "cases/direct-qa/tsumugi-v1-architecture-failure-source.md",
+  "sourceSha256": "4fc153654bac9bccba68fa85f1adc78244532b74aa939b025990af068070878e",
+  "scope": "Revisione documentale del controlled diagnostic design failure. Distinguere errore del diagnostic da failure del modello, verificare il confine V1/V2 e il significato di selected_pair_count, e controllare che la decisione non autorizzi nuove esecuzioni musicali.",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "# Owned Beats — P5 Tsumugi score diagnostic — controlled failure before publish\n\nData: 23 settembre 2026  \nBranch: `feature/fame-neural-roadmap`"
+    },
+    {
+      "unitId": "U02",
+      "text": "## Tentativo\n\nWrapper eseguito dall'operatore:\n\n`run-audio-to-midi-p5-tsumugi-score-diagnostic.ps1 -Workspace D:\\FAME_NEURAL`\n\nStatic test e self-test hanno passato i binding congelati. L'esecuzione reale sulle fixture si e poi fermata con:\n\n`FAME NEURAL TSUMUGI SCORE DIAGNOSTIC FAILED: 'pair_gate_logits'`\n\nIl run non ha pubblicato il summary finale; il runner usa una directory temporanea e la rimuove in caso di eccezione prima della rename append-only."
+    },
+    {
+      "unitId": "U03",
+      "text": "## Root cause nel source congelato Tsumugi\n\nAudit del commit Tsumugi congelato `f7411471a4de0ad3d430191de11b8623d67e5b38`:\n\n- `AudioSemiCRFTransformer.forward()` usa `V1SemiCRFHead` quando `semi_crf_version == \"v1\"`;\n- solo `V2OverlapSemiCRFHead.forward()` emette `pair_gate_logits`;\n- il V1 head emette invece `interval_query`, `interval_key`, `interval_diag`, `interval_features`, `instrument_features`, `instrument_logits` e `frame_valid_mask`;\n- nel decoder V1, `selected_pair_count` viene riportato come `track_count = NUM_PITCHES * num_pitch_slots`, non come numero di pair selezionati da un pair gate."
+    },
+    {
+      "unitId": "U04",
+      "text": "Quindi il precedente score diagnostic conteneva un presupposto architetturale non verificato: tentava di leggere un output V2. Il KeyError e coerente con un checkpoint istanziato con head V1. Prima di congelare il sostituto va registrato il `semi_crf_version` reale dal checkpoint locale tramite l'environment doctor read-only."
+    },
+    {
+      "unitId": "U05",
+      "text": "## Decisione\n\n1. Non rieseguire `audio-to-midi-p5-tsumugi-score-diagnostic-v1-001`.\n2. Conservare il failure come controlled diagnostic design failure.\n3. Aggiungere un guard nel vecchio runner: se il checkpoint non e V2, fermarsi immediatamente dopo il load del checkpoint e prima di aprire fixture audio.\n4. Verificare metadata checkpoint locale, in particolare `semi_crf_version` e `num_pitch_slots`.\n5. Se confermato V1, congelare un nuovo diagnostic con nuovo runId basato sui reali output V1: score pitch-wise Semi-CRF (`interval_query/key/diag`) e non pair-gate logits.\n6. Nessun retuning, beat reale, training, P6 o batch131 viene aperto da questo failure."
+    }
+  ],
+  "checks": [
+    {
+      "code": "CONTROLLED_FAILURE_BEFORE_PUBLISH",
+      "assertion": "Static test e self-test passano, ma l'esecuzione reale sulle fixture si ferma su pair_gate_logits e non pubblica il summary finale; la directory temporanea viene rimossa prima della rename append-only."
+    },
+    {
+      "code": "V1_V2_OUTPUT_MISMATCH",
+      "assertion": "Con semi_crf_version v1 il forward usa V1SemiCRFHead, mentre pair_gate_logits è emesso solo dal V2 head; il V1 espone invece interval_query/key/diag e altri output, e selected_pair_count nel decoder V1 è track_count, non un conteggio di pair sopra pair gate."
+    },
+    {
+      "code": "UNVERIFIED_ARCH_ASSUMPTION",
+      "assertion": "Il diagnostic fallito conteneva un presupposto architetturale non verificato tentando di leggere un output V2; il KeyError è coerente con un checkpoint V1 e prima del sostituto va verificato semi_crf_version tramite doctor read-only."
+    },
+    {
+      "code": "V1_REPLACEMENT_SCOPE",
+      "assertion": "La decisione conserva il failure come design failure, vieta il rerun dello stesso runId, introduce un guard prima dell'apertura fixture per checkpoint non V2 e, se V1 è confermato, richiede un nuovo diagnostic su output pitch-wise interval_query/key/diag."
+    },
+    {
+      "code": "FAILURE_AUTHORIZES_MUSICAL_EXECUTION",
+      "assertion": "Questo failure autorizza retuning, beat reali, training, P6 o batch131."
+    }
+  ],
+  "rubric": {
+    "CONTROLLED_FAILURE_BEFORE_PUBLISH": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U02"
+        ]
+      ],
+      "benignContext": []
+    },
+    "V1_V2_OUTPUT_MISMATCH": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U03"
+        ]
+      ],
+      "benignContext": []
+    },
+    "UNVERIFIED_ARCH_ASSUMPTION": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U03"
+        ],
+        [
+          "U04"
+        ]
+      ],
+      "benignContext": []
+    },
+    "V1_REPLACEMENT_SCOPE": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U05"
+        ]
+      ],
+      "benignContext": [
+        "U04"
+      ]
+    },
+    "FAILURE_AUTHORIZES_MUSICAL_EXECUTION": {
+      "supported": false,
+      "requiredGroups": [],
+      "benignContext": []
+    }
+  }
+}
