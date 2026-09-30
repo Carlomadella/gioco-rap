@@ -189,3 +189,21 @@ Risultato: [DIRECT_QA_RECOVERY_PROTOCOL_V2_RESULT_2026-09-30.md](DIRECT_QA_RECOV
 ## Verifica ottavo task v2
 
 Checkpoint `2f593f180470ba5191140873f045c3023f4f8b03`: `gptoss-diagnostic-semantics-review-v1` congelato prima di qualsiasi chiamata reale. GitHub Actions `Verifica FAME local worker`, run `36685205613`: `success`, 72 test, `OK`.
+
+
+## Esito ottavo run reale v2
+
+Root locale `FAME_DIRECT_QA_NETWORK_V2_20260930_103151`. `gptoss-diagnostic-semantics-review-v1` ha chiuso `VALIDATED_FOR_REVIEW` al primo tentativo con una sola chiamata. Tutti i 5 check hanno conclusione corretta e coverage sufficiente sui positivi.
+
+Il salvage host-side è intervenuto una sola volta:
+- `OUTPUT_TRUNCATED_NOT_SEMANTIC`: rimosso U01.
+
+Nessun precision warning residuo e nessun evidence ID non revisionato. Il PASS è semanticamente valido e quasi raw-clean.
+
+Metriche: `elapsedSeconds` circa 16.843 s, `prompt_eval_count=1703`, `eval_count=1179`, `done_reason=stop`. Il task è consumato e bloccato da nuove inizializzazioni.
+
+Risultato: [DIRECT_QA_GPTOSS_DIAGNOSTIC_SEMANTICS_V2_RESULT_2026-09-30.md](DIRECT_QA_GPTOSS_DIAGNOSTIC_SEMANTICS_V2_RESULT_2026-09-30.md).
+
+## Nono task v2 congelato
+
+È preparato `qa-transfer-protocol-review-v1` su `QA_TRANSFER.md` al commit `5f29502092c9b641117e595a70a4489e651e66be`. Verifica che il secondo caso non sia cieco rispetto ai preparatori, che PASS transfer sia più stretto di `VALIDATED_FOR_REVIEW`, che il salvage non corregga errori semantici o coverage mancante, che il costo umano non venga assunto e che un difetto della rubrica non promuova retroattivamente la prova.
