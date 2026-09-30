@@ -312,3 +312,31 @@ Causa del 400: lo schema Verifier generava `issueId.enum=[]` quando non esisteva
 Aggiunto `fame_four_role_network_v2_recovery.py`: recovery bounded che riusa gli output ACCEPTED di Extractor + Anti-Bias dal run storico e consente al massimo due nuove chiamate, Verifier + Integrator. Non rilancia i primi due ruoli.
 
 Report: [FAME_FOUR_ROLE_NETWORK_V2_FIRST_PILOT_RESULT_2026-09-30.md](FAME_FOUR_ROLE_NETWORK_V2_FIRST_PILOT_RESULT_2026-09-30.md).
+
+
+## Recovery V2 — failure semantico del Verifier
+
+Root locale `FAME_FOUR_ROLE_NETWORK_V2_RECOVERY_20260930_121630`.
+
+Il recovery ha riusato Extractor + Anti-Bias accettati e ha eseguito solo il Verifier. Esito `REJECTED` con `VERIFIER_NONSUPPORTED_WITH_EVIDENCE`; Integrator non eseguito.
+
+Il Verifier ha mantenuto evidence ID e motivazioni che dichiaravano i claim supportati, ma ha scelto `UNSUPPORTED` per tutti i claim e `ESTABLISHED` come verdict complessivo. Classificato come failure semantico/contrattuale V2, non trasporto.
+
+Report: [FAME_FOUR_ROLE_NETWORK_V2_RECOVERY_RESULT_2026-09-30.md](FAME_FOUR_ROLE_NETWORK_V2_RECOVERY_RESULT_2026-09-30.md).
+
+## Four-Role Network V3
+
+Preparato nuovo protocollo V3:
+- status claim non ambigui: `EVIDENCE_SUPPORTS_CLAIM`, `EVIDENCE_DOES_NOT_SUPPORT_CLAIM`, `CLAIM_NEEDS_REWORK`;
+- answer options con ID + significato testuale;
+- expected answer host-only;
+- Extractor non vede le answer options;
+- Verifier/Integrator vedono tutte le opzioni ma non quella attesa;
+- Integrator deve concordare con il Verifier;
+- evidence gate ristretto alla prova minima necessaria; U05 è contesto opzionale.
+
+Aggiunto `fame_four_role_network_v3_continuation.py`: verifica la catena V2 originale + recovery V2 semantico fallito e riusa solo Extractor + Anti-Bias, con massimo due nuove chiamate V3.
+
+Verifica automatica: GitHub Actions PASS con 80 test Direct-QA + 43 test FAME network/Anti-Bias/recovery/continuation.
+
+Dettagli: [FAME_FOUR_ROLE_NETWORK_V3.md](FAME_FOUR_ROLE_NETWORK_V3.md).
