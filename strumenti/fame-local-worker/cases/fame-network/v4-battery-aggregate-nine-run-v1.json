@@ -1,0 +1,59 @@
+{
+  "caseId": "v4-battery-aggregate-nine-run-v1",
+  "sourceCommit": "d6ea59a6c54693c408f92f65f8c12f6add398858",
+  "sourcePath": "strumenti/fame-local-worker/DIRECT_QA_V2_AGGREGATE_RESULT_2026-09-30.md",
+  "sourceSnapshot": "cases/fame-network/v4-battery-aggregate-source.md",
+  "question": "Quale sintesi rispetta i nove run storici v2 senza trasformare reject o metriche non misurate in successi?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "- task: 9;\n- finali accettati: 7;\n- first-pass raw-clean: 5;\n- first-pass con salvage: 2;\n- finali rejected: 2;\n- accepted after repair: 0;\n- error finali: 0;\n- tentativi troncati per output: 1;\n- task con salvage host-side: 2;\n- evidence ID eliminati dal salvage: 3;\n- incorrect conclusions nello stato finale: 0;\n- insufficient coverage nello stato finale: 1;\n- model calls totali: 11;\n- elapsed dei tentativi: circa 170.67 secondi."
+    },
+    {
+      "unitId": "U02",
+      "text": "Il tempo di revisione umana non è stato misurato."
+    },
+    {
+      "unitId": "U03",
+      "text": "Questo aggregate è una misura degli artefatti storici, non una reinterpretazione retroattiva. I due task formalmente rejected restano rejected nell'aggregate. Le diagnosi manuali già documentate sui difetti di authoring/precisione restano documentazione separata e non vengono convertite in PASS dal tool."
+    },
+    {
+      "unitId": "U04",
+      "text": "La sequenza fornisce abbastanza evidenza operativa per smettere di aggiungere task documentali equivalenti e passare a una prima prova coordinata multi-ruolo, mantenendo revisione umana e autorizzazioni chiuse."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_SEVEN_ACCEPTED",
+      "meaning": "L'aggregate riporta 7/9 finali accettati, mantiene 2 reject storici e non misura il tempo umano; sostiene il passaggio a una prova multi-ruolo con review e autorizzazioni ancora chiuse."
+    },
+    {
+      "optionId": "ANSWER_NINE_OF_NINE",
+      "meaning": "L'aggregate dimostra 9/9 PASS effettivi e permette di convertire retroattivamente i due reject in successi."
+    },
+    {
+      "optionId": "ANSWER_HUMAN_SAVINGS_PROVEN",
+      "meaning": "L'aggregate dimostra anche una riduzione misurata del tempo umano di revisione."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_SEVEN_ACCEPTED",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U01"
+    ],
+    [
+      "U02"
+    ],
+    [
+      "U03"
+    ]
+  ],
+  "optionalContext": [
+    "U04"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
