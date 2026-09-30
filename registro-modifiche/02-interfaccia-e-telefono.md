@@ -6,6 +6,29 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:3ae18e1 -->
+## 30/09/26, 10:41 â€” fix/global-map-navigation-v2 â†’ main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `3ae18e1`
+
+### Cosa Ã¨ entrato
+
+- `9d56bdc` â€” test(nav): align regression audit with host registry â€” **mycolbraga**
+- `79a37c8` â€” test(nav): cover stable global map navigation â€” **mycolbraga**
+- `65d8140` â€” fix(nav): bust cache for stable global navigation â€” **mycolbraga**
+- `bf3ba17` â€” fix(nav): keep one global map control â€” **mycolbraga**
+- `50eb2b8` â€” fix(nav): stabilize global return-to-map routing â€” **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/menu-sistema.css`
+- **Modificato:** `frontend/js/menu-sistema.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:4a578e8 -->
 ## 30/09/26, 00:35 â€” task/il-circolo â†’ main
 
