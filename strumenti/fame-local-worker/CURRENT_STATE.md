@@ -184,3 +184,8 @@ Risultato: [DIRECT_QA_RECOVERY_PROTOCOL_V2_RESULT_2026-09-30.md](DIRECT_QA_RECOV
 ## Ottavo task v2 congelato
 
 È preparato `gptoss-diagnostic-semantics-review-v1` su `GPTOSS_DIAGNOSTIC.md` al commit `6da4fd1666ea4d82a331e597b3004068d08a567f`. Verifica unica variazione think=low, distinzione OUTPUT_TRUNCATED vs SEMANTIC_FAIL, significato di ERROR operativo e controllo negativo che il troncamento provi un errore semantico.
+
+
+## Verifica ottavo task v2
+
+Checkpoint `2f593f180470ba5191140873f045c3023f4f8b03`: `gptoss-diagnostic-semantics-review-v1` congelato prima di qualsiasi chiamata reale. GitHub Actions `Verifica FAME local worker`, run `36685205613`: `success`, 72 test, `OK`.
