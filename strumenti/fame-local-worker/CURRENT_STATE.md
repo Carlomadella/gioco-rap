@@ -887,3 +887,44 @@ CI al commit `84e3ac67a33f4225534e07d112c7a24e4742ba59`:
 
 Prossimo passo: eseguire V5 sullo stesso transfer case esclusivamente come diagnostico del meccanismo di repair. Non e un nuovo first attempt, non e una nuova misura indipendente e non sostituisce il risultato V4 gia registrato.
 
+## Four-Role Network V5 — diagnostico reale: repair incompleto
+
+Eseguito `fame_four_role_network_v5.py` sul case gia consumato `adaptive-transfer-protocol-pilot-v1` esclusivamente come diagnostico di recovery, non come nuovo first attempt e non come nuova misura indipendente.
+
+Esito:
+- Extractor: ACCEPTED;
+- Anti-Bias: ACCEPTED;
+- Verifier: ACCEPTED;
+- Integrator: REJECTED;
+- errore finale: `INTEGRATOR_INSUFFICIENT_FINAL_EVIDENCE`;
+- status rete: `NEEDS_REVIEW`;
+- modelCalls: 4.
+
+Il Verifier V5 ha correttamente spostato C2 in `claimsNeedingRework` e creato repairedClaims R1-R4 per U02-U05, ma ha dichiarato tutte le issue `RESOLVED_BY_REPAIR` rimuovendo le parti contestate invece di preservare anche le distinzioni supportate da U06 e U07. L'Integrator ha bloccato correttamente il risultato per coverage finale incompleta.
+
+Diagnosi: V5 consente un falso `RESOLVED_BY_REPAIR` quando esiste almeno un repair del claim coinvolto, ma non verifica che il repair copra gli evidence ID esplicitamente indicati dalla issue Anti-Bias.
+
+V5 resta congelata e il run resta preservato come failure diagnostica reale.
+
+## Four-Role Network V6 — evidence-preserving repair
+
+Aggiunto `fame_four_role_network_v6.py`, senza modificare V4 o V5.
+
+V6 aggiunge due gate:
+- una issue `RESOLVED_BY_REPAIR` deve coprire tutti gli `evidenceIds` indicati dalla issue Anti-Bias tramite supportedClaims o repairedClaims derivati dai claim coinvolti;
+- prima dell'Integrator, l'host verifica che supportedClaims + repairedClaims coprano tutte le `requiredFinalEvidenceGroups` del case.
+
+Nuovi errori:
+- `VERIFIER_REPAIR_MISSING_ISSUE_EVIDENCE`;
+- `VERIFIER_INSUFFICIENT_FINAL_EVIDENCE_AFTER_REPAIR`.
+
+Il prompt V6 chiarisce inoltre che `RESOLVED_BY_REPAIR` non significa eliminare la parte contestata: le distinzioni supportate dalle evidenze devono essere preservate, eventualmente splittando il claim.
+
+Test dedicati in `test_fame_four_role_network_v6.py`, incluso il pattern reale V5 R1-R4 senza U06/U07 che V6 deve respingere.
+
+CI al commit `e012e88f38ce6d0e520c4fdd209f7d6bcfb2a462`:
+- 80 Direct-QA: OK;
+- 120 FAME: OK.
+
+Prossimo passo: eseguire V6 sullo stesso transfer case come ulteriore diagnostico di recovery. Anche questo non e un nuovo first attempt e non sostituisce i risultati V4/V5.
+
