@@ -396,3 +396,18 @@ Il case `model-comparison-generalization-network-v3` è consumato e non può ess
 Report: [FAME_FOUR_ROLE_NETWORK_V3_FRESH_RESULT_2026-09-30.md](FAME_FOUR_ROLE_NETWORK_V3_FRESH_RESULT_2026-09-30.md).
 
 Questo è il primo PASS completo V3 a quattro ruoli fresh. Non dimostra ancora affidabilità generale della rete, vantaggio rispetto a una baseline single-agent o riduzione del costo umano di review.
+
+
+## Confronto controllato single-agent vs Four-Role V3
+
+Preparato `fame_single_vs_four_v1.py` con baseline `fame_single_agent_baseline_v1.py`.
+
+Case congelato: `single-vs-four-coordinator-causality-v1`, su `COORDINATOR.md` al commit sorgente `b16ef607905d26bf12c9ac8fa2a3b0c481bb4574`.
+
+Entrambi i bracci ricevono la stessa domanda, stesse unità, stesso modello/digest e stesse opzioni di generazione. La baseline usa una chiamata; la rete V3 quattro. L'expected answer resta host-only in entrambi.
+
+`comparison.json` confronta correttezza, required evidence coverage, evidence selezionata, limitazioni, issue Anti-Bias, chiamate, token e tempi con load separato. Nessun winner automatico. Metriche di review umana restano null finché non misurate.
+
+Verifica automatica prima del run reale: 80 test Direct-QA + 49 test FAME, tutti OK.
+
+Dettagli: [FAME_SINGLE_VS_FOUR_V1.md](FAME_SINGLE_VS_FOUR_V1.md).
