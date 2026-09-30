@@ -1,0 +1,62 @@
+{
+  "caseId": "verifier-v4-branch-probe-v1",
+  "sourceCommit": "cdea2227a4a71906c48b97d888e707a787cecc3e",
+  "sourcePath": "strumenti/fame-local-worker/DIRECT_QA_TSUMUGI_CONTROLLED_RESULT_2026-09-23.md",
+  "sourceSnapshot": "cases/fame-network/v4-verifier-branch-source.md",
+  "question": "Considerando i quattro claim congelati del probe, la classificazione corretta è che alcuni sono supportati, uno non è supportato e uno richiede una riscrittura più stretta?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "Il task ha restituito `REJECTED` con una sola chiamata al modello."
+    },
+    {
+      "unitId": "U02",
+      "text": "Totale: 4/5 conclusioni corrette. A differenza del reject subset+BIC, qui esiste almeno un errore semantico reale, oltre a una omissione di copertura evidence."
+    },
+    {
+      "unitId": "U03",
+      "text": "Il risultato resta consumato e non viene ritentato con il worker v1."
+    },
+    {
+      "unitId": "U04",
+      "text": "Il worker one-shot v1 resta utile come misura del primo tentativo, ma non e sufficiente come percorso operativo se ogni singola omissione blocca l'intero incarico."
+    },
+    {
+      "unitId": "U05",
+      "text": "La seconda chiamata e recovery operativo, non una nuova independent evaluation."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_ALL_SUPPORTED",
+      "meaning": "Tutti e quattro i claim congelati sono sostenuti così come formulati."
+    },
+    {
+      "optionId": "ANSWER_MIXED",
+      "meaning": "La partizione corretta è mista: alcuni claim sono supportati, almeno uno non è supportato e almeno uno necessita una riscrittura più stretta."
+    },
+    {
+      "optionId": "ANSWER_INSUFFICIENT",
+      "meaning": "Le unità non consentono di classificare in modo affidabile i quattro claim congelati."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_MIXED",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U01"
+    ],
+    [
+      "U05"
+    ]
+  ],
+  "optionalContext": [
+    "U02",
+    "U03",
+    "U04"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
