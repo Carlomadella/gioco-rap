@@ -81,6 +81,7 @@ describe("widget tempo globale", () => {
 
       const parent = parentSel === "body" ? doc.body : doc.querySelector(rootSel).querySelector(parentSel);
       expect(dock.parentElement, id).toBe(parent);
+      if(parentSel !== "body") expect(parent.lastElementChild, id + " · widget sul bordo destro").toBe(dock);
 
       window.ADF_TIME_CONTROLS.open();
       expect(pannello.classList.contains("adf-tc-open"), id).toBe(true);
