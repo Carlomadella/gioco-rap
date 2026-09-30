@@ -1214,3 +1214,33 @@ CI al commit `7c06853c974a245d35bae0fa2fdb9056f2b37ebe`:
 
 Prossimo passo: eseguire una sola volta il fresh pilot Adaptive QA V3. Dopo il run il case deve essere trattato come consumato e non deve essere rilanciato come nuovo first attempt.
 
+## Adaptive QA V3 — fresh pilot: baseline sufficiente, nessuna escalation
+
+Eseguito una sola volta `adaptive-v3-first-attempt-pass-pilot-v1` nella root locale `FAME_ADAPTIVE_V3_FRESH_20260930_203349`.
+
+Baseline single-agent V2:
+- status: `PROPOSED_FOR_HUMAN_REVIEW`;
+- result status: `ACCEPTED`;
+- answer option: `ANSWER_LIMITED_FIRST_ATTEMPT_PASS`;
+- required evidence coverage completa:
+  - U01: PASS reale al primo tentativo / una chiamata / nessun repair;
+  - U02: cinque check host accettati;
+  - U04: human review ancora richiesta;
+  - U05: nessuna generalizzazione a affidabilita generale, rete autonoma multi-agent, training o produzione;
+- modelCalls: 1.
+
+Adaptive V3:
+- trigger: `BASELINE_ACCEPTED`;
+- decision: `NO_ESCALATION`;
+- selectedPath: `single-agent`;
+- recoveredByEscalation: false;
+- Four-Role Network V9 resta `IN_PROGRESS` con tutti i ruoli PENDING e modelCalls 0;
+- modelCalls totali: 1;
+- status finale: `PROPOSED_FOR_HUMAN_REVIEW`.
+
+Interpretazione: misura fresca valida a favore del gate adattivo. Su questo case il percorso economico single-agent e sufficiente e l'architettura evita correttamente quattro chiamate aggiuntive. Questo non dimostra ancora che V9 generalizzi sui failure freschi; dimostra il lato complementare della policy, cioe che l'escalation non viene usata quando non serve.
+
+Il case e ora consumato e non deve essere rilanciato come nuovo first attempt.
+
+Prossimo obiettivo scientifico: selezionare un'altra fonte reale non ancora usata dalla rete e congelare un nuovo case prima dell'inferenza. Non forzare artificialmente un failure della baseline; se la baseline passa di nuovo, registrare il dato. Se fallisce con response valida, quello sara il primo test fresco dell'escalation V9.
+
