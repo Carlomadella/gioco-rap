@@ -1441,18 +1441,17 @@ function studioSulBancoRighe(g){
 }
 
 /* ==================== LA PAGINA ==================== */
-/* energia · soldi · ora, come nella fascia dei riferimenti */
+/* energia · soldi. L'ora vive nel widget tempo globale: tenere anche il
+   vecchio orologio qui duplicherebbe la stessa informazione nello Studio e
+   in tutte le pagine luogo che riusano questa fascia. */
 function studioRisorse(){
-  const ora = (typeof GAME_TIME !== "undefined" && typeof GAME_TIME.text === "function")
-    ? GAME_TIME.text() : "";
   /* Nei riferimenti l'etichetta è azzurra, il numero bianco, e i soldi sono
      l'unica cosa d'oro: l'oro nella fascia lo prende solo quello che si
      spende. In mezzo pallini azzurri, non trattini. */
   const punto = '<span class="stpunto" aria-hidden="true"></span>';
   return '<span>' + stIco("fulmine") + '<i>energia</i><b>' + Math.round(G.energy) + '</b></span>' +
     punto +
-    '<span>' + stIco("soldi") + '<b class="oro">' + fmt(G.money) + ' €</b></span>' +
-    (ora ? punto + '<span>' + stIco("orologio") + '<b>' + studioEsc(ora) + '</b></span>' : "");
+    '<span>' + stIco("soldi") + '<b class="oro">' + fmt(G.money) + ' €</b></span>';
 }
 
 /* La riga in basso: se il diario di bordo ha qualcosa da dire lo dice lui —
