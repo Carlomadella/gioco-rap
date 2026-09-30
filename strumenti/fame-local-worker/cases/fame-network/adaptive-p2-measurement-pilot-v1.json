@@ -1,0 +1,59 @@
+{
+  "caseId": "adaptive-p2-measurement-pilot-v1",
+  "sourceCommit": "1b8365225370603abc8e5b70efe0caaf770f804f",
+  "sourcePath": "strumenti/fame-local-worker/DIRECT_QA_P2_MEASUREMENT_EXPORT_V2_RESULT_2026-09-30.md",
+  "sourceSnapshot": "cases/fame-network/adaptive-p2-measurement-source.md",
+  "question": "Quale interpretazione del risultato reale P2 measurement/export è supportata dal report senza trasformare il PASS tecnico in una conclusione più forte?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "Questo è il secondo first-attempt PASS reale della v2 su tre task reali v2 eseguiti. Il terzo task era deliberatamente diverso dai due Tsumugi e richiedeva di distinguere risultati tecnici da inferenze causali non dimostrate."
+    },
+    {
+      "unitId": "U02",
+      "text": "Il risultato non certifica affidabilità generale della rete e non autorizza nuove attività Audio→MIDI, training, batch131 o produzione."
+    },
+    {
+      "unitId": "U03",
+      "text": "Il task è consumato e non deve essere rilanciato in una nuova root come nuovo first attempt."
+    },
+    {
+      "unitId": "U04",
+      "text": "Tutti i cinque check sono stati accettati:"
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_LIMITED_PASS",
+      "meaning": "È un first-attempt PASS reale sul task P2 e distingue risultati tecnici da inferenze causali non dimostrate; non certifica affidabilità generale e il task consumato non va rilanciato come nuovo first attempt."
+    },
+    {
+      "optionId": "ANSWER_GENERAL_VALIDATION",
+      "meaning": "Il PASS tecnico certifica affidabilità generale della rete e permette di trattare le inferenze causali come dimostrate."
+    },
+    {
+      "optionId": "ANSWER_RERUN_REQUIRED",
+      "meaning": "Il task deve essere rilanciato in una nuova root per confermare il first-attempt PASS."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_LIMITED_PASS",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U01"
+    ],
+    [
+      "U02"
+    ],
+    [
+      "U03"
+    ]
+  ],
+  "optionalContext": [
+    "U04"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
