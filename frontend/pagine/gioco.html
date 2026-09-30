@@ -52,7 +52,7 @@
 <link rel="stylesheet" href="css/negozio.css?v=12">
 <link rel="stylesheet" href="css/strada-crimine.css?v=13">
 <link rel="stylesheet" href="css/strada-crimine-v2.css?v=2">
-<link rel="stylesheet" href="css/hub.css?v=17">
+<link rel="stylesheet" href="css/hub.css?v=18">
 <link rel="stylesheet" href="css/telefono.css?v=15">
 <!-- il telefono quando lo schermo è un telefono: sotto i 1180 si alza da un tasto -->
 <link rel="stylesheet" href="css/telefono-stretto.css?v=2">
@@ -62,7 +62,7 @@
      fogli qui sopra e messi in uno solo. Va dopo tutti loro, se no non correggono
      piu' niente, e prima di menu-sistema.css, che resta com'era (il perche' e'
      scritto in cima a stretto.css). -->
-<link rel="stylesheet" href="css/stretto.css?v=2">
+<link rel="stylesheet" href="css/stretto.css?v=3">
 <!-- per ultimo: le aree da toccare devono vincere sulla cascata di tutti gli altri -->
 <link rel="stylesheet" href="css/menu-sistema.css?v=12">
 <link rel="stylesheet" href="css/tocco.css?v=14">
@@ -193,20 +193,6 @@
           <span class="pcn2" id="hb-anno">Anno 1</span>
         </div>
         <div class="pora"><svg class="hicon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.7 14.6A8.6 8.6 0 0 1 9.4 3.3a8.6 8.6 0 1 0 11.3 11.3z"/></svg><span id="hb-ora">21:30</span></div>
-        <!-- Punto 24: la via d'uscita scritta a lettere, in fondo a destra. Il
-             marchio dall'altra parte apre il menu di sistema, ma bisogna
-             saperlo; questo dice quello che fa. Salva la partita e torna alla
-             landing — chi lo esegue è js/menu-sistema.js, lo stesso codice di
-             «Salva ed esci». Sta per ultimo anche nella fascia: il widget del
-             tempo si aggiunge qui dentro da solo, e `order` lo tiene comunque
-             all'estrema destra. -->
-        <button class="pmenu" id="hb-menu" data-adf-global="menu"
-                title="Salva la partita e torna al menu principale">
-          <svg class="hicon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 3 3 10v11h6v-6h6v6h6V10z"/>
-          </svg>
-          <span class="pk">Menu</span>
-        </button>
       </header>
 
       <!-- ---------- colonna di sinistra: il profilo ---------- -->
@@ -758,7 +744,7 @@
 <!-- Meteo globale: previsione coerente e persistente, senza effetti gameplay. -->
 <script src="js/game/meteo.js?v=2"></script>
 <!-- Widget unico tempo/meteo + controlli globali. -->
-<script src="js/game/tempo-controlli.js?v=17"></script>
+<script src="js/game/tempo-controlli.js?v=18"></script>
 <!-- Luce della città: crossfade dei tre render sul clock di gioco. -->
 <script src="js/game/mappa-luce.js?v=1"></script>
 <script src="js/game/mappa-scorre.js?v=1"></script>
