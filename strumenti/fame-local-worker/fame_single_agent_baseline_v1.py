@@ -14,6 +14,14 @@ MODEL=network.MODEL
 DIGEST=network.DIGEST
 OPTIONS=dict(network.OPTIONS)
 FINAL_ACCEPTED='PROPOSED_FOR_HUMAN_REVIEW'
+CONSUMED_CASES=frozenset({
+    'single-vs-four-coordinator-causality-v1',
+    'single-vs-four-rubric-audit-generalization-v2',
+    'battery-qa-transfer-v1',
+    'battery-recovery-v1',
+    'battery-gptoss-diagnostic-v1',
+    'battery-anti-bias-v1',
+})
 
 SYSTEM="""Sei la baseline single-agent di FAME Neural.
 Rispondi usando solo domanda, opzioni di risposta e unità di evidenza fornite.
@@ -143,6 +151,8 @@ def metadata(p):
 
 
 def init(root,case_id):
+    if case_id in CONSUMED_CASES:
+        raise ValueError('Case gia consumato dalla baseline: '+case_id)
     p=network.package(case_id)
     root.mkdir(parents=True,exist_ok=False)
     (root/'attempt-1').mkdir()
