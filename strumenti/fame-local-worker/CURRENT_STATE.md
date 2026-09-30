@@ -442,3 +442,49 @@ Il secondo confronto usa `fame_single_vs_four_v2.py` e inverte l'ordine dei brac
 Verifica automatica pre-run: 80 test Direct-QA + 54 test FAME, tutti OK.
 
 Dettagli: [FAME_SINGLE_VS_FOUR_V2.md](FAME_SINGLE_VS_FOUR_V2.md).
+
+
+## Secondo confronto reale single-agent vs Four-Role V3
+
+Root locale `FAME_SINGLE_VS_FOUR_V2_20260930_133018`.
+
+Entrambi i bracci hanno chiuso `PROPOSED_FOR_HUMAN_REVIEW` con `ANSWER_NO` e required evidence coverage completa.
+
+Revisione umana:
+- entrambe le risposte semanticamente corrette;
+- single-agent: 2 claim, evidence U01 + U03;
+- four-role: 6 claim, evidence U01–U05, incluse U04/U05 optional context;
+- nessun errore o omissione materiale della baseline corretto dalla rete.
+
+Classificazione: **secondo pareggio qualitativo; baseline più parsimoniosa e rete con overhead netto**.
+
+Costo relativo osservato della rete sul caso:
+- circa 6.12x prompt token;
+- circa 6.94x output token;
+- circa 6.96x model time excluding load;
+- circa 8.59x elapsed cumulativo.
+
+Il case `single-vs-four-rubric-audit-generalization-v2` è consumato.
+
+Report: [FAME_SINGLE_VS_FOUR_V2_RESULT_2026-09-30.md](FAME_SINGLE_VS_FOUR_V2_RESULT_2026-09-30.md).
+
+## Batteria precongelata single-agent vs Four-Role
+
+Per evitare selezione sequenziale dei casi dopo due risultati già osservati, preparata una batteria di quattro casi nuovi congelati insieme prima di qualsiasi inferenza:
+
+- `battery-qa-transfer-v1`: single first;
+- `battery-recovery-v1`: network first;
+- `battery-gptoss-diagnostic-v1`: single first;
+- `battery-anti-bias-v1`: network first.
+
+Ordine bilanciato 2/2. Massimo 20 chiamate totali.
+
+Runner: `fame_single_vs_four_battery_v1.py`.
+
+Output globale: `battery-result.json`.
+
+L'aggregatore riporta answer correctness, required coverage, calls, token, model time excluding load e issue Anti-Bias, senza assegnare un winner automatico. Review umana su overclaim/parsimony/correction burden resta separata.
+
+Verifica automatica pre-run: 80 test Direct-QA + 60 test FAME, tutti OK.
+
+Dettagli: [FAME_SINGLE_VS_FOUR_BATTERY_V1.md](FAME_SINGLE_VS_FOUR_BATTERY_V1.md).
