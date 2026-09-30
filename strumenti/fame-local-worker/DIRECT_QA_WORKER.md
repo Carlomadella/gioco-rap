@@ -283,3 +283,16 @@ Risultato: [DIRECT_QA_RUBRIC_AUDIT_SEMANTICS_V2_RESULT_2026-09-30.md](DIRECT_QA_
 ## Nono incarico v2 preparato — package authoring rules
 
 `package-authoring-rules-review-v1` usa `DIRECT_QA_PACKAGE_AUTHORING.md` congelato al commit `4c60c18425fc56a40b476ddfffded55ecb968141`. Il task testa le regole con cui vengono costruiti i package Direct QA stessi, inclusi freeze, benign context e prova minima sufficiente.
+
+
+## Esito nono incarico — package authoring rules first-attempt PASS
+
+`package-authoring-rules-review-v1` è stato consumato il 30 settembre 2026 nella root `FAME_DIRECT_QA_NETWORK_V2_20260930_092711`.
+
+Esito: `VALIDATED_FOR_REVIEW`, una chiamata, nessun repair, 5/5 conclusioni corrette, coverage sufficiente, nessun warning e nessun surplus evidence. Il salvage v2 non è intervenuto.
+
+Risultato: [DIRECT_QA_PACKAGE_AUTHORING_RULES_V2_RESULT_2026-09-30.md](DIRECT_QA_PACKAGE_AUTHORING_RULES_V2_RESULT_2026-09-30.md).
+
+## Decimo incarico v2 preparato — recovery protocol
+
+`recovery-protocol-review-v1` usa `RECOVERY.md` congelato al commit `5530c2649ddda83a07511f8e0549d4ccf45723fe`. Il task verifica che un recovery migliori coverage senza riscrivere il first pass, senza retry automatici e senza trasformare un caso noto in prova di generalizzazione o autorizzazione operativa.
