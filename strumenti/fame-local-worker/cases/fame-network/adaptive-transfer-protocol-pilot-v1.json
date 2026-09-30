@@ -1,0 +1,81 @@
+{
+  "caseId": "adaptive-transfer-protocol-pilot-v1",
+  "sourceCommit": "bd866ba6e5ab5516d33670451da304b53b89c67d",
+  "sourcePath": "strumenti/fame-local-worker/DIRECT_QA_TRANSFER_PROTOCOL_V2_RESULT_2026-09-30.md",
+  "sourceSnapshot": "cases/fame-network/adaptive-transfer-protocol-source.md",
+  "question": "Quale sintesi preserva tutte le distinzioni chiave del risultato QA transfer protocol senza promuovere il PASS oltre ciò che il report dimostra?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "Nessun errore, nessun precision warning, nessun evidence ID non revisionato. Non sono presenti `droppedEvidence` né `hostSalvageApplied`: il run è un first-attempt raw-clean PASS."
+    },
+    {
+      "unitId": "U02",
+      "text": "Il worker ha distinto correttamente:\n- nuovo caso sperimentale da test cieco/general learning test;"
+    },
+    {
+      "unitId": "U03",
+      "text": "- metrica transfer da semplice `VALIDATED_FOR_REVIEW`;"
+    },
+    {
+      "unitId": "U04",
+      "text": "- salvage di surplus evidence da correzione di errori semantici o coverage mancante;"
+    },
+    {
+      "unitId": "U05",
+      "text": "- costo della revisione umana misurato da risparmio umano presunto;"
+    },
+    {
+      "unitId": "U06",
+      "text": "- difetto reale della rubrica da promozione retroattiva."
+    },
+    {
+      "unitId": "U07",
+      "text": "Il task è consumato e non va rilanciato come nuovo first attempt."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_DISCIPLINED_TRANSFER_PASS",
+      "meaning": "È un first-attempt raw-clean PASS che distingue correttamente transfer, VALIDATED_FOR_REVIEW, salvage, costo umano misurato, difetti di rubrica e promozione retroattiva; il task resta consumato."
+    },
+    {
+      "optionId": "ANSWER_GENERALIZED_SUCCESS",
+      "meaning": "Il PASS dimostra generalizzazione/transfer e permette di trattare VALIDATED_FOR_REVIEW, salvage e risparmio umano come equivalenti a successo generale."
+    },
+    {
+      "optionId": "ANSWER_RETUNE_AND_RERUN",
+      "meaning": "Il task va ritentato o retunato per confermare il PASS e promuovere retroattivamente eventuali difetti di rubrica."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_DISCIPLINED_TRANSFER_PASS",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U01"
+    ],
+    [
+      "U02"
+    ],
+    [
+      "U03"
+    ],
+    [
+      "U04"
+    ],
+    [
+      "U05"
+    ],
+    [
+      "U06"
+    ],
+    [
+      "U07"
+    ]
+  ],
+  "optionalContext": [],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
