@@ -66,6 +66,18 @@ class FameAntiBiasTests(unittest.TestCase):
             a.validate(value,self.claims(),self.units())
         )
 
+    def test_clean_challenge_requires_clean_overall(self):
+        value=self.good()
+        value['issues']=[]
+        value['overall']='ANTI_BIAS_CHALLENGE_PASS_WITHIN_SCOPE'
+        self.assertEqual(a.validate(value,self.claims(),self.units()),[])
+        value['overall']='ANTI_BIAS_CHALLENGE_PASS_WITH_LIMITATIONS'
+        self.assertIn('ANTI_BIAS_CLEAN_OVERALL_MISMATCH',a.validate(value,self.claims(),self.units()))
+
+    def test_prompt_calibrates_reused_evidence_and_declared_conditions(self):
+        self.assertIn('riuso della stessa unità',a.SYSTEM)
+        self.assertIn('condizione già dichiarata nel claim',a.SYSTEM)
+
     def test_unknown_claim_or_evidence_is_rejected(self):
         value=self.good()
         value['issues'][0]['claimIds']=['C9']
