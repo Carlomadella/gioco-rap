@@ -112,7 +112,7 @@ class WorkerV2Tests(unittest.TestCase):
 
     def test_consumed_tasks_cannot_be_initialized_in_v2(self):
         other=Path(self.temp.name)/'consumed'
-        for task in ('pfnmf-review-v1','tsumugi-score-diagnostic-review-v1','tsumugi-v1-architecture-failure-review-v1','p2-measurement-export-review-v1','coordinator-architecture-review-v1'):
+        for task in ('pfnmf-review-v1','tsumugi-score-diagnostic-review-v1','tsumugi-v1-architecture-failure-review-v1','p2-measurement-export-review-v1','coordinator-architecture-review-v1','rubric-audit-semantics-review-v1'):
             with self.assertRaises(ValueError):
                 w.init(other,task)
             self.assertFalse(other.exists())
