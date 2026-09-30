@@ -6,6 +6,34 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:703d05e -->
+## 30/09/26, 20:43 â€” feature/pizzeria-pagina-foto â†’ main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `703d05e`
+
+### Cosa Ã¨ entrato
+
+- `4fe8256` â€” test(pizzeria): lega audit al lavoro corretto â€” **mycolbraga**
+- `88bdc89` â€” fix(pizzeria): lega il turno al lavoro del luogo â€” **mycolbraga**
+- `8fda34a` â€” test(pizzeria): aggiunge regressioni pagina separata â€” **mycolbraga**
+- `f3713e8` â€” chore(pizzeria): aggiorna cache pagina fotografica â€” **mycolbraga**
+- `5d70cc5` â€” feat(pizzeria): aggiunge fondale 4K â€” **github-actions[bot]**
+- `9a95106` â€” chore(pizzeria): installa fondale 4K â€” **mycolbraga**
+- `eed567a` â€” feat(pizzeria): aggiunge pagina fotografica separata â€” **mycolbraga**
+- `06cc3a8` â€” feat(pizzeria): apre la pagina fotografica â€” **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/luoghi-foto.js`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/pizzeria.webp`
+- **Modificato:** `frontend/pagine/gioco.html`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:e3e9a54 -->
 ## 30/09/26, 20:30 â€” feature/fabbrica-pagina-foto â†’ main
 
