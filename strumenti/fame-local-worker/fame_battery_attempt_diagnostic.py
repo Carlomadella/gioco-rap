@@ -43,7 +43,7 @@ def classify(result,response):
 
 def diagnostic(root,case_id):
     root=root.resolve()
-    case_root=agent.safe_path(root,'cases',case_id)
+    case_root=agent.safe_path(root,'cases/'+case_id)
     baseline_root=agent.safe_path(case_root,'single-agent')
     attempt=agent.safe_path(baseline_root,'attempt-1')
     network.verify_receipt(attempt)
