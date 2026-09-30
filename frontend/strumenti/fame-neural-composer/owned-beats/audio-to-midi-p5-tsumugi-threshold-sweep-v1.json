@@ -1,0 +1,46 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-p5-tsumugi-threshold-sweep-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_THRESHOLD_SWEEP_INFERENCE",
+  "createdAt": "2026-09-30",
+  "purpose": "DEVELOPMENT_ONLY_PAIR_GATE_THRESHOLD_SWEEP_FOR_FALSE_PERCUSSION_REDUCTION",
+  "baseCandidateId": "tsumugi-drums-v1_5",
+  "runId": "audio-to-midi-p5-tsumugi-threshold-sweep-v1-001",
+  "sourceProtocol": "audio-to-midi-p5-tsumugi-real-easy-development-v1.json",
+  "environmentSpec": "audio-to-midi-p5-tsumugi-environment-v1.json",
+  "controlledProtocol": "audio-to-midi-p5-tsumugi-controlled-protocol-v1.json",
+  "sourceRecordIds": [
+    "FAME000040",
+    "FAME000080",
+    "FAME000126"
+  ],
+  "sweep": {
+    "parameter": "instrumentPairGateThreshold",
+    "frozenValues": [
+      -3,
+      -2,
+      -1,
+      0
+    ],
+    "baselineValue": -3,
+    "allOtherInferenceSettingsFrozen": true
+  },
+  "evaluation": {
+    "goal": "Reduce spurious drum/percussion pitch classes without losing musically present core events",
+    "humanListeningRequired": true,
+    "automaticWinner": false,
+    "comparePitchClassCounts": true
+  },
+  "safety": {
+    "split": "development",
+    "reuseConsumedDevelopmentFamilies": true,
+    "originalSourceAudioAllowed": false,
+    "developmentDrumsStemAccessAllowed": true,
+    "independentEvaluationAllowed": false,
+    "finalHoldoutAllowed": false,
+    "sourceSeparationExecutionAllowed": false,
+    "trainingAuthorized": false,
+    "batch131Authorized": false,
+    "taskDataReadyMayBeDeclared": false
+  }
+}
