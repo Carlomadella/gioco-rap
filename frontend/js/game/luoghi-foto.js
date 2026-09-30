@@ -47,6 +47,10 @@ const LUOGHI_FOTO = {
              k:"Casa", bar:"Stacca la spina", d:"prenditi una pausa"},
   palestra: {f:"schermate_luoghi_con_elementi_HTML/palestra.png", pos:"center 55%",
              k:"Palestra", bar:"La sala pesi", d:"il fisico che si vede sotto le luci"},
+  /* La Fabbrica usa lo stesso telaio della Palestra: scena pulita sotto,
+     comandi veri HTML/CSS appoggiati in basso. Niente popup all'ingresso. */
+  fabbrica: {f:"schermate_luoghi_con_elementi_HTML/fabbrica.avif", pos:"center 52%",
+             k:"Fabbrica", bar:"Linea di montaggio", d:"turno pieno, rumore e ferro"},
   /* il Circolo (js/game/circolo.js) la foto non la stende sotto a tutto:
      la mette nel suo riquadro, come nel riferimento `il_circolo`. La
      stanza nella fascia è la fascia dell'ora (`circoloFascia`). */
@@ -138,6 +142,7 @@ function renderLuogo(){
     LUOGO.id === "casa"     ? lfCasa() :
     LUOGO.id === "stacca"   ? lfStacca() :
     LUOGO.id === "palestra" ? lfPalestra() :
+    LUOGO.id === "fabbrica" ? lfFabbrica() :
     circoloParti();
   const wrap = $("lf-wrap");
   /* la Casa non ha colonne: ha le porte sopra alla foto, e basta. Il
@@ -333,6 +338,70 @@ function lfPalestra(){
   return {sx:sx, mid:mid, dx:dx};
 }
 
+
+/* ---------- LA FABBRICA ----------
+   Stesso principio della Palestra: la scena resta libera e tutto quello che
+   deve rispondere al mouse e al touch e' HTML. Entrare nell'edificio non apre
+   piu' una showEvent: il posto, il turno e lo stato di oggi vivono nella
+   fascia in basso. La logica economica resta quella esistente di JOBS /
+   assumitiCome() / azione "turno". */
+function lfFabbrica(){
+  const def = (typeof JOBS !== "undefined" ? JOBS : []).find(j => j.id === "operaio");
+  if(!def) return {mid:lfPan("Fabbrica", '<div class="stvuoto">Turno non disponibile.</div>', "orologio")};
+
+  const mio = !!(G.job && G.job.id === def.id);
+  const altro = G.job && !mio ? G.job : null;
+  let stato = {ok:true, perche:""};
+  let orario = "Turno pieno";
+  try{
+    if(window.GAME_HOURS && window.GAME_TIME){
+      const st = GAME_HOURS.jobStatus(def.id);
+      const dur = GAME_TIME.formatDuration(GAME_HOURS.jobDuration(def.id));
+      orario = "Turno di " + dur;
+      if(st && !st.open) stato = {ok:false, perche:st.label || "Adesso e' chiuso"};
+      else if(st && !st.allDay && st.closeAt != null)
+        orario += " · ingresso fino alle " + GAME_TIME.format(st.closeAt - GAME_HOURS.jobDuration(def.id));
+    }
+  }catch(e){}
+  if(altro) stato = {ok:false, perche:"Lavori gia' come " + altro.n.toLowerCase()};
+  else if(stato.ok && G.energy < def.e) stato = {ok:false, perche:"Serve energia"};
+
+  const sx = lfPan("Il posto",
+    lfRiga("Mansione", def.n) +
+    lfRiga("Paga", fmt(def.pay) + " €", "oro") +
+    lfRiga("Costo", "−" + def.e + " energia") +
+    '<p class="stnota lfnotasotto">' + lfEsc(def.d) + '</p>',
+    "orologio");
+
+  const riga = stScelta({
+    attr:"",
+    on:true,
+    n:mio ? "Il tuo turno" : "Posto da operaio",
+    d:orario,
+    v:stato.ok ? (fmt(def.pay) + " € · −" + def.e + " energia") : stato.perche,
+    vCls:stato.ok ? "" : "calmo"
+  });
+  const testo = mio ? "Fai il turno" : "Fatti assumere e lavora";
+  const mid = lfPan(mio ? "Vai al lavoro" : "Vuoi lavorare qui?",
+    '<p class="stnota">Linea di montaggio, otto ore piene. I soldi entrano, la giornata se ne va.</p>' +
+    riga +
+    '<div class="stazioni"><button type="button" class="stprimo" data-lavoro="operaio"' +
+      (stato.ok ? "" : " disabled") + '>' + lfIco("orologio") + lfEsc(testo) +
+      ' · +' + fmt(def.pay) + ' € · −' + def.e + ' energia</button></div>' +
+    (stato.ok ? "" : '<p class="stperche">' + lfEsc(stato.perche) + '.</p>'),
+    "orologio");
+
+  const dx = lfPan("Oggi",
+    '<div class="stvuoto"><b>' + (mio ? "Sei assunto qui." : "Non sei ancora assunto.") + '</b> ' +
+      (mio ? "Quando entri fai direttamente il turno." : "Il primo turno ti assume automaticamente.") +
+    '</div>' +
+    lfRiga("Energia", Math.round(G.energy)) +
+    lfRiga("In cassa", fmt(G.money) + " €", "oro"),
+    "soldi");
+
+  return {sx:sx, mid:mid, dx:dx};
+}
+
 /* ---------- IL CIRCOLO ----------
    Il Live Club e la Sala sono diventati un posto solo (29/09/2026): la
    pagina è sua, in js/game/circolo.js — qui passa solo per la fascia in
@@ -463,6 +532,11 @@ if($("luogo")){
     if(sc && LUOGO){ LUOGO.scelta = sc.dataset.scelta; if(SFX.tap) SFX.tap(); renderLuogo(); return; }
     const vai = e.target.closest("[data-vai]");
     if(vai && !vai.disabled){ luogoVai(vai.dataset.vai); return; }
+    const lavoro = e.target.closest("[data-lavoro]");
+    if(lavoro && !lavoro.disabled && typeof assumitiCome === "function"){
+      assumitiCome(lavoro.dataset.lavoro);
+      return;
+    }
     if(e.target.closest("[data-continua]")){ luogoContinua(); }
   });
 }
