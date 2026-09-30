@@ -1,0 +1,66 @@
+{
+  "caseId": "v4-battery-subset-packaging-v1",
+  "sourceCommit": "a9f17c6ce45971d22ee70426704ee824c7ae1b49",
+  "sourcePath": "strumenti/fame-local-worker/DIRECT_QA_SUBSET_BIC_RESULT_2026-09-23.md",
+  "sourceSnapshot": "cases/fame-network/v4-battery-subset-bic-source.md",
+  "question": "Come va interpretato il REJECTED del run subset+BIC e cosa implica per un eventuale retry?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "Il run ha restituito `REJECTED` con una sola chiamata al modello. Il secondo comando `run` non ha rieseguito il modello: la coda ha riletto la desk gia consumata."
+    },
+    {
+      "unitId": "U02",
+      "text": "- 5/5 conclusioni corrette;\n- tutte le finding supportate hanno coverage `SUFFICIENT`;\n- unico errore: `TSUMUGI_PREFLIGHT_SCOPE:UNREVIEWED_EVIDENCE`;\n- evidence aggiuntiva: `U13`."
+    },
+    {
+      "unitId": "U03",
+      "text": "Il risultato storico resta `REJECTED`: il pacchetto e il validatore erano congelati prima del run e non vengono modificati retroattivamente."
+    },
+    {
+      "unitId": "U04",
+      "text": "La causa del reject e un difetto di authoring del pacchetto, non una conclusione semantica errata del modello: i heading Markdown erano stati separati in unita autonome. Per i task futuri, heading e blocco semantico immediatamente seguente devono essere mantenuti nella stessa unita quando il heading non porta contenuto autonomo."
+    },
+    {
+      "unitId": "U05",
+      "text": "Non eseguire retry di `subset-bic-review-v1` in una nuova root."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_PACKAGING_REJECT",
+      "meaning": "Il REJECTED resta storico ma deriva da un difetto di authoring/packaging, non da conclusioni semantiche errate; il task consumato non va ritentato in una nuova root."
+    },
+    {
+      "optionId": "ANSWER_SEMANTIC_FAILURE_RETRY",
+      "meaning": "Il REJECTED dimostra un fallimento semantico del modello e giustifica un nuovo retry dello stesso task fino al PASS."
+    },
+    {
+      "optionId": "ANSWER_RETROACTIVE_PASS",
+      "meaning": "Poiché le conclusioni erano corrette, il risultato storico può essere convertito retroattivamente in PASS."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_PACKAGING_REJECT",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U02"
+    ],
+    [
+      "U03"
+    ],
+    [
+      "U04"
+    ],
+    [
+      "U05"
+    ]
+  ],
+  "optionalContext": [
+    "U01"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
