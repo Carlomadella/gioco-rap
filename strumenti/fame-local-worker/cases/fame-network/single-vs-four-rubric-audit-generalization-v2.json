@@ -1,0 +1,62 @@
+{
+  "caseId": "single-vs-four-rubric-audit-generalization-v2",
+  "sourceCommit": "5530c2649ddda83a07511f8e0549d4ccf45723fe",
+  "sourcePath": "strumenti/fame-local-worker/RUBRIC_AUDIT.md",
+  "sourceSnapshot": "cases/fame-network/single-vs-four-rubric-audit-source.md",
+  "question": "La rivalutazione documentale 2/2 del recovery autorizza a considerare la rete originale 14/14 al primo tentativo e a trattare il supporto contestuale come equivalente generale a prova diretta?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "Il modello del recovery cita E147–E154, comprese E152 («Due ipotesi tecniche ... compatibili con il failure»), E153 e E154. Questo insieme sostiene per contesto l'incertezza causale. E155 la dichiara direttamente. Accettiamo il primo insieme come **supporto contestuale post-hoc**, mantenendo distinta la forza della prova. E153–E154 senza E152 non sono un'alternativa sufficiente secondo questa revisione."
+    },
+    {
+      "unitId": "U02",
+      "text": "Questo non dimostra che qualunque menzione di ipotesi escluda una causa verificata: la valutazione è specifica al report congelato completo, che non contiene una successiva conferma della causa. Non esportare questa equivalenza come regola universale."
+    },
+    {
+      "unitId": "U03",
+      "text": "Dal contenuto incollato dall'operatore: release recovery = prova diretta E145; note alte recovery = supporto contestuale E152+E153+E154. Quindi la rivalutazione documentale del recovery sarebbe 2/2, mentre il risultato congelato resta 1/2. La rete originale resta 13/14 anche nel sidecar: la risposta iniziale non copriva la release. Non chiamare questo «14/14 al primo tentativo» né nuova evaluation indipendente."
+    },
+    {
+      "unitId": "U04",
+      "text": "`qa_rubric_audit.py` è un rivalutatore locale separato; non modifica i validator congelati. Restituisce:\n\n- `conclusion`: CORRECT / INCORRECT / UNKNOWN;\n- `evidence`: DIRECT / CONTEXTUAL / INSUFFICIENT / NOT_REQUIRED / NOT_ASSESSED;\n- `surplusEvidenceIds`: citazioni non necessarie secondo la rubrica, separate dal giudizio;\n- stato originale e relativi errori, sempre conservati."
+    },
+    {
+      "unitId": "U05",
+      "text": "Prima confrontare i due audit con gli esiti documentali attesi sopra. Poi congelare un protocollo che distingua correttezza della conclusione, copertura e precisione delle citazioni. Solo dopo preparare un nuovo report con rubriche dirette e alternative contestuali definite prima delle risposte del modello, inclusi casi negativi. Nessun ulteriore retry sul caso noto per dichiarare generalizzazione. L'accettazione contestuale è una scelta di valutazione esplicita, rivedibile, non un nuovo successo sperimentale indipendente."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_YES",
+      "meaning": "Sì: il recovery rivalutato 2/2 permette di descrivere la rete originale come 14/14 al primo tentativo e il supporto contestuale può essere trattato in generale come equivalente alla prova diretta."
+    },
+    {
+      "optionId": "ANSWER_NO",
+      "meaning": "No: il sidecar preserva il risultato originale 13/14, vieta la promozione a 14/14 al primo tentativo e mantiene distinta la forza del supporto contestuale, che è specifico al caso e non generalizzabile automaticamente."
+    },
+    {
+      "optionId": "ANSWER_INSUFFICIENT",
+      "meaning": "Le unità fornite non permettono di stabilire né lo stato storico della rete né il rapporto tra supporto contestuale e prova diretta."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_NO",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U03"
+    ],
+    [
+      "U01",
+      "U02"
+    ]
+  ],
+  "optionalContext": [
+    "U04",
+    "U05"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
