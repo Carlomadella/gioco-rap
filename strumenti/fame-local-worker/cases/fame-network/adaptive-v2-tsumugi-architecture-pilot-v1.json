@@ -1,0 +1,81 @@
+{
+  "caseId": "adaptive-v2-tsumugi-architecture-pilot-v1",
+  "sourceCommit": "64ee9ee07fe46d57b4e5b8b2ff72182dd89b64a4",
+  "sourcePath": "strumenti/fame-local-worker/DIRECT_QA_TSUMUGI_V1_ARCHITECTURE_FAILURE_V2_RESULT_2026-09-30.md",
+  "sourceSnapshot": "cases/fame-network/adaptive-v2-tsumugi-architecture-source.md",
+  "question": "Quale sintesi distingue correttamente il fallimento formale del Direct QA V2 dal risultato semantico verificato e dalla correzione valida soltanto per l'authoring futuro?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "Esito formale: queue status NEEDS_REVIEW; task status REJECTED; model calls 2; firstAttemptPass false; acceptedAfterRepair false; executionAuthorized false."
+    },
+    {
+      "unitId": "U02",
+      "text": "Entrambi i tentativi hanno prodotto 5/5 conclusioni corrette. L'unico errore del validator in attempt-1 e attempt-2 è UNVERIFIED_ARCH_ASSUMPTION:INSUFFICIENT_EVIDENCE."
+    },
+    {
+      "unitId": "U03",
+      "text": "In entrambi i tentativi il modello ha citato soltanto U04 per quel check; anche dopo feedback generico ha mantenuto lo stesso identico evidence choice U04."
+    },
+    {
+      "unitId": "U04",
+      "text": "La rubrica congelata richiedeva U03 + U04, ma la richiesta era sovravincolata: U04 contiene già l'intera proposizione verificata, inclusi presupposto architetturale non verificato, tentativo di leggere un output V2, KeyError coerente con checkpoint V1 e necessità di verificare semi_crf_version via doctor read-only."
+    },
+    {
+      "unitId": "U05",
+      "text": "Classificazione: false negative di packaging/rubric, non errore semantico del modello."
+    },
+    {
+      "unitId": "U06",
+      "text": "Il task resta consumato e non viene ricalcolato o ritentato con una rubrica modificata."
+    },
+    {
+      "unitId": "U07",
+      "text": "Il repair generico non può correggere un errore quando il validator stesso impone una copertura non necessaria. Per i task futuri la rubrica non deve obbligare una seconda unità di background quando una singola unità contiene già tutte le componenti dell'affermazione; i task reali consumati restano immutabili."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_RUBRIC_FALSE_NEGATIVE_DISCIPLINED",
+      "meaning": "Il run resta formalmente REJECTED/NEEDS_REVIEW ma le 5/5 conclusioni erano semanticamente corrette; il failure deriva da una rubrica sovravincolata, il repair generico non poteva correggerla, il task resta consumato e la correzione vale solo per l'authoring futuro."
+    },
+    {
+      "optionId": "ANSWER_MODEL_SEMANTIC_FAILURE",
+      "meaning": "Il REJECTED dimostra che almeno una conclusione del modello era semanticamente errata e che il secondo tentativo non ha saputo correggerla."
+    },
+    {
+      "optionId": "ANSWER_RETROACTIVE_RERUN_PASS",
+      "meaning": "Poiché la rubrica era difettosa, bisogna modificarla, rilanciare lo stesso task e promuovere retroattivamente il run a PASS."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_RUBRIC_FALSE_NEGATIVE_DISCIPLINED",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U01"
+    ],
+    [
+      "U02"
+    ],
+    [
+      "U03"
+    ],
+    [
+      "U04"
+    ],
+    [
+      "U05"
+    ],
+    [
+      "U06"
+    ],
+    [
+      "U07"
+    ]
+  ],
+  "optionalContext": [],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
