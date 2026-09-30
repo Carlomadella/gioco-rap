@@ -160,3 +160,8 @@ Risultato: [DIRECT_QA_PACKAGE_AUTHORING_RULES_V2_RESULT_2026-09-30.md](DIRECT_QA
 ## Settimo task v2 congelato
 
 È preparato `recovery-protocol-review-v1` su `RECOVERY.md` al commit `5530c2649ddda83a07511f8e0549d4ccf45723fe`. Verifica preservazione del first pass, recovery bounded in due sottoincarichi, assenza di retry automatico, semantica degli stati recovery e controllo negativo su generalizzazione/training. La rubrica usa U04 come evidenza minima sufficiente per l'invarianza del first pass; U01/U02 sono solo benign context.
+
+
+## Verifica settimo task v2
+
+Checkpoint `cfb5ca113f551698e922e2709395a58a8ad3e74b`: `recovery-protocol-review-v1` congelato prima di qualsiasi chiamata reale. GitHub Actions `Verifica FAME local worker`, run `36684201024`: `success`, 69 test, `OK`.
