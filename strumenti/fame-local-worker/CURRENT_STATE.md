@@ -227,3 +227,8 @@ Risultato: [DIRECT_QA_TRANSFER_PROTOCOL_V2_RESULT_2026-09-30.md](DIRECT_QA_TRANS
 ## Aggregazione run v2
 
 Aggiunto `direct_qa_v2_aggregate.py`: legge root storiche v2 e verifica le receipt degli artefatti senza rieseguire vecchi run con il codice attuale. Distingue first-pass raw-clean, first-pass con salvage, accepted-after-repair, reject/error, troncamenti, warning, evidence scartata, chiamate e tempi. Non converte classificazioni storiche manuali in PASS e non dichiara tempo umano non misurato.
+
+
+## Verifica aggregatore v2
+
+Checkpoint `a3ef4ac1151cdf1cfc00b1866042ef33b36b3a31`: aggregatore storico e relativi test integrati. GitHub Actions `Verifica FAME local worker`, run `36691459244`: `success`, 79 test, `OK`.
