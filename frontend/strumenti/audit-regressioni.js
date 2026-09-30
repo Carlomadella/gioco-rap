@@ -2647,7 +2647,7 @@ test("i cartelli del Circolo e di Casa passano dal loro video",
   /function circoloEntra\(\)\{[\s\S]{0,300}?"club" : "sala";[\s\S]{0,200}?transizioneVideo\(video, \(\) => apriLuogo\("circolo"\)\)/.test(leggi("js/game/circolo.js")) &&
   /id:"vita"[\s\S]{0,300}?transizioneVideo\("casa",[\s\S]{0,40}?apriLuogo\("casa"\)/.test(hub));
 test("«stacca la spina» ha il filmato fra il tasto e l'esito, da dovunque parta",
-  /window\.mostraScena = function[\s\S]{0,1400}?transizioneVideo\(a\.id, mostra\)/.test(leggi("js/game/luoghi-foto.js")));
+  /window\.mostraScena = function[\s\S]*?transizioneVideo\(a\.id, mostra\)/.test(leggi("js/game/luoghi-foto.js")));
 test("«registra» ha il filmato sulla prima take del pezzo, e solo su quella",
   /function studioTakeAncora\(\)[\s\S]{0,2200}?if\(!t\.l\.length && typeof transizioneVideo === "function"\) transizioneVideo\("registra", incidi\)/.test(leggi("js/game/studio-elementi.js")));
 test("il puntatore sul cartello prepara il video giusto: i cartelli hanno un id loro",
@@ -2741,14 +2741,24 @@ test("luoghi-foto.js e il suo CSS si caricano dopo lo Studio, di cui riusano i p
 test("ogni foto di LUOGHI_FOTO esiste sul disco, quella di giorno del divano compresa",
   (() => {
     const dir = (luoghiFoto.match(/LUOGHI_FOTO_DIR = "([^"]+)"/) || [])[1];
-    const foto = Array.from(luoghiFoto.matchAll(/(?:f|giorno):"([^"]+\.png)"/g)).map(m => m[1]);
-    return !!dir && foto.length >= 6 && foto.every(f => fs.existsSync(path.join(ROOT, dir + f)));
+    const foto = Array.from(luoghiFoto.matchAll(/(?:f|giorno):"([^"]+\.(?:png|webp|avif))"/g)).map(m => m[1]);
+    return !!dir && foto.length >= 7 && foto.every(f => fs.existsSync(path.join(ROOT, dir + f)));
   })());
 test("Casa, Palestra e il Circolo sulla mappa aprono la pagina, non piu' la finestra con due risposte",
   /* dal 20/09 Casa passa prima dal suo video: il commento in mezzo allunga la strada */
   /id:"vita",[\s\S]{0,240}?apriLuogo\("casa"\)/.test(hub) &&
   /id:"palestra",[\s\S]{0,80}?apriLuogo\("palestra"\)/.test(hub) &&
+  /id:"fabbrica",[\s\S]{0,80}?apriLuogo\("fabbrica"\)/.test(hub) &&
   !hub.includes('{id:"concerti"') && hub.includes("circoloEntra()"));
+test("la Fabbrica usa la foto e i comandi HTML, senza riaprire la scheda lavoro",
+  luoghiFoto.includes('fabbrica: {f:"schermate_luoghi_con_elementi_HTML/fabbrica.webp"') &&
+  luoghiFoto.includes("function lfFabbrica()") &&
+  luoghiFoto.includes('data-lavoro="operaio"') &&
+  /id:"fabbrica",[\s\S]{0,80}?apriLuogo\("fabbrica"\)/.test(hub) &&
+  !/id:"fabbrica",[\s\S]{0,80}?schedaLavoro\("operaio"/.test(hub));
+test("il turno avviato dalla Fabbrica resta nella pagina, senza seconda scena sopra",
+  luoghiFoto.includes('a.id === "turno" && LUOGO && LUOGO.id === "fabbrica"') &&
+  luoghiFoto.includes('LUOGO_MOSSE[a.id] || (turnoFabbrica ? "fabbrica" : null)'));
 test("le quattro mosse con la pagina finiscono sulla loro foto, e sono tutte scene a pagina piena (il live nel Circolo)",
   (() => {
     const m = luoghiFoto.match(/const LUOGO_MOSSE = \{([^}]+)\}/);
