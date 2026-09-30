@@ -2741,14 +2741,21 @@ test("luoghi-foto.js e il suo CSS si caricano dopo lo Studio, di cui riusano i p
 test("ogni foto di LUOGHI_FOTO esiste sul disco, quella di giorno del divano compresa",
   (() => {
     const dir = (luoghiFoto.match(/LUOGHI_FOTO_DIR = "([^"]+)"/) || [])[1];
-    const foto = Array.from(luoghiFoto.matchAll(/(?:f|giorno):"([^"]+\.png)"/g)).map(m => m[1]);
-    return !!dir && foto.length >= 6 && foto.every(f => fs.existsSync(path.join(ROOT, dir + f)));
+    const foto = Array.from(luoghiFoto.matchAll(/(?:f|giorno):"([^"]+\.(?:png|avif))"/g)).map(m => m[1]);
+    return !!dir && foto.length >= 7 && foto.every(f => fs.existsSync(path.join(ROOT, dir + f)));
   })());
 test("Casa, Palestra e il Circolo sulla mappa aprono la pagina, non piu' la finestra con due risposte",
   /* dal 20/09 Casa passa prima dal suo video: il commento in mezzo allunga la strada */
   /id:"vita",[\s\S]{0,240}?apriLuogo\("casa"\)/.test(hub) &&
   /id:"palestra",[\s\S]{0,80}?apriLuogo\("palestra"\)/.test(hub) &&
+  /id:"fabbrica",[\s\S]{0,80}?apriLuogo\("fabbrica"\)/.test(hub) &&
   !hub.includes('{id:"concerti"') && hub.includes("circoloEntra()"));
+test("la Fabbrica usa la foto e i comandi HTML, senza riaprire la scheda lavoro",
+  luoghiFoto.includes('fabbrica: {f:"schermate_luoghi_con_elementi_HTML/fabbrica.avif"') &&
+  luoghiFoto.includes("function lfFabbrica()") &&
+  luoghiFoto.includes('data-lavoro="operaio"') &&
+  /id:"fabbrica",[\s\S]{0,80}?apriLuogo\("fabbrica"\)/.test(hub) &&
+  !/id:"fabbrica",[\s\S]{0,80}?schedaLavoro\("operaio"/.test(hub));
 test("le quattro mosse con la pagina finiscono sulla loro foto, e sono tutte scene a pagina piena (il live nel Circolo)",
   (() => {
     const m = luoghiFoto.match(/const LUOGO_MOSSE = \{([^}]+)\}/);
