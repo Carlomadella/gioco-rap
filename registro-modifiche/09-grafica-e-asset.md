@@ -6,6 +6,34 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:2353662 -->
+## 30/09/26, 12:23 â€” task/circolo-viewport-avatar â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `2353662`
+
+### Cosa Ã¨ entrato
+
+- `c8904e8` â€” npm audit: brace-expansion da 5.0.9 a 5.0.12 â€” **Carlomadella**
+- `d4fcf23` â€” Il Circolo tutto nello schermo: le voci del giro di fine task â€” **Carlomadella**
+- `41ac344` â€” Il Circolo tutto nello schermo, coi volti veri â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/circolo.css`
+- **Aggiunto:** `frontend/media/photo/circolo/volti/volto-1.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/volti/volto-2.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/volti/volto-3.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/volti/volto-4.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/volti/volto-5.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/volti/volto-6.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/volti/volto-7.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/volti/volto-8.jpg`
+
+**File interessati in questa categoria:** 9
+
+---
+
 <!-- merge:4a578e8 -->
 ## 30/09/26, 00:35 â€” task/il-circolo â†’ main
 
