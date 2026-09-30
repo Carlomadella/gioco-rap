@@ -1248,9 +1248,10 @@ test("controller si monta nella testata della finestra attiva",
    tasto «POSTA» e la stima degli stream. L'ora nello Studio ce l'ha la fascia
    in alto. Le due cose che devono restare vere: la riga muta c'è, e sta
    **prima** di quella dell'hub. */
-test("lo Studio è muto e viene prima dell'hub: nessuna pastiglia sui pannelli",
-  timeControls.includes('{id:"studio", root:"#studio.on",          mute:true}') &&
-  timeControls.includes('if(spec.mute) return null;') &&
+test("lo Studio ha il widget tempo proprio e viene prima dell'hub sottostante",
+  timeControls.includes('{id:"studio",   root:"#studio.on",         head:".sthead"') &&
+  timeControls.includes('before:".strisorse"') &&
+  !timeControls.includes("mute:true") &&
   timeControls.indexOf('id:"studio"') < timeControls.indexOf('id:"hub"'));
 test("pannello fixed nel body viene riposizionato vicino al widget attivo",
   timeControls.includes('.adf-tc-panel{position:fixed') &&
