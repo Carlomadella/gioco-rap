@@ -309,3 +309,16 @@ Risultato: [DIRECT_QA_RECOVERY_PROTOCOL_V2_RESULT_2026-09-30.md](DIRECT_QA_RECOV
 ## Undicesimo incarico v2 preparato — GPT-OSS diagnostic semantics
 
 `gptoss-diagnostic-semantics-review-v1` usa `GPTOSS_DIAGNOSTIC.md` congelato al commit `6da4fd1666ea4d82a331e597b3004068d08a567f`. Il task misura la capacità di distinguere failure semantici, troncamento di output ed errori operativi senza promuovere retroattivamente il confronto storico.
+
+
+## Esito undicesimo incarico — GPT-OSS diagnostic semantics first-attempt PASS con salvage minimo
+
+`gptoss-diagnostic-semantics-review-v1` è stato consumato il 30 settembre 2026 nella root `FAME_DIRECT_QA_NETWORK_V2_20260930_103151`.
+
+Esito: `VALIDATED_FOR_REVIEW`, una chiamata, nessun repair, 5/5 conclusioni corrette. Il salvage host-side ha rimosso un solo evidence ID superfluo (U01) da `OUTPUT_TRUNCATED_NOT_SEMANTIC`; nessun warning residuo e nessun evidence ID non revisionato.
+
+Risultato: [DIRECT_QA_GPTOSS_DIAGNOSTIC_SEMANTICS_V2_RESULT_2026-09-30.md](DIRECT_QA_GPTOSS_DIAGNOSTIC_SEMANTICS_V2_RESULT_2026-09-30.md).
+
+## Dodicesimo incarico v2 preparato — QA transfer protocol
+
+`qa-transfer-protocol-review-v1` usa `QA_TRANSFER.md` congelato al commit `5f29502092c9b641117e595a70a4489e651e66be`. Il task misura distinzione tra nuovo caso e blind test, metrica transfer e semplice validazione del motore, limiti del salvage, costo umano non misurato e gestione non retroattiva dei difetti di rubrica.
