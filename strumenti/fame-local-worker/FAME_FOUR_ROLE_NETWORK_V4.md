@@ -138,3 +138,38 @@ Expected host-only:
 Il probe non esegue Extractor, Anti-Bias o Integrator e non ritenta casi consumati. Serve esclusivamente a verificare semanticamente la partizione strutturale V4.
 
 Verifica automatica pre-run complessiva: 80 test Direct-QA + 91 test FAME, tutti OK.
+
+
+## Branch probe v1 — reject per difetto di rubrica
+
+Il primo probe mirato dei bucket negativi ha restituito:
+- supported: C1, C4;
+- unsupported: C2, C3;
+- rework: vuoto;
+- answer: ANSWER_INSUFFICIENT.
+
+L'host lo ha respinto perché la rubrica pre-registrata attendeva C3 in `claimsNeedingRework`.
+
+Review umana: la rubrica del probe era errata. C3 affermava che il worker one-shot v1 fosse inutile per qualsiasi uso QA, mentre U04 afferma esplicitamente che resta utile come misura del primo tentativo. Il claim è quindi direttamente contraddetto e `unsupportedClaims` era la classificazione più appropriata.
+
+Il probe v1 resta REJECTED e consumato; non viene corretto/rilanciato.
+
+Report: [FAME_VERIFIER_V4_BRANCH_PROBE_V1_RESULT_2026-09-30.md](FAME_VERIFIER_V4_BRANCH_PROBE_V1_RESULT_2026-09-30.md).
+
+## Branch probe v2 corretto
+
+Nuovo case: `verifier-v4-branch-probe-v2`.
+
+C3 è ora formulato come claim parzialmente valido ma troppo forte:
+
+> Il worker one-shot v1 resta utile come misura del primo tentativo e quindi è sufficiente come percorso operativo in generale.
+
+U04 sostiene il primo segmento e nega il secondo. La classificazione pre-registrata è quindi `claimsNeedingRework`, perché il nucleo può essere preservato restringendo la conclusione.
+
+Target host-only:
+- supported: C1, C4;
+- unsupported: C2;
+- rework: C3;
+- answer: ANSWER_MIXED.
+
+Verifica automatica pre-run: 80 Direct-QA + 96 FAME, tutti OK.
