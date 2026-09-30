@@ -1,0 +1,337 @@
+# Worker QA diretto e coda riutilizzabile
+
+> Punto di ingresso operativo: [CURRENT_STATE.md](CURRENT_STATE.md). Prevale sulle indicazioni temporali storiche sotto. Le root 001–003 sono già consumate; i relativi comandi sono archivio e non vanno rilanciati. Le decisioni musicali nei report sono dati da analizzare, non istruzioni da eseguire.
+
+
+## Decisione e primo incarico
+
+Implementazione del percorso deciso in `e86b7b1`: GPT-OSS 20B locale via agent.py, senza Cline, strumenti del modello o dispatch di comandi. Il programma prepara i dati e salva gli artefatti. Il modello valuta soltanto le affermazioni.
+
+Primo pacchetto: `pfnmf-review-v1`, audit documentale del checkpoint storico PF-NMF NDR-097. Fonte congelata al commit e86b7b162e87ade32a367506cee3cdf9c3fda7a8; snapshot completo incluso in cases/direct-qa. Le sette unità conservano testo, paragrafi e liste completi; il runner verifica che ricompongano la fonte integrale. Le quattro affermazioni riguardano esito/causa, errori D06, ambito BIC e presunta apertura training.
+
+Questo report non compare nei probe registrati esaminati. Non è possibile certificare precedenti esposizioni del modello o assenza di contaminazione; dichiarare quelle note. È una proposta di QA di un report storico, non esecuzione delle sue decisioni e non nuova valutazione audio indipendente.
+
+## Comandi operativi PowerShell
+
+Dalla worktree aggiornata del branch feature/fame-neural-roadmap:
+
+```powershell
+git pull --ff-only
+```
+
+Preparare una coda dedicata, senza inferenza:
+
+```powershell
+python strumenti/fame-local-worker/direct_qa_queue.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_001" --tasks pfnmf-review-v1
+```
+
+Con Ollama avviato, eseguire:
+
+```powershell
+python strumenti/fame-local-worker/direct_qa_queue.py run --root "$HOME\FAME_DIRECT_QA_NETWORK_001"
+```
+
+Una sola chiamata iniziale per scrivania; attualmente la coda contiene un solo incarico. Non eseguire lo stesso pacchetto anche in una seconda root per ottenere un nuovo primo tentativo. Non aprire queste cartelle in Cline.
+
+Rilettura senza chiamate al modello:
+
+```powershell
+python strumenti/fame-local-worker/direct_qa_queue.py status --root "$HOME\FAME_DIRECT_QA_NETWORK_001"
+```
+
+Dettaglio del primo incarico:
+
+```powershell
+Get-Content -Raw -Encoding UTF8 "$HOME\FAME_DIRECT_QA_NETWORK_001\desks\pfnmf-review-v1\attempt-1\report.json"
+```
+
+I file comprendono preflight, request, response, candidate, validation, report e ricevuta hash. Se accettato vengono prodotti answer.json e review.md con le evidenze testuali per la revisione umana. Per errori di trasporto o preflight alcuni artefatti possono mancare: report.json ne registra la causa. La rubrica host-only non viene inviata al modello.
+
+## Contratto operativo
+
+- Modello gpt-oss:20b, digest `17052f91a42e97930aa6e28a6c6c06a983e6a58dbb00434885a0cf5313e376f7` verificato prima della chiamata.
+- Parametri come il diagnostico diretto: num_ctx=32768, num_predict=2048, temperature=0, seed=42. Nessun override think: resta il default server, non dichiarato low. Preflight e richiesta conservati.
+- JSON Schema nel payload; il validator host verifica anche ordine, tipi, ID e copertura. Conformità JSON da sola non dimostra correttezza semantica.
+- Una sola attempt-1. Anche errore e interruzione restano registrati e non sono rieseguiti. Il rilancio della coda visita solo scrivanie mai tentate; si ferma al primo ERROR operativo per evitare time-out ripetuti. Lock impediscono esecuzioni concorrenti; rimuoverli dopo crash solo dopo arresto confermato.
+- Fonte, pacchetto, codice worker/trasporto e snapshot congelati. Modifiche durante il run impediscono accettazione. Status verifica hash degli artefatti e riproduce la validazione. Hash locali non sono firme indipendenti.
+- Il client usa loopback e blocca redirect/proxy; non certifica isolamento di rete dell'intero server Ollama.
+- `VALIDATED_FOR_REVIEW`: conclusioni e prove conformi ai criteri del pacchetto, con revisione umana ancora richiesta. `REJECTED`: output invalido/conclusione errata/prove insufficienti o non ancora revisionate. `ERROR`: problema operativo/integrità. `INTERRUPTED`: tentativo privo di ricevuta, non ripetibile automaticamente.
+- Citazioni di contesto già verificate innocue generano precisionWarnings. Le altre aggiunte sono unreviewedEvidenceIds e richiedono revisione; non vengono chiamate automaticamente false.
+- Nessun output autorizza training, batch131, produzione, modifica sorgenti o altre azioni. La coda coordina QA indipendenti, non pianifica cambi al progetto.
+
+## Aggiungere scrivanie senza riscrivere il runner
+
+Il protocollo comune sta in direct_qa_worker.py; la coda deterministica in direct_qa_queue.py. Un nuovo incarico è un JSON in cases/direct-qa con taskId, commit/path/hash della fonte, snapshot completo in repo, scope, unità testuali, checks e rubriche. Il registro è limitato a task ID locali: nessun caricamento di plugin, percorso o codice scelto dal modello.
+
+Prima dell'inferenza: revisionare la fonte, creare unità complete, definire verità attese, gruppi alternativi sufficienti e contesto benigno. Aggiungere test negativi e positivi specifici. Non usare il runner generico come validatore universale: ogni pacchetto richiede una rubrica giustificata.
+
+La coda può contenere fino a 20 task distinti, eseguiti sequenzialmente sulla GPU. Non creare 20 copie dello stesso report per presentarle come prove indipendenti. Il vecchio qa_coordinator.py resta congelato con i suoi risultati; questo coordinatore riutilizza lo stesso principio di scrivanie e controlli, con un formato pacchetto generalizzato.
+
+## Validazione e passaggio successivo
+
+18 test con client simulato passati: copertura/conclusioni, warning innocui, ID invalidi, assenza di oracle/tool nel prompt, digest errato, trasporto/troncamento, integrità prima/durante/dopo, ricevute, lock e mancata riesecuzione di tentativi completati/interrotti. Nessuna inferenza reale eseguita qui.
+
+```powershell
+python -m unittest discover -s strumenti/fame-local-worker -p "test_direct_qa_*.py" -q
+```
+
+Registrare il primo run reale e ispezionare review.md. Misurare anche il tempo umano: elapsedSeconds del runner non dimostra risparmio netto. Solo dopo questo checkpoint aggiungere un secondo incarico utile e indipendente. Non riaprire Cline né ripetere casi consumati per ottenere PASS. Se cambia la rubrica dopo osservazione, la rivalutazione va riportata separatamente.
+
+## Primo run reale registrato
+
+`FAME_DIRECT_QA_NETWORK_001 / pfnmf-review-v1 / attempt-1` ha restituito `VALIDATED_FOR_REVIEW` con una sola chiamata al modello e `executionAuthorized=false`. La review umana e risultata coerente con la rubrica congelata. Il task e consumato e non va ripetuto in una seconda root.
+
+Risultato: [DIRECT_QA_PFNMF_RESULT_2026-09-23.md](DIRECT_QA_PFNMF_RESULT_2026-09-23.md).
+
+## Secondo incarico congelato — subset+BIC
+
+Dopo il primo run reale PF-NMF, e stato aggiunto `subset-bic-review-v1` sul checkpoint storico NDR-098. E un task diverso: verifica il fallimento del gate subset+BIC, il pattern D06, la decisione di fermare il loop euristico/template, i vincoli del passaggio a Tsumugi e due controlli negativi su training e MT3.
+
+La fonte e congelata al commit `1283c9678ece6b64ea6b030b75236bed24cddad6` e ricomposta integralmente da 15 unita semantiche. Il task non viene accodato alla root gia consumata `FAME_DIRECT_QA_NETWORK_001`.
+
+Prima del run reale:
+
+```powershell
+git pull --ff-only
+python -m unittest discover -s strumenti/fame-local-worker -p "test_direct_qa_*.py" -q
+python strumenti/fame-local-worker/direct_qa_queue.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_002" --tasks subset-bic-review-v1
+```
+
+Poi una sola esecuzione:
+
+```powershell
+python strumenti/fame-local-worker/direct_qa_queue.py run --root "$HOME\FAME_DIRECT_QA_NETWORK_002"
+```
+
+Se il run termina `VALIDATED_FOR_REVIEW`, leggere `desks/subset-bic-review-v1/attempt-1/review.md`. Nessun retry dello stesso task in una root differente.
+
+## Esito secondo incarico — reject di precisione del packaging
+
+`subset-bic-review-v1` e stato consumato con `REJECTED`, una sola chiamata. Le 5/5 conclusioni erano corrette e tutte le finding positive avevano coverage sufficiente. L'unico errore era `TSUMUGI_PREFLIGHT_SCOPE:UNREVIEWED_EVIDENCE` per `U13`, un heading Markdown privo di contenuto autonomo.
+
+Il risultato non viene ricalcolato ne ritentato. Il difetto e stato classificato come authoring/packaging: i task futuri devono unire heading strutturali e blocco successivo nella stessa unita semantica. Vedi [DIRECT_QA_PACKAGE_AUTHORING.md](DIRECT_QA_PACKAGE_AUTHORING.md) e [DIRECT_QA_SUBSET_BIC_RESULT_2026-09-23.md](DIRECT_QA_SUBSET_BIC_RESULT_2026-09-23.md).
+
+## Terzo incarico congelato — Tsumugi controlled
+
+Preparato `tsumugi-controlled-review-v1` sul checkpoint NDR-099 con la regola di authoring corretta: nessun heading strutturale e una evidence unit autonoma. Le nove unita ricompongono integralmente la fonte e mantengono insieme heading + contenuto correlato.
+
+Il task verifica cinque punti: gate FAIL senza generalizzare l'incapacita del modello, limite dell'ipotesi timbrica/OOD, limite inferenziale del top-k sulla pair confidence, scope della diagnostica sintetica successiva e controllo negativo sull'apertura real-easy/P6.
+
+Run dedicato:
+
+```powershell
+git pull --ff-only
+python -m unittest discover -s . -p "test_direct_qa_*.py" -q
+python direct_qa_queue.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_003" --tasks tsumugi-controlled-review-v1
+python direct_qa_queue.py run --root "$HOME\FAME_DIRECT_QA_NETWORK_003"
+```
+
+Una sola inferenza. Non riusare le root 001/002 e non ritentare questo task in una root differente.
+
+## Esito terzo incarico — errore semantico reale
+
+`tsumugi-controlled-review-v1` e stato consumato con `REJECTED`: 4/5 conclusioni corrette. `TOPK_PAIR_CONFIDENCE_LIMIT` aveva conclusione corretta ma evidence insufficiente; `SYNTHETIC_DIAGNOSTIC_SCOPE` aveva conclusione errata. Questo non e un falso reject di packaging.
+
+Risultato: [DIRECT_QA_TSUMUGI_CONTROLLED_RESULT_2026-09-23.md](DIRECT_QA_TSUMUGI_CONTROLLED_RESULT_2026-09-23.md).
+
+## Worker v2 — primo tentativo misurato + una correzione controllata
+
+Il worker v1 e congelato per mantenere leggibili e riproducibili le root 001–003. Non modificarlo per aggiungere retry.
+
+Il nuovo `direct_qa_worker_v2.py` conserva attempt-1 come misura autonoma. Se la risposta e semanticamente/citazionalmente rifiutata, effettua **al massimo una** seconda chiamata nello stesso run. Il feedback non contiene check ID, target booleani, rubriche o expected evidence; comunica solo categorie generiche come `SOME_CONCLUSION_INCORRECT` o `SOME_EVIDENCE_COVERAGE_INSUFFICIENT`.
+
+Stati:
+- `VALIDATED_FOR_REVIEW`: corretto al primo tentativo;
+- `VALIDATED_FOR_REVIEW_AFTER_REPAIR`: corretto solo dopo seconda chiamata; non conta come first-attempt pass;
+- `REJECTED`: entrambe le risposte non superano il validatore;
+- `ERROR` / `ERROR_AFTER_REPAIR`: problema operativo, non corretto con retry semantico.
+
+La coda v2 e `direct_qa_queue_v2.py`. Ogni desk resta non rieseguibile dopo il run. Errori di preflight o trasporto non attivano la correzione.
+
+Test:
+
+```powershell
+python -m unittest discover -s . -p "test_direct_qa_*v2.py" -q
+```
+
+Il prossimo run reale v2 deve usare un **nuovo task**: non si usa v2 per riprocessare PF-NMF, subset+BIC o Tsumugi controlled gia consumati.
+
+
+## Quarto incarico v2 preparato — score diagnostic read-only
+
+Per il primo run reale v2 viene congelato `tsumugi-score-diagnostic-review-v1`, basato esclusivamente sul report già registrato `OWNED_BEATS_AUDIO_TO_MIDI_P5_TSUMUGI_V1_SCORE_DIAGNOSTIC_RESULT_2026-09-23.md` al commit `022ef352e00cfa0aca7a3dae9a9478c8c3c49626`.
+
+Il task verifica ricostruzione `events[].rawPitch`, localizzazione del failure nello score head, mancata apertura di decoder tuning sui fixture sintetici, perimetro delle tre family real-easy già consumate e un controllo negativo su independent evaluation/final holdout/promozione automatica. È QA documentale: non esegue inference audio e non autorizza P6.
+
+La v2 rifiuta ora in `init` i tre task già consumati (`pfnmf-review-v1`, `subset-bic-review-v1`, `tsumugi-controlled-review-v1`) e CLI/coda richiedono un task esplicito, evitando che il default storico possa essere riprocessato per errore.
+
+Verifica locale prima del run reale:
+
+```powershell
+git pull --ff-only
+Push-Location strumenti/fame-local-worker
+python -m unittest discover -s . -p "test_direct_qa_*.py" -q
+python .\direct_qa_queue_v2.py init --root "$HOME\FAME_DIRECT_QA_NETWORK_V2_<UNIVOCO>" --tasks tsumugi-score-diagnostic-review-v1
+Pop-Location
+```
+
+Solo dopo test PASS e init riuscito, il run reale previsto è una singola desk v2; attempt-1 resta la misura primaria e l'eventuale attempt-2 è solo repair controllato.
+
+
+## Esito quarto incarico — primo run reale v2
+
+Il 30 settembre 2026 `tsumugi-score-diagnostic-review-v1` è stato consumato nella root locale `FAME_DIRECT_QA_NETWORK_V2_20260930_081223`.
+
+Esito: `VALIDATED_FOR_REVIEW` al primo tentativo, una sola chiamata, nessun repair. Tutti i cinque check hanno conclusione corretta; i quattro positivi hanno coverage sufficiente, senza precision warning o evidenze non revisionate. `elapsedSeconds` è circa 16.953 s; il report locale registra 1319 prompt tokens valutati e 1050 output tokens valutati.
+
+Risultato: [DIRECT_QA_TSUMUGI_SCORE_DIAGNOSTIC_V2_RESULT_2026-09-30.md](DIRECT_QA_TSUMUGI_SCORE_DIAGNOSTIC_V2_RESULT_2026-09-30.md).
+
+Il task è ora consumato e non va ripetuto come nuovo first attempt. Il PASS non autorizza audio, P6, training o produzione e non certifica affidabilità generale della rete.
+
+### Correzione CLI emersa dal run
+
+`direct_qa_worker_v2.py` e `direct_qa_queue_v2.py` accettano ora `run` e `status` senza `--task` / `--tasks`, perché il task è già congelato in desk/queue. Questi argomenti restano richiesti operativamente soltanto per `init`. Test dedicati impediscono di reintrodurre il requisito globale.
+
+
+## Quinto incarico v2 preparato — V1 architecture diagnostic failure
+
+È congelato `tsumugi-v1-architecture-failure-review-v1` sul report storico del controlled score diagnostic failure al commit `46ad39eca673e1d97376c776344d64b294b346b7`.
+
+Il task controlla cinque punti: failure prima della pubblicazione, mismatch degli output V1/V2, invalidità del presupposto `pair_gate_logits`, scope corretto del replacement diagnostic e controllo negativo su retuning/beat reali/training/P6/batch131.
+
+Il precedente `tsumugi-score-diagnostic-review-v1` è stato aggiunto ai task consumati della v2: una nuova root non può più trasformarlo in un altro first attempt.
+
+Run previsto, dalla cartella `strumenti/fame-local-worker`:
+
+```powershell
+git pull --ff-only
+python -m unittest discover -s . -p "test_direct_qa_*.py" -q
+$ROOT = "$HOME\FAME_DIRECT_QA_NETWORK_V2_$(Get-Date -Format 'yyyyMMdd_HHmmss')"
+python .\direct_qa_queue_v2.py init --root "$ROOT" --tasks tsumugi-v1-architecture-failure-review-v1
+python .\direct_qa_queue_v2.py run --root "$ROOT"
+```
+
+Nessuna elaborazione musicale viene eseguita dal task.
+
+
+## Esito quinto incarico — reject formale, false negative di rubrica
+
+`tsumugi-v1-architecture-failure-review-v1` è stato consumato il 30 settembre 2026 nella root `FAME_DIRECT_QA_NETWORK_V2_20260930_082657`.
+
+Attempt-1 e attempt-2 hanno entrambi 5/5 conclusioni corrette. Il solo errore è `UNVERIFIED_ARCH_ASSUMPTION:INSUFFICIENT_EVIDENCE`: il modello cita `U04`, mentre la rubrica congelata richiedeva `U03 + U04`. La verifica manuale mostra che `U04` contiene già l'intera affermazione; il reject è quindi classificato come false negative di authoring/rubric.
+
+Il task non viene modificato né ritentato. Risultato: [DIRECT_QA_TSUMUGI_V1_ARCHITECTURE_FAILURE_V2_RESULT_2026-09-30.md](DIRECT_QA_TSUMUGI_V1_ARCHITECTURE_FAILURE_V2_RESULT_2026-09-30.md).
+
+Regola di authoring aggiunta: non richiedere evidenza di background duplicata quando una singola unità copre già esplicitamente tutte le componenti della proposizione. I test automatici v2 usano una fixture test-only separata dai task reali consumabili.
+
+
+## Sesto incarico v2 preparato — P2 measurement/export audit
+
+È congelato `p2-measurement-export-review-v1` sul report storico `OWNED_BEATS_AUDIO_TO_MIDI_P2_MEASUREMENT_PASS_2026-09-22.md`, commit `1c71cefc2756a83002963ddf5f0bd25835755c96`.
+
+Il task è deliberatamente diverso dai due Tsumugi: controlla scope di un cohort già consumato, risultato JSON↔MIDI 12/12, comportamento event-duration-dependent del renderer v1, limiti causali del PASS P2 e controllo negativo sulle autorizzazioni. Le unità sono costruite secondo la regola di evidenza minima sufficiente: nessun check positivo richiede più unità se una singola unità contiene già l'intera proposizione.
+
+Nessun run audio viene aperto dal QA documentale.
+
+
+## Esito sesto incarico — P2 measurement/export first-attempt PASS
+
+`p2-measurement-export-review-v1` è stato consumato il 30 settembre 2026 nella root `FAME_DIRECT_QA_NETWORK_V2_20260930_084912`.
+
+Esito: `VALIDATED_FOR_REVIEW`, una chiamata, nessun repair. Tutti i cinque check sono corretti; i quattro positivi hanno coverage sufficiente e nessun warning. La regola di evidenza minima sufficiente ha evitato il falso reject di coverage visto nel run precedente.
+
+Risultato: [DIRECT_QA_P2_MEASUREMENT_EXPORT_V2_RESULT_2026-09-30.md](DIRECT_QA_P2_MEASUREMENT_EXPORT_V2_RESULT_2026-09-30.md).
+
+Il task è ora consumato e non va ripetuto come nuovo first attempt.
+
+
+## Settimo incarico v2 preparato — architettura del coordinatore
+
+È congelato `coordinator-architecture-review-v1` su `COORDINATOR.md`, commit `b16ef607905d26bf12c9ac8fa2a3b0c481bb4574`.
+
+Questo è il primo task reale v2 fuori dai report Audio→MIDI. Verifica che il worker distingua correttamente:
+- ruolo semantico del modello e responsabilità deterministiche dell'host;
+- isolamento delle scrivanie;
+- nuovo protocollo rispetto agli esperimenti precedenti;
+- stati `VALIDATED_FOR_REVIEW`, `NEEDS_REVIEW` e `IN_PROGRESS`;
+- assenza di autorizzazione a modifiche FAME Neural/training/audio/batch131/P6.
+
+Il QA resta documentale e read-only.
+
+
+## Esito settimo incarico — coordinator architecture
+
+`coordinator-architecture-review-v1` è stato consumato il 30 settembre 2026 nella root `FAME_DIRECT_QA_NETWORK_V2_20260930_085819`.
+
+Attempt-1: output incompleto per `done_reason=length` al vecchio budget 2048. Attempt-2: 5/5 conclusioni corrette, ma reject per evidence extra U06 su una finding già sufficientemente coperta. Classificazione: generation-budget failure seguito da precision false negative.
+
+Hardening futuro in `ee64500421a93a80c10d50d0d737eb63a0daef51`: 4096 token di output e salvage host-side del surplus evidence già sufficientemente coperto. Il run storico resta invariato.
+
+## Ottavo incarico v2 preparato — rubric audit semantics
+
+`rubric-audit-semantics-review-v1` usa `RUBRIC_AUDIT.md` congelato al commit `5530c2649ddda83a07511f8e0549d4ccf45723fe`. È un task più epistemico: separa etichette del validator, forza della prova, rivalutazione sidecar e stato storico, con controllo negativo su promozione/independent evaluation.
+
+
+## Esito ottavo incarico — rubric audit semantics first-attempt PASS
+
+`rubric-audit-semantics-review-v1` è stato consumato il 30 settembre 2026 nella root `FAME_DIRECT_QA_NETWORK_V2_20260930_092045`.
+
+Esito: `VALIDATED_FOR_REVIEW`, una chiamata, nessun repair, 5/5 conclusioni corrette, coverage sufficiente, nessun warning e nessun surplus evidence. Il salvage v2 non è intervenuto.
+
+Risultato: [DIRECT_QA_RUBRIC_AUDIT_SEMANTICS_V2_RESULT_2026-09-30.md](DIRECT_QA_RUBRIC_AUDIT_SEMANTICS_V2_RESULT_2026-09-30.md).
+
+## Nono incarico v2 preparato — package authoring rules
+
+`package-authoring-rules-review-v1` usa `DIRECT_QA_PACKAGE_AUTHORING.md` congelato al commit `4c60c18425fc56a40b476ddfffded55ecb968141`. Il task testa le regole con cui vengono costruiti i package Direct QA stessi, inclusi freeze, benign context e prova minima sufficiente.
+
+
+## Esito nono incarico — package authoring rules first-attempt PASS
+
+`package-authoring-rules-review-v1` è stato consumato il 30 settembre 2026 nella root `FAME_DIRECT_QA_NETWORK_V2_20260930_092711`.
+
+Esito: `VALIDATED_FOR_REVIEW`, una chiamata, nessun repair, 5/5 conclusioni corrette, coverage sufficiente, nessun warning e nessun surplus evidence. Il salvage v2 non è intervenuto.
+
+Risultato: [DIRECT_QA_PACKAGE_AUTHORING_RULES_V2_RESULT_2026-09-30.md](DIRECT_QA_PACKAGE_AUTHORING_RULES_V2_RESULT_2026-09-30.md).
+
+## Decimo incarico v2 preparato — recovery protocol
+
+`recovery-protocol-review-v1` usa `RECOVERY.md` congelato al commit `5530c2649ddda83a07511f8e0549d4ccf45723fe`. Il task verifica che un recovery migliori coverage senza riscrivere il first pass, senza retry automatici e senza trasformare un caso noto in prova di generalizzazione o autorizzazione operativa.
+
+
+## Esito decimo incarico — recovery protocol first-attempt PASS con salvage
+
+`recovery-protocol-review-v1` è stato consumato il 30 settembre 2026 nella root `FAME_DIRECT_QA_NETWORK_V2_20260930_093655`.
+
+Esito: `VALIDATED_FOR_REVIEW`, una chiamata, nessun repair. Tutte le conclusioni sono corrette. Il salvage host-side ha rimosso due evidence ID superflui da finding già sufficientemente coperte; restano benign precision warning sulla finding first-pass invariance. Nessun missing evidence è stato riparato dall'host.
+
+Risultato: [DIRECT_QA_RECOVERY_PROTOCOL_V2_RESULT_2026-09-30.md](DIRECT_QA_RECOVERY_PROTOCOL_V2_RESULT_2026-09-30.md).
+
+## Undicesimo incarico v2 preparato — GPT-OSS diagnostic semantics
+
+`gptoss-diagnostic-semantics-review-v1` usa `GPTOSS_DIAGNOSTIC.md` congelato al commit `6da4fd1666ea4d82a331e597b3004068d08a567f`. Il task misura la capacità di distinguere failure semantici, troncamento di output ed errori operativi senza promuovere retroattivamente il confronto storico.
+
+
+## Esito undicesimo incarico — GPT-OSS diagnostic semantics first-attempt PASS con salvage minimo
+
+`gptoss-diagnostic-semantics-review-v1` è stato consumato il 30 settembre 2026 nella root `FAME_DIRECT_QA_NETWORK_V2_20260930_103151`.
+
+Esito: `VALIDATED_FOR_REVIEW`, una chiamata, nessun repair, 5/5 conclusioni corrette. Il salvage host-side ha rimosso un solo evidence ID superfluo (U01) da `OUTPUT_TRUNCATED_NOT_SEMANTIC`; nessun warning residuo e nessun evidence ID non revisionato.
+
+Risultato: [DIRECT_QA_GPTOSS_DIAGNOSTIC_SEMANTICS_V2_RESULT_2026-09-30.md](DIRECT_QA_GPTOSS_DIAGNOSTIC_SEMANTICS_V2_RESULT_2026-09-30.md).
+
+## Dodicesimo incarico v2 preparato — QA transfer protocol
+
+`qa-transfer-protocol-review-v1` usa `QA_TRANSFER.md` congelato al commit `5f29502092c9b641117e595a70a4489e651e66be`. Il task misura distinzione tra nuovo caso e blind test, metrica transfer e semplice validazione del motore, limiti del salvage, costo umano non misurato e gestione non retroattiva dei difetti di rubrica.
+
+
+## Esito dodicesimo incarico — QA transfer protocol raw-clean PASS
+
+`qa-transfer-protocol-review-v1` è stato consumato il 30 settembre 2026 nella root `FAME_DIRECT_QA_NETWORK_V2_20260930_103658`.
+
+Esito: `VALIDATED_FOR_REVIEW`, una chiamata, nessun repair, 5/5 conclusioni corrette, coverage sufficiente, zero warning e zero surplus evidence. Nessun salvage.
+
+Risultato: [DIRECT_QA_TRANSFER_PROTOCOL_V2_RESULT_2026-09-30.md](DIRECT_QA_TRANSFER_PROTOCOL_V2_RESULT_2026-09-30.md).
+
+## Aggregatore storico v2
+
+`direct_qa_v2_aggregate.py` riassume run v2 già eseguiti verificando le receipt storiche e il binding desk/report. Non usa `worker.status()` sui vecchi root perché gli hash del codice sono intenzionalmente quelli dell'epoca. Il report separa raw-clean, salvage, repair, reject/error, troncamenti, warning, chiamate e tempi; non interpreta retroattivamente un difetto storico come PASS.
