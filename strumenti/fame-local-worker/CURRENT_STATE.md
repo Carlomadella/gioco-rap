@@ -340,3 +340,35 @@ Aggiunto `fame_four_role_network_v3_continuation.py`: verifica la catena V2 orig
 Verifica automatica: GitHub Actions PASS con 80 test Direct-QA + 43 test FAME network/Anti-Bias/recovery/continuation.
 
 Dettagli: [FAME_FOUR_ROLE_NETWORK_V3.md](FAME_FOUR_ROLE_NETWORK_V3.md).
+
+
+## V3 continuation — esito riuscito
+
+Root locale `FAME_FOUR_ROLE_NETWORK_V3_20260930_123819`.
+
+Esito `PROPOSED_FOR_HUMAN_REVIEW` con riuso intenzionale di Extractor + Anti-Bias V2 e due nuove chiamate V3:
+- Verifier `ACCEPTED`, `ANSWER_NO`, tre claim su tre `EVIDENCE_SUPPORTS_CLAIM`;
+- Integrator `ACCEPTED`, `ANSWER_NO`, usa solo claim verificati;
+- zero errori host.
+
+Il risultato dimostra che il contratto V3 ha corretto il failure delle label/verdict V2 su questa continuazione. Non è ancora un fresh run V3 a quattro ruoli.
+
+Report: [FAME_FOUR_ROLE_NETWORK_V3_CONTINUATION_RESULT_2026-09-30.md](FAME_FOUR_ROLE_NETWORK_V3_CONTINUATION_RESULT_2026-09-30.md).
+
+Il case `agent-network-readiness-network-v3` è ora consumato per nuovi init V3.
+
+## Primo fresh run V3 preparato
+
+Congelato `model-comparison-generalization-network-v3` su `FAME_LOCAL_AGENT_MODEL_COMPARISON_HANDOFF_2026-09-23.md` al commit sorgente `826d121a6e752202c9cfa40289ae4ce359735986`.
+
+Domanda: il confronto congelato dimostra che Qwen3-Coder 30B è in generale un modello migliore di GPT-OSS 20B per la rete FAME Neural?
+
+Il case distingue:
+- Qwen REJECTED con output strutturato parziale 6/10;
+- GPT-OSS REJECTED per esaurimento output senza risposta strutturata;
+- risultato meno debole di Qwen sul protocollo specifico;
+- divieto esplicito di generalizzare quel risultato a un giudizio generale sui modelli.
+
+Questo sarà il primo run V3 completo da zero con quattro chiamate fresh: Extractor, Anti-Bias, Verifier, Integrator.
+
+Verifica automatica: 80 test Direct-QA + 43 test FAME, tutti OK.
