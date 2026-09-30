@@ -718,3 +718,31 @@ Verificato in reale:
 Il failure V3 `VERIFIER_NONSUPPORTED_WITH_EVIDENCE` è corretto a livello di contratto e la correzione è stata esercitata semanticamente.
 
 Non dichiarare affidabilità generale o production readiness della rete da questi test. Il prossimo lavoro deve tornare alla valutazione dell'architettura complessiva su nuovi casi, non continuare a rifinire questo contratto già verificato.
+
+
+## Nuova batteria V4 vs single-agent pronta
+
+Dopo la chiusura dell'hardening del Verifier V4, preparata una nuova batteria architetturale pre-registrata su quattro casi non usati nei confronti precedenti:
+
+- `v4-battery-pfnmf-limited-validation-v1`;
+- `v4-battery-subset-packaging-v1`;
+- `v4-battery-recovery-salvage-v1`;
+- `v4-battery-aggregate-nine-run-v1`.
+
+Budget massimo totale pareggiato:
+- single-agent V2: 1×16384;
+- Four-Role Network V4: 4×4096.
+
+Ordine bracci bilanciato 2/2. Massimo 20 chiamate.
+
+Runner: `fame_single_vs_four_v4_battery_v1.py`.
+
+Output finale: `v4-battery-result.json`.
+
+L'aggregato usa il nuovo contratto V4 e conta anche `verifierUnsupportedCount` e `verifierReworkCount`.
+
+Nessun winner automatico; human review resta separata.
+
+Verifica automatica pre-run: 80 Direct-QA + 103 FAME, tutti OK.
+
+Dettagli: [FAME_SINGLE_VS_FOUR_V4_BATTERY_V1.md](FAME_SINGLE_VS_FOUR_V4_BATTERY_V1.md).
