@@ -636,3 +636,35 @@ Il case verifica che un FAIL senza artefatto semantico venga distinto da un erro
 Verifica automatica pre-run: 80 test Direct-QA + 85 test FAME, tutti OK.
 
 Dettagli: [FAME_FOUR_ROLE_NETWORK_V4.md](FAME_FOUR_ROLE_NETWORK_V4.md).
+
+
+## Four-Role Network V4 — primo fresh PASS reale
+
+Root: `FAME_FOUR_ROLE_NETWORK_V4_20260930_165854`.
+
+`runtime-contract-result-network-v4` ha chiuso 4/4:
+- Extractor ACCEPTED;
+- Anti-Bias ACCEPTED;
+- Verifier ACCEPTED;
+- Integrator ACCEPTED;
+- answer `ANSWER_NO`;
+- 4 model calls.
+
+Il nuovo Verifier ha usato correttamente la partizione V4:
+- supported C1–C4;
+- unsupported vuoto;
+- rework vuoto.
+
+Review umana: PASS. Nota non bloccante: C4/U04 era optional context e non necessario alla conclusione.
+
+Il case è consumato.
+
+Il pilot completo non ha però esercitato i bucket negativi. Preparato quindi `fame_verifier_v4_branch_probe.py`, una singola chiamata al Verifier con claim host-frozen e expected host-only:
+- supported: C1, C4;
+- unsupported: C2;
+- needs-rework: C3;
+- answer: ANSWER_MIXED.
+
+Case probe: `verifier-v4-branch-probe-v1`, fonte `DIRECT_QA_TSUMUGI_CONTROLLED_RESULT_2026-09-23.md`.
+
+Verifica automatica: 80 Direct-QA + 91 FAME, tutti OK.
