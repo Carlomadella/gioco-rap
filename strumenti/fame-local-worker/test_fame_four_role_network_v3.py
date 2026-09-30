@@ -34,14 +34,14 @@ class FameFourRoleNetworkV3Tests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root=Path(self.temp.name)/'network'
         with contextlib.redirect_stdout(io.StringIO()):
-            n.init(self.root,'agent-network-readiness-network-v3')
+            n.init(self.root,'model-comparison-generalization-network-v3')
 
     def extractor(self):
         return {'claims':[
-            {'claimId':'C1','statement':'Qwen + Direct Worker ha ottenuto 3/3 PASS first-attempt sul task demo.','evidenceIds':['U02']},
-            {'claimId':'C2','statement':'Il recap dice esplicitamente che non è dimostrato che Qwen sia il modello migliore.','evidenceIds':['U03']},
-            {'claimId':'C3','statement':'Il recap include sia successi sia failure/rejection, quindi non stabilisce affidabilità generale.','evidenceIds':['U04']},
-            {'claimId':'C4','statement':'Il recap richiede un secondo task reale differente prima di considerare stabile il pattern.','evidenceIds':['U05']},
+            {'claimId':'C1','statement':'Qwen è stato REJECTED ma ha prodotto JSON valido con 6/10 categorie validate.','evidenceIds':['U01']},
+            {'claimId':'C2','statement':'GPT-OSS è stato REJECTED per esaurimento del budget di output senza risposta strutturata.','evidenceIds':['U02']},
+            {'claimId':'C3','statement':'Sul protocollo congelato Qwen è stato il risultato meno debole, ma il documento esclude una generalizzazione sui modelli.','evidenceIds':['U03']},
+            {'claimId':'C4','statement':'I tempi dei due run non vanno confrontati ingenuamente perché il run Qwen include carico a freddo.','evidenceIds':['U04']},
         ]}
 
     def challenge(self):
@@ -60,10 +60,10 @@ class FameFourRoleNetworkV3Tests(unittest.TestCase):
         return {
             'answerOptionId':option,
             'decisions':[
-                {'claimId':'C1','status':'EVIDENCE_SUPPORTS_CLAIM','evidenceIds':['U02'],'reason':'U02 sostiene il claim.'},
-                {'claimId':'C2','status':'EVIDENCE_SUPPORTS_CLAIM','evidenceIds':['U03'],'reason':'U03 sostiene il claim.'},
-                {'claimId':'C3','status':'EVIDENCE_SUPPORTS_CLAIM','evidenceIds':['U04'],'reason':'U04 sostiene il claim.'},
-                {'claimId':'C4','status':'EVIDENCE_SUPPORTS_CLAIM','evidenceIds':['U05'],'reason':'U05 sostiene il claim.'},
+                {'claimId':'C1','status':'EVIDENCE_SUPPORTS_CLAIM','evidenceIds':['U01'],'reason':'U01 sostiene il claim.'},
+                {'claimId':'C2','status':'EVIDENCE_SUPPORTS_CLAIM','evidenceIds':['U02'],'reason':'U02 sostiene il claim.'},
+                {'claimId':'C3','status':'EVIDENCE_SUPPORTS_CLAIM','evidenceIds':['U03'],'reason':'U03 sostiene il claim.'},
+                {'claimId':'C4','status':'EVIDENCE_SUPPORTS_CLAIM','evidenceIds':['U04'],'reason':'U04 sostiene il claim.'},
             ],
         }
 
@@ -71,8 +71,8 @@ class FameFourRoleNetworkV3Tests(unittest.TestCase):
         return {
             'answerOptionId':option,
             'usedClaimIds':['C1','C2','C3','C4'],
-            'answer':'No. Il recap mostra risultati positivi circoscritti ma non stabilisce superiorità di Qwen né affidabilità generale.',
-            'limitations':['La conclusione vale per il recap congelato.'],
+            'answer':'No. Qwen è stato meno debole su questo protocollo, ma il confronto non dimostra superiorità generale sui modelli.',
+            'limitations':['La conclusione vale solo per il protocollo congelato.'],
         }
 
     def run_network(self,replies):
@@ -103,7 +103,7 @@ class FameFourRoleNetworkV3Tests(unittest.TestCase):
         self.assertNotIn('expectedAnswerOptionId',payload)
 
     def test_verifier_schema_has_unambiguous_claim_statuses(self):
-        p=n.package('agent-network-readiness-network-v3')
+        p=n.package('model-comparison-generalization-network-v3')
         schema=n.verifier_schema(p,self.extractor(),self.challenge())
         status_enum=schema['properties']['decisions']['items']['properties']['status']['enum']
         self.assertEqual(status_enum,[
@@ -131,14 +131,15 @@ class FameFourRoleNetworkV3Tests(unittest.TestCase):
         verifier=self.verifier()
         verifier['decisions'][0]['status']='EVIDENCE_DOES_NOT_SUPPORT_CLAIM'
         errors=n.validate_verifier(
-            verifier,n.package('agent-network-readiness-network-v3'),self.extractor(),self.challenge()
+            verifier,n.package('model-comparison-generalization-network-v3'),self.extractor(),self.challenge()
         )
         self.assertIn('VERIFIER_NONSUPPORTED_WITH_EVIDENCE',errors)
 
-    def test_v2_case_is_consumed_for_v3_init(self):
-        other=Path(self.temp.name)/'old'
-        with self.assertRaisesRegex(ValueError,'Case gia consumato'):
-            n.init(other,'agent-network-readiness-network-v2')
+    def test_prior_cases_are_consumed_for_v3_init(self):
+        for case_id in ('agent-network-readiness-network-v2','agent-network-readiness-network-v3'):
+            other=Path(self.temp.name)/case_id
+            with self.assertRaisesRegex(ValueError,'Case gia consumato'):
+                n.init(other,case_id)
 
 
 if __name__=='__main__':
