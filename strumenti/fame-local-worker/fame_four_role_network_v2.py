@@ -53,7 +53,7 @@ def digest(value):
 
 
 def code_hashes():
-    names=('fame_four_role_network_v1.py','fame_anti_bias.py','agent.py')
+    names=('fame_four_role_network_v2.py','fame_anti_bias.py','agent.py')
     return {name:hashlib.sha256((BASE/name).read_bytes()).hexdigest() for name in names}
 
 
@@ -155,7 +155,7 @@ def init(root,case_id):
     agent.write(root/'network.json',metadata(p))
     agent.write(root/'case-public.json',public_case(p))
     agent.write(root/'host-rubric.json',host_rubric(p))
-    print('Rete FAME v1 creata; nessuna chiamata al modello: '+str(root))
+    print('Rete FAME v2 creata; nessuna chiamata al modello: '+str(root))
 
 
 def verify(root):
