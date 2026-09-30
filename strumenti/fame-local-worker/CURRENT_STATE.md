@@ -594,3 +594,20 @@ Aggiunto `fame_network_attempt_diagnostic.py`, read-only, per classificare il Ve
 Tutti i quattro case matched-budget sono consumati sia nella rete V3 sia nella baseline V2.
 
 Report: [FAME_SINGLE_VS_FOUR_MATCHED_BUDGET_V1_RESULT_2026-09-30.md](FAME_SINGLE_VS_FOUR_MATCHED_BUDGET_V1_RESULT_2026-09-30.md).
+
+
+## Matched-budget V1 — diagnosi Verifier completata
+
+Il tentativo storico del Verifier su `matched-coordinator-reject-v1` è stato esaminato in sola lettura, senza nuove chiamate modello.
+
+Classificazione: `VERIFIER_STATUS_EVIDENCE_CONTRACT_CONTRADICTION`.
+
+La response era completa e parseabile; il problema è nel contratto della decisione per-claim: il Verifier ha combinato un ramo non-support con evidenceIds/motivazione incompatibili con quel ramo, e l'host lo ha respinto.
+
+Interpretazione finale matched-budget:
+- 2 pareggi qualitativi;
+- 1 vantaggio operativo network su troncamento single-agent a 16384;
+- 1 errore contrattuale del Verifier network;
+- nessun vincitore generale.
+
+Decisione architetturale: V3 resta storica. La prossima versione del Verifier separa strutturalmente claim supportati, non supportati e da riscrivere, invece di affidarsi a uno status scelto nello stesso oggetto.
