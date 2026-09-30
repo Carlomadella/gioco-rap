@@ -687,3 +687,34 @@ Preparato `verifier-v4-branch-probe-v2` con C3 realmente parziale: il claim cons
 Runner: `fame_verifier_v4_branch_probe_v2.py`.
 
 Verifica automatica pre-run: 80 Direct-QA + 96 FAME, tutti OK.
+
+
+## Verifier V4 branch probe v2 — PASS
+
+Root: `FAME_VERIFIER_V4_BRANCH_PROBE_V2_20260930_181355`.
+
+Una sola chiamata reale. Esito:
+- ACCEPTED;
+- ANSWER_MIXED;
+- supported C1/C4;
+- unsupported C2;
+- claimsNeedingRework C3;
+- zero errori host;
+- done_reason stop.
+
+Review umana: PASS. La partizione coincide con la target host-only e con la fonte congelata.
+
+Il case è consumato.
+
+### Verifier V4 hardening chiuso
+
+Verificato in reale:
+1. fresh full-network V4 4/4 ACCEPTED;
+2. supportedClaims;
+3. unsupportedClaims;
+4. claimsNeedingRework;
+5. impossibilità strutturale di associare evidenceIds ai bucket negativi.
+
+Il failure V3 `VERIFIER_NONSUPPORTED_WITH_EVIDENCE` è corretto a livello di contratto e la correzione è stata esercitata semanticamente.
+
+Non dichiarare affidabilità generale o production readiness della rete da questi test. Il prossimo lavoro deve tornare alla valutazione dell'architettura complessiva su nuovi casi, non continuare a rifinire questo contratto già verificato.
