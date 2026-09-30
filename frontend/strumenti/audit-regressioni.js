@@ -2342,11 +2342,12 @@ test("il build impacchetta tutte e tre le pagine",
   build.includes('{ file: "pagine/gioco.html"'));
 
 console.log("\nPunti 24, 25, 28 — la via d'uscita, il nome della scheda, i beat gratis");
-test("punto 24: la plancia ha un tasto «Menu» in chiaro, non solo il logo",
-  index.includes('id="hb-menu"') && index.includes('data-adf-global="menu"') &&
+test("la plancia non ha piu' il tasto Menu ridondante accanto al tempo",
+  !index.includes('id="hb-menu"') &&
+  !index.includes('data-adf-global="menu"') &&
   index.includes('id="hb-logo"') &&
-  leggi("css/hub.css").includes(".pmenu {"));
-test("punto 24: quel tasto salva prima di uscire, e se non può dice perché",
+  !leggi("css/hub.css").includes(".pmenu {"));
+test("l'API di uscita rapida resta sicura anche senza il tasto ridondante",
   menuSystem.includes("function uscitaRapida()") &&
   menuSystem.includes('adfGlobal === "menu") uscitaRapida()') &&
   menuSystem.includes("exitToMenu:uscitaRapida") &&
@@ -2777,12 +2778,15 @@ test("le quattro mosse con la pagina finiscono sulla loro foto, e sono tutte sce
     return ids.length === 4 && ids.every(id => piena.includes('"' + id + '"')) &&
       luoghiFoto.includes("window.mostraScena = function(a, sc, msg, extra)");
   })());
-test("il menu di sistema e l'orologio sanno che la pagina esiste (le liste scritte a mano)",
-  menuSystem.includes('{id:"luogo",    root:"#luogo.on"}') &&
-  menuSystem.includes('typeof chiudiLuogo === "function") chiudiLuogo()') &&
-  menuSystem.includes('root:"#luogo.on",         head:".lfhead"') &&
-  timeControls.includes('{id:"luogo",  root:"#luogo.on",           mute:true}') &&
-  timeControls.includes('renderLuogo()'));
+test("il widget tempo copre tutte le schermate globali e nessuna e' muta",
+  (() => {
+    const ids = ["jail","abilita","strada","negozio","piazza","writer","studio","pannello","luogo","hub"];
+    return ids.every(id => timeControls.includes('{id:"' + id + '"')) &&
+      !timeControls.includes("mute:true") &&
+      timeControls.includes('{id:"abilita",  root:"#abilita.on",        head:null') &&
+      timeControls.includes('{id:"luogo",    root:"#luogo.on",          head:".lfhead"') &&
+      timeControls.includes('renderLuogo()');
+  })());
 test("la pagina sta allo stesso piano dello Studio (55), sotto alla finestra delle scelte (60)",
   /\.luogo\{[^}]*z-index:55/.test(luoghiFotoCss));
 test("la foto sotto alla Piazza sta nello stile dell'elemento, non in una variabile CSS",
@@ -2875,13 +2879,13 @@ test("sul telefono le tre colonne diventano una pila e le porte della Casa vanno
    stringe per gradi in hub.css (1240, 1120), va a capo a 980 in stretto.css e
    sul telefono e' tre righe; sotto i 1520 le card degli eventi stanno su due
    righe e due colonne; le due scatole del profilo non si schiacciano piu';
-   la piazza e il foglio sono muti in tempo-controlli.js. */
+   il widget del tempo resta disponibile anche dentro le pagine interne. */
 {
   const hubCss = leggi("css/hub.css");
   const strettoCss = leggi("css/stretto.css");
   const tempoCtl = leggi("js/game/tempo-controlli.js");
-  test("la fascia della plancia si stringe per gradi: sotto i 1240 il Menu e' la casetta, sotto i 1120 le risorse sono icona e numero",
-    /@media \(max-width: 1240px\) \{[\s\S]*?\.pmenu \.pk \{\s*display: none;/.test(hubCss) &&
+  test("la fascia della plancia si stringe sotto i 1120 senza dipendere dal vecchio Menu",
+    !hubCss.includes(".pmenu") &&
     /@media \(max-width: 1120px\) \{[\s\S]*?\.ps \.pk,\s*\.ps \.pbar \{\s*display: none;/.test(hubCss) &&
     /@media \(max-width: 1120px\) \{[\s\S]*?\.ps:first-child \.pbar \{\s*display: block;/.test(hubCss));
   test("sotto i 980 la fascia va a capo e la riga della griglia cresce con lei; sotto i 620 la pastiglia e' ai nove decimi in una scatola da 160",
@@ -2916,9 +2920,12 @@ test("sul telefono le tre colonne diventano una pila e le porte della Casa vanno
   test("le due scatole del profilo non si schiacciano: la colonna scorre",
     /\.pdue \{[^}]*flex: none;/.test(hubCss) &&
     hubCss.includes("@media (max-height: 820px) and (min-width: 901px)"));
-  test("la piazza e il foglio sono muti in tempo-controlli.js: la pastiglia dell'hub non galleggia sopra al freestyle",
-    tempoCtl.includes('{id:"piazza", root:"#piazza.on",          mute:true}') &&
-    tempoCtl.includes('{id:"writer", root:"#writer.on",          mute:true}'));
+  test("Studio, Luoghi, Piazza e Writer montano il loro widget invece di ereditare quello dell'hub",
+    tempoCtl.includes('{id:"studio",   root:"#studio.on",         head:".sthead"') &&
+    tempoCtl.includes('{id:"luogo",    root:"#luogo.on",          head:".lfhead"') &&
+    tempoCtl.includes('{id:"piazza",   root:"#piazza.on",         head:".phead"') &&
+    tempoCtl.includes('{id:"writer",   root:"#writer.on",         head:".whead"') &&
+    !tempoCtl.includes("mute:true"));
   test("sul telefono la riga piccola di una scelta dello Studio va a capo, al massimo due righe",
     /@media \(max-width:620px\)\{[\s\S]*?\.stchi span\{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;/.test(strettoCss));
 }
