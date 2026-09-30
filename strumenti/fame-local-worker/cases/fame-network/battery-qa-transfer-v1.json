@@ -1,0 +1,57 @@
+{
+  "caseId": "battery-qa-transfer-v1",
+  "sourceCommit": "5f29502092c9b641117e595a70a4489e651e66be",
+  "sourcePath": "strumenti/fame-local-worker/QA_TRANSFER.md",
+  "sourceSnapshot": "cases/fame-network/battery-qa-transfer-source.md",
+  "question": "Se un run del secondo caso chiude VALIDATED_FOR_REVIEW, possiamo considerarlo automaticamente PASS e dichiarare che il worker riduce il tempo umano di revisione?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "Esito primario: `transfer-evaluation.json` deve essere PASS, con prima risposta completa e `candidateErrors=[]`. Il solo `VALIDATED_FOR_REVIEW` non basta: il motore puo assemblare finding valide anche da un candidato contenente errori. La metrica della nuova prova lo distingue senza modificare v6."
+    },
+    {
+      "unitId": "U02",
+      "text": "La revisione umana deve ancora confermare citazioni, significato e utilita. Registrare separatamente tempo di revisione e tempo di una revisione manuale comparabile; il software lascia questi valori null e non dichiara un risparmio non misurato."
+    },
+    {
+      "unitId": "U03",
+      "text": "- PASS e revisione umana soddisfacente: conservare il risultato e valutare un piccolo incarico utile con costo umano misurato. Non certifica ancora una rete multiagente."
+    },
+    {
+      "unitId": "U04",
+      "text": "- Eventuale difetto reale della rubric: registrarlo e invalidare la prova, non trasformarla retroattivamente in PASS."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_YES",
+      "meaning": "Sì: VALIDATED_FOR_REVIEW equivale automaticamente a PASS e autorizza a dichiarare una riduzione del tempo umano."
+    },
+    {
+      "optionId": "ANSWER_NO",
+      "meaning": "No: PASS richiede criteri più stretti e revisione umana; il risparmio di tempo non può essere dichiarato senza misura comparabile."
+    },
+    {
+      "optionId": "ANSWER_INSUFFICIENT",
+      "meaning": "Le evidenze non chiariscono né la differenza tra VALIDATED_FOR_REVIEW e PASS né lo stato delle metriche umane."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_NO",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U01"
+    ],
+    [
+      "U02"
+    ]
+  ],
+  "optionalContext": [
+    "U03",
+    "U04"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
