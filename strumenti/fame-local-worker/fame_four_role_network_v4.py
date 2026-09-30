@@ -166,7 +166,7 @@ def metadata(p):
     }
 
 
-CONSUMED_CASES=frozenset({'source-registry-readiness-network-v1','agent-network-readiness-network-v2','agent-network-readiness-network-v3','model-comparison-generalization-network-v3','single-vs-four-coordinator-causality-v1','single-vs-four-rubric-audit-generalization-v2','battery-qa-transfer-v1','battery-recovery-v1','battery-gptoss-diagnostic-v1','battery-anti-bias-v1','matched-package-authoring-v1','matched-qa-review-v1','matched-cline-real-qa-v1','matched-coordinator-reject-v1','runtime-contract-result-network-v4'})
+CONSUMED_CASES=frozenset({'source-registry-readiness-network-v1','agent-network-readiness-network-v2','agent-network-readiness-network-v3','model-comparison-generalization-network-v3','single-vs-four-coordinator-causality-v1','single-vs-four-rubric-audit-generalization-v2','battery-qa-transfer-v1','battery-recovery-v1','battery-gptoss-diagnostic-v1','battery-anti-bias-v1','matched-package-authoring-v1','matched-qa-review-v1','matched-cline-real-qa-v1','matched-coordinator-reject-v1','runtime-contract-result-network-v4','verifier-v4-branch-probe-v1'})
 
 
 def init(root,case_id):
