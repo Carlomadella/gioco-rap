@@ -198,38 +198,42 @@ def verifier_schema(p,extractor,challenge):
     claims=[c['claimId'] for c in extractor['claims']]
     evidence=[u['unitId'] for u in p['units']]
     issues=[i['issueId'] for i in challenge['issues']]
-    return {
-        'type':'object','additionalProperties':False,
-        'required':['verdict','decisions','antiBiasResolution'],
-        'properties':{
-            'verdict':{'type':'string','enum':p['allowedVerdicts']},
-            'decisions':{
-                'type':'array','minItems':len(claims),'maxItems':len(claims),
-                'items':{
-                    'type':'object','additionalProperties':False,
-                    'required':['claimId','status','evidenceIds','reason'],
-                    'properties':{
-                        'claimId':{'type':'string','enum':claims},
-                        'status':{'type':'string','enum':['SUPPORTED','UNSUPPORTED','NEEDS_REWORK']},
-                        'evidenceIds':{'type':'array','maxItems':4,'uniqueItems':True,
-                                       'items':{'type':'string','enum':evidence}},
-                        'reason':{'type':'string','minLength':1},
-                    },
-                },
-            },
-            'antiBiasResolution':{
-                'type':'array','minItems':len(issues),'maxItems':len(issues),
-                'items':{
-                    'type':'object','additionalProperties':False,
-                    'required':['issueId','status','reason'],
-                    'properties':{
-                        'issueId':{'type':'string','enum':issues},
-                        'status':{'type':'string','enum':['UPHELD','REJECTED','UNRESOLVED']},
-                        'reason':{'type':'string','minLength':1},
-                    },
+    required=['verdict','decisions']
+    properties={
+        'verdict':{'type':'string','enum':p['allowedVerdicts']},
+        'decisions':{
+            'type':'array','minItems':len(claims),'maxItems':len(claims),
+            'items':{
+                'type':'object','additionalProperties':False,
+                'required':['claimId','status','evidenceIds','reason'],
+                'properties':{
+                    'claimId':{'type':'string','enum':claims},
+                    'status':{'type':'string','enum':['SUPPORTED','UNSUPPORTED','NEEDS_REWORK']},
+                    'evidenceIds':{'type':'array','maxItems':4,'uniqueItems':True,
+                                   'items':{'type':'string','enum':evidence}},
+                    'reason':{'type':'string','minLength':1},
                 },
             },
         },
+    }
+    if issues:
+        required.append('antiBiasResolution')
+        properties['antiBiasResolution']={
+            'type':'array','minItems':len(issues),'maxItems':len(issues),
+            'items':{
+                'type':'object','additionalProperties':False,
+                'required':['issueId','status','reason'],
+                'properties':{
+                    'issueId':{'type':'string','enum':issues},
+                    'status':{'type':'string','enum':['UPHELD','REJECTED','UNRESOLVED']},
+                    'reason':{'type':'string','minLength':1},
+                },
+            },
+        }
+    return {
+        'type':'object','additionalProperties':False,
+        'required':required,
+        'properties':properties,
     }
 
 
@@ -285,7 +289,9 @@ def validate_extractor(answer,p):
 
 def validate_verifier(answer,p,extractor,challenge):
     errors=[]
-    if type(answer) is not dict or set(answer)!={'verdict','decisions','antiBiasResolution'}:
+    issue_ids={i['issueId'] for i in challenge['issues']}
+    expected_keys={'verdict','decisions'} | ({'antiBiasResolution'} if issue_ids else set())
+    if type(answer) is not dict or set(answer)!=expected_keys:
         return ['VERIFIER_OUTPUT_CONTRACT']
     if answer.get('verdict') not in p['allowedVerdicts']:
         errors.append('VERIFIER_VERDICT')
@@ -317,8 +323,7 @@ def validate_verifier(answer,p,extractor,challenge):
         if set(seen)!=claim_ids or len(seen)!=len(set(seen)):
             errors.append('VERIFIER_DECISION_COVERAGE')
 
-    issue_ids={i['issueId'] for i in challenge['issues']}
-    resolutions=answer.get('antiBiasResolution')
+    resolutions=answer.get('antiBiasResolution',[])
     if type(resolutions) is not list or len(resolutions)!=len(issue_ids):
         errors.append('VERIFIER_ANTIBIAS_RESOLUTION_COUNT')
     else:
@@ -365,7 +370,7 @@ def validate_integrator(answer,p,extractor,challenge,verifier):
             errors.append('INTEGRATOR_INSUFFICIENT_FINAL_EVIDENCE')
 
     issue_by_id={row['issueId']:row for row in challenge['issues']}
-    for resolution in verifier['antiBiasResolution']:
+    for resolution in verifier.get('antiBiasResolution',[]):
         issue=issue_by_id.get(resolution['issueId'])
         if issue and issue['severity']=='BLOCKING' and resolution['status']!='REJECTED':
             errors.append('INTEGRATOR_BLOCKING_ANTIBIAS_NOT_REJECTED')
