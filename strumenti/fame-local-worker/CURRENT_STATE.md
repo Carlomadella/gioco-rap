@@ -232,3 +232,8 @@ Aggiunto `direct_qa_v2_aggregate.py`: legge root storiche v2 e verifica le recei
 ## Verifica aggregatore v2
 
 Checkpoint `a3ef4ac1151cdf1cfc00b1866042ef33b36b3a31`: aggregatore storico e relativi test integrati. GitHub Actions `Verifica FAME local worker`, run `36691459244`: `success`, 79 test, `OK`.
+
+
+## Correzione input aggregatore v2
+
+Il primo tentativo operativo dell'aggregatore ha evidenziato un mismatch d'interfaccia: il comando documentato passava root di queue `FAME_DIRECT_QA_NETWORK_V2_*`, mentre il codice cercava `desk.json` direttamente nella root. Corretto `direct_qa_v2_aggregate.py` per accettare sia root di queue sia singole desk root, espandendo deterministicamente `queue.json -> desks/<task>`. Aggiunto test dedicato.
