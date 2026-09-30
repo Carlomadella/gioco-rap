@@ -147,8 +147,37 @@ def load_root(root):
     }
 
 
+def expand_roots(roots):
+    desks=[]
+    for value in roots:
+        root=Path(value).resolve()
+        if not root.is_dir():
+            raise ValueError('Root inesistente: '+str(root))
+        if (root/'desk.json').is_file():
+            desks.append(root)
+            continue
+        queue_path=root/'queue.json'
+        if queue_path.is_file() and (root/'desks').is_dir():
+            queue=agent.read(queue_path)
+            if queue.get('schema')!='fame-direct-qa-queue-v2':
+                raise ValueError('Queue v2 non valida: '+str(root))
+            tasks=queue.get('tasks')
+            if type(tasks) is not list or not tasks:
+                raise ValueError('Queue senza task: '+str(root))
+            for task in tasks:
+                if not isinstance(task,str) or not task:
+                    raise ValueError('Task queue non valido: '+str(root))
+                desk=root/'desks'/task
+                if not desk.is_dir():
+                    raise ValueError('Desk mancante nella queue: '+str(desk))
+                desks.append(desk)
+            continue
+        raise ValueError('Root non riconosciuta come desk o queue v2: '+str(root))
+    return desks
+
+
 def summarize(roots):
-    rows=[load_root(Path(root)) for root in roots]
+    rows=[load_root(root) for root in expand_roots(roots)]
     tasks=[row['taskId'] for row in rows]
     if len(tasks)!=len(set(tasks)):
         raise ValueError('Task duplicato: un task consumato puo comparire una sola volta nel riepilogo')
