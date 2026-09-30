@@ -530,8 +530,9 @@ if(typeof mostraScena === "function"){
   window.mostraScena = function(a, sc, msg, extra){
     /* Fabbrica e Pizzeria hanno renderer distinti; condividono solo l'azione
        turno. Se parte da una delle due pagine, l'esito resta su quel luogo. */
-    const turnoLuogo = a && a.id === "turno" && LUOGO &&
-      (LUOGO.id === "fabbrica" || LUOGO.id === "pizzeria") ? LUOGO.id : null;
+    const turnoLuogo = a && a.id === "turno" && LUOGO && G && G.job &&
+      ((LUOGO.id === "fabbrica" && G.job.id === "operaio") ||
+       (LUOGO.id === "pizzeria" && G.job.id === "lavapiatti")) ? LUOGO.id : null;
     const id = a && (LUOGO_MOSSE[a.id] || turnoLuogo);
     if(!id) return lfScenaOriginale.apply(this, arguments);
     const esito = {a:a.id, msg:String(msg == null ? "" : msg), extra:String(extra == null ? "" : extra)};
