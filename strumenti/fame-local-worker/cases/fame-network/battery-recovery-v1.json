@@ -1,0 +1,57 @@
+{
+  "caseId": "battery-recovery-v1",
+  "sourceCommit": "5530c2649ddda83a07511f8e0549d4ccf45723fe",
+  "sourcePath": "strumenti/fame-local-worker/RECOVERY.md",
+  "sourceSnapshot": "cases/fame-network/battery-recovery-source.md",
+  "question": "Se il recovery arriva a VALIDATED_AFTER_RECOVERY, possiamo riscrivere il first pass come 14/14 e considerare già dimostrata la generalizzazione della scomposizione?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "- `VALIDATED_AFTER_RECOVERY`: entrambe le verifiche accettate, evidenze unite sufficienti per la rubrica originale e tutti i dieci finding validi. Vengono scritti anche answer.json e review.md.\n- `NEEDS_REVIEW`: recupero non completo; nessun report finale promosso. Conservare raw response, result ed evaluation per diagnosi.\n- `firstPassAccepted=13`, `firstPassTotal=14`, `firstPassPassed=false` restano invariati anche se dopo il recupero si arriva a 14/14."
+    },
+    {
+      "unitId": "U02",
+      "text": "4. Misurare separatamente primo passaggio, recuperi, falsi positivi, evidenze mancanti, chiamate, tempo modello e revisione umana. Un nuovo report potrà valutare trasferimento; questo recovery sul caso noto no.\n5. Solo dopo quel controllo assegnare un primo lavoro QA reale ristretto. La generalizzazione della scomposizione è ancora da progettare: questa versione implementa esplicitamente il caso low-end, non un pianificatore autonomo universale."
+    },
+    {
+      "unitId": "U03",
+      "text": "Un secondo `run` visita soltanto incarichi mai tentati: nessun retry automatico di errori, fallimenti o tentativi interrotti. Non cancellare una cartella per ottenere un nuovo primo tentativo."
+    },
+    {
+      "unitId": "U04",
+      "text": "Recovery reale riportato: 1/2, rete ancora 13/14 secondo il protocollo congelato. Completato audit delle 14 rubriche; il supporto contestuale E152+E153+E154 viene distinto dalla prova diretta E155. Leggere [RUBRIC_AUDIT.md](RUBRIC_AUDIT.md) ed eseguire `qa_rubric_audit.py` sugli artefatti esistenti. Nessun retry Ollama; esiti storici immutati."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_YES",
+      "meaning": "Sì: VALIDATED_AFTER_RECOVERY riscrive il first pass come 14/14 e dimostra già la generalizzazione della scomposizione."
+    },
+    {
+      "optionId": "ANSWER_NO",
+      "meaning": "No: il first pass resta 13/14 anche dopo recovery e il recovery sul caso noto non dimostra generalizzazione; serve un nuovo report/protocollo."
+    },
+    {
+      "optionId": "ANSWER_INSUFFICIENT",
+      "meaning": "Le evidenze non specificano né lo stato del first pass né cosa serva per valutare generalizzazione."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_NO",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U01"
+    ],
+    [
+      "U02"
+    ]
+  ],
+  "optionalContext": [
+    "U03",
+    "U04"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
