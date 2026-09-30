@@ -1,0 +1,57 @@
+{
+  "caseId": "matched-coordinator-reject-v1",
+  "sourceCommit": "b7cb6bb14a99ab2002c8eda633be7a06dc0b0eca",
+  "sourcePath": "strumenti/fame-local-worker/DIRECT_QA_COORDINATOR_ARCHITECTURE_V2_RESULT_2026-09-30.md",
+  "sourceSnapshot": "cases/fame-network/matched-coordinator-result-source.md",
+  "question": "Il fatto che il task coordinator architecture abbia status REJECTED dimostra che il modello ha fallito semanticamente e giustifica rilanciare lo stesso task dopo l'hardening del validator?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "Esito formale: status REJECTED; modelCalls 2; firstAttemptPass false; acceptedAfterRepair false; queue status NEEDS_REVIEW; executionAuthorized false. Il task è consumato e non viene ritentato."
+    },
+    {
+      "unitId": "U02",
+      "text": "Attempt 1: failure di output budget con done_reason length, eval_count 2048 e validation INVALID_RESPONSE:Risposta incompleta. Non esiste candidate.json per attempt-1."
+    },
+    {
+      "unitId": "U03",
+      "text": "Attempt 2: tutte le cinque conclusioni sono corrette; tutti i quattro check positivi hanno coverage sufficiente; il controllo negativo è corretto. L'unico errore formale è COORDINATOR_SCOPE:UNREVIEWED_EVIDENCE. U06 è pertinente. Il reject è quindi classificato come precision false negative del validator, non errore semantico."
+    },
+    {
+      "unitId": "U04",
+      "text": "Hardening successivo: num_predict portato da 2048 a 4096; task aggiunto ai consumati; evidence ID extra vengono rimossi host-side solo se conclusione e required coverage sono già corrette; missing evidence continua a fallire normalmente."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_YES",
+      "meaning": "Sì: REJECTED prova un fallimento semantico del modello e il task dovrebbe essere rilanciato dopo l'hardening per ottenere un PASS corretto."
+    },
+    {
+      "optionId": "ANSWER_NO",
+      "meaning": "No: il reject include un troncamento e poi un precision false negative non semantico; il task resta consumato e l'hardening si applica ai casi futuri senza rilanciare lo stesso task."
+    },
+    {
+      "optionId": "ANSWER_INSUFFICIENT",
+      "meaning": "Le evidenze non chiariscono né la causa del REJECTED né se il task sia consumato."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_NO",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U01"
+    ],
+    [
+      "U03"
+    ]
+  ],
+  "optionalContext": [
+    "U02",
+    "U04"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
