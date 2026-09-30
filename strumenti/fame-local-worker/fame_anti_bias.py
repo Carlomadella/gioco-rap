@@ -73,12 +73,24 @@ APPLICABILITY=("APPLICABLE","NOT_APPLICABLE_WITH_REASON","UNCERTAIN_APPLICABILIT
 SEVERITY=("BLOCKING","NONBLOCKING")
 
 SYSTEM="""Sei il challenger Anti-Bias indipendente di FAME Neural.
-Il tuo ruolo è separato dal worker che ha prodotto i claim: non difendere la sintesi precedente.
+Il tuo ruolo è separato dal worker che ha prodotto i claim: non difendere la sintesi precedente,
+ma non inventare difetti per forza.
 Usa solo la domanda, le unità di evidenza e i claim congelati forniti.
 Non modificare i claim e non inventare nuove prove.
-Per ciascuno dei sei controlli indica applicabilità e motivo.
-Cerca attivamente evidenza contraria, selezione favorevole, doppio conteggio, assunzioni nascoste,
-mismatch claim-evidenza e alternative/failure limits.
+Per ciascuno dei sei controlli indica applicabilità e motivo. Un controllo APPLICABLE può non produrre
+alcun issue se il rischio è già gestito correttamente dai claim.
+Prima di emettere un issue, rileggi il testo ESATTO dei claim target e verifica che il problema non sia
+già esplicitamente qualificato o limitato nel claim stesso.
+Il riuso della stessa unità in più claim NON è di per sé double counting: FAME-AB-03 si applica quando
+evidenze apparentemente indipendenti vengono aggregate come corroborazioni distinte pur condividendo
+la stessa origine/lineage.
+Una condizione già dichiarata nel claim NON è una hidden assumption e NON è un failure limit omesso.
+Cerca attivamente evidenza contraria, selezione favorevole, vere dipendenze, assunzioni nascoste,
+mismatch claim-evidenza e alternative/failure limits materiali.
+Semantica overall:
+- zero issue -> ANTI_BIAS_CHALLENGE_PASS_WITHIN_SCOPE;
+- solo issue NONBLOCKING -> ANTI_BIAS_CHALLENGE_PASS_WITH_LIMITATIONS;
+- almeno un issue BLOCKING -> ANTI_BIAS_REWORK_REQUIRED, oppure stato di insufficienza/contraddizione appropriato.
 Un issue materiale deve produrre un rework concreto, non una semplice etichetta.
 Non dichiarare mai che il sistema è unbiased, bias-free o che il bias è eliminato.
 Non autorizzare training, esecuzioni o modifiche. Restituisci esclusivamente il JSON richiesto.
@@ -190,15 +202,22 @@ def validate(answer, claims, units):
     if answer.get("residualBiasUncertaintyExplicit") is not True:
         errors.append("ANTI_BIAS_RESIDUAL_UNCERTAINTY")
 
-    blocking=any(isinstance(row,dict) and row.get("severity")=="BLOCKING" for row in (issues or []))
-    if blocking and answer.get("overall") not in (
+    valid_issues=issues if type(issues) is list else []
+    blocking=any(isinstance(row,dict) and row.get("severity")=="BLOCKING" for row in valid_issues)
+    nonblocking=any(isinstance(row,dict) and row.get("severity")=="NONBLOCKING" for row in valid_issues)
+    overall=answer.get("overall")
+    if blocking and overall not in (
         "ANTI_BIAS_REWORK_REQUIRED",
         "ANTI_BIAS_EVIDENCE_INSUFFICIENT",
         "ANTI_BIAS_RESULTS_CONTRADICTORY",
     ):
         errors.append("ANTI_BIAS_BLOCKING_ISSUE_NOT_REFLECTED")
-    if answer.get("overall")=="ANTI_BIAS_REWORK_REQUIRED" and not blocking:
+    if overall=="ANTI_BIAS_REWORK_REQUIRED" and not blocking:
         errors.append("ANTI_BIAS_REWORK_WITHOUT_BLOCKING_ISSUE")
+    if not blocking and nonblocking and overall!="ANTI_BIAS_CHALLENGE_PASS_WITH_LIMITATIONS":
+        errors.append("ANTI_BIAS_NONBLOCKING_OVERALL_MISMATCH")
+    if not blocking and not nonblocking and overall!="ANTI_BIAS_CHALLENGE_PASS_WITHIN_SCOPE":
+        errors.append("ANTI_BIAS_CLEAN_OVERALL_MISMATCH")
 
     return sorted(set(errors))
 
