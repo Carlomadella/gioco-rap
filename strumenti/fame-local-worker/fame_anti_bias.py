@@ -197,6 +197,8 @@ def validate(answer, claims, units):
         "ANTI_BIAS_RESULTS_CONTRADICTORY",
     ):
         errors.append("ANTI_BIAS_BLOCKING_ISSUE_NOT_REFLECTED")
+    if answer.get("overall")=="ANTI_BIAS_REWORK_REQUIRED" and not blocking:
+        errors.append("ANTI_BIAS_REWORK_WITHOUT_BLOCKING_ISSUE")
 
     return sorted(set(errors))
 
