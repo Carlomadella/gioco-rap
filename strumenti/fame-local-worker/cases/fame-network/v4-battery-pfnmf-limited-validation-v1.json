@@ -1,0 +1,53 @@
+{
+  "caseId": "v4-battery-pfnmf-limited-validation-v1",
+  "sourceCommit": "1283c9678ece6b64ea6b030b75236bed24cddad6",
+  "sourcePath": "strumenti/fame-local-worker/DIRECT_QA_PFNMF_RESULT_2026-09-23.md",
+  "sourceSnapshot": "cases/fame-network/v4-battery-pfnmf-source.md",
+  "question": "Quale interpretazione del primo run reale PF-NMF è giustificata dal report?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "Il risultato e operator-reported: il repository non contiene i byte della root locale del run e non certifica autonomamente la sessione Ollama."
+    },
+    {
+      "unitId": "U02",
+      "text": "Questo checkpoint valida il percorso operativo del worker generico su un primo task reale documentale:\n\n`pacchetto congelato -> Ollama diretto -> JSON Schema -> validatore host -> review umana`."
+    },
+    {
+      "unitId": "U03",
+      "text": "Non e una nuova evaluation audio, non autorizza training/batch131/produzione e non dimostra affidabilita generale del modello. Il prossimo task deve essere diverso e utile; non va ripetuto `pfnmf-review-v1` in una nuova root per ottenere un altro first attempt."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_LIMITED_OPERATIONAL_VALIDATION",
+      "meaning": "Il run valida il percorso operativo su un primo task documentale, ma resta operator-reported e non dimostra affidabilità generale né certifica autonomamente la sessione Ollama."
+    },
+    {
+      "optionId": "ANSWER_GENERAL_RELIABILITY",
+      "meaning": "Il run dimostra affidabilità generale del modello e il repository certifica autonomamente la sessione Ollama."
+    },
+    {
+      "optionId": "ANSWER_INSUFFICIENT",
+      "meaning": "Il report non consente neppure di stabilire se il percorso operativo abbia funzionato sul task PF-NMF."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_LIMITED_OPERATIONAL_VALIDATION",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U01"
+    ],
+    [
+      "U02"
+    ],
+    [
+      "U03"
+    ]
+  ],
+  "optionalContext": [],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
