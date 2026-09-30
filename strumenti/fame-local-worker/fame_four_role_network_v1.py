@@ -11,15 +11,14 @@ import time
 from pathlib import Path
 
 import agent
-import direct_qa_worker_v2 as direct_v2
 import fame_anti_bias as anti_bias
 
 BASE=Path(__file__).resolve().parent
 CASE_DIR=BASE/'cases'/'fame-network'
 VERSION='fame-four-role-network-v1'
-MODEL=direct_v2.MODEL
-DIGEST=direct_v2.DIGEST
-OPTIONS=dict(direct_v2.OPTIONS)
+MODEL='gpt-oss:20b'
+DIGEST='17052f91a42e97930aa6e28a6c6c06a983e6a58dbb00434885a0cf5313e376f7'
+OPTIONS=dict(num_ctx=32768,num_predict=4096,temperature=0,seed=42)
 ROLES=('extractor','anti-bias','verifier','integrator')
 VERDICTS=('GREEN_IS_SUFFICIENT','CONDITIONS_REQUIRED','INSUFFICIENT')
 FINAL_ACCEPTED='PROPOSED_FOR_HUMAN_REVIEW'
@@ -54,7 +53,7 @@ def digest(value):
 
 
 def code_hashes():
-    names=('fame_four_role_network_v1.py','fame_anti_bias.py','agent.py','direct_qa_worker_v2.py')
+    names=('fame_four_role_network_v1.py','fame_anti_bias.py','agent.py')
     return {name:hashlib.sha256((BASE/name).read_bytes()).hexdigest() for name in names}
 
 
@@ -437,18 +436,80 @@ def verify_receipt(out):
     return True
 
 
-def role_result(root,role):
+def expected_core(role,response,validator):
+    try:
+        answer=parse_complete(response)
+        errors=validator(answer)
+        return {'role':role,'status':'ACCEPTED' if not errors else 'REJECTED',
+                'errors':errors,'output':answer,
+                'metrics':{k:response.get(k) for k in ('total_duration','load_duration','prompt_eval_count','eval_count','done_reason')}}
+    except Exception as exc:
+        return {'role':role,'status':'ERROR','errors':[f'{type(exc).__name__}: {exc}'],'output':None}
+
+
+def read_role(root,role,expected_request=None,validator=None):
     out=root/'roles'/role/'attempt-1'
     if not out.exists():
         return {'status':'PENDING'}
     if not verify_receipt(out):
         return {'status':'INTERRUPTED'}
-    return agent.read(out/'result.json')
+    saved=agent.read(out/'result.json')
+    response_path=out/'response.json'
+    if not response_path.exists():
+        if saved.get('status')!='ERROR':
+            raise ValueError('Risposta assente senza ERROR: '+role)
+        return saved
+    if expected_request is None or validator is None:
+        raise ValueError('Dipendenze replay mancanti: '+role)
+    if agent.read(out/'request.json')!=expected_request:
+        raise ValueError('Request storica non conforme: '+role)
+    response=agent.read(response_path)
+    expected=expected_core(role,response,validator)
+    for key,value in expected.items():
+        if saved.get(key)!=value:
+            raise ValueError('Risultato non riproducibile: '+role+'/'+key)
+    return saved
+
+
+def replay_roles(root,p):
+    rows={}
+
+    ext=read_role(root,'extractor',extractor_request(p),lambda a:validate_extractor(a,p))
+    rows['extractor']=ext
+    if ext['status']!='ACCEPTED':
+        for role in ROLES[1:]:
+            rows[role]=read_role(root,role) if (root/'roles'/role/'attempt-1').exists() else {'status':'PENDING'}
+        return rows
+    extractor=ext['output']
+
+    ab_request=antibias_request(p,extractor)
+    ab=read_role(root,'anti-bias',ab_request,lambda a:anti_bias.validate(a,extractor['claims'],p['units']))
+    rows['anti-bias']=ab
+    if ab['status']!='ACCEPTED':
+        for role in ROLES[2:]:
+            rows[role]=read_role(root,role) if (root/'roles'/role/'attempt-1').exists() else {'status':'PENDING'}
+        return rows
+    challenge=ab['output']
+
+    ver_request=verifier_request(p,extractor,challenge)
+    ver=read_role(root,'verifier',ver_request,lambda a:validate_verifier(a,p,extractor,challenge))
+    rows['verifier']=ver
+    if ver['status']!='ACCEPTED':
+        rows['integrator']=read_role(root,'integrator') if (root/'roles'/'integrator'/'attempt-1').exists() else {'status':'PENDING'}
+        return rows
+    verifier=ver['output']
+
+    int_request=integrator_request(p,extractor,challenge,verifier)
+    rows['integrator']=read_role(
+        root,'integrator',int_request,
+        lambda a:validate_integrator(a,p,extractor,challenge,verifier)
+    )
+    return rows
 
 
 def status(root):
     p=verify(root)
-    rows={role:role_result(root,role) for role in ROLES}
+    rows=replay_roles(root,p)
     for role in ROLES:
         state=rows[role]['status']
         if state in ('REJECTED','ERROR','INTERRUPTED'):
@@ -513,7 +574,7 @@ def run(root,client=None):
         if preflight['model']['digest']!=DIGEST:
             raise ValueError('Digest modello diverso dal protocollo')
 
-        ext=role_result(root,'extractor')
+        ext=status(root)['roles']['extractor']
         if ext['status']=='PENDING':
             print('[1/4] Extractor: attesa Ollama...',flush=True)
             ext=execute_role(root,'extractor',extractor_request(p),lambda a:validate_extractor(a,p),client)
@@ -521,7 +582,7 @@ def run(root,client=None):
             return status(root)
         extractor=ext['output']
 
-        ab=role_result(root,'anti-bias')
+        ab=status(root)['roles']['anti-bias']
         if ab['status']=='PENDING':
             print('[2/4] Anti-Bias indipendente: attesa Ollama...',flush=True)
             req=antibias_request(p,extractor)
@@ -530,7 +591,7 @@ def run(root,client=None):
             return status(root)
         challenge=ab['output']
 
-        ver=role_result(root,'verifier')
+        ver=status(root)['roles']['verifier']
         if ver['status']=='PENDING':
             print('[3/4] Verifier: attesa Ollama...',flush=True)
             req=verifier_request(p,extractor,challenge)
@@ -539,7 +600,7 @@ def run(root,client=None):
             return status(root)
         verifier=ver['output']
 
-        integ=role_result(root,'integrator')
+        integ=status(root)['roles']['integrator']
         if integ['status']=='PENDING':
             print('[4/4] Integrator: attesa Ollama...',flush=True)
             req=integrator_request(p,extractor,challenge,verifier)
