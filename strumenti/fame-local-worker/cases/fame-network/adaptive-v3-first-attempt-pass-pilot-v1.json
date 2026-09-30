@@ -1,0 +1,66 @@
+{
+  "caseId": "adaptive-v3-first-attempt-pass-pilot-v1",
+  "sourceCommit": "2f5851de4f177588f5987e2d014830152b9a4ac5",
+  "sourcePath": "strumenti/fame-local-worker/DIRECT_QA_TSUMUGI_SCORE_DIAGNOSTIC_V2_RESULT_2026-09-30.md",
+  "sourceSnapshot": "cases/fame-network/adaptive-v3-first-attempt-pass-source.md",
+  "question": "Quale conclusione è giustificata dal primo run reale Direct QA V2, distinguendo ciò che il case dimostra da ciò che resta non dimostrato o non autorizzato?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "Il primo run reale del worker v2 ha restituito:\n\n- status: `VALIDATED_FOR_REVIEW`;\n- `firstAttemptPass: true`;\n- `acceptedAfterRepair: false`;\n- model calls: 1;\n- attempt-2: non eseguito;\n- `executionAuthorized: false`;\n- `trainingAuthorized: false`;\n- `networkProductionReady: false`;\n- `independentEvaluation: false`."
+    },
+    {
+      "unitId": "U02",
+      "text": "Il validator host ha accettato tutti i cinque check senza errori:\n\n1. `RAW_PITCH_RECONSTRUCTION` — conclusione corretta, coverage sufficiente;\n2. `SCORE_HEAD_FAILURE_LOCALIZED` — conclusione corretta, coverage sufficiente;\n3. `NO_SYNTHETIC_DECODER_TUNING` — conclusione corretta, coverage sufficiente;\n4. `REAL_EASY_COHORT_SCOPE` — conclusione corretta, coverage sufficiente;\n5. `FRESH_EVALUATION_OR_PROMOTION_AUTHORIZED` — conclusione corretta; coverage non richiesta perché controllo negativo."
+    },
+    {
+      "unitId": "U03",
+      "text": "Nessun `precisionWarning` e nessun `unreviewedEvidenceId` sono stati registrati. La `review.md` mostrata nella sessione usa U02+U03, U04+U06, U07 e U08 per i quattro check positivi e restituisce `False` sul controllo negativo finale, coerentemente con la rubrica congelata."
+    },
+    {
+      "unitId": "U04",
+      "text": "`humanReviewRequired` resta `true`: la review è stata ispezionata nella sessione, ma non è stato misurato separatamente un tempo di revisione umana e questo report non lo inventa."
+    },
+    {
+      "unitId": "U05",
+      "text": "Questo è un PASS reale al primo tentativo della v2 e dimostra che, su questo nuovo task documentale congelato, il worker può produrre una risposta conforme senza repair. Non dimostra affidabilità generale, non valida una rete autonoma multi-agent e non autorizza attività Audio→MIDI, training, P6 o produzione."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_LIMITED_FIRST_ATTEMPT_PASS",
+      "meaning": "Il run è un PASS reale al primo tentativo: una sola chiamata, nessun repair e cinque check accettati. Dimostra conformità su questo task congelato; human review resta richiesta e il risultato non dimostra affidabilità generale, non valida una rete autonoma multi-agent e non autorizza training o produzione."
+    },
+    {
+      "optionId": "ANSWER_GENERAL_NETWORK_VALIDATION",
+      "meaning": "Il PASS al primo tentativo dimostra che la rete multi-agent è generalmente affidabile e può essere considerata pronta per produzione e training senza ulteriore validazione."
+    },
+    {
+      "optionId": "ANSWER_FAILED_REPAIR_REQUIRED",
+      "meaning": "Il run non è passato al primo tentativo: ha richiesto repair e più chiamate prima di essere accettato, quindi resta un failure operativo."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_LIMITED_FIRST_ATTEMPT_PASS",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U01"
+    ],
+    [
+      "U02"
+    ],
+    [
+      "U04"
+    ],
+    [
+      "U05"
+    ]
+  ],
+  "optionalContext": [
+    "U03"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
