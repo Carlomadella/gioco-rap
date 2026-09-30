@@ -264,3 +264,36 @@ Primo pilot congelato: `source-registry-readiness-network-v1`, su `SOURCE_REGIST
 Domanda: una fonte `green` è automaticamente pronta per training simbolico commerciale o servono ancora condizioni?
 
 Nessuna inferenza reale della rete a quattro ruoli è stata ancora eseguita.
+
+
+## Primo pilot reale Four-Role Network V1
+
+Root locale: `FAME_FOUR_ROLE_NETWORK_V1_20260930_114109`.
+
+Esito:
+- Extractor `ACCEPTED`;
+- Anti-Bias `REJECTED`;
+- Verifier non eseguito;
+- Integrator non eseguito.
+
+Errore formale Anti-Bias: `ANTI_BIAS_REWORK_WITHOUT_BLOCKING_ISSUE`.
+
+Il challenger ha inoltre sovra-segnalato problemi già coperti dai claim e ha trattato il semplice riuso della stessa unità come double counting. Il validator fail-closed ha fermato correttamente il run.
+
+Il risultato resta FAIL storico e non viene promosso retroattivamente. Report: [FAME_FOUR_ROLE_NETWORK_V1_SOURCE_REGISTRY_RESULT_2026-09-30.md](FAME_FOUR_ROLE_NETWORK_V1_SOURCE_REGISTRY_RESULT_2026-09-30.md).
+
+## Four-Role Network V2
+
+Preparata `fame_four_role_network_v2.py` come nuovo protocollo:
+- Extractor senza verdetto;
+- Anti-Bias calibrato per non inventare issue;
+- primo verdetto al Verifier;
+- verdict ammessi definiti dal case;
+- rubric/expected verdict host-only;
+- stesso flusso fail-closed e quattro chiamate massime senza retry.
+
+Secondo pilot congelato: `agent-network-readiness-network-v2`, su un documento diverso dal pilot V1.
+
+Dettagli: [FAME_FOUR_ROLE_NETWORK_V2.md](FAME_FOUR_ROLE_NETWORK_V2.md).
+
+Verifica automatica dopo V2: GitHub Actions `Verifica FAME local worker` PASS con 80 test Direct-QA + 25 test FAME network/Anti-Bias.
