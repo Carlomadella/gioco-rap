@@ -6,6 +6,7 @@ const path=require("node:path");
 const cp=require("node:child_process");
 const {spawn}=require("node:child_process");
 const renderer=require("./audio-to-midi-human-review-v2");
+const pitchRenderer=require("./audio-to-midi-drum-pitch-renderer");
 
 const DEFAULT_WORKSPACE="D:\\FAME_NEURAL";
 const DEFAULT_FAMILY="FAME000126";
@@ -73,7 +74,8 @@ function load(workspace,rid){
     rid,baseline,tsumugi,drumsStem,bassStem,drumsDuration,bassDuration,
     fusionWav:renderer.renderDrums(fusion,drumsDuration),
     bassWav:renderer.renderBassNotes(low,bassDuration),
-    tsumugiWav:tsumugi?renderer.renderDrums(tsumugiEvents,drumsDuration):null
+    tsumugiWav:tsumugi?pitchRenderer.render(tsumugiEvents,drumsDuration):null,
+    tsumugiPitchSummary:tsumugi?pitchRenderer.summarize(tsumugiEvents):[]
   };
 }
 
@@ -107,6 +109,10 @@ function html(data){
   const tCount=t?.events?.length??0;
   const tRoles=t?.roleCounts||{};
   const fusionRoles=fusion.roleCounts||{};
+  const pitchRows=(data.tsumugiPitchSummary||[]).map(x=>
+    '<tr><td>'+x.pitch+'</td><td>'+x.name+'</td><td>'+x.family+'</td><td>'+x.count+'</td></tr>'
+  ).join("");
+  const distinctPitchCount=(data.tsumugiPitchSummary||[]).length;
   return `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FAME Audio→MIDI audition — ${data.rid}</title>
 <style>
@@ -114,6 +120,7 @@ body{margin:0;background:#0c0f14;color:#eef2f7;font-family:system-ui,Segoe UI,Ar
 main{max-width:980px;margin:auto;padding:24px}.panel{background:#151b23;border:1px solid #2c3744;border-radius:14px;padding:18px;margin:14px 0}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.muted{color:#9eacba}audio{width:100%}
 code{background:#0b0e12;padding:2px 5px;border-radius:5px}.good{color:#9ee493}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #2c3744}th{color:#9eacba}
 @media(max-width:760px){.grid{grid-template-columns:1fr}}
 </style></head><body><main>
 <h1>FAME Audio→MIDI audition — ${data.rid}</h1>
@@ -122,9 +129,11 @@ code{background:#0b0e12;padding:2px 5px;border-radius:5px}.good{color:#9ee493}
 <div class="panel"><h2>Drums reference</h2><p class="muted">Stem separato già esistente</p><audio controls src="/audio/drums-reference"></audio></div>
 
 <div class="grid">
-<div class="panel"><h2>Tsumugi drums</h2>
-<p>${t?"Eventi: <b>"+tCount+"</b> · kick "+(tRoles.kick||0)+" · snare "+(tRoles.snare||0)+" · hihat "+(tRoles.hihat||0):"Non disponibile per questa family"}</p>
+<div class="panel"><h2>Tsumugi drums — pitch MIDI distinti</h2>
+<p>${t?"Eventi: <b>"+tCount+"</b> · pitch MIDI distinti: <b>"+distinctPitchCount+"</b>":"Non disponibile per questa family"}</p>
 ${t?'<audio controls src="/audio/tsumugi"></audio>':'<p class="muted">Nessun output Tsumugi.</p>'}
+${t?'<p class="muted">Questo player usa il pitch MIDI effettivo dell’output Tsumugi: clap, rim, tom e cymbal non vengono più trasformati automaticamente in hi-hat.</p>':''}
+${t?'<table><thead><tr><th>Pitch</th><th>GM</th><th>Famiglia</th><th>Eventi</th></tr></thead><tbody>'+pitchRows+'</tbody></table>':''}
 </div>
 <div class="panel"><h2>Baseline drums + bass kick fusion</h2>
 <p>Eventi: <b>${fusion.eventCount}</b> · kick ${fusionRoles.kick||0} · snare ${fusionRoles.snare||0} · hihat ${fusionRoles.hihat||0}</p>
@@ -137,7 +146,8 @@ ${t?'<audio controls src="/audio/tsumugi"></audio>':'<p class="muted">Nessun out
 <audio controls src="/audio/bass-pyin"></audio></div>
 
 <div class="panel"><h2>Cosa ascoltare</h2>
-<p>Drums: kick/snare/hi-hat mancanti o inventati, timing e confusioni di ruolo. Bass: note sbagliate, salti di ottava, note estranee e durata delle note.</p>
+<p><b>Tsumugi:</b> ora valuta anche clap, rim, tom, crash/ride e altre percussioni quando il modello emette quei pitch. <b>Baseline fusion:</b> resta volutamente limitata a kick/snare/hi-hat, quindi non usarla per giudicare la copertura completa del drum kit.</p>
+<p>Bass: note sbagliate, salti di ottava, note estranee e durata delle note.</p>
 <p class="good">Nessun file viene modificato e non viene eseguita alcuna nuova trascrizione.</p></div>
 </main></body></html>`;
 }
@@ -191,9 +201,10 @@ function serve(workspaceRoot=DEFAULT_WORKSPACE,rid=DEFAULT_FAMILY,port=0){
 
 function selfTest(){
   const d=renderer.renderDrums([{timeSeconds:0.1,role:"kick"}],0.5);
+  const p=pitchRenderer.selfTest();
   const b=renderer.renderBassNotes([{startSeconds:0.1,endSeconds:0.3,midiNote:48}],0.5);
   if(d.toString("ascii",0,4)!=="RIFF"||b.toString("ascii",0,4)!=="RIFF")throw new Error("Renderer self-test failed");
-  return {mode:"FAME_AUDIO_TO_MIDI_AUDITION_SELF_TEST_PASS",rendererId:renderer.RENDERER_ID};
+  return {mode:"FAME_AUDIO_TO_MIDI_AUDITION_SELF_TEST_PASS",rendererId:renderer.RENDERER_ID,pitchRenderer:p.mode};
 }
 
 function main(){
