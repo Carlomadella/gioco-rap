@@ -668,3 +668,22 @@ Il pilot completo non ha però esercitato i bucket negativi. Preparato quindi `f
 Case probe: `verifier-v4-branch-probe-v1`, fonte `DIRECT_QA_TSUMUGI_CONTROLLED_RESULT_2026-09-23.md`.
 
 Verifica automatica: 80 Direct-QA + 91 FAME, tutti OK.
+
+
+## Verifier V4 branch probe v1 — esito
+
+Una chiamata reale. Il Verifier V4 ha prodotto una partizione strutturalmente valida:
+- supported C1/C4;
+- unsupported C2/C3;
+- rework vuoto;
+- nessun evidenceId nei bucket negativi.
+
+Il probe è stato REJECTED rispetto alla target rubric originaria. Review umana: difetto di authoring della rubric, non failure del contratto V4. C3 era direttamente contraddetto da U04 e quindi `unsupported` era corretto; non era un vero caso `rework`.
+
+Il probe v1 resta consumato e non viene ritentato.
+
+Preparato `verifier-v4-branch-probe-v2` con C3 realmente parziale: il claim conserva il fatto supportato che il worker one-shot è utile come misura del primo tentativo, ma aggiunge l'overclaim che sarebbe sufficiente come percorso operativo generale. Target host-only: supported C1/C4, unsupported C2, rework C3, ANSWER_MIXED.
+
+Runner: `fame_verifier_v4_branch_probe_v2.py`.
+
+Verifica automatica pre-run: 80 Direct-QA + 96 FAME, tutti OK.
