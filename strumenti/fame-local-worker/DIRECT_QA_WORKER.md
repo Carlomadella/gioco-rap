@@ -232,3 +232,14 @@ Regola di authoring aggiunta: non richiedere evidenza di background duplicata qu
 Il task è deliberatamente diverso dai due Tsumugi: controlla scope di un cohort già consumato, risultato JSON↔MIDI 12/12, comportamento event-duration-dependent del renderer v1, limiti causali del PASS P2 e controllo negativo sulle autorizzazioni. Le unità sono costruite secondo la regola di evidenza minima sufficiente: nessun check positivo richiede più unità se una singola unità contiene già l'intera proposizione.
 
 Nessun run audio viene aperto dal QA documentale.
+
+
+## Esito sesto incarico — P2 measurement/export first-attempt PASS
+
+`p2-measurement-export-review-v1` è stato consumato il 30 settembre 2026 nella root `FAME_DIRECT_QA_NETWORK_V2_20260930_084912`.
+
+Esito: `VALIDATED_FOR_REVIEW`, una chiamata, nessun repair. Tutti i cinque check sono corretti; i quattro positivi hanno coverage sufficiente e nessun warning. La regola di evidenza minima sufficiente ha evitato il falso reject di coverage visto nel run precedente.
+
+Risultato: [DIRECT_QA_P2_MEASUREMENT_EXPORT_V2_RESULT_2026-09-30.md](DIRECT_QA_P2_MEASUREMENT_EXPORT_V2_RESULT_2026-09-30.md).
+
+Il task è ora consumato e non va ripetuto come nuovo first attempt.

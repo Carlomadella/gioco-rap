@@ -99,3 +99,10 @@ Il task è aggiunto ai `CONSUMED_TASKS`. Le regressioni v2 usano ora una fixture
 ## Verifica terzo task v2
 
 Commit `4c60c18425fc56a40b476ddfffded55ecb968141`: terzo task `p2-measurement-export-review-v1` congelato con regola di evidenza minima sufficiente. GitHub Actions `Verifica FAME local worker`, run `36679412661`: `success`, 55 test, `OK`.
+
+
+## Esito terzo run reale v2
+
+Root locale `FAME_DIRECT_QA_NETWORK_V2_20260930_084912`. Il task `p2-measurement-export-review-v1` ha chiuso `VALIDATED_FOR_REVIEW` al primo tentativo con una sola chiamata. Tutti i 5 check sono corretti, con coverage sufficiente sui quattro positivi, zero precision warning e zero evidenze non revisionate. `elapsedSeconds` circa 16.422 s; 1832 prompt token valutati e 1173 output token valutati.
+
+Il task è ora consumato e aggiunto ai `CONSUMED_TASKS`. Risultato dettagliato in [DIRECT_QA_P2_MEASUREMENT_EXPORT_V2_RESULT_2026-09-30.md](DIRECT_QA_P2_MEASUREMENT_EXPORT_V2_RESULT_2026-09-30.md).
