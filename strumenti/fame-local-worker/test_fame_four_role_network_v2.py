@@ -77,7 +77,6 @@ class FameFourRoleNetworkV2Tests(unittest.TestCase):
                 {'claimId':'C3','status':'SUPPORTED','evidenceIds':['U04'],'reason':'stato QA v6 esplicito'},
                 {'claimId':'C4','status':'SUPPORTED','evidenceIds':['U05'],'reason':'next step esplicito'},
             ],
-            'antiBiasResolution':[],
         }
 
     def integrator(self,verdict='NOT_ESTABLISHED',claims=None):
@@ -117,6 +116,13 @@ class FameFourRoleNetworkV2Tests(unittest.TestCase):
         payload=request['messages'][1]['content']
         self.assertNotIn('expectedVerdict',payload)
         self.assertNotIn('NOT_ESTABLISHED',payload)
+
+    def test_zero_antibias_issues_do_not_generate_empty_enum_schema(self):
+        p=n.package('agent-network-readiness-network-v2')
+        schema=n.verifier_schema(p,self.extractor(),self.clean_challenge())
+        self.assertNotIn('antiBiasResolution',schema['required'])
+        self.assertNotIn('antiBiasResolution',schema['properties'])
+        self.assertNotIn('"enum": []',json.dumps(schema,ensure_ascii=False))
 
     def test_verdict_enum_is_case_owned_not_runner_hardcoded(self):
         p=n.package('agent-network-readiness-network-v2')
