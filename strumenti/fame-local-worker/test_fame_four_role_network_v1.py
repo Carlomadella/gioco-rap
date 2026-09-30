@@ -165,13 +165,19 @@ class FameFourRoleNetworkTests(unittest.TestCase):
     def test_rejected_role_is_not_retried(self):
         bad=self.extractor()
         bad['claims'][0]['evidenceIds']=[]
-        fake,result=self.run_network([bad])
+        fake=Fake([bad])
+        output=io.StringIO()
+        with contextlib.redirect_stdout(output):
+            result=n.run(self.root,fake)
         self.assertEqual(result['status'],'NEEDS_REVIEW')
+        self.assertIn('"status": "NEEDS_REVIEW"',output.getvalue())
         self.assertEqual(len(fake.calls),1)
         again=Fake([self.extractor()])
-        with contextlib.redirect_stdout(io.StringIO()):
+        output=io.StringIO()
+        with contextlib.redirect_stdout(output):
             second=n.run(self.root,again)
         self.assertEqual(second['status'],'NEEDS_REVIEW')
+        self.assertIn('"status": "NEEDS_REVIEW"',output.getvalue())
         self.assertEqual(again.calls,[])
 
     def test_digest_preflight_failure_makes_no_model_call(self):
