@@ -807,3 +807,17 @@ Baseline V2 e Network V4 restano intatte e riproducibili.
 Verifica automatica: 80 Direct-QA + 109 FAME, tutti OK.
 
 Dettagli: [FAME_ADAPTIVE_QA_V1.md](FAME_ADAPTIVE_QA_V1.md).
+
+
+## Adaptive QA V1 — fresh pilot pronto
+
+Congelato `adaptive-p2-measurement-pilot-v1` sulla fonte `DIRECT_QA_P2_MEASUREMENT_EXPORT_V2_RESULT_2026-09-30.md`, commit sorgente `1b8365225370603abc8e5b70efe0caaf770f804f`.
+
+Target host-only:
+- ANSWER_LIMITED_PASS;
+- required U01/U02/U03;
+- optional U04.
+
+Il pilot non è progettato per forzare l'escalation. Serve a verificare in reale il comportamento economico dell'adaptive: se la baseline V2 è sufficiente, V4 deve restare non eseguita e il run deve chiudere con 1 sola chiamata.
+
+Verifica automatica pre-run: 80 Direct-QA + 110 FAME, tutti OK.
