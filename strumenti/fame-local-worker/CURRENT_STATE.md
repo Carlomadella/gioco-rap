@@ -1090,3 +1090,62 @@ CI al commit `bec7d2bc63c08a589f69fe50d189e49902653df6`:
 
 Prossimo passo: eseguire V8 sullo stesso case consumato esclusivamente come diagnostico causale della nuova selected-option audit. Non e una nuova misura indipendente. Se recupera il failure, il test successivo deve essere un nuovo case fresco.
 
+## Four-Role Network V8 — diagnostico reale: audit corretto, recovery incoerente
+
+Eseguito `fame_four_role_network_v8.py` sul case consumato `adaptive-v2-tsumugi-architecture-pilot-v1` esclusivamente come diagnostico della selected-option support audit.
+
+Esito:
+- Extractor: ACCEPTED;
+- Anti-Bias: ACCEPTED, `omissionReview(U01)=NOT_MATERIAL`;
+- Verifier ha scelto correttamente `ANSWER_RUBRIC_FALSE_NEGATIVE_DISCIPLINED`;
+- `selectedOptionAudit.fullySupported=true`;
+- componente S1: `The run remains formally REJECTED/NEEDS_REVIEW.` con `evidenceIds=[U01]`;
+- nello stesso output il Verifier ha lasciato `recoveredClaims=[]` e `omissionResolution(U01)=NOT_REQUIRED`;
+- host Verifier REJECTED con:
+  - `VERIFIER_INSUFFICIENT_FINAL_EVIDENCE_AFTER_RECOVERY`;
+  - `VERIFIER_SELECTED_OPTION_OMISSION_NOT_RECOVERED`;
+- Integrator non eseguito;
+- modelCalls: 3;
+- network status: `NEEDS_REVIEW`.
+
+Interpretazione: V8 ha risolto il problema semantico di riconoscere che U01 serve a sostenere una clausola materiale dell'opzione selezionata. Il failure residuo e una contraddizione interna tra due sezioni dello stesso output del Verifier: selectedOptionAudit richiede U01, mentre omissionResolution la dichiara NOT_REQUIRED.
+
+V8 resta congelata e il run resta preservato come failure diagnostica reale.
+
+## Four-Role Network V9 — deterministic host audit reconciliation
+
+Aggiunto `fame_four_role_network_v9.py`, senza modificare V4-V8 e senza aggiungere model call.
+
+V9 conserva il raw output del Verifier e costruisce separatamente un `effectiveVerifier` lato host.
+
+Regola di reconciliation strettamente limitata:
+- selectedOptionAudit deve riferirsi alla stessa answerOptionId scelta;
+- `fullySupported` deve essere true;
+- una componente deve citare esclusivamente evidence unit pubbliche omesse dall'Extractor;
+- solo in quel caso il controller puo derivare deterministicamente un recoveredClaim usando esattamente statement ed evidenceIds della componente;
+- le corrispondenti omissionResolution vengono portate a RECOVERED;
+- componenti con mix di evidence omesse e gia usate NON vengono auto-riscritte, perche il controller non puo inferire che il sottoinsieme omesso sostenga da solo lo statement;
+- il raw output del modello non viene modificato;
+- l'Integrator riceve sia rawVerifierOutput sia effectiveVerifierOutput e usa i claim utilizzabili dell'effective verifier;
+- la rubrica host privata resta invisibile ai modelli.
+
+Il `status` V9 espone `hostDerivedRecovery` con:
+- applied;
+- derivedClaims;
+- overriddenResolutions;
+- skippedMixedComponents.
+
+Test dedicati in `test_fame_four_role_network_v9.py` riproducono il raw failure V8 reale e verificano:
+- derivazione O1/U01 dal componente S1;
+- override deterministicamente tracciato di U01 da NOT_REQUIRED a RECOVERED;
+- immutabilita del raw output;
+- nessuna auto-recovery per componenti con evidence miste;
+- nessuna reconciliation se optionId non coincide o fullySupported=false;
+- uso del recoveredClaim derivato da parte dell'Integrator.
+
+CI al commit `eaf273e435d7ee7d9d77be5d432517e499903977`:
+- 80 Direct-QA: OK;
+- 142 FAME: OK.
+
+Prossimo passo: eseguire V9 sullo stesso case consumato esclusivamente come diagnostico causale della reconciliation host. Se V9 recupera il failure, non iterare ulteriormente su Tsumugi: passare a un nuovo case fresco per valutare generalizzazione.
+
