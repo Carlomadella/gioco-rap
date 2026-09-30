@@ -1244,3 +1244,41 @@ Il case e ora consumato e non deve essere rilanciato come nuovo first attempt.
 
 Prossimo obiettivo scientifico: selezionare un'altra fonte reale non ancora usata dalla rete e congelare un nuovo case prima dell'inferenza. Non forzare artificialmente un failure della baseline; se la baseline passa di nuovo, registrare il dato. Se fallisce con response valida, quello sara il primo test fresco dell'escalation V9.
 
+## Adaptive QA V3 — secondo fresh pilot congelato
+
+Preparato un secondo case fresco per testare il lato complementare della policy adattiva senza forzare artificialmente un failure:
+
+- case: `adaptive-v3-controlled-failure-pilot-v1`;
+- source snapshot: `cases/fame-network/adaptive-v3-controlled-failure-source.md`;
+- fonte documentale: `DIRECT_QA_TSUMUGI_CONTROLLED_RESULT_2026-09-23.md`;
+- la fonte era consumata come storico Direct-QA, ma non risultava trasformata in un precedente case FAME-network;
+- nessuna nuova inferenza e stata eseguita durante il freeze del case.
+
+Il target distingue:
+- first-run v1 `REJECTED` dopo una sola chiamata;
+- 4/5 conclusioni corrette;
+- `TOPK_PAIR_CONFIDENCE_LIMIT` con coverage insufficiente;
+- `SYNTHETIC_DIAGNOSTIC_SCOPE` semanticamente errata;
+- presenza contemporanea di errore semantico reale e omissione di coverage;
+- risultato storico consumato e non ritentabile come nuovo first attempt;
+- worker v2 con al massimo una seconda chiamata di repair nello stesso run e feedback generico;
+- repair come recovery operativo, non nuova independent evaluation.
+
+Target host-only: `ANSWER_REAL_SEMANTIC_AND_COVERAGE_FAILURE`.
+
+Required evidence groups:
+- U01;
+- U02;
+- U03;
+- U04;
+- U06;
+- U07.
+
+U05 resta optional context.
+
+Obiettivo: eseguire Adaptive QA V3 una sola volta sul case. Non si forza l'escalation: se la baseline copre correttamente tutte le distinzioni, V9 deve restare spenta; se la baseline fallisce con response valida, V9 parte automaticamente e il run diventa il primo test fresco della sua capacita di recovery.
+
+CI al commit `1c1ed116d41d0bb1802511155ef0b1ef99f2536d`:
+- 80 Direct-QA: OK;
+- 148 FAME: OK.
+
