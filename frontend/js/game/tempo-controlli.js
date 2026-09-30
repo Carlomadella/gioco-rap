@@ -44,13 +44,13 @@
   const HOSTS = [
     {id:"jail",     root:"#adf-jail.on",       head:".adf-jail-top", mount:".adf-jail-meta", accent:"#ff315b", panel:"linear-gradient(180deg,rgba(25,8,14,.985),rgba(8,8,11,.985))", border:"rgba(255,49,91,.38)"},
     {id:"abilita",  root:"#abilita.on",        head:null, accent:"#b557ff", panel:"linear-gradient(180deg,rgba(12,9,18,.985),rgba(5,6,9,.985))", border:"rgba(181,87,255,.34)"},
-    {id:"strada",   root:"#strada.on",         head:".topbar", mount:".session", before:".exit", accent:"#c52e5f", panel:"linear-gradient(180deg,rgba(27,7,20,.985),rgba(8,5,9,.985))", border:"rgba(197,46,95,.42)"},
-    {id:"negozio",  root:"#negozio.on",        head:".nghead", mount:".nghead", before:".ngx", accentVar:"--acid", accent:"#a3e635", panel:"linear-gradient(180deg,rgba(25,20,34,.985),rgba(12,10,17,.985))", border:"rgba(255,255,255,.14)"},
-    {id:"piazza",   root:"#piazza.on",         head:".phead", mount:".phead", before:".px", accent:"#c084fc", panel:"linear-gradient(180deg,rgba(20,14,27,.985),rgba(8,7,12,.985))", border:"rgba(192,132,252,.32)"},
-    {id:"writer",   root:"#writer.on",         head:".whead", mount:".whead", before:".wx", accent:"#f0c75e", panel:"linear-gradient(180deg,rgba(24,20,13,.985),rgba(9,8,6,.985))", border:"rgba(240,199,94,.30)"},
-    {id:"studio",   root:"#studio.on",         head:".sthead", mount:".sthead", before:".strisorse", accent:"#f2c14e", panel:"linear-gradient(180deg,rgba(18,19,24,.985),rgba(7,9,13,.985))", border:"rgba(242,193,78,.28)"},
-    {id:"pannello", root:"#pannello.on",       head:".pnhead", mount:".pnhead", before:".pnx", accentVar:"--c1", accent:"#7c3aed", panel:"linear-gradient(180deg,rgba(20,18,25,.985),rgba(10,10,14,.985))", border:"rgba(255,255,255,.14)"},
-    {id:"luogo",    root:"#luogo.on",          head:".lfhead", mount:".lfhead", before:".strisorse", accent:"#f2c14e", panel:"linear-gradient(180deg,rgba(18,19,24,.985),rgba(7,9,13,.985))", border:"rgba(242,193,78,.28)"},
+    {id:"strada",   root:"#strada.on",         head:".topbar", mount:".session", accent:"#c52e5f", panel:"linear-gradient(180deg,rgba(27,7,20,.985),rgba(8,5,9,.985))", border:"rgba(197,46,95,.42)"},
+    {id:"negozio",  root:"#negozio.on",        head:".nghead", mount:".nghead", accentVar:"--acid", accent:"#a3e635", panel:"linear-gradient(180deg,rgba(25,20,34,.985),rgba(12,10,17,.985))", border:"rgba(255,255,255,.14)"},
+    {id:"piazza",   root:"#piazza.on",         head:".phead", mount:".phead", accent:"#c084fc", panel:"linear-gradient(180deg,rgba(20,14,27,.985),rgba(8,7,12,.985))", border:"rgba(192,132,252,.32)"},
+    {id:"writer",   root:"#writer.on",         head:".whead", mount:".whead", accent:"#f0c75e", panel:"linear-gradient(180deg,rgba(24,20,13,.985),rgba(9,8,6,.985))", border:"rgba(240,199,94,.30)"},
+    {id:"studio",   root:"#studio.on",         head:".sthead", mount:".sthead", accent:"#f2c14e", panel:"linear-gradient(180deg,rgba(18,19,24,.985),rgba(7,9,13,.985))", border:"rgba(242,193,78,.28)"},
+    {id:"pannello", root:"#pannello.on",       head:".pnhead", mount:".pnhead", accentVar:"--c1", accent:"#7c3aed", panel:"linear-gradient(180deg,rgba(20,18,25,.985),rgba(10,10,14,.985))", border:"rgba(255,255,255,.14)"},
+    {id:"luogo",    root:"#luogo.on",          head:".lfhead", mount:".lfhead", accent:"#f2c14e", panel:"linear-gradient(180deg,rgba(18,19,24,.985),rgba(7,9,13,.985))", border:"rgba(242,193,78,.28)"},
     {id:"hub",      root:"#s-hub.screen.on",   head:".pbarra", mount:".pbarra", accent:"#c084fc", panel:"linear-gradient(180deg,rgba(16,18,27,.985),rgba(7,9,14,.985))", border:"rgba(192,132,252,.28)"}
   ];
 
@@ -296,7 +296,7 @@
     s.textContent=`
       .adf-time-host{position:relative!important;overflow:visible!important}
       .adf-tc-legacy-hidden{display:none!important}
-      #adf-time-dock{position:relative;z-index:142;flex:0 0 224px;align-self:stretch;display:flex;align-items:center;justify-content:center;min-width:0;padding:4px 7px;border-left:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(255,255,255,.018),rgba(255,255,255,.006))}
+      #adf-time-dock{position:relative;z-index:142;flex:0 0 224px;margin-left:auto;align-self:stretch;display:flex;align-items:center;justify-content:center;min-width:0;padding:4px 7px;border-left:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(255,255,255,.018),rgba(255,255,255,.006))}
       #adf-time-dock[hidden]{display:none!important}
       /* sotto una decisione o nelle Impostazioni l'orologio non serve e non deve
          esserci: col suo 142 stava sopra la modale (60) e le Impostazioni (120),
