@@ -1,6 +1,6 @@
 # Rete di agenti locali — stato operativo
 
-Aggiornamento: 23 settembre 2026. Fonti verificate sul commit d2ad12db10e4943b8a17bcb75b795095fd831bcf.
+Aggiornamento: 30 settembre 2026. Stato della rete verificato fino al commit `23171593992036224d9e02dad351011db302b5ab`; Direct QA CI PASS.
 
 ## Obiettivo e perimetro
 
@@ -31,12 +31,29 @@ Checkpoint pertinente alla rete: `cdea2227a4a71906c48b97d888e707a787cecc3e` (val
 - Nei documenti esaminati non è registrato un run reale v2 riuscito. Non dichiararlo già validato.
 - La rubrica specifica è preparata dall'operatore/host: il sistema non è ancora un validatore semantico universale o una rete autonoma di sviluppo.
 
+## Hardening v2 verificato — 30 settembre 2026
+
+Commit `c3a1e2465f08dd6e20c8d576ca3de66269f16b51`:
+- `direct_qa_worker_v2.py` rifiuta in init i tre task già consumati: `pfnmf-review-v1`, `subset-bic-review-v1`, `tsumugi-controlled-review-v1`;
+- worker e queue v2 non hanno più un task consumato come default: `--task` / `--tasks` sono espliciti;
+- la queue pre-valida tutti i task prima di creare la root, evitando root parziali se compare un task consumato;
+- il guard authoring non è più un loop vuoto: controlla i package non grandfathered presenti;
+- è congelato il nuovo task `tsumugi-score-diagnostic-review-v1`, costruito sul report già persistito al commit `022ef352e00cfa0aca7a3dae9a9478c8c3c49626`. È solo QA documentale e non apre audio/P6/training.
+
+Commit CI `23171593992036224d9e02dad351011db302b5ab`:
+- workflow dedicato `Verifica FAME local worker`;
+- Python 3.10;
+- comando `python -m unittest discover -s . -p "test_direct_qa_*.py" -q`;
+- run GitHub Actions `36676247028`: `success`.
+
+Non è ancora stato eseguito alcun run reale v2 con Ollama.
+
 ## Prossimo passo della rete
 
-1. Verificare codice e test della v2, compresa la conservazione dei risultati e il limite di due chiamate.
-2. Preparare un nuovo task QA documentale distinto dai tre consumati, con fonte completa, rubrica e criteri fissati prima della prova. Seguire DIRECT_QA_PACKAGE_AUTHORING.md.
-3. Eseguire localmente una sola desk v2 e registrare primo tentativo, eventuale correzione, evidenze e tempo umano.
-4. Valutare l'utilità prima di ampliare i ruoli. Non avviare elaborazioni musicali per procurarsi un altro task.
+1. Aggiornare la worktree locale del branch `feature/fame-neural-roadmap`.
+2. Inizializzare una root nuova con `tsumugi-score-diagnostic-review-v1`.
+3. Eseguire localmente una sola desk v2 con Ollama e conservare attempt-1; l'eventuale attempt-2 resta una sola correzione validator-guided.
+4. Registrare esito, evidenze e tempo umano; valutare l'utilità prima di ampliare ruoli. Non avviare elaborazioni musicali per procurarsi altri task.
 
 La separazione documentale non esegue questi passi e non certifica nuovi test o inferenze.
 
