@@ -1,0 +1,57 @@
+{
+  "caseId": "matched-package-authoring-v1",
+  "sourceCommit": "4c60c18425fc56a40b476ddfffded55ecb968141",
+  "sourcePath": "strumenti/fame-local-worker/DIRECT_QA_PACKAGE_AUTHORING.md",
+  "sourceSnapshot": "cases/fame-network/matched-package-authoring-source.md",
+  "question": "Se un task consumato è stato respinto per un difetto di unitizzazione o rubrica, possiamo correggere il package e rilanciare lo stesso task fino al PASS, e conviene richiedere anche una seconda unità di background quando una singola unità contiene già tutta la prova materiale?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "Evidence units must represent complete semantic blocks. Do not split a structural Markdown heading into its own evidence unit when it only labels the paragraph/list that follows. A standalone heading can cause a precision false negative even when conclusion and required coverage are correct."
+    },
+    {
+      "unitId": "U02",
+      "text": "Frozen-run rule: Never repair a consumed task by changing its rubric/package and rerunning it. Preserve the historical result, classify the authoring defect separately, and apply the improved unitization only to new task IDs."
+    },
+    {
+      "unitId": "U03",
+      "text": "Before freezing a new direct-QA package: source snapshot must match; units must reconstruct source; positive checks need explicit required coverage; harmless context may be benign context; negative checks need no evidence IDs; add package-specific tests; freeze package and rubric before the first model call."
+    },
+    {
+      "unitId": "U04",
+      "text": "Minimal sufficient evidence rule: prefer the smallest semantic unit that already contains every material component of the assertion. Do not require a second background unit merely because it explains why the first unit is true. Multiple required groups are appropriate only when the assertion genuinely combines facts separated across the source."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_YES",
+      "meaning": "Sì: è corretto correggere e rilanciare lo stesso task consumato fino al PASS, e una seconda unità di background va richiesta anche quando la prima è già autosufficiente."
+    },
+    {
+      "optionId": "ANSWER_NO",
+      "meaning": "No: il risultato consumato va preservato e le correzioni valgono solo per nuovi task ID; inoltre non va richiesta prova di background ridondante quando una singola unità è materialmente sufficiente."
+    },
+    {
+      "optionId": "ANSWER_INSUFFICIENT",
+      "meaning": "Le evidenze non chiariscono né la regola sui task consumati né il criterio di evidenza minima sufficiente."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_NO",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U02"
+    ],
+    [
+      "U04"
+    ]
+  ],
+  "optionalContext": [
+    "U01",
+    "U03"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
