@@ -53,7 +53,7 @@ class QueueV2Tests(unittest.TestCase):
     def test_queue_rejects_consumed_task_before_creating_root(self):
         with tempfile.TemporaryDirectory() as d,contextlib.redirect_stdout(io.StringIO()):
             root=Path(d)/'q'
-            for task in ('tsumugi-v1-architecture-failure-review-v1','p2-measurement-export-review-v1','coordinator-architecture-review-v1'):
+            for task in ('tsumugi-v1-architecture-failure-review-v1','p2-measurement-export-review-v1','coordinator-architecture-review-v1','rubric-audit-semantics-review-v1'):
                 with self.assertRaises(ValueError):q.init(root,[task])
             self.assertFalse(root.exists())
 
