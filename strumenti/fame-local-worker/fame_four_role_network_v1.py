@@ -561,6 +561,12 @@ def execute_role(root,role,request,validator,client):
     return result
 
 
+def emit_status(root):
+    final=status(root)
+    print(json.dumps(final,ensure_ascii=False,indent=2))
+    return final
+
+
 def run(root,client=None):
     lock=agent.safe_path(root,'network.lock')
     with lock.open('x') as f:
@@ -584,7 +590,7 @@ def run(root,client=None):
             print('[1/4] Extractor: attesa Ollama...',flush=True)
             ext=execute_role(root,'extractor',extractor_request(p),lambda a:validate_extractor(a,p),client)
         if ext['status']!='ACCEPTED':
-            return status(root)
+            return emit_status(root)
         extractor=ext['output']
 
         ab=status(root)['roles']['anti-bias']
@@ -593,7 +599,7 @@ def run(root,client=None):
             req=antibias_request(p,extractor)
             ab=execute_role(root,'anti-bias',req,lambda a:anti_bias.validate(a,extractor['claims'],p['units']),client)
         if ab['status']!='ACCEPTED':
-            return status(root)
+            return emit_status(root)
         challenge=ab['output']
 
         ver=status(root)['roles']['verifier']
@@ -602,7 +608,7 @@ def run(root,client=None):
             req=verifier_request(p,extractor,challenge)
             ver=execute_role(root,'verifier',req,lambda a:validate_verifier(a,p,extractor,challenge),client)
         if ver['status']!='ACCEPTED':
-            return status(root)
+            return emit_status(root)
         verifier=ver['output']
 
         integ=status(root)['roles']['integrator']
