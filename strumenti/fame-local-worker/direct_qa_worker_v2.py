@@ -19,9 +19,10 @@ VERSION='fame-direct-qa-worker-v2'
 MODEL=base.MODEL
 DIGEST=base.DIGEST
 OPTIONS=dict(base.OPTIONS)
+OPTIONS['num_predict']=4096
 SYSTEM=base.SYSTEM
 MAXIMUM_MODEL_CALLS=2
-CONSUMED_TASKS=frozenset({'pfnmf-review-v1','subset-bic-review-v1','tsumugi-controlled-review-v1','tsumugi-score-diagnostic-review-v1','tsumugi-v1-architecture-failure-review-v1','p2-measurement-export-review-v1'})
+CONSUMED_TASKS=frozenset({'pfnmf-review-v1','subset-bic-review-v1','tsumugi-controlled-review-v1','tsumugi-score-diagnostic-review-v1','tsumugi-v1-architecture-failure-review-v1','p2-measurement-export-review-v1','coordinator-architecture-review-v1'})
 
 
 def ensure_fresh_task(task):
@@ -81,6 +82,43 @@ def assess(answer,p):
     return base.assess(answer,p)
 
 
+def salvage_surplus_evidence(answer,p):
+    first=base.assess(answer,p)
+    if type(answer) is not dict or type(answer.get('results')) is not list:
+        return answer,first
+
+    sanitized=json.loads(json.dumps(answer))
+    dropped={}
+    by_code={row.get('code'):row for row in first.get('assessments',[])}
+
+    for item in sanitized['results']:
+        row=by_code.get(item.get('code'))
+        if not row:
+            continue
+        if not row.get('conclusionCorrect') or row.get('coverage')!='SUFFICIENT':
+            continue
+
+        extra=list(row.get('unreviewedEvidenceIds') or [])
+        if not extra:
+            continue
+
+        extra_set=set(extra)
+        item['evidenceIds']=[
+            evidence_id
+            for evidence_id in item.get('evidenceIds',[])
+            if evidence_id not in extra_set
+        ]
+        dropped[item['code']]=extra
+
+    if not dropped:
+        return answer,first
+
+    second=base.assess(sanitized,p)
+    second['droppedEvidence']=dropped
+    second['hostSalvageApplied']=True
+    return sanitized,second
+
+
 def payload(p):
     return dict(model=MODEL,stream=False,options=dict(OPTIONS),format=schema(p),messages=[
         dict(role='system',content=SYSTEM),
@@ -89,7 +127,15 @@ def payload(p):
 
 
 def response_grade(response,p):
-    return base.response_grade(response,p)
+    if response.get('done') is not True or response.get('done_reason')=='length':
+        raise ValueError('Risposta incompleta')
+
+    msg=response.get('message')
+    if type(msg) is not dict or msg.get('tool_calls'):
+        raise ValueError('Tool inatteso o messaggio invalido')
+
+    answer=agent.parse(msg.get('content',''))
+    return salvage_surplus_evidence(answer,p)
 
 
 def feedback_classes(validation):

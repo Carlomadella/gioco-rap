@@ -73,6 +73,22 @@ class WorkerV2Tests(unittest.TestCase):
         self.assertNotIn('requiredGroups',request)
         self.assertNotIn('benignContext',request)
 
+    def test_surplus_evidence_is_salvaged_after_required_coverage(self):
+        answer=self.good()
+        answer['results'][0]['evidenceIds']=['U02','U01']
+        sanitized,validation=w.salvage_surplus_evidence(answer,self.p)
+
+        self.assertTrue(validation['accepted'])
+        self.assertEqual(
+            sanitized['results'][0]['evidenceIds'],
+            ['U02']
+        )
+        self.assertEqual(
+            validation['droppedEvidence'],
+            {'CONTROLLED_FAILURE_BEFORE_PUBLISH':['U01']}
+        )
+        self.assertTrue(validation['hostSalvageApplied'])
+
     def test_two_bad_attempts_rejected(self):
         f=Fake([self.bad(),self.bad()]);r=self.run_worker(f)
         self.assertEqual(r['status'],'REJECTED');self.assertEqual(r['modelCalls'],2)
@@ -96,7 +112,7 @@ class WorkerV2Tests(unittest.TestCase):
 
     def test_consumed_tasks_cannot_be_initialized_in_v2(self):
         other=Path(self.temp.name)/'consumed'
-        for task in ('pfnmf-review-v1','tsumugi-score-diagnostic-review-v1','tsumugi-v1-architecture-failure-review-v1','p2-measurement-export-review-v1'):
+        for task in ('pfnmf-review-v1','tsumugi-score-diagnostic-review-v1','tsumugi-v1-architecture-failure-review-v1','p2-measurement-export-review-v1','coordinator-architecture-review-v1'):
             with self.assertRaises(ValueError):
                 w.init(other,task)
             self.assertFalse(other.exists())
