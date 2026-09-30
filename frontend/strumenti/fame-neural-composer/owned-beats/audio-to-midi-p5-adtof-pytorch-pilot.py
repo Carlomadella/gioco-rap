@@ -43,6 +43,41 @@ def git_output(source_root: Path, *args: str) -> str:
     return proc.stdout.strip()
 
 
+def git_porcelain_status(source_root: Path) -> str:
+    proc = subprocess.run(
+        ["git", "-C", str(source_root), "status", "--porcelain"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return proc.stdout.rstrip("\r\n")
+
+
+def classify_porcelain_status(status: str) -> tuple[list[str], list[str], list[str]]:
+    allowed_generated_prefixes = ("src/adtof_pytorch.egg-info/",)
+    unsafe_tracked_dirty: list[str] = []
+    generated_tracked_dirty: list[str] = []
+    untracked_build_artifacts: list[str] = []
+
+    for raw_line in status.splitlines():
+        if not raw_line:
+            continue
+        if raw_line.startswith("?? "):
+            untracked_build_artifacts.append(raw_line[3:].replace("\\", "/"))
+            continue
+        if len(raw_line) < 4 or raw_line[2] != " ":
+            unsafe_tracked_dirty.append(raw_line)
+            continue
+
+        changed_path = raw_line[3:].replace("\\", "/").strip()
+        if changed_path.startswith(allowed_generated_prefixes):
+            generated_tracked_dirty.append(changed_path)
+        else:
+            unsafe_tracked_dirty.append(raw_line)
+
+    return unsafe_tracked_dirty, generated_tracked_dirty, untracked_build_artifacts
+
+
 def validate_protocol() -> dict:
     p = read_json(PROTOCOL_FILE)
     inf = p.get("inference", {})
@@ -95,20 +130,12 @@ def validate_environment(workspace: Path, protocol: dict) -> dict:
     if head != ext["commit"]:
         raise RuntimeError(f"ADTOF source HEAD mismatch: {head}")
 
-    status = git_output(source_root, "status", "--porcelain")
-    tracked_dirty = [
-        line for line in status.splitlines()
-        if line and not line.startswith("??")
-    ]
-    allowed_generated_prefixes = ("src/adtof_pytorch.egg-info/",)
-    unsafe_tracked_dirty = []
-    generated_tracked_dirty = []
-    for line in tracked_dirty:
-        changed_path = line[3:].replace("\\", "/").strip()
-        if changed_path.startswith(allowed_generated_prefixes):
-            generated_tracked_dirty.append(changed_path)
-        else:
-            unsafe_tracked_dirty.append(line)
+    status = git_porcelain_status(source_root)
+    (
+        unsafe_tracked_dirty,
+        generated_tracked_dirty,
+        untracked_build_artifacts,
+    ) = classify_porcelain_status(status)
     if unsafe_tracked_dirty:
         raise RuntimeError(
             "ADTOF pinned source has unsafe tracked modifications: "
@@ -129,10 +156,7 @@ def validate_environment(workspace: Path, protocol: dict) -> dict:
         "weightGitBlobSha1": blob,
         "weightSha256": sha256_file(weight),
         "generatedTrackedArtifacts": generated_tracked_dirty,
-        "untrackedBuildArtifacts": [
-            line[3:] for line in status.splitlines()
-            if line.startswith("??")
-        ],
+        "untrackedBuildArtifacts": untracked_build_artifacts,
     }
 
 
@@ -410,6 +434,21 @@ def self_test() -> dict:
     expected = {35: "kick", 38: "snare", 47: "tom", 42: "hihat", 49: "cymbal"}
     if mapping != expected:
         raise RuntimeError(f"ADTOF class mapping self-test failed: {mapping}")
+
+    unsafe, generated, untracked = classify_porcelain_status(
+        " M src/adtof_pytorch.egg-info/PKG-INFO\n"
+        "?? build/\n"
+    )
+    if unsafe or generated != ["src/adtof_pytorch.egg-info/PKG-INFO"] or untracked != ["build/"]:
+        raise RuntimeError(
+            "ADTOF porcelain parser self-test failed: "
+            f"unsafe={unsafe}, generated={generated}, untracked={untracked}"
+        )
+
+    unsafe_code, _, _ = classify_porcelain_status(" M src/adtof_pytorch/model.py\n")
+    if unsafe_code != [" M src/adtof_pytorch/model.py"]:
+        raise RuntimeError(f"ADTOF unsafe change parser self-test failed: {unsafe_code}")
+
     return {
         "mode": "FAME_ADTOF_PYTORCH_PILOT_SELF_TEST_PASS",
         "sourceRecordId": p["sourceRecordId"],
