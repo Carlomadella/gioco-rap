@@ -1,0 +1,89 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-p5-adtof-pytorch-pilot-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_ADTOF_PILOT_AUDIO_ACCESS",
+  "createdAt": "2026-09-30",
+  "purpose": "DEVELOPMENT_ONLY_COMPARE_FIVE_CLASS_DRUM_TRANSCRIPTION_WITH_TSUMUGI",
+  "candidateId": "adtof-pytorch-frame-rnn-5class",
+  "runId": "audio-to-midi-p5-adtof-pytorch-pilot-v1-001",
+  "sourceRecordId": "FAME000126",
+  "sourceSeparation": {
+    "runId": "source-separation-development-inference-v1-001"
+  },
+  "externalSource": {
+    "repository": "xavriley/ADTOF-pytorch",
+    "repositoryUrl": "https://github.com/xavriley/ADTOF-pytorch.git",
+    "commit": "85c192e78f716ea0b111cc8a5ee4a8f6a3a4f8a9",
+    "weightRelativePath": "src/adtof_pytorch/data/adtof_frame_rnn_pytorch_weights.pth",
+    "weightGitBlobSha1": "773d228e4a4250ed278aecb9fe61e5d0ed611324",
+    "observedLicenseStatus": "PORT_REPOSITORY_HAS_NO_LICENSE_FILE_AT_PINNED_COMMIT",
+    "upstreamOriginalRepository": "MZehren/ADTOF",
+    "upstreamOriginalLicense": "CC-BY-NC-SA-4.0",
+    "productionPromotionAllowed": false,
+    "productionBlockReason": "Commercial/redistribution rights for the converted bundled weights are not established for Anni di Fame."
+  },
+  "runtime": {
+    "pythonBootstrapRelativePath": "external/tsumugi-drums-v1_5/source/.venv/Scripts/python.exe",
+    "externalRelativePath": "external/adtof-pytorch",
+    "sourceRelativePath": "external/adtof-pytorch/source",
+    "venvRelativePath": "external/adtof-pytorch/.venv",
+    "torchVersion": "2.13.0",
+    "torchIndex": "https://download.pytorch.org/whl/cu130",
+    "preferredDevice": "cuda"
+  },
+  "inference": {
+    "fps": 100,
+    "labels": [
+      {
+        "pitch": 35,
+        "role": "kick",
+        "adtofLabel": "BD"
+      },
+      {
+        "pitch": 38,
+        "role": "snare",
+        "adtofLabel": "SD"
+      },
+      {
+        "pitch": 47,
+        "role": "tom",
+        "adtofLabel": "TT"
+      },
+      {
+        "pitch": 42,
+        "role": "hihat",
+        "adtofLabel": "HH"
+      },
+      {
+        "pitch": 49,
+        "role": "cymbal",
+        "adtofLabel": "CY+RD"
+      }
+    ],
+    "thresholds": [
+      0.22,
+      0.24,
+      0.32,
+      0.22,
+      0.3
+    ],
+    "retuningAllowed": false
+  },
+  "output": {
+    "writeMidi": true,
+    "writeEventJson": true,
+    "automaticPromotion": false,
+    "humanReviewRequired": true
+  },
+  "safety": {
+    "split": "development",
+    "originalSourceAudioAccessAllowed": false,
+    "sourceSeparationStemAccessAllowed": true,
+    "independentEvaluationAccessAllowed": false,
+    "finalHoldoutAccessAllowed": false,
+    "sourceSeparationExecutionAllowed": false,
+    "trainingAuthorized": false,
+    "batch131Authorized": false,
+    "taskDataReadyMayBeDeclared": false
+  }
+}
