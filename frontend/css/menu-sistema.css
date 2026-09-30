@@ -73,6 +73,9 @@ body.adf-system-open{overflow:hidden}
 /* I vecchi ritorni restano nel DOM per compatibilità con i moduli legacy, ma
    la navigazione visibile è una sola e non cambia posto tra le schermate. */
 #st-mappa,#mapReturn{display:none!important}
+/* Abilità conserva il suo bottone nel DOM come fallback se il JS globale non
+   parte. Quando la navigazione globale è viva, però, c'è un solo MAPPA. */
+body.adf-gameplay-active #returnToMap{display:none!important}
 .adf-context-btn{display:none!important}
 .adf-system-logo{cursor:pointer;outline:none}
 .adf-system-logo:focus-visible{box-shadow:0 0 0 2px rgba(215,176,106,.55);border-radius:10px}
