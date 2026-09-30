@@ -37,9 +37,16 @@ if (-not (Test-Path -LiteralPath (Join-Path $sourceRoot ".git") -PathType Contai
   if ($LASTEXITCODE -ne 0) { throw "ADTOF clone failed" }
 }
 
-$dirty = git -C $sourceRoot status --porcelain
+$dirty = @(git -C $sourceRoot status --porcelain)
 if ($LASTEXITCODE -ne 0) { throw "Cannot inspect ADTOF source tree" }
-if ($dirty) { throw "ADTOF source tree is dirty; refusing to mutate pinned external source" }
+$trackedDirty = @($dirty | Where-Object { $_ -and -not $_.StartsWith("??") })
+if ($trackedDirty.Count -gt 0) {
+  throw ("ADTOF pinned source has tracked modifications: " + ($trackedDirty -join " | "))
+}
+$untracked = @($dirty | Where-Object { $_ -and $_.StartsWith("??") })
+if ($untracked.Count -gt 0) {
+  Write-Host ("Bootstrap: ignoring generated untracked artifacts: " + ($untracked -join " | ")) -ForegroundColor DarkGray
+}
 
 $head = (git -C $sourceRoot rev-parse HEAD).Trim()
 if ($head -ne $commit) {
