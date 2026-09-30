@@ -1,0 +1,57 @@
+{
+  "caseId": "battery-gptoss-diagnostic-v1",
+  "sourceCommit": "6da4fd1666ea4d82a331e597b3004068d08a567f",
+  "sourcePath": "strumenti/fame-local-worker/GPTOSS_DIAGNOSTIC.md",
+  "sourceSnapshot": "cases/fame-network/battery-gptoss-diagnostic-source.md",
+  "question": "Un vecchio run GPT-OSS terminato con OUTPUT_TRUNCATED e una successiva prova con think=low bastano a dimostrare che il vecchio fallimento era semantico e che think=low risolve il problema in generale?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "Nuovo esperimento successivo al confronto congelato, senza modifica retroattiva dei FAIL Qwen/GPT-OSS. Il precedente run GPT-OSS `20260923T073208792637Z` ha terminato con length, 4096 token generati e nessun content finale (evidenza trascritta dall'operatore)."
+    },
+    {
+      "unitId": "U02",
+      "text": "Chiedere esplicitamente `think: \"low\"` potrebbe lasciare spazio al JSON finale nel budget esistente. Non e una garanzia e non equivale a disattivare il ragionamento. Non conosciamo il livello effettivo del vecchio run: think era omesso, quindi dipendeva dal modello/server."
+    },
+    {
+      "unitId": "U03",
+      "text": "- OUTPUT_TRUNCATED: il limite e ancora raggiunto. Non misura correttezza semantica. Prima di proporre un budget maggiore, guardare risposta, token e contesto residuo; con circa 10k token di input, aumentare output a 8192 nel contesto 16384 non e una scelta automaticamente valida. Un eventuale aumento richiedera un altro profilo dichiarato con verifica del contesto. Nessuna escalation automatica."
+    },
+    {
+      "unitId": "U04",
+      "text": "- VALIDATED_FOR_REVIEW: prima risposta finale completa e semanticamente accettata dalla rubric immutata; resta necessaria revisione umana. Mostra che questa configurazione funziona sul caso gia noto, non generalizzazione o apprendimento."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_YES",
+      "meaning": "Sì: OUTPUT_TRUNCATED dimostra errore semantico e un esito positivo con think=low dimostra che think=low risolve il problema in generale."
+    },
+    {
+      "optionId": "ANSWER_NO",
+      "meaning": "No: OUTPUT_TRUNCATED non misura correttezza semantica e think=low è un'ipotesi/configurazione da testare; anche un successo sul caso noto non dimostra generalizzazione."
+    },
+    {
+      "optionId": "ANSWER_INSUFFICIENT",
+      "meaning": "Le evidenze non distinguono troncamento da correttezza semantica e non descrivono il significato di think=low."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_NO",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U02"
+    ],
+    [
+      "U03"
+    ]
+  ],
+  "optionalContext": [
+    "U01",
+    "U04"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
