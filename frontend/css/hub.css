@@ -1301,12 +1301,6 @@ body.in-hub .topnav {
     width: 160px;
     padding-left: 14px;
   }
-  .pmenu {
-    padding: 0 14px;
-  }
-  .pmenu .pk {
-    display: none;
-  }
   .ps {
     padding: 0 4px 0 10px;
     gap: 7px;
