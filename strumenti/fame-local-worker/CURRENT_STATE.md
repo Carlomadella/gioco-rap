@@ -488,3 +488,33 @@ L'aggregatore riporta answer correctness, required coverage, calls, token, model
 Verifica automatica pre-run: 80 test Direct-QA + 60 test FAME, tutti OK.
 
 Dettagli: [FAME_SINGLE_VS_FOUR_BATTERY_V1.md](FAME_SINGLE_VS_FOUR_BATTERY_V1.md).
+
+
+## Batteria single-agent vs Four-Role — esito reale
+
+Batteria V1 completata su quattro casi pre-registrati con ordine dei bracci bilanciato 2/2.
+
+Automatic summary:
+- entrambi corretti: 3/4;
+- solo single-agent corretto: 0/4;
+- solo network corretto: 1/4;
+- required coverage completa: single-agent 3/4, network 4/4;
+- accepted: single-agent 3/4, network 4/4;
+- model calls: single-agent 4, network 16.
+
+Primi tre casi: entrambi i bracci corretti. Nessun vantaggio semantico osservabile della rete.
+
+Quarto caso `battery-anti-bias-v1`:
+- Four-Role Network `ACCEPTED`, `ANSWER_NO`, U01+U02, coverage completa;
+- single-agent `NEEDS_REVIEW`, output nullo, una response salvata, elapsed circa 26.422 s;
+- il summary aggregato non conserva il motivo del failure e riporta metriche response a zero.
+
+Non classificare ancora questo come vittoria semantica della rete. Il pattern indica un failure post-response da distinguere fra troncamento, final content vuoto, JSON invalido o altro errore.
+
+Aggiunto diagnostico read-only `fame_battery_attempt_diagnostic.py`: verifica receipt e legge `result.json` + `response.json` senza chiamare Ollama e senza modificare il run storico.
+
+Tutti i 4 case della batteria sono ora consumati e bloccati per nuovi init sia nella rete V3 sia nella baseline.
+
+Verifica automatica dopo hardening diagnostico: 80 test Direct-QA + 65 test FAME, tutti OK.
+
+Report: [FAME_SINGLE_VS_FOUR_BATTERY_V1_RESULT_2026-09-30.md](FAME_SINGLE_VS_FOUR_BATTERY_V1_RESULT_2026-09-30.md).
