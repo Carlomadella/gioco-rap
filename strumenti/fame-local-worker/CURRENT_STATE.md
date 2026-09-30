@@ -237,3 +237,30 @@ Checkpoint `a3ef4ac1151cdf1cfc00b1866042ef33b36b3a31`: aggregatore storico e rel
 ## Correzione input aggregatore v2
 
 Il primo tentativo operativo dell'aggregatore ha evidenziato un mismatch d'interfaccia: il comando documentato passava root di queue `FAME_DIRECT_QA_NETWORK_V2_*`, mentre il codice cercava `desk.json` direttamente nella root. Corretto `direct_qa_v2_aggregate.py` per accettare sia root di queue sia singole desk root, espandendo deterministicamente `queue.json -> desks/<task>`. Aggiunto test dedicato.
+
+
+## Aggregate Direct QA v2 — 9 task
+
+L'aggregate reale dei primi nove task è registrato in [DIRECT_QA_V2_AGGREGATE_RESULT_2026-09-30.md](DIRECT_QA_V2_AGGREGATE_RESULT_2026-09-30.md).
+
+Risultato: 9 task, 7 accettati, 5 first-pass raw-clean, 2 first-pass con salvage, 2 rejected, 0 error finali, 0 incorrect conclusions nello stato finale, 11 chiamate totali. Il tempo umano non è stato misurato.
+
+Questo chiude la fase in cui aggiungere altri task Direct-QA equivalenti era il prossimo passo predefinito.
+
+## FAME Four-Role Network V1
+
+Implementata la prima rete coordinata a quattro ruoli:
+
+`EXTRACTOR -> ANTI-BIAS -> VERIFIER -> INTEGRATOR`
+
+Il ruolo Anti-Bias deriva in modo minimale e read-only dal progetto `scientific-method-ai`; quel repository non è stato modificato. Dettagli e controlli importati in [FAME_ANTI_BIAS.md](FAME_ANTI_BIAS.md).
+
+Runner: `fame_four_role_network_v1.py`.
+
+Il runner congela case/codice, usa quattro chiamate isolate, zero retry, receipt per ruolo e replay deterministico di request/validazione. Un issue Anti-Bias `BLOCKING` confermato o non risolto blocca l'integrazione. Rubric e expected verdict restano host-only.
+
+Primo pilot congelato: `source-registry-readiness-network-v1`, su `SOURCE_REGISTRY.md` al commit sorgente `8ab0ef8c828cd4da8dff2c0212c53b01f4c9dd9b`.
+
+Domanda: una fonte `green` è automaticamente pronta per training simbolico commerciale o servono ancora condizioni?
+
+Nessuna inferenza reale della rete a quattro ruoli è stata ancora eseguita.
