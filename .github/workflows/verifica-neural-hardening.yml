@@ -119,6 +119,8 @@ jobs:
         run: python frontend/strumenti/fame-neural-composer/owned-beats/audio-to-midi-p5-tsumugi-threshold-sweep.py self-test
       - name: Tsumugi effective threshold sweep V2 self-test
         run: python frontend/strumenti/fame-neural-composer/owned-beats/audio-to-midi-p5-tsumugi-threshold-sweep-v2.py self-test
+      - name: Tsumugi V1 note-bias pilot self-test
+        run: python frontend/strumenti/fame-neural-composer/owned-beats/audio-to-midi-p5-tsumugi-note-bias-pilot.py self-test
 
   human-reference-browser:
     runs-on: ubuntu-latest
