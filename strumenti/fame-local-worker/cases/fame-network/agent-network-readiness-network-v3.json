@@ -48,13 +48,11 @@
     ],
     [
       "U03"
-    ],
-    [
-      "U05"
     ]
   ],
   "optionalContext": [
-    "U01"
+    "U01",
+    "U05"
   ],
   "humanReviewRequired": true,
   "executionAuthorized": false,
