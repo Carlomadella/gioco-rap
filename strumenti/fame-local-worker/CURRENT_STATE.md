@@ -142,3 +142,8 @@ Risultato: [DIRECT_QA_RUBRIC_AUDIT_SEMANTICS_V2_RESULT_2026-09-30.md](DIRECT_QA_
 ## Sesto task v2 congelato
 
 È preparato `package-authoring-rules-review-v1` su `DIRECT_QA_PACKAGE_AUTHORING.md` al commit `4c60c18425fc56a40b476ddfffded55ecb968141`. Verifica unità semantiche, frozen-run rule, checklist pre-run, minimal sufficient evidence e controllo negativo sul retuning/rerun di task consumati.
+
+
+## Verifica sesto task v2
+
+Checkpoint `775bdb3fcd0edb012a3626e87e1be3ac15467a8e`: `package-authoring-rules-review-v1` congelato prima di qualsiasi chiamata reale. GitHub Actions `Verifica FAME local worker`, run `36683638626`: `success`, 65 test, `OK`.
