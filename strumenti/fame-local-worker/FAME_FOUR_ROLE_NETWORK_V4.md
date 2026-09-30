@@ -173,3 +173,38 @@ Target host-only:
 - answer: ANSWER_MIXED.
 
 Verifica automatica pre-run: 80 Direct-QA + 96 FAME, tutti OK.
+
+
+## Branch probe v2 — PASS
+
+Root locale: `FAME_VERIFIER_V4_BRANCH_PROBE_V2_20260930_181355`.
+
+Esito:
+- una sola chiamata;
+- `ACCEPTED`;
+- zero errori;
+- `ANSWER_MIXED`.
+
+Partizione:
+- supported: C1, C4;
+- unsupported: C2;
+- rework: C3.
+
+La partizione coincide con la target host-only congelata.
+
+Review umana: PASS. C3 è un vero caso rework: U04 sostiene che il worker one-shot resta utile come misura del primo tentativo ma nega che sia sufficiente come percorso operativo generale.
+
+Con questo probe, tutti e tre i bucket V4 sono stati esercitati semanticamente in reale.
+
+### Stato hardening Verifier V4
+
+Chiuso:
+- fresh full-network V4: 4/4 ACCEPTED;
+- branch probe v1: contract strutturale corretto, ma rubric del probe difettosa;
+- branch probe v2: PASS semantico sui tre bucket.
+
+Il problema specifico V3 `status/evidence` è quindi corretto e verificato.
+
+Questo non equivale a validazione generale della rete; resta necessaria valutazione su più task nuovi per misurare affidabilità complessiva, costo e utilità rispetto al single-agent.
+
+Report: [FAME_VERIFIER_V4_BRANCH_PROBE_V2_RESULT_2026-09-30.md](FAME_VERIFIER_V4_BRANCH_PROBE_V2_RESULT_2026-09-30.md).
