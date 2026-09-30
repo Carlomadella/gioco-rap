@@ -65,3 +65,21 @@ Restano invariati:
 - `trainingAuthorized=false`;
 - `networkProductionReady=false`;
 - `independentEvaluation=false`.
+
+
+## Esito della continuazione V3
+
+La continuazione `FAME_FOUR_ROLE_NETWORK_V3_20260930_123819` ha chiuso `PROPOSED_FOR_HUMAN_REVIEW`.
+
+Verifier e Integrator sono entrambi `ACCEPTED` con `ANSWER_NO`; tutti i claim usati dal finale sono `EVIDENCE_SUPPORTS_CLAIM`.
+
+È un successo del contratto V3 sui due ruoli rieseguiti, ma non è un fresh run 4/4 perché Extractor e Anti-Bias provenivano dal pilot V2.
+
+## Fresh case successivo
+
+`model-comparison-generalization-network-v3` usa una fonte diversa:
+`documentazione/fame-neural/FAME_LOCAL_AGENT_MODEL_COMPARISON_HANDOFF_2026-09-23.md`.
+
+La domanda verifica se il vantaggio relativo di Qwen sul protocollo congelato può essere generalizzato a superiorità generale su GPT-OSS. La fonte stessa distingue il risultato specifico dal giudizio generale.
+
+Questo case è destinato al primo run completo V3 a quattro ruoli senza output riusati.
