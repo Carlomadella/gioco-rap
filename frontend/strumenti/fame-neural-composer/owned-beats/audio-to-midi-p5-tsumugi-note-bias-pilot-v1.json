@@ -1,0 +1,41 @@
+{
+  "schema": "fame-owned-beats-audio-to-midi-p5-tsumugi-note-bias-pilot-v1",
+  "version": 1,
+  "status": "FROZEN_BEFORE_NOTE_BIAS_PILOT_INFERENCE",
+  "createdAt": "2026-09-30",
+  "purpose": "TEST_V1_NOTE_BIAS_AS_FALSE_POSITIVE_CONTROL_ON_ONE_CONSUMED_DEVELOPMENT_STEM",
+  "candidateId": "tsumugi-drums-v1_5",
+  "runId": "audio-to-midi-p5-tsumugi-note-bias-pilot-v1-001",
+  "sourceRecordId": "FAME000126",
+  "sweep": {
+    "parameter": "noteBias",
+    "frozenValues": [
+      0,
+      -0.25,
+      -0.5,
+      -1,
+      -2
+    ],
+    "rationale": "V1 decode_pitch_intervals adds note_bias directly to note interval scores; negative values suppress marginal note intervals.",
+    "allOtherInferenceSettingsFrozen": true
+  },
+  "evaluation": {
+    "compareMidiHashesBeforeHumanReview": true,
+    "compareEventCounts": true,
+    "compareDistinctPitchCounts": true,
+    "humanListeningOnlyIfVariantsDiffer": true,
+    "automaticWinner": false
+  },
+  "safety": {
+    "split": "development",
+    "reuseConsumedDevelopmentFamily": true,
+    "originalSourceAudioAllowed": false,
+    "developmentDrumsStemAccessAllowed": true,
+    "independentEvaluationAllowed": false,
+    "finalHoldoutAllowed": false,
+    "sourceSeparationExecutionAllowed": false,
+    "trainingAuthorized": false,
+    "batch131Authorized": false,
+    "taskDataReadyMayBeDeclared": false
+  }
+}
