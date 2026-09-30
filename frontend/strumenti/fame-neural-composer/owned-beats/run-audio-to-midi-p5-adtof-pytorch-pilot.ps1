@@ -40,8 +40,21 @@ if (-not (Test-Path -LiteralPath (Join-Path $sourceRoot ".git") -PathType Contai
 $dirty = @(git -C $sourceRoot status --porcelain)
 if ($LASTEXITCODE -ne 0) { throw "Cannot inspect ADTOF source tree" }
 $trackedDirty = @($dirty | Where-Object { $_ -and -not $_.StartsWith("??") })
-if ($trackedDirty.Count -gt 0) {
-  throw ("ADTOF pinned source has tracked modifications: " + ($trackedDirty -join " | "))
+$unsafeTrackedDirty = @()
+$generatedTrackedDirty = @()
+foreach ($line in $trackedDirty) {
+  $changedPath = $line.Substring(3).Trim().Replace("\\","/")
+  if ($changedPath.StartsWith("src/adtof_pytorch.egg-info/")) {
+    $generatedTrackedDirty += $line
+  } else {
+    $unsafeTrackedDirty += $line
+  }
+}
+if ($unsafeTrackedDirty.Count -gt 0) {
+  throw ("ADTOF pinned source has unsafe tracked modifications: " + ($unsafeTrackedDirty -join " | "))
+}
+if ($generatedTrackedDirty.Count -gt 0) {
+  Write-Host ("Bootstrap: ignoring generated tracked packaging metadata: " + ($generatedTrackedDirty -join " | ")) -ForegroundColor DarkGray
 }
 $untracked = @($dirty | Where-Object { $_ -and $_.StartsWith("??") })
 if ($untracked.Count -gt 0) {
