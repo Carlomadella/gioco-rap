@@ -1,4 +1,4 @@
-"""FAME Neural four-role local network v1.
+"""FAME Neural four-role local network v2.
 
 Roles are sequential isolated GPT-OSS calls:
 extractor -> independent Anti-Bias challenger -> verifier -> integrator.
@@ -576,7 +576,7 @@ def emit_status(root):
 def run(root,client=None):
     lock=agent.safe_path(root,'network.lock')
     with lock.open('x') as f:
-        f.write('FAME four-role network v1 attiva\n')
+        f.write('FAME four-role network v2 attiva\n')
     try:
         p=verify(root)
         current=status(root)
