@@ -4,7 +4,7 @@
  *
  * Regole:
  * - un unico widget tempo/meteo, identico in ogni schermata;
- * - il widget viene spostato nella testata della finestra attiva;
+ * - il widget è disponibile in ogni schermata di gameplay; usa la testata attiva o un fallback globale;
  * - mostra sempre ANNO/SETTIMANA, GIORNO e ORA;
  * - il cielo segue continuamente l'ora di gioco;
  * - il meteo arriva da GAME_WEATHER (sereno/nuvole/pioggia/temporale/nebbia);
@@ -37,31 +37,21 @@
     return clampN(Math.round(WAIT_TOTAL_MS / passi), WAIT_MIN_MS, WAIT_STEP_MS);
   }
 
+  /* Stessa gerarchia delle schermate globali di menu-sistema.js.
+     Nessuna pagina di gameplay è più "muta": il widget del tempo esiste
+     ovunque. Dove c'è una testata si integra lì; Abilità, che non ha una
+     testata compatibile, usa il fallback fisso nel body. */
   const HOSTS = [
-    {id:"jail",    root:"#adf-jail.on",      head:".adf-jail-top", mount:".adf-jail-meta", accent:"#ff315b", panel:"linear-gradient(180deg,rgba(25,8,14,.985),rgba(8,8,11,.985))", border:"rgba(255,49,91,.38)"},
-    {id:"strada", root:"#strada.on",         head:".topbar",       mount:".session", before:".exit", accent:"#c52e5f", panel:"linear-gradient(180deg,rgba(27,7,20,.985),rgba(8,5,9,.985))", border:"rgba(197,46,95,.42)"},
-    {id:"negozio",root:"#negozio.on",        head:".nghead",       mount:".nghead", before:".ngx", accentVar:"--acid", accent:"#a3e635", panel:"linear-gradient(180deg,rgba(25,20,34,.985),rgba(12,10,17,.985))", border:"rgba(255,255,255,.14)"},
-    {id:"pannello",root:"#pannello.on",      head:".pnhead",       mount:".pnhead", accentVar:"--c1", accent:"#7c3aed", panel:"linear-gradient(180deg,rgba(20,18,25,.985),rgba(10,10,14,.985))", border:"rgba(255,255,255,.14)"},
-    /* Lo Studio è **muto**: l'ora ce l'ha già sua, nella fascia in alto
-       (`studioRisorse()`), e nelle foto di riferimento la pastiglia non c'è.
-       Deve stare **prima dell'hub**: lo Studio è un foglio sopra all'hub, e
-       l'hub resta acceso sotto — senza questa riga la pastiglia si agganciava
-       all'hub, si prendeva lo z-index 142 contro il 94 dello Studio e finiva
-       in mezzo ai pannelli, coprendo «Il quartiere», «POSTA» e la stima degli
-       stream. Un posto muto non monta il widget da nessuna parte. */
-    {id:"studio", root:"#studio.on",          mute:true},
-    /* Casa, Palestra, il Circolo e stacca la spina (js/game/luoghi-foto.js):
-       muti per la stessa ragione dello Studio — l'ora ce l'hanno nella
-       loro fascia — e prima dell'hub per lo stesso motivo. */
-    {id:"luogo",  root:"#luogo.on",           mute:true},
-    /* La piazza (il freestyle) e il foglio (writer.js) non montano la
-       pastiglia da nessuna parte, e sotto i 900 — dove il palco smette di
-       essere un contesto suo (`.palco{position:static}`, stretto.css) — la
-       pastiglia dell'hub, con il suo z-index 142, galleggiava sopra al
-       titolo del freestyle (giro del 20/09). Muti, come lo Studio. */
-    {id:"piazza", root:"#piazza.on",          mute:true},
-    {id:"writer", root:"#writer.on",          mute:true},
-    {id:"hub",    root:"#s-hub.screen.on",   head:".pbarra",       mount:".pbarra", accent:"#c084fc", panel:"linear-gradient(180deg,rgba(16,18,27,.985),rgba(7,9,14,.985))", border:"rgba(192,132,252,.28)"}
+    {id:"jail",     root:"#adf-jail.on",       head:".adf-jail-top", mount:".adf-jail-meta", accent:"#ff315b", panel:"linear-gradient(180deg,rgba(25,8,14,.985),rgba(8,8,11,.985))", border:"rgba(255,49,91,.38)"},
+    {id:"abilita",  root:"#abilita.on",        head:null, accent:"#b557ff", panel:"linear-gradient(180deg,rgba(12,9,18,.985),rgba(5,6,9,.985))", border:"rgba(181,87,255,.34)"},
+    {id:"strada",   root:"#strada.on",         head:".topbar", mount:".session", before:".exit", accent:"#c52e5f", panel:"linear-gradient(180deg,rgba(27,7,20,.985),rgba(8,5,9,.985))", border:"rgba(197,46,95,.42)"},
+    {id:"negozio",  root:"#negozio.on",        head:".nghead", mount:".nghead", before:".ngx", accentVar:"--acid", accent:"#a3e635", panel:"linear-gradient(180deg,rgba(25,20,34,.985),rgba(12,10,17,.985))", border:"rgba(255,255,255,.14)"},
+    {id:"piazza",   root:"#piazza.on",         head:".phead", mount:".phead", before:".px", accent:"#c084fc", panel:"linear-gradient(180deg,rgba(20,14,27,.985),rgba(8,7,12,.985))", border:"rgba(192,132,252,.32)"},
+    {id:"writer",   root:"#writer.on",         head:".whead", mount:".whead", before:".wx", accent:"#f0c75e", panel:"linear-gradient(180deg,rgba(24,20,13,.985),rgba(9,8,6,.985))", border:"rgba(240,199,94,.30)"},
+    {id:"studio",   root:"#studio.on",         head:".sthead", mount:".sthead", accent:"#f2c14e", panel:"linear-gradient(180deg,rgba(18,19,24,.985),rgba(7,9,13,.985))", border:"rgba(242,193,78,.28)"},
+    {id:"pannello", root:"#pannello.on",       head:".pnhead", mount:".pnhead", before:".pnx", accentVar:"--c1", accent:"#7c3aed", panel:"linear-gradient(180deg,rgba(20,18,25,.985),rgba(10,10,14,.985))", border:"rgba(255,255,255,.14)"},
+    {id:"luogo",    root:"#luogo.on",          head:".lfhead", mount:".lfhead", accent:"#f2c14e", panel:"linear-gradient(180deg,rgba(18,19,24,.985),rgba(7,9,13,.985))", border:"rgba(242,193,78,.28)"},
+    {id:"hub",      root:"#s-hub.screen.on",   head:".pbarra", mount:".pbarra", accent:"#c084fc", panel:"linear-gradient(180deg,rgba(16,18,27,.985),rgba(7,9,14,.985))", border:"rgba(192,132,252,.28)"}
   ];
 
   let panelRoot=null, panel=null, widget=null, dock=null, host=null;
@@ -76,10 +66,8 @@
     for(const spec of HOSTS){
       const scope=document.querySelector(spec.root);
       if(!scope) continue;
-      /* posto muto: è acceso, quindi comanda lui, e quello che dice è
-         «qui la pastiglia non ci va». Torna null come se non ci fosse
-         nessun host, e mount() nasconde widget e pannello. */
-      if(spec.mute) return null;
+      if(spec.head === null)
+        return {spec,scope,head:null,mount:document.body,before:null};
       const head=scope.querySelector(spec.head);
       if(!head) continue;
       const mount=scope.querySelector(spec.mount||spec.head)||head;
@@ -133,7 +121,8 @@
 
     /* I vecchi shortcut calendario non devono restare dietro al widget.
        Cerchiamo solo nella testata attiva: non tocchiamo le CTA del gameplay. */
-    const head=scope.querySelector((HOSTS.find(x=>x.id===id)||{}).head||"");
+    const spec=HOSTS.find(x=>x.id===id);
+    const head=spec&&spec.head ? scope.querySelector(spec.head) : null;
     if(head){
       for(const b of head.querySelectorAll("button")){
         if(b===widget || (dock&&dock.contains(b))) continue;
@@ -153,14 +142,18 @@
     panelRoot.style.setProperty("--tc-border",found.spec.border||"rgba(255,255,255,.16)");
   }
 
+  function clearHostClasses(){
+    if(host&&host.head) host.head.classList.remove("adf-time-host");
+    if(host&&host.mount&&host.mount!==document.body) host.mount.classList.remove("adf-time-dock-host");
+  }
+
   function mount(){
     ensure();
     const found=activeHost();
     if(!found){
       closePanel();
       restoreLegacy();
-      if(host&&host.head) host.head.classList.remove("adf-time-host");
-      if(host&&host.mount) host.mount.classList.remove("adf-time-dock-host");
+      clearHostClasses();
       host=null;
       if(dock) dock.hidden=true;
       widget.hidden=true;
@@ -172,11 +165,10 @@
     if(changed){
       closePanel();
       restoreLegacy();
-      if(host&&host.head) host.head.classList.remove("adf-time-host");
-      if(host&&host.mount) host.mount.classList.remove("adf-time-dock-host");
+      clearHostClasses();
       host=found;
-      host.head.classList.add("adf-time-host");
-      host.mount.classList.add("adf-time-dock-host");
+      if(host.head) host.head.classList.add("adf-time-host");
+      if(host.mount!==document.body) host.mount.classList.add("adf-time-dock-host");
       if(host.before&&host.before.parentElement===host.mount) host.mount.insertBefore(dock,host.before);
       else host.mount.appendChild(dock);
       hideLegacyFor(host.spec.id,host.scope);
