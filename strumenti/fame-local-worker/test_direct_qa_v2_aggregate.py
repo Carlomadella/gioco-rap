@@ -135,6 +135,33 @@ class DirectQaV2AggregateTests(unittest.TestCase):
         self.assertEqual(result['summary']['rejectedFinal'],1)
         self.assertEqual(result['runs'][0]['classification'],'REJECTED')
 
+    def test_queue_root_expands_desks(self):
+        queue=self.base/'queue-root'
+        desks=queue/'desks'
+        desks.mkdir(parents=True)
+        task='queued'
+        desk=desks/task
+        desk.mkdir()
+        write_json(desk/'desk.json',{
+            'schema':'fame-direct-qa-worker-v2',
+            'taskId':task,
+            'packageSha256':'pkg-'+task,
+            'codeHashes':{'old':'queue-hash'},
+        })
+        self.make_attempt(desk,1,self.report(task))
+        write_json(queue/'queue.json',{
+            'schema':'fame-direct-qa-queue-v2',
+            'tasks':[task],
+            'packages':{task:'unused-here'},
+            'executionAuthorized':False,
+            'maximumModelCallsPerTask':2,
+        })
+
+        result=a.summarize([queue])
+        self.assertEqual(result['summary']['tasks'],1)
+        self.assertEqual(result['runs'][0]['taskId'],task)
+        self.assertEqual(result['runs'][0]['classification'],'FIRST_PASS_RAW_CLEAN')
+
     def test_tampered_attempt_receipt_is_rejected(self):
         root=self.make_root('tampered',self.report('tampered'))
         (root/'attempt-1'/'report.json').write_text('{}\n',encoding='utf-8')
