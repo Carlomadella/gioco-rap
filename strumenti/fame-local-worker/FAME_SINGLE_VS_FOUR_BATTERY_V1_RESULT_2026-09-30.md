@@ -88,9 +88,17 @@ Single-agent:
 - elapsed circa 26.422 s;
 - metriche response assenti nell'aggregato.
 
-Il pattern indica che la chiamata ha prodotto `response.json` ma il tentativo è fallito dopo la chiamata. Il summary non permette di distinguere OUTPUT_TRUNCATED, final content vuoto, JSON invalido o altro errore post-response.
+Il diagnostico read-only successivo ha classificato il tentativo in modo definitivo come `OUTPUT_TRUNCATED`:
+- `resultStatus=ERROR`;
+- errore `ValueError: Risposta incompleta`;
+- `done_reason=length`;
+- `eval_count=4096`;
+- content presente: 17015 caratteri;
+- thinking presente: 3110 caratteri;
+- content finale non parseabile come JSON;
+- nessuna chiamata modello eseguita dal diagnostico.
 
-Aggiunto `fame_battery_attempt_diagnostic.py`, read-only e senza chiamate modello, per classificare il tentativo storico.
+Quindi il single-agent non è stato dimostrato semanticamente errato: ha esaurito il budget massimo di generazione della singola chiamata.
 
 ## Costi aggregati automatici
 
@@ -104,18 +112,45 @@ Single-agent:
 - eval_count: 2964;
 - model duration excluding load: 19.606 s.
 
-I totali single-agent NON sono direttamente confrontabili con quelli network perché nel quarto caso il summary del tentativo fallito espone metriche a zero. Il diagnostico storico deve recuperare il `done_reason` e le metriche della response prima di calcolare un rapporto finale.
+Il diagnostico storico recupera per il quarto single-agent:
+- total_duration: 26.418 s;
+- load_duration: 0.004 s;
+- prompt_eval_count: 640;
+- eval_count: 4096.
 
-## Interpretazione provvisoria
+Correggendo il totale single-agent con queste metriche storiche:
+- prompt_eval_count totale: 2930;
+- eval_count totale: 7060;
+- model duration excluding load: circa 46.020 s.
 
-La batteria non sostiene ancora una vittoria semantica generale della rete.
+La rete resta più costosa:
+- circa 6.67x prompt token;
+- circa 2.24x eval token;
+- circa 2.25x model time excluding load;
+- 16 call contro 4.
+
+## Interpretazione finale della Battery V1
+
+La batteria non sostiene una vittoria semantica generale della rete.
 
 Fatti osservati:
 - nei primi tre casi entrambi i bracci arrivano alla risposta attesa;
-- nel quarto caso la rete completa il task e il single-agent no;
-- il quarto failure deve essere classificato prima di attribuirne la causa;
-- la rete richiede 4x le chiamate per caso;
+- nel quarto caso la rete completa il task mentre il single-agent viene troncato al limite di 4096 token;
+- non è osservato un quarto caso in cui il single-agent fornisca una conclusione semantica errata corretta dalla rete;
+- la rete richiede 4x le chiamate per caso e più costo complessivo;
 - la selezione dell'evidenza non è uniformemente più parsimoniosa in uno dei due bracci.
+
+### Confondente di budget
+
+I due bracci usano le stesse opzioni **per chiamata**, ma non lo stesso budget totale di generazione:
+- single-agent: massimo 1 × 4096 token;
+- Four-Role Network: massimo 4 × 4096 token distribuiti fra quattro chiamate.
+
+Il quarto caso dimostra quindi un vantaggio di robustezza operativa della decomposizione **sotto un limite per-call di 4096 token**, ma non permette di attribuire il vantaggio alla decomposizione indipendentemente dal maggiore budget totale disponibile alla rete.
+
+Servono due estimand distinti nei test successivi:
+1. **fixed per-call budget**: misura la robustezza del sistema reale con il limite corrente;
+2. **matched total generation budget**: misura se la decomposizione aggiunge valore a parità di budget complessivo.
 
 ## Consumo
 
