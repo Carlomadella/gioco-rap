@@ -1,0 +1,91 @@
+{
+  "taskId": "package-authoring-rules-review-v1",
+  "sourceCommit": "4c60c18425fc56a40b476ddfffded55ecb968141",
+  "sourcePath": "strumenti/fame-local-worker/DIRECT_QA_PACKAGE_AUTHORING.md",
+  "sourceSnapshot": "cases/direct-qa/package-authoring-rules-source.md",
+  "sourceSha256": "c004ea93a12040095e8ade1c4a2f0a9c486d848d4535bcf4ec9eadc51d5085e1",
+  "scope": "Revisione documentale read-only delle regole di authoring dei package Direct QA. Verificare unità semantiche, immutabilità dei run consumati, checklist pre-run e prova minima sufficiente senza autorizzare il ritocco retroattivo di task storici.",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "# Direct QA package authoring rules\n\n## Semantic unit rule\n\nEvidence units must represent complete semantic blocks.\n\nDo not split a structural Markdown heading into its own evidence unit when it only labels the paragraph/list that follows. In that case, combine the heading and its following content into one unit.\n\nBad:\n\n```text\nU13: ## Ricerca per il prossimo ramo\nU14: Tsumugi: ...\n```\n\nPreferred:\n\n```text\nU13: ## Ricerca per il prossimo ramo\n\nTsumugi: ...\n```\n\nReason: the model may reasonably cite the heading together with the content. If the heading is a standalone unit but is neither required nor declared benign context, the host validator can produce a precision false negative even when the conclusion and required coverage are correct."
+    },
+    {
+      "unitId": "U02",
+      "text": "## Frozen-run rule\n\nNever repair a consumed task by changing its rubric/package and rerunning it. Preserve the historical result, classify the authoring defect separately, and apply the improved unitization only to new task IDs."
+    },
+    {
+      "unitId": "U03",
+      "text": "## Pre-run checklist\n\nBefore freezing a new direct-QA package:\n\n1. source snapshot must match the intended repository source exactly;\n2. units must reconstruct the complete source;\n3. headings without autonomous semantics must be joined to the following block;\n4. each positive check must have explicit required coverage groups;\n5. known harmless contextual units that may reasonably accompany evidence must be listed as benign context;\n6. negative checks must not need evidence IDs;\n7. package-specific tests must include incomplete coverage and false-positive authorization cases;\n8. freeze package and rubric before the first model call.\n"
+    },
+    {
+      "unitId": "U04",
+      "text": "## Minimal sufficient evidence rule\n\nFor a new positive check, prefer the smallest semantic unit that already contains every material component of the assertion. Do not require a second background unit merely because it explains why the first unit is true.\n\nIf one unit is explicitly self-sufficient, use one required group containing that unit. Multiple required groups are appropriate only when the assertion genuinely combines facts that are separated across the source and no single unit states the complete proposition.\n\nBefore freezing the package, manually test the minimal citation a careful reviewer could reasonably choose. If that citation supports the full assertion, the rubric must accept it.\n"
+    }
+  ],
+  "checks": [
+    {
+      "code": "SEMANTIC_UNIT_RULE",
+      "assertion": "Un heading Markdown che etichetta soltanto il contenuto successivo non deve diventare una evidence unit autonoma: va unito al blocco seguente, altrimenti il validator può produrre un precision false negative anche con conclusione e coverage corrette."
+    },
+    {
+      "code": "FROZEN_RUN_RULE",
+      "assertion": "Un task consumato non va riparato modificando rubric/package e rilanciandolo: il risultato storico va preservato, il difetto di authoring classificato separatamente e la correzione applicata solo a nuovi task ID."
+    },
+    {
+      "code": "PRE_RUN_AUTHORING_DISCIPLINE",
+      "assertion": "Prima del freeze, source snapshot e unità devono ricostruire la fonte, i check positivi devono avere coverage esplicita, il benign context va dichiarato, i negativi non richiedono evidence ID, i test devono coprire incomplete coverage e false authorization, e package/rubric vanno congelati prima della prima chiamata."
+    },
+    {
+      "code": "MINIMAL_SUFFICIENT_EVIDENCE",
+      "assertion": "Per un check positivo va preferita la più piccola unità semanticamente autosufficiente; non si deve richiedere background aggiuntivo se una sola unità copre già tutta la proposizione, e la citazione minima plausibile va testata prima del freeze."
+    },
+    {
+      "code": "CONSUMED_TASK_CAN_BE_RETUNED_AND_RERUN",
+      "assertion": "Dopo un reject è corretto cambiare la rubrica del task consumato e rilanciarlo con lo stesso task ID per ottenere un nuovo first attempt."
+    }
+  ],
+  "rubric": {
+    "SEMANTIC_UNIT_RULE": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U01"
+        ]
+      ],
+      "benignContext": []
+    },
+    "FROZEN_RUN_RULE": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U02"
+        ]
+      ],
+      "benignContext": []
+    },
+    "PRE_RUN_AUTHORING_DISCIPLINE": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U03"
+        ]
+      ],
+      "benignContext": []
+    },
+    "MINIMAL_SUFFICIENT_EVIDENCE": {
+      "supported": true,
+      "requiredGroups": [
+        [
+          "U04"
+        ]
+      ],
+      "benignContext": []
+    },
+    "CONSUMED_TASK_CAN_BE_RETUNED_AND_RERUN": {
+      "supported": false,
+      "requiredGroups": [],
+      "benignContext": []
+    }
+  }
+}
