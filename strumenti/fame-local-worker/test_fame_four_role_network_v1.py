@@ -99,14 +99,14 @@ class FameFourRoleNetworkTests(unittest.TestCase):
             'limitations':['La conclusione riguarda solo lo scope del Source Registry congelato.'],
         }
 
-    def run(self,replies):
+    def run_network(self,replies):
         fake=Fake(replies)
         with contextlib.redirect_stdout(io.StringIO()):
             result=n.run(self.root,fake)
         return fake,result
 
     def test_full_four_role_pilot_passes(self):
-        fake,result=self.run([self.extractor(),self.challenge(),self.verifier(),self.integrator()])
+        fake,result=self.run_network([self.extractor(),self.challenge(),self.verifier(),self.integrator()])
         self.assertEqual(result['status'],'PROPOSED_FOR_HUMAN_REVIEW')
         self.assertEqual(result['modelCalls'],4)
         self.assertEqual(len(fake.calls),4)
