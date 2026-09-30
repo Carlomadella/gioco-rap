@@ -51,6 +51,8 @@ const LUOGHI_FOTO = {
      comandi veri HTML/CSS appoggiati in basso. Niente popup all'ingresso. */
   fabbrica: {f:"schermate_luoghi_con_elementi_HTML/fabbrica.webp", pos:"center 52%",
              k:"Fabbrica", bar:"Linea di montaggio", d:"turno pieno, rumore e ferro"},
+  pizzeria: {f:"schermate_luoghi_con_elementi_HTML/pizzeria.webp", pos:"center 54%",
+             k:"Pizzeria", bar:"La cucina", d:"turno serale, forno acceso e piatti da lavare"},
   /* il Circolo (js/game/circolo.js) la foto non la stende sotto a tutto:
      la mette nel suo riquadro, come nel riferimento `il_circolo`. La
      stanza nella fascia è la fascia dell'ora (`circoloFascia`). */
@@ -143,6 +145,7 @@ function renderLuogo(){
     LUOGO.id === "stacca"   ? lfStacca() :
     LUOGO.id === "palestra" ? lfPalestra() :
     LUOGO.id === "fabbrica" ? lfFabbrica() :
+    LUOGO.id === "pizzeria" ? lfPizzeria() :
     circoloParti();
   const wrap = $("lf-wrap");
   /* la Casa non ha colonne: ha le porte sopra alla foto, e basta. Il
@@ -406,6 +409,71 @@ function lfFabbrica(){
   return {sx:sx, mid:mid, dx:dx};
 }
 
+/* ---------- LA PIZZERIA ----------
+   Renderer indipendente dalla Fabbrica: condivide soltanto JOBS,
+   assumitiCome() e l'azione turno. La UI puo' quindi evolvere da sola. */
+function lfPizzeria(){
+  const def = (typeof JOBS !== "undefined" ? JOBS : []).find(j => j.id === "lavapiatti");
+  if(!def) return {mid:lfPan("Pizzeria", '<div class="stvuoto">Turno non disponibile.</div>', "orologio")};
+
+  const mio = !!(G.job && G.job.id === def.id);
+  const altro = G.job && !mio ? G.job : null;
+  let stato = {ok:true, perche:""};
+  let orario = "Turno serale";
+  try{
+    if(window.GAME_HOURS && window.GAME_TIME){
+      const st = GAME_HOURS.jobStatus(def.id);
+      const dur = GAME_TIME.formatDuration(GAME_HOURS.jobDuration(def.id));
+      orario = "Turno di " + dur;
+      if(st && !st.open) stato = {ok:false, perche:st.label || "Adesso e' chiuso"};
+      else if(st && !st.allDay && st.closeAt != null)
+        orario += " · ingresso fino alle " + GAME_TIME.format(st.closeAt - GAME_HOURS.jobDuration(def.id));
+    }
+  }catch(e){}
+  if(altro) stato = {ok:false, perche:"Lavori gia' come " + altro.n.toLowerCase()};
+  else if(stato.ok && G.energy < def.e) stato = {ok:false, perche:"Serve energia"};
+
+  const sx = lfPan("Il posto",
+    lfRiga("Mansione", def.n) +
+    lfRiga("Paga", fmt(def.pay) + " €", "oro") +
+    lfRiga("Costo", "−" + def.e + " energia") +
+    '<p class="stnota lfnotasotto">' + lfEsc(def.d) + '</p>',
+    "orologio");
+
+  const riga = stScelta({
+    attr:"",
+    on:true,
+    n:mio ? "Il tuo turno" : "Posto da lavapiatti",
+    d:orario,
+    v:stato.ok ? (fmt(def.pay) + " € · −" + def.e + " energia") : stato.perche,
+    vCls:stato.ok ? "" : "calmo"
+  });
+
+  const testo = mio ? "Fai il turno" : "Fatti assumere e lavora";
+  const mid = lfPan(mio ? "Vai al lavoro" : "Vuoi lavorare qui?",
+    '<p class="stnota">Cucina bollente, servizio serale e piatti che non finiscono mai. È uno dei primi lavori che tengono in piedi la settimana.</p>' +
+    riga +
+    '<div class="stazioni"><button type="button" class="stprimo" data-lavoro="lavapiatti"' +
+      (stato.ok ? "" : " disabled") + '>' + lfIco("orologio") + lfEsc(testo) +
+      ' · +' + fmt(def.pay) + ' € · −' + def.e + ' energia</button></div>' +
+    (stato.ok ? "" : '<p class="stperche">' + lfEsc(stato.perche) + '.</p>'),
+    "orologio");
+
+  const statoTitolo = mio ? "Sei assunto qui." : altro ? "Hai già un altro lavoro." : "Non sei ancora assunto.";
+  const statoTesto = mio
+    ? "Quando il turno è aperto entri direttamente dalla cucina."
+    : altro
+      ? "Lavori già come " + altro.n.toLowerCase() + ". Un posto alla volta: questo turno resta bloccato."
+      : "Il primo turno ti assume automaticamente.";
+  const dx = lfPan("Oggi",
+    '<div class="stvuoto"><b>' + lfEsc(statoTitolo) + '</b> ' + lfEsc(statoTesto) + '</div>' +
+    lfRiga("Energia", Math.round(G.energy)) +
+    lfRiga("In cassa", fmt(G.money) + " €", "oro"),
+    "soldi");
+
+  return {sx:sx, mid:mid, dx:dx};
+}
+
 /* ---------- IL CIRCOLO ----------
    Il Live Club e la Sala sono diventati un posto solo (29/09/2026): la
    pagina è sua, in js/game/circolo.js — qui passa solo per la fascia in
@@ -460,12 +528,11 @@ if(typeof avviaAzioneDiretta === "function"){
 if(typeof mostraScena === "function"){
   const lfScenaOriginale = mostraScena;
   window.mostraScena = function(a, sc, msg, extra){
-    /* Il turno è condiviso da tutti i lavori: lo teniamo dentro alla pagina
-       solo quando è partito dalla Fabbrica. Pizzeria e gli altri flussi non
-       cambiano. In questo modo il bottone HTML sotto alla foto non apre una
-       seconda schermata sopra al luogo appena scelto. */
-    const turnoFabbrica = a && a.id === "turno" && LUOGO && LUOGO.id === "fabbrica";
-    const id = a && (LUOGO_MOSSE[a.id] || (turnoFabbrica ? "fabbrica" : null));
+    /* Fabbrica e Pizzeria hanno renderer distinti; condividono solo l'azione
+       turno. Se parte da una delle due pagine, l'esito resta su quel luogo. */
+    const turnoLuogo = a && a.id === "turno" && LUOGO &&
+      (LUOGO.id === "fabbrica" || LUOGO.id === "pizzeria") ? LUOGO.id : null;
+    const id = a && (LUOGO_MOSSE[a.id] || turnoLuogo);
     if(!id) return lfScenaOriginale.apply(this, arguments);
     const esito = {a:a.id, msg:String(msg == null ? "" : msg), extra:String(extra == null ? "" : extra)};
     const mostra = () => {
@@ -543,6 +610,8 @@ if($("luogo")){
     if(vai && !vai.disabled){ luogoVai(vai.dataset.vai); return; }
     const lavoro = e.target.closest("[data-lavoro]");
     if(lavoro && !lavoro.disabled && typeof assumitiCome === "function"){
+      LUOGO.prima = lfFotografia();
+      LUOGO.esito = null;
       assumitiCome(lavoro.dataset.lavoro);
       return;
     }
