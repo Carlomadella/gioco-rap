@@ -163,7 +163,7 @@ def metadata(p):
     }
 
 
-CONSUMED_CASES=frozenset({'source-registry-readiness-network-v1','agent-network-readiness-network-v2','agent-network-readiness-network-v3'})
+CONSUMED_CASES=frozenset({'source-registry-readiness-network-v1','agent-network-readiness-network-v2','agent-network-readiness-network-v3','model-comparison-generalization-network-v3'})
 
 
 def init(root,case_id):
