@@ -117,7 +117,7 @@ class FameFourRoleNetworkTests(unittest.TestCase):
         self.assertFalse(result['independentEvaluation'])
 
     def test_antibias_is_role_separated_and_minimal(self):
-        fake,_=self.run([self.extractor(),self.challenge(),self.verifier(),self.integrator()])
+        fake,_=self.run_network([self.extractor(),self.challenge(),self.verifier(),self.integrator()])
         extractor_request=json.dumps(fake.calls[0],ensure_ascii=False)
         antibias_request=json.dumps(fake.calls[1],ensure_ascii=False)
         self.assertNotIn('FAME-AB-01',extractor_request)
@@ -128,7 +128,7 @@ class FameFourRoleNetworkTests(unittest.TestCase):
         self.assertNotIn('language/region',antibias_request)
 
     def test_wrong_final_verdict_is_rejected(self):
-        fake,result=self.run([
+        fake,result=self.run_network([
             self.extractor(),self.challenge(),self.verifier(),
             self.integrator(verdict='GREEN_IS_SUFFICIENT')
         ])
@@ -139,7 +139,7 @@ class FameFourRoleNetworkTests(unittest.TestCase):
     def test_missing_required_final_evidence_is_rejected(self):
         verifier=self.verifier()
         verifier['decisions'][2]={'claimId':'C3','status':'UNSUPPORTED','evidenceIds':[],'reason':'test'}
-        fake,result=self.run([
+        fake,result=self.run_network([
             self.extractor(),self.challenge(),verifier,
             self.integrator(claims=['C1','C2','C4'])
         ])
@@ -147,7 +147,7 @@ class FameFourRoleNetworkTests(unittest.TestCase):
         self.assertIn('INTEGRATOR_INSUFFICIENT_FINAL_EVIDENCE',result['roles']['integrator']['errors'])
 
     def test_unresolved_blocking_antibias_issue_blocks_final(self):
-        fake,result=self.run([
+        fake,result=self.run_network([
             self.extractor(),self.challenge(blocking=True),self.verifier(resolution='UNRESOLVED'),
             self.integrator()
         ])
@@ -157,7 +157,7 @@ class FameFourRoleNetworkTests(unittest.TestCase):
     def test_rejected_role_is_not_retried(self):
         bad=self.extractor()
         bad['claims'][0]['evidenceIds']=[]
-        fake,result=self.run([bad])
+        fake,result=self.run_network([bad])
         self.assertEqual(result['status'],'NEEDS_REVIEW')
         self.assertEqual(len(fake.calls),1)
         again=Fake([self.extractor()])
@@ -174,7 +174,7 @@ class FameFourRoleNetworkTests(unittest.TestCase):
         self.assertEqual(fake.calls,[])
 
     def test_status_replays_requests_and_detects_tampering(self):
-        self.run([self.extractor(),self.challenge(),self.verifier(),self.integrator()])
+        self.run_network([self.extractor(),self.challenge(),self.verifier(),self.integrator()])
         out=self.root/'roles'/'anti-bias'/'attempt-1'
         request=json.loads((out/'request.json').read_text(encoding='utf-8'))
         request['messages'][1]['content']='tampered'
