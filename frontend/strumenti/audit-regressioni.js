@@ -2742,13 +2742,14 @@ test("ogni foto di LUOGHI_FOTO esiste sul disco, quella di giorno del divano com
   (() => {
     const dir = (luoghiFoto.match(/LUOGHI_FOTO_DIR = "([^"]+)"/) || [])[1];
     const foto = Array.from(luoghiFoto.matchAll(/(?:f|giorno):"([^"]+\.(?:png|webp|avif))"/g)).map(m => m[1]);
-    return !!dir && foto.length >= 7 && foto.every(f => fs.existsSync(path.join(ROOT, dir + f)));
+    return !!dir && foto.length >= 8 && foto.every(f => fs.existsSync(path.join(ROOT, dir + f)));
   })());
 test("Casa, Palestra e il Circolo sulla mappa aprono la pagina, non piu' la finestra con due risposte",
   /* dal 20/09 Casa passa prima dal suo video: il commento in mezzo allunga la strada */
   /id:"vita",[\s\S]{0,240}?apriLuogo\("casa"\)/.test(hub) &&
   /id:"palestra",[\s\S]{0,80}?apriLuogo\("palestra"\)/.test(hub) &&
   /id:"fabbrica",[\s\S]{0,80}?apriLuogo\("fabbrica"\)/.test(hub) &&
+  /id:"pizzeria",[\s\S]{0,80}?apriLuogo\("pizzeria"\)/.test(hub) &&
   !hub.includes('{id:"concerti"') && hub.includes("circoloEntra()"));
 test("la Fabbrica usa la foto e i comandi HTML, senza riaprire la scheda lavoro",
   luoghiFoto.includes('fabbrica: {f:"schermate_luoghi_con_elementi_HTML/fabbrica.webp"') &&
@@ -2756,9 +2757,16 @@ test("la Fabbrica usa la foto e i comandi HTML, senza riaprire la scheda lavoro"
   luoghiFoto.includes('data-lavoro="operaio"') &&
   /id:"fabbrica",[\s\S]{0,80}?apriLuogo\("fabbrica"\)/.test(hub) &&
   !/id:"fabbrica",[\s\S]{0,80}?schedaLavoro\("operaio"/.test(hub));
-test("il turno avviato dalla Fabbrica resta nella pagina, senza seconda scena sopra",
-  luoghiFoto.includes('a.id === "turno" && LUOGO && LUOGO.id === "fabbrica"') &&
-  luoghiFoto.includes('LUOGO_MOSSE[a.id] || (turnoFabbrica ? "fabbrica" : null)'));
+test("la Pizzeria usa una pagina fotografica separata dalla Fabbrica, senza popup lavoro",
+  luoghiFoto.includes('pizzeria: {f:"schermate_luoghi_con_elementi_HTML/pizzeria.webp"') &&
+  luoghiFoto.includes("function lfPizzeria()") &&
+  luoghiFoto.includes('data-lavoro="lavapiatti"') &&
+  !luoghiFoto.includes("function lfPostoLavoro(") &&
+  /id:"pizzeria",[\s\S]{0,80}?apriLuogo\("pizzeria"\)/.test(hub) &&
+  !/id:"pizzeria",[\s\S]{0,80}?schedaLavoro\("lavapiatti"/.test(hub));
+test("il turno di Fabbrica e Pizzeria resta nella rispettiva pagina, senza seconda scena sopra",
+  luoghiFoto.includes('(LUOGO.id === "fabbrica" || LUOGO.id === "pizzeria") ? LUOGO.id : null') &&
+  luoghiFoto.includes("LUOGO_MOSSE[a.id] || turnoLuogo"));
 test("le quattro mosse con la pagina finiscono sulla loro foto, e sono tutte scene a pagina piena (il live nel Circolo)",
   (() => {
     const m = luoghiFoto.match(/const LUOGO_MOSSE = \{([^}]+)\}/);
