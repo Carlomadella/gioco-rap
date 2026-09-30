@@ -518,3 +518,46 @@ Tutti i 4 case della batteria sono ora consumati e bloccati per nuovi init sia n
 Verifica automatica dopo hardening diagnostico: 80 test Direct-QA + 65 test FAME, tutti OK.
 
 Report: [FAME_SINGLE_VS_FOUR_BATTERY_V1_RESULT_2026-09-30.md](FAME_SINGLE_VS_FOUR_BATTERY_V1_RESULT_2026-09-30.md).
+
+
+## Battery V1 — diagnosi finale del quarto caso
+
+Il diagnostico read-only sul single-agent di `battery-anti-bias-v1` ha classificato il failure come `OUTPUT_TRUNCATED`:
+- `resultStatus=ERROR`;
+- `ValueError: Risposta incompleta`;
+- `done_reason=length`;
+- `eval_count=4096`;
+- content presente ma JSON non parseabile;
+- nessuna nuova chiamata modello e nessuna modifica allo storico.
+
+Quindi il 4/4 network vs 3/4 single della Battery V1 non è una vittoria semantica dimostrata della rete. È un vantaggio operativo osservato sotto limite per-call 4096: nei primi tre casi entrambi i bracci sono corretti; nel quarto la rete completa e il single-agent esaurisce il budget.
+
+Confondente: single-agent aveva massimo 1×4096 token; la rete massimo 4×4096 token distribuiti. Il budget totale non era equivalente.
+
+Report Battery V1 aggiornato con questa classificazione.
+
+## Matched-total-generation-budget V1 pronto
+
+Preparata baseline `fame_single_agent_baseline_v2.py`:
+- num_predict=16384;
+- num_ctx=32768, temperature=0, seed=42 invariati;
+- diagnostica response/metrics preservata anche su errore post-response;
+- nessun retry.
+
+Preparata `fame_single_vs_four_matched_budget_v1.py` con quattro casi nuovi congelati insieme:
+- `matched-package-authoring-v1`;
+- `matched-qa-review-v1`;
+- `matched-cline-real-qa-v1`;
+- `matched-coordinator-reject-v1`.
+
+Budget massimo totale per caso:
+- single-agent: 1×16384 = 16384;
+- Four-Role Network V3: 4×4096 = 16384.
+
+Ordine dei bracci bilanciato 2/2. Un output truncation con response salvata è contato come outcome e non ferma l'altro braccio; failure senza response ferma la batteria.
+
+Le unità dei package sono legate letteralmente agli snapshot congelati; nessuna inferenza reale è stata eseguita durante l'authoring.
+
+Verifica automatica pre-run: 80 test Direct-QA + 75 test FAME, tutti OK.
+
+Dettagli: [FAME_SINGLE_VS_FOUR_MATCHED_BUDGET_V1.md](FAME_SINGLE_VS_FOUR_MATCHED_BUDGET_V1.md).
