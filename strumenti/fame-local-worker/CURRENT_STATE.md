@@ -1282,3 +1282,61 @@ CI al commit `1c1ed116d41d0bb1802511155ef0b1ef99f2536d`:
 - 80 Direct-QA: OK;
 - 148 FAME: OK.
 
+## Adaptive QA V3 — secondo fresh pilot: baseline ancora sufficiente
+
+Eseguito una sola volta `adaptive-v3-controlled-failure-pilot-v1` nella root locale `FAME_ADAPTIVE_V3_CONTROLLED_20260930_204159`.
+
+Baseline single-agent V2:
+- status: `PROPOSED_FOR_HUMAN_REVIEW`;
+- result status: `ACCEPTED`;
+- answer option: `ANSWER_REAL_SEMANTIC_AND_COVERAGE_FAILURE`;
+- modelCalls: 1;
+- required evidence coverage completa.
+
+Contenuto correttamente distinto dalla baseline:
+- U01: first-run v1 `REJECTED` dopo una sola chiamata;
+- U02+U03: 4/5 conclusioni corrette, con una conclusione semanticamente errata e una coverage insufficiente;
+- U04: risultato storico consumato e non ritentato con worker v1;
+- U06+U07: worker v2 con al massimo una seconda chiamata nello stesso run, feedback generico e repair classificato come recovery operativo, non nuova independent evaluation.
+
+Adaptive V3:
+- trigger: `BASELINE_ACCEPTED`;
+- decision: `NO_ESCALATION`;
+- selectedPath: `single-agent`;
+- recoveredByEscalation: false;
+- Four-Role Network V9: 0 model call, tutti i ruoli PENDING;
+- modelCalls totali: 1;
+- status finale: `PROPOSED_FOR_HUMAN_REVIEW`.
+
+Interpretazione:
+- secondo fresh case consecutivo in cui la baseline e sufficiente;
+- il secondo case contiene contemporaneamente errore semantico reale storico, errore di coverage, stato consumato e distinzione recovery/evaluation, quindi non e un caso banale di solo PASS;
+- Adaptive V3 evita correttamente quattro chiamate aggiuntive anche qui;
+- V9 resta verificata soltanto sul diagnostico consumato Tsumugi-architecture; non esiste ancora un fresh failure naturale della baseline su cui misurarne la generalizzazione.
+
+Il case e ora consumato e non deve essere rilanciato come nuovo first attempt.
+
+## Decisione metodologica dopo i due fresh pilot Adaptive V3
+
+Non cercare o costruire altri case con l'obiettivo implicito di provocare l'escalation.
+
+Motivo:
+- due fresh pilot consecutivi hanno mostrato baseline sufficiente con una sola model call;
+- continuare a selezionare casi finche la baseline fallisce introdurrebbe selection bias e trasformerebbe la valutazione in ricerca di un failure;
+- il valore dell'architettura adattiva e proprio lasciare spenta la rete quando non serve.
+
+Protocollo operativo da questo checkpoint:
+1. usare il percorso Adaptive V3 soltanto su nuovi incarichi documentali/scientifici reali che entrano naturalmente nel lavoro;
+2. congelare domanda, evidence units, answer options e rubrica host prima della prima inferenza;
+3. non selezionare il task in funzione della probabilita attesa di escalation;
+4. se baseline e ACCEPTED, registrare NO_ESCALATION e costo di una call;
+5. se baseline fallisce con response valida, lasciare partire V9 automaticamente e trattare quel run come primo test fresco della sua recovery;
+6. non modificare V9 sulla base di task che non la eseguono;
+7. non creare V10 senza un nuovo failure indipendente e concretamente diagnosticato.
+
+Stato scientifico attuale:
+- gate adattivo: supportato da due fresh pilot consecutivi con corretta non-escalation;
+- V9: recovery causale dimostrata sul case consumato usato per il diagnostico, ma generalizzazione su fresh failure ancora NON verificata;
+- human review resta richiesta;
+- executionAuthorized, trainingAuthorized, networkProductionReady e independentEvaluation restano false.
+
