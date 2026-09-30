@@ -1,0 +1,57 @@
+{
+  "caseId": "verifier-v4-branch-probe-v2",
+  "sourceCommit": "cdea2227a4a71906c48b97d888e707a787cecc3e",
+  "sourcePath": "strumenti/fame-local-worker/DIRECT_QA_TSUMUGI_CONTROLLED_RESULT_2026-09-23.md",
+  "sourceSnapshot": "cases/fame-network/v4-verifier-branch-source.md",
+  "question": "Per i quattro claim congelati, C1 e C4 sono supportati, C2 è contraddetto e C3 contiene un nucleo vero ma una conclusione troppo forte da riscrivere?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "Il task ha restituito `REJECTED` con una sola chiamata al modello."
+    },
+    {
+      "unitId": "U02",
+      "text": "Totale: 4/5 conclusioni corrette. A differenza del reject subset+BIC, qui esiste almeno un errore semantico reale, oltre a una omissione di copertura evidence."
+    },
+    {
+      "unitId": "U03",
+      "text": "Il risultato resta consumato e non viene ritentato con il worker v1."
+    },
+    {
+      "unitId": "U04",
+      "text": "Il worker one-shot v1 resta utile come misura del primo tentativo, ma non e sufficiente come percorso operativo se ogni singola omissione blocca l'intero incarico."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_MIXED",
+      "meaning": "C1 e C4 sono supportati, C2 non è supportato, C3 va riscritto perché unisce un nucleo supportato a una conclusione troppo forte."
+    },
+    {
+      "optionId": "ANSWER_ALL_SUPPORTED",
+      "meaning": "Tutti e quattro i claim sono supportati così come formulati."
+    },
+    {
+      "optionId": "ANSWER_INSUFFICIENT",
+      "meaning": "Le unità non permettono una partizione affidabile dei quattro claim."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_MIXED",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U01"
+    ],
+    [
+      "U03"
+    ]
+  ],
+  "optionalContext": [
+    "U02",
+    "U04"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
