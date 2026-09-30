@@ -1,0 +1,10 @@
+{
+  "schema": "fame-adaptive-consumed-cases-v1",
+  "caseIds": [
+    "adaptive-p2-measurement-pilot-v1",
+    "adaptive-transfer-protocol-pilot-v1",
+    "adaptive-v2-tsumugi-architecture-pilot-v1",
+    "adaptive-v3-first-attempt-pass-pilot-v1",
+    "adaptive-v3-controlled-failure-pilot-v1"
+  ]
+}
