@@ -152,7 +152,15 @@ class FameFourRoleNetworkTests(unittest.TestCase):
             self.integrator()
         ])
         self.assertEqual(result['status'],'NEEDS_REVIEW')
-        self.assertIn('INTEGRATOR_UNRESOLVED_BLOCKING_ANTIBIAS',result['roles']['integrator']['errors'])
+        self.assertIn('INTEGRATOR_BLOCKING_ANTIBIAS_NOT_REJECTED',result['roles']['integrator']['errors'])
+
+    def test_upheld_blocking_antibias_issue_also_blocks_final(self):
+        fake,result=self.run_network([
+            self.extractor(),self.challenge(blocking=True),self.verifier(resolution='UPHELD'),
+            self.integrator()
+        ])
+        self.assertEqual(result['status'],'NEEDS_REVIEW')
+        self.assertIn('INTEGRATOR_BLOCKING_ANTIBIAS_NOT_REJECTED',result['roles']['integrator']['errors'])
 
     def test_rejected_role_is_not_retried(self):
         bad=self.extractor()
