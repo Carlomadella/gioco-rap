@@ -36,6 +36,7 @@ jobs:
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-audio-to-midi-development-qa-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-audio-to-midi-human-review-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-audio-to-midi-human-review-range-test.js
+      - run: node frontend/strumenti/fame-neural-composer/owned-beats-audio-to-midi-audition-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-basic-pitch-environment-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-basic-pitch-bootstrap-verify-test.js
       - run: node frontend/strumenti/fame-neural-composer/owned-beats-basic-pitch-lock-test.js
@@ -113,6 +114,8 @@ jobs:
         run: python frontend/strumenti/fame-neural-composer/owned-beats/basic-pitch-development-execute-v3.py self-test
       - name: Basic Pitch development QA self-test
         run: python frontend/strumenti/fame-neural-composer/owned-beats/basic-pitch-development-qa.py self-test
+      - name: Tsumugi threshold sweep self-test
+        run: python frontend/strumenti/fame-neural-composer/owned-beats/audio-to-midi-p5-tsumugi-threshold-sweep.py self-test
 
   human-reference-browser:
     runs-on: ubuntu-latest
