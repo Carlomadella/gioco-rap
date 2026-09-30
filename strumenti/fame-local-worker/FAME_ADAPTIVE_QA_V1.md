@@ -77,3 +77,32 @@ Sempre:
 
 - 80 test Direct-QA: OK;
 - 109 test FAME: OK.
+
+
+## Fresh pilot adaptive
+
+Case:
+`adaptive-p2-measurement-pilot-v1`.
+
+Fonte congelata:
+`DIRECT_QA_P2_MEASUREMENT_EXPORT_V2_RESULT_2026-09-30.md`,
+commit sorgente `1b8365225370603abc8e5b70efe0caaf770f804f`.
+
+Domanda:
+il first-attempt PASS P2 va interpretato come successo tecnico limitato, mantenendo separati risultati tecnici e inferenze causali non dimostrate, senza trasformarlo in affidabilità generale e senza rilanciare il task consumato.
+
+Expected answer host-only:
+`ANSWER_LIMITED_PASS`.
+
+Required evidence:
+- U01: first-attempt PASS + distinzione tecnico/causale;
+- U02: nessuna affidabilità generale;
+- U03: task consumato da non rilanciare.
+
+U04 è optional context.
+
+Questo pilot non è scelto per forzare escalation. Se il single-agent chiude clean, il comportamento atteso dell'architettura adaptive è fermarsi dopo una sola chiamata.
+
+Verifica automatica pre-run:
+- 80 Direct-QA: OK;
+- 110 FAME: OK.
