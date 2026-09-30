@@ -147,17 +147,34 @@ const CC_ICO = {
   intervista:"M4 2h9l4 4v12H4zm8 1.5V7h3.5zM6.5 9v1.6h8V9zm0 3v1.6h8V12zm0 3v1.6H12V15z",
   indietro:"M10 1.5a8.5 8.5 0 1 1 0 17 8.5 8.5 0 0 1 0-17zm.6 4.3L6.4 10l4.2 4.2 1.2-1.2-2.2-2.2H14V9.2H9.6l2.2-2.2z",
   fuoco:"M10 1.5c.6 3-2.8 4.6-2.8 8a2.8 2.8 0 0 0 5.6.3c1.2 1 1.9 2.6 1.9 4.2A4.7 4.7 0 0 1 10 18.5 5.2 5.2 0 0 1 4.6 13c0-5.4 5.4-6.6 5.4-11.5z",
-  bicchiere:"M4 2h12l-5 7v7h3v2H6v-2h3V9zm3.3 2L10 7.6 12.7 4z",
-  sagoma:"M10 2.4a4.2 4.2 0 1 1 0 8.4 4.2 4.2 0 0 1 0-8.4zM2.6 20c0-4.4 3.3-7.4 7.4-7.4s7.4 3 7.4 7.4z"
+  bicchiere:"M4 2h12l-5 7v7h3v2H6v-2h3V9zm3.3 2L10 7.6 12.7 4z"
 };
 function ccIco(n){
   return '<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="' + (CC_ICO[n] || "") + '"/></svg>';
 }
 const ccEsc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
-/* la faccia disegnata di posto.js, quadrata: nel riferimento sono ritratti */
-function ccFaccia(p, size){
-  if(typeof faccia !== "function") return "";
-  return faccia(p, size).replace('rx="11"', 'rx="0"').replace(/width="\d+" height="\d+"/, 'width="100%" height="100%" preserveAspectRatio="xMidYMid slice"');
+/* I volti: nel riferimento sono ritratti, e dal 30/09 lo sono davvero — gli
+   otto di `concept/simil_avatar.png`, ritagliati uno per uno in
+   `media/photo/circolo/volti/` (320 × 320). Tre sono ragazze (3, 5, 8): a chi
+   ha un nome da ragazza tocca uno di quelli, agli altri uno dei cinque
+   ragazzi. Il volto si sceglie la prima volta che la persona compare, fra
+   quelli meno usati da chi gira già, e resta suo (`p.volto`): due facce
+   uguali nel retro si vedono solo quando la gente supera i volti. */
+const CC_VOLTI = ["", "volto-1.jpg", "volto-2.jpg", "volto-3.jpg", "volto-4.jpg",
+  "volto-5.jpg", "volto-6.jpg", "volto-7.jpg", "volto-8.jpg"];
+const CC_VOLTI_LEI = [3, 5, 8], CC_VOLTI_LUI = [1, 2, 4, 6, 7];
+const CC_NOMI_LEI = ["Sara", "Marta", "Elisa", "Vale", "Bea", "Sara Sette", "Vale P.", "Farah", "Miele", "Ninna", "Selva", "Nebbia"];
+function circoloVolto(p){
+  const pool = CC_NOMI_LEI.indexOf(String(p.n).replace(/ \d$/, "")) >= 0 ? CC_VOLTI_LEI : CC_VOLTI_LUI;
+  if(pool.indexOf(p.volto) >= 0) return p.volto;
+  const usati = (G.gente || []).filter(x => x !== p).map(x => x.volto);
+  const uso = v => usati.filter(u => u === v).length;
+  const semi = String(p.id).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+  p.volto = pool.slice().sort((a, b) => uso(a) - uso(b) || ((a + semi) % pool.length) - ((b + semi) % pool.length))[0];
+  return p.volto;
+}
+function ccFaccia(p){
+  return '<img class="cc-volto" src="' + CIRCOLO_FOTO + 'volti/' + CC_VOLTI[circoloVolto(p)] + '" alt="" loading="lazy" decoding="async">';
 }
 function ccRuolo(p){ return (POSTO_RUOLI[p.ruolo] || {n:p.ruolo}).n; }
 
@@ -262,7 +279,7 @@ function ccGente(f){
   const lista = '<div class="cc-lista">' + chi.map(x => {
     const ignoto = circoloSconosciuto(x);
     return '<button type="button" class="cc-chi' + (p && x.id === p.id ? " on" : "") + '" data-cc-chi="' + x.id + '">' +
-      '<span class="cc-av">' + ccFaccia(x, 34) + '</span>' +
+      '<span class="cc-av">' + ccFaccia(x) + '</span>' +
       '<span class="cc-chitx"><b>' + (ignoto ? "???" : ccEsc(x.n)) +
         (x.numero ? ' <i class="cc-tel" title="Avete il numero">' + ccIco("bolla") + '</i>' : "") + '</b>' +
       '<i>' + ccRuolo(x) + '</i></span></button>';
@@ -279,7 +296,7 @@ function ccScheda(p){
   const car = p.scoperto ? CIRCOLO_CARATTERE[p.car] || p.car : "Da scoprire";
   const rel = typeof relNome === "function" ? relNome(p) : "";
   const testa = '<div class="cc-scheda">' +
-    '<div class="cc-ritratto">' + ccFaccia(p, 96) + '</div>' +
+    '<div class="cc-ritratto">' + ccFaccia(p) + '</div>' +
     '<div class="cc-chie"><b>' + (ignoto ? "???" : ccEsc(p.n)) + '</b><i>' + ccRuolo(p) + '</i>' +
       '<div class="cc-badge"><span class="' + (p.scoperto ? "verde" : "grigio") + '">' + ccIco("gente") + car + '</span>' +
         '<span class="viola">' + ccIco("numero") + rel.charAt(0).toUpperCase() + rel.slice(1) + '</span></div>' +
@@ -408,7 +425,7 @@ function ccSerata(f){
   const facce = chi.slice(0, 4).map(p => {
     const ignoto = circoloSconosciuto(p);
     return '<button type="button" class="cc-faccia" data-cc-chi="' + p.id + '">' +
-      '<span class="cc-fr">' + (ignoto ? '<span class="cc-sagoma">' + ccIco("sagoma") + '</span>' : ccFaccia(p, 80)) +
+      '<span class="cc-fr">' + ccFaccia(p) +
         (invito(p) && !ignoto ? '<u>ti chiama sul palco</u>' : "") + '</span>' +
       '<b>' + (ignoto ? "???" : ccEsc(p.n)) + '</b><i>' + ccRuolo(p) + '</i></button>';
   }).join("");
