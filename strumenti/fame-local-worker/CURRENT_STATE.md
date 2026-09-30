@@ -611,3 +611,28 @@ Interpretazione finale matched-budget:
 - nessun vincitore generale.
 
 Decisione architetturale: V3 resta storica. La prossima versione del Verifier separa strutturalmente claim supportati, non supportati e da riscrivere, invece di affidarsi a uno status scelto nello stesso oggetto.
+
+
+## Four-Role Network V4 pronta
+
+Il failure storico del Verifier su `matched-coordinator-reject-v1` è classificato come `VERIFIER_STATUS_EVIDENCE_CONTRACT_CONTRADICTION`.
+
+V4 è implementata in `fame_four_role_network_v4.py`.
+
+Cambio principale:
+- rimosso il singolo array `decisions` con status per claim;
+- introdotti `supportedClaims`, `unsupportedClaims`, `claimsNeedingRework`;
+- solo `supportedClaims` può contenere evidenceIds;
+- ogni claim deve comparire esattamente una volta nella partizione;
+- Integrator usa esclusivamente `supportedClaims`.
+
+V3 resta intatta per la riproducibilità storica.
+
+Fresh pilot V4 congelato:
+`runtime-contract-result-network-v4` su `CLINE_GPTOSS_TSUMUGI_CONTRACT_RESULT.md`, commit sorgente `718a4a09d3f206f8f1d927b38d2dca81e5333c5c`.
+
+Il case verifica che un FAIL senza artefatto semantico venga distinto da un errore semantico e che un caso consumato non venga reinterpretato come retry candidate.
+
+Verifica automatica pre-run: 80 test Direct-QA + 85 test FAME, tutti OK.
+
+Dettagli: [FAME_FOUR_ROLE_NETWORK_V4.md](FAME_FOUR_ROLE_NETWORK_V4.md).
