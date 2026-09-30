@@ -94,12 +94,11 @@ Network:
 
 Questo failure NON è classificato come troncamento o trasporto. Il Verifier ha prodotto una response completa e parseabile, respinta dal contratto host.
 
-Il summary aggregato non conserva l'output completo del Verifier. Aggiunto `fame_network_attempt_diagnostic.py`, read-only, per distinguere:
-- vera decisione semantica unsupported;
-- contraddizione status/evidence/reason del Verifier;
-- altro host validation reject.
+Il diagnostico read-only successivo ha classificato il tentativo come `VERIFIER_STATUS_EVIDENCE_CONTRACT_CONTRADICTION`.
 
-Nessuna nuova chiamata modello è necessaria.
+Quindi non è dimostrato un errore semantico del contenuto della rete: il Verifier ha prodotto una combinazione contraddittoria fra ramo/status scelto e presenza di evidenza/motivazione, e l'host l'ha correttamente respinta con `VERIFIER_NONSUPPORTED_WITH_EVIDENCE`.
+
+Il diagnostico non ha modificato lo storico e non ha chiamato il modello.
 
 ## Costi aggregati automatici
 
@@ -116,14 +115,17 @@ Network:
 
 La rete usa molti più prompt token e più chiamate, ma meno eval token e meno model time nel totale osservato perché una singola baseline ha consumato l'intero budget da 16384 token.
 
-## Interpretazione provvisoria
+## Interpretazione finale
 
-Il matched-budget elimina il confondente del massimo totale di generazione, ma non produce un vincitore generale:
-- 2 pareggi;
-- 1 caso di robustezza operativa network su troncamento single-agent;
-- 1 caso di failure network con single-agent corretto.
+Il matched-budget elimina il confondente del massimo totale di generazione ma non produce un vincitore generale:
+- 2 pareggi qualitativi;
+- 1 vantaggio operativo della rete: il single-agent tronca anche a 16384 token mentre la decomposizione completa;
+- 1 failure contrattuale della rete: il Verifier produce una contraddizione status/evidence e viene correttamente respinto dall'host.
 
-Prima di concludere sul quarto caso serve classificare l'output storico del Verifier.
+Non è osservato, in questa batteria, un caso in cui una conclusione semantica errata del single-agent venga corretta dalla rete.
+Non è osservato neppure un caso in cui una conclusione semantica errata della rete venga corretta dal single-agent: il quarto failure è contrattuale, non una conclusione finale sbagliata.
+
+Il problema del Verifier richiede un nuovo contratto strutturale, non un rerun dei casi consumati.
 
 Tutti i quattro case sono consumati e bloccati per nuovi init in entrambi i bracci.
 
