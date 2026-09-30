@@ -9,20 +9,21 @@ const pitchRenderer=require("./audio-to-midi-drum-pitch-renderer");
 
 const DEFAULT_WORKSPACE="D:\\FAME_NEURAL";
 const DEFAULT_FAMILY="FAME000126";
-const RUN_ID="audio-to-midi-p5-tsumugi-threshold-sweep-v1-001";
+const RUN_ID="audio-to-midi-p5-tsumugi-threshold-sweep-v2-001";
 const SS_RUN_ID="source-separation-development-inference-v1-001";
 const THRESHOLDS=[
   {value:-3,slug:"neg3p0"},
-  {value:-2,slug:"neg2p0"},
-  {value:-1,slug:"neg1p0"},
-  {value:0,slug:"pos0p0"}
+  {value:0,slug:"pos0p0"},
+  {value:0.5,slug:"pos0p5"},
+  {value:1,slug:"pos1p0"},
+  {value:2,slug:"pos2p0"}
 ];
 const FAMILIES=["FAME000040","FAME000080","FAME000126"];
 
 function readJson(file){return JSON.parse(fs.readFileSync(file,"utf8").replace(/^\uFEFF/,""))}
 
 function runRoot(workspace){
-  return path.join(workspace,"runs","audio-to-midi-p5-tsumugi-threshold-sweep",RUN_ID);
+  return path.join(workspace,"runs","audio-to-midi-p5-tsumugi-threshold-sweep-v2",RUN_ID);
 }
 function ssRoot(workspace){
   return path.join(workspace,"runs","source-separation-development-inference",SS_RUN_ID);
@@ -107,13 +108,13 @@ function table(rows){
     rows.map(x=>'<tr><td>'+x.pitch+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.family)+'</td><td>'+x.count+'</td></tr>').join("")+
     '</tbody></table>';
 }
-function variantCard(v){
+function variantCard(v,rid){
   const roles=v.supportedRoleCounts||{};
   return '<section class="panel">'+
     '<h2>Gate '+v.value.toFixed(1)+'</h2>'+
     '<p>Eventi: <b>'+v.eventCount+'</b> · pitch distinti: <b>'+v.distinctPitchCount+'</b> · legacy-unsupported: <b>'+v.unsupportedOutputPitchCount+'</b></p>'+
     '<p class="muted">Core legacy: kick '+(roles.kick||0)+' · snare '+(roles.snare||0)+' · hihat '+(roles.hihat||0)+'</p>'+
-    '<audio controls preload="none" src="/audio/'+v.slug+'"></audio>'+
+    '<audio controls preload="none" src="/audio/'+v.slug+'?family='+encodeURIComponent(rid)+'"></audio>'+
     table(v.pitchSummary)+
   '</section>';
 }
@@ -128,9 +129,9 @@ function html(data){
   '.warn{color:#ffd27a}@media(max-width:820px){.grid{grid-template-columns:1fr}}</style></head><body><main>'+
   '<h1>Tsumugi threshold audition — '+esc(data.rid)+'</h1>'+
   '<div class="nav">'+nav+'</div>'+
-  '<section class="panel"><h2>Reference drums stem</h2><audio controls preload="none" src="/audio/reference"></audio>'+
+  '<section class="panel"><h2>Reference drums stem</h2><audio controls preload="none" src="/audio/reference?family='+encodeURIComponent(data.rid)+'"></audio>'+
   '<p class="muted">Ascolta prima questo, poi i quattro candidati. Il renderer usa i pitch GM realmente emessi da Tsumugi.</p></section>'+
-  '<div class="grid">'+data.variants.map(variantCard).join("")+'</div>'+
+  '<div class="grid">'+data.variants.map(v=>variantCard(v,data.rid)).join("")+'</div>'+
   '<section class="panel"><h2>Decisione</h2><p class="warn">Non scegliere la soglia con meno note in assoluto: serve quella che elimina classi/colpi falsi senza perdere i colpi realmente presenti nel reference.</p>'+
   '<p>Nessuna nuova inferenza viene eseguita da questa pagina; legge soltanto lo sweep già completato.</p></section>'+
   '</main></body></html>';
@@ -199,7 +200,7 @@ function selfTest(){
     {timeSeconds:0.2,canonicalPitch:39},
     {timeSeconds:0.3,canonicalPitch:42}
   ]);
-  if(rows.length!==3||THRESHOLDS.length!==4||FAMILIES.length!==3)throw new Error("Threshold audition self-test failed");
+  if(rows.length!==3||THRESHOLDS.length!==5||FAMILIES.length!==3)throw new Error("Threshold audition self-test failed");
   return {mode:"FAME_TSUMUGI_THRESHOLD_AUDITION_SELF_TEST_PASS",thresholds:THRESHOLDS.map(x=>x.value),families:FAMILIES};
 }
 
