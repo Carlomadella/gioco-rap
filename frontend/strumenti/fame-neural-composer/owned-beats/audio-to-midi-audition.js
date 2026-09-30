@@ -41,6 +41,30 @@ function sourceStemPath(workspace,rid,stem){
   return file;
 }
 
+function buildClapRimEvents(tsumugiEvents){
+  return (Array.isArray(tsumugiEvents)?tsumugiEvents:[])
+    .filter(event=>[37,39].includes(Number(event.canonicalPitch ?? event.rawPitch)))
+    .map(event=>({...event}));
+}
+
+function buildAdtofTsumugiClapRimHybrid(adtofEvents,tsumugiEvents){
+  if(!Array.isArray(adtofEvents))return [];
+  const extras=buildClapRimEvents(tsumugiEvents);
+  const events=[
+    ...adtofEvents.map(event=>({...event,source:"adtof"})),
+    ...extras.map(event=>({...event,source:"tsumugi-clap-rim"}))
+  ];
+  events.sort((a,b)=>{
+    const ta=Number(a.timeSeconds)||0;
+    const tb=Number(b.timeSeconds)||0;
+    if(ta!==tb)return ta-tb;
+    const pa=Number(a.canonicalPitch ?? a.rawPitch)||0;
+    const pb=Number(b.canonicalPitch ?? b.rawPitch)||0;
+    return pa-pb;
+  });
+  return events;
+}
+
 function wavDurationSeconds(file){
   const r=cp.spawnSync("ffprobe",[
     "-v","error","-show_entries","format=duration",
@@ -82,6 +106,9 @@ function load(workspace,rid){
   const adtofEvents=adtof?.output?.events;
   if(adtof&&!Array.isArray(adtofEvents))throw new Error("ADTOF result missing output.events");
 
+  const clapRimEvents=buildClapRimEvents(tsumugiEvents);
+  const hybridEvents=adtof?buildAdtofTsumugiClapRimHybrid(adtofEvents,tsumugiEvents):[];
+
   return {
     rid,baseline,tsumugi,adtof,drumsStem,bassStem,drumsDuration,bassDuration,
     fusionWav:renderer.renderDrums(fusion,drumsDuration),
@@ -89,7 +116,12 @@ function load(workspace,rid){
     tsumugiWav:tsumugi?pitchRenderer.render(tsumugiEvents,drumsDuration):null,
     tsumugiPitchSummary:tsumugi?pitchRenderer.summarize(tsumugiEvents):[],
     adtofWav:adtof?pitchRenderer.render(adtofEvents,drumsDuration):null,
-    adtofPitchSummary:adtof?pitchRenderer.summarize(adtofEvents):[]
+    adtofPitchSummary:adtof?pitchRenderer.summarize(adtofEvents):[],
+    clapRimEvents,
+    clapRimWav:tsumugi?pitchRenderer.render(clapRimEvents,drumsDuration):null,
+    hybridEvents,
+    hybridWav:adtof?pitchRenderer.render(hybridEvents,drumsDuration):null,
+    hybridPitchSummary:adtof?pitchRenderer.summarize(hybridEvents):[]
   };
 }
 
@@ -134,6 +166,11 @@ function html(data){
     '<tr><td>'+x.pitch+'</td><td>'+x.name+'</td><td>'+x.family+'</td><td>'+x.count+'</td></tr>'
   ).join("");
   const aDistinct=(data.adtofPitchSummary||[]).length;
+  const cr=data.clapRimEvents||[];
+  const clapCount=cr.filter(x=>Number(x.canonicalPitch ?? x.rawPitch)===39).length;
+  const rimCount=cr.filter(x=>Number(x.canonicalPitch ?? x.rawPitch)===37).length;
+  const hybridCount=(data.hybridEvents||[]).length;
+  const hybridDistinct=(data.hybridPitchSummary||[]).length;
   return `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FAME Audio→MIDI audition — ${data.rid}</title>
 <style>
@@ -162,6 +199,19 @@ ${a?'<p class="muted">kick '+(aRoles.kick||0)+' · snare '+(aRoles.snare||0)+' �
 ${a?'<audio controls src="/audio/adtof"></audio>':'<p class="muted">Nessun output ADTOF.</p>'}
 ${a?'<table><thead><tr><th>Pitch</th><th>GM</th><th>Famiglia</th><th>Eventi</th></tr></thead><tbody>'+aRows+'</tbody></table>':''}
 ${a?'<p class="muted">Benchmark development-only: non promuovibile in production finché la licenza non è chiarita.</p>':''}
+</div>
+</div>
+
+<div class="grid">
+<div class="panel"><h2>Tsumugi — solo clap/rim</h2>
+<p>Eventi: <b>${cr.length}</b> · clap <b>${clapCount}</b> · rim <b>${rimCount}</b></p>
+${t?'<audio controls src="/audio/tsumugi-clap-rim"></audio>':'<p class="muted">Nessun output Tsumugi.</p>'}
+<p class="muted">Qui ascolti esclusivamente pitch 37 e 39 di Tsumugi; tutto il resto viene escluso.</p>
+</div>
+<div class="panel"><h2>Hybrid — ADTOF + clap/rim Tsumugi</h2>
+<p>Eventi: <b>${hybridCount}</b> · pitch distinti: <b>${hybridDistinct}</b></p>
+${a&&t?'<audio controls src="/audio/adtof-tsumugi-hybrid"></audio>':'<p class="muted">Hybrid non disponibile.</p>'}
+<p class="muted">ADTOF resta la base del kit; Tsumugi contribuisce solo con clap e rim.</p>
 </div>
 </div>
 
@@ -207,6 +257,8 @@ function serve(workspaceRoot=DEFAULT_WORKSPACE,rid=DEFAULT_FAMILY,port=0){
       if((req.method==="GET"||req.method==="HEAD")&&url.pathname==="/audio/bass-pyin")return sendBuffer(req,res,data.bassWav);
       if((req.method==="GET"||req.method==="HEAD")&&url.pathname==="/audio/tsumugi"&&data.tsumugiWav)return sendBuffer(req,res,data.tsumugiWav);
       if((req.method==="GET"||req.method==="HEAD")&&url.pathname==="/audio/adtof"&&data.adtofWav)return sendBuffer(req,res,data.adtofWav);
+      if((req.method==="GET"||req.method==="HEAD")&&url.pathname==="/audio/tsumugi-clap-rim"&&data.clapRimWav)return sendBuffer(req,res,data.clapRimWav);
+      if((req.method==="GET"||req.method==="HEAD")&&url.pathname==="/audio/adtof-tsumugi-hybrid"&&data.hybridWav)return sendBuffer(req,res,data.hybridWav);
       res.writeHead(404);res.end("Not found");
     }catch(error){res.writeHead(500,{"Content-Type":"text/plain"});res.end(error.message)}
   });
