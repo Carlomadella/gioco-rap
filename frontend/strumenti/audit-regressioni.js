@@ -2751,7 +2751,7 @@ test("Casa, Palestra e il Circolo sulla mappa aprono la pagina, non piu' la fine
   /id:"fabbrica",[\s\S]{0,80}?apriLuogo\("fabbrica"\)/.test(hub) &&
   !hub.includes('{id:"concerti"') && hub.includes("circoloEntra()"));
 test("la Fabbrica usa la foto e i comandi HTML, senza riaprire la scheda lavoro",
-  luoghiFoto.includes('fabbrica: {f:"schermate_luoghi_con_elementi_HTML/fabbrica.avif"') &&
+  luoghiFoto.includes('fabbrica: {f:"schermate_luoghi_con_elementi_HTML/fabbrica.webp"') &&
   luoghiFoto.includes("function lfFabbrica()") &&
   luoghiFoto.includes('data-lavoro="operaio"') &&
   /id:"fabbrica",[\s\S]{0,80}?apriLuogo\("fabbrica"\)/.test(hub) &&
