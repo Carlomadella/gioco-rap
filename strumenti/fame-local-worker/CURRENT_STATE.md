@@ -106,3 +106,8 @@ Commit `4c60c18425fc56a40b476ddfffded55ecb968141`: terzo task `p2-measurement-ex
 Root locale `FAME_DIRECT_QA_NETWORK_V2_20260930_084912`. Il task `p2-measurement-export-review-v1` ha chiuso `VALIDATED_FOR_REVIEW` al primo tentativo con una sola chiamata. Tutti i 5 check sono corretti, con coverage sufficiente sui quattro positivi, zero precision warning e zero evidenze non revisionate. `elapsedSeconds` circa 16.422 s; 1832 prompt token valutati e 1173 output token valutati.
 
 Il task è ora consumato e aggiunto ai `CONSUMED_TASKS`. Risultato dettagliato in [DIRECT_QA_P2_MEASUREMENT_EXPORT_V2_RESULT_2026-09-30.md](DIRECT_QA_P2_MEASUREMENT_EXPORT_V2_RESULT_2026-09-30.md).
+
+
+## Quarto task v2 congelato
+
+È preparato `coordinator-architecture-review-v1` sul documento `strumenti/fame-local-worker/COORDINATOR.md` al commit `b16ef607905d26bf12c9ac8fa2a3b0c481bb4574`. È il primo task v2 non basato su un report Audio→MIDI: verifica scopo del coordinatore, isolamento delle scrivanie, distinzione fra modello e host, limiti inferenziali del nuovo protocollo, semantica degli stati globali e controllo negativo sulle autorizzazioni operative. La fonte completa è congelata e i check positivi usano unità semanticamente autosufficienti.

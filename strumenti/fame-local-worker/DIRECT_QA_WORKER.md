@@ -243,3 +243,17 @@ Esito: `VALIDATED_FOR_REVIEW`, una chiamata, nessun repair. Tutti i cinque check
 Risultato: [DIRECT_QA_P2_MEASUREMENT_EXPORT_V2_RESULT_2026-09-30.md](DIRECT_QA_P2_MEASUREMENT_EXPORT_V2_RESULT_2026-09-30.md).
 
 Il task è ora consumato e non va ripetuto come nuovo first attempt.
+
+
+## Settimo incarico v2 preparato — architettura del coordinatore
+
+È congelato `coordinator-architecture-review-v1` su `COORDINATOR.md`, commit `b16ef607905d26bf12c9ac8fa2a3b0c481bb4574`.
+
+Questo è il primo task reale v2 fuori dai report Audio→MIDI. Verifica che il worker distingua correttamente:
+- ruolo semantico del modello e responsabilità deterministiche dell'host;
+- isolamento delle scrivanie;
+- nuovo protocollo rispetto agli esperimenti precedenti;
+- stati `VALIDATED_FOR_REVIEW`, `NEEDS_REVIEW` e `IN_PROGRESS`;
+- assenza di autorizzazione a modifiche FAME Neural/training/audio/batch131/P6.
+
+Il QA resta documentale e read-only.
