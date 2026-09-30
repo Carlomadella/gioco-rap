@@ -129,3 +129,16 @@ Risultato: [DIRECT_QA_COORDINATOR_ARCHITECTURE_V2_RESULT_2026-09-30.md](DIRECT_Q
 ## Quinto task v2 congelato
 
 È preparato `rubric-audit-semantics-review-v1` su `RUBRIC_AUDIT.md` al commit `5530c2649ddda83a07511f8e0549d4ccf45723fe`. Il task verifica distinzione tra SEMANTIC_FAIL e incapacità del modello, evidenza contestuale vs diretta, preservazione dello storico nel sidecar, disciplina del prossimo protocollo e controllo negativo sulla promozione retroattiva.
+
+
+## Esito quinto run reale v2
+
+Root locale `FAME_DIRECT_QA_NETWORK_V2_20260930_092045`. `rubric-audit-semantics-review-v1` ha chiuso `VALIDATED_FOR_REVIEW` al primo tentativo con una sola chiamata. Tutti i 5 check sono corretti; i quattro positivi hanno coverage sufficiente; zero errori, zero precision warning, zero evidence ID non revisionati. Il salvage host-side non è stato necessario.
+
+Metriche: `elapsedSeconds` circa 17.703 s, `prompt_eval_count=2824`, `eval_count=1275`, `done_reason=stop`. Il task è consumato e bloccato da nuove inizializzazioni.
+
+Risultato: [DIRECT_QA_RUBRIC_AUDIT_SEMANTICS_V2_RESULT_2026-09-30.md](DIRECT_QA_RUBRIC_AUDIT_SEMANTICS_V2_RESULT_2026-09-30.md).
+
+## Sesto task v2 congelato
+
+È preparato `package-authoring-rules-review-v1` su `DIRECT_QA_PACKAGE_AUTHORING.md` al commit `4c60c18425fc56a40b476ddfffded55ecb968141`. Verifica unità semantiche, frozen-run rule, checklist pre-run, minimal sufficient evidence e controllo negativo sul retuning/rerun di task consumati.
