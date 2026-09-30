@@ -7,23 +7,23 @@
   "units": [
     {
       "unitId": "U01",
-      "text": "Esito formale: queue status NEEDS_REVIEW; task status REJECTED; model calls 2; firstAttemptPass false; acceptedAfterRepair false; executionAuthorized false."
+      "text": "- queue status: `NEEDS_REVIEW`;\n- task status: `REJECTED`;\n- model calls: 2;\n- firstAttemptPass: false;\n- acceptedAfterRepair: false;\n- executionAuthorized: false."
     },
     {
       "unitId": "U02",
-      "text": "Entrambi i tentativi hanno prodotto 5/5 conclusioni corrette. L'unico errore del validator in attempt-1 e attempt-2 è UNVERIFIED_ARCH_ASSUMPTION:INSUFFICIENT_EVIDENCE."
+      "text": "Entrambi i tentativi hanno prodotto **5/5 conclusioni corrette**. L'unico errore del validator in attempt-1 e attempt-2 è:\n\n`UNVERIFIED_ARCH_ASSUMPTION:INSUFFICIENT_EVIDENCE`"
     },
     {
       "unitId": "U03",
-      "text": "In entrambi i tentativi il modello ha citato soltanto U04 per quel check; anche dopo feedback generico ha mantenuto lo stesso identico evidence choice U04."
+      "text": "In entrambi i tentativi il modello ha citato soltanto `U04` per quel check."
     },
     {
       "unitId": "U04",
-      "text": "La rubrica congelata richiedeva U03 + U04, ma la richiesta era sovravincolata: U04 contiene già l'intera proposizione verificata, inclusi presupposto architetturale non verificato, tentativo di leggere un output V2, KeyError coerente con checkpoint V1 e necessità di verificare semi_crf_version via doctor read-only."
+      "text": "La rubrica congelata richiedeva invece `U03` + `U04`. Questa richiesta era sovravincolata: `U04` contiene già l'intera proposizione verificata — presupposto architetturale non verificato, tentativo di leggere un output V2, KeyError coerente con checkpoint V1 e necessità di verificare `semi_crf_version` via doctor read-only."
     },
     {
       "unitId": "U05",
-      "text": "Classificazione: false negative di packaging/rubric, non errore semantico del modello."
+      "text": "Classificazione: **false negative di packaging/rubric**, non errore semantico del modello."
     },
     {
       "unitId": "U06",
@@ -31,7 +31,7 @@
     },
     {
       "unitId": "U07",
-      "text": "Il repair generico non può correggere un errore quando il validator stesso impone una copertura non necessaria. Per i task futuri la rubrica non deve obbligare una seconda unità di background quando una singola unità contiene già tutte le componenti dell'affermazione; i task reali consumati restano immutabili."
+      "text": "Il run mostra due cose separate:\n\n1. il worker ha mantenuto corrette tutte le conclusioni anche su un task più difficile;\n2. il repair generico non può correggere un errore quando il validator stesso impone una copertura non necessaria.\n\nPer i task futuri la rubrica non deve obbligare una seconda unità di background quando una singola unità contiene già tutte le componenti dell'affermazione. I task reali consumati restano immutabili; la correzione vale per l'authoring futuro."
     }
   ],
   "answerOptions": [
