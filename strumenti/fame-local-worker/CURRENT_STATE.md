@@ -1,6 +1,6 @@
 # Rete di agenti locali — stato operativo
 
-Aggiornamento: 30 settembre 2026. Stato della rete verificato fino al commit `23171593992036224d9e02dad351011db302b5ab`; Direct QA CI PASS.
+Aggiornamento: 30 settembre 2026. Stato della rete verificato fino al commit `04a4e9bddd5ce41f686faf0521aedd5a451febe7`; Direct QA CI PASS (47 test).
 
 ## Obiettivo e perimetro
 
@@ -53,9 +53,9 @@ Durante il run è emerso un bug CLI: `--task` / `--tasks` erano obbligatori anch
 
 ## Prossimo passo della rete
 
-1. Verificare con CI il fix CLI e la riproducibilità dei test Direct QA.
-2. Trattare `tsumugi-score-diagnostic-review-v1` come consumato: non rieseguirlo in una nuova root per ottenere un altro first attempt.
-3. Misurare almeno un secondo task documentale realmente nuovo prima di concludere che la v2 migliora affidabilità/utilità; preservare first-attempt e repair come metriche separate.
+1. Trattare `tsumugi-score-diagnostic-review-v1` come consumato: non rieseguirlo in una nuova root per ottenere un altro first attempt.
+2. Preparare e congelare un secondo task documentale realmente nuovo, con source snapshot completo e rubrica fissata prima del run.
+3. Eseguire una sola desk v2 sul nuovo task, preservando first-attempt e repair come metriche separate.
 4. Valutare il costo umano di review prima di ampliare ruoli. Non avviare elaborazioni musicali per procurarsi altri task.
 
 La separazione documentale non esegue questi passi e non certifica nuovi test o inferenze.
@@ -67,3 +67,8 @@ Per un incarico sulla rete si modificano strumenti/fame-local-worker e la sua do
 Le fonti congelate dei task restano immutate. Non usare il CURRENT_STATE generale come coda automatica di comandi. Nessun risultato del worker autorizza esecuzione musicale, training, batch131 o produzione.
 
 Guida tecnica e storico dei comandi: [DIRECT_QA_WORKER.md](DIRECT_QA_WORKER.md). I comandi delle root 001–003 sono storici, non istruzioni da rilanciare.
+
+
+## Verifica post-run
+
+Il commit `04a4e9bddd5ce41f686faf0521aedd5a451febe7` registra il primo run reale v2 e corregge la CLI `run/status`. GitHub Actions `Verifica FAME local worker`, run `36677541885`, ha completato con `success`: 47 test, `OK`.
