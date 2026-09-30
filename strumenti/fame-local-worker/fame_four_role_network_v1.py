@@ -361,8 +361,13 @@ def validate_integrator(answer,p,extractor,challenge,verifier):
     issue_by_id={row['issueId']:row for row in challenge['issues']}
     for resolution in verifier['antiBiasResolution']:
         issue=issue_by_id.get(resolution['issueId'])
-        if issue and issue['severity']=='BLOCKING' and resolution['status']=='UNRESOLVED':
-            errors.append('INTEGRATOR_UNRESOLVED_BLOCKING_ANTIBIAS')
+        if issue and issue['severity']=='BLOCKING' and resolution['status']!='REJECTED':
+            errors.append('INTEGRATOR_BLOCKING_ANTIBIAS_NOT_REJECTED')
+    if challenge.get('overall') in (
+        'ANTI_BIAS_EVIDENCE_INSUFFICIENT',
+        'ANTI_BIAS_RESULTS_CONTRADICTORY',
+    ):
+        errors.append('INTEGRATOR_ANTIBIAS_HARD_STOP')
 
     if not isinstance(answer.get('answer'),str) or not answer['answer'].strip():
         errors.append('INTEGRATOR_ANSWER')
