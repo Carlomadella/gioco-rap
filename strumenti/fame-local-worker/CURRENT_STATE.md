@@ -1149,3 +1149,68 @@ CI al commit `eaf273e435d7ee7d9d77be5d432517e499903977`:
 
 Prossimo passo: eseguire V9 sullo stesso case consumato esclusivamente come diagnostico causale della reconciliation host. Se V9 recupera il failure, non iterare ulteriormente su Tsumugi: passare a un nuovo case fresco per valutare generalizzazione.
 
+## Four-Role Network V9 — diagnostico reale recuperato
+
+Eseguito `fame_four_role_network_v9.py` sul case consumato `adaptive-v2-tsumugi-architecture-pilot-v1` esclusivamente come diagnostico causale della host audit reconciliation.
+
+Esito:
+- Extractor: ACCEPTED;
+- Anti-Bias: ACCEPTED, con `omissionReview(U01)=NOT_MATERIAL`;
+- raw Verifier: ACCEPTED;
+- raw Verifier mantiene la contraddizione storica:
+  - `selectedOptionAudit.S1` afferma `The run remains formally REJECTED/NEEDS_REVIEW.` con `evidenceIds=[U01]`;
+  - `recoveredClaims=[]`;
+  - `omissionResolution(U01)=NOT_REQUIRED`;
+- hostDerivedRecovery:
+  - `applied=true`;
+  - derived claim `O1` con lo statement di S1 e `evidenceIds=[U01]`;
+  - `overriddenResolutions=[U01]`;
+  - `skippedMixedComponents=[]`;
+- Integrator: ACCEPTED;
+- usedClaimIds: C1, C2, C3, O1;
+- answer option: `ANSWER_RUBRIC_FALSE_NEGATIVE_DISCIPLINED`;
+- network status: `PROPOSED_FOR_HUMAN_REVIEW`;
+- modelCalls: 4;
+- humanReviewRequired: true;
+- execution/training/production/independent-evaluation flags restano false.
+
+Interpretazione limitata: V9 recupera il failure V8 sullo stesso case consumato senza mutare il raw Verifier e senza aggiungere model call. Questo chiude il diagnostico Tsumugi-architecture ma NON costituisce evidenza indipendente di generalizzazione. Non creare V10 su questo case salvo un nuovo failure indipendente che lo giustifichi.
+
+## Adaptive QA V3 — V9 escalation + fresh first-attempt-pass pilot
+
+Aggiunto `fame_adaptive_qa_v3.py` senza modificare Adaptive V1/V2.
+
+Architettura:
+- baseline single-agent V2 resta il percorso primario;
+- escalation policy resta `adaptive-escalation-policy-v1`;
+- Four-Role Network V9 viene chiamata solo sui trigger di failure con response valida;
+- nessuna escalation se la baseline e accettata;
+- nessuna escalation su failure operativo senza response;
+- massimo 1 model call se la baseline basta, massimo 5 con escalation;
+- tutti i flag di autorizzazione/readiness restano invariati.
+
+Fresh case congelato PRIMA di qualsiasi inferenza:
+- case: `adaptive-v3-first-attempt-pass-pilot-v1`;
+- source snapshot: `cases/fame-network/adaptive-v3-first-attempt-pass-source.md`;
+- fonte documentale: `DIRECT_QA_TSUMUGI_SCORE_DIAGNOSTIC_V2_RESULT_2026-09-30.md`;
+- il case riguarda esclusivamente il comportamento documentato del Direct-QA worker, non esegue Audio-to-MIDI;
+- target host-only: `ANSWER_LIMITED_FIRST_ATTEMPT_PASS`;
+- required evidence groups: U01, U02, U04, U05;
+- U03 e optional context.
+
+Il target distingue:
+- PASS reale al primo tentativo;
+- una sola model call e nessun repair;
+- cinque check accettati;
+- humanReviewRequired ancora true;
+- nessuna dimostrazione di affidabilita generale o validazione di rete autonoma multi-agent;
+- nessuna autorizzazione di training/produzione.
+
+Obiettivo scientifico del fresh pilot: lasciare che sia il risultato a determinare il percorso. Se la baseline copre correttamente il case, V9 deve restare spenta e il costo deve essere una chiamata. Se la baseline fallisce con una response valida, l'escalation V9 deve partire automaticamente. Non viene forzata artificialmente l'escalation.
+
+CI al commit `7c06853c974a245d35bae0fa2fdb9056f2b37ebe`:
+- 80 Direct-QA: OK;
+- 147 FAME: OK.
+
+Prossimo passo: eseguire una sola volta il fresh pilot Adaptive QA V3. Dopo il run il case deve essere trattato come consumato e non deve essere rilanciato come nuovo first attempt.
+
