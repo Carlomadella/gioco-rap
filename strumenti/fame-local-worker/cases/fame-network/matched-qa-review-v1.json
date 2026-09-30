@@ -1,0 +1,57 @@
+{
+  "caseId": "matched-qa-review-v1",
+  "sourceCommit": "7e125be05667af9fdb5745774c5f09d88e8b1ea5",
+  "sourcePath": "strumenti/fame-local-worker/QA_REVIEW.md",
+  "sourceSnapshot": "cases/fame-network/matched-qa-review-source.md",
+  "question": "Un esito VALIDATED_FOR_REVIEW dimostra le cause scientifiche e autorizza una nuova inference, e il salvage v6 può trasformare una finding con evidenza richiesta mancante in valida?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "Un evidenceId valido da solo NON dimostra che una conclusione sia giusta: anche il legame categoria-evidenza è verificato da una rubrica specifica. La rubrica non è un valutatore semantico universale; per un altro report serve un nuovo caso e una revisione della rubrica."
+    },
+    {
+      "unitId": "U02",
+      "text": "Esito positivo: VALIDATED_FOR_REVIEW, con humanReviewRequired: true ed executionAuthorized: false. Non significa validazione delle cause scientifiche o autorizzazione a eseguire una nuova inference. Le proposte restano da confrontare con la roadmap corrente prima di qualsiasi attuazione."
+    },
+    {
+      "unitId": "U03",
+      "text": "La v6 distingue evidenza insufficiente e contesto superfluo. Se gli evidenceIds pertinenti coprono già tutti i gruppi richiesti, gli ID esterni alla rubrica vengono rimossi deterministicamente. Se invece la copertura richiesta manca, l'evidenza irrilevante resta un errore insieme a INSUFFICIENT_EVIDENCE."
+    },
+    {
+      "unitId": "U04",
+      "text": "I retry sono cumulativi: una finding già validata viene conservata dall'host e non può essere persa da un tentativo successivo. Nessuna finding non validata viene conservata."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_YES",
+      "meaning": "Sì: VALIDATED_FOR_REVIEW valida le cause e autorizza la nuova inference, e il salvage può colmare evidenza richiesta mancante."
+    },
+    {
+      "optionId": "ANSWER_NO",
+      "meaning": "No: VALIDATED_FOR_REVIEW richiede ancora review e non autorizza inference né valida cause scientifiche; il salvage elimina solo evidenza extra quando la coverage richiesta è già completa e non ripara missing evidence."
+    },
+    {
+      "optionId": "ANSWER_INSUFFICIENT",
+      "meaning": "Le evidenze non definiscono né il significato di VALIDATED_FOR_REVIEW né i limiti del salvage."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_NO",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U02"
+    ],
+    [
+      "U03"
+    ]
+  ],
+  "optionalContext": [
+    "U01",
+    "U04"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
