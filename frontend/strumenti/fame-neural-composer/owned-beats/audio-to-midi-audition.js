@@ -12,6 +12,7 @@ const DEFAULT_WORKSPACE="D:\\FAME_NEURAL";
 const DEFAULT_FAMILY="FAME000126";
 const BASELINE_RUN="audio-to-midi-development-baseline-v1-001";
 const TSUMUGI_RUN="audio-to-midi-p5-tsumugi-real-easy-development-v1-001";
+const ADTOF_RUN="audio-to-midi-p5-adtof-pytorch-pilot-v1-001";
 const SS_RUN="source-separation-development-inference-v1-001";
 
 function readJson(file){return JSON.parse(fs.readFileSync(file,"utf8").replace(/^\uFEFF/,""))}
@@ -21,6 +22,9 @@ function baselineRoot(workspace){
 }
 function tsumugiRoot(workspace){
   return path.join(workspace,"runs","audio-to-midi-p5-tsumugi-real-easy-development",TSUMUGI_RUN);
+}
+function adtofRoot(workspace){
+  return path.join(workspace,"runs","audio-to-midi-p5-adtof-pytorch-pilot",ADTOF_RUN);
 }
 function ssRoot(workspace){
   return path.join(workspace,"runs","source-separation-development-inference",SS_RUN);
@@ -58,6 +62,11 @@ function load(workspace,rid){
   const tsumugi=fs.existsSync(tfile)?readJson(tfile):null;
   if(tsumugi&&tsumugi.sourceRecordId!==rid)throw new Error("Tsumugi family mismatch");
 
+  const afile=path.join(adtofRoot(workspace),rid,"result.json");
+  const adtof=fs.existsSync(afile)?readJson(afile):null;
+  if(adtof&&adtof.sourceRecordId!==rid)throw new Error("ADTOF family mismatch");
+  if(adtof&&adtof.status!=="DEVELOPMENT_PILOT_COMPLETE_AWAITING_HUMAN_REVIEW")throw new Error("ADTOF pilot status mismatch");
+
   const drumsStem=sourceStemPath(workspace,rid,"drums");
   const bassStem=sourceStemPath(workspace,rid,"bass");
   const drumsDuration=wavDurationSeconds(drumsStem);
@@ -70,12 +79,17 @@ function load(workspace,rid){
   const tsumugiEvents=tsumugi?.events;
   if(tsumugi&&!Array.isArray(tsumugiEvents))throw new Error("Tsumugi result missing events");
 
+  const adtofEvents=adtof?.output?.events;
+  if(adtof&&!Array.isArray(adtofEvents))throw new Error("ADTOF result missing output.events");
+
   return {
-    rid,baseline,tsumugi,drumsStem,bassStem,drumsDuration,bassDuration,
+    rid,baseline,tsumugi,adtof,drumsStem,bassStem,drumsDuration,bassDuration,
     fusionWav:renderer.renderDrums(fusion,drumsDuration),
     bassWav:renderer.renderBassNotes(low,bassDuration),
     tsumugiWav:tsumugi?pitchRenderer.render(tsumugiEvents,drumsDuration):null,
-    tsumugiPitchSummary:tsumugi?pitchRenderer.summarize(tsumugiEvents):[]
+    tsumugiPitchSummary:tsumugi?pitchRenderer.summarize(tsumugiEvents):[],
+    adtofWav:adtof?pitchRenderer.render(adtofEvents,drumsDuration):null,
+    adtofPitchSummary:adtof?pitchRenderer.summarize(adtofEvents):[]
   };
 }
 
@@ -104,6 +118,7 @@ function sendFile(req,res,file){
 
 function html(data){
   const t=data.tsumugi;
+  const a=data.adtof;
   const fusion=data.baseline.drumsBassKickFusion;
   const low=data.baseline.lowEndPyin;
   const tCount=t?.events?.length??0;
@@ -113,6 +128,12 @@ function html(data){
     '<tr><td>'+x.pitch+'</td><td>'+x.name+'</td><td>'+x.family+'</td><td>'+x.count+'</td></tr>'
   ).join("");
   const distinctPitchCount=(data.tsumugiPitchSummary||[]).length;
+  const aCount=a?.output?.eventCount??0;
+  const aRoles=a?.output?.roleCounts||{};
+  const aRows=(data.adtofPitchSummary||[]).map(x=>
+    '<tr><td>'+x.pitch+'</td><td>'+x.name+'</td><td>'+x.family+'</td><td>'+x.count+'</td></tr>'
+  ).join("");
+  const aDistinct=(data.adtofPitchSummary||[]).length;
   return `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FAME Audio→MIDI audition — ${data.rid}</title>
 <style>
@@ -129,16 +150,24 @@ table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}th,td{t
 <div class="panel"><h2>Drums reference</h2><p class="muted">Stem separato già esistente</p><audio controls src="/audio/drums-reference"></audio></div>
 
 <div class="grid">
-<div class="panel"><h2>Tsumugi drums — pitch MIDI distinti</h2>
+<div class="panel"><h2>Tsumugi drums</h2>
 <p>${t?"Eventi: <b>"+tCount+"</b> · pitch MIDI distinti: <b>"+distinctPitchCount+"</b>":"Non disponibile per questa family"}</p>
 ${t?'<audio controls src="/audio/tsumugi"></audio>':'<p class="muted">Nessun output Tsumugi.</p>'}
-${t?'<p class="muted">Questo player usa il pitch MIDI effettivo dell’output Tsumugi: clap, rim, tom e cymbal non vengono più trasformati automaticamente in hi-hat.</p>':''}
+${t?'<p class="muted">Pitch MIDI effettivi emessi dal checkpoint Tsumugi.</p>':''}
 ${t?'<table><thead><tr><th>Pitch</th><th>GM</th><th>Famiglia</th><th>Eventi</th></tr></thead><tbody>'+pitchRows+'</tbody></table>':''}
 </div>
+<div class="panel"><h2>ADTOF-pytorch drums</h2>
+<p>${a?"Eventi: <b>"+aCount+"</b> · classi usate: <b>"+aDistinct+"</b>":"Pilot non disponibile per questa family"}</p>
+${a?'<p class="muted">kick '+(aRoles.kick||0)+' · snare '+(aRoles.snare||0)+' · tom '+(aRoles.tom||0)+' · hi-hat '+(aRoles.hihat||0)+' · cymbal '+(aRoles.cymbal||0)+'</p>':''}
+${a?'<audio controls src="/audio/adtof"></audio>':'<p class="muted">Nessun output ADTOF.</p>'}
+${a?'<table><thead><tr><th>Pitch</th><th>GM</th><th>Famiglia</th><th>Eventi</th></tr></thead><tbody>'+aRows+'</tbody></table>':''}
+${a?'<p class="muted">Benchmark development-only: non promuovibile in production finché la licenza non è chiarita.</p>':''}
+</div>
+</div>
+
 <div class="panel"><h2>Baseline drums + bass kick fusion</h2>
 <p>Eventi: <b>${fusion.eventCount}</b> · kick ${fusionRoles.kick||0} · snare ${fusionRoles.snare||0} · hihat ${fusionRoles.hihat||0}</p>
 <audio controls src="/audio/fusion"></audio></div>
-</div>
 
 <div class="panel"><h2>Bass reference</h2><p class="muted">Stem bass separato già esistente</p><audio controls src="/audio/bass-reference"></audio></div>
 <div class="panel"><h2>pYIN low-end MIDI</h2>
@@ -177,6 +206,7 @@ function serve(workspaceRoot=DEFAULT_WORKSPACE,rid=DEFAULT_FAMILY,port=0){
       if((req.method==="GET"||req.method==="HEAD")&&url.pathname==="/audio/fusion")return sendBuffer(req,res,data.fusionWav);
       if((req.method==="GET"||req.method==="HEAD")&&url.pathname==="/audio/bass-pyin")return sendBuffer(req,res,data.bassWav);
       if((req.method==="GET"||req.method==="HEAD")&&url.pathname==="/audio/tsumugi"&&data.tsumugiWav)return sendBuffer(req,res,data.tsumugiWav);
+      if((req.method==="GET"||req.method==="HEAD")&&url.pathname==="/audio/adtof"&&data.adtofWav)return sendBuffer(req,res,data.adtofWav);
       res.writeHead(404);res.end("Not found");
     }catch(error){res.writeHead(500,{"Content-Type":"text/plain"});res.end(error.message)}
   });
