@@ -1,0 +1,55 @@
+{
+  "caseId": "agent-network-readiness-network-v2",
+  "sourceCommit": "5530c2649ddda83a07511f8e0549d4ccf45723fe",
+  "sourcePath": "documentazione/fame-neural/FAME_LOCAL_AGENT_NETWORK_RECAP_2026-09-23.md",
+  "sourceSnapshot": "cases/fame-network/agent-network-recap-readiness-source.md",
+  "question": "Il recap dimostra che Qwen3-Coder 30B è il modello migliore per la rete e che il sistema è già affidabile in generale?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "## Obiettivo\n\nCostruire una rete di agenti locali affidabile per FAME Neural, evitando che il corretto funzionamento dipenda dalla perfezione del singolo modello."
+    },
+    {
+      "unitId": "U02",
+      "text": "## Risultato attuale\n\n**Qwen3-Coder 30B + Ollama diretto + FAME Direct Worker = 3/3 PASS al primo tentativo.**\n\nNessun retry necessario nei tre run reali.\n\nQuesto è il primo segnale concreto che il problema osservato nel proof-zero non era necessariamente Qwen 30B in sé, ma in larga parte il modo in cui veniva orchestrato tramite Cline."
+    },
+    {
+      "unitId": "U03",
+      "text": "Non è ancora dimostrato che Qwen3-Coder 30B sia il modello migliore per la rete.\n\nNon è nemmeno dimostrato che vada sostituito adesso.\n\nPrima di confrontare altri modelli conviene chiudere una versione del worker il cui contratto sia equo e stabile, poi fare un confronto controllato sullo stesso task."
+    },
+    {
+      "unitId": "U04",
+      "text": "## Stato sintetico al 23/09/2026\n\n- Cline proof-zero v2: **FAIL**\n- Direct Worker base automatic tests: **PASS**\n- Direct Worker base + Qwen reale: **3/3 PASS first-attempt**\n- QA worker v1–v5 real run: **REJECTED**\n- QA worker v5 automatic tests: **14/14 PASS**\n- Retry cumulativo v5: **funzionante**\n- QA worker v6 automatic tests: **16/16 PASS**\n- QA worker v6 real run Qwen: **VALIDATED_FOR_REVIEW al primo tentativo**\n- Modello corrente: `qwen3-coder:30b`\n- Runtime corrente: FAME Direct Worker diretto su Ollama\n- Cline: non usato nel runtime corrente\n- Audio→MIDI: non eseguito o modificato da questo lavoro"
+    },
+    {
+      "unitId": "U05",
+      "text": "## Prossimo passo consigliato\n\nNon continuare a ottimizzare questo stesso caso Tsumugi: il rischio ora è overfitting del worker alla rubrica conosciuta.\n\nIl prossimo esperimento utile è un **secondo task reale, differente e congelato**, con nuova rubrica preparata prima del run. Solo dopo questo secondo caso conviene decidere se:\n\n1. considerare stabile il pattern Direct Worker + validatore;\n2. confrontare Qwen con Devstral/GPT-OSS sullo stesso protocollo;\n3. iniziare la vera orchestrazione multi-agent (coda, più desk, memoria condivisa versionata, coordinatore)."
+    }
+  ],
+  "allowedVerdicts": [
+    "ESTABLISHED",
+    "NOT_ESTABLISHED",
+    "INSUFFICIENT_EVIDENCE"
+  ],
+  "expectedVerdict": "NOT_ESTABLISHED",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U02",
+      "U04"
+    ],
+    [
+      "U03"
+    ],
+    [
+      "U05"
+    ]
+  ],
+  "optionalContext": [
+    "U01"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
