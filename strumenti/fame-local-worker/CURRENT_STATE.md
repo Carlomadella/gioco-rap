@@ -116,3 +116,16 @@ Il task è ora consumato e aggiunto ai `CONSUMED_TASKS`. Risultato dettagliato i
 ## Verifica quarto task v2
 
 Commit `f932bfb2e6357eff93a5e816fb8dc7abfd4e0b0e`: `coordinator-architecture-review-v1` congelato sul documento della rete `COORDINATOR.md`, con titolo unito alla prima unità semantica per evitare heading-only evidence. GitHub Actions `Verifica FAME local worker`, run `36680868865`: `success`, 58 test, `OK`.
+
+
+## Esito quarto run reale v2
+
+Root locale `FAME_DIRECT_QA_NETWORK_V2_20260930_085819`. `coordinator-architecture-review-v1` ha chiuso formalmente `REJECTED` dopo due chiamate. Attempt-1 ha saturato il precedente budget `num_predict=2048` con `done_reason=length`; attempt-2 ha prodotto 5/5 conclusioni corrette e coverage sufficiente, ma è stato respinto per l'evidence extra U06 su `COORDINATOR_SCOPE`. U06 era pertinente ai limiti operativi: classificazione precision false negative del validator. Il task è consumato e non viene ritentato.
+
+Hardening commit `ee64500421a93a80c10d50d0d737eb63a0daef51`: `num_predict=4096`, task consumato bloccato, salvage deterministico del surplus evidence quando required coverage e conclusione sono già corrette. GitHub Actions `Verifica FAME local worker`, run `36682450395`: 59 test, OK.
+
+Risultato: [DIRECT_QA_COORDINATOR_ARCHITECTURE_V2_RESULT_2026-09-30.md](DIRECT_QA_COORDINATOR_ARCHITECTURE_V2_RESULT_2026-09-30.md).
+
+## Quinto task v2 congelato
+
+È preparato `rubric-audit-semantics-review-v1` su `RUBRIC_AUDIT.md` al commit `5530c2649ddda83a07511f8e0549d4ccf45723fe`. Il task verifica distinzione tra SEMANTIC_FAIL e incapacità del modello, evidenza contestuale vs diretta, preservazione dello storico nel sidecar, disciplina del prossimo protocollo e controllo negativo sulla promozione retroattiva.

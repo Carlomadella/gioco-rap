@@ -257,3 +257,16 @@ Questo è il primo task reale v2 fuori dai report Audio→MIDI. Verifica che il 
 - assenza di autorizzazione a modifiche FAME Neural/training/audio/batch131/P6.
 
 Il QA resta documentale e read-only.
+
+
+## Esito settimo incarico — coordinator architecture
+
+`coordinator-architecture-review-v1` è stato consumato il 30 settembre 2026 nella root `FAME_DIRECT_QA_NETWORK_V2_20260930_085819`.
+
+Attempt-1: output incompleto per `done_reason=length` al vecchio budget 2048. Attempt-2: 5/5 conclusioni corrette, ma reject per evidence extra U06 su una finding già sufficientemente coperta. Classificazione: generation-budget failure seguito da precision false negative.
+
+Hardening futuro in `ee64500421a93a80c10d50d0d737eb63a0daef51`: 4096 token di output e salvage host-side del surplus evidence già sufficientemente coperto. Il run storico resta invariato.
+
+## Ottavo incarico v2 preparato — rubric audit semantics
+
+`rubric-audit-semantics-review-v1` usa `RUBRIC_AUDIT.md` congelato al commit `5530c2649ddda83a07511f8e0549d4ccf45723fe`. È un task più epistemico: separa etichette del validator, forza della prova, rivalutazione sidecar e stato storico, con controllo negativo su promozione/independent evaluation.
