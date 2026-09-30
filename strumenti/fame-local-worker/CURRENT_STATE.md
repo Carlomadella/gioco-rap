@@ -985,3 +985,63 @@ CI sul commit `ce4c4c25d6440e45d88ef7fcee8963269cfea246`:
 
 Prossimo passo: eseguire una sola volta il fresh pilot Adaptive QA V2. Se la baseline passa, V6 deve restare spenta; se la baseline fallisce con response valida, V6 deve essere lanciata automaticamente. Il case diventa consumato dopo questo run.
 
+## Adaptive QA V2 — fresh pilot: escalation V6 non recupera
+
+Eseguito una sola volta `adaptive-v2-tsumugi-architecture-pilot-v1`.
+
+Baseline single-agent:
+- answer option corretta: `ANSWER_RUBRIC_FALSE_NEGATIVE_DISCIPLINED`;
+- status: `REJECTED`;
+- errore: `BASELINE_INSUFFICIENT_FINAL_EVIDENCE`;
+- coverage mancante: U03;
+- modelCalls: 1.
+
+Adaptive:
+- trigger: `ESCALATE / INSUFFICIENT_FINAL_EVIDENCE`;
+- Four-Role Network V6 avviata automaticamente.
+
+V6:
+- Extractor ACCEPTED ma ha citato U02-U07 e omesso completamente U01;
+- Anti-Bias ACCEPTED, zero issue, `ANTI_BIAS_CHALLENGE_PASS_WITHIN_SCOPE`;
+- Verifier ha supportato tutti i claim ricevuti ma e stato REJECTED dal gate host con `VERIFIER_INSUFFICIENT_FINAL_EVIDENCE_AFTER_REPAIR`;
+- Integrator non eseguito;
+- network modelCalls: 3.
+
+Esito Adaptive V2:
+- status: `NEEDS_REVIEW`;
+- selectedPath: null;
+- recoveredByEscalation: false;
+- modelCalls totali: 4.
+
+Questa e una misura fresca valida: V6 non ha generalizzato al nuovo failure. La causa e diversa da V5/V6 repair: U01 e stata persa prima del repair, direttamente nell'Extractor. Anti-Bias e Verifier non avevano un canale strutturale per recuperare una unita totalmente assente dai claim.
+
+Il case e ora consumato. Non va riusato come nuova misura indipendente.
+
+## Four-Role Network V7 — bounded omission recovery
+
+Aggiunto `fame_four_role_network_v7.py` senza modificare V4/V5/V6.
+
+Obiettivo: recuperare evidenze pubbliche materialmente rilevanti omesse completamente dall'Extractor senza esporre la rubrica host privata.
+
+Meccanismo:
+- dopo l'Extractor il controller calcola `uncoveredEvidenceIds` come differenza tra tutte le unit pubbliche e gli evidence ID citati dai claim;
+- l'Anti-Bias riceve questi ID e produce `omissionReview` per ogni unita scoperta: `MATERIAL_FOR_ANSWER`, `NOT_MATERIAL` o `UNCERTAIN_MATERIALITY`;
+- il Verifier rivaluta ogni omissione indipendentemente e produce `omissionResolution`: `RECOVERED`, `NOT_REQUIRED` o `UNRESOLVED`;
+- le omissioni recuperate diventano `recoveredClaims` O1-O8 e possono citare soltanto evidence ID realmente scoperti dopo l'Extractor;
+- `UNRESOLVED` blocca;
+- il gate host finale continua a verificare le `requiredFinalEvidenceGroups` private senza inviarle ai modelli;
+- l'Integrator puo usare supportedClaims + repairedClaims + recoveredClaims;
+- topologia invariata a quattro ruoli/chiamate massime.
+
+Test dedicati in `test_fame_four_role_network_v7.py`, incluso il pattern reale del fresh pilot con U01 omessa totalmente. Il test verifica anche che:
+- U01 venga individuata come public uncovered evidence;
+- il recovery O1/U01 possa completare la coverage;
+- ignorare U01 lasci il gate host rosso;
+- un recoveredClaim non possa riclassificare come omessa una evidenza gia usata dall'Extractor.
+
+CI al commit `1531f2d87241153b57ecab0af3f2670fb28de7aa`:
+- 80 Direct-QA: OK;
+- 131 FAME: OK.
+
+Prossimo passo: eseguire V7 sul case consumato `adaptive-v2-tsumugi-architecture-pilot-v1` soltanto come diagnostico del nuovo omission-recovery. Non e un nuovo first attempt e non costituisce nuova evidenza indipendente.
+
