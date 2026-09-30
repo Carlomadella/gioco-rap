@@ -2838,6 +2838,15 @@ console.log("\nIl Circolo — la Sala e il Live Club, un posto solo");
     leggi("css/stretto.css").includes(".cc-giu{grid-template-columns:minmax(0,1fr);") &&
     leggi("css/stretto.css").includes(".cc-su{grid-template-columns:minmax(0,1fr)}") &&
     circoloCss.includes("@media (hover:hover){"));
+  /* 30/09/2026, CARLO: la pagina non scorre, sta tutta nella viewport; e i
+     volti sono gli otto ritratti di `concept/simil_avatar.png` */
+  test("sopra i 1180 il Circolo sta tutto nello schermo e non scorre",
+    /@media \(min-width:1181px\)\{\s*\.lfwrap\.lfcircolo\{overflow:hidden\}/.test(circoloCss) &&
+    circoloCss.includes(".cc-scena{aspect-ratio:auto;height:100%;max-height:none;min-height:0}"));
+  test("le facce del Circolo sono gli otto ritratti, non il disegno di rivals.js",
+    [1, 2, 3, 4, 5, 6, 7, 8].every(n => circolo.includes('"volto-' + n + '.jpg"') &&
+      fs.existsSync(path.join(ROOT, "media/photo/circolo/volti/volto-" + n + ".jpg"))) &&
+    !circolo.includes("faccia(p, size)") && circolo.includes("function circoloVolto(p){"));
 }
 
 test("sul telefono le tre colonne diventano una pila e le porte della Casa vanno in colonna",

@@ -6449,3 +6449,44 @@ lanciato.
 
 ![Primo schermo in orizzontale](prove-telefono/2026-09-30/circolo-foto-844x390.png)
 - **RISOLTO (30/09/2026)** — branch `task/il-circolo`: di traverso la foto è al massimo il 68% dell'altezza, sotto si vede la pagina.
+
+## Giro del 30/09/2026 (segnala-problemi, fine task `task/circolo-viewport-avatar`, commit `41ac344`) — le due chiuse
+
+### 75. La serata a momenti non ci sta nel suo riquadro sugli schermi bassi
+- **dove** — `frontend/css/circolo.css:264` (`.cc-momenti{height:100%}`), col riquadro che
+  non scorre (`.cc-box`, `circolo.css:107`) e l'altezza fissa di `.cc-giu` (`:254` e `:276`)
+- **cosa succede** — adesso che la pagina non scorre, la card del momento sta al centro di un
+  riquadro alto quanto resta, e se è più alta viene tagliata **sopra e sotto**, senza
+  modo di scorrerla. Misurato con una card da tre risposte: a 1366 × 768 esce di 16 punti per
+  parte, a 1280 × 800 di 16, a 1280 × 720 di 33, a 1181 × 700 di 49, a 1181 × 650 di 60.
+  In alto sparisce la riga su com'è andato il pezzo prima («Qualcuno si è avvicinato
+  al palco.»), e a 1181 anche metà di «Secondo pezzo.». In basso sparisce la barra che dice come sta
+  andando la gente, e la terza risposta perde la riga del rischio. Le risposte si cliccano
+  ancora, ma **scegli senza sapere com'è andata l'ultima**. Il riquadro «Com'è andata» a
+  1181 × 650 perde 5 punti del tasto «Continua». A 1366 × 768, lo schermo del portatile più
+  comune, succede con cinque momenti su otto. Da 1440 × 900 in su ci sta.
+- **come si vede** — finestra a 1280 × 720, Circolo alle 21:30, sali per il Live e scegli la
+  prima risposta: al secondo pezzo la card non ha più il bordo in alto né la barra in fondo.
+- **quanto pesa** — si vede ma si gira intorno.
+
+**RISOLTO (30/09/2026)** — stesso branch: sopra i 1180 la card del momento ha `max-height:100%` e scorre lei dentro al riquadro, e sotto i 900 di altezza è più larga e più compatta; a 1181 × 700 e 1280 × 720, al secondo pezzo, si vedono la riga di prima, le tre risposte e la barra.
+
+### 76. Testi del Circolo tagliati senza modo di leggerli
+- **dove** — `frontend/css/circolo.css:297` (la descrizione nella scheda, max 3 righe) e
+  `:269` (il perché delle mosse chiuse su una riga, coi puntini)
+- **cosa succede** — sugli schermi alti fino a 900 la descrizione della persona nella scheda
+  («Non vi siete mai parlati. Gira i video. Decide come ti si vede…») si ferma a tre righe.
+  Nella colonna stretta della scheda sono poche parole, e il resto non si legge da nessuna
+  parte, anche se la scheda saprebbe già scorrere da sola. Le tre mosse chiuse del Palco
+  (Showcase, Opening Act, Headline) adesso mettono la spiegazione accanto al nome, su una
+  riga: nella colonna larga 145 punti di uno schermo da 1366 il conto dice che dopo «Opening
+  Act» restano i puntini e poco altro. **Questo non l'ho visto a schermo, va guardato.** Il
+  perché vero c'è solo al passaggio del mouse, quindi su un tablet non si vede mai.
+  A 1181 × 650 «Chi c'è stasera» taglia 5 punti in fondo, cioè il mestiere sotto i nomi.
+  Le didascalie sotto ai riquadri e la descrizione del locale, nascoste sotto i 900 di
+  altezza, sono una scelta per far stare tutto: non le conto.
+- **come si vede** — 1366 × 768, Circolo di pomeriggio, apri la scheda del videomaker o di
+  uno che non conosci.
+- **quanto pesa** — da sistemare con calma.
+
+**RISOLTO (30/09/2026)** — stesso branch: niente più tre righe nella scheda (la scheda scorre, con la barretta sottile), le mosse chiuse del Palco vanno a capo invece dei puntini e la loro colonna ha la barretta, le facce di «Chi c'è stasera» scendono fino a 46 punti.

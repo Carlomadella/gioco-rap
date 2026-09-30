@@ -2754,3 +2754,25 @@ invece di 454 a 1440 × 900), titolo 32, orari 28, tasti 64; sul telefono in ver
 invece di 443; di traverso (`max-height:480px`) la riga piccola sotto ai due tasti va via e
 la modale sta tutta, alta 250. La X resta 44 × 44. La prova in orizzontale di
 `ritocchi-telefono.spec.js` controlla anche che non scorra.
+
+## Il Circolo tutto nello schermo, coi volti veri
+
+CARLO, 30/09/2026: «controlla dal browser come risulta la schermata di gioco del circolo e
+sistemala, non deve essere scrollabile ma deve essere contenuta tutta nella viewport, poi
+sistema gli avatar e usa quelli che vedi nella foto simil_avatar».
+
+**FATTO (30/09/2026)** — branch `task/circolo-viewport-avatar`. Prima la pagina scorreva a
+1920 × 1080 (70 px), 1366 × 768 (100 px) e 1280 × 720 (100 px); stava giusta solo al
+riferimento, 1536 × 1024. Adesso sopra i 1180 punti non scorre a nessuna misura provata
+(1200 × 800, 1280 × 720, 1366 × 768, 1440 × 900, 1536 × 1024, 1600 × 900, 1920 × 1080,
+2560 × 1440): i quattro riquadri hanno un'altezza fissa in fondo (`clamp(300px,41vh,440px)`,
+47vh sugli schermi bassi) e la foto prende quello che resta, ritagliata come un `cover` coi
+cartelli dentro. Sotto i 900 di altezza vanno via le didascalie dei riquadri e la descrizione
+nella colonna, le mosse chiuse del Palco stanno su una riga. Sotto i 1180 di larghezza resta
+la pila di prima, che scorre. I volti: gli otto ritratti di `simil_avatar.png` (spostata in
+`frontend/concept/`, che il build non mette nel pacchetto) ritagliati in
+`media/photo/circolo/volti/`; a chi ha un nome da ragazza tocca una delle tre ragazze, il volto
+si sceglie fra i meno usati e resta suo (`p.volto`). Anche «Chi c'è stasera» mostra la faccia
+di chi non conosci (prima era una sagoma): il nome resta «???». Due controlli nuovi in
+`audit-regressioni.js`. Il resto del gioco (Studio, classifica) disegna ancora le facce di
+`rivals.js`.
