@@ -1,0 +1,26 @@
+name: Verifica FAME local worker
+
+on:
+  push:
+    paths:
+      - 'strumenti/fame-local-worker/**'
+      - '.github/workflows/verifica-fame-local-worker.yml'
+  pull_request:
+    paths:
+      - 'strumenti/fame-local-worker/**'
+      - '.github/workflows/verifica-fame-local-worker.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  direct-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Direct QA regressions
+        working-directory: strumenti/fame-local-worker
+        run: python -m unittest discover -s . -p "test_direct_qa_*.py" -q
