@@ -372,3 +372,27 @@ Il case distingue:
 Questo sarà il primo run V3 completo da zero con quattro chiamate fresh: Extractor, Anti-Bias, Verifier, Integrator.
 
 Verifica automatica: 80 test Direct-QA + 43 test FAME, tutti OK.
+
+
+## Primo fresh run completo Four-Role Network V3
+
+Root locale `FAME_FOUR_ROLE_NETWORK_V3_FRESH_20260930_124414`.
+
+Esito host `PROPOSED_FOR_HUMAN_REVIEW` con quattro chiamate fresh nello stesso protocollo:
+- Extractor `ACCEPTED`;
+- Anti-Bias `ACCEPTED`;
+- Verifier `ACCEPTED`;
+- Integrator `ACCEPTED`;
+- zero errori host.
+
+Il Verifier e l'Integrator hanno scelto `ANSWER_NO`: il confronto congelato mostra Qwen meno debole su quello specifico protocollo, ma non dimostra superiorità generale su GPT-OSS.
+
+L'Anti-Bias ha prodotto un issue `NONBLOCKING` sulle assunzioni di piena comparabilità e sulla sufficienza della metrica; il Verifier lo ha mantenuto `UNRESOLVED` e l'Integrator lo ha riportato come limitazione. Il flusso ha quindi preservato una incertezza reale senza bloccare una conclusione più stretta supportata dalla fonte.
+
+Revisione umana: PASS con nota di precisione su C2. La frase "higher success rate in generating structured output" è più forte del necessario dato un solo run per modello; formulazione preferibile: "in questo confronto Qwen ha prodotto output strutturato, GPT-OSS no". La nota non cambia il verdetto finale.
+
+Il case `model-comparison-generalization-network-v3` è consumato e non può essere inizializzato di nuovo come first attempt.
+
+Report: [FAME_FOUR_ROLE_NETWORK_V3_FRESH_RESULT_2026-09-30.md](FAME_FOUR_ROLE_NETWORK_V3_FRESH_RESULT_2026-09-30.md).
+
+Questo è il primo PASS completo V3 a quattro ruoli fresh. Non dimostra ancora affidabilità generale della rete, vantaggio rispetto a una baseline single-agent o riduzione del costo umano di review.
