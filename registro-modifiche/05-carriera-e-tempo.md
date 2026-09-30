@@ -6,6 +6,56 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:e3e9a54 -->
+## 30/09/26, 20:30 â€” feature/fabbrica-pagina-foto â†’ main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `e3e9a54`
+
+### Cosa Ã¨ entrato
+
+- `b101ed9` â€” test: rende stabile audit transizione stacca â€” **mycolbraga**
+- `9acedf4` â€” chore(fabbrica): invalida cache del fondale 4K â€” **mycolbraga**
+- `e90306a` â€” fix(fabbrica): sostituisce fondale con versione 4K â€” **github-actions[bot]**
+- `f188aaa` â€” chore(fabbrica): installa fondale 4K â€” **mycolbraga**
+- `96aeb85` â€” fix(fabbrica): punta al fondale 4K â€” **mycolbraga**
+- `54200c4` â€” fix(fabbrica): punta al fondale 4K â€” **mycolbraga**
+- `b8d1877` â€” test(fabbrica): verifica il fondale effettivo â€” **mycolbraga**
+- `66c9fce` â€” fix(fabbrica): usa il fondale presente nella branch â€” **mycolbraga**
+- `8ca4588` â€” test(fabbrica): allinea audit al fondale webp â€” **mycolbraga**
+- `9d3cf81` â€” fix(fabbrica): usa il fondale 2K webp â€” **mycolbraga**
+- `375a134` â€” test(fabbrica): protegge il turno dentro la pagina â€” **mycolbraga**
+- `874e784` â€” chore(fabbrica): aggiorna cache della pagina fotografica â€” **mycolbraga**
+- `26e5e81` â€” fix(fabbrica): mantiene il turno nella pagina fotografica â€” **mycolbraga**
+- `1e1214d` â€” chore: rimuove asset Fabbrica duplicato â€” **mycolbraga**
+- `8138ea9` â€” chore: pulisce asset temporaneo Fabbrica â€” **mycolbraga**
+- `fa021af` â€” chore: rimuove file temporanei asset Fabbrica â€” **mycolbraga**
+- `f13763a` â€” chore: pulizia asset Fabbrica 3/4 â€” **mycolbraga**
+- `0d867e0` â€” chore: pulizia asset Fabbrica 2/4 â€” **mycolbraga**
+- `cc2a863` â€” chore: pulizia asset Fabbrica 1/4 â€” **mycolbraga**
+- `0268ac7` â€” feat: aggiunge il fondale 2K della Fabbrica â€” **mycolbraga**
+- `828c405` â€” tmp: asset fabbrica 4/4 â€” **mycolbraga**
+- `c61d95d` â€” tmp: asset fabbrica 3/4 â€” **mycolbraga**
+- `4a497dc` â€” tmp: asset fabbrica 2/4 â€” **mycolbraga**
+- `b82bd05` â€” tmp: asset fabbrica 1/4 â€” **mycolbraga**
+- `679ffdd` â€” test: copre la nuova pagina Fabbrica â€” **mycolbraga**
+- `d883661` â€” chore: aggiorna cache pagina fabbrica â€” **mycolbraga**
+- `4fa44a2` â€” feat: apre la fabbrica senza popup â€” **mycolbraga**
+- `d2c48ec` â€” feat: trasforma la fabbrica in pagina fotografica â€” **mycolbraga**
+- `796bc86` â€” chore(fabbrica): prepara asset 2K â€” **mycolbraga**
+- `23deaf4` â€” feat(fabbrica): aggiungi fondale 2K â€” **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/luoghi-foto.js`
+- **Aggiunto:** `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/fabbrica.webp`
+- **Modificato:** `frontend/pagine/gioco.html`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:4a578e8 -->
 ## 30/09/26, 00:35 â€” task/il-circolo â†’ main
 
