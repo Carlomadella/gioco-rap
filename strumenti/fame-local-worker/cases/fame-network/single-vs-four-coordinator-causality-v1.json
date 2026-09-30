@@ -1,0 +1,62 @@
+{
+  "caseId": "single-vs-four-coordinator-causality-v1",
+  "sourceCommit": "b16ef607905d26bf12c9ac8fa2a3b0c481bb4574",
+  "sourcePath": "strumenti/fame-local-worker/COORDINATOR.md",
+  "sourceSnapshot": "cases/fame-network/single-vs-four-coordinator-source.md",
+  "question": "Se il coordinatore ottiene un risultato migliore del protocollo precedente, questo dimostra che la divisione del lavoro è la causa del miglioramento e che la rete generalizza già a nuovi documenti?",
+  "units": [
+    {
+      "unitId": "U01",
+      "text": "Primo flusso coordinato della rete FAME Neural: GPT-OSS locale esegue un incarico per chiamata, il coordinatore Python assegna i compiti, conserva gli artefatti, applica la rubric e raccoglie gli esiti. E un prototipo operativo di rete specializzata per QA documentale, non ancora una rete generalista autorizzata a modificare FAME Neural."
+    },
+    {
+      "unitId": "U02",
+      "text": "Questa e una nuova architettura/procedura; non una replica identica del confronto precedente. Cambiano granularita, prompt e contratto. Un miglioramento sosterrebbe l'utilita della divisione del lavoro, ma non dimostrerebbe che il solo sovraccarico fosse la causa."
+    },
+    {
+      "unitId": "U03",
+      "text": "Il caso e gia osservato; un risultato positivo dovra poi essere verificato su nuovi documenti."
+    },
+    {
+      "unitId": "U04",
+      "text": "Conservare i conteggi di false affermazioni accettate, affermazioni vere perse, citazioni insufficienti, evidenze scartate, token e tempi. Il summary contiene risultati e metriche per agente. Il tempo umano non viene inventato; risparmio non ancora dimostrato. Per il confronto conta il costo dell'intera rete, non solo quello di una chiamata."
+    },
+    {
+      "unitId": "U05",
+      "text": "Preparato il 23/09/2026. Undici nuovi test automatici passati nel container con modello simulato: 14 richieste isolate, assenza di rubric nelle richieste, aggregazione, ripresa senza ripetizioni, rifiuto categorie false, omissioni, troncamento, input/risposta modificati, lock, interruzione e timeout. Nessuna prova reale della rete eseguita dall'assistente."
+    }
+  ],
+  "answerOptions": [
+    {
+      "optionId": "ANSWER_YES",
+      "meaning": "Sì: un risultato migliore dimostra sia che la divisione del lavoro è la causa del miglioramento sia che la rete generalizza già a nuovi documenti."
+    },
+    {
+      "optionId": "ANSWER_NO",
+      "meaning": "No: un miglioramento può sostenere l'utilità della divisione del lavoro, ma non identifica da solo la causa e non dimostra generalizzazione; serve verifica su nuovi documenti."
+    },
+    {
+      "optionId": "ANSWER_INSUFFICIENT",
+      "meaning": "Le evidenze fornite non consentono di stabilire neppure se il documento pone limiti causali o di generalizzazione."
+    }
+  ],
+  "expectedAnswerOptionId": "ANSWER_NO",
+  "requiredFinalEvidenceGroups": [
+    [
+      "U02"
+    ],
+    [
+      "U03"
+    ]
+  ],
+  "optionalContext": [
+    "U01",
+    "U04",
+    "U05"
+  ],
+  "humanReviewRequired": true,
+  "executionAuthorized": false,
+  "trainingAuthorized": false,
+  "networkProductionReady": false,
+  "independentEvaluation": false
+}
