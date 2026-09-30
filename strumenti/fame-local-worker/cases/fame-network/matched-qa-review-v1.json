@@ -7,19 +7,19 @@
   "units": [
     {
       "unitId": "U01",
-      "text": "Un evidenceId valido da solo NON dimostra che una conclusione sia giusta: anche il legame categoria-evidenza è verificato da una rubrica specifica. La rubrica non è un valutatore semantico universale; per un altro report serve un nuovo caso e una revisione della rubrica."
+      "text": "Un `evidenceId` valido da solo NON dimostra che una conclusione sia giusta: qui anche il legame categoria-evidenza e verificato da una rubrica preparata e testata dall'operatore. La rubrica non e un valutatore semantico universale. Per un altro report serve un nuovo caso e una revisione della rubrica; non basta cambiare report.md."
     },
     {
       "unitId": "U02",
-      "text": "Esito positivo: VALIDATED_FOR_REVIEW, con humanReviewRequired: true ed executionAuthorized: false. Non significa validazione delle cause scientifiche o autorizzazione a eseguire una nuova inference. Le proposte restano da confrontare con la roadmap corrente prima di qualsiasi attuazione."
+      "text": "Esito positivo: `VALIDATED_FOR_REVIEW`, con `humanReviewRequired: true` e `executionAuthorized: false`. Non significa validazione delle cause scientifiche o autorizzazione a eseguire una nuova inference. Le proposte rimangono da confrontare con la roadmap corrente prima di qualsiasi attuazione."
     },
     {
       "unitId": "U03",
-      "text": "La v6 distingue evidenza insufficiente e contesto superfluo. Se gli evidenceIds pertinenti coprono già tutti i gruppi richiesti, gli ID esterni alla rubrica vengono rimossi deterministicamente. Se invece la copertura richiesta manca, l'evidenza irrilevante resta un errore insieme a INSUFFICIENT_EVIDENCE."
+      "text": "La v6 distingue ora tra evidenza insufficiente e contesto superfluo. Se gli evidenceIds pertinenti coprono gia tutti i gruppi richiesti della finding, gli ID esterni alla rubrica vengono rimossi deterministicamente dall'host invece di invalidare tutta la finding. Se invece la copertura richiesta manca, l'evidenza irrilevante resta un errore insieme a INSUFFICIENT_EVIDENCE."
     },
     {
       "unitId": "U04",
-      "text": "I retry sono cumulativi: una finding già validata viene conservata dall'host e non può essere persa da un tentativo successivo. Nessuna finding non validata viene conservata."
+      "text": "I retry sono cumulativi: una finding gia validata viene conservata dall'host e non puo essere persa da un tentativo successivo. L'output finale puo essere assemblato da finding validate in tentativi diversi; `assembledAcrossAttempts` lo rende esplicito nel report. Nessuna finding non validata viene conservata."
     }
   ],
   "answerOptions": [
