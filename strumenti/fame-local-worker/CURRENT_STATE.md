@@ -846,3 +846,44 @@ Required evidence: U01-U07, nessun optional context.
 Il secondo pilot è più denso e non forza artificialmente l'escalation: se il single-agent perde una delle sette unità richieste, il coordinator deve escalare a V4; se le copre tutte, deve fermarsi a 1 call.
 
 Verifica automatica pre-run: 80 Direct-QA + 111 FAME, tutti OK.
+
+## Adaptive QA V1 — pilot 2 escalation reale, V4 non recupera
+
+Pilot 2 `adaptive-transfer-protocol-pilot-v1` eseguito in reale:
+- baseline single-agent: `REJECTED` con `BASELINE_INSUFFICIENT_FINAL_EVIDENCE`;
+- modelCalls baseline: 1;
+- trigger adaptive: `ESCALATE / INSUFFICIENT_FINAL_EVIDENCE`;
+- Four-Role Network V4 eseguita automaticamente: 4 call;
+- totale adaptive: 5 call;
+- stato finale: `NEEDS_REVIEW`;
+- `selectedPath: null`;
+- `recoveredByEscalation: false`.
+
+Il ramo adaptive di escalation e quindi verificato in reale: la baseline insufficiente ha acceso V4 senza intervento manuale.
+
+Diagnosi V4:
+- l'Extractor ha prodotto un claim C2 troppo denso, citando U02-U05 ma includendo anche contenuti che richiedevano U06/U07;
+- Anti-Bias ha identificato il problema come BLOCKING;
+- il Verifier ha confermato il problema e mandato C2 in `claimsNeedingRework`;
+- V4 non consente al Verifier di riscrivere/splittare un claim e riparare la sua mappa evidenze;
+- l'Integrator puo usare solo `supportedClaims` e blocca un issue BLOCKING che non sia `REJECTED`;
+- quindi la recovery semantica era strutturalmente impossibile anche quando Anti-Bias e Verifier avevano diagnosticato correttamente il difetto.
+
+Il run V4 resta preservato come misura reale e NON viene retroattivamente promosso a PASS.
+
+Implementata `fame_four_role_network_v5.py` senza modificare V4:
+- stessa topologia Extractor -> Anti-Bias -> Verifier -> Integrator;
+- bounded semantic repair nel Verifier;
+- nuovi `repairedClaims`, ciascuno derivato da un claim in rework, atomico e con massimo 4 evidence ID;
+- nuovo stato Anti-Bias `RESOLVED_BY_REPAIR`, distinto da `REJECTED`;
+- l'Integrator puo usare solo claim originali supportati + repairedClaims;
+- issue BLOCKING ammesso solo se `REJECTED` o `RESOLVED_BY_REPAIR`;
+- nessuna autorizzazione a training/esecuzione e nessun fatto esterno.
+
+Test V5 aggiunti in `test_fame_four_role_network_v5.py`.
+CI al commit `84e3ac67a33f4225534e07d112c7a24e4742ba59`:
+- 80 Direct-QA: OK;
+- 116 FAME: OK.
+
+Prossimo passo: eseguire V5 sullo stesso transfer case esclusivamente come diagnostico del meccanismo di repair. Non e un nuovo first attempt, non e una nuova misura indipendente e non sostituisce il risultato V4 gia registrato.
+
