@@ -58,13 +58,11 @@
       "supported": true,
       "requiredGroups": [
         [
-          "U02"
-        ],
-        [
           "U04"
         ]
       ],
       "benignContext": [
+        "U02",
         "U01"
       ]
     },
