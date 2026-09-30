@@ -86,3 +86,55 @@ Expected answer host-only: `ANSWER_NO`.
 - 85 test FAME: OK.
 
 Il fresh pilot non è ancora stato eseguito.
+
+
+## Esito primo fresh pilot reale
+
+Root locale: `FAME_FOUR_ROLE_NETWORK_V4_20260930_165854`.
+
+Case: `runtime-contract-result-network-v4`.
+
+Esito:
+- Extractor `ACCEPTED`;
+- Anti-Bias `ACCEPTED`;
+- Verifier `ACCEPTED`;
+- Integrator `ACCEPTED`;
+- `ANSWER_NO`;
+- 4 model calls;
+- zero errori host.
+
+Il Verifier V4 ha prodotto:
+- `supportedClaims`: C1, C2, C3, C4;
+- `unsupportedClaims`: vuoto;
+- `claimsNeedingRework`: vuoto.
+
+Review umana: PASS. C1–C4 sono sostenuti; U01/U02/U03 coprono la required evidence. C4/U04 è contesto opzionale corretto ma non necessario.
+
+Il case è consumato e non va riutilizzato come nuovo first attempt.
+
+Report: [FAME_FOUR_ROLE_NETWORK_V4_FIRST_PILOT_RESULT_2026-09-30.md](FAME_FOUR_ROLE_NETWORK_V4_FIRST_PILOT_RESULT_2026-09-30.md).
+
+## Probe semantico dei tre bucket
+
+Il primo pilot reale ha esercitato soltanto `supportedClaims`. Per testare direttamente la correzione del failure storico è stato congelato un probe separato:
+
+`verifier-v4-branch-probe-v1`.
+
+Fonte:
+`DIRECT_QA_TSUMUGI_CONTROLLED_RESULT_2026-09-23.md`.
+
+Una sola chiamata al Verifier V4 riceve quattro claim host-frozen:
+- C1: supportato;
+- C2: non supportato;
+- C3: formulazione troppo forte, deve andare in `claimsNeedingRework`;
+- C4: supportato.
+
+Expected host-only:
+- `supportedClaims=[C1,C4]`;
+- `unsupportedClaims=[C2]`;
+- `claimsNeedingRework=[C3]`;
+- `answerOptionId=ANSWER_MIXED`.
+
+Il probe non esegue Extractor, Anti-Bias o Integrator e non ritenta casi consumati. Serve esclusivamente a verificare semanticamente la partizione strutturale V4.
+
+Verifica automatica pre-run complessiva: 80 test Direct-QA + 91 test FAME, tutti OK.
