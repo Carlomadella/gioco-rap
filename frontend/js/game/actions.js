@@ -769,7 +769,10 @@ function lavoroValutaDisciplinaSettimana(luogo, absoluteWeek, cycle, weekInCycle
     }
   }
 
-  if(!opts.silent && window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onDiscipline === "function")\n    ADF_WORK_EVENTS.onDiscipline(luogo,result);\n\n  return result;
+  if(!opts.silent && window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onDiscipline === "function")
+    ADF_WORK_EVENTS.onDiscipline(luogo,result);
+
+  return result;
 }
 
 /* Recupera le settimane già concluse del ciclo corrente.
@@ -933,7 +936,9 @@ function lavoroValutaCiclo(luogo, ciclo, turni){
         absences + (absences === 1 ? " assenza." : " assenze."), absences ? "bad" : "");
     }
   }
-  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onCycle === "function")\n    ADF_WORK_EVENTS.onCycle(luogo,evaluation);\n  return evaluation;
+  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onCycle === "function")
+    ADF_WORK_EVENTS.onCycle(luogo,evaluation);
+  return evaluation;
 }
 
 function lavoroChiudiCiclo(luogo){
