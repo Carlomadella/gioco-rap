@@ -189,6 +189,15 @@ const ADF_FABBRICA_CARRIERA = Object.freeze({
     affidabilita:75,
     cicliPerfettiNelRuolo:2
   }),
+  disciplina:Object.freeze({
+    assenzeLieveMax:2,
+    assenzeRichiamoMin:3,
+    richiamiPrimaLicenziamento:2,
+    bloccoRiassunzioneSettimane:8,
+    recuperoRichiamoCicliPerfetti:2,
+    malusLieveAffidabilita:5,
+    malusRichiamoAffidabilita:10
+  }),
   ruoli:Object.freeze([
     Object.freeze({id:"operaio", n:"Operaio"}),
     Object.freeze({id:"operaio_esperto", n:"Operaio esperto"}),
@@ -248,6 +257,20 @@ function lavoroFirmaContratto(luogo, job){
     signedAbsoluteDay:lavoroGiornoAssoluto(),
     roleAtSign:job && job.id || null
   };
+
+  if(luogo === "fabbrica"){
+    const carriera = lavoroCarriera(luogo);
+    if(carriera){
+      carriera.warnings = 0;
+      carriera.cyclesInRole = 0;
+      carriera.perfectCyclesInRole = 0;
+      carriera.perfectStreak = 0;
+      carriera.roleId = job && job.id || "operaio";
+      const idx = ADF_FABBRICA_CARRIERA.ruoli.findIndex(r => r.id === carriera.roleId);
+      carriera.roleLevel = idx >= 0 ? idx : 0;
+    }
+  }
+
   return sede.contract;
 }
 
@@ -307,6 +330,10 @@ function lavoroCarriera(luogo){
       raisesByRole:{},
       payHistory:[],
       roleHistory:[],
+      warnings:0,
+      warningHistory:[],
+      dismissals:0,
+      blockedUntilWeek:null,
       lastEvaluatedCycle:null,
       lastEvaluation:null,
       evaluations:[]
@@ -323,6 +350,10 @@ function lavoroCarriera(luogo){
   if(!c.raisesByRole || typeof c.raisesByRole !== "object") c.raisesByRole = {};
   if(!Array.isArray(c.payHistory)) c.payHistory = [];
   if(!Array.isArray(c.roleHistory)) c.roleHistory = [];
+  c.warnings = Math.max(0, Math.min(2, Number(c.warnings || 0)));
+  c.dismissals = Math.max(0, Number(c.dismissals || 0));
+  if(!Array.isArray(c.warningHistory)) c.warningHistory = [];
+  if(c.blockedUntilWeek != null && !Number.isFinite(Number(c.blockedUntilWeek))) c.blockedUntilWeek = null;
   if(!Array.isArray(c.evaluations)) c.evaluations = [];
 
   if(luogo === "fabbrica"){
@@ -463,6 +494,136 @@ function lavoroCicloInizioGiorno(ciclo){
   return Number(ciclo || 0) * ADF_LAVORO_GIORNI_CICLO + 1;
 }
 
+function lavoroBloccoRiassunzione(luogo){
+  const c = lavoroCarriera(luogo);
+  if(!c || c.blockedUntilWeek == null)
+    return {active:false, weeksRemaining:0, untilWeek:null};
+
+  const oggi = lavoroSettimanaAssoluta();
+  const fino = Number(c.blockedUntilWeek);
+  if(oggi > fino){
+    c.blockedUntilWeek = null;
+    return {active:false, weeksRemaining:0, untilWeek:null};
+  }
+  return {
+    active:true,
+    weeksRemaining:Math.max(1, fino - oggi + 1),
+    untilWeek:fino
+  };
+}
+
+function lavoroLicenzia(luogo, motivo){
+  const c = lavoroCarriera(luogo);
+  if(!c) return null;
+
+  const ruolo = G.job && lavoroLuogo(G.job) === luogo
+    ? {id:G.job.id, n:G.job.n}
+    : null;
+  const cfg = luogo === "fabbrica" ? ADF_FABBRICA_CARRIERA.disciplina : null;
+  const blocco = cfg ? Number(cfg.bloccoRiassunzioneSettimane || 0) : 0;
+
+  c.dismissals += 1;
+  c.blockedUntilWeek = blocco > 0 ? lavoroSettimanaAssoluta() + blocco : null;
+  c.warningHistory.push({
+    absoluteDay:lavoroGiornoAssoluto(),
+    type:"dismissal",
+    reason:motivo || "assenze",
+    warnings:c.warnings
+  });
+  if(c.warningHistory.length > 24) c.warningHistory.shift();
+
+  lavoroTerminaContratto(luogo, "licenziamento");
+  if(G.job && lavoroLuogo(G.job) === luogo) G.job = null;
+  G._lastJobLossReason = luogo === "fabbrica" ? "factory_absences" : "missed_shifts";
+
+  return {
+    luogo:luogo,
+    ruolo:ruolo,
+    reason:motivo || "assenze",
+    blockedUntilWeek:c.blockedUntilWeek,
+    weeksBlocked:blocco
+  };
+}
+
+function lavoroApplicaDisciplina(luogo, evaluation){
+  if(luogo !== "fabbrica" || !evaluation || !evaluation.eligible) return null;
+  const c = lavoroCarriera(luogo);
+  if(!c) return null;
+  const cfg = ADF_FABBRICA_CARRIERA.disciplina;
+  const assenze = Math.max(0, Number(evaluation.absences || 0));
+  const beforeWarnings = c.warnings;
+  const beforeReliability = c.reliability;
+  let warningAdded = 0;
+  let warningRemoved = 0;
+  let dismissed = false;
+
+  if(assenze === 0){
+    if(c.warnings > 0 &&
+       c.perfectStreak > 0 &&
+       c.perfectStreak % Number(cfg.recuperoRichiamoCicliPerfetti || 2) === 0){
+      c.warnings -= 1;
+      warningRemoved = 1;
+      c.warningHistory.push({
+        absoluteDay:lavoroGiornoAssoluto(),
+        type:"warning_removed",
+        reason:"due cicli perfetti consecutivi",
+        warnings:c.warnings
+      });
+    }
+  }else if(assenze <= Number(cfg.assenzeLieveMax || 2)){
+    c.reliability = Math.max(0, c.reliability - Number(cfg.malusLieveAffidabilita || 0));
+  }else if(assenze >= Number(cfg.assenzeRichiamoMin || 3)){
+    c.reliability = Math.max(0, c.reliability - Number(cfg.malusRichiamoAffidabilita || 0));
+
+    if(c.warnings >= Number(cfg.richiamiPrimaLicenziamento || 2)){
+      dismissed = true;
+      lavoroLicenzia(luogo, "assenze ripetute");
+    }else{
+      c.warnings += 1;
+      warningAdded = 1;
+      c.warningHistory.push({
+        absoluteDay:lavoroGiornoAssoluto(),
+        type:"warning",
+        reason:"assenze",
+        absences:assenze,
+        warnings:c.warnings
+      });
+    }
+  }
+
+  if(c.warningHistory.length > 24)
+    c.warningHistory.splice(0, c.warningHistory.length - 24);
+
+  const result = {
+    absences:assenze,
+    warningAdded:warningAdded,
+    warningRemoved:warningRemoved,
+    warningsBefore:beforeWarnings,
+    warningsAfter:c.warnings,
+    reliabilityBefore:beforeReliability,
+    reliabilityAfter:c.reliability,
+    dismissed:dismissed
+  };
+
+  if(typeof pushLog === "function"){
+    if(dismissed){
+      const blocco = lavoroBloccoRiassunzione(luogo);
+      pushLog("<b>Licenziato dalla Fabbrica.</b> Dopo due richiami, le nuove assenze hanno chiuso il rapporto. " +
+        "Non puoi essere riassunto qui per " + blocco.weeksRemaining + " settimane.", "bad");
+    }else if(warningAdded){
+      pushLog("<b>Richiamo formale in Fabbrica.</b> " + assenze + " assenze nel ciclo · richiami " +
+        c.warnings + "/2 · affidabilità −" + Number(cfg.malusRichiamoAffidabilita || 0) + ".", "bad");
+    }else if(warningRemoved){
+      pushLog("<b>Richiamo cancellato.</b> Due cicli perfetti consecutivi hanno ripulito il tuo storico recente.", "good");
+    }else if(assenze > 0){
+      pushLog("<b>Presenze sotto contratto.</b> " + assenze + (assenze === 1 ? " assenza" : " assenze") +
+        " nel ciclo · affidabilità −" + Number(cfg.malusLieveAffidabilita || 0) + ".", "bad");
+    }
+  }
+
+  return result;
+}
+
 function lavoroValutaCiclo(luogo, ciclo, turni){
   const def = lavoroContrattoDef(luogo);
   const contratto = lavoroContratto(luogo);
@@ -524,8 +685,13 @@ function lavoroValutaCiclo(luogo, ciclo, turni){
     reliabilityBefore:reliabilityBefore,
     reliabilityAfter:carriera.reliability,
     reliabilityDelta:carriera.reliability - reliabilityBefore,
-    settimane:settimane
+    settimane:settimane,
+    disciplina:null
   };
+
+  evaluation.disciplina = lavoroApplicaDisciplina(luogo, evaluation);
+  evaluation.reliabilityAfter = carriera.reliability;
+  evaluation.reliabilityDelta = carriera.reliability - reliabilityBefore;
 
   carriera.lastEvaluatedCycle = ciclo;
   carriera.lastEvaluation = evaluation;
@@ -536,7 +702,8 @@ function lavoroValutaCiclo(luogo, ciclo, turni){
     if(perfect){
       if(typeof pushLog === "function")
         pushLog("<b>Valutazione Fabbrica: 4/4 settimane complete.</b> Affidabilità +10.", "good");
-    }else if(typeof pushLog === "function"){
+    }else if(typeof pushLog === "function" &&
+             !(evaluation.disciplina && evaluation.disciplina.dismissed)){
       pushLog("<b>Valutazione Fabbrica:</b> " + fullWeeks + "/4 settimane complete · " +
         absences + (absences === 1 ? " assenza." : " assenze."), absences ? "bad" : "");
     }
@@ -651,6 +818,9 @@ function lavoroCartellino(luogo){
     mesiPerfetti:carriera ? carriera.perfectCycles : 0,
     mesiPerfettiDiFila:carriera ? carriera.perfectStreak : 0,
     cicliNelRuolo:carriera ? carriera.cyclesInRole : 0,
+    richiami:carriera ? carriera.warnings : 0,
+    licenziamenti:carriera ? carriera.dismissals : 0,
+    bloccoRiassunzione:lavoroBloccoRiassunzione(luogo),
     aumentoDisponibile:lavoroAumentoDisponibile(luogo),
     promozioneDisponibile:lavoroPromozioneDisponibile(luogo),
     prossimoRuolo:(lavoroProssimoRuolo(luogo) || {}).n || null
@@ -795,7 +965,13 @@ function offerJobs(){
       opts:[{n:"Va bene", d:"Torni a quello che facevi", run(){ return null; }}]});
     return;
   }
-  const pool = JOBS.filter(j => (!j.req || j.req(G)) && (!G.job || G.job.id !== j.id));
+  const pool = JOBS.filter(j => {
+    if(j.req && !j.req(G)) return false;
+    if(G.job && G.job.id === j.id) return false;
+    if(j.place === "fabbrica" && typeof lavoroBloccoRiassunzione === "function" &&
+       lavoroBloccoRiassunzione("fabbrica").active) return false;
+    return true;
+  });
   const picks = [];
   while(picks.length < 2 && picks.length < pool.length){
     const j = pick(pool);
@@ -805,6 +981,13 @@ function offerJobs(){
     n: j.n + " · " + j.pay + " € a turno",
     d: j.e + " energia per turno. " + j.d,
     run(){
+      if(j.place === "fabbrica"){
+        if(typeof assumitiCome === "function"){
+          assumitiCome(j.id);
+          return null;
+        }
+        return {t:"Per la Fabbrica devi firmare il contratto sul posto.", c:""};
+      }
       G.job = {id:j.id, place:j.place || null, n:j.n, pay:j.pay, e:j.e, missed:0};
       return {t:"Hai preso il posto da " + j.n.toLowerCase() + ": " + j.pay + " € a turno.", c:"good"};
     }
