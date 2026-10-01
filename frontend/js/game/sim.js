@@ -257,6 +257,11 @@ function advanceWeek(){
      fisicamente dentro: il contatto con l'esterno passa dal micro-loop carcere. */
   if(!detenutoAInizioSettimana && typeof chatSettimana === "function") chatSettimana();
 
+  /* La quarta settimana chiude anche il ciclo lavorativo di 28 giorni.
+     Va fatto PRIMA di incrementare G.week, quando il cartellino contiene
+     ancora l'ultima settimana del periodo appena completato. */
+  if(typeof lavoroChiudiCicli === "function") lavoroChiudiCicli();
+
   G.week++;
   if(G.week > 52){ G.week = 1; G.year++; G.age++; pushLog("<b>Un anno in più.</b> Hai " + G.age + " anni.", "big"); }
   /* «Le offerte della settimana» (21/09/2026): al lunedi' lo Shop tira a
