@@ -38,6 +38,21 @@ const ART = {
    sopra — non un'altra riga di testo che vola via in due secondi. */
 const SCENA_PIENA = new Set(["mixa","pubblica","promo","anteprima","live","turno","stacca",
   "palestra_pesi","palestra_cardio"]);
+/* Gli eventi lavoro possono fermare una mossa PRIMA che consumi energia o tempo.
+   Il caso principale è un turno che attraversa un appuntamento musicale già
+   segnato in Agenda. Il motore viene caricato dopo questa UI, quindi il bridge
+   resta opzionale e non crea una dipendenza di caricamento. */
+function guardiaEventoLavoro(id){
+  try{
+    if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.guardAction === "function"){
+      const gate = ADF_WORK_EVENTS.guardAction(id);
+      if(gate && gate.ok === false) return gate;
+    }
+  }catch(err){
+    console.error("[Anni di Fame] guardia eventi lavoro non riuscita", err);
+  }
+  return {ok:true};
+}
 function mostraScena(a, sc, msg, extra){
   $("sc-art").innerHTML = sc[2]
     ? '<svg viewBox="0 0 200 128" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">' + sc[2] + '</svg>'
@@ -114,6 +129,9 @@ function avviaAzioneDiretta(id){
           "bad","!",["#B91C1C","#7F1D1D"]);
       return false;
     }
+
+    const lavoroGate = guardiaEventoLavoro(a.id);
+    if(!lavoroGate.ok) return false;
 
     const fansBefore = G.fans;
     const moneyBefore = G.money;
@@ -315,6 +333,9 @@ function renderGioco(){
           toast("<b>Mossa non avviata.</b> Controllo luogo/orario non disponibile.","bad","!",["#B91C1C","#7F1D1D"]);
         return;
       }
+
+      const lavoroGate = guardiaEventoLavoro(a.id);
+      if(!lavoroGate.ok) return;
 
       const fansBefore = G.fans, moneyBefore = G.money;
       G.energy -= en2;

@@ -230,7 +230,7 @@ test("FAMEpedia usa UI dedicata coerente e responsive",
   famepediaCss.includes("var(--c1)") &&
   famepediaCss.includes("@media (max-width:820px)") &&
   landing.includes('css/famepedia.css?v=4') &&
-  landing.includes('js/famepedia.js?v=3'));
+  landing.includes('js/famepedia.js?v=4'));
 test("FAMEpedia V2 mantiene indice voci persistente a sinistra",
   landing.includes('id="fp-nav-list"') &&
   famepediaJs.includes('host=$fp("fp-nav-list")') &&
@@ -2914,9 +2914,10 @@ console.log("\nIl Circolo — la Sala e il Live Club, un posto solo");
     incontri.includes("G.hype = Math.max(prima, Math.min(tetto, prima + su));") &&
     incontri.includes("const CC_HYPE_SERA = 2;") &&
     !/\+1 hype\./.test(incontri));
-  test("la serata giocata a momenti pesa sul live di actions.js, e fuori dal Circolo vale 1",
+  test("la serata giocata a momenti pesa sul live; un lead lavoro si moltiplica senza saltare la resa",
     actions.includes('const resa = typeof circoloResaSerata === "function" ? circoloResaSerata() : 1;') &&
-    actions.includes("const molt = (giaOggi ? 0.45 : 1) * peso * resa;") &&
+    actions.includes('const moltLavoro = leadLavoro ? Math.max(1, Number(leadLavoro.multiplier || 1)) : 1;') &&
+    actions.includes("const molt = (giaOggi ? 0.45 : 1) * peso * resa * moltLavoro;") &&
     circolo.includes("function circoloResaSerata(){ const r = CIRCOLO_RESA; CIRCOLO_RESA = 1; return r; }"));
   test("il dopo-serata si somma prima del tetto «già visto oggi»",
     (() => {
@@ -3100,7 +3101,7 @@ console.log("\nLe tre del Marketing (20/09/2026)");
   test("il bot del simulatore di bilanciamento trova ancora finestre, colpi e azioni per nome", altro.length === 0, altro.join(", "));
 })();
 
-for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/studio-automatico.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/transizioni-video.js","js/game/luoghi-foto.js","js/preparo.js","js/gioco-ingresso.js"]){
+for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/studio-automatico.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/lavoro-eventi.js","js/game/transizioni-video.js","js/game/luoghi-foto.js","js/preparo.js","js/gioco-ingresso.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }

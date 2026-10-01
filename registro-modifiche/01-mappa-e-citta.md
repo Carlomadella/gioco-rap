@@ -6,6 +6,62 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:dc26a32 -->
+## 01/10/26, 13:34 â€” feature/eventi-lavoro-famiglie-rebased â†’ main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `dc26a32`
+
+### Cosa Ã¨ entrato
+
+- `85cf559` â€” test: riallinea dritta Fabbrica al testo corrente â€” **mycolbraga**
+- `70a302e` â€” fix: chiudi regressioni CI punto 10 â€” **mycolbraga**
+- `ce9fc63` â€” chore: riallinea punto 10 con main e risolvi conflitti â€” **mycolbraga**
+- `4541d4f` â€” chore: sync main before point 10 merge â€” **mycolbraga**
+- `be367d2` â€” docs(roadmap): align promoter geography with work contacts â€” **mycolbraga**
+- `7be1556` â€” docs(contacts): clarify work-only promoter exception in Provincia â€” **mycolbraga**
+- `d27fa4d` â€” test(work-events): follow refreshed event engine asset â€” **mycolbraga**
+- `b959cd2` â€” chore(work-events): refresh persistent conflict engine cache â€” **mycolbraga**
+- `69e291b` â€” test(work-events): keep pending conflicts persistent until shift commit â€” **mycolbraga**
+- `39aa1f6` â€” fix(work-events): persist pending work-music conflicts across reloads â€” **mycolbraga**
+- `58ada6d` â€” chore(gameplay): refresh reviewed work-event caches â€” **mycolbraga**
+- `86c1985` â€” test(work-review): cover clock resume and structured re-entry â€” **mycolbraga**
+- `a2bad73` â€” fix(work-events): wait for resumed shift before post-shift hooks â€” **mycolbraga**
+- `2cd000b` â€” fix(work): generalize structured contract re-entry state â€” **mycolbraga**
+- `3afec04` â€” fix(agenda): read numeric game time correctly â€” **mycolbraga**
+- `d245203` â€” docs(events): mark legacy promotion arc as superseded â€” **mycolbraga**
+- `dbdd985` â€” docs(work): point structured careers at real event engine â€” **mycolbraga**
+- `cb9c6fa` â€” test(work-events): cover work families on latest structured jobs â€” **mycolbraga**
+- `4581e71` â€” test(audit): align work-event checks with latest main â€” **mycolbraga**
+- `588e750` â€” chore(work-events): load work event engine on latest gameplay â€” **mycolbraga**
+- `2eba74b` â€” docs(famepedia): add work event families to structured jobs â€” **mycolbraga**
+- `e60798f` â€” feat(work-events): arbitrate structured work events after committed shifts â€” **mycolbraga**
+- `56c4c49` â€” feat(work-events): connect structured jobs to persistent event effects â€” **mycolbraga**
+- `54f273d` â€” feat(work-events): carry landing.html integration onto latest main â€” **mycolbraga**
+- `d6f10dd` â€” feat(work-events): carry strada-crimine.js integration onto latest main â€” **mycolbraga**
+- `aef21f6` â€” feat(work-events): carry ui.js integration onto latest main â€” **mycolbraga**
+- `c215384` â€” feat(work-events): carry agenda.js integration onto latest main â€” **mycolbraga**
+- `3b222e9` â€” feat(work-events): add persistent work event families on structured jobs â€” **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/famepedia.js`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/agenda.js`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Aggiunto:** `frontend/js/game/lavoro-eventi.js`
+- **Modificato:** `frontend/js/game/posto.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/js/game/ui.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+- **Modificato:** `frontend/test/unit/fabbrica-strada.test.js`
+- **Aggiunto:** `frontend/test/unit/lavoro-eventi.test.js`
+
+**File interessati in questa categoria:** 12
+
+---
+
 <!-- merge:18c56d3 -->
 ## 01/10/26, 10:58 â€” feature/pizzeria-lavoro-strutturato â†’ main
 
