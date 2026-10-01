@@ -18,7 +18,7 @@ function helperLavoro(){
 
 describe("cartellino presenze Fabbrica", () => {
   it("conta i turni reali, anche due nello stesso giorno", () => {
-    const ctx = { G:{year:1,week:2,day:3}, Number, Math, Array, Object };
+    const ctx = { G:{year:1,week:2,day:3}, Number, Math, Array, Object, Set };
     ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
     vm.createContext(ctx);
     vm.runInContext(helperLavoro(), ctx);
@@ -33,7 +33,7 @@ describe("cartellino presenze Fabbrica", () => {
   });
 
   it("azzera automaticamente il registro all'inizio del ciclo successivo", () => {
-    const ctx = { G:{year:1,week:4,day:7}, Number, Math, Array, Object };
+    const ctx = { G:{year:1,week:4,day:7}, Number, Math, Array, Object, Set };
     ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
     vm.createContext(ctx);
     vm.runInContext(helperLavoro(), ctx);
@@ -53,7 +53,7 @@ describe("cartellino presenze Fabbrica", () => {
   it("lega la presenza alla Fabbrica anche se cambia la mansione", () => {
     const ctx = {
       G:{year:1,week:2,day:3,job:{id:"capoturno",place:"fabbrica"}},
-      Number, Math, Array, Object
+      Number, Math, Array, Object, Set
     };
     ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
     vm.createContext(ctx);
@@ -72,7 +72,7 @@ describe("cartellino presenze Fabbrica", () => {
   it("migra il vecchio fabbricaPresenze senza perdere i turni", () => {
     const ctx = {
       G:{year:1,week:2,day:3,fabbricaPresenze:{ciclo:0,turni:[0,1,1]}},
-      Number, Math, Array, Object
+      Number, Math, Array, Object, Set
     };
     ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
     vm.createContext(ctx);
@@ -81,6 +81,62 @@ describe("cartellino presenze Fabbrica", () => {
     const out = vm.runInContext('lavoroCartellino("fabbrica")', ctx);
     expect(out.totale).toBe(3);
     expect(ctx.G.workplaces.fabbrica.attendance.turni).toEqual([0,1,1]);
+  });
+
+  it("definisce il contratto Fabbrica: 5 giorni, lunedì-sabato, domenica riposo", () => {
+    const ctx = { G:{year:1,week:1,day:1}, Number, Math, Array, Object, Set };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    const contratto = vm.runInContext('lavoroContrattoDef("fabbrica")', ctx);
+    expect(contratto.turniSettimanali).toBe(5);
+    expect(Array.from(contratto.giorniConsentiti)).toEqual([1,2,3,4,5,6]);
+    expect(contratto.domenicaRiposo).toBe(true);
+    expect(contratto.cicloSettimane).toBe(4);
+  });
+
+  it("conta per la quota settimanale i giorni distinti, non i doppi turni", () => {
+    const ctx = { G:{year:1,week:1,day:1}, Number, Math, Array, Object, Set };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    vm.runInContext('lavoroRegistraPresenza("fabbrica"); lavoroRegistraPresenza("fabbrica");', ctx);
+    ctx.G.day = 2;
+    vm.runInContext('lavoroRegistraPresenza("fabbrica")', ctx);
+    const out = vm.runInContext('lavoroCartellino("fabbrica")', ctx);
+
+    expect(out.totale).toBe(3);
+    expect(out.giorniLavoratiSettimana).toBe(2);
+    expect(out.turniSettimanaliRichiesti).toBe(5);
+  });
+
+  it("blocca la domenica salvo autorizzazione esplicita per quel giorno", () => {
+    const ctx = { G:{year:1,week:1,day:7}, Number, Math, Array, Object, Set };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    expect(vm.runInContext('lavoroTurnoConsentitoOggi("fabbrica").ok', ctx)).toBe(false);
+    vm.runInContext('lavoroAutorizzaDomenica("fabbrica")', ctx);
+    expect(vm.runInContext('lavoroTurnoConsentitoOggi("fabbrica").ok', ctx)).toBe(true);
+
+    ctx.G.week = 2;
+    expect(vm.runInContext('lavoroDomenicaAutorizzata("fabbrica")', ctx)).toBe(false);
+  });
+
+  it("la prima assunzione in Fabbrica passa dalla firma del contratto", () => {
+    const hub = leggi("js/game/hub.js");
+    const luoghi = leggi("js/game/luoghi-foto.js");
+    const orari = leggi("js/game/orari.js");
+
+    expect(hub).toContain('t:"Contratto di lavoro"');
+    expect(hub).toContain('n:"Firma il contratto"');
+    expect(hub).toContain('lavoroFirmaContratto("fabbrica", def)');
+    expect(luoghi).toContain('"Leggi e firma il contratto"');
+    expect(orari).toContain('label:"Domenica: riposo da contratto"');
+    expect(orari).toContain('lavoroDomenicaAutorizzata("fabbrica")');
   });
 
   it("il turno usa il luogo e la UI Fabbrica non dipende dall'id operaio", () => {
