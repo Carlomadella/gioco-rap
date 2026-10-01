@@ -139,6 +139,104 @@ describe("cartellino presenze Fabbrica", () => {
     expect(orari).toContain('lavoroDomenicaAutorizzata("fabbrica")');
   });
 
+  it("premia con affidabilità un ciclo 4/4 davvero completo", () => {
+    const logs = [];
+    const ctx = {
+      G:{year:1,week:4,day:7,job:{id:"operaio",place:"fabbrica"}},
+      Number, Math, Array, Object, Set,
+      pushLog:(msg, cls) => logs.push({msg, cls})
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    vm.runInContext(`
+      G.workplaces = {
+        fabbrica:{
+          contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+          attendance:{ciclo:0,turni:[
+            0,1,2,3,4,
+            7,8,9,10,11,
+            14,15,16,17,18,
+            21,22,23,24,25
+          ]}
+        }
+      };
+    `, ctx);
+
+    const out = vm.runInContext('lavoroChiudiCiclo("fabbrica")', ctx);
+    expect(out.eligible).toBe(true);
+    expect(out.fullWeeks).toBe(4);
+    expect(out.absences).toBe(0);
+    expect(out.perfect).toBe(true);
+    expect(out.reliabilityBefore).toBe(50);
+    expect(out.reliabilityAfter).toBe(60);
+    expect(vm.runInContext('lavoroCarriera("fabbrica").perfectStreak', ctx)).toBe(1);
+    expect(logs.some(x => x.msg.includes("4/4 settimane complete"))).toBe(true);
+  });
+
+  it("non considera valido il primo ciclo se il contratto è stato firmato a periodo già iniziato", () => {
+    const ctx = {
+      G:{year:1,week:4,day:7,job:{id:"operaio",place:"fabbrica"}},
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    vm.runInContext(`
+      G.workplaces = {
+        fabbrica:{
+          contract:{signed:true,legacy:false,signedAbsoluteDay:8,roleAtSign:"operaio"},
+          attendance:{ciclo:0,turni:[7,8,9,10,11,14,15,16,17,18,21,22,23,24,25]}
+        }
+      };
+    `, ctx);
+
+    const out = vm.runInContext('lavoroChiudiCiclo("fabbrica")', ctx);
+    expect(out.eligible).toBe(false);
+    expect(out.reliabilityDelta).toBe(0);
+    expect(vm.runInContext('lavoroCarriera("fabbrica").cyclesCompleted', ctx)).toBe(0);
+  });
+
+  it("la domenica straordinaria non copre una presenza ordinaria mancante", () => {
+    const ctx = {
+      G:{year:1,week:4,day:7,job:{id:"operaio",place:"fabbrica"}},
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    vm.runInContext(`
+      G.workplaces = {
+        fabbrica:{
+          contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+          attendance:{ciclo:0,turni:[
+            0,1,2,3,6,
+            7,8,9,10,11,
+            14,15,16,17,18,
+            21,22,23,24,25
+          ]}
+        }
+      };
+    `, ctx);
+
+    const out = vm.runInContext('lavoroChiudiCiclo("fabbrica")', ctx);
+    expect(out.fullWeeks).toBe(3);
+    expect(out.absences).toBe(1);
+    expect(out.perfect).toBe(false);
+    expect(out.reliabilityAfter).toBe(50);
+  });
+
+  it("chiude il ciclo lavorativo prima di avanzare la settimana", () => {
+    const sim = leggi("js/game/sim.js");
+    const close = sim.indexOf('if(typeof lavoroChiudiCicli === "function") lavoroChiudiCicli();');
+    const week = sim.indexOf("G.week++;", close);
+    expect(close).toBeGreaterThan(-1);
+    expect(week).toBeGreaterThan(close);
+  });
+
   it("il turno usa il luogo e la UI Fabbrica non dipende dall'id operaio", () => {
     const actions = leggi("js/game/actions.js");
     const luoghi = leggi("js/game/luoghi-foto.js");
