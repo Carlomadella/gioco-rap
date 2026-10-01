@@ -265,6 +265,21 @@ describe("cartellino presenze Fabbrica", () => {
     expect(ctx.G.workplaces.fabbrica.career.reliability).toBe(70);
   });
 
+  it("marca sempre la domenica e colora i giorni non lavorati solo a settimana conclusa", () => {
+    const luoghi = leggi("js/game/luoghi-foto.js");
+    const css = leggi("css/luoghi-foto.css");
+
+    expect(luoghi).toContain("const domenica = giorno === 6;");
+    expect(luoghi).toContain("const settimanaConclusa = settimana < (cart.settimana - 1);");
+    expect(luoghi).toContain("const nonLavorato = settimanaConclusa && !domenica && n === 0;");
+    expect(luoghi).toContain('(domenica ? " domenica" : "")');
+    expect(luoghi).toContain('(nonLavorato ? " non-lavorato" : "")');
+
+    expect(css).toContain(".lfpres-day.domenica{");
+    expect(css).toContain(".lfpres-day.non-lavorato{");
+    expect(css).toContain(".lfpres-day.domenica.fatto{");
+  });
+
   it("mostra il tasto dimissioni nel pannello Fabbrica con conferma", () => {
     const luoghi = leggi("js/game/luoghi-foto.js");
     expect(luoghi).toContain('data-dimissioni="fabbrica"');
