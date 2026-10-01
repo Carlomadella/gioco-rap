@@ -913,6 +913,10 @@ function lavoroCompletaStraordinario(luogo){
   });
   if(stato.history.length > 24) stato.history.shift();
   stato.accepted = null;
+  if(offerta.tipo === "domenica"){
+    const sede = lavoroSede(luogo);
+    if(sede) delete sede.sundayPermitAbsoluteDay;
+  }
 
   return {
     tipo:offerta.tipo,
@@ -948,6 +952,10 @@ function lavoroAggiornaStraordinariTempo(){
     });
     if(stato.history.length > 24) stato.history.shift();
     stato.accepted = null;
+    if(offerta.tipo === "domenica"){
+      const sede = lavoroSede(luogo);
+      if(sede) delete sede.sundayPermitAbsoluteDay;
+    }
 
     if(typeof pushLog === "function"){
       pushLog("<b>Straordinario saltato.</b> Avevi accettato il turno di " +
@@ -960,8 +968,14 @@ function lavoroTurnoConsentitoOggi(luogo){
   const def = lavoroContrattoDef(luogo);
   if(!def) return {ok:true, reason:null};
   const giorno = Math.max(1, Math.min(7, Number(G.day || 1)));
-  if(def.domenicaRiposo && giorno === 7 && !lavoroDomenicaAutorizzata(luogo))
-    return {ok:false, reason:"Domenica: riposo da contratto"};
+  if(def.domenicaRiposo && giorno === 7){
+    if(!lavoroDomenicaAutorizzata(luogo))
+      return {ok:false, reason:"Domenica: riposo da contratto"};
+    /* Una domenica autorizzata è l'eccezione esplicita al calendario
+       ordinario lunedì-sabato: non deve essere ribloccata dal controllo
+       giorniConsentiti qui sotto. */
+    return {ok:true, reason:null};
+  }
   if(Array.isArray(def.giorniConsentiti) && !def.giorniConsentiti.includes(giorno))
     return {ok:false, reason:"Giorno non previsto dal contratto"};
   return {ok:true, reason:null};
