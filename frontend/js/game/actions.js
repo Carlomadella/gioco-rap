@@ -204,12 +204,6 @@ const ADF_FABBRICA_CARRIERA = Object.freeze({
     affidabilitaCompletato:2,
     affidabilitaSaltato:-5
   }),
-  rete:Object.freeze({
-    chanceIncontro:0.18,
-    cooldownGiorni:7,
-    minTurniCiclo:3,
-    maxContatti:4
-  }),
   ruoli:Object.freeze([
     Object.freeze({id:"operaio", n:"Operaio"}),
     Object.freeze({id:"operaio_esperto", n:"Operaio esperto"}),
