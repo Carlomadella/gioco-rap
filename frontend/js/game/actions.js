@@ -223,6 +223,26 @@ function lavoroFirmaContratto(luogo, job){
   return sede.contract;
 }
 
+function lavoroTerminaContratto(luogo, motivo){
+  const sede = lavoroSede(luogo);
+  if(!sede) return null;
+
+  const contratto = sede.contract;
+  if(contratto && typeof contratto === "object"){
+    if(!Array.isArray(sede.contractHistory)) sede.contractHistory = [];
+    sede.contractHistory.push(Object.assign({}, contratto, {
+      signed:false,
+      endedAbsoluteDay:lavoroGiornoAssoluto(),
+      endReason:motivo || "chiuso"
+    }));
+    if(sede.contractHistory.length > 12) sede.contractHistory.shift();
+  }
+
+  sede.contract = null;
+  delete sede.sundayPermitAbsoluteDay;
+  return contratto || null;
+}
+
 function lavoroContrattoFirmato(luogo){
   const c = lavoroContratto(luogo);
   return !!(c && c.signed);
