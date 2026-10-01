@@ -198,6 +198,12 @@ const ADF_FABBRICA_CARRIERA = Object.freeze({
     malusLieveAffidabilita:5,
     malusRichiamoAffidabilita:10
   }),
+  straordinari:Object.freeze({
+    chanceSestoGiorno:0.35,
+    chanceDomenica:0.25,
+    affidabilitaCompletato:2,
+    affidabilitaSaltato:-5
+  }),
   ruoli:Object.freeze([
     Object.freeze({id:"operaio", n:"Operaio"}),
     Object.freeze({id:"operaio_esperto", n:"Operaio esperto"}),
@@ -299,6 +305,23 @@ function lavoroTerminaContratto(luogo, motivo){
   }
 
   sede.contract = null;
+
+  if(sede.overtime && typeof sede.overtime === "object"){
+    const attivo = sede.overtime.accepted || sede.overtime.pendingOffer;
+    if(attivo){
+      if(!Array.isArray(sede.overtime.history)) sede.overtime.history = [];
+      sede.overtime.history.push({
+        type:"cancelled",
+        targetAbsoluteDay:attivo.targetAbsoluteDay,
+        overtimeType:attivo.tipo,
+        reason:motivo || "contratto chiuso"
+      });
+      if(sede.overtime.history.length > 24) sede.overtime.history.shift();
+    }
+    sede.overtime.accepted = null;
+    sede.overtime.pendingOffer = null;
+  }
+
   delete sede.sundayPermitAbsoluteDay;
   return contratto || null;
 }
@@ -311,11 +334,13 @@ function lavoroContrattoFirmato(luogo){
 /* Un evento futuro può autorizzare ESATTAMENTE la domenica corrente.
    Non esiste un generico "sblocca domeniche": l'eccezione va consumata nel
    giorno per cui è stata concessa. */
-function lavoroAutorizzaDomenica(luogo){
+function lavoroAutorizzaDomenica(luogo, absoluteDay){
   const sede = lavoroSede(luogo);
   if(!sede) return false;
-  sede.sundayPermitAbsoluteDay = lavoroGiornoAssoluto();
-  return true;
+  sede.sundayPermitAbsoluteDay = absoluteDay == null
+    ? lavoroGiornoAssoluto()
+    : Number(absoluteDay);
+  return Number.isFinite(sede.sundayPermitAbsoluteDay);
 }
 
 function lavoroDomenicaAutorizzata(luogo){
@@ -733,6 +758,203 @@ function lavoroChiudiCicli(){
      ADF_LAVORO_CICLO_SETTIMANE - 1) return [];
   const luoghi = Object.keys(G.workplaces || {});
   return luoghi.map(luogo => lavoroChiudiCiclo(luogo)).filter(Boolean);
+}
+
+function lavoroStraordinarioStato(luogo){
+  const sede = lavoroSede(luogo);
+  if(!sede) return null;
+  if(!sede.overtime || typeof sede.overtime !== "object"){
+    sede.overtime = {
+      lastCheckAbsoluteDay:null,
+      lastOfferWeek:null,
+      pendingOffer:null,
+      accepted:null,
+      history:[]
+    };
+  }
+  const s = sede.overtime;
+  if(!Array.isArray(s.history)) s.history = [];
+  return s;
+}
+
+function lavoroCandidatoStraordinario(luogo){
+  if(luogo !== "fabbrica" || !G.job || lavoroLuogo(G.job) !== luogo) return null;
+
+  const cart = lavoroCartellino(luogo);
+  const stato = lavoroStraordinarioStato(luogo);
+  const cfg = ADF_FABBRICA_CARRIERA.straordinari;
+  if(!cart || !stato || stato.accepted || stato.pendingOffer) return null;
+
+  const oggi = Math.max(1, Math.min(7, Number(G.day || 1)));
+  const assoluto = lavoroGiornoAssoluto();
+  const settimana = lavoroSettimanaAssoluta();
+
+  if(stato.lastCheckAbsoluteDay === assoluto) return null;
+  if(Number(stato.lastOfferWeek) === settimana) return null;
+
+  /* La richiesta arriva solo quando il contratto è già coperto:
+     venerdì 5/5 -> sabato (+30%);
+     sabato almeno 5/5 -> domenica straordinaria (+75%). */
+  if(oggi === 5 && cart.giorniLavoratiSettimana >= cart.turniSettimanaliRichiesti){
+    return {
+      luogo:luogo,
+      tipo:"sesto-giorno",
+      targetAbsoluteDay:assoluto + 1,
+      targetDay:6,
+      targetLabel:"sabato",
+      bonusPct:30,
+      chance:Number(cfg.chanceSestoGiorno || 0)
+    };
+  }
+
+  if(oggi === 6 && cart.giorniLavoratiSettimana >= cart.turniSettimanaliRichiesti){
+    return {
+      luogo:luogo,
+      tipo:"domenica",
+      targetAbsoluteDay:assoluto + 1,
+      targetDay:7,
+      targetLabel:"domenica",
+      bonusPct:75,
+      chance:Number(cfg.chanceDomenica || 0)
+    };
+  }
+
+  return null;
+}
+
+function lavoroTentaRichiestaStraordinario(luogo, roll){
+  const stato = lavoroStraordinarioStato(luogo);
+  if(!stato) return null;
+
+  const assoluto = lavoroGiornoAssoluto();
+  if(stato.lastCheckAbsoluteDay === assoluto) return null;
+  stato.lastCheckAbsoluteDay = assoluto;
+
+  const offerta = lavoroCandidatoStraordinario(luogo);
+  if(!offerta) return null;
+
+  const r = roll == null ? Math.random() : Number(roll);
+  if(!Number.isFinite(r) || r >= offerta.chance) return null;
+
+  stato.lastOfferWeek = lavoroSettimanaAssoluta();
+  stato.pendingOffer = Object.assign({
+    offeredAbsoluteDay:assoluto,
+    status:"offered"
+  }, offerta);
+  return Object.assign({}, stato.pendingOffer);
+}
+
+function lavoroAccettaStraordinario(luogo){
+  const stato = lavoroStraordinarioStato(luogo);
+  if(!stato || !stato.pendingOffer) return null;
+
+  const offerta = Object.assign({}, stato.pendingOffer, {
+    status:"accepted",
+    acceptedAbsoluteDay:lavoroGiornoAssoluto()
+  });
+  stato.pendingOffer = null;
+  stato.accepted = offerta;
+
+  if(offerta.tipo === "domenica")
+    lavoroAutorizzaDomenica(luogo, offerta.targetAbsoluteDay);
+
+  stato.history.push({
+    type:"accepted",
+    offeredAbsoluteDay:offerta.offeredAbsoluteDay,
+    targetAbsoluteDay:offerta.targetAbsoluteDay,
+    overtimeType:offerta.tipo,
+    bonusPct:offerta.bonusPct
+  });
+  if(stato.history.length > 24) stato.history.shift();
+  return offerta;
+}
+
+function lavoroRifiutaStraordinario(luogo){
+  const stato = lavoroStraordinarioStato(luogo);
+  if(!stato || !stato.pendingOffer) return null;
+
+  const offerta = Object.assign({}, stato.pendingOffer, {status:"declined"});
+  stato.pendingOffer = null;
+  stato.history.push({
+    type:"declined",
+    offeredAbsoluteDay:offerta.offeredAbsoluteDay,
+    targetAbsoluteDay:offerta.targetAbsoluteDay,
+    overtimeType:offerta.tipo,
+    bonusPct:offerta.bonusPct
+  });
+  if(stato.history.length > 24) stato.history.shift();
+  return offerta;
+}
+
+function lavoroStraordinarioOggi(luogo){
+  const stato = lavoroStraordinarioStato(luogo);
+  if(!stato || !stato.accepted) return null;
+  return Number(stato.accepted.targetAbsoluteDay) === lavoroGiornoAssoluto()
+    ? stato.accepted
+    : null;
+}
+
+function lavoroCompletaStraordinario(luogo){
+  const stato = lavoroStraordinarioStato(luogo);
+  const offerta = lavoroStraordinarioOggi(luogo);
+  if(!stato || !offerta) return null;
+
+  const c = lavoroCarriera(luogo);
+  const cfg = ADF_FABBRICA_CARRIERA.straordinari;
+  const prima = c ? c.reliability : 50;
+  const delta = Math.max(0, Number(cfg.affidabilitaCompletato || 0));
+  if(c) c.reliability = Math.min(100, c.reliability + delta);
+
+  stato.history.push({
+    type:"completed",
+    completedAbsoluteDay:lavoroGiornoAssoluto(),
+    overtimeType:offerta.tipo,
+    bonusPct:offerta.bonusPct,
+    reliabilityDelta:delta
+  });
+  if(stato.history.length > 24) stato.history.shift();
+  stato.accepted = null;
+
+  return {
+    tipo:offerta.tipo,
+    bonusPct:offerta.bonusPct,
+    affidabilitaPrima:prima,
+    affidabilitaDopo:c ? c.reliability : prima,
+    affidabilitaDelta:c ? c.reliability - prima : 0
+  };
+}
+
+function lavoroAggiornaStraordinariTempo(){
+  const oggi = lavoroGiornoAssoluto();
+
+  for(const luogo of Object.keys(G.workplaces || {})){
+    const stato = lavoroStraordinarioStato(luogo);
+    if(!stato || !stato.accepted) continue;
+    if(Number(stato.accepted.targetAbsoluteDay) >= oggi) continue;
+
+    const c = lavoroCarriera(luogo);
+    const cfg = luogo === "fabbrica" ? ADF_FABBRICA_CARRIERA.straordinari : null;
+    const delta = cfg ? Number(cfg.affidabilitaSaltato || 0) : 0;
+    const offerta = stato.accepted;
+
+    if(c && delta)
+      c.reliability = Math.max(0, Math.min(100, c.reliability + delta));
+
+    stato.history.push({
+      type:"missed",
+      targetAbsoluteDay:offerta.targetAbsoluteDay,
+      overtimeType:offerta.tipo,
+      bonusPct:offerta.bonusPct,
+      reliabilityDelta:delta
+    });
+    if(stato.history.length > 24) stato.history.shift();
+    stato.accepted = null;
+
+    if(typeof pushLog === "function"){
+      pushLog("<b>Straordinario saltato.</b> Avevi accettato il turno di " +
+        offerta.targetLabel + ". Affidabilità " + (delta >= 0 ? "+" : "") + delta + ".", "bad");
+    }
+  }
 }
 
 function lavoroTurnoConsentitoOggi(luogo){
@@ -1426,6 +1648,7 @@ const ACTIONS = [
         Operaio a Capolinea/Capoturno in Fabbrica, il cartellino continua. */
      const luogoLavoro = lavoroLuogo(j);
      if(luogoLavoro) lavoroRegistraPresenza(luogoLavoro);
+     const straordinario = luogoLavoro ? lavoroCompletaStraordinario(luogoLavoro) : null;
      const def = JOBS.find(x => x.id === j.id);
      let extra = "";
      if(def && def.extra) extra = def.extra();
@@ -1433,6 +1656,10 @@ const ACTIONS = [
      if(paga.bonus > 0){
        msg += " <b>" + paga.etichetta + ": bonus +" + paga.percentuale +
          "% (+" + paga.bonus + " €).</b>";
+     }
+     if(straordinario && straordinario.affidabilitaDelta > 0){
+       msg += " <b>Straordinario concordato completato: affidabilità +" +
+         straordinario.affidabilitaDelta + ".</b>";
      }
      return msg + extra;
    }},
