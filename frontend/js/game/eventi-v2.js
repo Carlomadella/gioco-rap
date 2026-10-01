@@ -2272,10 +2272,67 @@ function adfFactoryOvertimeAfterShift(){
   return true;
 }
 
+/* Proposte dalla Strada, ma FUORI dal posto di lavoro.
+   Il giocatore deve aver già avviato il giro criminale: il lavoro non crea da
+   zero quella carriera. La proposta diventa poi una dritta persistente e a
+   tempo nella schermata Strada. */
+function adfFactoryStreetAfterShift(){
+  if(!G.job || typeof lavoroLuogo!=="function" || lavoroLuogo(G.job)!=="fabbrica")
+    return false;
+  if(typeof stradaTentaPropostaFabbrica!=="function") return false;
+
+  const s=st();
+  if(s.runtime.lastAutoEventKey===eventMinuteKey()) return false;
+
+  const proposta=stradaTentaPropostaFabbrica(Math.random(),Math.random());
+  if(!proposta) return false;
+  if(!claimAutoEvent("factory-street")){
+    if(typeof stradaAnnullaPropostaFabbrica==="function")
+      stradaAnnullaPropostaFabbrica();
+    return false;
+  }
+
+  s.lastHookEventDay=absDay();
+
+  afterClear(()=>showEvent({
+    k:"Fuori dalla Fabbrica",
+    t:"Ti aspetta al cancello",
+    d:"Hai appena finito il turno. Fuori dal cancello uno ti chiama per nome. " +
+      "Non entra, non ti parla sulla linea: sa già che frequenti un certo giro." +
+      "<br><br>Ha una dritta su <b>"+proposta.label+"</b>. Se la prendi resta valida per <b>"+
+      Number(proposta.durataGiorni||7)+" giorni</b>: il colpo rende <b>+"+
+      Number(proposta.bonusPct||0)+"%</b>, ma quando la usi genera <b>+"+
+      Number(proposta.extraHeat||0)+" attenzione</b> in più.",
+    annulla(){
+      if(typeof stradaRifiutaPropostaFabbrica==="function")
+        stradaRifiutaPropostaFabbrica();
+    },
+    opts:[
+      {n:"Prendi la dritta", d:"La proposta resta disponibile nella Strada per una settimana", run(){
+        const lead=typeof stradaAccettaPropostaFabbrica==="function"
+          ? stradaAccettaPropostaFabbrica()
+          : null;
+        if(!lead) return {t:"La proposta non è più disponibile.",c:""};
+        return {
+          t:"Hai accettato la dritta su <b>"+lead.label+"</b>. La trovi nella Strada: +"+
+            Number(lead.bonusPct||0)+"% sul guadagno finché non la usi o scade.",
+          c:"good"
+        };
+      }},
+      {n:"Lascia perdere", d:"Non vuoi mischiare il lavoro con quel giro", run(){
+        if(typeof stradaRifiutaPropostaFabbrica==="function")
+          stradaRifiutaPropostaFabbrica();
+        return {t:"Hai lasciato perdere. Nessun effetto sul lavoro o sulla Strada.",c:""};
+      }}
+    ]
+  }),80);
+
+  return true;
+}
+
 /* Conoscenze nate in Fabbrica.
    Sono persone vere di G.gente: se scambi il numero entrano nella chat e
-   possono produrre gli stessi beat/mix/video dei contatti conosciuti altrove.
-   Non tocchiamo ancora proposte criminali: quello è il punto successivo. */
+   possono produrre gli stessi beat/mix/video dei contatti conosciuti altrove. */
 function adfFactoryContactAfterShift(){
   if(!G.job || typeof lavoroLuogo!=="function" || lavoroLuogo(G.job)!=="fabbrica")
     return false;
@@ -2511,6 +2568,8 @@ avanzaGiorno=function(){
   const r=_avanzaGiorno.apply(this,arguments);
   if(typeof lavoroAggiornaStraordinariTempo==="function")
     lavoroAggiornaStraordinariTempo();
+  if(typeof stradaAggiornaPropostaFabbrica==="function")
+    stradaAggiornaPropostaFabbrica(false);
   if(!ADF.skipRunning && !wasJailed && !adfInJail()){
     const s=st();
     s.skip1Chain=0;
@@ -2689,12 +2748,15 @@ for(const a of ACTIONS){
     const out=old.apply(this,arguments);
     setTimeout(()=>{
       const overtimeShown = a.id==="turno" ? adfFactoryOvertimeAfterShift() : false;
-      const contactShown = a.id==="turno" && !overtimeShown
+      const streetShown = a.id==="turno" && !overtimeShown
+        ? adfFactoryStreetAfterShift()
+        : false;
+      const contactShown = a.id==="turno" && !overtimeShown && !streetShown
         ? adfFactoryContactAfterShift()
         : false;
-      if(!overtimeShown && !contactShown)
+      if(!overtimeShown && !streetShown && !contactShown)
         emitHook("after_action",{action_id:a.id});
-      if(a.id==="turno" && G.job && !overtimeShown && !contactShown)
+      if(a.id==="turno" && G.job && !overtimeShown && !streetShown && !contactShown)
         emitHook("after_job_shift",{
           action_id:"turno",
           job_id:G.job.id,
