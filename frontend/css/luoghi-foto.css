@@ -95,7 +95,7 @@
   text-transform:uppercase;
   cursor:pointer;
 }
-.lfdimissioni:hover{border-color:rgba(239,68,68,.62);background:rgba(127,29,29,.22);color:#fecaca}
+@media (hover:hover){.lfdimissioni:hover{border-color:rgba(239,68,68,.62);background:rgba(127,29,29,.22);color:#fecaca}}
 .lfdimissioni:focus-visible{outline:2px solid #ef4444;outline-offset:2px}
 
 /* ---- FABBRICA: CARTELLINO PRESENZE ----

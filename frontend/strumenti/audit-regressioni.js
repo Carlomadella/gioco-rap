@@ -55,6 +55,7 @@ const skip = leggi("js/game/skip.js");
 const transfers = leggi("js/game/trasferte.js");
 const time = leggi("js/game/tempo.js");
 const timeControls = leggi("js/game/tempo-controlli.js");
+const luoghiFoto = leggi("js/game/luoghi-foto.js");
 /* Punto 27: le pagine sono tre. «index» qui è la pagina del gioco, che è
    quella che tiene tutta l'impalcatura di cui parlano queste prove; la landing
    e la porta d'ingresso hanno le loro, più sotto. */
@@ -823,8 +824,9 @@ test("un rivale con lo stesso nome di uno della Sala si puo' chiamare: il legame
   studio.includes("return (G.rivals || []).filter(r => r && r.n && !studioRivaleContatto(r))") &&
   studio.includes("rivaleId:r.id") &&
   !studio.includes("const noti = new Set((G.gente || []).map(p => p.n));"));
-test("chi accetta dalla classifica non ruba un posto alla Sala: il tetto conta solo la gente della Sala",
-  posto.includes("function genteDellaSala(){ return (G.gente || []).filter(p => p && !p.rivale); }") &&
+test("classifica e contatti di lavoro non rubano posti alla Sala",
+  posto.includes("function genteDellaSala(){") &&
+  posto.includes("return (G.gente || []).filter(p => p && !p.rivale && !postoSoloLavoro(p));") &&
   posto.includes("while(genteDellaSala().length < quante){") &&
   !posto.includes("while(G.gente.length < quante){") &&
   posto.includes("const n = genteDellaSala().length;"));
@@ -1249,8 +1251,8 @@ test("controller si monta nella testata della finestra attiva",
    in alto. Le due cose che devono restare vere: la riga muta c'è, e sta
    **prima** di quella dell'hub. */
 test("lo Studio ha il widget tempo proprio e viene prima dell'hub sottostante",
-  timeControls.includes('{id:"studio",   root:"#studio.on",         head:".sthead"') &&
-  timeControls.includes('before:".strisorse"') &&
+  timeControls.includes('{id:"studio",   root:"#studio.on",         head:".sthead", mount:".sthead"') &&
+  timeControls.includes("const mount=scope.querySelector(spec.mount||spec.head)||head;") &&
   !timeControls.includes("mute:true") &&
   timeControls.indexOf('id:"studio"') < timeControls.indexOf('id:"hub"'));
 test("pannello fixed nel body viene riposizionato vicino al widget attivo",
@@ -2456,17 +2458,17 @@ test("la fascia si legge sulla card del beat, nello Studio",
   beatsJs.includes("const fasciaBeat = b =>"));
 test("si parte con tutti i parametri a 1",
   state.includes("skills:{scrittura:1, flow:1, presenza:1, rete:1}"));
-test("non ci si può licenziare: nessun testo promette «lascialo», e l'offerta di lavoro non arriva a chi lavora già",
-  !hub.includes("lascialo o aspetta di essere licenziato") &&
-  (hub.match(/da un lavoro non ci si licenzia/g) || []).length === 2 &&
-  /function offerJobs\(\)\{[\s\S]{0,500}if\(G\.job\)\{/.test(actions) &&
+test("le dimissioni dalla Fabbrica chiudono il contratto senza perdere lo storico",
+  luoghiFoto.includes("function lfDimissioniFabbrica()") &&
+  luoghiFoto.includes('data-dimissioni="fabbrica"') &&
+  luoghiFoto.includes('lavoroTerminaContratto("fabbrica", "dimissioni")') &&
+  luoghiFoto.includes("G.job = null;") &&
+  actions.includes("function lavoroTerminaContratto(luogo, motivo)") &&
+  actions.includes("sede.contractHistory.push(Object.assign({}, contratto") &&
+  /function offerJobs\(\)\{[\s\S]{0,900}if\(G\.job\)\{/.test(actions) &&
   ev.includes('if(t==="no_job") return !G.job;') &&
-  ev.includes("if(j && !G.job) G.job=") &&
-  (() => {
-    const lista = Array.isArray(cat) ? cat : (cat.events || cat.eventi || Object.values(cat).find(Array.isArray));
-    const e = lista.find(x => x.id === "EV0035");
-    return !!e && (e.requirements || []).some(r => r.test === "no_job");
-  })());
+  ev.includes("if(j && !G.job && !fabbricaBloccata){") &&
+  ev.includes("G.job={id:j.id,place:j.place||null,n:j.n,pay:j.pay,e:j.e,missed:0};"));
 
 console.log("\nPunto 7 — i file .md in cartelle con nomi coerenti");
 test("in radice restano solo README, ROADMAP e CLAUDE",
@@ -2653,13 +2655,17 @@ test("«stacca la spina» ha il filmato fra il tasto e l'esito, da dovunque part
 test("«registra» ha il filmato sulla prima take del pezzo, e solo su quella",
   /function studioTakeAncora\(\)[\s\S]{0,2200}?if\(!t\.l\.length && typeof transizioneVideo === "function"\) transizioneVideo\("registra", incidi\)/.test(leggi("js/game/studio-elementi.js")));
 test("il puntatore sul cartello prepara il video giusto: i cartelli hanno un id loro",
-  /TRANSIZIONI_CARTELLI = \{studio:"studio", beat:"sala", vita:"casa"\}/.test(tvid) &&
+  /TRANSIZIONI_CARTELLI = \{studio:"studio", beat:"sala", vita:"casa", fabbrica:"fabbrica"\}/.test(tvid) &&
   tvid.includes("transizioneVideoPrepara(TRANSIZIONI_CARTELLI[b.dataset.l])"));
 /* L'elemento video è uno solo: la precarica dello Studio (quattro secondi
    dopo l'avvio) cambiava `src` a un filmato che stava andando e lo tagliava
    lì. Visto agganciando la Sala: se la tocchi nei primi quattro secondi. */
-test("mentre un filmato va nessuna precarica gli cambia il file sotto",
-  /function transizioneVideoPrepara\(id\)\{\r?\n\s*const src = TRANSIZIONI_VIDEO\[id\]; if\(!src \|\| TVID_CORRENTE\) return;/.test(tvid) &&
+test("mentre una transizione va nessuna precarica cambia l'asset sotto",
+  tvid.includes("function transizioneScenePrepara(id){") &&
+  tvid.includes("if(!slides || TVID_CORRENTE) return;") &&
+  tvid.includes("function transizioneVideoPrepara(id){") &&
+  tvid.includes("if(TRANSIZIONI_SCENE[id]){ transizioneScenePrepara(id); return; }") &&
+  tvid.includes("const src = TRANSIZIONI_VIDEO[id]; if(!src || TVID_CORRENTE) return;") &&
   /transizioneVideoPrepara\(id\);\r?\n\s*TVID_CORRENTE = id;/.test(tvid));
 test("finito un filmato si prepara quello che può venire dopo nella pagina aperta",
   /TRANSIZIONI_DOPO = \{studio:"registra", casa:"stacca"\}/.test(tvid) &&
@@ -2734,7 +2740,7 @@ test("il creator offre Avaturn e MakeHuman, con Avaturn consigliato, e il ponte 
   })());
 
 console.log("\nLe pagine dei posti sulla loro foto — Casa, Palestra, Live Club, stacca la spina");
-const luoghiFoto = leggi("js/game/luoghi-foto.js");
+/* luoghiFoto è già caricato all’inizio dell’audit. */
 const luoghiFotoCss = leggi("css/luoghi-foto.css");
 test("luoghi-foto.js e il suo CSS si caricano dopo lo Studio, di cui riusano i pannelli",
   index.indexOf('<script src="js/game/luoghi-foto.js') > index.indexOf('<script src="js/game/studio-elementi.js') &&
@@ -2753,12 +2759,12 @@ test("Casa, Palestra e il Circolo sulla mappa aprono la pagina, non piu' la fine
   /id:"fabbrica",[\s\S]{0,80}?apriLuogo\("fabbrica"\)/.test(hub) &&
   /id:"pizzeria",[\s\S]{0,80}?apriLuogo\("pizzeria"\)/.test(hub) &&
   !hub.includes('{id:"concerti"') && hub.includes("circoloEntra()"));
-test("la Fabbrica usa la foto e i comandi HTML, senza riaprire la scheda lavoro",
+test("la Fabbrica usa la foto e i comandi HTML dopo la sua transizione",
   luoghiFoto.includes('fabbrica: {f:"schermate_luoghi_con_elementi_HTML/fabbrica.webp"') &&
   luoghiFoto.includes("function lfFabbrica()") &&
-  luoghiFoto.includes('data-lavoro="operaio"') &&
-  /id:"fabbrica",[\s\S]{0,80}?apriLuogo\("fabbrica"\)/.test(hub) &&
-  !/id:"fabbrica",[\s\S]{0,80}?schedaLavoro\("operaio"/.test(hub));
+  /const azioneLavoro = mio \? ' data-vai="turno"' : ' data-lavoro="' \+ baseDef\.id \+ '"';/.test(luoghiFoto) &&
+  /id:"fabbrica",[\s\S]{0,180}?transizioneVideo\("fabbrica",\s*\(\) => apriLuogo\("fabbrica"\)\)/.test(hub) &&
+  !/id:"fabbrica",[\s\S]{0,180}?schedaLavoro\("operaio"/.test(hub));
 test("la Pizzeria usa una pagina fotografica separata dalla Fabbrica, senza popup lavoro",
   luoghiFoto.includes('pizzeria: {f:"schermate_luoghi_con_elementi_HTML/pizzeria.webp"') &&
   luoghiFoto.includes("function lfPizzeria()") &&
