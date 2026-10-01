@@ -48,6 +48,13 @@
     operaio:480
   });
 
+  /* Per i posti con carriera interna la durata appartiene al luogo, non alla
+     mansione. Oggi è attiva soltanto la Fabbrica: una promozione non deve
+     trasformare per errore un turno da 8h nel fallback da 5h. */
+  const DURATE_LUOGO_LAVORO = Object.freeze({
+    fabbrica:480
+  });
+
   let AZIONE_ID_CATTURATA = null;
   let TEMPO_AZIONE = null;
 
@@ -104,7 +111,9 @@
   function durataAzione(id){
     if(id === "turno"){
       const jid = G.job && G.job.id;
-      return DURATE_LAVORO[jid] || 300;
+      const luogo = G.job && (G.job.place ||
+        (typeof lavoroLuogo === "function" ? lavoroLuogo(G.job) : null));
+      return DURATE_LUOGO_LAVORO[luogo] || DURATE_LAVORO[jid] || 300;
     }
     return DURATE[id] == null ? 60 : DURATE[id];
   }
@@ -491,6 +500,7 @@
     /* La durata del turno di un lavoro **anche se non sei ancora assunto**:
        serve a chi deve dire «non fai in tempo» prima di farti firmare. */
     durationForJob:(jid)=>DURATE_LAVORO[jid] || 300,
+    durationForWorkplace:(place)=>DURATE_LUOGO_LAVORO[place] || null,
     markAction:marcaAzione,
     canStart:puoIniziare,
     pending:azionePendente,
