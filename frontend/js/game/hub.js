@@ -441,8 +441,8 @@ function contrattoFabbrica(def){
       "<b>Presenze richieste:</b> " + turni + " giorni a settimana<br>" +
       "<b>Giorni ordinari:</b> lunedì–sabato<br>" +
       "<b>Domenica:</b> riposo. Si lavora solo con una richiesta straordinaria dell'azienda.<br>" +
-      "<b>Assenze:</b> 1–2 in un ciclo di 4 settimane riducono l'affidabilità; da 3 in su scatta un richiamo formale.<br>" +
-      "<b>Disciplina:</b> dopo 2 richiami, un altro ciclo grave porta al licenziamento e a 8 settimane senza riassunzione.<br>" +
+      "<b>Assenze:</b> vengono valutate a fine settimana. 1–2 assenze riducono l'affidabilità; da 3 in su scatta un richiamo formale.<br>" +
+      "<b>Disciplina:</b> dopo 2 richiami, un'altra settimana grave porta al licenziamento e a 8 settimane senza riassunzione.<br>" +
       "<b>Recupero:</b> 2 cicli perfetti consecutivi cancellano un richiamo.<br><br>" +
       "Le presenze e la carriera restano legate alla Fabbrica anche se in futuro cambi mansione.",
     annulla(){},
