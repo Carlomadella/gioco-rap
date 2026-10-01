@@ -342,9 +342,9 @@ function cooldownOk(e){
 }
 function eligible(e, opts){
   opts=opts||{};
-  /* ARC106 è il vecchio arco "promozione": oggi distribuisce somme una tantum
-     senza cambiare paga o mansione. Lo teniamo fuori dal pool finché, nel
-     passaggio eventi dedicato, verrà riscritto sui nuovi effetti reali. */
+  /* ARC106 è il vecchio arco "promozione": distribuisce somme una tantum
+     senza cambiare paga o mansione. Resta escluso perché la carriera lavoro è
+     ora gestita da lavoro-eventi.js con paga/ruolo persistenti reali. */
   if(e && e.arc_id==="ARC106") return false;
   if(!e || !cityOk(e) || !phaseOk(e) || !requirementsOk(e) || !cooldownOk(e)) return false;
   if(e.tier==="high" && !opts.ignoreHigh && !highDue()) return false;
