@@ -2467,7 +2467,8 @@ test("le dimissioni dalla Fabbrica chiudono il contratto senza perdere lo storic
   actions.includes("sede.contractHistory.push(Object.assign({}, contratto") &&
   /function offerJobs\(\)\{[\s\S]{0,900}if\(G\.job\)\{/.test(actions) &&
   ev.includes('if(t==="no_job") return !G.job;') &&
-  ev.includes("if(j && !G.job) G.job="));
+  ev.includes("if(j && !G.job && !fabbricaBloccata){") &&
+  ev.includes("G.job={id:j.id,place:j.place||null,n:j.n,pay:j.pay,e:j.e,missed:0};"));
 
 console.log("\nPunto 7 — i file .md in cartelle con nomi coerenti");
 test("in radice restano solo README, ROADMAP e CLAUDE",
@@ -2761,7 +2762,7 @@ test("Casa, Palestra e il Circolo sulla mappa aprono la pagina, non piu' la fine
 test("la Fabbrica usa la foto e i comandi HTML dopo la sua transizione",
   luoghiFoto.includes('fabbrica: {f:"schermate_luoghi_con_elementi_HTML/fabbrica.webp"') &&
   luoghiFoto.includes("function lfFabbrica()") &&
-  luoghiFoto.includes('data-lavoro="operaio"') &&
+  /const azioneLavoro = mio \? ' data-vai="turno"' : ' data-lavoro="' \+ baseDef\.id \+ '"';/.test(luoghiFoto) &&
   /id:"fabbrica",[\s\S]{0,180}?transizioneVideo\("fabbrica",\s*\(\) => apriLuogo\("fabbrica"\)\)/.test(hub) &&
   !/id:"fabbrica",[\s\S]{0,180}?schedaLavoro\("operaio"/.test(hub));
 test("la Pizzeria usa una pagina fotografica separata dalla Fabbrica, senza popup lavoro",
