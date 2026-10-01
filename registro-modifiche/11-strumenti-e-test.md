@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:19f6506 -->
+## 01/10/26, 20:34 â€” feature/pizzeria-cinematica â†’ main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `19f6506`
+
+### Cosa Ã¨ entrato
+
+- `9838ebc` â€” feat: integra cinematica di ingresso Pizzeria â€” **mycolbraga**
+- `decd68b` â€” assets(pizzeria): add arrival cinematic frames â€” **mycolbraga**
+- `861b15e` â€” feat(pizzeria): hook arrival cinematic slideshow â€” **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:77dea95 -->
 ## 01/10/26, 20:00 â€” fix/ci-avvio-rapido-roadmap â†’ main
 
