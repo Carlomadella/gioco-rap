@@ -115,7 +115,7 @@ const HUB_LUOGHI = [
   : apriStrada()},
   /* punto 59: il secondo lavoro, full time — era «Sponsor & brand» */
   {id:"fabbrica", n:"Fabbrica",
-   vai:() => apriLuogo("fabbrica")},
+   vai:() => transizioneVideo("fabbrica", () => apriLuogo("fabbrica"))},
   /* punto 61: la palestra esce dal sottomenu di Casa e diventa un posto
      suo — era «Business», un altro cartello chiuso senza niente dietro.
      Punto 9: non è più un pulsante solo — si sceglie cosa fare, come a Casa. */
