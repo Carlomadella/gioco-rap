@@ -463,11 +463,17 @@ function special(v){
     });
   }
   if(v.set_job){
-    /* con un posto in tasca non si cambia: da un lavoro non ci si licenzia
-       (vedi `no_job` in testReq; questa è la rete di sicurezza per un
-       evento che non lo chiede) */
+    /* Un evento non può aggirare né il posto già occupato né un blocco di
+       riassunzione della Fabbrica. */
     const j=(typeof JOBS!=="undefined"?JOBS:[]).find(x=>x.id===v.set_job);
-    if(j && !G.job) G.job={id:j.id,place:j.place||null,n:j.n,pay:j.pay,e:j.e,missed:0};
+    const fabbricaBloccata = j && j.place==="fabbrica" &&
+      typeof lavoroBloccoRiassunzione==="function" &&
+      lavoroBloccoRiassunzione("fabbrica").active;
+    if(j && !G.job && !fabbricaBloccata){
+      G.job={id:j.id,place:j.place||null,n:j.n,pay:j.pay,e:j.e,missed:0};
+      if(j.place==="fabbrica" && typeof lavoroFirmaContratto==="function")
+        lavoroFirmaContratto("fabbrica",j);
+    }
   }
   if(v.life_casa_delta){
     G.life=G.life||{};
@@ -2279,7 +2285,11 @@ function emitWeeklyHooks(before){
   emitHook("chat_state_event",{},false);
   emitHook("chat_posto_contact",{},false);
 
-  if(before.job && !G.job) emitHook("on_job_lost",{reason:"missed_shifts"},true);
+  if(before.job && !G.job){
+    const reason=G._lastJobLossReason||"missed_shifts";
+    emitHook("on_job_lost",{reason:reason},true);
+    delete G._lastJobLossReason;
+  }
   if(before.arresto && !(G.strada&&G.strada.arresto)){
     st().runtime.justReleasedDay=absDay();
     emitHook("on_release",{},true);
