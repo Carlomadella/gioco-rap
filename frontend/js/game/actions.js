@@ -204,12 +204,6 @@ const ADF_FABBRICA_CARRIERA = Object.freeze({
     affidabilitaCompletato:2,
     affidabilitaSaltato:-5
   }),
-  rete:Object.freeze({
-    chanceIncontro:0.18,
-    cooldownGiorni:7,
-    minTurniCiclo:3,
-    maxContatti:4
-  }),
   ruoli:Object.freeze([
     Object.freeze({id:"operaio", n:"Operaio"}),
     Object.freeze({id:"operaio_esperto", n:"Operaio esperto"}),
@@ -217,6 +211,83 @@ const ADF_FABBRICA_CARRIERA = Object.freeze({
     Object.freeze({id:"capoturno", n:"Capoturno"})
   ])
 });
+
+/* Identità sociale dei lavori.
+   Non è un secondo sistema di persone: decide soltanto CHI puoi incontrare
+   durante un turno; le persone create restano in G.gente e usano relazioni,
+   chat e opportunità normali. La chiave dello stato è il luogo quando esiste
+   (Fabbrica, così le promozioni non azzerano i colleghi), altrimenti l'id del
+   lavoro. */
+const ADF_LAVORO_RETE = Object.freeze({
+  fabbrica:Object.freeze({
+    chanceIncontro:0.18, cooldownGiorni:7, minTurni:3, maxContatti:4,
+    ruoli:Object.freeze(["collega","collega","collega","beatmaker","fonico"]),
+    dettaglio:"collega di Fabbrica",
+    storia:"Vi siete conosciuti lavorando in Fabbrica."
+  }),
+  barista:Object.freeze({
+    chanceIncontro:0.42, cooldownGiorni:2, minTurni:1, maxContatti:10,
+    ruoli:Object.freeze(["promoter","rapper","promoter","fonico","rapper"]),
+    dettaglio:"conoscenza del bar",
+    storia:"Vi siete conosciuti mentre lavoravi al bar."
+  }),
+  fonico:Object.freeze({
+    chanceIncontro:0.34, cooldownGiorni:3, minTurni:1, maxContatti:8,
+    ruoli:Object.freeze(["beatmaker","rapper","fonico","beatmaker","videomaker"]),
+    dettaglio:"contatto conosciuto in studio",
+    storia:"Vi siete conosciuti durante un turno da fonico."
+  }),
+  buttafuori:Object.freeze({
+    chanceIncontro:0.30, cooldownGiorni:3, minTurni:1, maxContatti:8,
+    ruoli:Object.freeze(["promoter","rapper","promoter","strada"]),
+    dettaglio:"conoscenza del locale",
+    storia:"Vi siete conosciuti lavorando alla porta di un locale."
+  }),
+  fattorino:Object.freeze({
+    chanceIncontro:0.28, cooldownGiorni:2, minTurni:1, maxContatti:10,
+    ruoli:Object.freeze(["rapper","beatmaker","fonico","promoter","videomaker","strada"]),
+    dettaglio:"incontro fatto durante le consegne",
+    storia:"Vi siete incrociati durante un turno da fattorino."
+  }),
+  volantini:Object.freeze({
+    chanceIncontro:0.24, cooldownGiorni:3, minTurni:1, maxContatti:8,
+    ruoli:Object.freeze(["rapper","promoter","beatmaker"]),
+    dettaglio:"incontro fatto lavorando in strada",
+    storia:"Vi siete conosciuti durante un turno di volantinaggio."
+  }),
+  lavapiatti:Object.freeze({
+    chanceIncontro:0.18, cooldownGiorni:5, minTurni:1, maxContatti:5,
+    ruoli:Object.freeze(["rapper","fonico","promoter"]),
+    dettaglio:"conoscenza della cucina",
+    storia:"Vi siete conosciuti durante un turno da lavapiatti."
+  }),
+  magazzino:Object.freeze({
+    chanceIncontro:0.14, cooldownGiorni:6, minTurni:2, maxContatti:4,
+    ruoli:Object.freeze(["rapper","beatmaker","fonico"]),
+    dettaglio:"collega di magazzino",
+    storia:"Vi siete conosciuti lavorando in magazzino."
+  })
+});
+
+function lavoroReteChiave(job){
+  if(!job) return null;
+  return lavoroLuogo(job) || job.id || null;
+}
+
+function lavoroReteDef(job){
+  if(!job) return null;
+  const chiave = lavoroReteChiave(job);
+  return ADF_LAVORO_RETE[job.id] || ADF_LAVORO_RETE[chiave] || null;
+}
+
+function lavoroReteRuoli(job, cfg){
+  const ruoli = Array.isArray(cfg && cfg.ruoli) ? cfg.ruoli.slice() : [];
+  /* I lavori possono esporre alla Strada, ma non devono avviare quella
+     carriera al posto del giocatore. */
+  if(!(G.strada && G.strada.giroAvviato))
+    return ruoli.filter(r => r !== "strada");
+  return ruoli;
+}
 
 function lavoroSettimanaAssoluta(){
   return typeof totalWeeks === "function"
@@ -1093,32 +1164,42 @@ function lavoroReteStato(luogo){
       lastCheckAbsoluteDay:null,
       lastEncounterAbsoluteDay:null,
       encounters:0,
+      turniVisti:0,
       history:[]
     };
   }
   const s = sede.network;
   s.encounters = Math.max(0, Number(s.encounters || 0));
+  s.turniVisti = Math.max(0, Number(s.turniVisti || 0));
   if(!Array.isArray(s.history)) s.history = [];
   return s;
 }
 
-/* La Fabbrica può generare conoscenze vere, ma senza trasformarsi in una
-   lotteria di contatti: almeno tre turni fatti nel ciclo, massimo quattro
-   persone nate da questo luogo e almeno una settimana fra due incontri. */
-function lavoroTentaIncontroContatto(luogo, roll){
-  if(luogo !== "fabbrica" || !G.job || lavoroLuogo(G.job) !== luogo) return null;
+/* Un turno può far nascere una conoscenza diversa a seconda del lavoro.
+   La Fabbrica continua a usare la sede "fabbrica" e il suo cartellino; i
+   lavori senza luogo dedicato persistono la rete sotto G.workplaces[job.id].
+   Il controllo è al massimo una volta al giorno anche con doppi turni. */
+function lavoroTentaIncontroContatto(luogo, roll, job){
+  const corrente = job || G.job;
+  if(!corrente || lavoroReteChiave(corrente) !== luogo) return null;
   if(typeof postoContattoLavoroCandidato !== "function") return null;
 
+  const cfg = lavoroReteDef(corrente);
   const stato = lavoroReteStato(luogo);
-  const cart = lavoroCartellino(luogo);
-  const cfg = ADF_FABBRICA_CARRIERA.rete;
-  if(!stato || !cart) return null;
+  if(!cfg || !stato) return null;
 
   const oggi = lavoroGiornoAssoluto();
   if(Number(stato.lastCheckAbsoluteDay) === oggi) return null;
   stato.lastCheckAbsoluteDay = oggi;
+  stato.turniVisti += 1;
 
-  if(cart.totale < Number(cfg.minTurniCiclo || 0)) return null;
+  let esposizione = stato.turniVisti;
+  if(luogo === "fabbrica"){
+    const cart = lavoroCartellino(luogo);
+    if(!cart) return null;
+    esposizione = cart.totale;
+  }
+  if(esposizione < Number(cfg.minTurni || 0)) return null;
 
   if(stato.lastEncounterAbsoluteDay != null &&
      oggi - Number(stato.lastEncounterAbsoluteDay) < Number(cfg.cooldownGiorni || 0))
@@ -1134,10 +1215,19 @@ function lavoroTentaIncontroContatto(luogo, roll){
   const r = roll == null ? Math.random() : Number(roll);
   if(!Number.isFinite(r) || r >= Number(cfg.chanceIncontro || 0)) return null;
 
+  const ruoli = lavoroReteRuoli(corrente, cfg);
+  if(!ruoli.length) return null;
+
   const persona = postoContattoLavoroCandidato(
     luogo,
     daRiprendere,
-    Number(cfg.maxContatti || 0)
+    Number(cfg.maxContatti || 0),
+    ruoli,
+    {
+      jobId:corrente.id || null,
+      dettaglio:cfg.dettaglio || "contatto conosciuto al lavoro",
+      storia:cfg.storia || "Vi siete conosciuti sul lavoro."
+    }
   );
   if(!persona) return null;
 
@@ -1147,6 +1237,7 @@ function lavoroTentaIncontroContatto(luogo, roll){
     absoluteDay:oggi,
     personId:persona.id,
     role:persona.ruolo,
+    jobId:corrente.id || null,
     type:persona.numero ? "known_contact" : "encounter"
   });
   if(stato.history.length > 24) stato.history.shift();

@@ -139,7 +139,15 @@ const POSTO_RUOLI = {
      un pezzo fuori non avrebbe niente da fare con te. */
   videomaker: {n:"Videomaker", k:"#22D3EE",
     d:"Gira i video. Decide come ti si vede, prima ancora di come suoni.",
-    da:g => (g.songs || []).some(x => x.released)}
+    da:g => (g.songs || []).some(x => x.released)},
+  /* Questi due ruoli possono nascere dal lavoro ma non occupano posti casuali
+     al Circolo: sono contatti persistenti della vita fuori dalla Sala. */
+  promoter: {n:"Promoter", k:"#FB7185",
+    d:"Lavora con serate e locali. Può farti arrivare occasioni che al Circolo non passano."},
+  collega: {n:"Collega", k:"#94A3B8",
+    d:"Una persona conosciuta sul posto di lavoro. Non è per forza dentro alla musica."},
+  strada: {n:"Conoscenza della Strada", k:"#F97316",
+    d:"Una persona legata al giro della Strada. Compare solo se quel giro lo hai già avviato."}
 };
 
 const POSTO_NOMI = {
@@ -147,7 +155,10 @@ const POSTO_NOMI = {
   rapper: null,                        /* i rapper prendono i nomi dei rivali */
   fonico: ["Andre", "Gigi", "Fede", "Nico", "Sara", "Pippo"],
   giornalista: ["Marta", "Dario", "Elisa", "Toni"],
-  videomaker: ["Ciro", "Vale", "Manu", "Bea", "Tommy", "Zeta"]
+  videomaker: ["Ciro", "Vale", "Manu", "Bea", "Tommy", "Zeta"],
+  promoter: ["Riky", "Mauri", "Simo", "Vale P.", "Dado", "Nina"],
+  collega: ["Luca", "Marco", "Simo", "Vale", "Ale", "Marta", "Nico", "Sara"],
+  strada: ["Cobra", "Lupo", "Moro", "Zero", "Nox", "Rami"]
 };
 
 const CARATTERI = [
@@ -439,15 +450,16 @@ function nuovaPersona(ruolo){
 }
 
 /* Contatti nati sul lavoro.
-   Restano persone normali di G.gente: stessi rapporti, stessa chat, stessi
-   effetti musicali. L'origine serve solo a non farli comparire per magia al
-   Circolo prima che il rapporto sia nato davvero. */
+   Restano persone normali di G.gente: stessi rapporti, stessa chat e gli stessi
+   effetti compatibili col loro ruolo. L'origine impedisce che compaiano per
+   magia al Circolo: prima li incontri davvero lavorando. */
 function postoContattiLavoro(luogo){
   return (G.gente || []).filter(p => p && !p.via && p.origineLuogo === luogo);
 }
 
-function postoNuovoContattoLavoro(luogo, ruolo){
+function postoNuovoContattoLavoro(luogo, ruolo, meta){
   if(!G.gente) G.gente = [];
+  meta = meta || {};
 
   let r = ruolo;
   if(!r){
@@ -458,15 +470,22 @@ function postoNuovoContattoLavoro(luogo, ruolo){
     r = pick(pool);
   }
 
-  if(["beatmaker","fonico","videomaker"].indexOf(r) < 0) r = "beatmaker";
+  /* Mai salvare una persona con un ruolo che il sistema relazioni non sa
+     descrivere. Se una configurazione futura sbaglia, ripieghiamo su rapper
+     invece di creare un contatto rotto. */
+  if(!POSTO_RUOLI[r]) r = "rapper";
+
   const p = nuovaPersona(r);
   p.origine = "lavoro";
   p.origineLuogo = luogo;
-  p.origineDettaglio = luogo === "fabbrica" ? "collega di Fabbrica" : "collega";
-  p.storia = luogo === "fabbrica"
-    ? "Vi siete conosciuti lavorando in Fabbrica."
-    : "Vi siete conosciuti sul lavoro.";
-  p.collega = true;
+  p.origineLavoro = meta.jobId || luogo;
+  p.origineDettaglio = meta.dettaglio ||
+    (luogo === "fabbrica" ? "collega di Fabbrica" : "contatto conosciuto al lavoro");
+  p.storia = meta.storia ||
+    (luogo === "fabbrica"
+      ? "Vi siete conosciuti lavorando in Fabbrica."
+      : "Vi siete conosciuti sul lavoro.");
+  p.collega = luogo === "fabbrica" || luogo === "magazzino";
   p.circoloSbloccato = false;
   p.numero = false;
   p.numDa = null;
@@ -474,18 +493,23 @@ function postoNuovoContattoLavoro(luogo, ruolo){
   return p;
 }
 
-function postoContattoLavoroCandidato(luogo, daRiprendere, maxContatti){
+function postoContattoLavoroCandidato(luogo, daRiprendere, maxContatti, ruoli, meta){
   const ripresa = Array.isArray(daRiprendere)
     ? daRiprendere.filter(p => p && !p.via && p.origineLuogo === luogo && !p.numero)
     : [];
 
-  /* Se hai già parlato con un collega senza scambiarvi il numero, quello ha
-     priorità: la Fabbrica non deve generare una sfilza infinita di facce. */
+  /* Un rapporto già iniziato ha priorità su una faccia nuova: così i lavori
+     costruiscono ambienti riconoscibili e non distributori infiniti di NPC. */
   if(ripresa.length) return pick(ripresa);
 
   const presenti = postoContattiLavoro(luogo);
   if(maxContatti != null && presenti.length >= Number(maxContatti)) return null;
-  return postoNuovoContattoLavoro(luogo);
+
+  const pool = Array.isArray(ruoli)
+    ? ruoli.filter(r => !!POSTO_RUOLI[r])
+    : [];
+  const ruolo = pool.length ? pick(pool) : null;
+  return postoNuovoContattoLavoro(luogo, ruolo, meta);
 }
 
 function postoAvvicinaContattoLavoro(p, punti){
@@ -502,8 +526,8 @@ function postoScambiaNumeroLavoro(p){
   if(!p || p.via) return null;
   const sett = typeof totalWeeks === "function" ? totalWeeks() : G.week;
 
-  /* Sul lavoro ci vediamo già tutti i giorni: scambiarsi il numero vale come
-     il primo gradino di rapporto, senza consumare un'azione separata alla Sala. */
+  /* Sul lavoro vi siete già conosciuti davvero: il numero apre il primo
+     gradino del rapporto, senza inventare una seconda persona in rubrica. */
   p.rel = Math.max(1, Number(p.rel || 0));
   p.pt = Math.max(0, Number(p.pt || 0));
   p.numero = true;

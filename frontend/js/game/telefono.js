@@ -137,7 +137,7 @@ const TEL_GRIGLIA = ["obiettivi", "notizie", "classifiche", "statistiche",
    Notifiche di eventi-v2, o Sputa di sputa.js) tiene il disegno vettoriale
    di prima. */
 const TEL_FOTO = new Set(TEL_GRIGLIA.concat(TEL_DOCK));
-const TEL_RUOLI = {beatmaker:"Beatmaker", rapper:"Rapper", fonico:"Fonico", giornalista:"Giornalista"};
+const TEL_RUOLI = {beatmaker:"Beatmaker", rapper:"Rapper", fonico:"Fonico", giornalista:"Giornalista", videomaker:"Videomaker", promoter:"Promoter", collega:"Collega", strada:"Conoscenza della Strada"};
 
 /* ================= LAFAMEGRAM — IL FEED (punti 52, 53) =================
    Il vero motore è sul server (`GET /api/feed`, backend/database/archivio.js
@@ -380,10 +380,22 @@ function schermataContatti(){
   const vivi = (G.gente || []).filter(p => !p.via);
   if(!vivi.length) return '<div class="tempty">Nessun contatto ancora. Passa dal Circolo: di pomeriggio ci trovi la gente del giro.</div>' +
     '<button class="tbtn" data-posto="1">Vai al Circolo</button>';
+
+  const destinazione = p => {
+    if(p.fuori) return 'data-app="trasferte"';
+    /* Le persone conosciute sul lavoro non vengono fatte comparire al Circolo
+       per magia. Se avete il numero si apre direttamente la loro chat; se non
+       lo avete ancora, restano visibili in rubrica ma le rincontri lavorando. */
+    if(p.origineLuogo)
+      return p.numero ? 'data-chat="sala:' + p.id + '"' : 'disabled aria-disabled="true"';
+    return 'data-posto="1"';
+  };
+
   return '<div class="tlist">' + vivi.map(p =>
-    '<button class="tli" ' + (p.fuori ? 'data-app="trasferte"' : 'data-posto="1"') + '>' +
+    '<button class="tli" ' + destinazione(p) + '>' +
       '<span class="tliav" style="--k:' + p.col + '">' + hsvg("persona") + '</span>' +
       '<span class="tlitx"><b>' + p.n + '</b><i>' + (TEL_RUOLI[p.ruolo] || p.ruolo) + ' · ' + REL_NOMI[p.rel] +
+        (p.origineDettaglio ? ' · ' + p.origineDettaglio : '') +
         (p.fuori && p.citta ? ' · ' + telCittaNome(p.citta) : '') + '</i></span>' +
       '<span class="tliv">' + hsvg("fama") + Math.round(p.fama) + '</span></button>').join("") +
     '</div><button class="tbtn" data-posto="1">Vai al Circolo</button>';
