@@ -819,6 +819,12 @@ function chatTuLavoroGenerico(p){
     {n:"Quando conviene farsi vedere?", d:"+lucidità",
      run(){ addLuc(3); return "Quando hai qualcosa da far ricordare, non solo per esserci."; }}
   ];
+  if(p.ruolo === "collega") return [
+    {n:"Come reggi i turni?", d:"+benessere",
+     run(){ chBene(3); chatAvvicina(p,1); return "Male, ma almeno adesso ho qualcuno con cui dirlo senza fare scena."; }},
+    {n:"Ci prendiamo un caffè in pausa?", d:"+rete",
+     run(){ chRete(1); return "Sì. Niente lavoro per cinque minuti però."; }}
+  ];
   if(p.ruolo === "strada") return [
     {n:"Com'è il giro?", d:"+lucidità",
      run(){ addLuc(3); chatAvvicina(p,1); return "Sempre uguale finché non cambia all'improvviso. Non correre dietro a ogni voce."; }},
