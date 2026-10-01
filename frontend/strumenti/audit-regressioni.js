@@ -2765,16 +2765,18 @@ test("la Fabbrica usa la foto e i comandi HTML dopo la sua transizione",
   /const azioneLavoro = mio \? ' data-vai="turno"' : ' data-lavoro="' \+ baseDef\.id \+ '"';/.test(luoghiFoto) &&
   /id:"fabbrica",[\s\S]{0,180}?transizioneVideo\("fabbrica",\s*\(\) => apriLuogo\("fabbrica"\)\)/.test(hub) &&
   !/id:"fabbrica",[\s\S]{0,180}?schedaLavoro\("operaio"/.test(hub));
-test("la Pizzeria usa una pagina fotografica separata dalla Fabbrica, senza popup lavoro",
+test("la Pizzeria usa una pagina fotografica propria con contratto e cartellino per sede",
   luoghiFoto.includes('pizzeria: {f:"schermate_luoghi_con_elementi_HTML/pizzeria.webp"') &&
   luoghiFoto.includes("function lfPizzeria()") &&
-  luoghiFoto.includes('data-lavoro="lavapiatti"') &&
+  luoghiFoto.includes("function lfPizzeriaCartellino()") &&
+  luoghiFoto.includes('data-dimissioni="pizzeria"') &&
+  luoghiFoto.includes('lfPan("Settimane in cucina"') &&
   !luoghiFoto.includes("function lfPostoLavoro(") &&
   /id:"pizzeria",[\s\S]{0,80}?apriLuogo\("pizzeria"\)/.test(hub) &&
   !/id:"pizzeria",[\s\S]{0,80}?schedaLavoro\("lavapiatti"/.test(hub));
-test("il turno di Fabbrica e Pizzeria resta nella rispettiva pagina, senza seconda scena sopra",
-  luoghiFoto.includes('LUOGO.id === "fabbrica" && G.job.id === "operaio"') &&
-  luoghiFoto.includes('LUOGO.id === "pizzeria" && G.job.id === "lavapiatti"') &&
+test("il turno di Fabbrica e Pizzeria resta nella rispettiva pagina anche dopo una promozione",
+  luoghiFoto.includes('(LUOGO.id === "fabbrica" || LUOGO.id === "pizzeria")') &&
+  luoghiFoto.includes('lavoroLuogo(G.job) === LUOGO.id') &&
   luoghiFoto.includes("LUOGO_MOSSE[a.id] || turnoLuogo"));
 test("le quattro mosse con la pagina finiscono sulla loro foto, e sono tutte scene a pagina piena (il live nel Circolo)",
   (() => {
