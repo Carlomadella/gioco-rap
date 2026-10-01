@@ -7,26 +7,26 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:471c965 -->
-## 01/10/26, 21:09 â€” task/rimuovi-centro-impiego â†’ main
+## 01/10/26, 21:09 — task/rimuovi-centro-impiego → main
 
 **Merge effettuato da:** GitHub (noreply@github.com)  
 **Merge commit:** `471c965`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `f95897f` â€” docs(lavori): segna la rimozione del Centro per l'impiego â€” **mycolbraga**
-- `8d9dd18` â€” chore(cache): invalida i moduli dopo la rimozione del Centro impiego â€” **mycolbraga**
-- `1305f1b` â€” refactor(lavori): completa pulizia riferimenti cerca lavoro â€” **mycolbraga**
-- `86ff491` â€” test(lavori): protegge la rimozione del Centro per l'impiego â€” **mycolbraga**
-- `9685d24` â€” test(bilanciamento): usa la Fabbrica invece dei colloqui legacy â€” **mycolbraga**
-- `49d7f3e` â€” refactor(lavori): rimuove scena del vecchio cerca lavoro â€” **mycolbraga**
-- `5fee8ff` â€” refactor(lavori): aggiorna commento macchina azioni â€” **mycolbraga**
-- `ffbe266` â€” refactor(lavori): pulisce UI del vecchio cerca lavoro â€” **mycolbraga**
-- `e1cc3aa` â€” refactor(lavori): rimuove coordinate Centro per l'impiego â€” **mycolbraga**
-- `2a4f4fe` â€” refactor(lavori): rimuove orario Centro per l'impiego â€” **mycolbraga**
-- `4d0d832` â€” refactor(lavori): rimuove il tempo dei colloqui legacy â€” **mycolbraga**
-- `c1b1835` â€” refactor(mappa): rimuove il Centro per l'impiego â€” **mycolbraga**
-- `d0fa123` â€” refactor(lavori): mette in pausa i lavori legacy â€” **mycolbraga**
+- `f95897f` — docs(lavori): segna la rimozione del Centro per l'impiego — **mycolbraga**
+- `8d9dd18` — chore(cache): invalida i moduli dopo la rimozione del Centro impiego — **mycolbraga**
+- `1305f1b` — refactor(lavori): completa pulizia riferimenti cerca lavoro — **mycolbraga**
+- `86ff491` — test(lavori): protegge la rimozione del Centro per l'impiego — **mycolbraga**
+- `9685d24` — test(bilanciamento): usa la Fabbrica invece dei colloqui legacy — **mycolbraga**
+- `49d7f3e` — refactor(lavori): rimuove scena del vecchio cerca lavoro — **mycolbraga**
+- `5fee8ff` — refactor(lavori): aggiorna commento macchina azioni — **mycolbraga**
+- `ffbe266` — refactor(lavori): pulisce UI del vecchio cerca lavoro — **mycolbraga**
+- `e1cc3aa` — refactor(lavori): rimuove coordinate Centro per l'impiego — **mycolbraga**
+- `2a4f4fe` — refactor(lavori): rimuove orario Centro per l'impiego — **mycolbraga**
+- `4d0d832` — refactor(lavori): rimuove il tempo dei colloqui legacy — **mycolbraga**
+- `c1b1835` — refactor(mappa): rimuove il Centro per l'impiego — **mycolbraga**
+- `d0fa123` — refactor(lavori): mette in pausa i lavori legacy — **mycolbraga**
 
 ### File di questa categoria
 
@@ -44,16 +44,16 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:19f6506 -->
-## 01/10/26, 20:34 â€” feature/pizzeria-cinematica â†’ main
+## 01/10/26, 20:34 — feature/pizzeria-cinematica → main
 
 **Merge effettuato da:** GitHub (noreply@github.com)  
 **Merge commit:** `19f6506`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `9838ebc` â€” feat: integra cinematica di ingresso Pizzeria â€” **mycolbraga**
-- `decd68b` â€” assets(pizzeria): add arrival cinematic frames â€” **mycolbraga**
-- `861b15e` â€” feat(pizzeria): hook arrival cinematic slideshow â€” **mycolbraga**
+- `9838ebc` — feat: integra cinematica di ingresso Pizzeria — **mycolbraga**
+- `decd68b` — assets(pizzeria): add arrival cinematic frames — **mycolbraga**
+- `861b15e` — feat(pizzeria): hook arrival cinematic slideshow — **mycolbraga**
 
 ### File di questa categoria
 
@@ -65,17 +65,17 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:77dea95 -->
-## 01/10/26, 20:00 â€” fix/ci-avvio-rapido-roadmap â†’ main
+## 01/10/26, 20:00 — fix/ci-avvio-rapido-roadmap → main
 
 **Merge effettuato da:** GitHub (noreply@github.com)  
 **Merge commit:** `77dea95`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `222bf1a` â€” test: riallinea audit avvio rapido al gameplay reale â€” **mycolbraga**
-- `ff2ecec` â€” ci: separa avvio rapido dal MakeHuman pesante â€” **mycolbraga**
-- `4c1205c` â€” ci: evita verifiche duplicate su push e pull request â€” **mycolbraga**
-- `019c5c9` â€” fix: stabilizza avvio rapido CI e riallinea inventario roadmap â€” **mycolbraga**
+- `222bf1a` — test: riallinea audit avvio rapido al gameplay reale — **mycolbraga**
+- `ff2ecec` — ci: separa avvio rapido dal MakeHuman pesante — **mycolbraga**
+- `4c1205c` — ci: evita verifiche duplicate su push e pull request — **mycolbraga**
+- `019c5c9` — fix: stabilizza avvio rapido CI e riallinea inventario roadmap — **mycolbraga**
 
 ### File di questa categoria
 
@@ -87,41 +87,41 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:dc26a32 -->
-## 01/10/26, 13:34 â€” feature/eventi-lavoro-famiglie-rebased â†’ main
+## 01/10/26, 13:34 — feature/eventi-lavoro-famiglie-rebased → main
 
 **Merge effettuato da:** GitHub (noreply@github.com)  
 **Merge commit:** `dc26a32`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `85cf559` â€” test: riallinea dritta Fabbrica al testo corrente â€” **mycolbraga**
-- `70a302e` â€” fix: chiudi regressioni CI punto 10 â€” **mycolbraga**
-- `ce9fc63` â€” chore: riallinea punto 10 con main e risolvi conflitti â€” **mycolbraga**
-- `4541d4f` â€” chore: sync main before point 10 merge â€” **mycolbraga**
-- `be367d2` â€” docs(roadmap): align promoter geography with work contacts â€” **mycolbraga**
-- `7be1556` â€” docs(contacts): clarify work-only promoter exception in Provincia â€” **mycolbraga**
-- `d27fa4d` â€” test(work-events): follow refreshed event engine asset â€” **mycolbraga**
-- `b959cd2` â€” chore(work-events): refresh persistent conflict engine cache â€” **mycolbraga**
-- `69e291b` â€” test(work-events): keep pending conflicts persistent until shift commit â€” **mycolbraga**
-- `39aa1f6` â€” fix(work-events): persist pending work-music conflicts across reloads â€” **mycolbraga**
-- `58ada6d` â€” chore(gameplay): refresh reviewed work-event caches â€” **mycolbraga**
-- `86c1985` â€” test(work-review): cover clock resume and structured re-entry â€” **mycolbraga**
-- `a2bad73` â€” fix(work-events): wait for resumed shift before post-shift hooks â€” **mycolbraga**
-- `2cd000b` â€” fix(work): generalize structured contract re-entry state â€” **mycolbraga**
-- `3afec04` â€” fix(agenda): read numeric game time correctly â€” **mycolbraga**
-- `d245203` â€” docs(events): mark legacy promotion arc as superseded â€” **mycolbraga**
-- `dbdd985` â€” docs(work): point structured careers at real event engine â€” **mycolbraga**
-- `cb9c6fa` â€” test(work-events): cover work families on latest structured jobs â€” **mycolbraga**
-- `4581e71` â€” test(audit): align work-event checks with latest main â€” **mycolbraga**
-- `588e750` â€” chore(work-events): load work event engine on latest gameplay â€” **mycolbraga**
-- `2eba74b` â€” docs(famepedia): add work event families to structured jobs â€” **mycolbraga**
-- `e60798f` â€” feat(work-events): arbitrate structured work events after committed shifts â€” **mycolbraga**
-- `56c4c49` â€” feat(work-events): connect structured jobs to persistent event effects â€” **mycolbraga**
-- `54f273d` â€” feat(work-events): carry landing.html integration onto latest main â€” **mycolbraga**
-- `d6f10dd` â€” feat(work-events): carry strada-crimine.js integration onto latest main â€” **mycolbraga**
-- `aef21f6` â€” feat(work-events): carry ui.js integration onto latest main â€” **mycolbraga**
-- `c215384` â€” feat(work-events): carry agenda.js integration onto latest main â€” **mycolbraga**
-- `3b222e9` â€” feat(work-events): add persistent work event families on structured jobs â€” **mycolbraga**
+- `85cf559` — test: riallinea dritta Fabbrica al testo corrente — **mycolbraga**
+- `70a302e` — fix: chiudi regressioni CI punto 10 — **mycolbraga**
+- `ce9fc63` — chore: riallinea punto 10 con main e risolvi conflitti — **mycolbraga**
+- `4541d4f` — chore: sync main before point 10 merge — **mycolbraga**
+- `be367d2` — docs(roadmap): align promoter geography with work contacts — **mycolbraga**
+- `7be1556` — docs(contacts): clarify work-only promoter exception in Provincia — **mycolbraga**
+- `d27fa4d` — test(work-events): follow refreshed event engine asset — **mycolbraga**
+- `b959cd2` — chore(work-events): refresh persistent conflict engine cache — **mycolbraga**
+- `69e291b` — test(work-events): keep pending conflicts persistent until shift commit — **mycolbraga**
+- `39aa1f6` — fix(work-events): persist pending work-music conflicts across reloads — **mycolbraga**
+- `58ada6d` — chore(gameplay): refresh reviewed work-event caches — **mycolbraga**
+- `86c1985` — test(work-review): cover clock resume and structured re-entry — **mycolbraga**
+- `a2bad73` — fix(work-events): wait for resumed shift before post-shift hooks — **mycolbraga**
+- `2cd000b` — fix(work): generalize structured contract re-entry state — **mycolbraga**
+- `3afec04` — fix(agenda): read numeric game time correctly — **mycolbraga**
+- `d245203` — docs(events): mark legacy promotion arc as superseded — **mycolbraga**
+- `dbdd985` — docs(work): point structured careers at real event engine — **mycolbraga**
+- `cb9c6fa` — test(work-events): cover work families on latest structured jobs — **mycolbraga**
+- `4581e71` — test(audit): align work-event checks with latest main — **mycolbraga**
+- `588e750` — chore(work-events): load work event engine on latest gameplay — **mycolbraga**
+- `2eba74b` — docs(famepedia): add work event families to structured jobs — **mycolbraga**
+- `e60798f` — feat(work-events): arbitrate structured work events after committed shifts — **mycolbraga**
+- `56c4c49` — feat(work-events): connect structured jobs to persistent event effects — **mycolbraga**
+- `54f273d` — feat(work-events): carry landing.html integration onto latest main — **mycolbraga**
+- `d6f10dd` — feat(work-events): carry strada-crimine.js integration onto latest main — **mycolbraga**
+- `aef21f6` — feat(work-events): carry ui.js integration onto latest main — **mycolbraga**
+- `c215384` — feat(work-events): carry agenda.js integration onto latest main — **mycolbraga**
+- `3b222e9` — feat(work-events): add persistent work event families on structured jobs — **mycolbraga**
 
 ### File di questa categoria
 
@@ -143,14 +143,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:3b85be1 -->
-## 27/09/26, 16:18 â€” task/diario-senza-giorno-saltato â†’ main
+## 27/09/26, 16:18 — task/diario-senza-giorno-saltato → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `3b85be1`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `29c22f1` â€” La fine giornata non scrive più «1 giorno saltato» nel diario â€” **Carlomadella**
+- `29c22f1` — La fine giornata non scrive più «1 giorno saltato» nel diario — **Carlomadella**
 
 ### File di questa categoria
 
@@ -161,14 +161,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:ae1413f -->
-## 27/09/26, 16:18 â€” task/classifica-dieci-posti â†’ main
+## 27/09/26, 16:18 — task/classifica-dieci-posti → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `ae1413f`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `5d1fe4c` â€” La classifica conta chi sta davanti a qualcuno, e il diario scrive l'hype vero â€” **Carlomadella**
+- `5d1fe4c` — La classifica conta chi sta davanti a qualcuno, e il diario scrive l'hype vero — **Carlomadella**
 
 ### File di questa categoria
 
@@ -179,14 +179,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:f83c4ad -->
-## 21/09/26, 08:07 â€” task/shop-lo-stile-che-conta â†’ main
+## 21/09/26, 08:07 — task/shop-lo-stile-che-conta → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `f83c4ad`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `08c5a0e` â€” Shop: «Lo stile che conta» — i capi addosso pesano su hype, presenza e promo â€” **Carlomadella**
+- `08c5a0e` — Shop: «Lo stile che conta» — i capi addosso pesano su hype, presenza e promo — **Carlomadella**
 
 ### File di questa categoria
 
@@ -199,15 +199,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:bf00c1d -->
-## 19/09/26, 15:59 â€” task/avvio-rapido â†’ main
+## 19/09/26, 15:59 — task/avvio-rapido → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `bf00c1d`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `db3e0e8` â€” fix(avvio): il giro di chiusura di «Preparo il tuo artista» — sette voci del 19/09, tutte chiuse â€” **Carlomadella**
-- `f29ad6b` â€” feat(avvio): «Preparo il tuo artista» — «l'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore» â€” **Carlomadella**
+- `db3e0e8` — fix(avvio): il giro di chiusura di «Preparo il tuo artista» — sette voci del 19/09, tutte chiuse — **Carlomadella**
+- `f29ad6b` — feat(avvio): «Preparo il tuo artista» — «l'avvio rapido ci mette quasi due minuti, e nessuno lo dice al giocatore» — **Carlomadella**
 
 ### File di questa categoria
 
@@ -218,15 +218,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:668d98c -->
-## 19/09/26, 14:00 â€” task/pagine-luoghi-foto â†’ main
+## 19/09/26, 14:00 — task/pagine-luoghi-foto → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `668d98c`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `2cf77fc` â€” fix(luoghi): il giro di chiusura delle pagine sulla foto — sei voci del 19/09, tutte chiuse â€” **Carlomadella**
-- `18141cf` â€” feat(luoghi): Casa, Palestra, Live Club e stacca la spina sulla loro foto — «aggiungi le foto di background dei posti» â€” **Carlomadella**
+- `2cf77fc` — fix(luoghi): il giro di chiusura delle pagine sulla foto — sei voci del 19/09, tutte chiuse — **Carlomadella**
+- `18141cf` — feat(luoghi): Casa, Palestra, Live Club e stacca la spina sulla loro foto — «aggiungi le foto di background dei posti» — **Carlomadella**
 
 ### File di questa categoria
 
@@ -238,14 +238,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:684a1af -->
-## 16/09/26, 14:36 â€” task/prima-transizione-video â†’ main
+## 16/09/26, 14:36 — task/prima-transizione-video → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `684a1af`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `f0f730f` â€” feat(transizioni): il primo video, lo Studio — «implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata» â€” **Carlomadella**
+- `f0f730f` — feat(transizioni): il primo video, lo Studio — «implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata» — **Carlomadella**
 
 ### File di questa categoria
 
@@ -257,14 +257,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:64db26c -->
-## 13/09/26, 20:20 â€” task/studio-mix-da-solo â†’ main
+## 13/09/26, 20:20 — task/studio-mix-da-solo → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `64db26c`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `5566fbb` â€” fix(studio): al banco del Mix si sceglie il fonico, e «da solo» si clicca â€” **Carlomadella**
+- `5566fbb` — fix(studio): al banco del Mix si sceglie il fonico, e «da solo» si clicca — **Carlomadella**
 
 ### File di questa categoria
 
@@ -275,14 +275,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:55a9083 -->
-## 13/09/26, 20:08 â€” task/studio-marketing-dopo-timing â†’ main
+## 13/09/26, 20:08 — task/studio-marketing-dopo-timing → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `55a9083`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `8cb498d` â€” feat(studio): Timing prima di Marketing â€” **Carlomadella**
+- `8cb498d` — feat(studio): Timing prima di Marketing — **Carlomadella**
 
 ### File di questa categoria
 
@@ -293,14 +293,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:4515ce0 -->
-## 13/09/26, 17:12 â€” task/watcher-uccide-la-partita â†’ main
+## 13/09/26, 17:12 — task/watcher-uccide-la-partita → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `4515ce0`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `d4a33fd` â€” fix(dev): il watcher non ricarica piu' la pagina in mezzo alla partita â€” **Carlomadella**
+- `d4a33fd` — fix(dev): il watcher non ricarica piu' la pagina in mezzo alla partita — **Carlomadella**
 
 ### File di questa categoria
 
@@ -311,21 +311,21 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:541eacc -->
-## 13/09/26, 15:18 â€” test/vitest-playwright-gate â†’ main
+## 13/09/26, 15:18 — test/vitest-playwright-gate → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `541eacc`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `fea873b` â€” docs: scrive la diagnosi del giro lungo, per chi ci ricasca â€” **Carlomadella**
-- `83a695f` â€” test: il controllo sulle navigazioni non prendeva l'errore piu' frequente â€” **Carlomadella**
-- `dad1c62` â€” test: il giro lungo nel browser esce dalla catena di ogni push â€” **Carlomadella**
-- `007de3d` â€” test: alza il tetto dell'attesa dell'avvio rapido a dieci minuti â€” **Carlomadella**
-- `8507075` â€” merge: porta il ramo del gate di prove sopra main â€” **Carlomadella**
-- `288fa6c` â€” docs: appunti nuovi in implementazioni â€” **Carlomadella**
-- `b4a6202` â€” docs(dipendenze): il registro dice quello che c'e' davvero, debito compreso â€” **Carlomadella**
-- `e78ed6d` â€” test: il gate di verifica fa girare prove vere, e trova l'avvio rapido rotto â€” **Carlomadella**
+- `fea873b` — docs: scrive la diagnosi del giro lungo, per chi ci ricasca — **Carlomadella**
+- `83a695f` — test: il controllo sulle navigazioni non prendeva l'errore piu' frequente — **Carlomadella**
+- `dad1c62` — test: il giro lungo nel browser esce dalla catena di ogni push — **Carlomadella**
+- `007de3d` — test: alza il tetto dell'attesa dell'avvio rapido a dieci minuti — **Carlomadella**
+- `8507075` — merge: porta il ramo del gate di prove sopra main — **Carlomadella**
+- `288fa6c` — docs: appunti nuovi in implementazioni — **Carlomadella**
+- `b4a6202` — docs(dipendenze): il registro dice quello che c'e' davvero, debito compreso — **Carlomadella**
+- `e78ed6d` — test: il gate di verifica fa girare prove vere, e trova l'avvio rapido rotto — **Carlomadella**
 
 ### File di questa categoria
 
@@ -337,16 +337,16 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:bdb2c5f -->
-## 05/09/26, 16:17 â€” task/pagine-di-servizio â†’ main
+## 05/09/26, 16:17 — task/pagine-di-servizio → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `bdb2c5f`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `59c3988` â€” refactor(backend): le pagine di errore diventano middleware, e il 404 esce dal frontend â€” **Carlomadella**
-- `28af709` â€” feat: le pagine di servizio — avvio, rotto, salvataggio illeggibile, server giù, 404 â€” **Carlomadella**
-- `86ba2c2` â€” chore: i video in ordine, i concept fuori dal pacchetto, e un 404 a ogni avvio â€” **Carlomadella**
+- `59c3988` — refactor(backend): le pagine di errore diventano middleware, e il 404 esce dal frontend — **Carlomadella**
+- `28af709` — feat: le pagine di servizio — avvio, rotto, salvataggio illeggibile, server giù, 404 — **Carlomadella**
+- `86ba2c2` — chore: i video in ordine, i concept fuori dal pacchetto, e un 404 a ogni avvio — **Carlomadella**
 
 ### File di questa categoria
 
@@ -355,10 +355,10 @@ Non contiene idee, TODO o implementazioni future.
 - **Aggiunto:** `backend/risposte.js`
 - **Modificato:** `backend/server.js`
 - **Modificato:** `frontend/concept/README.md`
-- **Rinominato:** `frontend/media/photo/immagini_background_personaggio/booth_registrazione_notturno.png` â†’ `frontend/concept/booth_registrazione_notturno.png`
-- **Rinominato:** `frontend/media/photo/immagini_background_personaggio/control_room_notturna.png` â†’ `frontend/concept/control_room_notturna.png`
-- **Rinominato:** `frontend/media/photo/pagina_skill_tree/interfaccia_skill_tree_a colonne.png` â†’ `frontend/concept/skill_tree_a_colonne.png`
-- **Rinominato:** `frontend/media/photo/pagina_skill_tree/interfaccia_skill_tree_ramificato.png` â†’ `frontend/concept/skill_tree_ramificato.png`
+- **Rinominato:** `frontend/media/photo/immagini_background_personaggio/booth_registrazione_notturno.png` → `frontend/concept/booth_registrazione_notturno.png`
+- **Rinominato:** `frontend/media/photo/immagini_background_personaggio/control_room_notturna.png` → `frontend/concept/control_room_notturna.png`
+- **Rinominato:** `frontend/media/photo/pagina_skill_tree/interfaccia_skill_tree_a colonne.png` → `frontend/concept/skill_tree_a_colonne.png`
+- **Rinominato:** `frontend/media/photo/pagina_skill_tree/interfaccia_skill_tree_ramificato.png` → `frontend/concept/skill_tree_ramificato.png`
 - **Aggiunto:** `frontend/css/servizio.css`
 - **Modificato:** `frontend/index.html`
 - **Modificato:** `frontend/js/game/state.js`
@@ -367,22 +367,22 @@ Non contiene idee, TODO o implementazioni future.
 - **Aggiunto:** `frontend/js/servizio.js`
 - **Rimosso:** `frontend/media/video/06_palestra_boxe_definitivo.mp4`
 - **Rimosso:** `frontend/media/video/08_ingresso_club_definitivo.mp4`
-- **Rinominato:** `frontend/media/video/07_partenza_milano_definitivo.mp4` â†’ `frontend/media/video/Transizioni di scena/07_partenza_milano_definitivo.mp4`
+- **Rinominato:** `frontend/media/video/07_partenza_milano_definitivo.mp4` → `frontend/media/video/Transizioni di scena/07_partenza_milano_definitivo.mp4`
 
 **File interessati in questa categoria:** 18
 
 ---
 
 <!-- merge:60b46fe -->
-## 04/09/26, 12:12 â€” task/studio-prova â†’ main
+## 04/09/26, 12:12 — task/studio-prova → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `60b46fe`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `05d39fc` â€” fix: il logo non finisce piu' sopra a "Lo Studio" â€” **Carlomadella**
-- `ccaf2a1` â€” fix: lo Studio non manda piu' al Catalogo, e la promo non finge â€” **Carlomadella**
+- `05d39fc` — fix: il logo non finisce piu' sopra a "Lo Studio" — **Carlomadella**
+- `ccaf2a1` — fix: lo Studio non manda piu' al Catalogo, e la promo non finge — **Carlomadella**
 
 ### File di questa categoria
 
