@@ -38,6 +38,21 @@ const ART = {
    sopra — non un'altra riga di testo che vola via in due secondi. */
 const SCENA_PIENA = new Set(["mixa","pubblica","promo","anteprima","live","turno","stacca",
   "palestra_pesi","palestra_cardio"]);
+/* Gli eventi lavoro possono fermare una mossa PRIMA che consumi energia o tempo.
+   Il caso principale è un turno che attraversa un appuntamento musicale già
+   segnato in Agenda. Il motore viene caricato dopo questa UI, quindi il bridge
+   resta opzionale e non crea una dipendenza di caricamento. */
+function guardiaEventoLavoro(id){
+  try{
+    if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.guardAction === "function"){
+      const gate = ADF_WORK_EVENTS.guardAction(id);
+      if(gate && gate.ok === false) return gate;
+    }
+  }catch(err){
+    console.error("[Anni di Fame] guardia eventi lavoro non riuscita", err);
+  }
+  return {ok:true};
+}
 function mostraScena(a, sc, msg, extra){
   $("sc-art").innerHTML = sc[2]
     ? '<svg viewBox="0 0 200 128" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">' + sc[2] + '</svg>'
@@ -99,6 +114,8 @@ function avviaAzioneDiretta(id){
   const g = ART[a.id] || ["#3A3F49","#22262E","·"];
 
   const esegui = () => {
+    const lavoroGate = guardiaEventoLavoro(a.id);
+    if(!lavoroGate.ok) return false;
     try{
       if(window.GAME_TRAVEL && typeof GAME_TRAVEL.guardAction === "function"){
         const gate = GAME_TRAVEL.guardAction(a.id);
@@ -298,6 +315,8 @@ function renderGioco(){
       /* La tile «spenta» arriva fin qui apposta: è cliccabile solo per poter
          rispondere. Nessuna energia scalata, nessuna mossa avviata. */
       if(b.classList.contains("spenta")){ avvisoSenzaEnergia(a.id); return; }
+      const lavoroGate = guardiaEventoLavoro(a.id);
+      if(!lavoroGate.ok) return;
       /* Le tile disabilitate da orari/spostamenti/clock sono solo UI.
          Prima di toccare energia, soldi o statistiche chiediamo al runtime
          se la mossa è davvero eseguibile in questo preciso momento. */
