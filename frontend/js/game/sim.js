@@ -165,11 +165,13 @@ function advanceWeek(){
   if(G.job){
     const luogoLavoro = typeof lavoroLuogo === "function" ? lavoroLuogo(G.job) : (G.job.place || null);
 
-    /* La Fabbrica ha ormai un contratto vero: presenze 5/6, valutazione ogni
-       quattro settimane, richiami e licenziamento dedicati. Il vecchio
-       "zero turni per tre settimane" resta solo per i lavori non ancora
-       migrati, altrimenti avremmo due sistemi disciplinari in conflitto. */
-    if(luogoLavoro !== "fabbrica"){
+    /* I posti migrati al contratto per sede (oggi Fabbrica e Pizzeria)
+       hanno presenze, richiami e licenziamento dedicati. Il vecchio
+       "zero turni per tre settimane" resta solo per i lavori legacy,
+       altrimenti avremmo due sistemi disciplinari in conflitto. */
+    const disciplinaPerSede = luogoLavoro && typeof lavoroContrattoDef === "function" &&
+      !!lavoroContrattoDef(luogoLavoro);
+    if(!disciplinaPerSede){
       if(G.shifts > 0) G.job.missed = 0;
       else{
         G.job.missed++;
@@ -266,10 +268,9 @@ function advanceWeek(){
      fisicamente dentro: il contatto con l'esterno passa dal micro-loop carcere. */
   if(!detenutoAInizioSettimana && typeof chatSettimana === "function") chatSettimana();
 
-  /* La disciplina Fabbrica si chiude OGNI settimana: così una settimana
-     grave genera subito il richiamo e non resta invisibile fino alla fine
-     del mese. La quarta settimana chiude poi anche il ciclo di 28 giorni per
-     bonus/carriera. Entrambe vanno eseguite prima di G.week++. */
+  /* La disciplina dei lavori strutturati si chiude OGNI settimana: così una
+     settimana grave genera subito il richiamo. La quarta settimana chiude
+     anche il ciclo di 28 giorni per bonus/carriera. Tutto prima di G.week++. */
   if(typeof lavoroChiudiSettimane === "function") lavoroChiudiSettimane();
   if(typeof lavoroChiudiCicli === "function") lavoroChiudiCicli();
 
