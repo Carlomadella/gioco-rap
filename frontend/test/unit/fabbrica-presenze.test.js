@@ -508,6 +508,7 @@ describe("cartellino presenze Fabbrica", () => {
     expect(ctx.G.workplaces.fabbrica.career.perfectCyclesInRole).toBe(0);
     expect(ctx.G.workplaces.fabbrica.career.reliability).toBe(80);
     expect(ctx.G.workplaces.fabbrica.career.roleHistory).toHaveLength(1);
+    expect(ctx.G.workplaces.fabbrica.network.turniPerRuolo.operaio_esperto).toBe(0);
   });
 
   it("prepara il motore eventi per requisiti ed effetti di carriera per luogo", () => {
