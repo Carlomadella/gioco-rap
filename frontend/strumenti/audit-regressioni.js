@@ -1804,15 +1804,16 @@ console.log("\nPunto 2 — la zona da toccare è la sagoma dell'edificio, non un
 /* Il rettangolo uguale per tutti (10.50×12.50) non c'è più: su una foto in
    prospettiva non combaciava con nessun palazzo. Adesso ogni posto ha il suo
    profilo in HUB_SAGOME, e il rettangolo del bottone è solo il contenitore. */
-/* dal 29/09/2026 sono nove: il Live Club è dentro al Circolo */
-test("i nove luoghi hanno un profilo in HUB_SAGOME, di almeno tre punti",
+/* Dal 01/10/2026 sono otto: il Live Club è dentro al Circolo e il
+   Centro per l'impiego è stato rimosso dalla città giocabile. */
+test("gli otto luoghi giocabili hanno un profilo in HUB_SAGOME, di almeno tre punti",
   (() => {
     const b0 = hub.indexOf("const HUB_SAGOME");
     const b1 = hub.indexOf("});", b0);
     if(b0 < 0 || b1 < 0) return false;
     const blocco = hub.slice(b0, b1);
     const sagome = [...blocco.matchAll(/([a-z]+):\s*\[(\[[^\]]*\][,\s]*)+\]/g)];
-    return sagome.length === 9 &&
+    return sagome.length === 8 &&
       sagome.every(m => (m[0].match(/\[[\d.]+,[\d.]+\]/g) || []).length >= 3);
   })());
 test("nessun luogo porta più x/y/w/h a mano: misure e baricentro escono dal profilo",
