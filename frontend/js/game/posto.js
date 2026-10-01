@@ -438,6 +438,90 @@ function nuovaPersona(ruolo){
   };
 }
 
+/* Contatti nati sul lavoro.
+   Restano persone normali di G.gente: stessi rapporti, stessa chat, stessi
+   effetti musicali. L'origine serve solo a non farli comparire per magia al
+   Circolo prima che il rapporto sia nato davvero. */
+function postoContattiLavoro(luogo){
+  return (G.gente || []).filter(p => p && !p.via && p.origineLuogo === luogo);
+}
+
+function postoNuovoContattoLavoro(luogo, ruolo){
+  if(!G.gente) G.gente = [];
+
+  let r = ruolo;
+  if(!r){
+    const haPezzoFuori = (G.songs || []).some(s => s && s.released);
+    const pool = haPezzoFuori
+      ? ["beatmaker","beatmaker","fonico","fonico","videomaker"]
+      : ["beatmaker","beatmaker","beatmaker","fonico","fonico"];
+    r = pick(pool);
+  }
+
+  if(["beatmaker","fonico","videomaker"].indexOf(r) < 0) r = "beatmaker";
+  const p = nuovaPersona(r);
+  p.origine = "lavoro";
+  p.origineLuogo = luogo;
+  p.origineDettaglio = luogo === "fabbrica" ? "collega di Fabbrica" : "collega";
+  p.storia = luogo === "fabbrica"
+    ? "Vi siete conosciuti lavorando in Fabbrica."
+    : "Vi siete conosciuti sul lavoro.";
+  p.collega = true;
+  p.circoloSbloccato = false;
+  p.numero = false;
+  p.numDa = null;
+  G.gente.push(p);
+  return p;
+}
+
+function postoContattoLavoroCandidato(luogo, daRiprendere, maxContatti){
+  const ripresa = Array.isArray(daRiprendere)
+    ? daRiprendere.filter(p => p && !p.via && p.origineLuogo === luogo && !p.numero)
+    : [];
+
+  /* Se hai già parlato con un collega senza scambiarvi il numero, quello ha
+     priorità: la Fabbrica non deve generare una sfilza infinita di facce. */
+  if(ripresa.length) return pick(ripresa);
+
+  const presenti = postoContattiLavoro(luogo);
+  if(maxContatti != null && presenti.length >= Number(maxContatti)) return null;
+  return postoNuovoContattoLavoro(luogo);
+}
+
+function postoAvvicinaContattoLavoro(p, punti){
+  if(!p || p.via) return null;
+  p.pt = Number(p.pt || 0) + Math.max(0, Number(punti || 0));
+  while(p.pt >= relSoglia(p) && p.rel < 5){
+    p.pt -= relSoglia(p);
+    p.rel++;
+  }
+  return p;
+}
+
+function postoScambiaNumeroLavoro(p){
+  if(!p || p.via) return null;
+  const sett = typeof totalWeeks === "function" ? totalWeeks() : G.week;
+
+  /* Sul lavoro ci vediamo già tutti i giorni: scambiarsi il numero vale come
+     il primo gradino di rapporto, senza consumare un'azione separata alla Sala. */
+  p.rel = Math.max(1, Number(p.rel || 0));
+  p.pt = Math.max(0, Number(p.pt || 0));
+  p.numero = true;
+  p.numDa = sett;
+
+  if(typeof chatPresentazione === "function") chatPresentazione(p);
+  if(typeof pushLog === "function")
+    pushLog("Hai scambiato il numero con <b>" + p.n +
+      "</b>, " + (p.origineDettaglio || "un contatto conosciuto al lavoro") +
+      ". Adesso lo trovi nelle chat.", "good");
+
+  return p;
+}
+
+function postoSoloLavoro(p){
+  return !!(p && p.origineLuogo && !p.circoloSbloccato);
+}
+
 /* Quanta gente gira: all'inizio tre facce, poi ne arriva una ogni due settimane.
    Il giornalista compare solo quando qualcuno comincia a sapere chi sei. */
 /* La gente DELLA SALA: chi e' arrivato dalla classifica (`rivale`, studio.js)
@@ -445,7 +529,9 @@ function nuovaPersona(ruolo){
    fa arrivare — se no due feat comprati in Cabina volevano dire due persone
    in meno alla Sala, magari il videomaker o il giornalista
    (problemi-riscontrati, 15/09; chiuso il 21/09). */
-function genteDellaSala(){ return (G.gente || []).filter(p => p && !p.rivale); }
+function genteDellaSala(){
+  return (G.gente || []).filter(p => p && !p.rivale && !postoSoloLavoro(p));
+}
 function sistemaGente(){
   if(!G.gente) G.gente = [];
   const sett = typeof totalWeeks === "function" ? totalWeeks() : G.week;
@@ -471,7 +557,7 @@ function sistemaGente(){
 function presentiOggi(quanti){
   sistemaGente();
   const sett = typeof totalWeeks === "function" ? totalWeeks() : G.week;
-  const vivi = G.gente.filter(p => !p.via);
+  const vivi = G.gente.filter(p => !p.via && !postoSoloLavoro(p));
   const ord = vivi.slice().sort((a, b) => {
     const ka = (a.id.charCodeAt(1) * 31 + sett * 17) % 97;
     const kb = (b.id.charCodeAt(1) * 31 + sett * 17) % 97;
