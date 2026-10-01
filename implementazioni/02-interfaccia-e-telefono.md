@@ -2914,3 +2914,31 @@ sempre PULITO e muoverne uno dava «Cannot use 'in' operator». Adesso stanno in
 `G.studio.cursori`, e un salvataggio vecchio con l'oggetto in `banco` lo sposta lì. Le prove
 in `strumenti/prova.js` (le linguette a banco vuoto, i cursori con un pezzo sopra), due
 controlli nell'audit, il test della remastered in `seguiti.test.js` aggiornato.
+
+## Mobile come UI dedicata, non come secondo gioco
+
+**DECISIONE (02/10/2026)** — il test reale su telefono ha chiarito il confine
+architetturale: Anni di Fame resta **un solo gioco**. Gameplay, stato, economia, eventi,
+salvataggi e backend sono condivisi; il telefono puo' invece avere disposizione,
+navigazione, gesture, controller e strategia di caricamento propri. Non nasce quindi una
+seconda copia `frontend-mobile`: il layer mobile resta sopra allo stesso frontend
+(`stretto.css`, `tocco.css` e JS dedicato solo quando il comportamento non puo' essere
+espresso bene in CSS).
+
+Il primo playtest via rete pubblica ha mostrato due difetti distinti:
+
+- **primo avvio MakeHuman**: `targets.bin` e' circa 145 MB. Il watchdog dell'avvio rapido
+  scatta dopo due minuti **senza messaggi**, ma `human.loadTargets()` poteva restare muto
+  durante tutto il download/elaborazione. `modifier-engine.html` ora manda un heartbeat
+  ogni 10 secondi durante quel solo blocco e il creator annuncia subito l'apertura del
+  motore. Il timeout continua quindi a distinguere un caricamento vivo da un processo
+  realmente fermo, senza inventare percentuali;
+- **trascinamento touch**: le superfici che scorrono sul telefono dichiarano esplicitamente
+  le gesture native (`pan-y` per pagine/pannelli, `pan-x pan-y` per mappa e nastri
+  orizzontali). Non introduciamo un drag JavaScript parallelo allo scroll del browser.
+
+Questi interventi rendono il playtest mobile meno fragile, ma **non chiudono il lavoro
+mobile**: la verifica definitiva del trascinamento resta da fare su dispositivo reale dopo
+il build della branch, e il peso del primo avvio MakeHuman va ancora ridotto/lazy-loadato
+prima di considerare pronta una release da store.
+
