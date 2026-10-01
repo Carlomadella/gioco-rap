@@ -190,7 +190,7 @@ describe("Fabbrica × Strada", () => {
     expect(eventi).toContain('claimAutoEvent("factory-street")');
     expect(eventi).toContain("stradaAggiornaPropostaFabbrica(false)");
     expect(eventi).toContain('const streetShown = a.id==="turno" && !overtimeShown');
-    expect(eventi).toContain("!overtimeShown && !streetShown && !contactShown");
+    expect(eventi).toContain("!overtimeShown && !streetShown && !workFamilyShown && !contactShown");
 
     expect(strada).toContain("moltiplicatoreLead");
     expect(strada).toContain("rumoreLead");

@@ -176,6 +176,7 @@ describe("famiglie eventi lavoro", () => {
         lavoroReteChiave:job => job && (job.place||job.id),
         lavoroAumentoDisponibile:()=>true,
         lavoroPromozioneDisponibile:()=>false,
+        lavoroCarrieraDef:()=>({}),
         lavoroApplicaAumento:(place,opt)=>{
           const prima=220, dopo=Math.round(prima*(1+Number(opt.percentuale)/100));
           envRef.G.job.pay=dopo;
