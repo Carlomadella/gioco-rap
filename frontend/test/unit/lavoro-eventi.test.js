@@ -161,6 +161,29 @@ describe("famiglie eventi lavoro", () => {
     )).toBe(true);
   });
 
+  it("i colleghi persistenti possono modificare davvero rapporto, rete e benessere", () => {
+    const env=ambiente({
+      random:0.9,
+      G:{
+        year:1,week:2,day:2,
+        job:{id:"barista",n:"Barista",pay:130,e:18},
+        workplaces:{},
+        gente:[{id:"c1",n:"Sara",ruolo:"collega",origineLuogo:"barista",numero:true,via:false,pt:0,rel:1}],
+        skills:{rete:0},wellbeing:60,lucidita:50,shifts:1,strada:{giroAvviato:false}
+      }
+    });
+
+    expect(env.ctx.ADF_WORK_EVENTS.afterShift({},{
+      music:1,crime:1,colleague:0,physical:1
+    })).toBe(true);
+    expect(env.shown[0].k).toContain("Colleghi");
+
+    env.shown[0].opts[0].run();
+    expect(env.G.gente[0].pt).toBe(2);
+    expect(env.G.skills.rete).toBeCloseTo(0.4);
+    expect(env.G.wellbeing).toBe(59);
+  });
+
   it("un contatto musicale del lavoro può creare un bonus consumabile sulla prossima live", () => {
     const env=ambiente({
       G:{
@@ -285,6 +308,10 @@ describe("famiglie eventi lavoro", () => {
     expect(actions).toContain("ADF_WORK_EVENTS.onCycle(luogo,evaluation)");
     expect(eventi).toContain("ADF_WORK_EVENTS.afterShift(shiftPayload)");
     expect(eventi).toContain("started_at:jobBefore.from");
+    expect(eventi.indexOf("adfFactoryOvertimeAfterShift()"))
+      .toBeLessThan(eventi.indexOf("ADF_WORK_EVENTS.afterShift(shiftPayload)"));
+    expect(eventi.indexOf("adfFactoryStreetAfterShift()"))
+      .toBeLessThan(eventi.indexOf("ADF_WORK_EVENTS.afterShift(shiftPayload)"));
     expect(strada).toContain("ADF_WORK_EVENTS.crimeLeadActive()");
     expect(strada).toContain("ADF_WORK_EVENTS.consumeCrimeLead(successo)");
     expect(html).toContain('js/game/lavoro-eventi.js?v=1');
