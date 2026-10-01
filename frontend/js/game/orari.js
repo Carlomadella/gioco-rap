@@ -151,7 +151,10 @@
   function scheduleForAction(id){
     if(id === "turno"){
       const jid = G.job && G.job.id;
-      return jid ? JOB_HOURS[jid] : null;
+      const place = G.job && (G.job.place ||
+        (typeof lavoroLuogo === "function" ? lavoroLuogo(G.job) : null));
+      const baseJob = place && PLACE_JOB[place];
+      return (baseJob && JOB_HOURS[baseJob]) || (jid ? JOB_HOURS[jid] : null);
     }
     if(ACTION_HOURS[id]) return ACTION_HOURS[id];
     const place = ACTION_PLACE[id];
@@ -159,6 +162,15 @@
   }
 
   function actionStatus(id, at){
+    if(id === "turno" && G.job){
+      const place = G.job.place ||
+        (typeof lavoroLuogo === "function" ? lavoroLuogo(G.job) : null);
+      if(place && PLACE_JOB[place]){
+        const pst = placeJobStatus(place, at);
+        if(pst) return pst;
+      }
+    }
+
     const def = scheduleForAction(id);
     if(!def) return {open:true, unrestricted:true, now:at == null ? GAME_TIME.now() : at};
     const st = statusWindow(def, at);
@@ -222,6 +234,22 @@
       if(currentPlace){
         if(currentPlace !== place) return null;
       }else if(G.job.id !== jid) return null;
+    }
+
+    /* Fabbrica: la domenica è riposo contrattuale. Un evento di straordinario
+       potrà autorizzare soltanto quella domenica tramite
+       lavoroAutorizzaDomenica("fabbrica"). */
+    if(place === "fabbrica" && Number(G.day || 1) === 7){
+      const permesso = typeof lavoroDomenicaAutorizzata === "function" &&
+        lavoroDomenicaAutorizzata("fabbrica");
+      if(!permesso){
+        return {
+          open:false,
+          now:at == null ? GAME_TIME.now() : at,
+          phase:"contract-rest",
+          label:"Domenica: riposo da contratto"
+        };
+      }
     }
 
     return jobStatus(jid, at);
