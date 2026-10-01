@@ -636,6 +636,164 @@ describe("cartellino presenze Fabbrica", () => {
     expect(eventi).toContain('delete G._lastJobLossReason');
   });
 
+  it("dopo il 5/5 del venerdì può proporre il sabato extra con +30%", () => {
+    const ctx = {
+      G:{
+        year:1,week:1,day:5,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{
+          fabbrica:{
+            contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+            attendance:{ciclo:0,turni:[0,1,2,3,4]},
+            career:{
+              reliability:60,cyclesCompleted:0,perfectCycles:0,perfectStreak:0,
+              cyclesInRole:0,perfectCyclesInRole:0,roleId:"operaio",roleLevel:0,
+              raisesByRole:{},payHistory:[],roleHistory:[],warnings:0,warningHistory:[],
+              dismissals:0,blockedUntilWeek:null,evaluations:[]
+            }
+          }
+        }
+      },
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    const offerta = vm.runInContext('lavoroTentaRichiestaStraordinario("fabbrica",0)', ctx);
+    expect(offerta.tipo).toBe("sesto-giorno");
+    expect(offerta.targetDay).toBe(6);
+    expect(offerta.bonusPct).toBe(30);
+
+    const accettata = vm.runInContext('lavoroAccettaStraordinario("fabbrica")', ctx);
+    expect(accettata.targetAbsoluteDay).toBe(6);
+    expect(ctx.G.workplaces.fabbrica.sundayPermitAbsoluteDay).toBeUndefined();
+  });
+
+  it("lo straordinario concordato completato dà +2 affidabilità una sola volta", () => {
+    const ctx = {
+      G:{
+        year:1,week:1,day:5,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{
+          fabbrica:{
+            contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+            attendance:{ciclo:0,turni:[0,1,2,3,4]},
+            career:{
+              reliability:60,cyclesCompleted:0,perfectCycles:0,perfectStreak:0,
+              cyclesInRole:0,perfectCyclesInRole:0,roleId:"operaio",roleLevel:0,
+              raisesByRole:{},payHistory:[],roleHistory:[],warnings:0,warningHistory:[],
+              dismissals:0,blockedUntilWeek:null,evaluations:[]
+            }
+          }
+        }
+      },
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    vm.runInContext('lavoroTentaRichiestaStraordinario("fabbrica",0); lavoroAccettaStraordinario("fabbrica")', ctx);
+    ctx.G.day = 6;
+
+    const out = vm.runInContext('lavoroCompletaStraordinario("fabbrica")', ctx);
+    expect(out.affidabilitaDelta).toBe(2);
+    expect(ctx.G.workplaces.fabbrica.career.reliability).toBe(62);
+    expect(ctx.G.workplaces.fabbrica.overtime.accepted).toBeNull();
+
+    expect(vm.runInContext('lavoroCompletaStraordinario("fabbrica")', ctx)).toBeNull();
+    expect(ctx.G.workplaces.fabbrica.career.reliability).toBe(62);
+  });
+
+  it("il sabato può autorizzare solo la domenica successiva con +75%", () => {
+    const ctx = {
+      G:{
+        year:1,week:1,day:6,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{
+          fabbrica:{
+            contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+            attendance:{ciclo:0,turni:[0,1,2,3,4]},
+            career:{
+              reliability:60,cyclesCompleted:0,perfectCycles:0,perfectStreak:0,
+              cyclesInRole:0,perfectCyclesInRole:0,roleId:"operaio",roleLevel:0,
+              raisesByRole:{},payHistory:[],roleHistory:[],warnings:0,warningHistory:[],
+              dismissals:0,blockedUntilWeek:null,evaluations:[]
+            }
+          }
+        }
+      },
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    const offerta = vm.runInContext('lavoroTentaRichiestaStraordinario("fabbrica",0)', ctx);
+    expect(offerta.tipo).toBe("domenica");
+    expect(offerta.bonusPct).toBe(75);
+
+    vm.runInContext('lavoroAccettaStraordinario("fabbrica")', ctx);
+    expect(ctx.G.workplaces.fabbrica.sundayPermitAbsoluteDay).toBe(7);
+
+    ctx.G.day = 7;
+    expect(vm.runInContext('lavoroDomenicaAutorizzata("fabbrica")', ctx)).toBe(true);
+    expect(vm.runInContext('lavoroTurnoConsentitoOggi("fabbrica").ok', ctx)).toBe(true);
+    expect(vm.runInContext('lavoroPagaTurno("fabbrica",220).totale', ctx)).toBe(385);
+
+    ctx.G.week = 2;
+    expect(vm.runInContext('lavoroDomenicaAutorizzata("fabbrica")', ctx)).toBe(false);
+  });
+
+  it("saltare uno straordinario già accettato costa 5 affidabilità", () => {
+    const logs = [];
+    const ctx = {
+      G:{
+        year:1,week:1,day:5,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{
+          fabbrica:{
+            contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+            attendance:{ciclo:0,turni:[0,1,2,3,4]},
+            career:{
+              reliability:60,cyclesCompleted:0,perfectCycles:0,perfectStreak:0,
+              cyclesInRole:0,perfectCyclesInRole:0,roleId:"operaio",roleLevel:0,
+              raisesByRole:{},payHistory:[],roleHistory:[],warnings:0,warningHistory:[],
+              dismissals:0,blockedUntilWeek:null,evaluations:[]
+            }
+          }
+        }
+      },
+      Number, Math, Array, Object, Set,
+      pushLog:(msg, cls) => logs.push({msg, cls})
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    vm.runInContext('lavoroTentaRichiestaStraordinario("fabbrica",0); lavoroAccettaStraordinario("fabbrica")', ctx);
+    ctx.G.day = 7;
+    vm.runInContext('lavoroAggiornaStraordinariTempo()', ctx);
+
+    expect(ctx.G.workplaces.fabbrica.career.reliability).toBe(55);
+    expect(ctx.G.workplaces.fabbrica.overtime.accepted).toBeNull();
+    expect(logs.some(x => x.msg.includes("Straordinario saltato"))).toBe(true);
+  });
+
+  it("il dialogo straordinari usa l'arbitro eventi e il calendario reale", () => {
+    const eventi = leggi("js/game/eventi-v2.js");
+    const luoghi = leggi("js/game/luoghi-foto.js");
+
+    expect(eventi).toContain("function adfFactoryOvertimeAfterShift()");
+    expect(eventi).toContain('claimAutoEvent("factory-overtime")');
+    expect(eventi).toContain('t:"Il capo ti ferma prima di uscire"');
+    expect(eventi).toContain('lavoroAccettaStraordinario("fabbrica")');
+    expect(eventi).toContain('lavoroAggiornaStraordinariTempo();');
+    expect(luoghi).toContain("Straordinario concordato oggi");
+    expect(luoghi).toContain("straordinarioAccettato.targetLabel");
+  });
+
   it("chiude il ciclo lavorativo prima di avanzare la settimana", () => {
     const sim = leggi("js/game/sim.js");
     const close = sim.indexOf('if(typeof lavoroChiudiCicli === "function") lavoroChiudiCicli();');
