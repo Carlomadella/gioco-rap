@@ -2904,11 +2904,15 @@ console.log("\nIl Circolo — la Sala e il Live Club, un posto solo");
     incontri.includes('(oggi.bevuto[p.id] ? "Stasera gliel’hai già offerto" : null)') &&
     incontri.includes("if(!fan || oggi.fan[fid] || !circoloQui()) return false;") &&
     /const CC_TEMPO = Object\.freeze\(\{bevi:15,/.test(incontri));
+  test("l'artista della serata ti presenta qualcuno una volta sola, e la gente della Sala resta sotto al tetto",
+    incontri.includes("c.presentati[o.n] = 1;") &&
+    incontri.includes("genteDellaSala().filter(x => !x.via).length >= POSTO_MAX"));
   test("nel backstage i fan dicono cosa gli è piaciuto e cosa no, dei pezzi veri",
     incontri.includes("function circoloFan(){") && incontri.includes("const critiche = [];") &&
     stanze.includes("Cosa funziona:") && stanze.includes("Cosa no:"));
-  test("l'hype delle stanze non passa il tetto, e la pagina scrive quello che è entrato davvero",
-    incontri.includes("G.hype = n > 0 ? Math.max(prima, Math.min(tetto, prima + n))") &&
+  test("l'hype delle stanze non passa il tetto né i due punti a sera, e la pagina scrive quello che è entrato davvero",
+    incontri.includes("G.hype = Math.max(prima, Math.min(tetto, prima + su));") &&
+    incontri.includes("const CC_HYPE_SERA = 2;") &&
     !/\+1 hype\./.test(incontri));
   test("la serata giocata a momenti pesa sul live di actions.js, e fuori dal Circolo vale 1",
     actions.includes('const resa = typeof circoloResaSerata === "function" ? circoloResaSerata() : 1;') &&

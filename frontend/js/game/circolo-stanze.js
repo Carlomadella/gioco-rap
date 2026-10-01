@@ -173,7 +173,12 @@ function ccSala(f){
   const chi = tutti.filter(p => filtro === "tutti" ? true : filtro === "conosciuti" ? !circoloSconosciuto(p) : circoloSconosciuto(p));
   let p = null;
   if(typeof POSTO_PARLA !== "undefined" && POSTO_PARLA) p = POSTO_PARLA.p;
-  if(!p) p = (G.gente || []).find(x => x.id === CIRCOLO.scelto && tutti.indexOf(x) >= 0) || chi[0] || tutti[0] || null;
+  /* anche chi stasera arriva più tardi («Chi c'è stasera»): la scheda si apre
+     su di lui, le mosse dicono che adesso non è qui (problemi-riscontrati,
+     voce 88) */
+  const stasera = typeof presentiOggi === "function" ? presentiOggi(8) : [];
+  if(!p) p = (G.gente || []).find(x => x.id === CIRCOLO.scelto && (tutti.indexOf(x) >= 0 || stasera.indexOf(x) >= 0)) || chi[0] || tutti[0] || null;
+  const arriva = p && tutti.indexOf(p) < 0;
   if(p) CIRCOLO.scelto = p.id;
   const chip = (id, n) => '<button type="button" class="cc-chip' + (filtro === id ? " on" : "") + '" data-cc-filtro="' + id + '">' + n + '</button>';
   const lista = chi.length ? chi.map(x => ccRigaPersona(x, p && x.id === p.id, ccRelBadge(x))).join("")
@@ -186,7 +191,9 @@ function ccSala(f){
     const perc = p.rel >= 5 ? 100 : Math.max(0, Math.min(100, Math.round(Number(p.pt || 0) / soglia * 100)));
     const rel = relNome(p);
     const gen = p.gen && typeof BEAT_GEN !== "undefined" && BEAT_GEN[p.gen] ? BEAT_GEN[p.gen].n : "";
-    const azioni = ccDialogo(p) || ('<div class="cc-salaz">' + ccVociSala(p) + ccBeatSulTavolo(p) + '</div>');
+    const azioni = ccDialogo(p) || (arriva
+      ? '<p class="cc-sotto">' + ccNome(p) + ' arriva più tardi, stasera: adesso non è in sala.</p>'
+      : '<div class="cc-salaz">' + ccVociSala(p) + ccBeatSulTavolo(p) + '</div>');
     scheda =
       '<div class="cc-shero">' +
         '<div class="cc-shtx"><h3>' + ccNome(p) + '</h3><em>' + ccRuolo(p) + '</em>' +
@@ -209,7 +216,6 @@ function ccSala(f){
   }
 
   /* a destra: chi c'è stasera e cosa ti può dare la sala */
-  const stasera = typeof presentiOggi === "function" ? presentiOggi(8) : [];
   const facce = stasera.map(x => '<button type="button" class="cc-sface' + (p && x.id === p.id ? " on" : "") + '" data-cc-chi="' + x.id + '">' +
     '<span>' + ccFaccia(x) + '</span><b>' + ccNome(x) + '</b><em>' + ccRuolo(x) + '</em>' + ccRelBadge(x) + '</button>').join("");
   const opp = (ic, n, d, ok) => '<li class="' + (ok ? "ok" : "") + '"><i>' + ccIco(ic) + '</i><b>' + n + '</b><em>' + d + '</em><s>' + ccIco(ok ? "freccia" : "lucchetto") + '</s></li>';
@@ -310,7 +316,8 @@ function ccPalcoStanza(f){
   /* i tre momenti e la gente */
   const passo = s ? s.passo : e ? 3 : -1;
   const passi = CC_PASSI.map((n, i) => '<li class="' + (passo > i ? "fatto" : passo === i ? "ora" : "") + '"><i>' + (passo > i ? ccIco("spunta") : "") + '</i><b>' + n + '</b></li>').join("");
-  const pub = s ? s.pubblico : 50;
+  const finita = !s && e && CIRCOLO.pubblico != null;
+  const pub = s ? s.pubblico : finita ? CIRCOLO.pubblico : 50;
   const nomePub = pub < 30 ? "Freddo" : pub < 55 ? "Tiepido" : pub < 75 ? "Caldo" : "In delirio";
   const seg = Array.from({length:16}, (_, i) => '<i class="' + (i < Math.round(pub / 100 * 16) ? (i < 5 ? "r" : i < 10 ? "g" : "v") : "") + '"></i>').join("");
 
@@ -336,7 +343,7 @@ function ccPalcoStanza(f){
     '</section>' +
     '<section class="cc-pmid">' +
       '<ol class="cc-passi">' + passi + '</ol>' +
-      '<div class="cc-reaz"><i>' + ccIco("gente") + '</i><div><h4>Reazione del pubblico</h4><div class="cc-seg">' + seg + '</div></div><b>' + (s ? nomePub : "—") + '</b></div>' +
+      '<div class="cc-reaz"><i>' + ccIco("gente") + '</i><div><h4>Reazione del pubblico</h4><div class="cc-seg">' + seg + '</div></div><b>' + (s || finita ? nomePub : "—") + '</b></div>' +
     '</section>' +
     '<section class="cc-pdx"><h2 class="cc-ptit">' + (s ? (s.tipo === "live" ? "Il live" : "Open mic") : "Il palco") + '</h2>' +
       '<div class="cc-pan2 cc-momento2">' + momento + '</div></section>' +
@@ -401,8 +408,8 @@ function ccBackstage(f){
         '<p class="cc-fno"><b>Cosa no:</b> ' + ccEsc(x.no) + '</p></div>' +
       '<div class="cc-bsaz">' +
         (fatto ? '<p class="cc-sotto">' + (fatto === "foto" ? "Avete fatto la foto." : "Ti ha detto il perché, e te lo sei segnato.") + '</p>'
-          : '<button type="button" class="cc-bsrow" data-cc-fan="' + x.id + '" data-scelta="foto"><i>' + ccIco("foto") + '</i><span><b>Ringrazia e fate una foto</b><em>La posta stanotte: un punto di hype, qualche fan.</em></span><s>' + ccIco("freccia") + '</s></button>' +
-            '<button type="button" class="cc-bsrow" data-cc-fan="' + x.id + '" data-scelta="critica"><i>' + ccIco("orecchio") + '</i><span><b>Chiedi cosa cambierebbe</b><em>La critica, nel dettaglio: ti insegna qualcosa.</em></span><s>' + ccIco("freccia") + '</s></button>') +
+          : '<button type="button" class="cc-bsrow" data-cc-fan="' + x.id + '" data-fan="foto"><i>' + ccIco("foto") + '</i><span><b>Ringrazia e fate una foto</b><em>La posta stanotte: un punto di hype, qualche fan.</em></span><s>' + ccIco("freccia") + '</s></button>' +
+            '<button type="button" class="cc-bsrow" data-cc-fan="' + x.id + '" data-fan="critica"><i>' + ccIco("orecchio") + '</i><span><b>Chiedi cosa cambierebbe</b><em>La critica, nel dettaglio: ti insegna qualcosa.</em></span><s>' + ccIco("freccia") + '</s></button>') +
         ccDettoRiga() + '</div></div>';
   } else if(sel === "ospite" && o){
     scheda = '<div class="cc-bscard">' +

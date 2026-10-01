@@ -6650,3 +6650,117 @@ vuoto non compare, perché `studioAutoRiga()` senza pezzo non scrive niente.
 - **RISOLTO (01/10/2026)** — stesso branch, prima del push: `studio.css?v=13`, `state.js?v=15`,
   `studio.js?v=16`, `strada.js?v=13`, `eventi-v2.js?v=1228`; `tempo-controlli.js?v=19` è arrivato
   col fix del widget, da `task/test-fabbrica-dopo-pizzeria`.
+
+## Giro del 01/10/2026 (segnala-problemi, fine task `task/circolo-orari-e-pagine`, commit `ab18a4f7`)
+
+Come chiesto non ho fatto girare né la verifica né i test (la verifica completa era già verde):
+ho letto il codice cambiato rispetto a `origin/main` e chi lo chiama. Guardato e **a posto**:
+
+- **Le funzioni e le foto tolte.** Nessun file del gioco chiama più `ccGente`, `ccPalco`,
+  `ccSerata`, `ccMomenti`, `ccPannello`, `ccScheda`, `ccNessuno` o un `data-pan`;
+  `circoloDopoDisegno` c'è ancora (ora fa solo pulizia), e `luoghi-foto.js:176` la trova.
+  `palco.jpg`, `serata.jpg` e `live_club.png` non li cita più nessun file del gioco (solo i
+  fogli di `implementazioni/` e `registro-modifiche/`, che sono storia). Le classi del vecchio
+  disegno non le cerca più nessuno, né i test né l'audit (l'audit controlla anzi che
+  `cc-giu` *non* ci sia). I due file nuovi non danno a niente lo stesso nome di una cosa
+  che c'è già in un altro file: all'avvio non si rompe niente. I numeri `?v=` dei file
+  cambiati sono stati tutti alzati.
+- **Il live partito da fuori.** La card o l'agenda aprono la pagina (`apriLuogo` con
+  `da:"mossa"`), poi arriva l'esito, e `circoloParti` (`circolo.js:246`) porta sul Palco, che
+  lo mostra con «Continua»; «Continua» chiude la pagina, come prima. Il live non ha un
+  filmato suo, quindi l'esito c'è già quando la serata a momenti ci aggiunge «La gente: …/100».
+- **La serata a metà.** Mentre sei sul palco «Il Circolo» in alto è spento, ma ci sono sempre
+  le tre risposte e la serata si chiude da sola alla terza. «Torna alla mappa» del menu
+  funziona lo stesso (`menu-sistema.js:405` chiude la pagina e basta): non si resta mai
+  chiusi dentro. Rientrando la stessa sera si torna sul palco a metà; se nel frattempo sei
+  andato altrove la serata è finita lì (è la scelta già scritta per «La serata lasciata a metà»).
+- **I salvataggi vecchi.** Senza `G.circolo.oggi`: `circoloOggi()` lo crea vuoto alla prima
+  lettura, e quando cambia il giorno lo rifà da capo. Senza `p.visto`: vale «no», come prima.
+  Una serata salvata a metà ha la stessa forma di prima (il freestyle una serata non la apriva).
+- **Il discorso di posto.js e il cambio di stanza.** Da una stanza all'altra si passa solo da
+  «Il Circolo», che chiude il discorso a metà: al ritorno non c'è una risposta che punta a una
+  persona sparita.
+- **L'inglese.** `js/lingua.js` traduce solo il menu e i pannelli fissi; nessuna pagina dei
+  posti (Casa, Palestra, Studio) ci passa, quindi le stanze in italiano sono come le altre.
+- **La misura della fascia.** Con la pagina chiusa la fascia misura zero e il gioco non
+  scrive niente (`luoghi-foto.js:125`); quando la pagina si riapre la misura riparte da
+  sola. Su computer la fascia è alta come prima (58), quindi Casa, Palestra, Fabbrica e
+  Pizzeria non si spostano. Non può girare all'infinito: cambia la pagina sotto, non la fascia.
+- **Il telefono, sulla carta.** Il passaggio del mouse sugli orari e sui tasti sta tutto sotto
+  «solo dove c'è un mouse»; col dito la linguetta si apre e si chiude toccandola. La striscia
+  degli orari non copre il cartello Backstage: la foto si ferma prima. Non l'ho provato su
+  uno schermo vero: quello è il lavoro di `prova-sul-telefono`.
+
+### 85. Il contatto dell'artista nel backstage si può avere ogni sera, e la gente non smette di crescere
+- **dove** — `frontend/js/game/circolo-incontri.js:319` (con `posto.js:27` e `posto.js:559`)
+- **cosa succede** — «Chiedi un contatto» crea ogni volta una persona nuova, già «contatto».
+  Il «una volta per sera» si azzera col giorno, e il «ti ha notato» pure: ogni sera ti
+  presenti, ti nota, e hai una persona nuova in 20 minuti. Il gioco dice che in provincia
+  girano al massimo 8 persone, ma questa strada il tetto non lo guarda: dopo un mese sono
+  una trentina. E siccome sono già oltre il tetto, il gioco smette di far arrivare
+  sconosciuti nuovi al bancone; in più chi ha un rapporto più alto si vede prima, e queste
+  persone nuove spingono fuori dalla sala quelle di prima. L'artista è sempre uno dei cinque,
+  quindi «te l'ha presentato Raiz» si ripete ogni cinque giorni.
+- **come si vede** — una sera di fila dopo l'altra: backstage, Presentati finché ti nota,
+  Chiedi un contatto; guarda la Sala dopo qualche settimana.
+- **quanto pesa** — si vede ma si gira intorno.
+- **RISOLTO (01/10/2026)** — stesso branch, prima del push: ogni artista ti presenta qualcuno
+  una volta sola (`G.circolo.presentati`), e con la Sala già a `POSTO_MAX` non nasce nessuno:
+  l'artista parla bene di te a uno che conosci (due pezzi di rapporto). Due prove in
+  `circolo-stanze.test.js`, un controllo nell'audit.
+
+### 86. Il tasto dei fan nel backstage funziona per caso
+- **dove** — `frontend/js/game/circolo-stanze.js:404-405`, `frontend/js/game/luoghi-foto.js:841`
+- **cosa succede** — i due tasti del fan («Ringrazia e fate una foto», «Chiedi cosa
+  cambierebbe») dicono cosa sono con lo stesso nome (`data-scelta`) che la pagina dei posti
+  usa per Pesi/Cardio della palestra. Al tocco quella risponde per prima, ridisegna tutto e si
+  ferma; solo dopo il Circolo guarda lo stesso tocco e fa la mossa. Oggi funziona, ma si
+  sente due volte il clic e la pagina si ridisegna due volte; basta che una delle due cambi
+  l'ordine o aggiunga un controllo e il tasto non fa più niente, senza errori.
+- **come si vede** — backstage di sera con un pezzo fuori, tocca un fan e poi la foto:
+  due clic.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (01/10/2026)** — i tasti dei fan usano `data-fan`, non più `data-scelta`: il clic
+  lo legge solo il Circolo.
+
+### 87. Le mosse nuove danno ogni sera hype e abilità, e «+0,4» scritto non è quello che entra (da decidere)
+- **dove** — `frontend/js/game/circolo-incontri.js:432-440` (i fan), `:293-309` (l'artista)
+- **cosa succede** — **è soprattutto una scelta di bilanciamento, non un errore.** I numeri
+  rispettano il tetto dell'hype e le soglie dei rapporti. Ma ogni sera, solo spendendo tempo:
+  fino a 3 fan con la foto (+1 hype e 2–6 fan l'uno) o con la critica (+0,4 a un'abilità
+  l'uno), più +1 dall'artista se ti nota e +1 dal networking con lui. Fanno circa 5 punti di
+  hype a sera, ripetibili, quando un pezzo che esce ne dà 6–15: va con la voce 65 («l'hype sta
+  al tetto») e la 61 (abilità al tetto in un anno). L'errore piccolo è il testo: la critica
+  scrive «Rap +0,4», ma l'abilità sale meno quanto più è alta (`sim.js:58`), quindi il numero
+  scritto è più grande di quello vero.
+- **come si vede** — backstage di sera con un pezzo fuori: tre fan, tre critiche, e guarda
+  quanto sale Rap nel profilo.
+- **quanto pesa** — da sistemare con calma (i numeri: da decidere).
+- **RISOLTO (01/10/2026)** — deciso col tetto: tutte le stanze insieme danno al massimo due
+  punti di hype a sera (`CC_HYPE_SERA`; la collaborazione con l'artista, una ogni quattro
+  settimane, ne resta fuori), e la critica dei fan non scrive più «+0,4» ma «ci guadagna il
+  Rap». Una prova in `circolo-stanze.test.js`.
+
+### 88. Nella Sala una faccia di «Chi c'è stasera» apre la scheda di un altro
+- **dove** — `frontend/js/game/circolo-stanze.js:176` e `:212`, `frontend/js/game/circolo.js:610-619`
+- **cosa succede** — la colonna «Chi c'è stasera» fa vedere 8 facce, ma nella sala in quel
+  momento ce ne sono 3 (di pomeriggio) o 5 (la sera). Toccando una di quelle che non sono
+  ancora arrivate esce «Arriva più tardi», e la scheda in mezzo si apre sul primo della lista,
+  non su quello toccato; il commento nel codice dice invece che chi non è ancora arrivato
+  «si guarda dalla Sala». Era già così nel riquadro di prima: non l'ha rotto questo lavoro.
+- **come si vede** — Sala alle 15:00, tocca la sesta faccia a destra.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (01/10/2026)** — la scheda si apre su chi hai toccato anche se arriva più tardi,
+  e al posto delle mosse dice che adesso non è in sala.
+
+### 89. «Ascolta la conversazione» fa sapere il nome di uno sconosciuto
+- **dove** — `frontend/js/game/circolo-incontri.js:179-182` (con `circolo.js:136`)
+- **cosa succede** — uno che non conosci si vede come «???». Ascoltandolo, se va bene ne
+  capisci il carattere, e il gioco per questo lo considera già conosciuto: il nome compare
+  subito, nella frase e nella lista. Il commento in `circolo.js` dice che il nome si scopre
+  offrendo da bere o presentandosi, e la frase ha pure il ramo «che tipo è quello lì», che
+  così non esce mai. Se ascoltare deve bastare, è da scrivere; se no è un errore.
+- **come si vede** — al bancone scegli un «???», Ascolta la conversazione.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (01/10/2026)** — `circoloSconosciuto` non guarda più `p.scoperto`: ascoltando ne
+  capisci il carattere, il nome resta «???» finché non ci parli o ti presenti.

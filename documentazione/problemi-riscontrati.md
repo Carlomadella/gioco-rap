@@ -11,7 +11,7 @@ roadmap, nei commenti del codice) quel giro lo trova in `problemi-risolti.md`, c
 ## Cosa resta aperto al 29/09/2026
 
 I numeri sono quelli di sempre, e restano: altri documenti citano «la voce 65». La prossima
-voce nuova è la 85. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
+voce nuova è la 90. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
 [`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md) (la 7 con «Via la
 lucidità», la 9 fra «Le decisioni tue», la 10 fra quelle fuori dall'ordine); la 61 e la 65
 sono decisioni di bilanciamento e per ora stanno solo qui.
@@ -88,6 +88,10 @@ giorno nel branch e stanno in `problemi-risolti.md`.
 Dal giro di fine task del 01/10 sullo stesso branch, dopo il merge della Pizzeria: la
 voce 84 (i numeri `?v=` di sei file rimasti quelli di `main`) è chiusa lo stesso giorno e sta
 in `problemi-risolti.md`.
+
+Dal giro di fine task del 01/10 su `task/circolo-orari-e-pagine` (le quattro stanze del
+Circolo): le voci 85–89 sono chiuse lo stesso giorno nel branch, prima del push, e stanno in
+`problemi-risolti.md`. La prossima voce nuova è la 90.
 
 ---
 
@@ -750,3 +754,5 @@ merge con la Pizzeria (PR #11). Guardato e **a posto**:
 Una cosa piccola che ho visto ma non è un errore: dopo «chiudi tu il resto» la scelta
 dell'Uscita resta su «venerdì» anche per il pezzo dopo (`studio-automatico.js:71`). Si vede
 ed è una scelta normale, quindi non apro una voce.
+
+---

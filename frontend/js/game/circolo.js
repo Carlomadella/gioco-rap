@@ -131,9 +131,12 @@ function circoloPresenti(){
 function circoloStasera(){
   return typeof presentiOggi === "function" ? presentiOggi(CIRCOLO_STASERA) : [];
 }
-/* uno che non hai mai visto: il nome non lo sai ancora. Offrirgli da bere o
-   presentarti (circolo-incontri.js) te lo fa conoscere: `p.visto` */
-function circoloSconosciuto(p){ return p.rel === 0 && !p.scoperto && !p.visto && (p.ult == null || p.ult < 0); }
+/* uno che non hai mai visto: il nome non lo sai ancora. Parlarci, offrirgli
+   da bere o presentarti (circolo-incontri.js) te lo fa conoscere: `p.visto`.
+   Ascoltarlo da lontano no: ne capisci il carattere (`p.scoperto`), non il
+   nome — prima di quella mossa `scoperto` arrivava solo dal dialogo, che
+   segna già `p.ult` (problemi-riscontrati, voce 89). */
+function circoloSconosciuto(p){ return p.rel === 0 && !p.visto && (p.ult == null || p.ult < 0); }
 const CIRCOLO_CARATTERE = {aperto:"Amichevole", diffidente:"Diffidente", gasato:"Gasato", pratico:"Pratico"};
 
 /* ==================== ICONE ==================== */
@@ -227,6 +230,7 @@ function circoloApri(opz){
   CIRCOLO.nessuno = false;
   CIRCOLO.detto = null;
   CIRCOLO.orari = false;
+  CIRCOLO.pubblico = null;
   CIRCOLO.stanza = CC_STANZA_DI[opz.stanza || opz.pannello] || null;
   if(opz.persona) CIRCOLO.scelto = opz.persona;
 }
@@ -458,6 +462,7 @@ function circoloPalco(id){
     const ids = [];
     while(ids.length < 3 && pool.length) ids.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0].id);
     circoloStato().serata = {key:circoloGiorno(), tipo:id, passo:0, pubblico:50, ids:ids, hl:false, detto:""};
+    CIRCOLO.pubblico = null;
     if(typeof LUOGO !== "undefined" && LUOGO) LUOGO.esito = null;
     CIRCOLO.stanza = "palco";
     save(); renderLuogo();
@@ -499,6 +504,8 @@ function circoloFineSerata(){
   const st = circoloStato();
   const s = st.serata;
   st.serata = null;
+  /* la reazione del pubblico resta sul palco accanto all'esito */
+  CIRCOLO.pubblico = s.pubblico;
   const resa = Math.round((0.55 + s.pubblico / 100 * 0.9) * 100) / 100;
   const guarda = circoloGenteGuarda(resa);
   const sala = '<b>La gente: ' + s.pubblico + '/100.</b>';
@@ -590,6 +597,7 @@ function circoloEsci(){
   if(typeof LUOGO !== "undefined" && LUOGO) LUOGO.esito = null;
   CIRCOLO.stanza = null;
   CIRCOLO.detto = null;
+  CIRCOLO.pubblico = null;
   renderLuogo();
 }
 /* dopo il disegno: la chiama renderLuogo (luoghi-foto.js) */
@@ -635,7 +643,7 @@ if($("luogo")){
     /* le mosse nuove delle stanze (circolo-incontri.js) */
     if(d.ccBan){ circoloBancone(d.ccBan, CIRCOLO.scelto); return; }
     if(d.ccBsm){ circoloBackstage(d.ccBsm, CIRCOLO.bsSel); return; }
-    if(d.ccFan){ circoloFanMossa(d.ccFan, d.scelta); return; }
+    if(d.ccFan){ circoloFanMossa(d.ccFan, d.fan); return; }
     if(d.ccPalco){ circoloPalco(d.ccPalco); return; }
     if(d.ccMomento != null){ circoloScegli(+d.ccMomento); return; }
     /* il beat sul tavolo: ascolta, prendi, lascia (come nella Sala di prima) */

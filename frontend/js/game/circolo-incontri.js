@@ -56,12 +56,23 @@ function ccTempoSpendi(tipo){
 }
 /* l'hype che entra davvero: sopra al tetto della fase (`hypeCap`) non sale,
    e la pagina scrive solo quello che è cambiato */
+const CC_HYPE_SERA = 2;               /* l'hype che le stanze danno in una sera, tutto insieme */
 function ccHype(n){
   const tetto = typeof hypeCap === "function" ? hypeCap() : 100;
   const prima = Number(G.hype || 0);
-  G.hype = n > 0 ? Math.max(prima, Math.min(tetto, prima + n)) : Math.max(0, prima + n);
+  if(n > 0){
+    /* una sera al Circolo vale al massimo due punti di hype, comunque li
+       prendi (problemi-riscontrati, voce 87): il resto lo fanno i pezzi e i
+       live. La collaborazione con l'artista no: è una ogni quattro settimane */
+    const oggi = circoloOggi();
+    const resto = ccHypeLibero ? n : Math.max(0, CC_HYPE_SERA - Number(oggi.hype || 0));
+    const su = Math.min(n, resto);
+    G.hype = Math.max(prima, Math.min(tetto, prima + su));
+    if(!ccHypeLibero) oggi.hype = Number(oggi.hype || 0) + Math.round(G.hype - prima);
+  } else G.hype = Math.max(0, prima + n);
   return Math.round(G.hype - prima);
 }
+let ccHypeLibero = false;
 const ccHypeTesto = d => d > 0 ? " +" + d + " hype." : d < 0 ? " " + d + " hype." : "";
 /* un pezzo di rapporto, e se basta un gradino: come la Sala (posto.js) */
 function ccRelSali(p, pt){
@@ -261,7 +272,8 @@ function circoloBackstageMosse(sel){
       voce("networking", "Fai networking", "Parla del tuo progetto e ascolta i suoi.",
         stop || (st.networking ? "Stasera l’hai già fatto" : null) || tempo("networking"), CC_TEMPO.networking + " min"),
       voce("contatto", "Chiedi un contatto", "Potrebbe presentarti a qualcuno.",
-        stop || (!st.notato ? "Prima deve averti notato" : null) || (st.contatto ? "Te l’ha già dato" : null) || tempo("contatto"),
+        stop || (!st.notato ? "Prima deve averti notato" : null) ||
+          (st.contatto || (circoloStato().presentati || {})[o.n] ? "Te l’ha già dato" : null) || tempo("contatto"),
         CC_TEMPO.contatto + " min"),
       voce("collab", "Proponi una collaborazione", "Valuta un progetto insieme.",
         stop || (!st.notato ? "Prima deve averti notato" : null) ||
@@ -318,20 +330,38 @@ function circoloBackstage(id, sel){
   }
   if(id === "contatto"){
     st.contatto = 1;
-    const ruoli = ["fonico", "videomaker", "beatmaker"].filter(r => !POSTO_RUOLI[r].da || POSTO_RUOLI[r].da(G));
-    const p = nuovaPersona(ruoli[ccNumeroGiorno() % ruoli.length]);
-    p.visto = true; p.rel = 1; p.pt = 0;
-    p.storia = "Te l’ha presentato " + o.n + " nel backstage del Circolo.";
-    G.gente.push(p);
-    ccDice(o.n + " ti presenta " + p.n + ", " + ccRuolo(p).toLowerCase() + ". Adesso è un tuo contatto.", "bene");
-    if(typeof pushLog === "function") pushLog("<b>" + o.n + "</b> ti ha presentato <b>" + p.n + "</b> (" + ccRuolo(p).toLowerCase() + ").", "");
+    /* Ogni artista ti presenta qualcuno una volta sola (`G.circolo.presentati`),
+       e la gente della Sala non passa il suo tetto (POSTO_MAX, posto.js): con la
+       Sala piena l'artista parla bene di te a uno che conosci già
+       (problemi-riscontrati, voce 85). */
+    const c = circoloStato();
+    if(!c.presentati) c.presentati = {};
+    c.presentati[o.n] = 1;
+    const pieno = typeof genteDellaSala === "function" && genteDellaSala().filter(x => !x.via).length >= POSTO_MAX;
+    const giro = (G.gente || []).filter(x => !x.via && !circoloSconosciuto(x) && x.rel < 5);
+    if(pieno && giro.length){
+      const p = giro[ccNumeroGiorno() % giro.length];
+      const salito = ccRelSali(p, 2);
+      ccDice(o.n + " conosce " + p.n + ", e gli parla bene di te." + (salito ? " Adesso siete " + relNome(p) + "." : " Due pezzi di rapporto in più."), "bene");
+    } else {
+      const ruoli = ["fonico", "videomaker", "beatmaker"].filter(r => !POSTO_RUOLI[r].da || POSTO_RUOLI[r].da(G));
+      const p = nuovaPersona(ruoli[ccNumeroGiorno() % ruoli.length]);
+      p.visto = true; p.rel = 1; p.pt = 0;
+      p.storia = "Te l’ha presentato " + o.n + " nel backstage del Circolo.";
+      G.gente.push(p);
+      ccDice(o.n + " ti presenta " + p.n + ", " + ccRuolo(p).toLowerCase() + ". Adesso è un tuo contatto.", "bene");
+      if(typeof pushLog === "function") pushLog("<b>" + o.n + "</b> ti ha presentato <b>" + p.n + "</b> (" + ccRuolo(p).toLowerCase() + ").", "");
+    }
   }
   if(id === "collab"){
     circoloStato().collab = circoloSett();
     if(Math.random() < circoloOspiteProb()){
       const h = Math.round(5 + o.fama * 0.05);
       const f = Math.round(rnd(30, 80) + Number(G.fans || 0) * 0.02);
-      const dh = ccHype(h); G.fans += f;
+      ccHypeLibero = true;
+      const dh = ccHype(h);
+      ccHypeLibero = false;
+      G.fans += f;
       if(typeof gain === "function"){ gain("rete", 1); gain("flow", 0.4); }
       ccDice(o.n + " ci sta: una strofa tua nel suo prossimo giro." + ccHypeTesto(dh) + " +" + f + " fan.", "bene");
       if(typeof pushLog === "function") pushLog("Collaborazione con <b>" + o.n + "</b>:" + ccHypeTesto(dh) + " +" + f + " fan.", "big");
@@ -373,7 +403,7 @@ function circoloSblocchi(){
   const st = circoloOggi().ospite;
   return [
     {ic:"nota", n:o ? "Feat con " + o.n : "Feat con l’artista della serata", d:"Sblocca una collaborazione per un brano.", ok:!!st.notato},
-    {ic:"gente", n:"Un contatto nuovo", d:"L’artista ti presenta qualcuno del suo giro.", ok:!!st.notato && !st.contatto},
+    {ic:"gente", n:"Un contatto nuovo", d:"L’artista ti presenta qualcuno del suo giro.", ok:!!st.notato && !st.contatto && !(o && (circoloStato().presentati || {})[o.n])},
     {ic:"stella", n:"Showcase", d:"Solo su invito: ti ci chiama un promoter, più avanti nella carriera.", ok:false},
     {ic:"stella", n:"Opening Act", d:"Apri il concerto di qualcuno: serve un nome che la gente conosce già.", ok:false}
   ];
@@ -434,9 +464,9 @@ function circoloFanMossa(fid, scelta){
     const dh = ccHype(1); G.fans += f;
     ccDice("Foto con " + fan.n + ": la posta stanotte." + ccHypeTesto(dh) + " +" + f + " fan.", "bene");
   } else {
-    const nomi = {flow:"Rap", presenza:"Carisma", scrittura:"Scrittura"};
+    const nomi = {flow:"il Rap", presenza:"il Carisma", scrittura:"la Scrittura"};
     if(typeof gain === "function") gain(fan.impara, 0.4);
-    ccDice(fan.n + " ti dice il perché, nel dettaglio. Te lo segni: " + nomi[fan.impara] + " +0,4.", "bene");
+    ccDice(fan.n + " ti dice il perché, nel dettaglio. Te lo segni: ci guadagna " + nomi[fan.impara] + ".", "bene");
   }
   if(typeof pushLog === "function") pushLog("Nel backstage hai parlato con <b>" + fan.n + "</b>, che ti segue.", "");
   ccFine();

@@ -166,6 +166,35 @@ describe("Il Circolo, le quattro stanze", () => {
     }
   });
 
+  it("l'artista ti presenta qualcuno una volta sola, anche le sere dopo", () => {
+    c.run(`circoloBackstage("presentati", "ospite"); circoloBackstage("contatto", "ospite")`);
+    const ospite = c.run("circoloOspite().n");
+    const quanti = c.ctx.G.gente.length;
+    /* la stessa sera dopo, e un'altra sera con lo stesso artista */
+    c.ctx.giorno = "1:1:9"; c.ctx.G.day = 1;
+    c.run(`circoloBackstage("presentati", "ospite")`);
+    expect(c.run("circoloOspite().n")).toBe(ospite);
+    expect(c.run(`circoloBackstage("contatto", "ospite")`)).toBe(false);
+    expect(c.ctx.G.gente.length).toBe(quanti);
+  });
+
+  it("con la Sala piena l'artista non porta gente nuova: parla bene di te a uno che conosci", () => {
+    c.run(`while(genteDellaSala().length < POSTO_MAX) G.gente.push(nuovaPersona("fonico")); G.gente.forEach(p => { p.visto = true; })`);
+    const quanti = c.ctx.G.gente.length;
+    c.run(`circoloBackstage("presentati", "ospite")`);
+    expect(c.run(`circoloBackstage("contatto", "ospite")`)).toBe(true);
+    expect(c.ctx.G.gente.length).toBe(quanti);
+    expect(c.run("CIRCOLO.detto.t")).toMatch(/parla bene di te/);
+  });
+
+  it("una sera al Circolo dà al massimo due punti di hype, comunque li prendi", () => {
+    c.ctx.G.songs.push({ t: "Neve Sporca", q: 72, mixed: true, released: true });
+    c.ctx.G.fans = 2000;
+    c.run(`circoloBackstage("presentati", "ospite"); circoloBackstage("networking", "ospite");
+      ["f0", "f1", "f2"].forEach(f => circoloFanMossa(f, "foto"))`);
+    expect(c.ctx.G.hype).toBe(2);
+  });
+
   it("chi apriva il riquadro della gente (l'agenda) apre la Sala", () => {
     c.run(`circoloApri({pannello:"gente"})`);
     expect(c.run("CIRCOLO.stanza")).toBe("sala");
