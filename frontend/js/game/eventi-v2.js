@@ -272,9 +272,20 @@ function testReq(r){
   if(t==="has_obligation") return !!G.obligation;
   if(t==="obligation_near_deadline") return !!G.obligation && G.obligation.left<=Number(r.weeks||v||10);
   if(t==="has_job") return !!G.job;
-  /* «non ci si può licenziare dal lavoro corrente»: un evento che ti offre
-     un posto (EV0035) non deve capitare a chi ce l'ha già, se no accettarlo
-     è licenziarsi da quello di prima */
+  if(t==="workplace_is"){
+    if(!G.job || typeof lavoroLuogo!=="function") return false;
+    return lavoroLuogo(G.job)===v;
+  }
+  if(t==="work_raise_available"){
+    const luogo=r.place||v||"fabbrica";
+    return typeof lavoroAumentoDisponibile==="function" && lavoroAumentoDisponibile(luogo);
+  }
+  if(t==="work_promotion_available"){
+    const luogo=r.place||v||"fabbrica";
+    return typeof lavoroPromozioneDisponibile==="function" && lavoroPromozioneDisponibile(luogo);
+  }
+  /* Un evento che offre un altro posto non deve sostituire silenziosamente
+     quello attuale. Le dimissioni della Fabbrica passano dalla sua UI. */
   if(t==="no_job") return !G.job;
   if(t==="origin_provincia"){
     const art=window.ARTIST||{};
@@ -331,6 +342,10 @@ function cooldownOk(e){
 }
 function eligible(e, opts){
   opts=opts||{};
+  /* ARC106 è il vecchio arco "promozione": oggi distribuisce somme una tantum
+     senza cambiare paga o mansione. Lo teniamo fuori dal pool finché, nel
+     passaggio eventi dedicato, verrà riscritto sui nuovi effetti reali. */
+  if(e && e.arc_id==="ARC106") return false;
   if(!e || !cityOk(e) || !phaseOk(e) || !requirementsOk(e) || !cooldownOk(e)) return false;
   if(e.tier==="high" && !opts.ignoreHigh && !highDue()) return false;
   return true;
@@ -429,6 +444,24 @@ function special(v){
     },60);
   }
   if(v.set_G_manager) G.manager=true;
+  if(v.work_raise && typeof lavoroApplicaAumento==="function"){
+    const x=v.work_raise;
+    lavoroApplicaAumento(x.place||"fabbrica",{
+      aumento:x.aumento,
+      percentuale:x.percentuale,
+      nuovaPaga:x.nuovaPaga,
+      motivo:x.motivo||"evento"
+    });
+  }
+  if(v.work_promotion && typeof lavoroPromuoviRuolo==="function"){
+    const x=v.work_promotion;
+    lavoroPromuoviRuolo(x.place||"fabbrica",{
+      nuovaPaga:x.nuovaPaga,
+      aumentoPaga:x.aumentoPaga,
+      energia:x.energia,
+      motivo:x.motivo||"evento"
+    });
+  }
   if(v.set_job){
     /* con un posto in tasca non si cambia: da un lavoro non ci si licenzia
        (vedi `no_job` in testReq; questa è la rete di sicurezza per un
@@ -2175,7 +2208,7 @@ function hookMatches(e, kind, payload){
   payload=payload||{};
   const h=e.repo_hook||{};
   if(h.kind===kind){
-    for(const key of ["action_id","job_id","colpo_id","approccio_id","gear_id","life_id","action","role","function","attivita_id","offer_id"]){
+    for(const key of ["action_id","job_id","workplace","colpo_id","approccio_id","gear_id","life_id","action","role","function","attivita_id","offer_id"]){
       if(h[key]==null) continue;
       if(h[key]==="*") continue;
       if(payload[key]!==h[key]) return false;
@@ -2512,7 +2545,11 @@ for(const a of ACTIONS){
     setTimeout(()=>{
       emitHook("after_action",{action_id:a.id});
       if(a.id==="turno" && G.job)
-        emitHook("after_job_shift",{action_id:"turno",job_id:G.job.id});
+        emitHook("after_job_shift",{
+          action_id:"turno",
+          job_id:G.job.id,
+          workplace:typeof lavoroLuogo==="function" ? lavoroLuogo(G.job) : (G.job.place||null)
+        });
     },0);
     return out;
   };
