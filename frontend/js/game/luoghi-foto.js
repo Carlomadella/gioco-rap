@@ -405,17 +405,22 @@ function lfFabbrica(){
   let orario = "Turno pieno";
   try{
     if(window.GAME_HOURS && window.GAME_TIME){
-      const st = typeof GAME_HOURS.placeJobStatus === "function"
+      /* Prima della firma controlliamo soltanto se l'edificio è accessibile:
+         la domenica deve bloccare il TURNO, non la possibilità di leggere e
+         firmare il contratto. Dopo l'assunzione vale invece placeJobStatus. */
+      const st = mio && typeof GAME_HOURS.placeJobStatus === "function"
         ? GAME_HOURS.placeJobStatus("fabbrica")
-        : GAME_HOURS.jobStatus(baseDef.id);
+        : (typeof GAME_HOURS.placeStatus === "function"
+            ? GAME_HOURS.placeStatus("fabbrica")
+            : GAME_HOURS.jobStatus(baseDef.id));
       const dur = GAME_TIME.formatDuration(
-        typeof GAME_HOURS.placeJobStatus === "function" && st && st.duration != null
+        mio && typeof GAME_HOURS.placeJobStatus === "function" && st && st.duration != null
           ? st.duration
           : GAME_HOURS.jobDuration(baseDef.id)
       );
       orario = "Turno di " + dur;
       if(st && !st.open) stato = {ok:false, perche:st.label || "Adesso e' chiuso"};
-      else if(st && !st.allDay && st.closeAt != null)
+      else if(st && !st.allDay && st.closeAt != null && mio)
         orario += " · ingresso fino alle " + GAME_TIME.format(st.closeAt - (st.duration != null ? st.duration : GAME_HOURS.jobDuration(baseDef.id)));
     }
   }catch(e){}
