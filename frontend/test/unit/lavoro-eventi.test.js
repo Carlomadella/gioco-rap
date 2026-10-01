@@ -94,10 +94,18 @@ describe("famiglie eventi lavoro", () => {
     expect(env.shown[0].t).toContain("Serata live");
 
     env.shown[0].opts[0].run();
-    expect(env.missed).toHaveLength(1);
+    expect(env.missed).toHaveLength(0);
     expect(env.started).toEqual(["turno"]);
+
+    env.ctx.ADF_WORK_EVENTS.afterShift({
+      started_at:17*60,
+      ended_at:22*60,
+      job_id:"barista"
+    },{music:1,crime:1,colleague:1,physical:1});
+
+    expect(env.missed).toHaveLength(1);
     expect(env.G.workplaces.barista.workEvents.history.some(x =>
-      x.family==="conflict" && x.choice==="work"
+      x.family==="conflict" && x.choice==="work" && x.missed===true
     )).toBe(true);
   });
 
