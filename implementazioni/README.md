@@ -33,7 +33,7 @@ per i punti, e sono in [`../documentazione/come-si-lavora.md`](../documentazione
 
 ## Tutti i punti
 
-137 voci in tutto: **102 chiuse**, 13 a metà, 17 da fare e 5 con la sola risposta scritta
+138 voci in tutto: **103 chiuse**, 13 a metà, 17 da fare e 5 con la sola risposta scritta
 (ricontate dalla tabella qui sotto il 21/09/2026, con le due piccole dell'energia — la Sala a
 zero, la take a 25 — «Lo stile che conta», lo Shop solo vestiti coi filtri e i capi che si
 sbloccano con le offerte della settimana, e le tre code dello Studio entrate quel giorno; il conto di prima era del 20/09, dopo il riordino del foglio dei punti; nello
