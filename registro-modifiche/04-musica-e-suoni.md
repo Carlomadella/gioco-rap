@@ -6,6 +6,41 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:14b1549 -->
+## 01/10/26, 21:27 — fix/registro-unico-utf8 → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `14b1549`
+
+### Cosa è entrato
+
+- `e8cf7ae` — test(mappa): aggiorna il conteggio dopo la rimozione del Centro impiego — **mycolbraga**
+- `b8d423e` — docs(registro): ripara il mojibake storico — **mycolbraga**
+- `8cb9235` — docs(registro): ripara il mojibake storico — **mycolbraga**
+- `7e09dfe` — docs(registro): ripara il mojibake storico — **mycolbraga**
+- `836a29d` — docs(registro): ripara il mojibake storico — **mycolbraga**
+- `8511f88` — docs(registro): ripara il mojibake storico — **mycolbraga**
+- `6dac263` — docs(registro): ripara il mojibake storico — **mycolbraga**
+- `f8e0268` — docs(registro): ripara il mojibake storico — **mycolbraga**
+- `9585ec5` — docs(registro): ripara il mojibake storico — **mycolbraga**
+- `5a23544` — docs(registro): ripara il mojibake storico — **mycolbraga**
+- `8df13bf` — docs(registro): ripara il mojibake storico — **mycolbraga**
+- `3168697` — docs(registro): ripara il mojibake storico — **mycolbraga**
+- `163cce2` — docs(registro): ripara il mojibake storico — **mycolbraga**
+- `5bbbdc2` — chore(git): fissa LF per il registro modifiche — **mycolbraga**
+- `0353524` — test(git): impedisce doppio writer e mojibake del registro — **mycolbraga**
+- `892485c` — fix(registro): corregge il testo del workflow — **mycolbraga**
+- `aadf981` — fix(registro): corregge le stringhe UTF-8 del generatore — **mycolbraga**
+- `8ef14d8` — fix(git): lascia il registro post-merge a GitHub Actions — **mycolbraga**
+
+### File di questa categoria
+
+- **Aggiunto:** `.gitattributes`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:747e7b7 -->
 ## 01/10/26, 13:58 — task/circolo-orari-e-pagine → main
 
