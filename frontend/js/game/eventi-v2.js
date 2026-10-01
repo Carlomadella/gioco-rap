@@ -2216,6 +2216,98 @@ function autoResolveNormal(e){
 /* Straordinari dei posti con contratto.
    Nascono dallo stato reale del posto di lavoro e passano dallo stesso arbitro
    eventi: Fabbrica e Pizzeria condividono la macchina, non il testo né i numeri. */
+
+/* La richiesta della Fabbrica non arriva più dal nulla. Le cause sotto sono
+   solo contesto narrativo: bonus, probabilità, durata e disciplina restano
+   quelli del motore lavoro. Teniamo anche memoria degli ultimi motivi mostrati
+   per non trasformare quattro settimane di turni nella stessa telefonata. */
+const ADF_FACTORY_OVERTIME_SCENARIOS = Object.freeze({
+  "sesto-giorno":Object.freeze([
+    Object.freeze({
+      id:"linea-scoperta",
+      label:"linea rimasta scoperta",
+      title:"Domani manca uno sulla linea",
+      body:"A fine turno il capolinea ti ferma: uno del reparto ha dato forfait e il sabato è rimasto corto."
+    }),
+    Object.freeze({
+      id:"recupero-fermo",
+      label:"recupero dopo un fermo linea",
+      title:"La linea deve recuperare",
+      body:"Un fermo tecnico ha mangiato ore di produzione. Per recuperare il ritardo tengono aperta la linea anche sabato."
+    }),
+    Object.freeze({
+      id:"ordine-urgente",
+      label:"ordine urgente da chiudere",
+      title:"È entrato un ordine urgente",
+      body:"Prima di timbrare l'uscita arriva la voce dal reparto: una commessa va chiusa prima di lunedì e cercano una persona in più."
+    }),
+    Object.freeze({
+      id:"reparto-scoperto",
+      label:"reparto vicino sotto organico",
+      title:"Il reparto accanto è corto",
+      body:"Due persone sono state spostate su un'altra linea e il sabato è rimasto un buco. Il capo prova a coprirlo con chi ha già chiuso la propria settimana."
+    })
+  ]),
+  domenica:Object.freeze([
+    Object.freeze({
+      id:"guasto-recupero",
+      label:"recupero produzione dopo un guasto",
+      title:"Il guasto ha lasciato indietro la produzione",
+      body:"La domenica sarebbe riposo, ma un guasto durante la settimana ha lasciato una consegna indietro. Stanno montando un turno straordinario di recupero."
+    }),
+    Object.freeze({
+      id:"spedizione-lunedi",
+      label:"spedizione di lunedì da preparare",
+      title:"Lunedì parte una spedizione grossa",
+      body:"Una spedizione deve uscire lunedì mattina e il reparto non ha chiuso tutto. Per finirla riaprono eccezionalmente domenica."
+    }),
+    Object.freeze({
+      id:"consegna-anticipata",
+      label:"consegna anticipata dal cliente",
+      title:"Il cliente ha anticipato la consegna",
+      body:"Una commessa che doveva uscire più avanti è stata anticipata. Il responsabile cerca volontari per recuperare domenica."
+    }),
+    Object.freeze({
+      id:"turno-recupero-scoperto",
+      label:"turno di recupero rimasto scoperto",
+      title:"Il turno di recupero è rimasto scoperto",
+      body:"Dovevano bastare quelli già segnati, ma all'ultimo manca una persona. Ti chiedono se puoi coprire la domenica."
+    })
+  ])
+});
+
+function adfFactoryOvertimeScenario(offerta){
+  if(!offerta) return null;
+  const key=offerta.tipo==="domenica" ? "domenica" : "sesto-giorno";
+  const pool=ADF_FACTORY_OVERTIME_SCENARIOS[key]||[];
+  if(!pool.length) return null;
+
+  const s=st();
+  const recent=Array.isArray(s.runtime.factoryOvertimeRecent)
+    ? s.runtime.factoryOvertimeRecent
+    : (s.runtime.factoryOvertimeRecent=[]);
+  const candidati=pool.filter(x=>!recent.includes(x.id));
+  const scelta=(candidati.length?candidati:pool)[Math.floor(Math.random()*(candidati.length?candidati.length:pool.length))];
+
+  recent.unshift(scelta.id);
+  if(recent.length>3) recent.length=3;
+
+  offerta.scenarioId=scelta.id;
+  offerta.scenarioLabel=scelta.label;
+
+  /* L'offerta restituita da actions.js è una copia. Aggiorniamo anche quella
+     persistente, così il motivo resta visibile dopo l'accettazione nella
+     schermata Fabbrica e non cambia a ogni render. */
+  if(typeof lavoroStraordinarioStato==="function"){
+    const overtime=lavoroStraordinarioStato("fabbrica");
+    if(overtime&&overtime.pendingOffer){
+      overtime.pendingOffer.scenarioId=scelta.id;
+      overtime.pendingOffer.scenarioLabel=scelta.label;
+    }
+  }
+  return scelta;
+}
+
 function adfWorkOvertimeAfterShift(){
   if(!G.job || typeof lavoroLuogo!=="function") return false;
   const luogo=lavoroLuogo(G.job);
@@ -2245,14 +2337,17 @@ function adfWorkOvertimeAfterShift(){
 
   const fabbrica=luogo==="fabbrica";
   const domenica=offerta.tipo==="domenica";
+  const scenario=fabbrica ? adfFactoryOvertimeScenario(offerta) : null;
   const nome=fabbrica?"Fabbrica":"Pizzeria";
   const titolo=fabbrica
-    ? (domenica?"Ti serve anche domenica?":"Puoi coprire anche sabato?")
+    ? (scenario ? scenario.title : (domenica?"Ti serve anche domenica?":"Puoi coprire anche sabato?"))
     : "Riesci a coprire un altro servizio?";
   const descrizione=fabbrica
-    ? ((domenica
-        ? "Domani la Fabbrica sarebbe chiusa per il tuo contratto, ma manca personale."
-        : "Hai già coperto i cinque giorni del contratto. Domani manca una persona sulla linea.") +
+    ? ((scenario
+        ? scenario.body
+        : (domenica
+          ? "Domani la Fabbrica sarebbe chiusa per il tuo contratto, ma manca personale."
+          : "Hai già coperto i cinque giorni del contratto. Domani manca una persona sulla linea.")) +
       "<br><br>Il capo ti chiede se puoi entrare <b>"+giorno+"</b>.")
     : ("Hai già coperto i quattro servizi del contratto. Nel weekend la sala è piena e manca una persona in cucina." +
       "<br><br>Il titolare ti chiede se puoi coprire anche <b>"+giorno+"</b>.");

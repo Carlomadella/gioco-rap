@@ -80,10 +80,10 @@ function ambiente(overrides = {}){
 }
 
 describe("famiglie eventi lavoro", () => {
-  it("espone esattamente le otto famiglie concordate", () => {
+  it("espone anche la famiglia di eventi legata alla responsabilità del ruolo", () => {
     const env=ambiente();
     expect(Object.keys(env.ctx.ADF_WORK_EVENTS.families)).toEqual([
-      "discipline","career","overtime","colleague",
+      "discipline","career","overtime","colleague","role",
       "music","crime","conflict","physical"
     ]);
   });
@@ -220,6 +220,39 @@ describe("famiglie eventi lavoro", () => {
     expect(env.G.gente[0].pt).toBe(2);
     expect(env.G.skills.rete).toBeCloseTo(0.4);
     expect(env.G.wellbeing).toBe(59);
+  });
+
+  it("un Capoturno può ricevere un evento specifico del suo ruolo con effetti reali", () => {
+    const career={reliability:70};
+    const env=ambiente({
+      random:0.9,
+      G:{
+        year:1,week:10,day:3,
+        job:{id:"capoturno",place:"fabbrica",n:"Capoturno",pay:330,e:28},
+        workplaces:{},gente:[],skills:{rete:0},wellbeing:70,lucidita:60,shifts:2,
+        strada:{giroAvviato:false}
+      },
+      extra:{
+        lavoroLuogo:job => job && job.place,
+        lavoroReteChiave:job => job && (job.place||job.id),
+        lavoroCarriera:()=>career
+      }
+    });
+
+    expect(env.ctx.ADF_WORK_EVENTS.afterShift({},{
+      music:1,role:0,crime:1,colleague:1,physical:1
+    })).toBe(true);
+    expect(env.shown).toHaveLength(1);
+    expect(env.shown[0].k).toContain("Capoturno");
+
+    const primaLuc=env.G.lucidita;
+    env.shown[0].opts[0].run();
+
+    expect(career.reliability).toBeGreaterThan(70);
+    expect(env.G.lucidita).toBeLessThan(primaLuc);
+    expect(env.G.workplaces.fabbrica.workEvents.history.some(x =>
+      x.family==="role" && x.roleId==="capoturno" && x.status==="resolved"
+    )).toBe(true);
   });
 
   it("la carriera eventi segue anche la Pizzeria strutturata, non solo la Fabbrica", () => {
@@ -419,7 +452,7 @@ describe("famiglie eventi lavoro", () => {
     expect(strada).toContain("ADF_WORK_EVENTS.consumeCrimeLead(successo)");
     expect(strada).toContain('"Dritta " + lead.sourceLabel');
     expect(eventi).toContain("ADF_WORK_EVENTS.crimeLeadActive()) return false");
-    expect(html).toContain('js/game/lavoro-eventi.js?v=2');
+    expect(html).toContain('js/game/lavoro-eventi.js?v=3');
     expect(famepedia).toContain("Quando il lavoro si scontra con la musica");
   });
 });

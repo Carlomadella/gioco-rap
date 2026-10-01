@@ -478,6 +478,10 @@ function lfFabbrica(){
     e:G.job.e,
     d:G.job.d || baseDef.d
   } : baseDef;
+  const effettiRuolo = mio && typeof lavoroEffettiTurno === "function"
+    ? lavoroEffettiTurno("fabbrica", G.job)
+    : null;
+  const energiaTurno = effettiRuolo ? Number(effettiRuolo.energia || def.e) : def.e;
   let stato = {ok:true, perche:""};
   let orario = "Turno pieno";
   try{
@@ -509,12 +513,20 @@ function lfFabbrica(){
   else if(bloccoRiassunzione.active)
     stato = {ok:false, perche:"Riassunzione bloccata · " + bloccoRiassunzione.weeksRemaining +
       (bloccoRiassunzione.weeksRemaining === 1 ? " settimana" : " settimane")};
-  else if(stato.ok && G.energy < def.e) stato = {ok:false, perche:"Serve energia"};
+  else if(stato.ok && G.energy < energiaTurno) stato = {ok:false, perche:"Serve energia"};
+
+  const caricoRuolo = effettiRuolo
+    ? (Math.abs(Number(effettiRuolo.benessere || 0)) + " benessere · " +
+       Math.abs(Number(effettiRuolo.lucidita || 0)) + " lucidità" +
+       (effettiRuolo.fisico ? " · fisico " + lfEsc(effettiRuolo.fisico) : "") +
+       (effettiRuolo.stress ? " · stress " + lfEsc(effettiRuolo.stress) : ""))
+    : null;
 
   const sx = lfPan("Il posto",
     lfRiga("Mansione", def.n) +
     lfRiga("Paga", fmt(def.pay) + " €", "oro") +
-    lfRiga("Costo", "−" + def.e + " energia") +
+    lfRiga("Costo", "−" + energiaTurno + " energia") +
+    (caricoRuolo ? lfRiga("Impatto turno", caricoRuolo) : "") +
     '<p class="stnota lfnotasotto">' + lfEsc(def.d) + '</p>' +
     (mio
       ? '<button type="button" class="lfdimissioni" data-dimissioni="fabbrica">Dai le dimissioni</button>'
@@ -543,7 +555,7 @@ function lfFabbrica(){
     on:true,
     n:mio ? "Il tuo turno" : "Posto in Fabbrica",
     d:orario + (quota ? " · " + quota + " giorni/settimana" : ""),
-    v:stato.ok ? (fmt(pagaTurno.totale) + " €" + notaBonus + " · −" + def.e + " energia") : stato.perche,
+    v:stato.ok ? (fmt(pagaTurno.totale) + " €" + notaBonus + " · −" + energiaTurno + " energia") : stato.perche,
     vCls:stato.ok ? "" : "calmo"
   });
   const testo = mio
@@ -557,9 +569,11 @@ function lfFabbrica(){
       (mio
         ? (straordinarioOggi
             ? '<b>Straordinario concordato oggi:</b> ' + lfEsc(straordinarioOggi.targetLabel) +
+              (straordinarioOggi.scenarioLabel ? ' · ' + lfEsc(straordinarioOggi.scenarioLabel) : '') +
               ' · maggiorazione +' + Number(straordinarioOggi.bonusPct || 0) + '%.'
             : straordinarioAccettato
               ? '<b>Straordinario concordato:</b> ' + lfEsc(straordinarioAccettato.targetLabel) +
+                (straordinarioAccettato.scenarioLabel ? ' · ' + lfEsc(straordinarioAccettato.scenarioLabel) : '') +
                 ' · maggiorazione +' + Number(straordinarioAccettato.bonusPct || 0) + '%.'
               : pagaTurno.percentuale
                 ? '<b>' + lfEsc(pagaTurno.etichetta) + ':</b> questo turno ha una maggiorazione del ' + pagaTurno.percentuale + '%.'
@@ -573,7 +587,7 @@ function lfFabbrica(){
       (stato.ok ? "" : " disabled") + '>' + lfIco("orologio") + lfEsc(testo) +
       ' · +' + fmt(pagaTurno.totale) + ' €' +
       (pagaTurno.percentuale ? ' (+' + pagaTurno.percentuale + '%)' : '') +
-      ' · −' + def.e + ' energia</button></div>' +
+      ' · −' + energiaTurno + ' energia</button></div>' +
     (stato.ok ? "" : '<p class="stperche">' + lfEsc(stato.perche) + '.</p>'),
     "orologio");
 

@@ -83,6 +83,35 @@ describe("cartellino presenze Fabbrica", () => {
     expect(ctx.G.workplaces.fabbrica.attendance.turni).toEqual([0,1,1]);
   });
 
+  it("i quattro ruoli Fabbrica cambiano davvero carico fisico e mentale", () => {
+    const ctx = {
+      G:{year:1,week:1,day:1,job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40}},
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => 1;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    const operaio = vm.runInContext('lavoroEffettiTurno("fabbrica",G.job)', ctx);
+    expect(operaio.energia).toBe(40);
+    expect(operaio.benessere).toBe(-3);
+    expect(operaio.lucidita).toBe(-1);
+
+    ctx.G.job.id="capolinea"; ctx.G.job.n="Capolinea";
+    const capolinea = vm.runInContext('lavoroEffettiTurno("fabbrica",G.job)', ctx);
+    expect(capolinea.energia).toBe(32);
+    expect(capolinea.benessere).toBe(-1);
+    expect(capolinea.lucidita).toBe(-2);
+
+    ctx.G.job.id="capoturno"; ctx.G.job.n="Capoturno";
+    const capoturno = vm.runInContext('lavoroEffettiTurno("fabbrica",G.job)', ctx);
+    expect(capoturno.energia).toBe(28);
+    expect(capoturno.benessere).toBe(-1);
+    expect(capoturno.lucidita).toBe(-3);
+    expect(capoturno.fisico).toBe("basso");
+    expect(capoturno.stress).toBe("molto alto");
+  });
+
   it("definisce il contratto Fabbrica: 5 giorni, lunedì-sabato, domenica riposo", () => {
     const ctx = { G:{year:1,week:1,day:1}, Number, Math, Array, Object, Set };
     ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
@@ -795,10 +824,16 @@ describe("cartellino presenze Fabbrica", () => {
     expect(eventi).toContain("function adfWorkOvertimeAfterShift()");
     expect(eventi).toContain('claimAutoEvent("work-overtime:"+luogo)');
     expect(eventi).toContain('const fabbrica=luogo==="fabbrica"');
+    expect(eventi).toContain("ADF_FACTORY_OVERTIME_SCENARIOS");
+    expect(eventi).toContain('id:"recupero-fermo"');
+    expect(eventi).toContain('id:"spedizione-lunedi"');
+    expect(eventi).toContain("adfFactoryOvertimeScenario(offerta)");
+    expect(eventi).toContain("overtime.pendingOffer.scenarioLabel=scelta.label");
     expect(eventi).toContain("lavoroAccettaStraordinario(luogo)");
     expect(eventi).toContain('lavoroAggiornaStraordinariTempo();');
     expect(luoghi).toContain("straordinarioOggi");
     expect(luoghi).toContain("straordinarioAccettato.targetLabel");
+    expect(luoghi).toContain("straordinarioAccettato.scenarioLabel");
   });
 
   it("dopo almeno tre turni può nascere una conoscenza persistente di Fabbrica", () => {
@@ -989,6 +1024,14 @@ describe("cartellino presenze Fabbrica", () => {
     expect(luoghi).toContain('t:"Dare le dimissioni?"');
     expect(luoghi).toContain('n:"Dai le dimissioni"');
     expect(luoghi).toContain('lavoroTerminaContratto(luogo, "dimissioni")');
+  });
+
+  it("la UI Fabbrica mostra energia e impatto del ruolo corrente", () => {
+    const luoghi = leggi("js/game/luoghi-foto.js");
+    expect(luoghi).toContain('lavoroEffettiTurno("fabbrica", G.job)');
+    expect(luoghi).toContain('lfRiga("Impatto turno", caricoRuolo)');
+    expect(luoghi).toContain('effettiRuolo.fisico');
+    expect(luoghi).toContain('effettiRuolo.stress');
   });
 
   it("il turno usa il luogo e la UI Fabbrica non dipende dall'id operaio", () => {
