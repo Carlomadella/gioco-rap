@@ -114,8 +114,6 @@ function avviaAzioneDiretta(id){
   const g = ART[a.id] || ["#3A3F49","#22262E","·"];
 
   const esegui = () => {
-    const lavoroGate = guardiaEventoLavoro(a.id);
-    if(!lavoroGate.ok) return false;
     try{
       if(window.GAME_TRAVEL && typeof GAME_TRAVEL.guardAction === "function"){
         const gate = GAME_TRAVEL.guardAction(a.id);
@@ -131,6 +129,9 @@ function avviaAzioneDiretta(id){
           "bad","!",["#B91C1C","#7F1D1D"]);
       return false;
     }
+
+    const lavoroGate = guardiaEventoLavoro(a.id);
+    if(!lavoroGate.ok) return false;
 
     const fansBefore = G.fans;
     const moneyBefore = G.money;
@@ -315,8 +316,6 @@ function renderGioco(){
       /* La tile «spenta» arriva fin qui apposta: è cliccabile solo per poter
          rispondere. Nessuna energia scalata, nessuna mossa avviata. */
       if(b.classList.contains("spenta")){ avvisoSenzaEnergia(a.id); return; }
-      const lavoroGate = guardiaEventoLavoro(a.id);
-      if(!lavoroGate.ok) return;
       /* Le tile disabilitate da orari/spostamenti/clock sono solo UI.
          Prima di toccare energia, soldi o statistiche chiediamo al runtime
          se la mossa è davvero eseguibile in questo preciso momento. */
@@ -334,6 +333,9 @@ function renderGioco(){
           toast("<b>Mossa non avviata.</b> Controllo luogo/orario non disponibile.","bad","!",["#B91C1C","#7F1D1D"]);
         return;
       }
+
+      const lavoroGate = guardiaEventoLavoro(a.id);
+      if(!lavoroGate.ok) return;
 
       const fansBefore = G.fans, moneyBefore = G.money;
       G.energy -= en2;
