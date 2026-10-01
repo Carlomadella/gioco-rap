@@ -112,14 +112,14 @@
   color:rgba(255,255,255,.5);font-size:11px;font-weight:900;font-variant-numeric:tabular-nums}
 .lfpres-day.fatto{border-color:rgba(242,193,78,.58);background:rgba(242,193,78,.16);color:var(--stOro);
   box-shadow:inset 0 0 0 1px rgba(242,193,78,.08)}
-/* Domenica = riposo contrattuale: rosso scuro anche nelle settimane future.
-   Se c'è uno straordinario resta rossa, ma il timbro oro rimane leggibile. */
-.lfpres-day.domenica{
+/* Il giorno di riposo dipende dal contratto: domenica in Fabbrica,
+   lunedì in Pizzeria. Resta rosso scuro anche nelle settimane future. */
+.lfpres-day.riposo,.lfpres-day.domenica{
   border-color:rgba(185,28,28,.46);
   background:rgba(127,29,29,.22);
   color:rgba(254,202,202,.72)
 }
-.lfpres-day.domenica.fatto{
+.lfpres-day.riposo.fatto,.lfpres-day.domenica.fatto{
   border-color:rgba(239,68,68,.58);
   background:rgba(127,29,29,.28);
   color:var(--stOro);
@@ -136,7 +136,7 @@
 }
 .lfpres-day.oggi{outline:1px solid var(--stAzz);outline-offset:1px}
 .lfpres-day.futuro{opacity:.32}
-.lfpres-day.domenica.futuro{opacity:.58}
+.lfpres-day.riposo.futuro,.lfpres-day.domenica.futuro{opacity:.58}
 .lfpres-day.fatto.futuro{opacity:1}
 .lfpres-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 10px;margin-top:8px;padding-top:9px;
   border-top:1px solid rgba(125,175,215,.14);font-size:12px;color:var(--stSoft)}
