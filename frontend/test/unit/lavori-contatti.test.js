@@ -143,6 +143,8 @@ describe("identità sociale dei lavori", () => {
     expect(telefono).toContain('promoter:"Promoter"');
     expect(telefono).toContain('collega:"Collega"');
     expect(telefono).toContain('strada:"Conoscenza della Strada"');
+    expect(telefono).toContain('data-chat="sala:' + "' + p.id + '" + '"');
+    expect(telefono).toContain('disabled aria-disabled="true"');
   });
 
   it("l'incontro nasce a fine turno e passa dall'arbitro eventi", () => {
