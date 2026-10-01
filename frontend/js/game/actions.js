@@ -223,10 +223,30 @@ const ADF_FABBRICA_CARRIERA = Object.freeze({
     affidabilitaSaltato:-5
   }),
   ruoli:Object.freeze([
-    Object.freeze({id:"operaio", n:"Operaio"}),
-    Object.freeze({id:"operaio_esperto", n:"Operaio esperto"}),
-    Object.freeze({id:"capolinea", n:"Capolinea"}),
-    Object.freeze({id:"capoturno", n:"Capoturno"})
+    /* La promozione cambia davvero il modo in cui pesa il turno.
+       L'energia rappresenta soprattutto il carico fisico; benessere/lucidità
+       separano invece fatica e pressione mentale. I ruoli alti consumano meno
+       corpo ma chiedono più testa e responsabilità. */
+    Object.freeze({
+      id:"operaio", n:"Operaio", energia:40, benessereTurno:-3, luciditaTurno:-1,
+      fisico:"alto", stress:"basso",
+      d:"Linea di montaggio: lavoro fisico, ritmo ripetitivo e poche responsabilità sugli altri."
+    }),
+    Object.freeze({
+      id:"operaio_esperto", n:"Operaio esperto", energia:36, benessereTurno:-2, luciditaTurno:-1,
+      fisico:"medio-alto", stress:"medio",
+      d:"Conosci la linea e risolvi i problemi piccoli: meno fatica cieca, più attenzione a qualità e nuovi assunti."
+    }),
+    Object.freeze({
+      id:"capolinea", n:"Capolinea", energia:32, benessereTurno:-1, luciditaTurno:-2,
+      fisico:"medio", stress:"alto",
+      d:"Stai meno tempo sul pezzo e più sulle persone: ritmo, qualità e problemi della linea passano da te."
+    }),
+    Object.freeze({
+      id:"capoturno", n:"Capoturno", energia:28, benessereTurno:-1, luciditaTurno:-3,
+      fisico:"basso", stress:"molto alto",
+      d:"Il carico fisico scende, ma il turno intero pesa sulle decisioni: personale, produzione e responsabilità."
+    })
   ])
 });
 
@@ -579,6 +599,30 @@ function lavoroProssimoRuolo(luogo){
   return idx >= 0 ? (cfg.ruoli[idx + 1] || null) : null;
 }
 
+/* Profilo concreto del turno per ruolo. Per i lavori che non hanno ancora
+   questa profondità mantiene esattamente il comportamento storico. */
+function lavoroEffettiTurno(luogo, job){
+  const corrente = job || G.job;
+  const cfg = lavoroCarrieraDef(luogo);
+  const ruolo = cfg && Array.isArray(cfg.ruoli) && corrente
+    ? cfg.ruoli.find(r => r.id === corrente.id)
+    : null;
+  return {
+    ruolo:ruolo || null,
+    energia:ruolo && Number.isFinite(Number(ruolo.energia))
+      ? Number(ruolo.energia)
+      : Math.max(0, Number(corrente && corrente.e || 18)),
+    benessere:ruolo && Number.isFinite(Number(ruolo.benessereTurno))
+      ? Number(ruolo.benessereTurno)
+      : -4,
+    lucidita:ruolo && Number.isFinite(Number(ruolo.luciditaTurno))
+      ? Number(ruolo.luciditaTurno)
+      : -3,
+    fisico:ruolo && ruolo.fisico || null,
+    stress:ruolo && ruolo.stress || null
+  };
+}
+
 function lavoroAumentoDisponibile(luogo){
   if(!G.job || lavoroLuogo(G.job) !== luogo) return false;
   const cfg = lavoroCarrieraDef(luogo);
@@ -654,8 +698,16 @@ function lavoroPromuoviRuolo(luogo, opzioni){
     G.job.pay = Math.round(Number(opzioni.nuovaPaga));
   else if(opzioni.aumentoPaga != null && Number(opzioni.aumentoPaga) > 0)
     G.job.pay = Math.round(pagaPrima + Number(opzioni.aumentoPaga));
+
+  /* La mansione porta con sé il suo carico reale: non resta per sempre il
+     costo energetico dell'Operaio iniziale dopo una promozione. Un override
+     esplicito dell'evento resta possibile, ma altrimenti comanda il ruolo. */
+  const energiaRuolo = Number(dopo.energia);
   if(opzioni.energia != null && Number(opzioni.energia) > 0)
     G.job.e = Math.round(Number(opzioni.energia));
+  else if(Number.isFinite(energiaRuolo) && energiaRuolo > 0)
+    G.job.e = Math.round(energiaRuolo);
+  if(dopo.d) G.job.d = dopo.d;
 
   c.roleHistory.push({
     absoluteDay:lavoroGiornoAssoluto(),
@@ -2010,18 +2062,25 @@ const ACTIONS = [
        (giaOggi ? " Il palco lo conoscevano già: oggi rende meno." : "");
    }},
 
-  {id:"turno", n:"Vai al turno", e:18, luc:-3,
+  {id:"turno", n:"Vai al turno", e:18, luc:0,
    d:"Nessuna musica, ma i soldi entrano.",
    avail:() => !!G.job,
-   dyn:() => G.job ? G.job.e : 18,
+   dyn:() => {
+     if(!G.job) return 18;
+     const luogo = lavoroLuogo(G.job);
+     return luogo ? lavoroEffettiTurno(luogo,G.job).energia : G.job.e;
+   },
    give:() => {
      if(!G.job) return "";
      const luogo = lavoroLuogo(G.job);
      const paga = luogo ? lavoroPagaTurno(luogo, G.job.pay) :
        {totale:G.job.pay, percentuale:0};
+     const fx = lavoroEffettiTurno(luogo,G.job);
+     const ben = Number(fx.benessere||0), luc = Number(fx.lucidita||0);
      return "+" + paga.totale + " €" +
        (paga.percentuale ? " · bonus +" + paga.percentuale + "%" : "") +
-       " · −4 benessere";
+       (ben ? " · " + (ben>0?"+":"−") + Math.abs(ben) + " benessere" : "") +
+       (luc ? " · " + (luc>0?"+":"−") + Math.abs(luc) + " lucidità" : "");
    },
    run(){
      const j = G.job;
@@ -2033,7 +2092,11 @@ const ACTIONS = [
      const paga = luogoLavoroAttuale
        ? lavoroPagaTurno(luogoLavoroAttuale, j.pay)
        : {base:j.pay, totale:j.pay, bonus:0, percentuale:0, tipo:null, etichetta:""};
-     G.money += paga.totale; G.wellbeing -= 4; G.shifts = (G.shifts||0) + 1;
+     const effettiTurno = lavoroEffettiTurno(luogoLavoroAttuale,j);
+     G.money += paga.totale;
+     G.wellbeing += Number(effettiTurno.benessere || 0);
+     if(typeof addLuc === "function") addLuc(Number(effettiTurno.lucidita || 0));
+     G.shifts = (G.shifts||0) + 1;
      /* La presenza appartiene al luogo di lavoro: se in futuro passi da
         Operaio a Capolinea/Capoturno in Fabbrica, il cartellino continua. */
      const luogoLavoro = lavoroLuogo(j);
@@ -2043,6 +2106,11 @@ const ACTIONS = [
      let extra = "";
      if(def && def.extra) extra = def.extra();
      let msg = "Turno da " + j.n.toLowerCase() + ": paga " + paga.totale + " €.";
+     if(luogoLavoroAttuale === "fabbrica" && effettiTurno.ruolo){
+       msg += " Carico del ruolo: " + Math.abs(Number(effettiTurno.benessere || 0)) +
+         " benessere e " + Math.abs(Number(effettiTurno.lucidita || 0)) +
+         " lucidità.";
+     }
      if(paga.bonus > 0){
        msg += " <b>" + paga.etichetta + ": bonus +" + paga.percentuale +
          "% (+" + paga.bonus + " €).</b>";
