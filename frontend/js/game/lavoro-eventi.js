@@ -239,6 +239,7 @@ function conflictShiftContext(job,hit){
         fatti,
         richiesti,
         giaOggi,
+        oggiConta,
         futuri,
         assenzeSeSalti,
         assenzeSeLavori,
@@ -266,7 +267,7 @@ function conflictWorkDetail(ctx){
   if(ctx.pagaLabel) d+=ctx.pagaLabel;
   if(ctx.attendance){
     const a=ctx.attendance;
-    const dopo=Math.min(a.richiesti,a.fatti+(a.giaOggi?0:1));
+    const dopo=Math.min(a.richiesti,a.fatti+(a.oggiConta?1:0));
     d+=" · presenza "+dopo+"/"+a.richiesti;
   }
   d+=" · perdi l'appuntamento";
