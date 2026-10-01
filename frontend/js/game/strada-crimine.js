@@ -379,8 +379,16 @@ function stradaTenta(colpoId, approccioId){
   s.giroAvviato=true;
   G.energy -= colpo.energia;
   const leadFabbrica = stradaFabbricaLeadAttivo(colpoId);
+  const leadLavoro = !leadFabbrica && window.ADF_WORK_EVENTS &&
+    typeof ADF_WORK_EVENTS.crimeLeadActive === "function"
+      ? ADF_WORK_EVENTS.crimeLeadActive()
+      : null;
   const successo = Math.random() < stradaChance(colpo, approccio);
-  const leadUsato = leadFabbrica ? stradaConsumaPropostaFabbrica(colpoId, successo) : null;
+  const leadUsato = leadFabbrica
+    ? stradaConsumaPropostaFabbrica(colpoId, successo)
+    : (leadLavoro && window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.consumeCrimeLead === "function"
+      ? ADF_WORK_EVENTS.consumeCrimeLead(successo)
+      : null);
   const moltiplicatoreLead = leadUsato ? (1 + Number(leadUsato.bonusPct || 0) / 100) : 1;
   const rumore = clamp((6 + colpo.difficolta * 10) * approccio.rumore, 2, 30);
   const rumoreLead = leadUsato ? Math.max(0, Number(leadUsato.extraHeat || 0)) : 0;
@@ -399,8 +407,11 @@ function stradaTenta(colpoId, approccioId){
     s.rep = clamp(s.rep + 3 + colpo.difficolta * 6, 0, 100);
     s.heat = clamp(s.heat + rumore * .6 + rumoreLead, 0, 100);
     diarioBordo().colpi++;
+    const fonteLead = leadUsato && leadUsato.sourceLabel
+      ? "Dritta dal lavoro (" + leadUsato.sourceLabel + ")"
+      : "Dritta fuori dalla Fabbrica";
     const notaLead = leadUsato
-      ? " <b>Dritta fuori dalla Fabbrica: +" + Number(leadUsato.bonusPct || 0) +
+      ? " <b>" + fonteLead + ": +" + Number(leadUsato.bonusPct || 0) +
         "% sul guadagno, +" + rumoreLead + " attenzione.</b>"
       : "";
     STRADA_SCENA = {k:"Com'è andata", titolo:"Andata bene", testo:"<b>" + colpo.n + "</b>: " + fmt(pulito) + " € in tasca, " +
@@ -409,7 +420,7 @@ function stradaTenta(colpoId, approccioId){
   }else{
     s.heat = clamp(s.heat + rumore + rumoreLead, 0, 100);
     const notaLeadFallita = leadUsato
-      ? " La dritta arrivata fuori dalla Fabbrica è bruciata."
+      ? " La dritta arrivata " + (leadUsato.sourceLabel ? "dal lavoro" : "fuori dalla Fabbrica") + " è bruciata."
       : "";
     if(approccio.id === "squadra" && s.uomini > 0 && Math.random() < .5){
       s.uomini--;
