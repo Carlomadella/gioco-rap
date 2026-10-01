@@ -1496,7 +1496,7 @@ function lavoroPagaTurno(luogo, pagaBase){
     const richiesti = Math.max(0, Number(def.turniSettimanali || 0));
     if(!giaLavoratoOggi && richiesti > 0 && cart.giorniLavoratiSettimana >= richiesti){
       percentuale = Math.max(0, Number(def.bonusSestoGiornoPct || 0));
-      tipo = "giorno-extra";
+      tipo = luogo === "fabbrica" ? "sesto-giorno" : "giorno-extra";
       etichetta = (richiesti + 1) + "° giorno";
     }
   }
