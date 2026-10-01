@@ -6,6 +6,49 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:18c56d3 -->
+## 01/10/26, 10:58 â€” feature/pizzeria-lavoro-strutturato â†’ main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `18c56d3`
+
+### Cosa Ã¨ entrato
+
+- `a628512` â€” test(audit): follow generic workplace resignation flow â€” **mycolbraga**
+- `6e8df92` â€” chore(web): bust pizzeria workplace assets â€” **mycolbraga**
+- `b88496c` â€” test(audit): cover structured pizzeria page â€” **mycolbraga**
+- `33f3a2e` â€” test(pizzeria): cover structured workplace rules â€” **mycolbraga**
+- `b123133` â€” fix(work): avoid legacy discipline for pizzeria â€” **mycolbraga**
+- `086daf8` â€” fix(work): preserve factory sixth-day payout type â€” **mycolbraga**
+- `f76d9ee` â€” docs(famepedia): explain structured pizzeria work â€” **mycolbraga**
+- `7a27c6d` â€” feat(events): add pizzeria overtime flow â€” **mycolbraga**
+- `c57b8e6` â€” feat(hours): apply each workplace contract calendar â€” **mycolbraga**
+- `77f5ed5` â€” fix(travel): keep workplace location after job promotions â€” **mycolbraga**
+- `0c2334e` â€” feat(time): keep pizzeria shift duration across promotions â€” **mycolbraga**
+- `a34271c` â€” style(work): render workplace-specific rest days â€” **mycolbraga**
+- `b171937` â€” feat(pizzeria): add contract attendance and career UI â€” **mycolbraga**
+- `24c8030` â€” feat(work): support pizzeria contracts in hiring flow â€” **mycolbraga**
+- `61012fc` â€” feat(work): generalize workplace career for pizzeria â€” **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/luoghi-foto.css`
+- **Modificato:** `frontend/js/famepedia.js`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/luoghi-foto.js`
+- **Modificato:** `frontend/js/game/orari.js`
+- **Modificato:** `frontend/js/game/sim.js`
+- **Modificato:** `frontend/js/game/spostamenti.js`
+- **Modificato:** `frontend/js/game/tempo.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/fabbrica-presenze.test.js`
+
+**File interessati in questa categoria:** 12
+
+---
+
 <!-- merge:3ae18e1 -->
 ## 30/09/26, 10:41 â€” fix/global-map-navigation-v2 â†’ main
 
