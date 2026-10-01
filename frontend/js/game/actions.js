@@ -559,9 +559,13 @@ function offerJobs(){
      quello di prima. La mossa «Cerca lavoro» lo sa già (avail), questo è
      per chiunque altro arrivi qui. */
   if(G.job){
+    const puoiLasciareFabbrica = typeof lavoroLuogo === "function" &&
+      lavoroLuogo(G.job) === "fabbrica";
     showEvent({k:"Colloqui", t:"Hai già un posto",
       d:"Lavori già come " + G.job.n.toLowerCase() +
-        ". Da un lavoro non ci si licenzia: lo perdi solo se non ti presenti per tre settimane.",
+        (puoiLasciareFabbrica
+          ? ". Se vuoi cercarne un altro, dai prima le dimissioni dalla Fabbrica."
+          : ". Un posto alla volta."),
       opts:[{n:"Va bene", d:"Torni a quello che facevi", run(){ return null; }}]});
     return;
   }
