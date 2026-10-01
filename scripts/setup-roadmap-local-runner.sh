@@ -15,6 +15,39 @@ done
 
 gh auth status >/dev/null
 
+detect_ollama() {
+  local candidates=()
+  if [ -n "${ADF_LOCAL_AI_BASE_URL:-}" ]; then
+    candidates+=("$ADF_LOCAL_AI_BASE_URL")
+  fi
+  candidates+=("http://127.0.0.1:11434/v1")
+  local host_ip
+  host_ip="$(ip route show default 2>/dev/null | awk '/default/ {print $3; exit}')"
+  if [ -n "$host_ip" ]; then
+    candidates+=("http://$host_ip:11434/v1")
+  fi
+
+  local url
+  for url in "${candidates[@]}"; do
+    if curl -fsS --max-time 3 "$url/models" >/dev/null 2>&1; then
+      printf '%s' "$url"
+      return 0
+    fi
+  done
+  return 1
+}
+
+OLLAMA_URL="$(detect_ollama || true)"
+if [ -z "$OLLAMA_URL" ]; then
+  echo "Ollama non è raggiungibile dal WSL sulla porta 11434." >&2
+  echo "Avvia Ollama e rendilo raggiungibile dal WSL, poi rilancia questo script." >&2
+  exit 1
+fi
+
+echo "Ollama rilevato: $OLLAMA_URL"
+gh variable set ADF_LOCAL_AI_BASE_URL --repo "$REPO" --body "$OLLAMA_URL"
+gh variable set ADF_LOCAL_AI_MODEL --repo "$REPO" --body "${ADF_LOCAL_AI_MODEL:-gpt-oss:20b}"
+
 mkdir -p "$RUNNER_DIR"
 cd "$RUNNER_DIR"
 
