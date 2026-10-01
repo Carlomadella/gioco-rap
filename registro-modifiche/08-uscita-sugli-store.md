@@ -7,14 +7,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:0ac2c93 -->
-## 12/09/26, 14:35 â€” feat/cloud-restore-ui-20260912-163446 â†’ main
+## 12/09/26, 14:35 — feat/cloud-restore-ui-20260912-163446 → main
 
 **Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
 **Merge commit:** `0ac2c93`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `80d4812` â€” feat(cloud): aggiunge salvataggio e ripristino dalla UI â€” **Mycol**
+- `80d4812` — feat(cloud): aggiunge salvataggio e ripristino dalla UI — **Mycol**
 
 ### File di questa categoria
 
@@ -29,36 +29,36 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:3170d23 -->
-## 04/09/26, 10:08 â€” main â†’ main
+## 04/09/26, 10:08 — main → main
 
 **Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.53)  
 **Merge commit:** `3170d23`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `0287cef` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
-- `994aa67` â€” Merge branch 'task/schermata-originale-nella-mappa' â€” **Carlomadella**
-- `276e8d1` â€” fix: via anche i quattro bottoni in fondo alla mappa, erano doppioni â€” **Carlomadella**
-- `cee9ce0` â€” feat: via la vecchia schermata di gioco, le sue schede sopra la mappa â€” **Carlomadella**
-- `6dad126` â€” chore: pulizia dei media, 35 MB fuori dal pacchetto per gli store â€” **Carlomadella**
+- `0287cef` — docs: aggiorna registro modifiche — **Anni di Fame Bot**
+- `994aa67` — Merge branch 'task/schermata-originale-nella-mappa' — **Carlomadella**
+- `276e8d1` — fix: via anche i quattro bottoni in fondo alla mappa, erano doppioni — **Carlomadella**
+- `cee9ce0` — feat: via la vecchia schermata di gioco, le sue schede sopra la mappa — **Carlomadella**
+- `6dad126` — chore: pulizia dei media, 35 MB fuori dal pacchetto per gli store — **Carlomadella**
 
 ### File di questa categoria
 
 - **Aggiunto:** `frontend/concept/README.md`
-- **Rinominato:** `frontend/media/photo/pagina avatar/avatar_profilo_carnagione_chiara.png` â†’ `frontend/concept/avatar_profilo_carnagione_chiara.png`
-- **Rinominato:** `frontend/media/photo/pagina avatar/avatar_profilo_carnagione_scura.png` â†’ `frontend/concept/avatar_profilo_carnagione_scura.png`
-- **Rinominato:** `frontend/media/photo/pagina di landing/landing_a_street_league.jpg` â†’ `frontend/concept/landing_a_street_league.jpg`
-- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_ferrovia.jpg` â†’ `frontend/concept/landing_b_ferrovia.jpg`
-- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_negozio_angolo.jpg` â†’ `frontend/concept/landing_b_negozio_angolo.jpg`
-- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_rooftop_session.jpg` â†’ `frontend/concept/landing_b_rooftop_session.jpg`
-- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_skate_spot.jpg` â†’ `frontend/concept/landing_b_skate_spot.jpg`
-- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_vicolo_graffiti.jpg` â†’ `frontend/concept/landing_b_vicolo_graffiti.jpg`
-- **Rinominato:** `frontend/media/photo/pagina di gioco/mappa_definitiva.png` â†’ `frontend/concept/mappa_definitiva.png`
+- **Rinominato:** `frontend/media/photo/pagina avatar/avatar_profilo_carnagione_chiara.png` → `frontend/concept/avatar_profilo_carnagione_chiara.png`
+- **Rinominato:** `frontend/media/photo/pagina avatar/avatar_profilo_carnagione_scura.png` → `frontend/concept/avatar_profilo_carnagione_scura.png`
+- **Rinominato:** `frontend/media/photo/pagina di landing/landing_a_street_league.jpg` → `frontend/concept/landing_a_street_league.jpg`
+- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_ferrovia.jpg` → `frontend/concept/landing_b_ferrovia.jpg`
+- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_negozio_angolo.jpg` → `frontend/concept/landing_b_negozio_angolo.jpg`
+- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_rooftop_session.jpg` → `frontend/concept/landing_b_rooftop_session.jpg`
+- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_skate_spot.jpg` → `frontend/concept/landing_b_skate_spot.jpg`
+- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_vicolo_graffiti.jpg` → `frontend/concept/landing_b_vicolo_graffiti.jpg`
+- **Rinominato:** `frontend/media/photo/pagina di gioco/mappa_definitiva.png` → `frontend/concept/mappa_definitiva.png`
 - **Aggiunto:** `frontend/concept/pagina_di_gioco_originale.png`
-- **Rinominato:** `frontend/media/photo/pagina di gioco/schermata_di_gioco.png` â†’ `frontend/concept/schermata_di_gioco.png`
-- **Rinominato:** `"frontend/media/photo/pagina di gioco/schermata_di_gioco_citt\303\240_di_mezzo.png"` â†’ `"frontend/concept/schermata_di_gioco_citt\303\240_di_mezzo.png"`
-- **Rinominato:** `"frontend/media/photo/pagina di gioco/schermata_di_gioco_citt\303\240_finale.png"` â†’ `"frontend/concept/schermata_di_gioco_citt\303\240_finale.png"`
-- **Rinominato:** `"frontend/media/photo/pagina di gioco/schermata_di_gioco_citt\303\240_iniziale.png"` â†’ `"frontend/concept/schermata_di_gioco_citt\303\240_iniziale.png"`
+- **Rinominato:** `frontend/media/photo/pagina di gioco/schermata_di_gioco.png` → `frontend/concept/schermata_di_gioco.png`
+- **Rinominato:** `"frontend/media/photo/pagina di gioco/schermata_di_gioco_citt\303\240_di_mezzo.png"` → `"frontend/concept/schermata_di_gioco_citt\303\240_di_mezzo.png"`
+- **Rinominato:** `"frontend/media/photo/pagina di gioco/schermata_di_gioco_citt\303\240_finale.png"` → `"frontend/concept/schermata_di_gioco_citt\303\240_finale.png"`
+- **Rinominato:** `"frontend/media/photo/pagina di gioco/schermata_di_gioco_citt\303\240_iniziale.png"` → `"frontend/concept/schermata_di_gioco_citt\303\240_iniziale.png"`
 - **Modificato:** `frontend/css/game.css`
 - **Modificato:** `frontend/css/hub.css`
 - **Modificato:** `frontend/css/menu-sistema.css`
@@ -111,34 +111,34 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:994aa67 -->
-## 04/09/26, 10:05 â€” task/schermata-originale-nella-mappa â†’ main
+## 04/09/26, 10:05 — task/schermata-originale-nella-mappa → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `994aa67`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `276e8d1` â€” fix: via anche i quattro bottoni in fondo alla mappa, erano doppioni â€” **Carlomadella**
-- `cee9ce0` â€” feat: via la vecchia schermata di gioco, le sue schede sopra la mappa â€” **Carlomadella**
-- `6dad126` â€” chore: pulizia dei media, 35 MB fuori dal pacchetto per gli store â€” **Carlomadella**
+- `276e8d1` — fix: via anche i quattro bottoni in fondo alla mappa, erano doppioni — **Carlomadella**
+- `cee9ce0` — feat: via la vecchia schermata di gioco, le sue schede sopra la mappa — **Carlomadella**
+- `6dad126` — chore: pulizia dei media, 35 MB fuori dal pacchetto per gli store — **Carlomadella**
 
 ### File di questa categoria
 
 - **Aggiunto:** `frontend/concept/README.md`
-- **Rinominato:** `frontend/media/photo/pagina avatar/avatar_profilo_carnagione_chiara.png` â†’ `frontend/concept/avatar_profilo_carnagione_chiara.png`
-- **Rinominato:** `frontend/media/photo/pagina avatar/avatar_profilo_carnagione_scura.png` â†’ `frontend/concept/avatar_profilo_carnagione_scura.png`
-- **Rinominato:** `frontend/media/photo/pagina di landing/landing_a_street_league.jpg` â†’ `frontend/concept/landing_a_street_league.jpg`
-- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_ferrovia.jpg` â†’ `frontend/concept/landing_b_ferrovia.jpg`
-- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_negozio_angolo.jpg` â†’ `frontend/concept/landing_b_negozio_angolo.jpg`
-- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_rooftop_session.jpg` â†’ `frontend/concept/landing_b_rooftop_session.jpg`
-- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_skate_spot.jpg` â†’ `frontend/concept/landing_b_skate_spot.jpg`
-- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_vicolo_graffiti.jpg` â†’ `frontend/concept/landing_b_vicolo_graffiti.jpg`
-- **Rinominato:** `frontend/media/photo/pagina di gioco/mappa_definitiva.png` â†’ `frontend/concept/mappa_definitiva.png`
+- **Rinominato:** `frontend/media/photo/pagina avatar/avatar_profilo_carnagione_chiara.png` → `frontend/concept/avatar_profilo_carnagione_chiara.png`
+- **Rinominato:** `frontend/media/photo/pagina avatar/avatar_profilo_carnagione_scura.png` → `frontend/concept/avatar_profilo_carnagione_scura.png`
+- **Rinominato:** `frontend/media/photo/pagina di landing/landing_a_street_league.jpg` → `frontend/concept/landing_a_street_league.jpg`
+- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_ferrovia.jpg` → `frontend/concept/landing_b_ferrovia.jpg`
+- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_negozio_angolo.jpg` → `frontend/concept/landing_b_negozio_angolo.jpg`
+- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_rooftop_session.jpg` → `frontend/concept/landing_b_rooftop_session.jpg`
+- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_skate_spot.jpg` → `frontend/concept/landing_b_skate_spot.jpg`
+- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_vicolo_graffiti.jpg` → `frontend/concept/landing_b_vicolo_graffiti.jpg`
+- **Rinominato:** `frontend/media/photo/pagina di gioco/mappa_definitiva.png` → `frontend/concept/mappa_definitiva.png`
 - **Aggiunto:** `frontend/concept/pagina_di_gioco_originale.png`
-- **Rinominato:** `frontend/media/photo/pagina di gioco/schermata_di_gioco.png` â†’ `frontend/concept/schermata_di_gioco.png`
-- **Rinominato:** `"frontend/media/photo/pagina di gioco/schermata_di_gioco_citt\303\240_di_mezzo.png"` â†’ `"frontend/concept/schermata_di_gioco_citt\303\240_di_mezzo.png"`
-- **Rinominato:** `"frontend/media/photo/pagina di gioco/schermata_di_gioco_citt\303\240_finale.png"` â†’ `"frontend/concept/schermata_di_gioco_citt\303\240_finale.png"`
-- **Rinominato:** `"frontend/media/photo/pagina di gioco/schermata_di_gioco_citt\303\240_iniziale.png"` â†’ `"frontend/concept/schermata_di_gioco_citt\303\240_iniziale.png"`
+- **Rinominato:** `frontend/media/photo/pagina di gioco/schermata_di_gioco.png` → `frontend/concept/schermata_di_gioco.png`
+- **Rinominato:** `"frontend/media/photo/pagina di gioco/schermata_di_gioco_citt\303\240_di_mezzo.png"` → `"frontend/concept/schermata_di_gioco_citt\303\240_di_mezzo.png"`
+- **Rinominato:** `"frontend/media/photo/pagina di gioco/schermata_di_gioco_citt\303\240_finale.png"` → `"frontend/concept/schermata_di_gioco_citt\303\240_finale.png"`
+- **Rinominato:** `"frontend/media/photo/pagina di gioco/schermata_di_gioco_citt\303\240_iniziale.png"` → `"frontend/concept/schermata_di_gioco_citt\303\240_iniziale.png"`
 - **Modificato:** `frontend/css/game.css`
 - **Modificato:** `frontend/css/hub.css`
 - **Modificato:** `frontend/css/menu-sistema.css`
