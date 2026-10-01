@@ -24,7 +24,7 @@ jobs:
           git config user.name "Anni di Fame Bot"
           git config user.email "actions@github.com"
 
-      - name: Controlla se Ã¨ un merge
+      - name: Controlla se è un merge
         id: mergecheck
         shell: bash
         run: |
