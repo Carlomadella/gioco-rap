@@ -2226,7 +2226,14 @@ function adfFactoryOvertimeAfterShift(){
 
   const offerta=lavoroTentaRichiestaStraordinario("fabbrica",Math.random());
   if(!offerta) return false;
-  if(!claimAutoEvent("factory-overtime")) return false;
+  if(!claimAutoEvent("factory-overtime")){
+    if(typeof lavoroAnnullaRichiestaStraordinario==="function")
+      lavoroAnnullaRichiestaStraordinario("fabbrica");
+    return false;
+  }
+
+  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onOvertime==="function")
+    ADF_WORK_EVENTS.onOvertime("fabbrica","offered",offerta);
 
   s.lastHookEventDay=absDay();
   const domenica=offerta.tipo==="domenica";
