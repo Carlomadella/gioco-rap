@@ -795,10 +795,16 @@ describe("cartellino presenze Fabbrica", () => {
     expect(eventi).toContain("function adfWorkOvertimeAfterShift()");
     expect(eventi).toContain('claimAutoEvent("work-overtime:"+luogo)');
     expect(eventi).toContain('const fabbrica=luogo==="fabbrica"');
+    expect(eventi).toContain("ADF_FACTORY_OVERTIME_SCENARIOS");
+    expect(eventi).toContain('id:"recupero-fermo"');
+    expect(eventi).toContain('id:"spedizione-lunedi"');
+    expect(eventi).toContain("adfFactoryOvertimeScenario(offerta)");
+    expect(eventi).toContain("overtime.pendingOffer.scenarioLabel=scelta.label");
     expect(eventi).toContain("lavoroAccettaStraordinario(luogo)");
     expect(eventi).toContain('lavoroAggiornaStraordinariTempo();');
     expect(luoghi).toContain("straordinarioOggi");
     expect(luoghi).toContain("straordinarioAccettato.targetLabel");
+    expect(luoghi).toContain("straordinarioAccettato.scenarioLabel");
   });
 
   it("dopo almeno tre turni può nascere una conoscenza persistente di Fabbrica", () => {
