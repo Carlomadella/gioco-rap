@@ -19,7 +19,8 @@
   "roadmap_impact": "none",
   "roadmap_note": "",
   "current_state": [
-    "Il comando globale Torna alla mappa chiude lo Studio e riporta all'hub; i contesti decisionali restano bloccati intenzionalmente."
+    "frontend/js/game/studio.js non registra chiusura con click sul fondo o Escape e non contiene piu' il pulsante X; chiudiStudio() resta disponibile al comando globale.",
+    "frontend/js/menu-sistema.js riconosce #studio.on, monta la barra nella testata .sthead e tornaMappa() chiude lo Studio prima di riaprire l'hub; i dialoghi decisionali restano bloccati intenzionalmente."
   ],
   "systems": [
     "frontend/js/menu-sistema.js",
@@ -36,12 +37,13 @@
   "acceptance_criteria": [
     {
       "id": "AC1",
-      "description": "Lo Studio espone il comando Torna alla mappa.",
+      "description": "Lo Studio espone il comando globale Torna alla mappa e non offre X, click sul fondo o Escape come scorciatoie di uscita.",
       "verification": "code_audit",
       "status": "satisfied",
       "evidence": [
-        "frontend/pagine/gioco.html: il bottone #returnToMap ha etichetta Torna alla mappa.",
-        "frontend/js/menu-sistema.js: il comando globale riconosce l'host Studio."
+        "frontend/pagine/gioco.html: #returnToMap espone l'etichetta Torna alla mappa.",
+        "frontend/js/game/studio.js: chiudiStudio() e handler click senza chiusura sul root; frontend/strumenti/audit-regressioni.js: verifiche dedicate a X, sfondo ed Escape.",
+        "frontend/js/menu-sistema.js: GAMEPLAY_HOSTS riconosce #studio.on."
       ]
     },
     {
@@ -50,8 +52,8 @@
       "verification": "automatic",
       "status": "satisfied",
       "evidence": [
-        "frontend/js/menu-sistema.js: hostAttivo(), tornaMappa() e la chiusura dell'host coordinano il ritorno.",
-        "frontend/strumenti/audit-regressioni.js: controlli dedicati alla chiusura dello Studio e degli host."
+        "frontend/js/menu-sistema.js: hostAttivo(), tornaMappa() e HOSTS chiudono lo Studio e montano la barra in .sthead.",
+        "frontend/strumenti/audit-regressioni.js: controlli 'lo Studio ha...' e 'Torna alla mappa chiude davvero lo Studio'."
       ]
     }
   ],

@@ -19,7 +19,8 @@
   "roadmap_impact": "none",
   "roadmap_note": "",
   "current_state": [
-    "Il ritorno globale alla mappa riconosce hub, Studio, Pannello, Piazza, Writer, Strada e gli altri host non bloccati; i dialoghi decisionali e il carcere restano correttamente esclusi."
+    "GAMEPLAY_HOSTS in frontend/js/menu-sistema.js riconosce gli host di gameplay, mentre tornaMappa() chiude gli host compatibili prima di riaprire l'hub.",
+    "Piazza e Writer annullano l'azione pendente in modo dedicato; dialoghi flottanti e carcere restano bloccati intenzionalmente. L'audit confronta host riconosciuti, barra e chiusure."
   ],
   "systems": [
     "navigazione",
@@ -42,7 +43,7 @@
       "verification": "code_audit",
       "status": "satisfied",
       "evidence": [
-        "frontend/pagine/gioco.html: bottone #returnToMap con etichetta Torna alla mappa."
+        "frontend/pagine/gioco.html: #returnToMap espone l'etichetta Torna alla mappa."
       ]
     },
     {
@@ -51,7 +52,7 @@
       "verification": "code_audit",
       "status": "satisfied",
       "evidence": [
-        "frontend/js/menu-sistema.js: hostAttivo(), mappaBloccata() e tornaMappa() coordinano gli host e impediscono il ritorno solo nei contesti decisionali o nel carcere."
+        "frontend/js/menu-sistema.js: GAMEPLAY_HOSTS/hostAttivo(), mappaBloccata() e tornaMappa() gestiscono host, blocchi decisionali e chiusure."
       ]
     },
     {
@@ -60,7 +61,7 @@
       "verification": "automatic",
       "status": "satisfied",
       "evidence": [
-        "frontend/strumenti/audit-regressioni.js: controlli dedicati a Studio, Piazza/Writer, Pannello e alla copertura degli host riconosciuti."
+        "frontend/strumenti/audit-regressioni.js: controlla host Piazza/Writer/Pannello, annullamento pulito, blocco dei dialoghi e coerenza tra host riconosciuti, HOSTS e chiusure."
       ]
     }
   ],

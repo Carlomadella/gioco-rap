@@ -1,0 +1,38 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-E346143BC967",
+  "origin": "legacy",
+  "title": "I prezzi dei beat per fama del beatmaker",
+  "category": "04-musica-e-suoni",
+  "source": {
+    "point": "—",
+    "text": "I prezzi dei beat per fama del beatmaker",
+    "file": "implementazioni/04-musica-e-suoni.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ]
+}

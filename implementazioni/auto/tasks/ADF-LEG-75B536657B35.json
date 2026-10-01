@@ -19,16 +19,19 @@
   "roadmap_impact": "none",
   "roadmap_note": "",
   "current_state": [
-    "Il luogo interno vita è presentato nella mappa e nei sottomenu come Casa; continua a contenere lifestyle, spese e azioni della vita quotidiana."
+    "HUB_LUOGHI presenta l'id interno vita con l'etichetta Casa e la scheda di luogo usa le azioni lifestyle e le spese domestiche.",
+    "L'identificatore vita resta usato da spostamenti e orari, preservando compatibilita' dei salvataggi e dei sistemi dipendenti."
   ],
   "systems": [
     "mappa",
     "casa",
     "lifestyle",
-    "spostamenti"
+    "spostamenti",
+    "frontend/js/game/luoghi-foto.js"
   ],
   "watch_paths": [
     "frontend/js/game/hub.js",
+    "frontend/js/game/luoghi-foto.js",
     "frontend/js/game/spostamenti.js",
     "frontend/js/game/orari.js",
     "frontend/pagine/gioco.html",
@@ -41,7 +44,7 @@
       "verification": "code_audit",
       "status": "satisfied",
       "evidence": [
-        "frontend/js/game/hub.js: HUB_LUOGHI contiene {id:\"vita\", n:\"Casa\"} e apre la scheda Casa."
+        "frontend/js/game/hub.js: HUB_LUOGHI contiene {id:\"vita\", n:\"Casa\"} e la relativa azione apre la vista Casa."
       ]
     },
     {
@@ -50,7 +53,8 @@
       "verification": "code_audit",
       "status": "satisfied",
       "evidence": [
-        "frontend/js/game/hub.js: il sottomenu Casa contiene spese e attività; frontend/js/game/spostamenti.js: HOME e orari restano collegati all'ID vita."
+        "frontend/js/game/luoghi-foto.js: lfCasa() offre le porte Casa e luogoPorta(\"conti\") apre il pannello lifestyle delle spese fisse.",
+        "frontend/js/game/spostamenti.js e frontend/js/game/orari.js: il luogo interno resta identificato come vita."
       ]
     }
   ],

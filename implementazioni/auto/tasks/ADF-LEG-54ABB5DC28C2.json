@@ -1,0 +1,38 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-54ABB5DC28C2",
+  "origin": "legacy",
+  "title": "Le pagine dei posti sulla loro foto: Casa, Palestra, Live Club, stacca la spina",
+  "category": "02-interfaccia-e-telefono",
+  "source": {
+    "point": "—",
+    "text": "Le pagine dei posti sulla loro foto: Casa, Palestra, Live Club, stacca la spina",
+    "file": "implementazioni/02-interfaccia-e-telefono.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ]
+}

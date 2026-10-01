@@ -19,38 +19,35 @@
   "roadmap_impact": "none",
   "roadmap_note": "",
   "current_state": [
-    "Gli stili della schermata Abilita' sono confinati sotto #abilita; la classe scena della schermata e' distinta dalla classe .scena dei riquadri."
+    "frontend/css/abilita.css confina selettori e variabili sotto #abilita; il layer a schermo intero usa .scenapiena mentre il riquadro della Piazza conserva .scena.",
+    "frontend/css/telefono.css usa .ttag anziche' .tag, lasciando le targhette di gioco definite in frontend/css/game.css."
   ],
   "systems": [
     "frontend/css/abilita.css",
     "frontend/css/effects.css",
+    "frontend/css/game.css",
     "frontend/css/overlays.css",
+    "frontend/css/telefono.css",
     "frontend/strumenti/audit-regressioni.js"
   ],
   "watch_paths": [
     "frontend/css/abilita.css",
     "frontend/css/effects.css",
+    "frontend/css/game.css",
     "frontend/css/overlays.css",
+    "frontend/css/telefono.css",
     "frontend/strumenti/audit-regressioni.js"
   ],
   "acceptance_criteria": [
     {
       "id": "AC1",
-      "description": "I nomi di classe usati dalle due interfacce non applicano piu' stili globali in conflitto.",
+      "description": "Le collisioni tra schermata Abilita'/layer scena e tra tag del telefono/targhette di gioco non applicano piu' stili globali in conflitto.",
       "verification": "code_audit",
       "status": "satisfied",
       "evidence": [
-        "frontend/css/effects.css: documenta e usa .scenapiena per il layer fullscreen, lasciando .scena al riquadro.",
-        "frontend/css/abilita.css: gli stili della nuova schermata sono prefissati da #abilita."
-      ]
-    },
-    {
-      "id": "AC2",
-      "description": "Il controllo regressioni mantiene il confinamento degli stili della schermata Abilita'.",
-      "verification": "automatic",
-      "status": "satisfied",
-      "evidence": [
-        "frontend/strumenti/audit-regressioni.js: controlli sui selettori #abilita e sul layer di navigazione."
+        "frontend/css/effects.css: il layer fullscreen usa .scenapiena; frontend/css/overlays.css conserva .scena per il riquadro della Piazza.",
+        "frontend/css/telefono.css: usa .ttag; frontend/css/game.css: .tag resta la classe delle targhette di gioco.",
+        "frontend/css/abilita.css: selettori e variabili della schermata sono confinati sotto #abilita."
       ]
     }
   ],

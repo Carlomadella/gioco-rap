@@ -19,7 +19,8 @@
   "roadmap_impact": "none",
   "roadmap_note": "",
   "current_state": [
-    "La schermata di avvio mostra tre slot, consente di scegliere una nuova carriera o caricare una carriera esistente e conserva lo slot attivo."
+    "N_SLOT e slots() alimentano la schermata di avvio con tre slot e relativo stato/artista/carriera.",
+    "La selezione di una nuova carriera e il caricamento aggiornano SET.slot; le chiavi degli altri slot restano separate e uno slot occupato non e' sovrascrivibile senza eliminarlo."
   ],
   "systems": [
     "frontend/js/avvio.js",
@@ -41,7 +42,7 @@
       "verification": "code_audit",
       "status": "satisfied",
       "evidence": [
-        "frontend/js/avvio.js: slots() usa nSlot() e htmlScegliSlot()/htmlCarica() disegnano i tre slot con stato."
+        "frontend/js/impostazioni.js: N_SLOT = 3; frontend/js/avvio.js: slots(), htmlScegliSlot() e htmlCarica() generano gli slot e lo stato."
       ]
     },
     {
@@ -50,8 +51,8 @@
       "verification": "code_audit",
       "status": "satisfied",
       "evidence": [
-        "frontend/js/avvio.js: selezionaSlot(), entraSlot() e il passaggio slot= conservano la scelta e distinguono nuovo/caricamento.",
-        "frontend/js/landing.js: ADF_PREPARA_ARTISTA_CONTINUA prepara lo stesso slot scelto da Continua."
+        "frontend/js/avvio.js: preparaNuovoSlot() rifiuta lo slot occupato, selezionaSlot() salva SET.slot ed entraSlot() carica la partita dallo slot scelto.",
+        "frontend/js/avvio.js: avviaNuova() passa slot= alla pagina di gioco; le chiavi per slot 2/3 aggiungono -s2/-s3."
       ]
     }
   ],

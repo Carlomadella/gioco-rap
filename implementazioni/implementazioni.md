@@ -182,7 +182,6 @@ intatte** e sono importate automaticamente nel cruscotto: non vengono riscritte 
 cancellate.
 
 <!-- ADF-AUTO-INBOX:BEGIN -->
-
 - [x] voglio sistemare gli eventi ed il tempo in game <!-- ADF-TASK:ADF-NEW-3E6D8998D1BD --> — **🟡 ESTENSIONE → ADF-LEG-EC3A45E275D0, ADF-LEG-99F7F334DFE9** · La richiesta è più ampia delle task esistenti: EC3A45E275D0 copre la gerarchia degli incontri durante i salti e 99F7F334DFE9 il passaggio alla giornata; resta un delta reale di coerenza e prestazioni del motore eventi-tempo.
 
 <!-- Esempio (non attivo): - [ ] voglio cambiare il tempo del turno in fabbrica -->
