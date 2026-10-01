@@ -11,7 +11,7 @@ roadmap, nei commenti del codice) quel giro lo trova in `problemi-risolti.md`, c
 ## Cosa resta aperto al 29/09/2026
 
 I numeri sono quelli di sempre, e restano: altri documenti citano «la voce 65». La prossima
-voce nuova è la 84. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
+voce nuova è la 85. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
 [`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md) (la 7 con «Via la
 lucidità», la 9 fra «Le decisioni tue», la 10 fra quelle fuori dall'ordine); la 61 e la 65
 sono decisioni di bilanciamento e per ora stanno solo qui.
@@ -84,6 +84,10 @@ non torna in cima: va deciso insieme alla risposta del Marketing in cima (la 10)
 
 Dal giro del 01/10 su `task/studio-cursori-e-linguette`: le voci 82–83 sono chiuse lo stesso
 giorno nel branch e stanno in `problemi-risolti.md`.
+
+Dal giro di fine task del 01/10 sullo stesso branch, dopo il merge della Pizzeria: la
+voce 84 (i numeri `?v=` di sei file rimasti quelli di `main`) è chiusa lo stesso giorno e sta
+in `problemi-risolti.md`.
 
 ---
 
@@ -714,3 +718,35 @@ voce 66, che resta aperta: non ne apro un'altra.
   fondo: ![Il feed del server a 360](prove-telefono/2026-10-01/lafamegram-feed-server-360x640.png)
   e in cima ![I post della gente a 390](prove-telefono/2026-10-01/lafamegram-gente-390x844.png)
 - **quanto pesa** — da sistemare con calma (va insieme alla voce 78).
+
+## Giro del 01/10/2026 (segnala-problemi, fine task `task/studio-cursori-e-linguette` dopo il merge della Pizzeria, `3b805321..f3b42b4f`)
+
+Non ho fatto girare né `npm run prova` né `npm run verifica` (la verifica completa girava già
+in parallelo nello stesso worktree): ho letto il codice dei nostri commit e il risultato del
+merge con la Pizzeria (PR #11). Guardato e **a posto**:
+
+- **Il merge.** Nessun segno di conflitto rimasto nei file. Rispetto a `origin/main` i nostri
+  commit toccano solo `eventi-v2.js` (le due righe che datano i post, `tw:totalWeeks()`),
+  non `actions.js` né `hub.js`: le modifiche a quei due sono tutte della Pizzeria, e le
+  nostre righe ci sono ancora dopo il merge.
+- **I salvataggi vecchi.** Senza `G.studio.cursori`: `studioBanco()` li crea al centro. Con
+  l'oggetto dei cursori ancora dentro a `banco`: `studioDati()` (`studio.js:168`) lo sposta in
+  `cursori` e poi ritrova il pezzo sul banco come per un salvataggio senza banco; nessun altro
+  file legge `G.studio.banco` per conto suo. Senza `esceAuto`: il pezzo esce col suo hype di
+  sempre. Senza `lafamegramGente`: il feed usa la lista vuota.
+- **Il resto in automatico.** Tutte le funzioni che chiama esistono; «Mandalo fuori» rimesso
+  su un pezzo già in coda non gli ridà l'hype, «Riprendi» e la cassaforte puliscono il segno;
+  il tasto `data-auto` non si scontra con gli altri tasti dello Studio.
+- **Il widget del tempo dopo il fix.** Il filtro scarta solo i cambiamenti *dentro* al widget e
+  al suo pannello. Le schermate che si aprono e chiudono, le finestre che bloccano
+  (`#modal.on`, `#report.on`…), il widget tolto da una testata ridisegnata: tutte cose che
+  succedono fuori, e fanno ancora ripartire il giro. Il widget poi ascolta da solo il tempo
+  che passa, il giorno nuovo, il meteo, il cambio di posto e ogni tocco sulla pagina, quindi
+  non resta fermo neanche quando fuori non cambia niente. Aprire il pannello lo aggiorna
+  subito, senza passare dal filtro. Non ho trovato un caso in cui il widget resti indietro.
+- **LaFamegram.** I post della gente non hanno i tasti Like/Rispondi (come quelli degli
+  incontri), quindi non c'è un tasto che cerca un post che non trova.
+
+Una cosa piccola che ho visto ma non è un errore: dopo «chiudi tu il resto» la scelta
+dell'Uscita resta su «venerdì» anche per il pezzo dopo (`studio-automatico.js:71`). Si vede
+ed è una scelta normale, quindi non apro una voce.

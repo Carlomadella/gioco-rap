@@ -6631,3 +6631,22 @@ vuoto non compare, perché `studioAutoRiga()` senza pezzo non scrive niente.
 - **RISOLTO (01/10/2026)** — stesso branch: via il ritorno al Beat, la classe `chiusa` con
   `aria-disabled`, il toast, `.sttab.chiusa` e `studioSbloccato()`; i tre commenti riscritti.
   L'audit controlla che il lucchetto non torni.
+
+### 84. Sei file cambiati e il loro numero nella pagina del gioco è rimasto lo stesso
+- **dove** — `frontend/pagine/gioco.html`: `css/studio.css?v=12` (riga 42),
+  `js/game/state.js?v=14` (678), `js/game/studio.js?v=15` (701), `js/game/strada.js?v=12`
+  (712), `js/game/eventi-v2.js?v=1227` (734), `js/game/tempo-controlli.js?v=18` (749). Sono
+  gli stessi numeri di `origin/main`, ma il contenuto dei sei file in questo branch è diverso.
+- **cosa succede** — quel numero serve a dire al browser «il file è nuovo, non usare la copia
+  vecchia». Qui non si è alzato, e chi gioca dal browser e ha già aperto il gioco può tenersi
+  le copie vecchie insieme a quelle nuove degli altri file. Non si rompe niente (ho guardato i
+  miscugli possibili), ma per lui il fix di oggi del widget del tempo non arriva (continua a
+  ridisegnarsi a ogni fotogramma e scalda il telefono), e lo Studio ha ancora le linguette col
+  lucchetto. Il pacchetto per gli store mette tutto in un file solo, quindi lì non succede.
+- **come si vede** — apri il gioco dal browser su `main` di adesso, poi aggiorna dopo il
+  merge di questo branch senza svuotare la cache: Mix e Uscita restano col lucchetto a banco
+  vuoto.
+- **quanto pesa** — da sistemare con calma (ma è un minuto: alzare di uno i sei numeri).
+- **RISOLTO (01/10/2026)** — stesso branch, prima del push: `studio.css?v=13`, `state.js?v=15`,
+  `studio.js?v=16`, `strada.js?v=13`, `eventi-v2.js?v=1228`; `tempo-controlli.js?v=19` è arrivato
+  col fix del widget, da `task/test-fabbrica-dopo-pizzeria`.
