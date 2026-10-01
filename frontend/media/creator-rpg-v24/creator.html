@@ -3258,6 +3258,18 @@ function startQuickMakeHuman(){
   quickMakeHumanPending = true;
   quickMakeHumanRequested = false;
   state.avatarPendingSource = 'local';
+
+  /* Segnale immediato al gioco prima di aprire l'iframe MakeHuman. Sul web,
+     e soprattutto via tunnel/rete mobile, il camerino puo' metterci piu' del
+     desktop locale a iniziare a parlare: questo evita che il watchdog iniziale
+     scambi il caricamento reale per un iframe morto. */
+  if(window.parent!==window){
+    window.parent.postMessage({
+      type:'adf-rpg-v24-quick-makehuman-progress',
+      message:'Apro il motore MakeHuman'
+    },'*');
+  }
+
   openLocalEditor();
 }
 
