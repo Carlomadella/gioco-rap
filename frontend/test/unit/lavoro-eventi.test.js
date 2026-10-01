@@ -363,6 +363,31 @@ describe("famiglie eventi lavoro", () => {
     )).toBe(true);
   });
 
+  it("Agenda usa il minuto numerico reale del clock", () => {
+    const agenda=leggi("js/game/agenda.js");
+    expect(agenda).toContain("Number(GAME_TIME.now())");
+    expect(agenda).not.toContain("GAME_TIME.now().minutes");
+  });
+
+  it("gli eventi dopo-turno aspettano la ripresa di un turno interrotto da un evento alto", () => {
+    const eventi=leggi("js/game/eventi-v2.js");
+    expect(eventi).toContain("GAME_TIME.suspended && GAME_TIME.suspended()");
+    expect(eventi).toContain('window.addEventListener("game-time:action-resumed",onResume)');
+    expect(eventi).toContain("adfCompletaHookAzione(a,jobBefore,d.to)");
+    expect(eventi).toContain('window.addEventListener("jail-ui:opened",onAbort)');
+  });
+
+  it("il rientro di contratto usa la carriera del luogo e non un hardcode Fabbrica", () => {
+    const actions=leggi("js/game/actions.js");
+    const firma=actions.slice(
+      actions.indexOf("function lavoroFirmaContratto("),
+      actions.indexOf("function lavoroTerminaContratto(")
+    );
+    expect(firma).toContain("const cfgCarriera = lavoroCarrieraDef(luogo)");
+    expect(firma).toContain("cfgCarriera.ruoli.findIndex");
+    expect(firma).not.toContain("ADF_FABBRICA_CARRIERA.ruoli.findIndex");
+  });
+
   it("integra il motore con clock, Agenda, Strada, live e arbitro Eventi V2", () => {
     const agenda=leggi("js/game/agenda.js");
     const ui=leggi("js/game/ui.js");
