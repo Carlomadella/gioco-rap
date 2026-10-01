@@ -1234,7 +1234,7 @@ function renderStColpi(){
     const senzaEnergia = G.energy < c.energia;
     const lead = leadFabbrica && leadFabbrica.colpoId === c.id ? leadFabbrica : null;
     const giorniLead = lead
-      ? Math.max(0, Math.ceil((Number(lead.expiresAbsoluteDay) - stradaAbsDay()) / 1))
+      ? Math.max(1, Number(lead.expiresAbsoluteDay) - stradaAbsDay())
       : 0;
     return '<button class="crime' + (senzaEnergia ? " no" : "") + '" data-stcolpo="' + c.id + '">' +
       '<span class="num">0' + (i + 1) + '</span><b>' + c.n + '</b><p>' + c.d + '</p>' +
