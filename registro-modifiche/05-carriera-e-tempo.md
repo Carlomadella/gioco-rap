@@ -6,6 +6,41 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:5e42834 -->
+## 01/10/26, 22:21 — task/fabbrica-straordinari-contestuali → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `5e42834`
+
+### Cosa è entrato
+
+- `90edafd` — test(lavoro): aggiorna cache bust eventi ruolo — **mycolbraga**
+- `f8337c3` — docs(fabbrica): allinea le famiglie eventi ai ruoli — **mycolbraga**
+- `36127c6` — chore(cache): invalida profili ed eventi ruolo fabbrica — **mycolbraga**
+- `2257960` — test(fabbrica): verifica carico differenziato dei ruoli — **mycolbraga**
+- `ec72cbd` — test(fabbrica): copre gli eventi specifici di ruolo — **mycolbraga**
+- `d593ac6` — feat(fabbrica): mostra il carico reale del ruolo — **mycolbraga**
+- `993ee7b` — feat(fabbrica): aggiunge eventi specifici per mansione — **mycolbraga**
+- `733c807` — feat(fabbrica): differenzia il carico dei turni per ruolo — **mycolbraga**
+- `4f1602f` — chore(cache): invalida straordinari contestuali fabbrica — **mycolbraga**
+- `acc0dbf` — test(fabbrica): copre i motivi contestuali degli straordinari — **mycolbraga**
+- `db21e66` — feat(fabbrica): mostra il motivo dello straordinario concordato — **mycolbraga**
+- `e8de4b5` — feat(fabbrica): rende contestuali le richieste di straordinario — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/lavoro-eventi.js`
+- **Modificato:** `frontend/js/game/luoghi-foto.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/fabbrica-presenze.test.js`
+- **Modificato:** `frontend/test/unit/lavoro-eventi.test.js`
+
+**File interessati in questa categoria:** 7
+
+---
+
 <!-- merge:7fe740c -->
 ## 01/10/26, 21:37 — task/widget-meteo-click-perimetro → main
 
