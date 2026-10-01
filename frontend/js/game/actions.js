@@ -1422,6 +1422,12 @@ function lavoroTentaIncontroContatto(luogo, roll, job){
   stato.lastCheckAbsoluteDay = oggi;
   stato.turniVisti += 1;
   const ruoloId=String(corrente.id||luogo||"lavoro");
+  /* Migrazione dei salvataggi precedenti: se esiste il vecchio contatore ma
+     nessun ruolo è mai stato registrato, lo attribuiamo alla mansione che il
+     giocatore ha al primo caricamento. Dopo questo passaggio, una promozione
+     futura avrà una chiave nuova e ripartirà correttamente da zero. */
+  if(!Object.keys(stato.turniPerRuolo).length && stato.turniVisti>0)
+    stato.turniPerRuolo[ruoloId]=stato.turniVisti;
   stato.turniPerRuolo[ruoloId]=Math.max(0,Number(stato.turniPerRuolo[ruoloId]||0))+1;
 
   /* L'esposizione per sbloccare nuovi incontri riparte quando cambia mansione.
