@@ -2498,12 +2498,27 @@ test("le dimissioni dai posti strutturati chiudono il contratto senza perdere lo
   luoghiFoto.includes('function lfDimissioniFabbrica(){ return lfDimissioniLavoro("fabbrica", "Fabbrica"); }') &&
   luoghiFoto.includes("G.job = null;") &&
   actions.includes("function lavoroTerminaContratto(luogo, motivo)") &&
-  actions.includes("sede.contractHistory.push(Object.assign({}, contratto") &&
-  /function offerJobs\(\)\{[\s\S]{0,1200}if\(G\.job\)\{/.test(actions) &&
-  ev.includes('if(t==="no_job") return !G.job;') &&
-  ev.includes("const luogoContratto=j&&j.place&&typeof lavoroContrattoDef") &&
-  ev.includes("if(j && !G.job && !blocco.active){") &&
-  ev.includes("G.job={id:j.id,place:j.place||null,n:j.n,pay:j.pay,e:j.e,missed:0};"));
+  actions.includes("sede.contractHistory.push(Object.assign({}, contratto"));
+
+test("Centro per l'impiego e Cerca lavoro non sono più ingressi di gameplay",
+  !hub.includes('{id:"impiego"') &&
+  !hub.includes("function schedaImpiego(") &&
+  !actions.includes('id:"cercalavoro"') &&
+  !actions.includes("function offerJobs(") &&
+  !time.includes("cercalavoro:90") &&
+  !hours.includes("impiego:") &&
+  !travel.includes("impiego:"));
+
+test("i lavori legacy restano parcheggiati fuori dal catalogo JOBS attivo",
+  actions.includes("const JOBS_LEGACY_PAUSED = Object.freeze([") &&
+  (() => {
+    const a=actions.indexOf("const JOBS = [");
+    const b=actions.indexOf("];",a);
+    const attivi=a>=0&&b>a?actions.slice(a,b):"";
+    return ["volantini","fattorino","barista","magazzino","buttafuori","fonico"]
+      .every(id => !attivi.includes('id:"'+id+'"')) &&
+      ["lavapiatti","operaio"].every(id => attivi.includes('id:"'+id+'"'));
+  })());
 
 console.log("\nPunto 7 — i file .md in cartelle con nomi coerenti");
 test("in radice restano solo README, ROADMAP e CLAUDE",
@@ -3101,12 +3116,13 @@ console.log("\nLe tre del Marketing (20/09/2026)");
   /* il resto su cui il bot si regge: i titoli delle finestre che non conta fra gli eventi,
      i colpi e le azioni che chiama per id, l'interruttore delle conferme che spegne */
   const altro = [];
-  for(const [t, f] of [["Come la fai","js/game/writer.js"],["Colloqui","js/game/actions.js"],["Come lo chiami","js/game/copertine.js"]])
+  for(const [t, f] of [["Come la fai","js/game/writer.js"],["Come lo chiami","js/game/copertine.js"]])
     if(!leggi(f).includes('"' + t + '"')) altro.push("finestra «" + t + "» in " + f);
   const bot = leggi("strumenti/bilanciamento/bot.js");
-  for(const t of ["Come la fai","Colloqui","Come lo chiami"]) if(!bot.includes('"' + t + '"')) altro.push("il bot non salta «" + t + "»");
+  for(const t of ["Come la fai","Fabbrica","Come lo chiami"]) if(!bot.includes('"' + t + '"')) altro.push("il bot non salta «" + t + "»");
+  if(!bot.includes('assumitiCome("operaio")')) altro.push("assunzione Fabbrica del bot");
   for(const c of ["consegne","scotta","cassa"]) if(!new RegExp('id:\\s*"' + c + '"').test(leggi("js/game/strada-crimine.js"))) altro.push("colpo " + c);
-  for(const a of ["scrivi","beat","registra","mixa","pubblica","promo","anteprima","free","live","turno","cercalavoro","stacca","palestra_cardio"])
+  for(const a of ["scrivi","beat","registra","mixa","pubblica","promo","anteprima","free","live","turno","stacca","palestra_cardio"])
     if(!new RegExp('id:\\s*"' + a + '"').test(leggi("js/game/actions.js"))) altro.push("azione " + a);
   if(!/conferme:\s*true/.test(leggi("js/impostazioni.js"))) altro.push("SET.gioco.conferme");
   test("il bot del simulatore di bilanciamento trova ancora finestre, colpi e azioni per nome", altro.length === 0, altro.join(", "));
