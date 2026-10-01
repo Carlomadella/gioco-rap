@@ -6,6 +6,45 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:747e7b7 -->
+## 01/10/26, 13:58 â€” task/circolo-orari-e-pagine â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `747e7b7`
+
+### Cosa Ã¨ entrato
+
+- `7332eb4` â€” Il Circolo a stanze: i titoli dritti, via il pennarello corsivo â€” **Carlomadella**
+- `c48b66b` â€” Merge remote-tracking branch 'origin/main' into task/circolo-orari-e-pagine â€” **Carlomadella**
+- `c511470` â€” Il Circolo a stanze: le voci 85–89 del giro di fine task â€” **Carlomadella**
+- `ab18a4f` â€” Il Circolo a stanze: Bancone, Sala, Palco, Backstage â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/problemi-risolti.md`
+- **Modificato:** `documentazione/roadmap.md`
+- **Aggiunto:** `frontend/css/circolo-stanze.css`
+- **Modificato:** `frontend/css/circolo.css`
+- **Modificato:** `frontend/css/luoghi-foto.css`
+- **Modificato:** `frontend/css/stretto.css`
+- **Aggiunto:** `frontend/js/game/circolo-incontri.js`
+- **Aggiunto:** `frontend/js/game/circolo-stanze.js`
+- **Modificato:** `frontend/js/game/circolo.js`
+- **Modificato:** `frontend/js/game/luoghi-foto.js`
+- **Rimosso:** `frontend/media/photo/circolo/palco.jpg`
+- **Rimosso:** `frontend/media/photo/circolo/serata.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/stanze/backstage.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/stanze/bancone.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/stanze/palco.jpg`
+- **Rimosso:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/live_club.png`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `frontend/test/unit/circolo-stanze.test.js`
+
+**File interessati in questa categoria:** 19
+
+---
+
 <!-- merge:dc26a32 -->
 ## 01/10/26, 13:34 â€” feature/eventi-lavoro-famiglie-rebased â†’ main
 

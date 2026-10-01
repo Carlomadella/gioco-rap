@@ -6,6 +6,27 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:747e7b7 -->
+## 01/10/26, 13:58 â€” task/circolo-orari-e-pagine â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `747e7b7`
+
+### Cosa Ã¨ entrato
+
+- `7332eb4` â€” Il Circolo a stanze: i titoli dritti, via il pennarello corsivo â€” **Carlomadella**
+- `c48b66b` â€” Merge remote-tracking branch 'origin/main' into task/circolo-orari-e-pagine â€” **Carlomadella**
+- `c511470` â€” Il Circolo a stanze: le voci 85–89 del giro di fine task â€” **Carlomadella**
+- `ab18a4f` â€” Il Circolo a stanze: Bancone, Sala, Palco, Backstage â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:dc26a32 -->
 ## 01/10/26, 13:34 â€” feature/eventi-lavoro-famiglie-rebased â†’ main
 
