@@ -169,6 +169,11 @@ che da un lavoro non ci si licenzia — il posto lo perdi solo se non ti present
 carriere da un anno con sei strategie (chi lavora, chi spinge la promo, chi fa crimini, chi
 sta fermo, chi fa a caso, il musicista) e scrive un rapporto con le curve che sembrano
 rotte. È lo strumento per misurare i numeri di questa tappa prima di cambiarli.
+**FATTO (02/10/2026)** — il lavoro in Fabbrica dipende dal ruolo (pull request #20–#25 di
+Carletto, segnati dal push degli altri): carico dei turni e straordinari per ruolo, eventi di
+reparto e per mansione con bonus e malus diversi, sovraccarico settimanale progressivo con la
+fatica solo sul carico lungo, il conflitto fra turno e musica leggibile, e la rete dei contatti
+separata per ruolo (`frontend/js/game/lavoro-eventi.js`, `actions.js`, `posto.js`).
 
 **Manca**:
 
