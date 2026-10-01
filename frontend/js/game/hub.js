@@ -443,7 +443,7 @@ function assumitiCome(jobId){
         ". Un posto alla volta, e da un lavoro non ci si licenzia: lo perdi solo se non ti presenti per tre settimane."});
       return;
     }
-    G.job = {id:def.id, n:def.n, pay:def.pay, e:def.e, missed:0};
+    G.job = {id:def.id, place:def.place || null, n:def.n, pay:def.pay, e:def.e, missed:0};
     pushLog("Hai preso il posto da " + def.n.toLowerCase() + ": " + def.pay + " € a turno.", "good");
   }
   hubAzione("turno");
