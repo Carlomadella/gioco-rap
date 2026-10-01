@@ -348,6 +348,40 @@ function lfPalestra(){
    piu' una showEvent: il posto, il turno e lo stato di oggi vivono nella
    fascia in basso. La logica economica resta quella esistente di JOBS /
    assumitiCome() / azione "turno". */
+
+function lfFabbricaCartellino(){
+  const cart = typeof fabbricaCartellino === "function" ? fabbricaCartellino() : null;
+  if(!cart) return '<div class="stvuoto">Cartellino non disponibile.</div>';
+
+  const giorni = ["L","M","M","G","V","S","D"];
+  let html = '<div class="lfpresenze" aria-label="Cartellino presenze delle ultime quattro settimane">' +
+    '<div class="lfpres-head"><span></span>' +
+    giorni.map(g => '<i>' + g + '</i>').join("") + '</div>';
+
+  for(let settimana = 0; settimana < 4; settimana++){
+    html += '<div class="lfpres-week"><b>S' + (settimana + 1) + '</b>';
+    for(let giorno = 0; giorno < 7; giorno++){
+      const pos = settimana * 7 + giorno;
+      const n = Number(cart.conteggi[pos] || 0);
+      const cls = "lfpres-day" +
+        (n ? " fatto" : "") +
+        (pos === cart.posOggi ? " oggi" : "") +
+        (pos > cart.posOggi ? " futuro" : "");
+      const testo = n > 1 ? "×" + n : n === 1 ? "✓" : "";
+      html += '<span class="' + cls + '" title="Settimana ' + (settimana + 1) +
+        ', giorno ' + (giorno + 1) + (n ? ': ' + n + (n === 1 ? ' turno' : ' turni') : '') +
+        '">' + testo + '</span>';
+    }
+    html += '</div>';
+  }
+
+  html += '<div class="lfpres-foot">' +
+    '<span>Turni <b>' + cart.totale + '</b></span>' +
+    '<span>Settimana <b>' + cart.settimana + '/4</b></span>' +
+    '</div></div>';
+  return html;
+}
+
 function lfFabbrica(){
   const def = (typeof JOBS !== "undefined" ? JOBS : []).find(j => j.id === "operaio");
   if(!def) return {mid:lfPan("Fabbrica", '<div class="stvuoto">Turno non disponibile.</div>', "orologio")};
@@ -394,17 +428,9 @@ function lfFabbrica(){
     (stato.ok ? "" : '<p class="stperche">' + lfEsc(stato.perche) + '.</p>'),
     "orologio");
 
-  const statoTitolo = mio ? "Sei assunto qui." : altro ? "Hai già un altro lavoro." : "Non sei ancora assunto.";
-  const statoTesto = mio
-    ? "Quando entri fai direttamente il turno."
-    : altro
-      ? "Lavori già come " + altro.n.toLowerCase() + ". Un posto alla volta: questo turno resta bloccato."
-      : "Il primo turno ti assume automaticamente.";
-  const dx = lfPan("Oggi",
-    '<div class="stvuoto"><b>' + lfEsc(statoTitolo) + '</b> ' + lfEsc(statoTesto) + '</div>' +
-    lfRiga("Energia", Math.round(G.energy)) +
-    lfRiga("In cassa", fmt(G.money) + " €", "oro"),
-    "soldi");
+  /* A destra non ripetiamo più energia/cassa (sono già nella HUD globale):
+     qui c'è il cartellino vero, che registra soltanto i turni completati. */
+  const dx = lfPan("Cartellino presenze", lfFabbricaCartellino(), "orologio");
 
   return {sx:sx, mid:mid, dx:dx};
 }
