@@ -767,6 +767,12 @@ function lavoroPromuoviRuolo(luogo, opzioni){
   c.perfectCyclesInRole = 0;
   c.perfectStreak = 0;
 
+  /* La sede e i contatti non si azzerano con la promozione, ma la nuova
+     mansione deve costruire la propria esposizione sociale da zero. */
+  const rete=lavoroReteStato(luogo);
+  if(rete && rete.turniPerRuolo && !Object.prototype.hasOwnProperty.call(rete.turniPerRuolo,dopo.id))
+    rete.turniPerRuolo[dopo.id]=0;
+
   return {
     luogo:luogo,
     da:prima,
@@ -1426,8 +1432,14 @@ function lavoroTentaIncontroContatto(luogo, roll, job){
      nessun ruolo è mai stato registrato, lo attribuiamo alla mansione che il
      giocatore ha al primo caricamento. Dopo questo passaggio, una promozione
      futura avrà una chiave nuova e ripartirà correttamente da zero. */
-  if(!Object.keys(stato.turniPerRuolo).length && stato.turniVisti>0)
-    stato.turniPerRuolo[ruoloId]=stato.turniVisti;
+  if(!Object.keys(stato.turniPerRuolo).length){
+    let legacy=Math.max(0,stato.turniVisti-1);
+    if(luogo==="fabbrica" && typeof lavoroCartellino==="function"){
+      const cart=lavoroCartellino(luogo);
+      if(cart) legacy=Math.max(legacy,Math.max(0,Number(cart.totale||0)-1));
+    }
+    if(legacy>0) stato.turniPerRuolo[ruoloId]=legacy;
+  }
   stato.turniPerRuolo[ruoloId]=Math.max(0,Number(stato.turniPerRuolo[ruoloId]||0))+1;
 
   /* L'esposizione per sbloccare nuovi incontri riparte quando cambia mansione.
