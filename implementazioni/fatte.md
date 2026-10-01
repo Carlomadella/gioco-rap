@@ -25,7 +25,7 @@ cita (la catena del pezzo) e il «punto 4 di ALE» di
 | quando | quante |
 | --- | --- |
 | 29/09/2026 | 5, più le chiuse dell'ordine |
-| 28/09/2026 | 1 |
+| 28/09/2026 | 2 |
 | 21/09/2026 | 4 |
 | 20/09/2026 | 9 |
 | 15/09/2026 | 6 |
@@ -190,14 +190,26 @@ nota; se il punto voleva altro, va riscritto nel foglio._
 
 ---
 
-## 21/09/2026
+## 28/09/2026
 
-_Le due piccole dell'energia, chiuse insieme nel branch `task/sala-gratis-e-take-a-25`:
-la Sala che non costa più niente e la take che costava troppo. Poi la prima delle tre dello
-Shop, «Lo stile che conta», nel branch `task/shop-lo-stile-che-conta`; la richiesta
-arrivata subito dopo — solo vestiti, coi filtri — chiusa in giornata; e le altre due dello
-Shop, i capi che si sbloccano e le offerte, insieme nel branch
-`task/shop-capi-sbloccati-e-offerte`._
+_I due punti chiusi il 28/09 nei branch `task/lafamegram-posta-la-gente` e
+`task/studio-resto-automatico`, rimasti fuori da `main` fino al 01/10._
+
+### Su LaFamegram non posta nessuno
+
+_Da `implementazioni.md`, CARLO «Da discutere» 9 (prima 11)._
+
+9. sull'app lafamegram non posta nessuno
+
+   **Stato (15/09/2026)** — nel feed (`telPost()` in `telefono.js`) ci sono i tuoi post,
+   quelli che nascono dagli incontri — il fan, il giornalista, la Strada, tutti in
+   `lafamegramEventi` e tutti **su di te** — e due notizie de «La Voce del Giro». Nessun
+   contatto della Sala, nessun rivale, posta per conto suo: è vero che «non posta
+   nessuno». Prima di farlo va deciso chi posta e cosa (i beatmaker i loro beat? gli opps
+   contro di te? chi scala la classifica?).
+
+   **FATTO (28/09/2026, su main il 01/10)** — postano i rivali e la gente della Sala che
+   conosci: «Su LaFamegram posta anche la gente», `02-interfaccia-e-telefono.md`.
 
 ### Beat, Testo e Cabina a mano, il resto in automatico
 
@@ -211,6 +223,15 @@ _Da `implementazioni.md`, CARLO «Studio (16/09/2026)» 10._
     non costa energia né una mossa. Il pezzo resta sul banco, e tornandoci Mix e Uscita
     sono aperte (Carlo, 28/09). «Il resto in automatico» in
     `02-interfaccia-e-telefono.md`.
+
+## 21/09/2026
+
+_Le due piccole dell'energia, chiuse insieme nel branch `task/sala-gratis-e-take-a-25`:
+la Sala che non costa più niente e la take che costava troppo. Poi la prima delle tre dello
+Shop, «Lo stile che conta», nel branch `task/shop-lo-stile-che-conta`; la richiesta
+arrivata subito dopo — solo vestiti, coi filtri — chiusa in giornata; e le altre due dello
+Shop, i capi che si sbloccano e le offerte, insieme nel branch
+`task/shop-capi-sbloccati-e-offerte`._
 
 ### Capi che si sbloccano, e le offerte della settimana
 

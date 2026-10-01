@@ -6515,3 +6515,59 @@ lanciato.
   `tw:totalWeeks()` quando nascono (`strada.js` e i due posti di `eventi-v2.js`), `telPost`
   non timbra più niente e quelli dei salvataggi vecchi senza settimana vanno in fondo.
   Controllo in `audit-regressioni.js`.
+
+## Giro del 01/10/2026 (segnala-problemi, `task/studio-resto-automatico`) — la chiusa
+
+### 79. Nota: due cose fuori posto in `fatte.md` per i punti chiusi oggi
+- **dove** — `implementazioni/fatte.md:28` (la riga «28/09/2026 | 1» della tabella) e
+  `:202` («### Beat, Testo e Cabina a mano, il resto in automatico», sotto «## 21/09/2026»
+  di `:193`); la nota tolta stava in `implementazioni/implementazioni.md` sotto «9.
+  sull'app lafamegram non posta nessuno» (CARLO, «Da discutere»)
+- **cosa succede** — il punto dello Studio è chiuso il 28/09 ma è finito sotto al titolo
+  del 21/09, e nella tabella c'è un 28/09 che non ha un titolo suo. Il punto di LaFamegram
+  è stato tolto dalla lista insieme alla sua nota «Stato (15/09/2026)», che non è stata
+  copiata né in `fatte.md` né in `02-interfaccia-e-telefono.md:352` (lì c'è solo la
+  richiesta e il FATTO): la regola di `fatte.md` è tenere le note com'erano. E nella lista
+  CARLO «Da discutere» adesso si salta dall'8 al 10. Il gioco non ne risente.
+- **come si vede** — apri `fatte.md` e cerca «Il resto in automatico»: sta in mezzo ai
+  punti del 21/09.
+- **quanto pesa** — da sistemare con calma.
+
+## Giro sul telefono del 01/10/2026 (prova-sul-telefono, branch `task/studio-resto-automatico` con dentro `task/lafamegram-posta-la-gente`, commit `d9425894`)
+
+**Misure:** 390 × 844 in verticale, 844 × 390 di traverso, 360 × 640 (il piccolo) e
+1366 × 768 (computer). L'estensione Chrome non era collegata: giro fatto con Playwright
+(Chromium, `isMobile` e `hasTouch` accesi sulle misure da telefono, i tasti premuti con
+`tap()`), su un server mio (`node strumenti/dev.js --porta 8137`), non sulla 8000. Il pezzo
+sul banco l'ho messo a mano da console (`G.songs.push(...)` + `studioMettiSulBanco`), non
+passando dalla Cabina vera: quello che si vede in Cabina *sopra* la riga («manca la strofa»)
+è quindi quello di un banco senza strofe e beat in cartella. Il feed di LaFamegram l'ho
+riempito facendo girare `vitaRivali` per sei settimane. **Console pulita**: nessun errore
+né avviso su nessuna misura.
+
+**Quello che funziona.** La riga «Il resto lo può chiudere il gioco…» e il tasto «chiudi tu
+il resto: mix e uscita» si leggono a tutte le misure: il testo va a capo dentro al pannello,
+il tasto è alto 44 e largo 231, non esce (a 360 il riquadro è largo 306 e il tasto finisce a
+258). **Nessuna pagina scorre di lato.** Il tocco funziona; dopo il tocco compare il toast
+«… esce venerdì, chiuso dal gioco» (sopra la barra delle notizie, leggibile anche di
+traverso), lo Studio torna al Beat, e **Mix e Uscita restano aperte** a tutte le misure: il
+Mix dice «è già mixato — della casa», l'Uscita ha «venerdì · fra 4 g» acceso e la riga della
+qualità scrive «Mix della casa +3». Su LaFamegram i post della gente sono card semplici,
+senza tasti (né rotti né vuoti), larghe quanto lo schermo del telefono, niente testo che
+esce con i testi veri; il feed scorre dentro al telefono e la testata «LAFAMEGRAM» col tasto
+indietro resta ferma.
+
+Di traverso la riga sta sotto la piega: nella Cabina e nel Mix la colonna che scorre è alta
+222 punti su 390, e la riga si trova solo scorrendo. Non è di questa task: è la fascia della
+**voce 9** e del giro del 20/09 («Di traverso la fascia si prende 144 punti su 390»).
+![Cabina di traverso: la riga è sotto, si scorre](prove-telefono/2026-10-01/studio-auto-cabina-844x390.png)
+
+Le figure di quello che va: ![Mix a 390, la riga in vista](prove-telefono/2026-10-01/studio-auto-mix-390x844.png)
+![Mix a 360](prove-telefono/2026-10-01/studio-auto-mix-360x640.png)
+![Mix al computer](prove-telefono/2026-10-01/studio-auto-mix-1366x768.png)
+![Uscita riaperta dopo il tocco, al computer](prove-telefono/2026-10-01/studio-auto-uscita-riaperta-1366x768.png)
+![LaFamegram, i post della gente a 390](prove-telefono/2026-10-01/lafamegram-gente-390x844.png)
+![LaFamegram di traverso](prove-telefono/2026-10-01/lafamegram-844x390.png)
+- **RISOLTO (01/10/2026)** — stesso branch: in `fatte.md` c'è «## 28/09/2026» coi due punti,
+  la nota «Stato (15/09/2026)» di LaFamegram è tornata sotto al suo punto, la tabella dice 2.
+  Il salto dall'8 al 10 nella lista CARLO è voluto: i numeri non si rifanno.
