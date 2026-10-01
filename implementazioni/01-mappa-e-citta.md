@@ -31,6 +31,12 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
    - **Centro per l'impiego** — apre *tutti* i lavori di `JOBS` (`actions.js`), non solo Pizzeria e
      Fabbrica: chi non ha i requisiti (es. Buttafuori, Fonico junior) lo vede scritto, non può prenderlo
      lo stesso. Orario d'ufficio, 09:00–18:00 (`orari.js`).
+
+   **RIMOSSO (01/10/2026)** — il Centro per l'impiego non fa più parte della città giocabile.
+   Pizzeria e Fabbrica assumono direttamente nel loro luogo; Volantinaggio, Fattorino, Barista,
+   Magazziniere, Buttafuori e Fonico junior restano parcheggiati fuori da `JOBS` in
+   `JOBS_LEGACY_PAUSED`, in attesa di essere riprogettati nel loro contesto reale. Rimossi anche
+   hotspot, orario, coordinate di viaggio, «Cerca lavoro», colloqui e relativa scena.
    - **Campetto** — nella foto c'è, nel gioco no: dice «sta arrivando» (`hubPresto`), non finge un
      minigioco che non esiste.
 
@@ -737,7 +743,7 @@ scheda è tornata dove la cosa già esisteva, e dove non esisteva è stata messa
 
 | la scheda | dov'è finita |
 |---|---|
-| **Settimana** (le 13 mosse) | nei luoghi: si scrive/registra/mixa/pubblica allo **Studio**, il palco al **Live Club**, il turno in **Pizzeria**/**Fabbrica**, il lavoro al **Centro per l'impiego**, staccare la spina a **Casa**, pesi e cardio in **Palestra** |
+| **Settimana** (le mosse) | nei luoghi: si scrive/registra/mixa/pubblica allo **Studio**, il palco al **Live Club**, i turni e le assunzioni in **Pizzeria**/**Fabbrica**, staccare la spina a **Casa**, pesi e cardio in **Palestra** |
 | **Catalogo** | lo **Shop** della mappa (attrezzatura, banco dei beat, vestiti). Quello che si possiede lo dice già l'app **Inventario** del telefono |
 | **Discografia** | app nuova del **telefono** |
 | **Classifica** | app **Classifiche** del telefono, **al posto** di quella che c'era |
