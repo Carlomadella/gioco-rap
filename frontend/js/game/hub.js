@@ -136,15 +136,6 @@ const HUB_LUOGHI = [
      if(typeof offerteAggiorna === "function") offerteAggiorna(true);
      apriPannello("Shop", "shop", "Vestiti e accessori per il tuo artista.");
    }},
-  /* punto 6: il centro per l'impiego, arrivato con la mappa definitiva.
-     Apre tutti i lavori (JOBS), non solo i due che hanno già un edificio —
-     rispetta i requisiti, non finge che siano tutti presi al volo.
-     Il campetto (che stava qui) è uscito col punto 8: non lo vogliamo un
-     posto giocabile. Il cartello nella foto resta — punto 45, le targhette
-     sono dentro al pixel — ma senza una zona da toccare sopra non fa più
-     niente, come «Periferia» o «Centro». */
-  {id:"impiego", n:"Centro per l'impiego",
-   vai:() => schedaImpiego()}
 ];
 
 /* ================= I PROFILI DEGLI EDIFICI =================
@@ -163,7 +154,6 @@ const HUB_SAGOME = Object.freeze({
   fabbrica:[[75.48,42.51],[79.84,38.89],[85.41,37.94],[92.11,42.72],[91.81,47.61],[87.44,49.73],[75.72,48.03]],
   palestra:[[74.16,76.09],[75.48,71.84],[82.24,69.08],[86.72,73.33],[86.48,79.91],[85.53,84.59],[74.64,85.02]],
   shop:    [[12.26,25.72],[14.53,23.59],[17.46,25.50],[17.52,31.88],[16.93,34.86],[12.44,33.79]],
-  impiego: [[61.72,25.29],[68.66,20.19],[75.66,24.44],[75.48,31.88],[68.18,36.13],[61.72,31.88]]
 });
 
 /* Dal profilo si ricavano tre cose: il rettangolo che lo contiene (la misura
@@ -210,7 +200,6 @@ const HUB_PIN_COLOR = Object.freeze({
   fabbrica:"#CBD5E1",
   palestra:"#38BDF8",
   shop:"#0EA5E9",
-  impiego:"#22D3EE"
 });
 
 /* Quartieri UI. Le strade principali sono fasce neutre e fanno da confine naturale. */
@@ -220,7 +209,6 @@ const HUB_DISTRICT = Object.freeze({
   crimin:"periferia",
   beat:"centro",
   shop:"periferia",
-  impiego:"centro",
   fabbrica:"industriale",
   pizzeria:"industriale",
   palestra:"industriale"
@@ -414,12 +402,9 @@ function hubChiuso(l){
     opts:[{n:"Ho capito", d:"Torni alla mappa", run(){ return null; }}]});
 }
 
-/* punto 59: due posti di lavoro veri sulla mappa, non un cartello con su
-   scritto «arriva a Milano». Un posto alla volta, come è sempre stato G.job.
-   La Fabbrica è già migrata al nuovo sistema: contratto, dimissioni,
-   disciplina per presenze e blocco di riassunzione. Gli altri lavori
-   continuano temporaneamente a usare le regole legacy finché verranno
-   migrati uno alla volta. */
+/* I lavori attivi si prendono direttamente nel loro luogo: Pizzeria e
+   Fabbrica. Il Centro per l'impiego e i colloqui generici sono stati rimossi;
+   i vecchi lavoretti restano in pausa finché non avranno un contesto proprio. */
 function completaAssunzione(def){
   G.job = {id:def.id, place:def.place || null, n:def.n, pay:def.pay, e:def.e, missed:0};
   pushLog("Hai preso il posto da " + def.n.toLowerCase() + ": " + def.pay + " € a turno.", "good");
@@ -558,63 +543,6 @@ function assumitiCome(jobId){
 
   hubAzione("turno");
 }
-function schedaLavoro(jobId, luogo){
-  const def = JOBS.find(j => j.id === jobId);
-  const mio = G.job && G.job.id === jobId;
-  /* Quanto dura davvero il turno e fino a che ora si può entrare: scritto
-     dove si decide, non scoperto dopo. */
-  let orario = "";
-  try{
-    if(window.GAME_HOURS && window.GAME_TIME){
-      const st = GAME_HOURS.jobStatus(jobId);
-      const dur = GAME_TIME.formatDuration(GAME_HOURS.jobDuration(jobId));
-      orario = "<br>Turno di <b>" + dur + "</b> · " +
-        (st.allDay ? "sempre" : (st.open ? "si entra fino alle <b>" +
-          GAME_TIME.format(st.closeAt - GAME_HOURS.jobDuration(jobId)) + "</b>" : st.label));
-    }
-  }catch(e){}
-  showEvent({k:luogo, t:def.n,
-    d:(mio ? "Sei già assunto qui." : def.d) + orario,
-    annulla(){},
-    opts:[
-      {n:mio ? "Fai il turno" : "Fatti assumere e lavora", d:def.pay + " € · " + def.e + " energia",
-       run(){ assumitiCome(jobId); return null; }},
-      {n:"Lascia stare", d:"Torni alla mappa", run(){ return null; }}
-    ]});
-}
-
-/* punto 6: il centro per l'impiego — l'unico luogo che apre tutti i lavori
-   di JOBS (actions.js), non solo Pizzeria e Fabbrica che hanno un edificio
-   loro. Chi non ha i requisiti lo vede, ma non può prenderlo: niente finto. */
-function schedaImpiego(){
-  const righe = JOBS.map(j => {
-    const reqOk = !j.req || j.req(G);
-    const luogoContratto = j.place && typeof lavoroContrattoDef === "function" && lavoroContrattoDef(j.place)
-      ? j.place : null;
-    const blocco = luogoContratto && typeof lavoroBloccoRiassunzione === "function"
-      ? lavoroBloccoRiassunzione(luogoContratto)
-      : {active:false,weeksRemaining:0};
-    const ok = reqOk && !blocco.active;
-    const desc = blocco.active
-      ? "Riassunzione bloccata · " + blocco.weeksRemaining +
-        (blocco.weeksRemaining === 1 ? " settimana" : " settimane")
-      : ok ? j.pay + " € · " + j.e + " energia" : "Serve di più: non ancora";
-    return {n:j.n, d:desc,
-      run(){ if(ok) assumitiCome(j.id); return null; }};
-  });
-  righe.push({n:"Lascia stare", d:"Torni alla mappa", run(){ return null; }});
-  showEvent({k:"Centro per l'impiego", t:"Tutti i lavori in città",
-    d:G.job ? "Lavori già come " + G.job.n.toLowerCase() +
-      (() => {
-        const luogo = typeof lavoroLuogo === "function" ? lavoroLuogo(G.job) : null;
-        return luogo && typeof lavoroContrattoDef === "function" && lavoroContrattoDef(luogo)
-          ? ". Per cambiare lavoro, dai prima le dimissioni dal posto attuale."
-          : ". Un posto alla volta.";
-      })()
-      : "Guarda cosa c'è, e fatti assumere.",
-    annulla(){}, opts:righe});
-}
-
 function hubNotizie(){
   showEvent({k:"Notizie della settimana", t:"Cosa gira in paese",
     d:HUB_NOTIZIE.map(n => "• " + n.t).join("<br>"), annulla(){},
