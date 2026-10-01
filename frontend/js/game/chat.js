@@ -907,10 +907,14 @@ function chatContattoSala(p){
 /* chi ti ha dato il numero ed è ancora in giro.
    Può essere una persona conosciuta alla Sala oppure sul lavoro: in entrambi
    i casi è la stessa persona persistente in G.gente, non un contatto finto. */
-const CHAT_MESTIERI = ["beatmaker","fonico","videomaker","rapper","promoter","collega","strada"];
+const CHAT_MESTIERI = ["beatmaker","fonico","videomaker"];
+const CHAT_MESTIERI_LAVORO = ["rapper","promoter","collega","strada"];
 function chatDaSala(){
   return (G.gente || [])
-    .filter(x => x.numero && !x.via && CHAT_MESTIERI.indexOf(x.ruolo) >= 0)
+    .filter(x => x.numero && !x.via && (
+      CHAT_MESTIERI.indexOf(x.ruolo) >= 0 ||
+      (!!x.origineLuogo && CHAT_MESTIERI_LAVORO.indexOf(x.ruolo) >= 0)
+    ))
     .map(chatContattoSala);
 }
 
