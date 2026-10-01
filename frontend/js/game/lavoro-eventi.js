@@ -43,9 +43,9 @@ const CFG = Object.freeze({
   })
 });
 
-/* Le otto famiglie del punto 10. Alcune sono orchestrate qui, altre (come
-   lo straordinario Fabbrica) conservano il loro motore storico ma registrano
-   gli esiti nello stesso stato persistente. */
+/* Le famiglie degli eventi di lavoro. Alle otto trasversali si aggiunge la
+   responsabilità di ruolo della Fabbrica: non duplica il motore, registra
+   gli esiti nello stesso stato persistente e passa dallo stesso arbitro. */
 const FAMILIES = Object.freeze({
   discipline:Object.freeze({id:"discipline",label:"Presenze e disciplina"}),
   career:Object.freeze({id:"career",label:"Carriera"}),
