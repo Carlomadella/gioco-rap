@@ -349,11 +349,19 @@ function lfPalestra(){
    fascia in basso. La logica economica resta quella esistente di JOBS /
    assumitiCome() / azione "turno". */
 
-function lfFabbricaCartellino(){
-  const cart = typeof fabbricaCartellino === "function" ? fabbricaCartellino() : null;
-  if(!cart) return '<div class="stvuoto">Cartellino non disponibile.</div>';
+function lfCartellinoLavoro(luogo){
+  const cart = typeof lavoroCartellino === "function" ? lavoroCartellino(luogo) : null;
+  const contratto = typeof lavoroContrattoDef === "function" ? lavoroContrattoDef(luogo) : null;
+  if(!cart || !contratto) return '<div class="stvuoto">Cartellino non disponibile.</div>';
 
   const giorni = ["L","M","M","G","V","S","D"];
+  const consentiti = Array.isArray(contratto.giorniConsentiti) ? contratto.giorniConsentiti : [1,2,3,4,5,6,7];
+  const riposo = Number(contratto.giornoRiposo || (contratto.domenicaRiposo ? 7 : 0));
+  const carrieraCfg = typeof lavoroCarrieraDef === "function" ? lavoroCarrieraDef(luogo) : null;
+  const maxRichiami = carrieraCfg && carrieraCfg.disciplina
+    ? Number(carrieraCfg.disciplina.richiamiPrimaLicenziamento || 2)
+    : 2;
+
   let html = '<div class="lfpresenze" aria-label="Cartellino presenze delle ultime quattro settimane">' +
     '<div class="lfpres-head"><span></span>' +
     giorni.map(g => '<i>' + g + '</i>').join("") + '</div>';
@@ -361,27 +369,30 @@ function lfFabbricaCartellino(){
   for(let settimana = 0; settimana < 4; settimana++){
     html += '<div class="lfpres-week"><b>S' + (settimana + 1) + '</b>';
     for(let giorno = 0; giorno < 7; giorno++){
+      const numeroGiorno = giorno + 1;
       const pos = settimana * 7 + giorno;
       const n = Number(cart.conteggi[pos] || 0);
-      const domenica = giorno === 6;
+      const giornoRiposo = riposo === numeroGiorno;
       const settimanaConclusa = settimana < (cart.settimana - 1);
-      const nonLavorato = settimanaConclusa && !domenica && n === 0;
+      const giornoOrdinario = consentiti.includes(numeroGiorno);
+      const nonLavorato = settimanaConclusa && giornoOrdinario && !giornoRiposo && n === 0;
       const cls = "lfpres-day" +
         (n ? " fatto" : "") +
-        (domenica ? " domenica" : "") +
+        (giornoRiposo ? " riposo" : "") +
+        (luogo === "fabbrica" && numeroGiorno === 7 ? " domenica" : "") +
         (nonLavorato ? " non-lavorato" : "") +
         (pos === cart.posOggi ? " oggi" : "") +
         (pos > cart.posOggi ? " futuro" : "");
       const testo = n > 1 ? "×" + n : n === 1 ? "✓" : "";
-      const stato = domenica
-        ? (n ? ": domenica straordinaria, " + n + (n === 1 ? " turno" : " turni") : ": domenica, riposo")
+      const stato = giornoRiposo
+        ? (n ? ": giorno di riposo lavorato, " + n + (n === 1 ? " turno" : " turni") : ": riposo")
         : n
           ? ": " + n + (n === 1 ? " turno" : " turni")
           : nonLavorato
             ? ": non lavorato"
             : "";
       html += '<span class="' + cls + '" title="Settimana ' + (settimana + 1) +
-        ', giorno ' + (giorno + 1) + stato + '">' + testo + '</span>';
+        ', giorno ' + numeroGiorno + stato + '">' + testo + '</span>';
     }
     html += '</div>';
   }
@@ -393,7 +404,7 @@ function lfFabbricaCartellino(){
       ? '<span>Questa settimana <b>' + cart.giorniLavoratiSettimana + '/' + cart.turniSettimanaliRichiesti + '</b></span>'
       : '') +
     '<span>Affidabilità <b>' + Math.round(cart.affidabilita == null ? 50 : cart.affidabilita) + '</b></span>' +
-    '<span>Richiami <b>' + Number(cart.richiami || 0) + '/2</b></span>' +
+    '<span>Richiami <b>' + Number(cart.richiami || 0) + '/' + maxRichiami + '</b></span>' +
     (blocco.active
       ? '<span>Riassunzione <b>' + blocco.weeksRemaining + ' sett.</b></span>'
       : '') +
@@ -402,30 +413,37 @@ function lfFabbricaCartellino(){
   return html;
 }
 
-function lfDimissioniFabbrica(){
-  if(!G.job || typeof lavoroLuogo !== "function" || lavoroLuogo(G.job) !== "fabbrica") return;
+function lfFabbricaCartellino(){ return lfCartellinoLavoro("fabbrica"); }
+function lfPizzeriaCartellino(){ return lfCartellinoLavoro("pizzeria"); }
+
+function lfDimissioniLavoro(luogo, nome){
+  if(!G.job || typeof lavoroLuogo !== "function" || lavoroLuogo(G.job) !== luogo) return;
+  nome = nome || (luogo === "fabbrica" ? "Fabbrica" : luogo === "pizzeria" ? "Pizzeria" : "posto di lavoro");
 
   showEvent({
-    k:"Fabbrica",
+    k:nome,
     t:"Dare le dimissioni?",
-    d:"Lasci volontariamente il posto in Fabbrica. Mantieni lo storico delle presenze e della carriera, ma il contratto attuale si chiude e non riceverai più la paga dei turni.",
+    d:"Lasci volontariamente il posto in " + nome +
+      ". Mantieni lo storico delle presenze e della carriera, ma il contratto attuale si chiude e non riceverai più la paga dei turni.",
     annulla(){},
     opts:[
       {n:"Dai le dimissioni", d:"Chiudi il rapporto di lavoro", run(){
         const ruolo = G.job && G.job.n ? G.job.n : "dipendente";
-        if(typeof lavoroTerminaContratto === "function") lavoroTerminaContratto("fabbrica", "dimissioni");
+        if(typeof lavoroTerminaContratto === "function") lavoroTerminaContratto(luogo, "dimissioni");
         G.job = null;
         if(typeof pushLog === "function")
-          pushLog("<b>Hai dato le dimissioni dalla Fabbrica.</b> Il rapporto di lavoro è chiuso.", "");
+          pushLog("<b>Hai dato le dimissioni dalla " + nome + ".</b> Il rapporto di lavoro è chiuso.", "");
         if(typeof save === "function") save();
         if(typeof renderGioco === "function") renderGioco();
         if(typeof renderLuogo === "function") renderLuogo();
-        return {t:"Hai lasciato il posto da " + ruolo.toLowerCase() + ". Lo storico della Fabbrica resta salvato.", c:""};
+        return {t:"Hai lasciato il posto da " + ruolo.toLowerCase() + ". Lo storico della " + nome + " resta salvato.", c:""};
       }},
       {n:"Resta", d:"Mantieni il posto", run(){ return null; }}
     ]
   });
 }
+
+function lfDimissioniFabbrica(){ return lfDimissioniLavoro("fabbrica", "Fabbrica"); }
 
 function lfFabbrica(){
   const baseDef = (typeof JOBS !== "undefined" ? JOBS : []).find(j => j.id === "operaio");
@@ -553,63 +571,120 @@ function lfFabbrica(){
    Renderer indipendente dalla Fabbrica: condivide soltanto JOBS,
    assumitiCome() e l'azione turno. La UI puo' quindi evolvere da sola. */
 function lfPizzeria(){
-  const def = (typeof JOBS !== "undefined" ? JOBS : []).find(j => j.id === "lavapiatti");
-  if(!def) return {mid:lfPan("Pizzeria", '<div class="stvuoto">Turno non disponibile.</div>', "orologio")};
+  const baseDef = (typeof JOBS !== "undefined" ? JOBS : []).find(j => j.id === "lavapiatti");
+  if(!baseDef) return {mid:lfPan("Pizzeria", '<div class="stvuoto">Turno non disponibile.</div>', "orologio")};
 
-  const mio = !!(G.job && G.job.id === def.id);
+  const mio = !!(G.job && typeof lavoroLuogo === "function" && lavoroLuogo(G.job) === "pizzeria");
   const altro = G.job && !mio ? G.job : null;
+  const def = mio ? {
+    id:G.job.id,
+    n:G.job.n,
+    pay:G.job.pay,
+    e:G.job.e,
+    d:G.job.d || baseDef.d
+  } : baseDef;
+
   let stato = {ok:true, perche:""};
   let orario = "Turno serale";
   try{
     if(window.GAME_HOURS && window.GAME_TIME){
-      const st = GAME_HOURS.jobStatus(def.id);
-      const dur = GAME_TIME.formatDuration(GAME_HOURS.jobDuration(def.id));
+      const st = mio && typeof GAME_HOURS.placeJobStatus === "function"
+        ? GAME_HOURS.placeJobStatus("pizzeria")
+        : (typeof GAME_HOURS.placeStatus === "function"
+            ? GAME_HOURS.placeStatus("pizzeria")
+            : GAME_HOURS.jobStatus(baseDef.id));
+      const durataBase = typeof GAME_TIME.durationForWorkplace === "function"
+        ? GAME_TIME.durationForWorkplace("pizzeria")
+        : GAME_HOURS.jobDuration(baseDef.id);
+      const dur = GAME_TIME.formatDuration(st && st.duration != null ? st.duration : durataBase);
       orario = "Turno di " + dur;
-      if(st && !st.open) stato = {ok:false, perche:st.label || "Adesso e' chiuso"};
-      else if(st && !st.allDay && st.closeAt != null)
-        orario += " · ingresso fino alle " + GAME_TIME.format(st.closeAt - GAME_HOURS.jobDuration(def.id));
+      if(st && !st.open) stato = {ok:false, perche:st.label || "Adesso è chiuso"};
+      else if(st && !st.allDay && st.closeAt != null && mio)
+        orario += " · ingresso fino alle " + GAME_TIME.format(st.closeAt - (st.duration != null ? st.duration : durataBase));
     }
   }catch(e){}
-  if(altro) stato = {ok:false, perche:"Lavori gia' come " + altro.n.toLowerCase()};
+
+  const bloccoRiassunzione = !mio && !altro && typeof lavoroBloccoRiassunzione === "function"
+    ? lavoroBloccoRiassunzione("pizzeria")
+    : {active:false,weeksRemaining:0};
+
+  if(altro) stato = {ok:false, perche:"Lavori già come " + altro.n.toLowerCase()};
+  else if(bloccoRiassunzione.active)
+    stato = {ok:false, perche:"Riassunzione bloccata · " + bloccoRiassunzione.weeksRemaining +
+      (bloccoRiassunzione.weeksRemaining === 1 ? " settimana" : " settimane")};
   else if(stato.ok && G.energy < def.e) stato = {ok:false, perche:"Serve energia"};
 
-  const sx = lfPan("Il posto",
+  const sx = lfPan("La cucina",
     lfRiga("Mansione", def.n) +
     lfRiga("Paga", fmt(def.pay) + " €", "oro") +
     lfRiga("Costo", "−" + def.e + " energia") +
-    '<p class="stnota lfnotasotto">' + lfEsc(def.d) + '</p>',
+    '<p class="stnota lfnotasotto">' + lfEsc(def.d) + '</p>' +
+    (mio
+      ? '<button type="button" class="lfdimissioni" data-dimissioni="pizzeria">Dai le dimissioni</button>'
+      : ""),
     "orologio");
+
+  const contratto = typeof lavoroContrattoDef === "function" ? lavoroContrattoDef("pizzeria") : null;
+  const quota = contratto ? Number(contratto.turniSettimanali || 0) : 0;
+  const pagaTurno = mio && typeof lavoroPagaTurno === "function"
+    ? lavoroPagaTurno("pizzeria", def.pay)
+    : {totale:def.pay, bonus:0, percentuale:0, etichetta:""};
+  const statoStraordinari = mio && typeof lavoroStraordinarioStato === "function"
+    ? lavoroStraordinarioStato("pizzeria")
+    : null;
+  const straordinarioAccettato = statoStraordinari && statoStraordinari.accepted
+    ? statoStraordinari.accepted
+    : null;
+  const straordinarioOggi = mio && typeof lavoroStraordinarioOggi === "function"
+    ? lavoroStraordinarioOggi("pizzeria")
+    : null;
+  const notaBonus = pagaTurno.percentuale
+    ? " · " + pagaTurno.etichetta + " +" + pagaTurno.percentuale + "%"
+    : "";
 
   const riga = stScelta({
     attr:"",
     on:true,
-    n:mio ? "Il tuo turno" : "Posto da lavapiatti",
-    d:orario,
-    v:stato.ok ? (fmt(def.pay) + " € · −" + def.e + " energia") : stato.perche,
+    n:mio ? "Il tuo servizio" : "Posto da lavapiatti",
+    d:orario + (quota ? " · " + quota + " turni/settimana" : ""),
+    v:stato.ok ? (fmt(pagaTurno.totale) + " €" + notaBonus + " · −" + def.e + " energia") : stato.perche,
     vCls:stato.ok ? "" : "calmo"
   });
 
-  const testo = mio ? "Fai il turno" : "Fatti assumere e lavora";
-  const mid = lfPan(mio ? "Vai al lavoro" : "Vuoi lavorare qui?",
-    '<p class="stnota">Cucina bollente, servizio serale e piatti che non finiscono mai. È uno dei primi lavori che tengono in piedi la settimana.</p>' +
+  const testo = mio
+    ? "Entra in servizio"
+    : bloccoRiassunzione.active
+      ? "Riassunzione bloccata"
+      : "Leggi e firma il contratto";
+  const azioneLavoro = mio ? ' data-vai="turno"' : ' data-lavoro="' + baseDef.id + '"';
+
+  const mid = lfPan(mio ? "Prima del servizio" : "Vuoi lavorare qui?",
+    '<p class="stnota">' +
+      (mio
+        ? (straordinarioOggi
+            ? '<b>Copertura extra concordata oggi:</b> ' + lfEsc(straordinarioOggi.targetLabel) +
+              ' · maggiorazione +' + Number(straordinarioOggi.bonusPct || 0) + '%.'
+            : straordinarioAccettato
+              ? '<b>Copertura extra concordata:</b> ' + lfEsc(straordinarioAccettato.targetLabel) +
+                ' · maggiorazione +' + Number(straordinarioAccettato.bonusPct || 0) + '%.'
+              : pagaTurno.percentuale
+                ? '<b>' + lfEsc(pagaTurno.etichetta) + ':</b> hai già coperto i quattro servizi del contratto; questo turno è pagato di più.'
+                : 'Servizio serale, ritmi stretti e cucina piena. Qui contano continuità e presenza, ma il calendario non è quello della Fabbrica.')
+        : (bloccoRiassunzione.active
+            ? 'Dopo un licenziamento la Pizzeria non ti riprende subito.'
+            : 'Il contratto richiede ' + (quota || 4) +
+              ' servizi a settimana tra martedì e domenica. Il lunedì è il giorno di riposo; dal quinto giorno distinto scatta una maggiorazione del 20%.')) +
+    '</p>' +
     riga +
-    '<div class="stazioni"><button type="button" class="stprimo" data-lavoro="lavapiatti"' +
+    '<div class="stazioni"><button type="button" class="stprimo"' + azioneLavoro +
       (stato.ok ? "" : " disabled") + '>' + lfIco("orologio") + lfEsc(testo) +
-      ' · +' + fmt(def.pay) + ' € · −' + def.e + ' energia</button></div>' +
+      ' · +' + fmt(pagaTurno.totale) + ' €' +
+      (pagaTurno.percentuale ? ' (+' + pagaTurno.percentuale + '%)' : '') +
+      ' · −' + def.e + ' energia</button></div>' +
     (stato.ok ? "" : '<p class="stperche">' + lfEsc(stato.perche) + '.</p>'),
     "orologio");
 
-  const statoTitolo = mio ? "Sei assunto qui." : altro ? "Hai già un altro lavoro." : "Non sei ancora assunto.";
-  const statoTesto = mio
-    ? "Quando il turno è aperto entri direttamente dalla cucina."
-    : altro
-      ? "Lavori già come " + altro.n.toLowerCase() + ". Un posto alla volta: questo turno resta bloccato."
-      : "Il primo turno ti assume automaticamente.";
-  const dx = lfPan("Oggi",
-    '<div class="stvuoto"><b>' + lfEsc(statoTitolo) + '</b> ' + lfEsc(statoTesto) + '</div>' +
-    lfRiga("Energia", Math.round(G.energy)) +
-    lfRiga("In cassa", fmt(G.money) + " €", "oro"),
-    "soldi");
+  const dx = lfPan("Settimane in cucina", lfPizzeriaCartellino(), "orologio");
 
   return {sx:sx, mid:mid, dx:dx};
 }
@@ -671,8 +746,9 @@ if(typeof mostraScena === "function"){
     /* Fabbrica e Pizzeria hanno renderer distinti; condividono solo l'azione
        turno. Se parte da una delle due pagine, l'esito resta su quel luogo. */
     const turnoLuogo = a && a.id === "turno" && LUOGO && G && G.job &&
-      ((LUOGO.id === "fabbrica" && G.job.id === "operaio") ||
-       (LUOGO.id === "pizzeria" && G.job.id === "lavapiatti")) ? LUOGO.id : null;
+      (LUOGO.id === "fabbrica" || LUOGO.id === "pizzeria") &&
+      typeof lavoroLuogo === "function" && lavoroLuogo(G.job) === LUOGO.id
+        ? LUOGO.id : null;
     const id = a && (LUOGO_MOSSE[a.id] || turnoLuogo);
     if(!id) return lfScenaOriginale.apply(this, arguments);
     const esito = {a:a.id, msg:String(msg == null ? "" : msg), extra:String(extra == null ? "" : extra)};
@@ -757,9 +833,12 @@ if($("luogo")){
       return;
     }
     const dimissioni = e.target.closest("[data-dimissioni]");
-    if(dimissioni && !dimissioni.disabled && dimissioni.dataset.dimissioni === "fabbrica"){
-      lfDimissioniFabbrica();
-      return;
+    if(dimissioni && !dimissioni.disabled){
+      const luogoDimissioni = dimissioni.dataset.dimissioni;
+      if(luogoDimissioni === "fabbrica" || luogoDimissioni === "pizzeria"){
+        lfDimissioniLavoro(luogoDimissioni, luogoDimissioni === "fabbrica" ? "Fabbrica" : "Pizzeria");
+        return;
+      }
     }
     if(e.target.closest("[data-continua]")){ luogoContinua(); }
   });

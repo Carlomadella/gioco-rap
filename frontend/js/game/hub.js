@@ -425,37 +425,64 @@ function completaAssunzione(def){
   pushLog("Hai preso il posto da " + def.n.toLowerCase() + ": " + def.pay + " € a turno.", "good");
 }
 
-function contrattoFabbrica(def){
-  const cfg = typeof lavoroContrattoDef === "function" ? lavoroContrattoDef("fabbrica") : null;
-  const turni = cfg ? Number(cfg.turniSettimanali || 5) : 5;
+function contrattoPostoLavoro(def){
+  const luogo = def && def.place;
+  const cfg = luogo && typeof lavoroContrattoDef === "function" ? lavoroContrattoDef(luogo) : null;
+  if(!def || !luogo || !cfg) return;
+
+  const nome = cfg.nome || (luogo === "fabbrica" ? "Fabbrica" : luogo === "pizzeria" ? "Pizzeria" : "Posto di lavoro");
+  const turni = Math.max(0, Number(cfg.turniSettimanali || 0));
+  const durataFallback = luogo === "fabbrica" ? 480 : luogo === "pizzeria" ? 300 : 300;
   const durata = window.GAME_TIME && typeof GAME_TIME.durationForWorkplace === "function"
-    ? GAME_TIME.formatDuration(GAME_TIME.durationForWorkplace("fabbrica") || 480)
-    : "8h";
+    ? GAME_TIME.formatDuration(GAME_TIME.durationForWorkplace(luogo) || durataFallback)
+    : (luogo === "fabbrica" ? "8h" : "5h");
+  const carrieraCfg = typeof lavoroCarrieraDef === "function" ? lavoroCarrieraDef(luogo) : null;
+  const disciplina = carrieraCfg && carrieraCfg.disciplina ? carrieraCfg.disciplina : {};
+  const giorni = luogo === "pizzeria" ? "martedì–domenica" : "lunedì–sabato";
+  const riposo = cfg.giornoRiposoLabel || (cfg.domenicaRiposo ? "domenica" : "un giorno");
+  const lieveMax = Math.max(0, Number(disciplina.assenzeLieveMax || 0));
+  const richiamoMin = Math.max(1, Number(disciplina.assenzeRichiamoMin || 1));
+  const richiamiMax = Math.max(1, Number(disciplina.richiamiPrimaLicenziamento || 2));
+  const blocco = Math.max(0, Number(disciplina.bloccoRiassunzioneSettimane || 0));
+  const recupero = Math.max(1, Number(disciplina.recuperoRichiamoCicliPerfetti || 1));
+  const bonusExtra = Math.max(0, Number(cfg.bonusSestoGiornoPct || 0));
+
+  const rigaExtra = luogo === "pizzeria"
+    ? "<b>Turni extra:</b> dal " + (turni + 1) + "° giorno distinto della settimana la paga sale del +" + bonusExtra + "%.<br>"
+    : "<b>Domenica:</b> riposo. Si lavora solo con una richiesta straordinaria dell'azienda.<br>";
 
   showEvent({
-    k:"Fabbrica",
+    k:nome,
     t:"Contratto di lavoro",
     d:"<b>Mansione iniziale:</b> " + def.n + "<br>" +
       "<b>Paga:</b> " + def.pay + " € a turno<br>" +
       "<b>Durata:</b> " + durata + "<br>" +
       "<b>Presenze richieste:</b> " + turni + " giorni a settimana<br>" +
-      "<b>Giorni ordinari:</b> lunedì–sabato<br>" +
-      "<b>Domenica:</b> riposo. Si lavora solo con una richiesta straordinaria dell'azienda.<br>" +
-      "<b>Assenze:</b> vengono valutate a fine settimana. 1–2 assenze riducono l'affidabilità; da 3 in su scatta un richiamo formale.<br>" +
-      "<b>Disciplina:</b> dopo 2 richiami, un'altra settimana grave porta al licenziamento e a 8 settimane senza riassunzione.<br>" +
-      "<b>Recupero:</b> 2 cicli perfetti consecutivi cancellano un richiamo.<br><br>" +
-      "Le presenze e la carriera restano legate alla Fabbrica anche se in futuro cambi mansione.",
+      "<b>Giorni ordinari:</b> " + giorni + "<br>" +
+      "<b>Riposo contrattuale:</b> " + riposo + ".<br>" +
+      rigaExtra +
+      "<b>Assenze:</b> vengono valutate a fine settimana. " +
+        (lieveMax > 0 ? "Fino a " + lieveMax + (lieveMax === 1 ? " assenza riduce" : " assenze riducono") +
+          " l'affidabilità; " : "") +
+        "da " + richiamoMin + " in su scatta un richiamo formale.<br>" +
+      "<b>Disciplina:</b> dopo " + richiamiMax +
+        " richiami, un'altra settimana grave porta al licenziamento" +
+        (blocco ? " e a " + blocco + " settimane senza riassunzione" : "") + ".<br>" +
+      "<b>Recupero:</b> " + recupero +
+        (recupero === 1 ? " ciclo perfetto cancella" : " cicli perfetti consecutivi cancellano") +
+        " un richiamo.<br><br>" +
+      "Presenze e carriera restano legate alla " + nome + " anche se cambi mansione.",
     annulla(){},
     opts:[
-      {n:"Firma il contratto", d:"Accetti le condizioni e diventi dipendente della Fabbrica", run(){
+      {n:"Firma il contratto", d:"Accetti le condizioni e diventi dipendente della " + nome, run(){
         completaAssunzione(def);
-        if(typeof lavoroFirmaContratto === "function") lavoroFirmaContratto("fabbrica", def);
+        if(typeof lavoroFirmaContratto === "function") lavoroFirmaContratto(luogo, def);
 
         const st = window.GAME_HOURS && typeof GAME_HOURS.placeJobStatus === "function"
-          ? GAME_HOURS.placeJobStatus("fabbrica")
+          ? GAME_HOURS.placeJobStatus(luogo)
           : null;
         if(st && !st.open){
-          pushLog("<b>Contratto firmato.</b> Il primo turno lo farai quando la Fabbrica è operativa.", "good");
+          pushLog("<b>Contratto firmato.</b> Il primo turno lo farai quando la " + nome + " è operativa.", "good");
           if(typeof renderGioco === "function") renderGioco();
           if(typeof renderLuogo === "function") renderLuogo();
           return {t:"Contratto firmato. " + (st.label || "Il turno oggi non è disponibile.") + ".", c:"good"};
@@ -473,13 +500,16 @@ function assumitiCome(jobId){
   const def = JOBS.find(j => j.id === jobId);
   if(!def) return;
 
-  if(def.place === "fabbrica" && !G.job &&
-     typeof lavoroBloccoRiassunzione === "function"){
-    const blocco = lavoroBloccoRiassunzione("fabbrica");
+  const luogoContratto = def.place && typeof lavoroContrattoDef === "function" &&
+    lavoroContrattoDef(def.place) ? def.place : null;
+
+  if(luogoContratto && !G.job && typeof lavoroBloccoRiassunzione === "function"){
+    const blocco = lavoroBloccoRiassunzione(luogoContratto);
     if(blocco.active){
+      const nome = (lavoroContrattoDef(luogoContratto) || {}).nome || luogoContratto;
       hubChiuso({
         n:def.n,
-        chiuso:"Dopo il licenziamento la Fabbrica non ti riassume ancora. Mancano " +
+        chiuso:"Dopo il licenziamento la " + nome + " non ti riassume ancora. Mancano " +
           blocco.weeksRemaining + (blocco.weeksRemaining === 1 ? " settimana." : " settimane.")
       });
       return;
@@ -490,10 +520,9 @@ function assumitiCome(jobId){
     ? lavoroLuogo(G.job) === def.place
     : !!(G.job && G.job.id === jobId);
 
-  /* Prima si guarda l'orologio, poi si lavora: per la Fabbrica la firma del
-     contratto può avvenire anche quando non c'è più spazio per il turno, ma
-     il turno non parte finché orari/giorno non lo consentono. */
-  if(def.place !== "fabbrica" && window.GAME_HOURS && typeof GAME_HOURS.jobStatus === "function" &&
+  /* Nei posti con contratto la firma può avvenire anche fuori turno:
+     orario e calendario bloccano il lavoro, non la lettura del contratto. */
+  if(!luogoContratto && window.GAME_HOURS && typeof GAME_HOURS.jobStatus === "function" &&
      (!G.job || stessoLuogo)){
     const st = GAME_HOURS.jobStatus(jobId);
     if(st && !st.open){
@@ -505,25 +534,26 @@ function assumitiCome(jobId){
 
   if(!stessoLuogo){
     if(G.job){
-      const puoiLasciareFabbrica = typeof lavoroLuogo === "function" &&
-        lavoroLuogo(G.job) === "fabbrica";
+      const luogoAttuale = typeof lavoroLuogo === "function" ? lavoroLuogo(G.job) : null;
+      const puoDimettersi = luogoAttuale && typeof lavoroContrattoDef === "function" &&
+        !!lavoroContrattoDef(luogoAttuale);
       hubChiuso({n:def.n, chiuso:"Lavori già come " + G.job.n.toLowerCase() +
-        (puoiLasciareFabbrica
-          ? ". Se vuoi cambiare lavoro, dai prima le dimissioni dalla Fabbrica."
+        (puoDimettersi
+          ? ". Se vuoi cambiare lavoro, dai prima le dimissioni dal posto attuale."
           : ". Un posto alla volta: prima devi lasciare quello attuale.")});
       return;
     }
 
-    if(def.place === "fabbrica" &&
+    if(luogoContratto &&
        typeof lavoroContrattoFirmato === "function" &&
-       !lavoroContrattoFirmato("fabbrica")){
-      contrattoFabbrica(def);
+       !lavoroContrattoFirmato(luogoContratto)){
+      contrattoPostoLavoro(def);
       return;
     }
 
     completaAssunzione(def);
-    if(def.place === "fabbrica" && typeof lavoroFirmaContratto === "function")
-      lavoroFirmaContratto("fabbrica", def);
+    if(luogoContratto && typeof lavoroFirmaContratto === "function")
+      lavoroFirmaContratto(luogoContratto, def);
   }
 
   hubAzione("turno");
@@ -559,8 +589,10 @@ function schedaLavoro(jobId, luogo){
 function schedaImpiego(){
   const righe = JOBS.map(j => {
     const reqOk = !j.req || j.req(G);
-    const blocco = j.place === "fabbrica" && typeof lavoroBloccoRiassunzione === "function"
-      ? lavoroBloccoRiassunzione("fabbrica")
+    const luogoContratto = j.place && typeof lavoroContrattoDef === "function" && lavoroContrattoDef(j.place)
+      ? j.place : null;
+    const blocco = luogoContratto && typeof lavoroBloccoRiassunzione === "function"
+      ? lavoroBloccoRiassunzione(luogoContratto)
       : {active:false,weeksRemaining:0};
     const ok = reqOk && !blocco.active;
     const desc = blocco.active
@@ -573,9 +605,12 @@ function schedaImpiego(){
   righe.push({n:"Lascia stare", d:"Torni alla mappa", run(){ return null; }});
   showEvent({k:"Centro per l'impiego", t:"Tutti i lavori in città",
     d:G.job ? "Lavori già come " + G.job.n.toLowerCase() +
-      ((typeof lavoroLuogo === "function" && lavoroLuogo(G.job) === "fabbrica")
-        ? ". Per cambiare lavoro, dai prima le dimissioni dalla Fabbrica."
-        : ". Un posto alla volta.")
+      (() => {
+        const luogo = typeof lavoroLuogo === "function" ? lavoroLuogo(G.job) : null;
+        return luogo && typeof lavoroContrattoDef === "function" && lavoroContrattoDef(luogo)
+          ? ". Per cambiare lavoro, dai prima le dimissioni dal posto attuale."
+          : ". Un posto alla volta.";
+      })()
       : "Guarda cosa c'è, e fatti assumere.",
     annulla(){}, opts:righe});
 }

@@ -463,16 +463,18 @@ function special(v){
     });
   }
   if(v.set_job){
-    /* Un evento non può aggirare né il posto già occupato né un blocco di
-       riassunzione della Fabbrica. */
+    /* Gli eventi non aggirano né il posto già occupato né disciplina e
+       contratto dei luoghi strutturati. */
     const j=(typeof JOBS!=="undefined"?JOBS:[]).find(x=>x.id===v.set_job);
-    const fabbricaBloccata = j && j.place==="fabbrica" &&
-      typeof lavoroBloccoRiassunzione==="function" &&
-      lavoroBloccoRiassunzione("fabbrica").active;
-    if(j && !G.job && !fabbricaBloccata){
+    const luogoContratto=j&&j.place&&typeof lavoroContrattoDef==="function"&&lavoroContrattoDef(j.place)
+      ? j.place : null;
+    const blocco=luogoContratto&&typeof lavoroBloccoRiassunzione==="function"
+      ? lavoroBloccoRiassunzione(luogoContratto)
+      : {active:false};
+    if(j && !G.job && !blocco.active){
       G.job={id:j.id,place:j.place||null,n:j.n,pay:j.pay,e:j.e,missed:0};
-      if(j.place==="fabbrica" && typeof lavoroFirmaContratto==="function")
-        lavoroFirmaContratto("fabbrica",j);
+      if(luogoContratto && typeof lavoroFirmaContratto==="function")
+        lavoroFirmaContratto(luogoContratto,j);
     }
   }
   if(v.life_casa_delta){
@@ -2211,60 +2213,74 @@ function autoResolveNormal(e){
 
 /* -------------------- hook repo reali -------------------- */
 
-/* Straordinari Fabbrica.
-   Non sono flavour del catalogo: nascono da uno stato di lavoro preciso
-   (5/5 raggiunto venerdì/sabato), aprono una scelta reale e modificano una
-   data concreta del calendario. Restano comunque dentro l'arbitro eventi:
-   una stessa azione non può generare questo dialogo e un secondo evento. */
-function adfFactoryOvertimeAfterShift(){
-  if(!G.job || typeof lavoroLuogo!=="function" || lavoroLuogo(G.job)!=="fabbrica")
-    return false;
+/* Straordinari dei posti con contratto.
+   Nascono dallo stato reale del posto di lavoro e passano dallo stesso arbitro
+   eventi: Fabbrica e Pizzeria condividono la macchina, non il testo né i numeri. */
+function adfWorkOvertimeAfterShift(){
+  if(!G.job || typeof lavoroLuogo!=="function") return false;
+  const luogo=lavoroLuogo(G.job);
+  if(luogo!=="fabbrica" && luogo!=="pizzeria") return false;
   if(typeof lavoroTentaRichiestaStraordinario!=="function") return false;
 
   const s=st();
   if(s.runtime.lastAutoEventKey===eventMinuteKey()) return false;
 
-  const offerta=lavoroTentaRichiestaStraordinario("fabbrica",Math.random());
+  const offerta=lavoroTentaRichiestaStraordinario(luogo,Math.random());
   if(!offerta) return false;
-  if(!claimAutoEvent("factory-overtime")) return false;
+  if(!claimAutoEvent("work-overtime:"+luogo)) return false;
 
   s.lastHookEventDay=absDay();
-  const domenica=offerta.tipo==="domenica";
-  const giorno=offerta.targetLabel|| (domenica?"domenica":"sabato");
+  const giorno=offerta.targetLabel||"domani";
   const bonus=Number(offerta.bonusPct||0);
-  const titolo=domenica
-    ? "Ti serve anche domenica?"
-    : "Puoi coprire anche sabato?";
+  const carrieraCfg=typeof lavoroCarrieraDef==="function" ? lavoroCarrieraDef(luogo) : null;
+  const straordinari=carrieraCfg&&carrieraCfg.straordinari?carrieraCfg.straordinari:{};
+  const malus=Math.abs(Math.min(0,Number(straordinari.affidabilitaSaltato||0)));
 
-  afterClear(()=>showEvent({
-    k:"Fabbrica · Straordinario",
-    t:"Il capo ti ferma prima di uscire",
-    d:(domenica
+  const fabbrica=luogo==="fabbrica";
+  const domenica=offerta.tipo==="domenica";
+  const nome=fabbrica?"Fabbrica":"Pizzeria";
+  const titolo=fabbrica
+    ? (domenica?"Ti serve anche domenica?":"Puoi coprire anche sabato?")
+    : "Riesci a coprire un altro servizio?";
+  const descrizione=fabbrica
+    ? ((domenica
         ? "Domani la Fabbrica sarebbe chiusa per il tuo contratto, ma manca personale."
         : "Hai già coperto i cinque giorni del contratto. Domani manca una persona sulla linea.") +
-      "<br><br>Il capo ti chiede se puoi entrare <b>"+giorno+"</b>. " +
-      "Il turno avrà una maggiorazione del <b>+"+bonus+"%</b>." +
-      "<br><br>Accettare è un impegno: se poi non ti presenti, perdi 5 punti di affidabilità.",
-    annulla(){ 
-      /* Chiudere con X equivale a non accettare: niente impegno nascosto. */
+      "<br><br>Il capo ti chiede se puoi entrare <b>"+giorno+"</b>.")
+    : ("Hai già coperto i quattro servizi del contratto. Nel weekend la sala è piena e manca una persona in cucina." +
+      "<br><br>Il titolare ti chiede se puoi coprire anche <b>"+giorno+"</b>.");
+
+  afterClear(()=>showEvent({
+    k:nome+" · "+(fabbrica?"Straordinario":"Copertura extra"),
+    t:titolo,
+    d:descrizione+
+      " Il turno avrà una maggiorazione del <b>+"+bonus+"%</b>."+
+      "<br><br>Accettare è un impegno: se poi non ti presenti, perdi <b>"+malus+
+      "</b> punti di affidabilità.",
+    annulla(){
       if(typeof lavoroRifiutaStraordinario==="function")
-        lavoroRifiutaStraordinario("fabbrica");
+        lavoroRifiutaStraordinario(luogo);
     },
     opts:[
       {n:"Accetta", d:"Confermi il turno extra di "+giorno+" · +"+bonus+"%", run(){
         const x=typeof lavoroAccettaStraordinario==="function"
-          ? lavoroAccettaStraordinario("fabbrica") : null;
+          ? lavoroAccettaStraordinario(luogo) : null;
         if(!x) return {t:"La richiesta non è più disponibile.",c:""};
         return {
-          t:"Hai accettato lo straordinario di "+giorno+
-            ". Se completi il turno, oltre alla maggiorazione guadagni anche affidabilità.",
+          t:fabbrica
+            ? "Hai accettato lo straordinario di "+giorno+
+              ". Se completi il turno, oltre alla maggiorazione guadagni anche affidabilità."
+            : "Hai accettato la copertura di "+giorno+
+              ". Se la completi prendi la maggiorazione e guadagni affidabilità.",
           c:"good"
         };
       }},
-      {n:"Rifiuta", d:"Nessuna penalità: resta il tuo giorno libero", run(){
+      {n:"Rifiuta", d:"Nessuna penalità: non prendi il turno extra", run(){
         if(typeof lavoroRifiutaStraordinario==="function")
-          lavoroRifiutaStraordinario("fabbrica");
-        return {t:"Hai rifiutato lo straordinario. Nessuna penalità.",c:""};
+          lavoroRifiutaStraordinario(luogo);
+        return {t:fabbrica
+          ? "Hai rifiutato lo straordinario. Nessuna penalità."
+          : "Hai rifiutato la copertura extra. Nessuna penalità.",c:""};
       }}
     ]
   }),80);
@@ -2762,7 +2778,7 @@ for(const a of ACTIONS){
     const jobBefore=G.job&&G.job.id;
     const out=old.apply(this,arguments);
     setTimeout(()=>{
-      const overtimeShown = a.id==="turno" ? adfFactoryOvertimeAfterShift() : false;
+      const overtimeShown = a.id==="turno" ? adfWorkOvertimeAfterShift() : false;
       const streetShown = a.id==="turno" && !overtimeShown
         ? adfFactoryStreetAfterShift()
         : false;
