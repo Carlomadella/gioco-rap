@@ -9,11 +9,14 @@
    La pagina è quella del riferimento
    `media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/il_circolo.png`,
    senza la barra di sotto (Mappa, Contatti…), che CARLO ha tolto: la foto
-   del locale con i quattro cartelli, la colonna degli orari, e sotto i
-   quattro riquadri — la gente, il palco, la serata di oggi, i momenti del
-   live — sempre aperti. Vive dentro `#luogo` (luoghi-foto.js), così la
-   fascia in alto, il menu di sistema, l'orologio e l'esito delle mosse sono
-   quelli di Casa e della Palestra.
+   del locale con i quattro cartelli, e la colonna degli orari che si apre
+   passandoci sopra (col tocco sul telefono). Dal 01/10/2026 i quattro
+   riquadri di sotto non ci sono più: ogni cartello apre la sua stanza —
+   Bancone, Sala, Palco, Backstage — disegnata in circolo-stanze.js sui
+   riferimenti `bancone.png`, `sala.png`, `open_mic.png`, `backstage.png`,
+   con le mosse nuove in circolo-incontri.js. Vive dentro `#luogo`
+   (luoghi-foto.js), così la fascia in alto, il menu di sistema, l'orologio
+   e l'esito delle mosse sono quelli di Casa e della Palestra.
 
    Le tre cose che nascono solo dall'unione:
    1. il dopo-serata — sceso dal palco, per due ore di gioco una risposta
@@ -99,7 +102,10 @@ function circoloOccupato(){
     !!$("luogo") && $("luogo").classList.contains("on");
 }
 function circoloGiorno(){ return typeof adfGiornoKey === "function" ? adfGiornoKey() : String(G.week || 1); }
-let CIRCOLO = {scelto:null, nessuno:false, lampo:null};
+/* `stanza` è la pagina aperta (null: la foto coi cartelli), `bsSel` chi è
+   scelto nel backstage, `filtro` la lista della Sala, `detto` l'ultima cosa
+   successa con una mossa del Circolo, `orari` la colonna aperta col tocco */
+let CIRCOLO = {scelto:null, nessuno:false, lampo:null, stanza:null, bsSel:null, filtro:"tutti", detto:null, orari:false};
 let CIRCOLO_RESA = 1;
 
 /* Il dopo-serata: vero per due ore dopo che sei sceso dal palco, lo stesso
@@ -125,8 +131,12 @@ function circoloPresenti(){
 function circoloStasera(){
   return typeof presentiOggi === "function" ? presentiOggi(CIRCOLO_STASERA) : [];
 }
-/* uno che non hai mai visto: il nome non lo sai ancora */
-function circoloSconosciuto(p){ return p.rel === 0 && !p.scoperto && (p.ult == null || p.ult < 0); }
+/* uno che non hai mai visto: il nome non lo sai ancora. Parlarci, offrirgli
+   da bere o presentarti (circolo-incontri.js) te lo fa conoscere: `p.visto`.
+   Ascoltarlo da lontano no: ne capisci il carattere (`p.scoperto`), non il
+   nome — prima di quella mossa `scoperto` arrivava solo dal dialogo, che
+   segna già `p.ult` (problemi-riscontrati, voce 89). */
+function circoloSconosciuto(p){ return p.rel === 0 && !p.visto && (p.ult == null || p.ult < 0); }
 const CIRCOLO_CARATTERE = {aperto:"Amichevole", diffidente:"Diffidente", gasato:"Gasato", pratico:"Pratico"};
 
 /* ==================== ICONE ==================== */
@@ -147,7 +157,28 @@ const CC_ICO = {
   intervista:"M4 2h9l4 4v12H4zm8 1.5V7h3.5zM6.5 9v1.6h8V9zm0 3v1.6h8V12zm0 3v1.6H12V15z",
   indietro:"M10 1.5a8.5 8.5 0 1 1 0 17 8.5 8.5 0 0 1 0-17zm.6 4.3L6.4 10l4.2 4.2 1.2-1.2-2.2-2.2H14V9.2H9.6l2.2-2.2z",
   fuoco:"M10 1.5c.6 3-2.8 4.6-2.8 8a2.8 2.8 0 0 0 5.6.3c1.2 1 1.9 2.6 1.9 4.2A4.7 4.7 0 0 1 10 18.5 5.2 5.2 0 0 1 4.6 13c0-5.4 5.4-6.6 5.4-11.5z",
-  bicchiere:"M4 2h12l-5 7v7h3v2H6v-2h3V9zm3.3 2L10 7.6 12.7 4z"
+  bicchiere:"M4 2h12l-5 7v7h3v2H6v-2h3V9zm3.3 2L10 7.6 12.7 4z",
+  /* le stanze (01/10/2026) */
+  boccale:"M4 4h9v2h1.5A2.5 2.5 0 0 1 17 8.5v4a2.5 2.5 0 0 1-2.5 2.5H13v1a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm9 4v5h1.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5zM6 7v8h1V7zm3 0v8h1V7z",
+  orecchio:"M10 2a6 6 0 0 1 6 6c0 2.3-1 3.6-2 4.6-.8.8-1.3 1.4-1.4 2.6A3 3 0 0 1 9.6 18H9v-2h.6a1 1 0 0 0 1-1c.1-2 1-3 2-3.9.8-.8 1.4-1.6 1.4-3.1a4 4 0 0 0-8 0H4a6 6 0 0 1 6-6zm0 3a3 3 0 0 1 3 3h-2a1 1 0 0 0-2 0c0 .6.3.9.8 1.4l-1.4 1.4C7.6 10 7 9.2 7 8a3 3 0 0 1 3-3z",
+  mano:"M1 9l4-4 3 1 2-1.5h3L19 9l-2 2-2-1-4 4-1 .1L7 11l-1 1-5-3zm6.8 0l2.4 2.2 3.3-3.2-1-.9h-1.6l-1.7 1.2z",
+  freccia:"M7.6 3.4 14.2 10l-6.6 6.6-1.4-1.4L11.4 10 6.2 4.8z",
+  occhio:"M10 4c4.6 0 8 4.2 8.8 6-.8 1.8-4.2 6-8.8 6S2 11.8 1.2 10C2 8.2 5.4 4 10 4zm0 2.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm0 2a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z",
+  aggiorna:"M10 3a7 7 0 0 1 6.3 4H14v2h5V4h-2v1.4A9 9 0 0 0 1 10h2a7 7 0 0 1 7-7zm7 7a7 7 0 0 1-13.3 3H6v-2H1v5h2v-1.4A9 9 0 0 0 19 10z",
+  nota:"M17 2v11.5a2.5 2.5 0 1 1-2-2.45V5.3l-7 1.5v8.7A2.5 2.5 0 1 1 6 13.05V5.2z",
+  calendario:"M5 1h2v2h6V1h2v2h2a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h2zM4 8v8h12V8zm2 2h3v3H6z",
+  bilancia:"M9 2h2v2h5l2.5 6a3 3 0 0 1-6 0L15 5h-4v11h4v2H5v-2h4V5H5l2.5 5a3 3 0 0 1-6 0L4 4h5zm6.5 4.6-1.6 3.9h3.2zm-11 0-1.6 3.9h3.2z",
+  barre:"M3 16V9h3v7zm5.5 0V5h3v11zM14 16v-4.5h3V16z",
+  fiato:"M9 2h2v5.5l1.5 1.5c1-2.4 2.3-4 3.5-4 1.7 0 2 4 2 7 0 2.5-.6 5-2.5 5-1.6 0-2.5-1.5-3-3.2L11 12.3V18H9v-5.7L7.5 13.8C7 15.5 6.1 17 4.5 17 2.6 17 2 14.5 2 12c0-3 .3-7 2-7 1.2 0 2.5 1.6 3.5 4L9 7.5z",
+  soldi:"M2 5h16a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm8 2.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z",
+  info:"M10 1.5a8.5 8.5 0 1 1 0 17 8.5 8.5 0 0 1 0-17zM9 8.5V14h2V8.5zM10 5a1.2 1.2 0 1 0 0 2.4A1.2 1.2 0 0 0 10 5z",
+  foto:"M7 3h6l1.5 2H18a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h3.5zm3 4a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z",
+  punto:"M10 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16zM9 5v6h2V5zm0 8v2h2v-2z",
+  faccia:"M10 1.5a8.5 8.5 0 1 1 0 17 8.5 8.5 0 0 1 0-17zm0 1.8a6.7 6.7 0 1 0 0 13.4 6.7 6.7 0 0 0 0-13.4zM7 7.5a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zm6 0a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zM6.3 12h7.4a4 4 0 0 1-7.4 0z",
+  persona:"M10 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2.5 18c0-3.7 3.4-5.8 7.5-5.8s7.5 2.1 7.5 5.8z",
+  spunta:"M7.8 13.6 3.9 9.7 2.5 11.1l5.3 5.3L17.5 6.7l-1.4-1.4z",
+  cuore:"M10 17.5s-7.5-4.4-7.5-9.6A4.3 4.3 0 0 1 10 5.1a4.3 4.3 0 0 1 7.5 2.8c0 5.2-7.5 9.6-7.5 9.6z",
+  rischio:"M10 1.5 19 17.5H1zM9 7v5h2V7zm0 6.5v2h2v-2z"
 };
 function ccIco(n){
   return '<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="' + (CC_ICO[n] || "") + '"/></svg>';
@@ -188,38 +219,44 @@ function circoloEntra(){
   if(typeof transizioneVideo === "function") transizioneVideo(video, () => apriLuogo("circolo"));
   else apriLuogo("circolo");
 }
-/* la chiama apriLuogo (luoghi-foto.js): su che riquadro si apre */
+/* la chiama apriLuogo (luoghi-foto.js): su che stanza si apre. Chi chiede
+   ancora un riquadro di prima (l'agenda, «passa dalla Sala»: `pannello:
+   "gente"`) finisce nella stanza che ne ha preso il posto. */
+const CC_STANZA_DI = {gente:"sala", palco:"palco", momenti:"palco", serata:"backstage",
+  bancone:"bancone", sala:"sala", backstage:"backstage"};
 function circoloApri(opz){
   if(typeof sistemaGente === "function") sistemaGente();
-  CIRCOLO.lampo = opz.pannello || null;
+  CIRCOLO.lampo = null;
   CIRCOLO.nessuno = false;
+  CIRCOLO.detto = null;
+  CIRCOLO.orari = false;
+  CIRCOLO.pubblico = null;
+  CIRCOLO.stanza = CC_STANZA_DI[opz.stanza || opz.pannello] || null;
   if(opz.persona) CIRCOLO.scelto = opz.persona;
 }
 
-/* ==================== LA PAGINA ==================== */
+/* ==================== LA PAGINA ====================
+   La foto del locale coi quattro cartelli, e la colonna degli orari che
+   sta chiusa sul bordo destro e si apre passandoci sopra col mouse — col
+   tocco sul telefono (CARLO, 01/10/2026: «la barra di destra con gli
+   orari deve aprirsi quando ci si passa sopra col cursore»). Un cartello
+   apre la sua stanza (circolo-stanze.js); dalla stanza «Il Circolo» in alto
+   torna qui. */
 function circoloParti(){
   const f = circoloFascia();
   circoloStato();
+  /* l'esito di un live partito da fuori (l'agenda, una card) si legge sul
+     palco, dove c'è il pubblico che l'ha visto */
+  if(typeof LUOGO !== "undefined" && LUOGO && LUOGO.esito && !CIRCOLO.stanza) CIRCOLO.stanza = "palco";
+  /* una serata a metà è sul palco: si torna lì */
+  if(circoloStato().serata) CIRCOLO.stanza = "palco";
+  if(CIRCOLO.stanza && typeof circoloStanza === "function")
+    return {pagina:'<div class="cc cc-in" data-fascia="' + (f ? f.id : "chiuso") + '" data-stanza="' + CIRCOLO.stanza + '">' +
+      circoloStanza(CIRCOLO.stanza, f) + '</div>'};
   return {pagina:
-    '<div class="cc" data-fascia="' + (f ? f.id : "chiuso") + '">' +
-      '<div class="cc-su">' + ccScena(f) + ccInfo(f) + '</div>' +
-      '<div class="cc-giu">' +
-        ccPannello("gente", "1.", "La gente", ccGente(f),
-          "Parla con le persone, conosci nuovi contatti,<br>costruisci rapporti, ottieni opportunità.") +
-        ccPannello("palco", "2.", "Il palco", ccPalco(f),
-          "Sali sul palco: open mic, freestyle, live e showcase.<br>La serata cresce con la tua carriera.") +
-        ccPannello("serata", "3.", "La serata di oggi", ccSerata(f),
-          "Ogni sera ci sono persone diverse. Scopri chi è presente<br>e sfrutta le occasioni.") +
-        ccPannello("momenti", "4.", "Momenti durante il live", ccMomenti(f),
-          "Durante il live possono succedere eventi imprevisti.<br>Le tue scelte influenzano il pubblico, la fama e nuove opportunità.") +
-      '</div>' +
+    '<div class="cc cc-casa" data-fascia="' + (f ? f.id : "chiuso") + '">' +
+      ccScena(f) + ccInfo(f) + ccPorte(f) +
     '</div>'};
-}
-function ccPannello(id, num, titolo, corpo, dida){
-  return '<section class="cc-pan" id="cc-' + id + '" data-pan="' + id + '">' +
-    '<h3 class="cc-pank"><span>' + num + '</span> ' + titolo + '</h3>' +
-    '<div class="cc-box cc-' + id + '">' + corpo + '</div>' +
-    '<p class="cc-dida">' + dida + '</p></section>';
 }
 
 /* ---------- la foto e i quattro cartelli ----------
@@ -233,12 +270,16 @@ function ccScena(f){
   const cart = (id, ic, t, righe) =>
     '<button type="button" class="cc-cart cc-c-' + id + '" data-cc-vai="' + id + '">' +
       '<i>' + ccIco(ic) + '</i><span><b>' + t + '</b>' + righe.map(r => '<em>' + r + '</em>').join("") + '</span></button>';
-  const palcoRighe = palco ? ["Open Mic, Freestyle,", "Live, Showcase"]
+  const palcoRighe = palco ? ["Open Mic e Live", "I momenti della serata"]
     : !f ? ["Chiuso", "Riapre alle 13:00"]
     : f.id === "aftershow" ? ["Spento per stasera", "Si riaccende alle 21:00"]
-    : ["Si accende alle 21:00", "Open Mic, Freestyle, Live"];
+    : ["Si accende alle 21:00", "Open Mic e Live"];
   const L = LUOGHI_FOTO.circolo;
+  /* la foto intera, e dietro la stessa sfocata a riempire i bordi: lo
+     schermo è meno largo della foto (1250 × 526), e un ritaglio tagliava
+     Bancone e Backstage */
   return '<section class="cc-scena' + (palco ? "" : " cc-buio") + '">' +
+    '<div class="cc-sfondo" aria-hidden="true" style="background-image:url(&quot;' + LUOGHI_FOTO_DIR + L.f + '&quot;)"></div>' +
     '<div class="cc-quadro" style="background-image:url(&quot;' + LUOGHI_FOTO_DIR + L.f + '&quot;)">' +
     cart("bancone", "gente", "Bancone", ["Parla con le persone", "Conosci nuovi contatti"]) +
     cart("palco", "mic", "Palco", palcoRighe) +
@@ -247,73 +288,46 @@ function ccScena(f){
   '</div></section>';
 }
 
-/* ---------- la colonna a destra ---------- */
+/* ---------- la colonna degli orari ----------
+   Chiusa è una linguetta sul bordo destro: l'orologio, «Orari» e il
+   pallino aperto/chiuso. Si apre col mouse sopra (`:hover`, solo dove il
+   mouse c'è) o col tocco sulla linguetta, che la richiude. */
 function ccInfo(f){
   const righe = CIRCOLO_FASCE.map(x =>
     '<li class="' + (f && f.id === x.id ? "ora" : "") + '"><span>' + x.da + ' – ' + x.a + '</span><b>' + x.n + '</b></li>').join("");
   const stato = f
     ? '<i class="cc-pallino"></i><b>Aperto</b> <span>(chiusura ore 03:00)</span>'
     : '<i class="cc-pallino no"></i><b>Chiuso</b> <span>(riapre alle 13:00)</span>';
-  return '<aside class="cc-info">' +
-    '<h2 class="cc-titolo">' + CIRCOLO_NOME + '</h2>' +
-    '<p class="cc-motto">Il posto della scena locale.</p>' +
-    '<p class="cc-desc">Di giorno è un punto d’incontro: qui conosci rapper, producer, fonici e gente del giro. ' +
-      'Di sera il palco si accende: open mic, freestyle, live. Le persone che incontri possono portarti lontano.</p>' +
-    '<div class="cc-orari"><h4>' + ccIco("orologio") + 'Orari oggi</h4><ul>' + righe + '</ul></div>' +
-    '<p class="cc-stato">' + stato + '</p>' +
+  return '<aside class="cc-info' + (CIRCOLO.orari ? " aperta" : "") + '">' +
+    '<button type="button" class="cc-linguetta" data-cc-orari="1" aria-expanded="' + (CIRCOLO.orari ? "true" : "false") + '" aria-label="Orari del Circolo">' +
+      ccIco("orologio") + '<b>Orari</b><i class="cc-pallino' + (f ? "" : " no") + '"></i></button>' +
+    '<div class="cc-infocorpo">' +
+      '<h2 class="cc-titolo">' + CIRCOLO_NOME + '</h2>' +
+      '<p class="cc-motto">Il posto della scena locale.</p>' +
+      '<p class="cc-desc">Di giorno è un punto d’incontro: qui conosci rapper, producer, fonici e gente del giro. ' +
+        'Di sera il palco si accende: open mic e live. Le persone che incontri possono portarti lontano.</p>' +
+      '<div class="cc-orari"><h4>' + ccIco("orologio") + 'Orari oggi</h4><ul>' + righe + '</ul></div>' +
+      '<p class="cc-stato">' + stato + '</p>' +
+    '</div>' +
   '</aside>';
 }
+/* sotto i 900 punti i cartelli sulla foto sono piccoli: le quattro stanze
+   sono anche quattro tasti sotto alla foto, grandi per il dito */
+function ccPorte(f){
+  const porta = (id, ic, t, d) => '<button type="button" class="cc-porta" data-cc-vai="' + id + '">' +
+    '<i>' + ccIco(ic) + '</i><span><b>' + t + '</b><em>' + d + '</em></span><s>' + ccIco("freccia") + '</s></button>';
+  const palco = f && f.palco ? "Open Mic e Live, adesso" : "Si accende alle 21:00";
+  return '<nav class="cc-porte" aria-label="Le stanze del Circolo">' +
+    porta("bancone", "boccale", "Bancone", "Parla con le persone, conosci nuovi contatti") +
+    porta("sala", "bolla", "Sala", "Costruisci rapporti con la scena locale") +
+    porta("palco", "mic", "Palco", palco) +
+    porta("backstage", "stella", "Backstage", circoloBackstageAperto() ? "Artisti della serata e i tuoi fan" : "Apre con la serata, alle 21:00") +
+  '</nav>';
+}
 
-/* ---------- 1. la gente ---------- */
-function ccGente(f){
-  const chi = circoloPresenti();
-  if(!chi.length){
-    return '<div class="cc-vuoto">' + (f ? "Non c’è nessuno, adesso." : "Il Circolo è chiuso. Riapre alle 13:00: di pomeriggio ci trovi la gente del giro.") + '</div>';
-  }
-  /* chi è selezionato: quello scelto se è qui, se no il primo — come nel
-     riferimento, dove la scheda è sempre aperta su qualcuno */
-  let p = null;
-  if(typeof POSTO_PARLA !== "undefined" && POSTO_PARLA) p = POSTO_PARLA.p;
-  if(!p && !CIRCOLO.nessuno) p = chi.find(x => x.id === CIRCOLO.scelto) || chi[0];
-  if(p) CIRCOLO.scelto = p.id;
-  const lista = '<div class="cc-lista">' + chi.map(x => {
-    const ignoto = circoloSconosciuto(x);
-    return '<button type="button" class="cc-chi' + (p && x.id === p.id ? " on" : "") + '" data-cc-chi="' + x.id + '">' +
-      '<span class="cc-av">' + ccFaccia(x) + '</span>' +
-      '<span class="cc-chitx"><b>' + (ignoto ? "???" : ccEsc(x.n)) +
-        (x.numero ? ' <i class="cc-tel" title="Avete il numero">' + ccIco("bolla") + '</i>' : "") + '</b>' +
-      '<i>' + ccRuolo(x) + '</i></span></button>';
-  }).join("") + '</div>';
-  return lista + '<div class="cc-dett">' + (p ? ccScheda(p) : ccNessuno(chi)) + '</div>';
-}
-function ccNessuno(chi){
-  return '<div class="cc-vuoto">' + chi.length + (chi.length === 1 ? " persona" : " persone") +
-    ' nel retro, adesso. Sceglie tu con chi parlare: con ognuno si sale un gradino alla volta.</div>';
-}
-function ccScheda(p){
-  const r = POSTO_RUOLI[p.ruolo] || {d:""};
-  const ignoto = circoloSconosciuto(p);
-  const car = p.scoperto ? CIRCOLO_CARATTERE[p.car] || p.car : "Da scoprire";
-  const rel = typeof relNome === "function" ? relNome(p) : "";
-  const testa = '<div class="cc-scheda">' +
-    '<div class="cc-ritratto">' + ccFaccia(p) + '</div>' +
-    '<div class="cc-chie"><b>' + (ignoto ? "???" : ccEsc(p.n)) + '</b><i>' + ccRuolo(p) + '</i>' +
-      '<div class="cc-badge"><span class="' + (p.scoperto ? "verde" : "grigio") + '">' + ccIco("gente") + car + '</span>' +
-        '<span class="viola">' + ccIco("numero") + rel.charAt(0).toUpperCase() + rel.slice(1) + '</span></div>' +
-      '<p>' + (ignoto ? "Non vi siete mai parlati. " : "") + r.d + '</p></div>' +
-  '</div>';
-  /* il dialogo: la situazione e le risposte al posto delle mosse */
-  if(typeof POSTO_PARLA !== "undefined" && POSTO_PARLA && POSTO_PARLA.p.id === p.id){
-    const sit = POSTO_PARLA.sit;
-    return testa + '<div class="cc-dialogo"><p>' + sit.t + '</p>' +
-      sit.o.map((o, i) => '<button type="button" class="cc-az" data-cc-risp="' + i + '"><span>' + o[0] + '</span></button>').join("") +
-      '</div>';
-  }
-  return testa + '<div class="cc-azioni">' + ccVoci(p).join("") +
-    ccBeatSulTavolo(p) +
-    '<button type="button" class="cc-az" data-cc-indietro="1"><i>' + ccIco("indietro") + '</i><span>Torna indietro</span></button>' +
-  '</div>';
-}
+/* ---------- le mosse con una persona ----------
+   Le voci di posto.js (`vociDi`) come tasti: le disegnano la Sala e il
+   Bancone (circolo-stanze.js). */
 const CC_AZ_ICO = {parla:"parla", numero:"numero", beat:"beat", sessione:"studio", mix:"mix", feat:"feat", video:"video", intervista:"intervista"};
 function ccVoci(p){
   const voci = typeof vociDi === "function" ? vociDi(p) : [];
@@ -347,11 +361,13 @@ function ccBeatSulTavolo(p){
   '</div>';
 }
 
-/* ---------- 2. il palco ----------
-   Le sei righe del riferimento. Le prime tre si fanno: l'open mic senza
-   requisiti, il freestyle (la mossa `free`, con la sua battle), il live (la
-   mossa `live`, un pezzo fuori). Le ultime tre sono la carriera che deve
-   ancora venire: si vedono chiuse, col lucchetto, come nel riferimento. */
+/* ---------- il palco ----------
+   Dal 01/10/2026 sul palco c'è solo il live (CARLO: «sul palco deve esserci
+   solo il live, e i momenti giocati»): si sale col live vero (la mossa
+   `live`, un pezzo fuori) o con l'open mic, che è lo stesso palco per chi
+   un pezzo fuori non ce l'ha ancora. Il freestyle sta in Piazza; Showcase e
+   Opening Act, la carriera che deve venire, li mostra il backstage fra le
+   cose da sbloccare. */
 function ccPalcoStato(id){
   const f = circoloFascia();
   const st = circoloStato();
@@ -377,68 +393,7 @@ function ccPalcoStato(id){
   }
   return {ok:true};
 }
-function ccPalco(f){
-  const riga = (id, n, d, costo) => {
-    const st = ccPalcoStato(id);
-    return '<button type="button" class="cc-mossa' + (st.ok ? "" : " no") + '" data-cc-palco="' + id + '"' +
-      (st.ok ? "" : " disabled") + ' title="' + ccEsc(st.ok ? d : st.perche) + '">' +
-      '<b>' + n + '</b><i>' + ccEsc(st.ok ? d : st.perche + ".") + '</i>' +
-      (st.ok && costo ? '<em>' + costo + '</em>' : "") + '</button>';
-  };
-  const chiusa = (n, d, perche) =>
-    '<button type="button" class="cc-mossa chiusa" disabled title="' + ccEsc(perche) + '">' +
-      '<b>' + n + '</b><i>' + d + '</i><s>' + ccIco("lucchetto") + '</s></button>';
-  const costo = id => typeof lfCosto === "function" ? lfCosto(id) : "";
-  return '<div class="cc-foto" style="background-image:url(&quot;' + CIRCOLO_FOTO + 'palco.jpg&quot;)"></div>' +
-    '<div class="cc-cosa"><h4>Cosa vuoi fare?</h4>' +
-      riga("openmic", "Open Mic", "Ideale per iniziare.", CIRCOLO_OPENMIC.e + " energie") +
-      riga("free", "Freestyle", "Mettiti alla prova.", costo("free")) +
-      riga("live", "Live", "Suona i tuoi pezzi.", costo("live")) +
-      chiusa("Showcase", "Solo su invito.", "Ti ci chiama un promoter: arriva più avanti nella carriera") +
-      chiusa("Opening Act", "Apri il concerto di qualcuno.", "Serve un nome che la gente conosce già") +
-      chiusa("Headline", "La serata è tutta tua.", "Quando il locale lo riempi da solo") +
-    '</div>';
-}
-
-/* ---------- 3. la serata di oggi ----------
-   Il programma cambia da una sera all'altra (il 22:30), sempre lo stesso
-   dentro alla giornata; sotto, chi c'è stasera — anche chi non conosci
-   ancora, che è un «???» finché non ci parli. */
-const CC_PROGRAMMA_2230 = [
-  ["Showcase locale", "Con artisti emergenti"],
-  ["Battle di freestyle", "Chi vince si prende la serata"],
-  ["Live di un nome del giro", "La sala si riempie presto"]
-];
-function ccSerata(f){
-  const ora = circoloOra();
-  const giorno = Number(G.day || 1) + Number(G.week || 1) * 7;
-  const act = CC_PROGRAMMA_2230[giorno % CC_PROGRAMMA_2230.length];
-  const fatto = typeof adfOggi === "function" && (adfOggi("openmic") > 0 || adfOggi("live") > 0);
-  const voce = (t, cls, ic, n, d) => {
-    const passato = ora >= circoloMin(t) + (n === "Aftershow" ? 180 : 90);
-    return '<li class="' + (passato ? "passato" : "") + '"><span class="cc-ora ' + cls + '">' + ccIco(ic) + t + '</span>' +
-      '<div><b>' + n + '</b><i>' + d + '</i></div></li>';
-  };
-  const chi = circoloStasera();
-  const invito = p => p.ruolo === "rapper" && p.rel >= 3 &&
-    ((typeof totalWeeks === "function" ? totalWeeks() : G.week) - p.feat) >= 6;
-  const facce = chi.slice(0, 4).map(p => {
-    const ignoto = circoloSconosciuto(p);
-    return '<button type="button" class="cc-faccia" data-cc-chi="' + p.id + '">' +
-      '<span class="cc-fr">' + ccFaccia(p) +
-        (invito(p) && !ignoto ? '<u>ti chiama sul palco</u>' : "") + '</span>' +
-      '<b>' + (ignoto ? "???" : ccEsc(p.n)) + '</b><i>' + ccRuolo(p) + '</i></button>';
-  }).join("");
-  return '<div class="cc-prog"><ul>' +
-      voce("21:00", "rosso", "mic", "Open Mic", fatto ? "Ci sei salito" : ora >= circoloMin("00:00") ? "Iscrizioni chiuse" : "Iscrizioni aperte") +
-      voce("22:30", "rosso", "fuoco", act[0], act[1]) +
-      voce("00:00", "verde", "bicchiere", "Aftershow", "DJ set e networking") +
-    '</ul><div class="cc-foto" style="background-image:url(&quot;' + CIRCOLO_FOTO + 'serata.jpg&quot;)"></div></div>' +
-    '<div class="cc-stasera"><h4>Chi c’è stasera</h4><div class="cc-facce">' +
-      (facce || '<p class="cc-vuoto">Stasera non c’è nessuno che conosci.</p>') + '</div></div>';
-}
-
-/* ---------- 4. i momenti durante il live ----------
+/* ---------- i momenti durante il live ----------
    La serata giocata a momenti (il punto «La serata del Live Club giocata a
    momenti»): tre pezzi, a ogni pezzo succede una cosa e scegli come
    rispondere. La gente parte da 50 e sale o scende; alla fine quanto è
@@ -480,35 +435,10 @@ const CC_BIS = {id:"bis", t:"La gente chiede il bis.", o:[
   {n:"Lo fai, e chiudi in alto", d:"Rischio basso.", p:.85, su:8, giu:-3},
   {n:"Ringrazi e scendi", d:"Lasciali con la voglia: rischio medio.", p:.6, su:6, giu:-2},
   {n:"Freestyle di chiusura", d:"Dipende da Rap.", p:.35, ab:"flow", su:16, giu:-8}]};
-const CC_PASSI = ["Primo pezzo.", "Secondo pezzo.", "Ultimo pezzo."];
+/* i tre momenti, come nel riferimento `open_mic.png` */
+const CC_PASSI = ["Intro", "Prima barra", "Chiusura"];
 function ccMomento(id){ return id === "bis" ? CC_BIS : CC_MOMENTI.find(m => m.id === id) || CC_MOMENTI[0]; }
 
-function ccMomenti(f){
-  const st = circoloStato();
-  const s = st.serata;
-  const e = typeof LUOGO !== "undefined" && LUOGO && LUOGO.esito;
-  let card;
-  if(e){
-    card = '<p class="cc-msit"><b>Com’è andata.</b></p>' +
-      '<div class="cc-esito"><p>' + (e.msg || "") + '</p>' + (e.extra ? '<p class="cc-extra">' + e.extra + '</p>' : "") + '</div>' +
-      '<button type="button" class="cc-mopz" data-continua="1"><b>Continua</b><i>Torni nel locale.</i></button>';
-  } else if(s){
-    const m = ccMomento(s.ids[s.passo]);
-    card = (s.detto ? '<p class="cc-mdetto">' + s.detto + '</p>' : "") +
-      '<p class="cc-msit">' + CC_PASSI[s.passo] + '<br>' + m.t + '</p>' +
-      m.o.map((o, i) => '<button type="button" class="cc-mopz" data-cc-momento="' + i + '"><b>' + o.n + '</b><i>' + ccDetto(o) + '</i></button>').join("") +
-      '<div class="cc-meter" title="Come sta andando la gente"><span style="width:' + s.pubblico + '%"></span></div>';
-  } else {
-    const palco = f && f.palco;
-    card = '<p class="cc-msit">' + (palco
-      ? "Il palco è acceso.<br>Scegli cosa fare: qui la serata si gioca un pezzo alla volta."
-      : "Il palco è spento.<br>" + (f && f.id === "aftershow" ? "Si riaccende domani alle 21:00." : "Si accende alle 21:00.")) + '</p>' +
-      '<div class="cc-mvuoto"><b>Tre pezzi, tre momenti.</b><i>Quello che scegli fa salire o scendere la gente, e la gente fa la serata.</i></div>';
-  }
-  /* la foto è quella del Live Club di prima: il palco visto dalla gente */
-  return '<div class="cc-mfoto" style="background-image:url(&quot;' + LUOGHI_FOTO_DIR + 'schermate luoghi_senza_HTML/live_club.png&quot;)"></div>' +
-    '<div class="cc-momento">' + card + '</div>';
-}
 /* la riga sotto a una risposta: il rischio, e se hai un aiuto in sala */
 function ccDetto(o){
   const a = o.amico && ccAmico(o.amico);
@@ -525,16 +455,16 @@ function ccAmico(ruolo){
 function circoloPalco(id){
   const st = ccPalcoStato(id);
   if(!st.ok) return;
+  if(id !== "live" && id !== "openmic") return;
   if(typeof SFX === "object" && SFX.tap) SFX.tap();
-  /* il freestyle ha già il suo gioco (piazza.js): si parte da lì */
-  if(id === "free"){ avviaAzioneDiretta("free"); return; }
   const parti = () => {
     const pool = CC_MOMENTI.filter(m => !m.se || m.se());
     const ids = [];
     while(ids.length < 3 && pool.length) ids.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0].id);
     circoloStato().serata = {key:circoloGiorno(), tipo:id, passo:0, pubblico:50, ids:ids, hl:false, detto:""};
+    CIRCOLO.pubblico = null;
     if(typeof LUOGO !== "undefined" && LUOGO) LUOGO.esito = null;
-    CIRCOLO.lampo = "momenti";
+    CIRCOLO.stanza = "palco";
     save(); renderLuogo();
   };
   /* il filmato del live (11) fra il tasto e il primo pezzo */
@@ -574,6 +504,8 @@ function circoloFineSerata(){
   const st = circoloStato();
   const s = st.serata;
   st.serata = null;
+  /* la reazione del pubblico resta sul palco accanto all'esito */
+  CIRCOLO.pubblico = s.pubblico;
   const resa = Math.round((0.55 + s.pubblico / 100 * 0.9) * 100) / 100;
   const guarda = circoloGenteGuarda(resa);
   const sala = '<b>La gente: ' + s.pubblico + '/100.</b>';
@@ -639,27 +571,38 @@ function circoloGenteGuarda(resa){
 }
 
 /* ==================== I COMANDI ==================== */
+/* Un cartello apre la sua stanza. Al bancone la lista si apre su chi non
+   conosci ancora, nella Sala sull'ultimo scelto, nel backstage
+   sull'artista della serata. */
 function circoloVai(dove){
-  const pan = {bancone:"gente", sala:"gente", palco:"palco", backstage:"serata"}[dove] || dove;
-  /* al bancone si conosce gente nuova: la scheda si apre su chi non conosci */
+  if(["bancone", "sala", "palco", "backstage"].indexOf(dove) < 0) return;
+  CIRCOLO.stanza = dove;
+  CIRCOLO.detto = null;
+  CIRCOLO.orari = false;
+  CIRCOLO.nessuno = false;
   if(dove === "bancone"){
     const nuovo = circoloPresenti().find(circoloSconosciuto);
-    if(nuovo){ CIRCOLO.scelto = nuovo.id; CIRCOLO.nessuno = false; }
+    if(nuovo) CIRCOLO.scelto = nuovo.id;
   }
-  CIRCOLO.lampo = pan;
+  if(dove === "backstage" && !CIRCOLO.bsSel) CIRCOLO.bsSel = "ospite";
+  renderLuogo();
+  const w = typeof $ === "function" && $("lf-wrap");
+  if(w) w.scrollTop = 0;
+}
+/* «Il Circolo» in alto: si torna alla foto coi cartelli. A metà dialogo o
+   sul palco a metà serata no — prima si finisce. */
+function circoloEsci(){
+  if(typeof POSTO_PARLA !== "undefined" && POSTO_PARLA) POSTO_PARLA = null;
+  if(circoloStato().serata) return;
+  if(typeof LUOGO !== "undefined" && LUOGO) LUOGO.esito = null;
+  CIRCOLO.stanza = null;
+  CIRCOLO.detto = null;
+  CIRCOLO.pubblico = null;
   renderLuogo();
 }
-/* dopo il disegno: se c'è un riquadro da mostrare, ci si scorre sopra e
-   lampeggia una volta (la chiama renderLuogo, luoghi-foto.js) */
+/* dopo il disegno: la chiama renderLuogo (luoghi-foto.js) */
 function circoloDopoDisegno(wrap){
-  const pan = CIRCOLO.lampo;
-  if(!pan) return;
   CIRCOLO.lampo = null;
-  const el = wrap.querySelector('[data-pan="' + pan + '"]');
-  if(!el) return;
-  el.classList.add("lampo");
-  if(el.scrollIntoView) el.scrollIntoView({block:"nearest", behavior:"smooth"});
-  setTimeout(() => el.classList.remove("lampo"), 900);
 }
 
 if($("luogo")){
@@ -668,18 +611,22 @@ if($("luogo")){
     const t = e.target.closest("button");
     if(!t || t.disabled) return;
     const d = t.dataset;
+    if(d.ccOrari){ if(SFX.tap) SFX.tap(); CIRCOLO.orari = !CIRCOLO.orari; renderLuogo(); return; }
     if(d.ccVai){ if(SFX.tap) SFX.tap(); circoloVai(d.ccVai); return; }
+    if(d.ccEsci){ if(SFX.tap) SFX.tap(); circoloEsci(); return; }
+    if(d.ccFiltro){ if(SFX.tap) SFX.tap(); CIRCOLO.filtro = d.ccFiltro; renderLuogo(); return; }
     if(d.ccChi){
       if(typeof POSTO_PARLA !== "undefined" && POSTO_PARLA) return;   /* a metà dialogo non si cambia persona */
       if(SFX.tap) SFX.tap();
       const qui = circoloPresenti().some(p => p.id === d.ccChi);
-      CIRCOLO.scelto = d.ccChi; CIRCOLO.nessuno = false;
+      CIRCOLO.scelto = d.ccChi; CIRCOLO.nessuno = false; CIRCOLO.detto = null;
+      /* «Chi c'è stasera»: chi non è ancora arrivato si guarda dalla Sala */
       if(!qui && typeof toast === "function")
         toast("Arriva più tardi, stasera. Adesso non è qui.", "", "…", ["#3A3F49", "#22262E"]);
-      CIRCOLO.lampo = "gente";
+      if(CIRCOLO.stanza !== "bancone") CIRCOLO.stanza = "sala";
       renderLuogo(); return;
     }
-    if(d.ccIndietro){ if(SFX.tap) SFX.tap(); CIRCOLO.nessuno = true; renderLuogo(); return; }
+    if(d.ccBs){ if(SFX.tap) SFX.tap(); CIRCOLO.bsSel = d.ccBs; CIRCOLO.detto = null; renderLuogo(); return; }
     if(d.ccRisp != null){ poRispondi(+d.ccRisp); return; }
     if(d.ccAz){
       /* il feat, sul palco: la pagina lo dice, qui si controlla di nuovo */
@@ -693,6 +640,10 @@ if($("luogo")){
       }
       return;
     }
+    /* le mosse nuove delle stanze (circolo-incontri.js) */
+    if(d.ccBan){ circoloBancone(d.ccBan, CIRCOLO.scelto); return; }
+    if(d.ccBsm){ circoloBackstage(d.ccBsm, CIRCOLO.bsSel); return; }
+    if(d.ccFan){ circoloFanMossa(d.ccFan, d.fan); return; }
     if(d.ccPalco){ circoloPalco(d.ccPalco); return; }
     if(d.ccMomento != null){ circoloScegli(+d.ccMomento); return; }
     /* il beat sul tavolo: ascolta, prendi, lascia (come nella Sala di prima) */

@@ -95,6 +95,9 @@ detto, la richiesta com'era scritta in [`fatte.md`](fatte.md):
 - **La serata del Live Club giocata a momenti** — FATTO 29/09 col Circolo (la Sala e il
   Live Club diventano un posto solo, con la serata giocata a momenti; uscita dall'ordine il
   01/10): «Il Circolo tutto nello schermo, coi volti veri», `02-interfaccia-e-telefono.md`.
+- **Il Circolo a stanze: Bancone, Sala, Palco, Backstage** — FATTO 01/10, chiesto lo stesso
+  giorno: gli orari a scomparsa, via i quattro riquadri di sotto, ogni cartello apre la sua
+  pagina sui riferimenti, coi fan nel backstage, `02-interfaccia-e-telefono.md`.
 - **Su LaFamegram non posta nessuno** — FATTO 28/09 (su main il 01/10): postano i rivali e la
   gente della Sala che conosci, «Su LaFamegram posta anche la gente», `02-interfaccia-e-telefono.md`.
 - **Beat, Testo e Cabina a mano, il resto in automatico coi malus** — FATTO 28/09 (su main il

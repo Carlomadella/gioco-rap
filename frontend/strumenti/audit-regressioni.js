@@ -2847,10 +2847,13 @@ console.log("\nIl Circolo — la Sala e il Live Club, un posto solo");
 {
   const circolo = leggi("js/game/circolo.js");
   const circoloCss = leggi("css/circolo.css");
-  test("circolo.js e circolo.css si caricano dopo luoghi-foto, col pennarello dei titoli",
+  /* 01/10/2026, CARLO: via il corsivo a pennarello dei titoli (es. «ORARI») */
+  test("circolo.js e circolo.css si caricano dopo luoghi-foto, e i titoli sono dritti, senza il pennarello",
     index.indexOf('<script src="js/game/circolo.js') > index.indexOf('<script src="js/game/luoghi-foto.js') &&
     index.indexOf('href="css/circolo.css') > index.indexOf('href="css/luoghi-foto.css') &&
-    index.includes("family=Permanent+Marker") && circoloCss.includes('"Permanent Marker"'));
+    !index.includes("Permanent+Marker") && !circoloCss.includes("Permanent Marker") &&
+    circoloCss.includes('--ccTitoli:"Archivo Black"') &&
+    !/var\(--ccTitoli\)[^}]*font-style:italic/.test(circoloCss + leggi("css/circolo-stanze.css")));
   test("la pagina della Sala non c'è più: né l'HTML, né il foglio, né la testata nelle liste",
     !index.includes('id="posto"') && !index.includes("css/posto.css") &&
     !fs.existsSync(path.join(ROOT, "css/posto.css")) &&
@@ -2865,15 +2868,55 @@ console.log("\nIl Circolo — la Sala e il Live Club, un posto solo");
     hours.includes('live:{open:"21:00", close:"03:00"}') &&
     hours.includes("if(ACTION_HOURS[id]) return ACTION_HOURS[id];") &&
     /\{id:"serata",\s*da:"21:00", a:"00:00"/.test(circolo));
-  test("le quattro targhette sulla foto e i quattro riquadri del riferimento",
+  /* 01/10/2026, CARLO: «togliamo la barra in basso con la gente, il palco,
+     la serata di oggi e i momenti durante il live, e quei punti devono
+     essere spostati nelle pagine che si aprono quando si clicca sul pulsante
+     bancone, palco, sala e backstage» */
+  const stanze = leggi("js/game/circolo-stanze.js");
+  const incontri = leggi("js/game/circolo-incontri.js");
+  test("le quattro targhette sulla foto aprono ognuna la sua stanza, e i quattro riquadri di sotto non ci sono più",
     ["bancone", "palco", "sala", "backstage"].every(id => circolo.includes('cart("' + id + '"')) &&
-    ["gente", "palco", "serata", "momenti"].every(id => circolo.includes('ccPannello("' + id + '"')) &&
+    ["bancone", "sala", "palco", "backstage"].every(id => stanze.includes(id + ':') && stanze.includes('ccBriciole("' + id + '")')) &&
+    circolo.includes('CIRCOLO.stanza = dove;') && !circolo.includes("function ccPannello(") &&
+    !circolo.includes('class="cc-giu"') && !leggi("css/circolo.css").includes(".cc-giu{") &&
     !circolo.includes("Statistiche") && !circolo.includes("Inventario"));
-  test("le foto della pagina ci sono: il fondale, il palco e la serata",
+  test("le stanze si caricano dopo circolo.js, col loro foglio",
+    index.indexOf('<script src="js/game/circolo-incontri.js') > index.indexOf('<script src="js/game/circolo.js') &&
+    index.indexOf('<script src="js/game/circolo-stanze.js') > index.indexOf('<script src="js/game/circolo.js') &&
+    index.indexOf('href="css/circolo-stanze.css') > index.indexOf('href="css/circolo.css'));
+  test("chi chiedeva un riquadro di prima (l'agenda: «passa dalla Sala») finisce nella stanza giusta",
+    circolo.includes('const CC_STANZA_DI = {gente:"sala", palco:"palco", momenti:"palco", serata:"backstage",') &&
+    leggi("js/game/posto.js").includes('apriLuogo("circolo", {pannello:"gente"})'));
+  test("le foto ci sono: il fondale e le tre stanze ritagliate dai riferimenti",
     ["media/photo/schermate_luoghi/schermate luoghi_senza_HTML/il_circolo.png",
-     "media/photo/circolo/palco.jpg", "media/photo/circolo/serata.jpg",
-     "media/photo/schermate_luoghi/schermate luoghi_senza_HTML/live_club.png"]
-      .every(f => fs.existsSync(path.join(ROOT, f))));
+     "media/photo/circolo/stanze/bancone.jpg", "media/photo/circolo/stanze/palco.jpg",
+     "media/photo/circolo/stanze/backstage.jpg"]
+      .every(f => fs.existsSync(path.join(ROOT, f))) &&
+    /* un url() dentro a una variabile CSS Chrome lo risolve rispetto al foglio */
+    !stanze.includes("--cc-fondo") && stanze.includes("function ccSfondo(url){"));
+  test("la colonna degli orari è una linguetta che si apre col mouse sopra, e col tocco",
+    circolo.includes('data-cc-orari="1"') && circolo.includes("CIRCOLO.orari = !CIRCOLO.orari") &&
+    /@media \(hover:hover\)\{[\s\S]*?\.cc-info:hover,\.cc-info:focus-within\{transform:none/.test(circoloCss) &&
+    circoloCss.includes(".cc-info.aperta{transform:none"));
+  test("sul palco c'è solo il live: Live e Open Mic, coi momenti; il freestyle sta in Piazza",
+    circolo.includes('if(id !== "live" && id !== "openmic") return;') &&
+    !circolo.includes('avviaAzioneDiretta("free")') && !stanze.includes('sali("free"') &&
+    circolo.includes('const CC_PASSI = ["Intro", "Prima barra", "Chiusura"];'));
+  test("al bancone e nel backstage ogni mossa vale una volta per sera, e costa tempo",
+    incontri.includes("if(!c.oggi || c.oggi.key !== key)") &&
+    incontri.includes('(oggi.bevuto[p.id] ? "Stasera gliel’hai già offerto" : null)') &&
+    incontri.includes("if(!fan || oggi.fan[fid] || !circoloQui()) return false;") &&
+    /const CC_TEMPO = Object\.freeze\(\{bevi:15,/.test(incontri));
+  test("l'artista della serata ti presenta qualcuno una volta sola, e la gente della Sala resta sotto al tetto",
+    incontri.includes("c.presentati[o.n] = 1;") &&
+    incontri.includes("genteDellaSala().filter(x => !x.via).length >= POSTO_MAX"));
+  test("nel backstage i fan dicono cosa gli è piaciuto e cosa no, dei pezzi veri",
+    incontri.includes("function circoloFan(){") && incontri.includes("const critiche = [];") &&
+    stanze.includes("Cosa funziona:") && stanze.includes("Cosa no:"));
+  test("l'hype delle stanze non passa il tetto né i due punti a sera, e la pagina scrive quello che è entrato davvero",
+    incontri.includes("G.hype = Math.max(prima, Math.min(tetto, prima + su));") &&
+    incontri.includes("const CC_HYPE_SERA = 2;") &&
+    !/\+1 hype\./.test(incontri));
   test("la serata giocata a momenti pesa sul live; un lead lavoro si moltiplica senza saltare la resa",
     actions.includes('const resa = typeof circoloResaSerata === "function" ? circoloResaSerata() : 1;') &&
     actions.includes('const moltLavoro = leadLavoro ? Math.max(1, Number(leadLavoro.multiplier || 1)) : 1;') &&
@@ -2897,15 +2940,21 @@ console.log("\nIl Circolo — la Sala e il Live Club, un posto solo");
   test("sul palco si sale solo stando al Circolo, e col Circolo aperto gli eventi aspettano",
     circolo.includes('if(!circoloQui()) return {ok:false, perche:"Sei lontano: raggiungi il Circolo dalla mappa"};') &&
     leggi("js/game/eventi-v2.js").includes('if(typeof circoloOccupato==="function" && circoloOccupato()) return true;'));
-  test("sugli schermi stretti il Circolo si impila, e i :hover stanno dietro a (hover:hover)",
-    leggi("css/stretto.css").includes(".cc-giu{grid-template-columns:minmax(0,1fr);") &&
-    leggi("css/stretto.css").includes(".cc-su{grid-template-columns:minmax(0,1fr)}") &&
-    circoloCss.includes("@media (hover:hover){"));
+  test("sugli schermi stretti le stanze sono tasti grandi sotto alla foto, le colonne si impilano, e i :hover stanno dietro a (hover:hover)",
+    /@media \(max-width:900px\)\{[\s\S]*?\.cc-porte\{display:flex/.test(circoloCss) &&
+    circolo.includes("function ccPorte(f){") &&
+    /@media \(max-width:1180px\)\{[\s\S]*?\.cc-bancone\{grid-template-columns:minmax\(0,1fr\)\}/.test(leggi("css/circolo-stanze.css")) &&
+    circoloCss.includes("@media (hover:hover){") && leggi("css/circolo-stanze.css").includes("@media (hover:hover){"));
+  test("la pagina dei luoghi parte dove finisce la fascia, anche quando sul telefono l'orologio va a capo",
+    leggi("css/luoghi-foto.css").includes(".lfwrap{position:absolute;left:0;right:0;top:var(--lfAlta,var(--stAlta));") &&
+    leggi("js/game/luoghi-foto.js").includes('root.style.setProperty("--lfAlta", h + "px");') &&
+    leggi("js/game/luoghi-foto.js").includes("new ResizeObserver(lfMisuraFascia).observe(barra);"));
   /* 30/09/2026, CARLO: la pagina non scorre, sta tutta nella viewport; e i
      volti sono gli otto ritratti di `concept/simil_avatar.png` */
-  test("sopra i 1180 il Circolo sta tutto nello schermo e non scorre",
-    /@media \(min-width:1181px\)\{\s*\.lfwrap\.lfcircolo\{overflow:hidden\}/.test(circoloCss) &&
-    circoloCss.includes(".cc-scena{aspect-ratio:auto;height:100%;max-height:none;min-height:0}"));
+  test("sopra i 1180 il Circolo e le sue stanze stanno nello schermo: la foto intera, le liste che scorrono dentro",
+    circoloCss.includes(".cc-casa{position:relative;height:100%;min-height:0}") &&
+    circoloCss.includes("width:min(100cqw, calc(100cqh * 1250 / 526))") &&
+    leggi("css/circolo-stanze.css").includes(".cc-in{height:100%;min-height:0;position:relative}"));
   test("le facce del Circolo sono gli otto ritratti, non il disegno di rivals.js",
     [1, 2, 3, 4, 5, 6, 7, 8].every(n => circolo.includes('"volto-' + n + '.jpg"') &&
       fs.existsSync(path.join(ROOT, "media/photo/circolo/volti/volto-" + n + ".jpg"))) &&

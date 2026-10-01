@@ -18,9 +18,6 @@
 <!-- I tre caratteri della Strada (schermata «Attività criminali»): stencil per i
      titoli, condensato per le etichette, Plex per il testo. -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=Roboto+Condensed:wght@400;500;600;700;800;900&display=swap">
-<!-- Il pennarello dei titoli del Circolo («IL CIRCOLO», «1. LA GENTE»),
-     css/circolo.css -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap">
 
 <meta name="robots" content="noindex">
 <!-- Fogli di stile: l'ordine conta, la cascata è quella originale. -->
@@ -44,10 +41,11 @@
 <link rel="stylesheet" href="css/studio-elementi.css?v=1">
 <!-- dopo studio.css anche questo: Casa, Palestra, Fabbrica, il Circolo e stacca la spina
      sono disegnati con lo stesso telaio, sopra alla loro foto -->
-<link rel="stylesheet" href="css/luoghi-foto.css?v=9">
+<link rel="stylesheet" href="css/luoghi-foto.css?v=10">
 <!-- dopo luoghi-foto.css: il Circolo (la Sala e il Live Club insieme) ha una
      pagina sua dentro a #luogo, js/game/circolo.js -->
-<link rel="stylesheet" href="css/circolo.css?v=1">
+<link rel="stylesheet" href="css/circolo.css?v=2">
+<link rel="stylesheet" href="css/circolo-stanze.css?v=1"><!-- le quattro stanze del Circolo: Bancone, Sala, Palco, Backstage -->
 <link rel="stylesheet" href="css/abilita.css?v=1">
 <link rel="stylesheet" href="css/negozio.css?v=12">
 <link rel="stylesheet" href="css/strada-crimine.css?v=13">
@@ -62,7 +60,7 @@
      fogli qui sopra e messi in uno solo. Va dopo tutti loro, se no non correggono
      piu' niente, e prima di menu-sistema.css, che resta com'era (il perche' e'
      scritto in cima a stretto.css). -->
-<link rel="stylesheet" href="css/stretto.css?v=3">
+<link rel="stylesheet" href="css/stretto.css?v=4">
 <!-- per ultimo: le aree da toccare devono vincere sulla cascata di tutti gli altri -->
 <link rel="stylesheet" href="css/menu-sistema.css?v=12">
 <link rel="stylesheet" href="css/tocco.css?v=14">
@@ -705,9 +703,11 @@
 <script src="js/game/seguiti.js?v=1"></script><!-- remastered e parti 2: si decidono dalla Discografia, si fanno in Studio -->
 <!-- e dopo lo Studio le pagine degli altri posti, che ne riusano i pannelli:
      Casa, Palestra, Fabbrica, Pizzeria, il Circolo, stacca la spina, e la foto sotto alla Piazza -->
-<script src="js/game/luoghi-foto.js?v=17"></script>
+<script src="js/game/luoghi-foto.js?v=18"></script>
 <!-- il Circolo: la Sala e il Live Club insieme, dentro alla pagina dei posti -->
-<script src="js/game/circolo.js?v=1"></script>
+<script src="js/game/circolo.js?v=2"></script>
+<script src="js/game/circolo-incontri.js?v=1"></script><!-- le mosse nuove delle stanze: il bancone, il backstage, i fan -->
+<script src="js/game/circolo-stanze.js?v=1"></script><!-- le quattro stanze, sui riferimenti bancone/sala/open_mic/backstage -->
 <script src="js/game/abilita.js?v=1"></script>
 <script src="js/game/strada.js?v=13"></script>
 <script src="js/game/strada-crimine.js?v=16"></script>
