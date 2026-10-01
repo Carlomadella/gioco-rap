@@ -155,6 +155,47 @@
     return a.voci.length !== n;
   }
 
+  /* Intersezioni reali col tempo: serve ai conflitti lavoro/musica.
+     Non inventa un secondo calendario: legge esclusivamente le voci che il
+     giocatore ha davvero segnato qui dentro e verifica se una mossa lunga
+     attraversa l'ora dell'appuntamento. */
+  function conflittiTra(da, a){
+    da = Number(da); a = Number(a);
+    if(!Number.isFinite(da) || !Number.isFinite(a) || a <= da) return [];
+    const anno = G.year || 1, sett = G.week || 1, giorno = G.day || 1;
+    return voci().filter(v =>
+      v.anno === anno && v.settimana === sett && v.giorno === giorno &&
+      !onorato(v.id, v.tipo) &&
+      Number(v.minuti) >= da && Number(v.minuti) < a
+    ).sort((x,y) => Number(x.minuti) - Number(y.minuti));
+  }
+
+  /* Un appuntamento saltato per una scelta del giocatore esce dall'agenda ma
+     non sparisce dalla storia: viene conservato in mancati, così il lavoro
+     può avere conseguenze senza lasciare una card ormai impossibile da fare. */
+  function mancaVoce(v, motivo){
+    if(!v) return null;
+    const a = ag();
+    const prima = a.voci.length;
+    a.voci = a.voci.filter(x => !(
+      x.k === v.k && x.anno === v.anno && x.settimana === v.settimana &&
+      x.giorno === v.giorno && Number(x.minuti) === Number(v.minuti)
+    ));
+    if(a.voci.length === prima) return null;
+    if(!Array.isArray(a.mancati)) a.mancati = [];
+    const missed = Object.assign({}, v, {
+      mancato:true,
+      motivo:motivo || "scelta",
+      mancatoAnno:G.year || 1,
+      mancatoSettimana:G.week || 1,
+      mancatoGiorno:G.day || 1
+    });
+    a.mancati.unshift(missed);
+    if(a.mancati.length > 24) a.mancati.length = 24;
+    if(typeof save === "function") save();
+    return missed;
+  }
+
   /* Il tasto sulla card: segna se non c'è, toglie se c'è. Torna cosa ha fatto,
      così chi ha cliccato può dirlo a schermo. */
   function tocca(e, tipo){
@@ -350,6 +391,7 @@
   window.AGENDA = {
     settimanali, voci, segnato, segna, togli, tocca,
     pesoDiOggi, consumaPeso, onora, onorato,
+    conflittiTra, mancaVoce,
     minutiDi:oraInMinuti,
     /* quanti giorni si possono saltare, e per colpa di chi ci si ferma */
     bloccoSalto,
