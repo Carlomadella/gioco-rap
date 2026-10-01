@@ -146,6 +146,111 @@ describe("famiglie eventi lavoro", () => {
     )).toBe(true);
   });
 
+  it("mostra se saltare il turno lascia ancora possibile il 5/5", () => {
+    const env=ambiente({
+      now:12*60,duration:480,
+      G:{
+        year:1,week:2,day:3,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{},gente:[],skills:{rete:0},
+        wellbeing:60,lucidita:50,shifts:2,strada:{giroAvviato:false}
+      },
+      extra:{
+        lavoroLuogo:job => job && job.place,
+        lavoroReteChiave:job => job && (job.place||job.id),
+        lavoroPagaTurno:()=>({totale:220,percentuale:0}),
+        lavoroEffettiTurno:()=>({energia:40,benessere:-3,lucidita:-1}),
+        lavoroCartellino:()=>({
+          giorniLavoratiSettimana:2,
+          turniSettimanaliRichiesti:5,
+          conteggi:Array(28).fill(0),
+          posOggi:9
+        }),
+        lavoroContrattoDef:()=>({turniSettimanali:5,giorniConsentiti:[1,2,3,4,5,6]}),
+        lavoroStraordinarioOggi:()=>null
+      }
+    });
+    env.ctx.AGENDA.conflittiTra=()=>[{
+      k:"settimana:live",id:"live",tipo:"settimana",n:"Serata live",
+      ora:"18:00",minuti:18*60,anno:1,settimana:2,giorno:3
+    }];
+    env.ctx.AGENDA.pesoDiOggi=()=>1.15;
+
+    env.ctx.ADF_WORK_EVENTS.guardAction("turno");
+
+    expect(env.shown[0].d).toContain("2/5 presenze");
+    expect(env.shown[0].d).toContain("Puoi ancora coprire il contratto");
+    expect(env.shown[0].opts[0].d).toContain("+220 €");
+    expect(env.shown[0].opts[0].d).toContain("×1.15");
+    expect(env.shown[0].opts[1].d).toContain("puoi ancora chiudere 5/5");
+  });
+
+  it("avverte quando scegliere la musica rende inevitabile un'assenza", () => {
+    const env=ambiente({
+      now:12*60,duration:480,
+      G:{
+        year:1,week:2,day:5,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{},gente:[],skills:{rete:0},
+        wellbeing:60,lucidita:50,shifts:3,strada:{giroAvviato:false}
+      },
+      extra:{
+        lavoroLuogo:job => job && job.place,
+        lavoroReteChiave:job => job && (job.place||job.id),
+        lavoroPagaTurno:()=>({totale:220,percentuale:0}),
+        lavoroEffettiTurno:()=>({energia:40,benessere:-3,lucidita:-1}),
+        lavoroCartellino:()=>({
+          giorniLavoratiSettimana:3,
+          turniSettimanaliRichiesti:5,
+          conteggi:Array(28).fill(0),
+          posOggi:11
+        }),
+        lavoroContrattoDef:()=>({turniSettimanali:5,giorniConsentiti:[1,2,3,4,5,6]}),
+        lavoroStraordinarioOggi:()=>null
+      }
+    });
+    env.ctx.AGENDA.conflittiTra=()=>[{
+      k:"settimana:live",id:"live",tipo:"settimana",n:"Serata live",
+      ora:"18:00",minuti:18*60,anno:1,settimana:2,giorno:5
+    }];
+
+    env.ctx.ADF_WORK_EVENTS.guardAction("turno");
+
+    expect(env.shown[0].d).toContain("3/5 presenze");
+    expect(env.shown[0].d).toContain("rende inevitabile 1 assenza");
+    expect(env.shown[0].opts[1].d).toContain("1 assenza diventa inevitabile");
+  });
+
+  it("scegliere la musica registra il costo opportunità senza regalare statistiche", () => {
+    const env=ambiente({
+      now:18*60,duration:300,
+      G:{
+        year:1,week:1,day:1,
+        job:{id:"barista",n:"Barista",pay:130,e:18},
+        workplaces:{},gente:[],skills:{rete:0},
+        wellbeing:60,lucidita:50,shifts:0,strada:{giroAvviato:false}
+      },
+      extra:{
+        lavoroPagaTurno:()=>({totale:130,percentuale:0})
+      }
+    });
+    env.ctx.AGENDA.conflittiTra=()=>[{
+      k:"oggi:sala",id:"sala",tipo:"oggi",n:"Sessione lunga al Circolo",
+      ora:"20:00",minuti:20*60,anno:1,settimana:1,giorno:1
+    }];
+
+    env.ctx.ADF_WORK_EVENTS.guardAction("turno");
+    const prima=env.G.lucidita;
+    env.shown[0].opts[1].run();
+
+    expect(env.G.lucidita).toBe(prima);
+    const row=env.G.workplaces.barista.workEvents.history.find(x =>
+      x.family==="conflict" && x.choice==="music"
+    );
+    expect(row.forgonePay).toBe(130);
+    expect(row.eventWeight).toBe(1);
+  });
+
   it("tenere l'appuntamento non avvia il turno", () => {
     const env=ambiente({now:18*60,duration:300});
     env.ctx.AGENDA.conflittiTra=()=>[{
@@ -594,7 +699,7 @@ describe("famiglie eventi lavoro", () => {
     expect(strada).toContain("ADF_WORK_EVENTS.consumeCrimeLead(successo)");
     expect(strada).toContain('"Dritta " + lead.sourceLabel');
     expect(eventi).toContain("ADF_WORK_EVENTS.crimeLeadActive()) return false");
-    expect(html).toContain('js/game/lavoro-eventi.js?v=5');
+    expect(html).toContain('js/game/lavoro-eventi.js?v=6');
     expect(famepedia).toContain("Quando il lavoro si scontra con la musica");
   });
 });
