@@ -83,7 +83,7 @@ describe("famiglie eventi lavoro", () => {
   it("espone anche la famiglia di eventi legata alla responsabilità del ruolo", () => {
     const env=ambiente();
     expect(Object.keys(env.ctx.ADF_WORK_EVENTS.families)).toEqual([
-      "discipline","career","overtime","colleague","role",
+      "discipline","career","overtime","colleague","role","factory",
       "music","crime","conflict","physical"
     ]);
   });
@@ -253,6 +253,52 @@ describe("famiglie eventi lavoro", () => {
     expect(env.G.workplaces.fabbrica.workEvents.history.some(x =>
       x.family==="role" && x.roleId==="capoturno" && x.status==="resolved"
     )).toBe(true);
+  });
+
+  it("la Fabbrica ha eventi di reparto propri, separati dagli eventi di ruolo", () => {
+    const env=ambiente({
+      random:0.9,
+      G:{
+        year:1,week:3,day:3,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{},gente:[],skills:{rete:0},
+        wellbeing:60,lucidita:50,shifts:2,strada:{giroAvviato:false}
+      },
+      extra:{
+        lavoroLuogo:job => job && job.place,
+        lavoroReteChiave:job => job && (job.place||job.id)
+      }
+    });
+
+    expect(env.ctx.ADF_WORK_EVENTS.afterShift({},{
+      music:1,role:1,factory:0,crime:1,colleague:1,physical:1
+    })).toBe(true);
+    expect(env.shown).toHaveLength(1);
+    expect(env.shown[0].k).toBe("Fabbrica · Reparto");
+    expect(env.shown[0].t).toContain("fila tutto liscio");
+
+    env.shown[0].opts[0].run();
+    expect(env.G.wellbeing).toBe(62);
+    expect(env.G.lucidita).toBe(51);
+    expect(env.G.workplaces.fabbrica.workEvents.history.some(x =>
+      x.family==="factory" && x.eventId==="giornata-liscia" && x.status==="resolved"
+    )).toBe(true);
+  });
+
+  it("gli eventi di reparto Fabbrica non contaminano gli altri lavori", () => {
+    const env=ambiente({
+      G:{
+        year:1,week:3,day:3,
+        job:{id:"barista",place:"bar",n:"Barista",pay:130,e:18},
+        workplaces:{},gente:[],skills:{rete:0},
+        wellbeing:60,lucidita:50,shifts:1,strada:{giroAvviato:false}
+      }
+    });
+
+    expect(env.ctx.ADF_WORK_EVENTS.afterShift({},{
+      music:1,role:1,factory:0,crime:1,colleague:1,physical:1
+    })).toBe(false);
+    expect(env.shown).toHaveLength(0);
   });
 
   it("la carriera eventi segue anche la Pizzeria strutturata, non solo la Fabbrica", () => {
@@ -452,7 +498,7 @@ describe("famiglie eventi lavoro", () => {
     expect(strada).toContain("ADF_WORK_EVENTS.consumeCrimeLead(successo)");
     expect(strada).toContain('"Dritta " + lead.sourceLabel');
     expect(eventi).toContain("ADF_WORK_EVENTS.crimeLeadActive()) return false");
-    expect(html).toContain('js/game/lavoro-eventi.js?v=3');
+    expect(html).toContain('js/game/lavoro-eventi.js?v=4');
     expect(famepedia).toContain("Quando il lavoro si scontra con la musica");
   });
 });
