@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:77dea95 -->
+## 01/10/26, 20:00 â€” fix/ci-avvio-rapido-roadmap â†’ main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `77dea95`
+
+### Cosa Ã¨ entrato
+
+- `222bf1a` â€” test: riallinea audit avvio rapido al gameplay reale â€” **mycolbraga**
+- `ff2ecec` â€” ci: separa avvio rapido dal MakeHuman pesante â€” **mycolbraga**
+- `4c1205c` â€” ci: evita verifiche duplicate su push e pull request â€” **mycolbraga**
+- `019c5c9` â€” fix: stabilizza avvio rapido CI e riallinea inventario roadmap â€” **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/package.json`
+- **Modificato:** `frontend/test/e2e/gameplay.spec.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:747e7b7 -->
 ## 01/10/26, 13:58 â€” task/circolo-orari-e-pagine â†’ main
 
