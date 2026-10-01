@@ -32,7 +32,11 @@ const START = () => ({
   promoSaturation:{key:"", baseFans:0, pctUsed:0},
   /* punto 21: la Strada. Ricostruita da claude/carriera-criminale.md */
   strada:{rep:0, heat:0, sporchi:0, uomini:0, prot:0, ferro:false, avvocato:false,
-    attivita:{}, precedenti:0, arresto:null, giroAvviato:false},
+    attivita:{}, precedenti:0, arresto:null, giroAvviato:false,
+    /* Proposte che nascono FUORI dal lavoro quando la carriera criminale è
+       già avviata. Campo top-level di strada così i vecchi salvataggi lo
+       ricevono automaticamente dal merge difensivo di partitaDaSalvataggio(). */
+    fabbricaLead:{lastCheckAbsoluteDay:null,lastOfferAbsoluteDay:null,pending:null,active:null,history:[]}},
   /* punto 66: chi scrive in chat — mamma e il migliore amico da subito */
   chat:{},
   /* Le palline rosse del telefono: qui sta quello che hai gia' guardato, se no
