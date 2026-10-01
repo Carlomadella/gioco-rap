@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:9950e9ff -->
+## 01/10/26, 23:40 — task/fabbrica-conflitto-musica-scelta → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `9950e9ff`
+
+### Cosa è entrato
+
+- `1556a833` — fix(lavoro): non conta gli straordinari fuori contratto nel conflitto — **mycolbraga**
+- `30e99346` — chore(cache): invalida conflitto lavoro musica — **mycolbraga**
+- `81022920` — test(lavoro): copre scelta tra turno e musica — **mycolbraga**
+- `c066b6fe` — feat(lavoro): rende leggibile il conflitto turno musica — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/lavoro-eventi.js`
+- **Modificato:** `frontend/test/unit/lavoro-eventi.test.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:e694bb9 -->
 ## 01/10/26, 23:03 — task/fabbrica-bonus-malus-ruolo → main
 
