@@ -1241,12 +1241,22 @@ function renderStColpi(){
 
   centro.classList.remove("locked");
   const leadFabbrica = stradaFabbricaLeadAttivo();
+  const leadLavoro = window.ADF_WORK_EVENTS &&
+    typeof ADF_WORK_EVENTS.crimeLeadActive === "function"
+      ? ADF_WORK_EVENTS.crimeLeadActive()
+      : null;
   griglia.innerHTML = STRADA_COLPI.map((c, i) => {
     const senzaEnergia = G.energy < c.energia;
-    const lead = leadFabbrica && leadFabbrica.colpoId === c.id ? leadFabbrica : null;
+    const leadFabbricaQui = leadFabbrica && leadFabbrica.colpoId === c.id ? leadFabbrica : null;
+    /* Il runtime usa la dritta Fabbrica solo sul colpo per cui è nata;
+       sugli altri colpi, un eventuale lead da Buttafuori/Fattorino resta valido. */
+    const lead = leadFabbricaQui || leadLavoro;
     const giorniLead = lead
       ? Math.max(1, Number(lead.expiresAbsoluteDay) - stradaAbsDay())
       : 0;
+    const fonteLead = leadFabbricaQui
+      ? "Dritta Fabbrica"
+      : (lead && lead.sourceLabel ? "Dritta " + lead.sourceLabel : "Dritta lavoro");
     return '<button class="crime' + (senzaEnergia ? " no" : "") + '" data-stcolpo="' + c.id + '">' +
       '<span class="num">0' + (i + 1) + '</span><b>' + c.n + '</b><p>' + c.d + '</p>' +
       '<div class="stchips">' +
@@ -1254,7 +1264,7 @@ function renderStColpi(){
         '<span class="stchip">' + c.energia + ' energia</span>' +
         '<span class="stchip ' + stClasseRischio(c) + '">Rischio ' + stRischio(c).toLowerCase() + '</span>' +
         (lead
-          ? '<span class="stchip money">Dritta Fabbrica +' + Number(lead.bonusPct || 0) +
+          ? '<span class="stchip money">' + fonteLead + ' +' + Number(lead.bonusPct || 0) +
             '% · ' + giorniLead + (giorniLead === 1 ? ' giorno' : ' giorni') + '</span>'
           : '') +
       '</div><span class="go">→</span></button>';
