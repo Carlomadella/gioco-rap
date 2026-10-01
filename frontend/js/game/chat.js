@@ -890,7 +890,13 @@ function chatContattoSala(p){
     id: "sala:" + p.id,
     n: p.n,
     sotto: r.n + origine,
-    ic: video ? "mirino" : (fonico ? "cursori" : "manopole"),
+    ic: video ? "mirino"
+      : fonico ? "cursori"
+      : p.ruolo === "rapper" ? "mic"
+      : p.ruolo === "promoter" ? "fama"
+      : p.ruolo === "collega" ? "persona"
+      : p.ruolo === "strada" ? "maschera"
+      : "manopole",
     k: r.k,
     sempre: true,
     spesso: .3,
