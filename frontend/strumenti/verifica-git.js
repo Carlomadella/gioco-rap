@@ -34,6 +34,22 @@ for (const hook of ["pre-commit", "pre-push", "post-merge"]) {
   test(`hook ${hook} presente`, fs.existsSync(path.join(ROOT, ".githooks", hook)));
 }
 
+const postMerge = fs.readFileSync(path.join(ROOT, ".githooks", "post-merge"), "utf8");
+const registroWorkflow = fs.readFileSync(path.join(ROOT, ".github", "workflows", "registro-merge.yml"), "utf8");
+const registroGenerator = fs.readFileSync(path.join(ROOT, "scripts", "genera-registro-modifiche.js"), "utf8");
+
+test("post-merge locale non genera né committa il registro",
+  !postMerge.includes("genera-registro-modifiche.js") &&
+  !postMerge.includes('git commit -m "docs: aggiorna registro modifiche"'));
+
+test("GitHub Actions è l'unico writer automatico del registro",
+  registroWorkflow.includes("node scripts/genera-registro-modifiche.js") &&
+  registroWorkflow.includes("git commit -m \"docs: aggiorna registro modifiche\"") &&
+  registroWorkflow.includes("git push"));
+
+test("generatore registro senza mojibake noto",
+  ["â€”","â†’","âœ“","Ã¨","Ã "].every(x => !registroGenerator.includes(x)));
+
 // GitHub Actions fa checkout in detached HEAD. La freschezza del branch locale
 // ha senso solo nella working copy di sviluppo.
 if (!process.env.GITHUB_ACTIONS) {
