@@ -6,6 +6,31 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:7c86244 -->
+## 01/10/26, 21:16 â€” task/contratti-visuali-lavoro â†’ main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `7c86244`
+
+### Cosa Ã¨ entrato
+
+- `05b485f` â€” test(lavori): protegge il layout dei contratti firmabili â€” **mycolbraga**
+- `a54f7cb` â€” chore(cache): invalida i contratti visuali â€” **mycolbraga**
+- `1590d72` â€” style(lavori): rende i contratti dei posti un foglio firmabile â€” **mycolbraga**
+- `9bf32d0` â€” feat(lavori): presenta Pizzeria e Fabbrica come contratti veri â€” **mycolbraga**
+- `50efb00` â€” feat(ui): aggiunge variante modale per i contratti di lavoro â€” **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/overlays.css`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/modal.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:471c965 -->
 ## 01/10/26, 21:09 â€” task/rimuovi-centro-impiego â†’ main
 
