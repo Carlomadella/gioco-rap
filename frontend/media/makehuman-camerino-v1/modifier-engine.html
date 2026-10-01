@@ -121,7 +121,21 @@
     await human.loadModel();
 
     log('Carico targets.bin (~145 MB)…');
-    await human.loadTargets(resources.baseUrl+'targets/'+resources.targets);
+    /* Il file piu' pesante del primo avvio puo' restare per parecchio tempo
+       dentro a loadTargets() su una rete mobile. Il gioco considera rotto il
+       camerino solo dopo due minuti SENZA notizie: durante questo await
+       mandiamo quindi un heartbeat esplicito, senza inventare una percentuale
+       che la libreria MakeHuman non espone. */
+    const targetHeartbeat=setInterval(
+      ()=>log('Carico targets.bin (~145 MB)… caricamento ancora in corso'),
+      10000
+    );
+    try{
+      await human.loadTargets(resources.baseUrl+'targets/'+resources.targets);
+    }finally{
+      clearInterval(targetHeartbeat);
+    }
+    log('targets.bin caricato.');
 
     modifiers=modifierMeta();
     targetData=human.targets.targetData;
