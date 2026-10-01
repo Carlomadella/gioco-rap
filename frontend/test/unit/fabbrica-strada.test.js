@@ -194,7 +194,7 @@ describe("Fabbrica × Strada", () => {
 
     expect(strada).toContain("moltiplicatoreLead");
     expect(strada).toContain("rumoreLead");
-    expect(strada).toContain("Dritta Fabbrica +");
+    expect(strada).toContain('"Dritta fuori dalla Fabbrica"');
     expect(strada).toContain("stradaConsumaPropostaFabbrica(colpoId, successo)");
     expect(stato).toContain("fabbricaLead:{lastCheckAbsoluteDay:null");
   });
