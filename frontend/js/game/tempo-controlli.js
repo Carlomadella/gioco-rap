@@ -32,6 +32,10 @@
      WAIT_TOTAL_MS: un'ora resta lenta come prima, otto ore non più. */
   const WAIT_TOTAL_MS = 1600;
   const WAIT_MIN_MS = 25;
+  /* Il pannello si apre con un click, ma col mouse non deve restare appeso:
+     usiamo un piccolo margine per attraversare il gap fra widget e pannello
+     senza chiuderlo mentre il puntatore passa da uno all'altro. */
+  const POINTER_LEAVE_CLOSE_MS = 180;
   function pausaPasso(minuti){
     const passi = Math.max(1, Math.ceil(minuti / STEP));
     return clampN(Math.round(WAIT_TOTAL_MS / passi), WAIT_MIN_MS, WAIT_STEP_MS);
@@ -56,6 +60,7 @@
 
   let panelRoot=null, panel=null, widget=null, dock=null, host=null;
   let panelOpen=false, waiting=false, targetTouched=false, syncQueued=false;
+  let pointerLeaveTimer=null;
   const hiddenLegacy=[];
 
   function clampN(v,a,b){ return Math.max(a,Math.min(b,v)); }
@@ -391,6 +396,24 @@
     document.head.appendChild(s);
   }
 
+  function cancelPointerLeaveClose(){
+    if(pointerLeaveTimer!=null){
+      clearTimeout(pointerLeaveTimer);
+      pointerLeaveTimer=null;
+    }
+  }
+
+  function schedulePointerLeaveClose(ev){
+    /* Su touch/pen l'apertura resta controllata dal tap: non esiste un
+       "perimetro del cursore" affidabile come col mouse. */
+    if(!panelOpen || !ev || ev.pointerType!=="mouse") return;
+    cancelPointerLeaveClose();
+    pointerLeaveTimer=setTimeout(()=>{
+      pointerLeaveTimer=null;
+      if(panelOpen) closePanel();
+    },POINTER_LEAVE_CLOSE_MS);
+  }
+
   function ensure(){
     css();
     if(!widget){
@@ -412,6 +435,8 @@
         <strong class="adf-tw-time">08:00</strong>
         <span class="adf-tw-day">GIORNO 1/7</span>`;
       widget.addEventListener("click",ev=>{ev.preventDefault();ev.stopPropagation();togglePanel();});
+      widget.addEventListener("pointerenter",ev=>{if(ev.pointerType==="mouse")cancelPointerLeaveClose();});
+      widget.addEventListener("pointerleave",schedulePointerLeaveClose);
     }
     if(!dock){
       dock=document.createElement("div");
@@ -459,11 +484,14 @@
       panelRoot.querySelector(".adf-tc-day1").onclick=()=>jumpDays(1);
       panelRoot.querySelector(".adf-tc-day7").onclick=()=>jumpDays(7);
       panel.addEventListener("click",ev=>ev.stopPropagation());
+      panel.addEventListener("pointerenter",ev=>{if(ev.pointerType==="mouse")cancelPointerLeaveClose();});
+      panel.addEventListener("pointerleave",schedulePointerLeaveClose);
     }
     return panelRoot;
   }
 
   function closePanel(){
+    cancelPointerLeaveClose();
     panelOpen=false;
     if(panelRoot) panelRoot.classList.remove("adf-tc-open");
     if(widget){widget.classList.remove("adf-tw-open");widget.setAttribute("aria-expanded","false");}
