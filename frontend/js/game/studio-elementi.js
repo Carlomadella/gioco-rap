@@ -533,10 +533,17 @@ const STUDIO_CARATTERI = [
   {t:() => true,                             n:"PULITO",    q:0}
 ];
 
+/* I tre cursori stanno in `G.studio.cursori`. Prima stavano in `d.banco`,
+   che dal 15/09 (F2) e' anche **il seed del pezzo sul banco** (studio.js): con
+   un pezzo sopra i cursori leggevano un numero — undefined alle tacche,
+   carattere sempre PULITO, e muoverne uno dava «Cannot use 'in' operator».
+   Trovato il 21/09 in un branch mai unito, portato qui il 01/10/2026. Un
+   salvataggio con l'oggetto dei cursori ancora in `banco` lo sposta
+   `studioDati()` (studio.js), prima di ritrovare il pezzo sul banco. */
 function studioBanco(){
   const d = studioDati();
-  if(!d.banco) d.banco = {voce:2, bassi:2, aria:2};
-  return d.banco;
+  if(!d.cursori) d.cursori = {voce:2, bassi:2, aria:2};
+  return d.cursori;
 }
 /* Muovere un cursore **non ridisegna la pagina**. Prima si': a ogni tacca
    `renderStudio()` rifaceva tutto il pannello di mezzo, e l'`input` che
@@ -743,6 +750,10 @@ function studioMandaFuori(){
   }
 
   const g = studioGiorniAVenerdi();
+  /* venerdì scelto da te: l'hype torna. Ma solo se non era già in coda: un
+     pezzo chiuso dal gioco resta sul banco con l'Uscita su venerdì, e
+     ripremere «Mandalo fuori» non deve ridargli l'hype che il malus toglie */
+  if(s.esce == null) delete s.esceAuto;
   s.esce = studioOggiAssoluto() + g;
   delete s.tenuto;
   pushLog("«" + s.t + "» è in coda per venerdì" +
@@ -758,6 +769,7 @@ function studioRiprendi(seed){
   if(!s) return;
   delete s.tenuto;
   delete s.esce;
+  delete s.esceAuto;
   studioMettiSulBanco(seed);               /* ritirato = di nuovo sul banco */
   studioDati().quando = "subito";
   SFX.tap(); save(); renderStudio(); renderGioco();
@@ -782,7 +794,11 @@ function studioUscitePronte(){
     if(typeof seguitoUscita === "function") seguitoUscita(s);
     const cap = typeof hypeCap === "function" ? hypeCap() : 100;
     const feat = typeof featHypeUscita === "function" ? featHypeUscita(s) : 0;
-    G.hype = clamp(G.hype + 6 + s.q * 0.12 + STUDIO_VENERDI_HYPE + feat, 0, cap);
+    /* chiuso dal gioco (studio-automatico.js): esce venerdì, ma l'attesa non
+       l'hai scelta tu e l'hype dell'attesa non c'è — è uno dei due malus */
+    const auto = !!s.esceAuto;
+    delete s.esceAuto;
+    G.hype = clamp(G.hype + 6 + s.q * 0.12 + (auto ? 0 : STUDIO_VENERDI_HYPE) + feat, 0, cap);
     /* Mandarlo fuori a mano costa un punto di lucidita' (la mossa «Pubblica
        il pezzo», in actions.js): se metterlo in coda non costasse niente,
        aspettare non sarebbe una scelta ma sempre la scelta giusta — l'hype in
@@ -790,7 +806,7 @@ function studioUscitePronte(){
        non gliela si puo' far pagare: il pezzo esce di notte, mentre dormi. */
     if(typeof addLuc === "function") addLuc(-1);
     if(typeof studioSvuotaBanco === "function") studioSvuotaBanco(s);
-    pushLog("<b>«" + s.t + "» è uscito</b>, di venerdì come avevi deciso" +
+    pushLog("<b>«" + s.t + "» è uscito</b>, di venerdì " + (auto ? "come l'ha messo in coda il gioco" : "come avevi deciso") +
       (s.mixed ? "." : ", ma non era mixato: qualità " + s.q + "."), "good");
   }
 }

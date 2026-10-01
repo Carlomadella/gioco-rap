@@ -11,14 +11,16 @@ roadmap, nei commenti del codice) quel giro lo trova in `problemi-risolti.md`, c
 ## Cosa resta aperto al 29/09/2026
 
 I numeri sono quelli di sempre, e restano: altri documenti citano «la voce 65». La prossima
-voce nuova è la 78. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
+voce nuova è la 85. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
 [`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md) (la 7 con «Via la
 lucidità», la 9 fra «Le decisioni tue», la 10 fra quelle fuori dall'ordine); la 61 e la 65
 sono decisioni di bilanciamento e per ora stanno solo qui.
 
 **7.** **L'uscita di venerdì non costa niente, quella a mano sì** (08/09): risolto in parte per
-scelta — il vantaggio di venerdì è quello di aspettare, non uno sconto. Sparisce del tutto
-con «togli il parametro lucidità» (CARLO), che nell'altro foglio è fra i lavori lunghi.
+scelta — il vantaggio di venerdì è quello di aspettare, non uno sconto, e dall'08/09
+anche l'uscita di venerdì costa un punto di lucidità. «Togli il parametro lucidità» non
+si fa più (Carlo, 21/09: la lucidità resta), quindi non sparisce da sola: è una scelta
+di bilanciamento, con la voce 61.
 
 **9.** **Di traverso** (844 × 390) il telefono alzato si usa, ma resta da **decidere se il gioco
 sugli store gira anche in orizzontale**: nel repo non c'è un manifest né un
@@ -64,6 +66,28 @@ Dal giro del 30/09 su `task/circolo-viewport-avatar` (dettaglio in fondo):
 
 **77.** Nota: la stessa persona ha una foto al Circolo e una faccia disegnata nello Studio; e
 chi è una ragazza lo decide una lista di nomi scritta a mano.
+
+Dal giro del 29/09 su `task/lafamegram-posta-la-gente` (dettaglio in fondo; arrivato su
+`main` il 01/10):
+
+**78.** Da decidere: **il feed vero del server finisce sotto ai post della gente** — fino a
+settanta card prima dei post dei giocatori veri.
+
+Dal giro sul telefono del 01/10 su `task/studio-resto-automatico` (dettaglio in fondo; la 79
+di segnala-problemi è chiusa lo stesso giorno, in `problemi-risolti.md`):
+
+**80.** Dopo «chiudi tu il resto» si atterra a metà del Beat, e cambiando linguetta la colonna
+non torna in cima: va deciso insieme alla risposta del Marketing in cima (la 10).
+
+**81.** Nota: nel feed di LaFamegram le date sono scritte in due modi («A1 S04» e «Settimana
+12»): con la 78.
+
+Dal giro del 01/10 su `task/studio-cursori-e-linguette`: le voci 82–83 sono chiuse lo stesso
+giorno nel branch e stanno in `problemi-risolti.md`.
+
+Dal giro di fine task del 01/10 sullo stesso branch, dopo il merge della Pizzeria: la
+voce 84 (i numeri `?v=` di sei file rimasti quelli di `main`) è chiusa lo stesso giorno e sta
+in `problemi-risolti.md`.
 
 ---
 
@@ -596,3 +620,133 @@ sue regole partono tutte da 1180 in giù.
   anche nello Studio, e se il genere diventa una cosa della persona invece che del nome.
 - **come si vede** — conosci un fonico al Circolo, poi aprilo nella Cabina.
 - **quanto pesa** — da sistemare con calma.
+
+## Giro del 29/09/2026 (segnala-problemi, giro stretto sul commit 2b1f650, branch `task/lafamegram-posta-la-gente`)
+
+I controlli automatici passano tutti e tre (`npm run prova`, `audit-regressioni.js`,
+`npm run verifica:build`). Guardato: i salvataggi vecchi (senza `lafamegramGente` prendono la
+lista vuota quando si carica la partita, e `telPost` ha comunque il suo `|| []`); le card di
+`eventi-v2.js` con i post della gente, che non hanno `sid`: escono come card semplici, senza
+i tasti Like/Repost/Rispondi, e nessun tasto resta con un indirizzo vuoto; l'ordine degli
+script in `frontend/pagine/gioco.html` (`rivals.js` e `sim.js` prima del file nuovo, che
+avvolge `vitaRivali` in un solo posto: altri file che la avvolgono non ce ne sono); `telPost`
+la usano solo le due schermate LaFamegram. Due cose da segnalare: la prima è chiusa nel branch e sta in `problemi-risolti.md`.
+
+### 78. Il feed vero del server finisce sotto a settanta post finti
+- **dove** — `frontend/js/game/telefono.js:220` (`miei.concat(altri, base)`), con il tetto di
+  40 post in `frontend/js/game/telefono-feed-gente.js:14`
+- **cosa succede** — `base` è il feed che arriva dal server (i post del mondo e chi ti ha
+  appena passato in classifica). Prima gli stavano sopra solo i tuoi post e quelli degli
+  incontri (al massimo 30); adesso ci si aggiungono fino a 40 post della gente, e dopo
+  qualche mese di partita i post dei giocatori veri stanno in fondo, dopo una settantina di
+  card. Funziona, ma è una scelta da fare apposta: se il feed online deve contare, così non
+  lo vede quasi nessuno.
+- **come si vede** — partita collegata al server, qualche mese di gioco, apri LaFamegram e
+  scorri: i post con «Settimana N» del server arrivano solo in fondo.
+- **quanto pesa** — da sistemare con calma (è più una scelta che un errore).
+
+## Giro del 01/10/2026 (segnala-problemi, giro stretto su `33d58ca4..d9425894`, branch `task/studio-resto-automatico` con dentro `task/lafamegram-posta-la-gente`, ribasati su main)
+
+Non ho fatto girare `npm run prova` né `npm run verifica` (giravano già in parallelo): ho
+letto il codice dei quattro commit e lanciato solo `node strumenti/audit-regressioni.js`, che
+dà **467 ok, 6 falliti**. I sei falliti sono tutti di `main` e non di questi branch (il
+widget tempo dello Studio, «non ci si può licenziare», il `:hover` di `css/luoghi-foto.css`,
+i due dei cartelli e della precarica video, la Fabbrica con la foto): li sta sistemando
+l'altro sviluppatore. I due controlli nuovi dei branch («il resto in automatico sta in un
+file suo…» e «su LaFamegram posta anche la gente…») passano.
+
+**Il rebase non ha rotto niente nel codice.** Guardato: l'ordine in
+`frontend/pagine/gioco.html` (`rivals.js` e `sim.js` prima di `telefono-feed-gente.js`;
+`studio.js`, `studio-elementi.js`, `scene-art.js` e `actions.js` prima di
+`studio-automatico.js`); `vitaRivali` su main non è stata né rinominata né avvolta da
+nessun altro, `sim.js:198` la chiama per nome e quindi passa dal giro nuovo; i campi dei
+rivali che il feed legge (`id`, `usc`, `deal`, `ult`, `city`, `p`) e la frase «ti ha
+nominato» in `rivals.js` ci sono ancora; i ruoli della gente (`beatmaker`, `fonico`,
+`videomaker`, `rapper`) sono quelli dei testi; `telPost` non l'ha toccata nessuno, e la
+LaFamegram vera (`eventi-v2.js:1957`) disegna i post della gente come card semplici;
+`totalWeeks` esiste (`sim.js:5`). Nello Studio, tutte le funzioni che
+`studio-automatico.js` chiama esistono con lo stesso nome (`studioSulBanco`, `stCoda`,
+`studioGiorniAVenerdi`, `studioOggiAssoluto`, `mixGain`…), `STUDIO_SEZ` è un `let` e si
+può cambiare, nessuno su main ha avvolto Cabina, Mix, l'Uscita o `studioUscitePronte`, e
+il tasto `data-auto` non si scontra con altri tasti dello Studio. I salvataggi vecchi
+vanno: senza `lafamegramGente` il feed usa la lista vuota, e senza `esceAuto` un pezzo
+esce col suo hype di sempre.
+
+Nei fogli: «Da fare adesso» in `implementazioni/implementazioni.md` è rinumerato senza
+buchi e l'unico rimando (la «voce 13», sul telefono di traverso) è giusto; i due punti
+chiusi non sono doppi e stanno tutti e due in `fatte.md` e nel file del loro argomento;
+la voce 78 qui e la sua chiusa in `problemi-risolti.md` non si pestano i numeri. Una cosa
+già aperta è solo un po' più storta di prima: il branch ha riscritto la **voce 7** («la
+lucidità resta»), ma due righe sopra la testa del foglio dice ancora «la 7 con «Via la
+lucidità»», e la voce 3 di «Da fare adesso» dice ancora che quel lavoro la chiude. È la
+voce 66, che resta aperta: non ne apro un'altra.
+
+### 80. Dopo «chiudi tu il resto» si atterra a metà del Beat, e cambiando linguetta il titolo resta sopra
+- **dove** — `frontend/js/game/studio-automatico.js:72` (`STUDIO_SEZ = "beat"`, poi
+  `renderStudio()` alla riga 77) e `frontend/js/game/studio.js:1587` (il tocco su una
+  linguetta: `STUDIO_SEZ = t.dataset.sez; … renderStudio()`); `renderStudio()`
+  (`studio.js:1489`) ridisegna senza mai rimettere in cima `.stwrap`, che è la colonna che
+  scorre sul telefono (`css/studio.css:106`).
+- **cosa succede** — sul telefono il tasto sta in fondo al Mix (dopo i tre cursori,
+  «Ascolta» e «Chiudi il mix»): per toccarlo scorri giù. Dopo il tocco lo Studio passa al
+  Beat ma lo scorrimento resta quello del Mix, e ti ritrovi a metà del pannello del Beat
+  («Un beat comprato è un beat di chiunque…» tagliato in alto), senza vedere né il titolo
+  né cosa è successo (lo dice solo il toast, che dura poco). Poi tocchi «Mix» o «Uscita»
+  per controllare: anche lì si apre a metà, con «… tangenziale di notte» · q55» e il titolo
+  dell'Uscita tagliati sotto la fascia alta. A 360 lo scarto è più piccolo (62 punti) ma
+  c'è.
+- **come si vede** — 390 × 844, un pezzo inciso sul banco, Mix, scorri fino al tasto e
+  toccalo; poi tocca «Mix» e «Uscita».
+  ![Dopo il tocco: il Beat a metà](prove-telefono/2026-10-01/studio-auto-dopo-tocco-beat-390x844.png)
+  ![Il Mix riaperto, titolo tagliato](prove-telefono/2026-10-01/studio-auto-mix-riaperto-390x844.png)
+  ![L'Uscita riaperta, titolo tagliato](prove-telefono/2026-10-01/studio-auto-uscita-riaperta-390x844.png)
+- **quanto pesa** — si vede ma si gira intorno (si risale col pollice). È parente della
+  voce «Nel Marketing tocchi un pezzo in fondo e la risposta compare in cima» (APERTO di
+  proposito: «scorrere in cima a ogni tocco» è una scelta per tutto lo Studio). Qui però
+  non è un tocco dentro alla stessa sezione: si **cambia sezione**, e lì tornare in cima
+  non toglie niente a nessuno. Da decidere insieme a quella.
+
+### 81. Nota: nel feed di LaFamegram le date sono scritte in due modi, e non si confrontano
+- **dove** — `frontend/js/game/telefono-feed-gente.js:57-58` (`feedGenteQuando`: «A1 S04»)
+  contro `frontend/js/game/telefono.js:159` (il feed del server: «Settimana 12»), mostrati
+  tutti e due in `.tigw` (`css/telefono.css:321`).
+- **cosa succede** — con il server acceso nello stesso feed ci sono «A1 S04» sui post della
+  gente e «Settimana 12» su quelli del server (che sta sotto, vedi la voce 78); la partita
+  era alla settimana 7. Chi legge vede due calendari diversi e un post «della settimana 12»
+  sotto a uno della 4. «A1 S01» da solo, poi, al primo sguardo non si capisce cosa sia.
+- **come si vede** — server acceso, qualche settimana di gioco, LaFamegram e scorri in
+  fondo: ![Il feed del server a 360](prove-telefono/2026-10-01/lafamegram-feed-server-360x640.png)
+  e in cima ![I post della gente a 390](prove-telefono/2026-10-01/lafamegram-gente-390x844.png)
+- **quanto pesa** — da sistemare con calma (va insieme alla voce 78).
+
+## Giro del 01/10/2026 (segnala-problemi, fine task `task/studio-cursori-e-linguette` dopo il merge della Pizzeria, `3b805321..f3b42b4f`)
+
+Non ho fatto girare né `npm run prova` né `npm run verifica` (la verifica completa girava già
+in parallelo nello stesso worktree): ho letto il codice dei nostri commit e il risultato del
+merge con la Pizzeria (PR #11). Guardato e **a posto**:
+
+- **Il merge.** Nessun segno di conflitto rimasto nei file. Rispetto a `origin/main` i nostri
+  commit toccano solo `eventi-v2.js` (le due righe che datano i post, `tw:totalWeeks()`),
+  non `actions.js` né `hub.js`: le modifiche a quei due sono tutte della Pizzeria, e le
+  nostre righe ci sono ancora dopo il merge.
+- **I salvataggi vecchi.** Senza `G.studio.cursori`: `studioBanco()` li crea al centro. Con
+  l'oggetto dei cursori ancora dentro a `banco`: `studioDati()` (`studio.js:168`) lo sposta in
+  `cursori` e poi ritrova il pezzo sul banco come per un salvataggio senza banco; nessun altro
+  file legge `G.studio.banco` per conto suo. Senza `esceAuto`: il pezzo esce col suo hype di
+  sempre. Senza `lafamegramGente`: il feed usa la lista vuota.
+- **Il resto in automatico.** Tutte le funzioni che chiama esistono; «Mandalo fuori» rimesso
+  su un pezzo già in coda non gli ridà l'hype, «Riprendi» e la cassaforte puliscono il segno;
+  il tasto `data-auto` non si scontra con gli altri tasti dello Studio.
+- **Il widget del tempo dopo il fix.** Il filtro scarta solo i cambiamenti *dentro* al widget e
+  al suo pannello. Le schermate che si aprono e chiudono, le finestre che bloccano
+  (`#modal.on`, `#report.on`…), il widget tolto da una testata ridisegnata: tutte cose che
+  succedono fuori, e fanno ancora ripartire il giro. Il widget poi ascolta da solo il tempo
+  che passa, il giorno nuovo, il meteo, il cambio di posto e ogni tocco sulla pagina, quindi
+  non resta fermo neanche quando fuori non cambia niente. Aprire il pannello lo aggiorna
+  subito, senza passare dal filtro. Non ho trovato un caso in cui il widget resti indietro.
+- **LaFamegram.** I post della gente non hanno i tasti Like/Rispondi (come quelli degli
+  incontri), quindi non c'è un tasto che cerca un post che non trova.
+
+Una cosa piccola che ho visto ma non è un errore: dopo «chiudi tu il resto» la scelta
+dell'Uscita resta su «venerdì» anche per il pezzo dopo (`studio-automatico.js:71`). Si vede
+ed è una scelta normale, quindi non apro una voce.

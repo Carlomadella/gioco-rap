@@ -205,9 +205,17 @@ function telPost(){
   if(TEL_FEED === null) telAggiornaFeed();
   const base = (TEL_FEED && TEL_FEED.length) ? TEL_FEED : telPostLocale();
   /* i tuoi post, poi quelli che nascono dagli incontri per strada (punto
-     54 — la foto col fan, il pezzo del giornalista...), poi il resto */
+     54 — la foto col fan, il pezzo del giornalista...) e quelli della gente
+     (rivali e Sala, telefono-feed-gente.js) dal più nuovo, poi il resto.
+     I post degli incontri si timbrano la settimana quando nascono (tw, in
+     strada.js e eventi-v2.js); quelli dei salvataggi vecchi non ce l'hanno
+     e vanno in fondo, che tanto sono i più vecchi. */
   const miei = G.lafamegramMiei || [], eventi = G.lafamegramEventi || [];
-  return miei.concat(eventi, base);
+  const altri = eventi.concat(G.lafamegramGente || [])
+    .map((p, i) => ({p, i}))
+    .sort((a, b) => (b.p.tw || 0) - (a.p.tw || 0) || a.i - b.i)
+    .map(x => x.p);
+  return miei.concat(altri, base);
 }
 
 function golPremio(rw){
