@@ -6,6 +6,30 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:995db28a -->
+## 01/10/26, 23:11 — task/fabbrica-sovraccarico-lungo-periodo → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `995db28a`
+
+### Cosa è entrato
+
+- `960e48be` — chore(cache): invalida nuovo carico lavoro — **mycolbraga**
+- `94c7f409` — test(lavoro): copre sovraccarico progressivo e recupero — **mycolbraga**
+- `8165128e` — feat(lavoro): accumula fatica solo col carico prolungato — **mycolbraga**
+- `37695259` — feat(lavoro): rende progressivo il sovraccarico settimanale — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/sim.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/fabbrica-presenze.test.js`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:e694bb9 -->
 ## 01/10/26, 23:03 — task/fabbrica-bonus-malus-ruolo → main
 
