@@ -25,13 +25,13 @@ test("una finestra che arriva sopra un ALTO aspetta in coda", async ({ page }) =
   const errori = [];
   await altoASchermo(page, errori);
 
-  await page.evaluate(() => { G.job = null; offerJobs(); });
-  /* l'ALTO resta lì, i colloqui no */
+  await page.evaluate(() => { G.job = null; assumitiCome("operaio"); });
+  /* l'ALTO resta lì, il contratto della Fabbrica aspetta in coda */
   await expect(page.locator("#m-t")).toHaveText("A casa ti fermano");
 
   await page.locator("#m-opts button").first().click();
-  /* scelto l'ALTO, arrivano i colloqui */
-  await expect(page.locator("#m-t")).toHaveText("Due posti liberi");
+  /* scelto l'ALTO, arriva la finestra lavoro attuale */
+  await expect(page.locator("#m-t")).toHaveText("Contratto di lavoro");
   await page.locator("#m-opts button").last().click();
 
   const dopo = await page.evaluate(() => ({pendente:GAME_EVENTS.pending(), lucchetto:ADF_EVENTI.globalHigh()}));
