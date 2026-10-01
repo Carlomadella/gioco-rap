@@ -1293,7 +1293,8 @@ test("widget tempo/meteo: click apre, uscita mouse dal perimetro richiude",
   timeControls.includes('panel.addEventListener("pointerleave",schedulePointerLeaveClose)') &&
   timeControls.includes('ev.pointerType!=="mouse"') &&
   timeControls.includes('const POINTER_LEAVE_CLOSE_MS = 180') &&
-  timeControls.includes('cancelPointerLeaveClose();\n    panelOpen=false;'));
+  /* \r?\n: su Windows il checkout è CRLF e un \n secco non trova niente */
+  /cancelPointerLeaveClose\(\);\r?\n\s*panelOpen=false;/.test(timeControls));
 test("slider orario e tasti +/- lavorano a step di 15 minuti",
   timeControls.includes('type="range"') &&
   timeControls.includes('const STEP = Number(GAME_TIME.SLOT) || 15') &&
