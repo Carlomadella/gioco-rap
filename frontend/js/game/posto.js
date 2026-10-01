@@ -480,6 +480,8 @@ function postoNuovoContattoLavoro(luogo, ruolo, meta){
   p.origine = "lavoro";
   p.origineLuogo = luogo;
   p.origineLavoro = meta.jobId || luogo;
+  p.origineRuoloLavoro = meta.workRoleId || meta.jobId || null;
+  p.origineRuoloNome = meta.workRoleName || null;
   p.origineDettaglio = meta.dettaglio ||
     (luogo === "fabbrica" ? "collega di Fabbrica" : "contatto conosciuto al lavoro");
   p.storia = meta.storia ||

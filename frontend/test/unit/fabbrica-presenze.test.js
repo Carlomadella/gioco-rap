@@ -508,6 +508,7 @@ describe("cartellino presenze Fabbrica", () => {
     expect(ctx.G.workplaces.fabbrica.career.perfectCyclesInRole).toBe(0);
     expect(ctx.G.workplaces.fabbrica.career.reliability).toBe(80);
     expect(ctx.G.workplaces.fabbrica.career.roleHistory).toHaveLength(1);
+    expect(ctx.G.workplaces.fabbrica.network.turniPerRuolo.operaio_esperto).toBe(0);
   });
 
   it("prepara il motore eventi per requisiti ed effetti di carriera per luogo", () => {
@@ -901,6 +902,125 @@ describe("cartellino presenze Fabbrica", () => {
     expect(luoghi).toContain("straordinarioOggi");
     expect(luoghi).toContain("straordinarioAccettato.targetLabel");
     expect(luoghi).toContain("straordinarioAccettato.scenarioLabel");
+  });
+
+  it("la rete Fabbrica cresce con la mansione senza cambiare la sede persistente", () => {
+    const ctx = {
+      G:{year:1,week:1,day:1,job:{id:"operaio",place:"fabbrica",n:"Operaio"},strada:{}},
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => 1;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    const profili = vm.runInContext(`
+      ["operaio","operaio_esperto","capolinea","capoturno"].map(id => {
+        const cfg=lavoroReteDef({id,place:"fabbrica",n:id});
+        return {
+          id,
+          chance:cfg.chanceIncontro,
+          cooldown:cfg.cooldownGiorni,
+          minTurni:cfg.minTurni,
+          max:cfg.maxContatti,
+          key:lavoroReteChiave({id,place:"fabbrica"})
+        };
+      })
+    `, ctx);
+
+    expect(profili).toEqual([
+      {id:"operaio",chance:.16,cooldown:7,minTurni:3,max:4,key:"fabbrica"},
+      {id:"operaio_esperto",chance:.18,cooldown:6,minTurni:2,max:5,key:"fabbrica"},
+      {id:"capolinea",chance:.20,cooldown:5,minTurni:2,max:6,key:"fabbrica"},
+      {id:"capoturno",chance:.22,cooldown:4,minTurni:1,max:7,key:"fabbrica"}
+    ]);
+  });
+
+  it("una promozione apre nuova rete ma non eredita i turni della mansione precedente", () => {
+    const persona = {
+      id:"p-exp-1",n:"Sara",ruolo:"fonico",
+      origineLuogo:"fabbrica",numero:false,via:false
+    };
+    const metaVisti=[];
+    const ctx = {
+      G:{
+        year:1,week:2,day:1,
+        job:{id:"operaio_esperto",place:"fabbrica",n:"Operaio esperto",pay:245,e:36},
+        gente:[],
+        workplaces:{
+          fabbrica:{
+            network:{
+              lastCheckAbsoluteDay:null,lastEncounterAbsoluteDay:null,
+              encounters:0,turniVisti:12,
+              turniPerRuolo:{operaio:12},
+              history:[]
+            }
+          }
+        },
+        strada:{}
+      },
+      Number, Math, Array, Object, Set,
+      postoContattoLavoroCandidato:(luogo,riprendi,max,ruoli,meta) => {
+        metaVisti.push({luogo,max,ruoli:[...ruoli],meta:{...meta}});
+        ctx.G.gente.push(persona);
+        return persona;
+      }
+    };
+    ctx.totalWeeks = () => 2;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    const primo=vm.runInContext('lavoroTentaIncontroContatto("fabbrica",0)', ctx);
+    expect(primo).toBeNull();
+    expect(ctx.G.workplaces.fabbrica.network.turniPerRuolo.operaio_esperto).toBe(1);
+
+    ctx.G.day=2;
+    const secondo=vm.runInContext('lavoroTentaIncontroContatto("fabbrica",0)', ctx);
+    expect(secondo.id).toBe("p-exp-1");
+    expect(metaVisti).toHaveLength(1);
+    expect(metaVisti[0].max).toBe(5);
+    expect(metaVisti[0].meta.workRoleId).toBe("operaio_esperto");
+    expect(metaVisti[0].meta.workRoleName).toBe("Operaio esperto");
+  });
+
+  it("un vecchio salvataggio conserva l'esposizione rete invece di ripartire da zero", () => {
+    const persona = {
+      id:"p-legacy",n:"Nico",ruolo:"beatmaker",
+      origineLuogo:"fabbrica",numero:false,via:false
+    };
+    const ctx = {
+      G:{
+        year:1,week:2,day:2,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        gente:[],
+        workplaces:{
+          fabbrica:{
+            network:{
+              lastCheckAbsoluteDay:null,lastEncounterAbsoluteDay:null,
+              encounters:0,turniVisti:5,history:[]
+            }
+          }
+        },
+        strada:{}
+      },
+      Number, Math, Array, Object, Set,
+      postoContattoLavoroCandidato:() => {
+        ctx.G.gente.push(persona);
+        return persona;
+      }
+    };
+    ctx.totalWeeks = () => 2;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    const out=vm.runInContext('lavoroTentaIncontroContatto("fabbrica",0)', ctx);
+    expect(out.id).toBe("p-legacy");
+    expect(ctx.G.workplaces.fabbrica.network.turniPerRuolo.operaio).toBe(6);
+  });
+
+  it("il contatto conserva per sempre la mansione in cui lo hai conosciuto", () => {
+    const posto = leggi("js/game/posto.js");
+    expect(posto).toContain("p.origineRuoloLavoro = meta.workRoleId || meta.jobId || null;");
+    expect(posto).toContain("p.origineRuoloNome = meta.workRoleName || null;");
   });
 
   it("dopo almeno tre turni può nascere una conoscenza persistente di Fabbrica", () => {

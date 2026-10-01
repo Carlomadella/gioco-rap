@@ -113,7 +113,7 @@ describe("identità sociale dei lavori", () => {
     expect(chiamate).toHaveLength(1);
   });
 
-  it("una promozione in Fabbrica continua a usare la rete del luogo", () => {
+  it("una promozione in Fabbrica continua a usare la rete del luogo col profilo del nuovo ruolo", () => {
     const ctx = contesto({
       year:1,week:1,day:1,
       job:{id:"capoturno",place:"fabbrica",n:"Capoturno",pay:300,e:38},
@@ -121,7 +121,8 @@ describe("identità sociale dei lavori", () => {
     });
 
     expect(vm.runInContext("lavoroReteChiave(G.job)", ctx)).toBe("fabbrica");
-    expect(vm.runInContext("lavoroReteDef(G.job).maxContatti", ctx)).toBe(4);
+    expect(vm.runInContext("lavoroReteDef(G.job).roleId", ctx)).toBe("capoturno");
+    expect(vm.runInContext("lavoroReteDef(G.job).maxContatti", ctx)).toBe(7);
   });
 
   it("le persone di lavoro usano ruoli reali e chat compatibili", () => {
