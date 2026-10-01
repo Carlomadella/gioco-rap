@@ -81,6 +81,29 @@
 .lfriga b{font-size:15.5px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;text-align:right}
 .lfriga.oro b{color:var(--stOro)}
 .lfnotasotto{margin:10px 0 0}
+
+/* ---- FABBRICA: CARTELLINO PRESENZE ----
+   Quattro righe = quattro settimane. Il bordo azzurro è oggi; il timbro oro
+   è un turno davvero completato. Se nello stesso giorno fai due turni, la
+   casella mostra ×2 invece di perderne uno. */
+.lfpresenze{display:flex;flex-direction:column;gap:5px}
+.lfpres-head,.lfpres-week{display:grid;grid-template-columns:26px repeat(7,minmax(0,1fr));gap:4px;align-items:center}
+.lfpres-head{margin-bottom:2px}
+.lfpres-head i{font-style:normal;text-align:center;font-size:9.5px;font-weight:800;letter-spacing:.04em;color:var(--stSoft)}
+.lfpres-week>b{font-size:10px;letter-spacing:.06em;color:var(--stSoft);text-align:left}
+.lfpres-day{height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(125,175,215,.16);background:rgba(2,8,14,.52);
+  color:rgba(255,255,255,.5);font-size:11px;font-weight:900;font-variant-numeric:tabular-nums}
+.lfpres-day.fatto{border-color:rgba(242,193,78,.58);background:rgba(242,193,78,.16);color:var(--stOro);
+  box-shadow:inset 0 0 0 1px rgba(242,193,78,.08)}
+.lfpres-day.oggi{outline:1px solid var(--stAzz);outline-offset:1px}
+.lfpres-day.futuro{opacity:.32}
+.lfpres-day.fatto.futuro{opacity:1}
+.lfpres-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;padding-top:9px;
+  border-top:1px solid rgba(125,175,215,.14);font-size:12px;color:var(--stSoft)}
+.lfpres-foot b{color:#fff;font-size:14px;font-variant-numeric:tabular-nums}
+.lfpres-foot span:first-child b{color:var(--stOro)}
+
 .lflista{margin:0 0 6px;padding:0 0 0 18px;font-size:14.5px;line-height:1.6;color:var(--stTesto)}
 .lflista i{color:var(--stSoft);font-style:normal;font-size:13px}
 
