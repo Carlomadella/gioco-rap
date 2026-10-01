@@ -2287,6 +2287,8 @@ function adfFactoryStreetAfterShift(){
   if(!G.job || typeof lavoroLuogo!=="function" || lavoroLuogo(G.job)!=="fabbrica")
     return false;
   if(typeof stradaTentaPropostaFabbrica!=="function") return false;
+  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.crimeLeadActive==="function" &&
+     ADF_WORK_EVENTS.crimeLeadActive()) return false;
 
   const s=st();
   if(s.runtime.lastAutoEventKey===eventMinuteKey()) return false;
