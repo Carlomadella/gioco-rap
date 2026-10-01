@@ -2759,20 +2759,40 @@ for(const a of ACTIONS){
   if(a.__adfWrapped) continue;
   const old=a.run;
   a.run=function(){
-    const jobBefore=G.job&&G.job.id;
+    const jobBefore=G.job ? {
+      id:G.job.id,
+      place:typeof lavoroLuogo==="function" ? lavoroLuogo(G.job) : (G.job.place||null),
+      n:G.job.n,
+      from:(typeof GAME_TIME!=="undefined" && GAME_TIME.now)
+        ? Number(GAME_TIME.now()) : Number(G.timeMinutes||0)
+    } : null;
     const out=old.apply(this,arguments);
     setTimeout(()=>{
+      const shiftPayload = a.id==="turno" && jobBefore ? {
+        action_id:"turno",
+        job_id:jobBefore.id,
+        workplace:jobBefore.place,
+        job_name:jobBefore.n,
+        started_at:jobBefore.from,
+        ended_at:(typeof GAME_TIME!=="undefined" && GAME_TIME.now)
+          ? Number(GAME_TIME.now()) : Number(G.timeMinutes||0)
+      } : null;
+
       const overtimeShown = a.id==="turno" ? adfFactoryOvertimeAfterShift() : false;
       const streetShown = a.id==="turno" && !overtimeShown
         ? adfFactoryStreetAfterShift()
         : false;
-      const contactShown = a.id==="turno" && !overtimeShown && !streetShown
+      const workFamilyShown = a.id==="turno" && !overtimeShown && !streetShown &&
+        window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.afterShift==="function"
+          ? ADF_WORK_EVENTS.afterShift(shiftPayload)
+          : false;
+      const contactShown = a.id==="turno" && !overtimeShown && !streetShown && !workFamilyShown
         ? adfWorkContactAfterShift()
         : false;
-      if(!overtimeShown && !streetShown && !contactShown)
+      if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown)
         emitHook("after_action",{action_id:a.id});
-      if(a.id==="turno" && G.job && !overtimeShown && !streetShown && !contactShown)
-        emitHook("after_job_shift",{
+      if(a.id==="turno" && G.job && !overtimeShown && !streetShown && !workFamilyShown && !contactShown)
+        emitHook("after_job_shift",shiftPayload || {
           action_id:"turno",
           job_id:G.job.id,
           workplace:typeof lavoroLuogo==="function" ? lavoroLuogo(G.job) : (G.job.place||null)
