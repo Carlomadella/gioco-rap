@@ -186,9 +186,9 @@ const ADF_LAVORO_CONTRATTI = Object.freeze({
   })
 });
 
-/* Carriera Fabbrica: requisiti di CANDIDATURA, non premi automatici.
-   L'evento che proporrà davvero aumento/promozione verrà collegato al catalogo
-   eventi in un passaggio dedicato. Qui costruiamo lo stato reale e gli effetti.
+/* Carriera dei lavori strutturati: requisiti di CANDIDATURA, non premi automatici.
+   Le offerte reali vengono aperte da lavoro-eventi.js dopo un turno concluso;
+   qui restano fonte di verità requisiti, stato persistente ed effetti.
    - aumento: dopo almeno 1 ciclo completo nel ruolo e affidabilità 60;
    - promozione di ruolo: dopo almeno 3 cicli nel ruolo, affidabilità 75 e
      almeno 2 cicli perfetti nel ruolo.
