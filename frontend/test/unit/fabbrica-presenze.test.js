@@ -425,9 +425,9 @@ describe("cartellino presenze Fabbrica", () => {
     expect(eventi).toContain('if(e && e.arc_id==="ARC106") return false;');
   });
 
-  it("1-2 assenze abbassano l'affidabilità senza richiamo formale", () => {
+  it("1-2 assenze settimanali abbassano l'affidabilità senza richiamo formale", () => {
     const ctx = {
-      G:{year:1,week:4,day:7,job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40}},
+      G:{year:1,week:1,day:7,job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40}},
       Number, Math, Array, Object, Set
     };
     ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
@@ -442,29 +442,27 @@ describe("cartellino presenze Fabbrica", () => {
             reliability:60,cyclesCompleted:0,perfectCycles:0,perfectStreak:0,
             cyclesInRole:0,perfectCyclesInRole:0,roleId:"operaio",roleLevel:0,
             raisesByRole:{},payHistory:[],roleHistory:[],warnings:0,warningHistory:[],
-            dismissals:0,blockedUntilWeek:null,evaluations:[]
+            weeklyEvaluations:[],dismissals:0,blockedUntilWeek:null,evaluations:[]
           },
-          attendance:{ciclo:0,turni:[
-            0,1,2,3,
-            7,8,9,10,11,
-            14,15,16,17,18,
-            21,22,23,24,25
-          ]}
+          attendance:{ciclo:0,turni:[0,1,2,3]}
         }
       };
     `, ctx);
 
-    const out = vm.runInContext('lavoroChiudiCiclo("fabbrica")', ctx);
+    const out = vm.runInContext(
+      'lavoroValutaDisciplinaSettimana("fabbrica",1,0,0,G.workplaces.fabbrica.attendance.turni,{silent:true})',
+      ctx
+    );
     expect(out.absences).toBe(1);
-    expect(out.disciplina.warningAdded).toBe(0);
-    expect(out.disciplina.dismissed).toBe(false);
+    expect(out.warningAdded).toBe(0);
+    expect(out.dismissed).toBe(false);
     expect(vm.runInContext('lavoroCarriera("fabbrica").warnings', ctx)).toBe(0);
     expect(vm.runInContext('lavoroCarriera("fabbrica").reliability', ctx)).toBe(55);
   });
 
-  it("da 3 assenze scatta un richiamo formale e -10 affidabilità", () => {
+  it("da 3 assenze nella settimana scatta un richiamo formale e -10 affidabilità", () => {
     const ctx = {
-      G:{year:1,week:4,day:7,job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40}},
+      G:{year:1,week:1,day:7,job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40}},
       Number, Math, Array, Object, Set
     };
     ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
@@ -479,27 +477,25 @@ describe("cartellino presenze Fabbrica", () => {
             reliability:70,cyclesCompleted:0,perfectCycles:0,perfectStreak:0,
             cyclesInRole:0,perfectCyclesInRole:0,roleId:"operaio",roleLevel:0,
             raisesByRole:{},payHistory:[],roleHistory:[],warnings:0,warningHistory:[],
-            dismissals:0,blockedUntilWeek:null,evaluations:[]
+            weeklyEvaluations:[],dismissals:0,blockedUntilWeek:null,evaluations:[]
           },
-          attendance:{ciclo:0,turni:[
-            0,1,
-            7,8,9,10,11,
-            14,15,16,17,18,
-            21,22,23,24,25
-          ]}
+          attendance:{ciclo:0,turni:[0,1]}
         }
       };
     `, ctx);
 
-    const out = vm.runInContext('lavoroChiudiCiclo("fabbrica")', ctx);
+    const out = vm.runInContext(
+      'lavoroValutaDisciplinaSettimana("fabbrica",1,0,0,G.workplaces.fabbrica.attendance.turni,{silent:true})',
+      ctx
+    );
     expect(out.absences).toBe(3);
-    expect(out.disciplina.warningAdded).toBe(1);
-    expect(out.disciplina.dismissed).toBe(false);
+    expect(out.warningAdded).toBe(1);
+    expect(out.dismissed).toBe(false);
     expect(vm.runInContext('lavoroCarriera("fabbrica").warnings', ctx)).toBe(1);
     expect(vm.runInContext('lavoroCarriera("fabbrica").reliability', ctx)).toBe(60);
   });
 
-  it("dopo due richiami un altro ciclo grave licenzia e blocca 8 settimane", () => {
+  it("dopo due richiami un'altra settimana grave licenzia e blocca 8 settimane", () => {
     const ctx = {
       G:{year:1,week:12,day:7,job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40}},
       Number, Math, Array, Object, Set
@@ -516,20 +512,18 @@ describe("cartellino presenze Fabbrica", () => {
             reliability:60,cyclesCompleted:2,perfectCycles:0,perfectStreak:0,
             cyclesInRole:2,perfectCyclesInRole:0,roleId:"operaio",roleLevel:0,
             raisesByRole:{},payHistory:[],roleHistory:[],warnings:2,warningHistory:[],
-            dismissals:0,blockedUntilWeek:null,lastEvaluatedCycle:1,evaluations:[]
+            weeklyEvaluations:[],dismissals:0,blockedUntilWeek:null,lastEvaluatedCycle:1,evaluations:[]
           },
-          attendance:{ciclo:2,turni:[
-            0,1,
-            7,8,9,10,11,
-            14,15,16,17,18,
-            21,22,23,24,25
-          ]}
+          attendance:{ciclo:2,turni:[21,22]}
         }
       };
     `, ctx);
 
-    const out = vm.runInContext('lavoroChiudiCiclo("fabbrica")', ctx);
-    expect(out.disciplina.dismissed).toBe(true);
+    const out = vm.runInContext(
+      'lavoroValutaDisciplinaSettimana("fabbrica",12,2,3,G.workplaces.fabbrica.attendance.turni,{silent:true})',
+      ctx
+    );
+    expect(out.dismissed).toBe(true);
     expect(ctx.G.job).toBeNull();
     expect(ctx.G.workplaces.fabbrica.contract).toBeNull();
     expect(ctx.G.workplaces.fabbrica.career.dismissals).toBe(1);
@@ -886,12 +880,50 @@ describe("cartellino presenze Fabbrica", () => {
     expect(eventi).toContain('const contactShown = a.id==="turno" && !overtimeShown');
   });
 
-  it("chiude il ciclo lavorativo prima di avanzare la settimana", () => {
+  it("recupera due richiami dalle due settimane gravi già concluse del cartellino", () => {
+    const ctx = {
+      G:{
+        year:1,week:4,day:2,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{
+          fabbrica:{
+            contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+            attendance:{ciclo:0,turni:[
+              0,1,3,4,5,
+              7,
+              21
+            ]},
+            career:{
+              reliability:50,cyclesCompleted:0,perfectCycles:0,perfectStreak:0,
+              cyclesInRole:0,perfectCyclesInRole:0,roleId:"operaio",roleLevel:0,
+              raisesByRole:{},payHistory:[],roleHistory:[],warnings:0,warningHistory:[],
+              weeklyEvaluations:[],dismissals:0,blockedUntilWeek:null,evaluations:[]
+            }
+          }
+        }
+      },
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    const cart = vm.runInContext('lavoroCartellino("fabbrica")', ctx);
+    expect(cart.richiami).toBe(2);
+    expect(cart.affidabilita).toBe(30);
+    expect(ctx.G.workplaces.fabbrica.career.weeklyEvaluations).toHaveLength(3);
+    expect(ctx.G.workplaces.fabbrica.career.weeklyEvaluations[1].absences).toBe(4);
+    expect(ctx.G.workplaces.fabbrica.career.weeklyEvaluations[2].absences).toBe(5);
+  });
+
+  it("chiude disciplina settimanale e ciclo prima di avanzare la settimana", () => {
     const sim = leggi("js/game/sim.js");
-    const close = sim.indexOf('if(typeof lavoroChiudiCicli === "function") lavoroChiudiCicli();');
-    const week = sim.indexOf("G.week++;", close);
-    expect(close).toBeGreaterThan(-1);
-    expect(week).toBeGreaterThan(close);
+    const weekly = sim.indexOf('if(typeof lavoroChiudiSettimane === "function") lavoroChiudiSettimane();');
+    const cycle = sim.indexOf('if(typeof lavoroChiudiCicli === "function") lavoroChiudiCicli();', weekly);
+    const week = sim.indexOf("G.week++;", cycle);
+    expect(weekly).toBeGreaterThan(-1);
+    expect(cycle).toBeGreaterThan(weekly);
+    expect(week).toBeGreaterThan(cycle);
   });
 
   it("le dimissioni chiudono il contratto ma conservano storico e carriera", () => {
