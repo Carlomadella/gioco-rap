@@ -60,7 +60,7 @@ detto, la richiesta com'era scritta in [`fatte.md`](fatte.md):
 - **L'avvio rapido ci mette due minuti e non lo dice** — FATTO 19/09: «L'avvio rapido: la
   schermata «Preparo il tuo artista»», `02-interfaccia-e-telefono.md`.
 - **Le foto dei posti che non hanno ancora una pagina** — FATTO 19/09: «Le pagine dei
-  posti sulla loro foto», `02-interfaccia-e-telefono.md`. La serata a momenti è la voce 6.
+  posti sulla loro foto», `02-interfaccia-e-telefono.md`. La serata a momenti è chiusa col Circolo (29/09).
 - **Fra i 980 e i 1180 punti la barra della plancia trabocca** — FATTO 20/09, con la
   plancia a 1280 × 800 e 1366 × 768: «La fascia della plancia fra 980 e 1240, e la plancia
   a 1280 × 800», `02-interfaccia-e-telefono.md`.
@@ -91,6 +91,9 @@ detto, la richiesta com'era scritta in [`fatte.md`](fatte.md):
   chiuse il 21/09/2026» sotto «Lo Studio a cinque linguette», `02-interfaccia-e-telefono.md`.
 - **Quando skippi tante ore ci mette troppo** — FATTO 28/09: otto ore di attesa da 11,8 a
   2,2 secondi, «L'attesa lunga non si trascina», `05-carriera-e-tempo.md`.
+- **La serata del Live Club giocata a momenti** — FATTO 29/09 col Circolo (la Sala e il
+  Live Club diventano un posto solo, con la serata giocata a momenti; uscita dall'ordine il
+  01/10): «Il Circolo tutto nello schermo, coi volti veri», `02-interfaccia-e-telefono.md`.
 
 Due punti di CARLO — «quando non sono fix… crea un file nuovo collegato ai già presenti»
 e «tieni tutto ciò che riguarda la parte smartphone separata dal resto del progetto» —
