@@ -383,21 +383,37 @@ function lfFabbricaCartellino(){
 }
 
 function lfFabbrica(){
-  const def = (typeof JOBS !== "undefined" ? JOBS : []).find(j => j.id === "operaio");
-  if(!def) return {mid:lfPan("Fabbrica", '<div class="stvuoto">Turno non disponibile.</div>', "orologio")};
+  const baseDef = (typeof JOBS !== "undefined" ? JOBS : []).find(j => j.id === "operaio");
+  if(!baseDef) return {mid:lfPan("Fabbrica", '<div class="stvuoto">Turno non disponibile.</div>', "orologio")};
 
-  const mio = !!(G.job && G.job.id === def.id);
+  /* La Fabbrica riconosce il posto, non l'id della mansione: una futura
+     promozione può cambiare Operaio -> Capolinea -> Capoturno senza farti
+     risultare "assunto altrove" né perdere il cartellino. */
+  const mio = !!(G.job && typeof lavoroLuogo === "function" && lavoroLuogo(G.job) === "fabbrica");
   const altro = G.job && !mio ? G.job : null;
+  const def = mio ? {
+    id:G.job.id,
+    n:G.job.n,
+    pay:G.job.pay,
+    e:G.job.e,
+    d:G.job.d || baseDef.d
+  } : baseDef;
   let stato = {ok:true, perche:""};
   let orario = "Turno pieno";
   try{
     if(window.GAME_HOURS && window.GAME_TIME){
-      const st = GAME_HOURS.jobStatus(def.id);
-      const dur = GAME_TIME.formatDuration(GAME_HOURS.jobDuration(def.id));
+      const st = typeof GAME_HOURS.placeJobStatus === "function"
+        ? GAME_HOURS.placeJobStatus("fabbrica")
+        : GAME_HOURS.jobStatus(baseDef.id);
+      const dur = GAME_TIME.formatDuration(
+        typeof GAME_HOURS.placeJobStatus === "function" && st && st.duration != null
+          ? st.duration
+          : GAME_HOURS.jobDuration(baseDef.id)
+      );
       orario = "Turno di " + dur;
       if(st && !st.open) stato = {ok:false, perche:st.label || "Adesso e' chiuso"};
       else if(st && !st.allDay && st.closeAt != null)
-        orario += " · ingresso fino alle " + GAME_TIME.format(st.closeAt - GAME_HOURS.jobDuration(def.id));
+        orario += " · ingresso fino alle " + GAME_TIME.format(st.closeAt - (st.duration != null ? st.duration : GAME_HOURS.jobDuration(baseDef.id)));
     }
   }catch(e){}
   if(altro) stato = {ok:false, perche:"Lavori gia' come " + altro.n.toLowerCase()};
@@ -419,10 +435,11 @@ function lfFabbrica(){
     vCls:stato.ok ? "" : "calmo"
   });
   const testo = mio ? "Fai il turno" : "Fatti assumere e lavora";
+  const azioneLavoro = mio ? ' data-vai="turno"' : ' data-lavoro="' + baseDef.id + '"';
   const mid = lfPan(mio ? "Vai al lavoro" : "Vuoi lavorare qui?",
     '<p class="stnota">Linea di montaggio, otto ore piene. I soldi entrano, la giornata se ne va.</p>' +
     riga +
-    '<div class="stazioni"><button type="button" class="stprimo" data-lavoro="operaio"' +
+    '<div class="stazioni"><button type="button" class="stprimo"' + azioneLavoro +
       (stato.ok ? "" : " disabled") + '>' + lfIco("orologio") + lfEsc(testo) +
       ' · +' + fmt(def.pay) + ' € · −' + def.e + ' energia</button></div>' +
     (stato.ok ? "" : '<p class="stperche">' + lfEsc(stato.perche) + '.</p>'),
