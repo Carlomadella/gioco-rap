@@ -2643,6 +2643,9 @@ test("gioco.html carica transizioni-video.js prima di hub.js, e il suo CSS",
   })());
 test("il cartello dello Studio passa dal video prima di aprire la stanza",
   /id:"studio"[\s\S]{0,600}?transizioneVideo\("studio",[\s\S]{0,80}?apriStudio\(/.test(hub));
+test("la Pizzeria usa la cinematica a tre scene prima di aprire la cucina",
+  /pizzeria:\s*\[[\s\S]{0,500}?pizzeria_01_arrivo\.webp[\s\S]{0,500}?pizzeria_02_spogliatoio\.webp[\s\S]{0,500}?pizzeria_03_cucina\.webp/.test(tvid) &&
+  /id:"pizzeria"[\s\S]{0,300}?transizioneVideo\("pizzeria",[\s\S]{0,80}?apriLuogo\("pizzeria"\)/.test(hub));
 /* Gli altri quattro (20/09/2026): due cartelli, una mossa, una take. La
    Sala e Casa come lo Studio; «stacca la spina» nel punto dove l'esito di
    quella mossa va sulla sua foto (l'incarto di mostraScena in luoghi-foto.js),
@@ -2658,7 +2661,7 @@ test("«stacca la spina» ha il filmato fra il tasto e l'esito, da dovunque part
 test("«registra» ha il filmato sulla prima take del pezzo, e solo su quella",
   /function studioTakeAncora\(\)[\s\S]{0,2200}?if\(!t\.l\.length && typeof transizioneVideo === "function"\) transizioneVideo\("registra", incidi\)/.test(leggi("js/game/studio-elementi.js")));
 test("il puntatore sul cartello prepara il video giusto: i cartelli hanno un id loro",
-  /TRANSIZIONI_CARTELLI = \{studio:"studio", beat:"sala", vita:"casa", fabbrica:"fabbrica"\}/.test(tvid) &&
+  /TRANSIZIONI_CARTELLI = \{studio:"studio", beat:"sala", vita:"casa", fabbrica:"fabbrica", pizzeria:"pizzeria"\}/.test(tvid) &&
   tvid.includes("transizioneVideoPrepara(TRANSIZIONI_CARTELLI[b.dataset.l])"));
 /* L'elemento video è uno solo: la precarica dello Studio (quattro secondi
    dopo l'avvio) cambiava `src` a un filmato che stava andando e lo tagliava

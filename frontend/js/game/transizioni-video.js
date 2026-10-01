@@ -52,11 +52,16 @@ const TRANSIZIONI_SCENE = {
     "media/video/Transizioni di scena/fabbrica_01_arrivo.webp",
     "media/video/Transizioni di scena/fabbrica_02_spogliatoio.webp",
     "media/video/Transizioni di scena/fabbrica_03_timbratura.webp"
+  ],
+  pizzeria: [
+    "media/video/Transizioni di scena/pizzeria_01_arrivo.webp",
+    "media/video/Transizioni di scena/pizzeria_02_spogliatoio.webp",
+    "media/video/Transizioni di scena/pizzeria_03_cucina.webp"
   ]
 };
 /* I cartelli della mappa hanno un id loro (`data-l`): qui si dice quale
    filmato preparare quando il puntatore ci passa sopra. */
-const TRANSIZIONI_CARTELLI = {studio:"studio", beat:"sala", vita:"casa", fabbrica:"fabbrica"};
+const TRANSIZIONI_CARTELLI = {studio:"studio", beat:"sala", vita:"casa", fabbrica:"fabbrica", pizzeria:"pizzeria"};
 /* Finito un filmato, si prepara quello che può venire subito dopo dentro
    alla pagina appena aperta: in Cabina si registra, a Casa si stacca la
    spina. Un download che parte a pagina ferma, non sotto al dito. */

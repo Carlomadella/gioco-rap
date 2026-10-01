@@ -86,7 +86,7 @@ const HUB_LUOGHI = [
      alla foto — cambia solo quando cambia la mappa, punto 45); qui sotto
      adesso c'è un lavoro vero, part time. */
   {id:"pizzeria", n:"Pizzeria",
-   vai:() => apriLuogo("pizzeria")},
+   vai:() => transizioneVideo("pizzeria", () => apriLuogo("pizzeria"))},
   /* Il Circolo (29/09/2026): la Sala e il Live Club sono diventati un posto
      solo, «un posto, due vite» — di pomeriggio il retro dove si conosce la
      gente, la sera il palco. Sta dov'era la Sala (id "beat", che resta
