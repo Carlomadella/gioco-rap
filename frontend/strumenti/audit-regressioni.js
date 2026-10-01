@@ -732,7 +732,9 @@ test("tenere una take non costa energia: la sessione la paga la prima take (25 d
   studio.includes(`stPrimo(' data-ancora="1"', "Registra la take · " + costo + " energia"`));
 
 test("i cursori del banco partono al centro e al centro valgono zero",
-  studioEl.includes("d.banco = {voce:2, bassi:2, aria:2}") &&
+  /* dal 01/10/2026 stanno in `cursori`: `banco` e' il seed del pezzo sul banco (F2) */
+  studioEl.includes("d.cursori = {voce:2, bassi:2, aria:2}") && !studioEl.includes("d.banco = {voce") &&
+  studioEl.includes('if(d.banco && typeof d.banco === "object"){ d.cursori = d.banco; d.banco = null; }') &&
   /* il carattere di ripiego, quello dei cursori fermi in mezzo, non da' punti */
   /PULITO",\s*q:0/.test(studioEl) &&
   actions.includes("+ studioBonus() + bancoBonus()"));
@@ -2034,10 +2036,12 @@ test("quando la parte 2 esce (a mano o di venerdi') il primo torna a girare, e l
   sim.includes('const curve = typeof curvaPezzo === "function" ? curvaPezzo(s, age)') &&
   sim.includes('const seguitoPull = typeof seguitoAscolti === "function" ? seguitoAscolti(s) : 0;') &&
   sim.includes("let out = (fanPull + scoperta + featPull + seguitoPull) * curve * rnd(0.8, 1.25);"));
-test("la remastered si prenota dalla Discografia e si chiude al banco del Mix: la mossa c'e' solo finche' e' prenotata, apre il Mix a banco vuoto, costa come un mix piu' la sala, una volta sola per pezzo",
+test("le linguette dello Studio sono aperte sempre (21/09/2026 sera, «lascia sbloccate le fasi dello studio bloccate»): studioSezAperta non guarda piu' il banco",
+  /function studioSezAperta\(x\)\{\r?\n  return !!x;\r?\n\}/.test(studio) &&
+  !studio.includes("if(!x.dopo || studioSbloccato()) return true;"));
+test("la remastered si prenota dalla Discografia e si chiude al banco del Mix: la mossa c'e' solo finche' e' prenotata, costa come un mix piu' la sala, una volta sola per pezzo",
   actions.includes('{id:"remaster", n:"Remastered", e:24, luc:2,') &&
   actions.includes('avail:() => typeof remasterPrenotato === "function" && !!remasterPrenotato(),') &&
-  studio.includes('return x.id === "banco" && typeof remasterPrenotato === "function" && !!remasterPrenotato();') &&
   studio.includes('const remaster = typeof remasterPannello === "function" ? remasterPannello() : "";') &&
   seguiti.includes("if(!s || s.remaster){ d.remaster = null; return null; }") &&
   seguiti.includes("function remasterBase(){") && !seguiti.includes("? mixGain()") &&

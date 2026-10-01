@@ -533,10 +533,17 @@ const STUDIO_CARATTERI = [
   {t:() => true,                             n:"PULITO",    q:0}
 ];
 
+/* I tre cursori stanno in `G.studio.cursori`. Prima stavano in `d.banco`,
+   che dal 15/09 (F2) e' anche **il seed del pezzo sul banco** (studio.js): con
+   un pezzo sopra i cursori leggevano un numero — undefined alle tacche,
+   carattere sempre PULITO, e muoverne uno dava «Cannot use 'in' operator».
+   Trovato il 21/09 in un branch mai unito, portato qui il 01/10/2026. Un
+   salvataggio con l'oggetto dei cursori ancora in `banco` lo sposta qui. */
 function studioBanco(){
   const d = studioDati();
-  if(!d.banco) d.banco = {voce:2, bassi:2, aria:2};
-  return d.banco;
+  if(d.banco && typeof d.banco === "object"){ d.cursori = d.banco; d.banco = null; }
+  if(!d.cursori) d.cursori = {voce:2, bassi:2, aria:2};
+  return d.cursori;
 }
 /* Muovere un cursore **non ridisegna la pagina**. Prima si': a ogni tacca
    `renderStudio()` rifaceva tutto il pannello di mezzo, e l'`input` che

@@ -107,11 +107,14 @@ let STUDIO_SEZ = "beat";
 function studioSbloccato(){
   return !!studioSulBanco();
 }
+/* Tutte le linguette sono aperte, sempre (Carlo, 21/09/2026 sera: «lascia
+   sbloccate le fasi dello studio bloccate»; portato il 01/10). Prima Mix e
+   Uscita si aprivano solo con un pezzo sul banco — o, il Mix, con una
+   remastered prenotata (seguiti.js). A banco vuoto dicono che non c'e' niente
+   e da dove si comincia. La funzione resta: e' lei che le linguette e
+   renderStudio interrogano, e se una sezione dovesse richiudersi si fa qui. */
 function studioSezAperta(x){
-  if(!x.dopo || studioSbloccato()) return true;
-  /* il Mix si apre anche a banco vuoto se c'e' una remastered prenotata
-     dalla Discografia (seguiti.js): e' li' che si chiude */
-  return x.id === "banco" && typeof remasterPrenotato === "function" && !!remasterPrenotato();
+  return !!x;
 }
 
 /* ==================== IL PEZZO SUL BANCO (F2) ====================

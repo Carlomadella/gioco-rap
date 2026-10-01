@@ -2832,3 +2832,20 @@ l'hype torna. Provato nel browser a 1440 × 900 e 390 × 844: la riga c'è, il t
 44, «Sottopasso» q48 → 51, in coda per venerdì, energia invariata, console pulita. Tre
 prove nuove in `strumenti/prova.js` (la riga, il mix della casa senza energia, l'uscita
 senza hype) e un controllo nell'audit.
+
+## Le linguette dello Studio sempre aperte, e i cursori del Mix
+
+CARLO, 21/09/2026 sera: «lascia sbloccate le fasi dello studio bloccate».
+
+**FATTO (01/10/2026)** — branch `task/studio-cursori-e-linguette`. Era fatto il 21/09 nel
+branch `task/studio-il-resto-in-automatico`, che non è mai entrato in `main` perché il resto
+in automatico è stato rifatto il 28/09 in un altro modo; da lì sono state portate le due cose
+che non dipendevano dall'automatico. **Le linguette**: `studioSezAperta()` dice sempre di
+sì, Mix e Uscita si aprono anche a banco vuoto e dicono che non c'è niente e da dove si
+comincia; uscito un pezzo si resta nell'Uscita, da dove si fa sapere su LaFamegram. **I
+cursori del Mix** (voce, bassi, aria) stavano in `G.studio.banco`, che dal 15/09 è anche il
+seed del pezzo sul banco: con un pezzo sopra leggevano un numero, il carattere restava
+sempre PULITO e muoverne uno dava «Cannot use 'in' operator». Adesso stanno in
+`G.studio.cursori`, e un salvataggio vecchio con l'oggetto in `banco` lo sposta lì. Le prove
+in `strumenti/prova.js` (le linguette a banco vuoto, i cursori con un pezzo sopra), due
+controlli nell'audit, il test della remastered in `seguiti.test.js` aggiornato.
