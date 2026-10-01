@@ -6,6 +6,35 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:1c3b791c -->
+## 01/10/26, 23:54 — task/fabbrica-contatti-per-ruolo → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `1c3b791c`
+
+### Cosa è entrato
+
+- `6a718557` — test(fabbrica): aggiorna rete attesa dopo promozione — **mycolbraga**
+- `dc5b3779` — chore(cache): invalida rete contatti per ruolo — **mycolbraga**
+- `8c1a3668` — test(fabbrica): verifica reset esposizione alla promozione — **mycolbraga**
+- `e42293b7` — fix(fabbrica): separa esposizione rete tra ruoli — **mycolbraga**
+- `8fb5fc9b` — test(fabbrica): copre progressione contatti per ruolo — **mycolbraga**
+- `4223d056` — fix(fabbrica): migra il vecchio contatore rete sul ruolo corrente — **mycolbraga**
+- `bbe5580b` — feat(contatti): conserva il ruolo lavorativo di origine — **mycolbraga**
+- `cee63025` — feat(fabbrica): differenzia la rete contatti per ruolo — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/posto.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/fabbrica-presenze.test.js`
+- **Modificato:** `frontend/test/unit/lavori-contatti.test.js`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:9950e9ff -->
 ## 01/10/26, 23:40 — task/fabbrica-conflitto-musica-scelta → main
 
