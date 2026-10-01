@@ -9,8 +9,10 @@
    circolo-stanze.css.
 
    I caratteri: il corpo è Roboto Condensed (già nel gioco, lo usa la
-   Strada), i titoli a pennarello («IL CIRCOLO», «BANCONE») sono Permanent
-   Marker, l'unico carattere caricato per questa pagina. */
+   Strada), i titoli («IL CIRCOLO», «BANCONE», «ORARI») sono Archivo Black,
+   dritto, quello della fascia in alto. Fino al 01/10/2026 erano un pennarello
+   corsivo; CARLO l'ha voluto cambiare, e il carattere non si
+   carica più. */
 
 #luogo[data-luogo="circolo"]{background:#08080A}
 #luogo[data-luogo="circolo"] .lfsfondo,
@@ -19,7 +21,7 @@
   scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent}
 
 .cc{--ccTesto:#ECE8E0;--ccSoft:#B9B4AA;--ccRiga:rgba(255,255,255,.16);--ccBox:#0D0E10;
-  --ccOro:#F1D27E;--ccRosso:#E5383B;--ccVerde:#4ED06A;--ccMarker:"Permanent Marker","Archivo Black",cursive;
+  --ccOro:#F1D27E;--ccRosso:#E5383B;--ccVerde:#4ED06A;--ccTitoli:"Archivo Black","Figtree",system-ui,sans-serif;
   --ccLinguetta:52px;
   font-family:"Roboto Condensed","Barlow Condensed","Arial Narrow",Arial,sans-serif;
   color:var(--ccTesto);background:#0A0A0B;min-height:100%;display:flex;flex-direction:column}
@@ -77,12 +79,12 @@
 .cc-linguetta{flex:none;width:var(--ccLinguetta);display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:14px;padding:16px 0;background:none;border:0;color:#F4F0E8}
 .cc-linguetta svg{width:24px;height:24px}
-.cc-linguetta b{writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--ccMarker);font-weight:400;font-style:italic;
+.cc-linguetta b{writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--ccTitoli);font-weight:400;font-style:normal;
   font-size:20px;letter-spacing:.06em;text-transform:uppercase}
 .cc-infocorpo{flex:1;min-width:0;padding:22px 24px 20px 6px;display:flex;flex-direction:column;
   overflow-y:auto;scrollbar-width:none}
 .cc-infocorpo::-webkit-scrollbar{display:none}
-.cc-titolo{margin:0;padding:6px 0 14px;font-family:var(--ccMarker);font-weight:400;font-style:italic;
+.cc-titolo{margin:0;padding:6px 0 14px;font-family:var(--ccTitoli);font-weight:400;font-style:normal;
   font-size:clamp(26px,2.5vw,42px);line-height:1;letter-spacing:.01em;text-transform:uppercase;color:#F4F0E8;
   white-space:nowrap;border-bottom:1px solid rgba(236,232,224,.5)}
 .cc-motto{margin:15px 0 0;font-size:17px;font-weight:700;color:#fff}

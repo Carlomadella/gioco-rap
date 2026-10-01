@@ -14,13 +14,13 @@
 .cc-indietro{display:inline-flex;align-items:center;gap:8px;padding:6px 10px 6px 6px;border-radius:6px;
   background:rgba(10,10,11,.72);border:1px solid rgba(255,255,255,.22)}
 .cc-indietro s{width:16px;height:16px;transform:rotate(180deg)}
-.cc-indietro b{font-family:var(--ccMarker);font-weight:400;font-style:italic;font-size:15px;color:#fff}
+.cc-indietro b{font-family:var(--ccTitoli);font-weight:400;font-style:normal;font-size:15px;color:#fff}
 .cc-indietro:disabled{opacity:.5}
 .cc-briciole i{font-style:normal;color:#fff}
 
 .cc-stit{display:flex;align-items:center;gap:14px}
 .cc-stit > i{flex:none;width:44px;height:44px;color:#F3D9AE}
-.cc-stit h2{margin:0;font-family:var(--ccMarker);font-weight:400;font-style:italic;font-size:clamp(30px,3vw,52px);
+.cc-stit h2{margin:0;font-family:var(--ccTitoli);font-weight:400;font-style:normal;font-size:clamp(30px,3vw,52px);
   line-height:1;text-transform:uppercase;color:#F4F0E8}
 .cc-stit p{margin:4px 0 0;font-size:16px;color:#E4DFD6}
 .cc-stit.piccolo > i{width:38px;height:38px}
@@ -30,8 +30,8 @@
 
 .cc-pan2{display:flex;flex-direction:column;min-height:0;padding:12px 14px;border-radius:8px;
   background:rgba(10,10,12,.86);border:1px solid rgba(255,255,255,.2);box-shadow:0 12px 30px rgba(0,0,0,.45)}
-.cc-h{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-family:var(--ccMarker);font-weight:400;font-style:italic;
-  font-size:clamp(15px,1.25vw,20px);letter-spacing:.02em;text-transform:uppercase;color:#F4F0E8}
+.cc-h{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-family:var(--ccTitoli);font-weight:400;font-style:normal;
+  font-size:clamp(13px,1.02vw,17px);letter-spacing:.01em;text-transform:uppercase;color:#F4F0E8}
 .cc-h svg{width:18px;height:18px;color:#F5C451}
 .cc-h small{margin-left:auto;font-family:"Roboto Condensed",Arial,sans-serif;font-style:normal;font-size:12.5px;
   text-transform:none;color:var(--ccSoft)}
@@ -137,7 +137,7 @@
   overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent}
 .cc-shero{display:grid;grid-template-columns:minmax(0,1fr) clamp(120px,11vw,190px);gap:14px;align-items:start;
   padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.12)}
-.cc-shtx h3{margin:0;font-family:var(--ccMarker);font-weight:400;font-style:italic;font-size:clamp(28px,2.4vw,40px);line-height:1;color:#fff}
+.cc-shtx h3{margin:0;font-family:var(--ccTitoli);font-weight:400;font-style:normal;font-size:clamp(28px,2.4vw,40px);line-height:1;color:#fff}
 .cc-shtx > em{display:block;margin-top:2px;font-style:normal;font-size:17px;color:#E4DFD6}
 .cc-shtx q{display:block;margin:10px 0;font-style:italic;font-size:14.5px;line-height:1.45;color:#ECE8E0}
 .cc-shtx ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
@@ -229,7 +229,7 @@
 .cc-seg i.g{background:#F1A33C}
 .cc-seg i.v{background:#4ED06A}
 .cc-reaz > b{flex:none;min-width:70px;font-size:16px;color:var(--ccOro)}
-.cc-ptit{margin:0;font-family:var(--ccMarker);font-weight:400;font-style:italic;font-size:clamp(34px,3.6vw,60px);line-height:1;
+.cc-ptit{margin:0;font-family:var(--ccTitoli);font-weight:400;font-style:normal;font-size:clamp(34px,3.6vw,60px);line-height:1;
   text-align:center;text-transform:uppercase;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.8)}
 .cc-momento2{flex:1 1 auto;gap:8px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent}
 .cc-msit{margin:0 0 4px;font-size:15.5px;line-height:1.5;color:#fff}
@@ -285,7 +285,7 @@
   border-radius:8px;background:rgba(10,10,12,.92);border:1px solid rgba(255,255,255,.22)}
 .cc-bsfoto{aspect-ratio:84/100;border-radius:6px;overflow:hidden;border:1px solid rgba(255,255,255,.2);background:#16171A}
 .cc-bstx{display:flex;flex-direction:column;gap:4px;min-width:0}
-.cc-bstx h3{display:flex;align-items:center;gap:6px;margin:0;font-family:var(--ccMarker);font-weight:400;font-style:italic;font-size:26px;color:#fff}
+.cc-bstx h3{display:flex;align-items:center;gap:6px;margin:0;font-family:var(--ccTitoli);font-weight:400;font-style:normal;font-size:26px;color:#fff}
 .cc-fuoco{width:20px;height:20px;color:#FF6B4A}
 .cc-bstx > em{font-style:normal;font-size:14px;color:#E4DFD6;display:flex;align-items:center;gap:5px}
 .cc-bstx > em svg{width:14px;height:14px;color:#FF6B8A}

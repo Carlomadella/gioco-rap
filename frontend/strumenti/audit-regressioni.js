@@ -2847,10 +2847,13 @@ console.log("\nIl Circolo — la Sala e il Live Club, un posto solo");
 {
   const circolo = leggi("js/game/circolo.js");
   const circoloCss = leggi("css/circolo.css");
-  test("circolo.js e circolo.css si caricano dopo luoghi-foto, col pennarello dei titoli",
+  /* 01/10/2026, CARLO: via il corsivo a pennarello dei titoli (es. «ORARI») */
+  test("circolo.js e circolo.css si caricano dopo luoghi-foto, e i titoli sono dritti, senza il pennarello",
     index.indexOf('<script src="js/game/circolo.js') > index.indexOf('<script src="js/game/luoghi-foto.js') &&
     index.indexOf('href="css/circolo.css') > index.indexOf('href="css/luoghi-foto.css') &&
-    index.includes("family=Permanent+Marker") && circoloCss.includes('"Permanent Marker"'));
+    !index.includes("Permanent+Marker") && !circoloCss.includes("Permanent Marker") &&
+    circoloCss.includes('--ccTitoli:"Archivo Black"') &&
+    !/var\(--ccTitoli\)[^}]*font-style:italic/.test(circoloCss + leggi("css/circolo-stanze.css")));
   test("la pagina della Sala non c'è più: né l'HTML, né il foglio, né la testata nelle liste",
     !index.includes('id="posto"') && !index.includes("css/posto.css") &&
     !fs.existsSync(path.join(ROOT, "css/posto.css")) &&
