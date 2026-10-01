@@ -2458,16 +2458,19 @@ test("la fascia si legge sulla card del beat, nello Studio",
   beatsJs.includes("const fasciaBeat = b =>"));
 test("si parte con tutti i parametri a 1",
   state.includes("skills:{scrittura:1, flow:1, presenza:1, rete:1}"));
-test("le dimissioni dalla Fabbrica chiudono il contratto senza perdere lo storico",
-  luoghiFoto.includes("function lfDimissioniFabbrica()") &&
+test("le dimissioni dai posti strutturati chiudono il contratto senza perdere lo storico",
+  luoghiFoto.includes("function lfDimissioniLavoro(luogo, nome)") &&
   luoghiFoto.includes('data-dimissioni="fabbrica"') &&
-  luoghiFoto.includes('lavoroTerminaContratto("fabbrica", "dimissioni")') &&
+  luoghiFoto.includes('data-dimissioni="pizzeria"') &&
+  luoghiFoto.includes('lavoroTerminaContratto(luogo, "dimissioni")') &&
+  luoghiFoto.includes('function lfDimissioniFabbrica(){ return lfDimissioniLavoro("fabbrica", "Fabbrica"); }') &&
   luoghiFoto.includes("G.job = null;") &&
   actions.includes("function lavoroTerminaContratto(luogo, motivo)") &&
   actions.includes("sede.contractHistory.push(Object.assign({}, contratto") &&
-  /function offerJobs\(\)\{[\s\S]{0,900}if\(G\.job\)\{/.test(actions) &&
+  /function offerJobs\(\)\{[\s\S]{0,1200}if\(G\.job\)\{/.test(actions) &&
   ev.includes('if(t==="no_job") return !G.job;') &&
-  ev.includes("if(j && !G.job && !fabbricaBloccata){") &&
+  ev.includes("const luogoContratto=j&&j.place&&typeof lavoroContrattoDef") &&
+  ev.includes("if(j && !G.job && !blocco.active){") &&
   ev.includes("G.job={id:j.id,place:j.place||null,n:j.n,pay:j.pay,e:j.e,missed:0};"));
 
 console.log("\nPunto 7 — i file .md in cartelle con nomi coerenti");
@@ -2765,16 +2768,18 @@ test("la Fabbrica usa la foto e i comandi HTML dopo la sua transizione",
   /const azioneLavoro = mio \? ' data-vai="turno"' : ' data-lavoro="' \+ baseDef\.id \+ '"';/.test(luoghiFoto) &&
   /id:"fabbrica",[\s\S]{0,180}?transizioneVideo\("fabbrica",\s*\(\) => apriLuogo\("fabbrica"\)\)/.test(hub) &&
   !/id:"fabbrica",[\s\S]{0,180}?schedaLavoro\("operaio"/.test(hub));
-test("la Pizzeria usa una pagina fotografica separata dalla Fabbrica, senza popup lavoro",
+test("la Pizzeria usa una pagina fotografica propria con contratto e cartellino per sede",
   luoghiFoto.includes('pizzeria: {f:"schermate_luoghi_con_elementi_HTML/pizzeria.webp"') &&
   luoghiFoto.includes("function lfPizzeria()") &&
-  luoghiFoto.includes('data-lavoro="lavapiatti"') &&
+  luoghiFoto.includes("function lfPizzeriaCartellino()") &&
+  luoghiFoto.includes('data-dimissioni="pizzeria"') &&
+  luoghiFoto.includes('lfPan("Settimane in cucina"') &&
   !luoghiFoto.includes("function lfPostoLavoro(") &&
   /id:"pizzeria",[\s\S]{0,80}?apriLuogo\("pizzeria"\)/.test(hub) &&
   !/id:"pizzeria",[\s\S]{0,80}?schedaLavoro\("lavapiatti"/.test(hub));
-test("il turno di Fabbrica e Pizzeria resta nella rispettiva pagina, senza seconda scena sopra",
-  luoghiFoto.includes('LUOGO.id === "fabbrica" && G.job.id === "operaio"') &&
-  luoghiFoto.includes('LUOGO.id === "pizzeria" && G.job.id === "lavapiatti"') &&
+test("il turno di Fabbrica e Pizzeria resta nella rispettiva pagina anche dopo una promozione",
+  luoghiFoto.includes('(LUOGO.id === "fabbrica" || LUOGO.id === "pizzeria")') &&
+  luoghiFoto.includes('lavoroLuogo(G.job) === LUOGO.id') &&
   luoghiFoto.includes("LUOGO_MOSSE[a.id] || turnoLuogo"));
 test("le quattro mosse con la pagina finiscono sulla loro foto, e sono tutte scene a pagina piena (il live nel Circolo)",
   (() => {

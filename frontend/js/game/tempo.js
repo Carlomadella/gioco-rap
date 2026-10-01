@@ -49,10 +49,11 @@
   });
 
   /* Per i posti con carriera interna la durata appartiene al luogo, non alla
-     mansione. Oggi è attiva soltanto la Fabbrica: una promozione non deve
+     mansione. Fabbrica e Pizzeria usano la sede: una promozione non deve
      trasformare per errore un turno da 8h nel fallback da 5h. */
   const DURATE_LUOGO_LAVORO = Object.freeze({
-    fabbrica:480
+    fabbrica:480,
+    pizzeria:300
   });
 
   let AZIONE_ID_CATTURATA = null;

@@ -131,7 +131,7 @@ function promoDailyMult(){
 
 const JOBS = [
   {id:"volantini", n:"Volantinaggio", pay:70,  e:18, d:"Freddo, gambe, nessuna dignità."},
-  {id:"lavapiatti", n:"Lavapiatti",   pay:100, e:18, d:"Turni serali, cucina bollente."},
+  {id:"lavapiatti", place:"pizzeria", n:"Lavapiatti", pay:100, e:18, d:"Turni serali, cucina bollente."},
   {id:"fattorino",  n:"Fattorino",    pay:125, e:18, d:"In giro col motorino, piove sempre."},
   {id:"barista",    n:"Barista",      pay:130, e:18, d:"Conosci gente. Ogni turno un contatto in più.",
    extra(){ G.skills.rete += 0.5; return " Rete +0.5."; }},
@@ -162,11 +162,26 @@ const ADF_LAVORO_GIORNI_CICLO = ADF_LAVORO_CICLO_SETTIMANE * 7;
 const ADF_LAVORO_CONTRATTI = Object.freeze({
   fabbrica:Object.freeze({
     luogo:"fabbrica",
+    nome:"Fabbrica",
     turniSettimanali:5,
     giorniConsentiti:Object.freeze([1,2,3,4,5,6]),
+    giornoRiposo:7,
+    giornoRiposoLabel:"domenica",
     domenicaRiposo:true,
     bonusSestoGiornoPct:30,
     bonusDomenicaPct:75,
+    cicloSettimane:4
+  }),
+  pizzeria:Object.freeze({
+    luogo:"pizzeria",
+    nome:"Pizzeria",
+    turniSettimanali:4,
+    giorniConsentiti:Object.freeze([2,3,4,5,6,7]),
+    giornoRiposo:1,
+    giornoRiposoLabel:"lunedì",
+    domenicaRiposo:false,
+    bonusSestoGiornoPct:20,
+    bonusDomenicaPct:0,
     cicloSettimane:4
   })
 });
@@ -212,6 +227,57 @@ const ADF_FABBRICA_CARRIERA = Object.freeze({
   ])
 });
 
+const ADF_PIZZERIA_CARRIERA = Object.freeze({
+  aumento:Object.freeze({
+    cicliNelRuolo:1,
+    affidabilita:55,
+    maxPerRuolo:1
+  }),
+  promozione:Object.freeze({
+    cicliNelRuolo:2,
+    affidabilita:70,
+    cicliPerfettiNelRuolo:1
+  }),
+  disciplina:Object.freeze({
+    assenzeLieveMax:1,
+    assenzeRichiamoMin:2,
+    richiamiPrimaLicenziamento:2,
+    bloccoRiassunzioneSettimane:4,
+    recuperoRichiamoCicliPerfetti:1,
+    malusLieveAffidabilita:4,
+    malusRichiamoAffidabilita:8
+  }),
+  straordinari:Object.freeze({
+    chanceSestoGiorno:0.30,
+    chanceDomenica:0.35,
+    affidabilitaCompletato:1,
+    affidabilitaSaltato:-3
+  }),
+  affidabilitaCicloPerfetto:8,
+  ruoli:Object.freeze([
+    Object.freeze({id:"lavapiatti", n:"Lavapiatti"}),
+    Object.freeze({id:"aiuto_cucina", n:"Aiuto cucina"}),
+    Object.freeze({id:"aiuto_pizzaiolo", n:"Aiuto pizzaiolo"}),
+    Object.freeze({id:"pizzaiolo", n:"Pizzaiolo"})
+  ])
+});
+
+const ADF_LAVORO_CARRIERE = Object.freeze({
+  fabbrica:ADF_FABBRICA_CARRIERA,
+  pizzeria:ADF_PIZZERIA_CARRIERA
+});
+
+function lavoroCarrieraDef(luogo){
+  return ADF_LAVORO_CARRIERE[luogo] || null;
+}
+
+function lavoroNomeLuogo(luogo){
+  const contratto = lavoroContrattoDef(luogo);
+  return contratto && contratto.nome
+    ? contratto.nome
+    : String(luogo || "Lavoro").replace(/^./, c => c.toUpperCase());
+}
+
 /* Identità sociale dei lavori.
    Non è un secondo sistema di persone: decide soltanto CHI puoi incontrare
    durante un turno; le persone create restano in G.gente e usano relazioni,
@@ -224,6 +290,12 @@ const ADF_LAVORO_RETE = Object.freeze({
     ruoli:Object.freeze(["collega","collega","collega","beatmaker","fonico"]),
     dettaglio:"collega di Fabbrica",
     storia:"Vi siete conosciuti lavorando in Fabbrica."
+  }),
+  pizzeria:Object.freeze({
+    chanceIncontro:0.24, cooldownGiorni:4, minTurni:1, maxContatti:6,
+    ruoli:Object.freeze(["collega","collega","rapper","promoter","fonico"]),
+    dettaglio:"collega della Pizzeria",
+    storia:"Vi siete conosciuti durante i turni in Pizzeria."
   }),
   barista:Object.freeze({
     chanceIncontro:0.42, cooldownGiorni:2, minTurni:1, maxContatti:10,
@@ -428,6 +500,7 @@ function lavoroDomenicaAutorizzata(luogo){
 function lavoroCarriera(luogo){
   const sede = lavoroSede(luogo);
   if(!sede) return null;
+  const cfg = lavoroCarrieraDef(luogo);
   if(!sede.career || typeof sede.career !== "object"){
     sede.career = {
       reliability:50,
@@ -462,17 +535,20 @@ function lavoroCarriera(luogo){
   if(!c.raisesByRole || typeof c.raisesByRole !== "object") c.raisesByRole = {};
   if(!Array.isArray(c.payHistory)) c.payHistory = [];
   if(!Array.isArray(c.roleHistory)) c.roleHistory = [];
-  c.warnings = Math.max(0, Math.min(2, Number(c.warnings || 0)));
+  const maxRichiami = cfg && cfg.disciplina
+    ? Math.max(0, Number(cfg.disciplina.richiamiPrimaLicenziamento || 2))
+    : 2;
+  c.warnings = Math.max(0, Math.min(maxRichiami, Number(c.warnings || 0)));
   c.dismissals = Math.max(0, Number(c.dismissals || 0));
   if(!Array.isArray(c.warningHistory)) c.warningHistory = [];
   if(!Array.isArray(c.weeklyEvaluations)) c.weeklyEvaluations = [];
   if(c.blockedUntilWeek != null && !Number.isFinite(Number(c.blockedUntilWeek))) c.blockedUntilWeek = null;
   if(!Array.isArray(c.evaluations)) c.evaluations = [];
 
-  if(luogo === "fabbrica"){
-    const job = G.job && lavoroLuogo(G.job) === "fabbrica" ? G.job : null;
-    if(!c.roleId && job) c.roleId = job.id || "operaio";
-    const idx = ADF_FABBRICA_CARRIERA.ruoli.findIndex(r => r.id === c.roleId);
+  if(cfg && Array.isArray(cfg.ruoli)){
+    const job = G.job && lavoroLuogo(G.job) === luogo ? G.job : null;
+    if(!c.roleId && job) c.roleId = job.id || (cfg.ruoli[0] && cfg.ruoli[0].id) || null;
+    const idx = cfg.ruoli.findIndex(r => r.id === c.roleId);
     c.roleLevel = idx >= 0 ? idx : Math.max(0, Number(c.roleLevel || 0));
   }
 
@@ -480,43 +556,45 @@ function lavoroCarriera(luogo){
 }
 
 function lavoroRuoloCorrente(luogo){
-  if(luogo !== "fabbrica") return null;
+  const cfg = lavoroCarrieraDef(luogo);
+  if(!cfg || !Array.isArray(cfg.ruoli)) return null;
   const c = lavoroCarriera(luogo);
   if(!c) return null;
   const job = G.job && lavoroLuogo(G.job) === luogo ? G.job : null;
   const id = job && job.id ? job.id : c.roleId;
-  return ADF_FABBRICA_CARRIERA.ruoli.find(r => r.id === id) || null;
+  return cfg.ruoli.find(r => r.id === id) || null;
 }
 
 function lavoroProssimoRuolo(luogo){
-  if(luogo !== "fabbrica") return null;
+  const cfg = lavoroCarrieraDef(luogo);
+  if(!cfg || !Array.isArray(cfg.ruoli)) return null;
   const ruolo = lavoroRuoloCorrente(luogo);
-  if(!ruolo) return ADF_FABBRICA_CARRIERA.ruoli[0] || null;
-  const idx = ADF_FABBRICA_CARRIERA.ruoli.findIndex(r => r.id === ruolo.id);
-  return idx >= 0 ? (ADF_FABBRICA_CARRIERA.ruoli[idx + 1] || null) : null;
+  if(!ruolo) return cfg.ruoli[0] || null;
+  const idx = cfg.ruoli.findIndex(r => r.id === ruolo.id);
+  return idx >= 0 ? (cfg.ruoli[idx + 1] || null) : null;
 }
 
 function lavoroAumentoDisponibile(luogo){
-  if(luogo !== "fabbrica" || !G.job || lavoroLuogo(G.job) !== luogo) return false;
+  if(!G.job || lavoroLuogo(G.job) !== luogo) return false;
+  const cfg = lavoroCarrieraDef(luogo);
   const c = lavoroCarriera(luogo);
   const ruolo = lavoroRuoloCorrente(luogo);
-  if(!c || !ruolo) return false;
-  const cfg = ADF_FABBRICA_CARRIERA.aumento;
+  if(!cfg || !cfg.aumento || !c || !ruolo) return false;
   const ricevuti = Math.max(0, Number(c.raisesByRole[ruolo.id] || 0));
-  return c.cyclesInRole >= cfg.cicliNelRuolo &&
-    c.reliability >= cfg.affidabilita &&
-    ricevuti < cfg.maxPerRuolo;
+  return c.cyclesInRole >= cfg.aumento.cicliNelRuolo &&
+    c.reliability >= cfg.aumento.affidabilita &&
+    ricevuti < cfg.aumento.maxPerRuolo;
 }
 
 function lavoroPromozioneDisponibile(luogo){
-  if(luogo !== "fabbrica" || !G.job || lavoroLuogo(G.job) !== luogo) return false;
+  if(!G.job || lavoroLuogo(G.job) !== luogo) return false;
+  const cfg = lavoroCarrieraDef(luogo);
   const c = lavoroCarriera(luogo);
   const next = lavoroProssimoRuolo(luogo);
-  if(!c || !next) return false;
-  const cfg = ADF_FABBRICA_CARRIERA.promozione;
-  return c.cyclesInRole >= cfg.cicliNelRuolo &&
-    c.reliability >= cfg.affidabilita &&
-    c.perfectCyclesInRole >= cfg.cicliPerfettiNelRuolo;
+  if(!cfg || !cfg.promozione || !c || !next) return false;
+  return c.cyclesInRole >= cfg.promozione.cicliNelRuolo &&
+    c.reliability >= cfg.promozione.affidabilita &&
+    c.perfectCyclesInRole >= cfg.promozione.cicliPerfettiNelRuolo;
 }
 
 /* Effetti reali che gli eventi useranno:
@@ -587,7 +665,8 @@ function lavoroPromuoviRuolo(luogo, opzioni){
   if(c.roleHistory.length > 12) c.roleHistory.shift();
 
   c.roleId = dopo.id;
-  c.roleLevel = ADF_FABBRICA_CARRIERA.ruoli.findIndex(r => r.id === dopo.id);
+  const cfg = lavoroCarrieraDef(luogo);
+  c.roleLevel = cfg && Array.isArray(cfg.ruoli) ? cfg.ruoli.findIndex(r => r.id === dopo.id) : 0;
   c.cyclesInRole = 0;
   c.perfectCyclesInRole = 0;
   c.perfectStreak = 0;
@@ -632,7 +711,8 @@ function lavoroLicenzia(luogo, motivo){
   const ruolo = G.job && lavoroLuogo(G.job) === luogo
     ? {id:G.job.id, n:G.job.n}
     : null;
-  const cfg = luogo === "fabbrica" ? ADF_FABBRICA_CARRIERA.disciplina : null;
+  const carrieraCfg = lavoroCarrieraDef(luogo);
+  const cfg = carrieraCfg && carrieraCfg.disciplina ? carrieraCfg.disciplina : null;
   const blocco = cfg ? Number(cfg.bloccoRiassunzioneSettimane || 0) : 0;
 
   c.dismissals += 1;
@@ -647,7 +727,7 @@ function lavoroLicenzia(luogo, motivo){
 
   lavoroTerminaContratto(luogo, "licenziamento");
   if(G.job && lavoroLuogo(G.job) === luogo) G.job = null;
-  G._lastJobLossReason = luogo === "fabbrica" ? "factory_absences" : "missed_shifts";
+  G._lastJobLossReason = luogo === "fabbrica" ? "factory_absences" : luogo + "_absences";
 
   return {
     luogo:luogo,
@@ -666,7 +746,8 @@ function lavoroSettimanaGiaValutata(luogo, absoluteWeek){
 
 function lavoroValutaDisciplinaSettimana(luogo, absoluteWeek, cycle, weekInCycle, turni, opts){
   opts = opts || {};
-  if(luogo !== "fabbrica") return null;
+  const carrieraCfg = lavoroCarrieraDef(luogo);
+  if(!carrieraCfg || !carrieraCfg.disciplina) return null;
 
   const sede = lavoroSede(luogo);
   const contratto = lavoroContratto(luogo);
@@ -686,20 +767,20 @@ function lavoroValutaDisciplinaSettimana(luogo, absoluteWeek, cycle, weekInCycle
   if(gia) return gia;
 
   const weekStartAbsoluteDay = (absoluteWeek - 1) * 7 + 1;
-  /* Se hai firmato a settimana già iniziata, quella settimana non può
-     generare assenze/richiami retroattivi. */
+  /* Un contratto firmato a settimana iniziata non genera assenze retroattive. */
   const eligible = Number(contratto.signedAbsoluteDay || Infinity) <= weekStartAbsoluteDay;
   const from = weekInCycle * 7;
   const to = from + 7;
   const lista = Array.isArray(turni) ? turni.map(Number).filter(Number.isInteger) : [];
+  const consentiti = Array.isArray(def.giorniConsentiti) ? def.giorniConsentiti : [1,2,3,4,5,6,7];
   const giorni = new Set(
-    lista.filter(n => n >= from && n < to && ((n - from) % 7) < 6)
+    lista.filter(n => n >= from && n < to && consentiti.includes((n - from) + 1))
   );
   const fatti = giorni.size;
   const richiesti = Math.max(0, Number(def.turniSettimanali || 0));
   const assenze = Math.max(0, richiesti - fatti);
 
-  const cfg = ADF_FABBRICA_CARRIERA.disciplina;
+  const cfg = carrieraCfg.disciplina;
   const primaAffidabilita = carriera.reliability;
   const primaRichiami = carriera.warnings;
   let warningAdded = 0;
@@ -754,16 +835,19 @@ function lavoroValutaDisciplinaSettimana(luogo, absoluteWeek, cycle, weekInCycle
     carriera.warningHistory.splice(0, carriera.warningHistory.length - 24);
 
   if(!opts.silent && eligible && typeof pushLog === "function"){
+    const nome = lavoroNomeLuogo(luogo);
+    const maxRichiami = Number(cfg.richiamiPrimaLicenziamento || 2);
     if(dismissed){
-      pushLog("<b>Licenziato dalla Fabbrica.</b> Dopo due richiami, un'altra settimana con " +
-        assenze + " assenze ha chiuso il rapporto. Non puoi essere riassunto qui per " +
+      pushLog("<b>Licenziato dalla " + nome + ".</b> Dopo " + maxRichiami +
+        " richiami, un'altra settimana con " + assenze +
+        " assenze ha chiuso il rapporto. Non puoi essere riassunto qui per " +
         Number(cfg.bloccoRiassunzioneSettimane || 0) + " settimane.", "bad");
     }else if(warningAdded){
-      pushLog("<b>Richiamo formale in Fabbrica.</b> Settimana " + (weekInCycle + 1) +
+      pushLog("<b>Richiamo formale in " + nome + ".</b> Settimana " + (weekInCycle + 1) +
         ": " + assenze + " assenze · richiami " + carriera.warnings +
-        "/2 · affidabilità −" + Number(cfg.malusRichiamoAffidabilita || 0) + ".", "bad");
+        "/" + maxRichiami + " · affidabilità −" + Number(cfg.malusRichiamoAffidabilita || 0) + ".", "bad");
     }else if(assenze > 0){
-      pushLog("<b>Presenze sotto contratto.</b> Settimana " + (weekInCycle + 1) +
+      pushLog("<b>Presenze sotto contratto.</b> " + nome + " · settimana " + (weekInCycle + 1) +
         ": " + assenze + (assenze === 1 ? " assenza" : " assenze") +
         " · affidabilità −" + Number(cfg.malusLieveAffidabilita || 0) + ".", "bad");
     }
@@ -817,26 +901,30 @@ function lavoroChiudiSettimane(){
    settimanale. Il ciclo di 4 settimane resta per bonus affidabilità, carriera
    e recupero dei richiami dopo due mesi perfetti consecutivi. */
 function lavoroApplicaDisciplina(luogo, evaluation){
-  if(luogo !== "fabbrica" || !evaluation || !evaluation.eligible) return null;
+  const carrieraCfg = lavoroCarrieraDef(luogo);
+  if(!carrieraCfg || !carrieraCfg.disciplina || !evaluation || !evaluation.eligible) return null;
   const c = lavoroCarriera(luogo);
   if(!c) return null;
-  const cfg = ADF_FABBRICA_CARRIERA.disciplina;
+  const cfg = carrieraCfg.disciplina;
   let warningRemoved = 0;
 
+  const recupero = Math.max(1, Number(cfg.recuperoRichiamoCicliPerfetti || 2));
   if(Number(evaluation.absences || 0) === 0 &&
      c.warnings > 0 &&
      c.perfectStreak > 0 &&
-     c.perfectStreak % Number(cfg.recuperoRichiamoCicliPerfetti || 2) === 0){
+     c.perfectStreak % recupero === 0){
     c.warnings -= 1;
     warningRemoved = 1;
     c.warningHistory.push({
       absoluteDay:lavoroGiornoAssoluto(),
       type:"warning_removed",
-      reason:"due cicli perfetti consecutivi",
+      reason:recupero + (recupero === 1 ? " ciclo perfetto consecutivo" : " cicli perfetti consecutivi"),
       warnings:c.warnings
     });
     if(typeof pushLog === "function")
-      pushLog("<b>Richiamo cancellato.</b> Due cicli perfetti consecutivi hanno ripulito il tuo storico recente.", "good");
+      pushLog("<b>Richiamo cancellato.</b> " + lavoroNomeLuogo(luogo) + ": " +
+        recupero + (recupero === 1 ? " ciclo perfetto ha" : " cicli perfetti hanno") +
+        " ripulito il tuo storico recente.", "good");
   }
 
   return {
@@ -866,11 +954,11 @@ function lavoroValutaCiclo(luogo, ciclo, turni){
 
   for(let w=0; w<ADF_LAVORO_CICLO_SETTIMANE; w++){
     const from = w * 7, to = from + 7;
-    /* La domenica è straordinario: può pagare e avere effetti propri, ma non
-       ripara un'assenza ordinaria. Per il 5/5 contano lunedì-sabato e ogni
-       giorno vale una volta, anche se hai fatto due turni. */
+    /* Conta soltanto i giorni ordinari previsti dal contratto del luogo.
+       Un doppio turno vale comunque come una sola presenza giornaliera. */
+    const consentiti = Array.isArray(def.giorniConsentiti) ? def.giorniConsentiti : [1,2,3,4,5,6,7];
     const giorni = new Set(
-      lista.filter(n => n >= from && n < to && ((n - from) % 7) < 6)
+      lista.filter(n => n >= from && n < to && consentiti.includes((n - from) + 1))
     );
     const fatti = giorni.size;
     const richiesti = Number(def.turniSettimanali || 0);
@@ -895,7 +983,11 @@ function lavoroValutaCiclo(luogo, ciclo, turni){
       carriera.perfectCycles += 1;
       carriera.perfectCyclesInRole += 1;
       carriera.perfectStreak += 1;
-      carriera.reliability = Math.min(100, carriera.reliability + 10);
+      const carrieraCfg = lavoroCarrieraDef(luogo);
+      const bonusPerfetto = carrieraCfg && carrieraCfg.affidabilitaCicloPerfetto != null
+        ? Number(carrieraCfg.affidabilitaCicloPerfetto)
+        : 10;
+      carriera.reliability = Math.min(100, carriera.reliability + bonusPerfetto);
     }else{
       carriera.perfectStreak = 0;
     }
@@ -924,12 +1016,14 @@ function lavoroValutaCiclo(luogo, ciclo, turni){
   if(carriera.evaluations.length > 12) carriera.evaluations.shift();
 
   if(eligible){
+    const nome = lavoroNomeLuogo(luogo);
     if(perfect){
       if(typeof pushLog === "function")
-        pushLog("<b>Valutazione Fabbrica: 4/4 settimane complete.</b> Affidabilità +10.", "good");
+        pushLog("<b>Valutazione " + nome + ": 4/4 settimane complete.</b> Affidabilità +" +
+          Math.max(0, evaluation.reliabilityDelta) + ".", "good");
     }else if(typeof pushLog === "function" &&
              !(evaluation.disciplina && evaluation.disciplina.dismissed)){
-      pushLog("<b>Valutazione Fabbrica:</b> " + fullWeeks + "/4 settimane complete · " +
+      pushLog("<b>Valutazione " + nome + ":</b> " + fullWeeks + "/4 settimane complete · " +
         absences + (absences === 1 ? " assenza." : " assenze."), absences ? "bad" : "");
     }
   }
@@ -970,42 +1064,48 @@ function lavoroStraordinarioStato(luogo){
 }
 
 function lavoroCandidatoStraordinario(luogo){
-  if(luogo !== "fabbrica" || !G.job || lavoroLuogo(G.job) !== luogo) return null;
+  if(!G.job || lavoroLuogo(G.job) !== luogo) return null;
 
   const cart = lavoroCartellino(luogo);
   const stato = lavoroStraordinarioStato(luogo);
-  const cfg = ADF_FABBRICA_CARRIERA.straordinari;
-  if(!cart || !stato || stato.accepted || stato.pendingOffer) return null;
+  const def = lavoroContrattoDef(luogo);
+  const carrieraCfg = lavoroCarrieraDef(luogo);
+  const cfg = carrieraCfg && carrieraCfg.straordinari;
+  if(!cart || !stato || !def || !cfg || stato.accepted || stato.pendingOffer) return null;
 
   const oggi = Math.max(1, Math.min(7, Number(G.day || 1)));
   const assoluto = lavoroGiornoAssoluto();
   const settimana = lavoroSettimanaAssoluta();
-
   if(Number(stato.lastOfferWeek) === settimana) return null;
+  if(cart.giorniLavoratiSettimana < cart.turniSettimanaliRichiesti) return null;
 
-  /* La richiesta arriva solo quando il contratto è già coperto:
-     venerdì 5/5 -> sabato (+30%);
-     sabato almeno 5/5 -> domenica straordinaria (+75%). */
-  if(oggi === 5 && cart.giorniLavoratiSettimana >= cart.turniSettimanaliRichiesti){
+  const bonusExtra = Math.max(0, Number(def.bonusSestoGiornoPct || 0));
+
+  /* La Fabbrica conserva la sua logica 5/5 -> sabato/domenica.
+     La Pizzeria ha invece 4 turni, martedì-domenica: dopo aver coperto la
+     quota può essere chiesto un quinto turno nel weekend, con premio più basso. */
+  if(oggi === 5 && Array.isArray(def.giorniConsentiti) && def.giorniConsentiti.includes(6)){
     return {
       luogo:luogo,
-      tipo:"sesto-giorno",
+      tipo:luogo === "fabbrica" ? "sesto-giorno" : "giorno-extra",
       targetAbsoluteDay:assoluto + 1,
       targetDay:6,
       targetLabel:"sabato",
-      bonusPct:30,
+      bonusPct:bonusExtra,
       chance:Number(cfg.chanceSestoGiorno || 0)
     };
   }
 
-  if(oggi === 6 && cart.giorniLavoratiSettimana >= cart.turniSettimanaliRichiesti){
+  if(oggi === 6){
+    const domenicaConsentita = Array.isArray(def.giorniConsentiti) && def.giorniConsentiti.includes(7);
+    if(!domenicaConsentita && !def.domenicaRiposo) return null;
     return {
       luogo:luogo,
-      tipo:"domenica",
+      tipo:def.domenicaRiposo ? "domenica" : "giorno-extra",
       targetAbsoluteDay:assoluto + 1,
       targetDay:7,
       targetLabel:"domenica",
-      bonusPct:75,
+      bonusPct:def.domenicaRiposo ? Math.max(0, Number(def.bonusDomenicaPct || 0)) : bonusExtra,
       chance:Number(cfg.chanceDomenica || 0)
     };
   }
@@ -1091,7 +1191,8 @@ function lavoroCompletaStraordinario(luogo){
   if(!stato || !offerta) return null;
 
   const c = lavoroCarriera(luogo);
-  const cfg = ADF_FABBRICA_CARRIERA.straordinari;
+  const carrieraCfg = lavoroCarrieraDef(luogo);
+  const cfg = carrieraCfg && carrieraCfg.straordinari ? carrieraCfg.straordinari : {};
   const prima = c ? c.reliability : 50;
   const delta = Math.max(0, Number(cfg.affidabilitaCompletato || 0));
   if(c) c.reliability = Math.min(100, c.reliability + delta);
@@ -1128,7 +1229,8 @@ function lavoroAggiornaStraordinariTempo(){
     if(Number(stato.accepted.targetAbsoluteDay) >= oggi) continue;
 
     const c = lavoroCarriera(luogo);
-    const cfg = luogo === "fabbrica" ? ADF_FABBRICA_CARRIERA.straordinari : null;
+    const carrieraCfg = lavoroCarrieraDef(luogo);
+    const cfg = carrieraCfg && carrieraCfg.straordinari ? carrieraCfg.straordinari : null;
     const delta = cfg ? Number(cfg.affidabilitaSaltato || 0) : 0;
     const offerta = stato.accepted;
 
@@ -1394,8 +1496,8 @@ function lavoroPagaTurno(luogo, pagaBase){
     const richiesti = Math.max(0, Number(def.turniSettimanali || 0));
     if(!giaLavoratoOggi && richiesti > 0 && cart.giorniLavoratiSettimana >= richiesti){
       percentuale = Math.max(0, Number(def.bonusSestoGiornoPct || 0));
-      tipo = "sesto-giorno";
-      etichetta = "6° giorno";
+      tipo = luogo === "fabbrica" ? "sesto-giorno" : "giorno-extra";
+      etichetta = (richiesti + 1) + "° giorno";
     }
   }
 
@@ -1483,12 +1585,12 @@ function offerJobs(){
      quello di prima. La mossa «Cerca lavoro» lo sa già (avail), questo è
      per chiunque altro arrivi qui. */
   if(G.job){
-    const puoiLasciareFabbrica = typeof lavoroLuogo === "function" &&
-      lavoroLuogo(G.job) === "fabbrica";
+    const luogo = typeof lavoroLuogo === "function" ? lavoroLuogo(G.job) : null;
+    const dimissioniDisponibili = luogo && typeof lavoroContrattoDef === "function" && !!lavoroContrattoDef(luogo);
     showEvent({k:"Colloqui", t:"Hai già un posto",
       d:"Lavori già come " + G.job.n.toLowerCase() +
-        (puoiLasciareFabbrica
-          ? ". Se vuoi cercarne un altro, dai prima le dimissioni dalla Fabbrica."
+        (dimissioniDisponibili
+          ? ". Se vuoi cercarne un altro, dai prima le dimissioni dal posto in cui lavori."
           : ". Un posto alla volta."),
       opts:[{n:"Va bene", d:"Torni a quello che facevi", run(){ return null; }}]});
     return;
@@ -1496,8 +1598,9 @@ function offerJobs(){
   const pool = JOBS.filter(j => {
     if(j.req && !j.req(G)) return false;
     if(G.job && G.job.id === j.id) return false;
-    if(j.place === "fabbrica" && typeof lavoroBloccoRiassunzione === "function" &&
-       lavoroBloccoRiassunzione("fabbrica").active) return false;
+    if(j.place && typeof lavoroContrattoDef === "function" && lavoroContrattoDef(j.place) &&
+       typeof lavoroBloccoRiassunzione === "function" &&
+       lavoroBloccoRiassunzione(j.place).active) return false;
     return true;
   });
   const picks = [];
@@ -1509,12 +1612,12 @@ function offerJobs(){
     n: j.n + " · " + j.pay + " € a turno",
     d: j.e + " energia per turno. " + j.d,
     run(){
-      if(j.place === "fabbrica"){
+      if(j.place && typeof lavoroContrattoDef === "function" && lavoroContrattoDef(j.place)){
         if(typeof assumitiCome === "function"){
           assumitiCome(j.id);
           return null;
         }
-        return {t:"Per la Fabbrica devi firmare il contratto sul posto.", c:""};
+        return {t:"Per questo posto devi firmare il contratto sul posto.", c:""};
       }
       G.job = {id:j.id, place:j.place || null, n:j.n, pay:j.pay, e:j.e, missed:0};
       return {t:"Hai preso il posto da " + j.n.toLowerCase() + ": " + j.pay + " € a turno.", c:"good"};

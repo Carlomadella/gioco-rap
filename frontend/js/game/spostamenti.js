@@ -166,8 +166,9 @@
 
   function requiredPlaceForAction(id){
     if(id === "turno"){
-      const jid = G.job && G.job.id;
-      return jid ? (JOB_PLACE[jid] || null) : null;
+      if(!G.job) return null;
+      const luogo = typeof lavoroLuogo === "function" ? lavoroLuogo(G.job) : null;
+      return luogo || JOB_PLACE[G.job.id] || null;
     }
     return typeof GAME_HOURS.placeForAction === "function" ? GAME_HOURS.placeForAction(id) : null;
   }
