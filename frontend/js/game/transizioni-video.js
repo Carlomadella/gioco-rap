@@ -49,9 +49,9 @@ const TRANSIZIONI_VIDEO = {
    transizioni mp4, ma mostrano tre immagini a schermo pieno in sequenza. */
 const TRANSIZIONI_SCENE = {
   fabbrica: [
-    "media/video/Transizioni di scena/fabbrica_01_arrivo.png",
-    "media/video/Transizioni di scena/fabbrica_02_spogliatoio.png",
-    "media/video/Transizioni di scena/fabbrica_03_timbratura.png"
+    "media/video/Transizioni di scena/fabbrica_01_arrivo.webp",
+    "media/video/Transizioni di scena/fabbrica_02_spogliatoio.webp",
+    "media/video/Transizioni di scena/fabbrica_03_timbratura.webp"
   ]
 };
 /* I cartelli della mappa hanno un id loro (`data-l`): qui si dice quale
