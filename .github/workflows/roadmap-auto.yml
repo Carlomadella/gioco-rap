@@ -72,6 +72,23 @@ jobs:
           git diff --name-only "$TARGET^1" "$TARGET" > "$RUNNER_TEMP/changed-files.txt" 2>/dev/null || :
           git log -1 --format=%s "$TARGET" > "$RUNNER_TEMP/commit-subject.txt"
 
+      - name: Verifica Ollama locale
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const base = String(process.env.ADF_LOCAL_AI_BASE_URL || '').replace(/\/+$/, '');
+          const model = process.env.ADF_LOCAL_AI_MODEL || 'gpt-oss:20b';
+          if (!base) throw new Error('ADF_LOCAL_AI_BASE_URL non configurato');
+          const response = await fetch(base + '/models');
+          if (!response.ok) throw new Error('Ollama non raggiungibile: HTTP ' + response.status);
+          const data = await response.json();
+          const ids = (data.data || []).map(x => x.id || x.model || x.name).filter(Boolean);
+          if (!ids.some(id => id === model || id.startsWith(model + ':'))) {
+            throw new Error('Modello locale non trovato: ' + model + '. Disponibili: ' + ids.join(', '));
+          }
+          console.log('Ollama OK:', base, 'modello:', model);
+          NODE
+
       - name: Test motore roadmap
         run: |
           node scripts/test-roadmap-auto.js
