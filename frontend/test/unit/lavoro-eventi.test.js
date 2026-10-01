@@ -80,6 +80,41 @@ function ambiente(overrides = {}){
 }
 
 describe("famiglie eventi lavoro", () => {
+  it("espone esattamente le otto famiglie concordate", () => {
+    const env=ambiente();
+    expect(Object.keys(env.ctx.ADF_WORK_EVENTS.families)).toEqual([
+      "discipline","career","overtime","colleague",
+      "music","crime","conflict","physical"
+    ]);
+  });
+
+  it("gli straordinari esistenti entrano nella stessa storia persistente", () => {
+    const env=ambiente({
+      G:{
+        year:1,week:5,day:5,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{},gente:[],skills:{rete:0},
+        wellbeing:60,lucidita:50,shifts:0,strada:{giroAvviato:false}
+      },
+      extra:{
+        lavoroLuogo:job => job && job.place,
+        lavoroReteChiave:job => job && (job.place||job.id)
+      }
+    });
+
+    env.ctx.ADF_WORK_EVENTS.onOvertime("fabbrica","accepted",{
+      tipo:"sabato",targetAbsoluteDay:34,bonusPct:30
+    });
+    env.ctx.ADF_WORK_EVENTS.onOvertime("fabbrica","completed",{
+      tipo:"sabato",bonusPct:30,affidabilitaDelta:2
+    });
+
+    const rows=env.G.workplaces.fabbrica.workEvents.history
+      .filter(x => x.family==="overtime");
+    expect(rows.map(x=>x.status)).toEqual(["completed","accepted"]);
+    expect(rows[0].reliabilityDelta).toBe(2);
+  });
+
   it("blocca il turno prima di spendere tempo quando attraversa un appuntamento musicale", () => {
     const env=ambiente({now:17*60,duration:300});
     env.ctx.AGENDA.conflittiTra=()=>[{
@@ -308,6 +343,9 @@ describe("famiglie eventi lavoro", () => {
     expect(actions).toContain("ADF_WORK_EVENTS.onCycle(luogo,evaluation)");
     expect(eventi).toContain("ADF_WORK_EVENTS.afterShift(shiftPayload)");
     expect(eventi).toContain("started_at:jobBefore.from");
+    expect(eventi).toContain('lavoroAnnullaRichiestaStraordinario("fabbrica")');
+    expect(actions).toContain("function lavoroAnnullaRichiestaStraordinario(luogo)");
+    expect(actions).toContain('ADF_WORK_EVENTS.onOvertime(luogo,"completed",result)');
     expect(eventi.indexOf("adfFactoryOvertimeAfterShift()"))
       .toBeLessThan(eventi.indexOf("ADF_WORK_EVENTS.afterShift(shiftPayload)"));
     expect(eventi.indexOf("adfFactoryStreetAfterShift()"))
