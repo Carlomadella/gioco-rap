@@ -163,16 +163,25 @@ function advanceWeek(){
      chiude i conti, non più quello che ti rimette in piedi. */
 
   if(G.job){
-    if(G.shifts > 0) G.job.missed = 0;
-    else{
-      G.job.missed++;
-      if(G.job.missed >= 3){
-        pushLog("<b>Ti hanno licenziato</b> da " + G.job.n + ". Niente più stipendio.", "bad");
-        G.job = null;
-      }else{
-        const restano = 3 - G.job.missed;
-        pushLog("Non ti sei presentato al lavoro. Ancora " + restano +
-          (restano === 1 ? " settimana così" : " settimane così") + " e ti licenziano.", "bad");
+    const luogoLavoro = typeof lavoroLuogo === "function" ? lavoroLuogo(G.job) : (G.job.place || null);
+
+    /* La Fabbrica ha ormai un contratto vero: presenze 5/6, valutazione ogni
+       quattro settimane, richiami e licenziamento dedicati. Il vecchio
+       "zero turni per tre settimane" resta solo per i lavori non ancora
+       migrati, altrimenti avremmo due sistemi disciplinari in conflitto. */
+    if(luogoLavoro !== "fabbrica"){
+      if(G.shifts > 0) G.job.missed = 0;
+      else{
+        G.job.missed++;
+        if(G.job.missed >= 3){
+          pushLog("<b>Ti hanno licenziato</b> da " + G.job.n + ". Niente più stipendio.", "bad");
+          G._lastJobLossReason = "missed_shifts";
+          G.job = null;
+        }else{
+          const restano = 3 - G.job.missed;
+          pushLog("Non ti sei presentato al lavoro. Ancora " + restano +
+            (restano === 1 ? " settimana così" : " settimane così") + " e ti licenziano.", "bad");
+        }
       }
     }
   }
