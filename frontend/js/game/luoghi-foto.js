@@ -386,6 +386,31 @@ function lfFabbricaCartellino(){
   return html;
 }
 
+function lfDimissioniFabbrica(){
+  if(!G.job || typeof lavoroLuogo !== "function" || lavoroLuogo(G.job) !== "fabbrica") return;
+
+  showEvent({
+    k:"Fabbrica",
+    t:"Dare le dimissioni?",
+    d:"Lasci volontariamente il posto in Fabbrica. Mantieni lo storico delle presenze e della carriera, ma il contratto attuale si chiude e non riceverai più la paga dei turni.",
+    annulla(){},
+    opts:[
+      {n:"Dai le dimissioni", d:"Chiudi il rapporto di lavoro", run(){
+        const ruolo = G.job && G.job.n ? G.job.n : "dipendente";
+        if(typeof lavoroTerminaContratto === "function") lavoroTerminaContratto("fabbrica", "dimissioni");
+        G.job = null;
+        if(typeof pushLog === "function")
+          pushLog("<b>Hai dato le dimissioni dalla Fabbrica.</b> Il rapporto di lavoro è chiuso.", "");
+        if(typeof save === "function") save();
+        if(typeof renderGioco === "function") renderGioco();
+        if(typeof renderLuogo === "function") renderLuogo();
+        return {t:"Hai lasciato il posto da " + ruolo.toLowerCase() + ". Lo storico della Fabbrica resta salvato.", c:""};
+      }},
+      {n:"Resta", d:"Mantieni il posto", run(){ return null; }}
+    ]
+  });
+}
+
 function lfFabbrica(){
   const baseDef = (typeof JOBS !== "undefined" ? JOBS : []).find(j => j.id === "operaio");
   if(!baseDef) return {mid:lfPan("Fabbrica", '<div class="stvuoto">Turno non disponibile.</div>', "orologio")};
@@ -432,7 +457,10 @@ function lfFabbrica(){
     lfRiga("Mansione", def.n) +
     lfRiga("Paga", fmt(def.pay) + " €", "oro") +
     lfRiga("Costo", "−" + def.e + " energia") +
-    '<p class="stnota lfnotasotto">' + lfEsc(def.d) + '</p>',
+    '<p class="stnota lfnotasotto">' + lfEsc(def.d) + '</p>' +
+    (mio
+      ? '<button type="button" class="lfdimissioni" data-dimissioni="fabbrica">Dai le dimissioni</button>'
+      : ""),
     "orologio");
 
   const contratto = typeof lavoroContrattoDef === "function" ? lavoroContrattoDef("fabbrica") : null;
@@ -672,6 +700,11 @@ if($("luogo")){
       LUOGO.prima = lfFotografia();
       LUOGO.esito = null;
       assumitiCome(lavoro.dataset.lavoro);
+      return;
+    }
+    const dimissioni = e.target.closest("[data-dimissioni]");
+    if(dimissioni && !dimissioni.disabled && dimissioni.dataset.dimissioni === "fabbrica"){
+      lfDimissioniFabbrica();
       return;
     }
     if(e.target.closest("[data-continua]")){ luogoContinua(); }
