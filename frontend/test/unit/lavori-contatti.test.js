@@ -135,7 +135,7 @@ describe("identità sociale dei lavori", () => {
     expect(posto).toContain("p.origineLavoro = meta.jobId || luogo;");
     expect(posto).toContain("function postoContattoLavoroCandidato(luogo, daRiprendere, maxContatti, ruoli, meta)");
 
-    expect(chat).toContain('"rapper","promoter","collega","strada"');
+    expect(chat).toContain('const CHAT_MESTIERI_LAVORO = ["rapper","promoter","collega","strada"]');
     expect(chat).toContain("function chatSpuntiLavoroGenerici(p)");
     expect(chat).toContain('p.ruolo === "promoter"');
     expect(chat).toContain('p.ruolo === "collega"');
