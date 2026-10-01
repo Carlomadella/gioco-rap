@@ -476,12 +476,18 @@ function lfFabbrica(){
 
   const contratto = typeof lavoroContrattoDef === "function" ? lavoroContrattoDef("fabbrica") : null;
   const quota = contratto ? Number(contratto.turniSettimanali || 0) : 0;
+  const pagaTurno = mio && typeof lavoroPagaTurno === "function"
+    ? lavoroPagaTurno("fabbrica", def.pay)
+    : {totale:def.pay, bonus:0, percentuale:0, etichetta:""};
+  const notaBonus = pagaTurno.percentuale
+    ? " · " + pagaTurno.etichetta + " +" + pagaTurno.percentuale + "%"
+    : "";
   const riga = stScelta({
     attr:"",
     on:true,
     n:mio ? "Il tuo turno" : "Posto in Fabbrica",
     d:orario + (quota ? " · " + quota + " giorni/settimana" : ""),
-    v:stato.ok ? (fmt(def.pay) + " € · −" + def.e + " energia") : stato.perche,
+    v:stato.ok ? (fmt(pagaTurno.totale) + " €" + notaBonus + " · −" + def.e + " energia") : stato.perche,
     vCls:stato.ok ? "" : "calmo"
   });
   const testo = mio ? "Fai il turno" : "Leggi e firma il contratto";
@@ -489,13 +495,17 @@ function lfFabbrica(){
   const mid = lfPan(mio ? "Vai al lavoro" : "Vuoi lavorare qui?",
     '<p class="stnota">' +
       (mio
-        ? 'Linea di montaggio, otto ore piene. Il cartellino misura la tua continuità in Fabbrica.'
+        ? (pagaTurno.percentuale
+            ? '<b>' + lfEsc(pagaTurno.etichetta) + ':</b> questo turno ha una maggiorazione del ' + pagaTurno.percentuale + '%.'
+            : 'Linea di montaggio, otto ore piene. Il cartellino misura la tua continuità in Fabbrica.')
         : 'Prima di iniziare firmi un contratto: ' + (quota || 5) + ' giorni a settimana, lunedì–sabato. La domenica è riposo salvo straordinario richiesto dall’azienda.') +
     '</p>' +
     riga +
     '<div class="stazioni"><button type="button" class="stprimo"' + azioneLavoro +
       (stato.ok ? "" : " disabled") + '>' + lfIco("orologio") + lfEsc(testo) +
-      ' · +' + fmt(def.pay) + ' € · −' + def.e + ' energia</button></div>' +
+      ' · +' + fmt(pagaTurno.totale) + ' €' +
+      (pagaTurno.percentuale ? ' (+' + pagaTurno.percentuale + '%)' : '') +
+      ' · −' + def.e + ' energia</button></div>' +
     (stato.ok ? "" : '<p class="stperche">' + lfEsc(stato.perche) + '.</p>'),
     "orologio");
 
