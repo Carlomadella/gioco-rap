@@ -60,8 +60,19 @@ function makeRuntime(root, mode, ids) {
   const allowedIds = new Set(ids);
   const taskDir = path.join(root, 'implementazioni', 'auto', 'tasks');
 
+  function readableRepoFile(rel) {
+    if (/^implementazioni\/auto\/tasks\/ADF-(LEG|NEW)-[A-F0-9]{12}\.json$/.test(rel)) return true;
+    try {
+      git(root, ['ls-files', '--error-unmatch', '--', rel]);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   function readFile(args) {
     const file = safePath(root, args.path);
+    if (!readableRepoFile(file.rel)) throw new Error('lettura non consentita: ' + file.rel);
     if (!fs.existsSync(file.abs)) throw new Error('file inesistente: ' + file.rel);
     const lines = fs.readFileSync(file.abs, 'utf8').split(/\r?\n/);
     const start = Math.max(1, Number(args.start_line || 1));
@@ -87,7 +98,7 @@ function makeRuntime(root, mode, ids) {
     const query = String(args.query || '').trim();
     if (!query) throw new Error('query vuota');
     const prefix = String(args.path_prefix || '').replace(/\\/g, '/').replace(/^\.\//, '');
-    const cmd = ['grep', '-n', '-I', '-F', '--', query];
+    const cmd = ['grep', '-n', '-I', '-F', query, '--'];
     if (prefix) cmd.push(prefix);
     try {
       const output = git(root, cmd);
@@ -312,6 +323,12 @@ function selfTest() {
   blocked = false;
   try { safePath(root, '../fuori'); } catch { blocked = true; }
   if (!blocked) throw new Error('safePath KO');
+
+  fs.mkdirSync(path.join(root, '.git', 'segreto'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.git', 'segreto', 'token.txt'), 'NON_LEGGERE', 'utf8');
+  blocked = false;
+  try { audit.read_file({ path: '.git/segreto/token.txt' }); } catch { blocked = true; }
+  if (!blocked) throw new Error('protezione lettura .git KO');
 
   fs.rmSync(root, { recursive: true, force: true });
   console.log('roadmap-local-agent: self-test OK');
