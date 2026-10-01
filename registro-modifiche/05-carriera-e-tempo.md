@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:45440b3 -->
+## 01/10/26, 22:50 — task/fabbrica-eventi-personalizzati → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `45440b3`
+
+### Cosa è entrato
+
+- `a58006f` — test(e2e): usa il contratto Fabbrica al posto dei colloqui rimossi — **mycolbraga**
+- `54d81c6` — chore(cache): invalida eventi personalizzati fabbrica — **mycolbraga**
+- `7a57cbf` — test(fabbrica): copre gli eventi personalizzati di reparto — **mycolbraga**
+- `ecab57f` — feat(fabbrica): aggiunge eventi personalizzati di reparto — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/lavoro-eventi.js`
+- **Modificato:** `frontend/test/unit/lavoro-eventi.test.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:5e42834 -->
 ## 01/10/26, 22:21 — task/fabbrica-straordinari-contestuali → main
 
