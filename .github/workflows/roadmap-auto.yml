@@ -10,6 +10,8 @@ on:
       - scripts/test-roadmap-auto.js
       - scripts/roadmap-audit-guard.js
       - scripts/test-roadmap-audit-guard.js
+      - scripts/roadmap-local-agent.js
+      - scripts/setup-roadmap-local-runner.sh
       - .github/workflows/roadmap-auto.yml
   workflow_run:
     workflows:
@@ -30,7 +32,7 @@ concurrency:
 jobs:
   aggiorna:
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: [self-hosted, Linux, X64, anni-di-fame-local]
     env:
       ADF_LOCAL_AI_MODEL: ${{ vars.ADF_LOCAL_AI_MODEL || 'gpt-oss:20b' }}
       ADF_LOCAL_AI_BASE_URL: ${{ vars.ADF_LOCAL_AI_BASE_URL || 'http://127.0.0.1:11434/v1' }}
@@ -74,7 +76,7 @@ jobs:
         run: |
           node scripts/test-roadmap-auto.js
           node scripts/test-roadmap-audit-guard.js
-          node scripts/test-roadmap-local-agent.js
+          node scripts/roadmap-local-agent.js self-test
 
       - name: Importa tutto lo storico senza riscriverlo
         run: node scripts/roadmap-auto.js bootstrap
