@@ -380,6 +380,7 @@ function lfFabbricaCartellino(){
     (cart.turniSettimanaliRichiesti
       ? '<span>Questa settimana <b>' + cart.giorniLavoratiSettimana + '/' + cart.turniSettimanaliRichiesti + '</b></span>'
       : '') +
+    '<span>Affidabilità <b>' + Math.round(cart.affidabilita == null ? 50 : cart.affidabilita) + '</b></span>' +
     '<span>Ciclo <b>' + cart.settimana + '/4</b></span>' +
     '</div></div>';
   return html;
