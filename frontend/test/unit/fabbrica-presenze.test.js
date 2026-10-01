@@ -112,6 +112,87 @@ describe("cartellino presenze Fabbrica", () => {
     expect(out.turniSettimanaliRichiesti).toBe(5);
   });
 
+  it("la domenica non entra nel conteggio contrattuale X/5", () => {
+    const ctx = { G:{year:1,week:1,day:7}, Number, Math, Array, Object, Set };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    vm.runInContext(`
+      G.workplaces = {
+        fabbrica:{
+          attendance:{ciclo:0,turni:[0,1,2,3,6]}
+        }
+      };
+    `, ctx);
+
+    const out = vm.runInContext('lavoroCartellino("fabbrica")', ctx);
+    expect(out.giorniLavoratiSettimana).toBe(4);
+    expect(out.turniSettimanaliRichiesti).toBe(5);
+  });
+
+  it("paga +30% soltanto sul sesto giorno ordinario distinto", () => {
+    const ctx = { G:{year:1,week:1,day:6}, Number, Math, Array, Object, Set };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    vm.runInContext(`
+      G.workplaces = {
+        fabbrica:{
+          attendance:{ciclo:0,turni:[0,1,2,3,4]}
+        }
+      };
+    `, ctx);
+
+    const paga = vm.runInContext('lavoroPagaTurno("fabbrica", 220)', ctx);
+    expect(paga.percentuale).toBe(30);
+    expect(paga.bonus).toBe(66);
+    expect(paga.totale).toBe(286);
+    expect(paga.tipo).toBe("sesto-giorno");
+
+    vm.runInContext('lavoroRegistraPresenza("fabbrica")', ctx);
+    const secondoTurno = vm.runInContext('lavoroPagaTurno("fabbrica", 220)', ctx);
+    expect(secondoTurno.percentuale).toBe(0);
+    expect(secondoTurno.totale).toBe(220);
+  });
+
+  it("paga +75% la domenica autorizzata senza usarla per il 5/5", () => {
+    const ctx = { G:{year:1,week:1,day:7}, Number, Math, Array, Object, Set };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    vm.runInContext(`
+      G.workplaces = {
+        fabbrica:{
+          attendance:{ciclo:0,turni:[0,1,2,3]}
+        }
+      };
+      lavoroAutorizzaDomenica("fabbrica");
+    `, ctx);
+
+    const paga = vm.runInContext('lavoroPagaTurno("fabbrica", 220)', ctx);
+    expect(paga.percentuale).toBe(75);
+    expect(paga.bonus).toBe(165);
+    expect(paga.totale).toBe(385);
+    expect(paga.tipo).toBe("domenica");
+
+    vm.runInContext('lavoroRegistraPresenza("fabbrica")', ctx);
+    const cart = vm.runInContext('lavoroCartellino("fabbrica")', ctx);
+    expect(cart.giorniLavoratiSettimana).toBe(4);
+  });
+
+  it("mostra la maggiorazione sia prima del turno sia nel risultato", () => {
+    const actions = leggi("js/game/actions.js");
+    const luoghi = leggi("js/game/luoghi-foto.js");
+
+    expect(actions).toContain('bonus +" + paga.percentuale');
+    expect(actions).toContain('paga.totale');
+    expect(luoghi).toContain('pagaTurno.etichetta');
+    expect(luoghi).toContain("(+" + pagaTurno.percentuale + "%)");
+  });
+
   it("blocca la domenica salvo autorizzazione esplicita per quel giorno", () => {
     const ctx = { G:{year:1,week:1,day:7}, Number, Math, Array, Object, Set };
     ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
