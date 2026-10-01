@@ -853,6 +853,9 @@ function lavoroValutaDisciplinaSettimana(luogo, absoluteWeek, cycle, weekInCycle
     }
   }
 
+  if(!opts.silent && window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onDiscipline === "function")
+    ADF_WORK_EVENTS.onDiscipline(luogo,result);
+
   return result;
 }
 
@@ -1027,6 +1030,8 @@ function lavoroValutaCiclo(luogo, ciclo, turni){
         absences + (absences === 1 ? " assenza." : " assenze."), absences ? "bad" : "");
     }
   }
+  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onCycle === "function")
+    ADF_WORK_EVENTS.onCycle(luogo,evaluation);
   return evaluation;
 }
 
@@ -1157,6 +1162,8 @@ function lavoroAccettaStraordinario(luogo){
     bonusPct:offerta.bonusPct
   });
   if(stato.history.length > 24) stato.history.shift();
+  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onOvertime === "function")
+    ADF_WORK_EVENTS.onOvertime(luogo,"accepted",offerta);
   return offerta;
 }
 
@@ -1174,6 +1181,18 @@ function lavoroRifiutaStraordinario(luogo){
     bonusPct:offerta.bonusPct
   });
   if(stato.history.length > 24) stato.history.shift();
+  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onOvertime === "function")
+    ADF_WORK_EVENTS.onOvertime(luogo,"declined",offerta);
+  return offerta;
+}
+
+function lavoroAnnullaRichiestaStraordinario(luogo){
+  const stato = lavoroStraordinarioStato(luogo);
+  if(!stato || !stato.pendingOffer) return null;
+  const offerta = stato.pendingOffer;
+  stato.pendingOffer = null;
+  if(Number(stato.lastOfferWeek)===lavoroSettimanaAssoluta())
+    stato.lastOfferWeek = null;
   return offerta;
 }
 
@@ -1211,13 +1230,16 @@ function lavoroCompletaStraordinario(luogo){
     if(sede) delete sede.sundayPermitAbsoluteDay;
   }
 
-  return {
+  const result = {
     tipo:offerta.tipo,
     bonusPct:offerta.bonusPct,
     affidabilitaPrima:prima,
     affidabilitaDopo:c ? c.reliability : prima,
     affidabilitaDelta:c ? c.reliability - prima : 0
   };
+  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onOvertime === "function")
+    ADF_WORK_EVENTS.onOvertime(luogo,"completed",result);
+  return result;
 }
 
 function lavoroAggiornaStraordinariTempo(){
@@ -1250,6 +1272,14 @@ function lavoroAggiornaStraordinariTempo(){
       const sede = lavoroSede(luogo);
       if(sede) delete sede.sundayPermitAbsoluteDay;
     }
+
+    if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onOvertime === "function")
+      ADF_WORK_EVENTS.onOvertime(luogo,"missed",{
+        tipo:offerta.tipo,
+        targetAbsoluteDay:offerta.targetAbsoluteDay,
+        bonusPct:offerta.bonusPct,
+        reliabilityDelta:delta
+      });
 
     if(typeof pushLog === "function"){
       pushLog("<b>Straordinario saltato.</b> Avevi accettato il turno di " +
@@ -2009,7 +2039,10 @@ const ACTIONS = [
         è andata la gente, da 0,55 a 1,45, pesa sulla resa. Da fuori (l'agenda,
         una card) vale 1, com'è sempre stato. */
      const resa = typeof circoloResaSerata === "function" ? circoloResaSerata() : 1;
-     const molt = (giaOggi ? 0.45 : 1) * peso * resa;
+     const leadLavoro = (window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.consumeMusicLead === "function")
+       ? ADF_WORK_EVENTS.consumeMusicLead("live") : null;
+     const moltLavoro = leadLavoro ? Math.max(1, Number(leadLavoro.multiplier || 1)) : 1;
+     const molt = (giaOggi ? 0.45 : 1) * peso * resa * moltLavoro;
      const f = Math.round((rnd(8,30) + presenzaSulPalco()*1.4 + G.hype*0.7) * RITMO * molt);
      const m = Math.round((rnd(20,60) + G.hype*1.4) * RITMO * molt);
      const lbb = lifeBonus();
@@ -2018,6 +2051,7 @@ const ACTIONS = [
      adfSegnaOggi("live");
      diarioBordo().live++;
      return "Serata fatta: +" + f + " fan, +" + m + " €." +
+       (leadLavoro ? " <b>Il contatto nato al lavoro ha spinto davvero la serata ×" + moltLavoro.toFixed(2) + ".</b>" : "") +
        (giaOggi ? " Il palco lo conoscevano già: oggi rende meno." : "");
    }},
 
