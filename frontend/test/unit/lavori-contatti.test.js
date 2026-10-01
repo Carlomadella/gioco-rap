@@ -40,6 +40,7 @@ describe("identità sociale dei lavori", () => {
     expect(Array.from(out.fonico.ruoli)).toContain("beatmaker");
     expect(Array.from(out.fonico.ruoli)).toContain("fonico");
     expect(Array.from(out.fonico.ruoli)).not.toContain("strada");
+    expect(Array.from(out.fabbrica.ruoli)).toContain("collega");
 
     expect(Array.from(out.buttafuori.ruoli)).toContain("promoter");
     expect(Array.from(out.buttafuori.ruoli)).toContain("strada");
@@ -129,15 +130,18 @@ describe("identità sociale dei lavori", () => {
     const telefono = leggi("js/game/telefono.js");
 
     expect(posto).toContain('promoter: {n:"Promoter"');
+    expect(posto).toContain('collega: {n:"Collega"');
     expect(posto).toContain('strada: {n:"Conoscenza della Strada"');
     expect(posto).toContain("p.origineLavoro = meta.jobId || luogo;");
     expect(posto).toContain("function postoContattoLavoroCandidato(luogo, daRiprendere, maxContatti, ruoli, meta)");
 
-    expect(chat).toContain('"rapper","promoter","strada"');
+    expect(chat).toContain('"rapper","promoter","collega","strada"');
     expect(chat).toContain("function chatSpuntiLavoroGenerici(p)");
     expect(chat).toContain('p.ruolo === "promoter"');
+    expect(chat).toContain('p.ruolo === "collega"');
     expect(chat).toContain('p.ruolo === "strada"');
     expect(telefono).toContain('promoter:"Promoter"');
+    expect(telefono).toContain('collega:"Collega"');
     expect(telefono).toContain('strada:"Conoscenza della Strada"');
   });
 
