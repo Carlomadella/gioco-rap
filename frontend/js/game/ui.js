@@ -15,7 +15,7 @@ const SHOWN = {};
 const LAPERTE = new Set();
 /* punto 67: stesse quattro famiglie di colore delle card (scene-art.js),
    così il toast che segue un tap non stona col colore della card appena
-   premuta. Solo scrivi/beat/registra/free/cercalavoro ci passano davvero —
+   premuta. Solo scrivi/beat/registra/free ci passano davvero —
    le altre finiscono nella scena a pagina piena (SCENA_PIENA, sotto), non
    nel toast, ma restano coerenti anche loro se un giorno cambia qualcosa. */
 const ART = {
