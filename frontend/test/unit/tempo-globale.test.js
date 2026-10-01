@@ -87,5 +87,22 @@ describe("widget tempo globale", () => {
       expect(pannello.classList.contains("adf-tc-open"), id).toBe(true);
       window.ADF_TIME_CONTROLS.close();
     }
+    window.close();
+  });
+
+  /* 01/10/2026: sync() riscrive testi e classi del widget, e l'observer li
+     contava come cambi della pagina: il widget rigirava a ogni frame per
+     sempre (e la prova sopra, col frame sincrono, non finiva più). */
+  it("a pagina ferma il widget non si risincronizza da solo", async () => {
+    const window = ambiente();
+    let frame = 0;
+    window.requestAnimationFrame = cb => { frame++; return window.setTimeout(cb, 5); };
+    window.document.querySelector("#s-hub").classList.add("on");
+    window.ADF_TIME_CONTROLS.sync();
+    await new Promise(r => setTimeout(r, 300));
+    const dopoUnPo = frame;
+    await new Promise(r => setTimeout(r, 300));
+    window.close();
+    expect(frame - dopoUnPo).toBe(0);
   });
 });
