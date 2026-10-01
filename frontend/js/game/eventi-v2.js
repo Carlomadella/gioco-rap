@@ -434,7 +434,7 @@ function special(v){
        (vedi `no_job` in testReq; questa è la rete di sicurezza per un
        evento che non lo chiede) */
     const j=(typeof JOBS!=="undefined"?JOBS:[]).find(x=>x.id===v.set_job);
-    if(j && !G.job) G.job={id:j.id,n:j.n,pay:j.pay,e:j.e,missed:0};
+    if(j && !G.job) G.job={id:j.id,place:j.place||null,n:j.n,pay:j.pay,e:j.e,missed:0};
   }
   if(v.life_casa_delta){
     G.life=G.life||{};
