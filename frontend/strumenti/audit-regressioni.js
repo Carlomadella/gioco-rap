@@ -2520,6 +2520,22 @@ test("i lavori legacy restano parcheggiati fuori dal catalogo JOBS attivo",
       ["lavapiatti","operaio"].every(id => attivi.includes('id:"'+id+'"'));
   })());
 
+test("i contratti di Pizzeria e Fabbrica usano la variante documento della modale",
+  hub.includes('variant:"work-contract"') &&
+  hub.includes("workplace:luogo") &&
+  hub.includes('class="wc-doc"') &&
+  hub.includes('class="wc-signatures"') &&
+  modal.includes('e.variant==="work-contract"') &&
+  modal.includes('contract-fabbrica') &&
+  modal.includes('contract-pizzeria') &&
+  overlaysCss.includes("#modal.work-contract") &&
+  overlaysCss.includes(".work-contract .sheet2") &&
+  overlaysCss.includes(".wc-signatures"));
+
+test("la variante contratto non sporca le modali successive",
+  modal.includes("function modaleSenzaViaggio(){ modaleViaggio(null); modaleAspetto(null); }") &&
+  modal.includes("modaleAspetto(e);"));
+
 console.log("\nPunto 7 — i file .md in cartelle con nomi coerenti");
 test("in radice restano solo README, ROADMAP e CLAUDE",
   (() => {
