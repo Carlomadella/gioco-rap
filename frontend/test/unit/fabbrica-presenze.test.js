@@ -214,10 +214,11 @@ describe("cartellino presenze Fabbrica", () => {
 
     expect(hub).toContain('t:"Contratto di lavoro"');
     expect(hub).toContain('n:"Firma il contratto"');
-    expect(hub).toContain('lavoroFirmaContratto("fabbrica", def)');
+    expect(hub).toContain("function contrattoPostoLavoro(def)");
+    expect(hub).toContain("lavoroFirmaContratto(luogo, def)");
     expect(luoghi).toContain('"Leggi e firma il contratto"');
-    expect(orari).toContain('label:"Domenica: riposo da contratto"');
-    expect(orari).toContain('lavoroDomenicaAutorizzata("fabbrica")');
+    expect(orari).toContain("lavoroTurnoConsentitoOggi(place)");
+    expect(orari).toContain('phase:"contract-rest"');
   });
 
   it("premia con affidabilità un ciclo 4/4 davvero completo", () => {
@@ -574,9 +575,10 @@ describe("cartellino presenze Fabbrica", () => {
     expect(vm.runInContext('lavoroCarriera("fabbrica").warnings', ctx)).toBe(0);
   });
 
-  it("la Fabbrica non usa più il vecchio licenziamento dopo tre settimane a zero turni", () => {
+  it("i lavori con contratto per sede non usano più il vecchio licenziamento a zero turni", () => {
     const sim = leggi("js/game/sim.js");
-    expect(sim).toContain('if(luogoLavoro !== "fabbrica")');
+    expect(sim).toContain("const disciplinaPerSede");
+    expect(sim).toContain("lavoroContrattoDef(luogoLavoro)");
     expect(sim).toContain("due sistemi disciplinari in conflitto");
   });
 
@@ -779,12 +781,12 @@ describe("cartellino presenze Fabbrica", () => {
     const eventi = leggi("js/game/eventi-v2.js");
     const luoghi = leggi("js/game/luoghi-foto.js");
 
-    expect(eventi).toContain("function adfFactoryOvertimeAfterShift()");
-    expect(eventi).toContain('claimAutoEvent("factory-overtime")');
-    expect(eventi).toContain('t:"Il capo ti ferma prima di uscire"');
-    expect(eventi).toContain('lavoroAccettaStraordinario("fabbrica")');
+    expect(eventi).toContain("function adfWorkOvertimeAfterShift()");
+    expect(eventi).toContain('claimAutoEvent("work-overtime:"+luogo)');
+    expect(eventi).toContain('const fabbrica=luogo==="fabbrica"');
+    expect(eventi).toContain("lavoroAccettaStraordinario(luogo)");
     expect(eventi).toContain('lavoroAggiornaStraordinariTempo();');
-    expect(luoghi).toContain("Straordinario concordato oggi");
+    expect(luoghi).toContain("straordinarioOggi");
     expect(luoghi).toContain("straordinarioAccettato.targetLabel");
   });
 
@@ -994,5 +996,179 @@ describe("cartellino presenze Fabbrica", () => {
     const fabbrica = luoghi.slice(start, end);
     expect(fabbrica).not.toContain('G.job.id === def.id');
     expect(fabbrica).not.toContain('lfPan("Oggi"');
+  });
+});
+
+
+describe("Pizzeria strutturata", () => {
+  function ctxBase(overrides = {}){
+    const ctx = {
+      G:Object.assign({
+        year:1,week:1,day:2,
+        job:{id:"lavapiatti",place:"pizzeria",n:"Lavapiatti",pay:100,e:18}
+      }, overrides),
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+    return ctx;
+  }
+
+  it("usa i dati propri: 4 servizi, martedì-domenica, lunedì riposo", () => {
+    const ctx = ctxBase();
+    const contratto = vm.runInContext('lavoroContrattoDef("pizzeria")', ctx);
+
+    expect(contratto.turniSettimanali).toBe(4);
+    expect(Array.from(contratto.giorniConsentiti)).toEqual([2,3,4,5,6,7]);
+    expect(contratto.giornoRiposo).toBe(1);
+    expect(contratto.domenicaRiposo).toBe(false);
+    expect(contratto.bonusSestoGiornoPct).toBe(20);
+
+    ctx.G.day = 1;
+    expect(vm.runInContext('lavoroTurnoConsentitoOggi("pizzeria").ok', ctx)).toBe(false);
+    ctx.G.day = 7;
+    expect(vm.runInContext('lavoroTurnoConsentitoOggi("pizzeria").ok', ctx)).toBe(true);
+  });
+
+  it("paga +20% dal quinto giorno distinto senza trasformare la domenica in straordinario", () => {
+    const ctx = ctxBase({day:6});
+    vm.runInContext(`
+      G.workplaces = {
+        pizzeria:{
+          contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"lavapiatti"},
+          attendance:{ciclo:0,turni:[1,2,3,4]}
+        }
+      };
+    `, ctx);
+
+    const paga = vm.runInContext('lavoroPagaTurno("pizzeria",100)', ctx);
+    expect(paga.percentuale).toBe(20);
+    expect(paga.bonus).toBe(20);
+    expect(paga.totale).toBe(120);
+    expect(paga.tipo).toBe("giorno-extra");
+    expect(paga.etichetta).toBe("5° giorno");
+  });
+
+  it("due assenze su quattro generano il richiamo Pizzeria e -8 affidabilità", () => {
+    const ctx = ctxBase({day:7});
+    vm.runInContext(`
+      G.workplaces = {
+        pizzeria:{
+          contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"lavapiatti"},
+          attendance:{ciclo:0,turni:[1,2]}
+        }
+      };
+    `, ctx);
+
+    const out = vm.runInContext(
+      'lavoroValutaDisciplinaSettimana("pizzeria",1,0,0,G.workplaces.pizzeria.attendance.turni,{silent:true})',
+      ctx
+    );
+    expect(out.absences).toBe(2);
+    expect(out.warningAdded).toBe(1);
+    expect(out.dismissed).toBe(false);
+    expect(vm.runInContext('lavoroCarriera("pizzeria").warnings', ctx)).toBe(1);
+    expect(vm.runInContext('lavoroCarriera("pizzeria").reliability', ctx)).toBe(42);
+  });
+
+  it("un ciclo 4/4 perfetto Pizzeria vale +8 affidabilità", () => {
+    const ctx = ctxBase({week:4,day:7});
+    vm.runInContext(`
+      G.workplaces = {
+        pizzeria:{
+          contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"lavapiatti"},
+          attendance:{ciclo:0,turni:[
+            1,2,3,4,
+            8,9,10,11,
+            15,16,17,18,
+            22,23,24,25
+          ]}
+        }
+      };
+    `, ctx);
+
+    const out = vm.runInContext('lavoroChiudiCiclo("pizzeria")', ctx);
+    expect(out.perfect).toBe(true);
+    expect(out.fullWeeks).toBe(4);
+    expect(out.absences).toBe(0);
+    expect(out.reliabilityBefore).toBe(50);
+    expect(out.reliabilityAfter).toBe(58);
+  });
+
+  it("la carriera della Pizzeria resta legata al luogo quando cambia mansione", () => {
+    const ctx = ctxBase({week:9,day:2});
+    vm.runInContext(`
+      G.workplaces = {
+        pizzeria:{
+          contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"lavapiatti"},
+          career:{
+            reliability:72,cyclesCompleted:2,perfectCycles:2,perfectStreak:2,
+            cyclesInRole:2,perfectCyclesInRole:1,roleId:"lavapiatti",roleLevel:0,
+            raisesByRole:{lavapiatti:1},payHistory:[],roleHistory:[],warnings:0,
+            warningHistory:[],weeklyEvaluations:[],dismissals:0,blockedUntilWeek:null,evaluations:[]
+          }
+        }
+      };
+    `, ctx);
+
+    expect(vm.runInContext('lavoroPromozioneDisponibile("pizzeria")', ctx)).toBe(true);
+    expect(vm.runInContext('lavoroProssimoRuolo("pizzeria").id', ctx)).toBe("aiuto_cucina");
+
+    const out = vm.runInContext(
+      'lavoroPromuoviRuolo("pizzeria",{nuovaPaga:115,energia:19,motivo:"test"})',
+      ctx
+    );
+    expect(out.a.id).toBe("aiuto_cucina");
+    expect(ctx.G.job.id).toBe("aiuto_cucina");
+    expect(ctx.G.job.n).toBe("Aiuto cucina");
+    expect(ctx.G.job.place).toBe("pizzeria");
+    expect(ctx.G.job.pay).toBe(115);
+  });
+
+  it("la copertura extra Pizzeria usa +20% e affidabilità propria", () => {
+    const ctx = ctxBase({day:5});
+    vm.runInContext(`
+      G.workplaces = {
+        pizzeria:{
+          contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"lavapiatti"},
+          attendance:{ciclo:0,turni:[1,2,3,4]},
+          career:{
+            reliability:50,cyclesCompleted:0,perfectCycles:0,perfectStreak:0,
+            cyclesInRole:0,perfectCyclesInRole:0,roleId:"lavapiatti",roleLevel:0,
+            raisesByRole:{},payHistory:[],roleHistory:[],warnings:0,warningHistory:[],
+            weeklyEvaluations:[],dismissals:0,blockedUntilWeek:null,evaluations:[]
+          }
+        }
+      };
+    `, ctx);
+
+    const offerta = vm.runInContext('lavoroTentaRichiestaStraordinario("pizzeria",0)', ctx);
+    expect(offerta.tipo).toBe("giorno-extra");
+    expect(offerta.targetDay).toBe(6);
+    expect(offerta.bonusPct).toBe(20);
+    vm.runInContext('lavoroAccettaStraordinario("pizzeria")', ctx);
+    ctx.G.day = 6;
+    const done = vm.runInContext('lavoroCompletaStraordinario("pizzeria")', ctx);
+    expect(done.affidabilitaDelta).toBe(1);
+    expect(ctx.G.workplaces.pizzeria.career.reliability).toBe(51);
+  });
+
+  it("UI, assunzione, orari e FAMEpedia sono collegati alla sede Pizzeria", () => {
+    const actions = leggi("js/game/actions.js");
+    const hub = leggi("js/game/hub.js");
+    const luoghi = leggi("js/game/luoghi-foto.js");
+    const tempo = leggi("js/game/tempo.js");
+    const spostamenti = leggi("js/game/spostamenti.js");
+    const famepedia = leggi("js/famepedia.js");
+
+    expect(actions).toContain('{id:"lavapiatti", place:"pizzeria"');
+    expect(hub).toContain("function contrattoPostoLavoro(def)");
+    expect(luoghi).toContain('data-dimissioni="pizzeria"');
+    expect(luoghi).toContain("function lfPizzeriaCartellino()");
+    expect(luoghi).toContain('lfPan("Settimane in cucina"');
+    expect(tempo).toContain("pizzeria:300");
+    expect(spostamenti).toContain("lavoroLuogo(G.job)");
+    expect(famepedia).toContain('["Pizzeria","Il percorso parte da Lavapiatti: 100 €');
   });
 });
