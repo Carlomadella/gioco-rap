@@ -221,7 +221,7 @@ const ADF_FABBRICA_CARRIERA = Object.freeze({
 const ADF_LAVORO_RETE = Object.freeze({
   fabbrica:Object.freeze({
     chanceIncontro:0.18, cooldownGiorni:7, minTurni:3, maxContatti:4,
-    ruoli:Object.freeze(["beatmaker","fonico","videomaker"]),
+    ruoli:Object.freeze(["collega","collega","collega","beatmaker","fonico"]),
     dettaglio:"collega di Fabbrica",
     storia:"Vi siete conosciuti lavorando in Fabbrica."
   }),
