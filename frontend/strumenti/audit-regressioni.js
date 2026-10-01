@@ -3021,7 +3021,7 @@ console.log("\nLe tre del Marketing (20/09/2026)");
   test("il bot del simulatore di bilanciamento trova ancora finestre, colpi e azioni per nome", altro.length === 0, altro.join(", "));
 })();
 
-for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/transizioni-video.js","js/game/luoghi-foto.js","js/preparo.js","js/gioco-ingresso.js"]){
+for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/lavoro-eventi.js","js/game/transizioni-video.js","js/game/luoghi-foto.js","js/preparo.js","js/gioco-ingresso.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }
