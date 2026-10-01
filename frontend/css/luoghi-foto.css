@@ -82,6 +82,22 @@
 .lfriga.oro b{color:var(--stOro)}
 .lfnotasotto{margin:10px 0 0}
 
+.lfdimissioni{
+  width:100%;
+  margin-top:12px;
+  padding:9px 10px;
+  border:1px solid rgba(239,68,68,.34);
+  border-radius:8px;
+  background:rgba(127,29,29,.12);
+  color:#fca5a5;
+  font:800 11px/1.2 Figtree,system-ui,sans-serif;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+.lfdimissioni:hover{border-color:rgba(239,68,68,.62);background:rgba(127,29,29,.22);color:#fecaca}
+.lfdimissioni:focus-visible{outline:2px solid #ef4444;outline-offset:2px}
+
 /* ---- FABBRICA: CARTELLINO PRESENZE ----
    Quattro righe = quattro settimane. Il bordo azzurro è oggi; il timbro oro
    è un turno davvero completato. Se nello stesso giorno fai due turni, la
