@@ -422,14 +422,65 @@ function hubChiuso(l){
    sim.js. Vale per tutti i lavori: qui, al centro per l'impiego, ai
    colloqui (actions.js, offerJobs) e all'offerta degli eventi (eventi-v2,
    `set_job`). Il testo di rifiuto qui sotto non promette più «lascialo». */
+function completaAssunzione(def){
+  G.job = {id:def.id, place:def.place || null, n:def.n, pay:def.pay, e:def.e, missed:0};
+  pushLog("Hai preso il posto da " + def.n.toLowerCase() + ": " + def.pay + " € a turno.", "good");
+}
+
+function contrattoFabbrica(def){
+  const cfg = typeof lavoroContrattoDef === "function" ? lavoroContrattoDef("fabbrica") : null;
+  const turni = cfg ? Number(cfg.turniSettimanali || 5) : 5;
+  const durata = window.GAME_TIME && typeof GAME_TIME.durationForWorkplace === "function"
+    ? GAME_TIME.formatDuration(GAME_TIME.durationForWorkplace("fabbrica") || 480)
+    : "8h";
+
+  showEvent({
+    k:"Fabbrica",
+    t:"Contratto di lavoro",
+    d:"<b>Mansione iniziale:</b> " + def.n + "<br>" +
+      "<b>Paga:</b> " + def.pay + " € a turno<br>" +
+      "<b>Durata:</b> " + durata + "<br>" +
+      "<b>Presenze richieste:</b> " + turni + " giorni a settimana<br>" +
+      "<b>Giorni ordinari:</b> lunedì–sabato<br>" +
+      "<b>Domenica:</b> riposo. Si lavora solo con una richiesta straordinaria dell'azienda.<br><br>" +
+      "Le presenze restano legate alla Fabbrica anche se in futuro cambi mansione.",
+    annulla(){},
+    opts:[
+      {n:"Firma il contratto", d:"Accetti le condizioni e diventi dipendente della Fabbrica", run(){
+        completaAssunzione(def);
+        if(typeof lavoroFirmaContratto === "function") lavoroFirmaContratto("fabbrica", def);
+
+        const st = window.GAME_HOURS && typeof GAME_HOURS.placeJobStatus === "function"
+          ? GAME_HOURS.placeJobStatus("fabbrica")
+          : null;
+        if(st && !st.open){
+          pushLog("<b>Contratto firmato.</b> Il primo turno lo farai quando la Fabbrica è operativa.", "good");
+          if(typeof renderGioco === "function") renderGioco();
+          if(typeof renderLuogo === "function") renderLuogo();
+          return {t:"Contratto firmato. " + (st.label || "Il turno oggi non è disponibile.") + ".", c:"good"};
+        }
+
+        hubAzione("turno");
+        return null;
+      }},
+      {n:"Non firmare", d:"Resti senza questo lavoro", run(){ return null; }}
+    ]
+  });
+}
+
 function assumitiCome(jobId){
   const def = JOBS.find(j => j.id === jobId);
   if(!def) return;
-  /* Prima si guarda l'orologio, poi si firma: altrimenti ti assumevano alle
-     18:00 in fabbrica e il turno da 8 ore veniva rifiutato subito dopo —
-     assunto, giornata persa, zero euro. */
-  if(window.GAME_HOURS && typeof GAME_HOURS.jobStatus === "function" &&
-     (!G.job || G.job.id === jobId)){
+
+  const stessoLuogo = G.job && def.place && typeof lavoroLuogo === "function"
+    ? lavoroLuogo(G.job) === def.place
+    : !!(G.job && G.job.id === jobId);
+
+  /* Prima si guarda l'orologio, poi si lavora: per la Fabbrica la firma del
+     contratto può avvenire anche quando non c'è più spazio per il turno, ma
+     il turno non parte finché orari/giorno non lo consentono. */
+  if(def.place !== "fabbrica" && window.GAME_HOURS && typeof GAME_HOURS.jobStatus === "function" &&
+     (!G.job || stessoLuogo)){
     const st = GAME_HOURS.jobStatus(jobId);
     if(st && !st.open){
       if(typeof SFX === "object" && SFX.fail) SFX.fail();
@@ -437,15 +488,26 @@ function assumitiCome(jobId){
       return;
     }
   }
-  if(!G.job || G.job.id !== jobId){
+
+  if(!stessoLuogo){
     if(G.job){
       hubChiuso({n:def.n, chiuso:"Lavori già come " + G.job.n.toLowerCase() +
-        ". Un posto alla volta, e da un lavoro non ci si licenzia: lo perdi solo se non ti presenti per tre settimane."});
+        ". Un posto alla volta, e da un lavoro non ci si licenzia: lo perdi solo se non rispetti il rapporto di lavoro."});
       return;
     }
-    G.job = {id:def.id, place:def.place || null, n:def.n, pay:def.pay, e:def.e, missed:0};
-    pushLog("Hai preso il posto da " + def.n.toLowerCase() + ": " + def.pay + " € a turno.", "good");
+
+    if(def.place === "fabbrica" &&
+       typeof lavoroContrattoFirmato === "function" &&
+       !lavoroContrattoFirmato("fabbrica")){
+      contrattoFabbrica(def);
+      return;
+    }
+
+    completaAssunzione(def);
+    if(def.place === "fabbrica" && typeof lavoroFirmaContratto === "function")
+      lavoroFirmaContratto("fabbrica", def);
   }
+
   hubAzione("turno");
 }
 function schedaLavoro(jobId, luogo){
