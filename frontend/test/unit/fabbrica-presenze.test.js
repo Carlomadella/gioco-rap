@@ -112,6 +112,73 @@ describe("cartellino presenze Fabbrica", () => {
     expect(capoturno.stress).toBe("molto alto");
   });
 
+  it("una settimana ordinaria da cinque turni non applica più un malus globale immediato", () => {
+    const ctx = {
+      G:{year:1,week:1,day:1,shifts:5,workFatigue:0},
+      Number, Math, Array, Object, Set,
+      clamp:(v,min,max)=>Math.max(min,Math.min(max,Number(v)||0))
+    };
+    ctx.totalWeeks = () => 1;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    expect(vm.runInContext("lavoroQualitaFattore()", ctx)).toBe(1);
+    expect(vm.runInContext("lavoroLifestyleFattore()", ctx)).toBe(1);
+
+    const prima=vm.runInContext("lavoroAggiornaFaticaSettimanale(5)", ctx);
+    expect(prima.dopo).toBe(4);
+    expect(vm.runInContext("lavoroQualitaFattore(5)", ctx)).toBe(1);
+  });
+
+  it("le settimane piene ripetute diventano un malus di lungo periodo", () => {
+    const ctx = {
+      G:{year:1,week:1,day:1,shifts:5,workFatigue:0},
+      Number, Math, Array, Object, Set,
+      clamp:(v,min,max)=>Math.max(min,Math.min(max,Number(v)||0))
+    };
+    ctx.totalWeeks = () => 1;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    for(let i=0;i<6;i++) vm.runInContext("lavoroAggiornaFaticaSettimanale(5)", ctx);
+
+    expect(ctx.G.workFatigue).toBe(24);
+    expect(vm.runInContext("lavoroQualitaFattore(5)", ctx)).toBeCloseTo(.988);
+    expect(vm.runInContext("lavoroLifestyleFattore(5)", ctx)).toBeCloseTo(.955);
+  });
+
+  it("sesto e settimo turno creano sovraccarico immediato, mentre settimane leggere recuperano", () => {
+    const ctx = {
+      G:{year:1,week:1,day:1,shifts:6,workFatigue:0},
+      Number, Math, Array, Object, Set,
+      clamp:(v,min,max)=>Math.max(min,Math.min(max,Number(v)||0))
+    };
+    ctx.totalWeeks = () => 1;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    expect(vm.runInContext("lavoroQualitaFattore(6,0)", ctx)).toBeCloseTo(.94);
+    expect(vm.runInContext("lavoroLifestyleFattore(6,0)", ctx)).toBeCloseTo(.85);
+    expect(vm.runInContext("lavoroQualitaFattore(7,0)", ctx)).toBeCloseTo(.86);
+    expect(vm.runInContext("lavoroLifestyleFattore(7,0)", ctx)).toBeCloseTo(.68);
+
+    ctx.G.workFatigue=50;
+    const out=vm.runInContext("lavoroAggiornaFaticaSettimanale(2)", ctx);
+    expect(out.dopo).toBe(32);
+    expect(out.delta).toBe(-18);
+  });
+
+  it("la simulazione usa il nuovo carico progressivo invece delle vecchie penalità lineari", () => {
+    const actions = leggi("js/game/actions.js");
+    const sim = leggi("js/game/sim.js");
+
+    expect(actions).toContain("lavoroQualitaFattore()");
+    expect(actions).not.toContain("(G.shifts||0)*0.07");
+    expect(sim).toContain("lavoroAggiornaFaticaSettimanale(G.shifts||0)");
+    expect(sim).toContain("lavoroLifestyleFattore(G.shifts||0,caricoLavoro.dopo)");
+    expect(sim).not.toContain("1 - (G.shifts||0) * 0.20");
+  });
+
   it("definisce il contratto Fabbrica: 5 giorni, lunedì-sabato, domenica riposo", () => {
     const ctx = { G:{year:1,week:1,day:1}, Number, Math, Array, Object, Set };
     ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;

@@ -140,9 +140,16 @@ function advanceWeek(){
   const costs = weeklyCosts();
   G.money += gross - costs;
 
-  // Il lifestyle lo vivi solo se hai tempo: ogni turno di lavoro te ne toglie un pezzo.
+  // Il lavoro non è una tassa automatica sul resto della vita. Una settimana
+  // ordinaria fino a 5 turni è già pagata in tempo/energia; dal 6° turno in poi
+  // pesa subito, mentre settimane piene ripetute lasciano fatica persistente.
+  const caricoLavoro = typeof lavoroAggiornaFaticaSettimanale === "function"
+    ? lavoroAggiornaFaticaSettimanale(G.shifts||0)
+    : {turni:Number(G.shifts||0),prima:0,dopo:0,delta:0};
   const lb = lifeBonus();
-  const vissuto = clamp(1 - (G.shifts||0) * 0.20, 0.25, 1);
+  const vissuto = typeof lavoroLifestyleFattore === "function"
+    ? lavoroLifestyleFattore(G.shifts||0,caricoLavoro.dopo)
+    : clamp(1 - Math.max(0,(G.shifts||0)-5)*0.15,0.45,1);
   G.fans += Math.round(newFans * (lb.fan - 1) * vissuto);
   /* «Lo stile che conta» (21/09/2026): i capi da hype che hai addosso, un
      punto l'uno a settimana, come «Come ti vesti» del lifestyle ma coi capi
@@ -154,8 +161,14 @@ function advanceWeek(){
   // il benessere tende al livello naturale del tuo tenore di vita, non sale all'infinito
   const naturale = clamp(34 + lb.well * 4.6 * vissuto - (G.money < 0 ? 12 : 0), 12, 100);
   G.wellbeing = clamp(G.wellbeing + (naturale - G.wellbeing) * 0.45, 0, 100);
-  if((G.shifts||0) >= 3)
-    pushLog("Tre turni in una settimana. <b>Il tenore di vita che paghi non lo stai vivendo.</b>", "");
+  if((G.shifts||0) >= 6)
+    pushLog("<b>"+(G.shifts||0)+" turni questa settimana.</b> Il lavoro sta mangiando recupero e tempo libero.", "bad");
+  if(caricoLavoro.prima < 20 && caricoLavoro.dopo >= 20)
+    pushLog("Le settimane piene iniziano ad accumularsi. <b>La fatica del lavoro non sparisce più tutta nel weekend.</b>", "");
+  else if(caricoLavoro.prima < 40 && caricoLavoro.dopo >= 40)
+    pushLog("<b>Stai trascinando stanchezza da settimane.</b> Anche fuori dal turno comincia a pesare.", "bad");
+  else if(caricoLavoro.prima >= 20 && caricoLavoro.dopo < 20)
+    pushLog("Hai alleggerito abbastanza il ritmo da <b>recuperare la fatica accumulata</b>.", "good");
   gain("rete", lb.rete * vissuto);
   syncEnergy();
   /* punto 40: l'energia non si riempie più chiudendo la settimana — si
