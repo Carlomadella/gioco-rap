@@ -152,6 +152,23 @@ const JOBS = [
 const ADF_LAVORO_CICLO_SETTIMANE = 4;
 const ADF_LAVORO_GIORNI_CICLO = ADF_LAVORO_CICLO_SETTIMANE * 7;
 
+/* Primo contratto reale: Fabbrica.
+   - 5 giornate lavorative a settimana;
+   - lunedì-sabato disponibili;
+   - domenica riposo, salvo autorizzazione esplicita di un evento;
+   - valutazione su cicli di 4 settimane.
+   Le conseguenze disciplinari vengono agganciate a questi dati, non hardcodate
+   nella UI o nella mansione, così restano valide anche dopo una promozione. */
+const ADF_LAVORO_CONTRATTI = Object.freeze({
+  fabbrica:Object.freeze({
+    luogo:"fabbrica",
+    turniSettimanali:5,
+    giorniConsentiti:Object.freeze([1,2,3,4,5,6]),
+    domenicaRiposo:true,
+    cicloSettimane:4
+  })
+});
+
 function lavoroSettimanaAssoluta(){
   return typeof totalWeeks === "function"
     ? Math.max(1, Number(totalWeeks()) || 1)
@@ -166,6 +183,75 @@ function lavoroPosizioneOggi(){
   const settimanaNelCiclo = (lavoroSettimanaAssoluta() - 1) % ADF_LAVORO_CICLO_SETTIMANE;
   const giorno = Math.max(1, Math.min(7, Number(G.day || 1)));
   return settimanaNelCiclo * 7 + (giorno - 1);
+}
+
+function lavoroGiornoAssoluto(){
+  return (lavoroSettimanaAssoluta() - 1) * 7 + Math.max(1, Math.min(7, Number(G.day || 1)));
+}
+
+function lavoroContrattoDef(luogo){
+  return ADF_LAVORO_CONTRATTI[luogo] || null;
+}
+
+function lavoroContratto(luogo){
+  const sede = lavoroSede(luogo);
+  if(!sede) return null;
+
+  /* Compatibilità: chi era già dipendente in Fabbrica prima del contratto
+     non viene espulso né obbligato a rifirmare a metà partita. */
+  if(!sede.contract && G.job && lavoroLuogo(G.job) === luogo){
+    sede.contract = {
+      signed:true,
+      legacy:true,
+      signedAbsoluteDay:lavoroGiornoAssoluto(),
+      roleAtSign:G.job.id || null
+    };
+  }
+  return sede.contract || null;
+}
+
+function lavoroFirmaContratto(luogo, job){
+  const sede = lavoroSede(luogo);
+  const def = lavoroContrattoDef(luogo);
+  if(!sede || !def) return null;
+  sede.contract = {
+    signed:true,
+    legacy:false,
+    signedAbsoluteDay:lavoroGiornoAssoluto(),
+    roleAtSign:job && job.id || null
+  };
+  return sede.contract;
+}
+
+function lavoroContrattoFirmato(luogo){
+  const c = lavoroContratto(luogo);
+  return !!(c && c.signed);
+}
+
+/* Un evento futuro può autorizzare ESATTAMENTE la domenica corrente.
+   Non esiste un generico "sblocca domeniche": l'eccezione va consumata nel
+   giorno per cui è stata concessa. */
+function lavoroAutorizzaDomenica(luogo){
+  const sede = lavoroSede(luogo);
+  if(!sede) return false;
+  sede.sundayPermitAbsoluteDay = lavoroGiornoAssoluto();
+  return true;
+}
+
+function lavoroDomenicaAutorizzata(luogo){
+  const sede = lavoroSede(luogo);
+  return !!(sede && Number(sede.sundayPermitAbsoluteDay) === lavoroGiornoAssoluto());
+}
+
+function lavoroTurnoConsentitoOggi(luogo){
+  const def = lavoroContrattoDef(luogo);
+  if(!def) return {ok:true, reason:null};
+  const giorno = Math.max(1, Math.min(7, Number(G.day || 1)));
+  if(def.domenicaRiposo && giorno === 7 && !lavoroDomenicaAutorizzata(luogo))
+    return {ok:false, reason:"Domenica: riposo da contratto"};
+  if(Array.isArray(def.giorniConsentiti) && !def.giorniConsentiti.includes(giorno))
+    return {ok:false, reason:"Giorno non previsto dal contratto"};
+  return {ok:true, reason:null};
 }
 
 function lavoroLuogo(job){
@@ -214,6 +300,12 @@ function lavoroCartellino(luogo){
   stato.turni.forEach(n => { conteggi[n] += 1; });
 
   const posOggi = lavoroPosizioneOggi();
+  const settimana = Math.floor(posOggi / 7) + 1;
+  const inizio = (settimana - 1) * 7;
+  const giorniLavoratiSettimana = new Set(
+    stato.turni.filter(n => n >= inizio && n < inizio + 7)
+  ).size;
+  const contratto = lavoroContrattoDef(luogo);
   return {
     luogo:luogo,
     ciclo:ciclo,
@@ -221,8 +313,10 @@ function lavoroCartellino(luogo){
     conteggi:conteggi,
     totale:stato.turni.length,
     posOggi:posOggi,
-    settimana:Math.floor(posOggi / 7) + 1,
-    giorno:(posOggi % 7) + 1
+    settimana:settimana,
+    giorno:(posOggi % 7) + 1,
+    giorniLavoratiSettimana:giorniLavoratiSettimana,
+    turniSettimanaliRichiesti:contratto ? Number(contratto.turniSettimanali || 0) : 0
   };
 }
 
@@ -738,6 +832,11 @@ const ACTIONS = [
    give:() => G.job ? "+" + G.job.pay + " € · −4 benessere" : "",
    run(){
      const j = G.job;
+     const luogoLavoroAttuale = lavoroLuogo(j);
+     if(luogoLavoroAttuale){
+       const gate = lavoroTurnoConsentitoOggi(luogoLavoroAttuale);
+       if(!gate.ok) return gate.reason + ".";
+     }
      G.money += j.pay; G.wellbeing -= 4; G.shifts = (G.shifts||0) + 1;
      /* La presenza appartiene al luogo di lavoro: se in futuro passi da
         Operaio a Capolinea/Capoturno in Fabbrica, il cartellino continua. */
