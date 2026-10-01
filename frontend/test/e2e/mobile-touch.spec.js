@@ -79,3 +79,36 @@ test("i quattro comandi segnalati hanno una presa di almeno 44 punti", async ({ 
      anche 43,969, una volta su cinque: un decimo di pixel non cambia la presa */
   expect.soft(filtro.height, "Filtro Shop").toBeGreaterThanOrEqual(43.9);
 });
+
+test("le superfici mobili lasciano al browser il trascinamento nativo", async ({ page }) => {
+  await entraNellaPlancia(page);
+
+  const gesture = await page.evaluate(() => {
+    const stile = selettore => {
+      const nodo = document.querySelector(selettore);
+      if(!nodo) return null;
+      const css = getComputedStyle(nodo);
+      return {
+        touchAction: css.touchAction,
+        overflowX: css.overflowX,
+        overflowY: css.overflowY
+      };
+    };
+
+    return {
+      mappa: stile(".pmappa"),
+      studio: stile(".stwrap"),
+      luogo: stile(".lfwrap")
+    };
+  });
+
+  expect(gesture.mappa).not.toBeNull();
+  expect(gesture.studio).not.toBeNull();
+  expect(gesture.luogo).not.toBeNull();
+
+  expect(gesture.mappa.touchAction).toContain("pan-x");
+  expect(gesture.mappa.touchAction).toContain("pan-y");
+  expect(gesture.studio.touchAction).toBe("pan-y");
+  expect(gesture.luogo.touchAction).toBe("pan-y");
+});
+
