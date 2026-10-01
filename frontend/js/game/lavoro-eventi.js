@@ -446,6 +446,95 @@ const FACTORY_ROLE_EVENTS = Object.freeze({
   ])
 });
 
+/* Il turno base differenzia già fatica fisica e pressione mentale per ruolo.
+   Gli eventi trasversali della Fabbrica devono rispettare la stessa logica:
+   - il lavoro fisico pesa di più in basso nella gerarchia;
+   - la pressione mentale cresce con responsabilità e coordinamento;
+   - affidabilità e rete non vengono "moltiplicate" dal ruolo: descrivono
+     conseguenze sociali/organizzative, non la fatica del corpo o della testa. */
+const FACTORY_ROLE_EVENT_LOAD = Object.freeze({
+  operaio:Object.freeze({
+    physicalPenalty:1,
+    mentalPenalty:1,
+    recovery:Object.freeze({wellbeing:3,lucidita:1}),
+    push:Object.freeze({wellbeing:-4,lucidita:-1}),
+    fatigueTitle:"Il turno oggi ti è rimasto nelle braccia",
+    fatigueText:"Hai già accumulato parecchio lavoro o il corpo sta iniziando a presentare il conto. Fermarti protegge soprattutto il fisico; tirare ancora pesa lì."
+  }),
+  operaio_esperto:Object.freeze({
+    physicalPenalty:.8,
+    mentalPenalty:1,
+    recovery:Object.freeze({wellbeing:3,lucidita:2}),
+    push:Object.freeze({wellbeing:-3,lucidita:-2}),
+    fatigueTitle:"Il turno oggi ti è rimasto addosso",
+    fatigueText:"Conosci meglio il mestiere e sprechi meno energie, ma tra linea, qualità e persone la stanchezza si divide tra corpo e testa."
+  }),
+  capolinea:Object.freeze({
+    physicalPenalty:.6,
+    mentalPenalty:1.5,
+    recovery:Object.freeze({wellbeing:2,lucidita:3}),
+    push:Object.freeze({wellbeing:-2,lucidita:-3}),
+    fatigueTitle:"La linea oggi ti è rimasta in testa",
+    fatigueText:"Il corpo lavora meno di prima, ma ritmo, persone e problemi della linea continuano a girarti in testa anche dopo la sirena."
+  }),
+  capoturno:Object.freeze({
+    physicalPenalty:.5,
+    mentalPenalty:2,
+    recovery:Object.freeze({wellbeing:1,lucidita:4}),
+    push:Object.freeze({wellbeing:-1,lucidita:-4}),
+    fatigueTitle:"Il turno oggi non ti esce dalla testa",
+    fatigueText:"Non sei più quello che porta il peso maggiore con le braccia: adesso ti porti dietro decisioni, imprevisti e responsabilità di tutto il turno."
+  })
+});
+
+const DEFAULT_WORK_EVENT_LOAD = Object.freeze({
+  recovery:Object.freeze({wellbeing:3,lucidita:2}),
+  push:Object.freeze({wellbeing:-4,lucidita:-3}),
+  fatigueTitle:"Il turno oggi ti è rimasto addosso",
+  fatigueText:"Non è solo una frase: hai già accumulato parecchi turni o una delle tue risorse sta scendendo troppo. Come chiudi la giornata cambia davvero come stai."
+});
+
+function factoryRoleEventLoad(job){
+  return job && workKey(job)==="fabbrica"
+    ? (FACTORY_ROLE_EVENT_LOAD[job.id] || null)
+    : null;
+}
+
+function scaleNegative(v,factor){
+  const n=Number(v||0);
+  if(n>=0) return n;
+  return -Math.max(1,Math.round(Math.abs(n)*Number(factor||1)));
+}
+
+function factoryFloorFx(job,opt){
+  const fx=Object.assign({},opt&&opt.fx||{});
+  const profile=factoryRoleEventLoad(job);
+  if(!profile || !opt || !opt.load) return fx;
+
+  if(opt.load==="physical" && Number(fx.wellbeing)<0)
+    fx.wellbeing=scaleNegative(fx.wellbeing,profile.physicalPenalty);
+  if(opt.load==="mental" && Number(fx.lucidita)<0)
+    fx.lucidita=scaleNegative(fx.lucidita,profile.mentalPenalty);
+  return fx;
+}
+
+function effectNumber(v){
+  const n=Number(v||0);
+  const abs=Math.abs(n);
+  const txt=Number.isInteger(abs) ? String(abs) : String(Math.round(abs*10)/10).replace(".",",");
+  return (n>0?"+":"−")+txt;
+}
+
+function factoryFxLabel(fx){
+  fx=fx||{};
+  const parts=[];
+  if(Number(fx.reliability)) parts.push(effectNumber(fx.reliability)+" affidabilità");
+  if(Number(fx.wellbeing)) parts.push(effectNumber(fx.wellbeing)+" benessere");
+  if(Number(fx.lucidita)) parts.push(effectNumber(fx.lucidita)+" lucidità");
+  if(Number(fx.rete)) parts.push(effectNumber(fx.rete)+" rete");
+  return parts.length ? parts.join(" · ") : "Nessun effetto diretto";
+}
+
 function workReliability(luogo,delta){
   if(typeof lavoroCarriera!=="function") return 0;
   const c=lavoroCarriera(luogo);
@@ -513,7 +602,7 @@ const FACTORY_FLOOR_EVENTS = Object.freeze([
     opts:Object.freeze([
       Object.freeze({n:"Stacchi un attimo",d:"+2 benessere · +1 lucidità",fx:{wellbeing:2,lucidita:1},
         result:"Hai usato il fermo per respirare invece di riempire anche quei venti minuti."}),
-      Object.freeze({n:"Dai una mano a liberare l'area",d:"+1 affidabilità · −1 lucidità",fx:{reliability:1,lucidita:-1},
+      Object.freeze({n:"Dai una mano a liberare l'area",d:"+1 affidabilità · −1 lucidità",load:"mental",fx:{reliability:1,lucidita:-1},
         result:"Non hai riparato la macchina, ma hai aiutato a far trovare il reparto pronto quando la manutenzione è arrivata."})
     ])
   }),
@@ -535,7 +624,7 @@ const FACTORY_FLOOR_EVENTS = Object.freeze([
     opts:Object.freeze([
       Object.freeze({n:"Chiedi una rotazione",d:"+1 benessere",fx:{wellbeing:1},
         result:"Hai cambiato postazione per un pezzo del turno e hai evitato di arrivare cotto alla fine."}),
-      Object.freeze({n:"Tieni la postazione",d:"+1 affidabilità · −2 benessere",fx:{reliability:1,wellbeing:-2},
+      Object.freeze({n:"Tieni la postazione",d:"+1 affidabilità · −2 benessere",load:"physical",fx:{reliability:1,wellbeing:-2},
         result:"Hai portato fino in fondo la postazione senza chiedere cambi. Il capo lo nota, il corpo pure."})
     ])
   }),
@@ -544,7 +633,7 @@ const FACTORY_FLOOR_EVENTS = Object.freeze([
     t:"Una protezione non ti convince",
     d:"Non è un'emergenza, ma una copertura vibra più del solito. Fermare e segnalarla rallenta il reparto; ignorarla è più comodo adesso.",
     opts:Object.freeze([
-      Object.freeze({n:"La segnali subito",d:"+2 affidabilità · −1 lucidità",fx:{reliability:2,lucidita:-1},
+      Object.freeze({n:"La segnali subito",d:"+2 affidabilità · −1 lucidità",load:"mental",fx:{reliability:2,lucidita:-1},
         result:"Hai fatto controllare la protezione prima che diventasse un problema vero."}),
       Object.freeze({n:"La lasci al controllo successivo",d:"+1 benessere · −1 affidabilità",fx:{wellbeing:1,reliability:-1},
         result:"Il turno scorre senza fermate, ma hai lasciato a qualcun altro una cosa che avevi già visto."})
@@ -555,7 +644,7 @@ const FACTORY_FLOOR_EVENTS = Object.freeze([
     t:"Il lotto finisce prima del previsto",
     d:"Per una volta siete avanti. Restano minuti buoni prima della chiusura del turno e nessuno sta correndo.",
     opts:Object.freeze([
-      Object.freeze({n:"Dai una mano alla linea accanto",d:"+1 affidabilità · +0,2 rete · −1 benessere",fx:{reliability:1,rete:.2,wellbeing:-1},
+      Object.freeze({n:"Dai una mano alla linea accanto",d:"+1 affidabilità · +0,2 rete · −1 benessere",load:"physical",fx:{reliability:1,rete:.2,wellbeing:-1},
         result:"Sei andato dove erano ancora sotto. Ti sei caricato un po' di lavoro in più, ma non è passato inosservato."}),
       Object.freeze({n:"Chiudi con calma",d:"+2 benessere · +1 lucidità",fx:{wellbeing:2,lucidita:1},
         result:"Hai finito pulito, sistemato la postazione e lasciato che una giornata buona restasse una giornata buona."})
@@ -568,7 +657,7 @@ const FACTORY_FLOOR_EVENTS = Object.freeze([
     opts:Object.freeze([
       Object.freeze({n:"La fai controllare",d:"+1 affidabilità · +1 lucidità",fx:{reliability:1,lucidita:1},
         result:"Il controllo non trova un guasto grave, ma hai tolto il dubbio prima che diventasse il pensiero di tutto il turno."}),
-      Object.freeze({n:"Aspetti fine turno",d:"−1 lucidità",fx:{lucidita:-1},
+      Object.freeze({n:"Aspetti fine turno",d:"−1 lucidità",load:"mental",fx:{lucidita:-1},
         result:"La macchina ha continuato a girare. Anche tu, con quel rumore in testa fino alla sirena."})
     ])
   }),
@@ -577,7 +666,7 @@ const FACTORY_FLOOR_EVENTS = Object.freeze([
     t:"Il responsabile passa più tempo del solito in reparto",
     d:"Non è un'ispezione formale. Guarda numeri, postazioni e come gira il lavoro. C'è spazio per farsi vedere, nel bene o nel male.",
     opts:Object.freeze([
-      Object.freeze({n:"Gli fai una segnalazione concreta",d:"+1 affidabilità · −1 lucidità",fx:{reliability:1,lucidita:-1},
+      Object.freeze({n:"Gli fai una segnalazione concreta",d:"+1 affidabilità · −1 lucidità",load:"mental",fx:{reliability:1,lucidita:-1},
         result:"Hai parlato di una cosa precisa invece di fare scena. La risposta è stata corta, ma ti ha ascoltato."}),
       Object.freeze({n:"Fai il tuo e basta",d:"+1 benessere",fx:{wellbeing:1},
         result:"Non hai cercato attenzione. Hai fatto il tuo turno senza aggiungere altra pressione."})
@@ -588,7 +677,7 @@ const FACTORY_FLOOR_EVENTS = Object.freeze([
     t:"Quello accanto a te oggi è in difficoltà",
     d:"Lo vedi rallentare da un po'. Non è un evento da eroe: puoi coprirgli qualche passaggio oppure chiamare chi coordina il reparto.",
     opts:Object.freeze([
-      Object.freeze({n:"Gli copri qualche passaggio",d:"+0,3 rete · −1 benessere",fx:{rete:.3,wellbeing:-1},
+      Object.freeze({n:"Gli copri qualche passaggio",d:"+0,3 rete · −1 benessere",load:"physical",fx:{rete:.3,wellbeing:-1},
         result:"Gli hai tolto pressione per un pezzo del turno. A fine giornata se lo ricorda."}),
       Object.freeze({n:"Chiami chi coordina",d:"+1 affidabilità · +1 lucidità",fx:{reliability:1,lucidita:1},
         result:"Hai fatto gestire il problema a chi deve farlo invece di caricartelo tutto addosso."})
@@ -638,11 +727,13 @@ function showFactoryFloor(job,s,roll){
     t:scena.t,
     d:scena.d,
     annulla(){},
-    opts:scena.opts.map(opt=>({
+    opts:scena.opts.map(opt=>{
+      const adjustedFx=factoryFloorFx(job,opt);
+      return {
       n:opt.n,
-      d:opt.d,
+      d:factoryFxLabel(adjustedFx),
       run(){
-        const fx=applyFactoryRoleFx(opt.fx);
+        const fx=applyFactoryRoleFx(adjustedFx);
         record(s,"factory",{
           status:"resolved",eventId:scena.id,roleId:job.id,choice:opt.n,effects:fx
         });
@@ -650,7 +741,8 @@ function showFactoryFloor(job,s,roll){
           Number(fx.lucidita||0)+Number(fx.rete||0);
         return {t:opt.result,c:saldo>0?"good":saldo<0?"bad":""};
       }
-    }))
+    };
+    })
   });
   return true;
 }
@@ -890,29 +982,51 @@ function consumeCrimeLead(success){
 /* ==================== 8. CONSEGUENZE FISICHE / MENTALI ==================== */
 
 function showPhysical(job,s,roll){
-  const overworked=Number(G.shifts||0)>=4 || Number(G.wellbeing||100)<=35;
+  const roleProfile=factoryRoleEventLoad(job);
+  const wellbeing=Number(G.wellbeing==null?100:G.wellbeing);
+  const lucidita=Number(G.lucidita==null?100:G.lucidita);
+  /* La lucidità bassa diventa un trigger aggiuntivo solo per i ruoli Fabbrica,
+     dove il carico mentale è parte esplicita della progressione. Gli altri
+     lavori mantengono il comportamento precedente. */
+  const overworked=Number(G.shifts||0)>=4 ||
+    wellbeing<=35 ||
+    (!!roleProfile && lucidita<=35);
   if(!overworked || !familyReady(s,"physical") || Number(roll)>=CFG.chance.physical)
     return false;
   if(!claim("work-physical")) return false;
 
-  record(s,"physical",{status:"shown",shifts:Number(G.shifts||0),wellbeing:Number(G.wellbeing||0)});
+  const profile=roleProfile || DEFAULT_WORK_EVENT_LOAD;
+  const recovery=profile.recovery || DEFAULT_WORK_EVENT_LOAD.recovery;
+  const push=profile.push || DEFAULT_WORK_EVENT_LOAD.push;
+
+  record(s,"physical",{
+    status:"shown",
+    roleId:job&&job.id||null,
+    shifts:Number(G.shifts||0),
+    wellbeing:Number(G.wellbeing||0),
+    lucidita:Number(G.lucidita||0)
+  });
   if(typeof showEvent!=="function") return false;
 
   showEvent({
     k:(job.n||"Lavoro")+" · Stanchezza",
-    t:"Il turno oggi ti è rimasto addosso",
-    d:"Non è solo una frase: hai già accumulato parecchi turni o il benessere è basso. Come chiudi la giornata cambia davvero come stai.",
+    t:profile.fatigueTitle || DEFAULT_WORK_EVENT_LOAD.fatigueTitle,
+    d:profile.fatigueText || DEFAULT_WORK_EVENT_LOAD.fatigueText,
     annulla(){},
     opts:[
-      {n:"Ti fermi qui",d:"+benessere · +lucidità",run(){
-        addWellbeing(3); addLucidity(2);
-        record(s,"physical",{status:"recovered",choice:"stop"});
-        return {t:"Hai deciso di non tirare ancora. <b>Benessere +3 · lucidità +2.</b>",c:"good"};
+      {n:"Ti fermi qui",d:factoryFxLabel(recovery),run(){
+        addWellbeing(recovery.wellbeing); addLucidity(recovery.lucidita);
+        record(s,"physical",{status:"recovered",choice:"stop",roleId:job&&job.id||null,
+          effects:Object.assign({},recovery)});
+        return {t:"Hai deciso di non tirare ancora. <b>"+
+          factoryFxLabel(recovery)+".</b>",c:"good"};
       }},
-      {n:"Tiri dritto",d:"−benessere · −lucidità",run(){
-        addWellbeing(-4); addLucidity(-3);
-        record(s,"physical",{status:"pushed",choice:"push"});
-        return {t:"Hai ignorato la stanchezza. <b>Benessere −4 · lucidità −3.</b>",c:"bad"};
+      {n:"Tiri dritto",d:factoryFxLabel(push),run(){
+        addWellbeing(push.wellbeing); addLucidity(push.lucidita);
+        record(s,"physical",{status:"pushed",choice:"push",roleId:job&&job.id||null,
+          effects:Object.assign({},push)});
+        return {t:"Hai ignorato la stanchezza. <b>"+
+          factoryFxLabel(push)+".</b>",c:"bad"};
       }}
     ]
   });

@@ -285,6 +285,102 @@ describe("famiglie eventi lavoro", () => {
     )).toBe(true);
   });
 
+  it("gli eventi di reparto modulano il costo fisico e mentale in base al ruolo", () => {
+    const crea=(id,n,random) => {
+      const career={reliability:70};
+      return ambiente({
+        random,
+        G:{
+          year:1,week:3,day:3,
+          job:{id,place:"fabbrica",n,pay:300,e:id==="capoturno"?28:40},
+          workplaces:{},gente:[],skills:{rete:0},
+          wellbeing:60,lucidita:50,shifts:2,strada:{giroAvviato:false}
+        },
+        extra:{
+          lavoroLuogo:job => job && job.place,
+          lavoroReteChiave:job => job && (job.place||job.id),
+          lavoroCarriera:()=>career
+        }
+      });
+    };
+
+    const operaioFisico=crea("operaio","Operaio",.21);
+    expect(operaioFisico.ctx.ADF_WORK_EVENTS.afterShift({},{
+      music:1,role:1,factory:0,crime:1,colleague:1,physical:1
+    })).toBe(true);
+    expect(operaioFisico.shown[0].t).toContain("muore di caldo");
+    expect(operaioFisico.shown[0].opts[1].d).toContain("−2 benessere");
+    operaioFisico.shown[0].opts[1].run();
+    expect(operaioFisico.G.wellbeing).toBe(58);
+
+    const capoFisico=crea("capoturno","Capoturno",.21);
+    expect(capoFisico.ctx.ADF_WORK_EVENTS.afterShift({},{
+      music:1,role:1,factory:0,crime:1,colleague:1,physical:1
+    })).toBe(true);
+    expect(capoFisico.shown[0].opts[1].d).toContain("−1 benessere");
+    capoFisico.shown[0].opts[1].run();
+    expect(capoFisico.G.wellbeing).toBe(59);
+
+    const operaioMentale=crea("operaio","Operaio",.31);
+    operaioMentale.ctx.ADF_WORK_EVENTS.afterShift({},{
+      music:1,role:1,factory:0,crime:1,colleague:1,physical:1
+    });
+    expect(operaioMentale.shown[0].t).toContain("protezione");
+    expect(operaioMentale.shown[0].opts[0].d).toContain("−1 lucidità");
+    operaioMentale.shown[0].opts[0].run();
+    expect(operaioMentale.G.lucidita).toBe(49);
+
+    const capoMentale=crea("capoturno","Capoturno",.31);
+    capoMentale.ctx.ADF_WORK_EVENTS.afterShift({},{
+      music:1,role:1,factory:0,crime:1,colleague:1,physical:1
+    });
+    expect(capoMentale.shown[0].opts[0].d).toContain("−2 lucidità");
+    capoMentale.shown[0].opts[0].run();
+    expect(capoMentale.G.lucidita).toBe(48);
+  });
+
+  it("la stanchezza Fabbrica segue il profilo del ruolo e può nascere da lucidità bassa", () => {
+    const crea=(id,n,wellbeing,lucidita,shifts) => ambiente({
+      random:.9,
+      G:{
+        year:1,week:6,day:4,
+        job:{id,place:"fabbrica",n,pay:300,e:id==="capoturno"?28:40},
+        workplaces:{},gente:[],skills:{rete:0},
+        wellbeing,lucidita,shifts,strada:{giroAvviato:false}
+      },
+      extra:{
+        lavoroLuogo:job => job && job.place,
+        lavoroReteChiave:job => job && (job.place||job.id)
+      }
+    });
+
+    const operaio=crea("operaio","Operaio",60,50,4);
+    expect(operaio.ctx.ADF_WORK_EVENTS.afterShift({},{
+      music:1,role:1,factory:1,crime:1,colleague:1,physical:0
+    })).toBe(true);
+    expect(operaio.shown[0].t).toContain("braccia");
+    expect(operaio.shown[0].opts[1].d).toContain("−4 benessere");
+    expect(operaio.shown[0].opts[1].d).toContain("−1 lucidità");
+    operaio.shown[0].opts[1].run();
+    expect(operaio.G.wellbeing).toBe(56);
+    expect(operaio.G.lucidita).toBe(49);
+
+    const capoturno=crea("capoturno","Capoturno",60,35,1);
+    expect(capoturno.ctx.ADF_WORK_EVENTS.afterShift({},{
+      music:1,role:1,factory:1,crime:1,colleague:1,physical:0
+    })).toBe(true);
+    expect(capoturno.shown[0].t).toContain("testa");
+    expect(capoturno.shown[0].opts[1].d).toContain("−1 benessere");
+    expect(capoturno.shown[0].opts[1].d).toContain("−4 lucidità");
+    capoturno.shown[0].opts[1].run();
+    expect(capoturno.G.wellbeing).toBe(59);
+    expect(capoturno.G.lucidita).toBe(31);
+    expect(capoturno.G.workplaces.fabbrica.workEvents.history.some(x =>
+      x.family==="physical" && x.roleId==="capoturno" &&
+      x.effects && x.effects.lucidita===-4
+    )).toBe(true);
+  });
+
   it("gli eventi di reparto Fabbrica non contaminano gli altri lavori", () => {
     const env=ambiente({
       G:{
@@ -498,7 +594,7 @@ describe("famiglie eventi lavoro", () => {
     expect(strada).toContain("ADF_WORK_EVENTS.consumeCrimeLead(successo)");
     expect(strada).toContain('"Dritta " + lead.sourceLabel');
     expect(eventi).toContain("ADF_WORK_EVENTS.crimeLeadActive()) return false");
-    expect(html).toContain('js/game/lavoro-eventi.js?v=4');
+    expect(html).toContain('js/game/lavoro-eventi.js?v=5');
     expect(famepedia).toContain("Quando il lavoro si scontra con la musica");
   });
 });
