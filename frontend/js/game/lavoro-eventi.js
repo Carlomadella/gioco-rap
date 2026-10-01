@@ -41,6 +41,20 @@ const CFG = Object.freeze({
   })
 });
 
+/* Le otto famiglie del punto 10. Alcune sono orchestrate qui, altre (come
+   lo straordinario Fabbrica) conservano il loro motore storico ma registrano
+   gli esiti nello stesso stato persistente. */
+const FAMILIES = Object.freeze({
+  discipline:Object.freeze({id:"discipline",label:"Presenze e disciplina"}),
+  career:Object.freeze({id:"career",label:"Carriera"}),
+  overtime:Object.freeze({id:"overtime",label:"Straordinari e richieste"}),
+  colleague:Object.freeze({id:"colleague",label:"Colleghi"}),
+  music:Object.freeze({id:"music",label:"Opportunità musicali"}),
+  crime:Object.freeze({id:"crime",label:"Opportunità criminali"}),
+  conflict:Object.freeze({id:"conflict",label:"Conflitto lavoro/musica"}),
+  physical:Object.freeze({id:"physical",label:"Conseguenze fisiche/mentali"})
+});
+
 const MUSIC_AGENDA_IDS = new Set(["live","free","sala","promo"]);
 const CRIME_JOBS = new Set(["buttafuori","fattorino"]);
 let bypassConflict = null;
@@ -582,6 +596,27 @@ function showPhysical(job,s,roll){
   return true;
 }
 
+/* ==================== 3. STRAORDINARI E RICHIESTE ==================== */
+
+function onOvertime(luogo,status,payload){
+  if(!luogo) return null;
+  const job=(G.job && workKey(G.job)===luogo)
+    ? G.job
+    : {id:luogo,place:luogo,n:luogo};
+  const s=state(job);
+  if(!s) return null;
+  payload=payload||{};
+  return record(s,"overtime",{
+    status:status||"updated",
+    overtimeType:payload.tipo||payload.overtimeType||null,
+    targetAbsoluteDay:payload.targetAbsoluteDay==null ? null : Number(payload.targetAbsoluteDay),
+    bonusPct:Number(payload.bonusPct||0),
+    reliabilityDelta:Number(payload.affidabilitaDelta!=null
+      ? payload.affidabilitaDelta
+      : payload.reliabilityDelta||0)
+  });
+}
+
 /* ==================== 1. PRESENZE / DISCIPLINA ==================== */
 
 function onDiscipline(luogo,result){
@@ -699,10 +734,12 @@ function afterShift(payload,rolls){
 
 window.ADF_WORK_EVENTS=Object.freeze({
   version:"1",
+  families:FAMILIES,
   guardAction,
   afterShift,
   onDiscipline,
   onCycle,
+  onOvertime,
   consumeMusicLead,
   crimeLeadActive,
   consumeCrimeLead,
