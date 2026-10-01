@@ -102,7 +102,7 @@
     return h * 60 + (+m[2]);
   };
   const adesso = () => {
-    try{ return window.GAME_TIME ? GAME_TIME.now().minutes : (G.timeMinutes || 8 * 60); }
+    try{ return window.GAME_TIME ? Number(GAME_TIME.now()) : (G.timeMinutes || 8 * 60); }
     catch(e){ return G.timeMinutes || 8 * 60; }
   };
   const chiave = (e, tipo) => tipo + ":" + e.id;
