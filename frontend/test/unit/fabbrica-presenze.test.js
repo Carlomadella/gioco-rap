@@ -310,6 +310,121 @@ describe("cartellino presenze Fabbrica", () => {
     expect(out.reliabilityAfter).toBe(50);
   });
 
+  it("sblocca la candidatura all'aumento dopo un ciclo pieno e affidabilità 60", () => {
+    const ctx = {
+      G:{year:1,week:4,day:7,job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40}},
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    vm.runInContext(`
+      G.workplaces = {
+        fabbrica:{
+          contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+          attendance:{ciclo:0,turni:[
+            0,1,2,3,4,
+            7,8,9,10,11,
+            14,15,16,17,18,
+            21,22,23,24,25
+          ]}
+        }
+      };
+      lavoroChiudiCiclo("fabbrica");
+    `, ctx);
+
+    expect(vm.runInContext('lavoroCarriera("fabbrica").cyclesInRole', ctx)).toBe(1);
+    expect(vm.runInContext('lavoroCarriera("fabbrica").reliability', ctx)).toBe(60);
+    expect(vm.runInContext('lavoroAumentoDisponibile("fabbrica")', ctx)).toBe(true);
+  });
+
+  it("un aumento cambia davvero la paga dei turni e viene registrato", () => {
+    const ctx = {
+      G:{year:1,week:5,day:1,job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40}},
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    vm.runInContext(`
+      G.workplaces = {
+        fabbrica:{
+          contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+          career:{
+            reliability:60,cyclesCompleted:1,perfectCycles:1,perfectStreak:1,
+            cyclesInRole:1,perfectCyclesInRole:1,roleId:"operaio",roleLevel:0,
+            raisesByRole:{},payHistory:[],roleHistory:[],evaluations:[]
+          }
+        }
+      };
+    `, ctx);
+
+    const out = vm.runInContext('lavoroApplicaAumento("fabbrica",{aumento:15,motivo:"test"})', ctx);
+    expect(out.prima).toBe(220);
+    expect(out.dopo).toBe(235);
+    expect(ctx.G.job.pay).toBe(235);
+    expect(ctx.G.workplaces.fabbrica.career.payHistory).toHaveLength(1);
+    expect(vm.runInContext('lavoroAumentoDisponibile("fabbrica")', ctx)).toBe(false);
+  });
+
+  it("dopo tre cicli buoni abilita la promozione e preserva il luogo", () => {
+    const ctx = {
+      G:{year:1,week:13,day:1,job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:235,e:40}},
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    vm.runInContext(`
+      G.workplaces = {
+        fabbrica:{
+          contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+          career:{
+            reliability:80,cyclesCompleted:3,perfectCycles:3,perfectStreak:3,
+            cyclesInRole:3,perfectCyclesInRole:3,roleId:"operaio",roleLevel:0,
+            raisesByRole:{operaio:1},payHistory:[],roleHistory:[],evaluations:[]
+          },
+          attendance:{ciclo:3,turni:[]}
+        }
+      };
+    `, ctx);
+
+    expect(vm.runInContext('lavoroPromozioneDisponibile("fabbrica")', ctx)).toBe(true);
+    expect(vm.runInContext('lavoroProssimoRuolo("fabbrica").id', ctx)).toBe("operaio_esperto");
+
+    const out = vm.runInContext(
+      'lavoroPromuoviRuolo("fabbrica",{nuovaPaga:260,energia:38,motivo:"test"})',
+      ctx
+    );
+
+    expect(out.da.id).toBe("operaio");
+    expect(out.a.id).toBe("operaio_esperto");
+    expect(ctx.G.job.id).toBe("operaio_esperto");
+    expect(ctx.G.job.n).toBe("Operaio esperto");
+    expect(ctx.G.job.place).toBe("fabbrica");
+    expect(ctx.G.job.pay).toBe(260);
+    expect(ctx.G.job.e).toBe(38);
+    expect(ctx.G.workplaces.fabbrica.career.cyclesInRole).toBe(0);
+    expect(ctx.G.workplaces.fabbrica.career.perfectCyclesInRole).toBe(0);
+    expect(ctx.G.workplaces.fabbrica.career.reliability).toBe(80);
+    expect(ctx.G.workplaces.fabbrica.career.roleHistory).toHaveLength(1);
+  });
+
+  it("prepara il motore eventi per requisiti ed effetti di carriera per luogo", () => {
+    const eventi = leggi("js/game/eventi-v2.js");
+
+    expect(eventi).toContain('if(t==="workplace_is")');
+    expect(eventi).toContain('if(t==="work_raise_available")');
+    expect(eventi).toContain('if(t==="work_promotion_available")');
+    expect(eventi).toContain('if(v.work_raise && typeof lavoroApplicaAumento==="function")');
+    expect(eventi).toContain('if(v.work_promotion && typeof lavoroPromuoviRuolo==="function")');
+    expect(eventi).toContain('workplace:typeof lavoroLuogo==="function" ? lavoroLuogo(G.job)');
+    expect(eventi).toContain('if(e && e.arc_id==="ARC106") return false;');
+  });
+
   it("chiude il ciclo lavorativo prima di avanzare la settimana", () => {
     const sim = leggi("js/game/sim.js");
     const close = sim.indexOf('if(typeof lavoroChiudiCicli === "function") lavoroChiudiCicli();');
