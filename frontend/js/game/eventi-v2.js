@@ -2330,20 +2330,24 @@ function adfFactoryStreetAfterShift(){
   return true;
 }
 
-/* Conoscenze nate in Fabbrica.
-   Sono persone vere di G.gente: se scambi il numero entrano nella chat e
-   possono produrre gli stessi beat/mix/video dei contatti conosciuti altrove. */
-function adfFactoryContactAfterShift(){
-  if(!G.job || typeof lavoroLuogo!=="function" || lavoroLuogo(G.job)!=="fabbrica")
-    return false;
-  if(typeof lavoroTentaIncontroContatto!=="function") return false;
+/* Conoscenze nate lavorando.
+   L'incontro scatta soltanto DOPO che il turno reale è terminato: quindi
+   eredita già giorno e ora prodotti dal motore del tempo. Non è un popup
+   ambientale scollegato dal clock. La persona creata resta in G.gente. */
+function adfWorkContactAfterShift(){
+  if(!G.job || typeof lavoroTentaIncontroContatto!=="function") return false;
+
+  const chiave=typeof lavoroReteChiave==="function"
+    ? lavoroReteChiave(G.job)
+    : ((typeof lavoroLuogo==="function" && lavoroLuogo(G.job)) || G.job.id);
+  if(!chiave) return false;
 
   const s=st();
   if(s.runtime.lastAutoEventKey===eventMinuteKey()) return false;
 
-  const p=lavoroTentaIncontroContatto("fabbrica",Math.random());
+  const p=lavoroTentaIncontroContatto(chiave,Math.random(),G.job);
   if(!p) return false;
-  if(!claimAutoEvent("factory-contact")) return false;
+  if(!claimAutoEvent("work-contact")) return false;
 
   s.lastHookEventDay=absDay();
 
@@ -2355,17 +2359,26 @@ function adfFactoryContactAfterShift(){
 
   let dettaglio="";
   if(p.ruolo==="fonico")
-    dettaglio="Ti racconta che fuori dal turno lavora anche dietro a un mixer.";
+    dettaglio="Parlando scopri che lavora anche dietro a un mixer.";
   else if(p.ruolo==="videomaker")
-    dettaglio="Ti fa vedere due clip sul telefono: fuori dal turno gira video.";
-  else
-    dettaglio="Ti dice che la sera produce beat sul portatile.";
+    dettaglio="Ti fa vedere due clip sul telefono: gira video quando non lavora.";
+  else if(p.ruolo==="beatmaker")
+    dettaglio="Ti dice che fuori dal lavoro produce beat.";
+  else if(p.ruolo==="rapper")
+    dettaglio="Scoprite di fare entrambi musica fuori dal lavoro.";
+  else if(p.ruolo==="promoter")
+    dettaglio="Gira tra serate e locali e conosce parecchie persone del giro.";
+  else if(p.ruolo==="strada")
+    dettaglio="Lo riconosci come una persona che frequenta lo stesso giro della Strada.";
+
+  const origine=p.origineDettaglio || "contatto conosciuto al lavoro";
+  const titoloLavoro=G.job && G.job.n ? G.job.n : "Lavoro";
 
   afterClear(()=>showEvent({
-    k:"Fabbrica · Colleghi",
-    t:giaVisto ? p.n+" torna a parlarti di musica" : "Un collega parla di musica",
-    d:"Durante il turno finisci a parlare con <b>"+p.n+"</b>. " +
-      dettaglio+"<br><br><b>"+ruolo+"</b> · collega di Fabbrica. " +
+    k:titoloLavoro+" · Contatti",
+    t:giaVisto ? p.n+" torna a fermarti dopo il turno" : "Una conoscenza dopo il turno",
+    d:"Hai appena finito di lavorare e finisci a parlare con <b>"+p.n+"</b>. " +
+      dettaglio+"<br><br><b>"+ruolo+"</b> · "+origine+". " +
       "Se nasce un contatto, resta una persona vera della tua rete e può ricomparire anche dopo.",
     annulla(){
       /* Chiudere il popup non cancella la persona: ormai vi siete conosciuti. */
@@ -2377,8 +2390,8 @@ function adfFactoryContactAfterShift(){
         if(!x) return {t:"Non siete riusciti a scambiarvi il numero.",c:""};
         if(typeof gain==="function") gain("rete",0.5);
         return {
-          t:"<b>"+p.n+"</b> è adesso nella tua rete. Lo trovi nelle chat come "+
-            ruolo.toLowerCase()+" · collega di Fabbrica.",
+          t:"<b>"+p.n+"</b> è adesso nella tua rete: "+ruolo.toLowerCase()+
+            " · "+origine+". Lo trovi nelle chat.",
           c:"good"
         };
       }},
@@ -2391,8 +2404,8 @@ function adfFactoryContactAfterShift(){
           c:""
         };
       }},
-      {n:"Resta sul lavoro", d:"Niente contatto per ora", run(){
-        return {t:"Vi conoscete di vista, ma per ora resta un collega della Fabbrica.",c:""};
+      {n:"Saluta e vai", d:"Nessun passo avanti nel rapporto", run(){
+        return {t:"Vi conoscete di vista. Se vi rincrocerete, il rapporto ripartirà da qui.",c:""};
       }}
     ]
   }),80);
@@ -2752,7 +2765,7 @@ for(const a of ACTIONS){
         ? adfFactoryStreetAfterShift()
         : false;
       const contactShown = a.id==="turno" && !overtimeShown && !streetShown
-        ? adfFactoryContactAfterShift()
+        ? adfWorkContactAfterShift()
         : false;
       if(!overtimeShown && !streetShown && !contactShown)
         emitHook("after_action",{action_id:a.id});
