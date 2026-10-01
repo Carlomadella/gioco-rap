@@ -856,25 +856,24 @@ describe("cartellino presenze Fabbrica", () => {
     expect(vm.runInContext('lavoroTentaIncontroContatto("fabbrica",0)', ctx)).toBeNull();
   });
 
-  it("i contatti di Fabbrica sono persone vere ma non occupano posti casuali al Circolo", () => {
+  it("i contatti di Fabbrica restano persone vere dentro il motore generico dei lavori", () => {
     const posto = leggi("js/game/posto.js");
     const chat = leggi("js/game/chat.js");
     const eventi = leggi("js/game/eventi-v2.js");
 
     expect(posto).toContain('p.origineLuogo = luogo;');
-    expect(posto).toContain('p.storia = luogo === "fabbrica"');
+    expect(posto).toContain('p.origineLavoro = meta.jobId || luogo;');
     expect(posto).toContain('p.numero = true;');
     expect(posto).toContain('function postoSoloLavoro(p)');
     expect(posto).toContain('!p.rivale && !postoSoloLavoro(p)');
     expect(posto).toContain('p => !p.via && !postoSoloLavoro(p)');
 
-    expect(chat).toContain('" · collega di Fabbrica"');
-    expect(chat).toContain('p.origineLuogo === "fabbrica"');
-    expect(chat).toContain('Fuori dal turno faccio beat');
-    expect(chat).toContain('Fuori dal turno sto dietro al mixer');
+    expect(chat).toContain('p.origineDettaglio || "conosciuto al lavoro"');
+    expect(chat).toContain('p.ruolo === "beatmaker"');
+    expect(chat).toContain('p.ruolo === "fonico"');
 
-    expect(eventi).toContain('function adfFactoryContactAfterShift()');
-    expect(eventi).toContain('claimAutoEvent("factory-contact")');
+    expect(eventi).toContain('function adfWorkContactAfterShift()');
+    expect(eventi).toContain('claimAutoEvent("work-contact")');
     expect(eventi).toContain('n:"Scambiatevi il numero"');
     expect(eventi).toContain('postoScambiaNumeroLavoro(p)');
     expect(eventi).toContain('const contactShown = a.id==="turno" && !overtimeShown');
