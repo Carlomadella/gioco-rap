@@ -131,6 +131,7 @@ describe("famiglie eventi lavoro", () => {
     env.shown[0].opts[0].run();
     expect(env.missed).toHaveLength(0);
     expect(env.started).toEqual(["turno"]);
+    expect(env.G.workplaces.barista.workEvents.pendingConflictMiss.voice.id).toBe("live");
 
     env.ctx.ADF_WORK_EVENTS.afterShift({
       started_at:17*60,
@@ -139,6 +140,7 @@ describe("famiglie eventi lavoro", () => {
     },{music:1,crime:1,colleague:1,physical:1});
 
     expect(env.missed).toHaveLength(1);
+    expect(env.G.workplaces.barista.workEvents.pendingConflictMiss).toBeUndefined();
     expect(env.G.workplaces.barista.workEvents.history.some(x =>
       x.family==="conflict" && x.choice==="work" && x.missed===true
     )).toBe(true);
