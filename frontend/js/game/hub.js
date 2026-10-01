@@ -415,13 +415,11 @@ function hubChiuso(l){
 }
 
 /* punto 59: due posti di lavoro veri sulla mappa, non un cartello con su
-   scritto «arriva a Milano». Si assume da solo chi ci va, se non lavora
-   già altrove — un posto alla volta, come è sempre stato G.job.
-   «Non ci si può licenziare dal lavoro corrente» (CARLO): il posto lo
-   lasci solo se ti mandano via — tre settimane senza presentarti, in
-   sim.js. Vale per tutti i lavori: qui, al centro per l'impiego, ai
-   colloqui (actions.js, offerJobs) e all'offerta degli eventi (eventi-v2,
-   `set_job`). Il testo di rifiuto qui sotto non promette più «lascialo». */
+   scritto «arriva a Milano». Un posto alla volta, come è sempre stato G.job.
+   La Fabbrica è già migrata al nuovo sistema: contratto, dimissioni,
+   disciplina per presenze e blocco di riassunzione. Gli altri lavori
+   continuano temporaneamente a usare le regole legacy finché verranno
+   migrati uno alla volta. */
 function completaAssunzione(def){
   G.job = {id:def.id, place:def.place || null, n:def.n, pay:def.pay, e:def.e, missed:0};
   pushLog("Hai preso il posto da " + def.n.toLowerCase() + ": " + def.pay + " € a turno.", "good");
@@ -442,8 +440,11 @@ function contrattoFabbrica(def){
       "<b>Durata:</b> " + durata + "<br>" +
       "<b>Presenze richieste:</b> " + turni + " giorni a settimana<br>" +
       "<b>Giorni ordinari:</b> lunedì–sabato<br>" +
-      "<b>Domenica:</b> riposo. Si lavora solo con una richiesta straordinaria dell'azienda.<br><br>" +
-      "Le presenze restano legate alla Fabbrica anche se in futuro cambi mansione.",
+      "<b>Domenica:</b> riposo. Si lavora solo con una richiesta straordinaria dell'azienda.<br>" +
+      "<b>Assenze:</b> 1–2 in un ciclo di 4 settimane riducono l'affidabilità; da 3 in su scatta un richiamo formale.<br>" +
+      "<b>Disciplina:</b> dopo 2 richiami, un altro ciclo grave porta al licenziamento e a 8 settimane senza riassunzione.<br>" +
+      "<b>Recupero:</b> 2 cicli perfetti consecutivi cancellano un richiamo.<br><br>" +
+      "Le presenze e la carriera restano legate alla Fabbrica anche se in futuro cambi mansione.",
     annulla(){},
     opts:[
       {n:"Firma il contratto", d:"Accetti le condizioni e diventi dipendente della Fabbrica", run(){
@@ -471,6 +472,19 @@ function contrattoFabbrica(def){
 function assumitiCome(jobId){
   const def = JOBS.find(j => j.id === jobId);
   if(!def) return;
+
+  if(def.place === "fabbrica" && !G.job &&
+     typeof lavoroBloccoRiassunzione === "function"){
+    const blocco = lavoroBloccoRiassunzione("fabbrica");
+    if(blocco.active){
+      hubChiuso({
+        n:def.n,
+        chiuso:"Dopo il licenziamento la Fabbrica non ti riassume ancora. Mancano " +
+          blocco.weeksRemaining + (blocco.weeksRemaining === 1 ? " settimana." : " settimane.")
+      });
+      return;
+    }
+  }
 
   const stessoLuogo = G.job && def.place && typeof lavoroLuogo === "function"
     ? lavoroLuogo(G.job) === def.place
@@ -544,8 +558,16 @@ function schedaLavoro(jobId, luogo){
    loro. Chi non ha i requisiti lo vede, ma non può prenderlo: niente finto. */
 function schedaImpiego(){
   const righe = JOBS.map(j => {
-    const ok = !j.req || j.req(G);
-    return {n:j.n, d:ok ? j.pay + " € · " + j.e + " energia" : "Serve di più: non ancora",
+    const reqOk = !j.req || j.req(G);
+    const blocco = j.place === "fabbrica" && typeof lavoroBloccoRiassunzione === "function"
+      ? lavoroBloccoRiassunzione("fabbrica")
+      : {active:false,weeksRemaining:0};
+    const ok = reqOk && !blocco.active;
+    const desc = blocco.active
+      ? "Riassunzione bloccata · " + blocco.weeksRemaining +
+        (blocco.weeksRemaining === 1 ? " settimana" : " settimane")
+      : ok ? j.pay + " € · " + j.e + " energia" : "Serve di più: non ancora";
+    return {n:j.n, d:desc,
       run(){ if(ok) assumitiCome(j.id); return null; }};
   });
   righe.push({n:"Lascia stare", d:"Torni alla mappa", run(){ return null; }});
