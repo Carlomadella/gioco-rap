@@ -22,7 +22,6 @@ on:
 
 permissions:
   contents: write
-  copilot-requests: write
 
 concurrency:
   group: roadmap-auto-${{ github.event_name == 'push' && github.ref_name || 'main' }}
@@ -31,7 +30,10 @@ concurrency:
 jobs:
   aggiorna:
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
+    env:
+      ADF_LOCAL_AI_MODEL: ${{ vars.ADF_LOCAL_AI_MODEL || 'gpt-oss:20b' }}
+      ADF_LOCAL_AI_BASE_URL: ${{ vars.ADF_LOCAL_AI_BASE_URL || 'http://127.0.0.1:11434/v1' }}
 
     steps:
       - name: Scegli branch
@@ -72,6 +74,7 @@ jobs:
         run: |
           node scripts/test-roadmap-auto.js
           node scripts/test-roadmap-audit-guard.js
+          node scripts/test-roadmap-local-agent.js
 
       - name: Importa tutto lo storico senza riscriverlo
         run: node scripts/roadmap-auto.js bootstrap
@@ -96,61 +99,15 @@ jobs:
           fi
           cp -a implementazioni/auto/tasks "$RUNNER_TEMP/tasks-prima-ai"
 
-      - name: Installa Copilot CLI
-        if: steps.piano.outputs.serve_ai == 'true'
-        run: npm install -g @github/copilot
-
       - name: Espandi richieste e verifica criteri
         id: ai
         if: steps.piano.outputs.serve_ai == 'true'
         shell: bash
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
         run: |
           set +e
-          if [ -z "$COPILOT_GITHUB_TOKEN" ]; then unset COPILOT_GITHUB_TOKEN; fi
-
-          CONTESTO_AUTOMAZIONE=$(cat <<'EOF_CONTEXT'
-          CONTESTO OPERATIVO DEL WORKFLOW:
-          - Sei già nel branch/worktree corretto predisposto da GitHub Actions.
-          - NON creare o cambiare branch. NON fare commit, pull o push.
-          - Puoi modificare SOLO i JSON task elencati nel prompt.
-          - Usa direttamente edit/apply_patch/create sui soli JSON autorizzati.
-
-          REGOLE DI CLASSIFICAZIONE OBBLIGATORIE:
-          - duplicate è una classificazione STRETTA: UNA singola task canonica deve avere perimetro, obiettivo e risultato atteso sostanzialmente equivalenti.
-          - Parole, categoria o sistema in comune NON bastano per duplicate.
-          - Se la nuova richiesta è più ampia della candidata, usa overlap, non duplicate.
-          - Più task strette che coprono pezzi diversi della richiesta implicano overlap, non duplicate.
-          - Se usi duplicate su una richiesta inbox: related_task_ids deve avere ESATTAMENTE una task e intake_note deve contenere la stringa delta=nessuno spiegando l'equivalenza.
-          - Non creare un piano per una modifica piccola/localizzata solo perché tocca più file o ha più criteri.
-          - Per una inbox unique/overlap, considera obbligatorio il piano automatico solo quando emergono almeno DUE segnali forti: 4+ systems E 4+ watch_paths; 3+ criteri; 2+ related_task_ids che coprono parti differenti.
-          - Se serve un auto-plan e l’utente non ha fornito V1...Vn, usa plan.mode=auto con ALMENO due step ordinati (V1 e V2 minimo), coprendo solo il delta reale.
-
-          FORMATO JSON OBBLIGATORIO:
-          - acceptance_criteria[] = { id, description, verification, status, evidence }.
-          - verification ammessi: automatic, code_audit, playtest.
-          - status dei criteri ammessi: pending, satisfied, needs_validation, blocked.
-          - plan = { mode, status, summary, steps, gaps, notes }.
-          - plan.mode ammessi: none, auto, user_defined.
-          - plan.status ammessi: not_applicable, draft, ready, gap_found, conflict.
-          - plan.steps[] = { id, title, objective, depends_on, systems, watch_paths, acceptance_criteria, status }.
-          - plan.steps[].id deve essere V1, V2, ...
-          - plan.steps[].status ammessi: planned, in_progress, needs_validation, complete, blocked.
-          - NON usare pending o satisfied come status di plan.steps.
-          - depends_on, systems, watch_paths e acceptance_criteria di ogni step devono essere sempre array, anche vuoti.
-          - Ogni criterio deve avere description non vuota ed evidence array, anche vuoto.
-          EOF_CONTEXT
-          )
-
-          copilot -p "$CONTESTO_AUTOMAZIONE
-
-          $(cat "$RUNNER_TEMP/roadmap-prompt.txt")" \
-            -s \
-            --available-tools='view,grep,glob,edit,apply_patch,create' \
-            --allow-tool='write' \
-            --no-ask-user
+          node scripts/roadmap-local-agent.js audit \
+            --prompt-file "$RUNNER_TEMP/roadmap-prompt.txt" \
+            --ids-file "$RUNNER_TEMP/audit-ids.txt"
           AI_CODE=$?
           CODE=$AI_CODE
 
@@ -161,24 +118,11 @@ jobs:
           fi
 
           if [ "$AI_CODE" -eq 0 ] && [ "$CODE" -ne 0 ]; then
-            echo "::warning::JSON AI non conformi: avvio un solo passaggio automatico di riparazione."
-            copilot -p "$CONTESTO_AUTOMAZIONE
-
-          RIPARAZIONE VINCOLATA DEL BATCH:
-          Il primo audit ha scritto i JSON ma il validatore deterministico li ha rifiutati.
-          Correggi SOLO gli stessi JSON. Preserva id, origin e source.
-          Mantieni l'analisi valida e correggi struttura/classificazione solo dove serve.
-          Se una richiesta inbox è più ampia della task candidata, deve essere overlap e non duplicate.
-          Se il validatore richiede un auto-plan, crealo con ALMENO due step ordinati (V1 e V2 minimo); un solo step non è valido.
-          ERRORI DEL VALIDATORE:
-          $(cat "$RUNNER_TEMP/audit-validation.log")
-
-          PROMPT ORIGINALE:
-          $(cat "$RUNNER_TEMP/roadmap-prompt.txt")" \
-              -s \
-              --available-tools='view,grep,glob,edit,apply_patch,create' \
-              --allow-tool='write' \
-              --no-ask-user
+            echo "::warning::JSON AI locali non conformi: avvio un solo passaggio automatico di riparazione."
+            node scripts/roadmap-local-agent.js repair \
+              --prompt-file "$RUNNER_TEMP/roadmap-prompt.txt" \
+              --ids-file "$RUNNER_TEMP/audit-ids.txt" \
+              --validation-file "$RUNNER_TEMP/audit-validation.log"
             REPAIR_CODE=$?
             CODE=$REPAIR_CODE
 
@@ -191,7 +135,7 @@ jobs:
           set -e
 
           if [ "$CODE" -ne 0 ]; then
-            echo "::error::Audit AI non completato o non conforme. Ripristino i JSON precedenti: niente falso verde."
+            echo "::error::Audit AI locale non completato o non conforme. Ripristino i JSON precedenti: niente falso verde."
             cat "$RUNNER_TEMP/audit-validation.log" 2>/dev/null || true
             rm -rf implementazioni/auto/tasks
             cp -a "$RUNNER_TEMP/tasks-prima-ai" implementazioni/auto/tasks
@@ -273,22 +217,15 @@ jobs:
       - name: Migliora la roadmap ufficiale dove mancano passaggi reali
         if: steps.roadmap.outputs.serve_ai == 'true'
         shell: bash
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
         run: |
           set +e
-          if [ -z "$COPILOT_GITHUB_TOKEN" ]; then unset COPILOT_GITHUB_TOKEN; fi
-          copilot -p "$(cat "$RUNNER_TEMP/roadmap-maintenance-prompt.txt")" \
-            -s \
-            --available-tools='view,grep,glob,edit,apply_patch' \
-            --allow-tool='write(ROADMAP.md)' \
-            --no-ask-user
+          node scripts/roadmap-local-agent.js roadmap \
+            --prompt-file "$RUNNER_TEMP/roadmap-maintenance-prompt.txt"
           CODE=$?
           set -e
 
           if [ "$CODE" -ne 0 ]; then
-            echo "::warning::Manutenzione roadmap non completata: ripristino ROADMAP.md senza inventare modifiche."
+            echo "::warning::Manutenzione roadmap locale non completata: ripristino ROADMAP.md senza inventare modifiche."
             cp "$RUNNER_TEMP/ROADMAP.before.md" ROADMAP.md
           fi
 
