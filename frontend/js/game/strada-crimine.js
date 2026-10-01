@@ -316,6 +316,16 @@ function stradaRifiutaPropostaFabbrica(){
   return proposta;
 }
 
+function stradaAnnullaPropostaFabbrica(){
+  const st=stradaFabbricaLeadStato();
+  if(!st.pending) return null;
+  const proposta=st.pending;
+  st.pending=null;
+  if(Number(st.lastOfferAbsoluteDay)===Number(proposta.offeredAbsoluteDay))
+    st.lastOfferAbsoluteDay=null;
+  return proposta;
+}
+
 function stradaConsumaPropostaFabbrica(colpoId,successo){
   const st=stradaFabbricaLeadStato();
   const lead=stradaFabbricaLeadAttivo(colpoId);
