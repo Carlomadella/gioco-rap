@@ -44,6 +44,7 @@ const CFG = Object.freeze({
 const MUSIC_AGENDA_IDS = new Set(["live","free","sala","promo"]);
 const CRIME_JOBS = new Set(["buttafuori","fattorino"]);
 let bypassConflict = null;
+let pendingConflictMiss = null;
 
 function nclamp(v,min,max){
   v=Number(v)||0;
@@ -197,8 +198,10 @@ function guardAction(id){
 
   const v=hit.voice;
   const s=state(G.job);
-  if(!claim("work-conflict")) return {ok:false,handled:true,reason:"event-busy"};
 
+  /* È una scelta richiesta dal giocatore PRIMA della mossa, non un evento
+     automatico: non occupa la chiave minuto dell'arbitro. Se chiudi e riprovi,
+     la decisione deve poter ricomparire nello stesso minuto. */
   if(typeof showEvent!=="function") return {ok:true};
 
   showEvent({
@@ -210,17 +213,10 @@ function guardAction(id){
     annulla(){},
     opts:[
       {n:"Vai al turno",d:"Prendi paga e presenza, ma perdi l'appuntamento",run(){
-        const missed=typeof AGENDA.mancaVoce==="function"
-          ? AGENDA.mancaVoce(v,"turno di lavoro")
-          : null;
-        record(s,"conflict",{
-          choice:"work",
-          jobId:G.job&&G.job.id,
-          appointmentId:v.id,
-          appointmentName:v.n,
-          appointmentTime:v.ora,
-          missed:!!missed
-        });
+        /* Non togliamo ancora la voce: il secondo avvio può comunque essere
+           respinto da luogo/orario. La perdita viene committata solo dopo che
+           il clock certifica che il turno ha davvero attraversato l'evento. */
+        pendingConflictMiss={voice:v,key,day:absDay(),jobId:G.job&&G.job.id};
         bypassConflict={key,day:absDay()};
         setTimeout(()=>{
           if(typeof avviaAzioneDiretta==="function") avviaAzioneDiretta("turno");
@@ -228,6 +224,7 @@ function guardAction(id){
         return null;
       }},
       {n:"Tieni l'appuntamento",d:"Non fai il turno: niente paga e il lavoro resta scoperto",run(){
+        pendingConflictMiss=null;
         record(s,"conflict",{
           choice:"music",
           jobId:G.job&&G.job.id,
@@ -648,11 +645,44 @@ function onCycle(luogo,evaluation){
 
 /* ==================== DOPO IL TURNO ==================== */
 
+/* Il conflitto scelto a favore del lavoro diventa "mancato" soltanto qui:
+   siamo dopo il commit del clock e possiamo verificare che l'intervallo del
+   turno abbia davvero attraversato l'appuntamento. */
+function commitConflictMiss(payload,job,s){
+  if(!pendingConflictMiss) return null;
+  const p=pendingConflictMiss;
+  pendingConflictMiss=null;
+
+  if(p.day!==absDay() || !p.voice) return null;
+  const from=Number(payload&&payload.started_at);
+  const to=Number(payload&&payload.ended_at);
+  const at=Number(p.voice.minuti);
+  if(!Number.isFinite(from) || !Number.isFinite(to) || !Number.isFinite(at) ||
+     !(at>=from && at<to)) return null;
+
+  const missed=window.AGENDA && typeof AGENDA.mancaVoce==="function"
+    ? AGENDA.mancaVoce(p.voice,"turno di lavoro")
+    : null;
+  record(s,"conflict",{
+    choice:"work",
+    jobId:p.jobId || (job&&job.id),
+    appointmentId:p.voice.id,
+    appointmentName:p.voice.n,
+    appointmentTime:p.voice.ora,
+    missed:!!missed,
+    startedAt:from,
+    endedAt:to
+  });
+  return missed;
+}
+
 function afterShift(payload,rolls){
   if(!G.job) return false;
   const job=G.job;
   const s=state(job);
   if(!s) return false;
+
+  commitConflictMiss(payload,job,s);
 
   rolls=rolls||{};
   const r=name => Number.isFinite(Number(rolls[name])) ? Number(rolls[name]) : Math.random();
