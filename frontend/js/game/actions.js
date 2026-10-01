@@ -142,52 +142,80 @@ const JOBS = [
    req:g => g.skills.flow >= 20, extra(){ G.skills.flow += 0.9; return " Flow +0.9."; }},
   /* punto 59: full time, non part time come il lavapiatti — paga di più e
      costa più energia, un turno vero ti si mangia la giornata */
-  {id:"operaio", n:"Operaio", pay:220, e:40, d:"Fabbrica, turno pieno, linea di montaggio. Si sente tutto."}
+  {id:"operaio", place:"fabbrica", n:"Operaio", pay:220, e:40, d:"Fabbrica, turno pieno, linea di montaggio. Si sente tutto."}
 ];
 
-/* ================= CARTELLINO PRESENZE FABBRICA =================
-   Il gioco non ha mesi di calendario: per la Fabbrica usiamo blocchi fissi
-   di quattro settimane. Il cartellino si azzera da solo all'inizio del blocco
-   successivo e conta i TURNI davvero eseguiti, non le visite alla schermata.
-   Più turni nello stesso giorno restano distinti (la casella mostra x2, x3...). */
-const ADF_FABBRICA_CICLO_SETTIMANE = 4;
-const ADF_FABBRICA_GIORNI_CICLO = ADF_FABBRICA_CICLO_SETTIMANE * 7;
+/* ================= LAVORO PER LUOGO =================
+   La carriera appartiene al posto di lavoro, non alla mansione. Oggi usa
+   questa base soltanto la Fabbrica; in futuro una promozione potrà cambiare
+   G.job.id/n/pay/e senza perdere presenze, anzianità o storico del luogo. */
+const ADF_LAVORO_CICLO_SETTIMANE = 4;
+const ADF_LAVORO_GIORNI_CICLO = ADF_LAVORO_CICLO_SETTIMANE * 7;
 
-function fabbricaSettimanaAssoluta(){
+function lavoroSettimanaAssoluta(){
   return typeof totalWeeks === "function"
     ? Math.max(1, Number(totalWeeks()) || 1)
     : Math.max(1, (Number(G.year || 1) - 1) * 52 + Number(G.week || 1));
 }
 
-function fabbricaCicloCorrente(){
-  return Math.floor((fabbricaSettimanaAssoluta() - 1) / ADF_FABBRICA_CICLO_SETTIMANE);
+function lavoroCicloCorrente(){
+  return Math.floor((lavoroSettimanaAssoluta() - 1) / ADF_LAVORO_CICLO_SETTIMANE);
 }
 
-function fabbricaPosizioneOggi(){
-  const settimanaNelCiclo = (fabbricaSettimanaAssoluta() - 1) % ADF_FABBRICA_CICLO_SETTIMANE;
+function lavoroPosizioneOggi(){
+  const settimanaNelCiclo = (lavoroSettimanaAssoluta() - 1) % ADF_LAVORO_CICLO_SETTIMANE;
   const giorno = Math.max(1, Math.min(7, Number(G.day || 1)));
   return settimanaNelCiclo * 7 + (giorno - 1);
 }
 
-function fabbricaCartellino(){
-  const ciclo = fabbricaCicloCorrente();
-  let stato = G.fabbricaPresenze;
+function lavoroLuogo(job){
+  if(!job) return null;
+  if(job.place) return job.place;
+  const def = (typeof JOBS !== "undefined" ? JOBS : []).find(j => j.id === job.id);
+  return def && def.place ? def.place : null;
+}
 
+function lavoroSede(luogo){
+  if(!luogo) return null;
+  if(!G.workplaces || typeof G.workplaces !== "object") G.workplaces = {};
+  if(!G.workplaces[luogo] || typeof G.workplaces[luogo] !== "object")
+    G.workplaces[luogo] = {};
+
+  const sede = G.workplaces[luogo];
+
+  /* Migrazione trasparente del cartellino creato prima di questa base
+     generica: nessuna presenza già fatta in Fabbrica viene persa. */
+  if(luogo === "fabbrica" && !sede.attendance &&
+     G.fabbricaPresenze && typeof G.fabbricaPresenze === "object"){
+    sede.attendance = {
+      ciclo:Number(G.fabbricaPresenze.ciclo),
+      turni:Array.isArray(G.fabbricaPresenze.turni) ? G.fabbricaPresenze.turni.slice() : []
+    };
+  }
+  return sede;
+}
+
+function lavoroCartellino(luogo){
+  const ciclo = lavoroCicloCorrente();
+  const sede = lavoroSede(luogo);
+  if(!sede) return null;
+
+  let stato = sede.attendance;
   if(!stato || typeof stato !== "object" || stato.ciclo !== ciclo || !Array.isArray(stato.turni)){
     stato = {ciclo:ciclo, turni:[]};
-    G.fabbricaPresenze = stato;
+    sede.attendance = stato;
   }else{
-    /* Salvataggi vecchi o dati sporchi non devono rompere la griglia. */
     stato.turni = stato.turni
       .map(Number)
-      .filter(n => Number.isInteger(n) && n >= 0 && n < ADF_FABBRICA_GIORNI_CICLO);
+      .filter(n => Number.isInteger(n) && n >= 0 && n < ADF_LAVORO_GIORNI_CICLO);
   }
 
-  const conteggi = Array(ADF_FABBRICA_GIORNI_CICLO).fill(0);
+  const conteggi = Array(ADF_LAVORO_GIORNI_CICLO).fill(0);
   stato.turni.forEach(n => { conteggi[n] += 1; });
 
-  const posOggi = fabbricaPosizioneOggi();
+  const posOggi = lavoroPosizioneOggi();
   return {
+    luogo:luogo,
     ciclo:ciclo,
     turni:stato.turni,
     conteggi:conteggi,
@@ -198,16 +226,23 @@ function fabbricaCartellino(){
   };
 }
 
-function fabbricaRegistraPresenza(){
-  const cartellino = fabbricaCartellino();
-  const pos = fabbricaPosizioneOggi();
-  G.fabbricaPresenze.turni.push(pos);
+function lavoroRegistraPresenza(luogo){
+  const cartellino = lavoroCartellino(luogo);
+  if(!cartellino) return null;
+  const pos = lavoroPosizioneOggi();
+  const stato = lavoroSede(luogo).attendance;
+  stato.turni.push(pos);
   return {
-    totale:G.fabbricaPresenze.turni.length,
-    oggi:G.fabbricaPresenze.turni.filter(n => n === pos).length,
+    luogo:luogo,
+    totale:stato.turni.length,
+    oggi:stato.turni.filter(n => n === pos).length,
     ciclo:cartellino.ciclo
   };
 }
+
+/* Compatibilità col renderer Fabbrica già esistente. */
+function fabbricaCartellino(){ return lavoroCartellino("fabbrica"); }
+function fabbricaRegistraPresenza(){ return lavoroRegistraPresenza("fabbrica"); }
 
 /* Cosa determina davvero la qualità di quello che fai:
    benessere, dove vivi, quanto hai lavorato questa settimana, quanti pezzi hai già fatto. */
@@ -294,7 +329,7 @@ function offerJobs(){
     n: j.n + " · " + j.pay + " € a turno",
     d: j.e + " energia per turno. " + j.d,
     run(){
-      G.job = {id:j.id, n:j.n, pay:j.pay, e:j.e, missed:0};
+      G.job = {id:j.id, place:j.place || null, n:j.n, pay:j.pay, e:j.e, missed:0};
       return {t:"Hai preso il posto da " + j.n.toLowerCase() + ": " + j.pay + " € a turno.", c:"good"};
     }
   }));
@@ -704,9 +739,10 @@ const ACTIONS = [
    run(){
      const j = G.job;
      G.money += j.pay; G.wellbeing -= 4; G.shifts = (G.shifts||0) + 1;
-     /* Il cartellino della Fabbrica si timbra qui, nel punto in cui il turno
-        è realmente eseguito. Aprire/chiudere la pagina non crea presenze. */
-     if(j && j.id === "operaio") fabbricaRegistraPresenza();
+     /* La presenza appartiene al luogo di lavoro: se in futuro passi da
+        Operaio a Capolinea/Capoturno in Fabbrica, il cartellino continua. */
+     const luogoLavoro = lavoroLuogo(j);
+     if(luogoLavoro) lavoroRegistraPresenza(luogoLavoro);
      const def = JOBS.find(x => x.id === j.id);
      let extra = "";
      if(def && def.extra) extra = def.extra();
