@@ -982,14 +982,20 @@ function consumeCrimeLead(success){
 /* ==================== 8. CONSEGUENZE FISICHE / MENTALI ==================== */
 
 function showPhysical(job,s,roll){
+  const roleProfile=factoryRoleEventLoad(job);
+  const wellbeing=Number(G.wellbeing==null?100:G.wellbeing);
+  const lucidita=Number(G.lucidita==null?100:G.lucidita);
+  /* La lucidità bassa diventa un trigger aggiuntivo solo per i ruoli Fabbrica,
+     dove il carico mentale è parte esplicita della progressione. Gli altri
+     lavori mantengono il comportamento precedente. */
   const overworked=Number(G.shifts||0)>=4 ||
-    Number(G.wellbeing||100)<=35 ||
-    Number(G.lucidita||100)<=35;
+    wellbeing<=35 ||
+    (!!roleProfile && lucidita<=35);
   if(!overworked || !familyReady(s,"physical") || Number(roll)>=CFG.chance.physical)
     return false;
   if(!claim("work-physical")) return false;
 
-  const profile=factoryRoleEventLoad(job) || DEFAULT_WORK_EVENT_LOAD;
+  const profile=roleProfile || DEFAULT_WORK_EVENT_LOAD;
   const recovery=profile.recovery || DEFAULT_WORK_EVENT_LOAD.recovery;
   const push=profile.push || DEFAULT_WORK_EVENT_LOAD.push;
 
