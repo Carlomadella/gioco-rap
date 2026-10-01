@@ -243,6 +243,128 @@ function lavoroDomenicaAutorizzata(luogo){
   return !!(sede && Number(sede.sundayPermitAbsoluteDay) === lavoroGiornoAssoluto());
 }
 
+function lavoroCarriera(luogo){
+  const sede = lavoroSede(luogo);
+  if(!sede) return null;
+  if(!sede.career || typeof sede.career !== "object"){
+    sede.career = {
+      reliability:50,
+      cyclesCompleted:0,
+      perfectCycles:0,
+      perfectStreak:0,
+      lastEvaluatedCycle:null,
+      lastEvaluation:null,
+      evaluations:[]
+    };
+  }
+  const c = sede.career;
+  c.reliability = Math.max(0, Math.min(100, Number(c.reliability == null ? 50 : c.reliability)));
+  c.cyclesCompleted = Math.max(0, Number(c.cyclesCompleted || 0));
+  c.perfectCycles = Math.max(0, Number(c.perfectCycles || 0));
+  c.perfectStreak = Math.max(0, Number(c.perfectStreak || 0));
+  if(!Array.isArray(c.evaluations)) c.evaluations = [];
+  return c;
+}
+
+function lavoroCicloInizioGiorno(ciclo){
+  return Number(ciclo || 0) * ADF_LAVORO_GIORNI_CICLO + 1;
+}
+
+function lavoroValutaCiclo(luogo, ciclo, turni){
+  const def = lavoroContrattoDef(luogo);
+  const contratto = lavoroContratto(luogo);
+  const carriera = lavoroCarriera(luogo);
+  if(!def || !contratto || !contratto.signed || !carriera) return null;
+
+  ciclo = Number(ciclo);
+  if(!Number.isInteger(ciclo) || ciclo < 0) return null;
+  if(Number(carriera.lastEvaluatedCycle) === ciclo) return carriera.lastEvaluation;
+
+  const startDay = lavoroCicloInizioGiorno(ciclo);
+  const eligible = Number(contratto.signedAbsoluteDay || Infinity) <= startDay;
+  const lista = Array.isArray(turni) ? turni.map(Number).filter(Number.isInteger) : [];
+  const settimane = [];
+
+  for(let w=0; w<ADF_LAVORO_CICLO_SETTIMANE; w++){
+    const from = w * 7, to = from + 7;
+    /* La domenica è straordinario: può pagare e avere effetti propri, ma non
+       ripara un'assenza ordinaria. Per il 5/5 contano lunedì-sabato e ogni
+       giorno vale una volta, anche se hai fatto due turni. */
+    const giorni = new Set(
+      lista.filter(n => n >= from && n < to && ((n - from) % 7) < 6)
+    );
+    const fatti = giorni.size;
+    const richiesti = Number(def.turniSettimanali || 0);
+    settimane.push({
+      settimana:w + 1,
+      giorni:fatti,
+      richiesti:richiesti,
+      completa:fatti >= richiesti,
+      assenze:Math.max(0, richiesti - fatti)
+    });
+  }
+
+  const fullWeeks = settimane.filter(x => x.completa).length;
+  const absences = settimane.reduce((n,x) => n + x.assenze, 0);
+  const perfect = eligible && fullWeeks === ADF_LAVORO_CICLO_SETTIMANE;
+  const reliabilityBefore = carriera.reliability;
+
+  if(eligible){
+    carriera.cyclesCompleted += 1;
+    if(perfect){
+      carriera.perfectCycles += 1;
+      carriera.perfectStreak += 1;
+      carriera.reliability = Math.min(100, carriera.reliability + 10);
+    }else{
+      carriera.perfectStreak = 0;
+    }
+  }
+
+  const evaluation = {
+    ciclo:ciclo,
+    eligible:eligible,
+    fullWeeks:fullWeeks,
+    absences:absences,
+    perfect:perfect,
+    reliabilityBefore:reliabilityBefore,
+    reliabilityAfter:carriera.reliability,
+    reliabilityDelta:carriera.reliability - reliabilityBefore,
+    settimane:settimane
+  };
+
+  carriera.lastEvaluatedCycle = ciclo;
+  carriera.lastEvaluation = evaluation;
+  carriera.evaluations.push(evaluation);
+  if(carriera.evaluations.length > 12) carriera.evaluations.shift();
+
+  if(eligible){
+    if(perfect){
+      if(typeof pushLog === "function")
+        pushLog("<b>Valutazione Fabbrica: 4/4 settimane complete.</b> Affidabilità +10.", "good");
+    }else if(typeof pushLog === "function"){
+      pushLog("<b>Valutazione Fabbrica:</b> " + fullWeeks + "/4 settimane complete · " +
+        absences + (absences === 1 ? " assenza." : " assenze."), absences ? "bad" : "");
+    }
+  }
+  return evaluation;
+}
+
+function lavoroChiudiCiclo(luogo){
+  const sede = lavoroSede(luogo);
+  if(!sede || !sede.attendance) return null;
+  const ciclo = lavoroCicloCorrente();
+  if(Number(sede.attendance.ciclo) !== ciclo) return null;
+  return lavoroValutaCiclo(luogo, ciclo, sede.attendance.turni);
+}
+
+function lavoroChiudiCicli(){
+  /* Si chiude soltanto alla quarta settimana del blocco corrente. */
+  if(((lavoroSettimanaAssoluta() - 1) % ADF_LAVORO_CICLO_SETTIMANE) !==
+     ADF_LAVORO_CICLO_SETTIMANE - 1) return [];
+  const luoghi = Object.keys(G.workplaces || {});
+  return luoghi.map(luogo => lavoroChiudiCiclo(luogo)).filter(Boolean);
+}
+
 function lavoroTurnoConsentitoOggi(luogo){
   const def = lavoroContrattoDef(luogo);
   if(!def) return {ok:true, reason:null};
@@ -287,6 +409,12 @@ function lavoroCartellino(luogo){
   if(!sede) return null;
 
   let stato = sede.attendance;
+  if(stato && typeof stato === "object" && Number(stato.ciclo) !== ciclo && Array.isArray(stato.turni)){
+    /* Rete di sicurezza per salvataggi/salti: se per qualunque motivo il
+       cambio ciclo non è passato da advanceWeek(), non buttiamo via il mese
+       precedente senza valutarlo. */
+    lavoroValutaCiclo(luogo, Number(stato.ciclo), stato.turni);
+  }
   if(!stato || typeof stato !== "object" || stato.ciclo !== ciclo || !Array.isArray(stato.turni)){
     stato = {ciclo:ciclo, turni:[]};
     sede.attendance = stato;
@@ -306,6 +434,7 @@ function lavoroCartellino(luogo){
     stato.turni.filter(n => n >= inizio && n < inizio + 7)
   ).size;
   const contratto = lavoroContrattoDef(luogo);
+  const carriera = lavoroCarriera(luogo);
   return {
     luogo:luogo,
     ciclo:ciclo,
@@ -316,7 +445,10 @@ function lavoroCartellino(luogo){
     settimana:settimana,
     giorno:(posOggi % 7) + 1,
     giorniLavoratiSettimana:giorniLavoratiSettimana,
-    turniSettimanaliRichiesti:contratto ? Number(contratto.turniSettimanali || 0) : 0
+    turniSettimanaliRichiesti:contratto ? Number(contratto.turniSettimanali || 0) : 0,
+    affidabilita:carriera ? carriera.reliability : 50,
+    mesiPerfetti:carriera ? carriera.perfectCycles : 0,
+    mesiPerfettiDiFila:carriera ? carriera.perfectStreak : 0
   };
 }
 
