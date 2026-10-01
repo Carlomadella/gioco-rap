@@ -557,9 +557,11 @@ function lfFabbrica(){
       (mio
         ? (straordinarioOggi
             ? '<b>Straordinario concordato oggi:</b> ' + lfEsc(straordinarioOggi.targetLabel) +
+              (straordinarioOggi.scenarioLabel ? ' · ' + lfEsc(straordinarioOggi.scenarioLabel) : '') +
               ' · maggiorazione +' + Number(straordinarioOggi.bonusPct || 0) + '%.'
             : straordinarioAccettato
               ? '<b>Straordinario concordato:</b> ' + lfEsc(straordinarioAccettato.targetLabel) +
+                (straordinarioAccettato.scenarioLabel ? ' · ' + lfEsc(straordinarioAccettato.scenarioLabel) : '') +
                 ' · maggiorazione +' + Number(straordinarioAccettato.bonusPct || 0) + '%.'
               : pagaTurno.percentuale
                 ? '<b>' + lfEsc(pagaTurno.etichetta) + ':</b> questo turno ha una maggiorazione del ' + pagaTurno.percentuale + '%.'
