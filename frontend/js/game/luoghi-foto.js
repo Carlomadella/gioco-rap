@@ -377,7 +377,10 @@ function lfFabbricaCartellino(){
 
   html += '<div class="lfpres-foot">' +
     '<span>Turni <b>' + cart.totale + '</b></span>' +
-    '<span>Settimana <b>' + cart.settimana + '/4</b></span>' +
+    (cart.turniSettimanaliRichiesti
+      ? '<span>Questa settimana <b>' + cart.giorniLavoratiSettimana + '/' + cart.turniSettimanaliRichiesti + '</b></span>'
+      : '') +
+    '<span>Ciclo <b>' + cart.settimana + '/4</b></span>' +
     '</div></div>';
   return html;
 }
@@ -426,18 +429,24 @@ function lfFabbrica(){
     '<p class="stnota lfnotasotto">' + lfEsc(def.d) + '</p>',
     "orologio");
 
+  const contratto = typeof lavoroContrattoDef === "function" ? lavoroContrattoDef("fabbrica") : null;
+  const quota = contratto ? Number(contratto.turniSettimanali || 0) : 0;
   const riga = stScelta({
     attr:"",
     on:true,
-    n:mio ? "Il tuo turno" : "Posto da operaio",
-    d:orario,
+    n:mio ? "Il tuo turno" : "Posto in Fabbrica",
+    d:orario + (quota ? " · " + quota + " giorni/settimana" : ""),
     v:stato.ok ? (fmt(def.pay) + " € · −" + def.e + " energia") : stato.perche,
     vCls:stato.ok ? "" : "calmo"
   });
-  const testo = mio ? "Fai il turno" : "Fatti assumere e lavora";
+  const testo = mio ? "Fai il turno" : "Leggi e firma il contratto";
   const azioneLavoro = mio ? ' data-vai="turno"' : ' data-lavoro="' + baseDef.id + '"';
   const mid = lfPan(mio ? "Vai al lavoro" : "Vuoi lavorare qui?",
-    '<p class="stnota">Linea di montaggio, otto ore piene. I soldi entrano, la giornata se ne va.</p>' +
+    '<p class="stnota">' +
+      (mio
+        ? 'Linea di montaggio, otto ore piene. Il cartellino misura la tua continuità in Fabbrica.'
+        : 'Prima di iniziare firmi un contratto: ' + (quota || 5) + ' giorni a settimana, lunedì–sabato. La domenica è riposo salvo straordinario richiesto dall’azienda.') +
+    '</p>' +
     riga +
     '<div class="stazioni"><button type="button" class="stprimo"' + azioneLavoro +
       (stato.ok ? "" : " disabled") + '>' + lfIco("orologio") + lfEsc(testo) +
