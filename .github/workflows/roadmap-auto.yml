@@ -30,7 +30,29 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  preflight-static:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scarica repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'push' && github.ref_name || 'main' }}
+          fetch-depth: 1
+      - name: Configura Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verifica motore e agente locale
+        run: |
+          node scripts/test-roadmap-auto.js
+          node scripts/test-roadmap-audit-guard.js
+          node --check scripts/roadmap-local-agent.js
+          node scripts/roadmap-local-agent.js self-test
+          bash -n scripts/setup-roadmap-local-runner.sh
+
   aggiorna:
+    needs: preflight-static
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: [self-hosted, Linux, X64, anni-di-fame-local]
     env:
@@ -88,12 +110,6 @@ jobs:
           }
           console.log('Ollama OK:', base, 'modello:', model);
           NODE
-
-      - name: Test motore roadmap
-        run: |
-          node scripts/test-roadmap-auto.js
-          node scripts/test-roadmap-audit-guard.js
-          node scripts/roadmap-local-agent.js self-test
 
       - name: Importa tutto lo storico senza riscriverlo
         run: node scripts/roadmap-auto.js bootstrap
