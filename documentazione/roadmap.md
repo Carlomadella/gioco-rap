@@ -123,11 +123,12 @@ non resta niente.
   sopra agli edifici»*;
 - Studio, Casa e Attività criminali sono ancora ammassate, e i pulsanti sopra la mappa
   restano grossi rispetto ai quadratini (foglio dei punti nuovi, Alessio);
-  **FATTO in parte (02/10/2026)** — la mappa non ha più solo il Circolo in alto al centro: lo
-  Shop è salito sul palazzo coi manifesti viola in alto a sinistra del Circolo (15 minuti dal
-  Circolo, 45 da Studio e Strada, 60 dalla zona industriale) e Casa è andata dov'era lo Shop
-  (`HUB_SAGOME` in `frontend/js/game/hub.js`, `TRAVEL_POS` in `spostamenti.js`). Il vecchio
-  palazzo di Casa resta senza cartello; i pulsanti grossi restano da fare;
+  **FATTO in parte (02/10/2026)** — la mappa non ha più solo il Circolo in alto al centro e
+  i posti sono distanti in modo più uniforme: Casa è andata dov'era lo Shop, lo Shop sul
+  palazzetto col murale in alto a sinistra del Circolo, lo Studio sul palazzetto di mattoni
+  poco più in alto a destra (`HUB_SAGOME` in `frontend/js/game/hub.js`, `TRAVEL_POS` in
+  `spostamenti.js`: Shop 15 minuti dal Circolo, 30 dallo Studio). I pulsanti grossi restano
+  da fare;
 - meno cartelli chiusi e più roba che si apre — *«Meno cartelli chiusi sulla mappa, più
   roba che si apre»*, a metà;
 - ogni parte del gioco con la sua ambientazione, e le schermate rifatte identiche alle foto

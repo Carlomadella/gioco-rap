@@ -145,20 +145,23 @@ const HUB_LUOGHI = [
    la sagoma che si vede, non la pianta dell'edificio.
    Per rimisurarne uno: le percentuali sono pixel/1672 e pixel/941. */
 const HUB_SAGOME = Object.freeze({
-  studio:  [[19.26,55.26],[27.03,50.80],[29.67,54.41],[29.55,61.64],[27.87,64.61],[19.74,63.97]],
+  /* 02/10/2026, Carlo: «lo studio poco più in alto a dx» e i posti ugualmente
+     distanti — il palazzetto di mattoni subito a destra di quello di prima. */
+  studio:  [[28.60,52.20],[31.20,51.30],[33.40,51.90],[33.60,57.00],[30.40,57.90],[29.40,56.00],[28.60,53.50]],
   pizzeria:[[49.64,69.29],[56.94,63.55],[62.44,66.95],[62.20,74.39],[58.31,80.23],
             [52.15,87.14],[47.73,83.74],[46.53,75.88]],
   beat:    [[44.86,31.88],[51.32,28.27],[58.31,31.03],[58.13,36.66],[52.93,39.53],[44.98,37.41]],
   /* 02/10/2026, Carlo: Casa va dov'era lo Shop (il palazzo stretto in alto a
-     sinistra), lo Shop sale sul palazzo coi manifesti viola in alto a
-     sinistra del Circolo. Il vecchio palazzo di Casa resta senza cartello. */
+     sinistra). Il vecchio palazzo di Casa resta senza cartello. */
   vita:    [[12.26,25.72],[14.53,23.59],[17.46,25.50],[17.52,31.88],[16.93,34.86],[12.44,33.79]],
   crimin:  [[1.79,65.36],[12.26,63.55],[14.95,72.26],[11.06,80.98],[3.29,78.64]],
   fabbrica:[[75.48,42.51],[79.84,38.89],[85.41,37.94],[92.11,42.72],[91.81,47.61],[87.44,49.73],[75.72,48.03]],
   palestra:[[74.16,76.09],[75.48,71.84],[82.24,69.08],[86.72,73.33],[86.48,79.91],[85.53,84.59],[74.64,85.02]],
-  /* lo spigolo in alto a destra non c'è apposta: sui monitor medi lì sopra
-     ci sta il cartello del Circolo, e un clic sull'angolo apriva il Circolo */
-  shop:    [[33.00,20.60],[39.60,19.60],[42.20,19.70],[42.20,28.40],[44.50,28.40],[44.50,30.30],[41.30,30.60],[33.20,28.40]],
+  /* 02/10/2026, Carlo: lo Shop «poco più in alto a sx» del Circolo, coi posti
+     ugualmente distanti — il palazzetto di mattoni col murale nella fila in
+     alto, a metà strada fra Casa e il Circolo. Il palazzo coi manifesti viola
+     sotto di lui resta senza cartello. */
+  shop:    [[32.60,16.00],[33.20,15.60],[38.60,16.00],[39.00,16.90],[39.00,19.70],[33.20,19.90],[32.80,18.60]],
 });
 
 /* Dal profilo si ricavano tre cose: il rettangolo che lo contiene (la misura

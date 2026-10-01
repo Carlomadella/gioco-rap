@@ -36,9 +36,11 @@
      dei tragitti già bilanciati.
 
      Sono i CENTRI percentuali degli hotspot originali, non nuove distanze —
-     tranne lo Shop, spostato apposta il 02/10/2026 (vedi sotto). */
+     tranne Studio e Shop, spostati apposta il 02/10/2026 (vedi sotto). */
   const TRAVEL_POS = Object.freeze({
-    studio:    {x:14.160, y:13.335},
+    /* 02/10/2026: lo Studio un poco più in alto a destra, come nella foto —
+       cambia solo Studio↔Shop, da 45 a 30 minuti. */
+    studio:    {x:17.500, y:10.500},
     pizzeria:  {x:90.040, y:60.420},
     beat:      {x:49.640, y:19.505},
     vita:      {x:17.745, y:59.330},
@@ -46,10 +48,10 @@
     fabbrica:  {x:88.410, y:29.580},
     palestra:  {x:75.520, y:85.415},
     /* 02/10/2026: lo Shop è salito in alto a sinistra del Circolo — sempre a
-       15 minuti dal Circolo, più vicino a Studio e Strada (45), più lontano
-       da Pizzeria, Fabbrica e Palestra (60). Casa ha solo cambiato palazzo
-       nella foto, a due passi, e i suoi tragitti restano quelli. */
-    shop:      {x:42.000, y:13.000},
+       15 minuti dal Circolo, 30 dallo Studio, 45 da Casa e Strada, 60 da
+       Pizzeria, Fabbrica e Palestra. Casa ha solo cambiato palazzo nella foto,
+       a due passi, e i suoi tragitti restano quelli. */
+    shop:      {x:40.000, y:9.500},
   });
 
   /* Solo i lavori che hanno già un punto fisico esplicito sulla mappa. */

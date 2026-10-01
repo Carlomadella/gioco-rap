@@ -2929,3 +2929,17 @@ resta senza cartello. Le distanze: in `TRAVEL_POS` (`spostamenti.js`) lo Shop è
 sinistra del Circolo e ci resta a 15 minuti; da Studio e Attività criminali passa da 60 a
 45, da Pizzeria, Fabbrica e Palestra da 45 a 60, da Casa resta 45. I tragitti di Casa non
 cambiano: nella foto si è spostata di poco.
+
+CARLO, 02/10/2026, dopo: «lo shop spostalo poco più in alto a sx, lo studio poco più in alto
+a dx, i luoghi sulla mappa devono essere ugualmente distanti tra di loro, sempre tenendo conto
+degli edifici».
+
+**FATTO (02/10/2026)** — lo Shop sale ancora, sul palazzetto di mattoni col murale nella
+fila in alto (x 32,6–39%, y 15,6–19,9%), a metà strada fra Casa e il Circolo; il palazzo coi
+manifesti viola resta senza cartello. Lo Studio va sul palazzetto di mattoni subito in alto a
+destra del suo (x 28,6–33,6%, y 51,3–57,9%). Misurate dai baricentri sulla foto, le distanze
+fra ogni posto e il suo vicino più prossimo vanno da 300 a 415 pixel (prima da 240 a 387, col
+Shop schiacciato sul Circolo); più uniformi non si può senza spostare Strada, Fabbrica e
+Palestra, che stanno sui loro palazzi. I tragitti seguono: Studio↔Shop da 45 a 30 minuti,
+il resto uguale. Nessun cartello sopra un altro o sopra il palazzo di un altro posto, da
+1024 × 768 a 1920 × 1080 e sul telefono.
