@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:e694bb9 -->
+## 01/10/26, 23:03 — task/fabbrica-bonus-malus-ruolo → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `e694bb9`
+
+### Cosa è entrato
+
+- `38bc685` — fix(fabbrica): limita il trigger mentale ai ruoli di stabilimento — **mycolbraga**
+- `d2a8e67` — chore(cache): invalida bonus malus ruolo Fabbrica — **mycolbraga**
+- `cb5f1f1` — test(fabbrica): copre bonus e malus differenziati per ruolo — **mycolbraga**
+- `db4a85a` — feat(fabbrica): differenzia bonus e malus eventi per ruolo — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/lavoro-eventi.js`
+- **Modificato:** `frontend/test/unit/lavoro-eventi.test.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:45440b3 -->
 ## 01/10/26, 22:50 — task/fabbrica-eventi-personalizzati → main
 
