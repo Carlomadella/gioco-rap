@@ -491,6 +491,15 @@ function lfFabbrica(){
   const pagaTurno = mio && typeof lavoroPagaTurno === "function"
     ? lavoroPagaTurno("fabbrica", def.pay)
     : {totale:def.pay, bonus:0, percentuale:0, etichetta:""};
+  const statoStraordinari = mio && typeof lavoroStraordinarioStato === "function"
+    ? lavoroStraordinarioStato("fabbrica")
+    : null;
+  const straordinarioAccettato = statoStraordinari && statoStraordinari.accepted
+    ? statoStraordinari.accepted
+    : null;
+  const straordinarioOggi = mio && typeof lavoroStraordinarioOggi === "function"
+    ? lavoroStraordinarioOggi("fabbrica")
+    : null;
   const notaBonus = pagaTurno.percentuale
     ? " · " + pagaTurno.etichetta + " +" + pagaTurno.percentuale + "%"
     : "";
@@ -511,9 +520,15 @@ function lfFabbrica(){
   const mid = lfPan(mio ? "Vai al lavoro" : "Vuoi lavorare qui?",
     '<p class="stnota">' +
       (mio
-        ? (pagaTurno.percentuale
-            ? '<b>' + lfEsc(pagaTurno.etichetta) + ':</b> questo turno ha una maggiorazione del ' + pagaTurno.percentuale + '%.'
-            : 'Linea di montaggio, otto ore piene. Il cartellino misura la tua continuità in Fabbrica.')
+        ? (straordinarioOggi
+            ? '<b>Straordinario concordato oggi:</b> ' + lfEsc(straordinarioOggi.targetLabel) +
+              ' · maggiorazione +' + Number(straordinarioOggi.bonusPct || 0) + '%.'
+            : straordinarioAccettato
+              ? '<b>Straordinario concordato:</b> ' + lfEsc(straordinarioAccettato.targetLabel) +
+                ' · maggiorazione +' + Number(straordinarioAccettato.bonusPct || 0) + '%.'
+              : pagaTurno.percentuale
+                ? '<b>' + lfEsc(pagaTurno.etichetta) + ':</b> questo turno ha una maggiorazione del ' + pagaTurno.percentuale + '%.'
+                : 'Linea di montaggio, otto ore piene. Il cartellino misura la tua continuità in Fabbrica.')
         : (bloccoRiassunzione.active
             ? 'Dopo il licenziamento la Fabbrica non ti riassume subito. Il blocco dura 8 settimane.'
             : 'Prima di iniziare firmi un contratto: ' + (quota || 5) + ' giorni a settimana, lunedì–sabato. La domenica è riposo salvo straordinario richiesto dall’azienda.')) +
