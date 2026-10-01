@@ -2368,6 +2368,8 @@ function adfWorkContactAfterShift(){
     dettaglio="Scoprite di fare entrambi musica fuori dal lavoro.";
   else if(p.ruolo==="promoter")
     dettaglio="Gira tra serate e locali e conosce parecchie persone del giro.";
+  else if(p.ruolo==="collega")
+    dettaglio="È una persona che lavori accanto abbastanza spesso da poterci costruire un rapporto vero.";
   else if(p.ruolo==="strada")
     dettaglio="Lo riconosci come una persona che frequenta lo stesso giro della Strada.";
 
