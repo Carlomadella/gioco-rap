@@ -6,6 +6,43 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:471c965 -->
+## 01/10/26, 21:09 â€” task/rimuovi-centro-impiego â†’ main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `471c965`
+
+### Cosa Ã¨ entrato
+
+- `f95897f` â€” docs(lavori): segna la rimozione del Centro per l'impiego â€” **mycolbraga**
+- `8d9dd18` â€” chore(cache): invalida i moduli dopo la rimozione del Centro impiego â€” **mycolbraga**
+- `1305f1b` â€” refactor(lavori): completa pulizia riferimenti cerca lavoro â€” **mycolbraga**
+- `86ff491` â€” test(lavori): protegge la rimozione del Centro per l'impiego â€” **mycolbraga**
+- `9685d24` â€” test(bilanciamento): usa la Fabbrica invece dei colloqui legacy â€” **mycolbraga**
+- `49d7f3e` â€” refactor(lavori): rimuove scena del vecchio cerca lavoro â€” **mycolbraga**
+- `5fee8ff` â€” refactor(lavori): aggiorna commento macchina azioni â€” **mycolbraga**
+- `ffbe266` â€” refactor(lavori): pulisce UI del vecchio cerca lavoro â€” **mycolbraga**
+- `e1cc3aa` â€” refactor(lavori): rimuove coordinate Centro per l'impiego â€” **mycolbraga**
+- `2a4f4fe` â€” refactor(lavori): rimuove orario Centro per l'impiego â€” **mycolbraga**
+- `4d0d832` â€” refactor(lavori): rimuove il tempo dei colloqui legacy â€” **mycolbraga**
+- `c1b1835` â€” refactor(mappa): rimuove il Centro per l'impiego â€” **mycolbraga**
+- `d0fa123` â€” refactor(lavori): mette in pausa i lavori legacy â€” **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/orari.js`
+- **Modificato:** `frontend/js/game/scene-art.js`
+- **Modificato:** `frontend/js/game/spostamenti.js`
+- **Modificato:** `frontend/js/game/tempo.js`
+- **Modificato:** `frontend/js/game/ui.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+
+**File interessati in questa categoria:** 8
+
+---
+
 <!-- merge:19f6506 -->
 ## 01/10/26, 20:34 â€” feature/pizzeria-cinematica â†’ main
 
