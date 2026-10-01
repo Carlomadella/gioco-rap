@@ -113,18 +113,21 @@ test("CI usa npm ci con Node 22 e cache del lockfile frontend",
   ciWorkflow.includes("node-version: 22") &&
   ciWorkflow.includes("run: npm ci") &&
   ciWorkflow.includes("frontend/package-lock.json"));
-/* Il giro lungo sta DENTRO alla catena, e ci deve restare: e' il percorso
-   dove il bug si era nascosto. Era stato messo fuori il 13/09 credendolo
-   instabile; non lo era — a farlo fallire era il watcher del server di
-   sviluppo, che ricaricava la pagina in mezzo alla partita (vedi il commento
-   in strumenti/dev.js). Se qualcuno lo rimette fuori, questo controllo lo
-   dice, e la domanda da farsi e' se il motivo e' vero o e' un'altra diagnosi
-   sbagliata. */
-test("il giro lungo nel browser gira almeno in CI, da solo",
+/* Il gate CI verifica il flusso Avvio rapido fino all'hub senza affidare
+   l'esito alle prestazioni di targets.bin sul runner headless. La prova
+   MakeHuman completa non sparisce: resta esplicita e manuale. */
+test("CI separa il flusso Avvio rapido dal MakeHuman reale senza togliere copertura",
   pkg.scripts && pkg.scripts["test:e2e"] &&
-  ciWorkflow.includes("run: npm run test:e2e:lento") &&
-  pkg.scripts["test:e2e:lento"] &&
-  pkg.scripts["test:e2e:lento"].includes("--grep @lento"));
+  pkg.scripts["test:e2e"].includes("--grep-invert @makehuman") &&
+  pkg.scripts["test:e2e:makehuman"] &&
+  pkg.scripts["test:e2e:makehuman"].includes("--grep @makehuman") &&
+  leggi("test/e2e/gameplay.spec.js").includes("avvio rapido conclude la cinematic ed entra nell'hub") &&
+  leggi("test/e2e/gameplay.spec.js").includes('page.route("**/media/makehuman-camerino-v1/index.html"') &&
+  leggi("test/e2e/gameplay.spec.js").includes("@makehuman") &&
+  ciWorkflow.includes("workflow_dispatch:") &&
+  ciWorkflow.includes("if: github.event_name == 'workflow_dispatch'") &&
+  ciWorkflow.includes("run: npm run test:e2e:makehuman"));
+
 /* Il watcher non deve tornare a guardare le cartelle dei dati: e' la causa
    vera di quei rossi, e senza questo controllo ci si ricasca al primo che
    "semplifica" quella riga. */

@@ -3342,23 +3342,10 @@ window.addEventListener('message', e=>{
        modifier): durante l'avvio rapido il gioco le mostra nella schermata
        «Preparo il tuo artista». Fuori dall'avvio rapido non servono a nessuno. */
     if(msg.type==='adf-makehuman-progress'){
-      const progressMessage=String(msg.message||'');
-      if(quickMakeHumanPending && /^ERRORE\b/i.test(progressMessage)){
-        quickMakeHumanPending=false;
-        quickMakeHumanRequested=false;
-        closeLocalEditor();
-        if(window.parent!==window){
-          window.parent.postMessage({
-            type:'adf-rpg-v24-quick-makehuman-error',
-            message:progressMessage
-          },'*');
-        }
-        return;
-      }
       if(quickMakeHumanPending && window.parent!==window){
         window.parent.postMessage({
           type:'adf-rpg-v24-quick-makehuman-progress',
-          message:progressMessage
+          message:String(msg.message||'')
         },'*');
       }
       return;

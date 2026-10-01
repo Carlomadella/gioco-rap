@@ -184,23 +184,15 @@
       clearTimeout(timeout);
       clearTimeout(silenzio);
     };
-    /* Watchdog per FASE, non per durata totale. Quasi tutte le fasi devono
-       parlare entro due minuti. L'eccezione reale è targets.bin (~145 MB):
-       su runner CI senza accelerazione la lettura/parsing può occupare diversi
-       minuti senza emettere eventi, quindi lì concediamo otto minuti. Non è il
-       timeout del test: è il limite operativo del caricamento MakeHuman. */
-    const timeoutFase = messaggio =>
-      /targets\.bin|modifier stack/i.test(String(messaggio || "")) ? 480000 : 120000;
-    const riarma = messaggio => {
+    /* Due minuti SENZA NOTIZIE, non due minuti in tutto: ogni fase che
+       arriva riparte il conto. Sulle macchine senza GPU la catena finisce
+       oltre i due minuti mandando fasi fino all'ultima, e un limite fisso
+       scattava mentre stava finendo. */
+    const riarma = () => {
       clearTimeout(timeout);
-      const ms = timeoutFase(messaggio);
       timeout = setTimeout(
-        () => fallisci(
-          ms > 120000
-            ? "Il caricamento del modello MakeHuman non dà notizie da otto minuti."
-            : "Il camerino non dà notizie da due minuti."
-        ),
-        ms
+        () => fallisci("Il camerino non dà notizie da due minuti."),
+        120000
       );
     };
 
@@ -233,7 +225,7 @@
          «Preparo il tuo artista» le mette in fila */
       if(msg.type === "adf-rpg-v24-quick-makehuman-progress"){
         clearTimeout(silenzio);
-        riarma(msg.message);
+        riarma();
         if(window.ADF_PREPARO) ADF_PREPARO.fase(msg.message);
         return;
       }
