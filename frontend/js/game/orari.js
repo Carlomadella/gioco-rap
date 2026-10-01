@@ -100,6 +100,9 @@
      lavoro e la sua durata, non solo l'orario di apertura del palazzo.
      Vale solo se quel lavoro è il tuo (o se non ne hai ancora uno): chi
      lavora altrove entra lo stesso, ma non gli fanno fare il turno. */
+  /* La mappa indica la mansione d'ingresso del luogo; non è l'identità
+     permanente del lavoratore. La Fabbrica può quindi promuovere cambiando
+     G.job.id senza perdere l'associazione al posto. */
   const PLACE_JOB = Object.freeze({fabbrica:"operaio", pizzeria:"lavapiatti"});
 
   function parseClock(text){
@@ -206,9 +209,21 @@
 
   /* Il turno di questo edificio, se è un lavoro che puoi davvero fare adesso. */
   function placeJobStatus(placeId, at){
-    const jid = PLACE_JOB[normalizePlace(placeId)];
+    const place = normalizePlace(placeId);
+    const jid = PLACE_JOB[place];
     if(!jid) return null;
-    if(G.job && G.job.id !== jid) return null;
+
+    /* Il posto resta lo stesso anche se la mansione cambia con una promozione.
+       Per salvataggi vecchi senza G.job.place, lavoroLuogo() ricava il luogo
+       dalla definizione JOBS. */
+    if(G.job){
+      const currentPlace = G.job.place ||
+        (typeof lavoroLuogo === "function" ? lavoroLuogo(G.job) : null);
+      if(currentPlace){
+        if(currentPlace !== place) return null;
+      }else if(G.job.id !== jid) return null;
+    }
+
     return jobStatus(jid, at);
   }
 
