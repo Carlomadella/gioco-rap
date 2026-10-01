@@ -35,7 +35,8 @@
      su una nuova grafica senza cambiare per sbaglio i 15/30/45/60 minuti
      dei tragitti già bilanciati.
 
-     Sono i CENTRI percentuali degli hotspot originali, non nuove distanze. */
+     Sono i CENTRI percentuali degli hotspot originali, non nuove distanze —
+     tranne lo Shop, spostato apposta il 02/10/2026 (vedi sotto). */
   const TRAVEL_POS = Object.freeze({
     studio:    {x:14.160, y:13.335},
     pizzeria:  {x:90.040, y:60.420},

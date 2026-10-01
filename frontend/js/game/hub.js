@@ -156,7 +156,9 @@ const HUB_SAGOME = Object.freeze({
   crimin:  [[1.79,65.36],[12.26,63.55],[14.95,72.26],[11.06,80.98],[3.29,78.64]],
   fabbrica:[[75.48,42.51],[79.84,38.89],[85.41,37.94],[92.11,42.72],[91.81,47.61],[87.44,49.73],[75.72,48.03]],
   palestra:[[74.16,76.09],[75.48,71.84],[82.24,69.08],[86.72,73.33],[86.48,79.91],[85.53,84.59],[74.64,85.02]],
-  shop:    [[33.00,20.60],[39.60,19.60],[44.50,19.80],[44.50,30.30],[41.30,30.60],[33.20,28.40]],
+  /* lo spigolo in alto a destra non c'è apposta: sui monitor medi lì sopra
+     ci sta il cartello del Circolo, e un clic sull'angolo apriva il Circolo */
+  shop:    [[33.00,20.60],[39.60,19.60],[42.20,19.70],[42.20,28.40],[44.50,28.40],[44.50,30.30],[41.30,30.60],[33.20,28.40]],
 });
 
 /* Dal profilo si ricavano tre cose: il rettangolo che lo contiene (la misura

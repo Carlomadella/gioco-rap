@@ -6764,3 +6764,21 @@ ho letto il codice cambiato rispetto a `origin/main` e chi lo chiama. Guardato e
 - **quanto pesa** — da sistemare con calma.
 - **RISOLTO (01/10/2026)** — `circoloSconosciuto` non guarda più `p.scoperto`: ascoltando ne
   capisci il carattere, il nome resta «???» finché non ci parli o ti presenti.
+
+## Giro del 02/10/2026 — la mappa con lo Shop spostato
+
+### 90. Sui monitor medi il cartello del Circolo copre l'angolo dello Shop
+- **dove** — `frontend/js/game/hub.js:159` (la sagoma nuova dello Shop, che arriva fino a
+  x 44,5%) e `frontend/css/hub.css:773-801` (il cartello sta sopra al palazzo e passa sopra
+  agli altri bottoni).
+- **cosa succede** — il cartello «Il Circolo» sta proprio sopra il bordo destro del palazzo
+  dello Shop. Sui monitor medi copre l'angolo in alto a destra del palazzo (l'8% a
+  1280 × 720 e 1280 × 800, un 2-3% a 1366 × 768 e 1024 × 768), e un clic su quell'angolo
+  apre il Circolo invece dello Shop. Anche i due cartelli restano a 4-5 pixel l'uno
+  dall'altro: col mouse sopra il Circolo il suo si alza e quasi tocca quello dello Shop. A
+  1440 e più, a 1180 e sotto i 900 non c'è niente di storto.
+- **come si vede** — finestra a 1280 × 800, plancia: il cartello «Il Circolo» sta sopra
+  il palazzo coi manifesti viola; un clic sul suo angolo alto a destra apre il Circolo.
+- **quanto pesa** — da sistemare con calma.
+
+**RISOLTO (02/10/2026)** — branch `task/mappa-shop-casa`: la sagoma dello Shop non ha più lo spigolo in alto a destra (x 42,2–44,5% solo da y 28,4% in giù). Misurato da 1024 × 768 a 1920 × 1080: il cartello del Circolo non copre più niente dello Shop, e i due cartelli non si toccano (5–8 px in verticale ai monitor medi).

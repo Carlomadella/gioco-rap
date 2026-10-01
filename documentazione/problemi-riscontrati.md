@@ -91,7 +91,12 @@ in `problemi-risolti.md`.
 
 Dal giro di fine task del 01/10 su `task/circolo-orari-e-pagine` (le quattro stanze del
 Circolo): le voci 85–89 sono chiuse lo stesso giorno nel branch, prima del push, e stanno in
-`problemi-risolti.md`. La prossima voce nuova è la 90.
+`problemi-risolti.md`.
+
+**91.** Nota: col cambio del 02/10 lo Shop sul telefono non si vede più senza scorrere la
+mappa (02/10). È la conseguenza di una scelta, non un errore.
+
+La prossima voce nuova è la 92.
 
 ---
 
@@ -756,3 +761,43 @@ dell'Uscita resta su «venerdì» anche per il pezzo dopo (`studio-automatico.js
 ed è una scelta normale, quindi non apro una voce.
 
 ---
+
+## Giro del 02/10/2026 (segnala-problemi, fine task `task/mappa-shop-casa`, `65191200` e `09d2bf49`)
+
+Non ho rifatto girare la verifica (era già passata). Ho letto i due commit, cercato in tutto
+`frontend/` chi dà per scontato dove stanno lo Shop e Casa, e ho aperto la plancia su un
+server mio (porta 8150) a 1920 × 1080, 1600 × 900, 1440 × 900, 1366 × 768, 1280 × 800,
+1280 × 720, 1180 × 820, 1024 × 768, 900 × 700, 390 × 844 e 844 × 390, misurando i cartelli.
+Guardato e **a posto**:
+
+- **I tragitti.** Rifatti a mano dai numeri di `spostamenti.js:51`: lo Shop è a 15 minuti dal
+  Circolo, 45 da Studio, Casa e Strada, 60 da Pizzeria, Fabbrica e Palestra, come dice il
+  commit. Casa non ha cambiato punto nei tragitti, quindi i suoi tempi sono quelli di prima.
+- **Nessun altro file sapeva dov'era lo Shop.** Gli orari (`orari.js:39`), gli eventi del
+  tempo (`eventi-tempo.js:39`), le transizioni video, le prove e l'audit nominano lo Shop
+  solo per nome, mai per posto o quartiere. Le vecchie coordinate non compaiono più da
+  nessuna parte.
+- **I quartieri.** Il centro della nuova sagoma dello Shop cade nel quartiere «centro»,
+  quella nuova di Casa tutta nella «periferia»: passando col mouse si accendono i cartelli
+  giusti.
+- **Le sagome di Shop e Circolo non si toccano**: fra le due resta una striscia di circa
+  0,4% della foto (un clic lì non apre niente, come deve). Nessun errore all'avvio a
+  nessuna misura.
+- **La mappa che scorre sul telefono** e la sua freccia non dipendono dai posti: funzionano
+  come prima.
+
+### 91. Nota: sul telefono lo Shop non si vede più senza scorrere la mappa
+- **dove** — `frontend/js/game/hub.js:159` (lo Shop ora sta fra il 33% e il 44,5% della foto)
+  e `frontend/css/stretto.css:510-524` (sotto i 900 la foto è larga 900 e si scorre col dito).
+- **cosa succede** — prima lo Shop stava sul bordo sinistro e sul telefono si vedeva appena
+  aperta la plancia. Adesso a 390 × 844 si vede solo mezzo cartello («SHOP · CHIUSO · APR»)
+  tagliato dal bordo destro, e per toccarlo bisogna scorrere. Non è un errore: è la
+  conseguenza di dove Carlo ha voluto lo Shop, e c'è la freccia che dice che la città
+  continua. Lo scrivo perché lo Shop è uno dei posti più usati. Già che c'è: il commento
+  in testa ai punti dei tragitti (`spostamenti.js:33-38`) dice ancora che sono tutti «i
+  centri dei bottoni di prima, non distanze nuove», e per lo Shop adesso non è più così.
+- **come si vede** — telefono in verticale, plancia: in alto a destra c'è mezzo cartello
+  dello Shop.
+- **quanto pesa** — da sistemare con calma (è una scelta: va deciso se va bene così).
+
+**RISOLTO in parte (02/10/2026)** — il commento in `spostamenti.js` ora dice che lo Shop è l'eccezione, spostato apposta. Resta da decidere se va bene lo Shop fuori vista sul telefono.
