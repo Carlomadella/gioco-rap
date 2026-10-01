@@ -43,9 +43,20 @@ const TRANSIZIONI_VIDEO = {
   /* sali sul palco del Circolo: fra il tasto e il primo dei tre momenti */
   palco:    "media/video/Transizioni di scena/11_live_definitivo.mp4"
 };
+
+/* Alcune entrate sono volutamente “a diapositive” invece che video: usano
+   lo stesso overlay, gli stessi tasti di skip e lo stesso fallback delle
+   transizioni mp4, ma mostrano tre immagini a schermo pieno in sequenza. */
+const TRANSIZIONI_SCENE = {
+  fabbrica: [
+    "media/video/Transizioni di scena/fabbrica_01_arrivo.png",
+    "media/video/Transizioni di scena/fabbrica_02_spogliatoio.png",
+    "media/video/Transizioni di scena/fabbrica_03_timbratura.png"
+  ]
+};
 /* I cartelli della mappa hanno un id loro (`data-l`): qui si dice quale
    filmato preparare quando il puntatore ci passa sopra. */
-const TRANSIZIONI_CARTELLI = {studio:"studio", beat:"sala", vita:"casa"};
+const TRANSIZIONI_CARTELLI = {studio:"studio", beat:"sala", vita:"casa", fabbrica:"fabbrica"};
 /* Finito un filmato, si prepara quello che può venire subito dopo dentro
    alla pagina appena aperta: in Cabina si registra, a Casa si stacca la
    spina. Un download che parte a pagina ferma, non sotto al dito. */
@@ -73,11 +84,131 @@ function transizioneVideoElemento(){
   return box;
 }
 
+function transizioneSceneElemento(){
+  let box = document.getElementById("tscene");
+  if(box) return box;
+
+  box = document.createElement("div");
+  box.id = "tscene";
+  box.className = "tscene";
+  box.tabIndex = -1;
+
+  const a = document.createElement("img");
+  const b = document.createElement("img");
+  a.className = "tscene-img on";
+  b.className = "tscene-img";
+  a.alt = ""; b.alt = "";
+  box.append(a, b);
+  document.body.appendChild(box);
+
+  if(!document.getElementById("tscene-css")){
+    const s = document.createElement("style");
+    s.id = "tscene-css";
+    s.textContent =
+      ".tscene{position:fixed;inset:0;z-index:170;background:#000;opacity:0;pointer-events:none;overflow:hidden;transition:opacity .24s ease}" +
+      ".tscene.on{opacity:1;pointer-events:auto}.tscene.attesa{opacity:0;pointer-events:auto}.tscene.via{opacity:0;pointer-events:none}" +
+      ".tscene-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.015);transition:opacity .28s ease,transform 1.45s ease}" +
+      ".tscene-img.on{opacity:1;transform:scale(1)}";
+    document.head.appendChild(s);
+  }
+  return box;
+}
+
+function transizioneScenePrepara(id){
+  const slides = TRANSIZIONI_SCENE[id];
+  if(!slides || TVID_CORRENTE) return;
+  slides.forEach(src => {
+    const img = new Image();
+    img.decoding = "async";
+    img.src = encodeURI(src);
+  });
+}
+
+function transizioneScene(id, poi){
+  const slides = TRANSIZIONI_SCENE[id];
+  const anim = !(typeof SET === "object" && SET && SET.look && SET.look.anim === false);
+  let ridotto = false;
+  try{ ridotto = window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(e){}
+  if(!slides || !slides.length || !anim || ridotto || TVID_CORRENTE){ poi(); return; }
+
+  const box = transizioneSceneElemento();
+  const imgs = Array.from(box.querySelectorAll(".tscene-img"));
+  let chiuso = false, attivo = 0, indice = 0, timer = 0, attesa = 0;
+
+  const sgancia = () => {
+    clearTimeout(timer); clearTimeout(attesa);
+    box.removeEventListener("click", fine);
+    document.removeEventListener("keydown", tasto, true);
+    document.removeEventListener("keyup", tasto, true);
+  };
+  const fine = () => {
+    if(chiuso) return;
+    chiuso = true; sgancia();
+    try{ poi(); }catch(e){ console.error(e); }
+    box.classList.remove("on", "attesa");
+    box.classList.add("via");
+    setTimeout(() => {
+      box.classList.remove("via");
+      TVID_CORRENTE = null;
+    }, 260);
+  };
+  const tasto = e => {
+    if(e.key === "Escape" || e.key === "Enter" || e.key === " "){
+      e.preventDefault();
+      if(e.type === "keydown") fine();
+    }else if(e.key === "Tab") e.preventDefault();
+  };
+  const mostra = n => {
+    const prossimo = 1 - attivo;
+    imgs[prossimo].src = encodeURI(slides[n]);
+    imgs[prossimo].classList.add("on");
+    imgs[attivo].classList.remove("on");
+    attivo = prossimo;
+  };
+  const avanti = () => {
+    if(chiuso) return;
+    indice += 1;
+    if(indice >= slides.length){ fine(); return; }
+    mostra(indice);
+    timer = setTimeout(avanti, 1350);
+  };
+  const carica = src => new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve();
+    img.onerror = reject;
+    img.src = encodeURI(src);
+  });
+
+  TVID_CORRENTE = id;
+  box.classList.remove("via", "on");
+  box.classList.add("attesa");
+  box.addEventListener("click", fine);
+  document.addEventListener("keydown", tasto, true);
+  document.addEventListener("keyup", tasto, true);
+  try{ box.focus({preventScroll:true}); }catch(e){}
+
+  /* Se uno degli asset manca non lasciamo mai il giocatore davanti al nero:
+     si entra normalmente in Fabbrica, come per un mp4 che non parte. */
+  attesa = setTimeout(fine, TRANSIZIONE_ATTESA);
+  Promise.all(slides.map(carica)).then(() => {
+    if(chiuso) return;
+    clearTimeout(attesa);
+    imgs[0].src = encodeURI(slides[0]);
+    imgs[0].classList.add("on");
+    imgs[1].classList.remove("on");
+    attivo = 0; indice = 0;
+    box.classList.remove("attesa");
+    box.classList.add("on");
+    timer = setTimeout(avanti, 1350);
+  }).catch(fine);
+}
+
 /* Mette in coda il download del filmato, senza farlo partire. Non mentre un
    altro sta andando: l'elemento video è uno solo, e cambiargli `src` a metà
    filmato lo taglia lì — succedeva con la precarica dello Studio (quattro
    secondi dopo l'avvio) se in quei quattro secondi toccavi la Sala. */
 function transizioneVideoPrepara(id){
+  if(TRANSIZIONI_SCENE[id]){ transizioneScenePrepara(id); return; }
   const src = TRANSIZIONI_VIDEO[id]; if(!src || TVID_CORRENTE) return;
   const v = transizioneVideoElemento().querySelector("video");
   const url = encodeURI(src);
@@ -86,6 +217,7 @@ function transizioneVideoPrepara(id){
 }
 
 function transizioneVideo(id, poi){
+  if(TRANSIZIONI_SCENE[id]){ transizioneScene(id, poi); return; }
   const src = TRANSIZIONI_VIDEO[id];
   const anim = !(typeof SET === "object" && SET && SET.look && SET.look.anim === false);
   /* «riduci movimento» del sistema (iOS e Android ce l'hanno fra le opzioni
