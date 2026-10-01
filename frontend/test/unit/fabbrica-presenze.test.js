@@ -187,10 +187,10 @@ describe("cartellino presenze Fabbrica", () => {
     const actions = leggi("js/game/actions.js");
     const luoghi = leggi("js/game/luoghi-foto.js");
 
-    expect(actions).toContain('bonus +" + paga.percentuale');
+    expect(actions).toContain('paga.etichetta + ": bonus +" + paga.percentuale');
     expect(actions).toContain('paga.totale');
     expect(luoghi).toContain('pagaTurno.etichetta');
-    expect(luoghi).toContain("(+" + pagaTurno.percentuale + "%)");
+    expect(luoghi).toContain("(pagaTurno.percentuale ? ' (+' + pagaTurno.percentuale + '%)' : '')");
   });
 
   it("blocca la domenica salvo autorizzazione esplicita per quel giorno", () => {
