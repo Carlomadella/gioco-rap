@@ -2210,6 +2210,68 @@ function autoResolveNormal(e){
 }
 
 /* -------------------- hook repo reali -------------------- */
+
+/* Straordinari Fabbrica.
+   Non sono flavour del catalogo: nascono da uno stato di lavoro preciso
+   (5/5 raggiunto venerdì/sabato), aprono una scelta reale e modificano una
+   data concreta del calendario. Restano comunque dentro l'arbitro eventi:
+   una stessa azione non può generare questo dialogo e un secondo evento. */
+function adfFactoryOvertimeAfterShift(){
+  if(!G.job || typeof lavoroLuogo!=="function" || lavoroLuogo(G.job)!=="fabbrica")
+    return false;
+  if(typeof lavoroTentaRichiestaStraordinario!=="function") return false;
+
+  const s=st();
+  if(s.runtime.lastAutoEventKey===eventMinuteKey()) return false;
+
+  const offerta=lavoroTentaRichiestaStraordinario("fabbrica",Math.random());
+  if(!offerta) return false;
+  if(!claimAutoEvent("factory-overtime")) return false;
+
+  s.lastHookEventDay=absDay();
+  const domenica=offerta.tipo==="domenica";
+  const giorno=offerta.targetLabel|| (domenica?"domenica":"sabato");
+  const bonus=Number(offerta.bonusPct||0);
+  const titolo=domenica
+    ? "Ti serve anche domenica?"
+    : "Puoi coprire anche sabato?";
+
+  afterClear(()=>showEvent({
+    k:"Fabbrica · Straordinario",
+    t:"Il capo ti ferma prima di uscire",
+    d:(domenica
+        ? "Domani la Fabbrica sarebbe chiusa per il tuo contratto, ma manca personale."
+        : "Hai già coperto i cinque giorni del contratto. Domani manca una persona sulla linea.") +
+      "<br><br>Il capo ti chiede se puoi entrare <b>"+giorno+"</b>. " +
+      "Il turno avrà una maggiorazione del <b>+"+bonus+"%</b>." +
+      "<br><br>Accettare è un impegno: se poi non ti presenti, perdi 5 punti di affidabilità.",
+    annulla(){ 
+      /* Chiudere con X equivale a non accettare: niente impegno nascosto. */
+      if(typeof lavoroRifiutaStraordinario==="function")
+        lavoroRifiutaStraordinario("fabbrica");
+    },
+    opts:[
+      {n:"Accetta", d:"Confermi il turno extra di "+giorno+" · +"+bonus+"%", run(){
+        const x=typeof lavoroAccettaStraordinario==="function"
+          ? lavoroAccettaStraordinario("fabbrica") : null;
+        if(!x) return {t:"La richiesta non è più disponibile.",c:""};
+        return {
+          t:"Hai accettato lo straordinario di "+giorno+
+            ". Se completi il turno, oltre alla maggiorazione guadagni anche affidabilità.",
+          c:"good"
+        };
+      }},
+      {n:"Rifiuta", d:"Nessuna penalità: resta il tuo giorno libero", run(){
+        if(typeof lavoroRifiutaStraordinario==="function")
+          lavoroRifiutaStraordinario("fabbrica");
+        return {t:"Hai rifiutato lo straordinario. Nessuna penalità.",c:""};
+      }}
+    ]
+  }),80);
+
+  return true;
+}
+
 function hookMatches(e, kind, payload){
   payload=payload||{};
   const h=e.repo_hook||{};
@@ -2376,6 +2438,8 @@ const _avanzaGiorno=avanzaGiorno;
 avanzaGiorno=function(){
   const wasJailed=adfInJail();
   const r=_avanzaGiorno.apply(this,arguments);
+  if(typeof lavoroAggiornaStraordinariTempo==="function")
+    lavoroAggiornaStraordinariTempo();
   if(!ADF.skipRunning && !wasJailed && !adfInJail()){
     const s=st();
     s.skip1Chain=0;
@@ -2553,8 +2617,10 @@ for(const a of ACTIONS){
     const jobBefore=G.job&&G.job.id;
     const out=old.apply(this,arguments);
     setTimeout(()=>{
-      emitHook("after_action",{action_id:a.id});
-      if(a.id==="turno" && G.job)
+      const overtimeShown = a.id==="turno" ? adfFactoryOvertimeAfterShift() : false;
+      if(!overtimeShown)
+        emitHook("after_action",{action_id:a.id});
+      if(a.id==="turno" && G.job && !overtimeShown)
         emitHook("after_job_shift",{
           action_id:"turno",
           job_id:G.job.id,
