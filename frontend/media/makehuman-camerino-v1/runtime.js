@@ -371,6 +371,11 @@ let nativeEngineBase=null;
 let nativeMorphedBody=null;
 let nativeCalibration=null;
 let nativeEngineReady=false;
+/* Il modifier engine carica/parsa targets.bin (~145 MB). Su runner CI senza GPU/CPU
+   dedicata può superare i 90 s: quel vecchio timeout assoluto scattava mentre il
+   caricamento era ancora sano e lasciava l'avvio rapido fermo in pregame. Restiamo
+   bounded, ma con un tetto coerente col giro E2E lungo. */
+const ADF_MH_ENGINE_BOOT_TIMEOUT_MS=480000;
 let nativeEngineReadyResolve=null;
 let nativeEngineReadyReject=null;
 let nativeRequestCounter=0;
@@ -2221,7 +2226,7 @@ function initNativeModifierEngine() {
 
     setTimeout(()=>{
       if(!nativeEngineReady) reject(new Error('Timeout modifier engine MakeHuman (targets.bin).'));
-    },90000);
+    },ADF_MH_ENGINE_BOOT_TIMEOUT_MS);
   });
 }
 

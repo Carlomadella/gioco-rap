@@ -2311,8 +2311,12 @@ test("quando la catena si rompe non resta il nero: tre strade, e il camerino mut
    finendo; «Fallo a mano» lasciava il camerino rotto sopra al creator e
    l'avvio rapido acceso, pronto ad applicare un preset a caso se il camerino
    si svegliava dopo. */
-test("i due minuti sono senza notizie (ripartono a ogni fase), e «Fallo a mano» spegne l'avvio rapido nel creator",
-  ingresso.includes("const riarma = () => {") && /progress"\)\{[\s\S]{0,120}?riarma\(\);/.test(ingresso) &&
+test("il watchdog è per fase: due minuti normalmente, otto per targets.bin; e «Fallo a mano» spegne l'avvio rapido nel creator",
+  ingresso.includes("const timeoutFase = messaggio =>") &&
+  ingresso.includes("480000 : 120000") &&
+  /progress"\)\{[\s\S]{0,160}?riarma\(msg\.message\);/.test(ingresso) &&
+  camerino.includes("const ADF_MH_ENGINE_BOOT_TIMEOUT_MS=480000;") &&
+  creatorHtml.includes("quickMakeHumanPending && /^ERRORE\\b/i.test(progressMessage)") &&
   ingresso.includes('postMessage({type:"adf-rpg-v24-quick-makehuman-cancel"}') &&
   creatorHtml.includes("msg.type==='adf-rpg-v24-quick-makehuman-cancel'") &&
   /quick-makehuman-cancel'\)\{[\s\S]{0,200}?quickMakeHumanPending = false;[\s\S]{0,200}?closeLocalEditor\(\);/.test(creatorHtml) &&
