@@ -101,7 +101,7 @@
      Vale solo se quel lavoro è il tuo (o se non ne hai ancora uno): chi
      lavora altrove entra lo stesso, ma non gli fanno fare il turno. */
   /* La mappa indica la mansione d'ingresso del luogo; non è l'identità
-     permanente del lavoratore. La Fabbrica può quindi promuovere cambiando
+     permanente del lavoratore. Fabbrica e Pizzeria possono quindi promuovere cambiando
      G.job.id senza perdere l'associazione al posto. */
   const PLACE_JOB = Object.freeze({fabbrica:"operaio", pizzeria:"lavapiatti"});
 
@@ -236,18 +236,17 @@
       }else if(G.job.id !== jid) return null;
     }
 
-    /* Fabbrica: la domenica è riposo contrattuale. Un evento di straordinario
-       potrà autorizzare soltanto quella domenica tramite
-       lavoroAutorizzaDomenica("fabbrica"). */
-    if(place === "fabbrica" && Number(G.day || 1) === 7){
-      const permesso = typeof lavoroDomenicaAutorizzata === "function" &&
-        lavoroDomenicaAutorizzata("fabbrica");
-      if(!permesso){
+    /* Il calendario appartiene al contratto del luogo: domenica in Fabbrica,
+       lunedì in Pizzeria. Eventuali eccezioni restano gestite dal motore
+       lavoro, non dall'orario della città. */
+    if(G.job && typeof lavoroTurnoConsentitoOggi === "function"){
+      const calendario = lavoroTurnoConsentitoOggi(place);
+      if(calendario && !calendario.ok){
         return {
           open:false,
           now:at == null ? GAME_TIME.now() : at,
           phase:"contract-rest",
-          label:"Domenica: riposo da contratto"
+          label:calendario.reason || "Riposo da contratto"
         };
       }
     }
