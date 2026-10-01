@@ -12,9 +12,9 @@ describe("cinematica ingresso Fabbrica", () => {
     const transizioni = leggi("js/game/transizioni-video.js");
     const hub = leggi("js/game/hub.js");
 
-    expect(transizioni).toContain('fabbrica_01_arrivo.png');
-    expect(transizioni).toContain('fabbrica_02_spogliatoio.png');
-    expect(transizioni).toContain('fabbrica_03_timbratura.png');
+    expect(transizioni).toContain('fabbrica_01_arrivo.webp');
+    expect(transizioni).toContain('fabbrica_02_spogliatoio.webp');
+    expect(transizioni).toContain('fabbrica_03_timbratura.webp');
     expect(transizioni).toContain('fabbrica:"fabbrica"');
     expect(hub).toMatch(/id:"fabbrica"[\s\S]*transizioneVideo\("fabbrica",\s*\(\) => apriLuogo\("fabbrica"\)\)/);
   });
