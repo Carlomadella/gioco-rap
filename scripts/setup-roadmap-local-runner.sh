@@ -64,10 +64,18 @@ mkdir -p "$RUNNER_DIR"
 cd "$RUNNER_DIR"
 
 if [ ! -f ./run.sh ]; then
+  DOWNLOADS_JSON="$(mktemp)"
+  if ! "${GH[@]}" api "repos/$REPO/actions/runners/downloads" > "$DOWNLOADS_JSON"; then
+    echo "GitHub CLI non ha i permessi necessari per leggere i pacchetti self-hosted runner." >&2
+    echo "Da PowerShell esegui: gh auth refresh -h github.com -s repo" >&2
+    rm -f "$DOWNLOADS_JSON"
+    exit 1
+  fi
+
   DOWNLOAD_URL="$(
-    "${GH[@]}" api "repos/$REPO/actions/runners/downloads" |
-      python3 -c 'import json,sys; rows=json.load(sys.stdin); xs=[r["download_url"] for r in rows if r.get("os")=="linux" and r.get("architecture")=="x64"]; print(xs[0] if xs else "")'
+    python3 -c 'import json,sys; rows=json.load(open(sys.argv[1])); xs=[r["download_url"] for r in rows if isinstance(r,dict) and r.get("os")=="linux" and r.get("architecture")=="x64"]; print(xs[0] if xs else "")' "$DOWNLOADS_JSON"
   )"
+  rm -f "$DOWNLOADS_JSON"
   if [ -z "$DOWNLOAD_URL" ]; then
     echo "Pacchetto GitHub Actions runner Linux x64 non trovato." >&2
     exit 1
@@ -80,7 +88,11 @@ if [ ! -f ./run.sh ]; then
 fi
 
 if [ ! -f .runner ]; then
-  TOKEN="$("${GH[@]}" api -X POST "repos/$REPO/actions/runners/registration-token" --jq .token)"
+  if ! TOKEN="$("${GH[@]}" api -X POST "repos/$REPO/actions/runners/registration-token" --jq .token)"; then
+    echo "GitHub CLI non ha i permessi necessari per registrare un self-hosted runner." >&2
+    echo "Da PowerShell esegui: gh auth refresh -h github.com -s repo" >&2
+    exit 1
+  fi
   echo "Registro il runner '$RUNNER_NAME' su $REPO con label '$RUNNER_LABEL'..."
   ./config.sh --unattended \
     --url "https://github.com/$REPO" \
