@@ -507,6 +507,7 @@ function showCrime(job,s,roll){
   if(!streetStarted() || (G.strada&&G.strada.arresto)) return false;
   if(!familyReady(s,"crime") || Number(roll)>=CFG.chance.crime) return false;
   if(activeLead("crimeLead")) return false;
+  if(typeof stradaFabbricaLeadAttivo==="function" && stradaFabbricaLeadAttivo()) return false;
 
   /* La Fabbrica ha già un lead dedicato, con numeri e varianti proprie. */
   if(typeof lavoroLuogo==="function" && lavoroLuogo(job)==="fabbrica") return false;
