@@ -266,9 +266,11 @@ function advanceWeek(){
      fisicamente dentro: il contatto con l'esterno passa dal micro-loop carcere. */
   if(!detenutoAInizioSettimana && typeof chatSettimana === "function") chatSettimana();
 
-  /* La quarta settimana chiude anche il ciclo lavorativo di 28 giorni.
-     Va fatto PRIMA di incrementare G.week, quando il cartellino contiene
-     ancora l'ultima settimana del periodo appena completato. */
+  /* La disciplina Fabbrica si chiude OGNI settimana: così una settimana
+     grave genera subito il richiamo e non resta invisibile fino alla fine
+     del mese. La quarta settimana chiude poi anche il ciclo di 28 giorni per
+     bonus/carriera. Entrambe vanno eseguite prima di G.week++. */
+  if(typeof lavoroChiudiSettimane === "function") lavoroChiudiSettimane();
   if(typeof lavoroChiudiCicli === "function") lavoroChiudiCicli();
 
   G.week++;
