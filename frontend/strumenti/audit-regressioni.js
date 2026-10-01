@@ -1287,6 +1287,13 @@ test("pannello fixed nel body viene riposizionato vicino al widget attivo",
   timeControls.includes('function positionPanel()') &&
   timeControls.includes('panel.style.left=Math.round(left)+"px"') &&
   timeControls.includes('panel.style.top=Math.round(top)+"px"'));
+test("widget tempo/meteo: click apre, uscita mouse dal perimetro richiude",
+  timeControls.includes('widget.addEventListener("click"') &&
+  timeControls.includes('widget.addEventListener("pointerleave",schedulePointerLeaveClose)') &&
+  timeControls.includes('panel.addEventListener("pointerleave",schedulePointerLeaveClose)') &&
+  timeControls.includes('ev.pointerType!=="mouse"') &&
+  timeControls.includes('const POINTER_LEAVE_CLOSE_MS = 180') &&
+  timeControls.includes('cancelPointerLeaveClose();\n    panelOpen=false;'));
 test("slider orario e tasti +/- lavorano a step di 15 minuti",
   timeControls.includes('type="range"') &&
   timeControls.includes('const STEP = Number(GAME_TIME.SLOT) || 15') &&
