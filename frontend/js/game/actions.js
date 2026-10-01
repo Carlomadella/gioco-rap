@@ -372,6 +372,7 @@ function lavoroCarriera(luogo){
       roleHistory:[],
       warnings:0,
       warningHistory:[],
+      weeklyEvaluations:[],
       dismissals:0,
       blockedUntilWeek:null,
       lastEvaluatedCycle:null,
@@ -393,6 +394,7 @@ function lavoroCarriera(luogo){
   c.warnings = Math.max(0, Math.min(2, Number(c.warnings || 0)));
   c.dismissals = Math.max(0, Number(c.dismissals || 0));
   if(!Array.isArray(c.warningHistory)) c.warningHistory = [];
+  if(!Array.isArray(c.weeklyEvaluations)) c.weeklyEvaluations = [];
   if(c.blockedUntilWeek != null && !Number.isFinite(Number(c.blockedUntilWeek))) c.blockedUntilWeek = null;
   if(!Array.isArray(c.evaluations)) c.evaluations = [];
 
@@ -585,82 +587,195 @@ function lavoroLicenzia(luogo, motivo){
   };
 }
 
+function lavoroSettimanaGiaValutata(luogo, absoluteWeek){
+  const c = lavoroCarriera(luogo);
+  if(!c) return false;
+  return c.weeklyEvaluations.some(x => Number(x.absoluteWeek) === Number(absoluteWeek));
+}
+
+function lavoroValutaDisciplinaSettimana(luogo, absoluteWeek, cycle, weekInCycle, turni, opts){
+  opts = opts || {};
+  if(luogo !== "fabbrica") return null;
+
+  const sede = lavoroSede(luogo);
+  const contratto = lavoroContratto(luogo);
+  const carriera = lavoroCarriera(luogo);
+  const def = lavoroContrattoDef(luogo);
+  if(!sede || !contratto || !contratto.signed || !carriera || !def) return null;
+
+  absoluteWeek = Number(absoluteWeek);
+  cycle = Number(cycle);
+  weekInCycle = Number(weekInCycle);
+  if(!Number.isInteger(absoluteWeek) || absoluteWeek < 1 ||
+     !Number.isInteger(cycle) || cycle < 0 ||
+     !Number.isInteger(weekInCycle) || weekInCycle < 0 || weekInCycle > 3)
+    return null;
+
+  const gia = carriera.weeklyEvaluations.find(x => Number(x.absoluteWeek) === absoluteWeek);
+  if(gia) return gia;
+
+  const weekStartAbsoluteDay = (absoluteWeek - 1) * 7 + 1;
+  /* Se hai firmato a settimana già iniziata, quella settimana non può
+     generare assenze/richiami retroattivi. */
+  const eligible = Number(contratto.signedAbsoluteDay || Infinity) <= weekStartAbsoluteDay;
+  const from = weekInCycle * 7;
+  const to = from + 7;
+  const lista = Array.isArray(turni) ? turni.map(Number).filter(Number.isInteger) : [];
+  const giorni = new Set(
+    lista.filter(n => n >= from && n < to && ((n - from) % 7) < 6)
+  );
+  const fatti = giorni.size;
+  const richiesti = Math.max(0, Number(def.turniSettimanali || 0));
+  const assenze = Math.max(0, richiesti - fatti);
+
+  const cfg = ADF_FABBRICA_CARRIERA.disciplina;
+  const primaAffidabilita = carriera.reliability;
+  const primaRichiami = carriera.warnings;
+  let warningAdded = 0;
+  let dismissed = false;
+
+  if(eligible){
+    if(assenze >= Number(cfg.assenzeRichiamoMin || 3)){
+      carriera.reliability = Math.max(0,
+        carriera.reliability - Number(cfg.malusRichiamoAffidabilita || 0));
+
+      if(carriera.warnings >= Number(cfg.richiamiPrimaLicenziamento || 2)){
+        dismissed = true;
+        lavoroLicenzia(luogo, "assenze ripetute");
+      }else{
+        carriera.warnings += 1;
+        warningAdded = 1;
+        carriera.warningHistory.push({
+          absoluteDay:lavoroGiornoAssoluto(),
+          absoluteWeek:absoluteWeek,
+          type:"warning",
+          reason:"assenze settimanali",
+          absences:assenze,
+          warnings:carriera.warnings
+        });
+      }
+    }else if(assenze > 0){
+      carriera.reliability = Math.max(0,
+        carriera.reliability - Number(cfg.malusLieveAffidabilita || 0));
+    }
+  }
+
+  const result = {
+    absoluteWeek:absoluteWeek,
+    cycle:cycle,
+    weekInCycle:weekInCycle + 1,
+    eligible:eligible,
+    workedDays:fatti,
+    requiredDays:richiesti,
+    absences:assenze,
+    warningAdded:warningAdded,
+    warningsBefore:primaRichiami,
+    warningsAfter:carriera.warnings,
+    reliabilityBefore:primaAffidabilita,
+    reliabilityAfter:carriera.reliability,
+    reliabilityDelta:carriera.reliability - primaAffidabilita,
+    dismissed:dismissed
+  };
+
+  carriera.weeklyEvaluations.push(result);
+  if(carriera.weeklyEvaluations.length > 24) carriera.weeklyEvaluations.shift();
+  if(carriera.warningHistory.length > 24)
+    carriera.warningHistory.splice(0, carriera.warningHistory.length - 24);
+
+  if(!opts.silent && eligible && typeof pushLog === "function"){
+    if(dismissed){
+      pushLog("<b>Licenziato dalla Fabbrica.</b> Dopo due richiami, un'altra settimana con " +
+        assenze + " assenze ha chiuso il rapporto. Non puoi essere riassunto qui per " +
+        Number(cfg.bloccoRiassunzioneSettimane || 0) + " settimane.", "bad");
+    }else if(warningAdded){
+      pushLog("<b>Richiamo formale in Fabbrica.</b> Settimana " + (weekInCycle + 1) +
+        ": " + assenze + " assenze · richiami " + carriera.warnings +
+        "/2 · affidabilità −" + Number(cfg.malusRichiamoAffidabilita || 0) + ".", "bad");
+    }else if(assenze > 0){
+      pushLog("<b>Presenze sotto contratto.</b> Settimana " + (weekInCycle + 1) +
+        ": " + assenze + (assenze === 1 ? " assenza" : " assenze") +
+        " · affidabilità −" + Number(cfg.malusLieveAffidabilita || 0) + ".", "bad");
+    }
+  }
+
+  return result;
+}
+
+/* Recupera le settimane già concluse del ciclo corrente.
+   Serve anche da migrazione per le partite già in corso: il cartellino che
+   l'utente sta guardando viene riallineato senza aspettare altre settimane. */
+function lavoroSincronizzaDisciplinaSettimane(luogo, silent){
+  const sede = lavoroSede(luogo);
+  if(!sede || !sede.attendance || !Array.isArray(sede.attendance.turni)) return [];
+
+  const ciclo = lavoroCicloCorrente();
+  if(Number(sede.attendance.ciclo) !== ciclo) return [];
+
+  const currentWeekInCycle = (lavoroSettimanaAssoluta() - 1) % ADF_LAVORO_CICLO_SETTIMANE;
+  const out = [];
+  for(let w=0; w<currentWeekInCycle; w++){
+    const absoluteWeek = ciclo * ADF_LAVORO_CICLO_SETTIMANE + w + 1;
+    if(lavoroSettimanaGiaValutata(luogo, absoluteWeek)) continue;
+    const r = lavoroValutaDisciplinaSettimana(
+      luogo, absoluteWeek, ciclo, w, sede.attendance.turni, {silent:!!silent}
+    );
+    if(r) out.push(r);
+    if(!G.job || lavoroLuogo(G.job) !== luogo) break;
+  }
+  return out;
+}
+
+function lavoroChiudiSettimana(luogo){
+  const sede = lavoroSede(luogo);
+  if(!sede || !sede.attendance || !Array.isArray(sede.attendance.turni)) return null;
+  const absoluteWeek = lavoroSettimanaAssoluta();
+  const ciclo = lavoroCicloCorrente();
+  const weekInCycle = (absoluteWeek - 1) % ADF_LAVORO_CICLO_SETTIMANE;
+  if(Number(sede.attendance.ciclo) !== ciclo) return null;
+  return lavoroValutaDisciplinaSettimana(
+    luogo, absoluteWeek, ciclo, weekInCycle, sede.attendance.turni, {silent:false}
+  );
+}
+
+function lavoroChiudiSettimane(){
+  const luoghi = Object.keys(G.workplaces || {});
+  return luoghi.map(luogo => lavoroChiudiSettimana(luogo)).filter(Boolean);
+}
+
+/* A fine ciclo non riapplichiamo le stesse assenze: la disciplina ormai è
+   settimanale. Il ciclo di 4 settimane resta per bonus affidabilità, carriera
+   e recupero dei richiami dopo due mesi perfetti consecutivi. */
 function lavoroApplicaDisciplina(luogo, evaluation){
   if(luogo !== "fabbrica" || !evaluation || !evaluation.eligible) return null;
   const c = lavoroCarriera(luogo);
   if(!c) return null;
   const cfg = ADF_FABBRICA_CARRIERA.disciplina;
-  const assenze = Math.max(0, Number(evaluation.absences || 0));
-  const beforeWarnings = c.warnings;
-  const beforeReliability = c.reliability;
-  let warningAdded = 0;
   let warningRemoved = 0;
-  let dismissed = false;
 
-  if(assenze === 0){
-    if(c.warnings > 0 &&
-       c.perfectStreak > 0 &&
-       c.perfectStreak % Number(cfg.recuperoRichiamoCicliPerfetti || 2) === 0){
-      c.warnings -= 1;
-      warningRemoved = 1;
-      c.warningHistory.push({
-        absoluteDay:lavoroGiornoAssoluto(),
-        type:"warning_removed",
-        reason:"due cicli perfetti consecutivi",
-        warnings:c.warnings
-      });
-    }
-  }else if(assenze <= Number(cfg.assenzeLieveMax || 2)){
-    c.reliability = Math.max(0, c.reliability - Number(cfg.malusLieveAffidabilita || 0));
-  }else if(assenze >= Number(cfg.assenzeRichiamoMin || 3)){
-    c.reliability = Math.max(0, c.reliability - Number(cfg.malusRichiamoAffidabilita || 0));
-
-    if(c.warnings >= Number(cfg.richiamiPrimaLicenziamento || 2)){
-      dismissed = true;
-      lavoroLicenzia(luogo, "assenze ripetute");
-    }else{
-      c.warnings += 1;
-      warningAdded = 1;
-      c.warningHistory.push({
-        absoluteDay:lavoroGiornoAssoluto(),
-        type:"warning",
-        reason:"assenze",
-        absences:assenze,
-        warnings:c.warnings
-      });
-    }
-  }
-
-  if(c.warningHistory.length > 24)
-    c.warningHistory.splice(0, c.warningHistory.length - 24);
-
-  const result = {
-    absences:assenze,
-    warningAdded:warningAdded,
-    warningRemoved:warningRemoved,
-    warningsBefore:beforeWarnings,
-    warningsAfter:c.warnings,
-    reliabilityBefore:beforeReliability,
-    reliabilityAfter:c.reliability,
-    dismissed:dismissed
-  };
-
-  if(typeof pushLog === "function"){
-    if(dismissed){
-      pushLog("<b>Licenziato dalla Fabbrica.</b> Dopo due richiami, le nuove assenze hanno chiuso il rapporto. " +
-        "Non puoi essere riassunto qui per " + Number(cfg.bloccoRiassunzioneSettimane || 0) + " settimane.", "bad");
-    }else if(warningAdded){
-      pushLog("<b>Richiamo formale in Fabbrica.</b> " + assenze + " assenze nel ciclo · richiami " +
-        c.warnings + "/2 · affidabilità −" + Number(cfg.malusRichiamoAffidabilita || 0) + ".", "bad");
-    }else if(warningRemoved){
+  if(Number(evaluation.absences || 0) === 0 &&
+     c.warnings > 0 &&
+     c.perfectStreak > 0 &&
+     c.perfectStreak % Number(cfg.recuperoRichiamoCicliPerfetti || 2) === 0){
+    c.warnings -= 1;
+    warningRemoved = 1;
+    c.warningHistory.push({
+      absoluteDay:lavoroGiornoAssoluto(),
+      type:"warning_removed",
+      reason:"due cicli perfetti consecutivi",
+      warnings:c.warnings
+    });
+    if(typeof pushLog === "function")
       pushLog("<b>Richiamo cancellato.</b> Due cicli perfetti consecutivi hanno ripulito il tuo storico recente.", "good");
-    }else if(assenze > 0){
-      pushLog("<b>Presenze sotto contratto.</b> " + assenze + (assenze === 1 ? " assenza" : " assenze") +
-        " nel ciclo · affidabilità −" + Number(cfg.malusLieveAffidabilita || 0) + ".", "bad");
-    }
   }
 
-  return result;
+  return {
+    absences:Number(evaluation.absences || 0),
+    warningAdded:0,
+    warningRemoved:warningRemoved,
+    warningsAfter:c.warnings,
+    reliabilityAfter:c.reliability,
+    dismissed:false
+  };
 }
 
 function lavoroValutaCiclo(luogo, ciclo, turni){
@@ -1120,6 +1235,10 @@ function lavoroCartellino(luogo){
       return giorniConsentiti.includes((n - inizio) + 1);
     })
   ).size;
+  /* Migrazione/sync: se questa partita era già dentro al ciclo quando il
+     sistema settimanale è stato introdotto, i richiami delle settimane già
+     chiuse vengono recuperati subito. */
+  lavoroSincronizzaDisciplinaSettimane(luogo, true);
   const carriera = lavoroCarriera(luogo);
   return {
     luogo:luogo,
