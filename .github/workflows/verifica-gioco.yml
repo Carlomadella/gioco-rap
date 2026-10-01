@@ -8,7 +8,10 @@ permissions:
   contents: read
 
 concurrency:
-  group: verifica-gioco-${{ github.workflow }}-${{ github.ref }}
+  # Push del branch e pull_request devono essere lo STESSO lavoro logico.
+  # github.ref cambia (refs/heads/... vs refs/pull/.../merge), head_ref no:
+  # senza questo ogni patch di una PR lanciava due CI identici in parallelo.
+  group: verifica-gioco-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
