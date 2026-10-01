@@ -242,27 +242,6 @@ S.turno = [...TINTA_HUSTLE,
   figura(100,92,0.96,"#3E4F47","#B0774A") +
   vign + grana];
 
-/* CERCA LAVORO — la bacheca, gli annunci */
-S.cercalavoro = [...TINTA_HUSTLE,
-  cielo("#2A2113","#100C06") +
-  '<rect x="0" y="96" width="200" height="32" fill="#171208"/>' +
-  '<rect x="26" y="14" width="148" height="76" rx="3" fill="#3B2B18"/>' +
-  '<rect x="30" y="18" width="140" height="68" fill="#5A452A"/>' +
-  '<g fill="#EFE6D2">' +
-    '<rect x="38" y="26" width="30" height="22" transform="rotate(-3 53 37)"/>' +
-    '<rect x="78" y="24" width="34" height="26" transform="rotate(2 95 37)"/>' +
-    '<rect x="124" y="28" width="30" height="20" transform="rotate(-2 139 38)"/>' +
-    '<rect x="44" y="56" width="34" height="22" transform="rotate(2 61 67)"/>' +
-    '<rect x="92" y="58" width="30" height="20" transform="rotate(-3 107 68)"/>' +
-    '<rect x="132" y="56" width="28" height="24" transform="rotate(3 146 68)"/></g>' +
-  '<g stroke="#A79A84" stroke-width="1.3">' +
-    '<path d="M42,32 h20M42,36 h14M84,30 h24M84,35 h18M84,40 h12M130,34 h20M130,39 h12' +
-      'M50,62 h22M50,67 h16M98,64 h18M98,69 h12M138,62 h16M138,67 h18"/></g>' +
-  '<g fill="#FF5A36"><circle cx="53" cy="26" r="2.4"/><circle cx="95" cy="24" r="2.4"/>' +
-    '<circle cx="139" cy="28" r="2.4"/><circle cx="61" cy="56" r="2.4"/><circle cx="107" cy="58" r="2.4"/></g>' +
-  figura(168,124,0.78,"#2E2A22","#82502D") +
-  vign + grana];
-
 /* STACCA — il divano, la tv accesa, la notte fuori */
 S.stacca = [...TINTA_VITA,
   cielo("#1B1838","#0A0916") +

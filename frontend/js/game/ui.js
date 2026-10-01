@@ -15,7 +15,7 @@ const SHOWN = {};
 const LAPERTE = new Set();
 /* punto 67: stesse quattro famiglie di colore delle card (scene-art.js),
    così il toast che segue un tap non stona col colore della card appena
-   premuta. Solo scrivi/beat/registra/free/cercalavoro ci passano davvero —
+   premuta. Solo scrivi/beat/registra/free ci passano davvero —
    le altre finiscono nella scena a pagina piena (SCENA_PIENA, sotto), non
    nel toast, ma restano coerenti anche loro se un giorno cambia qualcosa. */
 const ART = {
@@ -25,15 +25,15 @@ const ART = {
   pubblica:TINTA_STUDIO.concat("P"), promo:TINTA_HUSTLE.concat("O"),
   anteprima:TINTA_HUSTLE.concat("A"),
   free:TINTA_SUONO.concat("F"), live:TINTA_SUONO.concat("L"),
-  turno:TINTA_HUSTLE.concat("€"), cercalavoro:TINTA_HUSTLE.concat("C"),
+  turno:TINTA_HUSTLE.concat("€"),
   stacca:TINTA_VITA.concat("Z"), palestra_pesi:TINTA_VITA.concat("P"),
   palestra_cardio:TINTA_VITA.concat("P")
 };
 /* Punto 50: queste mosse finivano dritte in un toast — nessuna scena,
    nessuna pagina, un numero e via. Scrivi/beat/free hanno già la loro
    (foglio, piazza, e beat aspetta la scena del producer al punto 8);
-   registra e cercalavoro hanno già una finestra vera (il titolo del
-   pezzo, i due colloqui). Queste sette no: adesso aprono la scenetta che
+   registra ha già una finestra vera (il titolo del pezzo). Queste sette no:
+   adesso aprono la scenetta che
    avevano già sulla card (scene-art.js), grande, con l'esito scritto
    sopra — non un'altra riga di testo che vola via in due secondi. */
 const SCENA_PIENA = new Set(["mixa","pubblica","promo","anteprima","live","turno","stacca",

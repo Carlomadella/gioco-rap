@@ -45,7 +45,6 @@
     fabbrica:  {x:88.410, y:29.580},
     palestra:  {x:75.520, y:85.415},
     shop:      {x:54.035, y:44.335},
-    impiego:   {x:59.245, y:60.835}
   });
 
   /* Solo i lavori che hanno già un punto fisico esplicito sulla mappa. */

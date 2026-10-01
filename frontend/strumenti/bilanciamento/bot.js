@@ -21,12 +21,12 @@ function installaBot(){
   const on = id => { const el = document.getElementById(id); return !!(el && el.classList.contains("on")); };
   const conta = (tab, k) => { tab[k] = (tab[k] || 0) + 1; };
 
-  /* le finestre che non sono eventi: la scelta della strofa (writer.js), i colloqui
-     (actions.js) e il titolo del pezzo (copertine.js). Il bot prende la prima opzione
-     e non le conta fra gli eventi. I titoli li tiene fermi l'audit. */
-  const NON_EVENTI = ["Come la fai", "Colloqui", "Come lo chiami"];
+  /* le finestre che non sono eventi: la scelta della strofa, il contratto
+     iniziale in Fabbrica e il titolo del pezzo. Il bot prende la prima opzione
+     e non le conta fra gli eventi. */
+  const NON_EVENTI = ["Come la fai", "Fabbrica", "Come lo chiami"];
 
-  /* quello che resta aperto dopo un'azione o un salto: eventi, colloqui, il foglio,
+  /* quello che resta aperto dopo un'azione o un salto: eventi, contratti, il foglio,
      le schermate dei posti, gli overlay dei moduli eventi e crimine */
   function risolvi(sc){
     for(let giro = 0; giro < 25; giro++){
@@ -164,7 +164,14 @@ function installaBot(){
   const inCarcere = () => !!(G.strada && G.strada.arresto);
 
   function lavoro(sc, sempre){
-    if(!G.job){ if(sempre || G.money < 400) prova(sc, "cercalavoro"); return; }
+    if(!G.job){
+      if(!(sempre || G.money < 400)) return;
+      const viaggio = GAME_TRAVEL.go("fabbrica");
+      if(!viaggio || viaggio.ok === false) return;
+      if(typeof assumitiCome === "function") assumitiCome("operaio");
+      risolvi(sc);
+      return;
+    }
     if(sempre || ((G.shifts || 0) < 2 && (G.day === 2 || G.day === 4)) || G.money < 0) prova(sc, "turno");
   }
 

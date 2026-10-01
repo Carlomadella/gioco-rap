@@ -129,17 +129,20 @@ function promoDailyMult(){
     : ADF_PROMO_DAILY_FLOOR;
 }
 
-const JOBS = [
+/* I vecchi lavoretti restano documentati qui ma sono fuori dal gameplay
+   finché non verranno riprogettati dentro luoghi/situazioni reali della città.
+   Il catalogo JOBS contiene solo i lavori strutturati ancora giocabili. */
+const JOBS_LEGACY_PAUSED = Object.freeze([
   {id:"volantini", n:"Volantinaggio", pay:70,  e:18, d:"Freddo, gambe, nessuna dignità."},
+  {id:"fattorino", n:"Fattorino",    pay:125, e:18, d:"In giro col motorino, piove sempre."},
+  {id:"barista",   n:"Barista",      pay:130, e:18, d:"Conosci gente. Ogni turno un contatto in più."},
+  {id:"magazzino", n:"Magazziniere", pay:165, e:32, d:"Bancali e schiena. Paga bene, ti spegne."},
+  {id:"buttafuori",n:"Buttafuori",   pay:210, e:32, d:"Notti in piedi sulla porta di un locale."},
+  {id:"fonico",    n:"Fonico junior",pay:180, e:32, d:"In uno studio vero. Impari guardando."}
+]);
+
+const JOBS = [
   {id:"lavapiatti", place:"pizzeria", n:"Lavapiatti", pay:100, e:18, d:"Turni serali, cucina bollente."},
-  {id:"fattorino",  n:"Fattorino",    pay:125, e:18, d:"In giro col motorino, piove sempre."},
-  {id:"barista",    n:"Barista",      pay:130, e:18, d:"Conosci gente. Ogni turno un contatto in più.",
-   extra(){ G.skills.rete += 0.5; return " Rete +0.5."; }},
-  {id:"magazzino",  n:"Magazziniere", pay:165, e:32, d:"Bancali e schiena. Paga bene, ti spegne."},
-  {id:"buttafuori", n:"Buttafuori",   pay:210, e:32, d:"Notti in piedi sulla porta di un locale.",
-   req:g => g.skills.presenza >= 16},
-  {id:"fonico",     n:"Fonico junior", pay:180, e:32, d:"In uno studio vero. Impari guardando.",
-   req:g => g.skills.flow >= 20, extra(){ G.skills.flow += 0.9; return " Flow +0.9."; }},
   /* punto 59: full time, non part time come il lavapiatti — paga di più e
      costa più energia, un turno vero ti si mangia la giornata */
   {id:"operaio", place:"fabbrica", n:"Operaio", pay:220, e:40, d:"Fabbrica, turno pieno, linea di montaggio. Si sente tutto."}
@@ -1611,56 +1614,6 @@ const bancoBonus = () => (typeof studioBancoGuadagno === "function" ? studioBanc
 const mixGain = () => Math.round(6 + G.skills.flow*0.06)
   + studioBonus() + bancoBonus();
 
-function offerJobs(){
-  /* «Non ci si può licenziare dal lavoro corrente» (CARLO): con un posto in
-     tasca i colloqui non si fanno — accettarne uno voleva dire mollare
-     quello di prima. La mossa «Cerca lavoro» lo sa già (avail), questo è
-     per chiunque altro arrivi qui. */
-  if(G.job){
-    const luogo = typeof lavoroLuogo === "function" ? lavoroLuogo(G.job) : null;
-    const dimissioniDisponibili = luogo && typeof lavoroContrattoDef === "function" && !!lavoroContrattoDef(luogo);
-    showEvent({k:"Colloqui", t:"Hai già un posto",
-      d:"Lavori già come " + G.job.n.toLowerCase() +
-        (dimissioniDisponibili
-          ? ". Se vuoi cercarne un altro, dai prima le dimissioni dal posto in cui lavori."
-          : ". Un posto alla volta."),
-      opts:[{n:"Va bene", d:"Torni a quello che facevi", run(){ return null; }}]});
-    return;
-  }
-  const pool = JOBS.filter(j => {
-    if(j.req && !j.req(G)) return false;
-    if(G.job && G.job.id === j.id) return false;
-    if(j.place && typeof lavoroContrattoDef === "function" && lavoroContrattoDef(j.place) &&
-       typeof lavoroBloccoRiassunzione === "function" &&
-       lavoroBloccoRiassunzione(j.place).active) return false;
-    return true;
-  });
-  const picks = [];
-  while(picks.length < 2 && picks.length < pool.length){
-    const j = pick(pool);
-    if(picks.indexOf(j) < 0) picks.push(j);
-  }
-  const opts = picks.map(j => ({
-    n: j.n + " · " + j.pay + " € a turno",
-    d: j.e + " energia per turno. " + j.d,
-    run(){
-      if(j.place && typeof lavoroContrattoDef === "function" && lavoroContrattoDef(j.place)){
-        if(typeof assumitiCome === "function"){
-          assumitiCome(j.id);
-          return null;
-        }
-        return {t:"Per questo posto devi firmare il contratto sul posto.", c:""};
-      }
-      G.job = {id:j.id, place:j.place || null, n:j.n, pay:j.pay, e:j.e, missed:0};
-      return {t:"Hai preso il posto da " + j.n.toLowerCase() + ": " + j.pay + " € a turno.", c:"good"};
-    }
-  }));
-  opts.push({n:"Nessuno dei due", d:"Resti senza stipendio fisso.",
-    run(){ return {t:"Hai rifiutato entrambi. La settimana prossima si vedrà.", c:""}; }});
-  showEvent({k:"Colloqui", t:"Due posti liberi",
-    d:"Non è quello che vuoi fare nella vita. È quello che paga la sala e i beat.", opts});
-}
-
 /* ================= LA PALESTRA (punto 9) =================
    Non è più un pulsante piatto: al cartello sulla mappa si sceglie tra
    Pesi e Cardio (hub.js), e la costanza conta più della singola seduta.
@@ -2100,12 +2053,6 @@ const ACTIONS = [
      }
      return msg + extra;
    }},
-
-  {id:"cercalavoro", n:"Cerca lavoro", e:10, luc:-1,
-   d:"Due colloqui, due possibilità.",
-   avail:() => !G.job,
-   give:() => "2 offerte fra cui scegliere",
-   run(){ offerJobs(); return "Hai fatto due colloqui."; }},
 
   {id:"stacca", n:"Stacca la spina", e:14, luc:1,
    d:"Dormi, mangi, vedi gente normale.",
