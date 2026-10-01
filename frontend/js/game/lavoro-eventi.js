@@ -23,6 +23,7 @@ const CFG = Object.freeze({
     music:6,
     crime:10,
     role:6,
+    factory:4,
     physical:3
   }),
   chance:Object.freeze({
@@ -30,6 +31,7 @@ const CFG = Object.freeze({
     music:.14,
     crime:.12,
     role:.18,
+    factory:.16,
     physical:.24
   }),
   career:Object.freeze({
@@ -52,6 +54,7 @@ const FAMILIES = Object.freeze({
   overtime:Object.freeze({id:"overtime",label:"Straordinari e richieste"}),
   colleague:Object.freeze({id:"colleague",label:"Colleghi"}),
   role:Object.freeze({id:"role",label:"Responsabilità di ruolo"}),
+  factory:Object.freeze({id:"factory",label:"Vita di Fabbrica"}),
   music:Object.freeze({id:"music",label:"Opportunità musicali"}),
   crime:Object.freeze({id:"crime",label:"Opportunità criminali"}),
   conflict:Object.freeze({id:"conflict",label:"Conflitto lavoro/musica"}),
@@ -496,6 +499,162 @@ function showFactoryRole(job,s,roll){
   return true;
 }
 
+/* ==================== VITA DI FABBRICA ====================
+   Eventi ambientali dello stabilimento, indipendenti dalla mansione.
+   Sono volutamente piccoli e misti: lavorare non è una punizione automatica.
+   Alcune giornate pesano, altre aprono una pausa o un'occasione per gestire
+   meglio il turno. Gli eventi di responsabilità restano invece nella famiglia
+   "role" sopra. */
+const FACTORY_FLOOR_EVENTS = Object.freeze([
+  Object.freeze({
+    id:"fermo-linea",
+    t:"La linea si ferma per venti minuti",
+    d:"Una protezione scatta e il reparto resta fermo mentre arriva la manutenzione. Per una volta il ritmo si spezza davvero.",
+    opts:Object.freeze([
+      Object.freeze({n:"Stacchi un attimo",d:"+2 benessere · +1 lucidità",fx:{wellbeing:2,lucidita:1},
+        result:"Hai usato il fermo per respirare invece di riempire anche quei venti minuti."}),
+      Object.freeze({n:"Dai una mano a liberare l'area",d:"+1 affidabilità · −1 lucidità",fx:{reliability:1,lucidita:-1},
+        result:"Non hai riparato la macchina, ma hai aiutato a far trovare il reparto pronto quando la manutenzione è arrivata."})
+    ])
+  }),
+  Object.freeze({
+    id:"pausa-reparto",
+    t:"Alla pausa si forma il solito gruppetto",
+    d:"Dieci minuti alle macchinette. Non succede niente di enorme: è uno di quei momenti in cui il posto di lavoro smette di essere solo una linea.",
+    opts:Object.freeze([
+      Object.freeze({n:"Resti con gli altri",d:"+0,3 rete · +1 benessere",fx:{rete:.3,wellbeing:1},
+        result:"Avete parlato di niente e di tutto. Non è un contatto nuovo, ma smetti di essere uno che timbra e basta."}),
+      Object.freeze({n:"Ti prendi dieci minuti da solo",d:"+2 lucidità",fx:{lucidita:2},
+        result:"Hai lasciato il rumore fuori dalla pausa. Torni dentro con la testa più pulita."})
+    ])
+  }),
+  Object.freeze({
+    id:"caldo-reparto",
+    t:"Oggi in reparto si muore di caldo",
+    d:"L'aria gira male e dopo qualche ora il turno comincia a pesare più del normale. Puoi chiedere di ruotare o stringere i denti.",
+    opts:Object.freeze([
+      Object.freeze({n:"Chiedi una rotazione",d:"+1 benessere",fx:{wellbeing:1},
+        result:"Hai cambiato postazione per un pezzo del turno e hai evitato di arrivare cotto alla fine."}),
+      Object.freeze({n:"Tieni la postazione",d:"+1 affidabilità · −2 benessere",fx:{reliability:1,wellbeing:-2},
+        result:"Hai portato fino in fondo la postazione senza chiedere cambi. Il capo lo nota, il corpo pure."})
+    ])
+  }),
+  Object.freeze({
+    id:"protezione-allentata",
+    t:"Una protezione non ti convince",
+    d:"Non è un'emergenza, ma una copertura vibra più del solito. Fermare e segnalarla rallenta il reparto; ignorarla è più comodo adesso.",
+    opts:Object.freeze([
+      Object.freeze({n:"La segnali subito",d:"+2 affidabilità · −1 lucidità",fx:{reliability:2,lucidita:-1},
+        result:"Hai fatto controllare la protezione prima che diventasse un problema vero."}),
+      Object.freeze({n:"La lasci al controllo successivo",d:"+1 benessere · −1 affidabilità",fx:{wellbeing:1,reliability:-1},
+        result:"Il turno scorre senza fermate, ma hai lasciato a qualcun altro una cosa che avevi già visto."})
+    ])
+  }),
+  Object.freeze({
+    id:"ordine-chiuso",
+    t:"Il lotto finisce prima del previsto",
+    d:"Per una volta siete avanti. Restano minuti buoni prima della chiusura del turno e nessuno sta correndo.",
+    opts:Object.freeze([
+      Object.freeze({n:"Dai una mano alla linea accanto",d:"+1 affidabilità · +0,2 rete · −1 benessere",fx:{reliability:1,rete:.2,wellbeing:-1},
+        result:"Sei andato dove erano ancora sotto. Ti sei caricato un po' di lavoro in più, ma non è passato inosservato."}),
+      Object.freeze({n:"Chiudi con calma",d:"+2 benessere · +1 lucidità",fx:{wellbeing:2,lucidita:1},
+        result:"Hai finito pulito, sistemato la postazione e lasciato che una giornata buona restasse una giornata buona."})
+    ])
+  }),
+  Object.freeze({
+    id:"rumore-anomalo",
+    t:"Una macchina fa un rumore che ieri non faceva",
+    d:"Continua a lavorare, ma il rumore è nuovo. Può essere niente oppure l'inizio del fermo che nessuno vuole.",
+    opts:Object.freeze([
+      Object.freeze({n:"La fai controllare",d:"+1 affidabilità · +1 lucidità",fx:{reliability:1,lucidita:1},
+        result:"Il controllo non trova un guasto grave, ma hai tolto il dubbio prima che diventasse il pensiero di tutto il turno."}),
+      Object.freeze({n:"Aspetti fine turno",d:"−1 lucidità",fx:{lucidita:-1},
+        result:"La macchina ha continuato a girare. Anche tu, con quel rumore in testa fino alla sirena."})
+    ])
+  }),
+  Object.freeze({
+    id:"responsabile-visita",
+    t:"Il responsabile passa più tempo del solito in reparto",
+    d:"Non è un'ispezione formale. Guarda numeri, postazioni e come gira il lavoro. C'è spazio per farsi vedere, nel bene o nel male.",
+    opts:Object.freeze([
+      Object.freeze({n:"Gli fai una segnalazione concreta",d:"+1 affidabilità · −1 lucidità",fx:{reliability:1,lucidita:-1},
+        result:"Hai parlato di una cosa precisa invece di fare scena. La risposta è stata corta, ma ti ha ascoltato."}),
+      Object.freeze({n:"Fai il tuo e basta",d:"+1 benessere",fx:{wellbeing:1},
+        result:"Non hai cercato attenzione. Hai fatto il tuo turno senza aggiungere altra pressione."})
+    ])
+  }),
+  Object.freeze({
+    id:"collega-in-calo",
+    t:"Quello accanto a te oggi è in difficoltà",
+    d:"Lo vedi rallentare da un po'. Non è un evento da eroe: puoi coprirgli qualche passaggio oppure chiamare chi coordina il reparto.",
+    opts:Object.freeze([
+      Object.freeze({n:"Gli copri qualche passaggio",d:"+0,3 rete · −1 benessere",fx:{rete:.3,wellbeing:-1},
+        result:"Gli hai tolto pressione per un pezzo del turno. A fine giornata se lo ricorda."}),
+      Object.freeze({n:"Chiami chi coordina",d:"+1 affidabilità · +1 lucidità",fx:{reliability:1,lucidita:1},
+        result:"Hai fatto gestire il problema a chi deve farlo invece di caricartelo tutto addosso."})
+    ])
+  }),
+  Object.freeze({
+    id:"materiale-in-ritardo",
+    t:"Il materiale arriva tardi alla linea",
+    d:"Per quasi mezz'ora non puoi produrre al ritmo previsto. Il ritardo non dipende da te, ma il clima del reparto cambia lo stesso.",
+    opts:Object.freeze([
+      Object.freeze({n:"Prepari tutto per la ripartenza",d:"+1 affidabilità · +1 lucidità",fx:{reliability:1,lucidita:1},
+        result:"Quando il materiale arriva siete già pronti. Il ritardo resta, il caos no."}),
+      Object.freeze({n:"Usi il buco per respirare",d:"+2 benessere",fx:{wellbeing:2},
+        result:"Non puoi inventarti materiale che non c'è. Hai preso il respiro che il turno ti ha regalato."})
+    ])
+  }),
+  Object.freeze({
+    id:"giornata-liscia",
+    t:"Oggi fila tutto liscio",
+    d:"Nessun guasto, nessun casino, nessuno che corre urlando. Anche in Fabbrica esistono turni che fanno semplicemente il loro lavoro.",
+    opts:Object.freeze([
+      Object.freeze({n:"Mantieni il ritmo senza strafare",d:"+2 benessere · +1 lucidità",fx:{wellbeing:2,lucidita:1},
+        result:"Hai chiuso un turno normale senza trasformarlo per forza in una prova di resistenza."}),
+      Object.freeze({n:"Usi il margine per aiutare",d:"+1 affidabilità · +0,2 rete",fx:{reliability:1,rete:.2},
+        result:"Hai usato il margine per dare una mano dove serviva, senza mettere il reparto sotto pressione."})
+    ])
+  })
+]);
+
+function showFactoryFloor(job,s,roll){
+  if(!job || workKey(job)!=="fabbrica") return false;
+  if(!familyReady(s,"factory") || Number(roll)>=CFG.chance.factory) return false;
+  if(!claim("work-factory-floor")) return false;
+
+  if(!Array.isArray(s.factoryRecent)) s.factoryRecent=[];
+  const disponibili=FACTORY_FLOOR_EVENTS.filter(x=>!s.factoryRecent.includes(x.id));
+  const pool=disponibili.length?disponibili:FACTORY_FLOOR_EVENTS;
+  const scena=pool[Math.floor(Math.random()*pool.length)];
+
+  s.factoryRecent.unshift(scena.id);
+  if(s.factoryRecent.length>4) s.factoryRecent.length=4;
+  record(s,"factory",{status:"shown",eventId:scena.id,roleId:job.id});
+
+  if(typeof showEvent!=="function") return false;
+  showEvent({
+    k:"Fabbrica · Reparto",
+    t:scena.t,
+    d:scena.d,
+    annulla(){},
+    opts:scena.opts.map(opt=>({
+      n:opt.n,
+      d:opt.d,
+      run(){
+        const fx=applyFactoryRoleFx(opt.fx);
+        record(s,"factory",{
+          status:"resolved",eventId:scena.id,roleId:job.id,choice:opt.n,effects:fx
+        });
+        const saldo=Number(fx.reliability||0)+Number(fx.wellbeing||0)+
+          Number(fx.lucidita||0)+Number(fx.rete||0);
+        return {t:opt.result,c:saldo>0?"good":saldo<0?"bad":""};
+      }
+    }))
+  });
+  return true;
+}
+
 /* ==================== 4. COLLEGHI ==================== */
 
 function showColleague(job,s,roll){
@@ -893,6 +1052,7 @@ function afterShift(payload,rolls){
   if(career && showCareer(job,s,career)) return true;
   if(showMusic(job,s,r("music"))) return true;
   if(showFactoryRole(job,s,r("role"))) return true;
+  if(showFactoryFloor(job,s,r("factory"))) return true;
   if(showCrime(job,s,r("crime"))) return true;
   if(showColleague(job,s,r("colleague"))) return true;
   if(showPhysical(job,s,r("physical"))) return true;
